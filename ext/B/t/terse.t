@@ -10,20 +10,20 @@ use Test::More tests => 15;
 use_ok( 'B::Terse' );
 
 # indent should return a string indented four spaces times the argument
-is( B::Terse::indent(2), ' ' x 8, 'indent with an argument' );
-is( B::Terse::indent(), '', 'indent with no argument' );
+is( B::Terse::indent(2), ' ' x 8, 'indent works with an argument' );
+is( B::Terse::indent(), '', 'indent works with no argument' );
 
 # this should fail without a reference
 eval { B::Terse::terse('scalar') };
-like( $@, qr/not a reference/, 'terse() fed bad parameters' );
+like( $@, qr/not a reference/, 'terse() caught bad parameters okay' );
 
 # now point it at a sub and see what happens
 sub foo {}
 
 my $sub;
 eval{ $sub = B::Terse::compile('', 'foo') };
-is( $@, '', 'compile()' );
-ok( defined &$sub, 'valid subref back from compile()' );
+is( $@, '', 'compile() worked without error' );
+ok( defined &$sub, 'got a valid subref back from compile()' );
 
 # and point it at a real sub and hope the returned ops look alright
 my $out = tie *STDOUT, 'TieOut';
@@ -44,7 +44,7 @@ foreach (@lines) {
 	if (/^([A-Z]+)\s+/) {
 		my $op = $1;
 		next unless exists $ops{$op};
-		like( $_, $ops{$op}, "$op " );
+		like( $_, $ops{$op}, "$op appears okay" );
 		delete $ops{$op};
 		s/$ops{$op}//;
 		redo if $_;
@@ -78,22 +78,13 @@ sub bar {
 
 	# make a PV
 	$foo = "a string";
-
-	# make an OP_SUBSTCONT
-	$foo =~ s/(a)/$1/;
 }
 
-SKIP: {
-    use Config;
-    skip("- B::Terse won't grok RVs under ithreads yet", 1)
-	if $Config{useithreads};
-    # Schwern's example of finding an RV
-    my $path = join " ", map { qq["-I$_"] } @INC;
-    $path = '-I::lib -MMac::err=unix' if $^O eq 'MacOS';
-    my $redir = $^O eq 'MacOS' ? '' : "2>&1";
-    my $items = qx{$^X $path "-MO=Terse" -le "print \\42" $redir};
-    like( $items, qr/RV $hex \\42/, 'RV' );
-}
+# Schwern's example of finding an RV
+my $path = join " ", map { qq["-I$_"] } @INC;
+my $redir = $^O eq 'MacOS' ? '' : "2>&1";
+my $items = qx{$^X $path "-MO=Terse" -le "print \\42" $redir};
+like( $items, qr/RV $hex \\42/, 'found an RV, appears okay!' );
 
 package TieOut;
 
