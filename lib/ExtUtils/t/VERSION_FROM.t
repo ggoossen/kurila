@@ -1,5 +1,3 @@
-#!/usr/bin/perl -w
-
 BEGIN {
     if( $ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
@@ -21,7 +19,7 @@ use File::Path;
 
 perl_lib();
 
-mkdir('Odd-Version', 0777);
+mkdir 'Odd-Version';
 END { chdir File::Spec->updir;  rmtree 'Odd-Version' }
 chdir 'Odd-Version';
 
