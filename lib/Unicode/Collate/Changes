@@ -1,48 +1,5 @@
 Revision history for Perl extension Unicode::Collate.
 
-0.21  Sat Aug 03 10:24:00 2002
-    - upgrade keys.txt and t/test.t for UCA Version 9.
-
-0.20  Fri Jul 26 02:15:25 2002
-    - now UCA Version 9.
-    - U+FDD0..U+FDEF are new non-characters.
-    - fix: whitespace characters before @backwards etc. in a table file.
-    - now values for 'alternate', 'backwards', etc.,
-      which are explicitly specified via new(),
-      are preferred to those specified in a table file.
-
-0.12  Sun May 05 09:43:10 2002
-    - add new methods, ->UCA_Version and ->Base_Unicode_Version.
-    - test fix: removed the needless requirement of Unicode::Normalize.
-      [reported by David Hand]
-
-0.11  Fri May 03 02:28:10 2002
-    - fix: now derived collation elements can be used for Hangul Jamo
-      when their weights are not defined.
-      [reported by Andreas J. Koenig]
-    - fix: rearrangements had not worked.
-    - mentioned pleblem on index() in BUGS.
-    - more documents, more tests.
-    - tag names for 'alternate' are case-insensitive (i.e. 'SHIFTed' etc.).
-    - The <undef> value for the keys "overrideCJK", "overrideHangul",
-      "rearrange" has a special behavior (different from default).
-
-0.10  Tue Dec 11 23:26:42 2001
-    - now you are allowed to use no table file.
-    - fix: fetching CE with two or more combining characters.
-
-0.09  Sun Nov 11 17:02:40:18 2001
-    - add the following methods: eq, ne, lt, le, gt, le.
-    - relies on &Unicode::Normalize::getCombinClass()
-      in place of %Unicode::Normalize::Combin
-      (the hash is not defined in the XS version of Unicode::Normalize).
-      then you should install Unicode::Normalize 0.10 or later.
-    - now independent of Lingua::KO::Hangul::Util
-      (this module does decomposition of Hangul syllables for itself)
-
-0.08  Mon Aug 20 22:40:18 2001
-    - add the index method.
-
 0.07  Thu Aug 16 23:42:02 2001
     - rename the module name to Unicode::Collate.
 
