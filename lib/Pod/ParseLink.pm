@@ -1,5 +1,5 @@
 # Pod::ParseLink -- Parse an L<> formatting code in POD text.
-# $Id: ParseLink.pm,v 1.6 2002/07/15 05:46:00 eagle Exp $
+# $Id: ParseLink.pm,v 1.1 2001/11/15 07:58:57 eagle Exp $
 #
 # Copyright 2001 by Russ Allbery <rra@stanford.edu>
 #
@@ -34,7 +34,7 @@ use Exporter;
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
 # number should ideally be the same as the CVS revision in podlators, however.
-$VERSION = 1.06;
+$VERSION = 1.01;
 
 
 ##############################################################################
@@ -49,14 +49,14 @@ sub _parse_section {
 
     # If the whole link is enclosed in quotes, interpret it all as a section
     # even if it contains a slash.
-    return (undef, $1) if ($link =~ /^"\s*(.*?)\s*"$/);
+    return (undef, $1) if (/^"\s*(.*?)\s*"$/);
 
     # Split into page and section on slash, and then clean up quoting in the
     # section.  If there is no section and the name contains spaces, also
     # guess that it's an old section link.
     my ($page, $section) = split (/\s*\/\s*/, $link, 2);
-    $section =~ s/^"\s*(.*?)\s*"$/$1/ if $section;
-    if ($page && $page =~ / / && !defined ($section)) {
+    $section =~ s/^"\s*(.*?)\s*"$/$1/;
+    if ($page =~ / / && !defined ($section)) {
         $section = $page;
         $page = undef;
     } else {
@@ -95,7 +95,7 @@ sub parselink {
         }
         my ($name, $section) = _parse_section ($link);
         my $inferred = $text || _infer_text ($name, $section);
-        my $type = ($name && $name =~ /\(\S*\)/) ? 'man' : 'pod';
+        my $type = ($name =~ /\(\S*\)/) ? 'man' : 'pod';
         return ($text, $inferred, $name, $section, $type);
     }
 }
@@ -111,7 +111,7 @@ __END__
 
 =head1 NAME
 
-Pod::ParseLink - Parse an LE<lt>E<gt> formatting code in POD text
+Pod::ParseLink -- Parse an L<> formatting code in POD text
 
 =head1 SYNOPSIS
 
@@ -140,35 +140,12 @@ The inferred anchor text is implemented per L<perlpodspec>:
 
 The name may contain embedded EE<lt>E<gt> and ZE<lt>E<gt> formatting codes,
 and the section, anchor text, and inferred anchor text may contain any
-formatting codes.  Any double quotes around the section are removed as part
-of the parsing, as is any leading or trailing whitespace.
+formatting codes.  Any double quotes around the name or section are removed
+as part of the parsing, as are any leading or trailing whitespace.
 
-If the text of the LE<lt>E<gt> escape is entirely enclosed in double quotes,
-it's interpreted as a link to a section for backwards compatibility.
-
-No attempt is made to resolve formatting codes.  This must be done after
-calling parselink (since EE<lt>E<gt> formatting codes can be used to escape
-characters that would otherwise be significant to the parser and resolving
-them before parsing would result in an incorrect parse of a formatting code
-like:
-
-    L<verticalE<verbar>barE<sol>slash>
-
-which should be interpreted as a link to the C<vertical|bar/slash> POD page
-and not as a link to the C<slash> section of the C<bar> POD page with an
-anchor text of C<vertical>.  Note that not only the anchor text will need to
-have formatting codes expanded, but so will the target of the link (to deal
-with EE<lt>E<gt> and ZE<lt>E<gt> formatting codes), and special handling of
-the section may be necessary depending on whether the translator wants to
-consider markup in sections to be significant when resolving links.  See
-L<perlpodspec> for more information.
-
-=head1 SEE ALSO
-
-L<Pod::Parser>
-
-The current version of this module is always available from its web site at
-L<http://www.eyrie.org/~eagle/software/podlators/>.
+No attempt is made to resolve formatting codes.  The caller must be prepared
+to do that either before or after calling parselink().  (This is because
+interpretation of EE<lt>E<gt> formatting codes may vary by formatter.)
 
 =head1 AUTHOR
 
