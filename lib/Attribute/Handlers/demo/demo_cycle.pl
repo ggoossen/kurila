@@ -1,25 +1,9 @@
-package Selfish;
+use Attribute::Handlers autotie => { Cycle => Tie::Cycle };
 
-sub TIESCALAR {
-	use Data::Dumper 'Dumper';
-	print Dumper [ \@_ ];
-	bless [ @_[1..$#_] ], $_[0];
+my $next : Cycle(['A'..'Z']);
+
+print tied $next, "\n";
+
+while (<>) {
+	print $next, "\n";
 }
-
-sub FETCH {
-	use Data::Dumper 'Dumper';
-	Dumper [ @{$_[0]} ];
-}
-
-package main;
-
-use Attribute::Handlers autotieref => { Selfish => Selfish };
-
-my $next : Selfish("me");
-print "$next\n";
-
-my $last : Selfish("you","them","who?");
-print "$last\n";
-
-my $other : Selfish(["you","them","who?"]);
-print "$other\n";
