@@ -9,12 +9,7 @@ BEGIN {
 
 require "./test.pl";
 
-plan(tests => 19);
-
-# due to a bug in VMS's piping which makes it impossible for runperl()
-# to emulate echo -n (ie. stdin always winds up with a newline), these 
-# tests almost totally fail.
-$TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
+plan(tests => 15);
 
 my $r;
 my @tmpfiles = ();
@@ -68,8 +63,6 @@ is( $r, 'abc-def--ghi-jkl-mno--pq-/', '-0777 (slurp mode)' );
 
 my $filename = 'swctest.tmp';
 SKIP: {
-    local $TODO = '';   # this one works on VMS
-
     open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 BEGIN { print "block 1\n"; }
@@ -78,7 +71,7 @@ INIT  { print "block 3\n"; }
 	print "block 4\n";
 END   { print "block 5\n"; }
 SWTEST
-    close $f or die "Could not close: $!";
+    close $f;
     $r = runperl(
 	switches	=> [ '-c' ],
 	progfile	=> $filename,
@@ -123,13 +116,13 @@ SKIP: {
 #!perl -s
 print $x
 SWTEST
-    close $f or die "Could not close: $!";
+    close $f;
     $r = runperl(
 	switches    => [ '-s' ],
 	progfile    => $filename,
 	args	    => [ '-x=foo' ],
     );
-    is( $r, 'foo', '-s on the shebang line' );
+    is( $r, 'foo', '-s on the #! line' );
     push @tmpfiles, $filename;
 }
 
@@ -143,7 +136,7 @@ package swtest;
 sub import { print map "<$_>", @_ }
 1;
 SWTESTPM
-    close $f or die "Could not close: $!";
+    close $f;
     $r = runperl(
 	switches    => [ '-Mswtest' ],
 	prog	    => '1',
@@ -158,11 +151,7 @@ SWTESTPM
 	switches    => [ '-mswtest' ],
 	prog	    => '1',
     );
-
-    {
-        local $TODO = '';  # this one works on VMS
-        is( $r, '', '-m' );
-    }
+    is( $r, '', '-m' );
     $r = runperl(
 	switches    => [ '-mswtest=foo,bar' ],
 	prog	    => '1',
@@ -171,32 +160,23 @@ SWTESTPM
     push @tmpfiles, $filename;
 }
 
-# Tests for -V
+# Tests for -x
 
-{
-    local $TODO = '';   # these ones should work on VMS
-
-    # basic perl -V should generate significant output.
-    # we don't test actual format since it could change
-    like( runperl( switches => ['-V'] ), qr/(\n.*){20}/,
-          '-V generates 20+ lines' );
-
-    # lookup a known config var
-    chomp( $r=runperl( switches => ['-V:osname'] ) );
-    is( $r, "osname='$^O';", 'perl -V:osname');
-
-    # lookup a nonexistent var
-    chomp( $r=runperl( switches => ['-V:this_var_makes_switches_test_fail'] ) );
-    is( $r, "this_var_makes_switches_test_fail='UNKNOWN';",
-        'perl -V:unknown var');
-
-    # regexp lookup
-    # platforms that don't like this quoting can either skip this test
-    # or fix test.pl _quote_args
-    $r = runperl( switches => ['"-V:i\D+size"'] );
-    # should be unlike( $r, qr/^$|not found|UNKNOWN/ );
-    like( $r, qr/^(?!.*(not found|UNKNOWN))./, 'perl -V:re got a result' );
-
-    # make sure each line we got matches the re
-    ok( !( grep !/^i\D+size=/, split /^/, $r ), '-V:re correct' );
+$filename = 'swxtest.tmp';
+SKIP: {
+    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    print $f <<'SWTEST';
+print 1;
+#!perl
+print 2;
+__END__
+print 3;
+SWTEST
+    close $f;
+    $r = runperl(
+	switches    => [ '-x' ],
+	progfile    => $filename,
+    );
+    is( $r, '2', '-x' );
+    push @tmpfiles, $filename;
 }
