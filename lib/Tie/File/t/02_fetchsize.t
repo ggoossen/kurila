@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 
 my $file = "tf$$.txt";
-$: = Tie::File::_default_recsep();
-my $data = "rec1$:rec2$:rec3$:";
+my $data = "rec1$/rec2$/rec3$/";
 
 print "1..6\n";
 
@@ -16,11 +15,9 @@ print F $data;
 close F;
 
 
-my $o = tie @a, 'Tie::File', $file, autochomp => 0;
+my $o = tie @a, 'Tie::File', $file;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;
-
-$: = $o->{recsep};
 
 my $n;
 

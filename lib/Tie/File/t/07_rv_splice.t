@@ -4,12 +4,10 @@
 # (04_splice.t checks its effect on the file)
 #
 
-
 my $file = "tf$$.txt";
-$: = Tie::File::_default_recsep();
-my $data = "rec0$:rec1$:rec2$:";
+my $data = "rec0$/rec1$/rec2$/";
 
-print "1..56\n";
+print "1..50\n";
 
 my $N = 1;
 use Tie::File;
@@ -17,7 +15,7 @@ print "ok $N\n"; $N++;  # partial credit just for showing up
 
 init_file($data);
 
-my $o = tie @a, 'Tie::File', $file, autochomp => 0;
+my $o = tie @a, 'Tie::File', $file;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;
 
@@ -136,15 +134,15 @@ check_result('rec0', 'rec1');
 splice(@a, 0, 0, qw(I like pie));
 my $r;
 $r = splice(@a, 0, 0);
-print !defined($r) ? "ok $N\n" : "not ok $N \# return should have been undef, was <$r>\n";
+print !defined($r) ? "ok $N\n" : "not ok $N \# return should have been undef\n";
 $N++;
 
 $r = splice(@a, 2, 1);
-print $r eq "pie$:" ? "ok $N\n" : "not ok $N \# return should have been 'pie\\n', was <$r>\n";
+print $r eq "pie$/" ? "ok $N\n" : "not ok $N \# return should have been 'pie'\n";
 $N++;
 
 $r = splice(@a, 0, 2);
-print $r eq "like$:" ? "ok $N\n" : "not ok $N \# return should have been 'like\\n', was <$r>\n";
+print $r eq "like$/" ? "ok $N\n" : "not ok $N \# return should have been 'like'\n";
 $N++;
 
 # (49-50) Test default arguments
@@ -153,27 +151,6 @@ splice @a, 0, 0, (0..11);
 check_result(4..11);
 @r = splice @a;
 check_result(0..3);
-
-# (51-56) splice with negative length was treated wrong
-# 20020402 Reported by Juerd Waalboer
-@a = (0..8) ;
-@r = splice @a, 0, -3;
-check_result(0..5);
-@a = (0..8) ;
-@r = splice @a, 1, -3;
-check_result(1..5);
-@a = (0..8) ;
-@r = splice @a, 7, -3;
-check_result();
-@a = (0..2) ;
-@r = splice @a, 0, -3;
-check_result();
-@a = (0..2) ;
-@r = splice @a, 1, -3;
-check_result();
-@a = (0..2) ;
-@r = splice @a, 7, -3;
-check_result();
 
 sub init_file {
   my $data = shift;
@@ -187,7 +164,7 @@ sub init_file {
 # expected results are in @_
 sub check_result {
   my @x = @_;
-  s/$:$// for @r;
+  chomp @r;
   my $good = 1;
   $good = 0 unless @r == @x;
   for my $i (0 .. $#r) {
