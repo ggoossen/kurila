@@ -1,32 +1,29 @@
-Unicode/Normalize version 0.17
+Unicode/Normalize version 0.10
 ===================================
 
-Unicode::Normalize - Unicode Normalization Forms
+Unicode::Normalize - normalized forms of Unicode text
 
 SYNOPSIS
 
   use Unicode::Normalize;
 
-  $NFD_string  = NFD($string);  # Normalization Form D
-  $NFC_string  = NFC($string);  # Normalization Form C
-  $NFKD_string = NFKD($string); # Normalization Form KD
-  $NFKC_string = NFKC($string); # Normalization Form KC
+  $string_NFD  = NFD($string);  # Normalization Form D
+  $string_NFC  = NFC($string);  # Normalization Form C
+  $string_NFKD = NFKD($string); # Normalization Form KD
+  $string_NFKC = NFKC($string); # Normalization Form KC
 
-
-  or
-
+   or
 
   use Unicode::Normalize 'normalize';
 
-  $NFD_string  = normalize('D',  $string);  # Normalization Form D
-  $NFC_string  = normalize('C',  $string);  # Normalization Form C
-  $NFKD_string = normalize('KD', $string);  # Normalization Form KD
-  $NFKC_string = normalize('KC', $string);  # Normalization Form KC
-
+  $string_NFD  = normalize('D',  $string);  # Normalization Form D
+  $string_NFC  = normalize('C',  $string);  # Normalization Form C
+  $string_NFKD = normalize('KD', $string);  # Normalization Form KD
+  $string_NFKC = normalize('KC', $string);  # Normalization Form KC
 
 INSTALLATION
 
-Perl 5.6 or later
+Perl 5.006 or later
 
 To install this module type the following:
 
@@ -43,15 +40,6 @@ type the following:
    make test
    make install
 
-If you decide to install the NoXS version after trying to build the XS,
-type the following:
-
-   make clean
-   perl Makefile.PL noxs
-   make
-   make test
-   make install
-
 DEPENDENCIES
 
 This module requires these other modules and libraries:
@@ -60,35 +48,19 @@ Carp
 Exporter
 File::Copy
 File::Spec
-
-unicore/CombiningClass.pl         (or unicode/CombiningClass.pl)
-unicore/Decomposition.pl          (or unicode/Decomposition.pl)
-unicore/CompositionExclusions.txt (or unicode/CompExcl.txt)
-
-CAVEAT
-
-(1) In the perl-current, unicore/CompExcl.txt
-  is renamed unicore/CompositionExclusions.txt.
-
-(2) When these unicore/*.* files are updated;
-
-  in the case of an XS version:
-    You must rebuild the module,
-    as the data will be compiled on building.
-
-  in the case of a NoXS version:
-    Rebuilding is not necessary,
-    as the data will be read on requirement.
+Lingua::KO::Hangul::Util 0.06
+unicore/CombiningClass.pl or unicode/CombiningClass.pl
+unicore/Decomposition.pl  or unicode/Decomposition.pl
+unicore/CompExcl.txt      or unicode/CompExcl.txt
 
 COPYRIGHT AND LICENCE
 
-  SADAHIRO Tomoyuki
-
-  SADAHIRO@cpan.org
+SADAHIRO Tomoyuki, E<lt>SADAHIRO@cpan.orgE<gt>
 
   http://homepage1.nifty.com/nomenclator/perl/
 
-  Copyright(C) 2001-2002, SADAHIRO Tomoyuki. Japan. All rights reserved.
+  Copyright(C) 2001, SADAHIRO Tomoyuki. Japan. All rights reserved.
 
-  This program is free software; you can redistribute it and/or
+  This program is free software; you can redistribute it and/or 
   modify it under the same terms as Perl itself.
+
