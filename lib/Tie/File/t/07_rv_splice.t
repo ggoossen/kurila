@@ -4,6 +4,7 @@
 # (04_splice.t checks its effect on the file)
 #
 
+
 my $file = "tf$$.txt";
 $: = Tie::File::_default_recsep();
 my $data = "rec0$:rec1$:rec2$:";
@@ -16,7 +17,7 @@ print "ok $N\n"; $N++;  # partial credit just for showing up
 
 init_file($data);
 
-my $o = tie @a, 'Tie::File', $file;
+my $o = tie @a, 'Tie::File', $file, autochomp => 0;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;
 
@@ -135,15 +136,15 @@ check_result('rec0', 'rec1');
 splice(@a, 0, 0, qw(I like pie));
 my $r;
 $r = splice(@a, 0, 0);
-print !defined($r) ? "ok $N\n" : "not ok $N \# return should have been undef\n";
+print !defined($r) ? "ok $N\n" : "not ok $N \# return should have been undef, was <$r>\n";
 $N++;
 
 $r = splice(@a, 2, 1);
-print $r eq "pie$:" ? "ok $N\n" : "not ok $N \# return should have been 'pie'\n";
+print $r eq "pie$:" ? "ok $N\n" : "not ok $N \# return should have been 'pie\\n', was <$r>\n";
 $N++;
 
 $r = splice(@a, 0, 2);
-print $r eq "like$:" ? "ok $N\n" : "not ok $N \# return should have been 'like'\n";
+print $r eq "like$:" ? "ok $N\n" : "not ok $N \# return should have been 'like\\n', was <$r>\n";
 $N++;
 
 # (49-50) Test default arguments

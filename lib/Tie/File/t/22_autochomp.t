@@ -9,7 +9,7 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
-my $o = tie @a, 'Tie::File', $file, autochomp => 1, autodefer => 0;
+my $o = tie @a, 'Tie::File', $file, autochomp => 1;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;
 
@@ -141,18 +141,10 @@ sub expect {
     print $_[0] ? "ok $N\n" : "not ok $N\n";
   } elsif (@_ == 2) {
     my ($a, $x) = @_;
-    if    (! defined($a) && ! defined($x)) { print "ok $N\n" }
-    elsif (  defined($a) && ! defined($x)) { 
-      ctrlfix(my $msg = "expected UNDEF, got <$a>");
-      print "not ok $N \# $msg\n";
-    }
-    elsif (! defined($a) &&   defined($x)) { 
-      ctrlfix(my $msg = "expected <$x>, got UNDEF");
-      print "not ok $N \# $msg\n";
-    } elsif ($a eq $x) { print "ok $N\n" }
+    if ($a eq $x) { print "ok $N\n" }
     else {
       ctrlfix(my $msg = "expected <$x>, got <$a>");
-      print "not ok $N \# $msg\n";
+      print "not ok $N # $msg\n";
     }
   } else {
     die "expect() got ", scalar(@_), " args, should have been 1 or 2";

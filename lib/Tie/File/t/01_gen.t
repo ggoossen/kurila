@@ -8,7 +8,7 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
-my $o = tie @a, 'Tie::File', $file;
+my $o = tie @a, 'Tie::File', $file, autochomp => 0;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;
 
@@ -92,8 +92,9 @@ sub check_contents {
   my $good = 1;
   my $msg;
   for (0.. $#c) {
-    unless ($a[$_] eq "$c[$_]$:") {
-      $msg = "expected $c[$_]$:, got $a[$_]";
+    my $aa = $a[$_];
+    unless ($aa eq "$c[$_]$:") {
+      $msg = "expected <$c[$_]$:>, got <$aa>";
       ctrlfix($msg);
       $good = 0;
     }
