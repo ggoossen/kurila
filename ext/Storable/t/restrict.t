@@ -1,4 +1,5 @@
-#!./perl -w
+#!./perl
+
 #
 #  Copyright 2002, Larry Wall.
 #  
@@ -8,25 +9,14 @@
 
 sub BEGIN {
     chdir('t') if -d 't';
-    if ($ENV{PERL_CORE}){
-	@INC = ('.', '../lib', '../ext/Storable/t');
-        require Config;
-        if ($Config::Config{'extensions'} !~ /\bStorable\b/) {
-            print "1..0 # Skip: Storable was not built\n";
-            exit 0;
-        }
-    } else {
-        unless (eval "require Hash::Util") {
-            if ($@ =~ /Can\'t locate Hash\/Util\.pm in \@INC/) {
-                print "1..0 # Skip: No Hash::Util\n";
-                exit 0;
-            } else {
-                die;
-            }
-        }
-	unshift @INC, 't';
+    @INC = '.'; 
+    push @INC, '../lib';
+    require Config; import Config;
+    if ($Config{'extensions'} !~ /\bStorable\b/) {
+        print "1..0 # Skip: Storable was not built\n";
+        exit 0;
     }
-    require 'st-dump.pl';
+    require 'lib/st-dump.pl';
 }
 
 
@@ -77,7 +67,7 @@ sub testit {
   unless (ok ++$test, !$@, "Can assign to reserved key 'extra'?") {
     my $diag = $@;
     $diag =~ s/\n.*\z//s;
-    print "# \$\@: $diag\n";
+    print "# \$@: $diag\n";
   }
 
   eval { $copy->{nono} = 7 } ;
@@ -96,3 +86,4 @@ for $Storable::canonical (0, 1) {
   my $object = \%hash;
   # bless {}, "Restrict_Test";
 }
+

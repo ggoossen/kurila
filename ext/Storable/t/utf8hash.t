@@ -1,4 +1,8 @@
 #!./perl
+#
+# $Id: utf8.t,v 1.0.1.2 2000/09/28 21:44:17 ram Exp $
+#
+#
 
 sub BEGIN {
     if ($] < 5.007) {
@@ -7,10 +11,8 @@ sub BEGIN {
     }
     if ($ENV{PERL_CORE}){
 	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-	push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-    } else {
-	unshift @INC, 't';
+	@INC = '.'; 
+	push @INC, '../lib';
     }
     require Config; import Config;
     if ($ENV{PERL_CORE}){
@@ -19,6 +21,7 @@ sub BEGIN {
 	    exit 0;
 	}
     }
+    # require 'lib/st-dump.pl';
 }
 
 use strict;
@@ -35,19 +38,13 @@ use bytes ();
 use Encode qw(is_utf8);
 my %utf8hash;
 
-$Storable::canonical = $Storable::canonical; # Shut up a used only once warning.
-
 for $Storable::canonical (0, 1) {
 
 # first we generate a nasty hash which keys include both utf8
 # on and off with identical PVs
 
-no utf8; # we have a naked 8-bit byte below (in Latin 1, anyway)
-
-# In Latin 1 -ese the below ord() should end up 0xc0 (192),
-# in EBCDIC 0x64 (100).  Both should end up being UTF-8/UTF-EBCDIC.
 my @ords = (
-	    ord("Á"), # LATIN CAPITAL LETTER A WITH GRAVE
+	    0xc0,   # LATIN CAPITAL LETTER A WITH GRAVE
 	    0x3000, #IDEOGRAPHIC SPACE
 	   );
 
