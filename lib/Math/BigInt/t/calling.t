@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# test calling conventions, and :constant overloading
+# test calling conventions
 
 use strict;
 use Test;
@@ -8,35 +8,9 @@ use Test;
 BEGIN 
   {
   $| = 1;
-  # to locate the testing files
-  my $location = $0; $location =~ s/calling.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    # testing with the core distribution
-    @INC = qw(../lib);
-    }
-  else
-    {
-    unshift @INC, '../lib';
-    }
-  if (-d 't')
-    {
-    chdir 't';
-    require File::Spec;
-    unshift @INC, File::Spec->catdir(File::Spec->updir, $location);
-    }
-  else
-    {
-    unshift @INC, $location;
-    }
-  print "# INC = @INC\n";
-  my $tests = 161;
-  plan tests => $tests;
-  if ($] < 5.006)
-    {
-    for (1..$tests) { skip (1,'Not supported on older Perls'); }
-    exit;
-    }
+  # chdir 't' if -d 't';
+  unshift @INC, '../lib'; # for running manually
+  plan tests => 100;
   }
 
 package Math::BigInt::Test;
@@ -59,7 +33,6 @@ use Math::BigInt;
 use Math::BigFloat;
 
 my ($x,$y,$z,$u);
-my $version = '1.61';	# adjust manually to match latest release
 
 ###############################################################################
 # check whether op's accept normal strings, even when inherited by subclasses
@@ -69,7 +42,7 @@ my $version = '1.61';	# adjust manually to match latest release
 my ($func,@args,$ans,$rc,$class,$try);
 while (<DATA>)
   {
-  chomp;
+  chop;
   next if /^#/; # skip comments
   if (s/^&//)
     {
@@ -82,53 +55,13 @@ while (<DATA>)
     foreach $class (qw/
       Math::BigInt Math::BigFloat Math::BigInt::Test Math::BigFloat::Test/)
       {
-      $try = "'$args[0]'"; 			# quote it
-      $try = $args[0] if $args[0] =~ /'/;	# already quoted
-      $try = '' if $args[0] eq '';		# undef, no argument
-      $try = "$class\->$func($try);";
+      $try = "$class\->$func('$args[0]');";
       $rc = eval $try;
       print "# Tried: '$try'\n" if !ok ($rc, $ans);
       }
     } 
 
   }
-
-$class = 'Math::BigInt';
-
-# test whether use Math::BigInt qw/version/ works
-$try = "use $class ($version.'1');";
-$try .= ' $x = $class->new(123); $x = "$x";';
-eval $try;
-ok_undef ( $_ );               # should result in error!
-
-# test whether fallback to calc works
-$try = "use $class ($version,'lib','foo, bar , ');";
-$try .= "$class\->config()->{lib};";
-$ans = eval $try;
-ok ( $ans, "Math::BigInt::Calc");
-
-# test whether constant works or not, also test for qw($version)
-# bgcd() is present in subclass, too
-$try = "use Math::BigInt ($version,'bgcd',':constant');";
-$try .= ' $x = 2**150; bgcd($x); $x = "$x";';
-$ans = eval $try;
-ok ( $ans, "1427247692705959881058285969449495136382746624");
-
-# test wether Math::BigInt::Scalar via use works (w/ dff. spellings of calc)
-$try = "use $class ($version,'lib','Scalar');";
-$try .= ' $x = 2**10; $x = "$x";';
-$ans = eval $try; ok ( $ans, "1024");
-$try = "use $class ($version,'LiB','$class\::Scalar');";
-$try .= ' $x = 2**10; $x = "$x";';
-$ans = eval $try; ok ( $ans, "1024");
-
-# test wether calc => undef (array element not existing) works
-# no longer supported
-#$try = "use $class ($version,'LIB');";
-#$try = "require $class; $class\::import($version,'CALC');";
-#$try .= " \$x = $class\->new(2)**10; \$x = ".'"$x";';
-#print "$try\n";
-#$ans = eval $try; ok ( $ans, 1024);
 
 # all done
 
@@ -165,35 +98,17 @@ inf:1
 &bstr
 5:5
 10:10
--10:-10
 abc:NaN
-'+inf':inf
-'-inf':-inf
++inf:inf
+-inf:-inf
 &bsstr
 1:1e+0
 0:0e+1
 2:2e+0
 200:2e+2
--5:-5e+0
--100:-1e+2
-abc:NaN
-'+inf':inf
 &babs
 -1:1
 1:1
 &bnot
 -2:1
 1:-2
-&bzero
-:0
-&bnan
-:NaN
-abc:NaN
-&bone
-:1
-'+':1
-'-':-1
-&binf
-:inf
-'+':inf
-'-':-inf
