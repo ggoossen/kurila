@@ -6,7 +6,7 @@ perlpacktut - tutorial on C<pack> and C<unpack>
 
 C<pack> and C<unpack> are two functions for transforming data according
 to a user-defined template, between the guarded way Perl stores values
-and some well-defined representation as might be required in the 
+and some well-defined  representation as might be required in the 
 environment of a Perl program. Unfortunately, they're also two of 
 the most misunderstood and most often overlooked functions that Perl
 provides. This tutorial will demystify them for you.
@@ -42,7 +42,7 @@ of these two functions.
 To see how (un)packing works, we'll start with a simple template
 code where the conversion is in low gear: between the contents of a byte
 sequence and a string of hexadecimal digits. Let's use C<unpack>, since
-this is likely to remind you of a dump program, or some desperate last
+this is likely to remind you of a dump program, or some desparate last
 message unfortunate programs are wont to throw at you before they expire
 into the wild blue yonder. Assuming that the variable C<$mem> holds a 
 sequence of bytes that we'd like to inspect without assuming anything 
@@ -56,10 +56,10 @@ corresponding to a byte:
 
    41204d414e204120504c414e20412043414e414c2050414e414d41
 
-What was in this chunk of memory? Numbers, characters, or a mixture of
+What was in this chunk of memory? Numbers, charactes, or a mixture of
 both? Assuming that we're on a computer where ASCII (or some similar)
 encoding is used: hexadecimal values in the range C<0x40> - C<0x5A>
-indicate an uppercase letter, and C<0x20> encodes a space. So we might
+indicate an uppercase letter, and <0x20> encodes a space. So we might
 assume it is a piece of text, which some are able to read like a tabloid;
 but others will have to get hold of an ASCII table and relive that
 firstgrader feeling. Not caring too much about which way to read this,
@@ -109,7 +109,7 @@ numbers - which we've had to count by hand. So it's error-prone as well
 as horribly unfriendly.
 
 Or maybe we could use regular expressions:
-
+    
     while (<>) { 
         my($date, $desc, $income, $expend) = 
             m|(\d\d/\d\d/\d{4}) (.{27}) (.{7})(.*)|;
@@ -141,7 +141,7 @@ the headers, and a handy ruler so we can keep track of where we are.
     01/28/2001 Flea spray                                24.99
     01/29/2001 Camel rides to tourists      235.00
 
-From this, we can see that the date column stretches from column 1 to
+>From this, we can see that the date column stretches from column 1 to
 column 10 - ten characters wide. The C<pack>-ese for "character" is
 C<A>, and ten of them are C<A10>. So if we just wanted to extract the
 dates, we could say this:
@@ -340,7 +340,7 @@ Unpacking C<$ps> with the same template returns the original integer value:
    my( $s ) = unpack( 's', $ps );
 
 This is true for all numeric template codes. But don't expect miracles:
-if the packed value exceeds the allotted byte capacity, high order bits
+if the packed value exceeds the alotted byte capacity, high order bits
 are silently discarded, and unpack certainly won't be able to pull them
 back out of some magic hat. And, when you pack using a signed template
 code such as C<s>, an excess value may result in the sign bit
@@ -370,10 +370,10 @@ C and Perl. (If you'd like to use values from C<%Config> in your program
 you have to import it with C<use Config>.)
 
    signed unsigned  byte length in C   byte length in Perl       
-     s!     S!      sizeof(short)      $Config{shortsize}
-     i!     I!      sizeof(int)        $Config{intsize}
-     l!     L!      sizeof(long)       $Config{longsize}
-     q!     Q!      sizeof(long long)  $Config{longlongsize}
+   C<s!>  C<S!>     sizeof(short)      $Config{shortsize}
+   C<i!>  C<I!>     sizeof(int)        $Config{intsize}
+   C<l!>  C<L!>     sizeof(long)       $Config{longsize}
+   C<q!>  C<Q!>     sizeof(longlong)   $Config{longlongsize}
 
 The C<i!> and C<I!> codes aren't different from C<i> and C<I>; they are
 tolerated for completeness' sake.
@@ -382,7 +382,7 @@ tolerated for completeness' sake.
 =head2 Unpacking a Stack Frame
 
 Requesting a particular byte ordering may be necessary when you work with
-binary data coming from some specific architecture whereas your program could
+binary data coming from some specific architecture while your program could
 run on a totally different system. As an example, assume you have 24 bytes
 containing a stack frame as it happens on an Intel 8086:
 
@@ -423,11 +423,10 @@ together, we may now write:
        $si, $di, $bp, $ds, $es ) =
    unpack( 'v2' . ('vXXCC' x 5) . 'v5', $frame );
 
-We've taken some pains to construct the template so that it matches
+We've taken some pains to get construct the template so that it matches
 the contents of our frame buffer. Otherwise we'd either get undefined values,
 or C<unpack> could not unpack all. If C<pack> runs out of items, it will
-supply null strings (which are coerced into zeroes whenever the pack code
-says so).
+supply null strings.
 
 
 =head2 How to Eat an Egg on a Net
@@ -515,14 +514,14 @@ status register (a "-" stands for a "reserved" bit):
 
 Converting these two bytes to a string can be done with the unpack 
 template C<'b16'>. To obtain the individual bit values from the bit
-string we use C<split> with the "empty" separator pattern which dissects
+string we use C<split> with the "empty" separator pattern which splits
 into individual characters. Bit values from the "reserved" positions are
 simply assigned to C<undef>, a convenient notation for "I don't care where
 this goes".
 
    ($carry, undef, $parity, undef, $auxcarry, undef, $sign,
     $trace, $interrupt, $direction, $overflow) =
-      split( //, unpack( 'b16', $status ) );
+      split( '', unpack( 'b16', $status ) );
 
 We could have used an unpack template C<'b12'> just as well, since the
 last 4 bits can be ignored anyway. 
@@ -588,14 +587,14 @@ characters. Unicode 3.1 specifies 94,140 characters: The Basic Latin
 characters are assigned to the numbers 0 - 127. The Latin-1 Supplement with
 characters that are used in several European languages is in the next
 range, up to 255. After some more Latin extensions we find the character
-sets from languages using non-Roman alphabets, interspersed with a
+sets from languages using non-roman alphabets, interspersed with a
 variety of symbol sets such as currency symbols, Zapf Dingbats or Braille.
 (You might want to visit L<www.unicode.org> for a look at some of
 them - my personal favourites are Telugu and Kannada.)
 
 The Unicode character sets associates characters with integers. Encoding
 these numbers in an equal number of bytes would more than double the
-requirements for storing texts written in Latin alphabets.
+requirements for storing texts written in latin alphabets.
 The UTF-8 encoding avoids this by storing the most common (from a western
 point of view) characters in a single byte while encoding the rarer
 ones in three or more bytes.
@@ -619,22 +618,6 @@ Usually you'll want to pack or unpack UTF-8 strings:
    my @hebrew = unpack( 'U*', $utf );
 
 
-=head2 Another Portable Binary Encoding
-
-The pack code C<w> has been added to support a portable binary data
-encoding scheme that goes way beyond simple integers. (Details can
-be found at L<Casbah.org>, the Scarab project.)  A BER (Binary Encoded
-Representation) compressed unsigned integer stores base 128
-digits, most significant digit first, with as few digits as possible.
-Bit eight (the high bit) is set on each byte except the last. There
-is no size limit to BER encoding, but Perl won't go to extremes.
-
-   my $berbuf = pack( 'w*', 1, 128, 128+1, 128*128+127 );
-
-A hex dump of C<$berbuf>, with spaces inserted at the right places,
-shows 01 8100 8101 81807F. Since the last byte is always less than
-128, C<unpack> knows where to stop.
-
 
 =head1 Lengths and Widths
 
@@ -644,7 +627,7 @@ In the previous section we've seen a network message that was constructed
 by prefixing the binary message length to the actual message. You'll find
 that packing a length followed by so many bytes of data is a 
 frequently used recipe since appending a null byte won't work
-if a null byte may be part of the data. Here is an example where both
+if a null byte may be part of the data. - Here is an example where both
 techniques are used: after two null terminated strings with source and
 destination address, a Short Message (to a mobile phone) is sent after
 a length byte:
@@ -655,13 +638,13 @@ Unpacking this message can be done with the same template:
 
    ( $src, $dst, $len, $sm ) = unpack( 'Z*Z*CA*', $msg );
 
-There's a subtle trap lurking in the offing: Adding another field after
+There's a subtle trap lurking in the offings: Adding another field after
 the Short Message (in variable C<$sm>) is all right when packing, but this
 cannot be unpacked naively:
 
    # pack a message
    my $msg = pack( 'Z*Z*CA*C', $src, $dst, length( $sm ), $sm, $prio );
-
+   
    # unpack fails - $prio remains undefined!
    ( $src, $dst, $len, $sm, $prio ) = unpack( 'Z*Z*CA*C', $msg );
 
@@ -683,7 +666,7 @@ is added after being converted with the template code after the slash.
 This saves us the trouble of inserting the C<length> call, but it is 
 in C<unpack> where we really score: The value of the length byte marks the
 end of the string to be taken from the buffer. Since this combination
-doesn't make sense except when the second pack code isn't C<a*>, C<A*>
+doesn't make sense execpt when the second pack code isn't C<a*>, C<A*>
 or C<Z*>, Perl won't let you.
 
 The pack code preceding C</> may be anything that's fit to represent a
@@ -695,19 +678,6 @@ C<A4> or C<Z*>:
    # unpack $buf: '13  Humpty-Dumpty'
    my $txt = unpack( 'A4/A*', $buf );
 
-C</> is not implemented in Perls before 5.6, so if your code is required to
-work on older Perls you'll need to C<unpack( 'Z* Z* C')> to get the length,
-then use it to make a new unpack string. For example
-
-   # pack a message: ASCIIZ, ASCIIZ, length, string, byte (5.005 compatible)
-   my $msg = pack( 'Z* Z* C A* C', $src, $dst, length $sm, $sm, $prio );
-
-   # unpack
-   ( undef, undef, $len) = unpack( 'Z* Z* C', $msg );
-   ($src, $dst, $sm, $prio) = unpack ( "Z* Z* x A$len C", $msg );
-
-But that second C<unpack> is rushing ahead. It isn't using a simple literal
-string for the template. So maybe we should introduce...
 
 =head2 Dynamic Templates
 
@@ -720,25 +690,34 @@ strings, with C<=> between the name and the value, followed by an
 additional delimiting null byte. Here's how:
 
    my $env = pack( 'A*A*Z*' x keys( %Env ) . 'C',
-                   map( { ( $_, '=', $Env{$_} ) } keys( %Env ) ), 0 );
-
-Let's examine the cogs of this byte mill, one by one. There's the C<map>
-call, creating the items we intend to stuff into the C<$env> buffer:
-to each key (in C<$_>) it adds the C<=> separator and the hash entry value.
-Each triplet is packed with the template code sequence C<A*A*Z*> that
-is multiplied with the number of keys. (Yes, that's what the C<keys>
-function returns in scalar context.) To get the very last null byte,
-we add a C<0> at the end of the C<pack> list, to be packed with C<C>.
-(Attentive readers may have noticed that we could have omitted the 0.)
+                   map{ ( $_, '=', $Env{$_} ) } keys( %Env ), 0 );
 
 For the reverse operation, we'll have to determine the number of items
 in the buffer before we can let C<unpack> rip it apart:
 
-   my $n = $env =~ tr/\0// - 1;
-   my %env = map( split( /=/, $_ ), unpack( 'Z*' x $n, $env ) );
+   my $n = ( $env =~ s/\0/\0/g - 1 );
+   my %env = map { split( '=', $_ ) } unpack( 'Z*' x $n, $env );
 
-The C<tr> counts the null bytes. The C<unpack> call returns a list of
-name-value pairs each of which is taken apart in the C<map> block. 
+The substitution counts the null bytes. The C<unpack> call returns a
+list of name-value pairs each of which is taken apart in the C<map>
+block.
+
+
+=head2 Another Portable Binary Encoding
+
+The pack code C<w> has been added to support a portable binary data
+encoding scheme that goes way beyond simple integers. (Details can
+be found at L<Casbah.org>, the Scarab project.)  A BER (Binary Encoded
+Representation) compressed unsigned integer stores base 128
+digits, most significant digit first, with as few digits as possible.
+Bit eight (the high bit) is set on each byte except the last. There
+is no size limit to BER encoding, but Perl won't go to extremes.
+
+   my $berbuf = pack( 'w*', 1, 128, 128+1, 128*128+127 );
+
+A hex dump of C<$berbuf>, with spaces inserted at the right places,
+shows 01 8100 8101 81807F. Since the last byte is always less than
+128, C<unpack> knows where to stop.
 
 
 =head1 Packing and Unpacking C Structures
@@ -759,9 +738,7 @@ memory, or to or from a CPU register, if it is aligned at an even or
 multiple-of-four or even at a multiple-of eight address, a C compiler
 will give you this speed benefit by stuffing extra bytes into structures.
 If you don't cross the C shoreline this is not likely to cause you any
-grief (although you should care when you design large data structures,
-or you want your code to be portable between architectures (you do want
-that, don't you?)).
+grief (although you should care when you design large data structures).
 
 To see how this affects C<pack> and C<unpack>, we'll compare these two
 C structures:
@@ -814,10 +791,7 @@ from the list:
   my $gappy = pack( 'cxs cxxx l!', $c1, $s, $c2, $l );
 
 Note the C<!> after C<l>: We want to make sure that we pack a long
-integer as it is compiled by our C compiler. And even now, it will only
-work for the platforms where the compiler aligns things as above.
-And somebody somewhere has a platform where it doesn't.
-[Probably a Cray, where C<short>s, C<int>s and C<long>s are all 8 bytes. :-)]
+integer as it is compiled by our C compiler.
 
 Counting bytes and watching alignments in lengthy structures is bound to 
 be a drag. Isn't there a way we can create the template with a simple
@@ -836,7 +810,7 @@ program? Here's a C program that does the trick:
    #define Pt(struct,field,tchar) \
      printf( "@%d%s ", offsetof(struct,field), # tchar );
 
-   int main() {
+   int main(){
      Pt( gappy_t, fc1, c  );
      Pt( gappy_t, fs,  s! );
      Pt( gappy_t, fc2, c  );
@@ -885,18 +859,7 @@ of each component as well. Thus the correct template is:
    pack( 's!ax' x @buffer,
          map{ ( $_->{count}, $_->{glyph} ) } @buffer );
 
-=head2 Alignment, Take 3
 
-And even if you take all the above into account, ANSI still lets this:
-
-   typedef struct {
-     char     foo[2];
-   } foo_t;
-
-vary in size. The alignment constraint of the structure can be greater than
-any of its elements. [And if you think that this doesn't affect anything
-common, dismember the next cellphone that you see. Many have ARM cores, and
-the ARM structure rules make C<sizeof (foo_t)> == 4]
 
 =head2 Pointers for How to Use Them
 
@@ -1033,26 +996,10 @@ and C<unpack>:
     # Prepare argument for the nanosleep system call
     my $timespec = pack( 'L!L!', $secs, $nanosecs );
 
-For a simple memory dump we unpack some bytes into just as 
-many pairs of hex digits, and use C<map> to handle the traditional
-spacing - 16 bytes to a line:
-
+    # A simple memory dump
     my $i;
-    print map { ++$i % 16 ? "$_ " : "$_\n" }
-          unpack( 'H2' x length( $mem ), $mem ),
-          length( $mem ) % 16 ? "\n" : '';
-
-
-=head1 Funnies Section
-
-    # Pulling digits out of nowhere...
-    print unpack( 'C', pack( 'x' ) ),
-          unpack( '%B*', pack( 'A' ) ),
-          unpack( 'H', pack( 'A' ) ),
-          unpack( 'A', unpack( 'C', pack( 'A' ) ) ), "\n";
-
-    # One for the road ;-)
-    my $advice = pack( 'all u can in a van' );
+    map { ++$i % 16 ? "$_ " : "$_\n" }
+    unpack( 'H2' x length( $mem ), $mem );
 
 
 =head1 Authors
