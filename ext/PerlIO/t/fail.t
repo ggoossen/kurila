@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
     require "../t/test.pl";
     skip_all("No perlio") unless (find PerlIO::Layer 'perlio');
-    plan (15);
+    plan (16);
 }
 
 use warnings 'layer';
@@ -21,27 +21,24 @@ ok(open(FH,"<",$file),"Normal open works");
 
 $warn = ''; $! = 0;
 ok(!binmode(FH,":-)"),"All punctuation fails binmode");
-print "# $!\n";
-isnt($!,0,"Got errno");
+like($!,'Invalid',"Got errno");
 like($warn,qr/in layer/,"Got warning");
 
 $warn = ''; $! = 0;
 ok(!binmode(FH,":nonesuch"),"Bad package fails binmode");
-print "# $!\n";
-isnt($!,0,"Got errno");
+like($!,'No such',"Got errno");
 like($warn,qr/nonesuch/,"Got warning");
 close(FH);
 
 $warn = ''; $! = 0;
 ok(!open(FH,"<:-)",$file),"All punctuation fails open");
-print "# $!\n";
-isnt($!,"","Got errno");
+like($!,"Invalid","Got errno");
 like($warn,qr/in layer/,"Got warning");
+isnt($!,"","Got errno");
 
 $warn = ''; $! = 0;
 ok(!open(FH,"<:nonesuch",$file),"Bad package fails open");
-print "# $!\n";
-isnt($!,0,"Got errno");
+like($!,"No such","Got errno");
 like($warn,qr/nonesuch/,"Got warning");
 
 ok(open(FH,"<",$file),"Normal open (still) works");
