@@ -26,13 +26,14 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 1528;
+  plan tests => 1585;
   }
 
 use Math::BigInt;
 use Math::BigFloat;
 
-use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup);
+use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup $CL);
 $class = "Math::BigFloat";
+$CL = "Math::BigInt::Calc";
    
 require 'bigfltpm.inc';	# all tests here for sharing

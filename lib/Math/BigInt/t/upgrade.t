@@ -10,10 +10,9 @@ BEGIN
   my $location = $0; $location =~ s/upgrade.t//i;
   if ($ENV{PERL_CORE})
     {
-    # testing with the core distribution
-    @INC = qw(../t/lib);
+    @INC = qw(../t/lib);                # testing with the core distribution
     }
-  unshift @INC, qw(../lib);     # to locate the modules
+  unshift @INC, '../lib';       # for testing manually
   if (-d 't')
     {
     chdir 't';
@@ -26,8 +25,7 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 2072
-   + 2;			# our own tests
+  plan tests => 1991;
   }
 
 use Math::BigInt upgrade => 'Math::BigFloat';
@@ -40,6 +38,5 @@ $CL = "Math::BigInt::Calc";
 $ECL = "Math::BigFloat";
 
 ok (Math::BigInt->upgrade(),'Math::BigFloat');
-ok (Math::BigInt->downgrade()||'','');
 
 require 'upgrade.inc';	# all tests here for sharing

@@ -34,9 +34,9 @@ sub _swap
 ##############################################################################
 package main;
 
-my $CALC = $class->_core_lib(); ok ($CALC,$CL);
+my $CALC = $class->config()->{lib}; ok ($CALC,$CL);
 
-my ($f,$z,$a,$exp,@a,$m,$e,$round_mode);
+my ($f,$z,$a,$exp,@a,$m,$e,$round_mode,$expected_class);
 
 while (<DATA>) 
   {
@@ -52,12 +52,17 @@ while (<DATA>)
     }
 
   @args = split(/:/,$_,99); $ans = pop(@args);
+  $expected_class = $class;
+  if ($ans =~ /(.*?)=(.*)/)
+    {
+    $expected_class = $2; $ans = $1;
+    }
   $try = "\$x = $class->new(\"$args[0]\");";
   if ($f eq "bnorm")
     {
     $try = "\$x = $class->bnorm(\"$args[0]\");";
   # some is_xxx tests
-   } elsif ($f =~ /^is_(zero|one|odd|even|negative|positive|nan)$/) {
+   } elsif ($f =~ /^is_(zero|one|odd|even|negative|positive|nan|int)$/) {
     $try .= "\$x->$f();";
    } elsif ($f eq "as_hex") {
     $try .= '$x->as_hex();';
@@ -70,7 +75,7 @@ while (<DATA>)
    } elsif ($f eq "bone") {
     $try .= "\$x->bone('$args[1]');";
    # some unary ops
-   } elsif ($f =~ /^b(nan|floor|ceil|sstr|neg|abs|inc|dec|not|sqrt)$/) {
+   } elsif ($f =~ /^b(nan|floor|ceil|sstr|neg|abs|inc|dec|not|sqrt|fac)$/) {
     $try .= "\$x->$f();";
    } elsif ($f eq "length") {
     $try .= '$x->length();';
@@ -177,6 +182,7 @@ while (<DATA>)
     {
     # print "try: $try ans: $ans1 $ans\n";
     print "# Tried: '$try'\n" if !ok ($ans1, $ans);
+    ok (ref($ans),$expected_class) if $expected_class ne $class;
     }
   # check internal state of number objects
   is_valid($ans1,$f) if ref $ans1; 
@@ -562,6 +568,13 @@ NaNneg:0
 +inf:1
 -inf:0
 NaNneg:0
+&is_int
+-inf:0
++inf:0
+NaNis_int:0
+1:1
+0:1
+123e12:1
 &is_odd
 abc:0
 0:0
@@ -572,6 +585,8 @@ abc:0
 10000001:1
 10000002:0
 2:0
+120:0
+121:1
 &is_even
 abc:0
 0:1
@@ -582,6 +597,8 @@ abc:0
 10000001:0
 10000002:1
 2:1
+120:1
+121:0
 &bacmp
 +0:-0:0
 +0:+1:-1
@@ -836,6 +853,10 @@ abc:abc:NaN
 +12:2:10:1200
 +1234:-3:10:NaN
 1234567890123:12:10:1234567890123000000000000
+-3:1:2:-6
+-5:1:2:-10
+-2:1:2:-4
+-102533203:1:2:-205066406
 &brsft
 abc:abc:NaN
 +8:+2:2
@@ -854,6 +875,27 @@ abc:abc:NaN
 1230000000000:10:10:123
 09876123456789067890:12:10:9876123
 1234561234567890123:13:10:123456
+820265627:1:2:410132813
+# test shifting negative numbers in base 2
+-15:1:2:-8
+-14:1:2:-7
+-13:1:2:-7
+-12:1:2:-6
+-11:1:2:-6
+-10:1:2:-5
+-9:1:2:-5
+-8:1:2:-4
+-7:1:2:-4
+-6:1:2:-3
+-5:1:2:-3
+-4:1:2:-2
+-3:1:2:-2
+-2:1:2:-1
+-1:1:2:-1
+-1640531254:2:2:-410132814
+-1640531254:1:2:-820265627
+-820265627:1:2:-410132814
+-205066405:1:2:-102533203
 &bsstr
 1e+34:1e+34
 123.456E3:123456e+0
@@ -940,8 +982,8 @@ abc:NaN
 abc:abc:NaN
 abc:0:NaN
 +0:abc:NaN
-+inf:-inf:0
--inf:+inf:0
++inf:-inf:NaN
+-inf:+inf:NaN
 +inf:+inf:inf
 -inf:-inf:-inf
 baddNaN:+inf:NaN
@@ -988,8 +1030,8 @@ abc:+0:NaN
 +0:abc:NaN
 +inf:-inf:inf
 -inf:+inf:-inf
-+inf:+inf:0
--inf:-inf:0
++inf:+inf:NaN
+-inf:-inf:NaN
 +0:+0:0
 +1:+0:1
 +0:+1:-1
@@ -1091,6 +1133,8 @@ NaNmul:-inf:NaN
 4095:-4095:-1,0
 -4095:4095:-1,0
 123:2:61,1
+9:5:1,4
+9:4:2,1
 # inf handling and general remainder
 5:8:0,5
 0:8:0,0
@@ -1110,10 +1154,10 @@ inf:-5:-inf,0
 -inf:-5:inf,0
 5:5:1,0
 -5:-5:1,0
-inf:inf:1,0
--inf:-inf:1,0
--inf:inf:-1,0
-inf:-inf:-1,0
+inf:inf:NaN,NaN
+-inf:-inf:NaN,NaN
+-inf:inf:NaN,NaN
+inf:-inf:NaN,NaN
 8:0:inf,8
 inf:0:inf,inf
 # exceptions to reminder rule
@@ -1138,10 +1182,10 @@ inf:-5:-inf
 -inf:-5:inf
 5:5:1
 -5:-5:1
-inf:inf:1
--inf:-inf:1
--inf:inf:-1
-inf:-inf:-1
+inf:inf:NaN
+-inf:-inf:NaN
+-inf:inf:NaN
+inf:-inf:NaN
 8:0:inf
 inf:0:inf
 -8:0:-inf
@@ -1213,10 +1257,10 @@ inf:-5:0
 -inf:-5:0
 5:5:0
 -5:-5:0
-inf:inf:0
--inf:-inf:0
--inf:inf:0
-inf:-inf:0
+inf:inf:NaN
+-inf:-inf:NaN
+-inf:inf:NaN
+inf:-inf:NaN
 8:0:8
 inf:0:inf
 # exceptions to reminder rule
@@ -1273,6 +1317,7 @@ abc:1:abc:NaN
 4095:4095:0
 100041000510123:3:0
 152403346:12345:4321
+9:5:4
 &bgcd
 abc:abc:NaN
 abc:+0:NaN
@@ -1483,6 +1528,21 @@ abc:NaN,NaN
 0:0,1
 +inf:inf,inf
 -inf:-inf,inf
+&bfac
+-1:NaN
+NaNfac:NaN
++inf:NaN
+-inf:NaN
+0:1
+1:1
+2:2
+3:6
+4:24
+5:120
+6:720
+10:3628800
+11:39916800
+12:479001600
 &bpow
 abc:12:NaN
 12:abc:NaN
