@@ -6,20 +6,14 @@ use strict;
 use File::Find;
 use ExtUtils::Manifest qw(maniread);
 my $files = maniread();
-my %files;
-foreach (keys %$files)
- {
-  $files{lc($_)} = $files->{$_};
- } 
-
 my @dead;
 find(sub { 
- return if -d $_;
- my $name = $File::Find::name;
- $name =~ s#^\./##;
- unless (exists $files{lc($name)})
+return if -d $_;
+my $name = $File::Find::name;
+$name =~ s#^\./##;
+ unless (exists $files->{$name})
   {
-   # print "new $name\n";
+   print "new $name\n";
    push(@dead,$name);
   } 
 },'.');
