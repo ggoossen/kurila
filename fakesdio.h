@@ -1,12 +1,3 @@
-/*    fakestdio.h
- *
- *    Copyright (c) 2000-2002, Larry Wall
- *
- *    You may distribute under the terms of either the GNU General Public
- *    License or the Artistic License, as specified in the README file.
- *
- */
-
 /*
  * This is "source level" stdio compatibility mode.
  * We try and #define stdio functions in terms of PerlIO.
@@ -14,47 +5,42 @@
 #define _CANNOT "CANNOT"
 #undef FILE
 #define FILE			PerlIO
-#undef clearerr
-#undef fclose
-#undef fdopen
-#undef feof
-#undef ferror
-#undef fflush
-#undef fgetc
-#undef fgetpos
-#undef fgets
-#undef fileno
-#undef flockfile
-#undef fopen
 #undef fprintf
+#undef tmpfile
+#undef fclose
+#undef fopen
+#undef vfprintf
+#undef fgetc
+#undef getc_unlocked
 #undef fputc
+#undef putc_unlocked
 #undef fputs
+#undef ungetc
 #undef fread
-#undef freopen
-#undef fscanf
+#undef fwrite
+#undef fgetpos
 #undef fseek
 #undef fsetpos
 #undef ftell
-#undef ftrylockfile
-#undef funlockfile
-#undef fwrite
-#undef getc
-#undef getc_unlocked
-#undef getw
-#undef pclose
-#undef popen
-#undef putc
-#undef putc_unlocked
-#undef putw
 #undef rewind
+#undef fdopen
+#undef popen
+#undef pclose
+#undef getw
+#undef putw
+#undef freopen
 #undef setbuf
 #undef setvbuf
-#undef stderr
+#undef fscanf
+#undef fgets
 #undef stdin
 #undef stdout
-#undef tmpfile
-#undef ungetc
-#undef vfprintf
+#undef stderr
+#undef getc
+#undef putc
+#undef clearerr
+#undef feof
+#undef ferror
 #define fprintf			PerlIO_printf
 #define stdin			PerlIO_stdin()
 #define stdout			PerlIO_stdout()
@@ -68,8 +54,14 @@
 #define fputc(c,f)		PerlIO_putc(f,c)
 #define fputs(s,f)		PerlIO_puts(f,s)
 #define getc(f)			PerlIO_getc(f)
+#ifdef getc_unlocked
+#undef getc_unlocked
+#endif
 #define getc_unlocked(f)	PerlIO_getc(f)
 #define putc(c,f)		PerlIO_putc(f,c)
+#ifdef putc_unlocked
+#undef putc_unlocked
+#endif
 #define putc_unlocked(c,f)	PerlIO_putc(c,f)
 #define ungetc(c,f)		PerlIO_ungetc(f,c)
 #if 0
@@ -80,7 +72,9 @@
 #define fread(b,s,c,f)		_CANNOT fread
 #define fwrite(b,s,c,f)		_CANNOT fwrite
 #endif
+#define fgetpos(f,p)		PerlIO_getpos(f,p)
 #define fseek(f,o,w)		PerlIO_seek(f,o,w)
+#define fsetpos(f,p)		PerlIO_setpos(f,p)
 #define ftell(f)		PerlIO_tell(f)
 #define rewind(f)		PerlIO_rewind(f)
 #define clearerr(f)		PerlIO_clearerr(f)
@@ -90,9 +84,6 @@
 #define fileno(f)		PerlIO_fileno(f)
 #define popen(c,m)		my_popen(c,m)
 #define pclose(f)		my_pclose(f)
-
-#define fsetpos(f,p)		_CANNOT _fsetpos_
-#define fgetpos(f,p)		_CANNOT _fgetpos_
 
 #define __filbuf(f)		_CANNOT __filbuf_
 #define _filbuf(f)		_CANNOT _filbuf_
