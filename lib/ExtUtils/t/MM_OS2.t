@@ -1,22 +1,17 @@
-#!/usr/bin/perl -w
-
-BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
-}
-chdir 't';
+#!./perl -w
 
 use strict;
+
+BEGIN {
+	chdir 't' if -d 't';
+	@INC = '../lib';
+}
+
 use Test::More;
 if ($^O =~ /os2/i) {
 	plan( tests => 32 );
 } else {
-	plan( skip_all => "This is not OS/2" );
+	plan( skip_all => "This does not appear to be OS/2" );
 }
 
 # for dlsyms, overridden in tests
