@@ -1,6 +1,6 @@
 =head1 NAME
 
-perl561delta - what's new for perl v5.6.x
+perldelta - what's new for perl v5.6.x
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ a /bin/mail that is vulnerable to buffer overflow attacks.
 Note that suidperl is neither built nor installed by default in
 any recent version of perl.  Use of suidperl is highly discouraged.
 If you think you need it, try alternatives such as sudo first.
-See http://www.courtesan.com/sudo/ .
+See http://www.courtesan.com/sudo/.
 
 =head2 Core bug fixes
 
@@ -343,10 +343,9 @@ C<Configure -S> can be run non-interactively.
 
 =head2 Documentation
 
-README.aix, README.solaris and README.macos have been added.
-README.posix-bc has been renamed to README.bs2000.  These are
-installed as L<perlaix>, L<perlsolaris>, L<perlmacos>, and
-L<perlbs2000> respectively.
+README.aix, README.solaris and README.macos have been added.  README.posix-bc
+has been renamed to README.bs2000.  These are installed as L<perlaix>,
+L<perlsolaris>, L<perlmacos>, and L<perlbs2000> respectively.
 
 The following pod documents are brand new:
 
@@ -503,7 +502,7 @@ You will need a thread library package installed.  See README.hpux.
 
 Long doubles should now work under Linux.
 
-Mac OS Classic is now supported in the mainstream source package.
+MacOS Classic is now supported in the mainstream source package.
 See README.macos.
 
 Support for MPE/iX has been updated.  See README.mpeix.
@@ -602,7 +601,7 @@ send() works from within a pseudo-process.
 
 Unless specifically qualified otherwise, the remainder of this document
 covers changes between the 5.005 and 5.6.0 releases.
-
+ 
 =head1 Core Enhancements
 
 =head2 Interpreter cloning, threads, and concurrency
@@ -1053,7 +1052,7 @@ When the last non-weak reference to an object is deleted, the object
 is destroyed and all the weak references to the object are
 automatically undef-ed.
 
-To use this feature, you need the Devel::WeakRef package from CPAN, which
+To use this feature, you need the WeakRef package from CPAN, which
 contains additional documentation.
 
     NOTE: This is an experimental feature.  Details are subject to change.  
@@ -1609,7 +1608,7 @@ messages. For example:
 
     =head1 NAME
 
-    sample - Using Getopt::Long and Pod::Usage
+    sample - Using GetOpt::Long and Pod::Usage
 
     =head1 SYNOPSIS
 
@@ -3445,9 +3444,7 @@ is executed:
 
 =over
 
-=item *
-
-64-bit builds
+=item 64-bit builds
 
 Subtest #15 of lib/b.t may fail under 64-bit builds on platforms such
 as HP-UX PA64 and Linux IA64.  The issue is still being investigated.
@@ -3460,27 +3457,21 @@ in 64-bit HP-UX.  The test attempts to create and connect to
 
 Note that 64-bit support is still experimental.
 
-=item *
-
-Failure of Thread tests
+=item Failure of Thread tests
 
 The subtests 19 and 20 of lib/thr5005.t test are known to fail due to
 fundamental problems in the 5.005 threading implementation.  These are
 not new failures--Perl 5.005_0x has the same bugs, but didn't have these
 tests.  (Note that support for 5.005-style threading remains experimental.)
 
-=item *
-
-NEXTSTEP 3.3 POSIX test failure
+=item NEXTSTEP 3.3 POSIX test failure
 
 In NEXTSTEP 3.3p2 the implementation of the strftime(3) in the
 operating system libraries is buggy: the %j format numbers the days of
 a month starting from zero, which, while being logical to programmers,
 will cause the subtests 19 to 27 of the lib/posix test may fail.
 
-=item *
-
-Tru64 (aka Digital UNIX, aka DEC OSF/1) lib/sdbm test failure with gcc
+=item Tru64 (aka Digital UNIX, aka DEC OSF/1) lib/sdbm test failure with gcc
 
 If compiled with gcc 2.95 the lib/sdbm test will fail (dump core).
 The cure is to use the vendor cc, it comes with the operating system
@@ -3626,7 +3617,7 @@ warning.  And in Perl 5.005, this special treatment will cease.
 
 If you find what you think is a bug, you might check the
 articles recently posted to the comp.lang.perl.misc newsgroup.
-There may also be information at http://www.perl.com/ , the Perl
+There may also be information at http://www.perl.com/, the Perl
 Home Page.
 
 If you believe you have an unreported bug, please run the B<perlbug>
