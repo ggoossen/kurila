@@ -48,7 +48,7 @@ silently ignored.  Characters occuring after a '=' padding character
 are never decoded.
 
 If the length of the string to decode (after ignoring
-non-base64 chars) is not a multiple of 4 or padding occurs too early,
+non-base64 chars) is not a multiple of 4 or padding occurs too ealy,
 then a warning is generated if perl is running under C<-w>.
 
 =back
@@ -135,7 +135,7 @@ require DynaLoader;
 @ISA = qw(Exporter DynaLoader);
 @EXPORT = qw(encode_base64 decode_base64);
 
-$VERSION = '2.12';
+$VERSION = '2.13';
 
 eval { bootstrap MIME::Base64 $VERSION; };
 if ($@) {
