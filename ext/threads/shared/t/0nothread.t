@@ -1,16 +1,5 @@
+use Test::More tests => 53;
 use strict;
-use warnings;
-use Config;
-BEGIN {
-    require Test::More;
-    if ($Config{'useithreads'}) {
-	Test::More->import( tests => 53 );
-    }
-    else {
-	Test::More->import(skip_all => "no useithreads");
-    }
-}
-
 
 my @array;
 my %hash;
@@ -68,7 +57,6 @@ ok((require threads::shared),"Require module");
 
 array(24,[],'Thing');
 hash(24,[],'Thing');
-
 
 import threads::shared;
 share(\@array);
