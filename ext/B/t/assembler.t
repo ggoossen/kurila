@@ -154,13 +154,6 @@ use strict;
 use Test::More;
 use Config qw(%Config);
 
-BEGIN {
-  if (($Config{'extensions'} !~ /\bByteLoader\b/) ){
-    print "1..0 # Skip -- Perl configured without ByteLoader module\n";
-    exit 0;
-  }
-}
-
 use B::Asmdata      qw( %insn_data );
 use B::Assembler    qw( &assemble_fh );
 use B::Disassembler qw( &disassemble_fh &get_header );
@@ -204,7 +197,7 @@ sub putdis(@){
 #
 sub gen_type($$$){
     my( $href, $descref, $text ) = @_;
-    for my $odt ( sort( keys( %opsByType ) ) ){
+    for my $odt ( keys( %opsByType ) ){
         my $opcode = $opsByType{$odt}->[0];
 	my $sel = $odt;
 	$sel =~ s/^GET_//;
