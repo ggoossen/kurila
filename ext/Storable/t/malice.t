@@ -1,4 +1,5 @@
 #!./perl -w
+
 #
 #  Copyright 2002, Larry Wall.
 #
@@ -8,6 +9,7 @@
 
 # I'm trying to keep this test easily backwards compatible to 5.004, so no
 # qr//;
+# Currently using Test not Test::More, as Test is in core that far back.
 
 # This test tries to craft malicious data to test out as many different
 # error traps in Storable as possible
@@ -16,39 +18,25 @@
 sub BEGIN {
     if ($ENV{PERL_CORE}){
 	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
+	@INC = '.';
+	push @INC, '../lib';
     }
     require Config; import Config;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
+    # require 'lib/st-dump.pl';
 }
 
 use strict;
-use vars qw($file_magic_str $other_magic $network_magic $byteorder
-            $major $minor $minor_write $fancy);
-
-$byteorder = $Config{byteorder};
-
+use vars qw($file_magic_str $other_magic $network_magic);
 $file_magic_str = 'pst0';
-$other_magic = 7 + length $byteorder;
+$other_magic = 7 + $Config{longsize};
 $network_magic = 2;
-$major = 2;
-$minor = 6;
-$minor_write = $] > 5.007 ? 6 : 4;
 
-use Test::More;
-
-# If it's 5.7.3 or later the hash will be stored with flags, which is
-# 2 extra bytes. There are 2 * 2 * 2 tests per byte in the body and header
-# common to normal and network order serialised objects (hence the 8)
-# There are only 2 * 2 tests per byte in the parts of the header not present
-# for network order, and 2 tests per byte on the 'pst0' "magic number" only
-# present in files, but not in things store()ed to memory
-$fancy = ($] > 5.007 ? 2 : 0);
-
-plan tests => 368 + length ($byteorder) * 4 + $fancy * 8;
+use Test;
+BEGIN { plan tests => 334 + $Config{longsize} * 4}
 
 use Storable qw (store retrieve freeze thaw nstore nfreeze);
 
@@ -57,35 +45,33 @@ die "Temporary file 'malice.$$' already exists" if -e $file;
 
 END { while (-f $file) {unlink $file or die "Can't unlink '$file': $!" }}
 
-# The chr 256 is a hack to force the hash to always have the utf8 keys flag
-# set on 5.7.3 and later. Otherwise the test fails if run with -Mutf8 because
-# only there does the hash has the flag on, and hence only there is it stored
-# as a flagged hash, which is 2 bytes longer
-my %hash = (perl => 'rules', chr 256, '');
-delete $hash{chr 256};
+my %hash = (perl => 'rules');
 
 sub test_hash {
   my $clone = shift;
-  is (ref $clone, "HASH", "Get hash back");
-  is (scalar keys %$clone, 1, "with 1 key");
-  is ((keys %$clone)[0], "perl", "which is correct");
-  is ($clone->{perl}, "rules");
+  ok (ref $clone, "HASH", "Get hash back");
+  ok (scalar keys %$clone, 1, "with 1 key");
+  ok ((keys %$clone)[0], "perl", "which is correct");
+  ok ($clone->{perl}, "rules");
 }
 
 sub test_header {
   my ($header, $isfile, $isnetorder) = @_;
-  is (!!$header->{file}, !!$isfile, "is file");
-  is ($header->{major}, $major, "major number");
-  is ($header->{minor}, $minor_write, "minor number");
-  is (!!$header->{netorder}, !!$isnetorder, "is network order");
+  ok (!!$header->{file}, !!$isfile, "is file");
+  ok ($header->{major}, 2, "major number");
+  ok ($header->{minor}, 5, "minor number");
+  ok (!!$header->{netorder}, !!$isnetorder, "is network order");
   if ($isnetorder) {
-    # Network order header has no sizes
+    # Skip these
+    for (1..5) {
+      ok (1, 1, "Network order header has no sizes");
+    }
   } else {
-    is ($header->{byteorder}, $byteorder, "byte order");
-    is ($header->{intsize}, $Config{intsize}, "int size");
-    is ($header->{longsize}, $Config{longsize}, "long size");
-    is ($header->{ptrsize}, $Config{ptrsize}, "long size");
-    is ($header->{nvsize}, $Config{nvsize} || $Config{doublesize} || 8,
+    ok ($header->{byteorder}, $Config{byteorder}, "byte order");
+    ok ($header->{intsize}, $Config{intsize}, "int size");
+    ok ($header->{longsize}, $Config{longsize}, "long size");
+    ok ($header->{ptrsize}, $Config{ptrsize}, "long size");
+    ok ($header->{nvsize}, $Config{nvsize} || $Config{doublesize} || 8,
         "nv size"); # 5.00405 doesn't even have doublesize in config.
   }
 }
@@ -112,12 +98,12 @@ sub test_truncated {
     my $short = substr $data, 0, $i;
 
     my $clone = &$sub($short);
-    is (defined ($clone), '', "truncated $what to $i should fail");
+    ok (defined ($clone), '', "truncated $what to $i should fail");
     if ($i < $magic_len) {
-      like ($@, "/^Magic number checking on storable $what failed/",
+      ok ($@, "/^Magic number checking on storable $what failed/",
           "Should croak with magic number warning");
     } else {
-      is ($@, "", "Should not set \$\@");
+      ok ($@, "", "Should not set \$\@");
     }
   }
 }
@@ -126,8 +112,8 @@ sub test_corrupt {
   my ($data, $sub, $what, $name) = @_;
 
   my $clone = &$sub($data);
-  is (defined ($clone), '', "$name $what should fail");
-  like ($@, $what, $name);
+  ok (defined ($clone), '', "$name $what should fail");
+  ok ($@, $what, $name);
 }
 
 sub test_things {
@@ -141,7 +127,7 @@ sub test_things {
   # Test that if we re-write it, everything still works:
   my $clone = &$sub ($contents);
 
-  is ($@, "", "There should be no error");
+  ok ($@, "", "There should be no error");
 
   test_hash ($clone);
 
@@ -158,42 +144,24 @@ sub test_things {
   }
 
   $copy = $contents;
-  # Needs to be more than 1, as we're already coding a spread of 1 minor version
-  # number on writes (2.5, 2.4). May increase to 2 if we figure we can do 2.3
-  # on 5.005_03 (No utf8).
-  # 4 allows for a small safety margin
-  # (Joke:
-  # Question: What is the value of pi?
-  # Mathematician answers "It's pi, isn't it"
-  # Physicist answers "3.1, within experimental error"
-  # Engineer answers "Well, allowing for a small safety margin,   18"
-  # )
-  my $minor4 = $header->{minor} + 4;
-  substr ($copy, $file_magic + 1, 1) = chr $minor4;
-  {
-    # Now by default newer minor version numbers are not a pain.
-    $clone = &$sub($copy);
-    is ($@, "", "by default no error on higher minor");
-    test_hash ($clone);
-
-    local $Storable::accept_future_minor = 0;
-    test_corrupt ($copy, $sub,
-                  "/^Storable binary image v$header->{major}\.$minor4 more recent than I am \\(v$header->{major}\.$minor\\)/",
-                  "higher minor");
-  }
+  my $minor1 = $header->{minor} + 1;
+  substr ($copy, $file_magic + 1, 1) = chr $minor1;
+  test_corrupt ($copy, $sub,
+                "/^Storable binary image v$header->{major}.$minor1 more recent than I am \\(v$header->{major}.$header->{minor}\\)/",
+                "higher minor");
 
   $copy = $contents;
   my $major1 = $header->{major} + 1;
   substr ($copy, $file_magic, 1) = chr 2*$major1;
   test_corrupt ($copy, $sub,
-                "/^Storable binary image v$major1\.$header->{minor} more recent than I am \\(v$header->{major}\.$minor\\)/",
+                "/^Storable binary image v$major1.$header->{minor} more recent than I am \\(v$header->{major}.$header->{minor}\\)/",
                 "higher major");
 
   # Continue messing with the previous copy
-  my $minor1 = $header->{minor} - 1;
+  $minor1 = $header->{minor} - 1;
   substr ($copy, $file_magic + 1, 1) = chr $minor1;
   test_corrupt ($copy, $sub,
-                "/^Storable binary image v$major1\.$minor1 more recent than I am \\(v$header->{major}\.$minor\\)/",
+                "/^Storable binary image v$major1.$minor1 more recent than I am \\(v$header->{major}.$header->{minor}\\)/",
               "higher major, lower minor");
 
   my $where;
@@ -228,29 +196,6 @@ sub test_things {
   test_corrupt ($copy, $sub,
                 "/^Corrupted storable $what \\(binary v$header->{major}.$header->{minor}\\)/",
                 "bogus tag");
-
-  # Now drop the minor version number
-  substr ($copy, $file_magic + 1, 1) = chr $minor1;
-
-  test_corrupt ($copy, $sub,
-                "/^Corrupted storable $what \\(binary v$header->{major}.$minor1\\)/",
-                "bogus tag, minor less 1");
-  # Now increase the minor version number
-  substr ($copy, $file_magic + 1, 1) = chr $minor4;
-
-  # local $Storable::DEBUGME = 1;
-  # This is the delayed croak
-  test_corrupt ($copy, $sub,
-                "/^Storable binary image v$header->{major}.$minor4 contains data of type 255. This Storable is v$header->{major}.$minor and can only handle data types up to 26/",
-                "bogus tag, minor plus 4");
-  # And check again that this croak is not delayed:
-  {
-    # local $Storable::DEBUGME = 1;
-    local $Storable::accept_future_minor = 0;
-    test_corrupt ($copy, $sub,
-                  "/^Storable binary image v$header->{major}\.$minor4 more recent than I am \\(v$header->{major}\.$minor\\)/",
-                  "higher minor");
-  }
 }
 
 sub slurp {
@@ -266,7 +211,7 @@ sub slurp {
 
 ok (defined store(\%hash, $file));
 
-my $expected = 20 + length ($file_magic_str) + $other_magic + $fancy;
+my $expected = 20 + length ($file_magic_str) + $other_magic;
 my $length = -s $file;
 
 die "Don't seem to have written file '$file' as I can't get its length: $!"
@@ -294,7 +239,7 @@ unlink $file or die "Can't unlink '$file': $!";
 
 ok (defined nstore(\%hash, $file));
 
-$expected = 20 + length ($file_magic_str) + $network_magic + $fancy;
+$expected = 20 + length ($file_magic_str) + $network_magic;
 $length = -s $file;
 
 die "Don't seem to have written file '$file' as I can't get its length: $!"
