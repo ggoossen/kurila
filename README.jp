@@ -2,7 +2,7 @@ If you read this file _as_is_, just ignore the funny characters you
 see. It is written in the POD format (see perlpod manpage) which is
 specially designed to be readable as is.
 
-The following documentation is written in euc-jp encoding.
+The following documentation is written in FOO encoding.
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ perljp - ╞№╦▄╕ь Perl емеде╔
 
 =head1 └т╠└
 
-Perl д╬└д│жд╪дшджд│д╜!
+дшджд│д╜ Perl д╪!
 
 Perl 5.8.0 дшдъбвUnicodeе╡е▌б╝е╚дм┬ч╔¤д╦╢п▓╜д╡дьбвд╜д╬╖ы▓╠еще╞еє╩╕╗·░╩│░д╬╩╕╗·е│б╝е╔д╬е╡е▌б╝е╚дм CJK (├ц╣ё╕ьбв╞№╦▄╕ьбве╧еєе░еы)дЄ┤▐дсд╞▓├дядъд▐д╖д┐бгUnicodeд╧└д│ж├цд╬╩╕╗·дЄ░ьд─д╬╩╕╗·е│б╝е╔д╟░╖джд│д╚дЄ╠▄╗╪д╖д┐╔╕╜р╡м│╩д╟двдъбв┼ьдлдщ└╛бвд╧д┐д▐д┐д╜д╬┤╓д╬╩╕╗·б╩еоеъе╖еу╩╕╗·бвенеъб╝еы╩╕╗·бвевеще╙ев╩╕╗·бве╪е╓ещед╩╕╗·бве╟егб╝еЇебе╩емб╝еъ╩╕╗·бвд╩д╔д╩д╔б╦дфбвд│дьд▐д╟д╧OSе┘еєе└б╝дм╞╚╝лд╦─ъдсд╞ддд┐╩╕╗·(PCдкдшд╙Macintosh)дмд╣д╟д╦┤▐д▐дьд╞ддд▐д╣бг
 
@@ -63,22 +63,20 @@ Perl ╝л┐╚д╧ Unicode д╟╞░║юд╖д▐д╣бгPerl е╣епеъе╫е╚╞тд╬╩╕╗·╬єеъе╞ещеыдф└╡╡м╔╜╕╜д╧ 
 
 5.8░╩┴░д╬бве╣епеъе╫е╚дмEUC-JPд╟двдьд╨еъе╞ещеыд└д▒д╧░╖джд│д╚дмд╟днд▐д╖д┐бгд▐д┐бв╞■╜╨╬╧дЄ░╖джете╕ехб╝еыд╚д╖д╞д╧Jcode.pmдм( http://openlab.jp/Jcode/ )бвperl4═╤д╬ецб╝е╞егеъе╞егд╚д╖д╞д╧jcode.pl( http://srekcah.org/jcode/ )дмд╜дьд╛дь┬╕║▀д╖бв╞№╦▄╕ьд╬░╖дидыCGIд╟дшдп═°═╤д╡дьд╞дддыд│д╚дЄ╕ц┬╕д╕д╬╩¤дт╛пд╩дпд╩дддлд╚╗╫дядьд▐д╣бгд┐д└д╖бв╞№╦▄╕ьд╦дшды└╡╡м╔╜╕╜дЄджд▐дп░╖джд│д╚д╧╔╘▓─╟╜д╟д╖д┐бг
 
-5.005░╩┴░д╬Perlд╦д╧бв╞№╦▄╕ьд╦╞├▓╜д╖д┐еэб╝елещеде║╚╟бвJperlдм┬╕║▀д╖д▐д╖д┐( http://homepage2.nifty.com/kipp/perl/jperl/index.html )бгд▐д┐бвMac OS 9.x/Classic═╤д╬PerlбвMacPerlд╬╞№╦▄╕ь╚╟дтMacJPerlд╚д╖д╞┬╕║▀д╖д╞д▐д╖д┐бг( http://world.std.com/~habilis/macjperl/ ).д│дьдщд╟д╧╩╕╗·е│б╝е╔д╚д╖д╞EUC-JPд╦▓├диShift_JISдтд╜д╬д▐д▐░╖джд│д╚дмд╟днбвд▐д┐╞№╦▄╕ьд╦дшды└╡╡м╔╜╕╜дЄ░╖джд│д╚дт▓─╟╜д╟д╖д┐бг
+5.005░╩┴░д╬Perlд╦д╧бв╞№╦▄╕ьд╦╞├▓╜д╖д┐еэб╝елещеде║╚╟бвJperlдм┬╕║▀д╖д▐д╖д┐( http://homepage2.nifty.com/kipp/perl/jperl/index.html )бгд▐д┐бвMacOS 9.x/Classic═╤д╬PerlбвMacPerlд╬╞№╦▄╕ь╚╟дтMacJPerlд╚д╖д╞┬╕║▀д╖д╞д▐д╖д┐бг( http://world.std.com/~habilis/macjperl/ ).д│дьдщд╟д╧╩╕╗·е│б╝е╔д╚д╖д╞EUC-JPд╦▓├диShift_JISдтд╜д╬д▐д▐░╖джд│д╚дмд╟днбвд▐д┐╞№╦▄╕ьд╦дшды└╡╡м╔╜╕╜дЄ░╖джд│д╚дт▓─╟╜д╟д╖д┐бг
 
 Perl5.8д╟д╧бвд│дьдщд╬╡б╟╜дмд╣д┘д╞Perl╦▄┬╬д└д▒д╟╝┬╕╜д╟днды╛хд╦бв╞№╦▄╕ьд╬д▀д╩дщд║╛х╡н114д╬╩╕╗·е│б╝е╔дЄд╣д┘д╞бвд╖длдт╞▒╗■д╦░╖джд│д╚дмд╟днд▐д╣бгд╡дщд╦бвCPANд╩д╔длдщ┐╖д╖дд╩╕╗·е│б╝е╔═╤д╬ете╕ехб╝еыдЄ╞■╝ъд╣дыд│д╚дт┤╩├▒д╦д╟дндыдшджд╦д╩д├д╞ддд▐д╣бг
 
 =over 4
 
-=item *
-
-╞■╜╨╬╧
+=itemбб╞■╜╨╬╧
 
 ░╩▓╝д╬╬уд╧ддд┼дьдтShift_JISд╬╞■╬╧дЄEUC-JPд╦╩╤┤╣д╖д╞╜╨╬╧д╖д▐д╣бг
 
   # jcode.pl
   require "jcode.pl";
   while(<>){
-    jcode::convert(*_, 'euc', 'sjis');
+    jcode::convert(*_, 'euc', 'sjis);
     print;
   }
   # Jcode.pm
@@ -93,21 +91,19 @@ Perl5.8д╟д╧бвд│дьдщд╬╡б╟╜дмд╣д┘д╞Perl╦▄┬╬д└д▒д╟╝┬╕╜д╟днды╛хд╦бв╞№╦▄╕ьд╬д▀д╩дщд║╛
     print;
   }
   # Perl 5.8 - encoding дЄ═°═╤д╖д╞
-  use encoding 'euc-jp', STDIN => 'shiftjis';
+  use encoding 'euc-jp', STDIN=>'shiftjis'
   while(<>){
   	print;
   }
 
-=item *
-
-Jperl ╕▀┤╣е╣епеъе╫е╚
+=item Jperl ╕▀┤╣е╣епеъе╫е╚
 
  дддядцды"shebang"дЄ╩╤╣╣д╣дыд└д▒д╟бвJperl═╤д╬scriptд╬д█д╚дєд╔д╧╩╤╣╣д╩д╖д╦═°═╤▓─╟╜д└д╚╗╫дядьд▐д╣бг
-
+ 
    #!/path/to/jperl
    вн
    #!/path/to/perl -Mencoding=euc-jp
-
+   
  ╛▄д╖дпд╧ perldoc encoding дЄ╗▓╛╚д╖д╞дпд└д╡ддбг
 
 =back
