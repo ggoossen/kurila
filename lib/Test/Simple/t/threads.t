@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use Config;
-unless ($Config{'useithreads'} and eval { require threads; 1 }) {
+unless ($Config{'useithreads'}) {
     print "1..0 # Skip: no threads\n";
     exit 0;
 }
