@@ -290,7 +290,6 @@ sub try {
   undef $o; untie @lines;
 
   open F, "< $file" or die "Couldn't open file $file: $!";
-  binmode F;
   my $actual;
   { local $/;
     $actual = <F>;
