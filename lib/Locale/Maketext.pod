@@ -1,5 +1,5 @@
 
-# Time-stamp: "2001-06-21 23:12:39 MDT"
+# Time-stamp: "2001-05-25 07:50:08 MDT"
 
 =head1 NAME
 
@@ -110,9 +110,7 @@ These are to do with constructing a language handle:
 
 =over
 
-=item  *
-
-$lh = YourProjClass->get_handle( ...langtags... ) || die "lg-handle?";
+=item $lh = YourProjClass->get_handle( ...langtags... ) || die "lg-handle?";
 
 This tries loading classes based on the language-tags you give (like
 C<("en-US", "sk", "kon", "es-MX", "ja", "i-klingon")>, and for the first class
@@ -133,9 +131,7 @@ then if nothing comes of that, we use classes named by
 YourProjClass->fallback_language_classes().  Then in the (probably
 quite unlikely) event that that fails, we just return undef.
 
-=item *
-
-$lh = YourProjClass->get_handleB<()> || die "lg-handle?";
+=item $lh = YourProjClass->get_handleB<()> || die "lg-handle?";
 
 When C<get_handle> is called with an empty parameter list, magic happens:
 
@@ -175,17 +171,13 @@ file, you might consider something like this in your project class:
     return $lh;
   }
 
-=item *
-
-$lh = YourProjClass::langname->new();
+=item $lh = YourProjClass::langname->new();
 
 This constructs a language handle.  You usually B<don't> call this
 directly, but instead let C<get_handle> find a language class to C<use>
 and to then call ->new on.
 
-=item *
-
-$lh->init();
+=item $lh->init();
 
 This is called by ->new to initialize newly-constructed language handles.
 If you define an init method in your class, remember that it's usually
@@ -193,9 +185,7 @@ considered a good idea to call $lh->SUPER::init in it (presumably at the
 beginning), so that all classes get a chance to initialize a new object
 however they see fit.
 
-=item *
-
-YourProjClass->fallback_languages()
+=item YourProjClass->fallback_languages()
 
 C<get_handle> appends the return value of this to the end of
 whatever list of languages you pass C<get_handle>.  Unless
@@ -211,9 +201,7 @@ C<get_handle> will always manage to construct a language
 handle (assuming your language classes are in an appropriate
 @INC directory).  Or you can use the next method:
 
-=item *
-
-YourProjClass->fallback_language_classes()
+=item YourProjClass->fallback_language_classes()
 
 C<get_handle> appends the return value of this to the end
 of the list of classes it will try using.  Unless
@@ -739,13 +727,6 @@ then that group is interpreted like this:
 
 =item *
 
-If the first item in a bracket group is "*", it's taken as shorthand
-for the so commonly called "quant" method.  Similarly, if the first
-item in a bracket group is "#", it's taken to be shorthand for
-"numf".
-
-=item *
-
 If the first item in a bracket group is empty-string, or "_*"
 or "_I<digits>" or "_-I<digits>", then that group is interpreted
 as just the interpolation of all its items:
@@ -888,7 +869,7 @@ but since you anticipate localizing this, you write:
   my $lh = ThisProject::I18N->get_handle();
    # For the moment, assume that things are set up so
    # that we load class ThisProject::I18N::en
-   # and that's the class that $lh belongs to.
+   # and that that's the class that $lh belongs to.
   ...
   if(-e $filename) {
     go_process_file($filename)

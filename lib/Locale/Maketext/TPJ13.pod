@@ -48,7 +48,7 @@ messages, like this:
 
   Your query matched 10 files in 4 directories.
 
-So how hard could that be?  You look at the code that
+So how hard could that be?  You look at the code that produces
 produces the first item, and it reads:
 
   printf("I scanned %g directories.",
@@ -81,7 +81,7 @@ And you write:
   printf(gettext("I scanned %g %s."),
          $dir_scan_count,
          $dir_scan_count == 1 ?
-           gettext("directory") : gettext("directories"),
+           gettext("directory") : gettext("directory"),
   );
 
 But you then read in the gettext manual (Drepper, Miller, and Pinard 1995)
@@ -149,8 +149,8 @@ written, but this seems the way to go.  You mail off to the
 translators asking for translations for these four cases.  The
 Chinese guy replies with the one phrase that these all translate to in
 Chinese, and that phrase has two "%g"s in it, as it should -- but
-there's a problem.  He translates it word-for-word back: "In %g
-directories contains %g files match your query."  The %g
+there's a problem.  He translates it word-for-word back: "To your
+question, in %g directories you would find %g answers."  The "%g"
 slots are in an order reverse to what they are in English.  You wonder
 how you'll get gettext to handle that.
 
@@ -222,7 +222,7 @@ ending... The room begins to spin around you, slowly at first...  But
 with I<all other> integer values, since "directory" is an inanimate
 noun, when preceded by a number and in the nominative or accusative
 cases (as it is here, just your luck!), it does stay plural, but it is
-forced into the genitive case -- yet another ending...  And
+forced into the genitive case -- yet another another ending...  And
 you never hear him get to the part about how you're going to run into
 similar (but maybe subtly different) problems with other Slavic
 languages like Polish, because the floor comes up to meet you, and you
@@ -677,7 +677,7 @@ quantification is not as complicated an operation.
 =head2 The Devil in the Details
 
 There's plenty more to Maketext than described above -- for example,
-there's the details of how language tags ("en-US", "i-pwn", "fi",
+there's the details of how language tags ("en-US", "x-cree", "fi",
 etc.) or locale IDs ("en_US") interact with actual module naming
 ("BogoQuery/Locale/en_us.pm"), and what magic can ensue; there's the
 details of how to record (and possibly negotiate) what character
