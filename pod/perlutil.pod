@@ -29,13 +29,13 @@ described in this document.
 
 If it's run from a terminal, F<perldoc> will usually call F<pod2man> to
 translate POD (Plain Old Documentation - see L<perlpod> for an
-explanation) into a manpage, and then run F<man> to display it; if
+explanation) into a man page, and then run F<man> to display it; if
 F<man> isn't available, F<pod2text> will be used instead and the output
 piped through your favourite pager.
 
 =item L<pod2html|pod2html> and L<pod2latex|pod2latex>
 
-As well as these two, there are two other converters: F<pod2html> will
+As well as these two, there are two other convertors: F<pod2html> will
 produce HTML pages from POD, and F<pod2latex>, which produces LaTeX
 files.
 
@@ -97,7 +97,7 @@ Similarly, F<s2p> converts F<sed> scripts to Perl programs. F<s2p> run
 on C<s/foo/bar> will produce a Perl program based around this:
 
     while (<>) {
-        chomp;
+        chop;
         s/foo/bar/g;
         print if $printit;
     }
@@ -123,16 +123,6 @@ As well as these filters for converting other languages, the
 L<pl2pm|pl2pm> utility will help you convert old-style Perl 4 libraries to 
 new-style Perl5 modules.
 
-=head2 Administration
-
-=over 3
-
-=item L<libnetcfg|libnetcfg>
-
-To display and change the libnet configuration run the libnetcfg command.
-
-=back
-
 =head2 Development
 
 There are a set of utilities which help you in developing Perl programs, 
@@ -154,7 +144,7 @@ programmers used to get library constants by reading through the C
 header files. You may still see C<require 'syscall.ph'> or similar
 around - the F<.ph> file should be created by running F<h2ph> on the
 corresponding F<.h> file. See the F<h2ph> documentation for more on how
-to convert a whole bunch of header files at once.
+to convert a whole bunch of header files at ones.
 
 =item L<c2ph|c2ph> and L<pstruct|pstruct>
 
@@ -171,9 +161,9 @@ very useful for creating skeletons of pure Perl modules.
 
 =item L<dprofpp|dprofpp>
 
-Perl comes with a profiler, the F<Devel::DProf> module. The
+Perl comes with a profiler, the F<Devel::Dprof> module. The
 F<dprofpp> utility analyzes the output of this profiler and tells you
-which subroutines are taking up the most run time. See L<Devel::DProf>
+which subroutines are taking up the most run time. See L<Devel::Dprof>
 for more information.
 
 =item L<perlcc|perlcc>
@@ -190,6 +180,6 @@ L<podchecker|podchecker>, L<splain|splain>, L<perldiag>,
 L<roffitall|roffitall>, L<a2p|a2p>, L<s2p|s2p>, L<find2perl|find2perl>,
 L<File::Find|File::Find>, L<pl2pm|pl2pm>, L<perlbug|perlbug>,
 L<h2ph|h2ph>, L<c2ph|c2ph>, L<h2xs|h2xs>, L<dprofpp|dprofpp>,
-L<Devel::DProf>, L<perlcc|perlcc>
+L<Devel::Dprof>, L<perlcc|perlcc>
 
 =cut
