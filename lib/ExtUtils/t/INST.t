@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # Wherein we ensure the INST_* and INSTALL* variables are set correctly
-# according to the values of PREFIX, SITEPREFIX, INSTALLDIRS, etc...
+# in a default Makefile.PL run
 #
 # Essentially, this test is a Makefile.PL.
 
