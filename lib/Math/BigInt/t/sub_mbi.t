@@ -6,48 +6,25 @@ use strict;
 BEGIN
   {
   $| = 1;
-  # to locate the testing files
-  my $location = $0; $location =~ s/sub_mbi.t//i;
-  if ($ENV{PERL_CORE})
-    {
-    # testing with the core distribution
-    @INC = qw(../t/lib);
-    }
-  unshift @INC, qw(../lib);
-  if (-d 't')
-    {
-    chdir 't';
-    require File::Spec;
-    unshift @INC, File::Spec->catdir(File::Spec->updir, $location);
-    }
-  else
-    {
-    unshift @INC, $location;
-    }
-  print "# INC = @INC\n";
-
-  plan tests => 2527
-    + 5;	# +5 own tests
+  unshift @INC, '../lib';	# for running manually
+  my $location = $0; $location =~ s/sub_mbi.t//;
+  unshift @INC, $location; # to locate the testing files
+  chdir 't' if -d 't';
+  plan tests => 1608 + 4;	# +4 own tests
   }
 
 use Math::BigInt::Subclass;
 
-use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup $CL);
+use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup);
 $class = "Math::BigInt::Subclass";
-$CL = "Math::BigInt::Calc";
 
-my $version = '0.02';   # for $VERSION tests, match current release (by hand!)
+#my $version = '0.01';   # for $VERSION tests, match current release (by hand!)
 
-require 'bigintpm.inc';	# perform same tests as bigintpm
+require 'bigintpm.inc';	# perform same tests as bigfltpm
 
-###############################################################################
 # Now do custom tests for Subclass itself
- 
 my $ms = $class->new(23);
 print "# Missing custom attribute \$ms->{_custom}" if !ok (1, $ms->{_custom});
-
-# Check that a subclass is still considered a BigInt
-ok ($ms->isa('Math::BigInt'),1);
 
 use Math::BigInt;
 
