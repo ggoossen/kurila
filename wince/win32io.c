@@ -53,9 +53,9 @@ PerlIOWin32_fileno(pTHX_ PerlIO *f)
 }
 
 IV
-PerlIOWin32_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab)
+PerlIOWin32_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg)
 {
- IV code = PerlIOBase_pushed(aTHX_ f,mode,arg,tab);
+ IV code = PerlIOBase_pushed(aTHX_ f,mode,arg);
  if (*PerlIONext(f))
   {
    PerlIOWin32 *s = PerlIOSelf(f,PerlIOWin32);
