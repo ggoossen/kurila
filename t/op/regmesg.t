@@ -2,7 +2,7 @@
 
 BEGIN {
 	chdir 't' if -d 't';
-	@INC = '../lib';
+	unshift @INC, '../lib';
 }
 
 my $debug = 1;
@@ -13,102 +13,88 @@ my $debug = 1;
 ## arrays below. The {#} is a meta-marker -- it marks where the marker should
 ## go.
 
-my $marker1 = "<-- HERE";
-my $marker2 = " <-- HERE ";
+my $marker1 = "<HERE<";
+my $marker2 = " <<<HERE<<< ";
 
 ##
 ## Key-value pairs of code/error of code that should have fatal errors.
 ##
-
-eval 'use Config';         # assume defaults if fail
-our %Config;
-my $inf_m1 = ($Config{reg_infty} || 32767) - 1;
-my $inf_p1 = $inf_m1 + 2;
 my @death =
 (
- '/[[=foo=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=foo=]{#}]/',
+ '/[[=foo=]]/' => 'POSIX syntax [= =] is reserved for future extensions at {#} mark in regex m/[[=foo=]{#}]/',
 
- '/(?<= .*)/' =>  'Variable length lookbehind not implemented in regex; marked by {#} in m/(?<= .*){#}/',
+ '/(?<= .*)/' =>  'Variable length lookbehind not implemented at {#} mark in regex m/(?<= .*){#}/',
 
- '/(?<= x{1000})/' => 'Lookbehind longer than 255 not implemented in regex; marked by {#} in m/(?<= x{1000}){#}/',
+ '/(?<= x{10000})/' => 'Lookbehind longer than 255 not implemented at {#} mark in regex m/(?<= x{10000}){#}/',
 
- '/(?@)/' => 'Sequence (?@...) not implemented in regex; marked by {#} in m/(?@{#})/',
+ '/(?@)/' => 'Sequence (?@...) not implemented at {#} mark in regex m/(?@{#})/',
 
- '/(?{ 1/' => 'Sequence (?{...}) not terminated or not {}-balanced in regex; marked by {#} in m/(?{{#} 1/',
+ '/(?{ 1/' => 'Sequence (?{...}) not terminated or not {}-balanced at {#} mark in regex m/(?{{#} 1/',
 
- '/(?(1x))/' => 'Switch condition not recognized in regex; marked by {#} in m/(?(1x{#}))/',
+ '/(?(1x))/' => 'Switch condition not recognized at {#} mark in regex m/(?(1x{#}))/',
 
- '/(?(1)x|y|z)/' => 'Switch (?(condition)... contains too many branches in regex; marked by {#} in m/(?(1)x|y|{#}z)/',
+ '/(?(1)x|y|z)/' => 'Switch (?(condition)... contains too many branches at {#} mark in regex m/(?(1)x|y|{#}z)/',
 
- '/(?(x)y|x)/' => 'Unknown switch condition (?(x) in regex; marked by {#} in m/(?({#}x)y|x)/',
+ '/(?(x)y|x)/' => 'Unknown switch condition (?(x) at {#} mark in regex m/(?({#}x)y|x)/',
 
- '/(?/' => 'Sequence (? incomplete in regex; marked by {#} in m/(?{#}/',
+ '/(?/' => 'Sequence (? incomplete at {#} mark in regex m/(?{#}/',
 
- '/(?;x/' => 'Sequence (?;...) not recognized in regex; marked by {#} in m/(?;{#}x/',
- '/(?<;x/' => 'Sequence (?<;...) not recognized in regex; marked by {#} in m/(?<;{#}x/',
+ '/(?;x/' => 'Sequence (?;...) not recognized at {#} mark in regex m/(?;{#}x/',
+ '/(?<;x/' => 'Sequence (?<;...) not recognized at {#} mark in regex m/(?<;{#}x/',
 
- '/((x)/' => 'Unmatched ( in regex; marked by {#} in m/({#}(x)/',
+ '/((x)/' => 'Unmatched ( at {#} mark in regex m/({#}(x)/',
 
- "/x{$inf_p1}/" => "Quantifier in {,} bigger than $inf_m1 in regex; marked by {#} in m/x{{#}$inf_p1}/",
+ '/x{99999}/' => 'Quantifier in {,} bigger than 32766 at {#} mark in regex m/x{{#}99999}/',
 
- '/x{3,1}/' => 'Can\'t do {n,m} with n > m in regex; marked by {#} in m/x{3,1}{#}/',
+ '/x{3,1}/' => 'Can\'t do {n,m} with n > m at {#} mark in regex m/x{3,1}{#}/',
 
- '/x**/' => 'Nested quantifiers in regex; marked by {#} in m/x**{#}/',
+ '/x**/' => 'Nested quantifiers at {#} mark in regex m/x**{#}/',
 
- '/x[/' => 'Unmatched [ in regex; marked by {#} in m/x[{#}/',
+ '/x[/' => 'Unmatched [ at {#} mark in regex m/x[{#}/',
 
- '/*/', => 'Quantifier follows nothing in regex; marked by {#} in m/*{#}/',
+ '/*/', => 'Quantifier follows nothing at {#} mark in regex m/*{#}/',
 
- '/\p{x/' => 'Missing right brace on \p{} in regex; marked by {#} in m/\p{{#}x/',
+ '/\p{x/' => 'Missing right brace on \p{} at {#} mark in regex m/\p{{#}x/',
 
- '/[\p{x]/' => 'Missing right brace on \p{} in regex; marked by {#} in m/[\p{{#}x]/',
+ 'use utf8; /[\p{x]/' => 'Missing right brace on \p{} at {#} mark in regex m/[\p{{#}x]/',
 
- '/(x)\2/' => 'Reference to nonexistent group in regex; marked by {#} in m/(x)\2{#}/',
+ '/(x)\2/' => 'Reference to nonexistent group at {#} mark in regex m/(x)\2{#}/',
 
- 'my $m = "\\\"; $m =~ $m', => 'Trailing \ in regex m/\/',
+ 'my $m = chr(92); $m =~ $m', => 'Trailing \ in regex m/\/',
 
- '/\x{1/' => 'Missing right brace on \x{} in regex; marked by {#} in m/\x{{#}1/',
+ '/\x{1/' => 'Missing right brace on \x{} at {#} mark in regex m/\x{{#}1/',
 
- '/[\x{X]/' => 'Missing right brace on \x{} in regex; marked by {#} in m/[\x{{#}X]/',
+ 'use utf8; /[\x{X]/' => 'Missing right brace on \x{} at {#} mark in regex m/[\x{{#}X]/',
 
- '/[[:barf:]]/' => 'POSIX class [:barf:] unknown in regex; marked by {#} in m/[[:barf:]{#}]/',
+ '/\x{x}/' => 'Can\'t use \x{} without \'use utf8\' declaration at {#} mark in regex m/\x{x}{#}/',
 
- '/[[=barf=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=barf=]{#}]/',
+ '/[[:barf:]]/' => 'POSIX class [:barf:] unknown at {#} mark in regex m/[[:barf:]{#}]/',
 
- '/[[.barf.]]/' => 'POSIX syntax [. .] is reserved for future extensions in regex; marked by {#} in m/[[.barf.]{#}]/',
+ '/[[=barf=]]/' => 'POSIX syntax [= =] is reserved for future extensions at {#} mark in regex m/[[=barf=]{#}]/',
+
+ '/[[.barf.]]/' => 'POSIX syntax [. .] is reserved for future extensions at {#} mark in regex m/[[.barf.]{#}]/',
   
- '/[z-a]/' => 'Invalid [] range "z-a" in regex; marked by {#} in m/[z-a{#}]/',
-
- '/\p/' => 'Empty \p{} in regex; marked by {#} in m/\p{#}/',
-
- '/\P{}/' => 'Empty \P{} in regex; marked by {#} in m/\P{{#}}/',
+ '/[z-a]/' => 'Invalid [] range "z-a" at {#} mark in regex m/[z-a{#}]/',
 );
 
 ##
 ## Key-value pairs of code/error of code that should have non-fatal warnings.
 ##
 @warning = (
-    "m/(?p{ 'a' })/" => "(?p{}) is deprecated - use (??{}) in regex; marked by {#} in m/(?p{#}{ 'a' })/",
+    "m/(?p{ 'a' })/" => "(?p{}) is deprecated - use (??{}) at {#} mark in regex m/(?p{#}{ 'a' })/",
 
-    'm/\b*/' => '\b* matches null string many times in regex; marked by {#} in m/\b*{#}/',
+    'm/\b*/' => '\b* matches null string many times at {#} mark in regex m/\b*{#}/',
 
-    'm/[:blank:]/' => 'POSIX syntax [: :] belongs inside character classes in regex; marked by {#} in m/[:blank:]{#}/',
+    'm/[:blank:]/' => 'POSIX syntax [: :] belongs inside character classes at {#} mark in regex m/[:blank:]{#}/',
 
-    "m'[\\y]'"     => 'Unrecognized escape \y in character class passed through in regex; marked by {#} in m/[\y{#}]/',
+    "m'[\\y]'"     => 'Unrecognized escape \y in character class passed through at {#} mark in regex m/[\y{#}]/',
 
-    'm/[a-\d]/' => 'False [] range "a-\d" in regex; marked by {#} in m/[a-\d{#}]/',
-    'm/[\w-x]/' => 'False [] range "\w-" in regex; marked by {#} in m/[\w-{#}x]/',
-    "m'\\y'"     => 'Unrecognized escape \y passed through in regex; marked by {#} in m/\y{#}/',
+    'm/[a-\d]/' => 'False [] range "a-\d" at {#} mark in regex m/[a-\d{#}]/',
+    'm/[\w-x]/' => 'False [] range "\w-" at {#} mark in regex m/[\w-{#}x]/',
+    "m'\\y'"     => 'Unrecognized escape \y passed through at {#} mark in regex m/\y{#}/',
 );
 
 my $total = (@death + @warning)/2;
-
-# utf8 is a noop on EBCDIC platforms, it is not fatal
-my $Is_EBCDIC = (ord('A') == 193);
-if ($Is_EBCDIC) {
-    my @utf8_death = grep(/utf8/, @death); 
-    $total = $total - @utf8_death;
-}
 
 print "1..$total\n";
 
@@ -116,25 +102,34 @@ my $count = 0;
 
 while (@death)
 {
+    $count++;
     my $regex = shift @death;
     my $result = shift @death;
-    # skip the utf8 test on EBCDIC since they do not die
-    next if ($Is_EBCDIC && $regex =~ /utf8/);
-    $count++;
 
+    undef $@;
     $_ = "x";
     eval $regex;
     if (not $@) {
-	print "# oops, $regex didn't die\nnot ok $count\n";
+	if ($debug) {
+	    print "oops, $regex didn't die\n"
+	} else {
+	    print "not ok $count\n";
+	}
 	next;
     }
     chomp $@;
+    $@ =~ s/ at \(.*?\) line \d+\.$//;
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
-    if ($@ !~ /^\Q$result/) {
-	print "# For $regex, expected:\n#  $result\n# Got:\n#  $@\n#\nnot ";
+    if ($@ ne $result) {
+	if ($debug) {
+	    print "For $regex, expected:\n  $result\nGot:\n  $@\n\n";
+	} else {
+	    print "not ok $count\n";
+	}
+	next;
     }
-    print "ok $count - $regex\n";
+    print "ok $count\n";
 }
 
 
@@ -153,30 +148,37 @@ while (@warning)
 
     if ($@)
     {
-	print "# oops, $regex died with:\n#\t$@#\nnot ok $count\n";
+	if ($debug) {
+	    print "oops, $regex died with:\n\t$@\n";
+	} else {
+	    print "not ok $count\n";
+	}
 	next;
     }
 
     if (not $warning)
     {
-	print "# oops, $regex didn't generate a warning\nnot ok $count\n";
+	if ($debug) {
+	    print "oops, $regex didn't generate a warning\n";
+	} else {
+	    print "not ok $count\n";
+	}
 	next;
     }
+    chomp $warning;
+    $warning =~ s/ at \(.*?\) line \d+\.$//;
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
-    if ($warning !~ /^\Q$result/)
+    if ($warning ne $result)
     {
-	print <<"EOM";
-# For $regex, expected:
-#   $result
-# Got:
-#   $warning
-#
-not ok $count
-EOM
+	if ($debug) {
+	    print "For $regex, expected:\n  $result\nGot:\n  $warning\n\n";
+	} else {
+	    print "not ok $count\n";
+	}
 	next;
     }
-    print "ok $count - $regex\n";
+    print "ok $count\n";
 }
 
 
