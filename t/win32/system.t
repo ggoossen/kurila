@@ -32,28 +32,10 @@ open(my $F, ">$testdir/$exename.c")
     or die "Can't create $testdir/$exename.c: $!";
 print $F <<'EOT';
 #include <stdio.h>
-#ifdef __BORLANDC__
-#include <windows.h>
-#endif
 int
 main(int ac, char **av)
 {
     int i;
-#ifdef __BORLANDC__
-    char *s = GetCommandLine();
-    int j=0;
-    av[0] = s;
-    if (s[0]=='"') {
-	for(;s[++j]!='"';)
-	  ;
-	av[0]++;
-    }
-    else {
-	for(;s[++j]!=' ';)
-	  ;
-    }
-    s[j]=0;
-#endif
     for (i = 0; i < ac; i++)
 	printf("[%s]", av[i]);
     printf("\n");
@@ -94,9 +76,10 @@ close $F;
 # build the executable
 chdir($testdir);
 END {
-    chdir($cwd) && rmtree("$cwd/$testdir") if -d "$cwd/$testdir";
+#    chdir($cwd);
+#    rmtree($testdir);
 }
-if (open(my $EIN, "$cwd/win32/${exename}_exe.uu")) {
+if (open(my $EIN, "$cwd/op/${exename}_exe.uu")) {
     print "# Unpacking $exename.exe\n";
     my $e;
     {
@@ -142,8 +125,8 @@ unless (-x "$testdir/$exename.exe") {
     exit(0);
 }
 
-open my $T, "$^X -I../lib -w win32/system_tests |"
-    or die "Can't spawn win32/system_tests: $!";
+open my $T, "$^X -I../lib -w op/system_tests |"
+    or die "Can't spawn op/system_tests: $!";
 my $expect;
 my $comment = "";
 my $test = 0;
