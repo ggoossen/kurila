@@ -5,13 +5,6 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
-    unless (find PerlIO::Layer 'perlio') {
-        print "1..0 # Skip: PerlIO not used\n";
-	exit 0;
-    }
-    if (ord("A") == 193) {
-	print "1..0 # Skip: EBCDIC\n";
-    }
 }
 
 use Test::More tests => 11;
@@ -51,7 +44,7 @@ ok( close( $test ),			'close test handle' );
 # Check decoding _with_ layers
 
 ok(
- open( my $in,'<:via(QuotedPrint)', $file ),
+ open( my $in,'<:via(PerlIO::via::QuotedPrint)', $file ),
  "opening '$file' for reading"
 );
 is( $decoded,join( '',<$in> ),		'check decoding' );
