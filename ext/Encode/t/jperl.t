@@ -1,29 +1,10 @@
 #
-# $Id: jperl.t,v 1.24 2002/04/26 03:02:04 dankogai Exp $
+# $Id: jperl.t,v 1.11 2002/03/31 22:12:13 dankogai Exp dankogai $
 #
 # This script is written in euc-jp
 
-BEGIN {
-    require Config; import Config;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
-      print "1..0 # Skip: Encode was not built\n";
-      exit 0;
-    }
-    unless (find PerlIO::Layer 'perlio') {
-	print "1..0 # Skip: PerlIO was not built\n";
-	exit 0;
-    }
-    if (ord("A") == 193) {
-	print "1..0 # Skip: EBCDIC\n";
-	exit 0;
-    }
-    $| = 1;
-}
-
-no utf8; # we have raw Japanese encodings here
-
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 15;
 my $Debug = shift;
 
 no encoding; # ensure
@@ -70,26 +51,6 @@ ok(! defined(${^ENCODING}), q{not scoped yet});
 ok(! defined(${^ENCODING}), q{out of black magic});
 use bytes;
 is (length($Namae), 10);
-
-#
-# now something completely different!
-#
-{
-    use encoding "euc-jp", Filter=>1;
-    ok(1, "Filter on");
-    use utf8;
-    no strict 'vars'; # fools
-    # doesn't work w/ "my" as of this writing.
-    # because of  buggy strict.pm and utf8.pm
-    our $¿Í = 2; 
-    #   ^^U+4eba, "human" in CJK ideograph
-    $¿Í++; # a child is born
-    *people = \$¿Í;
-    is ($people, 3, "Filter:utf8 identifier");
-    no encoding;
-    ok(1, "Filter off");
-}
-
 1;
 __END__
 
