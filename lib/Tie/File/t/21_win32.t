@@ -9,7 +9,7 @@
 
 my $file = "tf$$.txt";
 
-unless ($^O =~ /^(MSWin32)$/) {
+unless ($^O =~ /^(MSWin32|dos)$/) {
   print "1..0\n";
   exit;
 }
@@ -21,7 +21,7 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
-my $o = tie @a, 'Tie::File', $file, autodefer => 0;
+my $o = tie @a, 'Tie::File', $file;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;
 

@@ -2,16 +2,14 @@
 
 print "1..1\n";
 
-my $testversion = "0.93";
 use Tie::File;
 
-if ($Tie::File::VERSION != $testversion) {
+if ($Tie::File::VERSION != 0.19) {
   print STDERR "
+WHOA THERE!!
 
-*** WHOA THERE!!! ***
-
-You seem to be running version $Tie::File::VERSION of the module
-against version $testversion of the test suite!
+You seem to be running version $Tie::File::VERSION of the module against
+version 0.19 of the test suite!
 
 None of the other test results will be reliable.
 ";

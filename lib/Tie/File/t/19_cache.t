@@ -169,6 +169,7 @@ sub init_file {
   close F;
 }
 
+use POSIX 'SEEK_SET';
 sub check {
   my $integrity = $o->_check_integrity($file, $ENV{INTEGRITY});
   print $integrity ? "ok $N\n" : "not ok $N\n";
@@ -185,7 +186,9 @@ sub ctrlfix {
 }
 
 sub repopulate {
-  $o->{cache}->empty;
+  %{$o->{cache}} = ();          # scrub out the cache
+  @{$o->{lru}} = ();            # and the LRU queue
+    $o->{cached} = 0;           # and the cache size
   my @z = @a;                   # refill the cache with correct data
 }
 
