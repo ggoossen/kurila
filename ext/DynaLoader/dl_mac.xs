@@ -23,26 +23,21 @@
 
 #include <CodeFragments.h>
 
-typedef CFragConnectionID ConnectionID;
 
-typedef struct {
-    ConnectionID **	x_connections;
-} my_cxtx_t;		/* this *must* be named my_cxtx_t */
-
-#define DL_CXT_EXTRA	/* ask for dl_cxtx to be defined in dlutils.c */
 #include "dlutils.c"	/* SaveError() etc	*/
 
-#define dl_connections	(dl_cxtx.x_connections)
+typedef CFragConnectionID ConnectionID;
 
-static void terminate(pTHX_ void *ptr)
+static ConnectionID **	connections;
+
+static void terminate(void)
 {
-    dMY_CXT;
-    int size = GetHandleSize((Handle) dl_connections) / sizeof(ConnectionID);
-    HLock((Handle) dl_connections);
+    int size = GetHandleSize((Handle) connections) / sizeof(ConnectionID);
+    HLock((Handle) connections);
     while (size)
-    	CloseConnection(*dl_connections + --size);
-    DisposeHandle((Handle) dl_connections);
-    dl_connections = nil;
+    	CloseConnection(*connections + --size);
+    DisposeHandle((Handle) connections);
+    connections = nil;
 }
 
 static void
@@ -68,23 +63,22 @@ dl_load_file(filename, flags=0)
     Ptr			mainAddr;
     Str255		errName;
     CODE:
-    DLDEBUG(1,PerlIO_printf(Perl_debug_log,"dl_load_file(%s):\n", filename));
+    DLDEBUG(1,fprintf(stderr,"dl_load_file(%s):\n", filename));
     err = GUSIPath2FSp(filename, &spec);
     if (!err)
     	err = 
 	    GetDiskFragment(
 	    	&spec, 0, 0, spec.name, kLoadCFrag, &connID, &mainAddr, errName);
     if (!err) {
-	dMY_CXT;
-    	if (!dl_connections) {
-	    dl_connections = (ConnectionID **)NewHandle(0);
-	    call_atexit(terminate, (void*)0);
+    	if (!connections) {
+	    connections = (ConnectionID **)NewHandle(0);
+	    atexit(terminate);
     	}
-        PtrAndHand((Ptr) &connID, (Handle) dl_connections, sizeof(ConnectionID));
+        PtrAndHand((Ptr) &connID, (Handle) connections, sizeof(ConnectionID));
     	RETVAL = connID;
     } else
     	RETVAL = (ConnectionID) 0;
-    DLDEBUG(2,PerlIO_printf(Perl_debug_log," libref=%d\n", RETVAL));
+    DLDEBUG(2,fprintf(stderr," libref=%d\n", RETVAL));
     ST(0) = sv_newmortal() ;
     if (err)
     	SaveError(aTHX_ "DynaLoader error [%d, %#s]", err, errName) ;
@@ -100,13 +94,13 @@ dl_find_symbol(connID, symbol)
     	OSErr		    err;
     	Ptr		    symAddr;
     	CFragSymbolClass    symClass;
-    	DLDEBUG(2,PerlIO_printf(Perl_debug_log,"dl_find_symbol(handle=%x, symbol=%#s)\n",
+    	DLDEBUG(2,fprintf(stderr,"dl_find_symbol(handle=%x, symbol=%#s)\n",
 	    connID, symbol));
    	err = FindSymbol(connID, symbol, &symAddr, &symClass);
     	if (err)
     	    symAddr = (Ptr) 0;
     	RETVAL = (void *) symAddr;
-    	DLDEBUG(2,PerlIO_printf(Perl_debug_log,"  symbolref = %x\n", RETVAL));
+    	DLDEBUG(2,fprintf(stderr,"  symbolref = %x\n", RETVAL));
     	ST(0) = sv_newmortal() ;
     	if (err)
 	    SaveError(aTHX_ "DynaLoader error [%d]!", err) ;
@@ -128,7 +122,7 @@ dl_install_xsub(perl_name, symref, filename="$Package")
     void *		symref 
     char *		filename
     CODE:
-    DLDEBUG(2,PerlIO_printf(Perl_debug_log,"dl_install_xsub(name=%s, symref=%x)\n",
+    DLDEBUG(2,fprintf(stderr,"dl_install_xsub(name=%s, symref=%x)\n",
 		perl_name, symref));
     ST(0)=sv_2mortal(newRV((SV*)newXS(perl_name, (void(*)())symref, filename)));
 
@@ -136,8 +130,7 @@ dl_install_xsub(perl_name, symref, filename="$Package")
 char *
 dl_error()
     CODE:
-    dMY_CXT;
-    RETVAL = dl_last_error ;
+    RETVAL = LastError ;
     OUTPUT:
     RETVAL
 
