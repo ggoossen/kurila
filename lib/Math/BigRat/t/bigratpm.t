@@ -29,7 +29,6 @@ BEGIN
   plan tests => 414;
   }
 
-#use Math::BigInt;
 use Math::BigRat;
 
 use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup $CL);
