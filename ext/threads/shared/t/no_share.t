@@ -1,4 +1,6 @@
-use warnings;
+
+
+
 
 BEGIN {
 #    chdir 't' if -d 't';
@@ -15,7 +17,6 @@ BEGIN {
 sub ok {
     my ($id, $ok, $name) = @_;
 
-    $name = '' unless defined $name;
     # You have to do it this way or VMS will get confused.
     print $ok ? "ok $id - $name\n" : "not ok $id - $name\n";
 
@@ -32,7 +33,7 @@ use threads::shared;
 use threads;
 ok(1,1,"loaded");
 ok(2,$warnmsg =~ /Warning, threads::shared has already been loaded/,
-    "threads has warned us");
+    "threads has warned us"); 
 my $test = "bar";
 share($test);
 ok(3,$test eq "bar","Test disabled share not interfering");
@@ -41,7 +42,6 @@ threads->create(
                    ok(4,$test eq "bar","Test disabled share after thread");
                    $test = "baz";
                    })->join();
-# Value should either remain unchanged or be value set by other thread
-ok(5,$test eq "bar" || $test eq 'baz',"Test that value is an expected one");
+ok(5,$test eq "bar","Test that value hasn't changed in another thread");
 
-
+ 
