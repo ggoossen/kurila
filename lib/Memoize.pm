@@ -3,15 +3,15 @@
 #
 # Transparent memoization of idempotent functions
 #
-# Copyright 1998, 1999, 2000, 2001 M-J. Dominus.
+# Copyright 1998, 1999 M-J. Dominus.
 # You may copy and distribute this program under the
 # same terms as Perl itself.  If in doubt, 
 # write to mjd-perl-memoize+@plover.com for a license.
 #
-# Version 1.01 $Revision: 1.18 $ $Date: 2001/06/24 17:16:47 $
+# Version 0.64 beta $Revision: 1.17 $ $Date: 2000/10/24 04:33:49 $
 
 package Memoize;
-$VERSION = '1.01';
+$VERSION = '0.64';
 
 # Compile-time constants
 sub SCALAR () { 0 } 
@@ -27,7 +27,6 @@ sub LIST () { 1 }
 use Carp;
 use Exporter;
 use vars qw($DEBUG);
-use Config;                     # Dammit.
 @ISA = qw(Exporter);
 @EXPORT = qw(memoize);
 @EXPORT_OK = qw(unmemoize flush_cache);
@@ -65,15 +64,18 @@ sub memoize {
   if (defined $proto) { $proto = "($proto)" }
   else { $proto = "" }
 
-  # I would like to get rid of the eval, but there seems not to be any
-  # other way to set the prototype properly.  The switch here for
-  # 'usethreads' works around a bug in threadperl having to do with
-  # magic goto.  It would be better to fix the bug and use the magic
-  # goto version everywhere.
-  my $wrapper = 
-      $Config{usethreads} 
-        ? eval "sub $proto { &_memoizer(\$cref, \@_); }" 
-        : eval "sub $proto { unshift \@_, \$cref; goto &_memoizer; }";
+  # Goto considered harmful!  Hee hee hee.  
+  my $wrapper = eval "sub $proto { unshift \@_, qq{$cref}; goto &_memoizer; }";
+  # Actually I would like to get rid of the eval, but there seems not
+  # to be any other way to set the prototype properly.
+
+# --- THREADED PERL COMMENT ---
+# The above line might not work under threaded perl because goto & 
+# semantics are broken.  If that's the case, try the following instead:
+#  my $wrapper = eval "sub { &_memoizer(qq{$cref}, \@_); }";
+# Confirmed 1998-12-27 this does work.
+# 1998-12-29: Sarathy says this bug is fixed in 5.005_54.
+# However, the module still fails, although the sample test program doesn't.
 
   my $normalizer = $options{NORMALIZER};
   if (defined $normalizer  && ! ref $normalizer) {
@@ -116,12 +118,7 @@ sub memoize {
     if ($cache_opt eq 'FAULT') { # no cache
       $caches{$context} = undef;
     } elsif ($cache_opt eq 'HASH') { # user-supplied hash
-      my $cache = $cache_opt_args[0];
-      my $package = ref(tied %$cache);
-      if ($context eq 'LIST' && $scalar_only{$package}) {
-        croak("You can't use $package for LIST_CACHE because it can only store scalars");
-      }
-      $caches{$context} = $cache;
+      $caches{$context} = $cache_opt_args[0];
     } elsif ($cache_opt eq '' ||  $IS_CACHE_TAG{$cache_opt}) {
       # default is that we make up an in-memory hash
       $caches{$context} = {};
@@ -176,8 +173,6 @@ sub _my_tie {
   my $shortopt = (ref $fullopt) ? $fullopt->[0] : $fullopt;
   
   return unless defined $shortopt && $shortopt eq 'TIE';
-  carp("TIE option to memoize() is deprecated; use HASH instead")
-      if $^W;
 
   my @args = ref $fullopt ? @$fullopt : ();
   shift @args;
@@ -191,9 +186,17 @@ sub _my_tie {
   if ($@) {
     croak "Memoize: Couldn't load hash tie module `$module': $@; aborting";
   }
+#  eval  { import $module };
+#  if ($@) {
+#    croak "Memoize: Couldn't import hash tie module `$module': $@; aborting";
+#  }    
+#  eval "use $module ()";  
+#  if ($@) {
+#    croak "Memoize: Couldn't use hash tie module `$module': $@; aborting";
+#  }    
   my $rc = (tie %$hash => $module, @args);
   unless ($rc) {
-    croak "Memoize: Couldn't tie hash to `$module': $!; aborting";
+    croak "Memoize: Couldn't tie hash to `$module': $@; aborting";
   }
   1;
 }
@@ -234,13 +237,12 @@ sub _memoizer {
       croak "Internal error \#41; context was neither LIST nor SCALAR\n";
     }
   } else {                      # Default normalizer
-    local $^W = 0;
-    $argstr = join chr(28),@_;  
+    $argstr = join $;,@_;       # $;,@_;? Perl is great.
   }
 
   if ($context == SCALAR) {
     my $cache = $info->{S};
-    _crap_out($info->{NAME}, 'scalar') unless $cache;
+    _crap_out($info->{NAME}, 'scalar') unless defined $cache;
     if (exists $cache->{$argstr}) { 
       return $cache->{$argstr};
     } else {
@@ -255,15 +257,17 @@ sub _memoizer {
     }
   } elsif ($context == LIST) {
     my $cache = $info->{L};
-    _crap_out($info->{NAME}, 'list') unless $cache;
+    _crap_out($info->{NAME}, 'list') unless defined $cache;
     if (exists $cache->{$argstr}) {
       my $val = $cache->{$argstr};
+      return ($val) unless ref $val eq 'ARRAY';
+      # An array ref is ambiguous. Did the function really return 
+      # an array ref?  Or did we cache a list-context list return in
+      # an anonymous array?
       # If LISTCONTEXT=>MERGE, then the function never returns lists,
-      # so we have a scalar value cached, so just return it straightaway:
+      # so we know for sure:
       return ($val) if $info->{O}{LIST_CACHE} eq 'MERGE';
-      # Maybe in a later version we can use a faster test.
-
-      # Otherwise, we cached an array containing the returned list:
+      # Otherwise, we're doomed.  ###BUG
       return @$val;
     } else {
       my $q = $cache->{$argstr} = [&{$info->{U}}(@_)];
@@ -357,11 +361,10 @@ sub _crap_out {
 
 =head1 NAME
 
-Memoize - Make functions faster by trading space for time
+Memoize - Make your functions faster by trading space for time
 
 =head1 SYNOPSIS
 
-        # This is the documentation for Memoize 1.01
 	use Memoize;
 	memoize('slow_function');
 	slow_function(arguments);    # Is faster than it was before
@@ -391,7 +394,7 @@ Options include:
 `Memoizing' a function makes it faster by trading space for time.  It
 does this by caching the return values of the function in a table.
 If you call the function again with the same arguments, C<memoize>
-jumps in and gives you the value out of the table, instead of letting
+jmups in and gives you the value out of the table, instead of letting
 the function compute the value all over again.
 
 Here is an extreme example.  Consider the Fibonacci sequence, defined
@@ -463,7 +466,7 @@ this:
 
 Since there are relatively few objects in a picture, there are only a
 few colors, which get looked up over and over again.  Memoizing
-C<ColorToRGB> sped up the program by several percent.
+C<ColorToRGB> speeded up the program by several percent.
 
 =head1 DETAILS
 
@@ -552,13 +555,13 @@ might look like this:
 	  $hash{B} ||= 2;
 	  $hash{C} ||= 7;
 
-	  join(',', $a, map ($_ => $hash{$_}) sort keys %hash);
+	  join($;, $a, map ($_ => $hash{$_}) sort keys %hash);
 	}
 
 Each of the argument lists above comes out of the C<normalize_f>
 function looking exactly the same, like this:
 
-	OUCH,B,2,C,7
+	OUCH^\B^\2^\C^\7
 
 You would tell C<Memoize> to use this normalizer this way:
 
@@ -570,11 +573,11 @@ that it computed for one argument list and return it as the result of
 calling the function with the other argument list, even if the
 argument lists look different.
 
-The default normalizer just concatenates the arguments with character
-28 in between.  (In ASCII, this is called FS or control-\.)  This
-always works correctly for functions with only one string argument,
-and also when the arguments never contain character 28.  However, it
-can confuse certain argument lists:
+The default normalizer just concatenates the arguments with C<$;> in
+between.  This always works correctly for functions with only one
+argument, and also when the arguments never contain C<$;> (which is
+normally character #28, control-\.  )  However, it can confuse certain
+argument lists:
 
 	normalizer("a\034", "b")
 	normalizer("a", "\034b")
@@ -582,16 +585,14 @@ can confuse certain argument lists:
 
 for example.
 
-Since hash keys are strings, the default normalizer will not
-distinguish between C<undef> and the empty string.  It also won't work
-when the function's arguments are references.  For example, consider a
-function C<g> which gets two arguments: A number, and a reference to
-an array of numbers:
+The default normalizer also won't work when the function's arguments
+are references.  For exampple, consider a function C<g> which gets two
+arguments: A number, and a reference to an array of numbers:
 
 	g(13, [1,2,3,4,5,6,7]);
 
 The default normalizer will turn this into something like
-C<"13\034ARRAY(0x436c1f)">.  That would be all right, except that a
+C<"13\024ARRAY(0x436c1f)">.  That would be all right, except that a
 subsequent array of numbers might be stored at a different location
 even though it contains the same data.  If this happens, C<Memoize>
 will think that the arguments are different, even though they are
@@ -616,7 +617,7 @@ returns a value which depends on the current hour of the day:
 	  return $line;
 	}
 
-At 10:23, this function generates the 10th line of a data file; at
+At 10:23, this function generates the tenth line of a data file; at
 3:45 PM it generates the 15th line instead.  By default, C<Memoize>
 will only see the $problem_type argument.  To fix this, include the
 current hour in the normalizer:
@@ -636,7 +637,7 @@ Normally, C<Memoize> caches your function's return values into an
 ordinary Perl hash variable.  However, you might like to have the
 values cached on the disk, so that they persist from one run of your
 program to the next, or you might like to associate some other
-interesting semantics with the cached values.
+interesting semantics with the cached values.  
 
 There's a slight complication under the hood of C<Memoize>: There are
 actually I<two> caches, one for scalar values and one for list values.
@@ -651,7 +652,7 @@ the following four strings:
 	MEMORY
 	FAULT
 	MERGE
-        HASH
+        HASH                                                           
 
 or else it must be a reference to a list whose first element is one of
 these four strings, such as C<[HASH, arguments...]>.
@@ -678,7 +679,7 @@ complete details about C<tie>.
 
 A typical example is:
 
-        use DB_File;
+        use DB_File; 
         tie my %cache => 'DB_File', $filename, O_RDWR|O_CREAT, 0666;
         memoize 'function', SCALAR_CACHE => [HASH => \%cache];
 
@@ -693,19 +694,16 @@ because all its results have been precomputed.
 
 =item C<TIE>
 
-This option is no longer supported.  It is still documented only to
-aid in the debugging of old programs that use it.  Old programs should
-be converted to use the C<HASH> option instead.
+This option is B<strongly deprecated> and will be removed
+in the B<next> version of C<Memoize>.  Use the C<HASH> option instead.
 
-        memoize ... [TIE, PACKAGE, ARGS...]
+        memoize ... [TIE, ARGS...]
 
 is merely a shortcut for
 
-        require PACKAGE;
-	{ my %cache;
-          tie %cache, PACKAGE, ARGS...;
-	}
+        tie my %cache, ARGS...;
         memoize ... [HASH => \%cache];
+
 
 =item C<FAULT>
 
@@ -741,12 +739,12 @@ caches the list C<(3)> in the list cache.  The third call doesn't call
 the real C<pi> function; it gets the value from the scalar cache.
 
 Obviously, the second call to C<pi> is a waste of time, and storing
-its return value is a waste of space.  Specifying C<LIST_CACHE =E<gt>
-MERGE> will make C<memoize> use the same cache for scalar and list
-context return values, so that the second call uses the scalar cache
-that was populated by the first call.  C<pi> ends up being called only
-once, and both subsequent calls return C<3> from the cache, regardless
-of the calling context.
+its return value is a waste of space.  Specifying C<LIST_CACHE
+=E<gt> MERGE> will make C<memoize> use the same cache for scalar and
+list context return values, so that the second call uses the scalar
+cache that was populated by the first call.  C<pi> ends up being
+cvalled only once, and both subsequent calls return C<3> from the
+cache, regardless of the calling context.
 
 Another use for C<MERGE> is when you want both kinds of return values
 stored in the same disk file; this saves you from having to deal with
@@ -787,6 +785,8 @@ without synchronizing the database.  So what you can do instead is
 
     $SIG{INT} = sub { unmemoize 'function' };
 
+Thanks to Jonathan Roy for discovering a use for C<unmemoize>.
+
 C<unmemoize> accepts a reference to, or the name of a previously
 memoized function, and undoes whatever it did to provide the memoized
 version in the first place, including making the name refer to the
@@ -799,7 +799,7 @@ croaks.
 =head2 C<flush_cache>
 
 C<flush_cache(function)> will flush out the caches, discarding I<all>
-the cached data.  The argument may be a function name or a reference
+the cached data.  The argument may be a funciton name or a reference
 to a function.  For finer control over when data is discarded or
 expired, see the documentation for C<Memoize::Expire>, included in
 this package.
@@ -811,7 +811,7 @@ method, this will cause a run-time error.
 An alternative approach to cache flushing is to use the C<HASH> option
 (see above) to request that C<Memoize> use a particular hash variable
 as its cache.  Then you can examine or modify the hash at any time in
-any way you desire.  You may flush the cache by using C<%hash = ()>. 
+any way you desire.
 
 =head1 CAVEATS
 
@@ -937,7 +937,7 @@ cache table on disk in an C<SDBM_File> database:
         memoize 'function', SCALAR_CACHE => [HASH => \%cache];
 
 C<NDBM_File> has the same problem and the same solution.  (Use
-C<Memoize::NDBM_File instead of plain NDBM_File.>)
+C<Memoize::NDBM_File instead of Plain NDBM_File.>)
 
 C<Storable> isn't a tied hash class at all.  You can use it to store a
 hash to disk and retrieve it again, but you can't modify the hash while
@@ -957,9 +957,6 @@ function (or when your program exits):
 Include the `nstore' option to have the C<Storable> database written
 in `network order'.  (See L<Storable> for more details about this.)
 
-The C<flush_cache()> function will raise a run-time error unless the
-tied package provides a C<CLEAR> method.
-
 =head1 EXPIRATION SUPPORT
 
 See Memoize::Expire, which is a plug-in module that adds expiration
@@ -973,18 +970,21 @@ is available on CPAN as Memoize::ExpireLRU.
 
 The test suite is much better, but always needs improvement.
 
-There is some problem with the way C<goto &f> works under threaded
-Perl, perhaps because of the lexical scoping of C<@_>.  This is a bug
-in Perl, and until it is resolved, memoized functions will see a
-slightly different C<caller()> and will perform a little more slowly
-on threaded perls than unthreaded perls.
+There used to be some problem with the way C<goto &f> works under
+threaded Perl, because of the lexical scoping of C<@_>.  This is a bug
+in Perl, and until it is resolved, Memoize won't work with these
+Perls.  This is probably still the case, although I have not been able
+to try it out.  If you encounter this problem, you can fix it by
+chopping the source code a little.  Find the comment in the source
+code that says C<--- THREADED PERL COMMENT---> and comment out the
+active line and uncomment the commented one.  Then try it again.
 
-Some versions of C<DB_File> won't let you store data under a key of
-length 0.  That means that if you have a function C<f> which you
-memoized and the cache is in a C<DB_File> database, then the value of
-C<f()> (C<f> called with no arguments) will not be memoized.  If this
-is a big problem, you can supply a normalizer function that prepends
-C<"x"> to every key.
+Here's a bug that isn't my fault: Some versions of C<DB_File> won't
+let you store data under a key of length 0.  That means that if you
+have a function C<f> which you memoized and the cache is in a
+C<DB_File> database, then the value of C<f()> (C<f> called with no
+arguments) will not be memoized.  Let us all breathe deeply and repeat
+this mantra: ``Gosh, Keith, that sure was a stupid thing to do.''
 
 =head1 MAILING LIST
 
@@ -1002,46 +1002,28 @@ memoization and about the internals of Memoize that appeared in The
 Perl Journal, issue #13.  (This article is also included in the
 Memoize distribution as `article.html'.)
 
-My upcoming book will discuss memoization (and many other fascinating
-topics) in tremendous detail.  It will be published by Morgan Kaufmann
-in 2002, possibly under the title I<Perl Advanced Techniques
-Handbook>.  It will also be available on-line for free.  For more
-information, visit http://perl.plover.com/book/ .
-
 To join a mailing list for announcements about C<Memoize>, send an
 empty message to C<mjd-perl-memoize-request@plover.com>.  This mailing
 list is for announcements only and has extremely low traffic---about
-two messages per year.
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 1998, 1999, 2000, 2001  by Mark Jason Dominus
-
-This library is free software; you may redistribute it and/or modify
-it under the same terms as Perl itself.
+four messages per year.
 
 =head1 THANK YOU
 
 Many thanks to Jonathan Roy for bug reports and suggestions, to
 Michael Schwern for other bug reports and patches, to Mike Cariaso for
 helping me to figure out the Right Thing to Do About Expiration, to
-Joshua Gerth, Joshua Chamas, Jonathan Roy (again), Mark D. Anderson,
-and Andrew Johnson for more suggestions about expiration, to Brent
-Powers for the Memoize::ExpireLRU module, to Ariel Scolnicov for
-delightful messages about the Fibonacci function, to Dion Almaer for
+Joshua Gerth, Joshua Chamas, Jonathan Roy, Mark D. Anderson, and
+Andrew Johnson for more suggestions about expiration, to Brent Powers
+for the Memoize::ExpireLRU module, to Ariel Scolnicov for delightful
+messages about the Fibonacci function, to Dion Almaer for
 thought-provoking suggestions about the default normalizer, to Walt
 Mankowski and Kurt Starsinic for much help investigating problems
 under threaded Perl, to Alex Dudkevich for reporting the bug in
 prototyped functions and for checking my patch, to Tony Bass for many
-helpful suggestions, to Jonathan Roy (again) for finding a use for
-C<unmemoize()>, to Philippe Verdret for enlightening discussion of
-C<Hook::PrePostCall>, to Nat Torkington for advice I ignored, to Chris
+helpful suggestions, to Philippe Verdret for enlightening discussion
+of Hook::PrePostCall, to Nat Torkington for advice I ignored, to Chris
 Nandor for portability advice, to Randal Schwartz for suggesting the
 'C<flush_cache> function, and to Jenda Krynicky for being a light in
 the world.
-
-Special thanks to Jarkko Hietaniemi, the 5.8.0 pumpking, for including
-this module in the core and for his patient and helpful guidance
-during the integration process.
 
 =cut

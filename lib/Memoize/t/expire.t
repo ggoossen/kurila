@@ -17,9 +17,7 @@ sub id {
   $arg;
 }
 
-tie my %cache => 'Memoize::ExpireTest';
-memoize 'id', 
-  SCALAR_CACHE => [HASH => \%cache], 
+memoize 'id', SCALAR_CACHE => ['TIE', 'Memoize::ExpireTest'], 
   LIST_CACHE => 'FAULT';
 $n++; print "ok $n\n";
 

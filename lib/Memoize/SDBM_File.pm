@@ -1,18 +1,6 @@
 package Memoize::SDBM_File;
-
-=head1 NAME
-
-Memoize::SDBM_File - glue to provide EXISTS for SDBM_File for Storable use
-
-=head1 DESCRIPTION
-
-See L<Memoize>.
-
-=cut
-
 use SDBM_File;
 @ISA = qw(SDBM_File);
-$VERSION = 0.65;
 
 $Verbose = 0;
 
