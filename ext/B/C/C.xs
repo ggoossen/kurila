@@ -47,7 +47,5 @@ my_runops(pTHX)
 
 MODULE=B__C PACKAGE=B::C
 
-PROTOTYPES: DISABLE
-
 BOOT:
     PL_runops = my_runops;
