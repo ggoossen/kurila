@@ -10,31 +10,19 @@ BEGIN {
     }
 }
 
+my $SAMPLE_TESTS = $ENV{PERL_CORE} ? 'lib/sample-tests' : 't/sample-tests';
+
 use strict;
-use Test::More;
-use File::Spec;
 
-my $Curdir = File::Spec->curdir;
-my $SAMPLE_TESTS = $ENV{PERL_CORE}
-                    ? File::Spec->catdir($Curdir, 'lib', 'sample-tests')
-                    : File::Spec->catdir($Curdir, 't',   'sample-tests');
+use Test::More tests => 27;
 
+use_ok('Test::Harness::Straps');
 
-my $IsMacOS   = $^O eq 'MacOS';
-my $IsVMS     = $^O eq 'VMS';
-
-# VMS uses native, not POSIX, exit codes.
-my $die_exit = $IsVMS ? 44 : $IsMacOS ? 0 : 1;
-
-# We can only predict that the wait status should be zero or not.
-my $wait_non_zero = 1;
+my $IsVMS = $^O eq 'VMS';
 
 my %samples = (
    combined   => {
                   passing     => 0,
-
-                  'exit'      => 0,
-                  'wait'      => 0,
 
                   max         => 10,
                   seen        => 10,
@@ -71,9 +59,6 @@ my %samples = (
    descriptive      => {
                         passing     => 1,
 
-                        'wait'      => 0,
-                        'exit'      => 0,
-
                         max         => 5,
                         seen        => 5,
 
@@ -103,9 +88,6 @@ my %samples = (
    duplicates       => {
                         passing     => 0,
 
-                        'exit'      => 0,
-                        'wait'      => 0,
-
                         max         => 10,
                         seen        => 11,
 
@@ -120,9 +102,6 @@ my %samples = (
 
    head_end         => {
                         passing     => 1,
-
-                        'exit'      => 0,
-                        'wait'      => 0,
 
                         max         => 4,
                         seen        => 4,
@@ -139,9 +118,6 @@ my %samples = (
    lone_not_bug     => {
                         passing     => 1,
 
-                        'exit'      => 0,
-                        'wait'      => 0,
-
                         max         => 4,
                         seen        => 4,
 
@@ -157,9 +133,6 @@ my %samples = (
    head_fail           => {
                            passing  => 0,
 
-                           'exit'   => 0,
-                           'wait'   => 0,
-
                            max      => 4,
                            seen     => 4,
 
@@ -173,21 +146,18 @@ my %samples = (
                                          ({ 'ok'=> 1, actual_ok => 1 }) x 2
                                        ],
                           },
-
+               
    simple           => {
                         passing     => 1,
 
-                        'exit'      => 0,
-                        'wait'      => 0,
-
                         max         => 5,
                         seen        => 5,
-
+                        
                         'ok'          => 5,
                         'todo'        => 0,
                         'skip'        => 0,
                         bonus       => 0,
-
+                        
                         details     => [ ({ 'ok' => 1, actual_ok => 1 }) x 5
                                        ]
                        },
@@ -195,17 +165,14 @@ my %samples = (
    simple_fail      => {
                         passing     => 0,
 
-                        'exit'      => 0,
-                        'wait'      => 0,
-
                         max         => 5,
                         seen        => 5,
-
+                        
                         'ok'          => 3,
                         'todo'        => 0,
                         'skip'        => 0,
                         bonus       => 0,
-
+                        
                         details     => [ { 'ok' => 1, actual_ok => 1 },
                                          { 'ok' => 0, actual_ok => 0 },
                                          { 'ok' => 1, actual_ok => 1 },
@@ -217,9 +184,6 @@ my %samples = (
    'skip'             => {
                         passing     => 1,
 
-                        'exit'      => 0,
-                        'wait'      => 0,
-
                         max         => 5,
                         seen        => 5,
 
@@ -227,7 +191,7 @@ my %samples = (
                         'todo'        => 0,
                         'skip'        => 1,
                         bonus       => 0,
-
+                        
                         details     => [ { 'ok' => 1, actual_ok => 1 },
                                          { 'ok'   => 1, actual_ok => 1,
                                            type   => 'skip',
@@ -237,32 +201,8 @@ my %samples = (
                                        ]
                        },
 
-   'skip_nomsg'     => {
-                        passing     => 1,
-
-                        'exit'      => 0,
-                        'wait'      => 0,
-
-                        max         => 1,
-                        seen        => 1,
-
-                        'ok'          => 1,
-                        'todo'        => 0,
-                        'skip'        => 1,
-                        bonus       => 0,
-
-                        details     => [ { 'ok'   => 1, actual_ok => 1,
-                                           type   => 'skip',
-                                           reason => '',
-                                         },
-                                       ]
-                       },
-
-   skipall           => {
+   skip_all           => {
                           passing   => 1,
-
-                          'exit'    => 0,
-                          'wait'    => 0,
 
                           max       => 0,
                           seen      => 0,
@@ -272,36 +212,16 @@ my %samples = (
                           'todo'    => 0,
                           'skip'    => 0,
                           bonus     => 0,
-
-                          details   => [],
-                         },
-
-   skipall_nomsg    => {
-                          passing   => 1,
-
-                          'exit'    => 0,
-                          'wait'    => 0,
-
-                          max       => 0,
-                          seen      => 0,
-
-                          'ok'      => 0,
-                          'todo'    => 0,
-                          'skip'    => 0,
-                          bonus     => 0,
-
+                          
                           details   => [],
                          },
 
    'todo'             => {
                         passing     => 1,
 
-                        'exit'      => 0,
-                        'wait'      => 0,
-
                         max         => 5,
                         seen        => 5,
-
+                                    
                         'ok'          => 5,
                         'todo'        => 2,
                         'skip'        => 0,
@@ -317,9 +237,6 @@ my %samples = (
                        },
    taint            => {
                         passing     => 1,
-
-                        'exit'      => 0,
-                        'wait'      => 0,
 
                         max         => 1,
                         seen        => 1,
@@ -337,9 +254,6 @@ my %samples = (
    vms_nit          => {
                         passing     => 0,
 
-                        'exit'      => 0,
-                        'wait'      => 0,
-
                         max         => 2,
                         seen        => 2,
 
@@ -351,143 +265,17 @@ my %samples = (
                         details     => [ { 'ok' => 0, actual_ok => 0 },
                                          { 'ok' => 1, actual_ok => 1 },
                                        ],
-                       },
-   'die'            => {
-                        passing     => 0,
-
-                        'exit'      => $die_exit,
-                        'wait'      => $wait_non_zero,
-
-                        max         => 0,
-                        seen        => 0,
-
-                        'ok'        => 0,
-                        'todo'      => 0,
-                        'skip'      => 0,
-                        bonus       => 0,
-
-                        details     => []
-                       },
-
-   die_head_end     => {
-                        passing     => 0,
-
-                        'exit'      => $die_exit,
-                        'wait'      => $wait_non_zero,
-
-                        max         => 0,
-                        seen        => 4,
-
-                        'ok'        => 4,
-                        'todo'      => 0,
-                        'skip'      => 0,
-                        bonus       => 0,
-
-                        details     => [ ({ 'ok' => 1, actual_ok => 1 }) x 4
-                                       ],
-                       },
-
-   die_last_minute  => {
-                        passing     => 0,
-
-                        'exit'      => $die_exit,
-                        'wait'      => $wait_non_zero,
-
-                        max         => 4,
-                        seen        => 4,
-
-                        'ok'        => 4,
-                        'todo'      => 0,
-                        'skip'      => 0,
-                        bonus       => 0,
-
-                        details     => [ ({ 'ok' => 1, actual_ok => 1 }) x 4
-                                       ],
-                       },
-
-   bignum           => {
-                        passing     => 0,
-
-                        'exit'      => 0,
-                        'wait'      => 0,
-
-                        max         => 2,
-                        seen        => 4,
-
-                        'ok'          => 4,
-                        'todo'        => 0,
-                        'skip'        => 0,
-                        bonus       => 0,
-
-                        details     => [ { 'ok' => 1, actual_ok => 1 },
-                                         { 'ok' => 1, actual_ok => 1 },
-                                       ]
-                       },
-
-   'shbang_misparse' =>{
-                        passing     => 1,
-
-                        'exit'      => 0,
-                        'wait'      => 0,
-
-                        max         => 2,
-                        seen        => 2,
-
-                        'ok'          => 2,
-                        'todo'        => 0,
-                        'skip'        => 0,
-                        bonus       => 0,
-
-                        details     => [ ({ 'ok' => 1, actual_ok => 1 }) x 2 ]
-                       },
+                       },              
 );
 
-plan tests => (keys(%samples) * 4) + 3;
 
-use_ok('Test::Harness::Straps');
-
-$SIG{__WARN__} = sub { 
-    warn @_ unless $_[0] =~ /^Enormous test number/ ||
-                   $_[0] =~ /^Can't detailize/
-};
 while( my($test, $expect) = each %samples ) {
-    for (0..$#{$expect->{details}}) {
-        $expect->{details}[$_]{type} = ''
-            unless exists $expect->{details}[$_]{type};
-        $expect->{details}[$_]{name} = ''
-            unless exists $expect->{details}[$_]{name};
-        $expect->{details}[$_]{reason} = ''
-            unless exists $expect->{details}[$_]{reason};
-    }
-
-    my $test_path = File::Spec->catfile($SAMPLE_TESTS, $test);
     my $strap = Test::Harness::Straps->new;
-    my %results = $strap->analyze_file($test_path);
-
-    is_deeply($results{details}, $expect->{details}, "$test details" );
+    my %results = $strap->analyze_file("$SAMPLE_TESTS/$test");
+    
+    is_deeply($expect->{details}, $results{details}, "$test details" );
 
     delete $expect->{details};
     delete $results{details};
-
-    SKIP: {
-        skip '$? unreliable in MacPerl', 2 if $IsMacOS;
-
-        # We can only check if it's zero or non-zero.
-        is( !!$results{'wait'}, !!$expect->{'wait'}, 'wait status' );
-        delete $results{'wait'};
-        delete $expect->{'wait'};
-
-        # Have to check the exit status seperately so we can skip it
-        # in MacPerl.
-        is( $results{'exit'}, $expect->{'exit'} );
-        delete $results{'exit'};
-        delete $expect->{'exit'};
-    }
-
-    is_deeply(\%results, $expect, "  the rest $test" );
+    is_deeply($expect, \%results, "  the rest" );
 }
-
-
-my $strap = Test::Harness::Straps->new;
-ok( !$strap->analyze_file('I_dont_exist') );
-is( $strap->{error}, "I_dont_exist does not exist" );
