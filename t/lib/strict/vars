@@ -396,20 +396,7 @@ our $foo;
 EXPECT
 "our" variable $foo redeclared at - line 9.
 	(Did you mean "local" instead of "our"?)
-########
-
---FILE-- abc
-ok
---FILE-- 
-# check if our variables are introduced correctly in readline()
-package Foo;
-use strict 'vars';
-our $FH;
-open $FH, "abc" or die "Can't open 'abc': $!";
-print <$FH>;
-close $FH;
-EXPECT
-ok
+Name "Foo::foo" used only once: possible typo at - line 11.
 ########
 
 # Make sure the strict vars failure still occurs

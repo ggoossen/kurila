@@ -46,11 +46,17 @@ toke.c	AOK
      warn(warn_reserved	
 	$a = abc;
 
+     chmod() mode argument is missing initial 0 
+	chmod 3;
+
      Possible attempt to separate words with commas 
 	@a = qw(a, b, c) ;
 
      Possible attempt to put comments in qw() list 
 	@a = qw(a b # c) ;
+
+     umask: argument is missing initial 0 
+	umask 3;
 
      %s (...) interpreted as function 
 	print ("")
@@ -101,13 +107,7 @@ toke.c	AOK
         $a =  0037777777776 ;
         $a =  0037777777777 ;
         $a =  0047777777777 ;
-
-    dump() better written as CORE::dump()
-
-    Use of /c modifier is meaningless without /g     
-
-    Use of /c modifier is meaningless in s///
-
+     
     Mandatory Warnings
     ------------------
     Use of "%s" without parentheses is ambiguous	[check_uni]
@@ -262,6 +262,14 @@ EXPECT
 Unquoted string "abc" may clash with future reserved word at - line 3.
 ########
 # toke.c
+use warnings 'chmod' ;
+chmod 3;
+no warnings 'chmod' ;
+chmod 3;
+EXPECT
+chmod() mode argument is missing initial 0 at - line 3.
+########
+# toke.c
 use warnings 'qw' ;
 @a = qw(a, b, c) ;
 no warnings 'qw' ;
@@ -276,6 +284,14 @@ no warnings 'qw' ;
 @a = qw(a b #) ;
 EXPECT
 Possible attempt to put comments in qw() list at - line 3.
+########
+# toke.c
+use warnings 'umask' ;
+umask 3;
+no warnings 'umask' ;
+umask 3;
+EXPECT
+umask: argument is missing initial 0 at - line 3.
 ########
 # toke.c
 use warnings 'syntax' ;
@@ -378,20 +394,20 @@ $a = -123._456; print "$a\n";		# 25
 $a = -123.4_56; print "$a\n";	
 $a = -123.45_6; print "$a\n";
 $a = -123.456_; print "$a\n";		# 28
-$a = 123.456E_12; printf("%.0f\n", $a);	# 29
-$a = 123.456E1_2; printf("%.0f\n", $a);
-$a = 123.456E12_; printf("%.0f\n", $a);	# 31
-$a = 123.456E_+12; printf("%.0f\n", $a);	# 32
-$a = 123.456E+_12; printf("%.0f\n", $a);	# 33
-$a = 123.456E+1_2; printf("%.0f\n", $a);
-$a = 123.456E+12_; printf("%.0f\n", $a);	# 35
+$a = 123.456E_12; print "$a\n";		# 29
+$a = 123.456E1_2; print "$a\n";
+$a = 123.456E12_; print "$a\n";		# 31
+$a = 123.456E_+12; print "$a\n";	# 32
+$a = 123.456E+_12; print "$a\n";	# 33
+$a = 123.456E+1_2; print "$a\n";
+$a = 123.456E+12_; print "$a\n";	# 35
 $a = 123.456E_-12; print "$a\n";	# 36
 $a = 123.456E-_12; print "$a\n";	# 37
 $a = 123.456E-1_2; print "$a\n";
 $a = 123.456E-12_; print "$a\n";	# 39
 $a = 1__23; print "$a\n";		# 40
 $a = 12.3__4; print "$a\n";		# 41
-$a = 12.34e1__2; printf("%.0f\n", $a);	# 42
+$a = 12.34e1__2; print "$a\n";		# 42
 no warnings 'syntax' ;
 $a = _123; print "$a\n";
 $a = 1_23; print "$a\n";
@@ -419,20 +435,20 @@ $a = -123._456; print "$a\n";
 $a = -123.4_56; print "$a\n";
 $a = -123.45_6; print "$a\n";
 $a = -123.456_; print "$a\n";
-$a = 123.456E_12; printf("%.0f\n", $a);
-$a = 123.456E1_2; printf("%.0f\n", $a);
-$a = 123.456E12_; printf("%.0f\n", $a);
-$a = 123.456E_+12; printf("%.0f\n", $a);
-$a = 123.456E+_12; printf("%.0f\n", $a);
-$a = 123.456E+1_2; printf("%.0f\n", $a);
-$a = 123.456E+12_; printf("%.0f\n", $a);
+$a = 123.456E_12; print "$a\n";
+$a = 123.456E1_2; print "$a\n";
+$a = 123.456E12_; print "$a\n";
+$a = 123.456E_+12; print "$a\n";
+$a = 123.456E+_12; print "$a\n";
+$a = 123.456E+1_2; print "$a\n";
+$a = 123.456E+12_; print "$a\n";
 $a = 123.456E_-12; print "$a\n";
 $a = 123.456E-_12; print "$a\n";
 $a = 123.456E-1_2; print "$a\n";
 $a = 123.456E-12_; print "$a\n";
 $a = 1__23; print "$a\n";
 $a = 12.3__4; print "$a\n";
-$a = 12.34e1__2; printf("%.0f\n", $a);
+$a = 12.34e1__2; print "$a\n";
 EXPECT
 OPTIONS regex
 Misplaced _ in number at - line 6.
@@ -708,91 +724,9 @@ Integer overflow in hexadecimal number at - line 8.
 Integer overflow in octal number at - line 11.
 ########
 # toke.c
-BEGIN { $^C = 1; }
-use warnings 'misc';
-dump;
-CORE::dump;
-EXPECT
-dump() better written as CORE::dump() at - line 4.
-- syntax OK
-########
-# toke.c
-use warnings 'misc';
-use subs qw/dump/;
-sub dump { print "no warning for overriden dump\n"; }
-dump;
-EXPECT
-no warning for overriden dump
-########
-# toke.c
 use warnings 'ambiguous';
 "@mjd_previously_unused_array";        
 no warnings 'ambiguous';
 "@mjd_previously_unused_array";        
 EXPECT
 Possible unintended interpolation of @mjd_previously_unused_array in string at - line 3.
-########
-# toke.c
-# The \q should warn, the \_ should NOT warn.
-use warnings 'misc';
-"foo" =~ /\q/;
-"bar" =~ /\_/;
-no warnings 'misc';
-"foo" =~ /\q/;
-"bar" =~ /\_/;
-EXPECT
-Unrecognized escape \q passed through at - line 4.
-########
-# toke.c
-# 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com
-use warnings 'regexp';
-"foo" =~ /foo/c;
-"foo" =~ /foo/cg;
-no warnings 'regexp';
-"foo" =~ /foo/c;
-"foo" =~ /foo/cg;
-EXPECT
-Use of /c modifier is meaningless without /g at - line 4.
-########
-# toke.c
-# 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com
-use warnings 'regexp';
-$_ = "ab" ; 
-s/ab/ab/c;
-s/ab/ab/cg;
-no warnings 'regexp';
-s/ab/ab/c;
-s/ab/ab/cg;
-EXPECT
-Use of /c modifier is meaningless in s/// at - line 5.
-Use of /c modifier is meaningless in s/// at - line 6.
-########
--wa
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com # -a flag should suppress these warnings
-print "@F\n";
-EXPECT
-
-########
--w
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com # -a flag should suppress these warnings
-print "@F\n";
-EXPECT
-Possible unintended interpolation of @F in string at - line 4.
-Name "main::F" used only once: possible typo at - line 4.
-########
--wa
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com
-EXPECT
-
-########
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com
-# In 5.7.3, this emitted "Possible unintended interpolation" warnings
-use warnings 'ambiguous';
-$s = "(@-)(@+)";
-EXPECT
-
-

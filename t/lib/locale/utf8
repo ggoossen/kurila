@@ -1,4 +1,3 @@
-use utf8;
 $locales .= <<EOF;
 Català Catalan:ca:es:1 15
 Français French:fr:be ca ch fr lu:1 15

@@ -36,8 +36,6 @@
   warn(warn_nl, "lstat");		[Perl_my_lstat]
     lstat "ab\ncd"
 
-  Use of -l on filehandle %s		[Perl_my_lstat]
-
   Can't exec \"%s\": %s 		[Perl_do_aexec5]
 
   Can't exec \"%s\": %s 		[Perl_do_exec3]
@@ -156,30 +154,7 @@ EXPECT
 Unsuccessful stat on filename containing newline at - line 3.
 Unsuccessful stat on filename containing newline at - line 4.
 ########
-# doio.c [Perl_my_stat]
-use warnings 'io';
--l STDIN;
--l $fh;
-open $fh, $0 or die "# $!";
--l $fh;
-no warnings 'io';
--l STDIN;
--l $fh;
-close $fh;
-EXPECT
-Use of -l on filehandle STDIN at - line 3.
-Use of -l on filehandle $fh at - line 6.
-########
 # doio.c [Perl_do_aexec5]
-BEGIN {
-    if ($^O eq 'MacOS') {
-	print <<EOM;
-SKIPPED
-# no exec on Mac OS
-EOM
-	exit;
-    }
-}
 use warnings 'io' ;
 exec "lskdjfalksdjfdjfkls","" ;
 no warnings 'io' ;
@@ -189,15 +164,6 @@ OPTION regex
 Can't exec "lskdjfalksdjfdjfkls": .+
 ########
 # doio.c [Perl_do_exec3]
-BEGIN {
-    if ($^O eq 'MacOS') {
-	print <<EOM;
-SKIPPED
-# no exec on Mac OS
-EOM
-	exit;
-    }
-}
 use warnings 'io' ;
 exec "lskdjfalksdjfdjfkls", "abc" ;
 no warnings 'io' ;
@@ -205,20 +171,6 @@ exec "lskdjfalksdjfdjfkls", "abc" ;
 EXPECT
 OPTION regex
 Can't exec "lskdjfalksdjfdjfkls(:? abc)?": .+
-########
-# doio.c [win32_execvp]
-BEGIN {
-    if ($^O eq 'MacOS') {
-	print <<EOM;
-SKIPPED
-# no exec on Mac OS
-EOM
-	exit;
-    }
-}
-use warnings 'exec' ;
-exec $^X, "-e0" ;
-EXPECT
 ########
 # doio.c [Perl_nextargv]
 $^W = 0 ;
@@ -255,23 +207,3 @@ no warnings 'io' ;
 $a = eof STDOUT ;
 EXPECT
 Filehandle STDOUT opened only for output at - line 3.
-########
-# doio.c [Perl_do_openn]
-use Config;
-BEGIN {
-    if ($Config{useperlio}) {
-	print <<EOM;
-SKIPPED
-# warns only without perlio
-EOM
-	exit;
-    }
-}
-use warnings 'io';
-my $x = "foo";
-open FOO, '>', \$x;
-open BAR, '>&', \*STDOUT; # should not warn
-no warnings 'io';
-open FOO, '>', \$x;
-EXPECT
-Can't open a reference at - line 14.

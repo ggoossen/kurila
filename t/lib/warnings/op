@@ -36,9 +36,6 @@
 	$a ;
 	"abc"
 
-     Useless use of sort in scalar context
-	my $x = sort (2,1,3);
-
      Applying %s to %s will act on scalar(%s)
 	my $a ; my @a = () ; my %a = () ; my $b = \@a ; my $c = \%a ;
 	@a =~ /abc/ ;
@@ -106,13 +103,6 @@
         fred() ; sub fred ($$) {}
 
 
-     Use of "package" with no arguments is deprecated
-	package;
-
-    Package `%s' not found (did you use the incorrect case?)
-
-    Use of /g modifier is meaningless in split
-
     Mandatory Warnings 
     ------------------
     Prototype mismatch:		[cv_ckproto]
@@ -130,13 +120,10 @@ __END__
 use warnings 'misc' ;
 my $x ;
 my $x ;
-my $y = my $y ;
 no warnings 'misc' ;
 my $x ;
-my $y ;
 EXPECT
 "my" variable $x masks earlier declaration in same scope at - line 4.
-"my" variable $y masks earlier declaration in same statement at - line 5.
 ########
 # op.c
 use warnings 'closure' ;
@@ -338,14 +325,6 @@ Useless use of getgrnam in void context at - line 50.
 Useless use of getgrgid in void context at - line 51.
 Useless use of getpwnam in void context at - line 52.
 Useless use of getpwuid in void context at - line 53.
-########
-# op.c
-use warnings 'void' ; close STDIN ;
-my $x = sort (2,1,3);
-no warnings 'void' ;
-$x = sort (2,1,3);
-EXPECT
-Useless use of sort in scalar context at - line 3.
 ########
 # op.c
 no warnings 'void' ; close STDIN ;
@@ -778,7 +757,7 @@ no warnings 'redefine' ;
 sub fred () { 1 }
 *fred = sub () { 2 };
 EXPECT
-Constant subroutine main::fred redefined at - line 4.
+Constant subroutine fred redefined at - line 4.
 ########
 # op.c
 use warnings 'redefine' ;
@@ -809,20 +788,11 @@ EXPECT
 Hash %FRED missing the % in argument 1 of keys() at - line 3.
 ########
 # op.c
-BEGIN {
-    if ($^O eq 'MacOS') {
-	print <<EOM;
-SKIPPED
-# no exec on Mac OS
-EOM
-	exit;
-    }
-}
 use warnings 'syntax' ;
 exec "$^X -e 1" ; 
 my $a
 EXPECT
-Statement unlikely to be reached at - line 13.
+Statement unlikely to be reached at - line 4.
 	(Maybe you meant system() when you said exec()?)
 ########
 # op.c
@@ -847,15 +817,6 @@ defined(%hash) is deprecated at - line 3.
 	(Maybe you should just omit the defined()?)
 ########
 # op.c
-BEGIN {
-    if ($^O eq 'MacOS') {
-	print <<EOM;
-SKIPPED
-# no exec on Mac OS
-EOM
-	exit;
-    }
-}
 no warnings 'syntax' ;
 exec "$^X -e 1" ; 
 my $a
@@ -965,22 +926,3 @@ unshift(@x);
 EXPECT
 Useless use of push with no values at - line 4.
 Useless use of unshift with no values at - line 5.
-########
-# op.c
-use warnings 'deprecated' ;
-package;
-no warnings 'deprecated' ;
-package;
-EXPECT
-Use of "package" with no arguments is deprecated at - line 3.
-Global symbol "BEGIN" requires explicit package name at - line 4.
-BEGIN not safe after errors--compilation aborted at - line 4.
-########
-# op.c
-# 20020401 mjd@plover.com at suggestion of jfriedl@yahoo.com
-use warnings 'regexp';
-split /blah/g, "blah";
-no warnings 'regexp';
-split /blah/g, "blah";
-EXPECT
-Use of /g modifier is meaningless in split at - line 4.

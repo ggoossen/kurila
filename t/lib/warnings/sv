@@ -180,17 +180,6 @@ $C .= $A ;
 EXPECT
 Use of uninitialized value in concatenation (.) or string at - line 10.
 ########
-# perlbug 20011116.125
-use warnings 'uninitialized';
-$a = undef;
-$foo = join '', $a, "\n";
-$foo = "$a\n";
-$foo = "a:$a\n";
-EXPECT
-Use of uninitialized value in join or string at - line 4.
-Use of uninitialized value in concatenation (.) or string at - line 5.
-Use of uninitialized value in concatenation (.) or string at - line 6.
-########
 # sv.c 
 use warnings 'numeric' ;
 sub TIESCALAR{bless[]} ; 
@@ -262,7 +251,7 @@ no warnings 'redefine' ;
 sub jim {} 
 *jim = \&joe ;
 EXPECT
-Subroutine main::fred redefined at - line 5.
+Subroutine fred redefined at - line 5.
 ########
 # sv.c
 use warnings 'printf' ;
@@ -329,19 +318,3 @@ Possible Y2K bug: %d format string following '19' at - line 15.
 31978
 1978
 1978
-########
-# sv.c
-use warnings 'numeric' ;
-$a = "\x{100}\x{200}" * 42;
-no warnings 'numeric' ;
-$a = "\x{100}\x{200}" * 42;
-EXPECT
-Argument "\x{100}\x{200}" isn't numeric in multiplication (*) at - line 3.
-########
-# sv.c
-use warnings 'numeric' ;
-$a = "\x{100}\x{200}"; $a = -$a;
-no warnings 'numeric' ;
-$a = "\x{100}\x{200}"; $a = -$a;
-EXPECT
-Argument "\x{100}\x{200}" isn't numeric in negation (-) at - line 3.

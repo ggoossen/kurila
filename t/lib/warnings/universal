@@ -6,7 +6,6 @@
 
 __END__
 # universal.c [S_isa_lookup]
-print("SKIPPED\n# todo fix: overloading triggers spurious warnings\n"),exit;
 use warnings 'misc' ;
 @ISA = qw(Joe) ;
 my $a = bless [] ;

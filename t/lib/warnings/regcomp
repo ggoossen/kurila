@@ -20,7 +20,7 @@
   /%.127s/: Unrecognized escape \\%c passed through	[S_regatom] 
   	$x = '\m' ; /$x/
 
-  POSIX syntax [%c %c] belongs inside character classes	[S_checkposixcc] 
+  POSIX syntax [%c %c] is reserved for future extensions [S_checkposixcc] 
 
 
   Character class [:%.*s:] unknown	[S_regpposixcc]
@@ -47,6 +47,15 @@ $a =~ /(?=a)*/ ;
 EXPECT
 (?=a)* matches null string many times in regex; marked by <-- HERE in m/(?=a)* <-- HERE / at - line 4.
 ########
+# regcomp.c [S_study_chunk]
+use warnings 'regexp' ;
+$_ = "" ;
+/(?=a)?/;
+no warnings 'regexp' ;
+/(?=a)?/;
+EXPECT
+Quantifier unexpected on zero-length expression in regex; marked by <-- HERE in m/(?=a)? <-- HERE / at - line 4.
+########
 # regcomp.c [S_regatom]
 $x = '\m' ;
 use warnings 'regexp' ;
@@ -62,12 +71,15 @@ use warnings 'regexp' ;
 $_ = "" ;
 /[:alpha:]/;
 /[:zog:]/;
+/[[:zog:]]/;
 no warnings 'regexp' ;
 /[:alpha:]/;
 /[:zog:]/;
+/[[:zog:]]/;
 EXPECT
 POSIX syntax [: :] belongs inside character classes in regex; marked by <-- HERE in m/[:alpha:] <-- HERE / at - line 5.
 POSIX syntax [: :] belongs inside character classes in regex; marked by <-- HERE in m/[:zog:] <-- HERE / at - line 6.
+POSIX class [:zog:] unknown in regex; marked by <-- HERE in m/[[:zog:] <-- HERE ]/
 ########
 # regcomp.c [S_checkposixcc]
 #
@@ -79,6 +91,16 @@ no warnings 'regexp' ;
 EXPECT
 POSIX syntax [. .] belongs inside character classes in regex; marked by <-- HERE in m/[.zog.] <-- HERE / at - line 5.
 POSIX syntax [. .] is reserved for future extensions in regex; marked by <-- HERE in m/[.zog.] <-- HERE /
+########
+# regcomp.c [S_checkposixcc]
+#
+use warnings 'regexp' ;
+$_ = "" ;
+/[[.zog.]]/;
+no warnings 'regexp' ;
+/[[.zog.]]/;
+EXPECT
+POSIX syntax [. .] is reserved for future extensions in regex; marked by <-- HERE in m/[[.zog.] <-- HERE ]/
 ########
 # regcomp.c [S_regclass]
 $_ = "";
@@ -170,7 +192,6 @@ $a =~ /(?p{'x'})/ ;
 use warnings;
 no warnings 'deprecated' ;
 no warnings 'regexp' ;
-no warnings 'syntax' ;
 $a =~ /(?p{'x'})/ ;
 EXPECT
 (?p{}) is deprecated - use (??{}) in regex; marked by <-- HERE in m/(?p <-- HERE {'x'})/ at - line 4.
