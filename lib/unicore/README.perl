@@ -1,26 +1,17 @@
-The *.txt files were copied 27 Mar 2002 from
+The *.txt files were copied 11 Feb 2001 from
 
-	http://www.unicode.org/Public/UNIDATA/
+	http://www.unicode.org/Public/3.1-Update/
 
-The two big files, NormalizationTest.txt (2.0MB) and Unihan.txt
-(25.7MB) were not included due to space considerations.  Also NOT
-included were any *.html files and the derived files:
+and most of them were renamed to better fit 8.3 filename limitations,
+by which the Perl distribution tries to live.  The renamings are listed
+in the file 'rename'.
 
-	DerivedAge.txt
-	DerivedCoreProperties.txt
-	DerivedNormalizationProps.txt
-	DerivedProperties.txt
+The two big files, NormalizationTest.txt (1.7MB) and Unihan.txt (15.8MB)
+were not copied due to space considerations.
 
-and the normalization-related files
+The *.pl files are generated from these files by the 'mktables.PL' script.
 
-	NormalizationCorrections.txt
-	NormalizationTest.txt
-
-To be 8.3-friendly, the lib/unicore/PropertyValueAliases.txt was
-renamed to be lib/unicore/PropValueAliases.txt, since otherwise
-it would have conflicted with lib/unicore/PropertyAliases.txt.
-
-The *.pl files are generated from these files by the mktables script.
+While the files have been renamed the links in the html files haven't.
 
 -- 
 jhi@iki.fi
