@@ -37,47 +37,45 @@ runlint 'implicit-write', 's/foo/bar/', <<'RESULT';
 Implicit substitution on $_ at -e line 1
 RESULT
 
-SKIP : {
-
-    use Config;
-    skip("Doesn't work with threaded perls",9)
-       if $Config{useithreads} || $Config{use5005threads};
-
-    runlint 'implicit-read', '1 for @ARGV', <<'RESULT', 'implicit-read in foreach';
+runlint 'implicit-read', '1 for @ARGV', <<'RESULT', 'implicit-read in foreach';
 Implicit use of $_ in foreach at -e line 1
 RESULT
 
-    runlint 'dollar-underscore', '$_ = 1', <<'RESULT';
+runlint 'dollar-underscore', '$_ = 1', <<'RESULT';
 Use of $_ at -e line 1
 RESULT
 
-    runlint 'dollar-underscore', 'print', <<'RESULT', 'dollar-underscore in print';
+runlint 'dollar-underscore', 'print', <<'RESULT', 'dollar-underscore in print';
 Use of $_ at -e line 1
 RESULT
 
-    runlint 'private-names', 'sub A::_f{};A::_f()', <<'RESULT';
+runlint 'private-names', 'sub A::_f{};A::_f()', <<'RESULT';
 Illegal reference to private name _f at -e line 1
 RESULT
 
-    runlint 'private-names', '$A::_x', <<'RESULT';
+runlint 'private-names', '$A::_x', <<'RESULT';
 Illegal reference to private name _x at -e line 1
 RESULT
 
+{
+    local $TODO = q/doesn't catch methods/;
     runlint 'private-names', 'sub A::_f{};A->_f()', <<'RESULT',
 Illegal reference to private method name _f at -e line 1
 RESULT
-    'private-names (method)';
+    'private-names';
+}
 
-    runlint 'undefined-subs', 'foo()', <<'RESULT';
+runlint 'undefined-subs', 'foo()', <<'RESULT';
 Undefined subroutine foo called at -e line 1
 RESULT
 
-    runlint 'regexp-variables', 'print $&', <<'RESULT';
+runlint 'regexp-variables', 'print $&', <<'RESULT';
 Use of regexp variable $& at -e line 1
 RESULT
 
+{
+    local $TODO = 'bug';
     runlint 'regexp-variables', 's/./$&/', <<'RESULT';
 Use of regexp variable $& at -e line 1
 RESULT
-
 }
