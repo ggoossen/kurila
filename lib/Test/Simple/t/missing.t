@@ -1,13 +1,3 @@
-BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = ('../lib', 'lib');
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
-}
-
 # Can't use Test.pm, that's a 5.005 thing.
 package My::Test;
 
@@ -17,12 +7,10 @@ my $test_num = 1;
 # Utility testing functions.
 sub ok ($;$) {
     my($test, $name) = @_;
-    my $ok = '';
-    $ok .= "not " unless $test;
-    $ok .= "ok $test_num";
-    $ok .= " - $name" if defined $name;
-    $ok .= "\n";
-    print $ok;
+    print "not " unless $test;
+    print "ok $test_num";
+    print " - $name" if defined $name;
+    print "\n";
     $test_num++;
 }
 
@@ -31,12 +19,12 @@ package main;
 
 require Test::Simple;
 
-require Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+push @INC, 'lib/Test/Simple/';
+require Catch;
+my($out, $err) = Catch::caught();
 
 Test::Simple->import(tests => 5);
 
-#line 30
 ok(1, 'Foo');
 ok(0, 'Bar');
 
@@ -48,7 +36,7 @@ not ok 2 - Bar
 OUT
 
     My::Test::ok($$err eq <<ERR);
-#     Failed test ($0 at line 31)
+#     Failed test ($0 at line 29)
 # Looks like you planned 5 tests but only ran 2.
 ERR
 

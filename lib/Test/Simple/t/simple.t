@@ -1,10 +1,3 @@
-BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = '../lib';
-    }
-}
-
 use strict;
 
 BEGIN { $| = 1; $^W = 1; }

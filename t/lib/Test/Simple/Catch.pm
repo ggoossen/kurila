@@ -1,18 +1,16 @@
 # For testing Test::Simple;
-package Test::Simple::Catch;
+package Catch;
 
-use Symbol;
-my($out_fh, $err_fh) = (gensym, gensym);
-my $out = tie *$out_fh, __PACKAGE__;
-my $err = tie *$err_fh, __PACKAGE__;
+my $out = tie *Test::Simple::TESTOUT, 'Catch';
+my $err = tie *Test::Simple::TESTERR, 'Catch';
 
-use Test::Builder;
-my $t = Test::Builder->new;
-$t->output($out_fh);
-$t->failure_output($err_fh);
-$t->todo_output($err_fh);
+# We have to use them to shut up a "used only once" warning.
+() = (*Test::Simple::TESTOUT, *Test::Simple::TESTERR);
 
-sub caught { return($out, $err) }
+sub caught { return $out, $err }
+
+# Prevent Test::Simple from exiting in its END block.
+*Test::Simple::exit = sub {};
 
 sub PRINT  {
     my $self = shift;
@@ -27,6 +25,5 @@ sub TIEHANDLE {
 sub READ {}
 sub READLINE {}
 sub GETC {}
-sub FILENO {}
 
 1;
