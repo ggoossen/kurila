@@ -1,28 +1,21 @@
 #!./perl -w
 
-BEGIN {
-	chdir 't' if -d 't';
-	if ($ENV{PERL_CORE}) {
-		@INC = '../lib';
-	} else {
-		# Due to a bug in older versions of MakeMaker & Test::Harness, we must
-		# ensure the blib's are in @INC, else we might use the core CGI.pm
-		unshift @INC, qw( ../blib/lib ../blib/arch lib );
-	}
-}
+use vars qw( $CGI::Q $CGI::Fast::Ext_Request );
 
 my $fcgi;
 BEGIN {
+	chdir 't' if -d 't';
+
+	# unshift, don't assign, so FCGI can be found if it's installed
+	# unlikely, but possible
+	unshift @INC, '../lib';
+
 	local $@;
 	eval { require FCGI };
 	$fcgi = $@ ? 0 : 1;
 }
 
 use Test::More tests => 7;
-
-# Shut up "used only once" warnings.
-() = $CGI::Q;
-() = $CGI::Fast::Ext_Request;
 
 SKIP: {
 	skip( 'FCGI not installed, cannot continue', 7 ) unless $fcgi;
