@@ -1,4 +1,4 @@
-case $PERL_CONFIG_SH in
+case $CONFIG in
 '')
 	if test -f config.sh; then TOP=.;
 	elif test -f ../config.sh; then TOP=..;
@@ -22,7 +22,7 @@ if test -d pod; then
 fi
 POD=`echo *.pod`
 MAN=`echo $POD|sed 's/\.pod/\.man/g'`
-HTML=`echo $POD|sed 's/perltoc.pod//'|sed 's/\.pod/\.html/g'`
+HTML=`echo $POD|sed 's/perltoc.pod//'|sed 's/\.pod/\.man/g'`
 TEX=`echo $POD|sed 's/\.pod/\.tex/g'`
 
 echo "Extracting pod/Makefile (with variable substitutions)"
@@ -45,10 +45,6 @@ HTML = $HTML
 
 TEX  = $TEX  
 
-# The following is used to include the current directory in
-# the dynamic loader path you are building a shared libperl.
-LDLIBPTH = $ldlibpth
-
 !GROK!THIS!
 
 ## In the following dollars and backticks do not need the extra backslash.
@@ -64,7 +60,6 @@ POD2HTML = pod2html \
 	    --libpods=perlfunc:perlguts:perlvar:perlrun:perlop
 
 PERL = ../miniperl
-PERLILIB = $(PERL) -I../lib
 REALPERL = ../perl
 
 all: $(CONVERTERS) man
@@ -73,10 +68,8 @@ converters: $(CONVERTERS)
 
 regen_pods: perlmodlib.pod toc
 
-buildtoc:	buildtoc.PL perl.pod ../MANIFEST
-	$(PERLILIB) buildtoc.PL
-
-perltoc.pod:	buildtoc
+buildtoc:	buildtoc.PL
+	$(PERL) -I ../lib buildtoc.PL
 
 man:	pod2man $(MAN)
 
@@ -84,8 +77,8 @@ html:	pod2html $(HTML)
 
 tex:	pod2latex $(TEX)
 
-toc perltoc.pod:	buildtoc
-	$(PERLILIB) buildtoc
+toc:
+	$(PERL) -I../lib buildtoc
 
 .SUFFIXES: .pm .pod
 
@@ -125,28 +118,25 @@ realclean:	clean
 
 distclean:	realclean
 
-veryclean:	distclean
-	-rm -f *~ *.orig
-
 check:	checkpods
 	@echo "checking..."; \
 	$(PERL) -I../lib checkpods $(POD)
 
 # Dependencies.
 pod2latex:	pod2latex.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I../lib pod2latex.PL
+	$(PERL) -I../lib pod2latex.PL
 
 pod2html:	pod2html.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I ../lib pod2html.PL
+	$(PERL) -I ../lib pod2html.PL
 
 pod2man:	pod2man.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I ../lib pod2man.PL
+	$(PERL) -I ../lib pod2man.PL
 
 pod2text:	pod2text.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I ../lib pod2text.PL
+	$(PERL) -I ../lib pod2text.PL
 
 checkpods:	checkpods.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I ../lib checkpods.PL
+	$(PERL) -I ../lib checkpods.PL
 
 pod2usage:	pod2usage.PL ../lib/Config.pm
 	$(PERL) -I ../lib pod2usage.PL
@@ -157,15 +147,12 @@ podchecker:	podchecker.PL ../lib/Config.pm
 podselect:	podselect.PL ../lib/Config.pm
 	$(PERL) -I ../lib podselect.PL
 
-perlmodlib.pod:	$(PERL) perlmodlib.PL ../mv-if-diff ../MANIFEST
+perlmodlib.pod:	$(PERL) perlmodlib.PL ../mv-if-diff
 	rm -f perlmodlib.tmp
 	$(PERL) -I ../lib perlmodlib.PL
 	sh ../mv-if-diff perlmodlib.tmp perlmodlib.pod
 
 compile: all
-	$(REALPERL) -I../lib ../utils/perlcc -I .. -L .. -o pod2latex.exe pod2latex -log ../compilelog
-	$(REALPERL) -I../lib ../utils/perlcc -I .. -L .. -o pod2man.exe pod2man -log ../compilelog
-	$(REALPERL) -I../lib ../utils/perlcc -I .. -L .. -o pod2text.exe pod2text -log ../compilelog
-	$(REALPERL) -I../lib ../utils/perlcc -I .. -L .. -o checkpods.exe checkpods -log ../compilelog
+	$(REALPERL) -I../lib ../utils/perlcc -regex 's/$$/.exe/' pod2latex pod2man pod2text checkpods -prog -verbose dcf -log ../compilelog;
 
 !NO!SUBS!

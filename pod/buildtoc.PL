@@ -59,114 +59,59 @@ if (-d "pod") {
   die "$0: failed to chdir('pod'): $!\n" unless chdir("pod");
 }
 
-@ARCHPODS = qw(
-    perlaix	
-    perlapollo
-    perlamiga          
-    perlbeos
-    perlbs2000
-    perlce
-    perlcygwin          
-    perldgux             
-    perldos             
-    perlepoc             
-    perlfreebsd             
-    perlhpux            
-    perlhurd            
-    perlirix            
-    perlmachten         
-    perlmacos
-    perlmint
-    perlmpeix
-    perlnetware             
-    perlos2             
-    perlos390           
-    perlqnx
-    perlplan9
-    perlsolaris
-    perltru64
-    perluts
-    perlvmesa
-    perlvms             
-    perlvos             
-    perlwin32           
-          );
+@pods = qw(
+    perl                
+    perlfaq             
+    perltoc             
+    perlbook            
 
-@CJKPODS = qw(
-    perlcn
-    perljp
-    perlko
-    perltw
-          );
+    perlsyn            
+    perldata            
+    perlop              
+    perlreftut          
+    perldsc             
+    perllol             
+    perlrequick         
+    perlretut           
 
-@pods = 
-  (
-    qw(
+    perllexwarn         
+    perldebug           
 
-    perl
-    perlintro
-    perlfaq
-    perltoc
-    perlbook
+    perlrun             
+    perlfunc            
+    perlopentut         
+    perlvar             
+    perlsub             
+    perlmod             
+    perlpod             
 
-    perlsyn
-    perldata
-    perlop
-    perlsub
-    perlfunc
-    perlreftut
-    perldsc
-    perlrequick
-    perlpod
-    perlpodspec
-    perlstyle
-    perltrap
+    perlstyle           
+    perlmodlib          
+    perlmodinstall      
+    perlnewmod          
+    perltrap            
+    perlport            
+    perlsec             
 
-    perlrun
-    perldiag
-    perllexwarn
-    perldebtut
-    perldebug
+    perlref             
+    perlre              
+    perlform            
+    perllocale          
+    perlunicode         
 
-    perlvar
-    perllol
-    perlopentut
-    perlpacktut
-    perlretut
+    perlboot            
+    perltoot            
+    perltootc           
+    perlobj             
+    perlbot             
+    perltie             
 
-    perlre
-    perlref
+    perlipc             
+    perlnumber          
+    perlfork            
+    perlthrtut          
 
-    perlform
-
-    perlboot
-    perltoot
-    perltooc
-    perlobj
-    perlbot
-    perltie
-
-    perlipc
-    perlfork
-    perlnumber
-
-    perlthrtut
-    perlothrtut
-
-    perlport
-    perllocale
-    perluniintro
-    perlunicode
-    perlebcdic
-
-    perlsec
-
-    perlmod
-    perlmodinstall
-    perlmodlib
-    perlmodstyle
-    perlnewmod
-
+    perldiag            
     perlfaq1            
     perlfaq2            
     perlfaq3            
@@ -183,7 +128,6 @@ if (-d "pod") {
     perldebguts         
     perlxstut           
     perlxs              
-    perlclib            
     perlguts            
     perlcall            
     perlutil            
@@ -191,32 +135,40 @@ if (-d "pod") {
     perldbmfilter       
     perlapi             
     perlintern          
-    perliol            
     perlapio            
     perltodo            
     perlhack            
 
     perlhist           
     perldelta           
-    perl572delta         
-    perl571delta         
-    perl570delta         
-    perl561delta         
     perl56delta         
     perl5005delta       
     perl5004delta       
 
-    ),
+    perlamiga          
+    perlcygwin          
+    perldos             
+    perlhpux            
+    perlmachten         
+    perlos2             
+    perlos390           
+    perlvms             
+    perlwin32           
+	  );
 
-    @ARCHPODS,
-
-  );
-
+@ARCHPODS = qw(
+    perlamiga          
+    perlcygwin          
+    perldos             
+    perlhpux            
+    perlmachten         
+    perlos2             
+    perlos390           
+    perlvms             
+    perlwin32           
+          );
 for (@ARCHPODS) { s/$/.pod/ }
 @ARCHPODS{@ARCHPODS} = ();
-
-for (@CJKPODS) { s/$/.pod/ }
-@CJKPODS{@CJKPODS} = ();
 
 for (@pods) { s/$/.pod/ }
 @pods{@pods} = ();
@@ -234,7 +186,7 @@ close(MANI);
 open(PERLPOD, "perl.pod") || die "$0: opening perl.pod failed: $!\n";
 while (<PERLPOD>) {
   if (/^For ease of access, /../^\(If you're intending /) {
-	if (/^\s+(perl\S*)\s+\w/) {
+	if (/^\s+(perl\w*)\s+\w/) {
 		push @PERLPODS, "$1.pod";
 	}
   }
@@ -244,11 +196,6 @@ die "$0: could not find the pod listing of perl.pod\n"
   unless @PERLPODS;
 @PERLPODS{@PERLPODS} = ();
 
-# Delete the CJK because we cannot mix their encodings.
-delete @PERLPODS{@CJKPODS};
-delete @PODS{@CJKPODS};
-delete @pods{@CJKPODS};
-
 # Cross-check against ourselves
 # Cross-check against the MANIFEST
 # Cross-check against the perl.pod
@@ -257,7 +204,7 @@ foreach my $i (sort keys %PODS) {
   warn "$0: $i exists but is unknown by buildtoc\n"
 	unless exists $pods{$i};
   warn "$0: $i exists but is unknown by ../MANIFEST\n"
-	if !exists $MANIPODS{$i} && !exists $ARCHPODS{$i} && !exists $CJKPODS{$i};
+	if !exists $MANIPODS{$i} && !exists $ARCHPODS{$i};
   warn "$0: $i exists but is unknown by perl.pod\n"
 	unless exists $PERLPODS{$i};
 }
@@ -303,14 +250,12 @@ find \&getpods => qw(../lib ../ext);
 
 sub getpods {
     if (/\.p(od|m)$/) {
+	# Skip .pm files that have corresponding .pod files, and Functions.pm.
+	return if /(.*)\.pm$/ && -f "$1.pod";
 	my $file = $File::Find::name;
-        return if $file eq '../lib/Pod/Functions.pm'; # Used only by pod itself
-        return if $file =~ m!lib/Attribute/Handlers/demo/!;
-        return if $file =~ m!lib/Net/FTP/.+\.pm!; # Hi, Graham! :-)
-        return if $file =~ m!lib/Math/BigInt/t/!;
-        return if $file =~ m!/Devel/PPPort/[Hh]arness|lib/Devel/Harness!i;
-        return if $file =~ m!XS/(?:APItest|Typemap)!;
-        die "tut $name" if $file =~ /TUT/;
+	return if $file eq '../lib/Pod/Functions.pm'; # Used only by pod itself
+
+	die "tut $name" if $file =~ /TUT/;
 	unless (open (F, "< $_\0")) {
 	    warn "bogus <$file>: $!";
 	    system "ls", "-l", $file;
@@ -374,7 +319,7 @@ podset( @modules[ sort { $modname[$a] cmp $modname[$b] } 0 .. $#modules ] );
 	Here should be listed all the extra programs' documentation, but they
 	don't all have manual pages yet:
 
-	=over 4
+	=over
 
 	=item a2p
 
@@ -427,13 +372,13 @@ sub podset {
 	}
 	if (s/^=head1 (.*)/=item $1/) {
 	    unhead2();
-	    output "=over 4\n\n" unless $inhead1;
+	    output "=over\n\n" unless $inhead1;
 	    $inhead1 = 1;
 	    output $_; nl(); next;
 	}
 	if (s/^=head2 (.*)/=item $1/) {
 	    unitem();
-	    output "=over 4\n\n" unless $inhead2;
+	    output "=over\n\n" unless $inhead2;
 	    $inhead2 = 1;
 	    output $_; nl(); next;
 	}
@@ -445,7 +390,7 @@ sub podset {
 	    s/\s+$//;
 	    next if /^[\d.]+$/;
 	    next if $pod eq 'perlmodlib' && /^ftp:/;
-	    ##print "=over 4\n\n" unless $initem;
+	    ##print "=over\n\n" unless $initem;
 	    output ", " if $initem;
 	    $initem = 1;
 	    s/\.$//;
@@ -520,7 +465,3 @@ sub output ($) {
 
 !NO!SUBS!
 
-close OUT or die "Can't close $file: $!";
-chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
-exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
-chdir $origdir;
