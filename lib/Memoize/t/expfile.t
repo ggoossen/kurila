@@ -4,7 +4,6 @@ use lib '..';
 use Memoize;
 
 my $n = 0;
-$|=1;
 
 
 if (-e '.fast') {
@@ -13,7 +12,7 @@ if (-e '.fast') {
 }
 
 print "1..12\n";
-# (1)
+
 ++$n; print "ok $n\n";
 
 my $READFILE_CALLS = 0;
@@ -36,7 +35,6 @@ sub readfile {
 }
 
 require Memoize::ExpireFile;
-# (2)
 ++$n; print "ok $n\n";
 
 tie my %cache => 'Memoize::ExpireFile';
@@ -45,27 +43,22 @@ memoize 'readfile',
     LIST_CACHE => 'FAULT'
     ;
 
-# (3)
 ++$n; print "ok $n\n";
 
-# (4)
 writefile($FILE);
 ++$n; print "ok $n\n";
-sleep 4;
+sleep 1;
 
-# (5-6)
 my $t1 = readfile($FILE);
 ++$n; print "ok $n\n";
 ++$n; print ((($READFILE_CALLS == 1) ? '' : 'not '), "ok $n\n");
 
-# (7-9)
 my $t2 = readfile($FILE);
-++$n; print "ok $n\n";  
+++$n; print "ok $n\n";
 ++$n; print ((($READFILE_CALLS == 1) ? '' : 'not '), "ok $n\n");
 ++$n; print ((($t1 eq $t2) ? '' : 'not '), "ok $n\n");
 
-# (10-12)
-sleep 4;
+sleep 2;
 writefile($FILE);
 my $t3 = readfile($FILE);
 ++$n; print "ok $n\n";
