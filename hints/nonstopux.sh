@@ -9,12 +9,9 @@ case "$cc" in
                 lddlflags='-shared'
                 ldflags=''
 		;;
-        *)
+        '')
                 cc="cc -Xa -Olimit 4096"
                 malloctype="void *"
 		;;
 esac
-
-libswanted=`echo " $libswanted " | sed -e 's/ ucb / /'`
-glibpth=`echo " $glibpth " | sed -e 's/ \/usr\/ucblib / /'`
 
