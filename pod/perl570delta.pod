@@ -31,7 +31,7 @@ and if deemed too risky to continue to be supported, it may be
 completely removed from future releases.  In any case, suidperl should
 only be used by security experts who know exactly what they are doing
 and why they are using suidperl instead of some other solution such as
-sudo ( see http://www.courtesan.com/sudo/ ).
+sudo (see http://www.courtesan.com/sudo/).
 
 =head1 Incompatible Changes
 
@@ -114,7 +114,7 @@ in multiple arguments.)
 
 =item *
 
-my __PACKAGE__ $obj now works.
+my __PACKAGE__ now works.
 
 =item *
 
@@ -589,12 +589,12 @@ Long doubles should now work (see INSTALL).
 
 =item *
 
-Mac OS Classic
+MacOS Classic
 
-Compilation of the standard Perl distribution in Mac OS Classic should
-now work if you have the Metrowerks development environment and the
-missing Mac-specific toolkit bits.  Contact the macperl mailing list
-for details.
+Compilation of the standard Perl distribution in MacOS Classic should
+now work if you have the Metrowerks development environment and
+the missing Mac-specific toolkit bits.  Contact the macperl mailing
+list for details.
 
 =item *
 
@@ -870,8 +870,8 @@ progress is the bytecode compiler.
 
 If you find what you think is a bug, you might check the articles
 recently posted to the comp.lang.perl.misc newsgroup and the perl
-bug database at http://bugs.perl.org/  There may also be
-information at http://www.perl.com/perl/ , the Perl Home Page.
+bug database at http://bugs.perl.org.  There may also be
+information at http://www.perl.com/perl/, the Perl Home Page.
 
 If you believe you have an unreported bug, please run the B<perlbug>
 program included with your release.  Be sure to trim your bug down
