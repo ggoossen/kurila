@@ -1,15 +1,13 @@
-#!/usr/bin/perl
+#!perl
+
+# 2001-01-14 Tels v0.01
+
+our $VERSION = 0.01;
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
+	chdir 't' if -d 't';
+	@INC = '../lib';
 }
-chdir 't';
 
 use Test::More;
 
