@@ -12,19 +12,19 @@ crlf
 
 =head1 DESCRIPTION
 
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
 
-    crlf crlf crlf crlf
-    crlf crlf crlf crlf
-    crlf crlf crlf crlf
+    clrf clrf clrf clrf
+    clrf clrf clrf clrf
+    clrf clrf clrf clrf
 
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
-crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
+clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf clrf
 
 =cut
 __EOF__
@@ -37,8 +37,8 @@ use Pod::Html;
 open(POD, "<$$.pod") or die "$$.pod: $!";
 open(IN,  ">$$.in")  or die "$$.in: $!";
 while (<POD>) {
-  s/[\r\n]+/\r/g;
-  print IN $_;
+  tr/\x0D\x0A//d;
+  print IN $_, "\x0D";
 }
 close(POD);
 close(IN);
@@ -50,8 +50,8 @@ pod2html("--title=eol", "--infile=$$.in", "--outfile=$$.o1");
 open(POD, "<$$.pod") or die "$$.pod: $!";
 open(IN,  ">$$.in")  or die "$$.in: $!";
 while (<POD>) {
-  s/[\r\n]+/\n/g;
-  print IN $_;
+  tr/\x0D\x0A//d;
+  print IN $_, "\x0A";
 }
 close(POD);
 close(IN);
@@ -63,8 +63,8 @@ pod2html("--title=eol", "--infile=$$.in", "--outfile=$$.o2");
 open(POD, "<$$.pod") or die "$$.pod: $!";
 open(IN,  ">$$.in")  or die "$$.in: $!";
 while (<POD>) {
-  s/[\r\n]+/\r\n/g;
-  print IN $_;
+  tr/\x0D\x0A//d;
+  print IN $_, "\x0D\x0A";
 }
 close(POD);
 close(IN);
@@ -87,9 +87,7 @@ my $cksum3 = unpack("%32C*", <IN>);
 ok($cksum1 == $cksum2, "CR vs LF");
 ok($cksum1 == $cksum3, "CR vs CRLF");
 ok($cksum2 == $cksum3, "LF vs CRLF");
-close IN;
 
 END {
-  1 while unlink("$$.pod", "$$.in", "$$.o1", "$$.o2", "$$.o3",
-                 "pod2htmd.x~~", "pod2htmi.x~~");
+  1 while unlink("$$.pod", "$$.in", "$$.o1", "$$.o2", "$$.o3");
 }
