@@ -1,4 +1,4 @@
-/* Time-stamp: <01/08/01 21:01:12 keuchel@w2k> */
+// Time-stamp: <01/08/01 21:01:12 keuchel@w2k>
 
 /* wincesck.c
  *
@@ -10,7 +10,7 @@
  *    License or the Artistic License, as specified in the README file.
  */
 
-/* The socket calls use fd functions from celib... */
+// The socket calls use fd functions from celib...
 
 #define WIN32IO_IS_STDIO
 #define WIN32SCK_IS_STDSCK
@@ -27,6 +27,11 @@
 
 #include "EXTERN.h"
 #include "perl.h"
+
+#if defined(PERL_OBJECT)
+#define NO_XSLOCKS
+#include "XSUB.h"
+#endif
 
 #include "Win32iop.h"
 #include <sys/socket.h>
@@ -50,14 +55,14 @@ XCE_EXPORT struct protoent *xcegetprotobynumber(int number);
 #define getprotobyname xcegetprotobyname
 #define getprotobynumber xcegetprotobynumber
 
-/* uses fdtab... */
+// uses fdtab...
 #include "cesocket2.h"
 
 #endif
 
 #define TO_SOCKET(X) (X)
 
-#ifdef USE_5005THREADS
+#ifdef USE_THREADS
 #define StartSockets() \
     STMT_START {					\
 	if (!wsock_started)				\
@@ -98,7 +103,7 @@ static int wsock_started = 0;
 void
 start_sockets(void) 
 {
-    dTHX;
+    dTHXo;
     unsigned short version;
     WSADATA retdata;
     int ret;
@@ -234,7 +239,7 @@ win32_select(int nfds, Perl_fd_set* rd, Perl_fd_set* wr,
 	     Perl_fd_set* ex, const struct timeval* timeout)
 {
   StartSockets();
-  /* select not yet fixed */
+  // select not yet fixed
   errno = ENOSYS;
   return -1;
 }
@@ -324,7 +329,7 @@ win32_getprotobynumber(int num)
 struct servent *
 win32_getservbyname(const char *name, const char *proto)
 {
-    dTHX;    
+    dTHXo;    
     struct servent *r;
 
     SOCKET_TEST(r = getservbyname(name, proto), NULL);
@@ -337,7 +342,7 @@ win32_getservbyname(const char *name, const char *proto)
 struct servent *
 win32_getservbyport(int port, const char *proto)
 {
-    dTHX; 
+    dTHXo; 
     struct servent *r;
 
     SOCKET_TEST(r = getservbyport(port, proto), NULL);
@@ -350,7 +355,7 @@ win32_getservbyport(int port, const char *proto)
 int
 win32_ioctl(int i, unsigned int u, char *data)
 {
-    dTHX;
+    dTHXo;
     u_long argp = (u_long)data;
     int retval;
 
@@ -391,28 +396,28 @@ win32_inet_addr(const char FAR *cp)
 void
 win32_endhostent() 
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("endhostent not implemented!\n");
 }
 
 void
 win32_endnetent()
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("endnetent not implemented!\n");
 }
 
 void
 win32_endprotoent()
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("endprotoent not implemented!\n");
 }
 
 void
 win32_endservent()
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("endservent not implemented!\n");
 }
 
@@ -420,7 +425,7 @@ win32_endservent()
 struct netent *
 win32_getnetent(void) 
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("getnetent not implemented!\n");
     return (struct netent *) NULL;
 }
@@ -428,7 +433,7 @@ win32_getnetent(void)
 struct netent *
 win32_getnetbyname(char *name) 
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("getnetbyname not implemented!\n");
     return (struct netent *)NULL;
 }
@@ -436,7 +441,7 @@ win32_getnetbyname(char *name)
 struct netent *
 win32_getnetbyaddr(long net, int type) 
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("getnetbyaddr not implemented!\n");
     return (struct netent *)NULL;
 }
@@ -444,7 +449,7 @@ win32_getnetbyaddr(long net, int type)
 struct protoent *
 win32_getprotoent(void) 
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("getprotoent not implemented!\n");
     return (struct protoent *) NULL;
 }
@@ -452,7 +457,7 @@ win32_getprotoent(void)
 struct servent *
 win32_getservent(void) 
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("getservent not implemented!\n");
     return (struct servent *) NULL;
 }
@@ -460,7 +465,7 @@ win32_getservent(void)
 void
 win32_sethostent(int stayopen)
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("sethostent not implemented!\n");
 }
 
@@ -468,7 +473,7 @@ win32_sethostent(int stayopen)
 void
 win32_setnetent(int stayopen)
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("setnetent not implemented!\n");
 }
 
@@ -476,7 +481,7 @@ win32_setnetent(int stayopen)
 void
 win32_setprotoent(int stayopen)
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("setprotoent not implemented!\n");
 }
 
@@ -484,7 +489,7 @@ win32_setprotoent(int stayopen)
 void
 win32_setservent(int stayopen)
 {
-    dTHX;
+    dTHXo;
     Perl_croak_nocontext("setservent not implemented!\n");
 }
 

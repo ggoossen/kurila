@@ -1,4 +1,4 @@
-/* Time-stamp: <01/08/01 20:59:54 keuchel@w2k> */
+// Time-stamp: <01/08/01 20:59:54 keuchel@w2k>
 
 /* WIN32.H
  *
@@ -16,7 +16,7 @@
 #  define _WIN32_WINNT 0x0400     /* needed for TryEnterCriticalSection() etc. */
 #endif
 
-#if defined(PERL_IMPLICIT_SYS)
+#if defined(PERL_OBJECT) || defined(PERL_IMPLICIT_SYS) || defined(PERL_CAPI)
 #  define DYNAMIC_ENV_FETCH
 #  define ENV_HV_NAME "___ENV_HV_NAME___"
 #  define HAS_GETENV_LEN
@@ -46,11 +46,15 @@
 
 /* now even GCC supports __declspec() */
 
+#if defined(PERL_OBJECT)
+#define DllExport
+#else
 #if defined(PERLDLL) || defined(WIN95FIX)
 #define DllExport
 /*#define DllExport __declspec(dllexport)*/	/* noises with VC5+sp3 */
 #else 
 #define DllExport __declspec(dllimport)
+#endif
 #endif
 
 #define  WIN32_LEAN_AND_MEAN
@@ -116,7 +120,7 @@ struct utsname {
 /* Define USE_SOCKETS_AS_HANDLES to enable emulation of windows sockets as
  * real filehandles. XXX Should always be defined (the other version is untested) */
 
-/* #define USE_SOCKETS_AS_HANDLES */
+//#define USE_SOCKETS_AS_HANDLES
 
 /* read() and write() aren't transparent for socket handles */
 #define PERL_SOCK_SYSREAD_IS_RECV
@@ -182,6 +186,11 @@ struct utsname {
 #pragma warn -pro	/* "call to function with no prototype" */
 #pragma warn -stu	/* "undefined structure 'foo'" */
 
+/* Borland is picky about a bare member function name used as its ptr */
+#ifdef PERL_OBJECT
+#  define MEMBER_TO_FPTR(name)	&(name)
+#endif
+
 /* Borland C thinks that a pointer to a member variable is 12 bytes in size. */
 #define PERL_MEMBER_PTR_SIZE	12
 
@@ -211,6 +220,10 @@ typedef long		gid_t;
 #define flushall	_flushall
 #define fcloseall	_fcloseall
 
+#ifdef PERL_OBJECT
+#  define MEMBER_TO_FPTR(name)	&(name)
+#endif
+
 #ifndef _O_NOINHERIT
 #  define _O_NOINHERIT	0x0080
 #  ifndef _NO_OLDNAMES
@@ -227,15 +240,45 @@ typedef long		gid_t;
 
 /* compatibility stuff for other compilers goes here */
 
-#ifndef _INTPTR_T_DEFINED
-typedef int		intptr_t;
-#  define _INTPTR_T_DEFINED
-#endif
 
-#ifndef _UINTPTR_T_DEFINED
-typedef unsigned int	uintptr_t;
-#  define _UINTPTR_T_DEFINED
-#endif
+#if !defined(PERL_OBJECT) && defined(PERL_CAPI) && defined(PERL_MEMBER_PTR_SIZE)
+#  define STRUCT_MGVTBL_DEFINITION \
+struct mgvtbl {								\
+    union {								\
+	int	    (CPERLscope(*svt_get))(pTHX_ SV *sv, MAGIC* mg);	\
+	char	    handle_VC_problem1[PERL_MEMBER_PTR_SIZE];		\
+    };									\
+    union {								\
+	int	    (CPERLscope(*svt_set))(pTHX_ SV *sv, MAGIC* mg);	\
+	char	    handle_VC_problem2[PERL_MEMBER_PTR_SIZE];		\
+    };									\
+    union {								\
+	U32	    (CPERLscope(*svt_len))(pTHX_ SV *sv, MAGIC* mg);	\
+	char	    handle_VC_problem3[PERL_MEMBER_PTR_SIZE];		\
+    };									\
+    union {								\
+	int	    (CPERLscope(*svt_clear))(pTHX_ SV *sv, MAGIC* mg);	\
+	char	    handle_VC_problem4[PERL_MEMBER_PTR_SIZE];		\
+    };									\
+    union {								\
+	int	    (CPERLscope(*svt_free))(pTHX_ SV *sv, MAGIC* mg);	\
+	char	    handle_VC_problem5[PERL_MEMBER_PTR_SIZE];		\
+    };									\
+}
+
+#  define BASEOP_DEFINITION \
+    OP*		op_next;						\
+    OP*		op_sibling;						\
+    OP*		(CPERLscope(*op_ppaddr))(pTHX);				\
+    char	handle_VC_problem[PERL_MEMBER_PTR_SIZE-sizeof(OP*)];	\
+    PADOFFSET	op_targ;						\
+    OPCODE	op_type;						\
+    U16		op_seq;							\
+    U8		op_flags;						\
+    U8		op_private;
+
+#endif /* !PERL_OBJECT && PERL_CAPI && PERL_MEMBER_PTR_SIZE */
+
 
 START_EXTERN_C
 
@@ -341,11 +384,11 @@ struct thread_intern {
 #    endif
 };
 
-#ifdef USE_5005THREADS
+#ifdef USE_THREADS
 #  ifndef USE_DECLSPEC_THREAD
 #    define HAVE_THREAD_INTERN
 #  endif /* !USE_DECLSPEC_THREAD */
-#endif /* USE_5005THREADS */
+#endif /* USE_THREADS */
 
 #define HAVE_INTERP_INTERN
 typedef struct {
@@ -365,7 +408,7 @@ struct interp_intern {
     child_tab *	pseudo_children;
 #endif
     void *	internal_host;
-#ifndef USE_5005THREADS
+#ifndef USE_THREADS
     struct thread_intern	thr_intern;
 #endif
 };
@@ -385,7 +428,7 @@ struct interp_intern {
 #define w32_pseudo_child_pids		(w32_pseudo_children->pids)
 #define w32_pseudo_child_handles	(w32_pseudo_children->handles)
 #define w32_internal_host		(PL_sys_intern.internal_host)
-#ifdef USE_5005THREADS
+#ifdef USE_THREADS
 #  define w32_strerror_buffer	(thr->i.Wstrerror_buffer)
 #  define w32_getlogin_buffer	(thr->i.Wgetlogin_buffer)
 #  define w32_crypt_buffer	(thr->i.Wcrypt_buffer)
@@ -397,7 +440,7 @@ struct interp_intern {
 #  define w32_crypt_buffer	(PL_sys_intern.thr_intern.Wcrypt_buffer)
 #  define w32_servent		(PL_sys_intern.thr_intern.Wservent)
 #  define w32_init_socktype	(PL_sys_intern.thr_intern.Winit_socktype)
-#endif /* USE_5005THREADS */
+#endif /* USE_THREADS */
 
 /* UNICODE<>ANSI translation helpers */
 /* Use CP_ACP when mode is ANSI */

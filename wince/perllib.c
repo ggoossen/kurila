@@ -1,7 +1,11 @@
-/* Time-stamp: <01/08/01 20:58:55 keuchel@w2k> */
+// Time-stamp: <01/08/01 20:58:55 keuchel@w2k>
 
 #include "EXTERN.h"
 #include "perl.h"
+
+#ifdef PERL_OBJECT
+#define NO_XSLOCKS
+#endif
 
 #include "XSUB.h"
 
@@ -17,10 +21,10 @@ char *staticlinkmodules[] = {
     NULL,
 };
 
-EXTERN_C void boot_DynaLoader (pTHX_ CV* cv);
+EXTERN_C void boot_DynaLoader (pTHXo_ CV* cv);
 
 static void
-xs_init(pTHX)
+xs_init(pTHXo)
 {
     char *file = __FILE__;
     dXSUB_SYS;
@@ -102,6 +106,9 @@ perl_alloc_override(struct IPerlMem** ppMem, struct IPerlMem** ppMemShared,
 				   pHost->m_pHostperlSock,
 				   pHost->m_pHostperlProc);
 	if (my_perl) {
+#ifdef PERL_OBJECT
+	    CPerlObj* pPerl = (CPerlObj*)my_perl;
+#endif
 	    w32_internal_host = pHost;
 	}
     }
@@ -124,6 +131,9 @@ perl_alloc(void)
 				   pHost->m_pHostperlSock,
 				   pHost->m_pHostperlProc);
 	if (my_perl) {
+#ifdef PERL_OBJECT
+	    CPerlObj* pPerl = (CPerlObj*)my_perl;
+#endif
 	    w32_internal_host = pHost;
 	}
     }
@@ -137,6 +147,108 @@ win32_delete_internal_host(void *h)
     delete host;
 }
 
+#ifdef PERL_OBJECT
+
+EXTERN_C void
+perl_construct(PerlInterpreter* my_perl)
+{
+    CPerlObj* pPerl = (CPerlObj*)my_perl;
+    try
+    {
+	Perl_construct();
+    }
+    catch(...)
+    {
+	win32_fprintf(stderr, "%s\n",
+		      "Error: Unable to construct data structures");
+	perl_free(my_perl);
+    }
+}
+
+EXTERN_C void
+perl_destruct(PerlInterpreter* my_perl)
+{
+    CPerlObj* pPerl = (CPerlObj*)my_perl;
+#ifdef DEBUGGING
+    Perl_destruct();
+#else
+    try
+    {
+	Perl_destruct();
+    }
+    catch(...)
+    {
+    }
+#endif
+}
+
+EXTERN_C void
+perl_free(PerlInterpreter* my_perl)
+{
+    CPerlObj* pPerl = (CPerlObj*)my_perl;
+    void *host = w32_internal_host;
+#ifdef DEBUGGING
+    Perl_free();
+#else
+    try
+    {
+	Perl_free();
+    }
+    catch(...)
+    {
+    }
+#endif
+    win32_delete_internal_host(host);
+    PERL_SET_THX(NULL);
+}
+
+EXTERN_C int
+perl_run(PerlInterpreter* my_perl)
+{
+    CPerlObj* pPerl = (CPerlObj*)my_perl;
+    int retVal;
+#ifdef DEBUGGING
+    retVal = Perl_run();
+#else
+    try
+    {
+	retVal = Perl_run();
+    }
+    catch(...)
+    {
+	win32_fprintf(stderr, "Error: Runtime exception\n");
+	retVal = -1;
+    }
+#endif
+    return retVal;
+}
+
+EXTERN_C int
+perl_parse(PerlInterpreter* my_perl, void (*xsinit)(CPerlObj*), int argc, char** argv, char** env)
+{
+    int retVal;
+    CPerlObj* pPerl = (CPerlObj*)my_perl;
+#ifdef DEBUGGING
+    retVal = Perl_parse(xsinit, argc, argv, env);
+#else
+    try
+    {
+	retVal = Perl_parse(xsinit, argc, argv, env);
+    }
+    catch(...)
+    {
+	win32_fprintf(stderr, "Error: Parse exception\n");
+	retVal = -1;
+    }
+#endif
+    *win32_errno() = 0;
+    return retVal;
+}
+
+#undef PL_perl_destruct_level
+#define PL_perl_destruct_level int dummy
+
+#endif /* PERL_OBJECT */
 #endif /* PERL_IMPLICIT_SYS */
 
 EXTERN_C HANDLE w32_perldll_handle;
@@ -181,7 +293,23 @@ RunPerl(int argc, char **argv, char **env)
     exitstatus = perl_parse(my_perl, xs_init, argc, argv, env);
     if (!exitstatus) {
 #if defined(TOP_CLONE) && defined(USE_ITHREADS)		/* XXXXXX testing */
+#  ifdef PERL_OBJECT
+	CPerlHost *h = new CPerlHost();
+	new_perl = perl_clone_using(my_perl, 1,
+				    h->m_pHostperlMem,
+				    h->m_pHostperlMemShared,
+				    h->m_pHostperlMemParse,
+				    h->m_pHostperlEnv,
+				    h->m_pHostperlStdIO,
+				    h->m_pHostperlLIO,
+				    h->m_pHostperlDir,
+				    h->m_pHostperlSock,
+				    h->m_pHostperlProc
+				    );
+	CPerlObj *pPerl = (CPerlObj*)new_perl;
+#  else
 	new_perl = perl_clone(my_perl, 1);
+#  endif
 	exitstatus = perl_run(new_perl);
 	PERL_SET_THX(my_perl);
 #else

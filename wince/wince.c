@@ -1,6 +1,6 @@
 /*  WINCE.C - stuff for Windows CE
  *
- *  Time-stamp: <26/10/01 15:25:20 keuchel@keuchelnt>
+ *  Time-stamp: <01/08/01 19:29:57 keuchel@w2k>
  *
  *  You may distribute under the terms of either the GNU General Public
  *  License or the Artistic License, as specified in the README file.
@@ -58,6 +58,13 @@
 #  define do_spawn g_do_spawn
 #  undef getlogin
 #  define getlogin g_getlogin
+#endif
+
+#if defined(PERL_OBJECT)
+#  undef do_aspawn
+#  define do_aspawn g_do_aspawn
+#  undef Perl_do_exec
+#  define Perl_do_exec g_do_exec
 #endif
 
 static long		filetime_to_clock(PFILETIME ft);
@@ -125,7 +132,7 @@ get_regstr_from(HKEY hkey, const char *valuename, SV **svp)
 	DWORD datalen;
 	retval = XCERegQueryValueExA(handle, valuename, 0, &type, NULL, &datalen);
 	if (retval == ERROR_SUCCESS && type == REG_SZ) {
-	    dTHX;
+	    dTHXo;
 	    if (!*svp)
 		*svp = sv_2mortal(newSVpvn("",0));
 	    SvGROW(*svp, datalen);
@@ -205,7 +212,7 @@ get_emd_part(SV **prev_pathp, char *trailing_path, ...)
     /* only add directory if it exists */
     if (XCEGetFileAttributesA(mod_name) != (DWORD) -1) {
 	/* directory exists */
-	dTHX;
+	dTHXo;
 	if (!*prev_pathp)
 	    *prev_pathp = sv_2mortal(newSVpvn("",0));
 	sv_catpvn(*prev_pathp, ";", 1);
@@ -219,7 +226,7 @@ get_emd_part(SV **prev_pathp, char *trailing_path, ...)
 char *
 win32_get_privlib(const char *pl)
 {
-    dTHX;
+    dTHXo;
     char *stdlib = "lib";
     char buffer[MAX_PATH+1];
     SV *sv = Nullsv;
@@ -236,7 +243,7 @@ win32_get_privlib(const char *pl)
 static char *
 win32_get_xlib(const char *pl, const char *xlib, const char *libname)
 {
-    dTHX;
+    dTHXo;
     char regstr[40];
     char pathstr[MAX_PATH+1];
     DWORD datalen;
@@ -351,20 +358,6 @@ win32_times(struct tms *timebuf)
   Perl_croak(aTHX_ PL_no_func, "times");
   return -1;
 }
-
-/* TODO */
-bool
-win32_signal()
-{
-  Perl_croak_nocontext("signal() TBD on this platform");
-  return FALSE;
-}
-DllExport void
-win32_clearenv()
-{
-  return;
-}
-
 
 DllExport char ***
 win32_environ(void)
@@ -497,12 +490,6 @@ win32_utime(const char *filename, struct utimbuf *times)
 }
 
 DllExport int
-win32_gettimeofday(struct timeval *tp, void *not_used)
-{
-    return xcegettimeofday(tp,not_used);
-}
-
-DllExport int
 win32_uname(struct utsname *name)
 {
     struct hostent *hep;
@@ -574,7 +561,11 @@ win32_uname(struct utsname *name)
 	char *arch;
 	GetSystemInfo(&info);
 
+#if defined(__BORLANDC__) || defined(__MINGW32__)
+	switch (info.u.s.wProcessorArchitecture) {
+#else
 	switch (info.wProcessorArchitecture) {
+#endif
 	case PROCESSOR_ARCHITECTURE_INTEL:
 	    arch = "x86"; break;
 	case PROCESSOR_ARCHITECTURE_MIPS:
@@ -598,19 +589,23 @@ win32_uname(struct utsname *name)
     return 0;
 }
 
+#ifndef PERL_OBJECT
+
 static UINT timerid = 0;
 
 static VOID CALLBACK TimerProc(HWND win, UINT msg, UINT id, DWORD time)
 {
-    dTHX;
+    dTHXo;
     KillTimer(NULL,timerid);
     timerid=0;  
     sighandler(14);
 }
+#endif	/* !PERL_OBJECT */
 
 DllExport unsigned int
 win32_alarm(unsigned int sec)
 {
+#ifndef PERL_OBJECT
     /* 
      * the 'obvious' implentation is SetTimer() with a callback
      * which does whatever receiving SIGALRM would do 
@@ -620,7 +615,7 @@ win32_alarm(unsigned int sec)
      * Snag is unless something is looking at the message queue
      * nothing happens :-(
      */ 
-    dTHX;
+    dTHXo;
     if (sec)
      {
       timerid = SetTimer(NULL,timerid,sec*1000,(TIMERPROC)TimerProc);
@@ -635,6 +630,7 @@ win32_alarm(unsigned int sec)
         timerid=0;  
        }
      }
+#endif	/* !PERL_OBJECT */
     return 0;
 }
 
@@ -645,7 +641,7 @@ extern char *	des_fcrypt(const char *txt, const char *salt, char *cbuf);
 DllExport char *
 win32_crypt(const char *txt, const char *salt)
 {
-    dTHX;
+    dTHXo;
 #ifdef HAVE_DES_FCRYPT
     dTHR;
     return des_fcrypt(txt, salt, w32_crypt_buffer);
@@ -760,7 +756,7 @@ win32_strerror(int e)
 DllExport void
 win32_str_os_error(void *sv, DWORD dwErr)
 {
-  dTHX;
+  dTHXo;
 
   sv_setpvn((SV*)sv, "Error", 5);
 }
@@ -887,8 +883,8 @@ win32_fseek(FILE *pf,long offset,int origin)
   return fseek(pf, offset, origin);
 }
 
-/* fpos_t seems to be int64 on hpc pro! Really stupid. */
-/* But maybe someday there will be such large disks in a hpc... */
+// fpos_t seems to be int64 on hpc pro! Really stupid.
+// But maybe someday there will be such large disks in a hpc...
 DllExport int
 win32_fgetpos(FILE *pf, fpos_t *p)
 {
@@ -947,11 +943,12 @@ win32_rename(const char *oname, const char *newname)
 DllExport int
 win32_setmode(int fd, int mode)
 {
-    /* currently 'celib' seem to have this function in src, but not
-     * exported. When it will be, we'll uncomment following line.
-     */
-    /* return xcesetmode(fd, mode); */
-    return 0;
+  if(mode != O_BINARY)
+    {
+      Perl_croak(aTHX_ PL_no_func, "setmode");
+      return -1;
+    }
+  return 0;
 }
 
 DllExport long
@@ -995,15 +992,15 @@ win32_eof(int fd)
 DllExport int
 win32_dup(int fd)
 {
-  //vv Perl_croak(aTHX_ PL_no_func, "dup");
-  return xcedup(fd); // from celib/ceio.c; requires some more work on it.
+  Perl_croak(aTHX_ PL_no_func, "dup");
+  return -1;
 }
 
 DllExport int
 win32_dup2(int fd1,int fd2)
 {
-  //Perl_croak(aTHX_ PL_no_func, "dup2");
-  return xcedup2(fd1,fd2);
+  Perl_croak(aTHX_ PL_no_func, "dup2");
+  return -1;
 }
 
 DllExport int
@@ -1240,7 +1237,7 @@ win32_execvp(const char *cmdname, const char *const *argv)
 DllExport void*
 win32_dynaload(const char* filename)
 {
-    dTHX;
+    dTHXo;
     HMODULE hModule;
 
     hModule = XCELoadLibraryA(filename);
@@ -1248,7 +1245,7 @@ win32_dynaload(const char* filename)
     return hModule;
 }
 
-/* this is needed by Cwd.pm... */
+// this is needed by Cwd.pm...
 
 static
 XS(w32_GetCwd)
@@ -1263,9 +1260,6 @@ XS(w32_GetCwd)
   EXTEND(SP,1);
   SvPOK_on(sv);
   ST(0) = sv;
-#ifndef INCOMPLETE_TAINTS
-  SvTAINTED_on(ST(0));
-#endif
   XSRETURN(1);
 }
 
@@ -1308,7 +1302,7 @@ XS(w32_GetOSVersion)
     XPUSHs(newSViv(osver.dwMajorVersion));
     XPUSHs(newSViv(osver.dwMinorVersion));
     XPUSHs(newSViv(osver.dwBuildNumber));
-    /* WINCE = 3 */
+    // WINCE = 3
     XPUSHs(newSViv(osver.dwPlatformId));
     PUTBACK;
 }
@@ -1472,7 +1466,7 @@ XS(w32_ShellEx)
 void
 Perl_init_os_extras(void)
 {
-    dTHX;
+    dTHXo;
     char *file = __FILE__;
     dXSUB_SYS;
 
@@ -1575,12 +1569,17 @@ wce_hitreturn()
   return;
 }
 
-/* //////////////////////////////////////////////////////////////////// */
+//////////////////////////////////////////////////////////////////////
+
+#ifdef PERL_OBJECT
+#  undef this
+#  define this pPerl
+#endif
 
 void
 win32_argv2utf8(int argc, char** argv)
 {
-  /* do nothing... */
+  // do nothing...
 }
 
 void
@@ -1615,137 +1614,3 @@ Perl_sys_intern_clear(pTHX)
 #  endif
 }
 
-/* //////////////////////////////////////////////////////////////////// */
-
-#undef getcwd
-
-char *
-getcwd(char *buf, size_t size)
-{
-  return xcegetcwd(buf, size);
-}
-
-int 
-isnan(double d)
-{
-  return _isnan(d);
-}
-
-int
-win32_open_osfhandle(intptr_t osfhandle, int flags)
-{
-    int fh;
-    char fileflags=0;		/* _osfile flags */
-
-    XCEMessageBoxA(NULL, "NEED TO IMPLEMENT in wince/wince.c(win32_open_osfhandle)", "error", 0);
-    Perl_croak_nocontext("win32_open_osfhandle() TBD on this platform");
-    return 0;
-}
-
-int
-win32_get_osfhandle(intptr_t osfhandle, int flags)
-{
-    int fh;
-    char fileflags=0;		/* _osfile flags */
-
-    XCEMessageBoxA(NULL, "NEED TO IMPLEMENT in wince/wince.c(win32_get_osfhandle)", "error", 0);
-    Perl_croak_nocontext("win32_get_osfhandle() TBD on this platform");
-    return 0;
-}
-
-/*
- * a popen() clone that respects PERL5SHELL
- *
- * changed to return PerlIO* rather than FILE * by BKS, 11-11-2000
- */
-
-DllExport PerlIO*
-win32_popen(const char *command, const char *mode)
-{
-    XCEMessageBoxA(NULL, "NEED TO IMPLEMENT in wince/wince.c(win32_popen)", "error", 0);
-    Perl_croak_nocontext("win32_popen() TBD on this platform");
-}
-
-/*
- * pclose() clone
- */
-
-DllExport int
-win32_pclose(PerlIO *pf)
-{
-#ifdef USE_RTL_POPEN
-    return _pclose(pf);
-#else
-    dTHX;
-    int childpid, status;
-    SV *sv;
-
-    LOCK_FDPID_MUTEX;
-    sv = *av_fetch(w32_fdpid, PerlIO_fileno(pf), TRUE);
-
-    if (SvIOK(sv))
-	childpid = SvIVX(sv);
-    else
-	childpid = 0;
-
-    if (!childpid) {
-	errno = EBADF;
-        return -1;
-    }
-
-#ifdef USE_PERLIO
-    PerlIO_close(pf);
-#else
-    fclose(pf);
-#endif
-    SvIVX(sv) = 0;
-    UNLOCK_FDPID_MUTEX;
-
-    if (win32_waitpid(childpid, &status, 0) == -1)
-        return -1;
-
-    return status;
-
-#endif /* USE_RTL_POPEN */
-}
-
-FILE *
-win32_fdupopen(FILE *pf)
-{
-    FILE* pfdup;
-    fpos_t pos;
-    char mode[3];
-    int fileno = win32_dup(win32_fileno(pf));
-
-    XCEMessageBoxA(NULL, "NEED TO IMPLEMENT a place in .../wince/wince.c(win32_fdupopen)", "Perl(developer)", 0);
-    Perl_croak_nocontext("win32_fdupopen() TBD on this platform");
-
-#if 0
-    /* open the file in the same mode */
-    if((pf)->_flag & _IOREAD) {
-	mode[0] = 'r';
-	mode[1] = 0;
-    }
-    else if((pf)->_flag & _IOWRT) {
-	mode[0] = 'a';
-	mode[1] = 0;
-    }
-    else if((pf)->_flag & _IORW) {
-	mode[0] = 'r';
-	mode[1] = '+';
-	mode[2] = 0;
-    }
-
-    /* it appears that the binmode is attached to the
-     * file descriptor so binmode files will be handled
-     * correctly
-     */
-    pfdup = win32_fdopen(fileno, mode);
-
-    /* move the file pointer to the same position */
-    if (!fgetpos(pf, &pos)) {
-	fsetpos(pfdup, &pos);
-    }
-#endif
-    return pfdup;
-}
