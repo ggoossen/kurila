@@ -21,7 +21,7 @@
 #
 
 # print "1..0\n"; exit;
-print "1..42\n";
+print "1..26\n";
 
 my ($N, @R, $Q, $ar) = (1);
 
@@ -37,7 +37,7 @@ $N++;
 {
   my $good = 1;
   for my $meth (qw(new is_empty empty lookup remove
-                 insert update rekey expire ckeys bytes
+                 insert update rekey expire keys bytes
                    set_limit adj_limit flush  reduce_size_to
                    _produce _produce_lru )) {
     unless ($h->can($meth)) {
@@ -49,7 +49,7 @@ $N++;
   $N++;
 }
 
-# (4-5) Straight insert and removal FIFO test
+# (4) Straight insert and removal FIFO test
 $ar = 'a0';
 for (1..10) {
   $h->insert($_, $ar++);
@@ -62,15 +62,13 @@ $iota = iota('a',9);
 print "@R" eq $iota
   ? "ok $N\n" : "not ok $N \# expected ($iota), got (@R)\n";
 $N++;
-check($h);
 
-# (6-7) Remove from empty heap
+# (5) Remove from empty heap
 $n = $h->expire;
 print ! defined $n ? "ok $N\n" : "not ok $N \# expected UNDEF, got $n";
 $N++;
-check($h);
 
-# (8-9) Interleaved insert and removal
+# (6) Interleaved insert and removal
 $Q = 0;
 @R = ();
 for my $i (1..4) {
@@ -85,13 +83,12 @@ for my $i (1..4) {
 $iota = iota('b', 9);
 print "@R" eq $iota ? "ok $N\n" : "not ok $N \# expected ($iota), got (@R)\n";
 $N++;
-check($h);
 
-# (10) It should be empty now
+# (7) It should be empty now
 print $h->is_empty ? "ok $N\n" : "not ok $N\n";
 $N++;
 
-# (11-12) Insert and delete
+# (8) Insert and delete
 $Q = 1;
 for (1..10) {
   $h->insert($_, "c$Q");
@@ -105,9 +102,8 @@ push @R, $n while defined ($n = $h->expire);
 print "@R" eq "c1 c3 c5 c7 c9" ? 
   "ok $N\n" : "not ok $N \# expected (c1 c3 c5 c7 c9), got (@R)\n";
 $N++;
-check($h);
 
-# (13-14) Interleaved insert and delete
+# (9) Interleaved insert and delete
 $Q = 1; my $QQ = 1;
 @R = ();
 for my $i (1..4) {
@@ -124,9 +120,8 @@ push @R, $n while defined ($n = $h->expire);
 print "@R" eq "d1 d3 d5 d7 d9" ? 
   "ok $N\n" : "not ok $N \# expected (d1 d3 d5 d7 d9), got (@R)\n";
 $N++;
-check($h);
 
-# (15-16) Promote
+# (10) Promote
 $h->empty;
 $Q = 1;
 for (1..10) {
@@ -146,9 +141,8 @@ print "@R" eq "e1 e3 e5 e7 e9 e2 e4 e6 e8 e10" ?
     "ok $N\n" : 
     "not ok $N \# expected (e1 e3 e5 e7 e9 e2 e4 e6 e8 e10), got (@R)\n";
 $N++;
-check($h);
 
-# (17-22) Lookup
+# (11-15) Lookup
 $Q = 1;
 for (1..10) {
   $h->insert($_, "f$Q");
@@ -160,22 +154,20 @@ for (2, 4, 6, 4, 8) {
   print $r eq "f$_" ? "ok $N\n" : "not ok $N \# expected f$_, got $r\n";
   $N++;
 }
-check($h);
 
-# (23) It shouldn't be empty
+# (16) It shouldn't be empty
 print ! $h->is_empty ? "ok $N\n" : "not ok $N\n";
 $N++;
 
-# (24-25) Lookup should have promoted the looked-up records
+# (17) Lookup should have promoted the looked-up records
 @R = ();
 push @R, $n while defined ($n = $h->expire);
 print "@R" eq "f1 f3 f5 f7 f9 f10 f2 f6 f4 f8" ?
   "ok $N\n" : 
   "not ok $N \# expected (f1 f3 f5 f7 f9 f10 f2 f6 f4 f8), got (@R)\n";
 $N++;
-check($h);
 
-# (26-29) Typical 'rekey' operation
+# (18-19) Typical 'rekey' operation
 $Q = 1;
 for (1..10) {
   $h->insert($_, "g$Q");
@@ -197,7 +189,6 @@ my %x = qw(1 g1 2 g2  3 g3  4 g4  5 g5
   print $good ? "ok $N\n" : "not ok $N\n";
   $N++;
 }
-check($h);
 {
   my $good = 1;
   for my $k (6, 7) {
@@ -210,63 +201,51 @@ check($h);
   print $good ? "ok $N\n" : "not ok $N\n";
   $N++;
 }
-check($h);
 
-# (30-31) ckeys
-@R = sort { $a <=> $b } $h->ckeys;
+# (20) keys
+@R = sort { $a <=> $b } $h->keys;
 print "@R" eq "1 2 3 4 5 8 9 10 11 12" ?
   "ok $N\n" : 
   "not ok $N \# expected (1 2 3 4 5 8 9 10 11 12) got (@R)\n";
 $N++;
-check($h);
 1;
-# (32-33) update
+# (21) update
 for (1..5, 8..12) {
   $h->update($_, "h$_");
 }
 @R = ();
-for (sort { $a <=> $b } $h->ckeys) {
+for (sort { $a <=> $b } $h->keys) {
   push @R, $h->lookup($_);
 }
 print "@R" eq "h1 h2 h3 h4 h5 h8 h9 h10 h11 h12" ?
   "ok $N\n" : 
   "not ok $N \# expected (h1 h2 h3 h4 h5 h8 h9 h10 h11 h12) got (@R)\n";
 $N++;
-check($h);
 
-# (34-37) bytes
+# (22-23) bytes
 my $B;
 $B = $h->bytes;
 print $B == 23 ? "ok $N\n" : "not ok $N \# expected 23, got $B\n";
 $N++;
-check($h);
 $h->update('12', "yobgorgle");
 $B = $h->bytes;
 print $B == 29 ? "ok $N\n" : "not ok $N \# expected 29, got $B\n";
 $N++;
-check($h);
 
-# (38-41) empty
+# (24-25) empty
 $h->empty;
 print $h->is_empty ? "ok $N\n" : "not ok $N\n";
 $N++;
-check($h);
 $n = $h->expire;
 print ! defined $n ? "ok $N\n" : "not ok $N \# expected UNDEF, got $n";
 $N++;
-check($h);
 
-# (42) very weak testing of DESTROY
+# (26) very weak testing of DESTROY
 undef $h;
 # are we still alive?
 print "ok $N\n";
 $N++;
 
-sub check {
-  my $h = shift;
-  print $h->_check_integrity ? "ok $N\n" : "not ok $N\n";
-  $N++;
-}
 
 sub iota {
   my ($p, $n) = @_;
