@@ -34,21 +34,20 @@ sub ok {
     return $ok;
 }
 
-ok(2, scalar @{[threads->list]} == 0);
 
+ok(2, threads->self == (threads->list)[0]);
 
 
 threads->create(sub {})->join();
-ok(3, scalar @{[threads->list]} == 0);
+ok(3, scalar @{[threads->list]} == 1);
 
 my $thread = threads->create(sub {});
-ok(4, scalar @{[threads->list]} == 1);
+ok(4, scalar @{[threads->list]} == 2);
 $thread->join();
-ok(5, scalar @{[threads->list]} == 0);
+ok(5, scalar @{[threads->list]} == 1);
 
-$thread = threads->create(sub { ok(6, threads->self == (threads->list)[0])});
-threads->yield; # help out non-preemptive thread implementations
+$thread = threads->create(sub { ok(6, threads->self == (threads->list)[1])});
 sleep 1;
-ok(7, $thread == (threads->list)[0]);
+ok(7, $thread == (threads->list)[1]);
 $thread->join();
-ok(8, scalar @{[threads->list]} == 0);
+ok(8, scalar @{[threads->list]} == 1);
