@@ -1,16 +1,9 @@
 #!./perl -w
 
-BEGIN {
-    chdir "t" if -d "t";
-    @INC = qw(. ../lib);
-}
-
 # Test srand.
 
 use strict;
-
-require "test.pl";
-plan(tests => 4);
+use Test::More tests => 5;
 
 # Generate a load of random numbers.
 # int() avoids possible floating point error.
@@ -38,22 +31,33 @@ ok( !eq_array(\@first_run, \@second_run),
                                  'srand(), different arg, different rands' );
 
 
-# Check that srand() isn't affected by $_
-{   
+# Check that srand() with no args provides different seeds.
+srand();
+@first_run  = mk_rand;
+
+srand();
+@second_run = mk_rand;
+
+ok( !eq_array(\@first_run, \@second_run), 'srand(), no arg, different rands');
+
+
+# Check that srand() isn't effected by $_
+{
     local $_ = 42;
     srand();
     @first_run  = mk_rand;
 
-    srand(42);
+    srand();
     @second_run = mk_rand;
 
-    ok( !eq_array(\@first_run, \@second_run),
-                       'srand(), no arg, not affected by $_');
+    ok( !eq_array(\@first_run, \@second_run), 
+                       'srand(), no arg, not effected by $_');
 }
+
+
 
 # This test checks whether Perl called srand for you.
 @first_run  = `$^X -le "print int rand 100 for 1..100"`;
-sleep(1); # in case our srand() is too time-dependent
 @second_run = `$^X -le "print int rand 100 for 1..100"`;
 
 ok( !eq_array(\@first_run, \@second_run), 'srand() called automatically');
