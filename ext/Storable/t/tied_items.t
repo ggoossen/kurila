@@ -1,9 +1,15 @@
 #!./perl
+
+# $Id: tied_items.t,v 1.0 2000/09/01 19:40:42 ram Exp $
 #
 #  Copyright (c) 1995-2000, Raphael Manfredi
 #  
 #  You may redistribute only under the same terms as Perl 5, as specified
 #  in the README file that comes with the distribution.
+#
+# $Log: tied_items.t,v $
+# Revision 1.0  2000/09/01 19:40:42  ram
+# Baseline for first official release.
 #
 
 #
@@ -11,18 +17,15 @@
 #
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
-    } else {
-	unshift @INC, 't';
-    }
+    chdir('t') if -d 't';
+    @INC = '.'; 
+    push @INC, '../lib';
     require Config; import Config;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
+    if ($Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
-    require 'st-dump.pl';
+    require 'lib/st-dump.pl';
 }
 
 sub ok;
@@ -62,3 +65,4 @@ ok 6, $$ref2 eq $$ref;
 ok 7, $$ref2 == 8;
 # I don't understand why it's 3 and not 2
 ok 8, $a_fetches == 3;
+

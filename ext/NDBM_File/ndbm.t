@@ -28,7 +28,7 @@ require NDBM_File;
 #If Fcntl is not available, try 0x202 or 0x102 for O_RDWR|O_CREAT
 use Fcntl;
 
-print "1..77\n";
+print "1..65\n";
 
 unlink <Op.dbmx*>;
 
@@ -40,7 +40,7 @@ my $Dfile = "Op.dbmx.pag";
 if (! -e $Dfile) {
 	($Dfile) = <Op.dbmx*>;
 }
-if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'MacOS') {
+if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'NetWare') {
     print "ok 2 # Skipped: different file permission semantics\n";
 }
 else {
@@ -137,7 +137,7 @@ print ($h{'foo'} eq '' ? "ok 11\n" : "not ok 11\n");
 print ($h{''} eq 'bar' ? "ok 12\n" : "not ok 12\n");
 
 untie %h;
-unlink <Op.dbmx*>, $Dfile;
+unlink 'Op.dbmx.dir', $Dfile;
 
 {
    # sub-class test
@@ -418,90 +418,3 @@ EOM
     
     ok(65, tie(%h, 'NDBM_File','Op.dbmx', O_RDWR|O_CREAT, 0640)) ;
 }
-
-{
-    # When iterating over a tied hash using "each", the key passed to FETCH
-    # will be recycled and passed to NEXTKEY. If a Source Filter modifies the
-    # key in FETCH via a filter_fetch_key method we need to check that the
-    # modified key doesn't get passed to NEXTKEY.
-    # Also Test "keys" & "values" while we are at it.
-
-    use warnings ;
-    use strict ;
-    use NDBM_File ;
-
-    unlink <Op.dbmx*>;
-    my $bad_key = 0 ;
-    my %h = () ;
-    ok(66, my $db = tie(%h, 'NDBM_File','Op.dbmx', O_RDWR|O_CREAT, 0640)) ;
-    $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
-    $db->filter_store_key (sub { $bad_key = 1 if /^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
-
-    $h{'Alpha_ABC'} = 2 ;
-    $h{'Alpha_DEF'} = 5 ;
-
-    ok(67, $h{'Alpha_ABC'} == 2);
-    ok(68, $h{'Alpha_DEF'} == 5);
-
-    my ($k, $v) = ("","");
-    while (($k, $v) = each %h) {}
-    ok(69, $bad_key == 0);
-
-    $bad_key = 0 ;
-    foreach $k (keys %h) {}
-    ok(70, $bad_key == 0);
-
-    $bad_key = 0 ;
-    foreach $v (values %h) {}
-    ok(71, $bad_key == 0);
-
-    undef $db ;
-    untie %h ;
-    unlink <Op.dbmx*>;
-}
-
-
-{
-   # Check that DBM Filter can cope with read-only $_
-
-   use warnings ;
-   use strict ;
-   my %h ;
-   unlink <Op.dbmx*>;
-
-   ok(72, my $db = tie(%h, 'NDBM_File','Op.dbmx', O_RDWR|O_CREAT, 0640)) ;
-
-   $db->filter_fetch_key   (sub { }) ;
-   $db->filter_store_key   (sub { }) ;
-   $db->filter_fetch_value (sub { }) ;
-   $db->filter_store_value (sub { }) ;
-
-   $_ = "original" ;
-
-   $h{"fred"} = "joe" ;
-   ok(73, $h{"fred"} eq "joe");
-
-   eval { grep { $h{$_} } (1, 2, 3) };
-   ok (74, ! $@);
-
-
-   # delete the filters
-   $db->filter_fetch_key   (undef);
-   $db->filter_store_key   (undef);
-   $db->filter_fetch_value (undef);
-   $db->filter_store_value (undef);
-
-   $h{"fred"} = "joe" ;
-
-   ok(75, $h{"fred"} eq "joe");
-
-   ok(76, $db->FIRSTKEY() eq "fred") ;
-   
-   eval { grep { $h{$_} } (1, 2, 3) };
-   ok (77, ! $@);
-
-   undef $db ;
-   untie %h;
-   unlink <Op.dbmx*>;
-}
-exit ;

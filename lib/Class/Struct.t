@@ -5,17 +5,13 @@ BEGIN {
 	@INC = '../lib';
 }
 
-print "1..12\n";
+print "1..10\n";
 
 package aClass;
 
 sub new { bless {}, shift }
 
 sub meth { 42 }
-
-package RecClass;
-
-sub new { bless {}, shift }
 
 package MyObj;
 
@@ -55,35 +51,26 @@ print "ok 5\n";
 
 my $orf = $obj->c;
 
-print "not " if defined($orf);
+print "not " unless ref $orf eq 'aClass';
 print "ok 6\n";
 
-$obj = MyObj->new( c => aClass->new );
-$orf = $obj->c;
-
-print "not " if ref $orf ne 'aClass';
-print "ok 7\n";
-
 print "not " unless $obj->c->meth() == 42;
-print "ok 8\n";
+print "ok 7\n";
 
 my $obk = SomeClass->new();
 
 $obk->SomeElem(123);
 
 print "not " unless $obk->SomeElem() == 123;
-print "ok 9\n";
+print "ok 8\n";
 
 $obj->a([4,5,6]);
 
 print "not " unless $obj->a(1) == 5;
-print "ok 10\n";
+print "ok 9\n";
 
 $obj->h({h=>7,r=>8,f=>9});
 
 print "not " unless $obj->h('r') == 8;
-print "ok 11\n";
-
-my $recobj = RecClass->new() or print "not ";
-print "ok 12\n";
+print "ok 10\n";
 

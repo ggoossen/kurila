@@ -7,7 +7,7 @@ BEGIN {
     }
     require Config; import Config;
     if ($] < 5.00326 || not $Config{'d_readdir'}) {
-	print "1..0 # Skip: readdir() not available\n";
+	print "1..0\n";
 	exit 0;
     }
 }
@@ -41,7 +41,7 @@ print defined($dot->read) ? "not ok" : "ok", " 5\n";
 
 open(FH,'>X') || die "Can't create x";
 print FH "X";
-close(FH) or die "Can't close: $!";
+close(FH);
 
 tie %dir, IO::Dir, $DIR;
 my @files = keys %dir;

@@ -5,7 +5,7 @@ BEGIN {
 
 use Carp qw(carp cluck croak confess);
 
-print "1..9\n";
+print "1..7\n";
 
 print "ok 1\n";
 
@@ -51,21 +51,3 @@ sub_6;
 
 print "ok 7\n";
 
-# test for caller_info API
-my $eval = "use Carp::Heavy; return Carp::caller_info(0);";
-my %info = eval($eval);
-print "not " if ($info{sub_name} ne "eval '$eval'");
-print "ok 8\n";
-
-# test for '...::CARP_NOT used only once' warning from Carp::Heavy
-my $warning;
-eval {
-    BEGIN {
-	$^W = 1;
-	$SIG{__WARN__} =
-	    sub { if( defined $^S ){ warn $_[0] } else { $warning = $_[0] } }
-    }
-    package Z; 
-    BEGIN { eval { Carp::croak() } }
-};
-print $warning ? "not ok 9\n#$warning" : "ok 9\n";

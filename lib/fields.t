@@ -18,9 +18,6 @@ use strict;
 use warnings;
 use vars qw($DEBUG);
 
-use Test::More;
-
-
 package B1;
 use fields qw(b1 b2 b3);
 
@@ -28,7 +25,7 @@ package B2;
 use fields '_b1';
 use fields qw(b1 _b2 b2);
 
-sub new { fields::new(shift); }
+sub new { bless [], shift }
 
 package D1;
 use base 'B1';
@@ -93,16 +90,18 @@ my %expect = (
     'Foo::Bar::Baz' => 'b1:1,b2:2,b3:3,foo:4,bar:5,baz:6',
 );
 
-plan tests => keys(%expect) + 17;
+print "1..", int(keys %expect)+15, "\n";
 my $testno = 0;
 while (my($class, $exp) = each %expect) {
    no strict 'refs';
    my $fstr = fstr(\%{$class."::FIELDS"});
-   is( $fstr, $exp, "\%FIELDS check for $class" );
+   print "EXP: $exp\nGOT: $fstr\nnot " unless $fstr eq $exp;
+   print "ok ", ++$testno, "\n";
 }
 
 # Did we get the appropriate amount of warnings?
-is( $w, 1 );
+print "not " unless $w == 1;
+print "ok ", ++$testno, "\n";
 
 # A simple object creation and AVHV attribute access test
 my B2 $obj1 = D3->new;
@@ -110,19 +109,37 @@ $obj1->{b1} = "B2";
 my D3 $obj2 = $obj1;
 $obj2->{b1} = "D3";
 
+print "not " unless $obj1->[2] eq "B2" && $obj1->[5] eq "D3";
+print "ok ", ++$testno, "\n";
+
 # We should get compile time failures field name typos
 eval q(my D3 $obj3 = $obj2; $obj3->{notthere} = "");
-like $@, qr/^Attempt to access disallowed key 'notthere' in a restricted hash/;
+print "not " unless $@ && $@ =~ /^No such pseudo-hash field "notthere"/;
+print "ok ", ++$testno, "\n";
 
 # Slices
 @$obj1{"_b1", "b1"} = (17, 29);
-is_deeply($obj1, { b1 => 29, _b1 => 17 });
+print "not " unless "@$obj1[1,2]" eq "17 29";
+print "ok ", ++$testno, "\n";
+@$obj1[1,2] = (44,28);
+print "not " unless "@$obj1{'b1','_b1','b1'}" eq "28 44 28";
+print "ok ", ++$testno, "\n";
 
-@$obj1{'_b1', 'b1'} = (44,28);
-is_deeply($obj1, { b1 => 28, _b1 => 44 });
+my $ph = fields::phash(a => 1, b => 2, c => 3);
+print "not " unless fstr($ph) eq 'a:1,b:2,c:3';
+print "ok ", ++$testno, "\n";
 
-eval { fields::phash };
-like $@, qr/^Pseudo-hashes have been removed from Perl/;
+$ph = fields::phash([qw/a b c/], [1, 2, 3]);
+print "not " unless fstr($ph) eq 'a:1,b:2,c:3';
+print "ok ", ++$testno, "\n";
+
+$ph = fields::phash([qw/a b c/], [1]);
+print "not " if exists $ph->{b} or exists $ph->{c} or !exists $ph->{a};
+print "ok ", ++$testno, "\n";
+
+eval '$ph = fields::phash("odd")';
+print "not " unless $@ && $@ =~ /^Odd number of/;
+print "ok ", ++$testno, "\n";
 
 #fields::_dump();
 
@@ -130,14 +147,14 @@ like $@, qr/^Pseudo-hashes have been removed from Perl/;
 {
     package Foo;
     use fields qw(foo bar);
-    sub new { fields::new($_[0]) }
+    sub new { bless [], $_[0]; }
 
     package main;
     my Foo $a = Foo->new();
-    $a->{foo} = ['a', 'ok', 'c'];
-    $a->{bar} = { A => 'ok' };
-    is( $a->{foo}[1],    'ok' );
-    is( $a->{bar}->{A},, 'ok' );
+    $a->{foo} = ['a', 'ok ' . ++$testno, 'c'];
+    $a->{bar} = { A => 'ok ' . ++$testno };
+    print $a->{foo}[1], "\n";
+    print $a->{bar}->{A}, "\n";
 }
 
 # check if fields autovivify
@@ -148,10 +165,10 @@ like $@, qr/^Pseudo-hashes have been removed from Perl/;
 
     package main;
     my Bar $a = Bar::->new();
-    $a->{foo} = ['a', 'ok', 'c'];
-    $a->{bar} = { A => 'ok' };
-    is( $a->{foo}[1], 'ok' );
-    is( $a->{bar}->{A}, 'ok' );
+    $a->{foo} = ['a', 'ok ' . ++$testno, 'c'];
+    $a->{bar} = { A => 'ok ' . ++$testno };
+    print $a->{foo}[1], "\n";
+    print $a->{bar}->{A}, "\n";
 }
 
 
@@ -164,7 +181,8 @@ sub VERSION { 42 }
 package Test::Version;
 
 use base qw(No::Version);
-::like( $No::Version::VERSION, qr/set by base.pm/ );
+print "not " unless $No::Version::VERSION =~ /set by base\.pm/;
+print "ok ", ++$testno ,"\n";
 
 # Test Inverse of $VERSION bug base.pm should not clobber existing $VERSION
 package Has::Version;
@@ -174,42 +192,6 @@ BEGIN { $Has::Version::VERSION = '42' };
 package Test::Version2;
 
 use base qw(Has::Version);
-::is( $Has::Version::VERSION, 42 );
-
-package main;
-
-our $eval1 = q{
-  {
-    package Eval1;
-    {
-      package Eval2;
-      use base 'Eval1';
-      $Eval2::VERSION = "1.02";
-    }
-    $Eval1::VERSION = "1.01";
-  }
-};
-
-eval $eval1;
-is( $@, '' );
-
-is( $Eval1::VERSION, 1.01 );
-
-is( $Eval2::VERSION, 1.02 );
-
-
-eval q{use base reallyReAlLyNotexists;};
-like( $@, qr/^Base class package "reallyReAlLyNotexists" is empty./,
-                                          'base with empty package');
-
-eval q{use base reallyReAlLyNotexists;};
-like( $@, qr/^Base class package "reallyReAlLyNotexists" is empty./,
-                                          '  still empty on 2nd load');
-
-BEGIN { $Has::Version_0::VERSION = 0 }
-
-package Test::Version3;
-
-use base qw(Has::Version_0);
-::is( $Has::Version_0::VERSION, 0, '$VERSION==0 preserved' );
+print "#$Has::Version::VERSION\nnot " unless $Has::Version::VERSION eq '42';
+print "ok ", ++$testno ,"\n";
 

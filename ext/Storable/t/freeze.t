@@ -1,30 +1,33 @@
 #!./perl
+
+# $Id: freeze.t,v 1.0 2000/09/01 19:40:41 ram Exp $
 #
 #  Copyright (c) 1995-2000, Raphael Manfredi
 #  
 #  You may redistribute only under the same terms as Perl 5, as specified
 #  in the README file that comes with the distribution.
 #
+# $Log: freeze.t,v $
+# Revision 1.0  2000/09/01 19:40:41  ram
+# Baseline for first official release.
+#
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
-    } else {
-	unshift @INC, 't';
-    }
+    chdir('t') if -d 't';
+    @INC = '.'; 
+    push @INC, '../lib';
     require Config; import Config;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
+    if ($Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
-    require 'st-dump.pl';
-    sub ok;
+    require 'lib/st-dump.pl';
 }
+
 
 use Storable qw(freeze nfreeze thaw);
 
-print "1..19\n";
+print "1..15\n";
 
 $a = 'toto';
 $b = \$a;
@@ -114,25 +117,3 @@ eval { freeze($foo) };
 print "not " if $@;
 print "ok 15\n";
 
-# Test cleanup bug found by Claudio Garcia -- RAM, 08/06/2001
-my $thaw_me = 'asdasdasdasd';
-
-eval {
-	my $thawed = thaw $thaw_me;
-};
-ok 16, $@;
-
-my %to_be_frozen = (foo => 'bar');
-my $frozen;
-eval {
-	$frozen = freeze \%to_be_frozen;
-};
-ok 17, !$@;
-
-freeze {};
-eval { thaw $thaw_me };
-eval { $frozen = freeze { foo => {} } };
-ok 18, !$@;
-
-thaw $frozen;			# used to segfault here
-ok 19, 1;

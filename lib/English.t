@@ -1,160 +1,65 @@
-#!./perl -i.inplace
-# note the extra switch, for the test below
+#!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
+print "1..22\n";
 
-use Test::More tests => 54;
-
+BEGIN { @INC = '../lib' }
 use English qw( -no_match_vars ) ;
 use Config;
-use Errno;
+my $threads = $Config{'use5005threads'} || 0;
 
-is( $PID, $$, '$PID' );
+print $PID == $$ ? "ok 1\n" : "not ok 1\n";
 
 $_ = 1;
-is( $ARG, $_, '$ARG' );
+print $ARG == $_  || $threads ? "ok 2\n" : "not ok 2\n";
 
 sub foo {
-	is($ARG[0], $_[0], '@ARG' );
+    print $ARG[0] == $_[0] || $threads ? "ok 3\n" : "not ok 3\n";
 }
-foo(1);
+&foo(1);
 
 "abc" =~ /b/;
 
-ok( !$PREMATCH, '$PREMATCH undefined' );
-ok( !$MATCH, '$MATCH undefined' );
-ok( !$POSTMATCH, '$POSTMATCH undefined' );
+print ! $PREMATCH  ? "" : "not ", "ok 4\n" ;
+print ! $MATCH     ? "" : "not ", "ok 5\n" ;
+print ! $POSTMATCH ? "" : "not ", "ok 6\n" ;
 
 $OFS = " ";
 $ORS = "\n";
-
-{
-	local(*IN, *OUT);
-	if ($^O ne 'dos') {
-	    pipe(IN, OUT);
-	} else {
-	    open(OUT, ">en.tmp");
-	}
-	select(OUT);
-	$| = 1;
-	print 'ok', '7';
-
-	# since $| is 1, this should be true
-	ok( $OUTPUT_AUTOFLUSH, '$OUTPUT_AUTOFLUSH should be true' );
-
-	my $close = close OUT;
-	ok( !($close) == $CHILD_ERROR, '$CHILD_ERROR should be false' );
-
-	open(IN, "<en.tmp") if ($^O eq 'dos');
-	my $foo = <IN>;
-	like( $foo, qr/ok 7/, '$OFS' );
-
-	# chomp is true because $ORS is "\n"
-	ok( chomp($foo), '$ORS should be \n' );
-}
-
-is( $FORMAT_NAME, 'OUT', '$FORMAT_NAME' );
-is( $FORMAT_TOP_NAME, 'OUT_TOP', '$FORMAT_TOP_NAME' );
-is( $FORMAT_FORMFEED, "\f", '$FORMAT_FORMFEED' );
-is( $FORMAT_LINES_LEFT, 0, '$FORMAT_LINES_LEFT' );
-is( $FORMAT_LINES_PER_PAGE, 60, '$FORMAT_LINES_PER_PAGE' );
-is( $FORMAT_LINE_BREAK_CHARACTERS, " \n-", '$FORMAT_LINE_BREAK_CHARACTERS');
-is( $FORMAT_PAGE_NUMBER, 0, '$FORMAT_PAGE_NUMBER' );
-is( $ACCUMULATOR, $^A, '$ACCUMULATOR' );
-
+print 'ok',7;
 undef $OUTPUT_FIELD_SEPARATOR;
 
 if ($threads) { $" = "\n" } else { $LIST_SEPARATOR = "\n" };
-@foo = (8, 9);
-@foo = split(/\n/, "@foo");
-is( $foo[0], 8, '$"' );
-is( $foo[1], 9, '$LIST_SEPARATOR' );
-
+@foo = ("ok 8", "ok 9");
+print "@foo";
 undef $OUTPUT_RECORD_SEPARATOR;
 
 eval 'NO SUCH FUNCTION';
-like( $EVAL_ERROR, qr/method/, '$EVAL_ERROR' );
+print "ok 10\n" if $EVAL_ERROR =~ /method/ || $threads;
 
-is( $UID, $<, '$UID' );
-is( $GID, $(, '$GID' );
-is( $EUID, $>, '$EUID' );
-is( $EGID, $), '$EGID' );
+print $UID == $< ? "ok 11\n" : "not ok 11\n";
+print $GID == $( ? "ok 12\n" : "not ok 12\n";
+print $EUID == $> ? "ok 13\n" : "not ok 13\n";
+print $EGID == $) ? "ok 14\n" : "not ok 14\n";
 
-is( $PROGRAM_NAME, $0, '$PROGRAM_NAME' );
-is( $BASETIME, $^T, '$BASETIME' );
+print $PROGRAM_NAME eq $0 ? "ok 15\n" : "not ok 15\n";
+print $BASETIME == $^T ? "ok 16\n" : "not ok 16\n";
 
-is( $PERL_VERSION, $^V, '$PERL_VERSION' );
-is( $DEBUGGING, $^D, '$DEBUGGING' );
+package B ;
 
-is( $WARNING, 0, '$WARNING' );
-like( $EXECUTABLE_NAME, qr/perl/i, '$EXECUTABLE_NAME' );
-is( $OSNAME, $Config{osname}, '$OSNAME' );
-
-# may be non-portable
-ok( $SYSTEM_FD_MAX >= 2, '$SYSTEM_FD_MAX should be at least 2' );
-
-is( $INPLACE_EDIT, '.inplace', '$INPLACE_EDIT' );
-
-'aabbcc' =~ /(.{2}).+(.{2})(?{ 9 })/;
-is( $LAST_PAREN_MATCH, 'cc', '$LAST_PARENT_MATCH' );
-is( $LAST_REGEXP_CODE_RESULT, 9, '$LAST_REGEXP_CODE_RESULT' );
-
-is( $LAST_MATCH_START[1], 0, '@LAST_MATCH_START' );
-is( $LAST_MATCH_END[1], 2, '@LAST_MATCH_END' );
-
-ok( !$PERLDB, '$PERLDB should be false' );
-
-{
-	local $INPUT_RECORD_SEPARATOR = "\n\n";
-	like( <DATA>, qr/a paragraph./, '$INPUT_RECORD_SEPARATOR' );
-}
-like( <DATA>, qr/second paragraph..\z/s, '$INPUT_RECORD_SEPARATOR' );
-
-is( $INPUT_LINE_NUMBER, 2, '$INPUT_LINE_NUMBER' );
-
-my %hash;
-$SUBSCRIPT_SEPARATOR = '|';
-$hash{d,e,f} = 1;
-$SUBSEP = ',';
-$hash{'a', 'b', 'c'} = 1;
-my @keys = sort keys %hash;
-
-is( $keys[0], 'a,b,c', '$SUBSCRIPT_SEPARATOR' );
-is( $keys[1], 'd|e|f', '$SUBSCRIPT_SEPARATOR' );
-
-eval { is( $EXCEPTIONS_BEING_CAUGHT, 1, '$EXCEPTIONS_BEING_CAUGHT' ) };
-ok( !$EXCEPTIONS_BEING_CAUGHT, '$EXCEPTIONS_BEING_CAUGHT should be false' );
-
-eval { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, $f); };
-is( $OS_ERROR, $ERRNO, '$OS_ERROR' );
-ok( $OS_ERROR{ENOENT}, '%OS_ERROR (ENOENT should be set)' );
-
-package B;
-
-use English;
+use English ;
 
 "abc" =~ /b/;
 
-main::is( $PREMATCH, 'a', '$PREMATCH defined' );
-main::is( $MATCH, 'b', '$MATCH defined' );
-main::is( $POSTMATCH, 'c', '$POSTMATCH defined' );
+print $PREMATCH  ? "" : "not ", "ok 17\n" ;
+print $MATCH     ? "" : "not ", "ok 18\n" ;
+print $POSTMATCH ? "" : "not ", "ok 19\n" ;
 
-package C;
+package C ;
 
 use English qw( -no_match_vars ) ;
 
 "abc" =~ /b/;
 
-main::ok( !$PREMATCH, '$PREMATCH disabled' );
-main::ok( !$MATCH, '$MATCH disabled' );
-main::ok( !$POSTMATCH, '$POSTMATCH disabled' );
-
-__END__
-This is a line.
-This is a paragraph.
-
-This is a second paragraph.
-It has several lines.
+print ! $PREMATCH  ? "" : "not ", "ok 20\n" ;
+print ! $MATCH     ? "" : "not ", "ok 21\n" ;
+print ! $POSTMATCH ? "" : "not ", "ok 22\n" ;

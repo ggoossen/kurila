@@ -8,7 +8,7 @@ BEGIN {
 BEGIN {
     our $hasne;
     eval { my @n = getnetbyname "loopback" };
-    $hasne = 1 unless $@ && $@ =~ /unimplemented|unsupported/i;
+    $hasne = 1 unless $@ && $@ =~ /unimplemented/;
     unless ($hasne) { print "1..0 # Skip: no getnetbyname\n"; exit 0 }
     use Config;
     $hasne = 0 unless $Config{'i_netdb'} eq 'define';

@@ -27,9 +27,10 @@ BEGIN {
 	    eval {IO::Socket::pack_sockaddr_un('/tmp/foo') || 1}
 	      or $@ !~ /not implemented/ or
 		$reason = 'compiled without TCP/IP stack v4';
-	} elsif ($^O =~ m/^(?:qnx|nto|vos)$/ ) {
+	} elsif ($^O eq 'qnx') {
 	    $reason = 'Not implemented';
 	}
+	undef $reason if $^O eq 'VMS' and $Config{d_socket};
 	if ($reason) {
 	    print "1..0 # Skip: $reason\n";
 	    exit 0;
@@ -59,26 +60,19 @@ print "ok 1\n";
 if($pid = fork()) {
 
     $sock = $listen->accept();
+    print "ok 2\n";
 
-    if (defined $sock) {
-	print "ok 2\n";
+    print $sock->getline();
 
-	print $sock->getline();
+    print $sock "ok 4\n";
 
-	print $sock "ok 4\n";
+    $sock->close;
 
-	$sock->close;
+    waitpid($pid,0);
+    unlink($PATH) || $^O eq 'os2' || warn "Can't unlink $PATH: $!";
 
-	waitpid($pid,0);
-	unlink($PATH) || $^O eq 'os2' || warn "Can't unlink $PATH: $!";
+    print "ok 5\n";
 
-	print "ok 5\n";
-    } else {
-	print "# accept() failed: $!\n";
-	for (2..5) {
-	    print "not ok $_ # accept failed\n";
-	}
-    }
 } elsif(defined $pid) {
 
     $sock = IO::Socket::UNIX->new(Peer => $PATH) or die "$!";

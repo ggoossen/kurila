@@ -15,7 +15,7 @@ if ($^O eq 'mpeix') {
 select(STDERR); $| = 1;
 select(STDOUT); $| = 1;
 
-print "1..10\n";
+print "1..9\n";
 
 use IO::Handle;
 use IO::Poll qw(/POLL/);
@@ -39,7 +39,7 @@ print "ok 2\n";
 
 $poll->poll(0.1);
 
-if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS' || $^O eq 'beos') {
+if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
 print "ok 3 # skipped, doesn't work on non-socket fds\n";
 print "ok 4 # skipped, doesn't work on non-socket fds\n";
 }
@@ -80,11 +80,3 @@ $poll->remove($dupout);
 print "not "
     if $poll->handles;
 print "ok 9\n";
-
-my $stdin = \*STDIN;
-$poll->mask($stdin => POLLIN);
-$poll->remove($stdin);
-close STDIN;
-print "not "
-    if $poll->poll(0.1);
-print "ok 10\n";

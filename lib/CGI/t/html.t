@@ -1,31 +1,19 @@
 #!/usr/local/bin/perl -w
 
 BEGIN {
-	chdir 't' if -d 't';
-	if ($ENV{PERL_CORE}) {
-		@INC = '../lib';
-	} else {
-		# Due to a bug in older versions of MakeMaker & Test::Harness,
-	        # we must ensure the blib's are in @INC, else we might use
-	        # the core CGI.pm
-		unshift @INC, qw( ../blib/lib ../blib/arch ../lib );
-	}
+    chdir('t') if -d 't';
+    @INC = '../lib';
 }
+
 # Test ability to retrieve HTTP request info
 ######################### We start with some black magic to print on failure.
+use lib '../blib/lib','../blib/arch';
 
 BEGIN {$| = 1; print "1..24\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use CGI (':standard','-no_debug','*h3','start_table');
 $loaded = 1;
 print "ok 1\n";
-
-BEGIN {
-    if ($] >= 5.006) {
-	require utf8;	# we contain Latin-1 in subtest #22,
-	utf8->unimport;	# possible "use utf8" must be undone
-    }
-}
 
 ######################### End of black magic.
 
@@ -63,26 +51,26 @@ test(10,header(-type=>'image/gif') eq "Content-Type: image/gif${CRLF}${CRLF}","h
 test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks${CRLF}Content-Type: image/gif${CRLF}${CRLF}","header()");
 test(12,header(-nph=>1) =~ m!HTTP/1.0 200 OK${CRLF}Server: cmdline${CRLF}Date:.+${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!,"header()");
 test(13,start_html() ."\n" eq <<END,"start_html()");
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN"
+	"http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>Untitled Document</title>
 </head><body>
 END
     ;
-test(14,start_html(-dtd=>"-//IETF//DTD HTML 3.2//FR",-lang=>'fr') ."\n" eq <<END,"start_html()");
+test(14,start_html(-dtd=>"-//IETF//DTD HTML 3.2//FR") ."\n" eq <<END,"start_html()");
 <!DOCTYPE html
 	PUBLIC "-//IETF//DTD HTML 3.2//FR">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><title>Untitled Document</title>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>Untitled Document</title>
 </head><body>
 END
     ;
 test(15,start_html(-Title=>'The world of foo') ."\n" eq <<END,"start_html()");
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN"
+	"http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>The world of foo</title>
 </head><body>
 END

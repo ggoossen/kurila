@@ -18,7 +18,7 @@ use warnings;
 
 use GDBM_File;
 
-print "1..80\n";
+print "1..68\n";
 
 unlink <Op.dbmx*>;
 
@@ -30,7 +30,7 @@ my $Dfile = "Op.dbmx.pag";
 if (! -e $Dfile) {
 	($Dfile) = <Op.dbmx*>;
 }
-if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin') {
+if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos') {
     print "ok 2 # Skipped: different file permission semantics\n";
 }
 else {
@@ -425,89 +425,3 @@ EOM
     untie %h;
     unlink <Op.dbmx*>;
 }
-
-{
-    # When iterating over a tied hash using "each", the key passed to FETCH
-    # will be recycled and passed to NEXTKEY. If a Source Filter modifies the
-    # key in FETCH via a filter_fetch_key method we need to check that the
-    # modified key doesn't get passed to NEXTKEY.
-    # Also Test "keys" & "values" while we are at it.
-
-    use warnings ;
-    use strict ;
-    use GDBM_File ;
-
-    unlink <Op.dbmx*>;
-    my $bad_key = 0 ;
-    my %h = () ;
-    ok(69, my $db = tie(%h, 'GDBM_File','Op.dbmx', &GDBM_WRCREAT, 0640));
-    $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
-    $db->filter_store_key (sub { $bad_key = 1 if /^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
-
-    $h{'Alpha_ABC'} = 2 ;
-    $h{'Alpha_DEF'} = 5 ;
-
-    ok(70, $h{'Alpha_ABC'} == 2);
-    ok(71, $h{'Alpha_DEF'} == 5);
-
-    my ($k, $v) = ("","");
-    while (($k, $v) = each %h) {}
-    ok(72, $bad_key == 0);
-
-    $bad_key = 0 ;
-    foreach $k (keys %h) {}
-    ok(73, $bad_key == 0);
-
-    $bad_key = 0 ;
-    foreach $v (values %h) {}
-    ok(74, $bad_key == 0);
-
-    undef $db ;
-    untie %h ;
-    unlink <Op.dbmx*>;
-}
-
-{
-   # Check that DBM Filter can cope with read-only $_
-
-   use warnings ;
-   use strict ;
-   my %h ;
-   unlink <Op.dbmx*>;
-
-   ok(75, my $db = tie(%h, 'GDBM_File','Op.dbmx', &GDBM_WRCREAT, 0640));
-
-   $db->filter_fetch_key   (sub { }) ;
-   $db->filter_store_key   (sub { }) ;
-   $db->filter_fetch_value (sub { }) ;
-   $db->filter_store_value (sub { }) ;
-
-   $_ = "original" ;
-
-   $h{"fred"} = "joe" ;
-   ok(76, $h{"fred"} eq "joe");
-
-   eval { grep { $h{$_} } (1, 2, 3) };
-   ok (77, ! $@);
-
-
-   # delete the filters
-   $db->filter_fetch_key   (undef);
-   $db->filter_store_key   (undef);
-   $db->filter_fetch_value (undef);
-   $db->filter_store_value (undef);
-
-   $h{"fred"} = "joe" ;
-
-   ok(78, $h{"fred"} eq "joe");
-
-   ok(79, $db->FIRSTKEY() eq "fred") ;
-   
-   eval { grep { $h{$_} } (1, 2, 3) };
-   ok (80, ! $@);
-
-   undef $db ;
-   untie %h;
-   unlink <Op.dbmx*>;
-}
-exit ;

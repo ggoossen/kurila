@@ -13,14 +13,14 @@ my $Is_MSWin32 = $^O eq 'MSWin32';
 my $Is_NetWare = $^O eq 'NetWare';
 my $tmpfile = "tmp0000";
 my $i = 0 ;
-1 while -e ++$tmpfile;
+1 while -f ++$tmpfile;
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs = () ;
 
-foreach (sort glob($^O eq 'MacOS' ? ":lib:strict:*" : "lib/strict/*")) {
+foreach (sort glob($^O eq 'MacOS' ? ":pragma:strict-*" : "pragma/strict-*")) {
 
-    next if -d || /(~|\.orig|,v)$/;
+    next if /(~|\.orig|,v)$/;
 
     open F, "<$_" or die "Cannot open $_: $!\n" ;
     while (<F>) {
@@ -31,7 +31,7 @@ foreach (sort glob($^O eq 'MacOS' ? ":lib:strict:*" : "lib/strict/*")) {
         local $/ = undef;
         @prgs = (@prgs, split "\n########\n", <F>) ;
     }
-    close F or die "Could not close: $!" ;
+    close F ;
 }
 
 undef $/;
@@ -59,21 +59,21 @@ for (@prgs){
     	    push @temps, $filename ;
 	    open F, ">$filename" or die "Cannot open $filename: $!\n" ;
 	    print F $code ;
-	    close F or die "Could not close: $!" ;
+	    close F ;
 	}
 	shift @files ;
 	$prog = shift @files ;
 	$prog =~ s|\./abc|:abc|g if $^O eq 'MacOS';
     }
-    open TEST, ">$tmpfile" or die "Could not open: $!";
+    open TEST, ">$tmpfile";
     print TEST $prog,"\n";
-    close TEST or die "Could not close: $!";
+    close TEST;
     my $results = $Is_MSWin32 ?
-	              `.\\perl -I../lib $switch $tmpfile 2>&1` :
-                  $^O eq 'NetWare' ?
-		      `perl -I../lib $switch $tmpfile 2>&1` :
+                  `.\\perl -I../lib $switch $tmpfile 2>&1` :
                   $^O eq 'MacOS' ?
-		      `$^X -I::lib -MMac::err=unix $switch $tmpfile` :
+                  `$^X -I::lib $switch $tmpfile` :
+                  $^O eq 'NetWare' ?
+                  `perl -I../lib $switch $tmpfile 2>&1` :
                   `./perl $switch $tmpfile 2>&1`;
     my $status = $?;
     $results =~ s/\n+$//;

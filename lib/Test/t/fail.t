@@ -1,12 +1,11 @@
 # -*-perl-*-
 use strict;
 use vars qw($Expect);
-use Test qw($TESTOUT $TESTERR $ntest ok skip plan); 
+use Test qw($TESTOUT $ntest ok skip plan); 
 plan tests => 14;
 
 open F, ">fails";
 $TESTOUT = *F{IO};
-$TESTERR = *F{IO};
 
 my $r=0;
 {
@@ -33,7 +32,6 @@ ok($r); # (failure==success :-)
 
 close F;
 $TESTOUT = *STDOUT{IO};
-$TESTERR = *STDERR{IO};
 $ntest = 1;
 
 open F, "fails";
@@ -51,54 +49,45 @@ shift @got;
 $Expect =~ s/\n+$//;
 my @expect = split /\n\n/, $Expect;
 
-
-sub commentless {
-  my $in = $_[0];
-  $in =~ s/^#[^\n]*\n//mg;
-  $in =~ s/\n#[^\n]*$//mg;
-  return $in;
-}
-
-
 for (my $x=0; $x < @got; $x++) {
-    ok commentless($got[$x]), commentless($expect[$x]."\n");
+    ok $got[$x], $expect[$x]."\n";
 }
 
 
 BEGIN {
     $Expect = <<"EXPECT";
-# Failed test 1 in $0 at line 15
+# Failed test 1 in $0 at line 14
 
-# Failed test 2 in $0 at line 17
+# Failed test 2 in $0 at line 16
 
-# Test 3 got: '0' ($0 at line 18)
+# Test 3 got: '0' ($0 at line 17)
 #   Expected: '1'
 
-# Test 4 got: '2' ($0 at line 19)
+# Test 4 got: '2' ($0 at line 18)
 #   Expected: '3'
 
-# Test 5 got: '2' ($0 at line 20)
+# Test 5 got: '2' ($0 at line 19)
 #   Expected: '0'
 
-# Test 6 got: '2' ($0 at line 23)
+# Test 6 got: '2' ($0 at line 22)
 #   Expected: '1' (\@list=0,0)
 
-# Test 7 got: '2' ($0 at line 24)
+# Test 7 got: '2' ($0 at line 23)
 #   Expected: '1' (\@list=0,0)
 
-# Test 8 got: 'segmentation fault' ($0 at line 25)
+# Test 8 got: 'segmentation fault' ($0 at line 24)
 #   Expected: qr{bongo}
 
-# Failed test 9 in $0 at line 27
+# Failed test 9 in $0 at line 26
 
-# Failed test 10 in $0 at line 27 fail #2
+# Failed test 10 in $0 at line 26 fail #2
 
-# Failed test 11 in $0 at line 29
+# Failed test 11 in $0 at line 28
 
-# Test 12 got: <UNDEF> ($0 at line 30)
+# Test 12 got: <UNDEF> ($0 at line 29)
 #    Expected: '1'
 
-# Failed test 13 in $0 at line 32
+# Failed test 13 in $0 at line 31
 EXPECT
 
 }

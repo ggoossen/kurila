@@ -1,56 +1,52 @@
-#!./perl -wT
+#!./perl
 
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
 }
 
-use strict;
-use Test::More tests => 21;
-use Getopt::Std;
+print "1..11\n";
 
-our ($warning, $opt_f, $opt_i, $opt_o, $opt_x, $opt_y, %opt);
+use Getopt::Std;
 
 # First we test the getopt function
 @ARGV = qw(-xo -f foo -y file);
 getopt('f');
 
-is( "@ARGV", 'file',		'options removed from @ARGV (1)' );
-ok( $opt_x && $opt_o && $opt_y, 'options -x, -o and -y set' );
-is( $opt_f, 'foo',		q/option -f is 'foo'/ );
+print "not " if "@ARGV" ne 'file';
+print "ok 1\n";
 
-@ARGV = qw(-hij k -- -l m -n);
-getopt 'il', \%opt;
+print "not " unless $opt_x && $opt_o && opt_y;
+print "ok 2\n";
 
-is( "@ARGV", 'k -- -l m -n',	'options removed from @ARGV (2)' );
-ok( $opt{h} && $opt{i} eq 'j',	'option -h and -i correctly set' );
-ok( !defined $opt{l},		'option -l not set' );
-ok( !defined $opt_i,		'$opt_i still undefined' );
+print "not " unless $opt_f eq 'foo';
+print "ok 3\n";
+
 
 # Then we try the getopts
 $opt_o = $opt_i = $opt_f = undef;
 @ARGV = qw(-foi -i file);
+getopts('oif:') or print "not ";
+print "ok 4\n";
 
-ok( getopts('oif:'),		'getopts succeeded (1)' );
-is( "@ARGV", 'file',		'options removed from @ARGV (3)' );
-ok( $opt_i && $opt_f eq 'oi',	'options -i and -f correctly set' );
-ok( !defined $opt_o,		'option -o not set' );
+print "not " unless "@ARGV" eq 'file';
+print "ok 5\n";
 
-%opt = (); $opt_i = undef;
-@ARGV = qw(-hij -k -- -l m);
+print "not " unless $opt_i and $opt_f eq 'oi';
+print "ok 6\n";
 
-ok( getopts('hi:kl', \%opt),	'getopts succeeded (2)' );
-is( "@ARGV", '-l m',		'options removed from @ARGV (4)' );
-ok( $opt{h} && $opt{k},		'options -h and -k set' );
-is( $opt{i}, 'j',		q/option -i is 'j'/ );
-ok( !defined $opt_i,		'$opt_i still undefined' );
+print "not " if $opt_o;
+print "ok 7\n";
 
 # Try illegal options, but avoid printing of the error message
-$SIG{__WARN__} = sub { $warning = $_[0] };
+
+open(STDERR, ">stderr") || die;
+
 @ARGV = qw(-h help);
 
-ok( !getopts("xf:y"),		'getopts fails for an illegal option' );
-ok( $warning eq "Unknown option: h\n", 'user warned' );
+!getopts("xf:y") or print "not ";
+print "ok 8\n";
+
 
 # Then try the Getopt::Long module
 
@@ -58,16 +54,20 @@ use Getopt::Long;
 
 @ARGV = qw(--help --file foo --foo --nobar --num=5 -- file);
 
-our ($HELP, $FILE, $FOO, $BAR, $NO);
+GetOptions(
+   'help'   => \$HELP,
+   'file:s' => \$FILE,
+   'foo!'   => \$FOO,
+   'bar!'   => \$BAR,
+   'num:i'  => \$NO,
+) || print "not ";
+print "ok 9\n";
 
-ok( GetOptions(
-	'help'   => \$HELP,
-	'file:s' => \$FILE,
-	'foo!'   => \$FOO,
-	'bar!'   => \$BAR,
-	'num:i'  => \$NO,
-    ),
-    'Getopt::Long::GetOptions succeeded'
-);
-is( "@ARGV", 'file', 'options removed from @ARGV (5)' );
-ok( $HELP && $FOO && !$BAR && $FILE eq 'foo' && $NO == 5, 'options set' );
+print "not " unless $HELP && $FOO && !$BAR && $FILE eq 'foo' && $NO == 5;
+print "ok 10\n";
+
+print "not " unless "@ARGV" eq "file";
+print "ok 11\n";
+
+close STDERR;
+unlink "stderr";

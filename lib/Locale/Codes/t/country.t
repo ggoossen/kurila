@@ -48,19 +48,6 @@ use Locale::Country;
  ['code2country("zw") eq "Zimbabwe"', 0],         # last in DATA segment
  ['code2country("gb") eq "United Kingdom"', 0],   # United Kingdom is "gb", not "uk"
 
- #-- tests added after changes in the standard 2002-05-20 ------
- ['code2country("kz") eq "Kazakhstan"', 0],
- ['country2code("kazakhstan")               eq "kz"', 0],
- ['country2code("kazakstan")                eq "kz"', 0],
-
- ['code2country("mo") eq "Macao"', 0],
- ['country2code("macao")                    eq "mo"', 0],
- ['country2code("macau")                    eq "mo"', 0],
-
- ['code2country("tl", LOCALE_CODE_ALPHA_2) eq "East Timor"', 0],
- ['code2country("tls", LOCALE_CODE_ALPHA_3) eq "East Timor"', 0],
- ['code2country("626", LOCALE_CODE_NUMERIC) eq "East Timor"', 0],
-
 	#================================================
 	# TESTS FOR country2code
 	#================================================
@@ -73,23 +60,13 @@ use Locale::Country;
  ['!defined country2code("Banana")', 0],          # illegal country name
 
  #---- some successful examples -----------------------------------------
- ['country2code("japan")                    eq "jp"', 0],
- ['country2code("japan")                    ne "ja"', 0],
- ['country2code("Japan")                    eq "jp"', 0],
- ['country2code("United States")            eq "us"', 0],
- ['country2code("United Kingdom")           eq "gb"', 0],
- ['country2code("Andorra")                  eq "ad"', 0],    # first in DATA
- ['country2code("Zimbabwe")                 eq "zw"', 0],    # last in DATA
- ['country2code("Iran")                     eq "ir"', 0],    # alias
- ['country2code("North Korea")              eq "kp"', 0],    # alias
- ['country2code("South Korea")              eq "kr"', 0],    # alias
- ['country2code("Libya")                    eq "ly"', 0],    # alias
- ['country2code("Syria")                    eq "sy"', 0],    # alias
- ['country2code("Svalbard")                 eq "sj"', 0],    # alias
- ['country2code("Jan Mayen")                eq "sj"', 0],    # alias
- ['country2code("USA")                      eq "us"', 0],    # alias
- ['country2code("United States of America") eq "us"', 0],    # alias
- ['country2code("Great Britain")            eq "gb"', 0],    # alias
+ ['country2code("japan")          eq "jp"', 0],
+ ['country2code("japan")          ne "ja"', 0],
+ ['country2code("Japan")          eq "jp"', 0],
+ ['country2code("United States")  eq "us"', 0],
+ ['country2code("United Kingdom") eq "gb"', 0],
+ ['country2code("Andorra")        eq "ad"', 0],    # first in DATA segment
+ ['country2code("Zimbabwe")       eq "zw"', 0],    # last in DATA segment
 
 	#================================================
 	# TESTS FOR country_code2code

@@ -1,24 +1,30 @@
 #!./perl
+
+# $Id: compat-0.6.t,v 1.0.1.1 2001/02/17 12:26:21 ram Exp $
 #
 #  Copyright (c) 1995-2000, Raphael Manfredi
 #  
 #  You may redistribute only under the same terms as Perl 5, as specified
 #  in the README file that comes with the distribution.
 #
+# $Log: compat-0.6.t,v $
+# Revision 1.0.1.1  2001/02/17 12:26:21  ram
+# patch8: added EBCDIC version of the test, from Peter Prymmer
+#
+# Revision 1.0  2000/09/01 19:40:41  ram
+# Baseline for first official release.
+#
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
-    } else {
-	unshift @INC, 't';
-    }
+    chdir('t') if -d 't';    
+    @INC = '.'; 
+    push @INC, '../lib';
     require Config; import Config;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
+    if ($Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
-    require 'st-dump.pl';
+    require 'lib/st-dump.pl';
 }
 
 sub ok;

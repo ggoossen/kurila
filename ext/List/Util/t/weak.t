@@ -1,26 +1,19 @@
-#!./perl
-
 BEGIN {
-    unless (-d 'blib') {
 	chdir 't' if -d 't';
 	@INC = '../lib';
 	require Config; import Config;
-	keys %Config; # Silence warning
 	if ($Config{extensions} !~ /\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
 	}
-    }
 }
-
-use vars qw($skip);
 
 BEGIN {
   $|=1;
   require Scalar::Util;
   if (grep { /weaken/ } @Scalar::Util::EXPORT_FAIL) {
     print("1..0\n");
-    $skip=1;
+    exit;
   }
 
   $DEBUG = 0;
@@ -33,7 +26,6 @@ BEGIN {
   }
 }
 
-eval <<'EOT' unless $skip;
 use Scalar::Util qw(weaken isweak);
 print "1..17\n";
 
@@ -212,4 +204,3 @@ sub DESTROY {
 	print "# INCFLAG\n";
 	${$_[0]{Flag}} ++;
 }
-EOT

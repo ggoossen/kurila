@@ -1,16 +1,21 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl test.pl'
+BEGIN {
+    chdir 't' if -d 't';
+    @INC = '../lib';
+}
 
 ######################### We start with some black magic to print on failure.
 require 5;
- # Time-stamp: "2001-06-21 22:59:38 MDT"
+
 use strict;
 use Test;
-BEGIN { plan tests => 46 };
+BEGIN { plan tests => 23 };
 BEGIN { ok 1 }
-use I18N::LangTags (':ALL');
-
-print "# Perl v$], I18N::LangTags v$I18N::LangTags::VERSION\n";
+use I18N::LangTags qw(is_language_tag same_language_tag
+		      extract_language_tags super_languages
+		      similarity_language_tag is_dialect_of
+		      locale2language_tag alternate_language_tags
+		      encode_language_tag
+		     );
 
 ok !is_language_tag('');
 ok  is_language_tag('fr');
@@ -36,44 +41,5 @@ ok 1 == similarity_language_tag('en-ca', 'en-us');
 ok 2 == similarity_language_tag('en-us-southern', 'en-us-western');
 ok 2 == similarity_language_tag('en-us-southern', 'en-us');
 
-ok grep $_ eq 'hi', panic_languages('kok');
-ok grep $_ eq 'en', panic_languages('x-woozle-wuzzle');
-ok ! grep $_ eq 'mr', panic_languages('it');
-ok grep $_ eq 'es', panic_languages('it');
-ok grep $_ eq 'it', panic_languages('es');
-
-
-print "# Now the ::List tests...\n";
-use I18N::LangTags::List;
-foreach my $lt (qw(
- en
- en-us
- en-kr
- el
- elx
- i-mingo
- i-mingo-tom
- x-mingo-tom
- it
- it-it
- it-IT
- it-FR
- yi
- ji
- cre-syllabic
- cre-syllabic-western
- cre-western
- cre-latin
-)) {
-  my $name = I18N::LangTags::List::name($lt);
-  if($name) {
-    ok(1);
-    print "#        $lt -> $name\n";
-  } else {
-    ok(0);
-    print "#        Failed lookup on $lt\n";
-  }
-}
-
-print "# So there!\n";
+# print "So there!\n";
 

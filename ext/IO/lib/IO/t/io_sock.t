@@ -21,6 +21,7 @@ BEGIN {
 	elsif ($Config{'extensions'} !~ /\bIO\b/) {
 	    $reason = 'IO extension unavailable';
 	}
+	undef $reason if $^O eq 'VMS' and $Config{d_socket};
 	if ($reason) {
 	    print "1..0 # Skip: $reason\n";
 	    exit 0;
@@ -204,15 +205,9 @@ if ($^O eq 'mpeix') {
 print "not " unless $server->blocking;
 print "ok 13\n";
 
-if ( $^O eq 'qnx' ) {
-  # QNX library bug: Can set non-blocking on socket, but
-  # cannot return that status.
-  print "ok 14 # skipped\n";
-} else {
-  $server->blocking(0);
-  print "not " if $server->blocking;
-  print "ok 14\n";
-}
+$server->blocking(0);
+print "not " if $server->blocking;
+print "ok 14\n";
 
 ### TEST 15
 ### Set up some data to be transfered between the server and
@@ -275,9 +270,6 @@ if( $server_pid) {
     ### a recv(2) call on the socket, while ungetc(3) put back a character
     ### to an IO buffer, which never again was read.
     #
-    if ($^O eq 'mpeix') {
-	print "ok 19 # skipped: broken on MPE/iX\n";
-    } else {
     $sock = IO::Socket::INET->new("localhost:$serverport")
          || IO::Socket::INET->new("127.0.0.1:$serverport");
 
@@ -300,7 +292,6 @@ if( $server_pid) {
 	print "not ";
     }
     print "ok 19\n";
-    }
 
     ### TEST 20
     ### Stop the server
