@@ -1,21 +1,68 @@
 # List::Util.pm
 #
-# Copyright (c) 1997-2001 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1997-2000 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
 package List::Util;
 
 require Exporter;
-require DynaLoader;
 
-our @ISA       = qw(Exporter DynaLoader);
-our @EXPORT_OK = qw(first min max minstr maxstr reduce sum shuffle);
-our $VERSION   = "1.07_00";
-our $XS_VERSION = $VERSION;
-$VERSION = eval $VERSION;
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(first min max minstr maxstr reduce sum);
+$VERSION = $VERSION = "1.02";
 
-bootstrap List::Util $XS_VERSION;
+eval {
+  require DynaLoader;
+  local @ISA = qw(DynaLoader);
+  bootstrap List::Util $VERSION;
+  1
+};
+
+eval <<'ESQ' unless defined &reduce;
+
+# This code is only compiled if the XS did not load
+
+use vars qw($a $b);
+
+sub reduce (&@) {
+  my $code = shift;
+
+  return shift unless @_ > 1;
+
+  my $caller = caller;
+  local(*{$caller."::a"}) = \my $a;
+  local(*{$caller."::b"}) = \my $b;
+
+  $a = shift;
+  foreach (@_) {
+    $b = $_;
+    $a = &{$code}();
+  }
+
+  $a;
+}
+
+sub sum (@) { reduce { $a + $b } @_ }
+
+sub min (@) { reduce { $a < $b ? $a : $b } @_ }
+
+sub max (@) { reduce { $a > $b ? $a : $b } @_ }
+
+sub minstr (@) { reduce { $a lt $b ? $a : $b } @_ }
+
+sub maxstr (@) { reduce { $a gt $b ? $a : $b } @_ }
+
+sub first (&@) {
+  my $code = shift;
+
+  foreach (@_) {
+    return $_ if &{$code}();
+  }
+
+  undef;
+}
+ESQ
 
 1;
 
@@ -27,7 +74,7 @@ List::Util - A selection of general-utility list subroutines
 
 =head1 SYNOPSIS
 
-    use List::Util qw(first max maxstr min minstr reduce shuffle sum);
+    use List::Util qw(first sum min max minstr maxstr reduce);
 
 =head1 DESCRIPTION
 
@@ -51,7 +98,7 @@ C<undef> is returned.
     $foo = first { defined($_) } @list    # first defined value in @list
     $foo = first { $_ > $value } @list    # first value in @list which
                                           # is greater than $value
-
+    
 This function could be implemented using C<reduce> like this
 
     $foo = reduce { defined($a) ? $a : wanted($b) ? $b : undef } undef, @list
@@ -77,8 +124,8 @@ This function could be implemented using C<reduce> like this
 Similar to C<max>, but treats all the entries in the list as strings
 and returns the highest string as defined by the C<gt> operator.
 If the list is empty then C<undef> is returned.
-
-    $foo = maxstr 'A'..'Z'          # 'Z'
+ 
+    $foo = maxstr 'A'..'Z'     	    # 'Z'
     $foo = maxstr "hello","world"   # "world"
     $foo = maxstr @bar, @baz        # whatever
 
@@ -105,9 +152,9 @@ Similar to C<min>, but treats all the entries in the list as strings
 and returns the lowest string as defined by the C<lt> operator.
 If the list is empty then C<undef> is returned.
 
-    $foo = minstr 'A'..'Z'          # 'A'
-    $foo = minstr "hello","world"   # "hello"
-    $foo = minstr @bar, @baz        # whatever
+    $foo = maxstr 'A'..'Z'     	    # 'A'
+    $foo = maxstr "hello","world"   # "hello"
+    $foo = maxstr @bar, @baz        # whatever
 
 This function could be implemented using C<reduce> like this
 
@@ -119,7 +166,7 @@ Reduces LIST by calling BLOCK multiple times, setting C<$a> and C<$b>
 each time. The first call will be with C<$a> and C<$b> set to the first
 two elements of the list, subsequent calls will be done by
 setting C<$a> to the result of the previous call and C<$b> to the next
-element in the list.
+element in the list. 
 
 Returns the result of the last call to BLOCK. If LIST is empty then
 C<undef> is returned. If LIST only contains one element then that
@@ -129,12 +176,6 @@ element is returned and BLOCK is not executed.
     $foo = reduce { $a lt $b ? $a : $b } 'aa'..'zz' # minstr
     $foo = reduce { $a + $b } 1 .. 10               # sum
     $foo = reduce { $a . $b } @bar                  # concat
-
-=item shuffle LIST
-
-Returns the elements of LIST in a random order
-
-    @cards = shuffle 0..51      # 0..51 in a random order
 
 =item sum LIST
 
@@ -149,12 +190,6 @@ This function could be implemented using C<reduce> like this
     $foo = reduce { $a + $b } 1..10
 
 =back
-
-=head1 KNOWN BUGS
-
-With perl versions prior to 5.005 there are some cases where reduce
-will return an incorrect result. This will show up as test 7 of
-reduce.t failing.
 
 =head1 SUGGESTED ADDITIONS
 
@@ -187,7 +222,7 @@ to add due to them being very simple to implement in perl
 
 =head1 COPYRIGHT
 
-Copyright (c) 1997-2001 Graham Barr <gbarr@pobox.com>. All rights reserved.
+Copyright (c) 1997-2000 Graham Barr <gbarr@pobox.com>. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
