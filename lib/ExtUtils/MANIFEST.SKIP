@@ -4,7 +4,7 @@
 ,v$
 
 # Avoid Makemaker generated and utility files.
-^MANIFEST\.bak
+^MANIFEST\.
 ^Makefile$
 ^blib/
 ^MakeMaker-\d
@@ -14,4 +14,3 @@
 ~$
 \.old$
 \#$
-^\.#
