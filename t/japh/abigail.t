@@ -3,25 +3,6 @@
 #
 # Tests derived from Japhs.
 #
-# These test use obscure features of Perl, or surprising combinations
-# of features. The tests were added because in the past, they have
-# exposed several bugs in Perl.
-#
-# Some of these tests may actually (mis)use bugs or use undefined behaviour.
-# These tests are still useful - behavioural changes or bugfixes will be
-# noted, and a remark can be put in the documentation. (Don't forget to
-# disable the test!)
-#
-# Getting everything to run well on the myriad of platforms Perl runs on
-# is unfortunately not a trivial task.
-#
-# WARNING: these tests are obfuscated.  Do not get frustrated.
-# Ask Abigail <abigail@foad.org>, or use the Deparse or Concise
-# modules (the former parses Perl to Perl, the latter shows the
-# op syntax tree) like this:
-# ./perl -Ilib -MO=Deparse foo.pl
-# ./perl -Ilib -MO=Concise foo.pl
-#
 
 BEGIN {
     if (ord("A") == 193) {
@@ -34,17 +15,15 @@ BEGIN {
     undef &skip;
 }
 
-skip_all "Unhappy on MacOS" if $^O eq 'MacOS';
-
 #
 # ./test.pl does real evilness by jumping to a label.
 # This function copies the skip from ./test, omitting the goto.
 #
 sub skip {
     my $why  = shift;
+    my $test = curr_test;
     my $n    = @_ ? shift : 1;
     for (1..$n) {
-        my $test = curr_test;
         print STDOUT "ok $test # skip: $why\n";
         next_test;
     }
@@ -101,7 +80,7 @@ plan tests => 130;
     if ($^O eq 'MSWin32' ||
         $^O eq 'NetWare' ||
         $^O eq 'VMS') {
-            skip "Your platform quotes differently.", 3;
+            skip 3, "Your platform quotes differently.\n";
             last;
     }
 
@@ -129,7 +108,7 @@ plan tests => 130;
     if ($^O eq 'MSWin32' ||
         $^O eq 'NetWare' ||
         $^O eq 'VMS') {
-            skip "Your platform quotes differently.", 1;
+            skip 1, "Your platform quotes differently.\n";
             last;
     }
     is (runperl (switches => [qw /-sweprint --/,
@@ -142,7 +121,7 @@ plan tests => 130;
 {
     my $datafile = "datatmp000";
     1 while -f ++ $datafile;
-    END {unlink_all $datafile if $datafile}
+    END {unlink_all $datafile}
 
     open  MY_DATA, "> $datafile" or die "Failed to open $datafile: $!";
     print MY_DATA  << "    --";
@@ -191,16 +170,14 @@ plan tests => 130;
     foreach my $program (@progs) {
         if (exists $program -> {SKIP}) {
             chomp  $program -> {SKIP};
-            skip   $program -> {SKIP}, 1;
+            skip   $program -> {SKIP};
             next;
         }
 
-	chomp @{$program -> {SKIP_OS}};
-        if (@{$program -> {SKIP_OS}}) {
-            if (grep {$^O eq $_} @{$program -> {SKIP_OS}}) {
-                skip "Your OS uses different quoting.", 1;
-                next;
-            }
+        if (@{$program -> {SKIP_OS}} &&
+            grep {$^O eq $_} @{$program -> {SKIP_OS}}) {
+            skip "Your OS uses different quoting.";
+            next;
         }
 
         map {s/\$datafile/$datafile/} @{$program -> {ARGS}};
@@ -222,32 +199,18 @@ plan tests => 130;
 {
     my $progfile = "progtmp000";
     1 while -f ++ $progfile;
-    END {unlink_all $progfile if $progfile}
+    END {unlink_all $progfile}
 
     my @programs = (<< '    --', << '    --');
-#!./perl
+#!./perl               --    # No trailing newline after the last line!    
 BEGIN{$|=$SIG{__WARN__}=sub{$_=$_[0];y-_- -;print/(.)"$/;seek _,-open(_ 
 ,"+<$0"),2;truncate _,tell _;close _;exec$0}}//rekcaH_lreP_rehtona_tsuJ
     --
-#!./perl
+#!./perl               --   # Remove trailing newline!
 BEGIN{$SIG{__WARN__}=sub{$_=pop;y-_- -;print/".*(.)"/;  
 truncate$0,-1+-s$0;exec$0;}}//rekcaH_lreP_rehtona_tsuJ
     --
     chomp @programs;
-
-    if ($^O eq 'VMS') {
-        # VMS needs extensions for files to be executable,
-        # but the Japhs above rely on $0 being exactly the
-        # filename of the program.
-        skip "VMS", 2 * @programs;
-        last
-    }
-
-    use Config;
-    unless (defined $Config {useperlio}) {
-        skip "Uuseperlio", 2 * @programs;
-        last
-    }
 
     my $i = 1;
     foreach my $program (@programs) {
@@ -258,18 +221,13 @@ truncate$0,-1+-s$0;exec$0;}}//rekcaH_lreP_rehtona_tsuJ
         chmod 0755   => $progfile or die "Failed to chmod $progfile: $!\n";
         my $command  = "./$progfile";
            $command .= ' 2>&1' unless $^O eq 'MacOS';
-        if ( $^O eq 'qnx' ) {
-          skip "#!./perl not supported in QNX4";
-          skip "#!./perl not supported in QNX4";
-        } else {
-          my $output   = `$command`;
+        my $output   = `$command`;
 
-          is ($output, $JaPH, "Self correcting code $i");
-
-                 $output   = `$command`;
-          is ($output, "",    "Self corrected code $i");
-        }
         $i ++;
+        is ($output, $JaPH, "Self correcting code $i");
+
+           $output   = `$command`;
+        is ($output, "",    "Self corrected code $i");
     }
 }
 
@@ -284,14 +242,12 @@ $_ = q *4a75737420616e6f74686572205065726c204861636b65720a*;
 for ($*=******;$**=******;$**=******) {$**=*******s*..*qq}
 print chr 0x$& and q
 qq}*excess********}
-SKIP_OS: qnx
 
 #######  Funky loop 3.
 $_ = q *4a75737420616e6f74686572205065726c204861636b65720a*;
 for ($*=******;$**=******;$**=******) {$**=*******s*..*qq}
 print chr 0x$& and q
 qq}*excess********}
-SKIP_OS: qnx
 
 #######  Funky loop 4.
 $_ = q ?4a75737420616e6f74686572205065726c204861636b65720as?;??;
@@ -528,7 +484,6 @@ SWITCHES: -w
 #######  Overloaded constants 1
 BEGIN {$^H {q} = sub {pop and pop and print pop}; $^H = 2**4.2**12}
 "Just "; "another "; "Perl "; "Hacker";
-SKIP_OS: qnx
 
 #######  Overloaded constants 2
 BEGIN {$^H {q} = sub {$_ [1] =~ y/S-ZA-IK-O/q-tc-fe-m/d; $_ [1]}; $^H = 0x28100}
