@@ -2,252 +2,133 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#ifdef I_UNISTD
-#   include <unistd.h>
-#endif
-
-/* The realpath() implementation from OpenBSD 2.9 (realpath.c 1.4)
- * Renamed here to bsd_realpath() to avoid library conflicts.
- * --jhi 2000-06-20 */
-
-/*
- * Copyright (c) 1994
- *	The Regents of the University of California.  All rights reserved.
- *
- * This code is derived from software contributed to Berkeley by
- * Jan-Simon Pendry.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char *rcsid = "$OpenBSD: realpath.c,v 1.4 1998/05/18 09:55:19 deraadt Exp $";
-#endif /* LIBC_SCCS and not lint */
-
-/* OpenBSD system #includes removed since the Perl ones should do. --jhi */
-
-#ifndef MAXSYMLINKS
-#define MAXSYMLINKS 8
-#endif
-
-/*
- * char *realpath(const char *path, char resolved_path[MAXPATHLEN]);
- *
- * Find the real name of path, by removing all ".", ".." and symlink
- * components.  Returns (resolved) on success, or (NULL) on failure,
- * in which case the path which caused trouble is left in (resolved).
- */
-static
+/* Originally written in Perl by John Bazik; rewritten in C by Ben Sugars.
+ * Comments from the orignal:
+ *     This is a faster version of getcwd.  It's also more dangerous
+ *     because you might chdir out of a directory that you can't chdir
+ *     back into. */
 char *
-bsd_realpath(path, resolved)
-	const char *path;
-	char *resolved;
+_cwdxs_fastcwd(void)
 {
-#ifdef VMS
-       dTHX;
-       return Perl_rmsexpand(aTHX_ (char*)path, resolved, NULL, 0);
-#else
-	int rootd, serrno;
-	char *p, *q, wbuf[MAXPATHLEN];
-	int symlinks = 0;
+/* XXX Should we just use getcwd(3) if available? */
+  struct stat statbuf;
+  int orig_cdev, orig_cino, cdev, cino, odev, oino, tdev, tino;
+  int i = 0, j = 0, k = 0, ndirs = 16, pathlen = 0, namelen;
+  DIR *dir;
+  Direntry_t *dp;
+  char **names, *path;
 
-	/* Save the starting point. */
-#ifdef HAS_FCHDIR
-	int fd;
+  Newz(0, names, ndirs, char*);
 
-	if ((fd = open(".", O_RDONLY)) < 0) {
-		(void)strcpy(resolved, ".");
-		return (NULL);
-	}
-#else
-	char wd[MAXPATHLEN];
+  if (PerlLIO_lstat(".", &statbuf) < 0) {
+    Safefree(names);
+    return FALSE;
+  }
+  orig_cdev = statbuf.st_dev;
+  orig_cino = statbuf.st_ino;
+  cdev = orig_cdev;
+  cino = orig_cino;
+  for (;;) {
+    odev = cdev;
+    oino = cino;
 
-	if (getcwd(wd, MAXPATHLEN - 1) == NULL) {
-		(void)strcpy(resolved, ".");
-		return (NULL);
-	}
-#endif
-
-	/*
-	 * Find the dirname and basename from the path to be resolved.
-	 * Change directory to the dirname component.
-	 * lstat the basename part.
-	 *     if it is a symlink, read in the value and loop.
-	 *     if it is a directory, then change to that directory.
-	 * get the current directory name and append the basename.
-	 */
-	(void)strncpy(resolved, path, MAXPATHLEN - 1);
-	resolved[MAXPATHLEN - 1] = '\0';
-loop:
-	q = strrchr(resolved, '/');
-	if (q != NULL) {
-		p = q + 1;
-		if (q == resolved)
-			q = "/";
-		else {
-			do {
-				--q;
-			} while (q > resolved && *q == '/');
-			q[1] = '\0';
-			q = resolved;
-		}
-		if (chdir(q) < 0)
-			goto err1;
-	} else
-		p = resolved;
-
-#if defined(HAS_LSTAT) && defined(HAS_READLINK) && defined(HAS_SYMLINK)
-    {
-	struct stat sb;
-	/* Deal with the last component. */
-	if (lstat(p, &sb) == 0) {
-		if (S_ISLNK(sb.st_mode)) {
-			int n;
-			if (++symlinks > MAXSYMLINKS) {
-				errno = ELOOP;
-				goto err1;
-			}
-			n = readlink(p, resolved, MAXPATHLEN-1);
-			if (n < 0)
-				goto err1;
-			resolved[n] = '\0';
-			goto loop;
-		}
-		if (S_ISDIR(sb.st_mode)) {
-			if (chdir(p) < 0)
-				goto err1;
-			p = "";
-		}
-	}
+    if (PerlDir_chdir("..") < 0) {
+      Safefree(names);
+      return FALSE;
     }
-#endif
+    if (PerlLIO_stat(".", &statbuf) < 0) {
+      Safefree(names);
+      return FALSE;
+    }
+    cdev = statbuf.st_dev;
+    cino = statbuf.st_ino;
+    if (odev == cdev && oino == cino)
+      break;
 
-	/*
-	 * Save the last component name and get the full pathname of
-	 * the current directory.
-	 */
-	(void)strcpy(wbuf, p);
-	if (getcwd(resolved, MAXPATHLEN) == 0)
-		goto err1;
+    if (!(dir = PerlDir_open("."))) {
+      Safefree(names);
+      return FALSE;
+    }
 
-	/*
-	 * Join the two strings together, ensuring that the right thing
-	 * happens if the last component is empty, or the dirname is root.
-	 */
-	if (resolved[0] == '/' && resolved[1] == '\0')
-		rootd = 1;
-	else
-		rootd = 0;
+    while ((dp = PerlDir_read(dir)) != NULL) {
+      if (PerlLIO_lstat(dp->d_name, &statbuf) < 0) {
+	Safefree(names);
+	return FALSE;
+      }
+      if (strEQ(dp->d_name, "."))
+	continue;
+      if (strEQ(dp->d_name, ".."))
+	continue;
+      tdev = statbuf.st_dev;
+      tino = statbuf.st_ino;
+      if (tino == oino && tdev == odev)
+	break;
+    }
 
-	if (*wbuf) {
-		if (strlen(resolved) + strlen(wbuf) + rootd + 1 > MAXPATHLEN) {
-			errno = ENAMETOOLONG;
-			goto err1;
-		}
-		if (rootd == 0)
-			(void)strcat(resolved, "/");
-		(void)strcat(resolved, wbuf);
-	}
+    if (!dp) {
+      Safefree(names);
+      return FALSE;
+    }
 
-	/* Go back to where we came from. */
-#ifdef HAS_FCHDIR
-	if (fchdir(fd) < 0) {
-		serrno = errno;
-		goto err2;
-	}
+    if (i >= ndirs) {
+      ndirs += 16;
+      Renew(names, ndirs, char*);
+    }
+#ifdef DIRNAMLEN
+    namelen = dp->d_namlen;
 #else
-	if (chdir(wd) < 0) {
-		serrno = errno;
-		goto err2;
-	}
+    namelen = strlen(dp->d_name);
 #endif
+    Newz(0, *(names + i), namelen + 1, char);
+    Copy(dp->d_name, *(names + i), namelen, char);
+    *(names[i] + namelen) = '\0';
+    pathlen += (namelen + 1);
+    ++i;
 
-	/* It's okay if the close fails, what's an fd more or less? */
-#ifdef HAS_FCHDIR
-	(void)close(fd);
-#endif
-	return (resolved);
+    if (PerlDir_close(dir) < 0) {
+      Safefree(names);
+      return FALSE;
+    }
+  }
 
-err1:	serrno = errno;
-#ifdef HAS_FCHDIR
-	(void)fchdir(fd);
-#else
-	(void)chdir(wd);
-#endif
+  Newz(0, path, pathlen + 1, char);
+  for (j = i - 1; j >= 0; j--) {
+    *(path + k) = '/';
+    Copy(names[j], path + k + 1, strlen(names[j]) + 1, char);
+    k = k + strlen(names[j]) + 1;
+    Safefree(names[j]);
+  }
 
-err2:
-#ifdef HAS_FCHDIR
-	(void)close(fd);
-#endif
-	errno = serrno;
-	return (NULL);
-#endif
+  if (PerlDir_chdir(path) < 0) {
+    Safefree(names);
+    Safefree(path);
+    return FALSE;
+  }
+  if (PerlLIO_stat(".", &statbuf) < 0) {
+    Safefree(names);
+    Safefree(path);
+    return FALSE;
+  }
+  cdev = statbuf.st_dev;
+  cino = statbuf.st_ino;
+  if (cdev != orig_cdev || cino != orig_cino)
+    Perl_croak(aTHX_ "Unstable directory path, current directory changed unexpectedly");
+
+  Safefree(names);
+  return(path);
 }
+
 
 MODULE = Cwd		PACKAGE = Cwd
 
-PROTOTYPES: ENABLE
-
-void
-fastcwd()
-PROTOTYPE: DISABLE
+char *
+_fastcwd()
 PPCODE:
-{
-    dXSTARG;
-    getcwd_sv(TARG);
-    XSprePUSH; PUSHTARG;
-#ifndef INCOMPLETE_TAINTS
-    SvTAINTED_on(TARG);
-#endif
-}
-
-void
-abs_path(pathsv=Nullsv)
-    SV *pathsv
-PPCODE:
-{
-    dXSTARG;
-    char *path;
-    char buf[MAXPATHLEN];
-
-    path = pathsv ? SvPV_nolen(pathsv) : ".";
-
-    if (bsd_realpath(path, buf)) {
-        sv_setpvn(TARG, buf, strlen(buf));
-        SvPOK_only(TARG);
-	SvTAINTED_on(TARG);
+    char * buf;
+    buf = _cwdxs_fastcwd();
+    if (buf) {
+        PUSHs(sv_2mortal(newSVpv(buf, 0)));
+        Safefree(buf);
     }
     else
-        sv_setsv(TARG, &PL_sv_undef);
-
-    XSprePUSH; PUSHTARG;
-#ifndef INCOMPLETE_TAINTS
-    SvTAINTED_on(TARG);
-#endif
-}
+	XSRETURN_UNDEF;
