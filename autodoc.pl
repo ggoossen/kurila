@@ -3,11 +3,8 @@
 require 5.003;	# keep this compatible, an old perl is all we may have before
                 # we build the new one
 
-BEGIN {  push @INC, 'lib' }	# glob() below requires File::Glob
-
-
 #
-# See database of global and static function prototypes in embed.fnc
+# See database of global and static function prototypes at the __END__.
 # This is used to generate prototype headers under various configurations,
 # export symbols lists for different platforms, and macros to provide an
 # implicit interpreter context argument.
