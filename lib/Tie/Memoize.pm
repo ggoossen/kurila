@@ -2,7 +2,6 @@ use strict;
 package Tie::Memoize;
 use Tie::Hash;
 our @ISA = 'Tie::ExtraHash';
-our $VERSION = '1.0';
 
 our $exists_token = \undef;
 
@@ -51,7 +50,7 @@ sub TIEHASH  {
 
 =head1 NAME
 
-Tie::Memoize - add data to hash when needed
+Tiel::Memoize - add data to hash when needed
 
 =head1 SYNOPSIS
 
