@@ -5,12 +5,6 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
-    if (!eval "require Socket") {
-	print "1..0 # no Socket\n"; exit 0;
-    }
-    if (ord('A') == 193 && !eval "require Convert::EBCDIC") {
-        print "1..0 # EBCDIC but no Convert::EBCDIC\n"; exit 0;
-    }
 }
 
 use strict;
@@ -47,7 +41,7 @@ ok( exists $INC{'Net/Netrc.pm'}, 'should be able to use Net::Netrc' );
 
 SKIP: {
 	skip('incompatible stat() handling for OS', 4), next SKIP 
-		if ($^O =~ /os2|win32|macos|cygwin/i or $] < 5.005);
+		if ($^O =~ /os2|win32|macos|cygwin/i);
 	
 	my $warn;
 	local $SIG{__WARN__} = sub {
@@ -58,20 +52,13 @@ SKIP: {
 	$stat[2] = 077;
 	ok( !defined(Net::Netrc::_readrc()),
 		'_readrc() should not read world-writable file' );
-	ok( scalar($warn =~ /^Bad permissions:/),
-		'... and should warn about it' );
+	ok( $warn =~ /^Bad permissions/, '... and should warn about it' );
 
 	# the owner field should still not match
 	$stat[2] = 0;
-
-        if ($<) { 
-          ok( !defined(Net::Netrc::_readrc()), 
-              '_readrc() should not read file owned by someone else' ); 
-          ok( scalar($warn =~ /^Not owner:/),
-		'... and should warn about it' ); 
-        } else { 
-          skip("testing as root",2);
-        } 
+	ok( !defined(Net::Netrc::_readrc()),
+		'_readrc() should not read file owned by someone else' );
+	ok( $warn =~ /^Not owner/, '... and should warn about it' );
 }
 
 # this field must now match, to avoid the last-tested warning
@@ -138,7 +125,7 @@ sub new {
 }
 
 sub TIEHANDLE {
-	my ($class, $file, $mode) = @_[0,2,3];
+	my ($class, undef, $file, $mode) = @_;
 	bless({ file => $file, mode => $mode }, $class);
 }
 
