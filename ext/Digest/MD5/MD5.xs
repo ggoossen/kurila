@@ -1,4 +1,4 @@
-/* $Id: MD5.xs,v 1.34 2002/05/01 23:30:28 gisle Exp $ */
+/* $Id: MD5.xs,v 1.26 2000/09/18 14:27:44 gisle Exp $ */
 
 /* 
  * This library is free software; you can redistribute it and/or
@@ -9,7 +9,7 @@
  *  Copyright 1991-1992 RSA Data Security, Inc.
  *
  * This code is derived from Neil Winton's MD5-1.7 Perl module, which in
- * turn is derived from the reference implementation in RFC 1321 which
+ * turn is derived from the reference implementation in RFC 1231 which
  * comes with this message:
  *
  * Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
@@ -44,29 +44,7 @@ extern "C" {
 }
 #endif
 
-#include "patchlevel.h"
-#if PATCHLEVEL <= 4 && !defined(PL_dowarn)
-   #define PL_dowarn dowarn
-#endif
-
-#ifdef SvPVbyte
-   #if PERL_REVISION == 5 && PERL_VERSION < 7
-       /* SvPVbyte does not work in perl-5.6.1, borrowed version for 5.7.3 */
-       #undef SvPVbyte
-       #define SvPVbyte(sv, lp) \
-	  ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK) \
-     	   ? ((lp = SvCUR(sv)), SvPVX(sv)) : my_sv_2pvbyte(aTHX_ sv, &lp))
-
-       static char *
-       my_sv_2pvbyte(pTHX_ register SV *sv, STRLEN *lp)
-       {
-	   sv_utf8_downgrade(sv,0);
-           return SvPV(sv,*lp);
-       }
-   #endif
-#else
-   #define SvPVbyte SvPV
-#endif
+/*#define MD5_DEBUG /**/
 
 /* Perl does not guarantee that U32 is exactly 32 bits.  Some system
  * has no integral type with exactly 32 bits.  For instance, A Cray has
@@ -102,10 +80,10 @@ extern "C" {
 #ifndef BYTESWAP
 static void u2s(U32 u, U8* s)
 {
-    *s++ = (U8)(u         & 0xFF);
-    *s++ = (U8)((u >>  8) & 0xFF);
-    *s++ = (U8)((u >> 16) & 0xFF);
-    *s   = (U8)((u >> 24) & 0xFF);
+    *s++ = u         & 0xFF;
+    *s++ = (u >>  8) & 0xFF;
+    *s++ = (u >> 16) & 0xFF;
+    *s   = (u >> 24) & 0xFF;
 }
 
 #define s2u(s,u) ((u) =  (U32)(*s)            |  \
@@ -159,7 +137,7 @@ static unsigned char PADDING[64] = {
 
 /* F, G, H and I are basic MD5 functions.
  */
-#define F(x, y, z) ((((x) & ((y) ^ (z))) ^ (z)))
+#define F(x, y, z) (((x) & ((y) ^ (z)) ^ (z)))
 #define G(x, y, z) F(z, x, y)
 #define H(x, y, z) ((x) ^ (y) ^ (z))
 #define I(x, y, z) ((y) ^ ((x) | (~z)))
@@ -217,9 +195,7 @@ MD5Init(MD5_CTX *ctx)
 static void
 MD5Transform(MD5_CTX* ctx, const U8* buf, STRLEN blocks)
 {
-#ifdef MD5_DEBUG
     static int tcount = 0;
-#endif
 
     U32 A = ctx->A;
     U32 B = ctx->B;
@@ -577,7 +553,7 @@ add(self, ...)
 	STRLEN len;
     PPCODE:
 	for (i = 1; i < items; i++) {
-	    data = (unsigned char *)(SvPVbyte(ST(i), len));
+	    data = (unsigned char *)(SvPV(ST(i), len));
 	    MD5Update(context, data, len);
 	}
 	XSRETURN(1);  /* self */
@@ -641,33 +617,8 @@ md5(...)
 	unsigned char digeststr[16];
     PPCODE:
 	MD5Init(&ctx);
-
-	if (PL_dowarn) {
-            char *msg = 0;
-	    if (items == 1) {
-		if (SvROK(ST(0))) {
-                    SV* sv = SvRV(ST(0));
-		    if (SvOBJECT(sv) && strEQ(HvNAME(SvSTASH(sv)), "Digest::MD5"))
-		        msg = "probably called as method";
-		    else
-			msg = "called with reference argument";
-		}
-	    }
-	    else if (items > 1) {
-		data = (unsigned char *)SvPVbyte(ST(0), len);
-		if (len == 11 && memEQ("Digest::MD5", data, 11)) {
-		    msg = "probably called as class method";
-		}
-	    }
-	    if (msg) {
-		char *f = (ix == F_BIN) ? "md5" :
-                          (ix == F_HEX) ? "md5_hex" : "md5_base64";
-	        warn("&Digest::MD5::%s function %s", f, msg);
-	    }
-	}
-
 	for (i = 0; i < items; i++) {
-	    data = (unsigned char *)(SvPVbyte(ST(i), len));
+	    data = (unsigned char *)(SvPV(ST(i), len));
 	    MD5Update(&ctx, data, len);
 	}
 	MD5Final(digeststr, &ctx);
