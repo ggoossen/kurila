@@ -1,657 +1,419 @@
-#define PERL_NO_GET_CONTEXT
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
 
-#ifdef USE_ITHREADS
+#include "threads.h"
 
-#ifdef WIN32
-#include <windows.h>
-#include <win32thread.h>
-#define PERL_THREAD_SETSPECIFIC(k,v) TlsSetValue(k,v)
-#define PERL_THREAD_GETSPECIFIC(k,v) v = TlsGetValue(k)
-#define PERL_THREAD_ALLOC_SPECIFIC(k) \
-STMT_START {\
-  if((k = TlsAlloc()) == TLS_OUT_OF_INDEXES) {\
-    PerlIO_printf(PerlIO_stderr(),"panic threads.h: TlsAlloc");\
-    exit(1);\
-  }\
-} STMT_END
-#else
-#include <pthread.h>
-#include <thread.h>
 
-#define PERL_THREAD_SETSPECIFIC(k,v) pthread_setspecific(k,v)
-#ifdef OLD_PTHREADS_API
-#define PERL_THREAD_DETACH(t) pthread_detach(&(t))
-#define PERL_THREAD_GETSPECIFIC(k,v) pthread_getspecific(k,&v)
-#define PERL_THREAD_ALLOC_SPECIFIC(k) STMT_START {\
-  if(pthread_keycreate(&(k),0)) {\
-    PerlIO_printf(PerlIO_stderr(), "panic threads.h: pthread_key_create");\
-    exit(1);\
-  }\
-} STMT_END
-#else
-#define PERL_THREAD_DETACH(t) pthread_detach((t))
-#define PERL_THREAD_GETSPECIFIC(k,v) v = pthread_getspecific(k)
-#define PERL_THREAD_ALLOC_SPECIFIC(k) STMT_START {\
-  if(pthread_key_create(&(k),0)) {\
-    PerlIO_printf(PerlIO_stderr(), "panic threads.h: pthread_key_create");\
-    exit(1);\
-  }\
-} STMT_END
-#endif
-#endif
 
-/* Values for 'state' member */
-#define PERL_ITHR_JOINABLE		0
-#define PERL_ITHR_DETACHED		1
-#define PERL_ITHR_FINISHED		4
-#define PERL_ITHR_JOINED		2
 
-typedef struct ithread_s {
-    struct ithread_s *next;	/* next thread in the list */
-    struct ithread_s *prev;	/* prev thread in the list */
-    PerlInterpreter *interp;	/* The threads interpreter */
-    I32 tid;              	/* threads module's thread id */
-    perl_mutex mutex; 		/* mutex for updating things in this struct */
-    I32 count;			/* how many SVs have a reference to us */
-    signed char state;		/* are we detached ? */
-    int gimme;			/* Context of create */
-    SV* init_function;          /* Code to run */
-    SV* params;                 /* args to pass function */
-#ifdef WIN32
-	DWORD	thr;            /* OS's idea if thread id */
-	HANDLE handle;          /* OS's waitable handle */
-#else
-  	pthread_t thr;          /* OS's handle for the thread */
-#endif
-} ithread;
-
-ithread *threads;
-
-/* Macros to supply the aTHX_ in an embed.h like manner */
-#define ithread_join(thread)		Perl_ithread_join(aTHX_ thread)
-#define ithread_DESTROY(thread)		Perl_ithread_DESTROY(aTHX_ thread)
-#define ithread_CLONE(thread)		Perl_ithread_CLONE(aTHX_ thread)
-#define ithread_detach(thread)		Perl_ithread_detach(aTHX_ thread)
-#define ithread_tid(thread)		((thread)->tid)
-#define ithread_yield(thread)		(YIELD);
-
-static perl_mutex create_destruct_mutex;  /* protects the creation and destruction of threads*/
-
-I32 tid_counter = 0;
-I32 known_threads = 0;
-I32 active_threads = 0;
-perl_key self_key;
-
-/*
- *  Clear up after thread is done with
- */
-void
-Perl_ithread_destruct (pTHX_ ithread* thread, const char *why)
-{
-        PerlInterpreter* destroyperl = NULL;        
-	MUTEX_LOCK(&thread->mutex);
-	if (!thread->next) {
-	    Perl_croak(aTHX_ "panic: destruct destroyed thread %p (%s)",thread, why);
-	}
-	if (thread->count != 0) {
-		MUTEX_UNLOCK(&thread->mutex);
-		return;
-	}
-	MUTEX_LOCK(&create_destruct_mutex);
-	/* Remove from circular list of threads */
-	if (thread->next == thread) {
-	    /* last one should never get here ? */
-	    threads = NULL;
-        }
-	else {
-	    thread->next->prev = thread->prev;
-	    thread->prev->next = thread->next;
-	    if (threads == thread) {
-		threads = thread->next;
-	    }
-	    thread->next = NULL;
-	    thread->prev = NULL;
-	}
-	known_threads--;
-	assert( known_threads >= 0 );
-#if 0
-        Perl_warn(aTHX_ "destruct %d @ %p by %p now %d",
-	          thread->tid,thread->interp,aTHX, known_threads);
-#endif
-	MUTEX_UNLOCK(&create_destruct_mutex);
-	/* Thread is now disowned */
-	if (thread->interp) {
-	    dTHXa(thread->interp);
-	    PERL_SET_CONTEXT(thread->interp);
-	    SvREFCNT_dec(thread->params);
-	    thread->params = Nullsv;
-	    destroyperl = thread->interp;
-	    thread->interp = NULL;
-	}
-	MUTEX_UNLOCK(&thread->mutex);
-	MUTEX_DESTROY(&thread->mutex);
-        PerlMemShared_free(thread);
-	if(destroyperl) {
-	    perl_destruct(destroyperl);
-            perl_free(destroyperl);
-	}
-	PERL_SET_CONTEXT(aTHX);
-}
-
-int
-Perl_ithread_hook(pTHX)
-{
-    int veto_cleanup = 0;
-    MUTEX_LOCK(&create_destruct_mutex);
-    if (aTHX == PL_curinterp && active_threads != 1) {
-	Perl_warn(aTHX_ "A thread exited while %" IVdf " other threads were still running",
-						(IV)active_threads);
-	veto_cleanup = 1;
-    }
-    MUTEX_UNLOCK(&create_destruct_mutex);
-    return veto_cleanup;
-}
-
-void
-Perl_ithread_detach(pTHX_ ithread *thread)
-{
-    MUTEX_LOCK(&thread->mutex);
-    if (!(thread->state & (PERL_ITHR_DETACHED|PERL_ITHR_JOINED))) {
-	thread->state |= PERL_ITHR_DETACHED;
-#ifdef WIN32
-	CloseHandle(thread->handle);
-	thread->handle = 0;
-#else
-	PERL_THREAD_DETACH(thread->thr);
-#endif
-    }
-    if ((thread->state & PERL_ITHR_FINISHED) &&
-        (thread->state & PERL_ITHR_DETACHED)) {
-	MUTEX_UNLOCK(&thread->mutex);
-	Perl_ithread_destruct(aTHX_ thread, "detach");
-    }
-    else {
-	MUTEX_UNLOCK(&thread->mutex);
-    }
-}
-
-/* MAGIC (in mg.h sense) hooks */
-
-int
-ithread_mg_get(pTHX_ SV *sv, MAGIC *mg)
-{
-    ithread *thread = (ithread *) mg->mg_ptr;
-    SvIVX(sv) = PTR2IV(thread);
-    SvIOK_on(sv);
-    return 0;
-}
-
-int
-ithread_mg_free(pTHX_ SV *sv, MAGIC *mg)
-{
-    ithread *thread = (ithread *) mg->mg_ptr;
-    MUTEX_LOCK(&thread->mutex);
-    thread->count--;
-    if (thread->count == 0) {
-       if(thread->state & PERL_ITHR_FINISHED &&
-          (thread->state & PERL_ITHR_DETACHED ||
-           thread->state & PERL_ITHR_JOINED))
-       {
-            MUTEX_UNLOCK(&thread->mutex);
-            Perl_ithread_destruct(aTHX_ thread, "no reference");
-       }
-       else {
-	    MUTEX_UNLOCK(&thread->mutex);
-       }    
-    }
-    else {
-	MUTEX_UNLOCK(&thread->mutex);
-    }
-    return 0;
-}
-
-int
-ithread_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param)
-{
-    ithread *thread = (ithread *) mg->mg_ptr;
-    MUTEX_LOCK(&thread->mutex);
-    thread->count++;
-    MUTEX_UNLOCK(&thread->mutex);
-    return 0;
-}
-
-MGVTBL ithread_vtbl = {
- ithread_mg_get,	/* get */
- 0,			/* set */
- 0,			/* len */
- 0,			/* clear */
- ithread_mg_free,	/* free */
- 0,			/* copy */
- ithread_mg_dup		/* dup */
-};
 
 
 /*
- *	Starts executing the thread. Needs to clean up memory a tad better.
- *      Passed as the C level function to run in the new thread
- */
+	Starts executing the thread. Needs to clean up memory a tad better.
+*/
 
 #ifdef WIN32
-THREAD_RET_TYPE
-Perl_ithread_run(LPVOID arg) {
-#else
-void*
-Perl_ithread_run(void * arg) {
-#endif
+THREAD_RET_TYPE thread_run(LPVOID arg) {
 	ithread* thread = (ithread*) arg;
+#else
+void thread_run(ithread* thread) {
+#endif
+	SV* thread_tid_ptr;
+	SV* thread_ptr;
 	dTHXa(thread->interp);
-	PERL_SET_CONTEXT(thread->interp);
-	PERL_THREAD_SETSPECIFIC(self_key,thread);
 
-#if 0
-	/* Far from clear messing with ->thr child-side is a good idea */
-	MUTEX_LOCK(&thread->mutex);
+
+	PERL_SET_CONTEXT(thread->interp);
+
 #ifdef WIN32
 	thread->thr = GetCurrentThreadId();
 #else
 	thread->thr = pthread_self();
 #endif
- 	MUTEX_UNLOCK(&thread->mutex);
-#endif
+
+	SHAREDSvEDIT(threads);
+	thread_tid_ptr = Perl_newSViv(sharedsv_space, (IV) thread->thr);
+	thread_ptr = Perl_newSViv(sharedsv_space, (IV) thread);	
+	hv_store_ent((HV*)SHAREDSvGET(threads), thread_tid_ptr, thread_ptr,0);
+   	SvREFCNT_dec(thread_tid_ptr);
+	SHAREDSvRELEASE(threads);
+
 
 	PL_perl_destruct_level = 2;
-
 	{
-		AV* params = (AV*) SvRV(thread->params);
-		I32 len = av_len(params)+1;
+
+		AV* params;
+		I32 len;
 		int i;
 		dSP;
+		params = (AV*) SvRV(thread->params);
+		len = av_len(params);
 		ENTER;
 		SAVETMPS;
 		PUSHMARK(SP);
-		for(i = 0; i < len; i++) {
-		    XPUSHs(av_shift(params));
+		if(len > -1) {
+			for(i = 0; i < len + 1; i++) {
+				XPUSHs(av_shift(params));
+			}	
 		}
 		PUTBACK;
-		len = call_sv(thread->init_function, thread->gimme|G_EVAL);
-		SPAGAIN;
-		for (i=len-1; i >= 0; i--) {
-		  SV *sv = POPs;
-		  av_store(params, i, SvREFCNT_inc(sv));
-		}
-		PUTBACK;
-		if (SvTRUE(ERRSV)) {
-		    Perl_warn(aTHX_ "thread failed to start: %" SVf, ERRSV);
-		}
+		call_sv(thread->init_function, G_DISCARD);
 		FREETMPS;
 		LEAVE;
-		SvREFCNT_dec(thread->init_function);
+
+
 	}
 
-	PerlIO_flush((PerlIO*)NULL);
+
+
 	MUTEX_LOCK(&thread->mutex);
-	thread->state |= PERL_ITHR_FINISHED;
-
-	if (thread->state & PERL_ITHR_DETACHED) {
+ 	perl_destruct(thread->interp);	
+	perl_free(thread->interp);
+	if(thread->detached == 1) {
 		MUTEX_UNLOCK(&thread->mutex);
-		Perl_ithread_destruct(aTHX_ thread, "detached finish");
+		thread_destruct(thread);
 	} else {
-		MUTEX_UNLOCK(&thread->mutex);
-	}
-	MUTEX_LOCK(&create_destruct_mutex);
-	active_threads--;
-	assert( active_threads >= 0 );
-	MUTEX_UNLOCK(&create_destruct_mutex);
-
+	  	MUTEX_UNLOCK(&thread->mutex);
+   	}
 #ifdef WIN32
 	return (DWORD)0;
-#else
-	return 0;
 #endif
+
 }
 
-SV *
-ithread_to_SV(pTHX_ SV *obj, ithread *thread, char *classname, bool inc)
-{
-    SV *sv;
-    MAGIC *mg;
-    if (inc) {
-	MUTEX_LOCK(&thread->mutex);
-	thread->count++;
-	MUTEX_UNLOCK(&thread->mutex);
-    }
-    if (!obj)
-     obj = newSV(0);
-    sv = newSVrv(obj,classname);
-    sv_setiv(sv,PTR2IV(thread));
-    mg = sv_magicext(sv,Nullsv,PERL_MAGIC_shared_scalar,&ithread_vtbl,(char *)thread,0);
-    mg->mg_flags |= MGf_DUP;
-    SvREADONLY_on(sv);
-    return obj;
-}
 
-ithread *
-SV_to_ithread(pTHX_ SV *sv)
-{
-    ithread *thread;
-    if (SvROK(sv))
-     {
-      thread = INT2PTR(ithread*, SvIV(SvRV(sv)));
-     }
-    else
-     {
-      PERL_THREAD_GETSPECIFIC(self_key,thread);
-     }
-    return thread;
-}
 
 /*
- * iThread->create(); ( aka iThread->new() )
- * Called in context of parent thread
- */
+	iThread->create();
+*/
 
-SV *
-Perl_ithread_create(pTHX_ SV *obj, char* classname, SV* init_function, SV* params)
-{
-	ithread*	thread;
-	CLONE_PARAMS	clone_param;
+SV* thread_create(char* class, SV* init_function, SV* params) {
+	ithread* thread = malloc(sizeof(ithread));
+  	SV*      obj_ref;
+  	SV*      obj;
+	SV*		temp_store;
+   I32		result;
+	PerlInterpreter *current_perl;
 
-	MUTEX_LOCK(&create_destruct_mutex);
-	thread = PerlMemShared_malloc(sizeof(ithread));
-	Zero(thread,1,ithread);
-	thread->next = threads;
-	thread->prev = threads->prev;
-	threads->prev = thread;
-	thread->prev->next = thread;
-	/* Set count to 1 immediately in case thread exits before
-	 * we return to caller !
-	 */
-	thread->count = 1;
+	MUTEX_LOCK(&create_mutex);  
+	obj_ref = newSViv(0);
+	obj = newSVrv(obj_ref, class);
+   sv_setiv(obj, (IV)thread);
+   SvREADONLY_on(obj);
+
+
+   current_perl = PERL_GET_CONTEXT;	
+
+	/*
+		here we put the values of params and function to call onto namespace, this is so perl will properly 		clone them when we call perl_clone.
+	*/
+	
+	/*if(SvTYPE(SvRV(init_function)) == SVt_PVCV) {
+		CvCLONED_on(SvRV(init_function));
+	}
+	*/
+
+	temp_store = Perl_get_sv(current_perl, "threads::paramtempstore", TRUE | GV_ADDMULTI);
+	Perl_sv_setsv(current_perl, temp_store,params);
+	params = NULL;
+	temp_store = NULL;
+
+	temp_store = Perl_get_sv(current_perl, "threads::calltempstore", TRUE | GV_ADDMULTI);
+	Perl_sv_setsv(current_perl,temp_store, init_function);
+
+	
+
+#ifdef WIN32
+	thread->interp = perl_clone(current_perl,4);
+#else
+	thread->interp = perl_clone(current_perl,0);
+#endif
+	
+	PL_perl_destruct_level = 2;
+
+//	sv_dump(SvRV(Perl_get_sv(current_perl, "threads::calltempstore",FALSE)));	
+//	sv_dump(SvRV(Perl_get_sv(thread->interp, "threads::calltempstore",FALSE)));	
+
+	thread->init_function = newSVsv(Perl_get_sv(thread->interp, "threads::calltempstore",FALSE));
+	thread->params = newSVsv(Perl_get_sv(thread->interp, "threads::paramtempstore",FALSE));
+
+	init_function = NULL;
+	temp_store = NULL;
+
+
+	/*
+		And here we make sure we clean up the data we put in the namespace of iThread, both in the new and the calling inteprreter
+	*/
+
+	
+
+	temp_store = Perl_get_sv(thread->interp,"threads::paramtempstore",FALSE);
+	Perl_sv_setsv(thread->interp,temp_store, &PL_sv_undef);
+
+	temp_store = Perl_get_sv(thread->interp,"threads::calltempstore",FALSE);
+	Perl_sv_setsv(thread->interp,temp_store, &PL_sv_undef);
+
+	PERL_SET_CONTEXT(current_perl);
+
+	temp_store = Perl_get_sv(current_perl,"threads::paramtempstore",FALSE);
+	Perl_sv_setsv(current_perl, temp_store, &PL_sv_undef);
+
+	temp_store = Perl_get_sv(current_perl,"threads::calltempstore",FALSE);
+	Perl_sv_setsv(current_perl, temp_store, &PL_sv_undef);
+
+	/* lets init the thread */
+
+
+
+
+
 	MUTEX_INIT(&thread->mutex);
 	thread->tid = tid_counter++;
-	thread->gimme = GIMME_V;
-
-	/* "Clone" our interpreter into the thread's interpreter
-	 * This gives thread access to "static data" and code.
-	 */
-
-	PerlIO_flush((PerlIO*)NULL);
-
-#ifdef WIN32
-	thread->interp = perl_clone(aTHX, CLONEf_KEEP_PTR_TABLE | CLONEf_CLONE_HOST);
-#else
-	thread->interp = perl_clone(aTHX, CLONEf_KEEP_PTR_TABLE);
-#endif
-	/* perl_clone leaves us in new interpreter's context.
-	   As it is tricky to spot implcit aTHX create a new scope
-	   with aTHX matching the context for the duration of
-	   our work for new interpreter.
-	 */
-	{
-	    dTHXa(thread->interp);
-            /* Here we remove END blocks since they should only run
-	       in the thread they are created
-            */
-            SvREFCNT_dec(PL_endav);
-            PL_endav = newAV();
-            clone_param.flags = 0;
-	    thread->init_function = sv_dup(init_function, &clone_param);
-	    if (SvREFCNT(thread->init_function) == 0) {
-		SvREFCNT_inc(thread->init_function);
-	    }
-
-	    thread->params = sv_dup(params, &clone_param);
-	    SvREFCNT_inc(thread->params);
-	    SvTEMP_off(thread->init_function);
-	    ptr_table_free(PL_ptr_table);
-	    PL_ptr_table = NULL;
-	    PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
-	}
-
-	PERL_SET_CONTEXT(aTHX);
-
-	/* Start the thread */
+	thread->detached = 0;
+	thread->count = 1;
 
 #ifdef WIN32
 
-	thread->handle = CreateThread(NULL, 0, Perl_ithread_run,
+	thread->handle = CreateThread(NULL, 0, thread_run,
 			(LPVOID)thread, 0, &thread->thr);
 
 #else
-	{
-	  static pthread_attr_t attr;
-	  static int attr_inited = 0;
-	  static int attr_joinable = PTHREAD_CREATE_JOINABLE;
-	  if (!attr_inited) {
-	    attr_inited = 1;
-	    pthread_attr_init(&attr);
-	  }
-#  ifdef PTHREAD_ATTR_SETDETACHSTATE
-            PTHREAD_ATTR_SETDETACHSTATE(&attr, attr_joinable);
-#  endif
-#  ifdef THREAD_CREATE_NEEDS_STACK
-	    if(pthread_attr_setstacksize(&attr, THREAD_CREATE_NEEDS_STACK))
-	      croak("panic: pthread_attr_setstacksize failed");
-#  endif
-
-#ifdef OLD_PTHREADS_API
-	  pthread_create( &thread->thr, attr, Perl_ithread_run, (void *)thread);
-#else
-	  pthread_create( &thread->thr, &attr, Perl_ithread_run, (void *)thread);
+	pthread_create( &thread->thr, NULL, (void *) thread_run, thread);
 #endif
-	}
-#endif
-	known_threads++;
-	active_threads++;
-	MUTEX_UNLOCK(&create_destruct_mutex);
-	sv_2mortal(params);
-	return ithread_to_SV(aTHX_ obj, thread, classname, FALSE);
-}
+	MUTEX_UNLOCK(&create_mutex);	
 
-SV*
-Perl_ithread_self (pTHX_ SV *obj, char* Class)
-{
-    ithread *thread;
-    PERL_THREAD_GETSPECIFIC(self_key,thread);
-    return ithread_to_SV(aTHX_ obj, thread, Class, TRUE);
+
+	if(!SvRV(obj_ref)) printf("FUCK\n");
+  return obj_ref;
 }
 
 /*
- * Joins the thread this code needs to take the returnvalue from the
- * call_sv and send it back
- */
-
-void
-Perl_ithread_CLONE(pTHX_ SV *obj)
-{
- if (SvROK(obj))
-  {
-   ithread *thread = SV_to_ithread(aTHX_ obj);
-  }
- else
-  {
-   Perl_warn(aTHX_ "CLONE %" SVf,obj);
-  }
+	returns the id of the thread
+*/
+I32 thread_tid (SV* obj) {
+	ithread* thread;
+	if(!SvROK(obj)) {
+		obj = thread_self(SvPV_nolen(obj));
+		thread = (ithread*)SvIV(SvRV(obj));	
+		SvREFCNT_dec(obj);
+	} else {
+		thread = (ithread*)SvIV(SvRV(obj));	
+	}
+	return thread->tid;
 }
 
-AV*
-Perl_ithread_join(pTHX_ SV *obj)
-{
-    ithread *thread = SV_to_ithread(aTHX_ obj);
-    MUTEX_LOCK(&thread->mutex);
-    if (thread->state & PERL_ITHR_DETACHED) {
-	MUTEX_UNLOCK(&thread->mutex);
-	Perl_croak(aTHX_ "Cannot join a detached thread");
-    }
-    else if (thread->state & PERL_ITHR_JOINED) {
-	MUTEX_UNLOCK(&thread->mutex);
-	Perl_croak(aTHX_ "Thread already joined");
-    }
-    else {
-        AV* retparam;
+SV* thread_self (char* class) {
+	dTHX;
+	SV*      obj_ref;
+	SV*      obj;
+	SV*		thread_tid_ptr;
+	SV*		thread_ptr;
+	HE*		thread_entry;
+	IV	pointer;
+	PerlInterpreter *old_context = PERL_GET_CONTEXT;
+
+
+	
+	SHAREDSvEDIT(threads);
+#ifdef WIN32
+	thread_tid_ptr = Perl_newSViv(sharedsv_space, (IV) GetCurrentThreadId());
+#else
+	thread_tid_ptr = Perl_newSViv(sharedsv_space, (IV) pthread_self());
+#endif
+	thread_entry = Perl_hv_fetch_ent(sharedsv_space,(HV*) SHAREDSvGET(threads), thread_tid_ptr, 0,0);
+	thread_ptr = HeVAL(thread_entry);
+	SvREFCNT_dec(thread_tid_ptr);	
+	pointer = SvIV(thread_ptr);
+	SHAREDSvRELEASE(threads);
+
+	
+
+
+	obj_ref = newSViv(0);
+	obj = newSVrv(obj_ref, class);
+   	sv_setiv(obj, pointer);
+   	SvREADONLY_on(obj);
+	return obj_ref;
+}
+
+/*
+	joins the thread
+	this code needs to take the returnvalue from the call_sv and send it back
+*/
+
+void thread_join(SV* obj) {
+	ithread* thread = (ithread*)SvIV(SvRV(obj));
 #ifdef WIN32
 	DWORD waitcode;
-#else
-	void *retval;
-#endif
-	MUTEX_UNLOCK(&thread->mutex);
-#ifdef WIN32
 	waitcode = WaitForSingleObject(thread->handle, INFINITE);
 #else
+	void *retval;
 	pthread_join(thread->thr,&retval);
 #endif
+}
+
+
+/*
+	detaches a thread
+	needs to better clean up memory
+*/
+
+void thread_detach(SV* obj) {
+	ithread* thread = (ithread*)SvIV(SvRV(obj));
 	MUTEX_LOCK(&thread->mutex);
+	thread->detached = 1;
+#if !defined(WIN32)
+	pthread_detach(thread->thr);
+#endif
+	MUTEX_UNLOCK(&thread->mutex);
+}
+
+
+
+void thread_DESTROY (SV* obj) {
+	ithread* thread = (ithread*)SvIV(SvRV(obj));
 	
-	/* sv_dup over the args */
+	MUTEX_LOCK(&thread->mutex);
+	thread->count--;
+	MUTEX_UNLOCK(&thread->mutex);
+	thread_destruct(thread);
+
+}
+
+void thread_destruct (ithread* thread) {
+	return;
+	MUTEX_LOCK(&thread->mutex);
+	if(thread->count != 0) {
+		MUTEX_UNLOCK(&thread->mutex);
+		return;	
+	}
+	MUTEX_UNLOCK(&thread->mutex);
+	/* it is safe noone is holding a ref to this */
+	/*printf("proper destruction!\n");*/
+}
+
+
+MODULE = threads		PACKAGE = threads		
+BOOT:
+	Perl_sharedsv_init(aTHX);
+	PL_perl_destruct_level = 2;
+	threads = Perl_sharedsv_new(aTHX);
+	SHAREDSvEDIT(threads);
+	((HV*) SHAREDSvGET(threads)) = newHV();
+	SHAREDSvRELEASE(threads);
 	{
-	  AV* params = (AV*) SvRV(thread->params);	
-	  CLONE_PARAMS clone_params;
-	  clone_params.stashes = newAV();
-	  PL_ptr_table = ptr_table_new();
-	  retparam = (AV*) sv_dup((SV*)params, &clone_params);
-	  SvREFCNT_dec(clone_params.stashes);
-	  SvREFCNT_inc(retparam);
-	  ptr_table_free(PL_ptr_table);
-	  PL_ptr_table = NULL;
+	    
+	
+	    SV* temp = get_sv("threads::sharedsv_space", TRUE | GV_ADDMULTI);
+	    SV* temp2 = newSViv((IV)sharedsv_space );
+	    sv_setsv( temp , temp2 );
+	}
+	{
+		ithread* thread = malloc(sizeof(ithread));
+		SV* thread_tid_ptr;
+		SV* thread_ptr;
+		MUTEX_INIT(&thread->mutex);
+		thread->tid = 0;
+#ifdef WIN32
+		thread->thr = GetCurrentThreadId();
+#else
+		thread->thr = pthread_self();
+#endif
+		SHAREDSvEDIT(threads);
+		thread_tid_ptr = Perl_newSViv(sharedsv_space, (IV) thread->thr);
+		thread_ptr = Perl_newSViv(sharedsv_space, (IV) thread);	
+		hv_store_ent((HV*) SHAREDSvGET(threads), thread_tid_ptr, thread_ptr,0);
+	   	SvREFCNT_dec(thread_tid_ptr);
+		SHAREDSvRELEASE(threads);
 
 	}
-	/* We have finished with it */
-	thread->state |= PERL_ITHR_JOINED;
-	MUTEX_UNLOCK(&thread->mutex);
-    	sv_unmagic(SvRV(obj),PERL_MAGIC_shared_scalar);
-	return retparam;
-    }
-    return (AV*)NULL;
-}
+	MUTEX_INIT(&create_mutex);
 
-void
-Perl_ithread_DESTROY(pTHX_ SV *sv)
-{
-    ithread *thread = SV_to_ithread(aTHX_ sv);
-    sv_unmagic(SvRV(sv),PERL_MAGIC_shared_scalar);
-}
 
-#endif /* USE_ITHREADS */
 
-MODULE = threads		PACKAGE = threads	PREFIX = ithread_
 PROTOTYPES: DISABLE
 
-#ifdef USE_ITHREADS
+SV *
+create (class, function_to_call, ...)
+        char *  class
+        SV *    function_to_call
+		CODE:
+			AV* params = newAV();
+			if(items > 2) {
+				int i;
+				for(i = 2; i < items ; i++) {
+					av_push(params, ST(i));
+				}
+			}
+			RETVAL = thread_create(class, function_to_call, newRV_noinc((SV*) params));
+			OUTPUT:
+			RETVAL
 
-void
-ithread_new (classname, function_to_call, ...)
-char *	classname
-SV *	function_to_call
-CODE:
-{
-    AV* params = newAV();
-    if (items > 2) {
-	int i;
-	for(i = 2; i < items ; i++) {
-	    av_push(params, SvREFCNT_inc(ST(i)));
-	}
-    }
-    ST(0) = sv_2mortal(Perl_ithread_create(aTHX_ Nullsv, classname, function_to_call, newRV_noinc((SV*) params)));
-    XSRETURN(1);
-}
-
-void
-ithread_list(char *classname)
-PPCODE:
-{
-  ithread *curr_thread;
-  MUTEX_LOCK(&create_destruct_mutex);
-  curr_thread = threads;
-  if(curr_thread->tid != 0)	
-    PUSHs( sv_2mortal(ithread_to_SV(aTHX_ NULL, curr_thread, classname, TRUE)));
-  while(curr_thread) {
-    curr_thread = curr_thread->next;
-    if(curr_thread == threads)
-      break;
-    if(curr_thread->state & PERL_ITHR_DETACHED ||
-       curr_thread->state & PERL_ITHR_JOINED)
-         continue;
-     PUSHs( sv_2mortal(ithread_to_SV(aTHX_ NULL, curr_thread, classname, TRUE)));
-  }	
-  MUTEX_UNLOCK(&create_destruct_mutex);
-}
-
-
-void
-ithread_self(char *classname)
-CODE:
-{
-	ST(0) = sv_2mortal(Perl_ithread_self(aTHX_ Nullsv,classname));
-	XSRETURN(1);
-}
+SV *
+self (class)
+		char* class
+	CODE:
+		RETVAL = thread_self(class);
+	OUTPUT:
+		RETVAL
 
 int
-ithread_tid(ithread *thread)
+tid (obj)	
+		SV *	obj;
+	CODE:
+		RETVAL = thread_tid(obj);
+	OUTPUT:
+	RETVAL
 
 void
-ithread_join(SV *obj)
-PPCODE:
-{
-  AV* params = Perl_ithread_join(aTHX_ obj);
-  int i;
-  I32 len = AvFILL(params);
-  for (i = 0; i <= len; i++) {
-    SV* tmp = av_shift(params);
-    XPUSHs(tmp);
-    sv_2mortal(tmp);
-  }
-  SvREFCNT_dec(params);
-}
+join (obj)
+        SV *    obj
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        thread_join(obj);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 void
-yield(...)
-CODE:
-{
-    YIELD;
-}
-	
+detach (obj)
+        SV *    obj
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        thread_detach(obj);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+
+
+
 
 void
-ithread_detach(ithread *thread)
+DESTROY (obj)
+        SV *    obj
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        thread_DESTROY(obj);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
-void
-ithread_DESTROY(SV *thread)
 
-#endif /* USE_ITHREADS */
-
-BOOT:
-{
-#ifdef USE_ITHREADS
-	ithread* thread;
-	PL_perl_destruct_level = 2;
-	PERL_THREAD_ALLOC_SPECIFIC(self_key);
-	MUTEX_INIT(&create_destruct_mutex);
-	MUTEX_LOCK(&create_destruct_mutex);
-	PL_threadhook = &Perl_ithread_hook;
-	thread  = PerlMemShared_malloc(sizeof(ithread));
-	Zero(thread,1,ithread);
-	PL_perl_destruct_level = 2;
-	MUTEX_INIT(&thread->mutex);
-	threads = thread;
-	thread->next = thread;
-        thread->prev = thread;
-	thread->interp = aTHX;
-	thread->count  = 1;  /* imortal */
-	thread->tid = tid_counter++;
-	known_threads++;
-	active_threads++;
-	thread->state = 1;
-#ifdef WIN32
-	thread->thr = GetCurrentThreadId();
-#else
-	thread->thr = pthread_self();
-#endif
-
-	PERL_THREAD_SETSPECIFIC(self_key,thread);
-	MUTEX_UNLOCK(&create_destruct_mutex);
-#endif /* USE_ITHREADS */
-}
 
