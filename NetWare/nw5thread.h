@@ -27,12 +27,7 @@
 
 typedef long perl_key;
 
-// The line below is just a definition to avoid compilation error.
-// It is not being used anywhere.
-// Ananth, 3 Sept 2001
-typedef struct nw_cond { long waiters; unsigned int sem; } perl_cond;
-
-#if (defined (USE_ITHREADS) || defined (USE_5005THREADS)) && defined(MPK_ON)
+#if (defined (USE_ITHREADS) || defined (USE_THREADS)) && defined(MPK_ON)
 #ifdef __cplusplus
 extern "C"
 {
@@ -100,7 +95,7 @@ typedef unsigned long perl_mutex;
 //For now let us just see when this happens -sgp.
 #define COND_INIT(c) \
     STMT_START {						\
-	/*ConsolePrintf("In COND_INIT\n");	*/\
+	ConsolePrintf("In COND_INIT\n");	\
     } STMT_END
 
 /*	(c)->waiters = 0;					\
@@ -110,7 +105,7 @@ typedef unsigned long perl_mutex;
 
 #define COND_SIGNAL(c) \
     STMT_START {						\
-	/*ConsolePrintf("In COND_SIGNAL\n");	*/\
+	ConsolePrintf("In COND_SIGNAL\n");	\
     } STMT_END
 /*if ((c)->waiters > 0 &&					\
 	    SignalLocalSemaphore((c)->sem) != 0)		\
@@ -118,7 +113,7 @@ typedef unsigned long perl_mutex;
 
 #define COND_BROADCAST(c) \
     STMT_START {						\
-	/*ConsolePrintf("In COND_BROADCAST\n");	*/\
+	ConsolePrintf("In COND_BROADCAST\n");	\	
     } STMT_END
 
 	/*if ((c)->waiters > 0 ) {					\
@@ -130,13 +125,13 @@ typedef unsigned long perl_mutex;
 	}	\*/
 #define COND_WAIT(c, m) \
     STMT_START {						\
-	/*ConsolePrintf("In COND_WAIT\n");	*/\
+	ConsolePrintf("In COND_WAIT\n");	\	
     } STMT_END
 
 
 #define COND_DESTROY(c) \
     STMT_START {						\
-	/*ConsolePrintf("In COND_DESTROY\n");	*/\
+	ConsolePrintf("In COND_DESTROY\n");	\	
     } STMT_END
 
 /*		(c)->waiters = 0;					\

@@ -8,11 +8,11 @@
  */
 
 /*
- * FILENAME     :  nw5sck.c
- * DESCRIPTION	:  Socket related functions.
- * Author		:  SGP
- * Date			:  January 2001.
- * Date Modified:  June 26th 2001.
+ * FILENAME		:	nw5sck.c
+ * DESCRIPTION	:	Socket related functions.
+ * Author		:	SGP
+ * Date			:	January 2001.
+ *
  */
 
 
@@ -20,14 +20,19 @@
 #include "EXTERN.h"
 #include "perl.h"
 
+#if defined(PERL_OBJECT)
+#define NO_XSLOCKS
+#include "XSUB.h"
+#endif
+
 #include "nw5iop.h"
 #include "nw5sck.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 
-// This is defined here since  arpa\inet.h  defines this array as an extern,
-// and  arpa\inet.h  gets included by the  inet_ntoa  call.
-char nwinet_scratch[18] = {'\0'};
+static struct servent* nw_savecopyservent(struct servent*d,
+                                             struct servent*s,
+                                             const char *proto);
 
 
 u_long
@@ -166,14 +171,28 @@ nw_getprotobynumber(int num)
 struct servent *
 nw_getservbyname(const char *name, const char *proto)
 {
-    return (struct servent *)getservbyname((char*)name, (char*)proto);
+	dTHXo; 
+    struct servent *r;
+
+    r = getservbyname((char*)name, (char*)proto);
+    if (r) {
+		/*r = nw_savecopyservent(&nw_servent, r, proto);*/
+    }
+    return r;
 }
 
 
 struct servent *
 nw_getservbyport(int port, const char *proto)
 {
-    return (struct servent *)getservbyport(port, (char*)proto);
+    dTHXo; 
+    struct servent *r;
+
+    r = getservbyport(port, (char*)proto);
+    if (r) {
+		//r = nw_savecopyservent(&nw_servent, r, proto);
+    }
+    return r;
 }
 
 struct servent *
@@ -185,39 +204,25 @@ nw_getservent(void)
 void
 nw_sethostent(int stayopen)
 {
-#ifdef HAS_SETHOSTENT
 	sethostent(stayopen);
-#endif
 }
 
 void
 nw_setnetent(int stayopen)
 {
-#ifdef HAS_SETNETENT
 	setnetent(stayopen);
-#endif
 }
 
 void
 nw_setprotoent(int stayopen)
 {
-#ifdef HAS_SETPROTENT
 	setprotoent(stayopen);
-#endif
 }
 
 void
 nw_setservent(int stayopen)
 {
-#ifdef HAS_SETSERVENT
 	setservent(stayopen);
-#endif
-}
-
-int
-nw_setsockopt(SOCKET s, int level, int optname, const char* optval, int optlen)
-{
-	return setsockopt(s, level, optname, (char*)optval, optlen);
 }
 
 int
@@ -238,10 +243,23 @@ nw_inet_addr(const char *cp)
     return inet_addr((char*)cp);
 }
 
-char *
-nw_inet_ntoa(struct in_addr in)
+static struct servent*
+nw_savecopyservent(struct servent*d, struct servent*s, const char *proto)
 {
-    return inet_ntoa(in);
+    d->s_name = s->s_name;
+    d->s_aliases = s->s_aliases;
+    d->s_port = s->s_port;
+#ifndef __BORLANDC__	/* Buggy on Win95 and WinNT-with-Borland-WSOCK */
+    if (/*!IsWin95() && */s->s_proto && strlen(s->s_proto))
+	d->s_proto = s->s_proto;
+    else
+#endif
+    if (proto && strlen(proto))
+	d->s_proto = (char *)proto;
+    else
+	d->s_proto = "tcp";
+   
+    return d;
 }
 
 SOCKET
@@ -252,6 +270,7 @@ nw_socket(int af, int type, int protocol)
 #ifndef USE_SOCKETS_AS_HANDLES
     s = socket(af, type, protocol);
 #else
+    //StartSockets();
     if((s = socket(af, type, protocol)) == INVALID_SOCKET)
 	//errno = WSAGetLastError();
     else

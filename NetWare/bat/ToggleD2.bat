@@ -13,9 +13,7 @@ if "%1" == "on" goto yes
 if "%1" == "off" goto no
 if "%1" == "/?" goto usage
 if "%1" == "/h" goto usage
-
-Rem Invalid input and so display the help message
-goto Usage
+goto dontknow
 
 :now
 if "%USE_D2%" == "" echo USE_D2 is removed, uses /d1
@@ -32,9 +30,11 @@ Set USE_D2=
 echo ....USE_D2 is removed. uses /d1
 goto exit
 
+:dontknow
+goto Usage
+
 :Usage
  @echo on
  @echo "Usage: ToggleD2 [on|off]"
  @echo "Usage: ToggleD2 /now" - To display current setting
-
 :exit

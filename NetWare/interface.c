@@ -8,25 +8,23 @@
  */
 
 /*
- * FILENAME     :   interface.c
- * DESCRIPTION  :   Calling Perl APIs.
- * Author       :   SGP
- * Date	Created :   January 2001.
- * Date Modified:   July 2nd 2001.
+ * FILENAME		:	interface.c
+ * DESCRIPTION	:	Perl parsing and running functions.
+ * Author		:	SGP
+ * Date			:	January 2001.
+ *
  */
 
 
 
 #include "interface.h"
-#include "nwtinfo.h"
+
 
 static void xs_init(pTHX);
 
 EXTERN_C int RunPerl(int argc, char **argv, char **env);
 EXTERN_C void Perl_nw5_init(int *argcp, char ***argvp);
-EXTERN_C void boot_DynaLoader (pTHX_ CV* cv);
-
-EXTERN_C BOOL Remove_Thread_Ctx(void);
+EXTERN_C void boot_DynaLoader (pTHXo_ CV* cv);
 
 
 ClsPerlHost::ClsPerlHost()
@@ -42,18 +40,6 @@ ClsPerlHost::~ClsPerlHost()
 ClsPerlHost::VersionNumber()
 {
 	return 0;
-}
-
-bool
-ClsPerlHost::RegisterWithThreadTable()
-{
-	return(fnRegisterWithThreadTable());
-}
-
-bool
-ClsPerlHost::UnregisterWithThreadTable()
-{
-	return(fnUnregisterWithThreadTable());
 }
 
 int
@@ -82,17 +68,8 @@ void
 ClsPerlHost::PerlDestroy(PerlInterpreter *my_perl)
 {
 	perl_destruct(my_perl);		// Destructor for Perl.
-}
-
-void
-ClsPerlHost::PerlFree(PerlInterpreter *my_perl)
-{
 	perl_free(my_perl);			// Free the memory allocated for Perl.
 
-	// Remove the thread context set during Perl_set_context
-	// This is added here since for web script there is no other place this gets executed
-	// and it cannot be included into cgi2perl.xs unless this symbol is exported.
-	Remove_Thread_Ctx();
 }
 
 /*============================================================================================
@@ -152,7 +129,23 @@ int RunPerl(int argc, char **argv, char **env)
 		if(exitstatus == 0)
 		{
 			#if defined(TOP_CLONE) && defined(USE_ITHREADS)		// XXXXXX testing
-				new_perl = perl_clone(my_perl, 1);
+				#  ifdef PERL_OBJECT
+					CPerlHost *h = new CPerlHost();
+					new_perl = perl_clone_using(my_perl, 1,
+										h->m_pHostperlMem,
+										h->m_pHostperlMemShared,
+										h->m_pHostperlMemParse,
+										h->m_pHostperlEnv,
+										h->m_pHostperlStdIO,
+										h->m_pHostperlLIO,
+										h->m_pHostperlDir,
+										h->m_pHostperlSock,
+										h->m_pHostperlProc
+										);
+					CPerlObj *pPerl = (CPerlObj*)new_perl;
+				#  else
+					new_perl = perl_clone(my_perl, 1);
+				#  endif
 
 				exitstatus = perl_run(new_perl);	// Run Perl.
 				PERL_SET_THX(my_perl);
@@ -162,15 +155,12 @@ int RunPerl(int argc, char **argv, char **env)
 		}
 		nlm.PerlDestroy(my_perl);
 	}
-	if(my_perl)
-		nlm.PerlFree(my_perl);
 
 	#ifdef USE_ITHREADS
 		if (new_perl)
 		{
 			PERL_SET_THX(new_perl);
 			nlm.PerlDestroy(new_perl);
-			nlm.PerlFree(my_perl);
 		}
 	#endif
 
@@ -188,7 +178,7 @@ int RunPerl(int argc, char **argv, char **env)
 //
 IPerlHost* AllocStdPerl()
 {
-	return (IPerlHost*) new ClsPerlHost();
+	return new ClsPerlHost();
 }
 
 
@@ -200,7 +190,7 @@ IPerlHost* AllocStdPerl()
 //
 void FreeStdPerl(IPerlHost* pPerlHost)
 {
-	if (pPerlHost)
-		delete (ClsPerlHost*) pPerlHost;
+	delete (ClsPerlHost*) pPerlHost;
 }
+
 

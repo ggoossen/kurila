@@ -472,16 +472,15 @@ void fnAppendArgument(PCOMMANDLINEPARSER pclp, char *new_arg)
 	strcpy(pclp->m_argv[pclp->m_argc], new_arg);	// Appended the new argument.
 	pclp->m_argc++;		// Increment the number of parameters appended.
 
-	// The char array is emptied for all elements upto the end so that there are no
-	// junk characters. If this is not done, then the issue is like this:
+	// The char array is emptied for all elements upto the end so that there are no junk characters.
+	// If this is not done, then the issue is like this:
 	// - Simple perl command like "perl" on the system console works fine for the first time.
-	// - When "perl" is executed the second time, a new blank screen should come up
-	//   which allows for editing also. This was not consistently working well.
-	//   More so when the command was like, "perl   ", that is the name "perl" followed
-	//   by a few blank spaces, it used to give error in opening file:
-	//   "unable to open the file" since the filename would have some junk characters.
-	// 
-	// These issues are fixed through the code below.
+	// - When it is given the second time, a new blank screen should come up which also
+	//   allows for editing. This was not consistently working well.
+	//   More so when the command was like, "perl   ", that is the name "perl"
+	//   followed by a few blank spaces. It used to give error in opening file and
+	//   would give some junk as the filename unable to open.
+	// Once the below fix was done, it is working fine.
 	for(i=pclp->m_argc; i<pclp->m_argv_len; i++)
 		strncpy(pclp->m_argv[i], "", (MAX_DN_BYTES * sizeof(char)));	// MAX_DN_BYTES is the size of pclp->m_argv[].
 
@@ -736,7 +735,6 @@ char* fnMy_MkTemp(char* templatestr)
 
 	char termchar = '\0';
 	char letter = 'a';
-	char letter1 = 'a';
 
 
 	if (templatestr && (pXs = strstr(templatestr, (char *)"XXXXXX")))
@@ -755,19 +753,6 @@ char* fnMy_MkTemp(char* templatestr)
 		else
 			pPid = numbuf;
 
-/**
-		Backtick operation uses temp files that are stored under NWDEFPERLTEMP
-		directory. They are temporarily used and then cleaned up after usage.
-		In cases where multiple backtick operations are used that call some
-		complex scripts, new temp files will be created before the old ones are
-		deleted. So, we need to have a provision to create many temp files.
-		Hence the below logic. It is found that provision for 26 files may
-		not be enough in some cases.
-
-		This below logic allows 26 files (like, pla00015.tmp through plz00015.tmp)
-		plus 6x26=676 (like, plaa0015.tmp through plzz0015.tmp)
-**/
-
 		letter = 'a';
 		do
 		{
@@ -779,23 +764,6 @@ char* fnMy_MkTemp(char* templatestr)
 			}
 			letter++;
 		} while (letter <= 'z');
-
-		letter1 = 'a';
-		do
-		{
-			letter = 'a';
-			do
-			{
-				sprintf(pXs, (char *)"%c%c%04.5s", letter1, letter, pPid);
-				pXs[6] = termchar;
-				if (access(templatestr, 0) != 0)	// File does not exist
-				{
-					return templatestr;
-				}
-				letter++;
-			} while (letter <= 'z');
-			letter1++;
-		} while (letter1 <= 'z');
 
 		errno = ENOENT;
 		return NULL;

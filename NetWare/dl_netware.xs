@@ -27,19 +27,23 @@ NetWare related modifications done on dl_win32.xs file created by Wei-Yuen Tan t
 //function pointer for UCSInitialize
 typedef void (*PFUCSINITIALIZE) ();
 
+#ifdef PERL_OBJECT
+
+#endif  /* PERL_OBJECT */
+
 #include "dlutils.c"	/* SaveError() etc	*/
 
 static void
-dl_private_init(pTHX)
+dl_private_init(pTHXo)
 {
-    (void)dl_generic_private_init(aTHX);
+    (void)dl_generic_private_init(aTHXo);
 }
 
 
 MODULE = DynaLoader	PACKAGE = DynaLoader
 
 BOOT:
-    (void)dl_private_init(aTHX);
+    (void)dl_private_init(aTHXo);
 
 
 void *
@@ -107,11 +111,11 @@ dl_load_file(filename,flags=0)
 					nlmHandle = FindNLMHandle(mod_name8);
 				}
 			}
-			//use Perl2UCS or UCSExt encountered :
+			//use UCSExt encountered-
 			//initialize UCS, this has to be terminated when the script finishes execution
 			//Is the script intending to use UCS Extensions?
 			//This should be done once per script execution
-			if ((strcmp(mod_name,"Perl2UCS.nlm")==0) || (strcmp(mod_name,"UCSExt.nlm")==0))
+			if (strcmp(mod_name,"Perl2UCS.nlp")==0)
 			{
 				unsigned int moduleHandle = 0;
 				moduleHandle = FindNLMHandle("UCSCORE.NLM");
@@ -126,8 +130,8 @@ dl_load_file(filename,flags=0)
 			DLDEBUG(2,PerlIO_printf(Perl_debug_log," libref=%x\n", nlmHandle));
 			ST(0) = sv_newmortal() ;
 			if (nlmHandle == NULL)
-			//SaveError(aTHX_ "load_file:%s",
-			//	  OS_Error_String(aTHX)) ;
+			//SaveError(aTHXo_ "load_file:%s",
+			//	  OS_Error_String(aTHXo)) ;
 			ConsolePrintf("load_file error :  %s\n", mod_name8);
 			else
 			sv_setiv( ST(0), (IV)nlmHandle);
@@ -152,8 +156,8 @@ dl_find_symbol(libhandle, symbolname)
     DLDEBUG(2,PerlIO_printf(Perl_debug_log,"  symbolref = %x\n", RETVAL));
     ST(0) = sv_newmortal() ;
     if (RETVAL == NULL)
-	//SaveError(aTHX_ "find_symbol:%s",
-	//	  OS_Error_String(aTHX)) ;
+	//SaveError(aTHXo_ "find_symbol:%s",
+	//	  OS_Error_String(aTHXo)) ;
 	ConsolePrintf("find_symbol error \n");
     else
 	sv_setiv( ST(0), (IV)RETVAL);
@@ -174,15 +178,14 @@ dl_install_xsub(perl_name, symref, filename="$Package")
     DLDEBUG(2,PerlIO_printf(Perl_debug_log,"dl_install_xsub(name=%s, symref=%x)\n",
 		      perl_name, symref));
     ST(0) = sv_2mortal(newRV((SV*)newXS(perl_name,
-					(void(*)(pTHX_ CV *))symref,
+					(void(*)(pTHXo_ CV *))symref,
 					filename)));
 
 
 char *
 dl_error()
     CODE:
-    dMY_CXT;
-    RETVAL = dl_last_error ;
+    RETVAL = LastError ;
     OUTPUT:
     RETVAL
 
