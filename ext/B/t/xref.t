@@ -1,4 +1,4 @@
-#!./perl
+#!./perl -w
 
 BEGIN {
     chdir 't' if -d 't';
@@ -6,8 +6,6 @@ BEGIN {
 }
 
 use strict;
-use warnings;
-no warnings 'once';
 use Test::More tests => 14;
 
 # line 50
@@ -15,14 +13,12 @@ use_ok( 'B::Xref' );
 
 my $file = 'xreftest.out';
 
-open SAVEOUT, ">&STDOUT" or diag $!;
-close STDOUT;
 # line 100
 our $compilesub = B::Xref::compile("-o$file");
 ok( ref $compilesub eq 'CODE', "compile() returns a coderef ($compilesub)" );
 $compilesub->(); # Compile this test script
-close STDOUT;
-open STDOUT, ">&SAVEOUT" or diag $!;
+
+#END { unlink $file or diag "END block failed: $!" }
 
 # Now parse the output
 # line 200
@@ -97,10 +93,6 @@ is(
     '1001', 'glob FOO used in subroutine foo'
 );
 
-END {
-    1 while unlink $file;
-}
-
 # End of tests.
 # Now some stuff to feed B::Xref
 
@@ -108,4 +100,3 @@ END {
 package Testing::Xref;
 sub foo { print FOO %::xreftable; }
 sub bar { print FOO foo; }
-
