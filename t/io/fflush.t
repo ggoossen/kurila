@@ -16,16 +16,10 @@ use strict;
 # This attempts to mirror the #ifdef forest found in perl.h so that we
 # know when to run these tests.  If that forest ever changes, change
 # it here too or expect test gratuitous test failures.
-my $useperlio = defined $Config{useperlio} ? $Config{useperlio} eq 'define' ? 1 : 0 : 0;
-my $fflushNULL = defined $Config{fflushNULL} ? $Config{fflushNULL} eq 'define' ? 1 : 0 : 0;
-my $d_sfio = defined $Config{d_sfio} ? $Config{d_sfio} eq 'define' ? 1 : 0 : 0;
-my $fflushall = defined $Config{fflushall} ? $Config{fflushall} eq 'define' ? 1 : 0 : 0;
-my $d_fork = defined $Config{d_fork} ? $Config{d_fork} eq 'define' ? 1 : 0 : 0;
-
-if ($useperlio || $fflushNULL || $d_sfio) {
+if ($Config{useperlio} || $Config{fflushNULL} || $Config{d_sfio}) {
     print "1..4\n";
 } else {
-    if ($fflushall) {
+    if ($Config{fflushall}) {
 	print "1..4\n";
     } else {
 	print "1..0 # Skip: fflush(NULL) or equivalent not available\n";
@@ -66,13 +60,13 @@ print OUT $str;
 close OUT;
 EOF
     ;
-close PROG or die "close ff-prog: $!";;
+close PROG;
 push @delete, "ff-prog";
 
 $| = 0; # we want buffered output
 
 # Test flush on fork/exec
-if (!$d_fork) {
+if ($Config{d_fork} ne "define") {
     print "ok 1 # skipped: no fork\n";
 } else {
     my $f = "ff-fork-$$";
@@ -122,9 +116,9 @@ for (qw(system qx popen)) {
     my $command = qq{$runperl "ff-prog" "$f" "rl"};
     open OUT, "> $f" or die "open $f: $!";
     print OUT "Pe";
-    close OUT or die "close $f: $!";;
     print "# $command\n";
     $code->($command);
+    close OUT;
     print file_eq($f, "Perl") ? "ok $t\n" : "not ok $t\n";
     push @delete, $f;
     ++$t;
