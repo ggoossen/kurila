@@ -1,37 +1,21 @@
 package Time::HiRes;
 
 use strict;
-use vars qw($VERSION $XS_VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK @EXPORT_FAIL);
 
 require Exporter;
-use XSLoader;
+require DynaLoader;
 
-@ISA = qw(Exporter);
+@ISA = qw(Exporter DynaLoader);
 
 @EXPORT = qw( );
-@EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
-		 getitimer setitimer ITIMER_REAL ITIMER_VIRTUAL ITIMER_PROF);
+@EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval);
 
-$VERSION = '1.20_00';
-$XS_VERSION = $VERSION;
-$VERSION = eval $VERSION;
+$VERSION = do{my@r=q$Revision: 1.20 $=~/\d+/g;sprintf '%02d.'.'%02d'x$#r,@r};
 
-sub AUTOLOAD {
-    my $constname;
-    ($constname= $AUTOLOAD) =~ s/.*:://;
-    my $val = constant($constname, @_ ? $_[0] : 0);
-    if ($!) {
-	my ($pack,$file,$line) = caller;
-	die "Your vendor has not defined Time::HiRes macro $constname, used at $file line $line.\n";
-    }
-    {
-	no strict 'refs';
-	*$AUTOLOAD = sub { $val };
-    }
-    goto &$AUTOLOAD;
-}
+bootstrap Time::HiRes $VERSION;
 
-XSLoader::load 'Time::HiRes', $XS_VERSION;
+@EXPORT_FAIL = grep { ! defined &$_ } @EXPORT_OK;
 
 # Preloaded methods go here.
 
@@ -42,6 +26,14 @@ sub tv_interval {
     (${$b}[0] - ${$a}[0]) + ((${$b}[1] - ${$a}[1]) / 1_000_000);
 }
 
+# I'm only supplying this because the version of it in 5.003's Export.pm
+# is buggy (it doesn't shift off the class name).
+
+sub export_fail {
+    my $self = shift;
+    @_;
+}
+
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
@@ -49,7 +41,7 @@ __END__
 
 =head1 NAME
 
-Time::HiRes - High resolution alarm, sleep, gettimeofday, interval timers
+Time::HiRes - High resolution ualarm, usleep, and gettimeofday
 
 =head1 SYNOPSIS
 
@@ -68,151 +60,71 @@ Time::HiRes - High resolution alarm, sleep, gettimeofday, interval timers
   $elapsed = tv_interval ( $t0 );
 
   use Time::HiRes qw ( time alarm sleep );
-
   $now_fractions = time;
   sleep ($floating_seconds);
   alarm ($floating_seconds);
   alarm ($floating_seconds, $floating_interval);
 
-  use Time::HiRes qw( setitimer getitimer
-		      ITIMER_REAL ITIMER_VIRTUAL ITIMER_PROF );
-
-  setitimer ($which, $floating_seconds, $floating_interval );
-  getitimer ($which);
-
 =head1 DESCRIPTION
 
-The C<Time::HiRes> module implements a Perl interface to the usleep,
-ualarm, gettimeofday, and setitimer/getitimer system calls. See the
-EXAMPLES section below and the test scripts for usage; see your system
-documentation for the description of the underlying usleep, ualarm,
-gettimeofday, and setitimer/getitimer calls.
+The C<Time::HiRes> module implements a Perl interface to the usleep, ualarm,
+and gettimeofday system calls. See the EXAMPLES section below and the test
+scripts for usage; see your system documentation for the description of
+the underlying gettimeofday, usleep, and ualarm calls.
 
-If your system lacks gettimeofday(2) or an emulation of it you don't
-get gettimeofday() or the one-arg form of tv_interval().
-If you don't have usleep(3) or select(2) you don't get usleep()
-or sleep().  If your system don't have ualarm(3) or setitimer(2) you
-don't get ualarm() or alarm().  If you try to import an unimplemented
-function in the C<use> statement it will fail at compile time.
+If your system lacks gettimeofday(2) you don't get gettimeofday() or the
+one-arg form of tv_interval().  If you don't have usleep(3) or select(2)
+you don't get usleep() or sleep().  If your system don't have ualarm(3)
+or setitimer(2) you don't
+get ualarm() or alarm().  If you try to import an unimplemented function
+in the C<use> statement it will fail at compile time.
 
-The following functions can be imported from this module.
-No functions are exported by default.
+The following functions can be imported from this module.  No
+functions are exported by default.
 
 =over 4
 
 =item gettimeofday ()
 
-In array context returns a 2 element array with the seconds and
-microseconds since the epoch.  In scalar context returns floating
+In array context it returns a 2 element array with the seconds and
+microseconds since the epoch.  In scalar context it returns floating
 seconds like Time::HiRes::time() (see below).
 
 =item usleep ( $useconds )
 
-Sleeps for the number of microseconds specified.  Returns the number
-of microseconds actually slept.  Can sleep for more than one second
-unlike the usleep system call. See also Time::HiRes::sleep() below.
+Issues a usleep for the number of microseconds specified. See also 
+Time::HiRes::sleep() below.
 
 =item ualarm ( $useconds [, $interval_useconds ] )
 
 Issues a ualarm call; interval_useconds is optional and will be 0 if 
 unspecified, resulting in alarm-like behaviour.
 
-=item tv_interval 
+=item tv_interval ( $ref_to_gettimeofday [, $ref_to_later_gettimeofday] )
 
-C<tv_interval ( $ref_to_gettimeofday [, $ref_to_later_gettimeofday] )>
-
-Returns the floating seconds between the two times, which should have
-been returned by gettimeofday(). If the second argument is omitted,
-then the current time is used.
+Returns the floating seconds between the two times, which should have been 
+returned by gettimeofday(). If the second argument is omitted, then the
+current time is used.
 
 =item time ()
 
-Returns a floating seconds since the epoch. This function can be
-imported, resulting in a nice drop-in replacement for the C<time>
-provided with core Perl, see the EXAMPLES below.
-
-B<NOTE 1>: this higher resolution timer can return values either less or
-more than the core time(), depending on whether your platforms rounds
-the higher resolution timer values up, down, or to the nearest to get
-the core time(), but naturally the difference should be never more than
-half a second.
-
-B<NOTE 2>: Since Sunday, September 9th, 2001 at 01:46:40 AM GMT
-(when the time() seconds since epoch rolled over to 1_000_000_000),
-the default floating point format of Perl and the seconds since epoch
-have conspired to produce an apparent bug: if you print the value of
-Time::HiRes::time() you seem to be getting only five decimals, not six
-as promised (microseconds).  Not to worry, the microseconds are there
-(assuming your platform supports such granularity).  What is going on
-is that the default floating point format of Perl only outputs 15
-digits.  In this case that means ten digits before the decimal
-separator and five after.  To see the microseconds you can use either
-printf/sprintf with C<%.6f>, or the gettimeofday() function in list
-context, which will give you the seconds and microseconds as two
-separate values.
+Returns a floating seconds since the epoch. This function can be imported,
+resulting in a nice drop-in replacement for the C<time> provided with perl,
+see the EXAMPLES below.
 
 =item sleep ( $floating_seconds )
 
-Sleeps for the specified amount of seconds.  Returns the number of
-seconds actually slept (a floating point value).  This function can be
-imported, resulting in a nice drop-in replacement for the C<sleep>
-provided with perl, see the EXAMPLES below.
+Converts $floating_seconds to microseconds and issues a usleep for the 
+result.  This function can be imported, resulting in a nice drop-in 
+replacement for the C<sleep> provided with perl, see the EXAMPLES below.
 
 =item alarm ( $floating_seconds [, $interval_floating_seconds ] )
 
-The SIGALRM signal is sent after the specfified number of seconds.
-Implemented using ualarm().  The $interval_floating_seconds argument
-is optional and will be 0 if unspecified, resulting in alarm()-like
+Converts $floating_seconds and $interval_floating_seconds and issues
+a ualarm for the results.  The $interval_floating_seconds argument
+is optional and will be 0 if unspecified, resulting in alarm-like
 behaviour.  This function can be imported, resulting in a nice drop-in
 replacement for the C<alarm> provided with perl, see the EXAMPLES below.
-
-=item setitimer 
-
-C<setitimer ( $which, $floating_seconds [, $interval_floating_seconds ] )>
-
-Start up an interval timer: after a certain time, a signal arrives,
-and more signals may keep arriving at certain intervals.  To disable
-a timer, use time of zero.  If interval is set to zero (or unspecified),
-the timer is disabled B<after> the next delivered signal.
-
-Use of interval timers may interfere with alarm(), sleep(), and usleep().
-In standard-speak the "interaction is unspecified", which means that
-I<anything> may happen: it may work, it may not.
-
-In scalar context, the remaining time in the timer is returned.
-
-In list context, both the remaining time and the interval are returned.
-
-There are three interval timers: the $which can be ITIMER_REAL,
-ITIMER_VIRTUAL, or ITIMER_PROF.
-
-ITIMER_REAL results in alarm()-like behavior.  Time is counted in
-I<real time>, that is, wallclock time.  SIGALRM is delivered when
-the timer expires.
-
-ITIMER_VIRTUAL counts time in (process) I<virtual time>, that is, only
-when the process is running.  In multiprocessor/user/CPU systems this
-may be more or less than real or wallclock time.  (This time is also
-known as the I<user time>.)  SIGVTALRM is delivered when the timer expires.
-
-ITIMER_PROF counts time when either the process virtual time or when
-the operating system is running on behalf of the process (such as
-I/O).  (This time is also known as the I<system time>.)  (Collectively
-these times are also known as the I<CPU time>.)  SIGPROF is delivered
-when the timer expires.  SIGPROF can interrupt system calls.
-
-The semantics of interval timers for multithreaded programs are
-system-specific, and some systems may support additional interval
-timers.  See your setitimer() documentation.
-
-=item getitimer ( $which )
-
-Return the remaining time in the interval timer specified by $which.
-
-In scalar context, the remaining time is returned.
-
-In list context, both the remaining time and the interval are returned.
-The interval is always what you put in using setitimer().
 
 =back
 
@@ -254,14 +166,6 @@ The interval is always what you put in using setitimer().
   sleep (2.5);
   alarm (10.6666666);
 
-  # Arm an interval timer to go off first at 10 seconds and
-  # after that every 2.5 seconds, in process virtual time
-
-  use Time::HiRes qw ( setitimer ITIMER_VIRTUAL time );
-
-  $SIG{VTLARM} = sub { print time, "\n" };
-  setitimer(ITIMER_VIRTUAL, 10, 2.5);
-
 =head1 C API
 
 In addition to the perl API described above, a C API is available for
@@ -284,14 +188,8 @@ Here is an example of using NVtime from C:
   SV **svp = hv_fetch(PL_modglobal, "Time::NVtime", 12, 0);
   if (!svp)         croak("Time::HiRes is required");
   if (!SvIOK(*svp)) croak("Time::NVtime isn't a function pointer");
-  myNVtime = INT2PTR(double(*)(), SvIV(*svp));
+  myNVtime = (double(*)()) SvIV(*svp);
   printf("The current time is: %f\n", (*myNVtime)());
-
-=head1 CAVEATS
-
-Notice that the core time() maybe rounding rather than truncating.
-What this means that the core time() may be giving time one second
-later than gettimeofday(), also known as Time::HiRes::time().
 
 =head1 AUTHORS
 

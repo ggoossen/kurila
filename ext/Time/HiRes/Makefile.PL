@@ -7,7 +7,6 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'	   => 'Time::HiRes',
-    MAN3PODS    => {},  # Pods will be built by installman.
     'VERSION_FROM' => 'HiRes.pm',
 );
 
