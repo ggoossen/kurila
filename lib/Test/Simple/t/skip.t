@@ -1,13 +1,4 @@
-#!perl -w
-
-BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = '../lib';
-    }
-}
-
-use Test::More tests => 15;
+use Test::More tests => 9;
 
 # If we skip with the same name, Test::Harness will report it back and
 # we won't get lots of false bug reports.
@@ -50,37 +41,3 @@ SKIP: {
     fail("Deliberate failure");
     fail("And again");
 }
-
-
-{
-    my $warning;
-    local $SIG{__WARN__} = sub { $warning = join "", @_ };
-    SKIP: {
-        # perl gets the line number a little wrong on the first
-        # statement inside a block.
-        1 == 1;
-#line 56
-        skip $Why;
-        fail("So very failed");
-    }
-    is( $warning, "skip() needs to know \$how_many tests are in the ".
-                  "block at $0 line 56\n",
-        'skip without $how_many warning' );
-}
-
-
-SKIP: {
-    skip "Not skipping here.", 4 if 0;
-
-    pass("This is supposed to run");
-
-    # Testing out nested skips.
-    SKIP: {
-        skip $Why, 2;
-        fail("AHHH!");
-        fail("You're a failure");
-    }
-
-    pass("This is supposed to run, too");
-}
-

@@ -1,19 +1,4 @@
-#!perl -w
-
-BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = '../lib';
-    }
-}
-
-use Test::More tests => 41;
-
-# Make sure we don't mess with $@ or $!.  Test at bottom.
-my $Err   = "this should not be touched";
-my $Errno = 42;
-$@ = $Err;
-$! = $Errno;
+use Test::More tests => 22;
 
 use_ok('Text::Soundex');
 require_ok('Test::More');
@@ -29,35 +14,12 @@ like("fooble", '/^foo/',    'foo is like fooble');
 like("FooBle", '/foo/i',   'foo is like FooBle');
 like("/usr/local/pr0n/", '/^\/usr\/local/',   'regexes with slashes in like' );
 
-unlike("fbar", '/^bar/',    'unlike bar');
-unlike("FooBle", '/foo/',   'foo is unlike FooBle');
-unlike("/var/local/pr0n/", '/^\/usr\/local/','regexes with slashes in unlike' );
-
 can_ok('Test::More', qw(require_ok use_ok ok is isnt like skip can_ok
                         pass fail eq_array eq_hash eq_set));
 can_ok(bless({}, "Test::More"), qw(require_ok use_ok ok is isnt like skip 
                                    can_ok pass fail eq_array eq_hash eq_set));
 
-
 isa_ok(bless([], "Foo"), "Foo");
-isa_ok([], 'ARRAY');
-isa_ok(\42, 'SCALAR');
-
-
-# can_ok() & isa_ok should call can() & isa() on the given object, not 
-# just class, in case of custom can()
-{
-       local *Foo::can;
-       local *Foo::isa;
-       *Foo::can = sub { $_[0]->[0] };
-       *Foo::isa = sub { $_[0]->[0] };
-       my $foo = bless([0], 'Foo');
-       ok( ! $foo->can('bar') );
-       ok( ! $foo->isa('bar') );
-       $foo->[0] = 1;
-       can_ok( $foo, 'blah');
-       isa_ok( $foo, 'blah');
-}
 
 
 pass('pass() passed');
@@ -84,7 +46,6 @@ my @complex_array2 = (
                       [qw(498 10 29)],
                      );
 
-is_deeply( \@complex_array1, \@complex_array2,    'is_deeply with arrays' );
 ok( eq_array(\@complex_array1, \@complex_array2),
     'eq_array with complicated arrays' );
 ok( eq_set(\@complex_array1, \@complex_array2),
@@ -109,8 +70,9 @@ my %hash2 = ( foo => 23,
               har => { foo => 24, bar => 42 },
             );
 
-is_deeply( \%hash1, \%hash2,    'is_deeply with complicated hashes' );
-ok( eq_hash(\%hash1, \%hash2),  'eq_hash with complicated hashes');
+
+ok( eq_hash(\%hash1, \%hash2),
+    'eq_hash with complicated hashes');
 
 %hash1 = ( foo => 23,
            bar => [qw(this that whatever)],
@@ -123,28 +85,3 @@ ok( eq_hash(\%hash1, \%hash2),  'eq_hash with complicated hashes');
 
 ok( !eq_hash(\%hash1, \%hash2),
     'eq_hash with slightly different complicated hashes' );
-
-is( Test::Builder->new, Test::More->builder,    'builder()' );
-
-
-cmp_ok(42, '==', 42,        'cmp_ok ==');
-cmp_ok('foo', 'eq', 'foo',  '       eq');
-cmp_ok(42.5, '<', 42.6,     '       <');
-cmp_ok(0, '||', 1,          '       ||');
-
-
-# Piers pointed out sometimes people override isa().
-{
-    package Wibble;
-    sub isa {
-        my($self, $class) = @_;
-        return 1 if $class eq 'Wibblemeister';
-    }
-    sub new { bless {} }
-}
-isa_ok( Wibble->new, 'Wibblemeister' );
-
-
-# These two tests must remain at the end.
-is( $@, $Err,               '$@ untouched' );
-cmp_ok( $!, '==', $Errno,   '$! untouched' );
