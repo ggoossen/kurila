@@ -224,7 +224,7 @@ installs modules, and this produces a Makefile with a C<dist> target.
 
 Once you've ensured that your module passes its own tests - always a
 good thing to make sure - you can C<make dist>, and the Makefile will
-hopefully produce you a nice tarball of your module, ready for upload.
+hopefully produce you a nice tarball of your module, ready for upliad.
 
 =item Upload the tarball
 
@@ -239,21 +239,18 @@ it connected to the rest of the CPAN, you'll need to tell the modules
 list about it. The best way to do this is to email them a line in the
 style of the modules list, like this:
 
-  Net::Acme bdpOP   Interface to Acme Frobnicator servers      FOOBAR
-  ^         ^^^^^   ^                                          ^
-  |         |||||   Module description                         Your ID
-  |         ||||| 
-  |         ||||\-Public Licence: (p)standard Perl, (g)GPL, (b)BSD,
-  |         ||||                  (l)LGPL, (a)rtistic, (o)ther
-  |         ||||
-  |         |||\- Interface: (O)OP, (r)eferences, (h)ybrid, (f)unctions
-  |         |||
-  |         ||\-- Language: (p)ure Perl, C(+)+, (h)ybrid, (C), (o)ther
-  |         ||
-  Module    |\--- Support: (d)eveloper, (m)ailing list, (u)senet, (n)one
-  Name      |
-            \---- Development: (i)dea, (c)onstructions, (a)lpha, (b)eta,
-                               (R)eleased, (M)ature, (S)tandard
+    Net::Acme bdpO  Interface to Acme Frobnicator servers         FOOBAR
+    ^         ^^^^  ^                                             ^
+    |         ||||  Module description                            Your ID
+    |         ||||
+    |         |||\- Interface: (O)OP, (r)eferences, (h)ybrid, (f)unctions
+    |         |||
+    |         ||\-- Language: (p)ure Perl, C(+)+, (h)ybrid, (C), (o)ther
+    |         ||
+    Module    |\--- Support: (d)eveloper, (m)ailing list, (u)senet, (n)one
+    Name      |
+              \---- Maturity: (i)dea, (c)onstructions, (a)lpha, (b)eta,
+                              (R)eleased, (M)ature, (S)tandard
 
 plus a description of the module and why you think it should be
 included. If you hear nothing back, that means your module will
@@ -282,5 +279,4 @@ Simon Cozens, C<simon@cpan.org>
 
 L<perlmod>, L<perlmodlib>, L<perlmodinstall>, L<h2xs>, L<strict>,
 L<Carp>, L<Exporter>, L<perlpod>, L<Test>, L<ExtUtils::MakeMaker>,
-http://www.cpan.org/ , Ken Williams' tutorial on building your own
-module at http://mathforum.org/~ken/perl_modules.html
+http://www.cpan.org/
