@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: basic.t,v 1.4 2002/01/28 02:56:19 eagle Exp $
+# $Id: basic.t,v 1.1 2001/11/23 10:09:06 eagle Exp $
 #
 # basic.t -- Basic tests for podlators.
 #
@@ -10,11 +10,6 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    if ($ENV{PERL_CORE}) {
-        @INC = '../lib';
-    } else {
-        unshift (@INC, '../blib/lib');
-    }
     unshift (@INC, '../blib/lib');
     $| = 1;
     print "1..11\n";
@@ -30,27 +25,11 @@ use Pod::Text::Color;
 use Pod::Text::Overstrike;
 use Pod::Text::Termcap;
 
-# Find the path to the test source files.  This requires some fiddling when
-# these tests are run as part of Perl core.
-sub source_path {
-    my $file = shift;
-    if ($ENV{PERL_CORE}) {
-        require File::Spec;
-        my $updir = File::Spec->updir;
-        my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 't');
-        return File::Spec->catfile ($dir, $file);
-    } else {
-        return $file;
-    }
-}
-
 $loaded = 1;
 print "ok 1\n";
 
 # Hard-code a few values to try to get reproducible results.
-$ENV{COLUMNS} = 80;
-$ENV{TERM} = 'xterm';
-$ENV{TERMCAP} = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
+@ENV{qw(TERMCAP COLUMNS)} = ('co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m', 80);
 
 # Map of translators to file extensions to find the formatted output to
 # compare against.
@@ -73,7 +52,7 @@ for (sort keys %translators) {
     # line.  That means that we don't check those things; oh well.  The header
     # changes with each version change or touch of the input file.
     if ($_ eq 'Pod::Man') {
-        $parser->parse_from_file (source_path ('basic.pod'), 'out.tmp');
+        $parser->parse_from_file ('basic.pod', 'out.tmp');
         open (TMP, 'out.tmp') or die "Cannot open out.tmp: $!\n";
         open (OUTPUT, "> out.$translators{$_}")
             or die "Cannot create out.$translators{$_}: $!\n";
@@ -84,12 +63,11 @@ for (sort keys %translators) {
         close TMP;
         unlink 'out.tmp';
     } else {
-        my $basic = source_path ('basic.pod');
-        $parser->parse_from_file ($basic, "out.$translators{$_}");
+        $parser->parse_from_file ('basic.pod', "out.$translators{$_}");
     }
     {
         local $/;
-        open (MASTER, source_path ("basic.$translators{$_}"))
+        open (MASTER, "basic.$translators{$_}")
             or die "Cannot open basic.$translators{$_}: $!\n";
         open (OUTPUT, "out.$translators{$_}")
             or die "Cannot open out.$translators{$_}: $!\n";
@@ -97,13 +75,6 @@ for (sort keys %translators) {
         my $output = <OUTPUT>;
         close MASTER;
         close OUTPUT;
-
-        # OS/390 is EBCDIC, which uses a different character for ESC
-        # apparently.  Try to convert so that the test still works.
-        if ($^O eq 'os390' && $_ eq 'Pod::Text::Termcap') {
-            $output =~ tr/\033/\047/;
-        }
-
         if ($master eq $output) {
             print "ok $n\n";
             unlink "out.$translators{$_}";
