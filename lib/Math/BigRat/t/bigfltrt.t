@@ -11,7 +11,7 @@ BEGIN
   if ($ENV{PERL_CORE})
     {
     # testing with the core distribution
-    @INC = qw(../t/lib);
+    @INC = qw(../lib lib);
     }
   unshift @INC, '../lib';
   if (-d 't')
@@ -41,4 +41,4 @@ $CL = "Math::BigInt::Calc";
 ok (1,1);
 
 # does not fully work yet  
-#require 'bigfltpm.inc';	# all tests here for sharing
+# require 'bigfltpm.inc';	# all tests here for sharing
