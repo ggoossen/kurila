@@ -37,12 +37,6 @@ for my $i (@sizes){
 	for my $op (qw(encode decode)){
 	    my ($meth, $from, $to) = ($op eq 'encode') ?
 		(\&encode, 'utf8', 'utf16') : (\&decode, 'utf16', 'utf8');
-	    my $XS = sub {
-		Encode::Unicode::set_transcoder("xs");  
-		$meth->('UTF-16BE', $S{$from}{$sz}{$cp})
-		     eq $S{$to}{$sz}{$cp} 
-			 or die "$op,$from,$to,$sz,$cp";
-	    };
 	    my $modern = sub {
 		Encode::Unicode::set_transcoder("modern");  
 		$meth->('UTF-16BE', $S{$from}{$sz}{$cp})
@@ -58,8 +52,7 @@ for my $i (@sizes){
 	    print "---- $op length=$sz/range=$cp ----\n";
 	    my $r = timethese($count,
 		     {
-		      "XS"      => $XS,
-		      "Modern"  => $modern,
+		      "Modern" => $modern,
 		      "Classic" => $classic,
 		     },
 		     'none',
