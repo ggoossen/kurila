@@ -1,4 +1,5 @@
 #!./perl -w
+
 #
 #  Copyright 2002, Larry Wall.
 #
@@ -15,17 +16,27 @@
 sub BEGIN {
     if ($ENV{PERL_CORE}){
 	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
+	@INC = '.';
+	push @INC, '../lib';
     }
     require Config; import Config;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
+    # require 'lib/st-dump.pl';
 }
 
+BEGIN {
+  if (ord 'A' != 65) {
+    die <<'EBCDIC';
+This test doesn't have EBCDIC data yet. Please run t/make_downgrade.pl using
+perl 5.8 (or later) and append its output to the end of the test.
+Please also mail the output to perlbug@perl.org so that the CPAN copy of
+Storable can be updated.
+EBCDIC
+  }
+}
 use Test::More;
 use Storable 'thaw';
 
@@ -37,22 +48,11 @@ use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
                   );
 %R_HASH = (perl => 'rules');
 
-if ($] > 5.007002) {
-  # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
-  # is stored in utf8, not bytes.
-  # "\xdf" is y diaresis in EBCDIC (except for cp875, but so far no-one seems
-  # to use that) which has exactly the same properties for \w
-  # So the tests happen to pass.
+if ($] >= 5.007003) {
   my $utf8 = "Schlo\xdf" . chr 256;
   chop $utf8;
 
-  # \xe5 is V in EBCDIC. That doesn't have the same properties w.r.t. \w as
-  # an a circumflex, so we need to be explicit.
-
-  # and its these very properties we're trying to test - an edge case
-  # involving whether scalars are being stored in bytes or in utf8.
-  my $a_circumflex = (ord ('A') == 193 ? "\x47" : "\xe5");
-  %U_HASH = (map {$_, $_} 'castle', "ch${a_circumflex}teau", $utf8, chr 0x57CE);
+  %U_HASH = (map {$_, $_} 'castle', "ch\xe5teau", $utf8, chr 0x57CE);
   plan tests => 169;
 } elsif ($] >= 5.006) {
   plan tests => 59;
@@ -91,21 +91,11 @@ sub thaw_hash {
 }
 
 sub thaw_scalar {
-  my ($name, $expected, $bug) = @_;
+  my ($name, $expected) = @_;
   my $scalar = eval {thaw $tests{$name}};
   is ($@, '', "Thawed $name without error?");
   isa_ok ($scalar, 'SCALAR', "Thawed $name?");
-  if ($bug and $] == 5.006) {
-    # Aargh. <expletive> <expletive> 5.6.0's harness doesn't even honour
-    # TODO tests.
-    warn "# Test skipped because eq is buggy for certain Unicode cases in 5.6.0";
-    warn "# Please upgrade to 5.6.1\n";
-    ok ("I'd really like to fail this test on 5.6.0 but I'm told that CPAN auto-dependancies mess up, and certain vendors only ship 5.6.0. Get your vendor to ugrade. Else upgrade your vendor.");
-    # One such vendor being the folks who brought you LONG_MIN as a positive
-    # integer.
-  } else {
-    is ($$scalar, $expected, "And it is the data we expected?");
-  }
+  is ($$scalar, $expected, "And it is the data we expected?");
   $scalar;
 }
 
@@ -195,8 +185,9 @@ if (eval "use Hash::Util; 1") {
 
 if ($] >= 5.006) {
   print "# We have utf8 scalars, so test that the utf8 scalars in <DATA> are valid\n";
-  thaw_scalar ('Short 8 bit utf8 data', "\xDF", 1);
-  thaw_scalar ('Long 8 bit utf8 data', "\xDF" x 256, 1);
+  print "# These seem to fail on 5.6 - you should seriously consider upgrading to 5.6.1\n" if $] == 5.006;
+  thaw_scalar ('Short 8 bit utf8 data', "\xDF");
+  thaw_scalar ('Long 8 bit utf8 data', "\xDF" x 256);
   thaw_scalar ('Short 24 bit utf8 data', chr 0xC0FFEE);
   thaw_scalar ('Long 24 bit utf8 data', chr (0xC0FFEE) x 256);
 } else {
@@ -214,7 +205,7 @@ if ($] >= 5.006) {
   thaw_scalar ('Long 24 bit utf8 data', $$bytes x 256);
 }
 
-if ($] > 5.007002) {
+if ($] >= 5.007003) {
   print "# We have utf8 hashes, so test that the utf8 hashes in <DATA> are valid\n";
   my $hash = thaw_hash ('Hash with utf8 keys', \%U_HASH);
   for (keys %$hash) {
@@ -385,126 +376,3 @@ D96%U%P/EGXX``````^6?CA<'4V-H;&_#GP(````&4V-H;&_?
 
 end
 
-begin 301 Locked hash
-8!049`0````$*!9FDDX6B!`````27A9F3
-
-end
-
-begin 301 Locked hash placeholder
-C!049`0````(.%`````69I).%H@H%F:23A:(`````!)>%F9,`
-
-end
-
-begin 301 Locked keys
-8!049`0````$*!9FDDX6B``````27A9F3
-
-end
-
-begin 301 Locked keys placeholder
-C!049`0````(.%`````69I).%H@H%F:23A:(`````!)>%F9,`
-
-end
-
-begin 301 Short 8 bit utf8 data
-&!047`HMS
-
-end
-
-begin 301 Short 8 bit utf8 data as bytes
-&!04*`HMS
-
-end
-
-begin 301 Long 8 bit utf8 data
-M!048```"`(MSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMS
-MBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+
-M<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMS
-MBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+
-M<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMS
-MBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+
-M<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMS
-MBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+
-M<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMS
-MBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+
-M<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMS
-8BW.+<XMSBW.+<XMSBW.+<XMSBW.+<XMS
-
-end
-
-begin 301 Short 24 bit utf8 data
-*!047!OM30G-S50``
-
-end
-
-begin 301 Short 24 bit utf8 data as bytes
-*!04*!OM30G-S50``
-
-end
-
-begin 301 Long 24 bit utf8 data
-M!048```&`/M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
-M5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M3
-M0G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S5?M30G-S
--5?M30G-S5?M30G-S50``
-
-end
-
-begin 301 Hash with utf8 flag but no utf8 keys
-8!049``````$*!9FDDX6B``````27A9F3
-
-end
-
-begin 301 Hash with utf8 keys
-M!049``````0*!X.(1Z.%@:0`````!X.(1Z.%@:0*!H.!HJ.3A0`````&@X&B
-FHY.%%P3<9')5`0````3<9')5%P?B@XB3EHMS`@````;B@XB3EM\`
-
-end
-
-begin 301 Locked hash with utf8 keys
-M!049`0````0*!X.(1Z.%@:0$````!X.(1Z.%@:0*!H.!HJ.3A00````&@X&B
-FHY.%%P3<9')5!0````3<9')5%P?B@XB3EHMS!@````;B@XB3EM\`
-
-end
-
-begin 301 Hash with utf8 keys for pre 5.6
-M!049``````0*!H.!HJ.3A0`````&@X&BHY.%"@B#B(M&HX6!I``````'@XA'
-GHX6!I`H'XH.(DY:+<P(````&XH.(DY;?"@3<9')5``````3<9')5
-
-end
-
-begin 301 Hash with utf8 keys for 5.6
-M!049``````0*!H.!HJ.3A0`````&@X&BHY.%"@>#B$>CA8&D``````>#B$>C
-FA8&D%P?B@XB3EHMS`@````;B@XB3EM\7!-QD<E4`````!-QD<E4`
-
-end

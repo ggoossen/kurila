@@ -50,10 +50,9 @@ chop $utf8;
 
 uuencode_it (\$utf8, "Short 8 bit utf8 data");
 
-my $utf8b = $utf8;
-utf8::encode ($utf8b);
+utf8::encode ($utf8);
 
-uuencode_it (\$utf8b, "Short 8 bit utf8 data as bytes");
+uuencode_it (\$utf8, "Short 8 bit utf8 data as bytes");
 
 $utf8 x= 256;
 
@@ -63,10 +62,9 @@ $utf8 = "\x{C0FFEE}";
 
 uuencode_it (\$utf8, "Short 24 bit utf8 data");
 
-$utf8b = $utf8;
-utf8::encode ($utf8b);
+utf8::encode ($utf8);
 
-uuencode_it (\$utf8b, "Short 24 bit utf8 data as bytes");
+uuencode_it (\$utf8, "Short 24 bit utf8 data as bytes");
 
 $utf8 x= 256;
 
@@ -81,8 +79,7 @@ uuencode_it (\%uhash, "Hash with utf8 flag but no utf8 keys");
 
 $utf8 = "Schlo\xdf" . chr 256;
 chop $utf8;
-my $a_circumflex = (ord ('A') == 193 ? "\x47" : "\xe5");
-%uhash = (map {$_, $_} 'castle', "ch${a_circumflex}teau", $utf8, "\x{57CE}");
+%uhash = (map {$_, $_} 'castle', "ch\xe5teau", $utf8, "\x{57CE}");
 
 uuencode_it (\%uhash, "Hash with utf8 keys");
 
