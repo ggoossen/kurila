@@ -10,8 +10,9 @@ BEGIN {
     }
 }
 
-use Test::More tests => 7;
+require "./test.pl";
 use Scalar::Util qw/tainted/;
+plan(tests => 5);
 
 
 use POSIX qw(fcntl_h open read mkfifo);
@@ -28,29 +29,19 @@ my $testfd;
 
 my $TAINT = substr($^X, 0, 0);
 
-# there is a bug in GUSI that causes problems trying to open
-# files and directories ... it is being fixed, this is just
-# a stopgap -- pudge
-my $file = $^O eq 'MacOS' ? 'TEST-OLD' : 'TEST';
+eval { mkfifo($TAINT. "TEST", 0) };
+ok($@ =~ /^Insecure dependency/,              'mkfifo with tainted data');
 
-eval { mkfifo($TAINT. $file, 0) };
-like($@, qr/^Insecure dependency/,              'mkfifo with tainted data');
+eval { $testfd = open($TAINT. "TEST", O_WRONLY, 0) };
+ok($@ =~ /^Insecure dependency/,              'open with tainted data');
 
-eval { $testfd = open($TAINT. $file, O_WRONLY, 0) };
-like($@, qr/^Insecure dependency/,              'open with tainted data');
-
-eval { $testfd = open($file, O_RDONLY, 0) };
-is($@, "",                                  'open with untainted data');
+eval { $testfd = open("TEST", O_RDONLY, 0) };
+ok($@ eq "",                                  'open with untainted data');
 
 read($testfd, $buffer, 2) if $testfd > 2;
 is( $buffer, "#!",	                          '    read' );
 ok(tainted($buffer),                          '    scalar tainted');
+read($testfd, $buffer[1], 2) if $testfd > 2;
 
-TODO: {
-    local $TODO = "POSIX::read won't taint an array element";
-
-    read($testfd, $buffer[1], 2) if $testfd > 2;
-
-    is( $buffer[1], "./",	                      '    read' );
-    ok(tainted($buffer[1]),                       '    array element tainted');
-}
+#is( $buffer[1], "./",	                      '    read' );
+#ok(tainted($buffer[1]),                       '    array element tainted');
