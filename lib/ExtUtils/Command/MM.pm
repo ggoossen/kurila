@@ -2,7 +2,7 @@ package ExtUtils::Command::MM;
 
 use strict;
 
-require 5.005_03;
+require 5.006;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT);
 @ISA = qw(Exporter);
@@ -34,24 +34,19 @@ Any $(FOO) used in the examples are make variables, not Perl.
 
 =item B<test_harness>
 
-  test_harness($verbose, @test_libs);
+  perl -MExtUtils::Command::MM -e "test_harness($(TEST_VERBOSE))" t/*.t
 
-Runs the tests on @ARGV via Test::Harness passing through the $verbose
-flag.  Any @test_libs will be unshifted onto the test's @INC.
+Runs the given tests via Test::Harness.  Will exit with non-zero if
+the test fails.
 
-@test_libs are run in alphabetical order.
+Typically used with t/*.t files.
 
 =cut
 
 sub test_harness {
     require Test::Harness;
-    require File::Spec;
-
     $Test::Harness::verbose = shift;
-
-    local @INC = @INC;
-    unshift @INC, map { File::Spec->rel2abs($_) } @_;
-    Test::Harness::runtests(sort { lc $a cmp lc $b } @ARGV);
+    Test::Harness::runtests(@ARGV);
 }
 
 =back

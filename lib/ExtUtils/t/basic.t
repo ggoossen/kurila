@@ -12,51 +12,20 @@ BEGIN {
         unshift @INC, 't/lib';
     }
 }
+$ENV{PERL_CORE} ? chdir '../lib/ExtUtils/t' : chdir 't';
 
 use strict;
-use Test::More tests => 17;
+use Test::More tests => 15;
 use MakeMaker::Test::Utils;
 use File::Spec;
 use TieOut;
 
-my $perl = which_perl();
-
-my $root_dir = 't';
-
-if( $^O eq 'VMS' ) {
-    # On older systems we might exceed the 8-level directory depth limit
-    # imposed by RMS.  We get around this with a rooted logical, but we
-    # can't create logical names with attributes in Perl, so we do it
-    # in a DCL subprocess and put it in the job table so the parent sees it.
-    open( BFDTMP, '>bfdtesttmp.com' ) || die "Error creating command file; $!";
-    print BFDTMP <<'COMMAND';
-$ IF F$TRNLNM("PERL_CORE") .EQS. "" .AND. F$TYPE(PERL_CORE) .EQS. ""
-$ THEN
-$!  building CPAN version
-$   BFD_TEST_ROOT = F$PARSE("SYS$DISK:[]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
-$ ELSE
-$!  we're in the core
-$   BFD_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
-$ ENDIF
-$ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED BFD_TEST_ROOT 'BFD_TEST_ROOT'
-COMMAND
-    close BFDTMP;
-
-    system '@bfdtesttmp.com';
-    END { 1 while unlink 'bfdtesttmp.com' }
-    $root_dir = 'BFD_TEST_ROOT:[t]';
-}
-
-chdir $root_dir;
-
-
+my $perl = which_perl;
 perl_lib;
-
-my $Touch_Time = calibrate_mtime();
 
 $| = 1;
 
-ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
+ok( chdir 'Big-Fat-Dummy', "chdir'd to Big-Fat-Dummy" ) ||
   diag("chdir failed: $!");
 
 my @mpl_out = `$perl Makefile.PL PREFIX=dummy-install`;
@@ -65,7 +34,7 @@ cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
 my $makefile = makefile_name();
-ok( grep(/^Writing $makefile for Big::Dummy/, 
+ok( grep(/^Writing $makefile for Big::Fat::Dummy/, 
          @mpl_out) == 1,
                                            'Makefile.PL output looks right');
 
@@ -75,21 +44,20 @@ ok( grep(/^Current package is: main$/,
 
 ok( -e $makefile,       'Makefile exists' );
 
-# -M is flakey on VMS
+# -M is flakey on VMS.
 my $mtime = (stat($makefile))[9];
-cmp_ok( $Touch_Time, '<=', $mtime,  '  its been touched' );
+ok( ($^T - $mtime) <= 0,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
 
+# Supress 'make manifest' noise
+open(SAVERR, ">&STDERR") || die $!;
+close(STDERR);
 my $make = make_run();
-
-{
-    # Supress 'make manifest' noise
-    local $ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
-    my $manifest_out = `$make manifest`;
-    ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
-    ok( -s 'MANIFEST',      '  its not empty' );
-}
+my $manifest_out = `$make manifest`;
+ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
+ok( -s 'MANIFEST',      '  its not empty' );
+open(STDERR, ">&SAVERR") || die $!;
 
 END { unlink 'MANIFEST'; }
 
@@ -107,25 +75,7 @@ is( $?, 0 );
 my $dist_test_out = `$make disttest`;
 is( $?, 0, 'disttest' ) || diag($dist_test_out);
 
-
-# Make sure init_dirscan doesn't go into the distdir
-@mpl_out = `$perl Makefile.PL "PREFIX=dummy-install"`;
-
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag(@mpl_out);
-
-ok( grep(/^Writing $makefile for Big::Dummy/, 
-         @mpl_out) == 1,
-                                'init_dirscan skipped distdir') || 
-  diag(@mpl_out);
-
-# I know we'll get ignored errors from make here, that's ok.
-# Send STDERR off to oblivion.
-open(SAVERR, ">&STDERR") or die $!;
-open(STDERR, ">".File::Spec->devnull) or die $!;
-
 my $realclean_out = `$make realclean`;
 is( $?, 0, 'realclean' ) || diag($realclean_out);
 
-open(STDERR, ">&SAVERR") or die $!;
 close SAVERR;

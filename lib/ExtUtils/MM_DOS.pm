@@ -5,14 +5,13 @@ use vars qw($VERSION @ISA);
 
 $VERSION = 0.01;
 
-require ExtUtils::MM_Any;
-require ExtUtils::MM_Unix;
-@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
+require ExtUtils::MM_Win32;
+@ISA = qw(ExtUtils::MM_Win32);
 
 
 =head1 NAME
 
-ExtUtils::MM_DOS - DOS specific subclass of ExtUtils::MM_Unix
+ExtUtils::MM_DOS - DOS specific subclass of ExtUtils::MM_Win32
 
 =head1 SYNOPSIS
 
@@ -21,10 +20,10 @@ ExtUtils::MM_DOS - DOS specific subclass of ExtUtils::MM_Unix
 
 =head1 DESCRIPTION
 
-This is a subclass of ExtUtils::MM_Unix which contains functionality
+This is a subclass of ExtUtils::MM_Win32 which contains functionality
 for DOS.
 
-Unless otherwise stated, it works just like ExtUtils::MM_Unix
+Unless otherwise stated, it works just like ExtUtils::MM_Win32
 
 =head2 Overridden methods
 
@@ -49,7 +48,6 @@ Michael G Schwern <schwern@pobox.com> with code from ExtUtils::MM_Unix
 
 =head1 SEE ALSO
 
-L<ExtUtils::MM_Unix>, L<ExtUtils::MakeMaker>
+L<ExtUtils::MM_Win32>, L<ExtUtils::MakeMaker>
 
-=cut
 1;
