@@ -177,9 +177,6 @@ You may not even need to write the module.  Check whether it's already
 been done in Perl, and avoid re-inventing the wheel unless you have a 
 good reason.
 
-Good places to look for pre-existing modules include
-http://search.cpan.org/ and asking on modules@perl.org
-
 If an existing module B<almost> does what you want, consider writing a
 patch, writing a subclass, or otherwise extending the existing module
 rather than rewriting it.
@@ -501,7 +498,7 @@ A contact email address for the author/maintainer
 The level of detail in Perl module documentation generally goes from
 less detailed to more detailed.  Your SYNOPSIS section should contain a
 minimal example of use (perhaps as little as one line of code; skip the
-unusual use cases or anything not needed by most users); the
+unusual use cases or or anything not needed by most users); the
 DESCRIPTION should describe your module in broad terms, generally in
 just a few paragraphs; more detail of the module's routines or methods,
 lengthy code examples, or other in-depth material should be given in 
@@ -591,20 +588,9 @@ using
 
     perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift)' 'Foo.pm'
 
-If you want to release a 'beta' or 'alpha' version of a module but
-don't want CPAN.pm to list it as most recent use an '_' after the
-regular version number followed by at least 2 digits, eg. 1.20_01. If
-you do this, the following idiom is recommended:
-
-  $VERSION = "1.12_01";
-  $XS_VERSION = $VERSION; # only needed if you have XS code
-  $VERSION = eval $VERSION;
-
-With that trick MakeMaker will only read the first line and thus read
-the underscore, while the perl interpreter will evaluate the $VERSION
-and convert the string into a number. Later operations that treat
-$VERSION as a number will then be able to do so without provoking a
-warning about $VERSION not being a number.
+If you want to release a 'beta' or 'alpha' version of a module but don't
+want CPAN.pm to list it as most recent use an '_' after the regular
+version number followed by at least 2 digits, eg. 1.20_01
 
 Never release anything (even a one-word documentation patch) without
 incrementing the number.  Even a one-word documentation patch should
