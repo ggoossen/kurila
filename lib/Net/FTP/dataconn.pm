@@ -5,11 +5,9 @@
 package Net::FTP::dataconn;
 
 use Carp;
-use vars qw(@ISA $timeout $VERSION);
+use vars qw(@ISA $timeout);
 use Net::Cmd;
-use Errno;
 
-$VERSION = '0.11';
 @ISA = qw(IO::Socket::INET);
 
 sub reading
@@ -75,34 +73,44 @@ sub close
  $ftp->status == CMD_OK;
 }
 
-sub _select {
- my ($data, $timeout, $do_read) = @_;
- my ($rin,$rout,$win,$wout,$tout,$nfound);
+sub _select
+{
+ my    $data 	= shift;
+ local *timeout = \$_[0]; shift;
+ my    $rw 	= shift;
 
- vec($rin='',fileno($data),1) = 1;
+ my($rin,$win);
 
- ($win, $rin) = ($rin, $win) unless $do_read;
+ return 1 unless $timeout;
 
- while (1) {
-   $nfound = select($rout=$rin, $wout=$win, undef, $tout=$timeout);
+ $rin = '';
+ vec($rin,fileno($data),1) = 1;
 
-   last if $nfound >= 0;
-   
-   croak "select: $!"
-     unless $!{EINTR};
- }
+ $win = $rw ? undef : $rin;
+ $rin = undef unless $rw;
 
- $nfound;
+ my $nfound = select($rin, $win, undef, $timeout);
+
+ croak "select: $!"
+	if $nfound < 0;
+
+ return $nfound;
 }
 
 sub can_read
 {
- _select(@_[0,1],1);
+ my    $data    = shift;
+ local *timeout = \$_[0];
+
+ $data->_select($timeout,1);
 }
 
 sub can_write
 {
- _select(@_[0,1],0);
+ my    $data    = shift;
+ local *timeout = \$_[0];
+
+ $data->_select($timeout,0);
 }
 
 sub cmd
@@ -110,12 +118,6 @@ sub cmd
  my $ftp = shift;
 
  ${*$ftp}{'net_ftp_cmd'};
-}
-
-sub bytes_read {
- my $ftp = shift;
-
- ${*$ftp}{'net_ftp_bytesread'} || 0;
 }
 
 1;

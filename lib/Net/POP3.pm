@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.23"; # $Id: //depot/libnet/Net/POP3.pm#22 $
+$VERSION = "2.21"; # $Id$
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -71,9 +71,19 @@ sub login
  @_ >= 1 && @_ <= 3 or croak 'usage: $pop3->login( USER, PASS )';
  my($me,$user,$pass) = @_;
 
- if (@_ <= 2) {
-   ($user, $pass) = $me->_lookup_credentials($user);
- }
+ if(@_ <= 2)
+  {
+   require Net::Netrc;
+
+   $user ||= eval { (getpwuid($>))[0] } || $ENV{NAME};
+
+   my $m = Net::Netrc->lookup(${*$me}{'net_pop3_host'},$user);
+
+   $m ||= Net::Netrc->lookup(${*$me}{'net_pop3_host'});
+
+   $pass = $m ? $m->password || ""
+              : "";
+  }
 
  $me->user($user) and
     $me->pass($pass);
@@ -84,30 +94,40 @@ sub apop
  @_ >= 1 && @_ <= 3 or croak 'usage: $pop3->apop( USER, PASS )';
  my($me,$user,$pass) = @_;
  my $banner;
- my $md;
 
- if (eval { local $SIG{__DIE__}; require Digest::MD5 }) {
-   $md = Digest::MD5->new();
- } elsif (eval { local $SIG{__DIE__}; require MD5 }) {
-   $md = MD5->new();
- } else {
-   carp "You need to install Digest::MD5 or MD5 to use the APOP command";
+ unless(eval { require MD5 })
+  {
+   carp "You need to install MD5 to use the APOP command";
    return undef;
- }
+  }
 
  return undef
    unless ( $banner = (${*$me}{'net_pop3_banner'} =~ /(<.*>)/)[0] );
 
- if (@_ <= 2) {
-   ($user, $pass) = $me->_lookup_credentials($user);
- }
+ if(@_ <= 2)
+  {
+   require Net::Netrc;
 
+   $user ||= eval { (getpwuid($>))[0] } || $ENV{NAME};
+
+   my $m = Net::Netrc->lookup(${*$me}{'net_pop3_host'},$user);
+
+   $m ||= Net::Netrc->lookup(${*$me}{'net_pop3_host'});
+
+   $pass = $m ? $m->password || ""
+              : "";
+  }
+
+ my $md = new MD5;
  $md->add($banner,$pass);
 
  return undef
     unless($me->_APOP($user,$md->hexdigest));
 
- $me->_get_mailbox_count();
+ my $ret = ${*$me}{'net_pop3_count'} = ($me->message =~ /(\d+)\s+message/io)
+	? $1 : ($me->popstat)[0];
+
+ $ret ? $ret : "0E0";
 }
 
 sub user
@@ -125,7 +145,10 @@ sub pass
  return undef
    unless($me->_PASS($pass));
 
- $me->_get_mailbox_count();
+ my $ret = ${*$me}{'net_pop3_count'} = ($me->message =~ /(\d+)\s+message/io)
+	? $1 : ($me->popstat)[0];
+
+ $ret ? $ret : "0E0";
 }
 
 sub reset
@@ -136,7 +159,7 @@ sub reset
 
  return 0 
    unless($me->_RSET);
-
+  
  if(defined ${*$me}{'net_pop3_mail'})
   {
    local $_;
@@ -192,7 +215,7 @@ sub list
    $me->message =~ /\d+\D+(\d+)/;
    return $1 || undef;
   }
-
+ 
  my $info = $me->read_until_dot
 	or return undef;
 
@@ -211,17 +234,6 @@ sub get
 
  $me->read_until_dot(@_);
 }
-
-sub getfh
-{
- @_ == 2 or croak 'usage: $pop3->getfh( MSGNUM )';
- my $me = shift;
-
- return unless $me->_RETR(shift);
- return        $me->tied_fh;
-}
-
-
 
 sub delete
 {
@@ -265,34 +277,7 @@ sub ping
  ($1 || 0, $2 || 0);
 }
 
-sub _lookup_credentials
-{
-  my ($me, $user) = @_;
-
-  require Net::Netrc;
-
-  $user ||= eval { local $SIG{__DIE__}; (getpwuid($>))[0] } ||
-    $ENV{NAME} || $ENV{USER} || $ENV{LOGNAME};
-
-  my $m = Net::Netrc->lookup(${*$me}{'net_pop3_host'},$user);
-  $m ||= Net::Netrc->lookup(${*$me}{'net_pop3_host'});
-
-  my $pass = $m ? $m->password || ""
-                : "";
-
-  ($user, $pass);
-}
-
-sub _get_mailbox_count
-{
-  my ($me) = @_;
-  my $ret = ${*$me}{'net_pop3_count'} = ($me->message =~ /(\d+)\s+message/io)
-	  ? $1 : ($me->popstat)[0];
-
-  $ret ? $ret : "0E0";
-}
-
-
+ 
 sub _STAT { shift->command('STAT')->response() == CMD_OK }
 sub _LIST { shift->command('LIST',@_)->response() == CMD_OK }
 sub _RETR { shift->command('RETR',$_[0])->response() == CMD_OK }
@@ -363,12 +348,12 @@ __END__
 
 =head1 NAME
 
-Net::POP3 - Post Office Protocol 3 Client class (RFC1939)
+Net::POP3 - Post Office Protocol 3 Client class (RFC1081)
 
 =head1 SYNOPSIS
 
     use Net::POP3;
-
+    
     # Constructors
     $pop = Net::POP3->new('pop3host');
     $pop = Net::POP3->new('pop3host', Timeout => 60);
@@ -377,7 +362,7 @@ Net::POP3 - Post Office Protocol 3 Client class (RFC1939)
 
 This module implements a client interface to the POP3 protocol, enabling
 a perl5 application to talk to POP3 servers. This documentation assumes
-that you are familiar with the POP3 protocol described in RFC1939.
+that you are familiar with the POP3 protocol described in RFC1081.
 
 A new Net::POP3 object must be created with the I<new> method. Once
 this has been done, all POP3 commands are accessed via method calls
@@ -432,7 +417,7 @@ Send the PASS command. Returns the number of messages in the mailbox.
 
 =item login ( [ USER [, PASS ]] )
 
-Send both the USER and PASS commands. If C<PASS> is not given the
+Send both the the USER and PASS commands. If C<PASS> is not given the
 C<Net::POP3> uses C<Net::Netrc> to lookup the password using the host
 and username. If the username is not specified then the current user name
 will be used.
@@ -443,13 +428,14 @@ will give a true value in a boolean context, but zero in a numeric context.
 
 If there was an error authenticating the user then I<undef> will be returned.
 
-=item apop ( [ USER [, PASS ]] )
+=item apop ( USER, PASS )
 
 Authenticate with the server identifying as C<USER> with password C<PASS>.
-Similar to L</login>, but the password is not sent in clear text.
+Similar ti L<login>, but the password is not sent in clear text. 
 
-To use this method you must have the Digest::MD5 or the MD5 module installed,
-otherwise this method will return I<undef>.
+To use this method you must have the MD5 package installed, if you do not
+this method will return I<undef>
+
 
 =item top ( MSGNUM [, NUMLINES ] )
 
@@ -472,12 +458,6 @@ Get the message C<MSGNUM> from the remote mailbox. If C<FH> is not given
 then get returns a reference to an array which contains the lines of
 text read from the server. If C<FH> is given then the lines returned
 from the server are printed to the filehandle C<FH>.
-
-=item getfh ( MSGNUM )
-
-As per get(), but returns a tied filehandle.  Reading from this
-filehandle returns the requested message.  The filehandle will return
-EOF at the end of the message and should not be reused.
 
 =item last ()
 
@@ -525,7 +505,7 @@ means that any messages marked to be deleted will not be.
 
 =head1 SEE ALSO
 
-L<Net::Netrc>,
+L<Net::Netrc>
 L<Net::Cmd>
 
 =head1 AUTHOR
@@ -537,9 +517,5 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=for html <hr>
-
-I<$Id: //depot/libnet/Net/POP3.pm#22 $>
 
 =cut

@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.24"; # $Id: //depot/libnet/Net/SMTP.pm#25 $
+$VERSION = "2.15"; # $Id$
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -34,8 +34,6 @@ sub new
   {
    $obj = $type->SUPER::new(PeerAddr => ($host = $h), 
 			    PeerPort => $arg{Port} || 'smtp(25)',
-			    LocalAddr => $arg{LocalAddr},
-			    LocalPort => $arg{LocalPort},
 			    Proto    => 'tcp',
 			    Timeout  => defined $arg{Timeout}
 						? $arg{Timeout}
@@ -94,58 +92,15 @@ sub etrn {
 	$self->_ETRN(@_);
 }
 
-sub auth {
-    my ($self, $username, $password) = @_;
-
-    require MIME::Base64;
-    require Authen::SASL;
-
-    my $mechanisms = $self->supports('AUTH',500,["Command unknown: 'AUTH'"]);
-    return unless defined $mechanisms;
-
-    my $sasl;
-
-    if (ref($username) and UNIVERSAL::isa($username,'Authen::SASL')) {
-      $sasl = $username;
-      $sasl->mechanism($mechanisms);
-    }
-    else {
-      die "auth(username, password)" if not length $username;
-      $sasl = Authen::SASL->new(mechanism=> $mechanisms,
-				callback => { user => $username,
-                                              pass => $password,
-					      authname => $username,
-                                            });
-    }
-
-    # We should probably allow the user to pass the host, but I don't
-    # currently know and SASL mechanisms that are used by smtp that need it
-    my $client = $sasl->client_new('smtp',${*$self}{'net_smtp_host'},0);
-    my $str    = $client->client_start;
-    # We dont support sasl mechanisms that encrypt the socket traffic.
-    # todo that we would really need to change the ISA hierarchy
-    # so we dont inherit from IO::Socket, but instead hold it in an attribute
-
-    my @cmd = ("AUTH", $client->mechanism, MIME::Base64::encode_base64($str,''));
-    my $code;
-
-    while (($code = $self->command(@cmd)->response()) == CMD_MORE) {
-      @cmd = (MIME::Base64::encode_base64(
-	$client->client_step(
-	  MIME::Base64::decode_base64(
-	    ($self->message)[0]
-	  )
-	), ''
-      ));
-    }
-
-    $code == CMD_OK;
-}
-
 sub hello
 {
  my $me = shift;
- my $domain = shift || "localhost.localdomain";
+ my $domain = shift ||
+	      eval {
+		    require Net::Domain;
+		    Net::Domain::hostfqdn();
+		   } ||
+		"";
  my $ok = $me->_EHLO($domain);
  my @msg = $me->message;
 
@@ -154,8 +109,8 @@ sub hello
    my $h = ${*$me}{'net_smtp_esmtp'} = {};
    my $ln;
    foreach $ln (@msg) {
-     $h->{uc $1} = $2
-	if $ln =~ /(\w+)\b[= \t]*([^\n]*)/;
+     $h->{$1} = $2
+	if $ln =~ /(\S+)\b[ \t]*([^\n]*)/;
     }
   }
  elsif($me->status == CMD_ERROR) 
@@ -164,7 +119,7 @@ sub hello
 	if $ok = $me->_HELO($domain);
   }
 
- $ok && $msg[0] =~ /\A\s*(\S+)/
+ $ok && $msg[0] =~ /\A(\S+)/
 	? $1
 	: undef;
 }
@@ -179,12 +134,19 @@ sub supports {
     return;
 }
 
-sub _addr {
-  my $addr = shift;
-  $addr = "" unless defined $addr;
-  $addr =~ s/^\s*<?\s*|\s*>?\s*$//sg;
-  "<$addr>";
+sub _addr
+{
+ my $addr = shift || "";
+
+ return $1
+    if $addr =~ /(<[^>]+>)/so;
+
+ $addr =~ s/\n/ /sog;
+ $addr =~ s/(\A\s+|\s+\Z)//sog;
+
+ return "<" . $addr . ">";
 }
+
 
 sub mail
 {
@@ -346,11 +308,7 @@ sub recipient
  return $skip_bad ? @ok : 1;
 }
 
-BEGIN {
-  *to  = \&recipient;
-  *cc  = \&recipient;
-  *bcc = \&recipient;
-}
+sub to { shift->recipient(@_) }
 
 sub data
 {
@@ -360,12 +318,6 @@ sub data
 
  $ok && @_ ? $me->dataend
 	   : $ok;
-}
-
-sub datafh {
-  my $me = shift;
-  return unless $me->_DATA();
-  return $me->tied_fh;
 }
 
 sub expand
@@ -420,7 +372,6 @@ sub _QUIT { shift->command("QUIT")->response()	    == CMD_OK }
 sub _DATA { shift->command("DATA")->response()	    == CMD_MORE } 
 sub _TURN { shift->unsupported(@_); } 			   	  
 sub _ETRN { shift->command("ETRN", @_)->response()  == CMD_OK }
-sub _AUTH { shift->command("AUTH", @_)->response()  == CMD_OK }   
 
 1;
 
@@ -433,7 +384,7 @@ Net::SMTP - Simple Mail Transfer Protocol Client
 =head1 SYNOPSIS
 
     use Net::SMTP;
-
+    
     # Constructors
     $smtp = Net::SMTP->new('mailhost');
     $smtp = Net::SMTP->new('mailhost', Timeout => 60);
@@ -455,9 +406,9 @@ The Net::SMTP class is a subclass of Net::Cmd and IO::Socket::INET.
 This example prints the mail domain name of the SMTP server known as mailhost:
 
     #!/usr/local/bin/perl -w
-
+    
     use Net::SMTP;
-
+    
     $smtp = Net::SMTP->new('mailhost');
     print $smtp->domain,"\n";
     $smtp->quit;
@@ -466,20 +417,20 @@ This example sends a small message to the postmaster at the SMTP server
 known as mailhost:
 
     #!/usr/local/bin/perl -w
-
+    
     use Net::SMTP;
-
+    
     $smtp = Net::SMTP->new('mailhost');
-
+    
     $smtp->mail($ENV{USER});
     $smtp->to('postmaster');
-
+    
     $smtp->data();
     $smtp->datasend("To: postmaster\n");
     $smtp->datasend("\n");
     $smtp->datasend("A simple test message\n");
     $smtp->dataend();
-
+    
     $smtp->quit;
 
 =head1 CONSTRUCTOR
@@ -489,7 +440,7 @@ known as mailhost:
 =item new Net::SMTP [ HOST, ] [ OPTIONS ]
 
 This is the constructor for a new Net::SMTP object. C<HOST> is the
-name of the remote host to which an SMTP connection is required.
+name of the remote host to which a SMTP connection is required.
 
 If C<HOST> is not given, then the C<SMTP_Host> specified in C<Net::Config>
 will be used.
@@ -500,9 +451,6 @@ Possible options are:
 B<Hello> - SMTP requires that you identify yourself. This option
 specifies a string to pass as your mail domain. If not
 given a guess will be taken.
-
-B<LocalAddr> and B<LocalPort> - These parameters are passed directly
-to IO::Socket to allow binding the socket to a local port.
 
 B<Timeout> - Maximum time, in seconds, to wait for a response from the
 SMTP server (default: 120)
@@ -518,8 +466,6 @@ Example:
 			   Timeout => 30,
                            Debug   => 1,
 			  );
-
-=back
 
 =head1 METHODS
 
@@ -550,10 +496,6 @@ normally not have to call it manually.
 =item etrn ( DOMAIN )
 
 Request a queue run for the DOMAIN given.
-
-=item auth ( USERNAME, PASSWORD )
-
-Attempt SASL authentication.
 
 =item mail ( ADDRESS [, OPTIONS] )
 
@@ -602,17 +544,9 @@ If C<SkipBad> is true the C<recipient> will not return an error when a
 bad address is encountered and it will return an array of addresses
 that did succeed.
 
-  $smtp->recipient($recipient1,$recipient2);  # Good
-  $smtp->recipient($recipient1,$recipient2, { SkipBad => 1 });  # Good
-  $smtp->recipient("$recipient,$recipient2"); # BAD   
-
 =item to ( ADDRESS [, ADDRESS [...]] )
 
-=item cc ( ADDRESS [, ADDRESS [...]] )
-
-=item bcc ( ADDRESS [, ADDRESS [...]] )
-
-Synonyms for C<recipient>.
+A synonym for C<recipient>.
 
 =item data ( [ DATA ] )
 
@@ -645,15 +579,6 @@ Send the QUIT command to the remote SMTP server and close the socket connection.
 
 =back
 
-=head1 ADDRESSES
-
-All methods that accept addresses expect the address to be a valid rfc2821-quoted address, although
-Net::SMTP will accept accept the address surrounded by angle brackets.
-
- funny user@domain      WRONG
- "funny user"@domain    RIGHT, recommended
- <"funny user"@domain>  OK
-
 =head1 SEE ALSO
 
 L<Net::Cmd>
@@ -667,9 +592,5 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=for html <hr>
-
-I<$Id: //depot/libnet/Net/SMTP.pm#25 $>
 
 =cut

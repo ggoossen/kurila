@@ -1,4 +1,4 @@
-## $Id: //depot/libnet/Net/FTP/I.pm#13 $
+##
 ## Package to read/write on BINARY data connections
 ##
 
@@ -10,7 +10,7 @@ use Carp;
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
-$VERSION = "1.12"; 
+$VERSION = "1.08"; # $Id: //depot/libnet/Net/FTP/I.pm#6$
 
 sub read {
   my    $data 	 = shift;
@@ -18,28 +18,25 @@ sub read {
   my    $size    = shift || croak 'read($buf,$size,[$timeout])';
   my    $timeout = @_ ? shift : $data->timeout;
 
-  my $n;
+  $data->can_read($timeout) or
+	 croak "Timeout";
 
-  if ($size > length ${*$data} and !${*$data}{'net_ftp_eof'}) {
-    $data->can_read($timeout) or
-	   croak "Timeout";
+  my($b,$n,$l);
+  my $blksize = ${*$data}{'net_ftp_blksize'};
+  $blksize = $size if $size > $blksize;
 
-    my $blksize = ${*$data}{'net_ftp_blksize'};
-    $blksize = $size if $size > $blksize;
-
-    unless ($n = sysread($data, ${*$data}, $blksize, length ${*$data})) {
-      return undef unless defined $n;
-      ${*$data}{'net_ftp_eof'} = 1;
-    }
+  while(($l = length(${*$data})) < $size) {
+   $n += ($b = sysread($data, ${*$data}, $blksize, $l));
+   last unless $b;
   }
 
-  $buf = substr(${*$data},0,$size);
+  $n = $size < ($l = length(${*$data})) ? $size : $l;
 
-  $n = length($buf);
-
+  $buf = substr(${*$data},0,$n);
   substr(${*$data},0,$n) = '';
 
-  ${*$data}{'net_ftp_bytesread'} += $n;
+  ${*$data}{'net_ftp_bytesread'} += $n if $n;
+  ${*$data}{'net_ftp_eof'} = 1 unless $n;
 
   $n;
 }
@@ -50,19 +47,18 @@ sub write {
   my    $size    = shift || croak 'write($buf,$size,[$timeout])';
   my    $timeout = @_ ? shift : $data->timeout;
 
+  $data->can_write($timeout) or
+	 croak "Timeout";
+
   # If the remote server has closed the connection we will be signal'd
   # when we write. This can happen if the disk on the remote server fills up
 
-  local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+  local $SIG{PIPE} = 'IGNORE';
   my $sent = $size;
   my $off = 0;
 
-  my $blksize = ${*$data}{'net_ftp_blksize'};
   while($sent > 0) {
-    $data->can_write($timeout) or
-	 croak "Timeout";
-
-    my $n = syswrite($data, $buf, $sent > $blksize ? $blksize : $sent ,$off);
+    my $n = syswrite($data, $buf, $sent,$off);
     return undef unless defined($n);
     $sent -= $n;
     $off += $n;

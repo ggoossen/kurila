@@ -1,18 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    unless (-d 'blib') {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-    if (!eval "require Socket") {
-	print "1..0 # no Socket\n"; exit 0;
-    }
-    if (ord('A') == 193 && !eval "require Convert::EBCDIC") {
-        print "1..0 # EBCDIC but no Convert::EBCDIC\n"; exit 0;
-    }
-}
-
 use Net::Config;
 use Net::FTP;
 
@@ -24,7 +11,7 @@ unless(defined($NetConfig{ftp_testhost}) && $NetConfig{test_hosts}) {
 my $t = 1;
 print "1..7\n";
 
-$ftp = Net::FTP->new($NetConfig{ftp_testhost})
+$ftp = Net::FTP->new($NetConfig{ftp_testhost}, Debug => 0)
 	or (print("not ok 1\n"), exit);
 
 printf "ok %d\n",$t++;
@@ -59,10 +46,10 @@ if ($data = $ftp->stor('libnet.tst')) {
   
 }
 else {
-  print "# ",$ftp->message,"\n";
-  printf "ok %d\n",$t++;
-  printf "ok %d\n",$t++;
-  printf "ok %d\n",$t++;
+  print STDERR $ftp->message,"\n";
+  printf "not ok %d\n",$t++;
+  printf "not ok %d\n",$t++;
+  printf "not ok %d\n",$t++;
 }
 
 $ftp->quit  or do {
