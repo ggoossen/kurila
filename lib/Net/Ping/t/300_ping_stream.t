@@ -1,20 +1,12 @@
 BEGIN {
-  if ($ENV{PERL_CORE}) {
-    unless ($ENV{PERL_TEST_Net_Ping}) {
-      print "1..0 # Skip: network dependent test\n";
-        exit;
+    if ($ENV{PERL_CORE}) {
+	unless ($ENV{PERL_TEST_Net_Ping}) {
+	    print "1..0 # Skip: network dependent test\n";
+	    exit;
+	}
+	chdir 't' if -d 't';
+	@INC = qw(../lib);
     }
-    chdir 't' if -d 't';
-    @INC = qw(../lib);
-  }
-  unless (eval "require Socket") {
-    print "1..0 \# Skip: no Socket\n";
-    exit;
-  }
-  unless (getservbyname('echo', 'udp')) {
-    print "1..0 \# Skip: no echo port\n";
-    exit;
-  }
 }
 
 # Test of stream protocol using loopback interface.
@@ -61,8 +53,3 @@ service echo
         server                  = /bin/cat
         disable                 = no
 }
-
-Or if you are using inetd, before restarting, add
-this line to your /etc/inetd.conf:
-
-echo   stream  tcp     nowait  root    internal
