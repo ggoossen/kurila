@@ -1,15 +1,12 @@
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
-        chdir 't';
-        unshift @INC, '../lib';
-    }
+    chdir 't' if -d 't';
+    @INC = '../lib';
     require Config; import Config;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
 }
-use strict;
 use Test;
 use Encode qw(from_to encode decode
 	      encode_utf8 decode_utf8
@@ -115,7 +112,7 @@ for my $i (256,128,129,256)
  }
 
 # Spot check a few points in/out of utf8
-for my $i (ord('A'),128,256,0x20AC)
+for my $i (0x41,128,256,0x20AC)
  {
   my $c = chr($i);
   my $o = encode_utf8($c);
@@ -137,4 +134,7 @@ ok(  is_utf8($a));
 $a = "\x{100}";
 chop $a;
 ok(  is_utf8($a)); # weird but true: an empty UTF-8 string
+
+
+
 
