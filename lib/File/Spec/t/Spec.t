@@ -3,9 +3,6 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    if ($^O eq 'MacOS') {
-	push @INC, "::lib:$MacPerl::Architecture";
-    }
 }
 # Grab all of the plain routines from File::Spec
 use File::Spec @File::Spec::EXPORT_OK ;
@@ -40,6 +37,7 @@ require File::Spec::Mac ;
 # tests are skipped on other OSs
 my $root;
 if ($^O eq 'MacOS') {
+	push @INC, "::lib:$MacPerl::Architecture";
 	$root = File::Spec::Mac->rootdir();
 }
 
