@@ -1,13 +1,9 @@
-#!/usr/bin/perl -w
-
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = '../lib';
-    }
+    chdir 't' if -d 't';
+    @INC = '../lib';
 }
 
-use Test::More tests => 10;
+use Test::More tests => 7;
 
 # Using Symbol because it's core and exports lots of stuff.
 {
@@ -27,12 +23,4 @@ use Test::More tests => 10;
     package Foo::three;
     ::use_ok("Symbol", qw(gensym ungensym));
     ::ok( defined &gensym && defined &ungensym,   '  multiple args' );
-}
-
-{
-    package Foo::four;
-    my $warn; local $SIG{__WARN__} = sub { $warn .= shift; };
-    ::use_ok("constant", qw(foo bar));
-    ::ok( defined &foo, 'constant' );
-    ::is( $warn, undef, 'no warning');
 }

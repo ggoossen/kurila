@@ -1,11 +1,9 @@
-use Test::Builder;
-
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = '../lib';
-    }
+    chdir 't' if -d 't';
+    @INC = '../lib';
 }
+
+use Test::Builder;
 
 BEGIN {
     my $t = Test::Builder->new;
