@@ -1,11 +1,10 @@
 package bigint;
 require 5.005;
 
-$VERSION = '0.03';
+$VERSION = '0.02';
 use Exporter;
-@ISA		= qw( Exporter );
-@EXPORT_OK	= qw( ); 
-@EXPORT		= qw( inf NaN ); 
+@ISA =       qw( Exporter );
+@EXPORT_OK = qw( ); 
 
 use strict;
 use overload;
@@ -146,6 +145,7 @@ sub import
   if ($trace)
     {
     require Math::BigInt::Trace; $class = 'Math::BigInt::Trace';
+    print STDERR "Loading $class";
     }
   else
     {
@@ -180,12 +180,7 @@ sub import
   # we take care of floating point constants, since BigFloat isn't available
   # and BigInt doesn't like them:
   overload::constant float => sub { Math::BigInt->new( _constant(shift) ); };
-
-  $self->export_to_level(1,$self,@a);           # export inf and NaN
   }
-
-sub inf () { Math::BigInt->binf(); }
-sub NaN () { Math::BigInt->bnan(); }
 
 1;
 
@@ -193,16 +188,14 @@ __END__
 
 =head1 NAME
 
-bigint - Transparent BigInteger support for Perl
+bigint - Transparent big integer support for Perl
 
 =head1 SYNOPSIS
 
   use bignt;
 
   $x = 2 + 4.5,"\n";			# BigInt 6
-  print 2 ** 512,"\n";			# really is what you think it is
-  print inf + 42,"\n";			# inf
-  print NaN * 7,"\n";			# NaN
+  print 2 ** 512;			# really is what you think it is
 
 =head1 DESCRIPTION
 

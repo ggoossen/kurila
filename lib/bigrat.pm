@@ -1,11 +1,10 @@
 package bigrat;
 require 5.005;
 
-$VERSION = '0.05';
+$VERSION = '0.04';
 use Exporter;
-@ISA		= qw( Exporter );
-@EXPORT_OK	= qw( ); 
-@EXPORT		= qw( inf NaN ); 
+@ISA =       qw( Exporter );
+@EXPORT_OK = qw( ); 
 
 use strict;
 
@@ -108,6 +107,7 @@ sub import
     {
     require Math::BigInt::Trace; $class = 'Math::BigInt::Trace';
     $upgrade = 'Math::BigFloat::Trace';
+    print STDERR "Loading $class";
     }
   else
     {
@@ -142,11 +142,7 @@ sub import
     print "Math::BigRat\t\t v$Math::BigRat::VERSION\n";
     exit;
     }
-  $self->export_to_level(1,$self,@a);           # export inf and NaN
   }
-
-sub inf () { Math::BigInt->binf(); }
-sub NaN () { Math::BigInt->bnan(); }
 
 1;
 
