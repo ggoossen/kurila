@@ -1,25 +1,22 @@
 package Thread;
 
-use strict;
-
-our($VERSION, $ithreads, $othreads);
+$VERSION = '2.00';
 
 BEGIN {
-    $VERSION = '2.00';
     use Config;
-    $ithreads = $Config{useithreads};
-    $othreads = $Config{use5005threads};
+    our $ithreads = $Config{useithreads};
+    our $othreads = $Config{use5005threads};
 }
 
 require Exporter;
 use XSLoader ();
-our(@ISA, @EXPORT, @EXPORT_OK);
+our($VERSION, @ISA, @EXPORT);
 
 @ISA = qw(Exporter);
 
 BEGIN {
     if ($ithreads) {
-	@EXPORT = qw(cond_wait cond_broadcast cond_signal)
+	@EXPORT = qw(share cond_wait cond_broadcast cond_signal unlock)
     } elsif ($othreads) {
 	@EXPORT_OK = qw(cond_signal cond_broadcast cond_wait);
     }
@@ -28,7 +25,7 @@ BEGIN {
 
 =head1 NAME
 
-Thread - manipulate threads in Perl (for old code only)
+Thread - manipulate threads in Perl
 
 =head1 CAVEAT
 
@@ -50,23 +47,14 @@ In Perl 5.8 the ithreads model became available through the C<threads>
 module.
 
 Neither model is configured by default into Perl (except, as mentioned
-above, in Win32 ithreads are always available.)  You can see your
-Perl's threading configuration by running C<perl -V> and looking for
-the I<use...threads> variables, or inside script by C<use Config;>
-and testing for C<$Config{use5005threads}> and C<$Config{useithreads}>.
+above, in Win32 ithreads are always available.)
 
-For old code and interim backwards compatibility, the Thread module
-has been reworked to function as a frontend for both 5005threads and
-ithreads.
-
+For backwards compatibility, the Thread module has been reworked
+to function as a frontend for both 5005threads and ithreads.
 Note that the compatibility is not complete: because the data sharing
 models are directly opposed, anything to do with data sharing has to
 be thought differently.  With the ithreads you must explicitly share()
 variables between the threads.
-
-For new code the use of the C<Thread> module is discouraged and
-the direct use of the C<threads> and C<threads::shared> modules
-is encouraged instead.
 
 Finally, note that there are many known serious problems with the
 5005threads, one of the least of which is that regular expression
@@ -107,6 +95,8 @@ use ithreads instead.
 
     my @list = Thread->list;	# not available with ithreads
 
+    unlock(...);	# not available with the 5.005 threads
+
     use Thread 'async';
 
 =head1 DESCRIPTION
@@ -130,7 +120,8 @@ thread.
 
 =item lock VARIABLE
 
-C<lock> places a lock on a variable until the lock goes out of scope.
+C<lock> places a lock on a variable until the lock goes out of scope
+(with ithreads you can also explicitly unlock()).
 
 If the variable is locked by another thread, the C<lock> call will
 block until it's available.  C<lock> is recursive, so multiple calls
@@ -303,34 +294,27 @@ sub unimplemented {
 
 sub unimplement {
     for my $m (@_) {
-	no strict 'refs';
 	*{"Thread::$m"} = sub { unimplemented $m };
     }
 }
 
 BEGIN {
     if ($ithreads) {
-	if ($othreads) {
-	    require Carp;
-	    Carp::croak("This Perl has both ithreads and 5005threads (serious malconfiguration)");
-	}
 	XSLoader::load 'threads';
-	for my $m (qw(new join detach yield self tid equal list)) {
-	    no strict 'refs';
+	for my $m (qw(new join detach yield self tid equal)) {
 	    *{"Thread::$m"} = \&{"threads::$m"};
 	}
-	require 'threads/shared.pm';
-	for my $m (qw(cond_signal cond_broadcast cond_wait)) {
-	    no strict 'refs';
+	XSLoader::load 'threads::shared';
+	for my $m (qw(cond_signal cond_broadcast cond_wait unlock share)) {
 	    *{"Thread::$m"} = \&{"threads::shared::${m}_enabled"};
 	}
-	# trying to unimplement eval gives redefined warning
-	unimplement(qw(done flags));
+	unimplement(qw(list done eval flags));
     } elsif ($othreads) {
 	XSLoader::load 'Thread';
+	unimplement(qw(unlock));
     } else {
 	require Carp;
-	Carp::croak("This Perl has neither ithreads nor 5005threads");
+	Carp::croak("This Perl has neither ithreads not 5005threads");
     }
 }
 
