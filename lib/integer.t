@@ -1,10 +1,3 @@
-#!./perl
-
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use integer;
 
 use Test::More tests => 11;
@@ -50,4 +43,4 @@ SKIP: {
     }
 }
 
-is(~0, -1, "signed instead of unsigned");
+is(~0, -1, "unsigned");

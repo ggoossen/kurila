@@ -1,24 +1,19 @@
 #!./perl -T
 
 
-my %Expect_File = (); # what we expect for $_
+my %Expect_File = (); # what we expect for $_ 
 my %Expect_Name = (); # what we expect for $File::Find::name/fullname
 my %Expect_Dir  = (); # what we expect for $File::Find::dir
 my ($cwd, $cwd_untainted);
 
+use Config;
 
 BEGIN {
     chdir 't' if -d 't';
     unshift @INC => '../lib';
-}
 
-use Config;
-
-BEGIN {
-    if ($^O ne 'VMS') {
-	for (keys %ENV) { # untaint ENV
-	    ($ENV{$_}) = $ENV{$_} =~ /(.*)/;
-	}
+    for (keys %ENV) { # untaint ENV
+	($ENV{$_}) = $ENV{$_} =~ /(.*)/;
     }
 
     # Remove insecure directories from PATH
@@ -49,15 +44,15 @@ use Cwd;
 cleanup();
 
 my $found;
-find({wanted => sub { $found = 1 if ($_ eq 'commonsense.t') },
+find({wanted => sub { $found = 1 if ($_ eq 'commonsense.t') }, 
 		untaint => 1, untaint_pattern => qr|^(.+)$|}, File::Spec->curdir);
-
+  
 ok($found, 'commonsense.t found');
 $found = 0;
-
+  
 finddepth({wanted => sub { $found = 1 if $_ eq 'commonsense.t'; },
            untaint => 1, untaint_pattern => qr|^(.+)$|}, File::Spec->curdir);
-
+  
 ok($found, 'commonsense.t found again');
 
 my $case = 2;
@@ -68,23 +63,21 @@ sub cleanup {
         chdir(dir_path('for_find'));
     }
     if (-d dir_path('fa')) {
-	unlink file_path('fa', 'fa_ord'),
-	       file_path('fa', 'fsl'),
-	       file_path('fa', 'faa', 'faa_ord'),
-	       file_path('fa', 'fab', 'fab_ord'),
-	       file_path('fa', 'fab', 'faba', 'faba_ord'),
-	       file_path('fb', 'fb_ord'),
-	       file_path('fb', 'fba', 'fba_ord');
-	rmdir dir_path('fa', 'faa');
-	rmdir dir_path('fa', 'fab', 'faba');
-	rmdir dir_path('fa', 'fab');
-	rmdir dir_path('fa');
-	rmdir dir_path('fb', 'fba');
-	rmdir dir_path('fb');
-    }
-    chdir File::Spec->updir;
-    if (-d dir_path('for_find')) {
-	rmdir dir_path('for_find') or print "# Can't rmdir for_find: $!\n";
+        unlink file_path('fa', 'fa_ord'),
+               file_path('fa', 'fsl'),
+               file_path('fa', 'faa', 'faa_ord'),
+               file_path('fa', 'fab', 'fab_ord'),
+               file_path('fa', 'fab', 'faba', 'faba_ord'),
+               file_path('fb', 'fb_ord'),
+               file_path('fb', 'fba', 'fba_ord');
+        rmdir dir_path('fa', 'faa');
+        rmdir dir_path('fa', 'fab', 'faba');
+        rmdir dir_path('fa', 'fab');
+        rmdir dir_path('fa');
+        rmdir dir_path('fb', 'fba');
+        rmdir dir_path('fb');
+        chdir File::Spec->updir;
+        rmdir dir_path('for_find');
     }
 }
 
@@ -106,10 +99,10 @@ sub wanted_File_Dir {
     s#\.$## if ($^O eq 'VMS' && $_ ne '.');
 	ok( $Expect_File{$_}, "Expected and found $File::Find::name" );
     if ( $FastFileTests_OK ) {
-        delete $Expect_File{ $_}
+        delete $Expect_File{ $_} 
           unless ( $Expect_Dir{$_} && ! -d _ );
     } else {
-        delete $Expect_File{$_}
+        delete $Expect_File{$_} 
           unless ( $Expect_Dir{$_} && ! -d $_ );
     }
 }
@@ -129,26 +122,28 @@ sub simple_wanted {
 # $File::Find::dir (%Expect_Dir). Also use it in file operations like
 # chdir, rmdir etc.
 #
-# dir_path() concatenates directory names to form a *relative*
-# directory path, independent from the platform it's run on, although
-# there are limitations. Don't try to create an absolute path,
+# dir_path() concatenates directory names to form a _relative_
+# directory path, independant from the platform it's run on, although
+# there are limitations.  Don't try to create an absolute path,
 # because that may fail on operating systems that have the concept of
-# volume names (e.g. Mac OS). As a special case, you can pass it a "."
-# as first argument, to create a directory path like "./fa/dir" on
+# volume names (e.g. Mac OS). Be careful when you want to create an
+# updir path like ../fa (Unix) or ::fa: (Mac OS). Plain directory
+# names will work best. As a special case, you can pass it a "." as
+# first argument, to create a directory path like "./fa/dir" on
 # operating systems other than Mac OS (actually, Mac OS will ignore
 # the ".", if it's the first argument). If there's no second argument,
 # this function will return the empty string on Mac OS and the string
 # "./" otherwise.
 
 sub dir_path {
-    my $first_arg = shift @_;
+    my $first_item = shift @_;
 
-    if ($first_arg eq '.') {
+    if ($first_item eq '.') {
         if ($^O eq 'MacOS') {
             return '' unless @_;
             # ignore first argument; return a relative path
             # with leading ":" and with trailing ":"
-            return File::Spec->catdir(@_);
+            return File::Spec->catdir("", @_); 
         } else { # other OS
             return './' unless @_;
             my $path = File::Spec->catdir(@_);
@@ -157,16 +152,21 @@ sub dir_path {
             return $path;
         }
 
-    } else { # $first_arg ne '.'
-        return $first_arg unless @_; # return plain filename
-        return File::Spec->catdir($first_arg, @_); # relative path
+    } else { # $first_item ne '.'
+        return $first_item unless @_; # return plain filename
+        if ($^O eq 'MacOS') {
+            # relative path with leading ":" and with trailing ":"
+            return File::Spec->catdir("", $first_item, @_);
+        } else { # other OS
+            return File::Spec->catdir($first_item, @_);
+        }
     }
 }
 
 
 # Use topdir() to specify a directory path that you want to pass to
-# find/finddepth. Basically, topdir() does the same as dir_path() (see
-# above), except that there's no trailing ":" on Mac OS.
+#find/finddepth Basically, topdir() does the same as dir_path() (see
+#above), except that there's no trailing ":" on Mac OS.
 
 sub topdir {
     my $path = dir_path(@_);
@@ -175,39 +175,44 @@ sub topdir {
 }
 
 
-# Use file_path() to specify a file path that's expected for $_
-# (%Expect_File). Also suitable for file operations like unlink etc.
-#
+# Use file_path() to specify a file path that's expected for $_ (%Expect_File).
+# Also suitable for file operations like unlink etc.
+
 # file_path() concatenates directory names (if any) and a filename to
-# form a *relative* file path (the last argument is assumed to be a
-# file). It's independent from the platform it's run on, although
-# there are limitations. As a special case, you can pass it a "." as
-# first argument, to create a file path like "./fa/file" on operating
-# systems other than Mac OS (actually, Mac OS will ignore the ".", if
-# it's the first argument). If there's no second argument, this
-# function will return the empty string on Mac OS and the string "./"
-# otherwise.
+# form a _relative_ file path (the last argument is assumed to be a
+# file). It's independant from the platform it's run on, although
+# there are limitations (see the warnings for dir_path() above). As a
+# special case, you can pass it a "." as first argument, to create a
+# file path like "./fa/file" on operating systems other than Mac OS
+# (actually, Mac OS will ignore the ".", if it's the first
+# argument). If there's no second argument, this function will return
+# the empty string on Mac OS and the string "./" otherwise.
 
 sub file_path {
-    my $first_arg = shift @_;
+    my $first_item = shift @_;
 
-    if ($first_arg eq '.') {
+    if ($first_item eq '.') {
         if ($^O eq 'MacOS') {
             return '' unless @_;
-            # ignore first argument; return a relative path
+            # ignore first argument; return a relative path  
             # with leading ":", but without trailing ":"
-            return File::Spec->catfile(@_);
+            return File::Spec->catfile("", @_); 
         } else { # other OS
             return './' unless @_;
             my $path = File::Spec->catfile(@_);
-            # add leading "./"
-            $path = "./$path";
+            # add leading "./" 
+            $path = "./$path"; 
             return $path;
         }
 
-    } else { # $first_arg ne '.'
-        return $first_arg unless @_; # return plain filename
-        return File::Spec->catfile($first_arg, @_); # relative path
+    } else { # $first_item ne '.'
+        return $first_item unless @_; # return plain filename
+        if ($^O eq 'MacOS') {
+            # relative path with leading ":", but without trailing ":"
+            return File::Spec->catfile("", $first_item, @_);
+        } else { # other OS
+            return File::Spec->catfile($first_item, @_);
+        }
     }
 }
 
@@ -290,7 +295,7 @@ like( $@, qr|Insecure dependency|, 'Tainted directory causes death (good)' );
 chdir($cwd_untainted);
 
 
-# untaint pattern doesn't match, should die
+# untaint pattern doesn't match, should die 
 undef $@;
 
 eval {File::Find::find( {wanted => \&simple_wanted, untaint => 1,
@@ -301,7 +306,7 @@ like( $@, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
 chdir($cwd_untainted);
 
 
-# untaint pattern doesn't match, should die when we chdir to cwd
+# untaint pattern doesn't match, should die when we chdir to cwd   
 print "# check untaint_skip (No follow)\n";
 undef $@;
 
@@ -312,7 +317,7 @@ eval {File::Find::find( {wanted => \&simple_wanted, untaint => 1,
 print "# $@" if $@;
 #$^D = 8;
 like( $@, qr|insecure cwd|, 'Bad untaint pattern causes death in cwd (good)' );
-
+ 
 chdir($cwd_untainted);
 
 
@@ -353,8 +358,8 @@ SKIP: {
                        qr|^(.+)$| }, topdir('fa') );
 
     is( scalar(keys %Expect_File), 0, 'Found all files in symlink test' );
-
-
+ 
+    
     # don't untaint at all, should die
     undef $@;
 
@@ -384,4 +389,5 @@ SKIP: {
     like( $@, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );
 
     chdir($cwd_untainted);
-}
+} 
+

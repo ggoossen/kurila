@@ -7,10 +7,8 @@ BEGIN {
 
 BEGIN{
 	# Don't do anything if POSIX is missing, or sigaction missing.
-	use Config;
 	eval { use POSIX; };
-	if($@ || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' ||
-	   $^O eq 'MacOS' || ($^O eq 'VMS' && !$Config{'d_sigaction'})) {
+	if($@ || $^O eq 'MSWin32' || $^O eq 'NetWare') {
 		print "1..0\n";
 		exit 0;
 	}
