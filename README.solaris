@@ -18,16 +18,12 @@ For the most part, everything should just work.
 Starting with Solaris 8, perl5.00503 (or higher) is supplied with the
 operating system, so you might not even need to build a newer version
 of perl at all.  The Sun-supplied version is installed in /usr/perl5
-with /usr/bin/perl pointing to /usr/perl5/bin/perl.  Do not disturb
-that installation unless you really know what you are doing.  If you
-remove the perl supplied with the OS, there is a good chance you will
-render some bits of your system inoperable.  If you wish to install a
-newer version of perl, install it under a different prefix from
-/usr/perl5.  Common prefixes to use are /usr/local and /opt/perl.
-
-You may wish to put your version of perl in the PATH of all users by
-changing the link /usr/bin/perl. This is OK, as all Perl scripts
-shipped with Solaris use /usr/perl5/bin/perl.
+with a link to /usr/bin/perl.  Do not disturb that installation unless
+you really know what you are doing.  If you remove the perl supplied
+with the OS, there is a good chance you will render some bits of your
+system inoperable.  If you wish to install a newer version of perl,
+install it under a different prefix from /usr/perl5.  Common prefixes
+to use are /usr/local and /opt/perl.
 
 =head2 Solaris Version Numbers.
 
@@ -37,17 +33,13 @@ number as reported by uname.  Here's a partial translation table:
 
              Sun:                      perl's Configure:
     uname    uname -r   Name           osname     osvers
-    SunOS    4.1.3     Solaris 1.1     sunos      4.1.3
+    SunOS    4.1.3     SunOS 4.1.3     sunos      4.1.3
     SunOS    5.6       Solaris 2.6     solaris    2.6
     SunOS    5.8       Solaris 8       solaris    2.8
 
-The complete table can be found in the Sun Managers' FAQ
-L<ftp://ftp.cs.toronto.edu/pub/jdd/sunmanagers/faq> under
-"9.1) Which Sun models run which versions of SunOS?".
-
 =head1 RESOURCES
 
-There are many, many sources for Solaris information.  A few of the
+There are many, many source for Solaris information.  A few of the
 important ones for perl:
 
 =over 4
@@ -57,23 +49,20 @@ important ones for perl:
 The Solaris FAQ is available at
 L<http://www.science.uva.nl/pub/solaris/solaris2.html>.
 
-The Sun Managers' FAQ is available at
-L<ftp://ftp.cs.toronto.edu/pub/jdd/sunmanagers/faq>
-
 =item Precompiled Binaries
 
 Precompiled binaries, links to many sites, and much, much more is
-available at L<http://www.sunfreeware.com/>.
+available at L<http://www.sunfreeware.com>.
 
 =item Solaris Documentation
 
-All Solaris documentation is available on-line at L<http://docs.sun.com/>.
+All Solaris documentation is available on-line at L<http://docs.sun.com>.
 
 =back
 
 =head1 SETTING UP
 
-=head2 File Extraction Problems on Solaris.
+=head2 File Extraction Problems.
 
 Be sure to use a tar program compiled under Solaris (not SunOS 4.x)
 to extract the perl-5.x.x.tar.gz file.  Do not use GNU tar compiled
@@ -81,11 +70,10 @@ for SunOS4 on Solaris.  (GNU tar compiled for Solaris should be fine.)
 When you run SunOS4 binaries on Solaris, the run-time system magically
 alters pathnames matching m#lib/locale# so that when tar tries to create
 lib/locale.pm, a file named lib/oldlocale.pm gets created instead.
-If you found this advice too late and used a SunOS4-compiled tar
-anyway, you must find the incorrectly renamed file and move it back
-to lib/locale.pm.
+If you ignore this advice and use a a SunOS4-compiled tar anyway, you
+must find the incorrectly renamed file and move it back to lib/locale.pm.
 
-=head2 Compiler and Related Tools on Solaris.
+=head2 Compiler and Related Tools.
 
 You must use an ANSI C compiler to build perl.  Perl can be compiled
 with either Sun's add-on C compiler or with gcc.  The C compiler that
@@ -108,33 +96,22 @@ SUNWcg6h, SUNWxwinc, SUNWolinc
 for 64 bit development: SUNWarcx, SUNWbtoox, SUNWdplx, SUNWscpux,
 SUNWsprox, SUNWtoox, SUNWlmsx, SUNWlmx, SUNWlibCx
 
-If you are in doubt which package contains a file you are missing,
-try to find an installation that has that file. Then do a
-
-	grep /my/missing/file /var/sadm/install/contents
-
-This will display a line like this:
-
-/usr/include/sys/errno.h f none 0644 root bin 7471 37605 956241356 SUNWhea
-
-The last item listed (SUNWhea in this example) is the package you need.
-
 =head3 Avoid /usr/ucb/cc.
 
 You don't need to have /usr/ucb/ in your PATH to build perl.  If you
-want /usr/ucb/ in your PATH anyway, make sure that /usr/ucb/ is NOT
-in your PATH before the directory containing the right C compiler.
+want /usr/ucb/ in your PATH anyway, make sure that /usr/ucb/cc is NOT
+in your PATH before the real C compiler.
 
 =head3 Sun's C Compiler
 
 If you use Sun's C compiler, make sure the correct directory
-(usually /opt/SUNWspro/bin/) is in your PATH (before /usr/ucb/).
+(usually /opt/SUNWspro/bin/) is in your PATH before /usr/ucb/.
 
 =head3 GCC
 
 If you use gcc, make sure your installation is recent and
 complete.  As a point of reference, perl-5.6.0 built fine with
-gcc-2.8.1 on both Solaris 2.6 and Solaris 8.  You should
+gcc-2.8.1 on both Solaris 2.6 and Solaris 8.  You'll be able to
 Configure perl with
 
 	sh Configure -Dcc=gcc
@@ -142,41 +119,22 @@ Configure perl with
 If you have updated your Solaris version, you may also have to update
 your GCC.  For example, if you are running Solaris 2.6 and your gcc is
 installed under /usr/local, check in /usr/local/lib/gcc-lib and make
-sure you have the appropriate directory, sparc-sun-solaris2.6/ or
-i386-pc-solaris2.6/.  If gcc's directory is for a different version of
-Solaris than you are running, then you will need to rebuild gcc for
-your new version of Solaris.
+sure you have the appropriate directory sparc-sun-solaris2.6/.  If gcc's
+directory is for a different version of Solaris than you are running,
+then you will need to rebuild gcc for your new version of Solaris.
 
 You can get a precompiled version of gcc from
-L<http://www.sunfreeware.com/>. Make sure you pick up the package for
-your Solaris release.
+L<http://www.sunfreeware.com/>.
 
 =head3 GNU as and GNU ld
 
-The following information applies to gcc version 2.  Volunteers to
-update it as appropropriate for gcc version 3 would be appreciated.
-
 The versions of as and ld supplied with Solaris work fine for building
-perl.  There is normally no need to install the GNU versions to
-compile perl.
+perl.  There is normally no need to install the GNU versions.
 
 If you decide to ignore this advice and use the GNU versions anyway,
 then be sure that they are relatively recent.  Versions newer than 2.7
 are apparently new enough.  Older versions may have trouble with
 dynamic loading.
-
-If you wish to use GNU ld, then you need to pass it the -Wl,-E flag.
-The hints/solaris_2.sh file tries to do this automatically by executing
-the following commands:
-
-	ccdlflags="$ccdlflags -Wl,-E"
-	lddlflags="$lddlflags -Wl,-E -G"
-
-However, over the years, changes in gcc, GNU ld, and Solaris ld have made
-it difficult to automatically detect which ld ultimately gets called.
-You may have to manually edit config.sh and add the -Wl,-E flags
-yourself, or else run Configure interactively and add the flags at the
-appropriate prompts.
 
 If your gcc is configured to use GNU as and ld but you want to use the
 Solaris ones instead to build perl, then you'll need to add
@@ -186,7 +144,7 @@ that is with
 	sh Configure -Dcc='gcc -B/usr/ccs/bin/'
 
 Note that the trailing slash is required.  This will result in some
-harmless warnings as Configure is run:
+harmless error messages as Configure is run:
 
 	gcc: file path prefix `/usr/ccs/bin/' never used
 
@@ -214,7 +172,7 @@ Normally this is not a problem since the solaris hints file prevents
 Configure from even looking in /usr/ucblib for libraries, and also
 explicitly omits -lucb.
 
-=head2 Environment for Compiling Perl on Solaris
+=head2 Environment
 
 =head3 PATH
 
@@ -251,7 +209,7 @@ See the INSTALL file for general information regarding Configure.
 Only Solaris-specific issues are discussed here.  Usually, the
 defaults should be fine.
 
-=head2 64-bit Issues with Perl on Solaris.
+=head2 64-bit Issues.
 
 See the INSTALL file for general information regarding 64-bit compiles.
 In general, the defaults should be fine for most people.
@@ -261,21 +219,20 @@ with largefile and long-long support.
 
 =head3 General 32-bit vs. 64-bit issues.
 
-Solaris 7 and above will run in either 32 bit or 64 bit mode on SPARC
-CPUs, via a reboot. You can build 64 bit apps whilst running 32 bit
-mode and vice-versa. 32 bit apps will run under Solaris running in
-either 32 or 64 bit mode.  64 bit apps require Solaris to be running
-64 bit mode.
+Solaris 2.7 and above will run in either 32 bit or 64 bit mode, via a reboot.
+You can build 64 bit apps whilst running 32 bit mode and vice-versa.
+32 bit apps will run under Solaris running in either 32 or 64 bit mode.
+64 bit apps require Solaris to be running 64 bit mode
 
 Existing 32 bit apps are properly known as LP32, i.e. Longs and
 Pointers are 32 bit.  64-bit apps are more properly known as LP64.
 The discriminating feature of a LP64 bit app is its ability to utilise a
 64-bit address space.  It is perfectly possible to have a LP32 bit app
-that supports both 64-bit integers (long long) and largefiles (> 2GB),
+that supports both 64-bit integers (long long) and largefiles (> 2Gb),
 and this is the default for perl-5.6.0.
 
 For a more complete explanation of 64-bit issues, see the Solaris 64-bit
-Developer's Guide at L<http://docs.sun.com:80/ab2/coll.45.13/SOL64TRANS/>
+Developer's Guide at http://docs.sun.com:80/ab2/coll.45.13/SOL64TRANS/
 
 You can detect the OS mode using "isainfo -v", e.g.
 
@@ -284,13 +241,13 @@ You can detect the OS mode using "isainfo -v", e.g.
       32-bit sparc applications
 
 By default, perl will be compiled as a 32-bit application.  Unless you
-want to allocate more than ~ 4GB of memory inside Perl, you probably
+want to allocate more than ~ 4Gb of memory inside Perl, you probably
 don't need Perl to be a 64-bit app.
 
-=head3 Large File Support
+=head3 Large File Suppprt
 
 For Solaris 2.6 and onwards, there are two different ways for 32-bit
-applications to manipulate large files (files whose size is > 2GByte).
+applications to manipulate large files (files whose size is > 2Gbyte).
 (A 64-bit application automatically has largefile support built in
 by default.)
 
@@ -341,8 +298,8 @@ relies on Solaris to do the underlying mapping of interfaces.
 
 =head3 Building an LP64 Perl
 
-To compile a 64-bit application on an UltraSparc with a recent Sun Compiler,
-you need to use the flag "-xarch=v9".  getconf(1) will tell you this, e.g.
+To compile a 64-bit application with a recent Sun Compiler, you need to
+use the flag "-xarch=v9".  getconf(1) will tell you this, e.g.
 
       fubar$ getconf -a | grep v9
       XBS5_LP64_OFF64_CFLAGS:         -xarch=v9
@@ -358,28 +315,29 @@ you need to use the flag "-xarch=v9".  getconf(1) will tell you this, e.g.
       _XBS5_LPBIG_OFFBIG_LDFLAGS:     -xarch=v9
       _XBS5_LPBIG_OFFBIG_LINTFLAGS:   -xarch=v9
 
-This flag is supported in Sun WorkShop Compilers 5.0 and onwards
-(now marketed under the name Forte) when used on Solaris 7 or later on
-UltraSparc systems.
+This flag is supported in Sun WorkShop Compilers 5.0 and onwards when
+used on Solaris 2.7 onwards.
 
-If you are using gcc, you would need to use -mcpu=v9 -m64 instead.  This
-option is not yet supported as of gcc 2.95.2; from install/SPECIFIC
-in that release:
-
-GCC version 2.95 is not able to compile code correctly for sparc64
-targets. Users of the Linux kernel, at least, can use the sparc32
-program to start up a new shell invocation with an environment that
-causes configure to recognize (via uname -a) the system as sparc-*-*
-instead.
+If you are using gcc, you need to use -mcpu=v9 -m64 instead.  This
+option is not supported in the installation of gcc-2.8.1 that I have
+at hand, but is supported in more recent versions.  [XXX -- any
+precise citations?]
 
 All this should be handled automatically by the hints file, if
 requested.
+
+If you do want to be able to allocate more than 4Gb memory inside
+perl, then you should use the Solaris malloc, since the perl
+malloc breaks when dealing with more than 2Gb of memory.  You can do
+this with
+
+	sh Configure -Uusemymalloc
 
 =head3 Long Doubles.
 
 As of 5.6.0, long doubles are not working.
 
-=head2 Threads in Perl on Solaris.
+=head2 Threads.
 
 It is possible to build a threaded version of perl on Solaris.  The entire
 perl thread implementation is still experimental, however, so beware.
@@ -387,23 +345,21 @@ Perl uses the sched_yield(3RT) function.  In versions of Solaris up
 to 2.6, that function is in -lposix4.  Starting with Solaris 7, it is
 in -lrt.  The hints file should handle adding this automatically.
 
-=head2 Malloc Issues with Perl on Solaris.
-
-Starting from Perl 5.7.1 Perl uses the Solaris malloc, since the perl
-malloc breaks when dealing with more than 2GB of memory, and the Solaris
-malloc also seems to be faster.
-
-If you for some reason (such as binary backward compatibility) really
-need to use perl's malloc, you can rebuild Perl from the sources
-and Configure the build with 
-
-	sh Configure -Dusemymalloc
+=head2 Malloc Issues.
 
 You should not use perl's malloc if you are building with gcc.  There
 are reports of core dumps, especially in the PDL module.  The problem
 appears to go away under -DDEBUGGING, so it has been difficult to
-track down.  Sun's compiler appears to be okay with or without perl's
+track down.  Sun's compiler appears to be ok with or without perl's
 malloc. [XXX further investigation is needed here.]
+
+You should also not use perl's malloc if you are building perl as
+an LP64 application, since perl's malloc has trouble allocating more
+than 2Gb of memory.
+
+You can avoid perl's malloc by Configuring with
+
+	sh Configure -Uusemymalloc
 
 =head1 MAKE PROBLEMS.
 
@@ -448,28 +404,24 @@ directory.
 
 =head1 MAKE TEST
 
-=head2 op/stat.t test 4 in Solaris
+=head2 op/stat.t test 4
 
 op/stat.t test 4 may fail if you are on a tmpfs of some sort.
 Building in /tmp sometimes shows this behavior.  The
 test suite detects if you are building in /tmp, but it may not be able
 to catch all tmpfs situations.
 
-=head2 nss_delete core dump from op/pwent or op/grent
-
-See L<perlhpux/"nss_delete core dump from op/pwent or op/grent">.
-
-=head1 PREBUILT BINARIES OF PERL FOR SOLARIS.
+=head1 PREBUILT BINARIES.
 
 You can pick up prebuilt binaries for Solaris from
-L<http://www.sunfreeware.com/>, ActiveState L<http://www.activestate.com/>,
-and L<http://www.perl.com/> under the Binaries list at the top of the page.
+L<http://www.sunfreeware.com>, ActiveState L<http://www.activestate.com>,
+and L<http://www.perl.com> under the Binaries list at the top of the page.
 There are probably other sources as well.  Please note that these sites
 are under the control of their respective owners, not the perl developers.
 
-=head1 RUNTIME ISSUES FOR PERL ON SOLARIS.
+=head1 RUNTIME ISSUES.
 
-=head2 Limits on Numbers of Open Files on Solaris.
+=head2 Limits on Numbers of Open Files.
 
 The stdio(3C) manpage notes that only 255 files may be opened using
 fopen(), and only file descriptors 0 through 255 can be used in a
@@ -484,7 +436,7 @@ L<http://www.cpan.org/modules/by-module/Solaris/>.
 
 =head1 SOLARIS-SPECIFIC PROBLEMS WITH MODULES.
 
-=head2 Proc::ProcessTable on Solaris
+=head2 Proc::ProcessTable
 
 Proc::ProcessTable does not compile on Solaris with perl5.6.0 and higher
 if you have LARGEFILES defined.  Since largefile support is the
@@ -500,28 +452,15 @@ discussion.
 A fix for Proc::ProcessTable is to edit Makefile to
 explicitly remove the largefile flags from the ones MakeMaker picks up
 from Config.pm.  This will result in Proc::ProcessTable being built
-under the correct environment.  Everything should then be OK as long as
+under the correct environment.  Everyting should then be OK as long as
 Proc::ProcessTable doesn't try to share off_t's with the rest of perl,
 or if it does they should be explicitly specified as off64_t.
 
-=head2 BSD::Resource on Solaris
+=head2 BSD::Resource
 
 BSD::Resource versions earlier than 1.09 do not compile on Solaris
 with perl 5.6.0 and higher, for the same reasons as Proc::ProcessTable.
 BSD::Resource versions starting from 1.09 have a workaround for the problem.
-
-=head2 Net::SSLeay on Solaris
-
-Net::SSLeay requires a /dev/urandom to be present. This device is not
-part of Solaris. You can either get the package SUNWski (packaged with
-several Sun software products, for example the Sun WebServer, which is
-part of the Solaris Server Intranet Extension, or the Sun Directory
-Services, part of Solaris for ISPs) or download the ANDIrand package
-from L<http://www.cosy.sbg.ac.at/~andi/>. If you use SUNWski, make a
-symbolic link /dev/urandom pointing to /dev/random.
-
-It may be possible to use the Entropy Gathering Daemon (written in
-Perl!), available from L<http://www.lothar.com/tech/crypto/>.
 
 =head1 AUTHOR
 
@@ -533,4 +472,4 @@ Please report any errors, updates, or suggestions to F<perlbug@perl.org>.
 
 =head1 LAST MODIFIED
 
-$Id: README.solaris,v 1.4 2000/11/11 20:29:58 doughera Exp $
+$Id: README.solaris,v 1.3 2000/11/09 19:11:27 doughera Exp $
