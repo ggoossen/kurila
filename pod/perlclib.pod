@@ -11,7 +11,7 @@ tends to reimplement or abstract standard library functions, so that we
 know exactly how they're going to operate.
 
 This is a reference card for people who are familiar with the C library
-and who want to do things the Perl way; to tell them which functions
+and who want to do things the Perl way; to tells them which functions
 they ought to use instead of the more normal C functions. 
 
 =head2 Conventions
@@ -44,12 +44,12 @@ C<sv>, C<av>, C<hv>, etc. represent variables of their respective types.
 
 Instead of the F<stdio.h> functions, you should use the Perl abstraction
 layer. Instead of C<FILE*> types, you need to be handling C<PerlIO*>
-types.  Don't forget that with the new PerlIO layered I/O abstraction 
+types; don't forget that with the new PerlIO layered IO abstraction, 
 C<FILE*> types may not even be available. See also the C<perlapio>
 documentation for more information about the following functions:
 
     Instead Of:                 Use:
-
+    
     stdin                       PerlIO_stdin()
     stdout                      PerlIO_stdout()
     stderr                      PerlIO_stderr()
@@ -97,17 +97,15 @@ There is no equivalent to C<fgets>; one should use C<sv_gets> instead:
 
 =head2 Memory Management and String Handling
 
-    Instead Of:                 	Use:
+    Instead Of:                 Use:
 
-    t* p = malloc(n)            	New(id, p, n, t)
-    t* p = calloc(n, s)         	Newz(id, p, n, t)
-    p = realloc(p, n)           	Renew(p, n, t)
-    memcpy(dst, src, n)         	Copy(src, dst, n, t)
-    memmove(dst, src, n)        	Move(src, dst, n, t)
-    memcpy/*(struct foo *)      	StructCopy(src, dst, t)
-    memset(dst, 0, n * sizeof(t))	Zero(dst, n, t)
-    memzero(dst, 0)			Zero(dst, n, char)
-    free(p)             	        Safefree(p)
+    t* p = malloc(n)            New(id, p, n, t)
+    t* p = calloc(n, s)         Newz(id, p, n, t)
+    p = realloc(p, n)           Renew(p, n, t)
+    memcpy(dst, src, n)         Copy(src, dst, n, t)
+    memmove(dst, src, n)        Move(src, dst, n, t)
+    memcpy/*(struct foo *)      StructCopy(src, dst, t)
+    free(p)                     Safefree(p)
 
     strdup(p)                   savepv(p)
     strndup(p, n)               savepvn(p, n) (Hey, strndup doesn't exist!)
@@ -129,18 +127,8 @@ instead of raw C<char *> strings:
     strncat(dt, src)            sv_catpvn(sv, s)
     sprintf(s, fmt, ...)        sv_setpvf(sv, fmt, ...)
 
-Note also the existence of C<sv_catpvf> and C<sv_vcatpvfn>, combining
+Note also the existence of C<sv_catpvf> and C<sv_catpvfn>, combining
 concatenation with formatting.
-
-Sometimes instead of zeroing the allocated heap by using Newz() you
-should consider "poisoning" the data.  This means writing a bit
-pattern into it that should be illegal as pointers (and floating point
-numbers), and also hopefully surprising enough as integers, so that
-any code attempting to use the data without forethought will break
-sooner rather than later.  Poisoning can be done using the Poison()
-macro, which has similar arguments as Zero():
-
-    Poison(dst, n, t)
 
 =head2 Character Class Tests
 
@@ -173,12 +161,12 @@ table, C<c> is a C<char>, and C<u> is a Unicode codepoint.
 
     atof(s)                     Atof(s)
     atol(s)                     Atol(s)
-    strtod(s, *p)               Nothing.  Just don't use it.
+    strtod(s, *p)               Nothing. Just don't use it.
     strtol(s, *p, n)            Strtol(s, *p, n)
     strtoul(s, *p, n)           Strtoul(s, *p, n)
 
-Notice also the C<grok_bin>, C<grok_hex>, and C<grok_oct> functions in
-F<numeric.c> for converting strings representing numbers in the respective
+Notice also the C<scan_bin>, C<scan_hex>, and C<scan_oct> functions in
+F<util.c> for converting strings representing numbers in the respective
 bases into C<NV>s.
 
 In theory C<Strtol> and C<Strtoul> may not be defined if the machine perl is
@@ -189,7 +177,7 @@ everywhere by now.
     int rand()                  double Drand01()
     srand(n)                    { seedDrand01((Rand_seed_t)n); 
                                   PL_srand_called = TRUE; }
-
+ 
     exit(n)                     my_exit(n)
     system(s)                   Don't. Look at pp_system or use my_popen
 
