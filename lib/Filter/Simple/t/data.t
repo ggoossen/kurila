@@ -1,10 +1,3 @@
-BEGIN {
-    if ($ENV{PERL_CORE}) {
-        chdir('t') if -d 't';
-	@INC = qw(lib/Filter/Simple ../lib);
-    }
-}
-
 use FilterOnlyTest qr/ok/ => "not ok", "bad" => "ok";
 print "1..6\n";
 
