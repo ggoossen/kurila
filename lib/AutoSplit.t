@@ -3,19 +3,15 @@
 # AutoLoader.t runs before this test, so it seems safe to assume that it will
 # work.
 
-my($incdir, $lib);
+my $incdir;
+my $lib = '"-I../lib"'; # ok on unix, nt, The extra \" are for VMS
 BEGIN {
     chdir 't' if -d 't';
-    if ($^O eq 'dos') {
-	print "1..0 # This test is not 8.3-aware.\n";
-	    exit 0;
-    }
     if ($^O eq 'MacOS') {
 	$incdir = ":auto-$$";
-        $lib = '-I::lib:';
+        $lib = '-x -I::lib:'; # -x overcomes MPW $Config{startperl} anomaly
     } else {
 	$incdir = "auto-$$";
-	$lib = '"-I../lib"'; # ok on unix, nt, The extra \" are for VMS
     }
     @INC = $incdir;
     push @INC, '../lib';
@@ -49,9 +45,6 @@ my @tests;
   close DATA;
 }
 
-my $pathsep = $^O eq 'MSWin32' ? '\\' : $^O eq 'MacOS' ? ':' : '/';
-my $endpathsep = $^O eq 'MacOS' ? ':' : '';
-
 sub split_a_file {
   my $contents = shift;
   my $file = $_[0];
@@ -63,7 +56,7 @@ sub split_a_file {
 
   # Assumption: no characters in arguments need escaping from the shell or perl
   my $com = qq($runperl -e "use AutoSplit; autosplit (qw(@_))");
-  print "# command: $com\n";
+  print "# $com\n";
   # There may be a way to capture STDOUT without spawning a child process, but
   # it's probably worthwhile spawning, as it ensures that nothing in AutoSplit
   # can load functions from split modules into this perl.
@@ -73,30 +66,20 @@ sub split_a_file {
 }
 
 my $i = 0;
-my $dir = File::Spec->catdir($incdir, 'auto');
-if ($^O eq 'VMS') {
-  $dir = VMS::Filespec::unixify($dir);
-  $dir =~ s/\/$//;
-} elsif ($^O eq 'MacOS') {
-  $dir =~ s/:$//;
-}
-
+my $dir = File::Spec->catfile($incdir, 'auto');
 foreach (@tests) {
   my $module = 'A' . $i . '_' . $$ . 'splittest';
   my $file = File::Spec->catfile($incdir,"$module.pm");
   s/\*INC\*/$incdir/gm;
   s/\*DIR\*/$dir/gm;
   s/\*MOD\*/$module/gm;
-  s/\*PATHSEP\*/$pathsep/gm;
-  s/\*ENDPATHSEP\*/$endpathsep/gm;
-  s#//#/#gm;
   # Build a hash for this test.
   my %args = /^\#\#\ ([^\n]*)\n	# Key is on a line starting ##
              ((?:[^\#]+		# Any number of characters not #
                | \#(?!\#)	# or a # character not followed by #
                | (?<!\n)\#	# or a # character not preceded by \n
               )*)/sgmx;
-  foreach ($args{Name}, $args{Require}, $args{Extra}) {
+  foreach ($args{Name}, $args{Require}) {
     chomp $_ if defined $_;
   }
   my @extra_args = !defined $args{Extra} ? () : split /,/, $args{Extra};
@@ -109,18 +92,8 @@ foreach (@tests) {
     $output = split_a_file (undef, $file, $dir, @extra_args);
   }
 
-  if ($^O eq 'VMS') {
-     my ($filespec, $replacement);
-     while ($output =~ m/(\[.+\])/) {
-       $filespec = $1;
-       $replacement =  VMS::Filespec::unixify($filespec);
-       $replacement =~ s/\/$//;
-       $output =~ s/\Q$filespec\E/$replacement/;
-     }
-  }
-
   # test n+1
-  cmp_ok ($output, 'eq', $args{Get}, "Output from autosplit()ing $args{Name}");
+  is ($output, $args{Get}, "Output from autosplit()ing $args{Name}");
 
   if ($args{Files}) {
     $args{Files} =~ s!/!:!gs if $^O eq 'MacOS';
@@ -128,7 +101,6 @@ foreach (@tests) {
     find (sub {$got{$File::Find::name}++ unless -d $_}, $dir);
     foreach (split /\n/, $args{Files}) {
       next if /^#/;
-      $_ = lc($_) if $^O eq 'VMS';
       unless (delete $got{$_}) {
         $missing{$_}++;
       }
@@ -147,9 +119,7 @@ foreach (@tests) {
     }
   }
   if ($args{Require}) {
-    $args{Require} =~ s|/|:|gm if $^O eq 'MacOS';
     my $com = 'require "' . File::Spec->catfile ('auto', $args{Require}) . '"';
-    $com =~ s{\\}{/}gm if ($^O eq 'MSWin32');
     eval $com;
     # test n+3
     ok ($@ eq '', $com) or print "# \$\@ = '$@'\n";
@@ -174,23 +144,6 @@ foreach (@tests) {
     foreach my $code (split /\n/, $args{Tests}) {
       next if $code =~ /^\#/;
       defined eval $code or fail(), print "# Code:  $code\n# Error: $@";
-    }
-  }
-  if (my $sleepfor = $args{Sleep}) {
-    # We need to sleep for a while
-    # Need the sleep hack else the next test is so fast that the timestamp
-    # compare routine in AutoSplit thinks that it shouldn't split the files.
-    my $time = time;
-    my $until = $time + $sleepfor;
-    my $attempts = 3;
-    do {
-      sleep ($sleepfor)
-    } while (time < $until && --$attempts > 0);
-    if ($attempts == 0) {
-      printf << "EOM", time;
-# Attempted to sleep for $sleepfor second(s), started at $time, now %d.
-# sleep attempt ppears to have failed; some tests may fail as a result.
-EOM
     }
   }
   unless ($args{SameAgain}) {
@@ -227,11 +180,11 @@ sub test_a2 : locked { 1; }
 # And that was all it has. You were expected to manually inspect the output
 ## Get
 Warning: AutoSplit had to create top-level *DIR* unexpectedly.
-AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
-*INC**PATHSEP**MOD*.pm: some names are not unique when truncated to 8 characters:
- directory *DIR**PATHSEP**MOD**ENDPATHSEP*:
+AutoSplitting *INC*/*MOD*.pm (*DIR*/*MOD*)
+*INC*/*MOD*.pm: some names are not unique when truncated to 8 characters:
+ directory *DIR*/*MOD*:
   testtesttesttest4_1.al, testtesttesttest4_2.al truncate to testtest
- directory *DIR**PATHSEP*Yet*PATHSEP*Another*PATHSEP*AutoSplit*ENDPATHSEP*:
+ directory *DIR*/Yet/Another/AutoSplit:
   testtesttesttest4_1.al, testtesttesttest4_2.al truncate to testtest
 ## Files
 *DIR*/*MOD*/autosplit.ix
@@ -267,7 +220,7 @@ is (&*MOD*::testtesttesttest4_2, "duplicate test 4");
 is (&Just::Another::test5, "another test 5");
 # very messy way to interpolate function into regexp, but it's going to be
 # needed to get : for Mac filespecs
-like (&*MOD*::test6, qr!^\Q*INC**PATHSEP**MOD*\E\.pm \(autosplit into \Q@{[File::Spec->catfile('*DIR*','*MOD*', 'test6.al')]}\E\):\d+$!);
+like (&*MOD*::test6, qr!^*INC*/*MOD*.pm \(autosplit into @{[File::Spec->catfile('*DIR*','*MOD*', 'test6.al')]}\):\d+$!);
 ok (Yet::Another::AutoSplit->testtesttesttest4_1 eq "another test 4");
 ################################################################
 ## Name
@@ -287,7 +240,7 @@ missing use AutoLoader; (but don't skip)
 1;
 __END__
 ## Get
-AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
+AutoSplitting *INC*/*MOD*.pm (*DIR*/*MOD*)
 ## Require
 *MOD*/autosplit.ix
 ## Files
@@ -302,7 +255,7 @@ __END__
 sub obsolete {my $a if 0; return $a++;}
 sub gonner {warn "This gonner function should never get called"}
 ## Get
-AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
+AutoSplitting *INC*/*MOD*.pm (*DIR*/*MOD*)
 ## Require
 *MOD*/autosplit.ix
 ## Files
@@ -312,10 +265,12 @@ AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
 ## Tests
 is (&*MOD*::obsolete, 0);
 is (&*MOD*::obsolete, 1);
-## Sleep
-4
+{my $time = time; print "# time is $time\n"; sleep (2); sleep (2) unless time > $time + 1}
+printf "# time is %d (hopefully >=2 seconds later)\n", time;
 ## SameAgain
 True, so don't scrub this directory.
+Need the sleep hack else the next test is so fast that the timestamp compare
+routine in AutoSplit thinks that it shouldn't split the files.
 IIRC DOS FAT filesystems have only 2 second granularity.
 ################################################################
 ## Name
@@ -330,7 +285,7 @@ sub ghoul {"wail"};
 sub zombie {"You didn't use fire."};
 sub flying_pig {"Oink oink flap flap"};
 ## Get
-AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
+AutoSplitting *INC*/*MOD*.pm (*DIR*/*MOD*)
 ## Require
 *MOD*/autosplit.ix
 ## Files
@@ -343,8 +298,8 @@ AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
 ## Tests
 is (&*MOD*::skeleton, "bones", "skeleton");
 eval {&*MOD*::gonner}; ok ($@ =~ m!^Can't locate auto/*MOD*/gonner.al in \@INC!, "Check &*MOD*::gonner is now a gonner") or print "# \$\@='$@'\n";
-## Sleep
-4
+{my $time = time; print "# time is $time\n"; sleep (2); sleep (2) unless time > $time + 1}
+printf "# time is %d (hopefully >=2 seconds later)\n", time;
 ## SameAgain
 True, so don't scrub this directory.
 ################################################################
@@ -359,7 +314,7 @@ __END__
 sub ghost {"bump"};
 sub wraith {9};
 ## Get
-AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
+AutoSplitting *INC*/*MOD*.pm (*DIR*/*MOD*)
 ## Require
 *MOD*/autosplit.ix
 ## Files
@@ -373,13 +328,13 @@ AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
 ## Tests
 is (&*MOD*::ghost, "bump");
 is (&*MOD*::zombie, "You didn't use fire.", "Are our zombies undead?");
-## Sleep
-4
+{my $time = time; print "# time is $time\n"; sleep (2); sleep (2) unless time > $time + 1}
+printf "# time is %d (hopefully >=2 seconds later)\n", time;
 ## SameAgain
 True, so don't scrub this directory.
 ################################################################
 ## Name
-Without the timestamp check make sure that nothing happens
+Without the the timestamp check make sure that nothing happens
 ## Extra
 0, 1, 1
 ## Require
@@ -395,17 +350,17 @@ Without the timestamp check make sure that nothing happens
 ## Tests
 is (&*MOD*::ghoul, "wail", "still haunted");
 is (&*MOD*::zombie, "You didn't use fire.", "Are our zombies still undead?");
-## Sleep
-4
+{my $time = time; print "# time is $time\n"; sleep (2); sleep (2) unless time > $time + 1}
+printf "# time is %d (hopefully >=2 seconds later)\n", time;
 ## SameAgain
 True, so don't scrub this directory.
 ################################################################
 ## Name
-With the timestamp check make sure that things happen (stuff gets deleted)
+With the the timestamp check make sure that things happen (stuff gets deleted)
 ## Extra
 0, 1, 0
 ## Get
-AutoSplitting *INC**PATHSEP**MOD*.pm (*DIR**PATHSEP**MOD**ENDPATHSEP*)
+AutoSplitting *INC*/*MOD*.pm (*DIR*/*MOD*)
 ## Require
 *MOD*/autosplit.ix
 ## Files
