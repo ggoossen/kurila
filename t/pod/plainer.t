@@ -31,14 +31,9 @@ while( <DATA> ) {
        print "not ";
     }
     printf "ok %d\n", ++$test; 
-    close OUT;
-    close IN;
 }
 
-END { 
-    1 while unlink $input;
-    1 while unlink $output;
-}
+END { unlink $input, $output }
 
 __END__
 =head <> now reads in records
