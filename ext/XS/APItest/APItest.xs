@@ -20,14 +20,12 @@ have_long_double()
 #else
         RETVAL = 0;
 #endif
-        OUTPUT:
-        RETVAL
 
 void
 print_long_double()
         CODE:
 #ifdef HAS_LONG_DOUBLE
-#   if defined(PERL_PRIfldbl) && (LONG_DOUBLESIZE > DOUBLESIZE)
+#   if LONG_DOUBLESIZE > DOUBLESIZE
         long double val = 7.0;
         printf("%5.3" PERL_PRIfldbl "\n",val);
 #   else
@@ -35,6 +33,24 @@ print_long_double()
         printf("%5.3f\n",val);
 #   endif
 #endif
+
+void
+print_nv(val)
+        NV val
+        CODE:
+        printf("%5.3Vf\n",val);
+
+void
+print_iv(val)
+        IV val
+        CODE:
+        printf("%Vd\n",val);
+
+void
+print_uv(val)
+        UV val
+        CODE:
+        printf("%Vu\n",val);
 
 void
 print_int(val)
