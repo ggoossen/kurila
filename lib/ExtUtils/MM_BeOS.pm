@@ -1,5 +1,7 @@
 package ExtUtils::MM_BeOS;
 
+our $VERSION = '1.00';
+
 =head1 NAME
 
 ExtUtils::MM_BeOS - methods to override UN*X behaviour in ExtUtils::MakeMaker
@@ -20,13 +22,12 @@ the semantics.
 
 use Config;
 use File::Spec;
-require ExtUtils::MM_Any;
-require ExtUtils::MM_Unix;
+require Exporter;
 
-use vars qw(@ISA $VERSION);
-@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
-$VERSION = 1.03;
+require ExtUtils::MakeMaker;
+ExtUtils::MakeMaker->import(qw( $Verbose &neatvalue));
 
+unshift @MM::ISA, 'ExtUtils::MM_BeOS';
 
 =item perl_archive
 
@@ -38,10 +39,8 @@ least BeOS has one.
 
 sub perl_archive
   {
-  return File::Spec->catdir('$(PERL_INC)',$Config{libperl});
+  return '$(PERL_INC)' . "/$Config{libperl}":
   }
-
-=back
 
 1;
 __END__
