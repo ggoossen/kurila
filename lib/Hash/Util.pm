@@ -11,6 +11,7 @@ our @EXPORT_OK  = qw(lock_keys unlock_keys lock_value unlock_value
                     );
 our $VERSION    = 0.04;
 
+
 =head1 NAME
 
 Hash::Util - A selection of general-utility hash subroutines
@@ -19,7 +20,8 @@ Hash::Util - A selection of general-utility hash subroutines
 
   use Hash::Util qw(lock_keys   unlock_keys 
                     lock_value  unlock_value
-                    lock_hash   unlock_hash);
+                    lock_hash   unlock_hash
+                   );
 
   %hash = (foo => 42, bar => 23);
   lock_keys(%hash);
@@ -31,6 +33,7 @@ Hash::Util - A selection of general-utility hash subroutines
 
   lock_hash  (%hash);
   unlock_hash(%hash);
+
 
 =head1 DESCRIPTION
 
@@ -57,12 +60,12 @@ This is intended to largely replace the deprecated pseudo-hashes.
   lock_keys(%hash);
   lock_keys(%hash, @keys);
 
+  unlock_keys(%hash;)
+
 Restricts the given %hash's set of keys to @keys.  If @keys is not
 given it restricts it to its current keyset.  No more keys can be
 added.  delete() and exists() will still work, but it does not effect
 the set of allowed keys.
-
-  unlock_keys(%hash;)
 
 Removes the restriction on the %hash's keyset.
 
@@ -71,7 +74,6 @@ Removes the restriction on the %hash's keyset.
 sub lock_keys (\%;@) {
     my($hash, @keys) = @_;
 
-    Internals::hv_clear_placeholders %$hash;
     if( @keys ) {
         my %keys = map { ($_ => 1) } @keys;
         my %original_keys = map { ($_ => 1) } keys %$hash;
@@ -94,14 +96,14 @@ sub lock_keys (\%;@) {
         Internals::SvREADONLY %$hash, 1;
     }
 
-    return;
+    return undef;
 }
 
 sub unlock_keys (\%) {
     my($hash) = shift;
 
     Internals::SvREADONLY %$hash, 0;
-    return;
+    return undef;
 }
 
 =item lock_value
@@ -136,15 +138,14 @@ sub unlock_value (\%$) {
 =item B<unlock_hash>
 
     lock_hash(%hash);
+    unlock_hash(%hash);
 
 lock_hash() locks an entire hash, making all keys and values readonly.
 No value can be changed, no keys can be added or deleted.
 
-    unlock_hash(%hash);
-
-unlock_hash() does the opposite of lock_hash().  All keys and values
-are made read/write.  All values can be changed and keys can be added
-and deleted.
+unlock_hash() does the opposite.  All keys and values are made
+read/write.  All values can be changed and keys can be added and
+deleted.
 
 =cut
 
