@@ -1,15 +1,9 @@
-#!/usr/bin/perl -w
+#!./perl
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
+	chdir 't' if -d 't';
+	@INC = '../lib';
 }
-chdir 't';
 
 use Test::More tests => 34;
 
@@ -39,8 +33,7 @@ is( ExtUtils::Packlist::FETCH($pl, 'foo'), 'bar', 'check FETCH()' );
 # test FIRSTKEY and NEXTKEY
 SKIP: {
 	$pl->{data}{bar} = 'baz';
-	skip('not enough keys to test FIRSTKEY', 2) 
-      unless keys %{ $pl->{data} } > 2;
+	skip('not enough keys to test FIRSTKEY', 2) unless %{ $pl->{data} } > 2;
 
 	# get the first and second key
 	my ($first, $second) = keys %{ $pl->{data} };
@@ -92,7 +85,7 @@ SKIP: {
 	chmod 0444, 'eplist';
 
 	SKIP: {
-	    skip("cannot write readonly files", 1) if -w 'eplist';
+	    skip("can write readonly files", 1) if -w 'eplist';
 
 	    eval { ExtUtils::Packlist::write({}, 'eplist') };
 	    like( $@, qr/Can't open file/, 'write() should croak on open failure' );

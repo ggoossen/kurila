@@ -1,13 +1,9 @@
-#!/usr/bin/perl
+#!./perl
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
+    chdir 't' if -d 't';
+    unshift @INC, '../lib';
 }
-chdir 't';
-
 use Config;
 use ExtUtils::Embed;
 use File::Spec;
@@ -20,10 +16,7 @@ $| = 1;
 print "1..9\n";
 my $cc = $Config{'cc'};
 my $cl  = ($^O eq 'MSWin32' && $cc eq 'cl');
-my $borl  = ($^O eq 'MSWin32' && $cc eq 'bcc32');
-my $skip_exe = $^O eq 'os2' && $Config{ldflags} =~ /(?<!\S)-Zexe\b/;
-my $exe = 'embed_test';
-$exe .= $Config{'exe_ext'} unless $skip_exe;	# Linker will auto-append it
+my $exe = 'embed_test' . $Config{'exe_ext'};
 my $obj = 'embed_test' . $Config{'obj_ext'};
 my $inc = File::Spec->updir;
 my $lib = File::Spec->updir;
@@ -54,9 +47,6 @@ if ($^O eq 'VMS') {
    if ($cl) {
     push(@cmd,$cc,"-Fe$exe");
    }
-   elsif ($borl) {
-    push(@cmd,$cc,"-o$exe");
-   }
    else {
     push(@cmd,$cc,'-o' => $exe);
    }
@@ -67,23 +57,20 @@ if ($^O eq 'VMS') {
     $inc = File::Spec->catdir($inc,'include');
     push(@cmd,"-I$inc");
     if ($cc eq 'cl') {
-	push(@cmd,'-link',"-libpath:$lib",$Config{'libperl'},$Config{'libs'});
+	push(@cmd,'-link',"-libpath:$lib",$Config{'libperl'},$Config{'libc'});
     }
     else {
 	push(@cmd,"-L$lib",File::Spec->catfile($lib,$Config{'libperl'}),$Config{'libc'});
     }
    }
-   else { # Not MSWin32.
+   else {
     push(@cmd,"-L$lib",'-lperl');
-    local $SIG{__WARN__} = sub {
-	warn $_[0] unless $_[0] =~ /No library found for .*perl/
-    };
-    push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!
-	if $^O eq 'os2' and $Config{ldflags} =~ /(?<!\S)-Zomf\b/;
-    push(@cmd,ldopts());
    }
-   if ($borl) {
-     @cmd = ($cmd[0],(grep{/^-[LI]/}@cmd[1..$#cmd]),(grep{!/^-[LI]/}@cmd[1..$#cmd]));
+   {
+    local $SIG{__WARN__} = sub {
+	warn $_[0] unless $_[0] =~ /No library found for -lperl/
+    };
+    push(@cmd,ldopts());
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
@@ -93,10 +80,11 @@ if ($^O eq 'VMS') {
         s!-bE:(\S+)!-bE:$perl_exp!;
     }
    }
-   elsif ($^O eq 'cygwin') { # Cygwin needs the shared libperl copied
+   elsif ($^O eq 'cygwin') { # Cygwin needs the libperl copied
      my $v_e_r_s = $Config{version};
      $v_e_r_s =~ tr/./_/;
-     system("cp ../cygperl$v_e_r_s.dll ./");    # for test 1
+     system("cp ../libperl$v_e_r_s.dll ./");    # for test 1
+     system("cp ../$Config{'libperl'} ../libperl.a");    # for test 1
    }
    elsif ($Config{'libperl'} !~ /\Alibperl\./) {
      # Everyone needs libperl copied if it's not found by '-lperl'.
@@ -107,22 +95,17 @@ if ($^O eq 'VMS') {
      $srclib = File::Spec::->catfile($lib, $srclib);
      if (-f $srclib) {
        unlink $testlib if -f $testlib;
-       my $ln_or_cp = $Config{'ln'} || $Config{'cp'};
-       my $lncmd = "$ln_or_cp $srclib $testlib";
+       my $lncmd = "$Config{'ln'} $srclib $testlib";
        #print "# $lncmd\n";
        $libperl_copied = 1	unless system($lncmd);
      }
    }
 }
 my $status;
-# On OS/2 the linker will always emit an empty line to STDOUT; filter these
-my $cmd = join ' ', @cmd;
-chomp($cmd); # where is the newline coming from? ldopts()?
-print "# $cmd\n";
-my @out = `$cmd`;
-$status = $?;
-print "# $_\n" foreach @out;
-
+my $display_cmd = "@cmd";
+chomp($display_cmd); # where is the newline coming from? ldopts()?
+print "# $display_cmd\n"; 
+$status = system(join(' ',@cmd));
 if ($^O eq 'VMS' && !$status) {
   print "# @cmd2\n";
   $status = system(join(' ',@cmd2)); 
@@ -133,11 +116,11 @@ my $embed_test = File::Spec->catfile(File::Spec->curdir, $exe);
 $embed_test = "run/nodebug $exe" if $^O eq 'VMS';
 print "# embed_test = $embed_test\n";
 $status = system($embed_test);
-print (($status? 'not ':'')."ok 9 # system returned $status\n");
+print (($status? 'not ':'')."ok 9 # $status\n");
 unlink($exe,"embed_test.c",$obj);
-unlink("$exe$Config{exe_ext}") if $skip_exe;
 unlink("embed_test.map","embed_test.lis") if $^O eq 'VMS';
-unlink(glob("./*.dll")) if $^O eq 'cygwin';
+unlink(glob("./libperl*.dll")) if $^O eq 'cygwin';
+unlink("../libperl.a")         if $^O eq 'cygwin';
 unlink($testlib)	       if $libperl_copied;
 
 # gcc -g -I.. -L../ -o perl_test perl_test.c -lperl `../perl -I../lib -MExtUtils::Embed -I../ -e ccopts -e ldopts`
@@ -151,7 +134,7 @@ __END__
 
 #define my_puts(a) if(puts(a) < 0) exit(666)
 
-static char *cmds[] = { "perl","-e", "print qq[ok 5\\n]", NULL };
+char *cmds[] = { "perl","-e", "print qq[ok 5\\n]", NULL };
 
 int main(int argc, char **argv, char **env)
 {
@@ -183,3 +166,7 @@ int main(int argc, char **argv, char **env)
 
     return 0;
 }
+
+
+
+

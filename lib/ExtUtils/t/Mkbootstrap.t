@@ -1,20 +1,15 @@
-#!/usr/bin/perl -w
+#!./perl
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = ('../lib', 'lib/');
-    }
-    else {
-        unshift @INC, 't/lib/';
-    }
+	chdir 't' if -d 't';
+	@INC = '../lib';
 }
-chdir 't';
 
 use vars qw( $required );
 use Test::More tests => 18;
 
-BEGIN { use_ok( 'ExtUtils::Mkbootstrap' ) }
+use_ok( 'ExtUtils::Mkbootstrap' );
+
 
 # Mkbootstrap makes a backup copy of "$_[0].bs" if it exists and is non-zero
 my $file_is_ready;
@@ -44,12 +39,12 @@ SKIP: {
 Mkbootstrap('fakeboot');
 ok( !( -f 'fakeboot.bso' ), 'Mkbootstrap should not backup an empty file' );
 
-use TieOut;
+
 my $out = tie *STDOUT, 'TieOut';
 
 # with $Verbose set, it should print status messages about libraries
 $ExtUtils::Mkbootstrap::Verbose = 1;
-Mkbootstrap('');
+Mkbootstrap();
 is( $out->read, "\tbsloadlibs=\n", 'should report libraries in Verbose mode' );
 
 Mkbootstrap('', 'foo');
@@ -81,7 +76,7 @@ SKIP: {
 	chmod 0444, 'dasboot.bs';
 
 	SKIP: {
-	    skip("cannot write readonly files", 1) if -w 'dasboot.bs'; 
+	    skip("can write readonly files", 1) if -w 'dasboot.bs'; 
 
 	    eval{ Mkbootstrap('dasboot', 1) };
 	    like( $@, qr/Unable to open dasboot\.bs/, 'should die given bad filename' );
@@ -124,7 +119,6 @@ SKIP: {
 	close OUT;
 
 	# if $DynaLoader::bscode is set, write its contents to the file
-    local $DynaLoader::bscode;
 	$DynaLoader::bscode = 'Wall';
 	$ExtUtils::Mkbootstrap::Verbose = 0;
 	
@@ -152,4 +146,20 @@ close OUT;
 END {
 	# clean things up, even on VMS
 	1 while unlink(qw( mkboot.bso boot_BS dasboot.bs .bs ));
+}
+
+package TieOut;
+
+sub TIEHANDLE {
+	bless( \(my $scalar), $_[0]);
+}
+
+sub PRINT {
+	my $self = shift;
+	$$self .= join('', @_);
+}
+
+sub read {
+	my $self = shift;
+	return substr($$self, 0, length($$self), '');
 }
