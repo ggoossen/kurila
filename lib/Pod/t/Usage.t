@@ -47,25 +47,17 @@ SKIP: {
     is( $$fake_out, $vbl_0, '-pathlist parameter' );
 }
 
-SKIP: { # Test exit status from pod2usage()
-    skip "Exit status broken on Mac OS", 1 if $^O eq 'MacOS';
-    my $exit = ($^O eq 'VMS' ? 2 : 42);
+{ # Test exit status from pod2usage()
+    my $exit = 42;
     my $dev_null = File::Spec->devnull;
     my $args = join ", ", (
         "-verbose => 0", 
         "-exit    => $exit",
-        "-output  => q{$dev_null}",
-        "-input   => q{$0}",
+        "-output  => q[$dev_null]",
+        "-input   => q[$0]",
     );
-    my $cq = (($^O eq 'MSWin32'
-               || $^O eq 'NetWare'
-               || $^O eq 'VMS') ? '"'
-              : "");
-    my @params = ( "${cq}-I../lib$cq",  "${cq}-MPod::Usage$cq", '-e' );
-    my $prg = qq[${cq}pod2usage({ $args })$cq];
-    my @cmd = ( $^X, @params, $prg );
-
-    print "# cmd = @cmd\n";
+    my $prg = qq[pod2usage({ $args })];
+    my @cmd = ( $^X, '-I../lib',  '-MPod::Usage', '-e',  $prg );
 
     is( system( @cmd ) >> 8, $exit, 'Exit status of pod2usage()' );
 }
