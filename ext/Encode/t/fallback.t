@@ -8,26 +8,22 @@ BEGIN {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
-    if (ord("A") == 193) {
-	print "1..0 # Skip: EBCDIC\n";
-	exit 0;
-    }
     $| = 1;
 }
 
 use strict;
 #use Test::More qw(no_plan);
-use Test::More tests => 22;
+use Test::More tests => 15;
 use Encode q(:all);
+
 
 my $original = '';
 my $nofallback  = '';
-my ($fallenback, $quiet, $perlqq, $htmlcref, $xmlcref);
+my ($fallenback, $quiet, $perlqq);
 for my $i (0x20..0x7e){
     $original .= chr($i);
 }
-$fallenback = $quiet = 
-$perlqq = $htmlcref = $xmlcref = $nofallback = $original;
+$fallenback = $quiet = $perlqq = $nofallback = $original;
 
 my $residue = '';
 for my $i (0x80..0xff){
@@ -35,8 +31,6 @@ for my $i (0x80..0xff){
     $residue    .= chr($i);
     $fallenback .= '?';
     $perlqq     .= sprintf("\\x{%04x}", $i);
-    $htmlcref    .= sprintf("&#%d;", $i);
-    $xmlcref    .= sprintf("&#x%x;", $i);
 }
 utf8::upgrade($original);
 my $meth   = find_encoding('ascii');
@@ -75,28 +69,9 @@ is($src, $residue, "FB_QUIET residue");
     is($dst, $quiet,   "FB_WARN");
     is($src, $residue, "FB_WARN residue");
     like($message, qr/does not map to ascii/o, "FB_WARN message");
-
-    $message = '';
-
-    $src = $original;
-    $dst = $meth->encode($src, WARN_ON_ERR);
-
-    is($dst, $fallenback, "WARN_ON_ERR");
-    is($src, '',  "WARN_ON_ERR residue");
-    like($message, qr/does not map to ascii/o, "WARN_ON_ERR message");
 }
 
 $src = $original;
 $dst = $meth->encode($src, FB_PERLQQ);
 is($dst, $perlqq,   "FB_PERLQQ");
 is($src, '', "FB_PERLQQ residue");
-
-$src = $original;
-$dst = $meth->encode($src, FB_HTMLCREF);
-is($dst, $htmlcref,   "FB_HTMLCREF");
-is($src, '', "FB_HTMLCREF residue");
-
-$src = $original;
-$dst = $meth->encode($src, FB_XMLCREF);
-is($dst, $xmlcref,   "FB_XMLCREF");
-is($src, '', "FB_XMLCREF residue");

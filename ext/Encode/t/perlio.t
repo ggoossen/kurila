@@ -12,130 +12,90 @@ BEGIN {
 	print "1..0 # Skip: EBCDIC\n";
 	exit 0;
     }
-    unless (PerlIO::Layer->find('perlio')){
-        print "1..0 # Skip: PerlIO required\n";
-        exit 0;
+    require Encode;
+    unless ($INC{"PerlIO/encoding.pm"} 
+	    and PerlIO::encoding->VERSION >= 0.02
+	   ){
+	print "1..0 # Skip:: PerlIO::encoding 0.02 or better required\n";
+	exit 0;
     }
+    # warn "PerlIO::encoding->VERSION == ", PerlIO::encoding->VERSION, "\n";
     $| = 1;
 }
 
 use strict;
 use File::Basename;
 use File::Spec;
-use File::Compare qw(compare_text);
-use File::Copy;
+use File::Compare;
 use FileHandle;
 
 #use Test::More qw(no_plan);
-use Test::More tests => 28;
+use Test::More tests => 20;
 
 our $DEBUG = 0;
 
-use Encode (":all");
 {
     no warnings;
     @ARGV and $DEBUG = shift;
-    #require Encode::JP::JIS7;
-    #require Encode::KR::2022_KR;
-    #$Encode::JP::JIS7::DEBUG = $DEBUG;
+    require Encode::JP::JIS7;
+    $Encode::JP::JIS7::DEBUG = $DEBUG;
 }
 
+Encode->import(":all");
 
-
-my $seq = 0;
 my $dir = dirname(__FILE__);
+my $ufile = File::Spec->catfile($dir,"jisx0208.ref");
+open my $fh, "<:utf8", $ufile or die "$ufile : $!";
+my @uline = <$fh>;
+my $utext = join('' => @uline);
+close $fh;
 
-my %e = 
-    (
-     jisx0208 => [ qw/euc-jp shiftjis 7bit-jis iso-2022-jp iso-2022-jp-1/],
-     #ksc5601  => [ qw/euc-kr iso-2022-kr/],
-     ksc5601  => [ qw/euc-kr/],
-     #gb2312   => [ qw/euc-cn hz/],
-     gb2312   => [ qw/euc-cn/],
-    );
+for my $e (qw/euc-jp shiftjis 7bit-jis iso-2022-jp iso-2022-jp-1/){
+    my $sfile = File::Spec->catfile($dir,"$$.sio");
+    my $pfile = File::Spec->catfile($dir,"$$.pio");
 
-$/ = "\x0a"; # may fix VMS problem for test #28 and #29
-
-for my $src(sort keys %e) {
-    my $ufile = File::Spec->catfile($dir,"$src.utf");
-    open my $fh, "<:utf8", $ufile or die "$ufile : $!";
-    my @uline = <$fh>;
-    my $utext = join('' => @uline);
-    close $fh;
-
-    for my $e (@{$e{$src}}){
-	my $sfile = File::Spec->catfile($dir,"$$.sio");
-	my $pfile = File::Spec->catfile($dir,"$$.pio");
-    
-	# first create a file without perlio
-	dump2file($sfile, &encode($e, $utext, 0));
-    
-	# then create a file via perlio without autoflush
-
-    TODO:{
-	    #local $TODO = "$e: !perlio_ok" unless (perlio_ok($e) or $DEBUG);
-	    todo_skip "$e: !perlio_ok", 4 unless (perlio_ok($e) or $DEBUG);
-	    no warnings 'uninitialized';
-	    open $fh, ">:encoding($e)", $pfile or die "$sfile : $!";
-	    $fh->autoflush(0);
-	    print $fh $utext;
-	    close $fh;
-	    $seq++;
-	    is(compare_text($sfile, $pfile), 0 => ">:encoding($e)");
-	    if ($DEBUG){
-		copy $sfile, "$sfile.$seq";
-		copy $pfile, "$pfile.$seq";
-	    }
-	    
-	    # this time print line by line.
-	    # works even for ISO-2022 but not ISO-2022-KR
-	    open $fh, ">:encoding($e)", $pfile or die "$sfile : $!";
-	    $fh->autoflush(1);
-	    for my $l (@uline) {
-		print $fh $l;
-	    }
-	    close $fh;
-	    $seq++;
-	    is(compare_text($sfile, $pfile), 0 => ">:encoding($e) by lines");
-	    if ($DEBUG){
-		copy $sfile, "$sfile.$seq";
-		copy $pfile, "$pfile.$seq";
-	    }
-	    my $dtext;
-	    open $fh, "<:encoding($e)", $pfile or die "$pfile : $!";
-	    $fh->autoflush(0);
-	    $dtext = join('' => <$fh>);
-	    close $fh;
-	    $seq++;
-	    ok($utext eq $dtext, "<:encoding($e)");
-	    if ($DEBUG){
-		dump2file("$sfile.$seq", $utext);
-		dump2file("$pfile.$seq", $dtext);
-	    }
-	    if (perlio_ok($e) or $DEBUG){
-		$dtext = '';
-		open $fh, "<:encoding($e)", $pfile or die "$pfile : $!";
-		while(defined(my $l = <$fh>)) {
-		    $dtext .= $l;
-		}
-		close $fh;
-	    }
-	    $seq++;
-	    ok($utext eq $dtext,  "<:encoding($e) by lines");
-	    if ($DEBUG){
-		dump2file("$sfile.$seq", $utext);
-		dump2file("$pfile.$seq", $dtext);
-	    }
-	}
-	$DEBUG or unlink ($sfile, $pfile);
-    }
-}
-    
-
-sub dump2file{
-    no warnings;
-    open my $fh, ">", $_[0] or die "$_[0]: $!";
+    # first create a file without perlio
+    open $fh, ">", $sfile or die "$sfile :$!";
     binmode $fh;
-    print $fh $_[1];
+    print $fh &encode($e, $utext, 0);
     close $fh;
+
+    # then create a file via perlio without autoflush
+	
+ TODO:{
+	todo_skip "$e: !perlio_ok", 1  unless perlio_ok($e);
+	open $fh, ">:encoding($e)", $pfile or die "$sfile : $!";
+	$fh->autoflush(0);
+	print $fh $utext;
+	close $fh;
+	ok(compare($sfile, $pfile) == 0 => ">:encoding($e)");
+    }
+	
+    # this time print line by line.
+    # works even for ISO-2022!
+    open $fh, ">:encoding($e)", $pfile or die "$sfile : $!";
+    $fh->autoflush(1);
+    for my $l (@uline) {
+	print $fh $l;
+    }
+    close $fh;
+    is(compare($sfile, $pfile), 0 => ">:encoding($e); line-by-line");
+
+ TODO:{
+	todo_skip "$e: !perlio_ok", 2 unless perlio_ok($e);
+	open $fh, "<:encoding($e)", $pfile or die "$pfile : $!";
+	$fh->autoflush(0);
+	my $dtext = join('' => <$fh>);
+	close $fh;
+	ok($utext eq $dtext, "<:encoding($e)");
+	$dtext = '';
+	open $fh, "<:encoding($e)", $pfile or die "$pfile : $!";
+	while(defined(my $l = <$fh>)) {
+	    $dtext .= $l;
+	}
+	close $fh;
+	ok($utext eq $dtext, "<:encoding($e); line-by-line");
+    }    
+    $DEBUG or unlink ($sfile, $pfile);
 }
+

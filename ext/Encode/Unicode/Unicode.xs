@@ -1,13 +1,11 @@
 /*
- $Id: Unicode.xs,v 1.5 2002/05/20 15:25:44 dankogai Exp $
+ $Id: Unicode.xs,v 1.2 2002/04/19 05:36:43 dankogai Exp $
  */
 
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#define U8 U8
-#include "../Encode/encode.h"
 
 #define FBCHAR			0xFFFd
 #define BOM_BE			0xFeFF
@@ -61,7 +59,7 @@ enc_pack(pTHX_ SV *result,STRLEN size,U8 endian,UV value)
 	d += SvCUR(result);
 	SvCUR_set(result,SvCUR(result)+size);
 	while (size--) {
-	    *d++ = (U8)(value & 0xFF);
+	    *d++ = value & 0xFF;
 	    value >>= 8;
 	}
 	break;
@@ -70,7 +68,7 @@ enc_pack(pTHX_ SV *result,STRLEN size,U8 endian,UV value)
 	SvCUR_set(result,SvCUR(result)+size);
 	d += SvCUR(result);
 	while (size--) {
-	    *--d = (U8)(value & 0xFF);
+	    *--d = value & 0xFF;
 	    value >>= 8;
 	}
 	break;
@@ -82,13 +80,11 @@ enc_pack(pTHX_ SV *result,STRLEN size,U8 endian,UV value)
 
 MODULE = Encode::Unicode PACKAGE = Encode::Unicode
 
-PROTOTYPES: DISABLE
-
 void
-decode_xs(obj, str, check = 0)
+decode_xs(obj, str, chk = &PL_sv_undef)
 SV *	obj
 SV *	str
-IV	check
+SV *	chk
 CODE:
 {
     int size    = SvIV(*hv_fetch((HV *)SvRV(obj),"size",4,0));
@@ -128,14 +124,14 @@ CODE:
 	U8 *d;
 	if (size != 4 && invalid_ucs2(ord)) {
 	    if (ucs2) {
-		if (check) {
+		if (SvTRUE(chk)) {
 		    croak("%s:no surrogates allowed %"UVxf,
 			  SvPV_nolen(*hv_fetch((HV *)SvRV(obj),"Name",4,0)),
 			  ord);
 		}
 		if (s+size <= e) {
                     /* skip the next one as well */
-		    enc_unpack(aTHX_ &s,e,size,endian);
+		    enc_unpack(aTHX_ &s,e,size,endian); 
 		}
 		ord = FBCHAR;
 	    }
@@ -164,12 +160,10 @@ CODE:
 	d = uvuni_to_utf8_flags(d+SvCUR(result), ord, 0);
 	SvCUR_set(result,d - (U8 *)SvPVX(result));
     }
-    if (s < e) {
+    if (SvTRUE(chk)) {
+	if (s < e) {
 	    Perl_warner(aTHX_ packWARN(WARN_UTF8),"%s:Partial character",
 			SvPV_nolen(*hv_fetch((HV *)SvRV(obj),"Name",4,0)));
-    }
-    if (check && !(check & ENCODE_LEAVE_SRC)){
-	if (s < e) {
 	    Move(s,SvPVX(str),e-s,U8);
 	    SvCUR_set(str,(e-s));
 	}
@@ -182,10 +176,10 @@ CODE:
 }
 
 void
-encode_xs(obj, utf8, check = 0)
-SV *	obj
+encode_xs(obj, utf8, chk = &PL_sv_undef)
+    SV *	obj
 SV *	utf8
-IV	check
+SV *	chk
 CODE:
 {
     int size   = SvIV(*hv_fetch((HV *)SvRV(obj),"size",4,0));
@@ -211,8 +205,8 @@ CODE:
 	if (size != 4 && invalid_ucs2(ord)) {
 	    if (!issurrogate(ord)){
 		if (ucs2) {
-		    if (check) {
-			croak("%s:code point \"\\x{%"UVxf"}\" too high",
+		    if (SvTRUE(chk)) {
+			croak("%s:code point \"\\x{"UVxf"}\" too high",
 			      SvPV_nolen(
 				  *hv_fetch((HV *)SvRV(obj),"Name",4,0))
 			      ,ord);
@@ -234,12 +228,10 @@ CODE:
 	    enc_pack(aTHX_ result,size,endian,ord);
 	}
     }
-    if (s < e) {
-	Perl_warner(aTHX_ packWARN(WARN_UTF8),"%s:Partial character",
-		    SvPV_nolen(*hv_fetch((HV *)SvRV(obj),"Name",4,0)));
-    }
-    if (check && !(check & ENCODE_LEAVE_SRC)){
+    if (SvTRUE(chk)) {
 	if (s < e) {
+	    Perl_warner(aTHX_ packWARN(WARN_UTF8),"%s:Partial character",
+			SvPV_nolen(*hv_fetch((HV *)SvRV(obj),"Name",4,0)));
 	    Move(s,SvPVX(utf8),e-s,U8);
 	    SvCUR_set(utf8,(e-s));
 	}
