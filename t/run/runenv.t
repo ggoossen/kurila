@@ -7,24 +7,17 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
-    unless ($Config{'d_fork'}) {
-        print "1..0 # Skip: no fork\n";
-	    exit 0;
-    }
 }
-
-use Test;
-
-plan tests => 11;
 
 my $STDOUT = './results-0';
 my $STDERR = './results-1';
 my $PERL = './perl';
 my $FAILURE_CODE = 119;
 
+print "1..9\n";
+
 # Run perl with specified environment and arguments returns a list.
-# First element is true if Perl's stdout and stderr match the
+# First element is true iff Perl's stdout and stderr match the
 # supplied $stdout and $stderr argument strings exactly.
 # second element is an explanation of the failure
 sub runperl {
@@ -72,14 +65,19 @@ sub it_didnt_work {
 }
 
 sub try {
+  my $testno = shift;
   my ($success, $reason) = runperl(@_);
-  $reason =~ s/\n/\\n/g if defined $reason;
-  ok( !!$success, 1, $reason );
+  if ($success) {
+    print "ok $testno\n";
+  } else {
+    $reason =~ s/\n/\\n/g;
+    print "not ok $testno # $reason\n";    
+  }
 }
 
 #  PERL5OPT    Command-line options (switches).  Switches in
 #                    this variable are taken as if they were on
-#                    every Perl command line.  Only the -[DIMUdmtw]
+#                    every Perl command line.  Only the -[DIMUdmw]
 #                    switches are allowed.  When running taint
 #                    checks (because the program was running setuid
 #                    or setgid, or the -T switch was used), this
@@ -87,24 +85,25 @@ sub try {
 #                    -T, tainting will be enabled, and any
 #                    subsequent options ignored.
 
-try({PERL5OPT => '-w'}, ['-e', 'print $::x'],
+my  $T = 1;
+try($T++, {PERL5OPT => '-w'}, ['-e', 'print $::x'],
     "", 
     qq{Name "main::x" used only once: possible typo at -e line 1.\nUse of uninitialized value in print at -e line 1.\n});
 
-try({PERL5OPT => '-Mstrict'}, ['-e', 'print $::x'],
+try($T++, {PERL5OPT => '-Mstrict'}, ['-e', 'print $::x'],
     "", "");
 
-try({PERL5OPT => '-Mstrict'}, ['-e', 'print $x'],
+try($T++, {PERL5OPT => '-Mstrict'}, ['-e', 'print $x'],
     "", 
     qq{Global symbol "\$x" requires explicit package name at -e line 1.\nExecution of -e aborted due to compilation errors.\n});
 
 # Fails in 5.6.0
-try({PERL5OPT => '-Mstrict -w'}, ['-e', 'print $x'],
+try($T++, {PERL5OPT => '-Mstrict -w'}, ['-e', 'print $x'],
     "", 
     qq{Global symbol "\$x" requires explicit package name at -e line 1.\nExecution of -e aborted due to compilation errors.\n});
 
 # Fails in 5.6.0
-try({PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
+try($T++, {PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
     "", 
     <<ERROR
 Name "main::x" used only once: possible typo at -e line 1.
@@ -113,7 +112,7 @@ ERROR
     );
 
 # Fails in 5.6.0
-try({PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
+try($T++, {PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
     "", 
     <<ERROR
 Name "main::x" used only once: possible typo at -e line 1.
@@ -121,31 +120,18 @@ Use of uninitialized value in print at -e line 1.
 ERROR
     );
 
-try({PERL5OPT => '-MExporter'}, ['-e0'],
+try($T++, {PERL5OPT => '-MExporter'}, ['-e0'],
     "", 
     "");
 
 # Fails in 5.6.0
-try({PERL5OPT => '-MExporter -MExporter'}, ['-e0'],
+try($T++, {PERL5OPT => '-MExporter -MExporter'}, ['-e0'],
     "", 
     "");
 
-try({PERL5OPT => '-Mstrict -Mwarnings'}, 
+try($T++, {PERL5OPT => '-Mstrict -Mwarnings'}, 
     ['-e', 'print "ok" if $INC{"strict.pm"} and $INC{"warnings.pm"}'],
     "ok",
     "");
 
-try({PERL5OPT => '-w -w'},
-    ['-e', 'print $ENV{PERL5OPT}'],
-    '-w -w',
-    '');
-
-try({PERL5OPT => '-t'},
-    ['-e', 'print ${^TAINT}'],
-    '1',
-    '');
-
-END {
-    1 while unlink $STDOUT;
-    1 while unlink $STDERR;
-}
+print "# ", $T-1, " tests total.\n";
