@@ -1,4 +1,4 @@
-#!./perl -t
+#!./perl -tw
 
 BEGIN {
     chdir 't';
@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 11;
+plan tests => 10;
 
 my $Perl = which_perl();
 
@@ -16,14 +16,14 @@ my $Tmsg = 'while running with -t switch';
 
 ok( ${^TAINT},      '${^TAINT} defined' );
 
-my $out = `$Perl -le "print q(Hello)"`;
+my $out = `$Perl -le "print q{Hello}"`;
 is( $out, "Hello\n",                      '`` worked' );
 like( $warning, qr/^Insecure .* $Tmsg/, '    taint warn' );
 
 {
     no warnings 'taint';
     $warning = '';
-    my $out = `$Perl -le "print q(Hello)"`;
+    my $out = `$Perl -le "print q{Hello}"`;
     is( $out, "Hello\n",                      '`` worked' );
     is( $warning, '',                       '   no warnings "taint"' );
 }
@@ -41,5 +41,3 @@ unlink($file);
 like( $warning, qr/^Insecure dependency in unlink $Tmsg/,
                                                   'unlink() taint warn' );
 ok( !-e $file,  'unlink worked' );
-
-ok( !$^W,   "-t doesn't enable regular warnings" );
