@@ -3,22 +3,15 @@ package B::Concise;
 # This program is free software; you can redistribute and/or modify it
 # under the same terms as Perl itself.
 
+our $VERSION = "0.50";
 use strict;
-use warnings;
-
-use Exporter ();
-
-our $VERSION   = "0.52";
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(set_style add_callback);
-
 use B qw(class ppname main_start main_root main_cv cstring svref_2object
 	 SVf_IOK SVf_NOK SVf_POK OPf_KIDS);
 
 my %style = 
   ("terse" =>
-   ["(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
-    . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n",
+   ["(?(#label =>\n)?)(*(    )*)#class (#addr) pp_#name "
+    . "(?([#targ])?) #svclass~(?((#svaddr))?)~#svval\n",
     "(*(    )*)goto #class (#addr)\n",
     "#class pp_#name"],
    "concise" =>
@@ -45,15 +38,6 @@ my %style =
 my($format, $gotofmt, $treefmt);
 my $curcv;
 my($seq_base, $cop_seq_base);
-my @callbacks;
-
-sub set_style {
-    ($format, $gotofmt, $treefmt) = @_;
-}
-
-sub add_callback {
-    push @callbacks, @_;
-}
 
 sub concise_cv {
     my ($order, $cvref) = @_;
@@ -84,12 +68,11 @@ my $big_endian = 1;
 
 my $order = "basic";
 
-set_style(@{$style{concise}});
-
 sub compile {
     my @options = grep(/^-/, @_);
     my @args = grep(!/^-/, @_);
     my $do_main = 0;
+    ($format, $gotofmt, $treefmt) = @{$style{"concise"}};
     for my $o (@options) {
 	if ($o eq "-basic") {
 	    $order = "basic";
@@ -114,7 +97,7 @@ sub compile {
 	} elsif ($o eq "-littleendian") {
 	    $big_endian = 0;
 	} elsif (exists $style{substr($o, 1)}) {
-	    set_style(@{$style{substr($o, 1)}});
+	    ($format, $gotofmt, $treefmt) = @{$style{substr($o, 1)}};
 	} else {
 	    warn "Option $o unrecognized";
 	}
@@ -151,9 +134,8 @@ my $lastnext;
 
 my %opclass = ('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
 	       'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*",
-	       'PVOP' => '"', 'LOOP' => "{", 'COP' => ";", 'PADOP' => "#");
+	       'PVOP' => '"', 'LOOP' => "{", 'COP' => ";");
 
-no warnings 'qw'; # "Possible attempt to put comments..."
 my @linenoise =
   qw'#  () sc (  @? 1  $* gv *{ m$ m@ m% m? p/ *$ $  $# & a& pt \\ s\\ rf bl
      `  *? <> ?? ?/ r/ c/ // qr s/ /c y/ =  @= C  sC Cp sp df un BM po +1 +I
@@ -207,8 +189,7 @@ sub walk_topdown {
 	    walk_topdown($kid, $sub, $level + 1);
 	}
     }
-    if (class($op) eq "PMOP" and $ {$op->pmreplroot}
-	and $op->pmreplroot->isa("B::OP")) {
+    if (class($op) eq "PMOP" and $ {$op->pmreplroot}) {
 	walk_topdown($op->pmreplroot, $sub, $level + 1);
     }
 }
@@ -274,6 +255,7 @@ $priv{$_}{128} = "LVINTRO"
        "padav", "padhv");
 $priv{$_}{64} = "REFC" for ("leave", "leavesub", "leavesublv", "leavewrite");
 $priv{"aassign"}{64} = "COMMON";
+$priv{"aassign"}{32} = "PHASH";
 $priv{"sassign"}{64} = "BKWARD";
 $priv{$_}{64} = "RTIME" for ("match", "subst", "substcont");
 @{$priv{"trans"}}{1,2,4,8,16,64} = ("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
@@ -300,7 +282,7 @@ $priv{$_}{16} = "TARGMY"
        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system",
        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority",
        "setpriority", "time", "sleep");
-@{$priv{"const"}}{8,16,32,64,128} = ("STRICT","ENTERED", '$[', "BARE", "WARN");
+@{$priv{"const"}}{8,16,32,64,128} = ("STRICT","ENTERED", "$[", "BARE", "WARN");
 $priv{"flip"}{64} = $priv{"flop"}{64} = "LINENUM";
 $priv{"list"}{64} = "GUESSED";
 $priv{"delete"}{64} = "SLICE";
@@ -343,7 +325,7 @@ sub concise_op {
     } elsif ($h{targ}) {
 	my $padname = (($curcv->PADLIST->ARRAY)[0]->ARRAY)[$h{targ}];
 	if (defined $padname and class($padname) ne "SPECIAL") {
-	    $h{targarg}  = $padname->PVX;
+	    $h{targarg}  = $padname->PV;
 	    my $intro = $padname->NVX - $cop_seq_base;
 	    my $finish = int($padname->IVX) - $cop_seq_base;
 	    $finish = "end" if $finish == 999999999 - $cop_seq_base;
@@ -356,23 +338,9 @@ sub concise_op {
     $h{svclass} = $h{svaddr} = $h{svval} = "";
     if ($h{class} eq "PMOP") {
 	my $precomp = $op->precomp;
-	if (defined $precomp) {
-	    # Escape literal control sequences
-	    for ($precomp) {
-		s/\t/\\t/g; s/\n/\\n/g; s/\r/\\r/g;
-		# How can we do the below portably?
-		#s/([\0-\037\177-\377])/"\\".sprintf("%03o", ord($1))/eg;
-	    }
-	    $precomp = "/$precomp/";
-	}
-	else { $precomp = ""; }
-	my $pmreplroot = $op->pmreplroot;
+	$precomp = defined($precomp) ? "/$precomp/" : "";
 	my $pmreplstart;
-	if ($$pmreplroot && $pmreplroot->isa("B::GV")) {
-	    # with C<@stash_array = split(/pat/, str);>,
-	    #  *stash_array is stored in pmreplroot.
-	    $h{arg} = "($precomp => \@" . $pmreplroot->NAME . ")";
-	} elsif ($ {$op->pmreplstart}) {
+	if ($ {$op->pmreplstart}) {
 	    undef $lastnext;
 	    $pmreplstart = "replstart->" . seq($op->pmreplstart);
 	    $h{arg} = "(" . join(" ", $precomp, $pmreplstart) . ")";
@@ -384,7 +352,6 @@ sub concise_op {
 	$h{svval} = '"' . $op->pv . '"';
     } elsif ($h{class} eq "COP") {
 	my $label = $op->label;
-	$h{coplabel} = $label;
 	$label = $label ? "$label: " : "";
 	my $loc = $op->file;
 	$loc =~ s[.*/][];
@@ -411,8 +378,8 @@ sub concise_op {
 	    } else {
 		$stash = $stash . "::";
 	    }
-	    $h{arg} = "(*$stash" . $gv->SAFENAME . ")";
-	    $h{svval} = "*$stash" . $gv->SAFENAME;
+	    $h{arg} = "(*$stash" . $gv->NAME . ")";
+	    $h{svval} = "*$stash" . $gv->NAME;
 	} else {
 	    while (class($sv) eq "RV") {
 		$h{svval} .= "\\";
@@ -449,7 +416,6 @@ sub concise_op {
     $h{label} = $labels{$op->seq};
     $h{typenum} = $op->type;
     $h{noise} = $linenoise[$op->type];
-    $_->(\%h, $op, \$format, \$level) for @callbacks;
     return fmt_line(\%h, $format, $level);
 }
 
@@ -498,44 +464,10 @@ sub tree {
            map(" " x (length($name)+$size) . $_, @lines));
 }
 
-# *** Warning: fragile kludge ahead ***
-# Because the B::* modules run in the same interpreter as the code
-# they're compiling, their presence tends to distort the view we have
-# of the code we're looking at. In particular, perl gives sequence
-# numbers to both OPs in general and COPs in particular. If the
-# program we're looking at were run on its own, these numbers would
-# start at 1. Because all of B::Concise and all the modules it uses
-# are compiled first, though, by the time we get to the user's program
-# the sequence numbers are alreay at pretty high numbers, which would
-# be distracting if you're trying to tell OPs apart. Therefore we'd
-# like to subtract an offset from all the sequence numbers we display,
-# to restore the simpler view of the world. The trick is to know what
-# that offset will be, when we're still compiling B::Concise!  If we
-# hardcoded a value, it would have to change every time B::Concise or
-# other modules we use do. To help a little, what we do here is
-# compile a little code at the end of the module, and compute the base
-# sequence number for the user's program as being a small offset
-# later, so all we have to worry about are changes in the offset.
-
-# When you say "perl -MO=Concise -e '$a'", the output should look like:
-
-# 4  <@> leave[t1] vKP/REFC ->(end)
-# 1     <0> enter ->2
- #^ smallest OP sequence number should be 1
-# 2     <;> nextstate(main 1 -e:1) v ->3
- #                         ^ smallest COP sequence number should be 1
-# -     <1> ex-rv2sv vK/1 ->4
-# 3        <$> gvsv(*a) s ->4
-
-# If either of the marked numbers there aren't 1, it means you need to
-# update the corresponding magic number in the next two lines.
-# Remember, these need to stay the last things in the module.
-
-# Why these are different for MacOS?  Does it matter?
-my $cop_seq_mnum = $^O eq 'MacOS' ? 12 : 11;
-my $seq_mnum = $^O eq 'MacOS' ? 100 : 84;
-$cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
-$seq_base = svref_2object(eval 'sub{}')->START->seq + $seq_mnum;
+# This is a bit of a hack; the 2 and 15 were determined empirically.
+# These need to stay the last things in the module.
+$cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + 2;
+$seq_base = svref_2object(eval 'sub{}')->START->seq + 15;
 
 1;
 
@@ -549,8 +481,6 @@ B::Concise - Walk Perl syntax tree, printing concise info about ops
 
     perl -MO=Concise[,OPTIONS] foo.pl
 
-    use B::Concise qw(set_style add_callback);
-
 =head1 DESCRIPTION
 
 This compiler backend prints the internal OPs of a Perl program's syntax
@@ -561,44 +491,6 @@ in a text approximation to their tree structure, and the format of the
 information displyed is customizable. Its function is similar to that of
 perl's B<-Dx> debugging flag or the B<B::Terse> module, but it is more
 sophisticated and flexible.
-
-=head1 EXAMPLE
-
-Here's is a short example of output, using the default formatting
-conventions :
-
-    % perl -MO=Concise -e '$a = $b + 42'
-    8  <@> leave[t1] vKP/REFC ->(end)
-    1     <0> enter ->2
-    2     <;> nextstate(main 1 -e:1) v ->3
-    7     <2> sassign vKS/2 ->8
-    5        <2> add[t1] sK/2 ->6
-    -           <1> ex-rv2sv sK/1 ->4
-    3              <$> gvsv(*b) s ->4
-    4           <$> const(IV 42) s ->5
-    -        <1> ex-rv2sv sKRM*/1 ->7
-    6           <$> gvsv(*a) s ->7
-
-Each line corresponds to an operator. Null ops appear as C<ex-opname>,
-where I<opname> is the op that has been optimized away by perl.
-
-The number on the first row indicates the op's sequence number. It's
-given in base 36 by default.
-
-The symbol between angle brackets indicates the op's type : for example,
-<2> is a BINOP, <@> a LISTOP, etc. (see L</"OP class abbreviations">).
-
-The opname may be followed by op-specific information in parentheses
-(e.g. C<gvsv(*b)>), and by targ information in brackets (e.g.
-C<leave[t1]>).
-
-Next come the op flags. The common flags are listed below
-(L</"OP flags abbreviations">). The private flags follow, separated
-by a slash. For example, C<vKP/REFC> means that the leave op has
-public flags OPf_WANT_VOID, OPf_KIDS, and OPf_PARENS, and the private
-flag OPpREFCOUNTED.
-
-Finally an arrow points to the sequence number of the next op.
 
 =head1 OPTIONS
 
@@ -771,13 +663,9 @@ non-local exit pointers for a LOOP, etc.) enclosed in paretheses.
 
 The B-determined class of the OP, in all caps.
 
-=item B<#classsym>
+=item B<#classym>
 
 A single symbol abbreviating the class of the OP.
-
-=item B<#coplabel>
-
-The label of the statement or block the OP is the start of, if any.
 
 =item B<#exname>
 
@@ -799,7 +687,7 @@ The OP's flags, abbreviated as a series of symbols.
 
 The numeric value of the OP's flags.
 
-=item B<#hyphseq>
+=item B<#hyphenseq>
 
 The sequence number of the OP, or a hyphen if it doesn't have one.
 
@@ -916,44 +804,6 @@ The numeric value of the OP's type, in decimal.
     "      PVOP             An OP with a string
     {      LOOP             An OP that holds pointers for a loop
     ;      COP              An OP that marks the start of a statement
-    #      PADOP            An OP with a GV on the pad
-
-=head1 Using B::Concise outside of the O framework
-
-It is possible to extend B<B::Concise> by using it outside of the B<O>
-framework and providing new styles and new variables.
-
-    use B::Concise qw(set_style add_callback);
-    set_style($format, $gotofmt, $treefmt);
-    add_callback
-    (
-        sub
-        {
-            my ($h, $op, $level, $format) = @_;
-            $h->{variable} = some_func($op);
-        }
-    );
-    B::Concise::compile(@options)->();
-
-You can specify a style by calling the B<set_style> subroutine.  If you
-have a new variable in your style, or you want to change the value of an
-existing variable, you will need to add a callback to specify the value
-for that variable.
-
-This is done by calling B<add_callback> passing references to any
-callback subroutines.  The subroutines are called in the same order as
-they are added.  Each subroutine is passed four parameters.  These are a
-reference to a hash, the keys of which are the names of the variables
-and the values of which are their values, the op, the level and the
-format.
-
-To define your own variables, simply add them to the hash, or change
-existing values if you need to.  The level and format are passed in as
-references to scalars, but it is unlikely that they will need to be
-changed or even used.
-
-To see the output, call the subroutine returned by B<compile> in the
-same way that B<O> does.
 
 =head1 AUTHOR
 
