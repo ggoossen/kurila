@@ -49,11 +49,9 @@ if ($^O ne 'MSWin32' && $^O ne 'NetWare' && $^O ne 'VMS' && $^O ne 'os2') {
     ($name, $home) = (getpwuid($>))[0,7];
     1;
   } and do {
-    if (defined $home && defined $name && -d $home) {
-	@a = bsd_glob("~$name", GLOB_TILDE);
-	if ((scalar(@a) != 1 || $a[0] ne $home || GLOB_ERROR)) {
-	    print "not ";
-	}
+    @a = bsd_glob("~$name", GLOB_TILDE);
+    if (scalar(@a) != 1 || $a[0] ne $home || GLOB_ERROR) {
+	print "not ";
     }
   };
 }
@@ -86,21 +84,15 @@ if ($^O eq 'mpeix' or $^O eq 'MSWin32' or $^O eq 'NetWare' or $^O eq 'os2' or $^
     print "ok 6 # skipped\n";
 }
 else {
-    $dir = "pteerslo";
+    $dir = "pteerslt";
     mkdir $dir, 0;
     @a = bsd_glob("$dir/*", GLOB_ERR);
     #print "\@a = ", array(@a);
     rmdir $dir;
     if (scalar(@a) != 0 || GLOB_ERROR == 0) {
-	if ($^O eq 'vos') {
-	    print "not ok 6 # TODO hit VOS bug posix-956\n";
-	} else {
-	    print "not ok 6\n";
-	}
+	print "not ";
     }
-    else {
-	print "ok 6\n";
-    }
+    print "ok 6\n";
 }
 
 # check for csh style globbing
@@ -118,7 +110,6 @@ print "ok 7\n";
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
 @a = grep !/(,v$|~$|\.(pm|ori?g|rej)$)/, @a;
-@a = (grep !/test.pl/, @a) if $^O eq 'VMS';
 
 print "# @a\n";
 
@@ -127,7 +118,7 @@ unless (@a == 3
         and $a[1] eq 'a'
         and $a[2] eq 'b')
 {
-    print "not ok 8 # @a\n";
+    print "not ok 8 # @a";
 } else {
     print "ok 8\n";
 }
@@ -141,8 +132,8 @@ unless ($^O eq "MacOS" || (@a == 1 and $a[0] eq $ENV{HOME})) {
 print "ok 9\n";
 
 # GLOB_ALPHASORT (default) should sort alphabetically regardless of case
-mkdir "pteerslo", 0777;
-chdir "pteerslo";
+mkdir "pteerslt", 0777;
+chdir "pteerslt";
 
 @f_names = qw(Ax.pl Bx.pl Cx.pl aY.pl bY.pl cY.pl);
 @f_alpha = qw(Ax.pl aY.pl Bx.pl bY.pl Cx.pl cY.pl);
@@ -181,4 +172,4 @@ print $ok ? "ok 11\n" : "not ok 11\n";
 
 unlink @f_names;
 chdir "..";
-rmdir "pteerslo";
+rmdir "pteerslt";
