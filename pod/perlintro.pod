@@ -14,13 +14,13 @@ write your own simple scripts.
 This introductory document does not aim to be complete.  It does not
 even aim to be entirely accurate.  In some cases perfection has been
 sacrificed in the goal of getting the general idea across.  You are
-I<strongly> advised to follow this introduction with more information
+B<strongly> advised to follow this introduction with more information
 from the full Perl manual, the table of contents to which can be found
 in L<perltoc>.
 
 Throughout this document you'll see references to other parts of the 
 Perl documentation.  You can read that documentation using the C<perldoc>
-command or whatever method you're using to read this document.
+command or using whatever method you're using to read this document.
 
 =head2 What is Perl?
 
@@ -29,12 +29,12 @@ text manipulation and now used for a wide range of tasks including
 system administration, web development, network programming, GUI 
 development, and more.
 
-The language is intended to be practical (easy to use, efficient,
-complete) rather than beautiful (tiny, elegant, minimal).  Its major
-features are that it's easy to use, supports both procedural and
-object-oriented (OO) programming, has powerful built-in support for text
-processing, and has one of the world's most impressive collections of
-third-party modules.
+The language is intended to be practical (easy to use, efficient, 
+complete) rather than beautiful (tiny, elegant, minimal).  Its major 
+features are that it's easy to use, supports both procedural and OO
+programming, has powerful built-in support for text processing, and 
+has one of the world's most impressive collections of third-party 
+modules.
 
 Different definitions of Perl are given in L<perl>, L<perlfaq1> and 
 no doubt other places.  From this we can determine that Perl is different 
@@ -55,14 +55,14 @@ Alternatively, put this as the first line of your script:
 to be executable first, so C<chmod 755 script.pl> (under Unix).
 
 For more information, including instructions for other platforms such as
-Windows and Mac OS, read L<perlrun>.
+Windows and MacOS, read L<perlrun>.
 
 =head2 Basic syntax overview
 
 A Perl script or program consists of one or more statements.  These
 statements are simply written in the script in a straightforward
-fashion.  There is no need to have a C<main()> function or anything of
-that kind.
+fashion.  There is no need to have a main() function or anything of that
+kind.
 
 Perl statements end in a semi-colon:
 
@@ -169,7 +169,7 @@ The elements we're getting from the array start with a C<$> because
 we're getting just a single value out of the array -- you ask for a scalar, 
 you get a scalar.
 
-To get multiple values from an array:
+To get multiple values from a array:
 
     @animals[0,1];                  # gives ("camel", "llama");
     @animals[0..2];                 # gives ("camel", "llama", "owl");
@@ -285,9 +285,9 @@ running the program.  Using C<strict> is highly recommended.
 =head2 Conditional and looping constructs
 
 Perl has most of the usual conditional and looping constructs except for
-case/switch (but if you really want it, there is a Switch module in Perl
-5.8 and newer, and on CPAN. See the section on modules, below, for more
-information about modules and CPAN).
+case/switch (but you can find a Switch module on CPAN, if you really
+want one -- see the section on modules, below, for more information 
+about modules and CPAN).
 
 The conditions can be any Perl expression.  See the list of operators in
 the next section for information on comparison and boolean logic operators, 
@@ -311,7 +311,7 @@ There's also a negated version of it:
         ...
     }
 
-This is provided as a more readable version of C<if (!I<condition>)>.
+This is provided as a more readable version of C<if (! condition)>.
 
 Note that the braces are required in Perl, even if you've only got one
 line in the block.  However, there is a clever way of making your one-line
@@ -351,7 +351,7 @@ Exactly like C:
     }
 
 The C style for loop is rarely needed in Perl since Perl provides
-the more friendly list scanning C<foreach> loop.
+the the more friendly list scanning C<foreach> loop.
 
 =item foreach
 
@@ -374,7 +374,7 @@ this overview) see L<perlsyn>.
 Perl comes with a wide selection of builtin functions.  Some of the ones
 we've already seen include C<print>, C<sort> and C<reverse>.  A list of
 them is given at the start of L<perlfunc> and you can easily read 
-about any given function by using C<perldoc -f I<functionname>>.
+about any given function by using C<perldoc -f functionname>.
 
 Perl operators are documented in full in L<perlop>, but here are a few
 of the most common ones:
@@ -560,7 +560,7 @@ The results end up in C<$1>, C<$2> and so on.
 
     # a cheap and nasty way to break an email address up into parts
 
-    if ($email =~ /([^@])+@(.+)/) {
+    if ($email =~ /([^@]+@(.+)/) {
         print "Username is $1\n";
         print "Hostname is $2\n";
     }
@@ -616,7 +616,7 @@ in using third-party modules, which are documented below.
 =head2 Using Perl modules
 
 Perl modules provide a range of features to help you avoid reinventing
-the wheel, and can be downloaded from CPAN ( http://www.cpan.org/ ).  A
+the wheel, and can be downloaded from CPAN (http://www.cpan.org).  A
 number of popular modules are included with the Perl distribution
 itself.
 
@@ -627,9 +627,9 @@ also available from CPAN.
 To learn how to install modules you download from CPAN, read
 L<perlmodinstall>
 
-To learn how to use a particular module, use C<perldoc I<Module::Name>>.
-Typically you will want to C<use I<Module::Name>>, which will then give
-you access to exported functions or an OO interface to the module.
+To learn how to use a particular module, use C<perldoc Module::Name>.
+Typically you will want to C<use Module::Name>, which will then give you
+access to exported functions or an OO interface to the module.
 
 L<perlfaq> contains questions and answers related to many common
 tasks, and often provides suggestions for good CPAN modules to use.
