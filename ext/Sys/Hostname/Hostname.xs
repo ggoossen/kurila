@@ -18,7 +18,8 @@
 #  endif
 #endif
 
-#ifdef I_SYSUTSNAME
+#if defined(HAS_UNAME) && !defined(WIN32)
+/* XXX need i_sys_utsname in config.sh */
 #  include <sys/utsname.h>
 #endif
 
@@ -69,9 +70,7 @@ ghname()
 #    endif
 #  endif
 #endif
-#ifndef HAS_GETHOSTNAME
     check_out:
-#endif
     if (retval == -1)
 	XSRETURN_UNDEF;
     else
