@@ -1,7 +1,7 @@
 package Encode::MIME::Header;
 use strict;
 # use warnings;
-our $VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 use Encode qw(find_encoding encode_utf8);
 use MIME::Base64;
@@ -36,8 +36,8 @@ $Encode::Encoding{'MIME-Q'} =
 	Name        => 'MIME-Q',
     } => __PACKAGE__;
 
-use base qw(Encode::Encoding);
-
+sub name { shift->{'Name'} }
+sub new_sequence { $_[0] }
 sub needs_lines { 1 }
 sub perlio_ok{ 0 };
 
@@ -51,7 +51,7 @@ sub decode($$;$){
     $str =~
 	s{
 	    =\?                  # begin encoded word
-		([0-9A-Za-z\-_]+) # charset (encoding)
+		([0-9A-Za-z\-]+) # charset (encoding)
 		\?([QqBb])\?     # delimiter
 		(.*?)            # Base64-encodede contents
 		\?=              # end encoded word      
@@ -128,9 +128,7 @@ sub _encode{
     my ($o, $str) = @_;
     my $enc = $o->{encode};
     my $llen = ($o->{bpl} - length(HEAD) - 2 - length(TAIL));
-    # to coerce a floating-point arithmetics, the following contains
-    # .0 in numbers -- dankogai
-    $llen *= $enc eq 'B' ? 3.0/4.0 : 1.0/3.0;
+    $llen *= $enc eq 'B' ? 3/4 : 1/3;
     my @result = ();
     my $chunk = '';
     while(my $chr = substr($str, 0, 1, '')){
@@ -199,7 +197,7 @@ line.
 
 =head1 BUGS
 
-It would be nice to support encoding to non-UTF8, such as =?ISO-2022-JP?
+It would be nice to support non-UTF8 encoding, such as =?ISO-2022-JP?
 and =?ISO-8859-1?= but that makes the implementation too complicated.
 These days major mail agents all support =?UTF-8? so I think it is
 just good enough.
