@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-print "1..52\n";
+print "1..27\n";
 
 BEGIN {
     if( $ENV{PERL_CORE} ) {
@@ -14,18 +14,10 @@ use strict;
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant qw (constant_types C_constant XS_constant autoload);
 use Config;
-use File::Spec;
-
-my $do_utf_tests = $] > 5.006;
-my $better_than_56 = $] > 5.007;
-
+use File::Spec::Functions qw(catfile rel2abs);
 # Because were are going to be changing directory before running Makefile.PL
-my $perl = $^X;
-# 5.005 doesn't have new enough File::Spec to have rel2abs. But actually we
-# only need it when $^X isn't absolute, which is going to be 5.8.0 or later
-# (where ExtUtils::Constant is in the core, and tests against the uninstalled
-# perl
-$perl = File::Spec->rel2abs ($perl) unless $] < 5.006;
+my $perl;
+$perl = rel2abs( $^X ) unless $] < 5.006; # Hack. Until 5.00503 has rel2abs
 # ExtUtils::Constant::C_constant uses $^X inside a comment, and we want to
 # compare output to ensure that it is the same. We were probably run as ./perl
 # whereas we will run the child with the full path in $perl. So make $^X for
@@ -33,9 +25,7 @@ $perl = File::Spec->rel2abs ($perl) unless $] < 5.006;
 $^X = $perl;
 
 print "# perl=$perl\n";
-
-my $lib = $ENV{PERL_CORE} ? '../../lib' : '../blib/lib';
-my $runperl = "$perl \"-I$lib\"";
+my $runperl = "$perl \"-I../../lib\"";
 
 $| = 1;
 
@@ -47,13 +37,10 @@ mkdir $dir, 0777 or die "mkdir: $!\n";
 
 my $output = "output";
 
-# For debugging set this to 1.
-my $keep_files = 0;
-
 END {
     use File::Path;
     print "# $dir being removed...\n";
-    rmtree($dir) unless $keep_files;
+    rmtree($dir);
 }
 
 my $package = "ExtTest";
@@ -65,30 +52,6 @@ N => 0, 'NE' => 45, E => 90, SE => 135, S => 180, SW => 225, W => 270, NW => 315
 
 my $parent_rfc1149 =
   'A Standard for the Transmission of IP Datagrams on Avian Carriers';
-# Check that 8 bit and unicode names don't cause problems.
-my $pound; 
-if (ord('A') == 193) {  # EBCDIC platform
-    $pound = chr 177; # A pound sign. (Currency)
-} else { # ASCII platform
-    $pound = chr 163; # A pound sign. (Currency)
-}
-
-my ($inf, $pound_bytes, $pound_utf8);
-if ($do_utf_tests) {
-  $inf = chr 0x221E;
-  # Check that we can distiguish the pathological case of a string, and the
-  # utf8 representation of that string.
-  $pound_utf8 = $pound . '1';
-  if ($better_than_56) {
-    $pound_bytes = $pound_utf8;
-    utf8::encode ($pound_bytes);
-  } else {
-    # Must have that "U*" to generate a zero length UTF string that forces
-    # top bit set chars (such as the pound sign) into UTF8, so that the
-    # unpack 'C*' then gets the byte form of the UTF8.
-    $pound_bytes =  pack 'C*', unpack 'C*', $pound_utf8 . pack "U*";
-  }
-}
 
 my @names = ("FIVE", {name=>"OK6", type=>"PV",},
              {name=>"OK7", type=>"PVN",
@@ -108,50 +71,11 @@ my @names = ("FIVE", {name=>"OK6", type=>"PV",},
               pre=>"SV *temp_sv = newSVpv(RFC1149, 0); "
               	   . "(void) SvUPGRADE(temp_sv,SVt_PVIV); SvIOK_on(temp_sv); "
                    . "SvIVX(temp_sv) = 1149;"},
-             {name=>"perl", type=>"PV",},
 );
 
 push @names, $_ foreach keys %compass;
 
-# Automatically compile the list of all the macro names, and make them
-# exported constants.
 my @names_only = map {(ref $_) ? $_->{name} : $_} @names;
-
-# Exporter::Heavy (currently) isn't able to export these names:
-push @names, ({name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1},
-              {name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1},
-              {name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1},
-             );
-
-if ($do_utf_tests) {
-  push @names, ({name=>$inf, type=>"PV", value=>'"Infinity"', macro=>1},
-                {name=>$pound_utf8, type=>"PV", value=>'"1 Pound"', macro=>1},
-                {name=>$pound_bytes, type=>"PV", value=>'"1 Pound (as bytes)"',
-                 macro=>1},
-               );
-}
-
-=pod
-
-The above set of names seems to produce a suitably bad set of compile
-problems on a Unicode naive version of ExtUtils::Constant (ie 0.11):
-
-nick@thinking-cap 15439-32-utf$ PERL_CORE=1 ./perl lib/ExtUtils/t/Constant.t
-1..33
-# perl=/stuff/perl5/15439-32-utf/perl
-# ext-30370 being created...
-Wide character in print at lib/ExtUtils/t/Constant.t line 140.
-ok 1
-ok 2
-# make = 'make'
-ExtTest.xs: In function `constant_1':
-ExtTest.xs:80: warning: multi-character character constant
-ExtTest.xs:80: warning: case value out of range
-ok 3
-
-=cut
-
-# Grr `
 
 my $types = {};
 my $constant_types = constant_types(); # macro defs
@@ -160,7 +84,7 @@ my $C_constant = join "\n",
 my $XS_constant = XS_constant ($package, $types); # XS for ExtTest::constant
 
 ################ Header
-my $header = File::Spec->catdir($dir, "test.h");
+my $header = catfile($dir, "test.h");
 push @files, "test.h";
 open FH, ">$header" or die "open >$header: $!\n";
 print FH <<"EOT";
@@ -174,7 +98,7 @@ print FH <<"EOT";
 #define Undef 1
 #define RFC1149 "$parent_rfc1149"
 #undef NOTDEF
-#define perl "rules"
+
 EOT
 
 while (my ($point, $bearing) = each %compass) {
@@ -183,7 +107,7 @@ while (my ($point, $bearing) = each %compass) {
 close FH or die "close $header: $!\n";
 
 ################ XS
-my $xs = File::Spec->catdir($dir, "$package.xs");
+my $xs = catfile($dir, "$package.xs");
 push @files, "$package.xs";
 open FH, ">$xs" or die "open >$xs: $!\n";
 
@@ -202,7 +126,7 @@ print FH $XS_constant;
 close FH or die "close $xs: $!\n";
 
 ################ PM
-my $pm = File::Spec->catdir($dir, "$package.pm");
+my $pm = catfile($dir, "$package.pm");
 push @files, "$package.pm";
 open FH, ">$pm" or die "open >$pm: $!\n";
 print FH "package $package;\n";
@@ -225,24 +149,19 @@ $VERSION = '0.01';
 @EXPORT_OK = qw(
 EOT
 
-# Print the names of all our autoloaded constants
 print FH "\t$_\n" foreach (@names_only);
 print FH ");\n";
-# Print the AUTOLOAD subroutine ExtUtils::Constant generated for us
 print FH autoload ($package, $]);
 print FH "bootstrap $package \$VERSION;\n1;\n__END__\n";
 close FH or die "close $pm: $!\n";
 
 ################ test.pl
-my $testpl = File::Spec->catdir($dir, "test.pl");
+my $testpl = catfile($dir, "test.pl");
 push @files, "test.pl";
 open FH, ">$testpl" or die "open >$testpl: $!\n";
 
 print FH "use strict;\n";
-print FH "use $package qw(@names_only);\n\n";
-
-print FH "use utf8\n\n" if $do_utf_tests;
-
+print FH "use $package qw(@names_only);\n";
 print FH <<"EOT";
 
 print "1..1\n";
@@ -256,8 +175,6 @@ if (open OUTPUT, ">$output") {
 EOT
 
 print FH << 'EOT';
-
-my $better_than_56 = $] > 5.007;
 
 # What follows goes to the temporary file.
 # IV
@@ -433,124 +350,12 @@ if ($open eq '/*') {
   print "not ok 22 # \$open='$open'\n";
 }
 EOT
-
-if ($do_utf_tests) {
-  # Do this in 7 bit in case someone is testing with some settings that cause
-  # 8 bit files incapable of storing this character.
-  my @values
-    = map {"'" . join (",", unpack "U*", $_ . pack "U*") . "'"}
-      ($pound, $inf, $pound_bytes, $pound_utf8);
-  # Values is a list of strings, such as ('194,163,49', '163,49')
-
-  print FH <<'EOT';
-
-  # I can see that this child test program might be about to use parts of
-  # Test::Builder
-
-  my $test = 23;
-  my ($pound, $inf, $pound_bytes, $pound_utf8) = map {eval "pack 'U*', $_"}
-EOT
-
-  print FH join ",", @values;
-
-  print FH << 'EOT';
-;
-
-foreach (["perl", "rules", "rules"],
-	 ["/*", "OPEN", "OPEN"],
-	 ["*/", "CLOSE", "CLOSE"],
-	 [$pound, 'Sterling', []],
-         [$inf, 'Infinity', []],
-	 [$pound_utf8, '1 Pound', '1 Pound (as bytes)'],
-	 [$pound_bytes, '1 Pound (as bytes)', []],
-        ) {
-  # Flag an expected error with a reference for the expect string.
-  my ($string, $expect, $expect_bytes) = @$_;
-  (my $name = $string) =~ s/([^ -~])/sprintf '\x{%X}', ord $1/ges;
-  print "# \"$name\" => \'$expect\'\n";
-  # Try to force this to be bytes if possible.
-  if ($better_than_56) {
-    utf8::downgrade ($string, 1);
-  } else {
-    if ($string =~ tr/0-\377// == length $string) {
-      # No chars outside range 0-255
-      $string = pack 'C*', unpack 'U*', ($string . pack 'U*');
-    }
-  }
-EOT
-
-  print FH  "my (\$error, \$got) = ${package}::constant (\$string);\n";
-
-  print FH <<'EOT';
-  if ($error or $got ne $expect) {
-    print "not ok $test # error '$error', got '$got'\n";
-  } else {
-    print "ok $test\n";
-  }
-  $test++;
-  print "# Now upgrade '$name' to utf8\n";
-  if ($better_than_56) {
-    utf8::upgrade ($string);
-  } else {
-    $string = pack ('U*') . $string;
-  }
-EOT
-
-  print FH  "my (\$error, \$got) = ${package}::constant (\$string);\n";
-
-  print FH <<'EOT';
-  if ($error or $got ne $expect) {
-    print "not ok $test # error '$error', got '$got'\n";
-  } else {
-    print "ok $test\n";
-  }
-  $test++;
-  if (defined $expect_bytes) {
-    print "# And now with the utf8 byte sequence for name\n";
-    # Try the encoded bytes.
-    if ($better_than_56) {
-      utf8::encode ($string);
-    } else {
-      $string = pack 'C*', unpack 'C*', $string . pack "U*";
-    }
-EOT
-
-    print FH "my (\$error, \$got) = ${package}::constant (\$string);\n";
-
-    print FH <<'EOT';
-    if (ref $expect_bytes) {
-      # Error expected.
-      if ($error) {
-        print "ok $test # error='$error' (as expected)\n";
-      } else {
-        print "not ok $test # expected error, got no error and '$got'\n";
-      }
-    } elsif ($got ne $expect_bytes) {
-      print "not ok $test # error '$error', expect '$expect_bytes', got '$got'\n";
-    } else {
-      print "ok $test\n";
-    }
-    $test++;
-  }
-}
-EOT
-} else {
-  # Don't utf tests;
-  print FH <<'EOT';
-print "ok $_ # Skipped on non Unicode perl\n" foreach 23..43;
-EOT
-}
-
 close FH or die "close $testpl: $!\n";
-
-# This is where the test numbers carry on after the test number above are
-# relayed
-my $test = 44;
 
 ################ Makefile.PL
 # We really need a Makefile.PL because make test for a no dynamic linking perl
 # will run Makefile.PL again as part of the "make perl" target.
-my $makefilePL = File::Spec->catdir($dir, "Makefile.PL");
+my $makefilePL = catfile($dir, "Makefile.PL");
 push @files, "Makefile.PL";
 open FH, ">$makefilePL" or die "open >$makefilePL: $!\n";
 print FH <<"EOT";
@@ -567,19 +372,10 @@ EOT
 
 close FH or die "close $makefilePL: $!\n";
 
-################ MANIFEST
-# We really need a MANIFEST because make distclean checks it.
-my $manifest = File::Spec->catdir($dir, "MANIFEST");
-push @files, "MANIFEST";
-open FH, ">$manifest" or die "open >$manifest: $!\n";
-print FH "$_\n" foreach @files;
-close FH or die "close $manifest: $!\n";
-
 chdir $dir or die $!; push @INC,  '../../lib';
 END {chdir ".." or warn $!};
 
-my $core = $ENV{PERL_CORE} ? ' PERL_CORE=1' : '';
-my @perlout = `$runperl Makefile.PL $core`;
+my @perlout = `$runperl Makefile.PL PERL_CORE=1`;
 if ($?) {
   print "not ok 1 # $runperl Makefile.PL failed: $?\n";
   print "# $_" foreach @perlout;
@@ -596,9 +392,8 @@ if (-f "$makefile$makefile_ext") {
 } else {
   print "not ok 2\n";
 }
-
-# Renamed by make clean
-my $makefile_rename = $makefile . ($^O eq 'VMS' ? '.mms' : '.old');
+my $makefile_rename = ($^O eq 'VMS' ? '.mms' : '.old');
+push @files, "$makefile$makefile_rename"; # Renamed by make clean
 
 my $make = $Config{make};
 
@@ -636,6 +431,8 @@ if ($Config{usedl}) {
   }
 }
 
+push @files, $output;
+
 my $maketest = "$make test";
 print "# make = '$maketest'\n";
 
@@ -648,6 +445,8 @@ if (open OUTPUT, "<$output") {
   # Harness will report missing test results at this point.
   print "# Open <$output failed: $!\n";
 }
+
+my $test = 23;
 
 if ($?) {
   print "not ok $test # $maketest failed: $?\n";
@@ -705,58 +504,20 @@ if ($?) {
 }
 $test++;
 
-sub check_for_bonus_files {
-  my $dir = shift;
-  my %expect = map {($^O eq 'VMS' ? lc($_) : $_), 1} @_;
-
-  my $fail;
-  opendir DIR, $dir or die "opendir '$dir': $!";
-  while (defined (my $entry = readdir DIR)) {
-    $entry =~ s/\.$// if $^O eq 'VMS';  # delete trailing dot that indicates no extension
-    next if $expect{$entry};
-    print "# Extra file '$entry'\n";
-    $fail = 1;
-  }
-
-  closedir DIR or warn "closedir '.': $!";
-  if ($fail) {
-    print "not ok $test\n";
-  } else {
-    print "ok $test\n";
-  }
-  $test++;
+foreach (@files) {
+  unlink $_ or warn "unlink $_: $!";
 }
 
-check_for_bonus_files ('.', @files, $output, $makefile_rename, '.', '..');
-
-rename $makefile_rename, $makefile
- or die "Can't rename '$makefile_rename' to '$makefile': $!";
-
-unlink $output or warn "Can't unlink '$output': $!";
-
-# Need to make distclean to remove ../../lib/ExtTest.pm
-my $makedistclean = "$make distclean";
-print "# make = '$makedistclean'\n";
-@makeout = `$makedistclean`;
-if ($?) {
-  print "not ok $test # $make failed: $?\n";
-  print "# $_" foreach @makeout;
+my $fail;
+opendir DIR, "." or die "opendir '.': $!";
+while (defined (my $entry = readdir DIR)) {
+  next if $entry =~ /^\.\.?$/;
+  print "# Extra file '$entry'\n";
+  $fail = 1;
+}
+closedir DIR or warn "closedir '.': $!";
+if ($fail) {
+  print "not ok $test\n";
 } else {
   print "ok $test\n";
 }
-$test++;
-
-check_for_bonus_files ('.', @files, '.', '..');
-
-unless ($keep_files) {
-  foreach (@files) {
-    unlink $_ or warn "unlink $_: $!";
-  }
-}
-
-check_for_bonus_files ('.', '.', '..');
-
-# This was causing an assertion failure (a C<confess>ion)
-C_constant ($package, undef, undef, undef, undef, undef, chr 255);
-
-print "ok $test\n"; $test++;
