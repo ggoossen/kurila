@@ -1,13 +1,12 @@
 package Encode::EBCDIC;
 use Encode;
-our $VERSION = do { my @r = (q$Revision: 1.21 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 0.96 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 use XSLoader;
-XSLoader::load(__PACKAGE__,$VERSION);
+XSLoader::load('Encode::EBCDIC',$VERSION);
 
 1;
 __END__
-
 =head1 NAME
 
 Encode::EBCDIC - EBCDIC Encodings
@@ -25,11 +24,8 @@ supported are as follows.
 
   Canonical   Alias		Description
   --------------------------------------------------------------------
-  cp37  
-  cp500  
-  cp875  
-  cp1026  
-  cp1047  
+  cp1047
+  cp37
   posix-bc
 
 =head1 DESCRIPTION

@@ -4,14 +4,11 @@ use ExtUtils::MakeMaker;
 
 my $name = 'EBCDIC';
 my %tables = (
-	      ebcdic_t  => 
-	      ['posix-bc.ucm',
-	       qw(cp037.ucm cp1026.ucm cp1047.ucm cp500.ucm cp875.ucm),
-	       ],
+	      ebcdic  => ['cp1047.ucm','cp37.ucm','posix-bc.ucm'],
 	      );
 
 WriteMakefile(
-              INC		=> "-I../Encode",
+              INC		=> "-I..",
 	      NAME		=> 'Encode::'.$name,
 	      VERSION_FROM	=> "$name.pm",
 	      OBJECT		=> '$(O_FILES)',
@@ -41,19 +38,15 @@ sub post_initialize
     $self->{'O_FILES'} = [sort keys %o];
     my @files = ("$name.xs");
     $self->{'C'} = ["$name.c"];
-    $self->{SOURCE} .= " $name.c"
-        if $^O eq 'MacOS' && $self->{SOURCE} !~ /\b$name\.c\b/;
-    $self->{'H'} = [$self->catfile($self->updir,'Encode', 'encode.h')];
+    $self->{'H'} = [$self->catfile($self->updir,'encode.h')];
     my %xs;
     foreach my $table (keys %tables) {
 	push (@{$self->{'C'}},"$table.c");
 	# Do NOT add $table.h etc. to H_FILES unless we own up as to how they
 	# get built.
-	foreach my $ext (qw($(OBJ_EXT) .c .h .exh .fnm)) {
+	foreach my $ext (qw($(OBJ_EXT) .c .h _def.h .fnm)) {
 	    push (@files,$table.$ext);
 	}
-	$self->{SOURCE} .= " $table.c"
-	    if $^O eq 'MacOS' && $self->{SOURCE} !~ /\b$table\.c\b/;
     }
     $self->{'XS'} = { "$name.xs" => "$name.c" };
     $self->{'clean'}{'FILES'} .= join(' ',@files);
@@ -63,7 +56,7 @@ sub post_initialize
 #include <perl.h>
 #include <XSUB.h>
 #define U8 U8
-#include "encode.h"
+#include "../encode.h"
 END
     foreach my $table (keys %tables) {
 	print XS qq[#include "${table}.h"\n];
@@ -95,7 +88,7 @@ BOOT:
 {
 END
     foreach my $table (keys %tables) {
-	print XS qq[#include "${table}.exh"\n];
+	print XS qq[#include "${table}_def.h"\n];
     }
     print XS "}\n";
     close(XS);
@@ -105,8 +98,8 @@ END
 sub postamble
 {
     my $self = shift;
-    my $dir  = $self->catdir($self->updir,'ucm');
-    my $str  = "# $name\$(OBJ_EXT) depends on .h and .exh files not .c files - but all written by enc2xs\n";
+    my $dir  = $self->catdir($self->updir,'Encode');
+    my $str  = "# $name\$(OBJ_EXT) depends on .h and _def.h files not .c files - but all written by compile\n";
     $str    .= "$name.c : $name.xs ";
     foreach my $table (keys %tables)
     {
@@ -115,13 +108,13 @@ sub postamble
     $str .= "\n\n";
     $str .= "$name\$(OBJ_EXT) : $name.c\n\n";
 
-    my $enc2xs = $self->catfile($self->updir,'bin', 'enc2xs');
+    my $compile = $self->catfile($self->updir,'compile');
     foreach my $table (keys %tables)
     {
 	my $numlines = 1;
 	my $lengthsofar = length($str);
 	my $continuator = '';
-	$str .= "$table.c : $enc2xs Makefile.PL";
+	$str .= "$table.c : $compile Makefile.PL";
 	foreach my $file (@{$tables{$table}})
 	{
 	    $str .= $continuator.' '.$self->catfile($dir,$file);
@@ -133,11 +126,9 @@ sub postamble
 		$continuator = '';
 	    }
 	}
-	my $plib   = $self->{PERL_CORE} ? '"-I$(PERL_LIB)"' : '';
-	$plib .= " -MCross=$::Cross::platform" if defined $::Cross::platform;
-	my $ucopts = '-"Q" -"O"';
-	$str .=  
-	    qq{\n\t\$(PERL) $plib $enc2xs $ucopts -o \$\@ -f $table.fnm\n\n};
+        $str .= $^O eq 'VMS' # In VMS quote to preserve case
+            ? qq{\n\t\$(PERL) $compile -"Q" -o \$\@ -f $table.fnm\n\n}
+            : qq{\n\t\$(PERL) $compile -Q -o \$\@ -f $table.fnm\n\n};
 	open (FILELIST, ">$table.fnm")
 	    || die "Could not open $table.fnm: $!";
 	foreach my $file (@{$tables{$table}})

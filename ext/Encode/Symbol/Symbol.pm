@@ -1,16 +1,15 @@
 package Encode::Symbol;
 use Encode;
-our $VERSION = do { my @r = (q$Revision: 1.22 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 0.96 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 use XSLoader;
-XSLoader::load(__PACKAGE__,$VERSION);
+XSLoader::load('Encode::Symbol',$VERSION);
 
 1;
 __END__
-
 =head1 NAME
 
-Encode::Symbol - Symbol Encodings
+Encode::Symbol - EBCDIC Encodings
 
 =head1 SYNOPSIS
 
@@ -27,13 +26,10 @@ supported are as follows.
   --------------------------------------------------------------------
   symbol
   dingbats
-  AdobeZDingbat
-  AdobeSymbol
-  MacDingbats
 
 =head1 DESCRIPTION
 
-To find out how to use this module in detail, see L<Encode>.
+To find how to use this module in detail, see L<Encode>.
 
 =head1 SEE ALSO
 
