@@ -1,7 +1,5 @@
 package vmsish;
 
-our $VERSION = '1.00';
-
 =head1 NAME
 
 vmsish - Perl pragma to control VMS-specific language features
