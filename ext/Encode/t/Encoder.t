@@ -1,5 +1,5 @@
 #
-# $Id: Encoder.t,v 1.3 2002/04/16 23:35:00 dankogai Exp $
+# $Id: Encoder.t,v 1.1 2002/04/08 18:07:31 dankogai Exp $
 #
 
 BEGIN {
@@ -8,13 +8,23 @@ BEGIN {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
+# should work without perlio
+#     unless (find PerlIO::Layer 'perlio') {
+# 	print "1..0 # Skip: PerlIO was not built\n";
+# 	exit 0;
+#     }
+# should work on EBCDIC
+#    if (ord("A") == 193) {
+# 	print "1..0 # Skip: EBCDIC\n";
+# 	exit 0;
+#    }
     $| = 1;
 }
 
 use strict;
 #use Test::More 'no_plan';
-use Test::More tests => 516;
-use Encode::Encoder qw(encoder);
+use Test::More tests => 512;
+use Encode::Encoder;
 use MIME::Base64;
 package Encode::Base64;
 use base 'Encode::Encoding';
@@ -30,12 +40,6 @@ sub decode{
 }
 
 package main;
-
-my $e = encoder("foo", "ascii");
-ok ($e->data("bar"));
-is ($e->data, "bar");
-ok ($e->encoding("latin1"));
-is ($e->encoding, "iso-8859-1");
 
 my $data = '';
 for my $i (0..255){

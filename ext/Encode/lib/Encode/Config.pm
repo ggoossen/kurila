@@ -2,14 +2,15 @@
 # Demand-load module list
 #
 package Encode::Config;
-our $VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 use strict;
+require Exporter;
 
 our %ExtModule = 
     (
       # Encode::Byte
-      #iso-8859-1 is in Encode.pm itself
+      #iso-8859-1 is on Encode.pm itself
      'iso-8859-2'             => 'Encode::Byte',
      'iso-8859-3'             => 'Encode::Byte',
      'iso-8859-4'             => 'Encode::Byte',
@@ -107,7 +108,6 @@ unless (ord("A") == 193){
 	 'euc-cn'             => 'Encode::CN',
 	 'gb12345-raw'        => 'Encode::CN',
 	 'gb2312-raw'         => 'Encode::CN',
-	 'hz'                 => 'Encode::CN',
 	 'iso-ir-165'         => 'Encode::CN',
 	 'cp936'              => 'Encode::CN',
 	 'MacChineseSimp'     => 'Encode::CN',
@@ -131,34 +131,17 @@ unless (ord("A") == 193){
 	 'cp949'              => 'Encode::KR',
 	 'MacKorean'          => 'Encode::KR',
 
-	 'big5-eten'          => 'Encode::TW',
+	 'big5'               => 'Encode::TW',
 	 'big5-hkscs'         => 'Encode::TW',
 	 'cp950'              => 'Encode::TW',
 	 'MacChineseTrad'     => 'Encode::TW',
 
-	 #'big5plus'           => 'Encode::HanExtra',
-	 #'euc-tw'             => 'Encode::HanExtra',
-	 #'gb18030'            => 'Encode::HanExtra',
-
-	 'MIME-Header'        => 'Encode::MIME::Header',
-	 'MIME-B'             => 'Encode::MIME::Header',
-	 'MIME-Q'             => 'Encode::MIME::Header',
-
+	 'big5plus'           => 'Encode::HanExtra',
+	 'euc-tw'             => 'Encode::HanExtra',
+	 'gb18030'            => 'Encode::HanExtra',
 	);
 }
 
-#
-# Why not export ? to keep ConfigLocal Happy!
-#
-while (my ($enc,$mod) = each %ExtModule){
-    $Encode::ExtModule{$enc} = $mod;
-}
+*Encode::ExtModule = \%ExtModule;
 
 1;
-__END__
-
-=head1 NAME
-
-Encode::Config -- internally used by Encode
-
-=cut
