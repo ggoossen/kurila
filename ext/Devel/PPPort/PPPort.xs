@@ -50,7 +50,7 @@ test4()
 	CODE:
 	{
 		SV * sv = newSViv(1);
-		newRV_inc(sv);
+		SV * rv = newRV_inc(sv);
 		RETVAL = (SvREFCNT(sv) == 2);
 	}
 	OUTPUT:
@@ -61,7 +61,7 @@ test5()
 	CODE:
 	{
 		SV * sv = newSViv(2);
-		newRV_noinc(sv);
+		SV * rv = newRV_noinc(sv);
 		RETVAL = (SvREFCNT(sv) == 1);
 	}
 	OUTPUT:

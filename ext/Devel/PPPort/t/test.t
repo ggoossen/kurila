@@ -1,12 +1,15 @@
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib' if -d '../lib';
-}
 
 use Devel::PPPort;
+
 use strict;
 
 print "1..17\n";
+
+BEGIN {
+    chdir 't' if -d 't';
+    @INC = '../lib' if -d '../lib';
+
+}
 
 my $total = 0;
 my $good = 0;
