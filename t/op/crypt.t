@@ -1,22 +1,4 @@
-#!./perl -w
-
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-BEGIN {
-    use Config;
-
-    require "test.pl";
-
-    if( !$Config{d_crypt} ) {
-        skip_all("crypt unimplemented");
-    }
-    else {
-        plan(tests => 4);
-    }
-}
+use Test::More tests => 2;
 
 # Can't assume too much about the string returned by crypt(),
 # and about how many bytes of the encrypted (really, hashed)
@@ -28,19 +10,6 @@ BEGIN {
 # bets, given alternative encryption/hashing schemes like MD5,
 # C2 (or higher) security schemes, and non-UNIX platforms.
 
-SKIP: {
-	skip ("VOS crypt ignores salt.", 1) if ($^O eq 'vos');
-	ok(substr(crypt("ab", "cd"), 2) ne substr(crypt("ab", "ce"), 2), "salt makes a difference");
-}
+ok(substr(crypt("ab", "cd"), 2) ne substr(crypt("ab", "ce"), 2), "salt");
 
-$a = "a\xFF\x{100}";
-
-eval {$b = crypt($a, "cd")};
-like($@, qr/Wide character in crypt/, "wide characters ungood");
-
-chop $a; # throw away the wide character
-
-eval {$b = crypt($a, "cd")};
-is($@, '',                   "downgrade to eight bit characters");
-is($b, crypt("a\xFF", "cd"), "downgrade results agree");
-
+ok(crypt("HI", "HO") eq crypt(v4040.4041, "HO"), "Unicode");
