@@ -1,9 +1,3 @@
-
-use strict ;
-use warnings;
-
-use vars qw( $Perl $Inc);
-
 sub readFile
 {
     my ($filename) = @_ ;
@@ -25,7 +19,7 @@ sub writeFile
     binmode(F) if $filename =~ /bin$/i;
     foreach (@strings)
       { print F }
-    close F or die "Could not close: $!" ;
+    close F ;
 }
 
 sub ok
@@ -44,13 +38,11 @@ sub ok
 
 $Inc = '' ;
 foreach (@INC)
- { $Inc .= "\"-I$_\" " }
-$Inc = "-I::lib" if $^O eq 'MacOS';
+ { $Inc .= "-I$_ " }
 
 $Perl = '' ;
 $Perl = ($ENV{'FULLPERL'} or $^X or 'perl') ;
 
-$Perl = "$Perl -MMac::err=unix" if $^O eq 'MacOS';
 $Perl = "$Perl -w" ;
 
 1;

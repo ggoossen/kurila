@@ -2,22 +2,35 @@
  * Filename : Call.xs
  * 
  * Author   : Paul Marquess 
- * Date     : 11th November 2001
- * Version  : 1.06
- *
- *    Copyright (c) 1995-2001 Paul Marquess. All rights reserved.
- *       This program is free software; you can redistribute it and/or
- *              modify it under the same terms as Perl itself.
+ * Date     : 26th March 2000
+ * Version  : 1.05
  *
  */
 
-#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#ifdef _NOT_CORE
-#  include "ppport.h"
+
+#ifndef PERL_VERSION
+#    include "patchlevel.h"
+#    define PERL_REVISION	5
+#    define PERL_VERSION	PATCHLEVEL
+#    define PERL_SUBVERSION	SUBVERSION
 #endif
+
+/* defgv must be accessed differently under threaded perl */
+/* DEFSV et al are in 5.004_56 */
+#ifndef DEFSV
+#    define DEFSV		GvSV(defgv)
+#endif
+
+#ifndef pTHX
+#    define pTHX
+#    define pTHX_
+#    define aTHX
+#    define aTHX_
+#endif
+
 
 /* Internal defines */
 #define PERL_MODULE(s)		IoBOTTOM_NAME(s)
@@ -30,25 +43,13 @@
         do { SvPVX(sv)[len] = '\0'; SvCUR_set(sv, len); } while (0)
 
 
-/* Global Data */
 
-#define MY_CXT_KEY "Filter::Util::Call::_guts" XS_VERSION
- 
-typedef struct {
-    int x_fdebug ;
-    int x_current_idx ;
-} my_cxt_t;
- 
-START_MY_CXT
- 
-#define fdebug          (MY_CXT.x_fdebug)
-#define current_idx     (MY_CXT.x_current_idx)
-
+static int fdebug = 0;
+static int current_idx ;
 
 static I32
 filter_call(pTHX_ int idx, SV *buf_sv, int maxlen)
 {
-    dMY_CXT;
     SV   *my_sv = FILTER_DATA(idx);
     char *nl = "\n";
     char *p;
@@ -62,7 +63,7 @@ filter_call(pTHX_ int idx, SV *buf_sv, int maxlen)
     while (1) {
 
 	/* anything left from last time */
-	if ((n = SvCUR(my_sv))) {
+	if (n = SvCUR(my_sv)) {
 
 	    out_ptr = SvPVX(my_sv) + BUF_OFFSET(my_sv) ;
 
@@ -85,7 +86,7 @@ filter_call(pTHX_ int idx, SV *buf_sv, int maxlen)
 	    }
 	    else {
 		/* want lines */
-                if ((p = ninstr(out_ptr, out_ptr + n - 1, nl, nl))) {
+                if (p = ninstr(out_ptr, out_ptr + n - 1, nl, nl)) {
 
 	            sv_catpvn(buf_sv, out_ptr, p - out_ptr + 1);
 
@@ -198,7 +199,6 @@ filter_read(size=0)
 	int	size 
 	CODE:
 	{
-    	    dMY_CXT;
 	    SV * buffer = DEFSV ;
 
 	    RETVAL = FILTER_READ(IDX + 1, buffer, size) ;
@@ -234,25 +234,19 @@ real_import(object, perlmodule, coderef)
 void
 filter_del()
     CODE:
-        dMY_CXT;
 	FILTER_ACTIVE(FILTER_DATA(IDX)) = FALSE ;
 
 
 
 void
-unimport(package="$Package", ...)
-    char *package
+unimport(...)
     PPCODE:
     filter_del(filter_call);
 
 
 BOOT:
-  {
-    MY_CXT_INIT;
-    fdebug = 0;
     /* temporary hack to control debugging in toke.c */
     if (fdebug)
         filter_add(NULL, (fdebug) ? (SV*)"1" : (SV*)"0");  
-  }
 
 
