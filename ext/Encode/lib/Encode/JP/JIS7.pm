@@ -1,15 +1,14 @@
 package Encode::JP::JIS7;
 use strict;
 
-our $VERSION = do { my @r = (q$Revision: 1.8 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
-use Encode qw(:fallbacks);
-
+require Encode;
 for my $name ('7bit-jis', 'iso-2022-jp', 'iso-2022-jp-1'){
     my $h2z     = ($name eq '7bit-jis')    ? 0 : 1;
     my $jis0212 = ($name eq 'iso-2022-jp') ? 0 : 1;
-
-    $Encode::Encoding{$name} =
+    
+    $Encode::Encoding{$name} =  
         bless {
                Name      =>   $name,
                h2z       =>   $h2z,
@@ -17,47 +16,35 @@ for my $name ('7bit-jis', 'iso-2022-jp', 'iso-2022-jp-1'){
               } => __PACKAGE__;
 }
 
-use base qw(Encode::Encoding);
-
-# we override this to 1 so PerlIO works
-sub needs_lines { 1 }
+sub name { shift->{'Name'} }
+sub new_sequence { $_[0] };
 
 use Encode::CJKConstants qw(:all);
-
-our $DEBUG = 0;
 
 #
 # decode is identical for all 2022 variants
 #
 
-sub decode($$;$)
+sub decode
 {
-    my ($obj, $str, $chk) = @_;
-    my $residue = '';
-    if ($chk){
-	$str =~ s/([^\x00-\x7f].*)$//so;
-	$1 and $residue = $1;
-    }
-    $residue .= jis_euc(\$str);
-    $_[1] = $residue if $chk;
-    return Encode::decode('euc-jp', $str, FB_PERLQQ);
+    my ($obj,$str,$chk) = @_;
+    jis_euc(\$str);
+    return Encode::decode('euc-jp', $str, $chk);
 }
 
 #
 # encode is different
 #
 
-sub encode($$;$)
+sub encode
 {
     require Encode::JP::H2Z;
-    my ($obj, $utf8, $chk) = @_;
-    # empty the input string in the stack so perlio is ok
-    $_[1] = '' if $chk;
+    my ($obj,$str,$chk) = @_;
     my ($h2z, $jis0212) = @$obj{qw(h2z jis0212)};
-    my $octet = Encode::encode('euc-jp', $utf8, FB_PERLQQ) ;
-    $h2z and &Encode::JP::H2Z::h2z(\$octet);
-    euc_jis(\$octet, $jis0212);
-    return $octet;
+    my $result = Encode::encode('euc-jp', $str, $chk);
+    $h2z and &Encode::JP::H2Z::h2z(\$result);
+    euc_jis(\$result, $jis0212);
+    return $result;
 }
 
 
@@ -70,41 +57,39 @@ sub jis_euc {
 		 ([^\e]*)
 		 )
     {
-	my ($esc, $chunk) = ($1, $2);
+	my ($esc, $str) = ($1, $2);
 	if ($esc !~ /$RE{ISO_ASC}/o) {
-	    $chunk =~ tr/\x21-\x7e/\xa1-\xfe/;
+	    $str =~ tr/\x21-\x7e/\xa1-\xfe/;
 	    if ($esc =~ /$RE{JIS_KANA}/o) {
-		$chunk =~ s/([\xa1-\xdf])/\x8e$1/og;
+		$str =~ s/([\xa1-\xdf])/\x8e$1/og;
 	    }
 	    elsif ($esc =~ /$RE{JIS_0212}/o) {
-		$chunk =~ s/([\xa1-\xfe][\xa1-\xfe])/\x8f$1/og;
+		$str =~ s/([\xa1-\xfe][\xa1-\xfe])/\x8f$1/og;
 	    }
 	}
-	$chunk;
+	$str;
     }geox;
-    my ($residue) = ($$r_str =~ s/(\e.*)$//so);
-    return $residue;
+    $$r_str;
 }
 
 sub euc_jis{
-    no warnings qw(uninitialized);
     my $r_str = shift;
     my $jis0212 = shift;
     $$r_str =~ s{
 	((?:$RE{EUC_C})+|(?:$RE{EUC_KANA})+|(?:$RE{EUC_0212})+)
 	}{
-	    my $chunk = $1;
-	    my $esc =
-		( $chunk =~ tr/\x8E//d ) ? $ESC{KANA} :
-		    ( $chunk =~ tr/\x8F//d ) ? $ESC{JIS_0212} :
+	    my $str = $1;
+	    my $esc = 
+		( $str =~ tr/\x8E//d ) ? $ESC{KANA} :
+		    ( $str =~ tr/\x8F//d ) ? $ESC{JIS_0212} :
 			$ESC{JIS_0208};
 	    if ($esc eq $ESC{JIS_0212} && !$jis0212){
 		# fallback to '?'
-		$chunk =~ tr/\xA1-\xFE/\x3F/;
+		$str =~ tr/\xA1-\xFE/\x3F/;
 	    }else{
-		$chunk =~ tr/\xA1-\xFE/\x21-\x7E/;
+		$str =~ tr/\xA1-\xFE/\x21-\x7E/;
 	    }
-	    $esc . $chunk . $ESC{ASC};
+	    $esc . $str . $ESC{ASC};
 	}geox;
     $$r_str =~
 	s/\Q$ESC{ASC}\E
