@@ -6,17 +6,17 @@ BEGIN {
 BEGIN {
     use Config;
     unless ($Config{d_fork}) {
-	print "1..0 # Skip: no fork\n";
+	print "1..0 # no fork\n";
 	exit 0;
     }
     eval { use POSIX qw(sys_wait_h) };
     if ($@) {
-	print "1..0 # Skip: no POSIX sys_wait_h\n";
+	print "1..0 # no POSIX sys_wait_h\n";
 	exit 0;
     }
-    eval { use Time::HiRes qw(time) };
+    eval { use Time::HiRes };
     if ($@) {
-	print "1..0 # Skip: no Time::HiRes\n";
+	print "1..0 # no Time::HiRes\n";
 	exit 0;
     }
 }
@@ -24,9 +24,9 @@ BEGIN {
 use warnings;
 use strict;
 
-$| = 1;
+use Time::HiRes qw(time);
 
-print "1..1\n";
+$| = 1;
 
 sub NEG1_PROHIBITED () { 0x01 }
 sub NEG1_REQUIRED   () { 0x02 }
