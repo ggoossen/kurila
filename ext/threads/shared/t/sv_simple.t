@@ -1,4 +1,6 @@
-use warnings;
+
+
+
 
 BEGIN {
 #    chdir 't' if -d 't';
@@ -14,7 +16,6 @@ BEGIN {
 sub ok {
     my ($id, $ok, $name) = @_;
 
-    $name = '' unless defined $name;
     # You have to do it this way or VMS will get confused.
     print $ok ? "ok $id - $name\n" : "not ok $id - $name\n";
 
@@ -35,15 +36,14 @@ share($test);
 ok(2,$test eq "bar","Test magic share fetch");
 $test = "foo";
 ok(3,$test eq "foo","Test magic share assign");
-my $c = threads::shared::_refcnt($test);
 threads->create(
 		sub {
-		    ok(4, $test eq "foo","Test magic share fetch after thread");
+		    ok(4, $test eq "foo","Test mage share fetch after thread");
 		    $test = "baz";
-                    ok(5,threads::shared::_refcnt($test) > $c, "Check that threadcount is correct");
+                    ok(5,threads::shared::_thrcnt($test) == 2, "Check that threadcount is correct");
 		    })->join();
 ok(6,$test eq "baz","Test that value has changed in another thread");
-ok(7,threads::shared::_refcnt($test) == $c,"Check thrcnt is down properly");
+ok(7,threads::shared::_thrcnt($test) == 1,"Check thrcnt is down properly");
 $test = "barbar";
 ok(8, length($test) == 6, "Check length code");
 threads->create(sub { $test = "barbarbar" })->join;

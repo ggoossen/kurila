@@ -1,5 +1,3 @@
-use warnings;
-
 BEGIN {
 #    chdir 't' if -d 't';
 #    push @INC ,'../lib';
@@ -14,7 +12,6 @@ BEGIN {
 sub ok {
     my ($id, $ok, $name) = @_;
 
-    $name = '' unless defined $name;
     # You have to do it this way or VMS will get confused.
     print $ok ? "ok $id - $name\n" : "not ok $id - $name\n";
 
@@ -26,7 +23,7 @@ sub ok {
 use Devel::Peek;
 use ExtUtils::testlib;
 use strict;
-BEGIN { print "1..10\n" };
+BEGIN { print "1..9\n" };
 use threads;
 use threads::shared;
 ok(1,1,"loaded");
@@ -37,8 +34,7 @@ share($foo);
 eval {
 $foo = \$bar;
 };
-
-ok(2,my $temp1 = $@ =~/^Invalid\b.*shared scalar/, "Wrong error message");
+ok(2,my $temp1 = $@ =~/You cannot assign a non shared reference to a shared scalar/, "Check that the warning message is correct");
 share($bar);
 $foo = \$bar;
 ok(3, $temp1 = $foo =~/SCALAR/, "Check that is a ref");
@@ -57,10 +53,4 @@ $baz = "original";
 $bar = \$baz;
 $foo = \$bar;
 ok(9,$$$foo eq 'original', "Check reference chain");
-my($t1,$t2);
-share($t1);
-share($t2);
-$t2 = "text";
-$t1 = \$t2;
-threads->create(sub { $t1 = "bar" })->join();
-ok(10,$t1 eq 'bar',"Check that assign to a ROK works");
+
