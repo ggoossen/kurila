@@ -27,21 +27,12 @@ typedef int intArray; /* T_ARRAY */
 typedef short shortOPQ;   /* T_OPAQUE */
 typedef int intOpq;   /* T_OPAQUEPTR */
 
-/* A structure to test T_OPAQUEPTR */
-struct t_opaqueptr {
-  int a;
-  int b;
-  double c;
-};
-
-typedef struct t_opaqueptr astruct;
-
 /* Some static memory for the tests */
-static I32 xst_anint;
-static intRef xst_anintref;
-static intObj xst_anintobj;
-static intRefIv xst_anintrefiv;
-static intOpq xst_anintopq;
+I32 anint;
+intRef anintref;
+intObj anintobj;
+intRefIv anintrefiv;
+intOpq anintopq;
 
 /* Helper functions */
 
@@ -120,7 +111,7 @@ T_AVREF( av )
 =item T_HVREF
 
 From the perl level this is a reference to a perl hash.
-From the C level this is a pointer to an HV.
+From the C level this is a pointer to a HV.
 
 =cut
 
@@ -201,7 +192,7 @@ T_UV( uv )
 =item T_IV
 
 A signed integer. This is cast to the required  integer type when
-passed to C and converted to an IV when passed back to Perl.
+passed to C and converted to a IV when passed back to Perl.
 
 =cut
 
@@ -414,8 +405,8 @@ void *
 T_PTR_OUT( in )
   int in;
  CODE:
-  xst_anint = in;
-  RETVAL = &xst_anint;
+  anint = in;
+  RETVAL = &anint;
  OUTPUT:
   RETVAL
 
@@ -448,8 +439,8 @@ intRef *
 T_PTRREF_OUT( in )
   intRef in;
  CODE:
-  xst_anintref = in;
-  RETVAL = &xst_anintref;
+  anintref = in;
+  RETVAL = &anintref;
  OUTPUT:
   RETVAL
 
@@ -486,8 +477,8 @@ intObj *
 T_PTROBJ_OUT( in )
   intObj in;
  CODE:
-  xst_anintobj = in;
-  RETVAL = &xst_anintobj;
+  anintobj = in;
+  RETVAL = &anintobj;
  OUTPUT:
   RETVAL
 
@@ -529,8 +520,8 @@ intRefIv *
 T_REF_IV_PTR_OUT( in )
   intRefIv in;
  CODE:
-  xst_anintrefiv = in;
-  RETVAL = &xst_anintrefiv;
+  anintrefiv = in;
+  RETVAL = &anintrefiv;
  OUTPUT:
   RETVAL
 
@@ -563,21 +554,16 @@ NOT YET
 
 =item T_OPAQUEPTR
 
-This can be used to store bytes in the string component of the
-SV. Here the representation of the data is irrelevant to perl and the
-bytes themselves are just stored in the SV. It is assumed that the C
-variable is a pointer (the bytes are copied from that memory
-location).  If the pointer is pointing to something that is
-represented by 8 bytes then those 8 bytes are stored in the SV (and
-length() will report a value of 8). This entry is similar to T_OPAQUE.
+This can be used to store a pointer in the string component of the
+SV. Unlike T_PTR which stores the pointer in an IV that can be
+printed, here the representation of the pointer is irrelevant and the
+bytes themselves are just stored in the SV. If the pointer is
+represented by 4 bytes then those 4 bytes are stored in the SV (and
+length() will report a value of 4). This makes use of the fact that a
+perl scalar can store arbritray data in its PV component.
 
-In principal the unpack() command can be used to convert the bytes
-back to a number (if the underlying type is known to be a number).
-
-This entry can be used to store a C structure (the number
-of bytes to be copied is calculated using the C C<sizeof> function)
-and can be used as an alternative to T_PTRREF without having to worry
-about a memory leak (since Perl will clean up the SV).
+In principal the unpack() command can be used to convert the pointer
+to a number.
 
 =cut
 
@@ -585,8 +571,8 @@ intOpq *
 T_OPAQUEPTR_IN( val )
   intOpq val
  CODE:
-  xst_anintopq = val;
-  RETVAL = &xst_anintopq;
+  anintopq = val;
+  RETVAL = &anintopq;
  OUTPUT:
   RETVAL
 
@@ -598,55 +584,18 @@ T_OPAQUEPTR_OUT( ptr )
  OUTPUT:
   RETVAL
 
-short
-T_OPAQUEPTR_OUT_short( ptr )
-  shortOPQ * ptr
- CODE:
-  RETVAL = *ptr;
- OUTPUT:
-  RETVAL
-
-# Test it with a structure
-astruct *
-T_OPAQUEPTR_IN_struct( a,b,c )
-  int a
-  int b
-  double c
- PREINIT:
-  struct t_opaqueptr test;
- CODE:
-  test.a = a;
-  test.b = b;
-  test.c = c;
-  RETVAL = &test;
- OUTPUT:
-  RETVAL
-
-void
-T_OPAQUEPTR_OUT_struct( test )
-  astruct * test
- PPCODE:
-  XPUSHs(sv_2mortal(newSViv(test->a)));
-  XPUSHs(sv_2mortal(newSViv(test->b)));
-  XPUSHs(sv_2mortal(newSVnv(test->c)));
-
-
 =item T_OPAQUE
 
-This can be used to store data from non-pointer types in the string
-part of an SV. It is similar to T_OPAQUEPTR except that the
-typemap retrieves the pointer directly rather than assuming it
-is being supplied. For example if an integer is imported into
-Perl using T_OPAQUE rather than T_IV the underlying bytes representing
-the integer will be stored in the SV but the actual integer value will not
-be available. i.e. The data is opaque to perl.
+This can be used to store pointers to non-pointer types in an SV. It
+is similar to T_OPAQUEPTR except that the typemap retrieves the
+pointer itself rather than assuming that it is to be given a
+pointer. This approach hides the pointer as a byte stream in the
+string part of the SV rather than making the actual pointer value
+available to Perl.
 
-The data may be retrieved using the C<unpack> function if the
-underlying type of the byte stream is known.
-
-T_OPAQUE supports input and output of simple types.
-T_OPAQUEPTR can be used to pass these bytes back into C if a pointer
-is acceptable.
+There is no reason to use T_OPAQUE to pass the data to C. Use
+T_OPAQUEPTR to do that since once the pointer is stored in the SV
+T_OPAQUE and T_OPAQUEPTR are identical.
 
 =cut
 
@@ -655,14 +604,6 @@ T_OPAQUE_IN( val )
   int val
  CODE:
   RETVAL = (shortOPQ)val;
- OUTPUT:
-  RETVAL
-
-IV
-T_OPAQUE_OUT( val )
-  shortOPQ val
- CODE:
-  RETVAL = (IV)val;
  OUTPUT:
   RETVAL
 
@@ -691,7 +632,7 @@ T_OPAQUE_array( a,b,c)
   int b
   int c
  PREINIT:
-  int array[3];
+  int array[2];
  CODE:
   array[0] = a;
   array[1] = b;
@@ -764,12 +705,11 @@ the subtype.
 
 intArray *
 T_ARRAY( dummy, array, ... )
-  int dummy = 0;
+  int dummy = NO_INIT
   intArray * array
  PREINIT:
   U32 size_RETVAL;
  CODE:
-  dummy += 0; /* Fix -Wall */
   size_RETVAL = ix_array;
   RETVAL = array;
  OUTPUT:
@@ -795,17 +735,10 @@ T_STDIO_open( file )
   RETVAL
 
 SysRet
-T_STDIO_close( f )
-  PerlIO * f
- PREINIT:
-  FILE * stream;
+T_STDIO_close( stream )
+  FILE * stream
  CODE:
-  /* Get the FILE* */
-  stream = PerlIO_findFILE( f );  
   RETVAL = xsfclose( stream );
-  /* Release the FILE* from the PerlIO system so that we do
-     not close the file twice */
-  PerlIO_releaseFILE(f,stream);
  OUTPUT:
   RETVAL
 
