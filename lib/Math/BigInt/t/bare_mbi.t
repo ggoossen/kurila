@@ -8,6 +8,7 @@ BEGIN
   $| = 1;
   # to locate the testing files
   my $location = $0; $location =~ s/bare_mbi.t//i;
+  print "loc $location\n";
   if ($ENV{PERL_CORE})
     {
     # testing with the core distribution
@@ -26,18 +27,16 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 2527;
+  plan tests => 1865;
   }
 
 use Math::BigInt lib => 'BareCalc';
-
-print "# ",Math::BigInt->config()->{lib},"\n";
 
 use vars qw ($class $try $x $y $f @args $ans $ans1 $ans1_str $setup $CL);
 $class = "Math::BigInt";
 $CL = "Math::BigInt::BareCalc";
 
-my $version = '1.61';	# for $VERSION tests, match current release (by hand!)
+my $version = '1.48';   # for $VERSION tests, match current release (by hand!)
 
 require 'bigintpm.inc';	# perform same tests as bigintpm
 
