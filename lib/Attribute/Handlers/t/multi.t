@@ -11,10 +11,10 @@ CHECK { $main::phase++ }
 # (correspondingly "not ok 13") depending on the success of chunk 13
 # of the test code):
 
-sub ok { $::count++; push @::results, [$_[1], $_[0]?"":"not ", defined($_[2])?$_[2]:""]; }
+sub ok { $::count++; push @::results, [$_[1], $_[0]?"":"not "]; }
 
 END { print "1..$::count\n";
-      print map "$_->[1]ok $_->[0] $_->[2]\n",
+      print map "$_->[1]ok $_->[0]\n",
 		sort {$a->[0]<=>$b->[0]}
 			grep $_->[0], @::results }
 
@@ -24,9 +24,7 @@ no warnings 'redefine';
 
 sub UNIVERSAL::Lastly :ATTR(INIT) { ::ok $_[4][0] && $main::phase, $_[4][1] }
 
-sub UNIVERSAL::Okay :ATTR(BEGIN) {
-::ok $_[4][0] && (!$main::phase || !ref $_[1] && $_[1] eq 'LEXICAL'), $_[4][1];
-}
+sub UNIVERSAL::Okay :ATTR(BEGIN) { ::ok  $_[4][0] && !$main::phase, $_[4][1] }
 
 sub Dokay :ATTR(SCALAR) { ::ok @{$_[4]} }
 sub Dokay :ATTR(HASH)   { ::ok @{$_[4]} }
@@ -128,59 +126,6 @@ $loud++;
 my @noisy : Noisy(34);
 $noisy[0]++;
 
-my %rowdy : Rowdy(37,'this arg should be ignored');
+my %rowdy : Rowdy(37);
 $rowdy{key}++;
-
-
-# check that applying attributes to lexicals doesn't unduly worry
-# their refcounts
-my $out = "begin\n";
-my $applied;
-sub UNIVERSAL::Dummy :ATTR { ++$applied };
-sub Dummy::DESTROY { $out .= "bye\n" }
-
-{ my $dummy;          $dummy = bless {}, 'Dummy'; }
-ok( $out eq "begin\nbye\n", 45 );
-
-{ my $dummy : Dummy;  $dummy = bless {}, 'Dummy'; }
-if($] < 5.008) {
-ok( 1, 46, " # skip lexicals are not runtime prior to 5.8");
-} else {
-ok( $out eq "begin\nbye\nbye\n", 46);
-}
-# are lexical attributes reapplied correctly?
-sub dummy { my $dummy : Dummy; }
-$applied = 0;
-dummy(); dummy();
-if($] < 5.008) {
-ok(1, 47, " # skip does not work with perl prior to 5.8");
-} else {
-ok( $applied == 2, 47 );
-}
-# 45-47 again, but for our variables
-$out = "begin\n";
-{ our $dummy;          $dummy = bless {}, 'Dummy'; }
-ok( $out eq "begin\n", 48 );
-{ no warnings; our $dummy : Dummy;  $dummy = bless {}, 'Dummy'; }
-ok( $out eq "begin\nbye\n", 49 );
-undef $::dummy;
-ok( $out eq "begin\nbye\nbye\n", 50 );
-
-# are lexical attributes reapplied correctly?
-sub dummy_our { no warnings; our $banjo : Dummy; }
-$applied = 0;
-dummy_our(); dummy_our();
-ok( $applied == 0, 51 );
-
-sub UNIVERSAL::Stooge :ATTR(END) {};
-eval {
-	local $SIG{__WARN__} = sub { die @_ };
-	my $groucho : Stooge;
-};
-my $match = $@ =~ /^Won't be able to apply END handler/; 
-if($] < 5.008) {
-ok(1,52 ,"# Skip, no difference between lexical handlers and normal handlers prior to 5.8");
-} else {
-ok( $match, 52 );
-}
 

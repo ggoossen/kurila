@@ -1,9 +1,4 @@
-BEGIN {
-    if ($ENV{PERL_CORE}) {
-        chdir('t') if -d 't';
-        @INC = qw(../lib);
-    }
-}
+#! /usr/local/bin/perl -w
 
 use Carp;
 use Switch qw(__ fallthrough);

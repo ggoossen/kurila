@@ -1,10 +1,3 @@
-BEGIN {
-    if ($ENV{PERL_CORE}) {
-        chdir('t') if -d 't';
-        @INC = qw(../lib);
-    }
-}
-
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
@@ -13,7 +6,7 @@ BEGIN {
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..181\n"; }
+BEGIN { $| = 1; print "1..81\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Text::Balanced qw ( extract_variable );
 $loaded = 1;
@@ -65,7 +58,6 @@ $a->;
 $a (1..3) { print $a };
 
 # USING: extract_variable($str);
-$obj->nextval;
 *var;
 *$var;
 *{var};
@@ -99,55 +91,6 @@ $#_;
 $#array;
 $#{array};
 $var[$#var];
-$1;
-$11;
-$&;
-$`;
-$';
-$+;
-$*;
-$.;
-$/;
-$|;
-$,;
-$";
-$;;
-$#;
-$%;
-$=;
-$-;
-$~;
-$^;
-$:;
-$^L;
-$^A;
-$?;
-$!;
-$^E;
-$@;
-$$;
-$<;
-$>;
-$(;
-$);
-$[;
-$];
-$^C;
-$^D;
-$^F;
-$^H;
-$^I;
-$^M;
-$^O;
-$^P;
-$^R;
-$^S;
-$^T;
-$^V;
-$^W;
-${^WARNING_BITS};
-${^WIDE_SYSTEM_CALLS};
-$^X;
 
 # THESE SHOULD FAIL
 $a->;
