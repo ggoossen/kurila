@@ -1,9 +1,30 @@
 package Thread::Queue;
 
-use threads::shared;
-use strict;
+our $VERSION = '1.00';
 
-our $VERSION = '2.00';
+our $ithreads;
+our $othreads;
+
+use Thread qw(cond_wait cond_broadcast);
+
+BEGIN {
+    use Config;
+    $ithreads = $Config{useithreads};
+    $othreads = $Config{use5005threads};
+    if($ithreads) {
+	require 'threads/shared/queue.pm';
+	for my $m (qw(new enqueue dequeue dequeue_nb pending)) {
+	    no strict 'refs';
+	    *{"Thread::Queue::$m"} = \&{"threads::shared::queue::${m}"};
+	}
+    } else {
+	for my $m (qw(new enqueue dequeue dequeue_nb pending)) {
+	    no strict 'refs';
+	    *{"Thread::Queue::$m"} = \&{"Thread::Queue::${m}_othread"};
+	}
+    }
+}
+
 
 =head1 NAME
 
@@ -15,16 +36,16 @@ Thread::Queue - thread-safe queues
     my $q = new Thread::Queue;
     $q->enqueue("foo", "bar");
     my $foo = $q->dequeue;    # The "bar" is still in the queue.
-    my $foo = $q->dequeue_nb; # returns "bar", or undef if the queue was empty
+    my $foo = $q->dequeue_nb; # returns "bar", or undef if the queue was
+                              # empty
     my $left = $q->pending;   # returns the number of items still in the queue
 
 =head1 DESCRIPTION
 
-A queue, as implemented by C<Thread::Queue> is a thread-safe 
-data structure much like a list.  Any number of threads can safely 
-add elements to the end of the list, or remove elements from the head 
-of the list. (Queues don't permit adding or removing elements from 
-the middle of the list).
+A queue, as implemented by C<Thread::Queue> is a thread-safe data structure
+much like a list. Any number of threads can safely add elements to the end
+of the list, or remove elements from the head of the list. (Queues don't
+permit adding or removing elements from the middle of the list)
 
 =head1 FUNCTIONS AND METHODS
 
@@ -37,7 +58,7 @@ The C<new> function creates a new empty queue.
 =item enqueue LIST
 
 The C<enqueue> method adds a list of scalars on to the end of the queue.
-The queue will grow as needed to accommodate the list.
+The queue will grow as needed to accomodate the list.
 
 =item dequeue
 
@@ -54,48 +75,46 @@ C<undef>.
 
 =item pending
 
-The C<pending> method returns the number of items still in the queue.
+The C<pending> method returns the number of items still in the queue.  (If
+there can be multiple readers on the queue it's best to lock the queue
+before checking to make sure that it stays in a consistent state)
 
 =back
 
 =head1 SEE ALSO
 
-L<threads>, L<threads::shared>
+L<Thread>
 
 =cut
 
-sub new {
+sub new_othread {
     my $class = shift;
-    my @q : shared = @_;
-    return bless \@q, $class;
+    return bless [@_], $class;
 }
 
-sub dequeue  {
+sub dequeue_othread : locked : method {
     my $q = shift;
-    lock(@$q);
-    cond_wait @$q until @$q;
-    cond_signal @$q if @$q > 1;
+    cond_wait $q until @$q;
     return shift @$q;
 }
 
-sub dequeue_nb {
-    my $q = shift;
-    lock(@$q);
+sub dequeue_nb_othread : locked : method {
+  my $q = shift;
+  if (@$q) {
     return shift @$q;
+  } else {
+    return undef;
+  }
 }
 
-sub enqueue {
+sub enqueue_othread : locked : method {
     my $q = shift;
-    lock(@$q);
-    push @$q, @_  and cond_signal @$q;
+    push(@$q, @_) and cond_broadcast $q;
 }
 
-sub pending  {
-    my $q = shift;
-    lock(@$q);
-    return scalar(@$q);
+sub pending_othread : locked : method {
+  my $q = shift;
+  return scalar(@$q);
 }
 
 1;
-
-

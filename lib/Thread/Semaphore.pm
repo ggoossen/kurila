@@ -1,8 +1,26 @@
 package Thread::Semaphore;
+use Thread qw(cond_wait cond_broadcast);
 
-use threads::shared;
+our $VERSION = '1.00';
 
-our $VERSION = '2.00';
+BEGIN {
+    use Config;
+    $ithreads = $Config{useithreads};
+    $othreads = $Config{use5005threads};
+    if($ithreads) {
+	require 'threads/shared/semaphore.pm';
+	for my $m (qw(new up down)) {
+	    no strict 'refs';
+	    *{"Thread::Semaphore::$m"} = \&{"threads::shared::semaphore::${m}"};
+	}
+    } else {
+	for my $m (qw(new up down)) {
+	    no strict 'refs';
+	    *{"Thread::Semaphore::$m"} = \&{"Thread::Semaphore::${m}_othread"};
+	}
+    }
+}
+
 
 =head1 NAME
 
@@ -28,8 +46,8 @@ unlike locks, aren't tied to particular scalars, and so may be used to
 control access to anything you care to use them for.
 
 Semaphores don't limit their values to zero or one, so they can be used to
-control access to some resource that there may be more than one of. (For
-example, filehandles). Increment and decrement amounts aren't fixed at one
+control access to some resource that may have more than one of. (For
+example, filehandles) Increment and decrement amounts aren't fixed at one
 either, so threads can reserve or return multiple resources at once.
 
 =head1 FUNCTIONS AND METHODS
@@ -48,7 +66,7 @@ number. If no number is passed, the semaphore's count is set to one.
 =item down NUMBER
 
 The C<down> method decreases the semaphore's count by the specified number,
-or by one if no number has been specified. If the semaphore's count would drop
+or one if no number has been specified. If the semaphore's count would drop
 below zero, this method will block until such time that the semaphore's
 count is equal to or larger than the amount you're C<down>ing the
 semaphore's count by.
@@ -58,33 +76,31 @@ semaphore's count by.
 =item up NUMBER
 
 The C<up> method increases the semaphore's count by the number specified,
-or by one if no number has been specified. This will unblock any thread blocked
+or one if no number's been specified. This will unblock any thread blocked
 trying to C<down> the semaphore if the C<up> raises the semaphore count
-above the amount that the C<down>s are trying to decrement it by.
+above what the C<down>s are trying to decrement it by.
 
 =back
 
 =cut
 
-sub new {
+sub new_othread {
     my $class = shift;
-    my $val : shared = @_ ? shift : 1;
+    my $val = @_ ? shift : 1;
     bless \$val, $class;
 }
 
-sub down {
+sub down_othread : locked : method {
     my $s = shift;
-    lock($$s);
     my $inc = @_ ? shift : 1;
-    cond_wait $$s until $$s >= $inc;
+    cond_wait $s until $$s >= $inc;
     $$s -= $inc;
 }
 
-sub up {
+sub up_othread : locked : method {
     my $s = shift;
-    lock($$s);
     my $inc = @_ ? shift : 1;
-    ($$s += $inc) > 0 and cond_broadcast $$s;
+    ($$s += $inc) > 0 and cond_broadcast $s;
 }
 
 1;
