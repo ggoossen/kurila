@@ -43,33 +43,8 @@ Revision history for Perl extension Switch.
 	- Added support for Perl 6 given..when syntax
 
 
-2.05	Mon Sep  3 08:13:25 2001
+2.04	Mon Jul 30 13:17:35 2001
 
-	- Changed licence for inclusion in core distribution
+	- Suppressed 'undef value' warning under -w (thanks Michael)
 
-	- Added new test file for non-fallthrough and nested switches
-
-
-2.06	Wed Nov 14 16:18:54 2001
-
-	- Fixed parsing of ternary operators in Switch'ed source code
-	  (at the expense of no longer correctly parsing ?...? regexes)
-	  (thanks Mark)
-
-	- Fixed the parsing of embedded POD (thanks Brent)
-
-	- Fixed bug encountered when -s or -m file test used (thanks Jochen)
-
-
-2.07	Wed May 15 15:19:28 2002
-
-	- Corified tests
-
-	- Updated "Perl6" syntax to reflect current design
-	  (as far as possible -- can't eliminate need to parenthesize
-	  variables, since they're ambiguous in Perl 5)
-
-
-2.09	Wed Jun 12 22:13:30 2002
-
-	- Removed spurious debugging statement
+	- Added support for Perl 6 given..when syntax
