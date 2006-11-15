@@ -3118,17 +3118,9 @@ PP(pp_substr)
 	if (utf8_curlen)
 	    sv_pos_u2b(sv, &pos, &rem);
 	tmps += pos;
-	/* we either return a PV or an LV. If the TARG hasn't been used
-	 * before, or is of that type, reuse it; otherwise use a mortal
-	 * instead. Note that LVs can have an extended lifetime, so also
-	 * dont reuse if refcount > 1 (bug #20933) */
-	if (SvTYPE(TARG) > SVt_NULL) {
-	    if ( (SvTYPE(TARG) == SVt_PVLV)
-		    ? (!lvalue || SvREFCNT(TARG) > 1)
-		    : lvalue)
-	    {
-		TARG = sv_newmortal();
-	    }
+	/* use a mortal for LVs because they can have an extended lifetime */
+	if (lvalue) {
+	    TARG = sv_newmortal();
 	}
 
 	sv_setpvn(TARG, tmps, rem);

@@ -2496,9 +2496,10 @@ PP(pp_leavesublv)
 	    EXTEND_MORTAL(1);
 	    if (MARK == SP) {
 		/* Temporaries are bad unless they happen to be elements
-		 * of a tied hash or array */
+		 * of a tied hash or array or it is an lvalue */
 		if (SvFLAGS(TOPs) & (SVs_TEMP | SVs_PADTMP | SVf_READONLY) &&
-		    !(SvRMAGICAL(TOPs) && mg_find(TOPs, PERL_MAGIC_tiedelem))) {
+		    !(SvRMAGICAL(TOPs) && mg_find(TOPs, PERL_MAGIC_tiedelem)) &&
+		    !(SvTYPE(TOPs) == SVt_PVLV)) {
 		    LEAVE;
 		    cxstack_ix--;
 		    POPSUB(cx,sv);
@@ -2529,7 +2530,8 @@ PP(pp_leavesublv)
 	    EXTEND_MORTAL(SP - newsp);
 	    for (mark = newsp + 1; mark <= SP; mark++) {
 		if (*mark != &PL_sv_undef
-		    && SvFLAGS(*mark) & (SVs_TEMP | SVs_PADTMP | SVf_READONLY)) {
+		    && (SvFLAGS(*mark) & (SVs_TEMP | SVs_PADTMP | SVf_READONLY))
+		    && !(SvTYPE(*mark) == SVt_PVLV)) {
 		    /* Might be flattened array after $#array =  */
 		    PUTBACK;
 		    LEAVE;
