@@ -335,17 +335,12 @@ PP(pp_pos)
     dVAR; dSP; dTARGET; dPOPss;
 
     if (PL_op->op_flags & OPf_MOD || LVRET) {
-	if (SvTYPE(TARG) < SVt_PVLV) {
-	    sv_upgrade(TARG, SVt_PVLV);
-	    sv_magic(TARG, NULL, PERL_MAGIC_pos, NULL, 0);
-	}
+	TARG = sv_newmortal();
+	sv_upgrade(TARG, SVt_PVLV);
+	sv_magic(TARG, NULL, PERL_MAGIC_pos, NULL, 0);
 
 	LvTYPE(TARG) = '.';
-	if (LvTARG(TARG) != sv) {
-	    if (LvTARG(TARG))
-		SvREFCNT_dec(LvTARG(TARG));
-	    LvTARG(TARG) = SvREFCNT_inc_simple(sv);
-	}
+	LvTARG(TARG) = SvREFCNT_inc_simple(sv);
 	PUSHs(TARG);	/* no SvSETMAGIC */
 	RETURN;
     }
@@ -3150,11 +3145,7 @@ PP(pp_substr)
 	    }
 
 	    LvTYPE(TARG) = 'x';
-	    if (LvTARG(TARG) != sv) {
-		if (LvTARG(TARG))
-		    SvREFCNT_dec(LvTARG(TARG));
-		LvTARG(TARG) = SvREFCNT_inc_simple(sv);
-	    }
+	    LvTARG(TARG) = SvREFCNT_inc_simple(sv);
 	    LvTARGOFF(TARG) = upos;
 	    LvTARGLEN(TARG) = urem;
 	}
@@ -3174,18 +3165,12 @@ PP(pp_vec)
 
     SvTAINTED_off(TARG);		/* decontaminate */
     if (lvalue) {			/* it's an lvalue! */
-	if (SvREFCNT(TARG) > 1)	/* don't share the TARG (#20933) */
-	    TARG = sv_newmortal();
-	if (SvTYPE(TARG) < SVt_PVLV) {
-	    sv_upgrade(TARG, SVt_PVLV);
-	    sv_magic(TARG, NULL, PERL_MAGIC_vec, NULL, 0);
-	}
+	/* always use a mortal for lvalues */
+	TARG = sv_newmortal();
+	sv_upgrade(TARG, SVt_PVLV);
+	sv_magic(TARG, NULL, PERL_MAGIC_vec, NULL, 0);
 	LvTYPE(TARG) = 'v';
-	if (LvTARG(TARG) != src) {
-	    if (LvTARG(TARG))
-		SvREFCNT_dec(LvTARG(TARG));
-	    LvTARG(TARG) = SvREFCNT_inc_simple(src);
-	}
+	LvTARG(TARG) = SvREFCNT_inc_simple(src);
 	LvTARGOFF(TARG) = offset;
 	LvTARGLEN(TARG) = size;
     }

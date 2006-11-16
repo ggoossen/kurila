@@ -1352,9 +1352,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if (type == OP_LEAVESUBLV)
 	    o->op_private |= OPpMAYBE_LVSUB;
       lvalue_func:
-	pad_free(o->op_targ);
-	o->op_targ = pad_alloc(o->op_type, SVs_PADMY);
-	assert(SvTYPE(PAD_SV(o->op_targ)) == SVt_NULL);
 	if (o->op_flags & OPf_KIDS)
 	    mod(cBINOPo->op_first->op_sibling, type);
 	break;
