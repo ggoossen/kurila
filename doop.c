@@ -1416,10 +1416,11 @@ Perl_do_kv(pTHX)
 
     if (!hv) {
 	if (PL_op->op_flags & OPf_MOD || LVRET) {	/* lvalue */
-	    dTARGET;		/* make sure to clear its target here */
-	    if (SvTYPE(TARG) == SVt_PVLV)
-		LvTARG(TARG) = NULL;
-	    PUSHs(TARG);
+	    SV * const sv = sv_newmortal();
+	    sv_upgrade(sv, SVt_PVLV);
+	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);
+	    LvTARG(sv) = NULL;
+	    PUSHs(sv);
 	}
 	RETURN;
     }
@@ -1432,20 +1433,14 @@ Perl_do_kv(pTHX)
 
     if (gimme == G_SCALAR) {
 	IV i;
-	dTARGET;
 
 	if (PL_op->op_flags & OPf_MOD || LVRET) {	/* lvalue */
-	    if (SvTYPE(TARG) < SVt_PVLV) {
-		sv_upgrade(TARG, SVt_PVLV);
-		sv_magic(TARG, NULL, PERL_MAGIC_nkeys, NULL, 0);
-	    }
-	    LvTYPE(TARG) = 'k';
-	    if (LvTARG(TARG) != (SV*)keys) {
-		if (LvTARG(TARG))
-		    SvREFCNT_dec(LvTARG(TARG));
-		LvTARG(TARG) = SvREFCNT_inc_simple(keys);
-	    }
-	    PUSHs(TARG);
+	    SV * const sv = sv_newmortal();
+	    sv_upgrade(sv, SVt_PVLV);
+	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);
+	    LvTYPE(sv) = 'k';
+	    LvTARG(sv) = SvREFCNT_inc_simple(keys);
+	    PUSHs(sv);
 	    RETURN;
 	}
 
@@ -1457,6 +1452,7 @@ Perl_do_kv(pTHX)
 	    i = 0;
 	    while (hv_iternext(keys)) i++;
 	}
+	dTARGET;
 	PUSHi( i );
 	RETURN;
     }
