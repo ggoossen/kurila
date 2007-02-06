@@ -77,7 +77,7 @@ sub wrap {
     my $shortchar = $char . "{0,$width}";
     my $longchar = $char . "{$width}";
     while (length > $width) {
-        if (s/^($shortchar)[\ \t\n\r\f]+// || s/^($longchar)//) {
+        if (s/^($shortchar)[\ \t]+// || s/^($longchar)//) {
             $output .= $spaces . $1 . "\n";
         } else {
             last;

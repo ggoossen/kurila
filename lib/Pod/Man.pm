@@ -351,7 +351,6 @@ sub format_text {
     # <Data> blocks.
     if ($convert) {
         if (ASCII) {
-            DEBUG and (utf8::valid($text) or Carp::confess "Invalid $text");
             $text =~ s/(\\|[^\x00-\x7F])/$ESCAPES{ord ($1)} || "X"/eg;
         } else {
             $text =~ s/(\\)/$ESCAPES{ord ($1)} || "X"/eg;
