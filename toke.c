@@ -2042,6 +2042,19 @@ S_scan_const(pTHX_ char *start)
 	    /* \x24 indicates a hex constant */
 	    case 'x':
 		++s;
+		if (*s == '[') {
+		    /* \x[XX] byte insert XX */
+		    STRLEN len = 2;
+		    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+		    s++;
+		    uv = grok_hex(s, &len, &flags, NULL);
+		    s += len;
+		    *d++ = (char)uv;
+		    if ((s >= send) || (*s != ']'))
+			yyerror("Missing right square bracket on \\x[]");
+		    s += 1;
+		    continue;
+		}
 		if (*s == '{') {
 		    char* const e = strchr(s, '}');
                     I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
@@ -2063,8 +2076,8 @@ S_scan_const(pTHX_ char *start)
                         I32 flags = PERL_SCAN_DISALLOW_PREFIX;
 			uv = grok_hex(s, &len, &flags, NULL);
 			s += len;
-		        *d++ = (char)uv;
-			continue;
+		        /* *d++ = (char)uv;
+			   continue; */
 		    }
 		}
 

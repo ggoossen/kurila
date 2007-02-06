@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-print q(1..23
+print q(1..25
 );
 
 # This is() function is written to avoid ""
@@ -67,3 +67,6 @@ is ("\x{10FFFD}", chr 1114109);
 use charnames ':full';
 is ("\N{LATIN SMALL LETTER A}", "a");
 is ("\N{NEL}", chr 0x85);
+
+is("\x[65]", chr 101);
+is("\x[FF]", bytes::chr(0xFF));
