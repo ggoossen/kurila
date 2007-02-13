@@ -6571,7 +6571,19 @@ tryagain:
 			p++;
 			break;
 		    case 'x':
-                       if (*++p == '{') {
+                       p++;
+                       if (*p == '[') {
+                           /* \x[XX] byte insert XX */
+                           STRLEN len = 2;
+                           I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+                           p++;
+                           ender = grok_hex(p, &len, &flags, NULL);
+                           p += len;
+                           if (*p != ']')
+                               yyerror("Missing right square bracket on \\x[]");
+                           p += 1;
+                       }
+                       else if (*p == '{') {
 			    char* const e = strchr(p, '}');
 	
 			    if (!e) {
