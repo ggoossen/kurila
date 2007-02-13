@@ -9,6 +9,7 @@ BEGIN {
 
 use strict;
 use Test;
+use utf8;
 
 my @them;
 BEGIN { plan('tests' => 63) };

@@ -686,7 +686,6 @@
 #define refkids			Perl_refkids
 #endif
 #define regdump			Perl_regdump
-#define regclass_swash		Perl_regclass_swash
 #define pregexec		Perl_pregexec
 #define pregfree		Perl_pregfree
 #if defined(PERL_CORE) || defined(PERL_EXT)
@@ -1339,9 +1338,9 @@
 #define regbranch		S_regbranch
 #define reguni			S_reguni
 #define regclass		S_regclass
+#define anyof_get_swash		S_anyof_get_swash
 #define regcurly		S_regcurly
 #define reg_node		S_reg_node
-#define reg_recode		S_reg_recode
 #define regpiece		S_regpiece
 #define reg_namedseq		S_reg_namedseq
 #define reginsert		S_reginsert
@@ -1400,8 +1399,6 @@
 #define reghopmaybe3		S_reghopmaybe3
 #define find_byclass		S_find_byclass
 #define swap_match_buff		S_swap_match_buff
-#define to_utf8_substr		S_to_utf8_substr
-#define to_byte_substr		S_to_byte_substr
 #define reg_check_named_buff_matched	S_reg_check_named_buff_matched
 #endif
 #  ifdef DEBUGGING
@@ -2922,7 +2919,6 @@
 #define refkids(a,b)		Perl_refkids(aTHX_ a,b)
 #endif
 #define regdump(a)		Perl_regdump(aTHX_ a)
-#define regclass_swash(a,b,c,d,e)	Perl_regclass_swash(aTHX_ a,b,c,d,e)
 #define pregexec(a,b,c,d,e,f,g)	Perl_pregexec(aTHX_ a,b,c,d,e,f,g)
 #define pregfree(a)		Perl_pregfree(aTHX_ a)
 #if defined(PERL_CORE) || defined(PERL_EXT)
@@ -3570,9 +3566,9 @@
 #define regbranch(a,b,c,d)	S_regbranch(aTHX_ a,b,c,d)
 #define reguni(a,b,c)		S_reguni(aTHX_ a,b,c)
 #define regclass(a,b)		S_regclass(aTHX_ a,b)
+#define anyof_get_swash(a,b,c,d)	S_anyof_get_swash(aTHX_ a,b,c,d)
 #define regcurly		S_regcurly
 #define reg_node(a,b)		S_reg_node(aTHX_ a,b)
-#define reg_recode(a,b)		S_reg_recode(aTHX_ a,b)
 #define regpiece(a,b,c)		S_regpiece(aTHX_ a,b,c)
 #define reg_namedseq(a,b)	S_reg_namedseq(aTHX_ a,b)
 #define reginsert(a,b,c,d)	S_reginsert(aTHX_ a,b,c,d)
@@ -3616,7 +3612,7 @@
 #define regmatch(a,b)		S_regmatch(aTHX_ a,b)
 #define regrepeat(a,b,c,d)	S_regrepeat(aTHX_ a,b,c,d)
 #define regtry(a,b)		S_regtry(aTHX_ a,b)
-#define reginclass(a,b,c,d,e)	S_reginclass(aTHX_ a,b,c,d,e)
+#define reginclass(a,b,c,d)	S_reginclass(aTHX_ a,b,c,d)
 #define regcppush(a)		S_regcppush(aTHX_ a)
 #define regcppop(a)		S_regcppop(aTHX_ a)
 #define reghop3			S_reghop3
@@ -3630,8 +3626,6 @@
 #define reghopmaybe3		S_reghopmaybe3
 #define find_byclass(a,b,c,d,e)	S_find_byclass(aTHX_ a,b,c,d,e)
 #define swap_match_buff(a)	S_swap_match_buff(aTHX_ a)
-#define to_utf8_substr(a)	S_to_utf8_substr(aTHX_ a)
-#define to_byte_substr(a)	S_to_byte_substr(aTHX_ a)
 #define reg_check_named_buff_matched(a,b)	S_reg_check_named_buff_matched(aTHX_ a,b)
 #endif
 #  ifdef DEBUGGING

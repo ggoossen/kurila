@@ -16,6 +16,8 @@ BEGIN {
 
 print "1..31\n";
 
+use utf8;
+
 use encoding "latin1"; # ignored (overwritten by the next line)
 use encoding "greek";  # iso 8859-7 (no "latin" alias, surprise...)
 

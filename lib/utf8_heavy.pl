@@ -10,12 +10,52 @@ my %Cache;
 
 our (%PropertyAlias, %PA_reverse, %PropValueAlias, %PVA_reverse, %PVA_abbr_map);
 
-sub croak { require Carp; Carp::croak(@_) }
+# sub croak { require Carp; Carp::croak(@_) }
 
 ##
 ## "SWASH" == "SWATCH HASH". A "swatch" is a swatch of the Unicode landscape.
 ## It's a data structure that encodes a set of Unicode characters.
 ##
+
+sub length (_) {
+    BEGIN { utf8::import() }
+    return CORE::length($_[0]);
+}
+
+sub substr ($$;$$) {
+    BEGIN { utf8::import() }
+    return
+	@_ == 2 ? CORE::substr($_[0], $_[1]) :
+	@_ == 3 ? CORE::substr($_[0], $_[1], $_[2]) :
+	          CORE::substr($_[0], $_[1], $_[2], $_[3]) ;
+}
+
+sub ord (_) {
+    BEGIN { utf8::import() }
+    return CORE::ord($_[0]);
+}
+
+sub chr (_) {
+    BEGIN { utf8::import() }
+    return CORE::chr($_[0]);
+}
+
+sub index ($$;$) {
+    BEGIN { utf8::import() }
+    return
+	@_ == 2 ? CORE::index($_[0], $_[1]) :
+	          CORE::index($_[0], $_[1], $_[2]) ;
+}
+
+sub rindex ($$;$) {
+    BEGIN { utf8::import() }
+    return
+	@_ == 2 ? CORE::rindex($_[0], $_[1]) :
+	          CORE::rindex($_[0], $_[1], $_[2]) ;
+}
+
+
+use bytes;
 
 sub SWASHNEW {
     my ($class, $type, $list, $minbits, $none) = @_;
@@ -281,5 +321,4 @@ sub SWASHNEW {
 }
 
 # Now SWASHGET is recasted into a C function S_swash_get (see utf8.c).
-
 1;

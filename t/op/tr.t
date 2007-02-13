@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 118;
+plan tests => 108;
 
 my $Is_EBCDIC = (ord('i') == 0x89 & ord('J') == 0xd1);
 
@@ -62,6 +62,8 @@ is($_, 'Fred',  'harmless if implicitly not updating');
 is($@, '',      '    no error');
 
 
+use utf8;
+
 # check tr handles UTF8 correctly
 ($x = 256.65.258) =~ tr/a/b/;
 is($x, 256.65.258,  'handles UTF8');
@@ -114,7 +116,7 @@ else {
     is($x, 100.125.60,      'Removing UTF8 chars from UTF8 string');
     is(length $x, 3);
 
-    $x = 400.125.60.400;
+    $x = "\x{190}abc\x{190}";
     $y = $x =~ tr/\x{190}/\x{190}/;
     is($y, 2,               'Counting UTF8 chars in UTF8 string');
 
@@ -186,60 +188,24 @@ like($@, qr|^Can't modify constant item in transliteration \(tr///\)|,
 # v400 (0x190) is UTF-8-encoded as 198 144 (0xc6 0x90)
 
 # Transliterate a byte to a byte, all four ways.
+{
+    use bytes;
+    ($a = "a\xc4b\xc4") =~ tr/\xc4/\xc5/;
+    is($a, "a\xc5b\xc5",    'byte2byte transliteration');
 
-($a = v300.196.172.300.196.172) =~ tr/\xc4/\xc5/;
-is($a, v300.197.172.300.197.172,    'byte2byte transliteration');
+    is((($a = "a\xc4b\xc4") =~ tr/\xc4/\xc5/), 2,
+       'transliterate and count');
+}
 
-($a = v300.196.172.300.196.172) =~ tr/\xc4/\x{c5}/;
-is($a, v300.197.172.300.197.172);
+is((($a = "a\x{12c}b\x{12c}") =~ tr/\x{12c}/\x{12d}/), 2);
 
-($a = v300.196.172.300.196.172) =~ tr/\x{c4}/\xc5/;
-is($a, v300.197.172.300.197.172);
+($a = "a\x{c4}b\x{c4}") =~ tr/\x{c4}/\x{12d}/c;
+is($a, "\x{12d}\x{c4}\x{12d}\x{c4}",    'translit w/complement');
 
-($a = v300.196.172.300.196.172) =~ tr/\x{c4}/\x{c5}/;
-is($a, v300.197.172.300.197.172);
+($a = "a\x{c4}b\x{c4}") =~ tr/\x{c4}//d;
+is($a, "ab",            'translit w/deletion');
 
-
-($a = v300.196.172.300.196.172) =~ tr/\xc4/\x{12d}/;
-is($a, v300.301.172.300.301.172,    'byte2wide transliteration');
-
-($a = v300.196.172.300.196.172) =~ tr/\x{12c}/\xc3/;
-is($a, v195.196.172.195.196.172,    '   wide2byte');
-
-($a = v300.196.172.300.196.172) =~ tr/\x{12c}/\x{12d}/;
-is($a, v301.196.172.301.196.172,    '   wide2wide');
-
-
-($a = v300.196.172.300.196.172) =~ tr/\xc4\x{12c}/\x{12d}\xc3/;
-is($a, v195.301.172.195.301.172,    'byte2wide & wide2byte');
-
-
-($a = v300.196.172.300.196.172.400.198.144) =~
-	tr/\xac\xc4\x{12c}\x{190}/\xad\x{12d}\xc5\x{191}/;
-is($a, v197.301.173.197.301.173.401.198.144,    'all together now!');
-
-
-is((($a = v300.196.172.300.196.172) =~ tr/\xc4/\xc5/), 2,
-                                     'transliterate and count');
-
-is((($a = v300.196.172.300.196.172) =~ tr/\x{12c}/\x{12d}/), 2);
-
-
-($a = v300.196.172.300.196.172) =~ tr/\xc4/\x{12d}/c;
-is($a, v301.196.301.301.196.301,    'translit w/complement');
-
-($a = v300.196.172.300.196.172) =~ tr/\x{12c}/\xc5/c;
-is($a, v300.197.197.300.197.197);
-
-
-($a = v300.196.172.300.196.172) =~ tr/\xc4//d;
-is($a, v300.172.300.172,            'translit w/deletion');
-
-($a = v300.196.172.300.196.172) =~ tr/\x{12c}//d;
-is($a, v196.172.196.172);
-
-
-($a = v196.196.172.300.300.196.172) =~ tr/\xc4/\xc5/s;
+($a = v196.196.172.300.300.196.172) =~ tr/\x{c4}/\x{c5}/s;
 is($a, v197.172.300.300.197.172,    'translit w/squeeze');
 
 ($a = v196.172.300.300.196.172.172) =~ tr/\x{12c}/\x{12d}/s;
@@ -260,10 +226,10 @@ is(sprintf("%vd", $a), '196.172.200');
 # UTF8 range tests from Inaba Hiroto
 
 # Not working in EBCDIC as of 12674.
-($a = v300.196.172.302.197.172) =~ tr/\x{12c}-\x{130}/\xc0-\xc4/;
+($a = v300.196.172.302.197.172) =~ tr/\x{12c}-\x{130}/\x{c0}-\x{c4}/;
 is($a, v192.196.172.194.197.172,    'UTF range');
 
-($a = v300.196.172.302.197.172) =~ tr/\xc4-\xc8/\x{12c}-\x{130}/;
+($a = v300.196.172.302.197.172) =~ tr/\x{c4}-\x{c8}/\x{12c}-\x{130}/;
 is($a, v300.300.172.302.301.172);
 
 
@@ -295,6 +261,8 @@ is($a, "X");
 # (i-j, r-s, I-J, R-S), [\x89-\x91] [\xc9-\xd1] has to match them,
 # from Karsten Sperling.
 
+{
+use bytes;
 $c = ($a = "\x89\x8a\x8b\x8c\x8d\x8f\x90\x91") =~ tr/\x89-\x91/X/;
 is($c, 8);
 is($a, "XXXXXXXX");
@@ -302,6 +270,7 @@ is($a, "XXXXXXXX");
 $c = ($a = "\xc9\xca\xcb\xcc\xcd\xcf\xd0\xd1") =~ tr/\xc9-\xd1/X/;
 is($c, 8);
 is($a, "XXXXXXXX");
+}
 
 SKIP: {
     skip "not EBCDIC", 4 unless $Is_EBCDIC;
@@ -315,19 +284,25 @@ SKIP: {
     is($a, "X\xca\xcb\xcc\xcd\xcf\xd0X");
 }
 
-($a = "\x{100}") =~ tr/\x00-\xff/X/c;
-is(ord($a), ord("X"));
+my $x = "\x{100}";
+use bytes;
+{
+    local $TODO = "byte range";
+    ($a = $x) =~ tr/\x00-\xff/X/c;
+    is(ord($a), ord("X"), "byte tr///");
 
-($a = "\x{100}") =~ tr/\x00-\xff/X/cs;
-is(ord($a), ord("X"));
+    ($a = $x) =~ tr/\x00-\xff/X/cs;
+    is(ord($a), ord("X"), "byte tr///");
+}
 
+use utf8;
 ($a = "\x{100}\x{100}") =~ tr/\x{101}-\x{200}//c;
 is($a, "\x{100}\x{100}");
 
 ($a = "\x{100}\x{100}") =~ tr/\x{101}-\x{200}//cs;
 is($a, "\x{100}");
 
-$a = "\xfe\xff"; $a =~ tr/\xfe\xff/\x{1ff}\x{1fe}/;
+$a = "\x{fe}\x{ff}"; $a =~ tr/\x{fe}\x{ff}/\x{1ff}\x{1fe}/;
 is($a, "\x{1ff}\x{1fe}");
 
 
@@ -344,7 +319,7 @@ is("@a", "1 2");
 
 
 # Additional test for Inaba Hiroto patch (robin@kitsite.com)
-($a = "\x{100}\x{102}\x{101}") =~ tr/\x00-\377/XYZ/c;
+($a = "\x{100}\x{102}\x{101}") =~ tr/\x00-\x{ff}/XYZ/c;
 is($a, "XZY");
 
 

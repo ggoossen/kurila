@@ -789,7 +789,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	     SvNOK_on(sv);	/* what a wonderful hack! */
 	 }
 	 else if (strEQ(remaining, "NCODING"))
-	      sv_setsv(sv, PL_encoding);
+	     sv_setsv(sv, PL_encoding);
 	 break;
     case '\006':		/* ^F */
 	sv_setiv(sv, (IV)PL_maxsysfd);
@@ -1942,15 +1942,13 @@ Perl_magic_getsubstr(pTHX_ SV *sv, MAGIC *mg)
     I32 rem = LvTARGLEN(sv);
     PERL_UNUSED_ARG(mg);
 
-    if (SvUTF8(lsv))
+    if (LvTYPE(sv) == 'X')  /* Uppercase is with utf8 */
 	sv_pos_u2b(lsv, &offs, &rem);
     if (offs > (I32)len)
 	offs = len;
     if (rem + offs > (I32)len)
 	rem = len - offs;
     sv_setpvn(sv, tmps + offs, (STRLEN)rem);
-    if (SvUTF8(lsv))
-        SvUTF8_on(sv);
     return 0;
 }
 
@@ -1965,20 +1963,10 @@ Perl_magic_setsubstr(pTHX_ SV *sv, MAGIC *mg)
     I32 lvlen = LvTARGLEN(sv);
     PERL_UNUSED_ARG(mg);
 
-    if (DO_UTF8(sv)) {
-	sv_utf8_upgrade(lsv);
+    if (LvTYPE(sv) == 'X') {  /* Uppercase is with utf8 */
  	sv_pos_u2b(lsv, &lvoff, &lvlen);
 	sv_insert(lsv, lvoff, lvlen, tmps, len);
 	LvTARGLEN(sv) = sv_len_utf8(sv);
-	SvUTF8_on(lsv);
-    }
-    else if (lsv && SvUTF8(lsv)) {
-	const char *utf8;
-	sv_pos_u2b(lsv, &lvoff, &lvlen);
-	LvTARGLEN(sv) = len;
-	utf8 = (char*)bytes_to_utf8((U8*)tmps, &len);
-	sv_insert(lsv, lvoff, lvlen, utf8, len);
-	Safefree(utf8);
     }
     else {
 	sv_insert(lsv, lvoff, lvlen, tmps, len);
@@ -2255,14 +2243,14 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 #endif
 	}
 	else if (strEQ(mg->mg_ptr+1, "NCODING")) {
-	    if (PL_encoding)
-		SvREFCNT_dec(PL_encoding);
-	    if (SvOK(sv) || SvGMAGICAL(sv)) {
-		PL_encoding = newSVsv(sv);
-	    }
-	    else {
-		PL_encoding = NULL;
-	    }
+           if (PL_encoding)
+               SvREFCNT_dec(PL_encoding);
+           if (SvOK(sv) || SvGMAGICAL(sv)) {
+               PL_encoding = newSVsv(sv);
+           }
+           else {
+               PL_encoding = NULL;
+           }
 	}
 	break;
     case '\006':	/* ^F */

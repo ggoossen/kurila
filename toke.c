@@ -88,11 +88,7 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 #define XFAKEBRACK 128
 #define XENUMMASK 127
 
-#ifdef USE_UTF8_SCRIPTS
-#   define UTF (!IN_BYTES)
-#else
-#   define UTF ((PL_linestr && DO_UTF8(PL_linestr)) || (PL_hints & HINT_UTF8))
-#endif
+#define UTF (!IN_BYTES)
 
 /* In variables named $^X, these are the legal values for X.
  * 1999-02-27 mjd-perl-patch@plover.com */
@@ -1238,9 +1234,7 @@ S_curmad(pTHX_ char slot, SV *sv)
 	sv_setpvn(sv, "", 0);
     else {
 	if (!IN_BYTES) {
-	    if (UTF && is_utf8_string((U8*)SvPVX(sv), SvCUR(sv)))
-		SvUTF8_on(sv);
-	    else if (PL_encoding) {
+	    if (PL_encoding) {
 		sv_recode_to_utf8(sv, PL_encoding);
 	    }
 	}
@@ -1402,16 +1396,13 @@ Perl_str_to_version(pTHX_ SV *sv)
     STRLEN len;
     const char *start = SvPV_const(sv,len);
     const char * const end = start + len;
-    const bool utf = SvUTF8(sv) ? TRUE : FALSE;
     while (start < end) {
 	STRLEN skip;
 	UV n;
-	if (utf)
-	    n = utf8n_to_uvchr((U8*)start, len, &skip, 0);
-	else {
-	    n = *(U8*)start;
-	    skip = 1;
-	}
+	n = utf8n_to_uvchr((U8*)start, len, &skip, 0);
+	if( n > 128 )
+	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
+			"High bit scalar value");
 	retval += ((NV)n)/nshift;
 	start += skip;
 	nshift *= 1000;
@@ -1854,15 +1845,11 @@ S_scan_const(pTHX_ char *start)
     I32  has_utf8 = FALSE;			/* Output constant is UTF8 */
     I32  this_utf8 = UTF;			/* The source string is assumed to be UTF8 */
     UV uv;
-#ifdef EBCDIC
-    UV literal_endpoint = 0;
-    bool native_range = TRUE; /* turned to FALSE if the first endpoint is Unicode. */
-#endif
 
     if (PL_lex_inwhat == OP_TRANS && PL_sublex_info.sub_op) {
 	/* If we are doing a trans and we know we want UTF8 set expectation */
-	has_utf8   = PL_sublex_info.sub_op->op_private & (OPpTRANS_FROM_UTF|OPpTRANS_TO_UTF);
-	this_utf8  = PL_sublex_info.sub_op->op_private & (PL_lex_repl ? OPpTRANS_FROM_UTF : OPpTRANS_TO_UTF);
+	has_utf8   = PL_sublex_info.sub_op->op_private & (OPpTRANS_UTF8);
+	this_utf8  = has_utf8;
     }
 
 
@@ -1875,14 +1862,8 @@ S_scan_const(pTHX_ char *start)
 		I32 min;			/* first character in range */
 		I32 max;			/* last character in range */
 
-#ifdef EBCDIC
-		UV uvmax = 0;
-#endif
 
 		if (has_utf8
-#ifdef EBCDIC
-		    && !native_range
-#endif
 		    ) {
 		    char * const c = (char*)utf8_hop((U8*)d, -1);
 		    char *e = d++;
@@ -1896,43 +1877,12 @@ S_scan_const(pTHX_ char *start)
 		}
 
 		i = d - SvPVX_const(sv);		/* remember current offset */
-#ifdef EBCDIC
-                SvGROW(sv,
-		       SvLEN(sv) + (has_utf8 ?
-				    (512 - UTF_CONTINUATION_MARK +
-				     UNISKIP(0x100))
-				    : 256));
-                /* How many two-byte within 0..255: 128 in UTF-8,
-		 * 96 in UTF-8-mod. */
-#else
 		SvGROW(sv, SvLEN(sv) + 256);	/* never more than 256 chars in a range */
-#endif
 		d = SvPVX(sv) + i;		/* refresh d after realloc */
-#ifdef EBCDIC
-                if (has_utf8) {
-                    int j;
-                    for (j = 0; j <= 1; j++) {
-                        char * const c = (char*)utf8_hop((U8*)d, -1);
-                        const UV uv    = utf8n_to_uvchr((U8*)c, d - c, NULL, 0);
-                        if (j)
-                            min = (U8)uv;
-                        else if (uv < 256)
-                            max = (U8)uv;
-                        else {
-                            max = (U8)0xff; /* only to \xff */
-                            uvmax = uv; /* \x{100} to uvmax */
-                        }
-                        d = c; /* eat endpoint chars */
-                     }
-                }
-               else {
-#endif
-		   d -= 2;		/* eat the first char and the - */
-		   min = (U8)*d;	/* first char in range */
-		   max = (U8)d[1];	/* last char in range  */
-#ifdef EBCDIC
-	       }
-#endif
+
+		d -= 2;		/* eat the first char and the - */
+		min = (U8)*d;	/* first char in range */
+		max = (U8)d[1];	/* last char in range  */
 
                 if (min > max) {
 		    Perl_croak(aTHX_
@@ -1940,53 +1890,12 @@ S_scan_const(pTHX_ char *start)
 			       (char)min, (char)max);
                 }
 
-#ifdef EBCDIC
-		if (literal_endpoint == 2 &&
-		    ((isLOWER(min) && isLOWER(max)) ||
-		     (isUPPER(min) && isUPPER(max)))) {
-		    if (isLOWER(min)) {
-			for (i = min; i <= max; i++)
-			    if (isLOWER(i))
-				*d++ = NATIVE_TO_NEED(has_utf8,i);
-		    } else {
-			for (i = min; i <= max; i++)
-			    if (isUPPER(i))
-				*d++ = NATIVE_TO_NEED(has_utf8,i);
-		    }
-		}
-		else
-#endif
-		    for (i = min; i <= max; i++)
-#ifdef EBCDIC
-                        if (has_utf8) {
-                            const U8 ch = (U8)NATIVE_TO_UTF(i);
-                            if (UNI_IS_INVARIANT(ch))
-                                *d++ = (U8)i;
-                            else {
-                                *d++ = (U8)UTF8_EIGHT_BIT_HI(ch);
-                                *d++ = (U8)UTF8_EIGHT_BIT_LO(ch);
-                            }
-                        }
-                        else
-#endif
-                            *d++ = (char)i;
+		for (i = min; i <= max; i++)
+		    *d++ = (char)i;
  
-#ifdef EBCDIC
-                if (uvmax) {
-                    d = (char*)uvchr_to_utf8((U8*)d, 0x100);
-                    if (uvmax > 0x101)
-                        *d++ = (char)UTF_TO_NATIVE(0xff);
-                    if (uvmax > 0x100)
-                        d = (char*)uvchr_to_utf8((U8*)d, uvmax);
-                }
-#endif
-
 		/* mark the range as done, and continue */
 		dorange = FALSE;
 		didrange = TRUE;
-#ifdef EBCDIC
-		literal_endpoint = 0;
-#endif
 		continue;
 	    }
 
@@ -1996,9 +1905,6 @@ S_scan_const(pTHX_ char *start)
 		    Perl_croak(aTHX_ "Ambiguous range in transliteration operator");
 		}
 		if (has_utf8
-#ifdef EBCDIC
-		    && !native_range
-#endif
 		    ) {
 		    *d++ = (char)UTF_TO_NATIVE(0xff);	/* use illegal utf8 byte--see pmtrans */
 		    s++;
@@ -2009,10 +1915,6 @@ S_scan_const(pTHX_ char *start)
 	    }
 	    else {
 		didrange = FALSE;
-#ifdef EBCDIC
-		literal_endpoint = 0;
-		native_range = TRUE;
-#endif
 	    }
 	}
 
@@ -2023,7 +1925,7 @@ S_scan_const(pTHX_ char *start)
 	else if (*s == '(' && PL_lex_inpat && s[1] == '?') {
 	    if (s[2] == '#') {
 		while (s+1 < send && *s != ')')
-		    *d++ = NATIVE_TO_NEED(has_utf8,*s++);
+		    *d++ = NATIVE_TO_UNI(*s++);
 	    }
 	    else if (s[2] == '{' /* This should match regcomp.c */
 		    || (s[2] == '?' && s[3] == '{'))
@@ -2044,7 +1946,7 @@ S_scan_const(pTHX_ char *start)
 		if (*regparse != ')')
 		    regparse--;		/* Leave one char for continuation. */
 		while (s < regparse)
-		    *d++ = NATIVE_TO_NEED(has_utf8,*s++);
+		    *d++ = NATIVE_TO_UNI(*s++);
 	    }
 	}
 
@@ -2052,7 +1954,7 @@ S_scan_const(pTHX_ char *start)
 	else if (*s == '#' && PL_lex_inpat &&
 	  ((PMOP*)PL_lex_inpat)->op_pmflags & PMf_EXTENDED) {
 	    while (s+1 < send && *s != '\n')
-		*d++ = NATIVE_TO_NEED(has_utf8,*s++);
+		*d++ = NATIVE_TO_UNI(*s++);
 	}
 
 	/* check for embedded arrays
@@ -2100,7 +2002,7 @@ S_scan_const(pTHX_ char *start)
 	    }
 	    /* skip any other backslash escapes in a pattern */
 	    else if (PL_lex_inpat) {
-		*d++ = NATIVE_TO_NEED(has_utf8,'\\');
+		*d++ = NATIVE_TO_UNI('\\');
 		goto default_action;
 	    }
 
@@ -2133,8 +2035,9 @@ S_scan_const(pTHX_ char *start)
                     STRLEN len = 3;
 		    uv = grok_oct(s, &len, &flags, NULL);
 		    s += len;
+		    *d++ = (char) uv;
+		    continue;
 		}
-		goto NUM_ESCAPE_INSERT;
 
 	    /* \x24 indicates a hex constant */
 	    case 'x':
@@ -2160,6 +2063,8 @@ S_scan_const(pTHX_ char *start)
                         I32 flags = PERL_SCAN_DISALLOW_PREFIX;
 			uv = grok_hex(s, &len, &flags, NULL);
 			s += len;
+		        *d++ = (char)uv;
+			continue;
 		    }
 		}
 
@@ -2173,58 +2078,17 @@ S_scan_const(pTHX_ char *start)
 		   to cover EBCDIC
 		*/
 		if (!UNI_IS_INVARIANT(NATIVE_TO_UNI(uv))) {
-		    if (!has_utf8 && uv > 255) {
-		        /* Might need to recode whatever we have
-			 * accumulated so far if it contains any
-			 * hibit chars.
-			 *
-			 * (Can't we keep track of that and avoid
-			 *  this rescan? --jhi)
-			 */
-			int hicount = 0;
-			U8 *c;
-			for (c = (U8 *) SvPVX(sv); c < (U8 *)d; c++) {
-			    if (!NATIVE_IS_INVARIANT(*c)) {
-			        hicount++;
-			    }
-			}
-			if (hicount) {
-			    const STRLEN offset = d - SvPVX_const(sv);
-			    U8 *src, *dst;
-			    d = SvGROW(sv, SvLEN(sv) + hicount + 1) + offset;
-			    src = (U8 *)d - 1;
-			    dst = src+hicount;
-			    d  += hicount;
-			    while (src >= (const U8 *)SvPVX_const(sv)) {
-			        if (!NATIVE_IS_INVARIANT(*src)) {
-				    const U8 ch = NATIVE_TO_ASCII(*src);
-				    *dst-- = (U8)UTF8_EIGHT_BIT_LO(ch);
-				    *dst-- = (U8)UTF8_EIGHT_BIT_HI(ch);
-			        }
-			        else {
-				    *dst-- = *src;
-			        }
-				src--;
-			    }
-                        }
-                    }
-
-                    if (has_utf8 || uv > 255) {
-		        d = (char*)uvchr_to_utf8((U8*)d, uv);
-			has_utf8 = TRUE;
-			if (PL_lex_inwhat == OP_TRANS &&
-			    PL_sublex_info.sub_op) {
+		    d = (char*)uvchr_to_utf8((U8*)d, uv);
+		    has_utf8 = TRUE;
+		    if (PL_lex_inwhat == OP_TRANS &&
+			PL_sublex_info.sub_op) {
+			if ( ! ( IN_CODEPOINTS || IN_BYTES))
+			    Perl_warner(aTHX_ packWARN(WARN_UTF8),
+					"Codepoints or bytes");
+			if (IN_CODEPOINTS) {
 			    PL_sublex_info.sub_op->op_private |=
-				(PL_lex_repl ? OPpTRANS_FROM_UTF
-					     : OPpTRANS_TO_UTF);
+				OPpTRANS_UTF8;
 			}
-#ifdef EBCDIC
-			if (uv > 255 && !dorange)
-			    native_range = FALSE;
-#endif
-                    }
-		    else {
-		        *d++ = (char)uv;
 		    }
 		}
 		else {
@@ -2305,10 +2169,6 @@ S_scan_const(pTHX_ char *start)
 			SvGROW(sv, (SvLEN(sv) + len - (e - s + 4)));
 			d = SvPVX(sv) + (d - odest);
 		    }
-#ifdef EBCDIC
-		    if (!dorange)
-			native_range = FALSE; /* \N{} is guessed to be Unicode */
-#endif
 		    Copy(str, d, len, char);
 		    d += len;
 		    SvREFCNT_dec(res);
@@ -2324,11 +2184,7 @@ S_scan_const(pTHX_ char *start)
 		s++;
 		if (s < send) {
 		    U8 c = *s++;
-#ifdef EBCDIC
-		    if (isLOWER(c))
-			c = toUPPER(c);
-#endif
-		    *d++ = NATIVE_TO_NEED(has_utf8,toCTRL(c));
+		    *d++ = NATIVE_TO_UNI(toCTRL(c));
 		}
 		else {
 		    yyerror("Missing control char name in \\c");
@@ -2337,58 +2193,42 @@ S_scan_const(pTHX_ char *start)
 
 	    /* printf-style backslashes, formfeeds, newlines, etc */
 	    case 'b':
-		*d++ = NATIVE_TO_NEED(has_utf8,'\b');
+		*d++ = NATIVE_TO_UNI('\b');
 		break;
 	    case 'n':
-		*d++ = NATIVE_TO_NEED(has_utf8,'\n');
+		*d++ = NATIVE_TO_UNI('\n');
 		break;
 	    case 'r':
-		*d++ = NATIVE_TO_NEED(has_utf8,'\r');
+		*d++ = NATIVE_TO_UNI('\r');
 		break;
 	    case 'f':
-		*d++ = NATIVE_TO_NEED(has_utf8,'\f');
+		*d++ = NATIVE_TO_UNI('\f');
 		break;
 	    case 't':
-		*d++ = NATIVE_TO_NEED(has_utf8,'\t');
+		*d++ = NATIVE_TO_UNI('\t');
 		break;
 	    case 'e':
-		*d++ = ASCII_TO_NEED(has_utf8,'\033');
+		*d++ = ASCII_TO_UNI('\033');
 		break;
 	    case 'a':
-		*d++ = ASCII_TO_NEED(has_utf8,'\007');
+		*d++ = ASCII_TO_UNI('\007');
 		break;
 	    } /* end switch */
 
 	    s++;
 	    continue;
 	} /* end if (backslash) */
-#ifdef EBCDIC
-	else
-	    literal_endpoint++;
-#endif
 
     default_action:
-	/* If we started with encoded form, or already know we want it
-	   and then encode the next character */
-	if ((has_utf8 || this_utf8) && !NATIVE_IS_INVARIANT((U8)(*s))) {
-	    STRLEN len  = 1;
-	    const UV nextuv   = (this_utf8) ? utf8n_to_uvchr((U8*)s, send - s, &len, 0) : (UV) ((U8) *s);
-	    const STRLEN need = UNISKIP(NATIVE_TO_UNI(nextuv));
-	    s += len;
-	    if (need > len) {
-		/* encoded value larger than old, need extra space (NOTE: SvCUR() not set here) */
-		const STRLEN off = d - SvPVX_const(sv);
-		d = SvGROW(sv, SvLEN(sv) + (need-len)) + off;
-	    }
-	    d = (char*)uvchr_to_utf8((U8*)d, nextuv);
+	if (!NATIVE_IS_INVARIANT((U8)(*s)) && ! IN_BYTES) {
+	    STRLEN len;
+	    utf8n_to_uvchr((U8*)s, send - s, &len, 0); /* validate UTF-8 */
 	    has_utf8 = TRUE;
-#ifdef EBCDIC
-	    if (uv > 255 && !dorange)
-		native_range = FALSE;
-#endif
+	    while (len--)
+		*d++ = *s++;
 	}
 	else {
-	    *d++ = NATIVE_TO_NEED(has_utf8,*s++);
+	    *d++ = NATIVE_TO_UNI(*s++);
 	}
     } /* while loop to process each character */
 
@@ -2399,18 +2239,6 @@ S_scan_const(pTHX_ char *start)
 	Perl_croak(aTHX_ "panic: constant overflowed allocated space");
 
     SvPOK_on(sv);
-    if (PL_encoding && !has_utf8) {
-	sv_recode_to_utf8(sv, PL_encoding);
-	if (SvUTF8(sv))
-	    has_utf8 = TRUE;
-    }
-    if (has_utf8) {
-	SvUTF8_on(sv);
-	if (PL_lex_inwhat == OP_TRANS && PL_sublex_info.sub_op) {
-	    PL_sublex_info.sub_op->op_private |=
-		    (PL_lex_repl ? OPpTRANS_FROM_UTF : OPpTRANS_TO_UTF);
-	}
-    }
 
     /* shrink the sv if we allocated more than we used */
     if (SvCUR(sv) + 5 < SvLEN(sv)) {
@@ -2432,6 +2260,10 @@ S_scan_const(pTHX_ char *start)
 	yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv);
     } else
 	SvREFCNT_dec(sv);
+
+    if ( has_utf8 && ! IN_CODEPOINTS && ! PL_encoding && ! IN_BYTES ) 
+	Perl_warner(aTHX_ packWARN(WARN_MISC),
+		    "utf8 found, but not 'use utf8'");
     return s;
 }
 
@@ -5671,25 +5503,6 @@ Perl_yylex(pTHX)
 		if (!IN_BYTES) {
 		    if (UTF)
 			PerlIO_apply_layers(aTHX_ PL_rsfp, NULL, ":utf8");
-		    else if (PL_encoding) {
-			SV *name;
-			dSP;
-			ENTER;
-			SAVETMPS;
-			PUSHMARK(sp);
-			EXTEND(SP, 1);
-			XPUSHs(PL_encoding);
-			PUTBACK;
-			call_method("name", G_SCALAR);
-			SPAGAIN;
-			name = POPs;
-			PUTBACK;
-			PerlIO_apply_layers(aTHX_ PL_rsfp, NULL,
-					    Perl_form(aTHX_ ":encoding(%"SVf")",
-						      SVfARG(name)));
-			FREETMPS;
-			LEAVE;
-		    }
 		}
 #endif
 #ifdef PERL_MAD
@@ -10831,6 +10644,10 @@ S_scan_pat(pTHX_ char *start, I32 type)
 #endif
     while (*s && strchr(valid_flags, *s))
 	pmflag(&pm->op_pmflags,*s++);
+
+    if (IN_CODEPOINTS)
+	pm->op_pmflags |= PMf_UTF8;
+
 #ifdef PERL_MAD
     if (PL_madskills && modstart != s) {
 	SV* tmptoken = newSVpvn(modstart, s - modstart);
@@ -10915,6 +10732,9 @@ S_scan_subst(pTHX_ char *start)
 	else
 	    break;
     }
+
+    if (IN_CODEPOINTS)
+	pm->op_pmflags |= PMf_UTF8;
 
 #ifdef PERL_MAD
     if (PL_madskills) {
@@ -11025,8 +10845,8 @@ S_scan_trans(pTHX_ char *start)
     o = newPVOP(OP_TRANS, 0, (char*)tbl);
     o->op_private &= ~OPpTRANS_ALL;
     o->op_private |= del|squash|complement|
-      (DO_UTF8(PL_lex_stuff)? OPpTRANS_FROM_UTF : 0)|
-      (DO_UTF8(PL_lex_repl) ? OPpTRANS_TO_UTF   : 0);
+      (DO_UTF8(PL_lex_stuff)? OPpTRANS_UTF8 : 0)|
+      (DO_UTF8(PL_lex_repl) ? OPpTRANS_UTF8   : 0);
 
     PL_lex_op = o;
     yylval.ival = OP_TRANS;
@@ -11294,9 +11114,7 @@ retval:
     }
     SvREFCNT_dec(herewas);
     if (!IN_BYTES) {
-	if (UTF && is_utf8_string((U8*)SvPVX_const(tmpstr), SvCUR(tmpstr)))
-	    SvUTF8_on(tmpstr);
-	else if (PL_encoding)
+	if (PL_encoding)
 	    sv_recode_to_utf8(tmpstr, PL_encoding);
     }
     PL_lex_stuff = tmpstr;
@@ -11586,74 +11404,75 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
     }
 #endif
     for (;;) {
-	if (PL_encoding && !UTF) {
-	    bool cont = TRUE;
+	if (PL_encoding) {
+            bool cont = TRUE;
+ 
+            while (cont) {
+                int offset = s - SvPVX_const(PL_linestr);
+                const bool found = sv_cat_decode(sv, PL_encoding, PL_linestr,
+                                           &offset, (char*)termstr, termlen);
+                const char * const ns = SvPVX_const(PL_linestr) + offset;
+                char * const svlast = SvEND(sv) - 1;
+ 
+                for (; s < ns; s++) {
+                    if (*s == '\n' && !PL_rsfp)
+                        CopLINE_inc(PL_curcop);
+                }
+                if (!found)
+                    goto read_more_line;
+                else {
+                    /* handle quoted delimiters */
+                    if (SvCUR(sv) > 1 && *(svlast-1) == '\\') {
+                        const char *t;
+                        for (t = svlast-2; t >= SvPVX_const(sv) && *t == '\\';)
+                            t--;
+                        if ((svlast-1 - t) % 2) {
+                            if (!keep_quoted) {
+                                *(svlast-1) = term;
+                                *svlast = '\0';
+                                SvCUR_set(sv, SvCUR(sv) - 1);
+                            }
+                            continue;
+                        }
+                    }
+                    if (PL_multi_open == PL_multi_close) {
+                        cont = FALSE;
+                    }
+                    else {
+                        const char *t;
+                        char *w;
+                        for (t = w = SvPVX(sv)+last_off; t < svlast; w++, t++) {
+                            /* At here, all closes are "was quoted" one,
+                               so we don't check PL_multi_close. */
+                            if (*t == '\\') {
+                                if (!keep_quoted && *(t+1) == PL_multi_open)
+                                    t++;
+                                else
+                                    *w++ = *t++;
+                            }
+                            else if (*t == PL_multi_open)
+                                brackets++;
+ 
+                            *w = *t;
+                        }
+                        if (w < t) {
+                            *w++ = term;
+                            *w = '\0';
 
-	    while (cont) {
-		int offset = s - SvPVX_const(PL_linestr);
-		const bool found = sv_cat_decode(sv, PL_encoding, PL_linestr,
-					   &offset, (char*)termstr, termlen);
-		const char * const ns = SvPVX_const(PL_linestr) + offset;
-		char * const svlast = SvEND(sv) - 1;
-
-		for (; s < ns; s++) {
-		    if (*s == '\n' && !PL_rsfp)
-			CopLINE_inc(PL_curcop);
-		}
-		if (!found)
-		    goto read_more_line;
-		else {
-		    /* handle quoted delimiters */
-		    if (SvCUR(sv) > 1 && *(svlast-1) == '\\') {
-			const char *t;
-			for (t = svlast-2; t >= SvPVX_const(sv) && *t == '\\';)
-			    t--;
-			if ((svlast-1 - t) % 2) {
-			    if (!keep_quoted) {
-				*(svlast-1) = term;
-				*svlast = '\0';
-				SvCUR_set(sv, SvCUR(sv) - 1);
-			    }
-			    continue;
-			}
-		    }
-		    if (PL_multi_open == PL_multi_close) {
-			cont = FALSE;
-		    }
-		    else {
-			const char *t;
-			char *w;
-			for (t = w = SvPVX(sv)+last_off; t < svlast; w++, t++) {
-			    /* At here, all closes are "was quoted" one,
-			       so we don't check PL_multi_close. */
-			    if (*t == '\\') {
-				if (!keep_quoted && *(t+1) == PL_multi_open)
-				    t++;
-				else
-				    *w++ = *t++;
-			    }
-			    else if (*t == PL_multi_open)
-				brackets++;
-
-			    *w = *t;
-			}
-			if (w < t) {
-			    *w++ = term;
-			    *w = '\0';
-			    SvCUR_set(sv, w - SvPVX_const(sv));
-			}
-			last_off = w - SvPVX(sv);
-			if (--brackets <= 0)
-			    cont = FALSE;
-		    }
-		}
-	    }
-	    if (!keep_delims) {
-		SvCUR_set(sv, SvCUR(sv) - 1);
-		*SvEND(sv) = '\0';
-	    }
+                            SvCUR_set(sv, w - SvPVX_const(sv));
+                        }
+                        last_off = w - SvPVX(sv);
+                        if (--brackets <= 0)
+                            cont = FALSE;
+                    }
+                }
+            }
+            if (!keep_delims) {
+                SvCUR_set(sv, SvCUR(sv) - 1);
+                *SvEND(sv) = '\0';
+            }
 	    break;
-	}
+        }
 
     	/* extend sv if need be */
 	SvGROW(sv, SvCUR(sv) + (PL_bufend - s) + 1);
@@ -11779,7 +11598,7 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
 
     /* at this point, we have successfully read the delimited string */
 
-    if (!PL_encoding || UTF) {
+    if (!PL_encoding) {
 #ifdef PERL_MAD
 	if (PL_madskills) {
 	    char * const tstart = SvPVX(PL_linestr) + stuffstart;
@@ -11799,20 +11618,18 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
     }
 #ifdef PERL_MAD
     else {
-	if (PL_madskills) {
-	    char * const tstart = SvPVX(PL_linestr) + stuffstart;
-	    const int len = s - tstart - termlen;
-	    if (PL_thisstuff)
-		sv_catpvn(PL_thisstuff, tstart, len);
-	    else
-		PL_thisstuff = newSVpvn(tstart, len);
-	    if (!PL_thisclose && !keep_delims)
-		PL_thisclose = newSVpvn(s - termlen,termlen);
-	}
+       if (PL_madskills) {
+           char * const tstart = SvPVX(PL_linestr) + stuffstart;
+           const int len = s - tstart - termlen;
+           if (PL_thisstuff)
+	       sv_catpvn(PL_thisstuff, tstart, len);
+           else
+               PL_thisstuff = newSVpvn(tstart, len);
+           if (!PL_thisclose && !keep_delims)
+               PL_thisclose = newSVpvn(s - termlen,termlen);
+       }
     }
 #endif
-    if (has_utf8 || PL_encoding)
-	SvUTF8_on(sv);
 
     PL_multi_end = CopLINE(PL_curcop);
 
@@ -12340,9 +12157,7 @@ S_scan_formline(pTHX_ register char *s)
 	else
 	    PL_lex_state = LEX_FORMLINE;
 	if (!IN_BYTES) {
-	    if (UTF && is_utf8_string((U8*)SvPVX_const(stuff), SvCUR(stuff)))
-		SvUTF8_on(stuff);
-	    else if (PL_encoding)
+	    if (PL_encoding)
 		sv_recode_to_utf8(stuff, PL_encoding);
 	}
 	start_force(PL_curforce);

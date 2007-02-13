@@ -1546,8 +1546,6 @@ PP(pp_sysread)
     Sock_size_t bufsize;
     SV *bufsv;
     STRLEN blen;
-    int fp_utf8;
-    int buffer_utf8;
     SV *read_target;
     Size_t got = 0;
     Size_t wanted;
@@ -1593,16 +1591,7 @@ PP(pp_sysread)
 	SETERRNO(EBADF,RMS_IFI);
 	goto say_undef;
     }
-    if ((fp_utf8 = PerlIO_isutf8(IoIFP(io))) && !IN_BYTES) {
-	buffer = SvPVutf8_force(bufsv, blen);
-	/* UTF-8 may not have been set if they are all low bytes */
-	SvUTF8_on(bufsv);
-	buffer_utf8 = 0;
-    }
-    else {
-	buffer = SvPV_force(bufsv, blen);
-	buffer_utf8 = !IN_BYTES && SvUTF8(bufsv);
-    }
+    buffer = SvPV_force(bufsv, blen);
     if (length < 0)
 	DIE(aTHX_ "Negative length");
     wanted = length;
@@ -1636,8 +1625,6 @@ PP(pp_sysread)
 	SvCUR_set(bufsv, count);
 	*SvEND(bufsv) = '\0';
 	(void)SvPOK_only(bufsv);
-	if (fp_utf8)
-	    SvUTF8_on(bufsv);
 	SvSETMAGIC(bufsv);
 	/* This should not be marked tainted if the fp is marked clean */
 	if (!(IoFLAGS(io) & IOf_UNTAINT))
@@ -1651,7 +1638,7 @@ PP(pp_sysread)
     if (PL_op->op_type == OP_RECV)
 	DIE(aTHX_ PL_no_sock_func, "recv");
 #endif
-    if (DO_UTF8(bufsv)) {
+    if (IN_CODEPOINTS) {
 	/* offset adjust in characters not bytes */
 	blen = sv_len_utf8(bufsv);
     }
@@ -1660,7 +1647,7 @@ PP(pp_sysread)
 	    DIE(aTHX_ "Offset outside string");
 	offset += blen;
     }
-    if (DO_UTF8(bufsv)) {
+    if (IN_CODEPOINTS) {
 	/* convert offset-as-chars to offset-as-bytes */
 	if (offset >= (int)blen)
 	    offset += SvCUR(bufsv) - blen;
@@ -1679,20 +1666,7 @@ PP(pp_sysread)
     	Zero(buffer+bufsize, offset-bufsize, char);
     }
     buffer = buffer + offset;
-    if (!buffer_utf8) {
-	read_target = bufsv;
-    } else {
-	/* Best to read the bytes into a new SV, upgrade that to UTF8, then
-	   concatenate it to the current buffer.  */
-
-	/* Truncate the existing buffer to the start of where we will be
-	   reading to:  */
-	SvCUR_set(bufsv, offset);
-
-	read_target = sv_newmortal();
-	SvUPGRADE(read_target, SVt_PV);
-	buffer = SvGROW(read_target, (STRLEN)(length + 1));
-    }
+    read_target = bufsv;
 
     if (PL_op->op_type == OP_SYSREAD) {
 #ifdef PERL_SOCK_SYSREAD_IS_RECV
@@ -1735,7 +1709,7 @@ PP(pp_sysread)
     SvCUR_set(read_target, count+(buffer - SvPVX_const(read_target)));
     *SvEND(read_target) = '\0';
     (void)SvPOK_only(read_target);
-    if (fp_utf8 && !IN_BYTES) {
+    if (IN_CODEPOINTS) {
 	/* Look at utf8 we got back and count the characters */
 	const char *bend = buffer + count;
 	while (buffer < bend) {
@@ -1768,12 +1742,6 @@ PP(pp_sysread)
 	}
 	/* return value is character count */
 	count = got;
-	SvUTF8_on(bufsv);
-    }
-    else if (buffer_utf8) {
-	/* Let svcatsv upgrade the bytes we read in to utf8.
-	   The buffer is a mortal so will be freed soon.  */
-	sv_catsv_nomg(bufsv, read_target);
     }
     SvSETMAGIC(bufsv);
     /* This should not be marked tainted if the fp is marked clean */
@@ -1798,7 +1766,6 @@ PP(pp_send)
     STRLEN blen;
     STRLEN orig_blen_bytes;
     const int op_type = PL_op->op_type;
-    bool doing_utf8;
     U8 *tmpbuf = NULL;
     
     GV *const gv = (GV*)*++MARK;
@@ -1849,40 +1816,13 @@ PP(pp_send)
     /* Do this first to trigger any overloading.  */
     buffer = SvPV_const(bufsv, blen);
     orig_blen_bytes = blen;
-    doing_utf8 = DO_UTF8(bufsv);
-
-    if (PerlIO_isutf8(IoIFP(io))) {
-	if (!SvUTF8(bufsv)) {
-	    /* We don't modify the original scalar.  */
-	    tmpbuf = bytes_to_utf8((const U8*) buffer, &blen);
-	    buffer = (char *) tmpbuf;
-	    doing_utf8 = TRUE;
-	}
-    }
-    else if (doing_utf8) {
-	STRLEN tmplen = blen;
-	U8 * const result = bytes_from_utf8((const U8*) buffer, &tmplen, &doing_utf8);
-	if (!doing_utf8) {
-	    tmpbuf = result;
-	    buffer = (char *) tmpbuf;
-	    blen = tmplen;
-	}
-	else {
-	    assert((char *)result == buffer);
-	    Perl_croak(aTHX_ "Wide character in %s", OP_DESC(PL_op));
-	}
-    }
 
     if (op_type == OP_SYSWRITE) {
 	Size_t length = 0; /* This length is in characters.  */
 	STRLEN blen_chars;
 	IV offset;
 
-	if (doing_utf8) {
-	    if (tmpbuf) {
-		/* The SV is bytes, and we've had to upgrade it.  */
-		blen_chars = orig_blen_bytes;
-	    } else {
+	if (IN_CODEPOINTS) {
 		/* The SV really is UTF-8.  */
 		if (SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
 		    /* Don't call sv_len_utf8 again because it will call magic
@@ -1893,7 +1833,6 @@ PP(pp_send)
 		    /* It's safe, and it may well be cached.  */
 		    blen_chars = sv_len_utf8(bufsv);
 		}
-	    }
 	} else {
 	    blen_chars = blen;
 	}
@@ -1928,9 +1867,9 @@ PP(pp_send)
 	    offset = 0;
 	if (length > blen_chars - offset)
 	    length = blen_chars - offset;
-	if (doing_utf8) {
+	if (IN_CODEPOINTS) {
 	    /* Here we convert length from characters to bytes.  */
-	    if (tmpbuf || SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
+	    if (SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
 		/* Either we had to convert the SV, or the SV is magical, or
 		   the SV has overloading, in which case we can't or mustn't
 		   or mustn't call it again.  */
@@ -1990,7 +1929,7 @@ PP(pp_send)
     if (retval < 0)
 	goto say_undef;
     SP = ORIGMARK;
-    if (doing_utf8)
+    if (IN_CODEPOINTS)
         retval = utf8_length((U8*)buffer, (U8*)buffer + retval);
 
     Safefree(tmpbuf);

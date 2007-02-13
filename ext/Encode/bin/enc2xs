@@ -82,13 +82,8 @@ use constant {
 sub encode_U
 {
  # UTF-8 encode long hand - only covers part of perl's range
- ## my $uv = shift;
- # chr() works in native space so convert value from table
- # into that space before using chr().
- my $ch = chr(utf8::unicode_to_native($_[0]));
- # Now get core perl to encode that the way it likes.
- utf8::encode($ch);
- return $ch;
+ use utf8;
+ return chr($_[0]);
 }
 
 sub encode_S
@@ -424,7 +419,8 @@ sub compile_ucm
    if (@uni)
     {
      my $uch =  join('', map { encode_U(hex($_)) } @uni );
-     my $ech = join('',map(chr(hex($_)),@byte));
+     require bytes;
+     my $ech = join('',map(bytes::chr(hex($_)),@byte));
      my $el  = length($ech);
      $max_el = $el if (!defined($max_el) || $el > $max_el);
      $min_el = $el if (!defined($min_el) || $el < $min_el);

@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..15\n";
+print "1..14\n";
 
 $SIG{__DIE__} = sub { print ref($_[0]) ? ("ok ",$_[0]->[0]++,"\n") : @_ } ;
 
@@ -47,6 +47,7 @@ print "ok 10\n";
 {
     # die/warn and utf8
     use utf8;
+    use utf8;
     local $SIG{__DIE__};
     my $msg = "ce ºtii tu, bã ?\n";
     eval { die $msg }; print "not " unless $@ eq $msg;
@@ -57,9 +58,6 @@ print "ok 10\n";
     print "ok 12\n";
     eval { warn $msg }; print "not " unless $err eq $msg;
     print "ok 13\n";
-    eval qq/ use strict; \$\x{3b1} /;
-    print "not " unless $@ =~ /Global symbol "\$\x{3b1}"/;
-    print "ok 14\n";
 }
 
 # [perl #36470] got uninit warning if $@ was undef
@@ -70,5 +68,5 @@ print "ok 10\n";
     local $SIG{__WARN__} = sub { $ok = 0 };
     eval { undef $@; die };
     print "not " unless $ok;
-    print "ok 15\n";
+    print "ok 14\n";
 }

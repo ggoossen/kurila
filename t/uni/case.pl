@@ -2,6 +2,8 @@ use File::Spec;
 
 require "test.pl";
 
+use utf8;
+
 sub unidump {
     join " ", map { sprintf "%04X", $_ } unpack "U*", $_[0];
 }
@@ -71,7 +73,7 @@ sub casetest {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
 	    print $d eq pack("U0U", hex $simple{$i}) ?
-		"ok $test # $i -> $w\n" : "not ok $test # $i -> $e ($w)\n";
+		"ok $test # $i -> $w\n" : "not ok $test # $i -> $e ($w)" . sprintf('%x', ord($d)) . "\n";
 		$test++;
 	}
     }

@@ -147,13 +147,6 @@ PP(pp_regcomp)
 		PL_reginterp_cnt = I32_MAX; /* Mark as safe.  */
 
 	    pm->op_pmflags = pm->op_pmpermflags;	/* reset case sensitivity */
-	    if (DO_UTF8(tmpstr))
-		pm->op_pmdynflags |= PMdf_DYN_UTF8;
-	    else {
-		pm->op_pmdynflags &= ~PMdf_DYN_UTF8;
-		if (pm->op_pmdynflags & PMdf_UTF8)
-		    t = (char*)bytes_to_utf8((U8*)t, &len);
-	    }
 	    if (eng) 
 	        PM_SETRE(pm, CALLREGCOMP_ENG(eng,(char *)t, (char *)t + len, pm));
             else

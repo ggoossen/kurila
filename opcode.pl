@@ -718,14 +718,14 @@ rindex		rindex			ck_index	isT@	S S S?
 
 sprintf		sprintf			ck_fun		mst@	S L
 formline	formline		ck_fun		ms@	S L
-ord		ord			ck_fun		ifsTu%	S?
-chr		chr			ck_fun		fsTu%	S?
+ord		ord			ck_fun		isTu%	S?
+chr		chr			ck_fun		sTu%	S?
 crypt		crypt			ck_fun		fsT@	S S
-ucfirst		ucfirst			ck_fun		fstu%	S?
-lcfirst		lcfirst			ck_fun		fstu%	S?
-uc		uc			ck_fun		fstu%	S?
-lc		lc			ck_fun		fstu%	S?
-quotemeta	quotemeta		ck_fun		fstu%	S?
+ucfirst		ucfirst			ck_fun		stu%	S?
+lcfirst		lcfirst			ck_fun		stu%	S?
+uc		uc			ck_fun		stu%	S?
+lc		lc			ck_fun		stu%	S?
+quotemeta	quotemeta		ck_fun		stu%	S?
 
 # Arrays.
 

@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 139;
+plan tests => 61;
 
 $_ = 'abc';
 $c = do foo();
@@ -107,6 +107,9 @@ is ($_, "ab\n");
 
 # Go Unicode.
 
+{
+    use utf8;
+
 $_ = "abc\x{1234}";
 chop;
 is ($_, "abc", "Go Unicode");
@@ -131,6 +134,8 @@ is (chop(@stuff[0, 2]), 'f');
 
 my %stuff = (1..4);
 is (chop(@stuff{1, 3}), '4');
+
+}
 
 # chomp should not stringify references unless it decides to modify them
 $_ = [];
@@ -183,35 +188,9 @@ ok($@ =~ /Can\'t modify.*chop.*in.*assignment/);
 eval 'chomp($x, $y) = (1, 2);';
 ok($@ =~ /Can\'t modify.*chom?p.*in.*assignment/);
 
-my @chars = ("N", ord('A') == 193 ? "\xee" : "\xd3", substr ("\xd4\x{100}", 0, 1), chr 1296);
-foreach my $start (@chars) {
-  foreach my $end (@chars) {
-    local $/ = $end;
-    my $message = "start=" . ord ($start) . " end=" . ord $end;
-    my $string = $start . $end;
-    is (chomp ($string), 1, "$message [returns 1]");
-    is ($string, $start, $message);
-
-    my $end_utf8 = $end;
-    utf8::encode ($end_utf8);
-    next if $end_utf8 eq $end;
-
-    # $end ne $end_utf8, so these should not chomp.
-    $string = $start . $end_utf8;
-    my $chomped = $string;
-    is (chomp ($chomped), 0, "$message (end as bytes) [returns 0]");
-    is ($chomped, $string, "$message (end as bytes)");
-
-    $/ = $end_utf8;
-    $string = $start . $end;
-    $chomped = $string;
-    is (chomp ($chomped), 0, "$message (\$/ as bytes) [returns 0]");
-    is ($chomped, $string, "$message (\$/ as bytes)");
-  }
-}
-
 {
-    # returns length in characters, but not in bytes.
+    use utf8;
+    # returns length in code-points, but not in bytes.
     $/ = "\x{100}";
     $a = "A$/";
     $b = chomp $a;
@@ -221,6 +200,19 @@ foreach my $start (@chars) {
     $a = "A$/";
     $b = chomp $a;
     is ($b, 2);
+
+    # returns length in bytes, not in code-points.
+    use utf8;
+    $/ = "\x{100}";
+    no utf8;
+    $a = "A$/";
+    is( chomp($a), 2);
+
+    use utf8;
+    $/ = "\x{100}\x{101}";
+    no utf8;
+    $a = "A$/";
+    is( chomp($a), 4);
 }
 
 {

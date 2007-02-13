@@ -428,29 +428,16 @@ CODE:
     FREETMPS; LEAVE;
     /* end PerlIO check */
 
-    if (SvUTF8(src)) {
-    s = utf8_to_bytes(s,&slen);
-    if (s) {
-        SvCUR_set(src,slen);
-        SvUTF8_off(src);
-        e = s+slen;
-    }
-    else {
-        croak("Cannot decode string with wide characters");
-    }
-    }
-
     s = process_utf8(aTHX_ dst, s, e, check, 0, strict_utf8(aTHX_ obj), renewed);
 
     /* Clear out translated part of source unless asked not to */
     if (check && !(check & ENCODE_LEAVE_SRC)){
-    slen = e-s;
-    if (slen) {
-        sv_setpvn(src, (char*)s, slen);
+        slen = e-s;
+        if (slen) {
+            sv_setpvn(src, (char*)s, slen);
+        }
+        SvCUR_set(src, slen);
     }
-    SvCUR_set(src, slen);
-    }
-    SvUTF8_on(dst);
     ST(0) = sv_2mortal(dst);
     XSRETURN(1);
 }
@@ -466,44 +453,25 @@ CODE:
     U8 *s = (U8 *) SvPV(src, slen);
     U8 *e = (U8 *) SvEND(src);
     SV *dst = newSV(slen>0?slen:1); /* newSV() abhors 0 -- inaba */
-    if (SvUTF8(src)) {
     /* Already encoded */
     if (strict_utf8(aTHX_ obj)) {
         s = process_utf8(aTHX_ dst, s, e, check, 1, 1, 0);
     }
-        else {
-            /* trust it and just copy the octets */
-    	    sv_setpvn(dst,(char *)s,(e-s));
-        s = e;
-        }
-    }
     else {
-    	/* Native bytes - can always encode */
-    U8 *d = (U8 *) SvGROW(dst, 2*slen+1); /* +1 or assertion will botch */
-    	while (s < e) {
-    	    UV uv = NATIVE_TO_UNI((UV) *s);
-	    s++; /* Above expansion of NATIVE_TO_UNI() is safer this way. */
-            if (UNI_IS_INVARIANT(uv))
-            	*d++ = (U8)UTF_TO_NATIVE(uv);
-            else {
-    	        *d++ = (U8)UTF8_EIGHT_BIT_HI(uv);
-                *d++ = (U8)UTF8_EIGHT_BIT_LO(uv);
-            }
-    }
-        SvCUR_set(dst, d- (U8 *)SvPVX(dst));
-    	*SvEND(dst) = '\0';
+        /* trust it and just copy the octets */
+        sv_setpvn(dst,(char *)s,(e-s));
+        s = e;
     }
 
     /* Clear out translated part of source unless asked not to */
     if (check && !(check & ENCODE_LEAVE_SRC)){
-    slen = e-s;
-    if (slen) {
-        sv_setpvn(src, (char*)s, slen);
-    }
-    SvCUR_set(src, slen);
+        slen = e-s;
+        if (slen) {
+            sv_setpvn(src, (char*)s, slen);
+        }
+        SvCUR_set(src, slen);
     }
     SvPOK_only(dst);
-    SvUTF8_off(dst);
     ST(0) = sv_2mortal(dst);
     XSRETURN(1);
 }

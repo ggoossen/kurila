@@ -672,7 +672,6 @@ Ap	|void	|push_scope
 Amb	|OP*	|ref		|NULLOK OP* o|I32 type
 p	|OP*	|refkids	|NULLOK OP* o|I32 type
 Ap	|void	|regdump	|NN const regexp* r
-Ap	|SV*	|regclass_swash	|NULLOK const regexp *prog|NN const struct regnode *n|bool doinit|NULLOK SV **listsvp|NULLOK SV **altsvp
 Ap	|I32	|pregexec	|NN regexp* prog|NN char* stringarg \
 				|NN char* strend|NN char* strbeg|I32 minend \
 				|NN SV* screamer|U32 nosave
@@ -1335,9 +1334,9 @@ Es	|regnode*|regatom	|NN struct RExC_state_t *state|NN I32 *flagp|U32 depth
 Es	|regnode*|regbranch	|NN struct RExC_state_t *state|NN I32 *flagp|I32 first|U32 depth
 Es	|STRLEN	|reguni		|NN const struct RExC_state_t *state|UV uv|NN char *s
 Es	|regnode*|regclass	|NN struct RExC_state_t *state|U32 depth
+Es	|void   |anyof_get_swash	|NN struct RExC_state_t *state|NN regnode *ret|NN SV *listsv|NULLOK AV* unicode_alternate
 ERsn	|I32	|regcurly	|NN const char *
 Es	|regnode*|reg_node	|NN struct RExC_state_t *state|U8 op
-Es	|UV	|reg_recode	|const char value|NULLOK SV **encp
 Es	|regnode*|regpiece	|NN struct RExC_state_t *state|NN I32 *flagp|U32 depth
 Es	|regnode*|reg_namedseq	|NN struct RExC_state_t *state|NULLOK UV *valuep
 Es	|void	|reginsert	|NN struct RExC_state_t *state|U8 op|NN regnode *opnd|U32 depth
@@ -1395,8 +1394,7 @@ Es	|U8	|regtail_study	|NN struct RExC_state_t *state|NN regnode *p|NN const regn
 ERs	|I32	|regmatch	|NN regmatch_info *reginfo|NN regnode *prog
 ERs	|I32	|regrepeat	|NN const regexp *prog|NN const regnode *p|I32 max|int depth
 ERs	|I32	|regtry		|NN regmatch_info *reginfo|NN char **startpos
-ERs	|bool	|reginclass	|NULLOK const regexp *prog|NN const regnode *n|NN const U8 *p|NULLOK STRLEN *lenp\
-				|bool do_utf8sv_is_utf8
+ERs	|bool	|reginclass	|NULLOK const regexp *prog|NN const regnode *n|NN const U8 *p|NULLOK STRLEN *lenp
 Es	|CHECKPOINT|regcppush	|I32 parenfloor
 Es	|char*	|regcppop	|NN const regexp *rex
 ERsn	|U8*	|reghop3	|NN U8 *pos|I32 off|NN const U8 *lim
@@ -1406,8 +1404,6 @@ ERsn	|U8*	|reghop4	|NN U8 *pos|I32 off|NN const U8 *llim|NN const U8 *rlim
 ERsn	|U8*	|reghopmaybe3	|NN U8 *pos|I32 off|NN const U8 *lim
 ERs	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c|NN char *s|NN const char *strend|NULLOK regmatch_info *reginfo
 Es	|void	|swap_match_buff|NN regexp * prog
-Es	|void	|to_utf8_substr	|NN regexp * prog
-Es	|void	|to_byte_substr	|NN regexp * prog
 ERs	|I32	|reg_check_named_buff_matched	|NN const regexp *rex|NN const regnode *prog
 #  ifdef DEBUGGING
 Es	|void	|dump_exec_pos	|NN const char *locinput|NN const regnode *scan|NN const char *loc_regeol\

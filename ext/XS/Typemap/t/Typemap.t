@@ -13,6 +13,7 @@ BEGIN { plan tests => 84 }
 
 use strict;
 use warnings;
+use utf8;
 use XS::Typemap;
 
 ok(1);
@@ -146,7 +147,7 @@ print "# T_CHAR\n";
 
 ok( T_CHAR("a"), "a");
 ok( T_CHAR("-"), "-");
-ok( T_CHAR(chr(128)),chr(128));
+ok( T_CHAR(bytes::chr(128)),bytes::chr(128));
 ok( T_CHAR(chr(256)) ne chr(256));
 
 # T_U_CHAR

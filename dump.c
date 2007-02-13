@@ -1176,6 +1176,7 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_vstring,        "vstring(V)" },
 	{ PERL_MAGIC_utf8,           "utf8(w)" },
 	{ PERL_MAGIC_substr,         "substr(x)" },
+	{ PERL_MAGIC_substr_utf8,    "substr(X)" },
 	{ PERL_MAGIC_defelem,        "defelem(y)" },
 	{ PERL_MAGIC_ext,            "ext(~)" },
 	/* this null string terminates the list */
@@ -1205,6 +1206,7 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             else if (v == &PL_vtbl_nkeys)      s = "nkeys";
             else if (v == &PL_vtbl_taint)      s = "taint";
             else if (v == &PL_vtbl_substr)     s = "substr";
+            else if (v == &PL_vtbl_substr_utf8)s = "substr_utf8";
             else if (v == &PL_vtbl_vec)        s = "vec";
             else if (v == &PL_vtbl_pos)        s = "pos";
             else if (v == &PL_vtbl_bm)         s = "bm";

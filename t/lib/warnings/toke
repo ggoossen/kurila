@@ -568,6 +568,7 @@ eval <<'EOE';
 #  line 30 "foo"
 warn "yelp";
 {
+  use utf8;
   $_ = " \x{123} " ;
 }
 EOE

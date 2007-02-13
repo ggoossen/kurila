@@ -384,6 +384,7 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 #  define VTBL_nkeys		&PL_vtbl_nkeys
 #  define VTBL_taint		&PL_vtbl_taint
 #  define VTBL_substr		&PL_vtbl_substr
+#  define VTBL_substr_utf8	&PL_vtbl_substr_utf8
 #  define VTBL_vec		&PL_vtbl_vec
 #  define VTBL_pos		&PL_vtbl_pos
 #  define VTBL_bm		&PL_vtbl_bm

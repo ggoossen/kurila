@@ -65,6 +65,7 @@ SKIP: {
 
     eval <<EOE;
     use open ':utf8';
+    use utf8;
     open(O, ">utf8");
     print O chr(0x100);
     close O;

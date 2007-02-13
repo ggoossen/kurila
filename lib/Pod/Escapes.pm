@@ -31,6 +31,8 @@ use vars qw(
   $NOT_ASCII
 );
 
+use utf8;
+
 $FAR_CHAR = "?" unless defined $FAR_CHAR;
 $FAR_CHAR_NUMBER = ord($FAR_CHAR) unless defined $FAR_CHAR_NUMBER;
 

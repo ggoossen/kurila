@@ -6,6 +6,8 @@ BEGIN {
 
 plan tests => 4;
 
+use utf8;
+
 sub ToUpper {
     return <<END;
 0061	0063	0041

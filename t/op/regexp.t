@@ -53,7 +53,7 @@ BEGIN {
 
 use strict;
 use warnings FATAL=>"all";
-use vars qw($iters $numtests $bang $ffff $nulnul $OP);
+use vars qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
 use vars qw($qr $skip_amp $qr_embed); # set by our callers
 
 
@@ -66,8 +66,16 @@ my @tests = <TESTS>;
 
 close TESTS;
 
+BEGIN {
+    require utf8;
+    if (1) {
+        $utf8 = "use utf8;\n";
+        utf8->import();
+    }
+}
+
 $bang = sprintf "\\%03o", ord "!"; # \41 would not be portable.
-$ffff  = chr(0xff) x 2;
+$ffff  = "\xFF\xFF";
 $nulnul = "\0" x 2;
 $OP = $qr ? 'qr' : 'm';
 
@@ -90,8 +98,8 @@ foreach (@tests) {
     $pat = "'$pat'" unless $pat =~ /^[:'\/]/;
     $pat =~ s/(\$\{\w+\})/$1/eeg;
     $pat =~ s/\\n/\n/g;
-    $subject = eval qq("$subject"); die $@ if $@;
-    $expect  = eval qq("$expect"); die $@ if $@;
+    $subject = eval qq(use utf8; "$subject"); die $@ if $@;
+    $expect  = eval qq(use utf8; "$expect"); die $@ if $@;
     $expect = $repl = '-' if $skip_amp and $input =~ /\$[&\`\']/;
     my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
@@ -106,6 +114,7 @@ foreach (@tests) {
 	my ($code, $match, $got);
         if ($repl eq 'pos') {
             $code= <<EOFCODE;
+                $utf8;
                 $study;
                 pos(\$subject)=0;
                 \$match = ( \$subject =~ m${pat}g );
@@ -114,6 +123,7 @@ EOFCODE
         }
         elsif ($qr_embed) {
             $code= <<EOFCODE;
+                $utf8;
                 my \$RE = qr$pat;
                 $study;
                 \$match = (\$subject =~ /(?:)\$RE(?:)/) while \$c--;
@@ -122,6 +132,7 @@ EOFCODE
         }
         else {
             $code= <<EOFCODE;
+                $utf8;
                 $study;
                 \$match = (\$subject =~ $OP$pat) while \$c--;
                 \$got = "$repl";

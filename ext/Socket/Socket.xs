@@ -252,8 +252,6 @@ inet_ntoa(ip_address_sv)
 	struct in_addr addr;
 	char * addr_str;
 	char * ip_address;
-	if (DO_UTF8(ip_address_sv) && !sv_utf8_downgrade(ip_address_sv, 1))
-	     croak("Wide character in Socket::inet_ntoa");
 	ip_address = SvPVbyte(ip_address_sv, addrlen);
 	if (addrlen == sizeof(addr) || addrlen == 4)
 	        addr.s_addr =
@@ -392,8 +390,6 @@ pack_sockaddr_in(port, ip_address_sv)
 	struct in_addr addr;
 	STRLEN addrlen;
 	char * ip_address;
-	if (DO_UTF8(ip_address_sv) && !sv_utf8_downgrade(ip_address_sv, 1))
-	     croak("Wide character in Socket::pack_sockaddr_in");
 	ip_address = SvPVbyte(ip_address_sv, addrlen);
 	if (addrlen == sizeof(addr) || addrlen == 4)
 	        addr.s_addr =

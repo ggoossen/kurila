@@ -1211,33 +1211,7 @@ Perl_do_print(pTHX_ register SV *sv, PerlIO *fp)
 	STRLEN len;
 	/* Do this first to trigger any overloading.  */
 	const char *tmps = SvPV_const(sv, len);
-	U8 *tmpbuf = NULL;
-	bool happy = TRUE;
 
-	if (PerlIO_isutf8(fp)) {
-	    if (!SvUTF8(sv)) {
-		/* We don't modify the original scalar.  */
-		tmpbuf = bytes_to_utf8((const U8*) tmps, &len);
-		tmps = (char *) tmpbuf;
-	    }
-	}
-	else if (DO_UTF8(sv)) {
-	    STRLEN tmplen = len;
-	    bool utf8 = TRUE;
-	    U8 * const result = bytes_from_utf8((const U8*) tmps, &tmplen, &utf8);
-	    if (!utf8) {
-		tmpbuf = result;
-		tmps = (char *) tmpbuf;
-		len = tmplen;
-	    }
-	    else {
-		assert((char *)result == tmps);
-		if (ckWARN_d(WARN_UTF8)) {
-		    Perl_warner(aTHX_ packWARN(WARN_UTF8),
-				"Wide character in print");
-		}
-	    }
-	}
 	/* To detect whether the process is about to overstep its
 	 * filesize limit we would need getrlimit().  We could then
 	 * also transparently raise the limit with setrlimit() --
@@ -1246,7 +1220,6 @@ Perl_do_print(pTHX_ register SV *sv, PerlIO *fp)
 	 * io the write failure can be delayed until the flush/close. --jhi */
 	if (len && (PerlIO_write(fp,tmps,len) == 0))
 	    happy = FALSE;
-	Safefree(tmpbuf);
 	return happy ? !PerlIO_error(fp) : FALSE;
     }
 }

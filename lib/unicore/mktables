@@ -1920,6 +1920,7 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n",
                    "##\n\n",
                    "## Mapping from name to filename in ./lib/gc_sc\n",
+                   "use utf8;\n",
                    "%utf8::Exact = (\n",
                   );
 
@@ -1944,6 +1945,7 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n",
                    "##\n\n",
                    "## Mapping from lc(canonical name) to filename in ./lib\n",
+                   "use utf8;\n",
                    "%utf8::Canonical = (\n",
                   );
         my $Trail = ""; ## used just to keep the spacing pretty
@@ -2015,6 +2017,7 @@ sub SpecialCasing_txt()
 	    (
 	     $HEADER, "\n",
 	     "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
+             "use utf8;\n",
 	     "%utf8::ToSpec$case =\n(\n",
 	    );
 
@@ -2078,6 +2081,7 @@ sub CaseFolding_txt()
 	(
 	 $HEADER, "\n",
 	 "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
+         "use utf8;\n",
 	 "%utf8::ToSpecFold =\n(\n",
 	);
     for my $code (sort { $a <=> $b } keys %Fold) {

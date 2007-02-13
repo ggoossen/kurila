@@ -8,6 +8,8 @@ use File::Spec::Unix  ();
 use Archive::Tar::File;
 use Archive::Tar::Constant;
 
+use bytes;
+
 my $all_chars         = join '', "\r\n", map( chr, 0..255 ), "zzz\n\r";
 my $start_time        = time() - 1 - TIME_OFFSET;
 my $replace_contents  = $all_chars x 42;

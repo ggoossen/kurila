@@ -3508,7 +3508,7 @@ of values, as follows:
     c	A signed char (8-bit) value.
     C	An unsigned C char (octet) even under Unicode. Should normally not
         be used. See U and W instead.
-    W   An unsigned char value (can be greater than 255).
+    W   An unsigned char (8-bit) value, exactly the same as C.
 
     s	A signed short (16-bit) value.
     S	An unsigned short value.

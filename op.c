@@ -437,7 +437,7 @@ Perl_op_clear(pTHX_ OP *o)
 	    break;
 	/* FALL THROUGH */
     case OP_TRANS:
-	if (o->op_private & (OPpTRANS_FROM_UTF|OPpTRANS_TO_UTF)) {
+	if (o->op_private & OPpTRANS_UTF8) {
 #ifdef USE_ITHREADS
 	    if (cPADOPo->op_padix > 0) {
 		pad_swipe(cPADOPo->op_padix, TRUE);
@@ -2837,13 +2837,10 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
     SV* swash;
     PL_hints |= HINT_BLOCK_SCOPE;
 
-    if (SvUTF8(tstr))
-        o->op_private |= OPpTRANS_FROM_UTF;
+    if (IN_CODEPOINTS)
+        o->op_private |= OPpTRANS_UTF8;
 
-    if (SvUTF8(rstr))
-        o->op_private |= OPpTRANS_TO_UTF;
-
-    if (o->op_private & (OPpTRANS_FROM_UTF|OPpTRANS_TO_UTF)) {
+    if (o->op_private & OPpTRANS_UTF8) {
 	SV* const listsv = newSVpvs("# comment\n");
 	SV* transv = NULL;
 	const U8* tend = t + tlen;
@@ -2861,22 +2858,9 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 	I32 bits;
 	I32 havefinal = 0;
 	U32 final = 0;
-	const I32 from_utf  = o->op_private & OPpTRANS_FROM_UTF;
-	const I32 to_utf    = o->op_private & OPpTRANS_TO_UTF;
 	U8* tsave = NULL;
 	U8* rsave = NULL;
 	const U32 flags = UTF8_ALLOW_DEFAULT;
-
-	if (!from_utf) {
-	    STRLEN len = tlen;
-	    t = tsave = bytes_to_utf8(t, &len);
-	    tend = t + len;
-	}
-	if (!to_utf && rlen) {
-	    STRLEN len = rlen;
-	    r = rsave = bytes_to_utf8(r, &len);
-	    rend = r + len;
-	}
 
 /* There are several snags with this code on EBCDIC:
    1. 0xFF is a legal UTF-EBCDIC byte (there are no illegal bytes).
@@ -7939,9 +7923,7 @@ Perl_peep(pTHX_ register OP *o)
 	    svp = cSVOPx_svp(((BINOP*)o)->op_last);
 	    if ((!SvFAKE(sv = *svp) || !SvREADONLY(sv)) && !IS_PADCONST(sv)) {
 		key = SvPV_const(sv, keylen);
-		lexname = newSVpvn_share(key,
-					 SvUTF8(sv) ? -(I32)keylen : (I32)keylen,
-					 0);
+		lexname = newSVpvn_share(key, (I32)keylen, 0);
 		SvREFCNT_dec(sv);
 		*svp = lexname;
 	    }

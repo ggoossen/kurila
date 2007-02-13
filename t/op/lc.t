@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 87;
+plan tests => 109;
 
 $a = "HELLO.* world";
 $b = "hello.* WORLD";
@@ -35,35 +35,79 @@ is(lcfirst($b)    , "hello\.\* WORLD",      'lcfirst');
 is(uc($b)         , "HELLO\.\* WORLD",      'uc');
 is(lc($b)         , "hello\.\* world",      'lc');
 
+use utf8;
+
+my ($x100, $x101);
+{
+    use utf8;
+    $x100 = "\x{100}";
+    $x101 = "\x{101}";
+}
+
+$a = "${x100}${x101}Aa";
+$b = "${x101}${x100}aA";
+{
+    use utf8;
+
 # \x{100} is LATIN CAPITAL LETTER A WITH MACRON; its bijective lowercase is
 # \x{101}, LATIN SMALL LETTER A WITH MACRON.
 
-$a = "\x{100}\x{101}Aa";
-$b = "\x{101}\x{100}aA";
 
-is("\Q$a\E."      , "\x{100}\x{101}Aa.", '\Q\E \x{100}\x{101}Aa');
-is("\u$a"         , "\x{100}\x{101}Aa",  '\u');
-is("\l$a"         , "\x{101}\x{101}Aa",  '\l');
-is("\U$a"         , "\x{100}\x{100}AA",  '\U');
-is("\L$a"         , "\x{101}\x{101}aa",  '\L');
+    is("\Q$a\E."      , "\x{100}\x{101}Aa.", '\Q\E \x{100}\x{101}Aa');
+    is("\u$a"         , "\x{100}\x{101}Aa",  '\u');
+    is("\l$a"         , "\x{101}\x{101}Aa",  '\l');
+    is("\U$a"         , "\x{100}\x{100}AA",  '\U');
+    is("\L$a"         , "\x{101}\x{101}aa",  '\L');
 
-is(quotemeta($a)  , "\x{100}\x{101}Aa",  'quotemeta');
-is(ucfirst($a)    , "\x{100}\x{101}Aa",  'ucfirst');
-is(lcfirst($a)    , "\x{101}\x{101}Aa",  'lcfirst');
-is(uc($a)         , "\x{100}\x{100}AA",  'uc');
-is(lc($a)         , "\x{101}\x{101}aa",  'lc');
+    is(quotemeta($a)  , "\x{100}\x{101}Aa",  'quotemeta');
+    is(ucfirst($a)    , "\x{100}\x{101}Aa",  'ucfirst');
+    is(lcfirst($a)    , "\x{101}\x{101}Aa",  'lcfirst');
+    is(uc($a)         , "\x{100}\x{100}AA",  'uc');
+    is(lc($a)         , "\x{101}\x{101}aa",  'lc');
 
-is("\Q$b\E."      , "\x{101}\x{100}aA.", '\Q\E \x{101}\x{100}aA');
-is("\u$b"         , "\x{100}\x{100}aA",  '\u');
-is("\l$b"         , "\x{101}\x{100}aA",  '\l');
-is("\U$b"         , "\x{100}\x{100}AA",  '\U');
-is("\L$b"         , "\x{101}\x{101}aa",  '\L');
+    is("\Q$b\E."      , "\x{101}\x{100}aA.", '\Q\E \x{101}\x{100}aA');
+    is("\u$b"         , "\x{100}\x{100}aA",  '\u');
+    is("\l$b"         , "\x{101}\x{100}aA",  '\l');
+    is("\U$b"         , "\x{100}\x{100}AA",  '\U');
+    is("\L$b"         , "\x{101}\x{101}aa",  '\L');
 
-is(quotemeta($b)  , "\x{101}\x{100}aA",  'quotemeta');
-is(ucfirst($b)    , "\x{100}\x{100}aA",  'ucfirst');
-is(lcfirst($b)    , "\x{101}\x{100}aA",  'lcfirst');
-is(uc($b)         , "\x{100}\x{100}AA",  'uc');
-is(lc($b)         , "\x{101}\x{101}aa",  'lc');
+    is(quotemeta($b)  , "\x{101}\x{100}aA",  'quotemeta');
+    is(ucfirst($b)    , "\x{100}\x{100}aA",  'ucfirst');
+    is(lcfirst($b)    , "\x{101}\x{100}aA",  'lcfirst');
+    is(uc($b)         , "\x{100}\x{100}AA",  'uc');
+    is(lc($b)         , "\x{101}\x{101}aa",  'lc');
+
+    is(ucfirst('')    , "",                  'ucfirst empty string');
+    is(lcfirst('')    , "",                  'lcfirst empty string');
+
+    no utf8;
+
+    local $TODO="no utf8 lc";
+
+    is("\Q$a\E."      , "${x100}${x101}Aa.", '\Q\E ${x100}${x101}Aa');
+    is("\u$a"         , "${x100}${x101}Aa",  '\u');
+    is("\l$a"         , "${x100}${x101}Aa",  '\l');
+    is("\U$a"         , "${x100}${x101}AA",  '\U');
+    is("\L$a"         , "${x100}${x101}aa",  '\L');
+
+    is(quotemeta($a)  , "${x100}${x101}Aa",  'quotemeta');
+    is(ucfirst($a)    , "${x100}${x101}Aa",  'ucfirst');
+    is(lcfirst($a)    , "${x100}${x101}Aa",  'lcfirst');
+    is(uc($a)         , "${x100}${x101}AA",  'uc');
+    is(lc($a)         , "${x100}${x101}aa",  'lc');
+
+    is("\Q$b\E."      , "${x101}${x100}aA.", '\Q\E ${x101}${x100}aA');
+    is("\u$b"         , "${x101}${x100}aA",  '\u');
+    is("\l$b"         , "${x101}${x100}aA",  '\l');
+    is("\U$b"         , "${x101}${x100}AA",  '\U');
+    is("\L$b"         , "${x101}${x100}aa",  '\L');
+
+    is(quotemeta($b)  , "${x101}${x100}aA",  'quotemeta');
+    is(ucfirst($b)    , "${x101}${x100}aA",  'ucfirst');
+    is(lcfirst($b)    , "${x101}${x100}aA",  'lcfirst');
+    is(uc($b)         , "${x101}${x100}AA",  'uc');
+    is(lc($b)         , "${x101}${x100}aa",  'lc');
+}
 
 # \x{DF} is LATIN SMALL LETTER SHARP S, its uppercase is SS or \x{53}\x{53};
 # \x{149} is LATIN SMALL LETTER N PRECEDED BY APOSTROPHE, its uppercase is
@@ -72,27 +116,19 @@ is(lc($b)         , "\x{101}\x{101}aa",  'lc');
 # In EBCDIC \x{DF} is LATIN SMALL LETTER Y WITH DIAERESIS,
 # and it's uppercase is \x{178}, LATIN CAPITAL LETTER Y WITH DIAERESIS.
 
-if (ord("A") == 193) { # EBCDIC
-    is("\U\x{DF}aB\x{149}cD" , "\x{178}AB\x{2BC}NCD",
-       "multicharacter uppercase");
-} elsif (ord("A") == 65) {
+{
+    use utf8;
     is("\U\x{DF}aB\x{149}cD" , "SSAB\x{2BC}NCD",
        "multicharacter uppercase");
-} else {
-    fail("what is your encoding?");
 }
 
 # The \x{DF} is its own lowercase, ditto for \x{149}.
 # There are no single character -> multiple characters lowercase mappings.
 
-if (ord("A") == 193) { # EBCDIC
-    is("\LaB\x{149}cD" , "ab\x{149}cd",
-       "multicharacter lowercase");
-} elsif (ord("A") == 65) {
+{
+    use utf8;
     is("\L\x{DF}aB\x{149}cD" , "\x{DF}ab\x{149}cd",
        "multicharacter lowercase");
-} else {
-    fail("what is your encoding?");
 }
 
 # titlecase is used for \u / ucfirst.
@@ -103,6 +139,8 @@ if (ord("A") == 193) { # EBCDIC
 # \x{587} itself
 # and its uppercase is
 # \x{535}\x{552} ARMENIAN CAPITAL LETTER ECH + ARMENIAN CAPITAL LETTER YIWN
+
+use utf8;
 
 $a = "\x{587}";
 
@@ -157,6 +195,7 @@ for my $a (0,1) {
 
 {
     foreach (0, 1) {
+        local $TODO = "fix lc";
 	$a = v10.v257;
 	chop $a;
 	$a =~ s/^(\s*)(\w*)/$1\u$2/;
@@ -173,7 +212,7 @@ for ("a\x{100}", "xyz\x{100}") {
 for ("A\x{100}", "XYZ\x{100}") {
     is(substr(lc($_), 0), lc($_), "[perl #38619] lc");
 }
-for ("a\x{100}", "ßyz\x{100}") { # ß to Ss (different length)
+for ("a\x{100}", "ÃŸyz\x{100}") { # ÃŸ to Ss (different length)
     is(substr(ucfirst($_), 0), ucfirst($_), "[perl #38619] ucfirst");
 }
 

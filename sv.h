@@ -1004,7 +1004,8 @@ and leaves the UTF-8 status as it was.
 
 /* Ensure the return value of this macro does not clash with the GV_ADD* flags
 in gv.h: */
-#define SvUTF8(sv)		(SvFLAGS(sv) & SVf_UTF8)
+#define SvUTF8(sv)		(0)
+/* (SvFLAGS(sv) & SVf_UTF8) */
 #define SvUTF8_on(sv)		(SvFLAGS(sv) |= (SVf_UTF8))
 #define SvUTF8_off(sv)		(SvFLAGS(sv) &= ~(SVf_UTF8))
 
@@ -1716,30 +1717,30 @@ Like C<sv_catsv> but doesn't process magic.
 /* ----*/
 
 #define SvPVutf8(sv, lp) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK|SVf_UTF8) \
+    ((SvFLAGS(sv) & (SVf_POK)) == (SVf_POK) \
      ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_2pvutf8(sv, &lp))
 
 #define SvPVutf8_force(sv, lp) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == (SVf_POK|SVf_UTF8) \
+    ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == (SVf_POK) \
      ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_pvutf8n_force(sv, &lp))
 
 
 #define SvPVutf8_nolen(sv) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK|SVf_UTF8)\
+    ((SvFLAGS(sv) & (SVf_POK)) == (SVf_POK)\
      ? SvPVX(sv) : sv_2pvutf8(sv, 0))
 
 /* ----*/
 
 #define SvPVbyte(sv, lp) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK) \
+    ((SvFLAGS(sv) & SVf_POK) == (SVf_POK) \
      ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_2pvbyte(sv, &lp))
 
 #define SvPVbyte_force(sv, lp) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8|SVf_THINKFIRST)) == (SVf_POK) \
+    ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == (SVf_POK) \
      ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_pvbyten_force(sv, &lp))
 
 #define SvPVbyte_nolen(sv) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK)\
+    ((SvFLAGS(sv) & SVf_POK) == (SVf_POK)\
      ? SvPVX(sv) : sv_2pvbyte(sv, 0))
 
 

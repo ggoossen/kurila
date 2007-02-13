@@ -174,13 +174,9 @@ PPCODE:
         SV *fl = &PL_sv_no;
         if (re->anchored_substr) {
             an = newSVsv(re->anchored_substr);
-        } else if (re->anchored_utf8) {
-            an = newSVsv(re->anchored_utf8);
         }
         if (re->float_substr) {
             fl = newSVsv(re->float_substr);
-        } else if (re->float_utf8) {
-            fl = newSVsv(re->float_utf8);
         }
         XPUSHs(an);
         XPUSHs(fl);

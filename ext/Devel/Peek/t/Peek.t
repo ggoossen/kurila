@@ -325,27 +325,17 @@ do_test(17,
     FLAGS = $ADDR
     EGV = $ADDR\\t"a"');
 
-if (ord('A') == 193) {
-do_test(18,
-	chr(256).chr(0).chr(512),
-'SV = PV\\($ADDR\\) at $ADDR
-  REFCNT = 1
-  FLAGS = \\((?:PADTMP,)?POK,READONLY,pPOK,UTF8\\)
-  PV = $ADDR "\\\214\\\101\\\0\\\235\\\101"\\\0 \[UTF8 "\\\x\{100\}\\\x\{0\}\\\x\{200\}"\]
-  CUR = 5
-  LEN = \\d+');
-} else {
-do_test(18,
-	chr(256).chr(0).chr(512),
-'SV = PV\\($ADDR\\) at $ADDR
-  REFCNT = 1
-  FLAGS = \\((?:PADTMP,)?POK,READONLY,pPOK,UTF8\\)
-  PV = $ADDR "\\\304\\\200\\\0\\\310\\\200"\\\0 \[UTF8 "\\\x\{100\}\\\x\{0\}\\\x\{200\}"\]
-  CUR = 5
-  LEN = \\d+');
-}
+use utf8;
 
-if (ord('A') == 193) {
+do_test(18,
+	chr(256).chr(0).chr(512),
+'SV = PV\\($ADDR\\) at $ADDR
+  REFCNT = 1
+  FLAGS = \\((?:PADTMP,)?POK,pPOK\\)
+  PV = $ADDR "\\\304\\\200\\\0\\\310\\\200"\\\0
+  CUR = 5
+  LEN = \\d+');
+
 do_test(19,
 	{chr(256)=>chr(512)},
 'SV = RV\\($ADDR\\) at $ADDR
@@ -354,7 +344,7 @@ do_test(19,
   RV = $ADDR
   SV = PVHV\\($ADDR\\) at $ADDR
     REFCNT = 1
-    FLAGS = \\(SHAREKEYS,HASKFLAGS\\)
+    FLAGS = \\(SHAREKEYS\\)
     ARRAY = $ADDR  \\(0:7, 1:1\\)
     hash quality = 100.0%
     KEYS = 1
@@ -362,38 +352,13 @@ do_test(19,
     MAX = 7
     RITER = -1
     EITER = $ADDR
-    Elt "\\\214\\\101" \[UTF8 "\\\x\{100\}"\] HASH = $ADDR
+    Elt "\\\304\\\200" HASH = $ADDR
     SV = PV\\($ADDR\\) at $ADDR
       REFCNT = 1
-      FLAGS = \\(POK,pPOK,UTF8\\)
-      PV = $ADDR "\\\235\\\101"\\\0 \[UTF8 "\\\x\{200\}"\]
+      FLAGS = \\(POK,pPOK\\)
+      PV = $ADDR "\\\310\\\200"\\\0
       CUR = 2
       LEN = \\d+');
-} else {
-do_test(19,
-	{chr(256)=>chr(512)},
-'SV = RV\\($ADDR\\) at $ADDR
-  REFCNT = 1
-  FLAGS = \\(ROK\\)
-  RV = $ADDR
-  SV = PVHV\\($ADDR\\) at $ADDR
-    REFCNT = 1
-    FLAGS = \\(SHAREKEYS,HASKFLAGS\\)
-    ARRAY = $ADDR  \\(0:7, 1:1\\)
-    hash quality = 100.0%
-    KEYS = 1
-    FILL = 1
-    MAX = 7
-    RITER = -1
-    EITER = $ADDR
-    Elt "\\\304\\\200" \[UTF8 "\\\x\{100\}"\] HASH = $ADDR
-    SV = PV\\($ADDR\\) at $ADDR
-      REFCNT = 1
-      FLAGS = \\(POK,pPOK,UTF8\\)
-      PV = $ADDR "\\\310\\\200"\\\0 \[UTF8 "\\\x\{200\}"\]
-      CUR = 2
-      LEN = \\d+');
-}
 
 my $x="";
 $x=~/.??/g;

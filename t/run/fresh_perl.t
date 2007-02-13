@@ -605,7 +605,7 @@ EXPECT
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-(?-xism:x)
+(?-uxism:x)
 ########
 # 20001210.003 mjd@plover.com
 format REMITOUT_TOP =
@@ -670,6 +670,7 @@ EXPECT
 OK
 ########
 # Bug 20010506.041
+use utf8;
 "abcd\x{1234}" =~ /(a)(b[c])(d+)?/i and print "ok\n";
 EXPECT
 ok
@@ -814,7 +815,7 @@ $toto = 'Hello';
 $toto =~ /\w/; # this line provokes the problem!
 $name = 'A B';
 # utf8::upgrade($name) if @ARGV;
-if ($name =~ /(\p{IsUpper}) (\p{IsUpper})/){
+if ($name =~ /(\p{IsUpper}) (\p{IsUpper})/u){
     print "It's good! >$1< >$2<\n";
 } else {
     print "It's not good...\n";
@@ -878,12 +879,15 @@ BEGIN {
   if ($@) { exit 0 } # running minitest?
 }
 # Test case cut down by jhi
+use Carp;
 $SIG{__WARN__} = sub { $@ = shift };
 use Encode;
+use utf8;
 my $t = ord('A') == 193 ? "\xEA" : "\xE9";
 Encode::_utf8_on($t);
 $t =~ s/([^a])//ge;
 $@ =~ s/ at .*/ at/;
 print $@
+print "Good" if $t eq "\xE9";
 EXPECT
-Malformed UTF-8 character (unexpected end of string) in substitution (s///) at
+Good

@@ -3394,6 +3394,9 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_substr:
 	result = &PL_vtbl_substr;
 	break;
+    case want_vtbl_substr_utf8:
+	result = &PL_vtbl_substr_utf8;
+	break;
     case want_vtbl_vec:
 	result = &PL_vtbl_vec;
 	break;

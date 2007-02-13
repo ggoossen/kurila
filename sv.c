@@ -2674,12 +2674,6 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
 			if (name) {
 			    stashname = HEK_KEY(name);
 			    stashnamelen = HEK_LEN(name);
-
-			    if (HEK_UTF8(name)) {
-				SvUTF8_on(sv);
-			    } else {
-				SvUTF8_off(sv);
-			    }
 			} else {
 			    stashname = "__ANON__";
 			    stashnamelen = 8;
@@ -2845,7 +2839,6 @@ Usually accessed via the C<SvPVbyte> macro.
 char *
 Perl_sv_2pvbyte(pTHX_ register SV *sv, STRLEN *lp)
 {
-    sv_utf8_downgrade(sv,0);
     return lp ? SvPV(sv,*lp) : SvPV_nolen(sv);
 }
 
@@ -2863,7 +2856,6 @@ Usually accessed via the C<SvPVutf8> macro.
 char *
 Perl_sv_2pvutf8(pTHX_ register SV *sv, STRLEN *lp)
 {
-    sv_utf8_upgrade(sv);
     return lp ? SvPV(sv,*lp) : SvPV_nolen(sv);
 }
 
@@ -2970,34 +2962,6 @@ Perl_sv_utf8_upgrade_flags(pTHX_ register SV *sv, I32 flags)
         sv_force_normal_flags(sv, 0);
     }
 
-    if (PL_encoding && !(flags & SV_UTF8_NO_ENCODING))
-        sv_recode_to_utf8(sv, PL_encoding);
-    else { /* Assume Latin-1/EBCDIC */
-	/* This function could be much more efficient if we
-	 * had a FLAG in SVs to signal if there are any hibit
-	 * chars in the PV.  Given that there isn't such a flag
-	 * make the loop as fast as possible. */
-	const U8 * const s = (U8 *) SvPVX_const(sv);
-	const U8 * const e = (U8 *) SvEND(sv);
-	const U8 *t = s;
-	
-	while (t < e) {
-	    const U8 ch = *t++;
-	    /* Check for hi bit */
-	    if (!NATIVE_IS_INVARIANT(ch)) {
-		STRLEN len = SvCUR(sv) + 1; /* Plus the \0 */
-		U8 * const recoded = bytes_to_utf8((U8*)s, &len);
-
-		SvPV_free(sv); /* No longer using what was there before. */
-		SvPV_set(sv, (char*)recoded);
-		SvCUR_set(sv, len - 1);
-		SvLEN_set(sv, len); /* No longer know the real size. */
-		break;
-	    }
-	}
-	/* Mark as UTF-8 even if no hibit - saves scanning loop */
-	SvUTF8_on(sv);
-    }
     return SvCUR(sv);
 }
 
@@ -3018,31 +2982,7 @@ use the Encode extension for that.
 bool
 Perl_sv_utf8_downgrade(pTHX_ register SV* sv, bool fail_ok)
 {
-    dVAR;
-    if (SvPOKp(sv) && SvUTF8(sv)) {
-        if (SvCUR(sv)) {
-	    U8 *s;
-	    STRLEN len;
-
-            if (SvIsCOW(sv)) {
-                sv_force_normal_flags(sv, 0);
-            }
-	    s = (U8 *) SvPV(sv, len);
-	    if (!utf8_to_bytes(s, &len)) {
-	        if (fail_ok)
-		    return FALSE;
-		else {
-		    if (PL_op)
-		        Perl_croak(aTHX_ "Wide character in %s",
-				   OP_DESC(PL_op));
-		    else
-		        Perl_croak(aTHX_ "Wide character");
-		}
-	    }
-	    SvCUR_set(sv, len);
-	}
-    }
-    SvUTF8_off(sv);
+    Perl_croak(aTHX_ "utf8_downgrade obsolete");
     return TRUE;
 }
 
@@ -3086,12 +3026,6 @@ Perl_sv_utf8_decode(pTHX_ register SV *sv)
     if (SvPOKp(sv)) {
         const U8 *c;
         const U8 *e;
-
-	/* The octets may have got themselves encoded - get them back as
-	 * bytes
-	 */
-	if (!sv_utf8_downgrade(sv, TRUE))
-	    return FALSE;
 
         /* it is actually just a matter of turning the utf8 flag on, but
          * we want to make sure everything inside is valid utf8 first.
@@ -3152,14 +3086,15 @@ S_glob_assign_glob(pTHX_ SV *dstr, SV *sstr, const int dtype)
     if (dtype != SVt_PVGV) {
 	const char * const name = GvNAME(sstr);
 	const STRLEN len = GvNAMELEN(sstr);
-	{
+	/* don't upgrade SVt_PVLV: it can hold a glob */
+	if (dtype != SVt_PVLV) {
 	    if (dtype >= SVt_PV) {
 		SvPV_free(dstr);
 		SvPV_set(dstr, 0);
 		SvLEN_set(dstr, 0);
 		SvCUR_set(dstr, 0);
 	    }
-	    SvUPGRADE(dstr, SVt_PVGV);
+	    sv_upgrade(dstr, SVt_PVGV);
 	    (void)SvOK_off(dstr);
 	    /* FIXME - why are we doing this, then turning it off and on again
 	       below?  */
@@ -4564,6 +4499,9 @@ Perl_sv_magic(pTHX_ register SV *sv, SV *obj, int how, const char *name, I32 nam
     case PERL_MAGIC_substr:
 	vtable = &PL_vtbl_substr;
 	break;
+    case PERL_MAGIC_substr_utf8:
+	vtable = &PL_vtbl_substr_utf8;
+	break;
     case PERL_MAGIC_defelem:
 	vtable = &PL_vtbl_defelem;
 	break;
@@ -5921,53 +5859,6 @@ Perl_sv_eq(pTHX_ register SV *sv1, register SV *sv2)
     else
 	pv2 = SvPV_const(sv2, cur2);
 
-    if (cur1 && cur2 && SvUTF8(sv1) != SvUTF8(sv2) && !IN_BYTES) {
-        /* Differing utf8ness.
-	 * Do not UTF8size the comparands as a side-effect. */
-	 if (PL_encoding) {
-	      if (SvUTF8(sv1)) {
-		   svrecode = newSVpvn(pv2, cur2);
-		   sv_recode_to_utf8(svrecode, PL_encoding);
-		   pv2 = SvPV_const(svrecode, cur2);
-	      }
-	      else {
-		   svrecode = newSVpvn(pv1, cur1);
-		   sv_recode_to_utf8(svrecode, PL_encoding);
-		   pv1 = SvPV_const(svrecode, cur1);
-	      }
-	      /* Now both are in UTF-8. */
-	      if (cur1 != cur2) {
-		   SvREFCNT_dec(svrecode);
-		   return FALSE;
-	      }
-	 }
-	 else {
-	      bool is_utf8 = TRUE;
-
-	      if (SvUTF8(sv1)) {
-		   /* sv1 is the UTF-8 one,
-		    * if is equal it must be downgrade-able */
-		   char * const pv = (char*)bytes_from_utf8((const U8*)pv1,
-						     &cur1, &is_utf8);
-		   if (pv != pv1)
-			pv1 = tpv = pv;
-	      }
-	      else {
-		   /* sv2 is the UTF-8 one,
-		    * if is equal it must be downgrade-able */
-		   char * const pv = (char *)bytes_from_utf8((const U8*)pv2,
-						      &cur2, &is_utf8);
-		   if (pv != pv2)
-			pv2 = tpv = pv;
-	      }
-	      if (is_utf8) {
-		   /* Downgrade not possible - cannot be eq */
-		   assert (tpv == 0);
-		   return FALSE;
-	      }
-	 }
-    }
-
     if (cur1 == cur2)
 	eq = (pv1 == pv2) || memEQ(pv1, pv2, cur1);
 	
@@ -6012,31 +5903,6 @@ Perl_sv_cmp(pTHX_ register SV *sv1, register SV *sv2)
     }
     else
 	pv2 = SvPV_const(sv2, cur2);
-
-    if (cur1 && cur2 && SvUTF8(sv1) != SvUTF8(sv2) && !IN_BYTES) {
-        /* Differing utf8ness.
-	 * Do not UTF8size the comparands as a side-effect. */
-	if (SvUTF8(sv1)) {
-	    if (PL_encoding) {
-		 svrecode = newSVpvn(pv2, cur2);
-		 sv_recode_to_utf8(svrecode, PL_encoding);
-		 pv2 = SvPV_const(svrecode, cur2);
-	    }
-	    else {
-		 pv2 = tpv = (char*)bytes_to_utf8((const U8*)pv2, &cur2);
-	    }
-	}
-	else {
-	    if (PL_encoding) {
-		 svrecode = newSVpvn(pv1, cur1);
-		 sv_recode_to_utf8(svrecode, PL_encoding);
-		 pv1 = SvPV_const(svrecode, cur1);
-	    }
-	    else {
-		 pv1 = tpv = (char*)bytes_to_utf8((const U8*)pv1, &cur1);
-	    }
-	}
-    }
 
     if (!cur1) {
 	cmp = cur2 ? -1 : 0;
@@ -6220,23 +6086,6 @@ Perl_sv_gets(pTHX_ register SV *sv, register PerlIO *fp, I32 append)
 
     SvSCREAM_off(sv);
 
-    if (append) {
-	if (PerlIO_isutf8(fp)) {
-	    if (!SvUTF8(sv)) {
-		sv_utf8_upgrade_nomg(sv);
-		sv_pos_u2b(sv,&append,0);
-	    }
-	} else if (SvUTF8(sv)) {
-	    SV * const tsv = newSV(0);
-	    sv_gets(tsv, fp, 0);
-	    sv_utf8_upgrade_nomg(tsv);
-	    SvCUR_set(sv,append);
-	    sv_catsv(sv,tsv);
-	    sv_free(tsv);
-	    goto return_string_or_null;
-	}
-    }
-
     SvPOK_only(sv);
     if (PerlIO_isutf8(fp))
 	SvUTF8_on(sv);
@@ -6298,10 +6147,10 @@ Perl_sv_gets(pTHX_ register SV *sv, register PerlIO *fp, I32 append)
 	    rsptr = SvPVutf8(PL_rs, rslen);
 	}
 	else {
-	    if (SvUTF8(PL_rs)) {
-		if (!sv_utf8_downgrade(PL_rs, TRUE)) {
-		    Perl_croak(aTHX_ "Wide character in $/");
-		}
+	    if ( ! IN_BYTES ) {
+/* 		if (!sv_utf8_downgrade(PL_rs, TRUE)) { */
+/* 		    Perl_croak(aTHX_ "Wide character in $/"); */
+/* 		} */
 	    }
 	    rsptr = SvPV_const(PL_rs, rslen);
 	}
@@ -6960,18 +6809,7 @@ Perl_newSVhek(pTHX_ const HEK *hek)
 	return newSVsv(*(SV**)HEK_KEY(hek));
     } else {
 	const int flags = HEK_FLAGS(hek);
-	if (flags & HVhek_WASUTF8) {
-	    /* Trouble :-)
-	       Andreas would like keys he put in as utf8 to come back as utf8
-	    */
-	    STRLEN utf8_len = HEK_LEN(hek);
-	    const U8 *as_utf8 = bytes_to_utf8 ((U8*)HEK_KEY(hek), &utf8_len);
-	    SV * const sv = newSVpvn ((const char*)as_utf8, utf8_len);
-
-	    SvUTF8_on (sv);
-	    Safefree (as_utf8); /* bytes_to_utf8() allocates a new string */
-	    return sv;
-	} else if (flags & (HVhek_REHASH|HVhek_UNSHARED)) {
+	if (flags & (HVhek_REHASH|HVhek_UNSHARED)) {
 	    /* We don't have a pointer to the hv, so we have to replicate the
 	       flag into every HEK. This hv is using custom a hasing
 	       algorithm. Hence we can't return a shared string scalar, as
@@ -6982,8 +6820,6 @@ Perl_newSVhek(pTHX_ const HEK *hek)
 	       share_hek_kek on it.  */
 
 	    SV * const sv = newSVpvn (HEK_KEY(hek), HEK_LEN(hek));
-	    if (HEK_UTF8(hek))
-		SvUTF8_on (sv);
 	    return sv;
 	}
 	/* This will be overwhelminly the most common case.  */
@@ -7000,8 +6836,6 @@ Perl_newSVhek(pTHX_ const HEK *hek)
 	    SvREADONLY_on(sv);
 	    SvFAKE_on(sv);
 	    SvPOK_on(sv);
-	    if (HEK_UTF8(hek))
-		SvUTF8_on(sv);
 	    return sv;
 	}
     }
@@ -7026,28 +6860,20 @@ Perl_newSVpvn_share(pTHX_ const char *src, I32 len, U32 hash)
 {
     dVAR;
     register SV *sv;
-    bool is_utf8 = FALSE;
     const char *const orig_src = src;
 
-    if (len < 0) {
-	STRLEN tmplen = -len;
-        is_utf8 = TRUE;
-	/* See the note in hv.c:hv_fetch() --jhi */
-	src = (char*)bytes_from_utf8((const U8*)src, &tmplen, &is_utf8);
-	len = tmplen;
-    }
+    assert(len >= 0);
+
     if (!hash)
 	PERL_HASH(hash, src, len);
     new_SV(sv);
     sv_upgrade(sv, SVt_PV);
-    SvPV_set(sv, sharepvn(src, is_utf8?-len:len, hash));
+    SvPV_set(sv, sharepvn(src, len, hash));
     SvCUR_set(sv, len);
     SvLEN_set(sv, 0);
     SvREADONLY_on(sv);
     SvFAKE_on(sv);
     SvPOK_on(sv);
-    if (is_utf8)
-        SvUTF8_on(sv);
     if (src != orig_src)
 	Safefree(src);
     return sv;
@@ -7591,7 +7417,6 @@ char *
 Perl_sv_pvbyten_force(pTHX_ SV *sv, STRLEN *lp)
 {
     sv_pvn_force(sv,lp);
-    sv_utf8_downgrade(sv,0);
     *lp = SvCUR(sv);
     return SvPVX(sv);
 }
@@ -7608,7 +7433,6 @@ char *
 Perl_sv_pvutf8n_force(pTHX_ SV *sv, STRLEN *lp)
 {
     sv_pvn_force(sv,lp);
-    sv_utf8_upgrade(sv);
     *lp = SvCUR(sv);
     return SvPVX(sv);
 }
@@ -8359,8 +8183,7 @@ Usually used via one of its frontends C<sv_vcatpvf> and C<sv_vcatpvf_mg>.
 
 
 #define VECTORIZE_ARGS	vecsv = va_arg(*args, SV*);\
-			vecstr = (U8*)SvPV_const(vecsv,veclen);\
-			vec_utf8 = DO_UTF8(vecsv);
+			vecstr = (U8*)SvPV_const(vecsv,veclen);
 
 /* XXX maybe_tainted is never assigned to, so the doc above is lying. */
 
@@ -8459,7 +8282,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	bool left = FALSE;
 	bool vectorize = FALSE;
 	bool vectorarg = FALSE;
-	bool vec_utf8 = FALSE;
 	char fill = ' ';
 	char plus = 0;
 	char intsize = 0;
@@ -8680,7 +8502,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    else if (efix ? (efix > 0 && efix <= svmax) : svix < svmax) {
 		vecsv = svargs[efix ? efix-1 : svix++];
 		vecstr = (U8*)SvPV_const(vecsv,veclen);
-		vec_utf8 = DO_UTF8(vecsv);
 
 		/* if this is a version object, we need to convert
 		 * back into v-string notation and then let the
@@ -8701,7 +8522,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    PL_bufend = version + veclen;
 		    scan_vstring(version, vecsv);
 		    vecstr = (U8*)SvPV_const(vecsv, veclen);
-		    vec_utf8 = DO_UTF8(vecsv);
 		    Safefree(version);
 		}
 	    }
@@ -8827,14 +8647,15 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    if (vectorize)
 		goto unknown;
 	    uv = (args) ? va_arg(*args, int) : SvIVx(argsv);
-	    if ((uv > 255 ||
-		 (!UNI_IS_INVARIANT(uv) && SvUTF8(sv)))
-		&& !IN_BYTES) {
+	    if ((!UNI_IS_INVARIANT(uv) && IN_CODEPOINTS)) {
 		eptr = (char*)utf8buf;
 		elen = uvchr_to_utf8((U8*)eptr, uv) - utf8buf;
 		is_utf8 = TRUE;
 	    }
 	    else {
+		if (uv > 255)
+		    Perl_warner(aTHX_ packWARN(WARN_MISC),
+				"character value > 255 without 'use codepoints'");
 		c = (char)uv;
 		eptr = &c;
 		elen = 1;
@@ -8908,7 +8729,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		STRLEN ulen;
 		if (!veclen)
 		    continue;
-		if (vec_utf8)
+		if (IN_CODEPOINTS)
 		    uv = utf8n_to_uvchr(vecstr, veclen, &ulen,
 					UTF8_ALLOW_ANYUV);
 		else {
@@ -8995,7 +8816,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	vector:
 		if (!veclen)
 		    continue;
-		if (vec_utf8)
+		if (IN_CODEPOINTS)
 		    uv = utf8n_to_uvchr(vecstr, veclen, &ulen,
 					UTF8_ALLOW_ANYUV);
 		else {
@@ -10986,7 +10807,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 #else
     PL_statusvalue_posix = proto_perl->Istatusvalue_posix;
 #endif
-    PL_encoding		= sv_dup(proto_perl->Iencoding, param);
 
     sv_setpvn(PERL_DEBUG_PAD(0), "", 0);	/* For regex debugging. */
     sv_setpvn(PERL_DEBUG_PAD(1), "", 0);	/* ext/re needs these */

@@ -1842,9 +1842,6 @@ PERL_CALLCONV OP*	Perl_refkids(pTHX_ OP* o, I32 type);
 PERL_CALLCONV void	Perl_regdump(pTHX_ const regexp* r)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV SV*	Perl_regclass_swash(pTHX_ const regexp *prog, const struct regnode *n, bool doinit, SV **listsvp, SV **altsvp)
-			__attribute__nonnull__(pTHX_2);
-
 PERL_CALLCONV I32	Perl_pregexec(pTHX_ regexp* prog, char* stringarg, char* strend, char* strbeg, I32 minend, SV* screamer, U32 nosave)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
@@ -3617,6 +3614,11 @@ STATIC STRLEN	S_reguni(pTHX_ const struct RExC_state_t *state, UV uv, char *s)
 STATIC regnode*	S_regclass(pTHX_ struct RExC_state_t *state, U32 depth)
 			__attribute__nonnull__(pTHX_1);
 
+STATIC void	S_anyof_get_swash(pTHX_ struct RExC_state_t *state, regnode *ret, SV *listsv, AV* unicode_alternate)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
+
 STATIC I32	S_regcurly(const char *)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1);
@@ -3624,7 +3626,6 @@ STATIC I32	S_regcurly(const char *)
 STATIC regnode*	S_reg_node(pTHX_ struct RExC_state_t *state, U8 op)
 			__attribute__nonnull__(pTHX_1);
 
-STATIC UV	S_reg_recode(pTHX_ const char value, SV **encp);
 STATIC regnode*	S_regpiece(pTHX_ struct RExC_state_t *state, I32 *flagp, U32 depth)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -3771,7 +3772,7 @@ STATIC I32	S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-STATIC bool	S_reginclass(pTHX_ const regexp *prog, const regnode *n, const U8 *p, STRLEN *lenp, bool do_utf8sv_is_utf8)
+STATIC bool	S_reginclass(pTHX_ const regexp *prog, const regnode *n, const U8 *p, STRLEN *lenp)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
@@ -3806,12 +3807,6 @@ STATIC char*	S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s, cons
 			__attribute__nonnull__(pTHX_4);
 
 STATIC void	S_swap_match_buff(pTHX_ regexp * prog)
-			__attribute__nonnull__(pTHX_1);
-
-STATIC void	S_to_utf8_substr(pTHX_ regexp * prog)
-			__attribute__nonnull__(pTHX_1);
-
-STATIC void	S_to_byte_substr(pTHX_ regexp * prog)
 			__attribute__nonnull__(pTHX_1);
 
 STATIC I32	S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *prog)

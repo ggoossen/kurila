@@ -19,24 +19,27 @@ use Encode qw(from_to encode decode
           encode_utf8 decode_utf8
           find_encoding is_utf8);
 use charnames qw(greek);
+require bytes;
+use utf8;
+
 my @encodings = grep(/iso-?8859/,Encode::encodings());
 my $n = 2;
 my @character_set = ('0'..'9', 'A'..'Z', 'a'..'z');
 my @source = qw(ascii iso8859-1 cp1250);
 my @destiny = qw(cp1047 cp37 posix-bc);
 my @ebcdic_sets = qw(cp1047 cp37 posix-bc);
-plan test => 38+$n*@encodings + 2*@source*@destiny*@character_set + 2*@ebcdic_sets*256 + 6 + 2;
-my $str = join('',map(chr($_),0x20..0x7E));
+plan test => 38+$n*@encodings + 2*@source*@destiny*@character_set + 2*@ebcdic_sets*256 + 2;
+my $str = join('',map(bytes::chr($_),0x20..0x7E));
 my $cpy = $str;
-ok(length($str),from_to($cpy,'iso8859-1','Unicode'),"Length Wrong");
+ok(0x5F,from_to($cpy,'iso8859-1','Unicode'),"Length Wrong");
 ok($cpy,$str,"ASCII mangled by translating from iso8859-1 to Unicode");
 $cpy = $str;
 ok(from_to($cpy,'Unicode','iso8859-1'),length($str),"Length wrong");
 ok($cpy,$str,"ASCII mangled by translating from Unicode to iso8859-1");
 
-$str = join('',map(chr($_),0xa0..0xff));
+$str = join('',map(bytes::chr($_),0xa0..0xff));
 $cpy = $str;
-ok(length($str),from_to($cpy,'iso8859-1','Unicode'),"Length Wrong");
+ok(0x60*2,from_to($cpy,'iso8859-1','Unicode'),"Length Wrong");
 
 my $sym = Encode->getEncoding('symbol');
 my $uni = $sym->decode(encode(ascii => 'a'));
@@ -48,7 +51,7 @@ foreach my $enc (qw(symbol dingbats ascii),@encodings)
  {
   my $tab = Encode->getEncoding($enc);
   ok(1,defined($tab),"Could not load $enc");
-  $str = join('',map(chr($_),0x20..0x7E));
+  $str = join('',map(bytes::chr($_),0x20..0x7E));
   $uni = $tab->decode($str);
   $cpy = $tab->encode($uni);
   ok($cpy,$str,"$enc mangled translating to Unicode and back");
@@ -79,7 +82,7 @@ foreach my $to (@destiny)
       my $cpy = $chr;
       my $rc = from_to($cpy,$from,$to);
       ok(1,$rc,"Could not translate from $from to $to");
-      ok(ord($cpy),shift(@expected),"mangled translating $native_chr from $from to $to");
+      ok(bytes::ord($cpy),shift(@expected),"mangled translating $native_chr from $from to $to");
      }
    }
  }
@@ -92,11 +95,11 @@ foreach my $enc_eb (@ebcdic_sets)
  {
   foreach my $ord (0..255)
    {
-    $str = chr($ord);
+    $str = bytes::chr($ord);
     my $rc = from_to($str,$enc_as,$enc_eb);
     $rc += from_to($str,$enc_eb,$enc_as);
     ok($rc,2,"return code for $ord $enc_eb -> $enc_as -> $enc_eb was not obtained");
-    ok($ord,ord($str),"$enc_as mangled translating $ord to $enc_eb and back");
+    ok($ord,bytes::ord($str),"$enc_as mangled translating $ord to $enc_eb and back");
    }
  }
 
@@ -128,19 +131,6 @@ for my $i (ord('A'),128,256,0x20AC)
   ok(decode('utf8',$o),$c,"utf8 decode by name broken for $i");
  }
 
-
-# is_utf8
-
-ok(  is_utf8("\x{100}"));
-ok(! is_utf8("a"));
-ok(! is_utf8(""));
-"\x{100}" =~ /(.)/;
-ok(  is_utf8($1)); # ID 20011127.151
-$a = $1;
-ok(  is_utf8($a));
-$a = "\x{100}";
-chop $a;
-ok(  is_utf8($a)); # weird but true: an empty UTF-8 string
 
 # non-string arguments
 package Encode::Dummy;

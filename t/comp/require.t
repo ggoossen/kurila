@@ -11,7 +11,7 @@ $i = 1;
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
 my $Is_UTF8   = (${^OPEN} || "") =~ /:utf8/;
-my $total_tests = 46;
+my $total_tests = 43;
 if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
 
@@ -87,6 +87,7 @@ print "not " unless 5.5.1 gt v5.5;
 print "ok ",$i++,"\n";
 
 {
+    use utf8;
     print "not " unless v5.5.640 eq "\x{5}\x{5}\x{280}";
     print "ok ",$i++,"\n";
 
@@ -198,27 +199,6 @@ if ($@ =~ /^This is an expected error/) {
 } else {
     print "not ok $i\n";
 }
-
-##########################################
-# What follows are UTF-8 specific tests. #
-# Add generic tests before this point.   #
-##########################################
-
-# UTF-encoded things - skipped on EBCDIC machines and on UTF-8 input
-
-if ($Is_EBCDIC || $Is_UTF8) { exit; }
-
-my $utf8 = chr(0xFEFF);
-
-$i++; do_require(qq(${utf8}print "ok $i\n"; 1;\n));
-
-sub bytes_to_utf16 {
-    my $utf16 = pack("$_[0]*", unpack("C*", $_[1]));
-    return @_ == 3 && $_[2] ? pack("$_[0]", 0xFEFF) . $utf16 : $utf16;
-}
-
-$i++; do_require(bytes_to_utf16('n', qq(print "ok $i\\n"; 1;\n), 1)); # BE
-$i++; do_require(bytes_to_utf16('v', qq(print "ok $i\\n"; 1;\n), 1)); # LE
 
 END {
     1 while unlink 'bleah.pm';

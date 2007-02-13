@@ -16,6 +16,7 @@ BEGIN {
 }
 
 use strict;
+use utf8;
 #use Test::More qw(no_plan);
 use Test::More tests => 44;
 use Encode q(:all);
@@ -47,7 +48,7 @@ for my $i (0x80..0xff){
 }
 
 my $ao = $uo;
-utf8::upgrade($uo);
+utf8::upgrade($uo); # NOOP, $ao and $ue are the same.
 
 my $ascii  = find_encoding('ascii');
 my $utf8   = find_encoding('utf8');
@@ -59,7 +60,7 @@ is($src, $uo, "FB_DEFAULT residue ascii");
 
 $src = $ao;
 $dst = $utf8->decode($src, FB_DEFAULT);
-is($dst, $uf, "FB_DEFAULT utf8");
+is($dst, $uo, "FB_DEFAULT utf8");
 is($src, $ao, "FB_DEFAULT residue utf8");
 
 $src = $uo;
@@ -68,9 +69,9 @@ like($@, qr/does not map to ascii/o, "FB_CROAK ascii");
 is($src, $uo, "FB_CROAK residue ascii");
 
 $src = $ao;
-eval{ $dst = $utf8->decode($src, FB_CROAK) };
-like($@, qr/does not map to Unicode/o, "FB_CROAK utf8");
-is($src, $ao, "FB_CROAK residue utf8");
+$dst = $utf8->decode($src, FB_CROAK);
+is($dst, $uo, "FB_DEFAULT utf8");
+is($src, $ao, "FB_DEFAULT residue utf8");
 
 $src = $nf;
 eval{ $dst = $ascii->encode($src, FB_CROAK) };

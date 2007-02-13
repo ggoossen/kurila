@@ -755,11 +755,7 @@ XS(XS_utf8_is_utf8)
      if (items != 1)
 	  Perl_croak(aTHX_ "Usage: utf8::is_utf8(sv)");
      else {
-	const SV * const sv = ST(0);
-	    if (SvUTF8(sv))
-		XSRETURN_YES;
-	    else
-		XSRETURN_NO;
+	 XSRETURN_NO;
      }
      XSRETURN_EMPTY;
 }
@@ -775,7 +771,7 @@ XS(XS_utf8_valid)
 	SV * const sv = ST(0);
 	STRLEN len;
 	const char * const s = SvPV_const(sv,len);
-	if (!SvUTF8(sv) || is_utf8_string((const U8*)s,len))
+	if (is_utf8_string((const U8*)s,len))
 	    XSRETURN_YES;
 	else
 	    XSRETURN_NO;

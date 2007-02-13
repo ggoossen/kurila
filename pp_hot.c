@@ -1226,7 +1226,7 @@ PP(pp_match)
 		 (PL_tainted && (pm->op_pmflags & PMf_RETAINT)));
     TAINT_NOT;
 
-    RX_MATCH_UTF8_set(rx, DO_UTF8(TARG));
+    RX_MATCH_UTF8_set(rx, IN_CODEPOINTS);
 
     /* PMdf_USED is set after a ?? matches once */
     if (pm->op_pmdynflags & PMdf_USED) {
@@ -1284,8 +1284,8 @@ play_it_again:
 	if (update_minmatch++)
 	    minmatch = had_zerolen;
     }
-    if (rx->extflags & RXf_USE_INTUIT &&
-	DO_UTF8(TARG) == ((rx->extflags & RXf_UTF8) != 0)) {
+
+    if (rx->extflags & RXf_USE_INTUIT) {
 	/* FIXME - can PL_bostr be made const char *?  */
 	PL_bostr = (char *)truebase;
 	s = CALLREG_INTUIT_START(rx, TARG, (char *)s, (char *)strend, r_flags, NULL);
@@ -1332,8 +1332,6 @@ play_it_again:
 		    len < 0 || len > strend - s)
 		    DIE(aTHX_ "panic: pp_match start/end pointers");
 		sv_setpvn(*SP, s, len);
-		if (DO_UTF8(TARG) && is_utf8_string((U8*)s, len))
-		    SvUTF8_on(*SP);
 	    }
 	}
 	if (global) {
@@ -1654,7 +1652,7 @@ Perl_do_readline(pTHX)
 		(void)POPs;		/* Unmatched wildcard?  Chuck it... */
 		continue;
 	    }
-	} else if (SvUTF8(sv)) { /* OP_READLINE, OP_RCATLINE */
+	} else if (PerlIO_isutf8(fp)) { /* OP_READLINE, OP_RCATLINE */
 	     if (ckWARN(WARN_UTF8)) {
 		const U8 * const s = (const U8*)SvPVX_const(sv) + offset;
 		const STRLEN len = SvCUR(sv) - offset;
@@ -1995,8 +1993,6 @@ PP(pp_subst)
     STRLEN len;
     int force_on_match = 0;
     const I32 oldsave = PL_savestack_ix;
-    STRLEN slen;
-    bool doutf8 = FALSE;
 #ifdef PERL_OLD_COPY_ON_WRITE
     bool is_cow;
 #endif
@@ -2048,8 +2044,7 @@ PP(pp_subst)
 	DIE(aTHX_ "panic: pp_subst");
 
     strend = s + len;
-    slen = RX_MATCH_UTF8(rx) ? utf8_length((U8*)s, (U8*)strend) : len;
-    maxiters = 2 * slen + 10;	/* We can match twice at each
+    maxiters = 2 * len + 10;	/* We can match twice at each
 				   position, once with zero-length,
 				   second time with non-zero. */
 
@@ -2086,25 +2081,10 @@ PP(pp_subst)
 
     /* known replacement string? */
     if (dstr) {
-	/* replacement needing upgrading? */
-	if (DO_UTF8(TARG) && !doutf8) {
-	     nsv = sv_newmortal();
-	     SvSetSV(nsv, dstr);
-	     if (PL_encoding)
-		  sv_recode_to_utf8(nsv, PL_encoding);
-	     else
-		  sv_utf8_upgrade(nsv);
-	     c = SvPV_const(nsv, clen);
-	     doutf8 = TRUE;
-	}
-	else {
-	    c = SvPV_const(dstr, clen);
-	    doutf8 = DO_UTF8(dstr);
-	}
+	c = SvPV_const(dstr, clen);
     }
     else {
 	c = NULL;
-	doutf8 = FALSE;
     }
     
     /* can do inplace substitution? */
@@ -2113,8 +2093,7 @@ PP(pp_subst)
 	&& !is_cow
 #endif
 	&& (I32)clen <= rx->minlenret && (once || !(r_flags & REXEC_COPY_STR))
-	&& !(rx->extflags & RXf_LOOKBEHIND_SEEN)
-	&& (!doutf8 || SvUTF8(TARG))) {
+	&& !(rx->extflags & RXf_LOOKBEHIND_SEEN)) {
 	if (!CALLREGEXEC(rx, s, strend, orig, 0, TARG, NULL,
 			 r_flags | REXEC_CHECKED))
 	{
@@ -2214,8 +2193,6 @@ PP(pp_subst)
 	    SPAGAIN;
 	}
 	SvTAINT(TARG);
-	if (doutf8)
-	    SvUTF8_on(TARG);
 	LEAVE_SCOPE(oldsave);
 	RETURN;
     }
@@ -2256,10 +2233,7 @@ PP(pp_subst)
 		strend = s + (strend - m);
 	    }
 	    m = rx->offs[0].start + orig;
-	    if (doutf8 && !SvUTF8(dstr))
-		sv_catpvn_utf8_upgrade(dstr, s, m - s, nsv);
-            else
-		sv_catpvn(dstr, s, m-s);
+	    sv_catpvn(dstr, s, m-s);
 	    s = rx->offs[0].end + orig;
 	    if (clen)
 		sv_catpvn(dstr, c, clen);
@@ -2267,10 +2241,7 @@ PP(pp_subst)
 		break;
 	} while (CALLREGEXEC(rx, s, strend, orig, s == m,
 			     TARG, NULL, r_flags));
-	if (doutf8 && !DO_UTF8(TARG))
-	    sv_catpvn_utf8_upgrade(dstr, s, strend - s, nsv);
-	else
-	    sv_catpvn(dstr, s, strend - s);
+	sv_catpvn(dstr, s, strend - s);
 
 #ifdef PERL_OLD_COPY_ON_WRITE
 	/* The match may make the string COW. If so, brilliant, because that's
@@ -2288,7 +2259,6 @@ PP(pp_subst)
 	SvPV_set(TARG, SvPVX(dstr));
 	SvCUR_set(TARG, SvCUR(dstr));
 	SvLEN_set(TARG, SvLEN(dstr));
-	doutf8 |= DO_UTF8(dstr);
 	SvPV_set(dstr, NULL);
 
 	TAINT_IF(rxtainted & 1);
@@ -2296,8 +2266,6 @@ PP(pp_subst)
 	PUSHs(sv_2mortal(newSViv((I32)iters)));
 
 	(void)SvPOK_only(TARG);
-	if (doutf8)
-	    SvUTF8_on(TARG);
 	TAINT_IF(rxtainted);
 	SvSETMAGIC(TARG);
 	SvTAINT(TARG);

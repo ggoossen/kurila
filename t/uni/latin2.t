@@ -26,14 +26,24 @@ BEGIN {
 
 plan tests => 94;
 
-use encoding "latin2"; # iso 8859-2
+require bytes;
+use encoding "latin1"; # iso 8859-2
 
 # U+00C1, \xC1, \301, LATIN CAPITAL LETTER A WITH ACUTE
 # U+0102, \xC3, \402, LATIN CAPITAL LETTER A WITH BREVE
 # U+00E1, \xE1, \303, LATIN SMALL LETTER A WITH ACUTE
 # U+0103, \xE3, \403, LATIN SMALL LETTER A WITH BREVE
-
-ok("\xC1"    =~ /\xC1/,     '\xC1 to /\xC1/');
+#warn ${^ENCODING}->encode("\xC1");
+use Encode;
+warn bytes::ord(Encode::find_encoding('latin2')->decode("\xC1"));
+warn bytes::length("\xC1");
+warn bytes::length("Á");
+warn "Á";
+warn sprintf('%x', ord( Encode::find_encoding('latin2')->decode("Á")));
+warn sprintf('%x', ord( "Á" ));
+warn sprintf('%x', 193);
+# ok("\xC1"    =~ /\xC1/,     '\xC1 to /\xC1/');
+__END__
 ok("\x{C1}"  =~ /\x{C1}/,   '\x{C1} to /\x{C1}/');
 ok("\xC3"    =~ /\xC3/,     '\xC3 to /\xC3/');
 ok("\x{102}" =~ /\xC3/,     '\x{102} to /\xC3/');

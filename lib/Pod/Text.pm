@@ -27,6 +27,7 @@ package Pod::Text;
 require 5.004;
 
 use strict;
+use utf8;
 use vars qw(@ISA @EXPORT %ESCAPES $VERSION);
 
 use Carp qw(carp croak);
@@ -245,7 +246,8 @@ sub reformat {
 # Output text to the output device.
 sub output {
     my ($self, $text) = @_;
-    $text =~ tr/\240\255/ /d;
+    $text =~ s/\x{a0}/ /g; # non-breaking space
+    $text =~ s/\x{ad}//g; # soft hyphen
     print { $$self{output_fh} } $text;
 }
 

@@ -207,9 +207,6 @@ S_hv_notallowed(pTHX_ int flags, const char *key, I32 klen,
 	/* XXX is this line an error ???:  SV *sv = sv_newmortal(); */
 	sv_usepvn(sv, (char *) key, klen);
     }
-    if (flags & HVhek_UTF8) {
-	SvUTF8_on(sv);
-    }
     Perl_croak(aTHX_ msg, SVfARG(sv));
 }
 
@@ -254,13 +251,9 @@ Perl_hv_store(pTHX_ HV *hv, const char *key, I32 klen_i32, SV *val, U32 hash)
     STRLEN klen;
     int flags;
 
-    if (klen_i32 < 0) {
-	klen = -klen_i32;
-	flags = HVhek_UTF8;
-    } else {
-	klen = klen_i32;
-	flags = 0;
-    }
+    klen = klen_i32;
+    flags = 0;
+
     hek = hv_fetch_common (hv, NULL, key, klen, flags,
 			   (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
     return hek ? &HeVAL(hek) : NULL;
@@ -327,13 +320,9 @@ Perl_hv_exists(pTHX_ HV *hv, const char *key, I32 klen_i32)
     STRLEN klen;
     int flags;
 
-    if (klen_i32 < 0) {
-	klen = -klen_i32;
-	flags = HVhek_UTF8;
-    } else {
-	klen = klen_i32;
-	flags = 0;
-    }
+    klen = klen_i32;
+    flags = 0;
+
     return hv_fetch_common(hv, NULL, key, klen, flags, HV_FETCH_ISEXISTS, 0, 0)
 	? TRUE : FALSE;
 }
@@ -359,13 +348,9 @@ Perl_hv_fetch(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 lval)
     STRLEN klen;
     int flags;
 
-    if (klen_i32 < 0) {
-	klen = -klen_i32;
-	flags = HVhek_UTF8;
-    } else {
-	klen = klen_i32;
-	flags = 0;
-    }
+    klen = klen_i32;
+    flags = 0;
+
     hek = hv_fetch_common (hv, NULL, key, klen, flags,
 			   lval ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE) : HV_FETCH_JUST_SV,
 			   NULL, 0);
@@ -425,7 +410,6 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     HE *entry;
     HE **oentry;
     SV *sv;
-    bool is_utf8;
     int masked_flags;
 
     if (!hv)
@@ -438,9 +422,6 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	    Safefree(key);
 	key = SvPV_const(keysv, klen);
 	flags = 0;
-	is_utf8 = (SvUTF8(keysv) != 0);
-    } else {
-	is_utf8 = ((flags & HVhek_UTF8) ? TRUE : FALSE);
     }
 
     xhv = (XPVHV*)SvANY(hv);
@@ -452,9 +433,6 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		   HV_FETCH_JUST_SV is true.  */
 		if (!keysv) {
 		    keysv = newSVpvn(key, klen);
-		    if (is_utf8) {
-			SvUTF8_on(keysv);
-		    }
 		} else {
 		    keysv = newSVsv(keysv);
 		}
@@ -523,13 +501,8 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		SV * const svret = sv_newmortal();
 		sv = sv_newmortal();
 
-		if (keysv || is_utf8) {
-		    if (!keysv) {
-			keysv = newSVpvn(key, klen);
-			SvUTF8_on(keysv);
-		    } else {
-			keysv = newSVsv(keysv);
-		    }
+		if (keysv) {
+		    keysv = newSVsv(keysv);
 		    mg_copy((SV*)hv, sv, (char *)sv_2mortal(keysv), HEf_SVKEY);
 		} else {
 		    mg_copy((SV*)hv, sv, key, klen);
@@ -549,7 +522,6 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		/* Will need to free this, so set FREEKEY flag.  */
 		key = savepvn(key,klen);
 		key = (const char*)strupr((char*)key);
-		is_utf8 = FALSE;
 		hash = 0;
 		keysv = 0;
 
@@ -566,11 +538,7 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	    hv_magic_check (hv, &needs_copy, &needs_store);
 	    if (needs_copy) {
 		const bool save_taint = PL_tainted;
-		if (keysv || is_utf8) {
-		    if (!keysv) {
-			keysv = newSVpvn(key, klen);
-			SvUTF8_on(keysv);
-		    }
+		if (keysv) {
 		    if (PL_tainting)
 			PL_tainted = SvTAINTED(keysv);
 		    keysv = sv_2mortal(newSVsv(keysv));
@@ -592,7 +560,6 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		    /* Will need to free this, so set FREEKEY flag.  */
 		    key = savepvn(key,klen);
 		    key = (const char*)strupr((char*)key);
-		    is_utf8 = FALSE;
 		    hash = 0;
 		    keysv = 0;
 
@@ -633,20 +600,6 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	}
     }
 
-    if (is_utf8) {
-	char * const keysave = (char *)key;
-	key = (char*)bytes_from_utf8((U8*)key, &klen, &is_utf8);
-        if (is_utf8)
-	    flags |= HVhek_UTF8;
-	else
-	    flags &= ~HVhek_UTF8;
-        if (key != keysave) {
-	    if (flags & HVhek_FREEKEY)
-		Safefree(keysave);
-            flags |= HVhek_WASUTF8 | HVhek_FREEKEY;
-	}
-    }
-
     if (HvREHASH(hv)) {
 	PERL_HASH_INTERNAL(hash, key, klen);
 	/* We don't have a pointer to the hv, so we have to replicate the
@@ -678,8 +631,6 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	if (HeKLEN(entry) != (I32)klen)
 	    continue;
 	if (HeKEY(entry) != key && memNE(HeKEY(entry),key,klen))	/* is this it? */
-	    continue;
-	if ((HeKFLAGS(entry) ^ masked_flags) & HVhek_UTF8)
 	    continue;
 
         if (action & (HV_FETCH_LVALUE|HV_FETCH_ISSTORE)) {
@@ -918,13 +869,9 @@ Perl_hv_delete(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 flags)
     STRLEN klen;
     int k_flags;
 
-    if (klen_i32 < 0) {
-	klen = -klen_i32;
-	k_flags = HVhek_UTF8;
-    } else {
-	klen = klen_i32;
-	k_flags = 0;
-    }
+    klen = klen_i32;
+    k_flags = 0;
+
     return hv_delete_common(hv, NULL, key, klen, k_flags, flags, 0);
 }
 
@@ -955,7 +902,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     register HE *entry;
     register HE **oentry;
     HE *const *first_entry;
-    bool is_utf8;
     int masked_flags;
 
     if (!hv)
@@ -968,9 +914,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	    Safefree(key);
 	key = SvPV_const(keysv, klen);
 	k_flags = 0;
-	is_utf8 = (SvUTF8(keysv) != 0);
-    } else {
-	is_utf8 = ((k_flags & HVhek_UTF8) ? TRUE : FALSE);
     }
 
     if (SvRMAGICAL(hv)) {
@@ -1004,7 +947,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 			Safefree(key);
 		    }
 		    key = strupr(SvPVX(keysv));
-		    is_utf8 = 0;
 		    k_flags = 0;
 		    hash = 0;
 		}
@@ -1015,25 +957,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     xhv = (XPVHV*)SvANY(hv);
     if (!HvARRAY(hv))
 	return NULL;
-
-    if (is_utf8) {
-	const char * const keysave = key;
-	key = (char*)bytes_from_utf8((U8*)key, &klen, &is_utf8);
-
-        if (is_utf8)
-            k_flags |= HVhek_UTF8;
-	else
-            k_flags &= ~HVhek_UTF8;
-        if (key != keysave) {
-	    if (k_flags & HVhek_FREEKEY) {
-		/* This shouldn't happen if our caller does what we expect,
-		   but strictly the API allows it.  */
-		Safefree(keysave);
-	    }
-	    k_flags |= HVhek_WASUTF8 | HVhek_FREEKEY;
-	}
-        HvHASKFLAGS_on((SV*)hv);
-    }
 
     if (HvREHASH(hv)) {
 	PERL_HASH_INTERNAL(hash, key, klen);
@@ -1056,8 +979,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	if (HeKLEN(entry) != (I32)klen)
 	    continue;
 	if (HeKEY(entry) != key && memNE(HeKEY(entry),key,klen))	/* is this it? */
-	    continue;
-	if ((HeKFLAGS(entry) ^ masked_flags) & HVhek_UTF8)
 	    continue;
 
 	if (hv == PL_strtab) {
@@ -2305,9 +2226,7 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
     HE *entry;
     register HE **oentry;
     HE **first;
-    bool is_utf8 = FALSE;
     int k_flags = 0;
-    const char * const save = str;
     struct shared_he *he = NULL;
 
     if (hek) {
@@ -2329,16 +2248,6 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
 	UNLOCK_STRTAB_MUTEX;
 
         hash = HEK_HASH(hek);
-    } else if (len < 0) {
-        STRLEN tmplen = -len;
-        is_utf8 = TRUE;
-        /* See the note in hv_fetch(). --jhi */
-        str = (char*)bytes_from_utf8((U8*)str, &tmplen, &is_utf8);
-        len = tmplen;
-        if (is_utf8)
-            k_flags = HVhek_UTF8;
-        if (str != save)
-            k_flags |= HVhek_WASUTF8 | HVhek_FREEKEY;
     }
 
     /* what follows was the moral equivalent of:
@@ -2389,7 +2298,7 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
                     "Attempt to free non-existent shared string '%s'%s"
                     pTHX__FORMAT,
                     hek ? HEK_KEY(hek) : str,
-                    ((k_flags & HVhek_UTF8) ? " (utf8)" : "") pTHX__VALUE);
+                    ("") pTHX__VALUE);
     if (k_flags & HVhek_FREEKEY)
 	Safefree(str);
 }
@@ -2401,26 +2310,7 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
 HEK *
 Perl_share_hek(pTHX_ const char *str, I32 len, register U32 hash)
 {
-    bool is_utf8 = FALSE;
     int flags = 0;
-    const char * const save = str;
-
-    if (len < 0) {
-      STRLEN tmplen = -len;
-      is_utf8 = TRUE;
-      /* See the note in hv_fetch(). --jhi */
-      str = (char*)bytes_from_utf8((U8*)str, &tmplen, &is_utf8);
-      len = tmplen;
-      /* If we were able to downgrade here, then than means that we were passed
-         in a key which only had chars 0-255, but was utf8 encoded.  */
-      if (is_utf8)
-          flags = HVhek_UTF8;
-      /* If we found we were able to downgrade the string to bytes, then
-         we should flag that it needs upgrading on keys or each.  Also flag
-         that we need share_hek_flags to free the string.  */
-      if (str != save)
-          flags |= HVhek_WASUTF8 | HVhek_FREEKEY;
-    }
 
     return share_hek_flags (str, len, hash, flags);
 }
@@ -2659,7 +2549,6 @@ Perl_refcounted_he_chain_2hv(pTHX_ const struct refcounted_he *chain)
 		if (HeKEY_hek(entry) == chain->refcounted_he_hek)
 		    goto next_please;
 		if (HeKLEN(entry) == HEK_LEN(chain->refcounted_he_hek)
-		    && HeKUTF8(entry) == HEK_UTF8(chain->refcounted_he_hek)
 		    && memEQ(HeKEY(entry), HEK_KEY(chain->refcounted_he_hek),
 			     HeKLEN(entry)))
 		    goto next_please;
@@ -2674,8 +2563,7 @@ Perl_refcounted_he_chain_2hv(pTHX_ const struct refcounted_he *chain)
 	    = share_hek_flags(REF_HE_KEY(chain),
 			      chain->refcounted_he_keylen,
 			      chain->refcounted_he_hash,
-			      (chain->refcounted_he_data[0]
-			       & (HVhek_UTF8|HVhek_WASUTF8)));
+			      0);
 #else
 	HeKEY_hek(entry) = share_hek_hek(chain->refcounted_he_hek);
 #endif
@@ -2720,16 +2608,12 @@ Perl_refcounted_he_fetch(pTHX_ const struct refcounted_he *chain, SV *keysv,
     /* Just to be awkward, if you're using this interface the UTF-8-or-not-ness
        of your key has to exactly match that which is stored.  */
     SV *value = &PL_sv_placeholder;
-    bool is_utf8;
 
     if (keysv) {
 	if (flags & HVhek_FREEKEY)
 	    Safefree(key);
 	key = SvPV_const(keysv, klen);
 	flags = 0;
-	is_utf8 = (SvUTF8(keysv) != 0);
-    } else {
-	is_utf8 = ((flags & HVhek_UTF8) ? TRUE : FALSE);
     }
 
     if (!hash) {
@@ -2748,16 +2632,12 @@ Perl_refcounted_he_fetch(pTHX_ const struct refcounted_he *chain, SV *keysv,
 	    continue;
 	if (memNE(REF_HE_KEY(chain),key,klen))
 	    continue;
-	if (!!is_utf8 != !!(chain->refcounted_he_data[0] & HVhek_UTF8))
-	    continue;
 #else
 	if (hash != HEK_HASH(chain->refcounted_he_hek))
 	    continue;
 	if (klen != (STRLEN)HEK_LEN(chain->refcounted_he_hek))
 	    continue;
 	if (memNE(HEK_KEY(chain->refcounted_he_hek),key,klen))
-	    continue;
-	if (!!is_utf8 != !!HEK_UTF8(chain->refcounted_he_hek))
 	    continue;
 #endif
 
@@ -2794,7 +2674,6 @@ Perl_refcounted_he_new(pTHX_ struct refcounted_he *const parent,
     char flags;
     STRLEN key_offset;
     U32 hash;
-    bool is_utf8 = SvUTF8(key) ? TRUE : FALSE;
 
     if (SvPOK(value)) {
 	value_type = HVrhek_PV;
@@ -2833,10 +2712,6 @@ Perl_refcounted_he_new(pTHX_ struct refcounted_he *const parent,
     if (value_type == HVrhek_PV) {
 	Copy(value_p, he->refcounted_he_data + 1, value_len + 1, char);
 	he->refcounted_he_val.refcounted_he_u_len = value_len;
-	/* Do it this way so that the SvUTF8() test is after the SvPV, in case
-	   the value is overloaded, and doesn't yet have the UTF-8flag set.  */
-	if (SvUTF8(value))
-	    value_type = HVrhek_PV_UTF8;
     } else if (value_type == HVrhek_IV) {
 	if (SvUOK(value)) {
 	    he->refcounted_he_val.refcounted_he_u_uv = SvUVX(value);
@@ -2847,13 +2722,6 @@ Perl_refcounted_he_new(pTHX_ struct refcounted_he *const parent,
     }
     flags = value_type;
 
-    if (is_utf8) {
-	/* Hash keys are always stored normalised to (yes) ISO-8859-1.
-	   As we're going to be building hash keys from this value in future,
-	   normalise it now.  */
-	key_p = (char*)bytes_from_utf8((const U8*)key_p, &key_len, &is_utf8);
-	flags |= is_utf8 ? HVhek_UTF8 : HVhek_WASUTF8;
-    }
     PERL_HASH(hash, key_p, key_len);
 
 #ifdef USE_ITHREADS
@@ -2863,12 +2731,6 @@ Perl_refcounted_he_new(pTHX_ struct refcounted_he *const parent,
 #else
     he->refcounted_he_hek = share_hek_flags(key_p, key_len, hash, flags);
 #endif
-
-    if (flags & HVhek_WASUTF8) {
-	/* If it was downgraded from UTF-8, then the pointer returned from
-	   bytes_from_utf8 is an allocated pointer that we must free.  */
-	Safefree(key_p);
-    }
 
     he->refcounted_he_data[0] = flags;
     he->refcounted_he_refcnt = 1;
@@ -2945,16 +2807,7 @@ Perl_hv_assert(pTHX_ HV *hv)
 	/* sanity check the keys */
 	if (HeSVKEY(entry)) {
 	    NOOP;   /* Don't know what to check on SV keys.  */
-	} else if (HeKUTF8(entry)) {
-	    withflags++;
-	    if (HeKWASUTF8(entry)) {
-		PerlIO_printf(Perl_debug_log,
-			    "hash key has both WASUTF8 and UTF8: '%.*s'\n",
-			    (int) HeKLEN(entry),  HeKEY(entry));
-		bad = 1;
-	    }
-	} else if (HeKWASUTF8(entry))
-	    withflags++;
+	} 
     }
     if (!SvTIED_mg((SV*)hv, PERL_MAGIC_tied)) {
 	static const char bad_count[] = "Count %d %s(s), but hash reports %d\n";

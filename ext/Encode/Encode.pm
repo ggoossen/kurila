@@ -187,19 +187,16 @@ sub from_to($$$;$) {
 
 sub encode_utf8($) {
     my ($str) = @_;
-    utf8::encode($str);
     return $str;
 }
 
 sub decode_utf8($;$) {
     my ( $str, $check ) = @_;
-    return $str if is_utf8($str);
     if ($check) {
         return decode( "utf8", $str, $check );
     }
     else {
         return decode( "utf8", $str );
-        return $str;
     }
 }
 
@@ -275,6 +272,7 @@ sub predefine_encodings {
         else {
             Encode::DEBUG and warn __PACKAGE__, " XS off";
             *decode = sub {
+                warn "decode_utf8";
                 my ( $obj, $octets, $chk ) = @_;
                 my $str = Encode::decode_utf8($octets);
                 if ( defined $str ) {

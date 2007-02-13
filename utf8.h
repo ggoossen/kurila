@@ -10,11 +10,7 @@
 /* Use UTF-8 as the default script encoding?
  * Turning this on will break scripts having non-UTF-8 binary
  * data (such as Latin-1) in string literals. */
-#ifdef USE_UTF8_SCRIPTS
-#    define USE_UTF8_IN_NAMES (!IN_BYTES)
-#else
-#    define USE_UTF8_IN_NAMES (PL_hints & HINT_UTF8)
-#endif
+#define USE_UTF8_IN_NAMES (!IN_BYTES)
 
 /* Source backward compatibility. */
 #define uvuni_to_utf8(d, uv)		uvuni_to_utf8_flags(d, uv, 0)
@@ -59,8 +55,7 @@ END_EXTERN_C
 #define UNI_TO_NATIVE(ch)        (ch)
 #define NATIVE_TO_UNI(ch)        (ch)
 /* Transforms in invariant space */
-#define NATIVE_TO_NEED(enc,ch)   (ch)
-#define ASCII_TO_NEED(enc,ch)    (ch)
+#define ASCII_TO_UNI(ch)    (ch)
 
 /* As there are no translations avoid the function wrapper */
 #define utf8n_to_uvchr utf8n_to_uvuni
@@ -189,7 +184,8 @@ encoded character.
 #define UTF8_MAXBYTES_CASE	6
 
 #define IN_BYTES (CopHINTS_get(PL_curcop) & HINT_BYTES)
-#define DO_UTF8(sv) (SvUTF8(sv) && !IN_BYTES)
+#define IN_CODEPOINTS (CopHINTS_get(PL_curcop) & HINT_CODEPOINTS)
+#define DO_UTF8(sv) (IN_CODEPOINTS)
 
 #define UTF8_ALLOW_EMPTY		0x0001
 #define UTF8_ALLOW_CONTINUATION		0x0002

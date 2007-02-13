@@ -7,6 +7,8 @@ BEGIN {
 
 plan tests => 20;
 
+use utf8;
+
 my $a = chr(0x100);
 
 is(ord($a), 0x100, "ord sanity check");

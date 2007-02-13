@@ -1133,7 +1133,6 @@ static SV *retrieve_double(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_byte(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_netint(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_scalar(pTHX_ stcxt_t *cxt, const char *cname);
-static SV *retrieve_utf8str(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_array(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_hash(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_scalar(pTHX_ stcxt_t *cxt, const char *cname);
@@ -1214,7 +1213,7 @@ static const sv_retrieve_t sv_retrieve[] = {
 	(sv_retrieve_t)retrieve_overloaded,	/* SX_OVERLOAD */
 	(sv_retrieve_t)retrieve_tied_key,	/* SX_TIED_KEY */
 	(sv_retrieve_t)retrieve_tied_idx,	/* SX_TIED_IDX */
-	(sv_retrieve_t)retrieve_utf8str,	/* SX_UTF8STR  */
+	(sv_retrieve_t)retrieve_scalar, 	/* SX_UTF8STR */
 	(sv_retrieve_t)retrieve_lutf8str,	/* SX_LUTF8STR */
 	(sv_retrieve_t)retrieve_flag_hash,	/* SX_HASH */
 	(sv_retrieve_t)retrieve_code,		/* SX_CODE */
@@ -2544,12 +2543,6 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
                             flags |= SHV_K_ISSV;
                         } else {
                             /* Regular string key. */
-#ifdef HAS_HASH_KEY_FLAGS
-                            if (HEK_UTF8(hek))
-                                flags |= SHV_K_UTF8;
-                            if (HEK_WASUTF8(hek))
-                                flags |= SHV_K_WASUTF8;
-#endif
                             key = HEK_KEY(hek);
                         }
 			/*
@@ -4888,35 +4881,6 @@ static SV *retrieve_scalar(pTHX_ stcxt_t *cxt, const char *cname)
 }
 
 /*
- * retrieve_utf8str
- *
- * Like retrieve_scalar(), but tag result as utf8.
- * If we're retrieving UTF8 data in a non-UTF8 perl, croaks.
- */
-static SV *retrieve_utf8str(pTHX_ stcxt_t *cxt, const char *cname)
-{
-    SV *sv;
-
-    TRACEME(("retrieve_utf8str"));
-
-    sv = retrieve_scalar(aTHX_ cxt, cname);
-    if (sv) {
-#ifdef HAS_UTF8_SCALARS
-        SvUTF8_on(sv);
-#else
-        if (cxt->use_bytes < 0)
-            cxt->use_bytes
-                = (SvTRUE(perl_get_sv("Storable::drop_utf8", TRUE))
-                   ? 1 : 0);
-        if (cxt->use_bytes == 0)
-            UTF8_CROAK();
-#endif
-    }
-
-    return sv;
-}
-
-/*
  * retrieve_lutf8str
  *
  * Like retrieve_lscalar(), but tag result as utf8.
@@ -5330,21 +5294,12 @@ static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname)
 		store_flags |= HVhek_PLACEHOLD;
 	    }
             if (flags & SHV_K_UTF8) {
-#ifdef HAS_UTF8_HASHES
-                store_flags |= HVhek_UTF8;
-#else
-                if (cxt->use_bytes < 0)
-                    cxt->use_bytes
-                        = (SvTRUE(perl_get_sv("Storable::drop_utf8", TRUE))
-                           ? 1 : 0);
-                if (cxt->use_bytes == 0)
-                    UTF8_CROAK();
-#endif
+                /* drop UTF8 flag */
             }
-#ifdef HAS_UTF8_HASHES
-            if (flags & SHV_K_WASUTF8)
-		store_flags |= HVhek_WASUTF8;
-#endif
+            if (flags & SHV_K_WASUTF8) {
+                /* UTF8 converted back to latin1 ?! */
+                CROAK(("WASUTF8 flag not supported"));
+            }
 
             RLEN(size);						/* Get key size */
             KBUFCHK((STRLEN)size);				/* Grow hash key read pool if needed */

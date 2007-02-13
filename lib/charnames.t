@@ -17,6 +17,8 @@ $| = 1;
 
 print "1..78\n";
 
+use utf8;
+
 use charnames ':full';
 
 print "not " unless "Here\N{EXCLAMATION MARK}?" eq "Here!?";
@@ -89,7 +91,7 @@ sub to_bytes {
     print "ok 9\n";
     print "not " unless sprintf("%vx", "\N{WHITE SMILING FACE}") eq "263a";
     print "ok 10\n";
-    print "not " unless sprintf("%vx", "\xFF\N{WHITE SMILING FACE}") eq "ff.263a";
+    print "not " unless sprintf("%vx", "\x{FF}\N{WHITE SMILING FACE}") eq "ff.263a";
     print "ok 11\n";
     print "not " unless sprintf("%vx", "\x{ff}\N{WHITE SMILING FACE}") eq "ff.263a";
     print "ok 12\n";
@@ -129,7 +131,7 @@ sub to_bytes {
   if (ord("Ä") == 0xc4) { # Try to do this only on Latin-1.
       use charnames ':full';
       my $text = "\N{LATIN CAPITAL LETTER A WITH DIAERESIS}";
-      print "not " unless $text eq "\xc4" && ord($text) == 0xc4;
+      print "not " unless $text eq "\x{c4}" && utf8::ord($text) == 0xc4;
       print "ok 16\n";
   } else {
       print "ok 16 # Skip: not Latin-1\n";

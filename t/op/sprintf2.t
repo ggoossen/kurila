@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 1292;
 
+use utf8;
+
 is(
     sprintf("%.40g ",0.01),
     sprintf("%.40g", 0.01)." ",

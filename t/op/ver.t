@@ -11,7 +11,9 @@ $DOWARN = 1; # enable run-time warnings now
 use Config;
 
 require "test.pl";
-plan( tests => 53 );
+plan( tests => 51 );
+
+use utf8;
 
 eval 'use v5.5.640';
 is( $@, '', "use v5.5.640; $@");
@@ -165,7 +167,6 @@ is(sprintf("%vd", join("", map { chr }
     is( "\x{41}",      +v65, 'bug id 20000323.056');
     is( "\x41",        +v65, 'bug id 20000323.056');
     is( "\x{c8}",     +v200, 'bug id 20000323.056');
-    is( "\xc8",       +v200, 'bug id 20000323.056');
     is( "\x{221b}",  +v8731, 'bug id 20000323.056');
 }
 
@@ -184,13 +185,6 @@ eval { require Socket; gethostbyaddr(v127.0.0.1, &Socket::AF_INET) };
 if ($@) {
     # No - so do not test insane fails.
     $@ =~ s/\n/\n# /g;
-}
-SKIP: {
-    skip("No Socket::AF_INET # $@") if $@;
-    my $ip   = v2004.148.0.1;
-    my $host;
-    eval { $host = gethostbyaddr($ip,&Socket::AF_INET) };
-    like($@, qr/Wide character/, "Non-bytes leak to gethostbyaddr");
 }
 
 # Chapter 28, pp671

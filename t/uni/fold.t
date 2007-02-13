@@ -5,6 +5,8 @@ BEGIN {
 
 use File::Spec;
 
+use utf8;
+
 my $CF = File::Spec->catfile(File::Spec->catdir(File::Spec->updir,
 					       "lib", "unicore"),
 			    "CaseFolding.txt");

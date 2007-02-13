@@ -6,6 +6,8 @@ our $VERSION = '1.05';
 
 use bytes ();		# for $bytes::hint_bits
 
+use utf8;
+
 my %alias1 = (
 		# Icky 3.2 names with parentheses.
 		'LINE FEED'		=> 'LINE FEED (LF)',

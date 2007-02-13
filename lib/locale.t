@@ -13,6 +13,7 @@ BEGIN {
 }
 
 use strict;
+use utf8;
 
 my $debug = 1;
 
@@ -60,7 +61,7 @@ sub ok {
     my ($n, $result) = @_;
 
     print 'not ' unless ($result);
-    print "ok $n\n";
+    print "ok $n # line " . (caller(1))[2] . "\n";
 }
 
 # First we'll do a lot of taint checking for locales.

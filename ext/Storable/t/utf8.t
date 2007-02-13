@@ -29,9 +29,11 @@ sub BEGIN {
 use strict;
 sub ok;
 
+use utf8;
+
 use Storable qw(thaw freeze);
 
-print "1..6\n";
+print "1..5\n";
 
 my $x = chr(1234);
 ok 1, $x eq ${thaw freeze \$x};
@@ -56,8 +58,3 @@ $data .= chr 256;
 chop $data;
 ok 5, $x eq ${thaw $data};
 
-
-$data .= chr 256;
-# This definately isn't valid
-eval {thaw $data};
-ok 6, $@ =~ /corrupt.*characters outside/;

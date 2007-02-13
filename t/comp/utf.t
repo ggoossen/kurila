@@ -20,19 +20,23 @@ BEGIN {
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 15);
+plan(tests => 18);
 
-my $BOM = chr(0xFEFF);
+my $BOM = "\xFE\xFF";
 
 sub test {
     my ($enc, $tag, $bom) = @_;
+  SKIP: {
+    skip "Only utf8 support", 1 if $enc ne "utf8" or $bom;
     open(UTF_PL, ">:raw:encoding($enc)", "utf.pl")
 	or die "utf.pl($enc,$tag,$bom): $!";
     print UTF_PL $BOM if $bom;
     print UTF_PL "$tag\n";
+    print UTF_PL $BOM if $bom;
     close(UTF_PL);
     my $got = do "./utf.pl";
     is($got, $tag);
+  }
 }
 
 test("utf16le",    123,   1);
@@ -51,6 +55,9 @@ test("utf16le",    12345, 0);
 test("utf16be",    123,   0);
 test("utf16be",    1234,  0);
 test("utf16be",    12345, 0);
+test("utf8",       123,   0);
+test("utf8",       1234,  0);
+test("utf8",       12345, 0);
 
 END {
     1 while unlink "utf.pl";

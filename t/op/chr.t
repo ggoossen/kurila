@@ -6,7 +6,7 @@ BEGIN {
     require "test.pl";
 }
 
-plan tests => 34;
+plan tests => 39;
 
 # Note that t/op/ord.t already tests for chr() <-> ord() rountripping.
 
@@ -14,29 +14,52 @@ plan tests => 34;
 
 is(chr(ord("A")), "A");
 
-is(chr(  0), "\x00");
-is(chr(127), "\x7F");
-is(chr(128), "\x80");
-is(chr(255), "\xFF");
-
-is(chr(-0.1), "\x{FFFD}"); # The U+FFFD Unicode replacement character.
-is(chr(-1  ), "\x{FFFD}");
-is(chr(-2  ), "\x{FFFD}");
-is(chr(-3.0), "\x{FFFD}");
 {
-    use bytes; # Backward compatibility.
+    # byte characters
+    use bytes;
+    is(chr(  0), "\x00");
+    is(chr(127), "\x7F");
+    is(chr(128), "\x80");
+    is(chr(255), "\xFF");
+}
+
+{
+    # unicode characters
+    use utf8;
+    is(chr(-0.1), "\x{FFFD}"); # The U+FFFD Unicode replacement character.
+    is(chr(-1  ), "\x{FFFD}");
+    is(chr(-2  ), "\x{FFFD}");
+    is(chr(-3.0), "\x{FFFD}");
+}
+
+{
+    # ASCII characters
+    is chr(0x65), "\x65";
+    my $warn;
+    $SIG{__WARN__} = sub { $warn = shift };
+    is chr(0x80), "\x80";
+    like $warn, qr"chr\(\) ambiguous with highbit without use bytes or use utf8", "highbit warning";
+}
+
+{
+    use bytes;
     is(chr(-0.1), "\x00");
     is(chr(-1  ), "\xFF");
     is(chr(-2  ), "\xFE");
     is(chr(-3.0), "\xFD");
 }
 
-# Check UTF-8 (not UTF-EBCDIC).
-SKIP: {
-    skip "no UTF-8 on EBCDIC", 21 if chr(193) eq 'A';
+{
+    use utf8;
+    is(utf8::chr(0xFF), "\x{FF}");
+    is(bytes::chr(0xFF), "\xFF");
+}
+
+# Check UTF-8
 
 sub hexes {
     no warnings 'utf8'; # avoid surrogate and beyond Unicode warnings
+    use utf8;
     join(" ",map{sprintf"%02x",$_}unpack("C*",chr($_[0])));
 }
 
@@ -62,4 +85,3 @@ sub hexes {
     is(hexes(0x110000), "f4 90 80 80");
     is(hexes(0x1FFFFF), "f7 bf bf bf"); # last four byte encoding
     is(hexes(0x200000), "f8 88 80 80 80");
-}

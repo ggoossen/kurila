@@ -18,7 +18,7 @@ sub ok {
     return $ok;
 }
 
-print "1..29\n";
+print "1..28\n";
 
 ($a, $b, $c) = qw(foo bar);
 
@@ -29,6 +29,7 @@ ok("$c$a$c" eq "foo",    "concatenate undef, fore and aft");
 # Okay, so that wasn't very challenging.  Let's go Unicode.
 
 {
+    use utf8;
     # bug id 20000819.004 
 
     $_ = $dx = "\x{10f2}";
@@ -55,6 +56,8 @@ ok("$c$a$c" eq "foo",    "concatenate undef, fore and aft");
     # bug id 20000901.092
     # test that undef left and right of utf8 results in a valid string
 
+    use utf8;
+
     my $a;
     $a .= "\x{1ff}";
     ok($a eq  "\x{1ff}", "bug id 20000901.092, undef left");
@@ -64,6 +67,7 @@ ok("$c$a$c" eq "foo",    "concatenate undef, fore and aft");
 
 {
     # ID 20001020.006
+    use utf8;
 
     "x" =~ /(.)/; # unset $2
 
@@ -92,16 +96,17 @@ sub beq { use bytes; $_[0] eq $_[1]; }
 
 {
     # concat should not upgrade its arguments.
+    use utf8;
     my($l, $r, $c);
 
-    ($l, $r, $c) = ("\x{101}", "\x{fe}", "\x{101}\x{fe}");
+    ($l, $r, $c) = ("\x{101}", "\xfe", "\x{101}\xfe");
     ok(beq($l.$r, $c), "concat utf8 and byte");
     ok(beq($l, "\x{101}"), "right not changed after concat u+b");
-    ok(beq($r, "\x{fe}"), "left not changed after concat u+b");
+    ok(beq($r, "\xfe"), "left not changed after concat u+b");
 
-    ($l, $r, $c) = ("\x{fe}", "\x{101}", "\x{fe}\x{101}");
+    ($l, $r, $c) = ("\xfe", "\x{101}", "\xfe\x{101}");
     ok(beq($l.$r, $c), "concat byte and utf8");
-    ok(beq($l, "\x{fe}"), "right not changed after concat b+u");
+    ok(beq($l, "\xfe"), "right not changed after concat b+u");
     ok(beq($r, "\x{101}"), "left not changed after concat b+u");
 }
 
@@ -120,6 +125,7 @@ sub beq { use bytes; $_[0] eq $_[1]; }
 
 {
     # [perl #26905] "use bytes" doesn't apply byte semantics to concatenation
+    use utf8;
 
     my $p = "\xB6"; # PILCROW SIGN (ASCII/EBCDIC), 2bytes in UTF-X
     my $u = "\x{100}";
@@ -132,8 +138,8 @@ sub beq { use bytes; $_[0] eq $_[1]; }
     use bytes;
     ok(beq($p.$u, $p.$b), "perl #26905, left eq bytes");
     ok(beq($u.$p, $b.$p), "perl #26905, right eq bytes");
-    ok(!beq($p.$u, $pu),  "perl #26905, left ne unicode");
-    ok(!beq($u.$p, $up),  "perl #26905, right ne unicode");
+    ok(beq($p.$u, $pu),  "perl #26905, left eq unicode");
+    ok(beq($u.$p, $up),  "perl #26905, right eq unicode");
 
     $x1 .= $u;
     $x2 = $p . $u;
@@ -145,10 +151,4 @@ sub beq { use bytes; $_[0] eq $_[1]; }
     ok(beq($y1, $y2), "perl #26905, right, .= vs = . in bytes");
     ok(($x1 eq $x2),  "perl #26905, left,  .= vs = . in chars");
     ok(($y1 eq $y2),  "perl #26905, right, .= vs = . in chars");
-}
-
-{
-    # Concatenation needs to preserve UTF8ness of left oper.
-    my $x = eval"qr/\x{fff}/";
-    ok( ord chop($x .= "\303\277") == 191, "UTF8ness preserved" );
 }

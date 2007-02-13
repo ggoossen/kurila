@@ -144,12 +144,13 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
     /* this will need EBCDICification */
     for (s = src; s < send; s += UTF8SKIP(s)) {
         const UV k = utf8_to_uvchr((U8*)s, NULL);
-
-#ifdef EBCDIC
-	if (!isprint(k) || k > 256) {
-#else
-	if (k > 127) {
-#endif
+       
+        if (k == 0) {
+            /* invalid character escape: \xXX */
+            grow += 2;
+            s += 1;
+            continue;
+        } else if (k > 127) {
             /* 4: \x{} then count the number of hex digits.  */
             grow += 4 + (k <= 0xFF ? 2 : k <= 0xFFF ? 3 : k <= 0xFFFF ? 4 :
 #if UVSIZE == 4
@@ -176,19 +177,21 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
 
         *r++ = '"';
 
-        for (s = src; s < send; s += UTF8SKIP(s)) {
-            const UV k = utf8_to_uvchr((U8*)s, NULL);
+        STRLEN charlen;
+        for (s = src; s < send; s += charlen) {
+            const UV k = utf8_to_uvchr((U8*)s, &charlen);
 
-            if (k == '"' || k == '\\' || k == '$' || k == '@') {
+            if (k == 0) {
+                /* invalid character */
+                r = r + my_sprintf(r, "\\x%02"UVxf"", (U8)*s);
+                charlen = 1;
+                continue;
+            } else if (k == '"' || k == '\\' || k == '$' || k == '@') {
                 *r++ = '\\';
                 *r++ = (char)k;
             }
             else
-#ifdef EBCDIC
-	      if (isprint(k) && k < 256)
-#else
 	      if (k < 0x80)
-#endif
                 *r++ = (char)k;
             else {
                 r = r + my_sprintf(r, "\\x{%"UVxf"}", k);
@@ -704,25 +707,10 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
                    The code is also smaller (22044 vs 22260) because I've been
                    able to pull the common logic out to both sides.  */
                 if (quotekeys || needs_quote(key)) {
-                    if (do_utf8) {
                         STRLEN ocur = SvCUR(retval);
                         nlen = esc_q_utf8(aTHX_ retval, key, klen);
                         nkey = SvPVX(retval) + ocur;
-                    }
-                    else {
-		        nticks = num_q(key, klen);
-			New(0, nkey_buffer, klen+nticks+3, char);
-                        nkey = nkey_buffer;
-			nkey[0] = '\'';
-			if (nticks)
-			    klen += esc_q(nkey+1, key, klen);
-			else
-			    (void)Copy(key, nkey+1, klen, char);
-			nkey[++klen] = '\'';
-			nkey[++klen] = '\0';
-                        nlen = klen;
-                        sv_catpvn(retval, nkey, klen);
-		    }
+                        klen = nlen;
                 }
                 else {
                     nkey = key;
@@ -926,18 +914,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	else {
         integer_came_from_string:
 	    c = SvPV(val, i);
-	    if (DO_UTF8(val))
-	        i += esc_q_utf8(aTHX_ retval, c, i);
-	    else {
-		sv_grow(retval, SvCUR(retval)+3+2*i); /* 3: ""\0 */
-		r = SvPVX(retval) + SvCUR(retval);
-		r[0] = '\'';
-		i += esc_q(r+1, c, i);
-		++i;
-		r[i++] = '\'';
-		r[i] = '\0';
-		SvCUR_set(retval, SvCUR(retval)+i);
-	    }
+            i += esc_q_utf8(aTHX_ retval, c, i);
 	}
     }
 

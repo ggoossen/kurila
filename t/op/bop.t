@@ -15,7 +15,7 @@ BEGIN {
 # If you find tests are failing, please try adding names to tests to track
 # down where the failure is, and supply your new names as a patch.
 # (Just-in-time test naming)
-plan tests => 161;
+plan tests => 136;
 
 # numerics
 ok ((0xdead & 0xbeef) == 0x9ead);
@@ -63,110 +63,17 @@ is (($foo | $bar), ($Aoz x 75 . $zap));
 # ^ does not truncate
 is (($foo ^ $bar), ($Axz x 75 . $zap));
 
-#
-is ("ok \xFF\xFF\n" & "ok 19\n", "ok 19\n");
-is ("ok 20\n" | "ok \0\0\n", "ok 20\n");
-is ("o\000 \0001\000" ^ "\000k\0002\000\n", "ok 21\n");
+# everything using bytes
+is (sprintf("%vd", v801), '204.161');
+is (sprintf("%vd", v4095 & v801), '192.161');
+is (sprintf("%vd", v4095 | v801), '236.191.191');
+is (sprintf("%vd", v4095 ^ v801), '44.30.191');
 
 #
-is ("ok \x{FF}\x{FF}\n" & "ok 22\n", "ok 22\n");
-is ("ok 23\n" | "ok \x{0}\x{0}\n", "ok 23\n");
-is ("o\x{0} \x{0}4\x{0}" ^ "\x{0}k\x{0}2\x{0}\n", "ok 24\n");
-
-#
-is (sprintf("%vd", v4095 & v801), 801);
-is (sprintf("%vd", v4095 | v801), 4095);
-is (sprintf("%vd", v4095 ^ v801), 3294);
-
-#
-is (sprintf("%vd", v4095.801.4095 & v801.4095), '801.801');
-is (sprintf("%vd", v4095.801.4095 | v801.4095), '4095.4095.4095');
-is (sprintf("%vd", v801.4095 ^ v4095.801.4095), '3294.3294.4095');
-#
-is (sprintf("%vd", v120.300 & v200.400), '72.256');
-is (sprintf("%vd", v120.300 | v200.400), '248.444');
-is (sprintf("%vd", v120.300 ^ v200.400), '176.188');
-#
-my $a = v120.300;
-my $b = v200.400;
-$a ^= $b;
-is (sprintf("%vd", $a), '176.188');
-my $a = v120.300;
-my $b = v200.400;
-$a |= $b;
-is (sprintf("%vd", $a), '248.444');
-
-#
-# UTF8 ~ behaviour
+# UTF8 ~ behaviour: ~ always works on bytes
 #
 
-my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
-
-my @not36;
-
-for (0x100...0xFFF) {
-  $a = ~(chr $_);
-  if ($Is_EBCDIC) {
-      push @not36, sprintf("%#03X", $_)
-          if $a ne chr(~$_) or length($a) != 1;
-  }
-  else {
-      push @not36, sprintf("%#03X", $_)
-          if $a ne chr(~$_) or length($a) != 1 or ~$a ne chr($_);
-  }
-}
-is (join (', ', @not36), '');
-
-my @not37;
-
-for my $i (0xEEE...0xF00) {
-  for my $j (0x0..0x120) {
-    $a = ~(chr ($i) . chr $j);
-    if ($Is_EBCDIC) {
-        push @not37, sprintf("%#03X %#03X", $i, $j)
-	    if $a ne chr(~$i).chr(~$j) or
-	       length($a) != 2;
-    }
-    else {
-        push @not37, sprintf("%#03X %#03X", $i, $j)
-	    if $a ne chr(~$i).chr(~$j) or
-	       length($a) != 2 or 
-               ~$a ne chr($i).chr($j);
-    }
-  }
-}
-is (join (', ', @not37), '');
-
-SKIP: {
-  skip "EBCDIC" if $Is_EBCDIC;
-  is (~chr(~0), "\0");
-}
-
-
-my @not39;
-
-for my $i (0x100..0x120) {
-    for my $j (0x100...0x120) {
-	push @not39, sprintf("%#03X %#03X", $i, $j)
-	    if ~(chr($i)|chr($j)) ne (~chr($i)&~chr($j));
-    }
-}
-is (join (', ', @not39), '');
-
-my @not40;
-
-for my $i (0x100..0x120) {
-    for my $j (0x100...0x120) {
-	push @not40, sprintf("%#03X %#03X", $i, $j)
-	    if ~(chr($i)&chr($j)) ne (~chr($i)|~chr($j));
-    }
-}
-is (join (', ', @not40), '');
-
-
-# More variations on 19 and 22.
-is ("ok \xFF\x{FF}\n" & "ok 41\n", "ok 41\n");
-is ("ok \x{FF}\xFF\n" & "ok 42\n", "ok 42\n");
+is ~"\x01\x00", "\xFE\xFF";
 
 # Tests to see if you really can do casts negative floats to unsigned properly
 $neg1 = -1.0;
@@ -318,11 +225,6 @@ is(~~$y, "c");
 is(fetches($y), 1);
 is(stores($y), 0);
 
-$a = "\0\x{100}"; chop($a);
-ok(utf8::is_utf8($a)); # make sure UTF8 flag is still there
-$a = ~$a;
-is($a, "\xFF", "~ works with utf-8");
-
 # [rt.perl.org 33003]
 # This would cause a segfault without malloc wrap
 SKIP: {
@@ -336,95 +238,31 @@ SKIP: {
     $a &= "a";
     ok($a =~ /a+$/, 'ASCII "a" is NUL-terminated');
 
+    use utf8;
     $b = "bb\x{100}";
     $b &= "b";
     ok($b =~ /b+$/, 'Unicode "b" is NUL-terminated');
 }
 
 {
-    $a = chr(0x101) x 0x101;
-    $b = chr(0x0FF) x 0x0FF;
+    $a = "\x01\x01" x 0x101;
+    $b = "\xFF" x 0x100;
 
     $c = $a | $b;
-    is($c, chr(0x1FF) x 0xFF . chr(0x101) x 2);
-
-    $c = $b | $a;
-    is($c, chr(0x1FF) x 0xFF . chr(0x101) x 2);
+    is($c, "\xFF" x 0x100 . "\x01\x01" x 0x81);
+    is( ($a | $b), ($b | $a) );
+    $c = $a; $c |= $b;
+    is( $c, ($a | $b) );
 
     $c = $a & $b;
-    is($c, chr(0x001) x 0x0FF);
-
-    $c = $b & $a;
-    is($c, chr(0x001) x 0x0FF);
+    is($c, "\x01" x 0x100);
+    is( ($a & $b), ($b & $a) );
+    $c = $a; $c ^= $b;
+    is( $c, ($a ^ $b) );
 
     $c = $a ^ $b;
-    is($c, chr(0x1FE) x 0x0FF . chr(0x101) x 2);
-
-    $c = $b ^ $a;
-    is($c, chr(0x1FE) x 0x0FF . chr(0x101) x 2);
-}
-
-{
-    $a = chr(0x101) x 0x101;
-    $b = chr(0x0FF) x 0x0FF;
-
-    $a |= $b;
-    is($a, chr(0x1FF) x 0xFF . chr(0x101) x 2);
-}
-
-{
-    $a = chr(0x101) x 0x101;
-    $b = chr(0x0FF) x 0x0FF;
-
-    $b |= $a;
-    is($b, chr(0x1FF) x 0xFF . chr(0x101) x 2);
-}
-
-{
-    $a = chr(0x101) x 0x101;
-    $b = chr(0x0FF) x 0x0FF;
-
-    $a &= $b;
-    is($a, chr(0x001) x 0x0FF);
-}
-
-{
-    $a = chr(0x101) x 0x101;
-    $b = chr(0x0FF) x 0x0FF;
-
-    $b &= $a;
-    is($b, chr(0x001) x 0x0FF);
-}
-
-{
-    $a = chr(0x101) x 0x101;
-    $b = chr(0x0FF) x 0x0FF;
-
-    $a ^= $b;
-    is($a, chr(0x1FE) x 0x0FF . chr(0x101) x 2);
-}
-
-{
-    $a = chr(0x101) x 0x101;
-    $b = chr(0x0FF) x 0x0FF;
-
-    $b ^= $a;
-    is($b, chr(0x1FE) x 0x0FF . chr(0x101) x 2);
-}
-
-# update to pp_complement() via Coverity
-SKIP: {
-  # UTF-EBCDIC is limited to 0x7fffffff and can't encode ~0.
-  skip "EBCDIC" if $Is_EBCDIC;
-
-  my $str = "\x{10000}\x{800}";
-  # U+10000 is four bytes in UTF-8/UTF-EBCDIC.
-  # U+0800 is three bytes in UTF-8/UTF-EBCDIC.
-
-  no warnings "utf8";
-  { use bytes; $str =~ s/\C\C\z//; }
-
-  # it's really bogus that (~~malformed) is \0.
-  my $ref = "\x{10000}\0";
-  is(~~$str, $ref);
+    is($c, "\xFE" x 0x100 . "\x01\x01" x 0x81);
+    is( ($a ^ $b), ($b ^ $a) );
+    $c = $a; $c ^= $b;
+    is( $c, ($a ^ $b) );
 }

@@ -379,7 +379,6 @@ Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp)
 char *
 Perl_sv_pvbyte(pTHX_ SV *sv)
 {
-    sv_utf8_downgrade(sv, FALSE);
     return sv_pv(sv);
 }
 
@@ -400,7 +399,6 @@ instead.
 char *
 Perl_sv_pvbyten(pTHX_ SV *sv, STRLEN *lp)
 {
-    sv_utf8_downgrade(sv, FALSE);
     return sv_pvn(sv,lp);
 }
 
@@ -411,7 +409,6 @@ Perl_sv_pvbyten(pTHX_ SV *sv, STRLEN *lp)
 char *
 Perl_sv_pvutf8(pTHX_ SV *sv)
 {
-    sv_utf8_upgrade(sv);
     return sv_pv(sv);
 }
 
@@ -432,7 +429,6 @@ instead.
 char *
 Perl_sv_pvutf8n(pTHX_ SV *sv, STRLEN *lp)
 {
-    sv_utf8_upgrade(sv);
     return sv_pvn(sv,lp);
 }
 

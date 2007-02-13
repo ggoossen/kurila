@@ -13,6 +13,8 @@ BEGIN {
 
 require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
 
+use utf8;
+
 plan(tests => 5);
 
 my $io;

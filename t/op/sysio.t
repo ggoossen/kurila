@@ -221,7 +221,7 @@ eval {binmode STDOUT, ":utf8"};
 die $@ if $@ and $@ !~ /^IO layers \(like ':utf8'\) unavailable/;
 
 # y diaresis is \w when UTF8
-$a = chr 255;
+$a = "\xFF";
 
 print $a =~ /\w/ ? "not ok 40\n" : "ok 40\n";
 

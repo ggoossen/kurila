@@ -24,6 +24,7 @@ use Term::Cap;
 
 use strict;
 use vars qw(@ISA $VERSION);
+use utf8;
 
 @ISA = qw(Pod::Text);
 
@@ -114,7 +115,7 @@ sub wrap {
     my $shortchar = $char . "{0,$width}";
     my $longchar = $char . "{$width}";
     while (length > $width) {
-        if (s/^($shortchar)[\ \t]+// || s/^($longchar)//) {
+        if (s/^($shortchar)[\ \t\r\n\f]+// || s/^($longchar)//) {
             $output .= $spaces . $1 . "\n";
         } else {
             last;

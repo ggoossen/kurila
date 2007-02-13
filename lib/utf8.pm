@@ -1,16 +1,26 @@
 package utf8;
 
-$utf8::hint_bits = 0x00800000;
+BEGIN {
+    $utf8::hint_bits = 0x01000000;
+    $bytes::hint_bits = 0x00000008;
+    $utf8::codepoints_hint_bits = 0x00800000;
+
+    $^H |= $utf8::codepoints_hint_bits;
+    $^H &= ~$bytes::hint_bits;
+}
 
 our $VERSION = '1.06';
 
 sub import {
     $^H |= $utf8::hint_bits;
+    $^H |= $utf8::codepoints_hint_bits;
+    $^H &= ~$bytes::hint_bits;
     $enc{caller()} = $_[1] if $_[1];
 }
 
 sub unimport {
     $^H &= ~$utf8::hint_bits;
+    $^H &= ~$utf8::codepoints_hint_bits;
 }
 
 sub AUTOLOAD {
@@ -19,6 +29,13 @@ sub AUTOLOAD {
     require Carp;
     Carp::croak("Undefined subroutine $AUTOLOAD called");
 }
+
+sub length (_);
+sub chr (_);
+sub ord (_);
+sub substr ($$;$$);
+sub index ($$;$);
+sub rindex ($$;$);
 
 1;
 __END__

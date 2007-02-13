@@ -3694,6 +3694,7 @@ Gid_t getegid (void);
 #define PERL_MAGIC_vstring	  'V' /* SV was vstring literal */
 #define PERL_MAGIC_utf8		  'w' /* Cached UTF-8 information */
 #define PERL_MAGIC_substr	  'x' /* substr() lvalue */
+#define PERL_MAGIC_substr_utf8	  'X' /* substr() lvalue with UTF-8 */
 #define PERL_MAGIC_defelem	  'y' /* Shadow "foreach" iterator variable /
 					smart parameter vivification */
 #define PERL_MAGIC_arylen	  '#' /* Array length ($#ary) */
@@ -4327,6 +4328,7 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_nkeys,
     want_vtbl_taint,
     want_vtbl_substr,
+    want_vtbl_substr_utf8,
     want_vtbl_vec,
     want_vtbl_pos,
     want_vtbl_bm,
@@ -4377,6 +4379,7 @@ enum {		/* pass one of these to get_vtbl */
 
 #define HINT_FILETEST_ACCESS	0x00400000 /* filetest pragma */
 #define HINT_UTF8		0x00800000 /* utf8 pragma */
+#define HINT_CODEPOINTS         0x01000000 /* utf8 pragma (for codepoints) */
 
 /* assertions pragma, stored in $^H{assertions} */
 #define HINT_ASSERTING          0x00000001
@@ -4810,6 +4813,18 @@ MGVTBL_SET(
     0,
     0,
     0
+);
+
+MGVTBL_SET(
+    PL_vtbl_substr_utf8,
+    MEMBER_TO_FPTR(Perl_magic_getsubstr),
+    MEMBER_TO_FPTR(Perl_magic_setsubstr),
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 );
 
 MGVTBL_SET(

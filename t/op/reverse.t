@@ -25,6 +25,7 @@ print "ok 2\n";
 {
     # Unicode.
 
+    use utf8;
     my $a = "\x{263A}\x{263A}x\x{263A}y\x{263A}";
     my $b = scalar reverse($a);
     my $c = scalar reverse($b);

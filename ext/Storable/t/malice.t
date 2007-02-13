@@ -43,13 +43,12 @@ $minor_write = $] > 5.005_50 ? 7 : 4;
 
 use Test::More;
 
-# If it's 5.7.3 or later the hash will be stored with flags, which is
-# 2 extra bytes. There are 2 * 2 * 2 tests per byte in the body and header
+# utf8 flags have been removed. There are 2 * 2 * 2 tests per byte in the body and header
 # common to normal and network order serialised objects (hence the 8)
 # There are only 2 * 2 tests per byte in the parts of the header not present
 # for network order, and 2 tests per byte on the 'pst0' "magic number" only
 # present in files, but not in things store()ed to memory
-$fancy = ($] > 5.007 ? 2 : 0);
+$fancy = 0;
 
 plan tests => 372 + length ($byteorder) * 4 + $fancy * 8;
 
@@ -57,12 +56,9 @@ use Storable qw (store retrieve freeze thaw nstore nfreeze);
 require 'testlib.pl';
 use vars '$file';
 
-# The chr 256 is a hack to force the hash to always have the utf8 keys flag
-# set on 5.7.3 and later. Otherwise the test fails if run with -Mutf8 because
-# only there does the hash has the flag on, and hence only there is it stored
-# as a flagged hash, which is 2 bytes longer
-my %hash = (perl => 'rules', chr 256, '');
-delete $hash{chr 256};
+# There is no UTF8 flag anymore
+use bytes;
+my %hash = (perl => 'rules');
 
 sub test_hash {
   my $clone = shift;
@@ -244,7 +240,7 @@ sub test_things {
 
 ok (defined store(\%hash, $file));
 
-my $expected = 20 + length ($file_magic_str) + $other_magic + $fancy;
+my $expected = 20 + bytes::length ($file_magic_str) + $other_magic + $fancy;
 my $length = -s $file;
 
 die "Don't seem to have written file '$file' as I can't get its length: $!"

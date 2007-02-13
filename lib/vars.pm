@@ -7,6 +7,8 @@ our $VERSION = '1.01';
 use warnings::register;
 use strict qw(vars subs);
 
+use utf8;
+
 sub import {
     my $callpack = caller;
     my ($pack, @imports) = @_;

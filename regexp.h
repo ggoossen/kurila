@@ -157,16 +157,18 @@ typedef struct regexp_engine {
 #define RXf_PMf_SINGLELINE	0x00002000 /* /s         */
 #define RXf_PMf_FOLD    	0x00004000 /* /i         */
 #define RXf_PMf_EXTENDED	0x00008000 /* /x         */
-#define RXf_PMf_KEEPCOPY	0x00010000 /* /k         */
+#define RXf_PMf_UTF8            0x00010000 /* /u         */
+#define RXf_PMf_KEEPCOPY	0x00020000 /* /k         */
 /* these flags are transfered from the PMOP->op_pmflags member during compilation */
-#define RXf_PMf_STD_PMMOD	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED)
-#define RXf_PMf_COMPILETIME	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_LOCALE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_KEEPCOPY)
+#define RXf_PMf_STD_PMMOD	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_UTF8)
+#define RXf_PMf_COMPILETIME	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_LOCALE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_KEEPCOPY|RXf_PMf_UTF8)
 
 #define CASE_STD_PMMOD_FLAGS_PARSE_SET(pmfl)                        \
     case IGNORE_PAT_MOD:    *(pmfl) |= RXf_PMf_FOLD;       break;   \
     case MULTILINE_PAT_MOD: *(pmfl) |= RXf_PMf_MULTILINE;  break;   \
     case SINGLE_PAT_MOD:    *(pmfl) |= RXf_PMf_SINGLELINE; break;   \
-    case XTENDED_PAT_MOD:   *(pmfl) |= RXf_PMf_EXTENDED;   break
+    case XTENDED_PAT_MOD:   *(pmfl) |= RXf_PMf_EXTENDED;   break;   \
+    case UTF8_PAT_MOD:      *(pmfl) |= RXf_PMf_UTF8;       break
 
 /* chars and strings used as regex pattern modifiers
  * Singlular is a 'c'har, plural is a "string"
@@ -184,13 +186,14 @@ typedef struct regexp_engine {
 #define SINGLE_PAT_MOD       's'
 #define IGNORE_PAT_MOD       'i'
 #define XTENDED_PAT_MOD      'x'
+#define UTF8_PAT_MOD         'u'
 
 #define ONCE_PAT_MODS        "o"
 #define KEEPCOPY_PAT_MODS    "p"
 #define EXEC_PAT_MODS        "e"
 #define LOOP_PAT_MODS        "gc"
 
-#define STD_PAT_MODS        "msix"
+#define STD_PAT_MODS        "msixu"
 
 #define INT_PAT_MODS    STD_PAT_MODS    KEEPCOPY_PAT_MODS
 
@@ -201,22 +204,22 @@ typedef struct regexp_engine {
 
 
 /* What we have seen */
-#define RXf_LOOKBEHIND_SEEN	0x00020000
-#define RXf_EVAL_SEEN   	0x00040000
-#define RXf_CANY_SEEN   	0x00080000
+#define RXf_LOOKBEHIND_SEEN	0x00040000
+#define RXf_EVAL_SEEN   	0x00080000
+#define RXf_CANY_SEEN   	0x00100000
 
 /* Special */
-#define RXf_NOSCAN      	0x00100000
-#define RXf_CHECK_ALL   	0x00200000
+#define RXf_NOSCAN      	0x00200000
+#define RXf_CHECK_ALL   	0x00400000
 
 /* UTF8 related */
-#define RXf_UTF8        	0x00400000
-#define RXf_MATCH_UTF8  	0x00800000
+#define RXf_UTF8        	0x00800000
+#define RXf_MATCH_UTF8  	0x01000000
 
 /* Intuit related */
-#define RXf_USE_INTUIT_NOML	0x01000000
-#define RXf_USE_INTUIT_ML	0x02000000
-#define RXf_INTUIT_TAIL 	0x04000000
+#define RXf_USE_INTUIT_NOML	0x02000000
+#define RXf_USE_INTUIT_ML	0x04000000
+#define RXf_INTUIT_TAIL 	0x08000000
 /* one bit here */
 #define RXf_USE_INTUIT		(RXf_USE_INTUIT_NOML|RXf_USE_INTUIT_ML)
 

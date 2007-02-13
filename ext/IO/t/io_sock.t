@@ -9,6 +9,8 @@ BEGIN {
 
 use Config;
 
+use utf8;
+
 BEGIN {
     my $can_fork = $Config{d_fork} ||
 		    (($^O eq 'MSWin32' || $^O eq 'NetWare') and

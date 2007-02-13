@@ -167,7 +167,7 @@ cc_opclass(pTHX_ const OP *o)
          * the OP is an SVOP, and the SV is a reference to a swash
          * (i.e., an RV pointing to an HV).
          */
-	return (o->op_private & (OPpTRANS_TO_UTF|OPpTRANS_FROM_UTF))
+	return (o->op_private & (OPpTRANS_UTF8))
 		? OPc_SVOP : OPc_PVOP;
 
     case OA_LOOP:

@@ -173,15 +173,14 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpRUNTIME		64	/* Pattern coming in on the stack */
 
 /* Private for OP_TRANS */
-#define OPpTRANS_FROM_UTF	1
-#define OPpTRANS_TO_UTF		2
+#define OPpTRANS_UTF8	1
 #define OPpTRANS_IDENTICAL	4	/* right side is same as left */
 #define OPpTRANS_SQUASH		8
     /* 16 is used for OPpTARGET_MY */
 #define OPpTRANS_COMPLEMENT	32
 #define OPpTRANS_GROWS		64
 #define OPpTRANS_DELETE		128
-#define OPpTRANS_ALL	(OPpTRANS_FROM_UTF|OPpTRANS_TO_UTF|OPpTRANS_IDENTICAL|OPpTRANS_SQUASH|OPpTRANS_COMPLEMENT|OPpTRANS_GROWS|OPpTRANS_DELETE)
+#define OPpTRANS_ALL	(OPpTRANS_UTF8|OPpTRANS_IDENTICAL|OPpTRANS_SQUASH|OPpTRANS_COMPLEMENT|OPpTRANS_GROWS|OPpTRANS_DELETE)
 
 /* Private for OP_REPEAT */
 #define OPpREPEAT_DOLIST	64	/* List replication. */
@@ -354,9 +353,6 @@ struct pmop {
 #define PMdf_USED	0x01		/* pm has been used once already */
 #define PMdf_TAINTED	0x02		/* pm compiled from tainted pattern */
 #define PMdf_UTF8	0x04		/* pm compiled from utf8 data */
-#define PMdf_DYN_UTF8	0x08
-
-#define PMdf_CMP_UTF8	(PMdf_UTF8|PMdf_DYN_UTF8)
 
 #define PMf_RETAINT	0x0001		/* taint $1 etc. if target tainted */
 #define PMf_ONCE	0x0002		/* use pattern only once per reset */
@@ -373,15 +369,16 @@ struct pmop {
 /* The following flags have exact equivalents in regcomp.h with the prefix RXf_
  * which are stored in the regexp->extflags member.
  */
-#define PMf_LOCALE	0x00800		/* use locale for character types */
-#define PMf_MULTILINE	0x01000		/* assume multiple lines */
-#define PMf_SINGLELINE	0x02000		/* assume single line */
-#define PMf_FOLD	0x04000		/* case insensitivity */
-#define PMf_EXTENDED	0x08000		/* chuck embedded whitespace */
-#define PMf_KEEPCOPY	0x10000		/* copy the string when matching */
+#define PMf_LOCALE	0x0800		/* use locale for character types */
+#define PMf_MULTILINE	0x1000		/* assume multiple lines */
+#define PMf_SINGLELINE	0x2000		/* assume single line */
+#define PMf_FOLD	0x4000		/* case insensitivity */
+#define PMf_EXTENDED	0x8000		/* chuck embedded whitespace */
+#define PMf_UTF8	0x10000		/* unicode characters */
+#define PMf_KEEPCOPY	0x20000		/* copy the string when matching */
 
 /* mask of bits that need to be transfered to re->extflags */
-#define PMf_COMPILETIME	(PMf_MULTILINE|PMf_SINGLELINE|PMf_LOCALE|PMf_FOLD|PMf_EXTENDED|PMf_KEEPCOPY)
+#define PMf_COMPILETIME	(PMf_MULTILINE|PMf_SINGLELINE|PMf_LOCALE|PMf_FOLD|PMf_EXTENDED|PMf_KEEPCOPY|PMf_UTF8)
 
 #ifdef USE_ITHREADS
 

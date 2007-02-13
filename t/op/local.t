@@ -377,6 +377,7 @@ sub f { ok(0 == $[); }
     $h{"\302\240"} = "octects";
     is(scalar keys %h, 2);
     {
+        use utf8;
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
@@ -401,6 +402,7 @@ sub f { ok(0 == $[); }
     $h{"\302\240"} = "octects";
     is(scalar keys %h, 2);
     {
+        use utf8;
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
