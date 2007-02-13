@@ -145,7 +145,7 @@ foreach (keys %u) {
 }
 ok (eq_hash(\%u, \%u2), "copied unicode hash keys correctly?");
 
-$a = "\xe3\x81\x82"; $A = "\x{3042}";
+$a = "\x[e3]\x[81]\x[82]"; $A = "\x{3042}";
 %b = ( $a => "non-utf8");
 %u = ( $A => "utf8");
 
@@ -159,9 +159,9 @@ pass ("change 8056 is thanks to Inaba Hiroto");
 {
     my %u;
     my $u0 = pack("U0U", 0x00FF);
-    my $b0 = "\xC3\xBF";          # 0xCB 0xBF is U+00FF in UTF-8
+    my $b0 = "\x[C3]\x[BF]";          # 0xCB 0xBF is U+00FF in UTF-8
     my $u1 = pack("U0U", 0x0100);
-    my $b1 = "\xC4\x80";          # 0xC4 0x80 is U+0100 in UTF-8
+    my $b1 = "\x[C4]\x[80]";          # 0xC4 0x80 is U+0100 in UTF-8
 
     $u{$u0} = 1;
     $u{$b0} = 2; 

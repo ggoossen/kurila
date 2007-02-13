@@ -2043,7 +2043,7 @@ S_scan_const(pTHX_ char *start)
 	    case 'x':
 		++s;
 		if (*s == '[') {
-		    /* \x[XX] byte insert XX */
+		    /* \x[XX] insert byte XX */
 		    STRLEN len = 2;
 		    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
 		    s++;
@@ -2056,6 +2056,7 @@ S_scan_const(pTHX_ char *start)
 		    continue;
 		}
 		if (*s == '{') {
+			/* \x{XX} insert codepoint XX */
 		    char* const e = strchr(s, '}');
                     I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
                       PERL_SCAN_DISALLOW_PREFIX;
@@ -2063,21 +2064,22 @@ S_scan_const(pTHX_ char *start)
 
                     ++s;
 		    if (!e) {
-			yyerror("Missing right brace on \\x{}");
-			continue;
+				yyerror("Missing right brace on \\x{}");
+				continue;
 		    }
                     len = e - s;
 		    uv = grok_hex(s, &len, &flags, NULL);
 		    s = e + 1;
 		}
 		else {
-		    {
+			/* \xXX insert byte or codepoint depending on IN_CODEPOINTS */
 			STRLEN len = 2;
-                        I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+			I32 flags = PERL_SCAN_DISALLOW_PREFIX;
 			uv = grok_hex(s, &len, &flags, NULL);
 			s += len;
-		        /* *d++ = (char)uv;
-			   continue; */
+			if ( ! IN_CODEPOINTS ) {
+		        *d++ = (char)uv;
+				continue;
 		    }
 		}
 

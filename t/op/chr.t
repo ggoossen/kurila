@@ -52,7 +52,7 @@ is(chr(ord("A")), "A");
 {
     use utf8;
     is(utf8::chr(0xFF), "\x{FF}");
-    is(bytes::chr(0xFF), "\xFF");
+    is(bytes::chr(0xFF), "\x[FF]");
 }
 
 # Check UTF-8
