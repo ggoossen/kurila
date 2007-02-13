@@ -3347,13 +3347,13 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                 minnext = study_chunk(pRExC_state, &nscan, minlenp, &deltanext, 
                     last, &data_fake, stopparen, recursed, NULL, f, depth+1);
                 if (scan->flags) {
-                    if (deltanext) {
+/*                    if (deltanext) {
 			FAIL("Variable length lookbehind not implemented");
                     }
                     else if (minnext > (I32)U8_MAX) {
 			FAIL2("Lookbehind longer than %"UVuf" not implemented", (UV)U8_MAX);
-                    }
-                    scan->flags = (U8)minnext;
+			} */
+                    scan->flags = RNf_IFMATCH_LOOKBEHIND; /* (U8)minnext; */
                 }
                 if (data) {
                     if (data_fake.flags & (SF_HAS_PAR|SF_IN_PAR))
@@ -5540,7 +5540,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 
 	if (paren && (p = strchr(parens, paren))) {
 	    U8 node = ((p - parens) % 2) ? UNLESSM : IFMATCH;
-	    int flag = (p - parens) > 1;
+	    int flag = ((p - parens) > 1) ? RNf_IFMATCH_LOOKBEHIND : 0;
 
 	    if (paren == '>')
 		node = SUSPEND, flag = 0;
@@ -6571,7 +6571,7 @@ tryagain:
 			p++;
 			break;
 		    case 'x':
-			if (*++p == '{') {
+                       if (*++p == '{') {
 			    char* const e = strchr(p, '}');
 	
 			    if (!e) {

@@ -346,6 +346,10 @@ struct regnode_charclass_class {	/* has [[:blah:]] classes */
 #define ANYOF_SPACEL	 ANYOF_SPACE
 #define ANYOF_NSPACEL	 ANYOF_NSPACE
 
+/* Flags for node->flags of IFMATCH */
+
+#define RNf_IFMATCH_LOOKBEHIND 1
+
 /* Utility macros for the bitmap and classes of ANYOF */
 
 #define ANYOF_SIZE		(sizeof(struct regnode_charclass))
