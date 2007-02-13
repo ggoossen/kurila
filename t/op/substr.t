@@ -23,7 +23,7 @@ $SIG{__WARN__} = sub {
 
 require './test.pl';
 
-plan(337);
+plan(340);
 
 $FATAL_MSG = qr/^substr outside of string/;
 
@@ -691,4 +691,14 @@ is($x, "\x{100}\x{200}\xFFb");
     my $x = "abccd";
     substr($x, 0, -1) =~ s/(c)/ord($1)/ge;
     is($x, "ab9999d");
+}
+
+# extended lifetime lvalue
+{
+    my $foo = "bar";
+    is(Devel::Peek::SvREFCNT($foo), 1);
+    my $y = \ substr($foo, -2, 2);
+    is(Devel::Peek::SvREFCNT($foo), 2);
+    undef $y;
+    is(Devel::Peek::SvREFCNT($foo), 1);
 }
