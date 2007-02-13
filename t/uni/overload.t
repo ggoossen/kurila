@@ -7,7 +7,7 @@ BEGIN {
     }
 }
 
-use Test::More tests => 208;
+use Test::More tests => 184;
 
 package UTF8Toggle;
 use strict;
@@ -88,68 +88,6 @@ is ($uc, "\311", "e acute -> E acute");
 $uc = ucfirst $u;
 is (length $uc, 1);
 is ($uc, "\351", "e acute -> E acute");
-
-my $have_setlocale = 0;
-eval {
-    require POSIX;
-    import POSIX ':locale_h';
-    $have_setlocale++;
-};
-
-SKIP: {
-    if (!$have_setlocale) {
-	skip "No setlocale", 24;
-    } elsif (!setlocale(&POSIX::LC_ALL, "en_GB.ISO8859-1")) {
-	skip "Could not setlocale to en_GB.ISO8859-1", 24;
-    } elsif ($^O eq 'dec_osf' || $^O eq 'VMS') {
-	skip "$^O has broken en_GB.ISO8859-1 locale", 24;
-    } else {
-	use locale;
-	my $u = UTF8Toggle->new("\311");
-	my $lc = lc $u;
-	is (length $lc, 1);
-	is ($lc, "\351", "E acute -> e acute");
-	$lc = lc $u;
-	is (length $lc, 1);
-	is ($lc, "\351", "E acute -> e acute");
-	$lc = lc $u;
-	is (length $lc, 1);
-	is ($lc, "\351", "E acute -> e acute");
-
-	$u = UTF8Toggle->new("\351");
-	my $uc = uc $u;
-	is (length $uc, 1);
-	is ($uc, "\311", "e acute -> E acute");
-	$uc = uc $u;
-	is (length $uc, 1);
-	is ($uc, "\311", "e acute -> E acute");
-	$uc = uc $u;
-	is (length $uc, 1);
-	is ($uc, "\311", "e acute -> E acute");
-
-	$u = UTF8Toggle->new("\311");
-	$lc = lcfirst $u;
-	is (length $lc, 1);
-	is ($lc, "\351", "E acute -> e acute");
-	$lc = lcfirst $u;
-	is (length $lc, 1);
-	is ($lc, "\351", "E acute -> e acute");
-	$lc = lcfirst $u;
-	is (length $lc, 1);
-	is ($lc, "\351", "E acute -> e acute");
-
-	$u = UTF8Toggle->new("\351");
-	$uc = ucfirst $u;
-	is (length $uc, 1);
-	is ($uc, "\311", "e acute -> E acute");
-	$uc = ucfirst $u;
-	is (length $uc, 1);
-	is ($uc, "\311", "e acute -> E acute");
-	$uc = ucfirst $u;
-	is (length $uc, 1);
-	is ($uc, "\311", "e acute -> E acute");
-    }
-}
 
 my $tmpfile = 'overload.tmp';
 

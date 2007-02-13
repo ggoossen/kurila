@@ -1912,10 +1912,8 @@ lib/Locale/Maketext/t/50_super.t	See if Locale::Maketext works
 lib/Locale/Maketext/t/60_super.t	See if Locale::Maketext works
 lib/Locale/Maketext/t/90_utf8.t	See if Locale::Maketext works
 lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
-lib/locale.pm			For "use locale"
 lib/Locale/Script.pm		Locale::Codes
 lib/Locale/Script.pod		Locale::Codes documentation
-lib/locale.t			See if locale support works
 lib/Log/Message/Config.pm	Log::Message
 lib/Log/Message/Handlers.pm	Log::Message
 lib/Log/Message/Item.pm	Log::Message
