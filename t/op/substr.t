@@ -23,7 +23,7 @@ $SIG{__WARN__} = sub {
 
 require './test.pl';
 
-plan(334);
+plan(337);
 
 run_tests() unless caller;
 
@@ -681,4 +681,19 @@ is($x, "\x{100}\x{200}\xFFb");
     is(substr($a,1,1), 'b');
 }
 
+{
+    # lvalue ref count
+    use Devel::Peek;
+
+    my $foo = "bar";
+    is(Devel::Peek::SvREFCNT($foo), 1);
+    substr($foo, -2, 2) = "la";
+    is(Devel::Peek::SvREFCNT($foo), 1);
+}
+
+# lvalue with regex and eval
+{
+    my $x = "abccd";
+    substr($x, 0, -1) =~ s/(c)/ord($1)/ge;
+    is($x, "ab9999d");
 }
