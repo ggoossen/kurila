@@ -3019,7 +3019,7 @@ PP(pp_substr)
     else {
 	const I32 upos = pos;
 	const I32 urem = rem;
-	if (utf8_curlen)
+	if (IN_CODEPOINTS)
 	    sv_pos_u2b(sv, &pos, &rem);
 	tmps += pos;
 	/* use a mortal for LVs because they can have an extended lifetime */
@@ -3031,8 +3031,6 @@ PP(pp_substr)
 #ifdef USE_LOCALE_COLLATE
 	sv_unmagic(TARG, PERL_MAGIC_collxfrm);
 #endif
-	if (utf8_curlen)
-	    SvUTF8_on(TARG);
 	if (repl) {
 	    SV* repl_sv_copy = NULL;
 
@@ -3069,10 +3067,11 @@ PP(pp_substr)
 		sv_magic(TARG, NULL, PERL_MAGIC_substr, NULL, 0);
 	    }
 
-	    LvTYPE(TARG) = 'x';
+	    LvTYPE(TARG) = IN_CODEPOINTS ? 'X' : 'x';
 	    LvTARG(TARG) = SvREFCNT_inc_simple(sv);
 	    LvTARGOFF(TARG) = upos;
 	    LvTARGLEN(TARG) = urem;
+
 	}
     }
     SPAGAIN;
