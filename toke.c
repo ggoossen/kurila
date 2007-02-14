@@ -107,27 +107,25 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 
 /* #define LEX_NOTPARSING		11 is done in perl.h. */
 
-#define LEX_NORMAL		10 /* normal code (ie not within "...")     */
-#define LEX_INTERPNORMAL	 9 /* code within a string, eg "$foo[$x+1]" */
-#define LEX_INTERPCASEMOD	 8 /* expecting a \U, \Q or \E etc          */
-#define LEX_INTERPPUSH		 7 /* starting a new sublex parse level     */
-#define LEX_INTERPSTART		 6 /* expecting the start of a $var         */
+#define LEX_NORMAL		 9 /* normal code (ie not within "...")     */
+#define LEX_INTERPNORMAL	 8 /* code within a string, eg "$foo[$x+1]" */
+#define LEX_INTERPCASEMOD	 7 /* expecting a \U, \Q or \E etc          */
+#define LEX_INTERPPUSH		 6 /* starting a new sublex parse level     */
+#define LEX_INTERPSTART		 5 /* expecting the start of a $var         */
 
 				   /* at end of code, eg "$x" followed by:  */
-#define LEX_INTERPEND		 5 /* ... eg not one of [, { or ->          */
-#define LEX_INTERPENDMAYBE	 4 /* ... eg one of [, { or ->              */
+#define LEX_INTERPEND		 4 /* ... eg not one of [, { or ->          */
+#define LEX_INTERPENDMAYBE	 3 /* ... eg one of [, { or ->              */
 
-#define LEX_INTERPCONCAT	 3 /* expecting anything, eg at start of
+#define LEX_INTERPCONCAT	 2 /* expecting anything, eg at start of
 				        string or after \E, $foo, etc       */
-#define LEX_INTERPCONST		 2 /* NOT USED */
-#define LEX_FORMLINE		 1 /* expecting a format line               */
+#define LEX_INTERPCONST		 1 /* NOT USED */
 #define LEX_KNOWNEXT		 0 /* next token known; just return it      */
 
 
 #ifdef DEBUGGING
 static const char* const lex_state_names[] = {
     "KNOWNEXT",
-    "FORMLINE",
     "INTERPCONST",
     "INTERPCONCAT",
     "INTERPENDMAYBE",
@@ -976,8 +974,7 @@ S_skipspace(pTHX_ register char *s)
 	 * of the buffer, we're not reading from a source filter, and
 	 * we're in normal lexing mode
 	 */
-	if (s < PL_bufend || !PL_rsfp || PL_sublex_info.sub_inwhat ||
-		PL_lex_state == LEX_FORMLINE)
+	if (s < PL_bufend || !PL_rsfp || PL_sublex_info.sub_inwhat)
 #ifdef PERL_MAD
 	    goto done;
 #else
@@ -3332,8 +3329,6 @@ Perl_yylex(pTHX)
 	}
 
 	return yylex();
-    case LEX_FORMLINE:
-	Perl_croak(aTHX_ "panic: FORMLINE");
     }
 
     s = PL_bufptr;
