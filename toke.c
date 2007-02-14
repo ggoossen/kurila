@@ -107,26 +107,24 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 
 /* #define LEX_NOTPARSING		11 is done in perl.h. */
 
-#define LEX_NORMAL		 9 /* normal code (ie not within "...")     */
-#define LEX_INTERPNORMAL	 8 /* code within a string, eg "$foo[$x+1]" */
-#define LEX_INTERPCASEMOD	 7 /* expecting a \U, \Q or \E etc          */
-#define LEX_INTERPPUSH		 6 /* starting a new sublex parse level     */
-#define LEX_INTERPSTART		 5 /* expecting the start of a $var         */
+#define LEX_NORMAL		 8 /* normal code (ie not within "...")     */
+#define LEX_INTERPNORMAL	 7 /* code within a string, eg "$foo[$x+1]" */
+#define LEX_INTERPCASEMOD	 6 /* expecting a \U, \Q or \E etc          */
+#define LEX_INTERPPUSH		 5 /* starting a new sublex parse level     */
+#define LEX_INTERPSTART		 4 /* expecting the start of a $var         */
 
 				   /* at end of code, eg "$x" followed by:  */
-#define LEX_INTERPEND		 4 /* ... eg not one of [, { or ->          */
-#define LEX_INTERPENDMAYBE	 3 /* ... eg one of [, { or ->              */
+#define LEX_INTERPEND		 3 /* ... eg not one of [, { or ->          */
+#define LEX_INTERPENDMAYBE	 2 /* ... eg one of [, { or ->              */
 
-#define LEX_INTERPCONCAT	 2 /* expecting anything, eg at start of
+#define LEX_INTERPCONCAT	 1 /* expecting anything, eg at start of
 				        string or after \E, $foo, etc       */
-#define LEX_INTERPCONST		 1 /* NOT USED */
 #define LEX_KNOWNEXT		 0 /* next token known; just return it      */
 
 
 #ifdef DEBUGGING
 static const char* const lex_state_names[] = {
     "KNOWNEXT",
-    "INTERPCONST",
     "INTERPCONCAT",
     "INTERPENDMAYBE",
     "INTERPEND",
