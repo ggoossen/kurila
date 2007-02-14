@@ -1481,7 +1481,6 @@ s	|char*	|force_word	|NN char *start|int token|int check_keyword \
 s	|SV*	|tokeq		|NN SV *sv
 s	|void	|readpipe_override|
 sR	|char*	|scan_const	|NN char *start
-sR	|char*	|scan_formline	|NN char *s
 sR	|char*	|scan_heredoc	|NN char *s
 s	|char*	|scan_ident	|NN char *s|NN const char *send|NN char *dest \
 				|STRLEN destlen|I32 ck_uni

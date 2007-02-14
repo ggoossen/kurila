@@ -6151,11 +6151,7 @@ Found in file sv.c
 =item sv_utf8_decode
 X<sv_utf8_decode>
 
-If the PV of the SV is an octet sequence in UTF-8
-and contains a multiple-byte character, the C<SvUTF8> flag is turned on
-so that it looks like a character. If the PV contains only single-byte
-characters, the C<SvUTF8> flag stays being off.
-Scans PV for validity and returns false if the PV is invalid UTF-8.
+A NOOP
 
 NOTE: this function is experimental and may change or be
 removed without notice.
@@ -6187,8 +6183,7 @@ Found in file sv.c
 =item sv_utf8_encode
 X<sv_utf8_encode>
 
-Converts the PV of an SV to UTF-8, but then turns the C<SvUTF8>
-flag off so that it looks like octets again.
+A NOOP
 
 	void	sv_utf8_encode(SV *sv)
 
@@ -6198,6 +6193,7 @@ Found in file sv.c
 =item sv_utf8_upgrade
 X<sv_utf8_upgrade>
 
+Obsolete function which used to:
 Converts the PV of an SV to its UTF-8-encoded form.
 Forces the SV to string form if it is not already.
 Always sets the SvUTF8 flag to avoid future validity checks even
@@ -6214,6 +6210,7 @@ Found in file sv.c
 =item sv_utf8_upgrade_flags
 X<sv_utf8_upgrade_flags>
 
+Obsolete function which used to:
 Converts the PV of an SV to its UTF-8-encoded form.
 Forces the SV to string form if it is not already.
 Always sets the SvUTF8 flag to avoid future validity checks even

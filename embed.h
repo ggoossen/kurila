@@ -1480,7 +1480,6 @@
 #define tokeq			S_tokeq
 #define readpipe_override	S_readpipe_override
 #define scan_const		S_scan_const
-#define scan_formline		S_scan_formline
 #define scan_heredoc		S_scan_heredoc
 #define scan_ident		S_scan_ident
 #define scan_inputsymbol	S_scan_inputsymbol
@@ -3711,7 +3710,6 @@
 #define tokeq(a)		S_tokeq(aTHX_ a)
 #define readpipe_override()	S_readpipe_override(aTHX)
 #define scan_const(a)		S_scan_const(aTHX_ a)
-#define scan_formline(a)	S_scan_formline(aTHX_ a)
 #define scan_heredoc(a)		S_scan_heredoc(aTHX_ a)
 #define scan_ident(a,b,c,d,e)	S_scan_ident(aTHX_ a,b,c,d,e)
 #define scan_inputsymbol(a)	S_scan_inputsymbol(aTHX_ a)

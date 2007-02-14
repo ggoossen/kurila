@@ -9250,7 +9250,6 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     parser->lex_defer	= proto->lex_defer;
     parser->lex_dojoin	= proto->lex_dojoin;
     parser->lex_expect	= proto->lex_expect;
-    parser->lex_formbrack = proto->lex_formbrack;
     parser->lex_inpat	= proto->lex_inpat;
     parser->lex_inwhat	= proto->lex_inwhat;
     parser->lex_op	= proto->lex_op;

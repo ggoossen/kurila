@@ -3972,10 +3972,6 @@ STATIC char*	S_scan_const(pTHX_ char *start)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-STATIC char*	S_scan_formline(pTHX_ char *s)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-
 STATIC char*	S_scan_heredoc(pTHX_ char *s)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);

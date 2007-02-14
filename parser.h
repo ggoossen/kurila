@@ -45,7 +45,6 @@ typedef struct yy_parser {
     U32		lex_defer;	/* state after determined token */
     I32		lex_dojoin;	/* doing an array interpolation */
     int		lex_expect;	/* expect after determined token */
-    I32		lex_formbrack;	/* bracket count at outer format level */
     OP		*lex_inpat;	/* in pattern $) and $| are special */
     I32		lex_inwhat;	/* what kind of quoting are we in */
     OP		*lex_op;	/* extra info to pass back on op */
