@@ -2,19 +2,21 @@ Check strict vars functionality
 
 __END__
 
-# no strict, should build & run ok.
+# default strict
 Fred ;
 my $fred ;
 $b = "fred" ;
 $a = $$b ;
 EXPECT
-
+Bareword "Fred" not allowed while "strict subs" in use at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 
 use strict qw(subs refs) ;
 $fred ;
 EXPECT
-
+Global symbol "$fred" requires explicit package name at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 
 use strict ;
@@ -101,13 +103,15 @@ $joe = 1 ;
 use strict 'vars' ;
 require "./abc";
 EXPECT
-
+Global symbol "$joe" requires explicit package name at ./abc line 1.
+Compilation failed in require at - line 2.
 ########
 
 --FILE-- abc
 use strict 'vars' ;
 1;
 --FILE-- 
+no strict 'vars';
 require "./abc";
 $joe = 1 ;
 EXPECT
@@ -119,12 +123,13 @@ use strict 'vars' ;
 $joe = 1 ;
 1;
 --FILE-- 
+no strict 'vars';
 $joe = 1 ;
 require "./abc";
 EXPECT
 Variable "$joe" is not imported at ./abc line 2.
 Global symbol "$joe" requires explicit package name at ./abc line 2.
-Compilation failed in require at - line 2.
+Compilation failed in require at - line 3.
 ########
 
 --FILE-- abc.pm
@@ -132,13 +137,14 @@ use strict 'vars' ;
 $joe = 1 ;
 1;
 --FILE-- 
+no strict 'vars';
 $joe = 1 ;
 use abc;
 EXPECT
 Variable "$joe" is not imported at abc.pm line 2.
 Global symbol "$joe" requires explicit package name at abc.pm line 2.
-Compilation failed in require at - line 2.
-BEGIN failed--compilation aborted at - line 2.
+Compilation failed in require at - line 3.
+BEGIN failed--compilation aborted at - line 3.
 ########
 
 --FILE-- abc.pm
@@ -338,6 +344,7 @@ Execution of - aborted due to compilation errors.
 ########
 
 # nested our with local - no error
+no strict 'vars';
 $fred = 1;
 use strict 'vars';
 {

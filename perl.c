@@ -415,6 +415,8 @@ perl_construct(pTHXx)
     PL_curforce = -1;
 #endif
 
+    PL_hints = DEFAULT_HINTS;
+
     ENTER;
 }
 

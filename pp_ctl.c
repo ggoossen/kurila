@@ -3374,7 +3374,7 @@ PP(pp_require)
 
     PL_rsfp = tryrsfp;
     SAVEHINTS();
-    PL_hints = 0;
+    PL_hints = DEFAULT_HINTS;
     SAVECOMPILEWARNINGS();
     if (PL_dowarn & G_WARN_ALL_ON)
         PL_compiling.cop_warnings = pWARN_ALL ;
