@@ -122,7 +122,7 @@ EOE
 	$k2 = $k1;
 	$k3 = chr 256;
 	$k4 = $k3;
-	utf8::upgrade $k2;
+	utf8::encode $k2;
 	utf8::encode $k4;
 
 	$^H{$k1} = 1;

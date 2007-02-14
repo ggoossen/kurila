@@ -800,7 +800,7 @@ GV *
 Perl_gv_fetchsv(pTHX_ SV *name, I32 flags, I32 sv_type) {
     STRLEN len;
     const char * const nambeg = SvPV_const(name, len);
-    return gv_fetchpvn_flags(nambeg, len, flags | SvUTF8(name), sv_type);
+    return gv_fetchpvn_flags(nambeg, len, flags, sv_type);
 }
 
 GV *
@@ -976,8 +976,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		  : sv_type == SVt_PVHV ? "%"
 		  : ""), name);
 	    GV *gv;
-	    if (USE_UTF8_IN_NAMES)
-		SvUTF8_on(err);
 	    qerror(err);
 	    gv = gv_fetchpvn_flags("<none>::", 8, GV_ADDMULTI, SVt_PVHV);
 	    if(!gv) {

@@ -228,10 +228,7 @@ PP(pp_substcont)
 
 	    assert(cx->sb_strend >= s);
 	    if(cx->sb_strend > s) {
-		 if (DO_UTF8(dstr) && !SvUTF8(targ))
-		      sv_catpvn_utf8_upgrade(dstr, s, cx->sb_strend - s, nsv);
-		 else
-		      sv_catpvn(dstr, s, cx->sb_strend - s);
+		sv_catpvn(dstr, s, cx->sb_strend - s);
 	    }
 	    cx->sb_rxtainted |= RX_MATCH_TAINTED(rx);
 
@@ -246,8 +243,6 @@ PP(pp_substcont)
 	    SvPV_set(targ, SvPVX(dstr));
 	    SvCUR_set(targ, SvCUR(dstr));
 	    SvLEN_set(targ, SvLEN(dstr));
-	    if (DO_UTF8(dstr))
-		SvUTF8_on(targ);
 	    SvPV_set(dstr, NULL);
 
 	    TAINT_IF(cx->sb_rxtainted & 1);
@@ -273,10 +268,7 @@ PP(pp_substcont)
     }
     cx->sb_m = m = rx->offs[0].start + orig;
     if (m > s) {
-	if (DO_UTF8(dstr) && !SvUTF8(cx->sb_targ))
-	    sv_catpvn_utf8_upgrade(dstr, s, m - s, nsv);
-	else
-	    sv_catpvn(dstr, s, m-s);
+	sv_catpvn(dstr, s, m-s);
     }
     cx->sb_s = rx->offs[0].end + orig;
     { /* Update the pos() information. */
@@ -4639,9 +4631,6 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	   "If it breaks, you get to keep both parts"
 	   (Your code is broken if you  don't put them back together again
 	   before something notices.) */
-	if (SvUTF8(upstream)) {
-	    SvUTF8_on(cache);
-	}
 	SvCUR_set(upstream, got_len - cached_len);
 	/* Can't yet be EOF  */
 	if (status == 0)

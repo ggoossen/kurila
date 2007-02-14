@@ -92,7 +92,7 @@ for my $ary ([ascii => 'perl'], [latin1 => "\xB6"]) {
     my $down = pack("a*", $ary->[1]);
 
     my $taint = $arg; substr($taint, 0) = $up;
-    utf8::upgrade($taint);
+    utf8::encode($taint);
 
     is($taint, $up, "compare: $encode, upgrade up");
 
@@ -101,7 +101,7 @@ for my $ary ([ascii => 'perl'], [latin1 => "\xB6"]) {
     is(tainted($taint), tainted($arg), "tainted: $encode, upgrade up");
 
     my $taint = $arg; substr($taint, 0) = $down;
-    utf8::upgrade($taint);
+    utf8::encode($taint);
 
     is($taint, $up, "compare: $encode, upgrade down");
 

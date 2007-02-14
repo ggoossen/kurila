@@ -226,16 +226,13 @@ PP(pp_concat)
   dVAR; dSP; dATARGET; tryAMAGICbin(concat,opASSIGN);
   {
     dPOPTOPssrl;
-    bool lbyte;
     STRLEN rlen;
     const char *rpv = NULL;
-    bool rbyte = FALSE;
     bool rcopied = FALSE;
 
     if (TARG == right && right != left) {
 	/* mg_get(right) may happen here ... */
 	rpv = SvPV_const(right, rlen);
-	rbyte = !DO_UTF8(right);
 	right = sv_2mortal(newSVpvn(rpv, rlen));
 	rpv = SvPV_const(right, rlen);	/* no point setting UTF-8 here */
 	rcopied = TRUE;
@@ -244,12 +241,7 @@ PP(pp_concat)
     if (TARG != left) {
         STRLEN llen;
         const char* const lpv = SvPV_const(left, llen);	/* mg_get(left) may happen here */
-	lbyte = !DO_UTF8(left);
 	sv_setpvn(TARG, lpv, llen);
-	if (!lbyte)
-	    SvUTF8_on(TARG);
-	else
-	    SvUTF8_off(TARG);
     }
     else { /* TARG == left */
         STRLEN llen;
@@ -260,25 +252,11 @@ PP(pp_concat)
 	    sv_setpvn(left, "", 0);
 	}
 	(void)SvPV_nomg_const(left, llen);    /* Needed to set UTF8 flag */
-	lbyte = !DO_UTF8(left);
-	if (IN_BYTES)
-	    SvUTF8_off(TARG);
     }
 
     /* or mg_get(right) may happen here */
     if (!rcopied) {
 	rpv = SvPV_const(right, rlen);
-	rbyte = !DO_UTF8(right);
-    }
-    if (lbyte != rbyte) {
-	if (lbyte)
-	    sv_utf8_upgrade_nomg(TARG);
-	else {
-	    if (!rcopied)
-		right = sv_2mortal(newSVpvn(rpv, rlen));
-	    sv_utf8_upgrade_nomg(right);
-	    rpv = SvPV_const(right, rlen);
-	}
     }
     sv_catpvn_nomg(TARG, rpv, rlen);
 
@@ -1762,8 +1740,7 @@ PP(pp_helem)
 		if (!preeminent) {
 		    STRLEN keylen;
 		    const char * const key = SvPV_const(keysv, keylen);
-		    SAVEDELETE(hv, savepvn(key,keylen),
-			       SvUTF8(keysv) ? -(I32)keylen : (I32)keylen);
+		    SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
 		} else
 		    save_helem(hv, keysv, svp);
             }
@@ -2211,8 +2188,6 @@ PP(pp_subst)
 	rxtainted |= RX_MATCH_TAINTED(rx);
 	dstr = newSVpvn(m, s-m);
 	SAVEFREESV(dstr);
-	if (DO_UTF8(TARG))
-	    SvUTF8_on(dstr);
 	PL_curpm = pm;
 	if (!c) {
 	    register PERL_CONTEXT *cx;
@@ -2612,7 +2587,7 @@ PP(pp_entersub)
 		DIE(aTHX_ PL_no_usym, "a subroutine");
 	    if (PL_op->op_private & HINT_STRICT_REFS)
 		DIE(aTHX_ PL_no_symref, sym, "a subroutine");
-	    cv = get_cvn_flags(sym, len, GV_ADD|SvUTF8(sv));
+	    cv = get_cvn_flags(sym, len, GV_ADD);
 	    break;
 	}
   got_rv:

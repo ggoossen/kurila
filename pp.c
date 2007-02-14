@@ -668,7 +668,7 @@ PP(pp_study)
     }
     s = (unsigned char*)(SvPV(sv, len));
     pos = len;
-    if (pos <= 0 || !SvPOK(sv) || SvUTF8(sv)) {
+    if (pos <= 0 || !SvPOK(sv)) {
 	/* No point in studying a zero length string, and not safe to study
 	   anything that doesn't appear to be a simple scalar (and hence might
 	   change between now and when the regexp engine runs without our set
@@ -2954,7 +2954,6 @@ PP(pp_substr)
     bool repl_is_utf8 = FALSE;
 
     SvTAINTED_off(TARG);			/* decontaminate */
-    SvUTF8_off(TARG);				/* decontaminate */
     if (num_args > 2) {
 	if (num_args > 3) {
 	    repl_sv = POPs;
@@ -3041,8 +3040,6 @@ PP(pp_substr)
 		repl_is_utf8 = DO_UTF8(repl_sv_copy) && SvCUR(sv);
 	    }
 	    sv_insert(sv, pos, rem, repl, repl_len);
-	    if (repl_is_utf8)
-		SvUTF8_on(sv);
 	    if (repl_sv_copy)
 		SvREFCNT_dec(repl_sv_copy);
 	}
@@ -3233,7 +3230,6 @@ PP(pp_chr)
 	SvCUR_set(TARG, tmps - SvPVX_const(TARG));
 	*tmps = '\0';
 	(void)SvPOK_only(TARG);
-	SvUTF8_on(TARG);
 	XPUSHs(TARG);
 	RETURN;
     } else if ( ! IN_BYTES ) {
@@ -3479,7 +3475,6 @@ PP(pp_uc)
 	    d += ulen;
 	    s += u;
 	}
-	SvUTF8_on(dest);
 	*d = '\0';
 	SvCUR_set(dest, d - (U8*)SvPVX_const(dest));
     } else {
@@ -3580,7 +3575,6 @@ PP(pp_lc)
 	    d += ulen;
 	    s += u;
 	}
-	SvUTF8_on(dest);
 	*d = '\0';
 	SvCUR_set(dest, d - (U8*)SvPVX_const(dest));
     } else {
@@ -3878,8 +3872,7 @@ PP(pp_hslice)
 		    else {
 			STRLEN keylen;
 			const char * const key = SvPV_const(keysv, keylen);
-			SAVEDELETE(hv, savepvn(key,keylen),
-				   SvUTF8(keysv) ? -(I32)keylen : (I32)keylen);
+			SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
 		    }
 		}
             }
@@ -4294,7 +4287,6 @@ PP(pp_reverse)
 	STRLEN len;
 	PADOFFSET padoff_du;
 
-	SvUTF8_off(TARG);				/* decontaminate */
 	if (SP - MARK > 1)
 	    do_join(TARG, &PL_sv_no, MARK, SP);
 	else
@@ -4593,8 +4585,6 @@ PP(pp_split)
 	dstr = newSVpvn(s, l);
 	if (make_mortal)
 	    sv_2mortal(dstr);
-	if (do_utf8)
-	    (void)SvUTF8_on(dstr);
 	XPUSHs(dstr);
 	iters++;
     }

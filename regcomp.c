@@ -643,7 +643,7 @@ S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *min
     SvCUR_set(data->last_found, 0);
     {
 	SV * const sv = data->last_found;
-	if (SvUTF8(sv) && SvMAGICAL(sv)) {
+	if (SvMAGICAL(sv)) {
 	    MAGIC * const mg = mg_find(sv, PERL_MAGIC_utf8);
 	    if (mg)
 		mg->mg_len = 0;
@@ -803,7 +803,7 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
                 colwidth,
                 pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), colwidth, 
 	                    PL_colors[0], PL_colors[1],
-	                    (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
+	                    (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0) |
 	                    PERL_PV_ESCAPE_FIRSTCHAR 
                 ) 
             );
@@ -897,7 +897,7 @@ S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
                     colwidth,
                     pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), colwidth, 
 	                    PL_colors[0], PL_colors[1],
-	                    (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
+	                    (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0) |
 	                    PERL_PV_ESCAPE_FIRSTCHAR 
                     ) ,
                     TRIE_LIST_ITEM(state,charid).forid,
@@ -943,7 +943,7 @@ S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie,
                 colwidth,
                 pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), colwidth, 
 	                    PL_colors[0], PL_colors[1],
-	                    (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
+	                    (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0) |
 	                    PERL_PV_ESCAPE_FIRSTCHAR 
                 ) 
             );
@@ -1162,7 +1162,6 @@ is the recommended Unicode-aware way of saying
             tmp = newSVpvn(STRING(noper), STR_LEN(noper));      \
         else                                                    \
             tmp = newSVpvn( "", 0 );                            \
-        if ( UTF ) SvUTF8_on( tmp );                            \
         av_push( trie_words, tmp );                             \
     });                                                         \
                                                                 \
@@ -1906,7 +1905,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                             (UV)state, (UV)idx, 
                             pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 6, 
 	                        PL_colors[0], PL_colors[1],
-	                        (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
+	                        (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0) |
 	                        PERL_PV_ESCAPE_FIRSTCHAR 
                             )
                         );
@@ -2798,7 +2797,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		sv_catpvn(data->last_found, STRING(scan), STR_LEN(scan));
 		{
 		    SV * const sv = data->last_found;
-		    MAGIC * const mg = SvUTF8(sv) && SvMAGICAL(sv) ?
+		    MAGIC * const mg = SvMAGICAL(sv) ?
 			mg_find(sv, PERL_MAGIC_utf8) : NULL;
 		    if (mg && mg->mg_len >= 0)
 			mg->mg_len += utf8_length((U8*)STRING(scan),
@@ -3191,7 +3190,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 				{
 				    SV * sv = data->last_found;
 				    MAGIC *mg =
-					SvUTF8(sv) && SvMAGICAL(sv) ?
+					SvMAGICAL(sv) ?
 					mg_find(sv, PERL_MAGIC_utf8) : NULL;
 				    if (mg && mg->mg_len >= 0)
 					mg->mg_len += sv_len_utf8(last_str);
@@ -3215,7 +3214,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			SCAN_COMMIT(pRExC_state,data,minlenp);
 			if (mincount && last_str) {
 			    SV * const sv = data->last_found;
-			    MAGIC * const mg = SvUTF8(sv) && SvMAGICAL(sv) ?
+			    MAGIC * const mg = SvMAGICAL(sv) ?
 				mg_find(sv, PERL_MAGIC_utf8) : NULL;
 
 			    if (mg)
@@ -4566,15 +4565,6 @@ Perl_reg_numbered_buff_get(pTHX_ const REGEXP * const rx, I32 paren, SV* usesv)
         TAINT_NOT;
         sv_setpvn(sv, s, i);
         PL_tainted = oldtainted;
-        if ( (rx->extflags & RXf_CANY_SEEN)
-            ? (RX_MATCH_UTF8(rx)
-                        && (!i || is_utf8_string((U8*)s, i)))
-            : (RX_MATCH_UTF8(rx)) )
-        {
-            SvUTF8_on(sv);
-        }
-        else
-            SvUTF8_off(sv);
         if (PL_tainting) {
             if (RX_MATCH_TAINTED(rx)) {
                 if (SvTYPE(sv) >= SVt_PVMG) {
@@ -4632,8 +4622,6 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags) {
     if ( flags ) {
         SV* sv_name = sv_2mortal(Perl_newSVpvn(aTHX_ name_start,
             (int)(RExC_parse - name_start)));
-	if (UTF)
-            SvUTF8_on(sv_name);
         if ( flags == REG_RSN_RETURN_NAME)
             return sv_name;
         else if (flags==REG_RSN_RETURN_DATA) {
@@ -5980,7 +5968,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         char *p = SvPV(sv_str, len);
         if (len) {
             STRLEN numlen = 1;
-            if ( SvUTF8(sv_str) ) {
+            if ( UTF ) {
                 *valuep = utf8_to_uvchr((U8*)p, &numlen);
                 /* XXXX
                   We have to turn on utf8 for high bit chars otherwise
@@ -7407,7 +7395,6 @@ parseit:
 				  if (!unicode_alternate)
 				      unicode_alternate = newAV();
 				  sv = newSVpvn((char*)foldbuf, foldlen);
-				  SvUTF8_on(sv);
 				  av_push(unicode_alternate, sv);
 			      }
 			 }

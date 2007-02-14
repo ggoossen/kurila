@@ -502,7 +502,7 @@ Perl_fbm_compile(pTHX_ SV *sv, U32 flags)
     U32 frequency = 256;
 
     if (flags & FBMcf_TAIL) {
-	MAGIC * const mg = SvUTF8(sv) && SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_utf8) : NULL;
+	MAGIC * const mg = SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_utf8) : NULL;
 	sv_catpvs(sv, "\n");		/* Taken into account in fbm_instr() */
 	if (mg && mg->mg_len >= 0)
 	    mg->mg_len++;
@@ -1307,7 +1307,6 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args, STRLEN* msglen,
 	}
 	else
 	    message = SvPV_const(msv,*msglen);
-	*utf8 = SvUTF8(msv);
     }
     else {
 	message = NULL;
@@ -1443,7 +1442,7 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
     dVAR;
     STRLEN msglen;
     SV * const msv = vmess(pat, args);
-    const I32 utf8 = SvUTF8(msv);
+    const I32 utf8 = 1;
     const char * const message = SvPV_const(msv, msglen);
 
     if (PL_warnhook) {
@@ -1513,7 +1512,7 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 	SV * const msv = vmess(pat, args);
 	STRLEN msglen;
 	const char * const message = SvPV_const(msv, msglen);
-	const I32 utf8 = SvUTF8(msv);
+	const I32 utf8 = 1;
 
 	if (PL_diehook) {
 	    assert(message);
@@ -1521,7 +1520,6 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 	}
 	if (PL_in_eval) {
 	    PL_restartop = die_where(message, msglen);
-	    SvFLAGS(ERRSV) |= utf8;
 	    JMPENV_JUMP(3);
 	}
 	write_to_stderr(message, msglen);

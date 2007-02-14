@@ -2487,8 +2487,6 @@ S_refcounted_he_value(pTHX_ const struct refcounted_he *he)
 	SvLEN_set(value, 0);
 	SvPOK_on(value);
 	SvREADONLY_on(value);
-	if ((he->refcounted_he_data[0] & HVrhek_typemask) == HVrhek_PV_UTF8)
-	    SvUTF8_on(value);
 	break;
     default:
 	Perl_croak(aTHX_ "panic: refcounted_he_value bad flags %x",

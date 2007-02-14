@@ -7941,8 +7941,7 @@ Perl_peep(pTHX_ register OP *o)
 	    if (!fields || !GvHV(*fields))
 		break;
 	    key = SvPV_const(*svp, keylen);
-	    if (!hv_fetch(GvHV(*fields), key,
-			SvUTF8(*svp) ? -(I32)keylen : (I32)keylen, FALSE))
+	    if (!hv_fetch(GvHV(*fields), key, (I32)keylen, FALSE))
 	    {
 		Perl_croak(aTHX_ "No such class field \"%s\" " 
 			   "in variable %s of type %s", 
@@ -7998,8 +7997,7 @@ Perl_peep(pTHX_ register OP *o)
 		    continue;
 		svp = cSVOPx_svp(key_op);
 		key = SvPV_const(*svp, keylen);
-		if (!hv_fetch(GvHV(*fields), key, 
-			    SvUTF8(*svp) ? -(I32)keylen : (I32)keylen, FALSE))
+		if (!hv_fetch(GvHV(*fields), key, (I32)keylen, FALSE))
 		{
 		    Perl_croak(aTHX_ "No such class field \"%s\" "
 			       "in variable %s of type %s",

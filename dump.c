@@ -488,10 +488,9 @@ Perl_sv_peek(pTHX_ SV *sv)
 	    if (SvOOK(sv))
 		Perl_sv_catpvf(aTHX_ t, "[%s]", pv_display(tmp, SvPVX_const(sv)-SvIVX(sv), SvIVX(sv), 0, 127));
 	    Perl_sv_catpvf(aTHX_ t, "%s)", pv_display(tmp, SvPVX_const(sv), SvCUR(sv), SvLEN(sv), 127));
-	    if (SvUTF8(sv))
-		Perl_sv_catpvf(aTHX_ t, " [UTF8 \"%s\"]",
-			       sv_uni_display(tmp, sv, 8 * sv_len_utf8(sv),
-					      UNI_DISPLAY_QQ));
+	    Perl_sv_catpvf(aTHX_ t, " [UTF8 \"%s\"]",
+			   sv_uni_display(tmp, sv, 8 * sv_len_utf8(sv),
+					  UNI_DISPLAY_QQ));
 	    SvREFCNT_dec(tmp);
 	}
     }
@@ -1011,11 +1010,6 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 		SV * const tmpsv = newSV(0);
 		ENTER;
 		SAVEFREESV(tmpsv);
-#ifdef PERL_MAD
-		/* FIXME - is this making unwarranted assumptions about the
-		   UTF-8 cleanliness of the dump file handle?  */
-		SvUTF8_on(tmpsv);
-#endif
 		gv_fullname3(tmpsv, (GV*)cSVOPo->op_sv, NULL);
 		Perl_dump_indent(aTHX_ level, file, "GV = %s\n",
 				 SvPV_nolen_const(tmpsv));
@@ -1481,9 +1475,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     case SVt_PVAV:
 	break;
     }
-    /* SVphv_SHAREKEYS is also 0x20000000 */
-    if ((type != SVt_PVHV) && SvUTF8(sv))
-        sv_catpv(d, "UTF8");
 
     if (*(SvEND(d) - 1) == ',') {
         SvCUR_set(d, SvCUR(d) - 1);
@@ -1567,8 +1558,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	    if (SvOOK(sv))
 		PerlIO_printf(file, "( %s . ) ", pv_display(d, SvPVX_const(sv)-SvIVX(sv), SvIVX(sv), 0, pvlim));
 	    PerlIO_printf(file, "%s", pv_display(d, SvPVX_const(sv), SvCUR(sv), SvLEN(sv), pvlim));
-	    if (SvUTF8(sv)) /* the 8?  \x{....} */
-	        PerlIO_printf(file, " [UTF8 \"%s\"]", sv_uni_display(d, sv, 8 * sv_len_utf8(sv), UNI_DISPLAY_QQ));
+	    PerlIO_printf(file, " [UTF8 \"%s\"]", sv_uni_display(d, sv, 8 * sv_len_utf8(sv), UNI_DISPLAY_QQ)); /* the 8?  \x{....} */
 	    PerlIO_printf(file, "\n");
 	    Perl_dump_indent(aTHX_ level, file, "  CUR = %"IVdf"\n", (IV)SvCUR(sv));
 	    Perl_dump_indent(aTHX_ level, file, "  LEN = %"IVdf"\n", (IV)SvLEN(sv));
@@ -1714,8 +1704,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 		keypv = SvPV_const(keysv, len);
 		elt = hv_iterval(hv, he);
 		Perl_dump_indent(aTHX_ level+1, file, "Elt %s ", pv_display(d, keypv, len, 0, pvlim));
-		if (SvUTF8(keysv))
-		    PerlIO_printf(file, "[UTF8 \"%s\"] ", sv_uni_display(d, keysv, 8 * sv_len_utf8(keysv), UNI_DISPLAY_QQ));
+		PerlIO_printf(file, "[UTF8 \"%s\"] ", sv_uni_display(d, keysv, 8 * sv_len_utf8(keysv), UNI_DISPLAY_QQ));
 		if (HeKREHASH(he))
 		    PerlIO_printf(file, "[REHASH] ");
 		PerlIO_printf(file, "HASH = 0x%"UVxf"\n", (UV)hash);
@@ -1937,11 +1926,6 @@ Perl_debop(pTHX_ const OP *o)
     case OP_GV:
 	if (cGVOPo_gv) {
 	    SV * const sv = newSV(0);
-#ifdef PERL_MAD
-	    /* FIXME - is this making unwarranted assumptions about the
-	       UTF-8 cleanliness of the dump file handle?  */
-	    SvUTF8_on(sv);
-#endif
 	    gv_fullname3(sv, cGVOPo_gv, NULL);
 	    PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
 	    SvREFCNT_dec(sv);
@@ -2136,7 +2120,7 @@ Perl_xmldump_eval(pTHX)
 char *
 Perl_sv_catxmlsv(pTHX_ SV *dsv, SV *ssv)
 {
-    return sv_catxmlpvn(dsv, SvPVX(ssv), SvCUR(ssv), SvUTF8(ssv));
+    return sv_catxmlpvn(dsv, SvPVX(ssv), SvCUR(ssv), IN_CODEPOINTS);
 }
 
 char *
@@ -2441,7 +2425,6 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     if (PM_GETRE(pm)) {
 	char *s = PM_GETRE(pm)->precomp;
 	SV *tmpsv = newSVpvn("",0);
-	SvUTF8_on(tmpsv);
 	sv_catxmlpvn(tmpsv, s, strlen(s), 1);
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"%s\"\n",
 	     SvPVX(tmpsv));
@@ -2808,8 +2791,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    SV *tmpsv2 = newSVpvn("",0);
 	    char *s;
 	    STRLEN len;
-	    SvUTF8_on(tmpsv1);
-	    SvUTF8_on(tmpsv2);
 	    ENTER;
 	    SAVEFREESV(tmpsv1);
 	    SAVEFREESV(tmpsv2);

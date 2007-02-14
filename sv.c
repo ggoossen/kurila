@@ -2627,10 +2627,6 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
 		    } else {
 			pv = sv_2pv_flags(tmpstr, lp, flags);
 		    }
-		    if (SvUTF8(tmpstr))
-			SvUTF8_on(sv);
-		    else
-			SvUTF8_off(sv);
 		    return pv;
 		}
 	    }
@@ -2654,10 +2650,6 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
                     I32 haseval = 0;
                     U32 flags = 0;
                     (str) = CALLREG_AS_STR(mg,lp,&flags,&haseval);
-                    if (flags & 1)
-	                SvUTF8_on(sv);
-                    else
-	                SvUTF8_off(sv);
                     PL_reginterp_cnt += haseval;
 		    return str;
 		} else {
@@ -2818,10 +2810,6 @@ Perl_sv_copypv(pTHX_ SV *dsv, register SV *ssv)
     STRLEN len;
     const char * const s = SvPV_const(ssv,len);
     sv_setpvn(dsv,s,len);
-    if (SvUTF8(ssv))
-	SvUTF8_on(dsv);
-    else
-	SvUTF8_off(dsv);
 }
 
 /*
@@ -2914,6 +2902,7 @@ Perl_sv_2bool(pTHX_ register SV *sv)
 /*
 =for apidoc sv_utf8_upgrade
 
+Obsolete function which used to:
 Converts the PV of an SV to its UTF-8-encoded form.
 Forces the SV to string form if it is not already.
 Always sets the SvUTF8 flag to avoid future validity checks even
@@ -2924,6 +2913,7 @@ use the Encode extension for that.
 
 =for apidoc sv_utf8_upgrade_flags
 
+Obsolete function which used to:
 Converts the PV of an SV to its UTF-8-encoded form.
 Forces the SV to string form if it is not already.
 Always sets the SvUTF8 flag to avoid future validity checks even
@@ -2941,28 +2931,7 @@ STRLEN
 Perl_sv_utf8_upgrade_flags(pTHX_ register SV *sv, I32 flags)
 {
     dVAR;
-    if (sv == &PL_sv_undef)
-	return 0;
-    if (!SvPOK(sv)) {
-	STRLEN len = 0;
-	if (SvREADONLY(sv) && (SvPOKp(sv) || SvIOKp(sv) || SvNOKp(sv))) {
-	    (void) sv_2pv_flags(sv,&len, flags);
-	    if (SvUTF8(sv))
-		return len;
-	} else {
-	    (void) SvPV_force(sv,len);
-	}
-    }
-
-    if (SvUTF8(sv)) {
-	return SvCUR(sv);
-    }
-
-    if (SvIsCOW(sv)) {
-        sv_force_normal_flags(sv, 0);
-    }
-
-    return SvCUR(sv);
+    Perl_croak(aTHX_ "utf8_upgrade obsolete");
 }
 
 /*
@@ -2989,8 +2958,7 @@ Perl_sv_utf8_downgrade(pTHX_ register SV* sv, bool fail_ok)
 /*
 =for apidoc sv_utf8_encode
 
-Converts the PV of an SV to UTF-8, but then turns the C<SvUTF8>
-flag off so that it looks like octets again.
+A NOOP
 
 =cut
 */
@@ -2998,24 +2966,13 @@ flag off so that it looks like octets again.
 void
 Perl_sv_utf8_encode(pTHX_ register SV *sv)
 {
-    if (SvIsCOW(sv)) {
-        sv_force_normal_flags(sv, 0);
-    }
-    if (SvREADONLY(sv)) {
-	Perl_croak(aTHX_ PL_no_modify);
-    }
-    (void) sv_utf8_upgrade(sv);
-    SvUTF8_off(sv);
+    return;
 }
 
 /*
 =for apidoc sv_utf8_decode
 
-If the PV of the SV is an octet sequence in UTF-8
-and contains a multiple-byte character, the C<SvUTF8> flag is turned on
-so that it looks like a character. If the PV contains only single-byte
-characters, the C<SvUTF8> flag stays being off.
-Scans PV for validity and returns false if the PV is invalid UTF-8.
+A NOOP
 
 =cut
 */
@@ -3023,6 +2980,7 @@ Scans PV for validity and returns false if the PV is invalid UTF-8.
 bool
 Perl_sv_utf8_decode(pTHX_ register SV *sv)
 {
+    return TRUE;
     if (SvPOKp(sv)) {
         const U8 *c;
         const U8 *e;
@@ -3741,8 +3699,6 @@ Perl_sv_setsv_cow(pTHX_ SV *dstr, SV *sstr)
   common_exit:
     SvPV_set(dstr, new_pv);
     SvFLAGS(dstr) = (SVt_PVIV|SVf_POK|SVp_POK|SVf_FAKE|SVf_READONLY);
-    if (SvUTF8(sstr))
-	SvUTF8_on(dstr);
     SvLEN_set(dstr, len);
     SvCUR_set(dstr, cur);
     if (DEBUG_C_TEST) {
@@ -5847,7 +5803,6 @@ Perl_sv_eq(pTHX_ register SV *sv1, register SV *sv2)
 	if (sv1 == sv2 && (SvTHINKFIRST(sv1) || SvGMAGICAL(sv1))) {
 	    pv1 = SvPV_const(sv1, cur1);
 	    sv1 = sv_2mortal(newSVpvn(pv1, cur1));
-	    if (SvUTF8(sv2)) SvUTF8_on(sv1);
 	}
 	pv1 = SvPV_const(sv1, cur1);
     }
@@ -6087,8 +6042,6 @@ Perl_sv_gets(pTHX_ register SV *sv, register PerlIO *fp, I32 append)
     SvSCREAM_off(sv);
 
     SvPOK_only(sv);
-    if (PerlIO_isutf8(fp))
-	SvUTF8_on(sv);
 
     if (IN_PERL_COMPILETIME) {
 	/* we always read code in line mode */
@@ -8198,8 +8151,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
     I32 svix = 0;
     static const char nullstr[] = "(null)";
     SV *argsv = NULL;
-    bool has_utf8 = DO_UTF8(sv);    /* has the result utf8? */
-    const bool pat_utf8 = has_utf8; /* the pattern is in utf8? */
     SV *nsv = NULL;
     /* Times 4: a decimal digit takes more than 3 binary digits.
      * NV_DIG: mantissa takes than many decimal digits.
@@ -8273,9 +8224,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
     }
 #endif /* !USE_LONG_DOUBLE */
 
-    if (!args && svix < svmax && DO_UTF8(*svargs))
-	has_utf8 = TRUE;
-
     patend = (char*)pat + patlen;
     for (p = (char*)pat; p < patend; p = q) {
 	bool alt = FALSE;
@@ -8333,10 +8281,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	/* echo everything up to the next format specification */
 	for (q = p; q < patend && *q != '%'; ++q) ;
 	if (q > p) {
-	    if (has_utf8 && !pat_utf8)
-		sv_catpvn_utf8_upgrade(sv, p, q - p, nsv);
-	    else
-		sv_catpvn(sv, p, q - p);
+	    sv_catpvn(sv, p, q - p);
 	    p = q;
 	}
 	if (q++ >= patend)
@@ -8385,8 +8330,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    }
 		    argsv = (SV*)va_arg(*args, void*);
 		    eptr = SvPVx_const(argsv, elen);
-		    if (DO_UTF8(argsv))
-			is_utf8 = TRUE;
 		    goto string;
 		}
 #if vdNUMBER
@@ -8485,16 +8428,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    vecsv = svix < svmax ? svargs[svix++] : &PL_sv_undef;
 		}
 		dotstr = SvPV_const(vecsv, dotstrlen);
-		/* Keep the DO_UTF8 test *after* the SvPV call, else things go
-		   bad with tied or overloaded values that return UTF8.  */
-		if (DO_UTF8(vecsv))
-		    is_utf8 = TRUE;
-		else if (has_utf8) {
-		    vecsv = sv_mortalcopy(vecsv);
-		    sv_utf8_upgrade(vecsv);
-		    dotstr = SvPV_const(vecsv, dotstrlen);
-		    is_utf8 = TRUE;
-		}		    
 	    }
 	    if (args) {
 		VECTORIZE_ARGS
@@ -8682,7 +8615,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    }
 	    else {
 		eptr = SvPVx_const(argsv, elen);
-		if (DO_UTF8(argsv)) {
+		if (IN_CODEPOINTS) {
 		    I32 old_precis = precis;
 		    if (has_precis && precis < elen) {
 			I32 p = precis;
@@ -9179,25 +9112,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    continue;	/* not "break" */
 	}
 
-	if (is_utf8 != has_utf8) {
-	    if (is_utf8) {
-		if (SvCUR(sv))
-		    sv_utf8_upgrade(sv);
-	    }
-	    else {
-		const STRLEN old_elen = elen;
-		SV * const nsv = sv_2mortal(newSVpvn(eptr, elen));
-		sv_utf8_upgrade(nsv);
-		eptr = SvPVX_const(nsv);
-		elen = SvCUR(nsv);
-
-		if (width) { /* fudge width (can't fudge elen) */
-		    width += elen - old_elen;
-		}
-		is_utf8 = TRUE;
-	    }
-	}
-
 	have = esignlen + zeros + elen;
 	if (have < zeros)
 	    Perl_croak_nocontext(PL_memory_wrap);
@@ -9244,10 +9158,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    else
 		vectorize = FALSE;		/* done iterating over vecstr */
 	}
-	if (is_utf8)
-	    has_utf8 = TRUE;
-	if (has_utf8)
-	    SvUTF8_on(sv);
 	*p = '\0';
 	SvCUR_set(sv, p - SvPVX_const(sv));
 	if (vectorize) {
@@ -11343,7 +11253,7 @@ char *
 Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
 {
     dVAR;
-    if (SvPOK(sv) && !SvUTF8(sv) && !IN_BYTES && SvROK(encoding)) {
+    if (SvPOK(sv) && !IN_BYTES && SvROK(encoding)) {
 	SV *uni;
 	STRLEN len;
 	const char *s;
@@ -11378,7 +11288,6 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
 	}
 	FREETMPS;
 	LEAVE;
-	SvUTF8_on(sv);
 	return SvPVX(sv);
     }
     return SvPOKp(sv) ? SvPVX(sv) : NULL;

@@ -1512,8 +1512,6 @@ S_tokeq(pTHX_ SV *sv)
     d = s;
     if ( PL_hints & HINT_NEW_STRING ) {
 	pv = sv_2mortal(newSVpvn(SvPVX_const(pv), len));
-	if (SvUTF8(sv))
-	    SvUTF8_on(pv);
     }
     while (s < send) {
 	if (*s == '\\') {
@@ -1581,8 +1579,6 @@ S_sublex_start(pTHX)
 	    STRLEN len;
 	    const char * const p = SvPV_const(sv, len);
 	    SV * const nsv = newSVpvn(p, len);
-	    if (SvUTF8(sv))
-		SvUTF8_on(nsv);
 	    SvREFCNT_dec(sv);
 	    sv = nsv;
 	}
@@ -1690,8 +1686,6 @@ S_sublex_done(pTHX)
     dVAR;
     if (!PL_lex_starts++) {
 	SV * const sv = newSVpvs("");
-	if (SvUTF8(PL_linestr))
-	    SvUTF8_on(sv);
 	PL_expect = XOPERATOR;
 	yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv);
 	return THING;
@@ -6148,8 +6142,6 @@ Perl_yylex(pTHX)
 				/**/;
 			}
 			sv = newSVpvn(b, d-b);
-			if (DO_UTF8(PL_lex_stuff))
-			    SvUTF8_on(sv);
 			words = append_elem(OP_LIST, words,
 					    newSVOP(OP_CONST, 0, tokeq(sv)));
 		    }
@@ -12382,7 +12374,6 @@ S_swallow_bom(pTHX_ U8 *s)
 		s[newlen] = '\0';
 #endif
 		Safefree(news);
-		SvUTF8_on(PL_linestr);
 		s = (U8*)SvPVX(PL_linestr);
 #ifdef PERL_MAD
 		/* FIXME - is this a general bug fix?  */
@@ -12412,7 +12403,6 @@ S_swallow_bom(pTHX_ U8 *s)
 			      &newlen);
 		sv_setpvn(PL_linestr, (const char*)news, newlen);
 		Safefree(news);
-		SvUTF8_on(PL_linestr);
 		s = (U8*)SvPVX(PL_linestr);
 		PL_bufend = SvPVX(PL_linestr) + newlen;
 	    }
@@ -12596,8 +12586,6 @@ Perl_scan_vstring(pTHX_ const char *s, SV *sv)
 	    /* Append native character for the rev point */
 	    tmpend = uvchr_to_utf8(tmpbuf, rev);
 	    sv_catpvn(sv, (const char*)tmpbuf, tmpend - tmpbuf);
-	    if (!UNI_IS_INVARIANT(NATIVE_TO_UNI(rev)))
-		 SvUTF8_on(sv);
 	    if (pos + 1 < PL_bufend && *pos == '.' && isDIGIT(pos[1]))
 		 s = ++pos;
 	    else {

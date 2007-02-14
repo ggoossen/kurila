@@ -105,8 +105,7 @@ foreach (@tests) {
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
     $result =~ s/B//i unless $skip;
 
-    for my $study ('', 'study $subject', 'utf8::upgrade($subject)',
-		   'utf8::upgrade($subject); study $subject') {
+    for my $study ('', 'study $subject') {
 	# Need to make a copy, else the utf8::upgrade of an alreay studied
 	# scalar confuses things.
 	my $subject = $subject;

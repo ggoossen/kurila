@@ -214,7 +214,6 @@ S_do_trans_simple_utf8(pTHX_ SV * const sv)
 	SvCUR_set(sv, d - dstart);
     }
     SvSETMAGIC(sv);
-    SvUTF8_on(sv);
 
     return matches;
 }
@@ -404,7 +403,6 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 	*d = '\0';
 	SvCUR_set(sv, d - dstart);
     }
-    SvUTF8_on(sv);
     SvSETMAGIC(sv);
 
     return matches;
@@ -490,8 +488,6 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV **mark, register SV *
     }
 
     sv_setpvn(sv, "", 0);
-    /* sv_setpv retains old UTF8ness [perl #24846] */
-    SvUTF8_off(sv);
 
     if (PL_tainting && SvMAGICAL(sv))
 	SvTAINTED_off(sv);
@@ -811,7 +807,6 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	sv_setpvn(astr, s, 1);
 	*s = '\0';
 	SvCUR_set(sv, len);
-	SvUTF8_off(sv);
 	SvNIOK_off(sv);
     }
     else

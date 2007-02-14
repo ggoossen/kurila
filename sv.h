@@ -1917,7 +1917,6 @@ Like C<sv_catsv> but doesn't process magic.
 		nsv = sv_2mortal(newSVpvn(sstr, slen));	\
 	    else					\
 		sv_setpvn(nsv, sstr, slen);		\
-	    SvUTF8_off(nsv);				\
 	    sv_utf8_upgrade(nsv);			\
 	    sv_catsv(dsv, nsv);	\
 	} STMT_END

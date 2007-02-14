@@ -2911,7 +2911,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			ST.accept_buff[ 0 ].wordnum,
 			tmp ? pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 0, 
 	                        PL_colors[0], PL_colors[1],
-	                        (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0)
+	                        (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0)
                             ) 
 			: "not compiled under -Dr",
 			PL_colors[5] );
@@ -2996,7 +2996,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			ST.accept_buff[best].wordnum,
 			tmp ? pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 0, 
 	                        PL_colors[0], PL_colors[1],
-	                        (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0)
+	                        (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0)
                             ) : "not compiled under -Dr", 
 			    REG_NODE_NUM(nextop),
 			PL_colors[5] );

@@ -1237,7 +1237,6 @@ PP(pp_getc)
 	    len = PerlIO_read(IoIFP(GvIOp(gv)),SvPVX(TARG)+1,len-1);
 	    SvCUR_set(TARG,1+len);
 	}
-	SvUTF8_on(TARG);
     }
     PUSHTARG;
     RETURN;
