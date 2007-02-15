@@ -2981,26 +2981,6 @@ bool
 Perl_sv_utf8_decode(pTHX_ register SV *sv)
 {
     return TRUE;
-    if (SvPOKp(sv)) {
-        const U8 *c;
-        const U8 *e;
-
-        /* it is actually just a matter of turning the utf8 flag on, but
-         * we want to make sure everything inside is valid utf8 first.
-         */
-        c = (const U8 *) SvPVX_const(sv);
-	if (!is_utf8_string(c, SvCUR(sv)+1))
-	    return FALSE;
-        e = (const U8 *) SvEND(sv);
-        while (c < e) {
-	    const U8 ch = *c++;
-            if (!UTF8_IS_INVARIANT(ch)) {
-		SvUTF8_on(sv);
-		break;
-	    }
-        }
-    }
-    return TRUE;
 }
 
 /*
@@ -8151,7 +8131,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
     I32 svix = 0;
     static const char nullstr[] = "(null)";
     SV *argsv = NULL;
-    SV *nsv = NULL;
     /* Times 4: a decimal digit takes more than 3 binary digits.
      * NV_DIG: mantissa takes than many decimal digits.
      * Plus 32: Playing safe. */

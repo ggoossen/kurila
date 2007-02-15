@@ -2209,70 +2209,6 @@ Perl_packlist(pTHX_ SV *cat, const char *pat, const char *patend, register SV **
     (void)pack_rec( cat, &sym, beglist, endlist );
 }
 
-/* like sv_utf8_upgrade, but also repoint the group start markers */
-STATIC void
-marked_upgrade(pTHX_ SV *sv, tempsym_t *sym_ptr) {
-    STRLEN len;
-    tempsym_t *group;
-    const char *from_ptr, *from_start, *from_end, **marks, **m;
-    char *to_start, *to_ptr;
-
-    if (SvUTF8(sv)) return;
-
-    from_start = SvPVX_const(sv);
-    from_end = from_start + SvCUR(sv);
-    for (from_ptr = from_start; from_ptr < from_end; from_ptr++)
-	if (!NATIVE_IS_INVARIANT(*from_ptr)) break;
-    if (from_ptr == from_end) {
-	/* Simple case: no character needs to be changed */
-	SvUTF8_on(sv);
-	return;
-    }
-
-    len = (from_end-from_ptr)*UTF8_EXPAND+(from_ptr-from_start)+1;
-    Newx(to_start, len, char);
-    Copy(from_start, to_start, from_ptr-from_start, char);
-    to_ptr = to_start + (from_ptr-from_start);
-
-    Newx(marks, sym_ptr->level+2, const char *);
-    for (group=sym_ptr; group; group = group->previous)
-	marks[group->level] = from_start + group->strbeg;
-    marks[sym_ptr->level+1] = from_end+1;
-    for (m = marks; *m < from_ptr; m++)
-	*m = to_start + (*m-from_start);
-
-    for (;from_ptr < from_end; from_ptr++) {
-	while (*m == from_ptr) *m++ = to_ptr;
-	to_ptr = (char *) uvchr_to_utf8((U8 *) to_ptr, *(U8 *) from_ptr);
-    }
-    *to_ptr = 0;
-
-    while (*m == from_ptr) *m++ = to_ptr;
-    if (m != marks + sym_ptr->level+1) {
-	Safefree(marks);
-	Safefree(to_start);
-	Perl_croak(aTHX_ "Assertion: marks beyond string end");
-    }
-    for (group=sym_ptr; group; group = group->previous)
-	group->strbeg = marks[group->level] - to_start;
-    Safefree(marks);
-
-    if (SvOOK(sv)) {
-	if (SvIVX(sv)) {
-	    SvLEN_set(sv, SvLEN(sv) + SvIVX(sv));
-	    from_start -= SvIVX(sv);
-	    SvIV_set(sv, 0);
-	}
-	SvFLAGS(sv) &= ~SVf_OOK;
-    }
-    if (SvLEN(sv) != 0)
-	Safefree(from_start);
-    SvPV_set(sv, to_start);
-    SvCUR_set(sv, to_ptr - to_start);
-    SvLEN_set(sv, len);
-    SvUTF8_on(sv);
-}
-
 /* Exponential string grower. Makes string extension effectively O(n)
    needed says how many extra bytes we need (not counting the final '\0')
    Only grows the string if there is an actual lack of space
@@ -2298,11 +2234,6 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
     bool utf8 = (symptr->flags & FLAG_PARSE_UTF8) ? 1 : 0;
     bool warn_utf8 = ckWARN(WARN_UTF8);
 
-    if (symptr->level == 0 && found && symptr->code == 'U') {
-	marked_upgrade(aTHX_ cat, symptr);
-	symptr->flags |= FLAG_DO_UTF8;
-	utf8 = 0;
-    }
     symptr->strbeg = SvCUR(cat);
 
     while (found) {
@@ -2354,12 +2285,9 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 			    STRLEN len;
 			    const char *const pv = SvPV_const(*beglist, len);
 			    SV *const temp = sv_2mortal(newSVpvn(pv, len));
-			    if (SvUTF8(*beglist))
-				SvUTF8_on(temp);
 			    *beglist = temp;
 			}
-			count = DO_UTF8(*beglist) ?
-			    sv_len_utf8(*beglist) : sv_len(*beglist);
+			count = sv_len(*beglist);
 		    }
 		    else count = 0;
 		    if (lookahead.code == 'Z') count++;
@@ -2450,15 +2378,8 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
             symptr->level++;
 	    symptr->previous = &lookahead;
 	    while (len--) {
-		U32 was_utf8;
-		if (utf8) symptr->flags |=  FLAG_PARSE_UTF8;
-		else      symptr->flags &= ~FLAG_PARSE_UTF8;
-		was_utf8 = SvUTF8(cat);
   	        symptr->patptr = savsym.grpbeg;
 		beglist = pack_rec(cat, symptr, beglist, endlist);
-		if (SvUTF8(cat) != was_utf8)
-		    /* This had better be an upgrade while in utf8==0 mode */
-		    utf8 = 1;
 
 		if (savsym.howlen == e_star && beglist == endlist)
 		    break;		/* No way to continue */
@@ -2539,71 +2460,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 
 	    fromstr = NEXTFROM;
 	    aptr = SvPV_const(fromstr, fromlen);
-	    if (DO_UTF8(fromstr)) {
-                const char *end, *s;
-
-		if (!utf8 && !SvUTF8(cat)) {
-		    marked_upgrade(aTHX_ cat, symptr);
-		    lookahead.flags |= FLAG_DO_UTF8;
-		    lookahead.strbeg = symptr->strbeg;
-		    utf8 = 1;
-		    start = SvPVX(cat);
-		    cur = start + SvCUR(cat);
-		}
-		if (howlen == e_star) {
-		    if (utf8) goto string_copy;
-		    len = fromlen+1;
-		}
-		s = aptr;
-		end = aptr + fromlen;
-		fromlen = datumtype == 'Z' ? len-1 : len;
-		while ((I32) fromlen > 0 && s < end) {
-		    s += UTF8SKIP(s);
-		    fromlen--;
-		}
-		if (s > end)
-		    Perl_croak(aTHX_ "Malformed UTF-8 string in pack");
-		if (utf8) {
-		    len = fromlen;
-		    if (datumtype == 'Z') len++;
-		    fromlen = s-aptr;
-		    len += fromlen;
-
-		    goto string_copy;
-		}
-		fromlen = len - fromlen;
-		if (datumtype == 'Z') fromlen--;
-		if (howlen == e_star) {
-		    len = fromlen;
-		    if (datumtype == 'Z') len++;
-		}
-		GROWING(0, cat, start, cur, len);
-		if (!uni_to_bytes(aTHX_ &aptr, end, cur, fromlen,
-				  datumtype | TYPE_IS_PACK))
-		    Perl_croak(aTHX_ "Perl bug: predicted utf8 length not available");
-		cur += fromlen;
-		len -= fromlen;
-	    } else if (utf8) {
-		if (howlen == e_star) {
-		    len = fromlen;
-		    if (datumtype == 'Z') len++;
-		}
-		if (len <= (I32) fromlen) {
-		    fromlen = len;
-		    if (datumtype == 'Z' && fromlen > 0) fromlen--;
-		}
-		/* assumes a byte expands to at most UTF8_EXPAND bytes on
-		   upgrade, so:
-		   expected_length <= from_len*UTF8_EXPAND + (len-from_len) */
-		GROWING(0, cat, start, cur, fromlen*(UTF8_EXPAND-1)+len);
-		len -= fromlen;
-		while (fromlen > 0) {
-		    cur = (char *) uvchr_to_utf8((U8 *) cur, * (U8 *) aptr);
-		    aptr++;
-		    fromlen--;
-		}
-	    } else {
-	      string_copy:
+	    {
 		if (howlen == e_star) {
 		    len = fromlen;
 		    if (datumtype == 'Z') len++;
@@ -2797,16 +2654,6 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 	    break;
 	case 'U': {
 	    char *end;
-
-	    if (len == 0) {
-		if (!(symptr->flags & FLAG_DO_UTF8)) {
-		    marked_upgrade(aTHX_ cat, symptr);
-		    lookahead.flags |= FLAG_DO_UTF8;
-		    lookahead.strbeg = symptr->strbeg;
-		}
-		utf8 = 0;
-		goto no_change;
-	    }
 
 	    end = start+SvLEN(cat);
 	    while (len-- > 0) {
@@ -3328,7 +3175,6 @@ PP(pp_pack)
 
     MARK++;
     sv_setpvn(cat, "", 0);
-    SvUTF8_off(cat);
 
     packlist(cat, pat, patend, MARK, SP + 1);
 

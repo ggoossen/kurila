@@ -3415,14 +3415,6 @@ STATIC const char *	S_get_num(pTHX_ const char *ppat, I32 *lenptr)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-STATIC bool	S_need_utf8(const char *pat, const char *patend)
-			__attribute__nonnull__(1)
-			__attribute__nonnull__(2);
-
-STATIC char	S_first_symbol(const char *pat, const char *patend)
-			__attribute__nonnull__(1)
-			__attribute__nonnull__(2);
-
 STATIC char *	S_sv_exp_grow(pTHX_ SV *sv, STRLEN needed)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);

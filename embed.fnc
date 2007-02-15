@@ -1269,8 +1269,6 @@ sR	|SV*	|is_an_int	|NN const char *s|STRLEN l
 s	|int	|div128		|NN SV *pnum|NN bool *done
 s	|const char *|group_end	|NN const char *pat|NN const char *patend|char ender
 sR	|const char *|get_num	|NN const char *ppat|NN I32 *lenptr
-ns	|bool	|need_utf8	|NN const char *pat|NN const char *patend
-ns	|char	|first_symbol	|NN const char *pat|NN const char *patend
 sR	|char *	|sv_exp_grow	|NN SV *sv|STRLEN needed
 snR	|char *	|bytes_to_uni	|NN const U8 *start|STRLEN len|NN char *dest
 #endif

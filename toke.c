@@ -2136,17 +2136,7 @@ S_scan_const(pTHX_ char *start)
 			 }
 		    }
 #endif
-		    if (!has_utf8 && SvUTF8(res)) {
-			const char * const ostart = SvPVX_const(sv);
-			SvCUR_set(sv, d - ostart);
-			SvPOK_on(sv);
-			*d = '\0';
-			sv_utf8_upgrade(sv);
-			/* this just broke our allocation above... */
-			SvGROW(sv, (STRLEN)(send - start));
-			d = SvPVX(sv) + SvCUR(sv);
-			has_utf8 = TRUE;
-		    }
+		    has_utf8 = TRUE;
 		    if (len > (STRLEN)(e - s + 4)) { /* I _guess_ 4 is \N{} --jhi */
 			const char * const odest = SvPVX_const(sv);
 
@@ -5033,10 +5023,6 @@ Perl_yylex(pTHX)
 		CLINE;
 		yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv);
 		yylval.opval->op_private = OPpCONST_BARE;
-		/* UTF-8 package name? */
-		if (UTF && !IN_BYTES &&
-		    is_utf8_string((U8*)SvPVX_const(sv), SvCUR(sv)))
-		    SvUTF8_on(sv);
 
 		/* And if "Foo::", then that's what it certainly is. */
 
@@ -5112,8 +5098,6 @@ Perl_yylex(pTHX)
 		if (*s == '=' && s[1] == '>' && !pkgname) {
 		    CLINE;
 		    sv_setpv(((SVOP*)yylval.opval)->op_sv, PL_tokenbuf);
-		    if (UTF && !IN_BYTES && is_utf8_string((U8*)PL_tokenbuf, len))
-		      SvUTF8_on(((SVOP*)yylval.opval)->op_sv);
 		    TERM(WORD);
 		}
 

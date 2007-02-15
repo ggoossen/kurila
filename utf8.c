@@ -1413,24 +1413,16 @@ Perl_to_utf8_case(pTHX_ const U8 *p, U8* ustrp, STRLEN *lenp,
 		   U8 *t = (U8*)s, *tend = t + len, *d;
 		
 		   d = tmpbuf;
-		   if (SvUTF8(*svp)) {
-			STRLEN tlen = 0;
+		   STRLEN tlen = 0;
 			
-			while (t < tend) {
-			     const UV c = utf8_to_uvchr(t, &tlen);
-			     if (tlen > 0) {
-				  d = uvchr_to_utf8(d, UNI_TO_NATIVE(c));
-				  t += tlen;
-			     }
-			     else
-				  break;
-			}
-		   }
-		   else {
-			while (t < tend) {
-			     d = uvchr_to_utf8(d, UNI_TO_NATIVE(*t));
-			     t++;
-			}
+		   while (t < tend) {
+		       const UV c = utf8_to_uvchr(t, &tlen);
+		       if (tlen > 0) {
+			   d = uvchr_to_utf8(d, UNI_TO_NATIVE(c));
+			   t += tlen;
+		       }
+		       else
+			   break;
 		   }
 		   len = d - tmpbuf;
 		   Copy(tmpbuf, ustrp, len, U8);

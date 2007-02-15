@@ -1264,8 +1264,6 @@
 #define div128			S_div128
 #define group_end		S_group_end
 #define get_num			S_get_num
-#define need_utf8		S_need_utf8
-#define first_symbol		S_first_symbol
 #define sv_exp_grow		S_sv_exp_grow
 #define bytes_to_uni		S_bytes_to_uni
 #endif
@@ -3491,8 +3489,6 @@
 #define div128(a,b)		S_div128(aTHX_ a,b)
 #define group_end(a,b,c)	S_group_end(aTHX_ a,b,c)
 #define get_num(a,b)		S_get_num(aTHX_ a,b)
-#define need_utf8		S_need_utf8
-#define first_symbol		S_first_symbol
 #define sv_exp_grow(a,b)	S_sv_exp_grow(aTHX_ a,b)
 #define bytes_to_uni		S_bytes_to_uni
 #endif

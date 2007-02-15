@@ -418,9 +418,9 @@ foreach $k (sort keys  %list) {
 }
 
 print PM "  );\n\n" ;
-print PM '$NONE     = "', ('\0' x $warn_size) , "\";\n" ;
-print PM '$LAST_BIT = ' . "$index ;\n" ;
-print PM '$BYTES    = ' . "$warn_size ;\n" ;
+print PM 'our $NONE     = "', ('\0' x $warn_size) , "\";\n" ;
+print PM 'our $LAST_BIT = ' . "$index ;\n" ;
+print PM 'our $BYTES    = ' . "$warn_size ;\n" ;
 while (<DATA>) {
     print PM $_ ;
 }
@@ -564,7 +564,7 @@ See L<perlmodlib/Pragmatic Modules> and L<perllexwarn>.
 
 KEYWORDS
 
-$All = "" ; vec($All, $Offsets{'all'}, 2) = 3 ;
+our $All = "" ; vec($All, $Offsets{'all'}, 2) = 3 ;
 
 sub Croaker
 {
