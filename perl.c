@@ -2525,7 +2525,6 @@ Perl_get_cvn_flags(pTHX_ const char *name, STRLEN len, I32 flags)
      * declaration! */
     if ((flags & ~GV_NOADD_MASK) && !GvCVu(gv)) {
 	SV *const sv = newSVpvn(name,len);
-	SvFLAGS(sv) |= flags & SVf_UTF8;
     	return newSUB(start_subparse(FALSE, 0),
 		      newSVOP(OP_CONST, 0, sv),
 		      NULL, NULL);

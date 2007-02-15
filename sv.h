@@ -345,10 +345,7 @@ perform the upgrade if necessary.  See C<svtype>.
 #define PRIVSHIFT 4	/* (SVp_?OK >> PRIVSHIFT) == SVf_?OK */
 
 #define SVf_AMAGIC	0x10000000  /* has magical overloaded methods */
-#define SVf_UTF8        0x20000000  /* SvPV is UTF-8 encoded
-				       This is also set on RVs whose overloaded
-				       stringification is UTF-8. This might
-				       only happen as a side effect of SvPV() */
+#define SVf_OBSOLETE    0x20000000  /* was: SVf_UTF8. SvPV is UTF-8 encoded */
 					   
 /* Ensure this value does not clash with the GV_ADD* flags in gv.h */
 
@@ -939,11 +936,10 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 				 : (SvFLAGS(sv) & SVf_OK))
 #define SvOK_off(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) &=	~(SVf_OK|		\
-						  SVf_IVisUV|SVf_UTF8),	\
+						  SVf_IVisUV),	\
 							SvOOK_off(sv))
 #define SvOK_off_exc_UV(sv)	(assert_not_ROK(sv)			\
-				 SvFLAGS(sv) &=	~(SVf_OK|		\
-						  SVf_UTF8),		\
+				 SvFLAGS(sv) &=	~(SVf_OK),		\
 							SvOOK_off(sv))
 
 #define SvOKp(sv)		(SvFLAGS(sv) & (SVp_IOK|SVp_NOK|SVp_POK))
@@ -984,15 +980,18 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 
 /*
 =for apidoc Am|U32|SvUTF8|SV* sv
+Deleted.
 Returns a U32 value indicating whether the SV contains UTF-8 encoded data.
 Call this after SvPV() in case any call to string overloading updates the
 internal flag.
 
 =for apidoc Am|void|SvUTF8_on|SV *sv
+Deleted.
 Turn on the UTF-8 status of an SV (the data is not changed, just the flag).
 Do not use frivolously.
 
 =for apidoc Am|void|SvUTF8_off|SV *sv
+Deleted.
 Unsets the UTF-8 status of an SV.
 
 =for apidoc Am|void|SvPOK_only_UTF8|SV* sv
@@ -1004,18 +1003,13 @@ and leaves the UTF-8 status as it was.
 
 /* Ensure the return value of this macro does not clash with the GV_ADD* flags
 in gv.h: */
-#define SvUTF8(sv)		(0)
-/* (SvFLAGS(sv) & SVf_UTF8) */
-#define SvUTF8_on(sv)		(SvFLAGS(sv) |= (SVf_UTF8))
-#define SvUTF8_off(sv)		(SvFLAGS(sv) &= ~(SVf_UTF8))
-
 #define SvPOK(sv)		(SvFLAGS(sv) & SVf_POK)
 #define SvPOK_on(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) |= (SVf_POK|SVp_POK))
 #define SvPOK_off(sv)		(SvFLAGS(sv) &= ~(SVf_POK|SVp_POK))
 #define SvPOK_only(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) &= ~(SVf_OK|		\
-						  SVf_IVisUV|SVf_UTF8),	\
+						  SVf_IVisUV),	\
 				    SvFLAGS(sv) |= (SVf_POK|SVp_POK))
 #define SvPOK_only_UTF8(sv)	(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) &= ~(SVf_OK|		\
