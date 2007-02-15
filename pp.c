@@ -2950,8 +2950,6 @@ PP(pp_substr)
     const char *repl = NULL;
     STRLEN repl_len;
     const int num_args = PL_op->op_private & 7;
-    bool repl_need_utf8_upgrade = FALSE;
-    bool repl_is_utf8 = FALSE;
 
     SvTAINTED_off(TARG);			/* decontaminate */
     if (num_args > 2) {
@@ -2964,12 +2962,6 @@ PP(pp_substr)
     pos = POPi;
     sv = POPs;
     PUTBACK;
-    if (repl_sv) {
-	if (IN_CODEPOINTS) {
-	    sv_utf8_upgrade(sv);
-	    repl_need_utf8_upgrade = TRUE;
-	}
-    }
     tmps = SvPV_const(sv, curlen);
 
     if (IN_CODEPOINTS)
@@ -3033,12 +3025,6 @@ PP(pp_substr)
 	if (repl) {
 	    SV* repl_sv_copy = NULL;
 
-	    if (repl_need_utf8_upgrade) {
-		repl_sv_copy = newSVsv(repl_sv);
-		sv_utf8_upgrade(repl_sv_copy);
-		repl = SvPV_const(repl_sv_copy, repl_len);
-		repl_is_utf8 = DO_UTF8(repl_sv_copy) && SvCUR(sv);
-	    }
 	    sv_insert(sv, pos, rem, repl, repl_len);
 	    if (repl_sv_copy)
 		SvREFCNT_dec(repl_sv_copy);

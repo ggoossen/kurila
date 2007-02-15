@@ -26,7 +26,7 @@ $SIG{__WARN__} = sub {
 
 require './test.pl';
 
-plan(260);
+plan(259);
 
 $FATAL_MSG = qr/^substr outside of string/;
 
@@ -529,13 +529,6 @@ is($x, "\x{100}\x{200}ab");
     my $a = substr($text, $pos, $pos);
     is(substr($text,$pos,1), $pos);
 
-}
-
-# [perl #23765]
-{
-    my $a = pack("C", 0xbf);
-    substr($a, -1) &= chr(0xfeff);
-    is($a, "\xBF" & "\x{feff}");
 }
 
 # [perl #34976] incorrect caching of utf8 substr length
