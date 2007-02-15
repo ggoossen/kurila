@@ -474,21 +474,6 @@ PP(pp_formline)
 
 	case FF_LITERAL:
 	    arg = *fpc++;
-	    if (targ_is_utf8 && !SvUTF8(tmpForm)) {
-		SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		*t = '\0';
-		sv_catpvn_utf8_upgrade(PL_formtarget, f, arg, nsv);
-		t = SvEND(PL_formtarget);
-		break;
-	    }
-	    if (!targ_is_utf8 && DO_UTF8(tmpForm)) {
-		SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		*t = '\0';
-		sv_utf8_upgrade(PL_formtarget);
-		SvGROW(PL_formtarget, SvCUR(PL_formtarget) + fudge + 1);
-		t = SvEND(PL_formtarget);
-		targ_is_utf8 = TRUE;
-	    }
 	    while (arg--)
 		*t++ = *f++;
 	    break;
@@ -770,8 +755,6 @@ PP(pp_formline)
 			}
 		    }
 		    SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		    if (targ_is_utf8)
-			SvUTF8_on(PL_formtarget);
 		    if (oneline) {
 			SvCUR_set(sv, chophere - item);
 			sv_catsv(PL_formtarget, sv);
@@ -855,8 +838,6 @@ PP(pp_formline)
 			if (strnEQ(linemark, linemark - arg, arg))
 			    DIE(aTHX_ "Runaway format");
 		    }
-		    if (targ_is_utf8)
-			SvUTF8_on(PL_formtarget);
 		    FmLINES(PL_formtarget) = lines;
 		    SP = ORIGMARK;
 		    RETURNOP(cLISTOP->op_first);
@@ -898,8 +879,6 @@ PP(pp_formline)
 	case FF_END:
 	    *t = '\0';
 	    SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-	    if (targ_is_utf8)
-		SvUTF8_on(PL_formtarget);
 	    FmLINES(PL_formtarget) += lines;
 	    SP = ORIGMARK;
 	    RETPUSHYES;
