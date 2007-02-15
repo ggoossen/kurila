@@ -12,6 +12,8 @@ BEGIN {
 use Config;
 plan(tests => 24);
 
+our ($bad_chmod, $oldeuid);
+
 ok( -d 'op' );
 ok( -f 'TEST' );
 ok( !-f 'op' );

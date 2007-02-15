@@ -14,6 +14,8 @@ plan 'no_plan';
 
 $SIG{__WARN__} = sub { die @_ };
 
+our ($anon1, $anon2, $anon3);
+
 sub eval_ok ($;$) {
     eval shift;
     is( $@, '', @_);
@@ -23,9 +25,9 @@ eval_ok 'sub t1 ($) : locked { $_[0]++ }';
 eval_ok 'sub t2 : locked { $_[0]++ }';
 eval_ok 'sub t3 ($) : locked ;';
 eval_ok 'sub t4 : locked ;';
-our $anon1; eval_ok '$anon1 = sub ($) : locked:method { $_[0]++ }';
-our $anon2; eval_ok '$anon2 = sub : locked : method { $_[0]++ }';
-our $anon3; eval_ok '$anon3 = sub : method { $_[0]->[1] }';
+eval_ok '$anon1 = sub ($) : locked:method { $_[0]++ }';
+eval_ok '$anon2 = sub : locked : method { $_[0]++ }';
+eval_ok '$anon3 = sub : method { $_[0]->[1] }';
 
 eval 'sub e1 ($) : plugh ;';
 like $@, qr/^Invalid CODE attributes?: ["']?plugh["']? at/;

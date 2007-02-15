@@ -8,6 +8,8 @@ BEGIN {
 require "test.pl";
 plan( tests => 38 );
 
+my (@foo, %foo, $foo, @bar, $key, @refary, %refhash, @list);
+
 # delete() on hash elements
 
 $foo{1} = 'a';
@@ -117,6 +119,7 @@ delete $refary[0]->[3];
 cmp_ok( scalar(@{$refary[0]}),'==',1,'one down');
 
 {
+    no strict 'subs';
     my @a = 33;
     my($a) = \(@a);
     my $b = \$a[0];

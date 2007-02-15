@@ -136,10 +136,10 @@ my %matchers =
 my $testpkgs = {
     # packages to test, with expected types for named funcs
 
-    Digest::MD5 => { perl => [qw/ import /],
+    'Digest::MD5' => { perl => [qw/ import /],
 		     dflt => 'XS' },
 
-    Data::Dumper => { XS => [qw/ bootstrap Dumpxs /],
+    'Data::Dumper' => { XS => [qw/ bootstrap Dumpxs /],
 		      dflt => 'perl' },
     B => { 
 	dflt => 'constant',		# all but 47/274
@@ -160,7 +160,7 @@ my $testpkgs = {
 		  ), $] > 5.009 ? ('unitcheck_av') : ()],
     },
 
-    B::Deparse => { dflt => 'perl',	# 235 functions
+    'B::Deparse' => { dflt => 'perl',	# 235 functions
 
 	XS => [qw( svref_2object perlstring opnumber main_start
 		   main_root main_cv )],
@@ -205,7 +205,7 @@ my $testpkgs = {
 		      /],
 	       },
 
-    IO::Socket => { dflt => 'constant',		# 157/190
+    'IO::Socket' => { dflt => 'constant',		# 157/190
 
 		    perl => [qw/ timeout socktype sockopt sockname
 			     socketpair socket sockdomain sockaddr_un
@@ -257,11 +257,11 @@ if ($opts{r}) {
 
 unless ($opts{a}) {
     unless (@argpkgs) {
-	foreach $pkg (sort keys %$testpkgs) {
+	foreach my $pkg (sort keys %$testpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
 	}
     } else {
-	foreach $pkg (@argpkgs) {
+	foreach my $pkg (@argpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
 	}
     }

@@ -8,6 +8,8 @@ BEGIN {
 require "test.pl";
 plan( tests => 7 );
 
+no strict 'vars';
+
 sub foo {
     $a='abcd';
     $a=~/(.)/g;

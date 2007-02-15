@@ -13,24 +13,24 @@ plan tests => 107;
 
 my $Perl = which_perl();
 
-$Is_Amiga   = $^O eq 'amigaos';
-$Is_Cygwin  = $^O eq 'cygwin';
-$Is_Darwin  = $^O eq 'darwin';
-$Is_Dos     = $^O eq 'dos';
-$Is_MacOS   = $^O eq 'MacOS';
-$Is_MPE     = $^O eq 'mpeix';
-$Is_MSWin32 = $^O eq 'MSWin32';
-$Is_NetWare = $^O eq 'NetWare';
-$Is_OS2     = $^O eq 'os2';
-$Is_Solaris = $^O eq 'solaris';
-$Is_VMS     = $^O eq 'VMS';
-$Is_DGUX    = $^O eq 'dgux';
-$Is_MPRAS   = $^O =~ /svr4/ && -f '/etc/.relid';
-$Is_Rhapsody= $^O eq 'rhapsody';
+my $Is_Amiga   = $^O eq 'amigaos';
+my $Is_Cygwin  = $^O eq 'cygwin';
+my $Is_Darwin  = $^O eq 'darwin';
+my $Is_Dos     = $^O eq 'dos';
+my $Is_MacOS   = $^O eq 'MacOS';
+my $Is_MPE     = $^O eq 'mpeix';
+my $Is_MSWin32 = $^O eq 'MSWin32';
+my $Is_NetWare = $^O eq 'NetWare';
+my $Is_OS2     = $^O eq 'os2';
+my $Is_Solaris = $^O eq 'solaris';
+my $Is_VMS     = $^O eq 'VMS';
+my $Is_DGUX    = $^O eq 'dgux';
+my $Is_MPRAS   = $^O =~ /svr4/ && -f '/etc/.relid';
+my $Is_Rhapsody= $^O eq 'rhapsody';
 
-$Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
+my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
 
-$Is_UFS     = $Is_Darwin && (() = `df -t ufs . 2>/dev/null`) == 2;
+my $Is_UFS     = $Is_Darwin && (() = `df -t ufs . 2>/dev/null`) == 2;
 
 my($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
    $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = (0..12);

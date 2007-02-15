@@ -16,10 +16,11 @@ $ENV{PERL5LIB} = "../lib";
 $|=1;
 
 undef $/;
-@prgs = split /^########\n/m, <DATA>;
+our @prgs = split /^########\n/m, <DATA>;
 
-require './test.pl';
+BEGIN { require './test.pl'; }
 plan(tests => scalar @prgs);
+my $i;
 for (@prgs){
     ++$i;
     my($prog,$expected) = split(/\nEXPECT\n/, $_, 2);
@@ -28,8 +29,8 @@ for (@prgs){
     my ($testname) = $prog =~ /^# (.*)\n/m;
     $testname ||= '';
     $TODO = $testname =~ s/^TODO //;
-    $results =~ s/\n+$//;
-    $expected =~ s/\n+$//;
+    my $results =~ s/\n+$//;
+    my $expected =~ s/\n+$//;
 
     fresh_perl_is($prog, $expected, {}, $testname);
 }
@@ -38,7 +39,7 @@ __END__
 
 # standard behaviour, without any extra references
 use Tie::Hash ;
-tie %h, Tie::StdHash;
+tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 ########
@@ -52,7 +53,8 @@ use Tie::Hash ;
    warn "Untied\n";
   }
 }
-tie %h, Tie::HashUntie;
+our %h;
+tie %h, 'Tie::HashUntie';
 untie %h;
 EXPECT
 Untied
@@ -60,22 +62,22 @@ Untied
 
 # standard behaviour, with 1 extra reference
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 ########
 
 # standard behaviour, with 1 extra reference via tied
 use Tie::Hash ;
-tie %h, Tie::StdHash;
-$a = tied %h;
+tie our %h, 'Tie::StdHash';
+our $a = tied %h;
 untie %h;
 EXPECT
 ########
 
 # standard behaviour, with 1 extra reference which is destroyed
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 $a = 0 ;
 untie %h;
 EXPECT
@@ -83,8 +85,8 @@ EXPECT
 
 # standard behaviour, with 1 extra reference via tied which is destroyed
 use Tie::Hash ;
-tie %h, Tie::StdHash;
-$a = tied %h;
+tie our %h, 'Tie::StdHash';
+our $a = tied %h;
 $a = 0 ;
 untie %h;
 EXPECT
@@ -93,7 +95,7 @@ EXPECT
 # strict behaviour, without any extra references
 use warnings 'untie';
 use Tie::Hash ;
-tie %h, Tie::StdHash;
+tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 ########
@@ -101,7 +103,7 @@ EXPECT
 # strict behaviour, with 1 extra references generating an error
 use warnings 'untie';
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 untie attempted while 1 inner references still exist at - line 6.
@@ -110,8 +112,8 @@ untie attempted while 1 inner references still exist at - line 6.
 # strict behaviour, with 1 extra references via tied generating an error
 use warnings 'untie';
 use Tie::Hash ;
-tie %h, Tie::StdHash;
-$a = tied %h;
+tie our %h, 'Tie::StdHash';
+our $a = tied %h;
 untie %h;
 EXPECT
 untie attempted while 1 inner references still exist at - line 7.
@@ -120,7 +122,7 @@ untie attempted while 1 inner references still exist at - line 7.
 # strict behaviour, with 1 extra references which are destroyed
 use warnings 'untie';
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 $a = 0 ;
 untie %h;
 EXPECT

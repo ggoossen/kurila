@@ -17,6 +17,8 @@ BEGIN {
 # (Just-in-time test naming)
 plan tests => 136;
 
+our ($Aoz, $Aaz, $Axz, $foo, $bar, $zap, $neg1, $neg7, $x, $y);
+
 # numerics
 ok ((0xdead & 0xbeef) == 0x9ead);
 ok ((0xdead | 0xbeef) == 0xfeef);
@@ -248,7 +250,7 @@ SKIP: {
     $a = "\x01\x01" x 0x101;
     $b = "\xFF" x 0x100;
 
-    $c = $a | $b;
+    my $c = $a | $b;
     is($c, "\xFF" x 0x100 . "\x01\x01" x 0x81);
     is( ($a | $b), ($b | $a) );
     $c = $a; $c |= $b;

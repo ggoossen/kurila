@@ -28,7 +28,7 @@ $dist->change_file( 'Build.PL', <<"---" );
 use Module::Build;
 
 my \$build = new Module::Build(
-  module_name => @{[$dist->name]},
+  module_name => '@{[$dist->name]}',
   scripts     => [ 'script' ],
   license     => 'perl',
   requires    => { 'File::Spec' => 0 },

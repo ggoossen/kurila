@@ -1,5 +1,7 @@
 #!./perl
 
+our (%Config, $where);
+
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
@@ -109,7 +111,7 @@ while (<PW>) {
     # In principle we could whine if @s != 7 but do we know enough
     # of passwd file formats everywhere?
     if (@s == 7 || ($^O eq 'darwin' && @s == 10)) {
-	@n = getpwuid($uid_s);
+	my @n = getpwuid($uid_s);
 	# 'nobody' et al.
 	next unless @n;
 	my ($name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) = @n;
@@ -135,6 +137,7 @@ endpwent();
 
 print "# max = $max, n = $n, perfect = ", scalar keys %perfect, "\n";
 
+my $not;
 if (keys %perfect == 0 && $n) {
     $max++;
     print <<EOEX;

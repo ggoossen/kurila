@@ -23,7 +23,7 @@ sub FETCH {
 
 
 package main;
-require './test.pl';
+BEGIN { require './test.pl' };
 
 plan( tests => 8 );
 

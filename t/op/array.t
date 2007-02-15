@@ -9,6 +9,7 @@ require 'test.pl';
 
 plan (125);
 
+my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 #
 # @foo, @bar, and @ary are also used from tie-stdarray after tie-ing them
 #
@@ -118,9 +119,13 @@ is($foo, 'e');
 $foo = ('a','b','c','d','e','f')[1];
 is($foo, 'b');
 
-@foo = ( 'foo', 'bar', 'burbl');
-push(foo, 'blah');
-is($#foo, 3);
+@foo = ( 'foo', 'bar', 'burbl', 'blah');
+{
+    no strict 'vars';
+    @foox = ( 'foo', 'bar', 'burbl');
+    push(foox, 'blah');
+    is($#foox, 3);
+}
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
 
@@ -146,7 +151,8 @@ is("@bar", "foo bar");						# 43
 # XXX tie-stdarray fails the tests involving local, so we use
 # different variable names to escape the 'tie'
 
-@bee = ( 'foo', 'bar', 'burbl', 'blah');
+our @bee = ( 'foo', 'bar', 'burbl', 'blah');
+our @bim;
 {
 
     local @bee = @bee;
@@ -243,13 +249,15 @@ is(push(@ary,56), 4);
 is(unshift(@ary,12), 5);
 
 sub foo { "a" }
-@foo=(foo())[0,0];
+my @foo=(foo())[0,0];
 is ($foo[1], "a");
 
 # $[ should have the same effect regardless of whether the aelem
 #    op is optimized to aelemfast.
 
 
+
+our @tary;
 
 sub tary {
   local $[ = 10;
@@ -266,8 +274,9 @@ tary();
 
 my $got = runperl (
 	prog => q{
+                    our @a;
 		    sub X::DESTROY { @a = () }
-		    @a = (bless {}, 'X');
+		    @a = (bless {}, \'X\');
 		    @a = ();
 		},
 	stderr => 1
@@ -368,6 +377,7 @@ sub test_arylen {
 
 {
     # Bug #36211
+    no strict 'vars';
     use vars '@array';
     for (1,2) {
 	{
@@ -380,6 +390,7 @@ sub test_arylen {
 
 {
     # Bug #37350
+    no strict 'refs';
     my @array = (1..4);
     $#{@array} = 7;
     is ($#{4}, 7);
@@ -393,6 +404,7 @@ sub test_arylen {
 }
 {
     # Bug #37350 -- once more with a global
+    no strict 'refs';
     use vars '@array';
     @array = (1..4);
     $#{@array} = 7;

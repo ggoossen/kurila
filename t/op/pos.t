@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 6;
 
+our ($x);
+
 $x='banana';
 $x=~/.a/g;
 is(pos($x), 2);

@@ -5,6 +5,13 @@ BEGIN {
     @INC = '../lib';
 }
 
+our ($xref, $runme, @a, %h, $aref, $chopit, @chopar, $posstr,
+     $cstr, $nn, $n, @INPUT, @simple_input, $ord, $href, $zzz1,
+    $zzz2, $op, $commentt, $expectop, $skip, $integer,
+    $comment, $operator, $variable);
+
+our ($undefed, @z, @x, @aaa, $toself, $direct);
+
 $| = 1;
 umask 0;
 $xref = \ "";
@@ -243,7 +250,7 @@ uc $cstr			# uc
 lc $cstr			# lc
 quotemeta $cstr			# quotemeta
 @$aref				# rv2av
-@$undefed			# rv2av undef
+do { no strict; @$undefed }			# rv2av undef
 (each %h) % 2 == 1		# each
 values %h			# values
 keys %h				# keys

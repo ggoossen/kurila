@@ -2,6 +2,8 @@
 
 print "1..13\n";
 
+our ($a, $b, $c);
+
 $a = 'ab' . 'c';	# compile time
 $b = 'def';
 

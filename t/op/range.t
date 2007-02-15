@@ -11,6 +11,8 @@ use Config;
 
 plan (45);
 
+our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
+
 is(join(':',1..5), '1:2:3:4:5');
 
 @foo = (1,2,3,4,5,6,7,8,9);

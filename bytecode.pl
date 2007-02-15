@@ -49,11 +49,13 @@ binmode ASMDATA_PM;
 print ASMDATA_PM $perl_header, <<'EOT';
 package B::Asmdata;
 
+use strict;
+
 our $VERSION = '1.01';
 
 use Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(%insn_data @insn_name @optype @specialsv_name);
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(%insn_data @insn_name @optype @specialsv_name);
 our(%insn_data, @insn_name, @optype, @specialsv_name);
 
 EOT

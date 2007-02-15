@@ -1,6 +1,7 @@
 package CGI;
 require 5.004;
 use Carp 'croak';
+no strict;
 
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.
@@ -423,7 +424,7 @@ sub param {
     # For compatibility between old calling style and use_named_parameters() style, 
     # we have to special case for a single parameter present.
     if (@p > 1) {
-	($name,$value,@other) = rearrange([NAME,[DEFAULT,VALUE,VALUES]],@p);
+	($name,$value,@other) = rearrange(['NAME',['DEFAULT','VALUE','VALUES']],@p);
 	my(@values);
 
 	if (substr($p[0],0,1) eq '-') {

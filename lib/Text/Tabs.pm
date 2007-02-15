@@ -3,13 +3,13 @@ package Text::Tabs;
 
 require Exporter;
 
-@ISA = (Exporter);
-@EXPORT = qw(expand unexpand $tabstop);
+use strict;
+
+our @ISA = ('Exporter');
+our @EXPORT = qw(expand unexpand $tabstop);
 
 use vars qw($VERSION $tabstop $debug);
 $VERSION = 2007.1117;
-
-use strict;
 
 BEGIN	{
 	$tabstop = 8;

@@ -3,11 +3,11 @@ package Text::Wrap;
 use warnings::register;
 require Exporter;
 
-@ISA = qw(Exporter);
-@EXPORT = qw(wrap fill);
-@EXPORT_OK = qw($columns $break $huge);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(wrap fill);
+our @EXPORT_OK = qw($columns $break $huge);
 
-$VERSION = 2006.1117;
+our $VERSION = 2006.1117;
 
 use vars qw($VERSION $columns $debug $break $huge $unexpand $tabstop
 	$separator $separator2);

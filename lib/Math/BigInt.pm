@@ -20,8 +20,8 @@ use 5.006002;
 
 $VERSION = '1.80';
 
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(objectify bgcd blcm); 
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(objectify bgcd blcm); 
 
 # _trap_inf and _trap_nan are internal and should never be accessed from the
 # outside

@@ -20,7 +20,7 @@ sub ok {
 
 print "1..28\n";
 
-($a, $b, $c) = qw(foo bar);
+our ($a, $b, $c, $dx) = qw(foo bar);
 
 ok("$a"     eq "foo",    "verifying assign");
 ok("$a$b"   eq "foobar", "basic concatenation");
@@ -79,6 +79,8 @@ ok("$c$a$c" eq "foo",    "concatenate undef, fore and aft");
     # For symmetry with the above.
     eval {"\x{1234}$2"};
     ok(!$@, "bug id 20001020.006, right");
+
+    no strict 'vars';
 
     *pi = \undef;
     # This bug existed earlier than the $2 bug, but is fixed with the same
@@ -142,9 +144,9 @@ sub beq { use bytes; $_[0] eq $_[1]; }
     ok(beq($u.$p, $up),  "perl #26905, right eq unicode");
 
     $x1 .= $u;
-    $x2 = $p . $u;
+    my $x2 = $p . $u;
     $y1 .= $p;
-    $y2 = $u . $p;
+    my $y2 = $u . $p;
 
     no bytes;
     ok(beq($x1, $x2), "perl #26905, left,  .= vs = . in bytes");

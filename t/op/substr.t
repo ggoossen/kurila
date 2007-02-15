@@ -7,6 +7,9 @@ BEGIN {
     @INC = '../lib';
 }
 use warnings ;
+use strict;
+
+our ($w, $FATAL_MSG, $x);
 
 $a = 'abcdefxyz';
 $SIG{__WARN__} = sub {

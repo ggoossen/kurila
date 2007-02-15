@@ -8,6 +8,9 @@ BEGIN {
 
 plan tests => 35;
 
+our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total, 
+     %hash, @foo, %u, $A, %b);
+
 $h{'abc'} = 'ABC';
 $h{'def'} = 'DEF';
 $h{'jkl','mno'} = "JKL\034MNO";
@@ -106,20 +109,23 @@ isnt ($size, (split('/', scalar %hash))[1]);
 
 is (keys(%hash), 10, "keys (%hash)");
 
+{
+no strict;
 is (keys(hash), 10, "keys (hash)");
+}
 
 $i = 0;
-%h = (a => A, b => B, c=> C, d => D, abc => ABC);
-@keys = keys(h);
-@values = values(h);
-while (($key, $value) = each(h)) {
+%h = (a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');
+@keys = keys(%h);
+@values = values(%h);
+while (($key, $value) = each(%h)) {
 	if ($key eq $keys[$i] && $value eq $values[$i] && $key eq lc($value)) {
 		$i++;
 	}
 }
 is ($i, 5);
 
-@tests = (&next_test, &next_test, &next_test);
+our @tests = (&next_test, &next_test, &next_test);
 {
     package Obj;
     sub DESTROY { print "ok $::tests[1] # DESTROY called\n"; }

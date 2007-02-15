@@ -17,6 +17,8 @@ BEGIN {
 use warnings;
 no warnings qw(overflow portable);
 
+our $c;
+
 print "1..67\n";
 
 # as 6 * 6 = 36, the last digit of 6**n will always be six. Hence the last

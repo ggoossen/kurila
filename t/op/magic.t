@@ -38,18 +38,18 @@ sub skip {
 
 print "1..58\n";
 
-$Is_MSWin32  = $^O eq 'MSWin32';
-$Is_NetWare  = $^O eq 'NetWare';
-$Is_VMS      = $^O eq 'VMS';
-$Is_Dos      = $^O eq 'dos';
-$Is_os2      = $^O eq 'os2';
-$Is_Cygwin   = $^O eq 'cygwin';
-$Is_MacOS    = $^O eq 'MacOS';
-$Is_MPE      = $^O eq 'mpeix';		
-$Is_miniperl = $ENV{PERL_CORE_MINITEST};
-$Is_BeOS     = $^O eq 'beos';
+my $Is_MSWin32  = $^O eq 'MSWin32';
+my $Is_NetWare  = $^O eq 'NetWare';
+my $Is_VMS      = $^O eq 'VMS';
+my $Is_Dos      = $^O eq 'dos';
+my $Is_os2      = $^O eq 'os2';
+my $Is_Cygwin   = $^O eq 'cygwin';
+my $Is_MacOS    = $^O eq 'MacOS';
+my $Is_MPE      = $^O eq 'mpeix';		
+my $Is_miniperl = $ENV{PERL_CORE_MINITEST};
+my $Is_BeOS     = $^O eq 'beos';
 
-$PERL = $ENV{PERL}
+my $PERL = $ENV{PERL}
     || ($Is_NetWare           ? 'perl'   :
        ($Is_MacOS || $Is_VMS) ? $^X      :
        $Is_MSWin32            ? '.\perl' :
@@ -89,7 +89,7 @@ else {
     $SIG{"INT"} = "DEFAULT"; kill "INT",$$; sleep 1; print "not ok 4\n";
 
     sub ok3 {
-	if (($x = pop(@_)) eq "INT") {
+	if ((my $x = pop(@_)) eq "INT") {
 	    print "ok 3\n";
 	}
 	else {
@@ -135,8 +135,8 @@ END
 }
 
 # can we slice ENV?
-@val1 = @ENV{keys(%ENV)};
-@val2 = values(%ENV);
+my @val1 = @ENV{keys(%ENV)};
+my @val2 = values(%ENV);
 ok join(':',@val1) eq join(':',@val2);
 ok @val1 > 1;
 
@@ -148,7 +148,7 @@ ok $' eq 'baz', $';
 ok $+ eq 'a', $+;
 
 # $"
-@a = qw(foo bar baz);
+my @a = qw(foo bar baz);
 ok "@a" eq "foo bar baz", "@a";
 {
     local $" = ',';
@@ -156,7 +156,7 @@ ok "@a" eq "foo bar baz", "@a";
 }
 
 # $;
-%h = ();
+my %h = ();
 $h{'foo', 'bar'} = 1;
 ok((keys %h)[0] eq "foo\034bar", (keys %h)[0]);
 {
@@ -183,6 +183,8 @@ ok $@ eq "foo\n", $@;
 ok $$ > 0, $$;
 eval { $$++ };
 ok $@ =~ /^Modification of a read-only value attempted/;
+
+our ($wd, $script);
 
 # $^X and $0
 {
@@ -240,7 +242,7 @@ EOT
         if 0;
 EOH
     }
-    $s1 = "\$^X is $perl, \$0 is $script\n";
+    my $s1 = "\$^X is $perl, \$0 is $script\n";
     ok open(SCRIPT, ">$script"), $!;
     ok print(SCRIPT $headmaybe . <<EOB . <<'EOF' . $tailmaybe), $!;
 #!$wd/perl
@@ -284,8 +286,8 @@ else {
 	if ($ENV{PERL_VALGRIND}) {
 	    skip("clearing \%ENV is not safe when running under valgrind");
 	} else {
-	    $PATH = $ENV{PATH};
-	    $PDL = $ENV{PERL_DESTRUCT_LEVEL} || 0;
+	    my $PATH = $ENV{PATH};
+	    my $PDL = $ENV{PERL_DESTRUCT_LEVEL} || 0;
 	    $ENV{foo} = "bar";
 	    %ENV = ();
 	    $ENV{PATH} = $PATH;
@@ -386,6 +388,7 @@ if ($Is_miniperl) {
     delete $INC{"Errno.pm"};
 
     open(FOO, "nonesuch"); # Generate ENOENT
+    no strict 'refs';
     my %errs = %{"!"}; # Cause Errno.pm to be loaded at run-time
     ok ${"!"}{ENOENT};
 }
@@ -438,6 +441,7 @@ ok "@+" eq "10 1 6 10";
 
 # Test for bug [perl #36434]
 if (!$Is_VMS) {
+    our @ISA;
     local @ISA;
     local %ENV;
     eval { push @ISA, __PACKAGE__ };

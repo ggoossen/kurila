@@ -7,6 +7,8 @@ BEGIN {
 }
 plan tests => 114;
 
+our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
+
 my $list_assignment_supported = 1;
 
 #mg.c says list assignment not supported on VMS, EPOC, and SYMBIAN.
@@ -298,7 +300,7 @@ while (/(o.+?),/gc) {
 	"Local \$_"   => sub { local $_  = 'ok?'; print },	0,
 	"for local"   => sub { for("#ok?\n"){ print } },	1,
     );
-    while ( ($name, $code, $ok) = splice(@tests, 0, 3) ) {
+    while ( my ($name, $code, $ok) = splice(@tests, 0, 3) ) {
 	eval { &$code };
         main::ok(($ok xor $@), "Underscore '$name'");
     }
@@ -307,6 +309,7 @@ while (/(o.+?),/gc) {
 
 {
     # BUG 20001205.22
+    no strict 'subs';
     my %x;
     $x{a} = 1;
     { local $x{b} = 1; }

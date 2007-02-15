@@ -2,12 +2,15 @@ package overload;
 
 our $VERSION = '1.04';
 
+use vars qw'%constants %ops';
+
 sub nil {}
 
 sub OVERLOAD {
-  $package = shift;
+  my $package = shift;
   my %arg = @_;
   my ($sub, $fb);
+  no strict 'refs';
   $ {$package . "::OVERLOAD"}{dummy}++; # Register with magic by touching.
   *{$package . "::()"} = \&nil; # Make it findable via fetchmethod.
   for (keys %arg) {
@@ -27,14 +30,14 @@ sub OVERLOAD {
 }
 
 sub import {
-  $package = (caller())[0];
+  my $package = (caller())[0];
   # *{$package . "::OVERLOAD"} = \&OVERLOAD;
   shift;
   $package->overload::OVERLOAD(@_);
 }
 
 sub unimport {
-  $package = (caller())[0];
+  my $package = (caller())[0];
   ${$package . "::OVERLOAD"}{dummy}++; # Upgrade the table
   shift;
   for (@_) {

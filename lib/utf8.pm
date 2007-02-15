@@ -15,13 +15,14 @@ sub import {
     $^H |= $utf8::hint_bits;
     $^H |= $utf8::codepoints_hint_bits;
     $^H &= ~$bytes::hint_bits;
-    $enc{caller()} = $_[1] if $_[1];
 }
 
 sub unimport {
     $^H &= ~$utf8::hint_bits;
     $^H &= ~$utf8::codepoints_hint_bits;
 }
+
+our $AUTOLOAD;
 
 sub AUTOLOAD {
     require "utf8_heavy.pl";

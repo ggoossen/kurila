@@ -5,6 +5,8 @@ BEGIN {
     @INC = '../lib';
 }
 
+my $test = 0;
+
 print "1..20\n";
 
 print "not " unless length("")    == 0;

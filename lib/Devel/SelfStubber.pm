@@ -1,10 +1,11 @@
 package Devel::SelfStubber;
+use strict;
 use File::Spec;
 require SelfLoader;
-@ISA = qw(SelfLoader);
-@EXPORT = 'AUTOLOAD';
-$JUST_STUBS = 1;
-$VERSION = 1.03;
+our @ISA = qw(SelfLoader);
+our @EXPORT = 'AUTOLOAD';
+our $JUST_STUBS = 1;
+our $VERSION = 1.03;
 sub Version {$VERSION}
 
 # Use as
@@ -14,6 +15,8 @@ sub Version {$VERSION}
 # would print out stubs needed if you added a __DATA__ before the subs.
 # Setting $Devel::SelfStubber::JUST_STUBS to 0 will print out the whole
 # module with the stubs entered just before the __DATA__
+
+our (@DATA, @STUBS);
 
 sub _add_to_cache {
     my($self,$fullname,$pack,$lines, $prototype) = @_;
@@ -39,6 +42,7 @@ sub stub {
     my (@BEFORE_DATA, @AFTER_DATA, @AFTER_END);
     @DATA = @STUBS = ();
 
+    no strict 'refs';
     open($fh,$mod_file) || die "Unable to open $mod_file";
     local $/ = "\n";
     while(defined ($line = <$fh>) and $line !~ m/^__DATA__/) {

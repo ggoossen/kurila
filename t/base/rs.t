@@ -3,6 +3,8 @@
 
 print "1..17\n";
 
+our ($teststring, $bar, $foo, $throwaway);
+
 $teststring = "1\n12\n123\n1234\n1234\n12345\n\n123456\n1234567\n";
 
 # Create our test datafile
@@ -131,7 +133,7 @@ if ($^O eq 'VMS') {
 } else {
   # Nobody else does this at the moment (well, maybe OS/390, but they can
   # put their own tests in) so we just punt
-  foreach $test (12..15) {print "ok $test # skipped on non-VMS system\n"};
+  foreach my $test (12..15) {print "ok $test # skipped on non-VMS system\n"};
 }
 
 $/ = "\n";

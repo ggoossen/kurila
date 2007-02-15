@@ -763,6 +763,8 @@ sub utime {
     CORE::utime($_[1], $_[2], $_[0]);
 }
 
+our (%EXPORT_TAGS, @EXPORT_OK, @EXPORT);
+
 sub load_imports {
 %EXPORT_TAGS = (
 

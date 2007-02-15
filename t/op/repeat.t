@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-require './test.pl';
+BEGIN { require './test.pl' };
 plan(tests => 42);
 
 # compile time
@@ -50,7 +50,7 @@ is($a, 'xyzxyz',        'x=1');
 $a x= 0;
 is($a, '',              'x=0');
 
-@x = (1,2,3);
+my @x = (1,2,3);
 
 is(join('', @x x 4),        '3333',                 '@x x Y');
 is(join('', (@x) x 4),      '123123123123',         '(@x) x Y');

@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 109;
 
+our ($a, $b, $c);
+
 $a = "HELLO.* world";
 $b = "hello.* WORLD";
 

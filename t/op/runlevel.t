@@ -8,21 +8,23 @@
 
 chdir 't' if -d 't';
 @INC = '../lib';
-$Is_VMS = $^O eq 'VMS';
-$Is_MSWin32 = $^O eq 'MSWin32';
-$Is_NetWare = $^O eq 'NetWare';
-$Is_MacOS = $^O eq 'MacOS';
+my $Is_VMS = $^O eq 'VMS';
+my $Is_MSWin32 = $^O eq 'MSWin32';
+my $Is_NetWare = $^O eq 'NetWare';
+my $Is_MacOS = $^O eq 'MacOS';
 $ENV{PERL5LIB} = "../lib" unless $Is_VMS;
 
 $|=1;
 
 undef $/;
-@prgs = split "\n########\n", <DATA>;
+our @prgs = split "\n########\n", <DATA>;
 print "1..", scalar @prgs, "\n";
 
-$tmpfile = "runltmp000";
+our $tmpfile = "runltmp000";
 1 while -f ++$tmpfile;
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }
+
+our $i;
 
 for (@prgs){
     my $switch = "";
@@ -58,7 +60,7 @@ for (@prgs){
 }
 
 __END__
-@a = (1, 2, 3);
+our @a = (1, 2, 3);
 {
   @a = sort { last ; } @a;
 }
@@ -78,7 +80,7 @@ sub FETCH {
 }
 package main;
  
-tie $bar, TEST;
+tie my $bar, 'TEST';
 print "- $bar\n";
 EXPECT
 still in fetch
@@ -99,7 +101,7 @@ sub FETCH {
  
 package main;
  
-tie $bar, TEST;
+tie my $bar, 'TEST';
 print "- $bar\n";
 print "OK\n";
 EXPECT
@@ -122,7 +124,7 @@ eval('die("test\n")');
 package main;
  
 open FH, ">&STDOUT";
-tie *FH, TEST;
+tie *FH, 'TEST';
 print FH "OK\n";
 print STDERR "DONE\n";
 EXPECT
@@ -153,7 +155,7 @@ sub str {
  
 package main;
  
-$bar = bless {}, TEST;
+our $bar = bless {}, 'TEST';
 print "$bar\n";
 print "OK\n";
 EXPECT
@@ -163,7 +165,7 @@ OK
 sub foo {
   $a <=> $b unless eval('$a == 0 ? bless undef : ($a <=> $b)');
 }
-@a = (3, 2, 0, 1);
+our @a = (3, 2, 0, 1);
 @a = sort foo @a;
 print join(', ', @a)."\n";
 EXPECT
@@ -173,7 +175,7 @@ sub foo {
   goto bar if $a == 0 || $b == 0;
   $a <=> $b;
 }
-@a = (3, 2, 0, 1);
+our @a = (3, 2, 0, 1);
 @a = sort foo @a;
 print join(', ', @a)."\n";
 exit;
@@ -182,7 +184,7 @@ print "bar reached\n";
 EXPECT
 Can't "goto" out of a pseudo block at - line 2.
 ########
-%seen = ();
+our %seen = ();
 sub sortfn {
   (split(/./, 'x'x10000))[0];
   my (@y) = ( 4, 6, 5);
@@ -191,20 +193,20 @@ sub sortfn {
   print $t if ($seen{$t}++ == 0);
   return $_[0] <=> $_[1];
 }
-@x = ( 3, 2, 1 );
+our @x = ( 3, 2, 1 );
 @x = sort { &sortfn($a, $b) } @x;
 print "---- ".join(', ', @x)."\n";
 EXPECT
 sortfn 4, 5, 6
 ---- 1, 2, 3
 ########
-@a = (3, 2, 1);
+our @a = (3, 2, 1);
 @a = sort { eval('die("no way")') ,  $a <=> $b} @a;
 print join(", ", @a)."\n";
 EXPECT
 1, 2, 3
 ########
-@a = (1, 2, 3);
+our @a = (1, 2, 3);
 foo:
 {
   @a = sort { last foo; } @a;
@@ -227,7 +229,7 @@ sub STORE {
  
 package main;
  
-tie $bar, TEST;
+tie our $bar, 'TEST';
 {
   print "- $bar\n";
 }
@@ -248,7 +250,7 @@ sub FETCH {
  
 package main;
  
-tie $bar, TEST;
+tie my $bar, 'TEST';
 print "- $bar\n";
 exit;
 bbb:
@@ -259,7 +261,7 @@ Can't find label bbb at - line 8.
 sub foo {
   $a <=> $b unless eval('$a == 0 ? die("foo\n") : ($a <=> $b)');
 }
-@a = (3, 2, 0, 1);
+our @a = (3, 2, 0, 1);
 @a = sort foo @a;
 print join(', ', @a)."\n";
 EXPECT
@@ -277,7 +279,7 @@ sub STORE {
 (split(/./, 'x'x10000))[0];
 }
 package main;
-tie $bar, TEST;
+tie our $bar, 'TEST';
 $bar = "x";
 ########
 package TEST;
@@ -288,12 +290,12 @@ sub TIESCALAR {
 }
 package main;
 {
-tie $bar, TEST;
+tie my $bar, 'TEST';
 }
 EXPECT
 Can't "next" outside a loop block at - line 4.
 ########
-@a = (1, 2, 3);
+our @a = (1, 2, 3);
 foo:
 {
   @a = sort { exit(0) } @a;
@@ -304,8 +306,8 @@ foobar
 ########
 $SIG{__DIE__} = sub {
     print "In DIE\n";
-    $i = 0;
-    while (($p,$f,$l,$s) = caller(++$i)) {
+    my $i = 0;
+    while (my ($p,$f,$l,$s) = caller(++$i)) {
         print "$p|$f|$l|$s\n";
     }
 };
@@ -347,9 +349,9 @@ EXPECT
 foo|fee|fie|foe
 ########
 package TH;
-sub TIEHASH { bless {}, TH }
+sub TIEHASH { bless {}, 'TH' }
 sub STORE { eval { print "@_[1,2]\n" }; die "bar\n" }
-tie %h, TH;
+tie our %h, 'TH';
 eval { $h{A} = 1; print "never\n"; };
 print $@;
 eval { $h{B} = 2; };

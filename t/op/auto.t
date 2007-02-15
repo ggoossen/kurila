@@ -8,6 +8,8 @@ BEGIN {
 require "test.pl";
 plan( tests => 37 );
 
+our ($x, $foo, @x, %x);
+
 $x = 10000;
 cmp_ok(0 + ++$x - 1,'==',10000,'scalar ++x - 1');
 cmp_ok(0 + $x-- - 1,'==',10000,'scalar x-- - 1');

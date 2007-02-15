@@ -1567,7 +1567,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     # String we will pull apart and rebuild in several ways:
     my $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
     my $up   = $down;
-    utf8::upgrade($up);
+    utf8::encode($up);
 
     my %expect =
         # [expected result,
@@ -1667,7 +1667,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     # u format
     my $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
     my $up   = $down;
-    utf8::upgrade($up);
+    utf8::encode($up);
     is(pack("u", $down), pack("u", $up), "u pack is neutral");
     is(unpack("u", pack("u", $down)), $down, "u unpack to downgraded works");
     is(unpack("U0C0u", pack("u", $down)), $up, "u unpack to upgraded works");
@@ -1681,7 +1681,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     is(pack("U0C0P", $str), $down);
     is(unpack("p", $down), "abc\xa5", "unpack p downgraded");
     $up   = $down;
-    utf8::upgrade($up);
+    utf8::encode($up);
     is(unpack("p", $up), "abc\xa5", "unpack p upgraded");
 
     is(unpack("P7", $down), "abc\xa5\x00\xfed", "unpack P downgraded");
@@ -1690,7 +1690,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     # x, X and @
     $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
     $up   = $down;
-    utf8::upgrade($up);
+    utf8::encode($up);
 
     is(unpack('@4W', $down), 0xfc, "\@positioning on downgraded string");
     is(unpack('@4W', $up),   0xfc, "\@positioning on upgraded string");

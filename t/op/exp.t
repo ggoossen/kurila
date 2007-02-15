@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 16;
 
+our ($s, $x1, $x2);
+
 # compile time evaluation
 
 $s = sqrt(2);

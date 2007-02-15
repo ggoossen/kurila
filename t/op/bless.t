@@ -8,6 +8,8 @@ BEGIN {
 
 plan (106);
 
+our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
+
 sub expected {
     my($object, $package, $type) = @_;
     print "# $object $package $type\n";
@@ -99,7 +101,7 @@ expected(bless([]), 'main', "ARRAY");
     local $SIG{__WARN__} = sub { push @w, join '', @_ };
     use warnings;
 
-    $m = bless [];
+    my $m = bless [];
     expected($m, 'main', "ARRAY");
     is (scalar @w, 0);
 
@@ -124,7 +126,7 @@ isnt ($@, '', "class is a ref");
     package H4;
     use overload '""' => sub { "C4" };
 }
-$h1 = bless {}, "H4";
-$c4 = eval { bless \$test, $h1 };
+my $h1 = bless {}, "H4";
+my $c4 = eval { bless \$test, $h1 };
 is ($@, '', "class is an overloaded ref");
 expected($c4, 'C4', "SCALAR");

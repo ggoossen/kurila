@@ -7,6 +7,8 @@ BEGIN {
 
 print "1..93\n";
 
+our ($foo, $fact, $ans, $i, $x, $eval);
+
 eval 'print "ok 1\n";';
 
 if ($@ eq '') {print "ok 2\n";} else {print "not ok 2\n";}
@@ -29,7 +31,7 @@ print eval '"ok 7\n";';
 # calculate a factorial with recursive evals
 
 $foo = 5;
-$fact = 'if ($foo <= 1) {1;} else {push(@x,$foo--); (eval $fact) * pop(@x);}';
+$fact = 'our @x; if ($foo <= 1) {1;} else {push(@x,$foo--); (eval $fact) * pop(@x);}';
 $ans = eval $fact;
 if ($ans == 120) {print "ok 8\n";} else {print "not ok 8\n";}
 
@@ -170,7 +172,7 @@ $x++;
 
 # does lexical search terminate correctly at subroutine boundary?
 $main::r = "ok $x\n";
-sub terminal { eval 'print $r' }
+sub terminal { eval 'no strict; print $r' }
 {
    my $r = "not ok $x\n";
    eval 'terminal($r)';
@@ -382,10 +384,10 @@ our $x = 1;
     print db6()     == 4 ? 'ok' : 'not ok', " $test\n"; $test++;
 }
 require './test.pl';
-$NO_ENDING = 1;
+our $NO_ENDING = 1;
 # [perl #19022] used to end up with shared hash warnings
 # The program should generate no output, so anything we see is on stderr
-my $got = runperl (prog => '$h{a}=1; foreach my $k (keys %h) {eval qq{\$k}}',
+my $got = runperl (prog => 'our %h; $h{a}=1; foreach my $k (keys %h) {eval qq{\$k}}',
 		   stderr => 1);
 
 if ($got eq '') {
@@ -443,7 +445,7 @@ print "ok ",$test++," - #20798 (used to dump core)\n";
 
 $got = runperl (
     prog => 
-    'sub A::TIEARRAY { L: { eval { last L } } } tie @a, A; warn qq(ok\n)',
+    'no strict; sub A::TIEARRAY { L: { eval { last L } } } tie @a, A; warn qq(ok\n)',
 stderr => 1);
 
 print "not " unless $got eq "ok\n";

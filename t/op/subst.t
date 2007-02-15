@@ -10,6 +10,8 @@ BEGIN {
 require './test.pl';
 plan( tests => 135 );
 
+our ($x, $snum, $foo, $t, $r, $s);
+
 $x = 'foo';
 $_ = "x";
 s/x/\$x/;
@@ -558,6 +560,7 @@ is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
 {
     $_ = "xy";
     no warnings 'uninitialized';
+    no strict 'refs';
     /(((((((((x)))))))))(z)/;	# clear $10
     s/(((((((((x)))))))))(y)/${10}/;
     is($_,"y","RT#6006: \$_ eq '$_'");

@@ -32,6 +32,7 @@ my $attr_list = qr{
 sub croak { { local $@; require Carp; } goto &Carp::croak }
 sub carp { { local $@; require Carp; } goto &Carp::carp }
 
+our $AUTOLOAD;
 AUTOLOAD {
     our $AUTOLOAD;
     print STDERR "SelfLoader::AUTOLOAD for $AUTOLOAD\n" if DEBUG;

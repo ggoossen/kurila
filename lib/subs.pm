@@ -32,7 +32,8 @@ sub import {
     my $callpack = caller;
     my $pack = shift;
     my @imports = @_;
-    foreach $sym (@imports) {
+    foreach my $sym (@imports) {
+        no strict 'refs';
 	*{"${callpack}::$sym"} = \&{"${callpack}::$sym"};
     }
 };

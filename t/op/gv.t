@@ -14,6 +14,8 @@ use warnings;
 require './test.pl';
 plan( tests => 160 );
 
+no strict;
+
 # type coersion on assignment
 $foo = 'foo';
 $bar = *main::foo;

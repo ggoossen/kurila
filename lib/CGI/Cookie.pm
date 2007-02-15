@@ -1,5 +1,7 @@
 package CGI::Cookie;
 
+no strict;
+
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.
 

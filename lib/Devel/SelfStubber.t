@@ -236,7 +236,7 @@ __END__
 ################ Child.pm
 package Child;
 require Parent;
-@ISA = 'Parent';
+our @ISA = 'Parent';
 use SelfLoader;
 
 1;

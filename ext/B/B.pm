@@ -11,11 +11,11 @@ our $VERSION = '1.15';
 
 use XSLoader ();
 require Exporter;
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
 # walkoptree_slow comes from B.pm (you are there),
 # walkoptree comes from B.xs
-@EXPORT_OK = qw(minus_c ppname save_BEGINs
+our @EXPORT_OK = qw(minus_c ppname save_BEGINs
 		class peekop cast_I32 cstring cchar hash threadsv_names
 		main_root main_start main_cv svref_2object opnumber
 		sub_generation amagic_generation perlstring

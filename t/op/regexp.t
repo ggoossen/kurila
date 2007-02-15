@@ -38,6 +38,13 @@
 # evalled; so something like a\"\x{100}$1 has length 3+length($1).
 
 my $file;
+
+use strict;
+use warnings FATAL=>"all";
+use vars qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
+use vars qw($qr $skip_amp $qr_embed); # set by our callers
+
+
 BEGIN {
     $iters = shift || 1;	# Poor man performance suite, 10000 is OK.
 
@@ -50,12 +57,6 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
 }
-
-use strict;
-use warnings FATAL=>"all";
-use vars qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
-use vars qw($qr $skip_amp $qr_embed); # set by our callers
-
 
 if (!defined $file) {
     open(TESTS,'op/re_tests') || open(TESTS,'t/op/re_tests')

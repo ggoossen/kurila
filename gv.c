@@ -930,6 +930,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    else if (IN_PERL_COMPILETIME) {
 		stash = PL_curstash;
 		if (add && (PL_hints & HINT_STRICT_VARS) &&
+		    !(flags & GV_NOTQUAL) &&
 		    sv_type != SVt_PVCV &&
 		    sv_type != SVt_PVGV &&
 		    sv_type != SVt_PVFM &&

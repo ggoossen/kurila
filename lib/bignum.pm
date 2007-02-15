@@ -1,11 +1,11 @@
 package bignum;
 use 5.006002;
 
-$VERSION = '0.19';
+our $VERSION = '0.19';
 use Exporter;
-@EXPORT_OK 	= qw( ); 
-@EXPORT 	= qw( inf NaN ); 
-@ISA 		= qw( Exporter );
+our @EXPORT_OK 	= qw( ); 
+our @EXPORT 	= qw( inf NaN ); 
+our @ISA 		= qw( Exporter );
 
 use strict;
 use overload;

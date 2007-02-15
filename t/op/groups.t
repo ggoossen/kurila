@@ -17,6 +17,8 @@ BEGIN {
     }
 }
 
+our ($groups, $pwgid, $pwgnam, %seen, @gr, $group, $gr1, $gr2, %basegroup);
+
 sub quit {
     print "1..0 # Skip: no `id` or `groups`\n";
     exit 0;

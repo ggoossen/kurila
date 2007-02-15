@@ -64,6 +64,8 @@ is( $r, "5.6" );
 # readline() has special behaviour too
 #
 
+our $fh;
+
 $r = 11;
 BEGIN { *CORE::GLOBAL::readline = sub (;*) { ++$r }; }
 is( <FH>	, 12 );

@@ -10,6 +10,12 @@ use strict qw(refs subs);
 
 plan(128);
 
+our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
+     @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
+     $refref, $x, %whatever, @spring, %spring2,
+     $subref, $subrefref, $anonhash, $anonhash2, $object2, $THIS,
+     @ARGS, $string);
+
 # Test glob operations.
 
 $bar = "one";
@@ -67,7 +73,7 @@ $ref[0] = \@a;
 $ref[1] = \@b;
 $ref[2] = \@c;
 $ref[3] = \@d;
-for $i (3,1,2,0) {
+for my $i (3,1,2,0) {
     push(@{$ref[$i]}, "ok $ary[$i]\n");
 }
 print @a;
@@ -185,7 +191,7 @@ DESTROY {
 
 package OBJ;
 
-@ISA = ('BASEOBJ');
+our @ISA = ('BASEOBJ');
 
 $main'object = bless {FOO => 'foo', BAR => 'bar'};
 
@@ -207,12 +213,13 @@ sub BASEOBJ'doit {
 }
 
 package UNIVERSAL;
-@ISA = 'LASTCHANCE';
+our @ISA = 'LASTCHANCE';
 
 package LASTCHANCE;
 sub foo { main::is ($_[1], 'works') }
 
 package WHATEVER;
+no strict;
 foo WHATEVER "works";
 
 #
@@ -263,7 +270,7 @@ $bar = "glob 3";
 local(*bar) = *bar;
 is ($bar, "glob 3");
 
-$var = "glob 4";
+our $var = "glob 4";
 $_   = \$var;
 is ($$_, 'glob 4');
 
@@ -379,14 +386,14 @@ is (runperl(
 # object is required to trigger the early freeing of GV refs to to STDOUT
 
 like (runperl(
-    prog => '$x=bless[]; sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
+    prog => 'our $x=bless[]; sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
     stderr => 1
       ), qr/^(ok)+$/, 'STDOUT destructor');
 
 TODO: {
     no strict 'refs';
-    $name1 = "\0Chalk";
-    $name2 = "\0Cheese";
+    my $name1 = "\0Chalk";
+    my $name2 = "\0Cheese";
 
     isnt ($name1, $name2, "They differ");
 
@@ -435,6 +442,7 @@ TODO: {
 
     $name1 = "Left"; $name2 = "Left\0Right";
     my $glob2 = *{$name2};
+    our $glob1;
 
     isnt ($glob1, $glob2, "We get different typeglobs");
 
@@ -498,6 +506,8 @@ my $test1 = $test + 1;
 my $test2 = $test + 2;
 
 package FINALE;
+
+our ($ref3, $ref1);
 
 {
     $ref3 = bless ["ok $test2\n"];	# package destruction

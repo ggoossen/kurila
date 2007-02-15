@@ -1,11 +1,11 @@
 package bigrat;
 use 5.006002;
 
-$VERSION = '0.09';
+our $VERSION = '0.09';
 require Exporter;
-@ISA		= qw( Exporter );
-@EXPORT_OK	= qw( ); 
-@EXPORT		= qw( inf NaN ); 
+our @ISA		= qw( Exporter );
+our @EXPORT_OK	= qw( ); 
+our @EXPORT		= qw( inf NaN ); 
 
 use strict;
 use overload;

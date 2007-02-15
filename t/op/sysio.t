@@ -2,6 +2,10 @@
 
 print "1..42\n";
 
+use strict;
+
+our ($reopen, $x, $outfile);
+
 chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $!";
 @INC = '../../lib';
 

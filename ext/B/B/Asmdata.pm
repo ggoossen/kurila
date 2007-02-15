@@ -11,11 +11,13 @@
 #
 package B::Asmdata;
 
+use strict;
+
 our $VERSION = '1.01';
 
 use Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(%insn_data @insn_name @optype @specialsv_name);
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(%insn_data @insn_name @optype @specialsv_name);
 our(%insn_data, @insn_name, @optype, @specialsv_name);
 
 @optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP);

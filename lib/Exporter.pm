@@ -3,8 +3,8 @@ package Exporter;
 require 5.006;
 
 # Be lean.
-#use strict;
-#no strict 'refs';
+use strict;
+no strict 'refs';
 
 our $Debug = 0;
 our $ExportLevel = 0;

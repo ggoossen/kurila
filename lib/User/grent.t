@@ -17,8 +17,10 @@ BEGIN {
     unless ($hasgr) { plan skip_all => "no grp.h"; }
 }
 
+use strict;
+our @grent;
 BEGIN {
-    our @grent = getgrgid 0; # This is the function getgrgid.
+    @grent = getgrgid 0; # This is the function getgrgid.
     unless (@grent) { plan skip_all => "no gid 0"; }
 }
 

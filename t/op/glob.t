@@ -8,6 +8,8 @@ BEGIN {
 require 'test.pl';
 plan( tests => 15 );
 
+our (@oops, @ops, %files, $not, @glops, $x);
+
 @oops = @ops = <op/*>;
 
 if ($^O eq 'MSWin32') {

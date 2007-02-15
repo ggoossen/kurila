@@ -22,8 +22,11 @@ $a++;
 ok(!close $a);
 ok(!defined *{$a});
 
-ok(open($a, ">&STDOUT"));
-ok(defined *{$a});
+{
+    no strict 'refs';
+    ok(open($a, ">&STDOUT"));
+    ok(defined *{$a});
+}
 
 ok(close $a);
 

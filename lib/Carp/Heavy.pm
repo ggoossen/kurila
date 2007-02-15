@@ -1,6 +1,8 @@
 # Carp::Heavy uses some variables in common with Carp.
 package Carp;
 
+use strict;
+
 =head1 NAME
 
 Carp::Heavy - heavy machinery, no user serviceable parts inside
@@ -23,6 +25,8 @@ use Carp;  our $VERSION = $Carp::VERSION;
 # croak.  They replace $CarpLevel, which is deprecated.    The
 # $Max(EvalLen|(Arg(Len|Nums)) variables are used to specify how the eval
 # text and function arguments should be formatted when printed.
+
+our (%CarpInternal, %Internal);
 
 # disable these by default, so they can live w/o require Carp
 $CarpInternal{Carp}++;
@@ -52,6 +56,8 @@ sub  longmess_real {
       return longmess_heavy(@_);
     }
 };
+
+our @CARP_NOT;
 
 sub shortmess_real {
     # Icky backwards compatibility wrapper. :-(

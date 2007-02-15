@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 135;
 
+our ($FS, $c, @ary, $x, $foo, $res, @list1, @list2, @a, $p, $n);
+
 $FS = ':';
 
 $_ = 'a:b:c';
@@ -261,7 +263,7 @@ ok(@ary == 3 &&
     for my $u (0, 1) {
 	for my $a (0, 1) {
 	    $_ = 'readin,database,readout';
-	    utf8::upgrade $_ if $u;
+	    utf8::encode $_ if $u;
 	    /(.+)/;
 	    my @d = split /[,]/,$1;
 	    is(join (':',@d), 'readin:database:readout', "[perl #18195]");
@@ -271,12 +273,13 @@ ok(@ary == 3 &&
 
 {
     $p="a,b";
-    utf8::upgrade $p;
+    utf8::encode $p;
     eval { @a=split(/[, ]+/,$p) };
     is ("$@-@a-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
 }
 
 {
+    no strict 'refs';
     is (\@a, \@{"a"}, '@a must be global for following test');
     $p="";
     $n = @a = split /,/,$p;

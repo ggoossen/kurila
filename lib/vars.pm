@@ -5,7 +5,8 @@ use 5.006;
 our $VERSION = '1.01';
 
 use warnings::register;
-use strict qw(vars subs);
+use strict;
+no strict 'refs';
 
 use utf8;
 

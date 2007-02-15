@@ -32,8 +32,10 @@ The values are the original list elements.
 
 =cut
 
-@ISA = qw(Exporter);
-@EXPORT = qw(abbrev);
+use strict;
+
+our @ISA = qw(Exporter);
+our @EXPORT = qw(abbrev);
 
 # Usage:
 #	abbrev \%foo, LIST;

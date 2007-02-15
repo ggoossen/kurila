@@ -14,6 +14,8 @@ sub unimport {
     $^H &= ~$bytes::hint_bits;
 }
 
+our $AUTOLOAD;
+
 sub AUTOLOAD {
     require "bytes_heavy.pl";
     goto &$AUTOLOAD if defined &$AUTOLOAD;

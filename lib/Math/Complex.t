@@ -15,6 +15,7 @@ BEGIN {
 
 use Math::Complex;
 
+use strict;
 use vars qw($VERSION);
 
 $VERSION = 1.92;
@@ -24,7 +25,7 @@ my ($args, $op, $target, $test, $test_set, $try, $val, $zvalue, @set, @val);
 $test = 0;
 $| = 1;
 my @script = (
-    'my ($res, $s0,$s1,$s2,$s3,$s4,$s5,$s6,$s7,$s8,$s9,$s10,$z0,$z1,$z2);' .
+    'my ($res, $s0,$s1,$s2,$s3,$s4,$s5,$s6,$s7,$s8,$s9,$s10,$z0,$z1,$z2,$bad,$z);' .
 	"\n\n"
 );
 my $eps = 1e-13;

@@ -1,5 +1,7 @@
 package Tie::SubstrHash;
 
+use strict;
+
 our $VERSION = '1.00';
 
 =head1 NAME
@@ -38,6 +40,9 @@ value of any of the initialization parameters.
 The hash does not support exists().
 
 =cut
+
+our ($self, $key, $klen, $vlen, $tsize, $rlen, $offset, $hash,
+     $record, $val, $entries, $iterix, $hashbase);
 
 use Carp;
 

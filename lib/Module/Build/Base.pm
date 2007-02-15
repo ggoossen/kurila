@@ -902,7 +902,7 @@ sub subclass {
   print $fh <<EOF;
 package $opts{class};
 use $pack;
-\@ISA = qw($pack);
+our \@ISA = qw($pack);
 $opts{code}
 1;
 EOF

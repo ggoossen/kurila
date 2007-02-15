@@ -1,5 +1,7 @@
 package CGI::Carp;
 
+no strict;
+
 =head1 NAME
 
 B<CGI::Carp> - CGI routines for writing to the HTTPD (or other) error log

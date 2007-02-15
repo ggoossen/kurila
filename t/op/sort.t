@@ -7,6 +7,8 @@ BEGIN {
 use warnings;
 plan( tests => 143 );
 
+our (@a, @b);
+
 # these shouldn't hang
 {
     no warnings;
@@ -39,11 +41,11 @@ my $upperfirst = 'A' lt 'a';
 # That said, EBCDIC sorts all small letters first, as opposed
 # to ASCII which sorts all big letters first.
 
-@harry = ('dog','cat','x','Cain','Abel');
-@george = ('gone','chased','yz','punished','Axed');
+our @harry = ('dog','cat','x','Cain','Abel');
+our @george = ('gone','chased','yz','punished','Axed');
 
-$x = join('', sort @harry);
-$expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
+our $x = join('', sort @harry);
+our $expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
 
 cmp_ok($x,'eq',$expected,'upper first 1');
 
@@ -88,7 +90,7 @@ cmp_ok("@b",'eq',"4 3 2 1",'reverse 5');
 @b = sort {$a <=> $b;} @a;
 cmp_ok("@b",'eq',"2 3 4 10",'sort numeric');
 
-$sub = 'Backwards';
+our $sub = 'Backwards';
 $x = join('', sort $sub @harry);
 $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
 
@@ -190,6 +192,7 @@ cmp_ok($@,'eq','',q(one is not a sub));
   cmp_ok("@b",'eq','4 3 2 1','sortname 8');
 }
 
+our ($sortsub, $sortglob, $sortglobr, $sortname);
 {
   local $sortsub = \&Backwards;
   local $sortglob = *Backwards;
@@ -297,7 +300,7 @@ sub test_if_scalar {
 
 $m = \&test_if_scalar;
 sub cxt_four { sort $m 1,2 }
-@x = cxt_four();
+our @x = cxt_four();
 sub cxt_five { sort { test_if_scalar($a,$b); } 1,2 }
 @x = cxt_five();
 sub cxt_six { sort test_if_scalar 1,2 }
@@ -677,7 +680,7 @@ ok "@output", "0 C B A", 'reversed sort with trailing argument';
 ok "@output", "C B A 0", 'reversed sort with leading argument';
 
 eval { @output = sort {goto sub {}} 1,2; };
-$fail_msg = q(Can't goto subroutine outside a subroutine);
+our $fail_msg = q(Can't goto subroutine outside a subroutine);
 main::cmp_ok(substr($@,0,length($fail_msg)),'eq',$fail_msg,'goto subr outside subr');
 
 

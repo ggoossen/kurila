@@ -11,7 +11,7 @@
 # Version 1.01 $Revision: 1.18 $ $Date: 2001/06/24 17:16:47 $
 
 package Memoize;
-$VERSION = '1.01_02';
+our $VERSION = '1.01_02';
 
 # Compile-time constants
 sub SCALAR () { 0 } 
@@ -28,9 +28,9 @@ use Carp;
 use Exporter;
 use vars qw($DEBUG);
 use Config;                     # Dammit.
-@ISA = qw(Exporter);
-@EXPORT = qw(memoize);
-@EXPORT_OK = qw(unmemoize flush_cache);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(memoize);
+our @EXPORT_OK = qw(unmemoize flush_cache);
 use strict;
 
 my %memotable;

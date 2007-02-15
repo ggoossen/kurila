@@ -7,6 +7,8 @@ BEGIN {
 
 print "1..14\n";
 
+our ($x, $y, @x);
+
 # compile time evaluation
 
 if (int(1.234) == 1) {print "ok 1\n";} else {print "not ok 1\n";}

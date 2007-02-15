@@ -20,10 +20,10 @@ package Human;
 sub eat {}
 
 package Female;
-@ISA=qw(Human);
+our @ISA=qw(Human);
 
 package Alice;
-@ISA=qw(Bob Female);
+our @ISA=qw(Bob Female);
 sub sing;
 sub drink { return "drinking " . $_[1]  }
 sub new { bless {} }
@@ -98,8 +98,8 @@ ok (!Cedric->isa('Programmer'));
 my $b = 'abc';
 my @refs = qw(SCALAR SCALAR     LVALUE      GLOB ARRAY HASH CODE);
 my @vals = (  \$b,   \3.14, \substr($b,1,1), \*b,  [],  {}, sub {} );
-for ($p=0; $p < @refs; $p++) {
-    for ($q=0; $q < @vals; $q++) {
+for (my $p=0; $p < @refs; $p++) {
+    for (my $q=0; $q < @vals; $q++) {
         is UNIVERSAL::isa($vals[$p], $refs[$q]), ($p==$q or $p+$q==1);
     };
 };
@@ -164,7 +164,7 @@ ok ! UNIVERSAL::isa("\xff\xff\xff\0", 'HASH');
     package Pickup;
     use UNIVERSAL qw( isa can VERSION );
 
-    ::ok isa "Pickup", UNIVERSAL;
+    ::ok isa "Pickup", 'UNIVERSAL';
     ::cmp_ok can( "Pickup", "can" ), '==', \&UNIVERSAL::can;
     ::ok VERSION "UNIVERSAL" ;
 }

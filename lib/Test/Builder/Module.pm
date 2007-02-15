@@ -1,9 +1,11 @@
 package Test::Builder::Module;
 
+use strict;
+
 use Test::Builder;
 
 require Exporter;
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
 $VERSION = '0.68';
 

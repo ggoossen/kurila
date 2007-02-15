@@ -1,6 +1,6 @@
 #!/usr/old/bin/perl5.004_01 -w
 
-@tests = (split(/\nEND\n/s, <<DONE));
+our @tests = (split(/\nEND\n/s, <<DONE));
 TEST 1 u
                 x
 END
@@ -91,16 +91,18 @@ print @tests/2;
 print "\n";
 
 use Text::Tabs;
+use strict;
 
-$rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+my $rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
-$tn = 1;
+my $tn = 1;
 while (@tests) {
 	my $in = shift(@tests);
 	my $out = shift(@tests);
 
 	$in =~ s/^TEST\s*(\d+)?\s*(\S+)?\n//;
 
+        my ($f, $fn);
 	if ($2 eq 'e') {
 		$f = \&expand;
 		$fn = 'expand';

@@ -23,7 +23,7 @@ like($@, 'Modification of a read-only value attempted', '[perl #19566]');
 foreach my $k (1, 82) {
   my $result
     = runperl (stdin => '', stderr => 1,
-              prog => "\$x = q(k) x $k; \$a{\$x} = qw(v); \$_ = <> foreach keys %a; print qw(end)",
+              prog => "our (\$x, \%a); \$x = q(k) x $k; \$a{\$x} = qw(v); \$_ = <> foreach keys %a; print qw(end)",
 	      );
   $result =~ s/\n\z// if $^O eq 'VMS';
   is ($result, "end", '[perl #21614] for length ' . length('k' x $k));
@@ -33,7 +33,7 @@ foreach my $k (1, 82) {
 foreach my $k (1, 21) {
   my $result
     = runperl (stdin => ' rules', stderr => 1,
-              prog => "\$x = q(perl) x $k; \$a{\$x} = q(v); foreach (keys %a) {\$_ .= <>; print}",
+              prog => "our (\$x, \%a); \$x = q(perl) x $k; \$a{\$x} = q(v); foreach (keys %a) {\$_ .= <>; print}",
 	      );
   $result =~ s/\n\z// if $^O eq 'VMS';
   is ($result, ('perl' x $k) . " rules", 'rcatline to shared sv for length ' . length('perl' x $k));

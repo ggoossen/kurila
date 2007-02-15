@@ -127,8 +127,8 @@ $WANT = <<'EOT';
 #$6 = $a->[1]{'c'};
 EOT
 
-TEST q(Data::Dumper->Dump([$a,$b,$c], [qw(a b), 6])), "basic";
-TEST q(Data::Dumper->Dumpxs([$a,$b,$c], [qw(a b), 6])), "basic XS" if $XS;
+TEST q(Data::Dumper->Dump([$a,$b,$c], [qw(a b), 6]));
+TEST q(Data::Dumper->Dumpxs([$a,$b,$c], [qw(a b), 6])) if $XS;
 
 
 ############# 7
@@ -305,7 +305,7 @@ $foo = { "abc\000\'\efg" => "mno\000",
 
   $WANT = <<"EOT";
 #\$VAR1 = {
-#  "abc\\x00\'\efg" => "mno\\x00",
+#  'abc\0\\'\efg' => 'mno\0',
 #  'reftest' => \\\\1
 #};
 EOT
@@ -838,7 +838,6 @@ TEST q(Data::Dumper->new([$b],['b'])->Purity(1)->Dumpxs;)
 }
 
 {
-  use utf8;
   $a = "\x{09c10}";
 ############# 187
 ## XS code was adding an extra \0
@@ -1312,19 +1311,38 @@ EOT
 
 #XXX}
 {
-    use utf8;
-
+    if ($Is_ebcdic) {
 	$b = "Bad. XS didn't escape dollar sign";
 ############# 322
-	$WANT = <<'EOT';
-#$VAR1 = "\$b\"\@\\\xa3";
+	$WANT = <<"EOT"; # Careful. This is '' string written inside '' here doc
+#\$VAR1 = '\$b\"\@\\\\\xB1';
+EOT
+        $a = "\$b\"\@\\\xB1\x{100}";
+	chop $a;
+	TEST q(Data::Dumper->Dump([$a])), "utf8 flag with \" and \$";
+	if ($XS) {
+	    $WANT = <<'EOT'; # While this is "" string written inside "" here doc
+#$VAR1 = "\$b\"\@\\\x{b1}";
+EOT
+            TEST q(Data::Dumper->Dumpxs([$a])), "XS utf8 flag with \" and \$";
+	}
+    } else {
+	$b = "Bad. XS didn't escape dollar sign";
+############# 322
+	$WANT = <<"EOT"; # Careful. This is '' string written inside '' here doc
+#\$VAR1 = '\$b\"\@\\\\\xA3';
 EOT
 
         $a = "\$b\"\@\\\xA3\x{100}";
 	chop $a;
 	TEST q(Data::Dumper->Dump([$a])), "utf8 flag with \" and \$";
-        TEST q(Data::Dumper->Dumpxs([$a])), "XS utf8 flag with \" and \$" if $XS;
-
+	if ($XS) {
+	    $WANT = <<'EOT'; # While this is "" string written inside "" here doc
+#$VAR1 = "\$b\"\@\\\x{a3}";
+EOT
+            TEST q(Data::Dumper->Dumpxs([$a])), "XS utf8 flag with \" and \$";
+	}
+  }
   # XS used to produce "$b\"' which is 4 chars, not 3. [ie wrongly qq(\$b\\\")]
 ############# 328
   $WANT = <<'EOT';
@@ -1371,7 +1389,7 @@ EOT
   local $Data::Dumper::Purity = 1;
   local $Data::Dumper::Sortkeys;
   $ping = 5;
-  %ping = (utf8::chr (0xDECAF) x 4  =>\$ping);
+  %ping = (chr (0xDECAF) x 4  =>\$ping);
   for $Data::Dumper::Sortkeys (0, 1) {
     if($] >= 5.007) {
       TEST q(Data::Dumper->Dump([\\*ping, \\%ping], ['*ping', '*pong']));
@@ -1387,7 +1405,6 @@ EOT
 # scalars
 
 {
-  use utf8;
   $WANT = <<'EOT';
 #$VAR1 = {
 #  perl => 'rocks'

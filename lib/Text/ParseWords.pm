@@ -1,6 +1,7 @@
 package Text::ParseWords;
 
-use vars qw($VERSION @ISA @EXPORT $PERL_SINGLE_QUOTE);
+use strict;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $PERL_SINGLE_QUOTE);
 $VERSION = "3.25";
 
 require 5.000;

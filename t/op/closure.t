@@ -274,6 +274,7 @@ END_MARK_TWO
 }
 
 # some of the variables which the closure will access
+no strict 'vars';
 \$global_scalar = 1000;
 \@global_array = (2000, 2100, 2200, 2300);
 %global_hash = 3000..3009;
@@ -507,10 +508,15 @@ END
 
 }
 
-# The following dumps core with perl <= 5.8.0 (bugid 9535) ...
-BEGIN { $vanishing_pad = sub { eval $_[0] } }
-$some_var = 123;
-test { $vanishing_pad->( '$some_var' ) == 123 };
+{
+    no strict 'vars';
+    # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
+    BEGIN { $vanishing_pad = sub { eval $_[0] } }
+    $some_var = 123;
+    test { $vanishing_pad->( '$some_var' ) == 123 };
+}
+
+our ($newvar, @a, $x);
 
 # ... and here's another coredump variant - this time we explicitly
 # delete the sub rather than using a BEGIN ...

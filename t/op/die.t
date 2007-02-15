@@ -4,6 +4,8 @@ print "1..14\n";
 
 $SIG{__DIE__} = sub { print ref($_[0]) ? ("ok ",$_[0]->[0]++,"\n") : @_ } ;
 
+my ($err, $x);
+
 $err = "#[\000]\nok 1\n";
 eval {
     die $err;

@@ -30,6 +30,8 @@ $uv_bigi |= 0x0;
 
 my @array = qw(perl rules);
 
+our (@FOO, $expect);
+
 # Seems one needs to perform the maths on 'Inf' to get the NV correctly primed.
 @FOO = ('s', 'N/A', 'a', 'NaN', -1, undef, 0, 1, 3.14, 1e37, 0.632120558, -.5,
 	'Inf'+1, '-Inf'-1, 0x0, 0x1, 0x5, 0xFFFFFFFF, $uv_max, $uv_maxm1,

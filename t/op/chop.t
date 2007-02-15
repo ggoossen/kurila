@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 61;
 
+our (@foo, $foo, $c, @bar, $got, %chop, %chomp, $x, $y);
+
 $_ = 'abc';
 $c = do foo();
 is ($c . $_, 'cab', 'optimized');

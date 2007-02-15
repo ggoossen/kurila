@@ -47,6 +47,7 @@ sub import {
 		die $compilesub;
 	    }
 
+            our $savebackslash;
 	    local $savebackslash = $\;
 	    local ($\,$",$,) = (undef,' ','');
 	    &$compilesub();

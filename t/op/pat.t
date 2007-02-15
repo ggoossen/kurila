@@ -19,6 +19,7 @@ BEGIN {
     require "utf8_heavy.pl";
 }
 
+our %Config;
 eval 'use Config';          #  Defaults assumed if this fails
 
 
@@ -38,6 +39,8 @@ eval 'use Config';          #  Defaults assumed if this fails
 
 
 require bytes;
+
+our ($test, $x, %XXX, @XXX, $foo, @x, $null, @words);
 
 # Force scalar context on the patern match
 sub ok ($;$) {
@@ -127,7 +130,7 @@ while ($_ = shift(@XXX)) {
 }
 
 if ($^O ne 'VMS') {
-  while (($key,$val) = each(%XXX)) {
+  while (my ($key,$val) = each(%XXX)) {
     print "not ok 27\n";
     exit;
   }
@@ -205,19 +208,19 @@ print join(':',@words) eq "to:to"
 
 $_ = "abcdefghi";
 
-$pat1 = 'def';
-$pat2 = '^def';
-$pat3 = '.def.';
-$pat4 = 'abc';
-$pat5 = '^abc';
-$pat6 = 'abc$';
-$pat7 = 'ghi';
-$pat8 = '\w*ghi';
-$pat9 = 'ghi$';
+my $pat1 = 'def';
+my $pat2 = '^def';
+my $pat3 = '.def.';
+my $pat4 = 'abc';
+my $pat5 = '^abc';
+my $pat6 = 'abc$';
+my $pat7 = 'ghi';
+my $pat8 = '\w*ghi';
+my $pat9 = 'ghi$';
 
-$t1=$t2=$t3=$t4=$t5=$t6=$t7=$t8=$t9=0;
+my $t1=my $t2=my $t3=my $t4=my $t5=my $t6=my $t7=my $t8=my $t9=0;
 
-for $iter (1..5) {
+for my $iter (1..5) {
     $t1++ if /$pat1/o;
     $t2++ if /$pat2/o;
     $t3++ if /$pat3/o;
@@ -232,10 +235,11 @@ for $iter (1..5) {
 $x = "$t1$t2$t3$t4$t5$t6$t7$t8$t9";
 print $x eq '505550555' ? "ok 48\n" : "not ok 48 $x\n";
 
-$xyz = 'xyz';
+my $xyz = 'xyz';
 print "abc" =~ /^abc$|$xyz/ ? "ok 49\n" : "not ok 49\n";
 
 # perl 4.009 says "unmatched ()"
+our $result;
 eval '"abc" =~ /a(bc$)|$xyz/; $result = "$&:$1"';
 print $@ eq "" ? "ok 50\n" : "not ok 50\n";
 print $result eq "abc:bc" ? "ok 51\n" : "not ok 51\n";
@@ -273,7 +277,7 @@ print "ok 61\n";
 print "not " if defined pos $_;
 print "ok 62\n";
 
-$out = 1;
+our $out = 1;
 'abc' =~ m'a(?{ $out = 2 })b';
 print "not " if $out != 2;
 print "ok 63\n";
@@ -284,13 +288,14 @@ print "not " if $out != 1;
 print "ok 64\n";
 
 $_ = 'foobar1 bar2 foobar3 barfoobar5 foobar6';
-@out = /(?<!foo)bar./g;
+our @out = /(?<!foo)bar./g;
 print "not " if "@out" ne 'bar2 barf';
 print "ok 65\n";
 
 # Tests which depend on REG_INFTY
-$reg_infty = defined $Config{reg_infty} ? $Config{reg_infty} : 32767;
-$reg_infty_m = $reg_infty - 1; $reg_infty_p = $reg_infty + 1;
+our $reg_infty = defined $Config{reg_infty} ? $Config{reg_infty} : 32767;
+our $reg_infty_m = $reg_infty - 1;
+our $reg_infty_p = $reg_infty + 1;
 
 # As well as failing if the pattern matches do unexpected things, the
 # next three tests will fail if you should have picked up a lower-than-
@@ -321,7 +326,7 @@ undef $@;
 
 # Poke a couple more parse failures
 
-$context = 'x' x 256;
+our $context = 'x' x 256;
 eval qq("${context}y" =~ /(?<=$context)y/);
 print "not " if $@ !~ m%^\QLookbehind longer than 255 not%;
 print "ok 71\n";
@@ -331,7 +336,7 @@ print "ok 72\n";
 
 # Long Monsters
 $test = 73;
-for $l (125, 140, 250, 270, 300000, 30) { # Ordered to free memory
+for my $l (125, 140, 250, 270, 300000, 30) { # Ordered to free memory
   $a = 'a' x $l;
   print "# length=$l\nnot " unless "ba$a=" =~ /a$a=/;
   print "ok $test\n";
@@ -343,9 +348,9 @@ for $l (125, 140, 250, 270, 300000, 30) { # Ordered to free memory
 }
 
 # 20000 nodes, each taking 3 words per string, and 1 per branch
-$long_constant_len = join '|', 12120 .. 32645;
-$long_var_len = join '|', 8120 .. 28645;
-%ans = ( 'ax13876y25677lbc' => 1,
+my $long_constant_len = join '|', 12120 .. 32645;
+my $long_var_len = join '|', 8120 .. 28645;
+my %ans = ( 'ax13876y25677lbc' => 1,
 	 'ax13876y25677mcb' => 0, # not b.
 	 'ax13876y35677nbc' => 0, # Num too big
 	 'ax13876y25677y21378obc' => 1,
@@ -367,7 +372,9 @@ for ( keys %ans ) {
 }
 
 $_ = " a (bla()) and x(y b((l)u((e))) and b(l(e)e)e";
-$expect = "(bla()) ((l)u((e))) (l(e)e)";
+my $expect = "(bla()) ((l)u((e))) (l(e)e)";
+
+our $c;
 
 sub matchit {
   m/
@@ -400,7 +407,7 @@ sub matchit {
    /xg;
 }
 
-@ans = ();
+our (@ans, $res, @ans1);
 push @ans, $res while $res = matchit;
 
 print "# ans='@ans'\n# expect='$expect'\nnot " if "@ans" ne "1 1 1";
@@ -442,8 +449,8 @@ print "not " if "@ans" ne 'a/ b';
 print "ok $test\n";
 $test++;
 
-$code = '{$blah = 45}';
-$blah = 12;
+my $code = '{$blah = 45}';
+my $blah = 12;
 eval { /(?$code)/ };
 print "not " unless $@ and $@ =~ /not allowed at runtime/ and $blah == 12;
 print "ok $test\n";
@@ -534,7 +541,7 @@ print "ok $test\n";
 $test++;
 
 $_ = 'xabcx';
-foreach $ans ('', 'c') {
+foreach my $ans ('', 'c') {
   /(?<=(?=a)..)((?=c)|.)/g;
   print "# \$1  ='$1'\n# \$ans='$ans'\nnot " unless $1 eq $ans;
   print "ok $test\n";
@@ -542,7 +549,7 @@ foreach $ans ('', 'c') {
 }
 
 $_ = 'a';
-foreach $ans ('', 'a', '') {
+foreach my $ans ('', 'a', '') {
   /^|a|$/g;
   print "# \$&  ='$&'\n# \$ans='$ans'\nnot " unless $& eq $ans;
   print "ok $test\n";
@@ -576,6 +583,7 @@ print "not " unless $b eq '11';
 print "ok $test\n";
 $test++;
 
+our $lex_a;
 {
   use re "eval";
   /$a$c$a/;
@@ -600,7 +608,7 @@ $test++;
 
 
   no re "eval";
-  $match = eval { /$a$c$a/ };
+  my $match = eval { /$a$c$a/ };
   print "not "
     unless $b eq '14' and $@ =~ /Eval-group not allowed/ and not $match;
   print "ok $test\n";
@@ -790,12 +798,12 @@ $test++;
 
 $_ = 'aaa';
 pos = 1;
-@a = /\Ga/g;
+my @a = /\Ga/g;
 print "not " unless "@a" eq "a a";
 print "ok $test\n";
 $test++;
 
-$str = 'abcde';
+my $str = 'abcde';
 pos $str = 2;
 
 print "not " if $str =~ /^\G/;
@@ -822,6 +830,7 @@ print "not " unless $str =~ /\G../ and $& eq 'cd';
 print "ok $test\n";
 $test++;
 
+our ($foo, $bar);
 undef $foo; undef $bar;
 print "#'$str','$foo','$bar'\nnot "
     unless $str =~ /b(?{$foo = $_; $bar = pos})c/
@@ -869,10 +878,10 @@ print "#'$str','$foo','$bar','$_'\nnot "
 print "ok $test\n";
 $test++;
 
-@res = ();
+our @res = ();
 # List context:
 $_ = 'abcde|abcde';
-@dummy = /([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g;
+our @dummy = /([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g;
 @res = map {defined $_ ? "'$_'" : 'undef'} @res;
 $res = "@res";
 print "#'@res' '$_'\nnot "
@@ -947,8 +956,8 @@ $test++;
 
 # See if $i work inside (?{}) in the presense of saved substrings and
 # changing $_
-@a = qw(foo bar);
-@b = ();
+our @a = qw(foo bar);
+our @b = ();
 s/(\w)(?{push @b, $1})/,$1,/g for @a;
 
 print "# \@b='@b', expect 'f o o b a r'\nnot " unless("@b" eq "f o o b a r");
@@ -959,6 +968,7 @@ print "not " unless("@a" eq ",f,,o,,o, ,b,,a,,r,");
 print "ok $test\n";
 $test++;
 
+my $brackets;
 $brackets = qr{
 	         {  (?> [^{}]+ | (??{ $brackets }) )* }
 	      }x;
@@ -982,7 +992,7 @@ m/^-.*bb/mg and print "not ";
 print "ok $test\n";
 $test++;
 
-$text = "aaXbXcc";
+our $text = "aaXbXcc";
 pos($text)=0;
 $text =~ /\GXb*X/g and print 'not ';
 print "ok $test - \\G matching \n";
@@ -1002,7 +1012,7 @@ $test++;
 @a = map bytes::chr,0..255;
 
 @b = grep(/\S/,@a);
-@c = grep(/[^\s]/,@a);
+our @c = grep(/[^\s]/,@a);
 print "not " if "@b" ne "@c";
 print "ok $test\n";
 $test++;
@@ -1110,7 +1120,7 @@ $test++;
 print "ok $test\n";
 $test++;
 
-$w = 0;
+our $w = 0;
 {
     local $SIG{__WARN__} = sub { $w = 1 };
     local $^W = 1;
@@ -1754,6 +1764,7 @@ print "ok 639\n";
 ## Test basic $^N usage outside of a regex
 ##
 $x = "abcdef";
+our $T;
 $T="ok 640\n";if ($x =~ /cde/ and not defined $^N)         {print $T} else {print "not $T"};
 $T="ok 641\n";if ($x =~ /(cde)/          and $^N eq "cde") {print $T} else {print "not $T"};
 $T="ok 642\n";if ($x =~ /(c)(d)(e)/      and $^N eq   "e") {print $T} else {print "not $T"};
@@ -1778,6 +1789,7 @@ $T="ok 655\n";if ($^N eq  "e" ){print $T} else {print "not $T"};
 ##
 ## Now test inside (?{...})
 ##
+our ($y, $z);
 $T="ok 656\n";if ($x =~ /a([abc])(?{$y=$^N})c/      and $y eq "b" ){print $T} else {print "not $T"};
 $T="ok 657\n";if ($x =~ /a([abc]+)(?{$y=$^N})d/     and $y eq "bc"){print $T} else {print "not $T"};
 $T="ok 658\n";if ($x =~ /a([abcdefg]+)(?{$y=$^N})d/ and $y eq "bc"){print $T} else {print "not $T"};
@@ -1834,7 +1846,7 @@ if (ord("A") == 65) {
 ## guarantee a specific locale......
 ##
     use bytes;
-    $AllBytes = join('', map { chr($_) } 0..255);
+    our $AllBytes = join('', map { chr($_) } 0..255);
     ($x = $AllBytes) =~ s/[[:cntrl:]]//g;
     if ($x ne join('', map { chr($_) } 0x20..0x7E, 0x80..0xFF)) {
 	print "not ";

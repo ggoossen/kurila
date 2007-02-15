@@ -12,8 +12,11 @@ BEGIN {
     unless ($haslocal) { print "1..0 # Skip: no localtime\n"; exit 0 }
 }
 
+use strict;
+
+our @localtime;
 BEGIN {
-    our @localtime = localtime 0; # This is the function localtime.
+    @localtime = localtime 0; # This is the function localtime.
     unless (@localtime) { print "1..0 # Skip: localtime failed\n"; exit 0 }
 }
 

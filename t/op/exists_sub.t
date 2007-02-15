@@ -16,7 +16,7 @@ sub t5 {1;}
     package P1;
     sub tmc {1;}
     package P2;
-    @ISA = 'P1';
+    our @ISA = 'P1';
 }
 
 print "not " unless exists &t1 && not defined &t1;

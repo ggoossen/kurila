@@ -7,10 +7,14 @@
 
 require DynaLoader;
 require Exporter;
-package Storable; @ISA = qw(Exporter DynaLoader);
+package Storable;
 
-@EXPORT = qw(store retrieve);
-@EXPORT_OK = qw(
+use strict;
+
+our @ISA = qw(Exporter DynaLoader);
+
+our @EXPORT = qw(store retrieve);
+our @EXPORT_OK = qw(
 	nstore store_fd nstore_fd fd_retrieve
 	freeze nfreeze thaw
 	dclone

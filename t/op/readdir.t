@@ -10,14 +10,14 @@ if ($@) { print "1..0\n"; exit; }
 
 print "1..11\n";
 
-for $i (1..2000) {
+for my $i (1..2000) {
     local *OP;
     opendir(OP, "op") or die "can't opendir: $!";
     # should auto-closedir() here
 }
 
 if (opendir(OP, "op")) { print "ok 1\n"; } else { print "not ok 1\n"; }
-@D = grep(/^[^\.].*\.t$/i, readdir(OP));
+our @D = grep(/^[^\.].*\.t$/i, readdir(OP));
 closedir(OP);
 
 ##
@@ -31,8 +31,8 @@ else {
       scalar @D;
 }
 
-@R = sort @D;
-@G = sort <op/*.t>;
+our @R = sort @D;
+our @G = sort <op/*.t>;
 @G = sort <:op:*.t> if $^O eq 'MacOS';
 if ($G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
@@ -45,6 +45,7 @@ while (@R && @G && $G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').$R[0]) {
 }
 if (@R == 0 && @G == 0) { print "ok 3\n"; } else { print "not ok 3\n"; }
 
+our ($fh, @fh, %fh);
 if (opendir($fh, "op")) { print "ok 4\n"; } else { print "not ok 4\n"; }
 if (ref($fh) eq 'GLOB') { print "ok 5\n"; } else { print "not ok 5\n"; }
 if (opendir($fh[0], "op")) { print "ok 6\n"; } else { print "not ok 6\n"; }

@@ -3,6 +3,7 @@
 # test a few problems with the Freezer option, not a complete Freezer
 # test suite yet
 
+our %Config;
 BEGIN {
     if ($ENV{PERL_CORE}){
         chdir 't' if -d 't';

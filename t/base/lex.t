@@ -2,7 +2,7 @@
 
 print "1..55\n";
 
-$x = 'x';
+my $x = 'x';
 
 print "#1	:$x: eq :x:\n";
 if ($x eq 'x') {print "ok 1\n";} else {print "not ok 1\n";}
@@ -11,6 +11,7 @@ $x = $#;	# this is the register $#
 
 if ($x eq '') {print "ok 2\n";} else {print "not ok 2\n";}
 
+our @x;
 $x = $#x;
 
 if ($x eq '-1') {print "ok 3\n";} else {print "not ok 3\n";}
@@ -24,6 +25,8 @@ eval 'while (0) {
 }
 /^/ && (print "ok 5\n");
 ';
+
+our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N);
 
 eval '$foo{1} / 1;';
 if (!$@) {print "ok 6\n";} else {print "not ok 6 $@\n";}
@@ -88,10 +91,13 @@ E2
 ]}
 E1
 
-$foo = FOO;
-$bar = BAR;
-$foo{$bar} = BAZ;
-$ary[0] = ABC;
+{
+    no strict 'subs';
+    $foo = FOO;
+    $bar = BAR;
+    $foo{$bar} = BAZ;
+    $ary[0] = ABC;
+}
 
 print "$foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 
@@ -118,7 +124,8 @@ print $foo;
 # Tests for new extended control-character variables
 # MJD 19990227
 
-{ my $CX = "\cX";
+{ no strict 'refs';
+  my $CX = "\cX";
   my $CXY  ="\cXY";
   $ {$CX} = 17;
   $ {$CXY} = 23;
@@ -211,6 +218,7 @@ EOT
 # arrays now *always* interpolate into "..." strings.
 # 20000522 MJD (mjd@plover.com)
 {
+  no strict 'vars';
   my $test = 47;
   eval(q(">@nosuch<" eq "><")) || print "# $@", "not ";
   print "ok $test\n";
@@ -249,6 +257,7 @@ EOT
 # => should only quote foo::bar if it isn't a real sub. AMS, 20010621
 
 sub xyz::foo { "bar" }
+no strict 'subs';
 my %str = (
     foo      => 1,
     xyz::foo => 1,

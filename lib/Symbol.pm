@@ -80,12 +80,14 @@ you reload the C<Foo> module afterwards.
 
 BEGIN { require 5.005; }
 
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(gensym ungensym qualify qualify_to_ref);
-@EXPORT_OK = qw(delete_package geniosym);
+use strict;
 
-$VERSION = '1.06';
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT = qw(gensym ungensym qualify qualify_to_ref);
+our @EXPORT_OK = qw(delete_package geniosym);
+
+our $VERSION = '1.06';
 
 my $genpkg = "Symbol::";
 my $genseq = 0;
@@ -99,6 +101,7 @@ my %global = map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT);
 #
 sub gensym () {
     my $name = "GEN" . $genseq++;
+    no strict 'refs';
     my $ref = \*{$genpkg . $name};
     delete $$genpkg{$name};
     $ref;

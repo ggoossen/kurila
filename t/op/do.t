@@ -1,5 +1,7 @@
 #!./perl
 
+our (@x, @y, $result, $x, $y, @t, $u);
+
 sub foo1
 {
     ok($_[0]);
