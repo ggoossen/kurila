@@ -131,15 +131,7 @@ $x = "ok $test\n";
 ++$test;
 sub x { "ok $test\n" }
 print ${*x{SCALAR}}, @{*x{ARRAY}}, %{*x{HASH}}, &{*x{CODE}};
-# This needs to go here, after the print, as sub x will return the current
-# value of test
-++$test;
-format x =
-XXX This text isn't used. Should it be?
-.
-curr_test($test);
 
-is (ref *x{FORMAT}, "FORMAT");
 *x = *STDOUT;
 is (*{*x{GLOB}}, "*main::STDOUT");
 
@@ -425,22 +417,6 @@ is (ref \$::{plunk}, 'GLOB', "Symbol table has full typeglob");
     is($foof, "halt and cool down");
     *foof = $pv;
     is($foof, 4);
-}
-
-format =
-.
-
-foreach my $value ([1,2,3], {1=>2}, *STDOUT{IO}, \&ok, *STDOUT{FORMAT}) {
-    # *STDOUT{IO} returns a reference to a PVIO. As it's blessed, ref returns
-    # IO::Handle, which isn't what we want.
-    my $type = $value;
-    $type =~ s/.*=//;
-    $type =~ s/\(.*//;
-    delete $::{oonk};
-    $::{oonk} = $value;
-    $proto = eval 'prototype \&oonk';
-    like ($@, qr/^Cannot convert a reference to $type to typeglob/,
-	  "Cannot upgrade ref-to-$type to typeglob");
 }
 
 {
