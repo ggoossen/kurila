@@ -8,6 +8,8 @@ BEGIN {
 require "test.pl";
 plan( tests => 57 );
 
+our (@b, @a, @foo, @bar, $c, $d, %c, $x);
+
 @foo = (1, 2, 3, 4);
 cmp_ok($foo[0], '==', 1, 'first elem');
 cmp_ok($foo[3], '==', 4, 'last elem');

@@ -203,8 +203,8 @@ is ($object->doit("BAR"), 'bar');
 
 # Test indirect-object-style method invocation.
 
-$foo = doit $object "FOO";
-main::is ($foo, 'foo');
+eval q{$foo = doit $object "FOO";};
+main::is (@$, 'foo');
 
 sub BASEOBJ'doit {
     local $ref = shift;
@@ -220,7 +220,8 @@ sub foo { main::is ($_[1], 'works') }
 
 package WHATEVER;
 no strict;
-foo WHATEVER "works";
+eval q{foo WHATEVER "works"};
+is($@, "Undefined subroutine &WHATEVER::is called at");
 
 #
 # test the \(@foo) construct
