@@ -2473,21 +2473,6 @@ S_intuit_method(pTHX_ char *start, GV *gv, CV *cv)
      * tmpbuf is a copy of it
      */
 
-    if (*start == '$') {
-	if (gv || PL_last_lop_op == OP_PRINT || PL_last_lop_op == OP_SAY ||
-		isUPPER(*PL_tokenbuf))
-	    return 0;
-#ifdef PERL_MAD
-	len = start - SvPVX(PL_linestr);
-#endif
-	s = PEEKSPACE(s);
-#ifdef PERL_MAD
-	start = SvPVX(PL_linestr) + len;
-#endif
-	PL_bufptr = start;
-	PL_expect = XREF;
-	return *s == '(' ? FUNCMETH : METHOD;
-    }
     if (!keyword(tmpbuf, len, 0)) {
 	if (len > 2 && tmpbuf[len - 2] == ':' && tmpbuf[len - 1] == ':') {
 	    len -= 2;
@@ -2500,8 +2485,8 @@ S_intuit_method(pTHX_ char *start, GV *gv, CV *cv)
 	indirgv = gv_fetchpvn_flags(tmpbuf, len, 0, SVt_PVCV);
 	if (indirgv && GvCVu(indirgv))
 	    return 0;
-	/* filehandle or package name makes it a method */
-	if (!gv || GvIO(indirgv) || gv_stashpvn(tmpbuf, len, 0)) {
+	/* filehandle makes it a method */
+	if (GvIO(indirgv)) {
 #ifdef PERL_MAD
 	    soff = s - SvPVX(PL_linestr);
 #endif
@@ -5185,21 +5170,6 @@ Perl_yylex(pTHX)
 		    yylval.ival = 0;
 		    TOKEN('&');
 		}
-
-		/* If followed by var or block, call it a method (unless sub) */
-
-		if ((*s == '$' || *s == '{') && (!gv || !cv)) {
-		    PL_last_lop = PL_oldbufptr;
-		    PL_last_lop_op = OP_METHOD;
-		    PREBLOCK(METHOD);
-		}
-
-		/* If followed by a bareword, see if it looks like indir obj. */
-
-		if (!orig_keyword
-			&& (isIDFIRST_lazy_if(s,UTF) || *s == '$')
-			&& (tmp = intuit_method(s, gv, cv)))
-		    return REPORT(tmp);
 
 		/* Not a method, so call it a subroutine (if defined) */
 

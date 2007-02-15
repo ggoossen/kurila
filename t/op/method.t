@@ -10,7 +10,7 @@ BEGIN {
     require "test.pl";
 }
 
-print "1..79\n";
+print "1..71\n";
 
 @A::ISA = 'B';
 @B::ISA = 'C';
@@ -25,30 +25,22 @@ my $mname = "method";
 
 is(Pack->method("a","b","c"), "method,a,b,c");
 is(Pack->$mname("a","b","c"), "method,a,b,c");
-is(method Pack ("a","b","c"), "method,a,b,c");
-is((method Pack "a","b","c"), "method,a,b,c");
 
 is(Pack->method(), "method");
 is(Pack->$mname(), "method");
-is(method Pack (), "method");
 is(Pack->method, "method");
 is(Pack->$mname, "method");
-is(method Pack, "method");
 
 is($obj->method("a","b","c"), "method,a,b,c");
 is($obj->$mname("a","b","c"), "method,a,b,c");
-is((method $obj ("a","b","c")), "method,a,b,c");
-is((method $obj "a","b","c"), "method,a,b,c");
 
 is($obj->method(0), "method,0");
 is($obj->method(1), "method,1");
 
 is($obj->method(), "method");
 is($obj->$mname(), "method");
-is((method $obj ()), "method");
 is($obj->method, "method");
 is($obj->$mname, "method");
-is(method $obj, "method");
 
 is( A->d, "C::d");		# Update hash table;
 
