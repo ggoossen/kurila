@@ -1219,8 +1219,8 @@ Perl_do_print(pTHX_ register SV *sv, PerlIO *fp)
 	 * at which we would get EPERM.  Note that when using buffered
 	 * io the write failure can be delayed until the flush/close. --jhi */
 	if (len && (PerlIO_write(fp,tmps,len) == 0))
-	    happy = FALSE;
-	return happy ? !PerlIO_error(fp) : FALSE;
+	    return FALSE;
+	return !PerlIO_error(fp);
     }
 }
 
