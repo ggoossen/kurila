@@ -5,7 +5,7 @@ BEGIN {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($] < 5.00326 || not $Config{'d_readdir'}) {
 	print "1..0 # Skip: readdir() not available\n";
 	exit 0;

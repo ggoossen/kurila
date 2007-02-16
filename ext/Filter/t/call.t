@@ -2,7 +2,7 @@ BEGIN {
     chdir('t') if -d 't';    
     @INC = '.'; 
     push @INC, '../lib';
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ m{\bFilter/Util/Call\b}) {
         print "1..0 # Skip: Filter::Util::Call was not built\n";
         exit 0;

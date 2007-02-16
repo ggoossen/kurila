@@ -86,7 +86,7 @@ sub logcarp {
 
 sub CAN_FLOCK; my $CAN_FLOCK; sub CAN_FLOCK {
 	return $CAN_FLOCK if defined $CAN_FLOCK;
-	require Config; import Config;
+	require Config; Config->import;
 	return $CAN_FLOCK =
 		$Config{'d_flock'} ||
 		$Config{'d_fcntl_can_lock'} ||

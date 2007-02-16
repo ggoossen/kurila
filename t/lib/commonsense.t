@@ -1,8 +1,11 @@
 #!./perl
 
+BEGIN {
 chdir 't' if -d 't';
 @INC = '../lib';
-require Config; import Config;
+require Config; Config->import;
+}
+
 if (($Config{'extensions'} !~ /\b(DB|[A-Z]DBM)_File\b/) ){
   print "Bail out! Perl configured without DB_File or [A-Z]DBM_File\n";
   exit 0;

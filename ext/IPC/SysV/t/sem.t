@@ -5,7 +5,7 @@ BEGIN {
     require 'test.pl';
 }
 
-require Config; import Config;
+require Config; Config->import;
 
 $TEST_COUNT = 11;
 

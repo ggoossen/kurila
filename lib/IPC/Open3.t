@@ -3,7 +3,8 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
+    our %Config;
+    require Config; Config->import;
     if (!$Config{'d_fork'}
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
        && (($^O ne 'MSWin32' && $^O ne 'NetWare') || $Config{'cc'} =~ /^bcc/i))

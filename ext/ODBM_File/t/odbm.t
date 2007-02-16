@@ -5,7 +5,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bODBM_File\b/ or $Config{'d_cplusplus'}) {
 	print "1..0 # Skip: ODBM_File was not built\n";
 	exit 0;

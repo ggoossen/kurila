@@ -4,7 +4,7 @@ BEGIN {
     chdir( 't' ) if -d 't';
     @INC = '../lib';
     require './test.pl';      # for which_perl() etc
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bDevel\/DProf\b/){
       print "1..0 # Skip: Devel::DProf was not built\n";
       exit 0;

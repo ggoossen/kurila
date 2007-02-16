@@ -4,7 +4,7 @@ BEGIN {
     if ($ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
-	require Config; import Config;
+	require Config; Config->import;
 	if (" $Config{'extensions'} " !~ m[ Time/HiRes ]) {
 	    print "1..0 # Skip -- Perl configured without Time::HiRes module\n";
 	    exit 0;
@@ -53,14 +53,14 @@ printf "# have_clock_nanosleep = %d\n", $have_clock_nanosleep;
 printf "# have_clock           = %d\n", $have_clock;
 printf "# have_hires_stat      = %d\n", $have_hires_stat;
 
-import Time::HiRes 'gettimeofday'	if $have_gettimeofday;
-import Time::HiRes 'usleep'		if $have_usleep;
-import Time::HiRes 'nanosleep'		if $have_nanosleep;
-import Time::HiRes 'ualarm'		if $have_ualarm;
-import Time::HiRes 'clock_gettime'	if $have_clock_gettime;
-import Time::HiRes 'clock_getres'	if $have_clock_getres;
-import Time::HiRes 'clock_nanosleep'	if $have_clock_nanosleep;
-import Time::HiRes 'clock'		if $have_clock;
+Time::HiRes->import('gettimeofday')	if $have_gettimeofday;
+Time::HiRes->import('usleep')		if $have_usleep;
+Time::HiRes->import('nanosleep')	if $have_nanosleep;
+Time::HiRes->import('ualarm')		if $have_ualarm;
+Time::HiRes->import('clock_gettime')	if $have_clock_gettime;
+Time::HiRes->import('clock_getres')	if $have_clock_getres;
+Time::HiRes->import('clock_nanosleep')	if $have_clock_nanosleep;
+Time::HiRes->import('clock')		if $have_clock;
 
 use Config;
 

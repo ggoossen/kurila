@@ -3,7 +3,7 @@ BEGIN {
 
     @INC = '../lib';
 
-    require Config; import Config;
+    require Config; Config->import;
 
     my $reason;
 

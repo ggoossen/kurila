@@ -1,5 +1,5 @@
 BEGIN {
-    eval { require Config; import Config };
+    eval { require Config; Config->import };
     if ($@) {
 	print "1..0 # Skip: no Config\n";
 	exit(0);

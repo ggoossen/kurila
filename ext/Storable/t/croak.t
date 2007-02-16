@@ -10,7 +10,7 @@ sub BEGIN {
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib');
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
