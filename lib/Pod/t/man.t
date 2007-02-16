@@ -17,7 +17,7 @@ BEGIN {
     }
     unshift (@INC, '../blib/lib');
     $| = 1;
-    print "1..21\n";
+    print "1..41\n";
 }
 
 END {
@@ -25,6 +25,8 @@ END {
 }
 
 use Pod::Man;
+use Encode;
+use charnames ':full';
 
 $loaded = 1;
 print "ok 1\n";
@@ -35,11 +37,27 @@ my $parser = Pod::Man->new or die "Cannot create parser\n";
 my $n = 2;
 while (<DATA>) {
     next until $_ eq "###\n";
+
+    my $input = "";
+    while (<DATA>) {
+        $_ = Encode::decode('iso-8859-1', $_); # DATA is ISO 8859-e encoded
+        last if $_ eq "###\n";
+        $input .= $_;
+    }
+    my $expected = '';
+    while (<DATA>) {
+        last if $_ eq "###\n";
+        $expected .= $_;
+    }
+
     open (TMP, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
 
     # We have a test in ISO 8859-1 encoding.  Make sure that nothing strange
-    # happens if Perl thinks the world is Unicode.
-    binmode (\*TMP, ':encoding(iso-8859-1)') if $have_encoding;
+    # happens if Perl thinks the world is Unicode.  Wrap this in eval so that
+    # older versions of Perl don't croak.
+    eval { binmode (\*TMP, ':encoding(iso-8859-1)') };
+    no warnings 'utf8';
+    print TMP $input;
 
     while (<DATA>) {
         last if $_ eq "###\n";
@@ -47,6 +65,19 @@ while (<DATA>) {
         print TMP $_;
     }
     close TMP;
+
+    test_outtmp($expected);
+
+    open (TMP2, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
+    eval { binmode (\*TMP2, ':encoding(utf-8)') };
+    print TMP2 "\N{BOM}";
+    print TMP2 $input;
+    close TMP2;
+    test_outtmp($expected);
+}
+
+sub test_outtmp {
+    my $expected = shift;
     open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
@@ -58,12 +89,7 @@ while (<DATA>) {
         $output = <OUT>;
     }
     close OUT;
-    unlink ('tmp.pod', 'out.tmp');
-    my $expected = '';
-    while (<DATA>) {
-        last if $_ eq "###\n";
-        $expected .= $_;
-    }
+    #unlink ('tmp.pod', 'out.tmp');
     if ($output eq $expected) {
         print "ok $n\n";
     } else {
@@ -149,8 +175,6 @@ Also not a bullet.
 ###
 
 ###
-=encoding iso-8859-1
-
 =head1 ACCENTS
 
 Beyoncé!  Beyoncé!  Beyoncé!!
