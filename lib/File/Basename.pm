@@ -43,7 +43,7 @@ package File::Basename;
 BEGIN {
   unless (eval { require re; })
     { eval ' sub re::import { $^H |= 0x00100000; } ' } # HINT_RE_TAINT
-  import re 'taint';
+  re->import('taint');
 }
 
 

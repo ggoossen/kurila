@@ -8,7 +8,7 @@ BEGIN {
 	print "1..0 # Skip: $1\n";
 	exit 0;
     }
-    eval { require Config; import Config; };
+    eval { require Config; Config->import; };
     my $reason;
     if ($Config{'i_pwd'} ne 'define') {
 	$reason = '$Config{i_pwd} undefined';

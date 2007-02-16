@@ -26,7 +26,7 @@ sub carp {
 #
 # The extra trips through newATTRSUB in the interpreter wipe out any savings
 # from avoiding the BEGIN block.  Just do the bootstrap now.
-BEGIN { bootstrap attributes }
+BEGIN { attributes->bootstrap }
 
 sub import {
     @_ > 2 && ref $_[2] or do {

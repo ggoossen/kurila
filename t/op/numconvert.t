@@ -54,7 +54,7 @@ print "# max_uv1 = $max_uv1, max_uv2 = $max_uv2, big_iv = $big_iv\n";
 print "# max_uv_less3 = $max_uv_less3\n";
 if ($max_uv1 ne $max_uv2 or $big_iv > $max_uv1 or $max_uv1 == $max_uv_less3) {
   print "1..0 # skipped: unsigned perl arithmetic is not sane";
-  eval { require Config; import Config };
+  eval { require Config; Config->import };
   use vars qw(%Config);
   if ($Config{d_quad} eq 'define') {
       print " (common in 64-bit platforms)";
