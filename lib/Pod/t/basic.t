@@ -23,6 +23,8 @@ END {
     print "not ok 1\n" unless $loaded;
 }
 
+use bytes;
+
 use Pod::Man;
 use Pod::Text;
 use Pod::Text::Overstrike;
