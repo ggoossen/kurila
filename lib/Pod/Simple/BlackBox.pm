@@ -85,8 +85,8 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       DEBUG > 2 and print "First line: [$source_line]\n";
 
       if( ($line = $source_line) =~ s/^\xEF\xBB\xBF//s ) {
-        DEBUG and print "UTF-8 BOM seen.  Faking a '=encode utf8'.\n";
-        $self->_handle_encoding_line( "=encode utf8" );
+        DEBUG and print "UTF-8 BOM seen.  Faking a '=encoding utf8'.\n";
+        $self->_handle_encoding_line( "=encoding utf8" );
         $line =~ tr/\n\r//d;
         
       } elsif( $line =~ s/^\xFE\xFF//s ) {
@@ -114,7 +114,8 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         # TODO: implement somehow?
         
       } else {
-        DEBUG > 2 and print "First line is BOM-less.\n";
+        DEBUG > 2 and print "First line is BOM-less.  Faking a '=encoding latin1'.\n";
+        $self->_handle_encoding_line( "=encoding latin1" );
         ($line = $source_line) =~ tr/\n\r//d;
       }
     }
@@ -275,23 +276,7 @@ sub _handle_encoding_line {
 
   require Pod::Simple::Transcode;
 
-  if( $self->{'encoding'} ) {
-    my $norm_current = $self->{'encoding'};
-    my $norm_e = $e;
-    foreach my $that ($norm_current, $norm_e) {
-      $that =  lc($that);
-      $that =~ s/[-_]//g;
-    }
-    if($norm_current eq $norm_e) {
-      DEBUG > 1 and print "The '=encoding $orig' line is ",
-       "redundant.  ($norm_current eq $norm_e).  Ignoring.\n";
-      $enc_error = '';
-       # But that doesn't necessarily mean that the earlier one went okay
-    } else {
-      $enc_error = "Encoding is already set to " . $self->{'encoding'};
-      DEBUG > 1 and print $enc_error;
-    }
-  } elsif (
+  if (
     # OK, let's turn on the encoding
     do {
       DEBUG > 1 and print " Setting encoding to $e\n";
@@ -301,11 +286,10 @@ sub _handle_encoding_line {
     and $e eq 'HACKRAW'
   ) {
     DEBUG and print " Putting in HACKRAW (no-op) encoding mode.\n";
+    $self->{'_transcoder'} = undef;
 
   } elsif( Pod::Simple::Transcode::->encoding_is_available($e) ) {
 
-    die($enc_error = "WHAT? _transcoder is already set?!")
-     if $self->{'_transcoder'};   # should never happen
     require Pod::Simple::Transcode;
     $self->{'_transcoder'} = Pod::Simple::Transcode::->make_transcoder($e);
     eval {
