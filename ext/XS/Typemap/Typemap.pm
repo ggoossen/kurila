@@ -74,7 +74,7 @@ $VERSION = '0.02';
 	   /);
 
 
-bootstrap XS::Typemap;
+XS::Typemap->bootstrap;
 
 =head1 NOTES
 

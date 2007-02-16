@@ -62,7 +62,7 @@ sub import {
     Time::HiRes->export_to_level(1, $this, @_);
 }
 
-bootstrap Time::HiRes;
+Time::HiRes->bootstrap();
 
 # Preloaded methods go here.
 

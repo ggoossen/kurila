@@ -24,7 +24,7 @@ our %EXPORT_TAGS = (
 
 our $VERSION = '1.11_02';
 
-bootstrap Time::Piece $VERSION;
+Time::Piece->bootstrap($VERSION);
 
 my $DATE_SEP = '-';
 my $TIME_SEP = ':';

@@ -17,7 +17,7 @@ sub import {
     $class->SUPER::import(@_);
     my $enabled = assertions::enabled();
     {
-	no strict 'vars';
+	no strict 'refs';
 	no warnings;
 	undef &{$name};
 	*{$name} = $enabled ? \&_on : \&_off;

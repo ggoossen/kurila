@@ -56,7 +56,7 @@ sub filter_add($)
     Filter::Util::Call::real_import($obj, (caller)[0], $coderef) ;
 }
 
-bootstrap Filter::Util::Call ;
+Filter::Util::Call->bootstrap;
 
 1;
 __END__

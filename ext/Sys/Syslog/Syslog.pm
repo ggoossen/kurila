@@ -60,7 +60,7 @@ require Exporter;
     } or do {
         require DynaLoader;
         push @ISA, 'DynaLoader';
-        bootstrap Sys::Syslog $VERSION;
+        Sys::Syslog->bootstrap($VERSION);
     };
 }
 

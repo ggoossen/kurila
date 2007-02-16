@@ -53,7 +53,7 @@ sub _catname {
     my($from, $to) = @_;
     if (not defined &basename) {
 	require File::Basename;
-	import  File::Basename 'basename';
+	File::Basename->import('basename');
     }
 
     if ($^O eq 'MacOS') {

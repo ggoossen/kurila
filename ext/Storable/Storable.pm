@@ -64,7 +64,7 @@ sub retrieve_fd { &fd_retrieve }		# Backward compatibility
 
 $Storable::downgrade_restricted = 1;
 $Storable::accept_future_minor = 1;
-bootstrap Storable;
+Storable->bootstrap;
 1;
 __END__
 #

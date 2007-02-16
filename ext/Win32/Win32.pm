@@ -251,7 +251,7 @@ sub GetOSName {
     return wantarray ? ($found_os, $found_desc) : $found_os;
 }
 
-bootstrap Win32;
+Win32->bootstrap;
 
 1;
 

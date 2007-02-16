@@ -31,7 +31,7 @@ our @EXPORT_OK  = qw(
 our $VERSION    = 0.07;
 require DynaLoader;
 local @ISA = qw(DynaLoader);
-bootstrap Hash::Util $VERSION;
+Hash::Util->bootstrap($VERSION);
 
 sub import {
     my $class = shift;

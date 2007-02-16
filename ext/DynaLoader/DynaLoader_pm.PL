@@ -931,7 +931,7 @@ $filename is not defined then "DynaLoader" will be used.
 
 Syntax:
 
-bootstrap($module)
+$module->bootstrap()
 
 This is the normal entry point for automatic dynamic loading in Perl.
 
