@@ -10,7 +10,7 @@ my $Perl = which_perl();
 
 print "1..3\n";
 
-$x = `$Perl -le "print 'ok';"`;
+our $x = `$Perl -le "print 'ok';"`;
 
 if ($x eq "ok\n") {print "ok 1\n";} else {print "not ok 1\n";}
 

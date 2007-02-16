@@ -7,7 +7,7 @@ BEGIN {
 }
 
 # don't make this lexical
-$i = 1;
+our $i = 1;
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
 my $Is_UTF8   = (${^OPEN} || "") =~ /:utf8/;
@@ -156,6 +156,7 @@ print "ok ",$i++,"\n";
 # do FILE shouldn't see any outside lexicals
 my $x = "ok $i\n";
 write_file("bleah.do", <<EOT);
+no strict 'vars';
 \$x = "not ok $i\\n";
 EOT
 do "bleah.do" or die $@;
@@ -171,6 +172,7 @@ print "ok $i - require() context\n";
 1;
 **BLEAH**
 );
+our ($foo, @foo);
                               delete $INC{"bleah.pm"}; ++$::i;
 $foo = eval q{require bleah}; delete $INC{"bleah.pm"}; ++$::i;
 @foo = eval q{require bleah}; delete $INC{"bleah.pm"}; ++$::i;

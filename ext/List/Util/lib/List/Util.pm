@@ -27,7 +27,7 @@ eval {
   } or do {
     require DynaLoader;
     local @ISA = qw(DynaLoader);
-    bootstrap List::Util $XS_VERSION;
+    List::Util->bootstrap($XS_VERSION);
   };
 } unless $TESTING_PERL_ONLY;
 

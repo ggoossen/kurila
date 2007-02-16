@@ -47,7 +47,7 @@ eval 'undef foo';
 like( $@, qr/^Can't modify constant item in undef operator /,
     'undefing constant causes a segfault in 5.6.1 [ID 20010906.019]' );
 
-eval 'read($bla, FILE, 1);';
+eval 'read(our $bla, FILE, 1);';
 like( $@, qr/^Can't modify constant item in read /,
     'read($var, FILE, 1) segfaults on 5.6.1 [ID 20011025.054]' );
 
@@ -79,6 +79,7 @@ is( $@, '', 'PL_lex_brackstack' );
 
 {
     # tests for bug #20716
+    our ($a, @b);
     undef $a;
     undef @b;
     my $a="A";

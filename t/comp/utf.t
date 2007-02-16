@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find('perlio')) {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }
@@ -11,6 +11,7 @@ BEGIN {
 	print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
 	exit 0;
     }
+    our %Config;
     require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";

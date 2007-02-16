@@ -138,7 +138,7 @@ sub getopt (;$$) {
     }
     unless (ref $hash) { 
 	local $Exporter::ExportLevel = 1;
-	import Getopt::Std;
+	Getopt::Std->import;
     }
 }
 
@@ -295,7 +295,7 @@ sub getopts ($;$) {
     }
     unless (ref $hash) { 
 	local $Exporter::ExportLevel = 1;
-	import Getopt::Std;
+	Getopt::Std->import;
     }
     $errs == 0;
 }

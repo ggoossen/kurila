@@ -260,7 +260,8 @@ if ($dl_debug) {
 
 sub croak   { require Carp; Carp::croak(@_)   }
 
-use vars qw(@isa @args $module @dirs $file);
+use vars qw(@isa @args $module @dirs $file, $dl_debug, $dlsrc, @dl_library_path,
+            @do_expand);
 
 sub bootstrap_inherit {
     my $module = $_[0];

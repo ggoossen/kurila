@@ -48,6 +48,7 @@ sub import {
 		unless substr($func, 0, $index) eq $module;
 	}
 
+        no strict 'refs';
 	my $load_sub = sub {
 	    unless ($INC{$pm}) {
 		require $pm;

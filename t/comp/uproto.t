@@ -10,7 +10,8 @@ plan(tests => 39);
 
 sub f($$_) { my $x = shift; is("@_", $x) }
 
-$foo = "FOO";
+our $undef;
+our $foo = "FOO";
 my $bar = "BAR";
 $_ = 42;
 
@@ -48,6 +49,7 @@ like( $@, qr/Too many arguments for main::f at/ );
 
 &f(""); # no error
 
+our $expected;
 sub g(_) { is(shift, $expected) }
 
 $expected = "foo";
