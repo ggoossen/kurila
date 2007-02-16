@@ -419,7 +419,6 @@ typedef DBT DBTKEY ;
 	      my_sv_setpvn(arg, (const char *)name.data, name.size) ;			\
 	      TAINT;                                       		\
 	      SvTAINTED_on(arg);                                       	\
-	      SvUTF8_off(arg);                                       	\
 	      DBM_ckFilter(arg, filter_fetch_value,"filter_fetch_value") ; 	\
 	  }								\
 	}
@@ -435,7 +434,6 @@ typedef DBT DBTKEY ;
 		    sv_setiv(arg, (I32)*(I32*)name.data - 1); 		\
 	      TAINT;                                       		\
 	      SvTAINTED_on(arg);                                       	\
-	      SvUTF8_off(arg);                                       	\
 	      DBM_ckFilter(arg, filter_fetch_key,"filter_fetch_key") ; 	\
 	  } 								\
 	}

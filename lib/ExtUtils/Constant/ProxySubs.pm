@@ -339,7 +339,6 @@ EOBOOT
 		SvCUR_set(tripwire, value_for_notfound->namelen);
 	    } else {
 		SvCUR_set(tripwire, -value_for_notfound->namelen);
-		SvUTF8_on(tripwire);
 	    }
 	    SvPOKp_on(tripwire);
 	    SvREADONLY_on(tripwire);
@@ -464,7 +463,7 @@ $xs_subname(sv)
 #ifdef SYMBIAN
 	sv = newSVpvf("%"SVf" is not a valid $package_sprintf_safe macro", sv);
 #else
-	if (hv_exists(${c_subname}_missing, s, SvUTF8(sv) ? -(I32)len : (I32)len)) {
+	if (hv_exists(${c_subname}_missing, s, (I32)len)) {
 	    sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro %" SVf
 			  ", used", sv);
 	} else {

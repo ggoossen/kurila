@@ -103,7 +103,6 @@ CODE:
     U8 *s = (U8 *)SvPVbyte(str,ulen);
     U8 *e = (U8 *)SvEND(str);
     ST(0) = sv_2mortal(result);
-    SvUTF8_on(result);
 
     if (!endian && s+size <= e) {
     UV bom;

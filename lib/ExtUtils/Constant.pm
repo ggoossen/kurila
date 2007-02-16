@@ -219,12 +219,6 @@ EOT
 	SV *		sv;
         const char *	s = SvPV(sv, len);
 EOT
-  if ($params->{''}) {
-  $xs .= << 'EOT';
-    INPUT:
-	int		utf8 = SvUTF8(sv);
-EOT
-  }
   $xs .= << 'EOT';
     PPCODE:
 EOT
@@ -236,7 +230,6 @@ EOT
 EOT
   }
   $xs .= "	type = $C_subname(aTHX_ s, len";
-  $xs .= ', utf8' if $params->{''};
   $xs .= ', &iv' if $params->{IV};
   $xs .= ', &nv' if $params->{NV};
   $xs .= ', &pv' if $params->{PV};

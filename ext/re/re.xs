@@ -121,7 +121,6 @@ PPCODE:
             }
 
             pattern = sv_2mortal(newSVpvn(re->precomp,re->prelen));
-            if (re->extflags & RXf_UTF8) SvUTF8_on(pattern);
 
             /* return the pattern and the modifiers */
             XPUSHs(pattern);
@@ -131,8 +130,6 @@ PPCODE:
             /* Scalar, so use the string that Perl would return */
             /* return the pattern in (?msix:..) format */
             pattern = sv_2mortal(newSVpvn(re->wrapped,re->wraplen));
-            if (re->extflags & RXf_UTF8) 
-                SvUTF8_on(pattern);
             XPUSHs(pattern);
             XSRETURN(1);
         }

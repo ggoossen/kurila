@@ -670,8 +670,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		    svp = av_fetch(keys, i, FALSE);
 		    keysv = svp ? *svp : sv_mortalcopy(&PL_sv_undef);
 		    key = SvPV(keysv, keylen);
-		    svp = hv_fetch((HV*)ival, key,
-                                   SvUTF8(keysv) ? -(I32)keylen : keylen, 0);
+		    svp = hv_fetch((HV*)ival, key, keylen, 0);
 		    hval = svp ? *svp : sv_mortalcopy(&PL_sv_undef);
 		}
 		else {

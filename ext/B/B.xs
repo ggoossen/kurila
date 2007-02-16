@@ -330,7 +330,7 @@ cstring(pTHX_ SV *sv, bool perlstyle)
 
     if (!SvOK(sv))
 	sv_setpvn(sstr, "0", 1);
-    else if (perlstyle && SvUTF8(sv)) {
+    else if (perlstyle) {
 	SV *tmpsv = sv_newmortal(); /* Temporary SV to feed sv_uni_display */
 	const STRLEN len = SvCUR(sv);
 	const char *s = sv_uni_display(tmpsv, sv, 8*len, UNI_DISPLAY_QQ);
@@ -1377,7 +1377,6 @@ SvPV(sv)
 	    } else {
 		sv_setpvn(ST(0), SvPVX_const(sv), SvCUR(sv));
 	    }
-            SvFLAGS(ST(0)) |= SvUTF8(sv);
         }
         else {
             /* XXX for backward compatibility, but should fail */

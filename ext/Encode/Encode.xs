@@ -519,9 +519,6 @@ CODE:
     encode_t *enc = INT2PTR(encode_t *, SvIV(SvRV(obj)));
     STRLEN offset = (STRLEN)SvIV(off);
     int code = 0;
-    if (SvUTF8(src)) {
-    	sv_utf8_downgrade(src, FALSE);
-    }
     sv_catsv(dst, encode_method(aTHX_ enc, enc->t_utf8, src, check,
                 &offset, term, &code));
     SvIV_set(off, (IV)offset);
@@ -542,9 +539,6 @@ CODE:
 {
     int check;
     encode_t *enc = INT2PTR(encode_t *, SvIV(SvRV(obj)));
-    if (SvUTF8(src)) {
-    	sv_utf8_downgrade(src, FALSE);
-    }
     if (SvROK(check_sv)){
     if (fallback_cb == (SV*)NULL){
             fallback_cb = newSVsv(check_sv); /* First time */
@@ -558,7 +552,6 @@ CODE:
     }
     ST(0) = encode_method(aTHX_ enc, enc->t_utf8, src, check,
               NULL, Nullsv, NULL);
-    SvUTF8_on(ST(0));
     XSRETURN(1);
 }
 
@@ -638,7 +631,6 @@ CODE:
 
     converted = bytes_to_utf8(s, &len); /* This allocs */
     sv_setpvn(sv, (char *)converted, len);
-    SvUTF8_on(sv); /* XXX Should we? */
     Safefree(converted);                /* ... so free it */
     RETVAL = len;
     }
@@ -708,7 +700,6 @@ CODE:
         }
         RETVAL = dest - d0;
         sv_usepvn(sv, (char *)dest, RETVAL);
-        SvUTF8_off(sv);
     } else {
         RETVAL = (utf8_to_bytes(s, &len) ? len : 0);
     }
@@ -725,45 +716,14 @@ CODE:
 {
     if (SvGMAGICAL(sv)) /* it could be $1, for example */
     sv = newSVsv(sv); /* GMAGIG will be done */
-    RETVAL = SvUTF8(sv) ? TRUE : FALSE;
-    if (RETVAL &&
-        check  &&
+    if (SvPOK(sv)) {
+    RETVAL = TRUE;
+    if (check  &&
         !is_utf8_string((U8*)SvPVX(sv), SvCUR(sv)))
         RETVAL = FALSE;
+    }
     if (sv != ST(0))
     SvREFCNT_dec(sv); /* it was a temp copy */
-}
-OUTPUT:
-    RETVAL
-
-SV *
-_utf8_on(sv)
-SV *	sv
-CODE:
-{
-    if (SvPOK(sv)) {
-    SV *rsv = newSViv(SvUTF8(sv));
-    RETVAL = rsv;
-    SvUTF8_on(sv);
-    } else {
-    RETVAL = &PL_sv_undef;
-    }
-}
-OUTPUT:
-    RETVAL
-
-SV *
-_utf8_off(sv)
-SV *	sv
-CODE:
-{
-    if (SvPOK(sv)) {
-    SV *rsv = newSViv(SvUTF8(sv));
-    RETVAL = rsv;
-    SvUTF8_off(sv);
-    } else {
-    RETVAL = &PL_sv_undef;
-    }
 }
 OUTPUT:
     RETVAL

@@ -816,16 +816,6 @@ Rarely needed.
 
 Equivalents of I<pre> and I<post> for the default value.
 
-=item utf8
-
-Generated internally. Is zero or undefined if name is 7 bit ASCII,
-"no" if the name is 8 bit (and so should only match if SvUTF8() is false),
-"yes" if the name is utf8 encoded.
-
-The internals automatically clone any name with characters 128-255 but none
-256+ (ie one that could be either in bytes or utf8) into a second entry
-which is utf8 encoded.
-
 =item weight
 
 Optional sorting weight for names, to determine the order of

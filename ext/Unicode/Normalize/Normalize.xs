@@ -186,13 +186,6 @@ static char* sv_2pvunicode(SV *sv, STRLEN *lp)
     char *s;
     STRLEN len;
     s = SvPV(sv,len);
-    if (!SvUTF8(sv)) {
-	SV* tmpsv = sv_2mortal(newSVpvn(s, len));
-	if (!SvPOK(tmpsv))
-	    s = SvPV_force(tmpsv,len);
-	sv_utf8_upgrade(tmpsv);
-	s = SvPV(tmpsv,len);
-    }
     if (lp)
 	*lp = len;
     return s;
@@ -466,7 +459,6 @@ decompose(src, compat = &PL_sv_no)
     New(0, d, dlen+1, U8);
     dend = pv_utf8_decompose(s, slen, &d, dlen, (bool)SvTRUE(compat));
     sv_setpvn(dst, (char *)d, dend - d);
-    SvUTF8_on(dst);
     Safefree(d);
     RETVAL = dst;
   OUTPUT:
@@ -485,7 +477,6 @@ reorder(src)
     dst = newSVpvn("", 0);
     dlen = slen + UTF8_MAXLEN;
     d = (U8*)SvGROW(dst,dlen+1);
-    SvUTF8_on(dst);
     dend = pv_utf8_reorder(s, slen, d, dlen);
     *dend = '\0';
     SvCUR_set(dst, dend - d);
@@ -508,7 +499,6 @@ compose(src)
     dst = newSVpvn("", 0);
     dlen = slen + UTF8_MAXLEN;
     d = (U8*)SvGROW(dst,dlen+1);
-    SvUTF8_on(dst);
     dend = pv_utf8_compose(s, slen, d, dlen, (bool)ix);
     *dend = '\0';
     SvCUR_set(dst, dend - d);
@@ -539,7 +529,6 @@ NFD(src)
     dst = newSVpvn("", 0);
     dlen = tlen + UTF8_MAXLEN;
     d = (U8*)SvGROW(dst,dlen+1);
-    SvUTF8_on(dst);
     dend = pv_utf8_reorder(t, tlen, d, dlen);
     *dend = '\0';
     SvCUR_set(dst, dend - d);
@@ -581,7 +570,6 @@ NFC(src)
     dst = newSVpvn("", 0);
     dlen = ulen + UTF8_MAXLEN;
     d = (U8*)SvGROW(dst,dlen+1);
-    SvUTF8_on(dst);
     dend = pv_utf8_compose(u, ulen, d, dlen, (bool)(ix==2));
     *dend = '\0';
     SvCUR_set(dst, dend - d);
@@ -845,7 +833,6 @@ getCanon(uv)
 	    XSRETURN_UNDEF;
 	RETVAL = newSVpvn((char *)rstr, strlen((char *)rstr));
     }
-    SvUTF8_on(RETVAL);
   OUTPUT:
     RETVAL
 
@@ -872,10 +859,8 @@ splitOnLastStarter(src)
     }
 
     svp = sv_2mortal(newSVpvn((char*)s, p - s));
-    SvUTF8_on(svp);
     XPUSHs(svp);
 
     svp = sv_2mortal(newSVpvn((char*)p, e - p));
-    SvUTF8_on(svp);
     XPUSHs(svp);
 
