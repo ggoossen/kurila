@@ -12,6 +12,8 @@ use File::Spec::Functions;
 my $Is_MacOS  = ($^O eq 'MacOS');
 my $Is_VMSish = ($^O eq 'VMS');
 
+our ($wd, $newmode, $delta, $foo);
+
 if (($^O eq 'MSWin32') || ($^O eq 'NetWare')) {
     $wd = `cd`;
 }

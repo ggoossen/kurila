@@ -112,7 +112,7 @@ while (<GR>) {
 	$members_s =~ s/\s*,\s*/,/g;
 	$members_s =~ s/\s+$//;
 	$members_s =~ s/^\s+//;
-	@n = getgrgid($gid_s);
+	my @n = getgrgid($gid_s);
 	# 'nogroup' et al.
 	next unless @n;
 	my ($name,$passwd,$gid,$members) = @n;

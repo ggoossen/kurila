@@ -13,7 +13,7 @@ use vars qw/@ISA $VERSION $BASE $BASE_LEN/;
 
 $VERSION = '0.12_01';
 
-bootstrap Math::BigInt::FastCalc $VERSION;
+Math::BigInt::FastCalc->bootstrap($VERSION);
 
 ##############################################################################
 # global constants, flags and accessory

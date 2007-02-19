@@ -6,7 +6,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require './test.pl';
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find('perlio')) {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }

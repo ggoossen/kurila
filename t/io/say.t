@@ -18,8 +18,11 @@ use feature "say";
 
 say "1..12";
 
+{
+no strict 'refs';
 my $foo = 'STDOUT';
 say $foo "ok 1";
+}
 
 say "ok 2\n","ok 3\n","ok 4";
 say STDOUT "ok 5";

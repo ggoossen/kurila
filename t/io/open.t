@@ -9,8 +9,10 @@ BEGIN {
 $|  = 1;
 use warnings;
 use Config;
-$Is_VMS = $^O eq 'VMS';
-$Is_MacOS = $^O eq 'MacOS';
+my $Is_VMS = $^O eq 'VMS';
+my $Is_MacOS = $^O eq 'MacOS';
+
+our ($f);
 
 plan tests => 108;
 

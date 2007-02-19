@@ -21,6 +21,8 @@ if ($^O eq 'mpeix') {
 
 $|=1;
 
+our (@prgs, $tmpfile, $CAT, $status, $i);
+
 undef $/;
 @prgs = split "\n########\n", <DATA>;
 print "1..", scalar @prgs, "\n";

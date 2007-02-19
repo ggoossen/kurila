@@ -11,8 +11,11 @@ die $@ if $@ and !$ENV{PERL_CORE_MINITEST};
 
 print "1..21\n";
 
+{
+no strict 'refs';
 my $foo = 'STDOUT';
 print $foo "ok 1\n";
+}
 
 print "ok 2\n","ok 3\n","ok 4\n";
 print STDOUT "ok 5\n";

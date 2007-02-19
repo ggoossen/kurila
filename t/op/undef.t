@@ -5,6 +5,8 @@ BEGIN {
     @INC = '../lib';
 }
 
+our (@ary, %ary, $test, %hash);
+
 print "1..36\n";
 
 print defined($a) ? "not ok 1\n" : "ok 1\n";

@@ -13,6 +13,8 @@ print "not ok 2\n" if 0;
 0 || (print "not ok 4\n") if 0;
 0 || (print "ok 4\n") if 1;
 
+our ($x, @x, @y);
+
 $x = 0;
 do {$x[$x] = $x;} while ($x++) < 10;
 if (join(' ',@x) eq '0 1 2 3 4 5 6 7 8 9 10') {

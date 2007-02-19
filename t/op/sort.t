@@ -417,7 +417,7 @@ sub ok { main::cmp_ok($_[0],'eq',$_[1],$_[2]);
 
 sub generate {
     my $count = 0;
-    map {new Oscalar $_, $count++} qw(A A A B B B C C C);
+    map {Oscalar->new($_, $count++)} qw(A A A B B B C C C);
 }
 
 my @input = &generate;
@@ -561,7 +561,7 @@ ok $output, "CCCBBBAAA",
 
 sub generate1 {
     my $count = 'A';
-    map {new Oscalar $count++, $_} 0, 0, 0, 1, 1, 1, 2, 2, 2;
+    map {Oscalar->new($count++, $_)} 0, 0, 0, 1, 1, 1, 2, 2, 2;
 }
 
 # This won't be very interesting

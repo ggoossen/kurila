@@ -1,6 +1,6 @@
 #!./perl
 
-$does_gmtime = gmtime(time);
+our $does_gmtime = gmtime(time);
 
 BEGIN {
     chdir 't' if -d 't';
@@ -10,14 +10,16 @@ BEGIN {
 
 plan tests => 8;
 
-($beguser,$begsys) = times;
+our ($beguser,$begsys) = times;
 
-$beg = time;
+our $beg = time;
 
+our $now;
 while (($now = time) == $beg) { sleep 1 }
 
 ok($now > $beg && $now - $beg < 10,             'very basic time test');
 
+our $i;
 for ($i = 0; $i < 1_000_000; $i++) {
     for my $j (1..100) {}; # burn some user cycles
     ($nowuser, $nowsys) = times;
@@ -28,9 +30,9 @@ for ($i = 0; $i < 1_000_000; $i++) {
 
 ok($i >= 2_000_000, 'very basic times test');
 
-($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
-($xsec,$foo) = localtime($now);
-$localyday = $yday;
+our ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
+our ($xsec,$foo) = localtime($now);
+our $localyday = $yday;
 
 ok($sec != $xsec && $mday && $year,             'localtime() list context');
 

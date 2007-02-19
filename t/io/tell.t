@@ -7,6 +7,8 @@ BEGIN {
 
 print "1..28\n";
 
+no strict 'vars';
+
 $TST = 'TST';
 
 $Is_Dosish = ($^O eq 'MSWin32' or $^O eq 'NetWare' or $^O eq 'dos' or

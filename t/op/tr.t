@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 108;
 
+our ($x, $f);
+
 my $Is_EBCDIC = (ord('i') == 0x89 & ord('J') == 0xd1);
 
 $_ = "abcdefghijklmnopqrstuvwxyz";
@@ -36,7 +38,6 @@ is($_, "aBCDEFGHIJKLMNOPQRSTUVWXYz",    'partial uc');
     is($_, "i\xcaj",    'EBCDIC discontinuity');
 }
 #
-
 
 ($x = 12) =~ tr/1/3/;
 (my $y = 12) =~ tr/1/3/;

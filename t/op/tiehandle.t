@@ -77,6 +77,8 @@ use Symbol;
 
 my $fh = gensym;
 
+our ($r, $text, $ln, @in, @line, $ch, $buf);
+
 @expect = (TIEHANDLE => 'Implement');
 my $ob = tie *$fh,'Implement';
 is(ref($ob),  'Implement');

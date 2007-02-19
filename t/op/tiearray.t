@@ -100,7 +100,7 @@ sub SPLICE
 }
 
 package NegIndex;               # 20020220 MJD
-@ISA = 'Implement';
+our @ISA = 'Implement';
 
 # simulate indices -2 .. 2
 my $offset = 2;
