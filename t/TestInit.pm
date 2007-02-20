@@ -15,12 +15,14 @@
 
 package TestInit;
 
-use strict;
-
 our $VERSION = 1.01;
 
-chdir 't' if -d 't';
-@INC = '../lib';
+BEGIN {
+    chdir 't' if -d 't';
+    @INC = '../lib';
+}
+
+use strict;
 
 # Don't interfere with the taintedness of %ENV, this could perturbate tests
 $ENV{PERL_CORE} = 1 unless ${^TAINT};
