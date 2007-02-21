@@ -60,24 +60,21 @@ while (<DATA>) {
     no warnings 'utf8';
     print TMP $input;
 
-    while (<DATA>) {
-        last if $_ eq "###\n";
-        print TMP $_;
-    }
     close TMP;
 
-    test_outtmp($expected);
+    test_outtmp($expected, "latin1\nINPUT:\n$input");
 
     open (TMP2, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
     eval { binmode (\*TMP2, ':encoding(utf-8)') };
     print TMP2 "\N{BOM}";
     print TMP2 $input;
     close TMP2;
-    test_outtmp($expected);
+    test_outtmp($expected, "UTF-8 BOM\nINPUT:\n$input");
 }
 
 sub test_outtmp {
     my $expected = shift;
+    my $msg = shift;
     open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
@@ -94,6 +91,7 @@ sub test_outtmp {
         print "ok $n\n";
     } else {
         print "not ok $n\n";
+        print "$msg\n";
         print "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
