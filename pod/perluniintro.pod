@@ -19,7 +19,7 @@ including all commercially-important modern languages.  All characters
 in the largest Chinese, Japanese, and Korean dictionaries are also
 encoded. The standards will eventually cover almost all characters in
 more than 250 writing systems and thousands of languages.
-Unicode 1.0 was released in October 1991, and 4.0 in April 2003.
+Unicode 1.0 was released in October 1991, and 5.0 in October 2006.
 
 A Unicode I<character> is an abstract entity.  It is not bound to any
 particular integer width, especially not to the C language C<char>.
@@ -117,77 +117,45 @@ and UCS-4 encoding forms.
 For more information about encodings--for instance, to learn what
 I<surrogates> and I<byte order marks> (BOMs) are--see L<perlunicode>.
 
-=head2 Perl's Unicode Support
+=head2 Characters represented by Code points represented by Bytes
 
-Starting from Perl 5.6.0, Perl has had the capacity to handle Unicode
-natively.  Perl 5.8.0, however, is the first recommended release for
-serious Unicode work.  The maintenance release 5.6.1 fixed many of the
-problems of the initial Unicode implementation, but for example
-regular expressions still do not work with Unicode in 5.6.1.
+According to the Unicode Standard: I<"Characters are the abstract
+representations of the smallest components of written language that
+have semantic value.">
+The Unicode meaning of character is often B<not> the meaning used by
+Perl. Characters used to be represented by bytes, for example the C type
+C<char> is a byte, or in Perl 5 the function C<chr>, always returned a
+byte for values below 256. The Unicode definition of character is also
+B<not> the idea of character that most people have.
 
-B<Starting from Perl 5.8.0, the use of C<use utf8> is no longer
-necessary.> In earlier releases the C<utf8> pragma was used to declare
-that operations in the current block or file would be Unicode-aware.
-This model was found to be wrong, or at least clumsy: the "Unicodeness"
-is now carried with the data, instead of being attached to the
-operations.  Only one case remains where an explicit C<use utf8> is
-needed: if your Perl script itself is encoded in UTF-8, you can use
-UTF-8 in your identifier names, and in string and regular expression
-literals, by saying C<use utf8>.  This is not the default because
-scripts with legacy 8-bit data in them would break.  See L<utf8>.
+Code points are numeric values representing Unicode characters. Because
+this is normally the only represented, and the term is less ambiguous
+then characters, this is the preferred term.
 
-=head2 Perl's Unicode Model
+Perl kurila uses the UTF-8 (or UTF-EBCDIC) encoding to store code
+points in bytes or 8-bit code units using Unicode terms. Multiple
+bytes may be needed to store a single code point.
 
-Perl supports both pre-5.6 strings of eight-bit native bytes, and
-strings of Unicode characters.  The principle is that Perl tries to
-keep its data as eight-bit bytes for as long as possible, but as soon
-as Unicodeness cannot be avoided, the data is transparently upgraded
-to Unicode.
+=head2 Byte and Code points Semantics
 
-Internally, Perl currently uses either whatever the native eight-bit
-character set of the platform (for example Latin-1) is, defaulting to
-UTF-8, to encode Unicode strings. Specifically, if all code points in
-the string are C<0xFF> or less, Perl uses the native eight-bit
-character set.  Otherwise, it uses UTF-8.
+Perl kurila uses the lexical scope to determine whether to use byte semantics
+or code point semantics. The C<bytes> pragma forces byte semantics, the
+C<utf8> pragma forces code points semantics. For compatibility reasons
+the default behaviour is byte semantics, but this might change.
 
-A user of Perl does not normally need to know nor care how Perl
-happens to encode its internal strings, but it becomes relevant when
-outputting Unicode strings to a stream without a PerlIO layer -- one with
-the "default" encoding.  In such a case, the raw bytes used internally
-(the native character set or UTF-8, as appropriate for each string)
-will be used, and a "Wide character" warning will be issued if those
-strings contain a character beyond 0x00FF.
+The C<bytes> pragma will always, regardless of platform, force byte
+semantics in a particular lexical scope.  See L<bytes>.
 
-For example,
+The C<utf8> pragma will force code points semantics in a particular
+lexical scope.  See L<utf8>. The C<utf8> pragma also set that the
+input of the parser is UTF-8. The pragma to force code points semantics
+might be changed to C<codepoints>.
 
-      perl -e 'print "\x{DF}\n", "\x{0100}\x{DF}\n"'              
-
-produces a fairly useless mixture of native bytes and UTF-8, as well
-as a warning:
-
-     Wide character in print at ...
-
-To output UTF-8, use the C<:utf8> output layer.  Prepending
-
-      binmode(STDOUT, ":utf8");
-
-to this sample program ensures that the output is completely UTF-8,
-and removes the program's warning.
-
-You can enable automatic UTF-8-ification of your standard file
-handles, default C<open()> layer, and C<@ARGV> by using either
-the C<-C> command line switch or the C<PERL_UNICODE> environment
-variable, see L<perlrun> for the documentation of the C<-C> switch.
-
-Note that this means that Perl expects other software to work, too:
-if Perl has been led to believe that STDIN should be UTF-8, but then
-STDIN coming in from another command is not UTF-8, Perl will complain
-about the malformed UTF-8.
-
-All features that combine Unicode and I/O also require using the new
-PerlIO feature.  Almost all Perl 5.8 platforms do use PerlIO, though:
-you can see whether yours is by running "perl -V" and looking for
-C<useperlio=define>.
+Under code points semantics, many operations that formerly operated on
+bytes now operate on code points. A code point in Perl is
+logically just a number ranging from 0 to 2**31 or so. Larger
+code points may encode into longer sequences of bytes internally, but
+this internal detail is mostly hidden for Perl code.
 
 =head2 Unicode and EBCDIC
 
@@ -202,6 +170,25 @@ On EBCDIC platforms, the internal Unicode encoding form is UTF-EBCDIC
 instead of UTF-8.  The difference is that as UTF-8 is "ASCII-safe" in
 that ASCII characters encode to UTF-8 as-is, while UTF-EBCDIC is
 "EBCDIC-safe".
+
+=head2 Perl's Unicode Support History
+
+Starting from Perl 5.6.0, Perl has had the capacity to handle Unicode
+natively.  Perl 5.8.0, however, is the first recommended release for
+serious Unicode work.  The maintenance release 5.6.1 fixed many of the
+problems of the initial Unicode implementation, but for example
+regular expressions still do not work with Unicode in 5.6.1.
+
+In Perl 5.6.x releases the C<utf8> pragma was used to declare
+that operations in the current block or file would be Unicode-aware.
+In Perl 5.8.x the "Unicodeness" is carried with the data, instead of
+being attached to the operations. Only one case remained where an explicit C<use utf8> was
+needed: if your Perl script itself is encoded in UTF-8, you can use
+UTF-8 in your identifier names, and in string and regular expression
+literals, by saying C<use utf8>.
+
+Perl kurila restores the meaning of the C<utf8> pragma as to mean
+Unicode-aware. And might change the default to Unicode-aware.
 
 =head2 Creating Unicode
 
@@ -851,29 +838,6 @@ You can explore various information from the Unicode data files using
 the C<Unicode::UCD> module.
 
 =back
-
-=head1 UNICODE IN OLDER PERLS
-
-If you cannot upgrade your Perl to 5.8.0 or later, you can still
-do some Unicode processing by using the modules C<Unicode::String>,
-C<Unicode::Map8>, and C<Unicode::Map>, available from CPAN.
-If you have the GNU recode installed, you can also use the
-Perl front-end C<Convert::Recode> for character conversions.
-
-The following are fast conversions from ISO 8859-1 (Latin-1) bytes
-to UTF-8 bytes and back, the code works even with older Perl 5 versions.
-
-    # ISO 8859-1 to UTF-8
-    s/([\x80-\xFF])/chr(0xC0|ord($1)>>6).chr(0x80|ord($1)&0x3F)/eg;
-
-    # UTF-8 to ISO 8859-1
-    s/([\xC2\xC3])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
-
-=head1 SEE ALSO
-
-L<perlunitut>, L<perlunicode>, L<Encode>, L<open>, L<utf8>, L<bytes>,
-L<perlretut>, L<perlrun>, L<Unicode::Collate>, L<Unicode::Normalize>,
-L<Unicode::UCD>
 
 =head1 ACKNOWLEDGMENTS
 

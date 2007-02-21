@@ -63,60 +63,6 @@ See L</"Byte and Character Semantics"> for more details.
 
 =back
 
-=head2 Byte and Character Semantics
-
-Beginning with version 5.6, Perl uses logically-wide characters to
-represent strings internally.
-
-In future, Perl-level operations will be expected to work with
-characters rather than bytes.
-
-However, as an interim compatibility measure, Perl aims to
-provide a safe migration path from byte semantics to character
-semantics for programs.  For operations where Perl can unambiguously
-decide that the input data are characters, Perl switches to
-character semantics.  For operations where this determination cannot
-be made without additional information from the user, Perl decides in
-favor of compatibility and chooses to use byte semantics.
-
-This behavior preserves compatibility with earlier versions of Perl,
-which allowed byte semantics in Perl operations only if
-none of the program's inputs were marked as being as source of Unicode
-character data.  Such data may come from filehandles, from calls to
-external programs, from information provided by the system (such as %ENV),
-or from literals and constants in the source text.
-
-The C<bytes> pragma will always, regardless of platform, force byte
-semantics in a particular lexical scope.  See L<bytes>.
-
-The C<utf8> pragma is primarily a compatibility device that enables
-recognition of UTF-(8|EBCDIC) in literals encountered by the parser.
-Note that this pragma is only required while Perl defaults to byte
-semantics; when character semantics become the default, this pragma
-may become a no-op.  See L<utf8>.
-
-Unless explicitly stated, Perl operators use character semantics
-for Unicode data and byte semantics for non-Unicode data.
-The decision to use character semantics is made transparently.  If
-input data comes from a Unicode source--for example, if a character
-encoding layer is added to a filehandle or a literal Unicode
-string constant appears in a program--character semantics apply.
-Otherwise, byte semantics are in effect.  The C<bytes> pragma should
-be used to force byte semantics on Unicode data.
-
-If strings operating under byte semantics and strings with Unicode
-character data are concatenated, the new string will be created by
-decoding the byte strings as I<ISO 8859-1 (Latin-1)>, even if the
-old Unicode string used EBCDIC.  This translation is done without
-regard to the system's native 8-bit encoding. 
-
-Under character semantics, many operations that formerly operated on
-bytes now operate on characters. A character in Perl is
-logically just a number ranging from 0 to 2**31 or so. Larger
-characters may encode into longer sequences of bytes internally, but
-this internal detail is mostly hidden for Perl code.
-See L<perluniintro> for more.
-
 =head2 Effects of Character Semantics
 
 Character semantics have the following effects:
@@ -1506,111 +1452,34 @@ be quite a bit slower (5-20 times) than their simpler counterparts
 like C<\d> (then again, there 268 Unicode characters matching C<Nd>
 compared with the 10 ASCII characters matching C<d>).
 
-=head2 Porting code from perl-5.6.X
-
-Perl 5.8 has a different Unicode model from 5.6. In 5.6 the programmer
-was required to use the C<utf8> pragma to declare that a given scope
-expected to deal with Unicode data and had to make sure that only
-Unicode data were reaching that scope. If you have code that is
-working with 5.6, you will need some of the following adjustments to
-your code. The examples are written such that the code will continue
-to work under 5.6, so you should be safe to try them out.
+=head2 Porting code from perl-5.8.x
 
 =over 4
 
 =item *
 
-A filehandle that should read or write UTF-8
+Deciding code points or byte semantics
 
-  if ($] > 5.007) {
-    binmode $fh, ":utf8";
-  }
-
-=item *
-
-A scalar that is going to be passed to some extension
-
-Be it Compress::Zlib, Apache::Request or any extension that has no
-mention of Unicode in the manpage, you need to make sure that the
-UTF8 flag is stripped off. Note that at the time of this writing
-(October 2002) the mentioned modules are not UTF-8-aware. Please
-check the documentation to verify if this is still true.
-
-  if ($] > 5.007) {
-    require Encode;
-    $val = Encode::encode_utf8($val); # make octets
-  }
+Perl kurila uses the lexical scope to determine to use code points or
+byte semantics. Decide which should be used and add the C<utf8> or
+C<bytes> pragma accordingly. Currently the default is byte semantics,
+but this might change, so it is strongly advised to make the choice
+explicit using the C<utf8> or C<bytes> pragmas.
 
 =item *
 
-A scalar we got back from an extension
+Handling latin1 text
 
-If you believe the scalar comes back as UTF-8, you will most likely
-want the UTF8 flag restored:
-
-  if ($] > 5.007) {
-    require Encode;
-    $val = Encode::decode_utf8($val);
-  }
+Latin1 text should be decode upon reading and encoded upon
+writing. Using either C<Encode::decode> or using an
+C<":encoding(latin1)"> layer.
 
 =item *
 
-Same thing, if you are really sure it is UTF-8
+Not using the UTF-8 flag
 
-  if ($] > 5.007) {
-    require Encode;
-    Encode::_utf8_on($val);
-  }
-
-=item *
-
-A wrapper for fetchrow_array and fetchrow_hashref
-
-When the database contains only UTF-8, a wrapper function or method is
-a convenient way to replace all your fetchrow_array and
-fetchrow_hashref calls. A wrapper function will also make it easier to
-adapt to future enhancements in your database driver. Note that at the
-time of this writing (October 2002), the DBI has no standardized way
-to deal with UTF-8 data. Please check the documentation to verify if
-that is still true.
-
-  sub fetchrow {
-    my($self, $sth, $what) = @_; # $what is one of fetchrow_{array,hashref}
-    if ($] < 5.007) {
-      return $sth->$what;
-    } else {
-      require Encode;
-      if (wantarray) {
-        my @arr = $sth->$what;
-        for (@arr) {
-          defined && /[^\000-\177]/ && Encode::_utf8_on($_);
-        }
-        return @arr;
-      } else {
-        my $ret = $sth->$what;
-        if (ref $ret) {
-          for my $k (keys %$ret) {
-            defined && /[^\000-\177]/ && Encode::_utf8_on($_) for $ret->{$k};
-          }
-          return $ret;
-        } else {
-          defined && /[^\000-\177]/ && Encode::_utf8_on($_) for $ret;
-          return $ret;
-        }
-      }
-    }
-  }
-
-
-=item *
-
-A large scalar that you know can only contain ASCII
-
-Scalars that contain only ASCII and are marked as UTF-8 are sometimes
-a drag to your program. If you recognize such a situation, just remove
-the UTF8 flag:
-
-  utf8::downgrade($val) if $] > 5.007;
+There is no UTF-8 flag anymore, so there is no need to preserve or set
+it. Functions to modify the flag have been removed or give an error.
 
 =back
 
