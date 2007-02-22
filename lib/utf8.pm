@@ -188,13 +188,13 @@ probably want to use utf8::is_utf8() instead.
 
 C<utf8::encode> is like C<utf8::upgrade>, but the UTF8 flag is
 cleared.  See L<perlunicode> for more on the UTF8 flag and the C API
-functions C<sv_utf8_upgrade>, C<sv_utf8_downgrade>, C<sv_utf8_encode>,
+functions C<sv_utf8_encode>,
 and C<sv_utf8_decode>, which are wrapped by the Perl functions
-C<utf8::upgrade>, C<utf8::downgrade>, C<utf8::encode> and
-C<utf8::decode>.  Also, the functions utf8::is_utf8, utf8::valid,
-utf8::encode, utf8::decode, utf8::upgrade, and utf8::downgrade are
-actually internal, and thus always available, without a C<require utf8>
-statement.
+C<utf8::encode> and
+C<utf8::decode>.  Note that in the Perl 5.8.0 and 5.8.1 implementation
+the functions utf8::is_utf8, utf8::valid, utf8::encode, utf8::decode,
+utf8::upgrade, and utf8::downgrade are always available, without a
+C<require utf8> statement-- this may change in future releases.
 
 =head1 BUGS
 

@@ -1035,7 +1035,6 @@ ApdRmb	|char*	|sv_2pvbyte_nolen|NN SV* sv
 AmdbR	|char*	|sv_pv		|NN SV *sv
 AmdbR	|char*	|sv_pvutf8	|NN SV *sv
 AmdbR	|char*	|sv_pvbyte	|NN SV *sv
-ApdM	|bool	|sv_utf8_downgrade|NN SV *sv|bool fail_ok
 Apd	|void	|sv_utf8_encode |NN SV *sv
 ApdM	|bool	|sv_utf8_decode |NN SV *sv
 Apdmb	|void	|sv_force_normal|NN SV *sv

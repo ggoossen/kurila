@@ -2910,29 +2910,12 @@ Converts the PV of an SV to its UTF-8-encoded form.
 Obsolete function which used to:
 Converts the PV of an SV to its UTF-8-encoded form.
 
-=cut
-*/
-
-/*
 =for apidoc sv_utf8_downgrade
 
-Attempts to convert the PV of an SV from characters to bytes.
-If the PV contains a character beyond byte, this conversion will fail;
-in this case, either returns false or, if C<fail_ok> is not
-true, croaks.
-
-This is not as a general purpose Unicode to byte encoding interface:
-use the Encode extension for that.
+Obsolete function which used to:
 
 =cut
 */
-
-bool
-Perl_sv_utf8_downgrade(pTHX_ register SV* sv, bool fail_ok)
-{
-    Perl_croak(aTHX_ "utf8_downgrade obsolete");
-    return TRUE;
-}
 
 /*
 =for apidoc sv_utf8_encode
@@ -6035,11 +6018,6 @@ Perl_sv_gets(pTHX_ register SV *sv, register PerlIO *fp, I32 append)
 	    rsptr = SvPVutf8(PL_rs, rslen);
 	}
 	else {
-	    if ( ! IN_BYTES ) {
-/* 		if (!sv_utf8_downgrade(PL_rs, TRUE)) { */
-/* 		    Perl_croak(aTHX_ "Wide character in $/"); */
-/* 		} */
-	    }
 	    rsptr = SvPV_const(PL_rs, rslen);
 	}
     }

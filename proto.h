@@ -2792,9 +2792,6 @@ PERL_CALLCONV void	Perl_reginitcolors(pTHX);
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1); */
 
-PERL_CALLCONV bool	Perl_sv_utf8_downgrade(pTHX_ SV *sv, bool fail_ok)
-			__attribute__nonnull__(pTHX_1);
-
 PERL_CALLCONV void	Perl_sv_utf8_encode(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
 

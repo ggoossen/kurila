@@ -6164,25 +6164,6 @@ removed without notice.
 =for hackers
 Found in file sv.c
 
-=item sv_utf8_downgrade
-X<sv_utf8_downgrade>
-
-Attempts to convert the PV of an SV from characters to bytes.
-If the PV contains a character beyond byte, this conversion will fail;
-in this case, either returns false or, if C<fail_ok> is not
-true, croaks.
-
-This is not as a general purpose Unicode to byte encoding interface:
-use the Encode extension for that.
-
-NOTE: this function is experimental and may change or be
-removed without notice.
-
-	bool	sv_utf8_downgrade(SV *sv, bool fail_ok)
-
-=for hackers
-Found in file sv.c
-
 =item sv_utf8_encode
 X<sv_utf8_encode>
 

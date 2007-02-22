@@ -65,22 +65,7 @@ extern "C" {
    #define DOWARN PL_dowarn
 #endif
 
-#ifdef SvPVbyte
-   #if PERL_REVISION == 5 && PERL_VERSION < 7
-       /* SvPVbyte does not work in perl-5.6.1, borrowed version for 5.7.3 */
-       #undef SvPVbyte
-       #define SvPVbyte(sv, lp) \
-	  ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK) \
-     	   ? ((lp = SvCUR(sv)), SvPVX(sv)) : my_sv_2pvbyte(aTHX_ sv, &lp))
-
-       static char *
-       my_sv_2pvbyte(pTHX_ register SV *sv, STRLEN *lp)
-       {
-	   sv_utf8_downgrade(sv,0);
-           return SvPV(sv,*lp);
-       }
-   #endif
-#else
+#ifndef SvPVbyte
    #define SvPVbyte SvPV
 #endif
 
