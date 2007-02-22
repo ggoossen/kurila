@@ -717,8 +717,7 @@ CODE:
     sv = newSVsv(sv); /* GMAGIG will be done */
     if (SvPOK(sv)) {
     RETVAL = TRUE;
-    if (check  &&
-        !is_utf8_string((U8*)SvPVX(sv), SvCUR(sv)))
+    if (!is_utf8_string((U8*)SvPVX(sv), SvCUR(sv)))
         RETVAL = FALSE;
     }
     if (sv != ST(0))

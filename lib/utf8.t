@@ -192,10 +192,6 @@ SKIP: {
     ok( utf8::valid($b), "utf8::valid beyond");
     ok( utf8::valid($c), "utf8::valid unicode");
 
-    ok(!utf8::is_utf8($a), "!utf8::is_utf8 basic");
-    ok(!utf8::is_utf8($b), "!utf8::is_utf8 beyond");
-    ok(!utf8::is_utf8($c), "!utf8::is_utf8 unicode");
-
     is($a, "A",       "basic");
     is($b, "\x{FF}",    "beyond");
     is($c, "\x{100}", "unicode");

@@ -257,7 +257,6 @@ XS(XS_version_noop);
 #endif
 XS(XS_version_is_alpha);
 XS(XS_version_qv);
-XS(XS_utf8_is_utf8);
 XS(XS_utf8_valid);
 XS(XS_utf8_encode);
 XS(XS_utf8_decode);
@@ -310,7 +309,6 @@ Perl_boot_core_UNIVERSAL(pTHX)
 	newXS("version::is_alpha", XS_version_is_alpha, file);
 	newXS("version::qv", XS_version_qv, file);
     }
-    newXS("utf8::is_utf8", XS_utf8_is_utf8, file);
     newXS("utf8::valid", XS_utf8_valid, file);
     newXS("utf8::encode", XS_utf8_encode, file);
     newXS("utf8::decode", XS_utf8_decode, file);
@@ -741,19 +739,6 @@ XS(XS_version_qv)
 	PUTBACK;
 	return;
     }
-}
-
-XS(XS_utf8_is_utf8)
-{
-     dVAR;
-     dXSARGS;
-     PERL_UNUSED_ARG(cv);
-     if (items != 1)
-	  Perl_croak(aTHX_ "Usage: utf8::is_utf8(sv)");
-     else {
-	 XSRETURN_NO;
-     }
-     XSRETURN_EMPTY;
 }
 
 XS(XS_utf8_valid)

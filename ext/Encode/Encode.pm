@@ -29,7 +29,7 @@ our @FB_CONSTS = qw(
 our @EXPORT_OK = (
     qw(
       _utf8_off _utf8_on define_encoding from_to is_16bit is_8bit
-      is_utf8 perlio_ok resolve_alias
+      perlio_ok resolve_alias
       ),
     @FB_FLAGS, @FB_CONSTS,
 );
@@ -764,8 +764,8 @@ implementation.  As such, they are efficient but may change.
 
 =item is_utf8(STRING [, CHECK])
 
-[INTERNAL] Tests whether the UTF8 flag is turned on in the STRING.
-If CHECK is true, also checks the data in STRING for being well-formed
+[INTERNAL] If CHECK is false, always returns true.
+If CHECK is true, checks the data in STRING for being well-formed
 UTF-8.  Returns true if successful, false otherwise.
 
 As of perl 5.8.1, L<utf8> also has utf8::is_utf8().

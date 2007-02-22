@@ -17,7 +17,7 @@ use strict;
 use Test;
 use Encode qw(from_to encode decode
           encode_utf8 decode_utf8
-          find_encoding is_utf8);
+          find_encoding);
 use charnames qw(greek);
 require bytes;
 use utf8;

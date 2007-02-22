@@ -122,8 +122,7 @@ sub format_arg {
   # The following handling of "control chars" is direct from
   # the original code - it is broken on Unicode though.
   # Suggestions?
-  utf8::is_utf8($arg)
-    or $arg =~ s/([[:cntrl:]]|[[:^ascii:]])/sprintf("\\x{%x}",ord($1))/eg;
+  $arg =~ s/([[:cntrl:]]|[[:^ascii:]])/sprintf("\\x{%x}",ord($1))/eg;
   return $arg;
 }
 
