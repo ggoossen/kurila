@@ -28,7 +28,7 @@ our @FB_CONSTS = qw(
 );
 our @EXPORT_OK = (
     qw(
-      _utf8_off _utf8_on define_encoding from_to is_16bit is_8bit
+      define_encoding from_to is_16bit is_8bit
       perlio_ok resolve_alias
       ),
     @FB_FLAGS, @FB_CONSTS,
@@ -769,21 +769,6 @@ If CHECK is true, checks the data in STRING for being well-formed
 UTF-8.  Returns true if successful, false otherwise.
 
 As of perl 5.8.1, L<utf8> also has utf8::is_utf8().
-
-=item _utf8_on(STRING)
-
-[INTERNAL] Turns on the UTF8 flag in STRING.  The data in STRING is
-B<not> checked for being well-formed UTF-8.  Do not use unless you
-B<know> that the STRING is well-formed UTF-8.  Returns the previous
-state of the UTF8 flag (so please don't treat the return value as
-indicating success or failure), or C<undef> if STRING is not a string.
-
-=item _utf8_off(STRING)
-
-[INTERNAL] Turns off the UTF8 flag in STRING.  Do not use frivolously.
-Returns the previous state of the UTF8 flag (so please don't treat the
-return value as indicating success or failure), or C<undef> if STRING is
-not a string.
 
 =back
 

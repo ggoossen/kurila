@@ -848,7 +848,6 @@ $SIG{__WARN__} = sub { $@ = shift };
 use Encode;
 use utf8;
 my $t = ord('A') == 193 ? "\xEA" : "\xE9";
-Encode::_utf8_on($t);
 $t =~ s/([^a])//ge;
 $@ =~ s/ at .*/ at/;
 print $@

@@ -72,7 +72,7 @@ for my $charset (sort keys %Charset){
     print $dst $uni;
     }else{ # ugh!
     binmode($dst);
-    my $raw = $uni; Encode::_utf8_off($raw);
+    my $raw = $uni;
     print $dst $raw;
     }
 
@@ -88,7 +88,6 @@ for my $charset (sort keys %Charset){
     }else{ # ugh!
     binmode($src);
     $uni = join('', <$src>);
-    Encode::_utf8_on($uni);
     }
     close $src;
 

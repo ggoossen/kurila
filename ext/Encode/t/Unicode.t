@@ -125,7 +125,6 @@ for my $file (@file){
     }else{ # ugh!
     binmode $fh;
     $content = join('' => <$fh>);
-    Encode::_utf8_on($content)
     }
     close $fh;
     is(decode("UTF-7", encode("UTF-7", $content)), $content, 
