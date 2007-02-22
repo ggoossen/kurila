@@ -585,33 +585,6 @@ The encoding pragma is not supported on EBCDIC platforms.
 (Porters who are willing and able to remove this limitation are
 welcome.)
 
-=item format
-
-This pragma doesn't work well with format because PerlIO does not
-get along very well with it.  When format contains non-ascii
-characters it prints funny or gets "wide character warnings".
-To understand it, try the code below.
-
-  # Save this one in utf8
-  # replace *non-ascii* with a non-ascii string
-  my $camel;
-  format STDOUT =
-  *non-ascii*@>>>>>>>
-  $camel
-  .
-  $camel = "*non-ascii*";
-  binmode(STDOUT=>':encoding(utf8)'); # bang!
-  write;              # funny 
-  print $camel, "\n"; # fine
-
-Without binmode this happens to work but without binmode, print()
-fails instead of write().
-
-At any rate, the very use of format is questionable when it comes to
-unicode characters since you have to consider such things as character
-width (i.e. double-width for ideographs) and directions (i.e. BIDI for
-Arabic and Hebrew).
-
 =back
 
 =head2 The Logic of :locale
