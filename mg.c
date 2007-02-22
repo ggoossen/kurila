@@ -687,7 +687,6 @@ Perl_emulate_cop_io(pTHX_ const COP *const c, SV *const sv)
 	sv_setsv(sv, &PL_sv_undef);
     else {
 	sv_setpvs(sv, "");
-	SvUTF8_off(sv);
 	if ((CopHINTS_get(c) & HINT_LEXICAL_IO_IN)) {
 	    SV *const value = Perl_refcounted_he_fetch(aTHX_
 						       c->cop_hints_hash,
@@ -2288,7 +2287,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	       ensure that hints for input are sooner on linked list.  */
 	    tmp = sv_2mortal(out ? newSVpvn(out + 1, start + len - out - 1)
 			     : newSVpvs(""));
-	    SvFLAGS(tmp) |= SvUTF8(sv);
 
 	    tmp_he
 		= Perl_refcounted_he_new(aTHX_ PL_compiling.cop_hints_hash, 

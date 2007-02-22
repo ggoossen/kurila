@@ -197,7 +197,6 @@ PP(pp_substcont)
     register char *m = cx->sb_m;
     char *orig = cx->sb_orig;
     register REGEXP * const rx = cx->sb_rx;
-    SV *nsv = NULL;
     REGEXP *old = PM_GETRE(pm);
     if(old != rx) {
 	if(old)
