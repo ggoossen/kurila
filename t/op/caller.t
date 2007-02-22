@@ -72,6 +72,7 @@ sub testwarn {
 
 # NB : extend the warning mask values below when new warnings are added
 {
+    use bytes;
     no warnings;
     BEGIN { is( ${^WARNING_BITS}, "\0" x 12, 'all bits off via "no warnings"' ) }
     testwarn("\0" x 12);

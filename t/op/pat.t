@@ -37,8 +37,8 @@ eval 'use Config';          #  Defaults assumed if this fails
 # #warn ":$a:" =~ /:$a:/i ? "a" : "b";
 # warn ((":İ:" =~ /:$a:/i) ? "a" : "b");
 
-
 require bytes;
+use utf8;
 
 our ($test, $x, %XXX, @XXX, $foo, @x, $null, @words);
 

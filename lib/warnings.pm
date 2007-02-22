@@ -131,6 +131,8 @@ See L<perlmodlib/Pragmatic Modules> and L<perllexwarn>.
 
 =cut
 
+use bytes; # to make \xXX output bytes, and make vec work on bytes
+
 our %Offsets = (
 
     # Warnings Categories added in Perl 5.008

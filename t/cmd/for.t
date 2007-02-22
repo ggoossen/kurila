@@ -476,7 +476,7 @@ TODO: {
     no warnings 'reserved';
     local $TODO = "RT #2166: foreach spuriously autovivifies";
     my %h;
-    foreach (@h{a, b}) {}
+    foreach (@h{'a', 'b'}) {}
     if(keys(%h)) {
         print "not ";
     }

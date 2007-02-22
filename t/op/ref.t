@@ -201,10 +201,10 @@ package main;
 
 is ($object->doit("BAR"), 'bar');
 
-# Test indirect-object-style method invocation.
+# Test not working indirect-object-style method invocation.
 
 eval q{$foo = doit $object "FOO";};
-main::is (@$, 'foo');
+main::isnt (@$, 'foo');
 
 sub BASEOBJ'doit {
     local $ref = shift;
