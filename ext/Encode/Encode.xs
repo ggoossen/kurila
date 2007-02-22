@@ -566,7 +566,6 @@ CODE:
 {
     int check;
     encode_t *enc = INT2PTR(encode_t *, SvIV(SvRV(obj)));
-    sv_utf8_upgrade(src);
     if (SvROK(check_sv)){
     if (fallback_cb == (SV*)NULL){
             fallback_cb = newSVsv(check_sv); /* First time */

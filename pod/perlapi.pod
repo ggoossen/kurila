@@ -4719,6 +4719,7 @@ Found in file sv.h
 =item SvUTF8
 X<SvUTF8>
 
+Deleted.
 Returns a U32 value indicating whether the SV contains UTF-8 encoded data.
 Call this after SvPV() in case any call to string overloading updates the
 internal flag.
@@ -4731,6 +4732,7 @@ Found in file sv.h
 =item SvUTF8_off
 X<SvUTF8_off>
 
+Deleted.
 Unsets the UTF-8 status of an SV.
 
 	void	SvUTF8_off(SV *sv)
@@ -4741,6 +4743,7 @@ Found in file sv.h
 =item SvUTF8_on
 X<SvUTF8_on>
 
+Deleted.
 Turn on the UTF-8 status of an SV (the data is not changed, just the flag).
 Do not use frivolously.
 
@@ -6186,42 +6189,6 @@ X<sv_utf8_encode>
 A NOOP
 
 	void	sv_utf8_encode(SV *sv)
-
-=for hackers
-Found in file sv.c
-
-=item sv_utf8_upgrade
-X<sv_utf8_upgrade>
-
-Obsolete function which used to:
-Converts the PV of an SV to its UTF-8-encoded form.
-Forces the SV to string form if it is not already.
-Always sets the SvUTF8 flag to avoid future validity checks even
-if all the bytes have hibit clear.
-
-This is not as a general purpose byte encoding to Unicode interface:
-use the Encode extension for that.
-
-	STRLEN	sv_utf8_upgrade(SV *sv)
-
-=for hackers
-Found in file sv.c
-
-=item sv_utf8_upgrade_flags
-X<sv_utf8_upgrade_flags>
-
-Obsolete function which used to:
-Converts the PV of an SV to its UTF-8-encoded form.
-Forces the SV to string form if it is not already.
-Always sets the SvUTF8 flag to avoid future validity checks even
-if all the bytes have hibit clear. If C<flags> has C<SV_GMAGIC> bit set,
-will C<mg_get> on C<sv> if appropriate, else not. C<sv_utf8_upgrade> and
-C<sv_utf8_upgrade_nomg> are implemented in terms of this function.
-
-This is not as a general purpose byte encoding to Unicode interface:
-use the Encode extension for that.
-
-	STRLEN	sv_utf8_upgrade_flags(SV *sv, I32 flags)
 
 =for hackers
 Found in file sv.c

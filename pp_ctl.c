@@ -649,14 +649,6 @@ PP(pp_formline)
 		const char *s = item;
 		arg = itemsize;
 		if (item_is_utf8) {
-		    if (!targ_is_utf8) {
-			SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-			*t = '\0';
-			sv_utf8_upgrade(PL_formtarget);
-			SvGROW(PL_formtarget, SvCUR(PL_formtarget) + fudge + 1);
-			t = SvEND(PL_formtarget);
-			targ_is_utf8 = TRUE;
-		    }
 		    while (arg--) {
 			if (UTF8_IS_CONTINUED(*s)) {
 			    STRLEN skip = UTF8SKIP(s);
@@ -679,21 +671,6 @@ PP(pp_formline)
 			    if ( !((*t++ = *s++) & ~31) )
 				t[-1] = ' ';
 			}
-		    }
-		    break;
-		}
-		if (targ_is_utf8 && !item_is_utf8) {
-		    SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		    *t = '\0';
-		    sv_catpvn_utf8_upgrade(PL_formtarget, s, arg, nsv);
-		    for (; t < SvEND(PL_formtarget); t++) {
-#ifdef EBCDIC
-			const int ch = *t;
-			if (iscntrl(ch))
-#else
-			    if (!(*t & ~31))
-#endif
-				*t = ' ';
 		    }
 		    break;
 		}

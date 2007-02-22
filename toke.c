@@ -2113,8 +2113,6 @@ S_scan_const(pTHX_ char *start)
 		    res = new_constant( NULL, 0, "charnames",
 					res, NULL, SvPVX(type) );
 		    SvREFCNT_dec(type);		
-		    if (has_utf8)
-			sv_utf8_upgrade(res);
 		    str = SvPV_const(res,len);
 #ifdef EBCDIC_NEVER_MIND
 		    /* charnames uses pack U and that has been

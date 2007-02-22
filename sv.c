@@ -2904,35 +2904,14 @@ Perl_sv_2bool(pTHX_ register SV *sv)
 
 Obsolete function which used to:
 Converts the PV of an SV to its UTF-8-encoded form.
-Forces the SV to string form if it is not already.
-Always sets the SvUTF8 flag to avoid future validity checks even
-if all the bytes have hibit clear.
-
-This is not as a general purpose byte encoding to Unicode interface:
-use the Encode extension for that.
 
 =for apidoc sv_utf8_upgrade_flags
 
 Obsolete function which used to:
 Converts the PV of an SV to its UTF-8-encoded form.
-Forces the SV to string form if it is not already.
-Always sets the SvUTF8 flag to avoid future validity checks even
-if all the bytes have hibit clear. If C<flags> has C<SV_GMAGIC> bit set,
-will C<mg_get> on C<sv> if appropriate, else not. C<sv_utf8_upgrade> and
-C<sv_utf8_upgrade_nomg> are implemented in terms of this function.
-
-This is not as a general purpose byte encoding to Unicode interface:
-use the Encode extension for that.
 
 =cut
 */
-
-STRLEN
-Perl_sv_utf8_upgrade_flags(pTHX_ register SV *sv, I32 flags)
-{
-    dVAR;
-    Perl_croak(aTHX_ "utf8_upgrade obsolete");
-}
 
 /*
 =for apidoc sv_utf8_downgrade

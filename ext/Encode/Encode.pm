@@ -29,7 +29,7 @@ our @FB_CONSTS = qw(
 our @EXPORT_OK = (
     qw(
       _utf8_off _utf8_on define_encoding from_to is_16bit is_8bit
-      is_utf8 perlio_ok resolve_alias utf8_downgrade utf8_upgrade
+      is_utf8 perlio_ok resolve_alias
       ),
     @FB_FLAGS, @FB_CONSTS,
 );

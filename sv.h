@@ -1883,7 +1883,6 @@ Like C<sv_catsv> but doesn't process magic.
 #define sv_pvbyte(sv) SvPVbyte_nolen(sv)
 
 #define sv_pvn_force_nomg(sv, lp) sv_pvn_force_flags(sv, lp, 0)
-#define sv_utf8_upgrade_nomg(sv) sv_utf8_upgrade_flags(sv, 0)
 #define sv_catpvn_nomg(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
 #define sv_setsv(dsv, ssv) \
 	sv_setsv_flags(dsv, ssv, SV_GMAGIC|SV_DO_COW_SVSETSV)
@@ -1900,20 +1899,8 @@ Like C<sv_catsv> but doesn't process magic.
 #define sv_2pvutf8_nolen(sv) sv_2pvutf8(sv, 0)
 #define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
 #define sv_pvn_force(sv, lp) sv_pvn_force_flags(sv, lp, SV_GMAGIC)
-#define sv_utf8_upgrade(sv) sv_utf8_upgrade_flags(sv, SV_GMAGIC)
 #define sv_2iv(sv) sv_2iv_flags(sv, SV_GMAGIC)
 #define sv_2uv(sv) sv_2uv_flags(sv, SV_GMAGIC)
-
-/* Should be named SvCatPVN_utf8_upgrade? */
-#define sv_catpvn_utf8_upgrade(dsv, sstr, slen, nsv)	\
-	STMT_START {					\
-	    if (!(nsv))					\
-		nsv = sv_2mortal(newSVpvn(sstr, slen));	\
-	    else					\
-		sv_setpvn(nsv, sstr, slen);		\
-	    sv_utf8_upgrade(nsv);			\
-	    sv_catsv(dsv, nsv);	\
-	} STMT_END
 
 /*
 =for apidoc Am|SV*|newRV_inc|SV* sv

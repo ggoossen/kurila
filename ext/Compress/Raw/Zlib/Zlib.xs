@@ -90,8 +90,6 @@
 #  endif
 #endif
 
-#undef UTF8_AVAILABLE
-
 typedef int                     DualType ;
 typedef int                     int_undef ;
 
@@ -636,10 +634,6 @@ Zip_adler32(buf, adler=adlerInitial)
 	INIT:
     	/* If the buffer is a reference, dereference it */
 	sv = deRef(sv, "adler32") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(sv) && !sv_utf8_downgrade(sv, 1))
-         croak("Wide character in Compress::Raw::Zlib::adler32");
-#endif         
 	buf = (Byte*)SvPVbyte(sv, len) ;
 
 	if (items < 2)
@@ -660,10 +654,6 @@ Zip_crc32(buf, crc=crcInitial)
 	INIT:
     	/* If the buffer is a reference, dereference it */
 	sv = deRef(sv, "crc32") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(sv) && !sv_utf8_downgrade(sv, 1))
-         croak("Wide character in Compress::Raw::Zlib::crc32");
-#endif         
 	buf = (Byte*)SvPVbyte(sv, len) ;
 
 	if (items < 2)
@@ -1351,10 +1341,6 @@ inflate (s, buf, output, eof=FALSE)
         SvPOK_only(output);
         SvCUR_set(output, prefix_length + s->bytesInflated) ;
 	*SvEND(output) = '\0';
-#ifdef UTF8_AVAILABLE    
-        if (out_utf8)
-            sv_utf8_upgrade(output);
-#endif        
         SvSETMAGIC(output);
 
         if (s->flags & FLAG_CRC32 )
@@ -1413,10 +1399,6 @@ inflateSync (s, buf)
   
     /* If the buffer is a reference, dereference it */
     buf = deRef(buf, "inflateSync") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(buf) && !sv_utf8_downgrade(buf, 1))
-         croak("Wide character in Compress::Raw::Zlib::Inflate::inflateSync");
-#endif         
     
     /* initialise the input buffer */
     s->stream.next_in = (Bytef*)SvPVbyte_nolen(buf) ;

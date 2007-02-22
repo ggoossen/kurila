@@ -48,7 +48,6 @@ PERL_CALLCONV char * Perl_sv_pv(pTHX_ SV *sv);
 PERL_CALLCONV char * Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp);
 PERL_CALLCONV char * Perl_sv_pvbyte(pTHX_ SV *sv);
 PERL_CALLCONV char * Perl_sv_pvutf8(pTHX_ SV *sv);
-PERL_CALLCONV STRLEN Perl_sv_utf8_upgrade(pTHX_ register SV *sv);
 PERL_CALLCONV NV Perl_huge(void);
 PERL_CALLCONV void Perl_gv_fullname3(pTHX_ SV *sv, const GV *gv, const char *prefix);
 PERL_CALLCONV void Perl_gv_efullname3(pTHX_ SV *sv, const GV *gv, const char *prefix);
@@ -430,16 +429,6 @@ char *
 Perl_sv_pvutf8n(pTHX_ SV *sv, STRLEN *lp)
 {
     return sv_pvn(sv,lp);
-}
-
-/* sv_utf8_upgrade() is now a macro using sv_utf8_upgrade_flags();
- * this function provided for binary compatibility only
- */
-
-STRLEN
-Perl_sv_utf8_upgrade(pTHX_ register SV *sv)
-{
-    return sv_utf8_upgrade_flags(sv, SV_GMAGIC);
 }
 
 int

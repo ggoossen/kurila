@@ -2254,7 +2254,6 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
     STRLEN n_a;
     int unref = 0;
 
-    sv_utf8_upgrade(t);
     sv_setpvn(t, "", 0);
     /* retry: */
     if (!sv) {
@@ -2878,7 +2877,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	char prevkey = '\0';
 	SV *tmpsv = newSVpvn("", 0);
 	MADPROP* mp = o->op_madprop;
-	sv_utf8_upgrade(tmpsv);
 	if (!contents) {
 	    contents = 1;
 	    PerlIO_printf(file, ">\n");

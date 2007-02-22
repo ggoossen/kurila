@@ -1298,18 +1298,6 @@ scalar.
 
 =item *
 
-C<sv_utf8_upgrade(sv)> converts the string of the scalar to its UTF-8
-encoded form.  C<sv_utf8_downgrade(sv)> does the opposite, if
-possible.  C<sv_utf8_encode(sv)> is like sv_utf8_upgrade except that
-it does not set the C<UTF8> flag.  C<sv_utf8_decode()> does the
-opposite of C<sv_utf8_encode()>.  Note that none of these are to be
-used as general-purpose encoding or decoding interfaces: C<use Encode>
-for that.  C<sv_utf8_upgrade()> is affected by the encoding pragma
-but C<sv_utf8_downgrade()> is not (since the encoding pragma is
-designed to be a one-way street).
-
-=item *
-
 C<is_utf8_char(s)> returns true if the pointer points to a valid UTF-8
 character.
 
