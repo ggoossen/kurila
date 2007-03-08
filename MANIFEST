@@ -3433,7 +3433,6 @@ t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
 t/lib/compmod.pl		Helper for 1_compile.t
 t/lib/compress/any.pl		Compress::Zlib
-t/lib/compress/anyunc.pl	Compress::Zlib
 t/lib/compress/CompTestUtils.pm	Compress::Zlib
 t/lib/compress/destroy.pl	Compress::Zlib
 t/lib/compress/encode.pl	Compress::Zlib
