@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 package PLXML;
 
 sub DESTROY { }
@@ -8,83 +11,87 @@ sub walk {
     for my $key (sort keys %$self) {
 	print "\t$key = <$$self{$key}>\n";
     }
-    foreach $kid (@{$$self{Kids}}) {
+    foreach my $kid (@{$$self{Kids}}) {
 	$kid->walk(@_);
     }
 }
 
 package PLXML::Characters;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 sub walk {}
 
 package PLXML::madprops;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::mad_op;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::mad_pv;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
+
+package PLXML::mad_sv;
+
+our @ISA = ('PLXML');
 
 package PLXML::baseop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::baseop_unop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::binop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::cop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::filestatop;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 package PLXML::listop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::logop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::loop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::loopexop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::padop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::padop_svop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::pmop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::pvop_svop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 package PLXML::unop;
 
-@ISA = ('PLXML');
+our @ISA = ('PLXML');
 
 
 # New ops always go at the end, just before 'custom'
@@ -124,7 +131,7 @@ package PLXML::unop;
 
 package PLXML::op_null;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'null' }
 sub desc { 'null operation' }
@@ -135,7 +142,7 @@ sub args { '' }
 
 package PLXML::op_stub;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'stub' }
 sub desc { 'stub' }
@@ -146,7 +153,7 @@ sub args { '' }
 
 package PLXML::op_scalar;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'scalar' }
 sub desc { 'scalar' }
@@ -160,7 +167,7 @@ sub args { 'S' }
 
 package PLXML::op_pushmark;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'pushmark' }
 sub desc { 'pushmark' }
@@ -171,7 +178,7 @@ sub args { '' }
 
 package PLXML::op_wantarray;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'wantarray' }
 sub desc { 'wantarray' }
@@ -183,7 +190,7 @@ sub args { '' }
 
 package PLXML::op_const;
 
-@ISA = ('PLXML::padop_svop');
+our @ISA = ('PLXML::padop_svop');
 
 sub key { 'const' }
 sub desc { 'constant item' }
@@ -195,7 +202,7 @@ sub args { '' }
 
 package PLXML::op_gvsv;
 
-@ISA = ('PLXML::padop_svop');
+our @ISA = ('PLXML::padop_svop');
 
 sub key { 'gvsv' }
 sub desc { 'scalar variable' }
@@ -206,7 +213,7 @@ sub args { '' }
 
 package PLXML::op_gv;
 
-@ISA = ('PLXML::padop_svop');
+our @ISA = ('PLXML::padop_svop');
 
 sub key { 'gv' }
 sub desc { 'glob value' }
@@ -217,7 +224,7 @@ sub args { '' }
 
 package PLXML::op_gelem;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'gelem' }
 sub desc { 'glob elem' }
@@ -228,7 +235,7 @@ sub args { 'S S' }
 
 package PLXML::op_padsv;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'padsv' }
 sub desc { 'private variable' }
@@ -239,7 +246,7 @@ sub args { '' }
 
 package PLXML::op_padav;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'padav' }
 sub desc { 'private array' }
@@ -250,7 +257,7 @@ sub args { '' }
 
 package PLXML::op_padhv;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'padhv' }
 sub desc { 'private hash' }
@@ -261,7 +268,7 @@ sub args { '' }
 
 package PLXML::op_padany;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'padany' }
 sub desc { 'private value' }
@@ -273,7 +280,7 @@ sub args { '' }
 
 package PLXML::op_pushre;
 
-@ISA = ('PLXML::pmop');
+our @ISA = ('PLXML::pmop');
 
 sub key { 'pushre' }
 sub desc { 'push regexp' }
@@ -287,7 +294,7 @@ sub args { '' }
 
 package PLXML::op_rv2gv;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'rv2gv' }
 sub desc { 'ref-to-glob cast' }
@@ -298,7 +305,7 @@ sub args { '' }
 
 package PLXML::op_rv2sv;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'rv2sv' }
 sub desc { 'scalar dereference' }
@@ -309,7 +316,7 @@ sub args { '' }
 
 package PLXML::op_av2arylen;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'av2arylen' }
 sub desc { 'array length' }
@@ -320,7 +327,7 @@ sub args { '' }
 
 package PLXML::op_rv2cv;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'rv2cv' }
 sub desc { 'subroutine dereference' }
@@ -331,7 +338,7 @@ sub args { '' }
 
 package PLXML::op_anoncode;
 
-@ISA = ('PLXML::padop_svop');
+our @ISA = ('PLXML::padop_svop');
 
 sub key { 'anoncode' }
 sub desc { 'anonymous subroutine' }
@@ -342,7 +349,7 @@ sub args { '' }
 
 package PLXML::op_prototype;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'prototype' }
 sub desc { 'subroutine prototype' }
@@ -353,7 +360,7 @@ sub args { 'S' }
 
 package PLXML::op_refgen;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'refgen' }
 sub desc { 'reference constructor' }
@@ -364,7 +371,7 @@ sub args { 'L' }
 
 package PLXML::op_srefgen;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'srefgen' }
 sub desc { 'single ref constructor' }
@@ -375,7 +382,7 @@ sub args { 'S' }
 
 package PLXML::op_ref;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'ref' }
 sub desc { 'reference-type operator' }
@@ -386,7 +393,7 @@ sub args { 'S?' }
 
 package PLXML::op_bless;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'bless' }
 sub desc { 'bless' }
@@ -400,7 +407,7 @@ sub args { 'S S?' }
 
 package PLXML::op_backtick;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'backtick' }
 sub desc { 'quoted execution (``, qx)' }
@@ -412,7 +419,7 @@ sub args { '' }
 # glob defaults its first arg to $_
 package PLXML::op_glob;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'glob' }
 sub desc { 'glob' }
@@ -423,7 +430,7 @@ sub args { 'S?' }
 
 package PLXML::op_readline;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'readline' }
 sub desc { '<HANDLE>' }
@@ -434,7 +441,7 @@ sub args { 'F?' }
 
 package PLXML::op_rcatline;
 
-@ISA = ('PLXML::padop_svop');
+our @ISA = ('PLXML::padop_svop');
 
 sub key { 'rcatline' }
 sub desc { 'append I/O operator' }
@@ -448,7 +455,7 @@ sub args { '' }
 
 package PLXML::op_regcmaybe;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'regcmaybe' }
 sub desc { 'regexp internal guard' }
@@ -459,7 +466,7 @@ sub args { 'S' }
 
 package PLXML::op_regcreset;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'regcreset' }
 sub desc { 'regexp internal reset' }
@@ -470,7 +477,7 @@ sub args { 'S' }
 
 package PLXML::op_regcomp;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'regcomp' }
 sub desc { 'regexp compilation' }
@@ -481,7 +488,7 @@ sub args { 'S' }
 
 package PLXML::op_match;
 
-@ISA = ('PLXML::pmop');
+our @ISA = ('PLXML::pmop');
 
 sub key { 'match' }
 sub desc { 'pattern match (m//)' }
@@ -492,7 +499,7 @@ sub args { '' }
 
 package PLXML::op_qr;
 
-@ISA = ('PLXML::pmop');
+our @ISA = ('PLXML::pmop');
 
 sub key { 'qr' }
 sub desc { 'pattern quote (qr//)' }
@@ -503,7 +510,7 @@ sub args { '' }
 
 package PLXML::op_subst;
 
-@ISA = ('PLXML::pmop');
+our @ISA = ('PLXML::pmop');
 
 sub key { 'subst' }
 sub desc { 'substitution (s///)' }
@@ -514,7 +521,7 @@ sub args { 'S' }
 
 package PLXML::op_substcont;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'substcont' }
 sub desc { 'substitution iterator' }
@@ -525,7 +532,7 @@ sub args { '' }
 
 package PLXML::op_trans;
 
-@ISA = ('PLXML::pvop_svop');
+our @ISA = ('PLXML::pvop_svop');
 
 sub key { 'trans' }
 sub desc { 'transliteration (tr///)' }
@@ -540,7 +547,7 @@ sub args { 'S' }
 
 package PLXML::op_sassign;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'sassign' }
 sub desc { 'scalar assignment' }
@@ -551,7 +558,7 @@ sub args { '' }
 
 package PLXML::op_aassign;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'aassign' }
 sub desc { 'list assignment' }
@@ -563,7 +570,7 @@ sub args { 'L L' }
 
 package PLXML::op_chop;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'chop' }
 sub desc { 'chop' }
@@ -574,7 +581,7 @@ sub args { 'L' }
 
 package PLXML::op_schop;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'schop' }
 sub desc { 'scalar chop' }
@@ -585,7 +592,7 @@ sub args { 'S?' }
 
 package PLXML::op_chomp;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'chomp' }
 sub desc { 'chomp' }
@@ -596,7 +603,7 @@ sub args { 'L' }
 
 package PLXML::op_schomp;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'schomp' }
 sub desc { 'scalar chomp' }
@@ -607,7 +614,7 @@ sub args { 'S?' }
 
 package PLXML::op_defined;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'defined' }
 sub desc { 'defined operator' }
@@ -618,7 +625,7 @@ sub args { 'S?' }
 
 package PLXML::op_undef;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'undef' }
 sub desc { 'undef operator' }
@@ -629,7 +636,7 @@ sub args { 'S?' }
 
 package PLXML::op_study;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'study' }
 sub desc { 'study' }
@@ -640,7 +647,7 @@ sub args { 'S?' }
 
 package PLXML::op_pos;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'pos' }
 sub desc { 'match position' }
@@ -652,7 +659,7 @@ sub args { 'S?' }
 
 package PLXML::op_preinc;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'preinc' }
 sub desc { 'preincrement (++)' }
@@ -663,7 +670,7 @@ sub args { 'S' }
 
 package PLXML::op_i_preinc;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'i_preinc' }
 sub desc { 'integer preincrement (++)' }
@@ -674,7 +681,7 @@ sub args { 'S' }
 
 package PLXML::op_predec;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'predec' }
 sub desc { 'predecrement (--)' }
@@ -685,7 +692,7 @@ sub args { 'S' }
 
 package PLXML::op_i_predec;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'i_predec' }
 sub desc { 'integer predecrement (--)' }
@@ -696,7 +703,7 @@ sub args { 'S' }
 
 package PLXML::op_postinc;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'postinc' }
 sub desc { 'postincrement (++)' }
@@ -707,7 +714,7 @@ sub args { 'S' }
 
 package PLXML::op_i_postinc;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'i_postinc' }
 sub desc { 'integer postincrement (++)' }
@@ -718,7 +725,7 @@ sub args { 'S' }
 
 package PLXML::op_postdec;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'postdec' }
 sub desc { 'postdecrement (--)' }
@@ -729,7 +736,7 @@ sub args { 'S' }
 
 package PLXML::op_i_postdec;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'i_postdec' }
 sub desc { 'integer postdecrement (--)' }
@@ -743,7 +750,7 @@ sub args { 'S' }
 
 package PLXML::op_pow;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'pow' }
 sub desc { 'exponentiation (**)' }
@@ -755,7 +762,7 @@ sub args { 'S S' }
 
 package PLXML::op_multiply;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'multiply' }
 sub desc { 'multiplication (*)' }
@@ -766,7 +773,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_multiply;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_multiply' }
 sub desc { 'integer multiplication (*)' }
@@ -777,7 +784,7 @@ sub args { 'S S' }
 
 package PLXML::op_divide;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'divide' }
 sub desc { 'division (/)' }
@@ -788,7 +795,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_divide;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_divide' }
 sub desc { 'integer division (/)' }
@@ -799,7 +806,7 @@ sub args { 'S S' }
 
 package PLXML::op_modulo;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'modulo' }
 sub desc { 'modulus (%)' }
@@ -810,7 +817,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_modulo;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_modulo' }
 sub desc { 'integer modulus (%)' }
@@ -821,7 +828,7 @@ sub args { 'S S' }
 
 package PLXML::op_repeat;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'repeat' }
 sub desc { 'repeat (x)' }
@@ -833,7 +840,7 @@ sub args { 'L S' }
 
 package PLXML::op_add;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'add' }
 sub desc { 'addition (+)' }
@@ -844,7 +851,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_add;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_add' }
 sub desc { 'integer addition (+)' }
@@ -855,7 +862,7 @@ sub args { 'S S' }
 
 package PLXML::op_subtract;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'subtract' }
 sub desc { 'subtraction (-)' }
@@ -866,7 +873,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_subtract;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_subtract' }
 sub desc { 'integer subtraction (-)' }
@@ -877,7 +884,7 @@ sub args { 'S S' }
 
 package PLXML::op_concat;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'concat' }
 sub desc { 'concatenation (.) or string' }
@@ -888,7 +895,7 @@ sub args { 'S S' }
 
 package PLXML::op_stringify;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'stringify' }
 sub desc { 'string' }
@@ -900,7 +907,7 @@ sub args { 'S' }
 
 package PLXML::op_left_shift;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'left_shift' }
 sub desc { 'left bitshift (<<)' }
@@ -911,7 +918,7 @@ sub args { 'S S' }
 
 package PLXML::op_right_shift;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'right_shift' }
 sub desc { 'right bitshift (>>)' }
@@ -923,7 +930,7 @@ sub args { 'S S' }
 
 package PLXML::op_lt;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'lt' }
 sub desc { 'numeric lt (<)' }
@@ -934,7 +941,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_lt;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_lt' }
 sub desc { 'integer lt (<)' }
@@ -945,7 +952,7 @@ sub args { 'S S' }
 
 package PLXML::op_gt;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'gt' }
 sub desc { 'numeric gt (>)' }
@@ -956,7 +963,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_gt;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_gt' }
 sub desc { 'integer gt (>)' }
@@ -967,7 +974,7 @@ sub args { 'S S' }
 
 package PLXML::op_le;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'le' }
 sub desc { 'numeric le (<=)' }
@@ -978,7 +985,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_le;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_le' }
 sub desc { 'integer le (<=)' }
@@ -989,7 +996,7 @@ sub args { 'S S' }
 
 package PLXML::op_ge;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'ge' }
 sub desc { 'numeric ge (>=)' }
@@ -1000,7 +1007,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_ge;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_ge' }
 sub desc { 'integer ge (>=)' }
@@ -1011,7 +1018,7 @@ sub args { 'S S' }
 
 package PLXML::op_eq;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'eq' }
 sub desc { 'numeric eq (==)' }
@@ -1022,7 +1029,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_eq;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_eq' }
 sub desc { 'integer eq (==)' }
@@ -1033,7 +1040,7 @@ sub args { 'S S' }
 
 package PLXML::op_ne;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'ne' }
 sub desc { 'numeric ne (!=)' }
@@ -1044,7 +1051,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_ne;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_ne' }
 sub desc { 'integer ne (!=)' }
@@ -1055,7 +1062,7 @@ sub args { 'S S' }
 
 package PLXML::op_ncmp;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'ncmp' }
 sub desc { 'numeric comparison (<=>)' }
@@ -1066,7 +1073,7 @@ sub args { 'S S' }
 
 package PLXML::op_i_ncmp;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'i_ncmp' }
 sub desc { 'integer comparison (<=>)' }
@@ -1078,7 +1085,7 @@ sub args { 'S S' }
 
 package PLXML::op_slt;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'slt' }
 sub desc { 'string lt' }
@@ -1089,7 +1096,7 @@ sub args { 'S S' }
 
 package PLXML::op_sgt;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'sgt' }
 sub desc { 'string gt' }
@@ -1100,7 +1107,7 @@ sub args { 'S S' }
 
 package PLXML::op_sle;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'sle' }
 sub desc { 'string le' }
@@ -1111,7 +1118,7 @@ sub args { 'S S' }
 
 package PLXML::op_sge;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'sge' }
 sub desc { 'string ge' }
@@ -1122,7 +1129,7 @@ sub args { 'S S' }
 
 package PLXML::op_seq;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'seq' }
 sub desc { 'string eq' }
@@ -1133,7 +1140,7 @@ sub args { 'S S' }
 
 package PLXML::op_sne;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'sne' }
 sub desc { 'string ne' }
@@ -1144,7 +1151,7 @@ sub args { 'S S' }
 
 package PLXML::op_scmp;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'scmp' }
 sub desc { 'string comparison (cmp)' }
@@ -1156,7 +1163,7 @@ sub args { 'S S' }
 
 package PLXML::op_bit_and;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'bit_and' }
 sub desc { 'bitwise and (&)' }
@@ -1167,7 +1174,7 @@ sub args { 'S S' }
 
 package PLXML::op_bit_xor;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'bit_xor' }
 sub desc { 'bitwise xor (^)' }
@@ -1178,7 +1185,7 @@ sub args { 'S S' }
 
 package PLXML::op_bit_or;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'bit_or' }
 sub desc { 'bitwise or (|)' }
@@ -1190,7 +1197,7 @@ sub args { 'S S' }
 
 package PLXML::op_negate;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'negate' }
 sub desc { 'negation (-)' }
@@ -1201,7 +1208,7 @@ sub args { 'S' }
 
 package PLXML::op_i_negate;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'i_negate' }
 sub desc { 'integer negation (-)' }
@@ -1212,7 +1219,7 @@ sub args { 'S' }
 
 package PLXML::op_not;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'not' }
 sub desc { 'not' }
@@ -1223,7 +1230,7 @@ sub args { 'S' }
 
 package PLXML::op_complement;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'complement' }
 sub desc { '1\'s complement (~)' }
@@ -1237,7 +1244,7 @@ sub args { 'S' }
 
 package PLXML::op_atan2;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'atan2' }
 sub desc { 'atan2' }
@@ -1248,7 +1255,7 @@ sub args { 'S S' }
 
 package PLXML::op_sin;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'sin' }
 sub desc { 'sin' }
@@ -1259,7 +1266,7 @@ sub args { 'S?' }
 
 package PLXML::op_cos;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'cos' }
 sub desc { 'cos' }
@@ -1270,7 +1277,7 @@ sub args { 'S?' }
 
 package PLXML::op_rand;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'rand' }
 sub desc { 'rand' }
@@ -1281,7 +1288,7 @@ sub args { 'S?' }
 
 package PLXML::op_srand;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'srand' }
 sub desc { 'srand' }
@@ -1292,7 +1299,7 @@ sub args { 'S?' }
 
 package PLXML::op_exp;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'exp' }
 sub desc { 'exp' }
@@ -1303,7 +1310,7 @@ sub args { 'S?' }
 
 package PLXML::op_log;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'log' }
 sub desc { 'log' }
@@ -1314,7 +1321,7 @@ sub args { 'S?' }
 
 package PLXML::op_sqrt;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'sqrt' }
 sub desc { 'sqrt' }
@@ -1328,7 +1335,7 @@ sub args { 'S?' }
 
 package PLXML::op_int;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'int' }
 sub desc { 'int' }
@@ -1339,7 +1346,7 @@ sub args { 'S?' }
 
 package PLXML::op_hex;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'hex' }
 sub desc { 'hex' }
@@ -1350,7 +1357,7 @@ sub args { 'S?' }
 
 package PLXML::op_oct;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'oct' }
 sub desc { 'oct' }
@@ -1361,7 +1368,7 @@ sub args { 'S?' }
 
 package PLXML::op_abs;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'abs' }
 sub desc { 'abs' }
@@ -1375,7 +1382,7 @@ sub args { 'S?' }
 
 package PLXML::op_length;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'length' }
 sub desc { 'length' }
@@ -1386,7 +1393,7 @@ sub args { 'S?' }
 
 package PLXML::op_substr;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'substr' }
 sub desc { 'substr' }
@@ -1397,7 +1404,7 @@ sub args { 'S S S? S?' }
 
 package PLXML::op_vec;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'vec' }
 sub desc { 'vec' }
@@ -1409,7 +1416,7 @@ sub args { 'S S S' }
 
 package PLXML::op_index;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'index' }
 sub desc { 'index' }
@@ -1420,7 +1427,7 @@ sub args { 'S S S?' }
 
 package PLXML::op_rindex;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'rindex' }
 sub desc { 'rindex' }
@@ -1432,7 +1439,7 @@ sub args { 'S S S?' }
 
 package PLXML::op_sprintf;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'sprintf' }
 sub desc { 'sprintf' }
@@ -1443,7 +1450,7 @@ sub args { 'S L' }
 
 package PLXML::op_formline;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'formline' }
 sub desc { 'formline' }
@@ -1454,7 +1461,7 @@ sub args { 'S L' }
 
 package PLXML::op_ord;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'ord' }
 sub desc { 'ord' }
@@ -1465,7 +1472,7 @@ sub args { 'S?' }
 
 package PLXML::op_chr;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'chr' }
 sub desc { 'chr' }
@@ -1476,7 +1483,7 @@ sub args { 'S?' }
 
 package PLXML::op_crypt;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'crypt' }
 sub desc { 'crypt' }
@@ -1487,7 +1494,7 @@ sub args { 'S S' }
 
 package PLXML::op_ucfirst;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'ucfirst' }
 sub desc { 'ucfirst' }
@@ -1498,7 +1505,7 @@ sub args { 'S?' }
 
 package PLXML::op_lcfirst;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'lcfirst' }
 sub desc { 'lcfirst' }
@@ -1509,7 +1516,7 @@ sub args { 'S?' }
 
 package PLXML::op_uc;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'uc' }
 sub desc { 'uc' }
@@ -1520,7 +1527,7 @@ sub args { 'S?' }
 
 package PLXML::op_lc;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'lc' }
 sub desc { 'lc' }
@@ -1531,7 +1538,7 @@ sub args { 'S?' }
 
 package PLXML::op_quotemeta;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'quotemeta' }
 sub desc { 'quotemeta' }
@@ -1545,7 +1552,7 @@ sub args { 'S?' }
 
 package PLXML::op_rv2av;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'rv2av' }
 sub desc { 'array dereference' }
@@ -1556,7 +1563,7 @@ sub args { '' }
 
 package PLXML::op_aelemfast;
 
-@ISA = ('PLXML::padop_svop');
+our @ISA = ('PLXML::padop_svop');
 
 sub key { 'aelemfast' }
 sub desc { 'constant array element' }
@@ -1567,7 +1574,7 @@ sub args { 'A S' }
 
 package PLXML::op_aelem;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'aelem' }
 sub desc { 'array element' }
@@ -1578,7 +1585,7 @@ sub args { 'A S' }
 
 package PLXML::op_aslice;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'aslice' }
 sub desc { 'array slice' }
@@ -1592,7 +1599,7 @@ sub args { 'A L' }
 
 package PLXML::op_each;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'each' }
 sub desc { 'each' }
@@ -1603,7 +1610,7 @@ sub args { 'H' }
 
 package PLXML::op_values;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'values' }
 sub desc { 'values' }
@@ -1614,7 +1621,7 @@ sub args { 'H' }
 
 package PLXML::op_keys;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'keys' }
 sub desc { 'keys' }
@@ -1625,7 +1632,7 @@ sub args { 'H' }
 
 package PLXML::op_delete;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'delete' }
 sub desc { 'delete' }
@@ -1636,7 +1643,7 @@ sub args { 'S' }
 
 package PLXML::op_exists;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'exists' }
 sub desc { 'exists' }
@@ -1647,7 +1654,7 @@ sub args { 'S' }
 
 package PLXML::op_rv2hv;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'rv2hv' }
 sub desc { 'hash dereference' }
@@ -1658,7 +1665,7 @@ sub args { '' }
 
 package PLXML::op_helem;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'helem' }
 sub desc { 'hash element' }
@@ -1669,7 +1676,7 @@ sub args { 'H S' }
 
 package PLXML::op_hslice;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'hslice' }
 sub desc { 'hash slice' }
@@ -1683,7 +1690,7 @@ sub args { 'H L' }
 
 package PLXML::op_unpack;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'unpack' }
 sub desc { 'unpack' }
@@ -1694,7 +1701,7 @@ sub args { 'S S?' }
 
 package PLXML::op_pack;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'pack' }
 sub desc { 'pack' }
@@ -1705,7 +1712,7 @@ sub args { 'S L' }
 
 package PLXML::op_split;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'split' }
 sub desc { 'split' }
@@ -1716,7 +1723,7 @@ sub args { 'S S S' }
 
 package PLXML::op_join;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'join' }
 sub desc { 'join or string' }
@@ -1730,7 +1737,7 @@ sub args { 'S L' }
 
 package PLXML::op_list;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'list' }
 sub desc { 'list' }
@@ -1741,7 +1748,7 @@ sub args { 'L' }
 
 package PLXML::op_lslice;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'lslice' }
 sub desc { 'list slice' }
@@ -1752,7 +1759,7 @@ sub args { 'H L L' }
 
 package PLXML::op_anonlist;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'anonlist' }
 sub desc { 'anonymous list ([])' }
@@ -1763,7 +1770,7 @@ sub args { 'L' }
 
 package PLXML::op_anonhash;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'anonhash' }
 sub desc { 'anonymous hash ({})' }
@@ -1775,7 +1782,7 @@ sub args { 'L' }
 
 package PLXML::op_splice;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'splice' }
 sub desc { 'splice' }
@@ -1786,7 +1793,7 @@ sub args { 'A S? S? L' }
 
 package PLXML::op_push;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'push' }
 sub desc { 'push' }
@@ -1797,7 +1804,7 @@ sub args { 'A L' }
 
 package PLXML::op_pop;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'pop' }
 sub desc { 'pop' }
@@ -1808,7 +1815,7 @@ sub args { 'A?' }
 
 package PLXML::op_shift;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'shift' }
 sub desc { 'shift' }
@@ -1819,7 +1826,7 @@ sub args { 'A?' }
 
 package PLXML::op_unshift;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'unshift' }
 sub desc { 'unshift' }
@@ -1830,7 +1837,7 @@ sub args { 'A L' }
 
 package PLXML::op_sort;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'sort' }
 sub desc { 'sort' }
@@ -1841,7 +1848,7 @@ sub args { 'C? L' }
 
 package PLXML::op_reverse;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'reverse' }
 sub desc { 'reverse' }
@@ -1853,7 +1860,7 @@ sub args { 'L' }
 
 package PLXML::op_grepstart;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'grepstart' }
 sub desc { 'grep' }
@@ -1864,7 +1871,7 @@ sub args { 'C L' }
 
 package PLXML::op_grepwhile;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'grepwhile' }
 sub desc { 'grep iterator' }
@@ -1876,7 +1883,7 @@ sub args { '' }
 
 package PLXML::op_mapstart;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'mapstart' }
 sub desc { 'map' }
@@ -1887,7 +1894,7 @@ sub args { 'C L' }
 
 package PLXML::op_mapwhile;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'mapwhile' }
 sub desc { 'map iterator' }
@@ -1901,7 +1908,7 @@ sub args { '' }
 
 package PLXML::op_range;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'range' }
 sub desc { 'flipflop' }
@@ -1912,7 +1919,7 @@ sub args { 'S S' }
 
 package PLXML::op_flip;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'flip' }
 sub desc { 'range (or flip)' }
@@ -1923,7 +1930,7 @@ sub args { 'S S' }
 
 package PLXML::op_flop;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'flop' }
 sub desc { 'range (or flop)' }
@@ -1937,7 +1944,7 @@ sub args { '' }
 
 package PLXML::op_and;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'and' }
 sub desc { 'logical and (&&)' }
@@ -1948,7 +1955,7 @@ sub args { '' }
 
 package PLXML::op_or;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'or' }
 sub desc { 'logical or (||)' }
@@ -1959,7 +1966,7 @@ sub args { '' }
 
 package PLXML::op_xor;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'xor' }
 sub desc { 'logical xor' }
@@ -1970,7 +1977,7 @@ sub args { 'S S	' }
 
 package PLXML::op_cond_expr;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'cond_expr' }
 sub desc { 'conditional expression' }
@@ -1981,7 +1988,7 @@ sub args { '' }
 
 package PLXML::op_andassign;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'andassign' }
 sub desc { 'logical and assignment (&&=)' }
@@ -1992,7 +1999,7 @@ sub args { '' }
 
 package PLXML::op_orassign;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'orassign' }
 sub desc { 'logical or assignment (||=)' }
@@ -2004,7 +2011,7 @@ sub args { '' }
 
 package PLXML::op_method;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'method' }
 sub desc { 'method lookup' }
@@ -2015,7 +2022,7 @@ sub args { '' }
 
 package PLXML::op_entersub;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'entersub' }
 sub desc { 'subroutine entry' }
@@ -2026,7 +2033,7 @@ sub args { 'L' }
 
 package PLXML::op_leavesub;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'leavesub' }
 sub desc { 'subroutine exit' }
@@ -2037,7 +2044,7 @@ sub args { '' }
 
 package PLXML::op_leavesublv;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'leavesublv' }
 sub desc { 'lvalue subroutine return' }
@@ -2048,7 +2055,7 @@ sub args { '' }
 
 package PLXML::op_caller;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'caller' }
 sub desc { 'caller' }
@@ -2059,7 +2066,7 @@ sub args { 'S?' }
 
 package PLXML::op_warn;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'warn' }
 sub desc { 'warn' }
@@ -2070,7 +2077,7 @@ sub args { 'L' }
 
 package PLXML::op_die;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'die' }
 sub desc { 'die' }
@@ -2081,7 +2088,7 @@ sub args { 'L' }
 
 package PLXML::op_reset;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'reset' }
 sub desc { 'symbol reset' }
@@ -2093,7 +2100,7 @@ sub args { 'S?' }
 
 package PLXML::op_lineseq;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'lineseq' }
 sub desc { 'line sequence' }
@@ -2104,7 +2111,7 @@ sub args { '' }
 
 package PLXML::op_nextstate;
 
-@ISA = ('PLXML::cop');
+our @ISA = ('PLXML::cop');
 
 sub key { 'nextstate' }
 sub desc { 'next statement' }
@@ -2115,7 +2122,7 @@ sub args { '' }
 
 package PLXML::op_dbstate;
 
-@ISA = ('PLXML::cop');
+our @ISA = ('PLXML::cop');
 
 sub key { 'dbstate' }
 sub desc { 'debug next statement' }
@@ -2126,7 +2133,7 @@ sub args { '' }
 
 package PLXML::op_unstack;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'unstack' }
 sub desc { 'iteration finalizer' }
@@ -2137,7 +2144,7 @@ sub args { '' }
 
 package PLXML::op_enter;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'enter' }
 sub desc { 'block entry' }
@@ -2148,7 +2155,7 @@ sub args { '' }
 
 package PLXML::op_leave;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'leave' }
 sub desc { 'block exit' }
@@ -2159,7 +2166,7 @@ sub args { '' }
 
 package PLXML::op_scope;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'scope' }
 sub desc { 'block' }
@@ -2170,7 +2177,7 @@ sub args { '' }
 
 package PLXML::op_enteriter;
 
-@ISA = ('PLXML::loop');
+our @ISA = ('PLXML::loop');
 
 sub key { 'enteriter' }
 sub desc { 'foreach loop entry' }
@@ -2181,7 +2188,7 @@ sub args { '' }
 
 package PLXML::op_iter;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'iter' }
 sub desc { 'foreach loop iterator' }
@@ -2192,7 +2199,7 @@ sub args { '' }
 
 package PLXML::op_enterloop;
 
-@ISA = ('PLXML::loop');
+our @ISA = ('PLXML::loop');
 
 sub key { 'enterloop' }
 sub desc { 'loop entry' }
@@ -2203,7 +2210,7 @@ sub args { '' }
 
 package PLXML::op_leaveloop;
 
-@ISA = ('PLXML::binop');
+our @ISA = ('PLXML::binop');
 
 sub key { 'leaveloop' }
 sub desc { 'loop exit' }
@@ -2214,7 +2221,7 @@ sub args { '' }
 
 package PLXML::op_return;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'return' }
 sub desc { 'return' }
@@ -2225,7 +2232,7 @@ sub args { 'L' }
 
 package PLXML::op_last;
 
-@ISA = ('PLXML::loopexop');
+our @ISA = ('PLXML::loopexop');
 
 sub key { 'last' }
 sub desc { 'last' }
@@ -2236,7 +2243,7 @@ sub args { '' }
 
 package PLXML::op_next;
 
-@ISA = ('PLXML::loopexop');
+our @ISA = ('PLXML::loopexop');
 
 sub key { 'next' }
 sub desc { 'next' }
@@ -2247,7 +2254,7 @@ sub args { '' }
 
 package PLXML::op_redo;
 
-@ISA = ('PLXML::loopexop');
+our @ISA = ('PLXML::loopexop');
 
 sub key { 'redo' }
 sub desc { 'redo' }
@@ -2258,7 +2265,7 @@ sub args { '' }
 
 package PLXML::op_dump;
 
-@ISA = ('PLXML::loopexop');
+our @ISA = ('PLXML::loopexop');
 
 sub key { 'dump' }
 sub desc { 'dump' }
@@ -2269,7 +2276,7 @@ sub args { '' }
 
 package PLXML::op_goto;
 
-@ISA = ('PLXML::loopexop');
+our @ISA = ('PLXML::loopexop');
 
 sub key { 'goto' }
 sub desc { 'goto' }
@@ -2280,7 +2287,7 @@ sub args { '' }
 
 package PLXML::op_exit;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'exit' }
 sub desc { 'exit' }
@@ -2298,7 +2305,7 @@ sub args { 'S?' }
 
 package PLXML::op_open;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'open' }
 sub desc { 'open' }
@@ -2309,7 +2316,7 @@ sub args { 'F S? L' }
 
 package PLXML::op_close;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'close' }
 sub desc { 'close' }
@@ -2320,7 +2327,7 @@ sub args { 'F?' }
 
 package PLXML::op_pipe_op;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'pipe_op' }
 sub desc { 'pipe' }
@@ -2332,7 +2339,7 @@ sub args { 'F F' }
 
 package PLXML::op_fileno;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'fileno' }
 sub desc { 'fileno' }
@@ -2343,7 +2350,7 @@ sub args { 'F' }
 
 package PLXML::op_umask;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'umask' }
 sub desc { 'umask' }
@@ -2354,7 +2361,7 @@ sub args { 'S?' }
 
 package PLXML::op_binmode;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'binmode' }
 sub desc { 'binmode' }
@@ -2366,7 +2373,7 @@ sub args { 'F S?' }
 
 package PLXML::op_tie;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'tie' }
 sub desc { 'tie' }
@@ -2377,7 +2384,7 @@ sub args { 'R S L' }
 
 package PLXML::op_untie;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'untie' }
 sub desc { 'untie' }
@@ -2388,7 +2395,7 @@ sub args { 'R' }
 
 package PLXML::op_tied;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'tied' }
 sub desc { 'tied' }
@@ -2399,7 +2406,7 @@ sub args { 'R' }
 
 package PLXML::op_dbmopen;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'dbmopen' }
 sub desc { 'dbmopen' }
@@ -2410,7 +2417,7 @@ sub args { 'H S S' }
 
 package PLXML::op_dbmclose;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'dbmclose' }
 sub desc { 'dbmclose' }
@@ -2422,7 +2429,7 @@ sub args { 'H' }
 
 package PLXML::op_sselect;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'sselect' }
 sub desc { 'select system call' }
@@ -2433,7 +2440,7 @@ sub args { 'S S S S' }
 
 package PLXML::op_select;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'select' }
 sub desc { 'select' }
@@ -2445,7 +2452,7 @@ sub args { 'F?' }
 
 package PLXML::op_getc;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'getc' }
 sub desc { 'getc' }
@@ -2456,7 +2463,7 @@ sub args { 'F?' }
 
 package PLXML::op_read;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'read' }
 sub desc { 'read' }
@@ -2467,7 +2474,7 @@ sub args { 'F R S S?' }
 
 package PLXML::op_enterwrite;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'enterwrite' }
 sub desc { 'write' }
@@ -2478,7 +2485,7 @@ sub args { 'F?' }
 
 package PLXML::op_leavewrite;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'leavewrite' }
 sub desc { 'write exit' }
@@ -2490,7 +2497,7 @@ sub args { '' }
 
 package PLXML::op_prtf;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'prtf' }
 sub desc { 'printf' }
@@ -2501,7 +2508,7 @@ sub args { 'F? L' }
 
 package PLXML::op_print;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'print' }
 sub desc { 'print' }
@@ -2513,7 +2520,7 @@ sub args { 'F? L' }
 
 package PLXML::op_sysopen;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'sysopen' }
 sub desc { 'sysopen' }
@@ -2524,7 +2531,7 @@ sub args { 'F S S S?' }
 
 package PLXML::op_sysseek;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'sysseek' }
 sub desc { 'sysseek' }
@@ -2535,7 +2542,7 @@ sub args { 'F S S' }
 
 package PLXML::op_sysread;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'sysread' }
 sub desc { 'sysread' }
@@ -2546,7 +2553,7 @@ sub args { 'F R S S?' }
 
 package PLXML::op_syswrite;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'syswrite' }
 sub desc { 'syswrite' }
@@ -2558,7 +2565,7 @@ sub args { 'F S S? S?' }
 
 package PLXML::op_send;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'send' }
 sub desc { 'send' }
@@ -2569,7 +2576,7 @@ sub args { 'Fs S S S?' }
 
 package PLXML::op_recv;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'recv' }
 sub desc { 'recv' }
@@ -2581,7 +2588,7 @@ sub args { 'Fs R S S' }
 
 package PLXML::op_eof;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'eof' }
 sub desc { 'eof' }
@@ -2592,7 +2599,7 @@ sub args { 'F?' }
 
 package PLXML::op_tell;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'tell' }
 sub desc { 'tell' }
@@ -2603,7 +2610,7 @@ sub args { 'F?' }
 
 package PLXML::op_seek;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'seek' }
 sub desc { 'seek' }
@@ -2615,7 +2622,7 @@ sub args { 'F S S' }
 # truncate really behaves as if it had both "S S" and "F S"
 package PLXML::op_truncate;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'truncate' }
 sub desc { 'truncate' }
@@ -2627,7 +2634,7 @@ sub args { 'S S' }
 
 package PLXML::op_fcntl;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'fcntl' }
 sub desc { 'fcntl' }
@@ -2638,7 +2645,7 @@ sub args { 'F S S' }
 
 package PLXML::op_ioctl;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'ioctl' }
 sub desc { 'ioctl' }
@@ -2649,7 +2656,7 @@ sub args { 'F S S' }
 
 package PLXML::op_flock;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'flock' }
 sub desc { 'flock' }
@@ -2663,7 +2670,7 @@ sub args { 'F S' }
 
 package PLXML::op_socket;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'socket' }
 sub desc { 'socket' }
@@ -2674,7 +2681,7 @@ sub args { 'Fs S S S' }
 
 package PLXML::op_sockpair;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'sockpair' }
 sub desc { 'socketpair' }
@@ -2686,7 +2693,7 @@ sub args { 'Fs Fs S S S' }
 
 package PLXML::op_bind;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'bind' }
 sub desc { 'bind' }
@@ -2697,7 +2704,7 @@ sub args { 'Fs S' }
 
 package PLXML::op_connect;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'connect' }
 sub desc { 'connect' }
@@ -2708,7 +2715,7 @@ sub args { 'Fs S' }
 
 package PLXML::op_listen;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'listen' }
 sub desc { 'listen' }
@@ -2719,7 +2726,7 @@ sub args { 'Fs S' }
 
 package PLXML::op_accept;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'accept' }
 sub desc { 'accept' }
@@ -2730,7 +2737,7 @@ sub args { 'Fs Fs' }
 
 package PLXML::op_shutdown;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'shutdown' }
 sub desc { 'shutdown' }
@@ -2742,7 +2749,7 @@ sub args { 'Fs S' }
 
 package PLXML::op_gsockopt;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'gsockopt' }
 sub desc { 'getsockopt' }
@@ -2753,7 +2760,7 @@ sub args { 'Fs S S' }
 
 package PLXML::op_ssockopt;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'ssockopt' }
 sub desc { 'setsockopt' }
@@ -2765,7 +2772,7 @@ sub args { 'Fs S S S' }
 
 package PLXML::op_getsockname;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'getsockname' }
 sub desc { 'getsockname' }
@@ -2776,7 +2783,7 @@ sub args { 'Fs' }
 
 package PLXML::op_getpeername;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'getpeername' }
 sub desc { 'getpeername' }
@@ -2790,7 +2797,7 @@ sub args { 'Fs' }
 
 package PLXML::op_lstat;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'lstat' }
 sub desc { 'lstat' }
@@ -2801,7 +2808,7 @@ sub args { 'F' }
 
 package PLXML::op_stat;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'stat' }
 sub desc { 'stat' }
@@ -2812,7 +2819,7 @@ sub args { 'F' }
 
 package PLXML::op_ftrread;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftrread' }
 sub desc { '-R' }
@@ -2823,7 +2830,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftrwrite;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftrwrite' }
 sub desc { '-W' }
@@ -2834,7 +2841,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftrexec;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftrexec' }
 sub desc { '-X' }
@@ -2845,7 +2852,7 @@ sub args { 'F-' }
 
 package PLXML::op_fteread;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'fteread' }
 sub desc { '-r' }
@@ -2856,7 +2863,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftewrite;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftewrite' }
 sub desc { '-w' }
@@ -2867,7 +2874,7 @@ sub args { 'F-' }
 
 package PLXML::op_fteexec;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'fteexec' }
 sub desc { '-x' }
@@ -2878,7 +2885,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftis;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftis' }
 sub desc { '-e' }
@@ -2889,7 +2896,7 @@ sub args { 'F-' }
 
 package PLXML::op_fteowned;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'fteowned' }
 sub desc { '-O' }
@@ -2900,7 +2907,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftrowned;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftrowned' }
 sub desc { '-o' }
@@ -2911,7 +2918,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftzero;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftzero' }
 sub desc { '-z' }
@@ -2922,7 +2929,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftsize;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftsize' }
 sub desc { '-s' }
@@ -2933,7 +2940,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftmtime;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftmtime' }
 sub desc { '-M' }
@@ -2944,7 +2951,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftatime;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftatime' }
 sub desc { '-A' }
@@ -2955,7 +2962,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftctime;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftctime' }
 sub desc { '-C' }
@@ -2966,7 +2973,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftsock;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftsock' }
 sub desc { '-S' }
@@ -2977,7 +2984,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftchr;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftchr' }
 sub desc { '-c' }
@@ -2988,7 +2995,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftblk;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftblk' }
 sub desc { '-b' }
@@ -2999,7 +3006,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftfile;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftfile' }
 sub desc { '-f' }
@@ -3010,7 +3017,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftdir;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftdir' }
 sub desc { '-d' }
@@ -3021,7 +3028,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftpipe;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftpipe' }
 sub desc { '-p' }
@@ -3032,7 +3039,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftlink;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftlink' }
 sub desc { '-l' }
@@ -3043,7 +3050,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftsuid;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftsuid' }
 sub desc { '-u' }
@@ -3054,7 +3061,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftsgid;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftsgid' }
 sub desc { '-g' }
@@ -3065,7 +3072,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftsvtx;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftsvtx' }
 sub desc { '-k' }
@@ -3076,7 +3083,7 @@ sub args { 'F-' }
 
 package PLXML::op_fttty;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'fttty' }
 sub desc { '-t' }
@@ -3087,7 +3094,7 @@ sub args { 'F-' }
 
 package PLXML::op_fttext;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'fttext' }
 sub desc { '-T' }
@@ -3098,7 +3105,7 @@ sub args { 'F-' }
 
 package PLXML::op_ftbinary;
 
-@ISA = ('PLXML::filestatop');
+our @ISA = ('PLXML::filestatop');
 
 sub key { 'ftbinary' }
 sub desc { '-B' }
@@ -3112,7 +3119,7 @@ sub args { 'F-' }
 
 package PLXML::op_chdir;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'chdir' }
 sub desc { 'chdir' }
@@ -3123,7 +3130,7 @@ sub args { 'S?' }
 
 package PLXML::op_chown;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'chown' }
 sub desc { 'chown' }
@@ -3134,7 +3141,7 @@ sub args { 'L' }
 
 package PLXML::op_chroot;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'chroot' }
 sub desc { 'chroot' }
@@ -3145,7 +3152,7 @@ sub args { 'S?' }
 
 package PLXML::op_unlink;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'unlink' }
 sub desc { 'unlink' }
@@ -3156,7 +3163,7 @@ sub args { 'L' }
 
 package PLXML::op_chmod;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'chmod' }
 sub desc { 'chmod' }
@@ -3167,7 +3174,7 @@ sub args { 'L' }
 
 package PLXML::op_utime;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'utime' }
 sub desc { 'utime' }
@@ -3178,7 +3185,7 @@ sub args { 'L' }
 
 package PLXML::op_rename;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'rename' }
 sub desc { 'rename' }
@@ -3189,7 +3196,7 @@ sub args { 'S S' }
 
 package PLXML::op_link;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'link' }
 sub desc { 'link' }
@@ -3200,7 +3207,7 @@ sub args { 'S S' }
 
 package PLXML::op_symlink;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'symlink' }
 sub desc { 'symlink' }
@@ -3211,7 +3218,7 @@ sub args { 'S S' }
 
 package PLXML::op_readlink;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'readlink' }
 sub desc { 'readlink' }
@@ -3222,7 +3229,7 @@ sub args { 'S?' }
 
 package PLXML::op_mkdir;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'mkdir' }
 sub desc { 'mkdir' }
@@ -3233,7 +3240,7 @@ sub args { 'S S?' }
 
 package PLXML::op_rmdir;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'rmdir' }
 sub desc { 'rmdir' }
@@ -3247,7 +3254,7 @@ sub args { 'S?' }
 
 package PLXML::op_open_dir;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'open_dir' }
 sub desc { 'opendir' }
@@ -3258,7 +3265,7 @@ sub args { 'F S' }
 
 package PLXML::op_readdir;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'readdir' }
 sub desc { 'readdir' }
@@ -3269,7 +3276,7 @@ sub args { 'F' }
 
 package PLXML::op_telldir;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'telldir' }
 sub desc { 'telldir' }
@@ -3280,7 +3287,7 @@ sub args { 'F' }
 
 package PLXML::op_seekdir;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'seekdir' }
 sub desc { 'seekdir' }
@@ -3291,7 +3298,7 @@ sub args { 'F S' }
 
 package PLXML::op_rewinddir;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'rewinddir' }
 sub desc { 'rewinddir' }
@@ -3302,7 +3309,7 @@ sub args { 'F' }
 
 package PLXML::op_closedir;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'closedir' }
 sub desc { 'closedir' }
@@ -3316,7 +3323,7 @@ sub args { 'F' }
 
 package PLXML::op_fork;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'fork' }
 sub desc { 'fork' }
@@ -3327,7 +3334,7 @@ sub args { '' }
 
 package PLXML::op_wait;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'wait' }
 sub desc { 'wait' }
@@ -3338,7 +3345,7 @@ sub args { '' }
 
 package PLXML::op_waitpid;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'waitpid' }
 sub desc { 'waitpid' }
@@ -3349,7 +3356,7 @@ sub args { 'S S' }
 
 package PLXML::op_system;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'system' }
 sub desc { 'system' }
@@ -3360,7 +3367,7 @@ sub args { 'S? L' }
 
 package PLXML::op_exec;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'exec' }
 sub desc { 'exec' }
@@ -3371,7 +3378,7 @@ sub args { 'S? L' }
 
 package PLXML::op_kill;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'kill' }
 sub desc { 'kill' }
@@ -3382,7 +3389,7 @@ sub args { 'L' }
 
 package PLXML::op_getppid;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'getppid' }
 sub desc { 'getppid' }
@@ -3393,7 +3400,7 @@ sub args { '' }
 
 package PLXML::op_getpgrp;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'getpgrp' }
 sub desc { 'getpgrp' }
@@ -3404,7 +3411,7 @@ sub args { 'S?' }
 
 package PLXML::op_setpgrp;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'setpgrp' }
 sub desc { 'setpgrp' }
@@ -3415,7 +3422,7 @@ sub args { 'S? S?' }
 
 package PLXML::op_getpriority;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'getpriority' }
 sub desc { 'getpriority' }
@@ -3426,7 +3433,7 @@ sub args { 'S S' }
 
 package PLXML::op_setpriority;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'setpriority' }
 sub desc { 'setpriority' }
@@ -3444,7 +3451,7 @@ sub args { 'S S S' }
 
 package PLXML::op_time;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'time' }
 sub desc { 'time' }
@@ -3455,7 +3462,7 @@ sub args { '' }
 
 package PLXML::op_tms;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'tms' }
 sub desc { 'times' }
@@ -3466,7 +3473,7 @@ sub args { '' }
 
 package PLXML::op_localtime;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'localtime' }
 sub desc { 'localtime' }
@@ -3477,7 +3484,7 @@ sub args { 'S?' }
 
 package PLXML::op_gmtime;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'gmtime' }
 sub desc { 'gmtime' }
@@ -3488,7 +3495,7 @@ sub args { 'S?' }
 
 package PLXML::op_alarm;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'alarm' }
 sub desc { 'alarm' }
@@ -3499,7 +3506,7 @@ sub args { 'S?' }
 
 package PLXML::op_sleep;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'sleep' }
 sub desc { 'sleep' }
@@ -3513,7 +3520,7 @@ sub args { 'S?' }
 
 package PLXML::op_shmget;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'shmget' }
 sub desc { 'shmget' }
@@ -3524,7 +3531,7 @@ sub args { 'S S S' }
 
 package PLXML::op_shmctl;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'shmctl' }
 sub desc { 'shmctl' }
@@ -3535,7 +3542,7 @@ sub args { 'S S S' }
 
 package PLXML::op_shmread;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'shmread' }
 sub desc { 'shmread' }
@@ -3546,7 +3553,7 @@ sub args { 'S S S S' }
 
 package PLXML::op_shmwrite;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'shmwrite' }
 sub desc { 'shmwrite' }
@@ -3560,7 +3567,7 @@ sub args { 'S S S S' }
 
 package PLXML::op_msgget;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'msgget' }
 sub desc { 'msgget' }
@@ -3571,7 +3578,7 @@ sub args { 'S S' }
 
 package PLXML::op_msgctl;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'msgctl' }
 sub desc { 'msgctl' }
@@ -3582,7 +3589,7 @@ sub args { 'S S S' }
 
 package PLXML::op_msgsnd;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'msgsnd' }
 sub desc { 'msgsnd' }
@@ -3593,7 +3600,7 @@ sub args { 'S S S' }
 
 package PLXML::op_msgrcv;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'msgrcv' }
 sub desc { 'msgrcv' }
@@ -3607,7 +3614,7 @@ sub args { 'S S S S S' }
 
 package PLXML::op_semget;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'semget' }
 sub desc { 'semget' }
@@ -3618,7 +3625,7 @@ sub args { 'S S S' }
 
 package PLXML::op_semctl;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'semctl' }
 sub desc { 'semctl' }
@@ -3629,7 +3636,7 @@ sub args { 'S S S S' }
 
 package PLXML::op_semop;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'semop' }
 sub desc { 'semop' }
@@ -3643,7 +3650,7 @@ sub args { 'S S' }
 
 package PLXML::op_require;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'require' }
 sub desc { 'require' }
@@ -3654,7 +3661,7 @@ sub args { 'S?' }
 
 package PLXML::op_dofile;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'dofile' }
 sub desc { 'do "file"' }
@@ -3665,7 +3672,7 @@ sub args { 'S' }
 
 package PLXML::op_entereval;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'entereval' }
 sub desc { 'eval "string"' }
@@ -3676,7 +3683,7 @@ sub args { 'S' }
 
 package PLXML::op_leaveeval;
 
-@ISA = ('PLXML::unop');
+our @ISA = ('PLXML::unop');
 
 sub key { 'leaveeval' }
 sub desc { 'eval "string" exit' }
@@ -3688,7 +3695,7 @@ sub args { 'S' }
 #evalonce	eval constant string	ck_null		d1	S
 package PLXML::op_entertry;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'entertry' }
 sub desc { 'eval {block}' }
@@ -3699,7 +3706,7 @@ sub args { '' }
 
 package PLXML::op_leavetry;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'leavetry' }
 sub desc { 'eval {block} exit' }
@@ -3713,7 +3720,7 @@ sub args { '' }
 
 package PLXML::op_ghbyname;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'ghbyname' }
 sub desc { 'gethostbyname' }
@@ -3724,7 +3731,7 @@ sub args { 'S' }
 
 package PLXML::op_ghbyaddr;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'ghbyaddr' }
 sub desc { 'gethostbyaddr' }
@@ -3735,7 +3742,7 @@ sub args { 'S S' }
 
 package PLXML::op_ghostent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'ghostent' }
 sub desc { 'gethostent' }
@@ -3746,7 +3753,7 @@ sub args { '' }
 
 package PLXML::op_gnbyname;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'gnbyname' }
 sub desc { 'getnetbyname' }
@@ -3757,7 +3764,7 @@ sub args { 'S' }
 
 package PLXML::op_gnbyaddr;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'gnbyaddr' }
 sub desc { 'getnetbyaddr' }
@@ -3768,7 +3775,7 @@ sub args { 'S S' }
 
 package PLXML::op_gnetent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'gnetent' }
 sub desc { 'getnetent' }
@@ -3779,7 +3786,7 @@ sub args { '' }
 
 package PLXML::op_gpbyname;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'gpbyname' }
 sub desc { 'getprotobyname' }
@@ -3790,7 +3797,7 @@ sub args { 'S' }
 
 package PLXML::op_gpbynumber;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'gpbynumber' }
 sub desc { 'getprotobynumber' }
@@ -3801,7 +3808,7 @@ sub args { 'S' }
 
 package PLXML::op_gprotoent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'gprotoent' }
 sub desc { 'getprotoent' }
@@ -3812,7 +3819,7 @@ sub args { '' }
 
 package PLXML::op_gsbyname;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'gsbyname' }
 sub desc { 'getservbyname' }
@@ -3823,7 +3830,7 @@ sub args { 'S S' }
 
 package PLXML::op_gsbyport;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'gsbyport' }
 sub desc { 'getservbyport' }
@@ -3834,7 +3841,7 @@ sub args { 'S S' }
 
 package PLXML::op_gservent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'gservent' }
 sub desc { 'getservent' }
@@ -3845,7 +3852,7 @@ sub args { '' }
 
 package PLXML::op_shostent;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'shostent' }
 sub desc { 'sethostent' }
@@ -3856,7 +3863,7 @@ sub args { 'S' }
 
 package PLXML::op_snetent;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'snetent' }
 sub desc { 'setnetent' }
@@ -3867,7 +3874,7 @@ sub args { 'S' }
 
 package PLXML::op_sprotoent;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'sprotoent' }
 sub desc { 'setprotoent' }
@@ -3878,7 +3885,7 @@ sub args { 'S' }
 
 package PLXML::op_sservent;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'sservent' }
 sub desc { 'setservent' }
@@ -3889,7 +3896,7 @@ sub args { 'S' }
 
 package PLXML::op_ehostent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'ehostent' }
 sub desc { 'endhostent' }
@@ -3900,7 +3907,7 @@ sub args { '' }
 
 package PLXML::op_enetent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'enetent' }
 sub desc { 'endnetent' }
@@ -3911,7 +3918,7 @@ sub args { '' }
 
 package PLXML::op_eprotoent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'eprotoent' }
 sub desc { 'endprotoent' }
@@ -3922,7 +3929,7 @@ sub args { '' }
 
 package PLXML::op_eservent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'eservent' }
 sub desc { 'endservent' }
@@ -3933,7 +3940,7 @@ sub args { '' }
 
 package PLXML::op_gpwnam;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'gpwnam' }
 sub desc { 'getpwnam' }
@@ -3944,7 +3951,7 @@ sub args { 'S' }
 
 package PLXML::op_gpwuid;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'gpwuid' }
 sub desc { 'getpwuid' }
@@ -3955,7 +3962,7 @@ sub args { 'S' }
 
 package PLXML::op_gpwent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'gpwent' }
 sub desc { 'getpwent' }
@@ -3966,7 +3973,7 @@ sub args { '' }
 
 package PLXML::op_spwent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'spwent' }
 sub desc { 'setpwent' }
@@ -3977,7 +3984,7 @@ sub args { '' }
 
 package PLXML::op_epwent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'epwent' }
 sub desc { 'endpwent' }
@@ -3988,7 +3995,7 @@ sub args { '' }
 
 package PLXML::op_ggrnam;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'ggrnam' }
 sub desc { 'getgrnam' }
@@ -3999,7 +4006,7 @@ sub args { 'S' }
 
 package PLXML::op_ggrgid;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'ggrgid' }
 sub desc { 'getgrgid' }
@@ -4010,7 +4017,7 @@ sub args { 'S' }
 
 package PLXML::op_ggrent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'ggrent' }
 sub desc { 'getgrent' }
@@ -4021,7 +4028,7 @@ sub args { '' }
 
 package PLXML::op_sgrent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'sgrent' }
 sub desc { 'setgrent' }
@@ -4032,7 +4039,7 @@ sub args { '' }
 
 package PLXML::op_egrent;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'egrent' }
 sub desc { 'endgrent' }
@@ -4043,7 +4050,7 @@ sub args { '' }
 
 package PLXML::op_getlogin;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'getlogin' }
 sub desc { 'getlogin' }
@@ -4057,7 +4064,7 @@ sub args { '' }
 
 package PLXML::op_syscall;
 
-@ISA = ('PLXML::listop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'syscall' }
 sub desc { 'syscall' }
@@ -4070,7 +4077,7 @@ sub args { 'S L' }
 # For multi-threading
 package PLXML::op_lock;
 
-@ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::baseop_unop');
 
 sub key { 'lock' }
 sub desc { 'lock' }
@@ -4081,7 +4088,7 @@ sub args { 'R' }
 
 package PLXML::op_threadsv;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'threadsv' }
 sub desc { 'per-thread value' }
@@ -4094,7 +4101,7 @@ sub args { '' }
 # Control (contd.)
 package PLXML::op_setstate;
 
-@ISA = ('PLXML::cop');
+our @ISA = ('PLXML::cop');
 
 sub key { 'setstate' }
 sub desc { 'set statement info' }
@@ -4105,7 +4112,7 @@ sub args { '' }
 
 package PLXML::op_method_named;
 
-@ISA = ('PLXML::padop_svop');
+our @ISA = ('PLXML::padop_svop');
 
 sub key { 'method_named' }
 sub desc { 'method with known name' }
@@ -4117,7 +4124,7 @@ sub args { '' }
 
 package PLXML::op_dor;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'dor' }
 sub desc { 'defined or (//)' }
@@ -4128,7 +4135,7 @@ sub args { '' }
 
 package PLXML::op_dorassign;
 
-@ISA = ('PLXML::logop');
+our @ISA = ('PLXML::logop');
 
 sub key { 'dorassign' }
 sub desc { 'defined or assignment (//=)' }
@@ -4142,7 +4149,7 @@ sub args { '' }
 
 package PLXML::op_custom;
 
-@ISA = ('PLXML::baseop');
+our @ISA = ('PLXML::baseop');
 
 sub key { 'custom' }
 sub desc { 'unknown custom operator' }
