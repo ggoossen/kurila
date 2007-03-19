@@ -606,7 +606,7 @@ sub IO::Compress::Base::Parameters::parse
             ++ $parsed{$canonkey};
 
             return $self->setError("Muliple instances of '$key' found") 
-                if $parsed && $type & Parse_multiple == 0 ;
+                if $parsed && ($type & Parse_multiple) == 0 ;
 
             my $s ;
             $self->_checkType($key, $value, $type, 1, \$s)
