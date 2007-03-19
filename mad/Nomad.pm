@@ -19,7 +19,6 @@ my $deinterpolate;
 sub xml_to_p5 {
     my %options = @_;
 
-
     my $filename = $options{'input'} or die;
     $deinterpolate = $options{'deinterpolate'};
     my $YAML = $options{'YAML'};
