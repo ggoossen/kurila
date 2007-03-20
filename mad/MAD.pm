@@ -39,7 +39,7 @@ sub convert {
         system "cat $file.xml.org | $convert > $file.xml" and die "Failed converting";
     }
 
-    return Nomad::xml_to_p5("$file.xml");
+    return Nomad::xml_to_p5( input => "$file.xml" );
 }
 
 1;
