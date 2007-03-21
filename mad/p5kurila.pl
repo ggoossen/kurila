@@ -86,14 +86,13 @@ sub const_handler {
     $const_X->set_att("key" => q|=|);
 }
 
-my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1,
-                          twig_handlers => {
-                                            op_entersub => \&entersub_handler,
-                                            # op_const => \&const_handler,
-                                           },
-                        );
+my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
 
 $twig->parsefile( "-" );
+
+for my $op ($twig->findnodes(q|//op_entersub|)) {
+    entersub_handler($twig, $op);
+}
 
 for my $op_const ($twig->findnodes(q|//op_const|)) {
     const_handler($twig, $op_const);
