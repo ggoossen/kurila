@@ -12,6 +12,9 @@ use XML::Twig;
 sub entersub_handler {
     my ($twig, $sub) = @_;
 
+    # Remove indirect object syntax.
+
+
     # check is method
     my ($method_named) = $twig->findnodes([$sub], "op_method_named");
     return if not $method_named;
@@ -46,14 +49,34 @@ sub entersub_handler {
 sub const_handler {
     my ($twig, $const) = @_;
 
+    # Convert BARE words
+
+    # real bareword
     return unless $const->att('private') && ($const->att('private') =~ m/BARE/);
     return unless $const->att('flags') eq "SCALAR";
     return if $const->parent( sub { $_[0]->tag eq "mad_op" } );
+    return if $const->parent->tag eq "op_require";
 
+    # keep qq| $aap{noot} |
+    return if $const->parent->tag eq "op_helem";
+    return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "helem";
+
+    # keep qq| -Level |
+    return if $const->parent->tag eq "op_negate";
+    return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "negate";
+
+    {
+        # keep qq| foo => |
+        my $x = $const->parent->tag eq "op_null" ? $const->parent : $const;
+        my ($next) = $x->parent->child($x->pos + 1);
+        return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key=","][@val="=&gt;"]|);
+    }
+
+    # Make it a string constant
     my ($madprops) = $twig->findnodes([$const], q|madprops|);
     $const->del_att('private');
     my ($const_ws) = $twig->findnodes([$const], q|madprops/mad_sv[@key="_"]|);
-    $const_ws->delete;
+    $const_ws->delete if $const_ws;
     $madprops->insert_new_elt( "mad_sv", { key => '_', val => q| | } );
     $madprops->insert_new_elt( "mad_sv", { key => 'q', val => q|'| } );
     $madprops->insert_new_elt( 'last_child', "mad_sv", { key => 'Q', val => q|'| } );
@@ -64,10 +87,14 @@ sub const_handler {
 my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1,
                           twig_handlers => {
                                             op_entersub => \&entersub_handler,
-                                            op_const => \&const_handler,
+                                            # op_const => \&const_handler,
                                            },
                         );
 
 $twig->parsefile( "-" );
+
+for my $op_const ($twig->findnodes(q|//op_const|)) {
+    const_handler($twig, $op_const);
+}
 
 $twig->print;

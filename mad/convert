@@ -4,34 +4,10 @@ use strict;
 use warnings;
 
 use lib "$ENV{madpath}/mad";
+
 use MAD;
 
 use Fatal qw|open close|;
-
-sub convert {
-    my ($input, $convert) = @_;
-
-    my $file = "tmp";
-
-    # perl5 to xml
-    open my $infile, "> $file.in";
-    $infile->print($input);
-    close $infile;
-    my $options = "";
-    if( $input =~ m/^[#][!].*perl(.*)/) {
-        $options = $1;
-    }
-
-    MAD::dump_xml( input => "$file.in", output => "$file.xml");
-
-    if ($convert) {
-        # convert
-        rename "$file.xml", "$file.xml.org";
-        system "cat $file.xml.org | $convert > $file.xml" and die "Failed converting";
-    }
-
-    return Nomad::xml_to_p5( input => "$file.xml" );
-}
 
 {
     local $/ = undef;
@@ -39,7 +15,7 @@ sub convert {
     my $fh;
     open $fh, '+<', "$filename";
     my $input = $fh->getline;
-    my $output = eval { convert($input, "/usr/bin/perl $ENV{madpath}/mad/p5kurila.pl") };
+    my $output = eval { MAD::convert($input, "/usr/bin/perl $ENV{madpath}/mad/p5kurila.pl") };
     if ($output) {
         seek $fh, 0, 0;
         $fh->print($output);

@@ -14,7 +14,7 @@ sub dump_xml {
                     @_
                   );
 
-    `PERL_XMLDUMP='$options{output}' ../perl $options{switches} -I ../lib $options{input} 2> tmp.err`;
+    `PERL_XMLDUMP='$options{output}' $ENV{madpath}/perl $options{switches} -I ../lib $options{input} 2> tmp.err`;
 }
 
 1;

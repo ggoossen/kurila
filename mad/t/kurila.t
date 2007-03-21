@@ -3,36 +3,30 @@
 use strict;
 use warnings;
 
+BEGIN {
+    push @INC, "../mad";
+}
+
 use IO::Handle;
 
 use Test::More qw|no_plan|;
 
 use Fatal qw|open close|;
 
-use lib "$ENV{madpath}/mad";
-use MAD;
+use Convert;
 
 
 sub p5convert {
     my ($input, $expected, $convert) = @_;
-    my $output = MAD::convert($input, $convert && "/usr/bin/perl $ENV{madpath}/mad/p5kurila.pl");
+    my $output = Convert::convert($input, $convert && "/usr/bin/perl ../mad/p5kurila.pl");
     is($output, $expected);
 }
 
-sub p55 {
-    my $input = shift;
-    my $output = MAD::convert($input);
-    is($output, $input);
-}
+t_indirect_object_syntax();
+t_barewords();
 
-p55( <<'END' );
-use strict;
-#ABC
-new Foo;
-Foo->new;
-END
-
-p5convert( split(m/^====\n/m, <<'END'), 1 );
+sub t_indirect_object_syntax {
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
 use strict;
 #ABC
 new Foo;
@@ -46,15 +40,63 @@ Foo->new();
 Foo->new;
 END
 
-p5convert( split(m/^====\n/m, <<'END'), 1 );
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
 use Test::More tests => 1;
 ====
 use Test::More tests => 1;
 END
 
-p5convert( split(m/^====\n/m, <<'END'), 1 );
+}
+
+
+sub t_barewords {
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
 bless {}, CLASS;
 ====
 bless {}, 'CLASS';
 END
 
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+bless {}, CLASS;
+====
+bless {}, 'CLASS';
+END
+
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+require overload;
+====
+require overload;
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+foo => 'bar';
+====
+foo => 'bar';
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+{ foo => 'bar', noot => "mies" };
+====
+{ foo => 'bar', noot => "mies" };
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+$aap{noot};
+====
+$aap{noot};
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+exists $aap->{noot};
+====
+exists $aap->{noot};
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+Foo->new(-Level);
+====
+Foo->new(-Level);
+END
+}
