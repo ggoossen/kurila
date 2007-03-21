@@ -5,7 +5,7 @@ use warnings;
 
 use lib "$ENV{madpath}/mad";
 
-use MAD;
+use Convert;
 
 use Fatal qw|open close|;
 
@@ -15,7 +15,7 @@ use Fatal qw|open close|;
     my $fh;
     open $fh, '+<', "$filename";
     my $input = $fh->getline;
-    my $output = eval { MAD::convert($input, "/usr/bin/perl $ENV{madpath}/mad/p5kurila.pl") };
+    my $output = eval { Convert::convert($input, "/usr/bin/perl $ENV{madpath}/mad/p5kurila.pl") };
     if ($output) {
         seek $fh, 0, 0;
         $fh->print($output);

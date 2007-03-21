@@ -57,13 +57,15 @@ sub const_handler {
     return if $const->parent( sub { $_[0]->tag eq "mad_op" } );
     return if $const->parent->tag eq "op_require";
 
-    # keep qq| $aap{noot} |
-    return if $const->parent->tag eq "op_helem";
-    return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "helem";
+    # helem:  $aap{noot}
+    # negate: -Level
+    # method: $aap->SUPER::noot()
+    return if $const->parent->tag =~ m/^op_(helem|negate|method)$/;
+    return if $const->parent->tag eq "op_null" 
+      and ($const->parent->att("was") || '') =~ m/^(helem|negate|method)$/;
 
-    # keep qq| -Level |
-    return if $const->parent->tag eq "op_negate";
-    return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "negate";
+    # Seems to work
+    return unless $twig->findnodes([$const], q|../madprops/mad_sv[@key=","][@val=","]|);
 
     {
         # keep qq| foo => |

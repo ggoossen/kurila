@@ -99,4 +99,22 @@ Foo->new(-Level);
 ====
 Foo->new(-Level);
 END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+$foo->SUPER::aap();
+====
+$foo->SUPER::aap();
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+sort Foo::aap 1,2,3;
+====
+sort Foo::aap 1,2,3;
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+sort aap 1,2,3;
+====
+sort aap 1,2,3;
+END
 }
