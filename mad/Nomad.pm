@@ -14,6 +14,8 @@ use Carp;
 use P5AST;
 use P5re;
 
+my $dowarn = 0;
+my $YAML = 0;
 my $deinterpolate;
 
 sub xml_to_p5 {
@@ -111,6 +113,12 @@ my %madtype = (
 #    'V' => 'p5::version',
     'X' => 'p5::token',
 );
+
+$SIG{__DIE__} = sub {
+    my $e = shift;
+    $e =~ s/\n$/\n    [NODE $filename line $::prevstate->{line}]/ if $::prevstate;
+    confess $e;
+};
 
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -351,6 +359,31 @@ sub encnum {
 }
 
 use PLXML;
+
+use XML::Parser;
+my $p1 = new XML::Parser(Style => 'Objects', Pkg => 'PLXML');
+$p1->setHandlers('Char' => sub { warn "Chars $_[1]" if $_[1] =~ /\S/; });
+
+# First slurp XML into tree of objects.
+
+my $root = $p1->parsefile($filename);
+
+# Now turn XML tree into something more like an AST.
+
+PLXML::prepreproc($root->[0]);
+my $ast = P5AST->new('Kids' => [$root->[0]->ast()]);
+#::t($ast);
+
+if ($YAML) {
+    require YAML::Syck;
+    print YAML::Syck::Dump($ast);
+    exit;
+}
+
+# Finally, walk AST to produce new program.
+
+my $text = $ast->p5text();	# returns encoded, must output raw
+print $text;
 
 package p5::text;
 
@@ -1530,7 +1563,7 @@ package PLXML::op_srefgen;
 sub ast {
     my @newkids;
     my $self = shift;
-    if ($$self{mp}{FIRST} eq '{') {
+    if ($$self{mp}{FIRST} and $$self{mp}{FIRST} eq '{') {
 	local $::curstate;	# this is officially a block, so hide it
 	local $::curenc = $::curenc;
 	push @newkids, $self->madness('{');
