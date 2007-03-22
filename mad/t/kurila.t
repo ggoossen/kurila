@@ -172,4 +172,24 @@ sort aap 1,2,3;
 ====
 sort aap 1,2,3;
 END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+plan(test, 12);
+====
+plan('test', 12);
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+sub plan { }
+BEGIN { plan(tests, 12); }
+====
+sub plan { }
+BEGIN { plan('tests', 12); }
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+plan(tests => 12);
+====
+plan(tests => 12);
+END
 }

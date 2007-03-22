@@ -22,7 +22,8 @@ sub convert {
 
     # XML dump
     unlink "$file.xml";
-    `PERL_XMLDUMP='$file.xml' $ENV{madpath}/perl -I ../lib $file.in 2> tmp.err`;
+    my $lib = "-I ../lib -I ../t/lib/compress";
+    `PERL_XMLDUMP='$file.xml' $ENV{madpath}/perl $lib $file.in 2> tmp.err`;
     if (not -s "$file.xml") {
         die "madskills failed. No XML dump";
     }

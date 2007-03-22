@@ -53,9 +53,9 @@ sub const_handler {
 
     # real bareword
     return unless $const->att('private') && ($const->att('private') =~ m/BARE/);
-    return unless $const->att('flags') eq "SCALAR";
-    return if $const->parent( sub { $_[0]->tag eq "mad_op" } );
-    return if $const->parent->tag eq "op_require";
+    return unless $const->att('flags') =~ "SCALAR";
+
+    return if $twig->findnodes([$const], q|madprops/mad_sv[@key="B"][@val="forced"]|);
 
     # helem:  $aap{noot}
     # negate: -Level
@@ -64,14 +64,13 @@ sub const_handler {
     return if $const->parent->tag eq "op_null" 
       and ($const->parent->att("was") || '') =~ m/^(helem|negate|method)$/;
 
-    # Seems to work
-    return unless $twig->findnodes([$const], q|../madprops/mad_sv[@key=","][@val=","]|);
-
     {
         # keep qq| foo => |
-        my $x = $const->parent->tag eq "op_null" ? $const->parent : $const;
+        my $x = ($const->parent->tag eq "op_null" and ! $const->parent->att('was')) ? $const->parent : $const;
         my ($next) = $x->parent->child($x->pos + 1);
         return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key=","][@val="=&gt;"]|);
+
+        return if $twig->findnodes([$const->parent], q|madprops/mad_sv[@key="A"]|); # [@val="-&gt;"]|);
     }
 
     # keep qq| $aap{noot} |
@@ -93,8 +92,9 @@ sub const_handler {
     my ($madprops) = $twig->findnodes([$const], q|madprops|);
     $const->del_att('private');
     my ($const_ws) = $twig->findnodes([$const], q|madprops/mad_sv[@key="_"]|);
+    my $ws = $const_ws && $const_ws->att('val');
     $const_ws->delete if $const_ws;
-    $madprops->insert_new_elt( "mad_sv", { key => '_', val => q| | } );
+    $madprops->insert_new_elt( "mad_sv", { key => '_', val => $ws } );
     $madprops->insert_new_elt( "mad_sv", { key => 'q', val => q|'| } );
     $madprops->insert_new_elt( 'last_child', "mad_sv", { key => 'Q', val => q|'| } );
     my ($const_X) = $twig->findnodes([$const], q|madprops/mad_sv[@key="X"]|);
