@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 
 require './test.pl';
-plan( tests => 160 );
+plan( tests => 150 );
 
 no strict;
 
@@ -150,7 +150,6 @@ is (*{*x{GLOB}}, "*main::STDOUT");
 		    ? "ok $test\n" : "not ok $test\n");
     curr_test(++$test);
 }
-
 
 {
     # test if defined() doesn't create any new symbols

@@ -8,7 +8,7 @@ BEGIN {
 require 'test.pl';
 use strict qw(refs subs);
 
-plan(128);
+plan(112);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -212,17 +212,6 @@ sub BASEOBJ'doit {
     $ref->{shift()};
 }
 
-package UNIVERSAL;
-our @ISA = 'LASTCHANCE';
-
-package LASTCHANCE;
-sub foo { main::is ($_[1], 'works') }
-
-package WHATEVER;
-no strict;
-eval q{foo WHATEVER "works"};
-is($@, "Undefined subroutine &WHATEVER::is called at");
-
 #
 # test the \(@foo) construct
 #
@@ -365,7 +354,7 @@ is (runperl (switches=>['-l'],
 runperl(prog => 'sub UNIVERSAL::AUTOLOAD { qr// } a->p' );
 is ($?, 0, 'UNIVERSAL::AUTOLOAD called when freeing qr//');
 
-runperl(prog => 'sub UNIVERSAL::DESTROY { warn } bless \$a, A', stderr => 1);
+runperl(prog => 'sub UNIVERSAL::DESTROY { warn } bless \$a, "A"', stderr => 1);
 is ($?, 0, 'warn called inside UNIVERSAL::DESTROY');
 
 
@@ -473,10 +462,8 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
 
 # test dereferencing errors
 {
-    format STDERR =
-.
     my $ref;
-    foreach $ref (*STDOUT{IO}, *STDERR{FORMAT}) {
+    foreach $ref (*STDOUT{IO}) {
 	eval q/ $$ref /;
 	like($@, qr/Not a SCALAR reference/, "Scalar dereference");
 	eval q/ @$ref /;
@@ -486,10 +473,6 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
 	eval q/ &$ref /;
 	like($@, qr/Not a CODE reference/, "Code dereference");
     }
-
-    $ref = *STDERR{FORMAT};
-    eval q/ *$ref /;
-    like($@, qr/Not a GLOB reference/, "Glob dereference");
 
     $ref = *STDOUT{IO};
     eval q/ *$ref /;

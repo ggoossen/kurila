@@ -11,27 +11,27 @@ BEGIN {
 }
 
 #1
-fresh_perl_is('sub cm : assertion { "ok" }; use assertions Hello; print cm()',
+fresh_perl_is('sub cm : assertion { "ok" }; use assertions "Hello"; print cm()',
 	      'ok',
 	      { switches => ['-A=Hello'] }, '-A=Hello');
 
 #2
-fresh_perl_is('sub cm : assertion { "ok" }; use assertions SDFJKS; print cm()',
+fresh_perl_is('sub cm : assertion { "ok" }; use assertions "SDFJKS"; print cm()',
 	      'ok',
 	      { switches => ['-A=.*'] }, '-A=.*');
 
 #3
-fresh_perl_is('sub cm : assertion { "ok" }; use assertions Bye; print cm()',
+fresh_perl_is('sub cm : assertion { "ok" }; use assertions "Bye"; print cm()',
 	      'ok',
 	      { switches => ['-A=B.e'] }, '-A=B.e');
 
 #4
-fresh_perl_is('sub cm : assertion { "ok" }; use assertions Hello; print cm()',
+fresh_perl_is('sub cm : assertion { "ok" }; use assertions "Hello"; print cm()',
 	      '0',
 	      { switches => ['-A=NoH..o'] }, '-A=NoH..o');
 
 #5
-fresh_perl_is('sub cm : assertion { "ok" }; use assertions Hello; print cm()',
+fresh_perl_is('sub cm : assertion { "ok" }; use assertions "Hello"; print cm()',
              'ok',
              { switches => ['-A'] }, '-A');
 

@@ -85,8 +85,6 @@ Can't call method "ref" without a package or object reference at - line 1.
 ########
 chop ($str .= <DATA>);
 ########
-close ($banana);
-########
 $x=2;$y=3;$x<$y ? $x : $y += 23;print $x;
 EXPECT
 25
@@ -99,7 +97,7 @@ chop($file = <DATA>);
 ########
 package N;
 sub new {my ($obj,$n)=@_; bless \$n}  
-$aa=new N 1;
+$aa=N->new(1);
 $aa=12345;
 print $aa;
 EXPECT
@@ -123,10 +121,10 @@ $_ x 4;}
 EXPECT
 Modification of a read-only value attempted at - line 3.
 ########
-package FOO;sub new {bless {FOO => BAR}};
+package FOO;sub new {bless {FOO => 'BAR'}};
 package main;
-use strict vars;   
-my $self = new FOO;
+use strict 'vars';   
+my $self = FOO->new();
 print $$self{FOO};
 EXPECT
 BAR
@@ -158,9 +156,9 @@ sub ShowShell
   local($i) = @_;
 }
  
-&ShowShell(&NewShell(beach,Work,"+0+0"));
-&ShowShell(&NewShell(beach,Work,"+0+0"));
-&ShowShell(&NewShell(beach,Work,"+0+0"));
+&ShowShell(&NewShell("beach","Work","+0+0"));
+&ShowShell(&NewShell("beach","Work","+0+0"));
+&ShowShell(&NewShell("beach","Work","+0+0"));
 ########
    {
        package FAKEARRAY;
@@ -175,8 +173,8 @@ sub ShowShell
        sub DESTROY { print "DESTROY \n"; undef @{$_[0]}; }
    }
    
-eval 'tie @h, FAKEARRAY, fred' ;
-tie @h, FAKEARRAY, fred ;
+eval 'tie @h, "FAKEARRAY", "fred"' ;
+tie @h, "FAKEARRAY", "fred" ;
 EXPECT
 TIEARRAY FAKEARRAY fred
 TIEARRAY FAKEARRAY fred
@@ -294,6 +292,7 @@ EXPECT
 happy joy
 ########
 $stimpy = 'happy';
+no strict 'refs';
 { local $main::{ren} = *stimpy; print ${'ren'}, ' ' }
 print +(defined(${'ren'}) ? 'oops' : 'joy'), "\n";
 EXPECT
@@ -391,7 +390,7 @@ package X;
 sub ascalar { my $r; bless \$r }
 sub DESTROY { print "destroyed\n" };
 package main;
-*s = ascalar X;
+*s = X->ascalar();
 EXPECT
 destroyed
 ########
@@ -399,7 +398,7 @@ package X;
 sub anarray { bless [] }
 sub DESTROY { print "destroyed\n" };
 package main;
-*a = anarray X;
+*a = X->anarray();
 EXPECT
 destroyed
 ########
@@ -407,7 +406,7 @@ package X;
 sub ahash { bless {} }
 sub DESTROY { print "destroyed\n" };
 package main;
-*h = ahash X;
+*h = X->ahash();
 EXPECT
 destroyed
 ########
@@ -415,18 +414,19 @@ package X;
 sub aclosure { my $x; bless sub { ++$x } }
 sub DESTROY { print "destroyed\n" };
 package main;
-*c = aclosure X;
+*c = X->aclosure;
 EXPECT
 destroyed
 ########
+no strict "refs";
 package X;
 sub any { bless {} }
 my $f = "FH000"; # just to thwart any future optimisations
 sub afh { select select ++$f; my $r = *{$f}{IO}; delete $X::{$f}; bless $r }
 sub DESTROY { print "destroyed\n" }
 package main;
-$x = any X; # to bump sv_objcount. IO objs aren't counted??
-*f = afh X;
+$x = X->any(); # to bump sv_objcount. IO objs aren't counted??
+*f = X->afh();
 EXPECT
 destroyed
 destroyed
@@ -571,24 +571,6 @@ die qr(x)
 EXPECT
 (?-uxism:x)
 ########
-# 20001210.003 mjd@plover.com
-format REMITOUT_TOP =
-FOO
-.
-
-format REMITOUT =
-BAR
-.
-
-# This loop causes a segv in 5.6.0
-for $lineno (1..61) {
-   write REMITOUT;
-}
-
-print "It's OK!";
-EXPECT
-It's OK!
-########
 # Inaba Hiroto
 reset;
 if (0) {
@@ -647,7 +629,7 @@ END {
 }
 package Bar;
 sub new {
-    my Bar $self = bless [], Bar;
+    my Bar $self = bless [], 'Bar';
     eval '$self';
     return $self;
 }
@@ -760,20 +742,6 @@ ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 $eval = eval 'sub { eval "sub { %S }" }';
 $eval->({});
-######## [perl #17951] Strange UTF error
--W
-# From: "John Kodis" <kodis@mail630.gsfc.nasa.gov>
-# Newsgroups: comp.lang.perl.moderated
-# Subject: Strange UTF error
-# Date: Fri, 11 Oct 2002 16:19:58 -0400
-# Message-ID: <pan.2002.10.11.20.19.48.407190@mail630.gsfc.nasa.gov>
-$_ = "foobar\n";
-utf8::upgrade($_); # the original code used a UTF-8 locale (affects STDIN)
-# matching is actually irrelevant: avoiding several dozen of these
-# Illegal hexadecimal digit '	' ignored at /usr/lib/perl5/5.8.0/utf8_heavy.pl line 152
-# is what matters.
-/^([[:digit:]]+)/;
-EXPECT
 ######## [perl #20667] unicode regex vs non-unicode regex
 $toto = 'Hello';
 $toto =~ /\w/; # this line provokes the problem!
@@ -786,10 +754,6 @@ if ($name =~ /(\p{IsUpper}) (\p{IsUpper})/u){
 }
 EXPECT
 It's good! >A< >B<
-######## [perl #8760] strangness with utf8 and warn
-$_="foo";utf8::upgrade($_);/bar/i,warn$_;
-EXPECT
-foo at - line 1.
 ######## glob() bug Mon, 01 Sep 2003 02:25:41 -0700 <200309010925.h819Pf0X011457@smtp3.ActiveState.com>
 -lw
 BEGIN {
