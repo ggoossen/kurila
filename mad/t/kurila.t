@@ -58,6 +58,61 @@ bless {}, 'CLASS';
 END
 
     p5convert( split(m/^====\n/m, <<'END'), 1 );
+require overload;
+====
+require overload;
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+foo => 'bar';
+====
+foo => 'bar';
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+{ foo => 'bar', noot => "mies" };
+====
+{ foo => 'bar', noot => "mies" };
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+$aap{noot};
+====
+$aap{noot};
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+exists $aap->{noot};
+====
+exists $aap->{noot};
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+Foo->new(-Level);
+====
+Foo->new(-Level);
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+$foo->SUPER::aap();
+====
+$foo->SUPER::aap();
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+sort Foo::aap 1,2,3;
+====
+sort Foo::aap 1,2,3;
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+sort aap 1,2,3;
+====
+sort aap 1,2,3;
+END
+}
+=======
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
 bless {}, CLASS;
 ====
 bless {}, 'CLASS';
@@ -98,23 +153,5 @@ END
 Foo->new(-Level);
 ====
 Foo->new(-Level);
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
-$foo->SUPER::aap();
-====
-$foo->SUPER::aap();
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
-sort Foo::aap 1,2,3;
-====
-sort Foo::aap 1,2,3;
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
-sort aap 1,2,3;
-====
-sort aap 1,2,3;
 END
 }

@@ -74,6 +74,21 @@ sub const_handler {
         return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key=","][@val="=&gt;"]|);
     }
 
+    # keep qq| $aap{noot} |
+    return if $const->parent->tag eq "op_helem";
+    return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "helem";
+
+    # keep qq| -Level |
+    return if $const->parent->tag eq "op_negate";
+    return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "negate";
+
+    {
+        # keep qq| foo => |
+        my $x = $const->parent->tag eq "op_null" ? $const->parent : $const;
+        my ($next) = $x->parent->child($x->pos + 1);
+        return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key=","][@val="=&gt;"]|);
+    }
+
     # Make it a string constant
     my ($madprops) = $twig->findnodes([$const], q|madprops|);
     $const->del_att('private');
