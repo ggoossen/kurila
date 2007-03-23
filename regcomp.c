@@ -155,7 +155,7 @@ typedef struct RExC_state_t {
 #define RExC_end	(pRExC_state->end)
 #define RExC_parse	(pRExC_state->parse)
 #define RExC_whilem_seen	(pRExC_state->whilem_seen)
-#define RExC_offsets	(pRExC_state->rxi->offsets) /* I am not like the others */
+#define RExC_offsets	(pRExC_state->rxi->u.offsets) /* I am not like the others */
 #define RExC_emit	(pRExC_state->emit)
 #define RExC_emit_start	(pRExC_state->emit_start)
 #define RExC_emit_bound	(pRExC_state->emit_bound)
@@ -3847,7 +3847,6 @@ Perl_re_compile(pTHX_ char *exp, char *xend, PMOP *pm)
 		       PL_colors[4],PL_colors[5],s);
     });
 
-redo_first_pass:
     RExC_precomp = exp;
     RExC_flags = pm->op_pmflags;
     RExC_sawback = 0;
@@ -3886,25 +3885,6 @@ redo_first_pass:
     if (reg(pRExC_state, 0, &flags,1) == NULL) {
 	RExC_precomp = NULL;
 	return(NULL);
-    }
-    if (RExC_utf8 && !RExC_orig_utf8) {
-        /* It's possible to write a regexp in ascii that represents unicode
-        codepoints outside of the byte range, such as via \x{100}. If we
-        detect such a sequence we have to convert the entire pattern to utf8
-        and then recompile, as our sizing calculation will have been based
-        on 1 byte == 1 character, but we will need to use utf8 to encode
-        at least some part of the pattern, and therefore must convert the whole
-        thing.
-        XXX: somehow figure out how to make this less expensive...
-        -- dmq */
-        STRLEN len = xend-exp;
-        DEBUG_PARSE_r(PerlIO_printf(Perl_debug_log,
-	    "UTF8 mismatch! Converting to utf8 for resizing and compile\n"));
-        exp = (char*)Perl_bytes_to_utf8(aTHX_ (U8*)exp, &len);
-        xend = exp + len;
-        RExC_orig_utf8 = RExC_utf8;
-        SAVEFREEPV(exp);
-        goto redo_first_pass;
     }
     DEBUG_PARSE_r({
         PerlIO_printf(Perl_debug_log, 
@@ -4000,13 +3980,13 @@ redo_first_pass:
     }
 
     /* Useful during FAIL. */
-    Newxz(ri->offsets, 2*RExC_size+1, U32); /* MJD 20001228 */
-    if (ri->offsets) {
-	ri->offsets[0] = RExC_size;
+    Newxz(ri->u.offsets, 2*RExC_size+1, U32); /* MJD 20001228 */
+    if (ri->u.offsets) {
+	ri->u.offsets[0] = RExC_size;
     }
     DEBUG_OFFSETS_r(PerlIO_printf(Perl_debug_log,
                           "%s %"UVuf" bytes for offset annotations.\n",
-                          ri->offsets ? "Got" : "Couldn't get",
+                          ri->u.offsets ? "Got" : "Couldn't get",
                           (UV)((2*RExC_size+1) * sizeof(U32))));
 
     RExC_rx = r;
@@ -4468,15 +4448,15 @@ reStudy:
         PerlIO_printf(Perl_debug_log,"Final program:\n");
         regdump(r);
     });
-    DEBUG_OFFSETS_r(if (ri->offsets) {
-        const U32 len = ri->offsets[0];
+    DEBUG_OFFSETS_r(if (ri->u.offsets) {
+        const U32 len = ri->u.offsets[0];
         U32 i;
         GET_RE_DEBUG_FLAGS_DECL;
-        PerlIO_printf(Perl_debug_log, "Offsets: [%"UVuf"]\n\t", (UV)ri->offsets[0]);
+        PerlIO_printf(Perl_debug_log, "Offsets: [%"UVuf"]\n\t", (UV)ri->u.offsets[0]);
         for (i = 1; i <= len; i++) {
-            if (ri->offsets[i*2-1] || ri->offsets[i*2])
+            if (ri->u.offsets[i*2-1] || ri->u.offsets[i*2])
                 PerlIO_printf(Perl_debug_log, "%"UVuf":%"UVuf"[%"UVuf"] ",
-                (UV)i, (UV)ri->offsets[i*2-1], (UV)ri->offsets[i*2]);
+                (UV)i, (UV)ri->u.offsets[i*2-1], (UV)ri->u.offsets[i*2]);
             }
         PerlIO_printf(Perl_debug_log, "\n");
     });
@@ -8358,12 +8338,8 @@ Perl_pregfree(pTHX_ struct regexp *r)
     if (r->substrs) {
         if (r->anchored_substr)
             SvREFCNT_dec(r->anchored_substr);
-        if (r->anchored_utf8)
-            SvREFCNT_dec(r->anchored_utf8);
         if (r->float_substr)
             SvREFCNT_dec(r->float_substr);
-        if (r->float_utf8)
-            SvREFCNT_dec(r->float_utf8);
 	Safefree(r->substrs);
     }
     RX_MATCH_COPY_FREE(r);
@@ -8460,7 +8436,7 @@ Perl_regfree_internal(pTHX_ struct regexp *r)
         }
     });
 
-    Safefree(ri->offsets);             /* 20010421 MJD */
+    Safefree(ri->u.offsets);             /* 20010421 MJD */
     if (ri->data) {
 	int n = ri->data->count;
 	PAD* new_comppad = NULL;
@@ -8669,7 +8645,7 @@ Perl_regdupe_internal(pTHX_ const regexp *r, CLONE_PARAMS *param)
     RXi_GET_DECL(r,ri);
     
     npar = r->nparens+1;
-    len = ri->offsets[0];
+    len = ri->u.offsets[0];
     
     Newxc(reti, sizeof(regexp_internal) + (len+1)*sizeof(regnode), char, regexp_internal);
     Copy(ri->program, reti->program, len+1, regnode);
@@ -8738,8 +8714,8 @@ Perl_regdupe_internal(pTHX_ const regexp *r, CLONE_PARAMS *param)
 
     reti->name_list_idx = ri->name_list_idx;
 
-    Newx(reti->offsets, 2*len+1, U32);
-    Copy(ri->offsets, reti->offsets, 2*len+1, U32);
+    Newx(reti->u.offsets, 2*len+1, U32);
+    Copy(ri->u.offsets, reti->u.offsets, 2*len+1, U32);
     
     return (void*)reti;
 }
