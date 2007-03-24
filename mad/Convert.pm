@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Nomad;
-use MAD;
 
 sub convert {
     my ($input, $convert) = @_;
@@ -22,7 +21,9 @@ sub convert {
 
     # XML dump
     unlink "$file.xml";
-    my $lib = "-I ../lib -I ../t/lib/compress";
+    use File::Basename;
+    my (undef, $dir, undef) = File::Basename::fileparse($file);
+    my $lib = "-I ../lib -I ../t/lib/compress -I $dir";
     `PERL_XMLDUMP='$file.xml' $ENV{madpath}/perl $lib $file.in 2> tmp.err`;
     if (not -s "$file.xml") {
         die "madskills failed. No XML dump";

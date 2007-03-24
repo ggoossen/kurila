@@ -49,6 +49,7 @@ sub entersub_handler {
 sub const_handler {
     my ($twig, $const) = @_;
 
+    return;
     # Convert BARE words
 
     # real bareword
