@@ -16,7 +16,10 @@ use Fatal qw|open close|;
     my $fh;
     open $fh, '+<', "$filename";
     my $input = $fh->getline;
-    my $output = eval { Convert::convert($input, "/usr/bin/perl ../mad/p5kurila.pl") };
+    use File::Basename;
+    my (undef, $dir, undef) = File::Basename::fileparse($filename);
+    my $output = eval { Convert::convert($input, "/usr/bin/perl ../mad/p5kurila.pl",
+                                         switches => "-I $dir") };
     if ($output) {
         seek $fh, 0, 0;
         $fh->print($output);
