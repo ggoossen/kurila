@@ -8,7 +8,7 @@ BEGIN {
    my $THISDIR = abs_path(dirname $0);
    unshift @INC, $THISDIR;
    require "testcmp.pl";
-   import TestCompare;
+   TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
    push @INC, map { File::Spec->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
 }

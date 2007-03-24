@@ -221,7 +221,7 @@ sub STORABLE_thaw {
 
 package main;
 
-my $bar = new Bar;
+my $bar = Bar->new();
 my $bar2 = thaw freeze $bar;
 
 ok 24, ref($bar2) eq 'Bar';

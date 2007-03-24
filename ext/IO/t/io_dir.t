@@ -29,7 +29,7 @@ print "1..10\n";
 
 my $DIR = $^O eq 'MacOS' ? ":" : ".";
 
-$dot = new IO::Dir $DIR;
+$dot = IO::Dir->new( $DIR);
 ok(defined($dot));
 
 @a = sort <*>;
