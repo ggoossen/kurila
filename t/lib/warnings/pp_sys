@@ -12,19 +12,6 @@
   printf() on unopened filehandle abc		[pp_prtf]
     $a = "abc"; printf $a "fred"
 
-  Filehandle %s opened only for input		[pp_leavewrite]
-    format STDIN =
-    .
-    write STDIN;
-
-  write() on closed filehandle %s		[pp_leavewrite]
-    format STDIN =
-    .
-    close STDIN;
-    write STDIN ;
-
-  page overflow	 				[pp_leavewrite]
-
   printf() on unopened filehandle abc		[pp_prtf]
     $a = "abc"; printf $a "fred"
 
@@ -116,52 +103,6 @@ $c = tie $d, 'main';
 untie $d ;
 EXPECT
 untie attempted while 1 inner references still exist at - line 5.
-########
-# pp_sys.c [pp_leavewrite]
-use warnings 'io' ;
-format STDIN =
-.
-write STDIN;
-no warnings 'io' ;
-write STDIN;
-EXPECT
-Filehandle STDIN opened only for input at - line 5.
-########
-# pp_sys.c [pp_leavewrite]
-use warnings 'closed' ;
-format STDIN =
-.
-close STDIN;
-write STDIN;
-opendir STDIN, ".";
-write STDIN;
-closedir STDIN;
-no warnings 'closed' ;
-write STDIN;
-opendir STDIN, ".";
-write STDIN;
-EXPECT
-write() on closed filehandle STDIN at - line 6.
-write() on closed filehandle STDIN at - line 8.
-	(Are you trying to call write() on dirhandle STDIN?)
-########
-# pp_sys.c [pp_leavewrite]
-use warnings 'io' ;
-format STDOUT_TOP =
-abc
-.
-format STDOUT =
-def
-ghi
-.
-$= = 1 ;
-$- =1 ;
-open STDOUT, ">".($^O eq 'VMS'? 'NL:' : '/dev/null') ;
-write ;
-no warnings 'io' ;
-write ;
-EXPECT
-page overflow at - line 13.
 ########
 # pp_sys.c [pp_prtf]
 use warnings 'unopened' ;

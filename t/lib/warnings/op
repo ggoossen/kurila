@@ -724,18 +724,6 @@ EXPECT
 Constant subroutine main::fred redefined at - line 4.
 ########
 # op.c
-use warnings 'redefine' ;
-format FRED =
-.
-format FRED =
-.
-no warnings 'redefine' ;
-format FRED =
-.
-EXPECT
-Format FRED redefined at - line 5.
-########
-# op.c
 use warnings 'deprecated' ;
 push FRED;
 no warnings 'deprecated' ;

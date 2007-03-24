@@ -4,7 +4,7 @@ print "1..80\n";
 
 use strict;
 
-our ($i, @x, $y, $c, $foo, @ary, $loop_count, Warray, $r);
+our ($i, @x, $y, $c, $foo, @ary, $loop_count, @array, $r, $TODO);
 
 for ($i = 0; $i <= 10; $i++) {
     $x[$i] = $i;

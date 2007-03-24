@@ -30,7 +30,7 @@ while (<DATA>)
       {
       @args = split(/:/,$_,99); $ans = pop(@args);
       }
-    $try = "\$x = new $class \"$args[0]\";";
+    $try = "\$x = $class->new(\"$args[0]\");";
     if ($f eq "bnorm")
       {
         $try .= "\$x;";
@@ -83,7 +83,7 @@ while (<DATA>)
       }
     else
       {
-      $try .= "\$y = new $class \"$args[1]\";";
+      $try .= "\$y = $class->new(\"$args[1]\");";
       if ($f eq "bcmp") {
         $try .= '$x <=> $y;';
       } elsif ($f eq "bacmp") {

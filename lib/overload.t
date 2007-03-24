@@ -237,7 +237,7 @@ is($b, "360");
 is($copies, 2);
 
 eval q[package Oscalar; 
-       use overload ('x' => sub {new Oscalar ( $_[2] ? "_.$_[1]._" x $ {$_[0]}
+       use overload ('x' => sub {Oscalar->new( $_[2] ? "_.$_[1]._" x $ {$_[0]}
 					      : "_.${$_[0]}._" x $_[1])}) ];
 
 $a= Oscalar->new( "yy");
@@ -245,7 +245,7 @@ $a x= 3;
 is($a, "_.yy.__.yy.__.yy._");
 
 eval q[package Oscalar; 
-       use overload ('.' => sub {new Oscalar ( $_[2] ? 
+       use overload ('.' => sub {Oscalar->new( $_[2] ? 
 					      "_.$_[1].__.$ {$_[0]}._"
 					      : "_.$ {$_[0]}.__.$_[1]._")}) ];
 

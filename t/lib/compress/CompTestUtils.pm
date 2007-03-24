@@ -179,16 +179,19 @@ sub readHeaderInfo
 some text
 EOM
 
-    ok my $x = new IO::Compress::Gzip $name, %opts 
+    my $x;
+    ok $x = new IO::Compress::Gzip $name, %opts 
         or diag "GzipError is $IO::Compress::Gzip::GzipError" ;
     ok $x->write($string) ;
     ok $x->close ;
 
     #is GZreadFile($name), $string ;
 
-    ok my $gunz = new IO::Uncompress::Gunzip $name, Strict => 0
+    my $gunz;
+    ok $gunz = new IO::Uncompress::Gunzip $name, Strict => 0
         or diag "GunzipError is $IO::Uncompress::Gunzip::GunzipError" ;
-    ok my $hdr = $gunz->getHeaderInfo();
+    my $hdr;
+    ok $hdr = $gunz->getHeaderInfo();
     my $uncomp ;
     ok $gunz->read($uncomp) ;
     ok $uncomp eq $string;

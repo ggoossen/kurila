@@ -1154,10 +1154,10 @@ sub new
 use abc ;
 no warnings;
 use warnings 'abc';
-$a = new abc ;
+$a = abc->new();
 $a->in1() ;
 print "**\n";
-$b = new def ;
+$b = def->new();
 $b->in1() ;
 EXPECT
 ok1

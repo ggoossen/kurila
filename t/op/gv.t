@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 
 require './test.pl';
-plan( tests => 150 );
+plan( tests => 154 );
 
 no strict;
 
@@ -132,6 +132,7 @@ $x = "ok $test\n";
 sub x { "ok $test\n" }
 print ${*x{SCALAR}}, @{*x{ARRAY}}, %{*x{HASH}}, &{*x{CODE}};
 
+curr_test(++$test);
 *x = *STDOUT;
 is (*{*x{GLOB}}, "*main::STDOUT");
 

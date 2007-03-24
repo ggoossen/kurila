@@ -124,22 +124,6 @@ toke.c	AOK
         *foo *foo
 
 __END__
-# toke.c 
-use warnings 'deprecated' ;
-format STDOUT =
-@<<<  @|||  @>>>  @>>>
-$a    $b    "abc" 'def'
-.
-no warnings 'deprecated' ;
-format STDOUT =
-@<<<  @|||  @>>>  @>>>
-$a    $b    "abc" 'def'
-.
-EXPECT
-Use of comma-less variable list is deprecated at - line 5.
-Use of comma-less variable list is deprecated at - line 5.
-Use of comma-less variable list is deprecated at - line 5.
-########
 # toke.c
 use warnings 'deprecated' ;
 $a = <<;

@@ -1012,7 +1012,7 @@ BEGIN {
   if ($ENV{PERL5DB_THREADED}) {
 	require threads;
 	require threads::shared;
-	import threads::shared qw(share);
+	threads::shared->import(qw(share));
 	$DBGR;
 	share(\$DBGR);
 	lock($DBGR);
@@ -1714,7 +1714,7 @@ and then tries to connect the input and output filehandles to it.
         # If RemotePort was defined in the options, connect input and output
         # to the socket.
         require IO::Socket;
-        $OUT = new IO::Socket::INET(
+        $OUT = IO::Socket::INET->new(
             Timeout  => '10',
             PeerAddr => $remoteport,
             Proto    => 'tcp',
@@ -6045,7 +6045,7 @@ sub setterm {
             my $rv = $ENV{PERLDB_NOTTY} || "$ENV{HOME}/.perldbtty$$";
 
             # Rendezvous and get the filehandles.
-            my $term_rv = new Term::Rendezvous $rv;
+            my $term_rv = Term::Rendezvous->new($rv);
             $IN  = $term_rv->IN;
             $OUT = $term_rv->OUT;
         } ## end else [ if ($tty)
@@ -6058,12 +6058,12 @@ sub setterm {
 
     # If we shouldn't use Term::ReadLine, don't.
     if ( !$rl ) {
-        $term = new Term::ReadLine::Stub 'perldb', $IN, $OUT;
+        $term = Term::ReadLine::Stub->new('perldb', $IN, $OUT);
     }
 
     # We're using Term::ReadLine. Get all the attributes for this terminal.
     else {
-        $term = new Term::ReadLine 'perldb', $IN, $OUT;
+        $term = Term::ReadLine->new('perldb', $IN, $OUT);
 
         $rl_attribs = $term->Attribs;
         $rl_attribs->{basic_word_break_characters} .= '-:+/*,[])}'
@@ -6808,10 +6808,10 @@ sub TTY {
     if ( @_ and ($^O eq 'VMS') and !defined($term) ) {
 	eval { require Term::ReadLine } or die $@;
         if ( !$rl ) {
-	    $term = new Term::ReadLine::Stub 'perldb', $IN, $OUT;
+	    $term = Term::ReadLine::Stub->new( 'perldb', $IN, $OUT);
 	}
 	else {
-	    $term = new Term::ReadLine 'perldb', $IN, $OUT;
+	    $term = Term::ReadLine->new( 'perldb', $IN, $OUT);
 	}
     }
     if ( @_ and $term and $term->Features->{newTTY} ) {
