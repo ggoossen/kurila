@@ -384,7 +384,6 @@ typedef struct regmatch_state {
 	    struct regmatch_state *prev_yes_state;
 	    I32 wanted;
 	    I32 logical;	/* saved copy of 'logical' var */
-	    char* locinputbehind;	/* last position tried in lookbehind */
 	    regnode  *me; /* the IFMATCH/SUSPEND/UNLESSM node  */
 	} ifmatch; /* and SUSPEND/UNLESSM */
 	

@@ -1981,6 +1981,9 @@ Perl_regexec_flags(pTHX_ register regexp *prog, char *stringarg, register char *
     goto phooey;
 
 got_it:
+    DEBUG_EXECUTE_r(
+	PerlIO_printf(Perl_debug_log,
+		      "Can't trim the tail, match fails (should not happen)%d\n", PL_reg_flags & RF_tainted));
     RX_MATCH_TAINTED_set(prog, PL_reg_flags & RF_tainted);
 
     if (PL_reg_eval_set) {
@@ -4544,25 +4547,22 @@ NULL
 	case IFMATCH:	/* +ve lookaround: (?=A), or with flags, (?<=A) */
 	    ST.wanted = 1;
 	  ifmatch_trivial_fail_test:
-		DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log,
-					      "lookbehind %p %p %d\n", PL_bostr, PL_reginput, scan->flags));
-	    if (scan->flags & RNf_IFMATCH_LOOKBEHIND) {
-/* 		char * const s = PL_bostr; */
-/* 		if (!s) { */
-/* 		    /\* trivial fail *\/ */
-/* 		    if (logical) { */
-/* 			logical = 0; */
-/* 			sw = 1 - (bool)ST.wanted; */
-/* 		    } */
-/* 		    else if (ST.wanted) */
-/* 			sayNO; */
-/* 		    next = scan + ARG(scan); */
-/* 		    if (next == scan) */
-/* 			next = NULL; */
-/* 		    break; */
-/* 		} */
-/* 		PL_reginput = s; */
-		ST.locinputbehind = PL_reginput = locinput;
+	    if (scan->flags) {
+		char * const s = HOPBACKc(locinput, scan->flags);
+		if (!s) {
+		    /* trivial fail */
+		    if (logical) {
+			logical = 0;
+			sw = 1 - (bool)ST.wanted;
+		    }
+		    else if (ST.wanted)
+			sayNO;
+		    next = scan + ARG(scan);
+		    if (next == scan)
+			next = NULL;
+		    break;
+		}
+		PL_reginput = s;
 	    }
 	    else
 		PL_reginput = locinput;
@@ -4579,18 +4579,6 @@ NULL
 	    /* FALL THROUGH */
 
 	case IFMATCH_A: /* body of (?...A) succeeded */
-	    if (ST.me->flags & RNf_IFMATCH_LOOKBEHIND) {
-		DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log,
-					      "lookbehindX %p %p\n", PL_reginput, st->locinput));
-		if (PL_reginput != st->locinput) {
-		    /* go back one char and try again */
-		    PL_reginput = --ST.locinputbehind;
-		    if (PL_reginput < PL_bostr)
-			sayNO;
-		    PUSH_YES_STATE_GOTO(IFMATCH_A, NEXTOPER(NEXTOPER(ST.me)));
-		}
-	    }
-
 	    if (ST.logical) {
 		sw = (bool)ST.wanted;
 	    }
