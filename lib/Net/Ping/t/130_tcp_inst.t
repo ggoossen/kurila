@@ -18,5 +18,5 @@ plan tests => 2;
 # Everything loaded fine
 ok 1;
 
-my $p = new Net::Ping "tcp";
+my $p = Net::Ping->new( "tcp");
 ok !!$p;

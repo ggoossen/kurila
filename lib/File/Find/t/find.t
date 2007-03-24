@@ -46,7 +46,7 @@ BEGIN {
       @File::Spec::ISA = 'File::Spec::Unix';
      }
      require File::Find;
-     import File::Find;
+     File::Find->import();
 }
 
 cleanup();

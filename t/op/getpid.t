@@ -38,7 +38,7 @@ my ($pid, $ppid) = ($$, getppid());
 my $pid2 : shared = 0;
 my $ppid2 : shared = 0;
 
-new threads( sub { ($pid2, $ppid2) = ($$, getppid()); } ) -> join();
+threads->new( sub { ($pid2, $ppid2) = ($$, getppid()); }) -> join();
 
 is($pid,  $pid2,  'pids');
 is($ppid, $ppid2, 'ppids');

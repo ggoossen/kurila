@@ -289,9 +289,9 @@ SKIP: {
 
     # test the CVS revision mode
     diag "testing CVS Revision" if $Verbose;
-    $version = new $CLASS qw$Revision: 1.2$;
+    $version = $CLASS-> new( qw$Revision: 1.2$);
     ok ( $version eq "1.2.0", 'qw$Revision: 1.2$ eq 1.2.0' );
-    $version = new $CLASS qw$Revision: 1.2.3.4$;
+    $version = $CLASS-> new( qw$Revision: 1.2.3.4$);
     ok ( $version eq "1.2.3.4", 'qw$Revision: 1.2.3.4$ eq 1.2.3.4' );
     
     # test the CPAN style reduced significant digit form

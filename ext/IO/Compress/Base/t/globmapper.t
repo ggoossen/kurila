@@ -22,7 +22,7 @@ Perl $]" )
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 68 + $extra ;
 
@@ -36,7 +36,7 @@ Perl $]" )
 
     for my $delim ( qw/ ( ) { } [ ] / )
     {
-        $gm = new File::GlobMapper("${delim}abc", '*.X');
+        $gm = File::GlobMapper->new("${delim}abc", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
             "  catch unmatched $delim";
@@ -44,7 +44,7 @@ Perl $]" )
 
     for my $delim ( qw/ ( ) [ ] / )
     {
-        $gm = new File::GlobMapper("{${delim}abc}", '*.X');
+        $gm = File::GlobMapper->new("{${delim}abc}", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
             "  catch unmatched $delim inside {}";
@@ -57,9 +57,9 @@ Perl $]" )
     title "input glob matches zero files";
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
 
-    my $gm = new File::GlobMapper("$tmpDir/Z*", '*.X');
+    my $gm = File::GlobMapper->new("$tmpDir/Z*", '*.X');
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
@@ -74,12 +74,12 @@ Perl $]" )
     title 'test wildcard mapping of * in destination';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
-    my $gm = new File::GlobMapper("$tmpDir/ab*.tmp", "*X");
+    my $gm = File::GlobMapper->new("$tmpDir/ab*.tmp", "*X");
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
@@ -102,12 +102,12 @@ Perl $]" )
     title 'no wildcards in input or destination';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
-    my $gm = new File::GlobMapper("$tmpDir/abc2.tmp", "$tmpDir/abc2.tmp");
+    my $gm = File::GlobMapper->new("$tmpDir/abc2.tmp", "$tmpDir/abc2.tmp");
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
@@ -126,12 +126,12 @@ Perl $]" )
     title 'test wildcard mapping of {} in destination';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
-    my $gm = new File::GlobMapper("$tmpDir/abc{1,3}.tmp", "*.X");
+    my $gm = File::GlobMapper->new("$tmpDir/abc{1,3}.tmp", "*.X");
     #diag "Input pattern is $gm->{InputPattern}";
     ok $gm, "  created GlobMapper object" ;
 
@@ -142,7 +142,7 @@ Perl $]" )
           [map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmp.X)],
         ], "  got mapping";
 
-    $gm = new File::GlobMapper("$tmpDir/abc{1,3}.tmp", "$tmpDir/X.#1.X")
+    $gm = File::GlobMapper->new("$tmpDir/abc{1,3}.tmp", "$tmpDir/X.#1.X")
         or diag $File::GlobMapper::Error ;
     #diag "Input pattern is $gm->{InputPattern}";
     ok $gm, "  created GlobMapper object" ;
@@ -161,12 +161,12 @@ Perl $]" )
     title 'test wildcard mapping of multiple * to #';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
-    my $gm = new File::GlobMapper("$tmpDir/*b(*).tmp", "$tmpDir/X-#2-#1-X");
+    my $gm = File::GlobMapper->new("$tmpDir/*b(*).tmp", "$tmpDir/X-#2-#1-X");
     ok $gm, "  created GlobMapper object" 
         or diag $File::GlobMapper::Error ;
 
@@ -183,12 +183,12 @@ Perl $]" )
     title 'test wildcard mapping of multiple ? to #';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
-    my $gm = new File::GlobMapper("$tmpDir/?b(*).tmp", "$tmpDir/X-#2-#1-X");
+    my $gm = File::GlobMapper->new("$tmpDir/?b(*).tmp", "$tmpDir/X-#2-#1-X");
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
@@ -204,12 +204,12 @@ Perl $]" )
     title 'test wildcard mapping of multiple ?,* and [] to #';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
-    my $gm = new File::GlobMapper("./$tmpDir/?b[a-z]*.tmp", "./$tmpDir/X-#3-#2-#1-X");
+    my $gm = File::GlobMapper->new("./$tmpDir/?b[a-z]*.tmp", "./$tmpDir/X-#3-#2-#1-X");
     ok $gm, "  created GlobMapper object" ;
 
     #diag "Input pattern is $gm->{InputPattern}";
@@ -226,12 +226,12 @@ Perl $]" )
     title 'input glob matches a file multiple times';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch "$tmpDir/abc.tmp";
 
-    my $gm = new File::GlobMapper("$tmpDir/{a*,*c}.tmp", '*.X');
+    my $gm = File::GlobMapper->new("$tmpDir/{a*,*c}.tmp", '*.X');
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
@@ -249,12 +249,12 @@ Perl $]" )
     title 'multiple input files map to one output file';
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc def) ;
 
-    my $gm = new File::GlobMapper("$tmpDir/*.tmp", "$tmpDir/fred");
+    my $gm = File::GlobMapper->new("$tmpDir/*.tmp", "$tmpDir/fred");
     ok ! $gm, "  did not create GlobMapper object" ;
 
     is $File::GlobMapper::Error, 'multiple input files map to one output file', "  Error is expected" ;
@@ -269,7 +269,7 @@ Perl $]" )
     title "globmap" ;
 
     my $tmpDir = 'td';
-    my $lex = new LexDir $tmpDir;
+    my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;

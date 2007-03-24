@@ -35,8 +35,8 @@ sub foo {
 	$ok=1;
 }
 
-my $newaction=POSIX::SigAction->new('::foo', new POSIX::SigSet(SIGUSR1), 0);
-my $oldaction=POSIX::SigAction->new('::bar', new POSIX::SigSet(), 0);
+my $newaction=POSIX::SigAction->new('::foo', POSIX::SigSet->new(SIGUSR1), 0);
+my $oldaction=POSIX::SigAction->new('::bar', POSIX::SigSet->new(), 0);
 
 {
 	my $bad;

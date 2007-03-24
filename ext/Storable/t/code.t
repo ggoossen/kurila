@@ -207,7 +207,7 @@ ok(prototype($thawed->[4]), prototype($obj[0]->[4]));
 }
 
 {
-    my $safe = new Safe;
+    my $safe = Safe->new();
     local $Storable::Eval = sub { $safe->reval(shift) };
 
     $freezed = freeze $obj[0]->[0];
@@ -240,7 +240,7 @@ ok(prototype($thawed->[4]), prototype($obj[0]->[4]));
 }
 
 {
-    my $safe = new Safe;
+    my $safe = Safe->new();
     # because of opcodes used in "use strict":
     $safe->permit(qw(:default require));
     local $Storable::Eval = sub { $safe->reval(shift) };
@@ -265,7 +265,7 @@ ok(prototype($thawed->[4]), prototype($obj[0]->[4]));
 	}
     }
 
-    my $safe = new MySafe;
+    my $safe = MySafe->new();
     local $Storable::Eval = sub { $safe->reval($_[0]) };
 
     $freezed = freeze $obj[0];

@@ -236,7 +236,7 @@ sub load_todo
   my($file, $expver) = @_;
 
   if (-e $file) {
-    my $f = new IO::File $file or die "cannot open $file: $!\n";
+    my $f = IO::File->new( $file) or die "cannot open $file: $!\n";
     my $ver = <$f>;
     chomp $ver;
     if ($ver eq $expver) {
@@ -263,7 +263,7 @@ sub write_todo
   my($file, $ver, $sym) = @_;
   my $f;
 
-  $f = new IO::File ">$file" or die "cannot open $file: $!\n";
+  $f = IO::File->new( ">$file") or die "cannot open $file: $!\n";
   $f->print("$ver\n");
 
   for (sort keys %$sym) {

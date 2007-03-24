@@ -68,7 +68,7 @@ sub _read_config_file {
     my $file = shift or return;
 
     my $conf = {};
-    my $FH = new FileHandle;
+    my $FH = FileHandle->new();
     $FH->open("$file") or (
                         warn(loc(q[Could not open config file '%1': %2],$file,$!)),
                         return {}

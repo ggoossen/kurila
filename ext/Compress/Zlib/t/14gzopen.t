@@ -18,7 +18,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 217 + $extra ;
 
@@ -263,7 +263,7 @@ ok ! $fil->gzclose ;
     # case 1: read a line, then a block. The block is
     #         smaller than the internal block used by
     #	  gzreadline
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
     $line1 = "hello hello, I'm back again\n" ;
     $line2 = "abc" x 200 ; 
     my $line3 = "def" x 200 ;
@@ -296,12 +296,12 @@ ok ! $fil->gzclose ;
 {
     title "Pass gzopen a filehandle - use IO::File" ;
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
 
     my $hello = "hello" ;
     my $len = length $hello ;
 
-    my $f = new IO::File ">$name" ;
+    my $f = IO::File->new( ">$name") ;
     ok $f;
 
     my $fil;
@@ -311,7 +311,7 @@ ok ! $fil->gzclose ;
 
     ok ! $fil->gzclose ;
 
-    $f = new IO::File "<$name" ;
+    $f = IO::File->new( "<$name") ;
     ok $fil = gzopen($name, "rb") ;
 
     my $uncmomp;
@@ -329,7 +329,7 @@ ok ! $fil->gzclose ;
 {
     title "Pass gzopen a filehandle - use open" ;
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
 
     my $hello = "hello" ;
     my $len = length $hello ;
@@ -366,7 +366,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 
     title "Pass gzopen a filehandle - use $stdin" ;
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
 
     my $hello = "hello" ;
     my $len = length $hello ;
@@ -410,7 +410,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 
 {
     title 'test parameters for gzopen';
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
 
     my $fil;
 
@@ -439,7 +439,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 {
     title 'Read operations when opened for writing';
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
     my $fil;
     ok $fil = gzopen($name, "wb"), '  gzopen for writing' ;
     ok !$fil->gzeof(), '    !eof'; ;
@@ -450,7 +450,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 {
     title 'write operations when opened for reading';
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
     my $test = "hello" ;
     my $fil;
     ok $fil = gzopen($name, "wb"), "  gzopen for writing" ;
@@ -466,7 +466,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 
     SKIP:
     {
-        my $lex = new LexFile my $name ;
+        my $lex = LexFile->new( my $name) ;
         writeFile($name, "abc");
         chmod 0444, $name ;
 
@@ -485,7 +485,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 
     SKIP:
     {
-        my $lex = new LexFile my $name ;
+        my $lex = LexFile->new( my $name) ;
         skip "Cannot create non-readable file", 3 
             if $^O eq 'cygwin';
 
@@ -509,7 +509,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
     title "gzseek" ;
 
     my $buff ;
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
 
     my $first = "beginning" ;
     my $last  = "the end" ;
@@ -553,7 +553,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 
 {
     # seek error cases
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
 
     my $a = gzopen($name, "w");
 
@@ -583,7 +583,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 
 {
     title "gzread ver 1.x compat -- the output buffer is always zapped.";
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
 
     my $a = gzopen($name, "w");
     $a->gzwrite("fred");

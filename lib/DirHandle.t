@@ -16,7 +16,7 @@ require './test.pl';
 
 plan(5);
 
-$dot = new DirHandle ($^O eq 'MacOS' ? ':' : '.');
+$dot = DirHandle->new($^O eq 'MacOS' ? ':' : '.');
 
 ok(defined($dot));
 

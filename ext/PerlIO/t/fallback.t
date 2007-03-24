@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
     push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
     require "../t/test.pl";
-    skip_all("No perlio") unless (find PerlIO::Layer 'perlio');
+    skip_all("No perlio") unless (PerlIO::Layer->find( 'perlio'));
     if (ord("A") == 193) {
 	print "1..0 # Skip: EBCDIC\n";
 	exit 0;
@@ -15,7 +15,7 @@ BEGIN {
 	exit 0;
     }
     plan (9);
-    import Encode qw(:fallback_all);
+    Encode->import( qw(:fallback_all));
 }
 
 # $PerlIO::encoding = 0; # WARN_ON_ERR|PERLQQ;

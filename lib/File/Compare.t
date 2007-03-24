@@ -72,9 +72,9 @@ print "ok 8\n";
 
 my @donetests;
 eval {
-  require File::Spec; import File::Spec;
-  require File::Path; import File::Path;
-  require File::Temp; import File::Temp qw/ :mktemp unlink0 /;
+  require File::Spec; File::Spec->import();
+  require File::Path; File::Path->import();
+  require File::Temp; File::Temp->import( qw/ :mktemp unlink0 /);
 
   my $template = File::Spec->catfile(File::Spec->tmpdir, 'fcmpXXXX');
   my($tfh,$filename) = mkstemp($template);

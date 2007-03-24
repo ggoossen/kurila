@@ -19,7 +19,7 @@ use Compress::Raw::Zlib  2.004 qw(crc32) ;
 BEGIN
 {
     eval { require IO::Uncompress::Adapter::Bunzip2 ;
-           import  IO::Uncompress::Adapter::Bunzip2 } ;
+           IO::Uncompress::Adapter::Bunzip2->import() } ;
 }
 
 
@@ -490,8 +490,8 @@ sub _readZipHeader($)
     my $compressedMethod   = unpack ("v", substr($buffer, 8-4,  2));
     my $lastModTime        = unpack ("V", substr($buffer, 10-4, 4));
     my $crc32              = unpack ("V", substr($buffer, 14-4, 4));
-    my $compressedLength   = new U64 unpack ("V", substr($buffer, 18-4, 4));
-    my $uncompressedLength = new U64 unpack ("V", substr($buffer, 22-4, 4));
+    my $compressedLength   = U64->new( unpack ("V", substr($buffer, 18-4, 4)));
+    my $uncompressedLength = U64->new( unpack ("V", substr($buffer, 22-4, 4)));
     my $filename_length    = unpack ("v", substr($buffer, 26-4, 2)); 
     my $extra_length       = unpack ("v", substr($buffer, 28-4, 2));
 

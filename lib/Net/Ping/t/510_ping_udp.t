@@ -18,5 +18,5 @@ plan tests => 2;
 # Everything loaded fine
 ok 1;
 
-my $p = new Net::Ping "udp";
+my $p = Net::Ping->new( "udp");
 ok $p->ping("127.0.0.1");

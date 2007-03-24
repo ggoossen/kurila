@@ -61,7 +61,7 @@ SKIP: {
 SKIP: {
     skip("no sigaction support on win32/dos", 6) if $Is_W32 || $Is_Dos;
 
-    my $sigset = new POSIX::SigSet 1, 3;
+    my $sigset = POSIX::SigSet->new( 1, 3);
     $sigset->delset(1);
     ok(! $sigset->ismember(1),  'POSIX::SigSet->delset' );
     ok(  $sigset->ismember(3),  'POSIX::SigSet->ismember' );
@@ -71,8 +71,8 @@ SKIP: {
 
         my $sigint_called = 0;
 
-	my $mask   = new POSIX::SigSet &SIGINT;
-	my $action = new POSIX::SigAction 'main::SigHUP', $mask, 0;
+	my $mask   = POSIX::SigSet->new( &SIGINT);
+	my $action = POSIX::SigAction->new( 'main::SigHUP', $mask, 0);
 	sigaction(&SIGHUP, $action);
 	$SIG{'INT'} = 'SigINT';
 

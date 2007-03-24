@@ -104,7 +104,7 @@ else {
 test(22,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; »rightº</h1>');
 }
 test(23,i(p('hello there')) eq '<i><p>hello there</p></i>');
-my $q = new CGI;
+my $q = CGI->new();
 test(24,$q->h1('hi') eq '<h1>hi</h1>');
 
 $q->autoEscape(1);

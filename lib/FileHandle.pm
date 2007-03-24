@@ -88,8 +88,8 @@ sub import {
 #
 
 sub pipe {
-    my $r = new IO::Handle;
-    my $w = new IO::Handle;
+    my $r = IO::Handle->new();
+    my $w = IO::Handle->new();
     CORE::pipe($r, $w) or return undef;
     ($r, $w);
 }

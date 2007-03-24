@@ -204,7 +204,7 @@ BEGIN {
         ALL     => [ @EXPORT, @EXPORT_OK ],
     );        
 
-    my $log         = new Log::Message;
+    my $log         = Log::Message->new();
 
     for my $func ( @EXPORT, @EXPORT_OK ) {
         no strict 'refs';

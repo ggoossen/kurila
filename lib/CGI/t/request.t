@@ -32,7 +32,7 @@ $ENV{SERVER_NAME}     = 'the.good.ship.lollypop.com';
 $ENV{REQUEST_URI}     = "$ENV{SCRIPT_NAME}$ENV{PATH_INFO}?$ENV{QUERY_STRING}";
 $ENV{HTTP_LOVE}       = 'true';
 
-$q = new CGI;
+$q = CGI->new();
 test(2,$q,"CGI::new()");
 test(3,$q->request_method eq 'GET',"CGI::request_method()");
 test(4,$q->query_string eq 'game=chess;game=checkers;weather=dull',"CGI::query_string()");
@@ -61,12 +61,12 @@ test(21,!$q->param('foo'),'CGI::delete()');
 
 $q->_reset_globals;
 $ENV{QUERY_STRING}='mary+had+a+little+lamb';
-test(22,$q=new CGI,"CGI::new() redux");
+test(22,$q= CGI->new(),"CGI::new() redux");
 test(23,join(' ',$q->keywords) eq 'mary had a little lamb','CGI::keywords');
 test(24,join(' ',$q->param('keywords')) eq 'mary had a little lamb','CGI::keywords');
-test(25,$q=new CGI('foo=bar&foo=baz'),"CGI::new() redux");
+test(25,$q= CGI->new('foo=bar&foo=baz'),"CGI::new() redux");
 test(26,$q->param('foo') eq 'bar','CGI::param() redux');
-test(27,$q=new CGI({'foo'=>'bar','bar'=>'froz'}),"CGI::new() redux 2");
+test(27,$q= CGI->new({'foo'=>'bar','bar'=>'froz'}),"CGI::new() redux 2");
 test(28,$q->param('bar') eq 'froz',"CGI::param() redux 2");
 
 # test tied interface
@@ -88,7 +88,7 @@ if ($Config{d_fork}) {
     exit 0;
   }
   # at this point, we're in a new (child) process
-  test(31,$q=new CGI,"CGI::new() from POST");
+  test(31,$q= CGI->new(),"CGI::new() from POST");
   test(32,$q->param('weather') eq 'nice',"CGI::param() from POST");
   test(33,$q->url_param('big_balls') eq 'basketball',"CGI::url_param()");
 } else {

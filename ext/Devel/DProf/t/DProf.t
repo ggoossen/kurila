@@ -47,11 +47,11 @@ sub profile {
 	local $ENV{PERL5LIB} = $perl5lib;
 	my $opt_d = '-d:DProf';
 
-	my $t_start = new Benchmark;
+	my $t_start = Benchmark->new();
 	open( R, "$perl -f \"$opt_d\" $test |" ) || warn "$0: Can't run. $!\n";
 	@results = <R>;
 	close R or warn "Could not close: $!";
-	my $t_total = timediff( new Benchmark, $t_start );
+	my $t_total = timediff( Benchmark->new(), $t_start );
 
 	if( $opt_v ){
 		print "\n";

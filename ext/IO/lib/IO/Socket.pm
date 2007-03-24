@@ -115,7 +115,7 @@ sub connect {
 	if (defined $timeout && ($!{EINPROGRESS} || $!{EWOULDBLOCK})) {
 	    require IO::Select;
 
-	    my $sel = new IO::Select $sock;
+	    my $sel = IO::Select->new( $sock);
 
 	    undef $!;
 	    if (!$sel->can_write($timeout)) {
@@ -210,7 +210,7 @@ sub accept {
     if(defined $timeout) {
 	require IO::Select;
 
-	my $sel = new IO::Select $sock;
+	my $sel = IO::Select->new( $sock);
 
 	unless ($sel->can_read($timeout)) {
 	    $@ = 'accept: timeout';

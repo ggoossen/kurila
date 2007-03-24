@@ -27,7 +27,7 @@ use IO::Seekable;
 
 print "1..4\n";
 
-$x = new_tmpfile IO::File or print "not ";
+$x = IO::File->new_tmpfile() or print "not ";
 print "ok 1\n";
 print $x "ok 2\n";
 $x->seek(0,SEEK_SET);

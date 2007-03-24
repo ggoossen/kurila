@@ -35,7 +35,7 @@ BEGIN {use_ok( "File::Temp" ); }
 
 # Tempfile
 # Open tempfile in some directory, unlink at end
-my $fh = new File::Temp( SUFFIX => '.txt' );
+my $fh = File::Temp->new( SUFFIX => '.txt');
 
 ok( (-f "$fh"), "File $fh exists"  );
 # Should still be around after closing
@@ -59,10 +59,9 @@ ok( (-d $tempdir), "Does $tempdir directory exist" );
 push(@dirs, $tempdir);
 
 # Create file in the temp dir
-$fh = new File::Temp(
+$fh = File::Temp->new(
 		     DIR => $tempdir,
-		     SUFFIX => '.dat',
-		    );
+		     SUFFIX => '.dat',);
 
 ok( $fh->unlink_on_destroy, "should unlink");
 print "# TEMPFILE: Created $fh\n";
@@ -72,7 +71,7 @@ push(@files, "$fh");
 
 # Test tempfile
 # ..and again (without unlinking it)
-$fh = new File::Temp( DIR => $tempdir, UNLINK => 0 );
+$fh = File::Temp->new( DIR => $tempdir, UNLINK => 0);
 
 print "# TEMPFILE: Created $fh\n";
 ok( (-f "$fh" ), "Second file $fh exists in tempdir [nounlink]?");
@@ -80,10 +79,9 @@ push(@files, "$fh");
 
 # and another (with template)
 
-$fh = new File::Temp( TEMPLATE => 'helloXXXXXXX',
+$fh = File::Temp->new( TEMPLATE => 'helloXXXXXXX',
 		      DIR => $tempdir,
-		      SUFFIX => '.dat',
-		    );
+		      SUFFIX => '.dat',);
 
 print "# TEMPFILE: Created $fh\n";
 
@@ -93,7 +91,7 @@ push(@files, "$fh");
 
 # Create a temporary file that should stay around after
 # it has been closed
-$fh = new File::Temp( TEMPLATE => 'permXXXXXXX', UNLINK => 0);
+$fh = File::Temp->new( TEMPLATE => 'permXXXXXXX', UNLINK => 0);
 
 print "# TEMPFILE: Created $fh\n";
 ok( -f "$fh", "File $fh exists?" );
@@ -103,7 +101,7 @@ push( @still_there, "$fh"); # check at END
 
 # Now create a temp file that will remain when the object
 # goes out of scope because of $KEEP_ALL
-$fh = new File::Temp( TEMPLATE => 'permXXXXXXX', UNLINK => 1);
+$fh = File::Temp->new( TEMPLATE => 'permXXXXXXX', UNLINK => 1);
 
 print "# TEMPFILE: Created $fh\n";
 ok( -f "$fh", "File $fh exists?" );
@@ -120,4 +118,6 @@ $File::Temp::KEEP_ALL = 0;
 
 # Now END block will execute to test the removal of directories
 print "# End of tests. Execute END blocks\n";
+
+ocks\n";
 

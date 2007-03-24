@@ -47,7 +47,7 @@ print "1..10\n";
 if ($is_win32) {
     print "ok $_ # skipped: $is_win32\n" for 1..4;
 } else {
-    $pipe = new IO::Pipe->reader($perl, '-e', 'print qq(not ok 1\n)');
+    $pipe = IO::Pipe->new()->reader($perl, '-e', 'print qq(not ok 1\n)');
     while (<$pipe>) {
       s/^not //;
       print;
@@ -55,7 +55,7 @@ if ($is_win32) {
     $pipe->close or print "# \$!=$!\nnot ";
     print "ok 2\n";
     $cmd = 'BEGIN{$SIG{ALRM} = sub {print qq(not ok 4\n); exit}; alarm 10} s/not //';
-    $pipe = new IO::Pipe->writer($perl, '-pe', $cmd);
+    $pipe = IO::Pipe->new()->writer($perl, '-pe', $cmd);
     print $pipe "not ok 3\n" ;
     $pipe->close or print "# \$!=$!\nnot ";
     print "ok 4\n";
@@ -68,7 +68,7 @@ if ($^O eq 'os2' and
     exit 0;
 }
 
-$pipe = new IO::Pipe;
+$pipe = IO::Pipe->new();
 
 $pid = fork();
 
@@ -95,7 +95,7 @@ else
 if ($is_win32) {
     print "ok $_ # skipped: $is_win32\n" for 7..8;
 } else {
-    $pipe = new IO::Pipe;
+    $pipe = IO::Pipe->new();
     $pid = fork();
 
     if($pid)
@@ -125,7 +125,7 @@ if ($is_win32) {
 if ($is_win32) {
     print "ok $_ # skipped: $is_win32\n" for 9;
 } else {
-    $pipe = new IO::Pipe;
+    $pipe = IO::Pipe->new();
     $pipe->writer;
 
     $SIG{'PIPE'} = 'broken_pipe';

@@ -18,7 +18,7 @@ my $GZIP ;
 
 sub ExternalGzipWorks
 {
-    my $lex = new LexFile my $outfile;
+    my $lex = LexFile->new( my $outfile);
     my $content = qq {
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
  dolor. Camelus perlus.  Larrius in lumen numen.  Dolor en quiquum filia
@@ -45,7 +45,7 @@ sub readWithGzip
 {
     my $file = shift ;
 
-    my $lex = new LexFile my $outfile;
+    my $lex = LexFile->new( my $outfile);
 
     my $comp = "$GZIP -dc" ;
 
@@ -70,7 +70,7 @@ sub writeWithGzip
     my $content = shift ;
     my $options = shift || '';
 
-    my $lex = new LexFile my $infile;
+    my $lex = LexFile->new( my $infile);
     writeFile($infile, $content);
 
     unlink $file ;
@@ -105,7 +105,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 7 + $extra ;
 
@@ -120,7 +120,7 @@ BEGIN {
 
     my $file;
     my $file1;
-    my $lex = new LexFile $file, $file1;
+    my $lex = LexFile->new( $file, $file1);
     my $content = qq {
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
  dolor. Camelus perlus.  Larrius in lumen numen.  Dolor en quiquum filia

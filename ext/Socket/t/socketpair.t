@@ -40,7 +40,7 @@ BEGIN {
         exit 1;
       }
     }
-    unless ($has_perlio = find PerlIO::Layer 'perlio') {
+    unless ($has_perlio = PerlIO::Layer->find( 'perlio')) {
 	print <<EOF;
 # Since you don't have perlio you might get failures with UTF-8 locales.
 EOF

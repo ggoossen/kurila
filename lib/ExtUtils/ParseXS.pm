@@ -67,7 +67,7 @@ sub process_file {
     # Establish set of global symbols with max length 28, since xsubpp
     # will later add the 'XS_' prefix.
     require ExtUtils::XSSymSet;
-    $SymSet = new ExtUtils::XSSymSet 28;
+    $SymSet = ExtUtils::XSSymSet->new( 28);
   }
   @XSStack = ({type => 'none'});
   ($XSS_work_idx, $cpp_next_tmp) = (0, "XSubPPtmpAAAA");

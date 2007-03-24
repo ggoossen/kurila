@@ -12,7 +12,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 48 + $extra ;
 
@@ -38,12 +38,12 @@ sub run
             my $string = "some text" x 100 ;
 
             my $buffer ;
-            my $x = new $CompressClass(\$buffer) ;
+            my $x = $CompressClass-> new((\$buffer)) ;
             ok $x, "  create $CompressClass object" ;
             ok $x->write($string), "  write to object" ;
             ok $x->close, "  close ok" ;
 
-            my $lex = new LexFile my $output;
+            my $lex = LexFile->new( my $output);
             my $input ;
 
             if ($file) {
@@ -55,9 +55,9 @@ sub run
             }
 
             {
-                my $unc = new $AnyConstruct $input, Transparent => $trans,
+                my $unc = $AnyConstruct-> new( $input, Transparent => $trans,
                                            RawInflate => 1,
-                                           Append => 1  ;
+                                           Append => 1)  ;
 
                 ok $unc, "  Created $AnyClass object" 
                     or print "# $$AnyError\n";
@@ -74,9 +74,9 @@ sub run
             }
 
             {
-                my $unc = new $AnyConstruct $input, Transparent => $trans,
+                my $unc = $AnyConstruct-> new( $input, Transparent => $trans,
                                            RawInflate => 1,
-                                           Append => 1  ;
+                                           Append => 1)  ;
 
                 ok $unc, "  Created $AnyClass object" 
                     or print "# $$AnyError\n";

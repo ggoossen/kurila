@@ -24,7 +24,7 @@ test_test("test_fail first");
 # test_diag
 
 use Test::Builder;
-my $test = new Test::Builder;
+my $test = Test::Builder->new();
 
 test_diag("this is a test string","so is this");
 $test->diag("this is a test string\n", "so is this\n");

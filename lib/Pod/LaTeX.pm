@@ -1265,7 +1265,7 @@ sub interior_sequence {
     return $seq_argument;
 
   } elsif ($seq_command eq 'L') {
-    my $link = new Pod::Hyperlink($seq_argument);
+    my $link = Pod::Hyperlink->new($seq_argument);
 
     # undef on failure
     unless (defined $link) {
@@ -1351,10 +1351,9 @@ sub begin_list {
 
   # Indicate that a list should be started for the next item
   # need to do this to work out the type of list
-  push ( @{$self->lists}, new Pod::List(-indent => $indent, 
+  push ( @{$self->lists}, Pod::List->new(-indent => $indent, 
 					-start => $line_num,
-					-file => $self->input_file,
-				       )	 
+					-file => $self->input_file,)	 
        );
 
 }
@@ -1870,6 +1869,10 @@ it under the same terms as Perl itself.
 $Id: LaTeX.pm,v 1.19 2004/12/30 01:40:44 timj Exp $
 
 =end __PRIVATE__
+
+=cut
+
+1;
 
 =cut
 

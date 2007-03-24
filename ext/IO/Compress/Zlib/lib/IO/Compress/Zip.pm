@@ -16,9 +16,9 @@ use Compress::Raw::Zlib  2.004 qw(crc32) ;
 BEGIN
 {
     eval { require IO::Compress::Adapter::Bzip2 ; 
-           import  IO::Compress::Adapter::Bzip2 2.004 ; 
+           IO::Compress::Adapter::Bzip2->import( 2.004) ; 
            require IO::Compress::Bzip2 ; 
-           import  IO::Compress::Bzip2 2.004 ; 
+           IO::Compress::Bzip2->import( 2.004) ; 
          } ;
 }
 
@@ -90,7 +90,7 @@ sub mkComp
 
     if (! defined *$self->{ZipData}{StartOffset}) {
         *$self->{ZipData}{StartOffset} = 0;
-        *$self->{ZipData}{Offset} = new U64 ;
+        *$self->{ZipData}{Offset} = U64->new() ;
     }
 
     return $obj;    

@@ -29,7 +29,7 @@ BEGIN {
 
     mkpath [$Auto_Dir];
 
-    open(MOD, ">$Module") || DIE $!;
+    open(MOD, ">$Module") || $!-> DIE();
     print MOD <<'MODULE';
 package Yup;
 $Plan = 9;

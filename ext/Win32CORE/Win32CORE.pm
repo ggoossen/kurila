@@ -8,7 +8,7 @@ use vars qw($VERSION @ISA);
 use base qw(Exporter DynaLoader);
 no warnings "redefine";
 
-bootstrap Win32CORE $VERSION;
+Win32CORE->bootstrap( $VERSION);
 
 1;
 __END__

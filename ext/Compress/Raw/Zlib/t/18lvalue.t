@@ -21,7 +21,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 10 + $extra ;
 
@@ -53,7 +53,7 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     sub getX    : lvalue { $X }
     sub getZ    : lvalue { $Z }
 
-    ok my $x = new Compress::Raw::Zlib::Deflate ( -AppendOutput => 1 );
+    ok my $x = Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1);
 
     cmp_ok $x->deflate(getData, getX), '==',  Z_OK ;
 
@@ -62,7 +62,7 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     my $append = "Appended" ;
     $X .= $append ;
      
-    ok my $k = new Compress::Raw::Zlib::Inflate ( -AppendOutput => 1 ) ;
+    ok my $k = Compress::Raw::Zlib::Inflate->new( -AppendOutput => 1) ;
      
     cmp_ok $k->inflate(getX, getZ), '==', Z_STREAM_END ; ;
      

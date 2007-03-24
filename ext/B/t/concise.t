@@ -76,7 +76,7 @@ foreach my $foo (undef, 0) {
     sub new { my $foo = bless {} };
     sub print { CORE::print @_ }
 }
-my $foo = new Hugo;	# suggested this API fix
+my $foo = Hugo->new();	# suggested this API fix
 eval {  walk_output($foo) };
 is ($@, '', "walk_output() accepts obj that can print");
 

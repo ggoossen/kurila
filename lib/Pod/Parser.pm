@@ -208,7 +208,7 @@ use Exporter;
 BEGIN {
    if ($] < 5.6) {
       require Symbol;
-      import Symbol;
+      Symbol->import();
    }
 }
 @ISA = qw(Exporter);
@@ -975,14 +975,13 @@ sub parse_paragraph {
         }
     }
     ## Save the attributes indicating how the command was specified.
-    $pod_para = new Pod::Paragraph(
+    $pod_para = Pod::Paragraph->new(
           -name      => $cmd,
           -text      => $text,
           -prefix    => $pfx,
           -separator => $sep,
           -file      => $myData{_INFILE},
-          -line      => $line_num
-    );
+          -line      => $line_num);
     # ## Invoke appropriate callbacks
     # if (exists $myData{_CALLBACKS}) {
     #    ## Look through the callback list, invoke callbacks,
@@ -1547,11 +1546,11 @@ sub _push_input_stream {
     $myData{_INFILE}  = '(unknown)'  unless (defined  $myData{_INFILE});
     $myData{_INPUT}   = $in_fh;
     my $input_top     = $myData{_TOP_STREAM}
-                      = new Pod::InputSource(
+                      = Pod::InputSource->new(
                             -name        => $myData{_INFILE},
                             -handle      => $in_fh,
                             -was_cutting => $myData{_CUTTING}
-                        );
+);
     local *input_stack = $myData{_INPUT_STREAMS};
     push(@input_stack, $input_top);
 
@@ -1805,6 +1804,9 @@ Based on code for B<Pod::Text> written by
 Tom Christiansen E<lt>tchrist@mox.perl.comE<gt>
 
 =cut
+
+1;
+# vim: ts=4 sw=4 et
 
 1;
 # vim: ts=4 sw=4 et

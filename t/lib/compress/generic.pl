@@ -14,7 +14,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
 
-    my $st = eval { require Test::NoWarnings ;  import Test::NoWarnings; 1; };
+    my $st = eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1; };
     $extra = 1
         if $st ;
 
@@ -27,9 +27,9 @@ sub myGZreadFile
     my $init = shift ;
 
 
-    my $fil = new $UncompressClass $filename,
+    my $fil = $UncompressClass-> new( $filename,
                                     -Strict   => 0,
-                                    -Append   => 1
+                                    -Append   => 1)
                                     ;
 
     my $data = '';
@@ -65,7 +65,7 @@ sub run
         like $@, mkEvalErr("^$CompressClass: output filename is undef or null string");
             
         my $x ;
-        $gz = new $CompressClass(\$x); 
+        $gz = $CompressClass-> new((\$x)); 
 
         foreach my $name (qw(read readline getc))
         {
@@ -95,7 +95,7 @@ sub run
         eval qq[\$a = new $UncompressClass \$out ;] ;
         like $@, mkEvalErr("^$UncompressClass: input filename is undef or null string");
 
-        my $lex = new LexFile my $name ;
+        my $lex = LexFile->new( my $name) ;
 
         ok ! -e $name, "  $name does not exist";
         
@@ -103,12 +103,12 @@ sub run
         is $$UnError, "input file '$name' does not exist";
 
         my $gc ;
-        my $guz = new $CompressClass(\$gc); 
+        my $guz = $CompressClass-> new((\$gc)); 
         $guz->write("abc") ;
         $guz->close();
 
         my $x ;
-        my $gz = new $UncompressClass(\$gc); 
+        my $gz = $UncompressClass-> new((\$gc)); 
 
         foreach my $name (qw(print printf write))
         {
@@ -160,7 +160,7 @@ sub run
             #========================================
 
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
             #my $name = "/tmp/try.lzf";
 
             my $hello = <<EOM ;
@@ -170,7 +170,7 @@ EOM
 
             {
               my $x ;
-              ok $x = new $CompressClass $name  ;
+              ok $x = $CompressClass-> new( $name)  ;
               is $x->autoflush(1), 0, "autoflush";
               is $x->autoflush(1), 1, "autoflush";
               ok $x->opened(), "opened";
@@ -183,7 +183,7 @@ EOM
 
             {
               my $uncomp;
-              ok my $x = new $UncompressClass $name, -Append => 1  ;
+              ok my $x = $UncompressClass-> new( $name, -Append => 1)  ;
               ok $x->opened(), "opened";
 
               my $len ;
@@ -204,7 +204,7 @@ EOM
             #========================================
 
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $hello = <<EOM ;
 hello world
@@ -213,7 +213,7 @@ EOM
 
             {
               my $x ;
-              ok $x = new $CompressClass $name  ;
+              ok $x = $CompressClass-> new( $name)  ;
 
               is $x->write(''), 0, "Write empty string is ok";
               is $x->write(undef), 0, "Write undef is ok";
@@ -223,7 +223,7 @@ EOM
 
             {
               my $uncomp;
-              my $x = new $UncompressClass $name  ;
+              my $x = $UncompressClass-> new( $name)  ;
               ok $x, "creates $UncompressClass $name"  ;
 
               my $data = '';
@@ -241,7 +241,7 @@ EOM
             #========================================
 
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $hello = <<EOM ;
 hello world
@@ -249,9 +249,9 @@ this is a test
 EOM
 
             {
-              my $fh = new IO::File ">$name" ;
+              my $fh = IO::File->new( ">$name") ;
               ok $fh, "opened file $name ok";
-              my $x = new $CompressClass $fh  ;
+              my $x = $CompressClass-> new( $fh)  ;
               ok $x, " created $CompressClass $fh"  ;
 
               is $x->fileno(), fileno($fh), "fileno match" ;
@@ -266,8 +266,8 @@ EOM
             my $uncomp;
             {
               my $x ;
-              ok my $fh1 = new IO::File "<$name" ;
-              ok $x = new $UncompressClass $fh1, -Append => 1  ;
+              ok my $fh1 = IO::File->new( "<$name") ;
+              ok $x = $UncompressClass-> new( $fh1, -Append => 1)  ;
               ok $x->fileno() == fileno $fh1 ;
 
               1 while $x->read($uncomp) > 0 ;
@@ -284,7 +284,7 @@ EOM
             #========================================
 
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
             #my $name  = "/tmp/fred";
 
             my $hello = <<EOM ;
@@ -296,7 +296,7 @@ EOM
               title "$CompressClass: Input from typeglob filehandle";  
               ok open FH, ">$name" ;
      
-              my $x = new $CompressClass *FH  ;
+              my $x = $CompressClass-> new( *FH)  ;
               ok $x, "  create $CompressClass"  ;
 
               is $x->fileno(), fileno(*FH), "  fileno" ;
@@ -314,7 +314,7 @@ EOM
               title "$UncompressClass: Input from typeglob filehandle, append output";  
               my $x ;
               ok open FH, "<$name" ;
-              ok $x = new $UncompressClass *FH, -Append => 1, Transparent => 0
+              ok $x = $UncompressClass-> new( *FH, -Append => 1, Transparent => 0)
                 or diag $$UnError ;
               is $x->fileno(), fileno FH, "  fileno ok" ;
 
@@ -328,7 +328,7 @@ EOM
         }
 
         {
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
             #my $name = "/tmp/fred";
 
             my $hello = <<EOM ;
@@ -343,7 +343,7 @@ EOM
               my $dummy = fileno SAVEOUT;
               open STDOUT, ">$name" ;
      
-              my $x = new $CompressClass '-'  ;
+              my $x = $CompressClass->new( '-')  ;
               $x->write($hello);
               $x->close;
 
@@ -364,7 +364,7 @@ EOM
                  open(SAVEIN, "<&STDIN");
               ok open(STDIN, "<$name"), "  redirect STDIN";
               my $dummy = fileno SAVEIN;
-              $x = new $UncompressClass '-', Append => 1, Transparent => 0
+              $x = $UncompressClass->new( '-', Append => 1, Transparent => 0)
                     or diag $$UnError ;
               ok $x, "  created object" ;
               is $x->fileno(), $stdinFileno, "  fileno ok" ;
@@ -383,7 +383,7 @@ EOM
             #========================================
 
             #my $name = "test.gz" ;
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $hello = <<EOM ;
 hello world
@@ -393,7 +393,7 @@ EOM
             my $buffer ;
             {
               my $x ;
-              ok $x = new $CompressClass(\$buffer) ;
+              ok $x = $CompressClass-> new((\$buffer)) ;
           
               ok ! defined $x->autoflush(1) ;
               ok ! defined $x->autoflush(1) ;
@@ -412,7 +412,7 @@ EOM
             my $uncomp;
             {
               my $x ;
-              ok $x = new $UncompressClass(\$buffer, Append => 1)  ;
+              ok $x = $UncompressClass-> new((\$buffer, Append => 1))  ;
 
               ok ! defined $x->autoflush(1) ;
               ok ! defined $x->autoflush(1) ;
@@ -434,7 +434,7 @@ EOM
             my $buffer = '';
             {
               my $x ;
-              ok $x = new $CompressClass(\$buffer) ;
+              ok $x = $CompressClass-> new((\$buffer)) ;
               ok $x->close ;
           
             }
@@ -443,7 +443,7 @@ EOM
             my $uncomp= '';
             {
               my $x ;
-              ok $x = new $UncompressClass(\$buffer, Append => 1)  ;
+              ok $x = $UncompressClass-> new((\$buffer, Append => 1))  ;
 
               1 while $x->read($uncomp) > 0  ;
 
@@ -460,7 +460,7 @@ EOM
             #========================================
 
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $hello = <<EOM ;
 hello world
@@ -471,7 +471,7 @@ EOM
             my $contents = '' ;
 
             {
-              my $x = new $CompressClass $name  ;
+              my $x = $CompressClass-> new( $name)  ;
               ok $x, "  created $CompressClass object";
 
               ok $x->write($hello), "  write ok" ;
@@ -500,7 +500,7 @@ EOM
             #================================
 
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $hello = <<EOM ;
 hello world
@@ -512,11 +512,11 @@ EOM
 
             {
               my $fh ;
-              ok $fh = new IO::File ">$name" ;
+              ok $fh = IO::File->new( ">$name") ;
               print $fh $header ;
               my $x ;
-              ok $x = new $CompressClass $fh,
-                                         -AutoClose => 0   ;
+              ok $x = $CompressClass-> new( $fh,
+                                         -AutoClose => 0)   ;
 
               ok $x->binmode();
               ok $x->write($hello) ;
@@ -527,12 +527,12 @@ EOM
 
             my ($fil, $uncomp) ;
             my $fh1 ;
-            ok $fh1 = new IO::File "<$name" ;
+            ok $fh1 = IO::File->new( "<$name") ;
             # skip leading junk
             my $line = <$fh1> ;
             ok $line eq $header ;
 
-            ok my $x = new $UncompressClass $fh1, Append => 1  ;
+            ok my $x = $UncompressClass-> new( $fh1, Append => 1)  ;
             ok $x->binmode();
             1 while $x->read($uncomp) > 0 ;
 
@@ -560,7 +560,7 @@ EOM
             my $compressed ;
 
             {
-              ok my $x = new $CompressClass(\$compressed);
+              ok my $x = $CompressClass-> new((\$compressed));
 
               ok $x->write($hello) ;
               ok $x->close ;
@@ -568,7 +568,7 @@ EOM
             }
 
             my $uncomp;
-            ok my $x = new $UncompressClass(\$compressed, Append => 1)  ;
+            ok my $x = $UncompressClass-> new((\$compressed, Append => 1))  ;
             1 while $x->read($uncomp) > 0 ;
 
             ok $uncomp eq $hello ;
@@ -580,7 +580,7 @@ EOM
             # Write
             # these tests come almost 100% from IO::String
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $io = $CompressClass->new($name);
 
@@ -649,10 +649,10 @@ and a single line.
 
 EOT
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my %opts = () ;
-            my $iow = new $CompressClass $name, %opts;
+            my $iow = $CompressClass-> new( $name, %opts);
             is $iow->input_line_number, undef; 
             $iow->print($str) ;
             is $iow->input_line_number, undef; 
@@ -661,7 +661,7 @@ EOT
             my @tmp;
             my $buf;
             {
-                my $io = new $UncompressClass $name ;
+                my $io = $UncompressClass-> new( $name) ;
             
                 is $., 0; 
                 is $io->input_line_number, 0; 
@@ -818,13 +818,13 @@ and a single line.
 
 EOT
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             writeFile($name, $str);
             my @tmp;
             my $buf;
             {
-                my $io = new $UncompressClass $name, -Transparent => 1 ;
+                my $io = $UncompressClass-> new( $name, -Transparent => 1) ;
             
                 ok defined $io;
                 ok ! $io->eof;
@@ -982,13 +982,13 @@ EOT
                     {
                         title "Read Tests - buf length $bufsize, Transparent $trans, Append $append" ;
 
-                        my $lex = new LexFile my $name ;
+                        my $lex = LexFile->new( my $name) ;
 
                         if ($trans) {
                             writeFile($name, $str) ;
                         }
                         else {
-                            my $iow = new $CompressClass $name;
+                            my $iow = $CompressClass-> new( $name);
                             $iow->print($str) ;
                             $iow->close ;
                         }
@@ -1026,7 +1026,7 @@ EOT
 
                 my $buffer ;
                 my $buff ;
-                my $lex = new LexFile my $name ;
+                my $lex = LexFile->new( my $name) ;
 
                 my $first = "beginning" ;
                 my $last  = "the end" ;
@@ -1048,7 +1048,7 @@ EOT
                         $output = \$buffer;
                     }
 
-                    my $iow = new $CompressClass $output ;
+                    my $iow = $CompressClass-> new( $output) ;
                     $iow->print($first) ;
                     ok $iow->seek(5, SEEK_CUR) ;
                     ok $iow->tell() == length($first)+5;
@@ -1099,7 +1099,7 @@ EOT
             title "seek error cases" ;
 
             my $b ;
-            my $a = new $CompressClass(\$b)  ;
+            my $a = $CompressClass-> new((\$b))  ;
 
             ok ! $a->error() ;
             eval { $a->seek(-1, 10) ; };
@@ -1112,7 +1112,7 @@ EOT
             $a->close ;
 
 
-            my $u = new $UncompressClass(\$b)  ;
+            my $u = $UncompressClass-> new((\$b))  ;
 
             eval { $u->seek(-1, 10) ; };
             like $@, mkErr("^${UncompressClass}::seek: unknown value, 10, for whence parameter");
@@ -1131,7 +1131,7 @@ EOT
                 {
                     title "$CompressClass -- Append $append, Output to $fb" ;
 
-                    my $lex = new LexFile my $name ;
+                    my $lex = LexFile->new( my $name) ;
 
                     my $already = 'already';
                     my $buffer = $already;
@@ -1146,11 +1146,11 @@ EOT
                     }
                     elsif ($fb eq 'filehandle')
                     {
-                        $output = new IO::File ">$name" ;
+                        $output = IO::File->new( ">$name") ;
                         print $output $buffer;
                     }
 
-                    my $a = new $CompressClass($output, Append => $append)  ;
+                    my $a = $CompressClass-> new(($output, Append => $append))  ;
                     ok $a, "  Created $CompressClass";
                     my $string = "appended";
                     $a->write($string);
@@ -1176,7 +1176,7 @@ EOT
 
 
                     my $uncomp;
-                    my $x = new $UncompressClass(\$data, Append => 1)  ;
+                    my $x = $UncompressClass-> new((\$data, Append => 1))  ;
                     ok $x, "  created $UncompressClass";
 
                     my $len ;
@@ -1201,7 +1201,7 @@ EOT
 
                 if ($good)
                 {
-                    my $c = new $CompressClass(\$compressed);
+                    my $c = $CompressClass-> new((\$compressed));
                     $c->write($string);
                     $c->close();
                 }
@@ -1213,7 +1213,7 @@ EOT
                 my $comp_len = length $compressed;
                 $compressed .= $appended;
 
-                my $lex = new LexFile my $name ;
+                my $lex = LexFile->new( my $name) ;
                 my $input ;
                 writeFile ($name, $compressed);
 
@@ -1227,14 +1227,14 @@ EOT
                 }
                 elsif ($type eq 'filehandle')
                 {
-                    my $fh = new IO::File "<$name" ;
+                    my $fh = IO::File->new( "<$name") ;
                     ok $fh, "opened file $name ok";
                     $input = $fh ;
                 }
 
-                my $x = new $UncompressClass($input, 
+                my $x = $UncompressClass-> new(($input, 
                                              InputLength => $comp_len,
-                                             Transparent => 1)  ;
+                                             Transparent => 1))  ;
                 ok $x, "  created $UncompressClass";
 
                 my $len ;
@@ -1259,15 +1259,15 @@ EOT
         {
             title "$UncompressClass -- Append $append" ;
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $string = "appended";
             my $compressed ; 
-            my $c = new $CompressClass(\$compressed);
+            my $c = $CompressClass-> new((\$compressed));
             $c->write($string);
             $c->close();
 
-            my $x = new $UncompressClass(\$compressed, Append => $append)  ;
+            my $x = $UncompressClass-> new((\$compressed, Append => $append))  ;
             ok $x, "  created $UncompressClass";
 
             my $already = 'already';
@@ -1294,7 +1294,7 @@ EOT
             {
                 title "ungetc, File $file, Transparent $trans" ;
 
-                my $lex = new LexFile my $name ;
+                my $lex = LexFile->new( my $name) ;
 
                 my $string = 'abcdeABCDE';
                 my $b ;
@@ -1304,7 +1304,7 @@ EOT
                 }
                 else
                 {
-                    my $a = new $CompressClass(\$b)  ;
+                    my $a = $CompressClass-> new((\$b))  ;
                     $a->write($string);
                     $a->close ;
                 }
@@ -1388,7 +1388,7 @@ EOT
                 title "${CompressClass}::write( $send )";
                 my($copy);
                 eval "\$copy = $send";
-                my $x = new $CompressClass(\$Answer);
+                my $x = $CompressClass-> new((\$Answer));
                 ok $x, "  Created $CompressClass object";
                 eval { $x->write($copy) } ;
                 #like $@, "/^$get/", "  error - $get";

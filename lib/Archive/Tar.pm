@@ -27,7 +27,7 @@ BEGIN {
     ### switch between perlio and IO::String
     eval {
         require IO::String;
-        import IO::String;
+        IO::String->import();
     };
     $HAS_IO_STRING = $@ ? 0 : 1;
 
@@ -205,7 +205,7 @@ sub _get_handle {
 
         ### IO::Zlib will Do The Right Thing, even when passed
         ### a plain file ###
-        $fh = new IO::Zlib;
+        $fh = IO::Zlib->new();
 
     } else {
         if( $gzip ) {
@@ -213,7 +213,7 @@ sub _get_handle {
             return;
 
         } else {
-            $fh = new IO::File;
+            $fh = IO::File->new();
             $bin++;
         }
     }

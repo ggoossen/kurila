@@ -61,7 +61,7 @@ sub new {
     }
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
-    eval { $term = Tgetent Term::Cap { TERM => undef, OSPEED => $ospeed } };
+    eval { $term = Term::Cap->Tgetent( { TERM => undef, OSPEED => $ospeed }) };
     $$self{BOLD} = $$term{_md} || "\e[1m";
     $$self{UNDL} = $$term{_us} || "\e[4m";
     $$self{NORM} = $$term{_me} || "\e[m";

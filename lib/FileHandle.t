@@ -17,31 +17,31 @@ BEGIN {
 use FileHandle;
 use strict subs;
 
-autoflush STDOUT 1;
+STDOUT->autoflush( 1);
 
-$mystdout = new_from_fd FileHandle 1,"w";
+$mystdout = FileHandle->new_from_fd( 1,"w");
 $| = 1;
-autoflush $mystdout;
+ $mystdout->autoflush();
 print "1..12\n";
 
 print $mystdout "ok ".fileno($mystdout)."\n";
 
-$fh = (new FileHandle "./TEST", O_RDONLY
-       or new FileHandle "TEST", O_RDONLY)
+$fh = (FileHandle->new( "./TEST", O_RDONLY)
+       or FileHandle->new( "TEST", O_RDONLY))
   and print "ok 2\n";
 
 
 $buffer = <$fh>;
 print $buffer eq "#!./perl\n" ? "ok 3\n" : "not ok 3\n";
+ $fh->
 
-
-ungetc $fh ord 'A';
+ungetc( ord 'A');
 CORE::read($fh, $buf,1);
 print $buf eq 'A' ? "ok 4\n" : "not ok 4\n";
 
 close $fh;
 
-$fh = new FileHandle;
+$fh = FileHandle->new();
 
 print "not " unless ($fh->open("< TEST") && <$fh> eq $buffer);
 print "ok 5\n";
@@ -58,12 +58,12 @@ print "ok 7\n";
 print "not " unless ($fh->open("TEST","r") && !$fh->tell && $fh->close);
 print "ok 8\n";
 
-autoflush STDOUT 0;
+STDOUT->autoflush( 0);
 
 print "not " if ($|);
 print "ok 9\n";
 
-autoflush STDOUT 1;
+STDOUT->autoflush( 1);
 
 print "not " unless ($|);
 print "ok 10\n";

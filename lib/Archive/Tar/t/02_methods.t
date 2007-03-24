@@ -755,7 +755,7 @@ sub slurp_gzfile {
     my $buff;
 
     require IO::Zlib;
-    my $fh = new IO::Zlib;
+    my $fh = IO::Zlib->new();
     $fh->open( $file, READ_ONLY->(1) )
         or warn( "Error opening '$file' with IO::Zlib" ), return undef;
 

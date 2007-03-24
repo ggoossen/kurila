@@ -11,7 +11,7 @@ BEGIN {
 		print "1..0 # Skip: no 64-bit file offsets\n";
 		exit(0);
 	}
-	require Fcntl; import Fcntl qw(/^O_/ /^SEEK_/);
+	require Fcntl; Fcntl->import( qw(/^O_/ /^SEEK_/));
 }
 
 use strict;

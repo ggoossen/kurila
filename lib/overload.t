@@ -13,21 +13,21 @@ BEGIN {
 package Oscalar;
 use overload ( 
 				# Anonymous subroutines:
-'+'	=>	sub {new Oscalar $ {$_[0]}+$_[1]},
-'-'	=>	sub {new Oscalar
-		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1]},
-'<=>'	=>	sub {new Oscalar
-		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1]},
-'cmp'	=>	sub {new Oscalar
-		       $_[2]? ($_[1] cmp ${$_[0]}) : (${$_[0]} cmp $_[1])},
-'*'	=>	sub {new Oscalar ${$_[0]}*$_[1]},
-'/'	=>	sub {new Oscalar 
+'+'	=>	sub { Oscalar->new( $ {$_[0]}+$_[1])},
+'-'	=>	sub { Oscalar->new(
+		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
+'<=>'	=>	sub { Oscalar->new(
+		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
+'cmp'	=>	sub { Oscalar->new(
+		       $_[2]? ($_[1] cmp ${$_[0]}) : (${$_[0]} cmp $_[1]))},
+'*'	=>	sub { Oscalar->new( ${$_[0]}*$_[1])},
+'/'	=>	sub { Oscalar->new( 
 		       $_[2]? $_[1]/${$_[0]} :
-			 ${$_[0]}/$_[1]},
-'%'	=>	sub {new Oscalar
-		       $_[2]? $_[1]%${$_[0]} : ${$_[0]}%$_[1]},
-'**'	=>	sub {new Oscalar
-		       $_[2]? $_[1]**${$_[0]} : ${$_[0]}-$_[1]},
+			 ${$_[0]}/$_[1])},
+'%'	=>	sub { Oscalar->new(
+		       $_[2]? $_[1]%${$_[0]} : ${$_[0]}%$_[1])},
+'**'	=>	sub { Oscalar->new(
+		       $_[2]? $_[1]**${$_[0]} : ${$_[0]}-$_[1])},
 
 qw(
 ""	stringify
@@ -50,7 +50,7 @@ $| = 1;
 use Test::More tests => 522;
 
 
-$a = new Oscalar "087";
+$a = Oscalar->new( "087");
 $b= "$a";
 
 is($b, $a);
@@ -159,7 +159,7 @@ eval q[ package Oscalar; use overload ('=' => sub {$main::copies++;
 						   local $new=$ {$_[0]};
 						   bless \$new } ) ];
 
-$b=new Oscalar "$a";
+$b= Oscalar->new( "$a");
 
 is(ref $b, "Oscalar");
 is($a, "087");
@@ -202,7 +202,7 @@ is($copies, 1);
 
 eval q[package Oscalar; use overload ('+=' => sub {$ {$_[0]} += 3*$_[1];
 						   $_[0] } ) ];
-$c=new Oscalar;			# Cause rehash
+$c= Oscalar->new();			# Cause rehash
 
 $b=$a;
 $b+=1;
@@ -240,7 +240,7 @@ eval q[package Oscalar;
        use overload ('x' => sub {new Oscalar ( $_[2] ? "_.$_[1]._" x $ {$_[0]}
 					      : "_.${$_[0]}._" x $_[1])}) ];
 
-$a=new Oscalar "yy";
+$a= Oscalar->new( "yy");
 $a x= 3;
 is($a, "_.yy.__.yy.__.yy._");
 
@@ -249,7 +249,7 @@ eval q[package Oscalar;
 					      "_.$_[1].__.$ {$_[0]}._"
 					      : "_.$ {$_[0]}.__.$_[1]._")}) ];
 
-$a=new Oscalar "xx";
+$a= Oscalar->new( "xx");
 
 is("b${a}c", "_._.b.__.xx._.__.c._");
 
@@ -259,7 +259,7 @@ is("b${a}c", "_._.b.__.xx._.__.c._");
   @ISA = 'Oscalar';
 }
 
-$aI = new OscalarI "$a";
+$aI = OscalarI->new( "$a");
 is(ref $aI, "OscalarI");
 is("$aI", "xx");
 is($aI, "xx");
@@ -273,7 +273,7 @@ is("b${a}", "_.b.__.xx._");
 $x="1";
 bless \$x, Oscalar;
 is("b${a}c", "bxxc");
-new Oscalar 1;
+ Oscalar->new( 1);
 is("b${a}c", "bxxc");
 
 # Negative overloading:
@@ -483,7 +483,7 @@ is($c, "bareword");
 }
 
 {
-  my $foo = new symbolic 11;
+  my $foo = symbolic->new( 11);
   my $baz = $foo++;
   is((sprintf "%d", $foo), '12');
   is((sprintf "%d", $baz), '11');
@@ -506,8 +506,8 @@ is($c, "bareword");
 }
 
 {
-  my $iter = new symbolic 2;
-  my $side = new symbolic 1;
+  my $iter = symbolic->new( 2);
+  my $side = symbolic->new( 1);
   my $cnt = $iter;
   
   while ($cnt) {
@@ -520,8 +520,8 @@ is($c, "bareword");
 }
 
 {
-  my $iter = new symbolic 2;
-  my $side = new symbolic 1;
+  my $iter = symbolic->new( 2);
+  my $side = symbolic->new( 1);
   my $cnt = $iter;
   
   while ($cnt--) {
@@ -604,7 +604,7 @@ is($c, "bareword");
 }
 
 {
-  my $foo = new symbolic1 11;
+  my $foo = symbolic1->new( 11);
   my $baz = $foo++;
   is((sprintf "%d", $foo), '12');
   is((sprintf "%d", $baz), '11');
@@ -627,8 +627,8 @@ is($c, "bareword");
 }
 
 {
-  my $iter = new symbolic1 2;
-  my $side = new symbolic1 1;
+  my $iter = symbolic1->new( 2);
+  my $side = symbolic1->new( 1);
   my $cnt = $iter;
   
   while ($cnt) {
@@ -641,8 +641,8 @@ is($c, "bareword");
 }
 
 {
-  my $iter = new symbolic1 2;
-  my $side = new symbolic1 1;
+  my $iter = symbolic1->new( 2);
+  my $side = symbolic1->new( 1);
   my $cnt = $iter;
   
   while ($cnt--) {
@@ -673,7 +673,7 @@ is($c, "bareword");
 }
 
 {
-  my $seven = new two_face ("vii", 7);
+  my $seven = two_face->new("vii", 7);
   is((sprintf "seven=$seven, seven=%d, eight=%d", $seven, $seven+1),
 	'seven=vii, seven=7, eight=8');
   is(scalar ($seven =~ /i/), '1');
@@ -826,7 +826,7 @@ else {
   }
 }
 
-my $bar = new two_refs 3,4,5,6;
+my $bar = two_refs->new( 3,4,5,6);
 $bar->[2] = 11;
 is($bar->{two}, 11);
 $bar->{three} = 13;
@@ -837,7 +837,7 @@ is($bar->[3], 13);
   @ISA = ('two_refs');
 }
 
-$bar = new two_refs_o 3,4,5,6;
+$bar = two_refs_o->new( 3,4,5,6);
 $bar->[2] = 11;
 is($bar->{two}, 11);
 $bar->{three} = 13;
@@ -879,7 +879,7 @@ is($bar->[3], 13);
   }
 }
 
-$bar = new two_refs_o 3,4,5,6;
+$bar = two_refs_o->new( 3,4,5,6);
 $bar->[2] = 11;
 is($bar->{two}, 11);
 $bar->{three} = 13;
@@ -890,7 +890,7 @@ is($bar->[3], 13);
   @ISA = ('two_refs1');
 }
 
-$bar = new two_refs1_o 3,4,5,6;
+$bar = two_refs1_o->new( 3,4,5,6);
 $bar->[2] = 11;
 is($bar->{two}, 11);
 $bar->{three} = 13;
@@ -975,13 +975,13 @@ unless ($aaa) {
 
   package main;
 
-  my $x = new noov_int 11;
+  my $x = noov_int->new( 11);
   my $int_x = int $x;
   main::is("$int_x", 20);
-  $x = new ov_int1 31;
+  $x = ov_int1->new( 31);
   $int_x = int $x;
   main::is("$int_x", 131);
-  $x = new ov_int2 51;
+  $x = ov_int2->new( 51);
   $int_x = int $x;
   main::is("$int_x", 1054);
 }
@@ -1048,7 +1048,7 @@ sub new
 package main;
 
 
-my $utfvar = new utf8_o 200.2.1;
+my $utfvar = utf8_o->new( 200.2.1);
 is("$utfvar", 200.2.1); # 223 - stringify
 is("a$utfvar", "a".200.2.1); # 224 - overload via sv_2pv_flags
 
@@ -1133,7 +1133,7 @@ like ($@, qr/zap/);
 
 # These are all check that overloaded values rather than reference addressess
 # are what is getting tested.
-my ($two, $one, $un, $deux) = map {new Numify $_} 2, 1, 1, 2;
+my ($two, $one, $un, $deux) = map {Numify->new( $_)} 2, 1, 1, 2;
 my ($ein, $zwei) = (1, 2);
 
 my %map = (one => 1, un => 1, ein => 1, deux => 2, two => 2, zwei => 2);

@@ -12,7 +12,7 @@ BEGIN {
 	$File =~ s/^t\W+//;                                 # Remove first directory
 	@INC = '../lib';
     }
-    require strict; import strict;
+    require strict; strict->import();
 }
 
 use Test;

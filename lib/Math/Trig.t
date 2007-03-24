@@ -22,7 +22,7 @@ BEGIN {
 	print "1..0 # No Test::More, skipping\n";
 	exit(0);
     } else {
-	import Test::More;
+	Test::More->import();
     }
 }
 

@@ -69,7 +69,7 @@ $SIG{ALRM} = sub {
   die "TIMED OUT!";
 };
 
-my $p = new Net::Ping "syn", 10;
+my $p = Net::Ping->new( "syn", 10);
 
 # new() worked?
 ok !!$p;

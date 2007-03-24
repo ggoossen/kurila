@@ -338,7 +338,7 @@ sub patch
 sub write_or_die
 {
   my($file, $data) = @_;
-  my $fh = new IO::File ">$file" or die "$file: $!\n";
+  my $fh = IO::File->new( ">$file") or die "$file: $!\n";
   $fh->print($data);
 }
 

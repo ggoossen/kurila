@@ -14,7 +14,7 @@ END {
     1 while unlink($file);
 }
 
-if (find PerlIO::Layer 'perlio') {
+if (PerlIO::Layer->find( 'perlio')) {
     plan(tests => 16);
     ok(open(FOO,">:crlf",$file));
     ok(print FOO 'a'.((('a' x 14).qq{\n}) x 2000) || close(FOO));

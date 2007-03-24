@@ -50,7 +50,7 @@ BEGIN {
 
     use vars      qw[ @EXPORT $HISTORY_FH ];
     @EXPORT     = qw[ history ];
-    my $log     = new Log::Message;
+    my $log     = Log::Message->new();
     $HISTORY_FH = \*STDOUT;
 
     for my $func ( @EXPORT ) {

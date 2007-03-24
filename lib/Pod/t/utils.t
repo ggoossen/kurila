@@ -4,7 +4,7 @@
 BEGIN {
         chdir 't' if -d 't';
         @INC = '../lib';
-        require Test; import Test;
+        require Test; Test->import();
         plan(tests => 22);
 }
 
@@ -42,17 +42,16 @@ my @results = (
 ok(@results,@links);
 
 for my $i( 0..@links ) {
-  my $link = new Pod::Hyperlink( $links[$i] );
+  my $link = Pod::Hyperlink->new( $links[$i]);
   ok($link->markup, $results[$i]);
 }
 
 # Now test lists
 # This test needs to be better
-my $list = new Pod::List( -indent => 4,
+my $list = Pod::List->new( -indent => 4,
 			  -start  => 52,
 			  -file   => "itemtest.t",
-			  -type   => "OL",
-			);
+			  -type   => "OL",);
 
 ok($list);
 
@@ -65,7 +64,7 @@ ok($list->type, "OL");
 
 # also needs work
 
-my $cache = new Pod::Cache;
+my $cache = Pod::Cache->new();
 
 # Store it in the cache
 $cache->item(

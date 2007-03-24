@@ -98,7 +98,7 @@ sub AUTOLOAD {
     goto &$AUTOLOAD;
 }
 
-bootstrap I18N::Langinfo $VERSION;
+I18N::Langinfo->bootstrap( $VERSION);
 
 1;
 __END__

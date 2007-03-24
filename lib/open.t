@@ -61,7 +61,7 @@ is( ${^OPEN}, ":raw :crlf\0:raw :crlf",
 is( $^H{'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 
 SKIP: {
-    skip("no perlio, no :utf8", 12) unless (find PerlIO::Layer 'perlio');
+    skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'));
 
     eval <<EOE;
     use open ':utf8';
@@ -183,7 +183,7 @@ EOE
 }
 
 SKIP: {
-    skip("no perlio", 1) unless (find PerlIO::Layer 'perlio');
+    skip("no perlio", 1) unless (PerlIO::Layer->find( 'perlio'));
     use open IN => ':non-existent';
     eval {
 	require Symbol; # Anything that exists but we havn't loaded
