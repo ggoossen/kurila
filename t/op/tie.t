@@ -29,8 +29,7 @@ for (@prgs){
     my ($testname) = $prog =~ /^# (.*)\n/m;
     $testname ||= '';
     $TODO = $testname =~ s/^TODO //;
-    my $results =~ s/\n+$//;
-    my $expected =~ s/\n+$//;
+    $expected =~ s/\n+$//;
 
     fresh_perl_is($prog, $expected, {}, $testname);
 }

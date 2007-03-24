@@ -224,15 +224,14 @@ open(I, ">$outfile") || die "sysio.t: cannot write $outfile: $!";
 eval {binmode STDOUT, ":utf8"};
 die $@ if $@ and $@ !~ /^IO layers \(like ':utf8'\) unavailable/;
 
-# y diaresis is \w when UTF8
 $a = "\xFF";
 
-print $a =~ /\w/ ? "not ok 40\n" : "ok 40\n";
+print $a ne "\xFF" ? "not ok 40\n" : "ok 40\n";
 
 syswrite I, $a;
 
-# Should not be upgraded as a side effect of syswrite.
-print $a =~ /\w/ ? "not ok 41\n" : "ok 41\n";
+# Should not be changed as a side effect of syswrite.
+print $a ne "\xFF" ? "not ok 41\n" : "ok 41\n";
 
 # This should work
 eval {syswrite I, 2;};

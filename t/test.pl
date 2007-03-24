@@ -16,7 +16,7 @@
 # In this file, we use the latter "Baby Perl" approach, and increment
 # will be worked over by t/op/inc.t
 
-use vars qw'$Level $TODO $NO_ENDING';
+our ($Level, $TODO, $NO_ENDING);
 
 $Level = 1;
 my $test = 1;

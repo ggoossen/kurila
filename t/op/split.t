@@ -331,14 +331,12 @@ ok(@ary == 3 &&
     foreach my $cp (@spaces) {
 	my $msg = sprintf "Space: U+%04x", $cp;
         my $space = chr($cp);
-        my $str="A:$space:B\x{FFFD}";
-        chop $str;
+        my $str="A:$space:B";
 
         my @res=split(/\s+/,$str);
         ok(@res == 2 && join('-',@res) eq "A:-:B", "$msg - /\\s+/");
 
-        my $s2 = "$space$space:A:$space$space:B\x{FFFD}";
-        chop $s2;
+        my $s2 = "$space$space:A:$space$space:B";
 
         my @r2 = split(' ',$s2);
         ok(@r2 == 2 && join('-', @r2) eq ":A:-:B",  "$msg - ' '");
