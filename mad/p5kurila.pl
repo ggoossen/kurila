@@ -19,19 +19,20 @@ sub entersub_handler {
     my ($method_named) = $twig->findnodes([$sub], "op_method_named");
     return if not $method_named;
 
+    return;
     # skip special subs
     return if $sub->att("flags") =~ m/SPECIAL/;
 
     # check is indirect object syntax.
-    my $x = $twig->findnodes([$sub], qq|madprops/mad_sv[\@key="A"][\@val="-&gt;"]|);
+    my $x = $twig->findnodes([$sub], qq|madprops/mad_sv[\@key="bigarrow"][\@val="-&gt;"]|);
     return if $x;
 
     # make indirect object syntax.
     my $madprops = ($twig->findnodes([$sub], qq|madprops|))[0] || $sub->insert_new_elt("madprops");
 
-    $madprops->insert_new_elt( "mad_sv", { key => "A", val => "-&gt;" } );
-    $madprops->insert_new_elt( "mad_sv", { key => "(", val => "(" } );
-    $madprops->insert_new_elt( "mad_sv", { key => ")", val => ")" } );
+    $madprops->insert_new_elt( "mad_sv", { key => "bigarrow", val => "-&gt;" } );
+    $madprops->insert_new_elt( "mad_sv", { key => "round_open", val => "(" } );
+    $madprops->insert_new_elt( "mad_sv", { key => "round_close", val => ")" } );
 
     # move widespace from method to object and visa versa.
     my ($method_ws) = $twig->findnodes([$method_named],
