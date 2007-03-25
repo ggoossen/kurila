@@ -248,7 +248,6 @@ sub predefine_encodings {
         push @Encode::Internal::ISA, 'Encode::Encoding';
         *decode = sub {
             my ( $obj, $str, $chk ) = @_;
-            utf8::upgrade($str);
             $_[1] = '' if $chk;
             return $str;
         };

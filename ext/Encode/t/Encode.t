@@ -28,7 +28,7 @@ my @character_set = ('0'..'9', 'A'..'Z', 'a'..'z');
 my @source = qw(ascii iso8859-1 cp1250);
 my @destiny = qw(cp1047 cp37 posix-bc);
 my @ebcdic_sets = qw(cp1047 cp37 posix-bc);
-plan test => 38+$n*@encodings + 2*@source*@destiny*@character_set + 2*@ebcdic_sets*256 + 2;
+plan test => 34+$n*@encodings + 2*@source*@destiny*@character_set + 2*@ebcdic_sets*256 + 2;
 my $str = join('',map(bytes::chr($_),0x20..0x7E));
 my $cpy = $str;
 ok(0x5F,from_to($cpy,'iso8859-1','Unicode'),"Length Wrong");
@@ -116,8 +116,6 @@ for my $i (256,128,129,256)
  {
   my $c = chr($i);
   my $s = "$c\n".sprintf("%02X",$i);
-  ok(utf8::valid($s),1,"concat of $i botched");
-  utf8::upgrade($s);
   ok(utf8::valid($s),1,"concat of $i botched");
  }
 

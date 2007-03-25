@@ -20,7 +20,7 @@ BEGIN {
 
 use strict;
 #use Test::More 'no_plan';
-use Test::More tests => 37;
+use Test::More tests => 44;
 use Encode qw(encode decode);
 
 #

@@ -1,12 +1,12 @@
 # $Id: enc_data.t,v 2.1 2006/05/03 18:24:10 dankogai Exp $
 
 BEGIN {
-    require Config; Config->import;
+    require Config; Config->import();
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find('perlio')) {
     print "1..0 # Skip: PerlIO was not built\n";
     exit 0;
     }
@@ -29,16 +29,16 @@ my @a;
 
 while (<DATA>) {
   chomp;
-  tr/¤Â¡-¤ó¥¡-¥Âó/¥Â¡-¥ó¤¡-¤Âó/;
+  tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
   push @a, $_;
 }
 
 is(scalar @a, 3);
-is($a[0], "¥³¥ì¥ÏDATA¤Õ¤¡¤¤¤ë¤Ï¤ó¤É¤ë¥Î¤Æ¤¹Â¤È¥Ç¥¹¡£");
-is($a[1], "ÆüËÜ¸ì¥¬¥Á¥ã¥ó¥ÈÂÊÑ´¹Â¥Ç¥­¥ë¥Â«");
-is($a[2], "¥É¥¦¥«¥Î¤Æ¤¹Â¤È¥ò¥·¥Æ¥¤Â¥Þ¥¹¡£");
+is($a[0], "¥³¥ì¥ÏDATA¤Õ¤¡¤¤¤ë¤Ï¤ó¤É¤ë¥Î¤Æ¤¹¤È¥Ç¥¹¡£");
+is($a[1], "ÆüËÜ¸ì¥¬¥Á¥ã¥ó¥ÈÊÑ´¹¥Ç¥­¥ë¥«");
+is($a[2], "¥É¥¦¥«¥Î¤Æ¤¹¤È¥ò¥·¥Æ¥¤¥Þ¥¹¡£");
 
 __DATA__
-¤³¤ì¤ÏDATA¥Õ¥¡¥¤¥ë¥Ï¥ó¥É¥ë¤Î¥Æ¥¹Â¥È¤Ç¤¹¡£
-ÆüËÜ¸ì¤¬¤Á¤ã¤ó¤ÈÂÊÑ´¹Â¤Ç¤­¤ë¤Â«
-¤É¤¦¤«¤Î¥Æ¥¹Â¥È¤ò¤·¤Æ¤¤Â¤Þ¤¹¡£
+¤³¤ì¤ÏDATA¥Õ¥¡¥¤¥ë¥Ï¥ó¥É¥ë¤Î¥Æ¥¹¥È¤Ç¤¹¡£
+ÆüËÜ¸ì¤¬¤Á¤ã¤ó¤ÈÊÑ´¹¤Ç¤­¤ë¤«
+¤É¤¦¤«¤Î¥Æ¥¹¥È¤ò¤·¤Æ¤¤¤Þ¤¹¡£
