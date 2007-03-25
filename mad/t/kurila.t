@@ -19,7 +19,7 @@ use Convert;
 sub p5convert {
     my ($input, $expected, $convert) = @_;
     my $output = Convert::convert($input, $convert && "/usr/bin/perl ../mad/p5kurila.pl");
-    is($output, $expected);
+    is($output, $expected) or $TODO or die;
 }
 
 t_indirect_object_syntax();

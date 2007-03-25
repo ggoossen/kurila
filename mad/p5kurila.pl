@@ -19,7 +19,6 @@ sub entersub_handler {
     my ($method_named) = $twig->findnodes([$sub], "op_method_named");
     return if not $method_named;
 
-    return;
     # skip special subs
     return if $sub->att("flags") =~ m/SPECIAL/;
 
@@ -36,8 +35,8 @@ sub entersub_handler {
 
     # move widespace from method to object and visa versa.
     my ($method_ws) = $twig->findnodes([$method_named],
-                                       qq|madprops/mad_op/op_method/op_const/madprops/mad_sv[\@key="_"]|);
-    my ($obj_ws) = $twig->findnodes([$sub], qq|op_const/madprops/mad_sv[\@key="_"]|);
+                                       qq|madprops/mad_op/op_method/op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
+    my ($obj_ws) = $twig->findnodes([$sub], qq|op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
     if ($method_ws and $obj_ws) {
         my $x_method_ws = $method_ws->att('val');
         my $x_obj_ws = $obj_ws->att('val');
