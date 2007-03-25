@@ -3934,7 +3934,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	    SvPADSTALE_on(PAD_SVl(left->op_targ));
 	}
 
-	if (right && right->op_type == OP_SPLIT) {
+	if (right && right->op_type == OP_SPLIT && !PL_madskills) {
 	    OP* tmpop = ((LISTOP*)right)->op_first;
 	    if (tmpop && (tmpop->op_type == OP_PUSHRE)) {
 		PMOP * const pm = (PMOP*)tmpop;
@@ -3956,11 +3956,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 			tmpop = ((UNOP*)tmpop)->op_first; /* to pushmark */
 			tmpop->op_sibling = NULL;	/* don't free split */
 			right->op_next = tmpop->op_next;  /* fix starting loc */
-#ifdef PERL_MAD
-			op_getmad(o,right,'R');		/* blow off assign */
-#else
 			op_free(o);			/* blow off assign */
-#endif
 			right->op_flags &= ~OPf_WANT;
 				/* "I don't know and I don't care." */
 			return right;
@@ -4092,7 +4088,9 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     /* optimize "!a && b" to "a || b", and "!a || b" to "a && b" */
     if (first->op_type == OP_NOT
 	&& (first->op_flags & OPf_SPECIAL)
-	&& (first->op_flags & OPf_KIDS)) {
+	&& (first->op_flags & OPf_KIDS)
+	&& !PL_madskills
+	) {
 	if (type == OP_AND || type == OP_OR) {
 	    if (type == OP_AND)
 		type = OP_OR;
@@ -4103,12 +4101,8 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 	    if (o->op_next)
 		first->op_next = o->op_next;
 	    cUNOPo->op_first = NULL;
-#ifdef PERL_MAD
-	    op_getmad(o,first,'O');
-#else
 	    op_free(o);
-#endif
-	}
+}
     }
     if (first->op_type == OP_CONST) {
 	if (first->op_private & OPpCONST_STRICT)
