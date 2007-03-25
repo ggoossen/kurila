@@ -6,6 +6,8 @@ BEGIN {
 
 plan tests => 4784;
 
+use utf8;
+
 sub MyUniClass {
   <<END;
 0030	004F

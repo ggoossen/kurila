@@ -76,7 +76,7 @@ is( $foo[1], 9, '$LIST_SEPARATOR' );
 undef $OUTPUT_RECORD_SEPARATOR;
 
 eval 'NO SUCH FUNCTION';
-like( $EVAL_ERROR, qr/method/, '$EVAL_ERROR' );
+like( $EVAL_ERROR, qr/syntax error/, '$EVAL_ERROR' );
 
 is( $UID, $<, '$UID' );
 is( $GID, $(, '$GID' );

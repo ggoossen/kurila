@@ -20,11 +20,11 @@ END { unlink "./__taint__$$" }
 
 print "1..3\n";
 use IO::File;
-$x = new IO::File "> ./__taint__$$" || die("Cannot open ./__taint__$$\n");
+$x = IO::File->new( "> ./__taint__$$" || die("Cannot open ./__taint__$$\n"));
 print $x "$$\n";
 $x->close;
 
-$x = new IO::File "< ./__taint__$$" || die("Cannot open ./__taint__$$\n");
+$x = IO::File->new( "< ./__taint__$$" || die("Cannot open ./__taint__$$\n"));
 chop($unsafe = <$x>);
 eval { kill 0 * $unsafe };
 print "not " if ((($^O ne 'MSWin32') && ($^O ne 'NetWare')) and ($@ !~ /^Insecure/o));
@@ -33,7 +33,7 @@ $x->close;
 
 # We could have just done a seek on $x, but technically we haven't tested
 # seek yet...
-$x = new IO::File "< ./__taint__$$" || die("Cannot open ./__taint__$$\n");
+$x = IO::File->new( "< ./__taint__$$" || die("Cannot open ./__taint__$$\n"));
 $x->untaint;
 print "not " if ($?);
 print "ok 2\n"; # Calling the method worked

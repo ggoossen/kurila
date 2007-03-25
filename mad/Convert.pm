@@ -14,15 +14,14 @@ sub convert {
     open my $infile, "> $file.in" or die;
     $infile->print($input);
     close $infile or die;
-    my $options = "";
+    $options{switches} ||= '';
     if( $input =~ m/^[#][!].*perl(.*)/) {
-        $options = $1;
+        $options{switches} .= " " . $1;
     }
 
     # XML dump
     unlink "$file.xml";
     my $lib = "-I ../lib -I ../t/lib/compress";
-    $options{switches} ||= '';
     `PERL_XMLDUMP='$file.xml' $ENV{madpath}/perl $options{switches} $lib $file.in 2> tmp.err`;
     if (not -s "$file.xml") {
         die "madskills failed. No XML dump";

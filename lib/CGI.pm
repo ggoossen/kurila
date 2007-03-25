@@ -2780,7 +2780,7 @@ sub cookie {
     push(@param,'-secure'=>$secure) if $secure;
     push(@param,'-httponly'=>$httponly) if $httponly;
 
-    return new CGI::Cookie(@param);
+    return CGI::Cookie->new(@param);
 }
 END_OF_FUNC
 

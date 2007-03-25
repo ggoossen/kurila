@@ -759,7 +759,7 @@ It's good! >A< >B<
 BEGIN {
   if ($^O eq 'os390') {
     require File::Glob;
-    import File::Glob ':glob';
+    File::Glob->import(':glob');
   }
 }
 BEGIN {
@@ -781,7 +781,7 @@ EXPECT
 BEGIN {
   if ($^O eq 'os390') {
     require File::Glob;
-    import File::Glob ':glob';
+    File::Glob->import(':glob');
   }
 }
 BEGIN {
@@ -811,10 +811,10 @@ use Carp;
 $SIG{__WARN__} = sub { $@ = shift };
 use Encode;
 use utf8;
-my $t = ord('A') == 193 ? "\xEA" : "\xE9";
+my $t = "\x[E9]";
 $t =~ s/([^a])//ge;
 $@ =~ s/ at .*/ at/;
 print $@
-print "Good" if $t eq "\xE9";
+print "Good" if $t eq "\x[E9]";
 EXPECT
 Good
