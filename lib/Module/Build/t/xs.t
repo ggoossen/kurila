@@ -180,7 +180,7 @@ require DynaLoader;
 \@ISA = qw( Exporter DynaLoader );
 \@EXPORT_OK = qw( okay );
 
-bootstrap Simple \$VERSION;
+Simple->bootstrap(\$VERSION);
 
 1;
 

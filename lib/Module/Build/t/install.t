@@ -27,7 +27,7 @@ print "Hello, World!\n";
 $dist->change_file( 'Build.PL', <<"---" );
 use Module::Build;
 
-my \$build = new Module::Build(
+my \$build = Module::Build->new(
   module_name => '@{[$dist->name]}',
   scripts     => [ 'script' ],
   license     => 'perl',

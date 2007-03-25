@@ -119,7 +119,7 @@ require DynaLoader;
 \@ISA = qw(Exporter DynaLoader);
 \@EXPORT_OK = qw( okay );
 
-bootstrap $self->{name} \$VERSION;
+$self->{name}\->bootstrap(\$VERSION);
 
 1;
 
