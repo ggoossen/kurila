@@ -1192,7 +1192,7 @@ static const sv_retrieve_t sv_retrieve[] = {
 	(sv_retrieve_t)retrieve_tied_key,	/* SX_TIED_KEY */
 	(sv_retrieve_t)retrieve_tied_idx,	/* SX_TIED_IDX */
 	(sv_retrieve_t)retrieve_scalar, 	/* SX_UTF8STR */
-	(sv_retrieve_t)retrieve_other,   	/* SX_LUTF8STR */
+	(sv_retrieve_t)retrieve_lscalar,   	/* SX_LUTF8STR */
 	(sv_retrieve_t)retrieve_flag_hash,	/* SX_HASH */
 	(sv_retrieve_t)retrieve_code,		/* SX_CODE */
 	(sv_retrieve_t)retrieve_weakref,	/* SX_WEAKREF */

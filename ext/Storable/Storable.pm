@@ -121,7 +121,7 @@ EOM
 
 sub file_magic {
     my $file = shift;
-    my $fh = new FileHandle;
+    my $fh = FileHandle->new();
     open($fh, "<". $file) || die "Can't open '$file': $!";
     binmode($fh);
     defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $!";
