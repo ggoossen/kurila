@@ -40,7 +40,8 @@ sub p55 {
     `PERL_XMLDUMP='tmp.xml' ../perl -I ../lib tmp.in 2> tmp.err`;
 
     if (-z "tmp.xml") {
-        return ok 0, "MAD dump failed $msg";
+        ok 0, "MAD dump failed $msg" or $TODO or die;
+        return;
     }
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
     # diag($@) if $@;
@@ -208,4 +209,8 @@ unless (eval { $a }) { $a = $b }
 ########
 # local our $...
 local our $TODO
+########
+# 'my' inside prototyped subcall
+sub ok($;$) { }
+ok my $x = "foobar";
 
