@@ -485,7 +485,7 @@ sub test {
 	} else {
 		my ($try, $args);
 		if (@args == 2) {
-			$try = "$op \$z0";
+			$try = ($op =~ /^\w/) ? "\$z0->$op" : "$op \$z0";
 			$args = "'$args[0]'";
 		} else {
 			$try = ($op =~ /^\w/) ? "$op(\$z0, \$z1)" : "\$z0 $op \$z1";

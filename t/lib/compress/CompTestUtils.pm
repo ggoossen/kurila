@@ -12,7 +12,6 @@ use Carp ;
 #use Test::More ; 
 
 
-
 sub title
 {
     #diag "" ; 
@@ -180,7 +179,7 @@ some text
 EOM
 
     my $x;
-    ok $x = new IO::Compress::Gzip $name, %opts 
+    ok $x = IO::Compress::Gzip->new( $name, %opts) 
         or diag "GzipError is $IO::Compress::Gzip::GzipError" ;
     ok $x->write($string) ;
     ok $x->close ;
@@ -188,7 +187,7 @@ EOM
     #is GZreadFile($name), $string ;
 
     my $gunz;
-    ok $gunz = new IO::Uncompress::Gunzip $name, Strict => 0
+    ok $gunz = IO::Uncompress::Gunzip->new( $name, Strict => 0)
         or diag "GunzipError is $IO::Uncompress::Gunzip::GunzipError" ;
     my $hdr;
     ok $hdr = $gunz->getHeaderInfo();
@@ -440,11 +439,11 @@ sub anyUncompress
     }
 
     my $out = '';
-    my $o = new IO::Uncompress::AnyUncompress \$data, 
+    my $o = IO::Uncompress::AnyUncompress->new( \$data, 
                     Append => 1, 
                     Transparent => 0, 
                     RawInflate => 1,
-                    @opts
+                    @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
     1 while $o->read($out) > 0 ;
@@ -500,12 +499,12 @@ sub getHeaders
     }
 
     my $out = '';
-    my $o = new IO::Uncompress::AnyUncompress \$data, 
+    my $o = IO::Uncompress::AnyUncompress->new( \$data, 
                 MultiStream => 1, 
                 Append => 1, 
                 Transparent => 0, 
                 RawInflate => 1,
-                @opts
+                @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
     1 while $o->read($out) > 0 ;
@@ -544,7 +543,7 @@ sub mkComplete
         );
     }
 
-    my $z = new $class( \$buffer, %params)
+    my $z = $class-> new(( \$buffer, %params))
         or croak "Cannot create $class object: $$Error";
     $z->write($data);
     $z->close();
@@ -552,7 +551,7 @@ sub mkComplete
     my $unc = getInverse($class);
     anyUncompress(\$buffer) eq $data
         or die "bad bad bad";
-    my $u = new $unc( \$buffer);
+    my $u = $unc-> new(( \$buffer));
     my $info = $u->getHeaderInfo() ;
 
 

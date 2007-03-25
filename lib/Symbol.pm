@@ -144,6 +144,8 @@ sub qualify_to_ref ($;$) {
 sub delete_package ($) {
     my $pkg = shift;
 
+    no strict 'refs';
+
     # expand to full symbol table name if needed
 
     unless ($pkg =~ /^main::.*::$/) {

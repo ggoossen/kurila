@@ -1181,7 +1181,7 @@ print PM autoload ($module, $compat_version) unless $opt_c or $opt_X;
 if( ! $opt_X ){ # print bootstrap, unless XS is disabled
   if ($use_Dyna) {
 	$tmp = <<"END";
-bootstrap $module \$VERSION;
+$module->bootstrap(\$VERSION);
 END
   } else {
 	$tmp = <<"END";
