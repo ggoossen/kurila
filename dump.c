@@ -2815,6 +2815,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
 
     if (PL_madskills && o->op_madprop) {
+	char prevkey = '\0';
 	SV *tmpsv = newSVpvn("", 0);
 	MADPROP* mp = o->op_madprop;
 	sv_utf8_upgrade(tmpsv);
@@ -2829,6 +2830,10 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    sv_setpvn(tmpsv,"\"",1);
 	    if (tmp)
 		sv_catxmlpvn(tmpsv, &tmp, 1, 0);
+	    if ((tmp == '_') || (tmp == '#')) /* '_' '#' whitespace belong to the previous token. */
+		sv_catxmlpvn(tmpsv, &prevkey, 1, 0);
+	    else
+		prevkey = tmp;
 	    sv_catpv(tmpsv, "\"");
 	    switch (mp->mad_type) {
 	    case MAD_NULL:
