@@ -6821,7 +6821,10 @@ Perl_ck_sassign(pTHX_ OP *o)
     if ((PL_opargs[kid->op_type] & OA_TARGLEX)
 	&& !(kid->op_flags & OPf_STACKED)
 	/* Cannot steal the second time! */
-	&& !(kid->op_private & OPpTARGET_MY))
+	&& !(kid->op_private & OPpTARGET_MY)
+	/* Keep the full thing for madskills */
+	&& !PL_madskills
+	)
     {
 	OP * const kkid = kid->op_sibling;
 
@@ -6834,13 +6837,8 @@ Perl_ck_sassign(pTHX_ OP *o)
 	    /* Now we do not need PADSV and SASSIGN. */
 	    kid->op_sibling = o->op_sibling;	/* NULL */
 	    cLISTOPo->op_first = NULL;
-#ifdef PERL_MAD
-	    op_getmad(o,kid,'O');
-	    op_getmad(kkid,kid,'M');
-#else
 	    op_free(o);
 	    op_free(kkid);
-#endif
 	    kid->op_private |= OPpTARGET_MY;	/* Used for context settings */
 	    return kid;
 	}
