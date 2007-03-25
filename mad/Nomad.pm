@@ -441,7 +441,8 @@ sub madness {
     my $self = shift;
     my @keys = split(' ', shift);
     my @vals = ();
-    @keys = map { $_ eq 'd' ? ('e', 'd') : $_ } @keys;
+
+    @keys = map { $_ eq 'd' ? ('local', 'd') : $_ } @keys; # always 'local' before 'defintion'
     for my $key (@keys) {
 	my $madprop = $self->{mp}{$key};
 	next unless defined $madprop;
@@ -516,9 +517,80 @@ sub hash {
     my $firstthing = '';
     my $lastthing = '';
     
+    my %mapping = map { reverse(%$_) } (
+    { 'd', "defintion" },
+    { '{', "curly_open" },
+    { '}', "curly_close" },
+    { 'q', "quote_open" },
+    { 'Q', "quote_close" },
+    { '=', "assign" },
+    { 'X', "value" },
+    { 'B', "bareword" },
+    { '^', "hat" },
+    { ';', "colon" },
+    { 'o', "operator" },
+    { '$', "variable" },
+    { '(', "round_open" },
+    { ')', "round_close" },
+    { 'U', "use" },
+    { '_', "wsbefore" },
+    { '#', "wsafter" },
+    { 'O', "replacedoperator" },
+    { 'A', "bigarrow" },
+    { 'a', "arrow" },
+    { '&', "ampersand" },
+    { 'n', "name" },
+    { 's', "sub" },
+    { ',', "comma" },
+    { 'p', "peg" },
+    { 'E', "evaluated" },
+    { 'z', "subst_open" },
+    { 'R', "subst_replacement" },
+    { 'Z', "subst_close" },
+    { 'e', "trans_something_e" },
+    { 'r', "trans_something_r" },
+    { '3', "arg_3" },
+    { '2', "arg_2" },
+    { '1', "arg_1" },
+    { 'L', "label" },
+    { 'm', "match" },
+    { 'D', "do" },
+    { 'f', "fold" },
+    { '@', "ary" },
+    { '%', "hsh" },
+    { 'I', "if" },
+    { 'C', "const" },
+    { 'i', "ifpost" },
+    { '?', "conditional_op" },
+    { 'w', "whilepost" },
+    { 'W', "while" },
+    { ':', "attribute" },
+    { '[', "square_open" },
+    { ']', "square_close" },
+    { '+', "unary_plus" },
+    { 'l', "arylen" },
+    { '*', "star" },
+    { 'v', "for" },
+    { 'P', "package" },
+    { 'V', "version" },
+    { 'S', "fakesub" },
+    { 'B', "block" },
+    { 'b', "unknown_b" },
+    { 'K', "key" },
+    { '~', "tilde" },
+    { 't', "something_t" },
+    { 'F', "format" },
+    );
+
     # We need to guarantee key uniqueness at this point.
     for my $kid (@{$$self{Kids}}) {
 	my ($k,$v) = $kid->pair($self, @_);
+        if ($k =~ m/^ws(before|after)-(.*)$/) {
+            $k = ($1 eq "before" ? '_' : '#') . ($mapping{$2} || $2);
+        }
+        else {
+            $k = $mapping{$k} || $k;
+        }
 	$firstthing ||= $k;
         die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne "" and $hash{$k} ne $v;
         $lastthing = $k;
@@ -594,7 +666,6 @@ sub ast {
 
     my @retval;
     my @newkids;
-    push @retval, $self->madness('M ox');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
@@ -611,7 +682,7 @@ package PLXML::baseop_unop;
 
 sub ast {
     my $self = shift;
-    my @newkids = $self->madness('d M ox o (');
+    my @newkids = $self->madness('d o (');
 
     if (exists $$self{Kids}) {
 	my $arg = $$self{Kids}[0];
@@ -627,8 +698,6 @@ package PLXML::binop;
 sub ast {
     my $self = shift;
     my @newkids;
-
-    push @newkids, $self->madness('M ox');
 
     my $left = $$self{Kids}[0];
     push @newkids, $left->ast($self, @_);
@@ -673,9 +742,6 @@ sub ast {
     my @retval;
     my @before;
     my @after;
-    if (@before = $self->madness('M')) {
-	push @before, $self->madness('ox');	# o is the function name
-    }
     if (@retval = $self->madness('X')) {
 	push @before, $self->madness('o x');
 	return P5AST::listop->new(Kids => [@before,@retval]);
@@ -1157,7 +1223,7 @@ BEGIN {
 	    else {
 		my $newself = $subkids[0];
 		splice(@{$newself->{Kids}}, 1, 0,
-			    $self->madness('ox ('),
+			    $self->madness('('),
 			    @newkids,
 			    $self->madness(')')
 		);
@@ -1854,10 +1920,6 @@ sub astnull {
     my $self = shift;
     my @newkids;
 
-    my @before;
-    if (@before = $self->madness('M')) {
-	push @before, $self->madness('ox');	# o is the .
-    }
     my @after;
     my $left = $$self{Kids}[0];
     push @newkids, $left->ast($self, @_);
@@ -1874,10 +1936,6 @@ sub ast {
     my $parent = $_[0];
     my @newkids;
 
-    my @before;
-    if (@before = $self->madness('M')) {
-	push @before, $self->madness('ox');	# o is the .
-    }
     my @after;
     my $left = $$self{Kids}[0];
     push @newkids, $left->ast($self, @_);
@@ -1887,7 +1945,7 @@ sub ast {
     my $right = $$self{Kids}[1];
     push @newkids, $right->ast($self, @_);
 
-    return $self->newtype->new(Kids => [@before, @newkids, @after]);
+    return $self->newtype->new(Kids => [@newkids, @after]);
 }
 
 package PLXML::op_stringify;
@@ -1901,10 +1959,6 @@ sub ast {
     my @newkids;
     my @front = $self->madness('q (');
     my @back = $self->madness(') Q');
-    my @M = $self->madness('M');
-    if (@M) {
-	push @newkids, $M[0], $self->madness('o');
-    }
     push @newkids, @front;
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
@@ -2215,7 +2269,7 @@ sub ast {
     my $self = shift;
     my $results = $self->SUPER::ast(@_);
     if (my @dest = $self->madness('R')) {
-	return PLXML::op_aassign->newtype->new(Kids => [@dest, $self->madness('ox'), $results]);
+	return PLXML::op_aassign->newtype->new(Kids => [@dest, $results]);
     }
     return $results;
 }

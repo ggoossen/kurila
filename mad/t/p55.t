@@ -23,6 +23,7 @@ BEGIN {
 }
 
 use Test::More qw|no_plan|;
+use Test::Differences;
 use IO::Handle;
 
 use Nomad;
@@ -42,8 +43,40 @@ sub p55 {
         return ok 0, "MAD dump failed $msg";
     }
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
-    diag($@) if $@;
-    is($output, $input, $msg);
+    # diag($@) if $@;
+    is($output, $input, $msg) or $TODO or die;
+}
+
+sub p55_file {
+    my $file = shift;
+    my $input;
+    local $/ = undef;
+    #warn $file;
+    open(my $fh, "<", "$file") or die "Failed open '../t/$file' $!";
+    $input = $fh->getline;
+    close $fh or die;
+
+    my $switches = "";
+    if( $input =~ m/^[#][!].*perl(.*)/) {
+        $switches = $1;
+    }
+
+    unlink "tmp.xml";
+    `PERL_XMLDUMP='tmp.xml' ../perl $switches -I ../lib $file 2> tmp.err`;
+
+    if (-z "tmp.xml") {
+        fail "MAD dump failure of '$file'";
+        return;
+    }
+    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
+    if ($@) {
+        fail "convert xml to p5 failed file: '$file'";
+        $TODO or die;
+        #diag "error: $@";
+        return;
+    }
+    # ok($output eq $input, "p55 '$file'");
+    eq_or_diff $output, $input, "p55 '$file'";
 }
 
 undef $/;
@@ -59,11 +92,8 @@ for my $prog (@prgs) {
 
 # Files
 use File::Find;
-use Test::Differences;
 
 our %failing = map { $_, 1 } qw|
-../t/op/subst.t
-
 ../t/comp/require.t
 
 ../t/io/layers.t
@@ -89,33 +119,8 @@ my @files;
 find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
 
 for my $file (@files) {
-    my $input;
-    local $/ = undef;
     local $TODO = (exists $failing{$file} ? "Known failure" : undef);
-    #warn $file;
-    open(my $fh, "<", "$file") or die "Failed open '../t/$file' $!";
-    $input = $fh->getline;
-    close $fh or die;
-
-    my $switches = "";
-    if( $input =~ m/^[#][!].*perl(.*)/) {
-        $switches = $1;
-    }
-
-    unlink "tmp.xml";
-    `PERL_XMLDUMP='tmp.xml' ../perl $switches -I ../lib $file 2> tmp.err`;
-
-    if (-z "tmp.xml") {
-        fail "MAD dump failure of '$file'";
-        next;
-    }
-    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
-    if ($@) {
-        fail "convert xml to p5 failed file: '$file'";
-        diag "error: $@";
-        next;
-    }
-    eq_or_diff $output, $input, "p55 '$file'";
+    p55_file($file);
 }
 
 __DATA__
@@ -139,13 +144,13 @@ for (my $i=0; $i<3; $i++) { }
 ########
 for (; $a<3; $a++) { }
 ########
-# TODO
+#
 s//$#foo/ge;
 ########
-# TODO
+#
 s//m#.#/ge;
 ########
-# TODO
+#
 eval { require 5.005 }
 ########
 # TODO Reduced test case from t/io/layers.t
@@ -184,3 +189,23 @@ BEGIN {
     exit 0;
 }
 use foobar;
+########
+# operator with modify TARGET_MY
+my $nc_attempt;
+$nc_attempt = 0+ ($within eq 'other_sub') ;
+########
+# __END__ section
+$foo
+
+__END__
+DATA
+########
+# split with PUSHRE
+@prgs = split "\n########\n", <DATA>;
+########
+# unless(eval { })
+unless (eval { $a }) { $a = $b }
+########
+# local our $...
+local our $TODO
+

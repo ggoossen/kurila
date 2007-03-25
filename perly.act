@@ -1212,7 +1212,7 @@ case 2:
   case 154:
 #line 1084 "perly.y"
     { (yyval.opval) = localize((ps[(2) - (2)].val.opval),IVAL((ps[(1) - (2)].val.i_tkval)));
-			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'e');
+			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'k');
 			;}
     break;
 
