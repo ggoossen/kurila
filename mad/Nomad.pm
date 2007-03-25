@@ -441,6 +441,7 @@ sub madness {
     my $self = shift;
     my @keys = split(' ', shift);
     my @vals = ();
+    @keys = map { $_ eq 'd' ? ('e', 'd') : $_ } @keys;
     for my $key (@keys) {
 	my $madprop = $self->{mp}{$key};
 	next unless defined $madprop;
@@ -519,13 +520,8 @@ sub hash {
     for my $kid (@{$$self{Kids}}) {
 	my ($k,$v) = $kid->pair($self, @_);
 	$firstthing ||= $k;
-	if ($k =~ /^[_#]$/) {	# rekey whitespace according to preceding entry
-	    $k .= $lastthing;	# (which is actually the token the whitespace is before)
-	}
-	else {
-	    $k .= 'x' while exists $hash{$k};
-	    $lastthing = $k;
-	}
+        die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne "" and $hash{$k} ne $v;
+        $lastthing = $k;
 	$hash{$k} = $v;
     }
     $hash{FIRST} = $firstthing;
