@@ -34,6 +34,7 @@ sub dprofpp {
 	close D;
 	push( @results, @err ) if @err;
 
+        sleep 1000;
 	$results = qq{@results};
 	# ignore Loader (Dyna/Auto etc), leave newline
 	$results =~ s/^\w+Loader::import//;

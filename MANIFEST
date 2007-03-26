@@ -197,6 +197,7 @@ ext/Devel/DProf/DProf.pm	Perl code profiler
 ext/Devel/DProf/DProf.xs	Perl code profiler
 ext/Devel/DProf/Makefile.PL	Perl code profiler makefile writer
 ext/Devel/DProf/t/DProf.t	Perl code profiler
+ext/Devel/DProf/t/dprofpp.t	Perl code profiler dprofpp test
 ext/Devel/DProf/Todo		Perl code profiler todo list
 ext/Devel/Peek/Changes		Data debugging tool, changelog
 ext/Devel/Peek/Makefile.PL	Data debugging tool, makefile writer
