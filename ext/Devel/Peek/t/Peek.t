@@ -71,7 +71,7 @@ do_test( 1,
 'SV = PV\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\(POK,pPOK\\)
-  PV = $ADDR "foo"\\\0
+  PV = $ADDR "foo"\\\0 \[UTF8 "foo"\]
   CUR = 3
   LEN = \\d+'
        );
@@ -81,7 +81,7 @@ do_test( 2,
 'SV = PV\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\(.*POK,READONLY,pPOK\\)
-  PV = $ADDR "bar"\\\0
+  PV = $ADDR "bar"\\\0 \[UTF8 "bar"\]
   CUR = 3
   LEN = \\d+');
 
@@ -125,10 +125,10 @@ do_test( 7,
 'SV = PVNV\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\(NOK,pNOK\\)
-  IV = \d+
+  IV = \\d+
   NV = 789\\.(?:1(?:000+\d+)?|0999+\d+)
-  PV = $ADDR "789"\\\0
-  CUR = 3
+  PV = $ADDR "789"\\\0 \\[UTF8 "789\\.1"\\]
+  CUR = 5
   LEN = \\d+');
 
 do_test( 8,
@@ -150,12 +150,19 @@ do_test(10,
   REFCNT = 1
   FLAGS = \\(ROK\\)
   RV = $ADDR
-  SV = PV\\($ADDR\\) at $ADDR
+  SV = PVMG\\($ADDR\\) at $ADDR
     REFCNT = 2
-    FLAGS = \\(POK,pPOK\\)
-    PV = $ADDR "foo"\\\0
+    FLAGS = \\(SMG,POK,pPOK\\)
+    IV = 0
+    NV = 0
+    PV = $ADDR "foo"\\\0 \\[UTF8 "foo"\\]
     CUR = 3
-    LEN = \\d+');
+    LEN = \\d+
+    MAGIC = $ADDR
+      MG_VIRTUAL = &PL_vtbl_utf8
+      MG_TYPE = PERL_MAGIC_utf8\\(w\\)
+      MG_LEN = 3
+');
 
 my $c_pattern;
 if ($type eq 'N') {
@@ -210,7 +217,7 @@ do_test(12,
     MAX = 7
     RITER = -1
     EITER = 0x0
-    Elt "123" HASH = $ADDR' . $c_pattern);
+    Elt "123" \\[UTF8 "123"\\] HASH = $ADDR' . $c_pattern);
 
 do_test(13,
         sub(){@_},
@@ -282,7 +289,7 @@ do_test(15,
       MG_VIRTUAL = $ADDR
       MG_TYPE = PERL_MAGIC_qr\(r\)
       MG_OBJ = $ADDR
-        PAT = "\(\?-xism:tic\)"
+        PAT = "\(\?-uxism:tic\)"
         REFCNT = 2
     STASH = $ADDR\\t"Regexp"');
 
@@ -332,7 +339,7 @@ do_test(18,
 'SV = PV\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\((?:PADTMP,)?POK,pPOK\\)
-  PV = $ADDR "\\\304\\\200\\\0\\\310\\\200"\\\0
+  PV = $ADDR "\\\304\\\200\\\0\\\310\\\200"\\\0 \\[UTF8 "\\\x\\{100\\}\\\x\\{0\\}\\\x\\{200\\}"\\]
   CUR = 5
   LEN = \\d+');
 
@@ -352,11 +359,11 @@ do_test(19,
     MAX = 7
     RITER = -1
     EITER = $ADDR
-    Elt "\\\304\\\200" HASH = $ADDR
+    Elt "\\\304\\\200" \\[UTF8 "\\\x[{]100[}]"\\] HASH = $ADDR
     SV = PV\\($ADDR\\) at $ADDR
       REFCNT = 1
       FLAGS = \\(POK,pPOK\\)
-      PV = $ADDR "\\\310\\\200"\\\0
+      PV = $ADDR "\\\310\\\200"\\\0 \\[UTF8 "\\\x[{]200[}]"]
       CUR = 2
       LEN = \\d+');
 
@@ -369,9 +376,12 @@ do_test(20,
   FLAGS = \\(PADMY,SMG,POK,pPOK\\)
   IV = 0
   NV = 0
-  PV = $ADDR ""\\\0
+  PV = $ADDR ""\\\0 \\[UTF8 ""\\]
   CUR = 0
   LEN = \d+
+  MAGIC = $ADDR
+    MG_VIRTUAL = &PL_vtbl_utf8
+    MG_TYPE = PERL_MAGIC_utf8[(]w[)]
   MAGIC = $ADDR
     MG_VIRTUAL = &PL_vtbl_mglob
     MG_TYPE = PERL_MAGIC_regex_global\\(g\\)
@@ -392,7 +402,7 @@ do_test(21,
   FLAGS = \\(GMG,SMG,RMG,pIOK,pPOK\\)
   IV = 0
   NV = 0
-  PV = $ADDR "0"\\\0
+  PV = $ADDR "0"\\\0 \\[UTF8 "0"\\]
   CUR = 1
   LEN = \d+
   MAGIC = $ADDR
@@ -429,9 +439,13 @@ do_test(22,
     SV = NULL\\(0x0\\) at $ADDR
       REFCNT = \d+
       FLAGS = \\(READONLY\\)
-    PV = $ADDR ""
+    PV = $ADDR "" \\[UTF8 ""\\]
     CUR = 0
     LEN = 0
+    MAGIC = $ADDR
+      MG_VIRTUAL = &PL_vtbl_utf8
+      MG_TYPE = PERL_MAGIC_utf8[(]w[)]
+      MG_LEN = 16
     STASH = $ADDR\s+"Foobar"');
 
 # Constant subroutines
@@ -458,7 +472,7 @@ do_test(23,
     SV = PV\\($ADDR\\) at $ADDR
       REFCNT = 1
       FLAGS = \\(.*POK,READONLY,pPOK\\)
-      PV = $ADDR "Perl rules"\\\0
+      PV = $ADDR "Perl rules"\\\0 \\[UTF8 "Perl rules"\\]
       CUR = 10
       LEN = \\d+
     GVGV::GV = $ADDR\\t"main" :: "const"

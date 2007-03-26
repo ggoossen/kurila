@@ -99,16 +99,6 @@ sub name_param {
   'name';
 }
 
-# This is possibly buggy, in that it's not mandatory (below, in the main
-# C_constant parameters, but is expected to exist here, if it's needed)
-# Buggy because if you're definitely pure 8 bit only, and will never be
-# presented with your constants in utf8, the default form of C_constant can't
-# be told not to do the utf8 version.
-
-sub is_utf8_param {
-  'utf8';
-}
-
 sub memEQ {
   "!memcmp";
 }
@@ -231,19 +221,7 @@ sub dump_names {
     my $type;
     if (ref $_) {
       $type = $_->{type} || $default_type;
-      if ($_->{utf8}) {
-        # For simplicity always skip the bytes case, and reconstitute this entry
-        # from its utf8 twin.
-        next if $_->{utf8} eq 'no';
-        # Copy the hashref, as we don't want to mess with the caller's hashref.
-        $_ = {%$_};
-        unless (is_perl56) {
-          utf8::decode ($_->{name});
-        } else {
-          $_->{name} = pack 'U*', unpack 'U0U*', $_->{name};
-        }
-        delete $_->{utf8};
-      }
+      confess "No more utf8 flag" if ($_->{utf8});
     } else {
       $_ = {name=>$_};
       $type = $default_type;
@@ -423,14 +401,8 @@ sub match_clause {
   my $body = '';
   my ($no, $yes, $either, $name, $inner_indent);
   if (ref $item eq 'ARRAY') {
-    ($yes, $no) = @$item;
-    $either = $yes || $no;
-    confess "$item is $either expecting hashref in [0] || [1]"
-      unless ref $either eq 'HASH';
-    $name = $either->{name};
+      confess("utf8 removed '$item->[0]{name}' - '$item->[1]{name}'");
   } else {
-    confess "$item->{name} has utf8 flag '$item->{utf8}', should be false"
-      if $item->{utf8};
     $name = $item->{name};
     $inner_indent = $indent;
   }
@@ -444,17 +416,8 @@ sub match_clause {
   # encoded in UTF8 happens to be the same byte sequence as the second's
   # encoded in (say) ISO-8859-1.
   # In this case, $yes and $no both have item hashrefs.
-  if ($yes) {
-    $body .= $indent . "  if (" . $self->is_utf8_param . ") {\n";
-  } elsif ($no) {
-    $body .= $indent . "  if (!" . $self->is_utf8_param . ") {\n";
-  }
   if ($either) {
     $body .= $self->return_clause ({indent=>4 + length $indent}, $either);
-    if ($yes and $no) {
-      $body .= $indent . "  } else {\n";
-      $body .= $self->return_clause ({indent=>4 + length $indent}, $no);
-    }
     $body .= $indent . "  }\n";
   } else {
     $body .= $self->return_clause ({indent=>2 + length $indent}, $item);
@@ -700,50 +663,12 @@ sub normalise_items
       warn +(ref ($self) || $self)
 	. "doesn't know how to handle values of type $_ used in macro $name"
 	  unless $self->valid_type ($item->{type});
-      # tr///c is broken on 5.6.1 for utf8, so my original tr/\0-\177//c
-      # doesn't work. Upgrade to 5.8
-      # if ($name !~ tr/\0-\177//c || $] < 5.005_50) {
-      if ($name =~ tr/\0-\177// == length $name || $] < 5.005_50
-	 || $args->{disable_utf8_duplication}) {
-        # No characters outside 7 bit ASCII.
-        if (exists $items->{$name}) {
-          die "Multiple definitions for macro $name";
-        }
-        $items->{$name} = $item;
-      } else {
-        # No characters outside 8 bit. This is hardest.
-        if (exists $items->{$name} and ref $items->{$name} ne 'ARRAY') {
-          confess "Unexpected ASCII definition for macro $name";
-        }
-        # Again, 5.6.1 tr broken, so s/5\.6.*/5\.8\.0/;
-        # if ($name !~ tr/\0-\377//c) {
-        if ($name =~ tr/\0-\377// == length $name) {
-#          if ($] < 5.007) {
-#            $name = pack "C*", unpack "U*", $name;
-#          }
-          $item->{utf8} = 'no';
-          $items->{$name}[1] = $item;
-          push @new_items, $item;
-          # Copy item, to create the utf8 variant.
-          $item = {%$item};
-        }
-        # Encode the name as utf8 bytes.
-        unless (is_perl56) {
-          utf8::encode($name);
-        } else {
-#          warn "Was >$name< " . length ${name};
-          $name = pack 'C*', unpack 'C*', $name . pack 'U*';
-#          warn "Now '${name}' " . length ${name};
-        }
-        if ($items->{$name}[0]) {
-          die "Multiple definitions for macro $name";
-        }
-        $item->{utf8} = 'yes';
+
         $item->{name} = $name;
-        $items->{$name}[0] = $item;
+        $items->{$name} = $item;
         # We have need for the utf8 flag.
         $what->{''} = 1;
-      }
+
       push @new_items, $item;
     }
     @new_items;

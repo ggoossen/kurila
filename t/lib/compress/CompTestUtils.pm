@@ -574,7 +574,6 @@ sub mkEvalErr
 {
     my $string = shift ;
 
-    return "/$string\\s+at \\(eval /" if $] > 5.006 ;
     return "/$string\\s+at /" ;
 }
 

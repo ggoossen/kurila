@@ -39,6 +39,8 @@ use Test;
 use strict;
 use warnings;
 
+use utf8;
+
 BEGIN { plan tests => 112 };
 
 #########################

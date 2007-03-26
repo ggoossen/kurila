@@ -74,6 +74,8 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%Kinds %Type %Flavor %Type_Description @Type_Order);
 
+use Perl6::Form;
+
 our(%Kinds, %Type, %Flavor);
 
 our %Type_Description = (
@@ -137,23 +139,20 @@ while (<DATA>) {
 close DATA;
 
 my( $typedesc, $list );
-unless (caller) { 
+unless (caller) {
     foreach my $type ( @Type_Order ) {
 	$list = join(", ", sort @{$Kinds{$type}});
 	$typedesc = $Type_Description{$type} . ":";
-	write;
-    } 
+
+        print form("",
+                   "{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+                   $typedesc,
+                   "     {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+                   $list,
+                  );
+    }
 }
 
-format = 
-
-^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    $typedesc 
-~~ ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    $typedesc 
- ~~  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	$list
-.
 
 1;
 

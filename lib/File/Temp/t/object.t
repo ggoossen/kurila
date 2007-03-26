@@ -119,5 +119,3 @@ $File::Temp::KEEP_ALL = 0;
 # Now END block will execute to test the removal of directories
 print "# End of tests. Execute END blocks\n";
 
-ocks\n";
-

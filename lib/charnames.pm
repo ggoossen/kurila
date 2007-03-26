@@ -84,6 +84,7 @@ sub alias_file ($)
   0;
 } # alias_file
 
+# This function is used by toke.c to get \N{...}
 # This is not optimized in any way yet
 sub charnames
 {

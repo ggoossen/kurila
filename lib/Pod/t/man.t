@@ -27,6 +27,7 @@ END {
 use Pod::Man;
 use Encode;
 use charnames ':full';
+use utf8;
 
 $loaded = 1;
 print "ok 1\n";
@@ -40,6 +41,7 @@ while (<DATA>) {
 
     my $input = "";
     while (<DATA>) {
+        no warnings 'utf8'; # No invalid unicode warnings.
         $_ = Encode::decode('iso-8859-1', $_); # DATA is ISO 8859-e encoded
         last if $_ eq "###\n";
         $input .= $_;
@@ -58,15 +60,11 @@ while (<DATA>) {
     eval { binmode (\*TMP, ':encoding(iso-8859-1)') };
     no warnings 'utf8';
     print TMP $input;
-
-    while (<DATA>) {
-        last if $_ eq "###\n";
-        no warnings 'utf8';
-        print TMP $_;
-    }
     close TMP;
 
     test_outtmp($expected);
+
+    unlink('tmp.pod');
 
     open (TMP2, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
     eval { binmode (\*TMP2, ':encoding(utf-8)') };
@@ -74,6 +72,8 @@ while (<DATA>) {
     print TMP2 $input;
     close TMP2;
     test_outtmp($expected);
+
+    unlink('tmp.pod');
 }
 
 sub test_outtmp {
@@ -89,12 +89,12 @@ sub test_outtmp {
         $output = <OUT>;
     }
     close OUT;
-    #unlink ('tmp.pod', 'out.tmp');
+    unlink ('out.tmp');
     if ($output eq $expected) {
         print "ok $n\n";
     } else {
-        print "not ok $n\n";
         print "Expected\n========\n$expected\nOutput\n======\n$output\n";
+        print "not ok $n\n";
     }
     $n++;
 }
