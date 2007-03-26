@@ -21,13 +21,13 @@ use bytes;
 use utf8;
 
 open(F,"+>:utf8",'a');
-print F chr(0x100)."\xc2\xa3";
+print F chr(0x100)."\x[c2]\x[a3]";
 cmp_ok( tell(F), '==', 4, tell(F) );
 print F "\n";
 cmp_ok( tell(F), '>=', 5, tell(F) );
 seek(F,0,0);
 is( getc(F), chr(0x100) );
-is( getc(F), "\xc2\xa3" );
+is( getc(F), "\x[c2]\x[a3]" );
 is( getc(F), "\n" );
 seek(F,0,0);
 binmode(F,":bytes");
@@ -42,12 +42,12 @@ is( getc(F), $chr );
 is( getc(F), "\n" );
 seek(F,0,0);
 binmode(F,":utf8");
-is( scalar(<F>), "\x{100}\xc2\xa3\n" );
+is( scalar(<F>), "\x{100}\x[c2]\x[a3]\n" );
 seek(F,0,0);
 $buf = chr(0x200);
 $count = read(F,$buf,2,1);
 cmp_ok( $count, '==', 2 );
-is( $buf, "\x{200}\x{100}\xc2\xa3" );
+is( $buf, "\x{200}\x{100}\x[c2]\x[a3]" );
 close(F);
 
 {
@@ -213,7 +213,6 @@ is($failed, undef);
 	    binmode(F, ":" . $u->[1]);
 
 	    my $s = chr($v->[0]);
-	    utf8::upgrade($s) if $v->[1] eq "utf8";
 
 	    $s .= <F>;
 	    is( $s, chr($v->[0]) . chr($u->[0]), 'rcatline utf8' );
@@ -244,7 +243,7 @@ is($failed, undef);
     local $SIG{__WARN__} = sub { $@ = shift };
     open F, ">a";
     binmode F;
-    my ($chrE4, $chrF6) = ("\xE4", "\xF6");
+    my ($chrE4, $chrF6) = ("\x[E4]", "\x[F6]");
     print F "foo", $chrE4, "\n";
     print F "foo", $chrF6, "\n";
     close F;

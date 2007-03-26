@@ -20,6 +20,7 @@ our @EXPORT_OK = qw(charinfo
 		    namedseq);
 
 use Carp;
+use utf8;
 
 =head1 NAME
 

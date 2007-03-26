@@ -21,6 +21,7 @@ local $Data::Dumper::Sortkeys = 1;
 
 use Data::Dumper;
 use Config;
+use utf8;
 my $Is_ebcdic = defined($Config{'ebcdic'}) && $Config{'ebcdic'} eq 'define';
 
 $Data::Dumper::Pad = "#";
@@ -305,7 +306,7 @@ $foo = { "abc\000\'\efg" => "mno\000",
 
   $WANT = <<"EOT";
 #\$VAR1 = {
-#  'abc\0\\'\efg' => 'mno\0',
+#  "abc\\x00'\efg" => "mno\\x00",
 #  'reftest' => \\\\1
 #};
 EOT
@@ -1311,38 +1312,21 @@ EOT
 
 #XXX}
 {
-    if ($Is_ebcdic) {
 	$b = "Bad. XS didn't escape dollar sign";
 ############# 322
-	$WANT = <<"EOT"; # Careful. This is '' string written inside '' here doc
-#\$VAR1 = '\$b\"\@\\\\\xB1';
-EOT
-        $a = "\$b\"\@\\\xB1\x{100}";
-	chop $a;
-	TEST q(Data::Dumper->Dump([$a])), "utf8 flag with \" and \$";
-	if ($XS) {
-	    $WANT = <<'EOT'; # While this is "" string written inside "" here doc
-#$VAR1 = "\$b\"\@\\\x{b1}";
-EOT
-            TEST q(Data::Dumper->Dumpxs([$a])), "XS utf8 flag with \" and \$";
-	}
-    } else {
-	$b = "Bad. XS didn't escape dollar sign";
-############# 322
-	$WANT = <<"EOT"; # Careful. This is '' string written inside '' here doc
-#\$VAR1 = '\$b\"\@\\\\\xA3';
+	$WANT = <<'EOT';
+#$VAR1 = "\$b\"\@\\\x{00a3}";
 EOT
 
         $a = "\$b\"\@\\\xA3\x{100}";
 	chop $a;
 	TEST q(Data::Dumper->Dump([$a])), "utf8 flag with \" and \$";
 	if ($XS) {
-	    $WANT = <<'EOT'; # While this is "" string written inside "" here doc
+	    $WANT = <<'EOT';
 #$VAR1 = "\$b\"\@\\\x{a3}";
 EOT
             TEST q(Data::Dumper->Dumpxs([$a])), "XS utf8 flag with \" and \$";
 	}
-  }
   # XS used to produce "$b\"' which is 4 chars, not 3. [ie wrongly qq(\$b\\\")]
 ############# 328
   $WANT = <<'EOT';

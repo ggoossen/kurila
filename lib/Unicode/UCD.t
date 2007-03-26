@@ -18,6 +18,7 @@ BEGIN {
 use strict;
 use Unicode::UCD;
 use Test::More;
+use utf8;
 
 BEGIN { plan tests => 188 };
 
