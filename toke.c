@@ -1813,6 +1813,7 @@ S_scan_const(pTHX_ char *start)
     bool didrange = FALSE;		        /* did we just finish a range? */
     I32  has_utf8 = FALSE;			/* Output constant is UTF8 */
     I32  this_utf8 = UTF;			/* The source string is assumed to be UTF8 */
+    bool in_codepoints = (IN_CODEPOINTS != 0);  /* PL_curtoken can be changed ?! */
     UV uv;
 
     if (PL_lex_inwhat == OP_TRANS && PL_sublex_info.sub_op) {
@@ -2046,7 +2047,7 @@ S_scan_const(pTHX_ char *start)
 			I32 flags = PERL_SCAN_DISALLOW_PREFIX;
 			uv = grok_hex(s, &len, &flags, NULL);
 			s += len;
-			if ( ! IN_CODEPOINTS ) {
+			if ( ! in_codepoints ) {
 		        *d++ = (char)uv;
 				continue;
 		    }
@@ -2066,10 +2067,10 @@ S_scan_const(pTHX_ char *start)
 		    has_utf8 = TRUE;
 		    if (PL_lex_inwhat == OP_TRANS &&
 			PL_sublex_info.sub_op) {
-			if ( ! ( IN_CODEPOINTS || IN_BYTES))
+			if ( ! ( in_codepoints || IN_BYTES))
 			    Perl_warner(aTHX_ packWARN(WARN_UTF8),
 					"Codepoints or bytes");
-			if (IN_CODEPOINTS) {
+			if (in_codepoints) {
 			    PL_sublex_info.sub_op->op_private |=
 				OPpTRANS_UTF8;
 			}
@@ -2233,7 +2234,7 @@ S_scan_const(pTHX_ char *start)
     } else
 	SvREFCNT_dec(sv);
 
-    if ( has_utf8 && ! IN_CODEPOINTS && ! PL_encoding && ! IN_BYTES ) 
+    if ( has_utf8 && ! in_codepoints && ! PL_encoding && ! IN_BYTES )
 	Perl_warner(aTHX_ packWARN(WARN_MISC),
 		    "utf8 found, but not 'use utf8'");
     return s;
