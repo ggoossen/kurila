@@ -32,6 +32,8 @@ ok(1);
 
 #########################
 
+use utf8;
+
 no warnings 'utf8';
 
 # NULL is tailorable but illegal code points are not.
