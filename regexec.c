@@ -1184,7 +1184,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	    break;
 	case EXACTF:
 	    m   = STRING(c);
-	    ln  = STR_LEN(c);	/* length to match in octets/bytes */
+	    ln  = 1; /*STR_LEN(c);*/	/* length to match in octets/bytes */
 	    if (do_utf8) {
 	        STRLEN ulen1, ulen2;
 		U8 tmpbuf1[UTF8_MAXBYTES_CASE+1];
@@ -1232,33 +1232,22 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	        U8 tmpbuf [UTF8_MAXBYTES+1];
 		STRLEN len, foldlen;
 		const U32 uniflags = UTF8_ALLOW_DEFAULT;
-		if (c1 == c2) {
-		    /* Upper and lower of 1st char are equal -
-		     * probably not a "letter". */
-		    while (s <= e) {
-		        c = utf8n_to_uvchr((U8*)s, UTF8_MAXBYTES, &len,
-					   uniflags);
-			REXEC_FBC_EXACTISH_CHECK(c == c1);
-		    }
-		}
-		else {
-		    while (s <= e) {
-		      c = utf8n_to_uvchr((U8*)s, UTF8_MAXBYTES, &len,
+		while (s <= e) {
+		    c = utf8n_to_uvchr((U8*)s, UTF8_MAXBYTES, &len,
 					   uniflags);
 
-			/* Handle some of the three Greek sigmas cases.
-			 * Note that not all the possible combinations
-			 * are handled here: some of them are handled
-			 * by the standard folding rules, and some of
-			 * them (the character class or ANYOF cases)
-			 * are handled during compiletime in
-			 * regexec.c:S_regclass(). */
-			if (c == (UV)UNICODE_GREEK_CAPITAL_LETTER_SIGMA ||
-			    c == (UV)UNICODE_GREEK_SMALL_LETTER_FINAL_SIGMA)
-			    c = (UV)UNICODE_GREEK_SMALL_LETTER_SIGMA;
-
-			REXEC_FBC_EXACTISH_CHECK(c == c1 || c == c2);
-		    }
+		    /* Handle some of the three Greek sigmas cases.
+		     * Note that not all the possible combinations
+		     * are handled here: some of them are handled
+		     * by the standard folding rules, and some of
+		     * them (the character class or ANYOF cases)
+		     * are handled during compiletime in
+		     * regexec.c:S_regclass(). */
+		    if (c == (UV)UNICODE_GREEK_CAPITAL_LETTER_SIGMA ||
+			c == (UV)UNICODE_GREEK_SMALL_LETTER_FINAL_SIGMA)
+			c = (UV)UNICODE_GREEK_SMALL_LETTER_SIGMA;
+		    
+		    REXEC_FBC_EXACTISH_CHECK(c == c1 || c == c2);
 		}
 	    }
 	    else {
@@ -1950,8 +1939,8 @@ Perl_regexec_flags(pTHX_ register regexp *prog, char *stringarg, register char *
 	    if (last == NULL) {
 		DEBUG_EXECUTE_r(
 		    PerlIO_printf(Perl_debug_log,
-			"%sCan't trim the tail, match fails (should not happen)%s\n",
-	                PL_colors[4], PL_colors[5]));
+			"%sCan't trim the tail %s, match fails (should not happen)%s\n",
+	                PL_colors[4], prog->float_substr, PL_colors[5]));
 		goto phooey; /* Should not happen! */
 	    }
 	    dontbother = strend - last + prog->float_min_offset;
@@ -1981,9 +1970,6 @@ Perl_regexec_flags(pTHX_ register regexp *prog, char *stringarg, register char *
     goto phooey;
 
 got_it:
-    DEBUG_EXECUTE_r(
-	PerlIO_printf(Perl_debug_log,
-		      "Can't trim the tail, match fails (should not happen)%d\n", PL_reg_flags & RF_tainted));
     RX_MATCH_TAINTED_set(prog, PL_reg_flags & RF_tainted);
 
     if (PL_reg_eval_set) {

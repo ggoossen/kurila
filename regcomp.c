@@ -2839,18 +2839,20 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 	}
 	else if (PL_regkind[OP(scan)] == EXACT) { /* But OP != EXACT! */
 	    I32 l = STR_LEN(scan);
+	    I32 ulen = utf8_length((U8*)STRING(scan), (U8*)STRING(scan)+l);
 	    UV uc = *((U8*)STRING(scan));
 
 	    /* Search for fixed substrings supports EXACT only. */
 	    if (flags & SCF_DO_SUBSTR) {
 		assert(data);
 		SCAN_COMMIT(pRExC_state, data, minlenp);
+		/* folded we know nothing about the pos_min or the pos_delta
+		      single character might be folded to multiple codepoints
+		      and there might be any number of case-ignorable codepoints */
+		data->longest = &(data->longest_float);
+		data->pos_min += ulen;
+		is_inf = is_inf_internal = 1;
 	    }
-
-	    min += l; /* incorrect with folding */
-
-	    if (flags & SCF_DO_SUBSTR)
-		data->pos_min += l;
 	    if (flags & SCF_DO_STCLASS_AND) {
 		/* Check whether it is compatible with what we know already! */
 		int compat = 1;
