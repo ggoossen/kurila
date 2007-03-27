@@ -8,6 +8,8 @@ BEGIN {
 
 plan tests => 52;
 
+use utf8;
+
 $a = "B\x{fc}f";
 $b = "G\x{100}r";
 $c = 0x200;
