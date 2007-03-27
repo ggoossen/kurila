@@ -33,7 +33,7 @@ BEGIN {
 use strict;
 use Test::More tests => 8;
 
-use encoding 'utf8';
+use utf8;
 
 my @hiragana =  map {chr} ord("ぁ")..ord("ん");
 my @katakana =  map {chr} ord("ァ")..ord("ン");
@@ -51,9 +51,9 @@ is($str, $katakana, "tr// # hiragana -> katakana");
 $str = $katakana; $str =~ tr/ァ-ン/ぁ-ん/;
 is($str, $hiragana, "tr// # hiragana -> katakana");
 
-$str = $hiragana; eval qq(\$str =~ tr/ぁ-ん/ァ-ン/);
+$str = $hiragana; eval qq(use utf8; \$str =~ tr/ぁ-ん/ァ-ン/);
 is($str, $katakana, "eval qq(tr//) # hiragana -> katakana");
-$str = $katakana; eval qq(\$str =~ tr/ァ-ン/ぁ-ん/);
+$str = $katakana; eval qq(use utf8; \$str =~ tr/ァ-ン/ぁ-ん/);
 is($str, $hiragana, "eval qq(tr//) # hiragana -> katakana");
 
 $str = $hiragana; $str =~ s/([ぁ-ん])/$h2k{$1}/go;

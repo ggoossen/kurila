@@ -413,7 +413,7 @@ Perl_do_trans(pTHX_ SV *sv)
 {
     dVAR;
     STRLEN len;
-    const I32 doutf = IN_CODEPOINTS;
+    const I32 doutf = PL_op->op_private & OPpTRANS_UTF8;
 
     if (SvREADONLY(sv)) {
         if (SvIsCOW(sv))
