@@ -765,9 +765,9 @@ PERL_CALLCONV I32	Perl_ibcmp_locale(pTHX_ const char* a, const char* b, I32 len)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV I32	Perl_ibcmp_utf8(pTHX_ const char* a, char **pe1, UV l1, bool u1, const char* b, char **pe2, UV l2, bool u2)
+PERL_CALLCONV I32	Perl_ibcmp_utf8(pTHX_ const char* a, char **pe1, UV l1, const char* b, char **pe2, UV l2)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_5);
+			__attribute__nonnull__(pTHX_4);
 
 PERL_CALLCONV bool	Perl_ingroup(pTHX_ Gid_t testgid, bool effective)
 			__attribute__warn_unused_result__;

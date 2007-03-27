@@ -2026,7 +2026,7 @@ sub SpecialCasing_txt()
             my ($ix, $code, $to) = @$prop;
             my $tostr =
               join "", map { sprintf "\\x{%s}", $_ } split ' ', $to;
-            push @OUT, sprintf qq["%s" => "$tostr",\n], join("", map { sprintf "\\x%02X", $_ } unpack("U0C*", pack("U", $ix)));
+            push @OUT, sprintf qq["%s" => "$tostr",\n], join("", map { sprintf "\\x[%02X]", $_ } unpack("U0C*", pack("U", $ix)));
 	    # Remove any single-character mappings for
 	    # the same character since we are going for
 	    # the special casing rules.
@@ -2088,7 +2088,7 @@ sub CaseFolding_txt()
     for my $code (sort { $a <=> $b } keys %Fold) {
         my $foldstr =
           join "", map { sprintf "\\x{%s}", $_ } split ' ', $Fold{$code};
-        push @OUT, sprintf qq["%s" => "$foldstr",\n], join("", map { sprintf "\\x%02X", $_ } unpack("U0C*", pack("U", $code)));
+        push @OUT, sprintf qq["%s" => "$foldstr",\n], join("", map { sprintf "\\x[%02X]", $_ } unpack("U0C*", pack("U", $code)));
     }
     push @OUT, (
                 ");\n\n",

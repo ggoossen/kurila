@@ -7376,6 +7376,7 @@ parseit:
 
 				  if (!unicode_alternate)
 				      unicode_alternate = newAV();
+				  DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "add alternate %p\n", unicode_alternate));
 				  sv = newSVpvn((char*)foldbuf, foldlen);
 				  av_push(unicode_alternate, sv);
 			      }

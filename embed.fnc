@@ -331,8 +331,8 @@ ApM	|SV**	|hv_store_flags	|NULLOK HV* tb|NULLOK const char* key|I32 klen|NULLOK 
 Apd	|void	|hv_undef	|NULLOK HV* tb
 ApP	|I32	|ibcmp		|NN const char* a|NN const char* b|I32 len
 ApP	|I32	|ibcmp_locale	|NN const char* a|NN const char* b|I32 len
-Apd	|I32	|ibcmp_utf8	|NN const char* a|NULLOK char **pe1|UV l1|bool u1 \
-				|NN const char* b|NULLOK char **pe2|UV l2|bool u2
+Apd	|I32	|ibcmp_utf8	|NN const char* a|NULLOK char **pe1|UV l1 \
+				|NN const char* b|NULLOK char **pe2|UV l2
 pR	|bool	|ingroup	|Gid_t testgid|bool effective
 p	|void	|init_argv_symbols|int argc|NN char **argv
 p	|void	|init_debugger

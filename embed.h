@@ -2532,7 +2532,7 @@
 #define hv_undef(a)		Perl_hv_undef(aTHX_ a)
 #define ibcmp(a,b,c)		Perl_ibcmp(aTHX_ a,b,c)
 #define ibcmp_locale(a,b,c)	Perl_ibcmp_locale(aTHX_ a,b,c)
-#define ibcmp_utf8(a,b,c,d,e,f,g,h)	Perl_ibcmp_utf8(aTHX_ a,b,c,d,e,f,g,h)
+#define ibcmp_utf8(a,b,c,d,e,f)	Perl_ibcmp_utf8(aTHX_ a,b,c,d,e,f)
 #ifdef PERL_CORE
 #define ingroup(a,b)		Perl_ingroup(aTHX_ a,b)
 #define init_argv_symbols(a,b)	Perl_init_argv_symbols(aTHX_ a,b)

@@ -2,7 +2,9 @@ use File::Spec;
 
 require "test.pl";
 
+require bytes;
 use utf8;
+use strict;
 
 sub unidump {
     join " ", map { sprintf "%04X", $_ } unpack "U*", $_[0];
@@ -83,13 +85,12 @@ sub casetest {
 	if (ord('A') == 193 && $i eq "\x8A\x73") {
 	    $w = '0178'; # It's a latin small Y with diaresis and not a latin small letter sharp 's'.
 	}
-	my $u = unpack "C0U", $i;
-	my $h = sprintf "%04X", $u;
-	my $c = chr($u); $c .= chr(0x100); chop $c;
+        #my $c = substr $i, 0, 1;
+	my $h = unidump($i);
 	foreach my $func (@funcs) {
-	    my $d = $func->($c);
+	    my $d = $func->($i);
 	    my $e = unidump($d);
-	    if (ord "A" == 193) { # EBCDIC
+	    if (bytes::ord "A" == 193) { # EBCDIC
 		# We need to a little bit of remapping.
 		#
 		# For example, in titlecase (ucfirst) mapping

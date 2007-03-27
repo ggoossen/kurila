@@ -1020,8 +1020,8 @@ uvc, charid, foldlen, foldbuf, uniflags) STMT_START {                       \
 #define REXEC_FBC_EXACTISH_CHECK(CoNd)                  \
     if ( (CoNd)                                        \
 	 && (ln == len ||                              \
-	     ibcmp_utf8(s, NULL, 0,  do_utf8,          \
-			m, NULL, ln, do_utf8))       \
+	     ibcmp_utf8(s, NULL, 0,          \
+			m, NULL, ln))       \
 	 && (!reginfo || regtry(reginfo, &s)) )         \
 	goto got_it;                                   \
     else {                                             \
@@ -1032,9 +1032,9 @@ uvc, charid, foldlen, foldbuf, uniflags) STMT_START {                       \
 	      && (f == c1 || f == c2)                  \
 	      && (ln == foldlen ||                     \
 		  !ibcmp_utf8((char *) foldbuf,        \
-			      NULL, foldlen, do_utf8,  \
+			      NULL, foldlen,  \
 			      m,                       \
-			      NULL, ln, do_utf8))    \
+			      NULL, ln))    \
 	      && (!reginfo || regtry(reginfo, &s)) )    \
 	      goto got_it;                             \
     }                                                  \
@@ -3050,8 +3050,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		const char * const l = locinput;
 		char *e = PL_regeol;
 
-		if (ibcmp_utf8(s, 0,  ln, do_utf8,
-			       l, &e, 0,  do_utf8)) {
+		if (ibcmp_utf8(s, 0,  ln, l, &e, 0)) {
 		     /* One more case for the sharp s:
 		      * pack("U0U*", 0xDF) =~ /ss/i,
 		      * the 0xC3 0x9F are the UTF-8
@@ -3088,10 +3087,10 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	    }
 	case ANYOFU: {
 	    STRLEN inclasslen = PL_regeol - locinput;
-	    DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "foobar %d\n", do_utf8));
 
 	    if (!reginclass(rex, scan, (U8*)locinput, &inclasslen))
 		goto anyof_fail;
+	    DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "foobar %d\n", inclasslen));
 	    if (locinput >= PL_regeol)
 		sayNO;
 	    locinput += inclasslen ? inclasslen : UTF8SKIP(locinput);
@@ -5040,11 +5039,10 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
 		    AV** const unicode_alternate = (AV**) av_fetch(av, 2, FALSE);
 		    if (!match && lenp && unicode_alternate) {
 		        I32 i;
-			for (i = 0; i < av_len(*unicode_alternate); i++) {
+			for (i = 0; i <= av_len(*unicode_alternate); i++) {
 			    SV* const sv = *av_fetch(*unicode_alternate, i, FALSE);
 			    STRLEN len;
 			    const char * const s = SvPV_const(sv, len);
-			
 			    if (len <= plen && memEQ(s, (char*)p, len)) {
 			        *lenp = len;
 				match = TRUE;

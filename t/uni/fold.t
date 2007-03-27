@@ -45,8 +45,8 @@ if (open(CF, $CF)) {
 	my $t6 = ":$b:" =~ /:$a:/i   ? 1 : 0;
 	my $t7 = ":$b:" =~ /:[$a]:/i ? 1 : 0;
 	print $t0 && $t1 && $t2 && $t3 && $t4 && $t5 && $t6 && $t7 ?
-	    "ok $i \# - $code - $name - $mapping - $status\n" :
-	    "not ok $i \# - $code - $name - $mapping - $status - $t0 $t1 $t2 $t3 $t4 $t5 $t6 $t7\n";
+	    "ok $i \# $todo - $code - $name - $mapping - $status\n" :
+	    "not ok $i \# $todo - $code - $name - $mapping - $status - $t0 $t1 $t2 $t3 $t4 $t5 $t6 $t7\n";
     }
 } else {
     die qq[$0: failed to open "$CF": $!\n];
