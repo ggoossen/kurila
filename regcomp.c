@@ -2242,59 +2242,6 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, I32 *min, U32 flags
 #endif
     }
     
-    if (UTF && ( OP(scan) == EXACTF ) && ( STR_LEN(scan) >= 6 ) ) {
-    /*
-    Two problematic code points in Unicode casefolding of EXACT nodes:
-    
-    U+0390 - GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS
-    U+03B0 - GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS
-    
-    which casefold to
-    
-    Unicode                      UTF-8
-    
-    U+03B9 U+0308 U+0301         0xCE 0xB9 0xCC 0x88 0xCC 0x81
-    U+03C5 U+0308 U+0301         0xCF 0x85 0xCC 0x88 0xCC 0x81
-    
-    This means that in case-insensitive matching (or "loose matching",
-    as Unicode calls it), an EXACTF of length six (the UTF-8 encoded byte
-    length of the above casefolded versions) can match a target string
-    of length two (the byte length of UTF-8 encoded U+0390 or U+03B0).
-    This would rather mess up the minimum length computation.
-    
-    What we'll do is to look for the tail four bytes, and then peek
-    at the preceding two bytes to see whether we need to decrease
-    the minimum length by four (six minus two).
-    
-    Thanks to the design of UTF-8, there cannot be false matches:
-    A sequence of valid UTF-8 bytes cannot be a subsequence of
-    another valid sequence of UTF-8 bytes.
-    
-    */
-         char * const s0 = STRING(scan), *s, *t;
-         char * const s1 = s0 + STR_LEN(scan) - 1;
-         char * const s2 = s1 - 4;
-#ifdef EBCDIC /* RD tunifold greek 0390 and 03B0 */
-	 const char t0[] = "\xaf\x49\xaf\x42";
-#else
-         const char t0[] = "\xcc\x88\xcc\x81";
-#endif
-         const char * const t1 = t0 + 3;
-    
-         for (s = s0 + 2;
-              s < s2 && (t = ninstr(s, s1, t0, t1));
-              s = t + 4) {
-#ifdef EBCDIC
-	      if (((U8)t[-1] == 0x68 && (U8)t[-2] == 0xB4) ||
-		  ((U8)t[-1] == 0x46 && (U8)t[-2] == 0xB5))
-#else
-              if (((U8)t[-1] == 0xB9 && (U8)t[-2] == 0xCE) ||
-                  ((U8)t[-1] == 0x85 && (U8)t[-2] == 0xCF))
-#endif
-                   *min -= 4;
-         }
-    }
-    
 #ifdef DEBUGGING
     /* Allow dumping */
     n = scan + NODE_SZ_STR(scan);
@@ -2855,9 +2802,10 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		    is_inf = is_inf_internal = 1;
 		} else {
 		    data->pos_min += l;
-		    min += l;
 		}
 	    }
+	    if (! UTF)
+		min += l;
 	    if (flags & SCF_DO_STCLASS_AND) {
 		/* Check whether it is compatible with what we know already! */
 		int compat = 1;
