@@ -1017,29 +1017,6 @@ uvc, charid, foldlen, foldbuf, uniflags) STMT_START {                       \
     }                                                                       \
 } STMT_END
 
-#define REXEC_FBC_EXACTISH_CHECK(CoNd)                  \
-    if ( (CoNd)                                        \
-	 && (ln == len ||                              \
-	     ibcmp_utf8(s, NULL, 0,          \
-			m, NULL, ln))       \
-	 && (!reginfo || regtry(reginfo, &s)) )         \
-	goto got_it;                                   \
-    else {                                             \
-	 U8 foldbuf[UTF8_MAXBYTES_CASE+1];             \
-	 uvchr_to_utf8(tmpbuf, c);                     \
-	 f = to_utf8_fold(tmpbuf, foldbuf, &foldlen);  \
-	 if ( f != c                                   \
-	      && (f == c1 || f == c2)                  \
-	      && (ln == foldlen ||                     \
-		  !ibcmp_utf8((char *) foldbuf,        \
-			      NULL, foldlen,  \
-			      m,                       \
-			      NULL, ln))    \
-	      && (!reginfo || regtry(reginfo, &s)) )    \
-	      goto got_it;                             \
-    }                                                  \
-    s += len
-
 #define REXEC_FBC_EXACTISH_SCAN(CoNd)                     \
 STMT_START {                                              \
     while (s <= e) {                                      \
@@ -1183,23 +1160,9 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	    );
 	    break;
 	case EXACTF:
-	    m   = STRING(c);
+	    m   = STRING(c); /* is assumed to be already folded */
 	    ln  = 1; /*STR_LEN(c);*/	/* length to match in octets/bytes */
-	    if (do_utf8) {
-	        STRLEN ulen1, ulen2;
-		U8 tmpbuf1[UTF8_MAXBYTES_CASE+1];
-		U8 tmpbuf2[UTF8_MAXBYTES_CASE+1];
-		const U32 uniflags = UTF8_ALLOW_DEFAULT;
-
-		to_utf8_lower((U8*)m, tmpbuf1, &ulen1);
-		to_utf8_upper((U8*)m, tmpbuf2, &ulen2);
-
-		c1 = utf8n_to_uvchr(tmpbuf1, UTF8_MAXBYTES_CASE, 
-				    0, uniflags);
-		c2 = utf8n_to_uvchr(tmpbuf2, UTF8_MAXBYTES_CASE,
-				    0, uniflags);
-	    }
-	    else {
+	    if ( ! do_utf8) {
 		c1 = *(U8*)m;
 		c2 = PL_fold[c1];
 	    }
@@ -1228,26 +1191,19 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	     * ibcmp_utf8() will do just that. */
 
 	    if (do_utf8) {
-	        UV c, f;
-	        U8 tmpbuf [UTF8_MAXBYTES+1];
-		STRLEN len, foldlen;
-		const U32 uniflags = UTF8_ALLOW_DEFAULT;
 		while (s <= e) {
-		    c = utf8n_to_uvchr((U8*)s, UTF8_MAXBYTES, &len,
-					   uniflags);
+		    STRLEN ulen1;
+		    U8 tmpbuf1[UTF8_MAXBYTES_CASE+1];
 
-		    /* Handle some of the three Greek sigmas cases.
-		     * Note that not all the possible combinations
-		     * are handled here: some of them are handled
-		     * by the standard folding rules, and some of
-		     * them (the character class or ANYOF cases)
-		     * are handled during compiletime in
-		     * regexec.c:S_regclass(). */
-		    if (c == (UV)UNICODE_GREEK_CAPITAL_LETTER_SIGMA ||
-			c == (UV)UNICODE_GREEK_SMALL_LETTER_FINAL_SIGMA)
-			c = (UV)UNICODE_GREEK_SMALL_LETTER_SIGMA;
-		    
-		    REXEC_FBC_EXACTISH_CHECK(c == c1 || c == c2);
+		    to_utf8_fold((U8*)s, tmpbuf1, &ulen1);
+
+		    /* compare only the first character of the folded strings */
+		    if (memEQ((char*)tmpbuf1, (char*)m, UTF8SKIP(tmpbuf1))) {
+			if (!reginfo || regtry(reginfo, &s)) {
+			    goto got_it;
+			}
+		    }
+		    s += UTF8SKIP(s);
 		}
 	    }
 	    else {
