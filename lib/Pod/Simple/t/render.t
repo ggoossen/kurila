@@ -8,6 +8,9 @@ BEGIN {
 }
 
 use strict;
+use utf8;
+use charnames ':full';
+
 use Test;
 BEGIN { plan tests => 26 };
 use Pod::Simple::TextContent;
@@ -82,6 +85,7 @@ foreach my $file (
   close(IN);
   print "#   ", length($out[-1]), " bytes pulled in.\n";
   
+  @out = map { Encode::decode('latin1', $_) } @out;
 
   for (@out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 

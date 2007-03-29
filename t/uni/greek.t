@@ -24,7 +24,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 3;
+plan tests => 5;
 
 use encoding "greek"; # iso 8859-7
 use utf8;

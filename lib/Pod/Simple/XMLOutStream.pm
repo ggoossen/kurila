@@ -2,6 +2,7 @@
 require 5;
 package Pod::Simple::XMLOutStream;
 use strict;
+use utf8;
 use Carp ();
 use Pod::Simple ();
 use vars qw( $ATTR_PAD @ISA $VERSION $SORT_ATTRS);

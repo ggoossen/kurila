@@ -18,6 +18,8 @@ BEGIN {
     Encode->import( qw(:fallback_all));
 }
 
+use utf8;
+
 # $PerlIO::encoding = 0; # WARN_ON_ERR|PERLQQ;
 
 my $file = "fallback$$.txt";
@@ -61,7 +63,7 @@ close($fh);
 ok(open($fh,"<encoding(US-ASCII)",$file),"Opened as ASCII");
 my $line = <$fh>;
 printf "# %x\n",ord($line);
-is($line,"\\xA30.02\n","Escaped non-mapped char");
+is($line,"\\x[A3]0.02\n","Escaped non-mapped char");
 close($fh);
 
 $PerlIO::encoding::fallback = Encode::WARN_ON_ERROR;

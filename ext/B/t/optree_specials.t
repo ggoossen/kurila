@@ -52,6 +52,7 @@ checkOptree ( name	=> 'BEGIN',
 	      prog	=> $src,
 	      @warnings_todo,
 	      strip_open_hints => 1,
+              todo      => "kurila changes",
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # BEGIN 1:
 # b  <1> leavesub[1 ref] K/REFC,1 ->(end)
@@ -196,6 +197,7 @@ checkOptree ( name	=> 'all of BEGIN END INIT CHECK UNITCHECK -exec',
 	      bcopts	=> [qw/ BEGIN END INIT CHECK UNITCHECK -exec /],
 	      prog	=> $src,
 	      @warnings_todo,
+              todo      => "kurila changes",
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # BEGIN 1:
@@ -283,6 +285,7 @@ EONT_EONT
 checkOptree ( name	=> 'regression test for patch 25352',
 	      bcopts	=> [qw/ BEGIN END INIT CHECK -exec /],
 	      prog	=> 'print q/foo/',
+              todo      => "kurila changes",
 	      @warnings_todo,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # BEGIN 1:

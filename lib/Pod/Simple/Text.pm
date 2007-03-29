@@ -1,7 +1,10 @@
 
 require 5;
 package Pod::Simple::Text;
+
 use strict;
+use utf8;
+
 use Carp ();
 use Pod::Simple::Methody ();
 use Pod::Simple ();
