@@ -8340,9 +8340,7 @@ Perl_reg_temp_copy (pTHX_ struct regexp *r) {
 	StructCopy(r->substrs, ret->substrs, struct reg_substr_data);
 
 	SvREFCNT_inc_void(ret->anchored_substr);
-	SvREFCNT_inc_void(ret->anchored_utf8);
 	SvREFCNT_inc_void(ret->float_substr);
-	SvREFCNT_inc_void(ret->float_utf8);
 
 	/* check_substr and check_utf8, if non-NULL, point to either their
 	   anchored or float namesakes, and don't hold a second reference.  */
