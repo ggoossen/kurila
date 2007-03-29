@@ -1519,7 +1519,7 @@ package PLXML::op_srefgen;
 sub ast {
     my @newkids;
     my $self = shift;
-    if ($$self{mp}{FIRST} eq '{') {
+    if ($$self{mp}{FIRST} and $$self{mp}{FIRST} eq '{') {
 	local $::curstate;	# this is officially a block, so hide it
 	local $::curenc = $::curenc;
 	push @newkids, $self->madness('{');
