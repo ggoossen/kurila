@@ -18,6 +18,8 @@ BEGIN {
 }
 
 use encoding 'utf8';
+use utf8;
+require bytes;
 
 my @c = (127, 128, 255, 256);
 
@@ -51,7 +53,7 @@ my $f = filename("f" . @f);
 push @f, $f;
 open(F, ">$f") or die "$0: failed to open '$f' for writing: $!";
 binmode(F, ":raw"); # Output raw bytes.
-print F chr(128); # Output illegal UTF-8.
+print F bytes::chr(128); # Output illegal UTF-8.
 close F;
 open(F, $f) or die "$0: failed to open '$f' for reading: $!";
 binmode(F, ":encoding(utf-8)");

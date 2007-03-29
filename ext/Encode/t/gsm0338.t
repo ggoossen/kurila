@@ -14,6 +14,7 @@ BEGIN {
 use strict;
 use Test::More tests => 21;
 use Encode;
+use utf8;
 
 # The specification of GSM 03.38 is not awfully clear.
 # (http://www.unicode.org/Public/MAPPINGS/ETSI/GSM0338.TXT)

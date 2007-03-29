@@ -22,12 +22,20 @@ BEGIN {
 
 
 use strict;
+use utf8;
 use encoding 'euc-jp';
-use Test::More tests => 4;
+use Encode;
+use Test::More tests => 5;
 
 my @a;
 
+{
+local $TODO = "decode of data section";
+is <DATA>, "これはDATAファイルハンドルのテストです。"."\n";
+}
+
 while (<DATA>) {
+  $_ = Encode::decode('euc-jp', $_);
   chomp;
   tr/ぁ-んァ-ン/ァ-ンぁ-ん/;
   push @a, $_;
@@ -39,6 +47,7 @@ is($a[1], "日本語ガチャント変換デキルカ");
 is($a[2], "ドウカノてすとヲシテイマス。");
 
 __DATA__
+これはDATAファイルハンドルのテストです。
 これはDATAファイルハンドルのテストです。
 日本語がちゃんと変換できるか
 どうかのテストをしています。

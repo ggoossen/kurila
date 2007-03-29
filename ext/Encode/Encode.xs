@@ -228,7 +228,7 @@ encode_method(pTHX_ const encode_t * enc, const encpage_t * dir, SV * src,
             SV* subchar = 
             (fallback_cb != (SV*)NULL) ? 
             do_fallback_cb(aTHX_ (UV)s[slen]) :
-            newSVpvf("\\x%02" UVXf, (UV)s[slen]);
+            newSVpvf("\\x[%02" UVXf"]", (UV)s[slen]);
             sdone += slen + 1;
             ddone += dlen + SvCUR(subchar);
             sv_catsv(dst, subchar);

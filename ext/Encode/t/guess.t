@@ -16,6 +16,7 @@ BEGIN {
 }
 
 use strict;
+use utf8;
 use File::Basename;
 use File::Spec;
 use Encode qw(decode encode find_encoding);
@@ -29,7 +30,7 @@ use_ok("Encode::Guess");
 }
 
 my $ascii  = join('' => map {chr($_)}(0x21..0x7e));
-my $latin1 = join('' => map {chr($_)}(0xa1..0xfe));
+my $latin1 = join('' => map {bytes::chr($_)}(0xa1..0xfe));
 my $utf8on  = join('' => map {chr($_)}(0x3000..0x30fe));
 my $utf8off = $utf8on;
 my $utf16 = encode('UTF-16', $utf8on);

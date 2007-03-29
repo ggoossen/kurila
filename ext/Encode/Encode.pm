@@ -271,7 +271,6 @@ sub predefine_encodings {
         else {
             Encode::DEBUG and warn __PACKAGE__, " XS off";
             *decode = sub {
-                warn "decode_utf8";
                 my ( $obj, $octets, $chk ) = @_;
                 my $str = Encode::decode_utf8($octets);
                 if ( defined $str ) {

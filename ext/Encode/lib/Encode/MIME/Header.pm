@@ -150,13 +150,12 @@ sub _encode {
     my ( $o, $str ) = @_;
     my $enc  = $o->{encode};
     my $llen = ( $o->{bpl} - length(HEAD) - 2 - length(TAIL) );
-
     # to coerce a floating-point arithmetics, the following contains
     # .0 in numbers -- dankogai
     $llen *= $enc eq 'B' ? 3.0 / 4.0 : 1.0 / 3.0;
     my @result = ();
     my $chunk  = '';
-    while ( length( my $chr = substr( $str, 0, 1, '' ) ) ) {
+    while ( utf8::length( my $chr = utf8::substr( $str, 0, 1, '' ) ) ) {
         use bytes ();
         if ( bytes::length($chunk) + bytes::length($chr) > $llen ) {
             push @result, SINGLE->{$enc}($chunk);
