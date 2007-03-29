@@ -6,6 +6,8 @@ BEGIN {
 }
 
 use strict;
+use encoding 'latin1';
+use charnames ':full';
 use Test;
 BEGIN { plan tests => 104 };
 
@@ -176,7 +178,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\n=head1 Когда читала (NAME)\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 Когда читала (NAME)\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
 my $t;
@@ -193,7 +195,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\n=head1 (NAME) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
 my $t;
@@ -210,7 +212,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title() || '', '';
 ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
@@ -227,7 +229,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
 ok $p->get_title() || '', '';
@@ -245,7 +247,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
 ok $p->get_title(), "Thingy";
@@ -263,7 +265,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title(), "Thingy";
 ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
@@ -281,7 +283,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\n=head1 (NAME) Вдали перед\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) Вдали перед\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title(), "Thingy";
 ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
@@ -299,7 +301,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \q{
+$p->set_source( \qq{\N{BYTE ORDER MARK}
 
 =head1 (NAME) Вдали перед
 
@@ -333,7 +335,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \q{
+$p->set_source( \qq{\N{BYTE ORDER MARK}
 
 =head1 (NAME) Вдали перед
 
