@@ -4,6 +4,7 @@ WriteMakefile(
 		NAME	=> q[Perl6::Form],
 		VERSION => q[0.04],
         AUTHOR  => 'Damian Conway',
-		PREREQ_PM => { Perl6::Export=>0, Scalar::Util=>0, List::Util=>0 },
+                MAN3PODS 	=> {}, 	# Pods will be built by installman.
+		# PREREQ_PM => { Scalar::Util=>0, List::Util=>0 },
 
 	     );
