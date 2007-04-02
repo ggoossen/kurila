@@ -8,8 +8,6 @@ use warnings::register;
 use strict;
 no strict 'refs';
 
-use utf8;
-
 sub import {
     my $callpack = caller;
     my ($pack, @imports) = @_;

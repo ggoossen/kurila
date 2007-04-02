@@ -15,6 +15,7 @@ use strict;
 use warnings;
 use utf8;
 use XS::Typemap;
+require bytes;
 
 ok(1);
 

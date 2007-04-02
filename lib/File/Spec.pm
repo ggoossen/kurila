@@ -1,7 +1,7 @@
 package File::Spec;
 
 use strict;
-use vars qw(@ISA $VERSION);
+our (@ISA, $VERSION);
 
 $VERSION = '3.24';
 $VERSION = eval $VERSION;
