@@ -3,11 +3,17 @@ use 5.008;
 
 our $VERSION = '0.04';
 
-use Perl6::Export;
 use Scalar::Util qw( readonly );
 use List::Util   qw( max min first );
 use Carp;
 use charnames ':full';
+
+use Exporter;
+
+our @ISA=qw|Exporter|;
+
+our @EXPORT=qw|form|;
+our @EXPORT_OK=qw|drill break_at|;
 
 my %caller_opts;
 
@@ -1059,7 +1065,7 @@ sub linecount($) {
 
 use warnings::register;
 
-sub form is export(:MANDATORY) {
+sub form {
 	croak "Useless call to &form in void context" unless defined wantarray;
 	
 	# Handle formatting calls...
@@ -1253,7 +1259,7 @@ sub slice {
 
 sub vals { return ref eq 'HASH' ? values %$_ : @$_ for $_[0] }
 
-sub drill (\[@%];@) is export {
+sub drill (\[@%];@) {
     my ($structure, @indices) = @_;
 	return $structure unless @indices;
 	my $index = shift @indices;
@@ -1293,7 +1299,7 @@ sub break_nl {
 
 my $wsnzw = q{ (??{length($^N)?'(?=)':'(?!)'}) };
 
-sub break_at is export {
+sub break_at {
     my ($hyphen) = @_;
 	my ($lit_hy) = qr/\Q$hyphen\E/;
     my $hylen = length($hyphen);         
@@ -1355,17 +1361,17 @@ sub break_at is export {
 	};
 }
 
-sub import {
-	my $class = shift;
-	my ($package, $file, $line) = caller;
-	my %opts;
-	for (@_) {
-		croak "Options for $class must be specified in a hash"
-			unless ref eq 'HASH';
-		update(%opts, %$_, 'croak');
-	}
-	$caller_opts{$package,$file}{$line} = \%opts;
-}
+# sub import {
+# 	my $class = shift;
+# 	my ($package, $file, $line) = caller;
+# 	my %opts;
+# 	for (@_) {
+# 		croak "Options for $class must be specified in a hash"
+# 			unless ref eq 'HASH';
+# 		update(%opts, %$_, 'croak');
+# 	}
+# 	$caller_opts{$package,$file}{$line} = \%opts;
+# }
 
 package Perl6::Form::Rule::Fail;
 use overload
