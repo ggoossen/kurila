@@ -7,7 +7,7 @@ BEGIN {
 }
 
 BEGIN { require './test.pl'; }
-plan tests => 238;
+plan tests => 236;
 
 while (<DATA>) {
     chomp;
@@ -80,8 +80,6 @@ flock (*$)
 for undef
 foreach undef
 fork ()
-format undef
-formline ($@)
 ge ($$)
 getc (;*)
 getgrent ()
@@ -261,7 +259,6 @@ wantarray ()
 warn (@)
 when undef
 while undef
-write (;*)
 x unknown
 xor ($$)
 y undef

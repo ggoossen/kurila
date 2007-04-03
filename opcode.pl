@@ -717,7 +717,6 @@ index		index			ck_index	isT@	S S S?
 rindex		rindex			ck_index	isT@	S S S?
 
 sprintf		sprintf			ck_fun		mst@	S L
-formline	formline		ck_fun		ms@	S L
 ord		ord			ck_fun		isTu%	S?
 chr		chr			ck_fun		sTu%	S?
 crypt		crypt			ck_fun		fsT@	S S
@@ -841,8 +840,6 @@ select		select			ck_select	st@	F?
 
 getc		getc			ck_eof		st%	F?
 read		read			ck_fun		imst@	F R S S?
-enterwrite	write			ck_fun		dis%	F?
-leavewrite	write exit		ck_null		1	
 
 prtf		printf			ck_listiob	ims@	F? L
 print		print			ck_listiob	ims@	F? L

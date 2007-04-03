@@ -1315,7 +1315,6 @@
 #endif
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define doform			S_doform
 #define emulate_eaccess		S_emulate_eaccess
 #endif
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
@@ -1970,7 +1969,6 @@
 #define pp_entersub		Perl_pp_entersub
 #define pp_entertry		Perl_pp_entertry
 #define pp_enterwhen		Perl_pp_enterwhen
-#define pp_enterwrite		Perl_pp_enterwrite
 #define pp_eof			Perl_pp_eof
 #define pp_eprotoent		Perl_pp_eprotoent
 #define pp_epwent		Perl_pp_epwent
@@ -1986,7 +1984,6 @@
 #define pp_flock		Perl_pp_flock
 #define pp_flop			Perl_pp_flop
 #define pp_fork			Perl_pp_fork
-#define pp_formline		Perl_pp_formline
 #define pp_ftatime		Perl_pp_ftatime
 #define pp_ftbinary		Perl_pp_ftbinary
 #define pp_ftblk		Perl_pp_ftblk
@@ -2085,7 +2082,6 @@
 #define pp_leavesublv		Perl_pp_leavesublv
 #define pp_leavetry		Perl_pp_leavetry
 #define pp_leavewhen		Perl_pp_leavewhen
-#define pp_leavewrite		Perl_pp_leavewrite
 #define pp_left_shift		Perl_pp_left_shift
 #define pp_length		Perl_pp_length
 #define pp_lineseq		Perl_pp_lineseq
@@ -3538,7 +3534,6 @@
 #endif
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define doform(a,b,c)		S_doform(aTHX_ a,b,c)
 #define emulate_eaccess(a,b)	S_emulate_eaccess(aTHX_ a,b)
 #endif
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
@@ -4202,7 +4197,6 @@
 #define pp_entersub()		Perl_pp_entersub(aTHX)
 #define pp_entertry()		Perl_pp_entertry(aTHX)
 #define pp_enterwhen()		Perl_pp_enterwhen(aTHX)
-#define pp_enterwrite()		Perl_pp_enterwrite(aTHX)
 #define pp_eof()		Perl_pp_eof(aTHX)
 #define pp_eprotoent()		Perl_pp_eprotoent(aTHX)
 #define pp_epwent()		Perl_pp_epwent(aTHX)
@@ -4218,7 +4212,6 @@
 #define pp_flock()		Perl_pp_flock(aTHX)
 #define pp_flop()		Perl_pp_flop(aTHX)
 #define pp_fork()		Perl_pp_fork(aTHX)
-#define pp_formline()		Perl_pp_formline(aTHX)
 #define pp_ftatime()		Perl_pp_ftatime(aTHX)
 #define pp_ftbinary()		Perl_pp_ftbinary(aTHX)
 #define pp_ftblk()		Perl_pp_ftblk(aTHX)
@@ -4317,7 +4310,6 @@
 #define pp_leavesublv()		Perl_pp_leavesublv(aTHX)
 #define pp_leavetry()		Perl_pp_leavetry(aTHX)
 #define pp_leavewhen()		Perl_pp_leavewhen(aTHX)
-#define pp_leavewrite()		Perl_pp_leavewrite(aTHX)
 #define pp_left_shift()		Perl_pp_left_shift(aTHX)
 #define pp_length()		Perl_pp_length(aTHX)
 #define pp_lineseq()		Perl_pp_lineseq(aTHX)

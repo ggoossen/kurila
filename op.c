@@ -315,7 +315,6 @@ Perl_op_free(pTHX_ OP *o)
 	case OP_LEAVEEVAL:
 	case OP_LEAVE:
 	case OP_SCOPE:
-	case OP_LEAVEWRITE:
 	    {
 	    PADOFFSET refcnt;
 	    OP_REFCNT_LOCK;
@@ -5626,67 +5625,6 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 	CvANON_on(cv);
 
     return cv;
-}
-
-#ifdef PERL_MAD
-OP *
-#else
-void
-#endif
-Perl_newFORM(pTHX_ I32 floor, OP *o, OP *block)
-{
-    dVAR;
-    register CV *cv;
-#ifdef PERL_MAD
-    OP* pegop = newOP(OP_NULL, 0);
-#endif
-
-    GV * const gv = o
-	? gv_fetchsv(cSVOPo->op_sv, GV_ADD, SVt_PVFM)
-	: gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL, SVt_PVFM);
-
-#ifdef GV_UNIQUE_CHECK
-    if (GvUNIQUE(gv)) {
-        Perl_croak(aTHX_ "Bad symbol for form (GV is unique)");
-    }
-#endif
-    GvMULTI_on(gv);
-    if ((cv = GvFORM(gv))) {
-	if (ckWARN(WARN_REDEFINE)) {
-	    const line_t oldline = CopLINE(PL_curcop);
-	    if (PL_copline != NOLINE)
-		CopLINE_set(PL_curcop, PL_copline);
-	    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
-			o ? "Format %"SVf" redefined"
-			: "Format STDOUT redefined", SVfARG(cSVOPo->op_sv));
-	    CopLINE_set(PL_curcop, oldline);
-	}
-	SvREFCNT_dec(cv);
-    }
-    cv = PL_compcv;
-    GvFORM(gv) = cv;
-    CvGV(cv) = gv;
-    CvFILE_set_from_cop(cv, PL_curcop);
-
-
-    pad_tidy(padtidy_FORMAT);
-    CvROOT(cv) = newUNOP(OP_LEAVEWRITE, 0, scalarseq(block));
-    CvROOT(cv)->op_private |= OPpREFCOUNTED;
-    OpREFCNT_set(CvROOT(cv), 1);
-    CvSTART(cv) = LINKLIST(CvROOT(cv));
-    CvROOT(cv)->op_next = 0;
-    CALL_PEEP(CvSTART(cv));
-#ifdef PERL_MAD
-    op_getmad(o,pegop,'n');
-    op_getmad_weak(block, pegop, 'b');
-#else
-    op_free(o);
-#endif
-    PL_copline = NOLINE;
-    LEAVE_SCOPE(floor);
-#ifdef PERL_MAD
-    return pegop;
-#endif
 }
 
 OP *

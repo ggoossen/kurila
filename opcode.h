@@ -149,7 +149,6 @@ EXTCONST char* const PL_op_name[] = {
 	"index",
 	"rindex",
 	"sprintf",
-	"formline",
 	"ord",
 	"chr",
 	"crypt",
@@ -239,8 +238,6 @@ EXTCONST char* const PL_op_name[] = {
 	"select",
 	"getc",
 	"read",
-	"enterwrite",
-	"leavewrite",
 	"prtf",
 	"print",
 	"sysopen",
@@ -517,7 +514,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"index",
 	"rindex",
 	"sprintf",
-	"formline",
 	"ord",
 	"chr",
 	"crypt",
@@ -607,8 +603,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"select",
 	"getc",
 	"read",
-	"write",
-	"write exit",
 	"printf",
 	"print",
 	"sysopen",
@@ -899,7 +893,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_index),
 	MEMBER_TO_FPTR(Perl_pp_index),	/* Perl_pp_rindex */
 	MEMBER_TO_FPTR(Perl_pp_sprintf),
-	MEMBER_TO_FPTR(Perl_pp_formline),
 	MEMBER_TO_FPTR(Perl_pp_ord),
 	MEMBER_TO_FPTR(Perl_pp_chr),
 	MEMBER_TO_FPTR(Perl_pp_crypt),
@@ -989,8 +982,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_select),
 	MEMBER_TO_FPTR(Perl_pp_getc),
 	MEMBER_TO_FPTR(Perl_pp_sysread),	/* Perl_pp_read */
-	MEMBER_TO_FPTR(Perl_pp_enterwrite),
-	MEMBER_TO_FPTR(Perl_pp_leavewrite),
 	MEMBER_TO_FPTR(Perl_pp_prtf),
 	MEMBER_TO_FPTR(Perl_pp_print),
 	MEMBER_TO_FPTR(Perl_pp_sysopen),
@@ -1277,7 +1268,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_index),	/* index */
 	MEMBER_TO_FPTR(Perl_ck_index),	/* rindex */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sprintf */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* formline */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* ord */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* chr */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* crypt */
@@ -1367,8 +1357,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_select),	/* select */
 	MEMBER_TO_FPTR(Perl_ck_eof),	/* getc */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* read */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* enterwrite */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* leavewrite */
 	MEMBER_TO_FPTR(Perl_ck_listiob),	/* prtf */
 	MEMBER_TO_FPTR(Perl_ck_listiob),	/* print */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysopen */
@@ -1650,7 +1638,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0122291c,	/* index */
 	0x0122291c,	/* rindex */
 	0x0004280d,	/* sprintf */
-	0x00042805,	/* formline */
 	0x0001379c,	/* ord */
 	0x0001378c,	/* chr */
 	0x0002290e,	/* crypt */
@@ -1740,8 +1727,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0001c80c,	/* select */
 	0x0001d60c,	/* getc */
 	0x122ec81d,	/* read */
-	0x0001d654,	/* enterwrite */
-	0x00000200,	/* leavewrite */
 	0x0005c815,	/* prtf */
 	0x0005c815,	/* print */
 	0x1222c804,	/* sysopen */

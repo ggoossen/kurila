@@ -3533,7 +3533,6 @@ Perl_report_evil_fh(pTHX_ const GV *gv, const IO *io, I32 op)
 	    const char * const func =
 		(const char *)
 		(op == OP_READLINE   ? "readline"  :	/* "<HANDLE>" not nice */
-		 op == OP_LEAVEWRITE ? "write" :		/* "write exit" not nice */
 		 op < 0              ? "" :              /* handle phoney cases */
 		 PL_op_desc[op]);
 	    const char * const type =

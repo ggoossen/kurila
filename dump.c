@@ -796,8 +796,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
 	else if (optype == OP_LEAVESUB ||
 		 optype == OP_LEAVE ||
-		 optype == OP_LEAVESUBLV ||
-		 optype == OP_LEAVEWRITE) {
+		 optype == OP_LEAVESUBLV) {
 	    if (o->op_private & OPpREFCOUNTED)
 		sv_catpv(tmpsv, ",REFCOUNTED");
 	}
@@ -1080,7 +1079,6 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:
     case OP_LEAVESUBLV:
-    case OP_LEAVEWRITE:
     case OP_SCOPE:
 	if (o->op_private & OPpREFCOUNTED)
 	    Perl_dump_indent(aTHX_ level, file, "REFCNT = %"UVuf"\n", (UV)o->op_targ);

@@ -69,7 +69,7 @@
 %token <opval> WORD METHOD FUNCMETH THING PMFUNC PRIVATEREF
 %token <opval> FUNC0SUB UNIOPSUB LSTOPSUB
 %token <p_tkval> LABEL
-%token <i_tkval> FORMAT SUB ANONSUB PACKAGE USE
+%token <i_tkval> SUB ANONSUB PACKAGE USE
 %token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF CONTINUE FOR
 %token <i_tkval> GIVEN WHEN DEFAULT
 %token <i_tkval> LOOPEX DOTDOT
@@ -80,17 +80,17 @@
 %token <i_tkval> COLONATTR
 
 %type <ival> prog progstart remember mremember savescope
-%type <ival>  startsub startanonsub startformsub
+%type <ival>  startsub startanonsub
 /* FIXME for MAD - are these two ival? */
 %type <ival> mydefsv mintro
 
-%type <opval> decl format subrout mysubrout package use peg
+%type <opval> decl subrout mysubrout package use peg
 
 %type <opval> block mblock lineseq line loop cond else
 %type <opval> expr term subscripted scalar ary hsh arylen star amper sideff
 %type <opval> argexpr nexpr texpr iexpr mexpr mnexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
-%type <opval> formname subname proto subbody cont my_scalar
+%type <opval> subname proto subbody cont my_scalar
 %type <opval> subattrlist myattrlist myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
 %type <opval> switch case
@@ -479,9 +479,7 @@ label	:	/* empty */
 	;
 
 /* Some kind of declaration - just hang on peg in the parse tree */
-decl	:	format
-			{ $$ = $1; }
-	|	subrout
+decl	:	subrout
 			{ $$ = $1; }
 	|	mysubrout
 			{ $$ = $1; }
@@ -500,24 +498,6 @@ peg	:	PEG
 			{ $$ = newOP(OP_NULL,0);
 			  TOKEN_GETMAD($1,$$,'p');
 			}
-	;
-
-format	:	FORMAT startformsub formname block
-			{ SvREFCNT_inc(PL_compcv);
-#ifdef MAD
-			  $$ = newFORM($2, $3, $4);
-			  prepend_madprops($1->tk_mad, $$, 'F');
-			  $1->tk_mad = 0;
-			  token_free($1);
-#else
-			  newFORM($2, $3, $4);
-			  $$ = Nullop;
-#endif
-			}
-	;
-
-formname:	WORD		{ $$ = $1; }
-	|	/* NULL */	{ $$ = Nullop; }
 	;
 
 /* Unimplemented "my sub foo { }" */
@@ -562,11 +542,6 @@ startsub:	/* NULL */	/* start a regular subroutine scope */
 
 startanonsub:	/* NULL */	/* start an anonymous subroutine scope */
 			{ $$ = start_subparse(FALSE, CVf_ANON);
-			    SAVEFREESV(PL_compcv); }
-	;
-
-startformsub:	/* NULL */	/* start a format subroutine scope */
-			{ $$ = start_subparse(TRUE, 0);
 			    SAVEFREESV(PL_compcv); }
 	;
 

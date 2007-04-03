@@ -286,7 +286,6 @@ static struct debug_tokens {
     { ELSIF,		TOKENTYPE_IVAL,		"ELSIF" },
     { EQOP,		TOKENTYPE_OPNUM,	"EQOP" },
     { FOR,		TOKENTYPE_IVAL,		"FOR" },
-    { FORMAT,		TOKENTYPE_NONE,		"FORMAT" },
     { FUNC,		TOKENTYPE_OPNUM,	"FUNC" },
     { FUNC0,		TOKENTYPE_OPNUM,	"FUNC0" },
     { FUNC0SUB,		TOKENTYPE_OPVAL,	"FUNC0SUB" },
@@ -5639,7 +5638,7 @@ Perl_yylex(pTHX)
 	    OPERATOR(FOR);
 
 	case KEY_formline:
-            LOP(OP_FORMLINE,XTERM);
+	    Perl_croak(aTHX_ "format keyword is removed");
 
 	case KEY_fork:
 	    FUN0(OP_FORK);
@@ -6520,18 +6519,7 @@ Perl_yylex(pTHX)
 	    FUN0(OP_WANTARRAY);
 
 	case KEY_write:
-#ifdef EBCDIC
-	{
-	    char ctl_l[2];
-	    ctl_l[0] = toCTRL('L');
-	    ctl_l[1] = '\0';
-	    gv_fetchpvn_flags(ctl_l, 1, GV_ADD|GV_NOTQUAL, SVt_PV);
-	}
-#else
-	    /* Make sure $^L is defined */
-	    gv_fetchpvs("\f", GV_ADD|GV_NOTQUAL, SVt_PV);
-#endif
-	    UNI(OP_ENTERWRITE);
+	    Perl_croak(aTHX_ "write keyword is removed");
 
 	case KEY_x:
 	    if (PL_expect == XOPERATOR)

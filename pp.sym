@@ -160,7 +160,6 @@ Perl_pp_vec
 Perl_pp_index
 Perl_pp_rindex
 Perl_pp_sprintf
-Perl_pp_formline
 Perl_pp_ord
 Perl_pp_chr
 Perl_pp_crypt
@@ -250,8 +249,6 @@ Perl_pp_sselect
 Perl_pp_select
 Perl_pp_getc
 Perl_pp_read
-Perl_pp_enterwrite
-Perl_pp_leavewrite
 Perl_pp_prtf
 Perl_pp_print
 Perl_pp_sysopen
