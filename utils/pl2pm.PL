@@ -227,8 +227,6 @@ flock
 for
 foreach
 fork
-format
-formline
 ge
 getc
 getgrent

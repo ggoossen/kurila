@@ -186,7 +186,6 @@ vec		vec
 index		index
 rindex		rindex
 sprintf		sprintf '%s', 'foo'
-formline	formline
 ord		ord
 chr		chr
 crypt		crypt 'foo','bar'

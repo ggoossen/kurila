@@ -64,7 +64,6 @@ corresponding built-in functions:
     $io->close
     $io->eof
     $io->fileno
-    $io->format_write( [FORMAT_NAME] )
     $io->getc
     $io->read ( BUF, LEN, [OFFSET] )
     $io->print ( ARGS )
@@ -137,8 +136,7 @@ guaranteed.
 =item $io->write ( BUF, LEN [, OFFSET ] )
 
 This C<write> is like C<write> found in C, that is it is the
-opposite of read. The wrapper for the perl C<write> function is
-called C<format_write>.
+opposite of read.
 
 =item $io->error
 
@@ -281,7 +279,6 @@ $VERSION = eval $VERSION;
     format_top_name
     format_line_break_characters
     format_formfeed
-    format_write
 
     print
     printf
@@ -564,27 +561,6 @@ sub format_formfeed {
     my $prev = $^L;
     $^L = $_[1] if @_ > 1;
     $prev;
-}
-
-sub formline {
-    my $io = shift;
-    my $picture = shift;
-    local($^A) = $^A;
-    local($\) = "";
-    formline($picture, @_);
-    print $io $^A;
-}
-
-sub format_write {
-    @_ < 3 || croak 'usage: $io->write( [FORMAT_NAME] )';
-    if (@_ == 2) {
-	my ($io, $fmt) = @_;
-	my $oldfmt = $io->format_name(qualify($fmt,caller));
-	CORE::write($io);
-	$io->format_name($oldfmt);
-    } else {
-	CORE::write($_[0]);
-    }
 }
 
 # XXX undocumented

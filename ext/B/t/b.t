@@ -164,7 +164,7 @@ is(B::cstring("wibble"), '"wibble"', "Testing B::cstring()");
 is(B::perlstring("wibble"), '"wibble"', "Testing B::perlstring()");
 is(B::class(bless {}, "Wibble::Bibble"), "Bibble", "Testing B::class()");
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()");
-is(B::opnumber("localtime"), 294, "Testing opnumber with opname (localtime)");
+is(B::opnumber("localtime"), 291, "Testing opnumber with opname (localtime)");
 
 {
     no warnings 'once';

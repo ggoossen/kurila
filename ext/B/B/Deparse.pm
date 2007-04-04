@@ -2250,7 +2250,6 @@ sub pp_vec { maybe_local(@_, listop(@_, "vec")) }
 sub pp_index { maybe_targmy(@_, \&listop, "index") }
 sub pp_rindex { maybe_targmy(@_, \&listop, "rindex") }
 sub pp_sprintf { maybe_targmy(@_, \&listop, "sprintf") }
-sub pp_formline { listop(@_, "formline") } # see also deparse_format
 sub pp_crypt { maybe_targmy(@_, \&listop, "crypt") }
 sub pp_unpack { listop(@_, "unpack") }
 sub pp_pack { listop(@_, "pack") }

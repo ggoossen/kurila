@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 my @pos = qw(__DATA__ __END__ AUTOLOAD BEGIN CHECK DESTROY default defined
-	    delete do END else eval elsif exists for format foreach given grep
+	    delete do END else eval elsif exists for foreach given grep
 	    goto glob INIT if last local m my map next no our pos print printf
 	    package prototype q qr qq qw qx redo return require s say scalar sort
 	    split state study sub tr tie tied use undef UNITCHECK until untie
@@ -17,7 +17,7 @@ my @neg = qw(__FILE__ __LINE__ __PACKAGE__ and abs alarm atan2 accept bless
 	    chown crypt chroot caller connect closedir continue die dump
 	    dbmopen dbmclose eq eof err exp exit exec each endgrent endpwent
 	    endnetent endhostent endservent endprotoent fork fcntl flock fileno
-	    formline getppid getpgrp getpwent getpwnam getpwuid getpeername
+	    getppid getpgrp getpwent getpwnam getpwuid getpeername
 	    getprotoent getpriority getprotobyname getprotobynumber
 	    gethostbyname gethostbyaddr gethostent getnetbyname getnetbyaddr
 	    getnetent getservbyname getservbyport getservent getsockname

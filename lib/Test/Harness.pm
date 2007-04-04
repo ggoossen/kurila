@@ -9,6 +9,7 @@ use Exporter;
 use Benchmark;
 use Config;
 use strict;
+use Perl6::Form qw|form|;
 
 
 use vars qw(
@@ -597,10 +598,10 @@ sub get_results {
         if ($tot->{bonus}) {
             my($fmt_top, $fmt) = _create_fmts("Passed TODO",$todo_passed);
             # Now write to formats
-            $out .= swrite( $fmt_top );
+            $out .= form( $fmt_top );
             for my $script (sort keys %{$todo_passed||{}}) {
                 my $Curtest = $todo_passed->{$script};
-                $out .= swrite( $fmt, @{ $Curtest }{qw(name estat wstat max failed canon)} );
+                $out .= form( $fmt, @{ $Curtest }{qw(name estat wstat max failed canon)} );
             }
         }
     }
@@ -619,11 +620,11 @@ sub get_results {
         my($fmt_top, $fmt1, $fmt2) = _create_fmts("Failed Test",$failedtests);
 
         # Now write to formats
-        $out .= swrite( $fmt_top );
+        $out .= form( $fmt_top );
         for my $script (sort keys %$failedtests) {
             my $Curtest = $failedtests->{$script};
-            $out .= swrite( $fmt1, @{ $Curtest }{qw(name estat wstat max failed canon)} );
-            $out .= swrite( $fmt2, $Curtest->{canon} );
+            $out .= form( $fmt1, @{ $Curtest }{qw(name estat wstat max failed canon)} );
+            $out .= form( $fmt2, $Curtest->{canon} );
         }
         if ($tot->{bad}) {
             $bonusmsg =~ s/^,\s*//;
@@ -636,16 +637,6 @@ sub get_results {
            $tot->{files}, $tot->{max}, timestr($tot->{bench}, 'nop'));
     return $out;
 }
-
-sub swrite {
-    my $format = shift;
-    $^A = '';
-    formline($format,@_);
-    my $out = $^A;
-    $^A = '';
-    return $out;
-}
-
 
 my %Handlers = (
     header  => \&header_handler,
@@ -820,11 +811,11 @@ sub _create_fmts {
                   . "-" x $Columns
                   . "\n";
 
-    my $fmt1 =  "@" . "<" x ($max_namelen - 1)
-              . "  @>> @>>>> @>>>> @>>>  "
-              . "^" . "<" x ($list_len - 1) . "\n";
-    my $fmt2 =  "~~" . " " x ($Columns - $list_len - 2) . "^"
-              . "<" x ($list_len - 1) . "\n";
+    my $fmt1 =  "{" . "<" x ($max_namelen - 1) . "}"
+              . "  {>>} {>>>>} {>>>>} {>>>}  "
+              . "{" . "<" x ($list_len - 1) . "}";
+    my $fmt2 =  " " x ($Columns - $list_len - 2) . "{"
+              . "[" x ($list_len - 1) . "}";
 
     return($fmt_top, $fmt1, $fmt2);
 }
