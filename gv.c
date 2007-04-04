@@ -1244,10 +1244,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    SvREADONLY_on(GvSVn(gv));
 	    /* FALL THROUGH */
 	case '[':
-	case '^':
-	case '~':
-	case '=':
-	case '%':
 	case '.':
 	case '(':
 	case ')':

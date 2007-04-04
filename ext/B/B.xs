@@ -1629,10 +1629,6 @@ IoLINES(io)
 	B::IO	io
 
 long
-IoPAGE(io)
-	B::IO	io
-
-long
 IoPAGE_LEN(io)
 	B::IO	io
 

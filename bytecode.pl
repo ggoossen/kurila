@@ -237,7 +237,6 @@ xbm_previous	BmPREVIOUS(bstate->bs_sv)		U16
 xbm_rare	BmRARE(bstate->bs_sv)			U8
 xfm_lines	FmLINES(bstate->bs_sv)			IV
 xio_lines	IoLINES(bstate->bs_sv)			IV
-xio_page	IoPAGE(bstate->bs_sv)			IV
 xio_page_len	IoPAGE_LEN(bstate->bs_sv)		IV
 xio_lines_left	IoLINES_LEFT(bstate->bs_sv)	       	IV
 xio_top_name	IoTOP_NAME(bstate->bs_sv)		pvindex

@@ -1320,8 +1320,6 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
 	    SvNV_set(sv, 0);
 #endif
 
-	if (new_type == SVt_PVIO)
-	    IoPAGE_LEN(sv) = 60;
 	if (old_type < SVt_RV)
 	    SvPV_set(sv, NULL);
 	break;
@@ -4901,9 +4899,6 @@ Perl_sv_clear(pTHX_ register SV *sv)
 	if (IoDIRP(sv) && !(IoFLAGS(sv) & IOf_FAKE_DIRP))
 	    PerlDir_close(IoDIRP(sv));
 	IoDIRP(sv) = (DIR*)NULL;
-	Safefree(IoTOP_NAME(sv));
-	Safefree(IoFMT_NAME(sv));
-	Safefree(IoBOTTOM_NAME(sv));
 	goto freescalar;
     case SVt_PVCV:
 	cv_undef((CV*)sv);

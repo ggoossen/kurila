@@ -939,8 +939,6 @@ Perl_do_close(pTHX_ GV *gv, bool not_implicit)
     retval = io_close(io, not_implicit);
     if (not_implicit) {
 	IoLINES(io) = 0;
-	IoPAGE(io) = 0;
-	IoLINES_LEFT(io) = IoPAGE_LEN(io);
     }
     IoTYPE(io) = IoTYPE_CLOSED;
     return retval;

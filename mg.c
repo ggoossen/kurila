@@ -947,35 +947,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 #endif
 	}
 	break;
-    case '^':
-	if (GvIOp(PL_defoutgv))
-	    s = IoTOP_NAME(GvIOp(PL_defoutgv));
-	if (s)
-	    sv_setpv(sv,s);
-	else {
-	    sv_setpv(sv,GvENAME(PL_defoutgv));
-	    sv_catpv(sv,"_TOP");
-	}
-	break;
-    case '~':
-	if (GvIOp(PL_defoutgv))
-	    s = IoFMT_NAME(GvIOp(PL_defoutgv));
-	if (!s)
-	    s = GvENAME(PL_defoutgv);
-	sv_setpv(sv,s);
-	break;
-    case '=':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)IoPAGE_LEN(GvIOp(PL_defoutgv)));
-	break;
-    case '-':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)IoLINES_LEFT(GvIOp(PL_defoutgv)));
-	break;
-    case '%':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)IoPAGE(GvIOp(PL_defoutgv)));
-	break;
     case ':':
 	break;
     case '/':
@@ -2362,27 +2333,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	}
 	else if (SvOK(sv) && GvIO(PL_last_in_gv))
 	    IoLINES(GvIOp(PL_last_in_gv)) = SvIV(sv);
-	break;
-    case '^':
-	Safefree(IoTOP_NAME(GvIOp(PL_defoutgv)));
-	s = IoTOP_NAME(GvIOp(PL_defoutgv)) = savesvpv(sv);
-	IoTOP_GV(GvIOp(PL_defoutgv)) =  gv_fetchsv(sv, GV_ADD, SVt_PVIO);
-	break;
-    case '~':
-	Safefree(IoFMT_NAME(GvIOp(PL_defoutgv)));
-	s = IoFMT_NAME(GvIOp(PL_defoutgv)) = savesvpv(sv);
-	IoFMT_GV(GvIOp(PL_defoutgv)) =  gv_fetchsv(sv, GV_ADD, SVt_PVIO);
-	break;
-    case '=':
-	IoPAGE_LEN(GvIOp(PL_defoutgv)) = (SvIV(sv));
-	break;
-    case '-':
-	IoLINES_LEFT(GvIOp(PL_defoutgv)) = (SvIV(sv));
-	if (IoLINES_LEFT(GvIOp(PL_defoutgv)) < 0L)
-	    IoLINES_LEFT(GvIOp(PL_defoutgv)) = 0L;
-	break;
-    case '%':
-	IoPAGE(GvIOp(PL_defoutgv)) = (SvIV(sv));
 	break;
     case '|':
 	{

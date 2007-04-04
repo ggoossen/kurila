@@ -639,15 +639,6 @@ struct xpvio {
 	void *	xiou_any;	/* for alignment */
     } xio_dirpu;
     IV		xio_lines;	/* $. */
-    IV		xio_page;	/* $% */
-    IV		xio_page_len;	/* $= */
-    IV		xio_lines_left;	/* $- */
-    char *	xio_top_name;	/* $^ */
-    GV *	xio_top_gv;	/* $^ */
-    char *	xio_fmt_name;	/* $~ */
-    GV *	xio_fmt_gv;	/* $~ */
-    char *	xio_bottom_name;/* $^B */
-    GV *	xio_bottom_gv;	/* $^B */
     short	xio_subprocess;	/* -| or |- */
     char	xio_type;
     char	xio_flags;
@@ -1373,15 +1364,6 @@ the scalar's value cannot change unless written to.
 #define IoDIRP(sv)	((XPVIO*)  SvANY(sv))->xio_dirp
 #define IoANY(sv)	((XPVIO*)  SvANY(sv))->xio_any
 #define IoLINES(sv)	((XPVIO*)  SvANY(sv))->xio_lines
-#define IoPAGE(sv)	((XPVIO*)  SvANY(sv))->xio_page
-#define IoPAGE_LEN(sv)	((XPVIO*)  SvANY(sv))->xio_page_len
-#define IoLINES_LEFT(sv)((XPVIO*)  SvANY(sv))->xio_lines_left
-#define IoTOP_NAME(sv)	((XPVIO*)  SvANY(sv))->xio_top_name
-#define IoTOP_GV(sv)	((XPVIO*)  SvANY(sv))->xio_top_gv
-#define IoFMT_NAME(sv)	((XPVIO*)  SvANY(sv))->xio_fmt_name
-#define IoFMT_GV(sv)	((XPVIO*)  SvANY(sv))->xio_fmt_gv
-#define IoBOTTOM_NAME(sv)((XPVIO*) SvANY(sv))->xio_bottom_name
-#define IoBOTTOM_GV(sv)	((XPVIO*)  SvANY(sv))->xio_bottom_gv
 #define IoSUBPROCESS(sv)((XPVIO*)  SvANY(sv))->xio_subprocess
 #define IoTYPE(sv)	((XPVIO*)  SvANY(sv))->xio_type
 #define IoFLAGS(sv)	((XPVIO*)  SvANY(sv))->xio_flags

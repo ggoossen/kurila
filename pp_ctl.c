@@ -2865,9 +2865,6 @@ PP(pp_require)
     if (filter_sub || filter_cache) {
 	SV * const datasv = filter_add(S_run_user_filter, NULL);
 	IoLINES(datasv) = filter_has_file;
-	IoTOP_GV(datasv) = (GV *)filter_state;
-	IoBOTTOM_GV(datasv) = (GV *)filter_sub;
-	IoFMT_GV(datasv) = (GV *)filter_cache;
     }
 
     /* switch to eval mode */
@@ -3760,8 +3757,8 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
     dVAR;
     SV * const datasv = FILTER_DATA(idx);
     const int filter_has_file = IoLINES(datasv);
-    SV * const filter_state = (SV *)IoTOP_GV(datasv);
-    SV * const filter_sub = (SV *)IoBOTTOM_GV(datasv);
+    SV * const filter_state = NULL; /* (SV *)IoTOP_GV(datasv); */
+    SV * const filter_sub = NULL; /* (SV *)IoBOTTOM_GV(datasv); */
     int status = 0;
     SV *upstream;
     STRLEN got_len;
@@ -3778,8 +3775,8 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
        for PL_error_count == 0.)  Solaris doesn't segfault --
        not sure where the trouble is yet.  XXX */
 
-    if (IoFMT_GV(datasv)) {
-	SV *const cache = (SV *)IoFMT_GV(datasv);
+    if (NULL) { /* IoFMT_GV(datasv)) { */
+	SV *const cache = NULL; /* (SV *)IoFMT_GV(datasv); */
 	if (SvOK(cache)) {
 	    STRLEN cache_len;
 	    const char *cache_p = SvPV(cache, cache_len);
@@ -3875,56 +3872,56 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	    }
 	}
     }
-    if (prune_from) {
-	/* Oh. Too long. Stuff some in our cache.  */
-	STRLEN cached_len = got_p + got_len - prune_from;
-	SV *cache = (SV *)IoFMT_GV(datasv);
+/*     if (prune_from) { */
+/* 	/\* Oh. Too long. Stuff some in our cache.  *\/ */
+/* 	STRLEN cached_len = got_p + got_len - prune_from; */
+/* 	SV *cache = NULL; /\* (SV *)IoFMT_GV(datasv); *\/ */
 
-	if (!cache) {
-	    IoFMT_GV(datasv) = (GV*) (cache = newSV(got_len - umaxlen));
-	} else if (SvOK(cache)) {
-	    /* Cache should be empty.  */
-	    assert(!SvCUR(cache));
-	}
+/* 	if (!cache) { */
+/* 	    IoFMT_GV(datasv) = (GV*) (cache = newSV(got_len - umaxlen)); */
+/* 	} else if (SvOK(cache)) { */
+/* 	    /\* Cache should be empty.  *\/ */
+/* 	    assert(!SvCUR(cache)); */
+/* 	} */
 
-	sv_setpvn(cache, prune_from, cached_len);
-	/* If you ask for block mode, you may well split UTF-8 characters.
-	   "If it breaks, you get to keep both parts"
-	   (Your code is broken if you  don't put them back together again
-	   before something notices.) */
-	SvCUR_set(upstream, got_len - cached_len);
-	/* Can't yet be EOF  */
-	if (status == 0)
-	    status = 1;
-    }
+/* 	sv_setpvn(cache, prune_from, cached_len); */
+/* 	/\* If you ask for block mode, you may well split UTF-8 characters. */
+/* 	   "If it breaks, you get to keep both parts" */
+/* 	   (Your code is broken if you  don't put them back together again */
+/* 	   before something notices.) *\/ */
+/* 	SvCUR_set(upstream, got_len - cached_len); */
+/* 	/\* Can't yet be EOF  *\/ */
+/* 	if (status == 0) */
+/* 	    status = 1; */
+/*     } */
 
-    /* If they are at EOF but buf_sv has something in it, then they may never
-       have touched the SV upstream, so it may be undefined.  If we naively
-       concatenate it then we get a warning about use of uninitialised value.
-    */
-    if (upstream != buf_sv && (SvOK(upstream) || SvGMAGICAL(upstream))) {
-	sv_catsv(buf_sv, upstream);
-    }
+/*     /\* If they are at EOF but buf_sv has something in it, then they may never */
+/*        have touched the SV upstream, so it may be undefined.  If we naively */
+/*        concatenate it then we get a warning about use of uninitialised value. */
+/*     *\/ */
+/*     if (upstream != buf_sv && (SvOK(upstream) || SvGMAGICAL(upstream))) { */
+/* 	sv_catsv(buf_sv, upstream); */
+/*     } */
 
-    if (status <= 0) {
-	IoLINES(datasv) = 0;
-	SvREFCNT_dec(IoFMT_GV(datasv));
-	if (filter_state) {
-	    SvREFCNT_dec(filter_state);
-	    IoTOP_GV(datasv) = NULL;
-	}
-	if (filter_sub) {
-	    SvREFCNT_dec(filter_sub);
-	    IoBOTTOM_GV(datasv) = NULL;
-	}
-	filter_del(S_run_user_filter);
-    }
-    if (status == 0 && read_from_cache) {
-	/* If we read some data from the cache (and by getting here it implies
-	   that we emptied the cache) then we aren't yet at EOF, and mustn't
-	   report that to our caller.  */
-	return 1;
-    }
+/*     if (status <= 0) { */
+/* 	IoLINES(datasv) = 0; */
+/* 	SvREFCNT_dec(IoFMT_GV(datasv)); */
+/* 	if (filter_state) { */
+/* 	    SvREFCNT_dec(filter_state); */
+/* 	    IoTOP_GV(datasv) = NULL; */
+/* 	} */
+/* 	if (filter_sub) { */
+/* 	    SvREFCNT_dec(filter_sub); */
+/* 	    IoBOTTOM_GV(datasv) = NULL; */
+/* 	} */
+/* 	filter_del(S_run_user_filter); */
+/*     } */
+/*     if (status == 0 && read_from_cache) { */
+/* 	/\* If we read some data from the cache (and by getting here it implies */
+/* 	   that we emptied the cache) then we aren't yet at EOF, and mustn't */
+/* 	   report that to our caller.  *\/ */
+/* 	return 1; */
+/*     } */
     return status;
 }
 
