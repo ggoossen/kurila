@@ -496,11 +496,6 @@ sub stash_subs {
 		next if $$val != ${$cv->GV};   # Ignore imposters
 		$self->todo($cv, 0);
 	    }
-	    if (class(my $cv = $val->FORM) ne "SPECIAL") {
-		next if $self->{'forms_done'}{$$val}++;
-		next if $$val != ${$cv->GV};   # Ignore imposters
-		$self->todo($cv, 1);
-	    }
 	    if (class($val->HV) ne "SPECIAL" && $key =~ /::$/) {
 		$self->stash_subs($pack . $key);
 	    }

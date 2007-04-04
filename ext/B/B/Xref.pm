@@ -320,13 +320,6 @@ sub B::GV::xref {
 	process([$gv->STASH->NAME, "&", $gv->NAME], "subdef");
 	push(@todo, $cv);
     }
-    my $form = $gv->FORM;
-    if ($$form) {
-	return if $done{$$form}++;
-	$file = $gv->FILE;
-	$line = $gv->LINE;
-	process([$gv->STASH->NAME, "", $gv->NAME], "formdef");
-    }
 }
 
 sub xref_definitions {

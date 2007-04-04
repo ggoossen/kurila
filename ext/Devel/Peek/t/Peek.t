@@ -322,7 +322,6 @@ do_test(17,
     SV = $ADDR
     REFCNT = 1
     IO = 0x0
-    FORM = 0x0  
     AV = 0x0
     HV = 0x0
     CV = 0x0

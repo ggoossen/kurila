@@ -117,7 +117,7 @@ use Getopt::Std;
 use Carp;
 use Test::More tests => ( # per-pkg tests (function ct + require_ok)
 			  40 + 16	# Data::Dumper, Digest::MD5
-			  + 517 + 238	# B::Deparse, B
+			  + 517 + 237	# B::Deparse, B
 			  + 595 + 190	# POSIX, IO::Socket
 			  + 323 * ($] > 5.009)
 			  + 17 * ($] >= 5.009003)

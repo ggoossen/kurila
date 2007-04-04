@@ -203,7 +203,6 @@ fcntl	File	file control system call
 fileno	I/O	return file descriptor from filehandle
 flock	I/O	lock an entire file with an advisory lock
 fork	Process	create a new process just like this one
-format	I/O	declare a picture format with use by the write() function
 getc	I/O	get	the next character from the filehandle
 getgrent	User	get next group record 
 getgrgid	User	get group record given group user ID

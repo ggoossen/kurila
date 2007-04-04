@@ -97,7 +97,7 @@ Functions for real %HASHes:
 
 Input and output functions:
      binmode, close, closedir, dbmclose, dbmopen, die, eof,
-     fileno, flock, format, getc, print, printf, read, readdir,
+     fileno, flock, getc, print, printf, read, readdir,
      readline, rewinddir, seek, seekdir, select, syscall,
      sysread, sysseek, syswrite, tell, telldir, truncate, warn,
      write
@@ -119,8 +119,8 @@ Keywords altering or affecting scoping of identifiers:
      caller, import, local, my, our, package, use
 
 Miscellaneous functions:
-     defined, dump, eval, formline, local, my, our, prototype,
-     reset, scalar, undef, wantarray
+     defined, dump, eval, local, my, our, prototype, reset,
+     scalar, undef, wantarray
 
 Functions for processes and process groups:
      alarm, exec, fork, getpgrp, getppid, getpriority, kill,
