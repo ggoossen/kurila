@@ -670,7 +670,7 @@ the parent pad.
 #define CvCOMPILED(cv)	CvROOT(cv)
 
 /* the CV does late binding of its lexicals */
-#define CvLATE(cv) (CvANON(cv) || SvTYPE(cv) == SVt_PVFM)
+#define CvLATE(cv) (CvANON(cv))
 
 
 STATIC PADOFFSET
@@ -1389,7 +1389,6 @@ S_cv_dump(pTHX_ const CV *cv, const char *title)
 		  title,
 		  PTR2UV(cv),
 		  (CvANON(cv) ? "ANON"
-		   : (SvTYPE(cv) == SVt_PVFM) ? "FORMAT"
 		   : (cv == PL_main_cv) ? "MAIN"
 		   : CvUNIQUE(cv) ? "UNIQUE"
 		   : CvGV(cv) ? GvNAME(CvGV(cv)) : "UNDEFINED"),
@@ -1447,7 +1446,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     if (outside && CvCLONE(outside) && ! CvCLONED(outside))
 	outside = find_runcv(NULL);
     depth = CvDEPTH(outside);
-    assert(depth || SvTYPE(proto) == SVt_PVFM);
+    assert(depth);
     if (!depth)
 	depth = 1;
     assert(CvPADLIST(outside));
@@ -1494,17 +1493,8 @@ Perl_cv_clone(pTHX_ CV *proto)
 	    if (SvFAKE(namesv)) {   /* lexical from outside? */
 		sv = outpad[PARENT_PAD_INDEX(namesv)];
 		assert(sv);
-		/* formats may have an inactive parent */
-		if (SvTYPE(proto) == SVt_PVFM && SvPADSTALE(sv)) {
-		    if (ckWARN(WARN_CLOSURE))
-			Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
-			    "Variable \"%s\" is not available", SvPVX_const(namesv));
-		    sv = NULL;
-		}
-		else {
-		    assert(!SvPADSTALE(sv));
-		    SvREFCNT_inc_simple_void_NN(sv);
-		}
+		assert(!SvPADSTALE(sv));
+		SvREFCNT_inc_simple_void_NN(sv);
 	    }
 	    if (!sv) {
                 const char sigil = SvPVX_const(namesv)[0];

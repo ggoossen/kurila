@@ -483,13 +483,13 @@ case 2:
 
   case 62:
 #line 538 "perly.y"
-    { (yyval.ival) = start_subparse(FALSE, 0);
+    { (yyval.ival) = start_subparse(0);
 			    SAVEFREESV(PL_compcv); ;}
     break;
 
   case 63:
 #line 544 "perly.y"
-    { (yyval.ival) = start_subparse(FALSE, CVf_ANON);
+    { (yyval.ival) = start_subparse(CVf_ANON);
 			    SAVEFREESV(PL_compcv); ;}
     break;
 

@@ -43,7 +43,6 @@
 #define PL_Sv			(vTHX->TSv)
 #define PL_Xpv			(vTHX->TXpv)
 #define PL_av_fetch_sv		(vTHX->Tav_fetch_sv)
-#define PL_bodytarget		(vTHX->Tbodytarget)
 #define PL_chopset		(vTHX->Tchopset)
 #define PL_colors		(vTHX->Tcolors)
 #define PL_colorset		(vTHX->Tcolorset)
@@ -62,7 +61,6 @@
 #define PL_efloatsize		(vTHX->Tefloatsize)
 #define PL_errors		(vTHX->Terrors)
 #define PL_firstgv		(vTHX->Tfirstgv)
-#define PL_formtarget		(vTHX->Tformtarget)
 #define PL_hv_fetch_ent_mh	(vTHX->Thv_fetch_ent_mh)
 #define PL_hv_fetch_sv		(vTHX->Thv_fetch_sv)
 #define PL_in_eval		(vTHX->Tin_eval)
@@ -114,7 +112,6 @@
 #define PL_tmps_max		(vTHX->Ttmps_max)
 #define PL_tmps_stack		(vTHX->Ttmps_stack)
 #define PL_top_env		(vTHX->Ttop_env)
-#define PL_toptarget		(vTHX->Ttoptarget)
 #define PL_watchaddr		(vTHX->Twatchaddr)
 #define PL_watchok		(vTHX->Twatchok)
 
@@ -651,7 +648,6 @@
 #define PL_TSv			PL_Sv
 #define PL_TXpv			PL_Xpv
 #define PL_Tav_fetch_sv		PL_av_fetch_sv
-#define PL_Tbodytarget		PL_bodytarget
 #define PL_Tchopset		PL_chopset
 #define PL_Tcolors		PL_colors
 #define PL_Tcolorset		PL_colorset
@@ -670,7 +666,6 @@
 #define PL_Tefloatsize		PL_efloatsize
 #define PL_Terrors		PL_errors
 #define PL_Tfirstgv		PL_firstgv
-#define PL_Tformtarget		PL_formtarget
 #define PL_Thv_fetch_ent_mh	PL_hv_fetch_ent_mh
 #define PL_Thv_fetch_sv		PL_hv_fetch_sv
 #define PL_Tin_eval		PL_in_eval
@@ -722,7 +717,6 @@
 #define PL_Ttmps_max		PL_tmps_max
 #define PL_Ttmps_stack		PL_tmps_stack
 #define PL_Ttop_env		PL_top_env
-#define PL_Ttoptarget		PL_toptarget
 #define PL_Twatchaddr		PL_watchaddr
 #define PL_Twatchok		PL_watchok
 

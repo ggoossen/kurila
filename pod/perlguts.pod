@@ -1036,7 +1036,6 @@ The current kinds of Magic Virtual Tables are:
 						element
     E  PERL_MAGIC_env            vtbl_env       %ENV hash
     e  PERL_MAGIC_envelem        vtbl_envelem   %ENV hash element
-    f  PERL_MAGIC_fm             vtbl_fm        Formline ('compiled' format)
     g  PERL_MAGIC_regex_global   vtbl_mglob     m//g target / study()ed string
     H  PERL_MAGIC_hints          vtbl_sig       %^H hash
     h  PERL_MAGIC_hintselem      vtbl_hintselem %^H hash element

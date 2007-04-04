@@ -1009,11 +1009,6 @@ perl_destruct(pTHXx)
     SvREFCNT_dec(PL_pidstatus);
     PL_pidstatus = NULL;
 #endif
-    SvREFCNT_dec(PL_toptarget);
-    PL_toptarget = NULL;
-    SvREFCNT_dec(PL_bodytarget);
-    PL_bodytarget = NULL;
-    PL_formtarget = NULL;
 
     /* free locale stuff */
 #ifdef USE_LOCALE_COLLATE
@@ -2525,7 +2520,7 @@ Perl_get_cvn_flags(pTHX_ const char *name, STRLEN len, I32 flags)
      * declaration! */
     if ((flags & ~GV_NOADD_MASK) && !GvCVu(gv)) {
 	SV *const sv = newSVpvn(name,len);
-    	return newSUB(start_subparse(FALSE, 0),
+    	return newSUB(start_subparse(0),
 		      newSVOP(OP_CONST, 0, sv),
 		      NULL, NULL);
     }
@@ -4657,12 +4652,6 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 {
     dVAR;
     GV* tmpgv;
-
-    PL_toptarget = newSV_type(SVt_PVFM);
-    sv_setpvn(PL_toptarget, "", 0);
-    PL_bodytarget = newSV_type(SVt_PVFM);
-    sv_setpvn(PL_bodytarget, "", 0);
-    PL_formtarget = PL_bodytarget;
 
     TAINT;
 

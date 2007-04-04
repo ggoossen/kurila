@@ -42,7 +42,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xlow;		\
 	 }))
@@ -52,7 +51,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xhigh;		\
 	 }))
@@ -62,7 +60,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xlow;		\
 	 }))
@@ -72,7 +69,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xhigh;		\
 	 }))

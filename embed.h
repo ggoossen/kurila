@@ -438,7 +438,6 @@
 #define magic_setdbline		Perl_magic_setdbline
 #define magic_setdefelem	Perl_magic_setdefelem
 #define magic_setenv		Perl_magic_setenv
-#define magic_setfm		Perl_magic_setfm
 #define magic_sethint		Perl_magic_sethint
 #define magic_setisa		Perl_magic_setisa
 #define magic_setglob		Perl_magic_setglob
@@ -1272,7 +1271,6 @@
 #define docatch			S_docatch
 #define docatch_body		S_docatch_body
 #define dofindlabel		S_dofindlabel
-#define doparseform		S_doparseform
 #define num_overflow		S_num_overflow
 #define dopoptoeval		S_dopoptoeval
 #define dopoptogiven		S_dopoptogiven
@@ -2665,7 +2663,6 @@
 #define magic_setdbline(a,b)	Perl_magic_setdbline(aTHX_ a,b)
 #define magic_setdefelem(a,b)	Perl_magic_setdefelem(aTHX_ a,b)
 #define magic_setenv(a,b)	Perl_magic_setenv(aTHX_ a,b)
-#define magic_setfm(a,b)	Perl_magic_setfm(aTHX_ a,b)
 #define magic_sethint(a,b)	Perl_magic_sethint(aTHX_ a,b)
 #define magic_setisa(a,b)	Perl_magic_setisa(aTHX_ a,b)
 #define magic_setglob(a,b)	Perl_magic_setglob(aTHX_ a,b)
@@ -3034,7 +3031,7 @@
 #define csighandler		Perl_csighandler
 #endif
 #define stack_grow(a,b,c)	Perl_stack_grow(aTHX_ a,b,c)
-#define start_subparse(a,b)	Perl_start_subparse(aTHX_ a,b)
+#define start_subparse(a)	Perl_start_subparse(aTHX_ a)
 #ifdef PERL_CORE
 #define sub_crush_depth(a)	Perl_sub_crush_depth(aTHX_ a)
 #endif
@@ -3491,7 +3488,6 @@
 #define docatch(a)		S_docatch(aTHX_ a)
 #define docatch_body()		S_docatch_body(aTHX)
 #define dofindlabel(a,b,c,d)	S_dofindlabel(aTHX_ a,b,c,d)
-#define doparseform(a)		S_doparseform(aTHX_ a)
 #define num_overflow		S_num_overflow
 #define dopoptoeval(a)		S_dopoptoeval(aTHX_ a)
 #define dopoptogiven(a)		S_dopoptogiven(aTHX_ a)

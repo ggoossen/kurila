@@ -287,7 +287,6 @@ gp_hv		*(SV**)&GvHV(bstate->bs_sv)		svindex
 gp_cv		*(SV**)&GvCV(bstate->bs_sv)		svindex
 gp_file		bstate->bs_sv				pvindex		x
 gp_io		*(SV**)&GvIOp(bstate->bs_sv)		svindex
-gp_form		*(SV**)&GvFORM(bstate->bs_sv)		svindex
 gp_cvgen	GvCVGEN(bstate->bs_sv)			U32
 gp_line		GvLINE(bstate->bs_sv)			line_t
 gp_share	bstate->bs_sv				svindex		x

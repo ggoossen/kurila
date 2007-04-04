@@ -280,7 +280,6 @@ PP(pp_rv2sv)
 	case SVt_PVAV:
 	case SVt_PVHV:
 	case SVt_PVCV:
-	case SVt_PVFM:
 	case SVt_PVIO:
 	    DIE(aTHX_ "Not a SCALAR reference");
 	default: NOOP;
@@ -607,9 +606,6 @@ PP(pp_gelem)
 		deprecate("*glob{FILEHANDLE}");
 		tmpRef = (SV*)GvIOp(gv);
 	    }
-	    else
-		if (strEQ(second_letter, "ORMAT"))
-		    tmpRef = (SV*)GvFORM(gv);
 	    break;
 	case 'G':
 	    if (strEQ(second_letter, "LOB"))
@@ -809,8 +805,6 @@ PP(pp_undef)
 	if (cv_const_sv((CV*)sv) && ckWARN(WARN_MISC))
 	    Perl_warner(aTHX_ packWARN(WARN_MISC), "Constant subroutine %s undefined",
 		 CvANON((CV*)sv) ? "(anonymous)" : GvENAME(CvGV((CV*)sv)));
-	/* FALLTHROUGH */
-    case SVt_PVFM:
 	{
 	    /* let user-undef'd sub keep its identity */
 	    GV* const gv = CvGV((CV*)sv);

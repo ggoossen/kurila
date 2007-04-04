@@ -142,7 +142,7 @@ PP(pp_sassign)
 	SV * const cv = SvRV(left);
 	const U32 cv_type = SvTYPE(cv);
 	const U32 gv_type = SvTYPE(right);
-	const bool got_coderef = cv_type == SVt_PVCV || cv_type == SVt_PVFM;
+	const bool got_coderef = cv_type == SVt_PVCV;
 
 	if (!got_coderef) {
 	    assert(SvROK(cv));

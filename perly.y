@@ -535,13 +535,13 @@ subrout	:	SUB startsub subname proto subattrlist subbody
 	;
 
 startsub:	/* NULL */	/* start a regular subroutine scope */
-			{ $$ = start_subparse(FALSE, 0);
+			{ $$ = start_subparse(0);
 			    SAVEFREESV(PL_compcv); }
 
 	;
 
 startanonsub:	/* NULL */	/* start an anonymous subroutine scope */
-			{ $$ = start_subparse(FALSE, CVf_ANON);
+			{ $$ = start_subparse(CVf_ANON);
 			    SAVEFREESV(PL_compcv); }
 	;
 

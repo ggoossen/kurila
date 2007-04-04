@@ -2331,7 +2331,6 @@ typedef struct xpvhv XPVHV;
 typedef struct xpvgv XPVGV;
 typedef struct xpvcv XPVCV;
 typedef struct xpvbm XPVBM;
-typedef struct xpvfm XPVFM;
 typedef struct xpvio XPVIO;
 typedef struct mgvtbl MGVTBL;
 typedef union any ANY;
@@ -4332,7 +4331,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_vec,
     want_vtbl_pos,
     want_vtbl_bm,
-    want_vtbl_fm,
     want_vtbl_uvar,
     want_vtbl_defelem,
     want_vtbl_regexp,
@@ -4857,18 +4855,6 @@ MGVTBL_SET(
     PL_vtbl_bm,
     0,
     MEMBER_TO_FPTR(Perl_magic_setbm),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_fm,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setfm),
     0,
     0,
     0,

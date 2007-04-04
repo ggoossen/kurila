@@ -646,8 +646,6 @@ END_EXTERN_C
 #define PL_Xpv			(*Perl_TXpv_ptr(aTHX))
 #undef  PL_av_fetch_sv
 #define PL_av_fetch_sv		(*Perl_Tav_fetch_sv_ptr(aTHX))
-#undef  PL_bodytarget
-#define PL_bodytarget		(*Perl_Tbodytarget_ptr(aTHX))
 #undef  PL_chopset
 #define PL_chopset		(*Perl_Tchopset_ptr(aTHX))
 #undef  PL_colors
@@ -684,8 +682,6 @@ END_EXTERN_C
 #define PL_errors		(*Perl_Terrors_ptr(aTHX))
 #undef  PL_firstgv
 #define PL_firstgv		(*Perl_Tfirstgv_ptr(aTHX))
-#undef  PL_formtarget
-#define PL_formtarget		(*Perl_Tformtarget_ptr(aTHX))
 #undef  PL_hv_fetch_ent_mh
 #define PL_hv_fetch_ent_mh	(*Perl_Thv_fetch_ent_mh_ptr(aTHX))
 #undef  PL_hv_fetch_sv
@@ -788,8 +784,6 @@ END_EXTERN_C
 #define PL_tmps_stack		(*Perl_Ttmps_stack_ptr(aTHX))
 #undef  PL_top_env
 #define PL_top_env		(*Perl_Ttop_env_ptr(aTHX))
-#undef  PL_toptarget
-#define PL_toptarget		(*Perl_Ttoptarget_ptr(aTHX))
 #undef  PL_watchaddr
 #define PL_watchaddr		(*Perl_Twatchaddr_ptr(aTHX))
 #undef  PL_watchok

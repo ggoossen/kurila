@@ -1580,14 +1580,6 @@ B::IO
 GvIO(gv)
 	B::GV	gv
 
-B::FM
-GvFORM(gv)
-	B::GV	gv
-    CODE:
-	RETVAL = (SV*)GvFORM(gv);
-    OUTPUT:
-	RETVAL
-
 B::AV
 GvAV(gv)
 	B::GV	gv

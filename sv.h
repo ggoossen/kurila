@@ -59,8 +59,7 @@ typedef enum {
 	SVt_PVAV,	/* 11 */
 	SVt_PVHV,	/* 12 */
 	SVt_PVCV,	/* 13 */
-	SVt_PVFM,	/* 14 */
-	SVt_PVIO,	/* 15 */
+	SVt_PVIO,	/* 14 */
 	SVt_LAST	/* keep last in enum. used to size arrays */
 } svtype;
 
@@ -374,8 +373,6 @@ perform the upgrade if necessary.  See C<svtype>.
 #define SVpav_REIFY 	0x80000000  /* can become real */
 /* PVHV */
 #define SVphv_HASKFLAGS	0x80000000  /* keys have flag byte after hash */
-/* PVFM */
-#define SVpfm_COMPILED	0x80000000  /* FORMLINE is compiled */
 /* PVGV when SVpbm_VALID is true */
 #define SVpbm_TAIL	0x80000000
 /* RV upwards. However, SVf_ROK and SVp_IOK are exclusive  */
@@ -1285,7 +1282,6 @@ the scalar's value cannot change unless written to.
 	    assert(SvTYPE(_svi) != SVt_PVAV);				\
 	    assert(SvTYPE(_svi) != SVt_PVHV);				\
 	    assert(SvTYPE(_svi) != SVt_PVCV);				\
-	    assert(SvTYPE(_svi) != SVt_PVFM);				\
 	    assert(!isGV_with_GP(_svi));				\
 	   &(((XPVNV*) SvANY(_svi))->xnv_u.xnv_nv);			\
 	 }))
@@ -1348,7 +1344,7 @@ the scalar's value cannot change unless written to.
 #define SvNV_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) == SVt_NV || SvTYPE(sv) >= SVt_PVNV); \
 	    assert(SvTYPE(sv) != SVt_PVAV); assert(SvTYPE(sv) != SVt_PVHV); \
-	    assert(SvTYPE(sv) != SVt_PVCV); assert(SvTYPE(sv) != SVt_PVFM); \
+	    assert(SvTYPE(sv) != SVt_PVCV); \
 		assert(!isGV_with_GP(sv));		\
 		(((XPVNV*)SvANY(sv))->xnv_u.xnv_nv = (val)); } STMT_END
 #define SvPV_set(sv, val) \
@@ -1453,8 +1449,6 @@ the scalar's value cannot change unless written to.
 #  define BmPREVIOUS(sv)	((XPVGV*) SvANY(sv))->xnv_u.xbm_s.xbm_previous
 
 #endif
-
-#define FmLINES(sv)	((XPVFM*)  SvANY(sv))->xfm_lines
 
 #define LvTYPE(sv)	((XPVLV*)  SvANY(sv))->xlv_type
 #define LvTARG(sv)	((XPVLV*)  SvANY(sv))->xlv_targ

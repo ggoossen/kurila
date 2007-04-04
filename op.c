@@ -3685,7 +3685,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
 	COP * const ocurcop = PL_curcop;
 	const int oexpect = PL_expect;
 
-	utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(FALSE, 0),
+	utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
 		veop, modname, imop);
 	PL_expect = oexpect;
 	PL_copline = ocopline;
@@ -4916,7 +4916,7 @@ Perl_cv_const_sv(pTHX_ CV *cv)
     PERL_UNUSED_CONTEXT;
     if (!cv)
 	return NULL;
-    if (!(SvTYPE(cv) == SVt_PVCV || SvTYPE(cv) == SVt_PVFM))
+    if (!(SvTYPE(cv) == SVt_PVCV))
 	return NULL;
     return CvCONST(cv) ? (SV*)CvXSUBANY(cv).any_ptr : NULL;
 }

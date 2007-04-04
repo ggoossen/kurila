@@ -210,7 +210,6 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	case SVt_PVAV:
 	case SVt_PVHV:
 	case SVt_PVCV:
-	case SVt_PVFM:
 	case SVt_PVIO:
             Perl_croak(aTHX_ "Cannot convert a reference to %s to typeglob",
 		       sv_reftype(has_constant, 0));
@@ -255,7 +254,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	    if (exported_constant)
 		GvIMPORTED_CV_on(gv);
 	} else {
-	    (void) start_subparse(0,0);	/* Create empty CV in compcv. */
+	    (void) start_subparse(0);	/* Create empty CV in compcv. */
 	    GvCV(gv) = PL_compcv;
 	}
 	LEAVE;
@@ -287,7 +286,6 @@ S_gv_init_sv(pTHX_ GV *gv, I32 sv_type)
 #ifdef PERL_DONT_CREATE_GVSV
     case SVt_NULL:
     case SVt_PVCV:
-    case SVt_PVFM:
     case SVt_PVGV:
 	break;
     default:
@@ -933,7 +931,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    !(flags & GV_NOTQUAL) &&
 		    sv_type != SVt_PVCV &&
 		    sv_type != SVt_PVGV &&
-		    sv_type != SVt_PVFM &&
 		    sv_type != SVt_PVIO &&
 		    !(len == 1 && sv_type == SVt_PV &&
 		      (*name == 'a' || *name == 'b')) )
@@ -1173,7 +1170,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		sv_type == SVt_PVAV ||
 		sv_type == SVt_PVHV ||
 		sv_type == SVt_PVCV ||
-		sv_type == SVt_PVFM ||
 		sv_type == SVt_PVIO
 		) { break; }
 	    PL_sawampersand = TRUE;
@@ -1485,7 +1481,6 @@ Perl_gp_free(pTHX_ GV *gv)
     }
     SvREFCNT_dec(gp->gp_io);
     SvREFCNT_dec(gp->gp_cv);
-    SvREFCNT_dec(gp->gp_form);
 
     Safefree(gp);
     GvGP(gv) = 0;

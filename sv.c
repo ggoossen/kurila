@@ -825,7 +825,7 @@ struct body_details {
    of 0 fits the max number bodies into a PERL_ARENA_SIZE.block,
    simplifying the default.  If count > 0, the arena is sized to fit
    only that many bodies, allowing arenas to be used for large, rare
-   bodies (XPVFM, XPVIO) without undue waste.  The arena size is
+   bodies (XPVIO) without undue waste.  The arena size is
    limited by PERL_ARENA_SIZE, so we can safely oversize the
    declarations.
  */
@@ -940,10 +940,6 @@ static const struct body_details bodies_by_type[] = {
     { sizeof(xpvcv_allocated), sizeof(xpvcv_allocated),
       + relative_STRUCT_OFFSET(xpvcv_allocated, XPVCV, xpv_cur),
       SVt_PVCV, TRUE, NONV, HASARENA, FIT_ARENA(0, sizeof(xpvcv_allocated)) },
-
-    { sizeof(xpvfm_allocated), sizeof(xpvfm_allocated),
-      + relative_STRUCT_OFFSET(xpvfm_allocated, XPVFM, xpv_cur),
-      SVt_PVFM, TRUE, NONV, NOARENA, FIT_ARENA(20, sizeof(xpvfm_allocated)) },
 
     /* XPVIO is 84 bytes, fits 48x */
     { sizeof(XPVIO), sizeof(XPVIO), 0, SVt_PVIO, TRUE, HADNV,
@@ -1275,7 +1271,6 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
 	assert(!SvNOKp(sv));
 	assert(!SvNOK(sv));
     case SVt_PVIO:
-    case SVt_PVFM:
     case SVt_PVGV:
     case SVt_PVCV:
     case SVt_PVLV:
@@ -1298,7 +1293,7 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
 
 	if (old_type_details->copy) {
 	    /* There is now the potential for an upgrade from something without
-	       an offset (PVNV or PVMG) to something with one (PVCV, PVFM)  */
+	       an offset (PVNV or PVMG) to something with one (PVCV)  */
 	    int offset = old_type_details->offset;
 	    int length = old_type_details->copy;
 
@@ -1475,7 +1470,6 @@ Perl_sv_setiv(pTHX_ register SV *sv, IV i)
     case SVt_PVAV:
     case SVt_PVHV:
     case SVt_PVCV:
-    case SVt_PVFM:
     case SVt_PVIO:
 	Perl_croak(aTHX_ "Can't coerce %s to integer in %s", sv_reftype(sv,0),
 		   OP_DESC(PL_op));
@@ -1574,7 +1568,6 @@ Perl_sv_setnv(pTHX_ register SV *sv, NV num)
     case SVt_PVAV:
     case SVt_PVHV:
     case SVt_PVCV:
-    case SVt_PVFM:
     case SVt_PVIO:
 	Perl_croak(aTHX_ "Can't coerce %s to number in %s", sv_reftype(sv,0),
 		   OP_NAME(PL_op));
@@ -3068,8 +3061,6 @@ S_glob_assign_ref(pTHX_ SV *dstr, SV *sstr) {
     case SVt_PVIO:
 	location = (SV **) &GvIOp(dstr);
 	goto common;
-    case SVt_PVFM:
-	location = (SV **) &GvFORM(dstr);
     default:
 	location = &GvSV(dstr);
 	import_flag = GVf_IMPORTED_SV;
@@ -3241,15 +3232,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV *sstr, I32 flags)
 	if (dtype < SVt_RV)
 	    sv_upgrade(dstr, SVt_RV);
 	break;
-    case SVt_PVFM:
-#ifdef PERL_OLD_COPY_ON_WRITE
-	if ((SvFLAGS(sstr) & CAN_COW_MASK) == CAN_COW_FLAGS) {
-	    if (dtype < SVt_PVIV)
-		sv_upgrade(dstr, SVt_PVIV);
-	    break;
-	}
-	/* Fall through */
-#endif
     case SVt_PV:
 	if (dtype < SVt_PV)
 	    sv_upgrade(dstr, SVt_PV);
@@ -3304,7 +3286,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV *sstr, I32 flags)
     dtype = SvTYPE(dstr);
     sflags = SvFLAGS(sstr);
 
-    if (dtype == SVt_PVCV || dtype == SVt_PVFM) {
+    if (dtype == SVt_PVCV) {
 	/* Assigning to a subroutine sets the prototype.  */
 	if (SvOK(sstr)) {
 	    STRLEN len;
@@ -4179,8 +4161,7 @@ Perl_sv_magicext(pTHX_ SV* sv, SV* obj, int how, const MGVTBL *vtable,
 	how == PERL_MAGIC_symtab ||
 	(SvTYPE(obj) == SVt_PVGV &&
 	    (GvSV(obj) == sv || GvHV(obj) == (HV*)sv || GvAV(obj) == (AV*)sv ||
-	    GvCV(obj) == (CV*)sv || GvIOp(obj) == (IO*)sv ||
-	    GvFORM(obj) == (CV*)sv)))
+	    GvCV(obj) == (CV*)sv || GvIOp(obj) == (IO*)sv)))
     {
 	mg->mg_obj = obj;
     }
@@ -4304,9 +4285,6 @@ Perl_sv_magic(pTHX_ register SV *sv, SV *obj, int how, const char *name, I32 nam
 	break;
     case PERL_MAGIC_env:
 	vtable = &PL_vtbl_env;
-	break;
-    case PERL_MAGIC_fm:
-	vtable = &PL_vtbl_fm;
 	break;
     case PERL_MAGIC_envelem:
 	vtable = &PL_vtbl_envelem;
@@ -4928,7 +4906,6 @@ Perl_sv_clear(pTHX_ register SV *sv)
 	Safefree(IoBOTTOM_NAME(sv));
 	goto freescalar;
     case SVt_PVCV:
-    case SVt_PVFM:
 	cv_undef((CV*)sv);
 	goto freescalar;
     case SVt_PVHV:
@@ -7155,7 +7132,7 @@ Perl_sv_2cv(pTHX_ SV *sv, HV **st, GV **gvp, I32 lref)
 	    /* XXX this is probably not what they think they're getting.
 	     * It has the same effect as "sub name;", i.e. just a forward
 	     * declaration! */
-	    newSUB(start_subparse(FALSE, 0),
+	    newSUB(start_subparse(0),
 		   newSVOP(OP_CONST, 0, tmpsv),
 		   NULL, NULL);
 	    LEAVE;
@@ -7245,7 +7222,7 @@ Perl_sv_pvn_force_flags(pTHX_ SV *sv, STRLEN *lp, I32 flags)
 	    else
 		Perl_croak(aTHX_ "Can't coerce readonly %s to string", ref);
 	}
-	if (SvTYPE(sv) > SVt_PVLV && SvTYPE(sv) != SVt_PVFM)
+	if (SvTYPE(sv) > SVt_PVLV)
 	    Perl_croak(aTHX_ "Can't coerce %s to string in %s", sv_reftype(sv,0),
 		OP_NAME(PL_op));
 	s = sv_2pv_flags(sv, &len, flags);
@@ -7346,7 +7323,6 @@ Perl_sv_reftype(pTHX_ const SV *sv, int ob)
 	case SVt_PVHV:		return "HASH";
 	case SVt_PVCV:		return "CODE";
 	case SVt_PVGV:		return "GLOB";
-	case SVt_PVFM:		return "FORMAT";
 	case SVt_PVIO:		return "IO";
 	case SVt_BIND:		return "BIND";
 	default:		return "UNKNOWN";
@@ -9250,7 +9226,6 @@ Perl_gp_dup(pTHX_ GP *gp, CLONE_PARAMS* param)
     ret->gp_refcnt	= 0;			/* must be before any other dups! */
     ret->gp_sv		= sv_dup_inc(gp->gp_sv, param);
     ret->gp_io		= io_dup_inc(gp->gp_io, param);
-    ret->gp_form	= cv_dup_inc(gp->gp_form, param);
     ret->gp_av		= av_dup_inc(gp->gp_av, param);
     ret->gp_hv		= hv_dup_inc(gp->gp_hv, param);
     ret->gp_egv	= gv_dup(gp->gp_egv, param);/* GvEGV is not refcounted */
@@ -9615,7 +9590,6 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		    NOOP;   /* Do sharing here, and fall through */
 		}
 	    case SVt_PVIO:
-	    case SVt_PVFM:
 	    case SVt_PVHV:
 	    case SVt_PVAV:
 	    case SVt_PVCV:
@@ -9803,7 +9777,6 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		if (!(param->flags & CLONEf_COPY_STACKS)) {
 		    CvDEPTH(dstr) = 0;
 		}
-	    case SVt_PVFM:
 		/* NOTE: not refcounted */
 		CvSTASH(dstr)	= hv_dup(CvSTASH(dstr), param);
 		OP_REFCNT_LOCK;
@@ -11061,9 +11034,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_ofs_sv		= sv_dup_inc(proto_perl->Tofs_sv, param);
     PL_defoutgv		= gv_dup_inc(proto_perl->Tdefoutgv, param);
     PL_chopset		= proto_perl->Tchopset;	/* XXX never deallocated */
-    PL_toptarget	= sv_dup_inc(proto_perl->Ttoptarget, param);
-    PL_bodytarget	= sv_dup_inc(proto_perl->Tbodytarget, param);
-    PL_formtarget	= sv_dup(proto_perl->Tformtarget, param);
 
     PL_restartop	= proto_perl->Trestartop;
     PL_in_eval		= proto_perl->Tin_eval;

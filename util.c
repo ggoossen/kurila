@@ -3404,9 +3404,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_bm:
 	result = &PL_vtbl_bm;
 	break;
-    case want_vtbl_fm:
-	result = &PL_vtbl_fm;
-	break;
     case want_vtbl_uvar:
 	result = &PL_vtbl_uvar;
 	break;

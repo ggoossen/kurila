@@ -5637,9 +5637,6 @@ Perl_yylex(pTHX)
 	    }
 	    OPERATOR(FOR);
 
-	case KEY_formline:
-	    Perl_croak(aTHX_ "format keyword is removed");
-
 	case KEY_fork:
 	    FUN0(OP_FORK);
 
@@ -6241,9 +6238,6 @@ Perl_yylex(pTHX)
 	case KEY_substr:
 	    LOP(OP_SUBSTR,XTERM);
 
-	case KEY_format:
-	    Perl_croak(aTHX_ "format keyword is removed");
-
 	case KEY_sub:
 	  really_sub:
 	    {
@@ -6311,10 +6305,6 @@ Perl_yylex(pTHX)
 		    attrful = XATTRTERM;
 		    sv_setpvn(PL_subname,"?",1);
 		    have_name = FALSE;
-		}
-
-		if (key == KEY_format) {
-		    Perl_croak(aTHX_ "format");
 		}
 
 		/* Look for a prototype */
@@ -8235,17 +8225,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
 
               goto unknown;
 
-            case 'o':
-              if (name[2] == 'r' &&
-                  name[3] == 'm' &&
-                  name[4] == 'a' &&
-                  name[5] == 't')
-              {                                   /* format     */
-                return KEY_format;
-              }
-
-              goto unknown;
-
             default:
               goto unknown;
           }
@@ -9158,20 +9137,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
               default:
                 goto unknown;
             }
-          }
-
-          goto unknown;
-
-        case 'f':
-          if (name[1] == 'o' &&
-              name[2] == 'r' &&
-              name[3] == 'm' &&
-              name[4] == 'l' &&
-              name[5] == 'i' &&
-              name[6] == 'n' &&
-              name[7] == 'e')
-          {                                       /* formline   */
-            return -KEY_formline;
           }
 
           goto unknown;
@@ -11913,7 +11878,7 @@ S_set_csh(pTHX)
 }
 
 I32
-Perl_start_subparse(pTHX_ I32 is_format, U32 flags)
+Perl_start_subparse(pTHX_ U32 flags)
 {
     dVAR;
     const I32 oldsavestack_ix = PL_savestack_ix;
@@ -11926,7 +11891,7 @@ Perl_start_subparse(pTHX_ I32 is_format, U32 flags)
     save_item(PL_subname);
     SAVESPTR(PL_compcv);
 
-    PL_compcv = (CV*)newSV_type(is_format ? SVt_PVFM : SVt_PVCV);
+    PL_compcv = (CV*)newSV_type(SVt_PVCV);
     CvFLAGS(PL_compcv) |= flags;
 
     PL_subline = CopLINE(PL_curcop);

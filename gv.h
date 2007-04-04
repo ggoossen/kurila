@@ -12,7 +12,6 @@ struct gp {
     SV *	gp_sv;		/* scalar value */
     U32		gp_refcnt;	/* how many globs point to this? */
     struct io *	gp_io;		/* filehandle value */
-    CV *	gp_form;	/* format value */
     AV *	gp_av;		/* array value */
     HV *	gp_hv;		/* hash value */
     GV *	gp_egv;		/* effective gv, if *glob */
@@ -92,7 +91,6 @@ Return the SV from the GV.
 #define GvIOp(gv)	(GvGP(gv)->gp_io)
 #define GvIOn(gv)	(GvIO(gv) ? GvIOp(gv) : GvIOp(gv_IOadd(gv)))
 
-#define GvFORM(gv)	(GvGP(gv)->gp_form)
 #define GvAV(gv)	(GvGP(gv)->gp_av)
 
 /* This macro is deprecated.  Do not use! */

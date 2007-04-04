@@ -42,7 +42,6 @@ static const char* const svtypenames[SVt_LAST] = {
     "PVAV",
     "PVHV",
     "PVCV",
-    "PVFM",
     "PVIO"
 };
 
@@ -112,8 +111,6 @@ Perl_dump_packsubs(pTHX_ const HV *stash)
 		continue;
 	    if (GvCVu(gv))
 		dump_sub(gv);
-	    if (GvFORM(gv))
-		dump_form(gv);
 	    if (HeKEY(entry)[HeKLEN(entry)-1] == ':'
 		&& (hv = GvHV(gv)) && hv != PL_defstash)
 		dump_packsubs(hv);		/* nested package */
@@ -134,19 +131,6 @@ Perl_dump_sub(pTHX_ const GV *gv)
 	    (int)CvXSUBANY(GvCV(gv)).any_i32);
     else if (CvROOT(GvCV(gv)))
 	op_dump(CvROOT(GvCV(gv)));
-    else
-	Perl_dump_indent(aTHX_ 0, Perl_debug_log, "<undef>\n");
-}
-
-void
-Perl_dump_form(pTHX_ const GV *gv)
-{
-    SV * const sv = sv_newmortal();
-
-    gv_fullname3(sv, gv, NULL);
-    Perl_dump_indent(aTHX_ 0, Perl_debug_log, "\nFORMAT %s = ", SvPVX_const(sv));
-    if (CvROOT(GvFORM(gv)))
-	op_dump(CvROOT(GvFORM(gv)));
     else
 	Perl_dump_indent(aTHX_ 0, Perl_debug_log, "<undef>\n");
 }
@@ -1202,7 +1186,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             else if (v == &PL_vtbl_vec)        s = "vec";
             else if (v == &PL_vtbl_pos)        s = "pos";
             else if (v == &PL_vtbl_bm)         s = "bm";
-            else if (v == &PL_vtbl_fm)         s = "fm";
             else if (v == &PL_vtbl_uvar)       s = "uvar";
             else if (v == &PL_vtbl_defelem)    s = "defelem";
 #ifdef USE_LOCALE_COLLATE
@@ -1412,20 +1395,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 
     switch (type) {
     case SVt_PVCV:
-    case SVt_PVFM:
-	if (CvANON(sv))		sv_catpv(d, "ANON,");
-	if (CvUNIQUE(sv))	sv_catpv(d, "UNIQUE,");
-	if (CvCLONE(sv))	sv_catpv(d, "CLONE,");
-	if (CvCLONED(sv))	sv_catpv(d, "CLONED,");
-	if (CvCONST(sv))	sv_catpv(d, "CONST,");
-	if (CvNODEBUG(sv))	sv_catpv(d, "NODEBUG,");
-	if (SvCOMPILED(sv))	sv_catpv(d, "COMPILED,");
-	if (CvLVALUE(sv))	sv_catpv(d, "LVALUE,");
-	if (CvMETHOD(sv))	sv_catpv(d, "METHOD,");
-	if (CvLOCKED(sv))	sv_catpv(d, "LOCKED,");
-	if (CvWEAKOUTSIDE(sv))	sv_catpv(d, "WEAKOUTSIDE,");
-	if (CvASSERTION(sv))    sv_catpv(d, "ASSERTION,");
-	break;
     case SVt_PVHV:
 	if (HvSHAREKEYS(sv))	sv_catpv(d, "SHAREKEYS,");
 	if (HvLAZYDEL(sv))	sv_catpv(d, "LAZYDEL,");
@@ -1529,7 +1498,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	Perl_dump_indent(aTHX_ level, file, "  COP_HIGH = %"UVuf"\n",
 			 (UV) COP_SEQ_RANGE_HIGH(sv));
     } else if ((type >= SVt_PVNV && type != SVt_PVAV && type != SVt_PVHV
-		&& type != SVt_PVCV && type != SVt_PVFM && !isGV_with_GP(sv)
+		&& type != SVt_PVCV && !isGV_with_GP(sv)
 		&& !SvVALID(sv))
 	       || type == SVt_NV) {
 	STORE_NUMERIC_LOCAL_SET_STANDARD();
@@ -1718,8 +1687,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	    Perl_dump_indent(aTHX_ level, file, "  PROTOTYPE = \"%.*s\"\n",
 			     (int) len, proto);
 	}
-	/* FALL THROUGH */
-    case SVt_PVFM:
 	do_hv_dump(level, file, "  COMP_STASH", CvSTASH(sv));
 	if (!CvISXSUB(sv)) {
 	    if (CvSTART(sv)) {
@@ -1754,8 +1721,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	Perl_dump_indent(aTHX_ level, file, "  DEPTH = %"IVdf"\n", (IV)CvDEPTH(sv));
 	Perl_dump_indent(aTHX_ level, file, "  FLAGS = 0x%"UVxf"\n", (UV)CvFLAGS(sv));
 	Perl_dump_indent(aTHX_ level, file, "  OUTSIDE_SEQ = %"UVuf"\n", (UV)CvOUTSIDE_SEQ(sv));
-	if (type == SVt_PVFM)
-	    Perl_dump_indent(aTHX_ level, file, "  LINES = %"IVdf"\n", (IV)FmLINES(sv));
 	Perl_dump_indent(aTHX_ level, file, "  PADLIST = 0x%"UVxf"\n", PTR2UV(CvPADLIST(sv)));
 	if (nest < maxnest) {
 	    do_dump_pad(level+1, file, CvPADLIST(sv), 0);
@@ -1801,7 +1766,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	Perl_dump_indent(aTHX_ level, file, "    SV = 0x%"UVxf"\n", PTR2UV(GvSV(sv)));
 	Perl_dump_indent(aTHX_ level, file, "    REFCNT = %"IVdf"\n", (IV)GvREFCNT(sv));
 	Perl_dump_indent(aTHX_ level, file, "    IO = 0x%"UVxf"\n", PTR2UV(GvIOp(sv)));
-	Perl_dump_indent(aTHX_ level, file, "    FORM = 0x%"UVxf"  \n", PTR2UV(GvFORM(sv)));
 	Perl_dump_indent(aTHX_ level, file, "    AV = 0x%"UVxf"\n", PTR2UV(GvAV(sv)));
 	Perl_dump_indent(aTHX_ level, file, "    HV = 0x%"UVxf"\n", PTR2UV(GvHV(sv)));
 	Perl_dump_indent(aTHX_ level, file, "    CV = 0x%"UVxf"\n", PTR2UV(GvCV(sv)));
@@ -2070,8 +2034,6 @@ Perl_xmldump_packsubs(pTHX_ const HV *stash)
 		continue;
 	    if (GvCVu(gv))
 		xmldump_sub(gv);
-	    if (GvFORM(gv))
-		xmldump_form(gv);
 	    if (HeKEY(entry)[HeKLEN(entry)-1] == ':'
 		&& (hv = GvHV(gv)) && hv != PL_defstash)
 		xmldump_packsubs(hv);		/* nested package */
@@ -2092,19 +2054,6 @@ Perl_xmldump_sub(pTHX_ const GV *gv)
 	    (int)CvXSUBANY(GvCV(gv)).any_i32);
     else if (CvROOT(GvCV(gv)))
 	op_xmldump(CvROOT(GvCV(gv)));
-    else
-	Perl_xmldump_indent(aTHX_ 0, PL_xmlfp, "<undef>\n");
-}
-
-void
-Perl_xmldump_form(pTHX_ const GV *gv)
-{
-    SV *sv = sv_newmortal();
-
-    gv_fullname3(sv, gv, Nullch);
-    Perl_xmldump_indent(aTHX_ 0, PL_xmlfp, "\nFORMAT %s = ", SvPVX(sv));
-    if (CvROOT(GvFORM(gv)))
-	op_xmldump(CvROOT(GvFORM(gv)));
     else
 	Perl_xmldump_indent(aTHX_ 0, PL_xmlfp, "<undef>\n");
 }
@@ -2373,9 +2322,6 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	break;
     case SVt_BIND:
 	sv_catpv(t, " BIND=\"");
-	break;
-    case SVt_PVFM:
-	sv_catpv(t, " FM=\"");
 	break;
     case SVt_PVIO:
 	sv_catpv(t, " IO=\"");

@@ -388,7 +388,6 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 #  define VTBL_vec		&PL_vtbl_vec
 #  define VTBL_pos		&PL_vtbl_pos
 #  define VTBL_bm		&PL_vtbl_bm
-#  define VTBL_fm		&PL_vtbl_fm
 #  define VTBL_uvar		&PL_vtbl_uvar
 #  define VTBL_defelem		&PL_vtbl_defelem
 #  define VTBL_regexp		&PL_vtbl_regexp

@@ -7,7 +7,7 @@ BEGIN {
 }
 
 BEGIN { require './test.pl'; }
-plan tests => 236;
+plan tests => 237;
 
 while (<DATA>) {
     chomp;
@@ -80,6 +80,8 @@ flock (*$)
 for undef
 foreach undef
 fork ()
+format unknown
+formline unknown
 ge ($$)
 getc (;*)
 getgrent ()

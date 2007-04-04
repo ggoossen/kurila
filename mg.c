@@ -716,9 +716,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     const char nextchar = *remaining;
 
     switch (*mg->mg_ptr) {
-    case '\001':		/* ^A */
-	sv_setsv(sv, PL_bodytarget);
-	break;
     case '\003':		/* ^C, ^CHILD_ERROR_NATIVE */
 	if (nextchar == '\0') {
 	    sv_setiv(sv, (IV)PL_minus_c);
@@ -2128,15 +2125,6 @@ Perl_magic_setbm(pTHX_ SV *sv, MAGIC *mg)
 }
 
 int
-Perl_magic_setfm(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_UNUSED_ARG(mg);
-    sv_unmagic(sv, PERL_MAGIC_fm);
-    SvCOMPILED_off(sv);
-    return 0;
-}
-
-int
 Perl_magic_setuvar(pTHX_ SV *sv, MAGIC *mg)
 {
     const struct ufuncs * const uf = (struct ufuncs *)mg->mg_ptr;
@@ -2204,9 +2192,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
     I32 i;
     STRLEN len;
     switch (*mg->mg_ptr) {
-    case '\001':	/* ^A */
-	sv_setsv(PL_bodytarget, sv);
-	break;
     case '\003':	/* ^C */
 	PL_minus_c = (bool)SvIV(sv);
 	break;
