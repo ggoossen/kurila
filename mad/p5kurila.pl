@@ -102,10 +102,30 @@ sub const_handler {
     $const_X->set_att("key" => q|=|);
 }
 
+sub add_encoding_latin1 {
+    my $twig = shift;
+    my ($root) = $twig->findnodes(q|/op_leave/|);
+
+    # check already existing encoding pragma.
+    return if $twig->findnodes(q|//mad_op[@key="use"]/op_const[@PV="encoding.pm"]|);
+
+    my $latin1 = 0;
+    for my $item ($twig->findnodes(q|//|)) {
+        if (grep { m/&#x..[;]/ } values %{ $item->atts() || {} }) {
+            $latin1 = 1;
+        }
+    }
+    return if not $latin1;
+    my $madprops = $root->insert_new_elt("op_null")->insert_new_elt("madprops");
+    $madprops->insert_new_elt("mad_sv", { key => 'p', val => qq|use encoding 'latin1';&#xA;| });
+}
+
+# parsing
 my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
 
 $twig->parsefile( "-" );
 
+# replacing.
 for my $op ($twig->findnodes(q|//op_entersub|)) {
     entersub_handler($twig, $op);
 }
@@ -114,4 +134,7 @@ for my $op_const ($twig->findnodes(q|//op_const|)) {
     const_handler($twig, $op_const);
 }
 
+add_encoding_latin1($twig);
+
+# print
 $twig->print;

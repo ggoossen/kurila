@@ -3,7 +3,11 @@
 use strict;
 use warnings;
 
-use lib "../mad/";
+our $kurilapath;
+BEGIN {
+    $kurilapath = $ENV{kurilapath} || "../";
+    push @INC, "$kurilapath/mad/";
+}
 
 use Convert;
 use IO::Handle;
@@ -18,8 +22,10 @@ use Fatal qw|open close|;
     my $input = $fh->getline;
     use File::Basename;
     my (undef, $dir, undef) = File::Basename::fileparse($filename);
-    my $output = eval { Convert::convert($input, "/usr/bin/perl ../mad/p5kurila.pl",
-                                         switches => "-I $dir") };
+    my @lib;
+    push @lib, $dir, "./lib", "./blib/lib", "./blib/arch/";
+    my $output = eval { Convert::convert($input, "/usr/bin/perl $kurilapath/mad/p5kurila.pl",
+                                         switches => join ' ', map { "-I $_" } @lib ) };
     if ($output) {
         seek $fh, 0, 0;
         $fh->print($output);

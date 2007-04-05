@@ -23,7 +23,8 @@ sub p5convert {
 }
 
 t_indirect_object_syntax();
-t_barewords();
+# t_barewords();
+t_encoding();
 
 sub t_indirect_object_syntax {
     p5convert( split(m/^====\n/m, <<'END'), 1 );
@@ -110,4 +111,9 @@ sort aap 1,2,3;
 ====
 sort aap 1,2,3;
 END
+}
+
+sub t_encoding {
+    p5convert( qq|use encoding 'latin1';\n"\x85"|, qq|use encoding 'latin1';\n"\x85"|, 1 );
+    p5convert( qq|"\x85"|, qq|use encoding 'latin1';\n"\x85"|, 1 );
 }
