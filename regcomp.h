@@ -285,7 +285,7 @@ struct regnode_charclass_class {	/* has [[:blah:]] classes */
 
 #define ANYOF_INVERT		0x04
 #define ANYOF_FOLD		0x02
-#define ANYOF_LOCALE		0x01
+#define ANYOF_NOTUSED		0x01
 
 /* Used for regstclass only */
 #define ANYOF_EOS		0x10		/* Can match an empty string too */

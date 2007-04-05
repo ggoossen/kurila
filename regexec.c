@@ -1124,15 +1124,11 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	/* We know what class it must start with. */
 	switch (OP(c)) {
 	case ANYOFU:
-	    if (c->flags & ANYOF_LOCALE)
-		PL_reg_flags |= RF_tainted;
 	    REXEC_FBC_UTF8_CLASS_SCAN(!UTF8_IS_INVARIANT((U8)s[0]) ?
 				      reginclass(prog, c, (U8*)s, 0) :
 				      REGINCLASS(prog, c, (U8*)s));
 	    break;
 	case ANYOF:
-	    if (c->flags & ANYOF_LOCALE)
-		PL_reg_flags |= RF_tainted;
 	    while (s < strend) {
 		STRLEN skip = 1;
 

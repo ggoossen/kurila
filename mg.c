@@ -710,7 +710,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 {
     dVAR;
     register I32 paren;
-    register char *s = NULL;
     register REGEXP *rx;
     const char * const remaining = mg->mg_ptr + 1;
     const char nextchar = *remaining;

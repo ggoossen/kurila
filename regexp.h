@@ -152,7 +152,6 @@ typedef struct regexp_engine {
 #define RXf_WHITE		0x00000400 /* Pattern is /\s+/ */
 
 /* 0x1F800 of extflags is used by (RXf_)PMf_COMPILETIME */
-#define RXf_PMf_LOCALE  	0x00000800 /* use locale */
 #define RXf_PMf_MULTILINE	0x00001000 /* /m         */
 #define RXf_PMf_SINGLELINE	0x00002000 /* /s         */
 #define RXf_PMf_FOLD    	0x00004000 /* /i         */
@@ -161,7 +160,7 @@ typedef struct regexp_engine {
 #define RXf_PMf_KEEPCOPY	0x00020000 /* /k         */
 /* these flags are transfered from the PMOP->op_pmflags member during compilation */
 #define RXf_PMf_STD_PMMOD	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_UTF8)
-#define RXf_PMf_COMPILETIME	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_LOCALE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_KEEPCOPY|RXf_PMf_UTF8)
+#define RXf_PMf_COMPILETIME	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_KEEPCOPY|RXf_PMf_UTF8)
 
 #define CASE_STD_PMMOD_FLAGS_PARSE_SET(pmfl)                        \
     case IGNORE_PAT_MOD:    *(pmfl) |= RXf_PMf_FOLD;       break;   \

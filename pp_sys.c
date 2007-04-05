@@ -3097,10 +3097,6 @@ PP(pp_fttext)
             odd++;
 #else
 	else if (*s & 128) {
-#ifdef USE_LOCALE
-	    if (IN_LOCALE_RUNTIME && isALPHA_LC(*s))
-		continue;
-#endif
 	    /* utf8 characters don't count as odd */
 	    if (UTF8_IS_START(*s)) {
 		int ulen = UTF8SKIP(s);

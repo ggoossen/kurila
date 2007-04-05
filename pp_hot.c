@@ -1973,7 +1973,6 @@ PP(pp_subst)
 #ifdef PERL_OLD_COPY_ON_WRITE
     bool is_cow;
 #endif
-    SV *nsv = NULL;
 
     /* known replacement string? */
     register SV *dstr = (pm->op_pmflags & PMf_CONST) ? POPs : NULL;

@@ -2247,9 +2247,7 @@ PP(pp_sle)
     tryAMAGICbinSET_var(amg_type,0);
     {
       dPOPTOPssrl;
-      const int cmp = (IN_LOCALE_RUNTIME
-		 ? sv_cmp_locale(left, right)
-		 : sv_cmp(left, right));
+      const int cmp = sv_cmp(left, right);
       SETs(boolSV(cmp * multiplier < rhs));
       RETURN;
     }
@@ -2280,9 +2278,7 @@ PP(pp_scmp)
     dVAR; dSP; dTARGET;  tryAMAGICbin(scmp,0);
     {
       dPOPTOPssrl;
-      const int cmp = (IN_LOCALE_RUNTIME
-		 ? sv_cmp_locale(left, right)
-		 : sv_cmp(left, right));
+      const int cmp = sv_cmp(left, right);
       SETi( cmp );
       RETURN;
     }
@@ -3352,14 +3348,7 @@ PP(pp_ucfirst)
     }
     else {
 	if (*s) {
-	    if (IN_LOCALE_RUNTIME) {
-		TAINT;
-		SvTAINTED_on(dest);
-		*d = (op_type == OP_UCFIRST)
-		    ? toUPPER_LC(*s) : toLOWER_LC(*s);
-	    }
-	    else
-		*d = (op_type == OP_UCFIRST) ? toUPPER(*s) : toLOWER(*s);
+	    *d = (op_type == OP_UCFIRST) ? toUPPER(*s) : toLOWER(*s);
 	} else {
 	    /* See bug #39028  */
 	    *d = *s;
@@ -3418,20 +3407,7 @@ PP(pp_uc)
 	SETs(dest);
     }
 
-    if (IN_LOCALE_RUNTIME) {
-	if (len) {
-	    const U8 *const send = s + len;
-	    TAINT;
-	    SvTAINTED_on(dest);
-	    for (; s < send; d++, s++)
-		*d = toUPPER_LC(*s);
-	}
-	if (source != dest) {
-	    *d = '\0';
-	    SvCUR_set(dest, d - (U8*)SvPVX_const(dest));
-	}
-    }
-    else if (IN_CODEPOINTS) {
+    if (IN_CODEPOINTS) {
 	const U8 *const send = s + len;
 	U8 tmpbuf[UTF8_MAXBYTES+1];
 
@@ -3560,16 +3536,8 @@ PP(pp_lc)
     } else {
 	if (len) {
 	    const U8 *const send = s + len;
-	    if (IN_LOCALE_RUNTIME) {
-		TAINT;
-		SvTAINTED_on(dest);
-		for (; s < send; d++, s++)
-		    *d = toLOWER_LC(*s);
-	    }
-	    else {
-		for (; s < send; d++, s++)
-		    *d = toLOWER(*s);
-	    }
+	    for (; s < send; d++, s++)
+		*d = toLOWER(*s);
 	}
 	if (source != dest) {
 	    *d = '\0';
@@ -4352,9 +4320,6 @@ PP(pp_split)
 	DIE(aTHX_ "panic: pp_split");
     rx = PM_GETRE(pm);
 
-    TAINT_IF((pm->op_pmflags & PMf_LOCALE) &&
-	     (pm->op_pmflags & (PMf_WHITE | PMf_SKIPWHITE)));
-
     do_utf8 = IN_CODEPOINTS != 0;
 
     if (pm->op_pmreplroot) {
@@ -4398,10 +4363,6 @@ PP(pp_split)
 	    while (*s == ' ' || is_utf8_space((U8*)s))
 		s += UTF8SKIP(s);
 	}
-	else if (pm->op_pmflags & PMf_LOCALE) {
-	    while (isSPACE_LC(*s))
-		s++;
-	}
 	else {
 	    while (isSPACE(*s))
 		s++;
@@ -4426,9 +4387,6 @@ PP(pp_split)
 		    else
 			m += t;
 		}
-            } else if (pm->op_pmflags & PMf_LOCALE) {
-	        while (m < strend && !isSPACE_LC(*m))
-		    ++m;
             } else {
                 while (m < strend && !isSPACE(*m))
                     ++m;
@@ -4451,9 +4409,6 @@ PP(pp_split)
 	    if (do_utf8) {
 		while (s < strend && ( *s == ' ' || is_utf8_space((U8*)s) ))
 	            s +=  UTF8SKIP(s);
-            } else if (pm->op_pmflags & PMf_LOCALE) {
-	        while (s < strend && isSPACE_LC(*s))
-		    ++s;
             } else {
                 while (s < strend && isSPACE(*s))
                     ++s;

@@ -2351,10 +2351,8 @@ Perl_sv_2nv(pTHX_ register SV *sv)
 	});
 #else
 	DEBUG_c({
-	    STORE_NUMERIC_LOCAL_SET_STANDARD();
 	    PerlIO_printf(Perl_debug_log, "0x%"UVxf" num(%"NVgf")\n",
 			  PTR2UV(sv), SvNVX(sv));
-	    RESTORE_NUMERIC_LOCAL();
 	});
 #endif
     }
@@ -2474,17 +2472,13 @@ Perl_sv_2nv(pTHX_ register SV *sv)
     }
 #if defined(USE_LONG_DOUBLE)
     DEBUG_c({
-	STORE_NUMERIC_LOCAL_SET_STANDARD();
 	PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2nv(%" PERL_PRIgldbl ")\n",
 		      PTR2UV(sv), SvNVX(sv));
-	RESTORE_NUMERIC_LOCAL();
     });
 #else
     DEBUG_c({
-	STORE_NUMERIC_LOCAL_SET_STANDARD();
 	PerlIO_printf(Perl_debug_log, "0x%"UVxf" 1nv(%"NVgf")\n",
 		      PTR2UV(sv), SvNVX(sv));
-	RESTORE_NUMERIC_LOCAL();
     });
 #endif
     return SvNVX(sv);

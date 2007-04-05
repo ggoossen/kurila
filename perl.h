@@ -4352,7 +4352,7 @@ enum {		/* pass one of these to get_vtbl */
    However, bitops store HINT_INTEGER in their op_private.  */
 #define HINT_INTEGER		0x00000001 /* integer pragma */
 #define HINT_STRICT_REFS	0x00000002 /* strict pragma */
-#define HINT_LOCALE		0x00000004 /* locale pragma */
+#define HINT_NOTUSED		0x00000004 /* not used. was: locale pragma */
 #define HINT_BYTES		0x00000008 /* bytes pragma */
 #define HINT_ARYBASE		0x00000010 /* $[ is non-zero */
 				/* Note: 20,40,80 used for NATIVE_HINTS */
@@ -5111,25 +5111,9 @@ typedef struct am_table_short AMTS;
 #define SET_NUMERIC_LOCAL() \
 	set_numeric_local();
 
-#define IN_LOCALE_RUNTIME	(CopHINTS_get(PL_curcop) & HINT_LOCALE)
-#define IN_LOCALE_COMPILETIME	(PL_hints & HINT_LOCALE)
+#define RESTORE_NUMERIC_LOCAL()
 
-#define IN_LOCALE \
-	(IN_PERL_COMPILETIME ? IN_LOCALE_COMPILETIME : IN_LOCALE_RUNTIME)
-
-#define STORE_NUMERIC_LOCAL_SET_STANDARD() \
-	bool was_local = PL_numeric_local && IN_LOCALE; \
-	if (was_local) SET_NUMERIC_STANDARD();
-
-#define STORE_NUMERIC_STANDARD_SET_LOCAL() \
-	bool was_standard = PL_numeric_standard && IN_LOCALE; \
-	if (was_standard) SET_NUMERIC_LOCAL();
-
-#define RESTORE_NUMERIC_LOCAL() \
-	if (was_local) SET_NUMERIC_LOCAL();
-
-#define RESTORE_NUMERIC_STANDARD() \
-	if (was_standard) SET_NUMERIC_STANDARD();
+#define RESTORE_NUMERIC_STANDARD()
 
 #define Atof				my_atof
 
@@ -5143,7 +5127,6 @@ typedef struct am_table_short AMTS;
 #define RESTORE_NUMERIC_LOCAL()		/**/
 #define RESTORE_NUMERIC_STANDARD()	/**/
 #define Atof				my_atof
-#define IN_LOCALE_RUNTIME		0
 
 #endif /* !USE_LOCALE_NUMERIC */
 

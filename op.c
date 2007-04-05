@@ -2173,18 +2173,6 @@ Perl_fold_constants(pTHX_ register OP *o)
 	/* XXX might want a ck_negate() for this */
 	cUNOPo->op_first->op_private &= ~OPpCONST_STRICT;
 	break;
-    case OP_UCFIRST:
-    case OP_LCFIRST:
-    case OP_UC:
-    case OP_LC:
-    case OP_SLT:
-    case OP_SGT:
-    case OP_SLE:
-    case OP_SGE:
-    case OP_SCMP:
-	/* XXX what about the numeric ops? */
-	if (PL_hints & HINT_LOCALE)
-	    goto nope;
     }
 
     if (PL_error_count)
@@ -3142,8 +3130,6 @@ Perl_newPMOP(pTHX_ I32 type, I32 flags)
 
     if (PL_hints & HINT_RE_TAINT)
 	pmop->op_pmpermflags |= PMf_RETAINT;
-    if (PL_hints & HINT_LOCALE)
-	pmop->op_pmpermflags |= PMf_LOCALE;
     pmop->op_pmflags = pmop->op_pmpermflags;
 
 #ifdef USE_ITHREADS

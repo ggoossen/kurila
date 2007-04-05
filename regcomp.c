@@ -351,7 +351,6 @@ static const scan_data_t zero_scan_data =
 #define SCF_TRIE_RESTUDY        0x4000 /* Do restudy? */
 #define SCF_SEEN_ACCEPT         0x8000 
 
-#define LOC ((RExC_flags & RXf_PMf_LOCALE) != 0)
 #define UTF ((RExC_flags & RXf_PMf_UTF8) != 0)
 #define FOLD ((RExC_flags & RXf_PMf_FOLD) != 0)
 
@@ -661,8 +660,6 @@ S_cl_anything(const RExC_state_t *pRExC_state, struct regnode_charclass_class *c
     ANYOF_CLASS_ZERO(cl);
     ANYOF_BITMAP_SETALL(cl);
     cl->flags = ANYOF_EOS|ANYOF_UNICODE_ALL;
-    if (LOC)
-	cl->flags |= ANYOF_LOCALE;
 }
 
 /* Can match anything (initialization) */
@@ -696,8 +693,6 @@ S_cl_init_zero(const RExC_state_t *pRExC_state, struct regnode_charclass_class *
     Zero(cl, 1, struct regnode_charclass_class);
     cl->type = ANYOF;
     cl_anything(pRExC_state, cl);
-    if (LOC)
-	cl->flags |= ANYOF_LOCALE;
 }
 
 /* 'And' a given class with another one.  Can create false positives */
@@ -708,9 +703,7 @@ S_cl_and(struct regnode_charclass_class *cl,
 {
 
     assert(and_with->type == ANYOF);
-    if ((and_with->flags & ANYOF_LOCALE) == (cl->flags & ANYOF_LOCALE)
-	&& !(and_with->flags & ANYOF_FOLD)
-	&& !(cl->flags & ANYOF_FOLD)) {
+    if (!(and_with->flags & ANYOF_FOLD) && !(cl->flags & ANYOF_FOLD)) {
 	int i;
 
 	for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
@@ -2759,10 +2752,9 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		int compat = 1;
 
 		if (uc >= 0x100 ||
-		    (!(data->start_class->flags & (ANYOF_LOCALE))
-		    && !ANYOF_BITMAP_TEST(data->start_class, uc)
-		    && (!(data->start_class->flags & ANYOF_FOLD)
-			|| !ANYOF_BITMAP_TEST(data->start_class, PL_fold[uc])))
+		    (!ANYOF_BITMAP_TEST(data->start_class, uc)
+		     && (!(data->start_class->flags & ANYOF_FOLD)
+			 || !ANYOF_BITMAP_TEST(data->start_class, PL_fold[uc])))
                     )
 		    compat = 0;
 		ANYOF_CLASS_ZERO(data->start_class);
@@ -2811,8 +2803,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		int compat = 1;
 
 		if (uc >= 0x100 ||
-		    (!(data->start_class->flags & (ANYOF_LOCALE))
-		    && !ANYOF_BITMAP_TEST(data->start_class, uc)
+		    (!ANYOF_BITMAP_TEST(data->start_class, uc)
 		     && !ANYOF_BITMAP_TEST(data->start_class, PL_fold[uc])))
 		    compat = 0;
 		ANYOF_CLASS_ZERO(data->start_class);
@@ -2822,8 +2813,6 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		    ANYOF_BITMAP_SET(data->start_class, PL_fold[uc]);
 		    data->start_class->flags &= ~ANYOF_EOS;
 		    data->start_class->flags |= ANYOF_FOLD;
-		    if (OP(scan) == EXACTFL)
-			data->start_class->flags |= ANYOF_LOCALE;
 		}
 	    }
 	    else if (flags & SCF_DO_STCLASS_OR) {
@@ -4816,7 +4805,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                     }
                     RExC_sawback = 1;
                     ret = reganode(pRExC_state,
-                    	   (U8)(FOLD ? (LOC ? NREFFL : NREFF) : NREF),
+                    	   (U8)(FOLD ? NREFF : NREF),
                     	   num);
                     *flagp |= HASWIDTH;
 
@@ -5948,7 +5937,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         GET_RE_DEBUG_FLAGS_DECL;     /* needed for the offsets */
         
         ret = reg_node(pRExC_state,
-            (U8)(FOLD ? (LOC ? EXACTFL : EXACTF) : EXACT));
+            (U8)(FOLD ? EXACTF : EXACT));
         s= STRING(ret);
         
         p = SvPV(sv_str, len);
@@ -6216,13 +6205,13 @@ tryagain:
 	case 'b':
 	    RExC_seen_zerolen++;
 	    RExC_seen |= REG_SEEN_LOOKBEHIND;
-	    ret = reg_node(pRExC_state, (U8)(LOC ? BOUNDL     : BOUND));
+	    ret = reg_node(pRExC_state, (U8)( BOUND));
 	    *flagp |= SIMPLE;
 	    goto finish_meta_pat;
 	case 'B':
 	    RExC_seen_zerolen++;
 	    RExC_seen |= REG_SEEN_LOOKBEHIND;
-	    ret = reg_node(pRExC_state, (U8)(LOC ? NBOUNDL    : NBOUND));
+	    ret = reg_node(pRExC_state, (U8)( NBOUND));
 	    *flagp |= SIMPLE;
 	    goto finish_meta_pat;
 	case 'v':
@@ -6309,7 +6298,7 @@ tryagain:
 
                 RExC_sawback = 1;
                 ret = reganode(pRExC_state,
-                	   (U8)(FOLD ? (LOC ? NREFFL : NREFF) : NREF),
+                	   (U8)(FOLD ? NREFF : NREF),
                 	   num);
                 *flagp |= HASWIDTH;
 
@@ -6369,7 +6358,7 @@ tryagain:
 		    }
 		    RExC_sawback = 1;
 		    ret = reganode(pRExC_state,
-				   (U8)(FOLD ? (LOC ? REFFL : REFF) : REF),
+				   (U8)(FOLD ? REFF : REF),
 				   num);
 		    *flagp |= HASWIDTH;
 
@@ -6415,7 +6404,7 @@ tryagain:
 	defchar:
 	    ender = 0;
 	    ret = reg_node(pRExC_state,
-			   (U8)(FOLD ? (LOC ? EXACTFL : EXACTF) : EXACT));
+			   (U8)(FOLD ? EXACTF : EXACT));
 	    s = STRING(ret);
 	    for (len = 0, p = RExC_parse - 1;
 	      len < 127 && p < RExC_end;
@@ -6930,8 +6919,6 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
  	RExC_emit += ANYOF_SKIP;
 	if (FOLD)
 	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
-	if (LOC)
-	    ANYOF_FLAGS(ret) |= ANYOF_LOCALE;
 	if (UTF)
 	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
 	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
@@ -7157,9 +7144,6 @@ parseit:
 		case _C_C_T_(UPPER, isUPPER(value), "Upper");
 		case _C_C_T_(XDIGIT, isXDIGIT(value), "XDigit");
 		case ANYOF_ASCII:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_ASCII);
-		    else {
 #ifndef EBCDIC
 			for (value = 0; value < 128; value++)
 			    ANYOF_BITMAP_SET(ret, value);
@@ -7169,14 +7153,10 @@ parseit:
 			        ANYOF_BITMAP_SET(ret, value);
 			}
 #endif /* EBCDIC */
-		    }
 		    yesno = '+';
 		    what = "ASCII";
 		    break;
 		case ANYOF_NASCII:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_NASCII);
-		    else {
 #ifndef EBCDIC
 			for (value = 128; value < 256; value++)
 			    ANYOF_BITMAP_SET(ret, value);
@@ -7186,31 +7166,22 @@ parseit:
 			        ANYOF_BITMAP_SET(ret, value);
 			}
 #endif /* EBCDIC */
-		    }
 		    yesno = '!';
 		    what = "ASCII";
 		    break;		
 		case ANYOF_DIGIT:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_DIGIT);
-		    else {
 			/* consecutive digits assumed */
 			for (value = '0'; value <= '9'; value++)
 			    ANYOF_BITMAP_SET(ret, value);
-		    }
 		    yesno = '+';
 		    what = "Digit";
 		    break;
 		case ANYOF_NDIGIT:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_NDIGIT);
-		    else {
 			/* consecutive digits assumed */
 			for (value = 0; value < '0'; value++)
 			    ANYOF_BITMAP_SET(ret, value);
 			for (value = '9' + 1; value < 256; value++)
 			    ANYOF_BITMAP_SET(ret, value);
-		    }
 		    yesno = '!';
 		    what = "Digit";
 		    break;		
@@ -8115,8 +8086,6 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	    "[:^blank:]"
 	};
 
-	if (flags & ANYOF_LOCALE)
-	    sv_catpvs(sv, "{loc}");
 	if (flags & ANYOF_FOLD)
 	    sv_catpvs(sv, "{i}");
 	Perl_sv_catpvf(aTHX_ sv, "[%s", PL_colors[0]);

@@ -501,19 +501,6 @@ Scan and skip for a numeric decimal separator (radix).
 bool
 Perl_grok_numeric_radix(pTHX_ const char **sp, const char *send)
 {
-#ifdef USE_LOCALE_NUMERIC
-    dVAR;
-    if (PL_numeric_radix_sv && IN_LOCALE) { 
-        STRLEN len;
-        const char * const radix = SvPV(PL_numeric_radix_sv, len);
-        if (*sp + len <= send && memEQ(*sp, radix, len)) {
-            *sp += len;
-            return TRUE; 
-        }
-    }
-    /* always try "." if numeric radix didn't match because
-     * we may have data from different locales mixed */
-#endif
     if (*sp < send && **sp == '.') {
         ++*sp;
         return TRUE;
@@ -807,25 +794,7 @@ NV
 Perl_my_atof(pTHX_ const char* s)
 {
     NV x = 0.0;
-#ifdef USE_LOCALE_NUMERIC
-    dVAR;
-    if (PL_numeric_local && IN_LOCALE) {
-	NV y;
-
-	/* Scan the number twice; once using locale and once without;
-	 * choose the larger result (in absolute value). */
-	Perl_atof2(s, x);
-	SET_NUMERIC_STANDARD();
-	Perl_atof2(s, y);
-	SET_NUMERIC_LOCAL();
-	if ((y < 0.0 && y < x) || (y > 0.0 && y > x))
-	    return y;
-    }
-    else
-	Perl_atof2(s, x);
-#else
     Perl_atof2(s, x);
-#endif
     return x;
 }
 
