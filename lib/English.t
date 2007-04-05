@@ -6,7 +6,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Test::More tests => 55;
+use Test::More tests => 47;
 
 use English qw( -no_match_vars ) ;
 use Config;
@@ -55,14 +55,6 @@ $ORS = "\n";
 	# chomp is true because $ORS is "\n"
 	ok( chomp($foo), '$ORS should be \n' );
 }
-
-is( $FORMAT_NAME, 'OUT', '$FORMAT_NAME' );
-is( $FORMAT_TOP_NAME, 'OUT_TOP', '$FORMAT_TOP_NAME' );
-is( $FORMAT_FORMFEED, "\f", '$FORMAT_FORMFEED' );
-is( $FORMAT_LINES_LEFT, 0, '$FORMAT_LINES_LEFT' );
-is( $FORMAT_LINES_PER_PAGE, 60, '$FORMAT_LINES_PER_PAGE' );
-is( $FORMAT_LINE_BREAK_CHARACTERS, " \n-", '$FORMAT_LINE_BREAK_CHARACTERS');
-is( $ACCUMULATOR, $^A, '$ACCUMULATOR' );
 
 undef $OUTPUT_FIELD_SEPARATOR;
 
