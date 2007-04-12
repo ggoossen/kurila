@@ -1,10 +1,15 @@
 package ByteLoader;
 
-use XSLoader ();
+use strict;
+use vars qw($VERSION @ISA);
 
-$VERSION = 0.04;
+require DynaLoader;
 
-XSLoader::load 'ByteLoader', $VERSION;
+@ISA = qw(DynaLoader);
+
+$VERSION = 0.01;
+
+bootstrap ByteLoader $VERSION;
 
 # Preloaded methods go here.
 
@@ -17,10 +22,10 @@ ByteLoader - load byte compiled perl code
 
 =head1 SYNOPSIS
 
-  use ByteLoader 0.04;
+  use ByteLoader 0.01;
   <byte code>
 
-  use ByteLoader 0.04;
+  use ByteLoader 0.01;
   <byte code>
 
 =head1 DESCRIPTION
