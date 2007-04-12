@@ -32,10 +32,10 @@ opargs
 ppaddr
 sig_name
 sig_num
+psig_name
+psig_ptr
 regkind
 simple
-utf8skip
-uuemap
 varies
 vtbl_sv
 vtbl_env
