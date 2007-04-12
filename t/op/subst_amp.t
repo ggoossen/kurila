@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = '../lib' if -d '../lib';
     require Config; import Config;
 }
 
