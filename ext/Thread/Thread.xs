@@ -5,24 +5,13 @@
 /* Magic signature for Thread's mg_private is "Th" */ 
 #define Thread_MAGIC_SIGNATURE 0x5468
 
-#ifdef __cplusplus
-#ifdef I_UNISTD
-#include <unistd.h>
-#endif
-#endif
-#include <fcntl.h>
-                        
+static U32 threadnum = 0;
 static int sig_pipe[2];
-            
-#ifndef THREAD_RET_TYPE
-#define THREAD_RET_TYPE void *
-#define THREAD_RET_CAST(x) ((THREAD_RET_TYPE) x)
-#endif
 
 static void
-remove_thread(struct perl_thread *t)
+remove_thread(t)
+Thread t;
 {
-#ifdef USE_THREADS
     DEBUG_L(WITH_THR(PerlIO_printf(PerlIO_stderr(),
 				   "%p: remove_thread %p\n", thr, t)));
     MUTEX_LOCK(&threads_mutex);
@@ -32,20 +21,19 @@ remove_thread(struct perl_thread *t)
     t->next->prev = t->prev;
     COND_BROADCAST(&nthreads_cond);
     MUTEX_UNLOCK(&threads_mutex);
-#endif
 }
 
-static THREAD_RET_TYPE
-threadstart(void *arg)
+static void *
+threadstart(arg)
+void *arg;
 {
-#ifdef USE_THREADS
 #ifdef FAKE_THREADS
     Thread savethread = thr;
     LOGOP myop;
     dSP;
     I32 oldscope = scopestack_ix;
     I32 retval;
-    AV *av;
+    AV *returnav;
     int i;
 
     DEBUG_L(PerlIO_printf(PerlIO_stderr(), "new thread %p starting at %s\n",
@@ -80,82 +68,88 @@ threadstart(void *arg)
 #else
     Thread thr = (Thread) arg;
     LOGOP myop;
-    djSP;
+    dSP;
     I32 oldmark = TOPMARK;
     I32 oldscope = scopestack_ix;
     I32 retval;
-    SV *sv;
-    AV *av = newAV();
+    AV *returnav;
     int i, ret;
     dJMPENV;
-    DEBUG_L(PerlIO_printf(PerlIO_stderr(), "new thread %p waiting to start\n",
-			  thr));
 
-    /* Don't call *anything* requiring dTHR until after SET_THR() */
+    /* Don't call *anything* requiring dTHR until after pthread_setspecific */
     /*
      * Wait until our creator releases us. If we didn't do this, then
      * it would be potentially possible for out thread to carry on and
      * do stuff before our creator fills in our "self" field. For example,
-     * if we went and created another thread which tried to JOIN with us,
-     * then we'd be in a mess.
+     * if we went and created another thread which tried to pthread_join
+     * with us, then we'd be in a mess.
      */
     MUTEX_LOCK(&thr->mutex);
     MUTEX_UNLOCK(&thr->mutex);
 
     /*
      * It's safe to wait until now to set the thread-specific pointer
-     * from our pthread_t structure to our struct perl_thread, since
-     * we're the only thread who can get at it anyway.
+     * from our pthread_t structure to our struct thread, since we're
+     * the only thread who can get at it anyway.
      */
-    SET_THR(thr);
+    if (pthread_setspecific(thr_key, (void *) thr))
+	croak("panic: pthread_setspecific");
 
     /* Only now can we use SvPEEK (which calls sv_newmortal which does dTHR) */
     DEBUG_L(PerlIO_printf(PerlIO_stderr(), "new thread %p starting at %s\n",
 			  thr, SvPEEK(TOPs)));
 
-    sv = POPs;
-    PUTBACK;
-    perl_call_sv(sv, G_ARRAY|G_EVAL);
+    JMPENV_PUSH(ret);
+    switch (ret) {
+    case 3:
+        PerlIO_printf(PerlIO_stderr(), "panic: threadstart\n");
+	/* fall through */
+    case 1:
+	STATUS_ALL_FAILURE;
+	/* fall through */
+    case 2:
+	/* my_exit() was called */
+	while (scopestack_ix > oldscope)
+	    LEAVE;
+	JMPENV_POP;
+	av_store(returnav, 0, newSViv(statusvalue));
+	goto finishoff;
+    }
+
+    /* Now duplicate most of perl_call_sv but with a few twists */
+    op = (OP*)&myop;
+    Zero(op, 1, LOGOP);
+    myop.op_flags = OPf_STACKED;
+    myop.op_next = Nullop;
+    myop.op_flags |= OPf_KNOW;
+    myop.op_flags |= OPf_WANT_LIST;
+    op = pp_entersub(ARGS);
+    if (op)
+	runops();
     SPAGAIN;
     retval = sp - (stack_base + oldmark);
     sp = stack_base + oldmark + 1;
-    if (SvCUR(thr->errsv)) {
-	MUTEX_LOCK(&thr->mutex);
-	thr->flags |= THRf_DID_DIE;
-	MUTEX_UNLOCK(&thr->mutex);
-	av_store(av, 0, &sv_no);
-	av_store(av, 1, newSVsv(thr->errsv));
-	DEBUG_L(PerlIO_printf(PerlIO_stderr(), "%p died: %s\n",
-			      SvPV(thr->errsv, na)));
-    } else {
-	DEBUG_L(STMT_START {
-	    for (i = 1; i <= retval; i++) {
-		PerlIO_printf(PerlIO_stderr(), "%p return[%d] = %s\n",
-				thr, i, SvPEEK(sp[i - 1]));
-	    }
-	} STMT_END);
-	av_store(av, 0, &sv_yes);
-	for (i = 1; i <= retval; i++, sp++)
-	    sv_setsv(*av_fetch(av, i, TRUE), SvREFCNT_inc(*sp));
-    }
-
+    DEBUG_L(for (i = 1; i <= retval; i++)
+		PerlIO_printf(PerlIO_stderr(),
+			      "%p returnav[%d] = %s\n",
+			      thr, i, SvPEEK(sp[i - 1]));)
+    returnav = newAV();
+    av_store(returnav, 0, newSVpv("", 0));
+    for (i = 1; i <= retval; i++, sp++)
+	sv_setsv(*av_fetch(returnav, i, TRUE), SvREFCNT_inc(*sp));
+    
   finishoff:
 #if 0    
     /* removed for debug */
     SvREFCNT_dec(curstack);
 #endif
-    SvREFCNT_dec(thr->cvcache);
-    SvREFCNT_dec(thr->threadsv);
-    SvREFCNT_dec(thr->specific);
-    SvREFCNT_dec(thr->errsv);
-    SvREFCNT_dec(thr->errhv);
+    SvREFCNT_dec(cvcache);
     Safefree(markstack);
     Safefree(scopestack);
     Safefree(savestack);
     Safefree(retstack);
     Safefree(cxstack);
     Safefree(tmps_stack);
-    Safefree(ofs);
 
     MUTEX_LOCK(&thr->mutex);
     DEBUG_L(PerlIO_printf(PerlIO_stderr(),
@@ -178,7 +172,7 @@ threadstart(void *arg)
     case THRf_R_DETACHED:
 	ThrSETSTATE(thr, THRf_DEAD);
 	MUTEX_UNLOCK(&thr->mutex);
-	SvREFCNT_dec(av);
+	SvREFCNT_dec(returnav);
 	DEBUG_L(PerlIO_printf(PerlIO_stderr(),
 			      "%p: DETACHED thread finished\n", thr));
 	remove_thread(thr);	/* This might trigger main thread to finish */
@@ -188,36 +182,61 @@ threadstart(void *arg)
 	croak("panic: illegal state %u at end of threadstart", ThrSTATE(thr));
 	/* NOTREACHED */
     }
-    return THREAD_RET_CAST(av);	/* Available for anyone to join with */
-					/* us unless we're detached, in which */
-					/* case noone sees the value anyway. */
+    return (void *) returnav;	/* Available for anyone to join with us */
+				/* unless we are detached in which case */
+				/* noone will see the value anyway. */
 #endif    
-#else
-    return THREAD_RET_CAST(NULL);
-#endif
 }
 
 static SV *
-newthread (SV *startsv, AV *initargs, char *classname)
+newthread(startsv, initargs, class)
+SV *startsv;
+AV *initargs;
+char *class;
 {
-#ifdef USE_THREADS
+    dTHR;
     dSP;
     Thread savethread;
     int i;
     SV *sv;
-    int err;
-#ifndef THREAD_CREATE
-    static pthread_attr_t attr;
-    static int attr_inited = 0;
     sigset_t fullmask, oldmask;
-#endif
     
     savethread = thr;
-    thr = new_struct_thread(thr);
+    sv = newSVpv("", 0);
+    SvGROW(sv, sizeof(struct thread) + 1);
+    SvCUR_set(sv, sizeof(struct thread));
+    thr = (Thread) SvPVX(sv);
+    DEBUG_L(PerlIO_printf(PerlIO_stderr(), "%p: newthread(%s) = %p)\n",
+			  savethread, SvPEEK(startsv), thr));
+    oursv = sv; 
+    /* If we don't zero these foostack pointers, init_stacks won't init them */
+    markstack = 0;
+    scopestack = 0;
+    savestack = 0;
+    retstack = 0;
+    init_stacks(ARGS);
+    curcop = savethread->Tcurcop;	/* XXX As good a guess as any? */
     SPAGAIN;
+    defstash = savethread->Tdefstash;	/* XXX maybe these should */
+    curstash = savethread->Tcurstash;	/* always be set to main? */
+    /* top_env? */
+    /* runlevel */
+    cvcache = newHV();
+    thr->flags = THRf_R_JOINABLE;
+    MUTEX_INIT(&thr->mutex);
+    thr->tid = ++threadnum;
+    /* Insert new thread into the circular linked list and bump nthreads */
+    MUTEX_LOCK(&threads_mutex);
+    thr->next = savethread->next;
+    thr->prev = savethread;
+    savethread->next = thr;
+    thr->next->prev = thr;
+    nthreads++;
+    MUTEX_UNLOCK(&threads_mutex);
+
     DEBUG_L(PerlIO_printf(PerlIO_stderr(),
-			  "%p: newthread (%p), tid is %u, preparing stack\n",
-			  savethread, thr, thr->tid));
+			  "%p: newthread, tid is %u, preparing stack\n",
+			  savethread, thr->tid));
     /* The following pushes the arg list and startsv onto the *new* stack */
     PUSHMARK(sp);
     /* Could easily speed up the following greatly */
@@ -225,75 +244,48 @@ newthread (SV *startsv, AV *initargs, char *classname)
 	XPUSHs(SvREFCNT_inc(*av_fetch(initargs, i, FALSE)));
     XPUSHs(SvREFCNT_inc(startsv));
     PUTBACK;
-#ifdef THREAD_CREATE
-    err = THREAD_CREATE(thr, threadstart);
+
+#ifdef FAKE_THREADS
+    threadstart(thr);
 #else    
     /* On your marks... */
     MUTEX_LOCK(&thr->mutex);
-    /* Get set...  */
+    /* Get set...
+     * Increment the global thread count.
+     */
     sigfillset(&fullmask);
     if (sigprocmask(SIG_SETMASK, &fullmask, &oldmask) == -1)
 	croak("panic: sigprocmask");
-    err = 0;
-    if (!attr_inited) {
-	attr_inited = 1;
-	err = pthread_attr_init(&attr);
-	if (err == 0)
-	    err = pthread_attr_setdetachstate(&attr, ATTR_JOINABLE);
-    }
-    if (err == 0)
-	err = pthread_create(&thr->self, &attr, threadstart, (void*) thr);
+    if (pthread_create(&self, NULL, threadstart, (void*) thr))
+	return NULL;	/* XXX should clean up first */
     /* Go */
     MUTEX_UNLOCK(&thr->mutex);
-#endif
-    if (err) {
-        DEBUG_L(PerlIO_printf(PerlIO_stderr(),
-			      "%p: create of %p failed %d\n",
-			      savethread, thr, err));
-	/* Thread creation failed--clean up */
-	SvREFCNT_dec(thr->cvcache);
-	remove_thread(thr);
-	MUTEX_DESTROY(&thr->mutex);
-	for (i = 0; i <= AvFILL(initargs); i++)
-	    SvREFCNT_dec(*av_fetch(initargs, i, FALSE));
-	SvREFCNT_dec(startsv);
-	return NULL;
-    }
-#ifdef THREAD_POST_CREATE
-    THREAD_POST_CREATE(thr);
-#else
     if (sigprocmask(SIG_SETMASK, &oldmask, 0))
 	croak("panic: sigprocmask");
 #endif
     sv = newSViv(thr->tid);
-    sv_magic(sv, thr->oursv, '~', 0, 0);
+    sv_magic(sv, oursv, '~', 0, 0);
     SvMAGIC(sv)->mg_private = Thread_MAGIC_SIGNATURE;
-    return sv_bless(newRV_noinc(sv), gv_stashpv(classname, TRUE));
-#else
-    croak("No threads in this perl");
-    return &sv_undef;
-#endif
+    return sv_bless(newRV_noinc(sv), gv_stashpv(class, TRUE));
 }
 
-static Signal_t handle_thread_signal _((int sig));
-
 static Signal_t
-handle_thread_signal(int sig)
+handle_thread_signal(sig)
+int sig;
 {
     char c = (char) sig;
     write(sig_pipe[0], &c, 1);
 }
 
 MODULE = Thread		PACKAGE = Thread
-PROTOTYPES: DISABLE
 
 void
-new(classname, startsv, ...)
-	char *		classname
+new(class, startsv, ...)
+	char *		class
 	SV *		startsv
 	AV *		av = av_make(items - 2, &ST(2));
     PPCODE:
-	XPUSHs(sv_2mortal(newthread(startsv, av, classname)));
+	XPUSHs(sv_2mortal(newthread(startsv, av, class)));
 
 void
 join(t)
@@ -301,7 +293,6 @@ join(t)
 	AV *	av = NO_INIT
 	int	i = NO_INIT
     PPCODE:
-#ifdef USE_THREADS
 	DEBUG_L(PerlIO_printf(PerlIO_stderr(), "%p: joining %p (state %u)\n",
 			      thr, t, ThrSTATE(t)););
     	MUTEX_LOCK(&t->mutex);
@@ -321,26 +312,17 @@ join(t)
 	    croak("can't join with thread");
 	    /* NOTREACHED */
 	}
-	JOIN(t, &av);
+	if (pthread_join(t->Tself, (void **) &av))
+	    croak("pthread_join failed");
 
-	if (SvTRUE(*av_fetch(av, 0, FALSE))) {
-	    /* Could easily speed up the following if necessary */
-	    for (i = 1; i <= AvFILL(av); i++)
-		XPUSHs(sv_2mortal(*av_fetch(av, i, FALSE)));
-	} else {
-	    char *mess = SvPV(*av_fetch(av, 1, FALSE), na);
-	    DEBUG_L(PerlIO_printf(PerlIO_stderr(),
-				  "%p: join propagating die message: %s\n",
-				  thr, mess));
-	    croak(mess);
-	}
-#endif
+	/* Could easily speed up the following if necessary */
+	for (i = 0; i <= AvFILL(av); i++)
+	    XPUSHs(sv_2mortal(*av_fetch(av, i, FALSE)));
 
 void
 detach(t)
 	Thread	t
     CODE:
-#ifdef USE_THREADS
 	DEBUG_L(PerlIO_printf(PerlIO_stderr(), "%p: detaching %p (state %u)\n",
 			      thr, t, ThrSTATE(t)););
     	MUTEX_LOCK(&t->mutex);
@@ -363,7 +345,6 @@ detach(t)
 	    croak("can't detach thread");
 	    /* NOTREACHED */
 	}
-#endif
 
 void
 equal(t1, t2)
@@ -376,35 +357,26 @@ void
 flags(t)
 	Thread	t
     PPCODE:
-#ifdef USE_THREADS
 	PUSHs(sv_2mortal(newSViv(t->flags)));
-#endif
 
 void
-self(classname)
-	char *	classname
+self(class)
+	char *	class
     PREINIT:
 	SV *sv;
-    PPCODE:        
-#ifdef USE_THREADS
+    PPCODE:
 	sv = newSViv(thr->tid);
-	sv_magic(sv, thr->oursv, '~', 0, 0);
+	sv_magic(sv, oursv, '~', 0, 0);
 	SvMAGIC(sv)->mg_private = Thread_MAGIC_SIGNATURE;
-	PUSHs(sv_2mortal(sv_bless(newRV_noinc(sv),
-				  gv_stashpv(classname, TRUE))));
-#endif
+	PUSHs(sv_2mortal(sv_bless(newRV_noinc(sv), gv_stashpv(class, TRUE))));
 
 U32
 tid(t)
 	Thread	t
     CODE:
-#ifdef USE_THREADS
     	MUTEX_LOCK(&t->mutex);
 	RETVAL = t->tid;
     	MUTEX_UNLOCK(&t->mutex);
-#else 
-	RETVAL = 0;
-#endif
     OUTPUT:
 	RETVAL
 
@@ -417,18 +389,19 @@ DESTROY(t)
 void
 yield()
     CODE:
-{
-#ifdef USE_THREADS
-	YIELD;
-#endif
-}
+#ifdef OLD_PTHREADS_API
+	pthread_yield();
+#else
+#ifndef NO_SCHED_YIELD
+	sched_yield();
+#endif /* NO_SCHED_YIELD */
+#endif /* OLD_PTHREADS_API */
 
 void
 cond_wait(sv)
 	SV *	sv
 	MAGIC *	mg = NO_INIT
-CODE:                       
-#ifdef USE_THREADS
+CODE:
 	if (SvROK(sv))
 	    sv = SvRV(sv);
 
@@ -445,14 +418,12 @@ CODE:
 	    COND_WAIT(MgOWNERCONDP(mg), MgMUTEXP(mg));
 	MgOWNER(mg) = thr;
 	MUTEX_UNLOCK(MgMUTEXP(mg));
-#endif
-
+	
 void
 cond_signal(sv)
 	SV *	sv
 	MAGIC *	mg = NO_INIT
 CODE:
-#ifdef USE_THREADS
 	if (SvROK(sv))
 	    sv = SvRV(sv);
 
@@ -465,14 +436,12 @@ CODE:
 	}
 	COND_SIGNAL(MgCONDP(mg));
 	MUTEX_UNLOCK(MgMUTEXP(mg));
-#endif
 
 void
 cond_broadcast(sv)
 	SV *	sv
 	MAGIC *	mg = NO_INIT
-CODE: 
-#ifdef USE_THREADS
+CODE:
 	if (SvROK(sv))
 	    sv = SvRV(sv);
 
@@ -486,18 +455,16 @@ CODE:
 	}
 	COND_BROADCAST(MgCONDP(mg));
 	MUTEX_UNLOCK(MgMUTEXP(mg));
-#endif
 
 void
-list(classname)
-	char *	classname
+list(class)
+	char *	class
     PREINIT:
 	Thread	t;
 	AV *	av;
 	SV **	svp;
 	int	n = 0;
     PPCODE:
-#ifdef USE_THREADS
 	av = newAV();
 	/*
 	 * Iterate until we have enough dynamic storage for all threads.
@@ -513,7 +480,7 @@ list(classname)
 		    SV *sv = newSViv(0);	/* fill in tid later */
 		    sv_magic(sv, 0, '~', 0, 0);	/* fill in other magic later */
 		    av_push(av, sv_bless(newRV_noinc(sv),
-					 gv_stashpv(classname, TRUE)));
+					 gv_stashpv(class, TRUE)));
 	
 		}
 	    }
@@ -532,7 +499,7 @@ list(classname)
 	do {
 	    SV *sv = (SV*)SvRV(*svp);
 	    sv_setiv(sv, t->tid);
-	    SvMAGIC(sv)->mg_obj = SvREFCNT_inc(t->oursv);
+	    SvMAGIC(sv)->mg_obj = SvREFCNT_inc(t->Toursv);
 	    SvMAGIC(sv)->mg_flags |= MGf_REFCOUNTED;
 	    SvMAGIC(sv)->mg_private = Thread_MAGIC_SIGNATURE;
 	    t = t->next;
@@ -547,7 +514,6 @@ list(classname)
 	for (svp = AvARRAY(av); n > 0; n--, svp++)
 	    PUSHs(*svp);
 	(void)sv_2mortal((SV*)av);
-#endif
 
 
 MODULE = Thread		PACKAGE = Thread::Signal
@@ -570,7 +536,7 @@ SV *
 await_signal()
     PREINIT:
 	char c;
-	SSize_t ret;
+	ssize_t ret;
     CODE:
 	do {
 	    ret = read(sig_pipe[1], &c, 1);
@@ -582,17 +548,3 @@ await_signal()
 	RETVAL = c ? psig_ptr[c] : &sv_no;
     OUTPUT:
 	RETVAL
-
-MODULE = Thread		PACKAGE = Thread::Specific
-
-void
-data(classname = "Thread::Specific")
-	char *	classname
-    PPCODE:
-#ifdef USE_THREADS
-	if (AvFILL(thr->specific) == -1) {
-	    GV *gv = gv_fetchpv("Thread::Specific::FIELDS", TRUE, SVt_PVHV);
-	    av_store(thr->specific, 0, newRV((SV*)GvHV(gv)));
-	}
-	XPUSHs(sv_bless(newRV((SV*)thr->specific),gv_stashpv(classname,TRUE)));
-#endif
