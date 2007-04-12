@@ -1,10 +1,10 @@
-#!./perl
+#!perl
 
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; import Config;
-    if ($Config{'ccflags'} !~ /USE_THREADS\b/) {
+    if ($Config{'ccflags'} !~ /-DUSE_THREADS\b/) {
 	print "1..0\n";
 	exit 0;
     }
@@ -49,6 +49,6 @@ join $t;
 
 # test that sleep lets other thread run
 $t = new Thread \&islocked,"ok 8\n";
-sleep 6;
+sleep 2;
 print "ok 9";
 join $t;
