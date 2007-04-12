@@ -1,6 +1,6 @@
 =head1 NAME
 
-perl5004delta - what's new for perl5.004
+perldelta - what's new for perl5.004
 
 =head1 DESCRIPTION
 
@@ -24,10 +24,7 @@ problems.  See the F<Changes> file in the distribution for details.
 C<%ENV = ()> and C<%ENV = @list> now work as expected (except on VMS
 where it generates a fatal error).
 
-=head2 Change to "Can't locate Foo.pm in @INC" error
-
-The error "Can't locate Foo.pm in @INC" now lists the contents of @INC
-for easier debugging.
+=head2 "Can't locate Foo.pm in @INC" error now lists @INC
 
 =head2 Compilation option: Binary compatibility with 5.003
 
@@ -82,7 +79,7 @@ your scripts.
 Before Perl 5.004, C<AUTOLOAD> functions were looked up as methods
 (using the C<@ISA> hierarchy), even when the function to be autoloaded
 was called as a plain function (e.g. C<Foo::bar()>), not a method
-(e.g. C<< Foo->bar() >> or C<< $obj->bar() >>).
+(e.g. C<Foo-E<gt>bar()> or C<$obj-E<gt>bar()>).
 
 Perl 5.005 will use method lookup only for methods' C<AUTOLOAD>s.
 However, there is a significant base of existing code that may be using
@@ -201,7 +198,7 @@ hole was just plugged.
 
 The new restrictions when tainting include:
 
-=over 4
+=over
 
 =item No glob() or <*>
 
@@ -261,7 +258,7 @@ the F<INSTALL> file for how to use it.
 
 =head2 New and changed syntax
 
-=over 4
+=over
 
 =item $coderef->(PARAMS)
 
@@ -269,17 +266,17 @@ A subroutine reference may now be suffixed with an arrow and a
 (possibly empty) parameter list.  This syntax denotes a call of the
 referenced subroutine, with the given parameters (if any).
 
-This new syntax follows the pattern of S<C<< $hashref->{FOO} >>> and
-S<C<< $aryref->[$foo] >>>: You may now write S<C<&$subref($foo)>> as
-S<C<< $subref->($foo) >>>.  All these arrow terms may be chained;
-thus, S<C<< &{$table->{FOO}}($bar) >>> may now be written
-S<C<< $table->{FOO}->($bar) >>>.
+This new syntax follows the pattern of S<C<$hashref-E<gt>{FOO}>> and
+S<C<$aryref-E<gt>[$foo]>>: You may now write S<C<&$subref($foo)>> as
+S<C<$subref-E<gt>($foo)>>.  All of these arrow terms may be chained;
+thus, S<C<&{$table-E<gt>{FOO}}($bar)>> may now be written
+S<C<$table-E<gt>{FOO}-E<gt>($bar)>>.
 
 =back
 
 =head2 New and changed builtin constants
 
-=over 4
+=over
 
 =item __PACKAGE__
 
@@ -292,7 +289,7 @@ into strings.
 
 =head2 New and changed builtin variables
 
-=over 4
+=over
 
 =item $^E
 
@@ -325,7 +322,7 @@ there is no C<use English> long name for this variable.
 
 =head2 New and changed builtin functions
 
-=over 4
+=over
 
 =item delete on slices
 
@@ -547,7 +544,7 @@ subroutine:
 The C<UNIVERSAL> package automatically contains the following methods that
 are inherited by all other classes:
 
-=over 4
+=over
 
 =item isa(CLASS)
 
@@ -596,7 +593,7 @@ have C<isa> available as a plain subroutine in the current package.
 
 See L<perltie> for other kinds of tie()s.
 
-=over 4
+=over
 
 =item TIEHANDLE classname, LIST
 
@@ -690,7 +687,7 @@ install the optional module Devel::Peek.)
 Three new compilation flags are recognized by malloc.c.  (They have no
 effect if perl is compiled with system malloc().)
 
-=over 4
+=over
 
 =item -DPERL_EMERGENCY_SBRK
 
@@ -761,7 +758,7 @@ details on how to get started with building this port.
 
 There is also support for building perl under the Cygwin32 environment.
 Cygwin32 is a set of GNU tools that make it possible to compile and run
-many Unix programs under Windows NT by providing a mostly Unix-like 
+many UNIX programs under Windows NT by providing a mostly UNIX-like 
 interface for compilation and execution.  See F<README.cygwin32> in the
 perl distribution for more details on this port and how to obtain the
 Cygwin32 toolkit.
@@ -782,7 +779,7 @@ See F<README.amigaos> in the perl distribution.
 
 Six new pragmatic modules exist:
 
-=over 4
+=over
 
 =item use autouse MODULE => qw(sub1 sub2 sub3)
 
@@ -813,7 +810,7 @@ builtin operations.
 
 When C<use locale> is in effect, the current LC_CTYPE locale is used
 for regular expressions and case mapping; LC_COLLATE for string
-ordering; and LC_NUMERIC for numeric formatting in printf and sprintf
+ordering; and LC_NUMERIC for numeric formating in printf and sprintf
 (but B<not> in print).  LC_NUMERIC is always used in write, since
 lexical scoping of formats is problematic at best.
 
@@ -939,7 +936,7 @@ requested with the ":flock" tag (e.g. C<use Fcntl ':flock'>).
 
 =head2 IO
 
-The IO module provides a simple mechanism to load all the IO modules at one
+The IO module provides a simple mechanism to load all of the IO modules at one
 go.  Currently this includes:
 
      IO::Handle
@@ -982,7 +979,7 @@ those who need trigonometric functions only for real numbers.
 There have been quite a few changes made to DB_File. Here are a few of
 the highlights:
 
-=over 4
+=over
 
 =item *
 
@@ -1048,7 +1045,7 @@ For example, you can now say
 
 =head2 pod2html
 
-=over 4
+=over
 
 =item Sends converted HTML to standard output
 
@@ -1061,7 +1058,7 @@ Use the B<--outfile=FILENAME> option to write to a file.
 
 =head2 xsubpp
 
-=over 4
+=over
 
 =item C<void> XSUBs now default to returning nothing
 
@@ -1086,7 +1083,7 @@ XSUB's return type is really C<SV *>.
 
 =head1 C Language API Changes
 
-=over 4
+=over
 
 =item C<gv_fetchmethod> and C<perl_call_sv>
 
@@ -1127,7 +1124,7 @@ which can be more efficient.  See L<perlguts> for details.
 Many of the base and library pods were updated.  These
 new pods are included in section 1:
 
-=over 4
+=over
 
 =item L<perldelta>
 
@@ -1180,7 +1177,7 @@ increasing order of desperation):
    (X) A very fatal error (nontrappable).
    (A) An alien error message (not generated by Perl).
 
-=over 4
+=over
 
 =item "my" variable %s masks earlier declaration in same scope
 
@@ -1293,7 +1290,7 @@ likely to eliminate these arbitrary limitations.
 
 (F) A carriage return character was found in the input.  This is an
 error, and not a warning, because carriage return characters can break
-multi-line strings, including here documents (e.g., C<print <<EOF;>).
+multi-line strings, including here documents (e.g., C<print E<lt>E<lt>EOF;>).
 
 =item Illegal switch in PERL5OPT: %s
 
@@ -1315,7 +1312,7 @@ architecture. On a 32-bit architecture the largest octal literal is
 =item internal error: glob failed
 
 (P) Something went wrong with the external program(s) used for C<glob>
-and C<< <*.c> >>.  This may mean that your csh (C shell) is
+and C<E<lt>*.cE<gt>>.  This may mean that your csh (C shell) is
 broken.  If so, you should change all of the csh-related variables in
 config.sh:  If you have tcsh, make the variables refer to it as if it
 were csh (e.g. C<full_csh='/usr/bin/tcsh'>); otherwise, make them all
@@ -1432,10 +1429,10 @@ assigning to it and when evaluating its argument, while C<@foo{&bar}> behaves
 like a list when you assign to it, and provides a list context to its
 subscript, which can do weird things if you're expecting only one subscript.
 
-=item Stub found while resolving method `%s' overloading `%s' in %s
+=item Stub found while resolving method `%s' overloading `%s' in package `%s'
 
 (P) Overloading resolution over @ISA tree may be broken by importing stubs.
-Stubs should never be implicitly created, but explicit calls to C<can>
+Stubs should never be implicitely created, but explicit calls to C<can>
 may break this.
 
 =item Too late for "B<-T>" option
@@ -1582,7 +1579,7 @@ in F<README.os2>.
 
 If you find what you think is a bug, you might check the headers of
 recently posted articles in the comp.lang.perl.misc newsgroup.
-There may also be information at http://www.perl.com/perl/ , the Perl
+There may also be information at http://www.perl.com/perl/, the Perl
 Home Page.
 
 If you believe you have an unreported bug, please run the B<perlbug>
