@@ -16,7 +16,6 @@ use strict;
 my $filename;
 my ($tag,$line_no,$line);
 my %tags = ();
-my %filetags = ();
 my %files = ();
 my @lines = ();
 
@@ -35,17 +34,21 @@ while (<>) {
   next if /struct/;
   if (/\x01/) {
     ($tag,$line_no) = /\x7F(\w+)\x01(\d+)/;
+    next unless $tag;
+    ##Take only the first entry per tag
+    next if defined($tags{$tag});
+    $tags{$tag}{FILE} = $filename;
+    $tags{$tag}{LINE_NO} = $line_no;
   }
   else {
     tr/(//d;
     ($tag,$line_no) = /(\w+)\s*\x7F(\d+),/;
+    next unless $tag;
+    ##Take only the first entry per tag
+    next if defined($tags{$tag});
+    $tags{$tag}{FILE} = $filename;
+    $tags{$tag}{LINE_NO} = $line_no;
   }
-  next unless $tag;
-  ##Take only the first entry per tag
-  next if defined($tags{$tag});
-  $tags{$tag}{FILE} = $filename;
-  $tags{$tag}{LINE_NO} = $line_no;
-  push @{$filetags{$filename}}, $tag;
 }
 
 foreach $filename (keys %files) {
@@ -53,7 +56,8 @@ foreach $filename (keys %files) {
   @lines = <FILE>;
   close FILE;
   chomp @lines;
-  foreach $tag ( @{$filetags{$filename}} ) {
+  foreach $tag ( keys %tags ) {
+    next unless $filename eq $tags{$tag}{FILE};
     $line = $lines[$tags{$tag}{LINE_NO}-1];
     if (length($line) >= 50) {
       $line = substr($line,0,50);
