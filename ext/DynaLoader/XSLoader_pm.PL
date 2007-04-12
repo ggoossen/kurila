@@ -37,12 +37,10 @@ print OUT '  my $dl_dlext = ', to_string($Config::Config{'dlext'}), ";\n" ;
 
 print OUT <<'EOT';
 
-package DynaLoader;
-
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
-# NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
+package DynaLoader;
 boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
-                                !defined(&dl_error);
+                                !defined(&dl_load_file);
 package XSLoader;
 
 1; # End of main code
@@ -92,14 +90,6 @@ print OUT <<'EOT';
     $bootname =~ s/\W/_/g;
     @dl_require_symbols = ($bootname);
 
-    my $boot_symbol_ref;
-
-    if ($^O eq 'darwin') {
-        if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
-            goto boot; #extension library has already been loaded, e.g. darwin
-        }
-    }
-
     # Many dynamic extension loading problems will appear to come from
     # this section of code: XYZ failed at line 123 of DynaLoader.pm.
     # Often these errors are actually occurring in the initialisation
@@ -119,15 +109,14 @@ print OUT <<'EOT';
 	Carp::carp("Undefined symbols present after loading $file: @unresolved\n");
     }
 
-    $boot_symbol_ref = dl_find_symbol($libref, $bootname) or do {
+    my $boot_symbol_ref = dl_find_symbol($libref, $bootname) or do {
 	require Carp;
 	Carp::croak("Can't find '$bootname' symbol in $file\n");
     };
 
-    push(@dl_modules, $module); # record loaded module
-
-  boot:
     my $xs = dl_install_xsub("${module}::bootstrap", $boot_symbol_ref, $file);
+
+    push(@dl_modules, $module); # record loaded module
 
     # See comment block above
     return &$xs(@_);
