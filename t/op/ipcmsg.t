@@ -27,18 +27,15 @@ BEGIN {
 	   $Config{'d_msgctl'} eq 'define' &&
 	   $Config{'d_msgsnd'} eq 'define' &&
 	   $Config{'d_msgrcv'} eq 'define') {
-	print "1..0\n";
+	print "0..0\n";
 	exit;
     }
-
-    use strict;
-
     my @incpath = (split(/\s+/, $Config{usrinc}), split(/\s+/ ,$Config{locincpth}));
     my %done = ();
     my %define = ();
 
     sub process_file {
-	my($file,$level) = @_;
+	my($file) = @_;
 
 	return unless defined $file;
 
@@ -54,55 +51,40 @@ BEGIN {
 	return if exists $done{$path};
 	$done{$path} = 1;
 
-	if(not defined $path and $level == 0) {
+	unless(defined $path) {
 	    warn "Cannot find '$file'";
 	    return;
 	}
 
-	local(*F);
 	open(F,$path) or return;
-        $level = 1 unless defined $level;
-	my $indent = " " x $level;
-	print "#$indent open $path\n";
 	while(<F>) {
 	    s#/\*.*(\*/|$)##;
 
-	    if ( /^#\s*include\s*[<"]([^>"]+)[>"]/ ) {
-	        print "#${indent} include $1\n";
-		process_file($1,$level+1);
-	        print "#${indent} done include $1\n";
-	        print "#${indent} back in $path\n";
-	    }
+	    process_file($mm,$1)
+		    if /^#\s*include\s*[<"]([^>"]+)[>"]/;
 
 	    s/(?:\([^)]*\)\s*)//;
 
-	    if ( /^#\s*define\s+(\w+)\s+(\w+)/ ) {
-	        print "#${indent} define $1 $2\n";
-		$define{$1} = $2;
-	    }
+	    $define{$1} = $2
+		if /^#\s*define\s+(\w+)\s+((0x)?\d+|\w+)/;
        }
        close(F);
-       print "#$indent close $path\n";
     }
 
     process_file("sys/sem.h");
     process_file("sys/ipc.h");
     process_file("sys/stat.h");
 
-    foreach my $d (@define) {
+    foreach $d (@define) {
 	while(defined($define{$d}) && $define{$d} !~ /^(0x)?\d+$/) {
 	    $define{$d} = exists $define{$define{$d}}
 		    ? $define{$define{$d}} : undef;
 	}
 	unless(defined $define{$d}) {
-	    print "# $d undefined\n";
-	    print "1..0\n";
+	    print "0..0\n";
 	    exit;
-	}
-	{
-	    no strict 'refs';
-	    ${ $d } = eval $define{$d};
-        }
+	};
+	${ $d } = eval $define{$d};
     }
 }
 
@@ -110,9 +92,8 @@ use strict;
 
 print "1..6\n";
 
-my $msg = msgget($IPC_PRIVATE, $S_IRWXU | $S_IRWXG | $S_IRWXO);
-# Very first time called after machine is booted value may be 0 
-die "msgget failed: $!\n" unless defined($msg) && $msg >= 0;
+my $msg = msgget($IPC_PRIVATE, $S_IRWXU | $S_IRWXG | $S_IRWXO)
+	|| die "msgget failed: $!\n";
 
 print "ok 1\n";
 
