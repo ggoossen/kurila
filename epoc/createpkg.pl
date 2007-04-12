@@ -3,39 +3,43 @@
 use File::Find;
 use Cwd;
 
-$VERSION="5.9.0";
-$EPOC_VERSION=1;
+$VERSION="5.005";
+$PATCH=62;
+$EPOC_VERSION=11;
+$CROSSCOMPILEPATH="Y:";
 
 
 sub filefound {
-
-  my $f = $File::Find::name;
+    my $f = $File::Find::name;
     
-  return if ( $f =~ /CVS|Unicode|unicore|CPAN|ExtUtils|IPC|User|DB.pm|\.a$|\.ld$|\.exists$|\.pod$|\.t$/i);
-  my $back = $f;
+    return if ( $f =~ /ExtUtils|unicode|CGI|CPAN|Net|IPC|User|DB.pm/i);
+    my $back = $f;
 
-  my $psiback = $back;
+    $back =~ s|$CROSSCOMPILEPATH||;
 
-  $psiback =~ s|.*/lib/|\\emx\\lib\\perl\\$VERSION\\|;
-  $psiback =~ s|/|\\|g;
-  print OUT "\"$back\"-\"!:$psiback\"\n"  if ( -f $f );
+    $back =~ s|/|\\|g;
+
+    my $psiback = $back;
+
+    $psiback =~ s/\\perl$VERSION\\perl$VERSION\_$PATCH\\lib\\/\\perl\\lib\\$VERSION$PATCH\\/i;
+
+    print OUT "\"$back\"-\"!:$psiback\"\n"  if ( -f $f );
+;
 }
+
+
+
+    
 
 open OUT,">perl.pkg";
 
-print OUT "#{\"perl$VERSION\"},(0x100051d8),0,$EPOC_VERSION,0\n";
-print OUT "\"" . cwd . "/Artistic.txt\"-\"\",FT,TC\n";
-print OUT "\"" . cwd . "/perl\"-\"!:\\emx\\bin\\perl.exe\"\n";
+print OUT "#{\"perl$VERSION\"},(0x100051d8),$PATCH,$EPOC_VERSION,0\n";
+
+print OUT "\"\\epoc32\\release\\marm\\rel\\perl.exe\"-\"!:\\perl.exe\"\n";
+print OUT "\"\\perl$VERSION\\perl${VERSION}_$PATCH\\epoc\\Config.pm\"-\"!:\\perl\\lib\\$VERSION$PATCH\\Config.pm\"\n";
 
 find(\&filefound, cwd.'/lib');
 
-open IN,  "<Artistic";
-open OUT, ">Artistic.txt";
-while (my $line = <IN>) {
-  chomp $line;
-  print OUT "$line\r\n";
-}
+print OUT "@\"\\epoc32\\release\\marm\\rel\\stdlib.sis\",(0x010002c3)\n"
 
-close IN;
-close OUT;
 
