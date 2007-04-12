@@ -3,9 +3,7 @@ package File::Spec::Functions;
 use File::Spec;
 use strict;
 
-our (@ISA,@EXPORT,@EXPORT_OK,%EXPORT_TAGS,$VERSION);
-
-$VERSION = '1.2';
+use vars qw(@ISA @EXPORT);
 
 require Exporter;
 
@@ -16,16 +14,13 @@ require Exporter;
 	catdir
 	catfile
 	curdir
+	devnull
 	rootdir
+	tmpdir
 	updir
 	no_upwards
 	file_name_is_absolute
 	path
-);
-
-@EXPORT_OK = qw(
-	devnull
-	tmpdir
 	splitpath
 	splitdir
 	catpath
@@ -33,12 +28,9 @@ require Exporter;
 	rel2abs
 );
 
-%EXPORT_TAGS = ( ALL => [ @EXPORT_OK, @EXPORT ] );
-
-foreach my $meth (@EXPORT, @EXPORT_OK) {
-    my $sub = File::Spec->can($meth);
+foreach my $meth (@EXPORT) {
     no strict 'refs';
-    *{$meth} = sub {&$sub('File::Spec', @_)};
+    *{$meth} = File::Spec->can($meth);
 }
 
 
@@ -72,24 +64,18 @@ The following functions are exported by default.
 	catdir
 	catfile
 	curdir
+	devnull
 	rootdir
+	tmpdir
 	updir
 	no_upwards
 	file_name_is_absolute
 	path
-
-
-The following functions are exported only by request.
-
-	devnull
-	tmpdir
 	splitpath
 	splitdir
 	catpath
 	abs2rel
 	rel2abs
-
-All the functions may be imported using the C<:ALL> tag.
 
 =head1 SEE ALSO
 
