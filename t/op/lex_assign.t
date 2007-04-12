@@ -5,15 +5,13 @@ BEGIN {
     @INC = '../lib';
 }
 
-$| = 1;
 umask 0;
 $xref = \ "";
-$runme = ($^O eq 'VMS' ? 'MCR ' : '') . $^X;
 @a = (1..5);
 %h = (1..6);
 $aref = \@a;
 $href = \%h;
-open OP, qq{$runme -le "print 'aaa Ok ok' for 1..100"|};
+open OP, qq{$^X -le 'print "aaa Ok ok" while \$i++ < 100'|};
 $chopit = 'aaaaaa';
 @chopar = (113 .. 119);
 $posstr = '123456';
@@ -23,101 +21,19 @@ $nn = $n = 2;
 sub subb {"in s"}
 
 @INPUT = <DATA>;
-@simple_input = grep /^\s*\w+\s*\$\w+\s*[#\n]/, @INPUT;
-print "1..", (10 + @INPUT + @simple_input), "\n";
+print "1..", (scalar @INPUT), "\n";
 $ord = 0;
 
 sub wrn {"@_"}
-
-# Check correct optimization of ucfirst etc
-$ord++;
-my $a = "AB";
-my $b = "\u\L$a";
-print "not " unless $b eq 'Ab';
-print "ok $ord\n";
-
-# Check correct destruction of objects:
-my $dc = 0;
-sub A::DESTROY {$dc += 1}
-$a=8;
-my $b;
-{ my $c = 6; $b = bless \$c, "A"}
-
-$ord++;
-print "not " unless $dc == 0;
-print "ok $ord\n";
-
-$b = $a+5;
-
-$ord++;
-print "not " unless $dc == 1;
-print "ok $ord\n";
-
-$ord++;
-my $xxx = 'b';
-$xxx = 'c' . ($xxx || 'e');
-print "not " unless $xxx eq 'cb';
-print "ok $ord\n";
-
-{				# Check calling STORE
-  my $sc = 0;
-  sub B::TIESCALAR {bless [11], 'B'}
-  sub B::FETCH { -(shift->[0]) }
-  sub B::STORE { $sc++; my $o = shift; $o->[0] = 17 + shift }
-
-  my $m;
-  tie $m, 'B';
-  $m = 100;
-
-  $ord++;
-  print "not " unless $sc == 1;
-  print "ok $ord\n";
-
-  my $t = 11;
-  $m = $t + 89;
-  
-  $ord++;
-  print "not " unless $sc == 2;
-  print "ok $ord\n";
-
-  $ord++;
-  print "# $m\nnot " unless $m == -117;
-  print "ok $ord\n";
-
-  $m += $t;
-
-  $ord++;
-  print "not " unless $sc == 3;
-  print "ok $ord\n";
-
-  $ord++;
-  print "# $m\nnot " unless $m == 89;
-  print "ok $ord\n";
-
-}
-
-# Chains of assignments
-
-my ($l1, $l2, $l3, $l4);
-my $zzzz = 12;
-$zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 1 + $zzzz;
-
-$ord++;
-print "# $zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13\nnot "
-  unless $zzz1 == 13 and $zzz2 == 13 and $l1 == 13
-  and $l2 == 13 and $l3 == 13 and $l4 == 13;
-print "ok $ord\n";
 
 for (@INPUT) {
   $ord++;
   ($op, undef, $comment) = /^([^\#]+)(\#\s+(.*))?/;
   $comment = $op unless defined $comment;
-  chomp;
   $op = "$op==$op" unless $op =~ /==/;
   ($op, $expectop) = $op =~ /(.*)==(.*)/;
   
-  $skip = ($op =~ /^'\?\?\?'/ or $comment =~ /skip\(.*\Q$^O\E.*\)/i)
-	  ? "skip" : "# '$_'\nnot";
+  $skip = ($op =~ /^'\?\?\?'/) ? "skip" : "not";
   $integer = ($comment =~ /^i_/) ? "use integer" : '' ;
   (print "#skipping $comment:\nok $ord\n"), next if $skip eq 'skip';
   
@@ -138,43 +54,15 @@ EOE
       print "# skipping $comment: unimplemented:\nok $ord\n";
     } else {
       warn $@;
-      print "# '$_'\nnot ok $ord\n";
-    }
-  }
-}
-
-for (@simple_input) {
-  $ord++;
-  ($op, undef, $comment) = /^([^\#]+)(\#\s+(.*))?/;
-  $comment = $op unless defined $comment;
-  chomp;
-  ($operator, $variable) = /^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
-  eval <<EOE;
-  local \$SIG{__WARN__} = \\&wrn;
-  my \$$variable = "Ac# Ca\\nxxx";
-  \$$variable = $operator \$$variable;
-  \$toself = \$$variable;
-  \$direct = $operator "Ac# Ca\\nxxx";
-  print "# \\\$$variable = $operator \\\$$variable\\nnot "
-    unless \$toself eq \$direct;
-  print "ok \$ord\\n";
-EOE
-  if ($@) {
-    if ($@ =~ /is unimplemented/) {
-      print "# skipping $comment: unimplemented:\nok $ord\n";
-    } elsif ($@ =~ /Can't (modify|take log of 0)/) {
-      print "# skipping $comment: syntax not good for selfassign:\nok $ord\n";
-    } else {
-      warn $@;
-      print "# '$_'\nnot ok $ord\n";
+      print "not ok $ord\n";
     }
   }
 }
 __END__
 ref $xref			# ref
 ref $cstr			# ref nonref
-`$runme -e "print qq[1\\n]"`				# backtick skip(MSWin32)
-`$undefed`			# backtick undef skip(MSWin32)
+`ls`				# backtick
+`$undefed`			# backtick undef
 <*>				# glob
 <OP>				# readline
 'faked'				# rcatline
@@ -244,7 +132,7 @@ lc $cstr			# lc
 quotemeta $cstr			# quotemeta
 @$aref				# rv2av
 @$undefed			# rv2av undef
-(each %h) % 2 == 1		# each
+each %h==1			# each
 values %h			# values
 keys %h				# keys
 %$href				# rv2hv
@@ -290,7 +178,7 @@ chmod 'non-existent'		# chmod
 utime 'non-existent'		# utime
 rename 'non-existent', 'non-existent1'	# rename
 link 'non-existent', 'non-existent1' # link
-'???'				# symlink
+symlink 'non-existent', 'non-existent1' # symlink
 readlink 'non-existent', 'non-existent1' # readlink
 '???'				# mkdir
 '???'				# rmdir
@@ -298,18 +186,18 @@ readlink 'non-existent', 'non-existent1' # readlink
 '???'				# fork
 '???'				# wait
 '???'				# waitpid
-system "$runme -e 0"		# system skip(VMS)
+system 'sh -c true'		# system
 '???'				# exec
-'???'				# kill
+kill 0, $$			# kill
 getppid				# getppid
 getpgrp				# getpgrp
 '???'				# setpgrp
 getpriority $$, $$		# getpriority
 '???'				# setpriority
 time				# time
-localtime $^T			# localtime
-gmtime $^T			# gmtime
-'???'				# sleep: can randomly fail
+localtime			# localtime
+gmtime				# gmtime
+sleep 1				# sleep
 '???'				# alarm
 '???'				# shmget
 '???'				# shmctl
