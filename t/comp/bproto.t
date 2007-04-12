@@ -5,10 +5,10 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    unshift @INC, '../lib';
 }
 
-print "1..10\n";
+print "1..7\n";
 
 my $i = 1;
 
@@ -38,7 +38,4 @@ q[	scalar(&foo,$bar);
 	defined &foo, &foo, &foo;
 	undef &foo, $bar;
 	uc $bar,$bar;
-	grep(not($bar), $bar);
-	grep(not($bar, $bar), $bar);
-	grep((not $bar, $bar, $bar), $bar);
 ];
