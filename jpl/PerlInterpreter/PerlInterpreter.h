@@ -7,7 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* Inaccessible static: initted */
 /*
  * Class:     PerlInterpreter
  * Method:    init

@@ -187,7 +187,7 @@ require AutoLoader;
 	GetJavaVM
 );
 
-$VERSION = '0.1';
+$VERSION = '0.01';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -213,110 +213,50 @@ sub AUTOLOAD {
 bootstrap JNI $VERSION;
 
 if (not $JPL::_env_) {
-    # Note that only Kaffe support only cares about what JNI::Config says
-    use JNI::Config qw($KAFFE $LD_LIBRARY_PATH $CLASS_HOME $LIB_HOME $JAVA_LIB);
-
-    # Win32 and Sun JDK pay attention to $ENV{JAVA_HOME}; Kaffe doesn't
     $ENV{JAVA_HOME} ||= "/usr/local/java";
 
-    my ($arch, @CLASSPATH);
-    if ($^O eq 'MSWin32' and (! $JNI::Config::KAFFE) ) {
+    chop(my $arch = `uname -p`);
+    chop($arch = `uname -m`) unless -d "$ENV{JAVA_HOME}/lib/$arch";
 
-        $arch = 'MSWin32' unless -d "$ENV{JAVA_HOME}/lib/$arch";
-        @CLASSPATH = split(/;/, $ENV{CLASSPATH});
-        @CLASSPATH = "." unless @CLASSPATH;
-        push @CLASSPATH,
-	    "$ENV{JAVA_HOME}\\classes",
-	    "$ENV{JAVA_HOME}\\lib\\classes.zip",
-	    # MSR - added for JDK 1.3
-	    "$ENV{JAVA_HOME}\\jre\\lib\\rt.jar",
-	    # MSR - added to find Closer.class
-	    '.';
+    my @CLASSPATH = split(/:/, $ENV{CLASSPATH});
+    @CLASSPATH = "." unless @CLASSPATH;
+    push @CLASSPATH,
+	"$ENV{JAVA_HOME}/classes",
+	"$ENV{JAVA_HOME}/lib/classes.zip";
+    $ENV{CLASSPATH} = join(':', @CLASSPATH);
 
-        $ENV{CLASSPATH} = join(';', @CLASSPATH);
-        $ENV{THREADS_TYPE} ||= "green_threads";
+    $ENV{THREADS_TYPE} ||= "green_threads";
 
-        #$JAVALIB = "$ENV{JAVA_HOME}/lib/$arch/$ENV{THREADS_TYPE}";
-        # MSR  - changed above for JDK 1.3
-        $JAVALIB = "$ENV{JAVA_HOME}/lib/";
+    $JAVALIB = "$ENV{JAVA_HOME}/lib/$arch/$ENV{THREADS_TYPE}";
+    $ENV{LD_LIBRARY_PATH} .= ":$JAVALIB";
 
-        $ENV{LD_LIBRARY_PATH} .= ":$JAVALIB";
-
-        push @JVM_ARGS, "classpath", $ENV{CLASSPATH};
-        print "JVM_ARGS=@JVM_ARGS!\n" if $JPL::DEBUG;
-        $JVM = GetJavaVM("$JAVALIB/javai.dll",@JVM_ARGS);
-    } elsif ($^O eq 'MSWin32' and $JNI::Config::KAFFE) {
-        croak "Kaffe is not yet supported on MSWin32 platform!";
-    } elsif ($JNI::Config::KAFFE) {
-        # The following code has to build a classpath for us.  It would be
-        # better if we could have *both* a classpath and a classhome, and
-        # not have to "guess" at the classpath like this.  We should be able
-        # to send in, say, a classpath of ".", and classhome of
-        # ".../share/kaffe", and have it build the right classpath.  That
-        # doesn't work.  The function initClasspath() in findInJar.c in the
-        # Kaffe source says: "Oh, you have a classpath, well forget
-        # classhome!"  This seems brain-dead to me.  But, anyway, that's why
-        # I don't use the classhome option on GetJavaVM.  I have to build
-        # the classpath by hand.  *sigh*
-        #                                            --  bkuhn
-
-        my $classpath = $ENV{CLASSPATH} || ".";
-        my %classCheck;
-        @classCheck{split(/\s*:\s*/, $classpath)} = 1;
-        foreach my $jarFile (qw(Klasses.jar comm.jar pjava.jar
-                                        tools.jar microsoft.jar rmi.jar)) {
-          $classpath .= ":$JNI::Config::CLASS_HOME/$jarFile"
-            unless defined $classCheck{"$JNI::Config::CLASS_HOME/$jarFile"};
-            # Assume that if someone else already put these here, they knew
-            # what they were doing and have the order right.
-        }
-        $classpath = ".:$classpath" unless defined $classCheck{"."};
-
-        $ENV{CLASSPATH} = $classpath;  # Not needed for GetJavaVM(), since
-                                       # we pass it in as a JVM option, but
-                                       # something else might expect it.
-                                       # (also see comment above)
-        print STDERR "bkuhn: JNI classpath=$classpath\n";
-        unshift(@JVM_ARGS, "classpath", $classpath,
-                "libraryhome", $JNI::Config::LIB_HOME);
-
-                #   The following line is useless; see comment above.
-                #  "classhome", $JNI::Config::CLASS_HOME);
-
-        $JVM = GetJavaVM($JNI::Config::JAVA_LIB, @JVM_ARGS);
-    } else {
-        chop($arch = `uname -p`);
-        chop($arch = `uname -m`) unless -d "$ENV{JAVA_HOME}/lib/$arch";
-
-        @CLASSPATH = split(/:/, $ENV{CLASSPATH});
-        @CLASSPATH = "." unless @CLASSPATH;
-        push @CLASSPATH,
-	    "$ENV{JAVA_HOME}/classes",
-	    "$ENV{JAVA_HOME}/lib/classes.zip";
-        $ENV{CLASSPATH} = join(':', @CLASSPATH);
-
-        $ENV{THREADS_TYPE} ||= "green_threads";
-
-        $JAVALIB = "$ENV{JAVA_HOME}/lib/$arch/$ENV{THREADS_TYPE}";
-        $ENV{LD_LIBRARY_PATH} .= ":$JAVALIB";
-        push @JVM_ARGS, "classpath", $ENV{CLASSPATH};
-        print "JVM_ARGS=@JVM_ARGS!\n" if $JPL::DEBUG;
-        $JVM = GetJavaVM("$JAVALIB/libjava.so",@JVM_ARGS);
-    }
+    $JVM = GetJavaVM("$JAVALIB/libjava.so",@JVM_ARGS);
 }
+
+# Preloaded methods go here.
+
+# Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
 __END__
+# Below is the stub of documentation for your module. You better edit it!
 
 =head1 NAME
 
-JNI - Perl encapsulation of the Java Native Interface
+JNI - Perl extension for blah blah blah
 
 =head1 SYNOPSIS
 
   use JNI;
+  blah blah blah
 
 =head1 DESCRIPTION
+
+Stub documentation for JNI was created by h2xs. It looks like the
+author of the extension was negligent enough to leave the stub
+unedited.
+
+Blah blah blah.
 
 =head1 Exported constants
 
@@ -331,9 +271,7 @@ JNI - Perl encapsulation of the Java Native Interface
 
 =head1 AUTHOR
 
-Copyright 1998, O'Reilly & Associates, Inc.
-
-This package may be copied under the same terms as Perl itself.
+A. U. Thor, a.u.thor@a.galaxy.far.far.away
 
 =head1 SEE ALSO
 

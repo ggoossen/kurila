@@ -8,37 +8,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 
-#ifndef PERL_VERSION
-#  include <patchlevel.h>
-#  define PERL_REVISION		5
-#  define PERL_VERSION		PATCHLEVEL
-#  define PERL_SUBVERSION	SUBVERSION
-#endif
-
-#if PERL_REVISION == 5 && (PERL_VERSION < 4 || \
-			   (PERL_VERSION == 4 && PERL_SUBVERSION <= 75))
-#  define PL_na				na
-#  define PL_sv_no			sv_no
-#  define PL_sv_undef			sv_undef
-#  define PL_dowarn			dowarn
-#  define PL_curinterp			curinterp
-#  define PL_do_undump			do_undump
-#  define PL_perl_destruct_level	perl_destruct_level
-#  define ERRSV				GvSV(errgv)
-#endif
-
-#ifndef newSVpvn
-#  define newSVpvn(a,b)	newSVpv(a,b)
-#endif
-
-#ifndef pTHX
-#  define pTHX		void
-#  define pTHX_
-#  define aTHX
-#  define aTHX_
-#  define dTHX		extern int JNI___notused
-#endif
-
 #ifndef EXTERN_C
 #  ifdef __cplusplus
 #    define EXTERN_C extern "C"
@@ -47,7 +16,7 @@
 #  endif
 #endif
 
-static void xs_init (pTHX);
+static void xs_init _((void));
 static PerlInterpreter *my_perl;
 
 int jpldebug = 0;
@@ -140,7 +109,7 @@ JNIEXPORT jint JNICALL
 Java_PerlInterpreter_eval(JNIEnv *env, jobject obj, jint ji)
 {
     op = (OP*)(void*)ji;
-    op = (*op->op_ppaddr)(pTHX);
+    op = (*op->op_ppaddr)();
     return (jint)(void*)op;
 }
 */
@@ -148,11 +117,11 @@ Java_PerlInterpreter_eval(JNIEnv *env, jobject obj, jint ji)
 /* Register any extra external extensions */
 
 /* Do not delete this line--writemain depends on it */
-EXTERN_C void boot_DynaLoader (pTHX_ CV* cv);
-EXTERN_C void boot_JNI (pTHX_ CV* cv);
+EXTERN_C void boot_DynaLoader _((CV* cv));
+EXTERN_C void boot_JNI _((CV* cv));
 
 static void
-xs_init(pTHX)
+xs_init()
 {
     char *file = __FILE__;
     dXSUB_SYS;

@@ -116,9 +116,9 @@ print "\nInstalling JNI module\n";
 system <<'END' and die "Couldn't install JNI\n";
 set -x
 cd JNI
-perl Makefile.PL -e
+perl Makefile.PL
 make clean
-perl Makefile.PL -e
+perl Makefile.PL
 make
 echo 'Attempting to install JNI as root'
 su root -c "make install"

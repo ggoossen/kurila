@@ -14,16 +14,11 @@ $WHAT =~ s#.*/##;
 if ($^O eq 'linux') {
     $flags = "-Dbool=char";	# avoid builtin bool altogether
     $libs = "-lc -lm -ldl";
-} else {
+}
+else {
     $flags = "";
     $libs = "-lc -lm -ldl";
 }
-
-# Needed for JNI
-if ($^O eq 'solaris') {
-    $libs .= " -lthread";
-}
-
 chop($cwd = `pwd`);
 ($jpldir = $cwd) =~ s#/[^/]*$##;
 
@@ -70,8 +65,7 @@ lib$(WHAT)_g.so: $(WHAT).c $(JPL_HOME)/lib/$(ARCHNAME)/libPerlInterpreter_g.so
 	$(LIBS) \
 	-o lib$(WHAT)_g.so
 
-test: all
-	java $(WHAT)
+test:
 
 install: all
 	cp *.class		$(JPL_HOME)/lib

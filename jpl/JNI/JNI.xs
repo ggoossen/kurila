@@ -8,60 +8,20 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <stdio.h>
+#include <perl.h>
 #include <jni.h>
+#include <dlfcn.h>
 
-#ifndef PERL_VERSION
-#  include <patchlevel.h>
-#  define PERL_REVISION		5
-#  define PERL_VERSION		PATCHLEVEL
-#  define PERL_SUBVERSION	SUBVERSION
-#endif
-
-#if PERL_REVISION == 5 && (PERL_VERSION < 4 || (PERL_VERSION == 4 && PERL_SUBVERSION <= 75))
-#  define PL_na		na
-#  define PL_sv_no	sv_no
-#  define PL_sv_undef	sv_undef
-#  define PL_dowarn	dowarn
-#endif
-
-#ifndef newSVpvn
-#  define newSVpvn(a,b)	newSVpv(a,b)
-#endif
-
-#ifndef pTHX
-#  define pTHX		void
-#  define pTHX_
-#  define aTHX
-#  define aTHX_
-#  define dTHX		extern int JNI___notused
-#endif
-
-#ifndef WIN32
-#  include <dlfcn.h>
-#endif
-
-#ifdef EMBEDDEDPERL
+extern SV** stack_sp;
 extern JNIEnv* jplcurenv;
 extern int jpldebug;
-#else
-JNIEnv* jplcurenv;
-int jpldebug = 1;
-#endif
 
 #define SysRet jint
 
-#ifdef WIN32
-static void JNICALL call_my_exit(jint status)
-{
-    my_exit(status);
-}
-#else
 static void call_my_exit(jint status)
 {
     my_exit(status);
 }
-#endif
 
 jvalue*
 makeargs(char *sig, SV** svp, int items)
@@ -369,7 +329,7 @@ makeargs(char *sig, SV** svp, int items)
 			    int i;
 			    SV** esv;
 			    static jclass jcl = 0;
-			    jobjectArray ja;
+			    jarray ja;
 
 			    if (!jcl)
 				jcl = (*env)->FindClass(env, "java/lang/String");
@@ -398,17 +358,19 @@ makeargs(char *sig, SV** svp, int items)
 			int i;
 			SV** esv;
 		       static jclass jcl = 0;
-			jobjectArray ja;
+			jarray ja;
 
 			if (!jcl)
 			    jcl = (*env)->FindClass(env, "java/lang/Object");
 			ja = (*env)->NewObjectArray(env, len, jcl, 0);
 			for (esv = AvARRAY((AV*)rv), i = 0; i < len; esv++, i++) {
 			    if (SvROK(*esv) && (rv = SvRV(*esv)) && SvOBJECT(rv)) {
-				(*env)->SetObjectArrayElement(env, ja, i, (jobject)(void*)SvIV(rv));
+				(*env)->SetObjectArrayElement(env, ja, i,
+				    (jobject)(void*)SvIV(rv));
 			    }
 			    else {
-				jobject str = (jobject)(*env)->NewStringUTF(env, SvPV(*esv,n_a));
+				jobject str = (jobject)(*env)->NewStringUTF(env,
+				    SvPV(*esv,n_a));
 				(*env)->SetObjectArrayElement(env, ja, i, str);
 			    }
 			}
@@ -425,7 +387,8 @@ makeargs(char *sig, SV** svp, int items)
 	case 'L':
 	    if (!SvROK(sv) || strnEQ(s, "java/lang/String;", 17)) {
 		s += 17;
-		jv[ix++].l = (jobject)(*env)->NewStringUTF(env, (char*) SvPV(sv,n_a));
+		jv[ix++].l = (jobject)(*env)->NewStringUTF(env,
+				(char*) SvPV(sv,n_a));
 		break;
 	    }
 	    while (*s != ';') s++;
@@ -456,14 +419,17 @@ cleanup:
 }
 
 static int
-not_here(char *s)
+not_here(s)
+char *s;
 {
     croak("%s not implemented on this architecture", s);
     return -1;
 }
 
 static double
-constant(char *name, int arg)
+constant(name, arg)
+char *name;
+int arg;
 {
     errno = 0;
     switch (*name) {
@@ -512,11 +478,7 @@ constant(char *name, int arg)
 #endif
 	if (strEQ(name, "JNI_H"))
 #ifdef JNI_H
-#ifdef WIN32
-	    return 1;
-#else
 	    return JNI_H;
-#endif
 #else
 	    goto not_there;
 #endif
@@ -607,11 +569,7 @@ DefineClass(name, loader, buf)
 	const jbyte *		buf
     CODE:
 	{
-#ifdef KAFFE
-	    RETVAL = (*env)->DefineClass(env,  loader, buf, (jsize)buf_len_);
-#else
-	    RETVAL = (*env)->DefineClass(env,  name, loader, buf, (jsize)buf_len_); 
-#endif
+	    RETVAL = (*env)->DefineClass(env,  name, loader, buf, (jsize)buf_len_);
 	    RESTOREENV;
 	}
     OUTPUT:
@@ -2561,7 +2519,7 @@ GetBooleanArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jboolean))));
 		}
 		else
@@ -2591,7 +2549,7 @@ GetByteArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jbyte))));
 		}
 		else
@@ -2621,7 +2579,7 @@ GetCharArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jchar))));
 		}
 		else
@@ -2651,7 +2609,7 @@ GetShortArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jshort))));
 		}
 		else
@@ -2681,7 +2639,7 @@ GetIntArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jint))));
 		}
 		else
@@ -2711,7 +2669,7 @@ GetLongArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jlong))));
 		}
 		else
@@ -2741,7 +2699,7 @@ GetFloatArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jfloat))));
 		}
 		else
@@ -2771,7 +2729,7 @@ GetDoubleArrayElements(array)
 	    }
 	    else {
 		if (RETVAL_len_) {
-		    PUSHs(sv_2mortal(newSVpvn((char*)RETVAL,
+		    PUSHs(sv_2mortal(newSVpv((char*)RETVAL,
 			(STRLEN)RETVAL_len_ * sizeof(jdouble))));
 		}
 		else
@@ -3120,134 +3078,61 @@ GetJavaVM(...)
 	JNIEnv *		env = FETCHENV;
     CODE:
 	{
-#ifdef JPL_DEBUG
-	    jpldebug = 1;
-#else
-	    jpldebug = 0;
-#endif
 	    if (env) {	/* We're embedded. */
 		if ((*env)->GetJavaVM(env, &RETVAL) < 0)
 		    RETVAL = 0;
 	    }
 	    else {	/* We're embedding. */
-#ifdef KAFFE
-                JavaVMInitArgs vm_args;
-#else
-                JDK1_1InitArgs vm_args;
-#endif
+		JDK1_1InitArgs vm_args;
 		char *lib;
-		if (jpldebug) {
-		    fprintf(stderr, "We're embedding Java in Perl.\n");
-		}
 
 		if (items--) {
-  		    ++mark;
+		    ++mark;
 		    lib = SvPV(*mark, PL_na);
 		}
 		else
 		    lib = 0;
-		if (jpldebug) {
-		    fprintf(stderr, "lib is %s.\n", lib);
-		}
-#ifdef WIN32
-        if (LoadLibrary("jvm.dll")) {
-            if (!LoadLibrary("javai.dll")) {
-                warn("Can't load javai.dll");
-            }
-        } else {
-            if (lib && !LoadLibrary(lib))
-                croak("Can't load javai.dll"); 
-        }
-#else
-		if (jpldebug) {
-		    fprintf(stderr, "Opening Java shared library.\n");
-                }
-#ifdef KAFFE
-		if (!dlopen("libkaffevm.so", RTLD_LAZY|RTLD_GLOBAL)) {
-#else
+
 		if (!dlopen("libjava.so", RTLD_LAZY|RTLD_GLOBAL)) {
-#endif
 		    if (lib && !dlopen(lib, RTLD_LAZY|RTLD_GLOBAL))
-			croak("Can't load Java shared library.");
+			croak("Can't load libjava.so");
 		}
-#endif
-               /* Kaffe seems to get very upset if vm_args.version isn't set */
-#ifdef KAFFE
-		vm_args.version = JNI_VERSION_1_1;
-#endif
+
 		JNI_GetDefaultJavaVMInitArgs(&vm_args);
 		vm_args.exit = &call_my_exit;
-		if (jpldebug) {
-            fprintf(stderr, "items = %d\n", items);
-            fprintf(stderr, "mark = %s\n", SvPV(*mark, PL_na));
-        }
 		while (items > 1) {
-		  char *s;
-		    ++mark;
-		    s = SvPV(*mark,PL_na);
-		    ++mark;
-		    if (jpldebug) {
-                fprintf(stderr, "*s = %s\n", s);
-                fprintf(stderr, "val = %s\n", SvPV(*mark, PL_na));
-            }
+		    char *s = SvPV(*++mark,PL_na);
 		    items -= 2;
 		    if (strEQ(s, "checkSource"))
-			vm_args.checkSource = (jint)SvIV(*mark);
+			vm_args.checkSource = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "nativeStackSize"))
-			vm_args.nativeStackSize = (jint)SvIV(*mark);
+			vm_args.nativeStackSize = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "javaStackSize"))
-			vm_args.javaStackSize = (jint)SvIV(*mark);
+			vm_args.javaStackSize = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "minHeapSize"))
-			vm_args.minHeapSize = (jint)SvIV(*mark);
+			vm_args.minHeapSize = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "maxHeapSize"))
-			vm_args.maxHeapSize = (jint)SvIV(*mark);
+			vm_args.maxHeapSize = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "verifyMode"))
-			vm_args.verifyMode = (jint)SvIV(*mark);
+			vm_args.verifyMode = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "classpath"))
-			vm_args.classpath = savepv(SvPV(*mark,PL_na));
+			vm_args.classpath = savepv(SvPV(*++mark,PL_na));
 		    else if (strEQ(s, "enableClassGC"))
-			vm_args.enableClassGC = (jint)SvIV(*mark);
+			vm_args.enableClassGC = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "enableVerboseGC"))
-			vm_args.enableVerboseGC = (jint)SvIV(*mark);
+			vm_args.enableVerboseGC = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "disableAsyncGC"))
-			vm_args.disableAsyncGC = (jint)SvIV(*mark);
-#ifdef KAFFE
-		    else if (strEQ(s, "libraryhome"))
-			vm_args.libraryhome = savepv(SvPV(*mark,PL_na));
-		    else if (strEQ(s, "classhome"))
-			vm_args.classhome = savepv(SvPV(*mark,PL_na));
-		    else if (strEQ(s, "enableVerboseJIT"))
-			vm_args.enableVerboseJIT = (jint)SvIV(*mark); 
-		    else if (strEQ(s, "enableVerboseClassloading"))
-			vm_args.enableVerboseClassloading = (jint)SvIV(*mark); 
-		    else if (strEQ(s, "enableVerboseCall"))
-			vm_args.enableVerboseCall = (jint)SvIV(*mark); 
-		    else if (strEQ(s, "allocHeapSize"))
-			vm_args.allocHeapSize = (jint)SvIV(*mark); 
-#else
+			vm_args.disableAsyncGC = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "verbose"))
-			vm_args.verbose = (jint)SvIV(*mark); 
+			vm_args.verbose = (jint)SvIV(*++mark);
 		    else if (strEQ(s, "debugging"))
-			vm_args.debugging = (jboolean)SvIV(*mark);
+			vm_args.debugging = (jboolean)SvIV(*++mark);
 		    else if (strEQ(s, "debugPort"))
-			vm_args.debugPort = (jint)SvIV(*mark); 
-#endif
+			vm_args.debugPort = (jint)SvIV(*++mark);
 		    else
 			croak("unrecognized option: %s", s);
 		}
-
-		if (jpldebug) {
-		    fprintf(stderr, "Creating Java VM...\n");
-		    fprintf(stderr, "Working CLASSPATH: %s\n", 
-			vm_args.classpath);
-		}
-		if (JNI_CreateJavaVM(&RETVAL, &jplcurenv, &vm_args) < 0) {
-                  croak("Unable to create instance of JVM");
-                }
-		if (jpldebug) {
-		    fprintf(stderr, "Created Java VM.\n");
-		}
-
+		JNI_CreateJavaVM(&RETVAL, &jplcurenv, &vm_args);
 	    }
 	}
 
