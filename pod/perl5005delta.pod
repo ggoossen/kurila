@@ -1,6 +1,6 @@
 =head1 NAME
 
-perl5005delta - what's new for perl5.005
+perldelta - what's new for perl5.005
 
 =head1 DESCRIPTION
 
@@ -27,13 +27,13 @@ Starting with Perl 5.004_50 there were many deep and far-reaching changes
 to the language internals.  If you have dynamically loaded extensions
 that you built under perl 5.003 or 5.004, you can continue to use them
 with 5.004, but you will need to rebuild and reinstall those extensions
-to use them 5.005.  See F<INSTALL> for detailed instructions on how to
+to use them 5.005.  See L<INSTALL> for detailed instructions on how to
 upgrade.
 
 =head2 Default installation structure has changed
 
 The new Configure defaults are designed to allow a smooth upgrade from
-5.004 to 5.005, but you should read F<INSTALL> for a detailed
+5.004 to 5.005, but you should read L<INSTALL> for a detailed
 discussion of the changes in order to adapt them to your system.
 
 =head2 Perl Source Compatibility
@@ -50,7 +50,7 @@ in a future version.
 
 Some new keywords have been introduced.  These are generally expected to
 have very little impact on compatibility.  See L<New C<INIT> keyword>,
-L<New C<lock> keyword>, and L<New C<qrE<sol>E<sol>> operator>.
+L<New C<lock> keyword>, and L<New C<qr//> operator>.
 
 Certain barewords are now reserved.  Use of these will provoke a warning
 if you have asked for them with the C<-w> switch.
@@ -63,15 +63,11 @@ the new features in this release.
 
 =over 4
 
-=item *
-
-Core sources now require ANSI C compiler
+=item Core sources now require ANSI C compiler
 
 An ANSI C compiler is now B<required> to build perl.  See F<INSTALL>.
 
-=item *
-
-All Perl global variables must now be referenced with an explicit prefix
+=item All Perl global variables must now be referenced with an explicit prefix
 
 All Perl global variables that are visible for use by extensions now
 have a C<PL_> prefix.  New extensions should C<not> refer to perl globals
@@ -89,11 +85,9 @@ begin with C<perl> be referenced with a C<Perl_> prefix.  The bare function
 names without the C<Perl_> prefix are supported with macros, but this
 support may cease in a future release.
 
-See L<perlguts/"API LISTING">.
+See L<perlguts/API LISTING>.
 
-=item *
-
-Enabling threads has source compatibility issues
+=item Enabling threads has source compatibility issues
 
 Perl built with threading enabled requires extensions to use the new
 C<dTHR> macro to initialize the handle to access per-thread data.
@@ -106,7 +100,7 @@ directly accessing perl globals as C<GvSV(errgv)>.  The API call is
 backward compatible with existing perls and provides source compatibility
 with threading is enabled.
 
-See L<"C Source Compatibility"> for more information.
+See L<API Changes for more information>.
 
 =back
 
@@ -143,9 +137,9 @@ Perl has a new Social Contract for contributors.  See F<Porting/Contract>.
 The license included in much of the Perl documentation has changed.
 Most of the Perl documentation was previously under the implicit GNU
 General Public License or the Artistic License (at the user's choice).
-Now much of the documentation unambiguously states the terms under which
+Now much of the documentation unambigously states the terms under which
 it may be distributed.  Those terms are in general much less restrictive
-than the GNU GPL.  See L<perl> and the individual perl manpages listed
+than the GNU GPL.  See L<perl> and the individual perl man pages listed
 therein.
 
 =head1 Core Changes
@@ -157,7 +151,7 @@ WARNING: Threading is considered an B<experimental> feature.  Details of the
 implementation may change without notice.  There are known limitations
 and some bugs.  These are expected to be fixed in future versions.
 
-See F<README.threads>.
+See L<README.threads>.
 
 =head2 Compiler
 
@@ -255,7 +249,7 @@ The following new syntax elements are supported:
 
 =item New operator for precompiled regular expressions
 
-See L<New C<qrE<sol>E<sol>> operator>.
+See L<New C<qr//> operator>.
 
 =item Other improvements
 
@@ -316,7 +310,7 @@ and in XSUBs.
 Perl used to complain if it encountered literal carriage returns in
 scripts.  Now they are mostly treated like whitespace within program text.
 Inside string literals and here documents, literal carriage returns are
-ignored if they occur paired with linefeeds, or get interpreted as whitespace
+ignored if they occur paired with newlines, or get interpreted as newlines
 if they stand alone.  This behavior means that literal carriage returns
 in files should be avoided.  You can get the older, more compatible (but
 less generous) behavior by defining the preprocessor symbol
@@ -488,10 +482,10 @@ magic lvalue too. For instance, this code now acts differently:
 
 In previous versions, this would print "hello", but it now prints "g'bye".
 
-=head2 <> now reads in records
+=head2 E<lt>E<gt> now reads in records
 
-If C<$/> is a reference to an integer, or a scalar that holds an integer,
-<> will read in records instead of lines. For more info, see
+If C<$/> is a referenence to an integer, or a scalar that holds an integer,
+E<lt>E<gt> will read in records instead of lines. For more info, see
 L<perlvar/$/>.
 
 =head1 Supported Platforms
@@ -502,19 +496,13 @@ the command-line arguments used in F<config.sh>.
 
 =head2 New Platforms
 
-BeOS is now supported.  See F<README.beos>.
+BeOS is now supported.  See L<README.beos>.
 
-DOS is now supported under the DJGPP tools.  See F<README.dos> (installed 
-as L<perldos> on some systems).
+DOS is now supported under the DJGPP tools.  See L<README.dos>.
 
-MiNT is now supported.  See F<README.mint>.
+MPE/iX is now supported.  See L<README.mpeix>.
 
-MPE/iX is now supported.  See F<README.mpeix>.
-
-MVS (aka OS390, aka Open Edition) is now supported.  See F<README.os390> 
-(installed as L<perlos390> on some systems).
-
-Stratus VOS is now supported.  See F<README.vos>.
+MVS (OS390) is now supported.  See L<README.os390>.
 
 =head2 Changes in existing support
 
@@ -522,8 +510,7 @@ Win32 support has been vastly enhanced.  Support for Perl Object, a C++
 encapsulation of Perl.  GCC and EGCS are now supported on Win32.
 See F<README.win32>, aka L<perlwin32>.
 
-VMS configuration system has been rewritten.  See F<README.vms> (installed 
-as L<README_vms> on some systems).
+VMS configuration system has been rewritten.  See L<README.vms>.
 
 The hints files for most Unix platforms have seen incremental improvements.
 
@@ -531,7 +518,7 @@ The hints files for most Unix platforms have seen incremental improvements.
 
 =head2 New Modules
 
-=over 4
+=over
 
 =item B
 
@@ -540,10 +527,6 @@ Perl compiler and tools.  See L<B>.
 =item Data::Dumper
 
 A module to pretty print Perl data.  See L<Data::Dumper>.
-
-=item Dumpvalue
-
-A module to dump perl values to the screen. See L<Dumpvalue>.
 
 =item Errno
 
@@ -602,41 +585,11 @@ Various pragmata to control behavior of regular expressions.
 
 =head2 Changes in existing modules
 
-=over 4
-
-=item Benchmark
-
-You can now run tests for I<x> seconds instead of guessing the right
-number of tests to run.
-
-Keeps better time.
-
-=item Carp
-
-Carp has a new function cluck(). cluck() warns, like carp(), but also adds
-a stack backtrace to the error message, like confess().
+=over
 
 =item CGI
 
 CGI has been updated to version 2.42.
-
-=item Fcntl
-
-More Fcntl constants added: F_SETLK64, F_SETLKW64, O_LARGEFILE for
-large (more than 4G) file access (the 64-bit support is not yet
-working, though, so no need to get overly excited), Free/Net/OpenBSD
-locking behaviour flags F_FLOCK, F_POSIX, Linux F_SHLCK, and
-O_ACCMODE: the mask of O_RDONLY, O_WRONLY, and O_RDWR.
-
-=item Math::Complex
-
-The accessors methods Re, Im, arg, abs, rho, theta, methods can
-($z->Re()) now also act as mutators ($z->Re(3)).
-
-=item Math::Trig
-
-A little bit of radial trigonometry (cylindrical and spherical) added,
-for example the great circle distance.
 
 =item POSIX
 
@@ -662,11 +615,15 @@ subtle incompatibilities.
 
 =item CPAN
 
-See L<perlmodinstall> and L<CPAN>.
+See <perlmodinstall> and L<CPAN>.
 
 =item Cwd
 
 Cwd::cwd is faster on most platforms.
+
+=item Benchmark
+
+Keeps better time.
 
 =back
 
@@ -698,15 +655,9 @@ sites.
 
 Some more Perl traps are documented now.  See L<perltrap>.
 
-L<perlopentut> gives a tutorial on using open().
-
-L<perlreftut> gives a tutorial on references.
-
-L<perlthrtut> gives a tutorial on threads.
-
 =head1 New Diagnostics
 
-=over 4
+=over
 
 =item Ambiguous call resolved as CORE::%s(), qualify as such or use &
 
@@ -746,10 +697,6 @@ Something like this will reproduce the error:
     process $BADREF 1,2,3;
     $BADREF->process(1,2,3);
 
-=item Can't check filesystem of script "%s" for nosuid
-
-(P) For some reason you can't check the filesystem of the script for nosuid.
-
 =item Can't coerce array into hash
 
 (F) You used an array where a hash was expected, but the array has no
@@ -763,10 +710,10 @@ only with arrays that have a hash reference at index 0.
 
 =item Can't localize pseudo-hash element
 
-(F) You said something like C<< local $ar->{'key'} >>, where $ar is
+(F) You said something like C<local $ar-E<gt>{'key'}>, where $ar is
 a reference to a pseudo-hash.  That hasn't been implemented yet, but
 you can get a similar effect by localizing the corresponding array
-element directly -- C<< local $ar->[$ar->[0]{'key'}] >>.
+element directly -- C<local $ar-E<gt>[$ar-E<gt>[0]{'key'}]>.
 
 =item Can't use %%! because Errno.pm is not available
 
@@ -863,7 +810,7 @@ are outside the range which can be represented by integers internally.
 One possible workaround is to force Perl to use magical string
 increment by prepending "0" to your numbers.
 
-=item Recursive inheritance detected while looking for method '%s' %s
+=item Recursive inheritance detected while looking for method '%s' in package '%s'
 
 (F) More than 100 levels of inheritance were encountered while invoking a
 method.  Probably indicates an unintended loop in your inheritance hierarchy.
@@ -913,58 +860,37 @@ not use those settings.  This was not dead serious, fortunately: there
 is a "default locale" called "C" that Perl can and will use, the
 script will be run.  Before you really fix the problem, however, you
 will get the same error message each time you run Perl.  How to really
-fix the problem can be found in L<perllocale/"LOCALE PROBLEMS">.
+fix the problem can be found in L<perllocale> section B<LOCALE PROBLEMS>.
 
 =back
 
 
 =head1 Obsolete Diagnostics
 
-=over 4
+=over
 
 =item Can't mktemp()
 
 (F) The mktemp() routine failed for some reason while trying to process
 a B<-e> switch.  Maybe your /tmp partition is full, or clobbered.
 
-Removed because B<-e> doesn't use temporary files any more.
-
 =item Can't write to temp file for B<-e>: %s
 
 (F) The write routine failed for some reason while trying to process
 a B<-e> switch.  Maybe your /tmp partition is full, or clobbered.
-
-Removed because B<-e> doesn't use temporary files any more.
 
 =item Cannot open temporary file
 
 (F) The create routine failed for some reason while trying to process
 a B<-e> switch.  Maybe your /tmp partition is full, or clobbered.
 
-Removed because B<-e> doesn't use temporary files any more.
-
-=item regexp too big
-
-(F) The current implementation of regular expressions uses shorts as
-address offsets within a string.  Unfortunately this means that if
-the regular expression compiles to longer than 32767, it'll blow up.
-Usually when you want a regular expression this big, there is a better
-way to do it with multiple statements.  See L<perlre>.
-
 =back
-
-=head1 Configuration Changes
-
-You can use "Configure -Uinstallusrbinperl" which causes installperl
-to skip installing perl also as /usr/bin/perl.  This is useful if you
-prefer not to modify /usr/bin for some reason or another but harmful
-because many scripts assume to find Perl in /usr/bin/perl.
 
 =head1 BUGS
 
 If you find what you think is a bug, you might check the headers of
 recently posted articles in the comp.lang.perl.misc newsgroup.
-There may also be information at http://www.perl.com/perl/ , the Perl
+There may also be information at http://www.perl.com/perl/, the Perl
 Home Page.
 
 If you believe you have an unreported bug, please run the B<perlbug>
@@ -985,7 +911,7 @@ The F<Artistic> and F<Copying> files for copyright information.
 
 =head1 HISTORY
 
-Written by Gurusamy Sarathy <F<gsar@activestate.com>>, with many contributions
+Written by Gurusamy Sarathy <F<gsar@umich.edu>>, with many contributions
 from The Perl Porters.
 
 Send omissions or corrections to <F<perlbug@perl.com>>.
