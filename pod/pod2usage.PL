@@ -2,7 +2,6 @@
 
 use Config;
 use File::Basename qw(&basename &dirname);
-use Cwd;
 
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you
@@ -13,11 +12,10 @@ use Cwd;
 
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
-$origdir = cwd;
 chdir(dirname($0));
 ($file = basename($0)) =~ s/\.PL$//;
-$file =~ s/\.pl$// if ($^O eq 'os2' or $^O eq 'dos');  # "case-forgiving"
-$file =~ s/\.pl$/.com/ if ($^O eq 'VMS');              # "case-forgiving"
+$file =~ s/\.pl$//
+        if ($^O eq 'VMS' or $^O eq 'os2');  # "case-forgiving"
 
 open OUT,">$file" or die "Can't create $file: $!";
 
@@ -39,7 +37,10 @@ print OUT <<'!NO!SUBS!';
 #############################################################################
 # pod2usage -- command to print usage messages from embedded pod docs
 #
-# Copyright (c) 1996-2000 by Bradford Appleton. All rights reserved.
+# Derived from Tom Christiansen's pod2text script.
+# (with extensive modifications)
+#
+# Copyright (c) 1996 Bradford Appleton. All rights reserved.
 # This file is part of "PodParser". PodParser is free software;
 # you can redistribute it and/or modify it under the same terms
 # as Perl itself.
@@ -176,4 +177,3 @@ pod2usage(\%usage);
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
-chdir $origdir;

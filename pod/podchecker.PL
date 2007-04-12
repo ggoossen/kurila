@@ -2,7 +2,6 @@
 
 use Config;
 use File::Basename qw(&basename &dirname);
-use Cwd;
 
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you
@@ -13,12 +12,10 @@ use Cwd;
 
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
-$origdir = cwd;
 chdir(dirname($0));
 ($file = basename($0)) =~ s/\.PL$//;
 $file =~ s/\.pl$//
-        if ($^O eq 'VMS' or $^O eq 'os2' or $^O eq 'dos');  # "case-forgiving"
-$file .= '.com' if $^O eq 'VMS';
+        if ($^O eq 'VMS' or $^O eq 'os2');  # "case-forgiving"
 
 open OUT,">$file" or die "Can't create $file: $!";
 
@@ -39,14 +36,17 @@ print OUT <<'!NO!SUBS!';
 #############################################################################
 # podchecker -- command to invoke the podchecker function in Pod::Checker
 #
-# Copyright (c) 1998-2000 by Bradford Appleton. All rights reserved.
+# Derived from Tom Christiansen's pod2text script.
+# (with extensive modifications)
+#
+# Copyright (c) 1998 Bradford Appleton. All rights reserved.
 # This file is part of "PodParser". PodParser is free software;
 # you can redistribute it and/or modify it under the same terms
 # as Perl itself.
 #############################################################################
 
 use strict;
-#use diagnostics;
+use diagnostics;
 
 =head1 NAME
 
@@ -54,7 +54,7 @@ podchecker - check the syntax of POD format documentation files
 
 =head1 SYNOPSIS
 
-B<podchecker> [B<-help>] [B<-man>] [B<-(no)warnings>] [I<file>S< >...]
+B<podchecker> [B<-help>] [B<-man>] [I<file>S< >...]
 
 =head1 OPTIONS AND ARGUMENTS
 
@@ -67,12 +67,6 @@ Print a brief help message and exit.
 =item B<-man>
 
 Print the manual page and exit.
-
-=item B<-warnings> B<-nowarnings>
-
-Turn on/off printing of warnings. Repeating B<-warnings> increases the
-warning level, i.e. more warnings are printed. Currently increasing to
-level two causes flagging of unescaped "E<lt>,E<gt>" characters.
 
 =item I<file>
 
@@ -87,35 +81,16 @@ syntax errors in the POD documentation and will print any errors
 it find to STDERR. At the end, it will print a status message
 indicating the number of errors found.
 
-Directories are ignored, an appropriate warning message is printed.
-
 B<podchecker> invokes the B<podchecker()> function exported by B<Pod::Checker>
 Please see L<Pod::Checker/podchecker()> for more details.
-
-=head1 RETURN VALUE
-
-B<podchecker> returns a 0 (zero) exit status if all specified
-POD files are ok.
-
-=head1 ERRORS
-
-B<podchecker> returns the exit status 1 if at least one of
-the given POD files has syntax errors.
-
-The status 2 indicates that at least one of the specified 
-files does not contain I<any> POD commands.
-
-Status 1 overrides status 2. If you want unambigouus
-results, call B<podchecker> with one single argument only.
 
 =head1 SEE ALSO
 
 L<Pod::Parser> and L<Pod::Checker>
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-Brad Appleton E<lt>bradapp@enteract.comE<gt>,
-Marek Rouchal E<lt>marek@saftsack.fs.uni-bayreuth.deE<gt>
+Brad Appleton E<lt>bradapp@enteract.comE<gt>
 
 Based on code for B<Pod::Text::pod2text(1)> written by
 Tom Christiansen E<lt>tchrist@mox.perl.comE<gt>
@@ -128,49 +103,28 @@ use Pod::Usage;
 use Getopt::Long;
 
 ## Define options
-my %options;
+my %options = (
+        "help"     => 0,
+        "man"      => 0,
+);
 
 ## Parse options
-GetOptions(\%options, qw(help man warnings+ nowarnings))  ||  pod2usage(2);
+GetOptions(\%options, "help", "man")  ||  pod2usage(2);
 pod2usage(1)  if ($options{help});
 pod2usage(-verbose => 2)  if ($options{man});
-
-if($options{nowarnings}) {
-  $options{warnings} = 0;
-}
-elsif(!defined $options{warnings}) {
-  $options{warnings} = 1; # default is warnings on
-}
 
 ## Dont default to STDIN if connected to a terminal
 pod2usage(2) if ((@ARGV == 0) && (-t STDIN));
 
 ## Invoke podchecker()
-my $status = 0;
-@ARGV = qw(-) unless(@ARGV);
-for (@ARGV) {
-    if($_ eq '-') {
-      $_ = "<&STDIN";
-    }
-    elsif(-d) {
-      warn "podchecker: Warning: Ignoring directory '$_'\n";
-      next;
-    }
-    my $s = podchecker($_, undef, '-warnings' => $options{warnings});
-    if($s > 0) {
-        # errors occurred
-        $status = 1;
-    }
-    elsif($s < 0) {
-        # no pod found
-        $status = 2 unless($status);
-    }
+if(@ARGV) {
+   for (@ARGV) { podchecker($_) };
+} else {
+	podchecker("<&STDIN");
 }
-exit $status;
 
 !NO!SUBS!
 
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
-chdir $origdir;

@@ -2,7 +2,7 @@
 # Pod/InputObjects.pm -- package which defines objects for input streams
 # and paragraphs and commands when parsing POD docs.
 #
-# Copyright (C) 1996-2000 by Bradford Appleton. All rights reserved.
+# Copyright (C) 1996-1999 Tom Christiansen. All rights reserved.
 # This file is part of "PodParser". PodParser is free software;
 # you can redistribute it and/or modify it under the same terms
 # as Perl itself.
@@ -11,8 +11,8 @@
 package Pod::InputObjects;
 
 use vars qw($VERSION);
-$VERSION = 1.13;  ## Current version of this package
-require  5.005;    ## requires this Perl version or later
+$VERSION = 1.08;   ## Current version of this package
+require  5.004;    ## requires this Perl version or later
 
 #############################################################################
 
@@ -42,7 +42,7 @@ are defined:
 
 =begin __PRIVATE__
 
-=item package B<Pod::InputSource>
+=item B<Pod::InputSource>
 
 An object corresponding to a source of POD input text. It is mostly a
 wrapper around a filehandle or C<IO::Handle>-type object (or anything
@@ -51,23 +51,23 @@ additional information relevant to the parsing of PODs.
 
 =end __PRIVATE__
 
-=item package B<Pod::Paragraph>
+=item B<Pod::Paragraph>
 
 An object corresponding to a paragraph of POD input text. It may be a
 plain paragraph, a verbatim paragraph, or a command paragraph (see
 L<perlpod>).
 
-=item package B<Pod::InteriorSequence>
+=item B<Pod::InteriorSequence>
 
 An object corresponding to an interior sequence command from the POD
 input text (see L<perlpod>).
 
-=item package B<Pod::ParseTree>
+=item B<Pod::ParseTree>
 
 An object corresponding to a tree of parsed POD text. Each "node" in
 a parse-tree (or I<ptree>) is either a text-string or a reference to
 a B<Pod::InteriorSequence> object. The nodes appear in the parse-tree
-in the order in which they were parsed from left-to-right.
+in they order in which they were parsed from  left-to-right.
 
 =back
 
@@ -232,7 +232,7 @@ It has the following methods/attributes:
 
 ##---------------------------------------------------------------------------
 
-=head2 Pod::Paragraph-E<gt>B<new()>
+=head2 B<new()>
 
         my $pod_para1 = Pod::Paragraph->new(-text => $text);
         my $pod_para2 = Pod::Paragraph->new(-name => $cmd,
@@ -268,7 +268,7 @@ sub new {
     ## If they are in the argument list, they will override the defaults.
     my $self = {
           -name       => undef,
-          -text       => (@_ == 1) ? shift : undef,
+          -text       => (@_ == 1) ? $_[0] : undef,
           -file       => '<unknown-file>',
           -line       => 0,
           -prefix     => '=',
@@ -284,7 +284,7 @@ sub new {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_para-E<gt>B<cmd_name()>
+=head2 B<cmd_name()>
 
         my $para_cmd = $pod_para->cmd_name();
 
@@ -303,7 +303,7 @@ sub cmd_name {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_para-E<gt>B<text()>
+=head2 B<text()>
 
         my $para_text = $pod_para->text();
 
@@ -318,7 +318,7 @@ sub text {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_para-E<gt>B<raw_text()>
+=head2 B<raw_text()>
 
         my $raw_pod_para = $pod_para->raw_text();
 
@@ -335,7 +335,7 @@ sub raw_text {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_para-E<gt>B<cmd_prefix()>
+=head2 B<cmd_prefix()>
 
         my $prefix = $pod_para->cmd_prefix();
 
@@ -351,7 +351,7 @@ sub cmd_prefix {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_para-E<gt>B<cmd_separator()>
+=head2 B<cmd_separator()>
 
         my $separator = $pod_para->cmd_separator();
 
@@ -367,7 +367,7 @@ sub cmd_separator {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_para-E<gt>B<parse_tree()>
+=head2 B<parse_tree()>
 
         my $ptree = $pod_parser->parse_text( $pod_para->text() );
         $pod_para->parse_tree( $ptree );
@@ -387,13 +387,13 @@ sub parse_tree {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_para-E<gt>B<file_line()>
+=head2 B<file_line()>
 
         my ($filename, $line_number) = $pod_para->file_line();
         my $position = $pod_para->file_line();
 
 Returns the current filename and line number for the paragraph
-object.  If called in a list context, it returns a list of two
+object.  If called in an array context, it returns a list of two
 elements: first the filename, then the line number. If called in
 a scalar context, it returns a string containing the filename, followed
 by a colon (':'), followed by the line number.
@@ -423,7 +423,7 @@ It has the following methods/attributes:
 
 ##---------------------------------------------------------------------------
 
-=head2 Pod::InteriorSequence-E<gt>B<new()>
+=head2 B<new()>
 
         my $pod_seq1 = Pod::InteriorSequence->new(-name => $cmd
                                                   -ldelim => $delimiter);
@@ -434,9 +434,6 @@ It has the following methods/attributes:
                                                  -file => $filename,
                                                  -line => $line_number);
 
-        my $pod_seq4 = new Pod::InteriorSequence(-name => $cmd, $ptree);
-        my $pod_seq5 = new Pod::InteriorSequence($cmd, $ptree);
-
 This is a class method that constructs a C<Pod::InteriorSequence> object
 and returns a reference to the new interior sequence object. It should
 be given two keyword arguments.  The C<-ldelim> keyword indicates the
@@ -444,10 +441,7 @@ corresponding left-delimiter of the interior sequence (e.g. 'E<lt>').
 The C<-name> keyword indicates the name of the corresponding interior
 sequence command, such as C<I> or C<B> or C<C>. The C<-file> and
 C<-line> keywords indicate the filename and line number corresponding
-to the beginning of the interior sequence. If the C<$ptree> argument is
-given, it must be the last argument, and it must be either string, or
-else an array-ref suitable for passing to B<Pod::ParseTree::new> (or
-it may be a reference to a Pod::ParseTree object).
+to the beginning of the interior sequence.
 
 =cut
 
@@ -455,18 +449,6 @@ sub new {
     ## Determine if we were called via an object-ref or a classname
     my $this = shift;
     my $class = ref($this) || $this;
-
-    ## See if first argument has no keyword
-    if (((@_ <= 2) or (@_ % 2)) and $_[0] !~ /^-\w/) {
-       ## Yup - need an implicit '-name' before first parameter
-       unshift @_, '-name';
-    }
-
-    ## See if odd number of args
-    if ((@_ % 2) != 0) {
-       ## Yup - need an implicit '-ptree' before the last parameter
-       splice @_, $#_, 0, '-ptree';
-    }
 
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object. Note that we default
@@ -478,17 +460,9 @@ sub new {
           -line       => 0,
           -ldelim     => '<',
           -rdelim     => '>',
+          -ptree => new Pod::ParseTree(),
           @_
     };
-
-    ## Initialize contents if they havent been already
-    my $ptree = $self->{'-ptree'} || new Pod::ParseTree();
-    if ( ref $ptree =~ /^(ARRAY)?$/ ) {
-        ## We have an array-ref, or a normal scalar. Pass it as an
-        ## an argument to the ptree-constructor
-        $ptree = new Pod::ParseTree($1 ? [$ptree] : $ptree);
-    }
-    $self->{'-ptree'} = $ptree;
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -497,7 +471,7 @@ sub new {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<cmd_name()>
+=head2 B<cmd_name()>
 
         my $seq_cmd = $pod_seq->cmd_name();
 
@@ -522,10 +496,8 @@ sub _set_child2parent_links {
    my ($self, @children) = @_;
    ## Make sure any sequences know who their parent is
    for (@children) {
-      next  unless (length  and  ref  and  ref ne 'SCALAR');
-      if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
-          UNIVERSAL::can($_, 'nested'))
-      {
+      next unless ref $_;
+      if ($_->isa('Pod::InteriorSequence') or $_->can('nested')) {
           $_->nested($self);
       }
    }
@@ -538,15 +510,14 @@ sub _unset_child2parent_links {
    $self->{'-parent_sequence'} = undef;
    my $ptree = $self->{'-ptree'};
    for (@$ptree) {
-      next  unless (length  and  ref  and  ref ne 'SCALAR');
-      $_->_unset_child2parent_links()
-          if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
+      next  unless ($_ and ref $_ and $_->isa('Pod::InteriorSequence'));
+      $_->_unset_child2parent_links();
    }
 }
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<prepend()>
+=head2 B<prepend()>
 
         $pod_seq->prepend($text);
         $pod_seq1->prepend($pod_seq2);
@@ -565,7 +536,7 @@ sub prepend {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<append()>
+=head2 B<append()>
 
         $pod_seq->append($text);
         $pod_seq1->append($pod_seq2);
@@ -584,7 +555,7 @@ sub append {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<nested()>
+=head2 B<nested()>
 
         $outer_seq = $pod_seq->nested || print "not nested";
 
@@ -602,7 +573,7 @@ sub nested {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<raw_text()>
+=head2 B<raw_text()>
 
         my $seq_raw_text = $pod_seq->raw_text();
 
@@ -623,7 +594,7 @@ sub raw_text {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<left_delimiter()>
+=head2 B<left_delimiter()>
 
         my $ldelim = $pod_seq->left_delimiter();
 
@@ -642,7 +613,7 @@ sub left_delimiter {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<right_delimiter()>
+=head2 B<right_delimiter()>
 
 The rightmost delimiter beginning the argument text to the interior
 sequence (should be ">").
@@ -659,7 +630,7 @@ sub right_delimiter {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<parse_tree()>
+=head2 B<parse_tree()>
 
         my $ptree = $pod_parser->parse_text($paragraph_text);
         $pod_seq->parse_tree( $ptree );
@@ -680,13 +651,13 @@ sub parse_tree {
 
 ##---------------------------------------------------------------------------
 
-=head2 $pod_seq-E<gt>B<file_line()>
+=head2 B<file_line()>
 
         my ($filename, $line_number) = $pod_seq->file_line();
         my $position = $pod_seq->file_line();
 
 Returns the current filename and line number for the interior sequence
-object.  If called in a list context, it returns a list of two
+object.  If called in an array context, it returns a list of two
 elements: first the filename, then the line number. If called in
 a scalar context, it returns a string containing the filename, followed
 by a colon (':'), followed by the line number.
@@ -701,7 +672,7 @@ sub file_line {
 
 ##---------------------------------------------------------------------------
 
-=head2 Pod::InteriorSequence::B<DESTROY()>
+=head2 B<DESTROY()>
 
 This method performs any necessary cleanup for the interior-sequence.
 If you override this method then it is B<imperative> that you invoke
@@ -738,7 +709,7 @@ itself contain a parse-tree (since interior sequences may be nested).
 
 ##---------------------------------------------------------------------------
 
-=head2 Pod::ParseTree-E<gt>B<new()>
+=head2 B<new()>
 
         my $ptree1 = Pod::ParseTree->new;
         my $ptree2 = new Pod::ParseTree;
@@ -747,7 +718,7 @@ itself contain a parse-tree (since interior sequences may be nested).
 
 This is a class method that constructs a C<Pod::Parse_tree> object and
 returns a reference to the new parse-tree. If a single-argument is given,
-it must be a reference to an array, and is used to initialize the root
+it mist be a reference to an array, and is used to initialize the root
 (top) of the parse tree.
 
 =cut
@@ -766,7 +737,7 @@ sub new {
 
 ##---------------------------------------------------------------------------
 
-=head2 $ptree-E<gt>B<top()>
+=head2 B<top()>
 
         my $top_node = $ptree->top();
         $ptree->top( $top_node );
@@ -794,7 +765,7 @@ sub top {
 
 ##---------------------------------------------------------------------------
 
-=head2 $ptree-E<gt>B<children()>
+=head2 B<children()>
 
 This method gets/sets the children of the top node in the parse-tree.
 If no arguments are given, it returns the list (array) of children
@@ -814,7 +785,7 @@ sub children {
 
 ##---------------------------------------------------------------------------
 
-=head2 $ptree-E<gt>B<prepend()>
+=head2 B<prepend()>
 
 This method prepends the given text or parse-tree to the current parse-tree.
 If the first item on the parse-tree is text and the argument is also text,
@@ -830,7 +801,7 @@ sub prepend {
    my $self = shift;
    local *ptree = $self;
    for (@_) {
-      next  unless length;
+      next  unless $_;
       if (@ptree  and  !(ref $ptree[0])  and  !(ref $_)) {
          $ptree[0] = $_ . $ptree[0];
       }
@@ -842,7 +813,7 @@ sub prepend {
 
 ##---------------------------------------------------------------------------
 
-=head2 $ptree-E<gt>B<append()>
+=head2 B<append()>
 
 This method appends the given text or parse-tree to the current parse-tree.
 If the last item on the parse-tree is text and the argument is also text,
@@ -856,7 +827,7 @@ sub append {
    my $self = shift;
    local *ptree = $self;
    for (@_) {
-      next  unless length;
+      next  unless $_;
       if (@ptree  and  !(ref $ptree[-1])  and  !(ref $_)) {
          $ptree[-1] .= $_;
       }
@@ -866,7 +837,7 @@ sub append {
    }
 }
 
-=head2 $ptree-E<gt>B<raw_text()>
+=head2 B<raw_text()>
 
         my $ptree_raw_text = $ptree->raw_text();
 
@@ -892,9 +863,8 @@ sub _unset_child2parent_links {
    my $self = shift;
    local *ptree = $self;
    for (@ptree) {
-       next  unless (defined and length  and  ref  and  ref ne 'SCALAR');
-       $_->_unset_child2parent_links()
-           if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
+       next  unless ($_ and ref $_ and $_->isa('Pod::InteriorSequence'));
+       $_->_unset_child2parent_links();
    }
 }
 
@@ -902,7 +872,7 @@ sub _set_child2parent_links {
     ## nothing to do, Pod::ParseTrees cant have parent pointers
 }
 
-=head2 Pod::ParseTree::B<DESTROY()>
+=head2 B<DESTROY()>
 
 This method performs any necessary cleanup for the parse-tree.
 If you override this method then it is B<imperative>
@@ -922,7 +892,7 @@ sub DESTROY {
 
 =head1 SEE ALSO
 
-See L<Pod::Parser>, L<Pod::Select>
+See L<Pod::Parser>, L<Pod::Select>, and L<Pod::Callbacks>.
 
 =head1 AUTHOR
 

@@ -7,7 +7,6 @@ use Carp;
 use Exporter;
 use File::Basename;
 use File::Spec;
-use FileHandle;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&testcmp);

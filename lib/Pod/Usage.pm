@@ -1,7 +1,10 @@
 #############################################################################
 # Pod/Usage.pm -- print usage messages for the running script.
 #
-# Copyright (C) 1996-2000 by Bradford Appleton. All rights reserved.
+# Based on Tom Christiansen's Pod::Text::pod2text() function
+# (with modifications).
+#
+# Copyright (C) 1994-1999 Tom Christiansen. All rights reserved.
 # This file is part of "PodParser". PodParser is free software;
 # you can redistribute it and/or modify it under the same terms
 # as Perl itself.
@@ -10,8 +13,8 @@
 package Pod::Usage;
 
 use vars qw($VERSION);
-$VERSION = 1.14;  ## Current version of this package
-require  5.005;    ## requires this Perl version or later
+$VERSION = 1.08;   ## Current version of this package
+require  5.004;    ## requires this Perl version or later
 
 =head1 NAME
 
@@ -46,7 +49,7 @@ B<pod2usage> should be given either a single argument, or a list of
 arguments corresponding to an associative array (a "hash"). When a single
 argument is given, it should correspond to exactly one of the following:
 
-=over 4
+=over
 
 =item *
 
@@ -68,7 +71,7 @@ assumed to be a hash.  If a hash is supplied (either as a reference or
 as a list) it should contain one or more elements with the following
 keys:
 
-=over 4
+=over
 
 =item C<-message>
 
@@ -80,9 +83,6 @@ program's usage message.
 =item C<-exitval>
 
 The desired exit status to pass to the B<exit()> function.
-This should be an integer, or else the string "NOEXIT" to
-indicate that control should simply be returned without
-terminating the invoking process.
 
 =item C<-verbose>
 
@@ -132,7 +132,7 @@ Unless they are explicitly specified, the default values for the exit
 status, verbose level, and output stream to use are determined as
 follows:
 
-=over 4
+=over
 
 =item *
 
@@ -162,7 +162,7 @@ Although the above may seem a bit confusing at first, it generally does
 "the right thing" in most situations.  This determination of the default
 values to use is based upon the following typical Unix conventions:
 
-=over 4
+=over
 
 =item *
 
@@ -314,58 +314,22 @@ command line syntax error is detected. They should also provide an
 option (usually C<-H> or C<-help>) to print a (possibly more verbose)
 usage message to C<STDOUT>. Some scripts may even wish to go so far as to
 provide a means of printing their complete documentation to C<STDOUT>
-(perhaps by allowing a C<-man> option). The following complete example
-uses B<Pod::Usage> in combination with B<Getopt::Long> to do all of these
+(perhaps by allowing a C<-man> option). The following example uses
+B<Pod::Usage> in combination with B<Getopt::Long> to do all of these
 things:
 
     use Getopt::Long;
     use Pod::Usage;
 
-    my $man = 0;
-    my $help = 0;
     ## Parse options and print usage if there is a syntax error,
     ## or if usage was explicitly requested.
-    GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
-    pod2usage(1) if $help;
-    pod2usage(-verbose => 2) if $man;
+    GetOptions("help", "man", "flag1")  ||  pod2usage(2);
+    pod2usage(1)  if ($opt_help);
+    pod2usage(-verbose => 2)  if ($opt_man);
 
     ## If no arguments were given, then allow STDIN to be used only
     ## if it's not connected to a terminal (otherwise print usage)
     pod2usage("$0: No files given.")  if ((@ARGV == 0) && (-t STDIN));
-    __END__
-
-    =head1 NAME
-
-    sample - Using GetOpt::Long and Pod::Usage
-
-    =head1 SYNOPSIS
-
-    sample [options] [file ...]
-
-     Options:
-       -help            brief help message
-       -man             full documentation
-
-    =head1 OPTIONS
-
-    =over 8
-
-    =item B<-help>
-
-    Print a brief help message and exits.
-
-    =item B<-man>
-
-    Prints the manual page and exits.
-
-    =back
-
-    =head1 DESCRIPTION
-
-    B<This program> will read the given input file(s) and do something
-    useful with the contents thereof.
-
-    =cut
 
 =head1 CAVEATS
 
@@ -398,23 +362,13 @@ with re-writing this manpage.
 use strict;
 #use diagnostics;
 use Carp;
-use Config;
 use Exporter;
+use Pod::PlainText;
 use File::Spec;
 
 use vars qw(@ISA @EXPORT);
+@ISA = qw(Pod::PlainText);
 @EXPORT = qw(&pod2usage);
-BEGIN {
-    if ( $] >= 5.005_58 ) {
-       require Pod::Text;
-       @ISA = qw( Pod::Text );
-    }
-    else {
-       require Pod::PlainText;
-       @ISA = qw( Pod::PlainText );
-    }
-}
-
 
 ##---------------------------------------------------------------------------
 
@@ -435,7 +389,7 @@ sub pod2usage {
         ## User passed a ref to a hash
         %opts = %{$_}  if (ref($_) eq 'HASH');
     }
-    elsif (/^[-+]?\d+$/) {
+    elsif (/^[-+]?\d+$/o) {
         ## User passed in the exit value to use
         $opts{"-exitval"} =  $_;
     }
@@ -478,7 +432,7 @@ sub pod2usage {
     unless ((ref $opts{"-input"}) || (-e $opts{"-input"})) {
         my ($dirname, $basename) = ('', $opts{"-input"});
         my $pathsep = ($^O =~ /^(?:dos|os2|MSWin32)$/) ? ";"
-                            : (($^O eq 'MacOS' || $^O eq 'VMS') ? ',' :  ":");
+                            : (($^O eq 'MacOS') ? ',' :  ":");
         my $pathspec = $opts{"-pathlist"} || $ENV{PATH} || $ENV{PERL5LIB};
 
         my @paths = (ref $pathspec) ? @$pathspec : split($pathsep, $pathspec);
@@ -501,19 +455,8 @@ sub pod2usage {
     }
 
     ## Now translate the pod document and then exit with the desired status
-    if ( $opts{"-verbose"} >= 2 
-             and  !ref($opts{"-input"})
-             and  $opts{"-output"} == \*STDOUT )
-    {
-       ## spit out the entire PODs. Might as well invoke perldoc
-       my $progpath = File::Spec->catfile($Config{scriptdir}, "perldoc");
-       system($progpath, $opts{"-input"});
-    }
-    else {
-       $parser->parse_from_file($opts{"-input"}, $opts{"-output"});
-    }
-
-    exit($opts{"-exitval"})  unless (lc($opts{"-exitval"}) eq 'noexit');
+    $parser->parse_from_file($opts{"-input"}, $opts{"-output"});
+    exit($opts{"-exitval"});
 }
 
 ##---------------------------------------------------------------------------
@@ -545,16 +488,15 @@ sub preprocess_paragraph {
     local $_ = shift;
     my $line = shift;
     ## See if this is a heading and we arent printing the entire manpage.
-    if (($self->{USAGE_OPTIONS}->{-verbose} < 2) && /^=head/) {
+    if (($self->{USAGE_OPTIONS}->{-verbose} < 2) && /^=head/o) {
         ## Change the title of the SYNOPSIS section to USAGE
-        s/^=head1\s+SYNOPSIS\s*$/=head1 USAGE/;
+        s/^=head1\s+SYNOPSIS\s*$/=head1 USAGE/o;
         ## Try to do some lowercasing instead of all-caps in headings
         s{([A-Z])([A-Z]+)}{((length($2) > 2) ? $1 : lc($1)) . lc($2)}ge;
         ## Use a colon to end all headings
-        s/\s*$/:/  unless (/:\s*$/);
+        s/\s*$/:/o  unless (/:\s*$/o);
         $_ .= "\n";
     }
     return  $self->SUPER::preprocess_paragraph($_);
 }
 
-1; # keep require happy
