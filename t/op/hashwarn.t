@@ -1,11 +1,10 @@
 #!./perl
 
+use strict;
+
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
 }
-
-use strict;
 
 use vars qw{ @warnings };
 
