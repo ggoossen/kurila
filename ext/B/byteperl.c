@@ -3,6 +3,7 @@
 #ifndef PATCHLEVEL
 #include "patchlevel.h"
 #endif
+#include "byterun.h"
 
 static void xs_init _((void));
 static PerlInterpreter *my_perl;
@@ -37,11 +38,7 @@ main(int argc, char **argv, char **env)
     if (!do_undump) {
 	my_perl = perl_alloc();
 	if (!my_perl)
-#ifdef VMS
-	    exit(vaxc$errno);
-#else
 	    exit(1);
-#endif
 	perl_construct( my_perl );
     }
 
@@ -60,11 +57,7 @@ main(int argc, char **argv, char **env)
 #endif
 	if (!fp) {
 	    perror(argv[1]);
-#ifdef VMS
-	    exit(vaxc$errno);
-#else
 	    exit(1);
-#endif
 	}
 	argv++;
 	argc--;

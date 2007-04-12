@@ -4,6 +4,7 @@ my %alias_to = (
     I32 => [qw(SSize_t long)],
     U16 => [qw(OPCODE line_t short)],
     U8 => [qw(char)],
+    objindex => [qw(svindex opindex)]		
 );
 
 my @optype= qw(OP UNOP BINOP LOGOP CONDOP LISTOP PMOP SVOP GVOP PVOP LOOP COP);
@@ -19,7 +20,7 @@ while (($from, $tos) = each %alias_to) {
 
 my $c_header = <<'EOT';
 /*
- *      Copyright (c) 1996-1998 Malcolm Beattie
+ *      Copyright (c) 1996, 1997 Malcolm Beattie
  *
  *      You may distribute under the terms of either the GNU General Public
  *      License or the Artistic License, as specified in the README file.
@@ -33,12 +34,20 @@ EOT
 my $perl_header;
 ($perl_header = $c_header) =~ s{[/ ]?\*/?}{#}g;
 
-unlink "byterun.c", "byterun.h", "ext/B/B/Asmdata.pm";
+if (-f "byterun.c") {
+    rename("byterun.c", "byterun.c.old");
+}
+if (-f "byterun.h") {
+    rename("byterun.h", "byterun.h.old");
+}
+if (-f "B/Asmdata.pm") {
+    rename("B/Asmdata.pm", "B/Asmdata.pm.old");
+}
 
 #
 # Start with boilerplate for Asmdata.pm
 #
-open(ASMDATA_PM, ">ext/B/B/Asmdata.pm") or die "ext/B/B/Asmdata.pm: $!";
+open(ASMDATA_PM, ">B/Asmdata.pm") or die "Asmdata.pm: $!";
 print ASMDATA_PM $perl_header, <<'EOT';
 package B::Asmdata;
 use Exporter;
@@ -64,30 +73,20 @@ print BYTERUN_C $c_header, <<'EOT';
 
 #include "EXTERN.h"
 #include "perl.h"
-
-void *
-bset_obj_store(void *obj, I32 ix)
-{
-    if (ix > obj_list_fill) {
-	if (obj_list_fill == -1)
-	    New(666, obj_list, ix + 1, void*);
-	else
-	    Renew(obj_list, ix + 1, void*);
-	obj_list_fill = ix;
-    }
-    obj_list[ix] = obj;
-    return obj;
-}
+#include "bytecode.h"
+#include "byterun.h"
 
 #ifdef INDIRECT_BGET_MACROS
-void byterun(struct bytestream bs)
+void byterun(bs)
+struct bytestream bs;
 #else
-void byterun(PerlIO *fp)
+void byterun(fp)
+FILE *fp;
 #endif /* INDIRECT_BGET_MACROS */
 {
     dTHR;
     int insn;
-    while ((insn = BGET_FGETC()) != EOF) {
+    while ((insn = FGETC()) != EOF) {
 	switch (insn) {
 EOT
 
@@ -164,9 +163,18 @@ struct bytestream {
     int (*fread)(char *, size_t, size_t, void*);
     void (*freadpv)(U32, void*);
 };
+void freadpv _((U32, void *));
+void byterun _((struct bytestream));
+#else
+void byterun _((FILE *));
 #endif /* INDIRECT_BGET_MACROS */
 
-void *bset_obj_store _((void *, I32));
+#ifndef PATCHLEVEL
+#include "patchlevel.h"
+#endif
+#if PATCHLEVEL < 4 || (PATCHLEVEL == 4 && SUBVERSION < 50)
+#define dTHR extern int errno
+#endif
 
 enum {
 EOT
@@ -211,14 +219,15 @@ print BYTERUN_H <<'EOT';
 
 EOT
 
-print BYTERUN_H <<'EOT';
+printf BYTERUN_H <<'EOT', scalar(@specialsv);
+EXT SV * specialsv_list[%d];
 #define INIT_SPECIALSV_LIST STMT_START { \
 EOT
 for ($i = 0; $i < @specialsv; $i++) {
-    print BYTERUN_H "\tspecialsv_list[$i] = $specialsv[$i]; \\\n";
+    print BYTERUN_H "specialsv_list[$i] = $specialsv[$i]; \\\n";
 }
 print BYTERUN_H <<'EOT';
-    } STMT_END
+} STMT_END
 EOT
 
 #
@@ -239,7 +248,7 @@ EOT
 __END__
 # First set instruction ord("#") to read comment to end-of-line (sneaky)
 %number 35
-comment		arg			comment_t
+comment		arg			comment
 # Then make ord("\n") into a no-op
 %number 10
 nop		none			none
