@@ -2,7 +2,7 @@ package ExtUtils::Packlist;
 use strict;
 use Carp qw();
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.02';
 
 # Used for generating filehandle globs.  IO::File might not be available!
 my $fhname = "FH1";
@@ -89,7 +89,7 @@ while (defined($line = <$fh>))
    {
    chomp $line;
    my ($key, @kvs) = split(' ', $line);
-   $key =~ s!/\./!/!g;   # Some .packlists have spurious '/./' bits in the paths
+   $key =~ s!/./!/!g;   # Some .packlists have spurious '/./' bits in the paths
    if (! @kvs)
       {
       $self->{data}->{$key} = undef;
@@ -147,13 +147,6 @@ foreach my $key (sort(keys(%{$self->{data}})))
       }
    }
 return(@missing);
-}
-
-sub packlist_file($)
-{
-my ($self) = @_;
-$self = tied(%$self) || $self;
-return($self->{packfile});
 }
 
 1;
@@ -229,57 +222,7 @@ argument which evaluates to true is given, any missing files will be removed
 from the internal hash.  The return value is a list of the missing files, which
 will be empty if they all exist.
 
-=item packlist_file()
-
-This returns the name of the associated .packlist file
-
 =back
-
-=head1 EXAMPLE
-
-Here's C<modrm>, a little utility to cleanly remove an installed module.
-
-    #!/usr/local/bin/perl -w
-
-    use strict;
-    use IO::Dir;
-    use ExtUtils::Packlist;
-    use ExtUtils::Installed;
-
-    sub emptydir($) {
-	my ($dir) = @_;
-	my $dh = IO::Dir->new($dir) || return(0);
-	my @count = $dh->read();
-	$dh->close();
-	return(@count == 2 ? 1 : 0);
-    }
-
-    # Find all the installed packages
-    print("Finding all installed modules...\n");
-    my $installed = ExtUtils::Installed->new();
-
-    foreach my $module (grep(!/^Perl$/, $installed->modules())) {
-       my $version = $installed->version($module) || "???";
-       print("Found module $module Version $version\n");
-       print("Do you want to delete $module? [n] ");
-       my $r = <STDIN>; chomp($r);
-       if ($r && $r =~ /^y/i) {
-	  # Remove all the files
-	  foreach my $file (sort($installed->files($module))) {
-	     print("rm $file\n");
-	     unlink($file);
-	  }
-	  my $pf = $installed->packlist($module)->packlist_file();
-	  print("rm $pf\n");
-	  unlink($pf);
-	  foreach my $dir (sort($installed->directory_tree($module))) {
-	     if (emptydir($dir)) {
-		print("rmdir $dir\n");
-		rmdir($dir);
-	     }
-	  }
-       }
-    }
 
 =head1 AUTHOR
 
