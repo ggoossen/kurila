@@ -1,7 +1,5 @@
 package OS2::DLL;
 
-our $VERSION = '1.00';
-
 use Carp;
 use DynaLoader;
 
@@ -23,17 +21,6 @@ sub AUTOLOAD {
 # processed by the autosplit program.
 
 # Cannot autoload, the autoloader is used for the REXX functions.
-
-sub new {
-  confess 'Usage: OS2::DLL->new( <file> [<dirs>] )' unless @_ >= 2;
-  my ($class, $file) = (shift, shift);
-  my $handle;
-  $handle = $class->load($file, @_) and return $handle;
-  my $path = @_ ? " from '@_'" : '';
-  my $err = DynaLoader::dl_error();
-  $err =~ s/\s+at\s+\S+\s+line\s+\S+\s*\z//;
-  croak "Can't load '$file'$path: $err";
-}
 
 sub load
 {
@@ -121,15 +108,7 @@ is performed in default DLL path (without adding paths and extensions).
 
 The DLL is not unloaded when the variable dies.
 
-Returns DLL object reference, or undef on failure (in this case one can
-get the reason via C<DynaLoader::dl_error()>).
-
-=head2 Create a REXX DLL handle
-
-	$dll = OS2::DLL->new( NAME [, WHERE] );
-
-Same as L<C<load>|Load REXX DLL>, but croaks with a meaningful message on
-failure.
+Returns DLL object reference, or undef on failure.
 
 =head2 Check for functions (optional):
 
