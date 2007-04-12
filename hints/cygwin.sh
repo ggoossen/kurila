@@ -1,42 +1,36 @@
 #! /bin/sh
-# cygwin.sh - hints for building perl using the Cygwin environment for Win32
+# cygwin32.sh - hintsfile for building perl on Windows NT using the
+#     Cygnus Win32 Development Kit.
 #
 
-# not otherwise settable
+_exe='.exe'
 exe_ext='.exe'
+# work around case-insensitive file names
 firstmakefile='GNUmakefile'
+sharpbang='#!'
+startsh='#!/bin/sh'
+
+archname='cygwin32'
+cc='gcc'
+libpth='/usr/i586-cygwin32/lib /usr/lib /usr/local/lib'
+so='dll'
+libs='-lcygwin -lm -lkernel32'
+#optimize='-g'
+ccflags='-DCYGWIN32 -I/usr/include -I/usr/local/include'
+ldflags='-L/usr/i586-cygwin32/lib -L/usr/lib -L/usr/local/lib'
+usemymalloc='n'
+dlsrc='dl_cygwin32.xs'
+cccdlflags=' '
+ld='ld2'
+lddlflags='-L/usr/local/lib'
+useshrplib='true'
+libperl='libperl.a'
+dlext='dll'
+
+man1dir=/usr/local/man/man1
+man3dir=/usr/local/man/man3
+sitelib=/usr/local/lib/perl5/site_perl
+
 case "$ldlibpthname" in
 '') ldlibpthname=PATH ;;
 esac
-archobjs='cygwin.o'
-
-# mandatory (overrides incorrect defaults)
-test -z "$cc" && cc='gcc'
-if test -z "$plibpth"
-then
-    plibpth=`gcc -print-file-name=libc.a`
-    plibpth=`dirname $plibpth`
-    plibpth=`cd $plibpth && pwd`
-fi
-so='dll'
-# - eliminate -lc, implied by gcc and a symlink to libcygwin.a
-libswanted=`echo " $libswanted " | sed -e 's/ c / /g'`
-# - eliminate -lm, symlink to libcygwin.a
-libswanted=`echo " $libswanted " | sed -e 's/ m / /g'`
-test -z "$optimize" && optimize='-O2'
-ccflags="$ccflags -DPERL_USE_SAFE_PUTENV"
-# - otherwise i686-cygwin
-archname='cygwin'
-
-# dynamic loading
-# - otherwise -fpic
-cccdlflags=' '
-ld='ld2'
-
-# Win9x problem with non-blocking read from a closed pipe
-d_eofnblk='define'
-
-# strip exe's and dll's
-#ldflags="$ldflags -s"
-#ccdlflags="$ccdlflags -s"
-#lddlflags="$lddlflags -s"
