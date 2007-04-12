@@ -2,7 +2,6 @@
  
 use Config;
 use File::Basename qw(&basename &dirname);
-use Cwd;
  
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you
@@ -14,7 +13,6 @@ use Cwd;
  
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
-$origdir = cwd;
 chdir dirname($0);
 $file = basename($0, '.PL');
 $file .= '.com' if $^O eq 'VMS';
@@ -40,7 +38,6 @@ use Config;
 use strict;
 use FileHandle;
 use File::Basename qw(&basename &dirname);
-use Cwd;
 
 use Getopt::Long;
 
@@ -143,7 +140,7 @@ sub _doit
                                                                 if ($errcode);
 
         _print("Compiling C($obj) for $file!\n", 36 ) if (!$options->{'gen'});
-        $errcode = _compileCode($file, $objfile, $obj) 
+        my $errcode = _compileCode($file, $objfile, $obj) 
                                             if (!$options->{'gen'});
 
         if ($errcode)
@@ -163,10 +160,9 @@ sub _doit
 
         _removeCode($file) if ($options->{'e'}); 
 
-        _removeCode($obj) if (($options->{'e'}
-			       && !$options->{'sav'}
-			       && !$options->{'o'})
-			      || ($options->{'run'} && !$options->{'sav'}));
+        _removeCode($obj) if (($options->{'e'} && 
+                                ((!$options->{'sav'}) || !$options->{'o'})) || 
+                                ($options->{'run'} && (!$options->{'sav'})));
     }
     else
     {
@@ -358,7 +354,7 @@ EOF
     _print("$ -I@INC $tmpfile\n", 36);
     _run("$ -I@INC $tmpfile", 9 );
 
-    $fd = new FileHandle ("$incfile"); 
+    my $fd = new FileHandle ("$incfile"); 
     my @lines = <$fd>;    
 
     unlink($tmpfile);
@@ -459,9 +455,9 @@ sub _mungeRegexp
 {
     my ($regexp) = @_;
 
-    grep(s:(^|[^\\])\.:$1\x00\\.:g, @$regexp);
-    grep(s:(^|[^\x00])\\\.:$1\.:g,  @$regexp);
-    grep(s:\x00::g,                 @$regexp);
+    grep(s"(^|[^\\])\."$1\x0\\."g, @$regexp);
+    grep(s"(^|[^\x0])\\\."$1\."g,  @$regexp);
+    grep(s"\x0""g,                 @$regexp);
 }
 
 
@@ -937,4 +933,3 @@ by perl5.005.
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
 exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
-chdir $origdir;
