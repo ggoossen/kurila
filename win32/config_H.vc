@@ -10,8 +10,8 @@
  * $Id: Config_h.U,v 3.0.1.4 1995/09/25 09:10:49 ram Exp $
  */
 
-/* Configuration time: undef
- * Configured by: nick
+/* Configuration time: Thu Apr 11 06:20:49 PDT 1996
+ * Configured by: garyng
  * Target system: 
  */
 
@@ -47,7 +47,7 @@
  *	where library files may be held under a private library, for
  *	instance.
  */
-#define ARCHNAME "MSWin32-x86-thread"		/**/
+#define ARCHNAME "MSWin32"		/**/
 
 /* BIN:
  *	This symbol holds the path of the bin directory where the package will
@@ -311,36 +311,6 @@
  */
 /*#define HAS_GETHOSTENT		/**/
 
-/* HAS_GETHBADD:
- *	This symbol, if defined, indicates that the gethostbyaddr routine is
- *	available to lookup host names by their IP addresses.
- */
-/*#define HAS_GETHBADD		/**/
-
-/* Gethbadd_addr_t:
- *	This symbol holds the type used for the 1st argument
- *	to gethostbyaddr().
- */
-#define Gethbadd_addr_t		char *
-
-/* Gethbadd_alen_t:
- *	This symbol holds the type used for the 2nd argument
- *	to gethostbyaddr().
- */
-#define Gethbadd_alen_t		int
-
-/* HAS_GETNBADD:
- *	This symbol, if defined, indicates that the getnetbyaddr routine is
- *	available to lookup networks by their IP addresses.
- */
-/*#define HAS_GETNBADD		/**/
-
-/* Gethbadd_net_t:
- *	This symbol holds the type used for the 1st argument
- *	to getnetbyaddr().
- */
-#define Getnbadd_net_t		long
-
 /* HAS_UNAME:
  *	This symbol, if defined, indicates that the C program may use the
  *	uname() routine to derive the host name.  See also HAS_GETHOSTNAME
@@ -352,7 +322,7 @@
  *	This symbol, if defined, indicates that the getlogin routine is
  *	available to get the login name.
  */
-#define HAS_GETLOGIN		/**/
+/*#define HAS_GETLOGIN		/**/
 
 /* HAS_GETPGRP2:
  *	This symbol, if defined, indicates that the getpgrp2() (as in DG/UX)
@@ -1129,12 +1099,6 @@
  */
 /*#define I_NETINET_IN	/**/
 
-/* I_NETDB:
- *	This symbol, if defined, indicates that <netdb.h> exists and 
- *	should be included.
- */
-/*#define I_NETDB		/**/
-
 /* I_PWD:
  *	This symbol, if defined, indicates to the C program that it should
  *	include <pwd.h>.
@@ -1408,7 +1372,7 @@
  *	is defined, and 'int *' otherwise.  This is only useful if you 
  *	have select(), of course.
  */
-#define Select_fd_set_t 	Perl_fd_set *	/**/
+#define Select_fd_set_t 	int *	/**/
 
 /* Size_t:
  *	This symbol holds the type used to declare length parameters
@@ -1432,7 +1396,7 @@
  *	This symbol is defined to be the type of char used in stdio.h.
  *	It has the values "unsigned char" or "char".
  */
-#define STDCHAR char	/**/
+#define STDCHAR unsigned char	/**/
 
 /* Uid_t:
  *	This symbol holds the type used to declare user ids in the kernel.
@@ -1466,8 +1430,8 @@
  *	This symbol contains the ~name expanded version of ARCHLIB, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define ARCHLIB "c:\\perl\\lib\\MSWin32-x86-thread"		/**/
-#define ARCHLIB_EXP (win32_perllib_path(ARCHNAME,NULL))	/**/
+#define ARCHLIB "c:\\perl\\lib"		/**/
+#define ARCHLIB_EXP (win32PerlLibPath())	/**/
 
 /* BINCOMPAT3:
  *	This symbol, if defined, indicates that Perl 5.004 should be
@@ -1686,7 +1650,7 @@
 /* MYMALLOC:
  *	This symbol, if defined, indicates that we're using our own malloc.
  */
-#define MYMALLOC			/**/
+/*#define MYMALLOC			/**/
 
 /* OLDARCHLIB:
  *	This variable, if defined, holds the name of the directory in
@@ -1714,7 +1678,7 @@
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
 #define PRIVLIB "c:\\perl\\lib"		/**/
-#define PRIVLIB_EXP (win32_perllib_path(NULL))	/**/
+#define PRIVLIB_EXP "c:\\perl\\lib"		/**/
 
 /* SH_PATH:
  *	This symbol contains the full pathname to the shell used on this
@@ -1770,7 +1734,7 @@
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
 #define SITEARCH "c:\\perl\\lib\\site"		/**/
-#define SITEARCH_EXP (win32_perllib_path("site",ARCHNAME,NULL))	/**/
+#define SITEARCH_EXP "c:\\perl\\lib\\site"		/**/
 
 /* SITELIB:
  *	This symbol contains the name of the private library for this package.
@@ -1786,14 +1750,14 @@
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
 #define SITELIB "c:\\perl\\lib\\site"		/**/
-#define SITELIB_EXP (win32_perllib_path("site",NULL))	/**/
+#define SITELIB_EXP "c:\\perl\\lib\\site"		/**/
 
 /* STARTPERL:
  *	This variable contains the string to put in front of a perl
  *	script to make sure (one hopes) that it runs with perl and not
  *	some shell.
  */
-#define STARTPERL "#!perl"		/**/
+#define STARTPERL "#perl"		/**/
 
 /* USE_PERLIO:
  *	This symbol, if defined, indicates that the PerlIO abstraction should
