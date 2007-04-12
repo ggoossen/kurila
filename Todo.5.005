@@ -1,17 +1,22 @@
 Merging
+    5.004_02
+    5.004_03
+    5.004_04
     oneperl (THIS pointer)
 
 Multi-threading
-    $AUTOLOAD. Hmm.
     without USE_THREADS, change extern variable for dTHR
+    sv_mutex initialisation and race
     consistent semantics for exit/die in threads
+    pp_entersub still cloning XSUBs (broken)?
+    test '~'-magic thread addresses
+    test new thread state flags, DESTROY etc.
     SvREFCNT_dec(curstack) in threadstart() in Thread.xs
+    per-thread GV -> [SAH]V dereference for $@ etc.
     Thread::Pool
-    more Configure support
 
 Miscellaneous
-    rename and alter ISA.pm
-    magic_setisa should be made to update %FIELDS
+    sv_bless3 and '~'-magic to give choice on reblessing
 
 Compiler
     auto-produce executable
@@ -20,8 +25,6 @@ Compiler
     $^C to track compiler/checker status
     END blocks need saving in compiled output
     _AUTOLOAD prodding
-    fix comppadlist (names in comppad_name can have fake SvCUR
-	from where newASSIGNOP steals the field)
 
 Documentation
     lots
