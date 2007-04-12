@@ -93,16 +93,6 @@ sub DB {
 
   $usrctxt = "package $DB::package;";		# this won't let them modify, alas
   local(*DB::dbline) = "::_<$DB::filename";
-
-  # we need to check for pseudofiles on Mac OS (these are files
-  # not attached to a filename, but instead stored in Dev:Pseudo)
-  # since this is done late, $DB::filename will be "wrong" after
-  # skippkg
-  if ($^O eq 'MacOS' && $#DB::dbline < 0) {
-    $DB::filename = 'Dev:Pseudo';
-    *DB::dbline = "::_<$DB::filename";
-  }
-
   my ($stop, $action);
   if (($stop,$action) = split(/\0/,$DB::dbline{$DB::lineno})) {
     if ($stop eq '1') {
@@ -416,7 +406,8 @@ sub _find_subline {
   $name = "main" . $name if substr($name,0,2) eq "::";
   my($fname, $from, $to) = ($DB::sub{$name} =~ /^(.*):(\d+)-(\d+)$/);
   if ($from) {
-    local *DB::dbline = "::_<$fname";
+    # XXX this needs local()-ization of some sort
+    *DB::dbline = "::_<$fname";
     ++$from while $DB::dbline[$from] == 0 && $from < $to;
     return $from;
   }
@@ -564,9 +555,9 @@ change)
     package CLIENT;
     use DB;
     @ISA = qw(DB);
-
+    
     # these (inherited) methods can be called by the client
-
+    
     CLIENT->register()      # register a client package name
     CLIENT->done()          # de-register from the debugging API
     CLIENT->skippkg('hide::hide')  # ask DB not to stop in this package
@@ -594,7 +585,7 @@ change)
     # These methods will be called at the appropriate times.
     # Stub versions provided do nothing.
     # None of these can block.
-
+    
     CLIENT->init()          # called when debug API inits itself
     CLIENT->stop(FILE,LINE) # when execution stops
     CLIENT->idle()          # while stopped (can be a client event loop)
@@ -803,7 +794,7 @@ highly experimental and subject to change.
 
 =head1 AUTHOR
 
-Gurusamy Sarathy	gsar@activestate.com
+Gurusamy Sarathy	gsar@umich.edu
 
 This code heavily adapted from an early version of perl5db.pl attributable
 to Larry Wall and the Perl Porters.
