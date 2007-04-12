@@ -81,7 +81,7 @@
  
 	RETVAL = dlopen(filename) ;
 	if (RETVAL == NULL)
-	    SaveError(aTHX_ "%s",dlerror()) ;
+	    SaveError("%s",dlerror()) ;
  
    Note that SaveError() takes a printf format string. Use a "%s" as
    the first parameter if the error may contain and % characters.
@@ -98,15 +98,15 @@
  
  
 static void
-dl_private_init(pTHX)
+dl_private_init()
 {
-    (void)dl_generic_private_init(aTHX);
+    (void)dl_generic_private_init();
 }
  
 MODULE = DynaLoader	PACKAGE = DynaLoader
  
 BOOT:
-    (void)dl_private_init(aTHX);
+    (void)dl_private_init();
  
  
 void *
@@ -115,15 +115,15 @@ dl_load_file(filename, flags=0)
     int		flags
     CODE:
     if (flags & 0x01)
-	Perl_warn(aTHX_ "Can't make loaded symbols global on this platform while loading %s",filename);
-    DLDEBUG(1,PerlIO_printf(Perl_debug_log, "dl_load_file(%s,%x):\n", filename,flags));
+	warn("Can't make loaded symbols global on this platform while loading %s",filename);
+    DLDEBUG(1,PerlIO_printf(PerlIO_stderr(), "dl_load_file(%s,%x):\n", filename,flags));
     RETVAL = dlopen(filename) ;
-    DLDEBUG(2,PerlIO_printf(Perl_debug_log, " libref=%lx\n", (unsigned long) RETVAL));
+    DLDEBUG(2,PerlIO_printf(PerlIO_stderr(), " libref=%lx\n", (unsigned long) RETVAL));
     ST(0) = sv_newmortal() ;
     if (RETVAL == NULL)
-	SaveError(aTHX_ "%s",dlerror()) ;
+	SaveError("%s",dlerror()) ;
     else
-	sv_setiv( ST(0), PTR2IV(RETVAL) );
+	sv_setiv( ST(0), (IV)RETVAL);
  
  
 void *
@@ -131,17 +131,17 @@ dl_find_symbol(libhandle, symbolname)
     void *	libhandle
     char *	symbolname
     CODE:
-    DLDEBUG(2, PerlIO_printf(Perl_debug_log,
+    DLDEBUG(2, PerlIO_printf(PerlIO_stderr(),
 			     "dl_find_symbol(handle=%lx, symbol=%s)\n",
 			     (unsigned long) libhandle, symbolname));
     RETVAL = dlsym(libhandle, symbolname);
-    DLDEBUG(2, PerlIO_printf(Perl_debug_log,
+    DLDEBUG(2, PerlIO_printf(PerlIO_stderr(),
 			     "  symbolref = %lx\n", (unsigned long) RETVAL));
     ST(0) = sv_newmortal() ;
     if (RETVAL == NULL)
-	SaveError(aTHX_ "%s",dlerror()) ;
+	SaveError("%s",dlerror()) ;
     else
-	sv_setiv( ST(0), PTR2IV(RETVAL) );
+	sv_setiv( ST(0), (IV)RETVAL);
  
  
 void
@@ -158,18 +158,15 @@ dl_install_xsub(perl_name, symref, filename="$Package")
     void *		symref
     char *		filename
     CODE:
-    DLDEBUG(2,PerlIO_printf(Perl_debug_log, "dl_install_xsub(name=%s, symref=%lx)\n",
+    DLDEBUG(2,PerlIO_printf(PerlIO_stderr(), "dl_install_xsub(name=%s, symref=%lx)\n",
 		perl_name, (unsigned long) symref));
-    ST(0) = sv_2mortal(newRV((SV*)newXS(perl_name,
-					(void(*)(pTHX_ CV *))symref,
-					filename)));
+    ST(0)=sv_2mortal(newRV((SV*)newXS(perl_name, (void(*)_((CV *)))symref, filename)));
  
  
 char *
 dl_error()
     CODE:
-    dMY_CXT;
-    RETVAL = dl_last_error ;
+    RETVAL = LastError ;
     OUTPUT:
     RETVAL
  
