@@ -116,17 +116,17 @@ do_aspawn(SV* really, SV **mark, SV **sp)
         fdMap[3];
  SV     *sv,
         **p_sv;
- STRLEN	n_a;
 
     status = FAIL;
     if (sp > mark)
     {
+       dTHR;
        New(401,PL_Argv, sp - mark + 1, char*);
        a = PL_Argv;
        while (++mark <= sp)
        {
            if (*mark)
-              *a++ = SvPVx(*mark, n_a);
+              *a++ = SvPVx(*mark, PL_na);
            else
               *a++ = "";
        }
@@ -142,7 +142,7 @@ do_aspawn(SV* really, SV **mark, SV **sp)
        /*-----------------------------------------------------*/
        if (*PL_Argv[0] != '/')
            TAINT_ENV();
-       if (really && *(tmps = SvPV(really, n_a)))
+       if (really && *(tmps = SvPV(really, PL_na)))
            pid = spawnp(tmps, nFd, fdMap, &inherit,
                         (const char **) PL_Argv,
                         (const char **) environ);
@@ -181,13 +181,11 @@ do_aspawn(SV* really, SV **mark, SV **sp)
              /* be used by my_pclose                        */
              /*---------------------------------------------*/
              close(fd);
-             MUTEX_LOCK(&PL_fdpid_mutex);
              p_sv  = av_fetch(PL_fdpid,fd,TRUE);
              fd    = (int) SvIVX(*p_sv);
              SvREFCNT_dec(*p_sv);
              *p_sv = &PL_sv_undef;
              sv    = *av_fetch(PL_fdpid,fd,TRUE);
-             MUTEX_UNLOCK(&PL_fdpid_mutex);
              (void) SvUPGRADE(sv, SVt_IV);
              SvIVX(sv) = pid;
              status    = 0;
@@ -285,6 +283,7 @@ do_spawn(char *cmd, int execf)
                     (const char **) environ);
        if (pid < 0)
        {
+          dTHR;
           status = FAIL;
           if (ckWARN(WARN_EXEC))
              warner(WARN_EXEC,"Can't exec \"%s\": %s",
@@ -408,13 +407,10 @@ my_popen(char *cmd, char *mode)
          Perl_stdin_fd = pFd[that];
       if (strNE(cmd,"-"))
       {
-         PERL_FLUSHALL_FOR_CHILD;
          pid = spawn_cmd(cmd, Perl_stdin_fd, Perl_stdout_fd);
          if (pid >= 0)
          {
-            MUTEX_LOCK(&PL_fdpid_mutex);
             sv = *av_fetch(PL_fdpid,pFd[this],TRUE);
-            MUTEX_UNLOCK(&PL_fdpid_mutex);
             (void) SvUPGRADE(sv, SVt_IV);
             SvIVX(sv) = pid;
             fd = PerlIO_fdopen(pFd[this], mode);
@@ -425,9 +421,7 @@ my_popen(char *cmd, char *mode)
       }
       else
       {
-         MUTEX_LOCK(&PL_fdpid_mutex);
          sv = *av_fetch(PL_fdpid,pFd[that],TRUE);
-         MUTEX_UNLOCK(&PL_fdpid_mutex);
          (void) SvUPGRADE(sv, SVt_IV);
          SvIVX(sv) = pFd[this];
          fd = PerlIO_fdopen(pFd[this], mode);
@@ -464,9 +458,7 @@ my_pclose(FILE *fp)
  SV   **sv;
  FILE *other;
 
-   MUTEX_LOCK(&PL_fdpid_mutex);
    sv        = av_fetch(PL_fdpid,PerlIO_fileno(fp),TRUE);
-   MUTEX_UNLOCK(&PL_fdpid_mutex);
    pid       = (int) SvIVX(*sv);
    SvREFCNT_dec(*sv);
    *sv       = &PL_sv_undef;

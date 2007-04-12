@@ -1,12 +1,7 @@
 # hints/vmesa.sh
 #
 # VM/ESA hints by Neale Ferguson (neale@mailbox.tabnsw.com.au)
-#
-# Currently (1999-Jan-09) Configure cannot be used in VM/ESA because
-# too many things are done differently in the C compiler environment.
-# Therefore the hints file is hand-crafted. --jhi@iki.fi
-# 
-
+ 
 case "$archname" in
 '') archname="$osname" ;;
 esac
@@ -24,7 +19,7 @@ d_access='define'
 d_alarm='define'
 d_archlib='define'
 # randbits='15'
-archobjs="vmesa.o"
+archobjs="ebcdic.o vmesa.o"
 d_attribut='undef'
 d_bcmp='define'
 d_bcopy='define'
@@ -218,6 +213,7 @@ dynamic_ext=''
 eagain='EAGAIN'
 ebcdic='define'
 exe_ext=''
+extensions='Fcntl GDBM_File IO NDBM_File Opcode POSIX Socket IPC/SysV Errno Thread attrs re Data/dumper'
 fpostype='fpos_t'
 freetype='void'
 groupstype='gid_t'
@@ -293,6 +289,7 @@ make='gnumake'
 mallocobj=''
 mallocsrc=''
 malloctype='void *'
+models='none'
 netdb_hlen_type='size_t'
 netdb_host_type='char *'
 netdb_name_type='const char *'
@@ -312,11 +309,11 @@ shmattype='void *'
 shrpenv=''
 signal_t='void'
 sig_name_init='"ZERO","HUP","INT","ABRT","ILL","POLL","URG","STOP","FPE","KILL","BUS","SEGV","SYS","PIPE","ALRM","TERM","USR1","USR2","NUM18","CONT","CHLD","TTIN","TTOU","IO","QUIT","TSTP","TRAP","NUM27","WINCH","XCPU","XFSZ","VTALRM","PROF","NUM33","NUM34","NUM35","NUM36","NUM3","NUM38","NUM39","NUM40","NUM41","NUM42","NUM43","NUM44","NUM45","NUM46","NUM47","NUM48","NUM49","CLD"'
-sig_num_init='0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,20 '
+sig_num='0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,20 '
 sizetype='size_t'
 so='.a'
 ssizetype='ssize_t'
-static_ext='Data/Dumper Digest/MD5 Fcntl Filter/Util/Call GDBM_File IO IPC/SysV List/Util MIME/Base64 NDBM_File Opcode PerlIO/scalar POSIX Socket Storable Thread Time/HiRes Time/Piece attrs re'
+static_ext='Data/Dumper Fcntl GDBM_File IO IPC/SysV NDBM_File Opcode POSIX Socket Thread attrs re'
 stdchar='char'
 stdio_cnt='(fp)->__countIn'
 stdio_ptr='(fp)->__bufPtr'
