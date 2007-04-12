@@ -86,7 +86,6 @@ sure you have already guessed, this is a problem that DBM Filters can
 fix very easily.
 
     use strict ;
-    use warnings ;
     use SDBM_File ;
     use Fcntl ;
 
@@ -100,8 +99,7 @@ fix very easily.
     # Install DBM Filters
     $db->filter_fetch_key  ( sub { s/\0$//    } ) ;
     $db->filter_store_key  ( sub { $_ .= "\0" } ) ;
-    $db->filter_fetch_value( 
-        sub { no warnings 'uninitialized' ;s/\0$// } ) ;
+    $db->filter_fetch_value( sub { s/\0$//    } ) ;
     $db->filter_store_value( sub { $_ .= "\0" } ) ;
 
     $hash{"abc"} = "def" ;
@@ -124,7 +122,7 @@ Here is another real-life example. By default, whenever Perl writes to
 a DBM database it always writes the key and value as strings. So when
 you use this:
 
-    $hash{12345} = "something" ;
+    $hash{12345} = "soemthing" ;
 
 the key 12345 will get stored in the DBM database as the 5 byte string
 "12345". If you actually want the key to be stored in the DBM database
@@ -134,7 +132,6 @@ when reading.
 Here is a DBM Filter that does it:
 
     use strict ;
-    use warnings ;
     use DB_File ;
     my %hash ;
     my $filename = "/tmp/filt" ;
