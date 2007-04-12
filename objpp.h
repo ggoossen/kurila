@@ -51,16 +51,30 @@
 #define av_unshift        CPerlObj::Perl_av_unshift
 #undef  avhv_keys
 #define avhv_keys         CPerlObj::Perl_avhv_keys
+#undef  avhv_fetch
+#define avhv_fetch        CPerlObj::Perl_avhv_fetch
 #undef  avhv_fetch_ent
 #define avhv_fetch_ent    CPerlObj::Perl_avhv_fetch_ent
+#undef  avhv_store
+#define avhv_store        CPerlObj::Perl_avhv_store
+#undef  avhv_store_ent
+#define avhv_store_ent    CPerlObj::Perl_avhv_store_ent
 #undef  avhv_exists_ent
 #define avhv_exists_ent   CPerlObj::Perl_avhv_exists_ent
-#undef  avhv_index_sv
-#define avhv_index_sv     CPerlObj::avhv_index_sv
+#undef  avhv_exists
+#define avhv_exists       CPerlObj::Perl_avhv_exists
+#undef  avhv_delete
+#define avhv_delete       CPerlObj::Perl_avhv_delete
+#undef  avhv_delete_ent
+#define avhv_delete_ent   CPerlObj::Perl_avhv_delete_ent
+#undef  avhv_iterinit
+#define avhv_iterinit     CPerlObj::Perl_avhv_iterinit
 #undef  avhv_iternext
 #define avhv_iternext     CPerlObj::Perl_avhv_iternext
 #undef  avhv_iterval
 #define avhv_iterval      CPerlObj::Perl_avhv_iterval
+#undef  avhv_iternextsv
+#define avhv_iternextsv   CPerlObj::Perl_avhv_iternextsv
 #undef  bad_type
 #define bad_type          CPerlObj::bad_type
 #undef  bind_match
@@ -371,8 +385,6 @@
 #define get_no_modify     CPerlObj::Perl_get_no_modify
 #undef  get_opargs
 #define get_opargs        CPerlObj::Perl_get_opargs
-#undef  get_specialsv_list
-#define get_specialsv_list CPerlObj::Perl_get_specialsv_list
 #undef  getlogin
 #define getlogin          CPerlObj::getlogin
 #undef  gp_free
@@ -485,8 +497,6 @@
 #define init_debugger     CPerlObj::init_debugger
 #undef  init_ids
 #define init_ids          CPerlObj::init_ids
-#undef  init_interp
-#define init_interp       CPerlObj::init_interp
 #undef  init_main_thread
 #define init_main_thread  CPerlObj::init_main_thread
 #undef  init_main_stash
@@ -633,14 +643,10 @@
 #define magic_setvec      CPerlObj::Perl_magic_setvec
 #undef  magic_sizepack
 #define magic_sizepack    CPerlObj::Perl_magic_sizepack
-#undef  magic_unchain
-#define magic_unchain     CPerlObj::Perl_magic_unchain
 #undef  magic_wipepack
 #define magic_wipepack    CPerlObj::Perl_magic_wipepack
 #undef  magicname
 #define magicname         CPerlObj::Perl_magicname
-#undef  malloced_size
-#define malloced_size     CPerlObj::Perl_malloced_size
 #undef  markstack_grow
 #define markstack_grow    CPerlObj::Perl_markstack_grow
 #undef  markstack_ptr
@@ -791,8 +797,6 @@
 #define newHVREF          CPerlObj::Perl_newHVREF
 #undef  newHV
 #define newHV             CPerlObj::Perl_newHV
-#undef  newHVhv
-#define newHVhv           CPerlObj::Perl_newHVhv
 #undef  newIO
 #define newIO             CPerlObj::Perl_newIO
 #undef  newLISTOP
@@ -829,8 +833,6 @@
 #define newUNOP           CPerlObj::Perl_newUNOP
 #undef  newWHILEOP
 #define newWHILEOP        CPerlObj::Perl_newWHILEOP
-#undef  new_constant
-#define new_constant      CPerlObj::new_constant
 #undef  new_logop
 #define new_logop         CPerlObj::new_logop
 #undef  new_stackinfo
@@ -1103,8 +1105,6 @@
 #define save_hek          CPerlObj::save_hek
 #undef  save_helem
 #define save_helem        CPerlObj::Perl_save_helem
-#undef  save_hints
-#define save_hints        CPerlObj::Perl_save_hints
 #undef  save_hptr
 #define save_hptr         CPerlObj::Perl_save_hptr
 #undef  save_I16

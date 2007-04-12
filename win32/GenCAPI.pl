@@ -71,7 +71,6 @@ safexcalloc
 safexrealloc
 safexfree
 Perl_GetVars
-malloced_size
 )];
 
 
@@ -378,6 +377,7 @@ opsave
 eval_mutex
 orslen
 ofmt
+mh
 modcount
 generation
 DBcv
@@ -385,7 +385,7 @@ archpat_auto
 sortcxix
 lastgotoprobe
 regdummy
-regcomp_parse
+regparse
 regxend
 regcode
 regnaughty
@@ -396,7 +396,7 @@ regsize
 regflags
 regseen
 seen_zerolen
-regcomp_rx
+rx
 extralen
 colorset
 colors
