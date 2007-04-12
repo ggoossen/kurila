@@ -8,7 +8,11 @@
  */
 
 static SV *
-isa_lookup(HV *stash, char *name, int len, int level)
+isa_lookup(stash, name, len, level)
+HV *stash;
+char *name;
+int len;
+int level;
 {
     AV* av;
     GV* gv;
@@ -48,8 +52,7 @@ isa_lookup(HV *stash, char *name, int len, int level)
 	}
 	if(hv) {
 	    SV** svp = AvARRAY(av);
-	    /* NOTE: No support for tied ISA */
-	    I32 items = AvFILLp(av) + 1;
+	    I32 items = AvFILL(av) + 1;
 	    while (items--) {
 		SV* sv = *svp++;
 		HV* basestash = gv_stashsv(sv, FALSE);
@@ -68,11 +71,13 @@ isa_lookup(HV *stash, char *name, int len, int level)
 	}
     }
 
-    return boolSV(strEQ(name, "UNIVERSAL"));
+    return &sv_no;
 }
 
 bool
-sv_derived_from(SV *sv, char *name)
+sv_derived_from(sv, name)
+SV * sv ;
+char * name ;
 {
     SV *rv;
     char *type;
@@ -198,7 +203,7 @@ XS(XS_UNIVERSAL_VERSION)
 }
 
 void
-boot_core_UNIVERSAL(void)
+boot_core_UNIVERSAL()
 {
     char *file = __FILE__;
 

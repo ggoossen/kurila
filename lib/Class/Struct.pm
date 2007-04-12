@@ -146,6 +146,9 @@ sub struct {
 
     # Create accessor methods.
 
+    if ( $got_class && $CHECK_CLASS_MEMBERSHIP ) {
+        $out .= "  use UNIVERSAL;\n";
+    }
     my( $pre, $pst, $sel );
     $cnt = 0;
     foreach $name (@methods){

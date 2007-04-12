@@ -29,8 +29,8 @@ perlapio - perl's IO abstraction interface.
 
     int     PerlIO_fileno(PerlIO *);
     PerlIO *PerlIO_fdopen(int, const char *);
-    PerlIO *PerlIO_importFILE(FILE *, int flags);
-    FILE   *PerlIO_exportFILE(PerlIO *, int flags);
+    PerlIO *PerlIO_importFILE(FILE *);
+    FILE   *PerlIO_exportFILE(PerlIO *);
     FILE   *PerlIO_findFILE(PerlIO *);
     void    PerlIO_releaseFILE(PerlIO *,FILE *);
 
@@ -99,12 +99,12 @@ are different, there is only one "count" and order has
 
 =item B<PerlIO_close(f)>
 
-=item B<PerlIO_puts(f,s)>, B<PerlIO_putc(f,c)>
+=item B<PerlIO_puts(s,f)>, B<PerlIO_putc(c,f)>
 
 These correspond to fputs() and fputc().
 Note that arguments have been revised to have "file" first.
 
-=item B<PerlIO_ungetc(f,c)>
+=item B<PerlIO_ungetc(c,f)>
 
 This corresponds to ungetc().
 Note that arguments have been revised to have "file" first.

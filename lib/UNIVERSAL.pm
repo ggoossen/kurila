@@ -1,10 +1,7 @@
 package UNIVERSAL;
 
-# UNIVERSAL should not contain any extra subs/methods beyond those
-# that it exists to define. The use of Exporter below is a historical
-# accident that should be fixed sometime.
 require Exporter;
-*import = \&Exporter::import;
+@ISA = qw(Exporter);
 @EXPORT_OK = qw(isa can);
 
 1;
@@ -16,10 +13,11 @@ UNIVERSAL - base class for ALL classes (blessed references)
 
 =head1 SYNOPSIS
 
+    use UNIVERSAL qw(isa);
+
+    $yes = isa($ref, "HASH");
     $io = $fd->isa("IO::Handle");
     $sub = $obj->can('print');
-
-    $yes = UNIVERSAL::isa($ref, "HASH");
 
 =head1 DESCRIPTION
 
@@ -56,11 +54,11 @@ C<VERSION> can be called as either a static or object method call.
 
 =back
 
-The C<isa> and C<can> methods can also be called as subroutines
+C<UNIVERSAL> also optionally exports the following subroutines
 
 =over 4
 
-=item UNIVERSAL::isa ( VAL, TYPE )
+=item isa ( VAL, TYPE )
 
 C<isa> returns I<true> if the first argument is a reference and either
 of the following statements is true.
@@ -78,7 +76,7 @@ C<VAL> is a reference to a C<TYPE> of perl variable (er 'HASH')
 
 =back
 
-=item UNIVERSAL::can ( VAL, METHOD )
+=item can ( VAL, METHOD )
 
 If C<VAL> is a blessed reference which has a method called C<METHOD>,
 C<can> returns a reference to the subroutine.   If C<VAL> is not
@@ -86,12 +84,5 @@ a blessed reference, or if it does not have a method C<METHOD>,
 I<undef> is returned.
 
 =back
-
-These subroutines should I<not> be imported via S<C<use UNIVERSAL qw(...)>>.
-If you want simple local access to them you can do
-
-  *isa = \&UNIVERSAL::isa;
-
-to import isa into your package.
 
 =cut

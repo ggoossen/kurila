@@ -283,13 +283,13 @@ locatelocale(\$Spanish, \@Spanish,
 # Select the largest of the alpha(num)bets.
 
 ($Locale, @Locale) = ($English, @English)
-    if (@English > @Locale);
+    if (length(@English) > length(@Locale));
 ($Locale, @Locale) = ($German, @German)
-    if (@German  > @Locale);
+    if (length(@German)  > length(@Locale));
 ($Locale, @Locale) = ($French, @French)
-    if (@French  > @Locale);
+    if (length(@French)  > length(@Locale));
 ($Locale, @Locale) = ($Spanish, @Spanish)
-    if (@Spanish > @Locale);
+    if (length(@Spanish) > length(@Locale));
 
 print "# Locale = $Locale\n";
 print "# Alnum_ = @Locale\n";
@@ -394,28 +394,11 @@ for (map { chr } 0..255) {
 }
 print "ok 101\n";
 
-# Test for read-onlys.
-
-{
-    no locale;
-    $a = "qwerty";
-    {
-	use locale;
-	print "not " if $a cmp "qwerty";
-    }
-}
-print "ok 102\n";
-
-# This test must be the last one because its failure is not fatal.
 # The @Locale should be internally consistent.
-# Thanks to Hallvard Furuseth <h.b.furuseth@usit.uio.no>
-# for inventing a way to test for ordering consistency
-# without requiring any particular order.
-# ++$jhi;#@iki.fi
 
-print "# testing 103\n";
+print "# testing 102\n";
 {
-    my ($from, $to, $lesser, $greater, @test, %test, $test, $yes, $no, $sign);
+    my ($from, $to, $lesser, $greater, @test, %test, $test);
 
     for (0..9) {
 	# Select a slice.
@@ -427,35 +410,32 @@ print "# testing 103\n";
 	$from++; $to++;
         $to = $#Locale if ($to > $#Locale);
 	$greater = join('', @Locale[$from..$to]);
-	($yes, $no, $sign) = ($lesser lt $greater
-				? ("    ", "not ", 1)
-				: ("not ", "    ", -1));
-	# all these tests should FAIL (return 0).
 	@test = 
 	    (
-	     $no.'    ($lesser  lt $greater)',  # 0
-	     $no.'    ($lesser  le $greater)',  # 1
-	     'not      ($lesser  ne $greater)', # 2
-	     '         ($lesser  eq $greater)', # 3
-	     $yes.'    ($lesser  ge $greater)', # 4
-	     $yes.'    ($lesser  gt $greater)', # 5
-	     $yes.'    ($greater lt $lesser )', # 6
-	     $yes.'    ($greater le $lesser )', # 7
-	     'not      ($greater ne $lesser )', # 8
-	     '         ($greater eq $lesser )', # 9
-	     $no.'     ($greater ge $lesser )', # 10
-	     $no.'     ($greater gt $lesser )', # 11
-	     'not (($lesser cmp $greater) == -$sign)' # 12
+	     'not ($lesser  lt $greater)', # 0
+	     'not ($lesser  le $greater)', # 1
+	     'not ($lesser  ne $greater)', # 2
+	     '    ($lesser  eq $greater)', # 3
+	     '    ($lesser  ge $greater)', # 4
+	     '    ($lesser  gt $greater)', # 5
+	     '    ($greater lt $lesser )', # 6
+	     '    ($greater le $lesser )', # 7
+	     'not ($greater ne $lesser )', # 8
+	     '    ($greater eq $lesser )', # 9
+	     'not ($greater ge $lesser )', # 10
+	     'not ($greater gt $lesser )', # 11
+	     # Well, these two are sort of redundant
+	     # because @Locale was derived using cmp.
+	     'not (($lesser  cmp $greater) == -1)', # 12
+	     'not (($greater cmp $lesser ) ==  1)'  # 13
 	     );
 	@test{@test} = 0 x @test;
 	$test = 0;
 	for my $ti (@test) { $test{$ti} = eval $ti ; $test ||= $test{$ti} }
 	if ($test) {
-	    print "# failed 103 at:\n";
+	    print "# failed 102 at:\n";
 	    print "# lesser  = '$lesser'\n";
 	    print "# greater = '$greater'\n";
-	    print "# lesser cmp greater = ", $lesser cmp $greater, "\n";
-	    print "# greater cmp lesser = ", $greater cmp $lesser, "\n";
 	    print "# (greater) from = $from, to = $to\n";
 	    for my $ti (@test) {
 		printf("# %-40s %-4s", $ti,
@@ -466,10 +446,9 @@ print "# testing 103\n";
 		print "\n";
 	    }
 
-	    warn "The locale definition on your system may have errors.\n";
+	    print 'not ';
 	    last;
 	}
     }
 }
-
-# eof
+print "ok 102\n";

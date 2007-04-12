@@ -4,7 +4,7 @@
 # test method calls and autoloading.
 #
 
-print "1..24\n";
+print "1..20\n";
 
 @A::ISA = 'B';
 @B::ISA = 'C';
@@ -23,14 +23,6 @@ test( A->d, "C::d");		# Update hash table;
 
 *B::d = \&D::d;			# Import now.
 test (A->d, "D::d");		# Update hash table;
-
-{
-    local @A::ISA = qw(C);	# Update hash table with split() assignment
-    test (A->d, "C::d");
-    $#A::ISA = -1;
-    test (eval { A->d } || "fail", "fail");
-}
-test (A->d, "D::d");
 
 {
     local *B::d;
@@ -117,6 +109,3 @@ test(Y->f(), "B: In Y::f, 3");	# Which sticks
 
 test(A->eee(), "new B: In A::eee, 4");	# We get a correct $autoload
 test(A->eee(), "new B: In A::eee, 4");	# Which sticks
-
-# this test added due to bug discovery
-test(defined(@{"unknown_package::ISA"}) ? "defined" : "undefined", "undefined");

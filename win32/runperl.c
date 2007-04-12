@@ -1,24 +1,18 @@
-/* Say NO to CPP! Hallelujah! */
-#ifdef __GNUC__
-/*
- * GNU C does not do __declspec()
- */
-#define __declspec(foo) 
+#include <stdio.h>
+#include <win32io.h>
 
-/* Mingw32 defaults to globing command line 
- * This is inconsistent with other Win32 ports and 
- * seems to cause trouble with passing -DXSVERSION=\"1.6\" 
- * So we turn it off like this:
- */
-int _CRT_glob = 0;
-
+#ifndef _DLL
+extern WIN32_IOSUBSYSTEM win32stdio;
 #endif
 
-
-__declspec(dllimport) int RunPerl(int argc, char **argv, char **env, void *ios);
+extern int RunPerl(int argc, char **argv, char **env, void *iosubsystem);
 
 int
 main(int argc, char **argv, char **env)
 {
-    return RunPerl(argc, argv, env, (void*)0);
+#ifdef _DLL
+    return (RunPerl(argc, argv, env, NULL));
+#else
+    return (RunPerl(argc, argv, env, &win32stdio));
+#endif
 }

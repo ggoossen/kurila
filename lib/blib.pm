@@ -38,16 +38,14 @@ Nick Ing-Simmons nik@tiuk.ti.com
 
 use Cwd;
 
-use vars qw($VERSION);
-$VERSION = '1.00';
 
 sub import
 {
  my $package = shift;
  my $dir = getcwd;
- if ($^O eq 'VMS') { ($dir = VMS::Filespec::unixify($dir)) =~ s-/$--; }
  if (@_)
   {
+   print join(',',@_),"\n";
    $dir = shift;
    $dir =~ s/blib$//;
    $dir =~ s,/+$,,;

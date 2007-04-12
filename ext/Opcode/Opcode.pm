@@ -5,7 +5,7 @@ require 5.002;
 use vars qw($VERSION $XS_VERSION @ISA @EXPORT_OK);
 
 $VERSION = "1.04";
-$XS_VERSION = "1.03";
+$XS_VERSION = "1.02";
 
 use strict;
 use Carp;
@@ -427,18 +427,12 @@ beyond the scope of the compartment.
 
     rand srand
 
-=item :base_thread
-
-These ops are related to multi-threading.
-
-    lock threadsv
-
 =item :default
 
 A handy tag name for a I<reasonable> default set of ops.  (The current ops
 allowed are unstable while development continues. It will change.)
 
-    :base_core :base_mem :base_loop :base_io :base_orig :base_thread
+    :base_core :base_mem :base_loop :base_io :base_orig
 
 If safety matters to you (and why else would you be using the Opcode module?)
 then you should not rely on the definition of this, or indeed any other, optag!

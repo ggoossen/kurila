@@ -21,9 +21,9 @@ main(int argc, char *argv[])
     BOOL downcase = TRUE;
 
     /* check out the file system characteristics */
+
     if (GetFullPathName(".", MAX_PATH, root, &dummy)) {
-        dummy = strchr(root,'\\'); 
-	if (dummy)
+	if (dummy = strchr(root, '\\'))
 	    *++dummy = '\0';
 	if (GetVolumeInformation(root, volname, MAX_PATH, 
 				 &serial, &maxname, &flags, 0, 0)) {
@@ -31,7 +31,7 @@ main(int argc, char *argv[])
 	}
     }
 
-    setmode(fileno(stdout), O_BINARY);
+    _setmode(_fileno(stdout), _O_BINARY);
     for (i = 1; i < argc; i++) {
 	len = strlen(argv[i]);
 	if (downcase)
@@ -41,4 +41,3 @@ main(int argc, char *argv[])
     }
     return 0;
 }
-

@@ -10,22 +10,10 @@ if ($] =~ /\.(\d\d\d)?(\d\d)?$/) { # should always be true
   $opt{SUBVERSION} = $2 || '00';
 }
 
-$opt{'cf_by'} = $ENV{USERNAME} unless $opt{'cf_by'};
-$opt{'cf_email'} = $opt{'cf_by'} . '@' . (gethostbyname('localhost'))[0]
-	unless $opt{'cf_email'};
-
 while (<>)
  {
   s/~([\w_]+)~/$opt{$1}/g;
-  if (/^([\w_]+)=(.*)$/) {
-    # this depends on cf_time being empty in the template (or we'll get a loop)
-    if ($1 eq 'cf_time') {
-      $_ = "$1='" . localtime(time) . "'\n" if $2 =~ /^\s*'\s*'/;
-    }
-    elsif (exists $opt{$1}) {
-      $_ = "$1='$opt{$1}'\n";
-    }
-  }
+  $_ = "$1='$opt{$1}'\n" if (/^([\w_]+)=/ && exists($opt{$1}));
   print;
  }
 

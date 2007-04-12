@@ -22,14 +22,17 @@ typedef FILE * OutputStream;
 #endif
 
 static int
-not_here(char *s)
+not_here(s)
+char *s;
 {
     croak("%s not implemented on this architecture", s);
     return -1;
 }
 
 static bool
-constant(char *name, IV *pval)
+constant(name, pval)
+char *name;
+IV *pval;
 {
     switch (*name) {
     case '_':
@@ -268,8 +271,6 @@ setvbuf(handle, buf, type, size)
     CODE:
 /* Should check HAS_SETVBUF once Configure tests for that */
 #if defined(PERLIO_IS_STDIO) && defined(_IOFBF)
-	if (!handle)			/* Try input stream. */
-	    handle = IoIFP(sv_2io(ST(0)));
 	if (handle)
 	    RETVAL = setvbuf(handle, buf, type, size);
 	else {

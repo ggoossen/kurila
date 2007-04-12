@@ -19,13 +19,6 @@ cannot be built there, for lack of a reasonable command interpreter.
 Most importantly, many bugs were fixed, including several security
 problems.  See the F<Changes> file in the distribution for details.
 
-=head2 List assignment to %ENV works
-
-C<%ENV = ()> and C<%ENV = @list> now work as expected (except on VMS
-where it generates a fatal error).
-
-=head2 "Can't locate Foo.pm in @INC" error now lists @INC
-
 =head2 Compilation option: Binary compatibility with 5.003
 
 There is a new Configure question that asks if you want to maintain
@@ -91,13 +84,6 @@ non-methods.  The simple fix for old code is:  In any module that used to
 depend on inheriting C<AUTOLOAD> for non-methods from a base class named
 C<BaseClass>, execute C<*AUTOLOAD = \&BaseClass::AUTOLOAD> during startup.
 
-=head2 Previously deprecated %OVERLOAD is no longer usable
-
-Using %OVERLOAD to define overloading was deprecated in 5.003.
-Overloading is now defined using the overload pragma. %OVERLOAD is
-still used internally but should not be used by Perl scripts. See
-L<overload> for more details.
-
 =head2 Subroutine arguments created only when they're modified
 
 In Perl 5.004, nonexistent array and hash elements used as subroutine
@@ -147,13 +133,6 @@ because at least two widely-used modules depend on the old meaning of
 old (broken) way inside strings; but it generates this message as a
 warning.  And in Perl 5.005, this special treatment will cease.
 
-=head2 Fixed localization of $<digit>, $&, etc.
-
-Perl versions before 5.004 did not always properly localize the
-regex-related special variables.  Perl 5.004 does localize them, as
-the documentation has always said it should.  This may result in $1,
-$2, etc. no longer being set where existing programs use them.
-
 =head2 No resetting of $. on implicit close
 
 The documentation for Perl 5.0 has always stated that C<$.> is I<not>
@@ -168,23 +147,6 @@ return a list, and false otherwise.  In Perl 5.004, C<wantarray> can
 also return the undefined value if a subroutine's return value will
 not be used at all, which allows subroutines to avoid a time-consuming
 calculation of a return value if it isn't going to be used.
-
-=head2 C<eval EXPR> determines value of EXPR in scalar context
-
-Perl (version 5) used to determine the value of EXPR inconsistently,
-sometimes incorrectly using the surrounding context for the determination.
-Now, the value of EXPR (before being parsed by eval) is always determined in
-a scalar context.  Once parsed, it is executed as before, by providing
-the context that the scope surrounding the eval provided.  This change
-makes the behavior Perl4 compatible, besides fixing bugs resulting from
-the inconsistent behavior.  This program:
-
-    @a = qw(time now is time);
-    print eval @a;
-    print '|', scalar eval @a;
-
-used to print something like "timenowis881399109|4", but now (and in perl4)
-prints "4|4".
 
 =head2 Changes to tainting checks
 
@@ -309,7 +271,7 @@ there is no C<use English> long name for this variable.
 By default, running out of memory it is not trappable.  However, if
 compiled for this, Perl may use the contents of C<$^M> as an emergency
 pool after die()ing with this message.  Suppose that your Perl were
-compiled with -DPERL_EMERGENCY_SBRK and used Perl's malloc.  Then
+compiled with -DEMERGENCY_SBRK and used Perl's malloc.  Then
 
     $^M = 'a' x (1<<16);
 
@@ -419,9 +381,6 @@ provides seven bits of the total value, with the most significant
 first.  Bit eight of each byte is set, except for the last byte, in
 which bit eight is clear.
 
-If 'p' or 'P' are given undef as values, they now generate a NULL
-pointer.
-
 Both pack() and unpack() now fail when their templates contain invalid
 types.  (Invalid types used to be ignored.)
 
@@ -517,21 +476,6 @@ before (printed only zeros), but is fine now:
     foreach $i ( 1 .. 10 ) {
 	write;
     }
-    format =
-	my i is @#
-	$i
-    .
-
-However, it still fails (without a warning) if the foreach is within a
-subroutine:
-
-    my $i;
-    sub foo {
-      foreach $i ( 1 .. 10 ) {
-	write;
-      }
-    }
-    foo;
     format =
 	my i is @#
 	$i
@@ -673,23 +617,24 @@ possibly for cleaning up.
 
 =head2 Malloc enhancements
 
-If perl is compiled with the malloc included with the perl distribution
-(that is, if C<perl -V:d_mymalloc> is 'define') then you can print
+Four new compilation flags are recognized by malloc.c.  (They have no
+effect if perl is compiled with system malloc().)
+
+=over
+
+=item -DDEBUGGING_MSTATS
+
+If perl is compiled with C<DEBUGGING_MSTATS> defined, you can print
 memory statistics at runtime by running Perl thusly:
 
   env PERL_DEBUG_MSTATS=2 perl your_script_here
 
 The value of 2 means to print statistics after compilation and on
-exit; with a value of 1, the statistics are printed only on exit.
+exit; with a value of 1, the statistics ares printed only on exit.
 (If you want the statistics at an arbitrary time, you'll need to
 install the optional module Devel::Peek.)
 
-Three new compilation flags are recognized by malloc.c.  (They have no
-effect if perl is compiled with system malloc().)
-
-=over
-
-=item -DPERL_EMERGENCY_SBRK
+=item -DEMERGENCY_SBRK
 
 If this macro is defined, running out of memory need not be a fatal
 error: a memory pool can allocated by assigning to the special
@@ -746,8 +691,7 @@ Support for the following operating systems is new in Perl 5.004.
 
 Perl 5.004 now includes support for building a "native" perl under
 Windows NT, using the Microsoft Visual C++ compiler (versions 2.0
-and above) or the Borland C++ compiler (versions 5.02 and above).
-The resulting perl can be used under Windows 95 (if it
+and above).  The resulting perl can be used under Windows 95 (if it
 is installed in the same directory locations as it got installed
 in Windows NT).  This port includes support for perl extension
 building tools like L<MakeMaker> and L<h2xs>, so that many extensions
@@ -761,6 +705,8 @@ Cygwin32 is a set of GNU tools that make it possible to compile and run
 many UNIX programs under Windows NT by providing a mostly UNIX-like 
 interface for compilation and execution.  See L<README.cygwin32> for
 more details on this port, and how to obtain the Cygwin32 toolkit.
+This port has not been as well tested as the "native" port described
+above (which is not as well tested as we'd like either :)
 
 =head2 Plan 9
 
@@ -1180,7 +1126,7 @@ increasing order of desperation):
 
 =item "my" variable %s masks earlier declaration in same scope
 
-(W) A lexical variable has been redeclared in the same scope, effectively
+(S) A lexical variable has been redeclared in the same scope, effectively
 eliminating all access to the previous instance.  This is almost always
 a typographical error.  Note that the earlier variable will still exist
 until the end of the scope or until all closure referents to it are

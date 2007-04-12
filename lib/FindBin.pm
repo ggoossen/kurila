@@ -82,12 +82,12 @@ use File::Basename;
 %EXPORT_TAGS = (ALL => [qw($Bin $Script $RealBin $RealScript $Dir $RealDir)]);
 @ISA = qw(Exporter);
 
-$VERSION = $VERSION = sprintf("%d.%02d", q$Revision: 1.41 $ =~ /(\d+)\.(\d+)/);
+$VERSION = $VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
 
 sub is_abs_path
 {
  local $_ = shift if (@_);
- if ($^O eq 'MSWin32' || $^O eq 'dos')
+ if ($^O eq 'MSWin32')
   {
    return m#^[a-z]:[\\/]#i;
   }
@@ -131,7 +131,7 @@ BEGIN
             && -f $script)
       {
        my $dir;
-       my $pathvar = 'PATH';
+       my $pathvar = ($IsWin32) ? 'Path' : 'PATH';
 
        foreach $dir (split(/$Config{'path_sep'}/,$ENV{$pathvar}))
 	{

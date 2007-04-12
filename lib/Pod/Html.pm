@@ -199,8 +199,6 @@ my %pages = ();			# associative array used to find the location
 my %sections = ();		# sections within this page
 my %items = ();			# associative array used to find the location
 				#   of =item directives referenced by C<> links
-my $Is83;                       # is dos with short filenames (8.3)
-
 sub init_globals {
 $dircache = "pod2html-dircache";
 $itemcache = "pod2html-itemcache";
@@ -238,15 +236,12 @@ $top = 1;			# true if we are at the top of the doc.  used
 				#   to prevent the first <HR> directive.
 $paragraph = '';			# which paragraph we're processing (used
 				#   for error messages)
-%sections = ();		# sections within this page
-
-# These are not reinitialised here but are kept as a cache.
-# See get_cache and related cache management code.
-#%pages = ();			# associative array used to find the location
+%pages = ();			# associative array used to find the location
 				#   of pages referenced by L<> links.
-#%items = ();			# associative array used to find the location
+%sections = ();		# sections within this page
+%items = ();			# associative array used to find the location
 				#   of =item directives referenced by C<> links
-$Is83=$^O eq 'dos';
+
 }
 
 sub pod2html {
@@ -256,9 +251,8 @@ sub pod2html {
 
     init_globals();
 
-    $Is83 = 0 if (defined (&Dos::UseLFN) && Dos::UseLFN());
-
     # cache of %pages and %items from last time we ran pod2html
+    my $podpath = '';		
 
     #undef $opt_help if defined $opt_help;
 
@@ -287,11 +281,6 @@ sub pod2html {
     # scan the pod for =head[1-6] directives and build an index
     my $index = scan_headings(\%sections, @poddata);
 
-    unless($index) {
-	warn "No pod in $podfile\n" if $verbose;
-	return;
-    }
-
     # open the output file
     open(HTML, ">$htmlfile")
 	    || die "$0: cannot open $htmlfile file for output: $!\n";
@@ -308,19 +297,14 @@ sub pod2html {
 
 	} 
     } 
-    if (!$title and $podfile =~ /\.pod$/) {
-	# probably a split pod so take first =head[12] as title
-	for (my $i = 0; $i < @poddata; $i++) { 
-	    last if ($title) = $poddata[$i] =~ /^=head[12]\s*(.*)/;
-	} 
-	warn "adopted '$title' as title for $podfile\n"
-	    if $verbose and $title;
-    } 
     unless ($title) { 
-	warn "$0: no title for $podfile";
 	$podfile =~ /^(.*)(\.[^.\/]+)?$/;
 	$title = ($podfile eq "-" ? 'No Title' : $1);
-	warn "using $title" if $verbose;
+		warn "found $title" if $verbose;
+    }
+    if ($title =~ /\.pm/) {
+	warn "$0: no title for $podfile";
+	$title = $podfile;
     }
     print HTML <<END_OF_HEAD;
     <HTML> 
@@ -332,8 +316,20 @@ sub pod2html {
 
 END_OF_HEAD
 
-    # load/reload/validate/cache %pages and %items
-    get_cache($dircache, $itemcache, \@podpath, $podroot, $recurse);
+    # load a cache of %pages and %items if possible.  $tests will be
+    #  non-zero if successful.
+    my $tests = 0;
+    if (-f $dircache && -f $itemcache) {
+	warn "scanning for item cache\n" if $verbose;
+	$tests = find_cache($dircache, $itemcache, $podpath, $podroot);
+    }
+
+    # if we didn't succeed in loading the cache then we must (re)build
+    #  %pages and %items.
+    if (!$tests) {
+	warn "scanning directories in pod-path\n" if $verbose;
+	scan_podpath($podroot, $recurse);
+    }
 
     # scan the pod for =item directives
     scan_items("", \%items, @poddata);
@@ -496,51 +492,12 @@ sub parse_command_line {
     $netscape = $opt_netscape if defined $opt_netscape;
 }
 
-
-my $saved_cache_key;
-
-sub get_cache {
-    my($dircache, $itemcache, $podpath, $podroot, $recurse) = @_;
-    my @cache_key_args = @_;
-
-    # A first-level cache:
-    # Don't bother reading the cache files if they still apply
-    # and haven't changed since we last read them.
-
-    my $this_cache_key = cache_key(@cache_key_args);
-
-    return if $saved_cache_key and $this_cache_key eq $saved_cache_key;
-
-    # load the cache of %pages and %items if possible.  $tests will be
-    # non-zero if successful.
-    my $tests = 0;
-    if (-f $dircache && -f $itemcache) {
-	warn "scanning for item cache\n" if $verbose;
-	$tests = load_cache($dircache, $itemcache, $podpath, $podroot);
-    }
-
-    # if we didn't succeed in loading the cache then we must (re)build
-    #  %pages and %items.
-    if (!$tests) {
-	warn "scanning directories in pod-path\n" if $verbose;
-	scan_podpath($podroot, $recurse, 0);
-    }
-    $saved_cache_key = cache_key(@cache_key_args);
-}
-
-sub cache_key {
-    my($dircache, $itemcache, $podpath, $podroot, $recurse) = @_;
-    return join('!', $dircache, $itemcache, $recurse,
-		@$podpath, $podroot, stat($dircache), stat($itemcache));
-}
-
 #
-# load_cache - tries to find if the caches stored in $dircache and $itemcache
+# find_cache - tries to find if the caches stored in $dircache and $itemcache
 #  are valid caches of %pages and %items.  if they are valid then it loads
 #  them and returns a non-zero value.
 #
-
-sub load_cache {
+sub find_cache {
     my($dircache, $itemcache, $podpath, $podroot) = @_;
     my($tests);
     local $_;
@@ -554,7 +511,7 @@ sub load_cache {
     # is it the same podpath?
     $_ = <CACHE>;
     chomp($_);
-    $tests++ if (join(":", @$podpath) eq $_);
+    $tests++ if (join(":", @podpath) eq $_);
 
     # is it the same podroot?
     $_ = <CACHE>;
@@ -564,6 +521,8 @@ sub load_cache {
     # load the cache if its good
     if ($tests != 2) {
 	close(CACHE);
+
+	%items = ();
 	return 0;
     }
 
@@ -583,7 +542,7 @@ sub load_cache {
     # is it the same podpath?
     $_ = <CACHE>;
     chomp($_);
-    $tests++ if (join(":", @$podpath) eq $_);
+    $tests++ if (join(":", @podpath) eq $_);
 
     # is it the same podroot?
     $_ = <CACHE>;
@@ -593,6 +552,9 @@ sub load_cache {
     # load the cache if its good
     if ($tests != 2) {
 	close(CACHE);
+
+	%pages = ();
+	%items = ();
 	return 0;
     }
 
@@ -613,14 +575,9 @@ sub load_cache {
 #  @libpods for =item directives.
 #
 sub scan_podpath {
-    my($podroot, $recurse, $append) = @_;
+    my($podroot, $recurse) = @_;
     my($pwd, $dir);
     my($libpod, $dirname, $pod, @files, @poddata);
-
-    unless($append) {
-	%items = ();
-	%pages = ();
-    }
 
     # scan each directory listed in @podpath
     $pwd = getcwd();
@@ -765,7 +722,7 @@ sub scan_headings {
     # scan for =head directives, note their name, and build an index
     #  pointing to each of them.
     foreach my $line (@data) {
-	if ($line =~ /^=(head)([1-6])\s+(.*)/) {
+	if ($line =~ /^\s*=(head)([1-6])\s+(.*)/) {
 	    ($tag,$which_head, $title) = ($1,$2,$3);
 	    chomp($title);
 	    $$sections{htmlify(0,$title)} = 1;
@@ -792,7 +749,7 @@ sub scan_headings {
     # get rid of bogus lists
     $index =~ s,\t*<UL>\s*</UL>\n,,g;
 
-    $ignore = 1;	# restore old value;
+    $ignore = 1;	# retore old value;
 
     return $index;
 }
@@ -959,7 +916,7 @@ sub process_over {
 # process_back - process a pod back tag and convert it to HTML format.
 #
 sub process_back {
-    warn "$0: $podfile: unexpected =back directive in paragraph $paragraph.  ignoring.\n"
+    warn "$0: $podfile: unexpected =back directive in paragraph $paragraph.  ignorning.\n"
 	unless $listlevel;
     return unless $listlevel;
 
@@ -1067,8 +1024,6 @@ sub process_text {
 		  }{
 		    if (defined $pages{$2}) {	# is a link
 			qq($1<A HREF="$htmlroot/$pages{$2}">$2</A>);
-		    } elsif (defined $pages{dosify($2)}) {	# is a link
-			qq($1<A HREF="$htmlroot/$pages{dosify($2)}">$2</A>);
 		    } else {
 			"$1$2";
 		    }
@@ -1315,19 +1270,6 @@ sub pre_escape {
 }
 
 #
-# dosify - convert filenames to 8.3
-#
-sub dosify {
-    my($str) = @_;
-    if ($Is83) {
-        $str = lc $str;
-        $str =~ s/(\.\w+)/substr ($1,0,4)/ge;
-        $str =~ s/(\w+)/substr ($1,0,8)/ge;
-    }
-    return $str;
-}
-
-#
 # process_L - convert a pod L<> directive to a corresponding HTML link.
 #  most of the links made are inferred rather than known about directly
 #  (i.e it's not known whether the =head\d section exists in the target file,
@@ -1339,7 +1281,7 @@ sub dosify {
 #
 sub process_L {
     my($str) = @_;
-    my($s1, $s2, $linktext, $page, $page83, $section, $link);	# work strings
+    my($s1, $s2, $linktext, $page, $section, $link);	# work strings
 
     $str =~ s/\n/ /g;			# undo word-wrapped tags
     $s1 = $str;
@@ -1365,8 +1307,6 @@ sub process_L {
 	}
     }
 
-    $page83=dosify($page);
-    $page=$page83 if (defined $pages{$page83});
     if ($page eq "") {
 	$link = "#" . htmlify(0,$section);
 	$linktext = $section;

@@ -69,8 +69,7 @@ import IO::Handle grep { !defined(&$_) } @EXPORT, @EXPORT_OK;
 sub import {
     my $pkg = shift;
     my $callpkg = caller;
-    require Exporter;
-    Exporter::export($pkg, $callpkg, @_);
+    Exporter::export $pkg, $callpkg, @_;
 
     #
     # If the Fcntl extension is available,
@@ -78,7 +77,7 @@ sub import {
     #
     eval {
 	require Fcntl;
-	Exporter::export('Fcntl', $callpkg);
+	Exporter::export 'Fcntl', $callpkg;
     };
 }
 
@@ -93,11 +92,6 @@ sub pipe {
     CORE::pipe($r, $w) or return undef;
     ($r, $w);
 }
-
-# Rebless standard file handles
-bless *STDIN{IO},  "FileHandle" if ref *STDIN{IO}  eq "IO::Handle";
-bless *STDOUT{IO}, "FileHandle" if ref *STDOUT{IO} eq "IO::Handle";
-bless *STDERR{IO}, "FileHandle" if ref *STDERR{IO} eq "IO::Handle";
 
 1;
 

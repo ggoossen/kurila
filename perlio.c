@@ -26,7 +26,7 @@
 #ifdef PERLIO_IS_STDIO 
 
 void
-PerlIO_init(void)
+PerlIO_init()
 {
  /* Does nothing (yet) except force this file to be included 
     in perl binary. That allows this file to force inclusion
@@ -37,7 +37,7 @@ PerlIO_init(void)
 
 #undef PerlIO_tmpfile
 PerlIO *
-PerlIO_tmpfile(void)
+PerlIO_tmpfile()
 {
  return tmpfile();
 }
@@ -360,11 +360,7 @@ PerlIO *f;
 #ifdef HAS_SETLINEBUF
     setlinebuf(f);
 #else
-#  ifdef __BORLANDC__ /* Borland doesn't like NULL size for _IOLBF */
-    setvbuf(f, Nullch, _IOLBF, BUFSIZ);
-#  else
     setvbuf(f, Nullch, _IOLBF, 0);
-#  endif
 #endif
 }
 
@@ -610,7 +606,11 @@ char *pat, *args;
 
 #ifndef PerlIO_vsprintf
 int 
-PerlIO_vsprintf(char *s, int n, const char *fmt, va_list ap)
+PerlIO_vsprintf(s,n,fmt,ap)
+char *s;
+const char *fmt;
+int n;
+va_list ap;
 {
  int val = vsprintf(s, fmt, ap);
  if (n >= 0)

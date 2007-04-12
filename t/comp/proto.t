@@ -16,7 +16,7 @@ BEGIN {
 
 use strict;
 
-print "1..80\n";
+print "1..74\n";
 
 my $i = 1;
 
@@ -362,44 +362,16 @@ printf "ok %d\n",$i++;
 ##
 ##
 
-testing \&array_ref_plus, '\@@';
+testing \&an_array_ref, '\@';
 
-sub array_ref_plus (\@@) {
+sub an_array_ref (\@) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ == 2 && ref($_[0]) && 1 == @{$_[0]} && $_[1] eq 'x';
+    print "not " unless ref($_[0]) && 1 == @{$_[0]};
     printf "ok %d\n",$i++;
     @{$_[0]} = (qw(ok)," ",$i++,"\n");
 }
 
 @array = ('a');
-{ my @more = ('x');
-  array_ref_plus @array, @more; }
+an_array_ref @array;
 print "not " unless @array == 4;
 print @array;
-
-my $p;
-print "not " if defined prototype('CORE::print');
-print "ok ", $i++, "\n";
-
-print "not " if defined prototype('CORE::system');
-print "ok ", $i++, "\n";
-
-print "# CORE::open => ($p)\nnot " if ($p = prototype('CORE::open')) ne '*;$';
-print "ok ", $i++, "\n";
-
-print "# CORE:Foo => ($p), \$@ => `$@'\nnot " 
-    if defined ($p = eval { prototype('CORE::Foo') or 1 }) or $@ !~ /^Cannot find an opnumber/;
-print "ok ", $i++, "\n";
-
-# correctly note too-short parameter lists that don't end with '$',
-#  a possible regression.
-
-sub foo1 ($\@);
-eval q{ foo1 "s" };
-print "not " unless $@ =~ /^Not enough/;
-print "ok ", $i++, "\n";
-
-sub foo2 ($\%);
-eval q{ foo2 "s" };
-print "not " unless $@ =~ /^Not enough/;
-print "ok ", $i++, "\n";
