@@ -5,15 +5,13 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the same terms as Perl itself.
  *
- * For systems that do not have the poll() system call (for example Linux
- * kernels < v2.1.23) try to emulate it as closely as possible using select()
+ * For systems that do not have the poll() system call (for example Linux)
+ * try to emulate it as closely as possible using select()
  *
  */
 
 #include "EXTERN.h"
 #include "perl.h"
-#include "XSUB.h"
-
 #include "poll.h"
 #ifdef I_SYS_TIME
 # include <sys/time.h>
@@ -28,12 +26,6 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-#ifdef HAS_SELECT
-#ifdef I_SYS_SELECT
-#include <sys/select.h>
-#endif
-#endif
-
 #ifdef EMULATE_POLL_WITH_SELECT
 
 # define POLL_CAN_READ	(POLLIN | POLLRDNORM )
@@ -43,7 +35,10 @@
 # define POLL_EVENTS_MASK (POLL_CAN_READ | POLL_CAN_WRITE | POLL_HAS_EXCP)
 
 int
-poll(struct pollfd *fds, unsigned long nfds, int timeout)
+poll(fds, nfds, timeout)
+struct pollfd *fds;
+unsigned long nfds;
+int timeout;
 {
     int i,err;
     fd_set rfd,wfd,efd,ifd;
@@ -60,7 +55,7 @@ again:
     FD_ZERO(&wfd);
     FD_ZERO(&efd);
 
-    for(i = 0 ; i < (int)nfds ; i++) {
+    for(i = 0 ; i < nfds ; i++) {
 	int events = fds[i].events;
 	int fd = fds[i].fd;
 
@@ -107,7 +102,7 @@ again:
 
     count = 0;
 
-    for(i = 0 ; i < (int)nfds ; i++) {
+    for(i = 0 ; i < nfds ; i++) {
 	int revents = (fds[i].events & POLL_EVENTS_MASK);
 	int fd = fds[i].fd;
 

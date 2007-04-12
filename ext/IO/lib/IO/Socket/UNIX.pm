@@ -7,14 +7,13 @@
 package IO::Socket::UNIX;
 
 use strict;
-our(@ISA, $VERSION);
+use vars qw(@ISA $VERSION);
 use IO::Socket;
 use Socket;
 use Carp;
 
 @ISA = qw(IO::Socket);
-$VERSION = "1.20_00";
-$VERSION = eval $VERSION;
+$VERSION = "1.20";
 
 IO::Socket::UNIX->register_domain( AF_UNIX );
 
@@ -38,7 +37,7 @@ sub configure {
 	$sock->bind($addr) or
 	    return undef;
     }
-    if(exists $arg->{Listen} && $type != SOCK_DGRAM) {
+    if(exists $arg->{Listen}) {
 	$sock->listen($arg->{Listen} || 5) or
 	    return undef;
     }
@@ -104,7 +103,7 @@ be a C<Peer> specification.
 
 
  NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-
+ 
 As of VERSION 1.18 all IO::Socket objects have autoflush turned on
 by default. This was not the case with earlier releases.
 
@@ -132,8 +131,7 @@ L<Socket>, L<IO::Socket>
 
 =head1 AUTHOR
 
-Graham Barr. Currently maintained by the Perl Porters.  Please report all
-bugs to <perl5-porters@perl.org>.
+Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 
 =head1 COPYRIGHT
 
