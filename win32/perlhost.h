@@ -32,6 +32,13 @@ extern CPerlObj *pPerl;
 	err = errno;\
     return ret;
 
+extern int		g_closedir(DIR *dirp);
+extern DIR *		g_opendir(char *filename);
+extern struct direct *	g_readdir(DIR *dirp);
+extern void		g_rewinddir(DIR *dirp);
+extern void		g_seekdir(DIR *dirp, long loc);
+extern long		g_telldir(DIR *dirp);
+
 class CPerlDir : public IPerlDir
 {
 public:
@@ -50,27 +57,27 @@ public:
     };
     virtual int Close(DIR *dirp, int &err)
     {
-	return win32_closedir(dirp);
+	return g_closedir(dirp);
     };
     virtual DIR *Open(char *filename, int &err)
     {
-	return win32_opendir(filename);
+	return g_opendir(filename);
     };
     virtual struct direct *Read(DIR *dirp, int &err)
     {
-	return win32_readdir(dirp);
+	return g_readdir(dirp);
     };
     virtual void Rewind(DIR *dirp, int &err)
     {
-	win32_rewinddir(dirp);
+	g_rewinddir(dirp);
     };
     virtual void Seek(DIR *dirp, long loc, int &err)
     {
-	win32_seekdir(dirp, loc);
+	g_seekdir(dirp, loc);
     };
     virtual long Tell(DIR *dirp, int &err)
     {
-	return win32_telldir(dirp);
+	return g_telldir(dirp);
     };
 };
 
