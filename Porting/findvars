@@ -11,17 +11,15 @@ chop $pat if $pat =~ /\|$/;
 
 # grep
 while (<>) {
-    print "$ARGV\:$.\:$_" if s/\b($pat)\b/#$1#/og;
-# this variant might useful if the transformation is more complicated
-#    if (/^(.*?)\b($pat)\b(.*)$/o) {
-#        my $head = "$1#$2#";
-#        $_ = $3;
-#        while (/^(.*?)\b($pat)\b(.*)$/o) {
-#            $head .= "$1#$2#";
-#            $_ = $3;
-#        }
-#	print "$ARGV\:$.\:$head$_\n";
-#    }
+    if (/^(.*?)\b($pat)\b(.*)$/o) {
+        my $head = "$1#$2#";
+        $_ = $3;
+        while (/^(.*?)\b($pat)\b(.*)$/o) {
+            $head .= "$1#$2#";
+            $_ = $3;
+        }
+	print "$ARGV\:$.\:$head$_\n";
+    }
 }
 continue {
     close ARGV if eof;
@@ -212,6 +210,7 @@ nice_chunk
 nice_chunk_size
 ninterps
 nomemok
+nrs
 nthreads
 nthreads_cond
 numeric_local
@@ -239,6 +238,7 @@ osname
 pad_reset_pending
 padix
 padix_floor
+parsehook
 patchlevel
 patleave
 pending_ident
