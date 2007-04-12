@@ -51,7 +51,7 @@ PERLVAR(Istatusvalue,	I32)		/* $? */
 PERLVAR(Istatusvalue_vms,	U32)		
 #endif
 
-PERLVAR(Istatcache,	Stat_t)	/* _ */
+PERLVAR(Istatcache,	struct stat)	/* _ */
 PERLVAR(Istatgv,	GV *)		
 PERLVARI(Istatname,	SV *,	Nullsv)	
 
@@ -156,5 +156,4 @@ PERLVAR(Iofmt,		char *)		/* $# */
 
 #ifdef USE_THREADS
 PERLVAR(Ithrsv,		SV *)		/* holds struct perl_thread for main thread */
-PERLVARI(Ithreadnum,	U32,	0)	/* incremented each thread creation */
 #endif /* USE_THREADS */

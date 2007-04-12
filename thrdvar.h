@@ -30,7 +30,7 @@ PERLVAR(Tmarkstack_max,	I32 *)
 
 PERLVAR(TSv,		SV *)		
 PERLVAR(TXpv,		XPV *)		
-PERLVAR(Tstatbuf,	Stat_t)		
+PERLVAR(Tstatbuf,	struct stat)		
 #ifdef HAS_TIMES
 PERLVAR(Ttimesbuf,	struct tms)		
 #endif
@@ -66,7 +66,7 @@ PERLVARI(Tcurcop,	COP * VOL,	&compiling)
 PERLVAR(Tin_eval,	VOL int)	/* trap "fatal" errors? */
 PERLVAR(Tdelaymagic,	int)		/* ($<,$>) = ... */
 PERLVAR(Tdirty,		bool)		/* In the middle of tearing things down? */
-PERLVAR(Tlocalizing,	int)		/* are we processing a local() list? */
+PERLVAR(Tlocalizing,	U8)		/* are we processing a local() list? */
 
 PERLVAR(Tcxstack,	PERL_CONTEXT *)		
 PERLVARI(Tcxstack_ix,	I32,	-1)	
@@ -87,7 +87,6 @@ PERLVAR(cvcache,	HV *)
 PERLVAR(self,		perl_os_thread)		/* Underlying thread object */
 PERLVAR(flags,		U32)		
 PERLVAR(threadsv,	AV *)			/* Per-thread SVs ($_, $@ etc.) */
-PERLVAR(threadsvp,	SV **)			/* AvARRAY(threadsv) */
 PERLVAR(specific,	AV *)			/* Thread-specific user data */
 PERLVAR(errsv,		SV *)			/* Backing SV for $@ */
 PERLVAR(errhv,		HV *)			/* HV for what was %@ in pp_ctl.c */
