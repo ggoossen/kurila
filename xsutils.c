@@ -1,18 +1,3 @@
-/*    xsutils.c
- *
- *    Copyright (c) 1999-2002, Larry Wall
- *
- *    You may distribute under the terms of either the GNU General Public
- *    License or the Artistic License, as specified in the README file.
- *
- */
-
-/*
- * "Perilous to us all are the devices of an art deeper than we possess
- * ourselves." --Gandalf
- */
-
-
 #include "EXTERN.h"
 #define PERL_IN_XSUTILS_C
 #include "perl.h"
@@ -21,39 +6,8 @@
  * Contributed by Spider Boardman (spider.boardman@orb.nashua.nh.us).
  */
 
-/* package attributes; */
-void XS_attributes__warn_reserved(pTHX_ CV *cv);
-void XS_attributes_reftype(pTHX_ CV *cv);
-void XS_attributes__modify_attrs(pTHX_ CV *cv);
-void XS_attributes__guess_stash(pTHX_ CV *cv);
-void XS_attributes__fetch_attrs(pTHX_ CV *cv);
-void XS_attributes_bootstrap(pTHX_ CV *cv);
-
-
-/*
- * Note that only ${pkg}::bootstrap definitions should go here.
- * This helps keep down the start-up time, which is especially
- * relevant for users who don't invoke any features which are
- * (partially) implemented here.
- *
- * The various bootstrap definitions can take care of doing
- * package-specific newXS() calls.  Since the layout of the
- * bundled *.pm files is in a version-specific directory,
- * version checks in these bootstrap calls are optional.
- */
-
-void
-Perl_boot_core_xsutils(pTHX)
-{
-    char *file = __FILE__;
-
-    newXS("attributes::bootstrap",	XS_attributes_bootstrap,	file);
-}
-
-#include "XSUB.h"
-
-static int
-modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
+STATIC int
+S_modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
 {
     SV *attr;
     char *name;
@@ -63,7 +17,7 @@ modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
 
     for (nret = 0 ; numattrs && (attr = *attrlist++); numattrs--) {
 	name = SvPV(attr, len);
-	if ((negated = (*name == '-'))) {
+	if (negated = (*name == '-')) {
 	    name++;
 	    len--;
 	}
@@ -99,44 +53,12 @@ modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
 			continue;
 		    }
 		    break;
-		case 'u':
-		    if (strEQ(name, "unique")) {
-			if (negated)
-			    GvUNIQUE_off(CvGV((CV*)sv));
-			else
-			    GvUNIQUE_on(CvGV((CV*)sv));
-			continue;
-		    }
-		    break;
 		}
 		break;
 	    }
 	    break;
 	default:
-	    switch ((int)len) {
-	    case 6:
-		switch (*name) {
-		case 's':
-		    if (strEQ(name, "shared")) {
-			if (negated)
-			    Perl_croak(aTHX_ "A variable may not be unshared");
-			SvSHARE(sv);
-                        continue;
-                    }
-		    break;
-		case 'u':
-		    if (strEQ(name, "unique")) {
-			if (SvTYPE(sv) == SVt_PVGV) {
-			    if (negated)
-				GvUNIQUE_off(sv);
-			    else
-				GvUNIQUE_on(sv);
-			}
-			/* Hope this came from toke.c if not a GV. */
-                        continue;
-                    }
-                }
-            }
+	    /* nothing, yet */
 	    break;
 	}
 	/* anything recognized had a 'continue' above */
@@ -148,6 +70,40 @@ modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
 }
 
 
+/* package attributes; */
+void XS_attributes__warn_reserved(pTHXo_ CV *cv);
+void XS_attributes_reftype(pTHXo_ CV *cv);
+void XS_attributes__modify_attrs(pTHXo_ CV *cv);
+void XS_attributes__guess_stash(pTHXo_ CV *cv);
+void XS_attributes__fetch_attrs(pTHXo_ CV *cv);
+void XS_attributes_bootstrap(pTHXo_ CV *cv);
+
+
+/*
+ * Note that only ${pkg}::bootstrap definitions should go here.
+ * This helps keep down the start-up time, which is especially
+ * relevant for users who don't invoke any features which are
+ * (partially) implemented here.
+ *
+ * The various bootstrap definitions can take care of doing
+ * package-specific newXS() calls.  Since the layout of the
+ * bundled lib/*.pm files is in a version-specific directory,
+ * version checks in these bootstrap calls are optional.
+ */
+
+void
+Perl_boot_core_xsutils(pTHX)
+{
+    char *file = __FILE__;
+
+    newXS("attributes::bootstrap",	XS_attributes_bootstrap,	file);
+}
+
+#ifdef PERL_OBJECT
+#define NO_XSLOCKS
+#endif  /* PERL_OBJECT */
+
+#include "XSUB.h"
 
 /* package attributes; */
 
@@ -155,9 +111,6 @@ XS(XS_attributes_bootstrap)
 {
     dXSARGS;
     char *file = __FILE__;
-
-    if( items > 1 )
-        Perl_croak(aTHX_ "Usage: attributes::bootstrap $module");
 
     newXSproto("attributes::_warn_reserved", XS_attributes__warn_reserved, file, "");
     newXS("attributes::_modify_attrs",	XS_attributes__modify_attrs,	file);
@@ -184,7 +137,7 @@ usage:
 	goto usage;
     sv = SvRV(rv);
     if (items > 1)
-	XSRETURN(modify_SV_attributes(aTHX_ sv, &ST(0), &ST(1), items-1));
+	XSRETURN(modify_SV_attributes(sv, &ST(0), &ST(1), items-1));
 
     XSRETURN(0);
 }
@@ -218,12 +171,6 @@ usage:
 #endif
 	if (cvflags & CVf_METHOD)
 	    XPUSHs(sv_2mortal(newSVpvn("method", 6)));
-        if (GvUNIQUE(CvGV((CV*)sv)))
-	    XPUSHs(sv_2mortal(newSVpvn("unique", 6)));
-	break;
-    case SVt_PVGV:
-	if (GvUNIQUE(sv))
-	    XPUSHs(sv_2mortal(newSVpvn("unique", 6)));
 	break;
     default:
 	break;
@@ -264,17 +211,18 @@ usage:
 	HV *stash = Nullhv;
 	switch (SvTYPE(sv)) {
 	case SVt_PVCV:
-	    if (CvGV(sv) && isGV(CvGV(sv)) && GvSTASH(CvGV(sv)))
+	    if (CvGV(sv) && isGV(CvGV(sv)) && GvSTASH(CvGV(sv)) &&
+			    HvNAME(GvSTASH(CvGV(sv))))
 		stash = GvSTASH(CvGV(sv));
-	    else if (/* !CvANON(sv) && */ CvSTASH(sv))
+	    else if (/* !CvANON(sv) && */ CvSTASH(sv) && HvNAME(CvSTASH(sv)))
 		stash = CvSTASH(sv);
 	    break;
 	case SVt_PVMG:
-	    if (!(SvFAKE(sv) && SvTIED_mg(sv, PERL_MAGIC_glob)))
+	    if (!(SvFAKE(sv) && SvTIED_mg(sv, '*')))
 		break;
 	    /*FALLTHROUGH*/
 	case SVt_PVGV:
-	    if (GvGP(sv) && GvESTASH((GV*)sv))
+	    if (GvGP(sv) && GvESTASH((GV*)sv) && HvNAME(GvESTASH((GV*)sv)))
 		stash = GvESTASH((GV*)sv);
 	    break;
 	default:
@@ -308,9 +256,11 @@ usage:
 
     rv = ST(0);
     ST(0) = TARG;
-    if (SvGMAGICAL(rv))
-	mg_get(rv);
-    if (!(SvOK(rv) && SvROK(rv)))
+    if (!SvOK(rv)) {
+	ST(0) = &PL_sv_no;
+	XSRETURN(1);
+    }
+    if (!SvROK(rv))
 	goto usage;
     sv = SvRV(rv);
     sv_setpv(TARG, sv_reftype(sv, 0));
@@ -324,6 +274,7 @@ usage:
 XS(XS_attributes__warn_reserved)
 {
     dXSARGS;
+    SV *rv, *sv;
 #ifdef dXSTARGET
     dXSTARGET;
 #else

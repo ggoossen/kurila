@@ -1,10 +1,9 @@
 package attributes;
 
-our $VERSION = 0.05;
+$VERSION = 0.01;
 
-@EXPORT_OK = qw(get reftype);
-@EXPORT = ();
-%EXPORT_TAGS = (ALL => [@EXPORT, @EXPORT_OK]);
+#@EXPORT_OK = qw(get reftype);
+#@EXPORT = ();
 
 use strict;
 
@@ -27,13 +26,11 @@ sub carp {
 #
 # The extra trips through newATTRSUB in the interpreter wipe out any savings
 # from avoiding the BEGIN block.  Just do the bootstrap now.
-BEGIN { bootstrap attributes }
+BEGIN { bootstrap }
 
 sub import {
-    @_ > 2 && ref $_[2] or do {
-	require Exporter;
-	goto &Exporter::import;
-    };
+    @_ > 2 && ref $_[2] or
+	croak 'Usage: use '.__PACKAGE__.' $home_stash, $ref, @attrlist';
     my (undef,$home_stash,$svref,@attrs) = @_;
 
     my $svtype = uc reftype($svref);
@@ -54,7 +51,7 @@ sub import {
 		my $s = ((@pkgattrs == 1) ? '' : 's');
 		carp "$svtype package attribute$s " .
 		    "may clash with future reserved word$s: " .
-		    join(' : ' , @pkgattrs);
+		    join(' , ' , @pkgattrs);
 	    }
 	}
     }
@@ -65,7 +62,7 @@ sub import {
 	croak "Invalid $svtype attribute" .
 	    (( @badattrs == 1 ) ? '' : 's') .
 	    ": " .
-	    join(' : ', @badattrs);
+	    join(' , ', @badattrs);
     }
 }
 
@@ -85,7 +82,12 @@ sub get ($) {
 	;
 }
 
-sub require_version { goto &UNIVERSAL::VERSION }
+#sub export {
+#    require Exporter;
+#    goto &Exporter::import;
+#}
+#
+#sub require_version { goto &UNIVERSAL::VERSION }
 
 1;
 __END__
@@ -98,14 +100,11 @@ attributes - get/set subroutine or variable attributes
 =head1 SYNOPSIS
 
   sub foo : method ;
-  my ($x,@y,%z) : Bent = 1;
+  my ($x,@y,%z) : Bent ;
   my $s = sub : method { ... };
 
   use attributes ();	# optional, to get subroutine declarations
   my @attrlist = attributes::get(\&foo);
-
-  use attributes 'get'; # import the attributes::get subroutine
-  my @attrlist = get \&foo;
 
 =head1 DESCRIPTION
 
@@ -113,25 +112,22 @@ Subroutine declarations and definitions may optionally have attribute lists
 associated with them.  (Variable C<my> declarations also may, but see the
 warning below.)  Perl handles these declarations by passing some information
 about the call site and the thing being declared along with the attribute
-list to this module.  In particular, the first example above is equivalent to
+list to this module.  In particular, first example above is equivalent to
 the following:
 
     use attributes __PACKAGE__, \&foo, 'method';
 
 The second example in the synopsis does something equivalent to this:
 
-    use attributes ();
-    my ($x,@y,%z);
-    attributes::->import(__PACKAGE__, \$x, 'Bent');
-    attributes::->import(__PACKAGE__, \@y, 'Bent');
-    attributes::->import(__PACKAGE__, \%z, 'Bent');
-    ($x,@y,%z) = 1;
+    use attributes __PACKAGE__, \$x, 'Bent';
+    use attributes __PACKAGE__, \@y, 'Bent';
+    use attributes __PACKAGE__, \%z, 'Bent';
 
-Yes, that's a lot of expansion.
+Yes, that's three invocations.
 
-B<WARNING>: attribute declarations for variables are still evolving.
-The semantics and interfaces of such declarations could change in
-future versions.  They are present for purposes of experimentation
+B<WARNING>: attribute declarations for variables are an I<experimental>
+feature.  The semantics of such declarations could change or be removed
+in future versions.  They are present for purposes of experimentation
 with what the semantics ought to be.  Do not rely on the current
 implementation of this feature.
 
@@ -140,22 +136,12 @@ directly by this module, depending on how you look at it.)  However,
 package-specific attributes are allowed by an extension mechanism.
 (See L<"Package-specific Attribute Handling"> below.)
 
-The setting of subroutine attributes happens at compile time.
-Variable attributes in C<our> declarations are also applied at compile time.
-However, C<my> variables get their attributes applied at run-time.
-This means that you have to I<reach> the run-time component of the C<my>
-before those attributes will get applied.  For example:
-
-    my $x : Bent = 42 if 0;
-
-will neither assign 42 to $x I<nor> will it apply the C<Bent> attribute
-to the variable.
-
-An attempt to set an unrecognized attribute is a fatal error.  (The
-error is trappable, but it still stops the compilation within that
-C<eval>.)  Setting an attribute with a name that's all lowercase
-letters that's not a built-in attribute (such as "foo") will result in
-a warning with B<-w> or C<use warnings 'reserved'>.
+The setting of attributes happens at compile time.  An attempt to set
+an unrecognized attribute is a fatal error.  (The error is trappable, but
+it still stops the compilation within that C<eval>.)  Setting an attribute
+with a name that's all lowercase letters that's not a built-in attribute
+(such as "foo")
+will result in a warning with B<-w> or C<use warnings 'reserved'>.
 
 =head2 Built-in Attributes
 
@@ -182,15 +168,9 @@ This has a meaning when taken together with the B<locked> attribute,
 as described there.  It also means that a subroutine so marked
 will not trigger the "Ambiguous call resolved as CORE::%s" warning.
 
-=item lvalue
-
-Indicates that the referenced subroutine is a valid lvalue and can
-be assigned to. The subroutine must return a modifiable value such
-as a scalar variable, as described in L<perlsub>.
-
 =back
 
-For global variables there is C<unique> attribute: see L<perlfunc/our>.
+There are no built-in attributes for anything other than subroutines.
 
 =head2 Available Subroutines
 
@@ -207,7 +187,7 @@ empty.  If passed invalid arguments, it uses die() (via L<Carp::croak|Carp>)
 to raise a fatal exception.  If it can find an appropriate package name
 for a class method lookup, it will include the results from a
 C<FETCH_I<type>_ATTRIBUTES> call in its return list, as described in
-L<"Package-specific Attribute Handling"> below.
+L"Package-specific Attribute Handling"> below.
 Otherwise, only L<built-in attributes|"Built-in Attributes"> will be returned.
 
 =item reftype
@@ -216,11 +196,13 @@ This routine expects a single parameter--a reference to a subroutine or
 variable.  It returns the built-in type of the referenced variable,
 ignoring any package into which it might have been blessed.
 This can be useful for determining the I<type> value which forms part of
-the method names described in L<"Package-specific Attribute Handling"> below.
+the method names described in L"Package-specific Attribute Handling"> below.
 
 =back
 
-Note that these routines are I<not> exported by default.
+Note that these routines are I<not> exported.  This is primarily because
+the C<use> mechanism which would normally import them is already in use
+by Perl itself to implement the C<sub : attributes> syntax.
 
 =head2 Package-specific Attribute Handling
 
@@ -286,8 +268,7 @@ will use that package name.
 =head2 Syntax of Attribute Lists
 
 An attribute list is a sequence of attribute specifications, separated by
-whitespace or a colon (with optional whitespace).
-Each attribute specification is a simple
+whitespace, commas, or both.  Each attribute specification is a simple
 name, optionally followed by a parenthesised parameter list.
 If such a parameter list is present, it is scanned past as for the rules
 for the C<q()> operator.  (See L<perlop/"Quote and Quote-like Operators">.)
@@ -295,8 +276,8 @@ The parameter list is passed as it was found, however, and not as per C<q()>.
 
 Some examples of syntactically valid attribute lists:
 
-    switch(10,foo(7,3))  :  expensive
-    Ugly('\(") :Bad
+    switch(10,foo(7,3)) , ,  expensive
+    Ugly('\(") , Bad
     _5x5
     locked method
 
@@ -306,21 +287,7 @@ Some examples of syntactically invalid attribute lists (with annotation):
     Ugly('(')			# ()-string not balanced
     5x5				# "5x5" not a valid identifier
     Y2::north			# "Y2::north" not a simple identifier
-    foo + bar			# "+" neither a colon nor whitespace
-
-=head1 EXPORTS
-
-=head2 Default exports
-
-None.
-
-=head2 Available exports
-
-The routines C<get> and C<reftype> are exportable.
-
-=head2 Export tags defined
-
-The C<:ALL> tag will get all of the above exports.
+    foo + bar			# "+" neither a comma nor whitespace
 
 =head1 EXAMPLES
 
@@ -342,8 +309,7 @@ Code:
 
 Effect:
 
-    use attributes ();
-    attributes::->import(Canine => \$spot, "Watchful");
+    use attributes Canine => \$spot, "Watchful";
 
 =item 2.
 
@@ -354,8 +320,7 @@ Code:
 
 Effect:
 
-    use attributes ();
-    attributes::->import(Felis => \$cat, "Nervous");
+    use attributes Felis => \$cat, "Nervous";
 
 =item 3.
 
