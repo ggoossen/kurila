@@ -1,10 +1,8 @@
-use 5.006_001;			# for (defined ref) and $#$v and our
+require 5.005;			# For (defined ref) and $#$v
 package Dumpvalue;
 use strict;
-our $VERSION = '1.11';
-our(%address, $stab, @stab, %stab, %subs);
+use vars qw(%address *stab %subs);
 
-# documentation nits, handle complex data structures better by chromatic
 # translate control chars to ^X - Randal Schwartz
 # Modifications to print types by Peter Gordon v1.0
 
@@ -93,7 +91,7 @@ sub stringify {
   { no strict 'refs';
     $_ = &{'overload::StrVal'}($_)
       if $self->{bareStringify} and ref $_
-	and %overload:: and defined &{'overload::StrVal'};
+	and defined %overload:: and defined &{'overload::StrVal'};
   }
 
   if ($tick eq 'auto') {
@@ -164,7 +162,7 @@ sub unwrap {
     my $val = $v;
     { no strict 'refs';
       $val = &{'overload::StrVal'}($v)
-	if %overload:: and defined &{'overload::StrVal'};
+	if defined %overload:: and defined &{'overload::StrVal'};
     }
     ($address) = $val =~ /(0x[0-9a-f]+)\)$/ ;
     if (!$self->{dumpReused} && defined $address) {
@@ -181,13 +179,6 @@ sub unwrap {
       print "${sp}*DUMPED_GLOB*\n" ;
       return ;
     }
-  }
-
-  if (ref $v eq 'Regexp') {
-    my $re = "$v";
-    $re =~ s,/,\\/,g;
-    print "$sp-> qr/$re/\n";
-    return;
   }
 
   if ( UNIVERSAL::isa($v, 'HASH') ) {
@@ -229,9 +220,9 @@ sub unwrap {
     if ($self->{compactDump} && !grep(ref $_, @{$v})) {
       if ($#$v >= 0) {
 	$short = $sp . "0..$#{$v}  " .
-	  join(" ", 
-	       map {exists $v->[$_] ? $self->stringify($v->[$_]) : "empty"} ($[..$tArrayDepth)
-	      ) . "$shortmore";
+	  join(" ",
+	       map {$self->stringify($_)} @{$v}[0..$tArrayDepth])
+	    . "$shortmore";
       } else {
 	$short = $sp . "empty array";
       }
@@ -240,11 +231,7 @@ sub unwrap {
     for my $num ($[ .. $tArrayDepth) {
       return if $DB::signal and $self->{stopDbSignal};
       print "$sp$num  ";
-      if (exists $v->[$num]) {
-        $self->DumpElem($v->[$num], $s);
-      } else {
-	print "empty slot\n";
-      }
+      $self->DumpElem($v->[$num], $s);
     }
     print "$sp  empty array\n" unless @$v;
     print "$sp$more" if defined $more ;
@@ -330,12 +317,12 @@ sub dumpglob {
     print( (' ' x $off) . "\$", &unctrl($key), " = " );
     $self->DumpElem($stab, 3+$off);
   }
-  if (($key !~ /^_</ or $self->{dumpDBFiles}) and @stab) {
+  if (($key !~ /^_</ or $self->{dumpDBFiles}) and defined @stab) {
     print( (' ' x $off) . "\@$key = (\n" );
     $self->unwrap(\@stab,3+$off) ;
     print( (' ' x $off) .  ")\n" );
   }
-  if ($key ne "main::" && $key ne "DB::" && %stab
+  if ($key ne "main::" && $key ne "DB::" && defined %stab
       && ($self->{dumpPackages} or $key !~ /::$/)
       && ($key !~ /^_</ or $self->{dumpDBFiles})
       && !($package eq "Dumpvalue" and $key eq "stab")) {
@@ -353,35 +340,21 @@ sub dumpglob {
   }
 }
 
-sub CvGV_name {
-  my $self = shift;
-  my $in = shift;
-  return if $self->{skipCvGV};	# Backdoor to avoid problems if XS broken...
-  $in = \&$in;			# Hard reference...
-  eval {require Devel::Peek; 1} or return;
-  my $gv = Devel::Peek::CvGV($in) or return;
-  *$gv{PACKAGE} . '::' . *$gv{NAME};
-}
-
 sub dumpsub {
   my $self = shift;
   my ($off,$sub) = @_;
-  my $ini = $sub;
-  my $s;
   $sub = $1 if $sub =~ /^\{\*(.*)\}$/;
-  my $subref = defined $1 ? \&$sub : \&$ini;
-  my $place = $DB::sub{$sub} || (($s = $subs{"$subref"}) && $DB::sub{$s})
-    || (($s = $self->CvGV_name($subref)) && $DB::sub{$s})
-    || ($self->{subdump} && ($s = $self->findsubs("$subref"))
-	&& $DB::sub{$s});
-  $s = $sub unless defined $s;
+  my $subref = \&$sub;
+  my $place = $DB::sub{$sub} || (($sub = $subs{"$subref"}) && $DB::sub{$sub})
+    || ($self->{subdump} && ($sub = $self->findsubs("$subref"))
+	&& $DB::sub{$sub});
   $place = '???' unless defined $place;
-  print( (' ' x $off) .  "&$s in $place\n" );
+  print( (' ' x $off) .  "&$sub in $place\n" );
 }
 
 sub findsubs {
   my $self = shift;
-  return undef unless %DB::sub;
+  return undef unless defined %DB::sub;
   my ($addr, $name, $loc);
   while (($name, $loc) = each %DB::sub) {
     $addr = \&$name;
@@ -410,8 +383,7 @@ sub dumpvars {
     next if @vars && !grep( matchvar($key, $_), @vars );
     if ($self->{usageOnly}) {
       $self->globUsage(\$val, $key)
-	if ($package ne 'Dumpvalue' or $key ne 'stab')
-	   and ref(\$val) eq 'GLOB';
+	unless $package eq 'Dumpvalue' and $key eq 'stab';
     } else {
       $self->dumpglob($package, 0,$key, $val);
     }
@@ -429,14 +401,7 @@ EOP
 
 sub scalarUsage {
   my $self = shift;
-  my $size;
-  if (UNIVERSAL::isa($_[0], 'ARRAY')) {
-	$size = $self->arrayUsage($_[0]);
-  } elsif (UNIVERSAL::isa($_[0], 'HASH')) {
-	$size = $self->hashUsage($_[0]);
-  } elsif (!ref($_[0])) {
-	$size = length($_[0]);
-  }
+  my $size = length($_[0]);
   $self->{TotalStrings} += $size;
   $self->{Strings}++;
   $size;
@@ -472,9 +437,9 @@ sub globUsage {			# glob ref, name
   local *stab = *{$_[0]};
   my $total = 0;
   $total += $self->scalarUsage($stab) if defined $stab;
-  $total += $self->arrayUsage(\@stab, $_[1]) if @stab;
+  $total += $self->arrayUsage(\@stab, $_[1]) if defined @stab;
   $total += $self->hashUsage(\%stab, $_[1]) 
-    if %stab and $_[1] ne "main::" and $_[1] ne "DB::";	
+    if defined %stab and $_[1] ne "main::" and $_[1] ne "DB::";	
   #and !($package eq "Dumpvalue" and $key eq "stab"));
   $total;
 }
@@ -485,14 +450,13 @@ sub globUsage {			# glob ref, name
 
 Dumpvalue - provides screen dump of Perl data.
 
-=head1 SYNOPSIS
+=head1 SYNOPSYS
 
   use Dumpvalue;
   my $dumper = new Dumpvalue;
   $dumper->set(globPrint => 1);
   $dumper->dumpValue(\*::);
   $dumper->dumpvars('main');
-  my $dump = $dumper->stringify($some_value);
 
 =head1 DESCRIPTION
 
@@ -504,7 +468,7 @@ A new dumper is created by a call
 
 Recognized options:
 
-=over 4
+=over
 
 =item C<arrayDepth>, C<hashDepth>
 
@@ -520,28 +484,28 @@ may be printed on one line.
 
 Whether to print contents of globs.
 
-=item C<dumpDBFiles>
+=item C<DumpDBFiles>
 
 Dump arrays holding contents of debugged files.
 
-=item C<dumpPackages>
+=item C<DumpPackages>
 
 Dump symbol tables of packages.
 
-=item C<dumpReused>
+=item C<DumpReused>
 
 Dump contents of "reused" addresses.
 
-=item C<tick>, C<quoteHighBit>, C<printUndef>
+=item C<tick>, C<HighBit>, C<printUndef>
 
 Change style of string dump.  Default value of C<tick> is C<auto>, one
 can enable either double-quotish dump, or single-quotish by setting it
 to C<"> or C<'>.  By default, characters with high bit set are printed
-I<as is>.  If C<quoteHighBit> is set, they will be quoted.
+I<as is>.
 
-=item C<usageOnly>
+=item C<UsageOnly>
 
-rudimentally per-package memory usage dump.  If set,
+I<very> rudimentally per-package memory usage dump.  If set,
 C<dumpvars> calculates total size of strings in variables in the package.
 
 =item unctrl
@@ -572,28 +536,16 @@ method and set() method (which accept multiple arguments).
 
 =head2 Methods
 
-=over 4
+=over
 
 =item dumpValue
 
   $dumper->dumpValue($value);
   $dumper->dumpValue([$value1, $value2]);
 
-Prints a dump to the currently selected filehandle.
-
 =item dumpValues
 
   $dumper->dumpValues($value1, $value2);
-
-Same as C< $dumper->dumpValue([$value1, $value2]); >.
-
-=item stringify
-
-  my $dump = $dumper->stringify($value [,$noticks] );
-
-Returns the dump of a single scalar without printing. If the second
-argument is true, the return value does not contain enclosing ticks.
-Does not handle data structures.
 
 =item dumpvars
 
