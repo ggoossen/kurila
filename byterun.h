@@ -1,5 +1,5 @@
 /*
- *      Copyright (c) 1996-1998 Malcolm Beattie
+ *      Copyright (c) 1996, 1997 Malcolm Beattie
  *
  *      You may distribute under the terms of either the GNU General Public
  *      License or the Artistic License, as specified in the README file.
@@ -15,9 +15,18 @@ struct bytestream {
     int (*fread)(char *, size_t, size_t, void*);
     void (*freadpv)(U32, void*);
 };
+void freadpv _((U32, void *));
+void byterun _((struct bytestream));
+#else
+void byterun _((FILE *));
 #endif /* INDIRECT_BGET_MACROS */
 
-void *bset_obj_store _((void *, I32));
+#ifndef PATCHLEVEL
+#include "patchlevel.h"
+#endif
+#if PATCHLEVEL < 4 || (PATCHLEVEL == 4 && SUBVERSION < 50)
+#define dTHR extern int errno
+#endif
 
 enum {
     INSN_RET,			/* 0 */
@@ -176,9 +185,10 @@ EXT int optype_size[]
 #endif /* DOINIT */
 ;
 
+EXT SV * specialsv_list[4];
 #define INIT_SPECIALSV_LIST STMT_START { \
-	specialsv_list[0] = Nullsv; \
-	specialsv_list[1] = &sv_undef; \
-	specialsv_list[2] = &sv_yes; \
-	specialsv_list[3] = &sv_no; \
-    } STMT_END
+specialsv_list[0] = Nullsv; \
+specialsv_list[1] = &sv_undef; \
+specialsv_list[2] = &sv_yes; \
+specialsv_list[3] = &sv_no; \
+} STMT_END

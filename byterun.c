@@ -1,5 +1,5 @@
 /*
- *      Copyright (c) 1996-1998 Malcolm Beattie
+ *      Copyright (c) 1996, 1997 Malcolm Beattie
  *
  *      You may distribute under the terms of either the GNU General Public
  *      License or the Artistic License, as specified in the README file.
@@ -11,35 +11,25 @@
 
 #include "EXTERN.h"
 #include "perl.h"
-
-void *
-bset_obj_store(void *obj, I32 ix)
-{
-    if (ix > obj_list_fill) {
-	if (obj_list_fill == -1)
-	    New(666, obj_list, ix + 1, void*);
-	else
-	    Renew(obj_list, ix + 1, void*);
-	obj_list_fill = ix;
-    }
-    obj_list[ix] = obj;
-    return obj;
-}
+#include "bytecode.h"
+#include "byterun.h"
 
 #ifdef INDIRECT_BGET_MACROS
-void byterun(struct bytestream bs)
+void byterun(bs)
+struct bytestream bs;
 #else
-void byterun(PerlIO *fp)
+void byterun(fp)
+FILE *fp;
 #endif /* INDIRECT_BGET_MACROS */
 {
     dTHR;
     int insn;
-    while ((insn = BGET_FGETC()) != EOF) {
+    while ((insn = FGETC()) != EOF) {
 	switch (insn) {
 	  case INSN_COMMENT:		/* 35 */
 	    {
-		comment_t arg;
-		BGET_comment_t(arg);
+		comment arg;
+		BGET_comment(arg);
 		arg = arg;
 		break;
 	    }
@@ -55,14 +45,14 @@ void byterun(PerlIO *fp)
 	  case INSN_LDSV:		/* 1 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		sv = arg;
 		break;
 	    }
 	  case INSN_LDOP:		/* 2 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		op = arg;
 		break;
 	    }
@@ -157,7 +147,7 @@ void byterun(PerlIO *fp)
 	  case INSN_XRV:		/* 17 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		SvRV(sv) = arg;
 		break;
 	    }
@@ -204,7 +194,7 @@ void byterun(PerlIO *fp)
 	  case INSN_XLV_TARG:		/* 24 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		LvTARG(sv) = arg;
 		break;
 	    }
@@ -281,7 +271,7 @@ void byterun(PerlIO *fp)
 	  case INSN_XIO_TOP_GV:		/* 36 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&IoTOP_GV(sv) = arg;
 		break;
 	    }
@@ -295,7 +285,7 @@ void byterun(PerlIO *fp)
 	  case INSN_XIO_FMT_GV:		/* 38 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&IoFMT_GV(sv) = arg;
 		break;
 	    }
@@ -309,7 +299,7 @@ void byterun(PerlIO *fp)
 	  case INSN_XIO_BOTTOM_GV:		/* 40 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&IoBOTTOM_GV(sv) = arg;
 		break;
 	    }
@@ -337,35 +327,35 @@ void byterun(PerlIO *fp)
 	  case INSN_XCV_STASH:		/* 44 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&CvSTASH(sv) = arg;
 		break;
 	    }
 	  case INSN_XCV_START:		/* 45 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		CvSTART(sv) = arg;
 		break;
 	    }
 	  case INSN_XCV_ROOT:		/* 46 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		CvROOT(sv) = arg;
 		break;
 	    }
 	  case INSN_XCV_GV:		/* 47 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&CvGV(sv) = arg;
 		break;
 	    }
 	  case INSN_XCV_FILEGV:		/* 48 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&CvFILEGV(sv) = arg;
 		break;
 	    }
@@ -379,14 +369,14 @@ void byterun(PerlIO *fp)
 	  case INSN_XCV_PADLIST:		/* 50 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&CvPADLIST(sv) = arg;
 		break;
 	    }
 	  case INSN_XCV_OUTSIDE:		/* 51 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&CvOUTSIDE(sv) = arg;
 		break;
 	    }
@@ -407,7 +397,7 @@ void byterun(PerlIO *fp)
 	  case INSN_AV_PUSH:		/* 54 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		BSET_av_push(sv, arg);
 		break;
 	    }
@@ -449,7 +439,7 @@ void byterun(PerlIO *fp)
 	  case INSN_HV_STORE:		/* 60 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		BSET_hv_store(sv, arg);
 		break;
 	    }
@@ -463,7 +453,7 @@ void byterun(PerlIO *fp)
 	  case INSN_MG_OBJ:		/* 62 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		SvMAGIC(sv)->mg_obj = arg;
 		break;
 	    }
@@ -491,7 +481,7 @@ void byterun(PerlIO *fp)
 	  case INSN_XMG_STASH:		/* 66 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&SvSTASH(sv) = arg;
 		break;
 	    }
@@ -512,7 +502,7 @@ void byterun(PerlIO *fp)
 	  case INSN_GP_SV:		/* 69 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		GvSV(sv) = arg;
 		break;
 	    }
@@ -533,42 +523,42 @@ void byterun(PerlIO *fp)
 	  case INSN_GP_AV:		/* 72 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&GvAV(sv) = arg;
 		break;
 	    }
 	  case INSN_GP_HV:		/* 73 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&GvHV(sv) = arg;
 		break;
 	    }
 	  case INSN_GP_CV:		/* 74 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&GvCV(sv) = arg;
 		break;
 	    }
 	  case INSN_GP_FILEGV:		/* 75 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&GvFILEGV(sv) = arg;
 		break;
 	    }
 	  case INSN_GP_IO:		/* 76 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&GvIOp(sv) = arg;
 		break;
 	    }
 	  case INSN_GP_FORM:		/* 77 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&GvFORM(sv) = arg;
 		break;
 	    }
@@ -589,7 +579,7 @@ void byterun(PerlIO *fp)
 	  case INSN_GP_SHARE:		/* 80 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		BSET_gp_share(sv, arg);
 		break;
 	    }
@@ -603,14 +593,14 @@ void byterun(PerlIO *fp)
 	  case INSN_OP_NEXT:		/* 82 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		op->op_next = arg;
 		break;
 	    }
 	  case INSN_OP_SIBLING:		/* 83 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		op->op_sibling = arg;
 		break;
 	    }
@@ -659,35 +649,35 @@ void byterun(PerlIO *fp)
 	  case INSN_OP_FIRST:		/* 90 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cUNOP->op_first = arg;
 		break;
 	    }
 	  case INSN_OP_LAST:		/* 91 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cBINOP->op_last = arg;
 		break;
 	    }
 	  case INSN_OP_OTHER:		/* 92 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cLOGOP->op_other = arg;
 		break;
 	    }
 	  case INSN_OP_TRUE:		/* 93 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cCONDOP->op_true = arg;
 		break;
 	    }
 	  case INSN_OP_FALSE:		/* 94 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cCONDOP->op_false = arg;
 		break;
 	    }
@@ -701,28 +691,28 @@ void byterun(PerlIO *fp)
 	  case INSN_OP_PMREPLROOT:		/* 96 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cPMOP->op_pmreplroot = arg;
 		break;
 	    }
 	  case INSN_OP_PMREPLROOTGV:		/* 97 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&cPMOP->op_pmreplroot = arg;
 		break;
 	    }
 	  case INSN_OP_PMREPLSTART:		/* 98 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cPMOP->op_pmreplstart = arg;
 		break;
 	    }
 	  case INSN_OP_PMNEXT:		/* 99 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		*(OP**)&cPMOP->op_pmnext = arg;
 		break;
 	    }
@@ -750,14 +740,14 @@ void byterun(PerlIO *fp)
 	  case INSN_OP_SV:		/* 103 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		cSVOP->op_sv = arg;
 		break;
 	    }
 	  case INSN_OP_GV:		/* 104 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&cGVOP->op_gv = arg;
 		break;
 	    }
@@ -778,21 +768,21 @@ void byterun(PerlIO *fp)
 	  case INSN_OP_REDOOP:		/* 107 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cLOOP->op_redoop = arg;
 		break;
 	    }
 	  case INSN_OP_NEXTOP:		/* 108 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cLOOP->op_nextop = arg;
 		break;
 	    }
 	  case INSN_OP_LASTOP:		/* 109 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		cLOOP->op_lastop = arg;
 		break;
 	    }
@@ -806,14 +796,14 @@ void byterun(PerlIO *fp)
 	  case INSN_COP_STASH:		/* 111 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&cCOP->cop_stash = arg;
 		break;
 	    }
 	  case INSN_COP_FILEGV:		/* 112 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		*(SV**)&cCOP->cop_filegv = arg;
 		break;
 	    }
@@ -841,21 +831,21 @@ void byterun(PerlIO *fp)
 	  case INSN_MAIN_START:		/* 116 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		main_start = arg;
 		break;
 	    }
 	  case INSN_MAIN_ROOT:		/* 117 */
 	    {
 		opindex arg;
-		BGET_opindex(arg);
+		BGET_objindex(arg);
 		main_root = arg;
 		break;
 	    }
 	  case INSN_CURPAD:		/* 118 */
 	    {
 		svindex arg;
-		BGET_svindex(arg);
+		BGET_objindex(arg);
 		BSET_curpad(curpad, arg);
 		break;
 	    }
