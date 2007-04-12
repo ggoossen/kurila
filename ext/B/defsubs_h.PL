@@ -2,27 +2,20 @@
 # this file as a template for defsubs.h
 # Extracting defsubs.h (with variable substitutions)
 #!perl
-my ($out) = __FILE__ =~ /(^.*)\.PL/i;
-$out =~ s/_h$/.h/;
+my ($out) = __FILE__ =~ /(^.*)\.PL/;
+if ($^O eq 'VMS') { ($out) = __FILE__ =~ /^(.+)_PL$/i; }
 open(OUT,">$out") || die "Cannot open $file:$!";
-print "Extracting $out...\n";
-foreach my $const (qw(
-		      AVf_REAL 
+print "Extracting $out . . .\n";
+foreach my $const (qw(AVf_REAL 
 		      HEf_SVKEY
-		      SVf_READONLY SVTYPEMASK
-		      GVf_IMPORTED_AV GVf_IMPORTED_HV
-		      GVf_IMPORTED_SV GVf_IMPORTED_CV
-		      CVf_METHOD CVf_LOCKED CVf_LVALUE CVf_CONST
-                      SVpad_OUR SVf_IOK SVf_IVisUV SVf_NOK SVf_POK 
-		      SVf_ROK SVp_IOK SVp_POK SVp_NOK
-		      ))
+                      SVf_IOK SVf_IVisUV SVf_NOK SVf_POK 
+		      SVf_ROK SVp_IOK SVp_POK ))
  {
   doconst($const);
  }
 foreach my $file (qw(op.h cop.h))
  {
-  my $path = $^O eq 'MacOS' ? ":::$file" : "../../$file";
-  open(OPH,"$path") || die "Cannot open $path:$!";
+  open(OPH,"../../$file") || die "Cannot open ../../$file:$!";
   while (<OPH>)
    {  
     doconst($1) if (/#define\s+(\w+)\s+([\(\)\|\dx]+)\s*(?:$|\/\*)/);
