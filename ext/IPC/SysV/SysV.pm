@@ -7,16 +7,14 @@
 package IPC::SysV;
 
 use strict;
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $XS_VERSION);
+use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 use Carp;
 use Config;
 
 require Exporter;
 @ISA = qw(Exporter);
 
-$VERSION = "1.03_00";
-$XS_VERSION = $VERSION;
-$VERSION = eval $VERSION;
+$VERSION = "1.03";
 
 @EXPORT_OK = qw(
 	GETALL GETNCNT GETPID GETVAL GETZCNT
@@ -55,7 +53,7 @@ BOOT_XS: {
 
     do {
 	__PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap
-    }->(__PACKAGE__, $XS_VERSION);
+    }->(__PACKAGE__, $VERSION);
 }
 
 1;
@@ -76,14 +74,10 @@ C<IPC::SysV> defines and conditionally exports all the constants
 defined in your system include files which are needed by the SysV
 IPC calls.
 
-=over 4
-
 =item ftok( PATH, ID )
 
 Return a key based on PATH and ID, which can be used as a key for
 C<msgget>, C<semget> and C<shmget>. See L<ftok>
-
-=back
 
 =head1 SEE ALSO
 

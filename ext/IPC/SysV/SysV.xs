@@ -4,52 +4,56 @@
 
 #include <sys/types.h>
 #ifdef __linux__
-#   include <asm/page.h>
+#include <asm/page.h>
 #endif
 #if defined(HAS_MSG) || defined(HAS_SEM) || defined(HAS_SHM)
-#ifndef HAS_SEM
-#   include <sys/ipc.h>
+#include <sys/ipc.h>
+#ifdef HAS_MSG
+#include <sys/msg.h>
 #endif
-#   ifdef HAS_MSG
-#       include <sys/msg.h>
-#   endif
-#   ifdef HAS_SHM
-#       if defined(PERL_SCO) || defined(PERL_ISC)
-#           include <sys/sysmacros.h>	/* SHMLBA */
-#       endif
-#      include <sys/shm.h>
-#      ifndef HAS_SHMAT_PROTOTYPE
-           extern Shmat_t shmat (int, char *, int);
-#      endif
-#      if defined(__sparc__) && (defined(__NetBSD__) || defined(__OpenBSD__))
-#          undef  SHMLBA /* not static: determined at boot time */
-#          define SHMLBA getpagesize()
-#      endif
-#   endif
+#ifdef HAS_SEM
+#include <sys/sem.h>
+#endif
+#ifdef HAS_SHM
+#include <sys/shm.h>
+# ifndef HAS_SHMAT_PROTOTYPE
+    extern Shmat_t shmat _((int, char *, int));
+# endif
+#endif
 #endif
 
-/* Required to get 'struct pte' for SHMLBA on ULTRIX. */
-#if defined(__ultrix) || defined(__ultrix__) || defined(ultrix)
-#include <machine/pte.h>
+#ifndef newCONSTSUB
+static void
+newCONSTSUB(stash,name,sv)
+    HV *stash;
+    char *name;
+    SV *sv;
+{
+#ifdef dTHR
+    dTHR;
 #endif
+    U32 oldhints = hints;
+    HV *old_cop_stash = curcop->cop_stash;
+    HV *old_curstash = curstash;
+    line_t oldline = curcop->cop_line;
+    curcop->cop_line = copline;
 
-/* Required in BSDI to get PAGE_SIZE definition for SHMLBA.
- * Ugly.  More beautiful solutions welcome.
- * Shouting at BSDI sounds quite beautiful. */
-#ifdef __bsdi__
-#   include <vm/vm_param.h>	/* move upwards under HAS_SHM? */
-#endif
+    hints &= ~HINT_BLOCK_SCOPE;
+    if(stash)
+	curstash = curcop->cop_stash = stash;
 
-#ifndef S_IRWXU
-#   ifdef S_IRUSR
-#       define S_IRWXU (S_IRUSR|S_IWUSR|S_IWUSR)
-#       define S_IRWXG (S_IRGRP|S_IWGRP|S_IWGRP)
-#       define S_IRWXO (S_IROTH|S_IWOTH|S_IWOTH)
-#   else
-#       define S_IRWXU 0700
-#       define S_IRWXG 0070
-#       define S_IRWXO 0007
-#   endif
+    newSUB(
+	start_subparse(FALSE, 0),
+	newSVOP(OP_CONST, 0, newSVpv(name,0)),
+	newSVOP(OP_CONST, 0, &sv_no),	/* SvPV(&sv_no) == "" -- GMB */
+	newSTATEOP(0, Nullch, newSVOP(OP_CONST, 0, sv))
+    );
+
+    hints = oldhints;
+    curcop->cop_stash = old_cop_stash;
+    curstash = old_curstash;
+    curcop->cop_line = oldline;
+}
 #endif
 
 MODULE=IPC::SysV	PACKAGE=IPC::Msg::stat
@@ -61,7 +65,6 @@ pack(obj)
     SV	* obj
 PPCODE:
 {
-#ifdef HAS_MSG
     SV *sv;
     struct msqid_ds ds;
     AV *list = (AV*)SvRV(obj);
@@ -69,11 +72,8 @@ PPCODE:
     sv = *av_fetch(list,1,TRUE); ds.msg_perm.gid = SvIV(sv);
     sv = *av_fetch(list,4,TRUE); ds.msg_perm.mode = SvIV(sv);
     sv = *av_fetch(list,6,TRUE); ds.msg_qbytes = SvIV(sv);
-    ST(0) = sv_2mortal(newSVpvn((char *)&ds,sizeof(ds)));
+    ST(0) = sv_2mortal(newSVpv((char *)&ds,sizeof(ds)));
     XSRETURN(1);
-#else
-    croak("System V msgxxx is not implemented on this machine");
-#endif
 }
 
 void
@@ -82,7 +82,6 @@ unpack(obj,buf)
     SV * buf
 PPCODE:
 {
-#ifdef HAS_MSG
     STRLEN len;
     SV **sv_ptr;
     struct msqid_ds *ds = (struct msqid_ds *)SvPV(buf,len);
@@ -117,9 +116,6 @@ PPCODE:
     sv_ptr = av_fetch(list,11,TRUE);
     sv_setiv(*sv_ptr, ds->msg_ctime);
     XSRETURN(1);
-#else
-    croak("System V msgxxx is not implemented on this machine");
-#endif
 }
 
 MODULE=IPC::SysV	PACKAGE=IPC::Semaphore::stat
@@ -130,7 +126,6 @@ unpack(obj,ds)
     SV * ds
 PPCODE:
 {
-#ifdef HAS_SEM
     STRLEN len;
     AV *list = (AV*)SvRV(obj);
     struct semid_ds *data = (struct semid_ds *)SvPV(ds,len);
@@ -151,9 +146,6 @@ PPCODE:
     sv_setiv(*av_fetch(list,6,TRUE), data[0].sem_otime);
     sv_setiv(*av_fetch(list,7,TRUE), data[0].sem_nsems);
     XSRETURN(1);
-#else
-    croak("System V semxxx is not implemented on this machine");
-#endif
 }
 
 void
@@ -161,51 +153,48 @@ pack(obj)
     SV	* obj
 PPCODE:
 {
-#ifdef HAS_SEM
     SV **sv_ptr;
+    SV *sv;
     struct semid_ds ds;
     AV *list = (AV*)SvRV(obj);
     if(!sv_isa(obj, "IPC::Semaphore::stat"))
 	croak("method %s not called a %s object",
 		"pack","IPC::Semaphore::stat");
-    if((sv_ptr = av_fetch(list,0,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,0,TRUE)) && (sv = *sv_ptr))
 	ds.sem_perm.uid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,1,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,1,TRUE)) && (sv = *sv_ptr))
 	ds.sem_perm.gid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,2,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,2,TRUE)) && (sv = *sv_ptr))
 	ds.sem_perm.cuid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,3,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,3,TRUE)) && (sv = *sv_ptr))
 	ds.sem_perm.cgid = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,4,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,4,TRUE)) && (sv = *sv_ptr))
 	ds.sem_perm.mode = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,5,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,5,TRUE)) && (sv = *sv_ptr))
 	ds.sem_ctime = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,6,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,6,TRUE)) && (sv = *sv_ptr))
 	ds.sem_otime = SvIV(*sv_ptr);
-    if((sv_ptr = av_fetch(list,7,TRUE)) && *sv_ptr)
+    if((sv_ptr = av_fetch(list,7,TRUE)) && (sv = *sv_ptr))
 	ds.sem_nsems = SvIV(*sv_ptr);
-    ST(0) = sv_2mortal(newSVpvn((char *)&ds,sizeof(ds)));
+    ST(0) = sv_2mortal(newSVpv((char *)&ds,sizeof(ds)));
     XSRETURN(1);
-#else
-    croak("System V semxxx is not implemented on this machine");
-#endif
 }
 
 MODULE=IPC::SysV	PACKAGE=IPC::SysV
 
-void
+int
 ftok(path, id)
         char *          path
         int             id
     CODE:
 #if defined(HAS_SEM) || defined(HAS_SHM)
         key_t k = ftok(path, id);
-        ST(0) = k == (key_t) -1 ? &PL_sv_undef : sv_2mortal(newSViv(k));
+        ST(0) = k == (key_t) -1 ? &sv_undef : sv_2mortal(newSViv(k));
 #else
-	Perl_die(aTHX_ PL_no_func, "ftok"); return;
+        DIE(no_func, "ftok");
 #endif
 
-void
+int
 SHMLBA()
     CODE:
 #ifdef SHMLBA
@@ -435,7 +424,7 @@ BOOT:
     char *name;
     int i;
 
-    for(i = 0 ; (name = IPC__SysV__const[i].n) ; i++) {
+    for(i = 0 ; name = IPC__SysV__const[i].n ; i++) {
 	newCONSTSUB(stash,name, newSViv(IPC__SysV__const[i].v));
     }
 }

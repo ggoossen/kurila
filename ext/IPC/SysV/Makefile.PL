@@ -22,8 +22,8 @@ sub MY::libscan
 WriteMakefile(
 	VERSION_FROM	=> "SysV.pm",
 	NAME      	=> "IPC::SysV",
-	MAN3PODS	=> {}, 	# Pods will be built by installman.
  
+	'linkext' 	=> {LINKTYPE => 'dynamic' },
 	'dist'    	=> {COMPRESS => 'gzip -9f',
 			    SUFFIX   => 'gz', 
 			    DIST_DEFAULT => 'all tardist',
@@ -31,7 +31,7 @@ WriteMakefile(
  
 	'clean'   	=> {FILES => join(" ",
 					map { "$_ */$_ */*/$_" }
-					qw(*% *.html *.b[ac]k *.old))
+					qw(*% *.html *.b[ac]k *.old *.orig))
 			   },
 	'macro'		=> { INSTALLDIRS => 'perl' },
 );
