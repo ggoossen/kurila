@@ -36,7 +36,7 @@
   
 /* USEMYBINMODE
  *	This symbol, if defined, indicates that the program should
- *	use the routine my_binmode(FILE *fp, char iotype, int mode) to insure
+ *	use the routine my_binmode(FILE *fp, char iotype) to insure
  *	that a file is in "binary" mode -- that is, that no translation
  *	of bytes occurs on read or write operations.
  */
@@ -89,7 +89,16 @@
  */
 /* #define ALTERNATE_SHEBANG "#!" / **/
 
+#if !defined(NSIG) || defined(M_UNIX) || defined(M_XENIX) || defined(__NetBSD__)
+# include <signal.h>
+#endif
 
+#ifndef SIGABRT
+#    define SIGABRT SIGILL
+#endif
+#ifndef SIGILL
+#    define SIGILL 6         /* blech */
+#endif
 #define ABORT() abort();
 
 /*
@@ -105,52 +114,23 @@
 #define Fflush(fp)         fflush(fp)
 #define Mkdir(path,mode)   mkdir((path),(mode))
 
-
-/* epocemx setenv bug workaround */
+/* these should be set in a hint file, not here */
 #ifndef PERL_SYS_INIT
-#    define PERL_SYS_INIT(c,v)    putenv(".dummy=foo"); putenv(".dummy"); MALLOC_INIT
+#ifdef PERL_SCO5
+#  define PERL_SYS_INIT(c,v)	fpsetmask(0); MALLOC_INIT
+#else
+#  ifdef POSIX_BC
+#    define PERL_SYS_INIT(c,v)	sigignore(SIGFPE); MALLOC_INIT
+#  else
+#    define PERL_SYS_INIT(c,v)	MALLOC_INIT
+#  endif
+#endif
 #endif
 
 #ifndef PERL_SYS_TERM
 #define PERL_SYS_TERM()		MALLOC_TERM
 #endif
 
-#define BIT_BUCKET "/dev/null"
+#define BIT_BUCKET "NUL:"
 
 #define dXSUB_SYS
-
-/* getsockname returns the size of struct sockaddr_in *without* padding */
-#define  BOGUS_GETNAME_RETURN 8
-
-/* 
-   read() on a socket is unimplemented in current epocemx
-   use recv() instead
-*/
-
-#define PERL_SOCK_SYSREAD_IS_RECV
-
-/* write ditto, use send */
-#define PERL_SOCK_SYSWRITE_IS_SEND
-
-/* No /dev/random available*/
-
-#define PERL_NO_DEV_RANDOM
-
-/*
-   work around for buggy atof():
-   atof() in ER5 stdlib depends on locale. 
-*/
-
-#define strtoul(a,b,c) epoc_strtoul(a,b,c)
-
-#define init_os_extras Perl_init_os_extras
-
-#define ARG_MAX 4096
-
-#define ECONNABORTED 0xdead
-
-/* For environ */
-#include <emx.h>
-#define PERL_USE_SAFE_PUTENV
-
-

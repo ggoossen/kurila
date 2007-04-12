@@ -1,125 +1,61 @@
-/*
- *    Copyright (c) 1999 Olaf Flebbe o.flebbe@gmx.de
- *    
- *    You may distribute under the terms of either the GNU General Public
- *    License or the Artistic License, as specified in the README file.
- *
- */
+/* Epoc helper Routines */
 
 #include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <sys/unistd.h>
-#include <process.h>
+
+int getgid() {return 0;}
+int getegid() {return 0;}
+int geteuid() {return 0;}
+int getuid() {return 0;}
+int setgid() {return -1;}
+int setuid() {return -1;}
 
 
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+char *environ;
 
-int 
-do_spawn( char *cmd) {
-    dTHX;
-    return system( cmd);
+int Perl_my_popen( int a, int b) {
+	 return 0;
+}
+int Perl_my_pclose( int a) {
+	 return 0;
 }
 
-int
-do_aspawn ( void *vreally, void **vmark, void **vsp) {
+kill() {}
+signal() {}
 
-    dTHX;
-
-    SV *really = (SV*)vreally;
-    SV **mark = (SV**)vmark;
-    SV **sp = (SV**)vsp;
-
-    char **argv;
-    char *str;
-    char *p2, **ptr;
-    char *cmd;
+void execv() {}
+void execvp() {}
 
 
-    int  rc;
-    int index = 0;
+void do_spawn() {}
+void do_aspawn() {}
+void Perl_do_exec() {}
 
-    if (sp<=mark)
-      return -1;
-    
-    ptr = argv =(char**) malloc ((sp-mark+3)*sizeof (char*));
-    
-    while (++mark <= sp) {
-      if (*mark && (str = SvPV_nolen(*mark)))
-	argv[index] = str;
-      else
-	argv[index] = "";
-    }
-    argv[index++] = 0;
+#ifdef __MARM__
+/* Symbian forgot to include __fixunsdfi into the MARM euser.lib */
+/* This is from libgcc2.c , gcc-2.7.2.3                          */
 
-    cmd = strdup((const char*)(really ? SvPV_nolen(really) : argv[0]));
+typedef unsigned int UQItype	__attribute__ ((mode (QI)));
+typedef 	 int SItype	__attribute__ ((mode (SI)));
+typedef unsigned int USItype	__attribute__ ((mode (SI)));
+typedef		 int DItype	__attribute__ ((mode (DI)));
+typedef unsigned int UDItype	__attribute__ ((mode (DI)));
 
-    rc = spawnvp( P_WAIT, cmd, argv);
-    free( argv);
-    free( cmd);
+typedef 	float SFtype	__attribute__ ((mode (SF)));
+typedef		float DFtype	__attribute__ ((mode (DF)));
 
-    return rc;
-}
 
-static
-XS(epoc_getcwd)   /* more or less stolen from win32.c */
+
+extern DItype __fixunssfdi (SFtype a);
+extern DItype __fixunsdfdi (DFtype a);
+
+
+USItype
+__fixunsdfsi (a)
+     DFtype a;
 {
-    dXSARGS;
-    /* Make the host for current directory */
-    char *buffer; 
-    int buflen = 256;
+  if (a >= - (DFtype) (- 2147483647L  -1) )
+    return (SItype) (a + (- 2147483647L  -1) ) - (- 2147483647L  -1) ;
+  return (SItype) a;
+}
 
-    char *ptr;
-    buffer = (char *) malloc( buflen);
-    if (buffer == NULL) {
-      XSRETURN_UNDEF;
-    }
-    while ((NULL == ( ptr = getcwd( buffer, buflen))) && (errno == ERANGE)) {
-      buflen *= 2;
-      if (NULL == realloc( buffer, buflen)) {
-	 XSRETURN_UNDEF;
-      }
-      
-    }
-
-    /* 
-     * If ptr != Nullch 
-     *   then it worked, set PV valid, 
-     *   else return 'undef' 
-     */
-
-    if (ptr) {
-	SV *sv = sv_newmortal();
-	char *tptr;
-
-	for (tptr = ptr; *tptr != '\0'; tptr++) {
-	  if (*tptr == '\\') {
-	    *tptr = '/';
-	  }
-	}
-	sv_setpv(sv, ptr);
-	free( buffer);
-
-	EXTEND(SP,1);
-	SvPOK_on(sv);
-	ST(0) = sv;
-#ifndef INCOMPLETE_TAINTS
-	SvTAINTED_on(ST(0));
 #endif
-	XSRETURN(1);
-    }
-    free( buffer);
-    XSRETURN_UNDEF;
-}
-  
-
-void
-Perl_init_os_extras(void)
-{ 
-  dTHX;
-  char *file = __FILE__;
-  newXS("EPOC::getcwd", epoc_getcwd, file);
-}
-

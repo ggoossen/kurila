@@ -1,160 +1,80 @@
-If you read this file _as_is_, just ignore the funny characters you
-see. It is written in the POD format (see pod/perlpod.pod) which is
-specially designed to be readable as is.
+=================================================
+Perl 5 README file for the EPOC operating system.
+==================================================
 
-=head1 NAME
+Olaf Flebbe <o.flebbe@gmx.de>
+http://www.fortunecity.de/wolkenkratzer/trumpet/84/perl5.html
+June 27, 1999
 
-README.epoc - Perl for EPOC
+Introduction
+------------ 
 
-=head1 SYNOPSIS
+This is a port of Perl version 5, revision 005-57 to EPOC. 
 
-Perl 5 README file for the EPOC Release 5 operating system.
+There are many features left out, because of restrictions of the posix
+support in the SDK.
 
-=head1 INTRODUCTION
+The following known problems do exist:
 
-EPOC is an OS for palmtops and mobile phones. For more informations look at:
-http://www.symbian.com/
+1) very little testing.
 
-This is a port of perl to the epocemx SDK by Eberhard Mattes, which
-itselfs uses the SDK by symbian. Essentially epocemx it is a POSIX
-look alike environment for the EPOC OS. For more informations look at: 
-http://www.windhager.de/~mattes/epocemx/
+2) no support for system, backquoting, pipes etc. One cannot exec a
+   different process.
 
-perl and epocemx runs on Epoc Release 5 machines: Psion 5mx, 5mx Pro,
-Psion Revo, Psion Netbook and on the Ericson M128. It may run on Epoc
-Release 3 Hardware (Series 5 classic), too. For more information about
-this hardware please refer to http://www.psion.com/
+3) no signals, kill. Do not try to use them.
 
-Vendors which like to have support for their devices are free to send
-me a sample. 
+4) select is missing.
 
-=head1 INSTALLING PERL ON EPOC
+5) binmode does not work. (No CR LF to LF translation for text files)
 
-You can download a ready-to-install version from
-http://www.science-computing.de/o.flebbe/perl/
+6) no Config.pm
 
-You will need at least ~6MB free space in order to install and run
-perl.
+7) no I/O redirection.
 
-Please install the emxusr.sis package from
-http://www.windhager.de/~mattes/epocemx/ first.
+8) it may not run from a drive other than C: (I have no CF Card to test)
 
-Install perl.sis on the EPOC machine. If you do not know how to do
-that, consult your PsiWin documentation.
+9) sockets may hardly of any use.
 
-Perl itself and its standard library is using 4 MB disk space.
-Unicode support and some other modules are left out. (For details,
-please look into epoc/createpkg.pl). If you like to use these modules,
-you are free to copy them from a current perl release.
+10) You need a shell in order to run perl.exe.
 
-=head1 STARTING PERL ON EPOC
 
-Please use the epocemx shell to start perl. perl integrates with the
-conventions of epocemx. 
+Compiling Perl 5 on the EPOC cross compiling envionment.
+--------------------------------------------------------
 
-=head2 Editors on Epoc
+0. You will need the C++ SDK from
+   http://developer.epocworld.com/. Install it on a separate drive.
 
-A suitable text editor can be downloaded from symbian
-http://www.symbian.com/developer/downloads/files/editor.zip
+1. Unpack the sources in the epoc development drive: The sources
+   should be in a directory perl5.005/perl5.005_57
 
-=head2 Features of Perl on Epoc
+2. Move all files in the directory perl5.005_57/epoc to perl5.005_57.
 
-The built-in function EPOC::getcwd returns the current directory.
+3. Check the perl.mmp file: It should have the correct locations for
+   project und subproject (see step 1)
 
-=head2 Restrictions of Perl on Epoc
+4. Change to the EPOC development drive and run 
+     makmake perl marm
+     nmake -f perl.marm
+     makesis perl.pkg perl5.005.sis
 
-Features are left out, because of restrictions of the POSIX support in
-EPOC:
+5. Beam the perl5.005.sis to the Psion5, install and enjoy!
 
-=over 4
+ToDo List
+---------
 
-=item * 
+- Allocate an UID from symbian.
 
-socket IO is only implemented poorly. You can only use sysread and
-syswrite on them. The commands read, write, print, <> do not work for
-sockets. This may change iff epocemx supports sockets.
+- Implement system() and I/O redirection, in order to run the
+  tests.
 
-=item *
+- Implement getprotcolbyname() and relatives.
 
-kill, alarm and signals. Do not try to use them. This may be
-impossible to implement on EPOC.
+- Implement perl as a OPX module. (What do you think?)
 
-=item *
+Support Status
+--------------
 
-select is missing.
+I'm offering this port "as is".  You can ask me questions, but I can't
+guarantee I'll be able to answer them; I don't know much about Perl
+itself;
 
-=item *
-
-binmode does not exist. (No CR LF to LF translation for text files)
-
-=item *
-
-EPOC does not handle the notion of current drive and current
-directory very well (i.e. not at all, but it tries hard to emulate
-one) See PATH.
-
-=item *
-
-Heap is limited to 4MB.
-
-=item *
-
-Dynamic loading is not implemented.
-
-=back
-
-=head2 Compiling Perl 5 on the EPOC cross compiling environment
-
-Sorry, this is far too short.
-
-=over 4
-
-=item *
-
-You will need the epocemx SDK from Eberhard Mattes. 
-
-=item *
-
-Get the Perl sources from your nearest CPAN site.
-
-=item *
-
-Unpack the sources. 
-
-=item *
-
-Build a native perl from this sources... Make sure to save the
-miniperl executable as miniperl.native.
-
-Start again from scratch
-
-      cp epoc/* .
-      ./Configure -S
-      make 
-      cp miniperl.native miniperl
-      touch miniperl.exe
-      make
-      perl createpkg.pl 
-
-      emxsis perl.pkg perl.sis
-
-=back
-
-=head1 SUPPORT STATUS OF PERL ON EPOC
-
-I'm offering this port "as is". You can ask me questions, but I can't
-guarantee I'll be able to answer them. Since the port to epocemx is
-quite new, please check the web for updates first.
-
-Very special thanks to Eberhard Mattes for epocemx.
-
-=head1 AUTHOR
-
-Olaf Flebbe <o.flebbe@science-computing.de>
-http://www.science-computing.de/o.flebbe/perl/
-
-=head1 LAST UPDATE
-
-2002-03-26
-
-=cut
