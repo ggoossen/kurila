@@ -4,11 +4,6 @@ perlfork - Perl's fork() emulation
 
 =head1 SYNOPSIS
 
-    NOTE:  As of the 5.8.0 release, fork() emulation has considerably
-    matured.  However, there are still a few known bugs and differences
-    from real fork() that might affect you.  See the "BUGS" and
-    "CAVEATS AND LIMITATIONS" sections below.
-
 Perl provides a fork() keyword that corresponds to the Unix system call
 of the same name.  On most Unix-like platforms where the fork() system
 call is available, Perl's fork() simply calls it.
@@ -16,7 +11,7 @@ call is available, Perl's fork() simply calls it.
 On some platforms such as Windows where the fork() system call is not
 available, Perl can be built to emulate fork() at the interpreter level.
 While the emulation is designed to be as compatible as possible with the
-real fork() at the level of the Perl program, there are certain
+real fork() at the the level of the Perl program, there are certain
 important differences that stem from the fact that all the pseudo child
 "processes" created this way live in the same real process as far as the
 operating system is concerned.
@@ -56,7 +51,7 @@ pseudo-processes are launched after others have been wait()-ed on.
 
 =item %ENV
 
-Each pseudo-process maintains its own virtual environment.  Modifications
+Each pseudo-process maintains its own virtual enviroment.  Modifications
 to %ENV affect the virtual environment, and are only visible within that
 pseudo-process, and in any processes (or pseudo-processes) launched from
 it.
@@ -177,73 +172,6 @@ the seek position in the parent will change it in the child and vice-versa.
 One can avoid this by opening files that need distinct seek pointers
 separately in the child.
 
-=item Forking pipe open() not yet implemented
-
-The C<open(FOO, "|-")> and C<open(BAR, "-|")> constructs are not yet
-implemented.  This limitation can be easily worked around in new code
-by creating a pipe explicitly.  The following example shows how to
-write to a forked child:
-
-    # simulate open(FOO, "|-")
-    sub pipe_to_fork ($) {
-	my $parent = shift;
-	pipe my $child, $parent or die;
-	my $pid = fork();
-	die "fork() failed: $!" unless defined $pid;
-	if ($pid) {
-	    close $child;
-	}
-	else {
-	    close $parent;
-	    open(STDIN, "<&=" . fileno($child)) or die;
-	}
-	$pid;
-    }
-
-    if (pipe_to_fork('FOO')) {
-	# parent
-	print FOO "pipe_to_fork\n";
-	close FOO;
-    }
-    else {
-	# child
-	while (<STDIN>) { print; }
-	close STDIN;
-	exit(0);
-    }
-
-And this one reads from the child:
-
-    # simulate open(FOO, "-|")
-    sub pipe_from_fork ($) {
-	my $parent = shift;
-	pipe $parent, my $child or die;
-	my $pid = fork();
-	die "fork() failed: $!" unless defined $pid;
-	if ($pid) {
-	    close $child;
-	}
-	else {
-	    close $parent;
-	    open(STDOUT, ">&=" . fileno($child)) or die;
-	}
-	$pid;
-    }
-
-    if (pipe_from_fork('BAR')) {
-	# parent
-	while (<BAR>) { print; }
-	close BAR;
-    }
-    else {
-	# child
-	print "pipe_from_fork\n";
-	close STDOUT;
-	exit(0);
-    }
-
-Forking pipe open() constructs will be supported in future.
-
 =item Global state maintained by XSUBs 
 
 External subroutines (XSUBs) that maintain their own global state may
@@ -263,14 +191,6 @@ only has knowledge about the Perl interpreter's own data structures and
 knows nothing about the containing application's state.  For example, any
 state carried on the application's own call stack is out of reach.
 
-=item Thread-safety of extensions
-
-Since the fork() emulation runs code in multiple threads, extensions
-calling into non-thread-safe libraries may not work reliably when
-calling fork().  As Perl's threading support gradually becomes more
-widely adopted even on platforms with a native fork(), such extensions
-are expected to be fixed for thread-safety.
-
 =back
 
 =head1 BUGS
@@ -287,23 +207,12 @@ representation for pseudo-process IDs will be implemented in future.
 
 =item *
 
-In certain cases, the OS-level handles created by the pipe(), socket(),
-and accept() operators are apparently not duplicated accurately in
-pseudo-processes.  This only happens in some situations, but where it
-does happen, it may result in deadlocks between the read and write ends
-of pipe handles, or inability to send or receive data across socket
-handles.
-
-=item *
-
 This document may be incomplete in some respects.
-
-=back
 
 =head1 AUTHOR
 
-Support for concurrent interpreters and the fork() emulation was implemented
-by ActiveState, with funding from Microsoft Corporation.
+Support for the fork() emulation was implemented by ActiveState, supported
+by funding from Microsoft Corporation.
 
 This document is authored and maintained by Gurusamy Sarathy
 E<lt>gsar@activestate.comE<gt>.

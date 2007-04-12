@@ -10,16 +10,12 @@
 #ifndef ___VDir_H___
 #define ___VDir_H___
 
-/*
- * Allow one slot for each possible drive letter
- * and one additional slot for a UNC name
- */
-const int driveCount = ('Z'-'A')+1+1;
+const int driveCount = 30;
 
 class VDir
 {
 public:
-    VDir(int bManageDir = 1);
+    VDir();
     ~VDir() {};
 
     void Init(VDir* pDir, VMem *pMem);
@@ -29,6 +25,14 @@ public:
     WCHAR* MapPathW(const WCHAR *pInName);
     int SetCurrentDirectoryA(char *lpBuffer);
     int SetCurrentDirectoryW(WCHAR *lpBuffer);
+    inline const char *GetDirA(int index)
+    {
+	return dirTableA[index];
+    };
+    inline const WCHAR *GetDirW(int index)
+    {
+	return dirTableW[index];
+    };
     inline int GetDefault(void) { return nDefault; };
 
     inline char* GetCurrentDirectoryA(int dwBufSize, char *lpBuffer)
@@ -80,42 +84,14 @@ protected:
 	SetDirW(pPath, index);
 	nDefault = index;
     };
-    inline const char *GetDirA(int index)
-    {
-	char *ptr = dirTableA[index];
-	if (!ptr) {
-	    /* simulate the existance of this drive */
-	    ptr = szLocalBufferA;
-	    ptr[0] = 'A' + index;
-	    ptr[1] = ':';
-	    ptr[2] = '\\';
-	    ptr[3] = 0;
-	}
-	return ptr;
-    };
-    inline const WCHAR *GetDirW(int index)
-    {
-	WCHAR *ptr = dirTableW[index];
-	if (!ptr) {
-	    /* simulate the existance of this drive */
-	    ptr = szLocalBufferW;
-	    ptr[0] = 'A' + index;
-	    ptr[1] = ':';
-	    ptr[2] = '\\';
-	    ptr[3] = 0;
-	}
-	return ptr;
-    };
 
     inline int DriveIndex(char chr)
     {
-	if (chr == '\\' || chr == '/')
-	    return ('Z'-'A')+1;
 	return (chr | 0x20)-'a';
     };
 
     VMem *pMem;
-    int nDefault, bManageDirectory;
+    int nDefault;
     char *dirTableA[driveCount];
     char szLocalBufferA[MAX_PATH+1];
     WCHAR *dirTableW[driveCount];
@@ -123,10 +99,9 @@ protected:
 };
 
 
-VDir::VDir(int bManageDir /* = 1 */)
+VDir::VDir()
 {
     nDefault = 0;
-    bManageDirectory = bManageDir;
     memset(dirTableA, 0, sizeof(dirTableA));
     memset(dirTableW, 0, sizeof(dirTableW));
 }
@@ -135,7 +110,6 @@ void VDir::Init(VDir* pDir, VMem *p)
 {
     int index;
     DWORD driveBits;
-    int nSave;
     char szBuffer[MAX_PATH*driveCount];
 
     pMem = p;
@@ -146,8 +120,6 @@ void VDir::Init(VDir* pDir, VMem *p)
 	nDefault = pDir->GetDefault();
     }
     else {
-	nSave = bManageDirectory;
-	bManageDirectory = 0;
 	driveBits = GetLogicalDrives();
 	if (GetLogicalDriveStrings(sizeof(szBuffer), szBuffer)) {
 	    char* pEnv = GetEnvironmentStrings();
@@ -161,7 +133,6 @@ void VDir::Init(VDir* pDir, VMem *p)
 	    FreeEnvironmentStrings(pEnv);
 	}
 	SetDefaultA(".");
-	bManageDirectory = nSave;
     }
 }
 
@@ -192,10 +163,6 @@ int VDir::SetDirA(char const *pPath, int index)
 	    }
 	}
     }
-
-    if(bManageDirectory)
-	::SetCurrentDirectoryA(pPath);
-
     return length;
 }
 
@@ -250,10 +217,6 @@ int VDir::SetDirW(WCHAR const *pPath, int index)
 	    }
 	}
     }
-
-    if(bManageDirectory)
-	::SetCurrentDirectoryW(pPath);
-
     return length;
 }
 
@@ -289,82 +252,6 @@ inline void DoGetFullPathNameA(char* lpBuffer, DWORD dwSize, char* Dest)
     GetFullPathNameA(lpBuffer, dwSize, Dest, &pPtr);
 }
 
-inline bool IsSpecialFileName(const char* pName)
-{
-    /* specical file names are devices that the system can open
-     * these include AUX, CON, NUL, PRN, COMx, LPTx, CLOCK$, CONIN$, CONOUT$
-     * (x is a single digit, and names are case-insensitive)
-     */
-    char ch = (pName[0] & ~0x20);
-    switch (ch)
-    {
-	case 'A': /* AUX */
-	    if (((pName[1] & ~0x20) == 'U')
-		&& ((pName[2] & ~0x20) == 'X')
-		&& !pName[3])
-		    return true;
-	    break;
-	case 'C': /* CLOCK$, COMx,  CON, CONIN$ CONOUT$ */
-	    ch = (pName[1] & ~0x20);
-	    switch (ch)
-	    {
-		case 'L': /* CLOCK$ */
-		    if (((pName[2] & ~0x20) == 'O')
-			&& ((pName[3] & ~0x20) == 'C')
-			&& ((pName[4] & ~0x20) == 'K')
-			&& (pName[5] == '$')
-			&& !pName[6])
-			    return true;
-		    break;
-		case 'O': /* COMx,  CON, CONIN$ CONOUT$ */
-		    if ((pName[2] & ~0x20) == 'M') {
-			if ((pName[3] >= '1') && (pName[3] <= '9')
-			    && !pName[4])
-			    return true;
-		    }
-		    else if ((pName[2] & ~0x20) == 'N') {
-			if (!pName[3])
-			    return true;
-			else if ((pName[3] & ~0x20) == 'I') {
-			    if (((pName[4] & ~0x20) == 'N')
-				&& (pName[5] == '$')
-				&& !pName[6])
-			    return true;
-			}
-			else if ((pName[3] & ~0x20) == 'O') {
-			    if (((pName[4] & ~0x20) == 'U')
-				&& ((pName[5] & ~0x20) == 'T')
-				&& (pName[6] == '$')
-				&& !pName[7])
-			    return true;
-			}
-		    }
-		    break;
-	    }
-	    break;
-	case 'L': /* LPTx */
-	    if (((pName[1] & ~0x20) == 'U')
-		&& ((pName[2] & ~0x20) == 'X')
-		&& (pName[3] >= '1') && (pName[3] <= '9')
-		&& !pName[4])
-		    return true;
-	    break;
-	case 'N': /* NUL */
-	    if (((pName[1] & ~0x20) == 'U')
-		&& ((pName[2] & ~0x20) == 'L')
-		&& !pName[3])
-		    return true;
-	    break;
-	case 'P': /* PRN */
-	    if (((pName[1] & ~0x20) == 'R')
-		&& ((pName[2] & ~0x20) == 'N')
-		&& !pName[3])
-		    return true;
-	    break;
-    }
-    return false;
-}
-
 char *VDir::MapPathA(const char *pInName)
 {   /*
      * possiblities -- relative path or absolute path with or without drive letter
@@ -372,12 +259,8 @@ char *VDir::MapPathA(const char *pInName)
      */
     char szBuffer[(MAX_PATH+1)*2];
     char szlBuf[MAX_PATH+1];
-    int length = strlen(pInName);
 
-    if (!length)
-	return (char*)pInName;
-
-    if (length > MAX_PATH) {
+    if (strlen(pInName) > MAX_PATH) {
 	strncpy(szlBuf, pInName, MAX_PATH);
 	if (IsPathSep(pInName[0]) && !IsPathSep(pInName[1])) {   
 	    /* absolute path - reduce length by 2 for drive specifier */
@@ -393,7 +276,7 @@ char *VDir::MapPathA(const char *pInName)
 	/* has drive letter */
 	if (IsPathSep(pInName[2])) {
 	    /* absolute with drive letter */
-	    DoGetFullPathNameA((char*)pInName, sizeof(szLocalBufferA), szLocalBufferA);
+	    strcpy(szLocalBufferA, pInName);
 	}
 	else {
 	    /* relative path with drive letter */
@@ -409,27 +292,23 @@ char *VDir::MapPathA(const char *pInName)
 	/* no drive letter */
 	if (IsPathSep(pInName[1]) && IsPathSep(pInName[0])) {
 	    /* UNC name */
-	    DoGetFullPathNameA((char*)pInName, sizeof(szLocalBufferA), szLocalBufferA);
+	    strcpy(szLocalBufferA, pInName);
 	}
 	else {
 	    strcpy(szBuffer, GetDefaultDirA());
 	    if (IsPathSep(pInName[0])) {
 		/* absolute path */
-		strcpy(&szBuffer[2], pInName);
-		DoGetFullPathNameA(szBuffer, sizeof(szLocalBufferA), szLocalBufferA);
+		szLocalBufferA[0] = szBuffer[0];
+		szLocalBufferA[1] = szBuffer[1];
+		strcpy(&szLocalBufferA[2], pInName);
 	    }
 	    else {
 		/* relative path */
-		if (IsSpecialFileName(pInName)) {
-		    return (char*)pInName;
-		}
-		else {
-		    strcat(szBuffer, pInName);
-		    if (strlen(szBuffer) > MAX_PATH)
-			szBuffer[MAX_PATH] = '\0';
+		strcat(szBuffer, pInName);
+		if (strlen(szBuffer) > MAX_PATH)
+		    szBuffer[MAX_PATH] = '\0';
 
-		    DoGetFullPathNameA(szBuffer, sizeof(szLocalBufferA), szLocalBufferA);
-		}
+		DoGetFullPathNameA(szBuffer, sizeof(szLocalBufferA), szLocalBufferA);
 	    }
 	}
     }
@@ -439,60 +318,64 @@ char *VDir::MapPathA(const char *pInName)
 
 int VDir::SetCurrentDirectoryA(char *lpBuffer)
 {
-    char *pPtr;
-    int length, nRet = -1;
+    HANDLE hHandle;
+    WIN32_FIND_DATA win32FD;
+    char szBuffer[MAX_PATH+1], *pPtr;
+    int nRet = -1;
 
-    pPtr = MapPathA(lpBuffer);
-    length = strlen(pPtr);
-    if(length > 3 && IsPathSep(pPtr[length-1])) {
-	/* don't remove the trailing slash from 'x:\'  */
-	pPtr[length-1] = '\0';
-    }
+    GetFullPathNameA(MapPathA(lpBuffer), sizeof(szBuffer), szBuffer, &pPtr);
 
-    DWORD r = GetFileAttributesA(pPtr);
-    if ((r != 0xffffffff) && (r & FILE_ATTRIBUTE_DIRECTORY))
-    {
-	char szBuffer[(MAX_PATH+1)*2];
-	DoGetFullPathNameA(pPtr, sizeof(szBuffer), szBuffer);
+    hHandle = FindFirstFile(szBuffer, &win32FD);
+    if (hHandle != INVALID_HANDLE_VALUE) {
+        FindClose(hHandle);
 	SetDefaultDirA(szBuffer, DriveIndex(szBuffer[0]));
 	nRet = 0;
     }
+    return nRet;
+}
 
+int VDir::SetCurrentDirectoryW(WCHAR *lpBuffer)
+{
+    HANDLE hHandle;
+    WIN32_FIND_DATAW win32FD;
+    WCHAR szBuffer[MAX_PATH+1], *pPtr;
+    int nRet = -1;
+
+    GetFullPathNameW(MapPathW(lpBuffer), (sizeof(szBuffer)/sizeof(WCHAR)), szBuffer, &pPtr);
+
+    hHandle = FindFirstFileW(szBuffer, &win32FD);
+    if (hHandle != INVALID_HANDLE_VALUE) {
+        FindClose(hHandle);
+	SetDefaultDirW(szBuffer, DriveIndex((char)szBuffer[0]));
+	nRet = 0;
+    }
     return nRet;
 }
 
 DWORD VDir::CalculateEnvironmentSpace(void)
-{   /* the current directory environment strings are stored as '=D:=d:\path' */
+{   /* the current directory environment strings are stored as '=d=d:\path' */
     int index;
     DWORD dwSize = 0;
     for (index = 0; index < driveCount; ++index) {
 	if (dirTableA[index] != NULL) {
-	    dwSize += strlen(dirTableA[index]) + 5;  /* add 1 for trailing NULL and 4 for '=D:=' */
+	    dwSize += strlen(dirTableA[index]) + 4;  /* add 1 for trailing NULL and 3 for '=d=' */
 	}
     }
     return dwSize;
 }
 
 LPSTR VDir::BuildEnvironmentSpace(LPSTR lpStr)
-{   /* store the current directory environment strings as '=D:=d:\path' */
-    int index, length;
+{   /* store the current directory environment strings as '=d=d:\path' */
+    int index;
     LPSTR lpDirStr;
     for (index = 0; index < driveCount; ++index) {
 	lpDirStr = dirTableA[index];
 	if (lpDirStr != NULL) {
 	    lpStr[0] = '=';
 	    lpStr[1] = lpDirStr[0];
-	    lpStr[2] = '\0';
-	    CharUpper(&lpStr[1]);
-	    lpStr[2] = ':';
-	    lpStr[3] = '=';
-	    strcpy(&lpStr[4], lpDirStr);
-	    length = strlen(lpDirStr);
-	    lpStr += length + 5; /* add 1 for trailing NULL and 4 for '=D:=' */
-	    if (length > 3 && IsPathSep(lpStr[-2])) {
-		lpStr[-2] = '\0';   /* remove the trailing path separator */
-		--lpStr;
-	    }
+	    lpStr[2] = '=';
+	    strcpy(&lpStr[3], lpDirStr);
+	    lpStr += strlen(lpDirStr) + 4; /* add 1 for trailing NULL and 3 for '=d=' */
 	}
     }
     return lpStr;
@@ -517,82 +400,6 @@ inline void DoGetFullPathNameW(WCHAR* lpBuffer, DWORD dwSize, WCHAR* Dest)
     GetFullPathNameW(lpBuffer, dwSize, Dest, &pPtr);
 }
 
-inline bool IsSpecialFileName(const WCHAR* pName)
-{
-    /* specical file names are devices that the system can open
-     * these include AUX, CON, NUL, PRN, COMx, LPTx, CLOCK$, CONIN$, CONOUT$
-     * (x is a single digit, and names are case-insensitive)
-     */
-    WCHAR ch = (pName[0] & ~0x20);
-    switch (ch)
-    {
-	case 'A': /* AUX */
-	    if (((pName[1] & ~0x20) == 'U')
-		&& ((pName[2] & ~0x20) == 'X')
-		&& !pName[3])
-		    return true;
-	    break;
-	case 'C': /* CLOCK$, COMx,  CON, CONIN$ CONOUT$ */
-	    ch = (pName[1] & ~0x20);
-	    switch (ch)
-	    {
-		case 'L': /* CLOCK$ */
-		    if (((pName[2] & ~0x20) == 'O')
-			&& ((pName[3] & ~0x20) == 'C')
-			&& ((pName[4] & ~0x20) == 'K')
-			&& (pName[5] == '$')
-			&& !pName[6])
-			    return true;
-		    break;
-		case 'O': /* COMx,  CON, CONIN$ CONOUT$ */
-		    if ((pName[2] & ~0x20) == 'M') {
-			if ((pName[3] >= '1') && (pName[3] <= '9')
-			    && !pName[4])
-			    return true;
-		    }
-		    else if ((pName[2] & ~0x20) == 'N') {
-			if (!pName[3])
-			    return true;
-			else if ((pName[3] & ~0x20) == 'I') {
-			    if (((pName[4] & ~0x20) == 'N')
-				&& (pName[5] == '$')
-				&& !pName[6])
-			    return true;
-			}
-			else if ((pName[3] & ~0x20) == 'O') {
-			    if (((pName[4] & ~0x20) == 'U')
-				&& ((pName[5] & ~0x20) == 'T')
-				&& (pName[6] == '$')
-				&& !pName[7])
-			    return true;
-			}
-		    }
-		    break;
-	    }
-	    break;
-	case 'L': /* LPTx */
-	    if (((pName[1] & ~0x20) == 'U')
-		&& ((pName[2] & ~0x20) == 'X')
-		&& (pName[3] >= '1') && (pName[3] <= '9')
-		&& !pName[4])
-		    return true;
-	    break;
-	case 'N': /* NUL */
-	    if (((pName[1] & ~0x20) == 'U')
-		&& ((pName[2] & ~0x20) == 'L')
-		&& !pName[3])
-		    return true;
-	    break;
-	case 'P': /* PRN */
-	    if (((pName[1] & ~0x20) == 'R')
-		&& ((pName[2] & ~0x20) == 'N')
-		&& !pName[3])
-		    return true;
-	    break;
-    }
-    return false;
-}
-
 WCHAR* VDir::MapPathW(const WCHAR *pInName)
 {   /*
      * possiblities -- relative path or absolute path with or without drive letter
@@ -600,12 +407,8 @@ WCHAR* VDir::MapPathW(const WCHAR *pInName)
      */
     WCHAR szBuffer[(MAX_PATH+1)*2];
     WCHAR szlBuf[MAX_PATH+1];
-    int length = wcslen(pInName);
 
-    if (!length)
-	return (WCHAR*)pInName;
-
-    if (length > MAX_PATH) {
+    if (wcslen(pInName) > MAX_PATH) {
 	wcsncpy(szlBuf, pInName, MAX_PATH);
 	if (IsPathSep(pInName[0]) && !IsPathSep(pInName[1])) {   
 	    /* absolute path - reduce length by 2 for drive specifier */
@@ -621,7 +424,7 @@ WCHAR* VDir::MapPathW(const WCHAR *pInName)
 	/* has drive letter */
 	if (IsPathSep(pInName[2])) {
 	    /* absolute with drive letter */
-	    DoGetFullPathNameW((WCHAR*)pInName, (sizeof(szLocalBufferW)/sizeof(WCHAR)), szLocalBufferW);
+	    wcscpy(szLocalBufferW, pInName);
 	}
 	else {
 	    /* relative path with drive letter */
@@ -637,55 +440,28 @@ WCHAR* VDir::MapPathW(const WCHAR *pInName)
 	/* no drive letter */
 	if (IsPathSep(pInName[1]) && IsPathSep(pInName[0])) {
 	    /* UNC name */
-	    DoGetFullPathNameW((WCHAR*)pInName, (sizeof(szLocalBufferW)/sizeof(WCHAR)), szLocalBufferW);
+	    wcscpy(szLocalBufferW, pInName);
 	}
 	else {
 	    wcscpy(szBuffer, GetDefaultDirW());
 	    if (IsPathSep(pInName[0])) {
 		/* absolute path */
-		wcscpy(&szBuffer[2], pInName);
-		DoGetFullPathNameW(szBuffer, (sizeof(szLocalBufferW)/sizeof(WCHAR)), szLocalBufferW);
+		szLocalBufferW[0] = szBuffer[0];
+		szLocalBufferW[1] = szBuffer[1];
+		wcscpy(&szLocalBufferW[2], pInName);
 	    }
 	    else {
 		/* relative path */
-		if (IsSpecialFileName(pInName)) {
-		    return (WCHAR*)pInName;
-		}
-		else {
-		    wcscat(szBuffer, pInName);
-		    if (wcslen(szBuffer) > MAX_PATH)
-			szBuffer[MAX_PATH] = '\0';
+		wcscat(szBuffer, pInName);
+		if (wcslen(szBuffer) > MAX_PATH)
+		    szBuffer[MAX_PATH] = '\0';
 
-		    DoGetFullPathNameW(szBuffer, (sizeof(szLocalBufferW)/sizeof(WCHAR)), szLocalBufferW);
-		}
+		DoGetFullPathNameW(szBuffer, (sizeof(szLocalBufferW)/sizeof(WCHAR)), szLocalBufferW);
 	    }
 	}
     }
     return szLocalBufferW;
 }
 
-int VDir::SetCurrentDirectoryW(WCHAR *lpBuffer)
-{
-    WCHAR *pPtr;
-    int length, nRet = -1;
-
-    pPtr = MapPathW(lpBuffer);
-    length = wcslen(pPtr);
-    if(length > 3 && IsPathSep(pPtr[length-1])) {
-	/* don't remove the trailing slash from 'x:\'  */
-	pPtr[length-1] = '\0';
-    }
-
-    DWORD r = GetFileAttributesW(pPtr);
-    if ((r != 0xffffffff) && (r & FILE_ATTRIBUTE_DIRECTORY))
-    {
-	WCHAR wBuffer[(MAX_PATH+1)*2];
-	DoGetFullPathNameW(pPtr, (sizeof(wBuffer)/sizeof(WCHAR)), wBuffer);
-	SetDefaultDirW(wBuffer, DriveIndex((char)wBuffer[0]));
-	nRet = 0;
-    }
-
-    return nRet;
-}
 
 #endif	/* ___VDir_H___ */
