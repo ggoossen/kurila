@@ -1,6 +1,7 @@
 =head1 NAME
 
 perlfilter - Source Filters
+ 
 
 =head1 DESCRIPTION
 
@@ -18,10 +19,12 @@ you'll soon learn. But first, the basics.
 =head1 CONCEPTS
 
 Before the Perl interpreter can execute a Perl script, it must first
-read it from a file into memory for parsing and compilation. If that
-script itself includes other scripts with a C<use> or C<require>
-statement, then each of those scripts will have to be read from their
-respective files as well.
+read it from a file into memory for parsing and compilation. (Even
+scripts specified on the command line with the C<-e> option are stored in
+a temporary file for the parser to process.) If that script itself
+includes other scripts with a C<use> or C<require> statement, then each
+of those scripts will have to be read from their respective files as
+well.
 
 Now think of each logical connection between the Perl parser and an
 individual file as a I<source stream>. A source stream is created when
@@ -54,7 +57,7 @@ Every source stream is associated with only one file.
 
 A source filter is a special kind of Perl module that intercepts and
 modifies a source stream before it reaches the parser. A source filter
-changes our diagram like this:
+changes the our diagram like this:
 
     file ----> filter ----> parser
 
@@ -197,7 +200,7 @@ going to this trouble is when writing a source scrambler. The
 C<decrypt> filter (which unscrambles the source before Perl parses it)
 included with the source filter distribution is an example of a C
 source filter (see Decryption Filters, below).
-
+ 
 
 =over 5
 
@@ -409,7 +412,6 @@ Here is the complete Debug filter:
     package Debug;
 
     use strict;
-    use warnings;
     use Filter::Util::Call ;
 
     use constant TRUE => 1 ;
@@ -508,7 +510,8 @@ doesn't know Perl. It can be fooled quite easily:
     EOM
 
 Such things aside, you can see that a lot can be achieved with a modest
-amount of code.
+amount of code. I<[Note that Tuomas' toy VRML parser on p. 17 had the
+same difficulty parsing VRML strings that look like comments. -Jon]>
 
 =head1 CONCLUSION
 
@@ -527,7 +530,7 @@ blocks get included.
 Once you can identify individual blocks, try allowing them to be
 nested. That isn't difficult either.
 
-Here is an interesting idea that doesn't involve the Debug filter.
+Here is a interesting idea that doesn't involve the Debug filter.
 Currently Perl subroutines have fairly limited support for formal
 parameter lists. You can specify the number of parameters and their
 type, but you still have to manually take them out of the C<@_> array
@@ -556,11 +559,6 @@ syntax you want your filter to have.
 The Source Filters distribution is available on CPAN, in 
 
     CPAN/modules/by-module/Filter
-
-Starting from Perl 5.8 Filter::Util::Call (the core part of the
-Source Filters distribution) is part of the standard Perl distribution.
-Also included is a friendlier interface called Filter::Simple, by
-Damian Conway.
 
 =head1 AUTHOR
 
