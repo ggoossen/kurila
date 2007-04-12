@@ -1,142 +1,87 @@
-If you read this file _as_is_, just ignore the funny characters you
-see. It is written in the POD format (see pod/perlpod.pod) which is
-specially designed to be readable as is.
+Perl 5 README file for the Stratus VOS operating system.
+Paul Green (Paul_Green@stratus.com)
+August 12, 1998
 
-=head1 NAME
-
-README.vos - Perl for Stratus VOS
-
-=head1 SYNOPSIS
-
-This file contains notes for building perl on the Stratus VOS
-operating system.  Perl is a scripting or macro language that is
-popular on many systems.  See L<perlbook> for a number of good
+Introduction
+------------
+This is a port of Perl version 5, revision 005-02, to VOS.  Perl
+is a scripting or macro language that is popular on many
+systems.  See your local computer bookstore for a number of good
 books on Perl.
 
-These are instructions for building Perl from source.  Most
-people can simply download a pre-compiled distribution from the
-VOS anonymous FTP site.  This version of Perl is not supported
-on VOS Release 14.2.0 or earlier releases.  If you are running
-VOS Release 14.3.0 or later, download Perl from
-ftp://ftp.stratus.com/pub/vos/posix/ga/ga.html.  Instructions
-for unbundling the Perl distribution file are at
-ftp://ftp.stratus.com/pub/vos/utility/utility.html.
+Most of the Perl features should work on VOS.  However, any
+attempt by perl.pm to call the following unimplemented POSIX
+functions will result in an error message and an immediate and
+fatal call to the VOS debugger.  They are "dup", "execlp",
+"execl", "execvp", "fork", and "waitpid".
 
-If you are running VOS Release 14.4.1 or later, you can obtain a
-pre-compiled, supported copy of perl by purchasing Release 2.0.1
-of the VOS GNU C++ and GNU Tools product from Stratus
-Technologies.
+Compiling Perl 5 on VOS
+-----------------------
+Before you can build Perl 5 on VOS, you need to have or acquire the
+following additional items.
 
-=head1 BUILDING PERL FOR VOS
+1.   The VOS Standard C Compiler and Runtime, or the VOS Standard C
+     Cross-Compiler.  This is a standard Stratus product.
 
-To build perl from its source code, you must have a Continuum
-platform running VOS Release 14.5.0 or later, the STCP product,
-and the GNU C++ and GNU Tools, Release 2.0.1 or later.
+2.   The VOS OS TCP/IP product set.  While the necessary header files
+     are included in this distribution, you still need the appropriate
+     object files in order to bind perl.pm.  This is a standard
+     Stratus product.
 
-To build full perl using the supplied Configure script and
-makefiles, change to the "vos" subdirectory and type the command
-"compile_full_perl" or "start_process compile_full_perl".  This
-will configure, build, and test perl.  All of the test cases
-that are executed should pass.
+3.   The VOS POSIX.1 environment.  As of this writing, this is
+     available on the VOS FTP site.  Login to ftp.stratus.com
+     anonymously and get the file /pub/vos/alpha/posix.save.evf.gz in
+     binary file-transfer mode.  Or use the Uniform Resource Locator
+     (URL) ftp://ftp.stratus.com/pub/vos/alpha/posix.save.evf.gz from
+     your web browser.  This is not a standard Stratus product.
 
-=head1 INSTALLING PERL IN VOS
+To build build 5, change to one of the VOS object directories
+(e.g., perl5.005_02>vos>obj), and give the command "<build".  If
+you have the cross-compilers and wish to build for a specific
+architecture, say "<build -processor pa7100" (for example).  You
+can also customize the "compile_perl.cm" command macro for your
+system.
 
-=over 4
+Changes to Perl for VOS
+-----------------------
+1.   The header perl.h was changed to include vosish.h instead
+     of unixish.h.  This change is necessary because VOS POSIX.1
+     does not (yet) implement the getgrname() or getgrgid()
+     functions.
 
-=item 1
+Unimplemented Features
+----------------------
+If Perl 5 attempts to call an unimplemented VOS POSIX.1
+function, it will print a fatal error message and enter the VOS
+debugger.  This error is not recoverable.  See vos_dummies.c for
+a list of the unimplemented POSIX.1 functions.  To see what the
+error message looks like, compile and execute
+"test_vos_dummies.c".
 
-If you have built perl using the Configure script, ensure that
-you have modify permission to C<< >system>ported >> and type
+Restrictions
+------------
+This port of Perl version 5 to VOS uses Unix-style,
+slash-separated pathnames, not VOS-style greater-than-separated
+pathnames.  If you wish to have it use VOS-style pathnames, try
+setting the external variable s$c_options to 4 with the
+following command line.  Note that this way of configuring Perl
+5 has not been tested; I don't know if Perl can handle the
+presence of the greater-thans, and the absence of the slashes.
 
-     gmake install
+     set_external_variable s$c_options -in perl.pm -type integer -to 4
 
-=item 2
+The following command can be used to check the value:
 
-While there are currently no architecture-specific
-extensions or modules distributed with perl, the following
-directories can be used to hold such files:
+     get_external_variable s$c_options -in perl.pm -type integer
 
-     >system>ported>lib>perl5>5.9.0>68k
-     >system>ported>lib>perl5>5.9.0>860
-     >system>ported>lib>perl5>5.9.0>7100
-     >system>ported>lib>perl5>5.9.0>8000
+See the documentation for VOS POSIX.1 for the full set of option
+values.
 
-=item 3
-
-Site-specific perl extensions and modules can be installed in one of
-two places.  Put architecture-independent files into:
-
-     >system>ported>lib>perl5>site_perl>5.9.0
-
-Put site-specific architecture-dependent files into one of the
-following directories:
-
-     >system>ported>lib>perl5>site_perl>5.9.0>68k
-     >system>ported>lib>perl5>site_perl>5.9.0>860
-     >system>ported>lib>perl5>site_perl>5.9.0>7100
-     >system>ported>lib>perl5>site_perl>5.9.0>8000
-
-=item 4
-
-You can examine the @INC variable from within a perl program
-to see the order in which Perl searches these directories.
-
-=back
-
-=head1 USING PERL IN VOS
-
-=head2 Restrictions of Perl on VOS
-
-This port of Perl version 5 to VOS prefers Unix-style,
-slash-separated pathnames over VOS-style greater-than-separated
-pathnames.  VOS-style pathnames should work in most contexts, but
-if you have trouble, replace all greater-than characters by slash
-characters.  Because the slash character is used as a pathname
-delimiter, Perl cannot process VOS pathnames containing a slash
-character in a directory or file name; these must be renamed.
-
-This port of Perl also uses Unix-epoch date values internally.
-As long as you are dealing with ASCII character string
-representations of dates, this should not be an issue.  The
-supported epoch is January 1, 1980 to January 17, 2038.
-
-See the file pod/perlport.pod for more information about the VOS
-port of Perl.
-
-=head2 Handling of underflow and overflow
-
-VOS does not support automatically mapping overflowed
-floating-point values to +infinity, nor automatically mapping
-underflowed floating-point values to -infinity, unlike many
-other platforms.  The Perl pack function has been modified to
-perform such mapping in software on VOS.  Performing other
-floating-point computations that underflow or overflow will
-probably result in SIGFPE.  Don't push your luck.
-
-=head1 TEST STATUS
-
-When Perl is built using the native build process on VOS Release
-14.5.0 and GNU C++/GNU Tools 2.0.1, all attempted tests either
-pass or result in TODO (ignored) failures.
-
-=head1 SUPPORT STATUS
-
+Support Status
+--------------
 I'm offering this port "as is".  You can ask me questions, but I
-can't guarantee I'll be able to answer them.  There are some
-excellent books available on the Perl language; consult a book
-seller.
+can't guarantee I'll be able to answer them; I don't know much
+about Perl itself; I'm still learning that.
 
-If you want a supported version of perl for VOS, purchase the VOS
-GNU C++ and GNU Tools Release 2.0.1 product from Stratus
-Technologies, along with a support contract (or from anyone else
-who will sell you support).
+(end)
 
-=head1 AUTHOR
-
-Paul Green (Paul.Green@stratus.com)
-
-=head1 LAST UPDATE
-
-August 12, 2002
-
-=cut
