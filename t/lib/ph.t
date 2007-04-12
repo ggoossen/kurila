@@ -4,12 +4,8 @@
 # just socket.ph and pals.
 #   -- Kurt Starsinic <kstar@isinet.com>
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
+use lib '../lib';
 
-use Config;
 
 # All the constants which Socket.pm tries to make available:
 my @possibly_defined = qw(
