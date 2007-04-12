@@ -16,14 +16,6 @@ $ Dec_C_Version := "''Dec_C_Version'"
 $ Dec_C_Version = Dec_C_Version + 0
 $ Vms_Ver := "''f$extract(1,3, f$getsyi(""version""))'"
 $ perl_extensions := "''extensions'"
-$ if f$length(Mcc) .eq. 0 then Mcc := "cc"
-$ MCC = f$edit(mcc, "UPCASE")
-$ IF Mcc.eqs."CC
-$ THEN
-$   C_Compiler_Replace := "CC="
-$ ELSE
-$   C_Compiler_Replace := "CC=CC=''Mcc'"
-$ ENDIF
 $ if "''Using_Dec_C'" .eqs. "Yes"
 $ THEN
 $   Checkcc := "''Mcc'/prefix=all"
@@ -31,6 +23,7 @@ $ ELSE
 $   Checkcc := "''Mcc'"
 $ ENDIF
 $ cc_flags = ""
+$ if f$length(Mcc) .eq. 0 then Mcc := "cc"
 $! Some constant defaults.
 $
 $ hwname = f$getsyi("HW_NAME")
@@ -38,7 +31,13 @@ $ myname = myhostname
 $ if "''myname'" .eqs. "" THEN myname = f$trnlnm("SYS$NODE")
 $ perl_package="''package'"
 $ perl_baserev = "''baserev'"
-$ cc_defines=""
+$ cc_defines="DEBUGGING"
+$ IF ("''Has_Socketshr'".eqs."T") .or. ("''Has_Dec_C_Sockets'".eqs."T") THEN cc_defines = cc_defines + ",VMS_DO_SOCKETS"
+$ if ("''Has_Dec_C_Sockets'".eqs."T") then cc_defines = cc_defines + ",DECCRTL_SOCKETS"
+$! if ("''Use_Threads'".eqs."T")
+$! then 
+$!   cc_defines = cc_defines + ",MULTIPLICITY"
+$! endif
 $ perl_CONFIG="true"
 $ perl_i_netdb="undef"
 $ perl_d_gnulibc="undef"
@@ -77,7 +76,6 @@ $ perl_d_sockpair="undef"
 $ perl_i_neterrno="define"
 $ perl_ldflags="/NoTrace/NoMap"
 $ perl_d_lchown="undef"
-$ perl_d_mknod="undef"
 $ perl_d_union_semun="undef"
 $ perl_d_semctl_semun="undef"
 $ perl_d_semctl_semid_ds="undef"
@@ -209,7 +207,7 @@ $ perl_i_termios="undef"
 $ perl_i_time="define"
 $ perl_i_systime="undef"
 $ perl_i_systimek="undef"
-$! perl_i_unistd="undef"
+$ perl_i_unistd="undef"
 $ perl_i_utime="undef"
 $ perl_i_varargs="undef"
 $ perl_i_vfork="undef"
@@ -411,9 +409,7 @@ $ WS "#endif
 $ WS "#include <stdio.h>
 $ WS "int main()
 $ WS "{"
-$ WS "int foo;
-$ WS "foo = sizeof(double);
-$ WS "printf(""%d\n"", foo);
+$ WS "printf(""%i\n"", sizeof(double));
 $ WS "exit(0);
 $ WS "}"
 $ CS
@@ -454,7 +450,7 @@ $ WS "#endif
 $ WS "#include <stdio.h>
 $ WS "int main()
 $ WS "{"
-$ WS "printf(""%d\n"", sizeof(long double));
+$ WS "printf(""%i\n"", sizeof(long double));
 $ WS "exit(0);
 $ WS "}"
 $ CS
@@ -512,7 +508,7 @@ $ WS "#endif
 $ WS "#include <stdio.h>
 $ WS "int main()
 $ WS "{"
-$ WS "printf(""%d\n"", sizeof(long long));
+$ WS "printf(""%i\n"", sizeof(long long));
 $ WS "exit(0);
 $ WS "}"
 $ CS
@@ -561,7 +557,7 @@ $ WS "#endif
 $ WS "#include <stdio.h>
 $ WS "int main()
 $ WS "{"
-$ WS "printf(""%d\n"", sizeof(int));
+$ WS "printf(""%i\n"", sizeof(int));
 $ WS "exit(0);
 $ WS "}"
 $ CS
@@ -607,7 +603,7 @@ $ WS "#endif
 $ WS "#include <stdio.h>
 $ WS "int main()
 $ WS "{"
-$ WS "printf(""%d\n"", sizeof(short));
+$ WS "printf(""%i\n"", sizeof(short));
 $ WS "exit(0);
 $ WS "}"
 $ CS
@@ -647,9 +643,7 @@ $ WS "#endif
 $ WS "#include <stdio.h>
 $ WS "int main()
 $ WS "{"
-$ WS "int foo;
-$ WS "foo = sizeof(long);
-$ WS "printf(""%d\n"", foo);
+$ WS "printf(""%i\n"", sizeof(long));
 $ WS "exit(0);
 $ WS "}"
 $ CS
@@ -711,68 +705,6 @@ $   ELSE
 $     perl_gidtype = "gid_t"
 $   ENDIF
 $ WRITE_RESULT "Gid_t is ''perl_gidtype'"
-$!
-$! Check to see if we've got dev_t
-$!
-$ OS
-$ WS "#ifdef __DECC
-$ WS "#include <stdlib.h>
-$ WS "#endif
-$ WS "#include <stdio.h>
-$ WS "#include <types.h>
-$ WS "#include <unistd.h>
-$ WS "int main()
-$ WS "{"
-$ WS "dev_t foo;
-$ WS "exit(0);
-$ WS "}"
-$ CS
-$   DEFINE SYS$ERROR _NLA0:
-$   DEFINE SYS$OUTPUT _NLA0:
-$   on error then continue
-$   on warning then continue
-$   'Checkcc' temp
-$   teststatus = f$extract(9,1,$status)
-$   DEASSIGN SYS$OUTPUT
-$   DEASSIGN SYS$ERROR
-$   if (teststatus.nes."1")
-$   THEN
-$!   Okay, dev_t failed. Must be unsigned int
-$     perl_devtype = "unsigned int"
-$   ELSE
-$     perl_devtype = "dev_t"
-$   ENDIF
-$ WRITE_RESULT "Dev_t is ''perl_devtype'"
-$!
-$! Check to see if we've got unistd.h (which we ought to, but you never know)
-$!
-$ OS
-$ WS "#ifdef __DECC
-$ WS "#include <stdlib.h>
-$ WS "#endif
-$ WS "#include <unistd.h>
-$ WS "int main()
-$ WS "{"
-$ WS "exit(0);
-$ WS "}"
-$ CS
-$   DEFINE SYS$ERROR _NLA0:
-$   DEFINE SYS$OUTPUT _NLA0:
-$   on error then continue
-$   on warning then continue
-$   'Checkcc' temp
-$   teststatus = f$extract(9,1,$status)
-$   DEASSIGN SYS$OUTPUT
-$   DEASSIGN SYS$ERROR
-$   if (teststatus.nes."1")
-$   THEN
-$!   Okay, failed. Must not have it
-$     perl_i_unistd = "undef"
-$   ELSE
-$     perl_i_unistd = "define"
-
-$   ENDIF
-$ WRITE_RESULT "i_unistd is ''perl_i_unistd'"
 $!
 $! Check the prototype for select
 $!
@@ -1667,14 +1599,10 @@ $ WS "#endif
 $ WS "#include <stdio.h>
 $ WS "int main()
 $ WS "{"
-$ WS "int foo;
-$ WS "foo = sizeof(char *);
-$ WS "printf(""%d\n"", foo);
+$ WS "printf(""%i\n"", sizeof(void *));
 $ WS "exit(0);
 $ WS "}"
 $ CS
-$! copy temp.c sys$output
-$!
 $   DEFINE SYS$ERROR _NLA0:
 $   DEFINE SYS$OUTPUT _NLA0:
 $   ON ERROR THEN CONTINUE
@@ -1890,11 +1818,11 @@ $ perl_sitearchexp="''perl_prefix':[lib.site_perl.''perl_arch']"
 $ perl_sitearch="''perl_prefix':[lib.site_perl.''perl_arch']"
 $ if "''Using_Dec_C'" .eqs. "Yes"
 $ THEN
-$ perl_ccflags="/Include=[]/Standard=Relaxed_ANSI/Prefix=All/Obj=''perl_obj_ext'/NoList''cc_flags'"
+$ perl_ccflags="/Define=(''cc_defines')/Include=[]/Standard=Relaxed_ANSI/Prefix=All/Obj=''perl_obj_ext'/NoList''cc_flags'"
 $ ELSE
 $   IF "''Using_Vax_C'" .eqs. "Yes"
 $   THEN
-$     perl_ccflags="/Include=[]/Obj=''perl_obj_ext'/NoList''cc_flags'"
+$     perl_ccflags="/Define=(''cc_defines')/Include=[]/Obj=''perl_obj_ext'/NoList''cc_flags'"
 $   ENDIF
 $ ENDIF
 $!
@@ -1948,7 +1876,7 @@ $ WC "installarchlib='" + perl_installarchlib + "'"
 $ WC "installsitelib='" + perl_installsitelib + "'"
 $ WC "installsitearch='" + perl_installsitearch + "'"
 $ WC "path_sep='" + perl_path_sep + "'"
-$ WC "startperl=""$ perl 'f$env(\""procedure\"")' 'p1' 'p2' 'p3' 'p4' 'p5' 'p6' 'p7' 'p8'  !\n$ exit++ perl_ + ++$status != 0 and $exit = $status = undef;"""
+$ WC "startperl='$ perl 'f$env(\""procedure\"")' 'p1' 'p2' 'p3' 'p4' 'p5' 'p6' 'p7' 'p8'  !\n$ exit++ perl_ + ++$status != 0 and $exit = $status = undef;'"
 $ WC "vms_cc_type='" + perl_vms_cc_type + "'"
 $ WC "d_attribut='" + perl_d_attribut + "'"
 $ WC "cc='" + perl_cc + "'"
@@ -2280,8 +2208,6 @@ $ WC "d_union_semun='" + perl_d_union_semun + "'"
 $ WC "d_semctl_semun='" + perl_d_semctl_semun + "'"
 $ WC "d_semctl_semid_ds='" + perl_d_semctl_semid_ds + "'"
 $ WC "extensions='" + perl_extensions + "'"
-$ WC "d_mknod='" + perl_d_mknod + "'"
-$ WC "devtype='" + perl_devtype + "'"
 $!
 $ Close CONFIGSH
 $
@@ -2302,64 +2228,8 @@ $ else
 $   link munchconfig
 $ endif
 $ WRITE_RESULT "Writing config.h"
-$ !
-$ ! we need an fdl file
-$ CREATE [-]CONFIG.FDL
-RECORD
-  FORMAT STREAM_LF
-$ CREATE /FDL=[-]CONFIG.FDL [-]CONFIG.LOCAL
-$ ! First spit out the header info with the local defines (to get
-$ ! around the 255 character command line limit)
-$ OPEN/APPEND CONFIG [-]config.local
-$ if use_debugging_perl.eqs."Y"
-$ THEN
-$   WRITE CONFIG "#define DEBUGGING"
-$ ENDIF
-$ if preload_env.eqs."Y"
-$ THEN
-$    WRITE CONFIG "#define PRIME_ENV_AT_STARTUP"
-$ ENDIF
-$ if use_two_pot_malloc.eqs."Y"
-$ THEN
-$    WRITE CONFIG "#define TWO_POT_OPTIMIZE"
-$ endif
-$ if mymalloc.eqs."Y"
-$ THEN
-$    WRITE CONFIG "#define EMBEDMYMALLOC"
-$ ENDIF
-$ if use_pack_malloc.eqs."Y"
-$ THEN
-$    WRITE CONFIG "#define PACK_MALLOC"
-$ endif
-$ if use_debugmalloc.eqs."Y"
-$ THEN
-$    write config "#define DEBUGGING_MSTATS"
-$ ENDIF
-$ if "''Using_Gnu_C'" .eqs."Yes"
-$ THEN
-$   WRITE CONFIG "#define GNUC_ATTRIBUTE_CHECK"
-$ ENDIF
-$ if "''Has_Dec_C_Sockets'".eqs."T"
-$ THEN
-$    WRITE CONFIG "#define VMS_DO_SOCKETS"
-$    WRITE CONFIG "#define DECCRTL_SOCKETS"
-$ ENDIF
-$ if "''Has_Socketshr'".eqs."T"
-$ THEN
-$    WRITE CONFIG "#define VMS_DO_SOCKETS"
-$ ENDIF
-$ CLOSE CONFIG
-$!
-$! Now build the normal config.h
-$ define/user sys$output [-]config.main
+$ define/user sys$output [-]config.h
 $ mcr []munchconfig [-]config.sh [-]config_h.sh
-$ ! Concatenate them together
-$ copy [-]config.local,[-]config.main [-]config.h
-$! Clean up
-$ DELETE/NOLOG [-]CONFIG.MAIN;*
-$ DELETE/NOLOG [-]CONFIG.LOCAL;*
-$ DELETE/NOLOG [-]CONFIG.FDL;*
-$!
 $ if "''Using_Dec_C'" .eqs."Yes"
 $ THEN
 $ DECC_REPLACE = "DECC=decc=1"
@@ -2391,14 +2261,6 @@ $     THREAD_REPLACE = "THREAD=OLDTHREADED=1"
 $   ELSE
 $     THREAD_REPLACE = "THREAD=THREADED=1"
 $   ENDIF
-$ ELSE
-$   THREAD_REPLACE = "THREAD="
-$ ENDIF
-$ if mymalloc.eqs."Y"
-$ THEN
-$   MALLOC_REPLACE = "MALLOC=MALLOC=1"
-$ ELSE
-$   MALLOC_REPLACE = "MALLOC="
 $ ENDIF
 $ if f$getsyi("HW_MODEL").ge.1024
 $ THEN
@@ -2409,7 +2271,7 @@ $ ENDIF
 $ WRITE_RESULT "Writing DESCRIP.MMS"
 $!set ver
 $ define/user sys$output [-]descrip.mms
-$ mcr []munchconfig [-]config.sh descrip_mms.template "''DECC_REPLACE'" "''ARCH_TYPE'" "''GNUC_REPLACE'" "''SOCKET_REPLACE'" "''THREAD_REPLACE'" "''C_Compiler_Replace'" "''MALLOC_REPLACE'" "''Thread_Live_Dangerously'"
+$ mcr []munchconfig [-]config.sh descrip_mms.template "''DECC_REPLACE'" "''ARCH_TYPE'" "''GNUC_REPLACE'" "''SOCKET_REPLACE'" "''THREAD_REPLACE'" "''C_Compiler_Replace'"
 $! set nover
 $!
 $! Clean up after ourselves
