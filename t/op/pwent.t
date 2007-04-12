@@ -2,113 +2,33 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
-    eval {my @n = getpwuid 0; setpwent()};
-    if ($@ && $@ =~ /(The \w+ function is unimplemented)/) {
-	print "1..0 # Skip: $1\n";
-	exit 0;
-    }
+    @INC = "../lib" if -d "../lib";
     eval { require Config; import Config; };
-    my $reason;
-    if ($Config{'i_pwd'} ne 'define') {
-	$reason = '$Config{i_pwd} undefined';
-    }
-    elsif (not -f "/etc/passwd" ) { # Play safe.
-	$reason = 'no /etc/passwd file';
-    }
 
-    if (not defined $where) {	# Try NIS.
-	foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat)) {
-	    if (-x $ypcat &&
-		open(PW, "$ypcat passwd 2>/dev/null |") &&
-		defined(<PW>)) {
-		$where = "NIS passwd";
-		undef $reason;
-		last;
-	    }
-	}
-    }
+    my $PW = "/etc/passwd";
 
-    if (not defined $where) {	# Try NetInfo.
-	foreach my $nidump (qw(/usr/bin/nidump)) {
-	    if (-x $nidump &&
-		open(PW, "$nidump passwd . 2>/dev/null |") &&
-		defined(<PW>)) {
-		$where = "NetInfo passwd";
-		undef $reason;
-		last;
-	    }
-	}
-    }
-
-    if (not defined $where) {	# Try local.
-	my $PW = "/etc/passwd";
-	if (-f $PW && open(PW, $PW) && defined(<PW>)) {
-	    $where = $PW;
-	    undef $reason;
-	}
-    }
-
-    if (not defined $where) {      # Try NIS+
-     foreach my $niscat (qw(/bin/niscat)) {
-         if (-x $niscat &&
-           open(PW, "$niscat passwd.org_dir 2>/dev/null |") &&
-           defined(<PW>)) {
-           $where = "NIS+ $niscat passwd.org_dir";
-           undef $reason;
-           last;
-         }
-     }
-    }
-
-    if ($reason) {	# Give up.
-	print "1..0 # Skip: $reason\n";
+    if ($Config{'i_pwd'} ne 'define' or not -f $PW or not open(PW, $PW)) {
+	print "1..0\n";
 	exit 0;
     }
 }
 
-# By now the PW filehandle should be open and full of juicy password entries.
-
-print "1..2\n";
+print "1..1\n";
 
 # Go through at most this many users.
-# (note that the first entry has been read away by now)
-my $max = 25;
+my $max = 25; #
 
 my $n = 0;
+my $not;
 my $tst = 1;
-my %perfect;
-my %seen;
 
-print "# where $where\n";
-
-setpwent();
-
+$not = 0;
 while (<PW>) {
+    last if $n == $max;
     chomp;
-    # LIMIT -1 so that users with empty shells don't fall off
-    my @s = split /:/, $_, -1;
-    my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s);
-    if ($^O eq 'darwin') {
-       ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s[0,1,2,3,7,8,9];
-    } else {
-       ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s;
-    }
-    next if /^\+/; # ignore NIS includes
-    if (@s) {
-	push @{ $seen{$name_s} }, $.;
-    } else {
-	warn "# Your $where line $. is empty.\n";
-	next;
-    }
-    if ($n == $max) {
-	local $/;
-	my $junk = <PW>;
-	last;
-    }
-    # In principle we could whine if @s != 7 but do we know enough
-    # of passwd file formats everywhere?
-    if (@s == 7 || ($^O eq 'darwin' && @s == 10)) {
+    @s = split /:/;
+    if (@s == 7) {
+	my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s;
 	@n = getpwuid($uid_s);
 	# 'nobody' et al.
 	next unless @n;
@@ -119,70 +39,21 @@ while (<PW>) {
 	    ($name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) = @n;
 	    next if $name_s ne $name;
 	}
-	$perfect{$name_s}++
-	    if $name    eq $name_s    and
-               $uid     eq $uid_s     and
-# Do not compare passwords: think shadow passwords.
-               $gid     eq $gid_s     and
-               $gcos    eq $gcos_s    and
-               $home    eq $home_s    and
-               $shell   eq $shell_s;
+	$not = 1, last
+	    if $name    ne $name_s    or
+# Shadow passwords confuse this.
+# Think about non-crypt(3) encryptions, too, before you do anything rash.
+#              $passwd  ne $passwd_s  or
+               $uid     ne $uid_s     or
+               $gid     ne $gid_s     or
+               $gcos    ne $gcos_s    or
+               $home    ne $home_s    or
+               $shell   ne $shell_s;
     }
     $n++;
 }
 
-endpwent();
-
-print "# max = $max, n = $n, perfect = ", scalar keys %perfect, "\n";
-
-if (keys %perfect == 0 && $n) {
-    $max++;
-    print <<EOEX;
-#
-# The failure of op/pwent test is not necessarily serious.
-# It may fail due to local password administration conventions.
-# If you are for example using both NIS and local passwords,
-# test failure is possible.  Any distributed password scheme
-# can cause such failures.
-#
-# What the pwent test is doing is that it compares the $max first
-# entries of $where
-# with the results of getpwuid() and getpwnam() call.  If it finds no
-# matches at all, it suspects something is wrong.
-# 
-EOEX
-    print "not ";
-    $not = 1;
-} else {
-    $not = 0;
-}
-print "ok ", $tst++;
-print "\t# (not necessarily serious: run t/op/pwent.t by itself)" if $not;
-print "\n";
-
-# Test both the scalar and list contexts.
-
-my @pw1;
-
-setpwent();
-for (1..$max) {
-    my $pw = scalar getpwent();
-    last unless defined $pw;
-    push @pw1, $pw;
-}
-endpwent();
-
-my @pw2;
-
-setpwent();
-for (1..$max) {
-    my ($pw) = (getpwent());
-    last unless defined $pw;
-    push @pw2, $pw;
-}
-endpwent();
-
-print "not " unless "@pw1" eq "@pw2";
+print "not " if $not;
 print "ok ", $tst++, "\n";
 
 close(PW);
