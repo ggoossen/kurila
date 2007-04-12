@@ -1,16 +1,7 @@
-If you read this file _as_is_, just ignore the funny characters you see.
-It is written in the POD format (see pod/perlpod.pod) which is specially
-designed to be readable as is.
-
-=head1 NAME
-
-README.apollo - Perl version 5 on Apollo DomainOS
-
-=head1 DESCRIPTION
-
 The following tests are known to fail as of Perl 5.005_03:
 
 comp/decl..........FAILED at test 0
+op/magic...........FAILED at test 23
 op/write...........FAILED at test 0
 lib/filefind.......FAILED at test 2
 lib/io_udp.........FAILED at test 2
@@ -18,6 +9,17 @@ lib/findbin........stat(/ressel/ABT/USER/vta/jk/proj.local/perl/perl5.005_03-MAI
 stat(/ressel/ABT/USER/vta/jk/proj.local/perl/perl5.005_03-MAINT_TRIAL_5/t/lib/): No such file or directory at ../lib/FindBin.pm line 163
 FAILED at test 1
 
-=head1 AUTHOR
-
-Johann Klasek <jk@auto.tuwien.ac.at>
+Failed 6 test scripts out of 188, 93.62% okay.
+   ### Since not all tests were successful, you may want to run some
+   ### of them individually and examine any diagnostic messages they
+   ### produce.  See the INSTALL document's section on "make test".
+   ### If you are testing the compiler, then ignore this message 
+   ### and run 
+   ###      ./perl harness
+   ### in the directory ./t.
+   ###
+   ### Since most tests were successful, you have a good chance to
+   ### get information with better granularity by running
+   ###     ./perl harness 
+   ### in directory ./t.
+u=9.2  s=20.1167  cu=431.5  cs=166.133  scripts=180  tests=6348
