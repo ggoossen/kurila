@@ -7,11 +7,6 @@
 # attempt 2 reparentings and see if the PID both orphaned grandchildren get is
 # the same. (and not ours)
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(../lib);
-}
-
 use strict;
 use Config;
 

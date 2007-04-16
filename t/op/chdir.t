@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use Config;
-require "test.pl";
+require "./test.pl";
 plan(tests => 48);
 
 my $IsVMS   = $^O eq 'VMS';

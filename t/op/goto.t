@@ -3,9 +3,7 @@
 # "This IS structured code.  It's just randomly structured."
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-    require "test.pl";
+    require "./test.pl";
 }
 
 use warnings;

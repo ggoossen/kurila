@@ -4,8 +4,6 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     $| = 1;
     require "./test.pl";
 }

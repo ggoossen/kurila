@@ -2,11 +2,6 @@
 
 # Test // and friends.
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 package main;
 use feature "err";
 require './test.pl';

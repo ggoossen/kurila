@@ -4,11 +4,6 @@
 # various typeglob tests
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use warnings;
 
 require './test.pl';

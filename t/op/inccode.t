@@ -8,11 +8,6 @@ my $can_fork   = 0;
 my $minitest   = $ENV{PERL_CORE_MINITEST};
 my $has_perlio = $Config{useperlio};
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
 if (!$minitest) {
     if ($Config{d_fork} && eval 'require POSIX; 1') {
 	$can_fork = 1;
@@ -22,7 +17,7 @@ if (!$minitest) {
 use strict;
 use File::Spec;
 
-require "test.pl";
+require "./test.pl";
 plan(tests => 45 + !$minitest * (3 + 7 * $can_fork));
 
 my @tempfiles = ();

@@ -7,11 +7,6 @@
 # better than having no tests at all, right?
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use strict;
 use Config;
 use File::Spec::Functions;

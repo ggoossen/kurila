@@ -6,10 +6,6 @@
 # not-a-number ...), of the effects of locale, and of features
 # specific to multi-byte characters (under the utf8 pragma and such).
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
 use warnings;
 use version;
 use Config;

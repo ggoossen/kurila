@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 # This ok() function is specially written to avoid any concatenation.
 my $test = 1;
 sub ok {

@@ -53,9 +53,6 @@ BEGIN {
     if (defined $file) {
 	open TESTS, $file or die "Can't open $file";
     }
-
-    chdir 't' if -d 't';
-    @INC = '../lib';
 }
 
 if (!defined $file) {

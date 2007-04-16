@@ -3,11 +3,6 @@
 # Tests to make sure the regexp engine doesn't run into limits too soon.
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 print "1..13\n";
 
 my $email = qr {

@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     $SIG{'__WARN__'} = sub { warn $_[0] if $DOWARN };
 }
 
@@ -10,7 +8,7 @@ $DOWARN = 1; # enable run-time warnings now
 
 use Config;
 
-require "test.pl";
+require "./test.pl";
 plan( tests => 51 );
 
 use utf8;

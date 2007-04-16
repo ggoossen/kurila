@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 our ($xref, $runme, @a, %h, $aref, $chopit, @chopar, $posstr,
      $cstr, $nn, $n, @INPUT, @simple_input, $ord, $href, $zzz1,
     $zzz2, $op, $commentt, $expectop, $skip, $integer,

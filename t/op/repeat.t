@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 BEGIN { require './test.pl' };
 plan(tests => 42);
 

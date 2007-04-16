@@ -35,11 +35,6 @@
 # sub a4 { sprintf "%g", $_[0] }	# N
 # sub a5 { "$_[0]" }		# P
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use strict 'vars';
 
 my $max_chain = $ENV{PERL_TEST_NUMCONVERTS} || 2;

@@ -7,11 +7,9 @@
 our $warns;
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     $SIG{__WARN__} = sub { $warns++; warn $_[0] };
 }
-require 'test.pl';
+require './test.pl';
 plan( tests => 19 );
 
 my $wanted_filename = $^O eq 'VMS' ? '0.' : '0';

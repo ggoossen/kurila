@@ -1,7 +1,5 @@
 #!./perl
 
-chdir 't' if -d 't';
-
 print "1..15\n";
 
 our (@a, $x, $z, $y, $foo);

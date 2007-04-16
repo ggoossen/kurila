@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 print "1..145\n";
 
 sub try ($$) {

@@ -3,8 +3,6 @@
 # tests for both real and emulated fork()
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     our %Config;
     require Config; Config->import;
     unless ($Config{'d_fork'} or $Config{'d_pseudofork'}) {

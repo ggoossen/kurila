@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 # WARNING: Do not use anymodules as part of this test code.
 # We could get action at a distance that would invalidate the tests.
 

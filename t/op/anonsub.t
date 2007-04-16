@@ -4,8 +4,6 @@
 # fresh_perl_is, and fresh_perl_is uses a closure -- a special
 # case of what this program tests for.
 
-chdir 't' if -d 't';
-@INC = '../lib';
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MSWin32 = $^O eq 'MSWin32';
 my $Is_MacOS = $^O eq 'MacOS';

@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-       chdir 't' if -d 't';
-       @INC = '../lib';
-}
-
 # 2s complement assumption. Won't break test, just makes the internals of
 # the SVs less interesting if were not on 2s complement system.
 my $uv_max = ~0;

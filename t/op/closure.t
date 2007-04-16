@@ -6,11 +6,6 @@
 #
 #   Run with -debug for debugging output.
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use Config;
 require './test.pl'; # for runperl()
 

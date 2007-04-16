@@ -2,10 +2,6 @@
 
 #P = start of string  Q = start of substr  R = end of substr  S = end of string
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
 use warnings ;
 use strict;
 

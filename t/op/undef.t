@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 our (@ary, %ary, $test, %hash);
 
 print "1..36\n";

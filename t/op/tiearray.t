@@ -1,11 +1,6 @@
 #!./perl
 
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 my %seen;
 
 package Implement;

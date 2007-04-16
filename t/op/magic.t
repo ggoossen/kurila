@@ -2,8 +2,6 @@
 
 BEGIN {
     $| = 1;
-    chdir 't' if -d 't';
-    @INC = '../lib';
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
 }
 

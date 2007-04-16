@@ -3,11 +3,6 @@
 # This test was originally for pseudo-hashes.  It now exists to ensure
 # they were properly removed in 5.9.
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 require Tie::Array;
 
 package Tie::BasicArray;

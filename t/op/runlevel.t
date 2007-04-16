@@ -6,8 +6,6 @@
 ## Adapted and expanded by Gurusamy Sarathy <gsar@activestate.com>
 ##
 
-chdir 't' if -d 't';
-@INC = '../lib';
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MSWin32 = $^O eq 'MSWin32';
 my $Is_NetWare = $^O eq 'NetWare';

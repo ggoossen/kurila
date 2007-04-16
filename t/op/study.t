@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 our $Ok_Level = 0;
 my $test = 1;
 sub ok ($;$) {

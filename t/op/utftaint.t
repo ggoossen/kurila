@@ -1,11 +1,6 @@
 #!./perl -T
 # tests whether tainting works with UTF-8
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(../lib);
-}
-
 use strict;
 use Config;
 

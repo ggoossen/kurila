@@ -3,8 +3,6 @@
 # If you modify/add tests here, remember to update also ext/Fcntl/t/syslfs.t.
 
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
 	# Don't bother if there are no quad offsets.
         our %Config;
 	require Config; Config->import;

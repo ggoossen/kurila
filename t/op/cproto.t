@@ -1,11 +1,6 @@
 #!./perl
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 BEGIN { require './test.pl'; }
 plan tests => 237;
 

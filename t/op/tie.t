@@ -9,10 +9,6 @@
 # Warn or die msgs (if any) at - line 1234
 #
 
-chdir 't' if -d 't';
-@INC = '../lib';
-$ENV{PERL5LIB} = "../lib";
-
 $|=1;
 
 undef $/;

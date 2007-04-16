@@ -9,7 +9,7 @@ BEGIN {
 
 use strict;
 
-require "test.pl";
+require "./test.pl";
 plan(tests => 4);
 
 # Generate a load of random numbers.

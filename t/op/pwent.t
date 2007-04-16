@@ -3,8 +3,6 @@
 our (%Config, $where);
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     eval {my @n = getpwuid 0; setpwent()};
     if ($@ && $@ =~ /(The \w+ function is unimplemented)/) {
 	print "1..0 # Skip: $1\n";

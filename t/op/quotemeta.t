@@ -1,10 +1,8 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(../lib .);
     require Config; Config->import;
-    require "test.pl";
+    require "./test.pl";
 }
 
 plan tests => 22;

@@ -9,8 +9,6 @@
 
 BEGIN { $| = 1; }
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     $ENV{PERL5LIB} = "../lib";
 
 # turn warnings into fatal errors

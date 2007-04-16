@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 my @expect;
 my $data = "";
 my @data = ();

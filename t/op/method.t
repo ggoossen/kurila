@@ -5,9 +5,7 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-    require "test.pl";
+    require "./test.pl";
 }
 
 print "1..71\n";

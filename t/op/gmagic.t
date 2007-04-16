@@ -2,8 +2,6 @@
 
 BEGIN {
     $| = 1;
-    chdir 't' if -d 't';
-    @INC = '../lib';
 }
 
 print "1..18\n";
