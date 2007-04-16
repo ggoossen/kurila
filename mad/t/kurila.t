@@ -17,11 +17,12 @@ use Convert;
 
 
 sub p5convert {
-    my ($input, $expected, $convert) = @_;
-    my $output = Convert::convert($input, $convert && "/usr/bin/perl ../mad/p5kurila.pl");
+    my ($input, $expected) = @_;
+    my $output = Convert::convert($input, "/usr/bin/perl ../mad/p5kurila.pl");
     is($output, $expected) or $TODO or die;
 }
 
+t_strict_refs();
 t_indirect_object_syntax();
 # t_barewords();
 t_encoding();
@@ -111,6 +112,32 @@ sort aap 1,2,3;
 ====
 sort aap 1,2,3;
 END
+}
+
+sub t_strict_refs {
+    p5convert( 'print {Symbol::qualify_to_ref("STDOUT")} "foo"',
+               'print {Symbol::qualify_to_ref("STDOUT")} "foo"' );
+    p5convert( 'print {"STDOUT"} "foo"',
+               'print {Symbol::qualify_to_ref("STDOUT")} "foo"' );
+    p5convert( 'my $pkg; *{$pkg . "::bar"} = sub { "foo" }',
+               'my $pkg; *{Symbol::qualify_to_ref($pkg . "::bar")} = sub { "foo" }');
+    p5convert( 'my $pkg; *{"$pkg\::bar"} = sub { "foo" }',
+               'my $pkg; *{Symbol::qualify_to_ref("$pkg\::bar")} = sub { "foo" }');
+    p5convert( 'my $pkg; ${$pkg . "::bar"} = "noot"',
+               'my $pkg; ${Symbol::qualify_to_ref($pkg . "::bar")} = "noot"');
+    p5convert( 'my $pkg; @{$pkg . "::bar"} = ("noot", "mies")',
+               'my $pkg; @{Symbol::qualify_to_ref($pkg . "::bar")} = ("noot", "mies")');
+    p5convert( 'my $pkg; %{$pkg . "::bar"} = { aap => "noot" }',
+               'my $pkg; %{Symbol::qualify_to_ref($pkg . "::bar")} = { aap => "noot" }');
+    p5convert( 'my $pkg; &{$pkg . "::bar"} = sub { "foobar" }',
+               'my $pkg; &{Symbol::qualify_to_ref($pkg . "::bar")} = sub { "foobar" }');
+    p5convert( 'my $pkg; defined &{$pkg . "::bar"}',
+               'my $pkg; defined &{Symbol::qualify_to_ref($pkg . "::bar")}');
+
+    p5convert( 'my $pkg; keys %Package::',
+               'my $pkg; keys %{Symbol::stash("Package")}');
+    p5convert( 'my $pkg; keys $Package::{"var"}',
+               'my $pkg; keys ${Symbol::stash("Package")}{"var"}');
 }
 
 sub t_encoding {

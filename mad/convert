@@ -23,7 +23,8 @@ use Fatal qw|open close|;
     use File::Basename;
     my (undef, $dir, undef) = File::Basename::fileparse($filename);
     my @lib;
-    push @lib, $dir, "./lib", "./blib/lib", "./blib/arch/";
+    push @lib, $dir, "/home/gerard/perl/bleadgerardmad/lib/";
+    #push @lib, $dir, "./lib", "./blib/lib", "./blib/arch/", "../lib/";
     my $output = eval { Convert::convert($input, "/usr/bin/perl $kurilapath/mad/p5kurila.pl",
                                          switches => join ' ', map { "-I $_" } @lib ) };
     if ($output) {
