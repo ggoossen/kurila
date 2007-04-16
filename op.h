@@ -317,22 +317,28 @@ struct pmop {
     BASEOP
     OP *	op_first;
     OP *	op_last;
-    OP *	op_pmreplroot; /* (type is really union {OP*,GV*,PADOFFSET}) */
-    OP *	op_pmreplstart;
-    PMOP *	op_pmnext;		/* list of all scanpats */
 #ifdef USE_ITHREADS
     IV          op_pmoffset;
 #else
     REGEXP *    op_pmregexp;            /* compiled expression */
 #endif
     U32		op_pmflags;
-    U32		op_pmpermflags;
-    U8		op_pmdynflags;
+    union {
+	OP *	op_pmreplroot;		/* For OP_SUBST */
 #ifdef USE_ITHREADS
-    char *	op_pmstashpv;
+	PADOFFSET  op_pmtargetoff;	/* For OP_PUSHRE */
 #else
-    HV *	op_pmstash;
+	GV *	op_pmtargetgv;
 #endif
+    }	op_pmreplrootu;
+    union {
+	OP *	op_pmreplstart;	/* Only used in OP_SUBST */
+#ifdef USE_ITHREADS
+	char *	op_pmstashpv;	/* Only used in OP_MATCH, with PMf_ONCE set */
+#else
+	HV *	op_pmstash;
+#endif
+    }		op_pmstashstartu;
 };
 
 #ifdef USE_ITHREADS
@@ -350,16 +356,20 @@ struct pmop {
 #define PM_SETRE_SAFE PM_SETRE
 #endif
 
-#define PMdf_USED	0x01		/* pm has been used once already */
-#define PMdf_TAINTED	0x02		/* pm compiled from tainted pattern */
-#define PMdf_UTF8	0x04		/* pm compiled from utf8 data */
 
 #define PMf_RETAINT	0x0001		/* taint $1 etc. if target tainted */
-#define PMf_ONCE	0x0002		/* use pattern only once per reset */
+#define PMf_ONCE	0x0002		/* match successfully only once per
+                                           reset, with related flag RXf_USED
+                                           in re->extflags holding state.
+					   This is used only for ?? matches,
+					   and only on OP_MATCH and OP_QR */
+
 #define PMf_UNUSED	0x0004		/* free for use */
 #define PMf_MAYBE_CONST	0x0008		/* replacement contains variables */
-#define PMf_SKIPWHITE	0x0010		/* skip leading whitespace for split */
-#define PMf_WHITE	0x0020		/* pattern is \s+ */
+
+#define PMf_USED        0x0010          /* PMf_ONCE has matched successfully.
+                                           Not used under threading. */
+
 #define PMf_CONST	0x0040		/* subst replacement is constant */
 #define PMf_KEEP	0x0080		/* keep 1st runtime pattern forever */
 #define PMf_GLOBAL	0x0100		/* pattern had a g modifier */
@@ -382,19 +392,38 @@ struct pmop {
 
 #ifdef USE_ITHREADS
 
-#  define PmopSTASHPV(o)	((o)->op_pmstashpv)
-#  define PmopSTASHPV_set(o,pv)	(PmopSTASHPV(o) = savesharedpv(pv))
+#  define PmopSTASHPV(o)						\
+    (((o)->op_pmflags & PMf_ONCE) ? (o)->op_pmstashstartu.op_pmstashpv : NULL)
+#  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+#    define PmopSTASHPV_set(o,pv)	({				\
+	assert((o)->op_pmflags & PMf_ONCE);				\
+	((o)->op_pmstashstartu.op_pmstashpv = savesharedpv(pv));	\
+    })
+#  else
+#    define PmopSTASHPV_set(o,pv)					\
+    ((o)->op_pmstashstartu.op_pmstashpv = savesharedpv(pv))
+#  endif
 #  define PmopSTASH(o)		(PmopSTASHPV(o) \
-				 ? gv_stashpv(PmopSTASHPV(o),GV_ADD) : NULL)
+				 ? gv_stashpv((o)->op_pmstashstartu.op_pmstashpv,GV_ADD) : NULL)
 #  define PmopSTASH_set(o,hv)	PmopSTASHPV_set(o, ((hv) ? HvNAME_get(hv) : NULL))
 #  define PmopSTASH_free(o)	PerlMemShared_free(PmopSTASHPV(o))
 
 #else
-#  define PmopSTASH(o)		((o)->op_pmstash)
-#  define PmopSTASH_set(o,hv)	((o)->op_pmstash = (hv))
+#  define PmopSTASH(o)							\
+    (((o)->op_pmflags & PMf_ONCE) ? (o)->op_pmstashstartu.op_pmstash : NULL)
+#  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+#    define PmopSTASH_set(o,hv)		({				\
+	assert((o)->op_pmflags & PMf_ONCE);				\
+	((o)->op_pmstashstartu.op_pmstash = (hv));			\
+    })
+#  else
+#    define PmopSTASH_set(o,hv)	((o)->op_pmstashstartu.op_pmstash = (hv))
+#  endif
 #  define PmopSTASHPV(o)	(PmopSTASH(o) ? HvNAME_get(PmopSTASH(o)) : NULL)
-   /* op_pmstash is not refcounted */
+   /* op_pmstashstartu.op_pmstash is not refcounted */
 #  define PmopSTASHPV_set(o,pv)	PmopSTASH_set((o), gv_stashpv(pv,GV_ADD))
+/* Note that if this becomes non-empty, then S_forget_pmop in op.c will need
+   changing */
 #  define PmopSTASH_free(o)    
 #endif
 
@@ -563,8 +592,13 @@ struct loop {
 #endif
 
 #define OpREFCNT_set(o,n)		((o)->op_targ = (n))
-#define OpREFCNT_inc(o)			((o) ? (++(o)->op_targ, (o)) : NULL)
-#define OpREFCNT_dec(o)			(--(o)->op_targ)
+#ifdef PERL_DEBUG_READONLY_OPS
+#  define OpREFCNT_inc(o)		Perl_op_refcnt_inc(aTHX_ o)
+#  define OpREFCNT_dec(o)		Perl_op_refcnt_dec(aTHX_ o)
+#else
+#  define OpREFCNT_inc(o)		((o) ? (++(o)->op_targ, (o)) : NULL)
+#  define OpREFCNT_dec(o)		(--(o)->op_targ)
+#endif
 
 /* flags used by Perl_load_module() */
 #define PERL_LOADMOD_DENY		0x1
@@ -587,9 +621,9 @@ struct loop {
 
 #if defined(PL_OP_SLAB_ALLOC)
 #define NewOp(m,var,c,type)	\
-	(var = (type *) Perl_Slab_Alloc(aTHX_ m,c*sizeof(type)))
+	(var = (type *) Perl_Slab_Alloc(aTHX_ c*sizeof(type)))
 #define NewOpSz(m,var,size)	\
-	(var = (OP *) Perl_Slab_Alloc(aTHX_ m,size))
+	(var = (OP *) Perl_Slab_Alloc(aTHX_ size))
 #define FreeOp(p) Perl_Slab_Free(aTHX_ p)
 #else
 #define NewOp(m, var, c, type)	\
@@ -695,4 +729,14 @@ struct token {
  * X       random thing
  * _       whitespace/comments preceding anything else
  * ~       =~ operator
+ */
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: t
+ * End:
+ *
+ * ex: set ts=8 sts=4 sw=4 noet:
  */

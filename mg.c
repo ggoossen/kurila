@@ -554,7 +554,7 @@ Perl_magic_regdatum_get(pTHX_ SV *sv, MAGIC *mg)
 		    else			/* @- */
 			i = s;
 
-		    if (i > 0 && RX_MATCH_UTF8(rx)) {
+		    if (i > 0 && IN_CODEPOINTS) {
 			const char * const b = rx->subbeg;
 			if (b)
 			    i = utf8_length((U8*)b, (U8*)(b+i));
@@ -598,7 +598,7 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
 	    {
 		i = t1 - s1;
 	      getlen:
-		if (i > 0 && RX_MATCH_UTF8(rx)) {
+		if (i > 0 && IN_CODEPOINTS) {
 		    const char * const s = rx->subbeg + s1;
 		    const U8 *ep;
 		    STRLEN el;

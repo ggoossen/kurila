@@ -518,9 +518,9 @@ Perl_do_pmop_dump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
 	     (pm->op_private & OPpRUNTIME) ? " (RUNTIME)" : "");
     else
 	Perl_dump_indent(aTHX_ level, file, "PMf_PRE (RUNTIME)\n");
-    if (pm->op_type != OP_PUSHRE && pm->op_pmreplroot) {
+    if (pm->op_type != OP_PUSHRE && pm->op_pmreplrootu.op_pmreplroot) {
 	Perl_dump_indent(aTHX_ level, file, "PMf_REPL = ");
-	op_dump(pm->op_pmreplroot);
+	op_dump(pm->op_pmreplrootu.op_pmreplroot);
     }
     if (pm->op_pmflags || (PM_GETRE(pm) && PM_GETRE(pm)->check_substr)) {
 	SV * const tmpsv = pm_description(pm);
@@ -538,21 +538,29 @@ S_pm_description(pTHX_ const PMOP *pm)
     const REGEXP * regex = PM_GETRE(pm);
     const U32 pmflags = pm->op_pmflags;
 
-    if (pm->op_pmdynflags & PMdf_USED)
-	sv_catpv(desc, ",USED");
-    if (pm->op_pmdynflags & PMdf_TAINTED)
-	sv_catpv(desc, ",TAINTED");
-
     if (pmflags & PMf_ONCE)
 	sv_catpv(desc, ",ONCE");
-    if (regex && regex->check_substr) {
-	if (!(regex->extflags & RXf_NOSCAN))
-	    sv_catpv(desc, ",SCANFIRST");
-	if (regex->extflags & RXf_CHECK_ALL)
-	    sv_catpv(desc, ",ALL");
+#ifdef USE_ITHREADS
+    if (SvREADONLY(PL_regex_pad[pm->op_pmoffset]))
+        sv_catpv(desc, ":USED");
+#else
+    if (pmflags & PMf_USED)
+        sv_catpv(desc, ":USED");
+#endif
+
+    if (regex) {
+        if (regex->extflags & RXf_TAINTED)
+            sv_catpv(desc, ",TAINTED");
+        if (regex->check_substr) {
+            if (!(regex->extflags & RXf_NOSCAN))
+                sv_catpv(desc, ",SCANFIRST");
+            if (regex->extflags & RXf_CHECK_ALL)
+                sv_catpv(desc, ",ALL");
+        }
+        if (regex->extflags & RXf_SKIPWHITE)
+            sv_catpv(desc, ",SKIPWHITE");
     }
-    if (pmflags & PMf_SKIPWHITE)
-	sv_catpv(desc, ",SKIPWHITE");
+
     if (pmflags & PMf_CONST)
 	sv_catpv(desc, ",CONST");
     if (pmflags & PMf_KEEP)
@@ -647,13 +655,13 @@ S_sequence(pTHX_ register const OP *o)
 	    sequence_tail(cLOOPo->op_lastop);
 	    break;
 
-	case OP_QR:
-	case OP_MATCH:
 	case OP_SUBST:
 	    hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    sequence_tail(cPMOPo->op_pmreplstart);
+	    sequence_tail(cPMOPo->op_pmstashstartu.op_pmreplstart);
 	    break;
 
+	case OP_QR:
+	case OP_MATCH:
 	case OP_HELEM:
 	    break;
 
@@ -1245,7 +1253,7 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
                 const char * const s =  pv_pretty(dsv, re->wrapped, re->wraplen, 
                     60, NULL, NULL,
                     ( PERL_PV_PRETTY_QUOTE | PERL_PV_ESCAPE_RE | PERL_PV_PRETTY_ELIPSES |
-                    ((re->extflags & RXf_UTF8) ? PERL_PV_ESCAPE_UNI : 0))
+                    (PERL_PV_ESCAPE_UNI))
                 );
 		Perl_dump_indent(aTHX_ level+1, file, "    PAT = %s\n", s);
 		Perl_dump_indent(aTHX_ level+1, file, "    REFCNT = %"IVdf"\n",
@@ -1951,8 +1959,7 @@ Perl_debprofdump(pTHX)
  *    XML variants of most of the above routines
  */
 
-STATIC
-void
+STATIC void
 S_xmldump_attr(pTHX_ I32 level, PerlIO *file, const char* pat, ...)
 {
     va_list args;
@@ -2356,10 +2363,10 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     }
 
     level--;
-    if (pm->op_type != OP_PUSHRE && pm->op_pmreplroot) {
+    if (pm->op_type != OP_PUSHRE && pm->op_pmreplrootu.op_pmreplroot) {
 	Perl_xmldump_indent(aTHX_ level, file, ">\n");
 	Perl_xmldump_indent(aTHX_ level+1, file, "<pm_repl>\n");
-	do_op_xmldump(level+2, file, pm->op_pmreplroot);
+	do_op_xmldump(level+2, file, pm->op_pmreplrootu.op_pmreplroot);
 	Perl_xmldump_indent(aTHX_ level+1, file, "</pm_repl>\n");
 	Perl_xmldump_indent(aTHX_ level, file, "</pmop>\n");
     }

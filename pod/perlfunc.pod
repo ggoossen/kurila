@@ -4467,8 +4467,9 @@ version should be used instead.
 
 Otherwise, C<require> demands that a library file be included if it
 hasn't already been included.  The file is included via the do-FILE
-mechanism, which is essentially just a variety of C<eval>.  Has
-semantics similar to the following subroutine:
+mechanism, which is essentially just a variety of C<eval> with the
+caveat that lexical variables in the invoking script will be invisible
+to the included code.  Has semantics similar to the following subroutine:
 
     sub require {
        my ($filename) = @_;
@@ -4725,7 +4726,7 @@ X<say>
 =item say
 
 Just like C<print>, but implicitly appends a newline.
-C<say LIST> is simply an abbreviation for C<{ local $/ = "\n"; print
+C<say LIST> is simply an abbreviation for C<{ local $\ = "\n"; print
 LIST }>.
 
 This keyword is only available when the "say" feature is

@@ -76,6 +76,7 @@ PP(pp_regcomp)
     register PMOP *pm = (PMOP*)cLOGOP->op_other;
     SV *tmpstr;
     MAGIC *mg = NULL;
+    regexp * re;
 
     /* prevent recompiling under /o and ithreads. */
 #if defined(USE_ITHREADS)
@@ -125,14 +126,14 @@ PP(pp_regcomp)
     else {
 	STRLEN len;
 	const char *t = SvPV_const(tmpstr, len);
-	regexp * const re = PM_GETRE(pm);
+	re = PM_GETRE(pm);
 
 	/* Check against the last compiled regexp. */
 	if (!re || !re->precomp || re->prelen != (I32)len ||
 	    memNE(re->precomp, t, len))
 	{
 	    const regexp_engine *eng = re ? re->engine : NULL;
-
+            U32 pm_flags = pm->op_pmflags & PMf_COMPILETIME;
 	    if (re) {
 	        ReREFCNT_dec(re);
 		PM_SETRE(pm, NULL);	/* crucial if regcomp aborts */
@@ -146,43 +147,39 @@ PP(pp_regcomp)
 	    if (PL_op->op_flags & OPf_SPECIAL)
 		PL_reginterp_cnt = I32_MAX; /* Mark as safe.  */
 
-	    pm->op_pmflags = pm->op_pmpermflags;	/* reset case sensitivity */
 	    if (eng) 
-	        PM_SETRE(pm, CALLREGCOMP_ENG(eng,(char *)t, (char *)t + len, pm));
+	        PM_SETRE(pm, CALLREGCOMP_ENG(eng,(char *)t, (char *)t + len, pm_flags));
             else
-                PM_SETRE(pm, CALLREGCOMP((char *)t, (char *)t + len, pm));
-                
-	    if (!DO_UTF8(tmpstr) && (pm->op_pmdynflags & PMdf_UTF8))
-		Safefree(t);
+                PM_SETRE(pm, CALLREGCOMP((char *)t, (char *)t + len, pm_flags));
+
 	    PL_reginterp_cnt = 0;	/* XXXX Be extra paranoid - needed
 					   inside tie/overload accessors.  */
 	}
     }
+    
+    re = PM_GETRE(pm);
 
 #ifndef INCOMPLETE_TAINTS
     if (PL_tainting) {
 	if (PL_tainted)
-	    pm->op_pmdynflags |= PMdf_TAINTED;
+	    re->extflags |= RXf_TAINTED;
 	else
-	    pm->op_pmdynflags &= ~PMdf_TAINTED;
+	    re->extflags &= ~RXf_TAINTED;
     }
 #endif
 
     if (!PM_GETRE(pm)->prelen && PL_curpm)
 	pm = PL_curpm;
-    else if (PM_GETRE(pm)->extflags & RXf_WHITE)
-	pm->op_pmflags |= PMf_WHITE;
-    else
-	pm->op_pmflags &= ~PMf_WHITE;
 
-    /* XXX runtime compiled output needs to move to the pad */
+
+#if !defined(USE_ITHREADS)
+    /* can't change the optree at runtime either */
+    /* PMf_KEEP is handled differently under threads to avoid these problems */
     if (pm->op_pmflags & PMf_KEEP) {
 	pm->op_private &= ~OPpRUNTIME;	/* no point compiling again */
-#if !defined(USE_ITHREADS)
-	/* XXX can't change the optree at runtime either */
 	cLOGOP->op_first->op_next = PL_op->op_next;
-#endif
     }
+#endif
     RETURN;
 }
 
@@ -205,7 +202,6 @@ PP(pp_substcont)
     }
 
     rxres_restore(&cx->sb_rxres, rx);
-    RX_MATCH_UTF8_set(rx, DO_UTF8(cx->sb_targ));
 
     if (cx->sb_iters++) {
 	const I32 saviters = cx->sb_iters;
@@ -292,7 +288,7 @@ PP(pp_substcont)
 	(void)ReREFCNT_inc(rx);
     cx->sb_rxtainted |= RX_MATCH_TAINTED(rx);
     rxres_save(&cx->sb_rxres, rx);
-    RETURNOP(pm->op_pmreplstart);
+    RETURNOP(pm->op_pmstashstartu.op_pmreplstart);
 }
 
 void
@@ -2381,7 +2377,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     SAVEI32(PL_error_count);
 
 #ifdef PERL_MAD
-    SAVEI32(PL_madskills);
+    SAVEBOOL(PL_madskills);
     PL_madskills = 0;
 #endif
 
@@ -3197,8 +3193,7 @@ PP(pp_leavegiven)
 }
 
 /* Helper routines used by pp_smartmatch */
-STATIC
-PMOP *
+STATIC PMOP *
 S_make_matcher(pTHX_ regexp *re)
 {
     dVAR;
@@ -3211,8 +3206,7 @@ S_make_matcher(pTHX_ regexp *re)
     return matcher;
 }
 
-STATIC
-bool
+STATIC bool
 S_matcher_matches_sv(pTHX_ PMOP *matcher, SV *sv)
 {
     dVAR;
@@ -3226,8 +3220,7 @@ S_matcher_matches_sv(pTHX_ PMOP *matcher, SV *sv)
     return (SvTRUEx(POPs));
 }
 
-STATIC
-void
+STATIC void
 S_destroy_matcher(pTHX_ PMOP *matcher)
 {
     dVAR;
@@ -3245,8 +3238,7 @@ PP(pp_smartmatch)
 /* This version of do_smartmatch() implements the
  * table of smart matches that is found in perlsyn.
  */
-STATIC
-OP *
+STATIC OP *
 S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 {
     dVAR;

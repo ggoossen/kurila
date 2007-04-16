@@ -704,6 +704,7 @@
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define reg_named_buff_get	Perl_reg_named_buff_get
 #define reg_numbered_buff_get	Perl_reg_numbered_buff_get
+#define reg_qr_pkg		Perl_reg_qr_pkg
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define regprop			Perl_regprop
@@ -1188,6 +1189,12 @@
 #define ck_unpack		Perl_ck_unpack
 #define is_handle_constructor	S_is_handle_constructor
 #define is_list_assignment	S_is_list_assignment
+#endif
+#  ifdef USE_ITHREADS
+#  else
+#  endif
+#ifdef PERL_CORE
+#define find_and_forget_pmops	S_find_and_forget_pmops
 #define cop_free		S_cop_free
 #define modkids			S_modkids
 #define scalarboolean		S_scalarboolean
@@ -1214,6 +1221,13 @@
 #if defined(PL_OP_SLAB_ALLOC)
 #define Slab_Alloc		Perl_Slab_Alloc
 #define Slab_Free		Perl_Slab_Free
+#  if defined(PERL_DEBUG_READONLY_OPS)
+#    if defined(PERL_IN_OP_C)
+#ifdef PERL_CORE
+#define Slab_to_rw		S_Slab_to_rw
+#endif
+#    endif
+#  endif
 #endif
 #if defined(PERL_IN_PERL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
@@ -2814,7 +2828,7 @@
 #define newWHENOP(a,b)		Perl_newWHENOP(aTHX_ a,b)
 #define newWHILEOP(a,b,c,d,e,f,g,h)	Perl_newWHILEOP(aTHX_ a,b,c,d,e,f,g,h)
 #define new_stackinfo(a,b)	Perl_new_stackinfo(aTHX_ a,b)
-#define scan_vstring(a,b)	Perl_scan_vstring(aTHX_ a,b)
+#define scan_vstring(a,b,c)	Perl_scan_vstring(aTHX_ a,b,c)
 #define scan_version(a,b,c)	Perl_scan_version(aTHX_ a,b,c)
 #define new_version(a)		Perl_new_version(aTHX_ a)
 #define upg_version(a,b)	Perl_upg_version(aTHX_ a,b)
@@ -2926,6 +2940,7 @@
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define reg_named_buff_get(a,b,c)	Perl_reg_named_buff_get(aTHX_ a,b,c)
 #define reg_numbered_buff_get(a,b,c)	Perl_reg_numbered_buff_get(aTHX_ a,b,c)
+#define reg_qr_pkg(a)		Perl_reg_qr_pkg(aTHX_ a)
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define regprop(a,b,c)		Perl_regprop(aTHX_ a,b,c)
@@ -3403,6 +3418,16 @@
 #define ck_unpack(a)		Perl_ck_unpack(aTHX_ a)
 #define is_handle_constructor	S_is_handle_constructor
 #define is_list_assignment(a)	S_is_list_assignment(aTHX_ a)
+#endif
+#  ifdef USE_ITHREADS
+#ifdef PERL_CORE
+#endif
+#  else
+#ifdef PERL_CORE
+#endif
+#  endif
+#ifdef PERL_CORE
+#define find_and_forget_pmops(a)	S_find_and_forget_pmops(aTHX_ a)
 #define cop_free(a)		S_cop_free(aTHX_ a)
 #define modkids(a,b)		S_modkids(aTHX_ a,b)
 #define scalarboolean(a)	S_scalarboolean(aTHX_ a)
@@ -3427,8 +3452,17 @@
 #endif
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
-#define Slab_Alloc(a,b)		Perl_Slab_Alloc(aTHX_ a,b)
+#define Slab_Alloc(a)		Perl_Slab_Alloc(aTHX_ a)
 #define Slab_Free(a)		Perl_Slab_Free(aTHX_ a)
+#  if defined(PERL_DEBUG_READONLY_OPS)
+#ifdef PERL_CORE
+#endif
+#    if defined(PERL_IN_OP_C)
+#ifdef PERL_CORE
+#define Slab_to_rw(a)		S_Slab_to_rw(aTHX_ a)
+#endif
+#    endif
+#  endif
 #endif
 #if defined(PERL_IN_PERL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE

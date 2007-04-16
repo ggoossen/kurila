@@ -2495,8 +2495,12 @@ PP(pp_i_divide)
     }
 }
 
+#if defined(__GLIBC__) && IVSIZE == 8
 STATIC
 PP(pp_i_modulo_0)
+#else
+PP(pp_i_modulo)
+#endif
 {
      /* This is the vanilla old i_modulo. */
      dVAR; dSP; dATARGET; tryAMAGICbin(modulo,opASSIGN);
@@ -2516,6 +2520,7 @@ PP(pp_i_modulo_0)
 #if defined(__GLIBC__) && IVSIZE == 8
 STATIC
 PP(pp_i_modulo_1)
+
 {
      /* This is the i_modulo with the workaround for the _moddi3 bug
       * in (at least) glibc 2.2.5 (the PERL_ABS() the workaround).
@@ -2533,7 +2538,6 @@ PP(pp_i_modulo_1)
 	  RETURN;
      }
 }
-#endif
 
 PP(pp_i_modulo)
 {
@@ -2553,7 +2557,6 @@ PP(pp_i_modulo)
 	   * opcode dispatch table if that is the case, remembering to
 	   * also apply the workaround so that this first round works
 	   * right, too.  See [perl #9402] for more information. */
-#if defined(__GLIBC__) && IVSIZE == 8
 	  {
 	       IV l =   3;
 	       IV r = -10;
@@ -2569,7 +2572,6 @@ PP(pp_i_modulo)
 		    right = PERL_ABS(right);
 	       }
 	  }
-#endif
 	  /* avoid FPE_INTOVF on some platforms when left is IV_MIN */
 	  if (right == -1)
 	      SETi( 0 );
@@ -2578,6 +2580,7 @@ PP(pp_i_modulo)
 	  RETURN;
      }
 }
+#endif
 
 PP(pp_i_add)
 {
@@ -3174,7 +3177,7 @@ PP(pp_ord)
 
     XPUSHu(IN_CODEPOINTS ?
 	   utf8n_to_uvchr(s, UTF8_MAXBYTES, 0, UTF8_ALLOW_ANYUV) :
-	   (*s & 0xff));
+	   (UV)(*s & 0xff));
 
     RETURN;
 }
@@ -4320,15 +4323,19 @@ PP(pp_split)
 	DIE(aTHX_ "panic: pp_split");
     rx = PM_GETRE(pm);
 
-    do_utf8 = IN_CODEPOINTS != 0;
+    do_utf8 = (rx->extflags & RXf_PMf_UTF8) != 0;
 
-    if (pm->op_pmreplroot) {
+    TAINT_IF((rx->extflags & (RXf_WHITE | RXf_SKIPWHITE)));
+
 #ifdef USE_ITHREADS
-	ary = GvAVn((GV*)PAD_SVl(INT2PTR(PADOFFSET, pm->op_pmreplroot)));
-#else
-	ary = GvAVn((GV*)pm->op_pmreplroot);
-#endif
+    if (pm->op_pmreplrootu.op_pmtargetoff) {
+	ary = GvAVn((GV*)PAD_SVl(pm->op_pmreplrootu.op_pmtargetoff));
     }
+#else
+    if (pm->op_pmreplrootu.op_pmtargetgv) {
+	ary = GvAVn(pm->op_pmreplrootu.op_pmtargetgv);
+    }
+#endif
     else if (gimme != G_ARRAY)
 	ary = GvAVn(PL_defgv);
     else
@@ -4358,7 +4365,7 @@ PP(pp_split)
     }
     base = SP - PL_stack_base;
     orig = s;
-    if (pm->op_pmflags & PMf_SKIPWHITE) {
+    if (rx->extflags & RXf_SKIPWHITE) {
 	if (do_utf8) {
 	    while (*s == ' ' || is_utf8_space((U8*)s))
 		s += UTF8SKIP(s);
@@ -4368,13 +4375,13 @@ PP(pp_split)
 		s++;
 	}
     }
-    if (pm->op_pmflags & PMf_MULTILINE) {
+    if (rx->extflags & PMf_MULTILINE) {
 	multiline = 1;
     }
 
     if (!limit)
 	limit = maxiters + 2;
-    if (pm->op_pmflags & PMf_WHITE) {
+    if (rx->extflags & RXf_WHITE) {
 	while (--limit) {
 	    m = s;
 	    /* this one uses 'm' and is a negative test */
@@ -4436,7 +4443,7 @@ PP(pp_split)
 	SV * const csv = CALLREG_INTUIT_STRING(rx);
 
 	len = rx->minlenret;
-	if (len == 1 && !(rx->extflags & RXf_UTF8) && !tail) {
+	if (len == 1 && !(IN_CODEPOINTS) && !tail) {
 	    const char c = *SvPV_nolen_const(csv);
 	    while (--limit) {
 		for (m = s; m < strend && *m != c; m++)

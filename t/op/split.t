@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 135;
+plan tests => 134;
 
 our ($FS, $c, @ary, $x, $foo, $res, @list1, @list2, @a, $p, $n);
 
@@ -132,9 +132,6 @@ is($_, "r:m :b");
 # unicode splittage
 
 use utf8;
-
-@ary = map {ord} split //, v1.20.300.4000.50000.4000.300.20.1;
-is("@ary", "1 20 300 4000 50000 4000 300 20 1");
 
 @ary = split(/\x{FE}/, "\x{FF}\x{FE}\x{FD}"); # bug id 20010105.016
 ok(@ary == 2 &&

@@ -385,7 +385,7 @@ Perl_re_intuit_start(pTHX_ regexp *prog, SV *sv, char *strpos,
     register SV *check;
     char *strbeg;
     char *t;
-    const bool do_utf8 = prog->extflags & RXf_PMf_UTF8 ? 1 : 0;
+    const bool do_utf8 = (prog->extflags & RXf_PMf_UTF8) != 0;
     I32 ml_anch;
     register char *other_last = NULL;	/* other substr checked before this */
     char *check_at = NULL;		/* check substr found at this pos */
@@ -397,11 +397,6 @@ Perl_re_intuit_start(pTHX_ regexp *prog, SV *sv, char *strpos,
 
     GET_RE_DEBUG_FLAGS_DECL;
 
-    RX_MATCH_UTF8_set(prog,do_utf8);
-
-    if (prog->extflags & RXf_UTF8) {
-	PL_reg_flags |= RF_utf8;
-    }
     DEBUG_EXECUTE_r( 
         debug_start_match(prog, do_utf8, strpos, strend, 
             sv ? "Guessing start of match in sv for"
@@ -1591,9 +1586,6 @@ Perl_regexec_flags(pTHX_ register regexp *prog, char *stringarg, register char *
     PL_reg_eval_set = 0;
     PL_reg_maxiter = 0;
 
-    if (prog->extflags & RXf_UTF8)
-	PL_reg_flags |= RF_utf8;
-
     /* Mark beginning of line for ^ and lookbehind. */
     reginfo.bol = startpos; /* XXX not used ??? */
     PL_bostr  = strbeg;
@@ -1924,14 +1916,8 @@ Perl_regexec_flags(pTHX_ register regexp *prog, char *stringarg, register char *
 got_it:
     RX_MATCH_TAINTED_set(prog, PL_reg_flags & RF_tainted);
 
-    if (PL_reg_eval_set) {
-	/* Preserve the current value of $^R */
-	if (oreplsv != GvSV(PL_replgv))
-	    sv_setsv(oreplsv, GvSV(PL_replgv));/* So that when GvSV(replgv) is
-						  restored, the value remains
-						  the same. */
+    if (PL_reg_eval_set)
 	restore_pos(aTHX_ prog);
-    }
     if (prog->paren_names) 
         (void)hv_iterinit(prog->paren_names);
 
@@ -2338,7 +2324,7 @@ STATIC void
 S_debug_start_match(pTHX_ const regexp *prog, const bool do_utf8, 
     const char *start, const char *end, const char *blurb)
 {
-    const bool utf8_pat= prog->extflags & RXf_UTF8 ? 1 : 0;
+    const bool utf8_pat= prog->extflags & RXf_PMf_UTF8 ? 1 : 0;
     if (!PL_colorset)   
             reginitcolors();    
     {
@@ -2447,6 +2433,26 @@ S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan) {
     return 0;
 }
 
+
+/* free all slabs above current one  - called during LEAVE_SCOPE */
+
+STATIC void
+S_clear_backtrack_stack(pTHX_ void *p)
+{
+    regmatch_slab *s = PL_regmatch_slab->next;
+    PERL_UNUSED_ARG(p);
+
+    if (!s)
+	return;
+    PL_regmatch_slab->next = NULL;
+    while (s) {
+	regmatch_slab * const osl = s;
+	s = s->next;
+	Safefree(osl);
+    }
+}
+
+
 #define SETREX(Re1,Re2) \
     if (PL_reg_eval_set) PM_SETRE((PL_reg_curpm), (Re2)); \
     Re1 = (Re2)
@@ -2464,8 +2470,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
     regexp *rex = reginfo->prog;
     RXi_GET_DECL(rex,rexi);
     
-    regmatch_slab  *orig_slab;
-    regmatch_state *orig_state;
+    I32	oldsave;
 
     /* the current state. This is a cached copy of PL_regmatch_state */
     register regmatch_state *st;
@@ -2503,6 +2508,8 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                                during a successfull match */
     U32 lastopen = 0;       /* last open we saw */
     bool has_cutgroup = RX_HAS_CUTGROUP(rex) ? 1 : 0;   
+
+    SV* const oreplsv = GvSV(PL_replgv);
                
     
     /* these three flags are set by various ops to signal information to
@@ -2535,10 +2542,10 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	PL_regmatch_state = SLAB_FIRST(PL_regmatch_slab);
     }
 
-    /* remember current high-water mark for exit */
-    /* XXX this should be done with SAVE* instead */
-    orig_slab  = PL_regmatch_slab;
-    orig_state = PL_regmatch_state;
+    oldsave = PL_savestack_ix;
+    SAVEDESTRUCTOR_X(S_clear_backtrack_stack, NULL);
+    SAVEVPTR(PL_regmatch_slab);
+    SAVEVPTR(PL_regmatch_state);
 
     /* grab next free state slot */
     st = ++PL_regmatch_state;
@@ -3317,13 +3324,11 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		    else {
 			STRLEN len;
 			const char * const t = SvPV_const(ret, len);
-			PMOP pm;
+			U32 pm_flags = 0;
 			const I32 osize = PL_regsize;
 
-			Zero(&pm, 1, PMOP);
-			if (do_utf8)
-			    pm.op_pmflags |= PMf_UTF8;
-			re = CALLREGCOMP((char*)t, (char*)t + len, &pm);
+			if (DO_UTF8(ret)) pm_flags |= RXf_PMf_UTF8;
+			re = CALLREGCOMP((char*)t, (char*)t + len, pm_flags);
 			if (!(SvFLAGS(ret)
 			      & (SVs_TEMP | SVs_PADTMP | SVf_READONLY
 				| SVs_GMG)))
@@ -3367,7 +3372,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		PL_reg_maxiter = 0;
 
 		ST.toggle_reg_flags = PL_reg_flags;
-		if (re->extflags & RXf_UTF8)
+		if (re->extflags & RXf_PMf_UTF8)
 		    PL_reg_flags |= RF_utf8;
 		else
 		    PL_reg_flags &= ~RF_utf8;
@@ -3622,15 +3627,6 @@ NULL
 	}
 
 	case CURLYX_end: /* just finished matching all of A*B */
-	    if (PL_reg_eval_set){
-		SV *pres= GvSV(PL_replgv);
-		SvREFCNT_inc(pres);
-		regcpblow(ST.cp);
-		sv_setsv(GvSV(PL_replgv), pres);
-		SvREFCNT_dec(pres);
-	    } else {
-		regcpblow(ST.cp);
-	    }
 	    cur_curlyx = ST.prev_curlyx;
 	    sayYES;
 	    /* NOTREACHED */
@@ -4748,6 +4744,15 @@ yes:
     DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "%sMatch successful!%s\n",
 			  PL_colors[4], PL_colors[5]));
 
+    if (PL_reg_eval_set) {
+	/* each successfully executed (?{...}) block does the equivalent of
+	 *   local $^R = do {...}
+	 * When popping the save stack, all these locals would be undone;
+	 * bypass this by setting the outermost saved $^R to the latest
+	 * value */
+	if (oreplsv != GvSV(PL_replgv))
+	    sv_setsv(oreplsv, GvSV(PL_replgv));
+    }
     result = 1;
     goto final_exit;
 
@@ -4804,20 +4809,9 @@ no_silent:
         sv_setsv(sv_err, sv_commit);
         sv_setsv(sv_mrk, sv_yes_mark);
     }
-    /* restore original high-water mark */
-    PL_regmatch_slab  = orig_slab;
-    PL_regmatch_state = orig_state;
 
-    /* free all slabs above current one */
-    if (orig_slab->next) {
-	regmatch_slab *sl = orig_slab->next;
-	orig_slab->next = NULL;
-	while (sl) {
-	    regmatch_slab * const osl = sl;
-	    sl = sl->next;
-	    Safefree(osl);
-	}
-    }
+    /* clean up; in particular, free all slabs above current one */
+    LEAVE_SCOPE(oldsave);
 
     return result;
 }

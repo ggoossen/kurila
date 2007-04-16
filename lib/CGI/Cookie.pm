@@ -15,7 +15,7 @@ no strict;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.27';
+$CGI::Cookie::VERSION='1.28';
 
 use CGI::Util qw(rearrange unescape escape);
 use CGI;
@@ -53,7 +53,7 @@ sub fetch {
    my %results;
    my($key,$value);
    
-   my(@pairs) = split("; ?",$raw_cookie);
+   my(@pairs) = split("[;,] ?",$raw_cookie);
    foreach (@pairs) {
      s/\s*(.*?)\s*/$1/;
      if (/^([^=]+)=(.*)/) {

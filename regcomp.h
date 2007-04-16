@@ -443,13 +443,14 @@ EXTCONST U8 PL_simple[] = {
 EXTCONST regexp_engine PL_core_reg_engine;
 #else /* DOINIT */
 EXTCONST regexp_engine PL_core_reg_engine = { 
-	Perl_re_compile,
+        Perl_re_compile,
         Perl_regexec_flags, 
         Perl_re_intuit_start,
         Perl_re_intuit_string, 
         Perl_regfree_internal, 
         Perl_reg_numbered_buff_get,
         Perl_reg_named_buff_get,
+        Perl_reg_qr_pkg,
 #if defined(USE_ITHREADS)        
         Perl_regdupe_internal
 #endif        
@@ -546,20 +547,20 @@ typedef struct _reg_trie_trans    reg_trie_trans;
    optimisation in Perl_regdupe.  */
 struct _reg_trie_data {
     U32             refcount;        /* number of times this trie is referenced */
-    U16             uniquecharcount; /* unique chars in trie (width of trans table) */
     U32             lasttrans;       /* last valid transition element */
     U16             *charmap;        /* byte to charid lookup array */
     reg_trie_state  *states;         /* state data */
     reg_trie_trans  *trans;          /* array of transition elements */
     char            *bitmap;         /* stclass bitmap */
-    U32             startstate;      /* initial state - used for common prefix optimisation */
-    STRLEN          minlen;          /* minimum length of words in trie - build/opt only? */
-    STRLEN          maxlen;          /* maximum length of words in trie - build/opt only? */
     U32             *wordlen;        /* array of lengths of words */
     U16 	    *jump;           /* optional 1 indexed array of offsets before tail 
                                         for the node following a given word. */
     U16	            *nextword;       /* optional 1 indexed array to support linked list
                                         of duplicate wordnums */
+    U16             uniquecharcount; /* unique chars in trie (width of trans table) */
+    U32             startstate;      /* initial state - used for common prefix optimisation */
+    STRLEN          minlen;          /* minimum length of words in trie - build/opt only? */
+    STRLEN          maxlen;          /* maximum length of words in trie - build/opt only? */
     U32             statecount;      /* Build only - number of states in the states array 
                                         (including the unused zero state) */
     U32             wordcount;       /* Build only */
@@ -585,9 +586,9 @@ typedef struct _reg_trie_data reg_trie_data;
    optimisation in Perl_regdupe.  */
 struct _reg_ac_data {
     U32              refcount;
+    U32              trie;
     U32              *fail;
     reg_trie_state   *states;
-    U32              trie;
 };
 typedef struct _reg_ac_data reg_ac_data;
 

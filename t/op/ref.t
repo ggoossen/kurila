@@ -3,7 +3,7 @@
 require './test.pl';
 use strict qw(refs subs);
 
-plan(112);
+plan(122);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -388,6 +388,10 @@ TODO: {
     is ($$name1, "Yummy", 'Accessing via the correct name works');
     is ($$name2, undef,
 	'Accessing via a different NUL-containing name gives nothing');
+    # defined uses a different code path
+    ok (defined $$name1, 'defined via the correct name works');
+    ok (!defined $$name2,
+	'defined via a different NUL-containing name gives nothing');
 
     is ($name1->[0], undef, 'Nothing before we start (arrays)');
     is ($name2->[0], undef, 'Nothing before we start');
@@ -395,6 +399,9 @@ TODO: {
     is ($name1->[0], "Yummy", 'Accessing via the correct name works');
     is ($name2->[0], undef,
 	'Accessing via a different NUL-containing name gives nothing');
+    ok (defined $name1->[0], 'defined via the correct name works');
+    ok (!defined$name2->[0],
+	'defined via a different NUL-containing name gives nothing');
 
     my (undef, $one) = @{$name1}[2,3];
     my (undef, $two) = @{$name2}[2,3];
@@ -406,6 +413,9 @@ TODO: {
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
+    ok (defined $one, 'defined via the correct name works');
+    ok (!defined $two,
+	'defined via a different NUL-containing name gives nothing');
 
     is ($name1->{PWOF}, undef, 'Nothing before we start (hashes)');
     is ($name2->{PWOF}, undef, 'Nothing before we start');
@@ -413,6 +423,9 @@ TODO: {
     is ($name1->{PWOF}, "Yummy", 'Accessing via the correct name works');
     is ($name2->{PWOF}, undef,
 	'Accessing via a different NUL-containing name gives nothing');
+    ok (defined $name1->{PWOF}, 'defined via the correct name works');
+    ok (!defined $name2->{PWOF},
+	'defined via a different NUL-containing name gives nothing');
 
     my (undef, $one) = @{$name1}{'SNIF', 'BEEYOOP'};
     my (undef, $two) = @{$name2}{'SNIF', 'BEEYOOP'};
@@ -424,12 +437,15 @@ TODO: {
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
+    ok (defined $one, 'defined via the correct name works');
+    ok (!defined $two,
+	'defined via a different NUL-containing name gives nothing');
 
     $name1 = "Left"; $name2 = "Left\0Right";
     my $glob2 = *{$name2};
     our $glob1;
 
-    isnt ($glob1, $glob2, "We get different typeglobs");
+    is ($glob1, undef, "We get different typeglobs. In fact, undef");
 
     *{$name1} = sub {"One"};
     *{$name2} = sub {"Two"};

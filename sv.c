@@ -502,10 +502,6 @@ do_clean_all(pTHX_ SV *sv)
     dVAR;
     DEBUG_D((PerlIO_printf(Perl_debug_log, "Cleaning loops: SV at 0x%"UVxf"\n", PTR2UV(sv)) ));
     SvFLAGS(sv) |= SVf_BREAK;
-    if (PL_comppad == (AV*)sv) {
-	PL_comppad = NULL;
-	PL_curpad = NULL;
-    }
     SvREFCNT_dec(sv);
 }
 
@@ -4902,6 +4898,10 @@ Perl_sv_clear(pTHX_ register SV *sv)
 	hv_undef((HV*)sv);
 	break;
     case SVt_PVAV:
+	if (PL_comppad == (AV*)sv) {
+	    PL_comppad = NULL;
+	    PL_curpad = NULL;
+	}
 	av_undef((AV*)sv);
 	break;
     case SVt_PVLV:
@@ -4922,6 +4922,11 @@ Perl_sv_clear(pTHX_ register SV *sv)
 	if (!SvVALID(sv) && GvSTASH(sv))
 		sv_del_backref((SV*)GvSTASH(sv), sv);
 	}
+	/* FIXME. There are probably more unreferenced pointers to SVs in the
+	   interpreter struct that we should check and tidy in a similar
+	   fashion to this:  */
+	if ((GV*)sv == PL_last_in_gv)
+	    PL_last_in_gv = NULL;
     case SVt_PVMG:
     case SVt_PVNV:
     case SVt_PVIV:
@@ -5039,6 +5044,10 @@ Perl_sv_free(pTHX_ SV *sv)
                         pTHX__FORMAT, PTR2UV(sv) pTHX__VALUE);
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
 	    Perl_dump_sv_child(aTHX_ sv);
+#else
+  #ifdef DEBUG_LEAKING_SCALARS
+	sv_dump(sv);
+  #endif
 #endif
 	}
 	return;
@@ -6925,10 +6934,17 @@ Perl_sv_reset(pTHX_ register const char *s, HV *stash)
     if (!*s) {		/* reset ?? searches */
 	MAGIC * const mg = mg_find((SV *)stash, PERL_MAGIC_symtab);
 	if (mg) {
-	    PMOP *pm = (PMOP *) mg->mg_obj;
-	    while (pm) {
-		pm->op_pmdynflags &= ~PMdf_USED;
-		pm = pm->op_pmnext;
+	    const U32 count = mg->mg_len / sizeof(PMOP**);
+	    PMOP **pmp = (PMOP**) mg->mg_ptr;
+	    PMOP *const *const end = pmp + count;
+
+	    while (pmp < end) {
+#ifdef USE_ITHREADS
+                SvREADONLY_off(PL_regex_pad[(*pmp)->op_pmoffset]);
+#else
+		(*pmp)->op_pmflags &= ~PMf_USED;
+#endif
+		++pmp;
 	    }
 	}
 	return;
@@ -8325,12 +8341,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 			goto unknown;
 		    }
 		    vecsv = sv_newmortal();
-		    /* scan_vstring is expected to be called during
-		     * tokenization, so we need to fake up the end
-		     * of the buffer for it
-		     */
-		    PL_bufend = version + veclen;
-		    scan_vstring(version, vecsv);
+		    scan_vstring(version, version + veclen, vecsv);
 		    vecstr = (U8*)SvPV_const(vecsv, veclen);
 		    Safefree(version);
 		}
@@ -9257,9 +9268,6 @@ Perl_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS* param)
 	    /* The backref AV has its reference count deliberately bumped by
 	       1.  */
 	    nmg->mg_obj = SvREFCNT_inc(av_dup_inc((AV*) mg->mg_obj, param));
-	}
-	else if (mg->mg_type == PERL_MAGIC_symtab) {
-	    nmg->mg_obj	= mg->mg_obj;
 	}
 	else {
 	    nmg->mg_obj	= (mg->mg_flags & MGf_REFCOUNTED)
@@ -10532,6 +10540,10 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 	HINTS_REFCNT_UNLOCK;
     }
     PL_curcop		= (COP*)any_dup(proto_perl->Tcurcop, proto_perl);
+#ifdef PERL_DEBUG_READONLY_OPS
+    PL_slabs = NULL;
+    PL_slab_count = 0;
+#endif
 
     /* pseudo environmental stuff */
     PL_origargc		= proto_perl->Iorigargc;
@@ -11050,8 +11062,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_maxscream	= -1;			/* reinits on demand */
     PL_lastscream	= NULL;
 
-    PL_watchaddr	= NULL;
-    PL_watchok		= NULL;
 
     PL_regdummy		= proto_perl->Tregdummy;
     PL_colorset		= 0;		/* reinits PL_colors[] */
@@ -11063,6 +11073,16 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_peepp		= proto_perl->Tpeepp;
 
     PL_stashcache       = newHV();
+
+    PL_watchaddr	= (char **) ptr_table_fetch(PL_ptr_table,
+					    proto_perl->Twatchaddr);
+    PL_watchok		= PL_watchaddr ? * PL_watchaddr : NULL;
+    if (PL_debug && PL_watchaddr) {
+	PerlIO_printf(Perl_debug_log,
+	  "WATCHING: %"UVxf" cloned as %"UVxf" with value %"UVxf"\n",
+	  PTR2UV(proto_perl->Twatchaddr), PTR2UV(PL_watchaddr),
+	  PTR2UV(PL_watchok));
+    }
 
     if (!(flags & CLONEf_KEEP_PTR_TABLE)) {
         ptr_table_free(PL_ptr_table);

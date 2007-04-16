@@ -25,8 +25,8 @@ typedef struct yy_parser {
     /* parser state */
 
     struct yy_parser *old_parser; /* previous value of PL_parser */
-    int		    yychar;	/* The lookahead symbol.  */
     YYSTYPE	    yylval;	/* value of lookahead symbol, set by yylex() */
+    int		    yychar;	/* The lookahead symbol.  */
 
     /* Number of tokens to shift before error messages enabled.  */
     int		    yyerrstatus;
@@ -46,9 +46,9 @@ typedef struct yy_parser {
     I32		lex_dojoin;	/* doing an array interpolation */
     int		lex_expect;	/* expect after determined token */
     OP		*lex_inpat;	/* in pattern $) and $| are special */
-    I32		lex_inwhat;	/* what kind of quoting are we in */
     OP		*lex_op;	/* extra info to pass back on op */
     SV		*lex_repl;	/* runtime replacement from s/// */
+    I32		lex_inwhat;	/* what kind of quoting are we in */
     I32		lex_starts;	/* how many interps done on level */
     SV		*lex_stuff;	/* runtime pattern from m// or s/// */
     I32		multi_start;	/* 1st line of multi-line string */

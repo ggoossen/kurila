@@ -595,7 +595,7 @@ Apa	|OP*	|newWHILEOP	|I32 flags|I32 debuggable|NULLOK LOOP* loop \
 				|I32 whileline|NULLOK OP* expr|NULLOK OP* block|NULLOK OP* cont \
 				|I32 has_my
 Apa	|PERL_SI*|new_stackinfo|I32 stitems|I32 cxitems
-Ap	|char*	|scan_vstring	|NN const char *vstr|NN SV *sv
+Ap	|char*	|scan_vstring	|NN const char *vstr|NN const char *end|NN SV *sv
 Apd	|const char*	|scan_version	|NN const char *vstr|NN SV *sv|bool qv
 Apd	|SV*	|new_version	|NN SV *ver
 Apd	|SV*	|upg_version	|NN SV *ver|bool qv
@@ -681,8 +681,8 @@ Ap	|char *	|reg_stringify  |NN MAGIC *mg|NULLOK STRLEN *lp|NULLOK U32 *flags|NUL
 #if defined(USE_ITHREADS)
 Ap	|void*	|regdupe_internal|NN const regexp* r|NN CLONE_PARAMS* param
 #endif
-Ap	|regexp*|pregcomp	|NN char* exp|NN char* xend|NN PMOP* pm
-Ap	|regexp*|re_compile	|NN char* exp|NN char* xend|NN PMOP* pm
+Ap	|regexp*|pregcomp	|NN char* exp|NN char* xend|U32 pm_flags
+Ap	|regexp*|re_compile	|NN char* exp|NN char* xend|U32 pm_flags
 Ap	|char*	|re_intuit_start|NN regexp* prog|NULLOK SV* sv|NN char* strpos \
 				|NN char* strend|U32 flags \
 				|NULLOK struct re_scream_pos_data_s *data
@@ -694,6 +694,7 @@ ApR	|regnode*|regnext	|NN regnode* p
 
 EXp	|SV*|reg_named_buff_get	|NN const REGEXP * const rx|NN SV* namesv|U32 flags
 EXp	|SV*|reg_numbered_buff_get|NN const REGEXP * const rx|I32 paren|NULLOK SV* usesv
+EXp	|SV*|reg_qr_pkg|NN const REGEXP * const rx
 
 Ep	|void	|regprop	|NULLOK const regexp *prog|NN SV* sv|NN const regnode* o
 Ap	|void	|repeatcpy	|NN char* to|NN const char* from|I32 len|I32 count
@@ -1190,6 +1191,12 @@ pR	|OP*	|ck_trunc	|NN OP *o
 pR	|OP*	|ck_unpack	|NN OP *o
 sRn	|bool	|is_handle_constructor|NN const OP *o|I32 numargs
 sR	|I32	|is_list_assignment|NULLOK const OP *o
+#  ifdef USE_ITHREADS
+so	|void	|forget_pmop	|NN PMOP *const o|U32 flags
+#  else
+so	|void	|forget_pmop	|NN PMOP *const o
+#  endif
+s	|void	|find_and_forget_pmops	|NN OP *o
 s	|void	|cop_free	|NN COP *cop
 s	|OP*	|modkids	|NULLOK OP *o|I32 type
 s	|OP*	|scalarboolean	|NN OP *o
@@ -1216,8 +1223,16 @@ s	|void	|process_special_blocks	|NN const char *const fullname\
 					|NN GV *const gv|NN CV *const cv
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
-Apa	|void*	|Slab_Alloc	|int m|size_t sz
+Apa	|void*	|Slab_Alloc	|size_t sz
 Ap	|void	|Slab_Free	|NN void *op
+#  if defined(PERL_DEBUG_READONLY_OPS)
+poxM	|void	|pending_Slabs_to_ro
+poxM	|OP *	|op_refcnt_inc	|NULLOK OP *o
+poxM	|PADOFFSET	|op_refcnt_dec	|NN OP *o
+#    if defined(PERL_IN_OP_C)
+s	|void	|Slab_to_rw	|NN void *op
+#    endif
+#  endif
 #endif
 
 #if defined(PERL_IN_PERL_C) || defined(PERL_DECL_PROT)

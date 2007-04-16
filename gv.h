@@ -10,13 +10,13 @@
 
 struct gp {
     SV *	gp_sv;		/* scalar value */
-    U32		gp_refcnt;	/* how many globs point to this? */
     struct io *	gp_io;		/* filehandle value */
-    AV *	gp_av;		/* array value */
-    HV *	gp_hv;		/* hash value */
-    GV *	gp_egv;		/* effective gv, if *glob */
     CV *	gp_cv;		/* subroutine value */
     U32		gp_cvgen;	/* generational validity of cached gv_cv */
+    U32		gp_refcnt;	/* how many globs point to this? */
+    HV *	gp_hv;		/* hash value */
+    AV *	gp_av;		/* array value */
+    GV *	gp_egv;		/* effective gv, if *glob */
     line_t	gp_line;	/* line first declared at (for -w) */
     HEK *	gp_file_hek;	/* file first declared in (for -w) */
 };

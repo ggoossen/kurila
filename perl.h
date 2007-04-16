@@ -225,6 +225,8 @@
 #define CALLREG_NAMEDBUF(rx,name,flags) \
     CALL_FPTR((rx)->engine->named_buff_get)(aTHX_ (rx),(name),(flags))
 
+#define CALLREG_QRPKG(rx) \
+    CALL_FPTR((rx)->engine->qr_pkg)(aTHX_ (rx))
 
 #if defined(USE_ITHREADS)         
 #define CALLREGDUPE(prog,param) \
@@ -1200,12 +1202,12 @@ EXTERN_C char *crypt(const char *, const char *);
 EXTERN_C char **environ;
 #endif
 
-#if defined(__OpenBSD__) && defined(__cplusplus)
+#if defined(__cplusplus)
+#  if defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__NetBSD__)
 EXTERN_C char **environ;
-#endif
-
-#if defined(__CYGWIN__) && defined(__cplusplus)
+#  elif defined(__CYGWIN__)
 EXTERN_C char *crypt(const char *, const char *);
+#endif
 #endif
 
 #ifdef SETERRNO
@@ -5016,8 +5018,8 @@ struct am_table {
   U32 flags;
   U32 was_ok_sub;
   long was_ok_am;
-  CV* table[NofAMmeth];
   long fallback;
+  CV* table[NofAMmeth];
 };
 struct am_table_short {
   U32 flags;

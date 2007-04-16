@@ -18,6 +18,8 @@ my %MASTER_CFG;
 my @CFG = (
 	   # This list contains both 5.8.x and 5.9.x files,
 	   # we check from MANIFEST whether they are expected to be present.
+	   # We can't base our check on $], because that's the version of the
+	   # perl that we are running, not the version of the source tree.
 	   "Cross/config.sh-arm-linux",
 	   "epoc/config.sh",
 	   "NetWare/config.wc",
@@ -31,7 +33,6 @@ my @CFG = (
 	   "win32/config.vc",
 	   "win32/config.vc64",
 	   "win32/config.ce",
-	   "wince/config.ce",
 	   "configure.com",
 	  );
 
@@ -50,8 +51,7 @@ sub read_file {
 sub config_h_SH_reader {
     my $cfg = shift;
     return sub {
-	return if 1../^echo \"Extracting \$CONFIG_H/;
-	while (/[^\\]\$(\w+)/g) {
+	while (/[^\\]\$([a-z]\w+)/g) {
 	    my $v = $1;
 	    next if $v =~ /^(CONFIG_H|CONFIG_SH)$/;
 	    $cfg->{$v}++;
@@ -107,5 +107,8 @@ for my $cfg (@CFG) {
 		      warn "$cfg:$.:$_";
 		  }
 	      });
+    if ($cfg eq 'configure.com') {
+	$cfg{startperl}++; # Cheat.
+    }
     check_cfg($cfg, \%cfg);
 }

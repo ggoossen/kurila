@@ -1659,9 +1659,10 @@ PERL_CALLCONV PERL_SI*	Perl_new_stackinfo(pTHX_ I32 stitems, I32 cxitems)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV char*	Perl_scan_vstring(pTHX_ const char *vstr, SV *sv)
+PERL_CALLCONV char*	Perl_scan_vstring(pTHX_ const char *vstr, const char *end, SV *sv)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
 
 PERL_CALLCONV const char*	Perl_scan_version(pTHX_ const char *vstr, SV *sv, bool qv)
 			__attribute__nonnull__(pTHX_1)
@@ -1859,15 +1860,13 @@ PERL_CALLCONV void*	Perl_regdupe_internal(pTHX_ const regexp* r, CLONE_PARAMS* p
 			__attribute__nonnull__(pTHX_2);
 
 #endif
-PERL_CALLCONV regexp*	Perl_pregcomp(pTHX_ char* exp, char* xend, PMOP* pm)
+PERL_CALLCONV regexp*	Perl_pregcomp(pTHX_ char* exp, char* xend, U32 pm_flags)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
+			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV regexp*	Perl_re_compile(pTHX_ char* exp, char* xend, PMOP* pm)
+PERL_CALLCONV regexp*	Perl_re_compile(pTHX_ char* exp, char* xend, U32 pm_flags)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
+			__attribute__nonnull__(pTHX_2);
 
 PERL_CALLCONV char*	Perl_re_intuit_start(pTHX_ regexp* prog, SV* sv, char* strpos, char* strend, U32 flags, struct re_scream_pos_data_s *data)
 			__attribute__nonnull__(pTHX_1)
@@ -1894,6 +1893,9 @@ PERL_CALLCONV SV*	Perl_reg_named_buff_get(pTHX_ const REGEXP * const rx, SV* nam
 			__attribute__nonnull__(pTHX_2);
 
 PERL_CALLCONV SV*	Perl_reg_numbered_buff_get(pTHX_ const REGEXP * const rx, I32 paren, SV* usesv)
+			__attribute__nonnull__(pTHX_1);
+
+PERL_CALLCONV SV*	Perl_reg_qr_pkg(pTHX_ const REGEXP * const rx)
 			__attribute__nonnull__(pTHX_1);
 
 
@@ -3225,6 +3227,18 @@ STATIC bool	S_is_handle_constructor(const OP *o, I32 numargs)
 STATIC I32	S_is_list_assignment(pTHX_ const OP *o)
 			__attribute__warn_unused_result__;
 
+#  ifdef USE_ITHREADS
+STATIC void	S_forget_pmop(pTHX_ PMOP *const o, U32 flags)
+			__attribute__nonnull__(pTHX_1);
+
+#  else
+STATIC void	S_forget_pmop(pTHX_ PMOP *const o)
+			__attribute__nonnull__(pTHX_1);
+
+#  endif
+STATIC void	S_find_and_forget_pmops(pTHX_ OP *o)
+			__attribute__nonnull__(pTHX_1);
+
 STATIC void	S_cop_free(pTHX_ COP *cop)
 			__attribute__nonnull__(pTHX_1);
 
@@ -3301,13 +3315,25 @@ STATIC void	S_process_special_blocks(pTHX_ const char *const fullname, GV *const
 
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
-PERL_CALLCONV void*	Perl_Slab_Alloc(pTHX_ int m, size_t sz)
+PERL_CALLCONV void*	Perl_Slab_Alloc(pTHX_ size_t sz)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV void	Perl_Slab_Free(pTHX_ void *op)
 			__attribute__nonnull__(pTHX_1);
 
+#  if defined(PERL_DEBUG_READONLY_OPS)
+PERL_CALLCONV void	Perl_pending_Slabs_to_ro(pTHX);
+PERL_CALLCONV OP *	Perl_op_refcnt_inc(pTHX_ OP *o);
+PERL_CALLCONV PADOFFSET	Perl_op_refcnt_dec(pTHX_ OP *o)
+			__attribute__nonnull__(pTHX_1);
+
+#    if defined(PERL_IN_OP_C)
+STATIC void	S_Slab_to_rw(pTHX_ void *op)
+			__attribute__nonnull__(pTHX_1);
+
+#    endif
+#  endif
 #endif
 
 #if defined(PERL_IN_PERL_C) || defined(PERL_DECL_PROT)

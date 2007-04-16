@@ -3735,7 +3735,7 @@ extern const struct regexp_engine my_reg_engine;
 
 #ifndef PERL_IN_XSUB_RE 
 regexp *
-Perl_pregcomp(pTHX_ char *exp, char *xend, PMOP *pm)
+Perl_pregcomp(pTHX_ char *exp, char *xend, U32 pm_flags)
 {
     dVAR;
     HV * const table = GvHV(PL_hintgv);
@@ -3750,15 +3750,15 @@ Perl_pregcomp(pTHX_ char *exp, char *xend, PMOP *pm)
                 PerlIO_printf(Perl_debug_log, "Using engine %"UVxf"\n",
                     SvIV(*ptr));
             });            
-            return CALLREGCOMP_ENG(eng, exp, xend, pm);
+            return CALLREGCOMP_ENG(eng, exp, xend, pm_flags);
         } 
     }
-    return Perl_re_compile(aTHX_ exp, xend, pm);
+    return Perl_re_compile(aTHX_ exp, xend, pm_flags);
 }
 #endif
 
 regexp *
-Perl_re_compile(pTHX_ char *exp, char *xend, PMOP *pm)
+Perl_re_compile(pTHX_ char *exp, char *xend, U32 pm_flags)
 {
     dVAR;
     register regexp *r;
@@ -3782,7 +3782,6 @@ Perl_re_compile(pTHX_ char *exp, char *xend, PMOP *pm)
     if (exp == NULL)
 	FAIL("NULL regexp argument");
 
-    RExC_precomp = exp;
     DEBUG_COMPILE_r({
         SV *dsv= sv_newmortal();
         RE_PV_QUOTED_DECL(s, 1,
@@ -3792,7 +3791,7 @@ Perl_re_compile(pTHX_ char *exp, char *xend, PMOP *pm)
     });
 
     RExC_precomp = exp;
-    RExC_flags = pm->op_pmflags;
+    RExC_flags = pm_flags;
     RExC_sawback = 0;
 
     RExC_seen = 0;
@@ -3868,7 +3867,7 @@ Perl_re_compile(pTHX_ char *exp, char *xend, PMOP *pm)
     r->engine= RE_ENGINE_PTR;
     r->refcnt = 1;
     r->prelen = xend - exp;
-    r->extflags = pm->op_pmflags & RXf_PMf_COMPILETIME;
+    r->extflags = pm_flags;
     {
         bool has_k     = ((r->extflags & RXf_PMf_KEEPCOPY) == RXf_PMf_KEEPCOPY);
 	bool has_minus = ((r->extflags & RXf_PMf_STD_PMMOD) != RXf_PMf_STD_PMMOD);
@@ -3937,7 +3936,7 @@ Perl_re_compile(pTHX_ char *exp, char *xend, PMOP *pm)
     RExC_rxi = ri;
 
     /* Second pass: emit code. */
-    RExC_flags = pm->op_pmflags;	/* don't let top level (?i) bleed */
+    RExC_flags = pm_flags;	/* don't let top level (?i) bleed */
     RExC_parse = exp;
     RExC_end = xend;
     RExC_naughty = 0;
@@ -3989,10 +3988,9 @@ reStudy:
 #endif    
 
     /* Dig out information for optimizations. */
-    r->extflags = pm->op_pmflags & RXf_PMf_COMPILETIME; /* Again? */
-    pm->op_pmflags = RExC_flags;
-    if (UTF)
-        r->extflags |= RXf_UTF8;	/* Unicode in it? */
+    r->extflags = pm_flags; /* Again? */
+    /*dmq: removed as part of de-PMOP: pm->op_pmflags = RExC_flags; */
+ 
     ri->regstclass = NULL;
     if (RExC_naughty >= 10)	/* Probably an expensive pattern. */
 	r->intflags |= PREGf_NAUGHTY;
@@ -4366,7 +4364,7 @@ reStudy:
         r->paren_names = (HV*)SvREFCNT_inc(RExC_paren_names);
     else
         r->paren_names = NULL;
-    if (r->prelen == 3 && strEQ("\\s+", r->precomp))
+    if (r->prelen == 3 && strnEQ("\\s+", r->precomp, 3)) /* precomp = "\\s+)" */
 	r->extflags |= RXf_WHITE;
     else if (r->prelen == 1 && r->precomp[0] == '^')
         r->extflags |= RXf_START_ONLY;
@@ -4436,7 +4434,7 @@ Perl_reg_named_buff_get(pTHX_ const REGEXP * const rx, SV* namesv, U32 flags)
                     ret = newSVsv(&PL_sv_undef);
                 }
                 if (retarray) {
-                    SvREFCNT_inc(ret);
+                    SvREFCNT_inc_simple_void(ret);
                     av_push(retarray, ret);
                 }
             }
@@ -4514,6 +4512,12 @@ Perl_reg_numbered_buff_get(pTHX_ const REGEXP * const rx, I32 paren, SV* usesv)
     return sv;
 }
 
+SV*
+Perl_reg_qr_pkg(pTHX_ const REGEXP * const rx)
+{
+	PERL_UNUSED_ARG(rx);
+	return newSVpvs("Regexp");
+}
 
 /* Scans the name of a named buffer from the pattern.
  * If flags is REG_RSN_RETURN_NULL returns null.
@@ -4801,7 +4805,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                     if (!SIZE_ONLY) {
                         num = add_data( pRExC_state, 1, "S" );
                         RExC_rxi->data->data[num]=(void*)sv_dat;
-                        SvREFCNT_inc(sv_dat);
+                        SvREFCNT_inc_simple_void(sv_dat);
                     }
                     RExC_sawback = 1;
                     ret = reganode(pRExC_state,
@@ -5136,7 +5140,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 	            if (!SIZE_ONLY) {
                         num = add_data( pRExC_state, 1, "S" );
                         RExC_rxi->data->data[num]=(void*)sv_dat;
-                        SvREFCNT_inc(sv_dat);
+                        SvREFCNT_inc_simple_void(sv_dat);
                     }
                     ret = reganode(pRExC_state,NGROUPP,num);
                     goto insert_if_check_paren;
@@ -6293,7 +6297,7 @@ tryagain:
                 if (!SIZE_ONLY) {
                     num = add_data( pRExC_state, 1, "S" );
                     RExC_rxi->data->data[num]=(void*)sv_dat;
-                    SvREFCNT_inc(sv_dat);
+                    SvREFCNT_inc_simple_void(sv_dat);
                 }
 
                 RExC_sawback = 1;
@@ -8352,7 +8356,7 @@ Perl_regfree_internal(pTHX_ struct regexp *r)
 	    reginitcolors();
 	{
 	    SV *dsv= sv_newmortal();
-            RE_PV_QUOTED_DECL(s, (r->extflags & RXf_UTF8),
+            RE_PV_QUOTED_DECL(s, 0,
                 dsv, r->precomp, r->prelen, 60);
             PerlIO_printf(Perl_debug_log,"%sFreeing REx:%s %s\n", 
                 PL_colors[4],PL_colors[5],s);
@@ -8681,7 +8685,7 @@ Perl_reg_stringify(pTHX_ MAGIC *mg, STRLEN *lp, U32 *flags, I32 *haseval ) {
     if (haseval) 
         *haseval = re->seen_evals;
     if (flags)    
-	*flags = ((re->extflags & RXf_UTF8) ? 1 : 0);
+	*flags = 1;
     if (lp)
 	*lp = re->wraplen;
     return re->wrapped;

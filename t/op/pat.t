@@ -3888,6 +3888,16 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
         iseq($^R,'last regexp code result');
     }
     iseq($^R,'Nothing');
+
+    {
+        local $^R = "Bad";
+        ok('x foofoo y' =~ m{
+         (foo|bar)\1 # this time without the +
+        (?{"last regexp code result"})
+        }x);
+        iseq($^R,'last regexp code result');
+    }
+    iseq($^R,'Nothing');
 }
 {
     local $Message="RT#22395";
@@ -4185,11 +4195,23 @@ ok($@=~/\QSequence \k... not terminated in regex;\E/);
     iseq( (join ",", sort map "@$_", values %-), ",a" );
 }
 
+# length() on captures, these end up in Perl_magic_len
+{
+    my $_ = "aoeu \xe6var ook";
+    /^ \w+ \s (?<eek>\S+)/x;
+
+    iseq( length($`), 0, 'length $`' );
+    iseq( length($'), 4, q[length $'] );
+    iseq( length($&), 9, 'length $&' );
+    iseq( length($1), 4, 'length $1' );
+    iseq( length($+{eek}), 4, 'length $+{eek} == length $1' );
+}
+
 # Put new tests above the dotted line about a page above this comment
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1727;
+    $::TestCount = 1663;
     print "1..$::TestCount\n";
 }
 

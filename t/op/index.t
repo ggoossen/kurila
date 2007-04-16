@@ -82,7 +82,7 @@ is(rindex("abc", "", 4), 3);
 {
     use utf8;
     my $needle = "\x{1230}\x{1270}";
-    my @needles = split ( //, $needle );
+    my @needles = ("\x{1230}", "\x1270");
     my $haystack = "\x{1228}\x{1228}\x{1230}\x{1270}";
     foreach ( @needles ) {
 	my $a = index ( "\x{1228}\x{1228}\x{1230}\x{1270}", $_ );
@@ -90,7 +90,7 @@ is(rindex("abc", "", 4), 3);
 	is($a, $b, q{[perl #22375] 'split'/'index' problem for utf8});
     }
     $needle = "\x{1270}\x{1230}"; # Transpose them.
-    @needles = split ( //, $needle );
+    @needles = ("\x{1270}", "\x1230");
     foreach ( @needles ) {
 	my $a = index ( "\x{1228}\x{1228}\x{1230}\x{1270}", $_ );
 	my $b = index ( $haystack, $_ );

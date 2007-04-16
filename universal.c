@@ -185,6 +185,7 @@ Perl_sv_does(pTHX_ SV *sv, const char *name)
 {
     const char *classname;
     bool does_it;
+    SV *methodname;
 
     dSP;
     ENTER;
@@ -210,7 +211,12 @@ Perl_sv_does(pTHX_ SV *sv, const char *name)
     XPUSHs(sv_2mortal(newSVpv(name, 0)));
     PUTBACK;
 
-    call_method("isa", G_SCALAR);
+    methodname = sv_2mortal(newSVpv("isa", 0));
+    /* ugly hack: use the SvSCREAM flag so S_method_common
+     * can figure out we're calling DOES() and not isa(),
+     * and report eventual errors correctly. --rgs */
+    SvSCREAM_on(methodname);
+    call_sv(methodname, G_SCALAR | G_METHOD);
     SPAGAIN;
 
     does_it = SvTRUE( TOPs );
@@ -410,7 +416,7 @@ XS(XS_UNIVERSAL_DOES)
     PERL_UNUSED_ARG(cv);
 
     if (items != 2)
-	Perl_croak(aTHX_ "Usage: invocant->does(kind)");
+	Perl_croak(aTHX_ "Usage: invocant->DOES(kind)");
     else {
 	SV * const sv = ST(0);
 	const char *name;

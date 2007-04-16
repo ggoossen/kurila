@@ -411,10 +411,6 @@ perl_construct(pTHXx)
     PL_timesbase.tms_cstime = 0;
 #endif
 
-#ifdef PERL_MAD
-    PL_curforce = -1;
-#endif
-
     PL_hints = DEFAULT_HINTS;
 
     ENTER;
@@ -1241,6 +1237,11 @@ perl_destruct(pTHXx)
 #endif
     PL_sv_count = 0;
 
+#ifdef PERL_DEBUG_READONLY_OPS
+    free(PL_slabs);
+    PL_slabs = NULL;
+    PL_slab_count = 0;
+#endif
 
 #if defined(PERLIO_LAYERS)
     /* No more IO - including error messages ! */
@@ -1836,6 +1837,9 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  ifdef NO_MATHOMS
                             " NO_MATHOMS"
 #  endif
+#  ifdef PERL_DEBUG_READONLY_OPS
+			     " PERL_DEBUG_READONLY_OPS"
+#  endif
 #  ifdef PERL_DONT_CREATE_GVSV
 			     " PERL_DONT_CREATE_GVSV"
 #  endif
@@ -2370,7 +2374,6 @@ perl_run(pTHXx)
     return ret;
 }
 
-
 STATIC void
 S_run_body(pTHX_ I32 oldscope)
 {
@@ -2407,6 +2410,9 @@ S_run_body(pTHX_ I32 oldscope)
 	    sv_setiv(PL_DBsingle, 1);
 	if (PL_initav)
 	    call_list(oldscope, PL_initav);
+#ifdef PERL_DEBUG_READONLY_OPS
+	Perl_pending_Slabs_to_ro(aTHX);
+#endif
     }
 
     /* do it */
@@ -3543,14 +3549,14 @@ S_init_main_stash(pTHX)
     SvREADONLY_on(gv);
     PL_incgv = gv_HVadd(gv_AVadd(gv_fetchpvs("INC", GV_ADD|GV_NOTQUAL,
 					     SVt_PVAV)));
-    SvREFCNT_inc_simple(PL_incgv); /* Don't allow it to be freed */
+    SvREFCNT_inc_simple_void(PL_incgv); /* Don't allow it to be freed */
     GvMULTI_on(PL_incgv);
     PL_hintgv = gv_fetchpvs("\010", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
     GvMULTI_on(PL_hintgv);
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
-    SvREFCNT_inc_simple(PL_defgv);
+    SvREFCNT_inc_simple_void(PL_defgv);
     PL_errgv = gv_HVadd(gv_fetchpvs("@", GV_ADD|GV_NOTQUAL, SVt_PV));
-    SvREFCNT_inc_simple(PL_errgv);
+    SvREFCNT_inc_simple_void(PL_errgv);
     GvMULTI_on(PL_errgv);
     PL_replgv = gv_fetchpvs("\022", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
     GvMULTI_on(PL_replgv);
@@ -5182,8 +5188,6 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 	    PL_curcop = &PL_compiling;
 	    CopLINE_set(PL_curcop, oldline);
 	    JMPENV_POP;
-	    if (PL_madskills && PL_minus_c && paramList == PL_beginav)
-		return;	/* not really trying to run, so just wing it */
 	    if (PL_statusvalue && !(PL_exit_flags & PERL_EXIT_EXPECTED)) {
 		if (paramList == PL_beginav)
 		    Perl_croak(aTHX_ "BEGIN failed--compilation aborted");

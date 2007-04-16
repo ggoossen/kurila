@@ -46,7 +46,7 @@ my %alias;
 # Format is "this function" => "does these op names"
 my @raw_alias = (
 		 Perl_do_kv => [qw( keys values )],
-		 Perl_unimplemented_op => [qw(padany mapstart)],
+		 Perl_unimplemented_op => [qw(padany mapstart custom)],
 		 # All the ops with a body of { return NORMAL; }
 		 Perl_pp_null => [qw(scalar regcmaybe lineseq scope)],
 
@@ -240,7 +240,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 END
 
 for (@ops) {
-    $_ eq "custom" and next;
     if (my $name = $alias{$_}) {
 	print "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n";
     }
@@ -523,7 +522,8 @@ sub tab {
 
 __END__
 
-# New ops always go at the end, just before 'custom'
+# New ops always go at the end
+# The restriction on having custom as the last op has been removed
 
 # A recapitulation of the format of this file:
 # The file consists of five columns: the name of the op, an English
@@ -689,6 +689,8 @@ i_negate	integer negation (-)	ck_null		ifsT1	S
 not		not			ck_null		ifs1	S
 complement	1's complement (~)	ck_bitop	fst1	S
 
+smartmatch	smart match		ck_smartmatch	s2
+
 # High falutin' math.
 
 atan2		atan2			ck_fun		fsT@	S S
@@ -783,9 +785,11 @@ flop		range (or flop)		ck_null		1
 and		logical and (&&)		ck_null		|	
 or		logical or (||)			ck_null		|	
 xor		logical xor			ck_null		fs2	S S	
+dor		defined or (//)			ck_null		|
 cond_expr	conditional expression		ck_null		d|	
 andassign	logical and assignment (&&=)	ck_null		s|	
 orassign	logical or assignment (||=)	ck_null		s|	
+dorassign	defined or assignment (//=)	ck_null		s|
 
 method		method lookup		ck_method	d1
 entersub	subroutine entry	ck_subr		dmt1	L
@@ -814,10 +818,15 @@ redo		redo			ck_null		ds}
 dump		dump			ck_null		ds}	
 goto		goto			ck_null		ds}	
 exit		exit			ck_exit		ds%	S?
-# continued below
+setstate	set statement info	ck_null		s;
+method_named	method with known name	ck_null		d$
 
-#nswitch	numeric switch		ck_null		d	
-#cswitch	character switch	ck_null		d	
+entergiven	given()			ck_null		d|
+leavegiven	leave given block	ck_null		1
+enterwhen	when()			ck_null		d|
+leavewhen	leave when block	ck_null		1
+break		break			ck_null		0
+continue	continue		ck_null		0
 
 # I/O.
 
@@ -843,6 +852,7 @@ read		read			ck_fun		imst@	F R S S?
 
 prtf		printf			ck_listiob	ims@	F? L
 print		print			ck_listiob	ims@	F? L
+say		say			ck_listiob	ims@	F? L
 
 sysopen		sysopen			ck_fun		s@	F S S S?
 sysseek		sysseek			ck_fun		s@	F S S
@@ -1033,24 +1043,5 @@ syscall		syscall			ck_fun		imst@	S L
 
 # For multi-threading
 lock		lock			ck_rfun		s%	R
-
-# Control (contd.)
-setstate	set statement info	ck_null		s;
-method_named	method with known name	ck_null		d$
-
-dor		defined or (//)			ck_null		|
-dorassign	defined or assignment (//=)	ck_null		s|
-
-entergiven	given()			ck_null		d|
-leavegiven	leave given block	ck_null		1
-enterwhen	when()			ck_null		d|
-leavewhen	leave when block	ck_null		1
-break		break			ck_null		0
-continue	continue		ck_null		0
-smartmatch	smart match		ck_smartmatch	s2
-
-say		say			ck_listiob	ims@	F? L
-
-# Add new ops before this, the custom operator.
 
 custom		unknown custom operator		ck_null		0

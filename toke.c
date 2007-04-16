@@ -605,8 +605,7 @@ S_cr_textfilter(pTHX_ int idx, SV *sv, int maxlen)
 
 /*
  * Perl_lex_start
- * Initialize variables.  Uses the Perl save_stack to save its state (for
- * recursive calls to the parser).
+ * Create a parser object and initialise its parser and lexer fields
  */
 
 void
@@ -631,6 +630,9 @@ Perl_lex_start(pTHX_ SV *line)
     parser->yyerrstatus = 0;
     parser->yychar = YYEMPTY;		/* Cause a token to be read.  */
 
+    /* on scope exit, free this parser and restore any outer one */
+    SAVEPARSER(parser);
+
     /* initialise lexer state */
 
     SAVEI32(PL_lex_state);
@@ -645,6 +647,7 @@ Perl_lex_start(pTHX_ SV *line)
 	}
     }
     SAVEI32(PL_curforce);
+    PL_curforce = -1;
 #else
     if (PL_lex_state == LEX_KNOWNEXT) {
 	I32 toke = PL_nexttoke;
@@ -701,6 +704,20 @@ Perl_lex_start(pTHX_ SV *line)
     PL_last_lop = PL_last_uni = NULL;
     PL_rsfp = 0;
 }
+
+
+/* delete a parser object */
+
+void
+Perl_parser_free(pTHX_  const yy_parser *parser)
+{
+    Safefree(parser->stack);
+    Safefree(parser->lex_brackstack);
+    Safefree(parser->lex_casestack);
+    PL_parser = parser->old_parser;
+    Safefree(parser);
+}
+
 
 /*
  * Perl_lex_end
@@ -10445,8 +10462,28 @@ S_scan_pat(pTHX_ char *start, I32 type)
     }
 
     pm = (PMOP*)newPMOP(type, 0);
-    if (PL_multi_open == '?')
+    if (PL_multi_open == '?') {
+	/* This is the only point in the code that sets PMf_ONCE:  */
 	pm->op_pmflags |= PMf_ONCE;
+
+	/* Hence it's safe to do this bit of PMOP book-keeping here, which
+	   allows us to restrict the list needed by reset to just the ??
+	   matches.  */
+	assert(type != OP_TRANS);
+	if (PL_curstash) {
+	    MAGIC *mg = mg_find((SV*)PL_curstash, PERL_MAGIC_symtab);
+	    U32 elements;
+	    if (!mg) {
+		mg = sv_magicext((SV*)PL_curstash, 0, PERL_MAGIC_symtab, 0, 0,
+				 0);
+	    }
+	    elements = mg->mg_len / sizeof(PMOP**);
+	    Renewc(mg->mg_ptr, elements + 1, PMOP*, char);
+	    ((PMOP**)mg->mg_ptr) [elements++] = pm;
+	    mg->mg_len = elements * sizeof(PMOP**);
+	    PmopSTASH_set(pm,PL_curstash);
+	}
+    }
 #ifdef PERL_MAD
     modstart = s;
 #endif
@@ -10469,8 +10506,6 @@ S_scan_pat(pTHX_ char *start, I32 type)
         Perl_warner(aTHX_ packWARN(WARN_REGEXP), 
             "Use of /c modifier is meaningless without /g" );
     }
-
-    pm->op_pmpermflags = pm->op_pmflags;
 
     PL_lex_op = (OP*)pm;
     yylval.ival = OP_MATCH;
@@ -10575,7 +10610,6 @@ S_scan_subst(pTHX_ char *start)
 	PL_lex_repl = repl;
     }
 
-    pm->op_pmpermflags = pm->op_pmflags;
     PL_lex_op = (OP*)pm;
     yylval.ival = OP_SUBST;
     return s;
@@ -11849,7 +11883,7 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
     case 'v':
 vstring:
 		sv = newSV(5); /* preallocate storage space */
-		s = scan_vstring(s,sv);
+		s = scan_vstring(s, PL_bufend, sv);
 	break;
     }
 
@@ -12198,28 +12232,29 @@ vstring, as well as updating the passed in sv.
 Function must be called like
 
 	sv = newSV(5);
-	s = scan_vstring(s,sv);
+	s = scan_vstring(s,e,sv);
 
+where s and e are the start and end of the string.
 The sv should already be large enough to store the vstring
 passed in, for performance reasons.
 
 */
 
 char *
-Perl_scan_vstring(pTHX_ const char *s, SV *sv)
+Perl_scan_vstring(pTHX_ const char *s, const char *e, SV *sv)
 {
     dVAR;
     const char *pos = s;
     const char *start = s;
     if (*pos == 'v') pos++;  /* get past 'v' */
-    while (pos < PL_bufend && (isDIGIT(*pos) || *pos == '_'))
+    while (pos < e && (isDIGIT(*pos) || *pos == '_'))
 	pos++;
     if ( *pos != '.') {
 	/* this may not be a v-string if followed by => */
 	const char *next = pos;
-	while (next < PL_bufend && isSPACE(*next))
+	while (next < e && isSPACE(*next))
 	    ++next;
-	if ((PL_bufend - next) >= 2 && *next == '=' && next[1] == '>' ) {
+	if ((e - next) >= 2 && *next == '=' && next[1] == '>' ) {
 	    /* return string not v-string */
 	    sv_setpvn(sv,(char *)s,pos-s);
 	    return (char *)pos;
@@ -12257,13 +12292,13 @@ Perl_scan_vstring(pTHX_ const char *s, SV *sv)
 	    /* Append native character for the rev point */
 	    tmpend = uvchr_to_utf8(tmpbuf, rev);
 	    sv_catpvn(sv, (const char*)tmpbuf, tmpend - tmpbuf);
-	    if (pos + 1 < PL_bufend && *pos == '.' && isDIGIT(pos[1]))
+	    if (pos + 1 < e && *pos == '.' && isDIGIT(pos[1]))
 		 s = ++pos;
 	    else {
 		 s = pos;
 		 break;
 	    }
-	    while (pos < PL_bufend && (isDIGIT(*pos) || *pos == '_'))
+	    while (pos < e && (isDIGIT(*pos) || *pos == '_'))
 		 pos++;
 	}
 	SvPOK_on(sv);

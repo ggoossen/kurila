@@ -117,7 +117,11 @@ use Getopt::Std;
 use Carp;
 use Test::More tests => ( # per-pkg tests (function ct + require_ok)
 			  40 + 16	# Data::Dumper, Digest::MD5
+<<<<<<< HEAD/ext/B/t/concise-xs.t
 			  + 517 + 237	# B::Deparse, B
+=======
+			  + 517 + 262	# B::Deparse, B
+>>>>>>> da480f52a092f349f0545103adcbb8bfb7e56d29/ext/B/t/concise-xs.t
 			  + 595 + 190	# POSIX, IO::Socket
 			  + 323 * ($] > 5.009)
 			  + 17 * ($] >= 5.009003)
@@ -142,7 +146,7 @@ my $testpkgs = {
     'Data::Dumper' => { XS => [qw/ bootstrap Dumpxs /],
 		      dflt => 'perl' },
     B => { 
-	dflt => 'constant',		# all but 47/274
+	dflt => 'constant',		# all but 47/297
 	skip => [ 'regex_padav' ],	# threaded only
 	perl => [qw(
 		    walksymtable walkoptree_slow walkoptree_exec
@@ -176,7 +180,7 @@ my $testpkgs = {
 		     OPpSORT_REVERSE OPpTARGET_MY OPpTRANS_COMPLEMENT
 		     OPpTRANS_DELETE OPpTRANS_SQUASH PMf_CONTINUE
 		     PMf_EVAL PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
-		     PMf_MULTILINE PMf_ONCE PMf_SINGLELINE PMf_SKIPWHITE
+		     PMf_MULTILINE PMf_ONCE PMf_SINGLELINE RXf_SKIPWHITE
 		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
 		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN OPpPAD_STATE
 		     /],
