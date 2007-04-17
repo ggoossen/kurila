@@ -159,7 +159,7 @@ can start it via the C<cpanp> binary, or as detailed in the L<SYNOPSIS>.
 sub new {
     my $class   = shift;
 
-    my $cb      = new CPANPLUS::Backend;
+    my $cb      = CPANPLUS::Backend->new();
     my $self    = $class->SUPER::_init(
                             brand       => $Brand,
                             term        => Term::ReadLine->new( $Brand ),

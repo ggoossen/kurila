@@ -838,7 +838,7 @@ sub write_makefile_pl {
     ### http://bugs.activestate.com/show_bug.cgi?id=34051
     unlink $file if $force;
 
-    my $fh = new FileHandle;
+    my $fh = FileHandle->new();
     unless( $fh->open( ">$file" ) ) {
         error( loc( "Could not create file '%1': %2", $file, $! ) );
         return;

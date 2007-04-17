@@ -75,7 +75,7 @@ BEGIN {
     @ISA        = 'Exporter';
     @EXPORT     = qw[cp_error cp_msg error msg];
 
-    my $log     = new Log::Message;
+    my $log     = Log::Message->new();
 
     for my $func ( @EXPORT ) {
         no strict 'refs';

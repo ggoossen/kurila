@@ -70,7 +70,7 @@ my $Prompt  = $Brand . '> ';
 sub new {
     my $class   = shift;
 
-    my $cb      = new CPANPLUS::Backend;
+    my $cb      = CPANPLUS::Backend->new();
     my $self    = $class->SUPER::_init(
                             brand   => $Brand,
                             term    => Term::ReadLine->new( $Brand ),

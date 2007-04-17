@@ -1376,7 +1376,7 @@ sub _parse_mirrored_by {
 
     -s $file or return;
 
-    my $fh = new FileHandle;
+    my $fh = FileHandle->new();
     $fh->open("$file")
         or (
             warn(loc('Could not open file "%1": %2', $file, $!)),
