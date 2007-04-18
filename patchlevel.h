@@ -13,6 +13,10 @@
 /* do not adjust the whitespace! Configure expects the numbers to be
  * exactly on the third column */
 
+#define KURILA_REVISION kurila
+#define KURILA_VERSION 2
+#define KURILA_SUBVERSION 0
+
 #define PERL_REVISION	5		/* age */
 #define PERL_VERSION	9		/* epoch */
 #define PERL_SUBVERSION	5		/* generation */
@@ -128,8 +132,4 @@ static const char * const local_patches[] = {
 #  define	LOCAL_PATCH_COUNT	\
 	((int)(sizeof(local_patches)/sizeof(local_patches[0])-2))
 
-/* the old terms of reference, add them only when explicitly included */
-#define PATCHLEVEL		PERL_VERSION
-#undef  SUBVERSION		/* OS/390 has a SUBVERSION in a system header */
-#define SUBVERSION		PERL_SUBVERSION
 #endif
