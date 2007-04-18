@@ -200,7 +200,7 @@ for my $op_const ($twig->findnodes(q|//op_const|)) {
 
 # add_encoding_latin1($twig);
 
-remove_rv2gv($twig);
+# remove_rv2gv($twig);
 
 # print
 $twig->print;
