@@ -20,7 +20,7 @@ $ENV{SHELL} = 'sh' if $^O eq 'os2';
 my $ver = $Config{version};     # Not used presently.
 my $release = substr($],0,3);   # Not used presently.
 my $patchlevel = substr($],3,2);
-die "Patchlevel of perl ($patchlevel)",
+warn "Patchlevel of perl ($patchlevel)",
     "and patchlevel of config.sh ($Config{'PERL_VERSION'}) don't match\n"
 	if $patchlevel != $Config{'PERL_VERSION'};
 
