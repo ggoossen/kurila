@@ -648,7 +648,6 @@ Apd	|HV*	|get_hv		|NN const char* name|I32 create
 Apd	|CV*	|get_cv		|NN const char* name|I32 flags
 Apd	|CV*	|get_cvn_flags	|NN const char* name|STRLEN len|I32 flags
 Ap	|int	|init_i18nl10n	|int printwarn
-Ap	|int	|init_i18nl14n	|int printwarn
 Ap	|void	|new_collate	|NULLOK const char* newcoll
 Ap	|void	|new_ctype	|NN const char* newctype
 Ap	|void	|new_numeric	|NULLOK const char* newcoll

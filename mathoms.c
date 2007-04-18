@@ -644,13 +644,6 @@ badexit:
 }
 #endif
 
-/* Backwards compatibility. */
-int
-Perl_init_i18nl14n(pTHX_ int printwarn)
-{
-    return init_i18nl10n(printwarn);
-}
-
 /* XXX kept for BINCOMPAT only */
 void
 Perl_save_hints(pTHX)
