@@ -734,7 +734,6 @@ Ap	|void	|save_shared_pvref|NN char** str
 Ap	|void	|save_gp	|NN GV* gv|I32 empty
 Ap	|HV*	|save_hash	|NN GV* gv
 Ap	|void	|save_helem	|NN HV* hv|NN SV *key|NN SV **sptr
-Apr	|void	|save_hints
 Ap	|void	|save_hptr	|NN HV** hptr
 Ap	|void	|save_I16	|NN I16* intp
 Ap	|void	|save_I32	|NN I32* intp

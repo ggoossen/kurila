@@ -644,13 +644,6 @@ badexit:
 }
 #endif
 
-/* XXX kept for BINCOMPAT only */
-void
-Perl_save_hints(pTHX)
-{
-    Perl_croak(aTHX_ "internal error: obsolete function save_hints() called");
-}
-
 #if 0
 OP *
 Perl_ck_retarget(pTHX_ OP *o)
