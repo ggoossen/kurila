@@ -33,10 +33,6 @@ package PLXML::mad_pv;
 
 our @ISA = ('PLXML');
 
-package PLXML::mad_sv;
-
-our @ISA = ('PLXML');
-
 package PLXML::baseop;
 
 our @ISA = ('PLXML');

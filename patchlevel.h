@@ -14,9 +14,10 @@
  * exactly on the third column */
 
 #define KURILA_REVISION kurila
-#define KURILA_VERSION 2
-#define KURILA_SUBVERSION 0
+#define KURILA_VERSION 0
+#define KURILA_SUBVERSION 2
 
+/* Fake Perl version 5.9.5 */
 #define PERL_REVISION	5		/* age */
 #define PERL_VERSION	9		/* epoch */
 #define PERL_SUBVERSION	5		/* generation */

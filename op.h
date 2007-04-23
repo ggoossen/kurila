@@ -696,6 +696,7 @@ struct token {
  * E       tr/E/R/, /E/
  * f       folded constant op
  * F       peg op for format
+ * g       bareword was forced
  * i       if/unless modifier
  * I       if/elsif/unless statement
  * K       retired kid op

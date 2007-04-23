@@ -1333,7 +1333,7 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
 	    }
 	}
 	if (PL_madskills)
-	    curmad('B', newSVpvs( "forced" ));
+	    curmad('g', newSVpvs( "forced" ));
 	NEXTVAL_NEXTTOKE.opval
 	    = (OP*)newSVOP(OP_CONST,0,
 			   newSVpvn(aTHX_ PL_tokenbuf, len));

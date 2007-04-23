@@ -1,0 +1,112 @@
+=head1 NAME
+
+kurila02delta - what is new for Perl Kurila 0.2
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 0.2 and Perl v5.9.x DEVEL30965
+
+=head1 Highlights In Kurila 0.2
+
+=over 4
+
+=item *
+
+Lexical scoped byte vs codepoint semantics
+
+=item *
+
+Strings are internally always encoded using UTF-8
+
+=item *
+
+Removal indirect object syntax
+
+=item *
+
+Removal formats
+
+=back
+
+=head1 Core Enhancements
+
+=head2 Lexical scoped byte vs codepoint semantics
+
+Instead of having an string dependend byte vs codepoint semantics, the semantics is not determined
+by the lexical scope.
+C<use bytes> sets byte semantics for the current lexical scope, C<use utf8> set codepoints semantics for the
+current lexical scope.
+chomp, chop, chr, index, lc, lcfirst, length, oct, ord, reverse, rindex, substr, uc, ucfirst
+all depend on the lexical scope to determine whether to use bytes or codepoints.
+The default lexical scope is bytes.
+
+=head2 Internal encoding using UTF-8
+
+Strings are always internally represented using UTF-8
+
+=head2 \x...
+
+C<\x{NUMBER}> creates a codepoint with the numeric value NUMBER.
+C<\x[NUMBER]> creates a byte with numeric value NUMBER modulo 256.
+C<\x1b> creates a codepoint or byte depending on the lexical scope.
+
+=head2 /u pattern option
+
+Regex unicode matching is enabled when C</u> option is enabled on a pattern, or when C<use utf8>
+is in effect.
+
+=head2 Indirect object syntax removed
+
+Indirect object syntax has been removed.
+
+=head2 formats removed
+
+The C<format> and C<formline> keywords have been removed. As well as the
+special vars $^A, $^, $~, $=, $-, $% and $:.
+
+=head1 Modules and Pragmata
+
+=head2 New Modules and Pragmata
+
+=over 4
+
+=item Perl6::Form, by Damian Conway, is a replacement for the removed format and formline keywords.
+Slightly modified as not to depend on Perl6::Export
+
+=back
+
+=head2 Updated Modules And Pragmata
+
+Almost all modules and pragmata have been udpated to for the changes in the Core.
+
+=head2 Deleted Modules and Pragmata
+
+=over 4
+
+=item locale, the locale pramga has been removed.
+
+=back
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documention has not been updated for many of the changes mentioned in this document.
+
+=head2 Limited platform support
+
+Perl Kurila has ony been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut

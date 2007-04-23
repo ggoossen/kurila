@@ -4,7 +4,15 @@ designed to be readable as is.
 
 =head1 NAME
 
-Install - Build and Installation guide for perl5.
+Install - Build and Installation guide for kurila.
+
+=head1 Kurila
+
+Installing kurila is basicly the same as perl5, only by default versiononly
+is set. It is not recommended to install kurila system wide, because
+some perl5 files might be overwritten (man-pages). Kurila is not very
+well tested, so if something doesn't work it is probably that kurila is 
+broken and not that you do something wrong.
 
 =head1 Reporting Problems
 
