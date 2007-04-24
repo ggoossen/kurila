@@ -207,7 +207,7 @@ SWTESTPM
           '-V generates 20+ lines' );
 
     like( runperl( switches => ['-V'] ),
-	  qr/\ASummary of my perl5 .*configuration:/,
+	  qr/\ASummary of my kurila .*configuration:/,
           '-V looks okay' );
 
     # lookup a known config var
