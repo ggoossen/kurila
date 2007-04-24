@@ -28,17 +28,8 @@ ok(exists($Config{$first_each}), "First key exists");
 ok(!exists($Config{"\n$first"}),
    "Check that first key with prepended newline isn't falsely existing");
 
-is($Config{PERL_REVISION}, 5, "PERL_REVISION is 5");
-
-# Check that old config variable names are aliased to their new ones.
-my %grandfathers = ( PERL_VERSION       => 'PATCHLEVEL',
-                     PERL_SUBVERSION    => 'SUBVERSION',
-                     PERL_CONFIG_SH     => 'CONFIG'
-                   );
-while( my($new, $old) = each %grandfathers ) {
-    isnt($Config{$new}, undef,       "$new is defined");
-    is($Config{$new}, $Config{$old}, "$new is aliased to $old");
-}
+is($Config{PERL_REVISION}, undef, "No PERL_REVISION");
+is($Config{KURILA_VERSION}, 0, "KURILA_REVISION 0");
 
 ok( exists $Config{cc},      "has cc");
 
@@ -95,86 +86,11 @@ Config::config_vars('d_bork');	# non-regex, non-existent cfg-var
 my $out2 = $$out;
 $out->clear;
 
-Config::config_vars('PERL_API_.*');	# regex, tagged multi-line answer
-my $out3 = $$out;
-$out->clear;
-
-Config::config_vars('PERL_API_.*:');	# regex, tagged single-line answer
-my $out4 = $$out;
-$out->clear;
-
-Config::config_vars(':PERL_API_.*:');	# regex, non-tagged single-line answer
-my $out5 = $$out;
-$out->clear;
-
-Config::config_vars(':PERL_API_.*');	# regex, non-tagged multi-line answer
-my $out6 = $$out;
-$out->clear;
-
-Config::config_vars('PERL_API_REVISION.*:'); # regex, tagged 
-my $out7 = $$out;
-$out->clear;
-
-# regex, non-tagged multi-line answer
-Config::config_vars(':PERL_API_REVISION.*');
-my $out8 = $$out;
-$out->clear;
-
-Config::config_vars('PERL_EXPENSIVE_.*:'); # non-matching regex
-my $out9 = $$out;
-$out->clear;
-
-Config::config_vars('?flags');	# bogus regex, no explicit warning !
-my $out10 = $$out;
-$out->clear;
-
 undef $out;
 untie *STDOUT;
 
 like($out1, qr/^cc='\Q$Config{cc}\E';/, "found config_var cc");
 like($out2, qr/^d_bork='UNKNOWN';/, "config_var d_bork is UNKNOWN");
-
-# test for leading, trailing colon effects
-# Split in scalar context it deprecated, and will warn.
-my @tmp;
-is(scalar (@tmp = split(/;\n/, $out3)), 3, "3 lines found");
-is(scalar (@tmp = split(/;\n/, $out6)), 3, "3 lines found");
-
-is($out4 =~ /(;\n)/s, '', "trailing colon gives 1-line response: $out4");
-is($out5 =~ /(;\n)/s, '', "trailing colon gives 1-line response: $out5");
-
-is(scalar (@tmp = split(/=/, $out3)), 4, "found 'tag='");
-is(scalar (@tmp = split(/=/, $out4)), 4, "found 'tag='");
-
-my @api;
-
-my @rev = @Config{qw(PERL_API_REVISION PERL_API_VERSION PERL_API_SUBVERSION)};
-
-print ("# test tagged responses, multi-line and single-line\n");
-foreach my $api ($out3, $out4) {
-    @api = $api =~ /PERL_API_(\w+)=(.*?)(?:;\n|\s)/mg;
-    is($api[0], "REVISION", "REVISION tag");
-    is($api[4], "VERSION",  "VERSION tag");
-    is($api[2], "SUBVERSION", "SUBVERSION tag");
-    is($api[1], "'$rev[0]'", "REVISION is $rev[0]");
-    is($api[5], "'$rev[1]'", "VERSION is $rev[1]");
-    is($api[3], "'$rev[2]'", "SUBVERSION is $rev[2]");
-}
-
-print("# test non-tagged responses, multi-line and single-line\n");
-foreach my $api ($out5, $out6) {
-    @api = split /(?: |;\n)/, $api;
-    is($api[0], "'$rev[0]'", "revision is $rev[0]");
-    is($api[2], "'$rev[1]'", "version is $rev[1]");
-    is($api[1], "'$rev[2]'", "subversion is $rev[2]");
-}
-
-# compare to each other, the outputs for trailing, leading colon
-$out7 =~ s/ $//;
-is("$out7;\n", "PERL_API_REVISION=$out8", "got expected diffs");
-
-like($out9, qr/\bnot\s+found\b/, "$out9 - perl is FREE !");
-like($out10, qr/\bnot\s+found\b/, "config_vars with invalid regexp");
 
 # Read-only.
 
