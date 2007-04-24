@@ -3398,9 +3398,9 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 
 	    p = SvPV_const(pat, plen);
 	    pm_flags |= RXf_SKIPWHITE;
-	    if (IN_CODEPOINTS)
-		pm_flags |= RXf_PMf_UTF8;
 	}
+	if (IN_CODEPOINTS)
+	    pm_flags |= RXf_PMf_UTF8;
 	/* FIXME - can we make this function take const char * args?  */
 	PM_SETRE(pm, CALLREGCOMP((char*)p, (char*)p + plen, pm_flags));
 
