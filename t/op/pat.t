@@ -4211,7 +4211,7 @@ ok($@=~/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1663;
+    $::TestCount = 1735;
     print "1..$::TestCount\n";
 }
 
