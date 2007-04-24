@@ -6204,6 +6204,9 @@ tryagain:
 		
 		RExC_end = orig_RExC_end;
 
+		if (RExC_flags & RXf_PMf_EXTENDED)
+ 		    RExC_parse = regwhite( pRExC_state, RExC_parse );
+
 		break;
 	    }
 	case 'b':
