@@ -13,16 +13,6 @@
 #include <perl.h>
 #include <XSUB.h>
 
-#ifndef PATCHLEVEL
-#include <patchlevel.h>		/* Perl's one, needed since 5.6 */
-#endif
-
-#if !defined(PERL_VERSION) || PERL_VERSION < 8
-#define NEED_load_module
-#define NEED_vload_module
-#include "ppport.h"             /* handle old perls */
-#endif
-
 #if 0
 #define DEBUGME /* Debug mode, turns assertions on as well */
 #define DASSERT /* Assertion mode */
@@ -46,34 +36,6 @@
 /*
  * Earlier versions of perl might be used, we can't assume they have the latest!
  */
-
-#ifndef PERL_VERSION		/* For perls < 5.6 */
-#define PERL_VERSION PATCHLEVEL
-#ifndef newRV_noinc
-#define newRV_noinc(sv)		((Sv = newRV(sv)), --SvREFCNT(SvRV(Sv)), Sv)
-#endif
-#if (PATCHLEVEL <= 4)		/* Older perls (<= 5.004) lack PL_ namespace */
-#define PL_sv_yes	sv_yes
-#define PL_sv_no	sv_no
-#define PL_sv_undef	sv_undef
-#if (SUBVERSION <= 4)		/* 5.004_04 has been reported to lack newSVpvn */
-#define newSVpvn newSVpv
-#endif
-#endif						/* PATCHLEVEL <= 4 */
-#ifndef HvSHAREKEYS_off
-#define HvSHAREKEYS_off(hv)	/* Ignore */
-#endif
-#ifndef AvFILLp				/* Older perls (<=5.003) lack AvFILLp */
-#define AvFILLp AvFILL
-#endif
-typedef double NV;			/* Older perls lack the NV type */
-#define	IVdf		"ld"	/* Various printf formats for Perl types */
-#define	UVuf		"lu"
-#define	UVof		"lo"
-#define	UVxf		"lx"
-#define INT2PTR(t,v) (t)(IV)(v)
-#define PTR2UV(v)    (unsigned long)(v)
-#endif						/* PERL_VERSION -- perls < 5.6 */
 
 #ifndef NVef				/* The following were not part of perl 5.6 */
 #if defined(USE_LONG_DOUBLE) && \
@@ -377,14 +339,9 @@ typedef struct stcxt {
 
 #if defined(MULTIPLICITY) || defined(PERL_OBJECT) || defined(PERL_CAPI)
 
-#if (PATCHLEVEL <= 4) && (SUBVERSION < 68)
-#define dSTCXT_SV 									\
-	SV *perinterp_sv = perl_get_sv(MY_VERSION, FALSE)
-#else	/* >= perl5.004_68 */
 #define dSTCXT_SV									\
 	SV *perinterp_sv = *hv_fetch(PL_modglobal,		\
 		MY_VERSION, sizeof(MY_VERSION)-1, TRUE)
-#endif	/* < perl5.004_68 */
 
 #define dSTCXT_PTR(T,name)							\
 	T name = ((perinterp_sv && SvIOK(perinterp_sv) && SvIVX(perinterp_sv)	\
@@ -825,18 +782,10 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
 #define STORABLE_BIN_MAJOR	2		/* Binary major "version" */
 #define STORABLE_BIN_MINOR	7		/* Binary minor "version" */
 
-#if (PATCHLEVEL <= 5)
-#define STORABLE_BIN_WRITE_MINOR	4
-#else 
 /*
  * Perl 5.6.0 onwards can do weak references.
 */
 #define STORABLE_BIN_WRITE_MINOR	7
-#endif /* (PATCHLEVEL <= 5) */
-
-#if (PATCHLEVEL < 8 || (PATCHLEVEL == 8 && SUBVERSION < 1))
-#define PL_sv_placeholder PL_sv_undef
-#endif
 
 /*
  * Useful store shortcuts...
@@ -1039,31 +988,8 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
  * sortsv is not available ( <= 5.6.1 ).
  */
 
-#if (PATCHLEVEL <= 6)
-
-#if defined(USE_ITHREADS)
-
-#define STORE_HASH_SORT \
-        ENTER; { \
-        PerlInterpreter *orig_perl = PERL_GET_CONTEXT; \
-        SAVESPTR(orig_perl); \
-        PERL_SET_CONTEXT(aTHX); \
-        qsort((char *) AvARRAY(av), len, sizeof(SV *), sortcmp); \
-        } LEAVE;
-
-#else /* ! USE_ITHREADS */
-
-#define STORE_HASH_SORT \
-        qsort((char *) AvARRAY(av), len, sizeof(SV *), sortcmp);
-
-#endif  /* USE_ITHREADS */
-
-#else /* PATCHLEVEL > 6 */
-
 #define STORE_HASH_SORT \
         sortsv(AvARRAY(av), len, Perl_sv_cmp);  
-
-#endif /* PATCHLEVEL <= 6 */
 
 static int store(pTHX_ stcxt_t *cxt, SV *sv);
 static SV *retrieve(pTHX_ stcxt_t *cxt, const char *cname);
@@ -2025,15 +1951,9 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
             /* public string - go direct to string read.  */
             goto string_readlen;
         } else if (
-#if (PATCHLEVEL <= 6)
-            /* For 5.6 and earlier NV flag trumps IV flag, so only use integer
-               direct if NV flag is off.  */
-            (flags & (SVf_NOK | SVf_IOK)) == SVf_IOK
-#else
             /* 5.7 rules are that if IV public flag is set, IV value is as
                good, if not better, than NV value.  */
             flags & SVf_IOK
-#endif
             ) {
             iv = SvIV(sv);
             /*
@@ -2096,16 +2016,6 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
             TRACEME(("ok (integer 0x%"UVxf", value = %"IVdf")", PTR2UV(sv), iv));
 	} else if (flags & SVf_NOK) {
             NV nv;
-#if (PATCHLEVEL <= 6)
-            nv = SvNV(sv);
-            /*
-             * Watch for number being an integer in disguise.
-             */
-            if (nv == (NV) (iv = I_V(nv))) {
-                TRACEME(("double %"NVff" is actually integer %"IVdf, nv, iv));
-                goto integer;		/* Share code above */
-            }
-#else
 
             SvIV_please(sv);
 	    if (SvIOK_notUV(sv)) {
@@ -2113,7 +2023,6 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
                 goto integer;		/* Share code above */
             }
             nv = SvNV(sv);
-#endif
 
             if (cxt->netorder) {
                 TRACEME(("double %"NVff" stored as string", nv));
@@ -2194,25 +2103,6 @@ static int store_array(pTHX_ stcxt_t *cxt, AV *av)
 	return 0;
 }
 
-
-#if (PATCHLEVEL <= 6)
-
-/*
- * sortcmp
- *
- * Sort two SVs
- * Borrowed from perl source file pp_ctl.c, where it is used by pp_sort.
- */
-static int
-sortcmp(const void *a, const void *b)
-{
-#if defined(USE_ITHREADS)
-        dTHX;
-#endif /* USE_ITHREADS */
-        return sv_cmp(*(SV * const *) a, *(SV * const *) b);
-}
-
-#endif /* PATCHLEVEL <= 6 */
 
 /*
  * store_hash
@@ -5991,22 +5881,7 @@ static SV *do_retrieve(
 
 	if (!sv) {
 		TRACEME(("retrieve ERROR"));
-#if (PATCHLEVEL <= 4) 
-		/* perl 5.00405 seems to screw up at this point with an
-		   'attempt to modify a read only value' error reported in the
-		   eval { $self = pretrieve(*FILE) } in _retrieve.
-		   I can't see what the cause of this error is, but I suspect a
-		   bug in 5.004, as it seems to be capable of issuing spurious
-		   errors or core dumping with matches on $@. I'm not going to
-		   spend time on what could be a fruitless search for the cause,
-		   so here's a bodge. If you're running 5.004 and don't like
-		   this inefficiency, either upgrade to a newer perl, or you are
-		   welcome to find the problem and send in a patch.
-		 */
-		return newSV(0);
-#else
 		return &PL_sv_undef;		/* Something went wrong, return undef */
-#endif
 	}
 
 	TRACEME(("retrieve got %s(0x%"UVxf")",
