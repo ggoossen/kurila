@@ -1,12 +1,12 @@
 =head1 NAME
 
-kurila02delta - what is new for Perl Kurila 0.2
+kurila01delta - what is new for Perl Kurila 0.1
 
 =head1 DESCRIPTION
 
-This document describes differences between Perl Kurila 0.2 and Perl v5.9.x DEVEL30965
+This document describes differences between Perl Kurila 0.1 and Perl v5.9.x DEVEL30965
 
-=head1 Highlights In Kurila 0.2
+=head1 Highlights In Kurila 0.1
 
 =over 4
 
