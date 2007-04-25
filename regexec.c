@@ -1213,7 +1213,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		    tmp = '\n';
 		else {
 		    U8 * const r = reghop3((U8*)s, -1, (U8*)PL_bostr);
-		    tmp = utf8n_to_uvchr(r, UTF8SKIP(r), 0, UTF8_ALLOW_DEFAULT);
+		    tmp = utf8n_to_uvchr(r, UTF8SKIP(r), 0, UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY);
 		}
 		tmp = ((OP(c) == BOUND ?
 			isALNUM_uni(tmp) : isALNUM_LC_uvchr(UNI_TO_NATIVE(tmp))) != 0);
@@ -1251,7 +1251,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		    tmp = '\n';
 		else {
 		    U8 * const r = reghop3((U8*)s, -1, (U8*)PL_bostr);
-		    tmp = utf8n_to_uvchr(r, UTF8SKIP(r), 0, UTF8_ALLOW_DEFAULT);
+		    tmp = utf8n_to_uvchr(r, UTF8SKIP(r), 0, UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY);
 		}
 		tmp = ((OP(c) == NBOUND ?
 			isALNUM_uni(tmp) : isALNUM_LC_uvchr(UNI_TO_NATIVE(tmp))) != 0);
@@ -1346,7 +1346,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 
                  */
                 while (s <= last_start) {
-                    const U32 uniflags = UTF8_ALLOW_DEFAULT;
+                    const U32 uniflags = UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY;
                     U8 *uc = (U8*)s;
                     U16 charid = 0;
                     U32 base = 1;
@@ -2465,7 +2465,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 #endif
     dVAR;
     register const bool do_utf8 = (reginfo->prog->extflags & RXf_PMf_UTF8) != 0;
-    const U32 uniflags = UTF8_ALLOW_DEFAULT;
+    const U32 uniflags = UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY;
 
     regexp *rex = reginfo->prog;
     RXi_GET_DECL(rex,rexi);
@@ -4186,10 +4186,10 @@ NULL
 #ifdef EBCDIC
 			     ST.c1 = utf8n_to_uvchr(tmpbuf1, UTF8_MAXLEN, 0,
 						    ckWARN(WARN_UTF8) ?
-                                                    0 : UTF8_ALLOW_ANY);
+						    0 | UTF8_CHECK_ONLY : UTF8_ALLOW_ANY | UTF8_CHECK_ONLY);
 			     ST.c2 = utf8n_to_uvchr(tmpbuf2, UTF8_MAXLEN, 0,
                                                     ckWARN(WARN_UTF8) ?
-                                                    0 : UTF8_ALLOW_ANY);
+                                                    0 | UTF8_CHECK_ONLY : UTF8_ALLOW_ANY | UTF8_CHECK_ONLY);
 #else
 			     ST.c1 = utf8n_to_uvuni(tmpbuf1, UTF8_MAXBYTES, 0,
 						    uniflags);

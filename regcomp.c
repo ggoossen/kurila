@@ -6075,7 +6075,7 @@ tryagain:
 		ret = reg_node(pRExC_state, SANY);
 	    else
 		ret = reg_node(pRExC_state, REG_ANYU);
-	    *flagp |= HASWIDTH|SIMPLE;
+	    *flagp |= HASWIDTH;
 	}
 	else {
 	    if (RExC_flags & RXf_PMf_SINGLELINE)
@@ -6096,7 +6096,7 @@ tryagain:
 	    vFAIL("Unmatched [");
 	}
 	nextchar(pRExC_state);
-	*flagp |= HASWIDTH|SIMPLE;
+	*flagp |= (RExC_flags & RXf_PMf_UTF8) ? HASWIDTH : HASWIDTH|SIMPLE;
         Set_Node_Length(ret, RExC_parse - oregcomp_parse + 1); /* MJD */
 	break;
     }

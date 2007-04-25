@@ -19,15 +19,13 @@ our %Config;
 eval 'use Config';          #  Defaults assumed if this fails
 
 
-#use utf8;
-
+# use utf8;
 # use re Debug => 'ALL';
 
-#use utf8;
+# "123" =~ /^.*1/; # .*23\x{100}$/, 'uft8 + multiple floating substr');
+# ok("123\x{100}" =~ /^.*1/); # .*23\x{100}$/, 'uft8 + multiple floating substr');
 
-#print ("a" =~ /[^\s]/ ? "x" : "y");
-
-#__END__
+# __END__
 
 # my $a = "İ";
 # #warn ":$a:" =~ /:$a:/i ? "a" : "b";
@@ -2698,11 +2696,8 @@ print "e" =~ /\P{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 	for my $len (32000, 32768, 33000) {
 	    my $s = $char . "f" x $len;
 	    my $r = $s =~ /$char([f]*)/gc;
-	    print $r ? "ok $test\n" : "not ok $test\t# <$type x $len> fail\n";
-	    ++$test;
-	    print +(!$r or pos($s) == $len + 1) ? "ok $test\n"
-		: "not ok $test\t# <$type x $len> pos @{[ pos($s) ]}\n";
-	    ++$test;
+            ok($r, " # TODO <$type x $len>");
+	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos @{[ pos($s) ]}");
 	}
     }
 }
