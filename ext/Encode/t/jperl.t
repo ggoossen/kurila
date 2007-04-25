@@ -25,7 +25,7 @@ require utf8;
 
 use strict;
 #use Test::More tests => 18;
-use Test::More tests => 16; # black magic tests commented out
+use Test::More tests => 13; # black magic tests commented out
 my $Debug = shift;
 
 no encoding; # ensure
@@ -77,25 +77,6 @@ ok(! defined(${^ENCODING}), q{not scoped yet});
 #ok(! defined(${^ENCODING}), q{out of black magic});
 use bytes;
 is (length($Namae), 10);
-
-#
-# now something completely different!
-#
-{
-    use encoding "euc-jp", Filter=>1;
-    ok(1, "Filter on");
-    use utf8;
-    no strict 'vars'; # fools
-    # doesn't work w/ "my" as of this writing.
-    # because of  buggy strict.pm and utf8.pm
-    our $¿Í = 2; 
-    #   ^^U+4eba, "human" in CJK ideograph
-    $¿Í++; # a child is born
-    *people = \$¿Í;
-    is ($people, 3, "Filter:utf8 identifier");
-    no encoding;
-    ok(1, "Filter off");
-}
 
 1;
 __END__

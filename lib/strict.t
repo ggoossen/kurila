@@ -94,7 +94,7 @@ for (@prgs){
         print STDERR "GOT:\n$results\n";
         print "not ";
     }
-    print "ok " . ++$i . "\n";
+    print "ok " . ++$i . " # TODO default 'use strict' \n";
     foreach (@temps) 
 	{ unlink $_ if $_ } 
 }

@@ -2,6 +2,21 @@
 
 perlkurila -- description of Perl Kurila
 
+=head1 SYNOPSIS
+
+The ice caps are meling, the sea level are rising,
+we need a Perl which can cope with these changes.
+This is Perl Kurila, a geneticly modified Perl 5, 
+ready to embrace the changes necessary for the 
+21-century.
+
+Standing on the shoulders of a giant, we will change the future!
+
+Next step in the evolution of language.
+A geneticly modified Perl 5. With all its bad genes removed. the junk DNA removed.
+Experience macroevolution in progress.
+Ready for the changing climate.
+
 =head1 DESCRIPTION
 
 =head2 What is Perl Kurila?
@@ -13,7 +28,7 @@ evolves.
 
 =head2 Why?
 
-Keep Perl 5 alive, and not let it be drowned by its burden of legacy features.
+Keep Perl 5 alive, and not let new development be drowned by its burden of legacy features.
 To have a more evolving language without being held back by backwards compatibility.
 Because of backward compatibility Perl 5 can only be extended by adding more, making
 it more complex. By creating a new dialect, we are free to have a more coherent Perl,
@@ -21,9 +36,9 @@ with cleaner internals.
 
 =head2 Is Perl Kurila a replacement for Perl 5?
 
-No. There is a lot of Perl 5 code. You can probably convert to Kurila without
+No. There is a lot of Perl 5 code. You can probably convert Perl 5 code to Kurila without
 much problems, but if you are happy with Perl 5, you can stay using it.
-They can be installed both at the same time.
+Both can be installed at the same time.
 
 =head2 Audience
 
