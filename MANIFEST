@@ -3005,7 +3005,7 @@ plan9/setup.rc			Plan9 port: script for easy build+install
 plan9/versnum			Plan9 port: script to print version number
 pod/buildtoc			Update files based on pod.lst
 pod/checkpods.PL		Tool to check for common errors in pods
-pod/kurila02delta.pod	What is new for Perl Kurila 0.2
+pod/kurila01delta.pod	What is new for Perl Kurila 0.1
 pod/kurilaintro.pod	Description of Perl Kurila
 pod.lst				List the pods and their roles
 pod/Makefile.SH			generate Makefile which makes pods into something else
