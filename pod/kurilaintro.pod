@@ -2,21 +2,6 @@
 
 perlkurila -- description of Perl Kurila
 
-=head1 SYNOPSIS
-
-The ice caps are meling, the sea level are rising,
-we need a Perl which can cope with these changes.
-This is Perl Kurila, a geneticly modified Perl 5, 
-ready to embrace the changes necessary for the 
-21-century.
-
-Standing on the shoulders of a giant, we will change the future!
-
-Next step in the evolution of language.
-A geneticly modified Perl 5. With all its bad genes removed. the junk DNA removed.
-Experience macroevolution in progress.
-Ready for the changing climate.
-
 =head1 DESCRIPTION
 
 =head2 What is Perl Kurila?
