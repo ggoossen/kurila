@@ -1789,7 +1789,6 @@ PERL_CALLCONV CV*	Perl_get_cvn_flags(pTHX_ const char* name, STRLEN len, I32 fla
 			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV int	Perl_init_i18nl10n(pTHX_ int printwarn);
-PERL_CALLCONV int	Perl_init_i18nl14n(pTHX_ int printwarn);
 PERL_CALLCONV void	Perl_new_collate(pTHX_ const char* newcoll);
 PERL_CALLCONV void	Perl_new_ctype(pTHX_ const char* newctype)
 			__attribute__nonnull__(pTHX_1);
@@ -2008,9 +2007,6 @@ PERL_CALLCONV void	Perl_save_helem(pTHX_ HV* hv, SV *key, SV **sptr)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
-
-PERL_CALLCONV void	Perl_save_hints(pTHX)
-			__attribute__noreturn__;
 
 PERL_CALLCONV void	Perl_save_hptr(pTHX_ HV** hptr)
 			__attribute__nonnull__(pTHX_1);

@@ -656,7 +656,6 @@
 #define get_cv			Perl_get_cv
 #define get_cvn_flags		Perl_get_cvn_flags
 #define init_i18nl10n		Perl_init_i18nl10n
-#define init_i18nl14n		Perl_init_i18nl14n
 #define new_collate		Perl_new_collate
 #define new_ctype		Perl_new_ctype
 #define new_numeric		Perl_new_numeric
@@ -754,7 +753,6 @@
 #define save_gp			Perl_save_gp
 #define save_hash		Perl_save_hash
 #define save_helem		Perl_save_helem
-#define save_hints		Perl_save_hints
 #define save_hptr		Perl_save_hptr
 #define save_I16		Perl_save_I16
 #define save_I32		Perl_save_I32
@@ -2892,7 +2890,6 @@
 #define get_cv(a,b)		Perl_get_cv(aTHX_ a,b)
 #define get_cvn_flags(a,b,c)	Perl_get_cvn_flags(aTHX_ a,b,c)
 #define init_i18nl10n(a)	Perl_init_i18nl10n(aTHX_ a)
-#define init_i18nl14n(a)	Perl_init_i18nl14n(aTHX_ a)
 #define new_collate(a)		Perl_new_collate(aTHX_ a)
 #define new_ctype(a)		Perl_new_ctype(aTHX_ a)
 #define new_numeric(a)		Perl_new_numeric(aTHX_ a)
@@ -2990,7 +2987,6 @@
 #define save_gp(a,b)		Perl_save_gp(aTHX_ a,b)
 #define save_hash(a)		Perl_save_hash(aTHX_ a)
 #define save_helem(a,b,c)	Perl_save_helem(aTHX_ a,b,c)
-#define save_hints()		Perl_save_hints(aTHX)
 #define save_hptr(a)		Perl_save_hptr(aTHX_ a)
 #define save_I16(a)		Perl_save_I16(aTHX_ a)
 #define save_I32(a)		Perl_save_I32(aTHX_ a)

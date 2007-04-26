@@ -88,7 +88,7 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila02delta> too see what has changed compared to Perl 5
+L<kurila01delta> too see what has changed compared to Perl 5
 
 =item AUTHOR
 
