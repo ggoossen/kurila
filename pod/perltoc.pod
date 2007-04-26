@@ -59,6 +59,41 @@ through to locate the proper section you're looking for.
 
 =back
 
+=head2 kurilaintro, perlkurila -- description of Perl Kurila
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item What is Perl Kurila?
+
+=item Why?
+
+=item Is Perl Kurila a replacement for Perl 5?
+
+=item Audience
+
+=item Goals
+
+Experimenting with the Perl language, Removing ugly things, Adding ugly
+things, Changing old design decisions, Readable, modifiable perl source
+
+=item Compatibility
+
+=item Development
+
+=back
+
+=item SEE ALSO
+
+L<kurila02delta> too see what has changed compared to Perl 5
+
+=item AUTHOR
+
+=back
+
 =head2 perlintro -- a brief introduction and overview of Perl
 
 =over 4
@@ -2796,7 +2831,6 @@ IO::Handle->output_record_separator EXPR, $OUTPUT_RECORD_SEPARATOR, $ORS,
 $\ X<$\> X<$ORS> X<$OUTPUT_RECORD_SEPARATOR>, $LIST_SEPARATOR, $" X<$">
 X<$LIST_SEPARATOR>, $SUBSCRIPT_SEPARATOR, $SUBSEP, $; X<$;> X<$SUBSEP>
 X<SUBSCRIPT_SEPARATOR>, HANDLE->format_page_number(EXPR),
-$FORMAT_PAGE_NUMBER, $% X<$%> X<$FORMAT_PAGE_NUMBER>,
 HANDLE->format_lines_per_page(EXPR), $FORMAT_LINES_PER_PAGE, $= X<$=>
 X<$FORMAT_LINES_PER_PAGE>, HANDLE->format_lines_left(EXPR),
 $FORMAT_LINES_LEFT, $- X<$-> X<$FORMAT_LINES_LEFT>, @LAST_MATCH_START, @-
@@ -3798,11 +3832,13 @@ LC_NUMERIC, LC_TIME, LANG
 
 =item Unicode
 
-=item Perl's Unicode Support
+=item Characters represented by Code points represented by Bytes
 
-=item Perl's Unicode Model
+=item Byte and Code points Semantics
 
 =item Unicode and EBCDIC
+
+=item Perl's Unicode Support History
 
 =item Creating Unicode
 
@@ -3828,10 +3864,6 @@ LC_NUMERIC, LC_TIME, LANG
 
 =back
 
-=item UNICODE IN OLDER PERLS
-
-=item SEE ALSO
-
 =item ACKNOWLEDGMENTS
 
 =item AUTHOR, COPYRIGHT, AND LICENSE
@@ -3851,8 +3883,6 @@ LC_NUMERIC, LC_TIME, LANG
 Input and Output Layers, Regular Expressions, C<use utf8> still needed to
 enable UTF-8/UTF-EBCDIC in scripts, BOM-marked scripts and UTF-16 scripts
 autodetected, C<use encoding> needed to upgrade non-Latin-1 byte strings
-
-=item Byte and Character Semantics
 
 =item Effects of Character Semantics
 
@@ -3895,7 +3925,7 @@ classes, Use of "Is" Prefix, Blocks
 
 =item Speed
 
-=item Porting code from perl-5.6.X
+=item Porting code from perl-5.8.x
 
 =back
 
@@ -4189,26 +4219,24 @@ X<CLONE> X<CLONE_SKIP> X<thread> X<threads> X<ithread>
 
 assertions, assertions::activate, assertions::compat, attributes, attrs,
 autouse, base, bigint, bignum, bigrat, blib, bytes, charnames, constant,
-diagnostics, encoding, encoding::warnings, feature, fields, filetest, if,
-integer, less, lib, locale, open, ops, overload, re, sigtrap, sort, strict,
-subs, threads, threads::shared, utf8, vars, version, vmsish, warnings,
-warnings::register
+diagnostics, encoding, feature, fields, filetest, if, integer, less, lib,
+open, ops, overload, re, sigtrap, sort, strict, subs, threads,
+threads::shared, utf8, vars, version, vmsish, warnings, warnings::register
 
 =item Standard Modules
 
-AnyDBM_File, Archive::Tar, Archive::Tar::File, Attribute::Handlers,
-AutoLoader, AutoSplit, B, B::Asmdata, B::Assembler, B::Bblock, B::Bytecode,
-B::C, B::CC, B::Concise, B::Debug, B::Deparse, B::Disassembler, B::Lint,
-B::Showlex, B::Stackobj, B::Stash, B::Terse, B::Xref, Benchmark,
-ByteLoader, CGI, CGI::Apache, CGI::Carp, CGI::Cookie, CGI::Fast,
-CGI::Pretty, CGI::Push, CGI::Switch, CGI::Util, CPAN, CPAN::FirstTime,
+AnyDBM_File, Archive::Extract, Archive::Tar, Archive::Tar::File,
+Attribute::Handlers, AutoLoader, AutoSplit, B, B::Asmdata, B::Concise,
+B::Debug, B::Deparse, B::Lint, B::Showlex, B::Terse, B::Xref, Benchmark,
+CGI, CGI::Apache, CGI::Carp, CGI::Cookie, CGI::Fast, CGI::Pretty,
+CGI::Push, CGI::Switch, CGI::Util, CPAN, CPAN::FirstTime, CPAN::Kwalify,
 CPAN::Nox, CPAN::Version, Carp, Carp::Heavy, Class::ISA, Class::Struct,
 Compress::Raw::Zlib, Compress::Zlib, Config, Cwd, DB, DBM_Filter,
 DBM_Filter::compress, DBM_Filter::encode, DBM_Filter::int32,
 DBM_Filter::null, DBM_Filter::utf8, DB_File, Data::Dumper, Devel::DProf,
-Devel::Peek, Devel::SelfStubber, Digest, Digest::MD5, Digest::SHA,
-Digest::base, Digest::file, DirHandle, Dumpvalue, DynaLoader, Encode,
-Encode::Alias, Encode::Byte, Encode::CJKConstants, Encode::CN,
+Devel::InnerPackage, Devel::Peek, Devel::SelfStubber, Digest, Digest::MD5,
+Digest::SHA, Digest::base, Digest::file, DirHandle, Dumpvalue, DynaLoader,
+Encode, Encode::Alias, Encode::Byte, Encode::CJKConstants, Encode::CN,
 Encode::CN::HZ, Encode::Config, Encode::EBCDIC, Encode::Encoder,
 Encode::Encoding, Encode::Guess, Encode::JP, Encode::JP::H2Z,
 Encode::JP::JIS7, Encode::KR, Encode::KR::2022_KR, Encode::MIME::Header,
@@ -4228,25 +4256,26 @@ ExtUtils::MakeMaker::Tutorial, ExtUtils::MakeMaker::bytes,
 ExtUtils::MakeMaker::vmsish, ExtUtils::Manifest, ExtUtils::Mkbootstrap,
 ExtUtils::Mksymlists, ExtUtils::Packlist, ExtUtils::ParseXS,
 ExtUtils::testlib, Fatal, Fcntl, File::Basename, File::CheckTree,
-File::Compare, File::Copy, File::DosGlob, File::Find, File::Glob,
-File::GlobMapper, File::Path, File::Spec, File::Spec::Cygwin,
+File::Compare, File::Copy, File::DosGlob, File::Fetch, File::Find,
+File::Glob, File::GlobMapper, File::Path, File::Spec, File::Spec::Cygwin,
 File::Spec::Epoc, File::Spec::Functions, File::Spec::Mac, File::Spec::OS2,
 File::Spec::Unix, File::Spec::VMS, File::Spec::Win32, File::Temp,
-File::stat, FileCache, FileHandle, Filter::Simple, Filter::Util::Call,
-FindBin, GDBM_File, Getopt::Long, Getopt::Std, Hash::Util,
-Hash::Util::FieldHash, I18N::Collate, I18N::LangTags,
-I18N::LangTags::Detect, I18N::LangTags::List, I18N::Langinfo, IO,
-IO::Compress::Base, IO::Compress::Deflate, IO::Compress::Gzip,
-IO::Compress::RawDeflate, IO::Compress::Zip, IO::Dir, IO::File, IO::Handle,
-IO::Pipe, IO::Poll, IO::Seekable, IO::Select, IO::Socket, IO::Socket::INET,
-IO::Socket::UNIX, IO::Uncompress::AnyInflate,
+File::stat, FileCache, FileHandle, FindBin, GDBM_File, Getopt::Long,
+Getopt::Std, Hash::Util, Hash::Util::FieldHash, I18N::Collate,
+I18N::LangTags, I18N::LangTags::Detect, I18N::LangTags::List,
+I18N::Langinfo, IO, IO::Compress::Base, IO::Compress::Deflate,
+IO::Compress::Gzip, IO::Compress::RawDeflate, IO::Compress::Zip, IO::Dir,
+IO::File, IO::Handle, IO::Pipe, IO::Poll, IO::Seekable, IO::Select,
+IO::Socket, IO::Socket::INET, IO::Socket::UNIX, IO::Uncompress::AnyInflate,
 IO::Uncompress::AnyUncompress, IO::Uncompress::Base,
 IO::Uncompress::Gunzip, IO::Uncompress::Inflate,
-IO::Uncompress::RawInflate, IO::Uncompress::Unzip, IO::Zlib, IPC::Open2,
-IPC::Open3, IPC::SysV, IPC::SysV::Msg, IPC::SysV::Semaphore, List::Util,
-Locale::Constants, Locale::Country, Locale::Currency, Locale::Language,
-Locale::Maketext, Locale::Maketext::TPJ13, Locale::Script, MIME::Base64,
-MIME::Base64::QuotedPrint, Math::BigFloat, Math::BigInt,
+IO::Uncompress::RawInflate, IO::Uncompress::Unzip, IO::Zlib, IPC::Cmd,
+IPC::Open2, IPC::Open3, IPC::SysV, IPC::SysV::Msg, IPC::SysV::Semaphore,
+List::Util, Locale::Constants, Locale::Country, Locale::Currency,
+Locale::Language, Locale::Maketext, Locale::Maketext::Simple,
+Locale::Maketext::TPJ13, Locale::Script, Log::Message,
+Log::Message::Config, Log::Message::Handlers, Log::Message::Item,
+MIME::Base64, MIME::Base64::QuotedPrint, Math::BigFloat, Math::BigInt,
 Math::BigInt::Calc, Math::BigInt::CalcEmu, Math::BigInt::FastCalc,
 Math::BigRat, Math::Complex, Math::Trig, Memoize, Memoize::AnyDBM_File,
 Memoize::Expire, Memoize::ExpireFile, Memoize::ExpireTest,
@@ -4261,11 +4290,13 @@ Module::Build::Platform::Unix, Module::Build::Platform::VMS,
 Module::Build::Platform::VOS, Module::Build::Platform::Windows,
 Module::Build::Platform::aix, Module::Build::Platform::cygwin,
 Module::Build::Platform::darwin, Module::Build::Platform::os2,
-Module::Build::YAML, Module::CoreList, Module::Load, Module::Loaded,
-NDBM_File, NEXT, Net::Cmd, Net::Config, Net::Domain, Net::FTP, Net::NNTP,
-Net::Netrc, Net::POP3, Net::Ping, Net::SMTP, Net::Time, Net::hostent,
-Net::libnetFAQ, Net::netent, Net::protoent, Net::servent, O, ODBM_File,
-Opcode, POSIX, Package::Constants, PerlIO, PerlIO::encoding,
+Module::Build::YAML, Module::CoreList, Module::Load,
+Module::Load::Conditional, Module::Loaded, Module::Pluggable,
+Module::Pluggable::Object, NDBM_File, NEXT, Net::Cmd, Net::Config,
+Net::Domain, Net::FTP, Net::NNTP, Net::Netrc, Net::POP3, Net::Ping,
+Net::SMTP, Net::Time, Net::hostent, Net::libnetFAQ, Net::netent,
+Net::protoent, Net::servent, O, ODBM_File, Opcode, POSIX,
+Package::Constants, Params::Check, PerlIO, PerlIO::encoding,
 PerlIO::scalar, PerlIO::via, PerlIO::via::QuotedPrint, Pod::Checker,
 Pod::Escapes, Pod::Find, Pod::Functions, Pod::Html, Pod::InputObjects,
 Pod::LaTeX, Pod::Man, Pod::ParseLink, Pod::ParseUtils, Pod::Parser,
@@ -4282,19 +4313,21 @@ Pod::Simple::SimpleTree, Pod::Simple::Subclassing, Pod::Simple::Text,
 Pod::Simple::TextContent, Pod::Simple::XMLOutStream, Pod::Text,
 Pod::Text::Color, Pod::Text::Overstrike, Pod::Text::Termcap, Pod::Usage,
 SDBM_File, Safe, Scalar::Util, Search::Dict, SelectSaver, SelfLoader,
-Shell, Socket, Storable, Switch, Symbol, Sys::Hostname, Sys::Syslog,
-Term::ANSIColor, Term::Cap, Term::Complete, Term::ReadLine, Test,
+Shell, Socket, Storable, Symbol, Sys::Hostname, Sys::Syslog,
+Term::ANSIColor, Term::Cap, Term::Complete, Term::ReadLine, Term::UI, Test,
 Test::Builder, Test::Builder::Module, Test::Builder::Tester,
 Test::Builder::Tester::Color, Test::Harness, Test::Harness::Assert,
-Test::Harness::Iterator, Test::Harness::Point, Test::Harness::Straps,
-Test::Harness::TAP, Test::Harness::Util, Test::More, Test::Simple,
-Test::Tutorial, Text::Abbrev, Text::Balanced, Text::ParseWords,
-Text::Soundex, Text::Tabs, Text::Wrap, Thread, Thread::Queue,
-Thread::Semaphore, Thread::Signal, Thread::Specific, Tie::Array, Tie::File,
-Tie::Handle, Tie::Hash, Tie::Memoize, Tie::RefHash, Tie::Scalar,
-Tie::SubstrHash, Time::HiRes, Time::Local, Time::gmtime, Time::localtime,
-Time::tm, UNIVERSAL, Unicode::Collate, Unicode::Normalize, Unicode::UCD,
-User::grent, User::pwent, XS::APItest, XS::Typemap, XSLoader
+Test::Harness::Iterator, Test::Harness::Point, Test::Harness::Results,
+Test::Harness::Straps, Test::Harness::TAP, Test::Harness::Util, Test::More,
+Test::Simple, Test::Tutorial, Text::Abbrev, Text::Balanced,
+Text::ParseWords, Text::Soundex, Text::Tabs, Text::Wrap, Thread,
+Thread::Queue, Thread::Semaphore, Thread::Signal, Thread::Specific,
+Tie::Array, Tie::File, Tie::Handle, Tie::Hash, Tie::Hash::NamedCapture,
+Tie::Memoize, Tie::RefHash, Tie::Scalar, Tie::SubstrHash, Time::HiRes,
+Time::Local, Time::Piece, Time::Piece::Seconds, Time::gmtime,
+Time::localtime, Time::tm, UNIVERSAL, Unicode::Collate, Unicode::Normalize,
+Unicode::UCD, User::grent, User::pwent, Win32, Win32API::File, XS::APItest,
+XS::Typemap, XSLoader
 
 =item Extension Modules
 
@@ -5339,8 +5372,6 @@ A, p, d, s, n, r, f, M, o, x, m, X, E, b, others
 
 =item How does Perl store UTF-8 strings?
 
-=item How do I convert a string to UTF-8?
-
 =item Is there anything else I need to know?
 
 =back
@@ -5818,12 +5849,10 @@ sv_setsv_flags X<sv_setsv_flags>, sv_setsv_mg X<sv_setsv_mg>, sv_setuv
 X<sv_setuv>, sv_setuv_mg X<sv_setuv_mg>, sv_tainted X<sv_tainted>, sv_true
 X<sv_true>, sv_unmagic X<sv_unmagic>, sv_unref_flags X<sv_unref_flags>,
 sv_untaint X<sv_untaint>, sv_upgrade X<sv_upgrade>, sv_usepvn_flags
-X<sv_usepvn_flags>, sv_utf8_decode X<sv_utf8_decode>, sv_utf8_downgrade
-X<sv_utf8_downgrade>, sv_utf8_encode X<sv_utf8_encode>, sv_utf8_upgrade
-X<sv_utf8_upgrade>, sv_utf8_upgrade_flags X<sv_utf8_upgrade_flags>,
-sv_vcatpvf X<sv_vcatpvf>, sv_vcatpvfn X<sv_vcatpvfn>, sv_vcatpvf_mg
-X<sv_vcatpvf_mg>, sv_vsetpvf X<sv_vsetpvf>, sv_vsetpvfn X<sv_vsetpvfn>,
-sv_vsetpvf_mg X<sv_vsetpvf_mg>
+X<sv_usepvn_flags>, sv_utf8_decode X<sv_utf8_decode>, sv_utf8_encode
+X<sv_utf8_encode>, sv_vcatpvf X<sv_vcatpvf>, sv_vcatpvfn X<sv_vcatpvfn>,
+sv_vcatpvf_mg X<sv_vcatpvf_mg>, sv_vsetpvf X<sv_vsetpvf>, sv_vsetpvfn
+X<sv_vsetpvfn>, sv_vsetpvf_mg X<sv_vsetpvf_mg>
 
 =item Unicode Support
 
@@ -6414,6 +6443,65 @@ B<-V>
 =item ENVIRONMENT
 
 =item AUTHOR
+
+=back
+
+=head2 kurila01delta - what is new for Perl Kurila 0.1
+
+=over 4
+
+=item DESCRIPTION
+
+=item Highlights In Kurila 0.1
+
+=item Core Enhancements
+
+=over 4
+
+=item Lexical scoped byte vs codepoint semantics
+
+=item Internal encoding using UTF-8
+
+=item \x...
+
+=item /u pattern option
+
+=item Indirect object syntax removed
+
+=item formats removed
+
+=back
+
+=item Modules and Pragmata
+
+=over 4
+
+=item New Modules and Pragmata
+
+Perl6::Form, by Damian Conway, is a replacement for the removed format and
+formline keywords. Slightly modified as not to depend on Perl6::Export
+
+=item Updated Modules And Pragmata
+
+=item Deleted Modules and Pragmata
+
+locale, the locale pramga has been removed
+
+=back
+
+=item KNOWN BUGS
+
+=over 4
+
+=item Documentation
+
+=item Limited platform support
+
+=back
+
+=item SEE ALSO
+
+=item HISTORY
 
 =back
 
@@ -11718,7 +11806,7 @@ Legend of characters above
 
 =item KNOWN PROBLEMS
 
-literals in regex that are longer than 127 bytes, EBCDIC, format
+literals in regex that are longer than 127 bytes, EBCDIC
 
 =over 4
 
@@ -11729,45 +11817,6 @@ literals in regex that are longer than 127 bytes, EBCDIC, format
 =item HISTORY
 
 =item SEE ALSO
-
-=back
-
-=head2 encoding::warnings - Warn on implicit encoding conversions
-
-=over 4
-
-=item VERSION
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Overview of the problem
-
-=item Detecting the problem
-
-=item Solving the problem
-
-Upgrade both sides to unicode-strings, Downgrade both sides to
-byte-strings, Specify the encoding for implicit byte-string upgrading,
-PerlIO layers for B<STDIN> and B<STDOUT>, Literal conversions, Implicit
-upgrading for byte-strings
-
-=back
-
-=item CAVEATS
-
-=back
-
-=over 4
-
-=item SEE ALSO
-
-=item AUTHORS
-
-=item COPYRIGHT
 
 =back
 
@@ -11905,17 +11954,6 @@ This probably does nothing, This works only on 5.10+
 =item SEE ALSO
 
 =item AUTHOR
-
-=back
-
-=head2 locale - Perl pragma to use and avoid POSIX locales for built-in
-operations
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
 
 =back
 
@@ -12163,7 +12201,7 @@ code
 
 $num_octets = utf8::upgrade($string), $success = utf8::downgrade($string[,
 FAIL_OK]), utf8::encode($string), $success = utf8::decode($string), $flag =
-utf8::is_utf8(STRING), $flag = utf8::valid(STRING)
+utf8::valid(STRING)
 
 =back
 
@@ -13985,1544 +14023,6 @@ _validate($schema_name, $data, $file, $doc), yaml($schema_name)
 
 =back
 
-=head2 CPANPLUS - API & CLI access to the CPAN mirrors
-
-=over 4
-
-=item SYNOPSIS
-
-=item GUIDE TO DOCUMENTATION
-
-=over 4
-
-=item GENERAL USAGE
-
-=item API REFERENCE
-
-=back
-
-=back
-
-=over 4
-
-=item COMMANDLINE TOOLS
-
-=over 4
-
-=item STARTING AN INTERACTIVE SHELL
-
-=item BUILDING PACKAGES
-
-=item $bool = install( Module::Name | /A/AU/AUTHOR/Module-Name-1.tgz )
-
-=item $where = fetch( Module::Name | /A/AU/AUTHOR/Module-Name-1.tgz )
-
-=item $where = get( Module::Name | /A/AU/AUTHOR/Module-Name-1.tgz )
-
-=item shell()
-
-=back
-
-=item FAQ
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=item CONTACT INFORMATION
-
-Bug reporting: I<bug-cpanplus@rt.cpan.org>, Questions & suggestions:
-I<cpanplus-devel@lists.sourceforge.net>
-
-=back
-
-=head2 CPANPLUS::Backend
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item ENVIRONMENT
-
-=item METHODS
-
-=over 4
-
-=item $cb = CPANPLUS::Backend->new( [CONFIGURE_OBJ] )
-
-Provide a valid C<CPANPLUS::Configure> object, No arguments
-
-=back
-
-=back
-
-=over 4
-
-=item $href = $cb->module_tree( [@modules_names_list] )
-
-=back
-
-=over 4
-
-=item $href = $cb->author_tree( [@author_names_list] )
-
-=back
-
-=over 4
-
-=item $conf = $cb->configure_object ()
-
-=back
-
-=over 4
-
-=item $su = $cb->selfupdate_object;
-
-=back
-
-=over 4
-
-=item @mods = $cb->search( type => TYPE, allow => AREF, [data => AREF,
-verbose => BOOL] )
-
-=back
-
-=over 4
-
-=item $backend_rv = $cb->fetch( modules => \@mods )
-
-=item $backend_rv = $cb->extract( modules => \@mods )
-
-=item $backend_rv = $cb->install( modules => \@mods )
-
-=item $backend_rv = $cb->readme( modules => \@mods )
-
-=item $backend_rv = $cb->files( modules => \@mods )
-
-=item $backend_rv = $cb->distributions( modules => \@mods )
-
-=back
-
-=over 4
-
-=item $mod_obj = $cb->parse_module( module => $modname|$distname|$modobj )
-
-Text::Bastardize, Text-Bastardize, Text-Bastardize-1.06,
-AYRNIEU/Text-Bastardize, AYRNIEU/Text-Bastardize-1.06,
-AYRNIEU/Text-Bastardize-1.06.tar.gz,
-http://example.com/Text-Bastardize-1.06.tar.gz,
-file:///tmp/Text-Bastardize-1.06.tar.gz
-
-=back
-
-=over 4
-
-=item $bool = $cb->reload_indices( [update_source => BOOL, verbose => BOOL]
-);
-
-=back
-
-=over 4
-
-=item $bool = $cb->flush(CACHE_NAME)
-
-C<methods>, C<hosts>, C<modules>, C<lib>, C<load>, C<all>
-
-=back
-
-=over 4
-
-=item @mods = $cb->installed()
-
-=back
-
-=over 4
-
-=item $bool = $cb->local_mirror([path => '/dir/to/save/to', index_files =>
-BOOL, force => BOOL, verbose => BOOL] )
-
-path, index_files, force, verbose
-
-=back
-
-=over 4
-
-=item $file = $cb->autobundle([path => OUTPUT_PATH, force => BOOL, verbose
-=> BOOL])
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 CPANPLUS::Backend::RV
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item new( ok => BOOL, args => DATA, rv => DATA, [function => $method_name]
-)
-
-ok, args, rv, function
-
-=back
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 CPANPLUS::Configure
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item $Configure = CPANPLUS::Configure->new( load_configs => BOOL )
-
-=back
-
-=back
-
-=over 4
-
-=item $bool = $Configure->init( [rescan => BOOL])
-
-=back
-
-=over 4
-
-=item can_save( [$config_location] )
-
-=back
-
-=over 4
-
-=item $file = $conf->save( [$package_name] )
-
-=back
-
-=over 4
-
-=item options( type => TYPE )
-
-=back
-
-=over 4
-
-=item ACCESSORS
-
-=over 4
-
-=item get_SOMETHING( ITEM, [ITEM, ITEM, ... ] );
-
-=item set_SOMETHING( ITEM => VAL, [ITEM => VAL, ITEM => VAL, ... ] );
-
-=item add_SOMETHING( ITEM => VAL, [ITEM => VAL, ITEM => VAL, ... ] );
-
-set|get_conf, set|get_program, _set|_get_build, _set|_get_source,
-_set|_get_mirror, _set|_get_dist, _set|_get_fetch, _set|_get_daemon
-
-=back
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 CPANPLUS::Dist
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item ACCESSORS
-
-parent(), status()
-
-=item STATUS ACCESSORS
-
-created(), installed(), uninstalled(), dist()
-
-=back
-
-=over 4
-
-=item $dist = CPANPLUS::Dist->new( module => MODOBJ, [format => DIST_TYPE]
-);
-
-=back
-
-=over 4
-
-=item @dists = CPANPLUS::Dist->dist_types;
-
-=back
-
-=over 4
-
-=item prereq_satisfied( modobj => $modobj, version => $version_spec )
-
-=back
-
-=over 4
-
-=item _resolve_prereqs
-
-=back
-
-=head2 CPANPLUS::Dist::Base - Base class for custom distribution classes
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item FLOW
-
-=item METHODS
-
-=back
-
-=over 4
-
-=item $bool = $Class->format_available
-
-=back
-
-=over 4
-
-=item $bool = $dist->init
-
-=back
-
-=over 4
-
-=item $bool = $dist->prepare
-
-=back
-
-=over 4
-
-=item $bool = $dist->create
-
-=back
-
-=over 4
-
-=item $bool = $dist->install
-
-=back
-
-=over 4
-
-=item $bool = $dist->uninstall
-
-=back
-
-=head2 CPANPLUS::Dist::MM
-
-=over 4
-
-=item SYNOPSIS
-
-=item ACCESSORS
-
-parent(), status()
-
-=item STATUS ACCESSORS 
-
-makefile (), make (), test (), prepared (), distdir (), created (),
-installed (), uninstalled (), _create_args (), _install_args ()
-
-=back
-
-=over 4
-
-=item METHODS
-
-=over 4
-
-=item $bool = $dist->format_available();
-
-=back
-
-=back
-
-=over 4
-
-=item $href = $dist->_find_prereqs( file => '/path/to/Makefile', [verbose
-=> BOOL])
-
-=back
-
-=over 4
-
-=item $bool = $dist->create([perl => '/path/to/perl', make =>
-'/path/to/make', makeflags => 'EXTRA=FLAGS', prereq_target => TARGET,
-skiptest => BOOL, force => BOOL, verbose => BOOL])
-
-=back
-
-=over 4
-
-=item $bool = $dist->install([make => '/path/to/make',	makemakerflags =>
-'EXTRA=FLAGS', force => BOOL, verbose => BOOL])
-
-=back
-
-=over 4
-
-=item $bool = $dist->write_makefile_pl([force => BOOL, verbose => BOOL])
-
-=back
-
-=head2 CPANPLUS::Dist::Sample -- Sample code to create your own Dist::*
-plugin
-
-=over 4
-
-=item Description.
-
-=back
-
-=head2 CPANPLUS::Error
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item FUNCTIONS
-
-=over 4
-
-=item cp_msg("message string" [,VERBOSE])
-
-=item msg()
-
-=item cp_error("error string" [,VERBOSE])
-
-=item error()
-
-=back
-
-=item CLASS METHODS
-
-=over 4
-
-=item CPANPLUS::Error->stack()
-
-=item CPANPLUS::Error->stack_as_string([TRACE])
-
-=item CPANPLUS::Error->flush()
-
-=back
-
-=back
-
-=over 4
-
-=item GLOBAL VARIABLES
-
-$ERROR_FH, $MSG_FH
-
-=back
-
-=head2 CPANPLUS::FAQ
-
-=over 4
-
-=item DESCRIPTION
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 CPANPLUS::Hacking
-
-=over 4
-
-=item DESCRIPTION
-
-=item OBTAINING CPANPLUS
-
-=item INSTALLING CPANPLUS
-
-=item CONFIGURING CPANPLUS
-
-=item RUNNING CPANPLUS FROM DEVELOPMENT ENVIRONMENT
-
-=item RUNNING CPANPLUS TESTS
-
-=item FINDING BUGS
-
-Problem description, Program demonstrating the bug, [OPTIONAL] A patch to
-the test suite to test for the bug, [OPTIONAL] A patch to the code + tests
-+ documentation
-
-=item SUPPLYING PATCHES
-
-In C<diff -u> or C<diff -c> format, From the root of the snapshot,
-Including patches for code + tests + docs, Sent per mail to
-cpanplus-devel@lists.sourceforge.net, With subject containing C<[PATCH]> +
-description of the patch
-
-=back
-
-=head2 CPANPLUS::Internals
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item ACCESSORS
-
-_conf, _id, _lib, _perl5lib
-
-=back
-
-=over 4
-
-=item METHODS
-
-=over 4
-
-=item $internals = CPANPLUS::Internals->_init( _conf => CONFIG_OBJ )
-
-=back
-
-=back
-
-=over 4
-
-=item $bool = $internals->_flush( list => \@caches )
-
-=back
-
-=over 4
-
-=item $bool = $internals->_register_callback( name => CALLBACK_NAME, code
-=> CODEREF );
-
-install_prerequisite, send_test_report, munge_test_report, edit_test_report
-
-=back
-
-=over 4
-
-=item $bool = $internals->_add_to_includepath( directories => \@dirs )
-
-=back
-
-=over 4
-
-=item $id = CPANPLUS::Internals->_last_id
-
-=item $id = CPANPLUS::Internals->_store_id( $internals )
-
-=item $obj = CPANPLUS::Internals->_retrieve_id( $ID )
-
-=item CPANPLUS::Internals->_remove_id( $ID )
-
-=item @objs = CPANPLUS::Internals->_return_all_objects
-
-=back
-
-=head2 CPANPLUS::Internals::Extract
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item $dir = _extract( module => $modobj, [perl => '/path/to/perl',
-extractdir => '/path/to/extract/to', prefer_bin => BOOL, verbose => BOOL,
-force => BOOL] )
-
-module, extractdir, prefer_bin, perl, verbose, force
-
-=back
-
-=back
-
-=head2 CPANPLUS::Internals::Fetch
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=back
-
-=over 4
-
-=item $path = _fetch( module => $modobj, [fetchdir => '/path/to/save/to',
-fetch_from => 'scheme://path/to/fetch/from', verbose => BOOL, force =>
-BOOL, prefer_bin => BOOL] )
-
-=back
-
-=over 4
-
-=item _add_fail_host( host => $host_hashref )
-
-=item _host_ok( host => $host_hashref )
-
-=back
-
-=head2 CPANPLUS::Internals::Report
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item $bool = $cb->_have_query_report_modules
-
-=item $bool = $cb->_have_send_report_modules
-
-=back
-
-=back
-
-=over 4
-
-=item @list = $cb->_query_report( module => $modobj, [all_versions => BOOL,
-verbose => BOOL] )
-
-=back
-
-=over 4
-
-=item $bool = $cb->_send_report( module => $modobj, buffer => $make_output,
-failed => BOOL, [save => BOOL, address => $email_to, dontcc => BOOL,
-verbose => BOOL, force => BOOL]);
-
-module, buffer, failed, save, address, dontcc, verbose, force
-
-=back
-
-=head2 CPANPLUS::Internals::Search
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item _search_module_tree( type => TYPE, allow => \@regexex, [data =>
-\@previous_results ] )
-
-type, allow, data
-
-=back
-
-=back
-
-=over 4
-
-=item _search_author_tree( type => TYPE, allow => \@regexex, [data =>
-\@previous_results ] )
-
-type, allow, data
-
-=back
-
-=over 4
-
-=item _all_installed()
-
-=back
-
-=head2 CPANPLUS::Internals::Source
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=back
-
-=over 4
-
-=item $cb->_check_trees( [update_source => BOOL, path => PATH, verbose =>
-BOOL] )
-
-update_source, path, verbose
-
-=back
-
-=over 4
-
-=item $cb->__check_uptodate( file => $file, name => $name, [update_source
-=> BOOL, verbose => BOOL] )
-
-file, name, update_source, verbose
-
-=back
-
-=over 4
-
-=item $cb->_update_source( name => $name, [path => $path, verbose => BOOL]
-)
-
-name, path, verbose
-
-=back
-
-=over 4
-
-=item $cb->_build_trees( uptodate => BOOL, [use_stored => BOOL, path =>
-$path, verbose => BOOL] )
-
-uptodate, path, verbose, use_stored
-
-=back
-
-=over 4
-
-=item $cb->__retrieve_source(name => $name, [path => $path, uptodate =>
-BOOL, verbose => BOOL])
-
-name, uptodate, path, verbose
-
-=back
-
-=over 4
-
-=item $cb->_save_source([verbose => BOOL, path => $path])
-
-path, verbose
-
-=back
-
-=over 4
-
-=item $cb->__create_author_tree([path => $path, uptodate => BOOL, verbose
-=> BOOL])
-
-uptodate, path, verbose
-
-=back
-
-=over 4
-
-=item $cb->_create_mod_tree([path => $path, uptodate => BOOL, verbose =>
-BOOL])
-
-uptodate, path, verbose
-
-=back
-
-=over 4
-
-=item $cb->__create_dslip_tree([path => $path, uptodate => BOOL, verbose =>
-BOOL])
-
-uptodate, path, verbose
-
-=back
-
-=over 4
-
-=item $cb->_dslip_defs ()
-
-=back
-
-=head2 CPANPLUS::Internals::Utils
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item $cb->_mkdir( dir => '/some/dir' )
-
-=back
-
-=back
-
-=over 4
-
-=item $cb->_chdir( dir => '/some/dir' )
-
-=back
-
-=over 4
-
-=item $cb->_rmdir( dir => '/some/dir' );
-
-=back
-
-=over 4
-
-=item $cb->_perl_version ( perl => 'some/perl/binary' );
-
-=back
-
-=over 4
-
-=item $cb->_version_to_number( version => $version );
-
-=back
-
-=over 4
-
-=item $cb->_whoami
-
-=back
-
-=over 4
-
-=item _get_file_contents( file => $file );
-
-=back
-
-=over 4
-
-=item $cb->_mode_plus_w( file => '/path/to/file' );
-
-=back
-
-=over 4
-
-=item $uri = $cb->_host_to_uri( scheme => SCHEME, host => HOST, path =>
-PATH );
-
-=back
-
-=over 4
-
-=item $cb->_vcmp( VERSION, VERSION );
-
-=back
-
-=over 4
-
-=item $cb->_home_dir
-
-=back
-
-=over 4
-
-=item $path = $cb->_safe_path( path => $path );
-
-=back
-
-=over 4
-
-=item ($pkg, $version, $ext) = $cb->_split_package_string( package =>
-PACKAGE_STRING );
-
-=back
-
-=head2 CPANPLUS::Module
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=over 4
-
-=item CLASS METHODS
-
-=over 4
-
-=item accessors ()
-
-=back
-
-=back
-
-=over 4
-
-=item ACCESSORS
-
-name, module, version, path, comment, package, description, dslip, status,
-author, parent
-
-=back
-
-=over 4
-
-=item STATUS ACCESSORS
-
-installer_type, dist_cpan, dist, prereqs, signature, extract, fetch,
-readme, uninstall, created, installed, checksums, checksum_ok,
-checksum_value
-
-=item METHODS
-
-=over 4
-
-=item $self = CPANPLUS::Module::new( OPTIONS )
-
-=back
-
-=back
-
-=over 4
-
-=item $mod->package_name
-
-=item $mod->package_version
-
-=item $mod->package_extension
-
-=item $mod->package_is_perl_core
-
-=item $mod->module_is_supplied_with_perl_core( [version => $]] )
-
-=item $mod->is_bundle
-
-=item $mod->is_third_party
-
-=item $mod->third_party_information
-
-=back
-
-=over 4
-
-=item $clone = $self->clone
-
-=back
-
-=over 4
-
-=item $where = $self->fetch
-
-=back
-
-=over 4
-
-=item $path = $self->extract
-
-=back
-
-=over 4
-
-=item $type = $self->get_installer_type([prefer_makefile => BOOL])
-
-=back
-
-=over 4
-
-=item $dist = $self->dist([target => 'prepare|create', format =>
-DISTRIBUTION_TYPE, args => {key => val}]);
-
-=back
-
-=over 4
-
-=item $bool = $mod->prepare( )
-
-Convenience method around C<install()> that prepares a module 
-without actually building it. This is equivalent to invoking C<install>
-with C<target> set to C<prepare>
-
-=back
-
-=over 4
-
-=item $bool = $mod->create( )
-
-=back
-
-=over 4
-
-=item $bool = $mod->test( )
-
-=back
-
-=over 4
-
-=item $bool = $self->install([ target => 'prepare|create|install', format
-=> FORMAT_TYPE, extractdir => DIRECTORY, fetchdir => DIRECTORY, prefer_bin
-=> BOOL, force => BOOL, verbose => BOOL, ..... ]);
-
-=back
-
-=over 4
-
-=item $text = $self->readme
-
-=back
-
-=over 4
-
-=item $version = $self->installed_version()
-
-=item $where = $self->installed_file()
-
-=item $bool = $self->is_uptodate([version => VERSION_NUMBER])
-
-=back
-
-=over 4
-
-=item $href = $self->details()
-
-=back
-
-=over 4
-
-=item @list = $self->contains()
-
-=back
-
-=over 4
-
-=item @list_of_hrefs = $self->fetch_report()
-
-=back
-
-=over 4
-
-=item $bool = $self->uninstall([type => [all|man|prog])
-
-=back
-
-=over 4
-
-=item @modobj = $self->distributions()
-
-=back
-
-=over 4
-
-=item @list = $self->files ()
-
-=back
-
-=over 4
-
-=item @list = $self->directory_tree ()
-
-=back
-
-=over 4
-
-=item @list = $self->packlist ()
-
-=back
-
-=over 4
-
-=item @list = $self->validate ()
-
-=back
-
-=over 4
-
-=item $bool = $self->add_to_includepath;
-
-=item $path = $self->best_path_to_module_build();
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 CPANPLUS::Module::Author
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item ACCESSORS
-
-author, cpanid, email, parent
-
-=back
-
-=over 4
-
-=item METHODS
-
-=over 4
-
-=item $auth = CPANPLUS::Module::Author->new( author => AUTHOR_NAME, cpanid
-=> CPAN_ID, _id => INTERNALS_ID [, email => AUTHOR_EMAIL] )
-
-=back
-
-=back
-
-=over 4
-
-=item @mod_objs = $auth->modules()
-
-=back
-
-=over 4
-
-=item @dists = $auth->distributions()
-
-=back
-
-=over 4
-
-=item CLASS METHODS
-
-=over 4
-
-=item accessors ()
-
-=back
-
-=back
-
-=head2 CPANPLUS::Module::Author::Fake
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item new( _id => DIGIT )
-
-=back
-
-=back
-
-=head2 CPANPLUS::Module::Checksums
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item $mod->checksums
-
-=back
-
-=back
-
-=head2 CPANPLUS::Module::Fake
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item new( module => $mod, path => $path, package => $pkg, [_id => DIGIT] )
-
-=back
-
-=back
-
-=head2 CPANPLUS::inc
-
-=over 4
-
-=item DESCRIPTION
-
-=back
-
-=head2 CPANPLUS::inc - runtime inclusion of privately bundled modules
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-Put a coderef at the beginning of C<@INC>, Add the full path to the
-C<CPANPLUS/inc> directory to C<$ENV{PERL5LIB>
-
-=item METHODS
-
-=over 4
-
-=item CPANPLUS::inc->inc_path()
-
-=item CPANPLUS::inc->my_path()
-
-=item CPANPLUS::inc->installer_path()
-
-=back
-
-=back
-
-=over 4
-
-=item CPANPLUS::inc->original_perl5lib
-
-=item CPANPLUS::inc->original_perl5opt
-
-=item CPANPLUS::inc->original_inc
-
-=item CPANPLUS::inc->limited_perl5opt(@modules);
-
-=back
-
-=over 4
-
-=item CPANPLUS::inc->interesting_modules()
-
-=back
-
-=over 4
-
-=item INTERESTING MODULES
-
-Loop over your @INC, Check the version on every suitable module found in
-@INC
-
-=back
-
-=over 4
-
-=item DEBUG
-
-=item CAVEATS
-
-On multiple C<use lib> calls, our coderef may not be the first in @INC,
-Non-directories in @INC
-
-=back
-
-=head2 CPANPLUSelfupdate, CPANPLUS::Selfupdate
-
-=over 4
-
-=item SYNOPSIS
-
-=back
-
-=over 4
-
-=item METHODS
-
-=over 4
-
-=item $self = CPANPLUS::Selfupdate->new( $backend_object );
-
-=back
-
-=back
-
-=over 4
-
-=item $bool = $self->selfupdate( update =>
-"core|dependencies|enabled_features|features|all", latest => BOOL )
-
-=back
-
-=over 4
-
-=item @features = $self->list_features
-
-=back
-
-=over 4
-
-=item @features = $self->list_enabled_features
-
-=back
-
-=over 4
-
-=item @mods = $self->modules_for_feature( FEATURE [,AS_HASH] )
-
-=back
-
-=over 4
-
-=item @mods = $self->list_core_dependencies( [AS_HASH] )
-
-=back
-
-=over 4
-
-=item @mods = $self->list_core_modules( [AS_HASH] )
-
-=back
-
-=over 4
-
-=item CPANPLUS::Selfupdate::Module
-
-=back
-
-=over 4
-
-=item $version = $mod->version_required
-
-=back
-
-=over 4
-
-=item $bool = $mod->is_installed_version_sufficient
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 CPANPLUShell, CPANPLUS::Shell
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 CPANPLUShell::Classic, CPANPLUS::Shell::Classic - CPAN.pm emulation
-for CPANPLUS
-
-=over 4
-
-=item DESCRIPTION
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=over 4
-
-=item SEE ALSO
-
-=back
-
-=head2 CPANPLUShell::Default, CPANPLUS::Shell::Default
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 CPANPLUShell::Default::Plugins::HOWTO,
-CPANPLUS::Shell::Default::Plugins::HOWTO -- documentation on how to write
-your own plugins
-
-=over 4
-
-=item SYNOPSIS
-
-=item HOWTO
-
-=over 4
-
-=item Registering Plugin Modules
-
-=item Registering Plugin Commands
-
-=item Registering Plugin Help
-
-=item Arguments to Plugin Commands
-
-Classname -- The name of your plugin class, Shell     -- The
-CPANPLUS::Shell::Default object, Backend   -- The CPANPLUS::Backend object,
-Command   -- The command issued by the user, Input     -- The input string
-from the user, Options	 -- A hashref of options provided by the user
-
-=back
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 CPANPLUShell::Default::Plugins::Remote,
-CPANPLUS::Shell::Default::Plugins::Remote
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 CPANPLUShell::Default::Plugins::Source,
-CPANPLUS::Shell::Default::Plugins::Source 
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=over 4
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
 =head2 CPANox, CPAN::Nox - Wrapper around CPAN.pm without using any XS
 module
 
@@ -17240,7 +15740,7 @@ Goal #1:, Goal #2:, Goal #3:, Goal #4:
 
 =item Messing with Perl's Internals
 
-is_utf8(STRING [, CHECK]), _utf8_on(STRING), _utf8_off(STRING)
+is_utf8(STRING [, CHECK])
 
 =back
 
@@ -17943,7 +16443,7 @@ Legend of characters above
 
 =item KNOWN PROBLEMS
 
-literals in regex that are longer than 127 bytes, EBCDIC, format
+literals in regex that are longer than 127 bytes, EBCDIC
 
 =over 4
 
@@ -18256,7 +16756,7 @@ dogfood arg_hashref, ITEM..
 normalise_items args, default_type, seen_types, seen_items, ITEM..
 
 C_constant arg_hashref, ITEM.., name, type, value, macro, default, pre,
-post, def_pre, def_post, utf8, weight
+post, def_pre, def_post, weight
 
 =over 4
 
@@ -20307,93 +18807,6 @@ cacheout EXPR, cacheout MODE, EXPR
 $fh->print, $fh->printf, $fh->getline, $fh->getlines
 
 =item SEE ALSO
-
-=back
-
-=head2 Filter::Simple - Simplified source filtering
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item The Problem
-
-=item A Solution
-
-=item Disabling or changing <no> behaviour
-
-=item All-in-one interface
-
-=item Filtering only specific components of source code
-
-C<"code">, C<"code_no_comments">, C<"executable">,
-C<"executable_no_comments">, C<"quotelike">, C<"string">, C<"regex">,
-C<"all">
-
-=item Filtering only the code parts of source code
-
-Most source code ceases to be grammatically correct when it is broken up
-into the pieces between string literals and regexes. So the C<'code'>
-and C<'code_no_comments'> component filter behave slightly differently
-from the other partial filters described in the previous section.
-
-=item Using Filter::Simple with an explicit C<import> subroutine
-
-=item Using Filter::Simple and Exporter together
-
-=item How it works
-
-=back
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 Filter::Util::Call - Perl Source Filter Utility Module
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item B<use Filter::Util::Call>
-
-=item B<import()>
-
-=item B<filter() and anonymous sub>
-
-B<$_>, B<$status>, B<filter_read> and B<filter_read_exact>, B<filter_del>
-
-=back
-
-=item EXAMPLES
-
-=over 4
-
-=item Example 1: A simple filter.
-
-=item Example 2: Using the context
-
-=item Example 3: Using the context within the filter
-
-=item Example 4: Using filter_del
-
-=back
-
-=item Filter::Simple
-
-=item AUTHOR
-
-=item DATE
 
 =back
 
@@ -27256,6 +25669,272 @@ string, regexp, subroutine, array ref
 
 =back
 
+=head2 Perl6-Form, Perl6::Form - Implements the Perl 6 'form' built-in
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Formatting jargon
+
+Format, Text, Field, Data, Single-line field, Block field, Text block,
+Column
+
+=item Return values
+
+=back
+
+=item Field types
+
+=item How fields are filled
+
+=item Keeping track of what's been formatted
+
+=item Array data sources
+
+=over 4
+
+=item Justifying fields
+
+=back
+
+=item Short fields
+
+=item Numerical fields
+
+=over 4
+
+=item Non-numeric data
+
+=item Decimal markers
+
+=item Negative numbers
+
+=item Thousands separators
+
+=back
+
+=item Locale-specific numeric formatting
+
+=item Currency fields
+
+=item Verbatim fields
+
+=item Overflow fields
+
+=over 4
+
+=item Line-breaking
+
+=item Interleaving data
+
+=item Multi-line formats
+
+=item Layout control
+
+=item Tabular layout
+
+=back
+
+=item Give him line and scope...
+
+=over 4
+
+=item Declarative field widths
+
+=item Imperative field widths
+
+=item Distributive field widths
+
+=item Extensible fields
+
+=item Whitespace squeezing
+
+=item Field filling
+
+=item Zero-filled numeric fields
+
+=item Up and down, up and down, I will lead them up and down...
+
+=item Height control
+
+=item Minimal height fields
+
+=item Underlining
+
+=item Output trimming
+
+=back
+
+=item Page control
+
+=over 4
+
+=item Measure his woe the length and breadth of mine...
+
+=item Headers and footers
+
+=item Page body postprocessing
+
+=back
+
+=item User-defined fields
+
+=over 4
+
+=item Single-column fields
+
+=back
+
+=item Bulleted lists
+
+=item WARNING
+
+=item DEPENDENCIES
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 Perl6::Form - Implements the Perl 6 'form' built-in
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Formatting jargon
+
+Format, Text, Field, Data, Single-line field, Block field, Text block,
+Column
+
+=item Return values
+
+=back
+
+=item Field types
+
+=item How fields are filled
+
+=item Keeping track of what's been formatted
+
+=item Array data sources
+
+=over 4
+
+=item Justifying fields
+
+=back
+
+=item Short fields
+
+=item Numerical fields
+
+=over 4
+
+=item Non-numeric data
+
+=item Decimal markers
+
+=item Negative numbers
+
+=item Thousands separators
+
+=back
+
+=item Locale-specific numeric formatting
+
+=item Currency fields
+
+=item Verbatim fields
+
+=item Overflow fields
+
+=over 4
+
+=item Line-breaking
+
+=item Interleaving data
+
+=item Multi-line formats
+
+=item Layout control
+
+=item Tabular layout
+
+=back
+
+=item Give him line and scope...
+
+=over 4
+
+=item Declarative field widths
+
+=item Imperative field widths
+
+=item Distributive field widths
+
+=item Extensible fields
+
+=item Whitespace squeezing
+
+=item Field filling
+
+=item Zero-filled numeric fields
+
+=item Up and down, up and down, I will lead them up and down...
+
+=item Height control
+
+=item Minimal height fields
+
+=item Underlining
+
+=item Output trimming
+
+=back
+
+=item Page control
+
+=over 4
+
+=item Measure his woe the length and breadth of mine...
+
+=item Headers and footers
+
+=item Page body postprocessing
+
+=back
+
+=item User-defined fields
+
+=over 4
+
+=item Single-column fields
+
+=back
+
+=item Bulleted lists
+
+=item WARNING
+
+=item DEPENDENCIES
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
 =head2 PerlIO - On demand loader for PerlIO layers and root of PerlIO::*
 name space
 
@@ -29445,42 +28124,6 @@ $buffer ), $info = Storable::read_magic( $buffer, $must_be_file )
 
 =back
 
-=head2 Switch - A switch statement for Perl
-
-=over 4
-
-=item VERSION
-
-=item SYNOPSIS
-
-=item BACKGROUND
-
-=item DESCRIPTION
-
-=over 4
-
-=item Allowing fall-through
-
-=item Automating fall-through
-
-=item Alternative syntax
-
-=item Higher-order Operations
-
-=back
-
-=item DEPENDENCIES
-
-=item AUTHOR
-
-=item BUGS
-
-=item LIMITATIONS
-
-=item COPYRIGHT
-
-=back
-
 =head2 Symbol - manipulate Perl symbols and their names
 
 =over 4
@@ -30841,11 +29484,13 @@ unexpand(1)
 
 =back
 
-=head2 Thread - manipulate threads in Perl (for old code only)
+=head2 Thread - Manipulate threads in Perl (for old code only)
 
 =over 4
 
-=item CAVEAT
+=item DEPRECATED
+
+=item HISTORY
 
 =item SYNOPSIS
 
@@ -30854,14 +29499,16 @@ unexpand(1)
 =item FUNCTIONS
 
 $thread = Thread->new(\&start_sub), $thread = Thread->new(\&start_sub,
-LIST), lock VARIABLE, async BLOCK;, Thread->self, cond_wait VARIABLE,
-cond_signal VARIABLE, cond_broadcast VARIABLE, yield
+LIST), lock VARIABLE, async BLOCK;, Thread->self, Thread->list, cond_wait
+VARIABLE, cond_signal VARIABLE, cond_broadcast VARIABLE, yield
 
 =item METHODS
 
-join, eval, detach, equal, tid, flags, done
+join, detach, equal, tid, done
 
-=item LIMITATIONS
+=item DEFUNCT
+
+lock(\&sub), eval, flags
 
 =item SEE ALSO
 

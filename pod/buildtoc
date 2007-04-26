@@ -11,8 +11,6 @@ use Text::Tabs;
 use Text::Wrap;
 use Getopt::Long;
 
-no locale;
-
 $Up = File::Spec->updir;
 $masterpodfile = File::Spec->catdir($Up, "pod.lst");
 

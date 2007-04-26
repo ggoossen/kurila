@@ -63,7 +63,7 @@ at git://dev.tty.nl/perl
 
 =over 4
 
-=item L<kurila02delta> too see what has changed compared to Perl 5.
+=item L<kurila01delta> too see what has changed compared to Perl 5.
 
 =back
 
