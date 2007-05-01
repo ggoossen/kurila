@@ -4920,6 +4920,7 @@ S_regrepeat(pTHX_ const regexp *prog, const regnode *p, I32 max, int depth)
     case ANYOF:
 	while (scan < loceol && REGINCLASS(prog, p, (U8*)scan))
 	    scan++;
+	break;
     case LNBREAK:
         if (do_utf8) {
 	    loceol = PL_regeol;

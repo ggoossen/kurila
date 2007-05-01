@@ -4095,29 +4095,16 @@ sub kt
     local $_="\t \r\n \n \t".chr(11)."\n";
     s/\H/H/g;
     s/\h/h/g;
-    iseq($_,"hhHHhHhhHH");
+    iseq($_,"\t \r\n \n \t".chr(11)."\n");
     $_="\t \r\n \n \t".chr(11)."\n";
-    utf8::upgrade($_);
-    s/\H/H/g;
-    s/\h/h/g;
-    iseq($_,"hhHHhHhhHH");
-}    
+}
 {
-    my @h=map { chr( $_ ) } (
-        0x09,   0x20,   0xa0,   0x1680, 0x180e, 0x2000, 0x2001, 0x2002,
-        0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200a,
-        0x202f, 0x205f, 0x3000
-    );
-    my @v=map { chr( $_ ) } ( 0x0a, 0x0b, 0x0c, 0x0d, 0x85, 0x2028, 0x2029 );
     my @lb=( "\x0D\x0A",
              map { chr( $_ ) } ( 0x0A..0x0D,0x85,0x2028,0x2029 ));
-    foreach my $t ([\@h,qr/\h/,qr/\h+/],[\@v,qr/\v/,qr/\v+/],[\@lb,qr/\R/,qr/\R+/],){
+    foreach my $t ([\@lb,qr/\R/,qr/\R+/],){
         my $ary=shift @$t;
         foreach my $pat (@$t) {
             foreach my $str (@$ary) {
-                ok($str=~/($pat)/);
-                iseq($1,$str);
-                utf8::upgrade($str);
                 ok($str=~/($pat)/);
                 iseq($1,$str);
             }
@@ -4207,7 +4194,7 @@ ok($@=~/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1735;
+    $::TestCount = 1759;
     print "1..$::TestCount\n";
 }
 
