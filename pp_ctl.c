@@ -125,7 +125,7 @@ PP(pp_regcomp)
     }
     else {
 	STRLEN len;
-	const char *t = SvPV_const(tmpstr, len);
+	const char *t = SvOK(tmpstr) ? SvPV_const(tmpstr, len) : "";
 	re = PM_GETRE(pm);
 
 	/* Check against the last compiled regexp. */
@@ -148,9 +148,9 @@ PP(pp_regcomp)
 		PL_reginterp_cnt = I32_MAX; /* Mark as safe.  */
 
 	    if (eng) 
-	        PM_SETRE(pm, CALLREGCOMP_ENG(eng,(char *)t, (char *)t + len, pm_flags));
+	        PM_SETRE(pm, CALLREGCOMP_ENG(eng, tmpstr, pm_flags));
             else
-                PM_SETRE(pm, CALLREGCOMP((char *)t, (char *)t + len, pm_flags));
+                PM_SETRE(pm, CALLREGCOMP(tmpstr, pm_flags));
 
 	    PL_reginterp_cnt = 0;	/* XXXX Be extra paranoid - needed
 					   inside tie/overload accessors.  */
