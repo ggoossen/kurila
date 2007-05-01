@@ -7,6 +7,7 @@
  *    License or the Artistic License, as specified in the README file.
  *
  */
+#include "regcharclass.h"
 
 typedef OP OP_4tree;			/* Will be redefined later. */
 
@@ -172,7 +173,7 @@ struct regnode_2 {
 
 
 #define ANYOF_BITMAP_SIZE	32	/* 256 b/(8 b/B) */
-#define ANYOF_CLASSBITMAP_SIZE	 4	/* up to 32 (8*4) named classes */
+#define ANYOF_CLASSBITMAP_SIZE	 4	/* up to 40 (8*5) named classes */
 
 /* also used by trie */
 struct regnode_charclass {
@@ -421,7 +422,7 @@ EXTCONST U8 PL_varies[] = {
     BRANCH, BACK, STAR, PLUS, CURLY, CURLYX, REF, REFF, REFFL,
     WHILEM, CURLYM, CURLYN, BRANCHJ, IFTHEN, SUSPEND, CLUMP,
     NREF, NREFF, NREFFL,
-    ANYOFU, REG_ANYU,
+    ANYOFU, REG_ANYU, LNBREAK,
     0
 };
 #endif
@@ -782,5 +783,6 @@ re.pm, especially to the documentation.
 #define RE_SV_TAIL(ItEm)
 
 #endif /* DEBUG RELATED DEFINES */
+
 
 

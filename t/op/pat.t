@@ -3158,7 +3158,7 @@ ok(("foba  ba${s}pxySS$s$s" =~ qr/(b(?:a${s}t|a${s}f|a${s}p)[xy]+$s*)/i)
 }
 
 
-
+print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
 if (!$ENV{PERL_SKIP_PSYCHO_TEST}){
     my @normal=qw(these are some normal words);
     use utf8;
@@ -3529,6 +3529,7 @@ sub iseq($$;$) {
 if ($ENV{PERL_SKIP_PSYCHO_TEST}){
   printf "ok %d Skip: No psycho tests\n", $test++;
 } else {    
+  print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
   my $r = qr/^
   	    (?:
   		( (?:a|z+)+ )
@@ -3669,25 +3670,6 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     1 while /.(??{'(*PRUNE)'})(?{$count++})(*FAIL)/g;
     iseq($count,4,"/.(*PRUNE)/");
 }
-{   # Test the \v form of the (*PRUNE) pattern
-    our $count = 0;
-    'aaab'=~/a+b?(?{$count++})(*FAIL)/;
-    iseq($count,9,"expect 9 for no \\v");
-    $count = 0;
-    'aaab'=~/a+b?\v(?{$count++})(*FAIL)/;
-    iseq($count,3,"expect 3 with \\v");
-    local $_='aaab';
-    $count=0;
-    1 while /.\v(?{$count++})(*FAIL)/g;
-    iseq($count,4,"/.\\v/");
-    $count = 0;
-    'aaab'=~/a+b?(??{'\v'})(?{$count++})(*FAIL)/;
-    iseq($count,3,"expect 3 with \\v");
-    local $_='aaab';
-    $count=0;
-    1 while /.(??{'\v'})(?{$count++})(*FAIL)/g;
-    iseq($count,4,"/.\\v/");
-}
 {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~/a+b?(*SKIP)(?{$count++})(*FAIL)/;
@@ -3702,21 +3684,6 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     1 while /(a+b?)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g;
     iseq($count,2,"Expect 2 with (*SKIP)" );
     iseq("@res","aaab aaab","adjacent (*SKIP) works as expected" );
-}
-{   # Test the \V form of the (*SKIP) pattern
-    our $count = 0;
-    'aaab'=~/a+b?\V(?{$count++})(*FAIL)/;
-    iseq($count,1,"expect 1 with \\V");
-    local $_='aaab';
-    $count=0;
-    1 while /.\V(?{$count++})(*FAIL)/g;
-    iseq($count,4,"/.\\V/");
-    $_='aaabaaab';
-    $count=0;
-    our @res=();
-    1 while /(a+b?)\V(?{$count++; push @res,$1})(*FAIL)/g;
-    iseq($count,2,"Expect 2 with \\V" );
-    iseq("@res","aaab aaab","adjacent \\V works as expected" );
 }
 {   # Test the (*SKIP) pattern
     our $count = 0;
@@ -4123,7 +4090,41 @@ sub kt
         iseq("$1$2",'foooooobaaaaar');    
     }
     iseq("$1$2","foobar");
+}
+{
+    local $_="\t \r\n \n \t".chr(11)."\n";
+    s/\H/H/g;
+    s/\h/h/g;
+    iseq($_,"hhHHhHhhHH");
+    $_="\t \r\n \n \t".chr(11)."\n";
+    utf8::upgrade($_);
+    s/\H/H/g;
+    s/\h/h/g;
+    iseq($_,"hhHHhHhhHH");
 }    
+{
+    my @h=map { chr( $_ ) } (
+        0x09,   0x20,   0xa0,   0x1680, 0x180e, 0x2000, 0x2001, 0x2002,
+        0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200a,
+        0x202f, 0x205f, 0x3000
+    );
+    my @v=map { chr( $_ ) } ( 0x0a, 0x0b, 0x0c, 0x0d, 0x85, 0x2028, 0x2029 );
+    my @lb=( "\x0D\x0A",
+             map { chr( $_ ) } ( 0x0A..0x0D,0x85,0x2028,0x2029 ));
+    foreach my $t ([\@h,qr/\h/,qr/\h+/],[\@v,qr/\v/,qr/\v+/],[\@lb,qr/\R/,qr/\R+/],){
+        my $ary=shift @$t;
+        foreach my $pat (@$t) {
+            foreach my $str (@$ary) {
+                ok($str=~/($pat)/);
+                iseq($1,$str);
+                utf8::upgrade($str);
+                ok($str=~/($pat)/);
+                iseq($1,$str);
+            }
+        }
+    }
+}
+
 # Test counter is at bottom of file. Put new tests above here.
 #-------------------------------------------------------------------
 # Keep the following tests last -- they may crash perl
@@ -4209,4 +4210,5 @@ BEGIN {
     $::TestCount = 1735;
     print "1..$::TestCount\n";
 }
+
 

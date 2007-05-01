@@ -3197,6 +3197,34 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		break;
 	    }
 	}
+	else if (OP(scan) == LNBREAK) {
+	    if (flags & SCF_DO_STCLASS) {
+		int value = 0;
+		data->start_class->flags &= ~ANYOF_EOS;	/* No match on empty */
+    	        if (flags & SCF_DO_STCLASS_AND) {
+                    for (value = 0; value < 256; value++)
+                        if (!is_LNBREAK_cp(value))                   
+                            ANYOF_BITMAP_CLEAR(data->start_class, value);  
+                }                                                              
+                else {                                                         
+                    for (value = 0; value < 256; value++)
+                        if (is_LNBREAK_cp(value))                    
+                            ANYOF_BITMAP_SET(data->start_class, value);	   
+                }                                                              
+                if (flags & SCF_DO_STCLASS_OR)
+		    cl_and(data->start_class, and_withp);
+		flags &= ~SCF_DO_STCLASS;
+            }
+	    min += 1;
+	    delta += 2;
+            if (flags & SCF_DO_SUBSTR) {
+    	        SCAN_COMMIT(pRExC_state,data,minlenp);	/* Cannot expect anything... */
+    	        data->pos_min += 1;
+    	        data->pos_delta += 2;
+		data->longest = &(data->longest_float);
+    	    }
+    	    
+	}
 	else if (strchr((const char*)PL_simple,OP(scan))) {
 	    int value = 0;
 
@@ -3612,6 +3640,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 	}
 #endif /* old or new */
 #endif /* TRIE_STUDY_OPT */	
+
 	/* Else: zero-length, ignore. */
 	scan = regnext(scan);
     }
@@ -6221,15 +6250,10 @@ tryagain:
 	    ret = reg_node(pRExC_state, (U8)( NBOUND));
 	    *flagp |= SIMPLE;
 	    goto finish_meta_pat;
-	case 'v':
-	    ret = reganode(pRExC_state, PRUNE, 0);
-	    ret->flags = 1;
-	    *flagp |= SIMPLE;
+	case 'R':
+	    ret = reg_node(pRExC_state, LNBREAK);
+	    *flagp |= HASWIDTH|SIMPLE;
 	    goto finish_meta_pat;
-	case 'V':
-	    ret = reganode(pRExC_state, SKIP, 0);
-	    ret->flags = 1;
-	    *flagp |= SIMPLE;
          finish_meta_pat:	    
 	    nextchar(pRExC_state);
             Set_Node_Length(ret, 2); /* MJD */
@@ -6454,8 +6478,8 @@ tryagain:
 		    case 'k': case 'K':   /* named backref, keep marker */
 		    case 'N':             /* named char sequence */
 		    case 'p': case 'P':   /* unicode property */
+		              case 'R':   /* LNBREAK */
 		    case 's': case 'S':   /* space class */
-		    case 'v': case 'V':   /* (*PRUNE) and (*SKIP) */
 		    case 'w': case 'W':   /* word class */
 		    case 'X':             /* eXtended Unicode "combining character sequence" */
 		    case 'z': case 'Z':   /* End of line/string assertion */
@@ -6878,10 +6902,10 @@ STATIC regnode *
 S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 {
     dVAR;
-    register UV value = 0;
     register UV nextvalue;
     register IV prevvalue = OOB_UNICODE;
     register IV range = 0;
+    UV value = 0; /* XXX:dmq: needs to be referenceable (unfortunately) */
     register regnode *ret;
     STRLEN numlen;
     IV namedclass;

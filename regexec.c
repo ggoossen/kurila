@@ -1069,6 +1069,15 @@ REXEC_FBC_SCAN(                                       \
 if ((!reginfo || regtry(reginfo, &s))) \
     goto got_it
 
+#define REXEC_FBC_CSCAN(CoNdUtF8,CoNd)                         \
+    if (do_utf8) {                                             \
+	REXEC_FBC_UTF8_CLASS_SCAN(CoNdUtF8);                   \
+    }                                                          \
+    else {                                                     \
+	REXEC_FBC_CLASS_SCAN(CoNd);                            \
+    }                                                          \
+    break
+    
 #define REXEC_FBC_CSCAN_PRELOAD(UtFpReLoAd,CoNdUtF8,CoNd)      \
     if (do_utf8) {                                             \
 	UtFpReLoAd;                                            \
@@ -1278,6 +1287,12 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	    if ((!prog->minlen && !tmp) && (!reginfo || regtry(reginfo, &s)))
 		goto got_it;
 	    break;
+	case LNBREAK:
+	    Perl_croak(aTHX_ "foobar");
+	    REXEC_FBC_CSCAN(
+		is_LNBREAK_utf8(s),
+		is_LNBREAK_latin1(s)
+	    );
 	case AHOCORASICKC:
 	case AHOCORASICK: 
 	    {
@@ -4631,6 +4646,14 @@ NULL
             /* NOTREACHED */
 #undef ST
 
+        case LNBREAK:
+            if ((n=is_LNBREAK(locinput,do_utf8))) {
+                locinput += n;
+                nextchr = UCHARAT(locinput);
+            } else
+                sayNO;
+            break;
+
 	default:
 	    PerlIO_printf(Perl_error_log, "%"UVxf" %d\n",
 			  PTR2UV(scan), OP(scan));
@@ -4897,7 +4920,26 @@ S_regrepeat(pTHX_ const regexp *prog, const regnode *p, I32 max, int depth)
     case ANYOF:
 	while (scan < loceol && REGINCLASS(prog, p, (U8*)scan))
 	    scan++;
+    case LNBREAK:
+        if (do_utf8) {
+	    loceol = PL_regeol;
+	    while (hardcount < max && scan < loceol && (c=is_LNBREAK_utf8(scan))) {
+		scan += c;
+		hardcount++;
+	    }
+	} else {
+	    /*
+	      LNBREAK can match two latin chars, which is ok,
+	      because we have a null terminated string, but we
+	      have to use hardcount in this situation
+	    */
+	    while (scan < loceol && (c=is_LNBREAK_latin1(scan)))  {
+		scan+=c;
+		hardcount++;
+	    }
+	}	
 	break;
+
     default:		/* Called on something of 0 width. */
 	break;		/* So match right here or not at all. */
     }

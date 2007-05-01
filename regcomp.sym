@@ -175,7 +175,10 @@ CUTGROUP	VERB,      no-sv 1	On failure go to the next alternation in the group
 #*Control what to keep in $&.
 KEEPS		KEEPS,  no	$& begins here.
 
-# NEW STUFF ABOVE THIS LINE -- Please update counts below. 
+#*New charclass like patterns
+LNBREAK		LNBREAK,   none		generic newline pattern
+
+# NEW STUFF ABOVE THIS LINE  
 
 ################################################################################
 
