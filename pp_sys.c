@@ -3153,7 +3153,7 @@ PP(pp_chdir)
             gv = (GV*)SvRV(sv);
         }
         else {
-	    tmps = SvPVx_nolen_const(sv);
+	    tmps = SvPV_nolen_const(sv);
 	}
     }
 
