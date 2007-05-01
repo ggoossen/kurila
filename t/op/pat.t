@@ -4092,6 +4092,7 @@ sub kt
     iseq("$1$2","foobar");
 }
 {
+    local $Message = "HORIZWS";
     local $_="\t \r\n \n \t".chr(11)."\n";
     s/\H/H/g;
     s/\h/h/g;
@@ -4099,47 +4100,38 @@ sub kt
     $_="\t \r\n \n \t".chr(11)."\n";
 }
 {
+    local $Message = "Various whitespace special patterns";
     my @lb=( "\x0D\x0A",
              map { chr( $_ ) } ( 0x0A..0x0D,0x85,0x2028,0x2029 ));
     foreach my $t ([\@lb,qr/\R/,qr/\R+/],){
         my $ary=shift @$t;
         foreach my $pat (@$t) {
             foreach my $str (@$ary) {
-                ok($str=~/($pat)/);
-                iseq($1,$str);
+                ok($str=~/($pat)/,$pat);
+                iseq($1,$str,$pat);
             }
         }
     }
 }
 {
+    local $Message = "Check that \\xDF match properly in its various forms";
     # test that \xDF matches properly. this is pretty hacky stuff,
     # but its actually needed. the malarky with '-' is to prevent
     # compilation caching from playing any role in the test.
     my @df= (chr(0xDF),'-',chr(0xDF));
-    utf8::upgrade($df[2]);
     my @strs= ('ss','sS','Ss','SS',chr(0xDF));
-    my @ss= map { ("$_", "$_") } @strs;
-    utf8::upgrade($ss[$_*2+1]) for 0..$#strs;
+    my @ss= @strs;
 
     for my $ssi (0..$#ss) {
         for my $dfi (0..$#df) {
             my $pat= $df[$dfi];
             my $str= $ss[$ssi];
-            my $utf_df= ($dfi > 1) ? 'utf8' : '';
-            my $utf_ss= ($ssi % 2) ? 'utf8' : '';
             (my $sstr=$str)=~s/\xDF/\\xDF/;
 
-            if ($utf_df || $utf_ss || length($ss[$ssi])==1) {
-                my $ret= $str=~/$pat/i;
-                next if $pat eq '-';
-                ok($ret, 
-                    "\"$sstr\"=~/\\xDF/i (str is @{[$utf_ss||'latin']}, pat is @{[$utf_df||'latin']})");
-            } else {
-                my $ret= $str !~ /$pat/i;
-                next if $pat eq '-';
-                ok($ret, 
-                    "\"$sstr\"!~/\\xDF/i (str is @{[$utf_ss||'latin']}, pat is @{[$utf_df||'latin']})");
-            }
+            my $ret= $str=~/$pat/i;
+            next if $pat eq '-';
+            ok($ret,
+               "\"$sstr\"=~/\\xDF/i");
         }
     }
 }
@@ -4225,7 +4217,7 @@ ok($@=~/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1759;
+    $::TestCount = 1769;
     print "1..$::TestCount\n";
 }
 

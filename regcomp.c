@@ -3203,12 +3203,12 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		data->start_class->flags &= ~ANYOF_EOS;	/* No match on empty */
     	        if (flags & SCF_DO_STCLASS_AND) {
                     for (value = 0; value < 256; value++)
-                        if (!is_LNBREAK_cp(value))                   
+                        if (!is_LNBREAK_CP_cp(value))
                             ANYOF_BITMAP_CLEAR(data->start_class, value);  
                 }                                                              
                 else {                                                         
                     for (value = 0; value < 256; value++)
-                        if (is_LNBREAK_cp(value))                    
+                        if (is_LNBREAK_CP_cp(value))
                             ANYOF_BITMAP_SET(data->start_class, value);	   
                 }                                                              
                 if (flags & SCF_DO_STCLASS_OR)
@@ -4450,7 +4450,7 @@ reStudy:
 
 
 SV*
-Perl_reg_named_buff_get(pTHX_ const REGEXP * const rx, SV* namesv, U32 flags)
+Perl_reg_named_buff_get(pTHX_ REGEXP * const rx, SV * const namesv, const U32 flags)
 {
     AV *retarray = NULL;
     SV *ret;
@@ -4468,7 +4468,8 @@ Perl_reg_named_buff_get(pTHX_ const REGEXP * const rx, SV* namesv, U32 flags)
 			&& rx->offs[nums[i]].start != -1
 			&& rx->offs[nums[i]].end != -1)
                 {
-                    ret = CALLREG_NUMBUF(rx,nums[i],NULL);
+                    ret = newSVpvs("");
+                    CALLREG_NUMBUF(rx,nums[i],ret);
                     if (!retarray)
                         return ret;
                 } else {
@@ -4486,17 +4487,16 @@ Perl_reg_named_buff_get(pTHX_ const REGEXP * const rx, SV* namesv, U32 flags)
     return NULL;
 }
 
-SV*
-Perl_reg_numbered_buff_get(pTHX_ const REGEXP * const rx, I32 paren, SV* usesv)
+void
+Perl_reg_numbered_buff_get(pTHX_ REGEXP * const rx, const I32 paren, SV * const sv)
 {
     char *s = NULL;
     I32 i = 0;
     I32 s1, t1;
-    SV *sv = usesv ? usesv : newSVpvs("");
         
     if (!rx->subbeg) {
         sv_setsv(sv,&PL_sv_undef);
-        return sv;
+        return;
     } 
     else               
     if (paren == -2 && rx->offs[0].start != -1) {
@@ -4520,7 +4520,7 @@ Perl_reg_numbered_buff_get(pTHX_ const REGEXP * const rx, I32 paren, SV* usesv)
         s = rx->subbeg + s1;
     } else {
         sv_setsv(sv,&PL_sv_undef);
-        return sv;
+        return;
     }          
     assert(rx->sublen >= (s - rx->subbeg) + i );
     if (i >= 0) {
@@ -4549,12 +4549,12 @@ Perl_reg_numbered_buff_get(pTHX_ const REGEXP * const rx, I32 paren, SV* usesv)
         }
     } else {
         sv_setsv(sv,&PL_sv_undef);
+        return;
     }
-    return sv;
 }
 
 SV*
-Perl_reg_qr_pkg(pTHX_ const REGEXP * const rx)
+Perl_reg_qr_package(pTHX_ REGEXP * const rx)
 {
 	PERL_UNUSED_ARG(rx);
 	return newSVpvs("Regexp");
@@ -8253,7 +8253,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 }
 
 SV *
-Perl_re_intuit_string(pTHX_ regexp *prog)
+Perl_re_intuit_string(pTHX_ REGEXP * const prog)
 {				/* Assume that RE_INTUIT is set */
     dVAR;
     GET_RE_DEBUG_FLAGS_DECL;
@@ -8606,7 +8606,7 @@ Perl_re_dup(pTHX_ const regexp *r, CLONE_PARAMS *param)
 */
 
 void *
-Perl_regdupe_internal(pTHX_ const regexp *r, CLONE_PARAMS *param)
+Perl_regdupe_internal(pTHX_ REGEXP * const r, CLONE_PARAMS *param)
 {
     dVAR;
     regexp_internal *reti;

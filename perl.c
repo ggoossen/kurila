@@ -1071,6 +1071,8 @@ perl_destruct(pTHXx)
     SvREFCNT_dec(PL_errors);
     PL_errors = NULL;
 
+    SvREFCNT_dec(PL_isarev);
+
     FREETMPS;
     if (destruct_level >= 2 && ckWARN_d(WARN_INTERNAL)) {
 	if (PL_scopestack_ix != 0)
@@ -2150,6 +2152,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     CvUNIQUE_on(PL_compcv);
 
     CvPADLIST(PL_compcv) = pad_new(0);
+
+    PL_isarev = newHV();
 
     boot_core_PerlIO();
     boot_core_UNIVERSAL();

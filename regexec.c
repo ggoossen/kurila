@@ -310,7 +310,7 @@ S_regcppop(pTHX_ const regexp *rex)
  - pregexec - match a regexp against a string
  */
 I32
-Perl_pregexec(pTHX_ register regexp *prog, char *stringarg, register char *strend,
+Perl_pregexec(pTHX_ REGEXP * const prog, char* stringarg, register char *strend,
 	 char *strbeg, I32 minend, SV *screamer, U32 nosave)
 /* strend: pointer to null at end of string */
 /* strbeg: real beginning of string */
@@ -374,7 +374,7 @@ Perl_pregexec(pTHX_ register regexp *prog, char *stringarg, register char *stren
    deleted from the finite automaton. */
 
 char *
-Perl_re_intuit_start(pTHX_ regexp *prog, SV *sv, char *strpos,
+Perl_re_intuit_start(pTHX_ REGEXP * const prog, SV *sv, char *strpos,
 		     char *strend, U32 flags, re_scream_pos_data *data)
 {
     dVAR;
@@ -1539,7 +1539,7 @@ S_swap_match_buff (pTHX_ regexp *prog) {
  - regexec_flags - match a regexp against a string
  */
 I32
-Perl_regexec_flags(pTHX_ register regexp *prog, char *stringarg, register char *strend,
+Perl_regexec_flags(pTHX_ REGEXP * const prog, char *stringarg, register char *strend,
 	      char *strbeg, I32 minend, SV *sv, void *data, U32 flags)
 /* strend: pointer to null at end of string */
 /* strbeg: real beginning of string */
@@ -4643,34 +4643,6 @@ NULL
             sayNO;
             /* NOTREACHED */
 #undef ST
-        case FOLDCHAR:
-            n = ARG(scan);
-            if (nextchr==n) {
-                locinput += UTF8SKIP(locinput);
-
-            } else {
-                /* This malarky is to handle LATIN SMALL LETTER SHARP S 
-                   properly. Sigh */
-                if (0xDF==n && (UTF||do_utf8) &&  
-                    toLOWER(locinput[0])=='s' && toLOWER(locinput[1])=='s') 
-                {
-                    locinput += 2;
-                } else if (do_utf8) {
-                    U8 tmpbuf1[UTF8_MAXBYTES_CASE+1];
-                    STRLEN tmplen1;
-                    U8 tmpbuf2[UTF8_MAXBYTES_CASE+1];
-                    STRLEN tmplen2;
-                    to_uni_fold(n, tmpbuf1, &tmplen1);
-                    to_utf8_fold(locinput, tmpbuf2, &tmplen2);    
-                    if (tmplen1!=tmplen2 || !strnEQ(tmpbuf1,tmpbuf2,tmplen1))
-                        sayNO;
-                    else 
-                        locinput += UTF8SKIP(locinput);
-                } else 
-                    sayNO;
-            } 
-            nextchr = UCHARAT(locinput);  
-            break;
         case LNBREAK:
             if ((n=is_LNBREAK(locinput,do_utf8))) {
                 locinput += n;
