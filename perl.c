@@ -258,43 +258,38 @@ perl_construct(pTHXx)
    if (PL_perl_destruct_level > 0)
        init_interp();
 #endif
-   /* Init the real globals (and main thread)? */
-    if (!PL_linestr) {
-	PL_curcop = &PL_compiling;	/* needed by ckWARN, right away */
+    PL_curcop = &PL_compiling;	/* needed by ckWARN, right away */
 
-	PL_linestr = newSV_type(SVt_PVIV);
-	SvGROW(PL_linestr, 80);
+    PL_linestr = newSV_type(SVt_PVIV);
+    SvGROW(PL_linestr, 80);
 
-	if (!SvREADONLY(&PL_sv_undef)) {
-	    /* set read-only and try to insure than we wont see REFCNT==0
-	       very often */
+    /* set read-only and try to insure than we wont see REFCNT==0
+       very often */
 
-	    SvREADONLY_on(&PL_sv_undef);
-	    SvREFCNT(&PL_sv_undef) = (~(U32)0)/2;
+    SvREADONLY_on(&PL_sv_undef);
+    SvREFCNT(&PL_sv_undef) = (~(U32)0)/2;
 
-	    sv_setpv(&PL_sv_no,PL_No);
-	    /* value lookup in void context - happens to have the side effect
-	       of caching the numeric forms.  */
-	    SvIV(&PL_sv_no);
-	    SvNV(&PL_sv_no);
-	    SvREADONLY_on(&PL_sv_no);
-	    SvREFCNT(&PL_sv_no) = (~(U32)0)/2;
+    sv_setpv(&PL_sv_no,PL_No);
+    /* value lookup in void context - happens to have the side effect
+       of caching the numeric forms.  */
+    SvIV(&PL_sv_no);
+    SvNV(&PL_sv_no);
+    SvREADONLY_on(&PL_sv_no);
+    SvREFCNT(&PL_sv_no) = (~(U32)0)/2;
 
-	    sv_setpv(&PL_sv_yes,PL_Yes);
-	    SvIV(&PL_sv_yes);
-	    SvNV(&PL_sv_yes);
-	    SvREADONLY_on(&PL_sv_yes);
-	    SvREFCNT(&PL_sv_yes) = (~(U32)0)/2;
+    sv_setpv(&PL_sv_yes,PL_Yes);
+    SvIV(&PL_sv_yes);
+    SvNV(&PL_sv_yes);
+    SvREADONLY_on(&PL_sv_yes);
+    SvREFCNT(&PL_sv_yes) = (~(U32)0)/2;
 
-	    SvREADONLY_on(&PL_sv_placeholder);
-	    SvREFCNT(&PL_sv_placeholder) = (~(U32)0)/2;
-	}
+    SvREADONLY_on(&PL_sv_placeholder);
+    SvREFCNT(&PL_sv_placeholder) = (~(U32)0)/2;
 
-	PL_sighandlerp = (Sighandler_t) Perl_sighandler;
+    PL_sighandlerp = (Sighandler_t) Perl_sighandler;
 #ifdef PERL_USES_PL_PIDSTATUS
-	PL_pidstatus = newHV();
+    PL_pidstatus = newHV();
 #endif
-    }
 
     PL_rs = newSVpvs("\n");
 
@@ -1660,6 +1655,7 @@ STATIC void *
 S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 {
     dVAR;
+    PerlIO *tmpfp;
     int argc = PL_origargc;
     char **argv = PL_origargv;
     const char *scriptname = NULL;
@@ -1671,8 +1667,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #ifdef USE_SITECUSTOMIZE
     bool minus_f = FALSE;
 #endif
+    SV *linestr_sv = newSV_type(SVt_PVIV);
 
-    sv_setpvn(PL_linestr,"",0);
+    SvGROW(linestr_sv, 80);
+    sv_setpvn(linestr_sv,"",0);
+
     sv = newSVpvs("");		/* first used for -I flags */
     SAVEFREESV(sv);
     init_main_stash();
@@ -2116,7 +2115,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	const int fdscript
 	    = open_script(scriptname, dosearch, sv, &suidscript);
 
-	validate_suid(validarg, scriptname, fdscript, suidscript);
+	validate_suid(validarg, scriptname, fdscript, suidscript, linestr_sv);
 
 #ifndef PERL_MICRO
 #  if defined(SIGCHLD) || defined(SIGCLD)
@@ -2146,7 +2145,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    forbid_setid('x', suidscript);
 	    /* Hence you can't get here if suidscript >= 0  */
 
-	    find_beginning();
+	    find_beginning(linestr_sv);
 	    if (cddir && PerlDir_chdir( (char *)cddir ) < 0)
 		Perl_croak(aTHX_ "Can't chdir to %s",cddir);
 	}
@@ -2259,7 +2258,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 #endif
 
-    init_lexer();
+    tmpfp = PL_rsfp;
+    PL_rsfp = NULL;
+    lex_start(linestr_sv);
+    PL_rsfp = tmpfp;
+    PL_subname = newSVpvs("main");
 
     /* now parse the script */
 
@@ -3886,7 +3889,7 @@ S_fd_on_nosuid_fs(pTHX_ int fd)
 
 STATIC void
 S_validate_suid(pTHX_ const char *validarg, const char *scriptname,
-		int fdscript, int suidscript)
+		int fdscript, int suidscript, SV *linestr_sv)
 {
     dVAR;
 #ifdef IAMSUID
@@ -4026,9 +4029,9 @@ S_validate_suid(pTHX_ const char *validarg, const char *scriptname,
 	PL_doswitches = FALSE;		/* -s is insecure in suid */
 	/* PSz 13 Nov 03  But -s was caught elsewhere ... so unsetting it here is useless(?!) */
 	CopLINE_inc(PL_curcop);
-	if (sv_gets(PL_linestr, PL_rsfp, 0) == NULL)
+	if (sv_gets(linestr_sv, PL_rsfp, 0) == NULL)
 	    Perl_croak(aTHX_ "No #! line");
-	linestr = SvPV_nolen_const(PL_linestr);
+	linestr = SvPV_nolen_const(linestr_sv);
 	/* required even on Sys V */
 	if (!*linestr || !linestr[1] || strnNE(linestr,"#!",2))
 	    Perl_croak(aTHX_ "No #! line");
@@ -4295,7 +4298,7 @@ FIX YOUR KERNEL, PUT A C WRAPPER AROUND THIS SCRIPT, OR USE -u AND UNDUMP!\n");
 }
 
 STATIC void
-S_find_beginning(pTHX)
+S_find_beginning(pTHX_ SV* linestr_sv)
 {
     dVAR;
     register char *s;
@@ -4310,7 +4313,7 @@ S_find_beginning(pTHX)
     /* Since the Mac OS does not honor #! arguments for us, we do it ourselves */
 
     while (PL_doextract || gMacPerl_AlwaysExtract) {
-	if ((s = sv_gets(PL_linestr, PL_rsfp, 0)) == NULL) {
+	if ((s = sv_gets(linestr_sv, PL_rsfp, 0)) == NULL) {
 	    if (!gMacPerl_AlwaysExtract)
 		Perl_croak(aTHX_ "No Perl script found in input\n");
 
@@ -4327,7 +4330,7 @@ S_find_beginning(pTHX)
 	}
 #else
     while (PL_doextract) {
-	if ((s = sv_gets(PL_linestr, PL_rsfp, 0)) == NULL)
+	if ((s = sv_gets(linestr_sv, PL_rsfp, 0)) == NULL)
 	    Perl_croak(aTHX_ "No Perl script found in input\n");
 #endif
 	s2 = s;
@@ -4564,17 +4567,6 @@ S_nuke_stacks(pTHX)
     Safefree(PL_savestack);
 }
 
-STATIC void
-S_init_lexer(pTHX)
-{
-    dVAR;
-    PerlIO *tmpfp;
-    tmpfp = PL_rsfp;
-    PL_rsfp = NULL;
-    lex_start(PL_linestr);
-    PL_rsfp = tmpfp;
-    PL_subname = newSVpvs("main");
-}
 
 STATIC void
 S_init_predump_symbols(pTHX)

@@ -127,15 +127,6 @@ PP(pp_sassign)
 	SV * const temp = left;
 	left = right; right = temp;
     }
-    else if (PL_op->op_private & OPpASSIGN_STATE) {
-	if (SvPADSTALE(right))
-	    SvPADSTALE_off(right);
-	else {
-	    (void)POPs;
-	    PUSHs(right);
-	    RETURN; /* ignore assignment */
-	}
-    }
     if (PL_tainting && PL_tainted && !SvTAINTED(left))
 	TAINT_NOT;
     if (PL_op->op_private & OPpASSIGN_CV_TO_GV) {
@@ -418,12 +409,13 @@ PP(pp_defined)
 		--SP;
             RETURNOP(cLOGOP->op_other);
         }
-    } else if (op_type == OP_DEFINED) {
+    }
+    else {
+	/* OP_DEFINED */
         sv = POPs;
         if (!sv || !SvANY(sv))
             RETPUSHNO;
-    } else
-        DIE(aTHX_ "panic:  Invalid op (%s) in pp_defined()", OP_NAME(PL_op));
+    }
 
     defined = FALSE;
     switch (SvTYPE(sv)) {
@@ -949,13 +941,6 @@ PP(pp_aassign)
     int magic;
     int duplicates = 0;
     SV **firsthashrelem = NULL;	/* "= 0" keeps gcc 2.95 quiet  */
-
-    if (PL_op->op_private & OPpASSIGN_STATE) {
-	if (SvPADSTALE(*firstlelem))
-	    SvPADSTALE_off(*firstlelem);
-	else
-	    RETURN; /* ignore assignment */
-    }
 
     PL_delaymagic = DM_DELAY;		/* catch simultaneous items */
     gimme = GIMME_V;
