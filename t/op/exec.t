@@ -1,6 +1,6 @@
 #!./perl
 
-BEGIN: {
+BEGIN {
     require './test.pl';
 }
 
