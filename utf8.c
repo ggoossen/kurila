@@ -1718,7 +1718,8 @@ Perl_swash_fetch(pTHX_ SV *swash, const U8 *ptr, bool do_utf8)
 	}
 
 	PL_last_swash_hv = hv;
-	PL_last_swash_klen = klen;
+	assert(klen <= sizeof(PL_last_swash_key));
+	PL_last_swash_klen = (U8)klen;
 	/* FIXME change interpvar.h?  */
 	PL_last_swash_tmps = (U8 *) tmps;
 	PL_last_swash_slen = slen;

@@ -362,8 +362,6 @@ END_EXTERN_C
 #define PL_lineary		(*Perl_Ilineary_ptr(aTHX))
 #undef  PL_linestart
 #define PL_linestart		(*Perl_Ilinestart_ptr(aTHX))
-#undef  PL_linestr
-#define PL_linestr		(*Perl_Ilinestr_ptr(aTHX))
 #undef  PL_localpatches
 #define PL_localpatches		(*Perl_Ilocalpatches_ptr(aTHX))
 #undef  PL_lockhook
@@ -634,8 +632,6 @@ END_EXTERN_C
 #define PL_utf8cache		(*Perl_Iutf8cache_ptr(aTHX))
 #undef  PL_utf8locale
 #define PL_utf8locale		(*Perl_Iutf8locale_ptr(aTHX))
-#undef  PL_uudmap
-#define PL_uudmap		(*Perl_Iuudmap_ptr(aTHX))
 #undef  PL_warnhook
 #define PL_warnhook		(*Perl_Iwarnhook_ptr(aTHX))
 #undef  PL_xmlfp

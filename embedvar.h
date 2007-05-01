@@ -239,7 +239,6 @@
 #define PL_lex_state		(vTHX->Ilex_state)
 #define PL_lineary		(vTHX->Ilineary)
 #define PL_linestart		(vTHX->Ilinestart)
-#define PL_linestr		(vTHX->Ilinestr)
 #define PL_localpatches		(vTHX->Ilocalpatches)
 #define PL_lockhook		(vTHX->Ilockhook)
 #define PL_madskills		(vTHX->Imadskills)
@@ -375,7 +374,6 @@
 #define PL_utf8_xdigit		(vTHX->Iutf8_xdigit)
 #define PL_utf8cache		(vTHX->Iutf8cache)
 #define PL_utf8locale		(vTHX->Iutf8locale)
-#define PL_uudmap		(vTHX->Iuudmap)
 #define PL_warnhook		(vTHX->Iwarnhook)
 #define PL_xmlfp		(vTHX->Ixmlfp)
 
@@ -505,7 +503,6 @@
 #define PL_Ilex_state		PL_lex_state
 #define PL_Ilineary		PL_lineary
 #define PL_Ilinestart		PL_linestart
-#define PL_Ilinestr		PL_linestr
 #define PL_Ilocalpatches	PL_localpatches
 #define PL_Ilockhook		PL_lockhook
 #define PL_Imadskills		PL_madskills
@@ -641,7 +638,6 @@
 #define PL_Iutf8_xdigit		PL_utf8_xdigit
 #define PL_Iutf8cache		PL_utf8cache
 #define PL_Iutf8locale		PL_utf8locale
-#define PL_Iuudmap		PL_uudmap
 #define PL_Iwarnhook		PL_warnhook
 #define PL_Ixmlfp		PL_xmlfp
 

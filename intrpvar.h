@@ -300,7 +300,6 @@ PERLVARA(Inexttype,5,	I32)		/* type of next token */
 PERLVAR(Inexttoke,	I32)
 #endif
 
-PERLVAR(Ilinestr,	SV *)
 PERLVAR(Ibufptr,	char *)
 PERLVAR(Ioldbufptr,	char *)
 PERLVAR(Ioldoldbufptr,	char *)
@@ -392,7 +391,6 @@ PERLVARI(Iglob_index,	int,	0)
 
 PERLVAR(Iparser,	yy_parser *)	/* current parser state */
 
-PERLVARA(Iuudmap,256,	char)
 PERLVAR(Ibitcount,	char *)
 
 PERLVAR(Ipsig_ptr, SV**)
