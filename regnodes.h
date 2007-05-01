@@ -6,8 +6,8 @@
 
 /* Regops and State definitions */
 
-#define REGNODE_MAX           	75
-#define REGMATCH_STATE_MAX    	115
+#define REGNODE_MAX           	76
+#define REGMATCH_STATE_MAX    	116
 
 #define	END                   	0	/* 0000 End of program. */
 #define	SUCCEED               	1	/* 0x01 Return from a subroutine, basically. */
@@ -83,8 +83,9 @@
 #define	CUTGROUP              	71	/* 0x47 On failure go to the next alternation in the group */
 #define	KEEPS                 	72	/* 0x48 $& begins here. */
 #define	LNBREAK               	73	/* 0x49 generic newline pattern */
-#define	OPTIMIZED             	74	/* 0x4a Placeholder for dump. */
-#define	PSEUDO                	75	/* 0x4b Pseudo opcode for internal use. */
+#define	FOLDCHAR              	74	/* 0x4a codepoint with tricky case folding properties. */
+#define	OPTIMIZED             	75	/* 0x4b Placeholder for dump. */
+#define	PSEUDO                	76	/* 0x4c Pseudo opcode for internal use. */
 	/* ------------ States ------------- */
 #define	TRIE_next             	(REGNODE_MAX + 1)	/* state for TRIE */
 #define	TRIE_next_fail        	(REGNODE_MAX + 2)	/* state for TRIE */
@@ -207,6 +208,7 @@ EXTCONST U8 PL_regkind[] = {
 	VERB,     	/* CUTGROUP               */
 	KEEPS,    	/* KEEPS                  */
 	LNBREAK,  	/* LNBREAK                */
+	FOLDCHAR, 	/* FOLDCHAR               */
 	NOTHING,  	/* OPTIMIZED              */
 	PSEUDO,   	/* PSEUDO                 */
 	/* ------------ States ------------- */
@@ -331,6 +333,7 @@ static const U8 regarglen[] = {
 	EXTRA_SIZE(struct regnode_1),        	/* CUTGROUP     */
 	0,                                   	/* KEEPS        */
 	0,                                   	/* LNBREAK      */
+	EXTRA_SIZE(struct regnode_1),        	/* FOLDCHAR     */
 	0,                                   	/* OPTIMIZED    */
 	0,                                   	/* PSEUDO       */
 };
@@ -412,6 +415,7 @@ static const char reg_off_by_arg[] = {
 	0,	/* CUTGROUP     */
 	0,	/* KEEPS        */
 	0,	/* LNBREAK      */
+	0,	/* FOLDCHAR     */
 	0,	/* OPTIMIZED    */
 	0,	/* PSEUDO       */
 };
@@ -498,8 +502,9 @@ EXTCONST char * const PL_reg_name[] = {
 	"CUTGROUP",              	/* 0x47 */
 	"KEEPS",                 	/* 0x48 */
 	"LNBREAK",               	/* 0x49 */
-	"OPTIMIZED",             	/* 0x4a */
-	"PSEUDO",                	/* 0x4b */
+	"FOLDCHAR",              	/* 0x4a */
+	"OPTIMIZED",             	/* 0x4b */
+	"PSEUDO",                	/* 0x4c */
 	/* ------------ States ------------- */
 	"TRIE_next",             	/* REGNODE_MAX +0x01 */
 	"TRIE_next_fail",        	/* REGNODE_MAX +0x02 */

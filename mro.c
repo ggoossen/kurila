@@ -483,7 +483,10 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
         while((iter = hv_iternext(isarev))) {
             SV* revkey = hv_iterkeysv(iter);
             HV* revstash = gv_stashsv(revkey, 0);
-            struct mro_meta* revmeta = HvMROMETA(revstash);
+            struct mro_meta* revmeta;
+
+            if(!revstash) continue;
+            revmeta = HvMROMETA(revstash);
             SvREFCNT_dec((SV*)revmeta->mro_linear_dfs);
             SvREFCNT_dec((SV*)revmeta->mro_linear_c3);
             revmeta->mro_linear_dfs = NULL;
@@ -554,14 +557,14 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 /*
 =for apidoc mro_method_changed_in
 
-Like C<mro_isa_changed_in>, but invalidates method
-caching on any child classes of the given stash, so
-that they might notice the changes in this one.
+Invalidates method caching on any child classes
+of the given stash, so that they might notice
+the changes in this one.
 
 Ideally, all instances of C<PL_sub_generation++> in
-the perl source should be replaced by calls to this.
-Some already are, but some are more difficult to
-replace.
+the perl source outside of C<mro.c> should be
+replaced by calls to this.  This conversion is
+nearly complete.
 
 Perl has always had problems with method caches
 getting out of sync when one directly manipulates
@@ -597,7 +600,10 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
         while((iter = hv_iternext(isarev))) {
             SV* revkey = hv_iterkeysv(iter);
             HV* revstash = gv_stashsv(revkey, 0);
-            struct mro_meta* mrometa = HvMROMETA(revstash);
+            struct mro_meta* mrometa;
+
+            if(!revstash) continue;
+            mrometa = HvMROMETA(revstash);
             mrometa->sub_generation++;
             if(mrometa->mro_nextmethod)
                 hv_clear(mrometa->mro_nextmethod);

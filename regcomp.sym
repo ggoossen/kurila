@@ -178,6 +178,8 @@ KEEPS		KEEPS,  no	$& begins here.
 #*New charclass like patterns
 LNBREAK		LNBREAK,   none		generic newline pattern
 
+FOLDCHAR	FOLDCHAR,  codepoint 1	codepoint with tricky case folding properties.
+
 # NEW STUFF ABOVE THIS LINE  
 
 ################################################################################
