@@ -81,6 +81,7 @@ if (@ARGV) {
         push @tests, <io/*.t>;
         push @tests, <op/*.t>;
         push @tests, <uni/*.t>;
+        push @tests, <mro/*.t>;
         push @tests, <lib/*.t>;
         push @tests, <japh/*.t> if $torture;
 	push @tests, <win32/*.t> if $^O eq 'MSWin32';
@@ -117,6 +118,7 @@ if (@ARGV) {
 	} else {
 	    warn "$0: cannot open $mani: $!\n";
 	}
+	push @tests, <Module_Pluggable/*.t>;
 	push @tests, <pod/*.t>;
 	push @tests, <x2p/*.t>;
     }
