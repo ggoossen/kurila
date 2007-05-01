@@ -8,6 +8,11 @@
  */
 
 /*
+ * "Which order shall we go in?" said Frodo. "Eldest first, or quickest first?
+ *  You'll be last either way, Master Peregrin."
+ */
+
+/*
 =head1 MRO Functions
 
 These functions are related to the method resolution order of perl classes
@@ -21,14 +26,14 @@ These functions are related to the method resolution order of perl classes
 struct mro_meta*
 Perl_mro_meta_init(pTHX_ HV* stash)
 {
-    void* newmeta;
+    struct mro_meta* newmeta;
 
     assert(stash);
     assert(HvAUX(stash));
     assert(!(HvAUX(stash)->xhv_mro_meta));
-    Newxz(newmeta, sizeof(struct mro_meta), char);
-    HvAUX(stash)->xhv_mro_meta = (struct mro_meta*)newmeta;
-    ((struct mro_meta*)newmeta)->sub_generation = 1;
+    Newxz(newmeta, 1, struct mro_meta);
+    HvAUX(stash)->xhv_mro_meta = newmeta;
+    newmeta->sub_generation = 1;
 
     /* Manually flag UNIVERSAL as being universal.
        This happens early in perl booting (when universal.c
@@ -49,13 +54,11 @@ Perl_mro_meta_init(pTHX_ HV* stash)
 struct mro_meta*
 Perl_mro_meta_dup(pTHX_ struct mro_meta* smeta, CLONE_PARAMS* param)
 {
-    void* newmeta_void;
     struct mro_meta* newmeta;
 
     assert(smeta);
 
-    Newx(newmeta_void, sizeof(struct mro_meta), char);
-    newmeta = (struct mro_meta*)newmeta_void;
+    Newxz(newmeta, 1, struct mro_meta);
 
     newmeta->mro_which       = smeta->mro_which;
     newmeta->sub_generation  = smeta->sub_generation;
@@ -334,7 +337,7 @@ Perl_mro_get_linear_isa(pTHX_ HV *stash)
     } else if(meta->mro_which == MRO_C3) {
         return mro_get_linear_isa_c3(stash, 0);
     } else {
-        Perl_croak(aTHX_ "Internal error: invalid MRO!");
+        Perl_croak(aTHX_ "panic: invalid MRO!");
     }
 }
 
@@ -651,8 +654,8 @@ __nextcan(pTHX_ SV* self, I32 throw_nomethod)
             curstash = gv_stashsv(linear_sv, FALSE);
 
             if (!curstash || (HvMROMETA(curstash)->fake && !HvFILL(curstash))) {
-                if (ckWARN(WARN_MISC))
-                    Perl_warner(aTHX_ packWARN(WARN_MISC), "Can't locate package %"SVf" for @%s::ISA",
+                if (ckWARN(WARN_SYNTAX))
+                    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), "Can't locate package %"SVf" for @%s::ISA",
                         (void*)linear_sv, hvname);
                 continue;
             }
@@ -864,9 +867,10 @@ XS(XS_mro_is_universal)
     class_stash = gv_stashsv(classname, 0);
     if(!class_stash) Perl_croak(aTHX_ "No such class: '%"SVf"'!", SVfARG(classname));
 
-    HvMROMETA(class_stash)->is_universal
-        ? XSRETURN_YES
-        : XSRETURN_NO;
+    if (HvMROMETA(class_stash)->is_universal)
+        XSRETURN_YES;
+    else
+        XSRETURN_NO;
 }
 
 XS(XS_mro_get_global_sub_generation)
