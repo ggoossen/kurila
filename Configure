@@ -4159,34 +4159,8 @@ EOM
         esac
     fi
     use5005threads="$undef"
-<<<<<<< HEAD/Configure
-    case "$usethreads" in
-    $define)
-	: Default to ithreads unless overridden on command line or with
-	: old config.sh
-	dflt='y'
-	case "$useithreads" in
-		$undef|false|[nN]*) dflt='n';;
-	esac
-	rp='Use the newer interpreter-based ithreads?'
-	. ./myread
-	case "$ans" in
-	y|Y)    val="$define" ;;
-	*)      val="$undef" ;;
-	esac
-	set useithreads
-	eval $setvar
-	;;
-    *)
-	useithreads="$undef"
-	;;
-    esac
-
-=======
     useithreads="$usethreads"
-fi
 
->>>>>>> 386b65bd85d6abb04d65ad6a494a00425ba2f9a1/Configure
 if test X"$usethreads" = "X$define" -a "X$useperlio" = "Xundef"; then
 	cat >&4 <<EOF
 ***
