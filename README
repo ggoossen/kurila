@@ -1,52 +1,43 @@
-Perl is Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
-2002, 2003, 2004, 2005, 2006 by Larry Wall and others.  All rights reserved.
+kurila is Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
+2002, 2003, 2004, 2005, 2006, 2007 by Larry Wall and others.  All rights reserved.
 
 
 
-ABOUT PERL
-==========
+ABOUT KURILA
+============
 
-Perl is a general-purpose programming language originally developed for
-text manipulation and now used for a wide range of tasks including
-system administration, web development, network programming, GUI
-development, and more.
+Perl Kurila is a dialect of Perl. It can work besides Perl 5.
 
-The language is intended to be practical (easy to use, efficient,
-complete) rather than beautiful (tiny, elegant, minimal).  Its major
-features are that it's easy to use, supports both procedural and
-object-oriented (OO) programming, has powerful built-in support for text
-processing, and has one of the world's most impressive collections of
-third-party modules.
+With Perl 5 as ancestor it has a solid base, but without the backwards
+compatibility requirement of Perl 5, it is free to evolve into new
+directions.
 
-For an introduction to the language's features, see pod/perlintro.pod.
-
-There are also many Perl books available, covering a wide variety of topics,
-from various publishers.  See pod/perlbook.pod for more information.
+For a longer explanation of Perl Kurila, see pod/kurilaintro.pod.
 
 
 INSTALLATION
 ============
 
 If you're using a relatively modern operating system and want to
-install this version of Perl locally, run the following commands:
+install this version of kurila locally, run the following commands:
 
-  ./Configure -des -Dprefix=$HOME/localperl
+  ./Configure -des -Dprefix=$HOME/localkurila
   make test
   make install
 
 This will configure and compile perl for your platform, run the regression
-tests, and install perl in a subdirectory "localperl" of your home directory.
+tests, and install perl in a subdirectory "localkurila" of your home directory.
 
 If you run into any trouble whatsoever or you need to install a customized
-version of Perl, you should read the detailed instructions in the "INSTALL"
+version of kurila, you should read the detailed instructions in the "INSTALL"
 file that came with this distribution.  Additionally, there are a number of
 "README" files with hints and tips about building and using Perl on a wide
 variety of platforms, some more common than others.
 
-Once you have Perl installed, a wealth of documentation is available to you
-through the 'perldoc' tool.  To get started, run this command:
+Once you have kurila installed, a wealth of documentation is available to you
+through the 'perldockurila' tool.  To get started, run this command:
 
-  perldoc perl
+  perldockurila perl
 
 
 IF YOU RUN INTO TROUBLE
