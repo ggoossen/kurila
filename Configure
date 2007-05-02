@@ -4147,7 +4147,19 @@ eval $setvar
 
 : perl-5.9.x and later
 
+    if test X"$usethreads" = "X$define"; then
+        case "$use5005threads" in
+            $define|true|[yY]*)
+                $cat >&4 <<EOM
+
+5.005 threads has been removed for 5.10.  Perl will be built using ithreads.
+
+EOM
+            ;;
+        esac
+    fi
     use5005threads="$undef"
+<<<<<<< HEAD/Configure
     case "$usethreads" in
     $define)
 	: Default to ithreads unless overridden on command line or with
@@ -4170,6 +4182,11 @@ eval $setvar
 	;;
     esac
 
+=======
+    useithreads="$usethreads"
+fi
+
+>>>>>>> 386b65bd85d6abb04d65ad6a494a00425ba2f9a1/Configure
 if test X"$usethreads" = "X$define" -a "X$useperlio" = "Xundef"; then
 	cat >&4 <<EOF
 ***
@@ -21051,8 +21068,8 @@ for xxx in $known_extensions ; do
 	Thread|thread)
                 case "$usethreads" in
                 true|$define|y)
-                        case "$useithreads" in
-                        $undef|false|[nN]*) avail_ext="$avail_ext $xxx" ;;
+                        case "$use5005threads" in
+                            $define|true|[yY]*) avail_ext="$avail_ext $xxx" ;;
                         esac
 		esac
 		;;
