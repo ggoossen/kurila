@@ -39,7 +39,7 @@ open my $fh, ">$file" or die "Can't open $file: $!";
 
 print $fh <<"EOI";
 name: kurila
-version: 0.1
+version: 0.2
 abstract: a geneticly modified perl
 author: ~
 license: perl
