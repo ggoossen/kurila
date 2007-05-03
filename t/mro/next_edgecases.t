@@ -77,6 +77,6 @@ require q(./test.pl); plan(tests => 11);
         }
 
         eval { $baz->bar() };
-        ok($@, '... calling bar() with next::method failed') || diag $@;
+        ok($@, '... calling bar() with next::method failed') || diag($@);
     }    
 }
