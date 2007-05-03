@@ -1899,24 +1899,6 @@ S_amagic_cmp(pTHX_ register SV *str1, register SV *str2)
     return sv_cmp(str1, str2);
 }
 
-static I32
-S_amagic_cmp_locale(pTHX_ register SV *str1, register SV *str2)
-{
-    dVAR;
-    SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp);
-    if (tmpsv) {
-        if (SvIOK(tmpsv)) {
-            const I32 i = SvIVX(tmpsv);
-            return SORT_NORMAL_RETURN_VALUE(i);
-        }
-	else {
-	    const NV d = SvNV(tmpsv);
-	    return SORT_NORMAL_RETURN_VALUE(d);
-	}
-    }
-    return sv_cmp_locale(str1, str2);
-}
-
 /*
  * Local variables:
  * c-indentation-style: bsd
