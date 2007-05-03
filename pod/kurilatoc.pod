@@ -4284,7 +4284,7 @@ X<CLONE> X<CLONE_SKIP> X<thread> X<threads> X<ithread>
 assertions, assertions::activate, assertions::compat, attributes, attrs,
 autouse, base, bigint, bignum, bigrat, blib, bytes, charnames, constant,
 diagnostics, encoding, feature, fields, filetest, if, integer, less, lib,
-open, ops, overload, re, sigtrap, sort, strict, subs, threads,
+mro, open, ops, overload, re, sigtrap, sort, strict, subs, threads,
 threads::shared, utf8, vars, version, vmsish, warnings, warnings::register
 
 =item Standard Modules
@@ -4302,20 +4302,20 @@ Devel::InnerPackage, Devel::Peek, Devel::SelfStubber, Digest, Digest::MD5,
 Digest::SHA, Digest::base, Digest::file, DirHandle, Dumpvalue, DynaLoader,
 Encode, Encode::Alias, Encode::Byte, Encode::CJKConstants, Encode::CN,
 Encode::CN::HZ, Encode::Config, Encode::EBCDIC, Encode::Encoder,
-Encode::Encoding, Encode::Guess, Encode::JP, Encode::JP::H2Z,
-Encode::JP::JIS7, Encode::KR, Encode::KR::2022_KR, Encode::MIME::Header,
-Encode::PerlIO, Encode::Supported, Encode::Symbol, Encode::TW,
-Encode::Unicode, Encode::Unicode::UTF7, English, Env, Errno, Exporter,
-Exporter::Heavy, ExtUtils::CBuilder, ExtUtils::CBuilder::Platform::Windows,
-ExtUtils::Command, ExtUtils::Command::MM, ExtUtils::Constant,
-ExtUtils::Constant::Base, ExtUtils::Constant::Utils,
-ExtUtils::Constant::XS, ExtUtils::Embed, ExtUtils::Install,
-ExtUtils::Installed, ExtUtils::Liblist, ExtUtils::MM, ExtUtils::MM_AIX,
-ExtUtils::MM_Any, ExtUtils::MM_BeOS, ExtUtils::MM_Cygwin, ExtUtils::MM_DOS,
-ExtUtils::MM_MacOS, ExtUtils::MM_NW5, ExtUtils::MM_OS2, ExtUtils::MM_QNX,
-ExtUtils::MM_UWIN, ExtUtils::MM_Unix, ExtUtils::MM_VMS, ExtUtils::MM_VOS,
-ExtUtils::MM_Win32, ExtUtils::MM_Win95, ExtUtils::MY, ExtUtils::MakeMaker,
-ExtUtils::MakeMaker::Config, ExtUtils::MakeMaker::FAQ,
+Encode::Encoding, Encode::GSM0338, Encode::Guess, Encode::JP,
+Encode::JP::H2Z, Encode::JP::JIS7, Encode::KR, Encode::KR::2022_KR,
+Encode::MIME::Header, Encode::PerlIO, Encode::Supported, Encode::Symbol,
+Encode::TW, Encode::Unicode, Encode::Unicode::UTF7, English, Env, Errno,
+Exporter, Exporter::Heavy, ExtUtils::CBuilder,
+ExtUtils::CBuilder::Platform::Windows, ExtUtils::Command,
+ExtUtils::Command::MM, ExtUtils::Constant, ExtUtils::Constant::Base,
+ExtUtils::Constant::Utils, ExtUtils::Constant::XS, ExtUtils::Embed,
+ExtUtils::Install, ExtUtils::Installed, ExtUtils::Liblist, ExtUtils::MM,
+ExtUtils::MM_AIX, ExtUtils::MM_Any, ExtUtils::MM_BeOS, ExtUtils::MM_Cygwin,
+ExtUtils::MM_DOS, ExtUtils::MM_MacOS, ExtUtils::MM_NW5, ExtUtils::MM_OS2,
+ExtUtils::MM_QNX, ExtUtils::MM_UWIN, ExtUtils::MM_Unix, ExtUtils::MM_VMS,
+ExtUtils::MM_VOS, ExtUtils::MM_Win32, ExtUtils::MM_Win95, ExtUtils::MY,
+ExtUtils::MakeMaker, ExtUtils::MakeMaker::Config, ExtUtils::MakeMaker::FAQ,
 ExtUtils::MakeMaker::Tutorial, ExtUtils::MakeMaker::bytes,
 ExtUtils::MakeMaker::vmsish, ExtUtils::Manifest, ExtUtils::Mkbootstrap,
 ExtUtils::Mksymlists, ExtUtils::Packlist, ExtUtils::ParseXS,
@@ -6557,6 +6557,40 @@ formline keywords. Slightly modified as not to depend on Perl6::Export
 =item Deleted Modules and Pragmata
 
 locale, the locale pramga has been removed
+
+=back
+
+=item KNOWN BUGS
+
+=over 4
+
+=item Documentation
+
+=item Limited platform support
+
+=back
+
+=item SEE ALSO
+
+=item HISTORY
+
+=back
+
+=head2 kurila02delta - what is new for Perl Kurila 0.2
+
+=over 4
+
+=item DESCRIPTION
+
+=item Highlights In Kurila 0.2
+
+=item Core Enhancements
+
+=over 4
+
+=item Claim to be kurila on more places
+
+=item Internal bleadperl changes
 
 =back
 

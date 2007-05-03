@@ -139,6 +139,10 @@ Request less of something
 
 Manipulate @INC at compile time
 
+=item mro
+
+Method Resolution Order
+
 =item open
 
 Set default PerlIO layers for input and output
@@ -496,6 +500,10 @@ Object Oriented Encoder
 =item Encode::Encoding
 
 Encode Implementation Base Class
+
+=item Encode::GSM0338
+
+ESTI GSM 03.38 Encoding
 
 =item Encode::Guess
 
