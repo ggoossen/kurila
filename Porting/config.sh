@@ -731,13 +731,8 @@ intsize='4'
 issymlink='/usr/bin/test -h'
 ivdformat='"ld"'
 ivsize='8'
-<<<<<<< HEAD/Porting/config.sh
 ivtype='long'
 known_extensions='attrs B Compress/Raw/Zlib Cwd Data/Dumper DB_File Devel/DProf Devel/Peek Devel/PPPort Digest/MD5 Digest/SHA Encode Fcntl File/Glob GDBM_File Hash/Util I18N/Langinfo IO IPC/SysV List/Util Math/BigInt/FastCalc MIME/Base64 NDBM_File ODBM_File Opcode PerlIO/encoding PerlIO/scalar PerlIO/via POSIX re SDBM_File Socket Storable Sys/Hostname Sys/Syslog Text/Soundex Thread threads Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File Win32CORE XS/APItest XS/Typemap threads/shared'
-=======
-ivtype='long long'
-known_extensions='attrs B Compress/Raw/Zlib Cwd Data/Dumper DB_File Devel/DProf Devel/Peek Devel/PPPort Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call GDBM_File Hash/Util I18N/Langinfo IO IPC/SysV List/Util Math/BigInt/FastCalc MIME/Base64 NDBM_File ODBM_File Opcode PerlIO/encoding PerlIO/scalar PerlIO/via POSIX re SDBM_File Socket Storable Sys/Hostname Sys/Syslog Text/Soundex threads Time/HiRes Unicode/Normalize XS/APItest XS/Typemap threads/shared'
->>>>>>> 386b65bd85d6abb04d65ad6a494a00425ba2f9a1/Porting/config.sh
 ksh=''
 ld='cc'
 lddlflags='-shared -O2 -L/usr/local/lib'
