@@ -4,7 +4,7 @@ abstract: a geneticly modified perl
 author: ~
 license: perl
 distribution_type: core
-private:
+no_index:
   directory:
     - ext/Compress/Zlib
     - ext/Cwd
@@ -273,6 +273,9 @@ private:
     - lib/Time/Local.pm
     - lib/Time/Local.t
     - lib/Unicode/Collate.pm
+    - lib/version.pm
+    - lib/version.pod
+    - lib/version.t
     - pod/pod2man.PL
     - pod/pod2text.PL
     - pod/pod2usage.PL

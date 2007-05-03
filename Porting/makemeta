@@ -44,7 +44,7 @@ abstract: a geneticly modified perl
 author: ~
 license: perl
 distribution_type: core
-private:
+no_index:
   directory:
 $dirs
   file:
