@@ -27,7 +27,7 @@ For ease of access, the Perl manual has been split up into several sections.
 
     perl		Perl overview (this section)
     perlintro		Perl introduction for beginners
-    perltoc		Perl documentation table of contents
+    kurilatoc		Kurila documentation table of contents
 
 =head2 Tutorials
 

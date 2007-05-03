@@ -118,7 +118,7 @@ POD = \
 	perlsyn.pod	\
 	perlthrtut.pod	\
 	perltie.pod	\
-	perltoc.pod	\
+	kurilatoc.pod	\
 	perltodo.pod	\
 	perltooc.pod	\
 	perltoot.pod	\
@@ -236,7 +236,7 @@ MAN = \
 	perlsyn.man	\
 	perlthrtut.man	\
 	perltie.man	\
-	perltoc.man	\
+	kurilatoc.man	\
 	perltodo.man	\
 	perltooc.man	\
 	perltoot.man	\
@@ -366,7 +366,7 @@ HTML = \
 	perlvar.html	\
 	perlxs.html	\
 	perlxstut.html	
-# not perltoc.html
+# not kurilatoc.html
 
 TEX = \
 	perl.tex	\
@@ -472,7 +472,7 @@ TEX = \
 	perlsyn.tex	\
 	perlthrtut.tex	\
 	perltie.tex	\
-	perltoc.tex	\
+	kurilatoc.tex	\
 	perltodo.tex	\
 	perltooc.tex	\
 	perltoot.tex	\
@@ -493,7 +493,7 @@ html:	pod2html $(HTML)
 tex:	pod2latex $(TEX)
 
 toc:
-	$(PERL) -I../lib buildtoc >perltoc.pod
+	$(PERL) -I../lib buildtoc >kurilatoc.pod
 
 .SUFFIXES: .pm .pod
 

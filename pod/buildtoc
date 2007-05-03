@@ -22,7 +22,7 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst");
 
 %Targets
   = (
-     toc => "perltoc.pod",
+     toc => "kurilatoc.pod",
      manifest => File::Spec->catdir($Up, "MANIFEST"),
      perlpod => "perl.pod",
      vms => File::Spec->catdir($Up, "vms", "descrip_mms.template"),
@@ -285,8 +285,8 @@ sub path2modname {
 
 sub output ($);
 
-sub output_perltoc {
-  open(OUT, ">perltoc.pod") || die "$0: creating perltoc.pod failed: $!";
+sub output_kurilatoc {
+  open(OUT, ">kurilatoc.pod") || die "$0: creating kurilatoc.pod failed: $!";
 
   local $/ = '';
 
@@ -298,11 +298,11 @@ sub output_perltoc {
 
 	=head1 NAME
 
-	perltoc - perl documentation table of contents
+	kurilatoc - kurila documentation table of contents
 
 	=head1 DESCRIPTION
 
-	This page provides a brief table of contents for the rest of the Perl
+	This page provides a brief table of contents for the rest of the Perl Kurila
 	documentation set.  It is meant to be scanned quickly or grepped
 	through to locate the proper section you're looking for.
 
@@ -365,7 +365,7 @@ EOPOD2B
   output "\n";                    # flush $LINE
 }
 
-# Below are all the auxiliary routines for generating perltoc.pod
+# Below are all the auxiliary routines for generating kurilatoc.pod
 
 my ($inhead1, $inhead2, $initem);
 
@@ -576,7 +576,7 @@ sub generate_pod_mak {
   my $line = join "\\\n", "\U$variable = ",
     map {"\t$_.$variable\t"} sort keys %Pods;
   # Special case
-  $line =~ s/.*perltoc.html.*\n//m;
+  $line =~ s/.*kurilatoc.html.*\n//m;
   $line;
 }
 
@@ -700,7 +700,7 @@ while (my ($target, $name) = each %Targets) {
   $built++;
   if ($target eq "toc") {
     print "Now processing $name\n" if $Verbose;
-    &output_perltoc;
+    &output_kurilatoc;
     print "Finished\n" if $Verbose;
     next;
   }

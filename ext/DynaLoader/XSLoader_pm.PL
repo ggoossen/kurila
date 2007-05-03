@@ -15,11 +15,7 @@ print OUT <<'EOT';
 
 package XSLoader;
 
-<<<<<<< HEAD/ext/DynaLoader/XSLoader_pm.PL
-our $VERSION = "0.07";
-=======
-$VERSION = "0.08";
->>>>>>> 386b65bd85d6abb04d65ad6a494a00425ba2f9a1/ext/DynaLoader/XSLoader_pm.PL
+our $VERSION = "0.08";
 
 #use strict;
 
