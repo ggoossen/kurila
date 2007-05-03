@@ -52,7 +52,7 @@ require q(./test.pl); plan(tests => 11);
 
         can_ok($bar, 'bar');
         my $value = eval { $bar->bar() };
-        ok(!$@, '... calling bar() succedded') || diag $@;
+        ok(!$@, '... calling bar() succedded') || diag($@);
         is($value, 'Foo::bar', '... got the right return value too');
     }
     
