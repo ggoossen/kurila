@@ -31,6 +31,7 @@ package Maintainers;
 	'jand'		=> 'Jan Dubois <jand@activestate.com>',
 	'jdhedden'	=> 'Jerry D. Hedden <jdhedden@cpan.org>',
 	'jhi'		=> 'Jarkko Hietaniemi <jhi@cpan.org>',
+	'jpeacock'	=> 'John Peacock <jpeacock@rowman.com>',
 	'jstowe'	=> 'Jonathan Stowe <jstowe@cpan.org>',
 	'jv'		=> 'Johan Vromans <jv@cpan.org>',
 	'kane'		=> 'Jos Boumans <kane@cpan.org>',
@@ -876,6 +877,12 @@ package Maintainers;
 		'MAINTAINER'	=> 'laun',
 		'FILES'		=> q[x2p/s2p.PL],
 		'CPAN'		=> 0,
+		},
+	'version' =>
+		{
+		'MAINTAINER'	=> 'jpeacock',
+		'FILES'		=> q[lib/version.pm lib/version.pod lib/version.t],
+		'CPAN'		=> 1,
 		},
 
 	);
