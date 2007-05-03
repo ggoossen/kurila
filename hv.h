@@ -42,8 +42,8 @@ struct shared_he {
 */
 
 typedef enum {
-    MRO_DFS, /* 0 */
-    MRO_C3   /* 1 */
+    MRO_C3,  /* 0 */
+    MRO_DFS  /* 1 */
 } mro_alg;
 
 struct mro_meta {
