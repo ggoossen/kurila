@@ -129,6 +129,7 @@ h Miscellaneous
   perldoc		Look up Perl documentation in Pod format
 
   kurila01delta         Perl Kurila changes in version 0.1
+  kurila02delta         Perl Kurila changes in version 0.2
   perlhist		Perl history records
 d perldelta		Perl changes since previous version
 D perl595delta		Perl changes in version 5.9.5
