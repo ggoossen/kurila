@@ -8092,15 +8092,7 @@ case "$man1dir" in
 ' ') dflt=none
 	;;
 '')
-	lookpath="$prefixexp/share/man/man1"
-	lookpath="$lookpath $prefixexp/man/man1 $prefixexp/man/l_man/man1"
-	lookpath="$lookpath $prefixexp/man/p_man/man1"
-	lookpath="$lookpath $prefixexp/man/u_man/man1"
-	lookpath="$lookpath $prefixexp/man/man.1"
-	case "$sysman" in
-	*/?_man*)	dflt=`./loc . $prefixexp/l_man/man1 $lookpath` ;;
-	*)	dflt=`./loc . $prefixexp/man/man1 $lookpath` ;;
-	esac
+        dflt="$privlib/man/man1"
 	set dflt
 	eval $prefixup
 	;;
