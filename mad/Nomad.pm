@@ -520,7 +520,7 @@ sub hash {
     for my $kid (@{$$self{Kids}}) {
 	my ($k,$v) = $kid->pair($self, @_);
 	$firstthing ||= $k;
-        $k .= 'x' while exists $hash{$k};
+        die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne "" and $hash{$k} ne $v;
         $lastthing = $k;
 	$hash{$k} = $v;
     }
