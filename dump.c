@@ -2473,6 +2473,83 @@ Perl_pmop_xmldump(pTHX_ const PMOP *pm)
     do_pmop_xmldump(0, PL_xmlfp, pm);
 }
 
+static struct { const char slot; const char* name; } const slotnames[] =
+{
+    { 'd', "defintion" },
+    { '{', "curly_open" },
+    { '}', "curly_close" },
+    { 'q', "quote_open" },
+    { 'Q', "quote_close" },
+    { '=', "assign" },
+    { 'X', "value" },
+    { 'g', "forcedword" },
+    { '^', "hat" },
+    { ';', "colon" },
+    { 'o', "operator" },
+    { '$', "variable" },
+    { '(', "round_open" },
+    { ')', "round_close" },
+    { 'U', "use" },
+    { '_', "wsbefore" },
+    { '#', "wsafter" },
+    { 'O', "replacedoperator" },
+    { 'A', "bigarrow" },
+    { 'a', "arrow" },
+    { '&', "ampersand" },
+    { 'n', "name" },
+    { 's', "sub" },
+    { ',', "comma" },
+    { 'p', "peg" },
+    { 'E', "evaluated" },
+    { 'z', "subst_open" },
+    { 'R', "subst_replacement" },
+    { 'Z', "subst_close" },
+    { 'k', "local" },
+    { 'e', "trans_something_e" },
+    { 'r', "trans_something_r" },
+    { '3', "arg_3" },
+    { '2', "arg_2" },
+    { '1', "arg_1" },
+    { 'L', "label" },
+    { 'm', "match" },
+    { 'D', "do" },
+    { 'f', "fold" },
+    { '@', "ary" },
+    { '%', "hsh" },
+    { 'I', "if" },
+    { 'C', "const" },
+    { 'i', "ifpost" },
+    { '?', "conditional_op" },
+    { 'w', "whilepost" },
+    { 'W', "while" },
+    { ':', "attribute" },
+    { '[', "square_open" },
+    { ']', "square_close" },
+    { '+', "unary_plus" },
+    { 'l', "arylen" },
+    { '*', "star" },
+    { 'v', "for" },
+    { 'P', "package" },
+    { 'V', "version" },
+    { 'S', "fakesub" },
+    { 'B', "block" },
+    { 'b', "unknown_b" },
+    { 'K', "key" },
+    { '~', "tilde" },
+    { 't', "something_t" },
+    { 'F', "format" },
+    { 0,   NULL }
+};
+char* slotname(char s) {
+    int i=0;
+    while (slotnames[i].slot != 0) {
+	if (slotnames[i].slot == s)
+	    return slotnames[i].name;
+	i++;
+    }
+    return NULL;
+}
+
 void
 Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 {
@@ -2829,10 +2906,16 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	while (mp) {
 	    char tmp = mp->mad_key;
 	    sv_setpvn(tmpsv,"\"",1);
-	    if (tmp)
-		sv_catxmlpvn(tmpsv, &tmp, 1, 0);
-	    if ((tmp == '_') || (tmp == '#')) /* '_' '#' whitespace belong to the previous token. */
-		sv_catxmlpvn(tmpsv, &prevkey, 1, 0);
+	    if (tmp) {
+		if (slotname(tmp))
+		    sv_catpv(tmpsv, slotname(tmp));
+		else
+		    Perl_croak(aTHX_ "open %c", tmp);
+	    }
+	    if ((tmp == '_') || (tmp == '#')) { /* '_' '#' whitespace belong to the previous token. */
+		sv_catpv(tmpsv, "-");
+		sv_catpv(tmpsv, slotname(prevkey));
+	    }
 	    else
 		prevkey = tmp;
 	    sv_catpv(tmpsv, "\"");
