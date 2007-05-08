@@ -440,8 +440,8 @@ sub newtype {
 sub madness {
     my $self = shift;
     my @keys = split(' ', shift);
-    @keys = map { $_ eq 'd' ? ('k', 'd') : $_ } @keys;
     my @vals = ();
+    @keys = map { $_ eq 'd' ? ('local', 'd') : $_ } @keys; # always 'local' before 'defintion'
     for my $key (@keys) {
 	my $madprop = $self->{mp}{$key};
 	next unless defined $madprop;
@@ -516,9 +516,80 @@ sub hash {
     my $firstthing = '';
     my $lastthing = '';
     
+    my %mapping = map { reverse(%$_) } (
+    { 'd', "defintion" },
+    { '{', "curly_open" },
+    { '}', "curly_close" },
+    { 'q', "quote_open" },
+    { 'Q', "quote_close" },
+    { '=', "assign" },
+    { 'X', "value" },
+    { 'g', "forcedword" },
+    { '^', "hat" },
+    { ';', "colon" },
+    { 'o', "operator" },
+    { '$', "variable" },
+    { '(', "round_open" },
+    { ')', "round_close" },
+    { 'U', "use" },
+    { '_', "wsbefore" },
+    { '#', "wsafter" },
+    { 'O', "replacedoperator" },
+    { 'A', "bigarrow" },
+    { 'a', "arrow" },
+    { '&', "ampersand" },
+    { 'n', "name" },
+    { 's', "sub" },
+    { ',', "comma" },
+    { 'p', "peg" },
+    { 'E', "evaluated" },
+    { 'z', "subst_open" },
+    { 'R', "subst_replacement" },
+    { 'Z', "subst_close" },
+    { 'e', "trans_something_e" },
+    { 'r', "trans_something_r" },
+    { '3', "arg_3" },
+    { '2', "arg_2" },
+    { '1', "arg_1" },
+    { 'L', "label" },
+    { 'm', "match" },
+    { 'D', "do" },
+    { 'f', "fold" },
+    { '@', "ary" },
+    { '%', "hsh" },
+    { 'I', "if" },
+    { 'C', "const" },
+    { 'i', "ifpost" },
+    { '?', "conditional_op" },
+    { 'w', "whilepost" },
+    { 'W', "while" },
+    { ':', "attribute" },
+    { '[', "square_open" },
+    { ']', "square_close" },
+    { '+', "unary_plus" },
+    { 'l', "arylen" },
+    { '*', "star" },
+    { 'v', "for" },
+    { 'P', "package" },
+    { 'V', "version" },
+    { 'S', "fakesub" },
+    { 'B', "block" },
+    { 'b', "unknown_b" },
+    { 'K', "key" },
+    { '~', "tilde" },
+    { 't', "something_t" },
+    { 'F', "format" },
+    );
+
     # We need to guarantee key uniqueness at this point.
     for my $kid (@{$$self{Kids}}) {
 	my ($k,$v) = $kid->pair($self, @_);
+        if ($k =~ m/^ws(before|after)-(.*)$/) {
+            $k = ($1 eq "before" ? '_' : '#') . ($mapping{$2} || $2);
+        }
+        else {
+            $k = $mapping{$k} || $k;
+        }
 	$firstthing ||= $k;
         die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne "" and $hash{$k} ne $v;
         $lastthing = $k;
@@ -1150,7 +1221,7 @@ BEGIN {
 	    else {
 		my $newself = $subkids[0];
 		splice(@{$newself->{Kids}}, 1, 0,
-			    $self->madness('ox ('),
+			    $self->madness('('),
 			    @newkids,
 			    $self->madness(')')
 		);
@@ -1889,10 +1960,6 @@ sub ast {
     my @newkids;
     my @front = $self->madness('q (');
     my @back = $self->madness(') Q');
-    my @M = $self->madness('M');
-    if (@M) {
-	push @newkids, $M[0], $self->madness('o');
-    }
     push @newkids, @front;
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
