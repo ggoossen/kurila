@@ -558,6 +558,13 @@ package Maintainers;
 		'CPAN'		=> 1,
 		},
 
+	'Perl6::Form' =>
+		{
+		'MAINTAINER'	=> 'dconway',
+		'FILES'		=> q[ext/Perl6-Form],
+		'CPAN'		=> 1,
+		},
+
 	'perlebcdic' =>
 		{
 		'MAINTAINER'	=> 'pvhp',
@@ -836,6 +843,13 @@ package Maintainers;
 		'CPAN'		=> 1,
 		},
 
+	'version' =>
+		{
+		'MAINTAINER'	=> 'jpeacock',
+		'FILES'		=> q[lib/version.pm lib/version.pod lib/version.t],
+		'CPAN'		=> 1,
+		},
+
 	'vms' =>
 		{
 		'MAINTAINER'	=> 'craig',
@@ -878,21 +892,6 @@ package Maintainers;
 		'FILES'		=> q[x2p/s2p.PL],
 		'CPAN'		=> 0,
 		},
-
-	'version' =>
-		{
-		'MAINTAINER'	=> 'jpeacock',
-		'FILES'		=> q[lib/version.pm lib/version.pod lib/version.t],
-		'CPAN'		=> 1,
-		},
-
-	'Perl6::Form' =>
-		{
-		'MAINTAINER'	=> 'dconway',
-		'FILES'		=> q[ext/Perl6-Form],
-		'CPAN'		=> 1,
-		},
-
 	);
 
 1;
