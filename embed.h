@@ -701,8 +701,14 @@
 #define regexec_flags		Perl_regexec_flags
 #define regnext			Perl_regnext
 #if defined(PERL_CORE) || defined(PERL_EXT)
-#define reg_named_buff_get	Perl_reg_named_buff_get
-#define reg_numbered_buff_get	Perl_reg_numbered_buff_get
+#define reg_named_buff_fetch	Perl_reg_named_buff_fetch
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
+#define reg_numbered_buff_fetch	Perl_reg_numbered_buff_fetch
+#define reg_numbered_buff_store	Perl_reg_numbered_buff_store
+#define reg_numbered_buff_length	Perl_reg_numbered_buff_length
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define reg_qr_package		Perl_reg_qr_package
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
@@ -976,6 +982,8 @@
 #ifdef PERL_CORE
 #define get_hash_seed		Perl_get_hash_seed
 #define report_evil_fh		Perl_report_evil_fh
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define report_uninit		Perl_report_uninit
 #endif
 #define warn			Perl_warn
@@ -2953,8 +2961,14 @@
 #define regexec_flags(a,b,c,d,e,f,g,h)	Perl_regexec_flags(aTHX_ a,b,c,d,e,f,g,h)
 #define regnext(a)		Perl_regnext(aTHX_ a)
 #if defined(PERL_CORE) || defined(PERL_EXT)
-#define reg_named_buff_get(a,b,c)	Perl_reg_named_buff_get(aTHX_ a,b,c)
-#define reg_numbered_buff_get(a,b,c)	Perl_reg_numbered_buff_get(aTHX_ a,b,c)
+#define reg_named_buff_fetch(a,b,c)	Perl_reg_named_buff_fetch(aTHX_ a,b,c)
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
+#define reg_numbered_buff_fetch(a,b,c)	Perl_reg_numbered_buff_fetch(aTHX_ a,b,c)
+#define reg_numbered_buff_store(a,b,c)	Perl_reg_numbered_buff_store(aTHX_ a,b,c)
+#define reg_numbered_buff_length(a,b,c)	Perl_reg_numbered_buff_length(aTHX_ a,b,c)
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define reg_qr_package(a)	Perl_reg_qr_package(aTHX_ a)
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
@@ -3224,6 +3238,8 @@
 #ifdef PERL_CORE
 #define get_hash_seed()		Perl_get_hash_seed(aTHX)
 #define report_evil_fh(a,b,c)	Perl_report_evil_fh(aTHX_ a,b,c)
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define report_uninit(a)	Perl_report_uninit(aTHX_ a)
 #endif
 #define vwarn(a,b)		Perl_vwarn(aTHX_ a,b)

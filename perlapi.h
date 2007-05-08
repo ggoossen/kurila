@@ -184,10 +184,6 @@ END_EXTERN_C
 #define PL_body_arenas		(*Perl_Ibody_arenas_ptr(aTHX))
 #undef  PL_body_roots
 #define PL_body_roots		(*Perl_Ibody_roots_ptr(aTHX))
-#undef  PL_bufend
-#define PL_bufend		(*Perl_Ibufend_ptr(aTHX))
-#undef  PL_bufptr
-#define PL_bufptr		(*Perl_Ibufptr_ptr(aTHX))
 #undef  PL_checkav
 #define PL_checkav		(*Perl_Icheckav_ptr(aTHX))
 #undef  PL_checkav_save
@@ -218,8 +214,6 @@ END_EXTERN_C
 #define PL_comppad_name_floor	(*Perl_Icomppad_name_floor_ptr(aTHX))
 #undef  PL_cop_seqmax
 #define PL_cop_seqmax		(*Perl_Icop_seqmax_ptr(aTHX))
-#undef  PL_copline
-#define PL_copline		(*Perl_Icopline_ptr(aTHX))
 #undef  PL_cryptseen
 #define PL_cryptseen		(*Perl_Icryptseen_ptr(aTHX))
 #undef  PL_cshlen
@@ -228,8 +222,6 @@ END_EXTERN_C
 #define PL_cshname		(*Perl_Icshname_ptr(aTHX))
 #undef  PL_curcopdb
 #define PL_curcopdb		(*Perl_Icurcopdb_ptr(aTHX))
-#undef  PL_curforce
-#define PL_curforce		(*Perl_Icurforce_ptr(aTHX))
 #undef  PL_curstname
 #define PL_curstname		(*Perl_Icurstname_ptr(aTHX))
 #undef  PL_custom_op_descs
@@ -288,8 +280,6 @@ END_EXTERN_C
 #define PL_exitlist		(*Perl_Iexitlist_ptr(aTHX))
 #undef  PL_exitlistlen
 #define PL_exitlistlen		(*Perl_Iexitlistlen_ptr(aTHX))
-#undef  PL_expect
-#define PL_expect		(*Perl_Iexpect_ptr(aTHX))
 #undef  PL_fdpid
 #define PL_fdpid		(*Perl_Ifdpid_ptr(aTHX))
 #undef  PL_filemode
@@ -336,10 +326,6 @@ END_EXTERN_C
 #define PL_isarev		(*Perl_Iisarev_ptr(aTHX))
 #undef  PL_known_layers
 #define PL_known_layers		(*Perl_Iknown_layers_ptr(aTHX))
-#undef  PL_last_lop
-#define PL_last_lop		(*Perl_Ilast_lop_ptr(aTHX))
-#undef  PL_last_lop_op
-#define PL_last_lop_op		(*Perl_Ilast_lop_op_ptr(aTHX))
 #undef  PL_last_swash_hv
 #define PL_last_swash_hv	(*Perl_Ilast_swash_hv_ptr(aTHX))
 #undef  PL_last_swash_key
@@ -350,20 +336,14 @@ END_EXTERN_C
 #define PL_last_swash_slen	(*Perl_Ilast_swash_slen_ptr(aTHX))
 #undef  PL_last_swash_tmps
 #define PL_last_swash_tmps	(*Perl_Ilast_swash_tmps_ptr(aTHX))
-#undef  PL_last_uni
-#define PL_last_uni		(*Perl_Ilast_uni_ptr(aTHX))
 #undef  PL_lastfd
 #define PL_lastfd		(*Perl_Ilastfd_ptr(aTHX))
 #undef  PL_laststatval
 #define PL_laststatval		(*Perl_Ilaststatval_ptr(aTHX))
 #undef  PL_laststype
 #define PL_laststype		(*Perl_Ilaststype_ptr(aTHX))
-#undef  PL_lex_state
-#define PL_lex_state		(*Perl_Ilex_state_ptr(aTHX))
 #undef  PL_lineary
 #define PL_lineary		(*Perl_Ilineary_ptr(aTHX))
-#undef  PL_linestart
-#define PL_linestart		(*Perl_Ilinestart_ptr(aTHX))
 #undef  PL_localpatches
 #define PL_localpatches		(*Perl_Ilocalpatches_ptr(aTHX))
 #undef  PL_lockhook
@@ -412,12 +392,6 @@ END_EXTERN_C
 #define PL_my_cxt_list		(*Perl_Imy_cxt_list_ptr(aTHX))
 #undef  PL_my_cxt_size
 #define PL_my_cxt_size		(*Perl_Imy_cxt_size_ptr(aTHX))
-#undef  PL_nexttoke
-#define PL_nexttoke		(*Perl_Inexttoke_ptr(aTHX))
-#undef  PL_nexttype
-#define PL_nexttype		(*Perl_Inexttype_ptr(aTHX))
-#undef  PL_nextval
-#define PL_nextval		(*Perl_Inextval_ptr(aTHX))
 #undef  PL_nice_chunk
 #define PL_nice_chunk		(*Perl_Inice_chunk_ptr(aTHX))
 #undef  PL_nice_chunk_size
@@ -432,12 +406,8 @@ END_EXTERN_C
 #define PL_numeric_radix_sv	(*Perl_Inumeric_radix_sv_ptr(aTHX))
 #undef  PL_numeric_standard
 #define PL_numeric_standard	(*Perl_Inumeric_standard_ptr(aTHX))
-#undef  PL_oldbufptr
-#define PL_oldbufptr		(*Perl_Ioldbufptr_ptr(aTHX))
 #undef  PL_oldname
 #define PL_oldname		(*Perl_Ioldname_ptr(aTHX))
-#undef  PL_oldoldbufptr
-#define PL_oldoldbufptr		(*Perl_Ioldoldbufptr_ptr(aTHX))
 #undef  PL_op_mask
 #define PL_op_mask		(*Perl_Iop_mask_ptr(aTHX))
 #undef  PL_origalen

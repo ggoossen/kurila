@@ -246,8 +246,8 @@ S_new_SV(pTHX)
     SvREFCNT(sv) = 1;
     SvFLAGS(sv) = 0;
     sv->sv_debug_optype = PL_op ? PL_op->op_type : 0;
-    sv->sv_debug_line = (U16) ((PL_copline == NOLINE) ?
-        (PL_curcop ? CopLINE(PL_curcop) : 0) : PL_copline);
+    sv->sv_debug_line = (U16) ((PL_parser && PL_parser->copline == NOLINE) ?
+        (PL_curcop ? CopLINE(PL_curcop) : 0) : PL_parser->copline);
     sv->sv_debug_inpad = 0;
     sv->sv_debug_cloned = 0;
     sv->sv_debug_file = PL_curcop ? savepv(CopFILE(PL_curcop)): NULL;
@@ -9179,6 +9179,33 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     parser->preambled	= proto->preambled;
     parser->sublex_info	= proto->sublex_info; /* XXX not quite right */
     parser->linestr	= sv_dup_inc(proto->linestr, param);
+    parser->expect	= proto->expect;
+    parser->copline	= proto->copline;
+    parser->last_lop_op	= proto->last_lop_op;
+    parser->lex_state	= proto->lex_state;
+
+
+    parser->linestr	= sv_dup_inc(proto->linestr, param);
+
+    {
+	char *ols = SvPVX(proto->linestr);
+	char *ls  = SvPVX(parser->linestr);
+
+	parser->bufptr	    = ls + (proto->bufptr >= ols ?
+				    proto->bufptr -  ols : 0);
+	parser->oldbufptr   = ls + (proto->oldbufptr >= ols ?
+				    proto->oldbufptr -  ols : 0);
+	parser->oldoldbufptr= ls + (proto->oldoldbufptr >= ols ?
+				    proto->oldoldbufptr -  ols : 0);
+	parser->linestart   = ls + (proto->linestart >= ols ?
+				    proto->linestart -  ols : 0);
+	parser->last_uni    = ls + (proto->last_uni >= ols ?
+				    proto->last_uni -  ols : 0);
+	parser->last_lop    = ls + (proto->last_lop >= ols ?
+				    proto->last_lop -  ols : 0);
+
+	parser->bufend	    = ls + SvCUR(parser->linestr);
+    }
 
 #ifdef PERL_MAD
     parser->endwhite	= proto->endwhite;
@@ -9193,6 +9220,13 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     parser->thisstuff	= proto->thisstuff;
     parser->thistoken	= proto->thistoken;
     parser->thiswhite	= proto->thiswhite;
+
+    Copy(proto->nexttoke, parser->nexttoke, 5, NEXTTOKE);
+    parser->curforce	= proto->curforce;
+#else
+    Copy(proto->nextval, parser->nextval, 5, YYSTYPE);
+    Copy(proto->nexttype, parser->nexttype, 5,	I32);
+    parser->nexttoke	= proto->nexttoke;
 #endif
     return parser;
 }
@@ -10740,7 +10774,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 
     /* runtime control stuff */
     PL_curcopdb		= (COP*)any_dup(proto_perl->Icurcopdb, proto_perl);
-    PL_copline		= proto_perl->Icopline;
 
     PL_filemode		= proto_perl->Ifilemode;
     PL_lastfd		= proto_perl->Ilastfd;
@@ -10829,42 +10862,12 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 
     PL_parser		= parser_dup(proto_perl->Iparser, param);
 
-    PL_lex_state	= proto_perl->Ilex_state;
-
-#ifdef PERL_MAD
-    Copy(proto_perl->Inexttoke, PL_nexttoke, 5, NEXTTOKE);
-    PL_curforce		= proto_perl->Icurforce;
-#else
-    Copy(proto_perl->Inextval, PL_nextval, 5, YYSTYPE);
-    Copy(proto_perl->Inexttype, PL_nexttype, 5,	I32);
-    PL_nexttoke		= proto_perl->Inexttoke;
-#endif
-
-    if (proto_perl->Iparser) {
-	i = proto_perl->Ibufptr - SvPVX_const(proto_perl->Iparser->linestr);
-	PL_bufptr		= SvPVX(PL_parser->linestr) + (i < 0 ? 0 : i);
-	i = proto_perl->Ioldbufptr - SvPVX_const(proto_perl->Iparser->linestr);
-	PL_oldbufptr	= SvPVX(PL_parser->linestr) + (i < 0 ? 0 : i);
-	i = proto_perl->Ioldoldbufptr - SvPVX_const(proto_perl->Iparser->linestr);
-	PL_oldoldbufptr	= SvPVX(PL_parser->linestr) + (i < 0 ? 0 : i);
-	i = proto_perl->Ilinestart - SvPVX_const(proto_perl->Iparser->linestr);
-	PL_linestart	= SvPVX(PL_parser->linestr) + (i < 0 ? 0 : i);
-	PL_bufend		= SvPVX(PL_parser->linestr) + SvCUR(PL_parser->linestr);
-	i = proto_perl->Ilast_uni - SvPVX_const(proto_perl->Iparser->linestr);
-	PL_last_uni		= SvPVX(PL_parser->linestr) + (i < 0 ? 0 : i);
-	i = proto_perl->Ilast_lop - SvPVX_const(proto_perl->Iparser->linestr);
-	PL_last_lop		= SvPVX(PL_parser->linestr) + (i < 0 ? 0 : i);
-    }
-
-    PL_expect		= proto_perl->Iexpect;
-
     PL_multi_end	= proto_perl->Imulti_end;
 
     PL_error_count	= proto_perl->Ierror_count;
     PL_subline		= proto_perl->Isubline;
     PL_subname		= sv_dup_inc(proto_perl->Isubname, param);
 
-    PL_last_lop_op	= proto_perl->Ilast_lop_op;
     PL_in_my		= proto_perl->Iin_my;
     PL_in_my_stash	= hv_dup(proto_perl->Iin_my_stash, param);
 #ifdef FCRYPT

@@ -49,7 +49,17 @@
 #define PL_preambled		(PL_parser->preambled)
 #define PL_sublex_info		(PL_parser->sublex_info)
 #define PL_linestr		(PL_parser->linestr)
-
+#define PL_expect		(PL_parser->expect)
+#define PL_copline		(PL_parser->copline)
+#define PL_bufptr		(PL_parser->bufptr)
+#define PL_oldbufptr		(PL_parser->oldbufptr)
+#define PL_oldoldbufptr		(PL_parser->oldoldbufptr)
+#define PL_linestart		(PL_parser->linestart)
+#define PL_bufend		(PL_parser->bufend)
+#define PL_last_uni		(PL_parser->last_uni)
+#define PL_last_lop		(PL_parser->last_lop)
+#define PL_last_lop_op		(PL_parser->last_lop_op)
+#define PL_lex_state		(PL_parser->lex_state)
 
 #ifdef PERL_MAD
 #  define PL_endwhite		(PL_parser->endwhite)
@@ -64,6 +74,13 @@
 #  define PL_thisstuff		(PL_parser->thisstuff)
 #  define PL_thistoken		(PL_parser->thistoken)
 #  define PL_thiswhite		(PL_parser->thiswhite)
+#  define PL_thiswhite		(PL_parser->thiswhite)
+#  define PL_nexttoke		(PL_parser->nexttoke)
+#  define PL_curforce		(PL_parser->curforce)
+#else
+#  define PL_nexttoke		(PL_parser->nexttoke)
+#  define PL_nexttype		(PL_parser->nexttype)
+#  define PL_nextval		(PL_parser->nextval)
 #endif
 
 static int
@@ -637,49 +654,20 @@ Perl_lex_start(pTHX_ SV *line)
 
     /* initialise lexer state */
 
-    SAVEI8(PL_lex_state);
-#ifdef PERL_MAD
-    if (PL_lex_state == LEX_KNOWNEXT) {
-	I32 toke = parser->old_parser->lasttoke;
- 	while (--toke >= 0) {
-	    SAVEI32(PL_nexttoke[toke].next_type);
-	    SAVEVPTR(PL_nexttoke[toke].next_val);
-	    if (PL_madskills)
-		SAVEVPTR(PL_nexttoke[toke].next_mad);
-	}
-    }
-    SAVEI32(PL_curforce);
-    PL_curforce = -1;
-#else
-    if (PL_lex_state == LEX_KNOWNEXT) {
-	I32 toke = PL_nexttoke;
-	while (--toke >= 0) {
-	    SAVEI32(PL_nexttype[toke]);
-	    SAVEVPTR(PL_nextval[toke]);
-	}
-	SAVEI32(PL_nexttoke);
-    }
-#endif
     SAVECOPLINE(PL_curcop);
-    SAVEPPTR(PL_bufptr);
-    SAVEPPTR(PL_bufend);
-    SAVEPPTR(PL_oldbufptr);
-    SAVEPPTR(PL_oldoldbufptr);
-    SAVEPPTR(PL_last_lop);
-    SAVEPPTR(PL_last_uni);
-    SAVEPPTR(PL_linestart);
     SAVEDESTRUCTOR_X(restore_rsfp, PL_rsfp);
-    SAVEI8(PL_expect);
 
-    PL_copline = NOLINE;
+#ifdef PERL_MAD
+    parser->curforce = -1;
+#else
+    parser->nexttoke = 0;
+#endif
+    parser->copline = NOLINE;
     PL_lex_state = LEX_NORMAL;
-    PL_expect = XSTATE;
+    parser->expect = XSTATE;
     Newx(parser->lex_brackstack, 120, char);
     Newx(parser->lex_casestack, 12, char);
     *parser->lex_casestack = '\0';
-#ifndef PERL_MAD
-    PL_nexttoke = 0;
-#endif
 
     if (line) {
 	s = SvPV_const(line, len);
@@ -698,9 +686,12 @@ Perl_lex_start(pTHX_ SV *line)
 	SvREFCNT_inc_simple_void_NN(line);
 	parser->linestr = line;
     }
-    PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = PL_linestart = SvPVX(parser->linestr);
-    PL_bufend = PL_bufptr + SvCUR(parser->linestr);
-    PL_last_lop = PL_last_uni = NULL;
+    parser->oldoldbufptr =
+	parser->oldbufptr =
+	parser->bufptr =
+	parser->linestart = SvPVX(parser->linestr);
+    parser->bufend = parser->bufptr + SvCUR(parser->linestr);
+    parser->last_lop = parser->last_uni = NULL;
     PL_rsfp = 0;
 }
 

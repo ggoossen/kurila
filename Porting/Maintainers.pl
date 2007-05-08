@@ -11,10 +11,12 @@ package Maintainers;
 %Maintainers =
 	(
 	'abergman'	=> 'Arthur Bergman <abergman@cpan.org>',
+	'abigail'	=> 'Abigail <abigail@abigail.be>',
 	'ams'		=> 'Abhijit Menon-Sen <ams@cpan.org>',
 	'andk'		=> 'Andreas J. Koenig <andk@cpan.org>',
 	'arandal'       => 'Allison Randal <allison@perl.org>',
 	'audreyt'	=> 'Audrey Tang <cpan@audreyt.org>',
+	'avar'		=> 'Ævar Arnfjörð Bjarmason <avar@cpan.org>',
 	'bbb'		=> 'Rob Brown <bbb@cpan.org>',
 	'craig'		=> 'Craig Berry <craigberry@mac.com>',
 	'dankogai'	=> 'Dan Kogai <dankogai@cpan.org>',
@@ -167,6 +169,34 @@ package Maintainers;
 		{
 		'MAINTAINER'	=> 'andk',
 		'FILES'		=> q[lib/CPAN.pm lib/CPAN],
+		'CPAN'		=> 1,
+		},
+
+	'CPANPLUS' =>
+		{
+		'MAINTAINER'	=> 'kane',
+		'FILES'		=> q[lib/CPANPLUS.pm
+				     lib/CPANPLUS/Backend lib/CPANPLUS/Backend.pm
+				     lib/CPANPLUS/bin
+				     lib/CPANPLUS/Config.pm
+				     lib/CPANPLUS/Configure lib/CPANPLUS/Configure.pm
+				     lib/CPANPLUS/Error.pm
+				     lib/CPANPLUS/FAQ.pod
+				     lib/CPANPLUS/Hacking.pod
+				     lib/CPANPLUS/inc.pm
+				     lib/CPANPLUS/Internals lib/CPANPLUS/Internals.pm
+				     lib/CPANPLUS/Module lib/CPANPLUS/Module.pm
+				     lib/CPANPLUS/Selfupdate.pm
+				     lib/CPANPLUS/Shell lib/CPANPLUS/Shell.pm
+				     lib/CPANPLUS/t
+				    ],
+		'CPAN'		=> 1,
+		},
+
+	'CPANPLUS::Dist::Build' =>
+		{
+		'MAINTAINER'	=> 'kane',
+		'FILES'		=> q[lib/CPANPLUS/Dist/Build.pm lib/CPANPLUS/Dist/Build],
 		'CPAN'		=> 1,
 		},
 
@@ -585,6 +615,22 @@ package Maintainers;
 		'FILES'		=> q[lib/PerlIO/via/QuotedPrint.pm
 				     lib/PerlIO/via/t/QuotedPrint.t],
 		'CPAN'		=> 1,
+		},
+
+	'perlre' =>
+		{
+		'MAINTAINER'	=> 'abigail',
+		'FILES'		=> q[pod/perlrecharclass.pod
+				     pod/perlrebackslash.pod],
+		'CPAN'		=> 0,
+		},
+
+
+	'perlreapi' =>
+		{
+		MAINTAINER	=> 'avar',
+		FILES		=> 'pod/perlreapi.pod',
+		CPAN		=> 0,
 		},
 
 	'perlreftut' =>

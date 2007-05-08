@@ -675,7 +675,7 @@ Ap	|I32	|pregexec	|NN REGEXP * const prog|NN char* stringarg \
 				|NN SV* screamer|U32 nosave
 Ap	|void	|pregfree	|NULLOK struct regexp* r
 EXp	|struct regexp*	|reg_temp_copy	|NN struct regexp* r
-Ap	|void	|regfree_internal|NULLOK struct regexp* r
+Ap	|void	|regfree_internal|NULLOK REGEXP * const r
 Ap	|char *	|reg_stringify  |NN MAGIC *mg|NULLOK STRLEN *lp|NULLOK U32 *flags|NULLOK I32 *haseval
 #if defined(USE_ITHREADS)
 Ap	|void*	|regdupe_internal|NN REGEXP * const r|NN CLONE_PARAMS* param
@@ -691,8 +691,12 @@ Ap	|I32	|regexec_flags	|NN REGEXP * const rx|NN char* stringarg \
 				|NN SV* screamer|NULLOK void* data|U32 flags
 ApR	|regnode*|regnext	|NN regnode* p
 
-EXp	|SV*|reg_named_buff_get	|NN REGEXP * const rx|NN SV * const namesv|const U32 flags
-EXp	|void|reg_numbered_buff_get|NN REGEXP * const rx|const I32 paren|NULLOK SV * const usesv
+EXp	|SV*|reg_named_buff_fetch	|NN REGEXP * const rx|NN SV * const key|const U32 flags
+
+EXp	|void|reg_numbered_buff_fetch|NN REGEXP * const rx|const I32 paren|NULLOK SV * const sv
+EXp	|void|reg_numbered_buff_store|NN REGEXP * const rx|const I32 paren|NULLOK SV const * const value
+EXp	|I32|reg_numbered_buff_length|NN REGEXP * const rx|NN const SV * const sv|const I32 paren
+
 EXp	|SV*|reg_qr_package|NN REGEXP * const rx
 
 Ep	|void	|regprop	|NULLOK const regexp *prog|NN SV* sv|NN const regnode* o
@@ -955,7 +959,7 @@ p	|U32	|parse_unicode_opts|NN const char **popt
 Ap	|U32	|seed
 pR	|UV	|get_hash_seed
 p	|void	|report_evil_fh	|NULLOK const GV *gv|NULLOK const IO *io|I32 op
-pd	|void	|report_uninit	|NULLOK SV* uninit_sv
+XEpd	|void	|report_uninit	|NULLOK SV* uninit_sv
 Afpd	|void	|warn		|NN const char* pat|...
 Ap	|void	|vwarn		|NN const char* pat|NULLOK va_list* args
 Afp	|void	|warner		|U32 err|NN const char* pat|...

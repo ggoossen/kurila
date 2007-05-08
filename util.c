@@ -3018,6 +3018,7 @@ Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
     register char *s;
     I32 len = 0;
     int retval;
+    char *bufend;
 #if defined(DOSISH) && !defined(OS2) && !defined(atarist)
 #  define SEARCH_EXTS ".bat", ".cmd", NULL
 #  define MAX_EXT_LEN 4
@@ -3142,10 +3143,10 @@ Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
     {
 	bool seen_dot = 0;
 
-	PL_bufend = s + strlen(s);
-	while (s < PL_bufend) {
+	bufend = s + strlen(s);
+	while (s < bufend) {
 #ifdef MACOS_TRADITIONAL
-	    s = delimcpy(tmpbuf, tmpbuf + sizeof tmpbuf, s, PL_bufend,
+	    s = delimcpy(tmpbuf, tmpbuf + sizeof tmpbuf, s, bufend,
 			',',
 			&len);
 #else
@@ -3161,12 +3162,12 @@ Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
 	    if (len < sizeof tmpbuf)
 		tmpbuf[len] = '\0';
 #else  /* ! (atarist || DOSISH) */
-	    s = delimcpy(tmpbuf, tmpbuf + sizeof tmpbuf, s, PL_bufend,
+	    s = delimcpy(tmpbuf, tmpbuf + sizeof tmpbuf, s, bufend,
 			':',
 			&len);
 #endif /* ! (atarist || DOSISH) */
 #endif /* MACOS_TRADITIONAL */
-	    if (s < PL_bufend)
+	    if (s < bufend)
 		s++;
 	    if (len + 1 + strlen(scriptname) + MAX_EXT_LEN >= sizeof tmpbuf)
 		continue;	/* don't search dir with too-long name */

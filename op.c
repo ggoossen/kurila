@@ -781,8 +781,8 @@ S_scalarboolean(pTHX_ OP *o)
 	if (ckWARN(WARN_SYNTAX)) {
 	    const line_t oldline = CopLINE(PL_curcop);
 
-	    if (PL_copline != NOLINE)
-		CopLINE_set(PL_curcop, PL_copline);
+	    if (PL_parser && PL_parser->copline != NOLINE)
+		CopLINE_set(PL_curcop, PL_parser->copline);
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), "Found = in conditional, should be ==");
 	    CopLINE_set(PL_curcop, oldline);
 	}
@@ -1814,7 +1814,6 @@ S_apply_attrs(pTHX_ HV *stash, SV *target, OP *attrs, bool for_my)
 
     /* fake up C<use attributes $pkg,$rv,@attrs> */
     ENTER;		/* need to protect against side-effects of 'use' */
-    SAVEI8(PL_expect);
     stashsv = stash ? newSVhek(HvNAME_HEK(stash)) : &PL_sv_no;
 
 #define ATTRSMODULE "attributes"
@@ -2257,10 +2256,11 @@ Perl_localize(pTHX_ OP *o, I32 lex)
 	NOOP;
 #endif
     else {
-	if ( PL_bufptr > PL_oldbufptr && PL_bufptr[-1] == ','
+	if ( PL_parser->bufptr > PL_parser->oldbufptr
+	    && PL_parser->bufptr[-1] == ','
 	    && ckWARN(WARN_PARENTHESIS))
 	{
-	    char *s = PL_bufptr;
+	    char *s = PL_parser->bufptr;
 	    bool sigil = FALSE;
 
 	    /* some heuristics to detect a potential error */
@@ -2802,7 +2802,7 @@ Perl_mad_free(pTHX_ MADPROP* mp)
 	return;
     if (mp->mad_next)
 	mad_free(mp->mad_next);
-/*    if (PL_lex_state != LEX_NOTPARSING && mp->mad_vlen)
+/*    if (PL_parser && PL_parser->lex_state != LEX_NOTPARSING && mp->mad_vlen)
 	PerlIO_printf(PerlIO_stderr(), "DESTROYING '%c'=<%s>\n", mp->mad_key & 255, mp->mad_val); */
     switch (mp->mad_type) {
     case MAD_NULL:
@@ -3618,8 +3618,8 @@ Perl_package(pTHX_ OP *o)
     sv_setsv(PL_curstname, sv);
 
     PL_hints |= HINT_BLOCK_SCOPE;
-    PL_copline = NOLINE;
-    PL_expect = XSTATE;
+    PL_parser->copline = NOLINE;
+    PL_parser->expect = XSTATE;
 
 #ifndef PERL_MAD
     op_free(o);
@@ -3743,8 +3743,8 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
      */
 
     PL_hints |= HINT_BLOCK_SCOPE;
-    PL_copline = NOLINE;
-    PL_expect = XSTATE;
+    PL_parser->copline = NOLINE;
+    PL_parser->expect = XSTATE;
     PL_cop_seqmax++; /* Purely for B::*'s benefit */
 
 #ifdef PERL_MAD
@@ -3822,17 +3822,19 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
 	    sv = va_arg(*args, SV*);
 	}
     }
-    {
-	const line_t ocopline = PL_copline;
-	COP * const ocurcop = PL_curcop;
-	const U8 oexpect = PL_expect;
 
-	utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
-		veop, modname, imop);
-	PL_expect = oexpect;
-	PL_copline = ocopline;
-	PL_curcop = ocurcop;
-    }
+    /* utilize() fakes up a BEGIN { require ..; import ... }, so make sure
+     * that it has a PL_parser to play with while doing that, and also
+     * that it doesn't mess with any existing parser, by creating a tmp
+     * new parser with lex_start(). This won't actually be used for much,
+     * since pp_require() will create another parser for the real work. */
+
+    ENTER;
+    SAVEVPTR(PL_curcop);
+    lex_start(NULL);
+    utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
+	    veop, modname, imop);
+    LEAVE;
 }
 
 OP *
@@ -4137,11 +4139,12 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o)
 	HINTS_REFCNT_UNLOCK;
     }
 
-    if (PL_copline == NOLINE)
+    if (PL_parser && PL_parser->copline == NOLINE)
         CopLINE_set(cop, CopLINE(PL_curcop));
     else {
-	CopLINE_set(cop, PL_copline);
-        PL_copline = NOLINE;
+	CopLINE_set(cop, PL_parser->copline);
+	if (PL_parser)
+	    PL_parser->copline = NOLINE;
     }
 #ifdef USE_ITHREADS
     CopFILE_set(cop, CopFILE(PL_curcop));	/* XXX share in a pvtable? */
@@ -4285,7 +4288,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 	}
 	if (warnop) {
 	    const line_t oldline = CopLINE(PL_curcop);
-	    CopLINE_set(PL_curcop, PL_copline);
+	    CopLINE_set(PL_curcop, PL_parser->copline);
 	    Perl_warner(aTHX_ packWARN(WARN_MISC),
 		 "Value of %s%s can be \"0\"; test with defined()",
 		 PL_op_desc[warnop],
@@ -4554,7 +4557,7 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     redo = LINKLIST(listop);
 
     if (expr) {
-	PL_copline = (line_t)whileline;
+	PL_parser->copline = (line_t)whileline;
 	scalar(listop);
 	o = new_logop(OP_AND, 0, &expr, &listop);
 	if (o == expr && o->op_type == OP_CONST && !SvTRUE(cSVOPo->op_sv)) {
@@ -4713,7 +4716,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     wop = newWHILEOP(flags, 1, loop, forline, newOP(OP_ITER, 0), block, cont, 0);
     if (madsv)
 	op_getmad(madsv, (OP*)loop, 'v');
-    PL_copline = forline;
+    PL_parser->copline = forline;
     return newSTATEOP(0, label, wop);
 }
 
@@ -5277,8 +5280,8 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 			&& (!const_sv || sv_cmp(cv_const_sv(cv), const_sv))))
 		{
 		    const line_t oldline = CopLINE(PL_curcop);
-		    if (PL_copline != NOLINE)
-			CopLINE_set(PL_curcop, PL_copline);
+		    if (PL_parser && PL_parser->copline != NOLINE)
+			CopLINE_set(PL_curcop, PL_parser->copline);
 		    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
 			CvCONST(cv) ? "Constant subroutine %s redefined"
 				    : "Subroutine %s redefined", name);
@@ -5498,7 +5501,8 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     }
 
   done:
-    PL_copline = NOLINE;
+    if (PL_parser)
+	PL_parser->copline = NOLINE;
     LEAVE_SCOPE(floor);
     return cv;
 }
@@ -5594,7 +5598,7 @@ Perl_newCONSTSUB(pTHX_ HV *stash, const char *name, SV *sv)
     ENTER;
 
     SAVECOPLINE(PL_curcop);
-    CopLINE_set(PL_curcop, PL_copline);
+    CopLINE_set(PL_curcop, PL_parser ? PL_parser->copline : NOLINE);
 
     SAVEHINTS();
     PL_hints &= ~HINT_BLOCK_SCOPE;
@@ -5707,8 +5711,8 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 			const char *redefined_name = HvNAME_get(stash);
 			if ( strEQ(redefined_name,"autouse") ) {
 			    const line_t oldline = CopLINE(PL_curcop);
-			    if (PL_copline != NOLINE)
-				CopLINE_set(PL_curcop, PL_copline);
+			    if (PL_parser && PL_parser->copline != NOLINE)
+				CopLINE_set(PL_curcop, PL_parser->copline);
 			    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
 					CvCONST(cv) ? "Constant subroutine %s redefined"
 						    : "Subroutine %s redefined"

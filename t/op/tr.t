@@ -164,10 +164,6 @@ eval "tr/m-d/ /";
 like($@, qr/^Invalid range "m-d" in transliteration operator/,
               'reversed range check');
 
-eval '$1 =~ tr/x/y/';
-like($@, qr/^Modification of a read-only value attempted/,
-              'cannot update read-only var');
-
 'abcdef' =~ /(bcd)/;
 is(eval '$1 =~ tr/abcd//', 3,  'explicit read-only count');
 is($@, '',                      '    no error');

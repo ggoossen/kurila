@@ -178,10 +178,7 @@ PERLVAR(Ieval_start,	OP *)
 
 /* runtime control stuff */
 PERLVARI(Icurcopdb,	COP *,	NULL)
-PERLVARI(Icopline,	line_t,	NOLINE)
 
-/* statics moved here for shared library purposes */
-PERLVARI(Igensym,	I32,	0)	/* next symbol for getsym() to define */
 PERLVAR(Ifilemode,	int)		/* so nextargv() can preserve mode */
 PERLVAR(Ilastfd,	int)		/* what to preserve mode on */
 PERLVAR(Ioldname,	char *)		/* what to preserve mode on */
@@ -190,8 +187,8 @@ PERLVAR(ICmd,		char *)		/* stuff to free from do_aexec, vfork safe */
 PERLVAR(Ipreambleav,	AV *)
 PERLVAR(Imess_sv,	SV *)
 PERLVAR(Iors_sv,	SV *)		/* output record separator $\ */
-     /* Space for one more U16 here without increasing the structure size */
-PERLVAR(Ilast_lop_op,	OPCODE)		/* last list operator */
+/* statics moved here for shared library purposes */
+PERLVARI(Igensym,	I32,	0)	/* next symbol for getsym() to define */
 PERLVAR(Iin_my,		U16)		/* we're compiling a "my" (or "our") declaration */
 PERLVARI(Ilaststype,	U16,	OP_STAT)
 PERLVARI(Ilaststatval,	int,	-1)
@@ -242,8 +239,6 @@ PERLVARI(Iin_clean_all,	bool,    FALSE)	/* from sv.c */
 PERLVAR(Inomemok,	bool)		/* let malloc context handle nomem */
 PERLVARI(Isavebegin,     bool,	FALSE)	/* save BEGINs for compiler	*/
 
-PERLVAR(Ilinestart,	char *)		/* beg. of most recently read line */
-
 PERLVAR(Iuid,		Uid_t)		/* current real user id */
 PERLVAR(Ieuid,		Uid_t)		/* current effective user id */
 PERLVAR(Igid,		Gid_t)		/* current real group id */
@@ -290,25 +285,10 @@ PERLVAR(Isv_undef,	SV)
 PERLVAR(Isv_no,		SV)
 PERLVAR(Isv_yes,	SV)
 
-/* What we know when we're in LEX_KNOWNEXT state. */
-#ifdef PERL_MAD
-PERLVARA(Inexttoke,5,	NEXTTOKE)	/* value of next token, if any */
-PERLVAR(Icurforce,	I32)
-#else
-PERLVARA(Inextval,5,	YYSTYPE)	/* value of next token, if any */
-PERLVARA(Inexttype,5,	I32)		/* type of next token */
-PERLVAR(Inexttoke,	I32)
-#endif
-
-PERLVAR(Ibufptr,	char *)
-PERLVAR(Ioldbufptr,	char *)
-PERLVAR(Ioldoldbufptr,	char *)
-PERLVAR(Ibufend,	char *)
-
-PERLVARI(Iexpect, U8,	XSTATE)		/* how to interpret ambiguous tokens */
-PERLVAR(Ilex_state,	U8)		/* next token is determined */
 PERLVAR(Ierror_count,	U8)		/* how many errors so far, max 10 */
 PERLVARI(Icv_has_eval, bool, FALSE) /* PL_compcv includes an entereval or similar */
+/* Space for two more U8 here without increasing the structure size */
+
 PERLVAR(Imulti_end,	I32)		/* last line of multi-line string */
 
 PERLVAR(Isubname,	SV *)		/* name of current subroutine */
@@ -322,8 +302,6 @@ PERLVAR(Ipadix,		I32)		/* max used index in current "register" pad */
 PERLVAR(Ipadix_floor,	I32)		/* how low may inner block reset padix */
 PERLVAR(Ipad_reset_pending,	I32)	/* reset pad on next attempted alloc */
 
-PERLVAR(Ilast_uni,	char *)		/* position of last named-unary op */
-PERLVAR(Ilast_lop,	char *)		/* position of last list operator */
 PERLVAR(Iin_my_stash,	HV *)		/* declared class of this "my" declaration */
 
 PERLVAR(Ihints,		U32)		/* pragma-tic compile-time flags */
@@ -537,8 +515,8 @@ PERLVARI(Islab_count, U32, 0)	/* Size of the array */
 
 PERLVARI(Iisarev, HV*, NULL) /* Reverse map of @ISA dependencies */
 
-/* If you are adding a U16, see the comment above on where there are 2 bytes
-   of gap which currently will be structure padding.  */
+/* If you are adding a U8 or U16, see the 'Space' comments above on where
+ * there are gaps which currently will be structure padding.  */
 
 /* Within a stable branch, new variables must be added to the very end, before
  * this comment, for binary compatibility (the offsets of the old members must
