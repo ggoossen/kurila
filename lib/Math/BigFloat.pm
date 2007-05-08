@@ -16,7 +16,7 @@ $VERSION = '1.54';
 require 5.006002;
 
 require Exporter;
-our @ISA =       qw(Exporter Math::BigInt);
+our @ISA =       qw(Math::BigInt Exporter);
 
 use strict;
 # $_trap_inf/$_trap_nan are internal and should never be accessed from outside

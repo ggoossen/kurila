@@ -19,7 +19,7 @@ our ($VERSION, @ISA, @EXPORT_OK, %DEFLATE_CONSTANTS, %EXPORT_TAGS, $RawDeflateEr
 $VERSION = '2.004';
 $RawDeflateError = '';
 
-@ISA = qw(Exporter IO::Compress::Base);
+@ISA = qw(IO::Compress::Base Exporter);
 @EXPORT_OK = qw( $RawDeflateError rawdeflate ) ;
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
 

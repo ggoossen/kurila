@@ -1,8 +1,8 @@
 package Term::UI::History;
 
 use strict;
-use base 'Exporter';
 use base 'Log::Message::Simple';
+use base 'Exporter';
 
 =pod
 

@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA $PACKAGE @EXPORT_OK
 	    $lib						
             $accuracy $precision $round_mode $div_scale);
 
-@ISA = qw(Exporter Math::BigInt);
+@ISA = qw(Math::BigInt Exporter);
 @EXPORT_OK = qw(bgcd objectify);
 
 $VERSION = 0.04;

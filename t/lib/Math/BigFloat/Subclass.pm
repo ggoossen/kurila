@@ -12,7 +12,7 @@ use Math::BigFloat(1.38);
 use vars qw($VERSION @ISA $PACKAGE
             $accuracy $precision $round_mode $div_scale);
 
-@ISA = qw(Exporter Math::BigFloat);
+@ISA = qw(Math::BigFloat Exporter);
 
 $VERSION = 0.05;
 

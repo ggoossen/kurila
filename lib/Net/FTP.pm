@@ -23,7 +23,7 @@ use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
 $VERSION = "2.77_01";
-@ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
+@ISA     = qw(Net::Cmd IO::Socket::INET Exporter);
 
 # Someday I will "use constant", when I am not bothered to much about
 # compatability with older releases of perl

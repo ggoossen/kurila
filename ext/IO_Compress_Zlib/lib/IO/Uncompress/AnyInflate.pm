@@ -24,7 +24,7 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyInflateError);
 $VERSION = '2.004';
 $AnyInflateError = '';
 
-@ISA = qw( Exporter IO::Uncompress::Base );
+@ISA = qw( IO::Uncompress::Base Exporter );
 @EXPORT_OK = qw( $AnyInflateError anyinflate ) ;
 %EXPORT_TAGS = %IO::Uncompress::Base::DEFLATE_CONSTANTS ;
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;

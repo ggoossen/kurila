@@ -20,7 +20,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GunzipError);
 
-@ISA = qw( Exporter IO::Uncompress::RawInflate );
+@ISA = qw( IO::Uncompress::RawInflate Exporter );
 @EXPORT_OK = qw( $GunzipError gunzip );
 %EXPORT_TAGS = %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ;
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
