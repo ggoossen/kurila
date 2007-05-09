@@ -36,7 +36,7 @@ package Math::BigFloat::Test;
 use Math::BigFloat;
 require Exporter;
 use vars qw/@ISA/;
-@ISA = qw/Exporter Math::BigFloat/;
+@ISA = qw/Math::BigFloat Exporter/;
 
 use overload;
 
