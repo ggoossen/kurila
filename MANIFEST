@@ -889,6 +889,20 @@ ext/MIME/Base64/t/base64.t	See whether MIME::Base64 works
 ext/MIME/Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
 ext/MIME/Base64/t/unicode.t	See whether MIME::Base64 works
 ext/MIME/Base64/t/warn.t	See whether MIME::Base64 works
+ext/Module-Load-Conditional/CHANGES	Module::Conditional
+ext/Module-Load-Conditional/lib/Module/Load/Conditional.pm	Module::Conditional
+ext/Module-Load-Conditional/Makefile.PL	Module::Conditional
+ext/Module-Load-Conditional/MANIFEST	Module::Conditional
+ext/Module-Load-Conditional/META.yml	Module::Conditional Module meta-data (added by MakeMaker)
+ext/Module-Load-Conditional/README	Module::Conditional
+ext/Module-Load-Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
+ext/Module-Load-Conditional/t/02_Parse_Version.t	Module::Load::Conditional tests
+ext/Module-Load-Conditional/t/to_load/Commented.pm	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/InPod.pm	Module::Load::Conditional tests
+ext/Module-Load-Conditional/t/to_load/LoadIt.pm	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/LoadMe.pl	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/Must/Be/Loaded.pm	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/ToBeLoaded	Module::Conditional tests
 ext/NDBM_File/hints/cygwin.pl	Hint for NDBM_File for named architecture
 ext/NDBM_File/hints/dec_osf.pl	Hint for NDBM_File for named architecture
 ext/NDBM_File/hints/dynixptx.pl	Hint for NDBM_File for named architecture
@@ -2049,15 +2063,6 @@ lib/Module/CoreList/bin/corelist	Module::CoreList
 lib/Module/CoreList.pm			Module::CoreList
 lib/Module/CoreList/t/corelist.t	Module::CoreList
 lib/Module/CoreList/t/find_modules.t	Module::CoreList
-lib/Module/Load/Conditional.pm	Module::Conditional
-lib/Module/Load/Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
-lib/Module/Load/Conditional/t/02_Parse_Version.t	Module::Load::Conditional tests
-lib/Module/Load/Conditional/t/to_load/Commented.pm	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/InPod.pm	Module::Load::Conditional tests
-lib/Module/Load/Conditional/t/to_load/LoadIt.pm	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/LoadMe.pl	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/Must/Be/Loaded.pm	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/ToBeLoaded	Module::Conditional tests
 lib/Module/Loaded.pm	Module::Loaded
 lib/Module/Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 lib/Module/Load.pm	Module::Load

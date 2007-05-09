@@ -531,8 +531,7 @@ package Maintainers;
 	'Module::Load::Conditional' =>
 		{
 		'MAINTAINER'	=> 'kane',
-		'FILES'		=> q[lib/Module/Load/Conditional
-				     lib/Module/Load/Conditional.pm],
+		'FILES'		=> q[ext/Module-Load-Conditional],
 		'CPAN'		=> 1,
 		},
 

@@ -1,12 +1,12 @@
 ### Module::Load::Conditional test suite ###
 BEGIN { 
     if( $ENV{PERL_CORE} ) {
-        chdir '../lib/Module/Load/Conditional' 
-            if -d '../lib/Module/Load/Conditional';
-        unshift @INC, '../../../..';
+        chdir '../ext/Module-Load-Conditional'
+            if -d '../ext/Module-Load-Conditional';
+        unshift @INC, '../../../lib';
     
         ### fix perl location too
-        $^X = '../../../../../t/' . $^X;
+        $^X = '../../../t/' . $^X;
     }
 } 
 

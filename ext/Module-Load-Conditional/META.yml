@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Module-Load-Conditional
+version:      0.16
+version_from: lib/Module/Load/Conditional.pm
+installdirs:  site
+requires:
+    Locale::Maketext::Simple:      0
+    Module::Load:                  0
+    Params::Check:                 0
+    Test::More:                    0
+    version:                       0.69
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30
