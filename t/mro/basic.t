@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-require q(./test.pl); plan(tests => 8);
+require q(./test.pl); plan(tests => 10);
 
 {
     package MRO_A;
@@ -20,6 +20,12 @@ require q(./test.pl); plan(tests => 8);
     our @ISA = qw/MRO_D MRO_E/;
 }
 
+is(mro::get_mro('MRO_F'), 'c3');
+ok(eq_array(
+    mro::get_linear_isa('MRO_F'),
+    [qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/]
+));
+mro::set_mro('MRO_F', 'dfs');
 is(mro::get_mro('MRO_F'), 'dfs');
 ok(eq_array(
     mro::get_linear_isa('MRO_F'),
