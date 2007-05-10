@@ -1,7 +1,7 @@
 package bignum;
 use 5.006002;
 
-$VERSION = '0.21';
+$VERSION = '0.21_02';
 use Exporter;
 our @EXPORT_OK 	= qw( ); 
 our @EXPORT 	= qw( inf NaN ); 

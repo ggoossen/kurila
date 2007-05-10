@@ -1,7 +1,7 @@
 package Module::CoreList;
 use strict;
 use vars qw/$VERSION %released %patchlevel %version %families/;
-$VERSION = '2.09_01';
+$VERSION = '2.10';
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ Module::CoreList - what modules shipped with versions of perl
 =head1 DESCRIPTION
 
 Module::CoreList contains the hash of hashes
-%Module::CoreList::version, this is keyed on perl version as indicated
+%Module::CoreList::version, that is keyed on perl version as indicated
 in $].  The second level hash is module => version pairs.
 
 Note, it is possible for the version of a module to be unspecified,
@@ -46,6 +46,9 @@ clusters known perl releases by their major versions.
 In 2.01 %Module::CoreList::patchlevel contains the branch and patchlevel
 corresponding to the specified perl version in the Perforce repository where
 the perl sources are kept.
+
+The special module name C<Unicode> refers to the version of the Unicode
+Character Database bundled with Perl.
 
 =head1 CAVEATS
 
@@ -66,14 +69,14 @@ Currently maintained by the perl 5 porters E<lt>perl5-porters@perl.orgE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2002-2006 Richard Clamp.  All Rights Reserved.
+Copyright (C) 2002-2007 Richard Clamp.  All Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Module::Info>, L<perl>
+L<corelist>, L<Module::Info>, L<perl>
 
 =cut
 
@@ -132,12 +135,12 @@ sub find_modules {
     5.00405  => '1999-04-29',
     5.006    => '2000-03-22',
     5.006001 => '2001-04-08',
-    5.006002 => '2003-11-15',
     5.007003 => '2002-03-05',
     5.008    => '2002-07-19',
     5.008001 => '2003-09-25',
-    5.008002 => '2003-11-05',
     5.009    => '2003-10-27',
+    5.008002 => '2003-11-05',
+    5.006002 => '2003-11-15',
     5.008003 => '2004-01-14',
     5.00504  => '2004-02-23',
     5.009001 => '2004-03-16',
@@ -1957,6 +1960,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::Local'           => undef, #lib/Time/Local.pm
         'Time::localtime'       => '1.01', #lib/Time/localtime.pm
         'Time::tm'              => undef, #lib/Time/tm.pm
+        'Unicode'               => '3.0.1', # lib/unicore/version
         'UNIVERSAL'             => undef, #lib/UNIVERSAL.pm
         'User::grent'           => undef, #lib/User/grent.pm
         'User::pwent'           => undef, #lib/User/pwent.pm
@@ -2607,6 +2611,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::Local'           => '1.04', #./lib/Time/Local.pm
         'Time::localtime'       => '1.02', #./lib/Time/localtime.pm
         'Time::tm'              => '1.00', #./lib/Time/tm.pm
+        'Unicode'               => '3.2.0', # lib/unicore/version
         'Unicode::Collate'      => '0.12', #./lib/Unicode/Collate.pm
         'Unicode::Normalize'    => '0.17', #./ext/Unicode/Normalize/Normalize.pm
         'Unicode::UCD'          => '0.2', #./lib/Unicode/UCD.pm
@@ -2963,6 +2968,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::Local'           => '1.07', #./lib/Time/Local.pm
         'Time::localtime'       => '1.02', #./lib/Time/localtime.pm
         'Time::tm'              => '1.00', #./lib/Time/tm.pm
+        'Unicode'               => '4.0.0', # lib/unicore/version
         'Unicode::Collate'      => '0.28', #./lib/Unicode/Collate.pm
         'Unicode::Normalize'    => '0.23', #./lib/Unicode/Normalize.pm
         'Unicode::UCD'          => '0.21', #./lib/Unicode/UCD.pm
@@ -3318,6 +3324,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::Local' => 1.07,  #Time\Local.pm
         'Time::localtime' => 1.02, #Time\localtime.pm
         'Time::tm' => '1.00',     #Time\tm.pm
+        'Unicode' => '4.0.0', # lib/unicore/version
         'Unicode::Collate' => '0.30', #Unicode\Collate.pm
         'Unicode::Normalize' => 0.25, #Unicode\Normalize.pm
         'Unicode::UCD' => 0.21, #Unicode\UCD.pm
@@ -3675,6 +3682,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::Local'           => '1.07',  #lib/Time/Local.pm
         'Time::localtime'       => '1.02',  #lib/Time/localtime.pm
         'Time::tm'              => '1.00',  #lib/Time/tm.pm
+        'Unicode'               => '4.0.0', # lib/unicore/version
         'Unicode::Collate'      => '0.33',  #lib/Unicode/Collate.pm
         'Unicode::Normalize'    => '0.28',  #lib/Unicode/Normalize.pm
         'Unicode::UCD'          => '0.21',  #lib/Unicode/UCD.pm
@@ -4033,6 +4041,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::Local'           => '1.07',  #lib/Time/Local.pm
         'Time::localtime'       => '1.02',  #lib/Time/localtime.pm
         'Time::tm'              => '1.00',  #lib/Time/tm.pm
+        'Unicode'               => '4.0.0', #lib/unicore/version
         'Unicode::Collate'      => '0.28',  #lib/Unicode/Collate.pm
         'Unicode::Normalize'    => '0.23',  #lib/Unicode/Normalize.pm
         'Unicode::UCD'          => '0.21',  #lib/Unicode/UCD.pm
@@ -4399,6 +4408,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::Local'           => '1.07_94',  #lib/Time/Local.pm
         'Time::localtime'       => '1.02',  #lib/Time/localtime.pm
         'Time::tm'              => '1.00',  #lib/Time/tm.pm
+        'Unicode'               => '4.0.0', #lib/unicore/version
         'Unicode::Collate'      => '0.33',  #lib/Unicode/Collate.pm
         'Unicode::Normalize'    => '0.28',  #lib/Unicode/Normalize.pm
         'Unicode::UCD'          => '0.21',  #lib/Unicode/UCD.pm
@@ -5065,6 +5075,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         'Time::localtime'       => '1.02',  #lib/Time/localtime.pm
         'Time::tm'              => '1.00',  #lib/Time/tm.pm
         'Time::HiRes'           => '1.59',  #lib/Time/HiRes.pm
+        'Unicode'               => '4.0.1', # lib/unicore/version
         'Unicode::Collate'      => '0.40',  #lib/Unicode/Collate.pm
         'Unicode::UCD'          => '0.22',  #lib/Unicode/UCD.pm
         'Unicode::Normalize'    => '0.30',  #lib/Unicode/Normalize.pm
@@ -5820,6 +5831,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
 	'Time::localtime'       => '1.02',
 	'Time::tm'              => '1.00',
 	'UNIVERSAL'             => '1.02',
+        'Unicode'               => '4.0.1',
 	'Unicode::Collate'      => '0.40',
 	'Unicode::Normalize'    => '0.30',
 	'Unicode::UCD'          => '0.22',
@@ -6182,6 +6194,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
 	'Time::localtime'       => '1.02',
 	'Time::tm'              => '1.00',
 	'UNIVERSAL'             => '1.01',
+        'Unicode'               => '4.1.0', # lib/unicore/version
 	'Unicode::Collate'      => '0.40',
 	'Unicode::Normalize'    => '0.32',
 	'Unicode::UCD'          => '0.23',
@@ -6624,6 +6637,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
 	'Time::localtime'       => '1.02',
 	'Time::tm'              => '1.00',
 	'UNIVERSAL'             => '1.03',
+        'Unicode'               => '4.1.0',
 	'Unicode::Collate'      => '0.52',
 	'Unicode::Normalize'    => '0.32',
 	'Unicode::UCD'          => '0.24',
@@ -6996,6 +7010,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
 	'Time::localtime'       => '1.02',
 	'Time::tm'              => '1.00',
 	'UNIVERSAL'             => '1.01',
+        'Unicode'               => '4.1.0',
 	'Unicode::Collate'      => '0.52',
 	'Unicode::Normalize'    => '0.32',
 	'Unicode::UCD'          => '0.24',
@@ -7469,6 +7484,7 @@ for my $version ( sort { $a <=> $b } keys %released ) {
 	'Time::localtime'       => '1.02',
 	'Time::tm'              => '1.00',
 	'UNIVERSAL'             => '1.04',
+        'Unicode'               => '4.1.0',
 	'Unicode::Collate'      => '0.52',
 	'Unicode::Normalize'    => '1.01',
 	'Unicode::UCD'          => '0.24',
