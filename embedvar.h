@@ -215,8 +215,6 @@
 #define PL_in_clean_all		(vTHX->Iin_clean_all)
 #define PL_in_clean_objs	(vTHX->Iin_clean_objs)
 #define PL_in_load_module	(vTHX->Iin_load_module)
-#define PL_in_my		(vTHX->Iin_my)
-#define PL_in_my_stash		(vTHX->Iin_my_stash)
 #define PL_incgv		(vTHX->Iincgv)
 #define PL_initav		(vTHX->Iinitav)
 #define PL_inplace		(vTHX->Iinplace)
@@ -295,8 +293,6 @@
 #define PL_rehash_seed		(vTHX->Irehash_seed)
 #define PL_rehash_seed_set	(vTHX->Irehash_seed_set)
 #define PL_replgv		(vTHX->Ireplgv)
-#define PL_rsfp			(vTHX->Irsfp)
-#define PL_rsfp_filters		(vTHX->Irsfp_filters)
 #define PL_runops		(vTHX->Irunops)
 #define PL_runops_dbg		(vTHX->Irunops_dbg)
 #define PL_runops_std		(vTHX->Irunops_std)
@@ -465,8 +461,6 @@
 #define PL_Iin_clean_all	PL_in_clean_all
 #define PL_Iin_clean_objs	PL_in_clean_objs
 #define PL_Iin_load_module	PL_in_load_module
-#define PL_Iin_my		PL_in_my
-#define PL_Iin_my_stash		PL_in_my_stash
 #define PL_Iincgv		PL_incgv
 #define PL_Iinitav		PL_initav
 #define PL_Iinplace		PL_inplace
@@ -545,8 +539,6 @@
 #define PL_Irehash_seed		PL_rehash_seed
 #define PL_Irehash_seed_set	PL_rehash_seed_set
 #define PL_Ireplgv		PL_replgv
-#define PL_Irsfp		PL_rsfp
-#define PL_Irsfp_filters	PL_rsfp_filters
 #define PL_Irunops		PL_runops
 #define PL_Irunops_dbg		PL_runops_dbg
 #define PL_Irunops_std		PL_runops_std

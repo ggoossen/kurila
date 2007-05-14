@@ -312,10 +312,6 @@ END_EXTERN_C
 #define PL_in_clean_objs	(*Perl_Iin_clean_objs_ptr(aTHX))
 #undef  PL_in_load_module
 #define PL_in_load_module	(*Perl_Iin_load_module_ptr(aTHX))
-#undef  PL_in_my
-#define PL_in_my		(*Perl_Iin_my_ptr(aTHX))
-#undef  PL_in_my_stash
-#define PL_in_my_stash		(*Perl_Iin_my_stash_ptr(aTHX))
 #undef  PL_incgv
 #define PL_incgv		(*Perl_Iincgv_ptr(aTHX))
 #undef  PL_initav
@@ -472,10 +468,6 @@ END_EXTERN_C
 #define PL_rehash_seed_set	(*Perl_Irehash_seed_set_ptr(aTHX))
 #undef  PL_replgv
 #define PL_replgv		(*Perl_Ireplgv_ptr(aTHX))
-#undef  PL_rsfp
-#define PL_rsfp			(*Perl_Irsfp_ptr(aTHX))
-#undef  PL_rsfp_filters
-#define PL_rsfp_filters		(*Perl_Irsfp_filters_ptr(aTHX))
 #undef  PL_runops
 #define PL_runops		(*Perl_Irunops_ptr(aTHX))
 #undef  PL_runops_dbg

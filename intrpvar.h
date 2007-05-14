@@ -189,7 +189,6 @@ PERLVAR(Imess_sv,	SV *)
 PERLVAR(Iors_sv,	SV *)		/* output record separator $\ */
 /* statics moved here for shared library purposes */
 PERLVARI(Igensym,	I32,	0)	/* next symbol for getsym() to define */
-PERLVAR(Iin_my,		U16)		/* we're compiling a "my" (or "our") declaration */
 PERLVARI(Ilaststype,	U16,	OP_STAT)
 PERLVARI(Ilaststatval,	int,	-1)
 
@@ -214,8 +213,6 @@ PERLVAR(Imodglobal,	HV *)		/* per-interp module data */
 
 /* these used to be in global before 5.004_68 */
 PERLVARI(Iprofiledata,	U32 *,	NULL)	/* table of ops, counts */
-PERLVARI(Irsfp,	PerlIO * VOL,	NULL)	/* current source file pointer */
-PERLVARI(Irsfp_filters,	AV *,	NULL)	/* keeps active source filters */
 
 PERLVAR(Icompiling,	COP)		/* compiling/done executing marker */
 
@@ -301,8 +298,6 @@ PERLVAR(Ipadix,		I32)		/* max used index in current "register" pad */
 
 PERLVAR(Ipadix_floor,	I32)		/* how low may inner block reset padix */
 PERLVAR(Ipad_reset_pending,	I32)	/* reset pad on next attempted alloc */
-
-PERLVAR(Iin_my_stash,	HV *)		/* declared class of this "my" declaration */
 
 PERLVAR(Ihints,		U32)		/* pragma-tic compile-time flags */
 

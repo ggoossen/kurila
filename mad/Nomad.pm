@@ -439,6 +439,7 @@ sub newtype {
 sub madness {
     my $self = shift;
     my @keys = split(' ', shift);
+    @keys = map { $_ eq 'd' ? ('k', 'd') : $_ } @keys;
     my @vals = ();
 
     @keys = map { $_ eq 'd' ? ('local', 'd') : $_ } @keys; # always 'local' before 'defintion'
@@ -739,10 +740,9 @@ sub ast {
     my $self = shift;
 
     my @retval;
-    my @before;
     my @after;
     if (@retval = $self->madness('X')) {
-	push @before, $self->madness('o x');
+	my @before, $self->madness('o x');
 	return P5AST::listop->new(Kids => [@before,@retval]);
     }
 
@@ -764,7 +764,7 @@ sub ast {
     push @retval, @newkids;
 
     push @retval, $self->madness('} ] )');
-    return $self->newtype->new(Kids => [@before,@retval,@after]);
+    return $self->newtype->new(Kids => [@retval,@after]);
 }
 
 package PLXML::logop;
@@ -2266,16 +2266,6 @@ sub ast {
 package PLXML::op_unpack;
 package PLXML::op_pack;
 package PLXML::op_split;
-
-sub ast {
-    my $self = shift;
-    my $results = $self->SUPER::ast(@_);
-    if (my @dest = $self->madness('R')) {
-	return PLXML::op_aassign->newtype->new(Kids => [@dest, $results]);
-    }
-    return $results;
-}
-
 package PLXML::op_join;
 package PLXML::op_list;
 

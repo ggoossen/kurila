@@ -9183,6 +9183,11 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     parser->copline	= proto->copline;
     parser->last_lop_op	= proto->last_lop_op;
     parser->lex_state	= proto->lex_state;
+    parser->rsfp	= fp_dup(proto->rsfp, '<', param);
+    /* rsfp_filters entries have fake IoDIRP() */
+    parser->rsfp_filters= av_dup_inc(proto->rsfp_filters, param);
+    parser->in_my	= proto->in_my;
+    parser->in_my_stash	= hv_dup(proto->in_my_stash, param);
 
 
     parser->linestr	= sv_dup_inc(proto->linestr, param);
@@ -9206,6 +9211,7 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
 
 	parser->bufend	    = ls + SvCUR(parser->linestr);
     }
+
 
 #ifdef PERL_MAD
     parser->endwhite	= proto->endwhite;
@@ -9737,7 +9743,7 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		    IoOFP(dstr) = IoIFP(dstr);
 		else
 		    IoOFP(dstr)	= fp_dup(IoOFP(dstr), IoTYPE(dstr), param);
-		/* PL_rsfp_filters entries have fake IoDIRP() */
+		/* PL_parser->rsfp_filters entries have fake IoDIRP() */
 		if(IoFLAGS(dstr) & IOf_FAKE_DIRP) {
 		    /* I have no idea why fake dirp (rsfps)
 		       should be treated differently but otherwise
@@ -10817,9 +10823,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_custom_op_descs  = hv_dup_inc(proto_perl->Icustom_op_descs,param);
 
     PL_profiledata	= NULL;
-    PL_rsfp		= fp_dup(proto_perl->Irsfp, '<', param);
-    /* PL_rsfp_filters entries have fake IoDIRP() */
-    PL_rsfp_filters	= av_dup_inc(proto_perl->Irsfp_filters, param);
 
     PL_compcv			= cv_dup(proto_perl->Icompcv, param);
 
@@ -10868,8 +10871,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_subline		= proto_perl->Isubline;
     PL_subname		= sv_dup_inc(proto_perl->Isubname, param);
 
-    PL_in_my		= proto_perl->Iin_my;
-    PL_in_my_stash	= hv_dup(proto_perl->Iin_my_stash, param);
 #ifdef FCRYPT
     PL_cryptseen	= proto_perl->Icryptseen;
 #endif

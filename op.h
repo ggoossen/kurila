@@ -696,11 +696,11 @@ struct token {
  * g       op was forced to be a word
  * i       if/unless modifier
  * I       if/elsif/unless statement
+ * k       local declarator
  * K       retired kid op
  * l       last index of array ($#foo)
  * L       label
  * m       modifier on regex
- * M       my assignment slurped into some other operator's target
  * n       sub or format name
  * o       current operator/declarator name
  * o       else/continue
@@ -713,7 +713,6 @@ struct token {
  * Q       optimized qw//
  * r       expression producing R
  * R       tr/E/R/ s/E/R/
- * R       assign slurped by split
  * s       sub signature
  * S       use import stub (no import)
  * S       retired sort block

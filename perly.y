@@ -226,7 +226,7 @@ line	:	label cond
 			{
 			  $$ = newSTATEOP(0, PVAL($1), $2);
 			  PL_parser->expect = XSTATE;
-			  DO_MAD(
+			  DO_MAD({
 			      /* sideff might already have a nexstate */
 			      OP* op = ((LISTOP*)$$)->op_first;
 			      if (op) {
@@ -236,7 +236,7 @@ line	:	label cond
 				  token_getmad($1,op,'L');
 				  token_getmad($3,op,';');
 			      }
-			  )
+			  })
 			}
 	;
 
@@ -517,16 +517,18 @@ mysubrout:	MYSUB startsub subname proto subattrlist subbody
 subrout	:	SUB startsub subname proto subattrlist subbody
 			{ SvREFCNT_inc_simple_void(PL_compcv);
 #ifdef MAD
-			  OP* o = newSVOP(OP_ANONCODE, 0,
-			    (SV*)newATTRSUB($2, $3, $4, $5, $6));
-			  $$ = newOP(OP_NULL,0);
-			  op_getmad(o,$$,'&');
-			  op_getmad($3,$$,'n');
-			  op_getmad($4,$$,'s');
-			  op_getmad($5,$$,'a');
-			  token_getmad($1,$$,'d');
-			  append_madprops($6->op_madprop, $$, 0);
-			  $6->op_madprop = 0;
+			  {
+			      OP* o = newSVOP(OP_ANONCODE, 0,
+				(SV*)newATTRSUB($2, $3, $4, $5, $6));
+			      $$ = newOP(OP_NULL,0);
+			      op_getmad(o,$$,'&');
+			      op_getmad($3,$$,'n');
+			      op_getmad($4,$$,'s');
+			      op_getmad($5,$$,'a');
+			      token_getmad($1,$$,'d');
+			      append_madprops($6->op_madprop, $$, 0);
+			      $6->op_madprop = 0;
+			    }
 #else
 			  newATTRSUB($2, $3, $4, $5, $6);
 			  $$ = Nullop;
@@ -622,7 +624,8 @@ use	:	USE startsub
 			  $$ = utilize(IVAL($1), $2, $4, $5, $6);
 			  token_getmad($1,$$,'o');
 			  token_getmad($7,$$,';');
-			  if (PL_rsfp_filters && AvFILLp(PL_rsfp_filters) >= 0)
+			  if (PL_parser->rsfp_filters &&
+				      AvFILLp(PL_parser->rsfp_filters) >= 0)
 			      append_madprops(newMADPROP('!', MAD_PV, "", 0), $$, 0);
 #else
 			  utilize(IVAL($1), $2, $4, $5, $6);
@@ -880,14 +883,14 @@ termbinop:	term ASSIGNOP term                     /* $x = $y */
 	|	term DOTDOT term                       /* $x..$y, $x...$y */
 			{
 			  $$ = newRANGE(IVAL($2), scalar($1), scalar($3));
-			  DO_MAD(
+			  DO_MAD({
 			      UNOP *op;
 			      op = (UNOP*)$$;
 			      op = (UNOP*)op->op_first;	/* get to flop */
 			      op = (UNOP*)op->op_first;	/* get to flip */
 			      op = (UNOP*)op->op_first;	/* get to range */
 			      token_getmad($2,(OP*)op,'o');
-			    )
+			    })
 			}
 	|	term ANDAND term                       /* $x && $y */
 			{ $$ = newLOGOP(OP_AND, 0, $1, $3);
@@ -1114,14 +1117,14 @@ term	:	termbinop
 			{
 			  $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST, $3, scalar($1)));
-			  DO_MAD(
+			  DO_MAD({
 			      OP* op = $$;
 			      if (op->op_type == OP_CONST) { /* defeat const fold */
 				op = (OP*)op->op_madprop->mad_val;
 			      }
 			      token_getmad($2,op,'(');
 			      token_getmad($4,op,')');
-			  )
+			  })
 			}
 	|	NOAMP WORD listexpr                  /* foo(@args) */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
@@ -1264,7 +1267,7 @@ listexprcom:	/* NULL */
 /* A little bit of trickery to make "for my $foo (@bar)" actually be
    lexical */
 my_scalar:	scalar
-			{ PL_in_my = 0; $$ = my($1); }
+			{ PL_parser->in_my = 0; $$ = my($1); }
 	;
 
 amper	:	'&' indirob
