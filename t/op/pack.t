@@ -10,7 +10,7 @@ my $no_endianness = $] > 5.009 ? '' :
 my $no_signedness = $] > 5.009 ? '' :
   "Signed/unsigned pack modifiers not available on this perl";
 
-plan tests => 14652;
+plan tests => 14651;
 
 use strict;
 use warnings qw(FATAL all);
@@ -944,9 +944,6 @@ is("@{[unpack('U*', pack('U*', 100, 200))]}", "100 200");
 SKIP: {
     skip "Not for EBCDIC", 4 if $Is_EBCDIC;
 
-    # does unpack C unravel pack U?
-    is("@{[unpack('C*', pack('U*', 100, 200))]}", "100 195 136");
-
     # does pack U0C create Unicode?
     is("@{[pack('U0C*', 100, 195, 136)]}", v100.v200);
 
@@ -1641,7 +1638,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
           skip "cannot pack/unpack $format on this perl", 9 if
               $@ && is_valid_error($@);
           use utf8;
-          my $up = pack("a0 $format", "\x{100}", $val);
+          my $up = pack("$format", $val);
           is($down, $up, "$format generated strings are equal though");
           no utf8;
           my @down_expanded = unpack("$format W", $down . chr(0x66));
