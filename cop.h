@@ -243,27 +243,6 @@ struct cop {
 #  define OutCopFILE(c) CopFILE(c)
 #endif
 
-/* If $[ is non-zero, it's stored in cop_hints under the key "$[", and
-   HINT_ARYBASE is set to indicate this.
-   Setting it is ineficient due to the need to create 2 mortal SVs, but as
-   using $[ is highly discouraged, no sane Perl code will be using it.  */
-#define CopARYBASE_get(c)	\
-	((CopHINTS_get(c) & HINT_ARYBASE)				\
-	 ? SvIV(Perl_refcounted_he_fetch(aTHX_ (c)->cop_hints_hash, 0,	\
-					 "$[", 2, 0, 0))		\
-	 : 0)
-#define CopARYBASE_set(c, b) STMT_START { \
-	if (b || ((c)->cop_hints & HINT_ARYBASE)) {			\
-	    (c)->cop_hints |= HINT_ARYBASE;				\
-	    if ((c) == &PL_compiling)					\
-		PL_hints |= HINT_LOCALIZE_HH | HINT_ARYBASE;		\
-	    (c)->cop_hints_hash						\
-	       = Perl_refcounted_he_new(aTHX_ (c)->cop_hints_hash,	\
-					sv_2mortal(newSVpvs("$[")),	\
-					sv_2mortal(newSViv(b)));	\
-	}								\
-    } STMT_END
-
 /* FIXME NATIVE_HINTS if this is changed from op_private (see perl.h)  */
 #define CopHINTS_get(c)		((c)->cop_hints + 0)
 #define CopHINTS_set(c, h)	STMT_START {				\

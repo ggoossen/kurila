@@ -1135,8 +1135,6 @@ Only when perl was compiled with ithreads.
 
 =item cop_seq
 
-=item arybase
-
 =item line
 
 =item warnings

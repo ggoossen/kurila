@@ -1205,7 +1205,6 @@ LOOP_lastop(o)
 #define COP_file(o)	CopFILE(o)
 #define COP_filegv(o)	CopFILEGV(o)
 #define COP_cop_seq(o)	o->cop_seq
-#define COP_arybase(o)	CopARYBASE_get(o)
 #define COP_line(o)	CopLINE(o)
 #define COP_hints(o)	CopHINTS_get(o)
 #if PERL_VERSION < 9
@@ -1238,10 +1237,6 @@ COP_filegv(o)
 
 U32
 COP_cop_seq(o)
-	B::COP	o
-
-I32
-COP_arybase(o)
 	B::COP	o
 
 U32

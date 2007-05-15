@@ -996,25 +996,6 @@ to ps(1) (assuming the operating system plays along).  Note that
 the view of C<$0> the other threads have will not change since they
 have their own copies of it.
 
-=item $[
-X<$[>
-
-The index of the first element in an array, and of the first character
-in a substring.  Default is 0, but you could theoretically set it
-to 1 to make Perl behave more like B<awk> (or Fortran) when
-subscripting and when evaluating the index() and substr() functions.
-(Mnemonic: [ begins subscripts.)
-
-As of release 5 of Perl, assignment to C<$[> is treated as a compiler
-directive, and cannot influence the behavior of any other file.
-(That's why you can only assign compile-time constants to it.)
-Its use is highly discouraged.
-
-Note that, unlike other compile-time directives (such as L<strict>),
-assignment to C<$[> can be seen from outer lexical scopes in the same file.
-However, you can use local() on it to strictly bind its value to a
-lexical block.
-
 =item $]
 X<$]>
 

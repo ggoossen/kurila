@@ -117,7 +117,7 @@ use Getopt::Std;
 use Carp;
 use Test::More tests => ( # per-pkg tests (function ct + require_ok)
 			  40 + 16	# Data::Dumper, Digest::MD5
-			  + 517 + 259	# B::Deparse, B
+			  + 517 + 258	# B::Deparse, B
 			  + 595 + 190	# POSIX, IO::Socket
 			  + 345 * ($] > 5.009)
 			  + 17 * ($] >= 5.009003)
@@ -169,7 +169,7 @@ my $testpkgs = {
 		     CVf_METHOD LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
 		     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
 		     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
-		     OPf_WANT_VOID OPpCONST_ARYBASE OPpCONST_BARE
+		     OPf_WANT_VOID OPpCONST_BARE
 		     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
 		     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
 		     OPpSORT_INPLACE OPpSORT_INTEGER OPpSORT_NUMERIC

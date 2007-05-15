@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 114;
+plan tests => 112;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -331,18 +331,6 @@ like($@, qr/Modification of a read-only value attempted/);
 # The s/// adds 'g' magic to $_, but it should remain non-readonly
 eval { for("a") { for $x (1,2) { local $_="b"; s/(.*)/+$1/ } } };
 is($@, "");
-
-# Special local() behavior for $[
-# (see RT #38207 - Useless localization of constant ($[) in getopts.pl}
-{
-    local $[ = 1;
-    local $TODO = "local() not currently working correctly with \$[";
-    ok(1 == $[);
-    undef $TODO;
-    f();
-}
-
-sub f { ok(0 == $[); }
 
 # sub localisation
 {

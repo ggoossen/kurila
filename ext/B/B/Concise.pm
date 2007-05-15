@@ -626,8 +626,8 @@ our %hints; # used to display each COP's op_hints values
 
 # strict refs, subs, vars
 @hints{2,512,1024} = ('$', '&', '*');
-# integers, locale, bytes, arybase
-@hints{1,4,8,16,32} = ('i', 'l', 'b', '[');
+# integers, locale, bytes
+@hints{1,4,8,16} = ('i', 'l', 'b');
 # block scope, localise %^H, $^OPEN (in), $^OPEN (out)
 @hints{256,131072,262144,524288} = ('{','%','<','>');
 # overload new integer, float, binary, string, re
@@ -790,9 +790,7 @@ sub concise_op {
 	$loc =~ s[.*/][];
 	$loc .= ":" . $op->line;
 	my($stash, $cseq) = ($op->stash->NAME, $op->cop_seq - $cop_seq_base);
-	my $arybase = $op->arybase;
-	$arybase = $arybase ? ' $[=' . $arybase : "";
-	$h{arg} = "($label$stash $cseq $loc$arybase)";
+	$h{arg} = "($label$stash $cseq $loc)";
     } elsif ($h{class} eq "LOOP") {
 	$h{arg} = "(next->" . seq($op->nextop) . " last->" . seq($op->lastop)
 	  . " redo->" . seq($op->redoop) . ")";

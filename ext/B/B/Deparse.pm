@@ -14,7 +14,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD OPpPAD_STATE
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
 	 OPpTRANS_SQUASH OPpTRANS_DELETE OPpTRANS_COMPLEMENT OPpTARGET_MY
-	 OPpCONST_ARYBASE OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
+	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
 	 OPpSORT_REVERSE OPpSORT_INPLACE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
          CVf_METHOD CVf_LOCKED CVf_LVALUE CVf_ASSERTION
@@ -554,7 +554,6 @@ sub new {
     $self->{'use_dumper'} = 0;
     $self->{'use_tabs'} = 0;
 
-    $self->{'ambient_arybase'} = 0;
     $self->{'ambient_warnings'} = undef; # Assume no lexical warnings
     $self->{'ambient_hints'} = 0;
     $self->init();
@@ -599,7 +598,6 @@ sub new {
 sub init {
     my $self = shift;
 
-    $self->{'arybase'}  = $self->{'ambient_arybase'};
     $self->{'warnings'} = defined ($self->{'ambient_warnings'})
 				? $self->{'ambient_warnings'} & WARN_MASK
 				: undef;
@@ -682,7 +680,7 @@ sub coderef2text {
 
 sub ambient_pragmas {
     my $self = shift;
-    my ($arybase, $hint_bits, $warning_bits) = (0, 0);
+    my ($hint_bits, $warning_bits) = (0, 0);
 
     while (@_ > 1) {
 	my $name = shift();
@@ -707,10 +705,6 @@ sub ambient_pragmas {
 		@names = split' ', $val;
 	    }
 	    $hint_bits |= strict::bits(@names);
-	}
-
-	elsif ($name eq '$[') {
-	    $arybase = $val;
 	}
 
 	elsif ($name eq 'integer'
@@ -779,7 +773,6 @@ sub ambient_pragmas {
 	croak "The ambient_pragmas method expects an even number of args";
     }
 
-    $self->{'ambient_arybase'} = $arybase;
     $self->{'ambient_warnings'} = $warning_bits;
     $self->{'ambient_hints'} = $hint_bits;
 }
@@ -1378,11 +1371,6 @@ sub pp_nextstate {
     if ($stash ne $self->{'curstash'}) {
 	push @text, "package $stash;\n";
 	$self->{'curstash'} = $stash;
-    }
-
-    if ($self->{'arybase'} != $op->arybase) {
-	push @text, '$[ = '. $op->arybase .";\n";
-	$self->{'arybase'} = $op->arybase;
     }
 
     my $warnings = $op->warnings;
@@ -2810,7 +2798,7 @@ sub pp_aelemfast {
 	$name = '$' . $name;
     }
 
-    return $name . "[" .  ($op->private + $self->{'arybase'}) . "]";
+    return $name . "[" .  ($op->private) . "]";
 }
 
 sub rv2x {
@@ -3672,9 +3660,6 @@ sub const_sv {
 sub pp_const {
     my $self = shift;
     my($op, $cx) = @_;
-    if ($op->private & OPpCONST_ARYBASE) {
-        return '$[';
-    }
 #    if ($op->private & OPpCONST_BARE) { # trouble with `=>' autoquoting
 #	return $self->const_sv($op)->PV;
 #    }
@@ -3687,7 +3672,6 @@ sub dq {
     my $op = shift;
     my $type = $op->name;
     if ($type eq "const") {
-	return '$[' if $op->private & OPpCONST_ARYBASE;
 	return uninterp(escape_str(unback($self->const_sv($op)->as_string)));
     } elsif ($type eq "concat") {
 	my $first = $self->dq($op->first);
@@ -3992,7 +3976,6 @@ sub re_dq {
 
     my $type = $op->name;
     if ($type eq "const") {
-	return '$[' if $op->private & OPpCONST_ARYBASE;
 	my $unbacked = re_unback($self->const_sv($op)->as_string);
 	return re_uninterp_extended(escape_extended_re($unbacked))
 	    if $extended;

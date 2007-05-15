@@ -5,7 +5,7 @@ BEGIN {
 }
 
 use strict;
-plan( tests => 57 );
+plan( tests => 49 );
 
 require bytes;
 
@@ -95,18 +95,6 @@ is(rindex("abc", "", 4), 3);
 	my $a = index ( "\x{1228}\x{1228}\x{1230}\x{1270}", $_ );
 	my $b = index ( $haystack, $_ );
 	is($a, $b, q{[perl #22375] 'split'/'index' problem for utf8});
-    }
-}
-
-foreach my $utf8 ('', ', utf-8') {
-    foreach my $arraybase (0, 1, -1, -2) {
-	my $expect_pos = 2 + $arraybase;
-
-	my $prog = "\$[ = $arraybase; my \$big = \"N\\xabN\\xab\"; ";
-	$prog .= 'use utf8; $big .= chr 256; chop $big; ' if $utf8;
-	$prog .= 'print rindex $big, "N", 2 + $[';
-
-	fresh_perl_is($prog, $expect_pos, {}, "\$[ = $arraybase$utf8");
     }
 }
 

@@ -4542,14 +4542,6 @@ Perl_yylex(pTHX)
 	    PREREF('$');
 	}
 
-	/* This kludge not intended to be bulletproof. */
-	if (PL_tokenbuf[1] == '[' && !PL_tokenbuf[2]) {
-	    yylval.opval = newSVOP(OP_CONST, 0,
-				   newSViv(CopARYBASE_get(&PL_compiling)));
-	    yylval.opval->op_private = OPpCONST_ARYBASE;
-	    TERM(THING);
-	}
-
 	d = s;
 	{
 	    const char tmp = *s;

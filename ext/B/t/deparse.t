@@ -38,7 +38,6 @@ print "ok " . $i++ . "\n";
  $deparse->ambient_pragmas (
      hint_bits    => $hint_bits,
      warning_bits => $warning_bits,
-     '$['         => 0 + $[
  );
 }
 
