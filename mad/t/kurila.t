@@ -130,6 +130,12 @@ Foo::Bar->new();
 ====
 Foo::Bar->new();
 END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+truncate(FH, 0);
+====
+truncate(FH, 0);
+END
 }
 
 sub t_strict_refs {

@@ -78,7 +78,7 @@ sub const_handler {
     }
 
     # "-x XX"
-    return if $const->parent->tag =~ m/^op_ft/;
+    return if $const->parent->tag =~ m/^op_(ft.*|truncate|chdir|stat|lstat)$/;
 
     # keep Foo::Bar->new()
     return if $const->parent->tag eq "op_entersub";
