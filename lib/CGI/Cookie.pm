@@ -119,7 +119,7 @@ sub new {
   shift if ref $_[0]
         && eval { $_[0]->isa('Apache::Request::Req') || $_[0]->isa('Apache') };
   my($name,$value,$path,$domain,$secure,$expires,$httponly) =
-    rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES,HTTPONLY],@_);
+    rearrange(['NAME',['VALUE','VALUES'],'PATH','DOMAIN','SECURE','EXPIRES','HTTPONLY'],@_);
   
   # Pull out our parameters.
   my @values;

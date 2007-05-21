@@ -75,7 +75,7 @@ sub which_perl {
 
     $perl .= $Config{exe_ext} unless $perl =~ m/$Config{exe_ext}$/i;
 
-    my $perlpath = File::Spec->rel2abs( $perl );
+    my $perlpath = 'File::Spec'->rel2abs( $perl );
     unless( $Is_MacOS || -x $perlpath ) {
         # $^X was probably 'perl'
 
@@ -84,8 +84,8 @@ sub which_perl {
         die "Can't find a perl to use (\$^X=$^X), (\$perlpath=$perlpath)" 
           if $ENV{PERL_CORE};
 
-        foreach my $path (File::Spec->path) {
-            $perlpath = File::Spec->catfile($path, $perl);
+        foreach my $path ('File::Spec'->path) {
+            $perlpath = 'File::Spec'->catfile($path, $perl);
             last if -x $perlpath;
         }
     }
@@ -108,7 +108,7 @@ sub perl_lib {
     my $lib =  $ENV{PERL_CORE} ? qq{../lib}
                                # ExtUtils-MakeMaker/t/
                                : qq{../blib/lib};
-    $lib = File::Spec->rel2abs($lib);
+    $lib = 'File::Spec'->rel2abs($lib);
     my @libs = ($lib);
     push @libs, $ENV{PERL5LIB} if exists $ENV{PERL5LIB};
     $ENV{PERL5LIB} = join($Config{path_sep}, @libs);
@@ -313,7 +313,7 @@ sub have_compiler {
 
     eval {
 	require ExtUtils::CBuilder;
-	my $cb = ExtUtils::CBuilder->new;
+	my $cb = 'ExtUtils::CBuilder'->new;
 
 	$have_compiler = $cb->have_compiler;
     };

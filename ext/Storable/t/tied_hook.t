@@ -151,9 +151,9 @@ package main;
 $a = 'toto';
 $b = \$a;
 
-$c = tie %hash, TIED_HASH;
-$d = tie @array, TIED_ARRAY;
-tie $scalar, TIED_SCALAR;
+$c = tie %hash, 'TIED_HASH';
+$d = tie @array, 'TIED_ARRAY';
+tie $scalar, 'TIED_SCALAR';
 
 $scalar = 'foo';
 $hash{'attribute'} = 'plain value';

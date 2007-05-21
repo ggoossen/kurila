@@ -91,11 +91,11 @@ ok(eq_array(
     [ qw(Test::A Test::B Test::E Test::C Test::D Test::F Test::O) ]
 ), '... got the right MRO for Test::A');      
     
-is(Test::A->O_or_D, 'Test::D', '... got the right method dispatch');    
-is(Test::A->O_or_F, 'Test::F', '... got the right method dispatch');   
+is('Test::A'->O_or_D, 'Test::D', '... got the right method dispatch');    
+is('Test::A'->O_or_F, 'Test::F', '... got the right method dispatch');   
 
 # NOTE: 
 # this test is particularly interesting because the p5 dispatch
 # would actually call Test::D before Test::C and Test::D is a
 # subclass of Test::C 
-is(Test::A->C_or_D, 'Test::C', '... got the right method dispatch');    
+is('Test::A'->C_or_D, 'Test::C', '... got the right method dispatch');    

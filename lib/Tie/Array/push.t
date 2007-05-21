@@ -18,8 +18,8 @@ BEGIN {
  sub STORESIZE { $#{$_[0]} = $_[1]-1 }
 }
 
-tie @x,Basic;
-tie @get,Basic;
-tie @got,Basic;
-tie @tests,Basic;
+tie @x,'Basic';
+tie @get,'Basic';
+tie @got,'Basic';
+tie @tests,'Basic';
 require "op/push.t"

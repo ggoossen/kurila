@@ -8,7 +8,7 @@ my $out = tie *$out_fh, 'TieOut';
 my $err = tie *$err_fh, 'TieOut';
 
 use Test::Builder;
-my $t = Test::Builder->new;
+my $t = 'Test::Builder'->new;
 $t->output($out_fh);
 $t->failure_output($err_fh);
 $t->todo_output($err_fh);

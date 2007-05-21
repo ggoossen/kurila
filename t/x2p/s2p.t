@@ -787,8 +787,8 @@ my $stdin  = "s2pt$$.in";
 my $plsed  = "s2pt$$.pl";
 
 # various command lines for 
-my $s2p  = File::Spec->catfile( File::Spec->updir(), 'x2p', 's2p' );
-my $psed = File::Spec->catfile( File::Spec->curdir(), 'psed' );
+my $s2p  = 'File::Spec'->catfile( 'File::Spec'->updir(), 'x2p', 's2p' );
+my $psed = 'File::Spec'->catfile( 'File::Spec'->curdir(), 'psed' );
 if ($^O eq 'VMS') {
   # default in the .com extenson if it's not already there
   $s2p = VMS::Filespec::vmsify($s2p);

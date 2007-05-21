@@ -33,7 +33,7 @@ sub new
         my $value       = shift;
 	my $a = $accuracy; $a = $_[0] if defined $_[0];
 	my $p = $precision; $p = $_[1] if defined $_[1];
-        my $self = Math::BigInt->new($value,$a,$p,$round_mode);
+        my $self = 'Math::BigInt'->new($value,$a,$p,$round_mode);
 	bless $self,$class;
         $self->{'_custom'} = 1; # make sure this never goes away
         return $self;
@@ -51,7 +51,7 @@ sub blcm
 
 sub as_int
   {
-  Math::BigInt->new($_[0]);
+  'Math::BigInt'->new($_[0]);
   }
 
 BEGIN

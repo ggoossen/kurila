@@ -28,7 +28,7 @@ print "1..14\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless {}, CLASS;
+$c = bless {}, 'CLASS';
 $c->{attribute} = 'attrval';
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 @a = ('first', '', undef, 3, -4, -3.14159, 456, 4.5,

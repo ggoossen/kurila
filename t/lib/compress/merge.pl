@@ -17,7 +17,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 165 + $extra ;
 
@@ -43,7 +43,7 @@ sub run
     {
         title "Misc error cases";
 
-        eval { Compress::Raw::Zlib::InflateScan->new( Bufsize => 0)} ;
+        eval { 'Compress::Raw::Zlib::InflateScan'->new( Bufsize => 0)} ;
         like $@, mkErr("^Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified 0"), "  catch bufsize == 0";
 
         eval { Compress::Raw::Zlib::inflateScanStream::createDeflateStream(undef, Bufsize => 0) } ;
@@ -83,7 +83,7 @@ sub run
                 if ($to_file)
                   { $dest = $out_file }
                 else
-                  { $dest = IO::File->new( "<$out_file")  }
+                  { $dest = 'IO::File'->new( "<$out_file")  }
 
                 my $gz = $CompressClass->new($dest, Merge => 1) ;
                 
@@ -128,7 +128,7 @@ sub run
 
                 if ($to_file eq 'handle')
                 {
-                    $buffer = IO::File->new( "+<$out_file") 
+                    $buffer = 'IO::File'->new( "+<$out_file") 
                         or die "# Cannot open $out_file: $!";
                 }
                 else
@@ -167,7 +167,7 @@ sub run
 
                 if ($to_file eq 'handle')
                 {
-                    $buffer = IO::File->new( "+<$out_file") 
+                    $buffer = 'IO::File'->new( "+<$out_file") 
                         or die "# Cannot open $out_file: $!";
                 }
                 else
@@ -256,7 +256,7 @@ sub run
                 my $dest = $buffer ;    
                 if ($to_file eq 'handle')
                 {
-                    $dest = IO::File->new( "+<$buffer") ;
+                    $dest = 'IO::File'->new( "+<$buffer") ;
                 }
 
                 my $gz1 = $CompressClass->new($dest, Merge => 1, AutoClose => 1)

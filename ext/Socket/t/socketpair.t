@@ -61,7 +61,7 @@ if( !$Config{d_alarm} ) {
   plan skip_all => "fork() not implemented on this platform";
 } else {
   # This should fail but not die if there is real socketpair
-  eval {socketpair LEFT, RIGHT, -1, -1, -1};
+  eval {socketpair LEFT, 'RIGHT', -1, -1, -1};
   if ($@ =~ /^Unsupported socket function "socketpair" called/ ||
       $! =~ /^The operation requested is not supported./) { # Stratus VOS
     plan skip_all => 'No socketpair (real or emulated)';
@@ -78,7 +78,7 @@ if( !$Config{d_alarm} ) {
 # But we'll install an alarm handler in case any of the races below fail.
 $SIG{ALRM} = sub {die "Unexpected alarm during testing"};
 
-ok (socketpair (LEFT, RIGHT, AF_UNIX, SOCK_STREAM, PF_UNSPEC),
+ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_STREAM, PF_UNSPEC),
     "socketpair (LEFT, RIGHT, AF_UNIX, SOCK_STREAM, PF_UNSPEC)")
   or print "# \$\! = $!\n";
 
@@ -172,7 +172,7 @@ SKIP: {
   skip "No usable SOCK_DGRAM for socketpair", 24 if ($^O =~ /^(MSWin32|os2)\z/);
   local $TODO = "socketpair not supported on $^O" if $^O eq 'nto';
 
-ok (socketpair (LEFT, RIGHT, AF_UNIX, SOCK_DGRAM, PF_UNSPEC),
+ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_DGRAM, PF_UNSPEC),
     "socketpair (LEFT, RIGHT, AF_UNIX, SOCK_DGRAM, PF_UNSPEC)")
   or print "# \$\! = $!\n";
 

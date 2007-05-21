@@ -13,7 +13,7 @@ open(FOO, ">foo-$$") || die;
 
 print "ok 1\n";
 {
-    my $saver = SelectSaver->new(FOO);
+    my $saver = SelectSaver->new('FOO');
     print "foo\n";
 }
 

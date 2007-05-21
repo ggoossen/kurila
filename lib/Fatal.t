@@ -10,7 +10,7 @@ use strict;
 use Fatal qw(open close :void opendir sin);
 
 my $i = 1;
-eval { open FOO, '<lkjqweriuapofukndajsdlfjnvcvn' };
+eval { open 'FOO', '<lkjqweriuapofukndajsdlfjnvcvn' };
 print "not " unless $@ =~ /^Can't open/;
 print "ok $i\n"; ++$i;
 
@@ -27,10 +27,10 @@ for ('$foo', "'$foo'", "*$foo", "\\*$foo") {
     print "ok $i\n"; ++$i;
 }
 
-eval { opendir FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
+eval { opendir 'FOO', 'lkjqweriuapofukndajsdlfjnvcvn' };
 print "not " unless $@ =~ /^Can't open/;
 print "ok $i\n"; ++$i;
 
-eval { my $a = opendir FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
+eval { my $a = opendir 'FOO', 'lkjqweriuapofukndajsdlfjnvcvn' };
 print "not " if $@ =~ /^Can't open/;
 print "ok $i\n"; ++$i;

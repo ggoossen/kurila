@@ -34,7 +34,7 @@ use overload
 
 package main;
 
-$a = bless [77], OVERLOADED;
+$a = bless [77], 'OVERLOADED';
 
 $b = thaw freeze $a;
 ok 1, ref $b eq 'OVERLOADED';

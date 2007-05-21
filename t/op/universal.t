@@ -83,7 +83,7 @@ ok (Cedric->isa('Programmer'));
 
 {
     package Alice;
-    base::->import('Programmer');
+    'base'->import('Programmer');
 }
 
 ok $a->isa('Programmer');
@@ -191,7 +191,7 @@ ok $x->isa('UNIVERSAL');
 
 # Check that the "historical accident" of UNIVERSAL having an import()
 # method doesn't effect anyone else.
-eval { Some::Package->import("bar") };
+eval { 'Some::Package'->import("bar") };
 is $@, '';
 
 

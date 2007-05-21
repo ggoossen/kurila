@@ -20,13 +20,13 @@ BaseTests("version");
 diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
 package version::Empty;
-use base version;
+use base 'version';
 $VERSION = 0.01;
 no warnings 'redefine';
 *::qv = sub { return bless version::qv(shift), __PACKAGE__; };
 
 package version::Bad;
-use base version;
+use base 'version';
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
 package main;

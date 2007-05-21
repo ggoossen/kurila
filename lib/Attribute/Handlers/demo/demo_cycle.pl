@@ -13,7 +13,7 @@ sub FETCH {
 
 package main;
 
-use Attribute::Handlers autotieref => { Selfish => Selfish };
+use Attribute::Handlers autotieref => { Selfish => 'Selfish' };
 
 my $next : Selfish("me");
 print "$next\n";

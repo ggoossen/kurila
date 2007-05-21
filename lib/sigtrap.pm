@@ -81,7 +81,7 @@ sub handler_die {
 
 sub handler_traceback {
     package DB;		# To get subroutine args.
-    $SIG{'ABRT'} = DEFAULT;
+    $SIG{'ABRT'} = 'DEFAULT';
     kill 'ABRT', $$ if $panic++;
     syswrite(STDERR, 'Caught a SIG', 12);
     syswrite(STDERR, $_[0], length($_[0]));

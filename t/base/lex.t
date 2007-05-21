@@ -93,10 +93,10 @@ E1
 
 {
     no strict 'subs';
-    $foo = FOO;
-    $bar = BAR;
-    $foo{$bar} = BAZ;
-    $ary[0] = ABC;
+    $foo = 'FOO';
+    $bar = 'BAR';
+    $foo{$bar} = 'BAZ';
+    $ary[0] = 'ABC';
 }
 
 print "$foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
@@ -261,7 +261,7 @@ no strict 'subs';
 my %str = (
     foo      => 1,
     xyz::foo => 1,
-    xyz::bar => 1,
+    'xyz::bar' => 1,
 );
 
 my $test = 52;

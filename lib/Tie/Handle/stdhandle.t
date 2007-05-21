@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use Tie::Handle;
-tie *tst,Tie::StdHandle;
+tie *tst,'Tie::StdHandle';
 
 $f = 'tst';
 

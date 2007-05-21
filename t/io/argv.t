@@ -11,7 +11,7 @@ plan(tests => 22);
 
 use File::Spec;
 
-my $devnull = File::Spec->devnull;
+my $devnull = 'File::Spec'->devnull;
 
 open(TRY, '>Io_argv1.tmp') || (die "Can't open temp file: $!");
 print TRY "a line\n";

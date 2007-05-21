@@ -20,6 +20,6 @@ sub yeppers {
 }
 
 
-&foo1( A );
-&foo2( B );
+&foo1( 'A' );
+&foo2( 'B' );
 

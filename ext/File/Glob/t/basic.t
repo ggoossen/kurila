@@ -29,7 +29,7 @@ sub array {
 
 # look for the contents of the current directory
 $ENV{PATH} = "/bin";
-delete @ENV{BASH_ENV, CDPATH, ENV, IFS};
+delete @ENV{'BASH_ENV', 'CDPATH', 'ENV', 'IFS'};
 @correct = ();
 if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
    @correct = grep { !/^\./ } sort readdir(D);

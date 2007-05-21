@@ -15,7 +15,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 7 + $extra ;
 
@@ -63,7 +63,7 @@ hello world
 this is a test
 EOM
 
-        my $fh = IO::File->new( "> $name") ;
+        my $fh = 'IO::File'->new( "> $name") ;
 
         {
           ok my $x = $CompressClass-> new( $fh, -AutoClose => 1)  ;

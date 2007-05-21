@@ -232,7 +232,7 @@ like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
 
     {
 	use strict; # the below should not warn
-	ok( open(my $stdout, ">&", STDOUT),         'dup STDOUT into lexical fh');
+	ok( open(my $stdout, ">&", 'STDOUT'),         'dup STDOUT into lexical fh');
     }
 
     # used to try to open a file [perl #17830]

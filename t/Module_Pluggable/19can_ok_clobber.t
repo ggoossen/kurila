@@ -14,7 +14,7 @@ my @plugins = MyTest->plugins;
 my @plugins_after;
 
 use_ok( 'MyTest::Plugin::Foo' );
-ok( my $foo = MyTest::Plugin::Foo->new() );
+ok( my $foo = 'MyTest::Plugin::Foo'->new() );
 
 @plugins_after = MyTest->plugins;
 is_deeply(

@@ -171,7 +171,7 @@ sub list_eq ($$) {
     $x = pack('w*', 5000000000); $y = '';
     eval {
     use Math::BigInt;
-    $y = pack('w*', Math::BigInt::->new(5000000000));
+    $y = pack('w*', 'Math::BigInt'->new(5000000000));
     };
     is($x, $y);
 

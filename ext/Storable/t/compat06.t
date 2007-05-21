@@ -60,7 +60,7 @@ package ROOT;
 
 sub make {
 	my $self = bless {}, shift;
-	my $h = tie %hash, TIED_HASH;
+	my $h = tie %hash, 'TIED_HASH';
 	$self->{h} = $h;
 	$self->{ref} = \%hash;
 	my @pool;

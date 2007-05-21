@@ -100,7 +100,7 @@ is(<$fh>, "42", "reading from non-string scalars");
 close $fh;
 
 { package P; sub TIESCALAR {bless{}} sub FETCH { "shazam" } }
-tie $p, P; open $fh, '<', \$p;
+tie $p, 'P'; open $fh, '<', \$p;
 is(<$fh>, "shazam", "reading from magic scalars");
 
 {

@@ -312,7 +312,7 @@ while (/(o.+?),/gc) {
     $x{a} = 1;
     { local $x{b} = 1; }
     ok(! exists $x{b});
-    { local @x{c,d,e}; }
+    { local @x{'c','d','e'}; }
     ok(! exists $x{c});
 }
 

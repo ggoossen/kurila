@@ -51,7 +51,7 @@ open(FH,'>X') || die "Can't create x";
 print FH "X";
 close(FH) or die "Can't close: $!";
 
-tie %dir, IO::Dir, $DIR;
+tie %dir, 'IO::Dir', $DIR;
 my @files = keys %dir;
 
 # I hope we do not have an empty dir :-)
@@ -64,7 +64,7 @@ delete $dir{'X'};
 
 ok(-f 'X');
 
-tie %dirx, IO::Dir, $DIR, DIR_UNLINK;
+tie %dirx, 'IO::Dir', $DIR, DIR_UNLINK;
 
 my $statx = $dirx{'X'};
 ok(defined($statx) && UNIVERSAL::isa($statx,'File::stat') && $statx->size == 1);

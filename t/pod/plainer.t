@@ -3,7 +3,7 @@
 BEGIN { chdir 't' if -d 't'; @INC = '../lib' }
 
 use Pod::Plainer;
-my $parser = Pod::Plainer->new();
+my $parser = 'Pod::Plainer'->new();
 my $header = "=pod\n\n";
 my $input  = 'plnr_in.pod';
 my $output = 'plnr_out.pod';

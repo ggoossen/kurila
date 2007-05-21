@@ -97,7 +97,7 @@ SKIP: {
     SKIP: {
         skip "fork required", 2 unless $Config{d_fork};
 
-        pipe(READER,WRITER) || die "Can't open pipe";
+        pipe(READER,'WRITER') || die "Can't open pipe";
 
         if ($pid = fork) {
             close WRITER;
@@ -128,7 +128,7 @@ SKIP: {
 } 
 wait;				# Collect from $pid
 
-pipe(READER,WRITER) || die "Can't open pipe";
+pipe(READER,'WRITER') || die "Can't open pipe";
 close READER;
 
 $SIG{'PIPE'} = 'broken_pipe';

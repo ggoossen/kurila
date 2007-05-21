@@ -62,7 +62,7 @@ sub _make_cmd {
                 local(*SAVEOUT, *READ, *WRITE);
 
                 open SAVEOUT, '>&STDOUT' or die;
-                pipe READ, WRITE or die;
+                pipe READ, 'WRITE' or die;
                 open STDOUT, '>&WRITE' or die;
                 close WRITE;
 

@@ -11,7 +11,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 694 + $extra ;
 
@@ -81,7 +81,7 @@ EOM
                 }
                 elsif ($fb eq 'filehandle')
                 {
-                    $output = IO::File->new( ">$name") ;
+                    $output = 'IO::File'->new( ">$name") ;
                 }
                 else
                 {
@@ -105,7 +105,7 @@ EOM
                     $cc = $output ;
                     if ($fb eq 'filehandle')
                     {
-                        $cc = IO::File->new( "<$name") ;
+                        $cc = 'IO::File'->new( "<$name") ;
                     }
                     my @opts = $unc ne $UncompressClass 
                                     ? (RawInflate => 1)
@@ -140,7 +140,7 @@ EOM
                     $cc = $output ;
                     if ($fb eq 'filehandle')
                     {
-                        $cc = IO::File->new( "<$name") ;
+                        $cc = 'IO::File'->new( "<$name") ;
                     }
                     my @opts = $unc ne $UncompressClass 
                                     ? (RawInflate => 1)

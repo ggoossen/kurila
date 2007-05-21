@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
     require Config; Config->import;
     require Test::More; Test::More->import();
-    plan(tests, 12);
+    plan('tests', 12);
 }
 
 require AnyDBM_File;
@@ -21,7 +21,7 @@ unlink <Op_dbmx*>;
 
 umask(0);
 
-ok( tie(%h,AnyDBM_File,'Op_dbmx', O_RDWR|O_CREAT, 0640), "Tie");
+ok( tie(%h,'AnyDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640), "Tie");
 
 $Dfile = "Op_dbmx.pag";
 if (! -e $Dfile) {
@@ -63,7 +63,7 @@ $h{'goner2'} = 'snork';
 delete $h{'goner2'};
 
 untie(%h);
-ok(tie(%h,AnyDBM_File,'Op_dbmx', O_RDWR, 0640),"Re-tie hash");
+ok(tie(%h,'AnyDBM_File','Op_dbmx', O_RDWR, 0640),"Re-tie hash");
 
 $h{'j'} = 'J';
 $h{'k'} = 'K';

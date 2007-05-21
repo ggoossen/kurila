@@ -126,9 +126,9 @@ package main;
 
 eval 'sub x7 :ATTR(SCALAR) :ATTR(CODE) {}' and ::ok(0,40) or ::ok(1,40);
 
-use Attribute::Handlers autotie => {      Other::Loud => Tie::Loud,
-				                Noisy => Tie::Noisy,
-				     UNIVERSAL::Rowdy => Tie::Row::dy,
+use Attribute::Handlers autotie => {      'Other::Loud' => 'Tie::Loud',
+				                Noisy => 'Tie::Noisy',
+				     'UNIVERSAL::Rowdy' => 'Tie::Row::dy',
                                    };
 
 my Other $loud : Loud;

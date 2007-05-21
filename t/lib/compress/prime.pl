@@ -13,7 +13,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
 }
 

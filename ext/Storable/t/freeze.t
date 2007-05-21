@@ -28,7 +28,7 @@ print "1..20\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless {}, CLASS;
+$c = bless {}, 'CLASS';
 $c->{attribute} = $b;
 $d = {};
 $e = [];

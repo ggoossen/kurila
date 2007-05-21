@@ -6,7 +6,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require './test.pl';
-    unless (PerlIO::Layer->find('perlio')) {
+    unless ('PerlIO::Layer'->find('perlio')) {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }
@@ -121,55 +121,55 @@ SKIP: {
 	}
     }
 
-    check([ PerlIO::get_layers(STDIN) ],
+    check([ PerlIO::get_layers('STDIN') ],
 	  $UTF8_STDIN ? [ "stdio", "utf8" ] : [ "stdio" ],
 	  "STDIN");
 
     open(F, ">:crlf", "afile");
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ qw(stdio crlf) ],
 	  "open :crlf");
 
     binmode(F, ":encoding(sjis)"); # "sjis" will be canonized to "shiftjis"
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ qw[stdio crlf encoding(shiftjis) utf8] ],
 	  ":encoding(sjis)");
     
     binmode(F, ":pop");
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ qw(stdio crlf) ],
 	  ":pop");
 
     binmode(F, ":raw");
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ "stdio" ],
 	  ":raw");
 
     binmode(F, ":utf8");
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ qw(stdio utf8) ],
 	  ":utf8");
 
     binmode(F, ":bytes");
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ "stdio" ],
 	  ":bytes");
 
     binmode(F, ":encoding(utf8)");
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	    [ qw[stdio encoding(utf8) utf8] ],
 	    ":encoding(utf8)");
 
     binmode(F, ":raw :crlf");
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ qw(stdio crlf) ],
 	  ":raw:crlf");
 
@@ -177,7 +177,7 @@ SKIP: {
 
     # 7 tests potentially skipped.
     unless ($DOSISH || !$FASTSTDIO) {
-	my @results = PerlIO::get_layers(F, details => 1);
+	my @results = PerlIO::get_layers('F', details => 1);
 
 	# Get rid of the args and the flags.
 	splice(@results, 1, 2) if $NONSTDIO;
@@ -190,7 +190,7 @@ SKIP: {
 
     binmode(F);
 
-    check([ PerlIO::get_layers(F) ],
+    check([ PerlIO::get_layers('F') ],
 	  [ "stdio" ],
 	  "binmode");
 
@@ -202,11 +202,11 @@ SKIP: {
 	open F, "<afile";
 	open G, ">afile";
 
-	check([ PerlIO::get_layers(F, input  => 1) ],
+	check([ PerlIO::get_layers('F', input  => 1) ],
 	      [ qw(stdio crlf) ],
 	      "use open IN");
 	
-	check([ PerlIO::get_layers(G, output => 1) ],
+	check([ PerlIO::get_layers('G', output => 1) ],
 	      [ qw[stdio encoding(cp1252) utf8] ],
 	      "use open OUT");
 

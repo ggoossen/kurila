@@ -32,7 +32,7 @@ sub new
 	my $a = $accuracy; $a = $_[0] if defined $_[0];
 	my $p = $precision; $p = $_[1] if defined $_[1];
         # Store the floating point value
-        my $self = Math::BigFloat->new($value,$a,$p,$round_mode);
+        my $self = 'Math::BigFloat'->new($value,$a,$p,$round_mode);
         bless $self, $class;
         $self->{'_custom'} = 1; # make sure this never goes away
         return $self;

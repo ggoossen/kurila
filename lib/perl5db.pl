@@ -1426,7 +1426,7 @@ EO_GRIPE
 sub is_safe_file {
     my $path = shift;
     stat($path) || return;    # mysteriously vaporized
-    my ( $dev, $ino, $mode, $nlink, $uid, $gid ) = stat(_);
+    my ( $dev, $ino, $mode, $nlink, $uid, $gid ) = stat('_');
 
     return 0 if $uid != 0 && $uid != $<;
     return 0 if $mode & 022;

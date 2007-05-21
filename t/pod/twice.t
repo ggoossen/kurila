@@ -12,14 +12,14 @@ eval {require IO::String;};
 skip($@ ? 'no IO::String' : '', sub {
   {
     my $pod_string = 'some I<silly> text';
-    my $handle = IO::String->new( \$pod_string );
-    my $parser = Pod::Parser->new();
+    my $handle = 'IO::String'->new( \$pod_string );
+    my $parser = 'Pod::Parser'->new();
     $parser->parse_from_file( $0, $handle );
   }
   # free the reference
   {
-    my $parser = Pod::Parser->new();
-    $parser->parse_from_file( $0, File::Spec->devnull );
+    my $parser = 'Pod::Parser'->new();
+    $parser->parse_from_file( $0, 'File::Spec'->devnull );
   }
   1;
 });

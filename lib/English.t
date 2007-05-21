@@ -34,7 +34,7 @@ $ORS = "\n";
 {
 	local(*IN, *OUT);
 	if ($^O ne 'dos') {
-	    pipe(IN, OUT);
+	    pipe(IN, 'OUT');
 	} else {
 	    open(OUT, ">en.tmp");
 	}
@@ -108,7 +108,7 @@ is( $INPUT_LINE_NUMBER, 2, '$INPUT_LINE_NUMBER' );
 
 my %hash;
 $SUBSCRIPT_SEPARATOR = '|';
-$hash{d,e,f} = 1;
+$hash{'d','e','f'} = 1;
 $SUBSEP = ',';
 $hash{'a', 'b', 'c'} = 1;
 my @keys = sort keys %hash;

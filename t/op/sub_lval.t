@@ -544,7 +544,7 @@ TODO: {
 
 {
     package Foo;
-    sub AUTOLOAD :lvalue { no strict refs; *{$AUTOLOAD} };
+    sub AUTOLOAD :lvalue { no strict 'refs'; *{$AUTOLOAD} };
     package main;
     my $foo = bless {},"Foo";
     my $result;

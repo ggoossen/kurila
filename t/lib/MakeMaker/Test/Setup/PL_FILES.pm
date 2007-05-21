@@ -93,7 +93,7 @@ sub setup {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = File::Spec->catfile(File::Spec->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;

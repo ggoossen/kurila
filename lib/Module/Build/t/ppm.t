@@ -53,7 +53,7 @@ Says "Hello"
 $dist->change_file( 'Build.PL', <<"---" );
 
 my \$build = Module::Build->new(
-  module_name => @{[$dist->name]},
+  module_name => '@{[$dist->name]}',
   license     => 'perl',
   scripts     => [ 'hello' ],
 );

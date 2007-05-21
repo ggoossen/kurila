@@ -66,7 +66,7 @@ printf "# %x\n",ord($line);
 is($line,"\\x[A3]0.02\n","Escaped non-mapped char");
 close($fh);
 
-$PerlIO::encoding::fallback = Encode::WARN_ON_ERROR;
+$PerlIO::encoding::fallback = 'Encode::WARN_ON_ERROR';
 
 ok(open($fh,"<encoding(US-ASCII)",$file),"Opened as ASCII");
 my $line = <$fh>;

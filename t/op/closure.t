@@ -433,8 +433,8 @@ END
 	    # Fork off a new perl to run the tests.
 	    # (This is so we can catch spurious warnings.)
 	    $| = 1; print ""; $| = 0; # flush output before forking
-	    pipe READ, WRITE or die "Can't make pipe: $!";
-	    pipe READ2, WRITE2 or die "Can't make second pipe: $!";
+	    pipe READ, 'WRITE' or die "Can't make pipe: $!";
+	    pipe READ2, 'WRITE2' or die "Can't make second pipe: $!";
 	    die "Can't fork: $!" unless defined($pid = open PERL, "|-");
 	    unless ($pid) {
 	      # Child process here. We're going to send errors back

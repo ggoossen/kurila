@@ -37,7 +37,7 @@ sub do_push {
     my ($boundary) = "----=_NeXtPaRt$random";
 
     my (@header);
-    my ($type,$callback,$delay,$last_page,$cookie,$target,$expires,$nph,@other) = rearrange([TYPE,NEXT_PAGE,DELAY,LAST_PAGE,[COOKIE,COOKIES],TARGET,EXPIRES,NPH],@p);
+    my ($type,$callback,$delay,$last_page,$cookie,$target,$expires,$nph,@other) = rearrange(['TYPE','NEXT_PAGE','DELAY','LAST_PAGE',['COOKIE','COOKIES'],'TARGET','EXPIRES','NPH'],@p);
     $type = 'text/html' unless $type;
     $callback = \&simple_counter unless $callback && ref($callback) eq 'CODE';
     $delay = 1 unless defined($delay);

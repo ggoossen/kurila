@@ -109,7 +109,7 @@ ok(eq_array(
     [ qw(Test::A Test::B Test::C Test::D Test::E Test::F Test::O) ]
 ), '... got the right MRO for Test::A');  
     
-is(Test::A->C_or_D, 'Test::C', '... got the expected method output');
-is(Test::A->can('C_or_D')->(), 'Test::C', '... can got the expected method output');
-is(Test::A->C_or_E, 'Test::C', '... got the expected method output');
-is(Test::A->can('C_or_E')->(), 'Test::C', '... can got the expected method output');
+is('Test::A'->C_or_D, 'Test::C', '... got the expected method output');
+is('Test::A'->can('C_or_D')->(), 'Test::C', '... can got the expected method output');
+is('Test::A'->C_or_E, 'Test::C', '... got the expected method output');
+is('Test::A'->can('C_or_E')->(), 'Test::C', '... can got the expected method output');

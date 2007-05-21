@@ -13,7 +13,7 @@ sub look {
     local(*FH,$key,$dict,$fold) = @_;
     local($max,$min,$mid,$_);
     local($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-       $blksize,$blocks) = stat(FH);
+       $blksize,$blocks) = stat('FH');
     $blksize = 8192 unless $blksize;
     $key =~ s/[^\w\s]//g if $dict;
     $key = lc $key if $fold;

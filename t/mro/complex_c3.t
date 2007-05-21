@@ -139,4 +139,4 @@ ok(eq_array(
     [ qw(Test::K Test::J Test::I Test::H Test::G Test::F Test::E Test::D Test::A Test::B Test::C) ]
 ), '... got the right C3 merge order for Test::K');
 
-is(Test::K->testmeth(), "right", 'next::method working ok');
+is('Test::K'->testmeth(), "right", 'next::method working ok');

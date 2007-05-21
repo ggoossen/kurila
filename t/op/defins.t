@@ -20,13 +20,13 @@ cmp_ok($warns,'==',0,'no warns at start');
 no strict 'subs';
 
 open(FILE,">$saved_filename");
-ok(defined(FILE),'created work file');
+ok(defined('FILE'),'created work file');
 print FILE "1\n";
 print FILE "0";
 close(FILE);
 
 open(FILE,"<$saved_filename");
-ok(defined(FILE),'opened work file');
+ok(defined('FILE'),'opened work file');
 my $seen = 0;
 my $dummy;
 while (my $name = <FILE>)
@@ -64,7 +64,7 @@ cmp_ok($seen,'==',1,'seen in hash while()');
 close FILE;
 
 opendir(DIR,($^O eq 'MacOS' ? ':' : '.'));
-ok(defined(DIR),'opened current directory');
+ok(defined('DIR'),'opened current directory');
 $seen = 0;
 while (my $name = readdir(DIR))
  {

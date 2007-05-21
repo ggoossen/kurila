@@ -816,9 +816,9 @@ sub _perl_fingerprint {
     my $dll = eval {OS2::DLLname()};
     my $mtime_dll = 0;
     if (defined $dll) {
-        $mtime_dll = (-f $dll ? (stat(_))[9] : '-1');
+        $mtime_dll = (-f $dll ? (stat('_'))[9] : '-1');
     }
-    my $mtime_perl = (-f $^X ? (stat(_))[9] : '-1');
+    my $mtime_perl = (-f $^X ? (stat('_'))[9] : '-1');
     my $this_fingerprint = {
                             '$^X' => $^X,
                             sitearchexp => $Config::Config{sitearchexp},

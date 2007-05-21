@@ -14,7 +14,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
 
-    my $st = eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1; };
+    my $st = eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1; };
     $extra = 1
         if $st ;
 
@@ -249,7 +249,7 @@ this is a test
 EOM
 
     {
-      my $fh = IO::File->new( ">$name") ;
+      my $fh = 'IO::File'->new( ">$name") ;
       ok $fh, "opened file $name ok";
       my $x = $CompressClass-> new( $fh)  ;
       ok $x, " created $CompressClass $fh"  ;
@@ -266,7 +266,7 @@ EOM
     my $uncomp;
     {
       my $x ;
-      ok my $fh1 = IO::File->new( "<$name") ;
+      ok my $fh1 = 'IO::File'->new( "<$name") ;
       ok $x = $UncompressClass-> new( $fh1, -Append => 1)  ;
       ok $x->fileno() == fileno $fh1 ;
 
@@ -512,7 +512,7 @@ EOM
 
     {
       my $fh ;
-      ok $fh = IO::File->new( ">$name") ;
+      ok $fh = 'IO::File'->new( ">$name") ;
       print $fh $header ;
       my $x ;
       ok $x = $CompressClass-> new( $fh,
@@ -527,7 +527,7 @@ EOM
 
     my ($fil, $uncomp) ;
     my $fh1 ;
-    ok $fh1 = IO::File->new( "<$name") ;
+    ok $fh1 = 'IO::File'->new( "<$name") ;
     # skip leading junk
     my $line = <$fh1> ;
     ok $line eq $header ;
@@ -1146,7 +1146,7 @@ foreach my $fb (qw(filename buffer filehandle))
             }
             elsif ($fb eq 'filehandle')
             {
-                $output = IO::File->new( ">$name") ;
+                $output = 'IO::File'->new( ">$name") ;
                 print $output $buffer;
             }
 
@@ -1227,7 +1227,7 @@ foreach my $type (qw(buffer filename filehandle))
         }
         elsif ($type eq 'filehandle')
         {
-            my $fh = IO::File->new( "<$name") ;
+            my $fh = 'IO::File'->new( "<$name") ;
             ok $fh, "opened file $name ok";
             $input = $fh ;
         }
