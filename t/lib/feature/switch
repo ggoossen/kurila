@@ -6,29 +6,29 @@ __END__
 use warnings;
 print STDOUT given;
 EXPECT
-Unquoted string "given" may clash with future reserved word at - line 3.
-given
+Bareword "given" not allowed while "strict subs" in use at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 # No switch; when should be a bareword.
 use warnings;
 print STDOUT when;
 EXPECT
-Unquoted string "when" may clash with future reserved word at - line 3.
-when
+Bareword "when" not allowed while "strict subs" in use at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 # No switch; default should be a bareword.
 use warnings;
 print STDOUT default;
 EXPECT
-Unquoted string "default" may clash with future reserved word at - line 3.
-default
+Bareword "default" not allowed while "strict subs" in use at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 # No switch; break should be a bareword.
 use warnings;
 print STDOUT break;
 EXPECT
-Unquoted string "break" may clash with future reserved word at - line 3.
-break
+Bareword "break" not allowed while "strict subs" in use at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 # No switch; but continue is still a keyword
 print STDOUT continue;
@@ -73,9 +73,8 @@ use warnings;
 }
 print STDOUT given;
 EXPECT
-Unquoted string "given" may clash with future reserved word at - line 6.
-Okay here
-given
+Bareword "given" not allowed while "strict subs" in use at - line 6.
+Execution of - aborted due to compilation errors.
 ########
 # switch out of scope; when should be a bareword.
 use warnings;
@@ -84,9 +83,8 @@ use warnings;
 }
 print STDOUT when;
 EXPECT
-Unquoted string "when" may clash with future reserved word at - line 6.
-Okay here
-when
+Bareword "when" not allowed while "strict subs" in use at - line 6.
+Execution of - aborted due to compilation errors.
 ########
 # switch out of scope; default should be a bareword.
 use warnings;
@@ -95,9 +93,8 @@ use warnings;
 }
 print STDOUT default;
 EXPECT
-Unquoted string "default" may clash with future reserved word at - line 6.
-Okay here
-default
+Bareword "default" not allowed while "strict subs" in use at - line 6.
+Execution of - aborted due to compilation errors.
 ########
 # switch out of scope; break should be a bareword.
 use warnings;
@@ -106,8 +103,8 @@ use warnings;
 }
 print STDOUT break;
 EXPECT
-Unquoted string "break" may clash with future reserved word at - line 6.
-break
+Bareword "break" not allowed while "strict subs" in use at - line 6.
+Execution of - aborted due to compilation errors.
 ########
 # switch out of scope; continue should not work
 { use feature 'switch';
@@ -125,9 +122,8 @@ given (1) { when(1) {print "Okay here\n";} }
 no feature 'switch';
 print STDOUT when;
 EXPECT
-Unquoted string "when" may clash with future reserved word at - line 6.
-Okay here
-when
+Bareword "when" not allowed while "strict subs" in use at - line 6.
+Execution of - aborted due to compilation errors.
 ########
 # C<no feature> should work too
 use warnings;
@@ -136,9 +132,8 @@ given (1) { when(1) {print "Okay here\n";} }
 no feature;
 print STDOUT when;
 EXPECT
-Unquoted string "when" may clash with future reserved word at - line 6.
-Okay here
-when
+Bareword "when" not allowed while "strict subs" in use at - line 6.
+Execution of - aborted due to compilation errors.
 ########
 # Without the feature, no 'Unambiguous use of' warning:
 use warnings;

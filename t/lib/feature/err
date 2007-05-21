@@ -8,7 +8,6 @@ my $undef err print "Hello!\n";
 EXPECT
 Bareword found where operator expected at - line 3, near "$undef err"
 	(Missing operator before err?)
-Unquoted string "err" may clash with future reserved word at - line 3.
 syntax error at - line 3, near "$undef err "
 Execution of - aborted due to compilation errors.
 ########
@@ -33,7 +32,6 @@ my $undef err print "Hello", "world";
 EXPECT
 Bareword found where operator expected at - line 4, near "$undef err"
 	(Missing operator before err?)
-Unquoted string "err" may clash with future reserved word at - line 4.
 syntax error at - line 4, near "$undef err "
 Execution of - aborted due to compilation errors.
 ########
@@ -46,7 +44,6 @@ my $undef2 err "Hello", "world";
 EXPECT
 Bareword found where operator expected at - line 6, near "$undef2 err"
 	(Missing operator before err?)
-Unquoted string "err" may clash with future reserved word at - line 6.
 String found where operator expected at - line 6, near "err "Hello""
 	(Do you need to predeclare err?)
 syntax error at - line 6, near "$undef2 err "
@@ -61,6 +58,5 @@ $undef err print "Hello", "world";
 EXPECT
 Bareword found where operator expected at - line 6, near "$undef err"
 	(Missing operator before err?)
-Unquoted string "err" may clash with future reserved word at - line 6.
 syntax error at - line 6, near "$undef err "
 Execution of - aborted due to compilation errors.

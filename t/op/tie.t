@@ -126,7 +126,7 @@ EXPECT
 # strict behaviour, with extra 1 references via tied which are destroyed
 use warnings 'untie';
 use Tie::Hash ;
-tie %h, Tie::StdHash;
+tie %h, 'Tie::StdHash';
 $a = tied %h;
 $a = 0 ;
 untie %h;
@@ -136,7 +136,7 @@ EXPECT
 # strict error behaviour, with 2 extra references
 use warnings 'untie';
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+$a = tie %h, 'Tie::StdHash';
 $b = tied %h ;
 untie %h;
 EXPECT
@@ -146,12 +146,12 @@ untie attempted while 2 inner references still exist at - line 7.
 # strict behaviour, check scope of strictness.
 no warnings 'untie';
 use Tie::Hash ;
-$A = tie %H, Tie::StdHash;
+$A = tie %H, 'Tie::StdHash';
 $C = $B = tied %H ;
 {
     use warnings 'untie';
     use Tie::Hash ;
-    tie %h, Tie::StdHash;
+    tie %h, 'Tie::StdHash';
     untie %h;
 }
 untie %H;
@@ -233,7 +233,7 @@ EXPECT
 
 my ($a, $b);
 use Tie::Scalar;
-tie $a,Tie::StdScalar or die;
+tie $a,'Tie::StdScalar' or die;
 vec($b,1,1)=1;
 $a = $b;
 vec($a,1,1)=0;
@@ -244,7 +244,7 @@ EXPECT
 
 # correct unlocalisation of tied hashes (patch #16431)
 use Tie::Hash ;
-tie %tied, Tie::StdHash;
+tie %tied, 'Tie::StdHash';
 { local $hash{'foo'} } warn "plain hash bad unlocalize" if exists $hash{'foo'};
 { local $tied{'foo'} } warn "tied hash bad unlocalize" if exists $tied{'foo'};
 { local $ENV{'foo'}  } warn "%ENV bad unlocalize" if exists $ENV{'foo'};
@@ -255,6 +255,7 @@ EXPECT
 tie FH, 'main';
 EXPECT
 Can't modify constant item in tie at - line 3, near "'main';"
+Bareword "FH" not allowed while "strict subs" in use at - line 3.
 Execution of - aborted due to compilation errors.
 ########
 
