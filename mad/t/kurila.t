@@ -22,10 +22,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_strict_refs();
+# t_strict_refs();
 t_indirect_object_syntax();
-# t_barewords();
-t_encoding();
+t_barewords();
+# t_encoding();
 
 sub t_indirect_object_syntax {
     p5convert( split(m/^====\n/m, <<'END'), 1 );
@@ -111,6 +111,24 @@ END
 sort aap 1,2,3;
 ====
 sort aap 1,2,3;
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+open(IN, "aap");
+====
+open(IN, "aap");
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+-d _;
+====
+-d _;
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+Foo::Bar->new();
+====
+Foo::Bar->new();
 END
 }
 

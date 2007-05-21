@@ -49,14 +49,13 @@ sub entersub_handler {
 sub const_handler {
     my ($twig, $const) = @_;
 
-    return;
     # Convert BARE words
 
     # real bareword
     return unless $const->att('private') && ($const->att('private') =~ m/BARE/);
     return unless $const->att('flags') =~ "SCALAR";
 
-    return if $twig->findnodes([$const], q|madprops/mad_sv[@key="B"][@val="forced"]|);
+    return if $twig->findnodes([$const], q|madprops/mad_sv[@key="forcedword"][@val="forced"]|);
 
     # helem:  $aap{noot}
     # negate: -Level
@@ -64,15 +63,25 @@ sub const_handler {
     return if $const->parent->tag =~ m/^op_(helem|negate|method)$/;
     return if $const->parent->tag eq "op_null" 
       and ($const->parent->att("was") || '') =~ m/^(helem|negate|method)$/;
+    # open IN, "filename";
+    return if $const->parent->tag =~ m/^mad_op$/ and $const->parent->att("key") eq "key";
 
     {
         # keep qq| foo => |
         my $x = ($const->parent->tag eq "op_null" and ! $const->parent->att('was')) ? $const->parent : $const;
         my ($next) = $x->parent->child($x->pos + 1);
-        return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key=","][@val="=&gt;"]|);
-
-        return if $twig->findnodes([$const->parent], q|madprops/mad_sv[@key="A"]|); # [@val="-&gt;"]|);
+        my ($value) = $twig->findnodes([$const], q|madprops/mad_sv[@key="value"]|);
+        if ($value->att("val") =~ m/^\w+$/) {
+            return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key="comma"][@val="=&gt;"]|);
+            return if $twig->findnodes([$const->parent], q|madprops/mad_sv[@key="bigarrow"]|); # [@val="-&gt;"]|);
+        }
     }
+
+    # "-x XX"
+    return if $const->parent->tag =~ m/^op_ft/;
+
+    # keep Foo::Bar->new()
+    return if $const->parent->tag eq "op_entersub";
 
     # keep qq| $aap{noot} |
     return if $const->parent->tag eq "op_helem";
@@ -82,24 +91,17 @@ sub const_handler {
     return if $const->parent->tag eq "op_negate";
     return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "negate";
 
-    {
-        # keep qq| foo => |
-        my $x = $const->parent->tag eq "op_null" ? $const->parent : $const;
-        my ($next) = $x->parent->child($x->pos + 1);
-        return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key=","][@val="=&gt;"]|);
-    }
-
     # Make it a string constant
     my ($madprops) = $twig->findnodes([$const], q|madprops|);
     $const->del_att('private');
-    my ($const_ws) = $twig->findnodes([$const], q|madprops/mad_sv[@key="_"]|);
+    my ($const_ws) = $twig->findnodes([$const], q|madprops/mad_sv[@key="wsbefore-value"]|);
     my $ws = $const_ws && $const_ws->att('val');
     $const_ws->delete if $const_ws;
-    $madprops->insert_new_elt( "mad_sv", { key => '_', val => $ws } );
-    $madprops->insert_new_elt( "mad_sv", { key => 'q', val => q|'| } );
-    $madprops->insert_new_elt( 'last_child', "mad_sv", { key => 'Q', val => q|'| } );
-    my ($const_X) = $twig->findnodes([$const], q|madprops/mad_sv[@key="X"]|);
-    $const_X->set_att("key" => q|=|);
+    $madprops->insert_new_elt( "mad_sv", { key => 'wsbefore-quote_open', val => $ws } );
+    $madprops->insert_new_elt( "mad_sv", { key => 'quote_open', val => q|'| } );
+    $madprops->insert_new_elt( 'last_child', "mad_sv", { key => 'quote_close', val => q|'| } );
+    my ($const_X) = $twig->findnodes([$const], q|madprops/mad_sv[@key="value"]|);
+    $const_X->set_att("key" => q|assign|);
 }
 
 sub add_encoding_latin1 {
