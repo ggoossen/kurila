@@ -47,7 +47,7 @@ sub numify { 0 + "${$_[0]}" }	# Not needed, additional overhead
 package main;
 
 $| = 1;
-use Test::More tests => 522;
+use Test::More tests => 521;
 
 
 $a = Oscalar->new( "087");
@@ -271,7 +271,7 @@ eval "package Oscalar; no overload '.'";
 
 is("b${a}", "_.b.__.xx._");
 $x="1";
-bless \$x, Oscalar;
+bless \$x, 'Oscalar';
 is("b${a}c", "bxxc");
  Oscalar->new( 1);
 is("b${a}c", "bxxc");
@@ -292,7 +292,7 @@ eval "package Oscalar; sub comple; use overload '~' => 'comple'";
 $na = eval { ~$a };		# Hash was not updated
 like($@, qr/no method found/);
 
-bless \$x, Oscalar;
+bless \$x, 'Oscalar';
 
 $na = eval { ~$a };		# Hash updated
 warn "`$na', $@" if $@;
@@ -304,7 +304,7 @@ $na = 0;
 $na = eval { ~$aI };		# Hash was not updated
 like($@, qr/no method found/);
 
-bless \$x, OscalarI;
+bless \$x, 'OscalarI';
 
 $na = eval { ~$aI };
 print $@;
@@ -317,7 +317,7 @@ eval "package Oscalar; sub rshft; use overload '>>' => 'rshft'";
 $na = eval { $aI >> 1 };	# Hash was not updated
 like($@, qr/no method found/);
 
-bless \$x, OscalarI;
+bless \$x, 'OscalarI';
 
 $na = 0;
 
@@ -398,7 +398,6 @@ EOF
   $b = <<'EOF';
 oups1
 EOF
-  $c = bareword;
   m'try it';
   s'first part'second part';
   s/yet another/tail here/;
@@ -417,7 +416,6 @@ is($a, "_<oups
 >_");
 is($b, "_<oups1
 >_");
-is($c, "bareword");
 
 {
   package symbolic;		# Primitive symbolic calculator
@@ -902,7 +900,7 @@ is($bar->[3], 13);
 }
 
 my $aaa;
-{ my $bbbb = 0; $aaa = bless \$bbbb, B }
+{ my $bbbb = 0; $aaa = bless \$bbbb, 'B' }
 
 is !$aaa, 1;
 
