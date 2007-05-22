@@ -122,7 +122,7 @@ END
     p5convert( split(m/^====\n/m, <<'END'), 1 );
 -d _;
 ====
--d _;
+-d *_;
 END
 
     p5convert( split(m/^====\n/m, <<'END'), 1 );
@@ -134,7 +134,15 @@ END
     p5convert( split(m/^====\n/m, <<'END'), 1 );
 truncate(FH, 0);
 ====
-truncate(FH, 0);
+truncate(*FH, 0);
+END
+
+    p5convert( split(m/^====\n/m, <<'END'), 1 );
+sub foo(*$) { }
+foo(FH, STR);
+====
+sub foo(*$) { }
+foo(*FH, 'STR');
 END
 }
 
