@@ -7773,6 +7773,9 @@ Perl_ck_subr(pTHX_ OP *o)
 		Perl_croak(aTHX_ "Malformed prototype for %s: %"SVf,
 			   gv_ename(namegv), SVfARG(cv));
 	    }
+#ifdef PERL_MAD
+	    addmad(newMADsv('c', newSVpvn(proto-1, 1)), &o3->op_madprop, 0);
+#endif
 	}
 	else
 	    list(o2);

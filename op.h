@@ -681,6 +681,7 @@ struct token {
  * A       use import args
  * b       format block
  * B       retired stub block
+ * c       the type the opcode is prototyped to
  * C       constant conditional op
  * d       declarator
  * D       do block
