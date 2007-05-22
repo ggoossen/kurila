@@ -2482,6 +2482,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 'Q', "quote_close" },
     { '=', "assign" },
     { 'c', "prototyped" },
+    { 'G', "endsection" },
     { 'X', "value" },
     { 'g', "forcedword" },
     { '^', "hat" },
