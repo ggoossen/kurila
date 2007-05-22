@@ -55,7 +55,7 @@ sub const_handler {
     return unless $const->att('private') && ($const->att('private') =~ m/BARE/);
     return unless $const->att('flags') =~ "SCALAR";
 
-    return if $twig->findnodes([$const], q|madprops/mad_sv[@key="forcedword"][@val="forced"]|);
+    return if $const->findnodes(q|madprops/mad_sv[@key="forcedword"][@val="forced"]|);
 
     # helem:  $aap{noot}
     # negate: -Level
@@ -81,9 +81,11 @@ sub const_handler {
     if ($const->parent->tag =~ m/^op_(ft.*|truncate|chdir|stat|lstat)$/ or
         $const->findnodes(q|madprops/mad_sv[@key="prototyped"][@val="*"]|)
        ) {
+        my ($val) = $twig->findnodes([$const], q|madprops/mad_sv[@key="value"]|);
+        $val->att("val") eq "_" and return; # not for -x '_'
+
         # Add '*' to make it a glob
         $const->set_tag("op_rv2gv");
-        my ($val) = $twig->findnodes([$const], q|madprops/mad_sv[@key="value"]|);
         $val->set_att( "val", "*" . $val->att("val") );
         $val->set_att( "key", "star" );
         my ($wsval) = $twig->findnodes([$const], q|madprops/mad_sv[@key="wsbefore-value"]|);

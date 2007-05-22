@@ -122,7 +122,7 @@ END
     p5convert( split(m/^====\n/m, <<'END'), 1 );
 -d _;
 ====
--d *_;
+-d _;
 END
 
     p5convert( split(m/^====\n/m, <<'END'), 1 );
