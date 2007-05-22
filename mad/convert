@@ -28,8 +28,10 @@ use Fatal qw|open close|;
     my $output = eval { Convert::convert($input, "/usr/bin/perl $kurilapath/mad/p5kurila.pl",
                                          switches => join ' ', map { "-I $_" } @lib ) };
     if ($output) {
-        seek $fh, 0, 0;
-        $fh->print($output);
+        if ($input ne $output) {
+            seek $fh, 0, 0;
+            $fh->print($output);
+        }
     } else {
         warn "Failed converting $filename:\n\n$@\n\n";
     }
