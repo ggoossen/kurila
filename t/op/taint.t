@@ -297,7 +297,7 @@ SKIP: {
 SKIP: {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
-    my @globs = eval { <*> };
+    my @globs = eval { glob("*") };
     test @globs == 0 && $@ =~ /^Insecure dependency/;
 
     @globs = eval { glob '*' };

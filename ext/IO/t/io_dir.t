@@ -32,7 +32,7 @@ my $DIR = $^O eq 'MacOS' ? ":" : ".";
 $dot = IO::Dir->new( $DIR);
 ok(defined($dot));
 
-@a = sort <*>;
+@a = sort glob("*");
 do { $first = $dot->read } while defined($first) && $first =~ /^\./;
 ok(+(grep { $_ eq $first } @a));
 

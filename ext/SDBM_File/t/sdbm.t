@@ -30,7 +30,7 @@ use Fcntl;
 
 print "1..80\n";
 
-unlink <Op_dbmx.*>;
+unlink glob("Op_dbmx.*");
 
 umask(0);
 my %h ;
@@ -38,7 +38,7 @@ ok(1, tie %h,'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640);
 
 my $Dfile = "Op_dbmx.pag";
 if (! -e $Dfile) {
-	($Dfile) = <Op_dbmx.*>;
+	($Dfile) = glob("Op_dbmx.*");
 }
 if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin') {
     print "ok 2 # Skipped: different file permission semantics\n";
@@ -207,7 +207,7 @@ EOM
 
     undef $X;
     untie(%h);
-    unlink "SubDB.pm", <dbhash_tmp.*> ;
+    unlink "SubDB.pm", glob("dbhash_tmp.*") ;
 
 }
 
@@ -215,7 +215,7 @@ ok(19, !exists $h{'goner1'});
 ok(20, exists $h{'foo'});
 
 untie %h;
-unlink <Op_dbmx*>, $Dfile;
+unlink glob("Op_dbmx*"), $Dfile;
 
 {
    # DBM Filter tests
@@ -233,7 +233,7 @@ unlink <Op_dbmx*>, $Dfile;
 	   $_ eq 'original' ;
    }
    
-   unlink <Op_dbmx*>;
+   unlink glob("Op_dbmx*");
    ok(21, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
 
    $db->filter_fetch_key   (sub { $fetch_key = $_ }) ;
@@ -320,7 +320,7 @@ unlink <Op_dbmx*>, $Dfile;
 
    undef $db ;
    untie %h;
-   unlink <Op_dbmx*>;
+   unlink glob("Op_dbmx*");
 }
 
 {    
@@ -330,7 +330,7 @@ unlink <Op_dbmx*>, $Dfile;
      use warnings ;
     my (%h, $db) ;
 
-    unlink <Op_dbmx*>;
+    unlink glob("Op_dbmx*");
     ok(42, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
 
     my %result = () ;
@@ -384,7 +384,7 @@ unlink <Op_dbmx*>, $Dfile;
 
     undef $db ;
     untie %h;
-    unlink <Op_dbmx*>;
+    unlink glob("Op_dbmx*");
 }		
 
 {
@@ -392,7 +392,7 @@ unlink <Op_dbmx*>, $Dfile;
    use strict ;
    use warnings ;
    my (%h, $db) ;
-   unlink <Op_dbmx*>;
+   unlink glob("Op_dbmx*");
 
    ok(65, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
 
@@ -403,7 +403,7 @@ unlink <Op_dbmx*>, $Dfile;
    
    undef $db ;
    untie %h;
-   unlink <Op_dbmx*>;
+   unlink glob("Op_dbmx*");
 }
 
 {
@@ -415,7 +415,7 @@ unlink <Op_dbmx*>, $Dfile;
     use strict ;
     use SDBM_File ;
 
-    unlink <Op_dbmx*>;
+    unlink glob("Op_dbmx*");
     my %h ;
     my $a = "";
     local $SIG{__WARN__} = sub {$a = $_[0]} ;
@@ -425,7 +425,7 @@ unlink <Op_dbmx*>, $Dfile;
     ok(68, $a eq "") ;
 
     untie %h;
-    unlink <Op_dbmx*>;
+    unlink glob("Op_dbmx*");
 }
 
 {
@@ -439,7 +439,7 @@ unlink <Op_dbmx*>, $Dfile;
     use strict ;
     use SDBM_File ;
 
-    unlink <Op_dbmx*>;
+    unlink glob("Op_dbmx*");
     my $bad_key = 0 ;
     my %h = () ;
     ok(69, my $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
@@ -466,7 +466,7 @@ unlink <Op_dbmx*>, $Dfile;
 
     undef $db ;
     untie %h ;
-    unlink <Op_dbmx*>;
+    unlink glob("Op_dbmx*");
 }
 
 
@@ -476,7 +476,7 @@ unlink <Op_dbmx*>, $Dfile;
    use warnings ;
    use strict ;
    my %h ;
-   unlink <Op1_dbmx*>;
+   unlink glob("Op1_dbmx*");
 
    ok(75, my $db = tie(%h, 'SDBM_File','Op1_dbmx', O_RDWR|O_CREAT, 0640)) ;
 
@@ -511,6 +511,6 @@ unlink <Op_dbmx*>, $Dfile;
 
    undef $db ;
    untie %h;
-   unlink <Op1_dbmx*>;
+   unlink glob("Op1_dbmx*");
 }
 exit ;

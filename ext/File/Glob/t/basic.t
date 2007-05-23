@@ -185,7 +185,7 @@ chdir "..";
 rmdir "pteerslo";
 
 # this can panic if PL_glob_index gets passed as flags to bsd_glob
-<*>; <*>;
+glob("*"); glob("*");
 print "ok 12\n";
 
 {

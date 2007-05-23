@@ -24,7 +24,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ("Just another Perl hacker," ne (<*>)[0]) {
+    if ("Just another Perl hacker," ne (glob("*"))[0]) {
         die <<EOMessage;
 Your version of perl ($]) doesn't seem to allow extensions to override
 the core glob operator.
@@ -46,9 +46,9 @@ print "ok 3\n";
 
 # check if <*/*> works
 if ($^O eq "MacOS") {
-    @r = <:*:*.t>;
+    @r = glob(":*:*.t");
 } else {
-    @r = <*/*.t>;
+    @r = glob("*/*.t");
 }
 # at least t/global.t t/basic.t, t/taint.t
 print "not " if @r < 3;
@@ -58,12 +58,12 @@ my $r = scalar @r;
 # check if scalar context works
 @r = ();
 if ($^O eq "MacOS") {
-    while (defined($_ = <:*:*.t>)) {
+    while (defined($_ = glob(":*:*.t"))) {
 	#print "# $_\n";
 	push @r, $_;
     }
 } else {
-    while (defined($_ = <*/*.t>)) {
+    while (defined($_ = glob("*/*.t"))) {
 	#print "# $_\n";
 	push @r, $_;
     }
@@ -74,12 +74,12 @@ print "ok 5\n";
 # check if list context works
 @r = ();
 if ($^O eq "MacOS") {
-    for (<:*:*.t>) {
+    for (glob(":*:*.t")) {
 	#print "# $_\n";
 	push @r, $_;
     }
 } else {
-    for (<*/*.t>) {
+    for (glob("*/*.t")) {
 	#print "# $_\n";
 	push @r, $_;
     }
@@ -90,12 +90,12 @@ print "ok 6\n";
 # test if implicit assign to $_ in while() works
 @r = ();
 if ($^O eq "MacOS") {
-    while (<:*:*.t>) {
+    while (glob(":*:*.t")) {
 	#print "# $_\n";
 	push @r, $_;
     }
 } else {
-    while (<*/*.t>) {
+    while (glob("*/*.t")) {
 	#print "# $_\n";
 	push @r, $_;
     }
@@ -127,20 +127,20 @@ print "ok 9\n";
 @s = ();
 my $i = 0;
 if ($^O eq "MacOS") {
-    while (<:*:*.t>) {
+    while (glob(":*:*.t")) {
 	#print "# $_ <";
 	push @s, $_;
-	while (<:bas*:*.t>) {
+	while (glob(":bas*:*.t")) {
 	    #print " $_";
 	    $i++;
 	}
 	#print " >\n";
     }
 } else {
-    while (<*/*.t>) {
+    while (glob("*/*.t")) {
 	#print "# $_ <";
 	push @s, $_;
-	while (<bas*/*.t>) {
+	while (glob("bas*/*.t")) {
 	    #print " $_";
 	    $i++;
 	}

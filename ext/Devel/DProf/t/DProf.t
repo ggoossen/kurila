@@ -24,7 +24,7 @@ getopts('vI:p:');
 # -I   Add to @INC
 # -p   Name of perl binary
 
-@tests = @ARGV ? @ARGV : sort (<lib/dprof/*_t>, <lib/dprof/*_v>);  # glob-sort, for OS/2
+@tests = @ARGV ? @ARGV : sort (glob("lib/dprof/*_t"), glob("lib/dprof/*_v"));  # glob-sort, for OS/2
 
 $path_sep = $Config{path_sep} || ':';
 $perl5lib = $opt_I || join( $path_sep, @INC );

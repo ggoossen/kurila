@@ -20,7 +20,7 @@ $dot = DirHandle->new($^O eq 'MacOS' ? ':' : '.');
 
 ok(defined($dot));
 
-@a = sort <*>;
+@a = sort glob("*");
 do { $first = $dot->read } while defined($first) && $first =~ /^\./;
 ok(+(grep { $_ eq $first } @a));
 

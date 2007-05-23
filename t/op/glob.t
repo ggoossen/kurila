@@ -5,23 +5,23 @@ plan( tests => 15 );
 
 our (@oops, @ops, %files, $not, @glops, $x);
 
-@oops = @ops = <op/*>;
+@oops = @ops = glob("op/*");
 
 if ($^O eq 'MSWin32') {
-  map { $files{lc($_)}++ } <op/*>;
+  map { $files{lc($_)}++ } glob("op/*");
   map { delete $files{"op/$_"} } split /[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,
 }
 elsif ($^O eq 'VMS') {
-  map { $files{lc($_)}++ } <[.op]*>;
+  map { $files{lc($_)}++ } glob("[.op]*");
   map { s/;.*$//; delete $files{lc($_)}; } split /[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
 }
 elsif ($^O eq 'MacOS') {
-  @oops = @ops = <:op:*>;
-  map { $files{$_}++ } <:op:*>;
+  @oops = @ops = glob(":op:*");
+  map { $files{$_}++ } glob(":op:*");
   map { delete $files{$_} } split /[\s\n]/, `echo :op:\xc5`;
 }
 else {
-  map { $files{$_}++ } <op/*>;
+  map { $files{$_}++ } glob("op/*");
   map { delete $files{$_} } split /[\s\n]/, `echo op/*`;
 }
 ok( !(keys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
@@ -30,12 +30,12 @@ cmp_ok($/,'eq',"\n",'sane input record separator');
 
 $not = '';
 if ($^O eq 'MacOS') {
-    while (<jskdfjskdfj* :op:* jskdjfjkosvk*>) {
+    while (glob("jskdfjskdfj* :op:* jskdjfjkosvk*")) {
 	$not = "not " unless $_ eq shift @ops;
 	$not = "not at all " if $/ eq "\0";
     }
 } else {
-    while (<jskdfjskdfj* op/* jskdjfjkosvk*>) {
+    while (glob("jskdfjskdfj* op/* jskdjfjkosvk*")) {
 	$not = "not " unless $_ eq shift @ops;
 	$not = "not at all " if $/ eq "\0";
     }

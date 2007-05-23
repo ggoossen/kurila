@@ -17,7 +17,7 @@ $Is_Dosish = ($^O eq 'amigaos' || $^O eq 'MSWin32' ||
 	      $^O eq 'os2' || $^O eq 'mint' ||
 	      $^O eq 'cygwin');
 
-unlink <Op_dbmx*>;
+unlink glob("Op_dbmx*");
 
 umask(0);
 
@@ -25,7 +25,7 @@ ok( tie(%h,'AnyDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640), "Tie");
 
 $Dfile = "Op_dbmx.pag";
 if (! -e $Dfile) {
-	($Dfile) = <Op_dbmx*>;
+	($Dfile) = glob("Op_dbmx*");
 }
 
 SKIP:

@@ -46,8 +46,8 @@ BEGIN {
 };
 BEGIN { use_ok('Fcntl') };
 
-unlink <Op_dbmx*>;
-END { unlink <Op_dbmx*>; }
+unlink glob("Op_dbmx*");
+END { unlink glob("Op_dbmx*"); }
 
 writeFile('times_ten', <<'EOM');
     package DBM_Filter::times_ten;
@@ -191,7 +191,7 @@ sub checkRaw
         eval { untie %h };
         is $@, '', "untie without inner references" ;
     }
-    unlink <Op_dbmx*>;
+    unlink glob("Op_dbmx*");
 }
 
 {
