@@ -160,6 +160,12 @@ sub get_madprop {
     return $madsv && $madsv->att("val");
 }
 
+sub rename_madprop {
+    my ($op, $oldkey, $newkey) = @_;
+    set_madprop($op, $newkey, get_madprop($op, $oldkey));
+    del_madprop($op, $oldkey);
+}
+
 sub make_glob_sub {
     my $twig = shift;
     for my $op_glob ($twig->findnodes(q|//op_null[@was="glob"]|)) {
@@ -170,6 +176,7 @@ sub make_glob_sub {
         del_madprop($op_glob, "assign");
         del_madprop($op_glob, "quote_open");
         del_madprop($op_glob, "quote_close");
+        rename_madprop($op_glob, "wsbefore-quote_open", "wsbefore-operator");
 
         my ($op_c) = $op_glob->findnodes(q|op_entersub/op_null/op_const|);
         set_madprop($op_c, "quote_open", "&#34;");
