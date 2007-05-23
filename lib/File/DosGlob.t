@@ -135,7 +135,7 @@ use File::DosGlob 'GLOBAL_glob';
 package Bar;
 @s = ();
 if ($^O eq 'MacOS') {
-    while (<:*:a*.t>) {
+    while (glob(":*:a*.t")) {
 	my $i = 0;
 	print "# $_ <";
 	push @s, $_;
@@ -146,7 +146,7 @@ if ($^O eq 'MacOS') {
 	print " >\n";
     }
 } else {
-    while (<*/a*.t>) {
+    while (glob("*/a*.t")) {
 	my $i = 0;
 	print "# $_ <";
 	push @s, $_;

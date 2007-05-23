@@ -686,7 +686,7 @@ sub DESTROY {
         my $self = shift;
 	dbmclose(%{$self->{'LT'}});
 	1 while unlink 'dbmtest';
-	1 while unlink <dbmtest.*>;
+	1 while unlink glob("dbmtest.*");
 	print "ok\n";
 }
 package main;

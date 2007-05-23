@@ -645,9 +645,9 @@ Value of readdir() operator can be "0"; test with defined() at - line 4.
 ########
 # op.c
 use warnings 'misc' ;
-$x = 1 if $x = <*> ;
+$x = 1 if $x = glob("*") ;
 no warnings 'misc' ;
-$x = 1 if $x = <*> ;
+$x = 1 if $x = glob("*") ;
 EXPECT
 Value of glob construct can be "0"; test with defined() at - line 3.
 ########
@@ -662,9 +662,9 @@ Value of each() operator can be "0"; test with defined() at - line 4.
 ########
 # op.c
 use warnings 'misc' ;
-$x = 1 while $x = <*> and 0 ;
+$x = 1 while $x = glob("*") and 0 ;
 no warnings 'misc' ;
-$x = 1 while $x = <*> and 0 ;
+$x = 1 while $x = glob("*") and 0 ;
 EXPECT
 Value of glob construct can be "0"; test with defined() at - line 3.
 ########
@@ -686,7 +686,7 @@ $_ = <FH> err $_ = 1;
 ($_ = <FH>) // ($_ = 1);
 opendir DH, ".";
 $_ = readdir DH err $_ = 1;
-$_ = <*> err $_ = 1;
+$_ = glob("*") err $_ = 1;
 %a = (1,2,3,4) ;
 $_ = each %a err $_ = 1;
 EXPECT

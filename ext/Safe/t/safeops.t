@@ -95,7 +95,6 @@ srefgen		SKIP \$x
 ref		ref
 bless		bless
 backtick	qx/ls/
-glob		<*.c>
 readline	<FH>
 rcatline	SKIP (set by optimizer) $x .= <F>
 regcmaybe	SKIP (internal)

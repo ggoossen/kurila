@@ -2194,7 +2194,7 @@ EOP
 
 warn "Writing $ext$modpname/MANIFEST\n";
 open(MANI,'>MANIFEST') or die "Can't create MANIFEST: $!";
-my @files = grep { -f } (<*>, <t/*>, <$fallbackdirname/*>, <$modpmdir/*>);
+my @files = grep { -f } (glob("*"), glob("t/*"), glob("$fallbackdirname/*"), glob("$modpmdir/*"));
 if (!@files) {
   eval {opendir(D,'.');};
   unless ($@) { @files = readdir(D); closedir(D); }
