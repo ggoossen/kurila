@@ -164,7 +164,7 @@ $[ = 1
 # TODO from t/comp/parser.t
 $x = 1 for ($[) = 0;
 ########
-# TODO from t/op/getppid.t
+# from t/op/getppid.t
 pipe my ($r, $w)
 ########
 # TODO switch
