@@ -365,7 +365,7 @@ SKIP: {
     {
 	use strict;
 	print FH "x\n" x 200;
-	ok(truncate(FH, 200), "fh resize to 200");
+	ok(truncate(*FH, 200), "fh resize to 200");
     }
 
     if ($needs_fh_reopen) {
@@ -379,7 +379,7 @@ SKIP: {
 
 	is(-s "Iofs.tmp", 200, "fh resize to 200 working (filename check)");
 
-	ok(truncate(FH, 0), "fh resize to zero");
+	ok(truncate(*FH, 0), "fh resize to zero");
 
 	if ($needs_fh_reopen) {
 	    close (FH); open (FH, ">>Iofs.tmp") or die "Can't reopen Iofs.tmp";

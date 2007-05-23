@@ -153,7 +153,7 @@ sub soft_chdir_with_alternatives ($);
 #-> sub CPAN::shell ;
 sub shell {
     my($self) = @_;
-    $Suppress_readline = ! -t STDIN unless defined $Suppress_readline;
+    $Suppress_readline = ! -t *STDIN unless defined $Suppress_readline;
     CPAN::HandleConfig->load unless $CPAN::Config_loaded++;
 
     my $oprompt = shift || CPAN::Prompt->new;
@@ -3003,7 +3003,7 @@ sub mysleep {
 
 #-> sub CPAN::Shell::setup_output ;
 sub setup_output {
-    return if -t STDOUT;
+    return if -t *STDOUT;
     my $odef = select STDERR;
     $| = 1;
     select STDOUT;

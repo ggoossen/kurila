@@ -432,7 +432,7 @@ my %msg;
 }
 
 if ($standalone) {
-    if (!@ARGV and -t STDIN) { print STDERR "$0: Reading from STDIN\n" } 
+    if (!@ARGV and -t *STDIN) { print STDERR "$0: Reading from STDIN\n" } 
     while (defined (my $error = <>)) {
 	splainthis($error) || print THITHER $error;
     } 

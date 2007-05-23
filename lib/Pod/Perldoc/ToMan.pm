@@ -64,7 +64,7 @@ sub parse_from_file {
          # no temp file, just a pipe!
 
   # Thanks to Brendan O'Dea for contributing the following block
-  if('Pod::Perldoc::IS_Linux' and -t STDOUT
+  if('Pod::Perldoc::IS_Linux' and -t *STDOUT
     and my ($cols) = `stty -a` =~ m/\bcolumns\s+(\d+)/
   ) {
     my $c = $cols * 39 / 40;

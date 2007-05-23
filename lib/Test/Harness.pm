@@ -554,7 +554,7 @@ sub _mk_leader {
     my $leader = "$te" . '.' x ($width - length($te));
     my $ml = "";
 
-    if ( -t STDOUT and not $ENV{HARNESS_NOTTY} and not $Verbose ) {
+    if ( -t *STDOUT and not $ENV{HARNESS_NOTTY} and not $Verbose ) {
         $ml = "\r" . (' ' x 77) . "\r$leader"
     }
 

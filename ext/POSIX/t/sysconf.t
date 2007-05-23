@@ -99,7 +99,7 @@ SKIP: {
 	or skip("$TTY not a character file", $n);
     open(TTY, $TTY)
 	or skip("failed to open $TTY: $!", $n);
-    -t TTY
+    -t *TTY
 	or skip("TTY ($TTY) not a terminal file", $n);
 
     my $fd = fileno(TTY);

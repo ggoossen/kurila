@@ -138,7 +138,7 @@ sub prompt ($;$) {
     Carp::confess("prompt function called without an argument") 
         unless defined $mess;
 
-    my $isa_tty = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;
+    my $isa_tty = -t *STDIN && (-t *STDOUT || !(-f *STDOUT || -c *STDOUT)) ;
 
     my $dispdef = defined $def ? "[$def] " : " ";
     $def = defined $def ? $def : "";

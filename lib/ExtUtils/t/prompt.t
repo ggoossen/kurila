@@ -49,7 +49,7 @@ SKIP: {
     close STDIN;
     my $stdin = tie *STDIN, 'TieIn' or die;
     $stdin->write("From STDIN");
-    ok( !-t STDIN,      'STDIN not a tty' );
+    ok( !-t *STDIN,      'STDIN not a tty' );
 
     is( prompt("Foo?", 'Bar!'), 'From STDIN',     'from STDIN' );
     like( $stdout->read,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );
