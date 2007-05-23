@@ -55,7 +55,7 @@ cmp_ok("@glops",'eq',"@oops",'glob operator 2');
 # (this used to dump core)
 my $i = 0;
 for (1..2) {
-    eval "<.>";
+    eval "glob('.')";
     ok(!length($@),"eval'ed a glob $_");
     undef %File::Glob::;
     ++$i;

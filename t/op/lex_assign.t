@@ -177,7 +177,6 @@ ref $xref			# ref
 ref $cstr			# ref nonref
 `$runme -e "print qq[1\\n]"`				# backtick skip(MSWin32)
 `$undefed`			# backtick undef skip(MSWin32)
-<*>				# glob
 <OP>				# readline
 'faked'				# rcatline
 (@z = (1 .. 3))			# aassign
