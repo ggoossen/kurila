@@ -2877,7 +2877,7 @@ Perl_madlex(pTHX)
     case 0:
 	optype = PEG;
 	if (PL_endwhite) {
-	    addmad(newMADsv('p', PL_endwhite), &PL_thismad, 0);
+	    addmad(newMADsv('G', PL_endwhite), &PL_thismad, 0);
 	    PL_endwhite = 0;
 	}
 	break;

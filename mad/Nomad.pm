@@ -525,7 +525,8 @@ sub hash {
     { 'Q', "quote_close" },
     { '=', "assign" },
     { 'X', "value" },
-    { 'B', "bareword" },
+    { 'G', "endsection" },
+    { 'g', "forcedword" },
     { '^', "hat" },
     { ';', "colon" },
     { 'o', "operator" },
@@ -592,7 +593,7 @@ sub hash {
             $k = $mapping{$k} || $k;
         }
 	$firstthing ||= $k;
-        die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne "" and $hash{$k} ne $v;
+        die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne $v;
         $lastthing = $k;
 	$hash{$k} = $v;
     }
@@ -964,7 +965,7 @@ BEGIN {
 	'p' => sub {		# peg for #! line, etc.
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('p px');
+	    push @newkids, $self->madness('p G');
 	    $::curstate = 0;
 	    return P5AST::peg->new(Kids => [@newkids])
 	},
