@@ -11033,12 +11033,7 @@ S_scan_inputsymbol(pTHX_ char *start)
     */
 
     if (d - PL_tokenbuf != len) {
-	yylval.ival = OP_GLOB;
-	set_csh();
-	s = scan_str(start,!!PL_madskills,FALSE);
-	if (!s)
-	   Perl_croak(aTHX_ "Glob not terminated");
-	return s;
+	Perl_croak(aTHX_ "<> with something take looks like a glob pattern");
     }
     else {
 	bool readline_overriden = FALSE;
