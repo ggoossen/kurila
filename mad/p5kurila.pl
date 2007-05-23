@@ -136,11 +136,46 @@ sub add_encoding_latin1 {
     $madprops->insert_new_elt("mad_sv", { key => 'p', val => qq|use encoding 'latin1';&#xA;| });
 }
 
-sub madprop {
+sub del_madprop {
+    my ($op, $key) = @_;
+    my ($madsv) = $op->findnodes(qq|madprops/mad_sv[\@key="$key"]|);
+    $madsv->delete if $madsv;
+}
+
+sub set_madprop {
     my ($op, $key, $val) = @_;
     my ($madprops) = $op->findnodes("madprops");
     $madprops ||= $op->insert_new_elt("madprops");
-    $madprops->insert_new_elt("mad_sv", { key => $key, val => $val } );
+    my ($madsv) = $op->findnodes(qq|madprops/mad_sv[\@key="$key"]|);
+    if ($madsv) {
+        $madsv->set_att("val", $val);
+    } else {
+        $madprops->insert_new_elt("mad_sv", { key => $key, val => $val } );
+    }
+}
+
+sub get_madprop {
+    my ($op, $key) = @_;
+    my ($madsv) = $op->findnodes(qq|madprops/mad_sv[\@key="$key"]|);
+    return $madsv && $madsv->att("val");
+}
+
+sub make_glob_sub {
+    my $twig = shift;
+    for my $op_glob ($twig->findnodes(q|//op_null[@was="glob"]|)) {
+        next if not get_madprop($op_glob, "quote_open");
+        set_madprop($op_glob, "round_open", "(");
+        set_madprop($op_glob, "round_close", ")");
+        set_madprop($op_glob, "operator", "glob");
+        del_madprop($op_glob, "assign");
+        del_madprop($op_glob, "quote_open");
+        del_madprop($op_glob, "quote_close");
+
+        my ($op_c) = $op_glob->findnodes(q|op_entersub/op_null/op_const|);
+        set_madprop($op_c, "quote_open", "&#34;");
+        set_madprop($op_c, "quote_close", "&#34;");
+        set_madprop($op_c, "assign", get_madprop($op_c, "value"));
+    }
 }
 
 sub remove_rv2gv {
@@ -151,8 +186,8 @@ sub remove_rv2gv {
         next unless $op_const and $op_const->att('PV') =~ m/[:][:]$/;
 
         my $op_scope = $op_rv2hv->insert_new_elt("op_scope");
-        madprop($op_scope, curly_open => '{');
-        madprop($op_scope, curly_close => '}');
+        add_madprop($op_scope, curly_open => '{');
+        add_madprop($op_scope, curly_close => '}');
 
         my $op_sub = $op_scope->insert_new_elt("op_entersub");
 
@@ -171,8 +206,8 @@ sub remove_rv2gv {
         madprop($op_const, quote_open => '&#34;');
         my $name = $op_const->att('PV');
         $name =~ s/::$//;
-        madprop($op_const, assign => $name);
-        madprop($op_const, quote_close => '&#34;');
+        add_madprop($op_const, assign => $name);
+        add_madprop($op_const, quote_close => '&#34;');
     }
 
     # strict refs
@@ -213,6 +248,8 @@ for my $op ($twig->findnodes(q|//op_entersub|)) {
 for my $op_const ($twig->findnodes(q|//op_const|)) {
     const_handler($twig, $op_const);
 }
+
+make_glob_sub( $twig );
 
 # add_encoding_latin1($twig);
 

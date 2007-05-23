@@ -25,6 +25,7 @@ sub p5convert {
 # t_strict_refs();
 t_indirect_object_syntax();
 t_barewords();
+t_glob_pattr();
 # t_encoding();
 
 sub t_indirect_object_syntax {
@@ -53,97 +54,71 @@ END
 
 sub t_barewords {
 
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+    p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
 bless {}, CLASS;
-====
+----------
 bless {}, 'CLASS';
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 require overload;
-====
+----------
 require overload;
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 foo => 'bar';
-====
+----------
 foo => 'bar';
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 { foo => 'bar', noot => "mies" };
-====
+----------
 { foo => 'bar', noot => "mies" };
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 $aap{noot};
-====
+----------
 $aap{noot};
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 exists $aap->{noot};
-====
+----------
 exists $aap->{noot};
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 Foo->new(-Level);
-====
+----------
 Foo->new(-Level);
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 $foo->SUPER::aap();
-====
+----------
 $foo->SUPER::aap();
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 sort Foo::aap 1,2,3;
-====
+----------
 sort Foo::aap 1,2,3;
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 sort aap 1,2,3;
-====
+----------
 sort aap 1,2,3;
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 open(IN, "aap");
-====
+----------
 open(IN, "aap");
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 -d _;
-====
+----------
 -d _;
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 Foo::Bar->new();
-====
+----------
 Foo::Bar->new();
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 truncate(FH, 0);
-====
+----------
 truncate(*FH, 0);
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 sub foo(*$) { }
 foo(FH, STR);
-====
+----------
 sub foo(*$) { }
 foo(*FH, 'STR');
+==========
 END
+
 }
 
 sub t_strict_refs {
@@ -175,4 +150,14 @@ sub t_strict_refs {
 sub t_encoding {
     p5convert( qq|use encoding 'latin1';\n"\x85"|, qq|use encoding 'latin1';\n"\x85"|, 1 );
     p5convert( qq|"\x85"|, qq|use encoding 'latin1';\n"\x85"|, 1 );
+}
+
+sub t_glob_pattr {
+    p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
+<*.pm>;
+glob("*.pm");
+----------
+glob("*.pm");
+glob("*.pm");
+END
 }
