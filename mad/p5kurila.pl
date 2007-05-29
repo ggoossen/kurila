@@ -242,6 +242,28 @@ sub remove_rv2gv {
     }
 }
 
+sub remove_vstring {
+    my $twig = shift;
+
+    for my $op_const ($twig->findnodes(q|//op_const|), $twig->findnodes(q|op_null[@was="const"]|)) {
+        next unless (get_madprop($op_const, "value") || '') =~ m/^v/;
+        next unless get_madprop($op_const, "v_string");
+        next if get_madprop($op_const, "forcedword");
+        next if $op_const->att('private') && ($op_const->att('private') =~ m/BARE/);
+
+        set_madprop($op_const, "wsbefore-quote_open", get_madprop($op_const, "wsbefore-value"));
+        set_madprop($op_const, "quote_open", "&#34;");
+        set_madprop($op_const, "quote_close", "&#34;");
+        my $v = get_madprop($op_const, "value");
+        $v =~ s/^v//;
+        $v =~ m/^[\d.]+$/ or die;
+        $v =~ s/(\d+)/ sprintf '\x{%x}', $1 /ge;
+        $v =~ s/[.]//g;
+        set_madprop($op_const, "assign", $v);
+        del_madprop($op_const, "value");
+    }
+}
+
 # parsing
 my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
 
@@ -257,9 +279,9 @@ for my $op_const ($twig->findnodes(q|//op_const|)) {
 }
 
 make_glob_sub( $twig );
+remove_vstring( $twig );
 
 # add_encoding_latin1($twig);
-
 # remove_rv2gv($twig);
 
 # print

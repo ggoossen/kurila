@@ -22,10 +22,11 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-# t_strict_refs();
+t_strict_refs();
 t_indirect_object_syntax();
 t_barewords();
 t_glob_pattr();
+t_vstring();
 # t_encoding();
 
 sub t_indirect_object_syntax {
@@ -166,4 +167,25 @@ glob("*.pm");
 #ABC
 glob("*.pm");
 END
+}
+
+sub t_vstring {
+    p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
+v1.2.3.10;
+"v1.2.3.10";
+----------
+"\x{1}\x{2}\x{3}\x{a}";
+"v1.2.3.10";
+==========
+use vars;
+{ version => 3 };
+----------
+use vars;
+{ version => 3 };
+==========
+is($vs,"\x{1}\x{14}\x{12c}\x{fa0}","v-string ne \\x{}");
+----------
+is($vs,"\x{1}\x{14}\x{12c}\x{fa0}","v-string ne \\x{}");
+END
+
 }
