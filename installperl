@@ -154,7 +154,7 @@ close SCRIPTS;
 
 if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
 
-my @pods = $nopods ? () : (<pod/*.pod>, 'x2p/a2p.pod');
+my @pods = $nopods ? () : (glob("pod/*.pod"), 'x2p/a2p.pod');
 
 # Specify here any .pm files that are actually architecture-dependent.
 # (Those included with XS extensions under ext/ are automatically
@@ -424,11 +424,11 @@ my @corefiles;
 if ($Is_VMS) {  # We did core file selection during build
     my $coredir = "lib/$Config{archname}/$ver/CORE";
     $coredir =~ tr/./_/;
-    map { s|^$coredir/||i; } @corefiles = <$coredir/*.*>;
+    map { s|^$coredir/||i; } @corefiles = glob("$coredir/*.*");
 }
 else {
     # [als] hard-coded 'libperl' name... not good!
-    @corefiles = <*.h libperl*.* perl*$Config{lib_ext}>;
+    @corefiles = glob("*.h libperl*.* perl*$Config{lib_ext}");
 
     # AIX needs perl.exp installed as well.
     push(@corefiles,'perl.exp') if $^O eq 'aix';
