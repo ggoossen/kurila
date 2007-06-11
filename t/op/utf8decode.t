@@ -1,7 +1,7 @@
 #!./perl
 
 {
-    my $wide = v256;
+    my $wide = "\x{100}";
     use bytes;
     my $ordwide = ord($wide);
     printf "# under use bytes ord(v256) = 0x%02x\n", $ordwide;

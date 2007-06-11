@@ -920,10 +920,11 @@ SKIP: {
     is("1.20.300.4000", sprintf "%vd", pack("U*",1,20,300,4000));
     is("1.20.300.4000", sprintf "%vd", pack("  U*",1,20,300,4000));
 }
-isnt(v1.20.300.4000, sprintf "%vd", pack("C0U*",1,20,300,4000));
 
 {
 use utf8;
+
+isnt("\x{1}\x{14}\x{12c}\x{fa0}", sprintf "%vd", pack("C0U*",1,20,300,4000));
 
 my $rslt = $Is_EBCDIC ? "156 67" : "199 162";
 is(join(" ", unpack("C*", "\x{1e2}")), $rslt);
@@ -944,8 +945,9 @@ is("@{[unpack('U*', pack('U*', 100, 200))]}", "100 200");
 SKIP: {
     skip "Not for EBCDIC", 4 if $Is_EBCDIC;
 
+    use utf8;
     # does pack U0C create Unicode?
-    is("@{[pack('U0C*', 100, 195, 136)]}", v100.v200);
+    is("@{[pack('U0C*', 100, 195, 136)]}", "\x{64}"."\x{c8}");
 
     # does pack C0U create characters?
     is("@{[pack('C0U*', 100, 200)]}", pack("C*", 100, 195, 136));

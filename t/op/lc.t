@@ -200,10 +200,10 @@ for my $a (0,1) {
 {
     foreach (0, 1) {
         local $TODO = "fix lc";
-	$a = v10.v257;
+	$a = "\x{a}"."\x{101}";
 	chop $a;
 	$a =~ s/^(\s*)(\w*)/$1\u$2/;
-	is($a, v10, "[perl #18857]");
+	is($a, "\x{a}", "[perl #18857]");
     } 
 }
 

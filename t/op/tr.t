@@ -200,32 +200,32 @@ is($a, "\x{12d}\x{c4}\x{12d}\x{c4}",    'translit w/complement');
 ($a = "a\x{c4}b\x{c4}") =~ tr/\x{c4}//d;
 is($a, "ab",            'translit w/deletion');
 
-($a = v196.196.172.300.300.196.172) =~ tr/\x{c4}/\x{c5}/s;
-is($a, v197.172.300.300.197.172,    'translit w/squeeze');
+($a = "\x{c4}\x{c4}\x{ac}\x{12c}\x{12c}\x{c4}\x{ac}") =~ tr/\x{c4}/\x{c5}/s;
+is($a, "\x{c5}\x{ac}\x{12c}\x{12c}\x{c5}\x{ac}",    'translit w/squeeze');
 
-($a = v196.172.300.300.196.172.172) =~ tr/\x{12c}/\x{12d}/s;
-is($a, v196.172.301.196.172.172);
+($a = "\x{c4}\x{ac}\x{12c}\x{12c}\x{c4}\x{ac}\x{ac}") =~ tr/\x{12c}/\x{12d}/s;
+is($a, "\x{c4}\x{ac}\x{12d}\x{c4}\x{ac}\x{ac}");
 
 
 # Tricky cases (When Simon Cozens Attacks)
-($a = v196.172.200) =~ tr/\x{12c}/a/;
+($a = "\x{c4}\x{ac}\x{c8}") =~ tr/\x{12c}/a/;
 is(sprintf("%vd", $a), '196.172.200');
 
-($a = v196.172.200) =~ tr/\x{12c}/\x{12c}/;
+($a = "\x{c4}\x{ac}\x{c8}") =~ tr/\x{12c}/\x{12c}/;
 is(sprintf("%vd", $a), '196.172.200');
 
-($a = v196.172.200) =~ tr/\x{12c}//d;
+($a = "\x{c4}\x{ac}\x{c8}") =~ tr/\x{12c}//d;
 is(sprintf("%vd", $a), '196.172.200');
 
 
 # UTF8 range tests from Inaba Hiroto
 
 # Not working in EBCDIC as of 12674.
-($a = v300.196.172.302.197.172) =~ tr/\x{12c}-\x{130}/\x{c0}-\x{c4}/;
-is($a, v192.196.172.194.197.172,    'UTF range');
+($a = "\x{12c}\x{c4}\x{ac}\x{12e}\x{c5}\x{ac}") =~ tr/\x{12c}-\x{130}/\x{c0}-\x{c4}/;
+is($a, "\x{c0}\x{c4}\x{ac}\x{c2}\x{c5}\x{ac}",    'UTF range');
 
-($a = v300.196.172.302.197.172) =~ tr/\x{c4}-\x{c8}/\x{12c}-\x{130}/;
-is($a, v300.300.172.302.301.172);
+($a = "\x{12c}\x{c4}\x{ac}\x{12e}\x{c5}\x{ac}") =~ tr/\x{c4}-\x{c8}/\x{12c}-\x{130}/;
+is($a, "\x{12c}\x{12c}\x{ac}\x{12e}\x{12d}\x{ac}");
 
 
 # UTF8 range tests from Karsten Sperling (patch #9008 required)
@@ -239,7 +239,7 @@ is($a, "X");
 ($a = "\x{0100}") =~ tr/\x{0000}-\x{00ff}\x{0101}/X/c;
 is($a, "X");
  
-($a = v256) =~ tr/\x{0000}-\x{00ff}\x{0101}/X/c;
+($a = "\x{100}") =~ tr/\x{0000}-\x{00ff}\x{0101}/X/c;
 is($a, "X");
 
 

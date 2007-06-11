@@ -64,10 +64,10 @@ is (($foo | $bar), ($Aoz x 75 . $zap));
 is (($foo ^ $bar), ($Axz x 75 . $zap));
 
 # everything using bytes
-is (sprintf("%vd", v801), '204.161');
-is (sprintf("%vd", v4095 & v801), '192.161');
-is (sprintf("%vd", v4095 | v801), '236.191.191');
-is (sprintf("%vd", v4095 ^ v801), '44.30.191');
+is (sprintf("%vd", "\x{321}"), '204.161');
+is (sprintf("%vd", "\x{fff}" & "\x{321}"), '192.161');
+is (sprintf("%vd", "\x{fff}" | "\x{321}"), '236.191.191');
+is (sprintf("%vd", "\x{fff}" ^ "\x{321}"), '44.30.191');
 
 #
 # UTF8 ~ behaviour: ~ always works on bytes
