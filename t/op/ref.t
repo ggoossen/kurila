@@ -56,7 +56,7 @@ $BAZ = "hit";
 is ($$$FOO, 'hit');
 
 # test that ref(vstring) makes sense
-my $vstref = \"\x{1}";
+my $vstref = \v1;
 is (ref($vstref), "VSTRING", "ref(vstr) eq VSTRING");
 like ( $vstref, qr/VSTRING\(0x[0-9a-f]+\)/, '\vstr is also VSTRING');
 

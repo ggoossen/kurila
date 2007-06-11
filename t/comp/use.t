@@ -160,7 +160,7 @@ if ($^O eq 'MacOS') {
     eval "use lib 100.105";
     like ($@, qr/lib version 100.105 required--this is only version 35.36/);
 
-    local $lib::VERSION = "\x{23}\x{24}";
+    local $lib::VERSION = v35.36;
     eval "use lib v33.55";
     is ($@, '');
 
