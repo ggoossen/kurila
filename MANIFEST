@@ -1412,12 +1412,17 @@ lib/Archive/Tar/bin/ptardiff	the ptardiff utility
 lib/Archive/Tar/Constant.pm	Archive::Tar
 lib/Archive/Tar/File.pm		Archive::Tar
 lib/Archive/Tar.pm		Archive::Tar
-lib/Archive/Tar/t/00_setup.t	Archive::Tar test setup
 lib/Archive/Tar/t/01_use.t	Archive::Tar tests
 lib/Archive/Tar/t/02_methods.t	Archive::Tar tests
 lib/Archive/Tar/t/03_file.t	Archive::Tar tests
 lib/Archive/Tar/t/04_resolved_issues.t	Archive::Tar tests
-lib/Archive/Tar/t/99_clean.t	Archive::Tar test cleanup
+lib/Archive/Tar/t/99_pod.t	Archive::Tar tests
+lib/Archive/Tar/t/src/long/b	Archive::Tar tests
+lib/Archive/Tar/t/src/long/bar.tar.packed	Archive::Tar tests
+lib/Archive/Tar/t/src/long/foo.tgz.packed	Archive::Tar tests
+lib/Archive/Tar/t/src/short/b	Archive::Tar tests
+lib/Archive/Tar/t/src/short/bar.tar.packed	Archive::Tar tests
+lib/Archive/Tar/t/src/short/foo.tgz.packed	Archive::Tar tests
 lib/assertions/activate.pm	assertions activate/deactivate
 lib/assertions/compat.pm	assertions compatibility for earlier perls
 lib/assertions.pm		module support for -A flag
@@ -3530,6 +3535,7 @@ t/mro/next_NEXT.t		mro tests
 t/mro/next_skip.t		mro tests
 t/mro/overload_c3.t		mro tests
 t/mro/overload_dfs.t		mro tests
+t/mro/pkg_gen.t		mro tests
 t/mro/recursion_c3.t		mro tests
 t/mro/recursion_dfs.t		mro tests
 t/mro/vulcan_c3.t		mro tests
