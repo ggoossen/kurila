@@ -54,10 +54,12 @@ typedef struct yy_parser {
     I32		lex_starts;	/* how many interps done on level */
     SV		*lex_stuff;	/* runtime pattern from m// or s/// */
     I32		multi_start;	/* 1st line of multi-line string */
+    I32		multi_end;	/* last line of multi-line string */
     char	multi_open;	/* delimiter of said string */
     char	multi_close;	/* delimiter of said string */
     char	pending_ident;	/* pending identifier lookup */
     bool	preambled;
+    /* XXX I32 space */
     SUBLEXINFO	sublex_info;
     SV		*linestr;	/* current chunk of src text */
     char	*bufptr;	
@@ -74,6 +76,7 @@ typedef struct yy_parser {
     HV		*in_my_stash;	/* declared class of this "my" declaration */
     PerlIO	*rsfp;		/* current source file pointer */
     AV		*rsfp_filters;	/* holds chain of active source filters */
+    U8		error_count;	/* how many compile errors so far, max 10 */
 
 #ifdef PERL_MAD
     SV		*endwhite;
@@ -99,6 +102,7 @@ typedef struct yy_parser {
 #endif
 
     COP		*saved_curcop;	/* the previous PL_curcop */
+    char	tokenbuf[256];
 
 } yy_parser;
     

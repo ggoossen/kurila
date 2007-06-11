@@ -798,7 +798,8 @@ Perl_scalar(pTHX_ OP *o)
     OP *kid;
 
     /* assumes no premature commitment */
-    if (!o || PL_error_count || (o->op_flags & OPf_WANT)
+    if (!o || (PL_parser && PL_parser->error_count)
+	 || (o->op_flags & OPf_WANT)
 	 || o->op_type == OP_RETURN)
     {
 	return o;
@@ -896,7 +897,8 @@ Perl_scalarvoid(pTHX_ OP *o)
 
     /* assumes no premature commitment */
     want = o->op_flags & OPf_WANT;
-    if ((want && want != OPf_WANT_SCALAR) || PL_error_count
+    if ((want && want != OPf_WANT_SCALAR)
+	 || (PL_parser && PL_parser->error_count)
 	 || o->op_type == OP_RETURN)
     {
 	return o;
@@ -1139,7 +1141,8 @@ Perl_list(pTHX_ OP *o)
     OP *kid;
 
     /* assumes no premature commitment */
-    if (!o || (o->op_flags & OPf_WANT) || PL_error_count
+    if (!o || (o->op_flags & OPf_WANT)
+	 || (PL_parser && PL_parser->error_count)
 	 || o->op_type == OP_RETURN)
     {
 	return o;
@@ -1265,7 +1268,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
     /* -1 = error on localize, 0 = ignore localize, 1 = ok to localize */
     int localize = -1;
 
-    if (!o || PL_error_count)
+    if (!o || (PL_parser && PL_parser->error_count))
 	return o;
 
     if ((o->op_private & OPpTARGET_MY)
@@ -1673,7 +1676,7 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
     dVAR;
     OP *kid;
 
-    if (!o || PL_error_count)
+    if (!o || (PL_parser && PL_parser->error_count))
 	return o;
 
     switch (o->op_type) {
@@ -1921,7 +1924,7 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
     dVAR;
     I32 type;
 
-    if (!o || PL_error_count)
+    if (!o || (PL_parser && PL_parser->error_count))
 	return o;
 
     type = o->op_type;
@@ -2337,7 +2340,7 @@ Perl_fold_constants(pTHX_ register OP *o)
 	break;
     }
 
-    if (PL_error_count)
+    if (PL_parser && PL_parser->error_count)
 	goto nope;		/* Don't try to run w/ errors */
 
     for (curop = LINKLIST(o); curop != o; curop = LINKLIST(curop)) {
@@ -2423,7 +2426,7 @@ Perl_gen_constant_list(pTHX_ register OP *o)
     const I32 oldtmps_floor = PL_tmps_floor;
 
     list(o);
-    if (PL_error_count)
+    if (PL_parser && PL_parser->error_count)
 	return o;		/* Don't attempt to run with errors */
 
     PL_op = curop = LINKLIST(o);
@@ -3439,8 +3442,8 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	OP *curop;
 	if (pm->op_pmflags & PMf_EVAL) {
 	    curop = NULL;
-	    if (CopLINE(PL_curcop) < (line_t)PL_multi_end)
-		CopLINE_set(PL_curcop, (line_t)PL_multi_end);
+	    if (CopLINE(PL_curcop) < (line_t)PL_parser->multi_end)
+		CopLINE_set(PL_curcop, (line_t)PL_parser->multi_end);
 	}
 	else if (repl->op_type == OP_CONST)
 	    curop = repl;
@@ -5391,7 +5394,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     if (ps)
 	sv_setpvn((SV*)cv, ps, ps_len);
 
-    if (PL_error_count) {
+    if (PL_parser && PL_parser->error_count) {
 	op_free(block);
 	block = NULL;
 	if (name) {
@@ -5476,7 +5479,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    }
 	}
 
-	if (name && !PL_error_count)
+	if (name && ! (PL_parser && PL_parser->error_count))
 	    process_special_blocks(name, gv, cv);
     }
 
@@ -6117,7 +6120,8 @@ Perl_ck_exists(pTHX_ OP *o)
 	OP * const kid = cUNOPo->op_first;
 	if (kid->op_type == OP_ENTERSUB) {
 	    (void) ref(kid, o->op_type);
-	    if (kid->op_type != OP_RV2CV && !PL_error_count)
+	    if (kid->op_type != OP_RV2CV
+			&& !(PL_parser && PL_parser->error_count))
 		Perl_croak(aTHX_ "%s argument is not a subroutine name",
 			    OP_DESC(o));
 	    o->op_private |= OPpEXISTS_SUB;
@@ -6633,7 +6637,7 @@ Perl_ck_grep(pTHX_ OP *o)
     PADOFFSET offset;
 
     o->op_ppaddr = PL_ppaddr[OP_GREPSTART];
-    /* don't allocate gwop here, as we may leak it if PL_error_count > 0 */
+    /* don't allocate gwop here, as we may leak it if PL_parser->error_count > 0 */
 
     if (o->op_flags & OPf_STACKED) {
 	OP* k;
@@ -6654,7 +6658,7 @@ Perl_ck_grep(pTHX_ OP *o)
     else
 	scalar(kid);
     o = ck_fun(o);
-    if (PL_error_count)
+    if (PL_parser && PL_parser->error_count)
 	return o;
     kid = cLISTOPo->op_first->op_sibling;
     if (kid->op_type != OP_NULL)
