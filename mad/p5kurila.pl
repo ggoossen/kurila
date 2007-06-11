@@ -247,16 +247,18 @@ sub remove_vstring {
 
     for my $op_const ($twig->findnodes(q|//op_const|), $twig->findnodes(q|op_null[@was="const"]|)) {
         next unless (get_madprop($op_const, "value") || '') =~ m/^v/;
-        next unless get_madprop($op_const, "v_string");
         next if get_madprop($op_const, "forcedword");
         next if $op_const->att('private') && ($op_const->att('private') =~ m/BARE/);
+        next if get_madprop($op_const->parent, "quote_open");
+        next if $op_const->parent->tag eq "mad_op";
+        next if $op_const->parent->tag eq "op_require";
 
         set_madprop($op_const, "wsbefore-quote_open", get_madprop($op_const, "wsbefore-value"));
         set_madprop($op_const, "quote_open", "&#34;");
         set_madprop($op_const, "quote_close", "&#34;");
         my $v = get_madprop($op_const, "value");
         $v =~ s/^v//;
-        $v =~ m/^[\d.]+$/ or die;
+        $v =~ m/^[\d.]+$/ or die "Invalid string '$v'";
         $v =~ s/(\d+)/ sprintf '\x{%x}', $1 /ge;
         $v =~ s/[.]//g;
         set_madprop($op_const, "assign", $v);
