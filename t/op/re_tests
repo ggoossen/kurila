@@ -1301,3 +1301,4 @@ foo(\R)bar	foo\rbar	y	$1	\r
 
 foo(\R+)bar	foo\r\n\x{85}\r\n\nbar	y	$1	\r\n\x{85}\r\n\n
 
+.*\z	foo\n	y	-	-
