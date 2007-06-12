@@ -16,7 +16,6 @@ END
 
 foreach my $const (qw(
 		      CVf_ANON
-		      CVf_ASSERTION
 		      CVf_CLONE
 		      CVf_CLONED
 		      CVf_CONST
