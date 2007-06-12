@@ -16,7 +16,8 @@ $VERSION = '1.58';
 require 5.006002;
 
 require Exporter;
-our @ISA =       qw(Math::BigInt);
+our @ISA		= qw/Math::BigInt/;
+our @EXPORT_OK	= qw/bpi/;
 
 use strict;
 # $_trap_inf/$_trap_nan are internal and should never be accessed from outside
@@ -602,11 +603,11 @@ sub badd
   # return result as BFLOAT
 
   # set up parameters
-  my ($self,$x,$y,$a,$p,$r) = (ref($_[0]),@_);
+  my ($self,$x,$y,@r) = (ref($_[0]),@_);
   # objectify is costly, so avoid it
   if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
     {
-    ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
+    ($self,$x,$y,@r) = objectify(2,@_);
     }
  
   return $x if $x->modify('badd');
@@ -628,11 +629,13 @@ sub badd
     return $x;
     }
 
-  return $upgrade->badd($x,$y,$a,$p,$r) if defined $upgrade &&
+  return $upgrade->badd($x,$y,@r) if defined $upgrade &&
    ((!$x->isa($self)) || (!$y->isa($self)));
 
+  $r[3] = $y;						# no push!
+
   # speed: no add for 0+y or x+0
-  return $x->bround($a,$p,$r) if $y->is_zero();		# x+0
+  return $x->bround(@r) if $y->is_zero();		# x+0
   if ($x->is_zero())					# 0+y
     {
     # make copy, clobbering up x (modify in place!)
@@ -640,7 +643,7 @@ sub badd
     $x->{_es} = $y->{_es};
     $x->{_m} = $MBI->_copy($y->{_m});
     $x->{sign} = $y->{sign} || $nan;
-    return $x->round($a,$p,$r,$y);
+    return $x->round(@r);
     }
  
   # take lower of the two e's and adapt m1 to it to match m2
@@ -677,7 +680,7 @@ sub badd
     }
 
   # delete trailing zeros, then round
-  $x->bnorm()->round($a,$p,$r,$y);
+  $x->bnorm()->round(@r);
   }
 
 # sub bsub is inherited from Math::BigInt!
@@ -1509,9 +1512,8 @@ sub is_int
   # return true if arg (BFLOAT or num_str) is an integer
   my ($self,$x) = ref($_[0]) ? (undef,$_[0]) : objectify(1,@_);
 
-  return 1 if ($x->{sign} =~ /^[+-]$/) &&	# NaN and +-inf aren't
-    $x->{_es} eq '+';				# 1e-1 => no integer
-  0;
+  (($x->{sign} =~ /^[+-]$/) &&			# NaN and +-inf aren't
+   ($x->{_es} eq '+')) ? 1 : 0;			# 1e-1 => no integer
   }
 
 sub is_zero
@@ -1519,8 +1521,7 @@ sub is_zero
   # return true if arg (BFLOAT or num_str) is zero
   my ($self,$x) = ref($_[0]) ? (undef,$_[0]) : objectify(1,@_);
 
-  return 1 if $x->{sign} eq '+' && $MBI->_is_zero($x->{_m});
-  0;
+  ($x->{sign} eq '+' && $MBI->_is_zero($x->{_m})) ? 1 : 0;
   }
 
 sub is_one
@@ -1529,10 +1530,10 @@ sub is_one
   my ($self,$x,$sign) = ref($_[0]) ? (undef,@_) : objectify(1,@_);
 
   $sign = '+' if !defined $sign || $sign ne '-';
-  return 1
-   if ($x->{sign} eq $sign && 
-    $MBI->_is_zero($x->{_e}) && $MBI->_is_one($x->{_m})); 
-  0;
+
+  ($x->{sign} eq $sign && 
+   $MBI->_is_zero($x->{_e}) &&
+   $MBI->_is_one($x->{_m}) ) ? 1 : 0; 
   }
 
 sub is_odd
@@ -1540,9 +1541,9 @@ sub is_odd
   # return true if arg (BFLOAT or num_str) is odd or false if even
   my ($self,$x) = ref($_[0]) ? (undef,$_[0]) : objectify(1,@_);
   
-  return 1 if ($x->{sign} =~ /^[+-]$/) &&		# NaN & +-inf aren't
-    ($MBI->_is_zero($x->{_e}) && $MBI->_is_odd($x->{_m})); 
-  0;
+  (($x->{sign} =~ /^[+-]$/) &&		# NaN & +-inf aren't
+   ($MBI->_is_zero($x->{_e})) &&
+   ($MBI->_is_odd($x->{_m}))) ? 1 : 0; 
   }
 
 sub is_even
@@ -1550,23 +1551,21 @@ sub is_even
   # return true if arg (BINT or num_str) is even or false if odd
   my ($self,$x) = ref($_[0]) ? (undef,$_[0]) : objectify(1,@_);
 
-  return 0 if $x->{sign} !~ /^[+-]$/;			# NaN & +-inf aren't
-  return 1 if ($x->{_es} eq '+'	 			# 123.45 is never
-     && $MBI->_is_even($x->{_m}));			# but 1200 is
-  0;
+  (($x->{sign} =~ /^[+-]$/) &&			# NaN & +-inf aren't
+   ($x->{_es} eq '+') &&	 		# 123.45 isn't
+   ($MBI->_is_even($x->{_m}))) ? 1 : 0;		# but 1200 is
   }
 
-sub bmul 
+sub bmul
   { 
-  # multiply two numbers -- stolen from Knuth Vol 2 pg 233
-  # (BINT or num_str, BINT or num_str) return BINT
+  # multiply two numbers
   
   # set up parameters
-  my ($self,$x,$y,$a,$p,$r) = (ref($_[0]),@_);
+  my ($self,$x,$y,@r) = (ref($_[0]),@_);
   # objectify is costly, so avoid it
   if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
     {
-    ($self,$x,$y,$a,$p,$r) = objectify(2,@_);
+    ($self,$x,$y,@r) = objectify(2,@_);
     }
 
   return $x if $x->modify('bmul');
@@ -1584,19 +1583,101 @@ sub bmul
     return $x->binf() if ($x->{sign} =~ /^-/ && $y->{sign} =~ /^-/);
     return $x->binf('-');
     }
-  # handle result = 0
-  return $x->bzero() if $x->is_zero() || $y->is_zero();
   
-  return $upgrade->bmul($x,$y,$a,$p,$r) if defined $upgrade &&
+  return $upgrade->bmul($x,$y,@r) if defined $upgrade &&
    ((!$x->isa($self)) || (!$y->isa($self)));
 
   # aEb * cEd = (a*c)E(b+d)
   $MBI->_mul($x->{_m},$y->{_m});
   ($x->{_e}, $x->{_es}) = _e_add($x->{_e}, $y->{_e}, $x->{_es}, $y->{_es});
 
+  $r[3] = $y;				# no push!
+
   # adjust sign:
   $x->{sign} = $x->{sign} ne $y->{sign} ? '-' : '+';
-  return $x->bnorm()->round($a,$p,$r,$y);
+  $x->bnorm->round(@r);
+  }
+
+sub bmuladd
+  { 
+  # multiply two numbers and add the third to the result
+  
+  # set up parameters
+  my ($self,$x,$y,$z,@r) = (ref($_[0]),@_);
+  # objectify is costly, so avoid it
+  if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
+    {
+    ($self,$x,$y,$z,@r) = objectify(3,@_);
+    }
+
+  return $x if $x->modify('bmuladd');
+
+  return $x->bnan() if (($x->{sign} eq $nan) ||
+			($y->{sign} eq $nan) ||
+			($z->{sign} eq $nan));
+
+  # inf handling
+  if (($x->{sign} =~ /^[+-]inf$/) || ($y->{sign} =~ /^[+-]inf$/))
+    {
+    return $x->bnan() if $x->is_zero() || $y->is_zero(); 
+    # result will always be +-inf:
+    # +inf * +/+inf => +inf, -inf * -/-inf => +inf
+    # +inf * -/-inf => -inf, -inf * +/+inf => -inf
+    return $x->binf() if ($x->{sign} =~ /^\+/ && $y->{sign} =~ /^\+/);
+    return $x->binf() if ($x->{sign} =~ /^-/ && $y->{sign} =~ /^-/);
+    return $x->binf('-');
+    }
+
+  return $upgrade->bmul($x,$y,@r) if defined $upgrade &&
+   ((!$x->isa($self)) || (!$y->isa($self)));
+
+  # aEb * cEd = (a*c)E(b+d)
+  $MBI->_mul($x->{_m},$y->{_m});
+  ($x->{_e}, $x->{_es}) = _e_add($x->{_e}, $y->{_e}, $x->{_es}, $y->{_es});
+
+  $r[3] = $y;				# no push!
+
+  # adjust sign:
+  $x->{sign} = $x->{sign} ne $y->{sign} ? '-' : '+';
+
+  # z=inf handling (z=NaN handled above)
+  $x->{sign} = $z->{sign}, return $x if $z->{sign} =~ /^[+-]inf$/;
+
+  # take lower of the two e's and adapt m1 to it to match m2
+  my $e = $z->{_e};
+  $e = $MBI->_zero() if !defined $e;		# if no BFLOAT?
+  $e = $MBI->_copy($e);				# make copy (didn't do it yet)
+
+  my $es;
+
+  ($e,$es) = _e_sub($e, $x->{_e}, $z->{_es} || '+', $x->{_es});
+
+  my $add = $MBI->_copy($z->{_m});
+
+  if ($es eq '-')				# < 0
+    {
+    $MBI->_lsft( $x->{_m}, $e, 10);
+    ($x->{_e},$x->{_es}) = _e_add($x->{_e}, $e, $x->{_es}, $es);
+    }
+  elsif (!$MBI->_is_zero($e))			# > 0
+    {
+    $MBI->_lsft($add, $e, 10);
+    }
+  # else: both e are the same, so just leave them
+
+  if ($x->{sign} eq $z->{sign})
+    {
+    # add
+    $x->{_m} = $MBI->_add($x->{_m}, $add);
+    }
+  else
+    {
+    ($x->{_m}, $x->{sign}) = 
+     _e_add($x->{_m}, $add, $x->{sign}, $z->{sign});
+    }
+
+  # delete trailing zeros, then round
+  $x->bnorm()->round(@r);
   }
 
 sub bdiv 
@@ -2323,6 +2404,172 @@ sub bpow
   $x->round($a,$p,$r,$y);
   }
 
+sub bmodpow
+  {
+  # takes a very large number to a very large exponent in a given very
+  # large modulus, quickly, thanks to binary exponentation. Supports
+  # negative exponents.
+  my ($self,$num,$exp,$mod,@r) = objectify(3,@_);
+
+  return $num if $num->modify('bmodpow');
+
+  # check modulus for valid values
+  return $num->bnan() if ($mod->{sign} ne '+'           # NaN, - , -inf, +inf
+                       || $mod->is_zero());
+
+  # check exponent for valid values
+  if ($exp->{sign} =~ /\w/)
+    {
+    # i.e., if it's NaN, +inf, or -inf...
+    return $num->bnan();
+    }
+
+  $num->bmodinv ($mod) if ($exp->{sign} eq '-');
+
+  # check num for valid values (also NaN if there was no inverse but $exp < 0)
+  return $num->bnan() if $num->{sign} !~ /^[+-]$/;
+
+  # $mod is positive, sign on $exp is ignored, result also positive
+
+  # XXX TODO: speed it up when all three numbers are integers
+  $num->bpow($exp)->bmod($mod);
+  }
+
+###############################################################################
+# trigonometric functions
+
+# helper function for bpi()
+
+sub _signed_sub
+  {
+  my ($a, $s, $b) = @_;
+ 
+  if ($s == 0)
+    {
+    # $a and $b are negativ: -> add 
+    $MBI->_add($a, $b);
+    }
+  else
+    {
+    my $c = $MBI->_acmp($a,$b);
+    # $a positiv, $b negativ
+    if ($c >= 0)
+      {
+      $MBI->_sub($a,$b);
+      }
+    else
+      {
+      # make negativ
+      $a = $MBI->_sub( $MBI->_copy($b), $a);
+      $s = 0;
+      }
+    }
+
+  ($a,$s);
+  }
+
+sub _signed_add
+  {
+  my ($a, $s, $b) = @_;
+ 
+  if ($s == 1)
+    {
+    # $a and $b are positiv: -> add 
+    $MBI->_add($a, $b);
+    }
+  else
+    {
+    my $c = $MBI->_acmp($a,$b);
+    # $a positiv, $b negativ
+    if ($c >= 0)
+      {
+      $MBI->_sub($a,$b);
+      }
+    else
+      {
+      # make positiv
+      $a = $MBI->_sub( $MBI->_copy($b), $a);
+      $s = 1;
+      }
+    }
+
+  ($a,$s);
+  }
+
+sub bpi
+  {
+  # Calculate PI to N digits (including the 3 before the dot).
+
+  # The basic algorithm is the one implemented in:
+
+  # The Computer Language Shootout
+  #   http://shootout.alioth.debian.org/
+  #
+  #   contributed by Robert Bradshaw
+  #      modified by Ruud H.G.van Tol
+  #      modified by Emanuele Zeppieri
+ 
+  # We re-implement it here by using the low-level library directly. Also,
+  # the functions consume() and extract_digit() were inlined and some
+  # rendundand operations ( like *= 1 ) were removed.
+
+  my ($self,$n) = @_;
+  if (@_ == 0)
+    {
+    $self = $class;
+    }
+  if (@_ == 1)
+    {
+    # called like Math::BigFloat::bpi(10);
+    $n = $self; $self = $class;
+    }
+  $self = ref($self) if ref($self);
+  $n = 40 if !defined $n || $n < 1;
+
+  my $z0 = $MBI->_one();
+  my $z1 = $MBI->_zero();
+  my $z2 = $MBI->_one();
+  my $ten = $MBI->_ten();
+  my $three = $MBI->_new(3);
+  my ($s, $d, $e, $r); my $k = 0; my $z1_sign = 0;
+
+  # main loop
+  for (1..$n)
+    {
+    while ( 1 < 3 )
+      {
+      if ($MBI->_acmp($z0,$z2) != 1)
+        {
+        # my $o = $z0 * 3 + $z1;
+        my $o = $MBI->_mul( $MBI->_copy($z0), $three);
+        $z1_sign == 0 ? $MBI->_sub( $o, $z1) : $MBI->_add( $o, $z1);
+        ($d,$r) = $MBI->_div( $MBI->_copy($o), $z2 );
+        $d = $MBI->_num($d);
+        $e = $MBI->_num( scalar $MBI->_div( $MBI->_add($o, $z0), $z2 ) );
+        last if $d == $e;
+        }
+      $k++;
+      my $k2 = $MBI->_new( 2*$k+1 );
+      # mul works regardless of the sign of $z1 since $k is always positive
+      $MBI->_mul( $z1, $k2 );
+      ($z1, $z1_sign) = _signed_add($z1, $z1_sign, $MBI->_mul( $MBI->_new(4*$k+2), $z0 ) );
+      $MBI->_mul( $z0, $MBI->_new($k) );
+      $MBI->_mul( $z2, $k2 );
+      }
+    $MBI->_mul( $z1, $ten );
+    ($z1, $z1_sign) = _signed_sub($z1, $z1_sign, $MBI->_mul( $MBI->_new(10*$d), $z2 ) );
+    $MBI->_mul( $z0, $ten );
+    $s .= $d;
+    }
+
+  my $x = $self->new(0);
+  $x->{_es} = '-';
+  $x->{_e} = $MBI->_new(length($s)-1);
+  $x->{_m} = $MBI->_new($s);
+
+  $x;
+  }
+
 ###############################################################################
 # rounding functions
 
@@ -2728,17 +2975,13 @@ sub import
 
   # register us with MBI to get notified of future lib changes
   Math::BigInt::_register_callback( $self, sub { $MBI = $_[0]; } );
-   
-  # any non :constant stuff is handled by our parent, Exporter
-  # even if @_ is empty, to give it a chance
-  $self->SUPER::import(@a);      	# for subclasses
-  $self->export_to_level(1,$self,@a);	# need this, too
+
+  $self->export_to_level(1,$self,@a);		# export wanted functions
   }
 
 sub bnorm
   {
   # adjust m and e so that m is smallest possible
-  # round number according to accuracy and precision settings
   my ($self,$x) = ref($_[0]) ? (undef,$_[0]) : objectify(1,@_);
 
   return $x if $x->{sign} !~ /^[+-]$/;		# inf, nan etc
@@ -2752,18 +2995,18 @@ sub bnorm
       {
       if ($MBI->_acmp($x->{_e},$z) >= 0)
         {
-        $x->{_e} = $MBI->_sub  ($x->{_e}, $z);
+        $x->{_e} = $MBI->_sub ($x->{_e}, $z);
         $x->{_es} = '+' if $MBI->_is_zero($x->{_e});
         }
       else
         {
-        $x->{_e} = $MBI->_sub  ( $MBI->_copy($z), $x->{_e});
+        $x->{_e} = $MBI->_sub ( $MBI->_copy($z), $x->{_e});
         $x->{_es} = '+';
         }
       }
     else
       {
-      $x->{_e} = $MBI->_add  ($x->{_e}, $z);
+      $x->{_e} = $MBI->_add ($x->{_e}, $z);
       }
     }
   else
@@ -2887,13 +3130,16 @@ Math::BigFloat - Arbitrary size floating point math package
   use Math::BigFloat;
 
   # Number creation
-  $x = Math::BigFloat->new($str);	# defaults to 0
-  $nan  = Math::BigFloat->bnan();	# create a NotANumber
-  $zero = Math::BigFloat->bzero();	# create a +0
-  $inf = Math::BigFloat->binf();	# create a +inf
-  $inf = Math::BigFloat->binf('-');	# create a -inf
-  $one = Math::BigFloat->bone();	# create a +1
-  $one = Math::BigFloat->bone('-');	# create a -1
+  my $x = Math::BigFloat->new($str);	# defaults to 0
+  my $y = $x->copy();			# make a true copy
+  my $nan  = Math::BigFloat->bnan();	# create a NotANumber
+  my $zero = Math::BigFloat->bzero();	# create a +0
+  my $inf = Math::BigFloat->binf();	# create a +inf
+  my $inf = Math::BigFloat->binf('-');	# create a -inf
+  my $one = Math::BigFloat->bone();	# create a +1
+  my $mone = Math::BigFloat->bone('-');	# create a -1
+
+  my $pi = Math::BigFloat->bpi(100);	# PI to 100 digits
 
   # Testing
   $x->is_zero();		# true if arg is +0
@@ -2939,6 +3185,7 @@ Math::BigFloat - Arbitrary size floating point math package
 
   $x->bmod($y);			# modulus ($x % $y)
   $x->bpow($y);			# power of arguments ($x ** $y)
+  $x->bmodpow($exp,$mod);	# modular exponentation (($num**$exp) % $mod))
   $x->blsft($y, $n);		# left shift by $y places in base $n
   $x->brsft($y, $n);		# right shift by $y places in base $n
 				# returns (quo,rem) or quo if in scalar context
@@ -3253,6 +3500,22 @@ function. The result is equivalent to:
 
 This method was added in v1.84 of Math::BigInt (April 2007).
 
+=head2 bpi()
+
+	print Math::BigFloat->bpi(100), "\n";
+
+Calculate PI to N digits (including the 3 before the dot).
+
+This method was added in v1.87 of Math::BigInt (June 2007).
+
+=head2 bmuladd()
+
+	$x->bmuladd($y,$z);		
+
+Multiply $x by $y, and then add $z to the result.
+
+This method was added in v1.87 of Math::BigInt (June 2007).
+
 =head1 Autocreating constants
 
 After C<use Math::BigFloat ':constant'> all the floating point constants
@@ -3328,6 +3591,14 @@ request a different storage class for use with Math::BigFloat:
 
 However, this request is ignored, as the current code now uses the low-level
 math libary for directly storing the number parts.
+
+=head1 EXPORTS
+
+C<Math::BigFloat> exports nothing by default, but can export the C<bpi()> method:
+
+	use Math::BigFloat qw/bpi/;
+
+	print bpi(10), "\n";
 
 =head1 BUGS
 

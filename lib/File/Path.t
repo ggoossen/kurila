@@ -81,6 +81,8 @@ is(scalar(@created), 0, "skipped making existing directories (old style 1)")
     or diag("unexpectedly recreated @created");
 
 $dir = catdir($tmp_base,'C');
+# mkpath returns unix syntax filespecs on VMS
+$dir = VMS::Filespec::unixify($dir) if $^O eq 'VMS';
 @created = mkpath($tmp_base, $dir);
 is(scalar(@created), 1, "created directory (new style 1)");
 is($created[0], $dir, "created directory (new style 1) cross-check");
@@ -90,6 +92,8 @@ is(scalar(@created), 0, "skipped making existing directories (old style 2)")
     or diag("unexpectedly recreated @created");
 
 $dir2 = catdir($tmp_base,'D');
+# mkpath returns unix syntax filespecs on VMS
+$dir2 = VMS::Filespec::unixify($dir2) if $^O eq 'VMS';
 @created = mkpath($tmp_base, $dir, $dir2);
 is(scalar(@created), 1, "created directory (new style 2)");
 is($created[0], $dir2, "created directory (new style 2) cross-check");
@@ -217,9 +221,9 @@ SKIP: {
 }
 
 {
-    $dir = catdir($tmp_base, 'Z');
+    $dir = catdir($tmp_base, 'ZZ');
     @created = mkpath($dir);
-    is(scalar(@created), 1, "create a Z directory");
+    is(scalar(@created), 1, "create a ZZ directory");
 
     local @ARGV = ($dir);
     rmtree( [grep -e $_, @ARGV], 0, 0 );

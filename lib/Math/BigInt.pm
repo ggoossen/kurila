@@ -1513,7 +1513,7 @@ sub is_int
 
 sub bmul 
   { 
-  # multiply two numbers -- stolen from Knuth Vol 2 pg 233
+  # multiply the first number by the second numbers
   # (BINT or num_str, BINT or num_str) return BINT
 
   # set up parameters
@@ -1550,6 +1550,82 @@ sub bmul
   $x->{value} = $CALC->_mul($x->{value},$y->{value});	# do actual math
   $x->{sign} = '+' if $CALC->_is_zero($x->{value}); 	# no -0
 
+  $x->round(@r);
+  }
+
+sub bmuladd
+  { 
+  # multiply two numbers and then add the third to the result
+  # (BINT or num_str, BINT or num_str, BINT or num_str) return BINT
+
+  # set up parameters
+  my ($self,$x,$y,$z,@r) = (ref($_[0]),@_);
+  # objectify is costly, so avoid it
+  if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
+    {
+    ($self,$x,$y,$z,@r) = objectify(3,@_);
+    }
+
+  return $x if $x->modify('bmuladd');
+
+  return $x->bnan() if  ($x->{sign} eq $nan) ||
+			($y->{sign} eq $nan) ||
+			($z->{sign} eq $nan);
+
+  # inf handling of x and y
+  if (($x->{sign} =~ /^[+-]inf$/) || ($y->{sign} =~ /^[+-]inf$/))
+    {
+    return $x->bnan() if $x->is_zero() || $y->is_zero();
+    # result will always be +-inf:
+    # +inf * +/+inf => +inf, -inf * -/-inf => +inf
+    # +inf * -/-inf => -inf, -inf * +/+inf => -inf
+    return $x->binf() if ($x->{sign} =~ /^\+/ && $y->{sign} =~ /^\+/); 
+    return $x->binf() if ($x->{sign} =~ /^-/ && $y->{sign} =~ /^-/); 
+    return $x->binf('-');
+    }
+  # inf handling x*y and z
+  if (($z->{sign} =~ /^[+-]inf$/))
+    {
+    # something +-inf => +-inf
+    $x->{sign} = $z->{sign}, return $x if $z->{sign} =~ /^[+-]inf$/;
+    }
+
+  return $upgrade->bmuladd($x,$upgrade->new($y),$upgrade->new($z),@r)
+   if defined $upgrade && (!$y->isa($self) || !$z->isa($self) || !$x->isa($self));
+ 
+  # TODO: what it $y and $z have A or P set?
+  $r[3] = $z;				# no push here
+
+  $x->{sign} = $x->{sign} eq $y->{sign} ? '+' : '-'; # +1 * +1 or -1 * -1 => +
+
+  $x->{value} = $CALC->_mul($x->{value},$y->{value});	# do actual math
+  $x->{sign} = '+' if $CALC->_is_zero($x->{value}); 	# no -0
+
+  my ($sx, $sz) = ( $x->{sign}, $z->{sign} ); 		# get signs
+
+  if ($sx eq $sz)  
+    {
+    $x->{value} = $CALC->_add($x->{value},$z->{value});	# same sign, abs add
+    }
+  else 
+    {
+    my $a = $CALC->_acmp ($z->{value},$x->{value});	# absolute compare
+    if ($a > 0)                           
+      {
+      $x->{value} = $CALC->_sub($z->{value},$x->{value},1); # abs sub w/ swap
+      $x->{sign} = $sz;
+      } 
+    elsif ($a == 0)
+      {
+      # speedup, if equal, set result to 0
+      $x->{value} = $CALC->_zero();
+      $x->{sign} = '+';
+      }
+    else # a < 0
+      {
+      $x->{value} = $CALC->_sub($x->{value}, $z->{value}); # abs sub
+      }
+    }
   $x->round(@r);
   }
 
@@ -1731,7 +1807,7 @@ sub bmodinv
 sub bmodpow
   {
   # takes a very large number to a very large exponent in a given very
-  # large modulus, quickly, thanks to binary exponentation.  supports
+  # large modulus, quickly, thanks to binary exponentation. Supports
   # negative exponents.
   my ($self,$num,$exp,$mod,@r) = objectify(3,@_);
 
@@ -2831,6 +2907,27 @@ sub __lcm
   }
 
 ###############################################################################
+# trigonometric functions
+
+sub bpi
+  {
+  # Calculate PI to N digits. Unless upgrading is in effect, returns the
+  # result truncated to an integer, that is, always returns '3'.
+  my ($self,$n) = @_;
+  if (@_ == 1)
+    {
+    # called like Math::BigInt::bpi(10);
+    $n = $self; $self = $class;
+    }
+  $self = ref($self) if ref($self);
+
+  return $upgrade->new($n) if defined $upgrade;
+
+  # hard-wired to "3"
+  $self->new(3);
+  }
+
+###############################################################################
 # this method returns 0 if the object can be modified, or 1 if not.
 # We use a fast constant sub() here, to avoid costly calls. Subclasses
 # may override it with special code (f.i. Math::BigInt::Constant does so)
@@ -2865,14 +2962,17 @@ Math::BigInt - Arbitrary size integer/float math package
   my $n = 1; my $sign = '-';
 
   # Number creation	
-  $x = Math::BigInt->new($str);		# defaults to 0
-  $y = $x->copy();			# make a true copy
-  $nan  = Math::BigInt->bnan(); 	# create a NotANumber
-  $zero = Math::BigInt->bzero();	# create a +0
-  $inf = Math::BigInt->binf();		# create a +inf
-  $inf = Math::BigInt->binf('-');	# create a -inf
-  $one = Math::BigInt->bone();		# create a +1
-  $one = Math::BigInt->bone('-');	# create a -1
+  my $x = Math::BigInt->new($str);	# defaults to 0
+  my $y = $x->copy();			# make a true copy
+  my $nan  = Math::BigInt->bnan(); 	# create a NotANumber
+  my $zero = Math::BigInt->bzero();	# create a +0
+  my $inf = Math::BigInt->binf();	# create a +inf
+  my $inf = Math::BigInt->binf('-');	# create a -inf
+  my $one = Math::BigInt->bone();	# create a +1
+  my $mone = Math::BigInt->bone('-');	# create a -1
+
+  my $pi = Math::BigInt->bpi();		# returns '3'
+					# see Math::BigFloat::bpi()
 
   $h = Math::BigInt->new('0x123');	# from hexadecimal
   $b = Math::BigInt->new('0b101');	# from binary
@@ -2922,6 +3022,8 @@ Math::BigInt - Arbitrary size integer/float math package
   $x->bmul($y);		# multiplication (multiply $x by $y)
   $x->bdiv($y);		# divide, set $x to quotient
 			# return (quo,rem) or quo if scalar
+
+  $x->bmuladd($y,$z);	# $x = $x * $y + $z
 
   $x->bmod($y);		   # modulus (x % y)
   $x->bmodpow($exp,$mod);  # modular exponentation (($num**$exp) % $mod))
@@ -3423,6 +3525,14 @@ but faster.
 
 	$x->bmul($y);			# multiplication (multiply $x by $y)
 
+=head2 bmuladd()
+
+	$x->bmuladd($y,$z);
+
+Multiply $x by $y, and then add $z to the result,
+
+This method was added in v1.87 of Math::BigInt (June 2007).
+
 =head2 bdiv()
 
 	$x->bdiv($y);			# divide, set $x to quotient
@@ -3496,6 +3606,23 @@ function. The result is equivalent to:
 	( k )    k!(n-k)!
 
 This method was added in v1.84 of Math::BigInt (April 2007).
+
+=head2 bpi()
+
+	print Math::BigInt->bpi(100), "\n";		# 3
+
+Returns PI truncated to an integer, with the argument being ignored. that
+is it always returns C<3>.
+
+If upgrading is in effect, returns PI to N digits (including the "3"
+before the dot):
+
+	use Math::BigFloat;
+	use Math::BigInt upgrade => Math::BigFloat;
+	print Math::BigInt->bpi(3), "\n";		# 3.14
+	print Math::BigInt->bpi(100), "\n";		# 3.1415....
+
+This method was added in v1.87 of Math::BigInt (June 2007).
 
 =head2 blsft()
 
@@ -4384,6 +4511,13 @@ Beware: This list is not complete.
 All other methods upgrade themselves only when one (or all) of their
 arguments are of the class mentioned in $upgrade (This might change in later
 versions to a more sophisticated scheme):
+
+=head1 EXPORTS
+
+C<Math::BigInt> exports nothing by default, but can export the following methods:
+
+	bgcd
+	blcm
 
 =head1 BUGS
 
