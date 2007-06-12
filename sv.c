@@ -10739,7 +10739,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_DBtrace		= sv_dup(proto_perl->IDBtrace, param);
     PL_DBsignal		= sv_dup(proto_perl->IDBsignal, param);
     PL_DBassertion      = sv_dup(proto_perl->IDBassertion, param);
-    PL_lineary		= av_dup(proto_perl->Ilineary, param);
     PL_dbargs		= av_dup(proto_perl->Idbargs, param);
 
     /* symbol tables */
@@ -10944,9 +10943,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_lockhook		= proto_perl->Ilockhook;
     PL_unlockhook	= proto_perl->Iunlockhook;
     PL_threadhook	= proto_perl->Ithreadhook;
-
-    PL_runops_std	= proto_perl->Irunops_std;
-    PL_runops_dbg	= proto_perl->Irunops_dbg;
 
 #ifdef THREADS_HAVE_PIDS
     PL_ppid		= proto_perl->Ippid;
@@ -11376,8 +11372,7 @@ S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
 	}
     }
     else {
-	U32 unused;
-	CV * const cv = find_runcv(&unused);
+	CV * const cv = find_runcv(NULL);
 	SV *sv;
 	AV *av;
 

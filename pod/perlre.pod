@@ -265,7 +265,7 @@ X<word> X<whitespace> X<character class> X<backreference>
     \x12     Hexadecimal escape sequence
     \x{1234} Long hexadecimal escape sequence
     \K       Keep the stuff left of the \K, don't include it in $&
-    \R       Linebreak (matches like \v inside of a charclass)
+    \R       Linebreak
 
 A C<\w> matches a single alphanumeric character (an alphabetic
 character, or a decimal digit) or C<_>, not a whole word.  Use C<\w+>
