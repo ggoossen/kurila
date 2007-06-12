@@ -473,7 +473,7 @@ package Maintainers;
 
 	'Log::Message::Simple' =>
                 {
-                'MAINTAINER'    => 'tels',
+                'MAINTAINER'    => 'kane',
                 'FILES'         => q[lib/Log/Message/Simple.pm lib/Log/Message/Simple],
                 'CPAN'          => 1,
                 },
@@ -848,7 +848,7 @@ package Maintainers;
 		{
 		'MAINTAINER'	=> 'jdhedden',
 		'FILES'		=> q[ext/threads/hints ext/threads/t
-				     ext/threads/threads.{pm,xs} ext/threads/typemap],
+				     ext/threads/threads.{pm,xs}],
 		'CPAN'		=> 1,
 		},
 

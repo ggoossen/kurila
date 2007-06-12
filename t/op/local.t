@@ -3,9 +3,13 @@
 BEGIN {
     require './test.pl';
 }
+<<<<<<< kurila/t/op/local.t
 plan tests => 115;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
+=======
+plan tests => 122;
+>>>>>>> cb6e304b7c22f0f69cf32575beda0e85671a0f6c/t/op/local.t
 
 my $list_assignment_supported = 1;
 
@@ -432,5 +436,24 @@ is($@, "");
     }
     ok(! exists($h{'k2'}));
     is($h{'k1'},111);
+}
+{
+    my %h=('k1' => 111);
+    our $k = 'k1';  # try dynamic too
+    {
+	local $h{$k}=222;
+	is($h{'k1'},222);
+	$k='k2';
+    }
+    ok(! exists($h{'k2'}));
+    is($h{'k1'},111);
+}
+
+# Keep this test last, as it can SEGV
+{
+    local *@;
+    pass("Localised *@");
+    eval {1};
+    pass("Can eval with *@ localised");
 }
 
