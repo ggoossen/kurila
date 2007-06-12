@@ -1866,29 +1866,28 @@ Perl_regexec_flags(pTHX_ REGEXP * const prog, char *stringarg, register char *st
 
 	    float_real = prog->float_substr;
 
-	    if (flags & REXEC_SCREAM) {
-		last = screaminstr(sv, float_real, s - strbeg,
-				   end_shift, &scream_pos, 1); /* last one */
-		if (!last)
-		    last = scream_olds; /* Only one occurrence. */
-		/* we may be pointing at the wrong string */
-		else if (RX_MATCH_COPIED(prog))
-		    s = strbeg + (s - SvPVX_const(sv));
-	    }
-	    else {
-		STRLEN len;
-                const char * const little = SvPV_const(float_real, len);
+	    STRLEN len;
+	    const char * const little = SvPV_const(float_real, len);
 
-		if (SvTAIL(float_real)) {
-		    if (memEQ(strend - len + 1, little, len - 1))
-			last = strend - len + 1;
-		    else if (!multiline)
-			last = memEQ(strend - len, little, len)
-			    ? strend - len : NULL;
-		    else
-			goto find_last;
+	    if (SvTAIL(float_real)) {
+		if (memEQ(strend - len + 1, little, len - 1))
+		    last = strend - len + 1;
+		else if (!multiline)
+		    last = memEQ(strend - len, little, len)
+			? strend - len : NULL;
+		else
+		    goto find_last;
+	    } else {
+	      find_last:
+		if (flags & REXEC_SCREAM) {
+		    last = screaminstr(sv, float_real, s - strbeg,
+				       end_shift, &scream_pos, 1); /* last one */
+		    if (!last)
+			last = scream_olds; /* Only one occurrence. */
+		    /* we may be pointing at the wrong string */
+		    else if (RX_MATCH_COPIED(prog))
+			s = strbeg + (s - SvPVX_const(sv));
 		} else {
-		  find_last:
 		    if (len)
 			last = rninstr(s, strend, little, little + len);
 		    else
