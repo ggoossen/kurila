@@ -3,13 +3,9 @@
 BEGIN {
     require './test.pl';
 }
-<<<<<<< kurila/t/op/local.t
-plan tests => 115;
+plan tests => 120;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
-=======
-plan tests => 122;
->>>>>>> cb6e304b7c22f0f69cf32575beda0e85671a0f6c/t/op/local.t
 
 my $list_assignment_supported = 1;
 
