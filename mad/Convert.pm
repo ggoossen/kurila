@@ -17,7 +17,7 @@ sub convert {
     $infile->print($input);
     close $infile or die;
     $options{switches} ||= '';
-    if( $input =~ m/^[#][!].*perl(.*)/) {
+    if( $input =~ m/^[#][!].*perl([^#\n]*)/) {
         $options{switches} .= " " . $1;
     }
 
