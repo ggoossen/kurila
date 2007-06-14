@@ -18,11 +18,12 @@ use Convert;
 
 sub p5convert {
     my ($input, $expected) = @_;
+    local $TODO = $TODO || ($input =~ m/^[#]\s*TODO/);
     my $output = Convert::convert($input, "/usr/bin/perl ../mad/p5kurila.pl");
     is($output, $expected) or $TODO or die;
 }
 
-t_strict_refs();
+# t_strict_refs();
 t_indirect_object_syntax();
 t_barewords();
 t_glob_pattr();
@@ -154,7 +155,7 @@ sub t_encoding {
 }
 
 sub t_glob_pattr {
-    p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
+    p5convert( split(m/^\-{10}.*\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
 <*.pm>;
 glob("*.pm");
 ----------
@@ -166,6 +167,12 @@ glob("*.pm");
 ----------
 #ABC
 glob("*.pm");
+==========
+# TODO
+<$_/*.pm>;
+----------
+# TODO
+glob("$_*.pm");
 END
 }
 

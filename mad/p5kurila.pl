@@ -178,10 +178,16 @@ sub make_glob_sub {
         del_madprop($op_glob, "quote_close");
         rename_madprop($op_glob, "wsbefore-quote_open", "wsbefore-operator");
 
-        my ($op_c) = $op_glob->findnodes(q|op_entersub/op_null/op_const|);
-        set_madprop($op_c, "quote_open", "&#34;");
-        set_madprop($op_c, "quote_close", "&#34;");
-        set_madprop($op_c, "assign", get_madprop($op_c, "value"));
+        my ($op_c) = $op_glob->findnodes(q|op_entersub/op_null/op_concat|);
+        if ($op_c) {
+            # TODO quote the op_concat by using op_strigify
+
+        } else {
+            $op_c = ($op_glob->findnodes(q|op_entersub/op_null/op_const|))[0];
+            set_madprop($op_c, "quote_open", "&#34;");
+            set_madprop($op_c, "quote_close", "&#34;");
+            set_madprop($op_c, "assign", get_madprop($op_c, "value"));
+        }
     }
 }
 
