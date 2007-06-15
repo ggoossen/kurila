@@ -1101,8 +1101,8 @@ Ap	|void	|sys_intern_clear
 Ap	|void	|sys_intern_init
 #endif
 
-ApR	|char *	|custom_op_name	|NN const OP* op
-ApR	|char *	|custom_op_desc	|NN const OP* op
+ApR	|const char *	|custom_op_name	|NN const OP* op
+ApR	|const char *	|custom_op_desc	|NN const OP* op
 
 Adp	|void	|sv_nosharing	|NULLOK SV *sv
 Adpbm	|void	|sv_nolocking	|NULLOK SV *sv
@@ -1834,7 +1834,7 @@ Mp	|void	|xmldump_sub	|NN const GV* gv
 Mp	|void	|xmldump_form	|NN const GV* gv
 Mp	|void	|xmldump_eval
 Mp	|char*	|sv_catxmlsv	|NN SV *dsv|NN SV *ssv
-Mp	|char*	|sv_catxmlpvn	|NN SV *dsv|NN char *pv|STRLEN len|int utf8
+Mp	|char*	|sv_catxmlpvn	|NN SV *dsv|NN const char *pv|STRLEN len|int utf8
 Mp	|char*	|sv_xmlpeek	|NN SV* sv
 Mp	|void	|do_pmop_xmldump|I32 level|NN PerlIO *file \
 				|NULLOK const PMOP *pm
