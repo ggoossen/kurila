@@ -135,6 +135,7 @@ sub qualify ($;$) {
 }
 
 sub qualify_to_ref ($;$) {
+    no strict 'refs';
     return \*{ qualify $_[0], @_ > 1 ? $_[1] : caller };
 }
 
