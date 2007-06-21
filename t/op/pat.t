@@ -1141,6 +1141,8 @@ $test++;
     ok($x =~ /^.$/u, "wide is extactly one .");
     my $y = qr/^.$/u;
     ok("$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified.");
+    eval q|no utf8; $x =~ m/\x{65e5}/|;
+    ok( $@ , "\\x{...} gives error in non-unicode regex");
 }
 
 use utf8;
@@ -3051,7 +3053,7 @@ for (120 .. 130) {
     my $head = 'x' x $_;
     for my $tail ('\x{0061}', '\x{1234}') {
 	ok(
-	    eval qq{ "$head$tail" =~ /$head$tail/ },
+	    eval qq{use utf8; "$head$tail" =~ /$head$tail/ },
 	    '\x{...} misparsed in regexp near 127 char EXACT limit'
 	);
     }

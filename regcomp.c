@@ -6775,6 +6775,9 @@ tryagain:
 				vFAIL("Missing right brace on \\x{}");
 			    }
 			    else {
+				if (! UTF) {
+				    vFAIL("\\x{} not allowed outside Unicode match");
+				}
                                 I32 flags = PERL_SCAN_ALLOW_UNDERSCORES
                                     | PERL_SCAN_DISALLOW_PREFIX;
                                 STRLEN numlen = e - p - 1;
