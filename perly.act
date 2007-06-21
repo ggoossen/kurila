@@ -91,7 +91,7 @@ case 2:
     {
 			  if (PVAL((ps[(1) - (2)].val.p_tkval))) {
 			      (yyval.opval) = newSTATEOP(0, PVAL((ps[(1) - (2)].val.p_tkval)), newOP(OP_NULL, 0));
-			      TOKEN_GETMAD((ps[(1) - (2)].val.p_tkval),(yyval.opval),'L');
+			      TOKEN_GETMAD((ps[(1) - (2)].val.p_tkval),((LISTOP*)(yyval.opval))->op_first,'L');
 			      TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),((LISTOP*)(yyval.opval))->op_first,';');
 			  }
 			  else {
