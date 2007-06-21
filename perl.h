@@ -2323,9 +2323,9 @@ struct _reg_trie_data;
 typedef MEM_SIZE STRLEN;
 
 #ifdef PERL_MAD
-typedef struct token TOKEN;
+typedef struct madtoken MADTOKEN;
 typedef struct madprop MADPROP;
-typedef struct nexttoken NEXTTOKE;
+typedef struct nextmadtoken NEXTMADTOKE;
 #endif
 typedef struct op OP;
 typedef struct cop COP;
@@ -3301,7 +3301,7 @@ typedef        struct crypt_data {     /* straight from /usr/include/crypt.h */
 #include "perly.h"
 
 #ifdef PERL_MAD
-struct nexttoken {
+struct nextmadtoken {
     YYSTYPE next_val;	/* value of next token, if any */
     I32 next_type;	/* type of next token */
     MADPROP *next_mad;	/* everything else about that token */

@@ -1246,7 +1246,7 @@ S_start_force(pTHX_ int where)
 	PL_lasttoke++;
     }
     if (PL_curforce < 0)	/* in case of duplicate start_force() */
-	Zero(&PL_nexttoke[where], 1, NEXTTOKE);
+	Zero(&PL_nexttoke[where], 1, NEXTMADTOKE);
     PL_curforce = where;
     if (PL_nextwhite) {
 	if (PL_madskills)
@@ -3153,7 +3153,7 @@ Perl_madlex(pTHX)
     }
 
     /* Create new token struct.  Note: opvals return early above. */
-    yylval.tkval = newTOKEN(optype, yylval, PL_thismad);
+    yylval.tkval = newMADTOKEN(optype, yylval, PL_thismad);
     PL_thismad = 0;
     return optype;
 }

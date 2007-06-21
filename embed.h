@@ -1871,7 +1871,7 @@
 #define op_xmldump		Perl_op_xmldump
 #endif
 #ifdef PERL_CORE
-#define newTOKEN		Perl_newTOKEN
+#define newMADTOKEN		Perl_newMADTOKEN
 #define token_free		Perl_token_free
 #define token_getmad		Perl_token_getmad
 #define op_getmad_weak		Perl_op_getmad_weak
@@ -4166,7 +4166,7 @@
 #define op_xmldump(a)		Perl_op_xmldump(aTHX_ a)
 #endif
 #ifdef PERL_CORE
-#define newTOKEN(a,b,c)		Perl_newTOKEN(aTHX_ a,b,c)
+#define newMADTOKEN(a,b,c)	Perl_newMADTOKEN(aTHX_ a,b,c)
 #define token_free(a)		Perl_token_free(aTHX_ a)
 #define token_getmad(a,b,c)	Perl_token_getmad(aTHX_ a,b,c)
 #define op_getmad_weak(a,b,c)	Perl_op_getmad_weak(aTHX_ a,b,c)

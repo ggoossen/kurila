@@ -4628,11 +4628,11 @@ PERL_CALLCONV void	Perl_op_xmldump(pTHX_ const OP* arg)
 			__attribute__nonnull__(pTHX_1);
 
 
-PERL_CALLCONV TOKEN*	Perl_newTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop);
-PERL_CALLCONV void	Perl_token_free(pTHX_ TOKEN* arg)
+PERL_CALLCONV MADTOKEN*	Perl_newMADTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop);
+PERL_CALLCONV void	Perl_token_free(pTHX_ MADTOKEN* arg)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV void	Perl_token_getmad(pTHX_ TOKEN* arg, OP* o, char slot)
+PERL_CALLCONV void	Perl_token_getmad(pTHX_ MADTOKEN* arg, OP* o, char slot)
 			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV void	Perl_op_getmad_weak(pTHX_ OP* from, OP* o, char slot);
