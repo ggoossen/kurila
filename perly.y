@@ -53,14 +53,14 @@
     OP *opval;
     GV *gvval;
 #ifdef PERL_IN_MADLY_C
-    TOKEN* p_tkval;
-    TOKEN* i_tkval;
+    MADTOKEN* p_tkval;
+    MADTOKEN* i_tkval;
 #else
     char *p_tkval;
     I32	i_tkval;
 #endif
 #ifdef PERL_MAD
-    TOKEN* tkval;
+    MADTOKEN* tkval;
 #endif
 }
 
@@ -468,7 +468,7 @@ label	:	/* empty */
 #ifdef MAD
 			  YYSTYPE tmplval;
 			  tmplval.pval = Nullch;
-			  $$ = newTOKEN(OP_NULL, tmplval, 0);
+			  $$ = newMADTOKEN(OP_NULL, tmplval, 0);
 #else
 			  $$ = Nullch;
 #endif

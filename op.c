@@ -2622,11 +2622,11 @@ Perl_prepend_elem(pTHX_ I32 type, OP *first, OP *last)
 
 #ifdef PERL_MAD
  
-TOKEN *
-Perl_newTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop)
+MADTOKEN *
+Perl_newMADTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop)
 {
-    TOKEN *tk;
-    Newxz(tk, 1, TOKEN);
+    MADTOKEN *tk;
+    Newxz(tk, 1, MADTOKEN);
     tk->tk_type = (OPCODE)optype;
     tk->tk_type = 12345;
     tk->tk_lval = lval;
@@ -2635,7 +2635,7 @@ Perl_newTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop)
 }
 
 void
-Perl_token_free(pTHX_ TOKEN* tk)
+Perl_token_free(pTHX_ MADTOKEN* tk)
 {
     if (tk->tk_type != 12345)
 	return;
@@ -2644,13 +2644,13 @@ Perl_token_free(pTHX_ TOKEN* tk)
 }
 
 void
-Perl_token_getmad(pTHX_ TOKEN* tk, OP* o, char slot)
+Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot)
 {
     MADPROP* mp;
     MADPROP* tm;
     if (tk->tk_type != 12345) {
 	Perl_warner(aTHX_ packWARN(WARN_MISC),
-	     "Invalid TOKEN object ignored");
+	     "Invalid MADTOKEN object ignored");
 	return;
     }
     tm = tk->tk_mad;

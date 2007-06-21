@@ -404,7 +404,7 @@ case 2:
 #ifdef MAD
 			  YYSTYPE tmplval;
 			  tmplval.pval = Nullch;
-			  (yyval.p_tkval) = newTOKEN(OP_NULL, tmplval, 0);
+			  (yyval.p_tkval) = newMADTOKEN(OP_NULL, tmplval, 0);
 #else
 			  (yyval.p_tkval) = Nullch;
 #endif
