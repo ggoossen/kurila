@@ -254,12 +254,13 @@ sub remove_vstring {
     my $twig = shift;
 
     for my $op_const ($twig->findnodes(q|//op_const|), $twig->findnodes(q|op_null[@was="const"]|)) {
-        next unless (get_madprop($op_const, "value") || '') =~ m/^v/;
+        next unless (get_madprop($op_const, "value") || '') =~ m/\Av/;
         next if get_madprop($op_const, "forcedword");
         next if $op_const->att('private') && ($op_const->att('private') =~ m/BARE/);
         next if get_madprop($op_const->parent, "quote_open");
         next if $op_const->parent->tag eq "mad_op";
         next if $op_const->parent->tag eq "op_require";
+        next if $op_const->parent->tag eq "op_concat";
 
         set_madprop($op_const, "wsbefore-quote_open", get_madprop($op_const, "wsbefore-value"));
         set_madprop($op_const, "quote_open", "&#34;");

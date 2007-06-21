@@ -209,6 +209,10 @@ require v5.6;
 use v5.6;
 ----------
 use v5.6;
+==========
+"foo$\value"
+----------
+"foo$\value"
 END
 
 }
