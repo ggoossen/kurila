@@ -206,4 +206,7 @@ unless (eval { $a }) { $a = $b }
 ########
 # local our $...
 local our $TODO
-
+########
+# LABLE without a statement.
+ LABLE: ;
+ LABLE: $a;
