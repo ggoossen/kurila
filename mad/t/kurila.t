@@ -119,6 +119,10 @@ foo(FH, STR);
 sub foo(*$) { }
 foo(*FH, 'STR');
 ==========
+$aap{noot::mies}
+----------
+$aap{'noot::mies'}
+==========
 END
 
 }

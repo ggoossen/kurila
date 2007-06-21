@@ -57,12 +57,11 @@ sub const_handler {
 
     return if $const->findnodes(q|madprops/mad_sv[@key="forcedword"][@val="forced"]|);
 
-    # helem:  $aap{noot}
     # negate: -Level
     # method: $aap->SUPER::noot()
-    return if $const->parent->tag =~ m/^op_(helem|negate|method)$/;
+    return if $const->parent->tag =~ m/^op_(negate|method)$/;
     return if $const->parent->tag eq "op_null" 
-      and ($const->parent->att("was") || '') =~ m/^(helem|negate|method)$/;
+      and ($const->parent->att("was") || '') =~ m/^(negate|method)$/;
     # open IN, "filename";
     return if $const->parent->tag =~ m/^mad_op$/ and $const->parent->att("key") eq "key";
 
@@ -98,8 +97,11 @@ sub const_handler {
     return if $const->parent->tag eq "op_entersub";
 
     # keep qq| $aap{noot} |
-    return if $const->parent->tag eq "op_helem";
-    return if $const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "helem";
+    if (($const->parent->tag eq "op_helem" or
+         ($const->parent->tag eq "op_null" and ($const->parent->att("was") || '') eq "helem"))
+        and get_madprop($const, "value") =~ m/^\w+$/) {
+        return;
+    }
 
     # keep qq| -Level |
     return if $const->parent->tag eq "op_negate";
