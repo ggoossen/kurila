@@ -1683,38 +1683,6 @@ long
 IoLINES(io)
 	B::IO	io
 
-long
-IoPAGE_LEN(io)
-	B::IO	io
-
-long
-IoLINES_LEFT(io)
-	B::IO	io
-
-char *
-IoTOP_NAME(io)
-	B::IO	io
-
-B::GV
-IoTOP_GV(io)
-	B::IO	io
-
-char *
-IoFMT_NAME(io)
-	B::IO	io
-
-B::GV
-IoFMT_GV(io)
-	B::IO	io
-
-char *
-IoBOTTOM_NAME(io)
-	B::IO	io
-
-B::GV
-IoBOTTOM_GV(io)
-	B::IO	io
-
 short
 IoSUBPROCESS(io)
 	B::IO	io
@@ -1803,12 +1771,6 @@ AvFLAGS(av)
 	B::AV	av
 
 #endif
-
-MODULE = B	PACKAGE = B::FM		PREFIX = Fm
-
-IV
-FmLINES(form)
-	B::FM	form
 
 MODULE = B	PACKAGE = B::CV		PREFIX = Cv
 
