@@ -207,7 +207,7 @@ line	:	label cond
 			{
 			  if (PVAL($1)) {
 			      $$ = newSTATEOP(0, PVAL($1), newOP(OP_NULL, 0));
-			      TOKEN_GETMAD($1,$$,'L');
+			      TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L');
 			      TOKEN_GETMAD($2,((LISTOP*)$$)->op_first,';');
 			  }
 			  else {
