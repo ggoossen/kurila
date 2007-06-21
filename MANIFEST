@@ -25,16 +25,16 @@ configure.com		Configure-equivalent for VMS
 configure.gnu		Crude emulation of GNU configure
 cop.h			Control operator header
 Copying			The GNU General Public License
+Cross/build-arm-n770-sh	Cross-compilation
+Cross/cflags-cross-arm	Cross-compilation
 Cross/config		Cross-compilation
 Cross/config.sh-arm-linux	Cross-compilation
 Cross/config.sh-arm-linux-n770	Cross-compilation
-Cross/build-arm-n770-sh	Cross-compilation
 Cross/generate_config_sh	Cross-compilation
 Cross/installperl.patch		Cross-compilation
 Cross/Makefile		Cross-compilation
-Cross/Makefile.SH.patch	Cross-compilation
 Cross/Makefile-cross-SH	Cross-compilation
-Cross/cflags-cross-arm	Cross-compilation
+Cross/Makefile.SH.patch	Cross-compilation
 Cross/README		Cross-compilation
 Cross/README.new	Cross-compilation
 Cross/TODO		Cross-compilation
@@ -1289,6 +1289,7 @@ hints/aux_3.sh			Hints for named architecture
 hints/beos.sh			Hints for named architecture
 hints/broken-db.msg		Warning message for systems with broken DB library
 hints/bsdos.sh			Hints for named architecture
+hints/catamount.sh		Hints for named architecture
 hints/convexos.sh		Hints for named architecture
 hints/cxux.sh			Hints for named architecture
 hints/cygwin.sh			Hints for named architecture
@@ -1415,7 +1416,6 @@ lib/Archive/Tar/t/01_use.t	Archive::Tar tests
 lib/Archive/Tar/t/02_methods.t	Archive::Tar tests
 lib/Archive/Tar/t/03_file.t	Archive::Tar tests
 lib/Archive/Tar/t/04_resolved_issues.t	Archive::Tar tests
-lib/Archive/Tar/t/99_pod.t	Archive::Tar tests
 lib/Archive/Tar/t/src/long/b	Archive::Tar tests
 lib/Archive/Tar/t/src/long/bar.tar.packed	Archive::Tar tests
 lib/Archive/Tar/t/src/long/foo.tgz.packed	Archive::Tar tests
