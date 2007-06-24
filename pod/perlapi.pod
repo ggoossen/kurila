@@ -848,9 +848,9 @@ will also be escaped.
 Normally the SV will be cleared before the escaped string is prepared,
 but when PERL_PV_ESCAPE_NOCLEAR is set this will not occur.
 
-If PERL_PV_ESCAPE_UNI is set then the input string is treated as unicode,
+If PERL_PV_ESCAPE_UNI is set then the input string is treated as Unicode,
 if PERL_PV_ESCAPE_UNI_DETECT is set then the input string is scanned
-using C<is_utf8_string()> to determine if it is unicode.
+using C<is_utf8_string()> to determine if it is Unicode.
 
 If PERL_PV_ESCAPE_ALL is set then all input chars will be output
 using C<\x01F1> style escapes, otherwise only chars above 255 will be
@@ -3131,6 +3131,50 @@ C<&PL_sv_yes>.
 
 =for hackers
 Found in file intrpvar.h
+
+
+=back
+
+=head1 REGEXP Functions
+
+=over 8
+
+=item SvRX
+X<SvRX>
+
+Convenience macro to get the REGEXP from a SV. This is approximately
+equivalent to the following snippet:
+
+    if (SvMAGICAL(sv))
+        mg_get(sv);
+    if (SvROK(sv) &&
+        (tmpsv = (SV*)SvRV(sv)) &&
+        SvTYPE(tmpsv) == SVt_PVMG &&
+        (tmpmg = mg_find(tmpsv, PERL_MAGIC_qr)))
+    {
+        return (REGEXP *)tmpmg->mg_obj;
+    }
+
+NULL will be returned if a REGEXP* is not found.
+
+	REGEXP *	SvRX(SV *sv)
+
+=for hackers
+Found in file regexp.h
+
+=item SvRXOK
+X<SvRXOK>
+
+Returns a boolean indicating whether the SV contains qr magic
+(PERL_MAGIC_qr).
+
+If you want to do something with the REGEXP* later use SvRX instead
+and check for NULL.
+
+	bool	SvRXOK(SV* sv)
+
+=for hackers
+Found in file regexp.h
 
 
 =back
@@ -6727,7 +6771,7 @@ Found in file utf8.c
 X<utf8n_to_uvuni>
 
 Bottom level UTF-8 decode routine.
-Returns the unicode code point value of the first character in the string C<s>
+Returns the Unicode code point value of the first character in the string C<s>
 which is assumed to be in UTF-8 encoding and no longer than C<curlen>;
 C<retlen> will be set to the length, in bytes, of that character.
 

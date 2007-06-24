@@ -175,9 +175,9 @@ will also be escaped.
 Normally the SV will be cleared before the escaped string is prepared,
 but when PERL_PV_ESCAPE_NOCLEAR is set this will not occur.
 
-If PERL_PV_ESCAPE_UNI is set then the input string is treated as unicode,
+If PERL_PV_ESCAPE_UNI is set then the input string is treated as Unicode,
 if PERL_PV_ESCAPE_UNI_DETECT is set then the input string is scanned
-using C<is_utf8_string()> to determine if it is unicode.
+using C<is_utf8_string()> to determine if it is Unicode.
 
 If PERL_PV_ESCAPE_ALL is set then all input chars will be output
 using C<\x01F1> style escapes, otherwise only chars above 255 will be
@@ -214,7 +214,7 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
     STRLEN wrote = 0;    /* chars written so far */
     STRLEN chsize = 0;   /* size of data to be written */
     STRLEN readsize = 1; /* size of data just read */
-    bool isuni= flags & PERL_PV_ESCAPE_UNI ? 1 : 0; /* is this unicode */
+    bool isuni= flags & PERL_PV_ESCAPE_UNI ? 1 : 0; /* is this Unicode */
     const char *pv  = str;
     const char * const end = pv + count; /* end of string */
     octbuf[0] = esc;
@@ -1170,7 +1170,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_isaelem,        "isaelem(i)" },
 	{ PERL_MAGIC_nkeys,          "nkeys(k)" },
 	{ PERL_MAGIC_dbline,         "dbline(l)" },
-	{ PERL_MAGIC_mutex,          "mutex(m)" },
 	{ PERL_MAGIC_shared_scalar,  "shared_scalar(n)" },
 	{ PERL_MAGIC_collxfrm,       "collxfrm(o)" },
 	{ PERL_MAGIC_tiedelem,       "tiedelem(p)" },
@@ -2141,11 +2140,11 @@ Perl_sv_catxmlsv(pTHX_ SV *dsv, SV *ssv)
 }
 
 char *
-Perl_sv_catxmlpvn(pTHX_ SV *dsv, char* pv, STRLEN len, int utf8)
+Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len, int utf8)
 {
     unsigned int c;
     const char * const e = pv + len;
-    char *start = pv;
+    const char * const start = pv;
     STRLEN dsvcur;
     STRLEN cl;
 
@@ -2818,7 +2817,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     if (PL_madskills && o->op_madprop) {
 	char prevkey = '\0';
 	SV * const tmpsv = newSVpvn("", 0);
-	const MADPROP* const mp = o->op_madprop;
+	const MADPROP* mp = o->op_madprop;
 
 	sv_utf8_upgrade(tmpsv);
 	if (!contents) {

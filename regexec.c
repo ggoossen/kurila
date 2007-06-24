@@ -285,9 +285,8 @@ S_regcppop(pTHX_ const regexp *rex)
      * requiring null fields (pat.t#187 and split.t#{13,14}
      * (as of patchlevel 7877)  will fail.  Then again,
      * this code seems to be necessary or otherwise
-     * building DynaLoader will fail:
-     * "Error: '*' not in typemap in DynaLoader.xs, line 164"
-     * --jhi */
+     * this erroneously leaves $1 defined: "1" =~ /^(?:(\d)x)?\d$/
+     * --jhi updated by dapm */
     for (i = *PL_reglastparen + 1; i <= rex->nparens; i++) {
 	if (i > PL_regsize)
 	    PL_regoffs[i].start = -1;
@@ -1482,8 +1481,8 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		U8 **points; /* map of where we were in the input string
 		                when reading a given char. For ASCII this
 		                is unnecessary overhead as the relationship
-		                is always 1:1, but for unicode, especially
-		                case folded unicode this is not true. */
+		                is always 1:1, but for Unicode, especially
+		                case folded Unicode this is not true. */
 		U8 foldbuf[ UTF8_MAXBYTES_CASE + 1 ];
 		U8 *bitmap=NULL;
 
@@ -2267,13 +2266,12 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
     /* Tests pat.t#187 and split.t#{13,14} seem to depend on this code.
      * Actually, the code in regcppop() (which Ilya may be meaning by
      * PL_reglastparen), is not needed at all by the test suite
-     * (op/regexp, op/pat, op/split), but that code is needed, oddly
-     * enough, for building DynaLoader, or otherwise this
-     * "Error: '*' not in typemap in DynaLoader.xs, line 164"
-     * will happen.  Meanwhile, this code *is* needed for the
+     * (op/regexp, op/pat, op/split), but that code is needed otherwise
+     * this erroneously leaves $1 defined: "1" =~ /^(?:(\d)x)?\d$/
+     * Meanwhile, this code *is* needed for the
      * above-mentioned test suite tests to succeed.  The common theme
      * on those tests seems to be returning null fields from matches.
-     * --jhi */
+     * --jhi updated by dapm */
 #if 1
     if (prog->nparens) {
 	regexp_paren_pair *pp = PL_regoffs;
@@ -4221,12 +4219,6 @@ NULL
 
 	case BRANCH:	    /*  /(...|A|...)/ */
 	    scan = NEXTOPER(scan); /* scan now points to inner node */
-	    if ((!next || (OP(next) != BRANCH && OP(next) != BRANCHJ)) 
-	        && !has_cutgroup)
-	    {
-	    	/* last branch; skip state push and jump direct to node */
-		continue;
-            }
 	    ST.lastparen = *PL_reglastparen;
 	    ST.next_branch = next;
 	    REGCP_SET(ST.cp);
