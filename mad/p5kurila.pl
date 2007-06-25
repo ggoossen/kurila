@@ -57,6 +57,9 @@ sub const_handler {
 
     return if $const->findnodes(q|madprops/mad_sv[@key="forcedword"][@val="forced"]|);
 
+    # no conversion if 'use strict' is active.
+    return if $const->att('private') && ($const->att('private') =~ m/STRICT/);
+
     # negate: -Level
     # method: $aap->SUPER::noot()
     return if $const->parent->tag =~ m/^op_(negate|method)$/;

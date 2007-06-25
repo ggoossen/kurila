@@ -123,6 +123,12 @@ $aap{noot::mies}
 ----------
 $aap{'noot::mies'}
 ==========
+use strict;
+foo
+----------
+use strict;
+foo
+==========
 END
 
 }
