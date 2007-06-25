@@ -3411,7 +3411,7 @@ sub read_multipart {
 	  # choose a relatively unpredictable tmpfile sequence number
           my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
           for (my $cnt=10;$cnt>0;$cnt--) {
-	    next unless $tmpfile = new CGITempFile($seqno);
+	    next unless $tmpfile = CGITempFile->new($seqno);
 	    $tmp = $tmpfile->as_string;
 	    last if defined($filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
@@ -3523,7 +3523,7 @@ sub read_multipart_related {
 	  # choose a relatively unpredictable tmpfile sequence number
           my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
           for (my $cnt=10;$cnt>0;$cnt--) {
-	    next unless $tmpfile = new CGITempFile($seqno);
+	    next unless $tmpfile = CGITempFile->new($seqno);
 	    $tmp = $tmpfile->as_string;
 	    last if defined($filehandle = Fh->new($param,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
@@ -4009,10 +4009,6 @@ find_tempdir();
 
 $MAXTRIES = 5000;
 
-# cute feature, but overload implementation broke it
-# %OVERLOAD = ('""'=>'as_string');
-*CGITempFile::AUTOLOAD = \&CGI::AUTOLOAD;
-
 sub DESTROY {
     my($self) = @_;
     $$self =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$! || return;
@@ -4020,14 +4016,6 @@ sub DESTROY {
     unlink $safe;              # get rid of the file
 }
 
-###############################################################################
-################# THESE FUNCTIONS ARE AUTOLOADED ON DEMAND ####################
-###############################################################################
-$AUTOLOADED_ROUTINES = '';      # prevent -w error
-$AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
-%SUBS = (
-
-'new' => <<'END_OF_FUNC',
 sub new {
     my($package,$sequence) = @_;
     my $filename;
@@ -4041,17 +4029,11 @@ sub new {
     # $filename = $1;
     return bless \$filename;
 }
-END_OF_FUNC
 
-'as_string' => <<'END_OF_FUNC'
 sub as_string {
     my($self) = @_;
     return $$self;
 }
-END_OF_FUNC
-
-);
-END_OF_AUTOLOAD
 
 package CGI;
 
