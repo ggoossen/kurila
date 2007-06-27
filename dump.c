@@ -209,10 +209,14 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
         isuni = 1;
     
     for ( ; (pv < end && (!max || (wrote < max))) ; pv += readsize ) {
-        const UV u= (isuni) ? utf8_to_uvchr((U8*)pv, &readsize) : (U8)*pv;            
+        const UV u= (isuni) ? utf8n_to_uvchr((U8*)pv, UTF8_MAXBYTES, &readsize, UTF8_CHECK_ONLY) : (U8)*pv;            
         const U8 c = (U8)u & 0xFF;
         
-        if ( ( u > 255 ) || (flags & PERL_PV_ESCAPE_ALL)) {
+	if ( readsize == -1 ) {
+	    chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
+                                      "%cx[%"UVxf"]", esc, (U8)*pv);
+	    readsize = 1;
+        } else if ( ( u > 255 ) || (flags & PERL_PV_ESCAPE_ALL)) {
             if (flags & PERL_PV_ESCAPE_FIRSTCHAR) 
                 chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
                                       "%"UVxf, u);
