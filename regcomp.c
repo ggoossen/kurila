@@ -1115,7 +1115,8 @@ is the recommended Unicode-aware way of saying
 		scan = foldbuf + UNISKIP( uvc );                              \
 	    }                                                                 \
 	} else {                                                              \
-	    uvc = utf8n_to_uvuni( (const U8*)uc, UTF8_MAXLEN, &len, uniflags);\
+	    uvc = (U32)*uc;                                                   \
+	    len = 1;                                                          \
 	}                                                                     \
     } else {                                                                  \
 	uvc = (U32)*uc;                                                       \

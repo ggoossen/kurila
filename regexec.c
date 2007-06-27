@@ -990,9 +990,6 @@ uvc, charid, foldlen, foldbuf, uniflags) STMT_START {                       \
 	    uscan = foldbuf + UNISKIP( uvc );                               \
 	}                                                                   \
 	break;                                                              \
-    case trie_utf8:                                                         \
-	uvc = utf8n_to_uvuni( (U8*)uc, UTF8_MAXLEN, &len, uniflags );       \
-	break;                                                              \
     case trie_plain:                                                        \
 	uvc = (UV)*uc;                                                      \
 	len = 1;                                                            \
@@ -1296,9 +1293,9 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	case AHOCORASICKC:
 	case AHOCORASICK: 
 	    {
-	        const enum { trie_plain, trie_utf8, trie_utf8_fold }
+	        const enum { trie_plain, trie_utf8_fold }
 		    trie_type = do_utf8 ?
-			  (c->flags == EXACT ? trie_utf8 : trie_utf8_fold)
+			  (c->flags == EXACT ? trie_plain : trie_utf8_fold)
 			: trie_plain;
                 /* what trie are we using right now */
         	reg_ac_data *aho
@@ -2697,9 +2694,9 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	case TRIE:
 	    {
                 /* what type of TRIE am I? (utf8 makes this contextual) */
-	        const enum { trie_plain, trie_utf8, trie_utf8_fold }
+	        const enum { trie_plain, trie_utf8_fold }
 		    trie_type = do_utf8 ?
-			  (scan->flags == EXACT ? trie_utf8 : trie_utf8_fold)
+			  (scan->flags == EXACT ? trie_plain : trie_utf8_fold)
 			: trie_plain;
 
                 /* what trie are we using right now */
