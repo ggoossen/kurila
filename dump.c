@@ -209,7 +209,7 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
         isuni = 1;
     
     for ( ; (pv < end && (!max || (wrote < max))) ; pv += readsize ) {
-        const UV u= (isuni) ? utf8n_to_uvchr((U8*)pv, UTF8_MAXBYTES, &readsize, UTF8_CHECK_ONLY) : (U8)*pv;            
+        const UV u= (isuni) ? utf8n_to_uvchr((U8*)pv, end - pv, &readsize, UTF8_CHECK_ONLY) : (U8)*pv;            
         const U8 c = (U8)u & 0xFF;
         
 	if ( readsize == -1 ) {
@@ -219,7 +219,7 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
         } else if ( ( u > 255 ) || (flags & PERL_PV_ESCAPE_ALL)) {
             if (flags & PERL_PV_ESCAPE_FIRSTCHAR) 
                 chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
-                                      "%"UVxf, u);
+                                      "%"UVxf, esc, u);
             else
                 chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
                                       "%cx{%"UVxf"}", esc, u);
@@ -251,10 +251,10 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
 		default:
                         if ( (pv < end) && isDIGIT((U8)*(pv+readsize)) )
                             chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
-                                                  "%c%03o", esc, c);
+                                                  "%cx%02x", esc, c);
 			else
                             chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
-                                                  "%c%o", esc, c);
+                                                  "%cx%x", esc, c);
                 }
             } else {
                 chsize = 1;
