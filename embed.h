@@ -441,6 +441,7 @@
 #define magic_setfm		Perl_magic_setfm
 #define magic_sethint		Perl_magic_sethint
 #define magic_setisa		Perl_magic_setisa
+#define magic_freeisa		Perl_magic_freeisa
 #define magic_setglob		Perl_magic_setglob
 #define magic_setmglob		Perl_magic_setmglob
 #define magic_setnkeys		Perl_magic_setnkeys
@@ -1348,6 +1349,10 @@
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define doform			S_doform
+#endif
+#  if !defined(PERL_EFF_ACCESS) && defined(HAS_ACCESS) && (defined(HAS_SETREUID) || defined(HAS_SETRESUID) || defined(HAS_SETREGID) || defined(HAS_SETRESGID))
+#  endif
+#ifdef PERL_CORE
 #define emulate_eaccess		S_emulate_eaccess
 #endif
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
@@ -2727,6 +2732,7 @@
 #define magic_setfm(a,b)	Perl_magic_setfm(aTHX_ a,b)
 #define magic_sethint(a,b)	Perl_magic_sethint(aTHX_ a,b)
 #define magic_setisa(a,b)	Perl_magic_setisa(aTHX_ a,b)
+#define magic_freeisa(a,b)	Perl_magic_freeisa(aTHX_ a,b)
 #define magic_setglob(a,b)	Perl_magic_setglob(aTHX_ a,b)
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
 #define magic_setnkeys(a,b)	Perl_magic_setnkeys(aTHX_ a,b)
@@ -3632,6 +3638,10 @@
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define doform(a,b,c)		S_doform(aTHX_ a,b,c)
+#endif
+#  if !defined(PERL_EFF_ACCESS) && defined(HAS_ACCESS) && (defined(HAS_SETREUID) || defined(HAS_SETRESUID) || defined(HAS_SETREGID) || defined(HAS_SETRESGID))
+#  endif
+#ifdef PERL_CORE
 #define emulate_eaccess(a,b)	S_emulate_eaccess(aTHX_ a,b)
 #endif
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)

@@ -675,6 +675,11 @@ EXTERN_C int syscall(int, ...);
 EXTERN_C int usleep(unsigned int);
 #endif
 
+/* Funky places that do not have socket stuff. */
+#if defined(__LIBCATAMOUNT__)
+#  define MYSWAP
+#endif
+
 #ifdef PERL_MICRO /* Last chance to export Perl_my_swap */
 #  define MYSWAP
 #endif
@@ -3270,6 +3275,12 @@ typedef        struct crypt_data {     /* straight from /usr/include/crypt.h */
 #  include "iperlsys.h"
 #endif
 
+#ifdef __LIBCATAMOUNT__
+#undef HAS_PASSWD  /* unixish.h but not unixish enough. */ 
+#undef HAS_GROUP
+#define FAKE_BIT_BUCKET
+#endif
+
 /* [perl #22371] Algorimic Complexity Attack on Perl 5.6.1, 5.8.0.
  * Note that the USE_HASH_SEED and USE_HASH_SEED_EXPLICIT are *NOT*
  * defined by Configure, despite their names being similar to the
@@ -3718,7 +3729,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_nkeys	  'k' /* scalar(keys()) lvalue */
 #define PERL_MAGIC_dbfile	  'L' /* Debugger %_<filename */
 #define PERL_MAGIC_dbline	  'l' /* Debugger %_<filename element */
-#define PERL_MAGIC_mutex	  'm' /* for lock op */
 #define PERL_MAGIC_shared	  'N' /* Shared between threads */
 #define PERL_MAGIC_shared_scalar  'n' /* Shared between threads */
 #define PERL_MAGIC_collxfrm	  'o' /* Locale transformation */
@@ -4758,7 +4768,7 @@ MGVTBL_SET(
     MEMBER_TO_FPTR(Perl_magic_setisa),
     0,
     MEMBER_TO_FPTR(Perl_magic_setisa),
-    0,
+    MEMBER_TO_FPTR(Perl_magic_freeisa),
     0,
     0,
     0

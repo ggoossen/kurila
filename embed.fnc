@@ -455,6 +455,7 @@ p	|int	|magic_setenv	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setfm	|NN SV* sv|NN MAGIC* mg
 dp	|int	|magic_sethint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setisa	|NN SV* sv|NN MAGIC* mg
+p	|int	|magic_freeisa	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setglob	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setmglob	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setnkeys	|NN SV* sv|NN MAGIC* mg
@@ -1350,6 +1351,8 @@ s	|void	|qsortsvu	|NN SV** array|size_t num_elts|NN SVCOMPARE_t compare
 
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
 s	|OP*	|doform		|NN CV *cv|NN GV *gv|NN OP *retop
+#  if !defined(PERL_EFF_ACCESS) && defined(HAS_ACCESS) && (defined(HAS_SETREUID) || defined(HAS_SETRESUID) || defined(HAS_SETREGID) || defined(HAS_SETRESGID))
+#  endif
 s	|int	|emulate_eaccess|NN const char* path|Mode_t mode
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
 sR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
@@ -1871,7 +1874,7 @@ AMdnoP	|int	|Perl_signbit	|NV f
 #endif
 
 XEMop	|void	|emulate_cop_io	|NN const COP *const c|NN SV *const sv
-XEMop	|regexp *|get_re_arg|NULLOK SV *sv|U32 flags|NULLOK MAGIC **mgp
+XEMop	|REGEXP *|get_re_arg|NULLOK SV *sv
 
 p	|struct mro_meta*	|mro_meta_init	|NN HV* stash
 #if defined(USE_ITHREADS)
