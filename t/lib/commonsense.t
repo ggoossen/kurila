@@ -6,10 +6,6 @@ chdir 't' if -d 't';
 require Config; Config->import;
 }
 
-if (($Config{'extensions'} !~ /\b(DB|[A-Z]DBM)_File\b/) ){
-  print "Bail out! Perl configured without DB_File or [A-Z]DBM_File\n";
-  exit 0;
-}
 if (($Config{'extensions'} !~ /\bFcntl\b/) ){
   print "Bail out! Perl configured without Fcntl module\n";
   exit 0;
