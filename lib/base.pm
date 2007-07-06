@@ -4,7 +4,7 @@ use strict;
 no strict qw(refs subs);
 
 use vars qw($VERSION);
-$VERSION = '2.09';
+$VERSION = '2.10';
 
 # constant.pm is slow
 sub SUCCESS () { 1 }
@@ -20,7 +20,7 @@ my $Fattr = \%fields::attr;
 sub has_fields {
     my($base) = shift;
     my $fglob = ${"$base\::"}{FIELDS};
-    return( ($fglob && *$fglob{HASH}) ? 1 : 0 );
+    return( ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ? 1 : 0 );
 }
 
 sub has_version {

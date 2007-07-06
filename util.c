@@ -2214,7 +2214,7 @@ Perl_my_swabn(void *ptr, int n)
 PerlIO *
 Perl_my_popen_list(pTHX_ char *mode, int n, SV **args)
 {
-#if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(OS2) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL) && !defined(NETWARE)
+#if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(OS2) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL) && !defined(NETWARE) && !defined(__LIBCATAMOUNT__)
     dVAR;
     int p[2];
     register I32 This, that;
@@ -2350,7 +2350,7 @@ Perl_my_popen_list(pTHX_ char *mode, int n, SV **args)
 }
 
     /* VMS' my_popen() is in VMS.c, same with OS/2. */
-#if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL)
+#if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL) && !defined(__LIBCATAMOUNT__)
 PerlIO *
 Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 {
@@ -2531,6 +2531,14 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
     */
     return PerlIO_importFILE(djgpp_popen(cmd, mode), 0);
 }
+#else
+#if defined(__LIBCATAMOUNT__)
+PerlIO *
+Perl_my_popen(pTHX_ const char *cmd, const char *mode)
+{
+    return NULL;
+}
+#endif
 #endif
 #endif
 
@@ -2793,7 +2801,7 @@ Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 #endif /* !PERL_MICRO */
 
     /* VMS' my_pclose() is in VMS.c; same with OS/2 */
-#if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL)
+#if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL) && !defined(__LIBCATAMOUNT__)
 I32
 Perl_my_pclose(pTHX_ PerlIO *ptr)
 {
@@ -2848,9 +2856,17 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
     }
     return(pid2 < 0 ? pid2 : status == 0 ? 0 : (errno = 0, status));
 }
+#else
+#if defined(__LIBCATAMOUNT__)
+I32
+Perl_my_pclose(pTHX_ PerlIO *ptr)
+{
+    return -1;
+}
+#endif
 #endif /* !DOSISH */
 
-#if  (!defined(DOSISH) || defined(OS2) || defined(WIN32) || defined(NETWARE)) && !defined(MACOS_TRADITIONAL)
+#if  (!defined(DOSISH) || defined(OS2) || defined(WIN32) || defined(NETWARE)) && !defined(MACOS_TRADITIONAL) && !defined(__LIBCATAMOUNT__)
 I32
 Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 {
@@ -5850,6 +5866,26 @@ Perl_my_dirfd(pTHX_ DIR * dir) {
    /* NOT REACHED */
     return 0;
 #endif 
+}
+
+REGEXP *
+Perl_get_re_arg(pTHX_ SV *sv) {
+    SV    *tmpsv;
+    MAGIC *mg;
+
+    if (sv) {
+        if (SvMAGICAL(sv))
+            mg_get(sv);
+        if (SvROK(sv) &&
+            (tmpsv = (SV*)SvRV(sv)) &&            /* assign deliberate */
+            SvTYPE(tmpsv) == SVt_PVMG &&
+            (mg = mg_find(tmpsv, PERL_MAGIC_qr))) /* assign deliberate */
+        {
+            return (REGEXP *)mg->mg_obj;
+        }
+    }
+ 
+    return NULL;
 }
 
 /*

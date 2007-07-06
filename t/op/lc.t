@@ -249,3 +249,10 @@ for (1, 4, 9, 16, 25) {
 
     is(lc "\x{0130}" x $_, "i\x{307}" x $_, 'lc U+0130 grows');
 }
+
+# bug #43207
+my $temp = "Hello";
+for ("$temp") {
+    lc $_;
+    is($_, "Hello");
+}

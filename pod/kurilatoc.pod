@@ -2626,14 +2626,14 @@ X<perl, location of interpreter>
 =item Command Switches
 X<perl, command switches> X<command switches>
 
-B<-0>[I<octal/hexadecimal>] X<-0> X<$/>, B<-A[I<module>][=I<assertions>]>
-X<-A>, B<-a> X<-a> X<autosplit>, B<-C [I<number/list>]> X<-C>, B<-c> X<-c>,
-B<-d> X<-d> X<-dt>, B<-dt>, B<-d:>I<foo[=bar,baz]> X<-d> X<-dt>,
-B<-dt:>I<foo[=bar,baz]>, B<-D>I<letters> X<-D> X<DEBUGGING> X<-DDEBUGGING>,
-B<-D>I<number>, B<-e> I<commandline> X<-e>, B<-E> I<commandline> X<-E>,
-B<-f> X<-f>, B<-F>I<pattern> X<-F>, B<-h> X<-h>, B<-i>[I<extension>] X<-i>
-X<in-place>, B<-I>I<directory> X<-I> X<@INC>, B<-l>[I<octnum>] X<-l> X<$/>
-X<$\>, B<-m>[B<->]I<module> X<-m> X<-M>, B<-M>[B<->]I<module>,
+B<-0>[I<octal/hexadecimal>] X<-0> X<$/>, B<-a> X<-a> X<autosplit>, B<-C
+[I<number/list>]> X<-C>, B<-c> X<-c>, B<-d> X<-d> X<-dt>, B<-dt>,
+B<-d:>I<foo[=bar,baz]> X<-d> X<-dt>, B<-dt:>I<foo[=bar,baz]>,
+B<-D>I<letters> X<-D> X<DEBUGGING> X<-DDEBUGGING>, B<-D>I<number>, B<-e>
+I<commandline> X<-e>, B<-E> I<commandline> X<-E>, B<-f> X<-f>,
+B<-F>I<pattern> X<-F>, B<-h> X<-h>, B<-i>[I<extension>] X<-i> X<in-place>,
+B<-I>I<directory> X<-I> X<@INC>, B<-l>[I<octnum>] X<-l> X<$/> X<$\>,
+B<-m>[B<->]I<module> X<-m> X<-M>, B<-M>[B<->]I<module>,
 B<-M>[B<->]I<'module ...'>, B<-[mM]>[B<->]I<module=arg[,arg]...>, B<-n>
 X<-n>, B<-p> X<-p>, B<-P> X<-P>, B<-s> X<-s>, B<-S> X<-S>, B<-t> X<-t>,
 B<-T> X<-T>, B<-u> X<-u>, B<-U> X<-U>, B<-v> X<-v>, B<-V> X<-V>,
@@ -4281,15 +4281,24 @@ X<CLONE> X<CLONE_SKIP> X<thread> X<threads> X<ithread>
 
 =item Pragmatic Modules
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 assertions, assertions::activate, assertions::compat, attributes, attrs,
 autouse, base, bigint, bignum, bigrat, blib, bytes, charnames, constant,
 diagnostics, encoding, feature, fields, filetest, if, integer, less, lib,
 mro, open, ops, overload, re, sigtrap, sort, strict, subs, threads,
 threads::shared, utf8, vars, version, vmsish, warnings, warnings::register
+=======
+attributes, attrs, autouse, base, bigint, bignum, bigrat, blib, bytes,
+charnames, constant, diagnostics, encoding, encoding::warnings, feature,
+fields, filetest, if, integer, less, lib, locale, mro, open, ops, overload,
+re, sigtrap, sort, strict, subs, threads, threads::shared, utf8, vars,
+version, vmsish, warnings, warnings::register
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item Standard Modules
 
 AnyDBM_File, Archive::Extract, Archive::Tar, Archive::Tar::File,
+<<<<<<< HEAD:pod/kurilatoc.pod
 Attribute::Handlers, AutoLoader, AutoSplit, B, B::Asmdata, B::Concise,
 B::Debug, B::Deparse, B::Lint, B::Showlex, B::Terse, B::Xref, Benchmark,
 CGI, CGI::Apache, CGI::Carp, CGI::Cookie, CGI::Fast, CGI::Pretty,
@@ -4305,6 +4314,25 @@ Encode::CN::HZ, Encode::Config, Encode::EBCDIC, Encode::Encoder,
 Encode::Encoding, Encode::GSM0338, Encode::Guess, Encode::JP,
 Encode::JP::H2Z, Encode::JP::JIS7, Encode::KR, Encode::KR::2022_KR,
 Encode::MIME::Header, Encode::PerlIO, Encode::Supported, Encode::Symbol,
+=======
+Attribute::Handlers, AutoLoader, AutoSplit, B, B::Concise, B::Debug,
+B::Deparse, B::Lint, B::Showlex, B::Terse, B::Xref, Benchmark, CGI,
+CGI::Apache, CGI::Carp, CGI::Cookie, CGI::Fast, CGI::Pretty, CGI::Push,
+CGI::Switch, CGI::Util, CPAN, CPAN::FirstTime, CPAN::Kwalify, CPAN::Nox,
+CPAN::Version, CPANPLUS, CPANPLUS::Dist::Base, CPANPLUS::Dist::Sample,
+CPANPLUS::Shell::Classic, CPANPLUS::Shell::Default::Plugins::HOWTO, Carp,
+Carp::Heavy, Class::ISA, Class::Struct, Compress::Raw::Zlib,
+Compress::Zlib, Config, Cwd, DB, DBM_Filter, DBM_Filter::compress,
+DBM_Filter::encode, DBM_Filter::int32, DBM_Filter::null, DBM_Filter::utf8,
+DB_File, Data::Dumper, Devel::DProf, Devel::InnerPackage, Devel::Peek,
+Devel::SelfStubber, Digest, Digest::MD5, Digest::SHA, Digest::base,
+Digest::file, DirHandle, Dumpvalue, DynaLoader, Encode, Encode::Alias,
+Encode::Byte, Encode::CJKConstants, Encode::CN, Encode::CN::HZ,
+Encode::Config, Encode::EBCDIC, Encode::Encoder, Encode::Encoding,
+Encode::GSM0338, Encode::Guess, Encode::JP, Encode::JP::H2Z,
+Encode::JP::JIS7, Encode::KR, Encode::KR::2022_KR, Encode::MIME::Header,
+Encode::MIME::Name, Encode::PerlIO, Encode::Supported, Encode::Symbol,
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 Encode::TW, Encode::Unicode, Encode::Unicode::UTF7, English, Env, Errno,
 Exporter, Exporter::Heavy, ExtUtils::CBuilder,
 ExtUtils::CBuilder::Platform::Windows, ExtUtils::Command,
@@ -4377,7 +4405,11 @@ Pod::Simple::SimpleTree, Pod::Simple::Subclassing, Pod::Simple::Text,
 Pod::Simple::TextContent, Pod::Simple::XMLOutStream, Pod::Text,
 Pod::Text::Color, Pod::Text::Overstrike, Pod::Text::Termcap, Pod::Usage,
 SDBM_File, Safe, Scalar::Util, Search::Dict, SelectSaver, SelfLoader,
+<<<<<<< HEAD:pod/kurilatoc.pod
 Shell, Socket, Storable, Symbol, Sys::Hostname, Sys::Syslog,
+=======
+Shell, Socket, Storable, Switch, Symbol, Sys::Hostname, Sys::Syslog,
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 Term::ANSIColor, Term::Cap, Term::Complete, Term::ReadLine, Term::UI, Test,
 Test::Builder, Test::Builder::Module, Test::Builder::Tester,
 Test::Builder::Tester::Color, Test::Harness, Test::Harness::Assert,
@@ -4671,7 +4703,7 @@ L<piconv>, L<ptar>, L<ptardiff>, L<shasum>
 
 =item Installation
 
-L<cpan>, L<instmodsh>
+L<cpan>, L<cpanp>, L<cpan2dist>, L<instmodsh>
 
 =back
 
@@ -5539,13 +5571,15 @@ callback
 
 =item DESCRIPTION
 
+=item Callbacks
+
 =over 4
 
 =item comp
 
-RXf_SKIPWHITE, RXf_START_ONLY, RXf_WHITE, RXf_PMf_LOCALE,
-RXf_PMf_MULTILINE, RXf_PMf_SINGLELINE, RXf_PMf_FOLD, RXf_PMf_EXTENDED,
-RXf_PMf_KEEPCOPY, RXf_UTF8
+C</m> - RXf_PMf_MULTILINE, C</s> - RXf_PMf_SINGLELINE, C</i> -
+RXf_PMf_FOLD, C</x> - RXf_PMf_EXTENDED, C</p> - RXf_PMf_KEEPCOPY,
+RXf_SKIPWHITE, RXf_PMf_LOCALE, RXf_UTF8, RXf_START_ONLY, RXf_WHITE
 
 =item exec
 
@@ -5555,9 +5589,9 @@ RXf_PMf_KEEPCOPY, RXf_UTF8
 
 =item free
 
-=item numbered_buff_get
+=item Numbered capture callbacks
 
-=item named_buff_get
+=item Named capture callbacks
 
 =item qr_package
 
@@ -5567,15 +5601,52 @@ RXf_PMf_KEEPCOPY, RXf_UTF8
 
 =item The REGEXP structure
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 C<engine>, C<mother_re>, C<extflags>, C<minlen> C<minlenret>, C<gofs>,
 C<substrs>, C<nparens>, C<lasparen>, and C<lastcloseparen>, C<intflags>,
 C<pprivate>, C<swap>, C<offs>, C<precomp> C<prelen>, C<paren_names>,
 C<reg_substr_data>, C<subbeg> C<sublen> C<saved_copy>, C<wrapped>
 C<wraplen>, C<seen_evals>, C<refcnt>
 
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =over 4
 
-=item De-allocation and Cloning
+=item C<engine>
+
+=item C<mother_re>
+
+=item C<extflags>
+
+=item C<minlen> C<minlenret>
+
+=item C<gofs>
+
+=item C<substrs>
+
+=item C<nparens>, C<lasparen>, and C<lastcloseparen>
+
+=item C<intflags>
+
+=item C<pprivate>
+
+=item C<swap>
+
+=item C<offs>
+
+=item C<precomp> C<prelen>
+
+=item C<paren_names>
+
+=item C<substrs>
+
+=item C<subbeg> C<sublen> C<saved_copy>
+
+=item C<wrapped> C<wraplen>
+
+=item C<seen_evals>
+
+=item C<refcnt>
 
 =back
 
@@ -5718,11 +5789,6 @@ X<sv_usepvn_mg>, sv_uv X<sv_uv>, unpack_str X<unpack_str>
 
 packlist X<packlist>, unpackstring X<unpackstring>
 
-=item Global Variables
-
-PL_modglobal X<PL_modglobal>, PL_na X<PL_na>, PL_sv_no X<PL_sv_no>,
-PL_sv_undef X<PL_sv_undef>, PL_sv_yes X<PL_sv_yes>
-
 =item GV Functions
 
 GvSV X<GvSV>, gv_const_sv X<gv_const_sv>, gv_fetchmeth X<gv_fetchmeth>,
@@ -5807,6 +5873,15 @@ cv_const_sv X<cv_const_sv>, newCONSTSUB X<newCONSTSUB>, newXS X<newXS>
 =item Pad Data Structures
 
 pad_sv X<pad_sv>
+
+=item Per-Interpreter Variables
+
+PL_modglobal X<PL_modglobal>, PL_na X<PL_na>, PL_sv_no X<PL_sv_no>,
+PL_sv_undef X<PL_sv_undef>, PL_sv_yes X<PL_sv_yes>
+
+=item REGEXP Functions
+
+SvRX X<SvRX>, SvRXOK X<SvRXOK>
 
 =item Simple Exception Handling Macros
 
@@ -5987,12 +6062,6 @@ SAVECOMPPAD X<SAVECOMPPAD>, SAVEPADSV X<SAVEPADSV>
 
 find_runcv X<find_runcv>
 
-=item Global Variables
-
-PL_DBsingle X<PL_DBsingle>, PL_DBsub X<PL_DBsub>, PL_DBtrace X<PL_DBtrace>,
-PL_dowarn X<PL_dowarn>, PL_last_in_gv X<PL_last_in_gv>, PL_ofs_sv
-X<PL_ofs_sv>, PL_rs X<PL_rs>
-
 =item GV Functions
 
 is_gv_magical X<is_gv_magical>, is_gv_magical_sv X<is_gv_magical_sv>
@@ -6025,6 +6094,12 @@ X<pad_fixup_inner_anons>, pad_free X<pad_free>, pad_leavemy X<pad_leavemy>,
 pad_new X<pad_new>, pad_push X<pad_push>, pad_reset X<pad_reset>, pad_setsv
 X<pad_setsv>, pad_swipe X<pad_swipe>, pad_tidy X<pad_tidy>, pad_undef
 X<pad_undef>
+
+=item Per-Interpreter Variables
+
+PL_DBsingle X<PL_DBsingle>, PL_DBsub X<PL_DBsub>, PL_DBtrace X<PL_DBtrace>,
+PL_dowarn X<PL_dowarn>, PL_last_in_gv X<PL_last_in_gv>, PL_ofs_sv
+X<PL_ofs_sv>, PL_rs X<PL_rs>
 
 =item Stack Manipulation Macros
 
@@ -6346,7 +6421,7 @@ I<The Road goes ever on and on, down from the door where it began.>
 
 =item common test code for timed bail out
 
-=item POD -> HTML conversion in the core still sucks
+=item POD -E<gt> HTML conversion in the core still sucks
 
 =item Parallel testing
 
@@ -6466,11 +6541,11 @@ I<The Road goes ever on and on, down from the door where it began.>
 
 =item Optimize away @_
 
-=item What hooks would assertions need?
-
 =item Properly Unicode safe tokeniser and pads.
 
 =item The yada yada yada operators
+
+=item Virtualize operating system access
 
 =back
 
@@ -6656,9 +6731,13 @@ locale, the locale pramga has been removed
 
 =item strictures and array/hash dereferencing in defined()
 
+=item C<(?p{})> has been removed
+
 =item Removal of the bytecode compiler and of perlcc
 
 =item Removal of the JPL
+
+=item Recursive inheritance detected earlier
 
 =back
 
@@ -6669,7 +6748,8 @@ locale, the locale pramga has been removed
 =item Regular expressions
 
 Recursive Patterns, Named Capture Buffers, Possessive Quantifiers,
-Backtracking control verbs, Relative backreferences, C<\K> escape
+Backtracking control verbs, Relative backreferences, C<\K> escape, Vertical
+and horizontal whitespace, and linebreak
 
 =item The C<_> prototype
 
@@ -6677,9 +6757,13 @@ Backtracking control verbs, Relative backreferences, C<\K> escape
 
 =item readpipe() is now overridable
 
+=item default argument for readline()
+
 =item UCD 5.0.0
 
 =item Smart match
+
+=item Implicit loading of C<feature>
 
 =back
 
@@ -6687,17 +6771,38 @@ Backtracking control verbs, Relative backreferences, C<\K> escape
 
 =over 4
 
+=item New Pragma, C<mro>
+
+=item bignum, bigint, bigrat
+
 =item New Core Modules
 
 =item Module changes
 
-C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
+C<assertions>, C<base>, C<strict> and C<warnings>, C<warnings>, C<less>,
+C<Attribute::Handlers>, C<B::Lint>, C<B>, C<Thread>
 
 =back
 
 =item Utility Changes
 
+=over 4
+
+=item C<cpanp>
+
+=item C<cpan2dist>
+
+=item C<pod2html>
+
+=back
+
 =item Documentation
+
+=over 4
+
+=item New manpage, perlunifaq
+
+=back
 
 =item Performance Enhancements
 
@@ -6707,7 +6812,11 @@ C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
 
 =item C++ compatibility
 
+=item Visual C++
+
 =item Static build on Win32
+
+=item C<d_pseudofork>
 
 =item Ports
 
@@ -6716,6 +6825,12 @@ C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
 =item Selected Bug Fixes
 
 =item New or Changed Diagnostics
+
+=over 4
+
+=item Deprecations
+
+=back
 
 =item Changed Internals
 
@@ -6749,9 +6864,13 @@ C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
 
 =item strictures and array/hash dereferencing in defined()
 
+=item C<(?p{})> has been removed
+
 =item Removal of the bytecode compiler and of perlcc
 
 =item Removal of the JPL
+
+=item Recursive inheritance detected earlier
 
 =back
 
@@ -6762,7 +6881,8 @@ C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
 =item Regular expressions
 
 Recursive Patterns, Named Capture Buffers, Possessive Quantifiers,
-Backtracking control verbs, Relative backreferences, C<\K> escape
+Backtracking control verbs, Relative backreferences, C<\K> escape, Vertical
+and horizontal whitespace, and linebreak
 
 =item The C<_> prototype
 
@@ -6770,9 +6890,13 @@ Backtracking control verbs, Relative backreferences, C<\K> escape
 
 =item readpipe() is now overridable
 
+=item default argument for readline()
+
 =item UCD 5.0.0
 
 =item Smart match
+
+=item Implicit loading of C<feature>
 
 =back
 
@@ -6780,17 +6904,38 @@ Backtracking control verbs, Relative backreferences, C<\K> escape
 
 =over 4
 
+=item New Pragma, C<mro>
+
+=item bignum, bigint, bigrat
+
 =item New Core Modules
 
 =item Module changes
 
-C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
+C<assertions>, C<base>, C<strict> and C<warnings>, C<warnings>, C<less>,
+C<Attribute::Handlers>, C<B::Lint>, C<B>, C<Thread>
 
 =back
 
 =item Utility Changes
 
+=over 4
+
+=item C<cpanp>
+
+=item C<cpan2dist>
+
+=item C<pod2html>
+
+=back
+
 =item Documentation
+
+=over 4
+
+=item New manpage, perlunifaq
+
+=back
 
 =item Performance Enhancements
 
@@ -6800,7 +6945,11 @@ C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
 
 =item C++ compatibility
 
+=item Visual C++
+
 =item Static build on Win32
+
+=item C<d_pseudofork>
 
 =item Ports
 
@@ -6809,6 +6958,12 @@ C<base>, C<warnings>, C<less>, C<Attribute::Handlers>, C<B::Lint>, C<B>
 =item Selected Bug Fixes
 
 =item New or Changed Diagnostics
+
+=over 4
+
+=item Deprecations
+
+=back
 
 =item Changed Internals
 
@@ -11330,8 +11485,7 @@ useful flags, ALL, All, MORE, More
 =item Exportable Functions
 
 is_regexp($ref), regexp_pattern($ref), regmust($ref), regname($name,$all),
-regnames($all), regnames_iterinit(), regnames_iternext($all),
-regnames_count()
+regnames($all), regnames_count()
 
 =back
 
@@ -11457,74 +11611,6 @@ L<threads>
 
 =back
 
-=head2 assertions - select assertions in blocks of code
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Selecting assertions
-
-=item Handling assertions your own way
-
-enabled($on), enabled(), seen($on), seen()
-
-=back
-
-=item COMPATIBILITY
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item COPYRIGHT AND LICENSE
-
-=back
-
-=head2 assertions::activate - activate assertions
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item COPYRIGHT AND LICENSE
-
-=back
-
-=head2 assertions::compat - assertions for pre-5.9 versions of perl
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item The C<assertion> attribute handler
-
-=item Assertion execution status as a constant
-
-=back
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item COPYRIGHT AND LICENSE
-
-=back
-
 =head2 attributes - get/set subroutine or variable attributes
 
 =over 4
@@ -11615,9 +11701,12 @@ Base class package "%s" is empty
 
 =over 4
 
+=item use integer vs. use bigint
+
 =item Options
 
-a or accuracy, p or precision, t or trace, l or lib, v or version
+a or accuracy, p or precision, t or trace, hex, oct, l, lib, try or only, v
+or version
 
 =item Math Library
 
@@ -11627,13 +11716,17 @@ a or accuracy, p or precision, t or trace, l or lib, v or version
 
 =item Methods
 
-inf(), NaN(), upgrade()
+inf(), NaN(), upgrade(), in_effect()
 
 =item MATH LIBRARY
 
 =item Caveat
 
 =back
+
+=item CAVAETS
+
+in_effect(), hex()/oct()
 
 =item MODULES USED
 
@@ -11659,21 +11752,25 @@ inf(), NaN(), upgrade()
 
 =item Options
 
-a or accuracy, p or precision, t or trace, l or lib, v or version
+a or accuracy, p or precision, t or trace, l or lib, hex, oct, v or version
 
 =item Methods
 
-=item Caveat
+=item Caveats
 
-inf(), NaN(), upgrade()
+inf(), NaN(), upgrade(), in_effect()
 
-=item MATH LIBRARY
+=item Math Library
 
 =item INTERNAL FORMAT
 
 =item SIGN
 
 =back
+
+=item CAVAETS
+
+in_effect(), hex()/oct()
 
 =item MODULES USED
 
@@ -11705,7 +11802,7 @@ inf(), NaN(), upgrade()
 
 =item Methods
 
-inf(), NaN(), upgrade()
+inf(), NaN(), upgrade(), in_effect()
 
 =item MATH LIBRARY
 
@@ -11713,9 +11810,13 @@ inf(), NaN(), upgrade()
 
 =item Options
 
-a or accuracy, p or precision, t or trace, l or lib, v or version
+a or accuracy, p or precision, t or trace, l or lib, hex, oct, v or version
 
 =back
+
+=item CAVAETS
+
+in_effect(), hex()/oct()
 
 =item EXAMPLES
 
@@ -12109,6 +12210,92 @@ This probably does nothing, This works only on 5.10+
 =item maybe::next::method
 
 =back
+
+=item SEE ALSO
+
+=over 4
+
+=item The original Dylan paper
+
+L<http://www.webcom.com/haahr/dylan/linearization-oopsla96.html>
+
+=item The prototype Perl 6 Object Model uses C3
+
+L<http://svn.openfoundry.org/pugs/perl5/Perl6-MetaModel/>
+
+=item Parrot now uses C3
+
+L<http://aspn.activestate.com/ASPN/Mail/Message/perl6-internals/2746631>,
+L<http://use.perl.org/~autrijus/journal/25768>
+
+=item Python 2.3 MRO related links
+
+L<http://www.python.org/2.3/mro.html>,
+L<http://www.python.org/2.2.2/descrintro.html#mro>
+
+=item C3 for TinyCLOS
+
+L<http://www.call-with-current-continuation.org/eggs/c3.html>
+
+=item Class::C3
+
+L<Class::C3>
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 mro - Method Resolution Order
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item OVERVIEW
+
+=item The C3 MRO
+
+=over 4
+
+=item What is C3?
+
+=item How does C3 work
+
+=back
+
+=item Functions
+
+=over 4
+
+=item mro::get_linear_isa($classname[, $type])
+
+=item mro::set_mro($classname, $type)
+
+=item mro::get_mro($classname)
+
+=item mro::get_isarev($classname)
+
+=item mro::is_universal($classname)
+
+=item mro::invalidate_all_method_caches()
+
+=item mro::method_changed_in($classname)
+
+=item mro::get_pkg_gen($classname)
+
+=item next::method
+
+=item next::can
+
+=item maybe::next::method
+
+=back
+
+=item PERFORMANCE CONSIDERATIONS
 
 =item SEE ALSO
 
@@ -12544,7 +12731,7 @@ warnings::warnif($object, $message)
 =item $ae = Archive::Extract->new(archive => '/path/to/archive',[type =>
 TYPE])
 
-tar, tgz, gz, zip, bz2, tbz
+tar, tgz, gz, Z, zip, bz2, tbz
 
 =back
 
@@ -12587,6 +12774,8 @@ $ae->extract_path, $ae->files
 =item $ae->is_tar
 
 =item $ae->is_gz
+
+=item $ae->is_Z
 
 =item $ae->is_zip
 
@@ -13068,6 +13257,10 @@ main_root, main_start, walkoptree(OP, METHOD), walkoptree_debug(DEBUG)
 ppname(OPNUM), hash(STR), cast_I32(I), minus_c, cstring(STR),
 perlstring(STR), class(OBJ), threadsv_names
 
+=item Exported utility variabiles
+
+@optype, @specialsv_name
+
 =back
 
 =item OVERVIEW OF CLASSES
@@ -13184,20 +13377,6 @@ redoop, nextop, lastop
 label, stash, stashpv, file, cop_seq, arybase, line, warnings, io, hints
 
 =back
-
-=item AUTHOR
-
-=back
-
-=head2 B::Asmdata - Autogenerated data about Perl ops
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-%insn_data, @insn_name, @optype, @specialsv_name
 
 =item AUTHOR
 
@@ -14444,6 +14623,1744 @@ B<-Dictionary>, B<-Bufsize>, B<-AppendOutput>, B<-CRC32>, B<-ADLER32>
 
 B<-Level>, B<-Strategy>, B<-BufSize>
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item B<$status = $d-E<gt>deflateTune($good_length, $max_lazy,
+$nice_length, $max_chain)>
+=======
+=head2 CPANPLUS::Config
+
+=over 4
+
+=item DESCRIPTION
+
+=item CONFIGURATION
+
+=back
+
+=over 4
+
+=item Section 'conf'
+
+hosts
+
+=back
+
+base
+
+buildflags
+
+cpantest
+
+cpantest_mx
+
+debug
+
+dist_type
+
+email
+
+extractdir
+
+fetchdir
+
+flush
+
+force
+
+lib
+
+makeflags
+
+makemakerflags
+
+md5
+
+no_update
+
+passive
+
+prefer_bin
+
+prefer_makefile
+
+prereqs
+
+shell
+
+show_startup_tip
+
+signature
+
+skiptest
+
+storable
+
+timeout
+
+verbose
+
+write_install_log
+
+editor
+
+make
+
+pager
+
+shell
+
+sudo
+
+perlwrapper
+
+=over 4
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item SEE ALSO
+
+=back
+
+=head2 CPANPLUS::Configure
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item B<$d-E<gt>dict_adler()>
+
+=item B<$d-E<gt>crc32()>
+
+=item B<$d-E<gt>adler32()>
+
+=item B<$d-E<gt>msg()>
+
+=item B<$d-E<gt>total_in()>
+
+=item B<$d-E<gt>total_out()>
+
+=item B<$d-E<gt>get_Strategy()>
+
+=item B<$d-E<gt>get_Level()>
+
+=item B<$d-E<gt>get_BufSize()>
+
+=item Example
+
+=back
+
+=item Compress::Raw::Zlib::Inflate
+
+=over 4
+
+=item B< ($i, $status) = new Compress::Raw::Zlib::Inflate( [OPT] ) >
+
+B<-WindowBits>, B<-Bufsize>, B<-Dictionary>, B<-AppendOutput>, B<-CRC32>,
+B<-ADLER32>, B<-ConsumeInput>
+
+=item B< $status = $i-E<gt>inflate($input, $output [,$eof]) >
+
+=item B<$status = $i-E<gt>inflateSync($input)>
+
+=item B<$i-E<gt>dict_adler()>
+
+=item B<$i-E<gt>crc32()>
+
+=item B<$i-E<gt>adler32()>
+
+=item B<$i-E<gt>msg()>
+
+=item B<$i-E<gt>total_in()>
+
+=item B<$i-E<gt>total_out()>
+
+=item B<$d-E<gt>get_BufSize()>
+
+=item Example
+
+=back
+
+=item CHECKSUM FUNCTIONS
+
+=item ACCESSING ZIP FILES
+
+=item CONSTANTS
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item MODIFICATION HISTORY
+
+=item COPYRIGHT AND LICENSE
+
+=back
+
+=head2 Compress::Zlib - Interface to zlib compression library
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Notes for users of Compress::Zlib version 1
+
+=back
+
+=item GZIP INTERFACE
+
+B<$gz = gzopen($filename, $mode)>, B<$gz = gzopen($filehandle, $mode)>,
+B<$bytesread = $gz-E<gt>gzread($buffer [, $size]) ;>, B<$bytesread =
+$gz-E<gt>gzreadline($line) ;>, B<$byteswritten = $gz-E<gt>gzwrite($buffer)
+;>, B<$status = $gz-E<gt>gzflush($flush_type) ;>, B<$offset =
+$gz-E<gt>gztell() ;>, B<$status = $gz-E<gt>gzseek($offset, $whence) ;>,
+B<$gz-E<gt>gzclose>, B<$gz-E<gt>gzsetparams($level, $strategy>, B<$level>,
+B<$strategy>, B<$gz-E<gt>gzerror>, B<$gzerrno>
+
+=over 4
+
+=item Examples
+
+=item Compress::Zlib::memGzip
+
+=item Compress::Zlib::memGunzip
+
+=back
+
+=item COMPRESS/UNCOMPRESS
+
+B<$dest = compress($source [, $level] ) ;>, B<$dest = uncompress($source)
+;>
+
+=item Deflate Interface
+
+=over 4
+
+=item B<($d, $status) = deflateInit( [OPT] )>
+
+B<-Level>, B<-Method>, B<-WindowBits>, B<-MemLevel>, B<-Strategy>,
+B<-Dictionary>, B<-Bufsize>
+
+=item B<($out, $status) = $d-E<gt>deflate($buffer)>
+
+=item B<($out, $status) = $d-E<gt>flush([flush_type])>
+
+=item B<$status = $d-E<gt>deflateParams([OPT])>
+
+B<-Level>, B<-Strategy>
+
+=item B<$d-E<gt>dict_adler()>
+
+=item B<$d-E<gt>msg()>
+
+=item B<$d-E<gt>total_in()>
+
+=item B<$d-E<gt>total_out()>
+
+=item Example
+
+=back
+
+=item Inflate Interface
+
+=over 4
+
+=item B<($i, $status) = inflateInit()>
+
+B<-WindowBits>, B<-Bufsize>, B<-Dictionary>
+
+=item B<($out, $status) = $i-E<gt>inflate($buffer)>
+
+=item B<$status = $i-E<gt>inflateSync($buffer)>
+
+=item B<$i-E<gt>dict_adler()>
+
+=item B<$i-E<gt>msg()>
+
+=item B<$i-E<gt>total_in()>
+
+=item B<$i-E<gt>total_out()>
+
+=item Example
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=======
+=over 4
+
+=item $bool = $dist->uninstall
+
+=back
+
+=head2 CPANPLUS::Dist::Build
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item ACCESSORS
+
+parent(), status()
+
+=item STATUS ACCESSORS
+
+build_pl (), build (), test (), prepared (), distdir (), created (),
+installed (), uninstalled (), _create_args (), _install_args (), _mb_object
+()
+
+=back
+
+=over 4
+
+=item METHODS
+
+=over 4
+
+=item $bool = CPANPLUS::Dist::Build->format_available();
+
+=back
+
+=back
+
+=over 4
+
+=item $bool = $dist->init();
+
+=back
+
+=over 4
+
+=item $bool = $dist->prepare([perl => '/path/to/perl', buildflags =>
+'EXTRA=FLAGS', force => BOOL, verbose => BOOL])
+
+=back
+
+=over 4
+
+=item $dist->create([perl => '/path/to/perl', buildflags => 'EXTRA=FLAGS',
+prereq_target => TARGET, force => BOOL, verbose => BOOL, skiptest => BOOL])
+
+=back
+
+=over 4
+
+=item $dist->install([verbose => BOOL, perl => /path/to/perl])
+
+=back
+
+=over 4
+
+=item KNOWN ISSUES
+
+Module::Build can not be upgraded using its own API (#13169), Module::Build
+does not provide access to install history (#9793)
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 CPANPLUS::Dist::MM
+
+=over 4
+
+=item SYNOPSIS
+
+=item ACCESSORS
+
+parent(), status()
+
+=item STATUS ACCESSORS 
+
+makefile (), make (), test (), prepared (), distdir (), created (),
+installed (), uninstalled (), _create_args (), _install_args ()
+
+=back
+
+=over 4
+
+=item METHODS
+
+=over 4
+
+=item $bool = $dist->format_available();
+
+=back
+
+=back
+
+=over 4
+
+=item $href = $dist->_find_prereqs( file => '/path/to/Makefile', [verbose
+=> BOOL])
+
+=back
+
+=over 4
+
+=item $bool = $dist->create([perl => '/path/to/perl', make =>
+'/path/to/make', makeflags => 'EXTRA=FLAGS', prereq_target => TARGET,
+skiptest => BOOL, force => BOOL, verbose => BOOL])
+
+=back
+
+=over 4
+
+=item $bool = $dist->install([make => '/path/to/make',	makemakerflags =>
+'EXTRA=FLAGS', force => BOOL, verbose => BOOL])
+
+=back
+
+=over 4
+
+=item $bool = $dist->write_makefile_pl([force => BOOL, verbose => BOOL])
+
+=back
+
+=head2 CPANPLUS::Dist::Sample -- Sample code to create your own Dist::*
+plugin
+
+=over 4
+
+=item Description.
+
+=back
+
+=head2 CPANPLUS::Error
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item FUNCTIONS
+
+=over 4
+
+=item cp_msg("message string" [,VERBOSE])
+
+=item msg()
+
+=item cp_error("error string" [,VERBOSE])
+
+=item error()
+
+=back
+
+=item CLASS METHODS
+
+=over 4
+
+=item CPANPLUS::Error->stack()
+
+=item CPANPLUS::Error->stack_as_string([TRACE])
+
+=item CPANPLUS::Error->flush()
+
+=back
+
+=back
+
+=over 4
+
+=item GLOBAL VARIABLES
+
+$ERROR_FH, $MSG_FH
+
+=back
+
+=head2 CPANPLUS::FAQ
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 CPANPLUS::Hacking
+
+=over 4
+
+=item DESCRIPTION
+
+=item OBTAINING CPANPLUS
+
+=item INSTALLING CPANPLUS
+
+=item CONFIGURING CPANPLUS
+
+=item RUNNING CPANPLUS FROM DEVELOPMENT ENVIRONMENT
+
+=item RUNNING CPANPLUS TESTS
+
+=item FINDING BUGS
+
+Problem description, Program demonstrating the bug, [OPTIONAL] A patch to
+the test suite to test for the bug, [OPTIONAL] A patch to the code + tests
++ documentation
+
+=item SUPPLYING PATCHES
+
+In C<diff -u> or C<diff -c> format, From the root of the snapshot,
+Including patches for code + tests + docs, Sent per mail to
+cpanplus-devel@lists.sourceforge.net, With subject containing C<[PATCH]> +
+description of the patch
+
+=back
+
+=head2 CPANPLUS::Internals
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item ACCESSORS
+
+_conf, _id, _lib, _perl5lib
+
+=back
+
+=over 4
+
+=item METHODS
+
+=over 4
+
+=item $internals = CPANPLUS::Internals->_init( _conf => CONFIG_OBJ )
+
+=back
+
+=back
+
+=over 4
+
+=item $bool = $internals->_flush( list => \@caches )
+
+=back
+
+=over 4
+
+=item $bool = $internals->_register_callback( name => CALLBACK_NAME, code
+=> CODEREF );
+
+install_prerequisite, send_test_report, munge_test_report,
+edit_test_report, proceed_on_test_failure
+
+=back
+
+=over 4
+
+=item $bool = $internals->_add_to_includepath( directories => \@dirs )
+
+=back
+
+=over 4
+
+=item $id = CPANPLUS::Internals->_last_id
+
+=item $id = CPANPLUS::Internals->_store_id( $internals )
+
+=item $obj = CPANPLUS::Internals->_retrieve_id( $ID )
+
+=item CPANPLUS::Internals->_remove_id( $ID )
+
+=item @objs = CPANPLUS::Internals->_return_all_objects
+
+=back
+
+=head2 CPANPLUS::Internals::Extract
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item $dir = _extract( module => $modobj, [perl => '/path/to/perl',
+extractdir => '/path/to/extract/to', prefer_bin => BOOL, verbose => BOOL,
+force => BOOL] )
+
+module, extractdir, prefer_bin, perl, verbose, force
+
+=back
+
+=back
+
+=head2 CPANPLUS::Internals::Fetch
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=back
+
+=over 4
+
+=item $path = _fetch( module => $modobj, [fetchdir => '/path/to/save/to',
+fetch_from => 'scheme://path/to/fetch/from', verbose => BOOL, force =>
+BOOL, prefer_bin => BOOL] )
+
+=back
+
+=over 4
+
+=item _add_fail_host( host => $host_hashref )
+
+=item _host_ok( host => $host_hashref )
+
+=back
+
+=head2 CPANPLUS::Internals::Report
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=over 4
+
+=item $bool = $cb->_have_query_report_modules
+
+=item $bool = $cb->_have_send_report_modules
+
+=back
+
+=back
+
+=over 4
+
+=item @list = $cb->_query_report( module => $modobj, [all_versions => BOOL,
+verbose => BOOL] )
+
+=back
+
+=over 4
+
+=item $bool = $cb->_send_report( module => $modobj, buffer => $make_output,
+failed => BOOL, [save => BOOL, address => $email_to, dontcc => BOOL,
+verbose => BOOL, force => BOOL]);
+
+module, buffer, failed, save, address, dontcc, verbose, force
+
+=back
+
+=head2 CPANPLUS::Internals::Search
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=over 4
+
+=item _search_module_tree( type => TYPE, allow => \@regexex, [data =>
+\@previous_results ] )
+
+type, allow, data
+
+=back
+
+=back
+
+=over 4
+
+=item _search_author_tree( type => TYPE, allow => \@regexex, [data =>
+\@previous_results ] )
+
+type, allow, data
+
+=back
+
+=over 4
+
+=item _all_installed()
+
+=back
+
+=head2 CPANPLUS::Internals::Source
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=back
+
+=over 4
+
+=item $cb->_check_trees( [update_source => BOOL, path => PATH, verbose =>
+BOOL] )
+
+update_source, path, verbose
+
+=back
+
+=over 4
+
+=item $cb->__check_uptodate( file => $file, name => $name, [update_source
+=> BOOL, verbose => BOOL] )
+
+file, name, update_source, verbose
+
+=back
+
+=over 4
+
+=item $cb->_update_source( name => $name, [path => $path, verbose => BOOL]
+)
+
+name, path, verbose
+
+=back
+
+=over 4
+
+=item $cb->_build_trees( uptodate => BOOL, [use_stored => BOOL, path =>
+$path, verbose => BOOL] )
+
+uptodate, path, verbose, use_stored
+
+=back
+
+=over 4
+
+=item $cb->__retrieve_source(name => $name, [path => $path, uptodate =>
+BOOL, verbose => BOOL])
+
+name, uptodate, path, verbose
+
+=back
+
+=over 4
+
+=item $cb->_save_source([verbose => BOOL, path => $path])
+
+path, verbose
+
+=back
+
+=over 4
+
+=item $cb->__create_author_tree([path => $path, uptodate => BOOL, verbose
+=> BOOL])
+
+uptodate, path, verbose
+
+=back
+
+=over 4
+
+=item $cb->_create_mod_tree([path => $path, uptodate => BOOL, verbose =>
+BOOL])
+
+uptodate, path, verbose
+
+=back
+
+=over 4
+
+=item $cb->__create_dslip_tree([path => $path, uptodate => BOOL, verbose =>
+BOOL])
+
+uptodate, path, verbose
+
+=back
+
+=over 4
+
+=item $cb->_dslip_defs ()
+
+=back
+
+=head2 CPANPLUS::Internals::Utils
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=over 4
+
+=item $cb->_mkdir( dir => '/some/dir' )
+
+=back
+
+=back
+
+=over 4
+
+=item $cb->_chdir( dir => '/some/dir' )
+
+=back
+
+=over 4
+
+=item $cb->_rmdir( dir => '/some/dir' );
+
+=back
+
+=over 4
+
+=item $cb->_perl_version ( perl => 'some/perl/binary' );
+
+=back
+
+=over 4
+
+=item $cb->_version_to_number( version => $version );
+
+=back
+
+=over 4
+
+=item $cb->_whoami
+
+=back
+
+=over 4
+
+=item _get_file_contents( file => $file );
+
+=back
+
+=over 4
+
+=item $cb->_mode_plus_w( file => '/path/to/file' );
+
+=back
+
+=over 4
+
+=item $uri = $cb->_host_to_uri( scheme => SCHEME, host => HOST, path =>
+PATH );
+
+=back
+
+=over 4
+
+=item $cb->_vcmp( VERSION, VERSION );
+
+=back
+
+=over 4
+
+=item $cb->_home_dir
+
+=back
+
+=over 4
+
+=item $path = $cb->_safe_path( path => $path );
+
+=back
+
+=over 4
+
+=item ($pkg, $version, $ext) = $cb->_split_package_string( package =>
+PACKAGE_STRING );
+
+=back
+
+=head2 CPANPLUS::Module
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=back
+
+=over 4
+
+=item CLASS METHODS
+
+=over 4
+
+=item accessors ()
+
+=back
+
+=back
+
+=over 4
+
+=item ACCESSORS
+
+name, module, version, path, comment, package, description, dslip, status,
+author, parent
+
+=back
+
+=over 4
+
+=item STATUS ACCESSORS
+
+installer_type, dist_cpan, dist, prereqs, signature, extract, fetch,
+readme, uninstall, created, installed, checksums, checksum_ok,
+checksum_value
+
+=item METHODS
+
+=over 4
+
+=item $self = CPANPLUS::Module::new( OPTIONS )
+
+=back
+
+=back
+
+=over 4
+
+=item $mod->package_name
+
+=item $mod->package_version
+
+=item $mod->package_extension
+
+=item $mod->package_is_perl_core
+
+=item $mod->module_is_supplied_with_perl_core( [version => $]] )
+
+=item $mod->is_bundle
+
+=item $mod->is_third_party
+
+=item $mod->third_party_information
+
+=back
+
+=over 4
+
+=item $clone = $self->clone
+
+=back
+
+=over 4
+
+=item $where = $self->fetch
+
+=back
+
+=over 4
+
+=item $path = $self->extract
+
+=back
+
+=over 4
+
+=item $type = $self->get_installer_type([prefer_makefile => BOOL])
+
+=back
+
+=over 4
+
+=item $dist = $self->dist([target => 'prepare|create', format =>
+DISTRIBUTION_TYPE, args => {key => val}]);
+
+=back
+
+=over 4
+
+=item $bool = $mod->prepare( )
+
+Convenience method around C<install()> that prepares a module 
+without actually building it. This is equivalent to invoking C<install>
+with C<target> set to C<prepare>
+
+=back
+
+=over 4
+
+=item $bool = $mod->create( )
+
+=back
+
+=over 4
+
+=item $bool = $mod->test( )
+
+=back
+
+=over 4
+
+=item $bool = $self->install([ target => 'prepare|create|install', format
+=> FORMAT_TYPE, extractdir => DIRECTORY, fetchdir => DIRECTORY, prefer_bin
+=> BOOL, force => BOOL, verbose => BOOL, ..... ]);
+
+=back
+
+=over 4
+
+=item $text = $self->readme
+
+=back
+
+=over 4
+
+=item $version = $self->installed_version()
+
+=item $where = $self->installed_file()
+
+=item $bool = $self->is_uptodate([version => VERSION_NUMBER])
+
+=back
+
+=over 4
+
+=item $href = $self->details()
+
+=back
+
+=over 4
+
+=item @list = $self->contains()
+
+=back
+
+=over 4
+
+=item @list_of_hrefs = $self->fetch_report()
+
+=back
+
+=over 4
+
+=item $bool = $self->uninstall([type => [all|man|prog])
+
+=back
+
+=over 4
+
+=item @modobj = $self->distributions()
+
+=back
+
+=over 4
+
+=item @list = $self->files ()
+
+=back
+
+=over 4
+
+=item @list = $self->directory_tree ()
+
+=back
+
+=over 4
+
+=item @list = $self->packlist ()
+
+=back
+
+=over 4
+
+=item @list = $self->validate ()
+
+=back
+
+=over 4
+
+=item $bool = $self->add_to_includepath;
+
+=item $path = $self->best_path_to_module_build();
+
+=back
+
+=over 4
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 CPANPLUS::Module::Author
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item ACCESSORS
+
+author, cpanid, email, parent
+
+=back
+
+=over 4
+
+=item METHODS
+
+=over 4
+
+=item $auth = CPANPLUS::Module::Author->new( author => AUTHOR_NAME, cpanid
+=> CPAN_ID, _id => INTERNALS_ID [, email => AUTHOR_EMAIL] )
+
+=back
+
+=back
+
+=over 4
+
+=item @mod_objs = $auth->modules()
+
+=back
+
+=over 4
+
+=item @dists = $auth->distributions()
+
+=back
+
+=over 4
+
+=item CLASS METHODS
+
+=over 4
+
+=item accessors ()
+
+=back
+
+=back
+
+=head2 CPANPLUS::Module::Author::Fake
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=over 4
+
+=item new( _id => DIGIT )
+
+=back
+
+=back
+
+=head2 CPANPLUS::Module::Checksums
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=over 4
+
+=item $mod->checksums
+
+=back
+
+=back
+
+=head2 CPANPLUS::Module::Fake
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+=over 4
+
+=item new( module => $mod, path => $path, package => $pkg, [_id => DIGIT] )
+
+=back
+
+=back
+
+=head2 CPANPLUS::inc
+
+=over 4
+
+=item DESCRIPTION
+
+=back
+
+=head2 CPANPLUS::inc - runtime inclusion of privately bundled modules
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+Put a coderef at the beginning of C<@INC>, Add the full path to the
+C<CPANPLUS/inc> directory to C<$ENV{PERL5LIB>
+
+=item METHODS
+
+=over 4
+
+=item CPANPLUS::inc->inc_path()
+
+=item CPANPLUS::inc->my_path()
+
+=item CPANPLUS::inc->installer_path()
+
+=back
+
+=back
+
+=over 4
+
+=item CPANPLUS::inc->original_perl5lib
+
+=item CPANPLUS::inc->original_perl5opt
+
+=item CPANPLUS::inc->original_inc
+
+=item CPANPLUS::inc->limited_perl5opt(@modules);
+
+=back
+
+=over 4
+
+=item CPANPLUS::inc->interesting_modules()
+
+=back
+
+=over 4
+
+=item INTERESTING MODULES
+
+Loop over your @INC, Check the version on every suitable module found in
+@INC
+
+=back
+
+=over 4
+
+=item DEBUG
+
+=item CAVEATS
+
+On multiple C<use lib> calls, our coderef may not be the first in @INC,
+Non-directories in @INC
+
+=back
+
+=head2 CPANPLUSelfupdate, CPANPLUS::Selfupdate
+
+=over 4
+
+=item SYNOPSIS
+
+=back
+
+=over 4
+
+=item METHODS
+
+=over 4
+
+=item $self = CPANPLUS::Selfupdate->new( $backend_object );
+
+=back
+
+=back
+
+=over 4
+
+=item %list = $self->list_modules_to_update( update =>
+"core|dependencies|enabled_features|features|all", [latest => BOOL] )
+
+List which modules C<selfupdate> would upgrade. You can update either 
+the core (CPANPLUS itself), the core dependencies, all features you have
+currently turned on, or all features available, or everything.
+
+=back
+
+=over 4
+
+=item @features = $self->list_features
+
+=back
+
+=over 4
+
+=item @features = $self->list_enabled_features
+
+=back
+
+=over 4
+
+=item @mods = $self->modules_for_feature( FEATURE [,AS_HASH] )
+
+=back
+
+=over 4
+
+=item @mods = $self->list_core_dependencies( [AS_HASH] )
+
+=back
+
+=over 4
+
+=item @mods = $self->list_core_modules( [AS_HASH] )
+
+=back
+
+=over 4
+
+=item CPANPLUS::Selfupdate::Module
+
+=back
+
+=over 4
+
+=item $version = $mod->version_required
+
+=back
+
+=over 4
+
+=item $bool = $mod->is_installed_version_sufficient
+
+=back
+
+=over 4
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 CPANPLUShell, CPANPLUS::Shell
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=back
+
+=over 4
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item SEE ALSO
+
+=back
+
+=head2 CPANPLUShell::Classic, CPANPLUS::Shell::Classic - CPAN.pm emulation
+for CPANPLUS
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item SEE ALSO
+
+=back
+
+=over 4
+
+=item SEE ALSO
+
+=back
+
+=head2 CPANPLUShell::Default, CPANPLUS::Shell::Default
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=back
+
+=over 4
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item SEE ALSO
+
+=back
+
+=head2 CPANPLUShell::Default::Plugins::HOWTO,
+CPANPLUS::Shell::Default::Plugins::HOWTO -- documentation on how to write
+your own plugins
+
+=over 4
+
+=item SYNOPSIS
+
+=item HOWTO
+
+=over 4
+
+=item Registering Plugin Modules
+
+=item Registering Plugin Commands
+
+=item Registering Plugin Help
+
+=item Arguments to Plugin Commands
+
+Classname -- The name of your plugin class, Shell     -- The
+CPANPLUS::Shell::Default object, Backend   -- The CPANPLUS::Backend object,
+Command   -- The command issued by the user, Input     -- The input string
+from the user, Options	 -- A hashref of options provided by the user
+
+=back
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item SEE ALSO
+
+=back
+
+=head2 CPANPLUShell::Default::Plugins::Remote,
+CPANPLUS::Shell::Default::Plugins::Remote
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=back
+
+=over 4
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item SEE ALSO
+
+=back
+
+=head2 CPANPLUShell::Default::Plugins::Source,
+CPANPLUS::Shell::Default::Plugins::Source 
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=back
+
+=over 4
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item SEE ALSO
+
+=back
+
+=head2 CPANox, CPAN::Nox - Wrapper around CPAN.pm without using any XS
+module
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item LICENSE
+
+=item  SEE ALSO
+
+=back
+
+=head2 Carp, carp    - warn of errors (from perspective of caller)
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Forcing a Stack Trace
+
+=back
+
+=item GLOBAL VARIABLES
+
+=over 4
+
+=item $Carp::MaxEvalLen
+
+=item $Carp::MaxArgLen
+
+=item $Carp::MaxArgNums
+
+=item $Carp::Verbose
+
+=item %Carp::Internal
+
+=item %Carp::CarpInternal
+
+=item $Carp::CarpLevel
+
+=back
+
+=item BUGS
+
+=back
+
+=head2 Carp::Heavy - heavy machinery, no user serviceable parts inside
+
+=head2 Class::ISA -- report the search path for a class's ISA tree
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item FUNCTIONS
+
+the function Class::ISA::super_path($CLASS), the function
+Class::ISA::self_and_super_path($CLASS), the function
+Class::ISA::self_and_super_versions($CLASS)
+
+=item CAUTIONARY NOTES
+
+=item COPYRIGHT
+
+=item AUTHOR
+
+=back
+
+=head2 Class::Struct - declare struct-like datatypes as Perl classes
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item The C<struct()> function
+
+=item Class Creation at Compile Time
+
+=item Element Types and Accessor Methods
+
+Scalar (C<'$'> or C<'*$'>), Array (C<'@'> or C<'*@'>), Hash (C<'%'> or
+C<'*%'>), Class (C<'Class_Name'> or C<'*Class_Name'>)
+
+=item Initializing with C<new>
+
+=back
+
+=item EXAMPLES
+
+Example 1, Example 2, Example 3
+
+=item Author and Modification History
+
+=back
+
+=head2 Compress::Raw::Zlib - Low-Level Interface to zlib compression
+library
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item Compress::Raw::Zlib::Deflate
+
+=over 4
+
+=item B<($d, $status) = new Compress::Raw::Zlib::Deflate( [OPT] ) >
+
+B<-Level>, B<-Method>, B<-WindowBits>, B<-MemLevel>, B<-Strategy>,
+B<-Dictionary>, B<-Bufsize>, B<-AppendOutput>, B<-CRC32>, B<-ADLER32>
+
+=item B<$status = $d-E<gt>deflate($input, $output)>
+
+=item B<$status = $d-E<gt>flush($output [, $flush_type]) >
+
+=item B<$status = $d-E<gt>deflateParams([OPT])>
+
+B<-Level>, B<-Strategy>, B<-BufSize>
+
+=item B<$status = $d-E<gt>deflateTune($good_length, $max_lazy,
+$nice_length, $max_chain)>
+
+=item B<$d-E<gt>dict_adler()>
+
+=item B<$d-E<gt>crc32()>
+
+=item B<$d-E<gt>adler32()>
+
+=item B<$d-E<gt>msg()>
+
+=item B<$d-E<gt>total_in()>
+
+=item B<$d-E<gt>total_out()>
+
+=item B<$d-E<gt>get_Strategy()>
+
+=item B<$d-E<gt>get_Level()>
+
+=item B<$d-E<gt>get_BufSize()>
+
+=item Example
+
+=back
+
+=item Compress::Raw::Zlib::Inflate
+
+=over 4
+
+=item B< ($i, $status) = new Compress::Raw::Zlib::Inflate( [OPT] ) >
+
+B<-WindowBits>, B<-Bufsize>, B<-Dictionary>, B<-AppendOutput>, B<-CRC32>,
+B<-ADLER32>, B<-ConsumeInput>
+
+=item B< $status = $i-E<gt>inflate($input, $output [,$eof]) >
+
+=item B<$status = $i-E<gt>inflateSync($input)>
+
+=item B<$i-E<gt>dict_adler()>
+
+=item B<$i-E<gt>crc32()>
+
+=item B<$i-E<gt>adler32()>
+
+=item B<$i-E<gt>msg()>
+
+=item B<$i-E<gt>total_in()>
+
+=item B<$i-E<gt>total_out()>
+
+=item B<$d-E<gt>get_BufSize()>
+
+=item Example
+
+=back
+
+=item CHECKSUM FUNCTIONS
+
+=item ACCESSING ZIP FILES
+
+=item CONSTANTS
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item MODIFICATION HISTORY
+
+=item COPYRIGHT AND LICENSE
+
+=back
+
+=head2 Compress::Raw::Zlib::Compress::Raw::Zlib, Compress::Raw::Zlib -
+Low-Level Interface to zlib compression library
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item Compress::Raw::Zlib::Deflate
+
+=over 4
+
+=item B<($d, $status) = new Compress::Raw::Zlib::Deflate( [OPT] ) >
+
+B<-Level>, B<-Method>, B<-WindowBits>, B<-MemLevel>, B<-Strategy>,
+B<-Dictionary>, B<-Bufsize>, B<-AppendOutput>, B<-CRC32>, B<-ADLER32>
+
+=item B<$status = $d-E<gt>deflate($input, $output)>
+
+=item B<$status = $d-E<gt>flush($output [, $flush_type]) >
+
+=item B<$status = $d-E<gt>deflateParams([OPT])>
+
+B<-Level>, B<-Strategy>, B<-BufSize>
+
 =item B<$status = $d-E<gt>deflateTune($good_length, $max_lazy,
 $nice_length, $max_chain)>
 
@@ -14608,6 +16525,7 @@ B<-WindowBits>, B<-Bufsize>, B<-Dictionary>
 
 =back
 
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =item CHECKSUM FUNCTIONS
 
 =item CONSTANTS
@@ -15900,6 +17818,8 @@ encode_utf8($string);, $string = decode_utf8($octets [, CHECK]);
 
 =item Defining Aliases
 
+=item Finding IANA Character Set Registry names
+
 =back
 
 =item Encoding via PerlIO
@@ -16025,7 +17945,7 @@ reference, e.g.:
 
 =item Other methods defined in Encode::Encodings
 
--E<gt>name, -E<gt>renew, -E<gt>renewed, -E<gt>perlio_ok(),
+-E<gt>name, -E<gt>mime_name, -E<gt>renew, -E<gt>renewed, -E<gt>perlio_ok(),
 -E<gt>needs_lines()
 
 =item Example: Encode::ROT13
@@ -16133,6 +18053,14 @@ guess_encoding($data, [, I<list of suspects>])
 =item DESCRIPTION
 
 =item BUGS
+
+=item SEE ALSO
+
+=back
+
+=head2 Encode::MIME::Name, Encode::MIME::NAME -- internally used by Encode
+
+=over 4
 
 =item SEE ALSO
 
@@ -16369,7 +18297,7 @@ Implementation Base Class
 
 =item Other methods defined in Encode::Encodings
 
--E<gt>name, -E<gt>renew, -E<gt>renewed, -E<gt>perlio_ok(),
+-E<gt>name, -E<gt>mime_name, -E<gt>renew, -E<gt>renewed, -E<gt>perlio_ok(),
 -E<gt>needs_lines()
 
 =item Example: Encode::ROT13
@@ -16392,6 +18320,26 @@ Scheme 1, Scheme 2, Other Schemes
 
 =head2 Encode::lib::Encode::GSM0338, Encode::GSM0338 -- ESTI GSM 03.38
 Encoding
+<<<<<<< HEAD:pod/kurilatoc.pod
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item NOTES
+
+=item BUGS
+
+=item SEE ALSO
+
+=back
+
+=head2 Encode::lib::Encode::Guess, Encode::Guess -- Guesses encoding from
+data
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -16451,6 +18399,15 @@ and 'Q' header encoding
 =item DESCRIPTION
 
 =item BUGS
+
+=item SEE ALSO
+
+=back
+
+=head2 Encode::lib::Encode::MIME::Name, Encode::MIME::NAME -- internally
+used by Encode
+
+=over 4
 
 =item SEE ALSO
 
@@ -17833,6 +19790,8 @@ max_exec_len
 
 os_flavor
 
+cflags
+
 =head2 ExtUtils::MM_Win95 - method to customize MakeMaker for Win9X
 
 =over 4
@@ -18560,17 +20519,41 @@ B<~>, B<~user>, B<.>, B<*>, B<?>, B<\>,  B<[]>,  B<{,}>,  B<()>
 
 =back
 
-=head2 File::Path - create or remove directory trees
+=head2 File::Path - Create or remove directory trees
 
 =over 4
+
+=item VERSION
 
 =item SYNOPSIS
 
 =item DESCRIPTION
 
+=over 4
+
+=item FUNCTIONS
+
+mode, verbose, error, verbose, skip_others, keep_root, result, error
+
+=item TRADITIONAL INTERFACE
+
+=item ERROR HANDLING
+
+=item NOTES
+
+=back
+
 =item DIAGNOSTICS
 
+=item SEE ALSO
+
+=item BUGS
+
 =item AUTHORS
+
+=item COPYRIGHT
+
+=item LICENSE
 
 =back
 
@@ -19214,8 +21197,6 @@ with switch clustering
 
 =over 4
 
-=item Field hashes
-
 =item Restricted hashes
 
 B<lock_keys>, B<unlock_keys>
@@ -19260,37 +21241,50 @@ unlock_hashref_recurse, hash_ref_unlocked, legal_ref_keys, hidden_ref_keys
 
 =back
 
-=head2 Hash::Util::FieldHash - Associate references with data
+=head2 Hash::Util::FieldHash - Support for Inside-Out Classes
 
 =over 4
 
 =item SYNOPSIS
 
-=item Functions
+=item FUNCTIONS
 
-fieldhash, fieldhashes
+id, id_2obj, register, idhash, idhashes, fieldhash, fieldhashes
 
-=item Description
+=item DESCRIPTION
 
 =over 4
 
-=item Features
+=item The Inside-out Technique
 
-Key exchange, Thread support, Garbage collection
+=item Problems of Inside-out
 
-=item Rationale
+=item Solutions
 
-Stringification, Thread Dependency, Garbage Collection
+=item More Problems
 
-=item How to use
+=item The Generic Object
 
-=item Examples
+=item How to use Field Hashes
 
 =item Garbage-Collected Hashes
 
 =back
 
-=item Guts
+=item EXAMPLES
+
+C<init()>, C<first()>, C<last()>, C<name()>, C<Name_hash>, C<Name_id>,
+C<Name_idhash>, C<Name_id_reg>, C<Name_idhash_reg>, C<Name_fieldhash>
+
+=over 4
+
+=item Example 1
+
+=item Example 2
+
+=back
+
+=item GUTS
 
 =over 4
 
@@ -19311,37 +21305,50 @@ Stringification, Thread Dependency, Garbage Collection
 =back
 
 =head2 Hash::Util::FieldHash::lib::Hash::Util::FieldHash,
-Hash::Util::FieldHash - Associate references with data
+Hash::Util::FieldHash - Support for Inside-Out Classes
 
 =over 4
 
 =item SYNOPSIS
 
-=item Functions
+=item FUNCTIONS
 
-fieldhash, fieldhashes
+id, id_2obj, register, idhash, idhashes, fieldhash, fieldhashes
 
-=item Description
+=item DESCRIPTION
 
 =over 4
 
-=item Features
+=item The Inside-out Technique
 
-Key exchange, Thread support, Garbage collection
+=item Problems of Inside-out
 
-=item Rationale
+=item Solutions
 
-Stringification, Thread Dependency, Garbage Collection
+=item More Problems
 
-=item How to use
+=item The Generic Object
 
-=item Examples
+=item How to use Field Hashes
 
 =item Garbage-Collected Hashes
 
 =back
 
-=item Guts
+=item EXAMPLES
+
+C<init()>, C<first()>, C<last()>, C<name()>, C<Name_hash>, C<Name_id>,
+C<Name_idhash>, C<Name_id_reg>, C<Name_idhash_reg>, C<Name_fieldhash>
+
+=over 4
+
+=item Example 1
+
+=item Example 2
+
+=back
+
+=item GUTS
 
 =over 4
 
@@ -19371,8 +21378,6 @@ general-utility hash subroutines
 =item DESCRIPTION
 
 =over 4
-
-=item Field hashes
 
 =item Restricted hashes
 
@@ -19698,6 +21703,7 @@ Sichuan Yi, {yi} : Yiddish, {yo} : Yoruba, [{ypk} : Yupik languages], {znd}
 =back
 
 =head2 IO::Compress::Deflate - Write RFC 1950 files/buffers
+<<<<<<< HEAD:pod/kurilatoc.pod
 
 =over 4
 
@@ -19797,6 +21803,8 @@ Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
 =back
 
 =head2 IO::Compress::Gzip - Write RFC 1952 files/buffers
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -19808,7 +21816,126 @@ Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item gzip $input => $output [, OPTS]
+=======
+=item deflate $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+A filename, A filehandle, A scalar reference, An array reference, An Input
+FileGlob string, A filename, A filehandle, A scalar reference, An Array
+Reference, An Output FileGlob
+
+=item Notes
+
+=item Optional Parameters
+
+C<< AutoClose => 0|1 >>, C<< BinModeIn => 0|1 >>, C<< Append => 0|1 >>
+
+=item Examples
+
+=back
+
+=item OO Interface
+
+=over 4
+
+=item Constructor
+
+A filename, A filehandle, A scalar reference
+
+=item Constructor Options
+
+C<< AutoClose => 0|1 >>, C<< Append => 0|1 >>, A Buffer, A Filename, A
+<<<<<<< HEAD:pod/kurilatoc.pod
+Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Minimal => 0|1 >>,
+C<< Comment => $comment >>, C<< Name => $string >>, C<< Time => $number >>,
+C<< TextFlag => 0|1 >>, C<< HeaderCRC => 0|1 >>, C<< OS_Code => $value >>,
+C<< ExtraField => $data >>, C<< ExtraFlags => $value >>, C<< Strict => 0|1
+>>
+=======
+Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item Examples
+
+=back
+
+=item Methods 
+
+=over 4
+
+=item print
+
+=item printf
+
+=item syswrite
+
+=item write
+
+=item flush
+
+=item tell
+
+=item eof
+
+=item seek
+
+=item binmode
+
+=item opened
+
+=item autoflush
+
+=item input_line_number
+
+=item fileno
+
+=item close
+
+=item newStream([OPTS])
+
+=item deflateParams
+
+=back
+
+=item Importing 
+
+:all, :constants, :flush, :level, :strategy
+
+=item EXAMPLES
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item MODIFICATION HISTORY
+
+=item COPYRIGHT AND LICENSE
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO::Compress::RawDeflate - Write RFC 1951 files/buffers
+=======
+=head2 IO::Compress::Gzip - Write RFC 1952 files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item Functional Interface
+
+=over 4
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item rawdeflate $input => $output [, OPTS]
+=======
+=item gzip $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 A filename, A filehandle, A scalar reference, An array reference, An Input
 FileGlob string, A filename, A filehandle, A scalar reference, An Array
@@ -19899,106 +22026,11 @@ C<< ExtraField => $data >>, C<< ExtraFlags => $value >>, C<< Strict => 0|1
 
 =back
 
-=head2 IO::Compress::RawDeflate - Write RFC 1951 files/buffers
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item Functional Interface
-
-=over 4
-
-=item rawdeflate $input => $output [, OPTS]
-
-A filename, A filehandle, A scalar reference, An array reference, An Input
-FileGlob string, A filename, A filehandle, A scalar reference, An Array
-Reference, An Output FileGlob
-
-=item Notes
-
-=item Optional Parameters
-
-C<< AutoClose => 0|1 >>, C<< BinModeIn => 0|1 >>, C<< Append => 0|1 >>
-
-=item Examples
-
-=back
-
-=item OO Interface
-
-=over 4
-
-=item Constructor
-
-A filename, A filehandle, A scalar reference
-
-=item Constructor Options
-
-C<< AutoClose => 0|1 >>, C<< Append => 0|1 >>, A Buffer, A Filename, A
-Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
-
-=item Examples
-
-=back
-
-=item Methods 
-
-=over 4
-
-=item print
-
-=item printf
-
-=item syswrite
-
-=item write
-
-=item flush
-
-=item tell
-
-=item eof
-
-=item seek
-
-=item binmode
-
-=item opened
-
-=item autoflush
-
-=item input_line_number
-
-=item fileno
-
-=item close
-
-=item newStream([OPTS])
-
-=item deflateParams
-
-=back
-
-=item Importing 
-
-:all, :constants, :flush, :level, :strategy
-
-=item EXAMPLES
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item MODIFICATION HISTORY
-
-=item COPYRIGHT AND LICENSE
-
-=back
-
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Compress::Zip - Write zip files/buffers
+=======
+=head2 IO::Compress::RawDeflate - Write RFC 1951 files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -20010,7 +22042,11 @@ Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item zip $input => $output [, OPTS]
+=======
+=item rawdeflate $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 A filename, A filehandle, A scalar reference, An array reference, An Input
 FileGlob string, A filename, A filehandle, A scalar reference, An Array
@@ -20037,6 +22073,7 @@ A filename, A filehandle, A scalar reference
 =item Constructor Options
 
 C<< AutoClose => 0|1 >>, C<< Append => 0|1 >>, A Buffer, A Filename, A
+<<<<<<< HEAD:pod/kurilatoc.pod
 Filehandle, C<< Name => $string >>, C<< Time => $number >>, C<< ExtAttr =>
 $attr >>, C<< exTime => [$atime, $mtime, $ctime] >>, C<< Comment =>
 $comment >>, C<< ZipComment => $comment >>, C<< Method => $method >>, C<<
@@ -20044,6 +22081,9 @@ Stream => 0|1 >>, C<< Zip64 => 0|1 >>, C<< TextFlag => 0|1 >>, C<<
 ExtraFieldLocal => $data >> =item C<< ExtraFieldCentral => $data >>, C<<
 Minimal => 1|0 >>, C<< BlockSize100K => number >>, C<< WorkFactor => number
 >>, -Level, -Strategy, C<< Strict => 0|1 >>
+=======
+Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item Examples
 
@@ -20103,7 +22143,11 @@ Minimal => 1|0 >>, C<< BlockSize100K => number >>, C<< WorkFactor => number
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Dir - supply object methods for directory handles
+=======
+=head2 IO::Compress::Zip - Write zip files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -20126,7 +22170,11 @@ rewind (), close (), tie %hash, 'IO::Dir', DIRNAME [, OPTIONS ]
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item SYNOPSIS
+=======
+=item zip $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item DESCRIPTION
 
@@ -20157,7 +22205,18 @@ open( FILENAME [,MODE [,PERMS]] ), open( FILENAME, IOLAYERS ), binmode(
 
 =item CONSTRUCTOR
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 new (), new_from_fd ( FD, MODE )
+=======
+C<< AutoClose => 0|1 >>, C<< Append => 0|1 >>, A Buffer, A Filename, A
+Filehandle, C<< Name => $string >>, C<< Time => $number >>, C<< ExtAttr =>
+$attr >>, C<< exTime => [$atime, $mtime, $ctime] >>, C<< Comment =>
+$comment >>, C<< ZipComment => $comment >>, C<< Method => $method >>, C<<
+Stream => 0|1 >>, C<< Zip64 => 0|1 >>, C<< TextFlag => 0|1 >>, C<<
+ExtraFieldLocal => $data >> =item C<< ExtraFieldCentral => $data >>, C<<
+Minimal => 1|0 >>, C<< BlockSize100K => number >>, C<< WorkFactor => number
+>>, -Level, -Strategy, C<< Strict => 0|1 >>
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item METHODS
 
@@ -20223,7 +22282,11 @@ IO ), handles( [ EVENT_MASK ] )
 
 =head2 IO::Seekable - supply seek based methods for I/O objects
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =over 4
+=======
+:all, :constants, :flush, :level, :strategy, :zip_method
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item SYNOPSIS
 
@@ -20239,7 +22302,122 @@ $io->tell
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Select - OO interface to the select system call
+=======
+=head2 IO::Dir - supply object methods for directory handles
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item CONSTRUCTOR
+=======
+new ( [ DIRNAME ] ), open ( DIRNAME ), read (), seek ( POS ), tell (),
+rewind (), close (), tie %hash, 'IO::Dir', DIRNAME [, OPTIONS ]
+
+=item SEE ALSO
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+new ( [ HANDLES ] )
+=======
+=item AUTHOR
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item METHODS
+=======
+=item COPYRIGHT
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+add ( HANDLES ), remove ( HANDLES ), exists ( HANDLE ), handles, can_read (
+[ TIMEOUT ] ), can_write ( [ TIMEOUT ] ), has_exception ( [ TIMEOUT ] ),
+count (), bits(), select ( READ, WRITE, EXCEPTION [, TIMEOUT ] )
+=======
+=back
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item EXAMPLE
+=======
+=head2 IO::File - supply object methods for filehandles
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item AUTHOR
+=======
+=over 4
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item COPYRIGHT
+=======
+=item SYNOPSIS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item DESCRIPTION
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO::Socket - Object interface to socket communications
+=======
+=item CONSTRUCTOR
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+new ( FILENAME [,MODE [,PERMS]] ), new_tmpfile
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item SYNOPSIS
+=======
+=item METHODS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item DESCRIPTION
+=======
+open( FILENAME [,MODE [,PERMS]] ), open( FILENAME, IOLAYERS ), binmode(
+[LAYER] )
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item CONSTRUCTOR
+=======
+=item NOTE
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+new ( [ARGS] )
+=======
+=item SEE ALSO
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item METHODS
+
+accept([PKG]), socketpair(DOMAIN, TYPE, PROTOCOL), atmark, connected,
+protocol, sockdomain, sockopt(OPT [, VAL]), socktype, timeout([VAL])
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item COPYRIGHT
+=======
+=item HISTORY
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO::Socket::INET - Object interface for AF_INET domain sockets
+=======
+=head2 IO::Handle - supply object methods for I/O handles
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -20249,9 +22427,188 @@ $io->tell
 
 =item CONSTRUCTOR
 
-new ( [ HANDLES ] )
+<<<<<<< HEAD:pod/kurilatoc.pod
+new ( [ARGS] )
+=======
+new (), new_from_fd ( FD, MODE )
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=over 4
+=======
+=item METHODS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item METHODS
+=======
+$io->fdopen ( FD, MODE ), $io->opened, $io->getline, $io->getlines,
+$io->ungetc ( ORD ), $io->write ( BUF, LEN [, OFFSET ] ), $io->error,
+$io->clearerr, $io->sync, $io->flush, $io->printflush ( ARGS ),
+$io->blocking ( [ BOOL ] ), $io->untaint
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+sockaddr (), sockport (), sockhost (), peeraddr (), peerport (), peerhost
+()
+=======
+=item NOTE
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=back
+=======
+=item SEE ALSO
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item SEE ALSO
+=======
+=item BUGS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item AUTHOR
+=======
+=item HISTORY
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item COPYRIGHT
+=======
+=back
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=back
+=======
+=head2 IO::Pipe - supply object methods for pipes
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO::Socket::UNIX - Object interface for AF_UNIX domain sockets
+=======
+=over 4
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=over 4
+=======
+=item SYNOPSIS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item SYNOPSIS
+=======
+=item DESCRIPTION
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item DESCRIPTION
+=======
+=item CONSTRUCTOR
+
+new ( [READER, WRITER] )
 
 =item METHODS
+
+reader ([ARGS]), writer ([ARGS]), handles ()
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item COPYRIGHT
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item CONSTRUCTOR
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+new ( [ARGS] )
+=======
+=head2 IO::Poll - Object interface to system poll call
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item METHODS
+=======
+=over 4
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+hostpath(), peerpath()
+=======
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+
+mask ( IO [, EVENT_MASK ] ), poll ( [ TIMEOUT ] ), events ( IO ), remove (
+IO ), handles( [ EVENT_MASK ] )
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO::Uncompress::AnyInflate - Uncompress zlib-based (zip, gzip)
+file/buffer
+=======
+=head2 IO::Seekable - supply seek based methods for I/O objects
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+RFC 1950, RFC 1951 (optionally), gzip (RFC 1952), zip
+=======
+$io->getpos, $io->setpos, $io->seek ( POS, WHENCE ), WHENCE=0 (SEEK_SET),
+WHENCE=1 (SEEK_CUR), WHENCE=2 (SEEK_END), $io->sysseek( POS, WHENCE ),
+$io->tell
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item Functional Interface
+=======
+=item SEE ALSO
+
+=item HISTORY
+
+=back
+
+=head2 IO::Select - OO interface to the select system call
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item anyinflate $input => $output [, OPTS]
+=======
+=item SYNOPSIS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item DESCRIPTION
+
+=item CONSTRUCTOR
+
+new ( [ HANDLES ] )
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+C<< AutoClose => 0|1 >>, C<< BinModeOut => 0|1 >>, C<< Append => 0|1 >>,
+C<< MultiStream => 0|1 >>, C<< TrailingData => $scalar >>
+=======
+=item METHODS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 add ( HANDLES ), remove ( HANDLES ), exists ( HANDLE ), handles, can_read (
 [ TIMEOUT ] ), can_write ( [ TIMEOUT ] ), has_exception ( [ TIMEOUT ] ),
@@ -20275,7 +22632,16 @@ count (), bits(), select ( READ, WRITE, EXCEPTION [, TIMEOUT ] )
 
 =item CONSTRUCTOR
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
+>>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
+$size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< RawInflate => 0|1
+>>, C<< ParseExtra => 0|1 >> If the gzip FEXTRA header field is present and
+this option is set, it will force the module to check that it conforms to
+the sub-field structure as defined in RFC 1952
+=======
 new ( [ARGS] )
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item METHODS
 
@@ -20294,15 +22660,39 @@ protocol, sockdomain, sockopt(OPT [, VAL]), socktype, timeout([VAL])
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item read
+=======
 =item SYNOPSIS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item read
+=======
 =item DESCRIPTION
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item getline
+=======
 =item CONSTRUCTOR
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item getc
+=======
 new ( [ARGS] )
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item ungetc
+
+=item inflateSync
+
+=item getHeaderInfo
+=======
 =over 4
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item METHODS
 
@@ -20323,15 +22713,27 @@ sockaddr (), sockport (), sockhost (), peeraddr (), peerport (), peerhost
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item nextStream
+=======
 =item SYNOPSIS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item trailingData
+=======
 =item DESCRIPTION
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item CONSTRUCTOR
 
 new ( [ARGS] )
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+:all
+=======
 =item METHODS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 hostpath(), peerpath()
 
@@ -20343,7 +22745,11 @@ hostpath(), peerpath()
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO::Uncompress::AnyUncompress - Uncompress gzip, zip, bzip2 or lzop
+=======
 =head2 IO::Uncompress::AnyInflate - Uncompress zlib-based (zip, gzip)
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 file/buffer
 
 =over 4
@@ -20352,13 +22758,21 @@ file/buffer
 
 =item DESCRIPTION
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+RFC 1950, RFC 1951 (optionally), gzip (RFC 1952), zip, bzip2, lzop, lzf
+=======
 RFC 1950, RFC 1951 (optionally), gzip (RFC 1952), zip
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item Functional Interface
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item anyuncompress $input => $output [, OPTS]
+=======
 =item anyinflate $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 A filename, A filehandle, A scalar reference, An array reference, An Input
 FileGlob string, A filename, A filehandle, A scalar reference, An Array
@@ -20388,9 +22802,13 @@ A filename, A filehandle, A scalar reference
 C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
 >>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
 $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< RawInflate => 0|1
+<<<<<<< HEAD:pod/kurilatoc.pod
+>>
+=======
 >>, C<< ParseExtra => 0|1 >> If the gzip FEXTRA header field is present and
 this option is set, it will force the module to check that it conforms to
 the sub-field structure as defined in RFC 1952
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item Examples
 
@@ -20410,8 +22828,11 @@ the sub-field structure as defined in RFC 1952
 
 =item ungetc
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=======
 =item inflateSync
 
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =item getHeaderInfo
 
 =item tell
@@ -20454,113 +22875,7 @@ the sub-field structure as defined in RFC 1952
 
 =back
 
-=head2 IO::Uncompress::AnyUncompress - Uncompress gzip, zip, bzip2 or lzop
-file/buffer
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-RFC 1950, RFC 1951 (optionally), gzip (RFC 1952), zip, bzip2, lzop, lzf
-
-=item Functional Interface
-
-=over 4
-
-=item anyuncompress $input => $output [, OPTS]
-
-A filename, A filehandle, A scalar reference, An array reference, An Input
-FileGlob string, A filename, A filehandle, A scalar reference, An Array
-Reference, An Output FileGlob
-
-=item Notes
-
-=item Optional Parameters
-
-C<< AutoClose => 0|1 >>, C<< BinModeOut => 0|1 >>, C<< Append => 0|1 >>,
-C<< MultiStream => 0|1 >>, C<< TrailingData => $scalar >>
-
-=item Examples
-
-=back
-
-=item OO Interface
-
-=over 4
-
-=item Constructor
-
-A filename, A filehandle, A scalar reference
-
-=item Constructor Options
-
-C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
->>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
-$size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< RawInflate => 0|1
->>
-
-=item Examples
-
-=back
-
-=item Methods 
-
-=over 4
-
-=item read
-
-=item read
-
-=item getline
-
-=item getc
-
-=item ungetc
-
-=item getHeaderInfo
-
-=item tell
-
-=item eof
-
-=item seek
-
-=item binmode
-
-=item opened
-
-=item autoflush
-
-=item input_line_number
-
-=item fileno
-
-=item close
-
-=item nextStream
-
-=item trailingData
-
-=back
-
-=item Importing 
-
-:all
-
-=item EXAMPLES
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item MODIFICATION HISTORY
-
-=item COPYRIGHT AND LICENSE
-
-=back
-
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Uncompress::Base - Base Class for IO::Uncompress modules 
 
 =over 4
@@ -20580,6 +22895,10 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< RawInflate => 0|1
 =back
 
 =head2 IO::Uncompress::Gunzip - Read RFC 1952 files/buffers
+=======
+=head2 IO::Uncompress::AnyUncompress - Uncompress gzip, zip, bzip2 or lzop
+file/buffer
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -20587,11 +22906,17 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< RawInflate => 0|1
 
 =item DESCRIPTION
 
+RFC 1950, RFC 1951 (optionally), gzip (RFC 1952), zip, bzip2, lzop, lzf
+
 =item Functional Interface
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item gunzip $input => $output [, OPTS]
+=======
+=item anyuncompress $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 A filename, A filehandle, A scalar reference, An array reference, An Input
 FileGlob string, A filename, A filehandle, A scalar reference, An Array
@@ -20620,10 +22945,15 @@ A filename, A filehandle, A scalar reference
 
 C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
 >>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
+<<<<<<< HEAD:pod/kurilatoc.pod
 $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< ParseExtra => 0|1
 >> If the gzip FEXTRA header field is present and this option is set, it
 will force the module to check that it conforms to the sub-field structure
 as defined in RFC 1952
+=======
+$size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< RawInflate => 0|1
+>>
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item Examples
 
@@ -20643,11 +22973,17 @@ as defined in RFC 1952
 
 =item ungetc
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item inflateSync
 
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =item getHeaderInfo
+<<<<<<< HEAD:pod/kurilatoc.pod
 
 Name, Comment
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item tell
 
@@ -20689,7 +23025,11 @@ Name, Comment
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Uncompress::Inflate - Read RFC 1950 files/buffers
+=======
+=head2 IO::Uncompress::Base - Base Class for IO::Uncompress modules 
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -20697,6 +23037,7 @@ Name, Comment
 
 =item DESCRIPTION
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item Functional Interface
 
 =over 4
@@ -20784,6 +23125,8 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =item EXAMPLES
 
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =item SEE ALSO
 
 =item AUTHOR
@@ -20794,7 +23137,11 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Uncompress::RawInflate - Read RFC 1951 files/buffers
+=======
+=head2 IO::Uncompress::Gunzip - Read RFC 1952 files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -20806,7 +23153,11 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item rawinflate $input => $output [, OPTS]
+=======
+=item gunzip $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 A filename, A filehandle, A scalar reference, An array reference, An Input
 FileGlob string, A filename, A filehandle, A scalar reference, An Array
@@ -20835,7 +23186,14 @@ A filename, A filehandle, A scalar reference
 
 C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
 >>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
+<<<<<<< HEAD:pod/kurilatoc.pod
 $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
+=======
+$size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< ParseExtra => 0|1
+>> If the gzip FEXTRA header field is present and this option is set, it
+will force the module to check that it conforms to the sub-field structure
+as defined in RFC 1952
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item Examples
 
@@ -20858,6 +23216,8 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 =item inflateSync
 
 =item getHeaderInfo
+
+Name, Comment
 
 =item tell
 
@@ -20899,7 +23259,11 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Uncompress::Unzip - Read zip files/buffers
+=======
+=head2 IO::Uncompress::Inflate - Read RFC 1950 files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -20911,7 +23275,11 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item unzip $input => $output [, OPTS]
+=======
+=item inflate $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 A filename, A filehandle, A scalar reference, An array reference, An Input
 FileGlob string, A filename, A filehandle, A scalar reference, An Array
@@ -21004,7 +23372,11 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::Zlib - IO:: style interface to L<Compress::Zlib>
+=======
+=head2 IO::Uncompress::RawInflate - Read RFC 1951 files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -21054,7 +23426,11 @@ handles
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item SYNOPSIS
+=======
+=item rawinflate $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item DESCRIPTION
 
@@ -21241,8 +23617,12 @@ protocol, sockdomain, sockopt(OPT [, VAL]), socktype, timeout([VAL])
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =head2 IO::lib::IO::Socket::INET, IO::Socket::INET - Object interface for
 AF_INET domain sockets
+=======
+=head2 IO::Uncompress::Unzip - Read zip files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
@@ -21256,7 +23636,11 @@ new ( [ARGS] )
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item METHODS
+=======
+=item unzip $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 sockaddr (), sockport (), sockhost (), peeraddr (), peerport (), peerhost
 ()
@@ -21292,6 +23676,468 @@ hostpath(), peerpath()
 
 =item AUTHOR
 
+=item COPYRIGHT
+
+=back
+
+=head2 IO_Compress_Base::lib::File::GlobMapper, File::GlobMapper - Extend
+File Glob to Allow Input and Output Files
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+This code is a work in progress, There are known bugs, The interface
+defined here is tentative, There are portability issues, Do not use in
+production code, Consider yourself warned!
+
+=over 4
+
+=item Behind The Scenes
+
+=item Limitations
+
+=item Input File Glob
+
+B<~>, B<~user>, B<.>, B<*>, B<?>, B<\>,  B<[]>,  B<{,}>,  B<()>
+
+=item Output File Glob
+
+"*", #1
+
+=item Returned Data
+
+=back
+
+=item EXAMPLES
+
+=over 4
+
+=item A Rename script
+
+=item A few example globmaps
+
+=back
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item COPYRIGHT AND LICENSE
+
+=back
+
+=head2 IO_Compress_Base::lib::IO::Compress::Base, IO::Compress::Base - Base
+Class for IO::Compress modules 
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item MODIFICATION HISTORY
+
+=item COPYRIGHT AND LICENSE
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO_Compress_Base::lib::IO::Uncompress::AnyUncompress,
+IO::Uncompress::AnyUncompress - Uncompress gzip, zip, bzip2 or lzop
+file/buffer
+=======
+=head2 IO::Zlib - IO:: style interface to L<Compress::Zlib>
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+RFC 1950, RFC 1951 (optionally), gzip (RFC 1952), zip, bzip2, lzop, lzf
+
+=item Functional Interface
+
+=over 4
+
+=item anyuncompress $input => $output [, OPTS]
+
+A filename, A filehandle, A scalar reference, An array reference, An Input
+FileGlob string, A filename, A filehandle, A scalar reference, An Array
+Reference, An Output FileGlob
+
+=item Notes
+
+=item Optional Parameters
+
+C<< AutoClose => 0|1 >>, C<< BinModeOut => 0|1 >>, C<< Append => 0|1 >>,
+C<< MultiStream => 0|1 >>, C<< TrailingData => $scalar >>
+
+=item Examples
+
+=back
+
+=item OO Interface
+
+=over 4
+
+=item Constructor
+
+A filename, A filehandle, A scalar reference
+
+=item Constructor Options
+
+C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
+>>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
+$size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>, C<< RawInflate => 0|1
+>>
+
+=item Examples
+
+=back
+
+=item Methods 
+
+=over 4
+
+=item read
+
+=item read
+
+=item getline
+
+=item getc
+
+=item ungetc
+
+=item getHeaderInfo
+
+=item tell
+
+=item eof
+
+=item seek
+
+=item binmode
+
+=item opened
+
+=item autoflush
+
+=item input_line_number
+=======
+=item CONSTRUCTOR
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+new ( [ARGS] )
+
+=item OBJECT METHODS
+
+open ( FILENAME, MODE ), opened, close, getc, getline, getlines, print (
+ARGS... ), read ( BUF, NBYTES, [OFFSET] ), eof, seek ( OFFSET, WHENCE ),
+tell, setpos ( POS ), getpos ( POS )
+
+=item USING THE EXTERNAL GZIP
+
+=item CLASS METHODS
+
+has_Compress_Zlib, gzip_external, gzip_used, gzip_read_open,
+gzip_write_open
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+:all
+=======
+=item DIAGNOSTICS
+
+IO::Zlib::getlines: must be called in list context,
+IO::Zlib::gzopen_external: mode '...' is illegal, IO::Zlib::import: '...'
+is illegal, IO::Zlib::import: ':gzip_external' requires an argument,
+IO::Zlib::import: 'gzip_read_open' requires an argument, IO::Zlib::import:
+'gzip_read' '...' is illegal, IO::Zlib::import: 'gzip_write_open' requires
+an argument, IO::Zlib::import: 'gzip_write_open' '...' is illegal,
+IO::Zlib::import: no Compress::Zlib and no external gzip, IO::Zlib::open:
+needs a filename, IO::Zlib::READ: NBYTES must be specified,
+IO::Zlib::WRITE: too long LENGTH, IO::Zlib::WRITE: OFFSET is not supported
+
+=item SEE ALSO
+
+=item HISTORY
+
+=item COPYRIGHT
+
+=back
+
+=head2 IO::lib::IO::Dir, IO::Dir - supply object methods for directory
+handles
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+new ( [ DIRNAME ] ), open ( DIRNAME ), read (), seek ( POS ), tell (),
+rewind (), close (), tie %hash, 'IO::Dir', DIRNAME [, OPTIONS ]
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 IO::lib::IO::File, IO::File - supply object methods for filehandles
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item CONSTRUCTOR
+
+new ( FILENAME [,MODE [,PERMS]] ), new_tmpfile
+
+=item METHODS
+
+open( FILENAME [,MODE [,PERMS]] ), open( FILENAME, IOLAYERS ), binmode(
+[LAYER] )
+
+=item NOTE
+
+=item SEE ALSO
+
+=item HISTORY
+
+=back
+
+=head2 IO::lib::IO::Handle, IO::Handle - supply object methods for I/O
+handles
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item CONSTRUCTOR
+
+new (), new_from_fd ( FD, MODE )
+
+=item METHODS
+
+$io->fdopen ( FD, MODE ), $io->opened, $io->getline, $io->getlines,
+$io->ungetc ( ORD ), $io->write ( BUF, LEN [, OFFSET ] ), $io->error,
+$io->clearerr, $io->sync, $io->flush, $io->printflush ( ARGS ),
+$io->blocking ( [ BOOL ] ), $io->untaint
+
+=item NOTE
+
+=item SEE ALSO
+
+=item BUGS
+
+=item HISTORY
+
+=back
+
+=head2 IO::lib::IO::Pipe, IO::Pipe - supply object methods for pipes
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item CONSTRUCTOR
+
+new ( [READER, WRITER] )
+
+=item METHODS
+
+reader ([ARGS]), writer ([ARGS]), handles ()
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 IO::lib::IO::Poll, IO::Poll - Object interface to system poll call
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item METHODS
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item EXAMPLES
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item MODIFICATION HISTORY
+
+=item COPYRIGHT AND LICENSE
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO_Compress_Base::lib::IO::Uncompress::Base, IO::Uncompress::Base -
+Base Class for IO::Uncompress modules 
+=======
+=head2 IO::lib::IO::Seekable, IO::Seekable - supply seek based methods for
+I/O objects
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=item MODIFICATION HISTORY
+
+=item COPYRIGHT AND LICENSE
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO_Compress_Zlib::IO::Compress::Deflate, IO::Compress::Deflate -
+Write RFC 1950 files/buffers
+=======
+=head2 IO::lib::IO::Select, IO::Select - OO interface to the select system
+call
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item Functional Interface
+
+=over 4
+
+=item deflate $input => $output [, OPTS]
+
+A filename, A filehandle, A scalar reference, An array reference, An Input
+FileGlob string, A filename, A filehandle, A scalar reference, An Array
+Reference, An Output FileGlob
+
+=item Notes
+
+=item Optional Parameters
+
+C<< AutoClose => 0|1 >>, C<< BinModeIn => 0|1 >>, C<< Append => 0|1 >>
+
+=item Examples
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item OO Interface
+=======
+=head2 IO::lib::IO::Socket, IO::Socket - Object interface to socket
+communications
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item Constructor
+
+A filename, A filehandle, A scalar reference
+
+=item Constructor Options
+
+C<< AutoClose => 0|1 >>, C<< Append => 0|1 >>, A Buffer, A Filename, A
+Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
+
+=item Examples
+
+=back
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item Methods 
+=======
+=head2 IO::lib::IO::Socket::INET, IO::Socket::INET - Object interface for
+AF_INET domain sockets
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=over 4
+
+=item print
+
+=item printf
+
+=item syswrite
+
+=item write
+
+=item flush
+
+=item tell
+
+=item eof
+
+=item seek
+
+=item binmode
+
+=item opened
+
+=item autoflush
+
+=item input_line_number
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item fileno
+=======
+=head2 IO::lib::IO::Socket::UNIX, IO::Socket::UNIX - Object interface for
+AF_UNIX domain sockets
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item close
+
+=item newStream([OPTS])
+
+=item deflateParams
+
+=back
+
+=item Importing 
+
+:all, :constants, :flush, :level, :strategy
+
+=item EXAMPLES
+
+=item SEE ALSO
+
+=item AUTHOR
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=======
 =item COPYRIGHT
 
 =back
@@ -21585,6 +24431,7 @@ Filehandle, C<< Merge => 0|1 >>, -Level, -Strategy, C<< Strict => 0|1 >>
 
 =item AUTHOR
 
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =item MODIFICATION HISTORY
 
 =item COPYRIGHT AND LICENSE
@@ -22222,6 +25069,7 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 =item SEE ALSO
 
 =item AUTHOR
+<<<<<<< HEAD:pod/kurilatoc.pod
 
 =item MODIFICATION HISTORY
 
@@ -22268,23 +25116,152 @@ C<< MultiStream => 0|1 >>, C<< TrailingData => $scalar >>
 A filename, A filehandle, A scalar reference
 
 =item Constructor Options
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
 >>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
 $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
+=======
+=item MODIFICATION HISTORY
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item Examples
+=======
+=item COPYRIGHT AND LICENSE
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =back
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item Methods 
+=======
+=head2 IO_Compress_Zlib::IO::Uncompress::RawInflate,
+IO::Uncompress::RawInflate - Read RFC 1951 files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item read
+=======
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item Functional Interface
+
+=over 4
+
+=item rawinflate $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item read
+=======
+A filename, A filehandle, A scalar reference, An array reference, An Input
+FileGlob string, A filename, A filehandle, A scalar reference, An Array
+Reference, An Output FileGlob
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item getline
+=======
+=item Notes
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item getc
+=======
+=item Optional Parameters
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item ungetc
+=======
+C<< AutoClose => 0|1 >>, C<< BinModeOut => 0|1 >>, C<< Append => 0|1 >>,
+C<< MultiStream => 0|1 >>, C<< TrailingData => $scalar >>
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item inflateSync
+=======
+=item Examples
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item getHeaderInfo
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item tell
+=======
+=item OO Interface
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+=item eof
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item seek
+=======
+=item Constructor
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item binmode
+=======
+A filename, A filehandle, A scalar reference
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item opened
+=======
+=item Constructor Options
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item autoflush
+=======
+C<< AutoClose => 0|1 >>, C<< MultiStream => 0|1 >>, C<< Prime => $string
+>>, C<< Transparent => 0|1 >>, C<< BlockSize => $num >>, C<< InputLength =>
+$size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item input_line_number
+=======
+=item Examples
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item fileno
+=======
+=back
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item close
+=======
+=item Methods 
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item nextStream
+=======
+=over 4
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item trailingData
+=======
+=item read
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item read
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item Importing 
+=======
 =item getline
 
 =item getc
@@ -22292,20 +25269,40 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 =item ungetc
 
 =item inflateSync
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+:all
+=======
 =item getHeaderInfo
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item EXAMPLES
+=======
 =item tell
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item eof
 
 =item seek
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item MODIFICATION HISTORY
+
+=item COPYRIGHT AND LICENSE
+=======
 =item binmode
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item opened
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=head2 IO_Compress_Zlib::IO::Uncompress::Unzip, IO::Uncompress::Unzip -
+Read zip files/buffers
+=======
 =item autoflush
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =item input_line_number
 
@@ -22313,6 +25310,9 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =item close
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item Functional Interface
+=======
 =item nextStream
 
 =item trailingData
@@ -22337,9 +25337,13 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 
 =head2 IO_Compress_Zlib::IO::Uncompress::Unzip, IO::Uncompress::Unzip -
 Read zip files/buffers
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
 =over 4
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item unzip $input => $output [, OPTS]
+=======
 =item SYNOPSIS
 
 =item DESCRIPTION
@@ -22347,20 +25351,43 @@ Read zip files/buffers
 =item Functional Interface
 
 =over 4
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
-=item unzip $input => $output [, OPTS]
-
+<<<<<<< HEAD:pod/kurilatoc.pod
 A filename, A filehandle, A scalar reference, An array reference, An Input
 FileGlob string, A filename, A filehandle, A scalar reference, An Array
 Reference, An Output FileGlob
+=======
+=item unzip $input => $output [, OPTS]
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item Notes
+=======
+A filename, A filehandle, A scalar reference, An array reference, An Input
+FileGlob string, A filename, A filehandle, A scalar reference, An Array
+Reference, An Output FileGlob
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item Optional Parameters
+=======
+=item Notes
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+C<< AutoClose => 0|1 >>, C<< BinModeOut => 0|1 >>, C<< Append => 0|1 >>,
+C<< MultiStream => 0|1 >>, C<< TrailingData => $scalar >>
+=======
+=item Optional Parameters
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=======
 C<< AutoClose => 0|1 >>, C<< BinModeOut => 0|1 >>, C<< Append => 0|1 >>,
 C<< MultiStream => 0|1 >>, C<< TrailingData => $scalar >>
 
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =item Examples
 
 =back
@@ -22410,25 +25437,63 @@ $size >>, C<< Append => 0|1 >>, C<< Strict => 0|1 >>
 =item binmode
 
 =item opened
+<<<<<<< HEAD:pod/kurilatoc.pod
 
 =item autoflush
 
 =item input_line_number
+=======
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item fileno
+=======
+=item autoflush
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item close
+=======
+=item input_line_number
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item nextStream
+=======
+=item fileno
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =item trailingData
+=======
+=item close
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
 =back
+=======
+=item nextStream
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 
+<<<<<<< HEAD:pod/kurilatoc.pod
+=item Importing 
+=======
+=item trailingData
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+:all
+=======
+=back
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
+
+<<<<<<< HEAD:pod/kurilatoc.pod
+=======
 =item Importing 
 
 :all
 
+>>>>>>> origin/bleadperl~0:pod/perltoc.pod
 =item EXAMPLES
 
 =item SEE ALSO
@@ -23406,6 +26471,14 @@ ffround ( +$scale ), ffround ( -$scale ), ffround ( 0 ), fround  ( +$scale
 
 =item precision()
 
+=item bexp()
+
+=item bnok()
+
+=item bpi()
+
+=item bmuladd()
+
 =back
 
 =item Autocreating constants
@@ -23417,6 +26490,8 @@ ffround ( +$scale ), ffround ( -$scale ), ffround ( 0 ), fround  ( +$scale
 =item Using Math::BigInt::Lite
 
 =back
+
+=item EXPORTS
 
 =item BUGS
 
@@ -23506,6 +26581,8 @@ Input, Output
 
 =item bmul()
 
+=item bmuladd()
+
 =item bdiv()
 
 =item bmod()
@@ -23519,6 +26596,10 @@ Input, Output
 =item blog()
 
 =item bexp()
+
+=item bnok()
+
+=item bpi()
 
 =item blsft()
 
@@ -23642,6 +26723,8 @@ oct()/hex(), log(-inf), exp(), cos(), sin(), atan2()
 bsqrt(), div(), blog(), bexp()
 
 =back
+
+=item EXPORTS
 
 =item BUGS
 
@@ -24184,14 +27267,14 @@ install_base_relpaths(), install_base_relpaths($type),
 install_base_relpaths($type => $path), install_destination($type),
 install_path(), install_path($type), install_path($type => $path),
 install_types(), invoked_action(), notes(), notes($key), notes($key =>
-$value), orig_dir(), os_type(), prefix_relpaths(),
-prefix_relpaths($installdirs), prefix_relpaths($installdirs, $type),
-prefix_relpaths($installdirs, $type => $path), prepare_metadata(),
-prereq_failures(), prereq_report(), prompt($message, $default),
-recommends(), requires(), rscan_dir($dir, $pattern), runtime_params(),
-runtime_params($key), script_files(), up_to_date($source_file,
-$derived_file), up_to_date(\@source_files, \@derived_files), y_n($message,
-$default)
+$value), orig_dir(), os_type(), is_vmsish(), is_windowsish(), is_unixish(),
+prefix_relpaths(), prefix_relpaths($installdirs),
+prefix_relpaths($installdirs, $type), prefix_relpaths($installdirs, $type
+=> $path), prepare_metadata(), prereq_failures(), prereq_report(),
+prompt($message, $default), recommends(), requires(), rscan_dir($dir,
+$pattern), runtime_params(), runtime_params($key), script_files(),
+up_to_date($source_file, $derived_file), up_to_date(\@source_files,
+\@derived_files), y_n($message, $default)
 
 =item Autogenerated Accessors
 
@@ -24548,6 +27631,8 @@ _backticks
 do_system
 
 _infer_xs_spec
+
+rscan_dir
 
 =over 4
 
@@ -30375,6 +33460,18 @@ http://www.unicode.org/review/pr-29.html, http://www.unicode.org/notes/tn5/
 
 =over 4
 
+=item general_categories
+
+=back
+
+=over 4
+
+=item bidi_types
+
+=back
+
+=over 4
+
 =item compexcl
 
 =back
@@ -30468,23 +33565,26 @@ March 18th, 2000
 =item Alphabetical Listing of Win32 Functions
 
 Win32::AbortSystemShutdown(MACHINE), Win32::BuildNumber(),
-Win32::CopyFile(FROM, TO, OVERWRITE), Win32::DomainName(),
+Win32::CopyFile(FROM, TO, OVERWRITE), Win32::CreateDirectory(DIRECTORY),
+Win32::CreateFile(FILE), Win32::DomainName(),
 Win32::ExpandEnvironmentStrings(STRING), Win32::FormatMessage(ERRORCODE),
-Win32::FsType(), Win32::FreeLibrary(HANDLE), Win32::GetArchName(),
-Win32::GetChipName(), Win32::GetCwd(), Win32::GetFileVersion(FILENAME),
-Win32::GetFolderPath(FOLDER [, CREATE]), Win32::GetFullPathName(FILENAME),
-Win32::GetLastError(), Win32::GetLongPathName(PATHNAME),
-Win32::GetNextAvailDrive(), Win32::GetOSVersion(), Win32::GetOSName(),
+Win32::FsType(), Win32::FreeLibrary(HANDLE),
+Win32::GetANSIPathName(FILENAME), Win32::GetArchName(),
+Win32::GetChipName(), Win32::GetCwd(), Win32::GetCurrentThreadId(),
+Win32::GetFileVersion(FILENAME), Win32::GetFolderPath(FOLDER [, CREATE]),
+Win32::GetFullPathName(FILENAME), Win32::GetLastError(),
+Win32::GetLongPathName(PATHNAME), Win32::GetNextAvailDrive(),
+Win32::GetOSVersion(), Win32::GetOSName(),
 Win32::GetShortPathName(PATHNAME), Win32::GetProcAddress(INSTANCE,
 PROCNAME), Win32::GetTickCount(), Win32::GuidGen(), Win32::IsAdminUser(),
 Win32::IsWinNT(), Win32::IsWin95(), Win32::LoadLibrary(LIBNAME),
 Win32::LoginName(), Win32::LookupAccountName(SYSTEM, ACCOUNT, DOMAIN, SID,
 SIDTYPE), Win32::LookupAccountSID(SYSTEM, SID, ACCOUNT, DOMAIN, SIDTYPE),
 Win32::MsgBox(MESSAGE [, FLAGS [, TITLE]]), Win32::NodeName(),
-Win32::RegisterServer(LIBRARYNAME), Win32::SetChildShowWindow(SHOWWINDOW),
-Win32::SetCwd(NEWDIRECTORY), Win32::SetLastError(ERROR),
-Win32::Sleep(TIME), Win32::Spawn(COMMAND, ARGS, PID),
-Win32::UnregisterServer(LIBRARYNAME)
+Win32::OutputDebugString(STRING), Win32::RegisterServer(LIBRARYNAME),
+Win32::SetChildShowWindow(SHOWWINDOW), Win32::SetCwd(NEWDIRECTORY),
+Win32::SetLastError(ERROR), Win32::Sleep(TIME), Win32::Spawn(COMMAND, ARGS,
+PID), Win32::UnregisterServer(LIBRARYNAME)
 
 =back
 

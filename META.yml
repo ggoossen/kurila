@@ -6,6 +6,7 @@ license: perl
 distribution_type: core
 no_index:
   directory:
+    - ext/Compress/Raw
     - ext/Compress/Zlib
     - ext/Cwd
     - ext/Data/Dumper
@@ -15,6 +16,8 @@ no_index:
     - ext/Digest/SHA
     - ext/Encode
     - ext/IO
+    - ext/IO_Compress_Base
+    - ext/IO_Compress_Zlib
     - ext/List/Util
     - ext/Math/BigInt/FastCalc
     - ext/MIME/Base64
@@ -32,13 +35,20 @@ no_index:
     - ext/Win32API/File
     - lib/Archive/Extract
     - lib/Archive/Tar
-    - lib/assertions
     - lib/Attribute/Handlers
     - lib/base
     - lib/bignum
     - lib/CGI
     - lib/Class/ISA
     - lib/CPAN
+    - lib/CPANPLUS/Backend
+    - lib/CPANPLUS/bin
+    - lib/CPANPLUS/Configure
+    - lib/CPANPLUS/Dist/Build
+    - lib/CPANPLUS/Internals
+    - lib/CPANPLUS/Module
+    - lib/CPANPLUS/Shell
+    - lib/CPANPLUS/t
     - lib/Digest
     - lib/ExtUtils/CBuilder
     - lib/ExtUtils/ParseXS
@@ -98,10 +108,8 @@ no_index:
     - ext/Filter/Util/Call
     - ext/threads/threads.pm
     - ext/threads/threads.xs
-    - ext/threads/typemap
     - lib/Archive/Extract.pm
     - lib/Archive/Tar.pm
-    - lib/assertions.pm
     - lib/Attribute/Handlers.pm
     - lib/AutoLoader.pm
     - lib/AutoLoader.t
@@ -112,6 +120,19 @@ no_index:
     - lib/CGI.pm
     - lib/Class/ISA.pm
     - lib/CPAN.pm
+    - lib/CPANPLUS.pm
+    - lib/CPANPLUS/Backend.pm
+    - lib/CPANPLUS/Config.pm
+    - lib/CPANPLUS/Configure.pm
+    - lib/CPANPLUS/Dist/Build.pm
+    - lib/CPANPLUS/Error.pm
+    - lib/CPANPLUS/FAQ.pod
+    - lib/CPANPLUS/Hacking.pod
+    - lib/CPANPLUS/inc.pm
+    - lib/CPANPLUS/Internals.pm
+    - lib/CPANPLUS/Module.pm
+    - lib/CPANPLUS/Selfupdate.pm
+    - lib/CPANPLUS/Shell.pm
     - lib/Cwd.pm
     - lib/Devel/InnerPackage.pm
     - lib/Digest.pm
@@ -255,7 +276,6 @@ no_index:
     - lib/Pod/Usage.pm
     - lib/Shell.pm
     - lib/Shell.t
-    - lib/Switch
     - lib/Switch.pm
     - lib/Term/ANSIColor.pm
     - lib/Term/Cap.pm
@@ -282,12 +302,9 @@ no_index:
     - pod/pod2usage.PL
     - pod/podchecker.PL
     - pod/podselect.PL
-    - t/comp/assertions.t
-    - t/comp/asstcompat.t
     - t/lib/filter-util.pl
     - t/lib/TieIn.pm
     - t/lib/TieOut.pm
-    - t/lib/ZlibTestUtils.pm
     - t/pod/emptycmd.t
     - t/pod/emptycmd.xr
     - t/pod/find.t
