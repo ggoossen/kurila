@@ -75,3 +75,78 @@ is(eval { MRO_N->testfunc() }, 123);
 # XXX TODO (when there's a way to backtrack through a glob's aliases)
 # push(@MRO_M::ISA, 'MRO_TestOtherBase');
 # is(eval { MRO_N->testfunctwo() }, 321);
+
+# Simple DESTROY Baseline
+{
+    my $x = 0;
+    my $obj;
+
+    {
+        package DESTROY_MRO_Baseline;
+        sub new { bless {} => shift }
+        sub DESTROY { $x++ }
+
+        package DESTROY_MRO_Baseline_Child;
+        our @ISA = qw/DESTROY_MRO_Baseline/;
+    }
+
+    $obj = DESTROY_MRO_Baseline->new();
+    undef $obj;
+    is($x, 1);
+
+    $obj = DESTROY_MRO_Baseline_Child->new();
+    undef $obj;
+    is($x, 2);
+}
+
+# Dynamic DESTROY
+{
+    my $x = 0;
+    my $obj;
+
+    {
+        package DESTROY_MRO_Dynamic;
+        sub new { bless {} => shift }
+
+        package DESTROY_MRO_Dynamic_Child;
+        our @ISA = qw/DESTROY_MRO_Dynamic/;
+    }
+
+    $obj = DESTROY_MRO_Dynamic->new();
+    undef $obj;
+    is($x, 0);
+
+    $obj = DESTROY_MRO_Dynamic_Child->new();
+    undef $obj;
+    is($x, 0);
+
+    no warnings 'once';
+    *DESTROY_MRO_Dynamic::DESTROY = sub { $x++ };
+
+    $obj = DESTROY_MRO_Dynamic->new();
+    undef $obj;
+    is($x, 1);
+
+    $obj = DESTROY_MRO_Dynamic_Child->new();
+    undef $obj;
+    is($x, 2);
+}
+
+# clearing @ISA in different ways
+{
+    no warnings 'uninitialized';
+    {
+        package ISACLEAR;
+        our @ISA = qw/XX YY ZZ/;
+    }
+    # baseline
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX YY ZZ/]));
+
+    # this looks dumb, but it preserves existing behavior for compatibility
+    #  (undefined @ISA elements treated as "main")
+    $ISACLEAR::ISA[1] = undef;
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX main ZZ/]));
+
+    undef @ISACLEAR::ISA;
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR/]));
+}

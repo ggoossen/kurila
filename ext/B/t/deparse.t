@@ -19,18 +19,13 @@ BEGIN {
     }
 }
 
-$|  = 1;
 use warnings;
 use strict;
-use Config;
-
-print "1..47\n";
+use Test::More tests => 50;
 
 use B::Deparse;
-my $deparse = B::Deparse->new() or print "not ";
-my $i=1;
-print "ok " . $i++ . "\n";
-
+my $deparse = B::Deparse->new();
+ok($deparse);
 
 # Tell B::Deparse about our ambient pragmas
 { my ($hint_bits, $warning_bits);
@@ -44,8 +39,8 @@ print "ok " . $i++ . "\n";
 $/ = "\n####\n";
 while (<DATA>) {
     chomp;
-    s/#.*$//mg;
-
+    s/#(.*)$//mg;
+    my ($num) = $1 =~ m/(\d+)/;
     my ($input, $expected);
     if (/(.*)\n>>>>\n(.*)/s) {
 	($input, $expected) = ($1, $2);
@@ -57,8 +52,7 @@ while (<DATA>) {
     my $coderef = eval "sub {$input}";
 
     if ($@) {
-	print "not ok " . $i++ . "\n";
-	print "# $@";
+	ok(0, "$num deparsed: $@");
     }
     else {
 	my $deparsed = $deparse->coderef2text( $coderef );
@@ -66,37 +60,21 @@ while (<DATA>) {
 	$regex =~ s/(\S+)/\Q$1/g;
 	$regex =~ s/\s+/\\s+/g;
 	$regex = '^\{\s*' . $regex . '\s*\}$';
-
-	my $ok = ($deparsed =~ /$regex/);
-	print (($ok ? "ok " : "not ok ") . $i++ . "\n");
-	if (!$ok) {
-	    print "# EXPECTED:\n";
-	    $regex =~ s/^/# /mg;
-	    print "$regex\n";
-
-	    print "\n# GOT: \n";
-	    $deparsed =~ s/^/# /mg;
-	    print "$deparsed\n";
-	}
+        like($deparsed, qr/$regex/);
     }
 }
 
 use constant 'c', 'stuff';
-print "not " if (eval "sub ".$deparse->coderef2text(\&c))->() ne 'stuff';
-print "ok " . $i++ . "\n";
+is((eval "sub ".$deparse->coderef2text(\&c))->(), 'stuff');
 
-$a = 0;
-print "not " if "{\n    (-1) ** \$a;\n}"
-		ne $deparse->coderef2text(sub{(-1) ** $a });
-print "ok " . $i++ . "\n";
+my $a = 0;
+is("{\n    (-1) ** \$a;\n}", $deparse->coderef2text(sub{(-1) ** $a }));
 
 use constant cr => ['hello'];
 my $string = "sub " . $deparse->coderef2text(\&cr);
 my $val = (eval $string)->();
-print "not " if ref($val) ne 'ARRAY' || $val->[0] ne 'hello';
-print "ok " . $i++ . "\n";
+ok( ref($val) eq 'ARRAY' && $val->[0] eq 'hello');
 
-my $a;
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
 
@@ -125,8 +103,7 @@ $b =~ s/(LINE:)/sub BEGIN {
     'XL'->bootstrap;
 }
 $1/ if $Is_MacOS;
-print "# [$a]\n\# vs expected\n# [$b]\nnot " if $a ne $b;
-print "ok " . $i++ . "\n";
+is($a, $b);
 
 #Re: perlbug #35857, patch #24505
 #handle warnings::register-ed packages properly.
@@ -145,7 +122,7 @@ use warnings;
 sub test {
    my $val = shift;
    my $res = B::Deparse::Wrapper::getcode($val);
-   print $res =~ /use warnings/ ? '' : 'not ', 'ok ', $i++, "\n";
+   like( $res, qr/use warnings/);
 }
 my ($q,$p);
 my $x=sub { ++$q,++$p };
@@ -270,7 +247,7 @@ my $i;
 while ($i) { my $z = 1; } continue { $i = 99; }
 ####
 # 23
-foreach $i (1, 2) {
+foreach my $i (1, 2) {
     my $z = 1;
 }
 ####
@@ -348,3 +325,13 @@ my $f = sub {
 ####
 # 41 (ibid.)
 &::::;
+####
+# 42
+my $bar;
+'Foo'->$bar('orz');
+####
+# 43
+'Foo'->bar('orz');
+####
+# 44
+'Foo'->bar;
