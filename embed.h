@@ -440,7 +440,6 @@
 #define magic_setenv		Perl_magic_setenv
 #define magic_sethint		Perl_magic_sethint
 #define magic_setisa		Perl_magic_setisa
-#define magic_freeisa		Perl_magic_freeisa
 #define magic_setglob		Perl_magic_setglob
 #define magic_setmglob		Perl_magic_setmglob
 #define magic_setnkeys		Perl_magic_setnkeys
@@ -1392,6 +1391,7 @@
 #endif
 #  ifdef DEBUGGING
 #if defined(PERL_CORE) || defined(PERL_EXT)
+#define regdump_extflags	S_regdump_extflags
 #define dumpuntil		S_dumpuntil
 #define put_byte		S_put_byte
 #define dump_trie		S_dump_trie
@@ -2711,7 +2711,6 @@
 #define magic_setenv(a,b)	Perl_magic_setenv(aTHX_ a,b)
 #define magic_sethint(a,b)	Perl_magic_sethint(aTHX_ a,b)
 #define magic_setisa(a,b)	Perl_magic_setisa(aTHX_ a,b)
-#define magic_freeisa(a,b)	Perl_magic_freeisa(aTHX_ a,b)
 #define magic_setglob(a,b)	Perl_magic_setglob(aTHX_ a,b)
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
 #define magic_setnkeys(a,b)	Perl_magic_setnkeys(aTHX_ a,b)
@@ -3660,6 +3659,7 @@
 #endif
 #  ifdef DEBUGGING
 #if defined(PERL_CORE) || defined(PERL_EXT)
+#define regdump_extflags(a,b)	S_regdump_extflags(aTHX_ a,b)
 #define dumpuntil(a,b,c,d,e,f,g,h)	S_dumpuntil(aTHX_ a,b,c,d,e,f,g,h)
 #define put_byte(a,b)		S_put_byte(aTHX_ a,b)
 #define dump_trie(a,b,c,d)	S_dump_trie(aTHX_ a,b,c,d)

@@ -247,7 +247,7 @@ and check for NULL.
 #define RXf_PMf_FOLD    	0x00004000 /* /i         */
 #define RXf_PMf_EXTENDED	0x00008000 /* /x         */
 #define RXf_PMf_UTF8            0x00010000 /* /u         */
-#define RXf_PMf_KEEPCOPY	0x00020000 /* /k         */
+#define RXf_PMf_KEEPCOPY	0x00020000 /* /p         */
 /* these flags are transfered from the PMOP->op_pmflags member during compilation */
 #define RXf_PMf_STD_PMMOD	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_UTF8)
 #define RXf_PMf_COMPILETIME	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_KEEPCOPY|RXf_PMf_UTF8)
@@ -350,9 +350,9 @@ and check for NULL.
 	}} STMT_END
 #endif
 
-#define RX_MATCH_UTF8(prog)		((prog)->extflags & RX_BUFF_IDX_FULLMATCH_UTF8)
-#define RX_MATCH_UTF8_on(prog)		((prog)->extflags |= RX_BUFF_IDX_FULLMATCH_UTF8)
-#define RX_MATCH_UTF8_off(prog)		((prog)->extflags &= ~RX_BUFF_IDX_FULLMATCH_UTF8)
+#define RX_MATCH_UTF8(prog)		((prog)->extflags & RXf_MATCH_UTF8)
+#define RX_MATCH_UTF8_on(prog)		((prog)->extflags |= RXf_MATCH_UTF8)
+#define RX_MATCH_UTF8_off(prog)		((prog)->extflags &= ~RXf_MATCH_UTF8)
 #define RX_MATCH_UTF8_set(prog, t)	((t) \
 			? (RX_MATCH_UTF8_on(prog), (PL_reg_match_utf8 = 1)) \
 			: (RX_MATCH_UTF8_off(prog), (PL_reg_match_utf8 = 0)))

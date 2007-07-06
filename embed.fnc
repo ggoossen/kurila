@@ -454,7 +454,6 @@ p	|int	|magic_setdefelem|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setenv	|NN SV* sv|NN MAGIC* mg
 dp	|int	|magic_sethint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setisa	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_freeisa	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setglob	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setmglob	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setnkeys	|NN SV* sv|NN MAGIC* mg
@@ -1392,6 +1391,7 @@ Es	|I32	|make_trie	|NN struct RExC_state_t* state|NN regnode *startbranch \
 Es	|void	|make_trie_failtable	|NN struct RExC_state_t* state \
                                 |NN regnode *source|NN regnode *node|U32 depth
 #  ifdef DEBUGGING
+Es	|void	|regdump_extflags|NULLOK const char *lead| const U32 flags
 Es	|const regnode*|dumpuntil|NN const regexp *r|NN const regnode *start \
 				|NN const regnode *node \
 				|NULLOK const regnode *last \
