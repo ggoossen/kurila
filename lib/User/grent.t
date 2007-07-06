@@ -18,10 +18,10 @@ BEGIN {
 }
 
 use strict;
-our @grent;
+our ($gid, @grent);
 BEGIN {
-    our $gid = $^O ne 'cygwin' ? 0 : 18;
-    our @grent = getgrgid $gid; # This is the function getgrgid.
+    $gid = $^O ne 'cygwin' ? 0 : 18;
+    @grent = getgrgid $gid; # This is the function getgrgid.
     unless (@grent) { plan skip_all => "no gid 0"; }
 }
 
