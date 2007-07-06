@@ -147,7 +147,7 @@ is(eval { MRO_N->testfunc() }, 123);
     # this looks dumb, but it preserves existing behavior for compatibility
     #  (undefined @ISA elements treated as "main")
     $ISACLEAR::ISA[1] = undef;
-    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX main ZZ/]));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX main/, undef, qw/ZZ/]));
 
     # undef the array itself
     undef @ISACLEAR::ISA;
