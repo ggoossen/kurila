@@ -997,7 +997,7 @@ my ($v);
 my %h = ("\0011\002\r\n\t\f\"\\abcdefghijklmnopqrstuvwxyz", undef);
 $v = join '', %h;
 EXPECT
-Use of uninitialized value $h{"\0011\2\r\n\t\f\"\\abcdefghijklm"...} in join or string at - line 6.
+Use of uninitialized value $h{"\x[1]1\x[2]\r\n\t\f\"\\abcdefghi"...} in join or string at - line 6.
 ########
 use warnings 'uninitialized';
 my ($m1, $v);

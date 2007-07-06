@@ -156,12 +156,15 @@ $map{"rjk-perl-p5p\100tamias.net"} = "rjk\100linguist.dartmouth.edu";
 $map{"sts\100accognoscere.org"} = "schubiger\100cpan.org";
 $map{"s.payrard\100wanadoo.fr"} = "stef\100mongueurs.net";
 $map{"richard.foley\100ubs.com"} = "richard.foley\100ubsw.com";
-# I assume that Ton Hopsel's lack of e-mail address in AUTHORS is deliberate
+$map{"jerry\100hedden.us"} = $map{"jdhedden\100" . "1979.usna.com"} =
+$map{"jdhedden\100gmail.com"} = $map{"jdhedden\100yahoo.com"}
+  = "jdhedden\100cpan.org";
+# I assume that Ton Hospel's lack of e-mail address in AUTHORS is deliberate
 $map{"me-02\100ton.iguana.be"} = $map{"perl-5.8.0\100ton.iguana.be"}
   = $map{"perl5-porters\100ton.iguana.be"} = "!";
 # No real name for these address
 $map{$_} = "?" foreach ("grommel\100sears.com", "pxm\100nubz.org",
-			"padre\100elte.hu", "jdhedden\100" . "1979.usna.com",
+			"padre\100elte.hu",
 			"nothingmuch\100woobling.org", "bob\100starlabs.net",
 			"bbucklan\100jpl-devvax.jpl.nasa.gov",
 			"bilbo\100ua.fm", "mats\100sm5sxl.net",

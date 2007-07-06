@@ -1830,24 +1830,51 @@ Perl_my_memcmp(const char *s1, const char *s2, register I32 len)
 #endif /* !HAS_MEMCMP || !HAS_SANE_MEMCMP */
 
 #ifndef HAS_VPRINTF
+/* This vsprintf replacement should generally never get used, since
+   vsprintf was available in both System V and BSD 2.11.  (There may
+   be some cross-compilation or embedded set-ups where it is needed,
+   however.)
+
+   If you encounter a problem in this function, it's probably a symptom
+   that Configure failed to detect your system's vprintf() function.
+   See the section on "item vsprintf" in the INSTALL file.
+
+   This version may compile on systems with BSD-ish <stdio.h>,
+   but probably won't on others.
+*/
 
 #ifdef USE_CHAR_VSPRINTF
 char *
 #else
 int
 #endif
-vsprintf(char *dest, const char *pat, char *args)
+vsprintf(char *dest, const char *pat, void *args)
 {
     FILE fakebuf;
 
+#if defined(STDIO_PTR_LVALUE) && defined(STDIO_CNT_LVALUE)
+    FILE_ptr(&fakebuf) = (STDCHAR *) dest;
+    FILE_cnt(&fakebuf) = 32767;
+#else
+    /* These probably won't compile -- If you really need
+       this, you'll have to figure out some other method. */
     fakebuf._ptr = dest;
     fakebuf._cnt = 32767;
+#endif
 #ifndef _IOSTRG
 #define _IOSTRG 0
 #endif
     fakebuf._flag = _IOWRT|_IOSTRG;
     _doprnt(pat, args, &fakebuf);	/* what a kludge */
-    (void)putc('\0', &fakebuf);
+#if defined(STDIO_PTR_LVALUE)
+    *(FILE_ptr(&fakebuf)++) = '\0';
+#else
+    /* PerlIO has probably #defined away fputc, but we want it here. */
+#  ifdef fputc
+#    undef fputc  /* XXX Should really restore it later */
+#  endif
+    (void)fputc('\0', &fakebuf);
+#endif
 #ifdef USE_CHAR_VSPRINTF
     return(dest);
 #else
@@ -1880,7 +1907,10 @@ Perl_my_htonl(pTHX_ long l)
 	char c[sizeof(long)];
     } u;
 
-#if BYTEORDER == 0x1234
+#if BYTEORDER == 0x1234 || BYTEORDER == 0x12345678
+#if BYTEORDER == 0x12345678
+    u.result = 0; 
+#endif 
     u.c[0] = (l >> 24) & 255;
     u.c[1] = (l >> 16) & 255;
     u.c[2] = (l >> 8) & 255;
@@ -2479,7 +2509,7 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 #if defined(atarist) || defined(EPOC)
 FILE *popen();
 PerlIO *
-Perl_my_popen((pTHX_ const char *cmd, const char *mode)
+Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 {
     PERL_FLUSHALL_FOR_CHILD;
     /* Call system's popen() to get a FILE *, then import it.
@@ -2492,7 +2522,7 @@ Perl_my_popen((pTHX_ const char *cmd, const char *mode)
 #if defined(DJGPP)
 FILE *djgpp_popen();
 PerlIO *
-Perl_my_popen((pTHX_ const char *cmd, const char *mode)
+Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 {
     PERL_FLUSHALL_FOR_CHILD;
     /* Call system's popen() to get a FILE *, then import it.

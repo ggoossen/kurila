@@ -8274,7 +8274,7 @@ Perl_peep(pTHX_ register OP *o)
     LEAVE;
 }
 
-char*
+const char*
 Perl_custom_op_name(pTHX_ const OP* o)
 {
     dVAR;
@@ -8294,7 +8294,7 @@ Perl_custom_op_name(pTHX_ const OP* o)
     return SvPV_nolen(HeVAL(he));
 }
 
-char*
+const char*
 Perl_custom_op_desc(pTHX_ const OP* o)
 {
     dVAR;
