@@ -1095,7 +1095,7 @@ is the recommended Unicode-aware way of saying
 #define TRIE_STORE_REVCHAR                                                 \
     STMT_START {                                                           \
 	SV *tmp = newSVpvs("");                                            \
-	Perl_sv_catpvf( aTHX_ tmp, "%c", (int)uvc );                       \
+	Perl_sv_catpvf( aTHX_ tmp, ((UTF && folder) ? "%c" : "%C"), (int)uvc );                       \
 	av_push( revcharmap, tmp );                                        \
     } STMT_END
 
@@ -1895,13 +1895,13 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                     DEBUG_OPTIMISE_r({
                         SV *sv=sv_newmortal();
                         PerlIO_printf( Perl_debug_log,
-			    "%*sPrefix State: %"UVuf" Idx:%"UVuf" Char='%s'\n",
+			    "%*sPrefix State: %"UVuf" Idx:%"UVuf" %x, Char='%s'\n",
                             (int)depth * 2 + 2, "",
                             (UV)state, (UV)idx, 
-                            pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 6, 
+				       SvCUR(*tmp),
+                            pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 0, 
 	                        PL_colors[0], PL_colors[1],
-	                        (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0) |
-	                        PERL_PV_ESCAPE_FIRSTCHAR 
+	                        (IN_CODEPOINTS ? PERL_PV_ESCAPE_UNI : 0)
                             )
                         );
                     });

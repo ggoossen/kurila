@@ -197,7 +197,7 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
     STRLEN wrote = 0;    /* chars written so far */
     STRLEN chsize = 0;   /* size of data to be written */
     STRLEN readsize = 1; /* size of data just read */
-    bool isuni= flags & PERL_PV_ESCAPE_UNI ? 1 : 0; /* is this unicode */
+    bool isuni= (flags & PERL_PV_ESCAPE_UNI) ? 1 : 0; /* is this unicode */
     const char *pv  = str;
     const char * const end = pv + count; /* end of string */
     octbuf[0] = esc;
@@ -249,12 +249,12 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
                             chsize = 1;
                         break;
 		default:
-                        if ( (pv < end) && isDIGIT((U8)*(pv+readsize)) )
+                        if ( isuni )
                             chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
-                                                  "%cx%02x", esc, c);
+                                                  "%cx{%02x}", esc, c);
 			else
                             chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
-                                                  "%cx%x", esc, c);
+                                                  "%cx[%x]", esc, c);
                 }
             } else {
                 chsize = 1;

@@ -4989,7 +4989,7 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
 		(UTF8_ALLOW_DEFAULT & UTF8_ALLOW_ANYUV) | UTF8_CHECK_ONLY);
 		/* see [perl #37836] for UTF8_ALLOW_ANYUV */
 	if (len == (STRLEN)-1) {
- 	   Perl_croak(aTHX_ "Malformed UTF-8 character (fatal)"); 
+/*  	   Perl_croak(aTHX_ "Malformed UTF-8 character (fatal)");  */
 	    if (lenp)
 		*lenp = 1;
 	    return FALSE;
