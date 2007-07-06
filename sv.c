@@ -8526,6 +8526,8 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    goto string;
 
 	case 'C':
+	    if (vectorize)
+		goto unknown;
 	    uv = (args) ? va_arg(*args, int) : SvIV(argsv);
 	    c = (char)uv;
 	    eptr = &c;
