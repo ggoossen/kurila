@@ -9,7 +9,7 @@ BEGIN {
     $^H &= ~$bytes::hint_bits;
 }
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 sub import {
     $^H |= $utf8::hint_bits;

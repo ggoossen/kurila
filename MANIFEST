@@ -1942,7 +1942,6 @@ lib/Math/BigInt/t/constant.t	Test Math::BigInt/BigFloat under :constant
 lib/Math/BigInt/t/const_mbf.t	Test Math::BigInt
 lib/Math/BigInt/t/downgrade.t	Test if use Math::BigInt(); under downgrade works
 lib/Math/BigInt/t/_e_math.t	Helper routine in BigFloat for _e math
-lib/Math/BigInt/t/fallback.t	Test Math::BigInt
 lib/Math/BigInt/t/inf_nan.t	Special tests for inf and NaN handling
 lib/Math/BigInt/t/isa.t		Test for Math::BigInt inheritance
 lib/Math/BigInt/t/lib_load.t	Test sane lib names
@@ -2093,7 +2092,7 @@ lib/Module/Load/t/to_load/ToBeLoaded	Module::Load tests
 lib/Module/Pluggable/Object.pm	Module::Pluggable
 lib/Module/Pluggable.pm	Module::Pluggable
 lib/mro.pm			mro extension
-lib/Net/Changes.libnet		libnet
+lib/Net/Changes			libnet
 lib/Net/Cmd.pm			libnet
 lib/Net/Config.eg		libnet
 lib/Net/Config.pm		libnet
@@ -2113,7 +2112,7 @@ lib/Net/FTP/L.pm		libnet
 lib/Net/FTP.pm			libnet
 lib/Net/hostent.pm		By-name interface to Perl's builtin gethost*
 lib/Net/hostent.t		See if Net::hostent works
-lib/Net/Hostname.eg		libnet
+lib/Net/Hostname.pm.eg		libnet
 lib/Net/libnetFAQ.pod		libnet
 lib/Net/netent.pm		By-name interface to Perl's builtin getnet*
 lib/Net/netent.t		See if Net::netent works
@@ -2139,7 +2138,7 @@ lib/Net/Ping/t/510_ping_udp.t	Ping Net::Ping
 lib/Net/POP3.pm			libnet
 lib/Net/protoent.pm		By-name interface to Perl's builtin getproto*
 lib/Net/protoent.t		See if Net::protoent works
-lib/Net/README.libnet		libnet
+lib/Net/README			libnet
 lib/Net/servent.pm		By-name interface to Perl's builtin getserv*
 lib/Net/servent.t		See if Net::servtent works
 lib/Net/SMTP.pm			libnet
@@ -3648,17 +3647,18 @@ t/op/readline.t			See if <> / readline / rcatline work
 t/op/read.t			See if read() works
 t/op/recurse.t			See if deep recursion works
 t/op/ref.t			See if refs and objects work
-t/op/regexp_email.t		See if regex recursion works by parsing email addresses
-t/op/regexp_namedcapture.t	Make sure glob assignment doesn't break named capture
-t/op/regexp_nc_tie.t	        Test the tied methods of Tie::Hash::NamedCapture
 t/op/regexp_noamp.t		See if regular expressions work with optimizations
 t/op/regexp_notrie.t		See if regular expressions work without trie optimisation
-t/op/regexp_pmod.t		See if regexp /p modifier works as expected
 t/op/regexp_qr_embed.t		See if regular expressions work with embedded qr//
 t/op/regexp_qr.t		See if regular expressions work as qr//
 t/op/regexp.t			See if regular expressions work
 t/op/regexp_trielist.t		See if regular expressions work with trie optimisation
-t/op/regmesg.t			See if one can get regular expression errors
+t/op/reg_email.t		See if regex recursion works by parsing email addresses
+t/op/reg_mesg.t			See if one can get regular expression errors
+t/op/reg_namedcapture.t		Make sure glob assignment doesn't break named capture
+t/op/reg_nc_tie.t	        Test the tied methods of Tie::Hash::NamedCapture
+t/op/reg_pmod.t			See if regexp /p modifier works as expected
+t/op/reg_unsafe.t		Check for unsafe match vars
 t/op/repeat.t			See if x operator works
 t/op/reset.t			See if reset operator works
 t/op/re_tests			Regular expressions for regexp.t

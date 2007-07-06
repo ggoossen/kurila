@@ -40,6 +40,7 @@ package Maintainers;
 	'kwilliams'	=> 'Ken Williams <kwilliams@cpan.org>',
 	'laun'		=> 'Wolfgang Laun <Wolfgang.Laun@alcatel.at>',
 	'lstein'	=> 'Lincoln D. Stein <lds@cpan.org>',
+	'lwall'		=> 'Larry Wall <lwall@cpan.org>',
 	'marekr'	=> 'Marek Rouchal <marekr@cpan.org>',
 	'markm'		=> 'Mark Mielke <markm@cpan.org>',
 	'mhx'		=> 'Marcus Holland-Moritz <mhx@cpan.org>',
@@ -100,13 +101,6 @@ package Maintainers;
 		'FILES'		=> q[lib/AutoLoader.pm lib/AutoLoader.t],
 		'CPAN'		=> 1,
 	},
-
-	'assertions' =>
-		{
-		'MAINTAINER'	=> 'salva',
-		'FILES'		=> q[lib/assertions.pm lib/assertions t/comp/assertions.t t/comp/asstcompat.t],
-		'CPAN'		=> 1,
-		},
 
 	'Attribute::Handlers' =>
 		{
@@ -432,7 +426,7 @@ package Maintainers;
 		{
 		'MAINTAINER'	=> 'gbarr',
 		'FILES'		=>
-			q[lib/Net/{Cmd,Config,Domain,FTP,Netrc,NNTP,POP3,SMTP,Time}.pm lib/Net/ChangeLog.libnet lib/Net/FTP lib/Net/*.eg lib/Net/libnetFAQ.pod lib/Net/README.libnet lib/Net/t],
+			q[lib/Net/{Cmd,Config,Domain,FTP,Netrc,NNTP,POP3,SMTP,Time}.pm lib/Net/ChangeLog lib/Net/FTP lib/Net/*.eg lib/Net/libnetFAQ.pod lib/Net/README lib/Net/t],
 		'CPAN'		=> 1,
 		},
 
@@ -477,6 +471,13 @@ package Maintainers;
                 'FILES'         => q[lib/Log/Message/Simple.pm lib/Log/Message/Simple],
                 'CPAN'          => 1,
                 },
+
+	'mad' =>
+		{
+		'MAINTAINER'	=> 'lwall',
+		'FILES'		=> q[mad],
+		'CPAN'		=> 0,
+		},
 
 	'Math::BigFloat' =>
 		{

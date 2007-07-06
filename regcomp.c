@@ -1286,7 +1286,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
        have unique chars.
 
        We use an array of integers to represent the character codes 0..255
-       (trie->charmap) and we use a an HV* to store unicode characters. We use the
+       (trie->charmap) and we use a an HV* to store Unicode characters. We use the
        native representation of the character value as the key and IV's for the
        coded index.
 
@@ -6082,7 +6082,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
     /* RExC_parse points at the beginning brace, 
        endbrace points at the last */
     if ( name[0]=='U' && name[1]=='+' ) {
-        /* its a "unicode hex" notation {U+89AB} */
+        /* its a "Unicode hex" notation {U+89AB} */
         I32 fl = PERL_SCAN_ALLOW_UNDERSCORES
             | PERL_SCAN_DISALLOW_PREFIX
             | (SIZE_ONLY ? PERL_SCAN_SILENT_ILLDIGIT : 0);
@@ -6719,7 +6719,7 @@ tryagain:
 		    case 'g': case 'G':   /* generic-backref, pos assertion */
 		    case 'k': case 'K':   /* named backref, keep marker */
 		    case 'N':             /* named char sequence */
-		    case 'p': case 'P':   /* unicode property */
+		    case 'p': case 'P':   /* Unicode property */
 		              case 'R':   /* LNBREAK */
 		    case 's': case 'S':   /* space class */
 		    case 'w': case 'W':   /* word class */

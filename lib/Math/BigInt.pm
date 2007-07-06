@@ -81,12 +81,11 @@ use overload
                "$_[1]" cmp $_[0]->bstr() :
                $_[0]->bstr() cmp "$_[1]" },
 
-# make cos()/sin()/atan2() "work" with BigInt's or subclasses
-'cos'	=>	sub { cos($_[0]->numify()) }, 
-'sin'	=>	sub { sin($_[0]->numify()) }, 
+'cos'	=>	sub { $_[0]->copy->bcos(); }, 
+'sin'	=>	sub { $_[0]->copy->bsin(); }, 
 'atan2'	=>	sub { $_[2] ?
-			atan2($_[1],$_[0]->numify()) :
-			atan2($_[0]->numify(),$_[1]) },
+			ref($_[0])->new($_[1])->batan2($_[0]) :
+			$_[0]->copy()->batan2($_[1]) },
 
 # are not yet overloadable
 #'hex'	=>	sub { print "hex"; $_[0]; }, 
@@ -2927,6 +2926,103 @@ sub bpi
   $self->new(3);
   }
 
+sub bcos
+  {
+  # Calculate cosinus(x) to N digits. Unless upgrading is in effect, returns the
+  # result truncated to an integer.
+  my ($self,$x,@r) = ref($_[0]) ? (undef,@_) : objectify(1,@_);
+
+  return $x if $x->modify('bcos');
+
+  return $x->bnan() if $x->{sign} !~ /^[+-]\z/;	# -inf +inf or NaN => NaN
+
+  return $upgrade->new($x)->bcos(@r) if defined $upgrade;
+
+  require Math::BigFloat;
+  # calculate the result and truncate it to integer
+  my $t = Math::BigFloat->new($x)->bcos(@r)->as_int();
+
+  $x->bone() if $t->is_one();
+  $x->bzero() if $t->is_zero();
+  $x->round(@r);
+  }
+
+sub bsin
+  {
+  # Calculate sinus(x) to N digits. Unless upgrading is in effect, returns the
+  # result truncated to an integer.
+  my ($self,$x,@r) = ref($_[0]) ? (undef,@_) : objectify(1,@_);
+
+  return $x if $x->modify('bsin');
+
+  return $x->bnan() if $x->{sign} !~ /^[+-]\z/;	# -inf +inf or NaN => NaN
+
+  return $upgrade->new($x)->bsin(@r) if defined $upgrade;
+
+  require Math::BigFloat;
+  # calculate the result and truncate it to integer
+  my $t = Math::BigFloat->new($x)->bsin(@r)->as_int();
+
+  $x->bone() if $t->is_one();
+  $x->bzero() if $t->is_zero();
+  $x->round(@r);
+  }
+
+sub batan2
+  { 
+  # calculate arcus tangens of ($x/$y)
+ 
+  # set up parameters
+  my ($self,$x,$y,@r) = (ref($_[0]),@_);
+  # objectify is costly, so avoid it
+  if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1])))
+    {
+    ($self,$x,$y,@r) = objectify(2,@_);
+    }
+
+  return $x if $x->modify('batan2');
+
+  return $x->bnan() if (($x->{sign} eq $nan) ||
+			($y->{sign} eq $nan) ||
+			($x->is_zero() && $y->is_zero()));
+
+  # inf handling
+  if (($x->{sign} =~ /^[+-]inf$/) || ($y->{sign} =~ /^[+-]inf$/))
+    {
+    # XXX TODO:
+    return $x->bnan();
+    }
+
+  return $upgrade->new($x)->batan2($upgrade->new($y),@r) if defined $upgrade;
+
+  require Math::BigFloat;
+  my $r = Math::BigFloat->new($x)->batan2(Math::BigFloat->new($y),@r)->as_int();
+
+  $x->{value} = $r->{value};
+  $x->{sign} = $r->{sign};
+
+  $x;
+  }
+
+sub batan
+  {
+  # Calculate arcus tangens of x to N digits. Unless upgrading is in effect, returns the
+  # result truncated to an integer.
+  my ($self,$x,@r) = ref($_[0]) ? (undef,@_) : objectify(1,@_);
+
+  return $x if $x->modify('batan');
+
+  return $x->bnan() if $x->{sign} !~ /^[+-]\z/;	# -inf +inf or NaN => NaN
+
+  return $upgrade->new($x)->batan(@r) if defined $upgrade;
+
+  # calculate the result and truncate it to integer
+  my $t = Math::BigFloat->new($x)->batan(@r);
+
+  $x->{value} = $CALC->_new( $x->as_int()->bstr() );
+  $x->round(@r);
+  }
+
 ###############################################################################
 # this method returns 0 if the object can be modified, or 1 if not.
 # We use a fast constant sub() here, to avoid costly calls. Subclasses
@@ -3611,16 +3707,64 @@ This method was added in v1.84 of Math::BigInt (April 2007).
 
 	print Math::BigInt->bpi(100), "\n";		# 3
 
-Returns PI truncated to an integer, with the argument being ignored. that
-is it always returns C<3>.
+Returns PI truncated to an integer, with the argument being ignored. This means
+under BigInt this always returns C<3>.
 
-If upgrading is in effect, returns PI to N digits (including the "3"
-before the dot):
+If upgrading is in effect, returns PI, rounded to N digits with the
+current rounding mode:
 
 	use Math::BigFloat;
 	use Math::BigInt upgrade => Math::BigFloat;
 	print Math::BigInt->bpi(3), "\n";		# 3.14
 	print Math::BigInt->bpi(100), "\n";		# 3.1415....
+
+This method was added in v1.87 of Math::BigInt (June 2007).
+
+=head2 bcos()
+
+	my $x = Math::BigInt->new(1);
+	print $x->bcos(100), "\n";
+
+Calculate the cosinus of $x, modifying $x in place.
+
+In BigInt, unless upgrading is in effect, the result is truncated to an
+integer.
+
+This method was added in v1.87 of Math::BigInt (June 2007).
+
+=head2 bsin()
+
+	my $x = Math::BigInt->new(1);
+	print $x->bsin(100), "\n";
+
+Calculate the sinus of $x, modifying $x in place.
+
+In BigInt, unless upgrading is in effect, the result is truncated to an
+integer.
+
+This method was added in v1.87 of Math::BigInt (June 2007).
+
+=head2 batan()
+
+	my $x = Math::BigInt->new(1);
+	print $x->batan(100), "\n";
+
+Calculate the arcus tanges of $x, modifying $x in place.
+
+In BigInt, unless upgrading is in effect, the result is truncated to an
+integer.
+
+This method was added in v1.87 of Math::BigInt (June 2007).
+
+=head2 batan2()
+
+	my $x = Math::BigInt->new(1);
+	print $x->batan2(5), "\n";
+
+Calculate the arcus tanges of $x / $y, modifying $x in place.
+
+In BigInt, unless upgrading is in effect, the result is truncated to an
+integer.
 
 This method was added in v1.87 of Math::BigInt (June 2007).
 

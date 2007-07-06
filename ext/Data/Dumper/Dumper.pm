@@ -9,7 +9,7 @@
 
 package Data::Dumper;
 
-$VERSION = '2.121_12';
+$VERSION = '2.121_13';
 
 #$| = 1;
 
@@ -498,7 +498,7 @@ sub _dump {
     }
     else {				 # string
       if ($s->{useqq} or $val =~ m/[\x80-\xFF]/) {
-        # Fall back to qq if there's unicode
+        # Fall back to qq if there's Unicode
 	$out .= qquote($val, $s->{useqq});
       }
       else {

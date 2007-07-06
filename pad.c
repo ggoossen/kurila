@@ -1176,6 +1176,7 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
      * (ie it contains eval '...', //ee, /$var/ or /(?{..})/), Then any
      * anon prototypes in the chain of CVs should be marked as cloneable,
      * so that for example the eval's CV in C<< sub { eval '$x' } >> gets
+>>>>>>> origin/bleadperl~45:pad.c
      * the right CvOUTSIDE.
      * If running with -d, *any* sub may potentially have an eval
      * excuted within it.
