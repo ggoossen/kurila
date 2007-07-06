@@ -1493,8 +1493,10 @@ Perl_cv_clone(pTHX_ CV *proto)
 	    if (SvFAKE(namesv)) {   /* lexical from outside? */
 		sv = outpad[PARENT_PAD_INDEX(namesv)];
 		assert(sv);
-		assert(!SvPADSTALE(sv));
-		SvREFCNT_inc_simple_void_NN(sv);
+		/* 'my $x if $y' can leave $x stale even in an active sub */
+		if (!SvPADSTALE(sv)) {
+		    SvREFCNT_inc_simple_void_NN(sv);
+		}
 	    }
 	    if (!sv) {
                 const char sigil = SvPVX_const(namesv)[0];
