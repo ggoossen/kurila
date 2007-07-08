@@ -1671,14 +1671,7 @@ Perl_swash_fetch(pTHX_ SV *swash, const U8 *ptr, bool do_utf8)
      * NB: this code assumes that swatches are never modified, once generated!
      */
 
-    if (hv   == PL_last_swash_hv &&
-	klen == PL_last_swash_klen &&
-	(!klen || memEQ((char *)ptr, (char *)PL_last_swash_key, klen)) )
     {
-	tmps = PL_last_swash_tmps;
-	slen = PL_last_swash_slen;
-    }
-    else {
 	/* Try our second-level swatch cache, kept in a hash. */
 	SV** svp = hv_fetch(hv, (const char*)ptr, klen, FALSE);
 
@@ -1705,15 +1698,6 @@ Perl_swash_fetch(pTHX_ SV *swash, const U8 *ptr, bool do_utf8)
 		     || (slen << 3) < needents)
 		Perl_croak(aTHX_ "panic: swash_fetch got improper swatch");
 	}
-
-	PL_last_swash_hv = hv;
-	assert(klen <= sizeof(PL_last_swash_key));
-	PL_last_swash_klen = (U8)klen;
-	/* FIXME change interpvar.h?  */
-	PL_last_swash_tmps = (U8 *) tmps;
-	PL_last_swash_slen = slen;
-	if (klen)
-	    Copy(ptr, PL_last_swash_key, klen, U8);
     }
 
     switch ((int)((slen << 3) / needents)) {

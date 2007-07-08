@@ -166,11 +166,6 @@
 #define PL_isarev		(vTHX->Iisarev)
 #define PL_known_layers		(vTHX->Iknown_layers)
 #define PL_last_in_gv		(vTHX->Ilast_in_gv)
-#define PL_last_swash_hv	(vTHX->Ilast_swash_hv)
-#define PL_last_swash_key	(vTHX->Ilast_swash_key)
-#define PL_last_swash_klen	(vTHX->Ilast_swash_klen)
-#define PL_last_swash_slen	(vTHX->Ilast_swash_slen)
-#define PL_last_swash_tmps	(vTHX->Ilast_swash_tmps)
 #define PL_lastfd		(vTHX->Ilastfd)
 #define PL_lastgotoprobe	(vTHX->Ilastgotoprobe)
 #define PL_lastscream		(vTHX->Ilastscream)
@@ -481,11 +476,6 @@
 #define PL_Iisarev		PL_isarev
 #define PL_Iknown_layers	PL_known_layers
 #define PL_Ilast_in_gv		PL_last_in_gv
-#define PL_Ilast_swash_hv	PL_last_swash_hv
-#define PL_Ilast_swash_key	PL_last_swash_key
-#define PL_Ilast_swash_klen	PL_last_swash_klen
-#define PL_Ilast_swash_slen	PL_last_swash_slen
-#define PL_Ilast_swash_tmps	PL_last_swash_tmps
 #define PL_Ilastfd		PL_lastfd
 #define PL_Ilastgotoprobe	PL_lastgotoprobe
 #define PL_Ilastscream		PL_lastscream

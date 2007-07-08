@@ -10967,13 +10967,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_ppid		= proto_perl->Ippid;
 #endif
 
-    /* swatch cache */
-    PL_last_swash_hv	= NULL;	/* reinits on demand */
-    PL_last_swash_klen	= 0;
-    PL_last_swash_key[0]= '\0';
-    PL_last_swash_tmps	= (U8*)NULL;
-    PL_last_swash_slen	= 0;
-
     PL_glob_index	= proto_perl->Iglob_index;
     PL_srand_called	= proto_perl->Isrand_called;
     PL_bitcount		= NULL;	/* reinits on demand */

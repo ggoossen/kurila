@@ -1338,9 +1338,11 @@
 #endif
 #endif
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
+#  if !defined(PERL_EFF_ACCESS) && defined(HAS_ACCESS) && (defined(HAS_SETREUID) || defined(HAS_SETRESUID) || defined(HAS_SETREGID) || defined(HAS_SETRESGIID) || defined(HAS_SETRESUID) || defined(HAS_SETREGID) || defined(HAS_SETRESGID))
 #ifdef PERL_CORE
 #define emulate_eaccess		S_emulate_eaccess
 #endif
+#  endif
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
 #ifdef PERL_CORE
 #define dooneliner		S_dooneliner
@@ -3607,9 +3609,11 @@
 #endif
 #endif
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
+#  if !defined(PERL_EFF_ACCESS) && defined(HAS_ACCESS) && (defined(HAS_SETREUID) || defined(HAS_SETRESUID) || defined(HAS_SETREGID) || defined(HAS_SETRESGIID) || defined(HAS_SETRESUID) || defined(HAS_SETREGID) || defined(HAS_SETRESGID))
 #ifdef PERL_CORE
 #define emulate_eaccess(a,b)	S_emulate_eaccess(aTHX_ a,b)
 #endif
+#  endif
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
 #ifdef PERL_CORE
 #define dooneliner(a,b)		S_dooneliner(aTHX_ a,b)

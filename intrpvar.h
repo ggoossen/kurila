@@ -512,11 +512,6 @@ PERLVAR(Iutf8_toupper,	SV *)
 PERLVAR(Iutf8_totitle,	SV *)
 PERLVAR(Iutf8_tolower,	SV *)
 PERLVAR(Iutf8_tofold,	SV *)
-PERLVAR(Ilast_swash_hv,	HV *)
-PERLVAR(Ilast_swash_tmps,	U8 *)
-PERLVAR(Ilast_swash_slen,	STRLEN)
-PERLVARA(Ilast_swash_key,10,	U8)
-PERLVAR(Ilast_swash_klen,	U8)	/* Only needs to store 0-10  */
 
 #ifdef FCRYPT
 PERLVARI(Icryptseen,	bool,	FALSE)	/* has fast crypt() been initialized? */
