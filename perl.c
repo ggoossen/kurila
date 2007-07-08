@@ -3277,9 +3277,9 @@ Perl_moreswitches(pTHX_ char *s)
 	    upg_version(PL_patchlevel, TRUE);
 #if !defined(DGUX)
 	PerlIO_printf(PerlIO_stdout(),
-		Perl_form(aTHX_ "\nThis is perl, %"SVf
-#ifdef PERL_PATCHNUM
-			  " DEVEL" STRINGIFY(PERL_PATCHNUM)
+		Perl_form(aTHX_ "\nThis is kurila, %"SVf
+#ifdef KURILA_PATCHNUM
+			  " DEVEL" STRINGIFY(KURILA_PATCHNUM)
 #endif
 			  " built for %s",
 			  SVfARG(vstringify(PL_patchlevel)),
@@ -3287,7 +3287,7 @@ Perl_moreswitches(pTHX_ char *s)
 #else /* DGUX */
 /* Adjust verbose output as in the perl that ships with the DG/UX OS from EMC */
 	PerlIO_printf(PerlIO_stdout(),
-		Perl_form(aTHX_ "\nThis is perl, %"SVf"\n",
+		Perl_form(aTHX_ "\nThis is kurila, %"SVf"\n",
 		    SVfARG(vstringify(PL_patchlevel))));
 	PerlIO_printf(PerlIO_stdout(),
 			Perl_form(aTHX_ "        built under %s at %s %s\n",
@@ -3307,7 +3307,7 @@ Perl_moreswitches(pTHX_ char *s)
 #endif
 
 	PerlIO_printf(PerlIO_stdout(),
-		      "\n\nCopyright 1987-2007, Larry Wall\n");
+		      "\n\nCopyright 2007, Gerard Goossen\n");
 #ifdef MACOS_TRADITIONAL
 	PerlIO_printf(PerlIO_stdout(),
 		      "\nMac OS port Copyright 1991-2002, Matthias Neeracher;\n"
@@ -3377,11 +3377,8 @@ Perl_moreswitches(pTHX_ char *s)
 #endif
 	PerlIO_printf(PerlIO_stdout(),
 		      "\n\
-Perl may be copied only under the terms of either the Artistic License or the\n\
-GNU General Public License, which may be found in the Perl 5 source kit.\n\n\
-Complete documentation for Perl, including FAQ lists, should be found on\n\
-this system using \"man perl\" or \"perldoc perl\".  If you have access to the\n\
-Internet, point your browser at http://www.perl.org/, the Perl Home Page.\n\n");
+Perl Kurila may be copied only under the terms of either the Artistic License or the\n\
+GNU General Public License, which may be found in the Perl Kurila source kit.\n");
 	my_exit(0);
     case 'w':
 	if (! (PL_dowarn & G_WARN_ALL_MASK)) {
