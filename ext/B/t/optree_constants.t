@@ -136,18 +136,17 @@ EONT_EONT
 checkOptree ( name	=> 'myyes() as coderef',
 	      prog	=> 'sub a() { 1==1 }; print a',
 	      noanchors => 1,
-	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:>,<,%,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const[SPECIAL sv_yes] s ->5
 EOT_EOT
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:>,<,%,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const(SPECIAL sv_yes) s ->5
@@ -160,18 +159,17 @@ EONT_EONT
 checkOptree ( name	=> 'myno() as coderef',
 	      prog	=> 'sub a() { 1!=1 }; print a',
 	      noanchors => 1,
-	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:>,<,%,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const[SPECIAL sv_no] s ->5
 EOT_EOT
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:>,<,%,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const(SPECIAL sv_no) s ->5
@@ -209,7 +207,7 @@ sub printem {
 my ($expect, $expect_nt) = (<<'EOT_EOT', <<'EONT_EONT');
 # 9  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->9
-# 1        <;> nextstate(main 635 optree_constants.t:163) v:>,<,% ->2
+# 1        <;> nextstate(main 635 optree_constants.t:163) v:& ->2
 # 8        <@> prtf sK ->9
 # 2           <0> pushmark s ->3
 # 3           <$> const[PV "myint %d mystr %s myfl %f pi %f\n"] s ->4
@@ -220,7 +218,7 @@ my ($expect, $expect_nt) = (<<'EOT_EOT', <<'EONT_EONT');
 EOT_EOT
 # 9  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->9
-# 1        <;> nextstate(main 635 optree_constants.t:163) v:>,<,% ->2
+# 1        <;> nextstate(main 635 optree_constants.t:163) v:& ->2
 # 8        <@> prtf sK ->9
 # 2           <0> pushmark s ->3
 # 3           <$> const(PV "myint %d mystr %s myfl %f pi %f\n") s ->4
@@ -240,7 +238,6 @@ if($] < 5.009) {
 
 checkOptree ( name	=> 'call many in a print statement',
 	      code	=> \&printem,
-	      strip_open_hints => 1,
 	      expect => $expect, expect_nt => $expect_nt);
 
 } #skip
