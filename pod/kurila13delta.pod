@@ -22,6 +22,10 @@ Default C3 method resolution
 
 Default "use strict 'subs'"
 
+=item *
+
+Integrate bleadperl changes
+
 =back
 
 =head1 Core Enhancements
@@ -38,6 +42,10 @@ the C3 method resolution.
 =head2 Default "use strict 'subs'"
 
 By default "use strict 'subs'" is active. See L<strict> for what this means.
+
+=head2 Internal bleadperl changes
+
+bleadperl changes upto 31540 are integrated
 
 =back
 

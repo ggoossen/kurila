@@ -237,7 +237,7 @@ SWTESTPM
 
     my $v = sprintf "%vd", $^V;
     like( runperl( switches => ['-v'] ),
-	  qr/This is perl, v$v (?:DEVEL\d+ )?built for \Q$Config{archname}\E.+Copyright.+Larry Wall.+Artistic License.+GNU General Public License/s,
+	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q$Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
           '-v looks okay' );
 
 }

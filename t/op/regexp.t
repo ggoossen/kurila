@@ -88,7 +88,6 @@ foreach (@tests) {
         if (/\S/) { print $_ };
         next;
     }
-    last if $test == 2;
     chomp;
     s/\\n/\n/g;
     my ($pat, $subject, $result, $repl, $expect, $reason) = split(/\t/,$_,6);
