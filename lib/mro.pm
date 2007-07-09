@@ -48,17 +48,13 @@ mro - Method Resolution Order
 
   use mro; # enables next::method and friends globally
 
-  use mro 'dfs'; # enable DFS MRO for this class (Perl default)
-  use mro 'c3'; # enable C3 MRO for this class
+  use mro 'c3'; # enable C3 MRO for this class (Perl Kurila default)
+  use mro 'dfs'; # enable DFS MRO for this class
 
 =head1 DESCRIPTION
 
 The "mro" namespace provides several utilities for dealing
 with method resolution order and method caching in general.
-
-These interfaces are only available in Perl 5.9.5 and higher.
-See L<MRO::Compat> on CPAN for a mostly forwards compatible
-implementation for older Perls.
 
 =head1 OVERVIEW
 
@@ -73,9 +69,9 @@ has been loaded via C<use> or C<require>.
 
 =head1 The C3 MRO
 
-In addition to the traditional Perl default MRO (depth first
-search, called C<DFS> here), Perl now offers the C3 MRO as
-well.  Perl's support for C3 is based on the work done in
+C3 is the defualt MRO of Perl Kurila, in contrast to Perl 5 which has
+depth first search (C<DFS>) as default MRO.
+Perl's support for C3 is based on the work done in
 Stevan Little's module L<Class::C3>, and most of the C3-related
 documentation here is ripped directly from there.
 
