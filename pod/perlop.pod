@@ -2258,67 +2258,13 @@ same.  For example:
 
 If what's within the angle brackets is neither a filehandle nor a simple
 scalar variable containing a filehandle name, typeglob, or typeglob
-reference, it is interpreted as a filename pattern to be globbed, and
-either a list of filenames or the next filename in the list is returned,
-depending on context.  This distinction is determined on syntactic
+reference, Perl 5 interpreted as a filename pattern to be globbed, Perl
+Kurila gives an error. This distinction is determined on syntactic
 grounds alone.  That means C<< <$x> >> is always a readline() from
-an indirect handle, but C<< <$hash{key}> >> is always a glob().
+an indirect handle, but C<< <$hash{key}> >> gives an error.
 That's because $x is a simple scalar variable, but C<$hash{key}> is
 not--it's a hash element.  Even C<< <$x > >> (note the extra space)
-is treated as C<glob("$x ")>, not C<readline($x)>.
-
-One level of double-quote interpretation is done first, but you can't
-say C<< <$foo> >> because that's an indirect filehandle as explained
-in the previous paragraph.  (In older versions of Perl, programmers
-would insert curly brackets to force interpretation as a filename glob:
-C<< <${foo}> >>.  These days, it's considered cleaner to call the
-internal function directly as C<glob($foo)>, which is probably the right
-way to have done it in the first place.)  For example:
-
-    while (<*.c>) {
-	chmod 0644, $_;
-    }
-
-is roughly equivalent to:
-
-    open(FOO, "echo *.c | tr -s ' \t\r\f' '\\012\\012\\012\\012'|");
-    while (<FOO>) {
-	chomp;
-	chmod 0644, $_;
-    }
-
-except that the globbing is actually done internally using the standard
-C<File::Glob> extension.  Of course, the shortest way to do the above is:
-
-    chmod 0644, <*.c>;
-
-A (file)glob evaluates its (embedded) argument only when it is
-starting a new list.  All values must be read before it will start
-over.  In list context, this isn't important because you automatically
-get them all anyway.  However, in scalar context the operator returns
-the next value each time it's called, or C<undef> when the list has
-run out.  As with filehandle reads, an automatic C<defined> is
-generated when the glob occurs in the test part of a C<while>,
-because legal glob returns (e.g. a file called F<0>) would otherwise
-terminate the loop.  Again, C<undef> is returned only once.  So if
-you're expecting a single value from a glob, it is much better to
-say
-
-    ($file) = <blurch*>;
-
-than
-
-    $file = <blurch*>;
-
-because the latter will alternate between returning a filename and
-returning false.
-
-If you're trying to do variable interpolation, it's definitely better
-to use the glob() function, because the older notation can cause people
-to become confused with the indirect filehandle notation.
-
-    @files = glob("$dir/*.[ch]");
-    @files = glob($files[$i]);
+gives an error. Use the C<glob> function to match filename patters.
 
 =head2 Constant Folding
 X<constant folding> X<folding>
