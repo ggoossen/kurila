@@ -68,8 +68,6 @@ BACK		BACK,   no	Match "", "next" ptr points backward.
 #*Literals (33..35)
 
 EXACT		EXACT,  str	Match this string (preceded by length).
-EXACTF		EXACT,  str	Match this string, folded (prec. by length).
-EXACTFL		EXACT,  str	Match this string, folded in locale (w/len).
 
 #*Do nothing types (36..37)
 

@@ -22,8 +22,6 @@ BEGIN {
     @INC = '../lib';
 }
 
-use strict;
-
 # Don't interfere with the taintedness of %ENV, this could perturbate tests
 $ENV{PERL_CORE} = 1 unless ${^TAINT};
 

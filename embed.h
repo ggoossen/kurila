@@ -1360,6 +1360,8 @@
 #define regbranch		S_regbranch
 #define reguni			S_reguni
 #define regclass		S_regclass
+#define regclassfold		S_regclassfold
+#define regclassfold_value	S_regclassfold_value
 #define anyof_get_swash		S_anyof_get_swash
 #define regcurly		S_regcurly
 #define reg_node		S_reg_node
@@ -1412,13 +1414,8 @@
 #define regcppush		S_regcppush
 #define regcppop		S_regcppop
 #define reghop3			S_reghop3
-#endif
-#ifdef XXX_dmq
-#if defined(PERL_CORE) || defined(PERL_EXT)
+#define reghop3x		S_reghop3x
 #define reghop4			S_reghop4
-#endif
-#endif
-#if defined(PERL_CORE) || defined(PERL_EXT)
 #define reghopmaybe3		S_reghopmaybe3
 #define find_byclass		S_find_byclass
 #define swap_match_buff		S_swap_match_buff
@@ -3631,6 +3628,8 @@
 #define regbranch(a,b,c,d)	S_regbranch(aTHX_ a,b,c,d)
 #define reguni(a,b,c)		S_reguni(aTHX_ a,b,c)
 #define regclass(a,b)		S_regclass(aTHX_ a,b)
+#define regclassfold(a,b)	S_regclassfold(aTHX_ a,b)
+#define regclassfold_value(a,b)	S_regclassfold_value(aTHX_ a,b)
 #define anyof_get_swash(a,b,c,d)	S_anyof_get_swash(aTHX_ a,b,c,d)
 #define regcurly		S_regcurly
 #define reg_node(a,b)		S_reg_node(aTHX_ a,b)
@@ -3666,9 +3665,9 @@
 #define regdump_extflags(a,b)	S_regdump_extflags(aTHX_ a,b)
 #define dumpuntil(a,b,c,d,e,f,g,h)	S_dumpuntil(aTHX_ a,b,c,d,e,f,g,h)
 #define put_byte(a,b)		S_put_byte(aTHX_ a,b)
-#define dump_trie(a,b,c,d)	S_dump_trie(aTHX_ a,b,c,d)
-#define dump_trie_interim_list(a,b,c,d,e)	S_dump_trie_interim_list(aTHX_ a,b,c,d,e)
-#define dump_trie_interim_table(a,b,c,d,e)	S_dump_trie_interim_table(aTHX_ a,b,c,d,e)
+#define dump_trie(a,b,c)	S_dump_trie(aTHX_ a,b,c)
+#define dump_trie_interim_list(a,b,c,d)	S_dump_trie_interim_list(aTHX_ a,b,c,d)
+#define dump_trie_interim_table(a,b,c,d)	S_dump_trie_interim_table(aTHX_ a,b,c,d)
 #define regtail_study(a,b,c,d)	S_regtail_study(aTHX_ a,b,c,d)
 #endif
 #  endif
@@ -3682,13 +3681,8 @@
 #define regcppush(a)		S_regcppush(aTHX_ a)
 #define regcppop(a)		S_regcppop(aTHX_ a)
 #define reghop3			S_reghop3
-#endif
-#ifdef XXX_dmq
-#if defined(PERL_CORE) || defined(PERL_EXT)
+#define reghop3x		S_reghop3x
 #define reghop4			S_reghop4
-#endif
-#endif
-#if defined(PERL_CORE) || defined(PERL_EXT)
 #define reghopmaybe3		S_reghopmaybe3
 #define find_byclass(a,b,c,d,e)	S_find_byclass(aTHX_ a,b,c,d,e)
 #define swap_match_buff(a)	S_swap_match_buff(aTHX_ a)

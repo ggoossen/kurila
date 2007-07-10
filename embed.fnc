@@ -1356,6 +1356,8 @@ Es	|regnode*|regatom	|NN struct RExC_state_t *state|NN I32 *flagp|U32 depth
 Es	|regnode*|regbranch	|NN struct RExC_state_t *state|NN I32 *flagp|I32 first|U32 depth
 Es	|STRLEN	|reguni		|NN const struct RExC_state_t *state|UV uv|NN char *s
 Es	|regnode*|regclass	|NN struct RExC_state_t *state|U32 depth
+Es	|regnode*|regclassfold	|NN struct RExC_state_t *state|U32 depth
+Es	|regnode*|regclassfold_value	|NN struct RExC_state_t *state|UV value
 Es	|void   |anyof_get_swash	|NN struct RExC_state_t *state|NN regnode *ret|NN SV *listsv|NULLOK AV* unicode_alternate
 ERsn	|I32	|regcurly	|NN const char *
 Es	|regnode*|reg_node	|NN struct RExC_state_t *state|U8 op
@@ -1401,13 +1403,13 @@ Es	|const regnode*|dumpuntil|NN const regexp *r|NN const regnode *start \
 				|NN SV* sv|I32 indent|U32 depth
 Es	|void	|put_byte	|NN SV* sv|int c
 Es	|void	|dump_trie	|NN const struct _reg_trie_data *trie\
-				|NULLOK HV* widecharmap|NN AV *revcharmap\
+				|NN AV *revcharmap\
 				|U32 depth
 Es	|void	|dump_trie_interim_list|NN const struct _reg_trie_data *trie\
-				|NULLOK HV* widecharmap|NN AV *revcharmap\
+				|NN AV *revcharmap\
 				|U32 next_alloc|U32 depth
 Es	|void	|dump_trie_interim_table|NN const struct _reg_trie_data *trie\
-				|NULLOK HV* widecharmap|NN AV *revcharmap\
+				|NN AV *revcharmap\
 				|U32 next_alloc|U32 depth
 Es	|U8	|regtail_study	|NN struct RExC_state_t *state|NN regnode *p|NN const regnode *val|U32 depth
 #  endif
@@ -1420,10 +1422,9 @@ ERs	|I32	|regtry		|NN regmatch_info *reginfo|NN char **startpos
 ERs	|bool	|reginclass	|NULLOK const regexp *prog|NN const regnode *n|NN const U8 *p|NULLOK STRLEN *lenp
 Es	|CHECKPOINT|regcppush	|I32 parenfloor
 Es	|char*	|regcppop	|NN const regexp *rex
-ERsn	|U8*	|reghop3	|NN U8 *pos|I32 off|NN const U8 *lim
-#ifdef XXX_dmq
-ERsn	|U8*	|reghop4	|NN U8 *pos|I32 off|NN const U8 *llim|NN const U8 *rlim
-#endif
+ERsn	|char*	|reghop3	|NN char *pos|I32 off|NN const char *lim
+ERsn	|char*	|reghop3x	|NN char *pos|I32 off|NN const char *lim
+ERsn	|char*	|reghop4	|NN char *pos|I32 off|NN const char *llim|NN const char *rlim
 ERsn	|U8*	|reghopmaybe3	|NN U8 *pos|I32 off|NN const U8 *lim
 ERs	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c|NN char *s|NN const char *strend|NULLOK regmatch_info *reginfo
 Es	|void	|swap_match_buff|NN regexp * prog

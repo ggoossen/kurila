@@ -3646,6 +3646,12 @@ STATIC STRLEN	S_reguni(pTHX_ const struct RExC_state_t *state, UV uv, char *s)
 STATIC regnode*	S_regclass(pTHX_ struct RExC_state_t *state, U32 depth)
 			__attribute__nonnull__(pTHX_1);
 
+STATIC regnode*	S_regclassfold(pTHX_ struct RExC_state_t *state, U32 depth)
+			__attribute__nonnull__(pTHX_1);
+
+STATIC regnode*	S_regclassfold_value(pTHX_ struct RExC_state_t *state, UV value)
+			__attribute__nonnull__(pTHX_1);
+
 STATIC void	S_anyof_get_swash(pTHX_ struct RExC_state_t *state, regnode *ret, SV *listsv, AV* unicode_alternate)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
@@ -3769,17 +3775,17 @@ STATIC const regnode*	S_dumpuntil(pTHX_ const regexp *r, const regnode *start, c
 STATIC void	S_put_byte(pTHX_ SV* sv, int c)
 			__attribute__nonnull__(pTHX_1);
 
-STATIC void	S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV* widecharmap, AV *revcharmap, U32 depth)
+STATIC void	S_dump_trie(pTHX_ const struct _reg_trie_data *trie, AV *revcharmap, U32 depth)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_3);
+			__attribute__nonnull__(pTHX_2);
 
-STATIC void	S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie, HV* widecharmap, AV *revcharmap, U32 next_alloc, U32 depth)
+STATIC void	S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie, AV *revcharmap, U32 next_alloc, U32 depth)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_3);
+			__attribute__nonnull__(pTHX_2);
 
-STATIC void	S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie, HV* widecharmap, AV *revcharmap, U32 next_alloc, U32 depth)
+STATIC void	S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie, AV *revcharmap, U32 next_alloc, U32 depth)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_3);
+			__attribute__nonnull__(pTHX_2);
 
 STATIC U8	S_regtail_study(pTHX_ struct RExC_state_t *state, regnode *p, const regnode *val, U32 depth)
 			__attribute__nonnull__(pTHX_1)
@@ -3814,19 +3820,22 @@ STATIC CHECKPOINT	S_regcppush(pTHX_ I32 parenfloor);
 STATIC char*	S_regcppop(pTHX_ const regexp *rex)
 			__attribute__nonnull__(pTHX_1);
 
-STATIC U8*	S_reghop3(U8 *pos, I32 off, const U8 *lim)
+STATIC char*	S_reghop3(char *pos, I32 off, const char *lim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3);
 
-#ifdef XXX_dmq
-STATIC U8*	S_reghop4(U8 *pos, I32 off, const U8 *llim, const U8 *rlim)
+STATIC char*	S_reghop3x(char *pos, I32 off, const char *lim)
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(1)
+			__attribute__nonnull__(3);
+
+STATIC char*	S_reghop4(char *pos, I32 off, const char *llim, const char *rlim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3)
 			__attribute__nonnull__(4);
 
-#endif
 STATIC U8*	S_reghopmaybe3(U8 *pos, I32 off, const U8 *lim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
