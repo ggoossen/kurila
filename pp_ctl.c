@@ -243,7 +243,7 @@ PP(pp_substcont)
 	    TAINT_IF(cx->sb_rxtainted & 1);
 	    PUSHs(sv_2mortal(newSViv(saviters - 1)));
 
-	    (void)SvPOK_only_UTF8(targ);
+	    (void)SvPOK_only(targ);
 	    TAINT_IF(cx->sb_rxtainted);
 	    SvSETMAGIC(targ);
 	    SvTAINT(targ);

@@ -1548,10 +1548,7 @@ PP(pp_repeat)
 	    }
 	    *SvEND(TARG) = '\0';
 	}
-	if (isutf)
-	    (void)SvPOK_only_UTF8(TARG);
-	else
-	    (void)SvPOK_only(TARG);
+	(void)SvPOK_only(TARG);
 
 	if (PL_op->op_private & OPpREPEAT_DOLIST) {
 	    /* The parser saw this as a list repeat, and there
@@ -3044,7 +3041,7 @@ PP(pp_substr)
 		if (isGV_with_GP(sv))
 		    SvPV_force_nolen(sv);
 		else if (SvOK(sv))	/* is it defined ? */
-		    (void)SvPOK_only_UTF8(sv);
+		    (void)SvPOK_only(sv);
 		else
 		    sv_setpvn(sv,"",0);	/* avoid lexical reincarnation */
 	    }
@@ -3598,7 +3595,7 @@ PP(pp_quotemeta)
 	}
 	*d = '\0';
 	SvCUR_set(TARG, d - SvPVX_const(TARG));
-	(void)SvPOK_only_UTF8(TARG);
+	(void)SvPOK_only(TARG);
     }
     else
 	sv_setpvn(TARG, s, len);
@@ -4277,7 +4274,7 @@ PP(pp_reverse)
 		*up++ = *down;
 		*down-- = (char)tmp;
 	    }
-	    (void)SvPOK_only_UTF8(TARG);
+	    (void)SvPOK_only(TARG);
 	}
 	SP = MARK + 1;
 	SETTARG;

@@ -882,29 +882,6 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 #define SvNOK_only(sv)		(SvOK_off(sv), \
 				    SvFLAGS(sv) |= (SVf_NOK|SVp_NOK))
 
-/*
-=for apidoc Am|U32|SvUTF8|SV* sv
-Deleted.
-Returns a U32 value indicating whether the SV contains UTF-8 encoded data.
-Call this after SvPV() in case any call to string overloading updates the
-internal flag.
-
-=for apidoc Am|void|SvUTF8_on|SV *sv
-Deleted.
-Turn on the UTF-8 status of an SV (the data is not changed, just the flag).
-Do not use frivolously.
-
-=for apidoc Am|void|SvUTF8_off|SV *sv
-Deleted.
-Unsets the UTF-8 status of an SV.
-
-=for apidoc Am|void|SvPOK_only_UTF8|SV* sv
-Tells an SV that it is a string and disables all other OK bits,
-and leaves the UTF-8 status as it was.
-
-=cut
- */
-
 /* Ensure the return value of this macro does not clash with the GV_ADD* flags
 in gv.h: */
 #define SvPOK(sv)		(SvFLAGS(sv) & SVf_POK)
@@ -914,10 +891,6 @@ in gv.h: */
 #define SvPOK_only(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) &= ~(SVf_OK|		\
 						  SVf_IVisUV),	\
-				    SvFLAGS(sv) |= (SVf_POK|SVp_POK))
-#define SvPOK_only_UTF8(sv)	(assert_not_ROK(sv) assert_not_glob(sv)	\
-				 SvFLAGS(sv) &= ~(SVf_OK|		\
-						  SVf_IVisUV),		\
 				    SvFLAGS(sv) |= (SVf_POK|SVp_POK))
 
 #define SvVOK(sv)		(SvMAGICAL(sv)				\

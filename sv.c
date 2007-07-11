@@ -3687,7 +3687,7 @@ Perl_sv_setpvn(pTHX_ register SV *sv, register const char *ptr, register STRLEN 
     Move(ptr,dptr,len,char);
     dptr[len] = '\0';
     SvCUR_set(sv, len);
-    (void)SvPOK_only_UTF8(sv);		/* validate pointer */
+    (void)SvPOK_only(sv);		/* validate pointer */
     SvTAINT(sv);
 }
 
@@ -3732,7 +3732,7 @@ Perl_sv_setpv(pTHX_ register SV *sv, register const char *ptr)
     SvGROW(sv, len + 1);
     Move(ptr,SvPVX(sv),len+1,char);
     SvCUR_set(sv, len);
-    (void)SvPOK_only_UTF8(sv);		/* validate pointer */
+    (void)SvPOK_only(sv);		/* validate pointer */
     SvTAINT(sv);
 }
 
@@ -3815,7 +3815,7 @@ Perl_sv_usepvn_flags(pTHX_ SV *sv, char *ptr, STRLEN len, U32 flags)
     if (!(flags & SV_HAS_TRAILING_NUL)) {
 	ptr[len] = '\0';
     }
-    (void)SvPOK_only_UTF8(sv);		/* validate pointer */
+    (void)SvPOK_only(sv);		/* validate pointer */
     SvTAINT(sv);
     if (flags & SV_SMAGIC)
 	SvSETMAGIC(sv);
@@ -4024,7 +4024,7 @@ Perl_sv_catpvn_flags(pTHX_ register SV *dsv, register const char *sstr, register
     Move(sstr, SvPVX(dsv) + dlen, slen, char);
     SvCUR_set(dsv, SvCUR(dsv) + slen);
     *SvEND(dsv) = '\0';
-    (void)SvPOK_only_UTF8(dsv);		/* validate pointer */
+    (void)SvPOK_only(dsv);		/* validate pointer */
     SvTAINT(dsv);
     if (flags & SV_SMAGIC)
 	SvSETMAGIC(dsv);
@@ -4089,7 +4089,7 @@ Perl_sv_catpv(pTHX_ register SV *sv, register const char *ptr)
 	ptr = SvPVX_const(sv);
     Move(ptr,SvPVX(sv)+tlen,len+1,char);
     SvCUR_set(sv, SvCUR(sv) + len);
-    (void)SvPOK_only_UTF8(sv);		/* validate pointer */
+    (void)SvPOK_only(sv);		/* validate pointer */
     SvTAINT(sv);
 }
 
@@ -4669,7 +4669,7 @@ Perl_sv_insert(pTHX_ SV *bigstr, STRLEN offset, STRLEN len, const char *little, 
     if (!bigstr)
 	Perl_croak(aTHX_ "Can't modify non-existent substring");
     SvPV_force(bigstr, curlen);
-    (void)SvPOK_only_UTF8(bigstr);
+    (void)SvPOK_only(bigstr);
     if (offset + len > curlen) {
 	SvGROW(bigstr, offset+len+1);
 	Zero(SvPVX(bigstr)+curlen, offset+len-curlen, char);
