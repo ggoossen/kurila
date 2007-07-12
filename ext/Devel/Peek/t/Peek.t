@@ -20,6 +20,7 @@ our $DEBUG = 0;
 open(SAVERR, ">&STDERR") or die "Can't dup STDERR: $!";
 
 sub do_test {
+    local $Level = $Level + 1;
     my $pattern = pop;
     if (open(OUT,">peek$$")) {
 	open(STDERR, ">&OUT") or die "Can't dup OUT: $!";
@@ -127,8 +128,8 @@ do_test( 7,
   FLAGS = \\(NOK,pNOK\\)
   IV = \\d+
   NV = 789\\.(?:1(?:000+\d+)?|0999+\d+)
-  PV = $ADDR "789"\\\0 \\[UTF8 "789\\.1"\\]
-  CUR = 5
+  PV = $ADDR "789"\\\0 \\[UTF8 "789"\\]
+  CUR = 3
   LEN = \\d+');
 
 do_test( 8,
@@ -150,18 +151,12 @@ do_test(10,
   REFCNT = 1
   FLAGS = \\(ROK\\)
   RV = $ADDR
-  SV = PVMG\\($ADDR\\) at $ADDR
+  SV = PV\\($ADDR\\) at $ADDR
     REFCNT = 2
-    FLAGS = \\(SMG,POK,pPOK\\)
-    IV = 0
-    NV = 0
+    FLAGS = \\(POK,pPOK\\)
     PV = $ADDR "foo"\\\0 \\[UTF8 "foo"\\]
     CUR = 3
     LEN = \\d+
-    MAGIC = $ADDR
-      MG_VIRTUAL = &PL_vtbl_utf8
-      MG_TYPE = PERL_MAGIC_utf8\\(w\\)
-      MG_LEN = 3
 ');
 
 my $c_pattern;
@@ -379,9 +374,6 @@ do_test(20,
   CUR = 0
   LEN = \d+
   MAGIC = $ADDR
-    MG_VIRTUAL = &PL_vtbl_utf8
-    MG_TYPE = PERL_MAGIC_utf8[(]w[)]
-  MAGIC = $ADDR
     MG_VIRTUAL = &PL_vtbl_mglob
     MG_TYPE = PERL_MAGIC_regex_global\\(g\\)
     MG_FLAGS = 0x01
@@ -441,10 +433,6 @@ do_test(22,
     PV = $ADDR "" \\[UTF8 ""\\]
     CUR = 0
     LEN = 0
-    MAGIC = $ADDR
-      MG_VIRTUAL = &PL_vtbl_utf8
-      MG_TYPE = PERL_MAGIC_utf8[(]w[)]
-      MG_LEN = 16
     STASH = $ADDR\s+"Foobar"');
 
 # Constant subroutines
