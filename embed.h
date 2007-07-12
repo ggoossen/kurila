@@ -1414,6 +1414,7 @@
 #define regcppush		S_regcppush
 #define regcppop		S_regcppop
 #define reghop3			S_reghop3
+#define reghop3c		S_reghop3c
 #define reghop3x		S_reghop3x
 #define reghop4			S_reghop4
 #define reghopmaybe3		S_reghopmaybe3
@@ -3681,6 +3682,7 @@
 #define regcppush(a)		S_regcppush(aTHX_ a)
 #define regcppop(a)		S_regcppop(aTHX_ a)
 #define reghop3			S_reghop3
+#define reghop3c		S_reghop3c
 #define reghop3x		S_reghop3x
 #define reghop4			S_reghop4
 #define reghopmaybe3		S_reghopmaybe3

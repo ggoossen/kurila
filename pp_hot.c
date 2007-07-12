@@ -1397,13 +1397,7 @@ yup:					/* Confirmed by INTUIT */
 	/* FIXME - should rx->subbeg be const char *?  */
 	rx->subbeg = (char *) truebase;
 	rx->offs[0].start = s - truebase;
-	if (IN_CODEPOINTS) {
-	    char * const t = (char*)utf8_hop((U8*)s, rx->minlenret);
-	    rx->offs[0].end = t - truebase;
-	}
-	else {
-	    rx->offs[0].end = s - truebase + rx->minlenret;
-	}
+	rx->offs[0].end = s - truebase + rx->minlenret;
 	rx->sublen = strend - truebase;
 	goto gotcha;
     }

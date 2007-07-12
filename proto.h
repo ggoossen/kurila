@@ -3825,6 +3825,11 @@ STATIC char*	S_reghop3(char *pos, I32 off, const char *lim)
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3);
 
+STATIC char*	S_reghop3c(char *pos, I32 off, const char *lim)
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(1)
+			__attribute__nonnull__(3);
+
 STATIC char*	S_reghop3x(char *pos, I32 off, const char *lim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)

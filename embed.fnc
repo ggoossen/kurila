@@ -1423,6 +1423,7 @@ ERs	|bool	|reginclass	|NULLOK const regexp *prog|NN const regnode *n|NN const U8
 Es	|CHECKPOINT|regcppush	|I32 parenfloor
 Es	|char*	|regcppop	|NN const regexp *rex
 ERsn	|char*	|reghop3	|NN char *pos|I32 off|NN const char *lim
+ERsn	|char*	|reghop3c	|NN char *pos|I32 off|NN const char *lim
 ERsn	|char*	|reghop3x	|NN char *pos|I32 off|NN const char *lim
 ERsn	|char*	|reghop4	|NN char *pos|I32 off|NN const char *llim|NN const char *rlim
 ERsn	|U8*	|reghopmaybe3	|NN U8 *pos|I32 off|NN const U8 *lim

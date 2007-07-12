@@ -4128,12 +4128,12 @@ sub kt
         for my $dfi (0..$#df) {
             my $pat= $df[$dfi];
             my $str= $ss[$ssi];
-            (my $sstr=$str)=~s/\xDF/\\xDF/;
+            (my $sstr=$str)=~s/\x{DF}/\\x{DF}/;
 
             my $ret= $str=~/$pat/i;
             next if $pat eq '-';
             ok($ret,
-               "\"$sstr\"=~/\\xDF/i");
+               "\"$sstr\"=~/\\x{DF}/i");
         }
     }
 }

@@ -534,7 +534,7 @@ Perl_re_intuit_start(pTHX_ REGEXP * const prog, SV *sv, char *strpos,
             start_point= (char*)(s + srch_start_shift);
             end_point= (char*)(strend - srch_end_shift);
         } else {
-	    start_point= reghop3(s, srch_start_shift, srch_start_shift < 0 ? strbeg : strend);
+	    start_point= reghop4(s, srch_start_shift, strbeg, strend);
             end_point= reghop3(strend, -srch_end_shift, strbeg);
 	}
 	DEBUG_OPTIMISE_MORE_r({
@@ -729,7 +729,7 @@ Perl_re_intuit_start(pTHX_ REGEXP * const prog, SV *sv, char *strpos,
     }
 
     
-    t= (char*)reghop3( s, -prog->check_offset_max, (prog->check_offset_max<0) ? strend : strpos);
+    t= reghop4( s, -prog->check_offset_max, strpos, strend);
         
     DEBUG_OPTIMISE_MORE_r(
         PerlIO_printf(Perl_debug_log, 
@@ -743,10 +743,7 @@ Perl_re_intuit_start(pTHX_ REGEXP * const prog, SV *sv, char *strpos,
         )
     );
 
-    if (s - strpos > prog->check_offset_max  /* signed-corrected t > strpos */
-        && (!do_utf8
-	    || ((t = (char*)reghopmaybe3((U8*)s, -prog->check_offset_max, (U8*) ((prog->check_offset_max<0) ? strend : strpos)))
-		 && t > strpos))) 
+    if (s - strpos > prog->check_offset_max)  /* signed-corrected t > strpos */
     {
 	/* Fixed substring is found far enough so that the match
 	   cannot start at strpos. */
@@ -1070,6 +1067,11 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
         
 	GET_RE_DEBUG_FLAGS_DECL;
 
+	DEBUG_EXECUTE_r( {
+            RE_PV_QUOTED_DECL(quoted, do_utf8, PERL_DEBUG_PAD_ZERO(0), 
+                s, strend -s + 1, 30);
+	    PerlIO_printf( Perl_debug_log,
+					" find by class. class: %s, %s\n", PL_reg_name[OP(c)], quoted); } );
 	/* We know what class it must start with. */
 	switch (OP(c)) {
 	case ANYOFU:
@@ -1112,7 +1114,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		if (s == PL_bostr)
 		    tmp = '\n';
 		else {
-		    U8 * const r = reghop3(s, -1, PL_bostr);
+		    U8 * const r = reghop3c(s, -1, PL_bostr);
 		    tmp = utf8n_to_uvchr(r, UTF8SKIP(r), 0, UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY);
 		}
 		tmp = ((OP(c) == BOUND ?
@@ -1150,7 +1152,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		if (s == PL_bostr)
 		    tmp = '\n';
 		else {
-		    U8 * const r = reghop3(s, -1, PL_bostr);
+		    U8 * const r = reghop3c(s, -1, PL_bostr);
 		    tmp = utf8n_to_uvchr(r, UTF8SKIP(r), 0, UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY);
 		}
 		tmp = ((OP(c) == NBOUND ?
@@ -1880,6 +1882,9 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
     RXi_GET_DECL(prog,progi);
     GET_RE_DEBUG_FLAGS_DECL;
     reginfo->cutpoint=NULL;
+
+    DEBUG_EXECUTE_r(
+			PerlIO_printf(Perl_debug_log, "regtry") );
 
     if ((prog->extflags & RXf_EVAL_SEEN) && !PL_reg_eval_set) {
 	MAGIC *mg;
@@ -2934,7 +2939,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		if (locinput == PL_bostr)
 		    ln = '\n';
 		else {
-		    const U8 * const r = reghop3((U8*)locinput, -1, (U8*)PL_bostr);
+		    const U8 * const r = reghop3c((U8*)locinput, -1, (U8*)PL_bostr);
 		
 		    ln = utf8n_to_uvchr(r, UTF8SKIP(r), 0, uniflags);
 		}
@@ -4812,8 +4817,8 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
     if (flags & ANYOF_UNICODE) {
         if (lenp)
 	    *lenp = 0;
-	if ((!ANYOF_RUNTIME(n)) && (c < 256)) {
-	    return (len != (STRLEN)-1 && ANYOF_BITMAP_TEST(n, c)) ? TRUE : FALSE;
+	if (c < 256) {
+	    match = ANYOF_BITMAP_TEST(n, c) ? TRUE : FALSE;
 	}
 	else if ((flags & ANYOF_UNICODE_ALL) && c >= 256)
 	    match = TRUE;
@@ -4892,28 +4897,29 @@ S_reghop3x(char *s, I32 off, const char* lim)
 	return s + off < lim ? lim : s + off;
     }
 }
-/* STATIC U8 * */
-/* S_reghop3(U8 *s, I32 off, const U8* lim) */
-/* { */
-/*     dVAR; */
-/*     if (off >= 0) { */
-/* 	while (off-- && s < lim) { */
-/* 	    /\* XXX could check well-formedness here *\/ */
-/* 	    s += UTF8SKIP(s); */
-/* 	} */
-/*     } */
-/*     else { */
-/*         while (off++ && s > lim) { */
-/*             s--; */
-/*             if (UTF8_IS_CONTINUED(*s)) { */
-/*                 while (s > lim && UTF8_IS_CONTINUATION(*s)) */
-/*                     s--; */
-/* 	    } */
-/*             /\* XXX could check well-formedness here *\/ */
-/* 	} */
-/*     } */
-/*     return s; */
-/* } */
+
+STATIC char *
+S_reghop3c(char *s, I32 off, const char* lim)
+{
+    dVAR;
+    if (off >= 0) {
+	while (off-- && s < lim) {
+	    /* XXX could check well-formedness here */
+	    s += UTF8SKIP(s);
+	}
+    }
+    else {
+        while (off++ && s > lim) {
+            s--;
+            if (UTF8_IS_CONTINUED(*s)) {
+                while (s > lim && UTF8_IS_CONTINUATION(*s))
+                    s--;
+	    }
+            /* XXX could check well-formedness here */
+	}
+    }
+    return s;
+}
 
 STATIC char *
 S_reghop4(char *s, I32 off, const char* llim, const char* rlim)
@@ -4927,28 +4933,12 @@ S_reghop4(char *s, I32 off, const char* llim, const char* rlim)
 STATIC U8 *
 S_reghopmaybe3(U8* s, I32 off, const U8* lim)
 {
-    dVAR;
     if (off >= 0) {
-	while (off-- && s < lim) {
-	    /* XXX could check well-formedness here */
-	    s += UTF8SKIP(s);
-	}
-	if (off >= 0)
-	    return NULL;
+	return s + off > lim ? NULL : s + off;
     }
     else {
-        while (off++ && s > lim) {
-            s--;
-            if (UTF8_IS_CONTINUED(*s)) {
-                while (s > lim && UTF8_IS_CONTINUATION(*s))
-                    s--;
-	    }
-            /* XXX could check well-formedness here */
-	}
-	if (off <= 0)
-	    return NULL;
+	return s + off < lim ? NULL : s + off;
     }
-    return s;
 }
 
 static void

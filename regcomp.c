@@ -5931,7 +5931,7 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
 	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
 	if (UTF)
 	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
-	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
+	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", UTF, FOLD));
 	ANYOF_BITMAP_ZERO(ret);
 	listsv = newSVpvs("# comment\n");
     }
@@ -5956,9 +5956,13 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
 			  * character, insert also the folded version
 			  * to the charclass. */
 			 if (f != value) {
-			      if (foldlen == (STRLEN)UNISKIP(f))
+			     if (f < 256) {
+				 ANYOF_BITMAP_SET(ret, f);
+			     }
+			     if (foldlen == (STRLEN)UNISKIP(f)) {
 				  Perl_sv_catpvf(aTHX_ listsv,
 						 "%04"UVxf"\n", f);
+			     }
 			      else {
 				  /* Any multicharacter foldings
 				   * require the following transform:
@@ -5973,7 +5977,7 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
 
 				  if (!unicode_alternate)
 				      unicode_alternate = newAV();
-				  DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "add alternate %p\n", unicode_alternate));
+				  DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "add alternate\n"));
 				  sv = newSVpvn((char*)foldbuf, foldlen);
 				  av_push(unicode_alternate, sv);
 			      }
