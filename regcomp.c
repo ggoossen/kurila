@@ -5931,7 +5931,6 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
 	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
 	if (UTF)
 	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
-	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", UTF, FOLD));
 	ANYOF_BITMAP_ZERO(ret);
 	listsv = newSVpvs("# comment\n");
     }
@@ -6019,7 +6018,6 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
 	}
     }
 
-    DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "anyof_get_swash\n"));
     anyof_get_swash(pRExC_state, ret, listsv, unicode_alternate);
 
     return ret;
@@ -7255,7 +7253,6 @@ parseit:
 	else
 	    value = UCHARAT(RExC_parse++);
 
-	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass XX %c\n", value));
 	nextvalue = RExC_parse < RExC_end ? UCHARAT(RExC_parse) : 0;
 	if (value == '[' && POSIXCC(nextvalue))
 	    namedclass = regpposixcc(pRExC_state, value);
@@ -7718,8 +7715,6 @@ S_regclassfold(pTHX_ RExC_state_t *pRExC_state, U32 depth)
     }
     else
 	value = UCHARAT(RExC_parse++);
-
-    DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass XX %c\n", value));
 
     if (value == '\\') {
 	if (UTF) {
@@ -8528,20 +8523,19 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	    sv_catpvs(sv, "{unicode_all}");
 
 	{
-	    int i;
-	    for (i=0; i< progi->data->count; i++) {
-		Perl_sv_catpvf(aTHX_ sv, "%c", progi->data->what[i]);
-		if (progi->data->what[i] == 's') {
-		    SV * const rv = (SV*)progi->data->data[i];
-		    AV * const av = (AV*)SvRV((SV*)rv);
-		    SV **const ary = AvARRAY(av);
-		    SV **a, **b;
-	
-		    /* See the end of regcomp.c:S_regclass() for
-		     * documentation of these array elements. */
+	    /* the list sv */
+	    int i = ARG(o);
+	    Perl_sv_catpvf(aTHX_ sv, "%c", progi->data->what[i]);
+	    if (progi->data->what[i] == 's') {
+		SV * const rv = (SV*)progi->data->data[i];
+		AV * const av = (AV*)SvRV((SV*)rv);
+		SV **const ary = AvARRAY(av);
+		SV **a, **b;
+		
+		/* See the end of regcomp.c:S_regclass() for
+		 * documentation of these array elements. */
 		    
-		    Perl_sv_catpvf(aTHX_ sv, "(%s)", SvPVX_const(ary[0]));
-		}
+		Perl_sv_catpvf(aTHX_ sv, "(%s)", SvPVX_const(ary[0]));
 	    }
 
 	    SV *lv = NULL;
