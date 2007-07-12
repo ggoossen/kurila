@@ -178,7 +178,25 @@ my $testpkgs = {
 
     POSIX => { dflt => 'constant',			# all but 252/589
 	       skip => [qw/ _POSIX_JOB_CONTROL /],	# platform varying
-	       perl => [qw/ import croak AUTOLOAD /],
+	       perl => [qw/ import croak AUTOLOAD load_imports
+                            usage redef unimpl assert tolower toupper closedir
+                            opendir readdir rewinddir errno creat fcntl getgrgid
+                            getgrnam atan2 cos exp fabs log pow sin sqrt getpwnam
+                            getpwuid longjmp setjmp siglongjmp sigsetjmp
+                            kill raise offsetof clearerr fclose fdopen feof fgetc
+                            fgets fileno fopen fprintf fputc fputs
+                            fread freopen fscanf fseek fsync ferror fflush fgetpos fsetpos ftell
+                            fwrite getc getchar gets perror printf putc putchar puts remove rename
+                            rewind scanf sprintf sscanf tmpfile ungetc vfprintf vprintf vsprintf
+                            abs atexit atof atoi atol bsearch calloc div exit free getenv labs
+                            ldiv malloc qsort rand realloc srand system memchr memcmp memcpy
+                            memmove memset strcat strchr strcmp strcpy strcspn strerror strlen
+                            strncat strncmp strncpy strpbrk strrchr strspn strstr strtok chmod
+                            fstat mkdir stat umask wait waitpid gmtime localtime time alarm chdir
+                            chown execl execle execlp execv execve execvp fork getegid geteuid
+                            getgid getgroups getlogin getpgrp getpid getppid getuid isatty link
+                            rmdir setbuf setvbuf sleep unlink utime
+                            /],
 
 	       XS => [qw/ write wctomb wcstombs uname tzset tzname
 		      ttyname tmpnam times tcsetpgrp tcsendbreak
