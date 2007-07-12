@@ -4818,7 +4818,7 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
         if (lenp)
 	    *lenp = 0;
 	if (c < 256) {
-	    match = ANYOF_BITMAP_TEST(n, c) ? TRUE : FALSE;
+	    return ANYOF_BITMAP_TEST(n, c) ? TRUE : FALSE;
 	}
 	else if ((flags & ANYOF_UNICODE_ALL) && c >= 256)
 	    match = TRUE;
