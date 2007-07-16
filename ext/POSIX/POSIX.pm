@@ -6,8 +6,6 @@ our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, $AUTOLOAD, %SIGRT) = ();
 
 our $VERSION = "1.13";
 
-use AutoLoader;
-
 use XSLoader ();
 
 use Fcntl qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
@@ -41,8 +39,7 @@ sub AUTOLOAD {
     no warnings 'uninitialized';
     if ($AUTOLOAD =~ /::(_?[a-z])/) {
 	# require AutoLoader;
-	$AutoLoader::AUTOLOAD = $AUTOLOAD;
-	goto &AutoLoader::AUTOLOAD
+        croak "subroutine $AUTOLOAD does not exist";
     }
     local $! = 0;
     my $constname = $AUTOLOAD;
@@ -60,13 +57,7 @@ sub AUTOLOAD {
     goto &$AUTOLOAD;
 }
 
-package POSIX::SigAction;
-
-use AutoLoader 'AUTOLOAD';
-
 package POSIX::SigRt;
-
-use AutoLoader 'AUTOLOAD';
 
 use Tie::Hash;
 
@@ -80,9 +71,6 @@ tie %POSIX::SIGRT, 'POSIX::SigRt';
 sub DESTROY {};
 
 package POSIX;
-
-1;
-__END__
 
 sub usage {
     my ($mess) = @_;
@@ -762,8 +750,6 @@ sub utime {
     usage "utime(filename, atime, mtime)" if @_ != 3;
     CORE::utime($_[1], $_[2], $_[0]);
 }
-
-our (%EXPORT_TAGS, @EXPORT_OK, @EXPORT);
 
 sub load_imports {
 %EXPORT_TAGS = (
