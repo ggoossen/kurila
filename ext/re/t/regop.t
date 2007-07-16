@@ -355,7 +355,7 @@ anchored "ABC" at 0
 #Freeing REx: "(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\."......
 %MATCHED%
 floating ""$ at 3..4 (checking floating)
-1:1[1] 3:2[1] 5:2[64] 45:83[1] 47:84[1] 48:85[0]
+1:1[1] 3:1[1] 4:3[0] 15:4[0] 26:5[0] 37:6[0] 48:7[1] 49:9[0]
 ANYOF{i}[Ccs(# comment
 Guessed: match at offset 26
 ---
