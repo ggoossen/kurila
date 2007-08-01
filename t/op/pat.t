@@ -2690,7 +2690,7 @@ EOF
 print "d" =~ /\p{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 print "e" =~ /\P{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 
-{
+if (!$ENV{PERL_SKIP_PSYCHO_TEST}){
     print "# [ID 20020630.002] utf8 regex only matches 32k\n";
     $test = 911;
     for ([ 'byte', "\x{ff}" ], [ 'utf8', "\x{1ff}" ]) {
@@ -2702,6 +2702,8 @@ print "e" =~ /\P{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos @{[ pos($s) ]}");
 	}
     }
+} else {
+    ok(1,'Skipped Psycho') for 1..12;
 }
 
 $test = 923;
