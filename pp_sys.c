@@ -4387,7 +4387,7 @@ PP(pp_ghostent)
     EXTEND(SP, 10);
     if (which == OP_GHBYNAME) {
 #ifdef HAS_GETHOSTBYNAME
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	hent = PerlSock_gethostbyname(name);
 #else
 	DIE(aTHX_ PL_no_sock_func, "gethostbyname");
@@ -4398,7 +4398,7 @@ PP(pp_ghostent)
 	const int addrtype = POPi;
 	SV * const addrsv = POPs;
 	STRLEN addrlen;
-	const char *addr = (char *)SvPVbyte(addrsv, addrlen);
+	const char *addr = (char *)SvPV(addrsv, addrlen);
 
 	hent = PerlSock_gethostbyaddr(addr, (Netdb_hlen_t) addrlen, addrtype);
 #else
@@ -4474,7 +4474,7 @@ PP(pp_gnetent)
 
     if (which == OP_GNBYNAME){
 #ifdef HAS_GETNETBYNAME
-	const char * const name = POPpbytex;
+	const char * const name = POPpx;
 	nent = PerlSock_getnetbyname(name);
 #else
         DIE(aTHX_ PL_no_sock_func, "getnetbyname");
@@ -4547,7 +4547,7 @@ PP(pp_gprotoent)
 
     if (which == OP_GPBYNAME) {
 #ifdef HAS_GETPROTOBYNAME
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	pent = PerlSock_getprotobyname(name);
 #else
 	DIE(aTHX_ PL_no_sock_func, "getprotobyname");
@@ -4607,8 +4607,8 @@ PP(pp_gservent)
 
     if (which == OP_GSBYNAME) {
 #ifdef HAS_GETSERVBYNAME
-	const char * const proto = POPpbytex;
-	const char * const name = POPpbytex;
+	const char * const proto = POPpx;
+	const char * const name = POPpx;
 	sent = PerlSock_getservbyname(name, (proto && !*proto) ? NULL : proto);
 #else
 	DIE(aTHX_ PL_no_sock_func, "getservbyname");
@@ -4616,7 +4616,7 @@ PP(pp_gservent)
     }
     else if (which == OP_GSBYPORT) {
 #ifdef HAS_GETSERVBYPORT
-	const char * const proto = POPpbytex;
+	const char * const proto = POPpx;
 	unsigned short port = (unsigned short)POPu;
 #ifdef HAS_HTONS
 	port = PerlSock_htons(port);
@@ -4835,7 +4835,7 @@ PP(pp_gpwent)
     switch (which) {
     case OP_GPWNAM:
       {
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	pwent  = getpwnam(name);
       }
       break;
@@ -5021,7 +5021,7 @@ PP(pp_ggrent)
     const struct group *grent;
 
     if (which == OP_GGRNAM) {
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	grent = (const struct group *)getgrnam(name);
     }
     else if (which == OP_GGRGID) {

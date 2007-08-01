@@ -344,7 +344,7 @@ perform the upgrade if necessary.  See C<svtype>.
 
 #define SVf_AMAGIC	0x10000000  /* has magical overloaded methods */
 /* Ensure this value does not clash with the GV_ADD* flags in gv.h: */
-#define SVf_OBSOLETE    0x20000000  /* was: SVf_UTF8. SvPV is UTF-8 encoded */
+#define SVf_NOTUSED    0x20000000  /* was: SVf_UTF8. SvPV is UTF-8 encoded */
 					   
 
 /* Some private flags. */
@@ -375,7 +375,7 @@ perform the upgrade if necessary.  See C<svtype>.
 /* PVAV */
 #define SVpav_REIFY 	0x80000000  /* can become real */
 /* PVHV */
-#define SVphv_HASKFLAGS	0x80000000  /* keys have flag byte after hash */
+#define SVphv_NOTUSED	0x80000000  /* unused */
 /* PVGV when SVpbm_VALID is true */
 #define SVpbm_TAIL	0x80000000
 /* RV upwards. However, SVf_ROK and SVp_IOK are exclusive  */
@@ -1459,44 +1459,6 @@ otherwise use the more efficient C<SvUV>.
 Returns a boolean indicating whether Perl would evaluate the SV as true or
 false, defined or undefined.  Does not handle 'get' magic.
 
-=for apidoc Am|char*|SvPVutf8_force|SV* sv|STRLEN len
-Like C<SvPV_force>, but converts sv to utf8 first if necessary.
-
-=for apidoc Am|char*|SvPVutf8|SV* sv|STRLEN len
-Like C<SvPV>, but converts sv to utf8 first if necessary.
-
-=for apidoc Am|char*|SvPVutf8_nolen|SV* sv
-Like C<SvPV_nolen>, but converts sv to utf8 first if necessary.
-
-=for apidoc Am|char*|SvPVbyte_force|SV* sv|STRLEN len
-Like C<SvPV_force>, but converts sv to byte representation first if necessary.
-
-=for apidoc Am|char*|SvPVbyte|SV* sv|STRLEN len
-Like C<SvPV>, but converts sv to byte representation first if necessary.
-
-=for apidoc Am|char*|SvPVbyte_nolen|SV* sv
-Like C<SvPV_nolen>, but converts sv to byte representation first if necessary.
-
-=for apidoc Am|char*|SvPVutf8x_force|SV* sv|STRLEN len
-Like C<SvPV_force>, but converts sv to utf8 first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVutf8_force>
-otherwise.
-
-=for apidoc Am|char*|SvPVutf8x|SV* sv|STRLEN len
-Like C<SvPV>, but converts sv to utf8 first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVutf8>
-otherwise.
-
-=for apidoc Am|char*|SvPVbytex_force|SV* sv|STRLEN len
-Like C<SvPV_force>, but converts sv to byte representation first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVbyte_force>
-otherwise.
-
-=for apidoc Am|char*|SvPVbytex|SV* sv|STRLEN len
-Like C<SvPV>, but converts sv to byte representation first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVbyte>
-otherwise.
-
 =for apidoc Am|bool|SvIsCOW|SV* sv
 Returns a boolean indicating whether the SV is Copy-On-Write. (either shared
 hash key scalars, or full Copy On Write scalars if 5.9.0 is configured for
@@ -1580,43 +1542,12 @@ Like C<sv_catsv> but doesn't process magic.
 
 /* ----*/
 
-#define SvPVutf8(sv, lp) \
-    ((SvFLAGS(sv) & (SVf_POK)) == (SVf_POK) \
-     ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_2pvutf8(sv, &lp))
-
-#define SvPVutf8_force(sv, lp) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == (SVf_POK) \
-     ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_pvutf8n_force(sv, &lp))
-
-
-#define SvPVutf8_nolen(sv) \
-    ((SvFLAGS(sv) & (SVf_POK)) == (SVf_POK)\
-     ? SvPVX(sv) : sv_2pvutf8(sv, 0))
-
-/* ----*/
-
-#define SvPVbyte(sv, lp) \
-    ((SvFLAGS(sv) & SVf_POK) == (SVf_POK) \
-     ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_2pvbyte(sv, &lp))
-
-#define SvPVbyte_force(sv, lp) \
-    ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == (SVf_POK) \
-     ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_pvbyten_force(sv, &lp))
-
-#define SvPVbyte_nolen(sv) \
-    ((SvFLAGS(sv) & SVf_POK) == (SVf_POK)\
-     ? SvPVX(sv) : sv_2pvbyte(sv, 0))
-
-
-    
 /* define FOOx(): idempotent versions of FOO(). If possible, use a local
  * var to evaluate the arg once; failing that, use a global if possible;
  * failing that, call a function to do the work
  */
 
 #define SvPVx_force(sv, lp) sv_pvn_force(sv, &lp)
-#define SvPVutf8x_force(sv, lp) sv_pvutf8n_force(sv, &lp)
-#define SvPVbytex_force(sv, lp) sv_pvbyten_force(sv, &lp)
 
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 
@@ -1627,9 +1558,6 @@ Like C<sv_catsv> but doesn't process magic.
 #  define SvPVx_const(sv, lp) ({SV *_sv = (sv); SvPV_const(_sv, lp); })
 #  define SvPVx_nolen(sv) ({SV *_sv = (sv); SvPV_nolen(_sv); })
 #  define SvPVx_nolen_const(sv) ({SV *_sv = (sv); SvPV_nolen_const(_sv); })
-#  define SvPVutf8x(sv, lp) ({SV *_sv = (sv); SvPVutf8(_sv, lp); })
-#  define SvPVbytex(sv, lp) ({SV *_sv = (sv); SvPVbyte(_sv, lp); })
-#  define SvPVbytex_nolen(sv) ({SV *_sv = (sv); SvPVbyte_nolen(_sv); })
 #  define SvTRUE(sv) (						\
     !sv								\
     ? 0								\
@@ -1660,9 +1588,6 @@ Like C<sv_catsv> but doesn't process magic.
 #  define SvPVx_const(sv, lp) ((PL_Sv = (sv)), SvPV_const(PL_Sv, lp))
 #  define SvPVx_nolen(sv) ((PL_Sv = (sv)), SvPV_nolen(PL_Sv))
 #  define SvPVx_nolen_const(sv) ((PL_Sv = (sv)), SvPV_nolen_const(PL_Sv))
-#  define SvPVutf8x(sv, lp) ((PL_Sv = (sv)), SvPVutf8(PL_Sv, lp))
-#  define SvPVbytex(sv, lp) ((PL_Sv = (sv)), SvPVbyte(PL_Sv, lp))
-#  define SvPVbytex_nolen(sv) ((PL_Sv = (sv)), SvPVbyte_nolen(PL_Sv))
 #  define SvTRUE(sv) (						\
     !sv								\
     ? 0								\
@@ -1751,8 +1676,6 @@ Like C<sv_catsv> but doesn't process magic.
 /* all these 'functions' are now just macros */
 
 #define sv_pv(sv) SvPV_nolen(sv)
-#define sv_pvutf8(sv) SvPVutf8_nolen(sv)
-#define sv_pvbyte(sv) SvPVbyte_nolen(sv)
 
 #define sv_pvn_force_nomg(sv, lp) sv_pvn_force_flags(sv, lp, 0)
 #define sv_catpvn_nomg(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
@@ -1767,8 +1690,6 @@ Like C<sv_catsv> but doesn't process magic.
 	sv_catpvn_flags(sv, sstr, slen, SV_GMAGIC|SV_SMAGIC);
 #define sv_2pv(sv, lp) sv_2pv_flags(sv, lp, SV_GMAGIC)
 #define sv_2pv_nolen(sv) sv_2pv(sv, 0)
-#define sv_2pvbyte_nolen(sv) sv_2pvbyte(sv, 0)
-#define sv_2pvutf8_nolen(sv) sv_2pvutf8(sv, 0)
 #define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
 #define sv_pvn_force(sv, lp) sv_pvn_force_flags(sv, lp, SV_GMAGIC)
 #define sv_2iv(sv) sv_2iv_flags(sv, SV_GMAGIC)

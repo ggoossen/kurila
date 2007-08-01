@@ -2801,42 +2801,6 @@ Perl_sv_copypv(pTHX_ SV *dsv, register SV *ssv)
 }
 
 /*
-=for apidoc sv_2pvbyte
-
-Return a pointer to the byte-encoded representation of the SV, and set *lp
-to its length.  May cause the SV to be downgraded from UTF-8 as a
-side-effect.
-
-Usually accessed via the C<SvPVbyte> macro.
-
-=cut
-*/
-
-char *
-Perl_sv_2pvbyte(pTHX_ register SV *sv, STRLEN *lp)
-{
-    return lp ? SvPV(sv,*lp) : SvPV_nolen(sv);
-}
-
-/*
-=for apidoc sv_2pvutf8
-
-Return a pointer to the UTF-8-encoded representation of the SV, and set *lp
-to its length.  May cause the SV to be upgraded to UTF-8 as a side-effect.
-
-Usually accessed via the C<SvPVutf8> macro.
-
-=cut
-*/
-
-char *
-Perl_sv_2pvutf8(pTHX_ register SV *sv, STRLEN *lp)
-{
-    return lp ? SvPV(sv,*lp) : SvPV_nolen(sv);
-}
-
-
-/*
 =for apidoc sv_2bool
 
 This function is only called on magical items, and is only used by
@@ -6027,12 +5991,7 @@ Perl_sv_gets(pTHX_ register SV *sv, register PerlIO *fp, I32 append)
     }
     else {
 	/* Get $/ i.e. PL_rs into same encoding as stream wants */
-	if (PerlIO_isutf8(fp)) {
-	    rsptr = SvPVutf8(PL_rs, rslen);
-	}
-	else {
-	    rsptr = SvPV_const(PL_rs, rslen);
-	}
+	rsptr = SvPV_const(PL_rs, rslen);
     }
 
     rslast = rslen ? rsptr[rslen - 1] : '\0';
@@ -7289,38 +7248,6 @@ Perl_sv_pvn_force_flags(pTHX_ SV *sv, STRLEN *lp, I32 flags)
 	}
     }
     return SvPVX_mutable(sv);
-}
-
-/*
-=for apidoc sv_pvbyten_force
-
-The backend for the C<SvPVbytex_force> macro. Always use the macro instead.
-
-=cut
-*/
-
-char *
-Perl_sv_pvbyten_force(pTHX_ SV *sv, STRLEN *lp)
-{
-    sv_pvn_force(sv,lp);
-    *lp = SvCUR(sv);
-    return SvPVX(sv);
-}
-
-/*
-=for apidoc sv_pvutf8n_force
-
-The backend for the C<SvPVutf8x_force> macro. Always use the macro instead.
-
-=cut
-*/
-
-char *
-Perl_sv_pvutf8n_force(pTHX_ SV *sv, STRLEN *lp)
-{
-    sv_pvn_force(sv,lp);
-    *lp = SvCUR(sv);
-    return SvPVX(sv);
 }
 
 /*

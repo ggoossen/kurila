@@ -657,6 +657,8 @@ S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *min
 STATIC void
 S_cl_anything(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl)
 {
+    PERL_UNUSED_ARG(pRExC_state);
+
     ANYOF_CLASS_ZERO(cl);
     ANYOF_BITMAP_SETALL(cl);
     cl->flags = ANYOF_EOS|ANYOF_UNICODE_ALL;
@@ -732,6 +734,7 @@ STATIC void
 S_cl_or(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl, const struct regnode_charclass_class *or_with)
 {
     int i;
+    PERL_UNUSED_ARG(pRExC_state);
     for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
 	cl->bitmap[i] |= or_with->bitmap[i];
     if (or_with->flags & ANYOF_EOS)
@@ -1188,7 +1191,6 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     reg_trie_data *trie;
     AV *revcharmap = newAV();
     regnode *cur;
-    const U32 uniflags = UTF8_ALLOW_DEFAULT;
     STRLEN len = 0;
     UV uvc = 0;
     U16 curword = 0;
@@ -1272,7 +1274,6 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         regnode * const noper = NEXTOPER( cur );
         const U8 *uc = (U8*)STRING( noper );
         const U8 * const e  = uc + STR_LEN( noper );
-        const U8 *scan = (U8*)NULL;
         U32 wordlen      = 0;         /* required init */
         STRLEN chars = 0;
 	bool set_bit = 1;
@@ -1372,7 +1373,6 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 	    const U8 * const e = uc + STR_LEN( noper );
 	    U32 state        = 1;         /* required init */
 	    U16 charid       = 0;         /* sanity init */
-	    U8 *scan         = (U8*)NULL; /* sanity init */
             U32 wordlen      = 0;         /* required init */
 
             if (OP(noper) != NOTHING) {
@@ -1560,7 +1560,6 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 
             U16 charid       = 0;         /* sanity init */
             U32 accept_state = 0;         /* sanity init */
-            U8 *scan         = (U8*)NULL; /* sanity init */
 
             U32 wordlen      = 0;         /* required init */
 
