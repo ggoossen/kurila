@@ -30,7 +30,7 @@ T_IV_undef
         $var = 0 ;
 T_PV
 	if (SvOK($arg))
-            $var = ($type)SvPVbyte_nolen($arg);
+            $var = ($type)SvPV_nolen($arg);
 	else
             $var = NULL ;
 
