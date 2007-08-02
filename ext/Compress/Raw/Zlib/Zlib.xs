@@ -1195,13 +1195,13 @@ inflate (s, buf, output, eof=FALSE)
     /* If the buffer is a reference, dereference it */
     buf = deRef(buf, "inflate") ;
 
-    if (s->flags & FLAG_CONSUME_INPUT && SvREADONLY(buf))
-        croak("Compress::Raw::Zlib::Inflate::inflate input parameter cannot be read-only when ConsumeInput is specified");
-    
     /* initialise the input buffer */
     s->stream.next_in = (Bytef*)SvPV_force(buf, stmp) ;
     s->stream.avail_in = SvCUR(buf) ;
 	
+    if (s->flags & FLAG_CONSUME_INPUT && SvREADONLY(buf))
+        croak("Compress::Raw::Zlib::Inflate::inflate input parameter cannot be read-only when ConsumeInput is specified");
+    
     /* and retrieve the output buffer */
     output = deRef_l(output, "inflate") ;
     if((s->flags & FLAG_APPEND) != FLAG_APPEND) {
