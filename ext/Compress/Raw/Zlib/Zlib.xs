@@ -64,31 +64,6 @@
 #  include "ppport.h"
 #endif
 
-#if PERL_REVISION == 5 && (PERL_VERSION < 8 || (PERL_VERSION == 8 && PERL_SUBVERSION < 4 ))
-
-#    ifdef SvPVbyte_force
-#        undef SvPVbyte_force
-#    endif
-
-#    define SvPVbyte_force(sv,lp) SvPV_force(sv,lp)
-
-#endif
-
-#ifndef SvPVbyte_nolen
-#    define SvPVbyte_nolen SvPV_nolen
-#endif
-
-
-
-#if 0
-#  ifndef SvPVbyte_nolen
-#    define SvPVbyte_nolen SvPV_nolen
-#  endif
-
-#  ifndef SvPVbyte_force
-#    define SvPVbyte_force(sv,lp) SvPV_force(sv,lp)
-#  endif
-#endif
 
 typedef int                     DualType ;
 typedef int                     int_undef ;
@@ -634,7 +609,7 @@ Zip_adler32(buf, adler=adlerInitial)
 	INIT:
     	/* If the buffer is a reference, dereference it */
 	sv = deRef(sv, "adler32") ;
-	buf = (Byte*)SvPVbyte(sv, len) ;
+	buf = (Byte*)SvPV(sv, len) ;
 
 	if (items < 2)
 	  adler = adlerInitial;
@@ -654,7 +629,7 @@ Zip_crc32(buf, crc=crcInitial)
 	INIT:
     	/* If the buffer is a reference, dereference it */
 	sv = deRef(sv, "crc32") ;
-	buf = (Byte*)SvPVbyte(sv, len) ;
+	buf = (Byte*)SvPV(sv, len) ;
 
 	if (items < 2)
 	  crc = crcInitial;
@@ -729,7 +704,7 @@ _deflateInit(flags,level, method, windowBits, memLevel, strategy, bufsize, dicti
 	/* Check if a dictionary has been specified */
 
 	if (err == Z_OK && SvCUR(dictionary)) {
-	    err = deflateSetDictionary(&(s->stream), (const Bytef*) SvPVbyte_nolen(dictionary), 
+	    err = deflateSetDictionary(&(s->stream), (const Bytef*) SvPV_nolen(dictionary), 
 					SvCUR(dictionary)) ;
 	    s->dict_adler = s->stream.adler ;
 	}
@@ -846,7 +821,7 @@ deflate (s, buf, output)
     buf = deRef(buf, "deflate") ;
  
     /* initialise the input buffer */
-    s->stream.next_in = (Bytef*)SvPVbyte_nolen(buf) ;
+    s->stream.next_in = (Bytef*)SvPV_nolen(buf) ;
     s->stream.avail_in = SvCUR(buf) ;
     
     if (s->flags & FLAG_CRC32)
@@ -863,7 +838,7 @@ deflate (s, buf, output)
         /* sv_setpvn(output, "", 0); */
     }
     prefix = cur_length =  SvCUR(output) ;
-    s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length;
+    s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length;
     increment =  SvLEN(output) -  cur_length;
     s->stream.avail_out =  increment;
 #ifdef SETP_BYTE
@@ -900,7 +875,7 @@ deflate (s, buf, output)
 	    /* out of space in the output buffer so make it bigger */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ;
@@ -959,7 +934,7 @@ flush(s, output, f=Z_FINISH)
         /* sv_setpvn(output, "", 0); */
     }
     prefix = cur_length =  SvCUR(output) ;
-    s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length;
+    s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length;
     increment =  SvLEN(output) -  cur_length;
     s->stream.avail_out =  increment;
 #ifdef SETP_BYTE
@@ -996,7 +971,7 @@ flush(s, output, f=Z_FINISH)
 	    /* consumed all the available output, so extend it */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ;
@@ -1224,7 +1199,7 @@ inflate (s, buf, output, eof=FALSE)
         croak("Compress::Raw::Zlib::Inflate::inflate input parameter cannot be read-only when ConsumeInput is specified");
     
     /* initialise the input buffer */
-    s->stream.next_in = (Bytef*)SvPVbyte_force(buf, stmp) ;
+    s->stream.next_in = (Bytef*)SvPV_force(buf, stmp) ;
     s->stream.avail_in = SvCUR(buf) ;
 	
     /* and retrieve the output buffer */
@@ -1234,7 +1209,7 @@ inflate (s, buf, output, eof=FALSE)
     }
     if (SvLEN(output)) {
         prefix_length = cur_length =  SvCUR(output) ;
-        s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length;
+        s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length;
         increment = SvLEN(output) -  cur_length - 1;
         s->stream.avail_out = increment;
     }
@@ -1249,7 +1224,7 @@ inflate (s, buf, output, eof=FALSE)
 	    /* out of space in the output buffer so make it bigger */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ; 
@@ -1273,7 +1248,7 @@ inflate (s, buf, output, eof=FALSE)
         if (RETVAL == Z_NEED_DICT && s->dictionary) {
             s->dict_adler = s->stream.adler ;
             RETVAL = inflateSetDictionary(&(s->stream), 
-            (const Bytef*)SvPVbyte_nolen(s->dictionary),
+            (const Bytef*)SvPV_nolen(s->dictionary),
             SvCUR(s->dictionary));
         }
 
@@ -1290,7 +1265,7 @@ inflate (s, buf, output, eof=FALSE)
 	    /* out of space in the output buffer so make it bigger */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ;
@@ -1316,12 +1291,12 @@ inflate (s, buf, output, eof=FALSE)
 
         if (s->flags & FLAG_CRC32 )
             s->crc32 = crc32(s->crc32, 
-				(const Bytef*)SvPVbyte_nolen(output)+prefix_length, 
+				(const Bytef*)SvPV_nolen(output)+prefix_length, 
             			SvCUR(output)-prefix_length) ;
 
         if (s->flags & FLAG_ADLER32) 
             s->adler32 = adler32(s->adler32, 
-				(const Bytef*)SvPVbyte_nolen(output)+prefix_length, 
+				(const Bytef*)SvPV_nolen(output)+prefix_length, 
             			SvCUR(output)-prefix_length) ;
 
 	/* fix the input buffer */
@@ -1329,7 +1304,7 @@ inflate (s, buf, output, eof=FALSE)
 	    in = s->stream.avail_in ;
 	    SvCUR_set(buf, in) ;
 	    if (in)
-	        Move(s->stream.next_in, SvPVbyte_nolen(buf), in, char) ;	
+	        Move(s->stream.next_in, SvPV_nolen(buf), in, char) ;	
             *SvEND(buf) = '\0';
             SvSETMAGIC(buf);
 	}
@@ -1372,7 +1347,7 @@ inflateSync (s, buf)
     buf = deRef(buf, "inflateSync") ;
     
     /* initialise the input buffer */
-    s->stream.next_in = (Bytef*)SvPVbyte_nolen(buf) ;
+    s->stream.next_in = (Bytef*)SvPV_nolen(buf) ;
     s->stream.avail_in = SvCUR(buf) ;
 	
     /* inflateSync doesn't create any output */
@@ -1387,7 +1362,7 @@ inflateSync (s, buf)
 	unsigned in = s->stream.avail_in ;
  	SvCUR_set(buf, in) ;
  	if (in)
-     	    Move(s->stream.next_in, SvPVbyte_nolen(buf), in, char) ;	
+     	    Move(s->stream.next_in, SvPV_nolen(buf), in, char) ;	
         *SvEND(buf) = '\0';
         SvSETMAGIC(buf);
     }
@@ -1542,7 +1517,7 @@ scan(s, buf, out=NULL, eof=FALSE)
 #else
     buf = deRef(buf, "inflateScan") ;
     /* initialise the input buffer */
-    s->stream.next_in = (Bytef*)SvPVbyte_force(buf, stmp) ;
+    s->stream.next_in = (Bytef*)SvPV_force(buf, stmp) ;
     s->stream.avail_in = SvCUR(buf) ;
     start_len = s->stream.avail_in ;
     s->bytesInflated = 0 ; 
@@ -1627,7 +1602,7 @@ scan(s, buf, out=NULL, eof=FALSE)
             unsigned in = s->stream.avail_in ;
             SvCUR_set(buf, in) ;
             if (in)
-                Move(s->stream.next_in, SvPVbyte_nolen(buf), in, char) ;	
+                Move(s->stream.next_in, SvPV_nolen(buf), in, char) ;	
                 *SvEND(buf) = '\0';
                 SvSETMAGIC(buf);
         }
