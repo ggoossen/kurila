@@ -1690,7 +1690,7 @@ unshift(db, ...)
 	    for (i = items-1 ; i > 0 ; --i)
 	    {
 		DBM_ckFilter(ST(i), filter_store_value, "filter_store_value");
-	        value.data = SvPVbyte(ST(i), n_a) ;
+	        value.data = SvPV(ST(i), n_a) ;
 	        value.size = n_a ;
 	        One = 1 ;
 	        key.data = &One ;
@@ -1800,7 +1800,7 @@ push(db, ...)
 	        for (i = 1 ; i < items ; ++i)
 	        {
 		    DBM_ckFilter(ST(i), filter_store_value, "filter_store_value");
-	            value.data = SvPVbyte(ST(i), n_a) ;
+	            value.data = SvPV(ST(i), n_a) ;
 	            value.size = n_a ;
 		    ++ keyval ;
 	            key.data = &keyval ;
