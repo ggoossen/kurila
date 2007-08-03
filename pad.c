@@ -339,8 +339,7 @@ SvOURSTASH to that value
 
 If fake, it means we're cloning an existing entry
 
-=cut
-*/
+=cut */
 
 PADOFFSET
 Perl_pad_add_name(pTHX_ const char *name, HV* typestash, HV* ourstash, bool fake, bool state)

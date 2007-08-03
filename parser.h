@@ -73,7 +73,6 @@ typedef struct yy_parser {
     U16		in_my;		/* we're compiling a "my"/"our" declaration */
     U8		lex_state;	/* next token is determined */
     /* space for a U8 here */
-    HV		*in_my_stash;	/* declared class of this "my" declaration */
     PerlIO	*rsfp;		/* current source file pointer */
     AV		*rsfp_filters;	/* holds chain of active source filters */
     U8		error_count;	/* how many compile errors so far, max 10 */

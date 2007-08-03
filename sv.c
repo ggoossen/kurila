@@ -9137,7 +9137,6 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     /* rsfp_filters entries have fake IoDIRP() */
     parser->rsfp_filters= av_dup_inc(proto->rsfp_filters, param);
     parser->in_my	= proto->in_my;
-    parser->in_my_stash	= hv_dup(proto->in_my_stash, param);
     parser->error_count	= proto->error_count;
 
 

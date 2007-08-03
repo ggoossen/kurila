@@ -63,7 +63,6 @@
 #define PL_rsfp			(PL_parser->rsfp)
 #define PL_rsfp_filters		(PL_parser->rsfp_filters)
 #define PL_in_my		(PL_parser->in_my)
-#define PL_in_my_stash		(PL_parser->in_my_stash)
 #define PL_tokenbuf		(PL_parser->tokenbuf)
 #define PL_multi_end		(PL_parser->multi_end)
 #define PL_error_count		(PL_parser->error_count)
@@ -2706,33 +2705,6 @@ S_filter_gets(pTHX_ register SV *sv, register PerlIO *fp, STRLEN append)
     }
     else
         return (sv_gets(sv, fp, append));
-}
-
-STATIC HV *
-S_find_in_my_stash(pTHX_ const char *pkgname, I32 len)
-{
-    dVAR;
-    GV *gv;
-
-    if (len == 11 && *pkgname == '_' && strEQ(pkgname, "__PACKAGE__"))
-        return PL_curstash;
-
-    if (len > 2 &&
-        (pkgname[len - 2] == ':' && pkgname[len - 1] == ':') &&
-        (gv = gv_fetchpvn_flags(pkgname, len, 0, SVt_PVHV)))
-    {
-        return GvHV(gv);			/* Foo:: */
-    }
-
-    /* use constant CLASS => 'MyClass' */
-    gv = gv_fetchpvn_flags(pkgname, len, 0, SVt_PVCV);
-    if (gv && GvCV(gv)) {
-	SV * const sv = cv_const_sv(GvCV(gv));
-	if (sv)
-            pkgname = SvPV_nolen_const(sv);
-    }
-
-    return gv_stashpv(pkgname, 0);
 }
 
 /*
@@ -5870,26 +5842,10 @@ Perl_yylex(pTHX)
 	    PL_in_my = (U16)tmp;
 	    s = SKIPSPACE1(s);
 	    if (isIDFIRST_lazy_if(s,UTF)) {
-#ifdef PERL_MAD
-		char* start = s;
-#endif
 		s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, TRUE, &len);
 		if (len == 3 && strnEQ(PL_tokenbuf, "sub", 3))
 		    goto really_sub;
-		PL_in_my_stash = find_in_my_stash(PL_tokenbuf, len);
-		if (!PL_in_my_stash) {
-		    char tmpbuf[1024];
-		    PL_bufptr = s;
-		    my_snprintf(tmpbuf, sizeof(tmpbuf), "No such class %.1000s", PL_tokenbuf);
-		    yyerror(tmpbuf);
-		}
-#ifdef PERL_MAD
-		if (PL_madskills) {	/* just add type to declarator token */
-		    sv_catsv(PL_thistoken, PL_nextwhite);
-		    PL_nextwhite = 0;
-		    sv_catpvn(PL_thistoken, start, s - start);
-		}
-#endif
+		Perl_croak(aTHX_ "Expected variable after declarator");
 	    }
 	    yylval.ival = 1;
 	    OPERATOR(MY);
@@ -12044,7 +12000,6 @@ Perl_yyerror(pTHX_ const char *s)
             OutCopFILE(PL_curcop));
     }
     PL_in_my = 0;
-    PL_in_my_stash = NULL;
     return 0;
 }
 #ifdef __SC__
