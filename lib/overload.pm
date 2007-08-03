@@ -110,7 +110,7 @@ sub mycan {				# Real can would leave stubs.
   my $mro = mro::get_linear_isa($package);
   foreach my $p (@$mro) {
     my $fqmeth = $p . q{::} . $meth;
-    return \*{$fqmeth} if defined &{$fqmeth};
+    return \*{Symbol::qualify_to_ref($fqmeth)} if defined &{Symbol::qualify_to_ref($fqmeth)};
   }
 
   return undef;

@@ -221,6 +221,7 @@ XS(XS_Tie_Hash_NamedCapture_FIRSTK);
 XS(XS_Tie_Hash_NamedCapture_NEXTK);
 XS(XS_Tie_Hash_NamedCapture_SCALAR);
 XS(XS_Tie_Hash_NamedCapture_flags);
+XS(XS_Symbol_qualify_to_ref);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -282,6 +283,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("Tie::Hash::NamedCapture::NEXTKEY", XS_Tie_Hash_NamedCapture_NEXTK, file);
     newXS("Tie::Hash::NamedCapture::SCALAR", XS_Tie_Hash_NamedCapture_SCALAR, file);
     newXS("Tie::Hash::NamedCapture::flags", XS_Tie_Hash_NamedCapture_flags, file);
+    newXSproto("Symbol::qualify_to_ref", XS_Symbol_qualify_to_ref, file, "$");
 }
 
 
@@ -1384,6 +1386,19 @@ XS(XS_Tie_Hash_NamedCapture_flags)
 	XPUSHs(sv_2mortal(newSVuv(RXapif_ALL)));
 	PUTBACK;
 	return;
+}
+
+XS(XS_Symbol_qualify_to_ref)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
+
+    ST(0) = gv_fetchsv(ST(0), GV_ADD, SVt_PVGV);
+    XSRETURN(1);
 }
 
 

@@ -23,11 +23,11 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-# t_strict_refs();
-t_indirect_object_syntax();
-t_barewords();
-t_glob_pattr();
-t_vstring();
+t_strict_refs();
+# t_indirect_object_syntax();
+# t_barewords();
+# t_glob_pattr();
+# t_vstring();
 # t_encoding();
 
 sub t_indirect_object_syntax {
@@ -155,8 +155,9 @@ sub t_strict_refs {
 
     p5convert( 'my $pkg; keys %Package::',
                'my $pkg; keys %{Symbol::stash("Package")}');
-    p5convert( 'my $pkg; keys $Package::{"var"}',
-               'my $pkg; keys ${Symbol::stash("Package")}{"var"}');
+    local $TODO = 1;
+    p5convert( 'my $pkg; $Package::{"var"}',
+               'my $pkg; ${Symbol::stash("Package")}{"var"}');
 }
 
 sub t_encoding {

@@ -204,8 +204,8 @@ sub remove_rv2gv {
         next unless $op_const and $op_const->att('PV') =~ m/[:][:]$/;
 
         my $op_scope = $op_rv2hv->insert_new_elt("op_scope");
-        add_madprop($op_scope, curly_open => '{');
-        add_madprop($op_scope, curly_close => '}');
+        set_madprop($op_scope, curly_open => '{');
+        set_madprop($op_scope, curly_close => '}');
 
         my $op_sub = $op_scope->insert_new_elt("op_entersub");
 
@@ -221,11 +221,11 @@ sub remove_rv2gv {
         $op_const->move($args);
 
         $_->set_att('val', '%') for $op_rv2hv->findnodes(q*madprops/mad_sv[@key='hsh']*);
-        madprop($op_const, quote_open => '&#34;');
+        set_madprop($op_const, quote_open => '&#34;');
         my $name = $op_const->att('PV');
         $name =~ s/::$//;
-        add_madprop($op_const, assign => $name);
-        add_madprop($op_const, quote_close => '&#34;');
+        set_madprop($op_const, assign => $name);
+        set_madprop($op_const, quote_close => '&#34;');
     }
 
     # strict refs
@@ -240,14 +240,13 @@ sub remove_rv2gv {
         my $op_sub = $op_scope->insert_new_elt("op_entersub");
 
         # ()
-        my $madprops = $op_sub->insert_new_elt("madprops");
-        $madprops->insert_new_elt("mad_sv", { key => "round_open", val => "(" });
-        $madprops->insert_new_elt("mad_sv", { key => "round_close", val => ")" });
+        set_madprop($op_sub, "round_open", "(");
+        set_madprop($op_sub, "round_close", ")");
 
         #args
         my $args = $op_sub->insert_new_elt("op_null", { was => "list" });
-        $args->insert_new_elt("op_gv")->insert_new_elt("madprops")
-          ->insert_new_elt("mad_sv", { key => "value", val => "Symbol::qualify_to_ref" });
+        set_madprop( $args->insert_new_elt("op_gv"),
+                      "value", "Symbol::qualify_to_ref" );
         $op_const->move($args);
 
     }
@@ -296,7 +295,8 @@ make_glob_sub( $twig );
 remove_vstring( $twig );
 
 # add_encoding_latin1($twig);
-# remove_rv2gv($twig);
+
+remove_rv2gv($twig);
 
 # print
 $twig->print;

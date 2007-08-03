@@ -1,6 +1,6 @@
 #include this file into another for subclass testing
 
-my $version = ${"$class\::VERSION"};
+my $version = ${Symbol::qualify_to_ref("$class\::VERSION")};
 
 use strict;
 

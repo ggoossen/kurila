@@ -134,10 +134,10 @@ sub qualify ($;$) {
     $name;
 }
 
-sub qualify_to_ref ($;$) {
-    no strict 'refs';
-    return \*{ qualify $_[0], @_ > 1 ? $_[1] : caller };
-}
+# sub qualify_to_ref ($) {
+#     no strict 'refs';
+#     return \*{ qualify $_[0], @_ > 1 ? $_[1] : caller };
+# }
 
 #
 # of Safe.pm lineage

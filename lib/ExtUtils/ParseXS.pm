@@ -388,7 +388,7 @@ EOF
     $_ = shift(@line);
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE")) {
       no strict 'refs';
-      &{"${kwd}_handler"}() ;
+      &{Symbol::qualify_to_ref("${kwd}_handler")}() ;
       next PARAGRAPH unless @line ;
       $_ = shift(@line);
     }
@@ -1086,7 +1086,7 @@ sub process_keyword($)
     my($pattern) = @_ ;
     my $kwd ;
 
-    &{"${kwd}_handler"}()
+    &{Symbol::qualify_to_ref("${kwd}_handler")}()
       while $kwd = check_keyword($pattern) ;
   }
 
