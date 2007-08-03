@@ -63,13 +63,6 @@ typedef enum {
 	SVt_LAST	/* keep last in enum. used to size arrays */
 } svtype;
 
-#ifndef PERL_CORE
-/* Although Fast Boyer Moore tables are now being stored in PVGVs, for most
-   purposes eternal code wanting to consider PVBM probably needs to think of
-   PVMG instead.  */
-#  define SVt_PVBM	SVt_PVMG
-#endif
-
 /* There is collusion here with sv_clear - sv_clear exits early for SVt_NULL
    and SVt_IV, so never reaches the clause at the end that uses
    sv_type_details->body_size to determine whether to call safefree(). Hence
