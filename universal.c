@@ -199,6 +199,7 @@ XS(XS_utf8_decode);
 XS(XS_utf8_unicode_to_native);
 XS(XS_utf8_native_to_unicode);
 XS(XS_Internals_SvREADONLY);
+XS(XS_Internals_peek);
 XS(XS_Internals_SvREFCNT);
 XS(XS_Internals_hv_clear_placehold);
 XS(XS_PerlIO_get_layers);
@@ -259,6 +260,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
     newXSproto("Internals::SvREFCNT",XS_Internals_SvREFCNT, file, "\\[$%@];$");
+    newXSproto("Internals::peek",XS_Internals_peek, file, "\\[$%@]");
     newXSproto("Internals::hv_clear_placeholders",
                XS_Internals_hv_clear_placehold, file, "\\%");
     newXSproto("PerlIO::get_layers",
@@ -715,7 +717,6 @@ XS(XS_utf8_encode)
     PERL_UNUSED_ARG(cv);
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: utf8::encode(sv)");
-    sv_utf8_encode(ST(0));
     XSRETURN_EMPTY;
 }
 
@@ -727,9 +728,7 @@ XS(XS_utf8_decode)
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: utf8::decode(sv)");
     else {
-	SV * const sv = ST(0);
-	const bool RETVAL = sv_utf8_decode(sv);
-	ST(0) = boolSV(RETVAL);
+	ST(0) = boolSV(1);
 	sv_2mortal(ST(0));
     }
     XSRETURN(1);
@@ -788,6 +787,19 @@ XS(XS_Internals_SvREADONLY)	/* This is dangerous stuff. */
 	}
     }
     XSRETURN_UNDEF; /* Can't happen. */
+}
+
+XS(XS_Internals_peek)	/* This is dangerous stuff. */
+{
+    dVAR;
+    dXSARGS;
+    SV * const sv = SvRV(ST(0));
+    PERL_UNUSED_ARG(cv);
+
+    if (items == 1) {
+	sv_dump(sv);
+    }
+    XSRETURN_UNDEF;
 }
 
 XS(XS_Internals_SvREFCNT)	/* This is dangerous stuff. */
