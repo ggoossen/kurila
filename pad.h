@@ -288,8 +288,6 @@ ling pad (lvalue) to C<gen>.  Note that C<SvUV_set> is hijacked for this purpose
   ((PAD_COMPNAME_FLAGS(po) & (SVpad_NAME|SVpad_OUR)) == (SVpad_NAME|SVpad_OUR))
 #define PAD_COMPNAME_PV(po) SvPV_nolen(PAD_COMPNAME_SV(po))
 
-#define PAD_COMPNAME_TYPE(po) pad_compname_type(po)
-
 #define PAD_COMPNAME_OURSTASH(po) \
     (SvOURSTASH(PAD_COMPNAME_SV(po)))
 

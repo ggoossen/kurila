@@ -332,8 +332,6 @@ Perl_pad_undef(pTHX_ CV* cv)
 
 Create a new name and associated PADMY SV in the current pad; return the
 offset.
-If C<typestash> is valid, the name is for a typed lexical; set the
-name's stash to that value.
 If C<ourstash> is valid, it's an our lexical, set the name's
 SvOURSTASH to that value
 
@@ -342,22 +340,17 @@ If fake, it means we're cloning an existing entry
 =cut */
 
 PADOFFSET
-Perl_pad_add_name(pTHX_ const char *name, HV* typestash, HV* ourstash, bool fake, bool state)
+Perl_pad_add_name(pTHX_ const char *name, HV* ourstash, bool fake, bool state)
 {
     dVAR;
     const PADOFFSET offset = pad_alloc(OP_PADSV, SVs_PADMY);
     SV* const namesv
-	= newSV_type((ourstash || typestash) ? SVt_PVMG : SVt_PVNV);
+	= newSV_type((ourstash) ? SVt_PVMG : SVt_PVNV);
 
     ASSERT_CURPAD_ACTIVE("pad_add_name");
 
     sv_setpv(namesv, name);
 
-    if (typestash) {
-	assert(SvTYPE(namesv) == SVt_PVMG);
-	SvPAD_TYPED_on(namesv);
-	SvSTASH_set(namesv, (HV*)SvREFCNT_inc_simple_NN((SV*)typestash));
-    }
     if (ourstash) {
 	SvPAD_OUR_on(namesv);
 	SvOURSTASH_set(namesv, ourstash);
@@ -848,8 +841,6 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 
 	new_offset = pad_add_name(
 	    SvPVX_const(*out_name_sv),
-	    SvPAD_TYPED(*out_name_sv)
-		    ? SvSTASH(*out_name_sv) : NULL,
 	    SvOURSTASH(*out_name_sv),
 	    1,  /* fake */
 	    0   /* not a state variable */
@@ -1650,17 +1641,6 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
     }
 }
 
-
-HV *
-Perl_pad_compname_type(pTHX_ const PADOFFSET po)
-{
-    dVAR;
-    SV* const * const av = av_fetch(PL_comppad_name, po, FALSE);
-    if ( SvPAD_TYPED(*av) ) {
-        return SvSTASH(*av);
-    }
-    return NULL;
-}
 
 /*
  * Local variables:

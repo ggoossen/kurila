@@ -4271,7 +4271,7 @@ PERL_CALLCONV PADLIST*	Perl_pad_new(pTHX_ int flags)
 PERL_CALLCONV void	Perl_pad_undef(pTHX_ CV* cv)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV PADOFFSET	Perl_pad_add_name(pTHX_ const char *name, HV* typestash, HV* ourstash, bool clone, bool state)
+PERL_CALLCONV PADOFFSET	Perl_pad_add_name(pTHX_ const char *name, HV* ourstash, bool clone, bool state)
 			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV PADOFFSET	Perl_pad_add_anon(pTHX_ SV* sv, OPCODE op_type)
