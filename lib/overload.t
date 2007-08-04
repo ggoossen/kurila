@@ -284,8 +284,8 @@ like($@, qr/no method found/);
 # Check AUTOLOADING:
 
 *Oscalar::AUTOLOAD = 
-  sub { *{"Oscalar::$AUTOLOAD"} = sub {"_!_" . shift() . "_!_"} ;
-	goto &{"Oscalar::$AUTOLOAD"}};
+  sub { *{Symbol::qualify_to_ref("Oscalar::$AUTOLOAD")} = sub {"_!_" . shift() . "_!_"} ;
+	goto &{Symbol::qualify_to_ref("Oscalar::$AUTOLOAD")}};
 
 eval "package Oscalar; sub comple; use overload '~' => 'comple'";
 

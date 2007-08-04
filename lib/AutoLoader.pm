@@ -63,7 +63,7 @@ sub can {
     return unless eval { require $filename };
 
     no strict 'refs';
-    return \&{ $package . '::' . $method };
+    return \&{Symbol::qualify_to_ref( $package . '::' . $method) };
 }
 
 sub find_filename {
@@ -151,8 +151,8 @@ sub import {
     if ($pkg eq 'AutoLoader') {
 	if ( @_ and $_[0] =~ /^&?AUTOLOAD$/ ) {
 	    no strict 'refs';
-	    *{ $callpkg . '::AUTOLOAD' } = \&AUTOLOAD;
-	    *{ $callpkg . '::can'      } = \&can;
+	    *{Symbol::qualify_to_ref( $callpkg . '::AUTOLOAD') } = \&AUTOLOAD;
+	    *{Symbol::qualify_to_ref( $callpkg . '::can')      } = \&can;
 	}
     }
 

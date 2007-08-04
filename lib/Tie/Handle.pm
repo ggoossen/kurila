@@ -128,7 +128,7 @@ sub new {
 
 sub TIEHANDLE {
     my $pkg = shift;
-    if (defined &{"{$pkg}::new"}) {
+    if (defined &{Symbol::qualify_to_ref("{$pkg}::new")}) {
 	warnings::warnif("WARNING: calling ${pkg}->new since ${pkg}->TIEHANDLE is missing");
 	$pkg->new(@_);
     }

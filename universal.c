@@ -222,6 +222,7 @@ XS(XS_Tie_Hash_NamedCapture_NEXTK);
 XS(XS_Tie_Hash_NamedCapture_SCALAR);
 XS(XS_Tie_Hash_NamedCapture_flags);
 XS(XS_Symbol_qualify_to_ref);
+XS(XS_Symbol_stash);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -261,7 +262,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
     newXSproto("Internals::SvREFCNT",XS_Internals_SvREFCNT, file, "\\[$%@];$");
-    newXSproto("Internals::peek",XS_Internals_peek, file, "\\[$%@]");
+    newXS("Internals::peek",XS_Internals_peek, file);
     newXSproto("Internals::hv_clear_placeholders",
                XS_Internals_hv_clear_placehold, file, "\\%");
     newXSproto("PerlIO::get_layers",
@@ -284,6 +285,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("Tie::Hash::NamedCapture::SCALAR", XS_Tie_Hash_NamedCapture_SCALAR, file);
     newXS("Tie::Hash::NamedCapture::flags", XS_Tie_Hash_NamedCapture_flags, file);
     newXSproto("Symbol::qualify_to_ref", XS_Symbol_qualify_to_ref, file, "$");
+    newXSproto("Symbol::stash", XS_Symbol_stash, file, "$");
 }
 
 
@@ -1401,6 +1403,18 @@ XS(XS_Symbol_qualify_to_ref)
     XSRETURN(1);
 }
 
+XS(XS_Symbol_stash)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
+
+    ST(0) = gv_stashsv(ST(0), GV_ADD);
+    XSRETURN(1);
+}
 
 /*
  * Local variables:

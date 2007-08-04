@@ -21,7 +21,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 29;
+use Test::More tests => 26;
 
 BEGIN { use_ok('base'); }
 
@@ -135,7 +135,7 @@ my %EXPECT = (
 
 while(my($class, $efields) = each %EXPECT) {
     no strict 'refs';
-    my %fields = %{$class.'::FIELDS'};
+    my %fields = %{Symbol::qualify_to_ref($class.'::FIELDS')};
     my %expected_fields;
     foreach my $idx (1..@$efields) {
         my $key = $efields->[$idx-1];
@@ -151,27 +151,12 @@ is( $W, 1, 'right warnings' );
 
 
 # A simple object creation and attribute access test
-my B2 $obj1 = D3->new;
+my $obj1 = D3->new;
 $obj1->{b1} = "B2";
-my D3 $obj2 = $obj1;
+my $obj2 = $obj1;
 $obj2->{b1} = "D3";
 
-# We should get compile time failures field name typos
-eval q(return; my D3 $obj3 = $obj2; $obj3->{notthere} = "");
-like $@, 
-    qr/^No such $Field "notthere" in variable \$obj3 of type D3/,
-    "Compile failure of undeclared fields (helem)";
-
 # Slices
-# We should get compile time failures field name typos
-eval q(return; my D3 $obj3 = $obj2; my $k; @$obj3{$k,'notthere'} = ());
-like $@, 
-    qr/^No such $Field "notthere" in variable \$obj3 of type D3/,
-    "Compile failure of undeclared fields (hslice)";
-eval q(return; my D3 $obj3 = $obj2; my $k; @{$obj3}{$k,'notthere'} = ());
-like 
-    $@, qr/^No such $Field "notthere" in variable \$obj3 of type D3/,
-    "Compile failure of undeclared fields (hslice (block form))";
 
 @$obj1{"_b1", "b1"} = (17, 29);
 is( $obj1->{_b1}, 17 );
@@ -232,7 +217,7 @@ package main;
     package X;
     use fields qw(X1 _X2);
     sub new {
-	my X $self = shift;
+	my $self = shift;
 	$self = fields::new($self) unless ref $self;
 	$self->{X1} = "x1";
 	# FIXME. This code is dead on blead becase the test is skipped.
@@ -243,13 +228,13 @@ package main;
 	$self->{_X2} = "_x2";
 	return $self;
     }
-    sub get_X2 { my X $self = shift; $self->{_X2} }
+    sub get_X2 { my $self = shift; $self->{_X2} }
 
     package Y;
     use base qw(X);
 
     sub new {
-	my Y $self = shift;
+	my $self = shift;
 	$self = fields::new($self) unless ref $self;
 	$self->SUPER::new();
 	return $self;
@@ -261,7 +246,7 @@ package main;
     use fields qw(Z1);
 
     sub new {
-	my Z $self = shift;
+	my $self = shift;
 	$self = fields::new($self) unless ref $self;
 	$self->SUPER::new();
 	$self->{Z1} = 'z1';
@@ -271,7 +256,7 @@ package main;
     package main;
 
     if ($Has_PH) {
-	my Z $c = Z->new();
+	my $c = Z->new();
 	is($c->get_X2, '_x2', "empty intermediate class");
     }
     else {

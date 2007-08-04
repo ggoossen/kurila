@@ -97,7 +97,7 @@ sub struct {
 
     my $isa = do {
         no strict 'refs';
-        \@{$class . '::ISA'};
+        \@{Symbol::qualify_to_ref($class . '::ISA')};
     };
     _subclass_error() if @$isa;
     tie @$isa, 'Class::Struct::Tie_ISA';
@@ -105,7 +105,7 @@ sub struct {
     # Create constructor.
 
     croak "function 'new' already defined in package $class"
-        if do { no strict 'refs'; defined &{$class . "::new"} };
+        if do { no strict 'refs'; defined &{Symbol::qualify_to_ref($class . "::new")} };
 
     my @methods = ();
     my %refs = ();
@@ -185,7 +185,7 @@ sub struct {
     my( $pre, $pst, $sel );
     $cnt = 0;
     foreach $name (@methods){
-        if ( do { no strict 'refs'; defined &{$class . "::$name"} } ) {
+        if ( do { no strict 'refs'; defined &{Symbol::qualify_to_ref($class . "::$name")} } ) {
             warnings::warnif("function '$name' already defined, overrides struct accessor method");
         }
         else {

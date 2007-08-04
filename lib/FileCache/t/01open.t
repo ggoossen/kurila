@@ -18,6 +18,7 @@ print "1..1\n";
 
 {# Test 1: that we can open files
      for my $path ( @files ){
+         $path = Symbol::qualify_to_ref($path);
 	 cacheout $path;
 	 print $path "$path 1\n";
 	 close $path;

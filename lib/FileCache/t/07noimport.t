@@ -17,9 +17,11 @@ plan( tests => 1 );
     my $file = 'foo';
     END { unlink $file }
     FileCache::cacheout($file);
+    $file = Symbol::qualify_to_ref($file);
     print $file "bar";
     close $file;
 
+    $file = 'foo';
     FileCache::cacheout("<", $file);
     ::ok( <$file> eq "bar" );
     close $file;

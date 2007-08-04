@@ -11,22 +11,22 @@ sub OVERLOAD {
   my %arg = @_;
   my ($sub, $fb);
   no strict 'refs';
-  $ {$package . "::OVERLOAD"}{dummy}++; # Register with magic by touching.
-  *{$package . "::()"} = \&nil; # Make it findable via fetchmethod.
+  $ {Symbol::qualify_to_ref($package . "::OVERLOAD")}{dummy}++; # Register with magic by touching.
+  *{Symbol::qualify_to_ref($package . "::()")} = \&nil; # Make it findable via fetchmethod.
   for (keys %arg) {
     if ($_ eq 'fallback') {
       $fb = $arg{$_};
     } else {
       $sub = $arg{$_};
       if (not ref $sub and $sub !~ /::/) {
-	$ {$package . "::(" . $_} = $sub;
+	$ {Symbol::qualify_to_ref($package . "::(" . $_)} = $sub;
 	$sub = \&nil;
       }
       #print STDERR "Setting `$ {'package'}::\cO$_' to \\&`$sub'.\n";
-      *{$package . "::(" . $_} = \&{ $sub };
+      *{Symbol::qualify_to_ref($package . "::(" . $_)} = \&{ $sub };
     }
   }
-  ${$package . "::()"} = $fb; # Make it findable too (fallback only).
+  ${Symbol::qualify_to_ref($package . "::()")} = $fb; # Make it findable too (fallback only).
 }
 
 sub import {
@@ -38,13 +38,13 @@ sub import {
 
 sub unimport {
   my $package = (caller())[0];
-  ${$package . "::OVERLOAD"}{dummy}++; # Upgrade the table
+  ${Symbol::qualify_to_ref($package . "::OVERLOAD")}{dummy}++; # Upgrade the table
   shift;
   for (@_) {
     if ($_ eq 'fallback') {
-      undef $ {$package . "::()"};
+      undef $ {Symbol::qualify_to_ref($package . "::()")};
     } else {
-      delete $ {$package . "::"}{"(" . $_};
+      delete $ {Symbol::qualify_to_ref($package . "::")}{"(" . $_};
     }
   }
 }

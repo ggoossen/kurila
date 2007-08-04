@@ -86,12 +86,12 @@ sub import {
     foreach (@vars) {
 	my ($type, $name) = m/^([\$\@])(.*)$/;
 	if ($type eq '$') {
-	    tie ${"${callpack}::$name"}, 'Env', $name;
+	    tie ${Symbol::qualify_to_ref("${callpack}::$name")}, 'Env', $name;
 	} else {
 	    if ($^O eq 'VMS') {
-		tie @{"${callpack}::$name"}, 'Env::Array::VMS', $name;
+		tie @{Symbol::qualify_to_ref("${callpack}::$name")}, 'Env::Array::VMS', $name;
 	    } else {
-		tie @{"${callpack}::$name"}, 'Env::Array', $name;
+		tie @{Symbol::qualify_to_ref("${callpack}::$name")}, 'Env::Array', $name;
 	    }
 	}
     }

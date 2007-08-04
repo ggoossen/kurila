@@ -55,10 +55,8 @@ my @ords = (
 	   );
 
 foreach my $i (@ords){
-    my $u = chr($i); utf8::upgrade($u);
-    # warn sprintf "%d,%d", bytes::length($u), is_utf8($u);
-    my $b = chr($i); utf8::encode($b);
-    # warn sprintf "%d,%d" ,bytes::length($b), is_utf8($b);
+    my $u = bytes::chr($i);
+    my $b = utf8::chr($i);
 
     isnt($u, $b, "equivalence - with utf8flag");
 
@@ -165,8 +163,9 @@ for my $package ('', 'Hash_Test') {
   }
 
 
-  my $bytes = my $char = chr 27182;
-  utf8::encode ($bytes);
+  my $bytes = my $char = utf8::chr 27182;
+  use Encode;
+  $bytes = Encode::decode('latin1', $bytes);
 
   my $orig = {$char => 1};
   if ($package) {

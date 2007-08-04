@@ -404,7 +404,7 @@ Setup: {
         }
 
 	if( defined $opt_V ){
-		my $fh = 'main::fh';
+		my $fh = *main::fh;
 		print "$0 version: $VERSION\n";
 		open( $fh, "<$Monfile" ) && do {
 			local $XS_VERSION = 'early';
@@ -447,7 +447,7 @@ Setup: {
 
 Main: {
 	my $monout = $Monfile;
-	my $fh = 'main::fh';
+	my $fh = *main::fh;
 	local $names = {};
 	local $times = {};   # times in hz
 	local $ctimes = {};  # Cumulative times in hz

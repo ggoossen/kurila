@@ -19,13 +19,13 @@ my $Fattr = \%fields::attr;
 
 sub has_fields {
     my($base) = shift;
-    my $fglob = ${"$base\::"}{FIELDS};
+    my $fglob = ${Symbol::qualify_to_ref("$base\::")}{FIELDS};
     return( ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ? 1 : 0 );
 }
 
 sub has_version {
     my($base) = shift;
-    my $vglob = ${$base.'::'}{VERSION};
+    my $vglob = ${Symbol::qualify_to_ref($base.'::')}{VERSION};
     return( ($vglob && *$vglob{SCALAR}) ? 1 : 0 );
 }
 
@@ -43,8 +43,8 @@ sub get_attr {
 if ($] < 5.009) {
     *get_fields = sub {
         # Shut up a possible typo warning.
-        () = \%{$_[0].'::FIELDS'};
-        my $f = \%{$_[0].'::FIELDS'};
+        () = \%{Symbol::qualify_to_ref($_[0].'::FIELDS')};
+        my $f = \%{Symbol::qualify_to_ref($_[0].'::FIELDS')};
 
         # should be centralized in fields? perhaps
         # fields::mk_FIELDS_be_OK. Peh. As long as %{ $package . '::FIELDS' }
@@ -57,8 +57,8 @@ if ($] < 5.009) {
 else {
     *get_fields = sub {
         # Shut up a possible typo warning.
-        () = \%{$_[0].'::FIELDS'};
-        return \%{$_[0].'::FIELDS'};
+        () = \%{Symbol::qualify_to_ref($_[0].'::FIELDS')};
+        return \%{Symbol::qualify_to_ref($_[0].'::FIELDS')};
     }
 }
 
@@ -80,8 +80,8 @@ sub import {
         next if $inheritor->isa($base);
 
         if (has_version($base)) {
-            ${$base.'::VERSION'} = '-1, set by base.pm' 
-              unless defined ${$base.'::VERSION'};
+            ${Symbol::qualify_to_ref($base.'::VERSION')} = '-1, set by base.pm' 
+              unless defined ${Symbol::qualify_to_ref($base.'::VERSION')};
         }
         else {
             my $sigdie;
@@ -91,7 +91,7 @@ sub import {
                 # Only ignore "Can't locate" errors from our eval require.
                 # Other fatal errors (syntax etc) must be reported.
                 die if $@ && $@ !~ /^Can't locate .*? at \(eval /;
-                unless (%{"$base\::"}) {
+                unless (%{Symbol::qualify_to_ref("$base\::")}) {
                     require Carp;
                     Carp::croak(<<ERROR);
 Base class package "$base" is empty.
@@ -102,10 +102,10 @@ ERROR
             }
             # Make sure a global $SIG{__DIE__} makes it out of the localization.
             $SIG{__DIE__} = $sigdie if defined $sigdie;
-            ${$base.'::VERSION'} = "-1, set by base.pm"
-              unless defined ${$base.'::VERSION'};
+            ${Symbol::qualify_to_ref($base.'::VERSION')} = "-1, set by base.pm"
+              unless defined ${Symbol::qualify_to_ref($base.'::VERSION')};
         }
-        push @{"$inheritor\::ISA"}, $base;
+        push @{Symbol::qualify_to_ref("$inheritor\::ISA")}, $base;
 
         if ( has_fields($base) || has_attr($base) ) {
             # No multiple fields inheritance *suck*

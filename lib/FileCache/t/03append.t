@@ -18,29 +18,34 @@ print "1..2\n";
 {# Test 3: that we open for append on second viewing
      my @cat;
      for my $path ( @files ){
+         my $sym = Symbol::qualify_to_ref($path);
 	 cacheout $path;
-	 print $path "$path 3\n";
+	 print $sym "$path 3\n";
      }
      for my $path ( @files ){
+         my $sym = Symbol::qualify_to_ref($path);
 	 cacheout $path;
-	 print $path "$path 33\n";
+	 print $sym "$path 33\n";
      }
      for my $path ( @files ){
-	 open($path, '<', $path);
-	 push @cat, do{ local $/; <$path>};
-         close($path);
+         my $sym = Symbol::qualify_to_ref($path);
+	 open($sym, '<', $path);
+	 push @cat, do{ local $/; <$sym>};
+         close($sym);
      }
      print 'not ' unless scalar grep(/\b3$/m, @cat) == scalar @files;
      print "ok 1\n";
      @cat = ();
      for my $path ( @files ){
+         my $sym = Symbol::qualify_to_ref($path);
 	 cacheout $path;
-	 print $path "$path 333\n";
+	 print $sym "$path 333\n";
      }
      for my $path ( @files ){
-	 open($path, '<', $path);
-	 push @cat, do{ local $/; <$path>};
-         close($path);
+         my $sym = Symbol::qualify_to_ref($path);
+	 open($sym, '<', $path);
+	 push @cat, do{ local $/; <$sym>};
+         close($sym);
      }
      print 'not ' unless scalar grep(/\b33$/m, @cat) == scalar @files;
      print "ok 2\n";

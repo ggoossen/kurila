@@ -115,7 +115,7 @@ sub getopt (;$$) {
 	    }
 	    else {
                 no strict 'refs';
-	        ${"opt_$first"} = $rest;
+	        ${Symbol::qualify_to_ref("opt_$first")} = $rest;
 	        push( @EXPORT, "\$opt_$first" );
 	    }
 	}
@@ -125,7 +125,7 @@ sub getopt (;$$) {
 	    }
 	    else {
                 no strict 'refs';
-	        ${"opt_$first"} = 1;
+	        ${Symbol::qualify_to_ref("opt_$first")} = 1;
 	        push( @EXPORT, "\$opt_$first" );
 	    }
 	    if ($rest ne '') {
@@ -249,7 +249,7 @@ sub getopts ($;$) {
 		}
 		else {
                     no strict 'refs';
-		    ${"opt_$first"} = $rest;
+		    ${Symbol::qualify_to_ref("opt_$first")} = $rest;
 		    push( @EXPORT, "\$opt_$first" );
 		}
 	    }
@@ -259,7 +259,7 @@ sub getopts ($;$) {
 		}
 		else {
                     no strict 'refs';
-		    ${"opt_$first"} = 1;
+		    ${Symbol::qualify_to_ref("opt_$first")} = 1;
 		    push( @EXPORT, "\$opt_$first" );
 		}
 		if ($rest eq '') {

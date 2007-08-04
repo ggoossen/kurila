@@ -592,7 +592,7 @@ for my $consume ( 0 .. 1)
      
     my $Z; 
     eval { $k->inflate("abc", $Z) ; };
-    like $@, mkErr("Compress::Raw::Zlib::Inflate::inflate input parameter cannot be read-only when ConsumeInput is specified");
+    like $@, mkErr("Modification of a read-only value attempted");
 
 }
 

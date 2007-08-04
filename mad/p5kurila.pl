@@ -277,6 +277,15 @@ sub remove_vstring {
     }
 }
 
+sub remove_typed_declaration {
+    my $twig = shift;
+    for my $op_pad (map { $twig->findnodes(qq|//$_|) } (qw|op_padsv op_list|)) {
+        if ((get_madprop($op_pad, "defintion") || '') =~ m/^(my|our).+$/) {
+            set_madprop($op_pad, "defintion", $1);
+        }
+    }
+}
+
 # parsing
 my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
 
@@ -297,6 +306,7 @@ remove_vstring( $twig );
 # add_encoding_latin1($twig);
 
 remove_rv2gv($twig);
+remove_typed_declaration($twig);
 
 # print
 $twig->print;

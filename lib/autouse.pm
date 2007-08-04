@@ -55,7 +55,7 @@ sub import {
 		vet_import $module;
 	    }
             no warnings qw(redefine prototype);
-	    *$closure_import_func = \&{"${module}::$closure_func"};
+	    *$closure_import_func = \&{Symbol::qualify_to_ref("${module}::$closure_func")};
 	    print "autousing $module; "
 		  ."imported $closure_func as $closure_import_func\n"
 		if $autouse::DEBUG;

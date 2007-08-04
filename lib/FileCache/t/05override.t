@@ -13,7 +13,7 @@ END{
 print "1..1\n";
 
 {# Test 5: that close is overridden properly within the caller
-     cacheout local $_ = "Foo_Bar";
+     cacheout local $_ = *Foo_Bar;
      print $_ "Hello World\n";
      close($_);
      print 'not ' if fileno($_);

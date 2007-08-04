@@ -559,7 +559,7 @@ sub _rmtree {
             }
             else {
 		no strict 'refs';
-		if (!defined ${"\cTAINT"} or ${"\cTAINT"}) {
+		if (!defined ${Symbol::qualify_to_ref("\cTAINT")} or ${Symbol::qualify_to_ref("\cTAINT")}) {
                     # Blindly untaint dir names if taint mode is
                     # active, or any perl < 5.006
                     @files = map { /\A(.*)\z/s; $1 } readdir $d;

@@ -22,16 +22,16 @@ unless (eval 'use open ":std"; 1') {
 }
 
 
-ok( eval "use if ($v_minus > \$]), strict => 'subs'; \${'f'} = 12" eq 12,
+ok( eval "use if ($v_minus > \$]), strict => 'bla'; 12" eq 12,
     '"use if" with a false condition, fake pragma');
 
-ok( eval "use if ($v_minus > \$]), strict => 'refs'; \${'f'} = 12" eq 12,
+ok( eval "use if ($v_minus > \$]), strict => 'bla'; 12" eq 12,
     '"use if" with a false condition and a pragma');
 
-ok( eval "use if ($v_plus > \$]), strict => 'subs'; \${'f'} = 12" eq 12,
+ok( eval "use if ($v_plus > \$]), strict => 'refs'; 12" eq 12,
     '"use if" with a true condition, fake pragma');
 
-ok( (not defined eval "use if ($v_plus > \$]), strict => 'refs'; \${'f'} = 12"
+ok( (not defined eval "use if ($v_plus > \$]), strict => 'bla'; 12"
      and $@ =~ /while "strict refs" in use/),
     '"use if" with a true condition and a pragma');
 

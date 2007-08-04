@@ -307,7 +307,7 @@ sub _store_fd {
 	# Call C routine nstore or pstore, depending on network order
 	eval { $ret = &$xsptr($file, $self) };
 	logcroak $@ if $@ =~ s/\.?\n$/,/;
-	local $\; print $file '';	# Autoflush the file if wanted
+	local $\; $file->print('');	# Autoflush the file if wanted
 	$@ = $da;
 	return $ret ? $ret : undef;
 }

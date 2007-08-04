@@ -144,7 +144,7 @@ Sean M. Burke C<sburke@cpan.org>
 sub self_and_super_versions {
   no strict 'refs';
   map {
-        $_ => (defined(${"$_\::VERSION"}) ? ${"$_\::VERSION"} : undef)
+        $_ => (defined(${Symbol::qualify_to_ref("$_\::VERSION")}) ? ${Symbol::qualify_to_ref("$_\::VERSION")} : undef)
       } self_and_super_path($_[0])
 }
 
@@ -199,7 +199,7 @@ sub self_and_super_path {
            # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
           $seen{$c}++ ? () : $c;
         }
-        @{"$current\::ISA"}
+        @{Symbol::qualify_to_ref("$current\::ISA")}
     ;
     # I.e., if this class has any parents (at least, ones I've never seen
     # before), push them, in order, onto the stack of classes I need to

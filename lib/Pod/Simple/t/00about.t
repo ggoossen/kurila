@@ -75,11 +75,11 @@ foreach my $m (@modules) {
 
     #print "Peeking at $this => ${$this . '::VERSION'}\n";
     no strict 'refs';
-    if( defined ${$this . '::VERSION'} ) {
-      $v{$this} = ${$this . '::VERSION'}
+    if( defined ${Symbol::qualify_to_ref($this . '::VERSION')} ) {
+      $v{$this} = ${Symbol::qualify_to_ref($this . '::VERSION')}
     } elsif(
-       defined *{$this . '::ISA'} or defined &{$this . '::import'}
-       or ($this ne '' and grep defined *{$_}{'CODE'}, values %{$this . "::"})
+       defined *{Symbol::qualify_to_ref($this . '::ISA')} or defined &{Symbol::qualify_to_ref($this . '::import')}
+       or ($this ne '' and grep defined *{$_}{'CODE'}, values %{Symbol::qualify_to_ref($this . "::")})
        # If it has an ISA, an import, or any subs...
     ) {
       # It's a class/module with no version.
@@ -91,7 +91,7 @@ foreach my $m (@modules) {
     
     $pref = length($this) ? "$this\::" : '';
     push @stack, map m/^(.+)::$/ ? "$pref$1" : (),
-        do { no strict 'refs'; keys %{$this . '::'} };
+        do { no strict 'refs'; keys %{Symbol::qualify_to_ref($this . '::')} };
     #print "Stack: @stack\n";
   }
   push @out, " Modules in memory:\n";

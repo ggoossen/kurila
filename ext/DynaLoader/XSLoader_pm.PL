@@ -144,7 +144,7 @@ sub bootstrap_inherit {
     package DynaLoader;
 
     my $module = $_[0];
-    local *DynaLoader::isa = *{"$module\::ISA"};
+    local *DynaLoader::isa = *{Symbol::qualify_to_ref("$module\::ISA")};
     local @DynaLoader::isa = (@DynaLoader::isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     require DynaLoader;

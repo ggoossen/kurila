@@ -29,6 +29,7 @@ t_strict_refs();
 # t_glob_pattr();
 # t_vstring();
 # t_encoding();
+t_typed_declaration();
 
 sub t_indirect_object_syntax {
     p5convert( split(m/^====\n/m, <<'END'), 1 );
@@ -221,5 +222,20 @@ use v5.6;
 ----------
 "foo$\value"
 END
+}
 
+sub t_typed_declaration {
+    p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
+package Foo;
+my Foo $bar;
+----------
+package Foo;
+my $bar;
+==========
+package Test;
+my Test $x2 :Dokay(1,5);
+----------
+package Test;
+my $x2 :Dokay(1,5);
+END
 }

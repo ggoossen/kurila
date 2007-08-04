@@ -27,7 +27,7 @@ my $file = "fallback$$.txt";
 {
     my $message = '';
     local $SIG{__WARN__} = sub { $message = $_[0] };
-    $PerlIO::encoding::fallback = Encode::PERLQQ;
+    $PerlIO::encoding::fallback = 'Encode::PERLQQ';
     ok(open(my $fh,">encoding(iso-8859-1)",$file),"opened iso-8859-1 file");
     my $str = "\x{20AC}";
     print $fh $str,"0.02\n";
@@ -40,7 +40,7 @@ my $line = <$fh>;
 is($line,"\\x{20ac}0.02\n","perlqq escapes");
 close($fh);
 
-$PerlIO::encoding::fallback = Encode::HTMLCREF;
+$PerlIO::encoding::fallback = 'Encode::HTMLCREF';
 
 ok(open(my $fh,">encoding(iso-8859-1)",$file),"opened iso-8859-1 file");
 my $str = "\x{20AC}";

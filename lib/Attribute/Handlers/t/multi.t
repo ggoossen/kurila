@@ -54,11 +54,11 @@ my @x1 :Lastly(1=>42);
 my %x1 :Lastly(1,43);
 sub x1 :Lastly(1,44) {}
 
-my Test $x2 :Dokay(1,5);
+my $x2 :Dokay(1,5);
 
 package Test;
 my $x3 :Dokay(1,6);
-my Test $x4 :Dokay(1,7);
+my $x4 :Dokay(1,7);
 sub x3 :Dokay(1,8) {}
 
 my $y1 :Okay(1,9);
@@ -83,7 +83,7 @@ use base 'Test';
 use warnings;
 
 my $x5 :Dokay(1,21);
-my Test $x6 :Dokay(1,22);
+my $x6 :Dokay(1,22);
 sub x5 :Dokay(1,23);
 
 my $y3 :Okay(1,24);
@@ -99,7 +99,7 @@ my %x11 :Okay(1,3);
 sub x11 :Okay(1,4) {}
 
 BEGIN { eval 'my $x7 :Dokay(0,28)' or ::ok(1,28); }
-my Test $x8 :Dokay(1,29);
+my $x8 :Dokay(1,29);
 eval 'sub x7 :Dokay(0,30) {}' or ::ok(1,30);
 
 
@@ -131,7 +131,7 @@ use Attribute::Handlers autotie => {      'Other::Loud' => 'Tie::Loud',
 				     'UNIVERSAL::Rowdy' => 'Tie::Row::dy',
                                    };
 
-my Other $loud : Loud;
+my $loud : Loud;
 $loud++;
 
 my @noisy : Noisy(34);

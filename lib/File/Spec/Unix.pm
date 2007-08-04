@@ -142,7 +142,7 @@ sub _tmpdir {
     my @dirlist = @_;
     {
 	no strict 'refs';
-	if (${"\cTAINT"}) { # Check for taint mode on perl >= 5.8.0
+	if (${Symbol::qualify_to_ref("\cTAINT")}) { # Check for taint mode on perl >= 5.8.0
             require Scalar::Util;
 	    @dirlist = grep { ! Scalar::Util::tainted($_) } @dirlist;
 	}

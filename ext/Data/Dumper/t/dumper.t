@@ -981,7 +981,7 @@ EOT
     TEST q(Data::Dumper->new([{ foo => sub { print "foo"; } }])->Dump);
   }
 }
-
+die;
 ############# 214
 ##
 

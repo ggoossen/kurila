@@ -102,7 +102,7 @@ my %global = map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT);
 sub gensym () {
     my $name = "GEN" . $genseq++;
     no strict 'refs';
-    my $ref = \*{$genpkg . $name};
+    my $ref = \*{Symbol::qualify_to_ref($genpkg . $name)};
     delete $$genpkg{$name};
     $ref;
 }
@@ -164,7 +164,7 @@ sub delete_package ($) {
 
     my $leaf_symtab = *{$stem_symtab->{$leaf}}{HASH};
     foreach my $name (keys %$leaf_symtab) {
-        undef *{$pkg . $name};
+        undef *{Symbol::qualify_to_ref($pkg . $name)};
     }
 
     # delete the symbol table

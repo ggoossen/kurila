@@ -9,7 +9,7 @@ sub import {
     my $who = _who();
 
     {   no strict 'refs';
-        *{"${who}::load"} = *load;
+        *{Symbol::qualify_to_ref("${who}::load")} = *load;
     }
 }
 
