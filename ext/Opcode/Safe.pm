@@ -179,7 +179,7 @@ sub share_from {
     no strict 'refs';
     # Check that 'from' package actually exists
     croak("Package \"$pkg\" does not exist")
-	unless keys %{"$pkg\::"};
+	unless keys %{Symbol::qualify_to_ref("$pkg\::")};
     my $arg;
     foreach $arg (@$vars) {
 	# catch some $safe->share($var) errors:
@@ -189,12 +189,12 @@ sub share_from {
 	my ($var, $type);
 	$type = $1 if ($var = $arg) =~ s/^(\W)//;
 	# warn "share_from $pkg $type $var";
-	*{$root."::$var"} = (!$type)       ? \&{$pkg."::$var"}
-			  : ($type eq '&') ? \&{$pkg."::$var"}
-			  : ($type eq '$') ? \${$pkg."::$var"}
-			  : ($type eq '@') ? \@{$pkg."::$var"}
-			  : ($type eq '%') ? \%{$pkg."::$var"}
-			  : ($type eq '*') ?  *{$pkg."::$var"}
+	*{Symbol::qualify_to_ref($root."::$var")} = (!$type)       ? \&{Symbol::qualify_to_ref($pkg."::$var")}
+			  : ($type eq '&') ? \&{Symbol::qualify_to_ref($pkg."::$var")}
+			  : ($type eq '$') ? \${Symbol::qualify_to_ref($pkg."::$var")}
+			  : ($type eq '@') ? \@{Symbol::qualify_to_ref($pkg."::$var")}
+			  : ($type eq '%') ? \%{Symbol::qualify_to_ref($pkg."::$var")}
+			  : ($type eq '*') ?  *{Symbol::qualify_to_ref($pkg."::$var")}
 			  : croak(qq(Can't share "$type$var" of unknown type));
     }
     $obj->share_record($pkg, $vars) unless $no_record or !$vars;
@@ -224,7 +224,7 @@ sub share_forget {
 sub varglob {
     my ($obj, $var) = @_;
     no strict 'refs';
-    return *{$obj->root()."::$var"};
+    return *{Symbol::qualify_to_ref($obj->root()."::$var")};
 }
 
 

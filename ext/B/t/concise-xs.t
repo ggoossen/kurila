@@ -289,9 +289,9 @@ sub test_pkg {
     # build %stash: keys are func-names, vals filled in below
     my (%stash) = map
 	( ($_ => 0)
-	  => ( grep exists &{"$pkg\::$_"}	# grab CODE symbols
+	  => ( grep exists &{Symbol::qualify_to_ref("$pkg\::$_")}	# grab CODE symbols
 	       => grep !/__ANON__/		# but not anon subs
-	       => keys %{$pkg.'::'}		# from symbol table
+	       => keys %{Symbol::qualify_to_ref($pkg.'::')}		# from symbol table
 	       ));
 
     for my $type (keys %matchers) {

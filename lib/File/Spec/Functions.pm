@@ -39,7 +39,7 @@ require Exporter;
 foreach my $meth (@EXPORT, @EXPORT_OK) {
     my $sub = File::Spec->can($meth);
     no strict 'refs';
-    *{$meth} = sub {&$sub('File::Spec', @_)};
+    *{Symbol::qualify_to_ref($meth)} = sub {&$sub('File::Spec', @_)};
 }
 
 

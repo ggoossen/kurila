@@ -103,7 +103,7 @@ sub gensym () {
     my $name = "GEN" . $genseq++;
     no strict 'refs';
     my $ref = \*{Symbol::qualify_to_ref($genpkg . $name)};
-    delete $$genpkg{$name};
+    delete ${Symbol::stash($genpkg)}{$name};
     $ref;
 }
 

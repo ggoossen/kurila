@@ -93,7 +93,7 @@ print ref $clone eq ref $empty_string_obj &&
 
 
 # Do not fail if Tie::Hash and/or Tie::StdHash is not available
-if (eval { require Tie::Hash; scalar keys %Tie::StdHash:: }) {
+if (eval { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     tie my %tie, "Tie::StdHash" or die $!;
     $tie{array} = [1,2,3,4];
     $tie{hash} = {1,2,3,4};

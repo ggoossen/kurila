@@ -56,7 +56,7 @@ sub import
             }
 
         } elsif ($sym =~ /^str/i) {
-            import overload ('""' => \&tid);
+            overload->import ('""' => \&tid);
 
         } elsif ($sym =~ /^(?::all|yield)$/) {
             push(@EXPORT, qw(yield));
@@ -71,7 +71,7 @@ sub import
     my $caller = caller();
     foreach my $sym (@EXPORT) {
         no strict 'refs';
-        *{$caller.'::'.$sym} = \&{$sym};
+        *{Symbol::qualify_to_ref($caller.'::'.$sym)} = \&{$sym};
     }
 
     # Set stack size via environment variable

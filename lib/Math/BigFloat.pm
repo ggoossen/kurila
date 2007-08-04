@@ -2123,7 +2123,7 @@ sub bsqrt
       delete $x->{_a}; delete $x->{_p};
       }
     # re-enable A and P, upgrade is taken care of by "local"
-    ${"$self\::accuracy"} = $ab; ${"$self\::precision"} = $pb;
+    ${Symbol::qualify_to_ref("$self\::accuracy")} = $ab; ${Symbol::qualify_to_ref("$self\::precision")} = $pb;
     return $x;
     }
  
@@ -3395,7 +3395,7 @@ sub AUTOLOAD
       }
     # try one level up, but subst. bxxx() for fxxx() since MBI only got bxxx()
     $name =~ s/^f/b/;
-    return &{"Math::BigInt"."::$name"}(@_);
+    return &{Symbol::qualify_to_ref("Math::BigInt"."::$name")}(@_);
     }
   my $bname = $name; $bname =~ s/^f/b/;
   $c .= "::$name";

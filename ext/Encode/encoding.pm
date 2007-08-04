@@ -108,7 +108,7 @@ sub import {
         my $caller = caller();
         {
             no strict 'refs';
-            *{"${caller}::_get_locale_encoding"} = \&_get_locale_encoding;
+            *{Symbol::qualify_to_ref("${caller}::_get_locale_encoding")} = \&_get_locale_encoding;
         }
         return;
     }

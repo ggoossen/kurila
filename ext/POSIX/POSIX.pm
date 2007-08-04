@@ -578,7 +578,7 @@ sub fstat {
     usage "fstat(fd)" if @_ != 1;
     local *TMP;
     CORE::open(TMP, "<&$_[0]");		# Gross.
-    my @l = CORE::stat(TMP);
+    my @l = CORE::stat(*TMP);
     CORE::close(TMP);
     @l;
 }

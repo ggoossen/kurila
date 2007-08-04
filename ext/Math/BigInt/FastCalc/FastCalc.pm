@@ -40,7 +40,7 @@ BEGIN
     /)
     {
     no strict 'refs';
-    *{'Math::BigInt::FastCalc::_' . $method} = \&{'Math::BigInt::Calc::_' . $method};
+    *{Symbol::qualify_to_ref('Math::BigInt::FastCalc::_' . $method)} = \&{Symbol::qualify_to_ref('Math::BigInt::Calc::_' . $method)};
     }
   my ($AND_BITS, $XOR_BITS, $OR_BITS, $BASE_LEN_SMALL, $MAX_VAL);
  

@@ -14,7 +14,7 @@ sub findsym {
 	$type ||= ref($ref);
 	my $found;
 	no strict 'refs';
-        foreach my $sym ( values %{$pkg."::"} ) {
+        foreach my $sym ( values %{Symbol::qualify_to_ref($pkg."::")} ) {
 	    use strict;
 	    next unless ref ( \$sym ) eq 'GLOB';
             return $symcache{$pkg,$ref} = \$sym
@@ -100,7 +100,7 @@ sub _resolve_lastattr {
 		if $^W and $name !~ /[A-Z]/;
 	foreach ( @{$validtype{$lastattr{type}}} ) {
 		no strict 'refs';
-		*{"$lastattr{pkg}::_ATTR_${_}_${name}"} = $lastattr{ref};
+		*{Symbol::qualify_to_ref("$lastattr{pkg}::_ATTR_${_}_${name}")} = $lastattr{ref};
 	}
 	%lastattr = ();
 }
@@ -174,7 +174,7 @@ sub _gen_handler_AH_() {
 
 {
     no strict 'refs';
-    *{"Attribute::Handlers::UNIVERSAL::MODIFY_${_}_ATTRIBUTES"} =
+    *{Symbol::qualify_to_ref("Attribute::Handlers::UNIVERSAL::MODIFY_${_}_ATTRIBUTES")} =
 	_gen_handler_AH_ foreach @{$validtype{ANY}};
 }
 push @UNIVERSAL::ISA, 'Attribute::Handlers::UNIVERSAL'

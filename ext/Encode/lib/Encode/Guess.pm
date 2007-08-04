@@ -24,7 +24,7 @@ sub import {    # Exporter not used so we do it on our own
     my $callpkg = caller;
     for my $item (@EXPORT) {
         no strict 'refs';
-        *{"$callpkg\::$item"} = \&{"$item"};
+        *{Symbol::qualify_to_ref("$callpkg\::$item")} = \&{"$item"};
     }
     set_suspects(@_);
 }

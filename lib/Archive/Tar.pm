@@ -94,7 +94,7 @@ my $tmpl = {
 ### install get/set accessors for this object.
 for my $key ( keys %$tmpl ) {
     no strict 'refs';
-    *{__PACKAGE__."::$key"} = sub {
+    *{Symbol::qualify_to_ref(__PACKAGE__."::$key")} = sub {
         my $self = shift;
         $self->{$key} = $_[0] if @_;
         return $self->{$key};

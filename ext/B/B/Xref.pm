@@ -332,7 +332,7 @@ sub xref_definitions {
         $exclude{$pack."::"} = 1;
     }
     no strict qw(vars refs);
-    walksymtable(\%{"main::"}, "xref", sub { !defined($exclude{$_[0]}) });
+    walksymtable(\%{Symbol::qualify_to_ref("main::")}, "xref", sub { !defined($exclude{$_[0]}) });
 }
 
 sub output {

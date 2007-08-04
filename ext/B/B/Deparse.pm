@@ -659,11 +659,11 @@ sub compile {
 	no strict 'refs';
 	my $laststash = defined $self->{'curcop'}
 	    ? $self->{'curcop'}->stash->NAME : $self->{'curstash'};
-	if (defined *{$laststash."::DATA"}{IO}) {
+	if (defined *{Symbol::qualify_to_ref($laststash."::DATA")}{IO}) {
 	    print "package $laststash;\n"
 		unless $laststash eq $self->{'curstash'};
 	    print "__DATA__\n";
-	    print readline(*{$laststash."::DATA"});
+	    print readline(*{Symbol::qualify_to_ref($laststash."::DATA")});
 	}
     }
 }
@@ -3252,7 +3252,7 @@ sub pp_entersub {
 	no warnings 'uninitialized';
 	$declared = exists $self->{'subs_declared'}{$kid}
 	    || (
-		 defined &{ ${$self->{'curstash'}."::"}{$kid} }
+		 defined &{ ${Symbol::qualify_to_ref($self->{'curstash'}."::")}{$kid} }
 		 && !exists
 		     $self->{'subs_deparsed'}{$self->{'curstash'}."::".$kid}
 		 && defined prototype $self->{'curstash'}."::".$kid

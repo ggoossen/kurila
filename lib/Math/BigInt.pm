@@ -215,9 +215,9 @@ sub round_mode
       {
       require Carp; Carp::croak ("Unknown round mode '$m'");
       }
-    return ${"${class}::round_mode"} = $m;
+    return ${Symbol::qualify_to_ref("${class}::round_mode")} = $m;
     }
-  ${"${class}::round_mode"};
+  ${Symbol::qualify_to_ref("${class}::round_mode")};
   }
 
 sub upgrade
@@ -229,9 +229,9 @@ sub upgrade
   # need to set new value?
   if (@_ > 0)
     {
-    return ${"${class}::upgrade"} = $_[0];
+    return ${Symbol::qualify_to_ref("${class}::upgrade")} = $_[0];
     }
-  ${"${class}::upgrade"};
+  ${Symbol::qualify_to_ref("${class}::upgrade")};
   }
 
 sub downgrade
@@ -243,9 +243,9 @@ sub downgrade
   # need to set new value?
   if (@_ > 0)
     {
-    return ${"${class}::downgrade"} = $_[0];
+    return ${Symbol::qualify_to_ref("${class}::downgrade")} = $_[0];
     }
-  ${"${class}::downgrade"};
+  ${Symbol::qualify_to_ref("${class}::downgrade")};
   }
 
 sub div_scale
@@ -260,9 +260,9 @@ sub div_scale
       {
       require Carp; Carp::croak ('div_scale must be greater than zero');
       }
-    ${"${class}::div_scale"} = $_[0];
+    ${Symbol::qualify_to_ref("${class}::div_scale")} = $_[0];
     }
-  ${"${class}::div_scale"};
+  ${Symbol::qualify_to_ref("${class}::div_scale")};
   }
 
 sub accuracy
@@ -304,12 +304,12 @@ sub accuracy
       $x->bround($a) if $a;		# not for undef, 0
       $x->{_a} = $a;			# set/overwrite, even if not rounded
       delete $x->{_p};			# clear P
-      $a = ${"${class}::accuracy"} unless defined $a;   # proper return value
+      $a = ${Symbol::qualify_to_ref("${class}::accuracy")} unless defined $a;   # proper return value
       }
     else
       {
-      ${"${class}::accuracy"} = $a;	# set global A
-      ${"${class}::precision"} = undef;	# clear global P
+      ${Symbol::qualify_to_ref("${class}::accuracy")} = $a;	# set global A
+      ${Symbol::qualify_to_ref("${class}::precision")} = undef;	# clear global P
       }
     return $a;				# shortcut
     }
@@ -318,7 +318,7 @@ sub accuracy
   # $object->accuracy() or fallback to global
   $a = $x->{_a} if ref($x);
   # but don't return global undef, when $x's accuracy is 0!
-  $a = ${"${class}::accuracy"} if !defined $a;
+  $a = ${Symbol::qualify_to_ref("${class}::accuracy")} if !defined $a;
   $a;
   }
 
@@ -350,12 +350,12 @@ sub precision
       $x->bfround($p) if $p;		# not for undef, 0
       $x->{_p} = $p;			# set/overwrite, even if not rounded
       delete $x->{_a};			# clear A
-      $p = ${"${class}::precision"} unless defined $p;  # proper return value
+      $p = ${Symbol::qualify_to_ref("${class}::precision")} unless defined $p;  # proper return value
       }
     else
       {
-      ${"${class}::precision"} = $p;	# set global P
-      ${"${class}::accuracy"} = undef;	# clear global A
+      ${Symbol::qualify_to_ref("${class}::precision")} = $p;	# set global P
+      ${Symbol::qualify_to_ref("${class}::accuracy")} = undef;	# clear global A
       }
     return $p;				# shortcut
     }
@@ -364,7 +364,7 @@ sub precision
   # $object->precision() or fallback to global
   $p = $x->{_p} if ref($x);
   # but don't return global undef, when $x's precision is 0!
-  $p = ${"${class}::precision"} if !defined $p;
+  $p = ${Symbol::qualify_to_ref("${class}::precision")} if !defined $p;
   $p;
   }
 
@@ -403,7 +403,7 @@ sub config
       {
       if ($key =~ /^trap_(inf|nan)\z/)
         {
-        ${"${class}::_trap_$1"} = ($set_args->{"trap_$1"} ? 1 : 0);
+        ${Symbol::qualify_to_ref("${class}::_trap_$1")} = ($set_args->{"trap_$1"} ? 1 : 0);
         next;
         }
       # use a call instead of just setting the $variable to check argument
@@ -415,17 +415,17 @@ sub config
 
   my $cfg = {
     lib => $CALC,
-    lib_version => ${"${CALC}::VERSION"},
+    lib_version => ${Symbol::qualify_to_ref("${CALC}::VERSION")},
     class => $class,
-    trap_nan => ${"${class}::_trap_nan"},
-    trap_inf => ${"${class}::_trap_inf"},
-    version => ${"${class}::VERSION"},
+    trap_nan => ${Symbol::qualify_to_ref("${class}::_trap_nan")},
+    trap_inf => ${Symbol::qualify_to_ref("${class}::_trap_inf")},
+    version => ${Symbol::qualify_to_ref("${class}::VERSION")},
     };
   foreach my $key (qw/
      upgrade downgrade precision accuracy round_mode div_scale
      /)
     {
-    $cfg->{$key} = ${"${class}::$key"};
+    $cfg->{$key} = ${Symbol::qualify_to_ref("${class}::$key")};
     };
   if (@_ == 1 && (ref($_[0]) ne 'HASH'))
     {
@@ -446,8 +446,8 @@ sub _scale_a
   no strict 'refs';
   my $class = ref($x);
 
-  $scale = ${ $class . '::accuracy' } unless defined $scale;
-  $mode = ${ $class . '::round_mode' } unless defined $mode;
+  $scale = ${Symbol::qualify_to_ref( $class . '::accuracy') } unless defined $scale;
+  $mode = ${Symbol::qualify_to_ref( $class . '::round_mode') } unless defined $mode;
 
   ($scale,$mode);
   }
@@ -463,8 +463,8 @@ sub _scale_p
   no strict 'refs';
   my $class = ref($x);
 
-  $scale = ${ $class . '::precision' } unless defined $scale;
-  $mode = ${ $class . '::round_mode' } unless defined $mode;
+  $scale = ${Symbol::qualify_to_ref( $class . '::precision') } unless defined $scale;
+  $mode = ${Symbol::qualify_to_ref( $class . '::round_mode') } unless defined $mode;
 
   ($scale,$mode);
   }
@@ -534,8 +534,8 @@ sub new
       }
     no strict 'refs';
     if ( (defined $a) || (defined $p) 
-        || (defined ${"${class}::precision"})
-        || (defined ${"${class}::accuracy"}) 
+        || (defined ${Symbol::qualify_to_ref("${class}::precision")})
+        || (defined ${Symbol::qualify_to_ref("${class}::accuracy")}) 
        )
       {
       $self->round($a,$p,$r) unless (@_ == 4 && !defined $a && !defined $p);
@@ -641,7 +641,7 @@ sub bnan
     my $c = $self; $self = {}; bless $self, $c;
     }
   no strict 'refs';
-  if (${"${class}::_trap_nan"})
+  if (${Symbol::qualify_to_ref("${class}::_trap_nan")})
     {
     require Carp;
     Carp::croak ("Tried to set $self to NaN in $class\::bnan()");
@@ -675,7 +675,7 @@ sub binf
     my $c = $self; $self = {}; bless $self, $c;
     }
   no strict 'refs';
-  if (${"${class}::_trap_inf"})
+  if (${Symbol::qualify_to_ref("${class}::_trap_inf")})
     {
     require Carp;
     Carp::croak ("Tried to set $self to +-inf in $class\::binf()");
@@ -889,8 +889,8 @@ sub _find_round_parameters
       }
     }
   # if still none defined, use globals (#2)
-  $a = ${"$c\::accuracy"} unless defined $a;
-  $p = ${"$c\::precision"} unless defined $p;
+  $a = ${Symbol::qualify_to_ref("$c\::accuracy")} unless defined $a;
+  $p = ${Symbol::qualify_to_ref("$c\::precision")} unless defined $p;
 
   # A == 0 is useless, so undef it to signal no rounding
   $a = undef if defined $a && $a == 0;
@@ -901,7 +901,7 @@ sub _find_round_parameters
   # set A and set P is an fatal error
   return ($self->bnan()) if defined $a && defined $p;		# error
 
-  $r = ${"$c\::round_mode"} unless defined $r;
+  $r = ${Symbol::qualify_to_ref("$c\::round_mode")} unless defined $r;
   if ($r !~ /^(even|odd|\+inf|\-inf|zero|trunc|common)$/)
     {
     require Carp; Carp::croak ("Unknown round mode '$r'");
@@ -946,8 +946,8 @@ sub round
       }
     }
   # if still none defined, use globals (#2)
-  $a = ${"$c\::accuracy"} unless defined $a;
-  $p = ${"$c\::precision"} unless defined $p;
+  $a = ${Symbol::qualify_to_ref("$c\::accuracy")} unless defined $a;
+  $p = ${Symbol::qualify_to_ref("$c\::precision")} unless defined $p;
  
   # A == 0 is useless, so undef it to signal no rounding
   $a = undef if defined $a && $a == 0;
@@ -958,7 +958,7 @@ sub round
   # set A and set P is an fatal error
   return $self->bnan() if defined $a && defined $p;
 
-  $r = ${"$c\::round_mode"} unless defined $r;
+  $r = ${Symbol::qualify_to_ref("$c\::round_mode")} unless defined $r;
   if ($r !~ /^(even|odd|\+inf|\-inf|zero|trunc|common)$/)
     {
     require Carp; Carp::croak ("Unknown round mode '$r'");
@@ -2509,13 +2509,13 @@ sub objectify
 
   no strict 'refs';
   # disable downgrading, because Math::BigFLoat->foo('1.0','2.0') needs floats
-  if (defined ${"$a[0]::downgrade"})
+  if (defined ${Symbol::qualify_to_ref("$a[0]::downgrade")})
     {
-    $d = ${"$a[0]::downgrade"};
-    ${"$a[0]::downgrade"} = undef;
+    $d = ${Symbol::qualify_to_ref("$a[0]::downgrade")};
+    ${Symbol::qualify_to_ref("$a[0]::downgrade")} = undef;
     }
 
-  my $up = ${"$a[0]::upgrade"};
+  my $up = ${Symbol::qualify_to_ref("$a[0]::upgrade")};
   # print STDERR "# Now in objectify, my class is today $a[0], count = $count\n";
   if ($count == 0)
     {
@@ -2557,7 +2557,7 @@ sub objectify
     {
     require Carp; Carp::croak ("$class objectify needs list context");
     }
-  ${"$a[0]::downgrade"} = $d;
+  ${Symbol::qualify_to_ref("$a[0]::downgrade")} = $d;
   @a;
   }
 
