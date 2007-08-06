@@ -127,8 +127,8 @@ print $foo;
 { no strict 'refs';
   my $CX = "\cX";
   my $CXY  ="\cXY";
-  $ {$CX} = 17;
-  $ {$CXY} = 23;
+  $ {Symbol::qualify_to_ref($CX)} = 17;
+  $ {Symbol::qualify_to_ref($CXY)} = 23;
   if ($ {^XY} != 23) { print "not "  }
   print "ok 31\n";
  
@@ -137,7 +137,7 @@ print $foo;
   print "ok 32\n";
 
   eval "\$\cQ = 24";                 # Literal control character
-  if ($@ or ${"\cQ"} != 24) {  print "not "  }
+  if ($@ or ${Symbol::qualify_to_ref("\cQ")} != 24) {  print "not "  }
   print "ok 33\n";
   if ($^Q != 24) {  print "not "  }  # Control character escape sequence
   print "ok 34\n";
@@ -147,7 +147,7 @@ print $foo;
   print "ok 35\n";
 
   sub XX () { 6 }
-  $ {"\cQ\cXX"} = 119; 
+  $ {Symbol::qualify_to_ref("\cQ\cXX")} = 119; 
   $^Q = 5; #  This should be an unused ^Var.
   $N = 5;
   # The second caret here should be interpreted as an xor
@@ -267,7 +267,7 @@ my %str = (
 my $test = 52;
 print ((exists $str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists $str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
-print ((exists $str{xyz::bar} ? "" : "not ")."ok $test\n"); ++$test;
+print ((exists $str{'xyz::bar'} ? "" : "not ")."ok $test\n"); ++$test;
 
 sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;

@@ -3902,7 +3902,7 @@ Perl_sv_force_normal_flags(pTHX_ register SV *sv, U32 flags)
 #endif
     if (SvROK(sv))
 	sv_unref_flags(sv, flags);
-    else if (SvFAKE(sv) && SvTYPE(sv) == SVt_PVGV)
+    else if (SvTYPE(sv) == SVt_PVGV)
 	sv_unglob(sv);
 }
 

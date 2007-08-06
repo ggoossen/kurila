@@ -480,9 +480,9 @@ EOF
     close F;
     # need to eliminate any other qv()'s
     undef *main::qv;
-    ok(!defined(&{"main\::qv"}), "make sure we cleared qv() properly");
+    ok(!defined(&{Symbol::qualify_to_ref("main\::qv")}), "make sure we cleared qv() properly");
     eval "use lib '.'; use vvv;";
-    ok(defined(&{"main\::qv"}), "make sure we exported qv() properly");
+    ok(defined(&{Symbol::qualify_to_ref("main\::qv")}), "make sure we exported qv() properly");
     isa_ok( qv(1.2), "vvv");
     unlink 'vvv.pm';
 

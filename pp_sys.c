@@ -1172,26 +1172,13 @@ Perl_setdefout(pTHX_ GV *gv)
 
 PP(pp_select)
 {
-    dVAR; dSP; dTARGET;
-    HV *hv;
+    dVAR; dSP;
     GV * const newdefout = (PL_op->op_private > 0) ? ((GV *) POPs) : NULL;
     GV * egv = GvEGV(PL_defoutgv);
 
     if (!egv)
 	egv = PL_defoutgv;
-    hv = GvSTASH(egv);
-    if (! hv)
-	XPUSHs(&PL_sv_undef);
-    else {
-	GV * const * const gvp = (GV**)hv_fetch(hv, GvNAME(egv), GvNAMELEN(egv), FALSE);
-	if (gvp && *gvp == egv) {
-	    gv_efullname4(TARG, PL_defoutgv, NULL, TRUE);
-	    XPUSHTARG;
-	}
-	else {
-	    XPUSHs(sv_2mortal(newRV((SV*)egv)));
-	}
-    }
+    XPUSHs( egv ? (SV*)egv : &PL_sv_undef );
 
     if (newdefout) {
 	if (!GvIO(newdefout))

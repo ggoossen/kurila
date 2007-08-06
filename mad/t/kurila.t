@@ -153,6 +153,8 @@ sub t_strict_refs {
                'my $pkg; &{Symbol::qualify_to_ref($pkg . "::bar")} = sub { "foobar" }');
     p5convert( 'my $pkg; defined &{$pkg . "::bar"}',
                'my $pkg; defined &{Symbol::qualify_to_ref($pkg . "::bar")}');
+    p5convert( '*$AUTOLOAD',
+               '*{Symbol::qualify_to_ref($AUTOLOAD)}');
 
     p5convert( 'my $pkg; keys %Package::',
                'my $pkg; keys %{Symbol::stash("Package")}');

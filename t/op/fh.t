@@ -13,7 +13,7 @@ my $a = "SYM000";
 ok(!defined(fileno($a)));
 ok(!defined *{$a});
 
-select select $a;
+select select Symbol::qualify_to_ref($a);
 ok(defined *{$a});
 
 $a++;
@@ -22,7 +22,7 @@ ok(!defined *{$a});
 
 {
     no strict 'refs';
-    ok(open($a, ">&STDOUT"));
+    ok(open(Symbol::qualify_to_ref($a), ">&STDOUT"));
     ok(defined *{$a});
 }
 

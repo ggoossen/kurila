@@ -87,6 +87,7 @@ sub reftype ($) {
   my $r = shift;
   my $t;
 
+  if (ref(\$r) eq "GLOB") { return "GLOB"; }
   length($t = ref($r)) or return undef;
 
   # This eval will fail if the reference is not blessed

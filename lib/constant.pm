@@ -111,13 +111,13 @@ sub import {
 		    $symtab->{$name} = \$scalar;
 		    mro::method_changed_in($pkg);
 		} else {
-		    *$full_name = sub () { $scalar };
+		    *{Symbol::qualify_to_ref($full_name)} = sub () { $scalar };
 		}
 	    } elsif (@_) {
 		my @list = @_;
-		*$full_name = sub () { @list };
+		*{Symbol::qualify_to_ref($full_name)} = sub () { @list };
 	    } else {
-		*$full_name = sub () { };
+		*{Symbol::qualify_to_ref($full_name)} = sub () { };
 	    }
 	}
     }

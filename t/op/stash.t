@@ -22,14 +22,14 @@ fresh_perl_is(
 
 {
     no strict 'refs';
-    ok( !defined %oedipa::maas::, q(stashes aren't defined if not used) );
-    ok( !defined %{"oedipa::maas::"}, q(- work with hard refs too) );
+    ok( !defined %{Symbol::stash("oedipa::maas")}, q(stashes aren't defined if not used) );
+    ok( !defined %{Symbol::qualify_to_ref("oedipa::maas::")}, q(- work with hard refs too) );
 
-    ok( defined %tyrone::slothrop::, q(stashes are defined if seen at compile time) );
-    ok( defined %{"tyrone::slothrop::"}, q(- work with hard refs too) );
+    ok( defined %{Symbol::stash("tyrone::slothrop")}, q(stashes are defined if seen at compile time) );
+    ok( defined %{Symbol::qualify_to_ref("tyrone::slothrop::")}, q(- work with hard refs too) );
 
-    ok( defined %bongo::shaftsbury::, q(stashes are defined if a var is seen at compile time) );
-    ok( defined %{"bongo::shaftsbury::"}, q(- work with hard refs too) );
+    ok( defined %{Symbol::stash("bongo::shaftsbury")}, q(stashes are defined if a var is seen at compile time) );
+    ok( defined %{Symbol::qualify_to_ref("bongo::shaftsbury::")}, q(- work with hard refs too) );
 }
 
 package tyrone::slothrop;
@@ -51,11 +51,11 @@ package main;
 
 # now tests in eval
 
-ok( !eval  { defined %achtfaden:: },   'works in eval{}' );
+ok( !eval  { defined %{Symbol::stash("achtfaden")} },   'works in eval{}' );
 ok( !eval q{ defined %schoenmaker:: }, 'works in eval("")' );
 
 # now tests with strictures
 
 use strict;
-ok( !defined %pig::, q(referencing a non-existent stash doesn't produce stricture errors) );
-ok( !exists $pig::{bodine}, q(referencing a non-existent stash element doesn't produce stricture errors) );
+ok( !defined %{Symbol::stash("pig")}, q(referencing a non-existent stash doesn't produce stricture errors) );
+ok( !exists $pig::{Symbol::stash("pig")}{bodine}, q(referencing a non-existent stash element doesn't produce stricture errors) );

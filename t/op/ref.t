@@ -56,7 +56,7 @@ $BAZ = "hit";
 is ($$$FOO, 'hit');
 
 # test that ref(vstring) makes sense
-my $vstref = \v1;
+my $vstref = \"\x{1}";
 is (ref($vstref), "VSTRING", "ref(vstr) eq VSTRING");
 like ( $vstref, qr/VSTRING\(0x[0-9a-f]+\)/, '\vstr is also VSTRING');
 
@@ -76,7 +76,7 @@ print ${$ref[1]}[0];
 print @{$ref[2]}[0];
 {
     no strict 'refs';
-    print @{'d'};
+    print @{Symbol::qualify_to_ref('d')};
 }
 curr_test($test+4);
 

@@ -1413,6 +1413,7 @@ XS(XS_Symbol_stash)
        Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
 
     ST(0) = gv_stashsv(ST(0), GV_ADD);
+    ST(0) = newRV(ST(0));
     XSRETURN(1);
 }
 

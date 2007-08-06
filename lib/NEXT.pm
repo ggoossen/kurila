@@ -10,7 +10,7 @@ sub NEXT::ELSEWHERE::ancestors
 	while (my $next = shift @inlist) {
 		push @outlist, $next;
 		no strict 'refs';
-		unshift @inlist, @{"$outlist[-1]::ISA"};
+		unshift @inlist, @{Symbol::qualify_to_ref("$outlist[-1]::ISA")};
 	}
 	return @outlist;
 }
@@ -22,7 +22,7 @@ sub NEXT::ELSEWHERE::ordered_ancestors
 	while (my $next = shift @inlist) {
 		push @outlist, $next;
 		no strict 'refs';
-		push @inlist, @{"$outlist[-1]::ISA"};
+		push @inlist, @{Symbol::qualify_to_ref("$outlist[-1]::ISA")};
 	}
 	return sort { $a->isa($b) ? -1
 	            : $b->isa($a) ? +1
@@ -55,10 +55,10 @@ sub AUTOLOAD
 		}
 		no strict 'refs';
 		@{$NEXT::NEXT{$self,$wanted_method}} = 
-			map { *{"${_}::$caller_method"}{CODE}||() } @forebears
+			map { *{Symbol::qualify_to_ref("${_}::$caller_method")}{CODE}||() } @forebears
 				unless $wanted_method eq 'AUTOLOAD';
 		@{$NEXT::NEXT{$self,$wanted_method}} = 
-			map { (*{"${_}::AUTOLOAD"}{CODE}) ? "${_}::AUTOLOAD" : ()} @forebears
+			map { (*{Symbol::qualify_to_ref("${_}::AUTOLOAD")}{CODE}) ? "${_}::AUTOLOAD" : ()} @forebears
 				unless @{$NEXT::NEXT{$self,$wanted_method}||[]};
 		$NEXT::SEEN->{$self,*{$caller}{CODE}}++;
 	}
@@ -76,7 +76,7 @@ sub AUTOLOAD
 	};
 	return $self->$call_method(@_[1..$#_]) if ref $call_method eq 'CODE';
 	no strict 'refs';
-	($wanted_method=${$caller_class."::AUTOLOAD"}) =~ s/.*:://
+	($wanted_method=${Symbol::qualify_to_ref($caller_class."::AUTOLOAD")}) =~ s/.*:://
 		if $wanted_method eq 'AUTOLOAD';
 	$$call_method = $caller_class."::NEXT::".$wanted_method;
 	return $call_method->(@_);

@@ -103,6 +103,7 @@ sub gensym () {
     my $name = "GEN" . $genseq++;
     no strict 'refs';
     my $ref = \*{Symbol::qualify_to_ref($genpkg . $name)};
+    $ref = \*{Symbol::qualify_to_ref($genpkg . $name)};  # second time to supress only-used once warning.
     delete ${Symbol::stash($genpkg)}{$name};
     $ref;
 }
@@ -156,7 +157,7 @@ sub delete_package ($) {
     }
 
     my($stem, $leaf) = $pkg =~ m/(.*::)(\w+::)$/;
-    my $stem_symtab = *{$stem}{HASH};
+    my $stem_symtab = *{Symbol::qualify_to_ref($stem)}{HASH};
     return unless defined $stem_symtab and exists $stem_symtab->{$leaf};
 
 

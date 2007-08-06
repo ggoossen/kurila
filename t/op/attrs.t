@@ -39,7 +39,8 @@ like $@, qr/Unterminated attribute parameter in attribute list at/;
 eval 'sub e4 ($) : plugh + xyzzy ;';
 like $@, qr/Invalid separator character '[+]' in attribute list at/;
 
-eval_ok 'my main $x : = 0;';
+eval 'my main $x : = 0;';
+like $@, qr/Expected variable after declarator at/;
 eval_ok 'my $x : = 0;';
 eval_ok 'my $x ;';
 eval_ok 'my ($x) : = 0;';
@@ -78,17 +79,17 @@ like $@, qr/Invalid separator character ':' in attribute list at/;
 
 sub A::MODIFY_SCALAR_ATTRIBUTES { return }
 eval 'my A $x : plugh;';
-like $@, qr/^SCALAR package attribute may clash with future reserved word: ["']?plugh["']? at/;
+like $@, qr/^Expected variable after declarator at/;
 
 eval 'my A $x : plugh plover;';
-like $@, qr/^SCALAR package attributes may clash with future reserved words: ["']?plugh["']? /;
+like $@, qr/^Expected variable after declarator at/;
 
 no warnings 'reserved';
 eval 'my A $x : plugh;';
-is $@, '';
+like $@, qr/^Expected variable after declarator at/;
 
 eval 'package Cat; my Cat @socks;';
-like $@, qr/^Can't declare class for non-scalar \@socks in "my"/;
+like $@, qr/^Expected variable after declarator at/;
 
 sub X::MODIFY_CODE_ATTRIBUTES { die "$_[0]" }
 sub X::foo { 1 }

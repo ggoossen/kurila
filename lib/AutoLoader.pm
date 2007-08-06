@@ -28,7 +28,7 @@ AUTOLOAD {
     if ($@) {
 	if (substr($sub,-9) eq '::DESTROY') {
 	    no strict 'refs';
-	    *$sub = sub {};
+	    *{Symbol::qualify_to_ref($sub)} = sub {};
 	    $@ = undef;
 	} elsif ($@ =~ /^Can't locate/) {
 	    # The load might just have failed because the filename was too
@@ -200,8 +200,8 @@ sub unimport {
 
     for my $exported (qw( AUTOLOAD can )) {
 	my $symname = $callpkg . '::' . $exported;
-	undef *{ $symname } if \&{ $symname } == \&{ $exported };
-	*{ $symname } = \&{ $symname };
+	undef *{Symbol::qualify_to_ref($symname) } if \&{ Symbol::qualify_to_ref($symname) } == \&{ $exported };
+	*{ Symbol::qualify_to_ref($symname) } = \&{ Symbol::qualify_to_ref($symname) };
     }
 }
 

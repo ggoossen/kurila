@@ -18,7 +18,7 @@ our $AUTOLOAD;
 
 sub AUTOLOAD {
     require "bytes_heavy.pl";
-    goto &$AUTOLOAD if defined &$AUTOLOAD;
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)} if defined &{Symbol::qualify_to_ref($AUTOLOAD)};
     require Carp;
     Carp::croak("Undefined subroutine $AUTOLOAD called");
 }

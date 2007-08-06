@@ -2086,8 +2086,8 @@ sub bsqrt
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = \$self::accuracy; my $ab = $$abr; $$abr = undef;
+  my $pbr = \$self::precision; my $pb = $$pbr; $$pbr = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};

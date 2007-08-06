@@ -131,14 +131,14 @@ if((inet_ntoa((unpack_sockaddr_in(pack_sockaddr_in(100,inet_aton("10.250.230.10"
     print "not ok 9\n"; 
 }
 print ((inet_ntoa(inet_aton("10.20.30.40")) eq "10.20.30.40") ? "ok 10\n" : "not ok 10\n");
-print ((inet_ntoa(v10.20.30.40) eq "10.20.30.40") ? "ok 11\n" : "not ok 11\n");
+print ((inet_ntoa("\x{a}\x{14}\x{1e}\x{28}") eq "10.20.30.40") ? "ok 11\n" : "not ok 11\n");
 {
-    my ($port,$addr) = unpack_sockaddr_in(pack_sockaddr_in(100,v10.10.10.10));
+    my ($port,$addr) = unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
     print (($port == 100) ? "ok 12\n" : "not ok 12\n");
     print ((inet_ntoa($addr) eq "10.10.10.10") ? "ok 13\n" : "not ok 13\n");
 }
 				     
-eval { inet_ntoa(v10.20.30.400) };
+eval { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") };
 print (($@ =~ /^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/) ? "ok 14\n" : "not ok 14\n");
 
 if (sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))) == AF_INET) {

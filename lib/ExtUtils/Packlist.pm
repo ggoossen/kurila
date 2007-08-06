@@ -22,7 +22,7 @@ Make a filehandle. Same kind of idea as Symbol::gensym().
 sub mkfh()
 {
 no strict;
-my $fh = \*{$fhname++};
+my $fh = \*{Symbol::qualify_to_ref($fhname++)};
 use strict;
 return($fh);
 }

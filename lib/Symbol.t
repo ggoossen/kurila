@@ -44,7 +44,7 @@ is( $FOO, 'Eymascalar', 'leaves scalar alone' );
     local $^W=1;		# 5.005 compat.
     my $warn;
     local $SIG{__WARN__} = sub { $warn .= "@_" };
-    readline 'FOO';
+    readline *FOO;
     like( $warn, qr/unopened filehandle/, 'warns like an unopened filehandle' );
 }
 
@@ -69,7 +69,7 @@ use Symbol qw(qualify qualify_to_ref);  # must import into this package too
 # Test qualify_to_ref()
 {
     no strict 'refs';
-    ::ok( qualify_to_ref("x") eq \*{"foo::x"}, 'qualify_to_ref() with a simple identifier' );
+    ::ok( \*{qualify_to_ref("x")} eq \*foo::x, 'qualify_to_ref() with a simple identifier' );
 }
 
 # tests for delete_package

@@ -184,12 +184,7 @@ PP(pp_rv2gv)
 		    SvSETMAGIC(sv);
 		    goto wasref;
 		}
-		if (PL_op->op_flags & OPf_REF ||
-		    PL_op->op_private & HINT_STRICT_REFS)
-		    DIE(aTHX_ PL_no_usym, "a symbol");
-		if (ckWARN(WARN_UNINITIALIZED))
-		    report_uninit(sv);
-		RETSETUNDEF;
+		DIE(aTHX_ PL_no_usym, "a symbol");
 	    }
 	    if ((PL_op->op_flags & OPf_SPECIAL) &&
 		!(PL_op->op_flags & OPf_MOD))
@@ -203,16 +198,7 @@ PP(pp_rv2gv)
 		sv = temp;
 	    }
 	    else {
-		if (PL_op->op_private & HINT_STRICT_REFS)
-		    DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
-		if ((PL_op->op_private & (OPpLVAL_INTRO|OPpDONT_INIT_GV))
-		    == OPpDONT_INIT_GV) {
-		    /* We are the target of a coderef assignment.  Return
-		       the scalar unchanged, and let pp_sasssign deal with
-		       things.  */
-		    RETURN;
-		}
-		sv = (SV*)gv_fetchsv(sv, GV_ADD, SVt_PVGV);
+		DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
 	    }
 	}
     }
@@ -227,43 +213,10 @@ GV *
 Perl_softref2xv(pTHX_ SV *const sv, const char *const what, const U32 type,
 		SV ***spp)
 {
-    dVAR;
-    GV *gv;
-
-    if (PL_op->op_private & HINT_STRICT_REFS) {
-	if (SvOK(sv))
-	    Perl_die(aTHX_ PL_no_symref_sv, sv, what);
-	else
-	    Perl_die(aTHX_ PL_no_usym, what);
-    }
-    if (!SvOK(sv)) {
-	if (PL_op->op_flags & OPf_REF)
-	    Perl_die(aTHX_ PL_no_usym, what);
-	if (ckWARN(WARN_UNINITIALIZED))
-	    report_uninit(sv);
-	if (type != SVt_PV && GIMME_V == G_ARRAY) {
-	    (*spp)--;
-	    return NULL;
-	}
-	**spp = &PL_sv_undef;
-	return NULL;
-    }
-    if ((PL_op->op_flags & OPf_SPECIAL) &&
-	!(PL_op->op_flags & OPf_MOD))
-	{
-	    gv = gv_fetchsv(sv, 0, type);
-	    if (!gv
-		&& (!is_gv_magical_sv(sv,0)
-		    || !(gv = gv_fetchsv(sv, GV_ADD, type))))
-		{
-		    **spp = &PL_sv_undef;
-		    return NULL;
-		}
-	}
-    else {
-	gv = gv_fetchsv(sv, GV_ADD, type);
-    }
-    return gv;
+    if (SvOK(sv))
+	Perl_die(aTHX_ PL_no_symref_sv, sv, what);
+    else
+	Perl_die(aTHX_ PL_no_usym, what);
 }
 
 PP(pp_rv2sv)

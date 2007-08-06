@@ -293,17 +293,17 @@ sub import {
 
     # To allow overriding, search through the packages
     # Till we find one in which the correct subroutine is defined.
-    my @packages = ($self,@{"$self\:\:ISA"});
+    my @packages = ($self,@{Symbol::qualify_to_ref("$self\:\:ISA")});
     foreach $sym (keys %EXPORT) {
 	my $pck;
-	my $def = ${"$self\:\:AutoloadClass"} || $DefaultClass;
+	my $def = ${Symbol::qualify_to_ref("$self\:\:AutoloadClass")} || $DefaultClass;
 	foreach $pck (@packages) {
-	    if (defined(&{"$pck\:\:$sym"})) {
+	    if (defined(&{Symbol::qualify_to_ref("$pck\:\:$sym")})) {
 		$def = $pck;
 		last;
 	    }
 	}
-	*{"${callpack}::$sym"} = \&{"$def\:\:$sym"};
+	*{Symbol::qualify_to_ref("${callpack}::$sym")} = \&{Symbol::qualify_to_ref("$def\:\:$sym")};
     }
 }
 
@@ -839,12 +839,12 @@ sub _compile {
 	$func=~/(.+)::([^:]+)$/;
 	($pack,$func_name) = ($1,$2);
 	$pack=~s/::SUPER$//;	# fix another obscure problem
-	$pack = ${"$pack\:\:AutoloadClass"} || $CGI::DefaultClass
-	    unless defined(${"$pack\:\:AUTOLOADED_ROUTINES"});
+	$pack = ${Symbol::qualify_to_ref("$pack\:\:AutoloadClass")} || $CGI::DefaultClass
+	    unless defined(${Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")});
 
-        my($sub) = \%{"$pack\:\:SUBS"};
+        my($sub) = \%{Symbol::qualify_to_ref("$pack\:\:SUBS")};
         unless (%$sub) {
-	   my($auto) = \${"$pack\:\:AUTOLOADED_ROUTINES"};
+	   my($auto) = \${Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")};
 	   local ($@,$!);
 	   eval "package $pack; $$auto";
 	   croak("$AUTOLOAD: $@") if $@;
@@ -918,7 +918,7 @@ sub _setup_symbols {
 	# This is probably extremely evil code -- to be deleted some day.
 	if (/^[-]autoload$/) {
 	    my($pkg) = caller(1);
-	    *{"${pkg}::AUTOLOAD"} = sub { 
+	    *{Symbol::qualify_to_ref("${pkg}::AUTOLOAD")} = sub { 
 		my($routine) = $AUTOLOAD;
 		$routine =~ s/^.*::/CGI::/;
 		&$routine;

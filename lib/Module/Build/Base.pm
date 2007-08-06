@@ -464,7 +464,7 @@ sub find_perl_interpreter {
 }
 
 sub _is_interactive {
-  return -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;   # Pipe?
+  return -t *STDIN && (-t *STDOUT || !(-f *STDOUT || -c *STDOUT)) ;   # Pipe?
 }
 
 # NOTE this is a blocking operation if(-t STDIN)
@@ -680,7 +680,7 @@ sub ACTION_config_data {
       unless ($class->can($property)) {
         no strict 'refs';
 	if ( $type eq 'HASH' ) {
-          *{"$class\::$property"} = sub {
+          *{Symbol::qualify_to_ref("$class\::$property")} = sub {
 	    my $self = shift;
 	    my $x = $self->{properties};
 	    return $x->{$property} unless @_;
@@ -703,7 +703,7 @@ sub ACTION_config_data {
 	  };
 
         } else {
-          *{"$class\::$property"} = sub {
+          *{Symbol::qualify_to_ref("$class\::$property")} = sub {
 	    my $self = shift;
 	    $self->{properties}{$property} = shift if @_;
 	    return $self->{properties}{$property};
@@ -854,7 +854,7 @@ sub mb_parents {
               # Canonize the :: -> main::, ::foo -> main::foo thing.
               # Should I ever canonize the Foo'Bar = Foo::Bar thing?
               $seen{$c}++ ? () : $c;
-          } @{"$current\::ISA"};
+          } @{Symbol::qualify_to_ref("$current\::ISA")};
 
         # I.e., if this class has any parents (at least, ones I've never seen
         # before), push them, in order, onto the stack of classes I need to
@@ -1208,7 +1208,7 @@ sub check_installed_status {
   if ($modname eq 'perl') {
     $status{have} = $self->perl_version;
   
-  } elsif (eval { no strict; $status{have} = ${"${modname}::VERSION"} }) {
+  } elsif (eval { no strict; $status{have} = ${Symbol::qualify_to_ref("${modname}::VERSION")} }) {
     # Don't try to load if it's already loaded
     
   } else {
@@ -1841,7 +1841,7 @@ sub super_classes {
   $seen  ||= {};
   
   no strict 'refs';
-  my @super = grep {not $seen->{$_}++} $class, @{ $class . '::ISA' };
+  my @super = grep {not $seen->{$_}++} $class, @{Symbol::qualify_to_ref( $class . '::ISA') };
   return @super, map {$self->super_classes($_,$seen)} @super;
 }
 
@@ -1852,7 +1852,7 @@ sub known_actions {
   no strict 'refs';
   
   foreach my $class ($self->super_classes) {
-    foreach ( keys %{ $class . '::' } ) {
+    foreach ( keys %{Symbol::qualify_to_ref( $class . '::') } ) {
       $actions{$1}++ if /^ACTION_(\w+)/;
     }
   }
@@ -3051,9 +3051,9 @@ EOF
       # when it actually only takes an input filehandle
 
       my $old_parse_file;
-      $old_parse_file = \&{"Pod::Simple::parse_file"}
+      $old_parse_file = \&{Symbol::qualify_to_ref("Pod::Simple::parse_file")}
 	and
-      local *{"Pod::Simple::parse_file"} = sub {
+      local *{Symbol::qualify_to_ref("Pod::Simple::parse_file")} = sub {
 	my $self = shift;
 	$self->output_fh($_[1]) if $_[1];
 	$self->$old_parse_file($_[0]);

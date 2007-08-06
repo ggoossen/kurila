@@ -367,7 +367,7 @@ if ($Is_miniperl) {
 
 # Make sure Errno hasn't been prematurely autoloaded
 
-   ok !keys %Errno::;
+   ok !keys %{Symbol::stash("Errno")};
 
 # Test auto-loading of Errno when %! is used
 
@@ -382,13 +382,13 @@ if ($Is_miniperl) {
 } else {
     # Make sure that Errno loading doesn't clobber $!
 
-    undef %Errno::;
+    undef %{Symbol::stash("Errno")};
     delete $INC{"Errno.pm"};
 
     open(FOO, "nonesuch"); # Generate ENOENT
     no strict 'refs';
-    my %errs = %{"!"}; # Cause Errno.pm to be loaded at run-time
-    ok ${"!"}{ENOENT};
+    my %errs = %{Symbol::qualify_to_ref("!")}; # Cause Errno.pm to be loaded at run-time
+    ok ${Symbol::qualify_to_ref("!")}{ENOENT};
 }
 
 ok $^S == 0 && defined $^S;

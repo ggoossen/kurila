@@ -10,7 +10,7 @@ $aa = 1;
 is($aa,1);
 { local ${aa};   $aa = 3; is($aa,3); }
 is($aa,1);
-{ no strict 'refs'; local ${"aa"}; $aa = 4; is($aa,4); }
+{ no strict 'refs'; local ${Symbol::qualify_to_ref("aa")}; $aa = 4; is($aa,4); }
 is($aa,1);
 $x = "aa";
 { no strict 'refs'; local ${$x};   $aa = 5; is($aa,5); undef $x; is($aa,5); }
@@ -27,7 +27,7 @@ is($aa,1);
 is("@aa","a b");
 { local @{aa};   @aa = qw/e f/; is("@aa","e f"); }
 is("@aa","a b");
-{ no strict 'refs'; local @{"aa"}; @aa = qw/g h/; is("@aa","g h"); }
+{ no strict 'refs'; local @{Symbol::qualify_to_ref("aa")}; @aa = qw/g h/; is("@aa","g h"); }
 is("@aa","a b");
 $x = "aa";
 { no strict 'refs'; local @{$x};   @aa = qw/i j/; is("@aa","i j"); undef $x; is("@aa","i j"); }
@@ -44,7 +44,7 @@ is("@aa","a b");
 is($aa{a},"b");
 { no strict 'refs'; local %{aa};   %aa = qw/e f/; is($aa{e},"f"); }
 is($aa{a},"b");
-{ no strict 'refs'; local %{"aa"}; %aa = qw/g h/; is($aa{g},"h"); }
+{ no strict 'refs'; local %{Symbol::qualify_to_ref("aa")}; %aa = qw/g h/; is($aa{g},"h"); }
 is($aa{a},"b");
 $x = "aa";
 { no strict 'refs'; local %{$x};   %aa = qw/i j/; is($aa{i},"j"); undef $x; is($aa{i},"j"); }
@@ -66,7 +66,7 @@ eval { local ${$x}; };    test_err_localref;
 eval { local $$y; };      test_err_localref;
 eval { local ${$y}; };    test_err_localref;
 eval { local ${\$aa}; };  test_err_localref;
-eval { local ${\'aa'}; }; test_err_localref;
+eval { local ${Symbol::qualify_to_ref(\'aa')}; }; test_err_localref;
 $x = \@aa;
 $y = \@aa;
 eval { local @$x; };      test_err_localref;

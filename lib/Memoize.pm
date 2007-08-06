@@ -96,7 +96,7 @@ sub memoize {
 	unless $install_name =~ /::/;
     no strict;
     local($^W) = 0;	       # ``Subroutine $install_name redefined at ...''
-    *{$install_name} = $wrapper; # Install memoized version
+    *{Symbol::qualify_to_ref($install_name)} = $wrapper; # Install memoized version
   }
 
   $revmemotable{$wrapper} = "" . $cref; # Turn code ref into hash key
@@ -332,7 +332,7 @@ sub _make_cref {
       croak "Cannot operate on nonexistent function `$fn'";
     }
 #    $cref = \&$name;
-    $cref = *{$name}{CODE};
+    $cref = *{Symbol::qualify_to_ref($name)}{CODE};
   } else {
     my $parent = (caller(1))[3]; # Function that called _make_cref
     croak "Usage: argument 1 to `$parent' must be a function name or reference.\n";

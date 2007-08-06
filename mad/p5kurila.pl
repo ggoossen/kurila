@@ -72,8 +72,7 @@ sub const_handler {
         # keep qq| foo => |
         my $x = ($const->parent->tag eq "op_null" and ! $const->parent->att('was')) ? $const->parent : $const;
         my ($next) = $x->parent->child($x->pos + 1);
-        my ($value) = $twig->findnodes([$const], q|madprops/mad_sv[@key="value"]|);
-        if ($value->att("val") =~ m/^\w+$/) {
+        if (get_madprop($const, "value") =~ m/^\w+$/) {
             return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key="comma"][@val="=&gt;"]|);
             return if $twig->findnodes([$const->parent], q|madprops/mad_sv[@key="bigarrow"]|); # [@val="-&gt;"]|);
         }
@@ -119,8 +118,8 @@ sub const_handler {
     $madprops->insert_new_elt( "mad_sv", { key => 'wsbefore-quote_open', val => $ws } );
     $madprops->insert_new_elt( "mad_sv", { key => 'quote_open', val => q|'| } );
     $madprops->insert_new_elt( 'last_child', "mad_sv", { key => 'quote_close', val => q|'| } );
-    my ($const_X) = $twig->findnodes([$const], q|madprops/mad_sv[@key="value"]|);
-    $const_X->set_att("key" => q|assign|);
+    set_madprop($const, "assign" => get_madprop($const, "value"));
+    del_madprop($const, "value");
 }
 
 sub add_encoding_latin1 {
@@ -232,11 +231,22 @@ sub remove_rv2gv {
     for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2gv op_rv2sv op_rv2hv op_rv2cv op_rv2av|,
                                                           q{op_null[@was="rv2cv"]}) ) {
 
-        my ($op_scope) = $op_rv2gv->findnodes(q|op_scope/|);
-        next if not $op_scope;
-        my $op_const = ($op_scope->findnodes(q*op_const*))[0] || ($op_scope->findnodes(q*op_concat*))[0]
-          || ($op_scope->findnodes(q*op_null[@was="stringify"]*))[0];
-        next if not $op_const;
+        my ($op_scope, $op_const);
+        if (($op_const) = $op_rv2gv->findnodes(q|op_null|)) {
+            # Special case *$AUTOLOAD
+            next unless (get_madprop($op_const, "variable") || '') eq '$AUTOLOAD';
+            $op_scope = $op_rv2gv->insert_new_elt("op_scope");
+            set_madprop($op_scope, "curly_open" => "{");
+            set_madprop($op_scope, "curly_close" => "}");
+            $op_const->move($op_scope);
+        } else {
+            ($op_scope) = $op_rv2gv->findnodes(q|op_scope/|);
+            next if not $op_scope;
+            $op_const = ($op_scope->findnodes(q*op_const*))[0] || ($op_scope->findnodes(q*op_concat*))[0]
+              || ($op_scope->findnodes(q*op_null[@was="stringify"]*))[0];
+            next if not $op_const;
+        }
+
         my $op_sub = $op_scope->insert_new_elt("op_entersub");
 
         # ()

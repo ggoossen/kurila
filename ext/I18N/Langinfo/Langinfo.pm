@@ -92,10 +92,10 @@ sub AUTOLOAD {
 #XXX	    *$AUTOLOAD = sub () { $val };
 #XXX	}
 #XXX	else {
-	    *$AUTOLOAD = sub { $val };
+	    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
 #XXX	}
     }
-    goto &$AUTOLOAD;
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
 }
 
 I18N::Langinfo->bootstrap( $VERSION);

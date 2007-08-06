@@ -27,7 +27,7 @@ sub AUTOLOAD
     {
     if ($n eq $name)
       {
-      *{"bigint::$name"} = sub 
+      *{Symbol::qualify_to_ref("bigint::$name")} = sub 
         {
         my $self = shift;
         no strict 'refs';
@@ -267,7 +267,7 @@ sub import
   my ($package) = caller();
 
   no strict 'refs';
-  if (!defined *{"${package}::inf"})
+  if (!defined *{Symbol::qualify_to_ref("${package}::inf")})
     {
     $self->export_to_level(1,$self,@a);           # export inf and NaN, e and PI
     }

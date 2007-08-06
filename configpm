@@ -157,10 +157,10 @@ sub import {
     foreach my $func (@funcs) {
 	die sprintf qq{"%%s" is not exported by the %%s module\n},
 	    $func, __PACKAGE__ unless $Export_Cache{$func};
-	*{$callpkg.'::'.$func} = \&{$func};
+	*{Symbol::qualify_to_ref($callpkg.'::'.$func)} = \&{$func};
     }
 
-    *{"$callpkg\::Config"} = \%%Config if $export_Config;
+    *{Symbol::qualify_to_ref("$callpkg\::Config")} = \%%Config if $export_Config;
     return;
 }
 

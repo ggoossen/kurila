@@ -59,9 +59,9 @@ AUTOLOAD {
         croak $@;
     }
     $@ = $save;
-    defined(&$AUTOLOAD) || die "SelfLoader inconsistency error";
+    defined(&{Symbol::qualify_to_ref($AUTOLOAD)}) || die "SelfLoader inconsistency error";
     delete $Cache{$AUTOLOAD};
-    goto &$AUTOLOAD
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)}
 }
 
 sub load_stubs { shift->_load_stubs((caller)[0]) }
@@ -70,7 +70,7 @@ sub _load_stubs {
     # $endlines is used by Devel::SelfStubber to capture lines after __END__
     my($self, $callpack, $endlines) = @_;
     no strict "refs";
-    my $fh = \*{"${callpack}::DATA"};
+    my $fh = \*{Symbol::qualify_to_ref("${callpack}::DATA")};
     use strict;
     my $currpack = $callpack;
     my($line,$name,@lines, @stubs, $protoype);
@@ -98,8 +98,8 @@ sub _load_stubs {
             } else {                            # sub name with package
                 $name = $1;
                 $name =~ m/^(.*)::/;
-                if (defined(&{"${1}::AUTOLOAD"})) {
-                    \&{"${1}::AUTOLOAD"} == \&SelfLoader::AUTOLOAD ||
+                if (defined(&{Symbol::qualify_to_ref("${1}::AUTOLOAD")})) {
+                    \&{Symbol::qualify_to_ref("${1}::AUTOLOAD")} == \&SelfLoader::AUTOLOAD ||
                         die 'SelfLoader Error: attempt to specify Selfloading',
                             " sub $name in non-selfloading module $1";
                 } else {
@@ -113,8 +113,8 @@ sub _load_stubs {
             @lines = ();
             $currpack = $1;
             $Cache{"${currpack}::<DATA"} = 1;   # indicate package is cached
-            if (defined(&{"${1}::AUTOLOAD"})) {
-                \&{"${1}::AUTOLOAD"} == \&SelfLoader::AUTOLOAD ||
+            if (defined(&{Symbol::qualify_to_ref("${1}::AUTOLOAD")})) {
+                \&{Symbol::qualify_to_ref("${1}::AUTOLOAD")} == \&SelfLoader::AUTOLOAD ||
                     die 'SelfLoader Error: attempt to specify Selfloading',
                         " package $currpack which already has AUTOLOAD";
             } else {

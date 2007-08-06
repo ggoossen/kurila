@@ -275,7 +275,7 @@ ok(@ary == 3 &&
 
 {
     no strict 'refs';
-    is (\@a, \@{"a"}, '@a must be global for following test');
+    is (\@a, \@{Symbol::qualify_to_ref("a")}, '@a must be global for following test');
     $p="";
     $n = @a = split /,/,$p;
     is ($n, 0, '#21765 - pmreplroot hack used to return undef for 0 iters');

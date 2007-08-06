@@ -112,16 +112,17 @@ sub import {
     # XXX This code is crazy.  Why is it a one element foreach loop?
     # Why is it using $param both as a filename and filehandle?
     foreach my $param ( '/usr/include/sys/param.h' ){
-      if (open($param, '<', $param)) {
+        my $fh;
+      if (open($fh, '<', $param)) {
 	local ($_, $.);
-	while (<$param>) {
+	while (<$fh>) {
 	  if( /^\s*#\s*define\s+NOFILE\s+(\d+)/ ){
 	    $cacheout_maxopen = $1 - 4;
-	    close($param);
+	    close($fh);
 	    last;
 	  }
 	}
-	close $param;
+	close $fh;
       }
     }
     $cacheout_maxopen ||= 16;
@@ -129,15 +130,15 @@ sub import {
 
 # Open in their package.
 sub cacheout_open {
-  return open(*{caller(1) . '::' . $_[1]}, $_[0], $_[1]) && $_[1];
+  return open(*{Symbol::qualify_to_ref(caller(1) . '::' . $_[1])}, $_[0], $_[1]) && $_[1];
 }
 
 # Close in their package.
 sub cacheout_close {
   # Short-circuit in case the filehandle disappeared
   my $pkg = caller($_[1]||0);
-  defined fileno(*{$pkg . '::' . $_[0]}) &&
-    CORE::close(*{$pkg . '::' . $_[0]});
+  defined fileno(*{Symbol::qualify_to_ref($pkg . '::' . $_[0])}) &&
+    CORE::close(*{Symbol::qualify_to_ref($pkg . '::' . $_[0])});
   delete $isopen{$_[0]};
 }
 

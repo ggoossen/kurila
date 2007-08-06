@@ -150,25 +150,26 @@ is (*{*x{GLOB}}, "*main::STDOUT");
 {
     # test if defined() doesn't create any new symbols
 
-    my $a = "SYM000";
-    ok(!defined *{$a});
+    my $a = Symbol::qualify_to_ref('SYM000');
+    ok(defined *{$a}); # qualify_to_ref does create the symbol
 
     ok(!defined @{$a});
-    ok(!defined *{$a});
+    ok(defined *{$a});
 
     ok(!defined %{$a});
-    ok(!defined *{$a});
+    ok(defined *{$a});
 
     ok(!defined ${$a});
-    ok(!defined *{$a});
+    ok(defined *{$a});
 
     ok(!defined &{$a});
-    ok(!defined *{$a});
+    ok(defined *{$a});
 
     my $state = "not";
     *{$a} = sub { $state = "ok" };
     ok(defined &{$a});
-    ok(defined *{$a});
+    local our $TODO = 1;
+    ok(defined &{Symbol::qualify_to_ref('SYM000')});
     &{$a};
     is ($state, 'ok');
 }
@@ -176,21 +177,21 @@ is (*{*x{GLOB}}, "*main::STDOUT");
 {
     # although it *should* if you're talking about magicals
 
-    my $a = "]";
+    my $a = Symbol::qualify_to_ref("]");
     ok(defined ${$a});
     ok(defined *{$a});
 
-    $a = "1";
+    $a = Symbol::qualify_to_ref("1");
     "o" =~ /(o)/;
     ok(${$a});
     ok(defined *{$a});
-    $a = "2";
+    $a = Symbol::qualify_to_ref("2");
     ok(!${$a});
     ok(defined *{$a});
-    $a = "1x";
+    $a = Symbol::qualify_to_ref("1x");
     ok(!defined ${$a});
-    ok(!defined *{$a});
-    $a = "11";
+    ok(defined *{$a});
+    $a = Symbol::qualify_to_ref("11");
     "o" =~ /(((((((((((o)))))))))))/;
     ok(${$a});
     ok(defined *{$a});
@@ -259,7 +260,7 @@ is($j[0], 1);
     $ary[0] = *DATA;
     is ($ary[0], '*main::DATA');
     is ($e, '');
-    my $x = readline $ary[0];
+    my $x = readline Symbol::qualify_to_ref($ary[0]);
     is($x, "rocks\n");
 }
 
@@ -313,7 +314,8 @@ foreach my $value (3, "Perl rules", \42, qr/whatever/, [1,2,3], {1=>2},
 delete $::{oonk};
 $::{oonk} = \"Value";
 
-*{"ga_shloip"} = \&{"oonk"};
+*{Symbol::qualify_to_ref("ga_shloip")} = \&{Symbol::qualify_to_ref("oonk")};
+Internals::peek(\*{Symbol::qualify_to_ref("go_shloip")});
 
 is (ref $::{ga_shloip}, 'SCALAR', "Export of proxy constant as is");
 is (ref $::{oonk}, 'SCALAR', "Export doesn't affect original");
@@ -327,7 +329,7 @@ eval 'sub ga_shloip (); 1' or die $@;
 is ($::{ga_shloip}, '', "Prototype is stored as an empty string");
 
 # Check that a prototype expands.
-*{"ga_shloip"} = \&{"oonk"};
+*{Symbol::qualify_to_ref("ga_shloip")} = \&{Symbol::qualify_to_ref("oonk")};
 
 is (ref $::{oonk}, 'SCALAR', "Export doesn't affect original");
 is (eval 'ga_shloip', "Value", "Constant has correct value");
@@ -340,7 +342,7 @@ is (ref \$::{ga_shloip}, 'GLOB', "Symbol table has full typeglob");
 {
   my $w = '';
   local $SIG{__WARN__} = sub { $w = $_[0] };
-  *{"zwot"} = \&{"oonk"};
+  *{Symbol::qualify_to_ref("zwot")} = \&{Symbol::qualify_to_ref("oonk")};
   is($w, '', "Should be no warning");
 }
 
@@ -357,7 +359,7 @@ sub spritsits () {
 {
   my $w = '';
   local $SIG{__WARN__} = sub { $w = $_[0] };
-  *{"spritsits"} = \&{"oonk"};
+  *{Symbol::qualify_to_ref("spritsits")} = \&{Symbol::qualify_to_ref("oonk")};
   like($w, qr/^Constant subroutine main::spritsits redefined/,
        "Redefining a constant sub should warn");
 }
@@ -371,7 +373,7 @@ my $result;
 {
   my $w = '';
   local $SIG{__WARN__} = sub { $w = $_[0] };
-  $result = *{"plunk"} = \&{"oonk"};
+  $result = *{Symbol::qualify_to_ref("plunk")} = \&{Symbol::qualify_to_ref("oonk")};
   is($w, '', "Should be no warning");
 }
 
@@ -387,7 +389,7 @@ my $gr = eval '\*plunk' or die;
 {
   my $w = '';
   local $SIG{__WARN__} = sub { $w = $_[0] };
-  $result = *{$gr} = \&{"oonk"};
+  $result = *{$gr} = \&{Symbol::qualify_to_ref("oonk")};
   is($w, '', "Redefining a constant sub to another constant sub with the same underlying value should not warn (It's just re-exporting, and that was always legal)");
 }
 

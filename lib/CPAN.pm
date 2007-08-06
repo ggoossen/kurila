@@ -7424,8 +7424,8 @@ sub _find_prefs {
                         $CPAN::Frontend->mydie("Error in distroprefs file $_\: $@");
                     }
                     my $i = 1;
-                    while (${"VAR".$i}) {
-                        push @distropref, ${"VAR".$i};
+                    while (${Symbol::qualify_to_ref("VAR".$i)}) {
+                        push @distropref, ${Symbol::qualify_to_ref("VAR".$i)};
                         $i++;
                     }
                 } elsif ($thisexte eq "st") {

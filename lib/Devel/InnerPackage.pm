@@ -65,7 +65,7 @@ sub list_packages {
 
             no strict 'refs';
             my @packs;
-            my @stuff = grep !/^(main|)::$/, keys %{$pack};
+            my @stuff = grep !/^(main|)::$/, keys %{Symbol::stash($pack)};
             for my $cand (grep /::$/, @stuff)
             {
                 $cand =~ s!::$!!;

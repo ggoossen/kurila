@@ -58,7 +58,7 @@ IO::Handle->import(grep { !defined(&$_) } @EXPORT, @EXPORT_OK);
 	for my $func (@{$import{$pkg}}) {
 	    my $c = *{Symbol::qualify_to_ref("${pkg}::$func")}{CODE}
 		or die "${pkg}::$func missing";
-	    *$func = $c;
+	    *{Symbol::qualify_to_ref($func)} = $c;
 	}
     }
 }
