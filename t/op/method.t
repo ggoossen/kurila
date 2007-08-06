@@ -144,7 +144,10 @@ our ($AUTOLOAD, $counter);
   my $method = $AUTOLOAD; 
   no strict 'refs';
   Internals::peek(\Symbol::qualify_to_ref($AUTOLOAD));
+  #Internals::peek(&{*{Symbol::qualify_to_ref($AUTOLOAD)}});
   *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { "new B: In $method, $c" };
+  Internals::peek(\Symbol::qualify_to_ref($AUTOLOAD));
+  #Internals::peek(\&{Symbol::qualify_to_ref($AUTOLOAD)});
   goto &{Symbol::qualify_to_ref($AUTOLOAD)};
 };
 

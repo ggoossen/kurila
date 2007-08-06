@@ -260,6 +260,19 @@ sub remove_rv2gv {
         $op_const->move($args);
 
     }
+
+    for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2sv op_rv2hv op_rv2cv op_rv2av|)) {
+        next unless $op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_null/op_gv[@gv="Symbol::qualify_to_ref"]|);
+        my ($op_scope) = $op_rv2gv->findnodes(q|op_scope|);
+        my ($op_sub) = $op_scope->findnodes(q|op_entersub|);
+
+        my $new_gv = $op_scope->insert_new_elt("op_rv2gv");
+        set_madprop($new_gv, "star", '*');
+        my $new_scope = $new_gv->insert_new_elt("op_scope");
+        set_madprop($new_scope, "curly_open", "{");
+        set_madprop($new_scope, "curly_close", "}");
+        $op_sub->move($new_scope);
+    }
 }
 
 sub remove_vstring {

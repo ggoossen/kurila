@@ -37,7 +37,8 @@ sub import {
   }
 
   # We *need* to treat @{"$pkg\::EXPORT_FAIL"} since Carp uses it :-(
-  my($exports, $fail) = (\@{Symbol::qualify_to_ref("$pkg\::EXPORT")}, \@{Symbol::qualify_to_ref("$pkg\::EXPORT_FAIL")});
+  my($exports, $fail) = (\@{*{Symbol::qualify_to_ref("$pkg\::EXPORT")}}, 
+                         \@{*{Symbol::qualify_to_ref("$pkg\::EXPORT_FAIL")}});
   return export $pkg, $callpkg, @_
     if $Verbose or $Debug or @$fail > 1;
   my $export_cache = ($Cache{$pkg} ||= {});
@@ -46,7 +47,7 @@ sub import {
   local $_;
   if ($args and not %$export_cache) {
     s/^&//, $export_cache->{$_} = 1
-      foreach (@$exports, @{Symbol::qualify_to_ref("$pkg\::EXPORT_OK")});
+      foreach (@$exports, @{*{Symbol::qualify_to_ref("$pkg\::EXPORT_OK")}});
   }
   my $heavy;
   # Try very hard not to use {} and hence have to  enter scope on the foreach

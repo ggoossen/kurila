@@ -61,7 +61,7 @@ sub heavy_export {
 
     my($pkg, $callpkg, @imports) = @_;
     my($type, $sym, $cache_is_current, $oops);
-    my($exports, $export_cache) = (\@{Symbol::qualify_to_ref("${pkg}::EXPORT")},
+    my($exports, $export_cache) = (\@{*{Symbol::qualify_to_ref("${pkg}::EXPORT")}},
                                    $Exporter::Cache{$pkg} ||= {});
 
     if (@imports) {
@@ -71,7 +71,7 @@ sub heavy_export {
 	}
 
 	if (grep m{^[/!:]}, @imports) {
-	    my $tagsref = \%{Symbol::qualify_to_ref("${pkg}::EXPORT_TAGS")};
+	    my $tagsref = \%{*{Symbol::qualify_to_ref("${pkg}::EXPORT_TAGS")}};
 	    my $tagdata;
 	    my %imports;
 	    my($remove, $spec, @names, @allexports);
@@ -160,7 +160,7 @@ sub heavy_export {
 	@imports = @$exports;
     }
 
-    my($fail, $fail_cache) = (\@{Symbol::qualify_to_ref("${pkg}::EXPORT_FAIL")},
+    my($fail, $fail_cache) = (\@{*{Symbol::qualify_to_ref("${pkg}::EXPORT_FAIL")}},
                               $Exporter::FailCache{$pkg} ||= {});
 
     if (@$fail) {

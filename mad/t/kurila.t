@@ -158,9 +158,15 @@ sub t_strict_refs {
 
     p5convert( 'my $pkg; keys %Package::',
                'my $pkg; keys %{Symbol::stash("Package")}');
-    local $TODO = 1;
-    p5convert( 'my $pkg; $Package::{"var"}',
-               'my $pkg; ${Symbol::stash("Package")}{"var"}');
+    {
+        local $TODO = 1;
+        p5convert( 'my $pkg; $Package::{"var"}',
+                   'my $pkg; ${Symbol::stash("Package")}{"var"}');
+    }
+
+    # Fix conversion of addition of additional ref
+    p5convert( '@{Symbol::qualify_to_ref("bar")}',
+               '@{*{Symbol::qualify_to_ref("bar")}}' );
 }
 
 sub t_encoding {
