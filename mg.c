@@ -1450,11 +1450,8 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 #endif
     }
     else {
-	/*
-	 * We should warn if HINT_STRICT_REFS, but without
-	 * access to a known hint bit in a known OP, we can't
-	 * tell whether HINT_STRICT_REFS is in force or not.
-	 */
+	if (ckWARN(WARN_SIGNAL))
+	    Perl_warner(aTHX_ packWARN(WARN_SIGNAL), "signal handler set to string");
 	if (!strchr(s,':') && !strchr(s,'\''))
 	    Perl_sv_insert(aTHX_ sv, 0, 0, STR_WITH_LEN("main::"));
 	if (i)

@@ -6126,7 +6126,6 @@ Perl_ck_rvconst(pTHX_ register OP *o)
     dVAR;
     SVOP * const kid = (SVOP*)cUNOPo->op_first;
 
-    o->op_private |= (PL_hints & HINT_STRICT_REFS);
     if (o->op_type == OP_RV2CV)
 	o->op_private &= ~1;
 
@@ -6163,18 +6162,7 @@ Perl_ck_rvconst(pTHX_ register OP *o)
 		Perl_croak(aTHX_ "Constant is not %s reference", badtype);
 	    return o;
 	}
-	else if ((o->op_type == OP_RV2HV || o->op_type == OP_RV2SV) &&
-		(PL_hints & HINT_STRICT_REFS) && SvPOK(kidsv)) {
-	    /* If this is an access to a stash, disable "strict refs", because
-	     * stashes aren't auto-vivified at compile-time (unless we store
-	     * symbols in them), and we don't want to produce a run-time
-	     * stricture error when auto-vivifying the stash. */
-	    const char *s = SvPV_nolen(kidsv);
-	    const STRLEN l = SvCUR(kidsv);
-	    if (l > 1 && s[l-1] == ':' && s[l-2] == ':')
-		o->op_private &= ~HINT_STRICT_REFS;
-	}
-	if ((o->op_private & HINT_STRICT_REFS) && (kid->op_private & OPpCONST_BARE)) {
+	if ((kid->op_private & OPpCONST_BARE)) {
 	    const char *badthing;
 	    switch (o->op_type) {
 	    case OP_RV2SV:
@@ -7070,8 +7058,6 @@ Perl_ck_select(pTHX_ OP *o)
     }
     o = ck_fun(o);
     kid = cLISTOPo->op_first->op_sibling;    /* get past pushmark */
-    if (kid && kid->op_type == OP_RV2GV)
-	kid->op_private &= ~HINT_STRICT_REFS;
     return o;
 }
 
@@ -7377,7 +7363,6 @@ Perl_ck_subr(pTHX_ OP *o)
 		sib->op_private &= ~OPpCONST_STRICT;
 	}
     }
-    o->op_private |= (PL_hints & HINT_STRICT_REFS);
     if (PERLDB_SUB && PL_curstash != PL_debstash)
 	o->op_private |= OPpENTERSUB_DB;
     while (o2 != cvop) {

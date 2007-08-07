@@ -2902,7 +2902,7 @@ sub __lcm
   return $x->bnan() if ($x->{sign} eq $nan) || ($ty->{sign} eq $nan);
   my $method = ref($x) . '::bgcd';
   no strict 'refs';
-  $x * $ty / &$method($x,$ty);
+  $x * $ty / &{*{Symbol::qualify_to_ref($method)}}($x,$ty);
   }
 
 ###############################################################################

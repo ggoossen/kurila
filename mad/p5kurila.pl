@@ -232,9 +232,9 @@ sub remove_rv2gv {
                                                           q{op_null[@was="rv2cv"]}) ) {
 
         my ($op_scope, $op_const);
-        if (($op_const) = $op_rv2gv->findnodes(q|op_null|)) {
+        if (($op_const) = (map { $op_rv2gv->findnodes($_) } qw|op_null op_padsv|)) {
             # Special case *$AUTOLOAD
-            next unless (get_madprop($op_const, "variable") || '') eq '$AUTOLOAD';
+            next unless (get_madprop($op_const, "variable") || '') =~ m/^\$(AUTOLOAD|name)$/;
             $op_scope = $op_rv2gv->insert_new_elt("op_scope");
             set_madprop($op_scope, "curly_open" => "{");
             set_madprop($op_scope, "curly_close" => "}");

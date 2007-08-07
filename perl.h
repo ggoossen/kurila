@@ -4405,7 +4405,7 @@ enum {		/* pass one of these to get_vtbl */
    special and there is no need for HINT_PRIVATE_MASK for COPs
    However, bitops store HINT_INTEGER in their op_private.  */
 #define HINT_INTEGER		0x00000001 /* integer pragma */
-#define HINT_STRICT_REFS	0x00000002 /* strict pragma */
+#define HINT_NOTUSED2	0x00000002 /* not used: was strict refs pragma */
 #define HINT_NOTUSED		0x00000004 /* not used. was: locale pragma */
 #define HINT_BYTES		0x00000008 /* bytes pragma */
 #define HINT_NOTUSED_2		0x00000010 /* not used. was: HINT_ARYBASE: $[ is non-zero */
@@ -4439,7 +4439,7 @@ enum {		/* pass one of these to get_vtbl */
 #define HINT_SORT_MERGESORT	0x00000002
 #define HINT_SORT_STABLE	0x00000100 /* sort styles (currently one) */
 
-#define DEFAULT_HINTS ( HINT_STRICT_SUBS | HINT_STRICT_REFS ) /* ( HINT_STRICT_REFS | HINT_STRICT_SUBS ) */
+#define DEFAULT_HINTS ( HINT_STRICT_SUBS ) /* ( HINT_STRICT_REFS | HINT_STRICT_SUBS ) */
 
 /* Various states of the input record separator SV (rs) */
 #define RsSNARF(sv)   (! SvOK(sv))

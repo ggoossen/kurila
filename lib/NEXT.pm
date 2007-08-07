@@ -79,7 +79,7 @@ sub AUTOLOAD
 	($wanted_method=${*{Symbol::qualify_to_ref($caller_class."::AUTOLOAD")}}) =~ s/.*:://
 		if $wanted_method eq 'AUTOLOAD';
 	${*{Symbol::qualify_to_ref($call_method)}} = $caller_class."::NEXT::".$wanted_method;
-	return $call_method->(@_);
+	return *{Symbol::qualify_to_ref($call_method)}->(@_);
 }
 
 no strict 'vars';

@@ -859,8 +859,6 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 		    sv_catpv(tmpsv, ",LVAL_DEFER");
 	    }
 	    else {
-		if (o->op_private & HINT_STRICT_REFS)
-		    sv_catpv(tmpsv, ",STRICT_REFS");
 		if (o->op_private & OPpOUR_INTRO)
 		    sv_catpv(tmpsv, ",OUR_INTRO");
 	    }
@@ -2606,8 +2604,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 		    sv_catpv(tmpsv, ",LVAL_DEFER");
 	    }
 	    else {
-		if (o->op_private & HINT_STRICT_REFS)
-		    sv_catpv(tmpsv, ",STRICT_REFS");
 		if (o->op_private & OPpOUR_INTRO)
 		    sv_catpv(tmpsv, ",OUR_INTRO");
 	    }

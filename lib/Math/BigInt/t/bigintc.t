@@ -356,7 +356,7 @@ $C->_dec($x); ok ($C->_str($x),'1000');
 my $BL;
 {
   no strict 'refs';
-  $BL = &{Symbol::qualify_to_ref("$C"."::_base_len")}();
+  $BL = &{*{Symbol::qualify_to_ref("$C"."::_base_len")}}();
 }
 
 $x = '1' . '0' x $BL;

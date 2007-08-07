@@ -46,7 +46,7 @@ sub AUTOLOAD
           }
         return Math::BigInt->$name();
         };
-      return &$name;
+      return &{*{Symbol::qualify_to_ref($name)}};
       }
     }
  
