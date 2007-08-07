@@ -20,7 +20,7 @@ say "1..12";
 
 {
 no strict 'refs';
-my $foo = 'STDOUT';
+my $foo = *STDOUT;
 say $foo "ok 1";
 }
 
@@ -33,7 +33,7 @@ say FOO "ok 6";
 open(my $bar,">-");
 say $bar "ok 7";
 
-say {"STDOUT"} "ok 8";
+say {*STDOUT} "ok 8";
 
 if (!exists &Errno::EBADF) {
     print "ok 9 # skipped: no EBADF\n";

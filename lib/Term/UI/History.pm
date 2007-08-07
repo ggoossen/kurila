@@ -56,7 +56,7 @@ BEGIN {
     for my $func ( @EXPORT ) {
         no strict 'refs';
         
-        *$func = sub {  my $msg     = shift;
+        *{Symbol::qualify_to_ref($func)} = sub {  my $msg     = shift;
                         $log->store(
                                 message => $msg,
                                 tag     => uc $func,

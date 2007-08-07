@@ -48,12 +48,12 @@ our $expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
 
 cmp_ok($x,'eq',$expected,'upper first 1');
 
-$x = join('', sort( 'Backwards' @harry));
+$x = join('', sort( { Backwards } @harry));
 $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
 
 cmp_ok($x,'eq',$expected,'upper first 2');
 
-$x = join('', sort( 'Backwards_stacked' @harry));
+$x = join('', sort( { Backwards_stacked($a, $b) } @harry));
 $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
 
 cmp_ok($x,'eq',$expected,'upper first 3');

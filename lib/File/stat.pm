@@ -53,7 +53,8 @@ sub stat ($) {
 		local $!;
 		no strict 'refs';
 		require Symbol;
-		$fh = \*{ Symbol::qualify( $arg, caller() )};
+                my ($pkg) = caller();
+		$fh = \*{ Symbol::qualify_to_ref( $pkg . "::" . $arg) };
 		return unless defined fileno $fh;
 	}
     return populate(CORE::stat $fh);

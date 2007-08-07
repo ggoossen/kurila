@@ -823,8 +823,8 @@ sub blog
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = \$self::accuracy; my $ab = $$abr; $$abr = undef;
+  my $pbr = \$self::precision; my $pb = $$pbr; $$pbr = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};
@@ -1001,8 +1001,8 @@ sub bexp
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = \$self::accuracy; my $ab = $$abr; $$abr = undef;
+  my $pbr = \$self::precision; my $pb = $$pbr; $$pbr = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};
@@ -1962,8 +1962,8 @@ sub broot
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = \$self::accuracy; my $ab = $$abr; $$abr = undef;
+  my $pbr = \$self::precision; my $pb = $$pbr; $$pbr = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};
@@ -2123,7 +2123,7 @@ sub bsqrt
       delete $x->{_a}; delete $x->{_p};
       }
     # re-enable A and P, upgrade is taken care of by "local"
-    ${Symbol::qualify_to_ref("$self\::accuracy")} = $ab; ${Symbol::qualify_to_ref("$self\::precision")} = $pb;
+    ${*{Symbol::qualify_to_ref("$self\::accuracy")}} = $ab; ${*{Symbol::qualify_to_ref("$self\::precision")}} = $pb;
     return $x;
     }
  
@@ -2289,8 +2289,8 @@ sub _pow
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = Symbol::qualify_to_ref("$self\::accuracy"); my $ab = ${*{$abr}}; ${*{$abr}} = undef;
+  my $pbr = Symbol::qualify_to_ref("$self\::precision"); my $pb = ${*{$pbr}}; ${*{$pbr}} = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};
@@ -2340,7 +2340,7 @@ sub _pow
     delete $x->{_a}; delete $x->{_p};
     }
   # restore globals
-  $$abr = $ab; $$pbr = $pb;
+  ${*{$abr}} = $ab; ${*{$pbr}} = $pb;
   $x;
   }
 
@@ -2672,8 +2672,8 @@ sub bcos
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = \${*{Symbol::qualify_to_ref("$self\::accuracy")}}; my $ab = $$abr; $$abr = undef;
+  my $pbr = \${*{Symbol::qualify_to_ref("$self\::precision")}}; my $pb = $$pbr; $$pbr = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};
@@ -2770,8 +2770,8 @@ sub bsin
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = \${*{Symbol::qualify_to_ref("$self\::accuracy")}}; my $ab = $$abr; $$abr = undef;
+  my $pbr = \${*{Symbol::qualify_to_ref("$self\::precision")}}; my $pb = $$pbr; $$pbr = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};
@@ -3052,8 +3052,8 @@ sub batan
   # when user set globals, they would interfere with our calculation, so
   # disable them and later re-enable them
   no strict 'refs';
-  my $abr = "$self\::accuracy"; my $ab = $$abr; $$abr = undef;
-  my $pbr = "$self\::precision"; my $pb = $$pbr; $$pbr = undef;
+  my $abr = \$self::accuracy; my $ab = $$abr; $$abr = undef;
+  my $pbr = \$self::precision; my $pb = $$pbr; $$pbr = undef;
   # we also need to disable any set A or P on $x (_find_round_parameters took
   # them already into account), since these would interfere, too
   delete $x->{_a}; delete $x->{_p};
@@ -3395,12 +3395,12 @@ sub AUTOLOAD
       }
     # try one level up, but subst. bxxx() for fxxx() since MBI only got bxxx()
     $name =~ s/^f/b/;
-    return &{Symbol::qualify_to_ref("Math::BigInt"."::$name")}(@_);
+    return &{*{Symbol::qualify_to_ref("Math::BigInt"."::$name")}}(@_);
     }
   my $bname = $name; $bname =~ s/^f/b/;
   $c .= "::$name";
-  *{$c} = \&{$bname};
-  &{$c};	# uses @_
+  *{Symbol::qualify_to_ref($c)} = \&{*{Symbol::qualify_to_ref($bname)}};
+  &{*{Symbol::qualify_to_ref($c)}};	# uses @_
   }
 
 sub exponent

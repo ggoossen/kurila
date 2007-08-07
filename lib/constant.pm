@@ -35,7 +35,7 @@ sub import {
 
     if ($] > 5.009002) {
 	no strict 'refs';
-	$symtab = \%{Symbol::qualify_to_ref($pkg . '::')};
+	$symtab = \%{*{Symbol::qualify_to_ref($pkg . '::')}};
     };
 
     if ( $multiple ) {

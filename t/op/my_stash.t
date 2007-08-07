@@ -20,8 +20,7 @@ use constant MyClass => 'Foo::Bar::Biz::Baz';
 
 for (qw(Foo Foo:: MyClass __PACKAGE__)) {
     eval "sub { my $_ \$obj = shift; }";
-    ok ! $@;
-#    print $@ if $@;
+    ok $@ =~ m/Expected variable after declarator/;
 }
 
 use constant NoClass => 'Nope::Foo::Bar::Biz::Baz';

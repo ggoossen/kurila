@@ -28,9 +28,9 @@ sub import {
 	    }
 	    $sym = "${callpack}::$sym" unless $sym =~ /::/;
 	    *{Symbol::qualify_to_ref($sym)} =
-		(  $ch eq "\$" ? \${Symbol::qualify_to_ref($sym)}
-		 : $ch eq "\@" ? \@{Symbol::qualify_to_ref($sym)}
-		 : $ch eq "\%" ? \%{Symbol::qualify_to_ref($sym)}
+		(  $ch eq "\$" ? \${*{Symbol::qualify_to_ref($sym)}}
+		 : $ch eq "\@" ? \@{*{Symbol::qualify_to_ref($sym)}}
+		 : $ch eq "\%" ? \%{*{Symbol::qualify_to_ref($sym)}}
 		 : $ch eq "\*" ? \*{Symbol::qualify_to_ref($sym)}
 		 : $ch eq "\&" ? \&{Symbol::qualify_to_ref($sym)}
 		 : do {

@@ -523,12 +523,12 @@ star2(*FOO, *BAR, sub {
     }); $i++;
 star2 \*FOO, \*BAR, sub {
     no strict 'refs';
-    print "not " unless $_[0] eq \*{'FOO'} and $_[1] eq \*{'BAR'};
+    print "not " unless $_[0] eq \*{Symbol::qualify_to_ref('FOO')} and $_[1] eq \*{Symbol::qualify_to_ref('BAR')};
     print "ok $i - star2 \*FOO, \*BAR\n";
 }; $i++;
 star2(\*FOO, \*BAR, sub {
 	no strict 'refs';
-	print "not " unless $_[0] eq \*{'FOO'} and $_[1] eq \*{'BAR'};
+	print "not " unless $_[0] eq \*{Symbol::qualify_to_ref('FOO')} and $_[1] eq \*{Symbol::qualify_to_ref('BAR')};
 	print "ok $i - star2(\*FOO, \*BAR)\n";
     }); $i++;
 

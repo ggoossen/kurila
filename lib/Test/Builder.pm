@@ -1575,7 +1575,7 @@ sub todo {
     return 0 unless $pack;
 
     no strict 'refs';
-    return defined ${Symbol::qualify_to_ref($pack.'::TODO')} ? ${Symbol::qualify_to_ref($pack.'::TODO')}
+    return defined ${*{Symbol::qualify_to_ref($pack.'::TODO')}} ? ${*{Symbol::qualify_to_ref($pack.'::TODO')}}
                                      : 0;
 }
 

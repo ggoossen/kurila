@@ -89,7 +89,7 @@ our @EXPORT_OK = qw(delete_package geniosym);
 
 our $VERSION = '1.06';
 
-my $genpkg = "Symbol::";
+my $genpkg = "Symbol";
 my $genseq = 0;
 
 my %global = map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT);
@@ -102,8 +102,8 @@ my %global = map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT);
 sub gensym () {
     my $name = "GEN" . $genseq++;
     no strict 'refs';
-    my $ref = \*{Symbol::qualify_to_ref($genpkg . $name)};
-    $ref = \*{Symbol::qualify_to_ref($genpkg . $name)};  # second time to supress only-used once warning.
+    my $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};
+    $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};  # second time to supress only-used once warning.
     delete ${Symbol::stash($genpkg)}{$name};
     $ref;
 }

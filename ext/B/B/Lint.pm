@@ -439,7 +439,7 @@ PRIVATE_NAMES: {
         my $method = $methop->sv_harder->PV;
         next
             unless $method =~ m/\A_/xms
-            and not defined &{Symbol::qualify_to_ref("$curstash\::$method")};
+            and not defined &{*{Symbol::qualify_to_ref("$curstash\::$method")}};
 
         warning q[Illegal reference to private method name '%s'], $method;
     }
@@ -548,7 +548,7 @@ BARE_SUBS: {
 
         # Check that it's a function.
         next
-            unless exists &{Symbol::qualify_to_ref("$curstash\::$sub")};
+            unless exists &{*{Symbol::qualify_to_ref("$curstash\::$sub")}};
 
         warning q[Bare sub name '%s' interpreted as string], $sub;
     }

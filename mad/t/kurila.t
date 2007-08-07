@@ -167,6 +167,8 @@ sub t_strict_refs {
     # Fix conversion of addition of additional ref
     p5convert( '@{Symbol::qualify_to_ref("bar")}',
                '@{*{Symbol::qualify_to_ref("bar")}}' );
+    p5convert( '&{Symbol::qualify_to_ref("bar")}',
+               '&{*{Symbol::qualify_to_ref("bar")}}' );
 }
 
 sub t_encoding {

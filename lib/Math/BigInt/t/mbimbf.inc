@@ -12,20 +12,20 @@ my ($x,$y,$z,$u,$rc);
 
 {
   no strict 'refs';
-  ok_undef (${"$mbi\::accuracy"});
-  ok_undef (${"$mbi\::precision"});
+  ok_undef (${*{Symbol::qualify_to_ref("$mbi\::accuracy")}});
+  ok_undef (${*{Symbol::qualify_to_ref("$mbi\::precision")}});
   ok_undef ($mbi->accuracy());
   ok_undef ($mbi->precision());
-  ok (${"$mbi\::div_scale"},40);
-  ok (${"$mbi\::round_mode"},'even');
+  ok (${*{Symbol::qualify_to_ref("$mbi\::div_scale")}},40);
+  ok (${*{Symbol::qualify_to_ref("$mbi\::round_mode")}},'even');
   ok ($mbi->round_mode(),'even');
 
-  ok_undef (${"$mbf\::accuracy"});
-  ok_undef (${"$mbf\::precision"});
+  ok_undef (${*{Symbol::qualify_to_ref("$mbf\::accuracy")}});
+  ok_undef (${*{Symbol::qualify_to_ref("$mbf\::precision")}});
   ok_undef ($mbf->precision());
   ok_undef ($mbf->precision());
-  ok (${"$mbf\::div_scale"},40);
-  ok (${"$mbf\::round_mode"},'even');
+  ok (${*{Symbol::qualify_to_ref("$mbf\::div_scale")}},40);
+  ok (${*{Symbol::qualify_to_ref("$mbf\::round_mode")}},'even');
   ok ($mbf->round_mode(),'even');
 }
 
@@ -58,43 +58,43 @@ foreach my $class ($mbi,$mbf)
   # accuracy
   foreach (qw/5 42 -1 0/)
     {
-    ok (${"$mbf\::accuracy"} = $_,$_);
-    ok (${"$mbi\::accuracy"} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbf\::accuracy")}} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = $_,$_);
     }
-  ok_undef (${"$mbf\::accuracy"} = undef);
-  ok_undef (${"$mbi\::accuracy"} = undef);
+  ok_undef (${*{Symbol::qualify_to_ref("$mbf\::accuracy")}} = undef);
+  ok_undef (${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = undef);
 
   # precision
   foreach (qw/5 42 -1 0/)
     {
-    ok (${"$mbf\::precision"} = $_,$_);
-    ok (${"$mbi\::precision"} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbf\::precision")}} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbi\::precision")}} = $_,$_);
     }
-  ok_undef (${"$mbf\::precision"} = undef);
-  ok_undef (${"$mbi\::precision"} = undef);
+  ok_undef (${*{Symbol::qualify_to_ref("$mbf\::precision")}} = undef);
+  ok_undef (${*{Symbol::qualify_to_ref("$mbi\::precision")}} = undef);
 
   # fallback
   foreach (qw/5 42 1/)
     {
-    ok (${"$mbf\::div_scale"} = $_,$_);
-    ok (${"$mbi\::div_scale"} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbf\::div_scale")}} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbi\::div_scale")}} = $_,$_);
     }
   # illegal values are possible for fallback due to no accessor
 
   # round_mode
   foreach (qw/odd even zero trunc +inf -inf/)
     {
-    ok (${"$mbf\::round_mode"} = $_,$_);
-    ok (${"$mbi\::round_mode"} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbf\::round_mode")}} = $_,$_);
+    ok (${*{Symbol::qualify_to_ref("$mbi\::round_mode")}} = $_,$_);
     }
-  ${"$mbf\::round_mode"} = 'zero';
-  ok (${"$mbf\::round_mode"},'zero');
-  ok (${"$mbi\::round_mode"},'-inf');	# from above
+  ${*{Symbol::qualify_to_ref("$mbf\::round_mode")}} = 'zero';
+  ok (${*{Symbol::qualify_to_ref("$mbf\::round_mode")}},'zero');
+  ok (${*{Symbol::qualify_to_ref("$mbi\::round_mode")}},'-inf');	# from above
 
   # reset for further tests
-  ${"$mbi\::accuracy"} = undef;
-  ${"$mbi\::precision"} = undef;
-  ${"$mbf\::div_scale"} = 40;
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbf\::div_scale")}} = 40;
 }
 
 # local copies
@@ -109,10 +109,10 @@ ok_undef ($x->precision(undef),undef);
 {
   no strict 'refs';
   # see if MBF changes MBIs values
-  ok (${"$mbi\::accuracy"} = 42,42);
-  ok (${"$mbf\::accuracy"} = 64,64);
-  ok (${"$mbi\::accuracy"},42);		# should be still 42
-  ok (${"$mbf\::accuracy"},64);		# should be now 64
+  ok (${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = 42,42);
+  ok (${*{Symbol::qualify_to_ref("$mbf\::accuracy")}} = 64,64);
+  ok (${*{Symbol::qualify_to_ref("$mbi\::accuracy")}},42);		# should be still 42
+  ok (${*{Symbol::qualify_to_ref("$mbf\::accuracy")}},64);		# should be now 64
 }
 
 ###############################################################################
@@ -120,24 +120,24 @@ ok_undef ($x->precision(undef),undef);
 
 {
   no strict 'refs';
-  ${"$mbi\::accuracy"} = 4;
-  ${"$mbi\::precision"} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = 4;
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = undef;
 
   ok ($mbi->new(123456),123500);		# with A
-  ${"$mbi\::accuracy"} = undef;
-  ${"$mbi\::precision"} = 3;
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = 3;
   ok ($mbi->new(123456),123000);		# with P
 
-  ${"$mbf\::accuracy"} = 4;
-  ${"$mbf\::precision"} = undef;
-  ${"$mbi\::precision"} = undef;
+  ${*{Symbol::qualify_to_ref("$mbf\::accuracy")}} = 4;
+  ${*{Symbol::qualify_to_ref("$mbf\::precision")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = undef;
 
   ok ($mbf->new('123.456'),'123.5');	# with A
-  ${"$mbf\::accuracy"} = undef;
-  ${"$mbf\::precision"} = -1;
+  ${*{Symbol::qualify_to_ref("$mbf\::accuracy")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbf\::precision")}} = -1;
   ok ($mbf->new('123.456'),'123.5');	# with P from MBF, not MBI!
 
-  ${"$mbf\::precision"} = undef;		# reset
+  ${*{Symbol::qualify_to_ref("$mbf\::precision")}} = undef;		# reset
 }
 
 ###############################################################################
@@ -145,10 +145,10 @@ ok_undef ($x->precision(undef),undef);
 
 {
   no strict 'refs';
-  ${"$mbi\::precision"} = undef; ${"$mbf\::precision"} = undef;
-  ${"$mbi\::accuracy"} = 4; ${"$mbf\::accuracy"} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = undef; ${*{Symbol::qualify_to_ref("$mbf\::precision")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = 4; ${*{Symbol::qualify_to_ref("$mbf\::accuracy")}} = undef;
   ok ($mbf->new('123.456'),'123.456');
-  ${"$mbi\::accuracy"} = undef; 		# reset
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = undef; 		# reset
 }
 
 ###############################################################################
@@ -415,9 +415,9 @@ ok ($warn !~ /^Use of uninitialized value (\$y )?(in numeric ge \(>=\) |)at/);
 
 {
   no strict 'refs';
-  ${"$mbf\::accuracy"} = undef;
-  ${"$mbf\::precision"} = undef;
-  ${"$mbf\::div_scale"} = 40;
+  ${*{Symbol::qualify_to_ref("$mbf\::accuracy")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbf\::precision")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbf\::div_scale")}} = 40;
 }
 
   $x = $mbf->new(10); $x->{_a} = 4;
@@ -439,10 +439,10 @@ ok ($x->bdiv(3,undef,-2),'3.33');
 # round in div with requested P greater than fallback
 {
   no strict 'refs';
-  ${"$mbf\::div_scale"} = 5;
+  ${*{Symbol::qualify_to_ref("$mbf\::div_scale")}} = 5;
   $x = $mbf->new(10);
   ok ($x->bdiv(3,undef,-8),'3.33333333');
-  ${"$mbf\::div_scale"} = 40;
+  ${*{Symbol::qualify_to_ref("$mbf\::div_scale")}} = 40;
 }
 
 $x = $mbf->new(10); $y = $mbf->new(3); $y->{_a} = 4;
@@ -620,10 +620,10 @@ ok ($x+$y,'2.46');				# 1.2345+1.2300=> 2.4645 => 2.46
 
 {
   no strict 'refs'; 
-  ${"$mbi\::accuracy"} = undef;
-  ${"$mbi\::precision"} = undef;
-  ${"$mbi\::div_scale"} = 40;
-  ${"$mbi\::round_mode"} = 'odd';
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::div_scale")}} = 40;
+  ${*{Symbol::qualify_to_ref("$mbi\::round_mode")}} = 'odd';
 }
 
 $x = $mbi->new(123);
@@ -660,20 +660,20 @@ ok ($params[0],$x);				# self
 
 {
   no strict 'refs';
-  ${"$mbi\::accuracy"} = 1;
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = 1;
   @params = $x->_find_round_parameters(undef,-2);
   ok (scalar @params,1);			# error, A and P defined
   ok ($params[0],$x);				# self
   ok ($x->is_nan(),1);				# and must be NaN
 
-  ${"$mbi\::accuracy"} = undef;
-  ${"$mbi\::precision"} = 1;
+  ${*{Symbol::qualify_to_ref("$mbi\::accuracy")}} = undef;
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = 1;
   @params = $x->_find_round_parameters(1,undef);
   ok (scalar @params,1);			# error, A and P defined
   ok ($params[0],$x);				# self
   ok ($x->is_nan(),1);				# and must be NaN
  
-  ${"$mbi\::precision"} = undef;		# reset
+  ${*{Symbol::qualify_to_ref("$mbi\::precision")}} = undef;		# reset
 }
 
 ###############################################################################
@@ -734,11 +734,11 @@ for my $c ($mbi,$mbf)
   foreach my $c ($mbi,$mbf)
     {
     ok ($c->new(123,4,-3),'NaN');			# with parameters
-    ${"$c\::accuracy"} = 42;
-    ${"$c\::precision"} = 2;
+    ${*{Symbol::qualify_to_ref("$c\::accuracy")}} = 42;
+    ${*{Symbol::qualify_to_ref("$c\::precision")}} = 2;
     ok ($c->new(123),'NaN');			# with globals
-    ${"$c\::accuracy"} = undef;
-    ${"$c\::precision"} = undef;
+    ${*{Symbol::qualify_to_ref("$c\::accuracy")}} = undef;
+    ${*{Symbol::qualify_to_ref("$c\::precision")}} = undef;
     }
 }
 

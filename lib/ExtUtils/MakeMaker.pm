@@ -448,7 +448,7 @@ sub new {
         bless $self, $newclass;
         push @Parent, $self;
         require ExtUtils::MY;
-        @{Symbol::qualify_to_ref("$newclass\:\:ISA")} = 'MM';
+        @{*{Symbol::qualify_to_ref("$newclass\:\:ISA")}} = 'MM';
     }
 
     if (defined $Parent[-2]){
@@ -810,7 +810,7 @@ sub _run_hintfile {
 sub mv_all_methods {
     my($from,$to) = @_;
     no strict 'refs';
-    my($symtab) = \%{Symbol::qualify_to_ref("${from}::")};
+    my($symtab) = \%{*{Symbol::qualify_to_ref("${from}::")}};
 
     # Here you see the *current* list of methods that are overridable
     # from Makefile.PL via MY:: subroutines. As of VERSION 5.07 I'm

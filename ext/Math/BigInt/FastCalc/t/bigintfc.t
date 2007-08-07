@@ -353,7 +353,7 @@ $C->_dec($x); ok ($C->_str($x),'1000');
 my $BL;
 {
   no strict 'refs';
-  $BL = &{Symbol::qualify_to_ref("$C"."::_base_len")}();
+  $BL = &{*{Symbol::qualify_to_ref("$C"."::_base_len")}}();
 }
 
 $x = '1' . '0' x $BL;
@@ -416,28 +416,28 @@ ok ($C->_check(123),'123 is not a reference');
 {
   no strict 'refs';
   # correct empty arrays
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([]); ok (@$x,1); ok ($x->[0],0);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([]); ok (@$x,1); ok ($x->[0],0);
   # don't strip single elements
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([0]); ok (@$x,1); ok ($x->[0],0);
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([1]); ok (@$x,1); ok ($x->[0],1);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([0]); ok (@$x,1); ok ($x->[0],0);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([1]); ok (@$x,1); ok ($x->[0],1);
   # don't strip non-zero elements
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([0,1]);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([0,1]);
   ok (@$x,2); ok ($x->[0],0); ok ($x->[1],1);
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([0,1,2]);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([0,1,2]);
   ok (@$x,3); ok ($x->[0],0); ok ($x->[1],1); ok ($x->[2],2);
 
   # but strip leading zeros
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([0,1,2,0]);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([0,1,2,0]);
   ok (@$x,3); ok ($x->[0],0); ok ($x->[1],1); ok ($x->[2],2);
 
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([0,1,2,0,0]);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([0,1,2,0,0]);
   ok (@$x,3); ok ($x->[0],0); ok ($x->[1],1); ok ($x->[2],2);
 
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([0,1,2,0,0,0]);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([0,1,2,0,0,0]);
   ok (@$x,3); ok ($x->[0],0); ok ($x->[1],1); ok ($x->[2],2);
 
   # collapse multiple zeros
-  $x = &{Symbol::qualify_to_ref($C."::__strip_zeros")}([0,0,0,0]);
+  $x = &{*{Symbol::qualify_to_ref($C."::__strip_zeros")}}([0,0,0,0]);
   ok (@$x,1); ok ($x->[0],0);
 }
 

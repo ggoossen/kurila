@@ -97,7 +97,7 @@ sub struct {
 
     my $isa = do {
         no strict 'refs';
-        \@{Symbol::qualify_to_ref($class . '::ISA')};
+        \@{*{Symbol::qualify_to_ref($class . '::ISA')}};
     };
     _subclass_error() if @$isa;
     tie @$isa, 'Class::Struct::Tie_ISA';

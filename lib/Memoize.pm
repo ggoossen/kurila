@@ -292,7 +292,7 @@ sub unmemoize {
   if (defined $name) {
     no strict;
     local($^W) = 0;	       # ``Subroutine $install_name redefined at ...''
-    *{$name} = $tabent->{U}; # Replace with original function
+    *{Symbol::qualify_to_ref($name)} = $tabent->{U}; # Replace with original function
   }
   undef $memotable{$revmemotable{$cref}};
   undef $revmemotable{$cref};

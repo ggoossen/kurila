@@ -45,7 +45,7 @@ BEGIN
   no strict 'refs';
   foreach my $method ( qw/ div acmp floor ceil root sqrt log fac modpow modinv/)
     {
-    *{'b' . $method} = \&{'Math::BigRat::b' . $method};
+    *{Symbol::qualify_to_ref('b' . $method)} = \&{*{Symbol::qualify_to_ref('Math::BigRat::b' . $method)}};
     }
   }
 

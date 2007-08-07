@@ -153,13 +153,13 @@ is (*{*x{GLOB}}, "*main::STDOUT");
     my $a = Symbol::qualify_to_ref('SYM000');
     ok(defined *{$a}); # qualify_to_ref does create the symbol
 
-    ok(!defined @{$a});
+    ok(!defined @{*{$a}});
     ok(defined *{$a});
 
-    ok(!defined %{$a});
+    ok(!defined %{*{$a}});
     ok(defined *{$a});
 
-    ok(!defined ${$a});
+    ok(!defined ${*{$a}});
     ok(defined *{$a});
 
     ok(!defined &{$a});
@@ -170,7 +170,7 @@ is (*{*x{GLOB}}, "*main::STDOUT");
     ok(defined &{$a});
     local our $TODO = 1;
     ok(defined &{Symbol::qualify_to_ref('SYM000')});
-    &{$a};
+    &{*{$a}};
     is ($state, 'ok');
 }
 
@@ -186,14 +186,14 @@ is (*{*x{GLOB}}, "*main::STDOUT");
     ok(${$a});
     ok(defined *{$a});
     $a = Symbol::qualify_to_ref("2");
-    ok(!${$a});
+    ok(!${*{$a}});
     ok(defined *{$a});
     $a = Symbol::qualify_to_ref("1x");
-    ok(!defined ${$a});
+    ok(!defined ${*{$a}});
     ok(defined *{$a});
     $a = Symbol::qualify_to_ref("11");
     "o" =~ /(((((((((((o)))))))))))/;
-    ok(${$a});
+    ok(${*{$a}});
     ok(defined *{$a});
 }
 

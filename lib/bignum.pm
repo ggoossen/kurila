@@ -229,7 +229,7 @@ sub import
   my ($package) = caller();
 
   no strict 'refs';
-  if (!defined *{Symbol::qualify_to_ref("${package}::inf")})
+  if (!defined &{*{Symbol::qualify_to_ref("${package}::inf")}})
     {
     $self->export_to_level(1,$self,@a);           # export inf and NaN
     }

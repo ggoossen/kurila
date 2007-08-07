@@ -22,7 +22,7 @@ $SIG{__WARN__} = sub {
 
 require './test.pl';
 
-plan(252);
+plan(246);
 
 $FATAL_MSG = qr/^substr outside of string/;
 
@@ -522,12 +522,10 @@ is($x, "\x{100}\x{200}ab");
 
 {
     # lvalue ref count
-    use Devel::Peek;
-
     my $foo = "bar";
-    is(Devel::Peek::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT($foo), 1);
     substr($foo, -2, 2) = "la";
-    is(Devel::Peek::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT($foo), 1);
 }
 
 # lvalue with regex and eval
@@ -540,36 +538,9 @@ is($x, "\x{100}\x{200}ab");
 # extended lifetime lvalue
 {
     my $foo = "bar";
-    is(Devel::Peek::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT($foo), 1);
     my $y = \ substr($foo, -2, 2);
-    is(Devel::Peek::SvREFCNT($foo), 2);
+    is(Internals::SvREFCNT($foo), 2);
     undef $y;
-    is(Devel::Peek::SvREFCNT($foo), 1);
-}
-
-{
-    # lvalue ref count
-    use Devel::Peek;
-
-    my $foo = "bar";
-    is(Devel::Peek::SvREFCNT($foo), 1);
-    substr($foo, -2, 2) = "la";
-    is(Devel::Peek::SvREFCNT($foo), 1);
-}
-
-# lvalue with regex and eval
-{
-    my $x = "abccd";
-    substr($x, 0, -1) =~ s/(c)/ord($1)/ge;
-    is($x, "ab9999d");
-}
-
-# extended lifetime lvalue
-{
-    my $foo = "bar";
-    is(Devel::Peek::SvREFCNT($foo), 1);
-    my $y = \ substr($foo, -2, 2);
-    is(Devel::Peek::SvREFCNT($foo), 2);
-    undef $y;
-    is(Devel::Peek::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT($foo), 1);
 }

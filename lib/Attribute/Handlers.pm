@@ -14,7 +14,7 @@ sub findsym {
 	$type ||= ref($ref);
 	my $found;
 	no strict 'refs';
-        foreach my $sym ( values %{Symbol::qualify_to_ref($pkg."::")} ) {
+        foreach my $sym ( values %{*{Symbol::qualify_to_ref($pkg."::")}} ) {
 	    use strict;
 	    next unless ref ( \$sym ) eq 'GLOB';
             return $symcache{$pkg,$ref} = \$sym

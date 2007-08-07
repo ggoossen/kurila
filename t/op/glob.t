@@ -57,7 +57,7 @@ my $i = 0;
 for (1..2) {
     eval "glob('.')";
     ok(!length($@),"eval'ed a glob $_");
-    undef %File::Glob::;
+    undef %{Symbol::stash('File::Glob')};
     ++$i;
 }
 cmp_ok($i,'==',2,'remore File::Glob stash');

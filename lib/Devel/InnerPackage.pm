@@ -87,11 +87,11 @@ sub _loaded {
 
        # Handle by far the two most common cases
        # This is very fast and handles 99% of cases.
-       return 1 if defined ${Symbol::qualify_to_ref("${name}::VERSION")};
-       return 1 if defined @{Symbol::qualify_to_ref("${name}::ISA")};
+       return 1 if defined ${*{Symbol::qualify_to_ref("${name}::VERSION")}};
+       return 1 if defined @{*{Symbol::qualify_to_ref("${name}::ISA")}};
 
        # Are there any symbol table entries other than other namespaces
-       foreach ( keys %{Symbol::qualify_to_ref("${name}::")} ) {
+       foreach ( keys %{*{Symbol::qualify_to_ref("${name}::")}} ) {
                next if substr($_, -2, 2) eq '::';
                return 1 if defined &{Symbol::qualify_to_ref("${name}::$_")};
        }

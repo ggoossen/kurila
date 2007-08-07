@@ -2085,7 +2085,7 @@ number information, and print that.
                                  # Perl 5 ones (sorry, we don't print Klingon
                                  #module names)
 
-            $prefix = $sub =~ /::/ ? "" : "${Symbol::qualify_to_ref('package')}::";
+            $prefix = $sub =~ /::/ ? "" : "${*{Symbol::qualify_to_ref('package')}}::";
             $prefix .= "$sub($filename:";
             $after = ( $dbline[$line] =~ /\n$/ ? '' : "\n" );
 
@@ -4034,7 +4034,7 @@ sub cmd_b {
         $subname =~ s/\'/::/g;
 
         # Qualify it into the current package unless it's already qualified.
-        $subname = "${Symbol::qualify_to_ref('package')}::" . $subname unless $subname =~ /::/;
+        $subname = "${*{Symbol::qualify_to_ref('package')}}::" . $subname unless $subname =~ /::/;
 
         # Add main if it starts with ::.
         $subname = "main" . $subname if substr( $subname, 0, 2 ) eq "::";
@@ -4455,7 +4455,7 @@ sub cmd_b_sub {
         my $s = $subname;
 
         # Put it in this package unless it's already qualified.
-        $subname = "${Symbol::qualify_to_ref('package')}::" . $subname
+        $subname = "${*{Symbol::qualify_to_ref('package')}}::" . $subname
           unless $subname =~ /::/;
 
         # Requalify it into CORE::GLOBAL if qualifying it into this
@@ -4773,8 +4773,8 @@ sub cmd_i {
                 map {    # snaffled unceremoniously from Class::ISA
                     "$_"
                       . (
-                        defined( ${Symbol::qualify_to_ref("$_\::VERSION")} )
-                        ? ' ' . ${Symbol::qualify_to_ref("$_\::VERSION")}
+                        defined( ${*{Symbol::qualify_to_ref("$_\::VERSION")}} )
+                        ? ' ' . ${*{Symbol::qualify_to_ref("$_\::VERSION")}}
                         : undef )
                   } Class::ISA::self_and_super_path(ref($isa) || $isa)
             );
@@ -7025,8 +7025,8 @@ sub list_modules {    # versions
 
         # If the package has a $VERSION package global (as all good packages
         # should!) decode it and save as partial message.
-        if ( defined ${Symbol::qualify_to_ref( $_ . '::VERSION') } ) {
-            $version{$file} = "${Symbol::qualify_to_ref( $_ . '::VERSION') } from ";
+        if ( defined ${*{Symbol::qualify_to_ref( $_ . '::VERSION')} } ) {
+            $version{$file} = "${*{Symbol::qualify_to_ref( $_ . '::VERSION')} } from ";
         }
 
         # Finish up the message with the file the package came from.
@@ -7895,10 +7895,10 @@ sub methods_via {
     for $name (
 
         # Keep if this is a defined subroutine in this class.
-        grep { defined &{ ${Symbol::qualify_to_ref("${class}::")}{$_} } }
+        grep { defined &{ ${*{Symbol::qualify_to_ref("${class}::")}}{$_} } }
 
         # Extract from all the symbols in this class.
-        sort keys %{Symbol::qualify_to_ref("${class}::")}
+        sort keys %{*{Symbol::qualify_to_ref("${class}::")}}
       )
     {
 
@@ -7916,7 +7916,7 @@ sub methods_via {
 
     # $crawl_upward true: keep going up the tree.
     # Find all the classes this one is a subclass of.
-    for $name ( @{Symbol::qualify_to_ref("${class}::ISA")} ) {
+    for $name ( @{*{Symbol::qualify_to_ref("${class}::ISA")}} ) {
 
         # Set up the new prefix.
         $prepend = $prefix ? $prefix . " -> $name" : $name;
@@ -8300,7 +8300,7 @@ sub db_complete {
     # The search pattern is current package, ::, extract the next qualifier
     # Prefix and pack are set to undef.
     my ( $itext, $search, $prefix, $pack ) =
-      ( $text, "^\Q${Symbol::qualify_to_ref('package')}::\E([^:]+)\$" );
+      ( $text, "^\Q${*{Symbol::qualify_to_ref('package')}}::\E([^:]+)\$" );
 
 =head3 C<b postpone|compile> 
 
@@ -8372,7 +8372,7 @@ start with 'main::'. Return this list.
 
     return sort map { ( $_, db_complete( $_ . "::", "V ", 2 ) ) }
       grep !/^main::/, grep /^\Q$text/,
-      map { /^(.*)::$/ ? ( $prefix . "::$1" ) : () } keys %{Symbol::qualify_to_ref( $prefix . '::') }
+      map { /^(.*)::$/ ? ( $prefix . "::$1" ) : () } keys %{*{Symbol::qualify_to_ref( $prefix . '::')} }
       if ( substr $line, 0, $start ) =~ /^\|*[Vm]\s+$/
       and $text =~ /^(.*[^:])::?(\w*)$/
       and $prefix = $1;
@@ -8793,8 +8793,8 @@ sub restart {
     # the 'require perl5db.pl;' line), and add them back on
     # to the command line to be executed.
     if ( $0 eq '-e' ) {
-        for ( 1 .. $#{Symbol::qualify_to_ref('::_<-e')} ) {  # The first line is PERL5DB
-            chomp( $cl = ${Symbol::qualify_to_ref('::_<-e')}[$_] );
+        for ( 1 .. $#{*{Symbol::qualify_to_ref('::_<-e')}} ) {  # The first line is PERL5DB
+            chomp( $cl = ${*{Symbol::qualify_to_ref('::_<-e')}}[$_] );
             push @script, '-e', $cl;
         }
     } ## end if ($0 eq '-e')
@@ -9097,7 +9097,7 @@ sub cmd_pre580_b {
         $subname =~ s/\'/::/g;
 
         # Qualify it into the current package unless it's already qualified.
-        $subname = "${Symbol::qualify_to_ref('package')}::" . $subname
+        $subname = "${*{Symbol::qualify_to_ref('package')}}::" . $subname
           unless $subname =~ /::/;
 
         # Add main if it starts with ::.

@@ -261,7 +261,7 @@ sub remove_rv2gv {
 
     }
 
-    for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2sv op_rv2hv op_rv2cv op_rv2av|)) {
+    for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2sv op_rv2hv op_rv2cv op_rv2av op_null[@was="rv2cv"]|)) {
         next unless $op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_null/op_gv[@gv="Symbol::qualify_to_ref"]|);
         my ($op_scope) = $op_rv2gv->findnodes(q|op_scope|);
         my ($op_sub) = $op_scope->findnodes(q|op_entersub|);

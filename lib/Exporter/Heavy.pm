@@ -31,7 +31,7 @@ sub _rebuild_cache {
     my ($pkg, $exports, $cache) = @_;
     s/^&// foreach @$exports;
     @{$cache}{@$exports} = (1) x @$exports;
-    my $ok = \@{Symbol::qualify_to_ref("${pkg}::EXPORT_OK")};
+    my $ok = \@{*{Symbol::qualify_to_ref("${pkg}::EXPORT_OK")}};
     if (@$ok) {
 	s/^&// foreach @$ok;
 	@{$cache}{@$ok} = (1) x @$ok;
@@ -199,9 +199,9 @@ sub heavy_export {
 	no warnings 'once';
 	*{Symbol::qualify_to_ref("${callpkg}::$sym")} =
 	    $type eq '&' ? \&{Symbol::qualify_to_ref("${pkg}::$sym")} :
-	    $type eq '$' ? \${Symbol::qualify_to_ref("${pkg}::$sym")} :
-	    $type eq '@' ? \@{Symbol::qualify_to_ref("${pkg}::$sym")} :
-	    $type eq '%' ? \%{Symbol::qualify_to_ref("${pkg}::$sym")} :
+	    $type eq '$' ? \${*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
+	    $type eq '@' ? \@{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
+	    $type eq '%' ? \%{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
 	    $type eq '*' ?  *{Symbol::qualify_to_ref("${pkg}::$sym")} :
 	    do { require Carp; Carp::croak("Can't export symbol: $type$sym") };
     }
@@ -221,8 +221,8 @@ sub heavy_export_to_level
 sub _push_tags {
     my($pkg, $var, $syms) = @_;
     my @nontag = ();
-    my $export_tags = \%{Symbol::qualify_to_ref("${pkg}::EXPORT_TAGS")};
-    push(@{Symbol::qualify_to_ref("${pkg}::$var")},
+    my $export_tags = \%{*{Symbol::qualify_to_ref("${pkg}::EXPORT_TAGS")}};
+    push(@{*{Symbol::qualify_to_ref("${pkg}::$var")}},
 	map { $export_tags->{$_} ? @{$export_tags->{$_}} 
                                  : scalar(push(@nontag,$_),$_) }
 		(@$syms) ? @$syms : keys %$export_tags);

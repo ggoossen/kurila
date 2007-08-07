@@ -130,7 +130,7 @@ EOS
       $code = eval("package $pkg; use Carp; $code");
       die if $@;
       no warnings;   # to avoid: Subroutine foo redefined ...
-      *{$sub} = $code;
+      *{Symbol::qualify_to_ref($sub)} = $code;
     }
 }
 

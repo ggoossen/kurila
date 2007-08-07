@@ -389,7 +389,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   my $module = $_[0];   # ASSUME sane module name!
   { no strict 'refs';
     return($tried{$module} = 1)
-     if defined(%{Symbol::qualify_to_ref($module . "::Lexicon")}) or defined(@{Symbol::qualify_to_ref($module . "::ISA")});
+     if defined(%{*{Symbol::qualify_to_ref($module . "::Lexicon")}}) or defined(@{*{Symbol::qualify_to_ref($module . "::ISA")}});
     # weird case: we never use'd it, but there it is!
   }
 
@@ -422,12 +422,12 @@ sub _lex_refs {  # report the lexicon references for this handle's class
   if( defined( *{Symbol::qualify_to_ref($class . '::Lexicon')}{'HASH'} )) {
     push @lex_refs, *{Symbol::qualify_to_ref($class . '::Lexicon')}{'HASH'};
     print "%" . $class . "::Lexicon contains ",
-         scalar(keys %{Symbol::qualify_to_ref($class . '::Lexicon')}), " entries\n" if DEBUG;
+         scalar(keys %{*{Symbol::qualify_to_ref($class . '::Lexicon')}}), " entries\n" if DEBUG;
   }
 
   # Implements depth(height?)-first recursive searching of superclasses.
   # In hindsight, I suppose I could have just used Class::ISA!
-  foreach my $superclass (@{Symbol::qualify_to_ref($class . "::ISA")}) {
+  foreach my $superclass (@{*{Symbol::qualify_to_ref($class . "::ISA")}}) {
     print " Super-class search into $superclass\n" if DEBUG;
     next if $seen_r->{$superclass}++;
     push @lex_refs, @{&_lex_refs($superclass, $seen_r)};  # call myself

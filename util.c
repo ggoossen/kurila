@@ -510,7 +510,7 @@ Perl_fbm_compile(pTHX_ SV *sv, U32 flags)
     s = (U8*)SvPV_force_mutable(sv, len);
     if (len == 0)		/* TAIL might be on a zero-length string. */
 	return;
-    SvUPGRADE(sv, SVt_PVGV);
+    SvUPGRADE(sv, SVt_PVMG);
     SvIOK_off(sv);
     SvNOK_off(sv);
     SvVALID_on(sv);
@@ -781,7 +781,7 @@ Perl_screaminstr(pTHX_ SV *bigstr, SV *littlestr, I32 start_shift, I32 end_shift
     register const unsigned char *littleend;
     I32 found = 0;
 
-    assert(SvTYPE(littlestr) == SVt_PVGV);
+    assert(SvTYPE(littlestr) == SVt_PVMG);
     assert(SvVALID(littlestr));
 
     if (*old_posp == -1

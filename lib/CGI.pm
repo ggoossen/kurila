@@ -293,10 +293,10 @@ sub import {
 
     # To allow overriding, search through the packages
     # Till we find one in which the correct subroutine is defined.
-    my @packages = ($self,@{Symbol::qualify_to_ref("$self\:\:ISA")});
+    my @packages = ($self,@{*{Symbol::qualify_to_ref("$self\:\:ISA")}});
     foreach $sym (keys %EXPORT) {
 	my $pck;
-	my $def = ${Symbol::qualify_to_ref("$self\:\:AutoloadClass")} || $DefaultClass;
+	my $def = ${*{Symbol::qualify_to_ref("$self\:\:AutoloadClass")}} || $DefaultClass;
 	foreach $pck (@packages) {
 	    if (defined(&{Symbol::qualify_to_ref("$pck\:\:$sym")})) {
 		$def = $pck;
@@ -839,12 +839,12 @@ sub _compile {
 	$func=~/(.+)::([^:]+)$/;
 	($pack,$func_name) = ($1,$2);
 	$pack=~s/::SUPER$//;	# fix another obscure problem
-	$pack = ${Symbol::qualify_to_ref("$pack\:\:AutoloadClass")} || $CGI::DefaultClass
-	    unless defined(${Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")});
+	$pack = ${*{Symbol::qualify_to_ref("$pack\:\:AutoloadClass")}} || $CGI::DefaultClass
+	    unless defined(${*{Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")}});
 
-        my($sub) = \%{Symbol::qualify_to_ref("$pack\:\:SUBS")};
+        my($sub) = \%{*{Symbol::qualify_to_ref("$pack\:\:SUBS")}};
         unless (%$sub) {
-	   my($auto) = \${Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")};
+	   my($auto) = \${*{Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")}};
 	   local ($@,$!);
 	   eval "package $pack; $$auto";
 	   croak("$AUTOLOAD: $@") if $@;
@@ -2193,8 +2193,8 @@ sub escapeHTML {
          else {
 	     $toencode =~ s{"}{&quot;}gso;
          }
-         my $latin = uc $self->{'.charset'} eq 'ISO-8859-1' ||
-                     uc $self->{'.charset'} eq 'WINDOWS-1252';
+         my $latin = ref $self && ( uc $self->{'.charset'} eq 'ISO-8859-1' ||
+                                    uc $self->{'.charset'} eq 'WINDOWS-1252' );
          if ($latin) {  # bug in some browsers
                 $toencode =~ s{'}{&#39;}gso;
                 $toencode =~ s{\x8b}{&#8249;}gso;

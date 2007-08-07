@@ -3247,7 +3247,7 @@ sub recent {
                         reports
                         test
                        )) {
-        *$command = sub { shift->rematein($command, @_); };
+        *{Symbol::qualify_to_ref($command)} = sub { shift->rematein($command, @_); };
     }
 }
 
@@ -7424,8 +7424,8 @@ sub _find_prefs {
                         $CPAN::Frontend->mydie("Error in distroprefs file $_\: $@");
                     }
                     my $i = 1;
-                    while (${Symbol::qualify_to_ref("VAR".$i)}) {
-                        push @distropref, ${Symbol::qualify_to_ref("VAR".$i)};
+                    while (${*{Symbol::qualify_to_ref("VAR".$i)}}) {
+                        push @distropref, ${*{Symbol::qualify_to_ref("VAR".$i)}};
                         $i++;
                     }
                 } elsif ($thisexte eq "st") {

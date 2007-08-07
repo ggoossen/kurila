@@ -3252,7 +3252,7 @@ sub pp_entersub {
 	no warnings 'uninitialized';
 	$declared = exists $self->{'subs_declared'}{$kid}
 	    || (
-		 defined &{ ${Symbol::qualify_to_ref($self->{'curstash'}."::")}{$kid} }
+		 defined &{ ${Symbol::stash($self->{'curstash'})}{$kid} }
 		 && !exists
 		     $self->{'subs_deparsed'}{$self->{'curstash'}."::".$kid}
 		 && defined prototype $self->{'curstash'}."::".$kid

@@ -28,7 +28,7 @@ sub run
 
     my $AnyConstruct = "IO::Uncompress::${AnyClass}" ;
     no strict 'refs';
-    my $AnyError = \${ "IO::Uncompress::${AnyClass}::${AnyClass}Error" };
+    my $AnyError = \${Symbol::qualify_to_ref( "IO::Uncompress::${AnyClass}::${AnyClass}Error") };
 
     for my $trans ( 0, 1 )
     {

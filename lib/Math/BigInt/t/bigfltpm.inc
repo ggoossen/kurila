@@ -272,7 +272,7 @@ $class->precision(-3); $x = $class->new(12); $x->fsqrt(); ok ($x,'3.464');
 {
   no strict 'refs';
   # A and P set => NaN
-  ${${class}.'::accuracy'} = 4; $x = $class->new(12);
+  ${*{Symbol::qualify_to_ref(${class}.'::accuracy')}} = 4; $x = $class->new(12);
   $x->fsqrt(3); ok ($x,'NaN');
   # supplied arg overrides set global
   $class->precision(undef); $x = $class->new(12); $x->fsqrt(3); ok ($x,'3.46');

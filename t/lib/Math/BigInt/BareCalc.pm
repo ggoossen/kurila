@@ -33,7 +33,7 @@ BEGIN
 	/)
     {
     my $name  = "Math::BigInt::Calc::_$_";
-    *{"Math::BigInt::BareCalc::_$_"} = \&$name;
+    *{Symbol::qualify_to_ref("Math::BigInt::BareCalc::_$_")} = \&{*{Symbol::qualify_to_ref($name)}};
     }
   print "# BareCalc using Calc v$Math::BigInt::Calc::VERSION\n";
   }

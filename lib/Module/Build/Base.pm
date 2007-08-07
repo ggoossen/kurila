@@ -682,6 +682,7 @@ sub ACTION_config_data {
 	if ( $type eq 'HASH' ) {
           *{Symbol::qualify_to_ref("$class\::$property")} = sub {
 	    my $self = shift;
+            $self = ${*{Symbol::qualify_to_ref("$self\::properties")}} ||= {} if not ref $self;
 	    my $x = $self->{properties};
 	    return $x->{$property} unless @_;
 
@@ -705,6 +706,7 @@ sub ACTION_config_data {
         } else {
           *{Symbol::qualify_to_ref("$class\::$property")} = sub {
 	    my $self = shift;
+            $self = ${*{Symbol::qualify_to_ref("$self\::properties")}} ||= {} if not ref $self;
 	    $self->{properties}{$property} = shift if @_;
 	    return $self->{properties}{$property};
 	  }
@@ -854,7 +856,7 @@ sub mb_parents {
               # Canonize the :: -> main::, ::foo -> main::foo thing.
               # Should I ever canonize the Foo'Bar = Foo::Bar thing?
               $seen{$c}++ ? () : $c;
-          } @{Symbol::qualify_to_ref("$current\::ISA")};
+          } @{*{Symbol::qualify_to_ref("$current\::ISA")}};
 
         # I.e., if this class has any parents (at least, ones I've never seen
         # before), push them, in order, onto the stack of classes I need to
@@ -1208,7 +1210,7 @@ sub check_installed_status {
   if ($modname eq 'perl') {
     $status{have} = $self->perl_version;
   
-  } elsif (eval { no strict; $status{have} = ${Symbol::qualify_to_ref("${modname}::VERSION")} }) {
+  } elsif (eval { no strict; $status{have} = ${*{Symbol::qualify_to_ref("${modname}::VERSION")}} }) {
     # Don't try to load if it's already loaded
     
   } else {
@@ -1841,7 +1843,7 @@ sub super_classes {
   $seen  ||= {};
   
   no strict 'refs';
-  my @super = grep {not $seen->{$_}++} $class, @{Symbol::qualify_to_ref( $class . '::ISA') };
+  my @super = grep {not $seen->{$_}++} $class, @{*{Symbol::qualify_to_ref( $class . '::ISA')} };
   return @super, map {$self->super_classes($_,$seen)} @super;
 }
 
@@ -1852,7 +1854,7 @@ sub known_actions {
   no strict 'refs';
   
   foreach my $class ($self->super_classes) {
-    foreach ( keys %{Symbol::qualify_to_ref( $class . '::') } ) {
+    foreach ( keys %{*{Symbol::qualify_to_ref( $class . '::')} } ) {
       $actions{$1}++ if /^ACTION_(\w+)/;
     }
   }

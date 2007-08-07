@@ -387,8 +387,8 @@ if ($Is_miniperl) {
 
     open(FOO, "nonesuch"); # Generate ENOENT
     no strict 'refs';
-    my %errs = %{Symbol::qualify_to_ref("!")}; # Cause Errno.pm to be loaded at run-time
-    ok ${Symbol::qualify_to_ref("!")}{ENOENT};
+    my %errs = %{*{Symbol::qualify_to_ref("!")}}; # Cause Errno.pm to be loaded at run-time
+    ok ${*{Symbol::qualify_to_ref("!")}}{ENOENT};
 }
 
 ok $^S == 0 && defined $^S;
