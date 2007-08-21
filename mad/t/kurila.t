@@ -144,15 +144,15 @@ sub t_strict_refs {
     p5convert( 'my $pkg; *{"$pkg\::bar"} = sub { "foo" }',
                'my $pkg; *{Symbol::qualify_to_ref("$pkg\::bar")} = sub { "foo" }');
     p5convert( 'my $pkg; ${$pkg . "::bar"} = "noot"',
-               'my $pkg; ${Symbol::qualify_to_ref($pkg . "::bar")} = "noot"');
+               'my $pkg; ${*{Symbol::qualify_to_ref($pkg . "::bar")}} = "noot"');
     p5convert( 'my $pkg; @{$pkg . "::bar"} = ("noot", "mies")',
-               'my $pkg; @{Symbol::qualify_to_ref($pkg . "::bar")} = ("noot", "mies")');
+               'my $pkg; @{*{Symbol::qualify_to_ref($pkg . "::bar")}} = ("noot", "mies")');
     p5convert( 'my $pkg; %{$pkg . "::bar"} = { aap => "noot" }',
-               'my $pkg; %{Symbol::qualify_to_ref($pkg . "::bar")} = { aap => "noot" }');
+               'my $pkg; %{*{Symbol::qualify_to_ref($pkg . "::bar")}} = { aap => "noot" }');
     p5convert( 'my $pkg; &{$pkg . "::bar"} = sub { "foobar" }',
-               'my $pkg; &{Symbol::qualify_to_ref($pkg . "::bar")} = sub { "foobar" }');
+               'my $pkg; &{*{Symbol::qualify_to_ref($pkg . "::bar")}} = sub { "foobar" }');
     p5convert( 'my $pkg; defined &{$pkg . "::bar"}',
-               'my $pkg; defined &{Symbol::qualify_to_ref($pkg . "::bar")}');
+               'my $pkg; defined &{*{Symbol::qualify_to_ref($pkg . "::bar")}}');
     p5convert( '*$AUTOLOAD',
                '*{Symbol::qualify_to_ref($AUTOLOAD)}');
     p5convert( 'my $name = "foo"; *$name',

@@ -255,14 +255,17 @@ sub remove_rv2gv {
 
         #args
         my $args = $op_sub->insert_new_elt("op_null", { was => "list" });
-        set_madprop( $args->insert_new_elt("op_gv"),
-                      "value", "Symbol::qualify_to_ref" );
+        my $op_gv = $args->insert_new_elt("op_gv");
+        $op_gv->set_att("gv", "Symbol::qualify_to_ref");
+        set_madprop( $op_gv, "value", "Symbol::qualify_to_ref" );
         $op_const->move($args);
 
     }
 
     for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2sv op_rv2hv op_rv2cv op_rv2av op_null[@was="rv2cv"]|)) {
-        next unless $op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_null/op_gv[@gv="Symbol::qualify_to_ref"]|);
+        next unless ($op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_null/op_gv[@gv="Symbol::qualify_to_ref"]|)
+                     or $op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_gv[@gv="Symbol::qualify_to_ref"]|));
+
         my ($op_scope) = $op_rv2gv->findnodes(q|op_scope|);
         my ($op_sub) = $op_scope->findnodes(q|op_entersub|);
 
