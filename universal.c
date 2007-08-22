@@ -1399,7 +1399,7 @@ XS(XS_Symbol_qualify_to_ref)
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
 
-    ST(0) = gv_fetchsv(ST(0), GV_ADD, SVt_PVGV);
+    ST(0) = gv_fetchsv(ST(0), GV_ADD | GV_ADDMULTI, SVt_PVGV);
     ST(0) = newRV_noinc(ST(0));
     XSRETURN(1);
 }
