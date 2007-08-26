@@ -208,9 +208,9 @@ sub _open3 {
     $dup_err = ($dad_err =~ s/^[<>]&//);
 
     # force unqualified filehandles into caller's package
-    $dad_wtr = *{Symbol::qualify_to_ref(qualify $dad_wtr, $package)} unless fh_is_fd($dad_wtr);
-    $dad_rdr = *{Symbol::qualify_to_ref(qualify $dad_rdr, $package)} unless fh_is_fd($dad_rdr);
-    $dad_err = *{Symbol::qualify_to_ref(qualify $dad_err, $package)} unless fh_is_fd($dad_err);
+    $dad_wtr = *{Symbol::qualify_to_ref(qualify $dad_wtr, $package)} unless ref $dad_wtr or fh_is_fd($dad_wtr);
+    $dad_rdr = *{Symbol::qualify_to_ref(qualify $dad_rdr, $package)} unless ref $dad_rdr or fh_is_fd($dad_rdr);
+    $dad_err = *{Symbol::qualify_to_ref(qualify $dad_err, $package)} unless ref $dad_err or fh_is_fd($dad_err);
 
     my $kid_rdr = gensym;
     my $kid_wtr = gensym;
