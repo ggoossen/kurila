@@ -24,10 +24,10 @@ sub p5convert {
 }
 
 t_strict_refs();
-# t_indirect_object_syntax();
-# t_barewords();
-# t_glob_pattr();
-# t_vstring();
+t_indirect_object_syntax();
+t_barewords();
+t_glob_pattr();
+t_vstring();
 # t_encoding();
 t_typed_declaration();
 

@@ -528,7 +528,7 @@ sub hash {
     { 'G', "endsection" },
     { 'g', "forcedword" },
     { '^', "hat" },
-    { ';', "colon" },
+    { ';', "semicolon" },
     { 'o', "operator" },
     { '$', "variable" },
     { '(', "round_open" },

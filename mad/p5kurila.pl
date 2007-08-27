@@ -9,40 +9,38 @@ my $filename = shift @ARGV;
 
 use XML::Twig;
 
-sub entersub_handler {
-    my ($twig, $sub) = @_;
+sub convert_indirect_object_syntax {
+    my ($xml) = @_;
 
     # Remove indirect object syntax.
+    for my $sub ($xml->findnodes(q|//op_entersub|)) {
 
+        # check is method
+        my ($method_named) = $xml->findnodes([$sub], "op_method_named");
+        next if not $method_named;
 
-    # check is method
-    my ($method_named) = $twig->findnodes([$sub], "op_method_named");
-    return if not $method_named;
+        # skip special subs
+        next if $sub->att("flags") =~ m/SPECIAL/;
 
-    # skip special subs
-    return if $sub->att("flags") =~ m/SPECIAL/;
+        # check it is indirect object syntax.
+        next if get_madprop($sub, "bigarrow");
 
-    # check is indirect object syntax.
-    my $x = $twig->findnodes([$sub], qq|madprops/mad_sv[\@key="bigarrow"][\@val="-&gt;"]|);
-    return if $x;
+        # make indirect object syntax.
+        set_madprop($sub, "bigarrow", "-&gt;");
+        set_madprop($sub, "round_open", "(");
+        set_madprop($sub, "round_close", ")");
 
-    # make indirect object syntax.
-    my $madprops = ($twig->findnodes([$sub], qq|madprops|))[0] || $sub->insert_new_elt("madprops");
-
-    $madprops->insert_new_elt( "mad_sv", { key => "bigarrow", val => "-&gt;" } );
-    $madprops->insert_new_elt( "mad_sv", { key => "round_open", val => "(" } );
-    $madprops->insert_new_elt( "mad_sv", { key => "round_close", val => ")" } );
-
-    # move widespace from method to object and visa versa.
-    my ($method_ws) = $twig->findnodes([$method_named],
-                                       qq|madprops/mad_op/op_method/op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
-    my ($obj_ws) = $twig->findnodes([$sub], qq|op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
-    if ($method_ws and $obj_ws) {
-        my $x_method_ws = $method_ws->att('val');
-        my $x_obj_ws = $obj_ws->att('val');
-        $x_obj_ws =~ s/\s+$//;
-        $method_ws->set_att("val" => $x_obj_ws);
-        $obj_ws->set_att("val" => $x_method_ws);
+        # move space from method to object and visa versa.
+        my ($method_ws) = $xml->findnodes([$method_named],
+                                           qq|madprops/mad_op/op_method/op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
+        my ($obj_ws) = $xml->findnodes([$sub], qq|op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
+        if ($method_ws and $obj_ws) {
+            my $x_method_ws = $method_ws->att('val');
+            my $x_obj_ws = $obj_ws->att('val');
+            $x_obj_ws =~ s/\s+$//;
+            $method_ws->set_att("val" => $x_obj_ws);
+            $obj_ws->set_att("val" => $x_method_ws);
+        }
     }
 }
 
@@ -318,9 +316,7 @@ my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
 $twig->parsefile( "-" );
 
 # replacing.
-for my $op ($twig->findnodes(q|//op_entersub|)) {
-    entersub_handler($twig, $op);
-}
+convert_indirect_object_syntax($twig);
 
 for my $op_const ($twig->findnodes(q|//op_const|)) {
     const_handler($twig, $op_const);
