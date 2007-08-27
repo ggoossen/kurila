@@ -73,7 +73,7 @@ BEGIN {
 }
 
 $bang = sprintf "\\%03o", ord "!"; # \41 would not be portable.
-$ffff  = "\xFF\xFF";
+$ffff  = "\x[FF]\x[FF]";
 $nulnul = "\0" x 2;
 $OP = $qr ? 'qr' : 'm';
 
