@@ -2486,7 +2486,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 'X', "value" },
     { 'g', "forcedword" },
     { '^', "hat" },
-    { ';', "colon" },
+    { ';', "semicolon" },
     { 'o', "operator" },
     { '$', "variable" },
     { '(', "round_open" },
