@@ -394,8 +394,7 @@ sub FETCH {
     my $proto = prototype("Errno::$errname");
     my $errno = "";
     if (defined($proto) && $proto eq "") {
-	no strict 'refs';
-	$errno = &$errname;
+	$errno = &{*{Symbol::qualify_to_ref($errname)}};
         $errno = 0 unless $! == $errno;
     }
     return $errno;
