@@ -19,7 +19,7 @@ use Convert;
 sub p5convert {
     my ($input, $expected) = @_;
     local $TODO = $TODO || ($input =~ m/^[#]\s*TODO/);
-    my $output = Convert::convert($input, "/usr/bin/perl ../mad/p5kurila.pl");
+    my $output = Convert::convert($input, "/usr/bin/env perl ../mad/p5kurila.pl");
     is($output, $expected) or $TODO or die;
 }
 
@@ -47,9 +47,9 @@ Foo->new;
 END
 
     p5convert( split(m/^====\n/m, <<'END'), 1 );
-use Test::More tests => 1;
+use Test::More tests => 13;
 ====
-use Test::More tests => 1;
+use Test::More tests => 13;
 END
 
 }
@@ -157,6 +157,8 @@ sub t_strict_refs {
                '*{Symbol::qualify_to_ref($AUTOLOAD)}');
     p5convert( 'my $name = "foo"; *$name',
                'my $name = "foo"; *{Symbol::qualify_to_ref($name)}');
+    p5convert( '*$globref',
+               '*$globref');
 
     p5convert( 'my $pkg; keys %Package::',
                'my $pkg; keys %{Symbol::stash("Package")}');

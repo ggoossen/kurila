@@ -16,7 +16,7 @@ sub convert_indirect_object_syntax {
     for my $sub ($xml->findnodes(q|//op_entersub|)) {
 
         # check is method
-        my ($method_named) = $xml->findnodes([$sub], "op_method_named");
+        my ($method_named) = $sub->findnodes("op_method_named");
         next if not $method_named;
 
         # skip special subs
@@ -31,9 +31,9 @@ sub convert_indirect_object_syntax {
         set_madprop($sub, "round_close", ")");
 
         # move space from method to object and visa versa.
-        my ($method_ws) = $xml->findnodes([$method_named],
-                                           qq|madprops/mad_op/op_method/op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
-        my ($obj_ws) = $xml->findnodes([$sub], qq|op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
+        my ($method_ws) = $method_named->findnodes(
+                                qq|madprops/mad_op/op_method/op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
+        my ($obj_ws) = $sub->findnodes(qq|op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
         if ($method_ws and $obj_ws) {
             my $x_method_ws = $method_ws->att('val');
             my $x_obj_ws = $obj_ws->att('val');
@@ -194,30 +194,27 @@ sub make_glob_sub {
 }
 
 sub remove_rv2gv {
-    my $twig = shift;
+    my $xml = shift;
     # stash
-    for my $op_rv2hv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2hv|)) {
+    for my $op_rv2hv (map { $xml->findnodes(qq|//$_|) } (qw|op_rv2hv|)) {
         my ($op_const) = $op_rv2hv->findnodes(q*op_const*);
-        next unless $op_const and $op_const->att('PV') =~ m/[:][:]$/;
+        next unless $op_const and $op_const->att('PV') =~ m/::$/;
 
         my $op_scope = $op_rv2hv->insert_new_elt("op_scope");
         set_madprop($op_scope, curly_open => '{');
         set_madprop($op_scope, curly_close => '}');
 
         my $op_sub = $op_scope->insert_new_elt("op_entersub");
-
-        # ()
-        my $madprops = $op_sub->insert_new_elt("madprops");
-        $madprops->insert_new_elt("mad_sv", { key => "round_open", val => "(" });
-        $madprops->insert_new_elt("mad_sv", { key => "round_close", val => ")" });
+	set_madprop($op_sub, "round_open", "(");
+	set_madprop($op_sub, "round_close", ")");
 
         #args
         my $args = $op_sub->insert_new_elt("op_null", { was => "list" });
-        $args->insert_new_elt("op_gv")->insert_new_elt("madprops")
-          ->insert_new_elt("mad_sv", { key => "value", val => "Symbol::stash" });
+        set_madprop($args->insert_new_elt("op_gv"),
+		    value => "Symbol::stash");
         $op_const->move($args);
 
-        $_->set_att('val', '%') for $op_rv2hv->findnodes(q*madprops/mad_sv[@key='hsh']*);
+	set_madprop($op_rv2hv, hsh => '%');
         set_madprop($op_const, quote_open => '&#34;');
         my $name = $op_const->att('PV');
         $name =~ s/::$//;
@@ -226,8 +223,8 @@ sub remove_rv2gv {
     }
 
     # strict refs
-    for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2gv op_rv2sv op_rv2hv op_rv2cv op_rv2av|,
-                                                          q{op_null[@was="rv2cv"]}) ) {
+    for my $op_rv2gv (map { $xml->findnodes($_) } map { (qq|//op_$_|, qq|//op_null[\@was="$_"]|) } 
+		      qw|rv2gv rv2sv rv2hv rv2cv rv2av|) {
 
         my ($op_scope, $op_const);
         if (($op_const) = (map { $op_rv2gv->findnodes($_) } qw|op_null op_padsv|)) {
@@ -240,8 +237,7 @@ sub remove_rv2gv {
         } else {
             ($op_scope) = $op_rv2gv->findnodes(q|op_scope/|);
             next if not $op_scope;
-            $op_const = ($op_scope->findnodes(q*op_const*))[0] || ($op_scope->findnodes(q*op_concat*))[0]
-              || ($op_scope->findnodes(q*op_null[@was="stringify"]*))[0];
+            ($op_const) = map { $op_scope->findnodes($_) } (q*op_const*, q*op_concat*, q*op_null[@was="stringify"]*);
             next if not $op_const;
         }
 
@@ -260,9 +256,8 @@ sub remove_rv2gv {
 
     }
 
-    for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2sv op_rv2hv op_rv2cv op_rv2av op_null[@was="rv2cv"]|)) {
-        next unless ($op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_null/op_gv[@gv="Symbol::qualify_to_ref"]|)
-                     or $op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_gv[@gv="Symbol::qualify_to_ref"]|));
+    for my $op_rv2gv (map { $xml->findnodes(qq|//$_|) } (qw|op_rv2sv op_rv2hv op_rv2cv op_rv2av op_null[@was="rv2cv"]|)) {
+        next unless $op_rv2gv->findnodes(q|op_scope/op_entersub/op_null//op_gv[@gv="Symbol::qualify_to_ref"]|);
 
         my ($op_scope) = $op_rv2gv->findnodes(q|op_scope|);
         my ($op_sub) = $op_scope->findnodes(q|op_entersub|);
