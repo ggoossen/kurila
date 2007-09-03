@@ -32,24 +32,26 @@ t_vstring();
 t_typed_declaration();
 
 sub t_indirect_object_syntax {
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+    p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
 use strict;
 #ABC
 new Foo;
 #DEF
 Foo->new;
-====
+----------
 use strict;
 #ABC
 Foo->new();
 #DEF
 Foo->new;
-END
-
-    p5convert( split(m/^====\n/m, <<'END'), 1 );
+==========
 use Test::More tests => 13;
-====
+----------
 use Test::More tests => 13;
+==========
+new Foo @args;
+----------
+Foo->new( @args);
 END
 
 }
