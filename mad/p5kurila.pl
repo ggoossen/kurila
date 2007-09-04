@@ -265,22 +265,24 @@ sub remove_rv2gv {
     for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2gv op_rv2sv op_rv2hv op_rv2cv op_rv2av|,
                                                           q{op_null[@was="rv2cv"]}) ) {
 
-        my ($op_scope, $op_const);
-        if (($op_const) = (map { $op_rv2gv->findnodes($_) } qw|op_null op_padsv|)) {
+        my $op_scope = fst $op_rv2gv->findnodes(q|op_scope|);
+        my $op_const;
+        if (($op_const) = (map { ($op_scope || $op_rv2gv)->findnodes($_) } qw|op_null[@was='rv2sv'] op_padsv|)) {
             # Special case *$AUTOLOAD
 
             # is variable a string?
-            next unless (get_madprop($op_const, "variable") || '') =~ m/^\$(AUTOLOAD|name)$/ 
+            next unless (get_madprop($op_const, "variable") || '') =~ m/^\$(AUTOLOAD|name)$/
               or is_string_op($op_const);
 
             next if ($op_rv2gv->att("private") || '') =~ m/STRICT_REFS/;
 
-            $op_scope = $op_rv2gv->insert_new_elt("op_scope");
-            set_madprop($op_scope, "curly_open" => "{");
-            set_madprop($op_scope, "curly_close" => "}");
-            $op_const->move($op_scope);
+            if (not $op_scope) {
+                $op_scope = $op_rv2gv->insert_new_elt("op_scope");
+                set_madprop($op_scope, "curly_open" => "{");
+                set_madprop($op_scope, "curly_close" => "}");
+                $op_const->move($op_scope);
+            }
         } else {
-            ($op_scope) = $op_rv2gv->findnodes(q|op_scope/|);
             next if not $op_scope;
             $op_const = ($op_scope->findnodes(q*op_const*))[0] || ($op_scope->findnodes(q*op_concat*))[0]
               || ($op_scope->findnodes(q*op_null[@was="stringify"]*))[0];

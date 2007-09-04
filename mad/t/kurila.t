@@ -188,6 +188,12 @@ my $string = "s";
 my $string = "s";
 @{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
 ===
+my $string = "s";
+@{$string} = sub { 1 };
+---
+my $string = "s";
+@{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
+===
 # not if 'use strict'
 use strict;
 my $string = "s";
