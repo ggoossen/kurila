@@ -204,7 +204,10 @@ sub is_string_op {
 
     # string constants, concatenations
     return 1 if $op->tag =~ m/^op_(const|concat)$/;
-    return 1 if $op->tag eq "op_null" and $op->att('was') eq "stringify";
+    # core functions returning a string
+    return 1 if $op->tag =~ m/^op_(sprintf)$/;
+    # stringify
+    return 1 if $op->tag eq "op_null" and ($op->att('was') || '') eq "stringify";
 
     if ($op->tag eq "op_padsv") {
         # lookup last change to variable and if string assignment
