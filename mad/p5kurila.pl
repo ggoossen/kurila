@@ -212,17 +212,22 @@ sub is_string_op {
         # is variable a string?
         my $targ = $op->att("targ");
         if ($targ) {
-            for (reverse $op->findnodes("ancestor-or-self::*/preceding-sibling::*")) {
-                next unless ($_->findnodes("*[\@targ='$targ']"));
-                if ($_->tag eq "op_sassign") {
-                    my ($src, $dst) = $_->findnodes("*[\@seq]");
-                    if ($dst->tag eq "op_padsv" and $dst->att("targ") eq $targ
-                        and is_string_op($src)) {
-                        return 1;
+            for my $op_x (reverse $op->findnodes("ancestor-or-self::*")) {
+                last if $op_x->tag eq "op_leavesub";
+                for (reverse $op_x->findnodes("preceding-sibling::*")) {
+                    next unless ($_->findnodes("*[\@targ='$targ']"));
+                    last if $_->tag eq "op_leavesub";
+                    if ($_->tag eq "op_sassign") {
+                        my ($src, $dst) = $_->findnodes("*[\@seq]");
+                        if ($dst->tag eq "op_padsv" and $dst->att("targ") eq $targ
+                            and is_string_op($src)) {
+                            return 1;
+                        }
                     }
+                    return 0;
                 }
-                return 0;
             }
+            return 0;
         }
     }
 
