@@ -171,10 +171,44 @@ sub t_strict_refs {
     }
 
     # Fix conversion of addition of additional ref
-    p5convert( '@{Symbol::qualify_to_ref("bar")}',
-               '@{*{Symbol::qualify_to_ref("bar")}}' );
-    p5convert( '&{Symbol::qualify_to_ref("bar")}',
-               '&{*{Symbol::qualify_to_ref("bar")}}' );
+    p5convert( split(m/^\-{3}\n/m, $_, 2)) for split(m/^={3}\n/m, <<'END');
+@{Symbol::qualify_to_ref("bar")}
+---
+@{*{Symbol::qualify_to_ref("bar")}}
+===
+&{Symbol::qualify_to_ref("bar")}
+---
+&{*{Symbol::qualify_to_ref("bar")}}
+===
+# finding strings
+my $string = "s";
+@$string = sub { 1 };
+---
+# finding strings
+my $string = "s";
+@{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
+===
+# not if 'use strict'
+use strict;
+my $string = "s";
+@$string= sub { 1 };
+---
+# not if 'use strict'
+use strict;
+my $string = "s";
+@$string= sub { 1 };
+===
+# variable is a hard ref
+my $ref = "s";
+$ref = [];
+@$ref= sub { 1 };
+---
+# variable is a hard ref
+my $ref = "s";
+$ref = [];
+@$ref= sub { 1 };
+END
+
 }
 
 sub t_encoding {
