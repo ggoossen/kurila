@@ -261,7 +261,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("utf8::native_to_unicode", XS_utf8_native_to_unicode, file);
     newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
-    newXSproto("Internals::SvREFCNT",XS_Internals_SvREFCNT, file, "\\[$%@];$");
+    newXS("Internals::SvREFCNT",XS_Internals_SvREFCNT, file); /* , "\\[$%@];$"); */
     newXS("Internals::peek",XS_Internals_peek, file);
     newXSproto("Internals::hv_clear_placeholders",
                XS_Internals_hv_clear_placehold, file, "\\%");
@@ -814,7 +814,7 @@ XS(XS_Internals_SvREFCNT)	/* This is dangerous stuff. */
     PERL_UNUSED_ARG(cv);
 
     if (items == 1)
-	 XSRETURN_IV(SvREFCNT(sv) - 1); /* Minus the ref created for us. */
+	 XSRETURN_IV(SvREFCNT(sv)); /* Minus the ref created for us. */
     else if (items == 2) {
          /* I hope you really know what you are doing. */
 	 SvREFCNT(sv) = SvIV(ST(1));
