@@ -20,7 +20,7 @@ sub as_heavy {
   # Thus the need to create a lot of identical subroutines
   my $c = (caller(1))[3];
   $c =~ s/.*:://;
-  \&{Symbol::qualify_to_ref("Exporter::Heavy::heavy_$c")};
+  \&{*{Symbol::qualify_to_ref("Exporter::Heavy::heavy_$c")}};
 }
 
 sub export {
@@ -64,7 +64,7 @@ sub import {
   local $SIG{__WARN__} = 
 	sub {require Carp; &Carp::carp};
   # shortcut for the common case of no type character
-  *{Symbol::qualify_to_ref("$callpkg\::$_")} = \&{Symbol::qualify_to_ref("$pkg\::$_")} foreach @_;
+  *{Symbol::qualify_to_ref("$callpkg\::$_")} = \&{*{Symbol::qualify_to_ref("$pkg\::$_")}} foreach @_;
 }
 
 # Default methods

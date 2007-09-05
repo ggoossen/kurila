@@ -384,7 +384,7 @@ sub findsubs {
   return undef unless %DB::sub;
   my ($addr, $name, $loc);
   while (($name, $loc) = each %DB::sub) {
-    $addr = \&$name;
+    $addr = \&{*{Symbol::qualify_to_ref($name)}};
     $subs{"$addr"} = $name;
   }
   $self->{subdump} = 0;

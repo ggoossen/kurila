@@ -3860,7 +3860,7 @@ sub cmd_wrapper {
           || ( $cmd =~ /^[<>{]+/o ? 'prepost' : $cmd ) );
 
     # Call the command subroutine, call it by name.
-    return &$call( $cmd, $line, $dblineno );
+    return &{*{Symbol::qualify_to_ref($call)}}( $cmd, $line, $dblineno );
 } ## end sub cmd_wrapper
 
 =head3 C<cmd_a> (command)
@@ -4464,7 +4464,7 @@ sub cmd_b_sub {
         $subname = "CORE::GLOBAL::$s"
           if not defined &$subname
           and $s !~ /::/
-          and defined &{Symbol::qualify_to_ref("CORE::GLOBAL::$s")};
+          and defined &{*{Symbol::qualify_to_ref("CORE::GLOBAL::$s")}};
 
         # Put it in package 'main' if it has a leading ::.
         $subname = "main" . $subname if substr( $subname, 0, 2 ) eq "::";
@@ -4841,7 +4841,7 @@ sub cmd_l {
         $subname = "CORE::GLOBAL::$s"
           if not defined &$subname
           and $s !~ /::/
-          and defined &{Symbol::qualify_to_ref("CORE::GLOBAL::$s")};
+          and defined &{*{Symbol::qualify_to_ref("CORE::GLOBAL::$s")}};
 
         # Put leading '::' names into 'main::'.
         $subname = "main" . $subname if substr( $subname, 0, 2 ) eq "::";
@@ -8473,7 +8473,7 @@ Look through all the symbols in the package. C<grep> out all the possible hashes
 =cut
 
         my @out = map "$prefix$_", grep /^\Q$text/, grep /^_?[a-zA-Z]/,
-          keys %$pack;
+          keys %{*{Symbol::qualify_to_ref($pack)}};
 
 =pod
 
@@ -8534,7 +8534,7 @@ If the package is C<::> (C<main>), create an empty list; if it's something else,
 =cut
 
         my @out = map "$prefix$_", grep /^\Q$text/,
-          ( grep /^_?[a-zA-Z]/, keys %$pack ),
+          ( grep /^_?[a-zA-Z]/, keys %{*{Symbol::qualify_to_ref($pack)}} ),
           ( $pack eq '::' ? () : ( grep /::$/, keys %:: ) );
 
 =item *

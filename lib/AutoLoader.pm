@@ -63,7 +63,7 @@ sub can {
     return unless eval { require $filename };
 
     no strict 'refs';
-    return \&{Symbol::qualify_to_ref( $package . '::' . $method) };
+    return \&{*{Symbol::qualify_to_ref( $package . '::' . $method)} };
 }
 
 sub find_filename {
@@ -200,8 +200,8 @@ sub unimport {
 
     for my $exported (qw( AUTOLOAD can )) {
 	my $symname = $callpkg . '::' . $exported;
-	undef *{Symbol::qualify_to_ref($symname) } if \&{ Symbol::qualify_to_ref($symname) } == \&{ $exported };
-	*{ Symbol::qualify_to_ref($symname) } = \&{ Symbol::qualify_to_ref($symname) };
+	undef *{Symbol::qualify_to_ref($symname) } if \&{*{ Symbol::qualify_to_ref($symname)} } == \&{ $exported };
+	*{ Symbol::qualify_to_ref($symname) } = \&{*{ Symbol::qualify_to_ref($symname)} };
     }
 }
 

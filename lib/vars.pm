@@ -32,7 +32,7 @@ sub import {
 		 : $ch eq "\@" ? \@{*{Symbol::qualify_to_ref($sym)}}
 		 : $ch eq "\%" ? \%{*{Symbol::qualify_to_ref($sym)}}
 		 : $ch eq "\*" ? \*{Symbol::qualify_to_ref($sym)}
-		 : $ch eq "\&" ? \&{Symbol::qualify_to_ref($sym)}
+		 : $ch eq "\&" ? \&{*{Symbol::qualify_to_ref($sym)}}
 		 : do {
 		     require Carp;
 		     Carp::croak("'$_' is not a valid variable name");

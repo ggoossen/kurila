@@ -63,9 +63,9 @@ sub stringify {
 
 	return 'undef' unless defined $_ or not $printUndef;
 	return $_ . "" if ref \$_ eq 'GLOB';
-	$_ = &{Symbol::qualify_to_ref('overload::StrVal')}($_) 
+	$_ = &{*{Symbol::qualify_to_ref('overload::StrVal')}}($_) 
 	  if $bareStringify and ref $_ 
-	    and %{Symbol::stash("overload")} and defined &{Symbol::qualify_to_ref('overload::StrVal')};
+	    and %{Symbol::stash("overload")} and defined &{*{Symbol::qualify_to_ref('overload::StrVal')}};
 	
 	if ($tick eq 'auto') {
 	    if (ord('A') == 193) {
@@ -160,8 +160,8 @@ sub unwrap {
     # Check for reused addresses
     if (ref $v) { 
       my $val = $v;
-      $val = &{Symbol::qualify_to_ref('overload::StrVal')}($v) 
-	if %{Symbol::stash("overload")} and defined &{Symbol::qualify_to_ref('overload::StrVal')};
+      $val = &{*{Symbol::qualify_to_ref('overload::StrVal')}}($v) 
+	if %{Symbol::stash("overload")} and defined &{*{Symbol::qualify_to_ref('overload::StrVal')}};
       # Match type and address.                      
       # Unblessed references will look like TYPE(0x...)
       # Blessed references will look like Class=TYPE(0x...)
@@ -452,7 +452,7 @@ sub findsubs {
   return undef unless %DB::sub;
   my ($addr, $name, $loc);
   while (($name, $loc) = each %DB::sub) {
-    $addr = \&$name;
+    $addr = \&{*{Symbol::qualify_to_ref($name)}};
     $subs{"$addr"} = $name;
   }
   $subdump = 0;

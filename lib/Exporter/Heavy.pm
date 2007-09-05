@@ -193,12 +193,12 @@ sub heavy_export {
 
     foreach $sym (@imports) {
 	# shortcut for the common case of no type character
-	(*{Symbol::qualify_to_ref("${callpkg}::$sym")} = \&{Symbol::qualify_to_ref("${pkg}::$sym")}, next)
+	(*{Symbol::qualify_to_ref("${callpkg}::$sym")} = \&{*{Symbol::qualify_to_ref("${pkg}::$sym")}}, next)
 	    unless $sym =~ s/^(\W)//;
 	$type = $1;
 	no warnings 'once';
 	*{Symbol::qualify_to_ref("${callpkg}::$sym")} =
-	    $type eq '&' ? \&{Symbol::qualify_to_ref("${pkg}::$sym")} :
+	    $type eq '&' ? \&{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
 	    $type eq '$' ? \${*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
 	    $type eq '@' ? \@{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
 	    $type eq '%' ? \%{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
