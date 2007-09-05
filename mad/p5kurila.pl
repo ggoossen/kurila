@@ -205,7 +205,7 @@ sub is_string_op {
     # string constants, concatenations
     return 1 if $op->tag =~ m/^op_(const|concat)$/;
     # core functions returning a string
-    return 1 if $op->tag =~ m/^op_(sprintf)$/;
+    return 1 if $op->tag =~ m/^op_(sprintf|join)$/;
     # stringify
     return 1 if $op->tag eq "op_null" and ($op->att('was') || '') eq "stringify";
 
