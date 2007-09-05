@@ -220,6 +220,7 @@ sub is_string_op {
                 for (reverse $op_x->findnodes("preceding-sibling::*")) {
                     next unless ($_->findnodes("*[\@targ='$targ']"));
                     last if $_->tag eq "op_leavesub";
+                    # assignment of string to $var
                     if ($_->tag eq "op_sassign") {
                         my ($src, $dst) = $_->findnodes("*[\@seq]");
                         if ($dst->tag eq "op_padsv" and $dst->att("targ") eq $targ
@@ -227,6 +228,14 @@ sub is_string_op {
                             return 1;
                         }
                     }
+                    # substitute on $var
+                    if ($_->tag eq "op_subst") {
+                        my $dst = fst $_->findnodes("*[\@seq]");
+                        if ($dst->tag eq "op_padsv" and $dst->att("targ") eq $targ) {
+                            return 1;
+                        }
+                    }
+                    # unknown fail.
                     return 0;
                 }
             }

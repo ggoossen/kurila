@@ -194,6 +194,14 @@ my $string = "s";
 my $string = "s";
 @{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
 ===
+my $string;
+$string =~ s/a/b/;
+@{$string} = sub { 1 };
+---
+my $string;
+$string =~ s/a/b/;
+@{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
+===
 my $x = "string";
 sub foo {
   my $h;
