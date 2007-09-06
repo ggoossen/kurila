@@ -612,11 +612,6 @@ S_sequence(pTHX_ register const OP *o)
     if (!o)
 	return;
 
-#ifdef PERL_MAD
-    if (o->op_next == 0)
- 	return;
-#endif
-
     if (!Sequence)
 	Sequence = newHV();
 
