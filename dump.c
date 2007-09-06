@@ -124,7 +124,7 @@ Perl_dump_sub(pTHX_ const GV *gv)
     SV * const sv = sv_newmortal();
 
     gv_fullname3(sv, gv, NULL);
-    Perl_dump_indent(aTHX_ 0, Perl_debug_log, "\nSUB %s = ", SvPVX_const(sv));
+    Perl_dump_indent(aTHX_ 0, Perl_debug_log, "SUB %s = ", SvPVX_const(sv));
     if (CvISXSUB(GvCV(gv)))
 	Perl_dump_indent(aTHX_ 0, Perl_debug_log, "(xsub 0x%"UVxf" %d)\n",
 	    PTR2UV(CvXSUB(GvCV(gv))),
@@ -744,205 +744,230 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     Perl_dump_indent(aTHX_ level, file, "ADDR = 0x%"UVxf" => 0x%"UVxf"\n", (UV)o, (UV)o->op_next);
 #endif
     if (o->op_flags || o->op_latefree || o->op_latefreed || o->op_attached) {
-	SV * const tmpsv = newSVpvs("");
-	switch (o->op_flags & OPf_WANT) {
-	case OPf_WANT_VOID:
-	    sv_catpv(tmpsv, ",VOID");
-	    break;
-	case OPf_WANT_SCALAR:
-	    sv_catpv(tmpsv, ",SCALAR");
-	    break;
-	case OPf_WANT_LIST:
-	    sv_catpv(tmpsv, ",LIST");
-	    break;
-	default:
-	    sv_catpv(tmpsv, ",UNKNOWN");
-	    break;
-	}
-	if (o->op_flags & OPf_KIDS)
-	    sv_catpv(tmpsv, ",KIDS");
-	if (o->op_flags & OPf_PARENS)
-	    sv_catpv(tmpsv, ",PARENS");
-	if (o->op_flags & OPf_STACKED)
-	    sv_catpv(tmpsv, ",STACKED");
-	if (o->op_flags & OPf_REF)
-	    sv_catpv(tmpsv, ",REF");
-	if (o->op_flags & OPf_MOD)
-	    sv_catpv(tmpsv, ",MOD");
-	if (o->op_flags & OPf_SPECIAL)
-	    sv_catpv(tmpsv, ",SPECIAL");
-	if (o->op_latefree)
-	    sv_catpv(tmpsv, ",LATEFREE");
-	if (o->op_latefreed)
-	    sv_catpv(tmpsv, ",LATEFREED");
-	if (o->op_attached)
-	    sv_catpv(tmpsv, ",ATTACHED");
+
+	/* call the refactored bits */
+	SV * const tmpsv = S_dump_op_flags(aTHX_ o);
 	Perl_dump_indent(aTHX_ level, file, "FLAGS = (%s)\n", SvCUR(tmpsv) ? SvPVX_const(tmpsv) + 1 : "");
-	SvREFCNT_dec(tmpsv);
     }
     if (o->op_private) {
-	SV * const tmpsv = newSVpvs("");
-	if (PL_opargs[optype] & OA_TARGLEX) {
-	    if (o->op_private & OPpTARGET_MY)
-		sv_catpv(tmpsv, ",TARGET_MY");
-	}
-	else if (optype == OP_LEAVESUB ||
-		 optype == OP_LEAVE ||
-		 optype == OP_LEAVESUBLV) {
-	    if (o->op_private & OPpREFCOUNTED)
-		sv_catpv(tmpsv, ",REFCOUNTED");
-	}
-        else if (optype == OP_AASSIGN) {
-	    if (o->op_private & OPpASSIGN_COMMON)
-		sv_catpv(tmpsv, ",COMMON");
-	}
-	else if (optype == OP_SASSIGN) {
-	    if (o->op_private & OPpASSIGN_BACKWARDS)
-		sv_catpv(tmpsv, ",BACKWARDS");
-	}
-	else if (optype == OP_TRANS) {
-	    if (o->op_private & OPpTRANS_SQUASH)
-		sv_catpv(tmpsv, ",SQUASH");
-	    if (o->op_private & OPpTRANS_DELETE)
-		sv_catpv(tmpsv, ",DELETE");
-	    if (o->op_private & OPpTRANS_COMPLEMENT)
-		sv_catpv(tmpsv, ",COMPLEMENT");
-	    if (o->op_private & OPpTRANS_IDENTICAL)
-		sv_catpv(tmpsv, ",IDENTICAL");
-	    if (o->op_private & OPpTRANS_GROWS)
-		sv_catpv(tmpsv, ",GROWS");
-	}
-	else if (optype == OP_REPEAT) {
-	    if (o->op_private & OPpREPEAT_DOLIST)
-		sv_catpv(tmpsv, ",DOLIST");
-	}
-	else if (optype == OP_ENTERSUB ||
-		 optype == OP_RV2SV ||
-		 optype == OP_GVSV ||
-		 optype == OP_RV2AV ||
-		 optype == OP_RV2HV ||
-		 optype == OP_RV2GV ||
-		 optype == OP_AELEM ||
-		 optype == OP_HELEM )
-	{
-	    if (optype == OP_ENTERSUB) {
-		if (o->op_private & OPpENTERSUB_AMPER)
-		    sv_catpv(tmpsv, ",AMPER");
-		if (o->op_private & OPpENTERSUB_DB)
-		    sv_catpv(tmpsv, ",DB");
-		if (o->op_private & OPpENTERSUB_HASTARG)
-		    sv_catpv(tmpsv, ",HASTARG");
-		if (o->op_private & OPpENTERSUB_NOPAREN)
-		    sv_catpv(tmpsv, ",NOPAREN");
-		if (o->op_private & OPpENTERSUB_INARGS)
-		    sv_catpv(tmpsv, ",INARGS");
-		if (o->op_private & OPpENTERSUB_NOMOD)
-		    sv_catpv(tmpsv, ",NOMOD");
-	    }
-	    else {
-		switch (o->op_private & OPpDEREF) {
-		case OPpDEREF_SV:
-		    sv_catpv(tmpsv, ",SV");
-		    break;
-		case OPpDEREF_AV:
-		    sv_catpv(tmpsv, ",AV");
-		    break;
-		case OPpDEREF_HV:
-		    sv_catpv(tmpsv, ",HV");
-		    break;
-		}
-		if (o->op_private & OPpMAYBE_LVSUB)
-		    sv_catpv(tmpsv, ",MAYBE_LVSUB");
-	    }
-	    if (optype == OP_AELEM || optype == OP_HELEM) {
-		if (o->op_private & OPpLVAL_DEFER)
-		    sv_catpv(tmpsv, ",LVAL_DEFER");
-	    }
-	    else {
-		if (o->op_private & OPpOUR_INTRO)
-		    sv_catpv(tmpsv, ",OUR_INTRO");
-	    }
-	}
-	else if (optype == OP_CONST) {
-	    if (o->op_private & OPpCONST_BARE)
-		sv_catpv(tmpsv, ",BARE");
-	    if (o->op_private & OPpCONST_STRICT)
-		sv_catpv(tmpsv, ",STRICT");
-	    if (o->op_private & OPpCONST_WARNING)
-		sv_catpv(tmpsv, ",WARNING");
-	    if (o->op_private & OPpCONST_ENTERED)
-		sv_catpv(tmpsv, ",ENTERED");
-	}
-	else if (optype == OP_FLIP) {
-	    if (o->op_private & OPpFLIP_LINENUM)
-		sv_catpv(tmpsv, ",LINENUM");
-	}
-	else if (optype == OP_FLOP) {
-	    if (o->op_private & OPpFLIP_LINENUM)
-		sv_catpv(tmpsv, ",LINENUM");
-	}
-	else if (optype == OP_RV2CV) {
-	    if (o->op_private & OPpLVAL_INTRO)
-		sv_catpv(tmpsv, ",INTRO");
-	}
-	else if (optype == OP_GV) {
-	    if (o->op_private & OPpEARLY_CV)
-		sv_catpv(tmpsv, ",EARLY_CV");
-	}
-	else if (optype == OP_LIST) {
-	    if (o->op_private & OPpLIST_GUESSED)
-		sv_catpv(tmpsv, ",GUESSED");
-	}
-	else if (optype == OP_DELETE) {
-	    if (o->op_private & OPpSLICE)
-		sv_catpv(tmpsv, ",SLICE");
-	}
-	else if (optype == OP_EXISTS) {
-	    if (o->op_private & OPpEXISTS_SUB)
-		sv_catpv(tmpsv, ",EXISTS_SUB");
-	}
-	else if (optype == OP_SORT) {
-	    if (o->op_private & OPpSORT_NUMERIC)
-		sv_catpv(tmpsv, ",NUMERIC");
-	    if (o->op_private & OPpSORT_INTEGER)
-		sv_catpv(tmpsv, ",INTEGER");
-	    if (o->op_private & OPpSORT_REVERSE)
-		sv_catpv(tmpsv, ",REVERSE");
-	}
-	else if (optype == OP_OPEN || optype == OP_BACKTICK) {
-	    if (o->op_private & OPpOPEN_IN_RAW)
-		sv_catpv(tmpsv, ",IN_RAW");
-	    if (o->op_private & OPpOPEN_IN_CRLF)
-		sv_catpv(tmpsv, ",IN_CRLF");
-	    if (o->op_private & OPpOPEN_OUT_RAW)
-		sv_catpv(tmpsv, ",OUT_RAW");
-	    if (o->op_private & OPpOPEN_OUT_CRLF)
-		sv_catpv(tmpsv, ",OUT_CRLF");
-	}
-	else if (optype == OP_EXIT) {
-	    if (o->op_private & OPpEXIT_VMSISH)
-		sv_catpv(tmpsv, ",EXIT_VMSISH");
-	    if (o->op_private & OPpHUSH_VMSISH)
-		sv_catpv(tmpsv, ",HUSH_VMSISH");
-	}
-	else if (optype == OP_DIE) {
-	    if (o->op_private & OPpHUSH_VMSISH)
-		sv_catpv(tmpsv, ",HUSH_VMSISH");
-	}
-	else if (PL_check[optype] != MEMBER_TO_FPTR(Perl_ck_ftst)) {
-	    if (OP_IS_FILETEST_ACCESS(o) && o->op_private & OPpFT_ACCESS)
-		sv_catpv(tmpsv, ",FT_ACCESS");
-	    if (o->op_private & OPpFT_STACKED)
-		sv_catpv(tmpsv, ",FT_STACKED");
-	}
-	if (o->op_flags & OPf_MOD && o->op_private & OPpLVAL_INTRO)
-	    sv_catpv(tmpsv, ",INTRO");
+	SV * const tmpsv = S_dump_op_flags_private(aTHX_ o);
 	if (SvCUR(tmpsv))
 	    Perl_dump_indent(aTHX_ level, file, "PRIVATE = (%s)\n", SvPVX_const(tmpsv) + 1);
-	SvREFCNT_dec(tmpsv);
     }
+    S_dump_op_mad(aTHX_ level, file, o);
+    S_dump_op_rest(aTHX_ level, file, o);
+}
+    
+STATIC SV* S_dump_op_flags(pTHX_ const OP* o)
+{
+    SV * const tmpsv = sv_2mortal(newSVpvs(""));
+    switch (o->op_flags & OPf_WANT) {
+    case OPf_WANT_VOID:
+	sv_catpv(tmpsv, ",VOID");
+	break;
+    case OPf_WANT_SCALAR:
+	sv_catpv(tmpsv, ",SCALAR");
+	break;
+    case OPf_WANT_LIST:
+	sv_catpv(tmpsv, ",LIST");
+	break;
+    default:
+	sv_catpv(tmpsv, ",UNKNOWN");
+	break;
+    }
+    if (o->op_flags & OPf_KIDS)
+	sv_catpv(tmpsv, ",KIDS");
+    if (o->op_flags & OPf_PARENS)
+	sv_catpv(tmpsv, ",PARENS");
+    if (o->op_flags & OPf_STACKED)
+	sv_catpv(tmpsv, ",STACKED");
+    if (o->op_flags & OPf_REF)
+	sv_catpv(tmpsv, ",REF");
+    if (o->op_flags & OPf_MOD)
+	sv_catpv(tmpsv, ",MOD");
+    if (o->op_flags & OPf_SPECIAL)
+	sv_catpv(tmpsv, ",SPECIAL");
+    if (o->op_latefree)
+	sv_catpv(tmpsv, ",LATEFREE");
+    if (o->op_latefreed)
+	sv_catpv(tmpsv, ",LATEFREED");
+    if (o->op_attached)
+	sv_catpv(tmpsv, ",ATTACHED");
+    
+    return tmpsv;
+}
 
-#ifdef PERL_MAD
+STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
+{
+    const OPCODE optype = o->op_type;
+    SV * const tmpsv = sv_2mortal(newSVpvs(""));
+
+    if (PL_opargs[optype] & OA_TARGLEX) {
+	if (o->op_private & OPpTARGET_MY)
+	    sv_catpv(tmpsv, ",TARGET_MY");
+    }
+    else if (optype == OP_LEAVESUB ||
+	     optype == OP_LEAVE ||
+	     optype == OP_LEAVESUBLV) {
+	if (o->op_private & OPpREFCOUNTED)
+	    sv_catpv(tmpsv, ",REFCOUNTED");
+    }
+    else if (optype == OP_AASSIGN) {
+	if (o->op_private & OPpASSIGN_COMMON)
+	    sv_catpv(tmpsv, ",COMMON");
+    }
+    else if (optype == OP_SASSIGN) {
+	if (o->op_private & OPpASSIGN_BACKWARDS)
+	    sv_catpv(tmpsv, ",BACKWARDS");
+    }
+    else if (optype == OP_TRANS) {
+	if (o->op_private & OPpTRANS_SQUASH)
+	    sv_catpv(tmpsv, ",SQUASH");
+	if (o->op_private & OPpTRANS_DELETE)
+	    sv_catpv(tmpsv, ",DELETE");
+	if (o->op_private & OPpTRANS_COMPLEMENT)
+	    sv_catpv(tmpsv, ",COMPLEMENT");
+	if (o->op_private & OPpTRANS_IDENTICAL)
+	    sv_catpv(tmpsv, ",IDENTICAL");
+	if (o->op_private & OPpTRANS_GROWS)
+	    sv_catpv(tmpsv, ",GROWS");
+    }
+    else if (optype == OP_REPEAT) {
+	if (o->op_private & OPpREPEAT_DOLIST)
+	    sv_catpv(tmpsv, ",DOLIST");
+    }
+    else if (optype == OP_ENTERSUB ||
+	     optype == OP_RV2SV ||
+	     optype == OP_GVSV ||
+	     optype == OP_RV2AV ||
+	     optype == OP_RV2HV ||
+	     optype == OP_RV2GV ||
+	     optype == OP_AELEM ||
+	     optype == OP_HELEM )
+    {
+	if (optype == OP_ENTERSUB) {
+	    if (o->op_private & OPpENTERSUB_AMPER)
+		sv_catpv(tmpsv, ",AMPER");
+	    if (o->op_private & OPpENTERSUB_DB)
+		sv_catpv(tmpsv, ",DB");
+	    if (o->op_private & OPpENTERSUB_HASTARG)
+		sv_catpv(tmpsv, ",HASTARG");
+	    if (o->op_private & OPpENTERSUB_NOPAREN)
+		sv_catpv(tmpsv, ",NOPAREN");
+	    if (o->op_private & OPpENTERSUB_INARGS)
+		sv_catpv(tmpsv, ",INARGS");
+	    if (o->op_private & OPpENTERSUB_NOMOD)
+		sv_catpv(tmpsv, ",NOMOD");
+	}
+	else {
+	    switch (o->op_private & OPpDEREF) {
+	    case OPpDEREF_SV:
+		sv_catpv(tmpsv, ",SV");
+		break;
+	    case OPpDEREF_AV:
+		sv_catpv(tmpsv, ",AV");
+		break;
+	    case OPpDEREF_HV:
+		sv_catpv(tmpsv, ",HV");
+		break;
+	    }
+	    if (o->op_private & OPpMAYBE_LVSUB)
+		sv_catpv(tmpsv, ",MAYBE_LVSUB");
+	}
+	if (optype == OP_AELEM || optype == OP_HELEM) {
+	    if (o->op_private & OPpLVAL_DEFER)
+		sv_catpv(tmpsv, ",LVAL_DEFER");
+	}
+	else {
+	    if (o->op_private & OPpOUR_INTRO)
+		sv_catpv(tmpsv, ",OUR_INTRO");
+	}
+    }
+    else if (optype == OP_CONST) {
+	if (o->op_private & OPpCONST_BARE)
+	    sv_catpv(tmpsv, ",BARE");
+	if (o->op_private & OPpCONST_STRICT)
+	    sv_catpv(tmpsv, ",STRICT");
+	if (o->op_private & OPpCONST_WARNING)
+	    sv_catpv(tmpsv, ",WARNING");
+	if (o->op_private & OPpCONST_ENTERED)
+	    sv_catpv(tmpsv, ",ENTERED");
+    }
+    else if (optype == OP_FLIP) {
+	if (o->op_private & OPpFLIP_LINENUM)
+	    sv_catpv(tmpsv, ",LINENUM");
+    }
+    else if (optype == OP_FLOP) {
+	if (o->op_private & OPpFLIP_LINENUM)
+	    sv_catpv(tmpsv, ",LINENUM");
+    }
+    else if (optype == OP_RV2CV) {
+	if (o->op_private & OPpLVAL_INTRO)
+	    sv_catpv(tmpsv, ",INTRO");
+    }
+    else if (optype == OP_GV) {
+	if (o->op_private & OPpEARLY_CV)
+	    sv_catpv(tmpsv, ",EARLY_CV");
+    }
+    else if (optype == OP_LIST) {
+	if (o->op_private & OPpLIST_GUESSED)
+	    sv_catpv(tmpsv, ",GUESSED");
+    }
+    else if (optype == OP_DELETE) {
+	if (o->op_private & OPpSLICE)
+	    sv_catpv(tmpsv, ",SLICE");
+    }
+    else if (optype == OP_EXISTS) {
+	if (o->op_private & OPpEXISTS_SUB)
+	    sv_catpv(tmpsv, ",EXISTS_SUB");
+    }
+    else if (optype == OP_SORT) {
+	if (o->op_private & OPpSORT_NUMERIC)
+	    sv_catpv(tmpsv, ",NUMERIC");
+	if (o->op_private & OPpSORT_INTEGER)
+	    sv_catpv(tmpsv, ",INTEGER");
+	if (o->op_private & OPpSORT_REVERSE)
+	    sv_catpv(tmpsv, ",REVERSE");
+    }
+    else if (optype == OP_OPEN || optype == OP_BACKTICK) {
+	if (o->op_private & OPpOPEN_IN_RAW)
+	    sv_catpv(tmpsv, ",IN_RAW");
+	if (o->op_private & OPpOPEN_IN_CRLF)
+	    sv_catpv(tmpsv, ",IN_CRLF");
+	if (o->op_private & OPpOPEN_OUT_RAW)
+	    sv_catpv(tmpsv, ",OUT_RAW");
+	if (o->op_private & OPpOPEN_OUT_CRLF)
+	    sv_catpv(tmpsv, ",OUT_CRLF");
+    }
+    else if (optype == OP_EXIT) {
+	if (o->op_private & OPpEXIT_VMSISH)
+	    sv_catpv(tmpsv, ",EXIT_VMSISH");
+	if (o->op_private & OPpHUSH_VMSISH)
+	    sv_catpv(tmpsv, ",HUSH_VMSISH");
+    }
+    else if (optype == OP_DIE) {
+	if (o->op_private & OPpHUSH_VMSISH)
+	    sv_catpv(tmpsv, ",HUSH_VMSISH");
+    }
+    else if (PL_check[optype] != MEMBER_TO_FPTR(Perl_ck_ftst)) {
+	if (OP_IS_FILETEST_ACCESS(o) && o->op_private & OPpFT_ACCESS)
+	    sv_catpv(tmpsv, ",FT_ACCESS");
+	if (o->op_private & OPpFT_STACKED)
+	    sv_catpv(tmpsv, ",FT_STACKED");
+    }
+    if (o->op_flags & OPf_MOD && o->op_private & OPpLVAL_INTRO)
+	sv_catpv(tmpsv, ",INTRO");
+    
+    return tmpsv;
+}
+
+static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
+{
+#ifndef PERL_MAD
+    PERL_UNUSED_ARG(level);
+    PERL_UNUSED_ARG(file);
+    PERL_UNUSED_ARG(o);
+#else
     if (PL_madskills && o->op_madprop) {
 	SV * const tmpsv = newSVpvn("", 0);
 	MADPROP* mp = o->op_madprop;
@@ -984,6 +1009,11 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	SvREFCNT_dec(tmpsv);
     }
 #endif
+}
+
+static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
+{
+    const OPCODE optype = o->op_type;
 
     switch (optype) {
     case OP_AELEMFAST:
@@ -1074,6 +1104,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     default:
 	break;
     }
+
     if (o->op_flags & OPf_KIDS) {
 	OP *kid;
 	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling)
@@ -2493,38 +2524,12 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 #ifdef DUMPADDR
     PerlIO_printf(file, " addr=\"0x%"UVxf" => 0x%"UVxf"\"", (UV)o, (UV)o->op_next);
 #endif
-    if (o->op_flags) {
-	SV * const tmpsv = newSVpvn("", 0);
-	switch (o->op_flags & OPf_WANT) {
-	case OPf_WANT_VOID:
-	    sv_catpv(tmpsv, ",VOID");
-	    break;
-	case OPf_WANT_SCALAR:
-	    sv_catpv(tmpsv, ",SCALAR");
-	    break;
-	case OPf_WANT_LIST:
-	    sv_catpv(tmpsv, ",LIST");
-	    break;
-	default:
-	    sv_catpv(tmpsv, ",UNKNOWN");
-	    break;
-	}
-	if (o->op_flags & OPf_KIDS)
-	    sv_catpv(tmpsv, ",KIDS");
-	if (o->op_flags & OPf_PARENS)
-	    sv_catpv(tmpsv, ",PARENS");
-	if (o->op_flags & OPf_STACKED)
-	    sv_catpv(tmpsv, ",STACKED");
-	if (o->op_flags & OPf_REF)
-	    sv_catpv(tmpsv, ",REF");
-	if (o->op_flags & OPf_MOD)
-	    sv_catpv(tmpsv, ",MOD");
-	if (o->op_flags & OPf_SPECIAL)
-	    sv_catpv(tmpsv, ",SPECIAL");
+    if (o->op_flags ) {  /* || o->op_latefree || o->op_latefreed || o->op_attached) { */
+	SV * const tmpsv = S_dump_op_flags(aTHX_ o);
 	PerlIO_printf(file, " flags=\"%s\"", SvCUR(tmpsv) ? SvPVX(tmpsv) + 1 : "");
-	SvREFCNT_dec(tmpsv);
     }
     if (o->op_private) {
+<<<<<<< HEAD:dump.c
 	SV * const tmpsv = newSVpvn("", 0);
 	if (PL_opargs[o->op_type] & OA_TARGLEX) {
 	    if (o->op_private & OPpTARGET_MY)
@@ -2682,9 +2687,11 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
 	if (o->op_flags & OPf_MOD && o->op_private & OPpLVAL_INTRO)
 	    sv_catpv(tmpsv, ",INTRO");
+=======
+	SV * const tmpsv = S_dump_op_flags_private(aTHX_ o);
+>>>>>>> 213514f... dump.c refactoring by Jim Cromie: carves long func into 3 new ones - in situ:dump.c
 	if (SvCUR(tmpsv))
 	    S_xmldump_attr(aTHX_ level, file, "private=\"%s\"", SvPVX(tmpsv) + 1);
-	SvREFCNT_dec(tmpsv);
     }
 
     switch (o->op_type) {

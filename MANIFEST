@@ -106,6 +106,7 @@ ext/B/t/optree_samples.t	various basic codes: if for while
 ext/B/t/optree_sort.t		inplace sort optimization regression
 ext/B/t/optree_specials.t	BEGIN, END, etc code
 ext/B/t/optree_varinit.t	my,our,local var init optimization
+ext/B/t/debugging.t	-Dx optree rendering
 ext/B/t/o.t		See if O works
 ext/B/t/pluglib/B/Lint/Plugin/Test.pm	See if B::Lint works
 ext/B/t/pragma.t	See if user pragmas work.

@@ -4300,9 +4300,6 @@ PERL_CALLCONV void	Perl_pad_fixup_inner_anons(pTHX_ PADLIST *padlist, CV *old_cv
 PERL_CALLCONV void	Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV HV*	Perl_pad_compname_type(pTHX_ const PADOFFSET po)
-			__attribute__warn_unused_result__;
-
 
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 STATIC PADOFFSET	S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn, SV** out_capture, SV** out_name_sv, int *out_flags)
@@ -4676,6 +4673,23 @@ PERL_CALLCONV void	Perl_mro_method_changed_in(pTHX_ HV* stash)
 			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV void	Perl_boot_core_mro(pTHX);
+
+#if defined(PERL_IN_DUMP_C)
+STATIC SV*	S_dump_op_flags(pTHX_ const OP* o)
+			__attribute__nonnull__(pTHX_1);
+
+STATIC SV*	S_dump_op_flags_private(pTHX_ const OP* o)
+			__attribute__nonnull__(pTHX_1);
+
+STATIC void	S_dump_op_mad(pTHX_ I32 level, PerlIO *file, const OP *o)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
+
+STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
+
+#endif
 
 END_EXTERN_C
 /*

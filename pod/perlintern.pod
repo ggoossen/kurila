@@ -644,8 +644,6 @@ X<pad_add_name>
 
 Create a new name and associated PADMY SV in the current pad; return the
 offset.
-If C<typestash> is valid, the name is for a typed lexical; set the
-name's stash to that value.
 If C<ourstash> is valid, it's an our lexical, set the name's
 SvOURSTASH to that value
 

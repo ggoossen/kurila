@@ -503,18 +503,23 @@ sub label {
 sub getRendering {
     my $tc = shift;
     fail("getRendering: code or prog is required")
-	unless $tc->{code} or $tc->{prog};
+	unless $tc->{code} or $tc->{prog} or $tc->{Dx};
 
     my @opts = get_bcopts($tc);
     my $rendering = ''; # suppress "Use of uninitialized value in open"
     my @errs;		# collect errs via 
 
-
-    if ($tc->{prog}) {
+    if ($tc->{Dx}) {
+	$rendering = runperl( switches => ['-w',join(',',"-Dx",@opts)],
+			      prog => $tc->{Dx}, stderr => 1,
+			      ); # verbose => 1);
+    }
+    elsif ($tc->{prog}) {
 	$rendering = runperl( switches => ['-w',join(',',"-MO=Concise",@opts)],
 			      prog => $tc->{prog}, stderr => 1,
 			      ); # verbose => 1);
-    } else {
+    } 
+    elsif ($tc->{code}) {
 	my $code = $tc->{code};
 	unless (ref $code eq 'CODE') {
 	    # treat as source, and wrap into subref 
@@ -539,6 +544,9 @@ sub getRendering {
 
 	# kludge error into rendering if its empty.
 	$rendering = $@ if $@ and ! $rendering;
+    }
+    else {
+	die "bad testcase; no prog, code or Dx parameter\n";
     }
     # separate banner, other stuff whose printing order isnt guaranteed
     if ($tc->{strip}) {
