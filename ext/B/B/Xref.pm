@@ -188,7 +188,7 @@ sub xref {
 	    xref($op->pmreplstart);
 	} else {
 	    no strict 'refs';
-	    my $ppname = "pp_$opname";
+	    my $ppname = *{Symbol::qualify_to_ref("pp_$opname")};
 	    &$ppname($op) if defined(&$ppname);
 	}
     }

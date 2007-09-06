@@ -185,13 +185,8 @@ EOT_EOT
 # 3  <1> leavesub[2 refs] K/REFC,1 ->(end)
 # -     <@> lineseq K ->3
 # 1        <;> nextstate(constant 61 constant.pm:118) v:*,& ->2
-# 2        <0> padav[@list:FAKE:m:71] ->3
+# 2        <0> padav[@list:FAKE:m:73] ->3
 EONT_EONT
-
-if($] < 5.009) {
-    # 5.8.x doesn't add the m flag to padav
-    s/FAKE:m:\d+/FAKE/ foreach ($expect, $expect_nt);
-}
 
 checkOptree ( name	=> 'constant sub returning list',
 	      code	=> \&WEEKDAYS,

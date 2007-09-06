@@ -461,9 +461,9 @@ sub stash_subs {
 	$stash = \%::;
     }
     else {
-	$pack =~ s/(::)?$/::/;
+	$pack =~ s/(::)?$//;
 	no strict 'refs';
-	$stash = \%$pack;
+	$stash = \%{Symbol::stash($pack)};
     }
     my %stash = svref_2object($stash)->ARRAY;
     while (my ($key, $val) = each %stash) {

@@ -41,8 +41,7 @@ sub import {
 		croak "use of backend $backend failed: $@";
 	    }
 
-            no strict 'refs';
-	    my $compilesub = &{"B::${backend}::compile"}(@options);
+	    my $compilesub = &{*{Symbol::qualify_to_ref("B::${backend}::compile")}}(@options);
 	    if (ref($compilesub) ne "CODE") {
 		die $compilesub;
 	    }

@@ -331,7 +331,7 @@ for (
     my ( $subname, $attr, $pad_attr ) = @$_;
     my $target = do {    ## no critic strict
         no strict 'refs';
-        \*$subname;
+        \*{Symbol::qualify_to_ref($subname)};
     };
     *$target = sub {
         my ($op) = @_;
