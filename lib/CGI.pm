@@ -959,32 +959,19 @@ sub element_tab {
 ###############################################################################
 ################# THESE FUNCTIONS ARE AUTOLOADED ON DEMAND ####################
 ###############################################################################
-$AUTOLOADED_ROUTINES = '';      # get rid of -w warning
-$AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 
-%SUBS = (
-
-'URL_ENCODED'=> <<'END_OF_FUNC',
 sub URL_ENCODED { 'application/x-www-form-urlencoded'; }
-END_OF_FUNC
 
-'MULTIPART' => <<'END_OF_FUNC',
 sub MULTIPART {  'multipart/form-data'; }
-END_OF_FUNC
 
-'SERVER_PUSH' => <<'END_OF_FUNC',
 sub SERVER_PUSH { 'multipart/x-mixed-replace;boundary="' . shift() . '"'; }
-END_OF_FUNC
 
-'new_MultipartBuffer' => <<'END_OF_FUNC',
 # Create a new multipart buffer
 sub new_MultipartBuffer {
     my($self,$boundary,$length) = @_;
     return MultipartBuffer->new($self,$boundary,$length);
 }
-END_OF_FUNC
 
-'read_from_client' => <<'END_OF_FUNC',
 # Read data from a file handle
 sub read_from_client {
     my($self, $buff, $len, $offset) = @_;
@@ -993,9 +980,7 @@ sub read_from_client {
         ? $self->r->read($$buff, $len, $offset)
         : read(\*STDIN, $$buff, $len, $offset);
 }
-END_OF_FUNC
 
-'delete' => <<'END_OF_FUNC',
 #### Method: delete
 # Deletes the named parameter entirely.
 ####
@@ -1013,13 +998,11 @@ sub delete {
     @{$self->{'.parameters'}}=grep { !exists($to_delete{$_}) } $self->param();
     return;
 }
-END_OF_FUNC
 
 #### Method: import_names
 # Import all parameters into the given namespace.
 # Assumes namespace 'Q' if not specified
 ####
-'import_names' => <<'END_OF_FUNC',
 sub import_names {
     my($self,$namespace,$delete) = self_or_default(@_);
     $namespace = 'Q' unless defined($namespace);
@@ -1044,14 +1027,12 @@ sub import_names {
 	$symbol = $value[0];
     }
 }
-END_OF_FUNC
 
 #### Method: keywords
 # Keywords acts a bit differently.  Calling it in a list context
 # returns the list of keywords.  
 # Calling it in a scalar context gives you the size of the list.
 ####
-'keywords' => <<'END_OF_FUNC',
 sub keywords {
     my($self,@values) = self_or_default(@_);
     # If values is provided, then we set it.
@@ -1059,11 +1040,9 @@ sub keywords {
     my(@result) = defined($self->{'keywords'}) ? @{$self->{'keywords'}} : ();
     @result;
 }
-END_OF_FUNC
 
 # These are some tie() interfaces for compatibility
 # with Steve Brenner's cgi-lib.pl routines
-'Vars' => <<'END_OF_FUNC',
 sub Vars {
     my $q = shift;
     my %in;
@@ -1071,11 +1050,9 @@ sub Vars {
     return %in if wantarray;
     return \%in;
 }
-END_OF_FUNC
 
 # These are some tie() interfaces for compatibility
 # with Steve Brenner's cgi-lib.pl routines
-'ReadParse' => <<'END_OF_FUNC',
 sub ReadParse {
     local(*in);
     if (@_) {
@@ -1087,50 +1064,36 @@ sub ReadParse {
     tie(%in,CGI);
     return scalar(keys %in);
 }
-END_OF_FUNC
 
-'PrintHeader' => <<'END_OF_FUNC',
 sub PrintHeader {
     my($self) = self_or_default(@_);
     return $self->header();
 }
-END_OF_FUNC
 
-'HtmlTop' => <<'END_OF_FUNC',
 sub HtmlTop {
     my($self,@p) = self_or_default(@_);
     return $self->start_html(@p);
 }
-END_OF_FUNC
 
-'HtmlBot' => <<'END_OF_FUNC',
 sub HtmlBot {
     my($self,@p) = self_or_default(@_);
     return $self->end_html(@p);
 }
-END_OF_FUNC
 
-'SplitParam' => <<'END_OF_FUNC',
 sub SplitParam {
     my ($param) = @_;
     my (@params) = split ("\0", $param);
     return (wantarray ? @params : $params[0]);
 }
-END_OF_FUNC
 
-'MethGet' => <<'END_OF_FUNC',
 sub MethGet {
     return request_method() eq 'GET';
 }
-END_OF_FUNC
 
-'MethPost' => <<'END_OF_FUNC',
 sub MethPost {
     return request_method() eq 'POST';
 }
-END_OF_FUNC
 
-'TIEHASH' => <<'END_OF_FUNC',
 sub TIEHASH {
     my $class = shift;
     my $arg   = $_[0];
@@ -1139,9 +1102,7 @@ sub TIEHASH {
     }
     return $Q ||= $class->new(@_);
 }
-END_OF_FUNC
 
-'STORE' => <<'END_OF_FUNC',
 sub STORE {
     my $self = shift;
     my $tag  = shift;
@@ -1149,52 +1110,38 @@ sub STORE {
     my @vals = index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
     $self->param(-name=>$tag,-value=>\@vals);
 }
-END_OF_FUNC
 
-'FETCH' => <<'END_OF_FUNC',
 sub FETCH {
     return $_[0] if $_[1] eq 'CGI';
     return undef unless defined $_[0]->param($_[1]);
     return join("\0",$_[0]->param($_[1]));
 }
-END_OF_FUNC
 
-'FIRSTKEY' => <<'END_OF_FUNC',
 sub FIRSTKEY {
     $_[0]->{'.iterator'}=0;
     $_[0]->{'.parameters'}->[$_[0]->{'.iterator'}++];
 }
-END_OF_FUNC
 
-'NEXTKEY' => <<'END_OF_FUNC',
 sub NEXTKEY {
     $_[0]->{'.parameters'}->[$_[0]->{'.iterator'}++];
 }
-END_OF_FUNC
 
-'EXISTS' => <<'END_OF_FUNC',
 sub EXISTS {
     exists $_[0]->{$_[1]};
 }
-END_OF_FUNC
 
-'DELETE' => <<'END_OF_FUNC',
 sub DELETE {
     $_[0]->delete($_[1]);
 }
-END_OF_FUNC
 
-'CLEAR' => <<'END_OF_FUNC',
 sub CLEAR {
     %{$_[0]}=();
 }
 ####
-END_OF_FUNC
 
 ####
 # Append a new value to an existing query
 ####
-'append' => <<'EOF',
 sub append {
     my($self,@p) = self_or_default(@_);
     my($name,$value) = rearrange([NAME,[VALUE,VALUES]],@p);
@@ -1205,60 +1152,48 @@ sub append {
     }
     return $self->param($name);
 }
-EOF
 
 #### Method: delete_all
 # Delete all parameters
 ####
-'delete_all' => <<'EOF',
 sub delete_all {
     my($self) = self_or_default(@_);
     my @param = $self->param();
     $self->delete(@param);
 }
-EOF
 
-'Delete' => <<'EOF',
 sub Delete {
     my($self,@p) = self_or_default(@_);
     $self->delete(@p);
 }
-EOF
 
-'Delete_all' => <<'EOF',
 sub Delete_all {
     my($self,@p) = self_or_default(@_);
     $self->delete_all(@p);
 }
-EOF
 
 #### Method: autoescape
 # If you want to turn off the autoescaping features,
 # call this method with undef as the argument
-'autoEscape' => <<'END_OF_FUNC',
 sub autoEscape {
     my($self,$escape) = self_or_default(@_);
     my $d = $self->{'escape'};
     $self->{'escape'} = $escape;
     $d;
 }
-END_OF_FUNC
 
 
 #### Method: version
 # Return the current version
 ####
-'version' => <<'END_OF_FUNC',
 sub version {
     return $VERSION;
 }
-END_OF_FUNC
 
 #### Method: url_param
 # Return a parameter in the QUERY_STRING, regardless of
 # whether this was a POST or a GET
 ####
-'url_param' => <<'END_OF_FUNC',
 sub url_param {
     my ($self,@p) = self_or_default(@_);
     my $name = shift(@p);
@@ -1283,14 +1218,12 @@ sub url_param {
     return wantarray ? @{$self->{'.url_param'}->{$name}}
                      : $self->{'.url_param'}->{$name}->[0];
 }
-END_OF_FUNC
 
 #### Method: Dump
 # Returns a string in which all the known parameter/value 
 # pairs are represented as nested lists, mainly for the purposes 
 # of debugging.
 ####
-'Dump' => <<'END_OF_FUNC',
 sub Dump {
     my($self) = self_or_default(@_);
     my($param,$value,@result);
@@ -1310,23 +1243,19 @@ sub Dump {
     push(@result,"</ul>");
     return join("\n",@result);
 }
-END_OF_FUNC
 
 #### Method as_string
 #
 # synonym for "dump"
 ####
-'as_string' => <<'END_OF_FUNC',
 sub as_string {
     &Dump(@_);
 }
-END_OF_FUNC
 
 #### Method: save
 # Write values out to a filehandle in such a way that they can
 # be reinitialized by the filehandle form of the new() method
 ####
-'save' => <<'END_OF_FUNC',
 sub save {
     my($self,$filehandle) = self_or_default(@_);
     $filehandle = to_filehandle($filehandle);
@@ -1345,29 +1274,24 @@ sub save {
     }
     print $filehandle "=\n";    # end of record
 }
-END_OF_FUNC
 
 
 #### Method: save_parameters
 # An alias for save() that is a better name for exportation.
 # Only intended to be used with the function (non-OO) interface.
 ####
-'save_parameters' => <<'END_OF_FUNC',
 sub save_parameters {
     my $fh = shift;
     return save(to_filehandle($fh));
 }
-END_OF_FUNC
 
 #### Method: restore_parameters
 # A way to restore CGI parameters from an initializer.
 # Only intended to be used with the function (non-OO) interface.
 ####
-'restore_parameters' => <<'END_OF_FUNC',
 sub restore_parameters {
     $Q = $CGI::DefaultClass->new(@_);
 }
-END_OF_FUNC
 
 #### Method: multipart_init
 # Return a Content-Type: style header for server-push
@@ -1376,7 +1300,6 @@ END_OF_FUNC
 # Many thanks to Ed Jordan <ed@fidalgo.net> for this
 # contribution, updated by Andrew Benham (adsb@bigfoot.com)
 ####
-'multipart_init' => <<'END_OF_FUNC',
 sub multipart_init {
     my($self,@p) = self_or_default(@_);
     my($boundary,@other) = rearrange([BOUNDARY],@p);
@@ -1390,7 +1313,6 @@ sub multipart_init {
 	(map { split "=", $_, 2 } @other),
     ) . "WARNING: YOUR BROWSER DOESN'T SUPPORT THIS SERVER-PUSH TECHNOLOGY." . $self->multipart_end;
 }
-END_OF_FUNC
 
 
 #### Method: multipart_start
@@ -1399,7 +1321,6 @@ END_OF_FUNC
 # Many thanks to Ed Jordan <ed@fidalgo.net> for this
 # contribution, updated by Andrew Benham (adsb@bigfoot.com)
 ####
-'multipart_start' => <<'END_OF_FUNC',
 sub multipart_start {
     my(@header);
     my($self,@p) = self_or_default(@_);
@@ -1418,7 +1339,6 @@ sub multipart_start {
     my $header = join($CRLF,@header)."${CRLF}${CRLF}";
     return $header;
 }
-END_OF_FUNC
 
 
 #### Method: multipart_end
@@ -1427,12 +1347,10 @@ END_OF_FUNC
 # Many thanks to Ed Jordan <ed@fidalgo.net> for this
 # contribution
 ####
-'multipart_end' => <<'END_OF_FUNC',
 sub multipart_end {
     my($self,@p) = self_or_default(@_);
     return $self->{'separator'};
 }
-END_OF_FUNC
 
 
 #### Method: multipart_final
@@ -1440,19 +1358,16 @@ END_OF_FUNC
 #
 # Contributed by Andrew Benham (adsb@bigfoot.com)
 ####
-'multipart_final' => <<'END_OF_FUNC',
 sub multipart_final {
     my($self,@p) = self_or_default(@_);
     return $self->{'final_separator'} . "WARNING: YOUR BROWSER DOESN'T SUPPORT THIS SERVER-PUSH TECHNOLOGY." . $CRLF;
 }
-END_OF_FUNC
 
 
 #### Method: header
 # Return a Content-Type: style header
 #
 ####
-'header' => <<'END_OF_FUNC',
 sub header {
     my($self,@p) = self_or_default(@_);
     my(@header);
@@ -1526,14 +1441,12 @@ sub header {
     }
     return $header;
 }
-END_OF_FUNC
 
 
 #### Method: cache
 # Control whether header() will produce the no-cache
 # Pragma directive.
 ####
-'cache' => <<'END_OF_FUNC',
 sub cache {
     my($self,$new_value) = self_or_default(@_);
     $new_value = '' unless $new_value;
@@ -1542,14 +1455,12 @@ sub cache {
     }
     return $self->{'cache'};
 }
-END_OF_FUNC
 
 
 #### Method: redirect
 # Return a Location: style header
 #
 ####
-'redirect' => <<'END_OF_FUNC',
 sub redirect {
     my($self,@p) = self_or_default(@_);
     my($url,$target,$status,$cookie,$nph,@other) = 
@@ -1568,7 +1479,6 @@ sub redirect {
     unshift(@unescaped,'-Cookie'=>$cookie) if $cookie;
     return $self->header((map {$self->unescapeHTML($_)} @o),@unescaped);
 }
-END_OF_FUNC
 
 
 #### Method: start_html
@@ -1590,7 +1500,6 @@ END_OF_FUNC
 # @other -> (optional) any other named parameters you'd like to incorporate into
 #           the <body> tag.
 ####
-'start_html' => <<'END_OF_FUNC',
 sub start_html {
     my($self,@p) = &self_or_default(@_);
     my($title,$author,$base,$xbase,$script,$noscript,
@@ -1682,12 +1591,10 @@ END
     push(@result,"</head>\n<body$other>\n");
     return join("\n",@result);
 }
-END_OF_FUNC
 
 ### Method: _style
 # internal method for generating a CSS style section
 ####
-'_style' => <<'END_OF_FUNC',
 sub _style {
     my ($self,$style) = @_;
     my (@result);
@@ -1740,9 +1647,7 @@ sub _style {
     }
     @result;
 }
-END_OF_FUNC
 
-'_script' => <<'END_OF_FUNC',
 sub _script {
     my ($self,$script) = @_;
     my (@result);
@@ -1785,17 +1690,14 @@ sub _script {
     }
     @result;
 }
-END_OF_FUNC
 
 #### Method: end_html
 # End an HTML document.
 # Trivial method for completeness.  Just returns "</body>"
 ####
-'end_html' => <<'END_OF_FUNC',
 sub end_html {
     return "\n</body>\n</html>";
 }
-END_OF_FUNC
 
 
 ################################
@@ -1808,7 +1710,6 @@ END_OF_FUNC
 #  $action -> optional URL of script to run
 # Returns:
 #   A string containing a <isindex> tag
-'isindex' => <<'END_OF_FUNC',
 sub isindex {
     my($self,@p) = self_or_default(@_);
     my($action,@other) = rearrange([ACTION],@p);
@@ -1816,7 +1717,6 @@ sub isindex {
     my($other) = @other ? " @other" : '';
     return $XHTML ? "<isindex$action$other />" : "<isindex$action$other>";
 }
-END_OF_FUNC
 
 
 #### Method: startform
@@ -1825,7 +1725,6 @@ END_OF_FUNC
 #   $method -> optional submission method to use (GET or POST)
 #   $action -> optional URL of script to run
 #   $enctype ->encoding to use (URL_ENCODED or MULTIPART)
-'startform' => <<'END_OF_FUNC',
 sub startform {
     my($self,@p) = self_or_default(@_);
 
@@ -1845,26 +1744,20 @@ sub startform {
     $self->{'.parametersToAdd'}={};
     return qq/<form method="$method" $action enctype="$enctype"$other>\n/;
 }
-END_OF_FUNC
 
 
 #### Method: start_form
 # synonym for startform
-'start_form' => <<'END_OF_FUNC',
 sub start_form {
     $XHTML ? &start_multipart_form : &startform;
 }
-END_OF_FUNC
 
-'end_multipart_form' => <<'END_OF_FUNC',
 sub end_multipart_form {
     &endform;
 }
-END_OF_FUNC
 
 #### Method: start_multipart_form
 # synonym for startform
-'start_multipart_form' => <<'END_OF_FUNC',
 sub start_multipart_form {
     my($self,@p) = self_or_default(@_);
     if (defined($p[0]) && substr($p[0],0,1) eq '-') {
@@ -1875,12 +1768,10 @@ sub start_multipart_form {
 	return $self->startform($method,$action,&MULTIPART,@other);
     }
 }
-END_OF_FUNC
 
 
 #### Method: endform
 # End a form
-'endform' => <<'END_OF_FUNC',
 sub endform {
     my($self,@p) = self_or_default(@_);
     if ( $NOSTICKY ) {
@@ -1894,10 +1785,8 @@ sub endform {
       }
     }
 }
-END_OF_FUNC
 
 
-'_textfield' => <<'END_OF_FUNC',
 sub _textfield {
     my($self,$tag,@p) = self_or_default(@_);
     my($name,$default,$size,$maxlength,$override,$tabindex,@other) = 
@@ -1918,7 +1807,6 @@ sub _textfield {
     return $XHTML ? qq(<input type="$tag" name="$name" $tabindex$value$s$m$other />) 
                   : qq(<input type="$tag" name="$name" $value$s$m$other>);
 }
-END_OF_FUNC
 
 #### Method: textfield
 # Parameters:
@@ -1930,12 +1818,10 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="text"> field
 #
-'textfield' => <<'END_OF_FUNC',
 sub textfield {
     my($self,@p) = self_or_default(@_);
     $self->_textfield('text',@p);
 }
-END_OF_FUNC
 
 
 #### Method: filefield
@@ -1946,12 +1832,10 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="file"> field
 #
-'filefield' => <<'END_OF_FUNC',
 sub filefield {
     my($self,@p) = self_or_default(@_);
     $self->_textfield('file',@p);
 }
-END_OF_FUNC
 
 
 #### Method: password
@@ -1965,12 +1849,10 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="password"> field
 #
-'password_field' => <<'END_OF_FUNC',
 sub password_field {
     my ($self,@p) = self_or_default(@_);
     $self->_textfield('password',@p);
 }
-END_OF_FUNC
 
 #### Method: textarea
 # Parameters:
@@ -1982,7 +1864,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <textarea></textarea> tag
 #
-'textarea' => <<'END_OF_FUNC',
 sub textarea {
     my($self,@p) = self_or_default(@_);
     my($name,$default,$rows,$cols,$override,$tabindex,@other) =
@@ -1999,7 +1880,6 @@ sub textarea {
     $tabindex = $self->element_tab($tabindex);
     return qq{<textarea name="$name" $tabindex$r$c$other>$current</textarea>};
 }
-END_OF_FUNC
 
 
 #### Method: button
@@ -2012,7 +1892,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="button"> tag
 ####
-'button' => <<'END_OF_FUNC',
 sub button {
     my($self,@p) = self_or_default(@_);
 
@@ -2034,7 +1913,6 @@ sub button {
     return $XHTML ? qq(<input type="button" $tabindex$name$val$script$other />)
                   : qq(<input type="button"$name$val$script$other>);
 }
-END_OF_FUNC
 
 
 #### Method: submit
@@ -2046,7 +1924,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="submit"> tag
 ####
-'submit' => <<'END_OF_FUNC',
 sub submit {
     my($self,@p) = self_or_default(@_);
 
@@ -2065,7 +1942,6 @@ sub submit {
     return $XHTML ? qq(<input type="submit" $tabindex$name$val$other/>)
                   : qq(<input type="submit" $name$val$other>);
 }
-END_OF_FUNC
 
 
 #### Method: reset
@@ -2075,7 +1951,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="reset"> tag
 ####
-'reset' => <<'END_OF_FUNC',
 sub reset {
     my($self,@p) = self_or_default(@_);
     my($label,$value,$tabindex,@other) = rearrange(['NAME',['VALUE','LABEL'],TABINDEX],@p);
@@ -2091,7 +1966,6 @@ sub reset {
     return $XHTML ? qq(<input type="reset" $tabindex$name$val$other />)
                   : qq(<input type="reset"$name$val$other>);
 }
-END_OF_FUNC
 
 
 #### Method: defaults
@@ -2105,7 +1979,6 @@ END_OF_FUNC
 # and tells it to ERASE the current query string so that your defaults
 # are used again!
 ####
-'defaults' => <<'END_OF_FUNC',
 sub defaults {
     my($self,@p) = self_or_default(@_);
 
@@ -2119,18 +1992,15 @@ sub defaults {
     return $XHTML ? qq(<input type="submit" name=".defaults" $tabindex$value$other />)
                   : qq/<input type="submit" NAME=".defaults"$value$other>/;
 }
-END_OF_FUNC
 
 
 #### Method: comment
 # Create an HTML <!-- comment -->
 # Parameters: a string
-'comment' => <<'END_OF_FUNC',
 sub comment {
     my($self,@p) = self_or_CGI(@_);
     return "<!-- @p -->";
 }
-END_OF_FUNC
 
 #### Method: checkbox
 # Create a checkbox that is not logically linked to any others.
@@ -2144,7 +2014,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="checkbox"> field
 ####
-'checkbox' => <<'END_OF_FUNC',
 sub checkbox {
     my($self,@p) = self_or_default(@_);
 
@@ -2169,12 +2038,10 @@ sub checkbox {
     return $XHTML ? CGI::label(qq{<input type="checkbox" name="$name" value="$value" $tabindex$checked$other/>$the_label})
                   : qq{<input type="checkbox" name="$name" value="$value"$checked$other>$the_label};
 }
-END_OF_FUNC
 
 
 
 # Escape HTML -- used internally
-'escapeHTML' => <<'END_OF_FUNC',
 sub escapeHTML {
          # hack to work around  earlier hacks
          push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
@@ -2206,10 +2073,8 @@ sub escapeHTML {
          }
          return $toencode;
 }
-END_OF_FUNC
 
 # unescape HTML -- used internally
-'unescapeHTML' => <<'END_OF_FUNC',
 sub unescapeHTML {
     # hack to work around  earlier hacks
     push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
@@ -2230,10 +2095,8 @@ sub unescapeHTML {
 	}gex;
     return $string;
 }
-END_OF_FUNC
 
 # Internal procedure - don't use
-'_tableize' => <<'END_OF_FUNC',
 sub _tableize {
     my($rows,$columns,$rowheaders,$colheaders,@elements) = @_;
     my @rowheaders = $rowheaders ? @$rowheaders : ();
@@ -2267,7 +2130,6 @@ sub _tableize {
     $result .= "</table>";
     return $result;
 }
-END_OF_FUNC
 
 
 #### Method: radio_group
@@ -2287,12 +2149,10 @@ END_OF_FUNC
 # Returns:
 #   An ARRAY containing a series of <input type="radio"> fields
 ####
-'radio_group' => <<'END_OF_FUNC',
 sub radio_group {
     my($self,@p) = self_or_default(@_);
    $self->_box_group('radio',@p);
 }
-END_OF_FUNC
 
 #### Method: checkbox_group
 # Create a list of logically-linked checkboxes.
@@ -2316,14 +2176,11 @@ END_OF_FUNC
 #   An ARRAY containing a series of <input type="checkbox"> fields
 ####
 
-'checkbox_group' => <<'END_OF_FUNC',
 sub checkbox_group {
     my($self,@p) = self_or_default(@_);
    $self->_box_group('checkbox',@p);
 }
-END_OF_FUNC
 
-'_box_group' => <<'END_OF_FUNC',
 sub _box_group {
     my $self     = shift;
     my $box_type = shift;
@@ -2405,7 +2262,6 @@ sub _box_group {
            unless defined($columns) || defined($rows);
     return _tableize($rows,$columns,$rowheaders,$colheaders,@elements);
 }
-END_OF_FUNC
 
 
 #### Method: popup_menu
@@ -2422,7 +2278,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing the definition of a popup menu.
 ####
-'popup_menu' => <<'END_OF_FUNC',
 sub popup_menu {
     my($self,@p) = self_or_default(@_);
 
@@ -2465,7 +2320,6 @@ sub popup_menu {
     $result .= "</select>";
     return $result;
 }
-END_OF_FUNC
 
 
 #### Method: optgroup
@@ -2490,7 +2344,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing the definition of an option group.
 ####
-'optgroup' => <<'END_OF_FUNC',
 sub optgroup {
     my($self,@p) = self_or_default(@_);
     my($name,$values,$attributes,$labeled,$noval,$labels,@other)
@@ -2525,7 +2378,6 @@ sub optgroup {
     $result .= "</optgroup>";
     return $result;
 }
-END_OF_FUNC
 
 
 #### Method: scrolling_list
@@ -2548,7 +2400,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing the definition of a scrolling list.
 ####
-'scrolling_list' => <<'END_OF_FUNC',
 sub scrolling_list {
     my($self,@p) = self_or_default(@_);
     my($name,$values,$defaults,$size,$multiple,$labels,$attributes,$override,$tabindex,@other)
@@ -2581,7 +2432,6 @@ sub scrolling_list {
     $self->register_parameter($name);
     return $result;
 }
-END_OF_FUNC
 
 
 #### Method: hidden
@@ -2593,7 +2443,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="hidden" name="name" value="value">
 ####
-'hidden' => <<'END_OF_FUNC',
 sub hidden {
     my($self,@p) = self_or_default(@_);
 
@@ -2625,7 +2474,6 @@ sub hidden {
     }
     return wantarray ? @result : join('',@result);
 }
-END_OF_FUNC
 
 
 #### Method: image_button
@@ -2636,7 +2484,6 @@ END_OF_FUNC
 # Returns:
 #   A string containing a <input type="image" name="name" src="url" align="alignment">
 ####
-'image_button' => <<'END_OF_FUNC',
 sub image_button {
     my($self,@p) = self_or_default(@_);
 
@@ -2649,7 +2496,6 @@ sub image_button {
     return $XHTML ? qq(<input type="image" name="$name" src="$src"$align$other />)
                   : qq/<input type="image" name="$name" src="$src"$align$other>/;
 }
-END_OF_FUNC
 
 
 #### Method: self_url
@@ -2658,28 +2504,23 @@ END_OF_FUNC
 # to create a link that, when selected, will reinvoke the
 # script with all its state information preserved.
 ####
-'self_url' => <<'END_OF_FUNC',
 sub self_url {
     my($self,@p) = self_or_default(@_);
     return $self->url('-path_info'=>1,'-query'=>1,'-full'=>1,@p);
 }
-END_OF_FUNC
 
 
 # This is provided as a synonym to self_url() for people unfortunate
 # enough to have incorporated it into their programs already!
-'state' => <<'END_OF_FUNC',
 sub state {
     &self_url;
 }
-END_OF_FUNC
 
 
 #### Method: url
 # Like self_url, but doesn't return the query string part of
 # the URL.
 ####
-'url' => <<'END_OF_FUNC',
 sub url {
     my($self,@p) = self_or_default(@_);
     my ($relative,$absolute,$full,$path_info,$query,$base,$rewrite) = 
@@ -2728,7 +2569,6 @@ sub url {
     return $url;
 }
 
-END_OF_FUNC
 
 #### Method: cookie
 # Set or read a cookie from the specified name.
@@ -2742,7 +2582,6 @@ END_OF_FUNC
 #   -secure -> if true, cookie only passed through secure channel (optional)
 #   -expires -> expiry date in format Wdy, DD-Mon-YYYY HH:MM:SS GMT (optional)
 ####
-'cookie' => <<'END_OF_FUNC',
 sub cookie {
     my($self,@p) = self_or_default(@_);
     my($name,$value,$path,$domain,$secure,$expires,$httponly) =
@@ -2778,9 +2617,7 @@ sub cookie {
 
     return CGI::Cookie->new(@param);
 }
-END_OF_FUNC
 
-'parse_keywordlist' => <<'END_OF_FUNC',
 sub parse_keywordlist {
     my($self,$tosplit) = @_;
     $tosplit = unescape($tosplit); # unescape the keywords
@@ -2788,9 +2625,7 @@ sub parse_keywordlist {
     my(@keywords) = split(/\s+/,$tosplit);
     return @keywords;
 }
-END_OF_FUNC
 
-'param_fetch' => <<'END_OF_FUNC',
 sub param_fetch {
     my($self,@p) = self_or_default(@_);
     my($name) = rearrange([NAME],@p);
@@ -2801,7 +2636,6 @@ sub param_fetch {
     
     return $self->{$name};
 }
-END_OF_FUNC
 
 ###############################################
 # OTHER INFORMATION PROVIDED BY THE ENVIRONMENT
@@ -2811,7 +2645,6 @@ END_OF_FUNC
 # Return the extra virtual path information provided
 # after the URL (if any)
 ####
-'path_info' => <<'END_OF_FUNC',
 sub path_info {
     my ($self,$info) = self_or_default(@_);
     if (defined($info)) {
@@ -2823,10 +2656,8 @@ sub path_info {
     }
     return $self->{'.path_info'};
 }
-END_OF_FUNC
 
 # WE USE THIS TO COMPENSATE FOR A BUG IN APACHE 2 PRESENT AT LEAST UP THROUGH 2.0.54
-'_name_and_path_from_env' => <<'END_OF_FUNC',
 sub _name_and_path_from_env {
    my $self = shift;
    my $raw_script_name = $ENV{SCRIPT_NAME} || '';
@@ -2850,53 +2681,43 @@ sub _name_and_path_from_env {
        return ($raw_script_name,$raw_path_info);
    }
 }
-END_OF_FUNC
 
 
 #### Method: request_method
 # Returns 'POST', 'GET', 'PUT' or 'HEAD'
 ####
-'request_method' => <<'END_OF_FUNC',
 sub request_method {
     return $ENV{'REQUEST_METHOD'};
 }
-END_OF_FUNC
 
 #### Method: content_type
 # Returns the content_type string
 ####
-'content_type' => <<'END_OF_FUNC',
 sub content_type {
     return $ENV{'CONTENT_TYPE'};
 }
-END_OF_FUNC
 
 #### Method: path_translated
 # Return the physical path information provided
 # by the URL (if any)
 ####
-'path_translated' => <<'END_OF_FUNC',
 sub path_translated {
     return $ENV{'PATH_TRANSLATED'};
 }
-END_OF_FUNC
 
 
 #### Method: request_uri
 # Return the literal request URI
 ####
-'request_uri' => <<'END_OF_FUNC',
 sub request_uri {
     return $ENV{'REQUEST_URI'};
 }
-END_OF_FUNC
 
 
 #### Method: query_string
 # Synthesize a query string from our current
 # parameters
 ####
-'query_string' => <<'END_OF_FUNC',
 sub query_string {
     my($self) = self_or_default(@_);
     my($param,$value,@pairs);
@@ -2913,7 +2734,6 @@ sub query_string {
     }
     return join($USE_PARAM_SEMICOLONS ? ';' : '&',@pairs);
 }
-END_OF_FUNC
 
 
 #### Method: accept
@@ -2927,7 +2747,6 @@ END_OF_FUNC
 # declares a quantitative score for it.
 # This handles MIME type globs correctly.
 ####
-'Accept' => <<'END_OF_FUNC',
 sub Accept {
     my($self,$search) = self_or_CGI(@_);
     my(%prefs,$type,$pref,$pat);
@@ -2960,7 +2779,6 @@ sub Accept {
 	return $prefs{$_} if $search=~/$pat/;
     }
 }
-END_OF_FUNC
 
 
 #### Method: user_agent
@@ -2968,13 +2786,11 @@ END_OF_FUNC
 # If called with one parameter, does a pattern match (case
 # insensitive) on the user agent.
 ####
-'user_agent' => <<'END_OF_FUNC',
 sub user_agent {
     my($self,$match)=self_or_CGI(@_);
     return $self->http('user_agent') unless $match;
     return $self->http('user_agent') =~ /$match/i;
 }
-END_OF_FUNC
 
 
 #### Method: raw_cookie
@@ -2985,7 +2801,6 @@ END_OF_FUNC
 # value is returned, otherwise the entire raw cookie
 # is returned.
 ####
-'raw_cookie' => <<'END_OF_FUNC',
 sub raw_cookie {
     my($self,$key) = self_or_CGI(@_);
 
@@ -3001,19 +2816,16 @@ sub raw_cookie {
     }
     return $self->http('cookie') || $ENV{'COOKIE'} || '';
 }
-END_OF_FUNC
 
 #### Method: virtual_host
 # Return the name of the virtual_host, which
 # is not always the same as the server
 ######
-'virtual_host' => <<'END_OF_FUNC',
 sub virtual_host {
     my $vh = http('x_forwarded_host') || http('host') || server_name();
     $vh =~ s/:\d+$//;		# get rid of port number
     return $vh;
 }
-END_OF_FUNC
 
 #### Method: remote_host
 # Return the name of the remote host, or its IP
@@ -3021,22 +2833,18 @@ END_OF_FUNC
 # defined, it returns "localhost" for debugging
 # purposes.
 ####
-'remote_host' => <<'END_OF_FUNC',
 sub remote_host {
     return $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} 
     || 'localhost';
 }
-END_OF_FUNC
 
 
 #### Method: remote_addr
 # Return the IP addr of the remote host.
 ####
-'remote_addr' => <<'END_OF_FUNC',
 sub remote_addr {
     return $ENV{'REMOTE_ADDR'} || '127.0.0.1';
 }
-END_OF_FUNC
 
 
 #### Method: script_name
@@ -3045,7 +2853,6 @@ END_OF_FUNC
 # self_url(), which returns a URL with all state information
 # preserved.
 ####
-'script_name' => <<'END_OF_FUNC',
 sub script_name {
     my ($self,@p) = self_or_default(@_);
     if (@p) {
@@ -3056,43 +2863,35 @@ sub script_name {
     }
     return $self->{'.script_name'};
 }
-END_OF_FUNC
 
 
 #### Method: referer
 # Return the HTTP_REFERER: useful for generating
 # a GO BACK button.
 ####
-'referer' => <<'END_OF_FUNC',
 sub referer {
     my($self) = self_or_CGI(@_);
     return $self->http('referer');
 }
-END_OF_FUNC
 
 
 #### Method: server_name
 # Return the name of the server
 ####
-'server_name' => <<'END_OF_FUNC',
 sub server_name {
     return $ENV{'SERVER_NAME'} || 'localhost';
 }
-END_OF_FUNC
 
 #### Method: server_software
 # Return the name of the server software
 ####
-'server_software' => <<'END_OF_FUNC',
 sub server_software {
     return $ENV{'SERVER_SOFTWARE'} || 'cmdline';
 }
-END_OF_FUNC
 
 #### Method: virtual_port
 # Return the server port, taking virtual hosts into account
 ####
-'virtual_port' => <<'END_OF_FUNC',
 sub virtual_port {
     my($self) = self_or_default(@_);
     my $vh = $self->http('x_forwarded_host') || $self->http('host');
@@ -3103,31 +2902,25 @@ sub virtual_port {
         return $self->server_port();
     }
 }
-END_OF_FUNC
 
 #### Method: server_port
 # Return the tcp/ip port the server is running on
 ####
-'server_port' => <<'END_OF_FUNC',
 sub server_port {
     return $ENV{'SERVER_PORT'} || 80; # for debugging
 }
-END_OF_FUNC
 
 #### Method: server_protocol
 # Return the protocol (usually HTTP/1.0)
 ####
-'server_protocol' => <<'END_OF_FUNC',
 sub server_protocol {
     return $ENV{'SERVER_PROTOCOL'} || 'HTTP/1.0'; # for debugging
 }
-END_OF_FUNC
 
 #### Method: http
 # Return the value of an HTTP variable, or
 # the list of variables if none provided
 ####
-'http' => <<'END_OF_FUNC',
 sub http {
     my ($self,$parameter) = self_or_CGI(@_);
     return $ENV{$parameter} if $parameter=~/^HTTP/;
@@ -3139,12 +2932,10 @@ sub http {
     }
     return @p;
 }
-END_OF_FUNC
 
 #### Method: https
 # Return the value of HTTPS
 ####
-'https' => <<'END_OF_FUNC',
 sub https {
     local($^W)=0;
     my ($self,$parameter) = self_or_CGI(@_);
@@ -3158,12 +2949,10 @@ sub https {
     }
     return @p;
 }
-END_OF_FUNC
 
 #### Method: protocol
 # Return the protocol (http or https currently)
 ####
-'protocol' => <<'END_OF_FUNC',
 sub protocol {
     local($^W)=0;
     my $self = shift;
@@ -3173,99 +2962,81 @@ sub protocol {
     my($protocol,$version) = split('/',$prot);
     return "\L$protocol\E";
 }
-END_OF_FUNC
 
 #### Method: remote_ident
 # Return the identity of the remote user
 # (but only if his host is running identd)
 ####
-'remote_ident' => <<'END_OF_FUNC',
 sub remote_ident {
     return $ENV{'REMOTE_IDENT'};
 }
-END_OF_FUNC
 
 
 #### Method: auth_type
 # Return the type of use verification/authorization in use, if any.
 ####
-'auth_type' => <<'END_OF_FUNC',
 sub auth_type {
     return $ENV{'AUTH_TYPE'};
 }
-END_OF_FUNC
 
 
 #### Method: remote_user
 # Return the authorization name used for user
 # verification.
 ####
-'remote_user' => <<'END_OF_FUNC',
 sub remote_user {
     return $ENV{'REMOTE_USER'};
 }
-END_OF_FUNC
 
 
 #### Method: user_name
 # Try to return the remote user's name by hook or by
 # crook
 ####
-'user_name' => <<'END_OF_FUNC',
 sub user_name {
     my ($self) = self_or_CGI(@_);
     return $self->http('from') || $ENV{'REMOTE_IDENT'} || $ENV{'REMOTE_USER'};
 }
-END_OF_FUNC
 
 #### Method: nosticky
 # Set or return the NOSTICKY global flag
 ####
-'nosticky' => <<'END_OF_FUNC',
 sub nosticky {
     my ($self,$param) = self_or_CGI(@_);
     $CGI::NOSTICKY = $param if defined($param);
     return $CGI::NOSTICKY;
 }
-END_OF_FUNC
 
 #### Method: nph
 # Set or return the NPH global flag
 ####
-'nph' => <<'END_OF_FUNC',
 sub nph {
     my ($self,$param) = self_or_CGI(@_);
     $CGI::NPH = $param if defined($param);
     return $CGI::NPH;
 }
-END_OF_FUNC
 
 #### Method: private_tempfiles
 # Set or return the private_tempfiles global flag
 ####
-'private_tempfiles' => <<'END_OF_FUNC',
 sub private_tempfiles {
     my ($self,$param) = self_or_CGI(@_);
     $CGI::PRIVATE_TEMPFILES = $param if defined($param);
     return $CGI::PRIVATE_TEMPFILES;
 }
-END_OF_FUNC
 #### Method: close_upload_files
 # Set or return the close_upload_files global flag
 ####
-'close_upload_files' => <<'END_OF_FUNC',
 sub close_upload_files {
     my ($self,$param) = self_or_CGI(@_);
     $CGI::CLOSE_UPLOAD_FILES = $param if defined($param);
     return $CGI::CLOSE_UPLOAD_FILES;
 }
-END_OF_FUNC
 
 
 #### Method: default_dtd
 # Set or return the default_dtd global
 ####
-'default_dtd' => <<'END_OF_FUNC',
 sub default_dtd {
     my ($self,$param,$param2) = self_or_CGI(@_);
     if (defined $param2 && defined $param) {
@@ -3275,10 +3046,8 @@ sub default_dtd {
     }
     return $CGI::DEFAULT_DTD;
 }
-END_OF_FUNC
 
 # -------------- really private subroutines -----------------
-'previous_or_default' => <<'END_OF_FUNC',
 sub previous_or_default {
     my($self,$name,$defaults,$override) = @_;
     my(%selected);
@@ -3295,25 +3064,19 @@ sub previous_or_default {
 
     return %selected;
 }
-END_OF_FUNC
 
-'register_parameter' => <<'END_OF_FUNC',
 sub register_parameter {
     my($self,$param) = @_;
     $self->{'.parametersToAdd'}->{$param}++;
 }
-END_OF_FUNC
 
-'get_fields' => <<'END_OF_FUNC',
 sub get_fields {
     my($self) = @_;
     return $self->CGI::hidden('-name'=>'.cgifields',
 			      '-values'=>[keys %{$self->{'.parametersToAdd'}}],
 			      '-override'=>1);
 }
-END_OF_FUNC
 
-'read_from_cmdline' => <<'END_OF_FUNC',
 sub read_from_cmdline {
     my($input,@words);
     my($query_string);
@@ -3344,7 +3107,6 @@ sub read_from_cmdline {
     }
     return { 'query_string' => $query_string, 'subpath' => $subpath };
 }
-END_OF_FUNC
 
 #####
 # subroutine: read_multipart
@@ -3354,7 +3116,6 @@ END_OF_FUNC
 # create a temporary file and open up a filehandle on it so that the
 # caller can read from it if necessary.
 #####
-'read_multipart' => <<'END_OF_FUNC',
 sub read_multipart {
     my($self,$boundary,$length) = @_;
     my($buffer) = $self->new_MultipartBuffer($boundary,$length);
@@ -3467,7 +3228,6 @@ sub read_multipart {
       }
     }
 }
-END_OF_FUNC
 
 #####
 # subroutine: read_multipart_related
@@ -3478,7 +3238,6 @@ END_OF_FUNC
 # returned by this method.  All other parts will be available as file
 # uploads accessible by their Content-ID
 #####
-'read_multipart_related' => <<'END_OF_FUNC',
 sub read_multipart_related {
     my($self,$start,$boundary,$length) = @_;
     my($buffer) = $self->new_MultipartBuffer($boundary,$length);
@@ -3570,36 +3329,28 @@ sub read_multipart_related {
     }
     return $returnvalue;
 }
-END_OF_FUNC
 
 
-'upload' =><<'END_OF_FUNC',
 sub upload {
     my($self,$param_name) = self_or_default(@_);
     my @param = grep {ref($_) && defined(fileno($_))} $self->param($param_name);
     return unless @param;
     return wantarray ? @param : $param[0];
 }
-END_OF_FUNC
 
-'tmpFileName' => <<'END_OF_FUNC',
 sub tmpFileName {
     my($self,$filename) = self_or_default(@_);
     return $self->{'.tmpfiles'}->{$$filename}->{name} ?
 	$self->{'.tmpfiles'}->{$$filename}->{name}->as_string
 	    : '';
 }
-END_OF_FUNC
 
-'uploadInfo' => <<'END_OF_FUNC',
 sub uploadInfo {
     my($self,$filename) = self_or_default(@_);
     return $self->{'.tmpfiles'}->{$$filename}->{info};
 }
-END_OF_FUNC
 
 # internal routine, don't use
-'_set_values_and_labels' => <<'END_OF_FUNC',
 sub _set_values_and_labels {
     my $self = shift;
     my ($v,$l,$n) = @_;
@@ -3608,10 +3359,8 @@ sub _set_values_and_labels {
     return $v if !ref($v);
     return ref($v) eq 'HASH' ? keys %$v : @$v;
 }
-END_OF_FUNC
 
 # internal routine, don't use
-'_set_attributes' => <<'END_OF_FUNC',
 sub _set_attributes {
     my $self = shift;
     my($element, $attributes) = @_;
@@ -3624,9 +3373,7 @@ sub _set_attributes {
     $attribs =~ s/ $//;
     return $attribs;
 }
-END_OF_FUNC
 
-'_compile_all' => <<'END_OF_FUNC',
 sub _compile_all {
     foreach (@_) {
 	next if defined(&$_);
@@ -3634,11 +3381,6 @@ sub _compile_all {
 	_compile();
     }
 }
-END_OF_FUNC
-
-);
-END_OF_AUTOLOAD
-;
 
 #########################################################
 # Globals and stubs for other packages that we use.
@@ -3653,17 +3395,11 @@ use overload
 
 $FH='fh00000';
 
-*Fh::AUTOLOAD = \&CGI::AUTOLOAD;
-
 sub DESTROY {
     my $self = shift;
     close $self;
 }
 
-$AUTOLOADED_ROUTINES = '';      # prevent -w error
-$AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
-%SUBS =  (
-'asString' => <<'END_OF_FUNC',
 sub asString {
     my $self = shift;
     # get rid of package name
@@ -3679,35 +3415,27 @@ sub asString {
 #    return ${*{$self}{SCALAR}};
 # END DEAD CODE
 }
-END_OF_FUNC
 
-'compare' => <<'END_OF_FUNC',
 sub compare {
     my $self = shift;
     my $value = shift;
     return "$self" cmp $value;
 }
-END_OF_FUNC
 
-'new'  => <<'END_OF_FUNC',
 sub new {
     my($pack,$name,$file,$delete) = @_;
     _setup_symbols(@SAVED_SYMBOLS) if @SAVED_SYMBOLS;
     require Fcntl unless defined &Fcntl::O_RDWR;
     (my $safename = $name) =~ s/([':%])/ sprintf '%%%02X', ord $1 /eg;
     my $fv = ++$FH . $safename;
-    my $ref = \*{"Fh::$fv"};
+    my $ref = \*{Symbol::qualify_to_ref("Fh::$fv")};
     $file =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$! || return;
     my $safe = $1;
     sysopen($ref,$safe,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($safe) if $delete;
-    CORE::delete $Fh::{$fv};
+    CORE::delete Symbol::stash('Fh')->{$fv};
     return bless $ref,$pack;
 }
-END_OF_FUNC
-
-);
-END_OF_AUTOLOAD
 
 ######################## MultipartBuffer ####################
 package MultipartBuffer;
@@ -3730,11 +3458,6 @@ sub DESTROY {}
 ###############################################################################
 ################# THESE FUNCTIONS ARE AUTOLOADED ON DEMAND ####################
 ###############################################################################
-$AUTOLOADED_ROUTINES = '';      # prevent -w error
-$AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
-%SUBS =  (
-
-'new' => <<'END_OF_FUNC',
 sub new {
     my($package,$interface,$boundary,$length) = @_;
     $FILLUNIT = $INITIAL_FILLUNIT;
@@ -3788,9 +3511,7 @@ sub new {
 
     return $retval;
 }
-END_OF_FUNC
 
-'readHeader' => <<'END_OF_FUNC',
 sub readHeader {
     my($self) = @_;
     my($end);
@@ -3835,10 +3556,8 @@ sub readHeader {
     }
     return %return;
 }
-END_OF_FUNC
 
 # This reads and returns the body as a single scalar value.
-'readBody' => <<'END_OF_FUNC',
 sub readBody {
     my($self) = @_;
     my($data);
@@ -3857,12 +3576,10 @@ sub readBody {
     }
     return $returnval;
 }
-END_OF_FUNC
 
 # This will read $bytes or until the boundary is hit, whichever happens
 # first.  After the boundary is hit, we return undef.  The next read will
 # skip over the boundary and begin reading again;
-'read' => <<'END_OF_FUNC',
 sub read {
     my($self,$bytes) = @_;
 
@@ -3920,12 +3637,10 @@ sub read {
     return ($bytesToReturn==$start)
            ? substr($returnval,0,-2) : $returnval;
 }
-END_OF_FUNC
 
 
 # This fills up our internal buffer in such a way that the
 # boundary is never split between reads
-'fillBuffer' => <<'END_OF_FUNC',
 sub fillBuffer {
     my($self,$bytes) = @_;
     return unless $self->{CHUNKED} || $self->{LENGTH};
@@ -3956,21 +3671,15 @@ sub fillBuffer {
 
     $self->{LENGTH} -= $bytesRead if !$self->{CHUNKED} && $bytesRead;
 }
-END_OF_FUNC
 
 
 # Return true when we've finished reading
-'eof' => <<'END_OF_FUNC'
 sub eof {
     my($self) = @_;
     return 1 if (length($self->{BUFFER}) == 0)
 		 && ($self->{LENGTH} <= 0);
     undef;
 }
-END_OF_FUNC
-
-);
-END_OF_AUTOLOAD
 
 ####################################################################################
 ################################## TEMPORARY FILES #################################
