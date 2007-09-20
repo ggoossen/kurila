@@ -1964,6 +1964,14 @@
 #ifdef PERL_CORE
 #define boot_core_mro		Perl_boot_core_mro
 #endif
+#if defined(PERL_IN_DUMP_C)
+#ifdef PERL_CORE
+#define dump_op_flags		S_dump_op_flags
+#define dump_op_flags_private	S_dump_op_flags_private
+#define dump_op_mad		S_dump_op_mad
+#define dump_op_rest		S_dump_op_rest
+#endif
+#endif
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
 #define ck_chdir		Perl_ck_chdir
@@ -4316,6 +4324,14 @@
 #define boot_core_mro()		Perl_boot_core_mro(aTHX)
 #endif
 #ifdef PERL_CORE
+#endif
+#if defined(PERL_IN_DUMP_C)
+#ifdef PERL_CORE
+#define dump_op_flags(a)	S_dump_op_flags(aTHX_ a)
+#define dump_op_flags_private(a)	S_dump_op_flags_private(aTHX_ a)
+#define dump_op_mad(a,b,c)	S_dump_op_mad(aTHX_ a,b,c)
+#define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
+#endif
 #endif
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
