@@ -23,13 +23,20 @@ use Fatal qw|open close|;
     use File::Basename;
     my (undef, $dir, undef) = File::Basename::fileparse($filename);
     my @lib;
-    push @lib, "$ENV{madpath}/lib", "./lib", "./blib/lib", "./blib/arch/", "../lib/", $dir;
+    #push @lib, "$ENV{madpath}/lib", "./lib", "./blib/lib", "./blib/arch/", "../lib/", $dir;
+    for (keys %ENV) {
+        $_ =~ m/^mad_(.*)$/ or next;
+        my $k = $1;
+        $ENV{$k} = $ENV{"mad_$k"};
+    }
     my $output = eval { Convert::convert($input, "/usr/bin/perl $kurilapath/mad/p5kurila.pl",
                                          switches => join ' ', map { "-I $_" } @lib ) };
     if ($output) {
         if ($input ne $output) {
             seek $fh, 0, 0;
+            truncate $fh, 0;
             $fh->print($output);
+            close $fh or die;
         }
     } else {
         warn "Failed converting $filename:\n\n$@\n\n";

@@ -31,8 +31,8 @@ sub convert {
     # sanity Perl 5 to Perl 5 works.
     my $p5 = Nomad::xml_to_p5( input => "$file.xml" );
     if ($p5 ne $input) {
-        #use Text::Diff;
-        #warn diff(\$input, \$p5);
+        use Text::Diff;
+        warn diff(\$input, \$p5);
         die "Perl 5 translation was not identical. Aborting conversion";
     }
 

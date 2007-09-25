@@ -233,6 +233,12 @@ $ref = [];
 my $ref = "s";
 $ref = [];
 @$ref= sub { 1 };
+===
+my $subname = "bla";
+$subname->();
+---
+my $subname = "bla";
+*{Symbol::qualify_to_ref($subname)}->();
 END
 
 }
