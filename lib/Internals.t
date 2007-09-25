@@ -43,16 +43,15 @@ ok(  Internals::SvREADONLY $foo{foo} );
 ok( !Internals::SvREADONLY $foo{foo}, 0 );
 ok( !Internals::SvREADONLY $foo{foo} );
 
-is(  Internals::SvREFCNT($foo), 1 );
+is(  Internals::SvREFCNT(\$foo), 2 );
 {
     my $bar = \$foo;
-    is(  Internals::SvREFCNT($foo), 2 );
-    is(  Internals::SvREFCNT($bar), 1 );
+    is(  Internals::SvREFCNT(\$foo), 3 );
+    is(  Internals::SvREFCNT(\$bar), 2 );
 }
-is(  Internals::SvREFCNT($foo), 1 );
+is(  Internals::SvREFCNT(\$foo), 2 );
 
-is(  Internals::SvREFCNT(@foo), 1 );
-is(  Internals::SvREFCNT($foo[2]), 1 );
-is(  Internals::SvREFCNT(%foo), 1 );
-is(  Internals::SvREFCNT($foo{foo}), 1 );
-
+is(  Internals::SvREFCNT(\@foo), 2 );
+is(  Internals::SvREFCNT(\$foo[2]), 2 );
+is(  Internals::SvREFCNT(\%foo), 2 );
+is(  Internals::SvREFCNT(\$foo{foo}), 2 );
