@@ -3730,12 +3730,12 @@ sub sub {
 	if ( defined wantarray ) {
 
 	    # Save the value if it's wanted at all.
-	    $ret = &{Symbol::qualify_to_ref($sub)};
+	    $ret = &{*{Symbol::qualify_to_ref($sub)}};
 	}
 	else {
 
 	    # Void return, explicitly.
-	    &{Symbol::qualify_to_ref($sub)};
+	    &{*{Symbol::qualify_to_ref($sub)}};
 	    undef $ret;
 	}
 

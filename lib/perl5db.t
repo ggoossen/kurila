@@ -47,7 +47,7 @@ rc(
 	    'n',
 	    'c', # line 23
 	    'n',
-	    "p \\\@{Symbol::qualify_to_ref('main::_<$target')}",
+	    "p \\\@{*{Symbol::qualify_to_ref('main::_<$target')}}",
 	    'q',
 	);
     }\n|,
