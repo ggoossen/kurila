@@ -1433,26 +1433,6 @@ lib/Archive/Tar/t/src/short/b	Archive::Tar tests
 lib/Archive/Tar/t/src/short/bar.tar.packed	Archive::Tar tests
 lib/Archive/Tar/t/src/short/foo.tgz.packed	Archive::Tar tests
 lib/assert.pl			assertion and panic with stack trace
-lib/Attribute/Handlers/Changes	Attribute::Handlers
-lib/Attribute/Handlers/demo/demo2.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo3.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo4.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_call.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_chain.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_cycle.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_hashdir.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_phases.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/Demo.pm	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_range.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_rawdata.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/Descriptions.pm	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/MyClass.pm	Attribute::Handlers demo
-lib/Attribute/Handlers.pm	Attribute::Handlers
-lib/Attribute/Handlers/README		Attribute::Handlers
-lib/Attribute/Handlers/t/constants.t	Test constants and Attribute::Handlers
-lib/Attribute/Handlers/t/linerep.t	See if Attribute::Handlers works
-lib/Attribute/Handlers/t/multi.t	See if Attribute::Handlers works
 lib/attributes.pm		For "sub foo : attrlist"
 lib/AutoLoader.pm		Autoloader base class
 lib/AutoLoader.t		See if AutoLoader works
@@ -3568,7 +3548,6 @@ t/op/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
 t/op/array.t			See if array operations work
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
-t/op/attrhand.t			See if attribute handlers work
 t/op/attrs.t			See if attributes on declarations work
 t/op/auto.t			See if autoincrement et all work
 t/op/avhv.t			See if pseudo-hashes work
