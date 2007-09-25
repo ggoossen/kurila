@@ -261,7 +261,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("utf8::native_to_unicode", XS_utf8_native_to_unicode, file);
     newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
-    newXS("Internals::SvREFCNT",XS_Internals_SvREFCNT, file); /* , "\\[$%@];$"); */
+    newXS("Internals::SvREFCNT",XS_Internals_SvREFCNT, file);
     newXS("Internals::peek",XS_Internals_peek, file);
     newXSproto("Internals::hv_clear_placeholders",
                XS_Internals_hv_clear_placehold, file, "\\%");
@@ -1399,7 +1399,7 @@ XS(XS_Symbol_qualify_to_ref)
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
 
-    ST(0) = gv_fetchsv(ST(0), GV_ADD | GV_ADDMULTI, SVt_PVGV);
+    ST(0) = (SV*)gv_fetchsv(ST(0), GV_ADD | GV_ADDMULTI, SVt_PVGV);
     ST(0) = newRV_noinc(ST(0));
     XSRETURN(1);
 }
@@ -1413,7 +1413,7 @@ XS(XS_Symbol_stash)
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
 
-    ST(0) = gv_stashsv(ST(0), GV_ADD);
+    ST(0) = (SV*)gv_stashsv(ST(0), GV_ADD);
     ST(0) = newRV_noinc(ST(0));
     XSRETURN(1);
 }
