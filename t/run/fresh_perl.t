@@ -296,7 +296,7 @@ no strict 'refs';
 { local $main::{ren} = *stimpy; print ${'ren'}, ' ' }
 print +(defined(${'ren'}) ? 'oops' : 'joy'), "\n";
 EXPECT
-happy joy
+Can't use string ("ren") as a SCALAR ref while "strict refs" in use at - line 3.
 ########
 package p;
 sub func { print 'really ' unless wantarray; 'p' }
@@ -422,7 +422,8 @@ no strict "refs";
 package X;
 sub any { bless {} }
 my $f = "FH000"; # just to thwart any future optimisations
-sub afh { select select ++$f; my $r = *{$f}{IO}; delete $X::{$f}; bless $r }
+sub afh { select select *{Symbol::qualify_to_ref(++$f)}; 
+          my $r = *{Symbol::qualify_to_ref($f)}{IO}; delete $X::{$f}; bless $r }
 sub DESTROY { print "destroyed\n" }
 package main;
 $x = X->any(); # to bump sv_objcount. IO objs aren't counted??
@@ -629,7 +630,7 @@ END {
 }
 package Bar;
 sub new {
-    my Bar $self = bless [], 'Bar';
+    my $self = bless [], 'Bar';
     eval '$self';
     return $self;
 }
@@ -814,7 +815,8 @@ use utf8;
 my $t = "\x[E9]";
 $t =~ s/([^a])//ge;
 $@ =~ s/ at .*/ at/;
-print $@
+print $@;
 print "Good" if $t eq "\x[E9]";
 EXPECT
+
 Good
