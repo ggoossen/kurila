@@ -44,9 +44,9 @@ sub list {
     
     my @rv;
     {   no strict 'refs';
-        my $stash = $pkg . '::';
+        my $stash = $pkg;
 
-        for my $name (sort keys %$stash ) {
+        for my $name (sort keys %{Symbol::stash($stash)} ) {
         
             _debug( "   Checking stash entry '$name'" );
             
