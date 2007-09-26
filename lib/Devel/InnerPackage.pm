@@ -61,18 +61,18 @@ Return a list of all inner packages of that package.
 =cut
 
 sub list_packages {
-            my $pack = shift; $pack .= "::" unless $pack =~ m!::$!;
+            my $pack = shift;
+            $pack =~ s/::$//;
 
-            no strict 'refs';
             my @packs;
             my @stuff = grep !/^(main|)::$/, keys %{Symbol::stash($pack)};
             for my $cand (grep /::$/, @stuff)
             {
                 $cand =~ s!::$!!;
-                my @children = list_packages($pack.$cand);
+                my @children = list_packages("$pack\::$cand");
     
-                push @packs, "$pack$cand" unless $cand =~ /^::/ ||
-                    !__PACKAGE__->_loaded($pack.$cand); # or @children;
+                push @packs, "$pack\::$cand" unless $cand =~ /^::/ ||
+                    !__PACKAGE__->_loaded("$pack\::$cand"); # or @children;
                 push @packs, @children;
             }
             return grep {$_ !~ /::::ISA::CACHE/} @packs;
