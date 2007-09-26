@@ -6,6 +6,7 @@
 # 20011002 and 3.3, and in Redhat 7.1 with gcc 3.3.1. The failures
 # happen only for unthreaded builds, threaded builds work okay.
 use Config;
+use vars '$self';
 if ($Config{gccversion}) {
     my $optimize = $Config{optimize};
     if ($optimize =~ s/(^| )-O[3-9]( |$)/$1-O2$2/) {

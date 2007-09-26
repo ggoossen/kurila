@@ -11,6 +11,7 @@ BEGIN { use_ok('NEXT') };
 my $order = 0;
 
 package A;
+use mro 'dfs';
 @ISA = qw/B C D/;
 
 sub test { ++$order; ::ok($order==1,"test A"); $_[0]->NEXT::ACTUAL::test;}

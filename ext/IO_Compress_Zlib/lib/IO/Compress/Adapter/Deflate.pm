@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.006 qw(:Status);
+use IO::Compress::Base::Common  2.004 qw(:Status);
 
-use Compress::Raw::Zlib  2.006 qw(Z_OK Z_FINISH MAX_WBITS) ;
+use Compress::Raw::Zlib  2.004 qw(Z_OK Z_FINISH MAX_WBITS) ;
 our ($VERSION);
 
-$VERSION = '2.006';
+$VERSION = '2.004';
 
 sub mkCompObject
 {
@@ -18,13 +18,13 @@ sub mkCompObject
     my $level    = shift ;
     my $strategy = shift ;
 
-    my ($def, $status) = new Compress::Raw::Zlib::Deflate
+    my ($def, $status) = Compress::Raw::Zlib::Deflate->new(
                                 -AppendOutput   => 1,
                                 -CRC32          => $crc32,
                                 -ADLER32        => $adler32,
                                 -Level          => $level,
                                 -Strategy       => $strategy,
-                                -WindowBits     => - MAX_WBITS;
+                                -WindowBits     => - MAX_WBITS);
 
     return (undef, "Cannot create Deflate object: $status", $status) 
         if $status != Z_OK;    

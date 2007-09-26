@@ -15,7 +15,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 625 + $extra;
 
@@ -51,7 +51,7 @@ foreach my $CompressClass ( 'IO::Compress::RawDeflate')
     my $Error = getErrorRef($UncompressClass);
 
     my $compressed ;
-        ok( my $x = new IO::Compress::RawDeflate \$compressed);
+        ok( my $x = IO::Compress::RawDeflate->new( \$compressed));
         ok $x->write($hello) ;
         ok $x->close ;
 
@@ -59,8 +59,8 @@ foreach my $CompressClass ( 'IO::Compress::RawDeflate')
     my $cc = $compressed ;
 
     my $gz ;
-    ok($gz = new $UncompressClass(\$cc,
-                                  -Transparent => 0))
+    ok($gz = $UncompressClass-> new((\$cc,
+                                  -Transparent => 0)))
             or diag "$$Error\n";
     my $un;
     ok $gz->read($un) > 0 ;
@@ -83,14 +83,14 @@ foreach my $CompressClass ( 'IO::Compress::RawDeflate')
         foreach my $i (0 .. $blocksize)
         {
         
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
         
             ok 1, "Length $i" ;
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
-            my $gz = new $UncompressClass $name,
+            my $gz = $UncompressClass-> new( $name,
                                        -BlockSize   => $blocksize,
-                                       -Transparent => $trans;
+                                       -Transparent => $trans);
             if ($trans) {
                 ok $gz;
                 ok ! $gz->error() ;
@@ -108,14 +108,14 @@ foreach my $CompressClass ( 'IO::Compress::RawDeflate')
         foreach my $i ($blocksize+1 .. length($compressed)-1)
         {
         
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
         
             ok 1, "Length $i" ;
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
-            ok my $gz = new $UncompressClass $name,
+            ok my $gz = $UncompressClass-> new( $name,
                                              -BlockSize   => $blocksize,
-                                             -Transparent => $trans;
+                                             -Transparent => $trans);
             my $un ;
             my $status = 1 ;
             $status = $gz->read($un) while $status > 0 ;

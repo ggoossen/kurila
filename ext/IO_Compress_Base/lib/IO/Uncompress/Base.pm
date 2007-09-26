@@ -6,15 +6,16 @@ use warnings;
 use bytes;
 
 our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
-@ISA    = qw(Exporter IO::File);
+#@ISA    = qw(Exporter IO::File);
+@ISA    = qw(Exporter );
 
 
-$VERSION = '2.006';
+$VERSION = '2.004';
 
 use constant G_EOF => 0 ;
 use constant G_ERR => -1 ;
 
-use IO::Compress::Base::Common 2.006 ;
+use IO::Compress::Base::Common 2.004 ;
 #use Parse::Parameters ;
 
 use IO::File ;
@@ -370,7 +371,7 @@ sub _create
             my $mode = '<';
             $mode = '+<' if $got->value('Scan');
             *$obj->{StdIO} = ($inValue eq '-');
-            *$obj->{FH} = new IO::File "$mode $inValue"
+            *$obj->{FH} = IO::File->new( "$mode $inValue")
                 or return $obj->saveErrorString(undef, "cannot open file '$inValue': $!", $!) ;
         }
         
@@ -411,8 +412,8 @@ sub _create
     *$obj->{Plain}             = 0;
     *$obj->{PlainBytesRead}    = 0;
     *$obj->{InflatedBytesRead} = 0;
-    *$obj->{UnCompSize}        = new U64;
-    *$obj->{CompSize}          = new U64;
+    *$obj->{UnCompSize}        = U64->new();
+    *$obj->{CompSize}          = U64->new();
     *$obj->{TotalInflatedBytesRead} = 0;
     *$obj->{NewStream}         = 0 ;
     *$obj->{EventEof}          = 0 ;
@@ -490,7 +491,7 @@ sub _inf
     my $output = shift ;
 
 
-    my $x = new Validator($class, *$obj->{Error}, $name, $input, $output)
+    my $x = Validator->new($class, *$obj->{Error}, $name, $input, $output)
         or return undef ;
     
     push @_, $output if $haveOut && $x->{Hash};
@@ -587,7 +588,7 @@ sub _singleTarget
         my $mode = '>' ;
         $mode = '>>'
             if $x->{Got}->value('Append') ;
-        $x->{fh} = new IO::File "$mode $output" 
+        $x->{fh} = IO::File->new( "$mode $output") 
             or return retErr($x, "cannot open file '$output': $!") ;
         binmode $x->{fh} if $x->{Got}->valueOrDefault('BinModeOut');
 
@@ -973,8 +974,13 @@ sub read
     my $self = shift ;
 
     return G_EOF if *$self->{Closed} ;
+    return G_EOF if !length *$self->{Pending} && *$self->{EndStream} ;
 
     my $buffer ;
+
+    #$self->croakError(*$self->{ClassName} . 
+    #            "::read: buffer parameter is read-only")
+    #    if Compress::Raw::Zlib::_readonly_ref($_[0]);
 
     if (ref $_[0] ) {
         $self->croakError(*$self->{ClassName} . "::read: buffer parameter is read-only")
@@ -994,22 +1000,6 @@ sub read
     my $length = $_[1] ;
     my $offset = $_[2] || 0;
 
-    if (! *$self->{AppendOutput}) {
-        if (! $offset) {    
-            $$buffer = '' ;
-        }
-        else {
-            if ($offset > length($$buffer)) {
-                $$buffer .= "\x00" x ($offset - length($$buffer));
-            }
-            else {
-                substr($$buffer, $offset) = '';
-            }
-        }
-    }
-
-    return G_EOF if !length *$self->{Pending} && *$self->{EndStream} ;
-
     # the core read will return 0 if asked for 0 bytes
     return 0 if defined $length && $length == 0 ;
 
@@ -1017,6 +1007,8 @@ sub read
 
     $self->croakError(*$self->{ClassName} . "::read: length parameter is negative")
         if $length < 0 ;
+
+    $$buffer = '' unless *$self->{AppendOutput}  || $offset ;
 
     # Short-circuit if this is a simple read, with no length
     # or offset specified.
@@ -1039,7 +1031,6 @@ sub read
     # or both are specified.
     my $out_buffer = *$self->{Pending} ;
 
-
     while (! *$self->{EndStream} && length($out_buffer) < $length)
     {
         my $buf_len = $self->_raw_read(\$out_buffer);
@@ -1053,18 +1044,21 @@ sub read
     return 0 
         if $length == 0 ;
 
-    $$buffer = '' 
-        if ! defined $$buffer;
-
-    $offset = length $$buffer
-        if *$self->{AppendOutput} ;
-
     *$self->{Pending} = $out_buffer;
     $out_buffer = \*$self->{Pending} ;
 
-    #substr($$buffer, $offset) = substr($$out_buffer, 0, $length, '') ;
-    substr($$buffer, $offset) = substr($$out_buffer, 0, $length) ;
-    substr($$out_buffer, 0, $length) =  '' ;
+    if ($offset) { 
+        $$buffer .= "\x00" x ($offset - length($$buffer))
+            if $offset > length($$buffer) ;
+        #substr($$buffer, $offset) = substr($$out_buffer, 0, $length, '') ;
+        substr($$buffer, $offset) = substr($$out_buffer, 0, $length) ;
+        substr($$out_buffer, 0, $length) =  '' ;
+    }
+    else {
+        #$$buffer .= substr($$out_buffer, 0, $length, '') ;
+        $$buffer .= substr($$out_buffer, 0, $length) ;
+        substr($$out_buffer, 0, $length) =  '' ;
+    }
 
     return $length ;
 }

@@ -155,9 +155,7 @@ typedef struct RExC_state_t {
 #define RExC_end	(pRExC_state->end)
 #define RExC_parse	(pRExC_state->parse)
 #define RExC_whilem_seen	(pRExC_state->whilem_seen)
-#ifdef RE_TRACK_PATTERN_OFFSETS
 #define RExC_offsets	(pRExC_state->rxi->u.offsets) /* I am not like the others */
-#endif
 #define RExC_emit	(pRExC_state->emit)
 #define RExC_emit_start	(pRExC_state->emit_start)
 #define RExC_emit_bound	(pRExC_state->emit_bound)
@@ -170,8 +168,6 @@ typedef struct RExC_state_t {
 #define RExC_extralen	(pRExC_state->extralen)
 #define RExC_seen_zerolen	(pRExC_state->seen_zerolen)
 #define RExC_seen_evals	(pRExC_state->seen_evals)
-#define RExC_utf8	(pRExC_state->utf8)
-#define RExC_orig_utf8	(pRExC_state->orig_utf8)
 #define RExC_charnames  (pRExC_state->charnames)
 #define RExC_open_parens	(pRExC_state->open_parens)
 #define RExC_close_parens	(pRExC_state->close_parens)
@@ -355,14 +351,12 @@ static const scan_data_t zero_scan_data =
 #define SCF_TRIE_RESTUDY        0x4000 /* Do restudy? */
 #define SCF_SEEN_ACCEPT         0x8000 
 
-#define UTF (RExC_utf8 != 0)
-#define LOC ((RExC_flags & RXf_PMf_LOCALE) != 0)
+#define UTF ((RExC_flags & RXf_PMf_UTF8) != 0)
 #define FOLD ((RExC_flags & RXf_PMf_FOLD) != 0)
 
 #define OOB_UNICODE		12345678
 #define OOB_NAMEDCLASS		-1
 
-#define CHR_SVLEN(sv) (UTF ? sv_len_utf8(sv) : SvCUR(sv))
 #define CHR_DIST(a,b) (UTF ? utf8_distance(a,b) : a - b)
 
 
@@ -520,21 +514,7 @@ static const scan_data_t zero_scan_data =
  * Element 0 holds the number n.
  * Position is 1 indexed.
  */
-#ifndef RE_TRACK_PATTERN_OFFSETS
-#define Set_Node_Offset_To_R(node,byte)
-#define Set_Node_Offset(node,byte)
-#define Set_Cur_Node_Offset
-#define Set_Node_Length_To_R(node,len)
-#define Set_Node_Length(node,len)
-#define Set_Node_Cur_Length(node)
-#define Node_Offset(n) 
-#define Node_Length(n) 
-#define Set_Node_Offset_Length(node,offset,len)
-#define ProgLen(ri) ri->u.proglen
-#define SetProgLen(ri,x) ri->u.proglen = x
-#else
-#define ProgLen(ri) ri->u.offsets[0]
-#define SetProgLen(ri,x) ri->u.offsets[0] = x
+
 #define Set_Node_Offset_To_R(node,byte) STMT_START {			\
     if (! SIZE_ONLY) {							\
 	MJD_OFFSET_DEBUG(("** (%d) offset of node %d is %d.\n",		\
@@ -577,11 +557,11 @@ static const scan_data_t zero_scan_data =
     Set_Node_Offset_To_R((node)-RExC_emit_start, (offset));	\
     Set_Node_Length_To_R((node)-RExC_emit_start, (len));	\
 } STMT_END
-#endif
+
 
 #if PERL_ENABLE_EXPERIMENTAL_REGEX_OPTIMISATIONS
 #define EXPERIMENTAL_INPLACESCAN
-#endif /*RE_TRACK_PATTERN_OFFSETS*/
+#endif
 
 #define DEBUG_STUDYDATA(str,data,depth)                              \
 DEBUG_OPTIMISE_MORE_r(if(data){                                      \
@@ -626,10 +606,11 @@ static void clear_re(pTHX_ void *r);
 STATIC void
 S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *minlenp, int is_inf)
 {
-    const STRLEN l = CHR_SVLEN(data->last_found);
-    const STRLEN old_l = CHR_SVLEN(*data->longest);
+    const STRLEN l = SvCUR(data->last_found);
+    const STRLEN old_l = SvCUR(*data->longest);
     GET_RE_DEBUG_FLAGS_DECL;
 
+    DEBUG_STUDYDATA("scan commit:",data,0);
     if ((l >= old_l) && ((l > old_l) || (data->flags & SF_BEFORE_EOL))) {
 	SvSetMagicSV(*data->longest, data->last_found);
 	if (*data->longest == data->longest_fixed) {
@@ -661,7 +642,7 @@ S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *min
     SvCUR_set(data->last_found, 0);
     {
 	SV * const sv = data->last_found;
-	if (SvUTF8(sv) && SvMAGICAL(sv)) {
+	if (SvMAGICAL(sv)) {
 	    MAGIC * const mg = mg_find(sv, PERL_MAGIC_utf8);
 	    if (mg)
 		mg->mg_len = 0;
@@ -676,11 +657,11 @@ S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *min
 STATIC void
 S_cl_anything(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl)
 {
+    PERL_UNUSED_ARG(pRExC_state);
+
     ANYOF_CLASS_ZERO(cl);
     ANYOF_BITMAP_SETALL(cl);
     cl->flags = ANYOF_EOS|ANYOF_UNICODE_ALL;
-    if (LOC)
-	cl->flags |= ANYOF_LOCALE;
 }
 
 /* Can match anything (initialization) */
@@ -714,8 +695,6 @@ S_cl_init_zero(const RExC_state_t *pRExC_state, struct regnode_charclass_class *
     Zero(cl, 1, struct regnode_charclass_class);
     cl->type = ANYOF;
     cl_anything(pRExC_state, cl);
-    if (LOC)
-	cl->flags |= ANYOF_LOCALE;
 }
 
 /* 'And' a given class with another one.  Can create false positives */
@@ -726,19 +705,11 @@ S_cl_and(struct regnode_charclass_class *cl,
 {
 
     assert(and_with->type == ANYOF);
-    if (!(and_with->flags & ANYOF_CLASS)
-	&& !(cl->flags & ANYOF_CLASS)
-	&& (and_with->flags & ANYOF_LOCALE) == (cl->flags & ANYOF_LOCALE)
-	&& !(and_with->flags & ANYOF_FOLD)
-	&& !(cl->flags & ANYOF_FOLD)) {
+    if (!(and_with->flags & ANYOF_FOLD) && !(cl->flags & ANYOF_FOLD)) {
 	int i;
 
-	if (and_with->flags & ANYOF_INVERT)
-	    for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
-		cl->bitmap[i] &= ~and_with->bitmap[i];
-	else
-	    for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
-		cl->bitmap[i] &= and_with->bitmap[i];
+	for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
+	    cl->bitmap[i] &= and_with->bitmap[i];
     } /* XXXX: logic is complicated otherwise, leave it along for a moment. */
     if (!(and_with->flags & ANYOF_EOS))
 	cl->flags &= ~ANYOF_EOS;
@@ -762,47 +733,10 @@ S_cl_and(struct regnode_charclass_class *cl,
 STATIC void
 S_cl_or(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl, const struct regnode_charclass_class *or_with)
 {
-    if (or_with->flags & ANYOF_INVERT) {
-	/* We do not use
-	 * (B1 | CL1) | (!B2 & !CL2) = (B1 | !B2 & !CL2) | (CL1 | (!B2 & !CL2))
-	 *   <= (B1 | !B2) | (CL1 | !CL2)
-	 * which is wasteful if CL2 is small, but we ignore CL2:
-	 *   (B1 | CL1) | (!B2 & !CL2) <= (B1 | CL1) | !B2 = (B1 | !B2) | CL1
-	 * XXXX Can we handle case-fold?  Unclear:
-	 *   (OK1(i) | OK1(i')) | !(OK1(i) | OK1(i')) =
-	 *   (OK1(i) | OK1(i')) | (!OK1(i) & !OK1(i'))
-	 */
-	if ( (or_with->flags & ANYOF_LOCALE) == (cl->flags & ANYOF_LOCALE)
-	     && !(or_with->flags & ANYOF_FOLD)
-	     && !(cl->flags & ANYOF_FOLD) ) {
-	    int i;
-
-	    for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
-		cl->bitmap[i] |= ~or_with->bitmap[i];
-	} /* XXXX: logic is complicated otherwise */
-	else {
-	    cl_anything(pRExC_state, cl);
-	}
-    } else {
-	/* (B1 | CL1) | (B2 | CL2) = (B1 | B2) | (CL1 | CL2)) */
-	if ( (or_with->flags & ANYOF_LOCALE) == (cl->flags & ANYOF_LOCALE)
-	     && (!(or_with->flags & ANYOF_FOLD)
-		 || (cl->flags & ANYOF_FOLD)) ) {
-	    int i;
-
-	    /* OR char bitmap and class bitmap separately */
-	    for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
-		cl->bitmap[i] |= or_with->bitmap[i];
-	    if (or_with->flags & ANYOF_CLASS) {
-		for (i = 0; i < ANYOF_CLASSBITMAP_SIZE; i++)
-		    cl->classflags[i] |= or_with->classflags[i];
-		cl->flags |= ANYOF_CLASS;
-	    }
-	}
-	else { /* XXXX: logic is complicated, leave it along for a moment. */
-	    cl_anything(pRExC_state, cl);
-	}
-    }
+    int i;
+    PERL_UNUSED_ARG(pRExC_state);
+    for (i = 0; i < ANYOF_BITMAP_SIZE; i++)
+	cl->bitmap[i] |= or_with->bitmap[i];
     if (or_with->flags & ANYOF_EOS)
 	cl->flags |= ANYOF_EOS;
 
@@ -825,9 +759,9 @@ S_cl_or(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl, con
 
 #ifdef DEBUGGING
 /*
-   dump_trie(trie,widecharmap,revcharmap)
-   dump_trie_interim_list(trie,widecharmap,revcharmap,next_alloc)
-   dump_trie_interim_table(trie,widecharmap,revcharmap,next_alloc)
+   dump_trie(trie,revcharmap)
+   dump_trie_interim_list(trie,revcharmap,next_alloc)
+   dump_trie_interim_table(trie,revcharmap,next_alloc)
 
    These routines dump out a trie in a somewhat readable format.
    The _interim_ variants are used for debugging the interim
@@ -845,12 +779,12 @@ S_cl_or(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl, con
 */
  
 STATIC void
-S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
+S_dump_trie(pTHX_ const struct _reg_trie_data *trie, 
 	    AV *revcharmap, U32 depth)
 {
     U32 state;
     SV *sv=sv_newmortal();
-    int colwidth= widecharmap ? 6 : 4;
+    int colwidth= 4;
     GET_RE_DEBUG_FLAGS_DECL;
 
 
@@ -865,7 +799,6 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
                 colwidth,
                 pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), colwidth, 
 	                    PL_colors[0], PL_colors[1],
-	                    (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
 	                    PERL_PV_ESCAPE_FIRSTCHAR 
                 ) 
             );
@@ -928,12 +861,12 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
 */
 STATIC void
 S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
-			 HV *widecharmap, AV *revcharmap, U32 next_alloc,
+			 AV *revcharmap, U32 next_alloc,
 			 U32 depth)
 {
     U32 state;
     SV *sv=sv_newmortal();
-    int colwidth= widecharmap ? 6 : 4;
+    int colwidth= 4;
     GET_RE_DEBUG_FLAGS_DECL;
     /* print out the table precompression.  */
     PerlIO_printf( Perl_debug_log, "%*sState :Word | Transition Data\n%*s%s",
@@ -959,7 +892,6 @@ S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
                     colwidth,
                     pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), colwidth, 
 	                    PL_colors[0], PL_colors[1],
-	                    (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
 	                    PERL_PV_ESCAPE_FIRSTCHAR 
                     ) ,
                     TRIE_LIST_ITEM(state,charid).forid,
@@ -982,13 +914,13 @@ S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
 */
 STATIC void
 S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie,
-			  HV *widecharmap, AV *revcharmap, U32 next_alloc,
+			  AV *revcharmap, U32 next_alloc,
 			  U32 depth)
 {
     U32 state;
     U16 charid;
     SV *sv=sv_newmortal();
-    int colwidth= widecharmap ? 6 : 4;
+    int colwidth= 4;
     GET_RE_DEBUG_FLAGS_DECL;
     
     /*
@@ -1005,7 +937,6 @@ S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie,
                 colwidth,
                 pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), colwidth, 
 	                    PL_colors[0], PL_colors[1],
-	                    (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
 	                    PERL_PV_ESCAPE_FIRSTCHAR 
                 ) 
             );
@@ -1052,7 +983,7 @@ S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie,
 	       May be the same as tail.
   tail       : item following the branch sequence
   count      : words in the sequence
-  flags      : currently the OP() type we will be building one of /EXACT(|F|Fl)/
+  flags      : currently the OP() type we will be building one of /EXACT/
   depth      : indent depth
 
 Inplace optimizes a sequence of 2 or more Branch-Exact nodes into a TRIE node.
@@ -1164,33 +1095,14 @@ is the recommended Unicode-aware way of saying
 #define TRIE_STORE_REVCHAR                                                 \
     STMT_START {                                                           \
 	SV *tmp = newSVpvs("");                                            \
-	if (UTF) SvUTF8_on(tmp);                                           \
-	Perl_sv_catpvf( aTHX_ tmp, "%c", (int)uvc );                       \
+	Perl_sv_catpvf( aTHX_ tmp, "%C", (int)uvc );                       \
 	av_push( revcharmap, tmp );                                        \
     } STMT_END
 
 #define TRIE_READ_CHAR STMT_START {                                           \
     wordlen++;                                                                \
-    if ( UTF ) {                                                              \
-	if ( folder ) {                                                       \
-	    if ( foldlen > 0 ) {                                              \
-	       uvc = utf8n_to_uvuni( scan, UTF8_MAXLEN, &len, uniflags );     \
-	       foldlen -= len;                                                \
-	       scan += len;                                                   \
-	       len = 0;                                                       \
-	    } else {                                                          \
-		uvc = utf8n_to_uvuni( (const U8*)uc, UTF8_MAXLEN, &len, uniflags);\
-		uvc = to_uni_fold( uvc, foldbuf, &foldlen );                  \
-		foldlen -= UNISKIP( uvc );                                    \
-		scan = foldbuf + UNISKIP( uvc );                              \
-	    }                                                                 \
-	} else {                                                              \
-	    uvc = utf8n_to_uvuni( (const U8*)uc, UTF8_MAXLEN, &len, uniflags);\
-	}                                                                     \
-    } else {                                                                  \
 	uvc = (U32)*uc;                                                       \
 	len = 1;                                                              \
-    }                                                                         \
 } STMT_END
 
 
@@ -1225,7 +1137,6 @@ is the recommended Unicode-aware way of saying
             tmp = newSVpvn(STRING(noper), STR_LEN(noper));      \
         else                                                    \
             tmp = newSVpvn( "", 0 );                            \
-        if ( UTF ) SvUTF8_on( tmp );                            \
         av_push( trie_words, tmp );                             \
     });                                                         \
                                                                 \
@@ -1278,10 +1189,8 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     dVAR;
     /* first pass, loop through and scan words */
     reg_trie_data *trie;
-    HV *widecharmap = NULL;
     AV *revcharmap = newAV();
     regnode *cur;
-    const U32 uniflags = UTF8_ALLOW_DEFAULT;
     STRLEN len = 0;
     UV uvc = 0;
     U16 curword = 0;
@@ -1289,14 +1198,6 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     regnode *jumper = NULL;
     regnode *nextbranch = NULL;
     regnode *convert = NULL;
-    /* we just use folder as a flag in utf8 */
-    const U8 * const folder = ( flags == EXACTF
-                       ? PL_fold
-                       : ( flags == EXACTFL
-                           ? PL_fold_locale
-                           : NULL
-                         )
-                     );
 
 #ifdef DEBUGGING
     const U32 data_slot = add_data( pRExC_state, 4, "tuuu" );
@@ -1320,8 +1221,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     trie->wordcount = word_count;
     RExC_rxi->data->data[ data_slot ] = (void*)trie;
     trie->charmap = (U16 *) PerlMemShared_calloc( 256, sizeof(U16) );
-    if (!(UTF && folder))
-	trie->bitmap = (char *) PerlMemShared_calloc( ANYOF_BITMAP_SIZE, 1 );
+    trie->bitmap = (char *) PerlMemShared_calloc( ANYOF_BITMAP_SIZE, 1 );
     DEBUG_r({
         trie_words = newAV();
     });
@@ -1350,14 +1250,13 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         
     /*  -- First loop and Setup --
 
-       We first traverse the branches and scan each word to determine if it
-       contains widechars, and how many unique chars there are, this is
-       important as we have to build a table with at least as many columns as we
-       have unique chars.
+       We first traverse the branches and scan each word to determine
+       how many unique chars there are, this is important as we have
+       to build a table with at least as many columns as we have
+       unique chars.
 
-       We use an array of integers to represent the character codes 0..255
-       (trie->charmap) and we use a an HV* to store Unicode characters. We use the
-       native representation of the character value as the key and IV's for the
+       We use an array of integers to represent the bytes codes 0..255
+       (trie->charmap). We use the byte as the key and IV's for the
        coded index.
 
        *TODO* If we keep track of how many times each character is used we can
@@ -1375,52 +1274,29 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         regnode * const noper = NEXTOPER( cur );
         const U8 *uc = (U8*)STRING( noper );
         const U8 * const e  = uc + STR_LEN( noper );
-        STRLEN foldlen = 0;
-        U8 foldbuf[ UTF8_MAXBYTES_CASE + 1 ];
-        const U8 *scan = (U8*)NULL;
         U32 wordlen      = 0;         /* required init */
         STRLEN chars = 0;
-        bool set_bit = trie->bitmap ? 1 : 0; /*store the first char in the bitmap?*/
+	bool set_bit = 1;
 
         if (OP(noper) == NOTHING) {
             trie->minlen= 0;
             continue;
         }
-        if ( set_bit ) /* bitmap only alloced when !(UTF&&Folding) */
-            TRIE_BITMAP_SET(trie,*uc); /* store the raw first byte
-                                          regardless of encoding */
+	TRIE_BITMAP_SET(trie,*uc); 
 
         for ( ; uc < e ; uc += len ) {
             TRIE_CHARCOUNT(trie)++;
             TRIE_READ_CHAR;
             chars++;
-            if ( uvc < 256 ) {
+            {
                 if ( !trie->charmap[ uvc ] ) {
                     trie->charmap[ uvc ]=( ++trie->uniquecharcount );
-                    if ( folder )
-                        trie->charmap[ folder[ uvc ] ] = trie->charmap[ uvc ];
                     TRIE_STORE_REVCHAR;
                 }
                 if ( set_bit ) {
-                    /* store the codepoint in the bitmap, and if its ascii
-                       also store its folded equivelent. */
+                    /* store the byte in the bitmap */
                     TRIE_BITMAP_SET(trie,uvc);
-                    if ( folder ) TRIE_BITMAP_SET(trie,folder[ uvc ]);
                     set_bit = 0; /* We've done our bit :-) */
-                }
-            } else {
-                SV** svpp;
-                if ( !widecharmap )
-                    widecharmap = newHV();
-
-                svpp = hv_fetch( widecharmap, (char*)&uvc, sizeof( UV ), 1 );
-
-                if ( !svpp )
-                    Perl_croak( aTHX_ "error creating/fetching widecharmap entry for 0x%"UVXf, uvc );
-
-                if ( !SvTRUE( *svpp ) ) {
-                    sv_setiv( *svpp, ++trie->uniquecharcount );
-                    TRIE_STORE_REVCHAR;
                 }
             }
         }
@@ -1437,7 +1313,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     DEBUG_TRIE_COMPILE_r(
         PerlIO_printf( Perl_debug_log, "%*sTRIE(%s): W:%d C:%d Uq:%d Min:%d Max:%d\n",
                 (int)depth * 2 + 2,"",
-                ( widecharmap ? "UTF8" : "NATIVE" ), (int)word_count,
+                ( "BYTES" ), (int)word_count,
 		(int)TRIE_CHARCOUNT(trie), trie->uniquecharcount,
 		(int)trie->minlen, (int)trie->maxlen )
     );
@@ -1497,26 +1373,14 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 	    const U8 * const e = uc + STR_LEN( noper );
 	    U32 state        = 1;         /* required init */
 	    U16 charid       = 0;         /* sanity init */
-	    U8 *scan         = (U8*)NULL; /* sanity init */
-	    STRLEN foldlen   = 0;         /* required init */
             U32 wordlen      = 0;         /* required init */
-	    U8 foldbuf[ UTF8_MAXBYTES_CASE + 1 ];
 
             if (OP(noper) != NOTHING) {
                 for ( ; uc < e ; uc += len ) {
 
                     TRIE_READ_CHAR;
 
-                    if ( uvc < 256 ) {
-                        charid = trie->charmap[ uvc ];
-		    } else {
-                        SV** const svpp = hv_fetch( widecharmap, (char*)&uvc, sizeof( UV ), 0);
-                        if ( !svpp ) {
-                            charid = 0;
-                        } else {
-                            charid=(U16)SvIV( *svpp );
-                        }
-		    }
+		    charid = trie->charmap[ uvc ];
                     /* charid is now 0 if we dont know the char read, or nonzero if we do */
                     if ( charid ) {
 
@@ -1556,7 +1420,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 				   * sizeof(reg_trie_state) );
 
         /* and now dump it out before we compress it */
-        DEBUG_TRIE_COMPILE_MORE_r(dump_trie_interim_list(trie, widecharmap,
+        DEBUG_TRIE_COMPILE_MORE_r(dump_trie_interim_list(trie,
 							 revcharmap, next_alloc,
 							 depth+1)
         );
@@ -1696,23 +1560,15 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 
             U16 charid       = 0;         /* sanity init */
             U32 accept_state = 0;         /* sanity init */
-            U8 *scan         = (U8*)NULL; /* sanity init */
 
-            STRLEN foldlen   = 0;         /* required init */
             U32 wordlen      = 0;         /* required init */
-            U8 foldbuf[ UTF8_MAXBYTES_CASE + 1 ];
 
             if ( OP(noper) != NOTHING ) {
                 for ( ; uc < e ; uc += len ) {
 
                     TRIE_READ_CHAR;
 
-                    if ( uvc < 256 ) {
-                        charid = trie->charmap[ uvc ];
-                    } else {
-                        SV* const * const svpp = hv_fetch( widecharmap, (char*)&uvc, sizeof( UV ), 0);
-                        charid = svpp ? (U16)SvIV(*svpp) : 0;
-                    }
+		    charid = trie->charmap[ uvc ];
                     if ( charid ) {
                         charid--;
                         if ( !trie->trans[ state + charid ].next ) {
@@ -1733,7 +1589,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         } /* end second pass */
 
         /* and now dump it out before we compress it */
-        DEBUG_TRIE_COMPILE_MORE_r(dump_trie_interim_table(trie, widecharmap,
+        DEBUG_TRIE_COMPILE_MORE_r(dump_trie_interim_table(trie,
 							  revcharmap,
 							  next_alloc, depth+1));
 
@@ -1866,7 +1722,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 			       * sizeof(reg_trie_trans) );
 
     /* and now dump out the compressed format */
-    DEBUG_TRIE_COMPILE_r(dump_trie(trie, widecharmap, revcharmap, depth+1));
+    DEBUG_TRIE_COMPILE_r(dump_trie(trie, revcharmap, depth+1));
 
     {   /* Modify the program and insert the new TRIE node*/ 
         U8 nodetype =(U8)(flags & 0xFF);
@@ -1874,12 +1730,9 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         
 #ifdef DEBUGGING
         regnode *optimize = NULL;
-#ifdef RE_TRACK_PATTERN_OFFSETS
-
         U32 mjd_offset = 0;
         U32 mjd_nodelen = 0;
-#endif /* RE_TRACK_PATTERN_OFFSETS */
-#endif /* DEBUGGING */
+#endif
         /*
            This means we convert either the first branch or the first Exact,
            depending on whether the thing following (in 'last') is a branch
@@ -1892,32 +1745,29 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         if ( first != startbranch || OP( last ) == BRANCH ) {
             /* branch sub-chain */
             NEXT_OFF( first ) = (U16)(last - first);
-#ifdef RE_TRACK_PATTERN_OFFSETS
             DEBUG_r({
                 mjd_offset= Node_Offset((convert));
                 mjd_nodelen= Node_Length((convert));
             });
-#endif
             /* whole branch chain */
-        }
-#ifdef RE_TRACK_PATTERN_OFFSETS
-        else {
+        } else {
             DEBUG_r({
                 const  regnode *nop = NEXTOPER( convert );
                 mjd_offset= Node_Offset((nop));
                 mjd_nodelen= Node_Length((nop));
             });
         }
+        
         DEBUG_OPTIMISE_r(
             PerlIO_printf(Perl_debug_log, "%*sMJD offset:%"UVuf" MJD length:%"UVuf"\n",
                 (int)depth * 2 + 2, "",
                 (UV)mjd_offset, (UV)mjd_nodelen)
         );
-#endif
+
         /* But first we check to see if there is a common prefix we can 
            split out as an EXACT and put in front of the TRIE node.  */
         trie->startstate= 1;
-        if ( trie->bitmap && !widecharmap && !trie->jump  ) {
+        if ( trie->bitmap && !trie->jump  ) {
             U32 state;
             for ( state = 1 ; state < trie->statecount-1 ; state++ ) {
                 U32 ofs = 0;
@@ -1949,16 +1799,12 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 				    const U8 * const ch = (U8*)SvPV_nolen_const( *tmp );
 
                                     TRIE_BITMAP_SET(trie,*ch);
-                                    if ( folder )
-                                        TRIE_BITMAP_SET(trie, folder[ *ch ]);
                                     DEBUG_OPTIMISE_r(
                                         PerlIO_printf(Perl_debug_log, (char*)ch)
                                     );
 				}
 			    }
 			    TRIE_BITMAP_SET(trie,*ch);
-			    if ( folder )
-				TRIE_BITMAP_SET(trie,folder[ *ch ]);
 			    DEBUG_OPTIMISE_r(PerlIO_printf( Perl_debug_log,"%s", ch));
 			}
                         idx = ofs;
@@ -1971,13 +1817,12 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                     DEBUG_OPTIMISE_r({
                         SV *sv=sv_newmortal();
                         PerlIO_printf( Perl_debug_log,
-			    "%*sPrefix State: %"UVuf" Idx:%"UVuf" Char='%s'\n",
+			    "%*sPrefix State: %"UVuf" Idx:%"UVuf" %x, Char='%s'\n",
                             (int)depth * 2 + 2, "",
                             (UV)state, (UV)idx, 
-                            pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 6, 
-	                        PL_colors[0], PL_colors[1],
-	                        (SvUTF8(*tmp) ? PERL_PV_ESCAPE_UNI : 0) |
-	                        PERL_PV_ESCAPE_FIRSTCHAR 
+				       SvCUR(*tmp),
+                            pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 0, 
+	                        PL_colors[0], PL_colors[1], 0
                             )
                         );
                     });
@@ -2081,7 +1926,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
             Set_Node_Offset_Length(convert,mjd_offset,mjd_nodelen);
         });
     } /* end node insert */
-    RExC_rxi->data->data[ data_slot + 1 ] = (void*)widecharmap;
+    RExC_rxi->data->data[ data_slot + 1 ] = NULL;
 #ifdef DEBUGGING
     RExC_rxi->data->data[ data_slot + TRIE_WORDS_OFFSET ] = (void*)trie_words;
     RExC_rxi->data->data[ data_slot + 3 ] = (void*)revcharmap;
@@ -2217,11 +2062,16 @@ S_make_trie_failtable(pTHX_ RExC_state_t *pRExC_state, regnode *source,  regnode
 #define DEBUG_PEEP(str,scan,depth) \
     DEBUG_OPTIMISE_r({if (scan){ \
        SV * const mysv=sv_newmortal(); \
+       PerlIO_printf(Perl_debug_log, "Debug peep start\n"); \
        regnode *Next = regnext(scan); \
+       PerlIO_printf(Perl_debug_log, "123 %*s" str ">%3d: %s (%d)\n", \
+           (int)depth*2, "", REG_NODE_NUM(scan), SvPV_nolen_const(mysv),\
+           Next ? (REG_NODE_NUM(Next)) : 0 ); \
        regprop(RExC_rx, mysv, scan); \
-       PerlIO_printf(Perl_debug_log, "%*s" str ">%3d: %s (%d)\n", \
-       (int)depth*2, "", REG_NODE_NUM(scan), SvPV_nolen_const(mysv),\
-       Next ? (REG_NODE_NUM(Next)) : 0 ); \
+       PerlIO_printf(Perl_debug_log, "456 %*s" str ">%3d: %s (%d)\n", \
+           (int)depth*2, "", REG_NODE_NUM(scan), SvPV_nolen_const(mysv),\
+           Next ? (REG_NODE_NUM(Next)) : 0 ); \
+       PerlIO_printf(Perl_debug_log, "Debug peep end\n"); \
    }});
 
 
@@ -2306,59 +2156,6 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, I32 *min, U32 flags
 #endif
     }
     
-    if (UTF && ( OP(scan) == EXACTF ) && ( STR_LEN(scan) >= 6 ) ) {
-    /*
-    Two problematic code points in Unicode casefolding of EXACT nodes:
-    
-    U+0390 - GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS
-    U+03B0 - GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS
-    
-    which casefold to
-    
-    Unicode                      UTF-8
-    
-    U+03B9 U+0308 U+0301         0xCE 0xB9 0xCC 0x88 0xCC 0x81
-    U+03C5 U+0308 U+0301         0xCF 0x85 0xCC 0x88 0xCC 0x81
-    
-    This means that in case-insensitive matching (or "loose matching",
-    as Unicode calls it), an EXACTF of length six (the UTF-8 encoded byte
-    length of the above casefolded versions) can match a target string
-    of length two (the byte length of UTF-8 encoded U+0390 or U+03B0).
-    This would rather mess up the minimum length computation.
-    
-    What we'll do is to look for the tail four bytes, and then peek
-    at the preceding two bytes to see whether we need to decrease
-    the minimum length by four (six minus two).
-    
-    Thanks to the design of UTF-8, there cannot be false matches:
-    A sequence of valid UTF-8 bytes cannot be a subsequence of
-    another valid sequence of UTF-8 bytes.
-    
-    */
-         char * const s0 = STRING(scan), *s, *t;
-         char * const s1 = s0 + STR_LEN(scan) - 1;
-         char * const s2 = s1 - 4;
-#ifdef EBCDIC /* RD tunifold greek 0390 and 03B0 */
-	 const char t0[] = "\xaf\x49\xaf\x42";
-#else
-         const char t0[] = "\xcc\x88\xcc\x81";
-#endif
-         const char * const t1 = t0 + 3;
-    
-         for (s = s0 + 2;
-              s < s2 && (t = ninstr(s, s1, t0, t1));
-              s = t + 4) {
-#ifdef EBCDIC
-	      if (((U8)t[-1] == 0x68 && (U8)t[-2] == 0xB4) ||
-		  ((U8)t[-1] == 0x46 && (U8)t[-2] == 0xB5))
-#else
-              if (((U8)t[-1] == 0xB9 && (U8)t[-2] == 0xCE) ||
-                  ((U8)t[-1] == 0x85 && (U8)t[-2] == 0xCF))
-#endif
-                   *min -= 4;
-         }
-    }
-    
 #ifdef DEBUGGING
     /* Allow dumping */
     n = scan + NODE_SZ_STR(scan);
@@ -2399,34 +2196,6 @@ typedef struct scan_frame {
 
 #define SCAN_COMMIT(s, data, m) scan_commit(s, data, m, is_inf)
 
-#define CASE_SYNST_FNC(nAmE)                                       \
-case nAmE:                                                         \
-    if (flags & SCF_DO_STCLASS_AND) {                              \
-	    for (value = 0; value < 256; value++)                  \
-		if (!is_ ## nAmE ## _cp(value))                       \
-		    ANYOF_BITMAP_CLEAR(data->start_class, value);  \
-    }                                                              \
-    else {                                                         \
-	    for (value = 0; value < 256; value++)                  \
-		if (is_ ## nAmE ## _cp(value))                        \
-		    ANYOF_BITMAP_SET(data->start_class, value);	   \
-    }                                                              \
-    break;                                                         \
-case N ## nAmE:                                                    \
-    if (flags & SCF_DO_STCLASS_AND) {                              \
-	    for (value = 0; value < 256; value++)                   \
-		if (is_ ## nAmE ## _cp(value))                         \
-		    ANYOF_BITMAP_CLEAR(data->start_class, value);   \
-    }                                                               \
-    else {                                                          \
-	    for (value = 0; value < 256; value++)                   \
-		if (!is_ ## nAmE ## _cp(value))                        \
-		    ANYOF_BITMAP_SET(data->start_class, value);	    \
-    }                                                               \
-    break
-
-
-
 STATIC I32
 S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                         I32 *minlenp, I32 *deltap,
@@ -2458,6 +2227,8 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
     scan_frame *frame = NULL;
 
     GET_RE_DEBUG_FLAGS_DECL;
+
+    DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "study chunk"));
 
 #ifdef DEBUGGING
     StructCopy(&zero_scan_data, &data_fake, scan_data_t);
@@ -2874,13 +2645,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 	else if (OP(scan) == EXACT) {
 	    I32 l = STR_LEN(scan);
 	    UV uc;
-	    if (UTF) {
-		const U8 * const s = (U8*)STRING(scan);
-		l = utf8_length(s, s + l);
-		uc = utf8_to_uvchr(s, NULL);
-	    } else {
-		uc = *((U8*)STRING(scan));
-	    }
+	    uc = *((U8*)STRING(scan));
 	    min += l;
 	    if (flags & SCF_DO_SUBSTR) { /* Update longest substr. */
 		/* The code below prefers earlier match for fixed
@@ -2891,11 +2656,9 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
  			? I32_MAX : data->pos_min + data->pos_delta;
 		}
 		sv_catpvn(data->last_found, STRING(scan), STR_LEN(scan));
-		if (UTF)
-		    SvUTF8_on(data->last_found);
 		{
 		    SV * const sv = data->last_found;
-		    MAGIC * const mg = SvUTF8(sv) && SvMAGICAL(sv) ?
+		    MAGIC * const mg = SvMAGICAL(sv) ?
 			mg_find(sv, PERL_MAGIC_utf8) : NULL;
 		    if (mg && mg->mg_len >= 0)
 			mg->mg_len += utf8_length((U8*)STRING(scan),
@@ -2910,10 +2673,9 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		int compat = 1;
 
 		if (uc >= 0x100 ||
-		    (!(data->start_class->flags & (ANYOF_CLASS | ANYOF_LOCALE))
-		    && !ANYOF_BITMAP_TEST(data->start_class, uc)
-		    && (!(data->start_class->flags & ANYOF_FOLD)
-			|| !ANYOF_BITMAP_TEST(data->start_class, PL_fold[uc])))
+		    (!ANYOF_BITMAP_TEST(data->start_class, uc)
+		     && (!(data->start_class->flags & ANYOF_FOLD)
+			 || !ANYOF_BITMAP_TEST(data->start_class, PL_fold[uc])))
                     )
 		    compat = 0;
 		ANYOF_CLASS_ZERO(data->start_class);
@@ -2931,54 +2693,6 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		else
 		    data->start_class->flags |= ANYOF_UNICODE_ALL;
 		data->start_class->flags &= ~ANYOF_EOS;
-		cl_and(data->start_class, and_withp);
-	    }
-	    flags &= ~SCF_DO_STCLASS;
-	}
-	else if (PL_regkind[OP(scan)] == EXACT) { /* But OP != EXACT! */
-	    I32 l = STR_LEN(scan);
-	    UV uc = *((U8*)STRING(scan));
-
-	    /* Search for fixed substrings supports EXACT only. */
-	    if (flags & SCF_DO_SUBSTR) {
-		assert(data);
-		SCAN_COMMIT(pRExC_state, data, minlenp);
-	    }
-	    if (UTF) {
-		const U8 * const s = (U8 *)STRING(scan);
-		l = utf8_length(s, s + l);
-		uc = utf8_to_uvchr(s, NULL);
-	    }
-	    min += l;
-	    if (flags & SCF_DO_SUBSTR)
-		data->pos_min += l;
-	    if (flags & SCF_DO_STCLASS_AND) {
-		/* Check whether it is compatible with what we know already! */
-		int compat = 1;
-
-		if (uc >= 0x100 ||
-		    (!(data->start_class->flags & (ANYOF_CLASS | ANYOF_LOCALE))
-		    && !ANYOF_BITMAP_TEST(data->start_class, uc)
-		     && !ANYOF_BITMAP_TEST(data->start_class, PL_fold[uc])))
-		    compat = 0;
-		ANYOF_CLASS_ZERO(data->start_class);
-		ANYOF_BITMAP_ZERO(data->start_class);
-		if (compat) {
-		    ANYOF_BITMAP_SET(data->start_class, uc);
-		    data->start_class->flags &= ~ANYOF_EOS;
-		    data->start_class->flags |= ANYOF_FOLD;
-		    if (OP(scan) == EXACTFL)
-			data->start_class->flags |= ANYOF_LOCALE;
-		}
-	    }
-	    else if (flags & SCF_DO_STCLASS_OR) {
-		if (data->start_class->flags & ANYOF_FOLD) {
-		    /* false positive possible if the class is case-folded.
-		       Assume that the locale settings are the same... */
-		    if (uc < 0x100)
-			ANYOF_BITMAP_SET(data->start_class, uc);
-		    data->start_class->flags &= ~ANYOF_EOS;
-		}
 		cl_and(data->start_class, and_withp);
 	    }
 	    flags &= ~SCF_DO_STCLASS;
@@ -3272,14 +2986,10 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			I32 old = b - data->last_start_min;
 #endif
 
-			if (UTF)
-			    old = utf8_hop((U8*)s, old) - (U8*)s;
-			
 			l -= old;
 			/* Get the added string: */
 			last_str = newSVpvn(s  + old, l);
-			if (UTF)
-			    SvUTF8_on(last_str);
+
 			if (deltanext == 0 && pos_before == b) {
 			    /* What was added is a constant string */
 			    if (mincount > 1) {
@@ -3294,10 +3004,10 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 				{
 				    SV * sv = data->last_found;
 				    MAGIC *mg =
-					SvUTF8(sv) && SvMAGICAL(sv) ?
+					SvMAGICAL(sv) ?
 					mg_find(sv, PERL_MAGIC_utf8) : NULL;
 				    if (mg && mg->mg_len >= 0)
-					mg->mg_len += CHR_SVLEN(last_str) - l;
+					mg->mg_len += sv_len_utf8(last_str);
 				}
 				data->last_end += l * (mincount - 1);
 			    }
@@ -3318,7 +3028,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			SCAN_COMMIT(pRExC_state,data,minlenp);
 			if (mincount && last_str) {
 			    SV * const sv = data->last_found;
-			    MAGIC * const mg = SvUTF8(sv) && SvMAGICAL(sv) ?
+			    MAGIC * const mg = SvMAGICAL(sv) ?
 				mg_find(sv, PERL_MAGIC_utf8) : NULL;
 
 			    if (mg)
@@ -3326,11 +3036,11 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			    sv_setsv(sv, last_str);
 			    data->last_end = data->pos_min;
 			    data->last_start_min =
-				data->pos_min - CHR_SVLEN(last_str);
+				data->pos_min - SvCUR(last_str);
 			    data->last_start_max = is_inf
 				? I32_MAX
 				: data->pos_min + data->pos_delta
-				- CHR_SVLEN(last_str);
+				- SvCUR(last_str);
 			}
 			data->longest = &(data->longest_float);
 		    }
@@ -3363,12 +3073,12 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		data->start_class->flags &= ~ANYOF_EOS;	/* No match on empty */
     	        if (flags & SCF_DO_STCLASS_AND) {
                     for (value = 0; value < 256; value++)
-                        if (!is_VERTWS_cp(value))
+                        if (!is_LNBREAK_CP_cp(value))
                             ANYOF_BITMAP_CLEAR(data->start_class, value);  
                 }                                                              
                 else {                                                         
                     for (value = 0; value < 256; value++)
-                        if (is_VERTWS_cp(value))
+                        if (is_LNBREAK_CP_cp(value))
                             ANYOF_BITMAP_SET(data->start_class, value);	   
                 }                                                              
                 if (flags & SCF_DO_STCLASS_OR)
@@ -3403,6 +3113,10 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 	    if (flags & SCF_DO_SUBSTR) {
 		SCAN_COMMIT(pRExC_state,data,minlenp);
 		data->pos_min++;
+		if (0) { /* TODO: if unicode */
+		    data->pos_delta += UTF8_MAXBYTES - 1;
+		    data->longest = &(data->longest_float);
+		}
 	    }
 	    min++;
 	    if (flags & SCF_DO_STCLASS) {
@@ -3419,17 +3133,18 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			cl_anything(pRExC_state, data->start_class);
 		    break;
 		case REG_ANY:
+		case REG_ANYU:
 		    if (OP(scan) == SANY)
 			goto do_default;
 		    if (flags & SCF_DO_STCLASS_OR) { /* Everything but \n */
-			value = (ANYOF_BITMAP_TEST(data->start_class,'\n')
-				 || (data->start_class->flags & ANYOF_CLASS));
+			value = (ANYOF_BITMAP_TEST(data->start_class,'\n'));
 			cl_anything(pRExC_state, data->start_class);
 		    }
 		    if (flags & SCF_DO_STCLASS_AND || !value)
 			ANYOF_BITMAP_CLEAR(data->start_class,'\n');
 		    break;
 		case ANYOF:
+		case ANYOFU:
 		    if (flags & SCF_DO_STCLASS_AND)
 			cl_and(data->start_class,
 			       (struct regnode_charclass_class*)scan);
@@ -3437,163 +3152,6 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			cl_or(pRExC_state, data->start_class,
 			      (struct regnode_charclass_class*)scan);
 		    break;
-		case ALNUM:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (!(data->start_class->flags & ANYOF_LOCALE)) {
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_NALNUM);
-			    for (value = 0; value < 256; value++)
-				if (!isALNUM(value))
-				    ANYOF_BITMAP_CLEAR(data->start_class, value);
-			}
-		    }
-		    else {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_SET(data->start_class,ANYOF_ALNUM);
-			else {
-			    for (value = 0; value < 256; value++)
-				if (isALNUM(value))
-				    ANYOF_BITMAP_SET(data->start_class, value);			
-			}
-		    }
-		    break;
-		case ALNUML:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_NALNUM);
-		    }
-		    else {
-			ANYOF_CLASS_SET(data->start_class,ANYOF_ALNUM);
-			data->start_class->flags |= ANYOF_LOCALE;
-		    }
-		    break;
-		case NALNUM:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (!(data->start_class->flags & ANYOF_LOCALE)) {
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_ALNUM);
-			    for (value = 0; value < 256; value++)
-				if (isALNUM(value))
-				    ANYOF_BITMAP_CLEAR(data->start_class, value);
-			}
-		    }
-		    else {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_SET(data->start_class,ANYOF_NALNUM);
-			else {
-			    for (value = 0; value < 256; value++)
-				if (!isALNUM(value))
-				    ANYOF_BITMAP_SET(data->start_class, value);			
-			}
-		    }
-		    break;
-		case NALNUML:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_ALNUM);
-		    }
-		    else {
-			data->start_class->flags |= ANYOF_LOCALE;
-			ANYOF_CLASS_SET(data->start_class,ANYOF_NALNUM);
-		    }
-		    break;
-		case SPACE:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (!(data->start_class->flags & ANYOF_LOCALE)) {
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_NSPACE);
-			    for (value = 0; value < 256; value++)
-				if (!isSPACE(value))
-				    ANYOF_BITMAP_CLEAR(data->start_class, value);
-			}
-		    }
-		    else {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_SET(data->start_class,ANYOF_SPACE);
-			else {
-			    for (value = 0; value < 256; value++)
-				if (isSPACE(value))
-				    ANYOF_BITMAP_SET(data->start_class, value);			
-			}
-		    }
-		    break;
-		case SPACEL:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_NSPACE);
-		    }
-		    else {
-			data->start_class->flags |= ANYOF_LOCALE;
-			ANYOF_CLASS_SET(data->start_class,ANYOF_SPACE);
-		    }
-		    break;
-		case NSPACE:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (!(data->start_class->flags & ANYOF_LOCALE)) {
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_SPACE);
-			    for (value = 0; value < 256; value++)
-				if (isSPACE(value))
-				    ANYOF_BITMAP_CLEAR(data->start_class, value);
-			}
-		    }
-		    else {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_SET(data->start_class,ANYOF_NSPACE);
-			else {
-			    for (value = 0; value < 256; value++)
-				if (!isSPACE(value))
-				    ANYOF_BITMAP_SET(data->start_class, value);			
-			}
-		    }
-		    break;
-		case NSPACEL:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			if (data->start_class->flags & ANYOF_LOCALE) {
-			    ANYOF_CLASS_CLEAR(data->start_class,ANYOF_SPACE);
-			    for (value = 0; value < 256; value++)
-				if (!isSPACE(value))
-				    ANYOF_BITMAP_CLEAR(data->start_class, value);
-			}
-		    }
-		    else {
-			data->start_class->flags |= ANYOF_LOCALE;
-			ANYOF_CLASS_SET(data->start_class,ANYOF_NSPACE);
-		    }
-		    break;
-		case DIGIT:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			ANYOF_CLASS_CLEAR(data->start_class,ANYOF_NDIGIT);
-			for (value = 0; value < 256; value++)
-			    if (!isDIGIT(value))
-				ANYOF_BITMAP_CLEAR(data->start_class, value);
-		    }
-		    else {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_SET(data->start_class,ANYOF_DIGIT);
-			else {
-			    for (value = 0; value < 256; value++)
-				if (isDIGIT(value))
-				    ANYOF_BITMAP_SET(data->start_class, value);			
-			}
-		    }
-		    break;
-		case NDIGIT:
-		    if (flags & SCF_DO_STCLASS_AND) {
-			ANYOF_CLASS_CLEAR(data->start_class,ANYOF_DIGIT);
-			for (value = 0; value < 256; value++)
-			    if (isDIGIT(value))
-				ANYOF_BITMAP_CLEAR(data->start_class, value);
-		    }
-		    else {
-			if (data->start_class->flags & ANYOF_LOCALE)
-			    ANYOF_CLASS_SET(data->start_class,ANYOF_NDIGIT);
-			else {
-			    for (value = 0; value < 256; value++)
-				if (!isDIGIT(value))
-				    ANYOF_BITMAP_SET(data->start_class, value);			
-			}
-		    }
-		    break;
-		CASE_SYNST_FNC(VERTWS);
-		CASE_SYNST_FNC(HORIZWS);
-		
 		}
 		if (flags & SCF_DO_STCLASS_OR)
 		    cl_and(data->start_class, and_withp);
@@ -4134,17 +3692,14 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
     GET_RE_DEBUG_FLAGS_DECL;
     DEBUG_r(if (!PL_colorset) reginitcolors());
 
-    RExC_utf8 = RExC_orig_utf8 = pm_flags & RXf_UTF8;
-
     DEBUG_COMPILE_r({
         SV *dsv= sv_newmortal();
-        RE_PV_QUOTED_DECL(s, RExC_utf8,
+        RE_PV_QUOTED_DECL(s, 1,
             dsv, exp, plen, 60);
         PerlIO_printf(Perl_debug_log, "%sCompiling REx%s %s\n",
 		       PL_colors[4],PL_colors[5],s);
     });
 
-redo_first_pass:
     RExC_precomp = exp;
     RExC_flags = pm_flags;
     RExC_sawback = 0;
@@ -4179,29 +3734,14 @@ redo_first_pass:
        * Clever compilers notice this and complain. --jhi */
     REGC((U8)REG_MAGIC, (char*)RExC_emit);
 #endif
-    DEBUG_PARSE_r(PerlIO_printf(Perl_debug_log, "Starting first pass (sizing)\n"));
+    DEBUG_PARSE_r({
+	PerlIO_printf(Perl_debug_log, "Starting first pass (sizing)\n");
+        RExC_lastnum=0; 
+        RExC_lastparse=NULL; 
+    });
     if (reg(pRExC_state, 0, &flags,1) == NULL) {
 	RExC_precomp = NULL;
 	return(NULL);
-    }
-    if (RExC_utf8 && !RExC_orig_utf8) {
-        /* It's possible to write a regexp in ascii that represents Unicode
-        codepoints outside of the byte range, such as via \x{100}. If we
-        detect such a sequence we have to convert the entire pattern to utf8
-        and then recompile, as our sizing calculation will have been based
-        on 1 byte == 1 character, but we will need to use utf8 to encode
-        at least some part of the pattern, and therefore must convert the whole
-        thing.
-        XXX: somehow figure out how to make this less expensive...
-        -- dmq */
-        STRLEN len = plen;
-        DEBUG_PARSE_r(PerlIO_printf(Perl_debug_log,
-	    "UTF8 mismatch! Converting to utf8 for resizing and compile\n"));
-        exp = (char*)Perl_bytes_to_utf8(aTHX_ (U8*)exp, &len);
-        xend = exp + len;
-        RExC_orig_utf8 = RExC_utf8;
-        SAVEFREEPV(exp);
-        goto redo_first_pass;
     }
     DEBUG_PARSE_r({
         PerlIO_printf(Perl_debug_log, 
@@ -4297,14 +3837,15 @@ redo_first_pass:
     }
 
     /* Useful during FAIL. */
-#ifdef RE_TRACK_PATTERN_OFFSETS
     Newxz(ri->u.offsets, 2*RExC_size+1, U32); /* MJD 20001228 */
+    if (ri->u.offsets) {
+	ri->u.offsets[0] = RExC_size;
+    }
     DEBUG_OFFSETS_r(PerlIO_printf(Perl_debug_log,
                           "%s %"UVuf" bytes for offset annotations.\n",
                           ri->u.offsets ? "Got" : "Couldn't get",
                           (UV)((2*RExC_size+1) * sizeof(U32))));
-#endif
-    SetProgLen(ri,RExC_size);
+
     RExC_rx = r;
     RExC_rxi = ri;
 
@@ -4365,8 +3906,6 @@ reStudy:
     r->extflags = RExC_flags; /* was pm_op */
     /*dmq: removed as part of de-PMOP: pm->op_pmflags = RExC_flags; */
  
-    if (UTF)
-        r->extflags |= RXf_UTF8;	/* Unicode in it? */
     ri->regstclass = NULL;
     if (RExC_naughty >= 10)	/* Probably an expensive pattern. */
 	r->intflags |= PREGf_NAUGHTY;
@@ -4413,10 +3952,7 @@ reStudy:
         DEBUG_PEEP("first:",first,0);
         /* Ignore EXACT as we deal with it later. */
 	if (PL_regkind[OP(first)] == EXACT) {
-	    if (OP(first) == EXACT)
-		NOOP;	/* Empty, get anchored substr later. */
-	    else if ((OP(first) == EXACTF || OP(first) == EXACTFL))
-		ri->regstclass = first;
+	    NOOP;	/* Empty, get anchored substr later. */
 	}
 #ifdef TRIE_STCLASS	
 	else if (PL_regkind[OP(first)] == TRIE &&
@@ -4440,8 +3976,11 @@ reStudy:
 	    ri->regstclass = trie_op;
 	}
 #endif	
-	else if (strchr((const char*)PL_simple,OP(first)))
+	else if (strchr((const char*)PL_simple,OP(first)) || (OP(first) == ANYOFU) ) {
+	    DEBUG_PEEP("ABC first after:",first,0);
 	    ri->regstclass = first;
+	    DEBUG_PEEP("DEF first:",first,0);
+	}
 	else if (PL_regkind[OP(first)] == BOUND ||
 		 PL_regkind[OP(first)] == NBOUND)
 	    ri->regstclass = first;
@@ -4488,7 +4027,7 @@ reStudy:
         );
 #else
 	DEBUG_PARSE_r(
-	    PerlIO_printf(Perl_debug_log, "first at %"IVdf"\n",
+	    PerlIO_printf(Perl_debug_log, "Xfirst at %"IVdf"\n",
 	        (IV)(first - scan + 1))
         );
 #endif
@@ -4523,6 +4062,7 @@ reStudy:
             &data, -1, NULL, NULL,
             SCF_DO_SUBSTR | SCF_WHILEM_VISITED_POS | stclass_flag,0);
 
+	DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "minlen: %d\n", minlen));
 	
         CHECK_RESTUDY_GOTO;
 
@@ -4540,7 +4080,7 @@ reStudy:
            follows immediately below, changes may need to be made to both. 
            Be careful. 
          */
-	longest_float_length = CHR_SVLEN(data.longest_float);
+	longest_float_length = SvCUR(data.longest_float);
 	if (longest_float_length
 	    || (data.flags & SF_FL_BEFORE_EOL
 		&& (!(data.flags & SF_FL_BEFORE_MEOL)
@@ -4555,13 +4095,8 @@ reStudy:
 
             /* copy the information about the longest float from the reg_scan_data
                over to the program. */
-	    if (SvUTF8(data.longest_float)) {
-		r->float_utf8 = data.longest_float;
-		r->float_substr = NULL;
-	    } else {
-		r->float_substr = data.longest_float;
-		r->float_utf8 = NULL;
-	    }
+	    r->float_substr = data.longest_float;
+
 	    /* float_end_shift is how many chars that must be matched that 
 	       follow this item. We calculate it ahead of time as once the
 	       lookbehind offset is added in we lose the ability to correctly
@@ -4583,7 +4118,7 @@ reStudy:
 	}
 	else {
 	  remove_float:
-	    r->float_substr = r->float_utf8 = NULL;
+	    r->float_substr = NULL;
 	    SvREFCNT_dec(data.longest_float);
 	    longest_float_length = 0;
 	}
@@ -4592,7 +4127,7 @@ reStudy:
            is immediately above, changes may need to be made to both. 
            Be careful. 
          */
-	longest_fixed_length = CHR_SVLEN(data.longest_fixed);
+	longest_fixed_length = SvCUR(data.longest_fixed);
 	if (longest_fixed_length
 	    || (data.flags & SF_FIX_BEFORE_EOL /* Cannot have SEOL and MULTI */
 		&& (!(data.flags & SF_FIX_BEFORE_MEOL)
@@ -4602,13 +4137,8 @@ reStudy:
 
             /* copy the information about the longest fixed 
                from the reg_scan_data over to the program. */
-	    if (SvUTF8(data.longest_fixed)) {
-		r->anchored_utf8 = data.longest_fixed;
-		r->anchored_substr = NULL;
-	    } else {
-		r->anchored_substr = data.longest_fixed;
-		r->anchored_utf8 = NULL;
-	    }
+	    r->anchored_substr = data.longest_fixed;
+
 	    /* fixed_end_shift is how many chars that must be matched that 
 	       follow this item. We calculate it ahead of time as once the
 	       lookbehind offset is added in we lose the ability to correctly
@@ -4626,14 +4156,14 @@ reStudy:
 	    fbm_compile(data.longest_fixed, t ? FBMcf_TAIL : 0);
 	}
 	else {
-	    r->anchored_substr = r->anchored_utf8 = NULL;
+	    r->anchored_substr = NULL;
 	    SvREFCNT_dec(data.longest_fixed);
 	    longest_fixed_length = 0;
 	}
 	if (ri->regstclass
 	    && (OP(ri->regstclass) == REG_ANY || OP(ri->regstclass) == SANY))
 	    ri->regstclass = NULL;
-	if ((!(r->anchored_substr || r->anchored_utf8) || r->anchored_offset)
+	if ((!r->anchored_substr || r->anchored_offset)
 	    && stclass_flag
 	    && !(data.start_class->flags & ANYOF_EOS)
 	    && !cl_is_anything(data.start_class))
@@ -4647,6 +4177,7 @@ reStudy:
 		       struct regnode_charclass_class);
 	    ri->regstclass = (regnode*)RExC_rxi->data->data[n];
 	    r->intflags &= ~PREGf_SKIP;	/* Used in find_byclass(). */
+	    /* DEBUG_COMPILE_r( Perl_croak("foobar") ); */
 	    DEBUG_COMPILE_r({ SV *sv = sv_newmortal();
 	              regprop(r, sv, (regnode*)data.start_class);
 		      PerlIO_printf(Perl_debug_log,
@@ -4658,7 +4189,6 @@ reStudy:
 	if (longest_fixed_length > longest_float_length) {
 	    r->check_end_shift = r->anchored_end_shift;
 	    r->check_substr = r->anchored_substr;
-	    r->check_utf8 = r->anchored_utf8;
 	    r->check_offset_min = r->check_offset_max = r->anchored_offset;
 	    if (r->extflags & RXf_ANCH_SINGLE)
 		r->extflags |= RXf_NOSCAN;
@@ -4666,15 +4196,14 @@ reStudy:
 	else {
 	    r->check_end_shift = r->float_end_shift;
 	    r->check_substr = r->float_substr;
-	    r->check_utf8 = r->float_utf8;
 	    r->check_offset_min = r->float_min_offset;
 	    r->check_offset_max = r->float_max_offset;
 	}
 	/* XXXX Currently intuiting is not compatible with ANCH_GPOS.
 	   This should be changed ASAP!  */
-	if ((r->check_substr || r->check_utf8) && !(r->extflags & RXf_ANCH_GPOS)) {
+	if ((r->check_substr) && !(r->extflags & RXf_ANCH_GPOS)) {
 	    r->extflags |= RXf_USE_INTUIT;
-	    if (SvTAIL(r->check_substr ? r->check_substr : r->check_utf8))
+	    if (SvTAIL(r->check_substr))
 		r->extflags |= RXf_INTUIT_TAIL;
 	}
 	/* XXX Unneeded? dmq (shouldn't as this is handled elsewhere)
@@ -4703,8 +4232,7 @@ reStudy:
         
         CHECK_RESTUDY_GOTO;
 
-	r->check_substr = r->check_utf8 = r->anchored_substr = r->anchored_utf8
-		= r->float_substr = r->float_utf8 = NULL;
+	r->check_substr = r->anchored_substr = r->float_substr = NULL;
 	if (!(data.start_class->flags & ANYOF_EOS)
 	    && !cl_is_anything(data.start_class))
 	{
@@ -4751,34 +4279,10 @@ reStudy:
         r->paren_names = (HV*)SvREFCNT_inc(RExC_paren_names);
     else
         r->paren_names = NULL;
-
-#ifdef STUPID_PATTERN_CHECKS            
-    if (r->prelen == 0)
-        r->extflags |= RXf_NULL;
-    if (r->extflags & RXf_SPLIT && r->prelen == 1 && r->precomp[0] == ' ')
-        /* XXX: this should happen BEFORE we compile */
-        r->extflags |= (RXf_SKIPWHITE|RXf_WHITE); 
-    else if (r->prelen == 3 && memEQ("\\s+", r->precomp, 3))
-        r->extflags |= RXf_WHITE;
+    if (r->prelen == 3 && strnEQ("\\s+", r->precomp, 3)) /* precomp = "\\s+)" */
+	r->extflags |= RXf_WHITE;
     else if (r->prelen == 1 && r->precomp[0] == '^')
         r->extflags |= RXf_START_ONLY;
-#else
-    if (r->extflags & RXf_SPLIT && r->prelen == 1 && r->precomp[0] == ' ')
-            /* XXX: this should happen BEFORE we compile */
-            r->extflags |= (RXf_SKIPWHITE|RXf_WHITE); 
-    else {
-        regnode *first = ri->program + 1;
-        U8 fop = OP(first);
-        U8 nop = OP(NEXTOPER(first));
-        
-        if (PL_regkind[fop] == NOTHING && nop == END)
-            r->extflags |= RXf_NULL;
-        else if (PL_regkind[fop] == BOL && nop == END)
-            r->extflags |= RXf_START_ONLY;
-        else if (fop == PLUS && nop ==SPACE && OP(regnext(first))==END)
-            r->extflags |= RXf_WHITE;    
-    }
-#endif
 #ifdef DEBUGGING
     if (RExC_paren_names) {
         ri->name_list_idx = add_data( pRExC_state, 1, "p" );
@@ -4800,7 +4304,6 @@ reStudy:
         PerlIO_printf(Perl_debug_log,"Final program:\n");
         regdump(r);
     });
-#ifdef RE_TRACK_PATTERN_OFFSETS
     DEBUG_OFFSETS_r(if (ri->u.offsets) {
         const U32 len = ri->u.offsets[0];
         U32 i;
@@ -4813,7 +4316,6 @@ reStudy:
             }
         PerlIO_printf(Perl_debug_log, "\n");
     });
-#endif
     return(r);
 }
 
@@ -5056,15 +4558,6 @@ Perl_reg_numbered_buff_fetch(pTHX_ REGEXP * const rx, const I32 paren, SV * cons
         TAINT_NOT;
         sv_setpvn(sv, s, i);
         PL_tainted = oldtainted;
-        if ( (rx->extflags & RXf_CANY_SEEN)
-            ? (RX_MATCH_UTF8(rx)
-                        && (!i || is_utf8_string((U8*)s, i)))
-            : (RX_MATCH_UTF8(rx)) )
-        {
-            SvUTF8_on(sv);
-        }
-        else
-            SvUTF8_off(sv);
         if (PL_tainting) {
             if (RX_MATCH_TAINTED(rx)) {
                 if (SvTYPE(sv) >= SVt_PVMG) {
@@ -5148,7 +4641,7 @@ Perl_reg_numbered_buff_length(pTHX_ REGEXP * const rx, const SV * const sv,
         }
     }
   getlen:
-    if (i > 0 && RX_MATCH_UTF8(rx)) {
+    if (i > 0 && IN_CODEPOINTS) {
         const char * const s = rx->subbeg + s1;
         const U8 *ep;
         STRLEN el;
@@ -5198,8 +4691,6 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags) {
     if ( flags ) {
         SV* sv_name = sv_2mortal(Perl_newSVpvn(aTHX_ name_start,
             (int)(RExC_parse - name_start)));
-	if (UTF)
-            SvUTF8_on(sv_name);
         if ( flags == REG_RSN_RETURN_NAME)
             return sv_name;
         else if (flags==REG_RSN_RETURN_DATA) {
@@ -5459,7 +4950,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                     }
                     RExC_sawback = 1;
                     ret = reganode(pRExC_state,
-                    	   (U8)(FOLD ? (LOC ? NREFFL : NREFF) : NREF),
+                    	   (U8)(FOLD ? NREFF : NREF),
                     	   num);
                     *flagp |= HASWIDTH;
 
@@ -5882,11 +5373,11 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                 vFAIL("Sequence (? incomplete");
                 break;
 	    default:
-	        --RExC_parse;
-	        parse_flags:      /* (?i) */  
+		--RExC_parse;
+	        parse_flags:      /* (?i) */
 	    {
                 U32 posflags = 0, negflags = 0;
-	        U32 *flagsp = &posflags;
+                U32 *flagsp = &posflags;
 
 		while (*RExC_parse) {
 		    /* && strchr("iogcmsx", *RExC_parse) */
@@ -6405,6 +5896,133 @@ S_regpiece(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
     return(ret);
 }
 
+STATIC regnode *
+S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
+{
+    dVAR;
+    register regnode *ret;
+    STRLEN numlen;
+    IV namedclass;
+    char *rangebegin = NULL;
+    SV *listsv = NULL;
+    bool optimize_invert   = TRUE;
+    AV* unicode_alternate  = NULL;
+
+    regnode * const orig_emit = RExC_emit; /* Save the original RExC_emit in
+        case we need to change the emitted regop to an EXACT. */
+    const char * orig_parse = RExC_parse;
+
+    GET_RE_DEBUG_FLAGS_DECL;
+
+    /* Assume we are going to generate an ANYOF node. */
+    ret = reganode(pRExC_state, (UTF ? ANYOFU : ANYOF), 0);
+
+    if (!SIZE_ONLY)
+	ANYOF_FLAGS(ret) = 0;
+
+    if (SIZE_ONLY) {
+	RExC_size += ANYOF_SKIP;
+	listsv = &PL_sv_undef; /* For code scanners: listsv always non-NULL. */
+    }
+    else {
+ 	RExC_emit += ANYOF_SKIP;
+	if (FOLD)
+	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
+	if (UTF)
+	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
+	ANYOF_BITMAP_ZERO(ret);
+	listsv = newSVpvs("# comment\n");
+    }
+
+
+	/* now is the next time */
+	if (!SIZE_ONLY) {
+	    if (value < 256) {
+		ANYOF_BITMAP_SET(ret, value);
+	    }
+	}
+	if (UTF && !SIZE_ONLY) {
+	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
+
+		    Perl_sv_catpvf(aTHX_ listsv, "%04"UVxf"\n", value);
+		    if (FOLD) {
+			 U8 foldbuf[UTF8_MAXBYTES_CASE+1];
+			 STRLEN foldlen;
+			 const UV f = to_uni_fold(value, foldbuf, &foldlen);
+
+			 /* If folding and foldable and a single
+			  * character, insert also the folded version
+			  * to the charclass. */
+			 if (f != value) {
+			     if (f < 256) {
+				 ANYOF_BITMAP_SET(ret, f);
+			     }
+			     if (foldlen == (STRLEN)UNISKIP(f)) {
+				  Perl_sv_catpvf(aTHX_ listsv,
+						 "%04"UVxf"\n", f);
+			     }
+			      else {
+				  /* Any multicharacter foldings
+				   * require the following transform:
+				   * [ABCDEF] -> (?:[ABCabcDEFd]|pq|rst)
+				   * where E folds into "pq" and F folds
+				   * into "rst", all other characters
+				   * fold to single characters.  We save
+				   * away these multicharacter foldings,
+				   * to be later saved as part of the
+				   * additional "s" data. */
+				  SV *sv;
+
+				  if (!unicode_alternate)
+				      unicode_alternate = newAV();
+				  DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "add alternate\n"));
+				  sv = newSVpvn((char*)foldbuf, foldlen);
+				  av_push(unicode_alternate, sv);
+			      }
+			 }
+
+			 /* If folding and the value is one of the Greek
+			  * sigmas insert a few more sigmas to make the
+			  * folding rules of the sigmas to work right.
+			  * Note that not all the possible combinations
+			  * are handled here: some of them are handled
+			  * by the standard folding rules, and some of
+			  * them (literal or EXACTF cases) are handled
+			  * during runtime in regexec.c:S_find_byclass(). */
+			 if (value == UNICODE_GREEK_SMALL_LETTER_FINAL_SIGMA) {
+			      Perl_sv_catpvf(aTHX_ listsv, "%04"UVxf"\n",
+					     (UV)UNICODE_GREEK_CAPITAL_LETTER_SIGMA);
+			      Perl_sv_catpvf(aTHX_ listsv, "%04"UVxf"\n",
+					     (UV)UNICODE_GREEK_SMALL_LETTER_SIGMA);
+			 }
+			 else if (value == UNICODE_GREEK_CAPITAL_LETTER_SIGMA)
+			      Perl_sv_catpvf(aTHX_ listsv, "%04"UVxf"\n",
+					     (UV)UNICODE_GREEK_SMALL_LETTER_SIGMA);
+		    }
+        }
+
+    if (SIZE_ONLY)
+        return ret;
+    /****** !SIZE_ONLY AFTER HERE *********/
+
+    /* apply case-insensitive search to bitmap */
+    if (ANYOF_FLAGS(ret) & ANYOF_FOLD) {
+	for (value = 0; value < 256; ++value) {
+	    if (ANYOF_BITMAP_TEST(ret, value)) {
+		UV fold = PL_fold[value];
+
+		if (fold != value)
+		    ANYOF_BITMAP_SET(ret, fold);
+	    }
+	}
+    }
+
+    anyof_get_swash(pRExC_state, ret, listsv, unicode_alternate);
+
+    return ret;
+
+}
+
 
 /* reg_namedseq(pRExC_state,UVp)
    
@@ -6461,7 +6079,8 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         vFAIL("Missing right brace on \\N{}");
     } 
     RExC_parse = endbrace + 1;  
-    
+
+    RExC_flags |= RXf_PMf_UTF8; /* namedsequences are always unicode */
     
     /* RExC_parse points at the beginning brace, 
        endbrace points at the last */
@@ -6476,8 +6095,6 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         if ( len != (STRLEN)(endbrace - name - 2) ) {
             cp = 0xFFFD;
         }    
-        if (cp > 0xff)
-            RExC_utf8 = 1;
         if ( valuep ) {
             *valuep = cp;
             return NULL;
@@ -6552,10 +6169,8 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         char *p = SvPV(sv_str, len);
         if (len) {
             STRLEN numlen = 1;
-            if ( SvUTF8(sv_str) ) {
+            if ( UTF ) {
                 *valuep = utf8_to_uvchr((U8*)p, &numlen);
-                if (*valuep > 0x7F)
-                    RExC_utf8 = 1; 
                 /* XXXX
                   We have to turn on utf8 for high bit chars otherwise
                   we get failures with
@@ -6595,72 +6210,70 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         char *s; 
         char *p, *pend;        
         STRLEN charlen = 1;
-#ifdef DEBUGGING
         char * parse_start = name-3; /* needed for the offsets */
-#endif
         GET_RE_DEBUG_FLAGS_DECL;     /* needed for the offsets */
         
-        ret = reg_node(pRExC_state,
-            (U8)(FOLD ? (LOC ? EXACTFL : EXACTF) : EXACT));
-        s= STRING(ret);
+	if (FOLD) {
+	    p = SvPV(sv_str, len);
+	    UV uvc = utf8_to_uvchr((U8*)p, &charlen);
+	    ret = regclassfold_value(pRExC_state, uvc);
+	} else {
+	    ret = reg_node(pRExC_state, (U8)EXACT);
+	    
+	    s= STRING(ret);
         
-        if ( RExC_utf8 && !SvUTF8(sv_str) ) {
-            sv_utf8_upgrade(sv_str);
-        } else if ( !RExC_utf8 && SvUTF8(sv_str) ) {
-            RExC_utf8= 1;
-        }
-        
-        p = SvPV(sv_str, len);
-        pend = p + len;
-        /* len is the length written, charlen is the size the char read */
-        for ( len = 0; p < pend; p += charlen ) {
-            if (UTF) {
-                UV uvc = utf8_to_uvchr((U8*)p, &charlen);
-                if (FOLD) {
-                    STRLEN foldlen,numlen;
-                    U8 tmpbuf[UTF8_MAXBYTES_CASE+1], *foldbuf;
-                    uvc = toFOLD_uni(uvc, tmpbuf, &foldlen);
-                    /* Emit all the Unicode characters. */
+	    p = SvPV(sv_str, len);
+	    pend = p + len;
+	    /* len is the length written, charlen is the size the char read */
+	    for ( len = 0; p < pend; p += charlen ) {
+		if (UTF) {
+		    UV uvc = utf8_to_uvchr((U8*)p, &charlen);
+		    if (FOLD) {
+			STRLEN foldlen,numlen;
+			U8 tmpbuf[UTF8_MAXBYTES_CASE+1], *foldbuf;
+			uvc = toFOLD_uni(uvc, tmpbuf, &foldlen);
+			/* Emit all the Unicode characters. */
                     
-                    for (foldbuf = tmpbuf;
-                        foldlen;
-                        foldlen -= numlen) 
-                    {
-                        uvc = utf8_to_uvchr(foldbuf, &numlen);
-                        if (numlen > 0) {
-                            const STRLEN unilen = reguni(pRExC_state, uvc, s);
-                            s       += unilen;
-                            len     += unilen;
-                            /* In EBCDIC the numlen
-                            * and unilen can differ. */
-                            foldbuf += numlen;
-                            if (numlen >= foldlen)
-                                break;
-                        }
-                        else
-                            break; /* "Can't happen." */
-                    }                          
-                } else {
-                    const STRLEN unilen = reguni(pRExC_state, uvc, s);
-        	    if (unilen > 0) {
-        	       s   += unilen;
-        	       len += unilen;
-        	    }
-        	}
+			for (foldbuf = tmpbuf;
+			     foldlen;
+			     foldlen -= numlen) 
+			    {
+				uvc = utf8_to_uvchr(foldbuf, &numlen);
+				if (numlen > 0) {
+				    const STRLEN unilen = reguni(pRExC_state, uvc, s);
+				    s       += unilen;
+				    len     += unilen;
+				    /* In EBCDIC the numlen
+				     * and unilen can differ. */
+				    foldbuf += numlen;
+				    if (numlen >= foldlen)
+					break;
+				}
+				else
+				    break; /* "Can't happen." */
+			    }                          
+		    } else {
+			const STRLEN unilen = reguni(pRExC_state, uvc, s);
+			if (unilen > 0) {
+			    s   += unilen;
+			    len += unilen;
+			}
+		    }
+		} else {
+		    len++;
+		    REGC(*p, s++);
+		}
+	    }
+	    if (SIZE_ONLY) {
+		RExC_size += STR_SZ(len);
 	    } else {
-                len++;
-                REGC(*p, s++);
-            }
-        }
-        if (SIZE_ONLY) {
-            RExC_size += STR_SZ(len);
-        } else {
-            STR_LEN(ret) = len;
-            RExC_emit += STR_SZ(len);
-        }
-        Set_Node_Cur_Length(ret); /* MJD */
-        RExC_parse--; 
-        nextchar(pRExC_state);
+		STR_LEN(ret) = len;
+		RExC_emit += STR_SZ(len);
+	    }
+	    Set_Node_Cur_Length(ret); /* MJD */
+	    RExC_parse--; 
+	    nextchar(pRExC_state);
+	}
     } else {
         ret = reg_node(pRExC_state,NOTHING);
     }
@@ -6672,38 +6285,6 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
     }
     return ret;
 
-}
-
-
-/*
- * reg_recode
- *
- * It returns the code point in utf8 for the value in *encp.
- *    value: a code value in the source encoding
- *    encp:  a pointer to an Encode object
- *
- * If the result from Encode is not a single character,
- * it returns U+FFFD (Replacement character) and sets *encp to NULL.
- */
-STATIC UV
-S_reg_recode(pTHX_ const char value, SV **encp)
-{
-    STRLEN numlen = 1;
-    SV * const sv = sv_2mortal(newSVpvn(&value, numlen));
-    const char * const s = *encp ? sv_recode_to_utf8(sv, *encp) : SvPVX(sv);
-    const STRLEN newlen = SvCUR(sv);
-    UV uv = UNICODE_REPLACEMENT;
-
-    if (newlen)
-	uv = SvUTF8(sv)
-	     ? utf8n_to_uvchr((U8*)s, newlen, &numlen, UTF8_ALLOW_DEFAULT)
-	     : *(U8*)s;
-
-    if (!newlen || numlen != newlen) {
-	uv = UNICODE_REPLACEMENT;
-	*encp = NULL;
-    }
-    return uv;
 }
 
 
@@ -6768,13 +6349,22 @@ tryagain:
 	break;
     case '.':
 	nextchar(pRExC_state);
-	if (RExC_flags & RXf_PMf_SINGLELINE)
-	    ret = reg_node(pRExC_state, SANY);
-	else
-	    ret = reg_node(pRExC_state, REG_ANY);
-	*flagp |= HASWIDTH|SIMPLE;
+	if (RExC_flags & RXf_PMf_UTF8) {
+	    if (RExC_flags & RXf_PMf_SINGLELINE)
+		ret = reg_node(pRExC_state, SANY);
+	    else
+		ret = reg_node(pRExC_state, REG_ANYU);
+	    *flagp |= HASWIDTH;
+	}
+	else {
+	    if (RExC_flags & RXf_PMf_SINGLELINE)
+		ret = reg_node(pRExC_state, SANY);
+	    else
+		ret = reg_node(pRExC_state, REG_ANY);
+	    *flagp |= HASWIDTH|SIMPLE;
+	}
 	RExC_naughty++;
-        Set_Node_Length(ret, 1); /* MJD */
+	Set_Node_Length(ret, 1); /* MJD */
 	break;
     case '[':
     {
@@ -6785,7 +6375,7 @@ tryagain:
 	    vFAIL("Unmatched [");
 	}
 	nextchar(pRExC_state);
-	*flagp |= HASWIDTH|SIMPLE;
+	*flagp |= (RExC_flags & RXf_PMf_UTF8) ? HASWIDTH : HASWIDTH|SIMPLE;
         Set_Node_Length(ret, RExC_parse - oregcomp_parse + 1); /* MJD */
 	break;
     }
@@ -6826,21 +6416,6 @@ tryagain:
 	RExC_parse++;
 	vFAIL("Quantifier follows nothing");
 	break;
-    case 0xDF:
-    case 0xC3:
-    case 0xCE:
-        if (!LOC && FOLD) {
-            U32 len,cp;
-            if ((cp = what_len_TRICKYFOLD_safe(RExC_parse,RExC_end,UTF,len))) {
-                *flagp |= HASWIDTH; /* could be SIMPLE too, but needs a handler in regexec.regrepeat */
-                RExC_parse+=len-1; /* we get one from nextchar() as well. :-( */
-                ret = reganode(pRExC_state, FOLDCHAR, cp);
-                Set_Node_Length(ret, 1); /* MJD */
-                nextchar(pRExC_state); /* kill whitespace under /x */
-                return ret;
-            }
-        }
-        goto outer_default;
     case '\\':
 	/* Special Escapes
 
@@ -6891,60 +6466,44 @@ tryagain:
 	    *flagp |= HASWIDTH;
 	    goto finish_meta_pat;
 	case 'w':
-	    ret = reg_node(pRExC_state, (U8)(LOC ? ALNUML     : ALNUM));
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
 	case 'W':
-	    ret = reg_node(pRExC_state, (U8)(LOC ? NALNUML    : NALNUM));
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
+	case 's':
+	case 'S':
+	case 'd':
+	case 'D':
+	    {
+		/* parse like a character class, which ends after the \X */
+		char * orig_RExC_end = RExC_end;
+		RExC_end = RExC_parse+1;
+		RExC_parse--; /* go back to the '\' */
+		ret = regclass(pRExC_state, depth+1);
+	    
+		*flagp |= HASWIDTH|SIMPLE;
+		Set_Node_Length(ret, 2);
+		
+		RExC_end = orig_RExC_end;
+
+		if (RExC_flags & RXf_PMf_EXTENDED)
+ 		    RExC_parse = regwhite( pRExC_state, RExC_parse );
+
+		break;
+	    }
 	case 'b':
 	    RExC_seen_zerolen++;
 	    RExC_seen |= REG_SEEN_LOOKBEHIND;
-	    ret = reg_node(pRExC_state, (U8)(LOC ? BOUNDL     : BOUND));
+	    ret = reg_node(pRExC_state, (U8)( BOUND));
 	    *flagp |= SIMPLE;
 	    goto finish_meta_pat;
 	case 'B':
 	    RExC_seen_zerolen++;
 	    RExC_seen |= REG_SEEN_LOOKBEHIND;
-	    ret = reg_node(pRExC_state, (U8)(LOC ? NBOUNDL    : NBOUND));
+	    ret = reg_node(pRExC_state, (U8)( NBOUND));
 	    *flagp |= SIMPLE;
-	    goto finish_meta_pat;
-	case 's':
-	    ret = reg_node(pRExC_state, (U8)(LOC ? SPACEL     : SPACE));
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
-	case 'S':
-	    ret = reg_node(pRExC_state, (U8)(LOC ? NSPACEL    : NSPACE));
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
-	case 'd':
-	    ret = reg_node(pRExC_state, DIGIT);
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
-	case 'D':
-	    ret = reg_node(pRExC_state, NDIGIT);
-	    *flagp |= HASWIDTH|SIMPLE;
 	    goto finish_meta_pat;
 	case 'R':
 	    ret = reg_node(pRExC_state, LNBREAK);
 	    *flagp |= HASWIDTH|SIMPLE;
 	    goto finish_meta_pat;
-	case 'h':
-	    ret = reg_node(pRExC_state, HORIZWS);
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
-	case 'H':
-	    ret = reg_node(pRExC_state, NHORIZWS);
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
-	case 'v':
-	    ret = reg_node(pRExC_state, VERTWS);
-	    *flagp |= HASWIDTH|SIMPLE;
-	    goto finish_meta_pat;
-	case 'V':
-	    ret = reg_node(pRExC_state, NVERTWS);
-	    *flagp |= HASWIDTH|SIMPLE;
          finish_meta_pat:	    
 	    nextchar(pRExC_state);
             Set_Node_Length(ret, 2); /* MJD */
@@ -7020,7 +6579,7 @@ tryagain:
 
                 RExC_sawback = 1;
                 ret = reganode(pRExC_state,
-                	   (U8)(FOLD ? (LOC ? NREFFL : NREFF) : NREF),
+                	   (U8)(FOLD ? NREFF : NREF),
                 	   num);
                 *flagp |= HASWIDTH;
 
@@ -7082,7 +6641,7 @@ tryagain:
 		    }
 		    RExC_sawback = 1;
 		    ret = reganode(pRExC_state,
-				   (U8)(FOLD ? (LOC ? REFFL : REFF) : REF),
+				   (U8)(FOLD ? REFF : REF),
 				   num);
 		    *flagp |= HASWIDTH;
 
@@ -7128,8 +6687,20 @@ tryagain:
 
 	defchar:
 	    ender = 0;
-	    ret = reg_node(pRExC_state,
-			   (U8)(FOLD ? (LOC ? EXACTFL : EXACTF) : EXACT));
+
+	    if (FOLD) {
+		RExC_parse--;
+		ret = regclassfold(pRExC_state, depth+1);
+
+		*flagp |= HASWIDTH|SIMPLE;
+		
+		if (RExC_flags & RXf_PMf_EXTENDED)
+ 		    RExC_parse = regwhite( pRExC_state, RExC_parse );
+
+		return ret;
+	    }
+
+	    ret = reg_node(pRExC_state, (U8)EXACT);
 	    s = STRING(ret);
 	    for (len = 0, p = RExC_parse - 1;
 	      len < 127 && p < RExC_end;
@@ -7140,11 +6711,6 @@ tryagain:
 		if (RExC_flags & RXf_PMf_EXTENDED)
 		    p = regwhite( pRExC_state, p );
 		switch ((U8)*p) {
-		case 0xDF:
-		case 0xC3:
-		case 0xCE:
-		           if (LOC || !FOLD || !is_TRICKYFOLD_safe(p,RExC_end,UTF))
-		                goto normal_default;
 		case '^':
 		case '$':
 		case '.':
@@ -7174,13 +6740,11 @@ tryagain:
 		    case 'C':             /* Single char !DANGEROUS! */
 		    case 'd': case 'D':   /* digit class */
 		    case 'g': case 'G':   /* generic-backref, pos assertion */
-		    case 'h': case 'H':   /* HORIZWS */
 		    case 'k': case 'K':   /* named backref, keep marker */
 		    case 'N':             /* named char sequence */
 		    case 'p': case 'P':   /* Unicode property */
 		              case 'R':   /* LNBREAK */
 		    case 's': case 'S':   /* space class */
-		    case 'v': case 'V':   /* VERTWS */
 		    case 'w': case 'W':   /* word class */
 		    case 'X':             /* eXtended Unicode "combining character sequence" */
 		    case 'z': case 'Z':   /* End of line/string assertion */
@@ -7215,7 +6779,19 @@ tryagain:
 			p++;
 			break;
 		    case 'x':
-			if (*++p == '{') {
+                       p++;
+                       if (*p == '[') {
+                           /* \x[XX] byte insert XX */
+                           STRLEN len = 2;
+                           I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+                           p++;
+                           ender = grok_hex(p, &len, &flags, NULL);
+                           p += len;
+                           if (*p != ']')
+                               yyerror("Missing right square bracket on \\x[]");
+                           p += 1;
+                       }
+                       else if (*p == '{') {
 			    char* const e = strchr(p, '}');
 	
 			    if (!e) {
@@ -7223,12 +6799,13 @@ tryagain:
 				vFAIL("Missing right brace on \\x{}");
 			    }
 			    else {
+				if (! UTF) {
+				    vFAIL("\\x{} not allowed outside Unicode match");
+				}
                                 I32 flags = PERL_SCAN_ALLOW_UNDERSCORES
                                     | PERL_SCAN_DISALLOW_PREFIX;
                                 STRLEN numlen = e - p - 1;
 				ender = grok_hex(p + 1, &numlen, &flags, NULL);
-				if (ender > 0xff)
-				    RExC_utf8 = 1;
 				p = e + 1;
 			    }
 			}
@@ -7238,8 +6815,6 @@ tryagain:
 			    ender = grok_hex(p, &numlen, &flags, NULL);
 			    p += numlen;
 			}
-			if (PL_encoding && ender < 0x100)
-			    goto recode_encoding;
 			break;
 		    case 'c':
 			p++;
@@ -7258,17 +6833,6 @@ tryagain:
 			else {
 			    --p;
 			    goto loopdone;
-			}
-			if (PL_encoding && ender < 0x100)
-			    goto recode_encoding;
-			break;
-		    recode_encoding:
-			{
-			    SV* enc = PL_encoding;
-			    ender = reg_recode((const char)(U8)ender, &enc);
-			    if (!enc && SIZE_ONLY && ckWARN(WARN_REGEXP))
-				vWARN(p, "Invalid escape in the specified encoding");
-			    RExC_utf8 = 1;
 			}
 			break;
 		    case '\0':
@@ -7581,30 +7145,6 @@ S_checkposixcc(pTHX_ RExC_state_t *pRExC_state)
 
 #define _C_C_T_(NAME,TEST,WORD)                         \
 ANYOF_##NAME:                                           \
-    if (LOC)                                            \
-	ANYOF_CLASS_SET(ret, ANYOF_##NAME);             \
-    else {                                              \
-	for (value = 0; value < 256; value++)           \
-	    if (TEST)                                   \
-		ANYOF_BITMAP_SET(ret, value);           \
-    }                                                   \
-    yesno = '+';                                        \
-    what = WORD;                                        \
-    break;                                              \
-case ANYOF_N##NAME:                                     \
-    if (LOC)                                            \
-	ANYOF_CLASS_SET(ret, ANYOF_N##NAME);            \
-    else {                                              \
-	for (value = 0; value < 256; value++)           \
-	    if (!TEST)                                  \
-		ANYOF_BITMAP_SET(ret, value);           \
-    }                                                   \
-    yesno = '!';                                        \
-    what = WORD;                                        \
-    break
-
-#define _C_C_T_NOLOC_(NAME,TEST,WORD)                   \
-ANYOF_##NAME:                                           \
 	for (value = 0; value < 256; value++)           \
 	    if (TEST)                                   \
 		ANYOF_BITMAP_SET(ret, value);           \
@@ -7640,7 +7180,6 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
     char *rangebegin = NULL;
     bool need_class = 0;
     SV *listsv = NULL;
-    UV n;
     bool optimize_invert   = TRUE;
     AV* unicode_alternate  = NULL;
 #ifdef EBCDIC
@@ -7659,7 +7198,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
     DEBUG_PARSE("clas");
 
     /* Assume we are going to generate an ANYOF node. */
-    ret = reganode(pRExC_state, ANYOF, 0);
+    ret = reganode(pRExC_state, (UTF ? ANYOFU : ANYOF), 0);
 
     if (!SIZE_ONLY)
 	ANYOF_FLAGS(ret) = 0;
@@ -7679,8 +7218,9 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
  	RExC_emit += ANYOF_SKIP;
 	if (FOLD)
 	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
-	if (LOC)
-	    ANYOF_FLAGS(ret) |= ANYOF_LOCALE;
+	if (UTF)
+	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
+	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
 	ANYOF_BITMAP_ZERO(ret);
 	listsv = newSVpvs("# comment\n");
     }
@@ -7736,10 +7276,6 @@ parseit:
 	    case 'S':	namedclass = ANYOF_NSPACE;	break;
 	    case 'd':	namedclass = ANYOF_DIGIT;	break;
 	    case 'D':	namedclass = ANYOF_NDIGIT;	break;
-	    case 'v':	namedclass = ANYOF_VERTWS;	break;
-	    case 'V':	namedclass = ANYOF_NVERTWS;	break;
-	    case 'h':	namedclass = ANYOF_HORIZWS;	break;
-	    case 'H':	namedclass = ANYOF_NHORIZWS;	break;
             case 'N':  /* Handle \N{NAME} in class */
                 {
                     /* We only pay attention to the first char of 
@@ -7758,6 +7294,7 @@ parseit:
 	    case 'P':
 		{
 		char *e;
+		UV n;
 		if (RExC_parse >= RExC_end)
 		    vFAIL2("Empty \\%c{}", (U8)value);
 		if (*RExC_parse == '{') {
@@ -7791,8 +7328,10 @@ parseit:
 			(value=='p' ? '+' : '!'), (int)n, RExC_parse);
 		}
 		RExC_parse = e + 1;
-		ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
 		namedclass = ANYOF_MAX;  /* no official name, but it's named */
+		if (!UTF)
+		    vWARN(RExC_parse, "\\p{...} only supported with unicode");
+
 		}
 		break;
 	    case 'n':	value = '\n';			break;
@@ -7820,8 +7359,6 @@ parseit:
 		    value = grok_hex(RExC_parse, &numlen, &flags, NULL);
 		    RExC_parse += numlen;
 		}
-		if (PL_encoding && value < 0x100)
-		    goto recode_encoding;
 		break;
 	    case 'c':
 		value = UCHARAT(RExC_parse++);
@@ -7834,17 +7371,6 @@ parseit:
 		    numlen = 3;
 		    value = grok_oct(--RExC_parse, &numlen, &flags, NULL);
 		    RExC_parse += numlen;
-		    if (PL_encoding && value < 0x100)
-			goto recode_encoding;
-		    break;
-		}
-	    recode_encoding:
-		{
-		    SV* enc = PL_encoding;
-		    value = reg_recode((const char)(U8)value, &enc);
-		    if (!enc && SIZE_ONLY && ckWARN(WARN_REGEXP))
-			vWARN(RExC_parse,
-			      "Invalid escape in the specified encoding");
 		    break;
 		}
 	    default:
@@ -7878,15 +7404,11 @@ parseit:
 			       "False [] range \"%*.*s\"",
 			       w, w, rangebegin);
 		    }
-		    if (prevvalue < 256) {
+		    ANYOF_BITMAP_SET(ret, '-');
+		    if (prevvalue < 256)
 			ANYOF_BITMAP_SET(ret, prevvalue);
-			ANYOF_BITMAP_SET(ret, '-');
-		    }
-		    else {
-			ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
-			Perl_sv_catpvf(aTHX_ listsv,
-				       "%04"UVxf"\n%04"UVxf"\n", (UV)prevvalue, (UV) '-');
-		    }
+		    Perl_sv_catpvf(aTHX_ listsv,
+				   "%04"UVxf"\n%04"UVxf"\n", (UV)prevvalue, (UV) '-');
 		}
 
 		range = 0; /* this was not a true range */
@@ -7904,8 +7426,9 @@ parseit:
 		 * the compiler gets heartburn about switch on 64-bit values.
 		 * A similar issue a little earlier when switching on value.
 		 * --jhi */
+
 		switch ((I32)namedclass) {
-		case _C_C_T_(ALNUM, isALNUM(value), "Word");
+		case _C_C_T_(ALNUM, isALNUM_LC(value), "Word");
 		case _C_C_T_(ALNUMC, isALNUMC(value), "Alnum");
 		case _C_C_T_(ALPHA, isALPHA(value), "Alpha");
 		case _C_C_T_(BLANK, isBLANK(value), "Blank");
@@ -7918,12 +7441,7 @@ parseit:
 		case _C_C_T_(SPACE, isSPACE(value), "SpacePerl");
 		case _C_C_T_(UPPER, isUPPER(value), "Upper");
 		case _C_C_T_(XDIGIT, isXDIGIT(value), "XDigit");
-		case _C_C_T_NOLOC_(VERTWS, is_VERTWS_latin1(&value), "VertSpace");
-		case _C_C_T_NOLOC_(HORIZWS, is_HORIZWS_latin1(&value), "HorizSpace");
 		case ANYOF_ASCII:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_ASCII);
-		    else {
 #ifndef EBCDIC
 			for (value = 0; value < 128; value++)
 			    ANYOF_BITMAP_SET(ret, value);
@@ -7933,14 +7451,10 @@ parseit:
 			        ANYOF_BITMAP_SET(ret, value);
 			}
 #endif /* EBCDIC */
-		    }
 		    yesno = '+';
 		    what = "ASCII";
 		    break;
 		case ANYOF_NASCII:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_NASCII);
-		    else {
 #ifndef EBCDIC
 			for (value = 128; value < 256; value++)
 			    ANYOF_BITMAP_SET(ret, value);
@@ -7950,31 +7464,22 @@ parseit:
 			        ANYOF_BITMAP_SET(ret, value);
 			}
 #endif /* EBCDIC */
-		    }
 		    yesno = '!';
 		    what = "ASCII";
 		    break;		
 		case ANYOF_DIGIT:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_DIGIT);
-		    else {
 			/* consecutive digits assumed */
 			for (value = '0'; value <= '9'; value++)
 			    ANYOF_BITMAP_SET(ret, value);
-		    }
 		    yesno = '+';
 		    what = "Digit";
 		    break;
 		case ANYOF_NDIGIT:
-		    if (LOC)
-			ANYOF_CLASS_SET(ret, ANYOF_NDIGIT);
-		    else {
 			/* consecutive digits assumed */
 			for (value = 0; value < '0'; value++)
 			    ANYOF_BITMAP_SET(ret, value);
 			for (value = '9' + 1; value < 256; value++)
 			    ANYOF_BITMAP_SET(ret, value);
-		    }
 		    yesno = '!';
 		    what = "Digit";
 		    break;		
@@ -7989,8 +7494,6 @@ parseit:
 		    /* Strings such as "+utf8::isWord\n" */
 		    Perl_sv_catpvf(aTHX_ listsv, "%cutf8::Is%s\n", yesno, what);
 		}
-		if (LOC)
-		    ANYOF_FLAGS(ret) |= ANYOF_CLASS;
 		continue;
 	    }
 	} /* end of namedclass \blah */
@@ -8018,8 +7521,11 @@ parseit:
 			       "False [] range \"%*.*s\"",
 			       w, w, rangebegin);
 		    }
-		    if (!SIZE_ONLY)
+		    if (!SIZE_ONLY) {
 			ANYOF_BITMAP_SET(ret, '-');
+			Perl_sv_catpvf(aTHX_ listsv,
+				       "%04"UVxf"\n", (UV) '-');
+		    }
 		} else
 		    range = 1;	/* yeah, it's a range! */
 		continue;	/* but do it the next time */
@@ -8032,37 +7538,14 @@ parseit:
 	    if (prevvalue < 256) {
 	        const IV ceilvalue = value < 256 ? value : 255;
 		IV i;
-#ifdef EBCDIC
-		/* In EBCDIC [\x89-\x91] should include
-		 * the \x8e but [i-j] should not. */
-		if (literal_endpoint == 2 &&
-		    ((isLOWER(prevvalue) && isLOWER(ceilvalue)) ||
-		     (isUPPER(prevvalue) && isUPPER(ceilvalue))))
-		{
-		    if (isLOWER(prevvalue)) {
-			for (i = prevvalue; i <= ceilvalue; i++)
-			    if (isLOWER(i) && !ANYOF_BITMAP_TEST(ret,i)) {
-				stored++;
-				ANYOF_BITMAP_SET(ret, i);
-			    }
-		    } else {
-			for (i = prevvalue; i <= ceilvalue; i++)
-			    if (isUPPER(i) && !ANYOF_BITMAP_TEST(ret,i)) {
-				stored++;
-				ANYOF_BITMAP_SET(ret, i);
-			    }
+		for (i = prevvalue; i <= ceilvalue; i++) {
+		    if (!ANYOF_BITMAP_TEST(ret,i)) {
+			stored++;  
+			ANYOF_BITMAP_SET(ret, i);
 		    }
 		}
-		else
-#endif
-		      for (i = prevvalue; i <= ceilvalue; i++) {
-		        if (!ANYOF_BITMAP_TEST(ret,i)) {
-		            stored++;  
-			    ANYOF_BITMAP_SET(ret, i);
-		        }
-	              }
 	  }
-	  if (value > 255 || UTF) {
+	  if (UTF) {
 	        const UV prevnatvalue  = NATIVE_TO_UNI(prevvalue);
 		const UV natvalue      = NATIVE_TO_UNI(value);
                 stored+=2; /* can't optimize this class */
@@ -8115,8 +7598,8 @@ parseit:
 
 				  if (!unicode_alternate)
 				      unicode_alternate = newAV();
+				  DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "add alternate %p\n", unicode_alternate));
 				  sv = newSVpvn((char*)foldbuf, foldlen);
-				  SvUTF8_on(sv);
 				  av_push(unicode_alternate, sv);
 			      }
 			 }
@@ -8161,27 +7644,24 @@ parseit:
     if (SIZE_ONLY)
         return ret;
     /****** !SIZE_ONLY AFTER HERE *********/
-
-    if( stored == 1 && (value < 128 || (value < 256 && !UTF))
-        && !( ANYOF_FLAGS(ret) & ( ANYOF_FLAGS_ALL ^ ANYOF_FOLD ) )
+    if( stored == 1 && value < 126
+        && !( ANYOF_FLAGS(ret) )
     ) {
         /* optimize single char class to an EXACT node
            but *only* when its not a UTF/high char  */
         const char * cur_parse= RExC_parse;
         RExC_emit = (regnode *)orig_emit;
         RExC_parse = (char *)orig_parse;
-        ret = reg_node(pRExC_state,
-                       (U8)((ANYOF_FLAGS(ret) & ANYOF_FOLD) ? EXACTF : EXACT));
+        ret = reg_node(pRExC_state, EXACT);
         RExC_parse = (char *)cur_parse;
         *STRING(ret)= (char)value;
         STR_LEN(ret)= 1;
         RExC_emit += STR_SZ(1);
         return ret;
     }
-    /* optimize case-insensitive simple patterns (e.g. /[a-z]/i) */
-    if ( /* If the only flag is folding (plus possibly inversion). */
-	((ANYOF_FLAGS(ret) & (ANYOF_FLAGS_ALL ^ ANYOF_INVERT)) == ANYOF_FOLD)
-       ) {
+
+    /* apply case-insensitive search to bitmpa */
+    if (ANYOF_FLAGS(ret) & ANYOF_FOLD) {
 	for (value = 0; value < 256; ++value) {
 	    if (ANYOF_BITMAP_TEST(ret, value)) {
 		UV fold = PL_fold[value];
@@ -8190,20 +7670,117 @@ parseit:
 		    ANYOF_BITMAP_SET(ret, fold);
 	    }
 	}
-	ANYOF_FLAGS(ret) &= ~ANYOF_FOLD;
     }
 
-    /* optimize inverted simple patterns (e.g. [^a-z]) */
-    if (optimize_invert &&
-	/* If the only flag is inversion. */
-	(ANYOF_FLAGS(ret) & ANYOF_FLAGS_ALL) ==	ANYOF_INVERT) {
+    DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "anyof_get_swash\n"));
+    anyof_get_swash(pRExC_state, ret, listsv, unicode_alternate);
+
+    /* apply invert flag to bitmap */
+    if (ANYOF_FLAGS(ret) & ANYOF_INVERT) {
 	for (value = 0; value < ANYOF_BITMAP_SIZE; ++value)
-	    ANYOF_BITMAP(ret)[value] ^= ANYOF_FLAGS_ALL;
-	ANYOF_FLAGS(ret) = ANYOF_UNICODE_ALL;
+	    ANYOF_BITMAP(ret)[value] ^= 0xFF;
     }
-    {
+
+    return ret;
+}
+#undef _C_C_T_
+
+
+STATIC regnode *
+S_regclassfold(pTHX_ RExC_state_t *pRExC_state, U32 depth)
+{
+    dVAR;
+    UV value = 0; /* XXX:dmq: needs to be referenceable (unfortunately) */
+    register regnode *ret;
+    STRLEN numlen;
+    IV namedclass;
+    char *rangebegin = NULL;
+    SV *listsv = NULL;
+    bool optimize_invert   = TRUE;
+    AV* unicode_alternate  = NULL;
+
+    regnode * const orig_emit = RExC_emit; /* Save the original RExC_emit in
+        case we need to change the emitted regop to an EXACT. */
+    const char * orig_parse = RExC_parse;
+    GET_RE_DEBUG_FLAGS_DECL;
+
+    DEBUG_PARSE("clasfold");
+
+    if (UTF) {
+	value = utf8n_to_uvchr((U8*)RExC_parse,
+			       RExC_end - RExC_parse,
+			       &numlen, UTF8_ALLOW_DEFAULT);
+	RExC_parse += numlen;
+    }
+    else
+	value = UCHARAT(RExC_parse++);
+
+    if (value == '\\') {
+	if (UTF) {
+	    value = utf8n_to_uvchr((U8*)RExC_parse,
+				   RExC_end - RExC_parse,
+				   &numlen, UTF8_ALLOW_DEFAULT);
+	    RExC_parse += numlen;
+	}
+	else
+	    value = UCHARAT(RExC_parse++);
+
+	switch (value) {
+	    case 'n':	value = '\n';			break;
+	    case 'r':	value = '\r';			break;
+	    case 't':	value = '\t';			break;
+	    case 'f':	value = '\f';			break;
+	    case 'b':	value = '\b';			break;
+	    case 'e':	value = ASCII_TO_NATIVE('\033');break;
+	    case 'a':	value = ASCII_TO_NATIVE('\007');break;
+	    case 'x':
+		if (*RExC_parse == '{') {
+                    I32 flags = PERL_SCAN_ALLOW_UNDERSCORES
+                        | PERL_SCAN_DISALLOW_PREFIX;
+		    char * const e = strchr(RExC_parse++, '}');
+                    if (!e)
+                        vFAIL("Missing right brace on \\x{}");
+
+		    numlen = e - RExC_parse;
+		    value = grok_hex(RExC_parse, &numlen, &flags, NULL);
+		    RExC_parse = e + 1;
+		}
+		else {
+                    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+		    numlen = 2;
+		    value = grok_hex(RExC_parse, &numlen, &flags, NULL);
+		    RExC_parse += numlen;
+		}
+		break;
+	    case 'c':
+		value = UCHARAT(RExC_parse++);
+		value = toCTRL(value);
+		break;
+	    case '0': case '1': case '2': case '3': case '4':
+	    case '5': case '6': case '7': case '8': case '9':
+		{
+		    I32 flags = 0;
+		    numlen = 3;
+		    value = grok_oct(--RExC_parse, &numlen, &flags, NULL);
+		    RExC_parse += numlen;
+		    break;
+		}
+	default:
+	    /* Assumes escape means literal */
+	    break;
+	}
+    }
+    return regclassfold_value(pRExC_state, value);
+}
+	
+
+STATIC void
+S_anyof_get_swash(pTHX_ RExC_state_t *pRExC_state, regnode* ret, SV* listsv, AV* unicode_alternate)
+{
+    UV n;
 	AV * const av = newAV();
 	SV *rv;
+	SV *sw  = NULL;
 	/* The 0th element stores the character class description
 	 * in its textual form: used later (regexec.c:Perl_regclass_swash())
 	 * to initialize the appropriate swash (which gets stored in
@@ -8214,14 +7791,33 @@ parseit:
 	av_store(av, 1, NULL);
 	av_store(av, 2, (SV*)unicode_alternate);
 	rv = newRV_noinc((SV*)av);
+
+	if (UTF) {
+	    SV **const ary = AvARRAY(av);
+	    sw = swash_init("utf8", "", *ary, 1, 0);
+	    (void)av_store(av, 1, sw);
+	}
+
 	n = add_data(pRExC_state, 1, "s");
 	RExC_rxi->data->data[n] = (void*)rv;
 	ARG_SET(ret, n);
-    }
-    return ret;
-}
-#undef _C_C_T_
 
+	if (sw) {
+            /* use the swash to fill the ANYOF_BITMAP */
+            U8 tmpbuf[UTF8_MAXBYTES_CASE+1];
+            UV value;
+            ANYOF_BITMAP_ZERO(ret);
+            for (value = 0; value < 256; ++value) {
+                uvuni_to_utf8_flags(tmpbuf, value, 0);
+		if (ANYOF_FLAGS(ret) & ANYOF_FOLD)
+		    to_utf8_fold(tmpbuf, tmpbuf, NULL);
+                if (swash_fetch(sw, tmpbuf, TRUE))
+                    ANYOF_BITMAP_SET(ret, value);
+                else
+                    ANYOF_BITMAP_CLEAR(ret, value);
+            }
+        }
+}
 
 /* reg_skipcomment()
 
@@ -8318,7 +7914,6 @@ S_reg_node(pTHX_ RExC_state_t *pRExC_state, U8 op)
     NODE_ALIGN_FILL(ret);
     ptr = ret;
     FILL_ADVANCE_NODE(ptr, op);
-#ifdef RE_TRACK_PATTERN_OFFSETS
     if (RExC_offsets) {         /* MJD */
 	MJD_OFFSET_DEBUG(("%s:%d: (op %s) %s %"UVuf" (len %"UVuf") (max %"UVuf").\n", 
               "reg_node", __LINE__, 
@@ -8330,7 +7925,7 @@ S_reg_node(pTHX_ RExC_state_t *pRExC_state, U8 op)
               (UV)RExC_offsets[0])); 
 	Set_Node_Offset(RExC_emit, RExC_parse + (op == END));
     }
-#endif
+
     RExC_emit = ptr;
     return(ret);
 }
@@ -8371,7 +7966,6 @@ S_reganode(pTHX_ RExC_state_t *pRExC_state, U8 op, U32 arg)
     NODE_ALIGN_FILL(ret);
     ptr = ret;
     FILL_ADVANCE_NODE_ARG(ptr, op, arg);
-#ifdef RE_TRACK_PATTERN_OFFSETS
     if (RExC_offsets) {         /* MJD */
 	MJD_OFFSET_DEBUG(("%s(%d): (op %s) %s %"UVuf" <- %"UVuf" (max %"UVuf").\n", 
               "reganode",
@@ -8384,7 +7978,7 @@ S_reganode(pTHX_ RExC_state_t *pRExC_state, U8 op, U32 arg)
               (UV)RExC_offsets[0])); 
 	Set_Cur_Node_Offset;
     }
-#endif            
+            
     RExC_emit = ptr;
     return(ret);
 }
@@ -8446,7 +8040,6 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 
     while (src > opnd) {
 	StructCopy(--src, --dst, regnode);
-#ifdef RE_TRACK_PATTERN_OFFSETS
         if (RExC_offsets) {     /* MJD 20010112 */
 	    MJD_OFFSET_DEBUG(("%s(%d): (op %s) %s copy %"UVuf" -> %"UVuf" (max %"UVuf").\n",
                   "reg_insert",
@@ -8460,12 +8053,10 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 	    Set_Node_Offset_To_R(dst-RExC_emit_start, Node_Offset(src));
 	    Set_Node_Length_To_R(dst-RExC_emit_start, Node_Length(src));
         }
-#endif
     }
     
 
     place = opnd;		/* Op node, where operand used to be. */
-#ifdef RE_TRACK_PATTERN_OFFSETS
     if (RExC_offsets) {         /* MJD */
 	MJD_OFFSET_DEBUG(("%s(%d): (op %s) %s %"UVuf" <- %"UVuf" (max %"UVuf").\n", 
               "reginsert",
@@ -8479,7 +8070,6 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 	Set_Node_Offset(place, RExC_parse);
 	Set_Node_Length(place, 1);
     }
-#endif    
     src = NEXTOPER(place);
     FILL_ADVANCE_NODE(place, op);
     Zero(src, offset, regnode);
@@ -8576,8 +8166,6 @@ S_regtail_study(pTHX_ RExC_state_t *pRExC_state, regnode *p, const regnode *val,
         if ( exact ) {
             switch (OP(scan)) {
                 case EXACT:
-                case EXACTF:
-                case EXACTFL:
                         if( exact == PSEUDO )
                             exact= OP(scan);
                         else if ( exact != OP(scan) )
@@ -8688,14 +8276,7 @@ Perl_regdump(pTHX_ const regexp *r)
 		      "anchored %s%s at %"IVdf" ",
 		      s, RE_SV_TAIL(r->anchored_substr),
 		      (IV)r->anchored_offset);
-    } else if (r->anchored_utf8) {
-	RE_PV_QUOTED_DECL(s, 1, dsv, SvPVX_const(r->anchored_utf8), 
-	    RE_SV_DUMPLEN(r->anchored_utf8), 30);
-	PerlIO_printf(Perl_debug_log,
-		      "anchored utf8 %s%s at %"IVdf" ",
-		      s, RE_SV_TAIL(r->anchored_utf8),
-		      (IV)r->anchored_offset);
-    }		      
+    }
     if (r->float_substr) {
 	RE_PV_QUOTED_DECL(s, 0, dsv, SvPVX_const(r->float_substr), 
 	    RE_SV_DUMPLEN(r->float_substr), 30);
@@ -8703,25 +8284,17 @@ Perl_regdump(pTHX_ const regexp *r)
 		      "floating %s%s at %"IVdf"..%"UVuf" ",
 		      s, RE_SV_TAIL(r->float_substr),
 		      (IV)r->float_min_offset, (UV)r->float_max_offset);
-    } else if (r->float_utf8) {
-	RE_PV_QUOTED_DECL(s, 1, dsv, SvPVX_const(r->float_utf8), 
-	    RE_SV_DUMPLEN(r->float_utf8), 30);
-	PerlIO_printf(Perl_debug_log,
-		      "floating utf8 %s%s at %"IVdf"..%"UVuf" ",
-		      s, RE_SV_TAIL(r->float_utf8),
-		      (IV)r->float_min_offset, (UV)r->float_max_offset);
     }
-    if (r->check_substr || r->check_utf8)
+    if (r->check_substr)
 	PerlIO_printf(Perl_debug_log,
 		      (const char *)
 		      (r->check_substr == r->float_substr
-		       && r->check_utf8 == r->float_utf8
 		       ? "(checking floating" : "(checking anchored"));
     if (r->extflags & RXf_NOSCAN)
 	PerlIO_printf(Perl_debug_log, " noscan");
     if (r->extflags & RXf_CHECK_ALL)
 	PerlIO_printf(Perl_debug_log, " isall");
-    if (r->check_substr || r->check_utf8)
+    if (r->check_substr)
 	PerlIO_printf(Perl_debug_log, ") ");
 
     if (ri->regstclass) {
@@ -8882,7 +8455,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
     } else if (k == LOGICAL)
 	Perl_sv_catpvf(aTHX_ sv, "[%d]", o->flags);	/* 2: embedded, otherwise 1 */
     else if (k == FOLDCHAR)
-	Perl_sv_catpvf(aTHX_ sv, "[0x%"UVXf"]", PTR2UV(ARG(o)) );
+	Perl_sv_catpvf(aTHX_ sv, "[0x%"UVXf"]",ARG(o) );	
     else if (k == ANYOF) {
 	int i, rangestart = -1;
 	const U8 flags = ANYOF_FLAGS(o);
@@ -8921,8 +8494,6 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	    "[:^blank:]"
 	};
 
-	if (flags & ANYOF_LOCALE)
-	    sv_catpvs(sv, "{loc}");
 	if (flags & ANYOF_FOLD)
 	    sv_catpvs(sv, "{i}");
 	Perl_sv_catpvf(aTHX_ sv, "[%s", PL_colors[0]);
@@ -8945,19 +8516,29 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	    }
 	}
 
-	if (o->flags & ANYOF_CLASS)
-	    for (i = 0; i < (int)(sizeof(anyofs)/sizeof(char*)); i++)
-		if (ANYOF_CLASS_TEST(o,i))
-		    sv_catpv(sv, anyofs[i]);
-
 	if (flags & ANYOF_UNICODE)
 	    sv_catpvs(sv, "{unicode}");
 	else if (flags & ANYOF_UNICODE_ALL)
 	    sv_catpvs(sv, "{unicode_all}");
 
 	{
-	    SV *lv;
-	    SV * const sw = regclass_swash(prog, o, FALSE, &lv, 0);
+	    /* the list sv */
+	    int i = ARG(o);
+	    Perl_sv_catpvf(aTHX_ sv, "%c", progi->data->what[i]);
+	    if (progi->data->what[i] == 's') {
+		SV * const rv = (SV*)progi->data->data[i];
+		AV * const av = (AV*)SvRV((SV*)rv);
+		SV **const ary = AvARRAY(av);
+		SV **a, **b;
+		
+		/* See the end of regcomp.c:S_regclass() for
+		 * documentation of these array elements. */
+		    
+		Perl_sv_catpvf(aTHX_ sv, "(%s)", SvPVX_const(ary[0]));
+	    }
+
+	    SV *lv = NULL;
+	    SV * const sw = NULL; /* TODO get swash */
 	
 	    if (lv) {
 		if (sw) {
@@ -9041,8 +8622,7 @@ Perl_re_intuit_string(pTHX_ REGEXP * const prog)
 
     DEBUG_COMPILE_r(
 	{
-	    const char * const s = SvPV_nolen_const(prog->check_substr
-		      ? prog->check_substr : prog->check_utf8);
+	    const char * const s = SvPV_nolen_const(prog->check_substr);
 
 	    if (!PL_colorset) reginitcolors();
 	    PerlIO_printf(Perl_debug_log,
@@ -9055,7 +8635,7 @@ Perl_re_intuit_string(pTHX_ REGEXP * const prog)
 		      (strlen(s) > 60 ? "..." : ""));
 	} );
 
-    return prog->check_substr ? prog->check_substr : prog->check_utf8;
+    return prog->check_substr;
 }
 
 /* 
@@ -9090,12 +8670,8 @@ Perl_pregfree(pTHX_ struct regexp *r)
     if (r->substrs) {
         if (r->anchored_substr)
             SvREFCNT_dec(r->anchored_substr);
-        if (r->anchored_utf8)
-            SvREFCNT_dec(r->anchored_utf8);
         if (r->float_substr)
             SvREFCNT_dec(r->float_substr);
-        if (r->float_utf8)
-            SvREFCNT_dec(r->float_utf8);
 	Safefree(r->substrs);
     }
     RX_MATCH_COPY_FREE(r);
@@ -9140,9 +8716,7 @@ Perl_reg_temp_copy (pTHX_ struct regexp *r) {
 	StructCopy(r->substrs, ret->substrs, struct reg_substr_data);
 
 	SvREFCNT_inc_void(ret->anchored_substr);
-	SvREFCNT_inc_void(ret->anchored_utf8);
 	SvREFCNT_inc_void(ret->float_substr);
-	SvREFCNT_inc_void(ret->float_utf8);
 
 	/* check_substr and check_utf8, if non-NULL, point to either their
 	   anchored or float namesakes, and don't hold a second reference.  */
@@ -9182,16 +8756,14 @@ Perl_regfree_internal(pTHX_ REGEXP * const r)
 	    reginitcolors();
 	{
 	    SV *dsv= sv_newmortal();
-            RE_PV_QUOTED_DECL(s, (r->extflags & RXf_UTF8),
+            RE_PV_QUOTED_DECL(s, 0,
                 dsv, r->precomp, r->prelen, 60);
             PerlIO_printf(Perl_debug_log,"%sFreeing REx:%s %s\n", 
                 PL_colors[4],PL_colors[5],s);
         }
     });
-#ifdef RE_TRACK_PATTERN_OFFSETS
-    if (ri->u.offsets)
-        Safefree(ri->u.offsets);             /* 20010421 MJD */
-#endif
+
+    Safefree(ri->u.offsets);             /* 20010421 MJD */
     if (ri->data) {
 	int n = ri->data->count;
 	PAD* new_comppad = NULL;
@@ -9337,23 +8909,18 @@ Perl_re_dup(pTHX_ const regexp *r, CLONE_PARAMS *param)
 	StructCopy(r->substrs, ret->substrs, struct reg_substr_data);
 
 	ret->anchored_substr = sv_dup_inc(ret->anchored_substr, param);
-	ret->anchored_utf8 = sv_dup_inc(ret->anchored_utf8, param);
 	ret->float_substr = sv_dup_inc(ret->float_substr, param);
-	ret->float_utf8 = sv_dup_inc(ret->float_utf8, param);
 
-	/* check_substr and check_utf8, if non-NULL, point to either their
+	/* check_substr, if non-NULL, point to either their
 	   anchored or float namesakes, and don't hold a second reference.  */
 
 	if (ret->check_substr) {
 	    if (anchored) {
-		assert(r->check_utf8 == r->anchored_utf8);
+		assert(r->check_substr == r->anchored_substr);
 		ret->check_substr = ret->anchored_substr;
-		ret->check_utf8 = ret->anchored_utf8;
 	    } else {
 		assert(r->check_substr == r->float_substr);
-		assert(r->check_utf8 == r->float_utf8);
 		ret->check_substr = ret->float_substr;
-		ret->check_utf8 = ret->float_utf8;
 	    }
 	}
     }
@@ -9405,7 +8972,7 @@ Perl_regdupe_internal(pTHX_ REGEXP * const r, CLONE_PARAMS *param)
     RXi_GET_DECL(r,ri);
     
     npar = r->nparens+1;
-    len = ProgLen(ri);
+    len = ri->u.offsets[0];
     
     Newxc(reti, sizeof(regexp_internal) + (len+1)*sizeof(regnode), char, regexp_internal);
     Copy(ri->program, reti->program, len+1, regnode);
@@ -9414,8 +8981,7 @@ Perl_regdupe_internal(pTHX_ REGEXP * const r, CLONE_PARAMS *param)
     reti->regstclass = NULL;
 
     if (ri->data) {
-	struct reg_data *d;
-        const int count = ri->data->count;
+	struct reg_data *d; const int count = ri->data->count;
 	int i;
 
 	Newxc(d, sizeof(struct reg_data) + count*sizeof(void *),
@@ -9475,15 +9041,9 @@ Perl_regdupe_internal(pTHX_ REGEXP * const r, CLONE_PARAMS *param)
 
     reti->name_list_idx = ri->name_list_idx;
 
-#ifdef RE_TRACK_PATTERN_OFFSETS
-    if (ri->u.offsets) {
-        Newx(reti->u.offsets, 2*len+1, U32);
-        Copy(ri->u.offsets, reti->u.offsets, 2*len+1, U32);
-    }
-#else
-    SetProgLen(reti,len);
-#endif
-
+    Newx(reti->u.offsets, 2*len+1, U32);
+    Copy(ri->u.offsets, reti->u.offsets, 2*len+1, U32);
+    
     return (void*)reti;
 }
 
@@ -9525,7 +9085,7 @@ Perl_reg_stringify(pTHX_ MAGIC *mg, STRLEN *lp, U32 *flags, I32 *haseval ) {
     if (haseval) 
         *haseval = re->seen_evals;
     if (flags)    
-	*flags = ((re->extflags & RXf_UTF8) ? 1 : 0);
+	*flags = 1;
     if (lp)
 	*lp = re->wraplen;
     return re->wrapped;
@@ -9651,7 +9211,7 @@ STATIC void
 S_put_byte(pTHX_ SV *sv, int c)
 {
     if (isCNTRL(c) || c == 255 || !isPRINT(c))
-	Perl_sv_catpvf(aTHX_ sv, "\\%o", c);
+	Perl_sv_catpvf(aTHX_ sv, "\\%.2x", c);
     else if (c == '-' || c == ']' || c == '\\' || c == '^')
 	Perl_sv_catpvf(aTHX_ sv, "\\%c", c);
     else
@@ -9757,7 +9317,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
                    (int)(2*(indent+3)), "",
                     elem_ptr ? pv_pretty(sv, SvPV_nolen_const(*elem_ptr), SvCUR(*elem_ptr), 60,
 	                    PL_colors[0], PL_colors[1],
-	                    (SvUTF8(*elem_ptr) ? PERL_PV_ESCAPE_UNI : 0) |
+	                    (PERL_PV_ESCAPE_UNI_DETECT) |
 	                    PERL_PV_PRETTY_ELIPSES    |
 	                    PERL_PV_PRETTY_LTGT
                             )

@@ -9,7 +9,7 @@ use Module::Build::ConfigData;
 my $manpage_support = Module::Build::ConfigData->feature('manpage_support');
 my $HTML_support = Module::Build::ConfigData->feature('HTML_support');
 
-
+use Archive::Tar;
 {
   my ($have_c_compiler, $C_support_feature) = check_compiler();
   if (! $C_support_feature) {
@@ -24,6 +24,7 @@ my $HTML_support = Module::Build::ConfigData->feature('HTML_support');
     plan tests => 12;
   }
 }
+
 
 
 use Cwd ();
@@ -52,8 +53,8 @@ Says "Hello"
 ---
 $dist->change_file( 'Build.PL', <<"---" );
 
-my \$build = new Module::Build(
-  module_name => @{[$dist->name]},
+my \$build = Module::Build->new(
+  module_name => '@{[$dist->name]}',
   license     => 'perl',
   scripts     => [ 'hello' ],
 );

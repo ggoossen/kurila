@@ -30,12 +30,7 @@
 # Feel free to add more here.
 #
 #  -- .robin. <robin@kitsite.com>  2001-03-13
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require "test.pl";
+require "./test.pl";
 plan( tests => 47 );
 
 my $ok;
@@ -970,8 +965,9 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 }
 
 {
+    our @a37725;
     $a37725[3] = 1; # use package var
-    $i = 2;
+    our $i = 2;
     for my $x (reverse @a37725) {
 	$x = $i++;
     }

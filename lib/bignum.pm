@@ -34,7 +34,7 @@ sub AUTOLOAD
     {
     if ($n eq $name)
       {
-      *{"bignum::$name"} = sub 
+      *{Symbol::qualify_to_ref("bignum::$name")} = sub 
         {
         my $self = shift;
         no strict 'refs';
@@ -45,7 +45,7 @@ sub AUTOLOAD
           }
         return Math::BigInt->$name();
         };
-      return &$name;
+      return &{*{Symbol::qualify_to_ref($name)}};
       }
     }
  
@@ -229,7 +229,7 @@ sub import
   my ($package) = caller();
 
   no strict 'refs';
-  if (!defined *{"${package}::inf"})
+  if (!defined &{*{Symbol::qualify_to_ref("${package}::inf")}})
     {
     $self->export_to_level(1,$self,@a);           # export inf and NaN
     }
@@ -419,13 +419,13 @@ This will be hopefully fixed soon ;)
 
 =item hex
 
-Override the built-in hex() method with a version that can handle big
+Override the build-in hex() method with a version that can handle big
 integers. Note that under Perl older than v5.9.4, this will be global
 and cannot be disabled with "no bigint;".
 
 =item oct
 
-Override the built-in oct() method with a version that can handle big
+Override the build-in oct() method with a version that can handle big
 integers. Note that under Perl older than v5.9.4, this will be global
 and cannot be disabled with "no bigint;".
 

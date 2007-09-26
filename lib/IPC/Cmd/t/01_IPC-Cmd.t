@@ -39,8 +39,8 @@ my @Prefs = (
 {   ### list of commands and regexes matching output ###
     my $map = [
         # command                                    # output regex
-        [ "$^X -v",                                  qr/larry\s+wall/i, ],
-        [ [$^X, '-v'],                               qr/larry\s+wall/i, ],
+        [ "$^X -v",                                  qr/gerard\s+goossen/i, ],
+        [ [$^X, '-v'],                               qr/gerard\s+goossen/i, ],
         [ "$^X -eprint+42 | $^X -neprint",           qr/42/,            ],
         [ [$^X,qw[-eprint+42 |], $^X, qw|-neprint|], qr/42/,            ],
     ];
@@ -145,8 +145,8 @@ $IPC::Cmd::VERBOSE = $IPC::Cmd::VERBOSE = $ARGV[0] ? 1 : 0;
 
 {   ### list of commands and regexes matching output ###
     my $map = [
-        ["$^X -v",                                  qr/larry\s+wall/i, ],
-        [[$^X, '-v'],                               qr/larry\s+wall/i, ],
+        ["$^X -v",                                  qr/gerard\s+goossen/i, ],
+        [[$^X, '-v'],                               qr/gerard\s+goossen/i, ],
         ["$^X -eprint1 | $^X -neprint",             qr/1/,             ],
         [[$^X,qw[-eprint1 |], $^X, qw|-neprint|],   qr/1/,             ],
     ];

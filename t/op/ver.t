@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     $SIG{'__WARN__'} = sub { warn $_[0] if $DOWARN };
 }
 
@@ -10,8 +8,10 @@ $DOWARN = 1; # enable run-time warnings now
 
 use Config;
 
-require "test.pl";
-plan( tests => 53 );
+require "./test.pl";
+plan( tests => 51 );
+
+use utf8;
 
 eval 'use v5.5.640';
 is( $@, '', "use v5.5.640; $@");
@@ -165,7 +165,6 @@ is(sprintf("%vd", join("", map { chr }
     is( "\x{41}",      +v65, 'bug id 20000323.056');
     is( "\x41",        +v65, 'bug id 20000323.056');
     is( "\x{c8}",     +v200, 'bug id 20000323.056');
-    is( "\xc8",       +v200, 'bug id 20000323.056');
     is( "\x{221b}",  +v8731, 'bug id 20000323.056');
 }
 
@@ -185,13 +184,6 @@ if ($@) {
     # No - so do not test insane fails.
     $@ =~ s/\n/\n# /g;
 }
-SKIP: {
-    skip("No Socket::AF_INET # $@") if $@;
-    my $ip   = v2004.148.0.1;
-    my $host;
-    eval { $host = gethostbyaddr($ip,&Socket::AF_INET) };
-    like($@, qr/Wide character/, "Non-bytes leak to gethostbyaddr");
-}
 
 # Chapter 28, pp671
 ok(v5.6.0 lt v5.7.0, "v5.6.0 lt v5.7.0");
@@ -203,7 +195,7 @@ is(v200, eval( "v200"), 'v200 eq "v200"'        );
 is(v200, eval("+v200"), 'v200 eq eval("+v200")' );
 
 # Tests for string/numeric value of $] itself
-my ($revision,$version,$subversion) = split /\./, sprintf("%vd",$^V);
+my ($revision,$version,$subversion) = split '\.', sprintf("%vd",$^V);
 
 # $^V always displays the leading 'v' but we don't want that here
 $revision =~ s/^v//;
@@ -217,7 +209,11 @@ my $v = sprintf("%d.%.3d%.3d",$revision,$version,$subversion);
 print "# v = '$v'\n";
 print "# ] = '$]'\n";
 
-is( $v, "$]", qq{\$^V eq "\$]"});
+$v =~ s/000$// if $subversion == 0;
+
+print "# v = '$v'\n";
+
+ok( $v eq "$]", qq{\$^V eq "\$]"});
 
 $v = $revision + $version/1000 + $subversion/1000000;
 

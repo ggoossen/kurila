@@ -1,8 +1,6 @@
 #!./perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
@@ -186,6 +184,8 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
 
 foreach my $chr (60, 200, 600, 6000, 60000) {
   # This little game may set a UTF8 flag internally. Or it may not. :-)
+    use utf8;
+
   my ($key, $value) = (chr ($chr) . "\x{ABCD}", "$chr\x{ABCD}");
   chop ($key, $value);
   my @utf8c = ($key, $value);

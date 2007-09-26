@@ -21,8 +21,8 @@ use Net::Cmd;
 use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 
-$VERSION = '2.77';
-@ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
+$VERSION = "2.77";
+@ISA     = qw(Net::Cmd IO::Socket::INET Exporter);
 
 # Someday I will "use constant", when I am not bothered to much about
 # compatability with older releases of perl
@@ -1468,7 +1468,7 @@ The alloc command allows you to give the ftp server a hint about the size
 of the file about to be transferred using the ALLO ftp command. Some storage
 systems use this to make intelligent decisions about how to store the file.
 The C<SIZE> argument represents the size of the file in bytes. The
-C<RECORD_SIZE> argument indicates a maximum record or page size for files
+C<RECORD_SIZE> argument indicates a mazimum record or page size for files
 sent with a record or page structure.
 
 The size of the file will be determined, and sent to the server

@@ -21,7 +21,7 @@ use vars qw(
 use vars qw($Revision);
 use strict;
 
-$VERSION = '6.36_01';
+$VERSION = '6.36';
 ($Revision) = q$Revision: 32261 $ =~ /Revision:\s+(\S+)/;
 
 @ISA = qw(Exporter);
@@ -148,7 +148,7 @@ sub prompt ($;$) {
     Carp::confess("prompt function called without an argument") 
         unless defined $mess;
 
-    my $isa_tty = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;
+    my $isa_tty = -t *STDIN && (-t *STDOUT || !(-f *STDOUT || -c *STDOUT)) ;
 
     my $dispdef = defined $def ? "[$def] " : " ";
     $def = defined $def ? $def : "";
@@ -448,7 +448,7 @@ sub new {
         bless $self, $newclass;
         push @Parent, $self;
         require ExtUtils::MY;
-        @{"$newclass\:\:ISA"} = 'MM';
+        @{*{Symbol::qualify_to_ref("$newclass\:\:ISA")}} = 'MM';
     }
 
     if (defined $Parent[-2]){
@@ -480,7 +480,7 @@ sub new {
         }
         if ($self->{PARENT}) {
             $self->{PARENT}->{CHILDREN}->{$newclass} = $self;
-            foreach my $opt (qw(POLLUTE PERL_CORE LINKTYPE)) {
+            foreach my $opt (qw(POLLUTE PERL_CORE)) {
                 if (exists $self->{PARENT}->{$opt}
                     and not exists $self->{$opt})
                     {
@@ -810,7 +810,7 @@ sub _run_hintfile {
 sub mv_all_methods {
     my($from,$to) = @_;
     no strict 'refs';
-    my($symtab) = \%{"${from}::"};
+    my($symtab) = \%{*{Symbol::qualify_to_ref("${from}::")}};
 
     # Here you see the *current* list of methods that are overridable
     # from Makefile.PL via MY:: subroutines. As of VERSION 5.07 I'm
@@ -831,9 +831,9 @@ sub mv_all_methods {
         # standard, we try to enable the next line again. It was
         # commented out until MM 5.23
 
-        next unless defined &{"${from}::$method"};
+        next unless defined &{Symbol::qualify_to_ref("${from}::$method")};
 
-        *{"${to}::$method"} = \&{"${from}::$method"};
+        *{Symbol::qualify_to_ref("${to}::$method")} = \&{Symbol::qualify_to_ref("${from}::$method")};
 
         # delete would do, if we were sure, nobody ever called
         # MY->makeaperl directly

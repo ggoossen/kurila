@@ -148,7 +148,7 @@ CGI::Carp::set_message(''),
 # Test set_progname
 #-----------------------------------------------------------------------------
 
-import CGI::Carp qw(name=new_progname);
+CGI::Carp->import( qw(name=new_progname));
 is($CGI::Carp::PROGNAME,
      'new_progname',
      'CGI::Carp::import set program name correctly');

@@ -1414,7 +1414,7 @@ sub VersionMessage(@) {
 sub HelpMessage(@) {
     eval {
 	require Pod::Usage;
-	import Pod::Usage;
+	Pod::Usage->import;
 	1;
     } || die("Cannot provide help: cannot load Pod::Usage\n");
 

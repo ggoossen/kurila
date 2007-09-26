@@ -11,7 +11,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 694 + $extra ;
 
@@ -72,7 +72,7 @@ EOM
 
                 }
 
-                my $lex = new LexFile my $name ;
+                my $lex = LexFile->new( my $name) ;
                 my $output ;
                 if ($fb eq 'buffer')
                 {
@@ -81,14 +81,14 @@ EOM
                 }
                 elsif ($fb eq 'filehandle')
                 {
-                    $output = new IO::File ">$name" ;
+                    $output = 'IO::File'->new( ">$name") ;
                 }
                 else
                 {
                     $output = $name ;
                 }
 
-                my $x = new $CompressClass($output, AutoClose => 1, %headers);
+                my $x = $CompressClass-> new(($output, AutoClose => 1, %headers));
                 isa_ok $x, $CompressClass, '  $x' ;
 
                 foreach my $buffer (@buffs) {
@@ -105,18 +105,18 @@ EOM
                     $cc = $output ;
                     if ($fb eq 'filehandle')
                     {
-                        $cc = new IO::File "<$name" ;
+                        $cc = 'IO::File'->new( "<$name") ;
                     }
                     my @opts = $unc ne $UncompressClass 
                                     ? (RawInflate => 1)
                                     : ();
-                    my $gz = new $unc($cc,
+                    my $gz = $unc-> new(($cc,
                                    @opts,
                                    Strict      => 1,
                                    AutoClose   => 1,
                                    Append      => 1,
                                    MultiStream => 1,
-                                   Transparent => 0)
+                                   Transparent => 0))
                         or diag $$UnError;
                     isa_ok $gz, $UncompressClass, '    $gz' ;
 
@@ -140,18 +140,18 @@ EOM
                     $cc = $output ;
                     if ($fb eq 'filehandle')
                     {
-                        $cc = new IO::File "<$name" ;
+                        $cc = 'IO::File'->new( "<$name") ;
                     }
                     my @opts = $unc ne $UncompressClass 
                                     ? (RawInflate => 1)
                                     : ();
-                    my $gz = new $unc($cc,
+                    my $gz = $unc-> new(($cc,
                                    @opts,
                                    Strict      => 1,
                                    AutoClose   => 1,
                                    Append      => 1,
                                    MultiStream => 0,
-                                   Transparent => 0)
+                                   Transparent => 0))
                         or diag $$UnError;
                     isa_ok $gz, $UncompressClass, '    $gz' ;
 

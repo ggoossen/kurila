@@ -5,7 +5,7 @@ use strict;
 use vars qw(@ISA $VERSION);
 require File::Spec::Unix;
 
-$VERSION = '1.6_01';
+$VERSION = '1.6';
 
 @ISA = qw(File::Spec::Unix);
 
@@ -77,35 +77,13 @@ sub tmpdir {
 			      '/'  );
 }
 
-=item case_tolerant
-
-MSWin32 case-tolerance depends on GetVolumeInformation() $ouFsFlags == FS_CASE_SENSITIVE,
-indicating the case significance when comparing file specifications.
-Since XP FS_CASE_SENSITIVE is effectively disabled for the NT subsubsystem.
-See http://cygwin.com/ml/cygwin/2007-07/msg00891.html
-Default: 1
-
-=cut
-
-sub case_tolerant () {
-  eval { require Win32API::File; } or return 1;
-  my $drive = shift || "C:";
-  my $osFsType = "\0"x256;
-  my $osVolName = "\0"x256;
-  my $ouFsFlags = 0;
-  Win32API::File::GetVolumeInformation($drive, $osVolName, 256, [], [], $ouFsFlags, $osFsType, 256 );
-  if ($ouFsFlags & Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
-  else { return 1; }
+sub case_tolerant {
+    return 1;
 }
 
-=item file_name_is_absolute
-
-As of right now, this returns 2 if the path is absolute with a
-volume, 1 if it's absolute with no volume, 0 otherwise.
-
-=cut
-
 sub file_name_is_absolute {
+    # As of right now, this returns 2 if the path is absolute with a
+    # volume, 1 if it's absolute with no volume, 0 otherwise.
 
     my ($self,$file) = @_;
 
@@ -363,7 +341,7 @@ Novell NetWare inherits its File::Spec behaviour from File::Spec::Win32.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004,2007 by the Perl 5 Porters.  All rights reserved.
+Copyright (c) 2004 by the Perl 5 Porters.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

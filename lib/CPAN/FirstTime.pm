@@ -734,7 +734,7 @@ sub conf_sites {
   local $^T = time;
   my $overwrite_local = 0;
   if ($mby && -f $mby && -M _ <= 60 && -s _ > 0) {
-      my $mtime = localtime((stat _)[9]);
+      my $mtime = localtime((stat '_')[9]);
       my $prompt = qq{Found $mby as of $mtime
 
 I\'d use that as a database of CPAN sites. If that is OK for you,

@@ -508,7 +508,7 @@ sub podchecker( $ ; $ % ) {
     $outfile ||= \*STDERR;
 
     ## Now create a pod checker
-    my $checker = new Pod::Checker(%options);
+    my $checker = Pod::Checker->new(%options);
 
     ## Now check the pod document for errors
     $checker->parse_from_file($infile, $outfile);

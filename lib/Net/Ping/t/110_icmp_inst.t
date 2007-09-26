@@ -24,7 +24,7 @@ if (($> and $^O ne 'VMS' and $^O ne 'cygwin')
 } elsif ($^O eq 'MacOS') {
   skip "icmp protocol not supported.", 1;
 } else {
-  my $p = new Net::Ping "icmp";
+  my $p = Net::Ping->new( "icmp");
   ok !!$p;
 }
 

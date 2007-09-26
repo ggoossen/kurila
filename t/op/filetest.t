@@ -4,13 +4,13 @@
 # See pod/perlport.pod for details.
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
 use Config;
 plan(tests => 24);
+
+our ($bad_chmod, $oldeuid);
 
 ok( -d 'op' );
 ok( -f 'TEST' );

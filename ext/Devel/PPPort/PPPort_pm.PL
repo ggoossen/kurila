@@ -4,9 +4,9 @@
 #
 ################################################################################
 #
-#  $Revision: 57 $
+#  $Revision: 52 $
 #  $Author: mhx $
-#  $Date: 2007/09/11 23:28:24 +0200 $
+#  $Date: 2007/03/23 16:27:19 +0100 $
 #
 ################################################################################
 #
@@ -27,7 +27,7 @@ my $INCLUDE = 'parts/inc';
 my $DPPP = 'DPPP_';
 
 my %embed = map { ( $_->{name} => $_ ) }
-            parse_embed(qw(parts/embed.fnc parts/apidoc.fnc parts/ppport.fnc));
+            parse_embed(qw(parts/embed.fnc parts/apidoc.fnc));
 
 my(%provides, %prototypes, %explicit);
 
@@ -82,7 +82,6 @@ for (@api) {
 
 my @perl_api;
 for (keys %provides) {
-  next if /^Perl_(.*)/ && exists $embed{$1};
   next if exists $embed{$_};
   push @perl_api, $_;
   check(2, "No API definition for provided element $_ found.");
@@ -126,7 +125,7 @@ $data =~ s{^__UNSUPPORTED_API__(\s*?)^}
           {join "\n", @todo}gem;
 
 $data =~ s{__MIN_PERL__}{5.003}g;
-$data =~ s{__MAX_PERL__}{5.10.0}g;
+$data =~ s{__MAX_PERL__}{5.9.4}g;
 
 open FH, ">PPPort.pm" or die "PPPort.pm: $!\n";
 print FH $data;
@@ -345,9 +344,9 @@ __DATA__
 #
 ################################################################################
 #
-#  $Revision: 57 $
+#  $Revision: 52 $
 #  $Author: mhx $
-#  $Date: 2007/09/11 23:28:24 +0200 $
+#  $Date: 2007/03/23 16:27:19 +0100 $
 #
 ################################################################################
 #
@@ -508,7 +507,7 @@ package Devel::PPPort;
 use strict;
 use vars qw($VERSION $data);
 
-$VERSION = do { my @r = '$Snapshot: /Devel-PPPort/3.11_06 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /Devel-PPPort/3.11_01 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 
 sub _init_data
 {
@@ -606,8 +605,6 @@ __DATA__
 %include Sv_set
 
 %include sv_xpvf
-
-%include shared_pv
 
 %include warn
 

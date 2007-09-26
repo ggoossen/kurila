@@ -15,7 +15,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 7 + $extra ;
 
@@ -35,7 +35,7 @@ sub run
     {
         # Check that the class destructor will call close
 
-        my $lex = new LexFile my $name ;
+        my $lex = LexFile->new( my $name) ;
 
         my $hello = <<EOM ;
 hello world
@@ -44,7 +44,7 @@ EOM
 
 
         {
-          ok my $x = new $CompressClass $name, -AutoClose => 1  ;
+          ok my $x = $CompressClass-> new( $name, -AutoClose => 1)  ;
 
           ok $x->write($hello) ;
         }
@@ -56,17 +56,17 @@ EOM
         # Tied filehandle destructor
 
 
-        my $lex = new LexFile my $name ;
+        my $lex = LexFile->new( my $name) ;
 
         my $hello = <<EOM ;
 hello world
 this is a test
 EOM
 
-        my $fh = new IO::File "> $name" ;
+        my $fh = 'IO::File'->new( "> $name") ;
 
         {
-          ok my $x = new $CompressClass $fh, -AutoClose => 1  ;
+          ok my $x = $CompressClass-> new( $fh, -AutoClose => 1)  ;
 
           $x->write($hello) ;
         }

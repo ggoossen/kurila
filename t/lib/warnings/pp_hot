@@ -58,7 +58,7 @@ use warnings;
 no warnings 'unopened' ;
 print $f $a;
 EXPECT
-print() on unopened filehandle abc at - line 4.
+Can't use string ("abc") as a symbol ref while "strict refs" in use at - line 4.
 ########
 # pp_hot.c [pp_print]
 use warnings 'io' ;
@@ -142,7 +142,7 @@ my @b = @$a;
 no warnings 'uninitialized' ;
 my @c = @$a;
 EXPECT
-Use of uninitialized value $a in array dereference at - line 4.
+Can't use an undefined value as an ARRAY reference at - line 4.
 ########
 # pp_hot.c [pp_rv2hv]
 use warnings 'uninitialized' ;
@@ -151,7 +151,7 @@ my %b = %$a;
 no warnings 'uninitialized' ;
 my %c = %$a;
 EXPECT
-Use of uninitialized value $a in hash dereference at - line 4.
+Can't use an undefined value as a HASH reference at - line 4.
 ########
 # pp_hot.c [pp_aassign]
 use warnings 'misc' ;

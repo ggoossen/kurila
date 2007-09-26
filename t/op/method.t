@@ -5,12 +5,10 @@
 #
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-    require "test.pl";
+    require "./test.pl";
 }
 
-print "1..78\n";
+print "1..71\n";
 
 @A::ISA = 'B';
 @B::ISA = 'C';
@@ -19,36 +17,28 @@ sub C::d {"C::d"}
 sub D::d {"D::d"}
 
 # First, some basic checks of method-calling syntax:
-$obj = bless [], "Pack";
+my $obj = bless [], "Pack";
 sub Pack::method { shift; join(",", "method", @_) }
-$mname = "method";
+my $mname = "method";
 
 is(Pack->method("a","b","c"), "method,a,b,c");
 is(Pack->$mname("a","b","c"), "method,a,b,c");
-is(method Pack ("a","b","c"), "method,a,b,c");
-is((method Pack "a","b","c"), "method,a,b,c");
 
 is(Pack->method(), "method");
 is(Pack->$mname(), "method");
-is(method Pack (), "method");
 is(Pack->method, "method");
 is(Pack->$mname, "method");
-is(method Pack, "method");
 
 is($obj->method("a","b","c"), "method,a,b,c");
 is($obj->$mname("a","b","c"), "method,a,b,c");
-is((method $obj ("a","b","c")), "method,a,b,c");
-is((method $obj "a","b","c"), "method,a,b,c");
 
 is($obj->method(0), "method,0");
 is($obj->method(1), "method,1");
 
 is($obj->method(), "method");
 is($obj->$mname(), "method");
-is((method $obj ()), "method");
 is($obj->method, "method");
 is($obj->$mname, "method");
-is(method $obj, "method");
 
 is( A->d, "C::d");		# Update hash table;
 
@@ -111,7 +101,7 @@ eval <<'EOF';
 sub C::e;
 BEGIN { *B::e = \&C::e }	# Shouldn't prevent AUTOLOAD in original pkg
 sub Y::f;
-$counter = 0;
+our $counter = 0;
 
 @X::ISA = 'Y';
 @Y::ISA = 'B';
@@ -132,6 +122,8 @@ sub C::AUTOLOAD {
 }
 EOF
 
+is($@, '', "correct eval");
+
 is(A->e(), "C: In C::e, 1");	# We get a correct autoload
 is(A->e(), "C: In C::e, 1");	# Which sticks
 
@@ -145,25 +137,31 @@ is(Y->f(), "B: In Y::f, 3");	# Which sticks
 # know that you broke some old construction. Feel free to rewrite the test
 # if your patch breaks it.
 
+our ($AUTOLOAD, $counter);
+
 *B::AUTOLOAD = sub {
   my $c = ++$counter;
   my $method = $AUTOLOAD; 
-  *$AUTOLOAD = sub { "new B: In $method, $c" };
-  goto &$AUTOLOAD;
+  no strict 'refs';
+  *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { "new B: In $method, $c" };
+  goto &{Symbol::qualify_to_ref($AUTOLOAD)};
 };
 
 is(A->eee(), "new B: In A::eee, 4");	# We get a correct $autoload
 is(A->eee(), "new B: In A::eee, 4");	# Which sticks
 
-# this test added due to bug discovery
-is(defined(@{"unknown_package::ISA"}) ? "defined" : "undefined", "undefined");
+{
+    # this test added due to bug discovery
+    no strict 'refs';
+    is(defined(@{*{Symbol::qualify_to_ref("unknown_package::ISA")}}) ? "defined" : "undefined", "undefined");
+}
 
 # test that failed subroutine calls don't affect method calls
 {
     package A1;
     sub foo { "foo" }
     package A2;
-    @ISA = 'A1';
+    our @ISA = 'A1';
     package main;
     is(A2->foo(), "foo");
     is(do { eval 'A2::foo()'; $@ ? 1 : 0}, 1);
@@ -183,19 +181,19 @@ is(defined(@{"unknown_package::ISA"}) ? "defined" : "undefined", "undefined");
 
 
 # test error messages if method loading fails
-is(do { eval '$e = bless {}, "E::A"; E::A->foo()';
+is(do { eval 'my $e = bless {}, "E::A"; E::A->foo()';
 	  $@ =~ /^\QCan't locate object method "foo" via package "E::A" at/ ? 1 : $@}, 1);
-is(do { eval '$e = bless {}, "E::B"; $e->foo()';  
+is(do { eval 'my $e = bless {}, "E::B"; $e->foo()';  
 	  $@ =~ /^\QCan't locate object method "foo" via package "E::B" at/ ? 1 : $@}, 1);
 is(do { eval 'E::C->foo()';
 	  $@ =~ /^\QCan't locate object method "foo" via package "E::C" (perhaps / ? 1 : $@}, 1);
 
 is(do { eval 'UNIVERSAL->E::D::foo()';
 	  $@ =~ /^\QCan't locate object method "foo" via package "E::D" (perhaps / ? 1 : $@}, 1);
-is(do { eval '$e = bless {}, "UNIVERSAL"; $e->E::E::foo()';
+is(do { eval 'my $e = bless {}, "UNIVERSAL"; $e->E::E::foo()';
 	  $@ =~ /^\QCan't locate object method "foo" via package "E::E" (perhaps / ? 1 : $@}, 1);
 
-$e = bless {}, "E::F";  # force package to exist
+my $e = bless {}, "E::F";  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
 	  $@ =~ /^\QCan't locate object method "foo" via package "E::F" at/ ? 1 : $@}, 1);
 is(do { eval '$e = bless {}, "UNIVERSAL"; $e->E::F::foo()';
@@ -237,7 +235,7 @@ ok(1);
 # Bug ID 20010902.002
 is(
     eval q[
-	$x = 'x';
+	our $x = 'x';
 	sub Foo::x : lvalue { $x }
 	Foo->$x = 'ok';
     ] || $@, 'ok'
@@ -283,7 +281,7 @@ for my $meth (['Bar', 'Foo::Bar'],
 	      ['Xyz::SUPER::Bar', 'Xyz::SUPER::Bar'])
 {
     fresh_perl_is(<<EOT,
-package UNIVERSAL; sub AUTOLOAD { my \$c = shift; print "\$c \$AUTOLOAD\\n" }
+package UNIVERSAL; our \$AUTOLOAD; sub AUTOLOAD { my \$c = shift; print "\$c \$AUTOLOAD\\n" }
 sub DESTROY {} # IO object destructor called in MacOS, because of Mac::err
 package Xyz;
 package main; Foo->$meth->[0]();

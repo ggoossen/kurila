@@ -331,6 +331,28 @@ Found in file pad.h
 
 =back
 
+=head1 Functions in file pp_ctl.c
+
+
+=over 8
+
+=item find_runcv
+X<find_runcv>
+
+Locate the CV corresponding to the currently executing sub or eval.
+If db_seqp is non_null, skip CVs that are in the DB package and populate
+*db_seqp with the cop sequence number at the point that the DB:: code was
+entered. (allows debuggers to eval in the scope of the breakpoint rather
+than in the scope of the debugger itself).
+
+	CV*	find_runcv(U32 *db_seqp)
+
+=for hackers
+Found in file pp_ctl.c
+
+
+=back
+
 =head1 GV Functions
 
 =over 8
@@ -622,14 +644,12 @@ X<pad_add_name>
 
 Create a new name and associated PADMY SV in the current pad; return the
 offset.
-If C<typestash> is valid, the name is for a typed lexical; set the
-name's stash to that value.
 If C<ourstash> is valid, it's an our lexical, set the name's
 SvOURSTASH to that value
 
 If fake, it means we're cloning an existing entry
 
-	PADOFFSET	pad_add_name(const char *name, HV* typestash, HV* ourstash, bool clone, bool state)
+	PADOFFSET	pad_add_name(const char *name, HV* ourstash, bool clone, bool state)
 
 =for hackers
 Found in file pad.c

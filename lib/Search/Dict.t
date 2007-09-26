@@ -7,7 +7,9 @@ BEGIN {
 
 print "1..4\n";
 
-$DICT = <<EOT;
+use strict;
+
+my $DICT = <<EOT;
 Aarhus
 Aaron
 Ababa
@@ -45,7 +47,7 @@ binmode DICT;			# To make length expected one.
 print DICT $DICT;
 
 my $pos = look *DICT, "Ababa";
-chomp($word = <DICT>);
+chomp(my $word = <DICT>);
 print "not " if $pos < 0 || $word ne "Ababa";
 print "ok 1\n";
 

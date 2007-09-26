@@ -1,6 +1,6 @@
 #include this file into another for subclass testing
 
-my $version = ${"$class\::VERSION"};
+my $version = ${Symbol::qualify_to_ref("$class\::VERSION")};
 
 use strict;
 
@@ -42,7 +42,7 @@ my ($f,$z,$a,$exp,@a,$m,$e,$round_mode,$expected_class);
 
 while (<DATA>) 
   {
-  $_ =~ s/[\n\r]//g;	# remove newlines
+  chomp;
   next if /^#/;	# skip comments
   if (s/^&//) 
     {

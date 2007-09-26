@@ -1,7 +1,7 @@
 package Socket;
 
 our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-$VERSION = "1.80";
+$VERSION = "1.79";
 
 =head1 NAME
 
@@ -223,13 +223,6 @@ use XSLoader ();
 	AF_WAN
 	AF_X25
 	IOV_MAX
-	IP_OPTIONS
-	IP_HDRINCL
-	IP_TOS
-	IP_TTL
-	IP_RECVOPTS
-	IP_RECVRETOPTS
-	IP_RETOPTS
 	MSG_BCAST
 	MSG_BTAG
 	MSG_CTLFLAGS
@@ -344,9 +337,6 @@ use XSLoader ();
 
 @EXPORT_OK = qw(CR LF CRLF $CR $LF $CRLF
 
-	       IPPROTO_IP
-	       IPPROTO_IPV6
-	       IPPROTO_RAW
 	       IPPROTO_ICMP
 	       IPPROTO_TCP
 	       IPPROTO_UDP
@@ -405,8 +395,8 @@ sub AUTOLOAD {
     if ($error) {
 	croak $error;
     }
-    *$AUTOLOAD = sub { $val };
-    goto &$AUTOLOAD;
+    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
 }
 
 XSLoader::load 'Socket', $VERSION;

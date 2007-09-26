@@ -116,6 +116,7 @@ my_atof                        # E
 my_fflush_all                  # E
 newANONATTRSUB                 # E
 newATTRSUB                     # E
+newPADOP                       # E
 newSVnv                        # E (Perl_newSVnv)
 newSVpvf                       # E (Perl_newSVpvf)
 newSVuv                        # E
@@ -128,6 +129,7 @@ op_dump                        # E
 perl_parse                     # E (perl_parse)
 pmop_dump                      # E
 pv_display                     # E
+re_intuit_start                # E
 re_intuit_string               # E
 reginitcolors                  # E
 require_pv                     # E (perl_require_pv)

@@ -6,8 +6,6 @@ our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, $AUTOLOAD, %SIGRT) = ();
 
 our $VERSION = "1.13";
 
-use AutoLoader;
-
 use XSLoader ();
 
 use Fcntl qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
@@ -41,8 +39,7 @@ sub AUTOLOAD {
     no warnings 'uninitialized';
     if ($AUTOLOAD =~ /::(_?[a-z])/) {
 	# require AutoLoader;
-	$AutoLoader::AUTOLOAD = $AUTOLOAD;
-	goto &AutoLoader::AUTOLOAD
+        croak "subroutine $AUTOLOAD does not exist";
     }
     local $! = 0;
     my $constname = $AUTOLOAD;
@@ -50,23 +47,17 @@ sub AUTOLOAD {
     if ($NON_CONSTS{$constname}) {
         my ($val, $error) = &int_macro_int($constname, $_[0]);
         croak $error if $error;
-        *$AUTOLOAD = sub { &int_macro_int($constname, $_[0]) };
+        *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { &int_macro_int($constname, $_[0]) };
     } else {
         my ($error, $val) = constant($constname);
         croak $error if $error;
-	*$AUTOLOAD = sub { $val };
+	*{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
     }
 
-    goto &$AUTOLOAD;
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
 }
 
-package POSIX::SigAction;
-
-use AutoLoader 'AUTOLOAD';
-
 package POSIX::SigRt;
-
-use AutoLoader 'AUTOLOAD';
 
 use Tie::Hash;
 
@@ -80,9 +71,6 @@ tie %POSIX::SIGRT, 'POSIX::SigRt';
 sub DESTROY {};
 
 package POSIX;
-
-1;
-__END__
 
 sub usage {
     my ($mess) = @_;
@@ -590,7 +578,7 @@ sub fstat {
     usage "fstat(fd)" if @_ != 1;
     local *TMP;
     CORE::open(TMP, "<&$_[0]");		# Gross.
-    my @l = CORE::stat(TMP);
+    my @l = CORE::stat(*TMP);
     CORE::close(TMP);
     @l;
 }

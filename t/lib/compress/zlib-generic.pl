@@ -11,7 +11,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 49 + $extra ;
 }
@@ -32,9 +32,9 @@ sub myGZreadFile
     my $init = shift ;
 
 
-    my $fil = new $UncompressClass $filename,
+    my $fil = $UncompressClass-> new( $filename,
                                     -Strict   => 1,
-                                    -Append   => 1
+                                    -Append   => 1)
                                     ;
 
     my $data = '';
@@ -65,7 +65,7 @@ sub myGZreadFile
         title "flush" ;
 
 
-        my $lex = new LexFile my $name ;
+        my $lex = LexFile->new( my $name) ;
 
         my $hello = <<EOM ;
 hello world
@@ -74,7 +74,7 @@ EOM
 
         {
           my $x ;
-          ok $x = new $CompressClass $name  ;
+          ok $x = $CompressClass-> new( $name)  ;
 
           ok $x->write($hello), "write" ;
           ok $x->flush(Z_FINISH), "flush";
@@ -83,7 +83,7 @@ EOM
 
         {
           my $uncomp;
-          ok my $x = new $UncompressClass $name, -Append => 1  ;
+          ok my $x = $UncompressClass-> new( $name, -Append => 1)  ;
 
           my $len ;
           1 while ($len = $x->read($uncomp)) > 0 ;
@@ -104,7 +104,7 @@ EOM
         my $buffer = '';
         {
           my $x ;
-          ok $x = new $CompressClass(\$buffer) ;
+          ok $x = $CompressClass-> new((\$buffer)) ;
           ok $x->close ;
       
         }
@@ -113,7 +113,7 @@ EOM
         my $uncomp= '';
         {
           my $x ;
-          ok $x = new $UncompressClass(\$buffer, Append => 1)  ;
+          ok $x = $UncompressClass-> new((\$buffer, Append => 1))  ;
 
           1 while $x->read($uncomp) > 0  ;
 
@@ -131,7 +131,7 @@ EOM
 
         my $hello = "I am a HAL 9000 computer" x 2001 ;
 
-        my $k = new $UncompressClass(\$hello, Transparent => 1);
+        my $k = $UncompressClass-> new((\$hello, Transparent => 1));
         ok $k ;
      
         # Skip to the flush point -- no-op for plain file
@@ -157,7 +157,7 @@ EOM
         my ($x, $err, $answer, $X, $Z, $status);
         my $Answer ;
      
-        ok ($x = new $CompressClass(\$Answer));
+        ok ($x = $CompressClass-> new((\$Answer)));
         ok $x ;
      
         is $x->write($hello), length($hello);
@@ -170,7 +170,7 @@ EOM
         ok $x->close() ;
      
         my $k;
-        $k = new $UncompressClass(\$Answer, BlockSize => 1);
+        $k = $UncompressClass-> new((\$Answer, BlockSize => 1));
         ok $k ;
      
         my $initial;
@@ -200,14 +200,14 @@ EOM
         my ($x, $err, $answer, $X, $Z, $status);
         my $Answer ;
      
-        ok ($x = new $CompressClass(\$Answer));
+        ok ($x = $CompressClass-> new((\$Answer)));
         ok $x ;
      
         is $x->write($hello), length($hello);
     
         ok $x->close() ;
      
-        my $k = new $UncompressClass(\$Answer, BlockSize => 1);
+        my $k = $UncompressClass-> new((\$Answer, BlockSize => 1));
         ok $k ;
      
         my $initial;

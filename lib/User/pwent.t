@@ -16,8 +16,11 @@ BEGIN {
     unless ($haspw) { print "1..0 # Skip: no pwd.h\n"; exit 0 }
 }
 
+use strict;
+our ($uid, @pwent);
+
 BEGIN {
-    our $uid = 0;
+    $uid = 0;
     # On VMS getpwuid(0) may return [$gid,0] UIC info (which may not exist).
     # It is better to use the $< uid for testing on VMS instead.
     if ( $^O eq 'VMS' ) { $uid = $< ; }

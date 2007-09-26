@@ -6,7 +6,7 @@ use warnings;
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find( 'perlio')) {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }

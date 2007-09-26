@@ -125,8 +125,9 @@ SKIP: {
   $dist->change_file( 'Build.PL', <<"---" );
 use Module::Build;
 
+use strict;
 my \$build = Module::Build->new(
-  module_name => @{[$dist->name]},
+  module_name => '@{[$dist->name]}',
   license     => 'perl',
   get_options => { foo => {},
                    bar => { type    => '+'  },
@@ -141,7 +142,10 @@ my \$build = Module::Build->new(
 ---
 
   $dist->regen;
-  eval {Module::Build->run_perl_script('Build.PL', [], ['--nouse-rcfile', '--config', "foocakes=barcakes", '--foo', '--bar', '--bar', '-bat=hello', 'gee=whiz', '--any', 'hey', '--destdir', 'yo', '--verbose', '1'])};
+  eval {Module::Build->run_perl_script('Build.PL', [], 
+                                       ['--nouse-rcfile', '--config', "foocakes=barcakes",
+                                        '--foo', '--bar', '--bar', '-bat=hello', 'gee=whiz',
+                                        '--any', 'hey', '--destdir', 'yo', '--verbose', '1'])};
   is $@, '';
 
   my $mb = Module::Build->resume;

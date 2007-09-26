@@ -6,11 +6,6 @@
 #
 #   Run with -debug for debugging output.
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use Config;
 require './test.pl'; # for runperl()
 
@@ -274,6 +269,7 @@ END_MARK_TWO
 }
 
 # some of the variables which the closure will access
+no strict 'vars';
 \$global_scalar = 1000;
 \@global_array = (2000, 2100, 2200, 2300);
 %global_hash = 3000..3009;
@@ -437,8 +433,8 @@ END
 	    # Fork off a new perl to run the tests.
 	    # (This is so we can catch spurious warnings.)
 	    $| = 1; print ""; $| = 0; # flush output before forking
-	    pipe READ, WRITE or die "Can't make pipe: $!";
-	    pipe READ2, WRITE2 or die "Can't make second pipe: $!";
+	    pipe READ, 'WRITE' or die "Can't make pipe: $!";
+	    pipe READ2, 'WRITE2' or die "Can't make second pipe: $!";
 	    die "Can't fork: $!" unless defined($pid = open PERL, "|-");
 	    unless ($pid) {
 	      # Child process here. We're going to send errors back
@@ -447,7 +443,7 @@ END
 	      close READ2;
 	      open STDOUT, ">&WRITE"  or die "Can't redirect STDOUT: $!";
 	      open STDERR, ">&WRITE2" or die "Can't redirect STDERR: $!";
-	      exec which_perl(), '-w', '-'
+	      exec which_perl(), '-w', '-MTestInit', '-'
 		or die "Can't exec perl: $!";
 	    } else {
 	      # Parent process here.
@@ -507,10 +503,15 @@ END
 
 }
 
-# The following dumps core with perl <= 5.8.0 (bugid 9535) ...
-BEGIN { $vanishing_pad = sub { eval $_[0] } }
-$some_var = 123;
-test { $vanishing_pad->( '$some_var' ) == 123 };
+{
+    no strict 'vars';
+    # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
+    BEGIN { $vanishing_pad = sub { eval $_[0] } }
+    $some_var = 123;
+    test { $vanishing_pad->( '$some_var' ) == 123 };
+}
+
+our ($newvar, @a, $x);
 
 # ... and here's another coredump variant - this time we explicitly
 # delete the sub rather than using a BEGIN ...

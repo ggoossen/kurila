@@ -1,8 +1,8 @@
 #!./perl
 
-chdir 't' if -d 't';
-
 print "1..15\n";
+
+our (@a, $x, $z, $y, $foo);
 
 @a = (1,2,3,4,5,6,7,8,9,10,11,12);
 
@@ -33,7 +33,7 @@ if (($x...$x) eq "1") {print "ok 9\n";} else {print "not ok 9\n";}
 
 {
     # coredump reported in bug 20001018.008
-    readline(UNKNOWN);
+    readline(Symbol::qualify_to_ref('UNKNOWN'));
     $. = 1;
     $x = 1..10;
     print "ok 10\n";

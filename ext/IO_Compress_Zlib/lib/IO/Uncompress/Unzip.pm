@@ -8,18 +8,18 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Uncompress::RawInflate  2.006 ;
-use IO::Compress::Base::Common  2.006 qw(:Status createSelfTiedObject);
-use IO::Uncompress::Adapter::Identity 2.006 ;
-use IO::Compress::Zlib::Extra 2.006 ;
-use IO::Compress::Zip::Constants 2.006 ;
+use IO::Uncompress::RawInflate  2.004 ;
+use IO::Compress::Base::Common  2.004 qw(:Status createSelfTiedObject);
+use IO::Uncompress::Adapter::Identity 2.004 ;
+use IO::Compress::Zlib::Extra 2.004 ;
+use IO::Compress::Zip::Constants 2.004 ;
 
-use Compress::Raw::Zlib  2.006 qw(crc32) ;
+use Compress::Raw::Zlib  2.004 qw(crc32) ;
 
 BEGIN
 {
     eval { require IO::Uncompress::Adapter::Bunzip2 ;
-           import  IO::Uncompress::Adapter::Bunzip2 } ;
+           IO::Uncompress::Adapter::Bunzip2->import() } ;
 }
 
 
@@ -27,10 +27,10 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnzipError, %headerLookup);
 
-$VERSION = '2.006';
+$VERSION = '2.004';
 $UnzipError = '';
 
-@ISA    = qw(Exporter IO::Uncompress::RawInflate);
+@ISA    = qw(IO::Uncompress::RawInflate Exporter);
 @EXPORT_OK = qw( $UnzipError unzip );
 %EXPORT_TAGS = %IO::Uncompress::RawInflate::EXPORT_TAGS ;
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
@@ -60,7 +60,7 @@ sub unzip
 
 sub getExtraParams
 {
-    use IO::Compress::Base::Common  2.006 qw(:Parse);
+    use IO::Compress::Base::Common  2.004 qw(:Parse);
 
     
     return (
@@ -490,8 +490,8 @@ sub _readZipHeader($)
     my $compressedMethod   = unpack ("v", substr($buffer, 8-4,  2));
     my $lastModTime        = unpack ("V", substr($buffer, 10-4, 4));
     my $crc32              = unpack ("V", substr($buffer, 14-4, 4));
-    my $compressedLength   = new U64 unpack ("V", substr($buffer, 18-4, 4));
-    my $uncompressedLength = new U64 unpack ("V", substr($buffer, 22-4, 4));
+    my $compressedLength   = U64->new( unpack ("V", substr($buffer, 18-4, 4)));
+    my $uncompressedLength = U64->new( unpack ("V", substr($buffer, 22-4, 4)));
     my $filename_length    = unpack ("v", substr($buffer, 26-4, 2)); 
     my $extra_length       = unpack ("v", substr($buffer, 28-4, 2));
 

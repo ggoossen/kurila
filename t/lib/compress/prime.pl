@@ -13,7 +13,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
 }
 
@@ -50,7 +50,7 @@ EOM
             for my $useBuf (0 .. 1)
             {
                 print "#\n# BlockSize $blocksize, Length $i, Buffer $useBuf\n#\n" ;
-                my $lex = new LexFile my $name ;
+                my $lex = LexFile->new( my $name) ;
         
                 my $prime = substr($compressed, 0, $i);
                 my $rest = substr($compressed, $i);
@@ -65,11 +65,11 @@ EOM
                 }
 
                 #my $gz = new $UncompressClass $name,
-                my $gz = new $UncompressClass $start,
+                my $gz = $UncompressClass-> new( $start,
                                               -Append      => 1,
                                               -BlockSize   => $blocksize,
                                               -Prime       => $prime,
-                                              -Transparent => 0
+                                              -Transparent => 0)
                                               ;
                 ok $gz;
                 ok ! $gz->error() ;

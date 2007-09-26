@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-require q(./test.pl); plan(tests => 29);
+require q(./test.pl); plan(tests => 23);
 
 {
     package MRO_A;
@@ -20,6 +20,12 @@ require q(./test.pl); plan(tests => 29);
     our @ISA = qw/MRO_D MRO_E/;
 }
 
+is(mro::get_mro('MRO_F'), 'c3');
+ok(eq_array(
+    mro::get_linear_isa('MRO_F'),
+    [qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/]
+));
+mro::set_mro('MRO_F', 'dfs');
 is(mro::get_mro('MRO_F'), 'dfs');
 ok(eq_array(
     mro::get_linear_isa('MRO_F'),
@@ -141,41 +147,9 @@ is(eval { MRO_N->testfunc() }, 123);
     # this looks dumb, but it preserves existing behavior for compatibility
     #  (undefined @ISA elements treated as "main")
     $ISACLEAR::ISA[1] = undef;
-    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX main ZZ/]));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX main/, undef, qw/ZZ/]));
 
     # undef the array itself
     undef @ISACLEAR::ISA;
     ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR/]));
-
-    # Now, clear more than one package's @ISA at once
-    {
-        package ISACLEAR1;
-        our @ISA = qw/WW XX/;
-
-        package ISACLEAR2;
-        our @ISA = qw/YY ZZ/;
-    }
-    # baseline
-    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),[qw/ISACLEAR1 WW XX/]));
-    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),[qw/ISACLEAR2 YY ZZ/]));
-    (@ISACLEAR1::ISA, @ISACLEAR2::ISA) = ();
-
-    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),[qw/ISACLEAR1/]));
-    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),[qw/ISACLEAR2/]));
 }
-
-# Check that recursion bails out "cleanly" in a variety of cases
-# (as opposed to say, bombing the interpreter or something)
-{
-    my @recurse_codes = (
-        '@MRO_R1::ISA = "MRO_R2"; @MRO_R2::ISA = "MRO_R1";',
-        '@MRO_R3::ISA = "MRO_R4"; push(@MRO_R4::ISA, "MRO_R3");',
-        '@MRO_R5::ISA = "MRO_R6"; @MRO_R6::ISA = qw/XX MRO_R5 YY/;',
-        '@MRO_R7::ISA = "MRO_R8"; push(@MRO_R8::ISA, qw/XX MRO_R7 YY/)',
-    );
-    foreach my $code (@recurse_codes) {
-        eval $code;
-        ok($@ =~ /Recursive inheritance detected/);
-    }
-}
-

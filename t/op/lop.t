@@ -4,11 +4,6 @@
 # test the logical operators '&&', '||', '!', 'and', 'or', 'not'
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 print "1..7\n";
 
 my $test = 0;

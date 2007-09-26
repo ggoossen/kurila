@@ -188,7 +188,7 @@ sub xref {
 	    xref($op->pmreplstart);
 	} else {
 	    no strict 'refs';
-	    my $ppname = "pp_$opname";
+	    my $ppname = *{Symbol::qualify_to_ref("pp_$opname")};
 	    &$ppname($op) if defined(&$ppname);
 	}
     }
@@ -320,13 +320,6 @@ sub B::GV::xref {
 	process([$gv->STASH->NAME, "&", $gv->NAME], "subdef");
 	push(@todo, $cv);
     }
-    my $form = $gv->FORM;
-    if ($$form) {
-	return if $done{$$form}++;
-	$file = $gv->FILE;
-	$line = $gv->LINE;
-	process([$gv->STASH->NAME, "", $gv->NAME], "formdef");
-    }
 }
 
 sub xref_definitions {
@@ -339,7 +332,7 @@ sub xref_definitions {
         $exclude{$pack."::"} = 1;
     }
     no strict qw(vars refs);
-    walksymtable(\%{"main::"}, "xref", sub { !defined($exclude{$_[0]}) });
+    walksymtable(\%{*{Symbol::qualify_to_ref("main::")}}, "xref", sub { !defined($exclude{$_[0]}) });
 }
 
 sub output {

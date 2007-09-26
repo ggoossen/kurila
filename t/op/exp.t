@@ -1,12 +1,12 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
 plan tests => 16;
+
+our ($s, $x1, $x2);
 
 # compile time evaluation
 

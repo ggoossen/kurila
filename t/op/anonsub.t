@@ -4,21 +4,21 @@
 # fresh_perl_is, and fresh_perl_is uses a closure -- a special
 # case of what this program tests for.
 
-chdir 't' if -d 't';
-@INC = '../lib';
-$Is_VMS = $^O eq 'VMS';
-$Is_MSWin32 = $^O eq 'MSWin32';
-$Is_MacOS = $^O eq 'MacOS';
-$Is_NetWare = $^O eq 'NetWare';
+my $Is_VMS = $^O eq 'VMS';
+my $Is_MSWin32 = $^O eq 'MSWin32';
+my $Is_MacOS = $^O eq 'MacOS';
+my $Is_NetWare = $^O eq 'NetWare';
 $ENV{PERL5LIB} = "../lib" unless $Is_VMS;
+
+our $i = 0;
 
 $|=1;
 
 undef $/;
-@prgs = split "\n########\n", <DATA>;
+my @prgs = split "\n########\n", <DATA>;
 print "1..", 6 + scalar @prgs, "\n";
 
-$tmpfile = "asubtmp000";
+my $tmpfile = "asubtmp000";
 1 while -f ++$tmpfile;
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 

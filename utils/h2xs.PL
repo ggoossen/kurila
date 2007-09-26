@@ -658,7 +658,9 @@ if( $opt_b ){
 	    $sub ? sprintf("%d.%03d%02d",$maj,$min,$sub) :
 	           sprintf("%d.%03d",    $maj,$min);
     } else {
-        $compat_version = sprintf("%d.%03d%03d",$maj,$min,$sub);
+        $compat_version =
+	    $sub ? sprintf("%d.%03d%03d",$maj,$min,$sub) :
+		   sprintf("%d.%03d",    $maj,$min);
     }
 } else {
     my ($maj,$min,$sub) = $compat_version =~ /(\d+)\.(\d\d\d)(\d*)/;
@@ -986,8 +988,8 @@ if( ! $opt_X ){  # use XS, unless it was disabled
       }
       warn "Scanning $filename for functions...\n";
       my @styles = $Config{gccversion} ? qw(C++ C9X GNU) : qw(C++ C9X);
-      $c = new C::Scan 'filename' => $filename, 'filename_filter' => $filter,
-	'add_cppflags' => $addflags, 'c_styles' => \@styles;
+      $c = C::Scan->new('filename' => $filename, 'filename_filter' => $filter,
+	'add_cppflags' => $addflags, 'c_styles' => \@styles);
       $c->set('includeDirs' => ["$Config::Config{archlib}/CORE", $cwd]);
 
       $c->get('keywords')->{'__restrict'} = 1;
@@ -1185,7 +1187,7 @@ print PM autoload ($module, $compat_version) unless $opt_c or $opt_X;
 if( ! $opt_X ){ # print bootstrap, unless XS is disabled
   if ($use_Dyna) {
 	$tmp = <<"END";
-bootstrap $module \$VERSION;
+$module->bootstrap(\$VERSION);
 END
   } else {
 	$tmp = <<"END";
@@ -2192,7 +2194,7 @@ EOP
 
 warn "Writing $ext$modpname/MANIFEST\n";
 open(MANI,'>MANIFEST') or die "Can't create MANIFEST: $!";
-my @files = grep { -f } (<*>, <t/*>, <$fallbackdirname/*>, <$modpmdir/*>);
+my @files = grep { -f } (glob("*"), glob("t/*"), glob("$fallbackdirname/*"), glob("$modpmdir/*"));
 if (!@files) {
   eval {opendir(D,'.');};
   unless ($@) { @files = readdir(D); closedir(D); }

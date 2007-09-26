@@ -1,8 +1,10 @@
 package base;
 
-use strict 'vars';
+use strict;
+no strict qw(refs subs);
+
 use vars qw($VERSION);
-$VERSION = '2.13';
+$VERSION = '2.12';
 
 # constant.pm is slow
 sub SUCCESS () { 1 }
@@ -17,13 +19,13 @@ my $Fattr = \%fields::attr;
 
 sub has_fields {
     my($base) = shift;
-    my $fglob = ${"$base\::"}{FIELDS};
+    my $fglob = ${*{Symbol::qualify_to_ref("$base\::")}}{FIELDS};
     return( ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ? 1 : 0 );
 }
 
 sub has_version {
     my($base) = shift;
-    my $vglob = ${$base.'::'}{VERSION};
+    my $vglob = ${*{Symbol::qualify_to_ref($base.'::')}}{VERSION};
     return( ($vglob && *$vglob{SCALAR}) ? 1 : 0 );
 }
 
@@ -41,8 +43,8 @@ sub get_attr {
 if ($] < 5.009) {
     *get_fields = sub {
         # Shut up a possible typo warning.
-        () = \%{$_[0].'::FIELDS'};
-        my $f = \%{$_[0].'::FIELDS'};
+        () = \%{*{Symbol::qualify_to_ref($_[0].'::FIELDS')}};
+        my $f = \%{*{Symbol::qualify_to_ref($_[0].'::FIELDS')}};
 
         # should be centralized in fields? perhaps
         # fields::mk_FIELDS_be_OK. Peh. As long as %{ $package . '::FIELDS' }
@@ -55,8 +57,8 @@ if ($] < 5.009) {
 else {
     *get_fields = sub {
         # Shut up a possible typo warning.
-        () = \%{$_[0].'::FIELDS'};
-        return \%{$_[0].'::FIELDS'};
+        () = \%{*{Symbol::qualify_to_ref($_[0].'::FIELDS')}};
+        return \%{*{Symbol::qualify_to_ref($_[0].'::FIELDS')}};
     }
 }
 
@@ -69,19 +71,17 @@ sub import {
     my $fields_base;
 
     my $inheritor = caller(0);
-    my @isa_classes;
 
-    my @bases;
     foreach my $base (@_) {
         if ( $inheritor eq $base ) {
             warn "Class '$inheritor' tried to inherit from itself\n";
         }
 
-        next if grep $_->isa($base), ($inheritor, @bases);
+        next if $inheritor->isa($base);
 
         if (has_version($base)) {
-            ${$base.'::VERSION'} = '-1, set by base.pm' 
-              unless defined ${$base.'::VERSION'};
+            ${*{Symbol::qualify_to_ref($base.'::VERSION')}} = '-1, set by base.pm' 
+              unless defined ${*{Symbol::qualify_to_ref($base.'::VERSION')}};
         }
         else {
             my $sigdie;
@@ -91,23 +91,21 @@ sub import {
                 # Only ignore "Can't locate" errors from our eval require.
                 # Other fatal errors (syntax etc) must be reported.
                 die if $@ && $@ !~ /^Can't locate .*? at \(eval /;
-                unless (%{"$base\::"}) {
+                unless (%{*{Symbol::qualify_to_ref("$base\::")}}) {
                     require Carp;
-                    local $" = " ";
                     Carp::croak(<<ERROR);
 Base class package "$base" is empty.
-    (Perhaps you need to 'use' the module which defines that package first,
-    or make that module available in \@INC (\@INC contains: @INC).
+    (Perhaps you need to 'use' the module which defines that package first.)
 ERROR
                 }
                 $sigdie = $SIG{__DIE__};
             }
             # Make sure a global $SIG{__DIE__} makes it out of the localization.
             $SIG{__DIE__} = $sigdie if defined $sigdie;
-            ${$base.'::VERSION'} = "-1, set by base.pm"
-              unless defined ${$base.'::VERSION'};
+            ${*{Symbol::qualify_to_ref($base.'::VERSION')}} = "-1, set by base.pm"
+              unless defined ${*{Symbol::qualify_to_ref($base.'::VERSION')}};
         }
-        push @bases, $base;
+        push @{*{Symbol::qualify_to_ref("$inheritor\::ISA")}}, $base;
 
         if ( has_fields($base) || has_attr($base) ) {
             # No multiple fields inheritance *suck*
@@ -119,10 +117,6 @@ ERROR
             }
         }
     }
-    # Save this until the end so it's all or nothing if the above loop croaks.
-    push @{"$inheritor\::ISA"}, @isa_classes;
-
-    push @{"$inheritor\::ISA"}, @bases;
 
     if( defined $fields_base ) {
         inherit_fields($inheritor, $fields_base);

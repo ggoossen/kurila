@@ -192,6 +192,7 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list");
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
 
 # And now UTF8
+use utf8;
 
 foreach my $chr (60, 200, 600, 6000, 60000) {
   # This little game may set a UTF8 flag internally. Or it may not. :-)

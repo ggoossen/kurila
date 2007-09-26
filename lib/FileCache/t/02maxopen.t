@@ -18,19 +18,21 @@ END{
 {# Test 2: that we actually adhere to maxopen
   for my $path ( @files ){
     cacheout $path;
-    print $path "$path 1\n";
+    my $sym = Symbol::qualify_to_ref($path);
+    print $sym "$path 1\n";
   }
   
   my @cat;
   for my $path ( @files ){
+    my $sym = Symbol::qualify_to_ref($path);
     ok(fileno($path) || $path =~ /^(?:foo|bar)$/);
     next unless fileno($path);
-    print $path "$path 2\n";
-    close($path);
-    open($path, $path);
-    <$path>;
-    push @cat, <$path>;
-    close($path);
+    print $sym "$path 2\n";
+    close($sym);
+    open($sym, $path);
+    <$sym>;
+    push @cat, <$sym>;
+    close($sym);
   }
   ok( grep(/^(?:baz|quux) 2$/, @cat) == 2 );
 }

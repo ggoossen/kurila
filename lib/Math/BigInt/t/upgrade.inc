@@ -12,7 +12,7 @@
 # with ^, since then we test whether it has the proper class and that it left
 # the upgrade variable alone.
 
-my $version = ${"$class\::VERSION"};
+my $version = ${Symbol::qualify_to_ref("$class\::VERSION")};
 
 ##############################################################################
 # for testing inheritance of _swap
@@ -52,7 +52,7 @@ my ($f,$z,$a,$exp,@a,$m,$e,$round_mode,$expected_class);
 
 while (<DATA>) 
   {
-  $_ =~ s/[\n\r]//g;	# remove newlines
+  chomp;
   next if /^#/;	# skip comments
   if (s/^&//) 
     {

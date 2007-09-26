@@ -5,13 +5,15 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
-    unless ($] >= 5.008 and find PerlIO::Layer 'perlio') {
+    unless ($] >= 5.008 and PerlIO::Layer->find( 'perlio')) {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }
 }
 
 require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
+
+use utf8;
 
 plan(tests => 5);
 

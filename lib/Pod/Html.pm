@@ -15,7 +15,7 @@ use File::Spec;
 use File::Spec::Unix;
 use Getopt::Long;
 
-use locale;	# make \w work right in non-ASCII lands
+#use utf8;	# variable length lookbehind "(?<=\s" is not yet supported
 
 =head1 NAME
 

@@ -48,17 +48,13 @@ mro - Method Resolution Order
 
   use mro; # enables next::method and friends globally
 
-  use mro 'dfs'; # enable DFS MRO for this class (Perl default)
-  use mro 'c3'; # enable C3 MRO for this class
+  use mro 'c3'; # enable C3 MRO for this class (Perl Kurila default)
+  use mro 'dfs'; # enable DFS MRO for this class
 
 =head1 DESCRIPTION
 
 The "mro" namespace provides several utilities for dealing
 with method resolution order and method caching in general.
-
-These interfaces are only available in Perl 5.9.5 and higher.
-See L<MRO::Compat> on CPAN for a mostly forwards compatible
-implementation for older Perls.
 
 =head1 OVERVIEW
 
@@ -73,9 +69,9 @@ has been loaded via C<use> or C<require>.
 
 =head1 The C3 MRO
 
-In addition to the traditional Perl default MRO (depth first
-search, called C<DFS> here), Perl now offers the C3 MRO as
-well.  Perl's support for C3 is based on the work done in
+C3 is the defualt MRO of Perl Kurila, in contrast to Perl 5 which has
+depth first search (C<DFS>) as default MRO.
+Perl's support for C3 is based on the work done in
 Stevan Little's module L<Class::C3>, and most of the C3-related
 documentation here is ripped directly from there.
 
@@ -314,6 +310,39 @@ In simple cases, it is equivalent to:
 
 But there are some cases where only this solution
 works (like C<goto &maybe::next::method>);
+
+=head1 PERFORMANCE CONSIDERATIONS
+
+Specifying the mro type of a class before setting C<@ISA> will
+be faster than the other way around.  Also, making all of your
+C<@ISA> manipulations in a single assignment statement will be
+faster that doing them one by one via C<push> (which is what
+C<use base> does currently).
+
+Examples:
+
+  # The slowest way
+  package Foo;
+  use base qw/A B C/;
+  use mro 'c3';
+
+  # The fastest way
+  # (not exactly equivalent to above,
+  #   as base.pm can do other magic)
+  use mro 'c3';
+  use A ();
+  use B ();
+  use C ();
+  our @ISA = qw/A B C/;
+
+Generally speaking, every time C<@ISA> is modified, the MRO
+of that class will be recalculated, because of the way array
+magic works.  Pushing multiple items onto C<@ISA> in one push
+statement still counts as multiple modifications.  However,
+assigning a list to C<@ISA> only counts as a single
+modification.  Thus if you really need to do C<push> as
+opposed to assignment, C<@ISA = (@ISA, qw/A B C/);>
+will still be faster than C<push(@ISA, qw/A B C/);>
 
 =head1 SEE ALSO
 

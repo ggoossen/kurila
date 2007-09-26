@@ -11,7 +11,7 @@ use File::GlobMapper;
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, %EXPORT_TAGS, $HAS_ENCODE);
 @ISA = qw(Exporter);
-$VERSION = '2.006';
+$VERSION = '2.004';
 
 @EXPORT = qw( isaFilehandle isaFilename whatIsInput whatIsOutput 
               isaFileGlobString cleanFileGlobString oneTarget
@@ -249,7 +249,7 @@ sub Validator::new
     {
         $data{GlobMap} = 1 ;
         $data{inType} = $data{outType} = 'filename';
-        my $mapper = new File::GlobMapper($_[0], $_[1]);
+        my $mapper = File::GlobMapper->new($_[0], $_[1]);
         if ( ! $mapper )
         {
             return $obj->saveErrorString($File::GlobMapper::Error) ;
@@ -485,7 +485,7 @@ sub ParseParameters
 
     my $sub = (caller($level + 1))[3] ;
     local $Carp::CarpLevel = 1 ;
-    my $p = new IO::Compress::Base::Parameters() ;
+    my $p = IO::Compress::Base::Parameters->new() ;
     $p->parse(@_)
         or croak "$sub: $p->{Error}" ;
 
@@ -606,7 +606,7 @@ sub IO::Compress::Base::Parameters::parse
             ++ $parsed{$canonkey};
 
             return $self->setError("Muliple instances of '$key' found") 
-                if $parsed && $type & Parse_multiple == 0 ;
+                if $parsed && ($type & Parse_multiple) == 0 ;
 
             my $s ;
             $self->_checkType($key, $value, $type, 1, \$s)

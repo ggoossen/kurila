@@ -14,7 +14,7 @@ BEGIN {
   if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
     @INC = ('../lib', '../ext/Devel/PPPort/t') if -d '../lib' && -d '../ext';
-    require Config; import Config;
+    require Config; Config->import;
     use vars '%Config';
     if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
       print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
@@ -30,9 +30,9 @@ BEGIN {
     require 'testutil.pl' if $@;
   }
 
-  if (46) {
+  if (40) {
     load();
-    plan(tests => 46);
+    plan(tests => 40);
   }
 }
 
@@ -44,7 +44,7 @@ package Devel::PPPort;
 use vars '@ISA';
 require DynaLoader;
 @ISA = qw(DynaLoader);
-bootstrap Devel::PPPort;
+Devel::PPPort->bootstrap;
 
 package main;
 
@@ -90,7 +90,6 @@ for $test (
     print "# --- $description ---\n";
     ok(eq_array( [ &Devel::PPPort::call_sv(\&f, $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_sv(*f,  $flags, @$args) ], $expected));
-    ok(eq_array( [ &Devel::PPPort::call_sv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_pv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_argv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::eval_sv("f(qw(@$args))", $flags) ], $expected));
@@ -101,6 +100,6 @@ ok(&Devel::PPPort::eval_pv('f()', 0), 'y');
 ok(&Devel::PPPort::eval_pv('f(qw(a b c))', 0), 'y');
 
 ok(!defined $::{'less::'}, 1, "Hadn't loaded less yet");
-Devel::PPPort::load_module(0, "less", undef);
+Devel::PPPort::load_module(0, "less", undef);  
 ok(defined $::{'less::'}, 1, "Have now loaded less");
 

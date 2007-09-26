@@ -7,10 +7,14 @@
 
 require DynaLoader;
 require Exporter;
-package Storable; @ISA = qw(Exporter DynaLoader);
+package Storable;
 
-@EXPORT = qw(store retrieve);
-@EXPORT_OK = qw(
+use strict;
+
+our @ISA = qw(Exporter DynaLoader);
+
+our @EXPORT = qw(store retrieve);
+our @EXPORT_OK = qw(
 	nstore store_fd nstore_fd fd_retrieve
 	freeze nfreeze thaw
 	dclone
@@ -64,7 +68,7 @@ sub retrieve_fd { &fd_retrieve }		# Backward compatibility
 
 $Storable::downgrade_restricted = 1;
 $Storable::accept_future_minor = 1;
-bootstrap Storable;
+Storable->bootstrap;
 1;
 __END__
 #
@@ -86,7 +90,7 @@ sub logcarp {
 
 sub CAN_FLOCK; my $CAN_FLOCK; sub CAN_FLOCK {
 	return $CAN_FLOCK if defined $CAN_FLOCK;
-	require Config; import Config;
+	require Config; Config->import;
 	return $CAN_FLOCK =
 		$Config{'d_flock'} ||
 		$Config{'d_fcntl_can_lock'} ||
@@ -117,7 +121,7 @@ EOM
 
 sub file_magic {
     my $file = shift;
-    my $fh = new FileHandle;
+    my $fh = FileHandle->new();
     open($fh, "<". $file) || die "Can't open '$file': $!";
     binmode($fh);
     defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $!";
@@ -303,7 +307,7 @@ sub _store_fd {
 	# Call C routine nstore or pstore, depending on network order
 	eval { $ret = &$xsptr($file, $self) };
 	logcroak $@ if $@ =~ s/\.?\n$/,/;
-	local $\; print $file '';	# Autoflush the file if wanted
+	local $\; $file->print('');	# Autoflush the file if wanted
 	$@ = $da;
 	return $ret ? $ret : undef;
 }

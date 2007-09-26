@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w -I.
 
-@tests = (split(/\nEND\n/s, <<DONE));
+use strict;
+our @tests = (split(/\nEND\n/s, <<DONE));
 TEST1
 Cyberdog Information
 
@@ -49,14 +50,17 @@ DONE
 
 $| = 1;
 
-my $numtests = scalar(@tests) / 2;
-print "1..$numtests\n";
+print "1..";
+print @tests/2;
+print "\n";
 
 use Text::Wrap;
 
-$rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+use strict;
 
-$tn = 1;
+my $rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+
+my $tn = 1;
 while (@tests) {
 	my $in = shift(@tests);
 	my $out = shift(@tests);

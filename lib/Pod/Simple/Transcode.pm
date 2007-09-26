@@ -2,6 +2,10 @@
 require 5;
 package Pod::Simple::Transcode;
 
+use strict;
+
+our @ISA;
+
 BEGIN {
   if(defined &DEBUG) {;} # Okay
   elsif( defined &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG; }

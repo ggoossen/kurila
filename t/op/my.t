@@ -2,6 +2,8 @@
 
 print "1..36\n";
 
+our ($a, $b, $c, $d, $x, $y, @b, @c, %d, $k);
+
 sub foo {
     my($a, $b) = @_;
     my $c;

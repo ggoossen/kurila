@@ -34,7 +34,7 @@ INST_TOP	*= $(INST_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-#INST_VER	*= \5.10.0
+#INST_VER	*= \5.9.5
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -106,10 +106,6 @@ USE_LARGE_FILES	*= define
 #CCTYPE		*= MSVC80FREE
 # Visual C++ 2005 (aka Visual C++ 8.x) (full version)
 #CCTYPE		*= MSVC80
-# Visual C++ 2008 Express Edition (aka Visual C++ 9.x) (free version)
-#CCTYPE		*= MSVC90FREE
-# Visual C++ 2008 (aka Visual C++ 9.x) (full version)
-#CCTYPE		*= MSVC90
 # Borland 5.02 or later
 #CCTYPE		*= BORLAND
 # MinGW with gcc-2.95.2 or later
@@ -187,20 +183,11 @@ CRYPT_SRC	*= fcrypt.c
 #
 # set this to additionally provide a statically linked perl-static.exe.
 # Note that dynamic loading will not work with this perl, so you must
-# include required modules statically using the STATIC_EXT or ALL_STATIC
-# variables below. A static library perl59s.lib will also be created.
+# include required modules statically using STATIC_EXT variable below.
+# A static library perl59s.lib will also be created.
 # Ordinary perl.exe is not affected by this option.
 #
 #BUILD_STATIC	*= define
-
-#
-# in addition to BUILD_STATIC the option ALL_STATIC makes *every*
-# extension get statically built
-# This will result in a very large perl executable, but the main purpose
-# is to have proper linking set so as to be able to create miscellaneous
-# executables with different built-in extensions
-#
-#ALL_STATIC	*= define
 
 #
 # set the install locations of the compiler include/libraries
@@ -370,23 +357,20 @@ ARCHNAME	= MSWin32-$(ARCHITECTURE)
 ARCHNAME	!:= $(ARCHNAME)-thread
 .ENDIF
 
-# Visual C++ 98, .NET 2003, 2005 and 2008 specific.
-# VC++ 6.x, 7.x, 8.x and 9.x can load DLL's on demand.  Makes the test suite run
-# in about 10% less time.  (The free version of 7.x can't do this, but the free
-# versions of 8.x and 9.x can.)
-.IF "$(CCTYPE)" == "MSVC60" || "$(CCTYPE)" == "MSVC70"     || \
-    "$(CCTYPE)" == "MSVC80" || "$(CCTYPE)" == "MSVC80FREE" ||
-    "$(CCTYPE)" == "MSVC90" || "$(CCTYPE)" == "MSVC90FREE"
+# Visual C++ 98, .NET 2003 and 2005 specific.
+# VC++ 6.x, 7.x and 8.x can load DLL's on demand.  Makes the test suite run in
+# about 10% less time.  (The free version of 7.x can't do this, but the free
+# version of 8.x can.)
+.IF "$(CCTYPE)" == "MSVC60" || "$(CCTYPE)" == "MSVC70" \
+    "$(CCTYPE)" == "MSVC80" || "$(CCTYPE)" == "MSVC80FREE"
 DELAYLOAD	*= -DELAYLOAD:ws2_32.dll delayimp.lib
 .ENDIF
 
-# Visual C++ 2005 and 2008 (VC++ 8.x and 9.x) create manifest files for EXEs and
-# DLLs. These either need copying everywhere with the binaries, or else need
-# embedding in them otherwise MSVCR80.dll or MSVCR90.dll won't be found. Embed
-# them for simplicity, and delete them afterwards so that they don't get
-# installed too.
-.IF "$(CCTYPE)" == "MSVC80" || "$(CCTYPE)" == "MSVC80FREE" || \
-    "$(CCTYPE)" == "MSVC90" || "$(CCTYPE)" == "MSVC90FREE"
+# Visual C++ 2005 (VC++ 8.x) creates manifest files for EXEs and DLLs. These
+# either need copying everywhere with the binaries, or else need embedding in
+# them otherwise MSVCR80.dll won't be found. Embed them for simplicity, and
+# delete them afterwards so that they don't get installed too.
+.IF "$(CCTYPE)" == "MSVC80" || "$(CCTYPE)" == "MSVC80FREE"
 EMBED_EXE_MANI	= mt -nologo -manifest $@.manifest -outputresource:$@;1 && \
 		  del $@.manifest
 EMBED_DLL_MANI	= mt -nologo -manifest $@.manifest -outputresource:$@;2 && \
@@ -581,11 +565,10 @@ DEFINES		+= -DWIN64 -DCONSERVATIVE
 OPTIMIZE	+= -Wp64 -fp:precise
 .ENDIF
 
-# For now, silence VC++ 8.x's and 9.x's warnings about "unsafe" CRT functions
-# and POSIX CRT function names being deprecated.
-.IF "$(CCTYPE)" == "MSVC80" || "$(CCTYPE)" == "MSVC80FREE" || \
-    "$(CCTYPE)" == "MSVC90" || "$(CCTYPE)" == "MSVC90FREE"
-DEFINES		+= -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE
+# For now, silence VC++ 8.x's warnings about "unsafe" CRT functions and POSIX
+# CRT function names being deprecated.
+.IF "$(CCTYPE)" == "MSVC80" || "$(CCTYPE)" == "MSVC80FREE"
+DEFINES		+= -D_CRT_SECURE_NO_DEPRECATE -wd4996
 .ENDIF
 
 # Use the MSVCRT read() fix if the PerlCRT was not chosen, but only when using
@@ -949,18 +932,9 @@ PERLDLL_OBJ	+= $(WIN32_OBJ) $(DLL_OBJ)
 SETARGV_OBJ	= setargv$(o)
 .ENDIF
 
-.IF "$(ALL_STATIC)" == "define"
-# some exclusions, unfortunately, until fixed:
-#  - Win32 extension contains overlapped symbols with win32.c (BUG!)
-#  - MakeMaker isn't capable enough for SDBM_File (smaller bug)
-#  - Encode (encoding search algorithm relies on shared library?)
-#  - Hash/Util (fails various tests when linked statically)
-STATIC_EXT	= * !Win32 !SDBM_File !Encode !Hash/Util
-.ELSE
-# specify static extensions here, for example:
+# specify static extensions here
 #STATIC_EXT	= Cwd Compress/Raw/Zlib
 STATIC_EXT	= Win32CORE
-.ENDIF
 
 DYNALOADER	= $(EXTDIR)\DynaLoader\DynaLoader
 
@@ -1028,14 +1002,14 @@ ODBCCP32_DLL = $(windir)\system\odbccp32.dll
 #
 
 all : CHECKDMAKE .\config.h $(GLOBEXE) $(MINIPERL) $(MK2)		\
-	$(RIGHTMAKE) $(MINIMOD) $(CONFIGPM) $(UNIDATAFILES) MakePPPort	\
-	$(PERLEXE) $(X2P) Extensions $(PERLSTATIC)
+	$(RIGHTMAKE) $(MINIMOD) $(CONFIGPM) $(UNIDATAFILES) $(PERLEXE)	\
+	$(X2P) MakePPPort Extensions $(PERLSTATIC)
 
 ..\regnodes.h : ..\regcomp.sym ..\regcomp.pl ..\regexp.h
-	cd .. && miniperl regcomp.pl && cd win32
+	cd .. && regcomp.pl && cd win32
 
 ..\regcharclass.h : ..\Porting\regcharclass.pl
-	cd .. && miniperl Porting\regcharclass.pl && cd win32
+	cd .. && Porting\regcharclass.pl && cd win32
 
 regnodes : ..\regnodes.h
 
@@ -1359,7 +1333,7 @@ $(PERLEXESTATIC): $(PERLSTATICLIB) $(CONFIGPM) $(PERLEXEST_OBJ) $(PERLEXE_RES)
 		$(PERLEXE_RES) $(LKPOST))
 .ELSE
 	$(LINK32) -subsystem:console -out:$@ -stack:0x1000000 $(BLINK_FLAGS) \
-	    @Extensions_static $(PERLSTATICLIB) /PDB:NONE \
+	    @Extensions_static $(PERLSTATICLIB) \
 	    $(LIBFILES) $(PERLEXEST_OBJ) $(SETARGV_OBJ) $(PERLEXE_RES)
 	$(EMBED_EXE_MANI)
 .ENDIF

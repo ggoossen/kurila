@@ -85,8 +85,6 @@ Can't call method "ref" without a package or object reference at - line 1.
 ########
 chop ($str .= <DATA>);
 ########
-close ($banana);
-########
 $x=2;$y=3;$x<$y ? $x : $y += 23;print $x;
 EXPECT
 25
@@ -99,7 +97,7 @@ chop($file = <DATA>);
 ########
 package N;
 sub new {my ($obj,$n)=@_; bless \$n}  
-$aa=new N 1;
+$aa=N->new(1);
 $aa=12345;
 print $aa;
 EXPECT
@@ -123,10 +121,10 @@ $_ x 4;}
 EXPECT
 Modification of a read-only value attempted at - line 3.
 ########
-package FOO;sub new {bless {FOO => BAR}};
+package FOO;sub new {bless {FOO => 'BAR'}};
 package main;
-use strict vars;   
-my $self = new FOO;
+use strict 'vars';   
+my $self = FOO->new();
 print $$self{FOO};
 EXPECT
 BAR
@@ -158,9 +156,9 @@ sub ShowShell
   local($i) = @_;
 }
  
-&ShowShell(&NewShell(beach,Work,"+0+0"));
-&ShowShell(&NewShell(beach,Work,"+0+0"));
-&ShowShell(&NewShell(beach,Work,"+0+0"));
+&ShowShell(&NewShell("beach","Work","+0+0"));
+&ShowShell(&NewShell("beach","Work","+0+0"));
+&ShowShell(&NewShell("beach","Work","+0+0"));
 ########
    {
        package FAKEARRAY;
@@ -175,8 +173,8 @@ sub ShowShell
        sub DESTROY { print "DESTROY \n"; undef @{$_[0]}; }
    }
    
-eval 'tie @h, FAKEARRAY, fred' ;
-tie @h, FAKEARRAY, fred ;
+eval 'tie @h, "FAKEARRAY", "fred"' ;
+tie @h, "FAKEARRAY", "fred" ;
 EXPECT
 TIEARRAY FAKEARRAY fred
 TIEARRAY FAKEARRAY fred
@@ -294,10 +292,11 @@ EXPECT
 happy joy
 ########
 $stimpy = 'happy';
+no strict 'refs';
 { local $main::{ren} = *stimpy; print ${'ren'}, ' ' }
 print +(defined(${'ren'}) ? 'oops' : 'joy'), "\n";
 EXPECT
-happy joy
+Can't use string ("ren") as a SCALAR ref while "strict refs" in use at - line 3.
 ########
 package p;
 sub func { print 'really ' unless wantarray; 'p' }
@@ -391,7 +390,7 @@ package X;
 sub ascalar { my $r; bless \$r }
 sub DESTROY { print "destroyed\n" };
 package main;
-*s = ascalar X;
+*s = X->ascalar();
 EXPECT
 destroyed
 ########
@@ -399,7 +398,7 @@ package X;
 sub anarray { bless [] }
 sub DESTROY { print "destroyed\n" };
 package main;
-*a = anarray X;
+*a = X->anarray();
 EXPECT
 destroyed
 ########
@@ -407,7 +406,7 @@ package X;
 sub ahash { bless {} }
 sub DESTROY { print "destroyed\n" };
 package main;
-*h = ahash X;
+*h = X->ahash();
 EXPECT
 destroyed
 ########
@@ -415,18 +414,20 @@ package X;
 sub aclosure { my $x; bless sub { ++$x } }
 sub DESTROY { print "destroyed\n" };
 package main;
-*c = aclosure X;
+*c = X->aclosure;
 EXPECT
 destroyed
 ########
+no strict "refs";
 package X;
 sub any { bless {} }
 my $f = "FH000"; # just to thwart any future optimisations
-sub afh { select select ++$f; my $r = *{$f}{IO}; delete $X::{$f}; bless $r }
+sub afh { select select *{Symbol::qualify_to_ref(++$f)}; 
+          my $r = *{Symbol::qualify_to_ref($f)}{IO}; delete $X::{$f}; bless $r }
 sub DESTROY { print "destroyed\n" }
 package main;
-$x = any X; # to bump sv_objcount. IO objs aren't counted??
-*f = afh X;
+$x = X->any(); # to bump sv_objcount. IO objs aren't counted??
+*f = X->afh();
 EXPECT
 destroyed
 destroyed
@@ -565,65 +566,11 @@ EOT
 EXPECT
 ok
 ########
-# This test is here instead of lib/locale.t because
-# the bug depends on in the internal state of the locale
-# settings and pragma/locale messes up that state pretty badly.
-# We need a "fresh run".
-BEGIN {
-    eval { require POSIX };
-    if ($@) {
-	exit(0); # running minitest?
-    }
-}
-use Config;
-my $have_setlocale = $Config{d_setlocale} eq 'define';
-$have_setlocale = 0 if $@;
-# Visual C's CRT goes silly on strings of the form "en_US.ISO8859-1"
-# and mingw32 uses said silly CRT
-$have_setlocale = 0 if (($^O eq 'MSWin32' || $^O eq 'NetWare') && $Config{cc} =~ /^(cl|gcc)/i);
-exit(0) unless $have_setlocale;
-my @locales;
-if (-x "/usr/bin/locale" && open(LOCALES, "/usr/bin/locale -a 2>/dev/null|")) {
-    while(<LOCALES>) {
-        chomp;
-        push(@locales, $_);
-    }
-    close(LOCALES);
-}
-exit(0) unless @locales;
-for (@locales) {
-    use POSIX qw(locale_h);
-    use locale;
-    setlocale(LC_NUMERIC, $_) or next;
-    my $s = sprintf "%g %g", 3.1, 3.1;
-    next if $s eq '3.1 3.1' || $s =~ /^(3.+1) \1$/;
-    print "$_ $s\n";
-}
-EXPECT
-########
 # [ID 20001202.002] and change #8066 added 'at -e line 1';
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-(?-xism:x)
-########
-# 20001210.003 mjd@plover.com
-format REMITOUT_TOP =
-FOO
-.
-
-format REMITOUT =
-BAR
-.
-
-# This loop causes a segv in 5.6.0
-for $lineno (1..61) {
-   write REMITOUT;
-}
-
-print "It's OK!";
-EXPECT
-It's OK!
+(?-uxism:x)
 ########
 # Inaba Hiroto
 reset;
@@ -670,6 +617,7 @@ EXPECT
 OK
 ########
 # Bug 20010506.041
+use utf8;
 "abcd\x{1234}" =~ /(a)(b[c])(d+)?/i and print "ok\n";
 EXPECT
 ok
@@ -682,7 +630,7 @@ END {
 }
 package Bar;
 sub new {
-    my Bar $self = bless [], Bar;
+    my $self = bless [], 'Bar';
     eval '$self';
     return $self;
 }
@@ -739,7 +687,7 @@ sub DESTROY {
         my $self = shift;
 	dbmclose(%{$self->{'LT'}});
 	1 while unlink 'dbmtest';
-	1 while unlink <dbmtest.*>;
+	1 while unlink glob("dbmtest.*");
 	print "ok\n";
 }
 package main;
@@ -795,42 +743,24 @@ ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 $eval = eval 'sub { eval "sub { %S }" }';
 $eval->({});
-######## [perl #17951] Strange UTF error
--W
-# From: "John Kodis" <kodis@mail630.gsfc.nasa.gov>
-# Newsgroups: comp.lang.perl.moderated
-# Subject: Strange UTF error
-# Date: Fri, 11 Oct 2002 16:19:58 -0400
-# Message-ID: <pan.2002.10.11.20.19.48.407190@mail630.gsfc.nasa.gov>
-$_ = "foobar\n";
-utf8::upgrade($_); # the original code used a UTF-8 locale (affects STDIN)
-# matching is actually irrelevant: avoiding several dozen of these
-# Illegal hexadecimal digit '	' ignored at /usr/lib/perl5/5.8.0/utf8_heavy.pl line 152
-# is what matters.
-/^([[:digit:]]+)/;
-EXPECT
 ######## [perl #20667] unicode regex vs non-unicode regex
 $toto = 'Hello';
 $toto =~ /\w/; # this line provokes the problem!
 $name = 'A B';
 # utf8::upgrade($name) if @ARGV;
-if ($name =~ /(\p{IsUpper}) (\p{IsUpper})/){
+if ($name =~ /(\p{IsUpper}) (\p{IsUpper})/u){
     print "It's good! >$1< >$2<\n";
 } else {
     print "It's not good...\n";
 }
 EXPECT
 It's good! >A< >B<
-######## [perl #8760] strangness with utf8 and warn
-$_="foo";utf8::upgrade($_);/bar/i,warn$_;
-EXPECT
-foo at - line 1.
 ######## glob() bug Mon, 01 Sep 2003 02:25:41 -0700 <200309010925.h819Pf0X011457@smtp3.ActiveState.com>
 -lw
 BEGIN {
   if ($^O eq 'os390') {
     require File::Glob;
-    import File::Glob ':glob';
+    File::Glob->import(':glob');
   }
 }
 BEGIN {
@@ -852,7 +782,7 @@ EXPECT
 BEGIN {
   if ($^O eq 'os390') {
     require File::Glob;
-    import File::Glob ':glob';
+    File::Glob->import(':glob');
   }
 }
 BEGIN {
@@ -878,12 +808,15 @@ BEGIN {
   if ($@) { exit 0 } # running minitest?
 }
 # Test case cut down by jhi
+use Carp;
 $SIG{__WARN__} = sub { $@ = shift };
 use Encode;
-my $t = ord('A') == 193 ? "\xEA" : "\xE9";
-Encode::_utf8_on($t);
+use utf8;
+my $t = "\x[E9]";
 $t =~ s/([^a])//ge;
 $@ =~ s/ at .*/ at/;
-print $@
+print $@;
+print "Good" if $t eq "\x[E9]";
 EXPECT
-Malformed UTF-8 character (unexpected end of string) in substitution (s///) at
+
+Good

@@ -12,7 +12,7 @@
 #ifdef HAS_PPPORT_H
 #  define NEED_PL_signals
 #  define NEED_newRV_noinc
-#  define NEED_sv_2pv_flags
+#  define NEED_sv_2pv_nolen
 #  include "ppport.h"
 #  include "threads.h"
 #endif
@@ -452,7 +452,7 @@ S_ithread_run(void * arg)
         SPAGAIN;
         for (ii=len-1; ii >= 0; ii--) {
             SV *sv = POPs;
-            if (jmp_rc == 0 && (! (thread->gimme & G_VOID))) {
+            if (jmp_rc == 0) {
                 av_store(params, ii, SvREFCNT_inc(sv));
             }
         }

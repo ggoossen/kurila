@@ -8,7 +8,7 @@ BEGIN {
 	@INC = '.'; 
 	push @INC, '../lib'; 
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bFile\/Glob\b/i) {
         print "1..0\n";
         exit 0;
@@ -29,7 +29,7 @@ sub array {
 
 # look for the contents of the current directory
 $ENV{PATH} = "/bin";
-delete @ENV{BASH_ENV, CDPATH, ENV, IFS};
+delete @ENV{'BASH_ENV', 'CDPATH', 'ENV', 'IFS'};
 @correct = ();
 if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
    @correct = grep { !/^\./ } sort readdir(D);
@@ -185,7 +185,7 @@ chdir "..";
 rmdir "pteerslo";
 
 # this can panic if PL_glob_index gets passed as flags to bsd_glob
-<*>; <*>;
+glob("*"); glob("*");
 print "ok 12\n";
 
 {

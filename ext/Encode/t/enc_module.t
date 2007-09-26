@@ -1,12 +1,12 @@
 # $Id: enc_module.t,v 2.1 2006/05/03 18:24:10 dankogai Exp $
 # This file is in euc-jp
 BEGIN {
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find( 'perlio')) {
     print "1..0 # Skip: PerlIO was not built\n";
     exit 0;
     }

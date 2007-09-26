@@ -1302,9 +1302,10 @@ that understands regular expressions.
     sub glob {
 	my $pat = shift;
 	my @got;
-	if (opendir my $d, '.') { 
-	    @got = grep /$pat/, readdir $d; 
-	    closedir $d;   
+	local *D;
+	if (opendir D, '.') { 
+	    @got = grep /$pat/, readdir D; 
+	    closedir D;   
 	}
 	return @got;
     }

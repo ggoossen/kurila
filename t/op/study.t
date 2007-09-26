@@ -1,11 +1,6 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
-$Ok_Level = 0;
+our $Ok_Level = 0;
 my $test = 1;
 sub ok ($;$) {
     my($ok, $name) = @_;
@@ -49,7 +44,7 @@ sub alarm_ok (&) {
 
 print "1..26\n";
 
-$x = "abc\ndef\n";
+my $x = "abc\ndef\n";
 study($x);
 
 ok($x =~ /^abc/);

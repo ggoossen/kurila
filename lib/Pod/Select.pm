@@ -583,7 +583,7 @@ filenames are given).
 sub podselect {
     my(@argv) = @_;
     my %defaults = ();
-    my $pod_parser = new Pod::Select(%defaults);
+    my $pod_parser = Pod::Select->new(%defaults);
     my $num_inputs = 0;
     my $output = ">&STDOUT";
     my %opts;

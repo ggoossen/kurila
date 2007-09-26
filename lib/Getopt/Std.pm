@@ -2,6 +2,8 @@ package Getopt::Std;
 require 5.000;
 require Exporter;
 
+use strict;
+
 =head1 NAME
 
 getopt, getopts - Process single-character switches with switch clustering
@@ -69,9 +71,12 @@ and version_mess() with the switches string as an argument.
 
 =cut
 
-@ISA = qw(Exporter);
-@EXPORT = qw(getopt getopts);
-$VERSION = '1.05';
+our @ISA = qw(Exporter);
+our @EXPORT = qw(getopt getopts);
+our $VERSION = '1.05';
+
+our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
+
 # uncomment the next line to disable 1.03-backward compatibility paranoia
 # $STANDARD_HELP_VERSION = 1;
 
@@ -109,7 +114,8 @@ sub getopt (;$$) {
 	        $$hash{$first} = $rest;
 	    }
 	    else {
-	        ${"opt_$first"} = $rest;
+                no strict 'refs';
+	        ${*{Symbol::qualify_to_ref("opt_$first")}} = $rest;
 	        push( @EXPORT, "\$opt_$first" );
 	    }
 	}
@@ -118,7 +124,8 @@ sub getopt (;$$) {
 	        $$hash{$first} = 1;
 	    }
 	    else {
-	        ${"opt_$first"} = 1;
+                no strict 'refs';
+	        ${*{Symbol::qualify_to_ref("opt_$first")}} = 1;
 	        push( @EXPORT, "\$opt_$first" );
 	    }
 	    if ($rest ne '') {
@@ -131,7 +138,7 @@ sub getopt (;$$) {
     }
     unless (ref $hash) { 
 	local $Exporter::ExportLevel = 1;
-	import Getopt::Std;
+	Getopt::Std->import;
     }
 }
 
@@ -241,7 +248,8 @@ sub getopts ($;$) {
 		    $$hash{$first} = $rest;
 		}
 		else {
-		    ${"opt_$first"} = $rest;
+                    no strict 'refs';
+		    ${*{Symbol::qualify_to_ref("opt_$first")}} = $rest;
 		    push( @EXPORT, "\$opt_$first" );
 		}
 	    }
@@ -250,7 +258,8 @@ sub getopts ($;$) {
 		    $$hash{$first} = 1;
 		}
 		else {
-		    ${"opt_$first"} = 1;
+                    no strict 'refs';
+		    ${*{Symbol::qualify_to_ref("opt_$first")}} = 1;
 		    push( @EXPORT, "\$opt_$first" );
 		}
 		if ($rest eq '') {
@@ -286,7 +295,7 @@ sub getopts ($;$) {
     }
     unless (ref $hash) { 
 	local $Exporter::ExportLevel = 1;
-	import Getopt::Std;
+	Getopt::Std->import;
     }
     $errs == 0;
 }

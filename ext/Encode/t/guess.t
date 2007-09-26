@@ -3,7 +3,7 @@ BEGIN {
         chdir 't';
         unshift @INC, '../lib';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
@@ -16,9 +16,10 @@ BEGIN {
 }
 
 use strict;
+use utf8;
 use File::Basename;
 use File::Spec;
-use Encode qw(decode encode find_encoding _utf8_off);
+use Encode qw(decode encode find_encoding);
 
 #use Test::More qw(no_plan);
 use Test::More tests => 29;
@@ -29,9 +30,9 @@ use_ok("Encode::Guess");
 }
 
 my $ascii  = join('' => map {chr($_)}(0x21..0x7e));
-my $latin1 = join('' => map {chr($_)}(0xa1..0xfe));
+my $latin1 = join('' => map {bytes::chr($_)}(0xa1..0xfe));
 my $utf8on  = join('' => map {chr($_)}(0x3000..0x30fe));
-my $utf8off = $utf8on; _utf8_off($utf8off);
+my $utf8off = $utf8on;
 my $utf16 = encode('UTF-16', $utf8on);
 my $utf32 = encode('UTF-32', $utf8on);
 

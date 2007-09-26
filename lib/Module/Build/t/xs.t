@@ -109,7 +109,7 @@ $dist->remove;
 
 # Try a XS distro with a deep namespace
 
-$dist = DistGen->new( name => 'Simple::With::Deep::Name',
+$dist = DistGen->new( name => 'Simple::With::Deep::Namespace',
 		      dir => $tmp, xs => 1 );
 $dist->regen;
 chdir( $dist->dirname ) or die "Can't chdir to '@{[$dist->dirname]}': $!";
@@ -180,7 +180,7 @@ require DynaLoader;
 \@ISA = qw( Exporter DynaLoader );
 \@EXPORT_OK = qw( okay );
 
-bootstrap Simple \$VERSION;
+Simple->bootstrap(\$VERSION);
 
 1;
 

@@ -1,7 +1,7 @@
 #!./perl -w
 
 # Tests for the command-line switches:
-# -0, -c, -l, -s, -m, -M, -V, -v, -h, -i, -E and all unknown
+# -0, -c, -l, -s, -m, -M, -V, -v, -h, -z, -i, -E
 # Some switches have their own tests, see MANIFEST.
 
 BEGIN {
@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 61);
+plan(tests => 31);
 
 use Config;
 
@@ -120,7 +120,7 @@ is( $r, 'fooxbarx', '-l with octal number' );
 
 $r = runperl(
     switches	=> [ '-s' ],
-    prog	=> 'for (qw/abc def ghi/) {print defined $$_ ? $$_ : q(-)}',
+    prog	=> 'for (qw/abc def ghi/) {print defined ${*{Symbol::qualify_to_ref($_)}} ? ${*{Symbol::qualify_to_ref($_)}} : q(-)}',
     args	=> [ '--', '-abc=2', '-def', ],
 );
 is( $r, '21-', '-s switch parsing' );
@@ -207,7 +207,7 @@ SWTESTPM
           '-V generates 20+ lines' );
 
     like( runperl( switches => ['-V'] ),
-	  qr/\ASummary of my perl5 .*configuration:/,
+	  qr/\ASummary of my kurila .*configuration:/,
           '-V looks okay' );
 
     # lookup a known config var
@@ -237,7 +237,7 @@ SWTESTPM
 
     my $v = sprintf "%vd", $^V;
     like( runperl( switches => ['-v'] ),
-	  qr/This is perl, v$v (?:DEVEL\d+ )?built for \Q$Config{archname}\E.+Copyright.+Larry Wall.+Artistic License.+GNU General Public License/s,
+	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q$Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
           '-v looks okay' );
 
 }
@@ -253,16 +253,14 @@ SWTESTPM
 
 }
 
-# Tests for switches which do not exist
+# Tests for -z (which does not exist)
 
-foreach my $switch (split //, "ABbGgHJjKkLNOoQqRrYyZz123456789_")
 {
     local $TODO = '';   # these ones should work on VMS
 
-    like( runperl( switches => ["-$switch"], stderr => 1,
-		   prog => 'die "oops"' ),
-	  qr/\QUnrecognized switch: -$switch  (-h will show valid options)./,
-          "-$switch correctly unknown" );
+    like( runperl( switches => ['-z'], stderr => 1 ),
+	  qr/\QUnrecognized switch: -z  (-h will show valid options)./,
+          '-z correctly unknown' );
 
 }
 
@@ -308,6 +306,11 @@ $r = runperl(
 );
 is( $r, "Hello, world!\n", "-E say" );
 
+
+$r = runperl(
+    switches	=> [ '-E', '"undef err say q(Hello, world!)"']
+);
+is( $r, "Hello, world!\n", "-E err" );
 
 $r = runperl(
     switches	=> [ '-E', '"undef ~~ undef and say q(Hello, world!)"']

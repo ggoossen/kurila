@@ -5,7 +5,7 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
         print "1..0\n";
         exit 0;
@@ -31,11 +31,11 @@ print "1..$last_test\n";
 my $t = 1;
 my $cpt;
 # create and destroy some automatic Safe compartments first
-$cpt = new Safe or die;
-$cpt = new Safe or die;
-$cpt = new Safe or die;
+$cpt = Safe->new() or die;
+$cpt = Safe->new() or die;
+$cpt = Safe->new() or die;
 
-$cpt = new Safe "Root" or die;
+$cpt = Safe->new( "Root") or die;
 
 foreach(1..3) {
 	$foo = 42;
@@ -54,7 +54,7 @@ foreach(1..3) {
 	print $cpt->reval('$main::foo') == 9	? "ok $t\n" : "not ok $t\n"; $t++;
 	# check we can't see our test package:
 	print $cpt->reval('$test::foo')     	? "not ok $t\n" : "ok $t\n"; $t++;
-	print $cpt->reval('${"test::foo"}')		? "not ok $t\n" : "ok $t\n"; $t++;
+	print $cpt->reval('${*{Symbol::qualify_to_ref("test::foo")}}')		? "not ok $t\n" : "ok $t\n"; $t++;
 
 	$cpt->erase;	# erase the compartment, e.g., delete all variables
 

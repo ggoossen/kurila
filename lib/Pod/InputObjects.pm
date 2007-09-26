@@ -482,11 +482,11 @@ sub new {
     };
 
     ## Initialize contents if they havent been already
-    my $ptree = $self->{'-ptree'} || new Pod::ParseTree();
+    my $ptree = $self->{'-ptree'} || Pod::ParseTree->new();
     if ( ref $ptree =~ /^(ARRAY)?$/ ) {
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
-        $ptree = new Pod::ParseTree($1 ? [$ptree] : $ptree);
+        $ptree = Pod::ParseTree->new($1 ? [$ptree] : $ptree);
     }
     $self->{'-ptree'} = $ptree;
 

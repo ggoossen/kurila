@@ -1,16 +1,17 @@
 #!./perl
 
-print "1..56\n";
+print "1..55\n";
 
-$x = 'x';
+my $x = 'x';
 
 print "#1	:$x: eq :x:\n";
 if ($x eq 'x') {print "ok 1\n";} else {print "not ok 1\n";}
 
-$x = $#[0];
+$x = $#;	# this is the register $#
 
 if ($x eq '') {print "ok 2\n";} else {print "not ok 2\n";}
 
+our @x;
 $x = $#x;
 
 if ($x eq '-1') {print "ok 3\n";} else {print "not ok 3\n";}
@@ -24,6 +25,8 @@ eval 'while (0) {
 }
 /^/ && (print "ok 5\n");
 ';
+
+our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N);
 
 eval '$foo{1} / 1;';
 if (!$@) {print "ok 6\n";} else {print "not ok 6 $@\n";}
@@ -88,10 +91,13 @@ E2
 ]}
 E1
 
-$foo = FOO;
-$bar = BAR;
-$foo{$bar} = BAZ;
-$ary[0] = ABC;
+{
+    no strict 'subs';
+    $foo = 'FOO';
+    $bar = 'BAR';
+    $foo{$bar} = 'BAZ';
+    $ary[0] = 'ABC';
+}
 
 print "$foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 
@@ -109,7 +115,6 @@ print "a1" !~ /^$X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 
 print (((q{{\{\(}} . q{{\)\}}}) eq '{{\(}{\)}}') ? "ok 29\n" : "not ok 29\n");
 
-
 $foo = "not ok 30\n";
 $foo =~ s/^not /substr(<<EOF, 0, 0)/e;
   Ignored
@@ -119,10 +124,11 @@ print $foo;
 # Tests for new extended control-character variables
 # MJD 19990227
 
-{ my $CX = "\cX";
+{ no strict 'refs';
+  my $CX = "\cX";
   my $CXY  ="\cXY";
-  $ {$CX} = 17;
-  $ {$CXY} = 23;
+  $ {*{Symbol::qualify_to_ref($CX)}} = 17;
+  $ {*{Symbol::qualify_to_ref($CXY)}} = 23;
   if ($ {^XY} != 23) { print "not "  }
   print "ok 31\n";
  
@@ -131,7 +137,7 @@ print $foo;
   print "ok 32\n";
 
   eval "\$\cQ = 24";                 # Literal control character
-  if ($@ or ${"\cQ"} != 24) {  print "not "  }
+  if ($@ or ${*{Symbol::qualify_to_ref("\cQ")}} != 24) {  print "not "  }
   print "ok 33\n";
   if ($^Q != 24) {  print "not "  }  # Control character escape sequence
   print "ok 34\n";
@@ -141,7 +147,7 @@ print $foo;
   print "ok 35\n";
 
   sub XX () { 6 }
-  $ {"\cQ\cXX"} = 119; 
+  $ {*{Symbol::qualify_to_ref("\cQ\cXX")}} = 119; 
   $^Q = 5; #  This should be an unused ^Var.
   $N = 5;
   # The second caret here should be interpreted as an xor
@@ -212,6 +218,7 @@ EOT
 # arrays now *always* interpolate into "..." strings.
 # 20000522 MJD (mjd@plover.com)
 {
+  no strict 'vars';
   my $test = 47;
   eval(q(">@nosuch<" eq "><")) || print "# $@", "not ";
   print "ok $test\n";
@@ -250,20 +257,17 @@ EOT
 # => should only quote foo::bar if it isn't a real sub. AMS, 20010621
 
 sub xyz::foo { "bar" }
+no strict 'subs';
 my %str = (
     foo      => 1,
     xyz::foo => 1,
-    xyz::bar => 1,
+    'xyz::bar' => 1,
 );
 
 my $test = 52;
 print ((exists $str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists $str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
-print ((exists $str{xyz::bar} ? "" : "not ")."ok $test\n"); ++$test;
+print ((exists $str{'xyz::bar'} ? "" : "not ")."ok $test\n"); ++$test;
 
 sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;
-
-eval "\$x =\xE2foo";
-if ($@ =~ /Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
-$test++;

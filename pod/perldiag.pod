@@ -9,7 +9,7 @@ desperation):
 
     (W) A warning (optional).
     (D) A deprecation (optional).
-    (S) A severe warning (enabled by default).
+    (S) A severe warning (default).
     (F) A fatal error (trappable).
     (P) An internal error you should never see (trappable).
     (X) A very fatal error (nontrappable).
@@ -27,7 +27,7 @@ and B<-W> switches. Warnings may be captured by setting C<$SIG{__WARN__}>
 to a reference to a routine that will be called on each warning instead
 of printing it.  See L<perlvar>.
 
-Severe warnings are always enabled, unless they are explicitly disabled
+Default warnings are always enabled unless they are explicitly disabled
 with the C<warnings> pragma or the B<-X> switch.
 
 Trappable errors may be trapped using the eval operator.  See
@@ -606,13 +606,13 @@ quotas or other plumbing problems.
 =item Can't declare class for non-scalar %s in "%s"
 
 (F) Currently, only scalar variables can be declared with a specific
-class qualifier in a "my", "our" or "state" declaration.  The semantics may be
+class qualifier in a "my" or "our" declaration.  The semantics may be
 extended for other types of variables in future.
 
 =item Can't declare %s in "%s"
 
-(F) Only scalar, array, and hash variables may be declared as "my", "our" or
-"state" variables.  They must have ordinary identifiers as names.
+(F) Only scalar, array, and hash variables may be declared as "my" or
+"our" variables.  They must have ordinary identifiers as names.
 
 =item Can't do inplace edit: %s is not a regular file
 
@@ -848,7 +848,7 @@ extensions.
 =item Can't localize lexical variable %s
 
 (F) You used local on a variable name that was previously declared as a
-lexical variable using "my" or "state".  This is not allowed.  If you want to
+lexical variable using "my".  This is not allowed.  If you want to
 localize a package variable of the same name, qualify it with the
 package name.
 
@@ -1133,7 +1133,7 @@ allowed.  See L<perlfunc/pack>.
 (F) Only a simple scalar variable may be used as a loop variable on a
 foreach.
 
-=item Can't use global %s in "%s"
+=item Can't use global %s in "my"
 
 (F) You tried to declare a magical variable as a lexical variable.  This
 is not allowed, because the magic can be tied to only one location
@@ -1804,10 +1804,10 @@ L<perlfunc/getsockopt>.
 
 =item Global symbol "%s" requires explicit package name
 
-(F) You've said "use strict" or "use strict vars", which indicates 
-that all variables must either be lexically scoped (using "my" or "state"), 
-declared beforehand using "our", or explicitly qualified to say 
-which package the global variable is in (using "::").
+(F) You've said "use strict vars", which indicates that all variables
+must either be lexically scoped (using "my"), declared beforehand using
+"our", or explicitly qualified to say which package the global variable
+is in (using "::").
 
 =item glob failed (%s)
 
@@ -1999,13 +1999,6 @@ either consume text or fail.
 The <-- HERE shows in the regular expression about where the problem was
 discovered.
 
-=item Initialization of state variables in list context currently forbidden
-
-(F) Currently the implementation of "state" only permits the initialization
-of scalar variables in scalar context. Re-write C<state ($a) = 42> as
-C<state $a = 42> to change from list to scalar context. Constructions such
-as C<state (@a) = foo()> will be supported in a future perl release.
-
 =item Insecure dependency in %s
 
 (F) You tried to do something that the tainting mechanism didn't like.
@@ -2184,13 +2177,13 @@ neither as a system call or an ioctl call (SIOCATMARK).
 
 =item $* is no longer supported
 
-(S deprecated, syntax) The special variable C<$*>, deprecated in older perls, has
+(D deprecated) The special variable C<$*>, deprecated in older perls, has
 been removed as of 5.9.0 and is no longer supported. You should use the
 C<//m> and C<//s> regexp modifiers instead.
 
 =item $# is no longer supported
 
-(S deprecated, syntax) The special variable C<$#>, deprecated in older perls, has
+(D deprecated) The special variable C<$#>, deprecated in older perls, has
 been removed as of 5.9.3 and is no longer supported. You should use the
 printf/sprintf functions instead.
 
@@ -2500,7 +2493,7 @@ See L<perlfunc/pack>.
 (F) Lexically scoped subroutines are not yet implemented.  Don't try
 that yet.
 
-=item "%s" variable %s can't be in a package
+=item "my" variable %s can't be in a package
 
 (F) Lexically scoped variables aren't in a package, so it doesn't make
 sense to try to declare one with a package qualifier on the front.  Use
@@ -2687,7 +2680,7 @@ package has restricted the set of allowed keys using the L<fields> pragma.
 
 =item No such class %s
 
-(F) You provided a class qualifier in a "my", "our" or "state" declaration, but
+(F) You provided a class qualifier in a "my" or "our" declaration, but
 this class doesn't exist at this point in your program.
 
 =item No such pipe open
@@ -3213,7 +3206,7 @@ when you meant
 
     my ($foo, $bar) = @_;
 
-Remember that "my", "our", "local" and "state" bind tighter than comma.
+Remember that "my", "our", and "local" bind tighter than comma.
 
 =item C<-p> destination: %s
 
@@ -4082,21 +4075,6 @@ was either never opened or has since been closed.
 (W io) The dirhandle you tried to telldir() is either closed or not really
 a dirhandle.  Check your control flow.
 
-=item That use of $[ is unsupported
-
-(F) Assignment to C<$[> is now strictly circumscribed, and interpreted
-as a compiler directive.  You may say only one of
-
-    $[ = 0;
-    $[ = 1;
-    ...
-    local $[ = 0;
-    local $[ = 1;
-    ...
-
-This is to prevent the problem of one module changing the array base out
-from under another module inadvertently.  See L<perlvar/$[>.
-
 =item The crypt() function is unimplemented due to excessive paranoia
 
 (F) Configure couldn't find the crypt() function on your machine,
@@ -4417,11 +4395,11 @@ reserved word.  It's best to put such a word in quotes, or capitalize it
 somehow, or insert an underbar into it.  You might also declare it as a
 subroutine.
 
-=item Unrecognized character %s in column %d
+=item Unrecognized character %s
 
 (F) The Perl parser has no idea what to do with the specified character
-in your Perl script (or eval) at the specified column.  Perhaps you tried 
-to run a compressed script, a binary program, or a directory as a Perl program.
+in your Perl script (or eval).  Perhaps you tried to run a compressed
+script, a binary program, or a directory as a Perl program.
 
 =item Unrecognized escape \\%c in character class passed through in regex; marked by <-- HERE in m/%s/
 
@@ -4876,7 +4854,7 @@ known at compile time.  See L<perlre>.
 
 =item "%s" variable %s masks earlier declaration in same %s
 
-(W misc) A "my", "our" or "state" variable has been redeclared in the current
+(W misc) A "my" or "our" variable has been redeclared in the current
 scope or statement, effectively eliminating all access to the previous
 instance.  This is almost always a typographical error.  Note that the
 earlier variable will still exist until the end of the scope or until
@@ -5030,9 +5008,5 @@ not get any randomness out of your system.  This usually indicates
 Something Very Wrong.
 
 =back
-
-=head1 SEE ALSO
-
-L<warnings>, L<perllexwarn>.
 
 =cut

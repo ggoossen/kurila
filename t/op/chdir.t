@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use Config;
-require "test.pl";
+require "./test.pl";
 plan(tests => 48);
 
 my $IsVMS   = $^O eq 'VMS';
@@ -65,13 +65,13 @@ SKIP: {
     no warnings 'once';
     *DH = $dh;
     *FH = $fh;
-    ok(chdir FH, "fchdir op bareword");
+    ok(chdir *FH, "fchdir op bareword");
     ok(-f "chdir.t", "verify that we are in op");
     if ($has_dirfd) {
-       ok(chdir DH, "fchdir back bareword");
+       ok(chdir *DH, "fchdir back bareword");
     }
     else {
-       eval { chdir(DH); };
+       eval { chdir(*DH); };
        like($@, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
        chdir ".." or die $!;
     }
@@ -80,16 +80,16 @@ SKIP: {
     # And now the ambiguous case
     {
 	no warnings qw<io deprecated>;
-	ok(opendir(H, "op"), "opendir op") or diag $!;
-	ok(open(H, "<", "base"), "open base") or diag $!;
+	ok(opendir(H, "op"), "opendir op") or $!-> diag();
+	ok(open(H, "<", "base"), "open base") or $!-> diag();
     }
     if ($has_dirfd) {
-	ok(chdir(H), "fchdir to op");
+	ok(chdir(*H), "fchdir to op");
 	ok(-f "chdir.t", "verify that we are in 'op'");
 	chdir ".." or die $!;
     }
     else {
-	eval { chdir(H); };
+	eval { chdir(*H); };
 	like($@, qr/^The dirfd function is unimplemented at/,
 	     "dirfd is unimplemented");
 	SKIP: {
@@ -97,7 +97,7 @@ SKIP: {
 	}
     }
     ok(closedir(H), "closedir");
-    ok(chdir(H), "fchdir to base");
+    ok(chdir(*H), "fchdir to base");
     ok(-f "cond.t", "verify that we are in 'base'");
     chdir ".." or die $!;
 }

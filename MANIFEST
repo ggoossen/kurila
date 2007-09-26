@@ -41,7 +41,9 @@ Cross/TODO		Cross-compilation
 Cross/warp		Cross-compilation
 cv.h			Code value header
 cygwin/cygwin.c		Additional code for Cygwin port
+cygwin/ld2.in		ld wrapper template for Cygwin port
 cygwin/Makefile.SHs	Shared library generation for Cygwin port
+cygwin/perlld.in	dll generator template for Cygwin port
 deb.c			Debugging routines
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
@@ -104,6 +106,7 @@ ext/B/t/optree_samples.t	various basic codes: if for while
 ext/B/t/optree_sort.t		inplace sort optimization regression
 ext/B/t/optree_specials.t	BEGIN, END, etc code
 ext/B/t/optree_varinit.t	my,our,local var init optimization
+ext/B/t/debugging.t	-Dx optree rendering
 ext/B/t/o.t		See if O works
 ext/B/t/pluglib/B/Lint/Plugin/Test.pm	See if B::Lint works
 ext/B/t/pragma.t	See if user pragmas work.
@@ -174,7 +177,6 @@ ext/Data/Dumper/Changes		Data pretty printer, changelog
 ext/Data/Dumper/Dumper.pm	Data pretty printer, module
 ext/Data/Dumper/Dumper.xs	Data pretty printer, externals
 ext/Data/Dumper/Makefile.PL	Data pretty printer, makefile writer
-ext/Data/Dumper/t/bless.t	See if Data::Dumper works
 ext/Data/Dumper/t/bugs.t	See if Data::Dumper works
 ext/Data/Dumper/t/dumper.t	See if Data::Dumper works
 ext/Data/Dumper/t/freezer.t	See if $Data::Dumper::Freezer works
@@ -198,6 +200,7 @@ ext/Devel/DProf/Changes		Perl code profiler changelog
 ext/Devel/DProf/DProf.pm	Perl code profiler
 ext/Devel/DProf/DProf.xs	Perl code profiler
 ext/Devel/DProf/Makefile.PL	Perl code profiler makefile writer
+ext/Devel/DProf/t/dprofpp.t	Perl code profiler dprofpp test
 ext/Devel/DProf/t/DProf.t	Perl code profiler
 ext/Devel/DProf/Todo		Perl code profiler todo list
 ext/Devel/Peek/Changes		Data debugging tool, changelog
@@ -274,7 +277,6 @@ ext/Devel/PPPort/parts/inc/ppphbin	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/ppphdoc	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/ppphtest	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/pvs	Devel::PPPort include
-ext/Devel/PPPort/parts/inc/shared_pv	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/snprintf	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/strlfuncs	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/SvPV	Devel::PPPort include
@@ -286,7 +288,6 @@ ext/Devel/PPPort/parts/inc/uv	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/variables	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/version	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/warn	Devel::PPPort include
-ext/Devel/PPPort/parts/ppport.fnc	Devel::PPPort API listing
 ext/Devel/PPPort/parts/ppptools.pl	Devel::PPPort various utilities
 ext/Devel/PPPort/parts/todo/5004000	Devel::PPPort todo file
 ext/Devel/PPPort/parts/todo/5004010	Devel::PPPort todo file
@@ -343,7 +344,6 @@ ext/Devel/PPPort/TODO		Devel::PPPort Todo
 ext/Devel/PPPort/t/podtest.t	Devel::PPPort test file
 ext/Devel/PPPort/t/ppphtest.t	Devel::PPPort test file
 ext/Devel/PPPort/t/pvs.t	Devel::PPPort test file
-ext/Devel/PPPort/t/shared_pv.t	Devel::PPPort test file
 ext/Devel/PPPort/t/snprintf.t	Devel::PPPort test file
 ext/Devel/PPPort/t/strlfuncs.t	Devel::PPPort test file
 ext/Devel/PPPort/t/SvPV.t	Devel::PPPort test file
@@ -370,7 +370,6 @@ ext/Digest/MD5/t/bits.t		See if Digest::MD5 extension works
 ext/Digest/MD5/t/clone.t	See if Digest::MD5 extension works
 ext/Digest/MD5/t/files.t	See if Digest::MD5 extension works
 ext/Digest/MD5/t/md5-aaa.t	See if Digest::MD5 extension works
-ext/Digest/MD5/t/utf8.t		See if Digest::MD5 extension works
 ext/Digest/MD5/typemap		Digest::MD5 extension
 ext/Digest/SHA/bin/shasum	shasum script
 ext/Digest/SHA/Changes		Digest::SHA changes
@@ -386,26 +385,41 @@ ext/Digest/SHA/src/sha64bit.h	Digest::SHA extension
 ext/Digest/SHA/src/sha.c	Digest::SHA extension
 ext/Digest/SHA/src/sha.h	Digest::SHA extension
 ext/Digest/SHA/src/shaxtra.c	Digest::SHA extension
-ext/Digest/SHA/t/allfcns.t	See if Digest::SHA works
-ext/Digest/SHA/t/base64.t	See if Digest::SHA works
-ext/Digest/SHA/t/bitbuf.t	See if Digest::SHA works
-ext/Digest/SHA/t/dumpload.t	See if Digest::SHA works
-ext/Digest/SHA/t/fips198.t	See if Digest::SHA works
-ext/Digest/SHA/t/gglong.t	See if Digest::SHA works
-ext/Digest/SHA/t/gg.t		See if Digest::SHA works
-ext/Digest/SHA/t/hmacsha.t	See if Digest::SHA works
-ext/Digest/SHA/t/ireland.t	See if Digest::SHA works
-ext/Digest/SHA/t/methods.t	See if Digest::SHA works
-ext/Digest/SHA/t/nistbit.t	See if Digest::SHA works
-ext/Digest/SHA/t/nistbyte.t	See if Digest::SHA works
-ext/Digest/SHA/t/rfc2202.t	See if Digest::SHA works
-ext/Digest/SHA/t/sha1.t		See if Digest::SHA works
-ext/Digest/SHA/t/sha224.t	See if Digest::SHA works
-ext/Digest/SHA/t/sha256.t	See if Digest::SHA works
-ext/Digest/SHA/t/sha384.t	See if Digest::SHA works
-ext/Digest/SHA/t/sha512.t	See if Digest::SHA works
-ext/Digest/SHA/t/woodbury.t	See if Digest::SHA works
-ext/Digest/SHA/typemap		Typemap for Digest::SHA
+ext/Digest/SHA/t/1-exist.t	See if Digest::SHA works
+ext/Digest/SHA/t/1-hello-world.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-sha-1.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-sha-224.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-sha-256.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-sha-384.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-sha-512.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-sha-base64.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-sha-oo.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-vectors-bit.t	See if Digest::SHA works
+ext/Digest/SHA/t/2-nist-vectors-byte.t	See if Digest::SHA works
+ext/Digest/SHA/t/3-gillogly-easy.t	See if Digest::SHA works
+ext/Digest/SHA/t/3-gillogly-hard.t	See if Digest::SHA works
+ext/Digest/SHA/t/4-bitstr-increasing.t	See if Digest::SHA works
+ext/Digest/SHA/t/4-bitstr-large.t	See if Digest::SHA works
+ext/Digest/SHA/t/4-bitstr-random.t	See if Digest::SHA works
+ext/Digest/SHA/t/5-hmac-fips198.t	See if Digest::SHA works
+ext/Digest/SHA/t/5-hmac-rfc2202.t	See if Digest::SHA works
+ext/Digest/SHA/t/5-hmac-sha-256.t	See if Digest::SHA works
+ext/Digest/SHA/t/5-hmac-woodbury.t	See if Digest::SHA works
+ext/Digest/SHA/t/6-dump-load.t	See if Digest::SHA works
+ext/Digest/SHA/t/7-ireland.t	See if Digest::SHA works
+ext/Digest/SHA/t/gillogly/state.011	See if Digest::SHA works
+ext/Digest/SHA/t/gillogly/state.110	See if Digest::SHA works
+ext/Digest/SHA/t/nist/bit-hashes.sha1	See if Digest::SHA works
+ext/Digest/SHA/t/nist/bit-messages.sha1	See if Digest::SHA works
+ext/Digest/SHA/t/nist/byte-hashes.sha1	See if Digest::SHA works
+ext/Digest/SHA/t/nist/byte-messages.sha1	See if Digest::SHA works
+ext/Digest/SHA/t/nist/COPYRIGHT	See if Digest::SHA works
+ext/Digest/SHA/t/nist/Readme.txt	See if Digest::SHA works
+ext/Digest/SHA/t/state/state.1	See if Digest::SHA works
+ext/Digest/SHA/t/state/state.256	See if Digest::SHA works
+ext/Digest/SHA/t/state/state.384	See if Digest::SHA works
+ext/Digest/SHA/t/state/state.512	See if Digest::SHA works
+ext/Digest/SHA/typemap		See if Digest::SHA works
 ext/DynaLoader/dl_aix.xs	AIX implementation
 ext/DynaLoader/dl_beos.xs	BeOS implementation
 ext/DynaLoader/dl_dld.xs	GNU dld style implementation
@@ -497,7 +511,6 @@ ext/Encode/t/enc_module.enc	test data for t/enc_module.t
 ext/Encode/t/enc_module.t	test script
 ext/Encode/t/Encoder.t		test script
 ext/Encode/t/Encode.t		test script
-ext/Encode/t/encoding.t		test script
 ext/Encode/t/enc_utf8.t		test script
 ext/Encode/t/fallback.t		test script
 ext/Encode/t/from_to.t		test script
@@ -654,10 +667,6 @@ ext/File/Glob/t/case.t		See if File::Glob works
 ext/File/Glob/t/global.t	See if File::Glob works
 ext/File/Glob/TODO		File::Glob extension todo list
 ext/File/Glob/t/taint.t		See if File::Glob works
-ext/Filter/t/call.t		See if Filter::Util::Call works
-ext/Filter/Util/Call/Call.pm	Filter::Util::Call extension module
-ext/Filter/Util/Call/Call.xs	Filter::Util::Call extension external subroutines
-ext/Filter/Util/Call/Makefile.PL	Filter::Util::Call extension makefile writer
 ext/GDBM_File/GDBM_File.pm	GDBM extension Perl module
 ext/GDBM_File/GDBM_File.xs	GDBM extension external subroutines
 ext/GDBM_File/hints/sco.pl	Hint for GDBM_File for named architecture
@@ -782,10 +791,6 @@ ext/IO_Compress_Zlib/t/109merge-deflate.t	IO::Compress::Zlib
 ext/IO_Compress_Zlib/t/109merge-gzip.t	IO::Compress::Zlib
 ext/IO_Compress_Zlib/t/109merge-rawdeflate.t	IO::Compress::Zlib
 ext/IO_Compress_Zlib/t/109merge-zip.t	IO::Compress::Zlib
-ext/IO_Compress_Zlib/t/110encode-deflate.t	IO::Compress::Zlib
-ext/IO_Compress_Zlib/t/110encode-gzip.t	IO::Compress::Zlib
-ext/IO_Compress_Zlib/t/110encode-rawdeflate.t	IO::Compress::Zlib
-ext/IO_Compress_Zlib/t/110encode-zip.t	IO::Compress::Zlib
 ext/IO/hints/sco.pl		Hint for IO for named architecture
 ext/IO/IO.pm			Top-level interface to IO::* classes
 ext/IO/IO.xs			IO extension external subroutines
@@ -892,6 +897,20 @@ ext/MIME/Base64/t/base64.t	See whether MIME::Base64 works
 ext/MIME/Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
 ext/MIME/Base64/t/unicode.t	See whether MIME::Base64 works
 ext/MIME/Base64/t/warn.t	See whether MIME::Base64 works
+ext/Module-Load-Conditional/CHANGES	Module::Conditional
+ext/Module-Load-Conditional/lib/Module/Load/Conditional.pm	Module::Conditional
+ext/Module-Load-Conditional/Makefile.PL	Module::Conditional
+ext/Module-Load-Conditional/MANIFEST	Module::Conditional
+ext/Module-Load-Conditional/META.yml	Module::Conditional Module meta-data (added by MakeMaker)
+ext/Module-Load-Conditional/README	Module::Conditional
+ext/Module-Load-Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
+ext/Module-Load-Conditional/t/02_Parse_Version.t	Module::Load::Conditional tests
+ext/Module-Load-Conditional/t/to_load/Commented.pm	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/InPod.pm	Module::Load::Conditional tests
+ext/Module-Load-Conditional/t/to_load/LoadIt.pm	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/LoadMe.pl	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/Must/Be/Loaded.pm	Module::Conditional tests
+ext/Module-Load-Conditional/t/to_load/ToBeLoaded	Module::Conditional tests
 ext/NDBM_File/hints/cygwin.pl	Hint for NDBM_File for named architecture
 ext/NDBM_File/hints/dec_osf.pl	Hint for NDBM_File for named architecture
 ext/NDBM_File/hints/dynixptx.pl	Hint for NDBM_File for named architecture
@@ -1070,7 +1089,6 @@ ext/Storable/t/threads.t	Does Storable work with threads?
 ext/Storable/t/tied_hook.t	See if Storable works
 ext/Storable/t/tied_items.t	See if Storable works
 ext/Storable/t/tied.t		See if Storable works
-ext/Storable/t/utf8hash.t	See if Storable works
 ext/Storable/t/utf8.t		See if Storable works
 ext/Storable/t/weak.t		Can Storable store weakrefs
 ext/Sys/Hostname/Hostname.pm	Sys::Hostname extension Perl module
@@ -1082,28 +1100,26 @@ ext/Sys/Syslog/fallback/const-c.inc	Sys::Syslog constants fallback file
 ext/Sys/Syslog/fallback/const-xs.inc	Sys::Syslog constants fallback file
 ext/Sys/Syslog/Makefile.PL	Sys::Syslog extension makefile writer
 ext/Sys/Syslog/README		README for Sys::Syslog
-ext/Sys/Syslog/README.win32	README for Sys::Syslog on Windows
 ext/Sys/Syslog/Syslog.pm	Sys::Syslog extension Perl module
 ext/Sys/Syslog/Syslog.xs	Sys::Syslog extension external subroutines
 ext/Sys/Syslog/t/00-load.t	test for Sys::Syslog
 ext/Sys/Syslog/t/constants.t	test for Sys::Syslog
 ext/Sys/Syslog/t/syslog.t	See if Sys::Syslog works
-ext/Sys/Syslog/win32/compile.pl	Sys::Syslog extension Win32 related file
-ext/Sys/Syslog/win32/PerlLog_dll.uu	Sys::Syslog extension Win32 related file
-ext/Sys/Syslog/win32/PerlLog.mc	Sys::Syslog extension Win32 related file
-ext/Sys/Syslog/win32/PerlLog_RES.uu	Sys::Syslog extension Win32 related file
-ext/Sys/Syslog/win32/Win32.pm	Sys::Syslog extension Win32 related file
 ext/Text/Soundex/Changes	Changelog for Text::Soundex
 ext/Text/Soundex/Makefile.PL	Text::Soundex extension makefile writer
 ext/Text/Soundex/README		README for Text::Soundex
 ext/Text/Soundex/Soundex.pm	Text::Soundex extension Perl module
 ext/Text/Soundex/Soundex.xs	Text::Soundex extension external subroutines
 ext/Text/Soundex/t/Soundex.t	test for Text::Soundex
+ext/threads/Changes		ithreads
 ext/threads/hints/hpux.pl	Hint file for HPUX
 ext/threads/hints/linux.pl	Hint file for Linux
 ext/threads/Makefile.PL		ithreads
+ext/threads/README		ithreads
+ext/threads/shared/Changes	Changes for threads::shared
 ext/threads/shared/hints/linux.pl	thread shared variables
 ext/threads/shared/Makefile.PL	thread shared variables
+ext/threads/shared/README	thread shared variables
 ext/threads/shared/shared.pm	thread shared variables
 ext/threads/shared/shared.xs	thread shared variables
 ext/threads/shared/t/0nothread.t	Tests for basic shared array functionality.
@@ -1218,7 +1234,6 @@ ext/Win32/t/GetLongPathName.t	See if Win32 extension works
 ext/Win32/t/GetOSVersion.t	See if Win32 extension works
 ext/Win32/t/GetShortPathName.t	See if Win32 extension works
 ext/Win32/t/GuidGen.t		See if Win32 extension works
-ext/Win32/t/Names.t		See if Win32 extension works
 ext/Win32/t/Unicode.t		See if Win32 extension works
 ext/Win32/Win32.pm		Win32 extension Perl module
 ext/Win32/Win32.xs		Win32 extension external subroutines
@@ -1418,26 +1433,6 @@ lib/Archive/Tar/t/src/short/b	Archive::Tar tests
 lib/Archive/Tar/t/src/short/bar.tar.packed	Archive::Tar tests
 lib/Archive/Tar/t/src/short/foo.tgz.packed	Archive::Tar tests
 lib/assert.pl			assertion and panic with stack trace
-lib/Attribute/Handlers/Changes	Attribute::Handlers
-lib/Attribute/Handlers/demo/demo2.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo3.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo4.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_call.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_chain.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_cycle.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_hashdir.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_phases.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/Demo.pm	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_range.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/demo_rawdata.pl	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/Descriptions.pm	Attribute::Handlers demo
-lib/Attribute/Handlers/demo/MyClass.pm	Attribute::Handlers demo
-lib/Attribute/Handlers.pm	Attribute::Handlers
-lib/Attribute/Handlers/README		Attribute::Handlers
-lib/Attribute/Handlers/t/constants.t	Test constants and Attribute::Handlers
-lib/Attribute/Handlers/t/linerep.t	See if Attribute::Handlers works
-lib/Attribute/Handlers/t/multi.t	See if Attribute::Handlers works
 lib/attributes.pm		For "sub foo : attrlist"
 lib/AutoLoader.pm		Autoloader base class
 lib/AutoLoader.t		See if AutoLoader works
@@ -1445,12 +1440,11 @@ lib/AutoSplit.pm		Split up autoload functions
 lib/AutoSplit.t			See if AutoSplit works
 lib/autouse.pm			Load and call a function only when it's used
 lib/autouse.t			See if autouse works
-lib/base/Changes		base.pm changelog
 lib/base.pm			Establish IS-A relationship at compile time
+lib/base/Changes		base.pm changelog
 lib/base/t/base.t		See if base works
 lib/base/t/fields-base.t	See if fields work
 lib/base/t/fields.t		See if fields work
-lib/base/t/isa.t		See if base's behaviour doesn't change
 lib/base/t/sigdie.t		See if base works with SIGDIE
 lib/base/t/version.t		See if base works with versions
 lib/base/t/warnings.t		See if base works with warnings
@@ -1462,14 +1456,14 @@ lib/bigint.pl			An arbitrary precision integer arithmetic package
 lib/bigintpl.t			See if bigint.pl works
 lib/bigint.pm			bigint
 lib/bignum.pm			bignum
-lib/bignum/t/big_e_pi.t		See if bignum exports e() and PI()
 lib/bignum/t/bigexp.t		See if bignum works
 lib/bignum/t/bigint.t		See if bigint works
 lib/bignum/t/bignum.t		See if bignum works
 lib/bignum/t/bigrat.t		See if bigrat works
 lib/bignum/t/bii_e_pi.t		See if bigint exports e() and PI()
-lib/bignum/t/biinfnan.t		See if bignum works
 lib/bignum/t/bir_e_pi.t		See if bigrat exports e() and PI()
+lib/bignum/t/big_e_pi.t		See if bignum exports e() and PI()
+lib/bignum/t/biinfnan.t		See if bignum works
 lib/bignum/t/bninfnan.t		See if bignum works
 lib/bignum/t/bn_lite.t		See if bignum with Math::BigInt::Lite works
 lib/bignum/t/brinfnan.t		See if bignum works
@@ -1558,7 +1552,6 @@ lib/Config/Extensions.t		See if Config::Extensions works
 lib/Config.t			See if Config works
 lib/constant.pm			For "use constant"
 lib/constant.t			See if compile-time constants work
-lib/CORE.pod			document the CORE namespace
 lib/CPAN/bin/cpan		easily interact with CPAN from the command line
 lib/CPAN/Debug.pm		helper package for CPAN.pm
 lib/CPAN/FirstTime.pm		Utility for creating CPAN config files
@@ -1570,89 +1563,6 @@ lib/CPAN/Nox.pm			Runs CPAN while avoiding compiled extensions
 lib/CPAN/PAUSE2003.pub		CPAN public key
 lib/CPAN/PAUSE2005.pub		CPAN public key
 lib/CPAN/PAUSE2007.pub		CPAN public key
-lib/CPANPLUS/Backend.pm	CPANPLUS
-lib/CPANPLUS/Backend/RV.pm	CPANPLUS
-lib/CPANPLUS/bin/cpan2dist	the cpan2dist utility
-lib/CPANPLUS/bin/cpanp	the cpanp utility
-lib/CPANPLUS/bin/cpanp-run-perl	the cpanp-run-perl utility
-lib/CPANPLUS/Config.pm	CPANPLUS
-lib/CPANPLUS/Configure.pm	CPANPLUS
-lib/CPANPLUS/Configure/Setup.pm	CPANPLUS
-lib/CPANPLUS/Dist/Base.pm	CPANPLUS
-lib/CPANPLUS/Dist/Build/Constants.pm	CPANPLUS::Dist::Build
-lib/CPANPLUS/Dist/Build.pm	CPANPLUS::Dist::Build
-lib/CPANPLUS/Dist/Build/t/01_CPANPLUS-Dist-Build-Constants.t	CPANPLUS::Dist::Build tests
-lib/CPANPLUS/Dist/Build/t/02_CPANPLUS-Dist-Build.t	CPANPLUS::Dist::Build tests
-lib/CPANPLUS/Dist/Build/t/inc/conf.pl	CPANPLUS::Dist::Build tests
-lib/CPANPLUS/Dist/Build/t/src/noxs/Foo-Bar-0.01.tar.gz.packed	CPANPLUS::Dist::Build tests
-lib/CPANPLUS/Dist/Build/t/src/xs/Foo-Bar-0.01.tar.gz.packed	CPANPLUS::Dist::Build tests
-lib/CPANPLUS/Dist/MM.pm	CPANPLUS
-lib/CPANPLUS/Dist.pm	CPANPLUS
-lib/CPANPLUS/Dist/Sample.pm	CPANPLUS
-lib/CPANPLUS/Error.pm	CPANPLUS
-lib/CPANPLUS/FAQ.pod	CPANPLUS
-lib/CPANPLUS/Hacking.pod	CPANPLUS
-lib/CPANPLUS/inc.pm	CPANPLUS
-lib/CPANPLUS/Internals/Constants.pm	CPANPLUS
-lib/CPANPLUS/Internals/Constants/Report.pm	CPANPLUS
-lib/CPANPLUS/Internals/Extract.pm	CPANPLUS
-lib/CPANPLUS/Internals/Fetch.pm	CPANPLUS
-lib/CPANPLUS/Internals.pm	CPANPLUS
-lib/CPANPLUS/Internals/Report.pm	CPANPLUS
-lib/CPANPLUS/Internals/Search.pm	CPANPLUS
-lib/CPANPLUS/Internals/Source.pm	CPANPLUS
-lib/CPANPLUS/Internals/Utils/Autoflush.pm	CPANPLUS
-lib/CPANPLUS/Internals/Utils.pm	CPANPLUS
-lib/CPANPLUS/Module/Author/Fake.pm	CPANPLUS
-lib/CPANPLUS/Module/Author.pm	CPANPLUS
-lib/CPANPLUS/Module/Checksums.pm	CPANPLUS
-lib/CPANPLUS/Module/Fake.pm	CPANPLUS
-lib/CPANPLUS/Module.pm	CPANPLUS
-lib/CPANPLUS/Module/Signature.pm	CPANPLUS
-lib/CPANPLUS.pm	CPANPLUS
-lib/CPANPLUS/Selfupdate.pm	CPANPLUS
-lib/CPANPLUS/Shell/Classic.pm	CPANPLUS
-lib/CPANPLUS/Shell/Default/Plugins/HOWTO.pod	CPANPLUS
-lib/CPANPLUS/Shell/Default/Plugins/Remote.pm	CPANPLUS
-lib/CPANPLUS/Shell/Default/Plugins/Source.pm	CPANPLUS
-lib/CPANPLUS/Shell/Default.pm	CPANPLUS
-lib/CPANPLUS/Shell.pm	CPANPLUS
-lib/CPANPLUS/t/00_CPANPLUS-Inc.t	CPANPLUS tests
-lib/CPANPLUS/t/00_CPANPLUS-Internals-Utils.t	CPANPLUS tests
-lib/CPANPLUS/t/01_CPANPLUS-Configure.t	CPANPLUS tests
-lib/CPANPLUS/t/02_CPANPLUS-Internals.t	CPANPLUS tests
-lib/CPANPLUS/t/03_CPANPLUS-Internals-Source.t	CPANPLUS tests
-lib/CPANPLUS/t/04_CPANPLUS-Module.t	CPANPLUS tests
-lib/CPANPLUS/t/05_CPANPLUS-Internals-Fetch.t	CPANPLUS tests
-lib/CPANPLUS/t/06_CPANPLUS-Internals-Constants.t	CPANPLUS tests
-lib/CPANPLUS/t/07_CPANPLUS-Internals-Extract.t	CPANPLUS tests
-lib/CPANPLUS/t/08_CPANPLUS-Backend.t	CPANPLUS tests
-lib/CPANPLUS/t/09_CPANPLUS-Internals-Search.t	CPANPLUS tests
-lib/CPANPLUS/t/10_CPANPLUS-Error.t	CPANPLUS tests
-lib/CPANPLUS/t/15_CPANPLUS-Shell.t	CPANPLUS tests
-lib/CPANPLUS/t/19_CPANPLUS-Dist.t	CPANPLUS tests
-lib/CPANPLUS/t/20_CPANPLUS-Dist-MM.t	CPANPLUS tests
-lib/CPANPLUS/t/21_CPANPLUS-Dist-No-Build.t	CPANPLUS tests
-lib/CPANPLUS/t/30_CPANPLUS-Internals-Selfupdate.t	CPANPLUS tests
-lib/CPANPLUS/t/40_CPANPLUS-Internals-Report.t	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/01mailrc.txt.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUNOXS/Bundle-Foo-Bar-0.01.tar.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUNOXS/CHECKSUMS	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUNOXS/Foo-Bar-0.01.readme	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUNOXS/Foo-Bar-0.01.tar.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUNOXS/perl5.005_03.tar.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUXS/CHECKSUMS	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUXS/Foo-Bar-0.01.readme	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/E/EU/EUXS/Foo-Bar-0.01.tar.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/M/MB/MBNOXS/CHECKSUMS	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/M/MB/MBNOXS/Foo-Bar-0.01.readme	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/M/MB/MBNOXS/Foo-Bar-0.01.tar.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/M/MB/MBXS/CHECKSUMS	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/M/MB/MBXS/Foo-Bar-0.01.readme	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/authors/id/M/MB/MBXS/Foo-Bar-0.01.tar.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/modules/02packages.details.txt.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/dummy-CPAN/modules/03modlist.data.gz.packed	CPANPLUS tests
-lib/CPANPLUS/t/inc/conf.pl	CPANPLUS tests
 lib/CPAN.pm			Interface to Comprehensive Perl Archive Network
 lib/CPAN/Queue.pm		queueing system for CPAN.pm
 lib/CPAN/SIGNATURE		CPAN public key
@@ -1701,11 +1611,6 @@ lib/Dumpvalue.pm		Screen dump of perl values
 lib/Dumpvalue.t			See if Dumpvalue works
 lib/dumpvar.pl			A variable dumper
 lib/dumpvar.t			A variable dumper tester
-lib/encoding/warnings.pm	warn on implicit encoding conversions
-lib/encoding/warnings/t/1-warning.t	tests for encoding::warnings
-lib/encoding/warnings/t/2-fatal.t	tests for encoding::warnings
-lib/encoding/warnings/t/3-normal.t	tests for encoding::warnings
-lib/encoding/warnings/t/4-lexical.t	tests for encoding::warnings
 lib/English.pm			Readable aliases for short variables
 lib/English.t			See if English works
 lib/Env.pm			Map environment into ordinary variables
@@ -1817,8 +1722,8 @@ lib/ExtUtils/t/PL_FILES.t	Test PL_FILES in MakeMaker
 lib/ExtUtils/t/pm.t		See if Makemaker can handle PM
 lib/ExtUtils/t/postamble.t	See if postamble works
 lib/ExtUtils/t/prefixify.t	See if MakeMaker can apply a PREFIX
-lib/ExtUtils/t/prereq_print.t	See if PREREQ_PRINT works
 lib/ExtUtils/t/prereq.t		See if MakeMaker works
+lib/ExtUtils/t/prereq_print.t	See if PREREQ_PRINT works
 lib/ExtUtils/t/problems.t	How MakeMaker reacts to build problems
 lib/ExtUtils/t/prompt.t		See if E::MM::prompt() works
 lib/ExtUtils/t/recurs.t		See if recursive builds work
@@ -1891,14 +1796,6 @@ lib/File/Temp/t/seekable.t	See if File::Temp works
 lib/File/Temp/t/tempfile.t	See if File::Temp works
 lib/filetest.pm			For "use filetest"
 lib/filetest.t			See if filetest works
-lib/Filter/Simple/Changes	Filter::Simple
-lib/Filter/Simple.pm		Simple frontend to Filter::Util::Call
-lib/Filter/Simple/README	Filter::Simple
-lib/Filter/Simple/t/data.t	See if Filter::Simple works
-lib/Filter/Simple/t/export.t	See if Filter::Simple works
-lib/Filter/Simple/t/filter_only.t	See if Filter::Simple works
-lib/Filter/Simple/t/filter.t	See if Filter::Simple works
-lib/Filter/Simple/t/import.t	See if Filter::Simple works
 lib/FindBin.pm			Find name of currently executing program
 lib/FindBin.t			See if FindBin works
 lib/finddepth.pl		A depth-first find emulator--used by find2perl
@@ -2000,10 +1897,8 @@ lib/Locale/Maketext/t/50_super.t	See if Locale::Maketext works
 lib/Locale/Maketext/t/60_super.t	See if Locale::Maketext works
 lib/Locale/Maketext/t/90_utf8.t	See if Locale::Maketext works
 lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
-lib/locale.pm			For "use locale"
 lib/Locale/Script.pm		Locale::Codes
 lib/Locale/Script.pod		Locale::Codes documentation
-lib/locale.t			See if locale support works
 lib/Log/Message/Config.pm	Log::Message
 lib/Log/Message/Handlers.pm	Log::Message
 lib/Log/Message/Item.pm	Log::Message
@@ -2026,6 +1921,7 @@ lib/Math/BigInt/t/alias.inc	Support for BigInt tests
 lib/Math/BigInt/t/bare_mbf.t	Test MBF under Math::BigInt::BareCalc
 lib/Math/BigInt/t/bare_mbi.t	Test MBI under Math::BigInt::BareCalc
 lib/Math/BigInt/t/bare_mif.t	Rounding tests under BareCalc
+lib/Math/BigInt/t/big_pi_e.t	test bpi() and bexp()
 lib/Math/BigInt/t/bigfltpm.inc	Shared tests for bigfltpm.t and sub_mbf.t
 lib/Math/BigInt/t/bigfltpm.t	See if BigFloat.pm works
 lib/Math/BigInt/t/bigintc.t	See if BigInt/Calc.pm works
@@ -2033,7 +1929,6 @@ lib/Math/BigInt/t/bigintpm.inc	Shared tests for bigintpm.t and sub_mbi.t
 lib/Math/BigInt/t/bigintpm.t	See if BigInt.pm works
 lib/Math/BigInt/t/bigints.t	See if BigInt.pm works
 lib/Math/BigInt/t/biglog.t	Test the log function
-lib/Math/BigInt/t/big_pi_e.t	test bpi() and bexp()
 lib/Math/BigInt/t/bigroot.t	Test the broot function
 lib/Math/BigInt/t/calling.t	Test calling conventions
 lib/Math/BigInt/t/config.t	Test Math::BigInt->config()
@@ -2078,12 +1973,10 @@ lib/Math/BigRat.pm		Math::BigRat
 lib/Math/BigRat/t/big_ap.t		Math::BigRat test
 lib/Math/BigRat/t/bigfltpm.inc		Math::BigRat test
 lib/Math/BigRat/t/bigfltrt.t		Math::BigRat test
-lib/Math/BigRat/t/biglog.t		Math::BigRat test
 lib/Math/BigRat/t/bigratpm.inc		Math::BigRat test
 lib/Math/BigRat/t/bigratpm.t		Math::BigRat test
 lib/Math/BigRat/t/bigrat.t		Math::BigRat test
 lib/Math/BigRat/t/bigratup.t	test under $Math::BigInt::upgrade
-lib/Math/BigRat/t/bigroot.t		Math::BigRat test
 lib/Math/BigRat/t/requirer.t	see if require works properly
 lib/Math/BigRat/t/trap.t	see if trap_nan and trap_inf work
 lib/Math/Complex.pm		A Complex package
@@ -2180,15 +2073,6 @@ lib/Module/CoreList/bin/corelist	Module::CoreList
 lib/Module/CoreList.pm			Module::CoreList
 lib/Module/CoreList/t/corelist.t	Module::CoreList
 lib/Module/CoreList/t/find_modules.t	Module::CoreList
-lib/Module/Load/Conditional.pm	Module::Conditional
-lib/Module/Load/Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
-lib/Module/Load/Conditional/t/02_Parse_Version.t	Module::Load::Conditional tests
-lib/Module/Load/Conditional/t/to_load/Commented.pm	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/InPod.pm	Module::Load::Conditional tests
-lib/Module/Load/Conditional/t/to_load/LoadIt.pm	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/LoadMe.pl	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/Must/Be/Loaded.pm	Module::Conditional tests
-lib/Module/Load/Conditional/t/to_load/ToBeLoaded	Module::Conditional tests
 lib/Module/Loaded.pm	Module::Loaded
 lib/Module/Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 lib/Module/Load.pm	Module::Load
@@ -2556,10 +2440,6 @@ lib/strict.pm			For "use strict"
 lib/strict.t			See if strictures work
 lib/subs.pm			Declare overriding subs
 lib/subs.t			See if subroutine pseudo-importation works
-lib/Switch.pm			Switch for Perl
-lib/Switch/t/given.t		See if Perl 6 given (switch) works
-lib/Switch/t/nested.t		See if nested switch works
-lib/Switch/t/switch.t		See if Perl 5 switch works
 lib/Symbol.pm			Symbol table manipulation routines
 lib/Symbol.t			See if Symbol works
 lib/syslog.pl			Perl library supporting syslogging
@@ -2773,7 +2653,6 @@ lib/Tie/File/t/40_abs_cache.t	Unit tests for Tie::File::Cache
 lib/Tie/File/t/41_heap.t	Unit tests for Tie::File::Heap
 lib/Tie/File/t/42_offset.t	Unit tests for the offset method
 lib/Tie/Handle.pm		Base class for tied handles
-lib/Tie/Handle/stdhandle_from_handle.t	Test for Tie::StdHandle/Handle backwards compat
 lib/Tie/Handle/stdhandle.t	Test for Tie::StdHandle
 lib/Tie/Hash/NamedCapture.pm	Implements %- and %+ behaviour
 lib/Tie/Hash.pm			Base class for tied hashes
@@ -2786,7 +2665,6 @@ lib/Tie/RefHash/storable.t	Test for Tie::RefHash with storable
 lib/Tie/RefHash/threaded.t	Test for Tie::RefHash with threads
 lib/Tie/Scalar.pm		Base class for tied scalars
 lib/Tie/Scalar.t		See if Tie::Scalar works
-lib/Tie/StdHandle.pm		Tie::StdHandle
 lib/Tie/SubstrHash.pm		Compact hash for known key, value and table size
 lib/Tie/SubstrHash.t		Test for Tie::SubstrHash
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
@@ -3070,6 +2948,9 @@ plan9/setup.rc			Plan9 port: script for easy build+install
 plan9/versnum			Plan9 port: script to print version number
 pod/buildtoc			Update files based on pod.lst
 pod/checkpods.PL		Tool to check for common errors in pods
+pod/kurila01delta.pod	What is new for Perl Kurila 0.1
+pod/kurila02delta.pod	What is new for Perl Kurila 0.2
+pod/kurilaintro.pod	Description of Perl Kurila
 pod.lst				List the pods and their roles
 pod/Makefile.SH			generate Makefile which makes pods into something else
 pod/perl5004delta.pod		Perl changes in version 5.004
@@ -3104,7 +2985,6 @@ pod/perlbot.pod			Perl OO tricks and examples
 pod/perlcall.pod		Perl calling conventions from C
 pod/perlcheat.pod		Perl cheat sheet
 pod/perlclib.pod		Internal replacements for standard C library functions
-pod/perlcommunity.pod		Perl community information
 pod/perlcompile.pod		Perl compiler suite intro
 pod/perldata.pod		Perl data structures
 pod/perldbmfilter.pod		Perl DBM filters
@@ -3176,7 +3056,7 @@ pod/perlsub.pod			Perl subroutines
 pod/perlsyn.pod			Perl syntax
 pod/perlthrtut.pod		Perl threads tutorial
 pod/perltie.pod			Perl objects hidden behind simple variables
-pod/perltoc.pod			Perl documentation table of contents
+pod/kurilatoc.pod		Perl Kurila documentation table of contents
 pod/perltodo.pod		Perl things to do
 pod/perltooc.pod		Perl OO tutorial, part 2
 pod/perltoot.pod		Perl OO tutorial, part 1
@@ -3201,7 +3081,6 @@ pod/rofftoc			Generate a table of contents in troff format
 pod/splitman			Splits perlfunc into multiple man pages
 pod/splitpod			Splits perlfunc into multiple pod pages
 Policy_sh.SH		Hold site-wide preferences between Configure runs.
-Porting/add-package.pl	Add/Update CPAN modules that are part of Core
 Porting/apply		Apply patches sent by mail
 Porting/check83.pl	Check whether we are 8.3-friendly
 Porting/checkAUTHORS.pl	Check that the AUTHORS file is complete
@@ -3427,10 +3306,8 @@ t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
 t/lib/compmod.pl		Helper for 1_compile.t
 t/lib/compress/any.pl		Compress::Zlib
-t/lib/compress/anyunc.pl	Compress::Zlib
 t/lib/compress/CompTestUtils.pm	Compress::Zlib
 t/lib/compress/destroy.pl	Compress::Zlib
-t/lib/compress/encode.pl	Compress::Zlib
 t/lib/compress/generic.pl	Compress::Zlib
 t/lib/compress/merge.pl		Compress::Zlib
 t/lib/compress/multi.pl		Compress::Zlib
@@ -3444,6 +3321,7 @@ t/lib/contains_pod.xr		Pod-Parser test file
 t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
 t/lib/Dev/Null.pm		Module for testing Test::Harness
+t/lib/Dummy.pm			Module for testing base.pm
 t/lib/dprof/test1_t		Perl code profiler tests
 t/lib/dprof/test1_v		Perl code profiler tests
 t/lib/dprof/test2_t		Perl code profiler tests
@@ -3461,7 +3339,7 @@ t/lib/dprof/test7_v		Perl code profiler tests
 t/lib/dprof/test8_t		Perl code profiler tests
 t/lib/dprof/test8_v		Perl code profiler tests
 t/lib/dprof/V.pm		Perl code profiler tests
-t/lib/Dummy.pm			Module for testing base.pm
+t/lib/feature/err		Tests for enabling/disabling err feature
 t/lib/feature/implicit		Tests for implicit loading of feature.pm
 t/lib/feature/nonesuch		Tests for enabling/disabling nonexistent feature
 t/lib/feature/say		Tests for enabling/disabling say feature
@@ -3471,9 +3349,9 @@ t/lib/Filter/Simple/FilterOnlyTest.pm	Helper file for Filter::Simple tests
 t/lib/Filter/Simple/FilterTest.pm	Helper file for Filter::Simple tests
 t/lib/Filter/Simple/ImportTest.pm	Helper file for Filter::Simple tests
 t/lib/filter-util.pl		See if Filter::Util::Call works
+t/lib/HasSigDie.pm		Module for testing base.pm
 t/lib/h2ph.h			Test header file for h2ph
 t/lib/h2ph.pht			Generated output from h2ph.h by h2ph, for comparison
-t/lib/HasSigDie.pm		Module for testing base.pm
 t/lib/locale/latin1		Part of locale.t in Latin 1
 t/lib/locale/utf8		Part of locale.t in UTF8
 t/lib/MakeMaker/Test/Setup/BFD.pm	MakeMaker test utilities
@@ -3670,7 +3548,6 @@ t/op/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
 t/op/array.t			See if array operations work
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
-t/op/attrhand.t			See if attribute handlers work
 t/op/attrs.t			See if attributes on declarations work
 t/op/auto.t			See if autoincrement et all work
 t/op/avhv.t			See if pseudo-hashes work
@@ -3720,7 +3597,6 @@ t/op/hash.t			See if the complexity attackers are repelled
 t/op/hashwarn.t			See if warnings for bad hash assignments work
 t/op/inccode.t			See if coderefs work in @INC
 t/op/inccode-tie.t		See if tie to @INC works
-t/op/incfilter.t		See if the source filters in coderef-in-@INC work
 t/op/inc.t			See if inc/dec of integers near 32 bit limit work
 t/op/index.t			See if index works
 t/op/int.t			See if int works
@@ -3748,7 +3624,6 @@ t/op/numconvert.t		See if accessing fields does not change numeric values
 t/op/oct.t			See if oct and hex work
 t/op/ord.t			See if ord works
 t/op/or.t			See if || works in weird situations
-t/op/overload_integer.t			See if overload::constant for integer works after "use".   
 t/op/override.t			See if operator overriding works
 t/op/pack.t			See if pack and unpack work
 t/op/pat.t			See if esoteric patterns work
@@ -3767,13 +3642,13 @@ t/op/readline.t			See if <> / readline / rcatline work
 t/op/read.t			See if read() works
 t/op/recurse.t			See if deep recursion works
 t/op/ref.t			See if refs and objects work
-t/op/reg_email.t		See if regex recursion works by parsing email addresses
 t/op/regexp_noamp.t		See if regular expressions work with optimizations
 t/op/regexp_notrie.t		See if regular expressions work without trie optimisation
 t/op/regexp_qr_embed.t		See if regular expressions work with embedded qr//
 t/op/regexp_qr.t		See if regular expressions work as qr//
 t/op/regexp.t			See if regular expressions work
 t/op/regexp_trielist.t		See if regular expressions work with trie optimisation
+t/op/reg_email.t		See if regex recursion works by parsing email addresses
 t/op/reg_mesg.t			See if one can get regular expression errors
 t/op/reg_namedcapture.t		Make sure glob assignment doesn't break named capture
 t/op/reg_nc_tie.t	        Test the tied methods of Tie::Hash::NamedCapture
@@ -3821,12 +3696,10 @@ t/op/undef.t			See if undef works
 t/op/universal.t		See if UNIVERSAL class works
 t/op/unshift.t			See if unshift works
 t/op/utf8decode.t		See if UTF-8 decoding works
-t/op/utfhash.t			See if utf8 keys in hashes behave
 t/op/utftaint.t			See if utf8 and taint work together
 t/op/vec.t			See if vectors work
 t/op/ver.t			See if v-strings and the %v format flag work
 t/op/wantarray.t		See if wantarray works
-t/op/write.t			See if write works (formats work)
 t/perl.supp			Perl valgrind suppressions
 t/pod/emptycmd.t		Test empty pod directives
 t/pod/emptycmd.xr		Expected results for emptycmd.t
@@ -3884,22 +3757,16 @@ t/run/switchp.t			Test the -p switch
 t/run/switchPx.aux		Data for switchPx.t
 t/run/switchPx.t		Test the -Px combination
 t/run/switcht.t			Test the -t switch
-t/run/switchx2.aux		Data for switchx.t
 t/run/switchx.aux		Data for switchx.t
 t/run/switchx.t			Test the -x switch
 t/TEST				The regression tester
 t/TestInit.pm			Preamble library for core tests
 t/test.pl			Simple testing library
-t/uni/cache.t			See if Unicode swash caching works
 t/uni/case.pl			See if Unicode casing works
-t/uni/chomp.t			See if Unicode chomp works
-t/uni/chr.t			See if Unicode chr works
 t/uni/class.t			See if Unicode classes work (\p)
 t/uni/fold.t			See if Unicode folding works
 t/uni/greek.t			See if Unicode in greek works
-t/uni/latin2.t			See if Unicode in latin2 works
 t/uni/lower.t			See if Unicode casing works
-t/uni/overload.t		See if Unicode overloading works
 t/uni/sprintf.t			See if Unicode sprintf works
 t/uni/title.t			See if Unicode casing works
 t/uni/tr_7jis.t			See if Unicode tr/// in 7jis works
@@ -3907,7 +3774,6 @@ t/uni/tr_eucjp.t		See if Unicode tr/// in eucjp works
 t/uni/tr_sjis.t			See if Unicode tr/// in sjis works
 t/uni/tr_utf8.t			See if Unicode tr/// in utf8 works
 t/uni/upper.t			See if Unicode casing works
-t/uni/write.t			See if Unicode formats work
 t/win32/system.t		See if system works in Win*
 t/win32/system_tests		Test runner for system.t
 t/x2p/s2p.t			See if s2p/psed work
@@ -3917,16 +3783,13 @@ universal.c			The default UNIVERSAL package methods
 unixish.h			Defines that are assumed on Unix
 utf8.c				Unicode routines
 utf8.h				Unicode header
-utfebcdic.h			Unicode on EBCDIC (UTF-EBCDIC, tr16) header
+utfebcdic.h                     Unicode on EBCDIC (UTF-EBCDIC, tr16) header
 util.c				Utility routines
 util.h				Dummy header
 utils/c2ph.PL			program to translate dbx stabs to perl
 utils/config_data.PL		Module::Build tool
 utils/corelist.PL		Module::CoreList
-utils/cpan2dist.PL	the cpan2dist utility
 utils/cpan.PL			easily interact with CPAN from the command line
-utils/cpanp.PL	the cpanp utility
-utils/cpanp-run-perl.PL	the cpanp-run-perl utility
 utils/dprofpp.PL		Perl code profile post-processor
 utils/enc2xs.PL			Encode module generator
 utils/h2ph.PL			A thing to turn C .h files into perl .ph files
@@ -3934,7 +3797,7 @@ utils/h2xs.PL			Program to make .xs files from C header files
 utils/instmodsh.PL		Give information about installed extensions
 utils/libnetcfg.PL		libnet
 utils.lst			Lists utilities bundled with Perl
-utils/Makefile.SH		Extract the utility scripts
+utils/Makefile			Extract the utility scripts
 utils/perlbug.PL		A simple tool to submit a bug report
 utils/perldoc.PL		A simple tool to find & display perl's documentation
 utils/perlivp.PL		installation verification procedure

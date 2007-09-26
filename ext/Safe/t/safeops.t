@@ -50,7 +50,7 @@ sub testop {
     my ($op, $opname, $code) = @_;
     pass("$op : skipped") and return if $code =~ /^SKIP/;
     pass("$op : skipped") and return if $code =~ m://: && $] < 5.009; # no dor
-    my $c = new Safe;
+    my $c = Safe->new();
     $c->deny_only($op);
     $c->reval($code);
     like($@, qr/'\Q$opname\E' trapped by operation mask/, $op);
@@ -95,7 +95,6 @@ srefgen		SKIP \$x
 ref		ref
 bless		bless
 backtick	qx/ls/
-glob		<*.c>
 readline	<FH>
 rcatline	SKIP (set by optimizer) $x .= <F>
 regcmaybe	SKIP (internal)
@@ -186,7 +185,6 @@ vec		vec
 index		index
 rindex		rindex
 sprintf		sprintf '%s', 'foo'
-formline	formline
 ord		ord
 chr		chr
 crypt		crypt 'foo','bar'

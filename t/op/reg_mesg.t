@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-}
-
 my $debug = 1;
 
 ##
@@ -106,7 +101,7 @@ my @death =
     'm/[a-\d]/' => 'False [] range "a-\d" in regex; marked by {#} in m/[a-\d{#}]/',
     'm/[\w-x]/' => 'False [] range "\w-" in regex; marked by {#} in m/[\w-{#}x]/',
     'm/[a-\pM]/' => 'False [] range "a-\pM" in regex; marked by {#} in m/[a-\pM{#}]/',
-    'm/[\pM-x]/' => 'False [] range "\pM-" in regex; marked by {#} in m/[\pM-{#}x]/',
+    'm/[\pM-x]/' => '\p{...} only supported with unicode in regex; marked by {#} in m/[\pM{#}-x]/',
     "m'\\y'"     => 'Unrecognized escape \y passed through in regex; marked by {#} in m/\y{#}/',
 );
 

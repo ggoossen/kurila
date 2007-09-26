@@ -1,10 +1,10 @@
-name: perl
-version: 5.009005
-abstract: Practical Extraction and Report Language
-author: perl5-porters@perl.org
+name: kurila
+version: 0_02
+abstract: a geneticly modified perl
+author: ~
 license: perl
 distribution_type: core
-private:
+no_index:
   directory:
     - ext/Compress/Raw
     - ext/Compress/Zlib
@@ -15,13 +15,13 @@ private:
     - ext/Digest/MD5
     - ext/Digest/SHA
     - ext/Encode
-    - ext/Filter/Util/Call
     - ext/IO
     - ext/IO_Compress_Base
     - ext/IO_Compress_Zlib
     - ext/List/Util
     - ext/Math/BigInt/FastCalc
     - ext/MIME/Base64
+    - ext/Perl6-Form
     - ext/Safe
     - ext/Storable
     - ext/Sys/Syslog
@@ -32,9 +32,7 @@ private:
     - ext/Time/HiRes
     - ext/Time/Piece
     - ext/Unicode/Normalize
-    - ext/Win32
     - ext/Win32API/File
-    - ext/Win32CORE
     - lib/Archive/Extract
     - lib/Archive/Tar
     - lib/Attribute/Handlers
@@ -52,14 +50,12 @@ private:
     - lib/CPANPLUS/Shell
     - lib/CPANPLUS/t
     - lib/Digest
-    - lib/encoding/warnings
     - lib/ExtUtils/CBuilder
     - lib/ExtUtils/ParseXS
     - lib/ExtUtils/t
     - lib/File/Fetch
     - lib/File/Spec
     - lib/File/Temp
-    - lib/Filter/Simple
     - lib/Getopt/Long
     - lib/I18N/LangTags
     - lib/IO/Zlib
@@ -88,7 +84,6 @@ private:
     - lib/Pod/Escapes
     - lib/Pod/Perldoc
     - lib/Pod/Simple
-    - lib/Switch
     - lib/Term/ANSIColor
     - lib/Term/UI
     - lib/Test/Harness
@@ -110,6 +105,7 @@ private:
     - ext/DynaLoader/t/XSLoader.t
     - ext/DynaLoader/XSLoader_pm.PL
     - ext/Filter/t/call.t
+    - ext/Filter/Util/Call
     - ext/threads/threads.pm
     - ext/threads/threads.xs
     - lib/Archive/Extract.pm
@@ -140,6 +136,7 @@ private:
     - lib/Cwd.pm
     - lib/Devel/InnerPackage.pm
     - lib/Digest.pm
+    - lib/encoding/warnings
     - lib/encoding/warnings.pm
     - lib/Exporter.pm
     - lib/Exporter.t
@@ -181,6 +178,7 @@ private:
     - lib/File/Fetch.pm
     - lib/File/Spec.pm
     - lib/File/Temp.pm
+    - lib/Filter/Simple
     - lib/Filter/Simple.pm
     - lib/Getopt/Long.pm
     - lib/I18N/LangTags.pm
@@ -224,19 +222,19 @@ private:
     - lib/Module/Load/Conditional.pm
     - lib/Module/Loaded.pm
     - lib/Module/Pluggable.pm
-    - lib/Net/ChangeLog
+    - lib/Net/ChangeLog.libnet
     - lib/Net/Cmd.pm
     - lib/Net/Config.eg
     - lib/Net/Config.pm
     - lib/Net/Domain.pm
     - lib/Net/FTP.pm
-    - lib/Net/Hostname.pm.eg
+    - lib/Net/Hostname.eg
     - lib/Net/libnetFAQ.pod
     - lib/Net/Netrc.pm
     - lib/Net/NNTP.pm
     - lib/Net/Ping.pm
     - lib/Net/POP3.pm
-    - lib/Net/README
+    - lib/Net/README.libnet
     - lib/Net/SMTP.pm
     - lib/Net/Time.pm
     - lib/NEXT.pm

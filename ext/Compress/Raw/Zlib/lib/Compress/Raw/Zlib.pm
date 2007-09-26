@@ -13,7 +13,7 @@ use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.006';
+$VERSION = '2.004_01';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -71,8 +71,8 @@ sub AUTOLOAD {
     my ($error, $val) = constant($constname);
     Carp::croak $error if $error;
     no strict 'refs';
-    *{$AUTOLOAD} = sub { $val };
-    goto &{$AUTOLOAD};
+    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
 }
 
 use constant FLAG_APPEND             => 1 ;
@@ -88,7 +88,7 @@ eval {
 or do {
     require DynaLoader;
     local @ISA = qw(DynaLoader);
-    bootstrap Compress::Raw::Zlib $XS_VERSION ; 
+    Compress::Raw::Zlib->bootstrap( $XS_VERSION) ; 
 };
  
 
@@ -116,7 +116,7 @@ sub ParseParameters
 
     my $sub = (caller($level + 1))[3] ;
     #local $Carp::CarpLevel = 1 ;
-    my $p = new Compress::Raw::Zlib::Parameters() ;
+    my $p = Compress::Raw::Zlib::Parameters->new() ;
     $p->parse(@_)
         or croak "$sub: $p->{Error}" ;
 

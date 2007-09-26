@@ -941,32 +941,6 @@ flags are not used. This call should not be used; use packlist instead.
 =for hackers
 Found in file mathoms.c
 
-=item sv_2pvbyte_nolen
-X<sv_2pvbyte_nolen>
-
-Return a pointer to the byte-encoded representation of the SV.
-May cause the SV to be downgraded from UTF-8 as a side-effect.
-
-Usually accessed via the C<SvPVbyte_nolen> macro.
-
-	char*	sv_2pvbyte_nolen(SV* sv)
-
-=for hackers
-Found in file mathoms.c
-
-=item sv_2pvutf8_nolen
-X<sv_2pvutf8_nolen>
-
-Return a pointer to the UTF-8-encoded representation of the SV.
-May cause the SV to be upgraded to UTF-8 as a side-effect.
-
-Usually accessed via the C<SvPVutf8_nolen> macro.
-
-	char*	sv_2pvutf8_nolen(SV* sv)
-
-=for hackers
-Found in file mathoms.c
-
 =item sv_2pv_nolen
 X<sv_2pv_nolen>
 
@@ -1189,28 +1163,6 @@ and ocnt are not used. This call should not be used, use unpackstring instead.
 
 =for hackers
 Found in file mathoms.c
-
-
-=back
-
-=head1 Functions in file pp_ctl.c
-
-
-=over 8
-
-=item find_runcv
-X<find_runcv>
-
-Locate the CV corresponding to the currently executing sub or eval.
-If db_seqp is non_null, skip CVs that are in the DB package and populate
-*db_seqp with the cop sequence number at the point that the DB:: code was
-entered. (allows debuggers to eval in the scope of the breakpoint rather
-than in the scope of the debugger itself).
-
-	CV*	find_runcv(U32 *db_seqp)
-
-=for hackers
-Found in file pp_ctl.c
 
 
 =back
@@ -4398,17 +4350,6 @@ Will also turn off the UTF-8 status.
 =for hackers
 Found in file sv.h
 
-=item SvPOK_only_UTF8
-X<SvPOK_only_UTF8>
-
-Tells an SV that it is a string and disables all other OK bits,
-and leaves the UTF-8 status as it was.
-
-	void	SvPOK_only_UTF8(SV* sv)
-
-=for hackers
-Found in file sv.h
-
 =item SvPV
 X<SvPV>
 
@@ -4418,114 +4359,6 @@ stringified version becoming C<SvPOK>.  Handles 'get' magic. See also
 C<SvPVx> for a version which guarantees to evaluate sv only once.
 
 	char*	SvPV(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVbyte
-X<SvPVbyte>
-
-Like C<SvPV>, but converts sv to byte representation first if necessary.
-
-	char*	SvPVbyte(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVbytex
-X<SvPVbytex>
-
-Like C<SvPV>, but converts sv to byte representation first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVbyte>
-otherwise.
-
-	char*	SvPVbytex(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVbytex_force
-X<SvPVbytex_force>
-
-Like C<SvPV_force>, but converts sv to byte representation first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVbyte_force>
-otherwise.
-
-	char*	SvPVbytex_force(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVbyte_force
-X<SvPVbyte_force>
-
-Like C<SvPV_force>, but converts sv to byte representation first if necessary.
-
-	char*	SvPVbyte_force(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVbyte_nolen
-X<SvPVbyte_nolen>
-
-Like C<SvPV_nolen>, but converts sv to byte representation first if necessary.
-
-	char*	SvPVbyte_nolen(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVutf8
-X<SvPVutf8>
-
-Like C<SvPV>, but converts sv to utf8 first if necessary.
-
-	char*	SvPVutf8(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVutf8x
-X<SvPVutf8x>
-
-Like C<SvPV>, but converts sv to utf8 first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVutf8>
-otherwise.
-
-	char*	SvPVutf8x(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVutf8x_force
-X<SvPVutf8x_force>
-
-Like C<SvPV_force>, but converts sv to utf8 first if necessary.
-Guarantees to evaluate sv only once; use the more efficient C<SvPVutf8_force>
-otherwise.
-
-	char*	SvPVutf8x_force(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVutf8_force
-X<SvPVutf8_force>
-
-Like C<SvPV_force>, but converts sv to utf8 first if necessary.
-
-	char*	SvPVutf8_force(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
-=item SvPVutf8_nolen
-X<SvPVutf8_nolen>
-
-Like C<SvPV_nolen>, but converts sv to utf8 first if necessary.
-
-	char*	SvPVutf8_nolen(SV* sv)
 
 =for hackers
 Found in file sv.h
@@ -4883,39 +4716,6 @@ perform the upgrade if necessary.  See C<svtype>.
 =for hackers
 Found in file sv.h
 
-=item SvUTF8
-X<SvUTF8>
-
-Returns a U32 value indicating whether the SV contains UTF-8 encoded data.
-Call this after SvPV() in case any call to string overloading updates the
-internal flag.
-
-	U32	SvUTF8(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvUTF8_off
-X<SvUTF8_off>
-
-Unsets the UTF-8 status of an SV.
-
-	void	SvUTF8_off(SV *sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvUTF8_on
-X<SvUTF8_on>
-
-Turn on the UTF-8 status of an SV (the data is not changed, just the flag).
-Do not use frivolously.
-
-	void	SvUTF8_on(SV *sv)
-
-=for hackers
-Found in file sv.h
-
 =item SvUV
 X<SvUV>
 
@@ -5167,11 +4967,11 @@ X<newSVpvn_share>
 
 Creates a new SV with its SvPVX_const pointing to a shared string in the string
 table. If the string does not already exist in the table, it is created
-first.  Turns on READONLY and FAKE. If the C<hash> parameter is non-zero, that
-value is used; otherwise the hash is computed. The string's hash can be later
-be retrieved from the SV with the C<SvSHARED_HASH()> macro. The idea here is
-that as the string table is used for shared hash keys these strings will have
-SvPVX_const == HeKEY and hash lookup will avoid string compare.
+first.  Turns on READONLY and FAKE.  The string's hash is stored in the UV
+slot of the SV; if the C<hash> parameter is non-zero, that value is used;
+otherwise the hash is computed.  The idea here is that as the string table
+is used for shared hash keys these strings will have SvPVX_const == HeKEY and
+hash lookup will avoid string compare.
 
 	SV*	newSVpvn_share(const char* s, I32 len, U32 hash)
 
@@ -5314,33 +5114,6 @@ conversion, magic etc. Normally used via the C<SvNV(sv)> and C<SvNVx(sv)>
 macros.
 
 	NV	sv_2nv(SV* sv)
-
-=for hackers
-Found in file sv.c
-
-=item sv_2pvbyte
-X<sv_2pvbyte>
-
-Return a pointer to the byte-encoded representation of the SV, and set *lp
-to its length.  May cause the SV to be downgraded from UTF-8 as a
-side-effect.
-
-Usually accessed via the C<SvPVbyte> macro.
-
-	char*	sv_2pvbyte(SV* sv, STRLEN* lp)
-
-=for hackers
-Found in file sv.c
-
-=item sv_2pvutf8
-X<sv_2pvutf8>
-
-Return a pointer to the UTF-8-encoded representation of the SV, and set *lp
-to its length.  May cause the SV to be upgraded to UTF-8 as a side-effect.
-
-Usually accessed via the C<SvPVutf8> macro.
-
-	char*	sv_2pvutf8(SV* sv, STRLEN* lp)
 
 =for hackers
 Found in file sv.c
@@ -5839,16 +5612,6 @@ type coercion.
 =for hackers
 Found in file sv.c
 
-=item sv_pvbyten_force
-X<sv_pvbyten_force>
-
-The backend for the C<SvPVbytex_force> macro. Always use the macro instead.
-
-	char*	sv_pvbyten_force(SV* sv, STRLEN* lp)
-
-=for hackers
-Found in file sv.c
-
 =item sv_pvn_force
 X<sv_pvn_force>
 
@@ -5872,16 +5635,6 @@ You normally want to use the various wrapper macros instead: see
 C<SvPV_force> and C<SvPV_force_nomg>
 
 	char*	sv_pvn_force_flags(SV* sv, STRLEN* lp, I32 flags)
-
-=for hackers
-Found in file sv.c
-
-=item sv_pvutf8n_force
-X<sv_pvutf8n_force>
-
-The backend for the C<SvPVutf8x_force> macro. Always use the macro instead.
-
-	char*	sv_pvutf8n_force(SV* sv, STRLEN* lp)
 
 =for hackers
 Found in file sv.c
@@ -6319,11 +6072,7 @@ Found in file sv.c
 =item sv_utf8_decode
 X<sv_utf8_decode>
 
-If the PV of the SV is an octet sequence in UTF-8
-and contains a multiple-byte character, the C<SvUTF8> flag is turned on
-so that it looks like a character. If the PV contains only single-byte
-characters, the C<SvUTF8> flag stays being off.
-Scans PV for validity and returns false if the PV is invalid UTF-8.
+A NOOP
 
 NOTE: this function is experimental and may change or be
 removed without notice.
@@ -6333,66 +6082,12 @@ removed without notice.
 =for hackers
 Found in file sv.c
 
-=item sv_utf8_downgrade
-X<sv_utf8_downgrade>
-
-Attempts to convert the PV of an SV from characters to bytes.
-If the PV contains a character beyond byte, this conversion will fail;
-in this case, either returns false or, if C<fail_ok> is not
-true, croaks.
-
-This is not as a general purpose Unicode to byte encoding interface:
-use the Encode extension for that.
-
-NOTE: this function is experimental and may change or be
-removed without notice.
-
-	bool	sv_utf8_downgrade(SV *sv, bool fail_ok)
-
-=for hackers
-Found in file sv.c
-
 =item sv_utf8_encode
 X<sv_utf8_encode>
 
-Converts the PV of an SV to UTF-8, but then turns the C<SvUTF8>
-flag off so that it looks like octets again.
+A NOOP
 
 	void	sv_utf8_encode(SV *sv)
-
-=for hackers
-Found in file sv.c
-
-=item sv_utf8_upgrade
-X<sv_utf8_upgrade>
-
-Converts the PV of an SV to its UTF-8-encoded form.
-Forces the SV to string form if it is not already.
-Always sets the SvUTF8 flag to avoid future validity checks even
-if all the bytes have hibit clear.
-
-This is not as a general purpose byte encoding to Unicode interface:
-use the Encode extension for that.
-
-	STRLEN	sv_utf8_upgrade(SV *sv)
-
-=for hackers
-Found in file sv.c
-
-=item sv_utf8_upgrade_flags
-X<sv_utf8_upgrade_flags>
-
-Converts the PV of an SV to its UTF-8-encoded form.
-Forces the SV to string form if it is not already.
-Always sets the SvUTF8 flag to avoid future validity checks even
-if all the bytes have hibit clear. If C<flags> has C<SV_GMAGIC> bit set,
-will C<mg_get> on C<sv> if appropriate, else not. C<sv_utf8_upgrade> and
-C<sv_utf8_upgrade_nomg> are implemented in terms of this function.
-
-This is not as a general purpose byte encoding to Unicode interface:
-use the Encode extension for that.
-
-	STRLEN	sv_utf8_upgrade_flags(SV *sv, I32 flags)
 
 =for hackers
 Found in file sv.c
@@ -6523,11 +6218,8 @@ Found in file utf8.c
 X<ibcmp_utf8>
 
 Return true if the strings s1 and s2 differ case-insensitively, false
-if not (if they are equal case-insensitively).  If u1 is true, the
-string s1 is assumed to be in UTF-8-encoded Unicode.  If u2 is true,
-the string s2 is assumed to be in UTF-8-encoded Unicode.  If u1 or u2
-are false, the respective string is assumed to be in native 8-bit
-encoding.
+if not (if they are equal case-insensitively).  s1 and s2 are assumed
+to be in UTF-8 encoded Unicode.
 
 If the pe1 and pe2 are non-NULL, the scanning pointers will be copied
 in there (they will point at the beginning of the I<next> character).
@@ -6543,7 +6235,7 @@ For case-insensitiveness, the "casefolding" of Unicode is used
 instead of upper/lowercasing both the characters, see
 http://www.unicode.org/unicode/reports/tr21/ (Case Mappings).
 
-	I32	ibcmp_utf8(const char* a, char **pe1, UV l1, bool u1, const char* b, char **pe2, UV l2, bool u2)
+	I32	ibcmp_utf8(const char* a, char **pe1, UV l1, const char* b, char **pe2, UV l2)
 
 =for hackers
 Found in file utf8.c

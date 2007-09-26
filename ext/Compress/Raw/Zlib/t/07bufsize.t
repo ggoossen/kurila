@@ -18,7 +18,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 288 + $extra ;
 
@@ -52,7 +52,7 @@ for my $i (1 .. 13)
 
     my ($err, $x, $X, $status); 
  
-    ok( ($x, $err) = new Compress::Raw::Zlib::Deflate (-AppendOutput => 1));
+    ok( ($x, $err) = Compress::Raw::Zlib::Deflate->new(-AppendOutput => 1));
     ok $x ;
     cmp_ok $err, '==', Z_OK, "  status is Z_OK" ;
  
@@ -81,7 +81,7 @@ for my $i (1 .. 13)
     push @Answer, $tmp if length $tmp ;
      
     my $k;
-    ok(($k, $err) = new Compress::Raw::Zlib::Inflate( -AppendOutput => 1));
+    ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( -AppendOutput => 1));
     ok $k ;
     cmp_ok $err, '==', Z_OK, "  status is Z_OK" ;
  

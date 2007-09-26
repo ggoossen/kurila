@@ -29,9 +29,9 @@ print "ok 2\n";
 
 # check if <*/*> works
 if ($^O eq 'MacOS') {
-    @r = <:*:a*.t>;
+    @r = glob(":*:a*.t");
 } else {
-    @r = <*/a*.t>;
+    @r = glob("*/a*.t");
 }
 # atleast {argv,abbrev,anydbm,autoloader,append,arith,array,assignwarn,auto}.t
 print "# |@r|\nnot " if @r < 9;
@@ -40,7 +40,7 @@ my $r = scalar @r;
 
 # check if scalar context works
 @r = ();
-while (defined($_ = ($^O eq 'MacOS') ? <:*:a*.t> : <*/a*.t>)) {
+while (defined($_ = ($^O eq 'MacOS') ? glob(":*:a*.t") : glob("*/a*.t"))) {
     print "# $_\n";
     push @r, $_;
 }
@@ -50,12 +50,12 @@ print "ok 4\n";
 # check if list context works
 @r = ();
 if ($^O eq 'MacOS') {
-    for (<:*:a*.t>) {
+    for (glob(":*:a*.t")) {
     	print "# $_\n";
     	push @r, $_;
     }
 } else {
-    for (<*/a*.t>) {
+    for (glob("*/a*.t")) {
     	print "# $_\n";
     	push @r, $_;
     }
@@ -66,12 +66,12 @@ print "ok 5\n";
 # test if implicit assign to $_ in while() works
 @r = ();
 if ($^O eq 'MacOS') {
-    while (<:*:a*.t>) {
+    while (glob(":*:a*.t")) {
     	print "# $_\n";
 	push @r, $_;
     }
 } else {
-    while (<*/a*.t>) {
+    while (glob("*/a*.t")) {
     	print "# $_\n";
 	push @r, $_;
     }
@@ -104,22 +104,22 @@ print "ok 8\n";
 # test if different glob ops maintain independent contexts
 @s = ();
 if ($^O eq 'MacOS') {
-    while (<:*:a*.t>) {
+    while (glob(":*:a*.t")) {
 	my $i = 0;
 	print "# $_ <";
 	push @s, $_;
-	while (<:*:b*.t>) {
+	while (glob(":*:b*.t")) {
 	    print " $_";
 	    $i++;
 	}
 	print " >\n";
     }
 } else {
-    while (<*/a*.t>) {
+    while (glob("*/a*.t")) {
 	my $i = 0;
 	print "# $_ <";
 	push @s, $_;
-	while (<*/b*.t>) {
+	while (glob("*/b*.t")) {
 	    print " $_";
 	    $i++;
 	}
@@ -135,7 +135,7 @@ use File::DosGlob 'GLOBAL_glob';
 package Bar;
 @s = ();
 if ($^O eq 'MacOS') {
-    while (<:*:a*.t>) {
+    while (glob(":*:a*.t")) {
 	my $i = 0;
 	print "# $_ <";
 	push @s, $_;
@@ -146,7 +146,7 @@ if ($^O eq 'MacOS') {
 	print " >\n";
     }
 } else {
-    while (<*/a*.t>) {
+    while (glob("*/a*.t")) {
 	my $i = 0;
 	print "# $_ <";
 	push @s, $_;

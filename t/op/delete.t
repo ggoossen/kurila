@@ -1,12 +1,9 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require "test.pl";
+require "./test.pl";
 plan( tests => 38 );
+
+my (@foo, %foo, $foo, @bar, $key, @refary, %refhash, @list);
 
 # delete() on hash elements
 
@@ -117,10 +114,11 @@ delete $refary[0]->[3];
 cmp_ok( scalar(@{$refary[0]}),'==',1,'one down');
 
 {
+    no strict 'subs';
     my @a = 33;
     my($a) = \(@a);
     my $b = \$a[0];
-    my $c = \delete $a[bar];
+    my $c = \delete $a['bar'];
 
     ok($a == $b && $b == $c,'a b c also equivalent');
 }

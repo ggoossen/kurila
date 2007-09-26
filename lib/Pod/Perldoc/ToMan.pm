@@ -64,7 +64,7 @@ sub parse_from_file {
          # no temp file, just a pipe!
 
   # Thanks to Brendan O'Dea for contributing the following block
-  if(Pod::Perldoc::IS_Linux and -t STDOUT
+  if('Pod::Perldoc::IS_Linux' and -t *STDOUT
     and my ($cols) = `stty -a` =~ m/\bcolumns\s+(\d+)/
   ) {
     my $c = $cols * 39 / 40;
@@ -72,7 +72,7 @@ sub parse_from_file {
     $command .= ' -rLL=' . (int $c) . 'n' if $cols > 80;
   }
 
-  if(Pod::Perldoc::IS_Cygwin) {
+  if('Pod::Perldoc::IS_Cygwin') {
     $command .= ' -c';
   }
 
@@ -81,7 +81,7 @@ sub parse_from_file {
   # don't have a -c switch, so that unconditionally adding it here
   # would presumably be a Bad Thing   -- sburke@cpan.org
 
-  $command .= " | col -x" if Pod::Perldoc::IS_HPUX;
+  $command .= " | col -x" if 'Pod::Perldoc::IS_HPUX';
   
   defined(&Pod::Perldoc::DEBUG)
    and Pod::Perldoc::DEBUG()

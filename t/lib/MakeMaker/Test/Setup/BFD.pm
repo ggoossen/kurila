@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::BFD;
 
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 require Exporter;
-@EXPORT = qw(setup_recurs teardown_recurs);
+our @EXPORT = qw(setup_recurs teardown_recurs);
 
 use strict;
 use File::Path;
@@ -101,7 +101,7 @@ sub setup_recurs {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = File::Spec->catfile(File::Spec->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;

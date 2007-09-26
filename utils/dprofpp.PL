@@ -370,6 +370,7 @@ EOF
 
 use Getopt::Std 'getopts';
 use Config '%Config';
+use Perl6::Form;
 
 Setup: {
 	my $options = 'O:g:G:Pf:dlzaAvuTtqrRsUFEIp:QVShH';
@@ -403,7 +404,7 @@ Setup: {
         }
 
 	if( defined $opt_V ){
-		my $fh = 'main::fh';
+		my $fh = *main::fh;
 		print "$0 version: $VERSION\n";
 		open( $fh, "<$Monfile" ) && do {
 			local $XS_VERSION = 'early';
@@ -446,7 +447,7 @@ Setup: {
 
 Main: {
 	my $monout = $Monfile;
-	my $fh = 'main::fh';
+	my $fh = *main::fh;
 	local $names = {};
 	local $times = {};   # times in hz
 	local $ctimes = {};  # Cumulative times in hz
@@ -625,6 +626,7 @@ sub display_tree {
 }
 
 # Report the times in seconds.
+our $statform;
 sub display {
 	my( $runtime, $hz, $names, $calls, $times, $ctimes, $cnt, 
 	    $idkeys, $deep_times ) = @_;
@@ -634,6 +636,17 @@ sub display {
 	if ($opt_S) {
 	  display_tree( $deep_times, 'toplevel', -1 )
 	} else {
+
+            print form(
+                       "Total Elapsed Time = {>>>>>>} Seconds",
+                       (($rrun_rtime - $overhead) / $hz),
+                       "  {>>>>>>>>>} Time = {>>>>>>} Seconds",
+                       $whichtime, $runtime,
+                       "{<<<<<<<} Times",
+                       $incl_excl,
+                       "\%Time ExclSec CumulS #Calls sec/call Csec/c  Name",
+                      );
+
 	  for( $x = 0; $x < @$idkeys; ++$x ){
 	    $key = $idkeys->[$x];
 	    $ncalls = $calls->{$key};
@@ -646,11 +659,11 @@ sub display {
 	    $cpercall = sprintf("%.4f", $cs/$ncalls );
 	    $pcnt = sprintf("%.2f",
 			    $runtime? ((($opt_I ? $csecs : $secs) / $runtime) * 100.0): 0 );
-	    write;
+            print form($statform,
+                       $pcnt, $secs, $csecs, $ncalls, $percall, $cpercall, $name);
 	    $pcnt = $secs = $ncalls = $percall = "";
-	    write while( length $name );
 	    last unless --$cnt;
-	  }	  
+	  }
 	}
 }
 
@@ -957,27 +970,13 @@ sub rby_calls { $calls->{$a} <=> $calls->{$b} }
 sub rby_alpha { $names->{$b} cmp $names->{$a} }
 sub rby_avgcpu { $persecs->{$a} <=> $persecs->{$b} }
 
-
-format CSTAT_top =
-Total Elapsed Time = @>>>>>>> Seconds
-(($rrun_rtime - $overhead) / $hz)
-  @>>>>>>>>>> Time = @>>>>>>> Seconds
-$whichtime, $runtime
-@<<<<<<<< Times
-$incl_excl
-%Time ExclSec CumulS #Calls sec/call Csec/c  Name
-.
-
 BEGIN {
-    my $fmt = ' ^>>>   ^>>>> ^>>>>> ^>>>>>   ^>>>>> ^>>>>>  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<';
+    $statform = ' {>>}  {>>>>} {>>>>} {>>>>} {>>>>>>} {>>>>}  {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<';
     if (-t STDOUT and defined $stty and my ($cols) = `$stty -a` =~ /\bcolumns\s+(\d+)/)
     {
-	$fmt .= '<' x ($cols - length $fmt) if $cols > 80;
+	$statform .= '<' x ($cols - length $statform) if $cols > 80;
     }
-
-    eval "format STAT = \n$fmt" . '
-$pcnt, $secs, $csecs, $ncalls, $percall, $cpercall, $name
-.';
+    $statform .= "}";
 }
 !NO!SUBS!
 

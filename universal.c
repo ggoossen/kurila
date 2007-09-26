@@ -193,15 +193,13 @@ XS(XS_version_noop);
 #endif
 XS(XS_version_is_alpha);
 XS(XS_version_qv);
-XS(XS_utf8_is_utf8);
 XS(XS_utf8_valid);
 XS(XS_utf8_encode);
 XS(XS_utf8_decode);
-XS(XS_utf8_upgrade);
-XS(XS_utf8_downgrade);
 XS(XS_utf8_unicode_to_native);
 XS(XS_utf8_native_to_unicode);
 XS(XS_Internals_SvREADONLY);
+XS(XS_Internals_peek);
 XS(XS_Internals_SvREFCNT);
 XS(XS_Internals_hv_clear_placehold);
 XS(XS_PerlIO_get_layers);
@@ -223,6 +221,8 @@ XS(XS_Tie_Hash_NamedCapture_FIRSTK);
 XS(XS_Tie_Hash_NamedCapture_NEXTK);
 XS(XS_Tie_Hash_NamedCapture_SCALAR);
 XS(XS_Tie_Hash_NamedCapture_flags);
+XS(XS_Symbol_qualify_to_ref);
+XS(XS_Symbol_stash);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -255,16 +255,14 @@ Perl_boot_core_UNIVERSAL(pTHX)
 	newXS("version::is_alpha", XS_version_is_alpha, file);
 	newXS("version::qv", XS_version_qv, file);
     }
-    newXS("utf8::is_utf8", XS_utf8_is_utf8, file);
     newXS("utf8::valid", XS_utf8_valid, file);
     newXS("utf8::encode", XS_utf8_encode, file);
     newXS("utf8::decode", XS_utf8_decode, file);
-    newXS("utf8::upgrade", XS_utf8_upgrade, file);
-    newXS("utf8::downgrade", XS_utf8_downgrade, file);
     newXS("utf8::native_to_unicode", XS_utf8_native_to_unicode, file);
     newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
-    newXSproto("Internals::SvREFCNT",XS_Internals_SvREFCNT, file, "\\[$%@];$");
+    newXS("Internals::SvREFCNT",XS_Internals_SvREFCNT, file);
+    newXS("Internals::peek",XS_Internals_peek, file);
     newXSproto("Internals::hv_clear_placeholders",
                XS_Internals_hv_clear_placehold, file, "\\%");
     newXSproto("PerlIO::get_layers",
@@ -286,6 +284,8 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("Tie::Hash::NamedCapture::NEXTKEY", XS_Tie_Hash_NamedCapture_NEXTK, file);
     newXS("Tie::Hash::NamedCapture::SCALAR", XS_Tie_Hash_NamedCapture_SCALAR, file);
     newXS("Tie::Hash::NamedCapture::flags", XS_Tie_Hash_NamedCapture_flags, file);
+    newXSproto("Symbol::qualify_to_ref", XS_Symbol_qualify_to_ref, file, "$");
+    newXSproto("Symbol::stash", XS_Symbol_stash, file, "$");
 }
 
 
@@ -695,23 +695,6 @@ XS(XS_version_qv)
     }
 }
 
-XS(XS_utf8_is_utf8)
-{
-     dVAR;
-     dXSARGS;
-     PERL_UNUSED_ARG(cv);
-     if (items != 1)
-	  Perl_croak(aTHX_ "Usage: utf8::is_utf8(sv)");
-     else {
-	const SV * const sv = ST(0);
-	    if (SvUTF8(sv))
-		XSRETURN_YES;
-	    else
-		XSRETURN_NO;
-     }
-     XSRETURN_EMPTY;
-}
-
 XS(XS_utf8_valid)
 {
      dVAR;
@@ -723,7 +706,7 @@ XS(XS_utf8_valid)
 	SV * const sv = ST(0);
 	STRLEN len;
 	const char * const s = SvPV_const(sv,len);
-	if (!SvUTF8(sv) || is_utf8_string((const U8*)s,len))
+	if (is_utf8_string((const U8*)s,len))
 	    XSRETURN_YES;
 	else
 	    XSRETURN_NO;
@@ -738,7 +721,6 @@ XS(XS_utf8_encode)
     PERL_UNUSED_ARG(cv);
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: utf8::encode(sv)");
-    sv_utf8_encode(ST(0));
     XSRETURN_EMPTY;
 }
 
@@ -750,45 +732,7 @@ XS(XS_utf8_decode)
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: utf8::decode(sv)");
     else {
-	SV * const sv = ST(0);
-	const bool RETVAL = sv_utf8_decode(sv);
-	ST(0) = boolSV(RETVAL);
-	sv_2mortal(ST(0));
-    }
-    XSRETURN(1);
-}
-
-XS(XS_utf8_upgrade)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items != 1)
-	Perl_croak(aTHX_ "Usage: utf8::upgrade(sv)");
-    else {
-	SV * const sv = ST(0);
-	STRLEN	RETVAL;
-	dXSTARG;
-
-	RETVAL = sv_utf8_upgrade(sv);
-	XSprePUSH; PUSHi((IV)RETVAL);
-    }
-    XSRETURN(1);
-}
-
-XS(XS_utf8_downgrade)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items < 1 || items > 2)
-	Perl_croak(aTHX_ "Usage: utf8::downgrade(sv, failok=0)");
-    else {
-	SV * const sv = ST(0);
-        const bool failok = (items < 2) ? 0 : (int)SvIV(ST(1));
-        const bool RETVAL = sv_utf8_downgrade(sv, failok);
-
-	ST(0) = boolSV(RETVAL);
+	ST(0) = boolSV(1);
 	sv_2mortal(ST(0));
     }
     XSRETURN(1);
@@ -849,6 +793,19 @@ XS(XS_Internals_SvREADONLY)	/* This is dangerous stuff. */
     XSRETURN_UNDEF; /* Can't happen. */
 }
 
+XS(XS_Internals_peek)	/* This is dangerous stuff. */
+{
+    dVAR;
+    dXSARGS;
+    SV * const sv = SvRV(ST(0));
+    PERL_UNUSED_ARG(cv);
+
+    if (items == 1) {
+	sv_dump(sv);
+    }
+    XSRETURN_UNDEF;
+}
+
 XS(XS_Internals_SvREFCNT)	/* This is dangerous stuff. */
 {
     dVAR;
@@ -857,7 +814,7 @@ XS(XS_Internals_SvREFCNT)	/* This is dangerous stuff. */
     PERL_UNUSED_ARG(cv);
 
     if (items == 1)
-	 XSRETURN_IV(SvREFCNT(sv) - 1); /* Minus the ref created for us. */
+	 XSRETURN_IV(SvREFCNT(sv)); /* Minus the ref created for us. */
     else if (items == 2) {
          /* I hope you really know what you are doing. */
 	 SvREFCNT(sv) = SvIV(ST(1));
@@ -1433,6 +1390,33 @@ XS(XS_Tie_Hash_NamedCapture_flags)
 	return;
 }
 
+XS(XS_Symbol_qualify_to_ref)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
+
+    ST(0) = (SV*)gv_fetchsv(ST(0), GV_ADD | GV_ADDMULTI, SVt_PVGV);
+    ST(0) = newRV_noinc(ST(0));
+    XSRETURN(1);
+}
+
+XS(XS_Symbol_stash)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
+
+    ST(0) = (SV*)gv_stashsv(ST(0), GV_ADD);
+    ST(0) = newRV_noinc(ST(0));
+    XSRETURN(1);
+}
 
 /*
  * Local variables:

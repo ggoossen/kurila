@@ -136,7 +136,7 @@ result of $ff->output_file will be used.
     
     for my $method ( keys %$Tmpl ) {
         no strict 'refs';
-        *$method = sub {
+        *{Symbol::qualify_to_ref($method)} = sub {
                         my $self = shift;
                         $self->{$method} = $_[0] if @_;
                         return $self->{$method};

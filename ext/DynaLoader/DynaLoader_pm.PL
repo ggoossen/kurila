@@ -85,7 +85,7 @@ package DynaLoader;
 # Tim.Bunce@ig.co.uk, August 1994
 
 BEGIN {
-    $VERSION = '1.08';
+    our $VERSION = '1.08';
 }
 
 require AutoLoader;
@@ -94,6 +94,7 @@ require AutoLoader;
 use Config;
 
 # enable debug/trace messages from DynaLoader perl code
+our $dl_debug;
 $dl_debug = $ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
 
 #
@@ -113,9 +114,9 @@ sub dl_load_flags { 0x00 }
 #         = @Config::Config{'dlext', 'dlsrc'};
 EOT
 
-$dl_dlext = $Config::Config{'dlext'};
-$dl_so = $Config::Config{'so'};
-print OUT "  (\$dl_dlext, \$dlsrc) = ('$dl_dlext', ",
+our $dl_dlext = $Config::Config{'dlext'};
+our $dl_so = $Config::Config{'so'};
+print OUT "  our (\$dl_dlext, \$dlsrc) = ('$dl_dlext', ",
           to_string($Config::Config{'dlsrc'}), ")\n;";
 
 print OUT expand_os_specific(<<'EOT');
@@ -127,21 +128,21 @@ print OUT expand_os_specific(<<'EOT');
 # inefficient to define on systems that don't need it.
 $Is_VMS    = $^O eq 'VMS';
 <</$^O-eq-VMS>>
-$do_expand = <<$^O-eq-VMS>>1<<|$^O-eq-VMS>>0<</$^O-eq-VMS>>;
+our $do_expand = <<$^O-eq-VMS>>1<<|$^O-eq-VMS>>0<</$^O-eq-VMS>>;
 
 <<$^O-eq-MacOS>>
 my $Mac_FS;
 $Mac_FS = eval { require Mac::FileSpec::Unixish };
 <</$^O-eq-MacOS>>
 
-@dl_require_symbols = ();       # names of symbols we need
-@dl_resolve_using   = ();       # names of files to link with
-@dl_library_path    = ();       # path to look for files
+our @dl_require_symbols = ();       # names of symbols we need
+our @dl_resolve_using   = ();       # names of files to link with
+our @dl_library_path    = ();       # path to look for files
 
 #XSLoader.pm may have added elements before we were required
-#@dl_shared_objects  = ();       # shared objects for symbols we have 
-#@dl_librefs         = ();       # things we have loaded
-#@dl_modules         = ();       # Modules we have loaded
+our @dl_shared_objects;       # shared objects for symbols we have 
+our @dl_librefs;              # things we have loaded
+our @dl_modules;              # Modules we have loaded
 
 # This is a fix to support DLD's unfortunate desire to relink -lc
 @dl_resolve_using = dl_findfile('-lc') if $dlsrc eq "dl_dld.xs";
@@ -155,6 +156,8 @@ EOT
 sub dquoted_comma_list {
     join(", ", map {'"'.quotemeta($_).'"'} @_);
 }
+
+our @dl_library_path;
 
 if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     eval $cfg_dl_library_path;
@@ -257,9 +260,12 @@ if ($dl_debug) {
 
 sub croak   { require Carp; Carp::croak(@_)   }
 
+use vars qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
+            @do_expand);
+
 sub bootstrap_inherit {
     my $module = $_[0];
-    local *isa = *{"$module\::ISA"};
+    local *isa = *{Symbol::qualify_to_ref("$module\::ISA")};
     local @isa = (@isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     bootstrap(@_);
@@ -926,7 +932,7 @@ $filename is not defined then "DynaLoader" will be used.
 
 Syntax:
 
-bootstrap($module)
+$module->bootstrap()
 
 This is the normal entry point for automatic dynamic loading in Perl.
 

@@ -29,18 +29,15 @@ push @paths, qw(
     //.\/./\
 );
 
-my $drive = $ENV{SYSTEMDRIVE};
+my $drive = $ENV{SystemDrive};
 if ($drive) {
     for (@paths) {
 	s/^c:/$drive/;
     }
-    push @paths, $ENV{SYSTEMROOT} if $ENV{SYSTEMROOT};
+    push @paths, $ENV{SystemRoot} if $ENV{SystemRoot};
 }
 my %expect;
-@expect{@paths} = map { my $x = $_;
-                        $x =~ s,(.[/\\])[/\\]+,$1,g;
-                        $x =~ s,^(\w):,\U$1:,;
-                        $x } @paths;
+@expect{@paths} = map { my $x = $_; $x =~ s,(.[/\\])[/\\]+,$1,g; $x } @paths;
 
 plan tests => scalar(@paths);
 

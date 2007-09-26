@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 print "1..145\n";
 
 sub try ($$) {
@@ -292,7 +287,7 @@ tryeq_sloppy $T++, 18446744073709551616/9223372036854775808, 2;
 my $vms_no_ieee;
 if ($^O eq 'VMS') {
   use vars '%Config';
-  eval {require Config; import Config};
+  eval {require Config; Config->import() };
   $vms_no_ieee = 1 unless defined($Config{useieee});
 }
 

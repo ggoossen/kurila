@@ -185,7 +185,6 @@ sub namelen_param_definition {
 sub C_constant_other_params_defintion {
   my ($self, $params) = @_;
   my $body = '';
-  $body .= ", int utf8" if $params->{''};
   $body .= ", IV *iv_return" if $params->{IV};
   $body .= ", NV *nv_return" if $params->{NV};
   $body .= ", const char **pv_return" if $params->{PV};
@@ -196,7 +195,6 @@ sub C_constant_other_params_defintion {
 sub C_constant_other_params {
   my ($self, $params) = @_;
   my $body = '';
-  $body .= ", utf8" if $params->{''};
   $body .= ", iv_return" if $params->{IV};
   $body .= ", nv_return" if $params->{NV};
   $body .= ", pv_return" if $params->{PV};

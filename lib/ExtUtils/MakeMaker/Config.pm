@@ -13,7 +13,7 @@ sub import {
     my $caller = caller;
 
     no strict 'refs';
-    *{$caller.'::Config'} = \%Config;
+    *{Symbol::qualify_to_ref($caller.'::Config')} = \%Config;
 }
 
 1;

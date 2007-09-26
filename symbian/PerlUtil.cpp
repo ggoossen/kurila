@@ -44,7 +44,6 @@ EXPORT_C SV* PerlUtil::newSvPVfromTDesC16(const TDesC16& aDesC16) {
     sv = newSVpvn((const char *)(hBuf8->Ptr()), hBuf8->Size());
     delete hBuf8;
     hBuf8 = NULL;
-    SvUTF8_on(sv);
   }
 
   return sv;
@@ -60,7 +59,6 @@ EXPORT_C void PerlUtil::setSvPVfromTDesC16(SV* sv, const TDesC16& aDesC16) {
     sv_setpvn(sv, (const char *)(hBuf8->Ptr()), hBuf8->Size());
     delete hBuf8;
     hBuf8 = NULL;
-    SvUTF8_on(sv);
   }
 }
 

@@ -3,9 +3,8 @@
 # tests for both real and emulated fork()
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config; import Config;
+    our %Config;
+    require Config; Config->import;
     unless ($Config{'d_fork'} or $Config{'d_pseudofork'}) {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
@@ -19,6 +18,8 @@ if ($^O eq 'mpeix') {
 }
 
 $|=1;
+
+our (@prgs, $tmpfile, $CAT, $status, $i);
 
 undef $/;
 @prgs = split "\n########\n", <DATA>;
@@ -379,15 +380,19 @@ sub pipe_to_fork ($$) {
     $pid;
 }
 
-if (pipe_to_fork('PARENT','CHILD')) {
+my ($parent, $child);
+
+open $parent;
+open $child;
+if (pipe_to_fork($parent, $child)) {
     # parent
-    print PARENT "pipe_to_fork\n";
-    close PARENT;
+    print $parent "pipe_to_fork\n";
+    close $parent;
 }
 else {
     # child
-    while (<CHILD>) { print; }
-    close CHILD;
+    while (<$child>) { print; }
+    close $child;
     exit;
 }
 
@@ -401,15 +406,15 @@ sub pipe_from_fork ($$) {
     $pid;
 }
 
-if (pipe_from_fork('PARENT','CHILD')) {
+if (pipe_from_fork($parent, $child)) {
     # parent
-    while (<PARENT>) { print; }
-    close PARENT;
+    while (<$parent>) { print; }
+    close $parent;
 }
 else {
     # child
-    print CHILD "pipe_from_fork\n";
-    close CHILD;
+    print $child "pipe_from_fork\n";
+    close $child;
     exit;
 }
 EXPECT

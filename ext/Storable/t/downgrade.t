@@ -19,7 +19,7 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -29,6 +29,8 @@ sub BEGIN {
 use Test::More;
 use Storable 'thaw';
 
+require utf8;
+
 use strict;
 use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
 
@@ -37,27 +39,21 @@ use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
                   );
 %R_HASH = (perl => 'rules');
 
-if ($] > 5.007002) {
+{
   # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
   # is stored in utf8, not bytes.
   # "\xdf" is y diaresis in EBCDIC (except for cp875, but so far no-one seems
   # to use that) which has exactly the same properties for \w
   # So the tests happen to pass.
-  my $utf8 = "Schlo\xdf" . chr 256;
-  chop $utf8;
+  use utf8;
+  my $utf8 = "Schlo\x{df}";
 
   # \xe5 is V in EBCDIC. That doesn't have the same properties w.r.t. \w as
   # an a circumflex, so we need to be explicit.
 
-  # and its these very properties we're trying to test - an edge case
-  # involving whether scalars are being stored in bytes or in utf8.
-  my $a_circumflex = (ord ('A') == 193 ? "\x47" : "\xe5");
+  my $a_circumflex = "\xe5"; # a byte.
   %U_HASH = (map {$_, $_} 'castle', "ch${a_circumflex}teau", $utf8, chr 0x57CE);
-  plan tests => 169;
-} elsif ($] >= 5.006) {
-  plan tests => 59;
-} else {
-  plan tests => 67;
+  plan tests => 162;
 }
 
 $UTF8_CROAK = "/^Cannot retrieve UTF8 data in non-UTF8 perl/";
@@ -87,6 +83,7 @@ sub thaw_hash {
   isa_ok ($hash, 'HASH');
   ok (defined $hash && eq_hash($hash, $expected),
       "And it is the hash we expected?");
+  is_deeply($hash, $expected);
   $hash;
 }
 
@@ -95,17 +92,7 @@ sub thaw_scalar {
   my $scalar = eval {thaw $tests{$name}};
   is ($@, '', "Thawed $name without error?");
   isa_ok ($scalar, 'SCALAR', "Thawed $name?");
-  if ($bug and $] == 5.006) {
-    # Aargh. <expletive> <expletive> 5.6.0's harness doesn't even honour
-    # TODO tests.
-    warn "# Test skipped because eq is buggy for certain Unicode cases in 5.6.0";
-    warn "# Please upgrade to 5.6.1\n";
-    ok ("I'd really like to fail this test on 5.6.0 but I'm told that CPAN auto-dependancies mess up, and certain vendors only ship 5.6.0. Get your vendor to ugrade. Else upgrade your vendor.");
-    # One such vendor being the folks who brought you LONG_MIN as a positive
-    # integer.
-  } else {
-    is ($$scalar, $expected, "And it is the data we expected?");
-  }
+  is ($$scalar, $expected, "And it is the data we expected?");
   $scalar;
 }
 
@@ -193,77 +180,18 @@ if (eval "use Hash::Util; 1") {
   thaw_fail ('Locked keys placeholder', $RESTRICTED_CROAK);
 }
 
-if ($] >= 5.006) {
+{
+  use utf8;
   print "# We have utf8 scalars, so test that the utf8 scalars in <DATA> are valid\n";
-  thaw_scalar ('Short 8 bit utf8 data', "\xDF", 1);
-  thaw_scalar ('Long 8 bit utf8 data', "\xDF" x 256, 1);
+  thaw_scalar ('Short 8 bit utf8 data', "\x{DF}", 1);
+  thaw_scalar ('Long 8 bit utf8 data', "\x{DF}" x 256, 1);
   thaw_scalar ('Short 24 bit utf8 data', chr 0xC0FFEE);
   thaw_scalar ('Long 24 bit utf8 data', chr (0xC0FFEE) x 256);
-} else {
-  print "# We don't have utf8 scalars, so test that the utf8 scalars downgrade\n";
-  thaw_fail ('Short 8 bit utf8 data', $UTF8_CROAK);
-  thaw_fail ('Long 8 bit utf8 data', $UTF8_CROAK);
-  thaw_fail ('Short 24 bit utf8 data', $UTF8_CROAK);
-  thaw_fail ('Long 24 bit utf8 data', $UTF8_CROAK);
-  local $Storable::drop_utf8 = 1;
-  my $bytes = thaw $tests{'Short 8 bit utf8 data as bytes'};
-  thaw_scalar ('Short 8 bit utf8 data', $$bytes);
-  thaw_scalar ('Long 8 bit utf8 data', $$bytes x 256);
-  $bytes = thaw $tests{'Short 24 bit utf8 data as bytes'};
-  thaw_scalar ('Short 24 bit utf8 data', $$bytes);
-  thaw_scalar ('Long 24 bit utf8 data', $$bytes x 256);
 }
 
-if ($] > 5.007002) {
-  print "# We have utf8 hashes, so test that the utf8 hashes in <DATA> are valid\n";
-  my $hash = thaw_hash ('Hash with utf8 keys', \%U_HASH);
-  my $a_circumflex = (ord ('A') == 193 ? "\x47" : "\xe5");
-  for (keys %$hash) {
-    my $l = 0 + /^\w+$/;
-    my $r = 0 + $hash->{$_} =~ /^\w+$/;
-    cmp_ok ($l, '==', $r, sprintf "key length %d", length $_);
-    cmp_ok ($l, '==', $_ eq "ch${a_circumflex}teau" ? 0 : 1);
-  }
-  if (eval "use Hash::Util; 1") {
-    print "# We have Hash::Util, so test that the restricted utf8 hash is valid\n";
-  my $hash = thaw_hash ('Locked hash with utf8 keys', \%U_HASH);
-    for (keys %$hash) {
-      my $l = 0 + /^\w+$/;
-      my $r = 0 + $hash->{$_} =~ /^\w+$/;
-      cmp_ok ($l, '==', $r, sprintf "key length %d", length $_);
-      cmp_ok ($l, '==', $_ eq "ch${a_circumflex}teau" ? 0 : 1);
-    }
-    test_locked_hash ($hash);
-  } else {
-    print "# We don't have Hash::Util, so test that the utf8 hash downgrades\n";
-    fail ("You can't get here [perl version $]]. This is a bug in the test.
-# Please send the output of perl -V to perlbug\@perl.org");
-  }
-} else {
-  print "# We don't have utf8 hashes, so test that the utf8 hashes downgrade\n";
-  thaw_fail ('Hash with utf8 keys', $UTF8_CROAK);
-  thaw_fail ('Locked hash with utf8 keys', $UTF8_CROAK);
-  local $Storable::drop_utf8 = 1;
-  my $what = $] < 5.006 ? 'pre 5.6' : '5.6';
-  my $expect = thaw $tests{"Hash with utf8 keys for $what"};
-  thaw_hash ('Hash with utf8 keys', $expect);
-  #foreach (keys %$expect) { print "'$_':\t'$expect->{$_}'\n"; }
-  #foreach (keys %$got) { print "'$_':\t'$got->{$_}'\n"; }
-  if (eval "use Hash::Util; 1") {
-    print "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n";
-    fail ("You can't get here [perl version $]]. This is a bug in the test.
-# Please send the output of perl -V to perlbug\@perl.org");
-  } else {
-    print "# We don't have Hash::Util, so test that the restricted hashes downgrade\n";
-    my $hash = thaw_hash ('Locked hash with utf8 keys', $expect);
-    test_newkey ($hash);
-    local $Storable::downgrade_restricted = 0;
-    thaw_fail ('Locked hash with utf8 keys', $RESTRICTED_CROAK);
-    # Which croak comes first is a bit of an implementation issue :-)
-    local $Storable::drop_utf8 = 0;
-    thaw_fail ('Locked hash with utf8 keys', $RESTRICTED_CROAK);
-  }
-}
+print "# We have utf8 hashes, so test that the utf8 hashes in <DATA> are valid\n";
+thaw_fail ('Hash with utf8 keys', qr/WASUTF8 flag not supported/ );
+
 __END__
 # A whole run of 2.x nfreeze data, uuencoded. The "mode bits" are the octal
 # value of 'A', the "file name" is the test name. Use make_downgrade.pl to

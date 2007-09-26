@@ -31,6 +31,7 @@ if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS' || $^O eq 'MacOS') {
 $|=1;
 $SIG{"INT"} = "fred"; kill "INT",$$;
 EXPECT
+signal handler set to string at - line 7.
 SIGINT handler "fred" not defined.
 ########
 # mg.c

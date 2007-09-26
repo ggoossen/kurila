@@ -22,7 +22,7 @@ if test -d pod; then
 fi
 POD=`echo *.pod`
 MAN=`echo $POD|sed 's/\.pod/\.man/g'`
-HTML=`echo $POD|sed 's/perltoc.pod//'|sed 's/\.pod/\.html/g'`
+HTML=`echo $POD|sed 's/kurilatoc.pod//'|sed 's/\.pod/\.html/g'`
 TEX=`echo $POD|sed 's/\.pod/\.tex/g'`
 
 echo "Extracting pod/Makefile (with variable substitutions)"
@@ -40,7 +40,7 @@ POD = $POD
 
 MAN = $MAN
 
-# no perltoc.html
+# no kurilatoc.html
 HTML = $HTML
 
 TEX  = $TEX  
@@ -73,7 +73,7 @@ converters: $(CONVERTERS)
 
 regen_pods: perlmodlib.pod toc
 
-perltoc.pod:	buildtoc
+kurilatoc.pod:	buildtoc
 
 man:	pod2man $(MAN)
 
@@ -81,7 +81,7 @@ html:	pod2html $(HTML)
 
 tex:	pod2latex $(TEX)
 
-toc perltoc.pod:	buildtoc
+toc kurilatoc.pod:	buildtoc
 	$(PERLILIB) buildtoc --build-toc
 
 .SUFFIXES: .pm .pod

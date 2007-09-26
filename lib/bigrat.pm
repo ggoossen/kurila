@@ -1,7 +1,7 @@
 package bigrat;
 use 5.006002;
 
-$VERSION = '0.22';
+our $VERSION = '0.22';
 require Exporter;
 @ISA		= qw( bigint );
 @EXPORT_OK 	= qw( PI e bpi bexp );
@@ -34,7 +34,7 @@ sub AUTOLOAD
     {
     if ($n eq $name)
       {
-      *{"bigrat::$name"} = sub 
+      *{Symbol::qualify_to_ref("bigrat::$name")} = sub 
         {
         my $self = shift;
         no strict 'refs';
@@ -46,7 +46,7 @@ sub AUTOLOAD
           }
         return Math::BigInt->$name();
         };
-      return &$name;
+      return &{*{Symbol::qualify_to_ref($name)}};
       }
     }
  
@@ -215,7 +215,7 @@ sub import
   my ($package) = caller();
 
   no strict 'refs';
-  if (!defined *{"${package}::inf"})
+  if (!defined &{*{Symbol::qualify_to_ref("${package}::inf")}})
     {
     $self->export_to_level(1,$self,@a);           # export inf and NaN
     }
@@ -485,13 +485,13 @@ This will be hopefully fixed soon ;)
 
 =item hex
 
-Override the built-in hex() method with a version that can handle big
+Override the build-in hex() method with a version that can handle big
 integers. Note that under Perl v5.9.4 or ealier, this will be global
 and cannot be disabled with "no bigint;".
 
 =item oct
 
-Override the built-in oct() method with a version that can handle big
+Override the build-in oct() method with a version that can handle big
 integers. Note that under Perl v5.9.4 or ealier, this will be global
 and cannot be disabled with "no bigint;".
 

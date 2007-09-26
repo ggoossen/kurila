@@ -46,7 +46,7 @@ BEGIN {
       @File::Spec::ISA = 'File::Spec::Unix';
      }
      require File::Find;
-     import File::Find;
+     File::Find->import();
 }
 
 cleanup();
@@ -124,7 +124,6 @@ sub MkDir($$) {
 sub wanted_File_Dir {
     printf "# \$File::Find::dir => '$File::Find::dir'\t\$_ => '$_'\n";
     s#\.$## if ($^O eq 'VMS' && $_ ne '.');
-    s/(.dir)?$//i if ($^O eq 'VMS' && -d _);
     Check( $Expect_File{$_} );
     if ( $FastFileTests_OK ) {
         delete $Expect_File{ $_} 
@@ -702,7 +701,7 @@ if ( $symlink_exists ) {
     undef $@;
     eval {File::Find::find( {wanted => \&simple_wanted, follow => 1,
                              no_chdir => 1}, topdir('fa') ); };
-    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]faa_sl is a recursive symbolic link|i );  
+    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]faa_sl is a recursive symbolic link| );  
     unlink file_path('fa', 'faa', 'faa_sl'); 
 
 
@@ -719,7 +718,7 @@ if ( $symlink_exists ) {
                                   follow_skip => 0, no_chdir => 1},
                                   topdir('fa') );};
 
-    Check( $@ =~ m|for_find[:/]fa[:/]fa_ord encountered a second time|i );
+    Check( $@ =~ m|for_find[:/]fa[:/]fa_ord encountered a second time| );
 
 
     # no_chdir is in effect, hence we use file_path_name to specify
@@ -768,7 +767,7 @@ if ( $symlink_exists ) {
                             follow_skip => 0, no_chdir => 1},
                             topdir('fa') );};
 
-    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );
+    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time| );
 
   
     undef $@;
@@ -777,7 +776,7 @@ if ( $symlink_exists ) {
                             follow_skip => 1, no_chdir => 1},
                             topdir('fa') );};
 
-    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );  
+    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time| );  
 
     # no_chdir is in effect, hence we use file_path_name to specify
     # the expected paths for %Expect_File

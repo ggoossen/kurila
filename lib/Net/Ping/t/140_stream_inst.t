@@ -18,5 +18,5 @@ plan tests => 2;
 # Everything loaded fine
 ok 1;
 
-my $p = new Net::Ping "stream";
+my $p = Net::Ping->new( "stream");
 ok !!$p;

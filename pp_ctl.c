@@ -147,13 +147,10 @@ PP(pp_regcomp)
 	    if (PL_op->op_flags & OPf_SPECIAL)
 		PL_reginterp_cnt = I32_MAX; /* Mark as safe.  */
 
-	    if (DO_UTF8(tmpstr))
-		pm_flags |= RXf_UTF8;
-
- 		if (eng) 
+	    if (eng) 
 	        PM_SETRE(pm, CALLREGCOMP_ENG(eng, tmpstr, pm_flags));
-		else
-	        PM_SETRE(pm, CALLREGCOMP(tmpstr, pm_flags));
+            else
+                PM_SETRE(pm, CALLREGCOMP(tmpstr, pm_flags));
 
 	    PL_reginterp_cnt = 0;	/* XXXX Be extra paranoid - needed
 					   inside tie/overload accessors.  */
@@ -197,7 +194,6 @@ PP(pp_substcont)
     register char *m = cx->sb_m;
     char *orig = cx->sb_orig;
     register REGEXP * const rx = cx->sb_rx;
-    SV *nsv = NULL;
     REGEXP *old = PM_GETRE(pm);
     if(old != rx) {
 	if(old)
@@ -206,7 +202,6 @@ PP(pp_substcont)
     }
 
     rxres_restore(&cx->sb_rxres, rx);
-    RX_MATCH_UTF8_set(rx, DO_UTF8(cx->sb_targ));
 
     if (cx->sb_iters++) {
 	const I32 saviters = cx->sb_iters;
@@ -216,7 +211,6 @@ PP(pp_substcont)
 	if (!(cx->sb_rxtainted & 2) && SvTAINTED(TOPs))
 	    cx->sb_rxtainted |= 2;
 	sv_catsv(dstr, POPs);
-	FREETMPS; /* Prevent excess tmp stack */
 
 	/* Are we done */
 	if (cx->sb_once || !CALLREGEXEC(rx, s, cx->sb_strend, orig,
@@ -229,10 +223,7 @@ PP(pp_substcont)
 
 	    assert(cx->sb_strend >= s);
 	    if(cx->sb_strend > s) {
-		 if (DO_UTF8(dstr) && !SvUTF8(targ))
-		      sv_catpvn_utf8_upgrade(dstr, s, cx->sb_strend - s, nsv);
-		 else
-		      sv_catpvn(dstr, s, cx->sb_strend - s);
+		sv_catpvn(dstr, s, cx->sb_strend - s);
 	    }
 	    cx->sb_rxtainted |= RX_MATCH_TAINTED(rx);
 
@@ -247,14 +238,12 @@ PP(pp_substcont)
 	    SvPV_set(targ, SvPVX(dstr));
 	    SvCUR_set(targ, SvCUR(dstr));
 	    SvLEN_set(targ, SvLEN(dstr));
-	    if (DO_UTF8(dstr))
-		SvUTF8_on(targ);
 	    SvPV_set(dstr, NULL);
 
 	    TAINT_IF(cx->sb_rxtainted & 1);
 	    PUSHs(sv_2mortal(newSViv(saviters - 1)));
 
-	    (void)SvPOK_only_UTF8(targ);
+	    (void)SvPOK_only(targ);
 	    TAINT_IF(cx->sb_rxtainted);
 	    SvSETMAGIC(targ);
 	    SvTAINT(targ);
@@ -274,10 +263,7 @@ PP(pp_substcont)
     }
     cx->sb_m = m = rx->offs[0].start + orig;
     if (m > s) {
-	if (DO_UTF8(dstr) && !SvUTF8(cx->sb_targ))
-	    sv_catpvn_utf8_upgrade(dstr, s, m - s, nsv);
-	else
-	    sv_catpvn(dstr, s, m-s);
+	sv_catpvn(dstr, s, m-s);
     }
     cx->sb_s = rx->offs[0].end + orig;
     { /* Update the pos() information. */
@@ -393,526 +379,6 @@ Perl_rxres_free(pTHX_ void **rsp)
 #endif
 	Safefree(p);
 	*rsp = NULL;
-    }
-}
-
-PP(pp_formline)
-{
-    dVAR; dSP; dMARK; dORIGMARK;
-    register SV * const tmpForm = *++MARK;
-    register U32 *fpc;
-    register char *t;
-    const char *f;
-    register I32 arg;
-    register SV *sv = NULL;
-    const char *item = NULL;
-    I32 itemsize  = 0;
-    I32 fieldsize = 0;
-    I32 lines = 0;
-    bool chopspace = (strchr(PL_chopset, ' ') != NULL);
-    const char *chophere = NULL;
-    char *linemark = NULL;
-    NV value;
-    bool gotsome = FALSE;
-    STRLEN len;
-    const STRLEN fudge = SvPOK(tmpForm)
-			? (SvCUR(tmpForm) * (IN_BYTES ? 1 : 3) + 1) : 0;
-    bool item_is_utf8 = FALSE;
-    bool targ_is_utf8 = FALSE;
-    SV * nsv = NULL;
-    OP * parseres = NULL;
-    const char *fmt;
-    bool oneline;
-
-    if (!SvMAGICAL(tmpForm) || !SvCOMPILED(tmpForm)) {
-	if (SvREADONLY(tmpForm)) {
-	    SvREADONLY_off(tmpForm);
-	    parseres = doparseform(tmpForm);
-	    SvREADONLY_on(tmpForm);
-	}
-	else
-	    parseres = doparseform(tmpForm);
-	if (parseres)
-	    return parseres;
-    }
-    SvPV_force(PL_formtarget, len);
-    if (DO_UTF8(PL_formtarget))
-	targ_is_utf8 = TRUE;
-    t = SvGROW(PL_formtarget, len + fudge + 1);  /* XXX SvCUR bad */
-    t += len;
-    f = SvPV_const(tmpForm, len);
-    /* need to jump to the next word */
-    fpc = (U32*)(f + len + WORD_ALIGN - SvCUR(tmpForm) % WORD_ALIGN);
-
-    for (;;) {
-	DEBUG_f( {
-	    const char *name = "???";
-	    arg = -1;
-	    switch (*fpc) {
-	    case FF_LITERAL:	arg = fpc[1]; name = "LITERAL";	break;
-	    case FF_BLANK:	arg = fpc[1]; name = "BLANK";	break;
-	    case FF_SKIP:	arg = fpc[1]; name = "SKIP";	break;
-	    case FF_FETCH:	arg = fpc[1]; name = "FETCH";	break;
-	    case FF_DECIMAL:	arg = fpc[1]; name = "DECIMAL";	break;
-
-	    case FF_CHECKNL:	name = "CHECKNL";	break;
-	    case FF_CHECKCHOP:	name = "CHECKCHOP";	break;
-	    case FF_SPACE:	name = "SPACE";		break;
-	    case FF_HALFSPACE:	name = "HALFSPACE";	break;
-	    case FF_ITEM:	name = "ITEM";		break;
-	    case FF_CHOP:	name = "CHOP";		break;
-	    case FF_LINEGLOB:	name = "LINEGLOB";	break;
-	    case FF_NEWLINE:	name = "NEWLINE";	break;
-	    case FF_MORE:	name = "MORE";		break;
-	    case FF_LINEMARK:	name = "LINEMARK";	break;
-	    case FF_END:	name = "END";		break;
-	    case FF_0DECIMAL:	name = "0DECIMAL";	break;
-	    case FF_LINESNGL:	name = "LINESNGL";	break;
-	    }
-	    if (arg >= 0)
-		PerlIO_printf(Perl_debug_log, "%-16s%ld\n", name, (long) arg);
-	    else
-		PerlIO_printf(Perl_debug_log, "%-16s\n", name);
-	} );
-	switch (*fpc++) {
-	case FF_LINEMARK:
-	    linemark = t;
-	    lines++;
-	    gotsome = FALSE;
-	    break;
-
-	case FF_LITERAL:
-	    arg = *fpc++;
-	    if (targ_is_utf8 && !SvUTF8(tmpForm)) {
-		SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		*t = '\0';
-		sv_catpvn_utf8_upgrade(PL_formtarget, f, arg, nsv);
-		t = SvEND(PL_formtarget);
-		break;
-	    }
-	    if (!targ_is_utf8 && DO_UTF8(tmpForm)) {
-		SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		*t = '\0';
-		sv_utf8_upgrade(PL_formtarget);
-		SvGROW(PL_formtarget, SvCUR(PL_formtarget) + fudge + 1);
-		t = SvEND(PL_formtarget);
-		targ_is_utf8 = TRUE;
-	    }
-	    while (arg--)
-		*t++ = *f++;
-	    break;
-
-	case FF_SKIP:
-	    f += *fpc++;
-	    break;
-
-	case FF_FETCH:
-	    arg = *fpc++;
-	    f += arg;
-	    fieldsize = arg;
-
-	    if (MARK < SP)
-		sv = *++MARK;
-	    else {
-		sv = &PL_sv_no;
-		if (ckWARN(WARN_SYNTAX))
-		    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), "Not enough format arguments");
-	    }
-	    break;
-
-	case FF_CHECKNL:
-	    {
-		const char *send;
-		const char *s = item = SvPV_const(sv, len);
-		itemsize = len;
-		if (DO_UTF8(sv)) {
-		    itemsize = sv_len_utf8(sv);
-		    if (itemsize != (I32)len) {
-			I32 itembytes;
-			if (itemsize > fieldsize) {
-			    itemsize = fieldsize;
-			    itembytes = itemsize;
-			    sv_pos_u2b(sv, &itembytes, 0);
-			}
-			else
-			    itembytes = len;
-			send = chophere = s + itembytes;
-			while (s < send) {
-			    if (*s & ~31)
-				gotsome = TRUE;
-			    else if (*s == '\n')
-				break;
-			    s++;
-			}
-			item_is_utf8 = TRUE;
-			itemsize = s - item;
-			sv_pos_b2u(sv, &itemsize);
-			break;
-		    }
-		}
-		item_is_utf8 = FALSE;
-		if (itemsize > fieldsize)
-		    itemsize = fieldsize;
-		send = chophere = s + itemsize;
-		while (s < send) {
-		    if (*s & ~31)
-			gotsome = TRUE;
-		    else if (*s == '\n')
-			break;
-		    s++;
-		}
-		itemsize = s - item;
-		break;
-	    }
-
-	case FF_CHECKCHOP:
-	    {
-		const char *s = item = SvPV_const(sv, len);
-		itemsize = len;
-		if (DO_UTF8(sv)) {
-		    itemsize = sv_len_utf8(sv);
-		    if (itemsize != (I32)len) {
-			I32 itembytes;
-			if (itemsize <= fieldsize) {
-			    const char *send = chophere = s + itemsize;
-			    while (s < send) {
-				if (*s == '\r') {
-				    itemsize = s - item;
-				    chophere = s;
-				    break;
-				}
-				if (*s++ & ~31)
-				    gotsome = TRUE;
-			    }
-			}
-			else {
-			    const char *send;
-			    itemsize = fieldsize;
-			    itembytes = itemsize;
-			    sv_pos_u2b(sv, &itembytes, 0);
-			    send = chophere = s + itembytes;
-			    while (s < send || (s == send && isSPACE(*s))) {
-				if (isSPACE(*s)) {
-				    if (chopspace)
-					chophere = s;
-				    if (*s == '\r')
-					break;
-				}
-				else {
-				    if (*s & ~31)
-					gotsome = TRUE;
-				    if (strchr(PL_chopset, *s))
-					chophere = s + 1;
-				}
-				s++;
-			    }
-			    itemsize = chophere - item;
-			    sv_pos_b2u(sv, &itemsize);
-			}
-			item_is_utf8 = TRUE;
-			break;
-		    }
-		}
-		item_is_utf8 = FALSE;
-		if (itemsize <= fieldsize) {
-		    const char *const send = chophere = s + itemsize;
-		    while (s < send) {
-			if (*s == '\r') {
-			    itemsize = s - item;
-			    chophere = s;
-			    break;
-			}
-			if (*s++ & ~31)
-			    gotsome = TRUE;
-		    }
-		}
-		else {
-		    const char *send;
-		    itemsize = fieldsize;
-		    send = chophere = s + itemsize;
-		    while (s < send || (s == send && isSPACE(*s))) {
-			if (isSPACE(*s)) {
-			    if (chopspace)
-				chophere = s;
-			    if (*s == '\r')
-				break;
-			}
-			else {
-			    if (*s & ~31)
-				gotsome = TRUE;
-			    if (strchr(PL_chopset, *s))
-				chophere = s + 1;
-			}
-			s++;
-		    }
-		    itemsize = chophere - item;
-		}
-		break;
-	    }
-
-	case FF_SPACE:
-	    arg = fieldsize - itemsize;
-	    if (arg) {
-		fieldsize -= arg;
-		while (arg-- > 0)
-		    *t++ = ' ';
-	    }
-	    break;
-
-	case FF_HALFSPACE:
-	    arg = fieldsize - itemsize;
-	    if (arg) {
-		arg /= 2;
-		fieldsize -= arg;
-		while (arg-- > 0)
-		    *t++ = ' ';
-	    }
-	    break;
-
-	case FF_ITEM:
-	    {
-		const char *s = item;
-		arg = itemsize;
-		if (item_is_utf8) {
-		    if (!targ_is_utf8) {
-			SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-			*t = '\0';
-			sv_utf8_upgrade(PL_formtarget);
-			SvGROW(PL_formtarget, SvCUR(PL_formtarget) + fudge + 1);
-			t = SvEND(PL_formtarget);
-			targ_is_utf8 = TRUE;
-		    }
-		    while (arg--) {
-			if (UTF8_IS_CONTINUED(*s)) {
-			    STRLEN skip = UTF8SKIP(s);
-			    switch (skip) {
-			    default:
-				Move(s,t,skip,char);
-				s += skip;
-				t += skip;
-				break;
-			    case 7: *t++ = *s++;
-			    case 6: *t++ = *s++;
-			    case 5: *t++ = *s++;
-			    case 4: *t++ = *s++;
-			    case 3: *t++ = *s++;
-			    case 2: *t++ = *s++;
-			    case 1: *t++ = *s++;
-			    }
-			}
-			else {
-			    if ( !((*t++ = *s++) & ~31) )
-				t[-1] = ' ';
-			}
-		    }
-		    break;
-		}
-		if (targ_is_utf8 && !item_is_utf8) {
-		    SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		    *t = '\0';
-		    sv_catpvn_utf8_upgrade(PL_formtarget, s, arg, nsv);
-		    for (; t < SvEND(PL_formtarget); t++) {
-#ifdef EBCDIC
-			const int ch = *t;
-			if (iscntrl(ch))
-#else
-			    if (!(*t & ~31))
-#endif
-				*t = ' ';
-		    }
-		    break;
-		}
-		while (arg--) {
-#ifdef EBCDIC
-		    const int ch = *t++ = *s++;
-		    if (iscntrl(ch))
-#else
-			if ( !((*t++ = *s++) & ~31) )
-#endif
-			    t[-1] = ' ';
-		}
-		break;
-	    }
-
-	case FF_CHOP:
-	    {
-		const char *s = chophere;
-		if (chopspace) {
-		    while (isSPACE(*s))
-			s++;
-		}
-		sv_chop(sv,s);
-		SvSETMAGIC(sv);
-		break;
-	    }
-
-	case FF_LINESNGL:
-	    chopspace = 0;
-	    oneline = TRUE;
-	    goto ff_line;
-	case FF_LINEGLOB:
-	    oneline = FALSE;
-	ff_line:
-	    {
-		const char *s = item = SvPV_const(sv, len);
-		itemsize = len;
-		if ((item_is_utf8 = DO_UTF8(sv)))
-		    itemsize = sv_len_utf8(sv);
-		if (itemsize) {
-		    bool chopped = FALSE;
-		    const char *const send = s + len;
-		    gotsome = TRUE;
-		    chophere = s + itemsize;
-		    while (s < send) {
-			if (*s++ == '\n') {
-			    if (oneline) {
-				chopped = TRUE;
-				chophere = s;
-				break;
-			    } else {
-				if (s == send) {
-				    itemsize--;
-				    chopped = TRUE;
-				} else
-				    lines++;
-			    }
-			}
-		    }
-		    SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		    if (targ_is_utf8)
-			SvUTF8_on(PL_formtarget);
-		    if (oneline) {
-			SvCUR_set(sv, chophere - item);
-			sv_catsv(PL_formtarget, sv);
-			SvCUR_set(sv, itemsize);
-		    } else
-			sv_catsv(PL_formtarget, sv);
-		    if (chopped)
-			SvCUR_set(PL_formtarget, SvCUR(PL_formtarget) - 1);
-		    SvGROW(PL_formtarget, SvCUR(PL_formtarget) + fudge + 1);
-		    t = SvPVX(PL_formtarget) + SvCUR(PL_formtarget);
-		    if (item_is_utf8)
-			targ_is_utf8 = TRUE;
-		}
-		break;
-	    }
-
-	case FF_0DECIMAL:
-	    arg = *fpc++;
-#if defined(USE_LONG_DOUBLE)
-	    fmt = (const char *)
-		((arg & 256) ?
-		 "%#0*.*" PERL_PRIfldbl : "%0*.*" PERL_PRIfldbl);
-#else
-	    fmt = (const char *)
-		((arg & 256) ?
-		 "%#0*.*f"              : "%0*.*f");
-#endif
-	    goto ff_dec;
-	case FF_DECIMAL:
-	    arg = *fpc++;
-#if defined(USE_LONG_DOUBLE)
- 	    fmt = (const char *)
-		((arg & 256) ? "%#*.*" PERL_PRIfldbl : "%*.*" PERL_PRIfldbl);
-#else
-            fmt = (const char *)
-		((arg & 256) ? "%#*.*f"              : "%*.*f");
-#endif
-	ff_dec:
-	    /* If the field is marked with ^ and the value is undefined,
-	       blank it out. */
-	    if ((arg & 512) && !SvOK(sv)) {
-		arg = fieldsize;
-		while (arg--)
-		    *t++ = ' ';
-		break;
-	    }
-	    gotsome = TRUE;
-	    value = SvNV(sv);
-	    /* overflow evidence */
-	    if (num_overflow(value, fieldsize, arg)) {
-	        arg = fieldsize;
-		while (arg--)
-		    *t++ = '#';
-		break;
-	    }
-	    /* Formats aren't yet marked for locales, so assume "yes". */
-	    {
-		STORE_NUMERIC_STANDARD_SET_LOCAL();
-		my_snprintf(t, SvLEN(PL_formtarget) - (t - SvPVX(PL_formtarget)), fmt, (int) fieldsize, (int) arg & 255, value);
-		RESTORE_NUMERIC_STANDARD();
-	    }
-	    t += fieldsize;
-	    break;
-
-	case FF_NEWLINE:
-	    f++;
-	    while (t-- > linemark && *t == ' ') ;
-	    t++;
-	    *t++ = '\n';
-	    break;
-
-	case FF_BLANK:
-	    arg = *fpc++;
-	    if (gotsome) {
-		if (arg) {		/* repeat until fields exhausted? */
-		    *t = '\0';
-		    SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-		    lines += FmLINES(PL_formtarget);
-		    if (lines == 200) {
-			arg = t - linemark;
-			if (strnEQ(linemark, linemark - arg, arg))
-			    DIE(aTHX_ "Runaway format");
-		    }
-		    if (targ_is_utf8)
-			SvUTF8_on(PL_formtarget);
-		    FmLINES(PL_formtarget) = lines;
-		    SP = ORIGMARK;
-		    RETURNOP(cLISTOP->op_first);
-		}
-	    }
-	    else {
-		t = linemark;
-		lines--;
-	    }
-	    break;
-
-	case FF_MORE:
-	    {
-		const char *s = chophere;
-		const char *send = item + len;
-		if (chopspace) {
-		    while (isSPACE(*s) && (s < send))
-			s++;
-		}
-		if (s < send) {
-		    char *s1;
-		    arg = fieldsize - itemsize;
-		    if (arg) {
-			fieldsize -= arg;
-			while (arg-- > 0)
-			    *t++ = ' ';
-		    }
-		    s1 = t - 3;
-		    if (strnEQ(s1,"   ",3)) {
-			while (s1 > SvPVX_const(PL_formtarget) && isSPACE(s1[-1]))
-			    s1--;
-		    }
-		    *s1++ = '.';
-		    *s1++ = '.';
-		    *s1++ = '.';
-		}
-		break;
-	    }
-	case FF_END:
-	    *t = '\0';
-	    SvCUR_set(PL_formtarget, t - SvPVX_const(PL_formtarget));
-	    if (targ_is_utf8)
-		SvUTF8_on(PL_formtarget);
-	    FmLINES(PL_formtarget) += lines;
-	    SP = ORIGMARK;
-	    RETPUSHYES;
-	}
     }
 }
 
@@ -2737,6 +2203,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     I32 gimme = G_VOID;
     I32 optype;
     OP dummy;
+    OP *rop;
     char tbuf[TYPE_DIGITS(long) + 12 + 10];
     char *tmpbuf = tbuf;
     char *safestr;
@@ -2794,9 +2261,9 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PUSHEVAL(cx, 0, NULL);
 
     if (runtime)
-	(void) doeval(G_SCALAR, startop, runcv, PL_curcop->cop_seq);
+	rop = doeval(G_SCALAR, startop, runcv, PL_curcop->cop_seq);
     else
-	(void) doeval(G_SCALAR, startop, PL_compcv, PL_cop_seqmax);
+	rop = doeval(G_SCALAR, startop, PL_compcv, PL_cop_seqmax);
     POPBLOCK(cx,PL_curpm);
     POPEVAL(cx);
 
@@ -2814,7 +2281,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(optype);
 
-    return PL_eval_start;
+    return rop;
 }
 
 
@@ -2863,12 +2330,9 @@ Perl_find_runcv(pTHX_ U32 *db_seqp)
  * In the last case, startop is non-null, and contains the address of
  * a pointer that should be set to the just-compiled code.
  * outside is the lexically enclosing CV (if any) that invoked us.
- * Returns a bool indicating whether the compile was successful; if so,
- * PL_eval_start contains the first op of the compiled ocde; otherwise,
- * pushes undef (also croaks if startop != NULL).
  */
 
-STATIC bool
+STATIC OP *
 S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 {
     dVAR; dSP;
@@ -2921,7 +2385,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
     PL_eval_root = NULL;
     PL_curcop = &PL_compiling;
-    CopARYBASE_set(PL_curcop, 0);
     if (saveop && (saveop->op_type != OP_REQUIRE) && (saveop->op_flags & OPf_SPECIAL))
 	PL_in_eval |= EVAL_KEEPERR;
     else
@@ -2950,8 +2413,8 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    const SV * const nsv = cx->blk_eval.old_namesv;
 	    (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                           &PL_sv_undef, 0);
-	    Perl_croak(aTHX_ "%sCompilation failed in require",
-		       *msg ? msg : "Unknown error\n");
+	    DIE(aTHX_ "%sCompilation failed in require",
+		*msg ? msg : "Unknown error\n");
 	}
 	else if (startop) {
 	    POPBLOCK(cx,PL_curpm);
@@ -2965,9 +2428,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    }
 	}
 	PERL_UNUSED_VAR(newsp);
-	PUSHs(&PL_sv_undef);
-	PUTBACK;
-	return FALSE;
+	RETPUSHUNDEF;
     }
     CopLINE_set(&PL_compiling, 0);
     if (startop) {
@@ -3014,8 +2475,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     PL_op = saveop;			/* The caller may need it. */
     PL_parser->lex_state = LEX_NOTPARSING;	/* $^S needs this. */
 
-    PUTBACK;
-    return TRUE;
+    RETURNOP(PL_eval_start);
 }
 
 STATIC PerlIO *
@@ -3066,11 +2526,6 @@ PP(pp_require)
     SV *sv;
     const char *name;
     STRLEN len;
-    char * unixname;
-    STRLEN unixlen;
-#ifdef VMS
-    int vms_unixname = 0;
-#endif
     const char *tryname = NULL;
     SV *namesv = NULL;
     const I32 gimme = GIMME_V;
@@ -3120,31 +2575,8 @@ PP(pp_require)
     if (!(name && len > 0 && *name))
 	DIE(aTHX_ "Null filename used");
     TAINT_PROPER("require");
-
-
-#ifdef VMS
-    /* The key in the %ENV hash is in the syntax of file passed as the argument
-     * usually this is in UNIX format, but sometimes in VMS format, which
-     * can result in a module being pulled in more than once.
-     * To prevent this, the key must be stored in UNIX format if the VMS
-     * name can be translated to UNIX.
-     */
-    if ((unixname = tounixspec(name, NULL)) != NULL) {
-	unixlen = strlen(unixname);
-	vms_unixname = 1;
-    }
-    else
-#endif
-    {
-        /* if not VMS or VMS name can not be translated to UNIX, pass it
-	 * through.
-	 */
-	unixname = (char *) name;
-	unixlen = len;
-    }
     if (PL_op->op_type == OP_REQUIRE) {
-	SV * const * const svp = hv_fetch(GvHVn(PL_incgv),
-					  unixname, unixlen, 0);
+	SV * const * const svp = hv_fetch(GvHVn(PL_incgv), name, len, 0);
 	if ( svp ) {
 	    if (*svp != &PL_sv_undef)
 		RETPUSHYES;
@@ -3174,7 +2606,8 @@ PP(pp_require)
 	AV * const ar = GvAVn(PL_incgv);
 	I32 i;
 #ifdef VMS
-	if (vms_unixname)
+	char *unixname;
+	if ((unixname = tounixspec(name, NULL)) != NULL)
 #endif
 	{
 	    namesv = newSV(0);
@@ -3307,7 +2740,7 @@ PP(pp_require)
 			|| (*name == ':' && name[1] != ':' && strchr(name+2, ':'))
 #endif
 		  ) {
-		    const char *dir = SvOK(dirsv) ? SvPV_nolen_const(dirsv) : "";
+		    const char *dir = SvPV_nolen_const(dirsv);
 #ifdef MACOS_TRADITIONAL
 		    char buf1[256];
 		    char buf2[256];
@@ -3399,13 +2832,11 @@ PP(pp_require)
     /* name is never assigned to again, so len is still strlen(name)  */
     /* Check whether a hook in @INC has already filled %INC */
     if (!hook_sv) {
-	(void)hv_store(GvHVn(PL_incgv),
-		       unixname, unixlen, newSVpv(CopFILE(&PL_compiling),0),0);
+	(void)hv_store(GvHVn(PL_incgv), name, len, newSVpv(CopFILE(&PL_compiling),0),0);
     } else {
-	SV** const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
+	SV** const svp = hv_fetch(GvHVn(PL_incgv), name, len, 0);
 	if (!svp)
-	    (void)hv_store(GvHVn(PL_incgv),
-			   unixname, unixlen, SvREFCNT_inc_simple(hook_sv), 0 );
+	    (void)hv_store(GvHVn(PL_incgv), name, len, SvREFCNT_inc_simple(hook_sv), 0 );
     }
 
     ENTER;
@@ -3413,7 +2844,7 @@ PP(pp_require)
     lex_start(NULL, tryrsfp, TRUE);
 
     SAVEHINTS();
-    PL_hints = 0;
+    PL_hints = DEFAULT_HINTS;
     SAVECOMPILEWARNINGS();
     if (PL_dowarn & G_WARN_ALL_ON)
         PL_compiling.cop_warnings = pWARN_ALL ;
@@ -3425,9 +2856,6 @@ PP(pp_require)
     if (filter_sub || filter_cache) {
 	SV * const datasv = filter_add(S_run_user_filter, NULL);
 	IoLINES(datasv) = filter_has_file;
-	IoTOP_GV(datasv) = (GV *)filter_state;
-	IoBOTTOM_GV(datasv) = (GV *)filter_sub;
-	IoFMT_GV(datasv) = (GV *)filter_cache;
     }
 
     /* switch to eval mode */
@@ -3444,10 +2872,7 @@ PP(pp_require)
     encoding = PL_encoding;
     PL_encoding = NULL;
 
-    if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
-	op = DOCATCH(PL_eval_start);
-    else
-	op = PL_op->op_next;
+    op = DOCATCH(doeval(gimme, NULL, NULL, PL_curcop->cop_seq));
 
     /* Restore encoding. */
     PL_encoding = encoding;
@@ -3466,7 +2891,7 @@ PP(pp_entereval)
     char *tmpbuf = tbuf;
     char *safestr;
     STRLEN len;
-    bool ok;
+    OP *ret;
     CV* runcv;
     U32 seq;
     HV *saved_hh = NULL;
@@ -3539,13 +2964,13 @@ PP(pp_entereval)
     if (PERLDB_LINE && PL_curstash != PL_debstash)
 	save_lines(CopFILEAV(&PL_compiling), PL_parser->linestr);
     PUTBACK;
-    ok = doeval(gimme, NULL, runcv, seq);
+    ret = doeval(gimme, NULL, runcv, seq);
     if (PERLDB_INTER && was != (I32)PL_sub_generation /* Some subs defined here. */
-	&& ok) {
+	&& ret != PL_op->op_next) {	/* Successive compilation. */
 	/* Copy in anything fake and short. */
 	my_strlcpy(safestr, fakestr, fakelen);
     }
-    return ok ? DOCATCH(PL_eval_start) : PL_op->op_next;
+    return DOCATCH(ret);
 }
 
 PP(pp_leaveeval)
@@ -4286,224 +3711,6 @@ PP(pp_break)
 	return cx->blk_givwhen.leave_op;
 }
 
-STATIC OP *
-S_doparseform(pTHX_ SV *sv)
-{
-    STRLEN len;
-    register char *s = SvPV_force(sv, len);
-    register char * const send = s + len;
-    register char *base = NULL;
-    register I32 skipspaces = 0;
-    bool noblank   = FALSE;
-    bool repeat    = FALSE;
-    bool postspace = FALSE;
-    U32 *fops;
-    register U32 *fpc;
-    U32 *linepc = NULL;
-    register I32 arg;
-    bool ischop;
-    bool unchopnum = FALSE;
-    int maxops = 12; /* FF_LINEMARK + FF_END + 10 (\0 without preceding \n) */
-
-    if (len == 0)
-	Perl_croak(aTHX_ "Null picture in formline");
-
-    /* estimate the buffer size needed */
-    for (base = s; s <= send; s++) {
-	if (*s == '\n' || *s == '@' || *s == '^')
-	    maxops += 10;
-    }
-    s = base;
-    base = NULL;
-
-    Newx(fops, maxops, U32);
-    fpc = fops;
-
-    if (s < send) {
-	linepc = fpc;
-	*fpc++ = FF_LINEMARK;
-	noblank = repeat = FALSE;
-	base = s;
-    }
-
-    while (s <= send) {
-	switch (*s++) {
-	default:
-	    skipspaces = 0;
-	    continue;
-
-	case '~':
-	    if (*s == '~') {
-		repeat = TRUE;
-		*s = ' ';
-	    }
-	    noblank = TRUE;
-	    s[-1] = ' ';
-	    /* FALL THROUGH */
-	case ' ': case '\t':
-	    skipspaces++;
-	    continue;
-        case 0:
-	    if (s < send) {
-	        skipspaces = 0;
-                continue;
-            } /* else FALL THROUGH */
-	case '\n':
-	    arg = s - base;
-	    skipspaces++;
-	    arg -= skipspaces;
-	    if (arg) {
-		if (postspace)
-		    *fpc++ = FF_SPACE;
-		*fpc++ = FF_LITERAL;
-		*fpc++ = (U16)arg;
-	    }
-	    postspace = FALSE;
-	    if (s <= send)
-		skipspaces--;
-	    if (skipspaces) {
-		*fpc++ = FF_SKIP;
-		*fpc++ = (U16)skipspaces;
-	    }
-	    skipspaces = 0;
-	    if (s <= send)
-		*fpc++ = FF_NEWLINE;
-	    if (noblank) {
-		*fpc++ = FF_BLANK;
-		if (repeat)
-		    arg = fpc - linepc + 1;
-		else
-		    arg = 0;
-		*fpc++ = (U16)arg;
-	    }
-	    if (s < send) {
-		linepc = fpc;
-		*fpc++ = FF_LINEMARK;
-		noblank = repeat = FALSE;
-		base = s;
-	    }
-	    else
-		s++;
-	    continue;
-
-	case '@':
-	case '^':
-	    ischop = s[-1] == '^';
-
-	    if (postspace) {
-		*fpc++ = FF_SPACE;
-		postspace = FALSE;
-	    }
-	    arg = (s - base) - 1;
-	    if (arg) {
-		*fpc++ = FF_LITERAL;
-		*fpc++ = (U16)arg;
-	    }
-
-	    base = s - 1;
-	    *fpc++ = FF_FETCH;
-	    if (*s == '*') {
-		s++;
-		*fpc++ = 2;  /* skip the @* or ^* */
-		if (ischop) {
-		    *fpc++ = FF_LINESNGL;
-		    *fpc++ = FF_CHOP;
-		} else
-		    *fpc++ = FF_LINEGLOB;
-	    }
-	    else if (*s == '#' || (*s == '.' && s[1] == '#')) {
-		arg = ischop ? 512 : 0;
-		base = s - 1;
-		while (*s == '#')
-		    s++;
-		if (*s == '.') {
-                    const char * const f = ++s;
-		    while (*s == '#')
-			s++;
-		    arg |= 256 + (s - f);
-		}
-		*fpc++ = s - base;		/* fieldsize for FETCH */
-		*fpc++ = FF_DECIMAL;
-                *fpc++ = (U16)arg;
-                unchopnum |= ! ischop;
-            }
-            else if (*s == '0' && s[1] == '#') {  /* Zero padded decimals */
-                arg = ischop ? 512 : 0;
-		base = s - 1;
-                s++;                                /* skip the '0' first */
-                while (*s == '#')
-                    s++;
-                if (*s == '.') {
-                    const char * const f = ++s;
-                    while (*s == '#')
-                        s++;
-                    arg |= 256 + (s - f);
-                }
-                *fpc++ = s - base;                /* fieldsize for FETCH */
-                *fpc++ = FF_0DECIMAL;
-		*fpc++ = (U16)arg;
-                unchopnum |= ! ischop;
-	    }
-	    else {
-		I32 prespace = 0;
-		bool ismore = FALSE;
-
-		if (*s == '>') {
-		    while (*++s == '>') ;
-		    prespace = FF_SPACE;
-		}
-		else if (*s == '|') {
-		    while (*++s == '|') ;
-		    prespace = FF_HALFSPACE;
-		    postspace = TRUE;
-		}
-		else {
-		    if (*s == '<')
-			while (*++s == '<') ;
-		    postspace = TRUE;
-		}
-		if (*s == '.' && s[1] == '.' && s[2] == '.') {
-		    s += 3;
-		    ismore = TRUE;
-		}
-		*fpc++ = s - base;		/* fieldsize for FETCH */
-
-		*fpc++ = ischop ? FF_CHECKCHOP : FF_CHECKNL;
-
-		if (prespace)
-		    *fpc++ = (U16)prespace;
-		*fpc++ = FF_ITEM;
-		if (ismore)
-		    *fpc++ = FF_MORE;
-		if (ischop)
-		    *fpc++ = FF_CHOP;
-	    }
-	    base = s;
-	    skipspaces = 0;
-	    continue;
-	}
-    }
-    *fpc++ = FF_END;
-
-    assert (fpc <= fops + maxops); /* ensure our buffer estimate was valid */
-    arg = fpc - fops;
-    { /* need to jump to the next word */
-        int z;
-	z = WORD_ALIGN - SvCUR(sv) % WORD_ALIGN;
-	SvGROW(sv, SvCUR(sv) + z + arg * sizeof(U32) + 4);
-	s = SvPVX(sv) + SvCUR(sv) + z;
-    }
-    Copy(fops, s, arg, U32);
-    Safefree(fops);
-    sv_magic(sv, NULL, PERL_MAGIC_fm, NULL, 0);
-    SvCOMPILED_on(sv);
-
-    if (unchopnum && repeat)
-        DIE(aTHX_ "Repeated format line will never terminate (~~ and @#)");
-    return 0;
-}
-
-
 STATIC bool
 S_num_overflow(NV value, I32 fldsize, I32 frcsize)
 {
@@ -4537,8 +3744,8 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
     dVAR;
     SV * const datasv = FILTER_DATA(idx);
     const int filter_has_file = IoLINES(datasv);
-    SV * const filter_state = (SV *)IoTOP_GV(datasv);
-    SV * const filter_sub = (SV *)IoBOTTOM_GV(datasv);
+    SV * const filter_state = NULL; /* (SV *)IoTOP_GV(datasv); */
+    SV * const filter_sub = NULL; /* (SV *)IoBOTTOM_GV(datasv); */
     int status = 0;
     SV *upstream;
     STRLEN got_len;
@@ -4555,8 +3762,8 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
        for PL_parser->error_count == 0.)  Solaris doesn't segfault --
        not sure where the trouble is yet.  XXX */
 
-    if (IoFMT_GV(datasv)) {
-	SV *const cache = (SV *)IoFMT_GV(datasv);
+    if (NULL) { /* IoFMT_GV(datasv)) { */
+	SV *const cache = NULL; /* (SV *)IoFMT_GV(datasv); */
 	if (SvOK(cache)) {
 	    STRLEN cache_len;
 	    const char *cache_p = SvPV(cache, cache_len);
@@ -4652,59 +3859,56 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	    }
 	}
     }
-    if (prune_from) {
-	/* Oh. Too long. Stuff some in our cache.  */
-	STRLEN cached_len = got_p + got_len - prune_from;
-	SV *cache = (SV *)IoFMT_GV(datasv);
+/*     if (prune_from) { */
+/* 	/\* Oh. Too long. Stuff some in our cache.  *\/ */
+/* 	STRLEN cached_len = got_p + got_len - prune_from; */
+/* 	SV *cache = NULL; /\* (SV *)IoFMT_GV(datasv); *\/ */
 
-	if (!cache) {
-	    IoFMT_GV(datasv) = (GV*) (cache = newSV(got_len - umaxlen));
-	} else if (SvOK(cache)) {
-	    /* Cache should be empty.  */
-	    assert(!SvCUR(cache));
-	}
+/* 	if (!cache) { */
+/* 	    IoFMT_GV(datasv) = (GV*) (cache = newSV(got_len - umaxlen)); */
+/* 	} else if (SvOK(cache)) { */
+/* 	    /\* Cache should be empty.  *\/ */
+/* 	    assert(!SvCUR(cache)); */
+/* 	} */
 
-	sv_setpvn(cache, prune_from, cached_len);
-	/* If you ask for block mode, you may well split UTF-8 characters.
-	   "If it breaks, you get to keep both parts"
-	   (Your code is broken if you  don't put them back together again
-	   before something notices.) */
-	if (SvUTF8(upstream)) {
-	    SvUTF8_on(cache);
-	}
-	SvCUR_set(upstream, got_len - cached_len);
-	/* Can't yet be EOF  */
-	if (status == 0)
-	    status = 1;
-    }
+/* 	sv_setpvn(cache, prune_from, cached_len); */
+/* 	/\* If you ask for block mode, you may well split UTF-8 characters. */
+/* 	   "If it breaks, you get to keep both parts" */
+/* 	   (Your code is broken if you  don't put them back together again */
+/* 	   before something notices.) *\/ */
+/* 	SvCUR_set(upstream, got_len - cached_len); */
+/* 	/\* Can't yet be EOF  *\/ */
+/* 	if (status == 0) */
+/* 	    status = 1; */
+/*     } */
 
-    /* If they are at EOF but buf_sv has something in it, then they may never
-       have touched the SV upstream, so it may be undefined.  If we naively
-       concatenate it then we get a warning about use of uninitialised value.
-    */
-    if (upstream != buf_sv && (SvOK(upstream) || SvGMAGICAL(upstream))) {
-	sv_catsv(buf_sv, upstream);
-    }
+/*     /\* If they are at EOF but buf_sv has something in it, then they may never */
+/*        have touched the SV upstream, so it may be undefined.  If we naively */
+/*        concatenate it then we get a warning about use of uninitialised value. */
+/*     *\/ */
+/*     if (upstream != buf_sv && (SvOK(upstream) || SvGMAGICAL(upstream))) { */
+/* 	sv_catsv(buf_sv, upstream); */
+/*     } */
 
-    if (status <= 0) {
-	IoLINES(datasv) = 0;
-	SvREFCNT_dec(IoFMT_GV(datasv));
-	if (filter_state) {
-	    SvREFCNT_dec(filter_state);
-	    IoTOP_GV(datasv) = NULL;
-	}
-	if (filter_sub) {
-	    SvREFCNT_dec(filter_sub);
-	    IoBOTTOM_GV(datasv) = NULL;
-	}
-	filter_del(S_run_user_filter);
-    }
-    if (status == 0 && read_from_cache) {
-	/* If we read some data from the cache (and by getting here it implies
-	   that we emptied the cache) then we aren't yet at EOF, and mustn't
-	   report that to our caller.  */
-	return 1;
-    }
+/*     if (status <= 0) { */
+/* 	IoLINES(datasv) = 0; */
+/* 	SvREFCNT_dec(IoFMT_GV(datasv)); */
+/* 	if (filter_state) { */
+/* 	    SvREFCNT_dec(filter_state); */
+/* 	    IoTOP_GV(datasv) = NULL; */
+/* 	} */
+/* 	if (filter_sub) { */
+/* 	    SvREFCNT_dec(filter_sub); */
+/* 	    IoBOTTOM_GV(datasv) = NULL; */
+/* 	} */
+/* 	filter_del(S_run_user_filter); */
+/*     } */
+/*     if (status == 0 && read_from_cache) { */
+/* 	/\* If we read some data from the cache (and by getting here it implies */
+/* 	   that we emptied the cache) then we aren't yet at EOF, and mustn't */
+/* 	   report that to our caller.  *\/ */
+/* 	return 1; */
+/*     } */
     return status;
 }
 

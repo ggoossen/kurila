@@ -634,7 +634,7 @@ miniperl: $& miniperlmain$(OBJ_EXT) $(obj) opmini$(OBJ_EXT)
 	$(CC) -o miniperl $(CLDFLAGS) \
 	    `echo $(obj) | sed 's/ op$(OBJ_EXT) / /'` \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e '<?>' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	next4*)
@@ -642,7 +642,7 @@ miniperl: $& miniperlmain$(OBJ_EXT) $(obj) opmini$(OBJ_EXT)
 miniperl: $& miniperlmain$(OBJ_EXT) $(obj) opmini$(OBJ_EXT)
 	$(CC) -o miniperl `echo $(obj) | sed 's/ op$(OBJ_EXT) / /'` \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e '<?>' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	darwin*)
@@ -664,7 +664,7 @@ miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(obj) opmini$(OBJ_EXT)
 	$(CC) $(CLDFLAGS) $(NAMESPACEFLAGS) -o miniperl \
 	    `echo $(obj) | sed 's/ op$(OBJ_EXT) / /'` \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e '<?>' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	*)
@@ -674,7 +674,7 @@ miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(obj) opmini$(OBJ_EXT)
 	$(LDLIBPTH) $(CC) $(CLDFLAGS) -o miniperl \
 	    `echo $(obj) | sed 's/ op$(OBJ_EXT) / /'` \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) $(libs)
-	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e '<?>' || $(MAKE) minitest
+	$(LDLIBPTH) $(RUN) ./miniperl -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
 !NO!SUBS!
 		;;
 	esac
@@ -798,29 +798,6 @@ suidperl$(EXE_EXT): $& sperl$(OBJ_EXT) perlmain$(OBJ_EXT) $(LIBPERL) $(static_ex
 
 fi
 
-# Some environment have no system(), which mkpport uses.
-# Let's try running the commands with shell.
-case "${osname}" in
-catamount)
-$spitshell >>Makefile <<!GROK!THIS!
-.PHONY: makeppport
-makeppport: miniperl\$(EXE_EXT) \$(CONFIGPM)
-	-@for f in Makefile.PL PPPort_pm.PL PPPort_xs.PL ppport_h.PL; do \
-	(cd ext/Devel/PPPort && `pwd`/run.sh ../../../miniperl -I../../../lib \$\$f); \
-	done
-
-!GROK!THIS!
-;;
-*)
-$spitshell >>Makefile <<'!NO!SUBS!'
-.PHONY: makeppport
-makeppport: miniperl$(EXE_EXT) $(CONFIGPM)
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib mkppport
-
-!NO!SUBS!
-;;
-esac
-
 $spitshell >>Makefile <<'!NO!SUBS!'
 
 sperl$(OBJ_EXT): perl.c $(h)
@@ -842,6 +819,10 @@ preplibrary: miniperl$(EXE_EXT) $(CONFIGPM) lib/lib.pm $(PREPLIBRARY_LIBPERL)
 	$(LDLIBPTH) $(RUN) ./miniperl -Ilib -e 'use AutoSplit; \
 		autosplit_lib_modules(@ARGV)' lib/*/*.pm
 	$(MAKE) lib/re.pm
+
+.PHONY: makeppport
+makeppport: miniperl$(EXE_EXT) $(CONFIGPM)
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib mkppport
 
 lib/Config.pod: config.sh miniperl$(EXE_EXT) configpm Porting/Glossary
 	$(LDLIBPTH) $(RUN) ./miniperl -Ilib configpm
@@ -886,13 +867,13 @@ extra.pods: miniperl$(EXE_EXT)
 	-@test -f pod/perl595delta.pod && cd pod && $(LNS) perl595delta.pod perldelta.pod && cd .. && echo "pod/perldelta.pod" >> extra.pods # See buildtoc
 
 extras.make: perl$(EXE_EXT)
-	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&make(@ARGV)' `cat extras.lst`
+	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) ./perl -Ilib -MCPAN -e '@ARGV&&make(@ARGV)' `cat extras.lst`
 
 extras.test: perl$(EXE_EXT)
-	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&test(@ARGV)' `cat extras.lst`
+	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) ./perl -Ilib -MCPAN -e '@ARGV&&test(@ARGV)' `cat extras.lst`
 
 extras.install: perl$(EXE_EXT)
-	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib -MCPAN -e '@ARGV&&install(@ARGV)' `cat extras.lst`
+	-@test ! -s extras.lst || PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) ./perl -Ilib -MCPAN -e '@ARGV&&install(@ARGV)' `cat extras.lst`
 
 .PHONY: install install-strip install-all install-verbose install-silent \
 	no-install install.perl install.man install.html
@@ -919,17 +900,17 @@ no-install:
 INSTALL_DEPENDENCE = all
 
 install.perl:	$(INSTALL_DEPENDENCE) installperl
-	$(LDLIBPTH) $(RUN) ./perl installperl --destdir=$(DESTDIR) $(INSTALLFLAGS) $(STRIPFLAGS)
+	$(LDLIBPTH) ./perl installperl --destdir=$(DESTDIR) $(INSTALLFLAGS) $(STRIPFLAGS)
 	-@test ! -s extras.lst || $(MAKE) extras.install
 
 install.man:	all installman
-	$(LDLIBPTH) $(RUN) ./perl installman --destdir=$(DESTDIR) $(INSTALLFLAGS)
+	$(LDLIBPTH) ./perl installman --destdir=$(DESTDIR) $(INSTALLFLAGS)
 
 # XXX Experimental. Hardwired values, but useful for testing.
 # Eventually Configure could ask for some of these values.
 install.html: all installhtml
 	-@test -f README.vms && cd vms && $(LNS) ../README.vms README_vms.pod && cd ..
-	$(LDLIBPTH) $(RUN) ./perl installhtml   \
+	$(LDLIBPTH) ./perl installhtml   \
       --podroot=. --podpath=. --recurse  \
       --htmldir=$(privlib)/html   \
       --htmlroot=$(privlib)/html  \
@@ -1043,7 +1024,7 @@ $spitshell >>Makefile <<'!NO!SUBS!'
 
 .PHONY: printconfig
 printconfig:
-	@eval `$(LDLIBPTH) $(RUN) ./perl -Ilib -V:$(CONFIGVAR)`; echo $$$(CONFIGVAR)
+	@eval `$(LDLIBPTH) ./perl -Ilib -V:$(CONFIGVAR)`; echo $$$(CONFIGVAR)
 
 .PHONY: clean _tidy _mopup _cleaner1 _cleaner2 \
 	realclean _realcleaner clobber _clobber \
@@ -1064,7 +1045,7 @@ clobber:	cleanup_unpacked_files _realcleaner _mopup _clobber
 distclean:	clobber
 
 # Like distclean but also removes emacs backups and *.orig.
-veryclean:	cleanup_unpacked_files _verycleaner _mopup _clobber
+veryclean:	_verycleaner _mopup _clobber
 	-@rm -f Obsolete Wanted
 
 # Do not 'make _mopup' directly.
@@ -1117,7 +1098,7 @@ _cleaner2:
 	rm -f lib/.exists lib/*/.exists lib/*/*/.exists
 	rm -f h2ph.man pstruct
 	rm -rf .config
-	rm -f preload lib/re.pm
+	rm -f preload
 	rm -rf lib/Encode lib/Compress lib/Hash lib/re
 	rm -rf lib/IO/Compress lib/IO/Uncompress
 	rm -f lib/ExtUtils/ParseXS/t/XSTest.c
@@ -1127,11 +1108,6 @@ _cleaner2:
 	-rmdir lib/Filter/Util lib/IO/Socket
 	-rmdir lib/List lib/MIME lib/Scalar lib/Sys
 	-rmdir lib/threads lib/XS
-	-rmdir lib/CPANPLUS/Dist/Build/t/dummy-*
-	-rmdir lib/CPANPLUS/t/dummy-cpanplus lib/CPANPLUS/t/dummy-localmirror
-	-rm -f cygcrypt-0.dll cygwin1.dll
-	-rm -f lib/ExtUtils/CBuilder/t/libcompilet.dll.a
-	-rm -f lib/ExtUtils/ParseXS/t/libXSTest.dll.a
 
 _realcleaner:
 	@$(LDLIBPTH) $(MAKE) _cleaner1 CLEAN=realclean
@@ -1198,10 +1174,10 @@ test_prep: test_prep_pre miniperl$(EXE_EXT) $(unidatafiles) perl$(EXE_EXT) $(dyn
 	PERL=./perl $(MAKE) _test_prep
 
 _test_tty:
-	cd t && $(PERL_DEBUG) $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS) $(TEST_FILES) </dev/tty
+	cd t && $(PERL_DEBUG) $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS) </dev/tty
 
 _test_notty:
-	cd t && $(PERL_DEBUG) PERL_SKIP_TTY_TEST=1 $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS) $(TEST_FILES)
+	cd t && $(PERL_DEBUG) PERL_SKIP_TTY_TEST=1 $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS)
 
 unpack_files:
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib uupacktool.pl -u -m
@@ -1249,7 +1225,7 @@ test.torture torturetest:	test_prep
 
 minitest.utf16: minitest.prep
 	- cd t && (rm -f perl$(EXE_EXT); $(LNS) ../miniperl$(EXE_EXT) perl$(EXE_EXT)) \
-		&& $(LDLIBPTH) $(RUN) ./perl TEST -minitest -utf16 base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
+		&& $(LDLIBPTH) ./perl TEST -minitest -utf16 base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
 
 test.utf16 check.utf16: test_prep
 	PERL=./perl $(MAKE) TEST_ARGS=-utf16 _test
@@ -1310,7 +1286,7 @@ minitest.prep:
 # is crashing.
 minitest: miniperl$(EXE_EXT) lib/re.pm minitest.prep
 	- cd t && (rm -f perl$(EXE_EXT); $(LNS) ../miniperl$(EXE_EXT) perl$(EXE_EXT)) \
-		&& $(LDLIBPTH) $(RUN) ./perl TEST -minitest base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
+		&& $(LDLIBPTH) ./perl TEST -minitest base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
 
 # Test via harness
 
@@ -1328,28 +1304,28 @@ test_harness_notty: test_prep
 .PHONY: ok okfile oknack okfilenack nok nokfile noknack nokfilenack
 
 ok:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)'
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)'
 
 okfile:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)' -F perl.ok
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)' -F perl.ok
 
 oknack:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)' -A
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)' -A
 
 okfilenack:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)' -F perl.ok -A
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -ok -s '(UNINSTALLED)' -F perl.ok -A
 
 nok:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)'
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)'
 
 nokfile:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)' -F perl.nok
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)' -F perl.nok
 
 noknack:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)' -A
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)' -A
 
 nokfilenack:	utilities
-	$(LDLIBPTH) $(RUN) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)' -F perl.nok -A
+	$(LDLIBPTH) ./perl -Ilib utils/perlbug -nok -s '(UNINSTALLED)' -F perl.nok -A
 
 .PHONY: clist hlist shlist pllist
 

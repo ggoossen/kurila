@@ -108,7 +108,7 @@ sub import {
         my $caller = caller();
         {
             no strict 'refs';
-            *{"${caller}::_get_locale_encoding"} = \&_get_locale_encoding;
+            *{Symbol::qualify_to_ref("${caller}::_get_locale_encoding")} = \&_get_locale_encoding;
         }
         return;
     }
@@ -149,42 +149,12 @@ sub import {
         $@ eq '' and DEBUG and warn "Filter installed";
     }
     defined ${^UNICODE} and ${^UNICODE} != 0 and return 1;
-    for my $h (qw(STDIN STDOUT)) {
-        if ( $arg{$h} ) {
-            unless ( defined find_encoding( $arg{$h} ) ) {
-                require Carp;
-                Carp::croak(
-                    "encoding: Unknown encoding for $h, '$arg{$h}'");
-            }
-            eval { binmode( $h, ":raw :encoding($arg{$h})" ) };
-        }
-        else {
-            unless ( exists $arg{$h} ) {
-                eval {
-                    no warnings 'uninitialized';
-                    binmode( $h, ":raw :encoding($name)" );
-                };
-            }
-        }
-        if ($@) {
-            require Carp;
-            Carp::croak($@);
-        }
-    }
     return 1;    # I doubt if we need it, though
 }
 
 sub unimport {
     no warnings;
     undef ${^ENCODING};
-    if ($HAS_PERLIO) {
-        binmode( STDIN,  ":raw" );
-        binmode( STDOUT, ":raw" );
-    }
-    else {
-        binmode(STDIN);
-        binmode(STDOUT);
-    }
     if ( $INC{"Filter/Util/Call.pm"} ) {
         eval { filter_del() };
     }
@@ -212,7 +182,7 @@ encoding - allows you to write your script in non-ascii or non-utf8
   # more control
 
   # A simple euc-cn => utf-8 converter
-  use encoding "euc-cn", STDOUT => "utf8";  while(<>){print};
+  use encoding "euc-cn";  while(<>){print};
 
   # "no encoding;" supported (but not scoped!)
   no encoding;
@@ -251,13 +221,6 @@ Internally converts all literals (C<q//,qq//,qr//,qw///, qx//>) from
 the encoding specified to utf8.  In Perl 5.8.1 and later, literals in
 C<tr///> and C<DATA> pseudo-filehandle are also converted.
 
-=item *
-
-Changing PerlIO layers of C<STDIN> and C<STDOUT> to the encoding
- specified.
-
-=back
-
 =head2 Literal Conversions
 
 You can write code in EUC-JP as follows:
@@ -271,22 +234,6 @@ the code in UTF-8:
 
   my $Rakuda = "\x{99F1}\x{99DD}"; # two Unicode Characters
   s/\bCamel\b/$Rakuda/;
-
-=head2 PerlIO layers for C<STD(IN|OUT)>
-
-The B<encoding> pragma also modifies the filehandle layers of
-STDIN and STDOUT to the specified encoding.  Therefore,
-
-  use encoding "euc-jp";
-  my $message = "Camel is the symbol of perl.\n";
-  my $Rakuda = "\xF1\xD1\xF1\xCC"; # Camel in Kanji
-  $message =~ s/\bCamel\b/$Rakuda/;
-  print $message;
-
-Will print "\xF1\xD1\xF1\xCC is the symbol of perl.\n",
-not "\x{99F1}\x{99DD} is the symbol of perl.\n".
-
-You can override this by giving extra arguments; see below.
 
 =head2 Implicit upgrading for byte strings
 
@@ -601,33 +548,6 @@ The encoding pragma is not supported on EBCDIC platforms.
 (Porters who are willing and able to remove this limitation are
 welcome.)
 
-=item format
-
-This pragma doesn't work well with format because PerlIO does not
-get along very well with it.  When format contains non-ascii
-characters it prints funny or gets "wide character warnings".
-To understand it, try the code below.
-
-  # Save this one in utf8
-  # replace *non-ascii* with a non-ascii string
-  my $camel;
-  format STDOUT =
-  *non-ascii*@>>>>>>>
-  $camel
-  .
-  $camel = "*non-ascii*";
-  binmode(STDOUT=>':encoding(utf8)'); # bang!
-  write;              # funny 
-  print $camel, "\n"; # fine
-
-Without binmode this happens to work but without binmode, print()
-fails instead of write().
-
-At any rate, the very use of format is questionable when it comes to
-unicode characters since you have to consider such things as character
-width (i.e. double-width for ideographs) and directions (i.e. BIDI for
-Arabic and Hebrew).
-
 =back
 
 =head2 The Logic of :locale
@@ -663,6 +583,9 @@ the default encoding of your STDIN, STDOUT, and STDERR, and of
 B<any subsequent file open>, is UTF-8.
 
 =head1 HISTORY
+
+Perl 5.8.x also sets the STDIN and STDOUT to the specified encoding,
+Perl Kurila does not modifiy the STDIN and STDOUT.
 
 This pragma first appeared in Perl 5.8.0.  For features that require 
 5.8.1 and better, see above.

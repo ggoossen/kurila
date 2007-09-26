@@ -4,9 +4,10 @@ require 5;
 # Time-stamp: "2004-05-07 15:31:25 ADT"
 package Pod::Escapes;
 require Exporter;
-@ISA = ('Exporter');
-$VERSION = '1.04';
-@EXPORT_OK = qw(
+use strict;
+our @ISA = ('Exporter');
+our $VERSION = '1.04';
+our @EXPORT_OK = qw(
   %Code2USASCII
   %Name2character
   %Name2character_number
@@ -15,11 +16,10 @@ $VERSION = '1.04';
   e2char
   e2charnum
 );
-%EXPORT_TAGS = ('ALL' => \@EXPORT_OK);
+our %EXPORT_TAGS = ('ALL' => \@EXPORT_OK);
 
 #==========================================================================
 
-use strict;
 use vars qw(
   %Code2USASCII
   %Name2character
@@ -30,6 +30,8 @@ use vars qw(
   $FAR_CHAR_NUMBER
   $NOT_ASCII
 );
+
+use utf8;
 
 $FAR_CHAR = "?" unless defined $FAR_CHAR;
 $FAR_CHAR_NUMBER = ord($FAR_CHAR) unless defined $FAR_CHAR_NUMBER;

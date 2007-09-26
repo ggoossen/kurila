@@ -26,20 +26,20 @@ plan tests => 26, ($^O eq 'MSWin32' ? (todo => [18]) :
 ok 1;
 
 # Start a tcp listen server on ephemeral port
-my $sock1 = new IO::Socket::INET
+my $sock1 = IO::Socket::INET->new(
   LocalAddr => "127.0.0.1",
   Proto => "tcp",
-  Listen => 8,
+  Listen => 8,)
   or warn "bind: $!";
 
 # Make sure it worked.
 ok !!$sock1;
 
 # Start listening on another ephemeral port
-my $sock2 = new IO::Socket::INET
+my $sock2 = IO::Socket::INET->new(
   LocalAddr => "127.0.0.1",
   Proto => "tcp",
-  Listen => 8,
+  Listen => 8,)
   or warn "bind: $!";
 
 # Make sure it worked too.
@@ -63,7 +63,7 @@ $sock2->close;
 #####
 # First, we test using the "tcp" protocol.
 # (2 seconds should be long enough to connect to loopback.)
-my $p = new Net::Ping "tcp", 2;
+my $p = Net::Ping->new( "tcp", 2);
 
 # new() worked?
 ok !!$p;
@@ -104,7 +104,7 @@ ok !$p -> ping("127.0.0.1");
 
 #####
 # Lastly, we test using the "syn" protocol.
-$p = new Net::Ping "syn", 2;
+$p = Net::Ping->new( "syn", 2);
 
 # new() worked?
 ok !!$p;
@@ -125,7 +125,7 @@ ok !$p -> ack();
 
 ###
 # Get a fresh object
-$p = new Net::Ping "syn", 2;
+$p = Net::Ping->new( "syn", 2);
 
 # new() worked?
 ok !!$p;
@@ -147,7 +147,7 @@ ok !$p -> ack();
 
 ###
 # Get a fresh object
-$p = new Net::Ping "syn", 2;
+$p = Net::Ping->new( "syn", 2);
 
 # new() worked?
 ok !!$p;
@@ -169,7 +169,7 @@ ok !$p -> ack();
 
 ###
 # Get a fresh object
-$p = new Net::Ping "syn", 2;
+$p = Net::Ping->new( "syn", 2);
 
 # new() worked?
 ok !!$p;

@@ -1,14 +1,9 @@
 #!./perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-BEGIN {
     use Config;
 
-    require "test.pl";
+    require "./test.pl";
 
     if( !$Config{d_crypt} ) {
         skip_all("crypt unimplemented");
@@ -33,10 +28,12 @@ SKIP: {
 	ok(substr(crypt("ab", "cd"), 2) ne substr(crypt("ab", "ce"), 2), "salt makes a difference");
 }
 
+use utf8;
+
 $a = "a\xFF\x{100}";
 
 eval {$b = crypt($a, "cd")};
-like($@, qr/Wide character in crypt/, "wide characters ungood");
+is($@, '',   "treat all strings as byte-strings");
 
 chop $a; # throw away the wide character
 

@@ -2,8 +2,6 @@
 # Now they'll be wanting biff! and zap! tests too.
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 

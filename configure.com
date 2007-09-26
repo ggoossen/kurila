@@ -52,6 +52,7 @@ $ use64bitint = "n"
 $ uselongdouble = "n"
 $ uselargefiles = "n"
 $ usestdstat = "n"
+$ usedecterm = "n"
 $ usesitecustomize = "n"
 $ C_Compiler_Replace = "CC="
 $ thread_upcalls = "MTU="
@@ -906,7 +907,7 @@ $   config_symbols1 ="|installprivlib|installscript|installsitearch|installsitel
 $   config_symbols2 ="|prefix|privlib|privlibexp|scriptdir|sitearch|sitearchexp|sitebin|sitelib|sitelib_stem|sitelibexp|try_cxx|use64bitall|use64bitint|"
 $   config_symbols3 ="|usecasesensitive|usedefaulttypes|usedevel|useieee|useithreads|uselongdouble|usemultiplicity|usemymalloc|usedebugging_perl|"
 $   config_symbols4 ="|useperlio|usesecurelog|usethreads|usevmsdebug|usefaststdio|usemallocwrap|unlink_all_versions|uselargefiles|usesitecustomize|"
-$   config_symbols5 ="|buildmake|builder|usethreadupcalls|usekernelthread"
+$   config_symbols5 ="|buildmake|builder|usethreadupcalls|usekernelthreads|usedecterm"
 $!  
 $   open/read CONFIG 'config_sh'
 $   rd_conf_loop:
@@ -1369,20 +1370,6 @@ $   THEN
 $     line = F$EDIT(line,"COMPRESS, TRIM")
 $     perl_patchlevel = F$ELEMENT(1,"""",line)
 $     perl_patchlevel = perl_patchlevel - "DEVEL"
-$     got_perl_patchlevel = "true"
-$   ENDIF
-$   IF ((F$LOCATE("""SMOKE",line).NE.F$LENGTH(line)).AND.(.NOT.got_perl_patchlevel))
-$   THEN
-$     line = F$EDIT(line,"COMPRESS, TRIM")
-$     perl_patchlevel = F$ELEMENT(1,"""",line)
-$     perl_patchlevel = perl_patchlevel - "SMOKE"
-$     got_perl_patchlevel = "true"
-$   ENDIF
-$   IF ((F$LOCATE("""MAINT",line).NE.F$LENGTH(line)).AND.(.NOT.got_perl_patchlevel))
-$   THEN
-$     line = F$EDIT(line,"COMPRESS, TRIM")
-$     perl_patchlevel = F$ELEMENT(1,"""",line)
-$     perl_patchlevel = perl_patchlevel - "MAINT"
 $     got_perl_patchlevel = "true"
 $   ENDIF
 $   IF (.NOT. got_patch) .OR. -
@@ -2585,6 +2572,44 @@ $ ELSE
 $     d_unlink_all_versions = "undef"
 $ ENDIF
 $!
+$! To avoid 'SYSTEM-F-PROTINSTALL, protected images must be installed'
+$! at run time, we must check that the DECterm image is both present
+$! and installed as a known image.
+$!
+$ decterm_capable = "FALSE"
+$ dflt = "SYS$SHARE:DECW$TERMINALSHR12.EXE"
+$ IF F$SEARCH(dflt) .NES. "" 
+$ THEN 
+$    decterm_capable = F$FILE_ATTRIBUTES(dflt, "KNOWN")
+$ ELSE
+$     dflt = "SYS$SHARE:DECW$TERMINALSHR.EXE"
+$     IF F$SEARCH(dflt) .NES. "" THEN decterm_capable = F$FILE_ATTRIBUTES(dflt, "KNOWN")
+$ ENDIF
+$!
+$ IF F$TYPE(usedecterm) .NES. ""
+$ THEN
+$       if usedecterm .or. usedecterm .eqs. "define"
+$       then
+$         bool_dflt="y"
+$       else
+$         bool_dflt="n"
+$       endif
+$ ELSE
+$       bool_dflt="n"
+$ ENDIF
+$ IF .NOT. use_debugging_perl THEN bool_dflt = "n"
+$ echo ""
+$ echo "Perl can be built to support DECterms from the Perl debugger"
+$ echo ""
+$ echo "If this does not make any sense to you, just accept the default '" + bool_dflt + "'."
+$ rp = "Build with DECterm Perl debugger support, if available? [''bool_dflt'] "
+$ GOSUB myread
+$ usedecterm=ans
+$ IF (usedecterm .OR. usedecterm .EQS. "define") .AND. .NOT. decterm_capable
+$ THEN
+$     echo4 "No installed DECterm image found, disabling..."
+$     usedecterm = "n"
+$ ENDIF
 $! CC Flags
 $ echo ""
 $ echo "Your compiler may want other flags.  For this question you should include"
@@ -4001,7 +4026,7 @@ $   WS "int main() {"
 $   WS "#if defined(F_SETLK) && defined(F_SETLKW)"
 $   WS "     struct flock flock;"
 $   WS "     int retval, fd;"
-$   WS "     fd = open(""[-]perl.c"", O_RDONLY);"
+$   WS "     fd = open(""try.c"", O_RDONLY);"
 $   WS "     flock.l_type = F_RDLCK;"
 $   WS "     flock.l_whence = SEEK_SET;"
 $   WS "     flock.l_start = flock.l_len = 0;"
@@ -5678,7 +5703,6 @@ $ WC "PERL_API_REVISION='" + api_revision + "'"
 $ WC "PERL_API_VERSION='" + api_version + "'" 
 $ WC "PERL_API_SUBVERSION='" + api_subversion + "'"
 $ WC "PERL_PATCHLEVEL='" + perl_patchlevel + "'"
-$ WC "perl_patchlevel='" + perl_patchlevel + "'"
 $ WC "PERL_CONFIG_SH='true'"
 $ WC "_a='" + lib_ext + "'"
 $ WC "_exe='" + exe_ext + "'"
@@ -6695,6 +6719,7 @@ $! Alas this does not help to build Fcntl
 $!   WC "#define PERL_IGNORE_FPUSIG SIGFPE"
 $ ENDIF
 $ IF kill_by_sigprc .EQS. "define" then WC "#define KILL_BY_SIGPRC"
+$ IF usedecterm .OR. usedecterm .EQS. "define" then WC "#define USE_VMS_DECTERM"
 $ IF unlink_all_versions .OR. unlink_all_versions .EQS. "define" THEN -
     WC "#define UNLINK_ALL_VERSIONS"
 $ CLOSE CONFIG
@@ -6769,6 +6794,17 @@ $   ENDIF
 $ ELSE
 $   LARGEFILE_REPLACE = "LARGEFILE="
 $ ENDIF
+$ IF usedecterm .OR. usedecterm .EQS. "define"
+$ THEN
+$   IF F$SEARCH("SYS$SHARE:DECW$TERMINALSHR12.EXE") .nes. ""
+$   THEN
+$      DECTERM_REPLACE = "DECTERMLIB=DECTERMLIB=DECW$TERMINALSHR12/SHARE"
+$   ELSE
+$      DECTERM_REPLACE = "DECTERMLIB=DECTERMLIB=DECW$TERMINALSHR/SHARE"
+$   ENDIF
+$ ELSE
+$   DECTERM_REPLACE = "DECTERMLIB=DECTERMLIB="
+$ ENDIF
 $!
 $! In order not to stress the tiny command buffer on pre-7.3-2 systems,
 $! we put the following substitutions in a file and pass the file to
@@ -6789,6 +6825,7 @@ $ WC "''THREAD_KERNEL'"
 $ WC "PV=''version'"
 $ WC "FLAGS=FLAGS=''extra_flags'"
 $ WC "''LARGEFILE_REPLACE'"
+$ WC "''DECTERM_REPLACE'"
 $ close CONFIG
 $!
 $ echo4 "Extracting ''defmakefile' (with variable substitutions)"
@@ -7088,16 +7125,10 @@ $ ELSE    !leave in but commented out (in case setting was from perl :-)
 $ WRITE CONFIG "$! define SYS$TIMEZONE_DIFFERENTIAL ''tzd'"
 $ ENDIF
 $ WRITE CONFIG "$!"
-$ WRITE CONFIG "$! Symbols for Perl-based utility programs:"
+$ WRITE CONFIG "$! Symbols for commonly used programs:"
 $ WRITE CONFIG "$!"
 $ WRITE CONFIG "$ c2ph       == """ + perl_setup_perl + " ''vms_prefix':[utils]c2ph.com"""
-$ WRITE CONFIG "$ config_data== """ + perl_setup_perl + " ''vms_prefix':[utils]config_data.com"""
-$ WRITE CONFIG "$ corelist   == """ + perl_setup_perl + " ''vms_prefix':[utils]corelist.com"""
 $ WRITE CONFIG "$ cpan       == """ + perl_setup_perl + " ''vms_prefix':[utils]cpan.com"""
-$ WRITE CONFIG "$ cpan2dist  == """ + perl_setup_perl + " ''vms_prefix':[utils]cpan2dist.com"""
-$! FIXME: "-" is an operator and illegal in a symbol name -- cpanp-run-perl can't work
-$!$ WRITE CONFIG "$ cpanp-run-perl == """ + perl_setup_perl + " ''vms_prefix':[utils]cpanp-run-perl.com"""
-$ WRITE CONFIG "$ cpanp      == """ + perl_setup_perl + " ''vms_prefix':[utils]cpanp.com"""
 $ IF F$LOCATE("Devel::DProf",extensions) .LT. F$LENGTH(extensions)
 $ THEN
 $ WRITE CONFIG "$ dprofpp    == """ + perl_setup_perl + " ''vms_prefix':[utils]dprofpp.com"""
@@ -7124,9 +7155,6 @@ $ WRITE CONFIG "$ prove      == """ + perl_setup_perl + " ''vms_prefix':[utils]p
 $ WRITE CONFIG "$ psed       == """ + perl_setup_perl + " ''vms_prefix':[utils]psed.com"""
 $ WRITE CONFIG "$ pstruct    == """ + perl_setup_perl + " ''vms_prefix':[utils]pstruct.com"""
 $ WRITE CONFIG "$ s2p        == """ + perl_setup_perl + " ''vms_prefix':[utils]s2p.com"""
-$ WRITE CONFIG "$ ptar       == """ + perl_setup_perl + " ''vms_prefix':[utils]ptar.com"""
-$ WRITE CONFIG "$ ptardiff   == """ + perl_setup_perl + " ''vms_prefix':[utils]ptardiff.com"""
-$ WRITE CONFIG "$ shasum     == """ + perl_setup_perl + " ''vms_prefix':[utils]shasum.com"""
 $ WRITE CONFIG "$ splain     == """ + perl_setup_perl + " ''vms_prefix':[utils]splain.com"""
 $ WRITE CONFIG "$ xsubpp     == """ + perl_setup_perl + " ''vms_prefix':[utils]xsubpp.com"""
 $ CLOSE CONFIG

@@ -33,7 +33,7 @@ sub new
 	my @args;
 	($class, @args) = @$class if ref($class);
 	no strict 'refs';
-	unless (exists ${"$class\::"}{"VERSION"}) {
+	unless (exists ${*{Symbol::qualify_to_ref("$class\::")}}{"VERSION"}) {
 	    eval "require $class";
 	    if ($@) {
 		$err ||= $@;

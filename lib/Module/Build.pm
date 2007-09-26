@@ -15,7 +15,7 @@ use Module::Build::Base;
 
 use vars qw($VERSION @ISA);
 @ISA = qw(Module::Build::Base);
-$VERSION = '0.2808_01';
+$VERSION = '0.2808';
 $VERSION = eval $VERSION;
 
 # Okay, this is the brute-force method of finding out what kind of
@@ -75,12 +75,12 @@ sub _interpose_module {
 
   no strict 'refs';
   my $top_class = $mod;
-  while (@{"${top_class}::ISA"}) {
-    last if ${"${top_class}::ISA"}[0] eq $ISA[0];
-    $top_class = ${"${top_class}::ISA"}[0];
+  while (@{*{Symbol::qualify_to_ref("${top_class}::ISA")}}) {
+    last if ${*{Symbol::qualify_to_ref("${top_class}::ISA")}}[0] eq $ISA[0];
+    $top_class = ${*{Symbol::qualify_to_ref("${top_class}::ISA")}}[0];
   }
 
-  @{"${top_class}::ISA"} = @ISA;
+  @{*{Symbol::qualify_to_ref("${top_class}::ISA")}} = @ISA;
   @ISA = ($mod);
 }
 

@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find( 'perlio')) {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }
@@ -100,7 +100,7 @@ is(<$fh>, "42", "reading from non-string scalars");
 close $fh;
 
 { package P; sub TIESCALAR {bless{}} sub FETCH { "shazam" } }
-tie $p, P; open $fh, '<', \$p;
+tie $p, 'P'; open $fh, '<', \$p;
 is(<$fh>, "shazam", "reading from magic scalars");
 
 {

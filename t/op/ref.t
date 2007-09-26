@@ -1,14 +1,15 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require 'test.pl';
+require './test.pl';
 use strict qw(refs subs);
 
-plan(138);
+plan(122);
+
+our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
+     @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
+     $refref, $x, %whatever, @spring, %spring2,
+     $subref, $subrefref, $anonhash, $anonhash2, $object2, $THIS,
+     @ARGS, $string);
 
 # Test glob operations.
 
@@ -44,7 +45,7 @@ is ($foo, 'global');
     $baz = "valid";
     $bar = 'baz';
     $foo = 'bar';
-    is ($$$foo, 'valid');
+    is (${*{Symbol::qualify_to_ref(${*{Symbol::qualify_to_ref($foo)}})}}, 'valid');
 }
 
 # Test real references.
@@ -67,7 +68,7 @@ $ref[0] = \@a;
 $ref[1] = \@b;
 $ref[2] = \@c;
 $ref[3] = \@d;
-for $i (3,1,2,0) {
+for my $i (3,1,2,0) {
     push(@{$ref[$i]}, "ok $ary[$i]\n");
 }
 print @a;
@@ -75,7 +76,7 @@ print ${$ref[1]}[0];
 print @{$ref[2]}[0];
 {
     no strict 'refs';
-    print @{'d'};
+    print @{*{Symbol::qualify_to_ref('d')}};
 }
 curr_test($test+4);
 
@@ -185,7 +186,7 @@ DESTROY {
 
 package OBJ;
 
-@ISA = ('BASEOBJ');
+our @ISA = ('BASEOBJ');
 
 $main'object = bless {FOO => 'foo', BAR => 'bar'};
 
@@ -195,25 +196,16 @@ package main;
 
 is ($object->doit("BAR"), 'bar');
 
-# Test indirect-object-style method invocation.
+# Test not working indirect-object-style method invocation.
 
-$foo = doit $object "FOO";
-main::is ($foo, 'foo');
+eval q{$foo = doit $object "FOO";};
+main::isnt (@$, 'foo');
 
 sub BASEOBJ'doit {
     local $ref = shift;
     die "Not an OBJ" unless ref $ref eq 'OBJ';
     $ref->{shift()};
 }
-
-package UNIVERSAL;
-@ISA = 'LASTCHANCE';
-
-package LASTCHANCE;
-sub foo { main::is ($_[1], 'works') }
-
-package WHATEVER;
-foo WHATEVER "works";
 
 #
 # test the \(@foo) construct
@@ -263,7 +255,7 @@ $bar = "glob 3";
 local(*bar) = *bar;
 is ($bar, "glob 3");
 
-$var = "glob 4";
+our $var = "glob 4";
 $_   = \$var;
 is ($$_, 'glob 4');
 
@@ -357,7 +349,7 @@ is (runperl (switches=>['-l'],
 runperl(prog => 'sub UNIVERSAL::AUTOLOAD { qr// } a->p' );
 is ($?, 0, 'UNIVERSAL::AUTOLOAD called when freeing qr//');
 
-runperl(prog => 'sub UNIVERSAL::DESTROY { warn } bless \$a, A', stderr => 1);
+runperl(prog => 'sub UNIVERSAL::DESTROY { warn } bless \$a, "A"', stderr => 1);
 is ($?, 0, 'warn called inside UNIVERSAL::DESTROY');
 
 
@@ -379,76 +371,45 @@ is (runperl(
 # object is required to trigger the early freeing of GV refs to to STDOUT
 
 like (runperl(
-    prog => '$x=bless[]; sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
+    prog => 'our $x=bless[]; sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
     stderr => 1
       ), qr/^(ok)+$/, 'STDOUT destructor');
 
 TODO: {
     no strict 'refs';
-    $name8 = chr 163;
-    $name_utf8 = $name8 . chr 256;
-    chop $name_utf8;
-
-    is ($$name8, undef, 'Nothing before we start');
-    is ($$name_utf8, undef, 'Nothing before we start');
-    $$name8 = "Pound";
-    is ($$name8, "Pound", 'Accessing via 8 bit symref works');
-    local $TODO = "UTF8 mangled in symrefs";
-    is ($$name_utf8, "Pound", 'Accessing via UTF8 symref works');
-}
-
-TODO: {
-    no strict 'refs';
-    $name_utf8 = $name = chr 9787;
-    utf8::encode $name_utf8;
-
-    is (length $name, 1, "Name is 1 char");
-    is (length $name_utf8, 3, "UTF8 representation is 3 chars");
-
-    is ($$name, undef, 'Nothing before we start');
-    is ($$name_utf8, undef, 'Nothing before we start');
-    $$name = "Face";
-    is ($$name, "Face", 'Accessing via Unicode symref works');
-    local $TODO = "UTF8 mangled in symrefs";
-    is ($$name_utf8, undef,
-	'Accessing via the UTF8 byte sequence gives nothing');
-}
-
-{
-    no strict 'refs';
-    $name1 = "\0Chalk";
-    $name2 = "\0Cheese";
+    my $name1 = "\0Chalk";
+    my $name2 = "\0Cheese";
 
     isnt ($name1, $name2, "They differ");
 
-    is ($$name1, undef, 'Nothing before we start (scalars)');
-    is ($$name2, undef, 'Nothing before we start');
-    $$name1 = "Yummy";
-    is ($$name1, "Yummy", 'Accessing via the correct name works');
-    is ($$name2, undef,
+    is (${*{Symbol::qualify_to_ref($name1)}}, undef, 'Nothing before we start (scalars)');
+    is (${*{Symbol::qualify_to_ref($name2)}}, undef, 'Nothing before we start');
+    ${*{Symbol::qualify_to_ref($name1)}} = "Yummy";
+    is (${*{Symbol::qualify_to_ref($name1)}}, "Yummy", 'Accessing via the correct name works');
+    is (${*{Symbol::qualify_to_ref($name2)}}, undef,
 	'Accessing via a different NUL-containing name gives nothing');
     # defined uses a different code path
-    ok (defined $$name1, 'defined via the correct name works');
-    ok (!defined $$name2,
+    ok (defined ${*{Symbol::qualify_to_ref($name1)}}, 'defined via the correct name works');
+    ok (!defined ${*{Symbol::qualify_to_ref($name2)}},
 	'defined via a different NUL-containing name gives nothing');
 
-    is ($name1->[0], undef, 'Nothing before we start (arrays)');
-    is ($name2->[0], undef, 'Nothing before we start');
-    $name1->[0] = "Yummy";
-    is ($name1->[0], "Yummy", 'Accessing via the correct name works');
-    is ($name2->[0], undef,
+    is (*{Symbol::qualify_to_ref($name1)}->[0], undef, 'Nothing before we start (arrays)');
+    is (*{Symbol::qualify_to_ref($name2)}->[0], undef, 'Nothing before we start');
+    *{Symbol::qualify_to_ref($name1)}->[0] = "Yummy";
+    is (*{Symbol::qualify_to_ref($name1)}->[0], "Yummy", 'Accessing via the correct name works');
+    is (*{Symbol::qualify_to_ref($name2)}->[0], undef,
 	'Accessing via a different NUL-containing name gives nothing');
-    ok (defined $name1->[0], 'defined via the correct name works');
-    ok (!defined$name2->[0],
+    ok (defined *{Symbol::qualify_to_ref($name1)}->[0], 'defined via the correct name works');
+    ok (!defined*{Symbol::qualify_to_ref($name2)}->[0],
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = @{$name1}[2,3];
-    my (undef, $two) = @{$name2}[2,3];
+    my (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}[2,3];
+    my (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}[2,3];
     is ($one, undef, 'Nothing before we start (array slices)');
     is ($two, undef, 'Nothing before we start');
-    @{$name1}[2,3] = ("Very", "Yummy");
-    (undef, $one) = @{$name1}[2,3];
-    (undef, $two) = @{$name2}[2,3];
+    @{*{Symbol::qualify_to_ref($name1)}}[2,3] = ("Very", "Yummy");
+    (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}[2,3];
+    (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}[2,3];
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
@@ -456,23 +417,23 @@ TODO: {
     ok (!defined $two,
 	'defined via a different NUL-containing name gives nothing');
 
-    is ($name1->{PWOF}, undef, 'Nothing before we start (hashes)');
-    is ($name2->{PWOF}, undef, 'Nothing before we start');
-    $name1->{PWOF} = "Yummy";
-    is ($name1->{PWOF}, "Yummy", 'Accessing via the correct name works');
-    is ($name2->{PWOF}, undef,
+    is (*{Symbol::qualify_to_ref($name1)}->{PWOF}, undef, 'Nothing before we start (hashes)');
+    is (*{Symbol::qualify_to_ref($name2)}->{PWOF}, undef, 'Nothing before we start');
+    *{Symbol::qualify_to_ref($name1)}->{PWOF} = "Yummy";
+    is (*{Symbol::qualify_to_ref($name1)}->{PWOF}, "Yummy", 'Accessing via the correct name works');
+    is (*{Symbol::qualify_to_ref($name2)}->{PWOF}, undef,
 	'Accessing via a different NUL-containing name gives nothing');
-    ok (defined $name1->{PWOF}, 'defined via the correct name works');
-    ok (!defined $name2->{PWOF},
+    ok (defined *{Symbol::qualify_to_ref($name1)}->{PWOF}, 'defined via the correct name works');
+    ok (!defined *{Symbol::qualify_to_ref($name2)}->{PWOF},
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = @{$name1}{'SNIF', 'BEEYOOP'};
-    my (undef, $two) = @{$name2}{'SNIF', 'BEEYOOP'};
+    my (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}{'SNIF', 'BEEYOOP'};
+    my (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}{'SNIF', 'BEEYOOP'};
     is ($one, undef, 'Nothing before we start (hash slices)');
     is ($two, undef, 'Nothing before we start');
-    @{$name1}{'SNIF', 'BEEYOOP'} = ("Very", "Yummy");
-    (undef, $one) = @{$name1}{'SNIF', 'BEEYOOP'};
-    (undef, $two) = @{$name2}{'SNIF', 'BEEYOOP'};
+    @{*{Symbol::qualify_to_ref($name1)}}{'SNIF', 'BEEYOOP'} = ("Very", "Yummy");
+    (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}{'SNIF', 'BEEYOOP'};
+    (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}{'SNIF', 'BEEYOOP'};
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
@@ -481,15 +442,16 @@ TODO: {
 	'defined via a different NUL-containing name gives nothing');
 
     $name1 = "Left"; $name2 = "Left\0Right";
-    my $glob2 = *{$name2};
+    my $glob2 = *{Symbol::qualify_to_ref($name2)};
+    our $glob1;
 
     is ($glob1, undef, "We get different typeglobs. In fact, undef");
 
-    *{$name1} = sub {"One"};
-    *{$name2} = sub {"Two"};
+    *{Symbol::qualify_to_ref($name1)} = sub {"One"};
+    *{Symbol::qualify_to_ref($name2)} = sub {"Two"};
 
-    is (&{$name1}, "One");
-    is (&{$name2}, "Two");
+    is (&{*{Symbol::qualify_to_ref($name1)}}, "One");
+    is (&{*{Symbol::qualify_to_ref($name2)}}, "Two");
 }
 
 # test derefs after list slice
@@ -511,10 +473,8 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
 
 # test dereferencing errors
 {
-    format STDERR =
-.
     my $ref;
-    foreach $ref (*STDOUT{IO}, *STDERR{FORMAT}) {
+    foreach $ref (*STDOUT{IO}) {
 	eval q/ $$ref /;
 	like($@, qr/Not a SCALAR reference/, "Scalar dereference");
 	eval q/ @$ref /;
@@ -524,10 +484,6 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
 	eval q/ &$ref /;
 	like($@, qr/Not a CODE reference/, "Code dereference");
     }
-
-    $ref = *STDERR{FORMAT};
-    eval q/ *$ref /;
-    like($@, qr/Not a GLOB reference/, "Glob dereference");
 
     $ref = *STDOUT{IO};
     eval q/ *$ref /;
@@ -545,6 +501,8 @@ my $test1 = $test + 1;
 my $test2 = $test + 2;
 
 package FINALE;
+
+our ($ref3, $ref1);
 
 {
     $ref3 = bless ["ok $test2\n"];	# package destruction

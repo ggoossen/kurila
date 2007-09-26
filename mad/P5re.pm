@@ -21,6 +21,8 @@ our $insensitive;
 our $singleline;
 our $multiline;
 
+use bytes;
+
 my %xmlish = (
 	chr(0x00) => "STUPIDXML(#x00)",
 	chr(0x01) => "STUPIDXML(#x01)",

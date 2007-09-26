@@ -153,7 +153,7 @@ sub soft_chdir_with_alternatives ($);
 #-> sub CPAN::shell ;
 sub shell {
     my($self) = @_;
-    $Suppress_readline = ! -t STDIN unless defined $Suppress_readline;
+    $Suppress_readline = ! -t *STDIN unless defined $Suppress_readline;
     CPAN::HandleConfig->load unless $CPAN::Config_loaded++;
 
     my $oprompt = shift || CPAN::Prompt->new;
@@ -816,9 +816,9 @@ sub _perl_fingerprint {
     my $dll = eval {OS2::DLLname()};
     my $mtime_dll = 0;
     if (defined $dll) {
-        $mtime_dll = (-f $dll ? (stat(_))[9] : '-1');
+        $mtime_dll = (-f $dll ? (stat('_'))[9] : '-1');
     }
-    my $mtime_perl = (-f $^X ? (stat(_))[9] : '-1');
+    my $mtime_perl = (-f $^X ? (stat('_'))[9] : '-1');
     my $this_fingerprint = {
                             '$^X' => $^X,
                             sitearchexp => $Config::Config{sitearchexp},
@@ -3003,7 +3003,7 @@ sub mysleep {
 
 #-> sub CPAN::Shell::setup_output ;
 sub setup_output {
-    return if -t STDOUT;
+    return if -t *STDOUT;
     my $odef = select STDERR;
     $| = 1;
     select STDOUT;
@@ -3247,7 +3247,7 @@ sub recent {
                         reports
                         test
                        )) {
-        *$command = sub { shift->rematein($command, @_); };
+        *{Symbol::qualify_to_ref($command)} = sub { shift->rematein($command, @_); };
     }
 }
 
@@ -7424,8 +7424,8 @@ sub _find_prefs {
                         $CPAN::Frontend->mydie("Error in distroprefs file $_\: $@");
                     }
                     my $i = 1;
-                    while (${"VAR".$i}) {
-                        push @distropref, ${"VAR".$i};
+                    while (${*{Symbol::qualify_to_ref("VAR".$i)}}) {
+                        push @distropref, ${*{Symbol::qualify_to_ref("VAR".$i)}};
                         $i++;
                     }
                 } elsif ($thisexte eq "st") {

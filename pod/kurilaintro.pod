@@ -1,0 +1,72 @@
+=head1 NAME
+
+perlkurila -- description of Perl Kurila
+
+=head1 DESCRIPTION
+
+=head2 What is Perl Kurila?
+
+Perl Kurila is a dialect of Perl. It is based upon Perl 5, mostly compatible.
+Unlike Perl 6 which is a completely new language, Perl Kurila is an evolution
+Perl 5. Currently they are almost the same, but this will change as Perl Kurila
+evolves.
+
+=head2 Why?
+
+Keep Perl 5 alive, and not let new development be drowned by its burden of legacy features.
+To have a more evolving language without being held back by backwards compatibility.
+Because of backward compatibility Perl 5 can only be extended by adding more, making
+it more complex. By creating a new dialect, we are free to have a more coherent Perl,
+with cleaner internals.
+
+=head2 Is Perl Kurila a replacement for Perl 5?
+
+No. There is a lot of Perl 5 code. You can probably convert Perl 5 code to Kurila without
+much problems, but if you are happy with Perl 5, you can stay using it.
+Both can be installed at the same time.
+
+=head2 Audience
+
+Kurila has just started, so at the moment it is primary interesting
+for people interested in experiments with the Perl language.
+People interesting in continuing Perl 5, without all its legacy features,
+who don't want to let Perl 5 become a white dwarf.
+
+=head2 Goals
+
+=over 4
+
+=item Experimenting with the Perl language.
+
+=item Removing ugly things.
+
+=item Adding ugly things.
+
+=item Changing old design decisions.
+
+=item Readable, modifiable perl source.
+
+=back
+
+=head2 Compatibility
+
+Kurila is not intended to be compatible with Perl 5.
+There is the p5kurila convert script which does some basic conversion from Perl 5
+to Perl Kurila, but it requires a modified perl5.
+
+=head2 Development
+
+Development is currently only done by Gerard Goossen. Using the git repository
+at git://dev.tty.nl/perl
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<kurila01delta> too see what has changed compared to Perl 5.
+
+=back
+
+=head1 AUTHOR
+
+Gerard Goossen <gerard@tty.nl>

@@ -1003,7 +1003,7 @@ BEGIN {
   if ($ENV{PERL5DB_THREADED}) {
 	require threads;
 	require threads::shared;
-	import threads::shared qw(share);
+	threads::shared->import(qw(share));
 	$DBGR;
 	share(\$DBGR);
 	lock($DBGR);
@@ -1415,7 +1415,7 @@ EO_GRIPE
 sub is_safe_file {
     my $path = shift;
     stat($path) || return;    # mysteriously vaporized
-    my ( $dev, $ino, $mode, $nlink, $uid, $gid ) = stat(_);
+    my ( $dev, $ino, $mode, $nlink, $uid, $gid ) = stat('_');
 
     return 0 if $uid != 0 && $uid != $<;
     return 0 if $mode & 022;
@@ -1703,7 +1703,7 @@ and then tries to connect the input and output filehandles to it.
         # If RemotePort was defined in the options, connect input and output
         # to the socket.
         require IO::Socket;
-        $OUT = new IO::Socket::INET(
+        $OUT = IO::Socket::INET->new(
             Timeout  => '10',
             PeerAddr => $remoteport,
             Proto    => 'tcp',
@@ -2085,7 +2085,7 @@ number information, and print that.
                                  # Perl 5 ones (sorry, we don't print Klingon
                                  #module names)
 
-            $prefix = $sub =~ /::/ ? "" : "${'package'}::";
+            $prefix = $sub =~ /::/ ? "" : "${*{Symbol::qualify_to_ref('package')}}::";
             $prefix .= "$sub($filename:";
             $after = ( $dbline[$line] =~ /\n$/ ? '' : "\n" );
 
@@ -3730,12 +3730,12 @@ sub sub {
 	if ( defined wantarray ) {
 
 	    # Save the value if it's wanted at all.
-	    $ret = &$sub;
+	    $ret = &{*{Symbol::qualify_to_ref($sub)}};
 	}
 	else {
 
 	    # Void return, explicitly.
-	    &$sub;
+	    &{*{Symbol::qualify_to_ref($sub)}};
 	    undef $ret;
 	}
 
@@ -3860,7 +3860,7 @@ sub cmd_wrapper {
           || ( $cmd =~ /^[<>{]+/o ? 'prepost' : $cmd ) );
 
     # Call the command subroutine, call it by name.
-    return &$call( $cmd, $line, $dblineno );
+    return &{*{Symbol::qualify_to_ref($call)}}( $cmd, $line, $dblineno );
 } ## end sub cmd_wrapper
 
 =head3 C<cmd_a> (command)
@@ -4034,7 +4034,7 @@ sub cmd_b {
         $subname =~ s/\'/::/g;
 
         # Qualify it into the current package unless it's already qualified.
-        $subname = "${'package'}::" . $subname unless $subname =~ /::/;
+        $subname = "${*{Symbol::qualify_to_ref('package')}}::" . $subname unless $subname =~ /::/;
 
         # Add main if it starts with ::.
         $subname = "main" . $subname if substr( $subname, 0, 2 ) eq "::";
@@ -4455,7 +4455,7 @@ sub cmd_b_sub {
         my $s = $subname;
 
         # Put it in this package unless it's already qualified.
-        $subname = "${'package'}::" . $subname
+        $subname = "${*{Symbol::qualify_to_ref('package')}}::" . $subname
           unless $subname =~ /::/;
 
         # Requalify it into CORE::GLOBAL if qualifying it into this
@@ -4464,7 +4464,7 @@ sub cmd_b_sub {
         $subname = "CORE::GLOBAL::$s"
           if not defined &$subname
           and $s !~ /::/
-          and defined &{"CORE::GLOBAL::$s"};
+          and defined &{*{Symbol::qualify_to_ref("CORE::GLOBAL::$s")}};
 
         # Put it in package 'main' if it has a leading ::.
         $subname = "main" . $subname if substr( $subname, 0, 2 ) eq "::";
@@ -4773,8 +4773,8 @@ sub cmd_i {
                 map {    # snaffled unceremoniously from Class::ISA
                     "$_"
                       . (
-                        defined( ${"$_\::VERSION"} )
-                        ? ' ' . ${"$_\::VERSION"}
+                        defined( ${*{Symbol::qualify_to_ref("$_\::VERSION")}} )
+                        ? ' ' . ${*{Symbol::qualify_to_ref("$_\::VERSION")}}
                         : undef )
                   } Class::ISA::self_and_super_path(ref($isa) || $isa)
             );
@@ -4841,7 +4841,7 @@ sub cmd_l {
         $subname = "CORE::GLOBAL::$s"
           if not defined &$subname
           and $s !~ /::/
-          and defined &{"CORE::GLOBAL::$s"};
+          and defined &{*{Symbol::qualify_to_ref("CORE::GLOBAL::$s")}};
 
         # Put leading '::' names into 'main::'.
         $subname = "main" . $subname if substr( $subname, 0, 2 ) eq "::";
@@ -5977,7 +5977,7 @@ sub setterm {
             my $rv = $ENV{PERLDB_NOTTY} || "$ENV{HOME}/.perldbtty$$";
 
             # Rendezvous and get the filehandles.
-            my $term_rv = new Term::Rendezvous $rv;
+            my $term_rv = Term::Rendezvous->new($rv);
             $IN  = $term_rv->IN;
             $OUT = $term_rv->OUT;
         } ## end else [ if ($tty)
@@ -5990,12 +5990,12 @@ sub setterm {
 
     # If we shouldn't use Term::ReadLine, don't.
     if ( !$rl ) {
-        $term = new Term::ReadLine::Stub 'perldb', $IN, $OUT;
+        $term = Term::ReadLine::Stub->new('perldb', $IN, $OUT);
     }
 
     # We're using Term::ReadLine. Get all the attributes for this terminal.
     else {
-        $term = new Term::ReadLine 'perldb', $IN, $OUT;
+        $term = Term::ReadLine->new('perldb', $IN, $OUT);
 
         $rl_attribs = $term->Attribs;
         $rl_attribs->{basic_word_break_characters} .= '-:+/*,[])}'
@@ -6740,10 +6740,10 @@ sub TTY {
     if ( @_ and ($^O eq 'VMS') and !defined($term) ) {
 	eval { require Term::ReadLine } or die $@;
         if ( !$rl ) {
-	    $term = new Term::ReadLine::Stub 'perldb', $IN, $OUT;
+	    $term = Term::ReadLine::Stub->new( 'perldb', $IN, $OUT);
 	}
 	else {
-	    $term = new Term::ReadLine 'perldb', $IN, $OUT;
+	    $term = Term::ReadLine->new( 'perldb', $IN, $OUT);
 	}
     }
     if ( @_ and $term and $term->Features->{newTTY} ) {
@@ -7025,8 +7025,8 @@ sub list_modules {    # versions
 
         # If the package has a $VERSION package global (as all good packages
         # should!) decode it and save as partial message.
-        if ( defined ${ $_ . '::VERSION' } ) {
-            $version{$file} = "${ $_ . '::VERSION' } from ";
+        if ( defined ${*{Symbol::qualify_to_ref( $_ . '::VERSION')} } ) {
+            $version{$file} = "${*{Symbol::qualify_to_ref( $_ . '::VERSION')} } from ";
         }
 
         # Finish up the message with the file the package came from.
@@ -7895,10 +7895,10 @@ sub methods_via {
     for $name (
 
         # Keep if this is a defined subroutine in this class.
-        grep { defined &{ ${"${class}::"}{$_} } }
+        grep { defined &{ ${*{Symbol::qualify_to_ref("${class}::")}}{$_} } }
 
         # Extract from all the symbols in this class.
-        sort keys %{"${class}::"}
+        sort keys %{*{Symbol::qualify_to_ref("${class}::")}}
       )
     {
 
@@ -7916,7 +7916,7 @@ sub methods_via {
 
     # $crawl_upward true: keep going up the tree.
     # Find all the classes this one is a subclass of.
-    for $name ( @{"${class}::ISA"} ) {
+    for $name ( @{*{Symbol::qualify_to_ref("${class}::ISA")}} ) {
 
         # Set up the new prefix.
         $prepend = $prefix ? $prefix . " -> $name" : $name;
@@ -8300,7 +8300,7 @@ sub db_complete {
     # The search pattern is current package, ::, extract the next qualifier
     # Prefix and pack are set to undef.
     my ( $itext, $search, $prefix, $pack ) =
-      ( $text, "^\Q${'package'}::\E([^:]+)\$" );
+      ( $text, "^\Q${*{Symbol::qualify_to_ref('package')}}::\E([^:]+)\$" );
 
 =head3 C<b postpone|compile> 
 
@@ -8372,7 +8372,7 @@ start with 'main::'. Return this list.
 
     return sort map { ( $_, db_complete( $_ . "::", "V ", 2 ) ) }
       grep !/^main::/, grep /^\Q$text/,
-      map { /^(.*)::$/ ? ( $prefix . "::$1" ) : () } keys %{ $prefix . '::' }
+      map { /^(.*)::$/ ? ( $prefix . "::$1" ) : () } keys %{*{Symbol::qualify_to_ref( $prefix . '::')} }
       if ( substr $line, 0, $start ) =~ /^\|*[Vm]\s+$/
       and $text =~ /^(.*[^:])::?(\w*)$/
       and $prefix = $1;
@@ -8473,7 +8473,7 @@ Look through all the symbols in the package. C<grep> out all the possible hashes
 =cut
 
         my @out = map "$prefix$_", grep /^\Q$text/, grep /^_?[a-zA-Z]/,
-          keys %$pack;
+          keys %{*{Symbol::qualify_to_ref($pack)}};
 
 =pod
 
@@ -8534,7 +8534,7 @@ If the package is C<::> (C<main>), create an empty list; if it's something else,
 =cut
 
         my @out = map "$prefix$_", grep /^\Q$text/,
-          ( grep /^_?[a-zA-Z]/, keys %$pack ),
+          ( grep /^_?[a-zA-Z]/, keys %{*{Symbol::qualify_to_ref($pack)}} ),
           ( $pack eq '::' ? () : ( grep /::$/, keys %:: ) );
 
 =item *
@@ -8793,8 +8793,8 @@ sub restart {
     # the 'require perl5db.pl;' line), and add them back on
     # to the command line to be executed.
     if ( $0 eq '-e' ) {
-        for ( 1 .. $#{'::_<-e'} ) {  # The first line is PERL5DB
-            chomp( $cl = ${'::_<-e'}[$_] );
+        for ( 1 .. $#{*{Symbol::qualify_to_ref('::_<-e')}} ) {  # The first line is PERL5DB
+            chomp( $cl = ${*{Symbol::qualify_to_ref('::_<-e')}}[$_] );
             push @script, '-e', $cl;
         }
     } ## end if ($0 eq '-e')
@@ -9097,7 +9097,7 @@ sub cmd_pre580_b {
         $subname =~ s/\'/::/g;
 
         # Qualify it into the current package unless it's already qualified.
-        $subname = "${'package'}::" . $subname
+        $subname = "${*{Symbol::qualify_to_ref('package')}}::" . $subname
           unless $subname =~ /::/;
 
         # Add main if it starts with ::.

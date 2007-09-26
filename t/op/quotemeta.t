@@ -1,10 +1,8 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(../lib .);
-    require Config; import Config;
-    require "test.pl";
+    require Config; Config->import;
+    require "./test.pl";
 }
 
 plan tests => 22;
@@ -44,8 +42,11 @@ is("\Q\l\UPe*x*r\El\E*", "pE\\*X\\*Rl*", '\Q\l\UPe*x*r\El\E*');
 is("\U\lPerl\E\E\E\E", "pERL", '\U\lPerl\E\E\E\E');
 is("\l\UPerl\E\E\E\E", "pERL", '\l\UPerl\E\E\E\E');
 
-is(quotemeta("\x{263a}"), "\x{263a}", "quotemeta Unicode");
-is(length(quotemeta("\x{263a}")), 1, "quotemeta Unicode length");
+use utf8;
+my $x = "\x{263a}";
+is(quotemeta($x), "\x{263a}", "quotemeta Unicode");
+no utf8;
+is(quotemeta($x), "\\\xE2\\\x98\\\xBA", "quotemeta bytes");
 
 $a = "foo|bar";
 is("a\Q\Ec$a", "acfoo|bar", '\Q\E');

@@ -12,8 +12,12 @@ BEGIN {
     unless ($hasgm) { print "1..0 # Skip: no gmtime\n"; exit 0 }
 }
 
+use strict;
+
+our @gmtime;
+
 BEGIN {
-    our @gmtime = gmtime 0; # This is the function gmtime.
+    @gmtime = gmtime 0; # This is the function gmtime.
     unless (@gmtime) { print "1..0 # Skip: gmtime failed\n"; exit 0 }
 }
 

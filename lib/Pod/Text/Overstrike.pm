@@ -30,6 +30,7 @@ use Pod::Text ();
 
 use strict;
 use vars qw(@ISA $VERSION);
+use utf8;
 
 @ISA = qw(Pod::Text);
 
@@ -115,7 +116,7 @@ sub wrap {
         # backspace, and a character).  Use [^\n] rather than . to protect
         # against odd settings of $*.
         my $char = '(?:[^\n][\b])?[^\n]';
-        if (s/^((?>$char){0,$width})(?:\Z|\s+)//) {
+        if (s/^((?>$char){0,$width})(?:\Z|[\ \t]+)//) {
             $output .= $spaces . $1 . "\n";
         } else {
             last;

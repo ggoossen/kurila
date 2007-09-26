@@ -112,7 +112,7 @@ test_freeent(freeent_function *f) {
 
 MODULE = XS::APItest:Hash		PACKAGE = XS::APItest::Hash
 
-#define UTF8KLEN(sv, len)   (SvUTF8(sv) ? -(I32)len : (I32)len)
+#define UTF8KLEN(sv, len)   ((I32)len)
 
 bool
 exists(hash, key_sv)

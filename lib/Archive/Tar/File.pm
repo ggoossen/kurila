@@ -41,7 +41,7 @@ my $tmpl = [
 for ( my $i=0; $i<scalar @$tmpl ; $i+=2 ) {
     my $key = $tmpl->[$i];
     no strict 'refs';
-    *{__PACKAGE__."::$key"} = sub {
+    *{Symbol::qualify_to_ref(__PACKAGE__."::$key")} = sub {
         my $self = shift;
         $self->{$key} = $_[0] if @_;
 
@@ -200,7 +200,7 @@ sub clone {
 
 sub _new_from_chunk {
     my $class = shift;
-    my $chunk = shift or return;    # 512 bytes of tar header
+    my $chunk = shift or return;
     my %hash  = @_;
 
     ### filter any arguments on defined-ness of values.
@@ -233,11 +233,7 @@ sub _new_from_chunk {
 
 sub _new_from_file {
     my $class       = shift;
-    my $path        = shift;        
-    
-    ### path has to at least exist
-    return unless defined $path;
-    
+    my $path        = shift or return;
     my $type        = __PACKAGE__->_filetype($path);
     my $data        = '';
 
@@ -308,7 +304,7 @@ sub _new_from_file {
 
 sub _new_from_data {
     my $class   = shift;
-    my $path    = shift;    return unless defined $path;
+    my $path    = shift     or return;
     my $data    = shift;    return unless defined $data;
     my $opt     = shift;
 
@@ -375,9 +371,7 @@ sub _prefix_and_file {
 
 sub _filetype {
     my $self = shift;
-    my $file = shift;
-    
-    return unless defined $file;
+    my $file = shift or return;
 
     return SYMLINK  if (-l $file);	# Symlink
 
@@ -521,9 +515,7 @@ Returns true on success and false on failure.
 
 sub rename {
     my $self = shift;
-    my $path = shift;
-    
-    return unless defined $path;
+    my $path = shift or return;
 
     my ($prefix,$file) = $self->_prefix_and_file( $path );
 

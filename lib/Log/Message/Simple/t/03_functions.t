@@ -18,7 +18,7 @@ use_ok( $Class );
     ### & friends will print there
     for my $name (@Carp, @Msg) {
         no strict 'refs';
-        *$name = sub {  
+        *{Symbol::qualify_to_ref($name)} = sub {  
                     local $^W;
 
                     ### do the block twice to avoid 'used only once'

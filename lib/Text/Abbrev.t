@@ -12,6 +12,7 @@ use Text::Abbrev;
 print "ok 1\n";
 
 # old style as reference
+our %x;
 local(%x);
 my @z = qw(list edit send abort gripe listen);
 abbrev(*x, @z);

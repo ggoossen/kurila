@@ -36,7 +36,7 @@ require IO::File;
 #
 # Everything we're willing to export, we must first import.
 #
-import IO::Handle grep { !defined(&$_) } @EXPORT, @EXPORT_OK;
+IO::Handle->import(grep { !defined(&$_) } @EXPORT, @EXPORT_OK);
 
 #
 # Some people call "FileHandle::function", so all the functions
@@ -56,9 +56,9 @@ import IO::Handle grep { !defined(&$_) } @EXPORT, @EXPORT_OK;
     );
     for my $pkg (keys %import) {
 	for my $func (@{$import{$pkg}}) {
-	    my $c = *{"${pkg}::$func"}{CODE}
+	    my $c = *{Symbol::qualify_to_ref("${pkg}::$func")}{CODE}
 		or die "${pkg}::$func missing";
-	    *$func = $c;
+	    *{Symbol::qualify_to_ref($func)} = $c;
 	}
     }
 }
@@ -88,8 +88,8 @@ sub import {
 #
 
 sub pipe {
-    my $r = new IO::Handle;
-    my $w = new IO::Handle;
+    my $r = IO::Handle->new();
+    my $w = IO::Handle->new();
     CORE::pipe($r, $w) or return undef;
     ($r, $w);
 }

@@ -240,7 +240,7 @@ sub import {
     my $pkg     = shift;
     my %hash    = @_;
 
-    $CONFIG = new Log::Message::Config( %hash )
+    $CONFIG = Log::Message::Config->new( %hash)
                 or die loc(qq[Problem initialising %1], __PACKAGE__);
 
 }
@@ -283,7 +283,7 @@ sub new {
     my $class   = shift;
     my %hash    = @_;
 
-    my $conf = new Log::Message::Config( %hash, default => $CONFIG ) or return undef;
+    my $conf = Log::Message::Config->new( %hash, default => $CONFIG) or return undef;
 
     if( $conf->private || $CONFIG->private ) {
 

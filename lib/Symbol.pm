@@ -80,14 +80,16 @@ you reload the C<Foo> module afterwards.
 
 BEGIN { require 5.005; }
 
+use strict;
+
 require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(gensym ungensym qualify qualify_to_ref);
-@EXPORT_OK = qw(delete_package geniosym);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(gensym ungensym qualify qualify_to_ref);
+our @EXPORT_OK = qw(delete_package geniosym);
 
-$VERSION = '1.06';
+our $VERSION = '1.06';
 
-my $genpkg = "Symbol::";
+my $genpkg = "Symbol";
 my $genseq = 0;
 
 my %global = map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT);
@@ -99,8 +101,10 @@ my %global = map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT);
 #
 sub gensym () {
     my $name = "GEN" . $genseq++;
-    my $ref = \*{$genpkg . $name};
-    delete $$genpkg{$name};
+    no strict 'refs';
+    my $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};
+    $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};  # second time to supress only-used once warning.
+    delete ${Symbol::stash($genpkg)}{$name};
     $ref;
 }
 
@@ -131,15 +135,18 @@ sub qualify ($;$) {
     $name;
 }
 
-sub qualify_to_ref ($;$) {
-    return \*{ qualify $_[0], @_ > 1 ? $_[1] : caller };
-}
+# sub qualify_to_ref ($) {
+#     no strict 'refs';
+#     return \*{ qualify $_[0], @_ > 1 ? $_[1] : caller };
+# }
 
 #
 # of Safe.pm lineage
 #
 sub delete_package ($) {
     my $pkg = shift;
+
+    no strict 'refs';
 
     # expand to full symbol table name if needed
 
@@ -150,7 +157,7 @@ sub delete_package ($) {
     }
 
     my($stem, $leaf) = $pkg =~ m/(.*::)(\w+::)$/;
-    my $stem_symtab = *{$stem}{HASH};
+    my $stem_symtab = *{Symbol::qualify_to_ref($stem)}{HASH};
     return unless defined $stem_symtab and exists $stem_symtab->{$leaf};
 
 
@@ -158,7 +165,7 @@ sub delete_package ($) {
 
     my $leaf_symtab = *{$stem_symtab->{$leaf}}{HASH};
     foreach my $name (keys %$leaf_symtab) {
-        undef *{$pkg . $name};
+        undef *{Symbol::qualify_to_ref($pkg . $name)};
     }
 
     # delete the symbol table

@@ -645,9 +645,9 @@ Value of readdir() operator can be "0"; test with defined() at - line 4.
 ########
 # op.c
 use warnings 'misc' ;
-$x = 1 if $x = <*> ;
+$x = 1 if $x = glob("*") ;
 no warnings 'misc' ;
-$x = 1 if $x = <*> ;
+$x = 1 if $x = glob("*") ;
 EXPECT
 Value of glob construct can be "0"; test with defined() at - line 3.
 ########
@@ -662,9 +662,9 @@ Value of each() operator can be "0"; test with defined() at - line 4.
 ########
 # op.c
 use warnings 'misc' ;
-$x = 1 while $x = <*> and 0 ;
+$x = 1 while $x = glob("*") and 0 ;
 no warnings 'misc' ;
-$x = 1 while $x = <*> and 0 ;
+$x = 1 while $x = glob("*") and 0 ;
 EXPECT
 Value of glob construct can be "0"; test with defined() at - line 3.
 ########
@@ -680,10 +680,15 @@ Value of readdir() operator can be "0"; test with defined() at - line 4.
 ########
 # op.c
 use warnings 'misc';
+use feature 'err';
 open FH, "<abc";
+$_ = <FH> err $_ = 1;
 ($_ = <FH>) // ($_ = 1);
 opendir DH, ".";
+$_ = readdir DH err $_ = 1;
+$_ = glob("*") err $_ = 1;
 %a = (1,2,3,4) ;
+$_ = each %a err $_ = 1;
 EXPECT
 ########
 # op.c
@@ -717,18 +722,6 @@ sub fred () { 1 }
 *fred = sub () { 2 };
 EXPECT
 Constant subroutine main::fred redefined at - line 4.
-########
-# op.c
-use warnings 'redefine' ;
-format FRED =
-.
-format FRED =
-.
-no warnings 'redefine' ;
-format FRED =
-.
-EXPECT
-Format FRED redefined at - line 5.
 ########
 # op.c
 use warnings 'deprecated' ;
@@ -1006,7 +999,7 @@ local(*a);		# OP_RV2GV		ok
 local(@a[1,2]);		# OP_ASLICE		ok
 local(@a{1,2});		# OP_HSLICE		ok
 local(@a = (1,2));	# OP_AASSIGN
-local($$x);		# OP_RV2SV		ok
+#local($$x);		# OP_RV2SV		ok
 local($#a);		# OP_AV2ARYLEN
 local($x =   1);	# OP_SASSIGN
 local($x &&= 1);	# OP_ANDASSIGN
@@ -1019,7 +1012,6 @@ local(pos($x));		# OP_POS
 local(vec($x,0,1));	# OP_VEC
 local($a[$b]);		# OP_AELEM		ok
 local($a{$b});		# OP_HELEM		ok
-local($[);		# OP_CONST
 
 no warnings 'syntax';
 EXPECT

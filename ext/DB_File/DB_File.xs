@@ -419,7 +419,6 @@ typedef DBT DBTKEY ;
 	      my_sv_setpvn(arg, (const char *)name.data, name.size) ;			\
 	      TAINT;                                       		\
 	      SvTAINTED_on(arg);                                       	\
-	      SvUTF8_off(arg);                                       	\
 	      DBM_ckFilter(arg, filter_fetch_value,"filter_fetch_value") ; 	\
 	  }								\
 	}
@@ -435,7 +434,6 @@ typedef DBT DBTKEY ;
 		    sv_setiv(arg, (I32)*(I32*)name.data - 1); 		\
 	      TAINT;                                       		\
 	      SvTAINTED_on(arg);                                       	\
-	      SvUTF8_off(arg);                                       	\
 	      DBM_ckFilter(arg, filter_fetch_key,"filter_fetch_key") ; 	\
 	  } 								\
 	}
@@ -1692,7 +1690,7 @@ unshift(db, ...)
 	    for (i = items-1 ; i > 0 ; --i)
 	    {
 		DBM_ckFilter(ST(i), filter_store_value, "filter_store_value");
-	        value.data = SvPVbyte(ST(i), n_a) ;
+	        value.data = SvPV(ST(i), n_a) ;
 	        value.size = n_a ;
 	        One = 1 ;
 	        key.data = &One ;
@@ -1802,7 +1800,7 @@ push(db, ...)
 	        for (i = 1 ; i < items ; ++i)
 	        {
 		    DBM_ckFilter(ST(i), filter_store_value, "filter_store_value");
-	            value.data = SvPVbyte(ST(i), n_a) ;
+	            value.data = SvPV(ST(i), n_a) ;
 	            value.size = n_a ;
 		    ++ keyval ;
 	            key.data = &keyval ;

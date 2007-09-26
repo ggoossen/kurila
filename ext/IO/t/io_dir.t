@@ -5,7 +5,7 @@ BEGIN {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($] < 5.00326 || not $Config{'d_readdir'}) {
 	print "1..0 # Skip: readdir() not available\n";
 	exit 0;
@@ -29,10 +29,10 @@ print "1..10\n";
 
 my $DIR = $^O eq 'MacOS' ? ":" : ".";
 
-$dot = new IO::Dir $DIR;
+$dot = IO::Dir->new( $DIR);
 ok(defined($dot));
 
-@a = sort <*>;
+@a = sort glob("*");
 do { $first = $dot->read } while defined($first) && $first =~ /^\./;
 ok(+(grep { $_ eq $first } @a));
 
@@ -51,7 +51,7 @@ open(FH,'>X') || die "Can't create x";
 print FH "X";
 close(FH) or die "Can't close: $!";
 
-tie %dir, IO::Dir, $DIR;
+tie %dir, 'IO::Dir', $DIR;
 my @files = keys %dir;
 
 # I hope we do not have an empty dir :-)
@@ -64,7 +64,7 @@ delete $dir{'X'};
 
 ok(-f 'X');
 
-tie %dirx, IO::Dir, $DIR, DIR_UNLINK;
+tie %dirx, 'IO::Dir', $DIR, DIR_UNLINK;
 
 my $statx = $dirx{'X'};
 ok(defined($statx) && UNIVERSAL::isa($statx,'File::stat') && $statx->size == 1);

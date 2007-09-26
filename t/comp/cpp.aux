@@ -16,8 +16,8 @@ print MESS;
 
 open(TRY,">Comp_cpp.tmp") || die "Can't open temp perl file: $!";
 
-($prog = <<'END') =~ s/X//g;
-X$ok = "not ok 3\n";
+(our $prog = <<'END') =~ s/X//g;
+Xmy $ok = "not ok 3\n";
 X#include "Comp_cpp.inc"
 X#ifdef OK
 X$ok = OK;

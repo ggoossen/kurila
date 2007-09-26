@@ -2,12 +2,13 @@
 # this file as a template for defsubs.h
 # Extracting defsubs.h (with variable substitutions)
 #!perl -w
+use strict;
 use File::Spec;
 my (undef, $headerpath) = @ARGV;
 my ($out) = __FILE__ =~ /(^.*)\.PL/i;
 $out =~ s/_h$/.h/;
 unlink $out if -l $out;
-open(OUT,">$out") || die "Cannot open $file:$!";
+open(OUT,">$out") || die "Cannot open $out:$!";
 print "Extracting $out...\n";
 print OUT <<"END";
 /*
@@ -57,15 +58,15 @@ foreach my $const (qw(
 if ($] < 5.009) {
     # This is only present in 5.10, but it's useful to B::Deparse to be able
     # to import a dummy value from B
-    doconst(OPpPAD_STATE);
+    doconst('OPpPAD_STATE');
 }
 
 if ($] >= 5.009) {
     # Constant not present in 5.8.x
-    doconst(CVf_ISXSUB);
+    doconst('CVf_ISXSUB');
 } else {
     # Constant not present after 5.8.x
-    doconst(AVf_REAL);
+    doconst('AVf_REAL');
 }  
 
 foreach my $tuple (['op.h'],['cop.h'],['regexp.h','RXf_'])

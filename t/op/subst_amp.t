@@ -1,12 +1,12 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config; import Config;
+    require Config; Config->import;
 }
 
 print "1..13\n";
+
+our ($foo, $t, @res);
 
 $_ = 'x' x 20; 
 s/\d*|x/<$&>/g; 

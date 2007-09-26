@@ -554,7 +554,7 @@ Perl_magic_regdatum_get(pTHX_ SV *sv, MAGIC *mg)
 		    else			/* @- */
 			i = s;
 
-		    if (i > 0 && RX_MATCH_UTF8(rx)) {
+		    if (i > 0 && IN_CODEPOINTS) {
 			const char * const b = rx->subbeg;
 			if (b)
 			    i = utf8_length((U8*)b, (U8*)(b+i));
@@ -671,7 +671,6 @@ Perl_emulate_cop_io(pTHX_ const COP *const c, SV *const sv)
 	sv_setsv(sv, &PL_sv_undef);
     else {
 	sv_setpvs(sv, "");
-	SvUTF8_off(sv);
 	if ((CopHINTS_get(c) & HINT_LEXICAL_IO_IN)) {
 	    SV *const value = Perl_refcounted_he_fetch(aTHX_
 						       c->cop_hints_hash,
@@ -695,15 +694,11 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 {
     dVAR;
     register I32 paren;
-    register char *s = NULL;
     register REGEXP *rx;
     const char * const remaining = mg->mg_ptr + 1;
     const char nextchar = *remaining;
 
     switch (*mg->mg_ptr) {
-    case '\001':		/* ^A */
-	sv_setsv(sv, PL_bodytarget);
-	break;
     case '\003':		/* ^C, ^CHILD_ERROR_NATIVE */
 	if (nextchar == '\0') {
 	    sv_setiv(sv, (IV)PL_minus_c);
@@ -773,7 +768,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	     SvNOK_on(sv);	/* what a wonderful hack! */
 	 }
 	 else if (strEQ(remaining, "NCODING"))
-	      sv_setsv(sv, PL_encoding);
+	     sv_setsv(sv, PL_encoding);
 	 break;
     case '\006':		/* ^F */
 	sv_setiv(sv, (IV)PL_maxsysfd);
@@ -935,41 +930,9 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 #endif
 	}
 	break;
-    case '^':
-	if (GvIOp(PL_defoutgv))
-	    s = IoTOP_NAME(GvIOp(PL_defoutgv));
-	if (s)
-	    sv_setpv(sv,s);
-	else {
-	    sv_setpv(sv,GvENAME(PL_defoutgv));
-	    sv_catpv(sv,"_TOP");
-	}
-	break;
-    case '~':
-	if (GvIOp(PL_defoutgv))
-	    s = IoFMT_NAME(GvIOp(PL_defoutgv));
-	if (!s)
-	    s = GvENAME(PL_defoutgv);
-	sv_setpv(sv,s);
-	break;
-    case '=':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)IoPAGE_LEN(GvIOp(PL_defoutgv)));
-	break;
-    case '-':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)IoLINES_LEFT(GvIOp(PL_defoutgv)));
-	break;
-    case '%':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)IoPAGE(GvIOp(PL_defoutgv)));
-	break;
     case ':':
 	break;
     case '/':
-	break;
-    case '[':
-	sv_setiv(sv, (IV)CopARYBASE_get(PL_curcop));
 	break;
     case '|':
 	if (GvIOp(PL_defoutgv))
@@ -1317,9 +1280,6 @@ Perl_csighandler(int sig)
 #else
     dTHX;
 #endif
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-   va_list args;
-#endif
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
     (void) rsignal(sig, PL_csighandlerp);
     if (PL_sig_ignoring[sig]) return;
@@ -1331,9 +1291,6 @@ Perl_csighandler(int sig)
 #else
             exit(1);
 #endif
-#endif
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-   va_start(args, sig);
 #endif
    if (
 #ifdef SIGILL
@@ -1351,9 +1308,6 @@ Perl_csighandler(int sig)
 	(*PL_sighandlerp)(sig);
    else
 	S_raise_signal(aTHX_ sig);
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-   va_end(args);
-#endif
 }
 
 #if defined(FAKE_PERSISTENT_SIGNAL_HANDLERS) || defined(FAKE_DEFAULT_SIGNAL_HANDLERS)
@@ -1496,11 +1450,8 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 #endif
     }
     else {
-	/*
-	 * We should warn if HINT_STRICT_REFS, but without
-	 * access to a known hint bit in a known OP, we can't
-	 * tell whether HINT_STRICT_REFS is in force or not.
-	 */
+	if (ckWARN(WARN_SIGNAL))
+	    Perl_warner(aTHX_ packWARN(WARN_SIGNAL), "signal handler set to string");
 	if (!strchr(s,':') && !strchr(s,'\''))
 	    Perl_sv_insert(aTHX_ sv, 0, 0, STR_WITH_LEN("main::"));
 	if (i)
@@ -1528,10 +1479,6 @@ Perl_magic_setisa(pTHX_ SV *sv, MAGIC *mg)
     /* Bail out if destruction is going on */
     if(PL_dirty) return 0;
 
-    /* Skip _isaelem because _isa will handle it shortly */
-    if (PL_delaymagic & DM_ARRAY && mg->mg_type == PERL_MAGIC_isaelem)
-	return 0;
-
     /* XXX Once it's possible, we need to
        detect that our @ISA is aliased in
        other stashes, and act on the stashes
@@ -1546,7 +1493,10 @@ Perl_magic_setisa(pTHX_ SV *sv, MAGIC *mg)
             : (GV*)SvMAGIC(mg->mg_obj)->mg_obj
     );
 
-    mro_isa_changed_in(stash);
+    if(PL_delaymagic)
+        PL_delayedisa = stash;
+    else
+        mro_isa_changed_in(stash);
 
     return 0;
 }
@@ -1802,7 +1752,7 @@ Perl_magic_getarylen(pTHX_ SV *sv, const MAGIC *mg)
     dVAR;
     const AV * const obj = (AV*)mg->mg_obj;
     if (obj) {
-	sv_setiv(sv, AvFILL(obj) + CopARYBASE_get(PL_curcop));
+	sv_setiv(sv, AvFILL(obj));
     } else {
 	SvOK_off(sv);
     }
@@ -1815,7 +1765,7 @@ Perl_magic_setarylen(pTHX_ SV *sv, MAGIC *mg)
     dVAR;
     AV * const obj = (AV*)mg->mg_obj;
     if (obj) {
-	av_fill(obj, SvIV(sv) - CopARYBASE_get(PL_curcop));
+	av_fill(obj, SvIV(sv));
     } else {
 	if (ckWARN(WARN_MISC))
 	    Perl_warner(aTHX_ packWARN(WARN_MISC),
@@ -1859,7 +1809,7 @@ Perl_magic_getpos(pTHX_ SV *sv, MAGIC *mg)
 	    I32 i = found->mg_len;
 	    if (DO_UTF8(lsv))
 		sv_pos_b2u(lsv, &i);
-	    sv_setiv(sv, i + CopARYBASE_get(PL_curcop));
+	    sv_setiv(sv, i);
 	    return 0;
 	}
     }
@@ -1899,7 +1849,7 @@ Perl_magic_setpos(pTHX_ SV *sv, MAGIC *mg)
     }
     len = SvPOK(lsv) ? SvCUR(lsv) : sv_len(lsv);
 
-    pos = SvIV(sv) - CopARYBASE_get(PL_curcop);
+    pos = SvIV(sv);
 
     if (DO_UTF8(lsv)) {
 	ulen = sv_len_utf8(lsv);
@@ -1961,15 +1911,13 @@ Perl_magic_getsubstr(pTHX_ SV *sv, MAGIC *mg)
     I32 rem = LvTARGLEN(sv);
     PERL_UNUSED_ARG(mg);
 
-    if (SvUTF8(lsv))
+    if (LvTYPE(sv) == 'X')  /* Uppercase is with utf8 */
 	sv_pos_u2b(lsv, &offs, &rem);
     if (offs > (I32)len)
 	offs = len;
     if (rem + offs > (I32)len)
 	rem = len - offs;
     sv_setpvn(sv, tmps + offs, (STRLEN)rem);
-    if (SvUTF8(lsv))
-        SvUTF8_on(sv);
     return 0;
 }
 
@@ -1984,20 +1932,10 @@ Perl_magic_setsubstr(pTHX_ SV *sv, MAGIC *mg)
     I32 lvlen = LvTARGLEN(sv);
     PERL_UNUSED_ARG(mg);
 
-    if (DO_UTF8(sv)) {
-	sv_utf8_upgrade(lsv);
+    if (LvTYPE(sv) == 'X') {  /* Uppercase is with utf8 */
  	sv_pos_u2b(lsv, &lvoff, &lvlen);
 	sv_insert(lsv, lvoff, lvlen, tmps, len);
 	LvTARGLEN(sv) = sv_len_utf8(sv);
-	SvUTF8_on(lsv);
-    }
-    else if (lsv && SvUTF8(lsv)) {
-	const char *utf8;
-	sv_pos_u2b(lsv, &lvoff, &lvlen);
-	LvTARGLEN(sv) = len;
-	utf8 = (char*)bytes_to_utf8((U8*)tmps, &len);
-	sv_insert(lsv, lvoff, lvlen, utf8, len);
-	Safefree(utf8);
     }
     else {
 	sv_insert(lsv, lvoff, lvlen, tmps, len);
@@ -2160,15 +2098,6 @@ Perl_magic_setbm(pTHX_ SV *sv, MAGIC *mg)
 }
 
 int
-Perl_magic_setfm(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_UNUSED_ARG(mg);
-    sv_unmagic(sv, PERL_MAGIC_fm);
-    SvCOMPILED_off(sv);
-    return 0;
-}
-
-int
 Perl_magic_setuvar(pTHX_ SV *sv, MAGIC *mg)
 {
     const struct ufuncs * const uf = (struct ufuncs *)mg->mg_ptr;
@@ -2270,9 +2199,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case '\001':	/* ^A */
-	sv_setsv(PL_bodytarget, sv);
-	break;
     case '\003':	/* ^C */
 	PL_minus_c = (bool)SvIV(sv);
 	break;
@@ -2308,14 +2234,14 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 #endif
 	}
 	else if (strEQ(mg->mg_ptr+1, "NCODING")) {
-	    if (PL_encoding)
-		SvREFCNT_dec(PL_encoding);
-	    if (SvOK(sv) || SvGMAGICAL(sv)) {
-		PL_encoding = newSVsv(sv);
-	    }
-	    else {
-		PL_encoding = NULL;
-	    }
+           if (PL_encoding)
+               SvREFCNT_dec(PL_encoding);
+           if (SvOK(sv) || SvGMAGICAL(sv)) {
+               PL_encoding = newSVsv(sv);
+           }
+           else {
+               PL_encoding = NULL;
+           }
 	}
 	break;
     case '\006':	/* ^F */
@@ -2353,7 +2279,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	       ensure that hints for input are sooner on linked list.  */
 	    tmp = sv_2mortal(out ? newSVpvn(out + 1, start + len - out - 1)
 			     : newSVpvs(""));
-	    SvFLAGS(tmp) |= SvUTF8(sv);
 
 	    tmp_he
 		= Perl_refcounted_he_new(aTHX_ PL_compiling.cop_hints_hash, 
@@ -2451,27 +2376,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	else if (SvOK(sv) && GvIO(PL_last_in_gv))
 	    IoLINES(GvIOp(PL_last_in_gv)) = SvIV(sv);
 	break;
-    case '^':
-	Safefree(IoTOP_NAME(GvIOp(PL_defoutgv)));
-	s = IoTOP_NAME(GvIOp(PL_defoutgv)) = savesvpv(sv);
-	IoTOP_GV(GvIOp(PL_defoutgv)) =  gv_fetchsv(sv, GV_ADD, SVt_PVIO);
-	break;
-    case '~':
-	Safefree(IoFMT_NAME(GvIOp(PL_defoutgv)));
-	s = IoFMT_NAME(GvIOp(PL_defoutgv)) = savesvpv(sv);
-	IoFMT_GV(GvIOp(PL_defoutgv)) =  gv_fetchsv(sv, GV_ADD, SVt_PVIO);
-	break;
-    case '=':
-	IoPAGE_LEN(GvIOp(PL_defoutgv)) = (SvIV(sv));
-	break;
-    case '-':
-	IoLINES_LEFT(GvIOp(PL_defoutgv)) = (SvIV(sv));
-	if (IoLINES_LEFT(GvIOp(PL_defoutgv)) < 0L)
-	    IoLINES_LEFT(GvIOp(PL_defoutgv)) = 0L;
-	break;
-    case '%':
-	IoPAGE(GvIOp(PL_defoutgv)) = (SvIV(sv));
-	break;
     case '|':
 	{
 	    IO * const io = GvIOp(PL_defoutgv);
@@ -2512,9 +2416,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	else {
 	    PL_ofs_sv = NULL;
 	}
-	break;
-    case '[':
-	CopARYBASE_set(&PL_compiling, SvIV(sv));
 	break;
     case '?':
 #ifdef COMPLEX_STATUS

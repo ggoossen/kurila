@@ -3,15 +3,10 @@
 # This test was originally for pseudo-hashes.  It now exists to ensure
 # they were properly removed in 5.9.
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 require Tie::Array;
 
 package Tie::BasicArray;
-@ISA = 'Tie::Array';
+our @ISA = 'Tie::Array';
 sub TIEARRAY  { bless [], $_[0] }
 sub STORE     { $_[0]->[$_[1]] = $_[2] }
 sub FETCH     { $_[0]->[$_[1]] }
@@ -35,6 +30,7 @@ sub not_hash {
 my $foo = 42;
 sub no_op { $foo++ }
 
+our ($sch, @keys, @values, @fake, %fake, $v, @x, %hv);
 
 $sch = {
     'abc' => 1,
@@ -111,7 +107,7 @@ not_hash($@);
 
 # quick check with tied array & tied hash
 require Tie::Hash;
-tie %fake, Tie::StdHash;
+tie %fake, 'Tie::StdHash';
 %fake = %$sch;
 $a->[0] = \%fake;
 

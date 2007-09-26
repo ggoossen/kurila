@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.006 qw(:Status);
-use Compress::Raw::Zlib  2.006 qw(Z_OK Z_DATA_ERROR Z_STREAM_END Z_FINISH MAX_WBITS);
+use IO::Compress::Base::Common  2.004 qw(:Status);
+use Compress::Raw::Zlib  2.004 qw(Z_OK Z_DATA_ERROR Z_STREAM_END Z_FINISH MAX_WBITS);
 
 our ($VERSION);
-$VERSION = '2.006';
+$VERSION = '2.004';
 
 
 
@@ -23,18 +23,18 @@ sub mkUncompObject
 
     if ($scan)
     {
-        ($inflate, $status) = new Compress::Raw::Zlib::InflateScan
+        ($inflate, $status) = Compress::Raw::Zlib::InflateScan->new(
                                     CRC32        => $crc32,
                                     ADLER32      => $adler32,
-                                    WindowBits   => - MAX_WBITS ;
+                                    WindowBits   => - MAX_WBITS) ;
     }
     else
     {
-        ($inflate, $status) = new Compress::Raw::Zlib::Inflate
+        ($inflate, $status) = Compress::Raw::Zlib::Inflate->new(
                                     AppendOutput => 1,
                                     CRC32        => $crc32,
                                     ADLER32      => $adler32,
-                                    WindowBits   => - MAX_WBITS ;
+                                    WindowBits   => - MAX_WBITS) ;
     }
 
     return (undef, "Could not create Inflation object: $status", $status) 

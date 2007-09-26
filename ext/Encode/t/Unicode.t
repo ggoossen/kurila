@@ -6,7 +6,7 @@
 #
 
 BEGIN {
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
@@ -125,7 +125,6 @@ for my $file (@file){
     }else{ # ugh!
     binmode $fh;
     $content = join('' => <$fh>);
-    Encode::_utf8_on($content)
     }
     close $fh;
     is(decode("UTF-7", encode("UTF-7", $content)), $content, 

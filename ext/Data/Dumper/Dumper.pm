@@ -9,7 +9,7 @@
 
 package Data::Dumper;
 
-$VERSION = '2.121_14';
+$VERSION = '2.121_13';
 
 #$| = 1;
 
@@ -253,13 +253,6 @@ sub Dumpperl {
   return wantarray ? @out : join('', @out);
 }
 
-# wrap string in single quotes (escaping if needed)
-sub _quote {
-    my $val = shift;
-    $val =~ s/([\\\'])/\\$1/g;
-    return  "'" . $val .  "'";
-}
-
 #
 # twist, toil and turn;
 # and recurse, of course.
@@ -445,7 +438,7 @@ sub _dump {
     }
     
     if ($realpack) { # we have a blessed ref
-      $out .= ', ' . _quote($realpack) . ' )';
+      $out .= ', \'' . $realpack . '\'' . ' )';
       $out .= '->' . $s->{toaster} . '()'  if $s->{toaster} ne '';
       $s->{apad} = $blesspad;
     }
@@ -504,12 +497,13 @@ sub _dump {
       $out .= $val;
     }
     else {				 # string
-      if ($s->{useqq} or $val =~ tr/\0-\377//c) {
+      if ($s->{useqq} or $val =~ m/[\x80-\xFF]/) {
         # Fall back to qq if there's Unicode
 	$out .= qquote($val, $s->{useqq});
       }
       else {
-        $out .= _quote($val);
+	$val =~ s/([\\\'])/\\$1/g;
+	$out .= '\'' . $val .  '\'';
       }
     }
   }
@@ -661,14 +655,13 @@ sub qquote {
   local($_) = shift;
   s/([\\\"\@\$])/\\$1/g;
   my $bytes; { use bytes; $bytes = length }
-  s/([^\x00-\x7f])/'\x{'.sprintf("%x",ord($1)).'}'/ge if $bytes > length;
+  s/([^\x00-\x7f])/'\x'.sprintf("%02x",ord($1))/ge if $bytes > length;
   return qq("$_") unless 
     /[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
   my $high = shift || "";
   s/([\a\b\t\n\f\r\e])/$esc{$1}/g;
 
-  if (ord('^')==94)  { # ascii
     # no need for 3 digits in escape for these
     s/([\0-\037])(?!\d)/'\\'.sprintf('%o',ord($1))/eg;
     s/([\0-\037\177])/'\\'.sprintf('%03o',ord($1))/eg;
@@ -681,16 +674,9 @@ sub qquote {
     } elsif ($high eq "8bit") {
         # leave it as it is
     } else {
-      s/([\200-\377])/'\\'.sprintf('%03o',ord($1))/eg;
-      s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
+        use utf8;
+        s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
     }
-  }
-  else { # ebcdic
-      s{([^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~])(?!\d)}
-       {my $v = ord($1); '\\'.sprintf(($v <= 037 ? '%o' : '%03o'), $v)}eg;
-      s{([^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~])}
-       {'\\'.sprintf('%03o',ord($1))}eg;
-  }
 
   return qq("$_");
 }

@@ -8,7 +8,7 @@ use integer;
 use Pod::Escapes 1.03 ();
 use Pod::Simple::LinkSection ();
 use Pod::Simple::BlackBox ();
-#use utf8;
+use utf8;
 
 use vars qw(
   $VERSION @ISA
@@ -1373,7 +1373,7 @@ sub _change_S_to_nbsp { #  a recursive function
         $i +=  @$to_pull_up - 1;   # Make $i skip the pulled-up stuff
       }
     } else {
-      $treelet->[$i] =~ s/\s/\xA0/g if ASCII and $in_s;
+      $treelet->[$i] =~ s/\s/\x{A0}/g if ASCII and $in_s;
        # (If not in ASCIIland, we can't assume that \xA0 == nbsp.)
        
        # Note that if you apply nbsp_for_S to text, and so turn
@@ -1395,7 +1395,7 @@ sub _accessorize {  # A simple-minded method-maker
   no strict 'refs';
   foreach my $attrname (@_) {
     next if $attrname =~ m/::/; # a hack
-    *{caller() . '::' . $attrname} = sub {
+    *{Symbol::qualify_to_ref(caller() . '::' . $attrname)} = sub {
       use strict;
       $Carp::CarpLevel = 1,  Carp::croak(
        "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"

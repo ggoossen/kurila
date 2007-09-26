@@ -26,7 +26,7 @@ if ($ARGV[0] && $ARGV[0] eq '-torture') {
 $ENV{PERL_CORE} = 1;
 
 #fudge DATA for now.
-%datahandle = qw(
+our %datahandle = qw(
 		lib/bigint.t		1
 		lib/bigintpm.t		1
 		lib/bigfloat.t	 	1
@@ -54,6 +54,7 @@ sub _populate_hash {
     return map {$_, 1} split /\s+/, $_[0];
 }
 
+our $re;
 if ($ARGV[0] && $ARGV[0]=~/^-re/) {
     if ($ARGV[0]!~/=/) {
         shift;

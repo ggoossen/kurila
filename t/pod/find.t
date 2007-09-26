@@ -31,12 +31,12 @@ require Cwd;
 my $THISDIR = Cwd::cwd();
 my $VERBOSE = $ENV{PERL_CORE} ? 0 : ($ENV{TEST_VERBOSE} || 0);
 my $lib_dir = $ENV{PERL_CORE} ? 
-  File::Spec->catdir('pod', 'testpods', 'lib')
-  : File::Spec->catdir($THISDIR,'lib');
+  'File::Spec'->catdir('pod', 'testpods', 'lib')
+  : 'File::Spec'->catdir($THISDIR,'lib');
 if ($^O eq 'VMS') {
     $lib_dir = $ENV{PERL_CORE} ?
-      VMS::Filespec::unixify(File::Spec->catdir('pod', 'testpods', 'lib'))
-      : VMS::Filespec::unixify(File::Spec->catdir($THISDIR,'-','lib','pod'));
+      VMS::Filespec::unixify('File::Spec'->catdir('pod', 'testpods', 'lib'))
+      : VMS::Filespec::unixify('File::Spec'->catdir($THISDIR,'-','lib','pod'));
     $Qlib_dir = $lib_dir;
     $Qlib_dir =~ s#\/#::#g;
 }
@@ -74,7 +74,7 @@ if ($^O eq 'VMS') {
     }
     ok($count/($#result+1)-1,$#compare);
 }
-elsif (File::Spec->case_tolerant || $^O eq 'dos') {
+elsif ('File::Spec'->case_tolerant || $^O eq 'dos') {
     ok(lc $result,lc $compare);
 }
 else {
@@ -95,8 +95,8 @@ if ($^O eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
 }
 else {
     $compare = $ENV{PERL_CORE} ?
-      File::Spec->catfile(File::Spec->updir, 'lib','File','Find.pm')
-      : File::Spec->catfile($Config::Config{privlib},"File","Find.pm");
+      'File::Spec'->catfile('File::Spec'->updir, 'lib','File','Find.pm')
+      : 'File::Spec'->catfile($Config::Config{privlib},"File","Find.pm");
     ok(_canon($result),_canon($compare));
 }
 
@@ -104,13 +104,13 @@ else {
 my $searchpod = 'Stuff';
 print "### searching for $searchpod.pod\n";
 $result = pod_where(
-  { -dirs => [ File::Spec->catdir(
+  { -dirs => [ 'File::Spec'->catdir(
     $ENV{PERL_CORE} ? () : qw(t), 'pod', 'testpods', 'lib', 'Pod') ],
     -verbose => $VERBOSE }, $searchpod)
   || "undef - $searchpod.pod not found!";
 print "### found $result\n";
 
-$compare = File::Spec->catfile(
+$compare = 'File::Spec'->catfile(
     $ENV{PERL_CORE} ? () : qw(t),
     'pod', 'testpods', 'lib', 'Pod' ,'Stuff.pm');
 ok(_canon($result),_canon($compare));
@@ -119,12 +119,12 @@ ok(_canon($result),_canon($compare));
 sub _canon
 {
   my ($path) = @_;
-  $path = File::Spec->canonpath($path);
-  my @comp = File::Spec->splitpath($path);
-  my @dir = File::Spec->splitdir($comp[1]);
-  $comp[1] = File::Spec->catdir(@dir);
-  $path = File::Spec->catpath(@comp);
-  $path = uc($path) if File::Spec->case_tolerant;
+  $path = 'File::Spec'->canonpath($path);
+  my @comp = 'File::Spec'->splitpath($path);
+  my @dir = 'File::Spec'->splitdir($comp[1]);
+  $comp[1] = 'File::Spec'->catdir(@dir);
+  $path = 'File::Spec'->catpath(@comp);
+  $path = uc($path) if 'File::Spec'->case_tolerant;
   print "### general path: $path\n" if $VERBOSE;
   $path;
 }

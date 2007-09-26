@@ -115,8 +115,6 @@ while (<DATA>)
         $try .= '$x->facmp($y);';
       } elsif ($f eq "fpow") {
         $try .= '$x ** $y;';
-      } elsif ($f eq "bnok") {
-        $try .= '$x->bnok($y);';
       } elsif ($f eq "froot") {
         $try .= "$setup; \$x->froot(\$y);";
       } elsif ($f eq "fadd") {
@@ -399,21 +397,6 @@ abc:+0:NaN
 +27:+90:270
 +1034:+804:415668
 $div_scale = 40;
-&bnok
-+inf:10:inf
-NaN:NaN:NaN
-NaN:1:NaN
-1:NaN:NaN
-1:1:1
-# k > n
-1:2:0
-2:3:0
-# k < 0
-1:-2:0
-# 7 over 3 = 35
-7:3:35
-7:6:1
-100:90:17310309456440
 &flog
 0::NaN
 -1::NaN

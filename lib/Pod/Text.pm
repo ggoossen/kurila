@@ -27,6 +27,7 @@ package Pod::Text;
 require 5.004;
 
 use strict;
+use utf8;
 use vars qw(@ISA @EXPORT %ESCAPES $VERSION);
 
 use Carp qw(carp croak);
@@ -212,7 +213,7 @@ sub wrap {
     my $spaces = ' ' x $$self{MARGIN};
     my $width = $$self{opt_width} - $$self{MARGIN};
     while (length > $width) {
-        if (s/^([^\n]{0,$width})\s+// || s/^([^\n]{$width})//) {
+        if (s/^([^\n]{0,$width})[ \t]+// || s/^([^\n]{$width})//) {
             $output .= $spaces . $1 . "\n";
         } else {
             last;
@@ -237,7 +238,7 @@ sub reformat {
         s/\n/ /g;
         s/   +/  /g;
     } else {
-        s/\s+/ /g;
+        s/[ \t\n\r\f]+/ /g;
     }
     return $self->wrap ($_);
 }
@@ -245,7 +246,8 @@ sub reformat {
 # Output text to the output device.
 sub output {
     my ($self, $text) = @_;
-    $text =~ tr/\240\255/ /d;
+    $text =~ s/\x{a0}/ /g; # non-breaking space
+    $text =~ s/\x{ad}//g; # soft hyphen
     print { $$self{output_fh} } $text;
 }
 

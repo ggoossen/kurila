@@ -154,7 +154,7 @@ close SCRIPTS;
 
 if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
 
-my @pods = $nopods ? () : (<pod/*.pod>, 'x2p/a2p.pod');
+my @pods = $nopods ? () : (glob("pod/*.pod"), 'x2p/a2p.pod');
 
 # Specify here any .pm files that are actually architecture-dependent.
 # (Those included with XS extensions under ext/ are automatically
@@ -200,7 +200,7 @@ find(sub {
 my $ver = $Config{version};
 my $release = substr($],0,3);   # Not used currently.
 my $patchlevel = substr($],3,2);
-die "Patchlevel of perl ($patchlevel)",
+warn "Patchlevel of perl ($patchlevel)",
     "and patchlevel of config.sh ($Config{'PERL_VERSION'}) don't match\n"
 	if $patchlevel != $Config{'PERL_VERSION'};
 
@@ -285,6 +285,37 @@ if (($Is_W32 and ! $Is_NetWare) or $Is_Cygwin) {
 	my $v_e_r_s = $ver; $v_e_r_s =~ tr/./_/;
 	$perldll =~ s/(\..*)?$/$v_e_r_s.$dlext/;
 	$perldll =~ s/^lib/cyg/;
+	if ($Config{useshrplib} eq 'true') {
+	    # install ld2 and perlld as well
+	    foreach ('ld2', 'perlld') {
+		safe_unlink("$installbin/$_");
+		copy("$_", "$installbin/$_");
+		chmod(0755, "$installbin/$_");
+		$packlist->{"$installbin/$_"} = { type => 'file' };
+	    };
+	    open (LD2, ">$installbin/ld2");
+	    print LD2 <<SHELL;
+#!/bin/sh
+#
+# ld wrapper, passes all args to perlld;
+#
+for trythis in $installbin/perl
+do
+  if [ -x \$trythis ]
+  then
+    \$trythis $installbin/perlld "\$\@"
+    exit \$?
+  fi
+done
+# hard luck!
+echo I see no perl executable around there
+echo perl is required to build dynamic libraries
+echo look if the path to perl in /bin/ld2 is correct
+exit 1
+SHELL
+	    close LD2;
+	    chmod(0755, "$installbin/ld2");
+	};
     } else {
 	$perldll = 'perl59.' . $dlext;
     }
@@ -393,11 +424,11 @@ my @corefiles;
 if ($Is_VMS) {  # We did core file selection during build
     my $coredir = "lib/$Config{archname}/$ver/CORE";
     $coredir =~ tr/./_/;
-    map { s|^$coredir/||i; } @corefiles = <$coredir/*.*>;
+    map { s|^$coredir/||i; } @corefiles = glob("$coredir/*.*");
 }
 else {
     # [als] hard-coded 'libperl' name... not good!
-    @corefiles = <*.h libperl*.* perl*$Config{lib_ext}>;
+    @corefiles = glob("*.h libperl*.* perl*$Config{lib_ext}");
 
     # AIX needs perl.exp installed as well.
     push(@corefiles,'perl.exp') if $^O eq 'aix';
@@ -806,23 +837,13 @@ sub installlib {
     return if $dir =~ m{\bXS/(?:APItest|Typemap)\b};
     return if $name =~ m{\b(?:APItest|Typemap)\.pm$};
     # ignore the demo files
-    return if $dir =~ /\b(?:demos?|eg)\b/;
+    return if $dir =~ /\bdemos?\b/;
 
     # ignore READMEs, MANIFESTs, INSTALL docs, META.ymls and change logs.
     # Changes.e2x and README.e2x are needed by enc2xs.
-    return if $name =~ m{^(?:README(?:\.\w+)?)$} && $name ne 'README.e2x';
-    return if $name =~ m{^(?:MANIFEST|META\.yml)$};
-    return if $name =~ m{^(?:INSTALL|TODO|BUGS|CREDITS)$}i;
+    return if $name =~ m{^(?:README(?:\.\w+)?|MANIFEST|META\.yml|INSTALL)$} && $name ne 'README.e2x';
+    return if $name =~ m{^(?:TODO|BUGS|CREDITS)$}i;
     return if $name =~ m{^change(?:s|log)(?:\.libnet)?$}i;
-    return if $name =~ m{^(?:SIGNATURE|PAUSE200\d\.pub)$}; # CPAN files
-    return if $name =~ m{^(?:NOTES|PATCHING)$}; # ExtUtils files
-
-    # if using a shared perl library then ignore:
-    # - static library files [of statically linked extensions];
-    # - import library files and export library files (only present on Win32
-    #   anyway?) and empty bootstrap files [of dynamically linked extensions].
-    return if $Config{useshrplib} eq 'true' and
-             ($name =~ /$Config{_a}$/ or $name =~ /\.exp$/ or ($name =~ /\.bs$/ and -z $name));
 
     $name = "$dir/$name" if $dir ne '';
 

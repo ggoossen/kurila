@@ -24,6 +24,9 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;  # partial credit just for showing up
 
+use strict;
+our (@a);
+
 my $o = tie @a, 'Tie::File', $file;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;

@@ -6,25 +6,25 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.006 qw(createSelfTiedObject);
+use IO::Compress::Base::Common  2.004 qw(createSelfTiedObject);
 
-use IO::Uncompress::Adapter::Inflate  2.006 ();
+use IO::Uncompress::Adapter::Inflate  2.004 ();
 
 
-use IO::Uncompress::Base  2.006 ;
-use IO::Uncompress::Gunzip  2.006 ;
-use IO::Uncompress::Inflate  2.006 ;
-use IO::Uncompress::RawInflate  2.006 ;
-use IO::Uncompress::Unzip  2.006 ;
+use IO::Uncompress::Base  2.004 ;
+use IO::Uncompress::Gunzip  2.004 ;
+use IO::Uncompress::Inflate  2.004 ;
+use IO::Uncompress::RawInflate  2.004 ;
+use IO::Uncompress::Unzip  2.004 ;
 
 require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyInflateError);
 
-$VERSION = '2.006';
+$VERSION = '2.004';
 $AnyInflateError = '';
 
-@ISA = qw( Exporter IO::Uncompress::Base );
+@ISA = qw( IO::Uncompress::Base Exporter );
 @EXPORT_OK = qw( $AnyInflateError anyinflate ) ;
 %EXPORT_TAGS = %IO::Uncompress::Base::DEFLATE_CONSTANTS ;
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
@@ -48,7 +48,7 @@ sub anyinflate
 
 sub getExtraParams
 {
-    use IO::Compress::Base::Common  2.006 qw(:Parse);
+    use IO::Compress::Base::Common  2.004 qw(:Parse);
     return ( 'RawInflate' => [1, 1, Parse_boolean,  0] ) ;
 }
 

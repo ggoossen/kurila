@@ -77,6 +77,9 @@ no warnings 'reserved' ;
 foo.bar;
 EXPECT
 Useless use of concatenation (.) or string in void context at - line 3.
+Bareword "foo" not allowed while "strict subs" in use at - line 3.
+Bareword "bar" not allowed while "strict subs" in use at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 
 --FILE-- abc

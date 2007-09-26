@@ -41,12 +41,12 @@ sub import {
 		croak "use of backend $backend failed: $@";
 	    }
 
-
-	    my $compilesub = &{"B::${backend}::compile"}(@options);
+	    my $compilesub = &{*{Symbol::qualify_to_ref("B::${backend}::compile")}}(@options);
 	    if (ref($compilesub) ne "CODE") {
 		die $compilesub;
 	    }
 
+            our $savebackslash;
 	    local $savebackslash = $\;
 	    local ($\,$",$,) = (undef,' ','');
 	    &$compilesub();

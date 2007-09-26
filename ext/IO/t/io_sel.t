@@ -14,7 +14,7 @@ print "1..23\n";
 
 use IO::Select 1.09;
 
-my $sel = new IO::Select(\*STDIN);
+my $sel = IO::Select->new(\*STDIN);
 $sel->add(4, 5) == 2 or print "not ";
 print "ok 1\n";
 
@@ -41,7 +41,7 @@ $sel->remove(1, 4);
 print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 7\n";
 
-$sel = new IO::Select;
+$sel = IO::Select->new();
 print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 8\n";
 

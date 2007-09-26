@@ -3,9 +3,9 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
-    require Test::More; import Test::More;
-    plan(tests, 12);
+    require Config; Config->import;
+    require Test::More; Test::More->import();
+    plan('tests', 12);
 }
 
 require AnyDBM_File;
@@ -17,15 +17,15 @@ $Is_Dosish = ($^O eq 'amigaos' || $^O eq 'MSWin32' ||
 	      $^O eq 'os2' || $^O eq 'mint' ||
 	      $^O eq 'cygwin');
 
-unlink <Op_dbmx*>;
+unlink glob("Op_dbmx*");
 
 umask(0);
 
-ok( tie(%h,AnyDBM_File,'Op_dbmx', O_RDWR|O_CREAT, 0640), "Tie");
+ok( tie(%h,'AnyDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640), "Tie");
 
 $Dfile = "Op_dbmx.pag";
 if (! -e $Dfile) {
-	($Dfile) = <Op_dbmx*>;
+	($Dfile) = glob("Op_dbmx*");
 }
 
 SKIP:
@@ -63,7 +63,7 @@ $h{'goner2'} = 'snork';
 delete $h{'goner2'};
 
 untie(%h);
-ok(tie(%h,AnyDBM_File,'Op_dbmx', O_RDWR, 0640),"Re-tie hash");
+ok(tie(%h,'AnyDBM_File','Op_dbmx', O_RDWR, 0640),"Re-tie hash");
 
 $h{'j'} = 'J';
 $h{'k'} = 'K';

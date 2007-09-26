@@ -297,36 +297,7 @@ our ($g1);
 close $m1;	# exercises rv2gv
 close $g1;	# exercises rv2gv
 EXPECT
-Use of uninitialized value $m1 in ref-to-glob cast at - line 5.
-Use of uninitialized value $g1 in ref-to-glob cast at - line 6.
-########
-use warnings 'uninitialized';
-my ($m1, $m2, $v);
-our ($g1, $g2);
-
-$v = $$m1;
-$v = $$g1;
-
-$v = @$m1;
-$v = @$g1;
-$v = %$m2;
-$v = %$g2;
-
-$v = ${"foo.bar"}+1;
-$v = ${"foo$m1"}+1;
-$v = ${"foo$g1"}+1;
-EXPECT
-Use of uninitialized value $m1 in scalar dereference at - line 5.
-Use of uninitialized value $g1 in scalar dereference at - line 6.
-Use of uninitialized value $m1 in array dereference at - line 8.
-Use of uninitialized value $g1 in array dereference at - line 9.
-Use of uninitialized value $m2 in hash dereference at - line 10.
-Use of uninitialized value $g2 in hash dereference at - line 11.
-Use of uninitialized value in addition (+) at - line 13.
-Use of uninitialized value $m1 in concatenation (.) or string at - line 14.
-Use of uninitialized value in addition (+) at - line 14.
-Use of uninitialized value $g1 in concatenation (.) or string at - line 15.
-Use of uninitialized value in addition (+) at - line 15.
+Can't use an undefined value as a symbol reference at - line 5.
 ########
 use warnings 'uninitialized';
 my ($m1, $v);
@@ -759,22 +730,6 @@ Use of uninitialized value $m1 in scalar assignment at - line 5.
 ########
 use warnings 'uninitialized';
 my ($m1);
-our ($g1);
-
-$v = pos($m1) + 1;
-$v = pos($g1) + 1;
-$m1 = 0;
-$g1 = "";
-$v = pos($m1) + 1;
-$v = pos($g1) + 1;
-EXPECT
-Use of uninitialized value in addition (+) at - line 5.
-Use of uninitialized value in addition (+) at - line 6.
-Use of uninitialized value in addition (+) at - line 9.
-Use of uninitialized value in addition (+) at - line 10.
-########
-use warnings 'uninitialized';
-my ($m1);
 
 { my $x = "a" x $m1 }		# NB LHS of repeat does not warn
 { my @x = ("a") x $m1 }
@@ -899,26 +854,6 @@ use warnings 'uninitialized';
 my ($m1, $v);
 our ($g1);
 
-$v = sprintf $m1;
-$v = sprintf '%d%d%d%d', $m1, $m2, $g1, $g2;
-my $m3; eval {formline $m3 };
-formline '@<<@<<@<<@<<', $m1, $m2, $g1, $g2;
-EXPECT
-Use of uninitialized value $m1 in sprintf at - line 5.
-Use of uninitialized value $m1 in sprintf at - line 6.
-Use of uninitialized value $m2 in sprintf at - line 6.
-Use of uninitialized value $g1 in sprintf at - line 6.
-Use of uninitialized value $g2 in sprintf at - line 6.
-Use of uninitialized value $m3 in formline at - line 7.
-Use of uninitialized value $m1 in formline at - line 8.
-Use of uninitialized value $m2 in formline at - line 8.
-Use of uninitialized value $g1 in formline at - line 8.
-Use of uninitialized value $g2 in formline at - line 8.
-########
-use warnings 'uninitialized';
-my ($m1, $v);
-our ($g1);
-
 $v = crypt $m1, $g1;
 
 $v = ord;
@@ -1033,7 +968,7 @@ my ($v);
 my %h = ("\0011\002\r\n\t\f\"\\abcdefghijklmnopqrstuvwxyz", undef);
 $v = join '', %h;
 EXPECT
-Use of uninitialized value $h{"\0011\2\r\n\t\f\"\\abcdefghijklm"...} in join or string at - line 6.
+Use of uninitialized value $h{"\x[1]1\x[2]\r\n\t\f\"\\abcdefghi"...} in join or string at - line 6.
 ########
 use warnings 'uninitialized';
 my ($m1, $v);
@@ -1104,45 +1039,16 @@ umask $old;
 binmode STDIN, $m1;
 EXPECT
 Use of uninitialized value $FOO in open at - line 5.
-Use of uninitialized value in open at - line 7.
-Use of uninitialized value in open at - line 8.
-Use of uninitialized value in open at - line 9.
-Use of uninitialized value $m1 in open at - line 11.
-Use of uninitialized value $m1 in open at - line 12.
-Use of uninitialized value $g1 in open at - line 13.
-Use of uninitialized value $m2 in sysopen at - line 15.
-Use of uninitialized value $m1 in sysopen at - line 15.
-Use of uninitialized value $m2 in sysopen at - line 16.
-Use of uninitialized value $g1 in sysopen at - line 16.
-Use of uninitialized value $m1 in sysopen at - line 16.
-Use of uninitialized value $m1 in umask at - line 19.
-Use of uninitialized value $g1 in umask at - line 20.
-Use of uninitialized value $m1 in binmode at - line 23.
-Use of uninitialized value $m1 in binmode at - line 23.
+Can't use string ("FOO") as a symbol ref while "strict refs" in use at - line 7.
 ########
 use warnings 'uninitialized';
 my ($m1);
 our ($g1);
 
 eval { my $x; tie $x, $m1 };
-
-eval { my $x; read    $m1, $x, $g1 };
-eval { my $x; read    $m1, $x, $g1, $g2 };
-eval { my $x; sysread $m1, $x, $g1 };
-eval { my $x; sysread $m1, $x, $g1, $g2 };
 EXPECT
 Use of uninitialized value $m1 in tie at - line 5.
 Use of uninitialized value $m1 in tie at - line 5.
-Use of uninitialized value $m1 in ref-to-glob cast at - line 7.
-Use of uninitialized value $g1 in read at - line 7.
-Use of uninitialized value $m1 in ref-to-glob cast at - line 8.
-Use of uninitialized value $g1 in read at - line 8.
-Use of uninitialized value $g2 in read at - line 8.
-Use of uninitialized value $m1 in ref-to-glob cast at - line 9.
-Use of uninitialized value $g1 in sysread at - line 9.
-Use of uninitialized value $m1 in ref-to-glob cast at - line 10.
-Use of uninitialized value $g1 in sysread at - line 10.
-Use of uninitialized value $g2 in sysread at - line 10.
 ########
 use warnings 'uninitialized';
 my ($m1);
@@ -1185,13 +1091,6 @@ eval { syswrite $m1, $g1 }; # logic changed - now won't try $g1 if $m1 is bad
 eval { my $x; socket $x, $m1, $g1, $m2 };
 eval { my ($x,$y); socketpair $x, $y, $m1, $g1, $m2 };
 EXPECT
-Use of uninitialized value $x in ref-to-glob cast at - line 5.
-Use of uninitialized value $g1 in seek at - line 5.
-Use of uninitialized value $m1 in seek at - line 5.
-Use of uninitialized value $x in ref-to-glob cast at - line 6.
-Use of uninitialized value $g1 in sysseek at - line 6.
-Use of uninitialized value $m1 in sysseek at - line 6.
-Use of uninitialized value $m1 in ref-to-glob cast at - line 7.
 Use of uninitialized value $m2 in socket at - line 11.
 Use of uninitialized value $g1 in socket at - line 11.
 Use of uninitialized value $m1 in socket at - line 11.
@@ -1214,10 +1113,9 @@ EOM
 use warnings 'uninitialized';
 our ($g1);
 
-eval { my $x; flock $x, $g1 };
+my $x; flock $x, $g1;
 EXPECT
-Use of uninitialized value $x in ref-to-glob cast at - line 16.
-Use of uninitialized value $g1 in flock at - line 16.
+Can't use an undefined value as a symbol reference at - line 16.
 ########
 use warnings 'uninitialized';
 my ($m1, $v);

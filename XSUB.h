@@ -96,33 +96,21 @@ is a lexical $_ in scope.
 
 #define ST(off) PL_stack_base[ax + (off)]
 
-/* XSPROTO() is also used by SWIG like this:
- *
- *     typedef XSPROTO(SwigPerlWrapper);
- *     typedef SwigPerlWrapper *SwigPerlWrapperPtr;
- *
- * This code needs to be compilable under both C and C++.
- *
- * Don't forget to change the __attribute__unused__ version of XS()
- * below too if you change XSPROTO() here.
- */
-#define XSPROTO(name) void name(pTHX_ CV* cv)
-
 #undef XS
 #if defined(__CYGWIN__) && defined(USE_DYNAMIC_LOADING)
-#  define XS(name) __declspec(dllexport) XSPROTO(name)
+#  define XS(name) __declspec(dllexport) void name(pTHX_ CV* cv)
 #endif
 #if defined(__SYMBIAN32__)
-#  define XS(name) EXPORT_C XSPROTO(name)
+#  define XS(name) EXPORT_C void name(pTHX_ CV* cv)
 #endif
 #ifndef XS
 #  if defined(HASATTRIBUTE_UNUSED) && !defined(__cplusplus)
 #    define XS(name) void name(pTHX_ CV* cv __attribute__unused__)
 #  else
 #    ifdef __cplusplus
-#      define XS(name) extern "C" XSPROTO(name)
+#      define XS(name) extern "C" void name(pTHX_ CV* cv)
 #    else
-#      define XS(name) XSPROTO(name)
+#      define XS(name) void name(pTHX_ CV* cv)
 #    endif
 #  endif
 #endif
@@ -156,13 +144,11 @@ is a lexical $_ in scope.
 
 #ifdef __cplusplus
 #  define XSINTERFACE_CVT(ret,name) ret (*name)(...)
-#  define XSINTERFACE_CVT_ANON(ret) ret (*)(...)
 #else
 #  define XSINTERFACE_CVT(ret,name) ret (*name)()
-#  define XSINTERFACE_CVT_ANON(ret) ret (*)()
 #endif
 #define dXSFUNCTION(ret)		XSINTERFACE_CVT(ret,XSFUNCTION)
-#define XSINTERFACE_FUNC(ret,cv,f)     ((XSINTERFACE_CVT_ANON(ret))(f))
+#define XSINTERFACE_FUNC(ret,cv,f)     ((XSINTERFACE_CVT(ret,))(f))
 #define XSINTERFACE_FUNC_SET(cv,f)	\
 		CvXSUBANY(cv).any_dxptr = (void (*) (pTHX_ void*))(f)
 
@@ -398,10 +384,10 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 #  define VTBL_nkeys		&PL_vtbl_nkeys
 #  define VTBL_taint		&PL_vtbl_taint
 #  define VTBL_substr		&PL_vtbl_substr
+#  define VTBL_substr_utf8	&PL_vtbl_substr_utf8
 #  define VTBL_vec		&PL_vtbl_vec
 #  define VTBL_pos		&PL_vtbl_pos
 #  define VTBL_bm		&PL_vtbl_bm
-#  define VTBL_fm		&PL_vtbl_fm
 #  define VTBL_uvar		&PL_vtbl_uvar
 #  define VTBL_defelem		&PL_vtbl_defelem
 #  define VTBL_regexp		&PL_vtbl_regexp

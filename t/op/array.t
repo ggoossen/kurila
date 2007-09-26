@@ -1,14 +1,10 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = ('.', '../lib');
-}
+require './test.pl';
 
-require 'test.pl';
+plan (117);
 
-plan (125);
-
+my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 #
 # @foo, @bar, and @ary are also used from tie-stdarray after tie-ing them
 #
@@ -21,23 +17,6 @@ is($tmp, 5);
 is($#ary, 3);
 is(join('',@ary), '1234');
 
-$[ = 1;
-@ary = (1,2,3,4,5);
-is(join('',@ary), '12345');
-
-$tmp = $ary[$#ary]; --$#ary;
-is($tmp, 5);
-# Must do == here beacuse $[ isn't 0
-ok($#ary == 4);
-is(join('',@ary), '1234');
-
-is($ary[5], undef);
-
-$#ary += 1;	# see if element 5 gone for good
-ok($#ary == 5);
-ok(!defined $ary[5]);
-
-$[ = 0;
 @foo = ();
 $r = join(',', $#foo, @foo);
 is($r, "-1");
@@ -118,9 +97,13 @@ is($foo, 'e');
 $foo = ('a','b','c','d','e','f')[1];
 is($foo, 'b');
 
-@foo = ( 'foo', 'bar', 'burbl');
-push(foo, 'blah');
-is($#foo, 3);
+@foo = ( 'foo', 'bar', 'burbl', 'blah');
+{
+    no strict 'vars';
+    @foox = ( 'foo', 'bar', 'burbl');
+    push(foox, 'blah');
+    is($#foox, 3);
+}
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
 
@@ -146,7 +129,8 @@ is("@bar", "foo bar");						# 43
 # XXX tie-stdarray fails the tests involving local, so we use
 # different variable names to escape the 'tie'
 
-@bee = ( 'foo', 'bar', 'burbl', 'blah');
+our @bee = ( 'foo', 'bar', 'burbl', 'blah');
+our @bim;
 {
 
     local @bee = @bee;
@@ -243,31 +227,17 @@ is(push(@ary,56), 4);
 is(unshift(@ary,12), 5);
 
 sub foo { "a" }
-@foo=(foo())[0,0];
+my @foo=(foo())[0,0];
 is ($foo[1], "a");
-
-# $[ should have the same effect regardless of whether the aelem
-#    op is optimized to aelemfast.
-
-
-
-sub tary {
-  local $[ = 10;
-  my $five = 5;
-  is ($tary[5], $tary[$five]);
-}
-
-@tary = (0..50);
-tary();
-
 
 # bugid #15439 - clearing an array calls destructors which may try
 # to modify the array - caused 'Attempt to free unreferenced scalar'
 
 my $got = runperl (
 	prog => q{
+                    our @a;
 		    sub X::DESTROY { @a = () }
-		    @a = (bless {}, 'X');
+		    @a = (bless {}, \'X\');
 		    @a = ();
 		},
 	stderr => 1
@@ -368,6 +338,7 @@ sub test_arylen {
 
 {
     # Bug #36211
+    no strict 'vars';
     use vars '@array';
     for (1,2) {
 	{
@@ -380,29 +351,31 @@ sub test_arylen {
 
 {
     # Bug #37350
+    no strict 'refs';
     my @array = (1..4);
-    $#{@array} = 7;
+    $#{*{Symbol::qualify_to_ref(scalar @array)}} = 7;
     is ($#{4}, 7);
 
     my $x;
     $#{$x} = 3;
     is(scalar @$x, 4);
 
-    push @{@array}, 23;
+    push @{*{Symbol::qualify_to_ref(scalar @array)}}, 23;
     is ($4[8], 23);
 }
 {
     # Bug #37350 -- once more with a global
+    no strict 'refs';
     use vars '@array';
     @array = (1..4);
-    $#{@array} = 7;
+    $#{*{Symbol::qualify_to_ref(scalar @array)}} = 7;
     is ($#{4}, 7);
 
     my $x;
     $#{$x} = 3;
     is(scalar @$x, 4);
 
-    push @{@array}, 23;
+    push @{*{Symbol::qualify_to_ref(scalar @array)}}, 23;
     is ($4[8], 23);
 }
 

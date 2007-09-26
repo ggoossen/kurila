@@ -204,14 +204,15 @@ BEGIN {
         ALL     => [ @EXPORT, @EXPORT_OK ],
     );        
 
-    my $log         = new Log::Message;
+    my $log         = Log::Message->new();
 
     for my $func ( @EXPORT, @EXPORT_OK ) {
         no strict 'refs';
         
                         ### up the carplevel for the carp emulation
                         ### functions
-        *$func = sub {  local $Carp::CarpLevel += 2
+        *{Symbol::qualify_to_ref($func)}
+          = sub {  local $Carp::CarpLevel += 2
                             if grep { $_ eq $func } @EXPORT_OK;
                             
                         my $msg     = shift;

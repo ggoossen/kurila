@@ -7,7 +7,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bXS\/APItest\b/) {
 	# Look, I'm using this fully-qualified variable more than once!
 	my $arch = $MacPerl::Architecture;
@@ -24,7 +24,7 @@ use strict;
 
 BEGIN {
     require './test.pl';
-    plan(240);
+    plan(184);
     use_ok('XS::APItest')
 };
 
@@ -78,9 +78,6 @@ for my $test (
     ok(eq_array( [ call_sv(*f,  $flags, @$args) ], $expected),
 	"$description call_sv(*f)");
 
-    ok(eq_array( [ call_sv('f', $flags, @$args) ], $expected),
-	"$description call_sv('f')");
-
     ok(eq_array( [ call_pv('f', $flags, @$args) ], $expected),
 	"$description call_pv('f')");
 
@@ -94,11 +91,6 @@ for my $test (
 	my $desc = $description . ($keep ? ' G_KEEPERR' : '');
 	my $exp_err = $keep ? "before\n\t(in cleanup) its_dead_jim\n"
 			    : "its_dead_jim\n";
-	$@ = "before\n";
-	ok(eq_array( [ call_sv('d', $flags|G_EVAL|$keep, @$args) ],
-		    $flags & (G_ARRAY|G_DISCARD) ? [0] : [ undef, 1 ]),
-		    "$desc G_EVAL call_sv('d')");
-	is($@, $exp_err, "$desc G_EVAL call_sv('d') - \$@");
 
 	$@ = "before\n";
 	ok(eq_array( [ call_pv('d', $flags|G_EVAL|$keep, @$args) ], 
@@ -119,9 +111,6 @@ for my $test (
 	is($@, $exp_err, "$desc G_EVAL call_method('d') - \$@");
     }
 
-    ok(eq_array( [ sub { call_sv('f', $flags|G_NOARGS, "bad") }->(@$args) ],
-	$expected), "$description G_NOARGS call_sv('f')");
-
     ok(eq_array( [ sub { call_pv('f', $flags|G_NOARGS, "bad") }->(@$args) ],
 	$expected), "$description G_NOARGS call_pv('f')");
 
@@ -130,9 +119,6 @@ for my $test (
 
     # XXX call_method(G_NOARGS) isn't tested: I'm assuming
     # it's not a sensible combination. DAPM.
-
-    ok(eq_array( [ eval { call_sv('d', $flags, @$args)}, $@ ],
-	[ "its_dead_jim\n" ]), "$description eval { call_sv('d') }");
 
     ok(eq_array( [ eval { call_pv('d', $flags, @$args) }, $@ ],
 	[ "its_dead_jim\n" ]), "$description eval { call_pv('d') }");

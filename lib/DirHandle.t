@@ -3,7 +3,8 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
+    our %Config;
+    require Config; Config->import;
     if (not $Config{'d_readdir'}) {
 	print "1..0\n";
 	exit 0;
@@ -15,11 +16,11 @@ require './test.pl';
 
 plan(5);
 
-$dot = new DirHandle ($^O eq 'MacOS' ? ':' : '.');
+$dot = DirHandle->new($^O eq 'MacOS' ? ':' : '.');
 
 ok(defined($dot));
 
-@a = sort <*>;
+@a = sort glob("*");
 do { $first = $dot->read } while defined($first) && $first =~ /^\./;
 ok(+(grep { $_ eq $first } @a));
 

@@ -167,7 +167,7 @@ cc_opclass(pTHX_ const OP *o)
          * the OP is an SVOP, and the SV is a reference to a swash
          * (i.e., an RV pointing to an HV).
          */
-	return (o->op_private & (OPpTRANS_TO_UTF|OPpTRANS_FROM_UTF))
+	return (o->op_private & (OPpTRANS_UTF8))
 		? OPc_SVOP : OPc_PVOP;
 
     case OA_LOOP:
@@ -330,7 +330,7 @@ cstring(pTHX_ SV *sv, bool perlstyle)
 
     if (!SvOK(sv))
 	sv_setpvn(sstr, "0", 1);
-    else if (perlstyle && SvUTF8(sv)) {
+    else if (perlstyle) {
 	SV *tmpsv = sv_newmortal(); /* Temporary SV to feed sv_uni_display */
 	const STRLEN len = SvCUR(sv);
 	const char *s = sv_uni_display(tmpsv, sv, 8*len, UNI_DISPLAY_QQ);
@@ -1199,7 +1199,6 @@ LOOP_lastop(o)
 #define COP_file(o)	CopFILE(o)
 #define COP_filegv(o)	CopFILEGV(o)
 #define COP_cop_seq(o)	o->cop_seq
-#define COP_arybase(o)	CopARYBASE_get(o)
 #define COP_line(o)	CopLINE(o)
 #define COP_hints(o)	CopHINTS_get(o)
 #if PERL_VERSION < 9
@@ -1232,10 +1231,6 @@ COP_filegv(o)
 
 U32
 COP_cop_seq(o)
-	B::COP	o
-
-I32
-COP_arybase(o)
 	B::COP	o
 
 U32
@@ -1432,7 +1427,6 @@ SvPV(sv)
 	    } else {
 		sv_setpvn(ST(0), SvPVX_const(sv), SvCUR(sv));
 	    }
-            SvFLAGS(ST(0)) |= SvUTF8(sv);
         }
         else {
             /* XXX for backward compatibility, but should fail */
@@ -1636,14 +1630,6 @@ B::IO
 GvIO(gv)
 	B::GV	gv
 
-B::FM
-GvFORM(gv)
-	B::GV	gv
-    CODE:
-	RETVAL = (SV*)GvFORM(gv);
-    OUTPUT:
-	RETVAL
-
 B::AV
 GvAV(gv)
 	B::GV	gv
@@ -1690,42 +1676,6 @@ MODULE = B	PACKAGE = B::IO		PREFIX = Io
 
 long
 IoLINES(io)
-	B::IO	io
-
-long
-IoPAGE(io)
-	B::IO	io
-
-long
-IoPAGE_LEN(io)
-	B::IO	io
-
-long
-IoLINES_LEFT(io)
-	B::IO	io
-
-char *
-IoTOP_NAME(io)
-	B::IO	io
-
-B::GV
-IoTOP_GV(io)
-	B::IO	io
-
-char *
-IoFMT_NAME(io)
-	B::IO	io
-
-B::GV
-IoFMT_GV(io)
-	B::IO	io
-
-char *
-IoBOTTOM_NAME(io)
-	B::IO	io
-
-B::GV
-IoBOTTOM_GV(io)
 	B::IO	io
 
 short
@@ -1816,12 +1766,6 @@ AvFLAGS(av)
 	B::AV	av
 
 #endif
-
-MODULE = B	PACKAGE = B::FM		PREFIX = Fm
-
-IV
-FmLINES(form)
-	B::FM	form
 
 MODULE = B	PACKAGE = B::CV		PREFIX = Cv
 

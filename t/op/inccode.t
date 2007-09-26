@@ -8,11 +8,6 @@ my $can_fork   = 0;
 my $minitest   = $ENV{PERL_CORE_MINITEST};
 my $has_perlio = $Config{useperlio};
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
 if (!$minitest) {
     if ($Config{d_fork} && eval 'require POSIX; 1') {
 	$can_fork = 1;
@@ -22,8 +17,8 @@ if (!$minitest) {
 use strict;
 use File::Spec;
 
-require "test.pl";
-plan(tests => 45 + !$minitest * (3 + 14 * $can_fork));
+require "./test.pl";
+plan(tests => 45 + !$minitest * (3 + 7 * $can_fork));
 
 my @tempfiles = ();
 
@@ -246,15 +241,12 @@ if ($can_fork) {
     # This little bundle of joy generates n more recursive use statements,
     # with each module chaining the next one down to 0. If it works, then we
     # can safely nest subprocesses
-    my $use_filter_too;
     push @INC, sub {
 	return unless $_[1] =~ /^BBBLPLAST(\d+)\.pm/;
 	my $pid = open my $fh, "-|";
 	if ($pid) {
 	    # Parent
-	    return $fh unless $use_filter_too;
-	    # Try filters and state in addition.
-	    return ($fh, sub {s/$_[1]/pass/; return}, "die")
+	    return $fh;
 	}
 	die "Can't fork self: $!" unless defined $pid;
 
@@ -267,11 +259,7 @@ if ($can_fork) {
 	if ($count--) {
 	    print "use BBBLPLAST$count;\n";
 	}
-	if ($use_filter_too) {
-	    print "die('In $_[1]');";
-	} else {
-	    print "pass('In $_[1]');";
-	}
+        print "pass('In $_[1]');";
 	print '"Truth"';
 	POSIX::_exit(0);
 	die "Can't get here: $!";
@@ -286,9 +274,4 @@ if ($can_fork) {
     }
 
     @::bbblplast = ();
-    $use_filter_too = 1;
-
-    require BBBLPLAST5;
-
-    is ("@::bbblplast", "0 1 2 3 4 5", "All ran with a filter");
 }

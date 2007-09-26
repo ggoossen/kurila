@@ -64,35 +64,6 @@
 #  include "ppport.h"
 #endif
 
-#if PERL_REVISION == 5 && (PERL_VERSION < 8 || (PERL_VERSION == 8 && PERL_SUBVERSION < 4 ))
-
-#    ifdef SvPVbyte_force
-#        undef SvPVbyte_force
-#    endif
-
-#    define SvPVbyte_force(sv,lp) SvPV_force(sv,lp)
-
-#endif
-
-#ifndef SvPVbyte_nolen
-#    define SvPVbyte_nolen SvPV_nolen
-#endif
-
-
-
-#if 0
-#  ifndef SvPVbyte_nolen
-#    define SvPVbyte_nolen SvPV_nolen
-#  endif
-
-#  ifndef SvPVbyte_force
-#    define SvPVbyte_force(sv,lp) SvPV_force(sv,lp)
-#  endif
-#endif
-
-#if PERL_REVISION == 5 && (PERL_VERSION >= 8 || (PERL_VERSION == 8 && PERL_SUBVERSION < 4 ))
-#    define UTF8_AVAILABLE
-#endif
 
 typedef int                     DualType ;
 typedef int                     int_undef ;
@@ -227,6 +198,7 @@ typedef di_stream * Compress__Raw__Zlib__inflateScanStream ;
 
 #define adlerInitial adler32(0L, Z_NULL, 0)
 #define crcInitial crc32(0L, Z_NULL, 0)
+
 
 static const char * const my_z_errmsg[] = {
     "need dictionary",     /* Z_NEED_DICT     2 */
@@ -606,8 +578,8 @@ BOOT:
     }
 
 
-#define Zip_zlib_version()	(const char*)zlib_version
-const char*
+#define Zip_zlib_version()	(char*)zlib_version
+char*
 Zip_zlib_version()
 
 unsigned
@@ -637,11 +609,7 @@ Zip_adler32(buf, adler=adlerInitial)
 	INIT:
     	/* If the buffer is a reference, dereference it */
 	sv = deRef(sv, "adler32") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(sv) && !sv_utf8_downgrade(sv, 1))
-         croak("Wide character in Compress::Raw::Zlib::adler32");
-#endif         
-	buf = (Byte*)SvPVbyte(sv, len) ;
+	buf = (Byte*)SvPV(sv, len) ;
 
 	if (items < 2)
 	  adler = adlerInitial;
@@ -649,8 +617,6 @@ Zip_adler32(buf, adler=adlerInitial)
 	  adler = SvUV(ST(1)) ;
 	else
 	  adler = adlerInitial;
-    OUTPUT:
-        RETVAL
  
 #define Zip_crc32(buf, crc) crc32(crc, buf, (uInt)len)
 
@@ -663,11 +629,7 @@ Zip_crc32(buf, crc=crcInitial)
 	INIT:
     	/* If the buffer is a reference, dereference it */
 	sv = deRef(sv, "crc32") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(sv) && !sv_utf8_downgrade(sv, 1))
-         croak("Wide character in Compress::Raw::Zlib::crc32");
-#endif         
-	buf = (Byte*)SvPVbyte(sv, len) ;
+	buf = (Byte*)SvPV(sv, len) ;
 
 	if (items < 2)
 	  crc = crcInitial;
@@ -725,9 +687,9 @@ _deflateInit(flags,level, method, windowBits, memLevel, strategy, bufsize, dicti
     int err ;
     deflateStream s ;
 
-    if (trace) 
-        warn("in _deflateInit(level=%d, method=%d, windowBits=%d, memLevel=%d, strategy=%d, bufsize=%ld dictionary=%p)\n", 
-	level, method, windowBits, memLevel, strategy, bufsize, dictionary) ;
+    if (trace)
+        warn("in _deflateInit(level=%d, method=%d, windowBits=%d, memLevel=%d, strategy=%d, bufsize=%ld\n",
+	level, method, windowBits, memLevel, strategy, bufsize) ;
     if ((s = InitStream() )) {
 
         s->Level      = level;
@@ -742,11 +704,7 @@ _deflateInit(flags,level, method, windowBits, memLevel, strategy, bufsize, dicti
 	/* Check if a dictionary has been specified */
 
 	if (err == Z_OK && SvCUR(dictionary)) {
-#ifdef UTF8_AVAILABLE    
-        if (DO_UTF8(dictionary) && !sv_utf8_downgrade(dictionary, 1))
-             croak("Wide character in Compress::Raw::Zlib::Deflate::new dicrionary parameter");
-#endif         
-	    err = deflateSetDictionary(&(s->stream), (const Bytef*) SvPVbyte_nolen(dictionary), 
+	    err = deflateSetDictionary(&(s->stream), (const Bytef*) SvPV_nolen(dictionary), 
 					SvCUR(dictionary)) ;
 	    s->dict_adler = s->stream.adler ;
 	}
@@ -762,11 +720,8 @@ _deflateInit(flags,level, method, windowBits, memLevel, strategy, bufsize, dicti
     else
         err = Z_MEM_ERROR ;
 
-    {
-        SV* obj = sv_setref_pv(sv_newmortal(), 
-            "Compress::Raw::Zlib::deflateStream", (void*)s);
-        XPUSHs(obj);
-    }
+    XPUSHs(sv_setref_pv(sv_newmortal(), 
+	"Compress::Raw::Zlib::deflateStream", (void*)s));
     if (GIMME == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
 	setDUALstatus(sv, err);
@@ -818,14 +773,11 @@ _inflateInit(flags, windowBits, bufsize, dictionary)
     else
 	err = Z_MEM_ERROR ;
 
-    {
-        SV* obj = sv_setref_pv(sv_newmortal(), 
+    XPUSHs(sv_setref_pv(sv_newmortal(), 
                    ix == 1 
                    ? "Compress::Raw::Zlib::inflateScanStream" 
                    :  "Compress::Raw::Zlib::inflateStream",
-                   (void*)s);
-        XPUSHs(obj);
-    }
+                   (void*)s));
     if (GIMME == G_ARRAY) {
         SV * sv = sv_2mortal(newSViv(err)) ;
 	setDUALstatus(sv, err);
@@ -869,11 +821,7 @@ deflate (s, buf, output)
     buf = deRef(buf, "deflate") ;
  
     /* initialise the input buffer */
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(buf) && !sv_utf8_downgrade(buf, 1))
-         croak("Wide character in Compress::Raw::Zlib::Deflate::deflate input parameter");
-#endif         
-    s->stream.next_in = (Bytef*)SvPVbyte_nolen(buf) ;
+    s->stream.next_in = (Bytef*)SvPV_nolen(buf) ;
     s->stream.avail_in = SvCUR(buf) ;
     
     if (s->flags & FLAG_CRC32)
@@ -884,17 +832,13 @@ deflate (s, buf, output)
 
     /* and retrieve the output buffer */
     output = deRef_l(output, "deflate") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(output) && !sv_utf8_downgrade(output, 1))
-         croak("Wide character in Compress::Raw::Zlib::Deflate::deflate output parameter");
-#endif         
 
     if((s->flags & FLAG_APPEND) != FLAG_APPEND) {
         SvCUR_set(output, 0);
         /* sv_setpvn(output, "", 0); */
     }
     prefix = cur_length =  SvCUR(output) ;
-    s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length;
+    s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length;
     increment =  SvLEN(output) -  cur_length;
     s->stream.avail_out =  increment;
 #ifdef SETP_BYTE
@@ -931,7 +875,7 @@ deflate (s, buf, output)
 	    /* out of space in the output buffer so make it bigger */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ;
@@ -985,16 +929,12 @@ flush(s, output, f=Z_FINISH)
   
     /* retrieve the output buffer */
     output = deRef_l(output, "flush") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(output) && !sv_utf8_downgrade(output, 1))
-         croak("Wide character in Compress::Raw::Zlib::Deflate::flush input parameter");
-#endif         
     if(! s->flags & FLAG_APPEND) {
         SvCUR_set(output, 0);
         /* sv_setpvn(output, "", 0); */
     }
     prefix = cur_length =  SvCUR(output) ;
-    s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length;
+    s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length;
     increment =  SvLEN(output) -  cur_length;
     s->stream.avail_out =  increment;
 #ifdef SETP_BYTE
@@ -1031,7 +971,7 @@ flush(s, output, f=Z_FINISH)
 	    /* consumed all the available output, so extend it */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ;
@@ -1250,39 +1190,26 @@ inflate (s, buf, output, eof=FALSE)
     STRLEN  stmp    = NO_INIT
     uLong     bufinc = NO_INIT
   PREINIT:
-#ifdef UTF8_AVAILABLE    
-    bool	out_utf8  = FALSE;
-#endif    
   CODE:
     bufinc = s->bufsize;
     /* If the buffer is a reference, dereference it */
     buf = deRef(buf, "inflate") ;
 
-    if (s->flags & FLAG_CONSUME_INPUT && SvREADONLY(buf))
-        croak("Compress::Raw::Zlib::Inflate::inflate input parameter cannot be read-only when ConsumeInput is specified");
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(buf) && !sv_utf8_downgrade(buf, 1))
-         croak("Wide character in Compress::Raw::Zlib::Inflate::inflate input parameter");
-#endif         
-    
     /* initialise the input buffer */
-    s->stream.next_in = (Bytef*)SvPVbyte_force(buf, stmp) ;
+    s->stream.next_in = (Bytef*)SvPV_force(buf, stmp) ;
     s->stream.avail_in = SvCUR(buf) ;
 	
+    if (s->flags & FLAG_CONSUME_INPUT && SvREADONLY(buf))
+        croak("Compress::Raw::Zlib::Inflate::inflate input parameter cannot be read-only when ConsumeInput is specified");
+    
     /* and retrieve the output buffer */
     output = deRef_l(output, "inflate") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(output))
-         out_utf8 = TRUE ;
-    if (DO_UTF8(output) && !sv_utf8_downgrade(output, 1))
-         croak("Wide character in Compress::Raw::Zlib::Inflate::inflate output parameter");
-#endif         
     if((s->flags & FLAG_APPEND) != FLAG_APPEND) {
         SvCUR_set(output, 0);
     }
     if (SvLEN(output)) {
         prefix_length = cur_length =  SvCUR(output) ;
-        s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length;
+        s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length;
         increment = SvLEN(output) -  cur_length - 1;
         s->stream.avail_out = increment;
     }
@@ -1297,7 +1224,7 @@ inflate (s, buf, output, eof=FALSE)
 	    /* out of space in the output buffer so make it bigger */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ; 
@@ -1321,7 +1248,7 @@ inflate (s, buf, output, eof=FALSE)
         if (RETVAL == Z_NEED_DICT && s->dictionary) {
             s->dict_adler = s->stream.adler ;
             RETVAL = inflateSetDictionary(&(s->stream), 
-            (const Bytef*)SvPVbyte_nolen(s->dictionary),
+            (const Bytef*)SvPV_nolen(s->dictionary),
             SvCUR(s->dictionary));
         }
 
@@ -1338,7 +1265,7 @@ inflate (s, buf, output, eof=FALSE)
 	    /* out of space in the output buffer so make it bigger */
             Sv_Grow(output, SvLEN(output) + bufinc) ;
             cur_length += increment ;
-            s->stream.next_out = (Bytef*) SvPVbyte_nolen(output) + cur_length ;
+            s->stream.next_out = (Bytef*) SvPV_nolen(output) + cur_length ;
             increment = bufinc ;
             s->stream.avail_out = increment;
             bufinc *= 2 ;
@@ -1360,20 +1287,16 @@ inflate (s, buf, output, eof=FALSE)
         SvPOK_only(output);
         SvCUR_set(output, prefix_length + s->bytesInflated) ;
 	*SvEND(output) = '\0';
-#ifdef UTF8_AVAILABLE    
-        if (out_utf8)
-            sv_utf8_upgrade(output);
-#endif        
         SvSETMAGIC(output);
 
         if (s->flags & FLAG_CRC32 )
             s->crc32 = crc32(s->crc32, 
-				(const Bytef*)SvPVbyte_nolen(output)+prefix_length, 
+				(const Bytef*)SvPV_nolen(output)+prefix_length, 
             			SvCUR(output)-prefix_length) ;
 
         if (s->flags & FLAG_ADLER32) 
             s->adler32 = adler32(s->adler32, 
-				(const Bytef*)SvPVbyte_nolen(output)+prefix_length, 
+				(const Bytef*)SvPV_nolen(output)+prefix_length, 
             			SvCUR(output)-prefix_length) ;
 
 	/* fix the input buffer */
@@ -1381,7 +1304,7 @@ inflate (s, buf, output, eof=FALSE)
 	    in = s->stream.avail_in ;
 	    SvCUR_set(buf, in) ;
 	    if (in)
-	        Move(s->stream.next_in, SvPVbyte_nolen(buf), in, char) ;	
+	        Move(s->stream.next_in, SvPV_nolen(buf), in, char) ;	
             *SvEND(buf) = '\0';
             SvSETMAGIC(buf);
 	}
@@ -1422,13 +1345,9 @@ inflateSync (s, buf)
   
     /* If the buffer is a reference, dereference it */
     buf = deRef(buf, "inflateSync") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(buf) && !sv_utf8_downgrade(buf, 1))
-         croak("Wide character in Compress::Raw::Zlib::Inflate::inflateSync");
-#endif         
     
     /* initialise the input buffer */
-    s->stream.next_in = (Bytef*)SvPVbyte_nolen(buf) ;
+    s->stream.next_in = (Bytef*)SvPV_nolen(buf) ;
     s->stream.avail_in = SvCUR(buf) ;
 	
     /* inflateSync doesn't create any output */
@@ -1443,7 +1362,7 @@ inflateSync (s, buf)
 	unsigned in = s->stream.avail_in ;
  	SvCUR_set(buf, in) ;
  	if (in)
-     	    Move(s->stream.next_in, SvPVbyte_nolen(buf), in, char) ;	
+     	    Move(s->stream.next_in, SvPV_nolen(buf), in, char) ;	
         *SvEND(buf) = '\0';
         SvSETMAGIC(buf);
     }
@@ -1597,12 +1516,8 @@ scan(s, buf, out=NULL, eof=FALSE)
         croak("scan needs zlib 1.2.1 or better");
 #else
     buf = deRef(buf, "inflateScan") ;
-#ifdef UTF8_AVAILABLE    
-    if (DO_UTF8(buf) && !sv_utf8_downgrade(buf, 1))
-        croak("Wide character in Compress::Raw::Zlib::InflateScan::scan input parameter");
-#endif         
     /* initialise the input buffer */
-    s->stream.next_in = (Bytef*)SvPVbyte_force(buf, stmp) ;
+    s->stream.next_in = (Bytef*)SvPV_force(buf, stmp) ;
     s->stream.avail_in = SvCUR(buf) ;
     start_len = s->stream.avail_in ;
     s->bytesInflated = 0 ; 
@@ -1687,7 +1602,7 @@ scan(s, buf, out=NULL, eof=FALSE)
             unsigned in = s->stream.avail_in ;
             SvCUR_set(buf, in) ;
             if (in)
-                Move(s->stream.next_in, SvPVbyte_nolen(buf), in, char) ;	
+                Move(s->stream.next_in, SvPV_nolen(buf), in, char) ;	
                 *SvEND(buf) = '\0';
                 SvSETMAGIC(buf);
         }

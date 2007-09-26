@@ -9,7 +9,7 @@ our $VERSION = '1.04';
 # Exporter.  It's bad enough that all classes have a import() method
 # whenever UNIVERSAL.pm is loaded.
 require Exporter;
-@EXPORT_OK = qw(isa can VERSION);
+our @EXPORT_OK = qw(isa can VERSION);
 
 # Make sure that even though the import method is called, it doesn't do
 # anything unless called on UNIVERSAL.

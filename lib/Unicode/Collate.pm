@@ -11,6 +11,7 @@ use strict;
 use warnings;
 use Carp;
 use File::Spec;
+use utf8;
 
 no warnings 'utf8';
 

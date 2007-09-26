@@ -4,13 +4,10 @@
 # grep() and map() tests
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require "test.pl";
+require "./test.pl";
 plan( tests => 60 );
+
+our $test;
 
 {
     my @lol = ([qw(a b c)], [], [qw(1 2 3)]);

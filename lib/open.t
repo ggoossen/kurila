@@ -4,7 +4,7 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
 	push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-	require Config; import Config;
+	require Config; Config->import;
 }
 
 use Test::More tests => 22;
@@ -61,10 +61,11 @@ is( ${^OPEN}, ":raw :crlf\0:raw :crlf",
 is( $^H{'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 
 SKIP: {
-    skip("no perlio, no :utf8", 12) unless (find PerlIO::Layer 'perlio');
+    skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'));
 
     eval <<EOE;
     use open ':utf8';
+    use utf8;
     open(O, ">utf8");
     print O chr(0x100);
     close O;
@@ -95,13 +96,13 @@ EOE
 		($c = sysread(F, $b, 1)) == 1  &&
 		length($b)               == 1  &&
 		ord($b)                  == ord($_) &&
-		systell(F)               == ($a += bytes::length($b))
+		systell('F')               == ($a += bytes::length($b))
 		) {
 	    print '# ord($_)           == ', ord($_), "\n";
 	    print '# ord($b)           == ', ord($b), "\n";
 	    print '# length($b)        == ', length($b), "\n";
 	    print '# bytes::length($b) == ', bytes::length($b), "\n";
-	    print '# systell(F)        == ', systell(F), "\n";
+	    print '# systell(F)        == ', systell('F'), "\n";
 	    print '# $a                == ', $a, "\n";
 	    print '# $c                == ', $c, "\n";
 	    last;
@@ -115,7 +116,7 @@ EOE
     sub diagnostics {
 	print '# ord($_)           == ', ord($_), "\n";
 	print '# bytes::length($_) == ', bytes::length($_), "\n";
-	print '# systell(G)        == ', systell(G), "\n";
+	print '# systell(G)        == ', systell('G'), "\n";
 	print '# $a                == ', $a, "\n";
 	print '# $c                == ', $c, "\n";
     }
@@ -144,7 +145,7 @@ EOE
 	for (@a) {
 	    unless (
 		    ($c = $actions{$key}($_)) == 1 &&
-		    systell(G)                == ($a += bytes::length($_))
+		    systell('G')                == ($a += bytes::length($_))
 		   ) {
 		diagnostics();
 		last;
@@ -162,13 +163,13 @@ EOE
 		    ($c = sysread(G, $b, 1)) == 1 &&
 		    length($b)               == 1 &&
 		    ord($b)                  == ord($_) &&
-		    systell(G)               == ($a += bytes::length($_))
+		    systell('G')               == ($a += bytes::length($_))
 		   ) {
 		print '# ord($_)           == ', ord($_), "\n";
 		print '# ord($b)           == ', ord($b), "\n";
 		print '# length($b)        == ', length($b), "\n";
 		print '# bytes::length($b) == ', bytes::length($b), "\n";
-		print '# systell(G)        == ', systell(G), "\n";
+		print '# systell(G)        == ', systell('G'), "\n";
 		print '# $a                == ', $a, "\n";
 		print '# $c                == ', $c, "\n";
 		last;
@@ -182,7 +183,7 @@ EOE
 }
 
 SKIP: {
-    skip("no perlio", 1) unless (find PerlIO::Layer 'perlio');
+    skip("no perlio", 1) unless (PerlIO::Layer->find( 'perlio'));
     use open IN => ':non-existent';
     eval {
 	require Symbol; # Anything that exists but we havn't loaded

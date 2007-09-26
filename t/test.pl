@@ -16,6 +16,8 @@
 # In this file, we use the latter "Baby Perl" approach, and increment
 # will be worked over by t/op/inc.t
 
+our ($Level, $TODO, $NO_ENDING);
+
 $Level = 1;
 my $test = 1;
 my $planned;
@@ -513,6 +515,7 @@ sub runperl {
 	# run a fresh perl, so we'll brute force launder everything for you
 	my $sep;
 
+        our %Config;
 	eval "require Config; Config->import";
 	if ($@) {
 	    warn "test.pl had problems loading Config: $@";
@@ -528,7 +531,7 @@ sub runperl {
 	$ENV{PATH} =~ /(.*)/s;
 	local $ENV{PATH} =
 	    join $sep, grep { $_ ne "" and $_ ne "." and
-		($is_mswin or $is_vms or !(stat && (stat _)[2]&0022)) }
+		($is_mswin or $is_vms or !(stat && (stat '_')[2]&0022)) }
 		    split quotemeta ($sep), $1;
 
 	$runperl =~ /(.*)/s;
@@ -559,6 +562,7 @@ sub which_perl {
 	return $Perl if $^O eq 'VMS';
 
 	my $exe;
+        our %Config;
 	eval "require Config; Config->import";
 	if ($@) {
 	    warn "test.pl had problems loading Config: $@";
@@ -579,7 +583,7 @@ sub which_perl {
 		warn "test.pl had problems loading File::Spec: $@";
 		$Perl = "./$perl";
 	    } else {
-		$Perl = File::Spec->catfile(File::Spec->curdir(), $perl);
+		$Perl = 'File::Spec'->catfile('File::Spec'->curdir(), $perl);
 	    }
 	}
 
@@ -669,6 +673,7 @@ sub _fresh_perl {
 
     # Use the first line of the program as a name if none was given
     unless( $name ) {
+        my $first_line;
         ($first_line, $name) = $prog =~ /^((.{1,50}).*)/;
         $name .= '...' if length $first_line > length $name;
     }

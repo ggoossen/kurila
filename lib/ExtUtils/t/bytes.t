@@ -18,6 +18,8 @@ use_ok('ExtUtils::MakeMaker::bytes');
 SKIP: {
     skip "bytes.pm appeared in 5.6", 3 if $] < 5.006;
 
+    use utf8;
+
     my $chr = chr(400);
     is( length $chr, 1 );
 

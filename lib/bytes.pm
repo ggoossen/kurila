@@ -3,18 +3,22 @@ package bytes;
 our $VERSION = '1.03';
 
 $bytes::hint_bits = 0x00000008;
+$bytes::codepoints_hint_bits = 0x01000000;
 
 sub import {
     $^H |= $bytes::hint_bits;
+    $^H &= ~$bytes::codepoints_hint_bits;
 }
 
 sub unimport {
     $^H &= ~$bytes::hint_bits;
 }
 
+our $AUTOLOAD;
+
 sub AUTOLOAD {
     require "bytes_heavy.pl";
-    goto &$AUTOLOAD if defined &$AUTOLOAD;
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)} if defined &{Symbol::qualify_to_ref($AUTOLOAD)};
     require Carp;
     Carp::croak("Undefined subroutine $AUTOLOAD called");
 }

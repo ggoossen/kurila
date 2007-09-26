@@ -170,7 +170,7 @@ is(B::opnumber("chop"), 38, "Testing opnumber with opname (chop)");
     no warnings 'once';
     my $sg = B::sub_generation();
     *UNIVERSAL::hand_waving = sub { };
-    ok( $sg < B::sub_generation, "sub_generation increments" );
+    ok( $sg < B::sub_generation(), "sub_generation increments" );
 }
 
 {
@@ -181,5 +181,5 @@ is(B::opnumber("chop"), 38, "Testing opnumber with opname (chop)");
         require overload;
         overload->import( '""' => sub {"What? You want more?!"} );
     }
-    ok( $ag < B::amagic_generation, "amagic_generation increments" );
+    ok( $ag < B::amagic_generation(), "amagic_generation increments" );
 }

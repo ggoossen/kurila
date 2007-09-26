@@ -1,12 +1,5 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-   if( $ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = qw(../lib);
-    }
-}
-
 use strict;
 use Test::More tests => 11;
 
@@ -56,11 +49,11 @@ is( $Eval2::VERSION, 1.02 );
 
 
 eval q{use base 'reallyReAlLyNotexists'};
-like( $@, qr/^Base class package "reallyReAlLyNotexists" is empty\./,
+like( $@, qr/^Base class package "reallyReAlLyNotexists" is empty./,
                                           'base with empty package');
 
 eval q{use base 'reallyReAlLyNotexists'};
-like( $@, qr/^Base class package "reallyReAlLyNotexists" is empty\./,
+like( $@, qr/^Base class package "reallyReAlLyNotexists" is empty./,
                                           '  still empty on 2nd load');
 {
     my $warning;

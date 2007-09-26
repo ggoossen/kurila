@@ -42,7 +42,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xlow;		\
 	 }))
@@ -52,7 +51,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xhigh;		\
 	 }))
@@ -62,7 +60,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xlow;		\
 	 }))
@@ -72,7 +69,6 @@ typedef U64TYPE PADOFFSET;
 	  assert(SvTYPE(_svi) != SVt_PVAV);				\
 	  assert(SvTYPE(_svi) != SVt_PVHV);				\
 	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(SvTYPE(_svi) != SVt_PVFM);				\
 	  assert(!isGV_with_GP(_svi));					\
 	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xhigh;		\
 	 }))
@@ -291,8 +287,6 @@ ling pad (lvalue) to C<gen>.  Note that C<SvUV_set> is hijacked for this purpose
 #define PAD_COMPNAME_FLAGS_isOUR(po) \
   ((PAD_COMPNAME_FLAGS(po) & (SVpad_NAME|SVpad_OUR)) == (SVpad_NAME|SVpad_OUR))
 #define PAD_COMPNAME_PV(po) SvPV_nolen(PAD_COMPNAME_SV(po))
-
-#define PAD_COMPNAME_TYPE(po) pad_compname_type(po)
 
 #define PAD_COMPNAME_OURSTASH(po) \
     (SvOURSTASH(PAD_COMPNAME_SV(po)))

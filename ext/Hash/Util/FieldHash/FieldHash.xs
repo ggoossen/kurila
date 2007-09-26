@@ -6,6 +6,9 @@
 
 /* A Perl sub that returns a hashref to the object registry */
 #define HUF_OB_REG "Hash::Util::FieldHash::_ob_reg"
+/* Magic cookies to recognize object id's.  Hi, Eva, David */
+#define HUF_COOKIE 2805.1980
+#define HUF_REFADDR_COOKIE 1811.1976
 /* Identifier for PERL_MAGIC_ext magic */
 #define HUF_IDCACHE 0x4944
 
@@ -372,7 +375,6 @@ OUTPUT:
 
 void
 id(SV* ref)
-PROTOTYPE: $
 PPCODE:
     if (SvROK(ref)) {
         XPUSHs(HUF_obj_id(ref));

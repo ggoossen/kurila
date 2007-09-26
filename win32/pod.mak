@@ -48,7 +48,6 @@ POD = \
 	perlcall.pod	\
 	perlcheat.pod	\
 	perlclib.pod	\
-	perlcommunity.pod	\
 	perlcompile.pod	\
 	perldata.pod	\
 	perldbmfilter.pod	\
@@ -119,7 +118,7 @@ POD = \
 	perlsyn.pod	\
 	perlthrtut.pod	\
 	perltie.pod	\
-	perltoc.pod	\
+	kurilatoc.pod	\
 	perltodo.pod	\
 	perltooc.pod	\
 	perltoot.pod	\
@@ -167,7 +166,6 @@ MAN = \
 	perlcall.man	\
 	perlcheat.man	\
 	perlclib.man	\
-	perlcommunity.man	\
 	perlcompile.man	\
 	perldata.man	\
 	perldbmfilter.man	\
@@ -238,7 +236,7 @@ MAN = \
 	perlsyn.man	\
 	perlthrtut.man	\
 	perltie.man	\
-	perltoc.man	\
+	kurilatoc.man	\
 	perltodo.man	\
 	perltooc.man	\
 	perltoot.man	\
@@ -286,7 +284,6 @@ HTML = \
 	perlcall.html	\
 	perlcheat.html	\
 	perlclib.html	\
-	perlcommunity.html	\
 	perlcompile.html	\
 	perldata.html	\
 	perldbmfilter.html	\
@@ -369,7 +366,7 @@ HTML = \
 	perlvar.html	\
 	perlxs.html	\
 	perlxstut.html	
-# not perltoc.html
+# not kurilatoc.html
 
 TEX = \
 	perl.tex	\
@@ -405,7 +402,6 @@ TEX = \
 	perlcall.tex	\
 	perlcheat.tex	\
 	perlclib.tex	\
-	perlcommunity.tex	\
 	perlcompile.tex	\
 	perldata.tex	\
 	perldbmfilter.tex	\
@@ -476,7 +472,7 @@ TEX = \
 	perlsyn.tex	\
 	perlthrtut.tex	\
 	perltie.tex	\
-	perltoc.tex	\
+	kurilatoc.tex	\
 	perltodo.tex	\
 	perltooc.tex	\
 	perltoot.tex	\
@@ -497,7 +493,7 @@ html:	pod2html $(HTML)
 tex:	pod2latex $(TEX)
 
 toc:
-	$(PERL) -I../lib buildtoc >perltoc.pod
+	$(PERL) -I../lib buildtoc >kurilatoc.pod
 
 .SUFFIXES: .pm .pod
 

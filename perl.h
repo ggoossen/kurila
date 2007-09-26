@@ -2371,7 +2371,6 @@ typedef struct xpvhv XPVHV;
 typedef struct xpvgv XPVGV;
 typedef struct xpvcv XPVCV;
 typedef struct xpvbm XPVBM;
-typedef struct xpvfm XPVFM;
 typedef struct xpvio XPVIO;
 typedef struct mgvtbl MGVTBL;
 typedef union any ANY;
@@ -3564,7 +3563,6 @@ Gid_t getegid (void);
 #  define DEBUG_A_TEST_ (PL_debug & DEBUG_A_FLAG)
 #  define DEBUG_q_TEST_ (PL_debug & DEBUG_q_FLAG)
 #  define DEBUG_Xv_TEST_ (DEBUG_X_TEST_ && DEBUG_v_TEST_)
-#  define DEBUG_Uv_TEST_ (DEBUG_U_TEST_ && DEBUG_v_TEST_)
 
 #ifdef DEBUGGING
 
@@ -3583,6 +3581,7 @@ Gid_t getegid (void);
 #  define DEBUG_U_TEST DEBUG_U_TEST_
 #  define DEBUG_H_TEST DEBUG_H_TEST_
 #  define DEBUG_X_TEST DEBUG_X_TEST_
+#  define DEBUG_Xv_TEST DEBUG_Xv_TEST_
 #  define DEBUG_D_TEST DEBUG_D_TEST_
 #  define DEBUG_S_TEST DEBUG_S_TEST_
 #  define DEBUG_T_TEST DEBUG_T_TEST_
@@ -3592,8 +3591,6 @@ Gid_t getegid (void);
 #  define DEBUG_C_TEST DEBUG_C_TEST_
 #  define DEBUG_A_TEST DEBUG_A_TEST_
 #  define DEBUG_q_TEST DEBUG_q_TEST_
-#  define DEBUG_Xv_TEST DEBUG_Xv_TEST_
-#  define DEBUG_Uv_TEST DEBUG_Uv_TEST_
 
 #  define PERL_DEB(a)                  a
 #  define PERL_DEBUG(a) if (PL_debug)  a
@@ -3628,9 +3625,8 @@ Gid_t getegid (void);
 #  define DEBUG_U(a) DEBUG__(DEBUG_U_TEST, a)
 #  define DEBUG_H(a) DEBUG__(DEBUG_H_TEST, a)
 #  define DEBUG_X(a) DEBUG__(DEBUG_X_TEST, a)
-#  define DEBUG_D(a) DEBUG__(DEBUG_D_TEST, a)
 #  define DEBUG_Xv(a) DEBUG__(DEBUG_Xv_TEST, a)
-#  define DEBUG_Uv(a) DEBUG__(DEBUG_Uv_TEST, a)
+#  define DEBUG_D(a) DEBUG__(DEBUG_D_TEST, a)
 
 #  define DEBUG_S(a)
 
@@ -3658,6 +3654,7 @@ Gid_t getegid (void);
 #  define DEBUG_U_TEST (0)
 #  define DEBUG_H_TEST (0)
 #  define DEBUG_X_TEST (0)
+#  define DEBUG_Xv_TEST (0)
 #  define DEBUG_D_TEST (0)
 #  define DEBUG_S_TEST (0)
 #  define DEBUG_T_TEST (0)
@@ -3667,8 +3664,6 @@ Gid_t getegid (void);
 #  define DEBUG_C_TEST (0)
 #  define DEBUG_A_TEST (0)
 #  define DEBUG_q_TEST (0)
-#  define DEBUG_Xv_TEST (0)
-#  define DEBUG_Uv_TEST (0)
 
 #  define PERL_DEB(a)
 #  define PERL_DEBUG(a)
@@ -3687,6 +3682,7 @@ Gid_t getegid (void);
 #  define DEBUG_U(a)
 #  define DEBUG_H(a)
 #  define DEBUG_X(a)
+#  define DEBUG_Xv(a)
 #  define DEBUG_D(a)
 #  define DEBUG_S(a)
 #  define DEBUG_T(a)
@@ -3695,8 +3691,6 @@ Gid_t getegid (void);
 #  define DEBUG_C(a)
 #  define DEBUG_A(a)
 #  define DEBUG_q(a)
-#  define DEBUG_Xv(a)
-#  define DEBUG_Uv(a)
 #endif /* DEBUGGING */
 
 
@@ -3750,6 +3744,7 @@ Gid_t getegid (void);
 #define PERL_MAGIC_vstring	  'V' /* SV was vstring literal */
 #define PERL_MAGIC_utf8		  'w' /* Cached UTF-8 information */
 #define PERL_MAGIC_substr	  'x' /* substr() lvalue */
+#define PERL_MAGIC_substr_utf8	  'X' /* substr() lvalue with UTF-8 */
 #define PERL_MAGIC_defelem	  'y' /* Shadow "foreach" iterator variable /
 					smart parameter vivification */
 #define PERL_MAGIC_arylen	  '#' /* Array length ($#ary) */
@@ -4337,99 +4332,6 @@ EXTCONST char* PL_block_type[];
 #endif
 #endif
 
-/* These are all the compile time options that affect binary compatibility.
-   Other compile time options that are binary compatible are in perl.c
-   Both are combined for the output of perl -V
-   However, this string will be embedded in any shared perl library, which will
-   allow us add a comparison check in perlmain.c in the near future.  */
-#ifdef DOINIT
-EXTCONST char PL_bincompat_options[] =
-#  ifdef DEBUG_LEAKING_SCALARS
-			     " DEBUG_LEAKING_SCALARS"
-#  endif
-#  ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-			     " DEBUG_LEAKING_SCALARS_FORK_DUMP"
-#  endif
-#  ifdef FAKE_THREADS
-			     " FAKE_THREADS"
-#  endif
-#  ifdef MULTIPLICITY
-			     " MULTIPLICITY"
-#  endif
-#  ifdef MYMALLOC
-			     " MYMALLOC"
-#  endif
-#  ifdef PERL_DEBUG_READONLY_OPS
-			     " PERL_DEBUG_READONLY_OPS"
-#  endif
-#  ifdef PERL_GLOBAL_STRUCT
-			     " PERL_GLOBAL_STRUCT"
-#  endif
-#  ifdef PERL_IMPLICIT_CONTEXT
-			     " PERL_IMPLICIT_CONTEXT"
-#  endif
-#  ifdef PERL_IMPLICIT_SYS
-			     " PERL_IMPLICIT_SYS"
-#  endif
-#  ifdef PERL_MAD
-			     " PERL_MAD"
-#  endif
-#  ifdef PERL_NEED_APPCTX
-			     " PERL_NEED_APPCTX"
-#  endif
-#  ifdef PERL_NEED_TIMESBASE
-			     " PERL_NEED_TIMESBASE"
-#  endif
-#  ifdef PERL_OLD_COPY_ON_WRITE
-			     " PERL_OLD_COPY_ON_WRITE"
-#  endif
-#  ifdef PERL_POISON
-			     " PERL_POISON"
-#  endif
-#  ifdef PERL_TRACK_MEMPOOL
-			     " PERL_TRACK_MEMPOOL"
-#  endif
-#  ifdef PERL_USES_PL_PIDSTATUS
-			     " PERL_USES_PL_PIDSTATUS"
-#  endif
-#  ifdef PL_OP_SLAB_ALLOC
-			     " PL_OP_SLAB_ALLOC"
-#  endif
-#  ifdef THREADS_HAVE_PIDS
-			     " THREADS_HAVE_PIDS"
-#  endif
-#  ifdef USE_64_BIT_ALL
-			     " USE_64_BIT_ALL"
-#  endif
-#  ifdef USE_64_BIT_INT
-			     " USE_64_BIT_INT"
-#  endif
-#  ifdef USE_ITHREADS
-			     " USE_ITHREADS"
-#  endif
-#  ifdef USE_LARGE_FILES
-			     " USE_LARGE_FILES"
-#  endif
-#  ifdef USE_LONG_DOUBLE
-			     " USE_LONG_DOUBLE"
-#  endif
-#  ifdef USE_PERLIO
-			     " USE_PERLIO"
-#  endif
-#  ifdef USE_REENTRANT_API
-			     " USE_REENTRANT_API"
-#  endif
-#  ifdef USE_SFIO
-			     " USE_SFIO"
-#  endif
-#  ifdef USE_SOCKS
-			     " USE_SOCKS"
-#  endif
-  "";
-#else
-EXTCONST char PL_bincompat_options[];
-#endif
-
 END_EXTERN_C
 
 /*****************************************************************************/
@@ -4479,10 +4381,10 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_nkeys,
     want_vtbl_taint,
     want_vtbl_substr,
+    want_vtbl_substr_utf8,
     want_vtbl_vec,
     want_vtbl_pos,
     want_vtbl_bm,
-    want_vtbl_fm,
     want_vtbl_uvar,
     want_vtbl_defelem,
     want_vtbl_regexp,
@@ -4503,10 +4405,10 @@ enum {		/* pass one of these to get_vtbl */
    special and there is no need for HINT_PRIVATE_MASK for COPs
    However, bitops store HINT_INTEGER in their op_private.  */
 #define HINT_INTEGER		0x00000001 /* integer pragma */
-#define HINT_STRICT_REFS	0x00000002 /* strict pragma */
-#define HINT_LOCALE		0x00000004 /* locale pragma */
+#define HINT_NOTUSED2	0x00000002 /* not used: was strict refs pragma */
+#define HINT_NOTUSED		0x00000004 /* not used. was: locale pragma */
 #define HINT_BYTES		0x00000008 /* bytes pragma */
-#define HINT_ARYBASE		0x00000010 /* $[ is non-zero */
+#define HINT_NOTUSED_2		0x00000010 /* not used. was: HINT_ARYBASE: $[ is non-zero */
 				/* Note: 20,40,80 used for NATIVE_HINTS */
 				/* currently defined by vms/vmsish.h */
 
@@ -4529,12 +4431,15 @@ enum {		/* pass one of these to get_vtbl */
 
 #define HINT_FILETEST_ACCESS	0x00400000 /* filetest pragma */
 #define HINT_UTF8		0x00800000 /* utf8 pragma */
+#define HINT_CODEPOINTS         0x01000000 /* utf8 pragma (for codepoints) */
 
 /* The following are stored in $^H{sort}, not in PL_hints */
 #define HINT_SORT_SORT_BITS	0x000000FF /* allow 256 different ones */
 #define HINT_SORT_QUICKSORT	0x00000001
 #define HINT_SORT_MERGESORT	0x00000002
 #define HINT_SORT_STABLE	0x00000100 /* sort styles (currently one) */
+
+#define DEFAULT_HINTS ( HINT_STRICT_SUBS ) /* ( HINT_STRICT_REFS | HINT_STRICT_SUBS ) */
 
 /* Various states of the input record separator SV (rs) */
 #define RsSNARF(sv)   (! SvOK(sv))
@@ -4957,6 +4862,18 @@ MGVTBL_SET(
 );
 
 MGVTBL_SET(
+    PL_vtbl_substr_utf8,
+    MEMBER_TO_FPTR(Perl_magic_getsubstr),
+    MEMBER_TO_FPTR(Perl_magic_setsubstr),
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+);
+
+MGVTBL_SET(
     PL_vtbl_vec,
     MEMBER_TO_FPTR(Perl_magic_getvec),
     MEMBER_TO_FPTR(Perl_magic_setvec),
@@ -4984,18 +4901,6 @@ MGVTBL_SET(
     PL_vtbl_bm,
     0,
     MEMBER_TO_FPTR(Perl_magic_setbm),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_fm,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setfm),
     0,
     0,
     0,
@@ -5251,25 +5156,9 @@ typedef struct am_table_short AMTS;
 #define SET_NUMERIC_LOCAL() \
 	set_numeric_local();
 
-#define IN_LOCALE_RUNTIME	(CopHINTS_get(PL_curcop) & HINT_LOCALE)
-#define IN_LOCALE_COMPILETIME	(PL_hints & HINT_LOCALE)
+#define RESTORE_NUMERIC_LOCAL()
 
-#define IN_LOCALE \
-	(IN_PERL_COMPILETIME ? IN_LOCALE_COMPILETIME : IN_LOCALE_RUNTIME)
-
-#define STORE_NUMERIC_LOCAL_SET_STANDARD() \
-	bool was_local = PL_numeric_local && IN_LOCALE; \
-	if (was_local) SET_NUMERIC_STANDARD();
-
-#define STORE_NUMERIC_STANDARD_SET_LOCAL() \
-	bool was_standard = PL_numeric_standard && IN_LOCALE; \
-	if (was_standard) SET_NUMERIC_LOCAL();
-
-#define RESTORE_NUMERIC_LOCAL() \
-	if (was_local) SET_NUMERIC_LOCAL();
-
-#define RESTORE_NUMERIC_STANDARD() \
-	if (was_standard) SET_NUMERIC_STANDARD();
+#define RESTORE_NUMERIC_STANDARD()
 
 #define Atof				my_atof
 
@@ -5283,7 +5172,6 @@ typedef struct am_table_short AMTS;
 #define RESTORE_NUMERIC_LOCAL()		/**/
 #define RESTORE_NUMERIC_STANDARD()	/**/
 #define Atof				my_atof
-#define IN_LOCALE_RUNTIME		0
 
 #endif /* !USE_LOCALE_NUMERIC */
 

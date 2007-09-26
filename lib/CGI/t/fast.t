@@ -22,7 +22,7 @@ use Test::More tests => 7;
 SKIP: {
 	skip( 'FCGI not installed, cannot continue', 7 ) unless $fcgi;
 
-	use_ok( CGI::Fast );
+	use_ok( 'CGI::Fast' );
 	ok( my $q = CGI::Fast->new(), 'created new CGI::Fast object' );
 	is( $q, $CGI::Q, 'checking to see if the object was stored properly' );
 	is( $q->param(), (), 'no params' );

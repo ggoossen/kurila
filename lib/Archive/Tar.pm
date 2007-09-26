@@ -14,7 +14,7 @@ use vars qw[$DEBUG $error $VERSION $WARN $FOLLOW_SYMLINK $CHOWN $CHMOD
 $DEBUG              = 0;
 $WARN               = 1;
 $FOLLOW_SYMLINK     = 0;
-$VERSION            = "1.36";
+$VERSION            = "1.32";
 $CHOWN              = 1;
 $CHMOD              = 1;
 $DO_NOT_USE_PREFIX  = 0;
@@ -27,7 +27,7 @@ BEGIN {
     ### switch between perlio and IO::String
     eval {
         require IO::String;
-        import IO::String;
+        IO::String->import();
     };
     $HAS_IO_STRING = $@ ? 0 : 1;
 
@@ -94,7 +94,7 @@ my $tmpl = {
 ### install get/set accessors for this object.
 for my $key ( keys %$tmpl ) {
     no strict 'refs';
-    *{__PACKAGE__."::$key"} = sub {
+    *{Symbol::qualify_to_ref(__PACKAGE__."::$key")} = sub {
         my $self = shift;
         $self->{$key} = $_[0] if @_;
         return $self->{$key};
@@ -205,7 +205,7 @@ sub _get_handle {
 
         ### IO::Zlib will Do The Right Thing, even when passed
         ### a plain file ###
-        $fh = new IO::Zlib;
+        $fh = IO::Zlib->new();
 
     } else {
         if( $gzip ) {
@@ -213,7 +213,7 @@ sub _get_handle {
             return;
 
         } else {
-            $fh = new IO::File;
+            $fh = IO::File->new();
             $bin++;
         }
     }
@@ -406,9 +406,7 @@ underlying file.
 
 sub contains_file {
     my $self = shift;
-    my $full = shift;
-    
-    return unless defined $full;
+    my $full = shift or return;
 
     ### don't warn if the entry isn't there.. that's what this function
     ### is for after all.
@@ -496,7 +494,7 @@ sub extract {
 =head2 $tar->extract_file( $file, [$extract_path] )
 
 Write an entry, whose name is equivalent to the file name provided to
-disk. Optionally takes a second parameter, which is the full native
+disk. Optionally takes a second parameter, which is the full (unix)
 path (including filename) the entry will be written to.
 
 For example:
@@ -511,7 +509,7 @@ Returns true on success, false on failure.
 
 sub extract_file {
     my $self = shift;
-    my $file = shift;   return unless defined $file;
+    my $file = shift or return;
     my $alt  = shift;
 
     my $entry = $self->_find_entry( $file )
@@ -547,39 +545,11 @@ sub _extract_file {
     ### it's a relative path ###
     } else {
         my $cwd     = (defined $self->{cwd} ? $self->{cwd} : cwd());
+        my @dirs    = File::Spec::Unix->splitdir( $dirs );
+        my @cwd     = File::Spec->splitdir( $cwd );
+        $dir        = File::Spec->catdir( @cwd, @dirs );
 
-
-
-        my @dirs = defined $alt
-            ? File::Spec->splitdir( $dirs )         # It's a local-OS path
-            : File::Spec::Unix->splitdir( $dirs );  # it's UNIX-style, likely
-                                                    # straight from the tarball
-        
-        ### '.' is the directory delimiter, of which the first one has to
-        ### be escaped/changed.
-        map tr/\./_/, @dirs if ON_VMS;        
-
-        my ($cwd_vol,$cwd_dir,$cwd_file) 
-                    = File::Spec->splitpath( $cwd );
-        my @cwd     = File::Spec->splitdir( $cwd_dir );
-        push @cwd, $cwd_file if length $cwd_file;
-
-        ### We need to pass '' as the last elemant to catpath. Craig Berry
-        ### explains why (msgid <p0624083dc311ae541393@[172.16.52.1]>):
-        ### The root problem is that splitpath on UNIX always returns the 
-        ### final path element as a file even if it is a directory, and of
-        ### course there is no way it can know the difference without checking
-        ### against the filesystem, which it is documented as not doing.  When
-        ### you turn around and call catpath, on VMS you have to know which bits
-        ### are directory bits and which bits are file bits.  In this case we
-        ### know the result should be a directory.  I had thought you could omit
-        ### the file argument to catpath in such a case, but apparently on UNIX
-        ### you can't.
-        $dir        = File::Spec->catpath( 
-                            $cwd_vol, File::Spec->catdir( @cwd, @dirs ), '' 
-                        );
-
-        ### catdir() returns undef if the path is longer than 255 chars on VMS
+        # catdir() returns undef if the path is longer than 255 chars on VMS
         unless ( defined $dir ) {
             $^W && $self->_error( qq[Could not compose a path for '$dirs'\n] );
             return;
@@ -1699,56 +1669,6 @@ write a C<.tar.Z> file
     $tar->write($fh);
     $fh->close ;
 
-=item How do I handle Unicode strings?
-
-C<Archive::Tar> uses byte semantics for any files it reads from or writes
-to disk. This is not a problem if you only deal with files and never
-look at their content or work solely with byte strings. But if you use
-Unicode strings with character semantics, some additional steps need
-to be taken.
-
-For example, if you add a Unicode string like
-
-    # Problem
-    $tar->add_data('file.txt', "Euro: \x{20AC}");
-
-then there will be a problem later when the tarfile gets written out
-to disk via C<$tar->write()>:
-
-    Wide character in print at .../Archive/Tar.pm line 1014.
-
-The data was added as a Unicode string and when writing it out to disk,
-the C<:utf8> line discipline wasn't set by C<Archive::Tar>, so Perl
-tried to convert the string to ISO-8859 and failed. The written file
-now contains garbage.
-
-For this reason, Unicode strings need to be converted to UTF-8-encoded
-bytestrings before they are handed off to C<add_data()>:
-
-    use Encode;
-    my $data = "Accented character: \x{20AC}";
-    $data = encode('utf8', $data);
-
-    $tar->add_data('file.txt', $data);
-
-A opposite problem occurs if you extract a UTF8-encoded file from a 
-tarball. Using C<get_content()> on the C<Archive::Tar::File> object
-will return its content as a bytestring, not as a Unicode string.
-
-If you want it to be a Unicode string (because you want character
-semantics with operations like regular expression matching), you need
-to decode the UTF8-encoded content and have Perl convert it into 
-a Unicode string:
-
-    use Encode;
-    my $data = $tar->get_content();
-    
-    # Make it a Unicode string
-    $data = decode('utf8', $data);
-
-There is no easy way to provide this functionality in C<Archive::Tar>, 
-because a tarball can contain many files, and each of which could be
-encoded in a different way.
 
 =back
 

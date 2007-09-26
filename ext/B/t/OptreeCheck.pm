@@ -503,18 +503,23 @@ sub label {
 sub getRendering {
     my $tc = shift;
     fail("getRendering: code or prog is required")
-	unless $tc->{code} or $tc->{prog};
+	unless $tc->{code} or $tc->{prog} or $tc->{Dx};
 
     my @opts = get_bcopts($tc);
     my $rendering = ''; # suppress "Use of uninitialized value in open"
     my @errs;		# collect errs via 
 
-
-    if ($tc->{prog}) {
+    if ($tc->{Dx}) {
+	$rendering = runperl( switches => ['-w',join(',',"-Dx",@opts)],
+			      prog => $tc->{Dx}, stderr => 1,
+			      ); # verbose => 1);
+    }
+    elsif ($tc->{prog}) {
 	$rendering = runperl( switches => ['-w',join(',',"-MO=Concise",@opts)],
 			      prog => $tc->{prog}, stderr => 1,
 			      ); # verbose => 1);
-    } else {
+    } 
+    elsif ($tc->{code}) {
 	my $code = $tc->{code};
 	unless (ref $code eq 'CODE') {
 	    # treat as source, and wrap into subref 
@@ -539,6 +544,9 @@ sub getRendering {
 
 	# kludge error into rendering if its empty.
 	$rendering = $@ if $@ and ! $rendering;
+    }
+    else {
+	die "bad testcase; no prog, code or Dx parameter\n";
     }
     # separate banner, other stuff whose printing order isnt guaranteed
     if ($tc->{strip}) {
@@ -702,40 +710,6 @@ sub mkCheckRex {
 	      . '\\)'!msgxe;
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg;
-    if (!$using_open && $tc->{strip_open_hints}) {
-      $str =~ s[(			# capture
-		 \(\?:next\|db\)state	# the regexp matching next/db state
-		 .*			# all sorts of things follow it
-		 v			# The opening v
-		)
-		(?:(:>,<,%,\\{)		# hints when open.pm is in force
-		   |(:>,<,%))		# (two variations)
-		(\ ->[0-9a-z]+)?
-		$
-	       ]
-	[$1 . ($2 && ':{') . $4]xegm;	# change to the hints without open.pm
-    }
-
-    if ($] < 5.009) {
-	# 5.8.x doesn't provide the hints in the OP, which means that
-	# B::Concise doesn't show the symbolic hints. So strip all the
-	# symbolic hints from the golden results.
-	$str =~ s[(			# capture
-		   \(\?:next\|db\)state	# the regexp matching next/db state
-		   .*			# all sorts of things follow it
-		  v			# The opening v
-		  )
-		  :(?:\\[{*]		# \{ or \*
-		      |[^,\\])		# or other symbols on their own
-		    (?:,
-		     (?:\\[{*]
-			|[^,\\])
-		      )*		# maybe some more joined with commas
-		(\ ->[0-9a-z]+)?
-		$
-	       ]
-	[$1$2]xgm;			# change to the hints without flags
-    }
 
     # don't care about:
     $str =~ s/:-?\d+,-?\d+/:-?\\d+,-?\\d+/msg;		# FAKE line numbers

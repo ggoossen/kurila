@@ -328,7 +328,6 @@ PerlIOEncode_fill(pTHX_ PerlIO * f)
 	    SvCUR_set(e->dataSV,use);
 	    SvPOK_only(e->dataSV);
 	}
-	SvUTF8_off(e->dataSV);
 	PUSHMARK(sp);
 	XPUSHs(e->enc);
 	XPUSHs(e->dataSV);
@@ -342,7 +341,7 @@ PerlIOEncode_fill(pTHX_ PerlIO * f)
 	PUTBACK;
 	/* Now get translated string (forced to UTF-8) and use as buffer */
 	if (SvPOK(uni)) {
-	    s = SvPVutf8(uni, len);
+	    s = SvPV(uni, len);
 #ifdef PARANOID_ENCODE_CHECKS
 	    if (len && !is_utf8_string((U8*)s,len)) {
 		Perl_warn(aTHX_ "panic: decode did not return UTF-8 '%.*s'",(int) len,s);
@@ -359,7 +358,6 @@ PerlIOEncode_fill(pTHX_ PerlIO * f)
 	    e->base.ptr = e->base.buf = (STDCHAR*)SvPVX(e->bufsv);
 	    e->base.end = e->base.ptr + SvCUR(e->bufsv);
 	    PerlIOBase(f)->flags |= PERLIO_F_RDBUF;
-	    SvUTF8_on(e->bufsv);
 
 	    /* Adjust ptr/cnt not taking anything which
 	       did not translate - not clear this is a win */
@@ -415,7 +413,6 @@ PerlIOEncode_flush(pTHX_ PerlIO * f)
 	    PUSHMARK(sp);
 	    XPUSHs(e->enc);
 	    SvCUR_set(e->bufsv, e->base.ptr - e->base.buf);
-	    SvUTF8_on(e->bufsv);
 	    XPUSHs(e->bufsv);
 	    XPUSHs(e->chk);
 	    PUTBACK;
@@ -473,7 +470,6 @@ PerlIOEncode_flush(pTHX_ PerlIO * f)
 		SvLEN_set(str, 0);
 		SvCUR_set(str, e->base.end - e->base.ptr);
 		SvPOK_only(str);
-		SvUTF8_on(str);
 		PUSHMARK(sp);
 		XPUSHs(e->enc);
 		XPUSHs(str);

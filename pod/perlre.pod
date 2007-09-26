@@ -65,15 +65,6 @@ X</p> X<regex, preserve> X<regexp, preserve>
 Preserve the string matched such that ${^PREMATCH}, {$^MATCH}, and
 ${^POSTMATCH} are available for use after matching.
 
-=item g and c
-X</g> X</c>
-
-Global matching, and keep the Current position after failed matching.
-Unlike i, m, s and x, these two flags affect the way the regex is used
-rather than the regex itself. See
-L<perlretut/"Using regular expressions in Perl"> for further explanation
-of the g and c modifiers.
-
 =back
 
 These are usually written as "the C</x> modifier", even though the delimiter
@@ -223,9 +214,9 @@ X<\0> X<\c> X<\N> X<\x>
     \e		escape (think troff)  (ESC)
     \033	octal char            (example: ESC)
     \x1B	hex char              (example: ESC)
-    \x{263a}	long hex char         (example: Unicode SMILEY)
+    \x{263a}	wide hex char         (example: Unicode SMILEY)
     \cK		control char          (example: VT)
-    \N{name}	named Unicode character
+    \N{name}	named char
     \l		lowercase next char (think vi)
     \u		uppercase next char (think vi)
     \L		lowercase till \E (think vi)
@@ -246,7 +237,7 @@ You'll need to write something like C<m/\Quser\E\@\Qhost/>.
 
 In addition, Perl defines the following:
 X<\w> X<\W> X<\s> X<\S> X<\d> X<\D> X<\X> X<\p> X<\P> X<\C>
-X<\g> X<\k> X<\N> X<\K> X<\v> X<\V> X<\h> X<\H>
+X<\g> X<\k> X<\N> X<\K>
 X<word> X<whitespace> X<character class> X<backreference>
 
     \w	     Match a "word" character (alphanumeric plus "_")
@@ -270,11 +261,10 @@ X<word> X<whitespace> X<character class> X<backreference>
              optionally be wrapped in curly brackets for safer parsing.
     \g{name} Named backreference
     \k<name> Named backreference
+    \N{name} Named Unicode character, or Unicode escape
+    \x12     Hexadecimal escape sequence
+    \x{1234} Long hexadecimal escape sequence
     \K       Keep the stuff left of the \K, don't include it in $&
-    \v       Vertical whitespace
-    \V       Not vertical whitespace
-    \h       Horizontal whitespace
-    \H       Not horizontal whitespace
     \R       Linebreak
 
 A C<\w> matches a single alphanumeric character (an alphabetic
@@ -293,7 +283,7 @@ in general.
 X<\w> X<\W> X<word>
 
 C<\R> will atomically match a linebreak, including the network line-ending
-"\x0D\x0A".  Specifically, X<\R> is exactly equivalent to
+"\x0D\x0A".  Specifically, X<\R> is exactly equivelent to
 
   (?>\x0D\x0A?|[\x0A-\x0C\x85\x{2028}\x{2029}])
 
@@ -555,7 +545,7 @@ and C<< \k<name> >> refer to the leftmost defined group. (Thus it's possible
 to do things with named capture buffers that would otherwise require C<(??{})>
 code to accomplish.)
 X<named capture buffer> X<regular expression, named capture buffer>
-X<%+> X<$+{name}> X<< \k<name> >>
+X<%+> X<$+{name}> X<\k{name}>
 
 Examples:
 
@@ -862,9 +852,10 @@ its Unicode extension (see L<utf8>),
 though it isn't extended by the locale (see L<perllocale>).
 
 B<NOTE:> In order to make things easier for programmers with experience
-with the Python or PCRE regex engines, the pattern C<< (?P<NAME>pattern) >>
+with the Python or PCRE regex engines, the pattern C<< (?PE<lt>NAMEE<gt>pattern) >>
 may be used instead of C<< (?<NAME>pattern) >>; however this form does not
-support the use of single quotes as a delimiter for the name.
+support the use of single quotes as a delimiter for the name. This is
+only available in Perl 5.10 or later.
 
 =item C<< \k<NAME> >>
 
@@ -882,7 +873,7 @@ Both forms are equivalent.
 
 B<NOTE:> In order to make things easier for programmers with experience
 with the Python or PCRE regex engines, the pattern C<< (?P=NAME) >>
-may be used instead of C<< \k<NAME> >>.
+may be used instead of C<< \k<NAME> >> in Perl 5.10 or later.
 
 =item C<(?{ code })>
 X<(?{})> X<regex, code in> X<regexp, code in> X<regular expression, code in>
@@ -1107,7 +1098,7 @@ pattern.
 
 B<NOTE:> In order to make things easier for programmers with experience
 with the Python or PCRE regex engines the pattern C<< (?P>NAME) >>
-may be used instead of C<< (?&NAME) >>.
+may be used instead of C<< (?&NAME) >> in Perl 5.10 or later.
 
 =item C<(?(condition)yes-pattern|no-pattern)>
 X<(?()>
@@ -1471,7 +1462,7 @@ As a shortcut C<(*MARK:NAME)> can be written C<(*:NAME)>.
 
 =item C<(*THEN)> C<(*THEN:NAME)>
 
-This is similar to the "cut group" operator C<::> from Perl 6. Like
+This is similar to the "cut group" operator C<::> from Perl6. Like
 C<(*PRUNE)>, this verb always matches, and when backtracked into on
 failure, it causes the regex engine to try the next alternation in the
 innermost enclosing group (capturing or otherwise).
@@ -1505,7 +1496,7 @@ backtrack and try C; but the C<(*PRUNE)> verb will simply fail.
 =item C<(*COMMIT)>
 X<(*COMMIT)>
 
-This is the Perl 6 "commit pattern" C<< <commit> >> or C<:::>. It's a
+This is the Perl6 "commit pattern" C<< <commit> >> or C<:::>. It's a
 zero-width pattern similar to C<(*SKIP)>, except that when backtracked
 into on failure it causes the match to fail outright. No further attempts
 to find a valid match by advancing the start pointer will occur again.
@@ -2111,7 +2102,7 @@ Perl specific syntax, the following are legal in Perl 5.10:
 
 =over 4
 
-=item C<< (?P<NAME>pattern) >>
+=item C<< (?PE<lt>NAMEE<gt>pattern) >>
 
 Define a named capture buffer. Equivalent to C<< (?<NAME>pattern) >>.
 

@@ -5,14 +5,14 @@
 use warnings;
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
 plan 'no_plan';
 
 $SIG{__WARN__} = sub { die @_ };
+
+our ($anon1, $anon2, $anon3);
 
 sub eval_ok ($;$) {
     eval shift;
@@ -23,9 +23,9 @@ eval_ok 'sub t1 ($) : locked { $_[0]++ }';
 eval_ok 'sub t2 : locked { $_[0]++ }';
 eval_ok 'sub t3 ($) : locked ;';
 eval_ok 'sub t4 : locked ;';
-our $anon1; eval_ok '$anon1 = sub ($) : locked:method { $_[0]++ }';
-our $anon2; eval_ok '$anon2 = sub : locked : method { $_[0]++ }';
-our $anon3; eval_ok '$anon3 = sub : method { $_[0]->[1] }';
+eval_ok '$anon1 = sub ($) : locked:method { $_[0]++ }';
+eval_ok '$anon2 = sub : locked : method { $_[0]++ }';
+eval_ok '$anon3 = sub : method { $_[0]->[1] }';
 
 eval 'sub e1 ($) : plugh ;';
 like $@, qr/^Invalid CODE attributes?: ["']?plugh["']? at/;
@@ -39,7 +39,8 @@ like $@, qr/Unterminated attribute parameter in attribute list at/;
 eval 'sub e4 ($) : plugh + xyzzy ;';
 like $@, qr/Invalid separator character '[+]' in attribute list at/;
 
-eval_ok 'my main $x : = 0;';
+eval 'my main $x : = 0;';
+like $@, qr/Expected variable after declarator at/;
 eval_ok 'my $x : = 0;';
 eval_ok 'my $x ;';
 eval_ok 'my ($x) : = 0;';
@@ -78,17 +79,17 @@ like $@, qr/Invalid separator character ':' in attribute list at/;
 
 sub A::MODIFY_SCALAR_ATTRIBUTES { return }
 eval 'my A $x : plugh;';
-like $@, qr/^SCALAR package attribute may clash with future reserved word: ["']?plugh["']? at/;
+like $@, qr/^Expected variable after declarator at/;
 
 eval 'my A $x : plugh plover;';
-like $@, qr/^SCALAR package attributes may clash with future reserved words: ["']?plugh["']? /;
+like $@, qr/^Expected variable after declarator at/;
 
 no warnings 'reserved';
 eval 'my A $x : plugh;';
-is $@, '';
+like $@, qr/^Expected variable after declarator at/;
 
 eval 'package Cat; my Cat @socks;';
-like $@, qr/^Can't declare class for non-scalar \@socks in "my"/;
+like $@, qr/^Expected variable after declarator at/;
 
 sub X::MODIFY_CODE_ATTRIBUTES { die "$_[0]" }
 sub X::foo { 1 }

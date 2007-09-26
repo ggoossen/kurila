@@ -27,7 +27,7 @@ eval {
   } or do {
     require DynaLoader;
     local @ISA = qw(DynaLoader);
-    bootstrap List::Util $XS_VERSION;
+    List::Util->bootstrap($XS_VERSION);
   };
 } unless $TESTING_PERL_ONLY;
 
@@ -47,8 +47,8 @@ sub reduce (&@) {
   use vars qw($a $b);
 
   my $caller = caller;
-  local(*{$caller."::a"}) = \my $a;
-  local(*{$caller."::b"}) = \my $b;
+  local(*{Symbol::qualify_to_ref($caller."::a")}) = \my $a;
+  local(*{Symbol::qualify_to_ref($caller."::b")}) = \my $b;
 
   $a = shift;
   foreach (@_) {

@@ -1,9 +1,11 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
+our ($xref, $runme, @a, %h, $aref, $chopit, @chopar, $posstr,
+     $cstr, $nn, $n, @INPUT, @simple_input, $ord, $href, $zzz1,
+    $zzz2, $op, $commentt, $expectop, $skip, $integer,
+    $comment, $operator, $variable);
+
+our ($undefed, @z, @x, @aaa, $toself, $direct);
 
 $| = 1;
 umask 0;
@@ -175,7 +177,6 @@ ref $xref			# ref
 ref $cstr			# ref nonref
 `$runme -e "print qq[1\\n]"`				# backtick skip(MSWin32)
 `$undefed`			# backtick undef skip(MSWin32)
-<*>				# glob
 <OP>				# readline
 'faked'				# rcatline
 (@z = (1 .. 3))			# aassign
@@ -243,7 +244,6 @@ uc $cstr			# uc
 lc $cstr			# lc
 quotemeta $cstr			# quotemeta
 @$aref				# rv2av
-@$undefed			# rv2av undef
 (each %h) % 2 == 1		# each
 values %h			# values
 keys %h				# keys

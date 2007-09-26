@@ -10,6 +10,8 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
+our (@a);
+
 my $o = tie @a, 'Tie::File', $file, autochomp => 0, autodefer => 0;
 print $o ? "ok $N\n" : "not ok $N\n";
 $N++;

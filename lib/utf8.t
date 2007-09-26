@@ -6,7 +6,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require './test.pl';
-    unless ($has_perlio = find PerlIO::Layer 'perlio') {
+    unless ($has_perlio = PerlIO::Layer->find( 'perlio')) {
 	print <<EOF;
 # Since you don't have perlio you might get failures with UTF-8 locales.
 EOF
@@ -37,11 +37,9 @@ no utf8; # Ironic, no?
 #
 #
 
-plan tests => 150;
+plan tests => 37;
 
 {
-    # bug id 20001009.001
-
     my ($a, $b);
 
     { use bytes; $a = "\xc3\xa4" }
@@ -49,14 +47,15 @@ plan tests => 150;
 
     my $test = 68;
 
-    ok($a ne $b);
+    ok($a eq $b);
 
-    { use utf8; ok($a ne $b) }
+    { use utf8; ok($a eq $b) }
 }
 
 
 {
     # bug id 20000730.004
+    use utf8;
 
     my $smiley = "\x{263a}";
 
@@ -103,167 +102,13 @@ plan tests => 150;
 
 
 {
+    local $TODO = "use utf8; passed to eval";
+    use utf8;
     my $w = 0;
     local $SIG{__WARN__} = sub { print "#($_[0])\n"; $w++ };
-    my $x = eval q/"\\/ . "\x{100}" . q/"/;;
+    my $x = eval q/"\\/ . "\x{100}" . q/"/;
    
     ok($w == 0 && $x eq "\x{100}");
-}
-
-{
-    use warnings;
-    use strict;
-
-    my $show = q(
-                 sub show {
-                   my $result;
-                   $result .= '>' . join (',', map {ord} split //, $_) . '<'
-                     foreach @_;
-                   $result;
-                 }
-                 1;
-                );
-    eval $show or die $@; # We don't expect this sub definition to fail.
-    my $progfile = 'utf' . $$;
-    END {unlink_all $progfile}
-
-    # If I'm right 60 is '>' in ASCII, ' ' in EBCDIC
-    # 173 is not punctuation in either ASCII or EBCDIC
-    my (@char);
-    foreach (60, 173, 257, 65532) {
-      my $char = chr $_;
-      utf8::encode($char);
-      # I don't want to use map {ord} and I've no need to hardcode the UTF
-      # version
-      my $charsubst = $char;
-      $charsubst =~ s/(.)/ord ($1) . ','/ge;
-      chop $charsubst;
-      # Not testing this one against map {ord}
-      my $char_as_ord
-          = join " . ", map {sprintf 'chr (%d)', ord $_} split //, $char;
-      push @char, [$_, $char, $charsubst, $char_as_ord];
-    }
-    # Now we've done all the UTF8 munching hopefully we're safe
-    my @tests = (
-             ['check our detection program works',
-              'my @a = ("'.chr(60).'\x2A", ""); $b = show @a', qr/^>60,42<><$/],
-             ['check literal 8 bit input',
-              '$a = "' . chr (173) . '"; $b = show $a', qr/^>173<$/],
-             ['check no utf8; makes no change',
-              'no utf8; $a = "' . chr (173) . '"; $b = show $a', qr/^>173<$/],
-             # Now we do the real byte sequences that are valid UTF8
-             (map {
-               ["the utf8 sequence for chr $_->[0]",
-                qq{\$a = "$_->[1]"; \$b = show \$a}, qr/^>$_->[2]<$/],
-               ["no utf8; for the utf8 sequence for chr $_->[0]",
-                qq(no utf8; \$a = "$_->[1]"; \$b = show \$a), qr/^>$_->[2]<$/],
-               ["use utf8; for the utf8 sequence for chr $_->[0]",
-                qq(use utf8; \$a = "$_->[1]"; \$b = show \$a), qr/^>$_->[0]<$/],
-              } @char),
-             # Interpolation of hex characters needs to take place now, as we're
-             # testing feeding malformed utf8 into perl. Bug now fixed was an
-             # "out of memory" error. We really need the "" [rather than qq()
-             # or q()] to get the best explosion.
-             ["!Feed malformed utf8 into perl.", <<"BANG",
-    use utf8; %a = ("\xE1\xA0"=>"sterling");
-    print 'start'; printf '%x,', ord \$_ foreach keys %a; print "end\n";
-BANG
-	      qr/^Malformed UTF-8 character \(\d bytes?, need \d, .+\).*start\d+,end$/sm
-	     ],
-            );
-    foreach (@tests) {
-        my ($why, $prog, $expect) = @$_;
-        open P, ">$progfile" or die "Can't open '$progfile': $!";
-        binmode(P, ":bytes") if $has_perlio;
-	print P $show, $prog, '; print $b'
-            or die "Print to 'progfile' failed: $!";
-        close P or die "Can't close '$progfile': $!";
-        if ($why =~ s/^!//) {
-            print "# Possible delay...\n";
-        } else {
-            print "# $prog\n";
-        }
-        my $result = runperl ( stderr => 1, progfile => $progfile );
-        like ($result, $expect, $why);
-    }
-    print
-        "# Again! Again! [but this time as eval, and not the explosive one]\n";
-    # and now we've safely done them all as separate files, check that the
-    # evals do the same thing. Hopefully doing it later successfully decouples
-    # the previous tests from anything messy that may go wrong with the evals.
-    foreach (@tests) {
-        my ($why, $prog, $expect) = @$_;
-        next if $why =~ m/^!/; # Goes bang.
-        my $result = eval $prog;
-        if ($@) {
-            print "# prog is $prog\n";
-            print "# \$\@=", _qq($@), "\n";
-        }
-        like ($result, $expect, $why);
-    }
-
-    # See what the tokeniser does with hash keys.
-    print "# What does the tokeniser do with utf8 hash keys?\n";
-    @tests = (map {
-        # This is the control - I don't expect it to fail
-        ["assign utf8 for chr $_->[0] to a hash",
-         qq(my \$a = "$_->[1]"; my %h; \$h{\$a} = 1;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["no utf8; assign utf8 for chr $_->[0] to a hash",
-         qq(no utf8; my \$a = "$_->[1]"; my %h; \$h{\$a} = 1;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["use utf8; assign utf8 for chr $_->[0] to a hash",
-         qq(use utf8; my \$a = "$_->[1]"; my %h; \$h{\$a} = 1;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{chr $_->[0]}; \$b),
-         qr/^>$_->[0]<$/],
-        # Now check literal $h{"x"} constructions.
-        ["\$h{\"x\"} construction, where x is utf8 for chr $_->[0]",
-         qq(my \$a = "$_->[1]"; my %h; \$h{"$_->[1]"} = 1;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["no utf8; \$h{\"x\"} construction, where x is utf8 for chr $_->[0]",
-         qq(no utf8; my \$a = "$_->[1]"; my %h; \$h{"$_->[1]"} = 1;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["use utf8; \$h{\"x\"} construction, where x is utf8 for chr $_->[0]",
-         qq(use utf8; my \$a = "$_->[1]"; my %h; \$h{"$_->[1]"} = 1;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{chr $_->[0]}; \$b),
-         qr/^>$_->[0]<$/],
-        # Now check "x" => constructions.
-        ["assign \"x\"=>1 to a hash, where x is utf8 for chr $_->[0]",
-         qq(my \$a = "$_->[1]"; my %h; %h = ("$_->[1]" => 1);
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["no utf8; assign \"x\"=>1 to a hash, where x is utf8 for chr $_->[0]",
-         qq(no utf8; my \$a = "$_->[1]"; my %h; %h = ("$_->[1]" => 1);
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["use utf8; assign \"x\"=>1 to a hash, where x is utf8 for chr $_->[0]",
-         qq(use utf8; my \$a = "$_->[1]"; my %h; %h = ("$_->[1]" => 1);
-            my \$b = show keys %h; \$b .= 'F' unless \$h{chr $_->[0]}; \$b),
-         qr/^>$_->[0]<$/],
-        # Check copies of hashes made from literal utf8 keys
-        ["assign utf8 for chr $_->[0] to a hash, then copy it",
-         qq(my \$a = "$_->[1]"; my %i; \$i{\$a} = 1; my %h = %i;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["no utf8; assign utf8 for chr $_->[0] to a hash, then copy it",
-         qq(no utf8; my \$a = "$_->[1]"; my %i; \$i{\$a} = 1;; my %h = %i;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{$_->[3]}; \$b),
-         qr/^>$_->[2]<$/],
-        ["use utf8; assign utf8 for chr $_->[0] to a hash, then copy it",
-         qq(use utf8; my \$a = "$_->[1]"; my %i; \$i{\$a} = 1; my %h = %i;
-            my \$b = show keys %h; \$b .= 'F' unless \$h{chr $_->[0]}; \$b),
-         qr/^>$_->[0]<$/],
-     } @char);
-    foreach (@tests) {
-        my ($why, $prog, $expect) = @$_;
-        # print "# $prog\n";
-        my $result = eval $prog;
-        like ($result, $expect, $why);
-    }
 }
 
 #
@@ -336,6 +181,7 @@ SKIP: {
 # Test the "internals".
 
 {
+    use utf8;
     my $a = "A";
     my $b = chr(0x0FF);
     my $c = chr(0x100);
@@ -344,98 +190,33 @@ SKIP: {
     ok( utf8::valid($b), "utf8::valid beyond");
     ok( utf8::valid($c), "utf8::valid unicode");
 
-    ok(!utf8::is_utf8($a), "!utf8::is_utf8 basic");
-    ok(!utf8::is_utf8($b), "!utf8::is_utf8 beyond");
-    ok( utf8::is_utf8($c), "utf8::is_utf8 unicode");
-
-    is(utf8::upgrade($a), 1, "utf8::upgrade basic");
-    if (ord('A') == 193) { # EBCDIC.
-	is(utf8::upgrade($b), 1, "utf8::upgrade beyond");
-    } else {
-	is(utf8::upgrade($b), 2, "utf8::upgrade beyond");
-    }
-    is(utf8::upgrade($c), 2, "utf8::upgrade unicode");
-
     is($a, "A",       "basic");
-    is($b, "\xFF",    "beyond");
+    is($b, "\x{FF}",    "beyond");
     is($c, "\x{100}", "unicode");
 
-    ok( utf8::valid($a), "utf8::valid basic");
-    ok( utf8::valid($b), "utf8::valid beyond");
-    ok( utf8::valid($c), "utf8::valid unicode");
-
-    ok( utf8::is_utf8($a), "utf8::is_utf8 basic");
-    ok( utf8::is_utf8($b), "utf8::is_utf8 beyond");
-    ok( utf8::is_utf8($c), "utf8::is_utf8 unicode");
-
-    is(utf8::downgrade($a), 1, "utf8::downgrade basic");
-    is(utf8::downgrade($b), 1, "utf8::downgrade beyond");
-
-    is($a, "A",       "basic");
-    is($b, "\xFF",    "beyond");
-
-    ok( utf8::valid($a), "utf8::valid basic");
-    ok( utf8::valid($b), "utf8::valid beyond");
-
-    ok(!utf8::is_utf8($a), "!utf8::is_utf8 basic");
-    ok(!utf8::is_utf8($b), "!utf8::is_utf8 beyond");
-
+    # noop
     utf8::encode($a);
     utf8::encode($b);
     utf8::encode($c);
 
     is($a, "A",       "basic");
-    if (ord('A') == 193) { # EBCDIC.
-	is(length($b), 1, "beyond length");
-    } else {
-	is(length($b), 2, "beyond length");
-    }
-    is(length($c), 2, "unicode length");
+    is($b, "\x{FF}",    "beyond");
+    is($c, "\x{100}", "unicode");
 
-    ok(utf8::valid($a), "utf8::valid basic");
-    ok(utf8::valid($b), "utf8::valid beyond");
-    ok(utf8::valid($c), "utf8::valid unicode");
-
-    # encode() clears the UTF-8 flag (unlike upgrade()).
-    ok(!utf8::is_utf8($a), "!utf8::is_utf8 basic");
-    ok(!utf8::is_utf8($b), "!utf8::is_utf8 beyond");
-    ok(!utf8::is_utf8($c), "!utf8::is_utf8 unicode");
-
+    # noop
     utf8::decode($a);
     utf8::decode($b);
     utf8::decode($c);
 
     is($a, "A",       "basic");
-    is($b, "\xFF",    "beyond");
+    is($b, "\x{FF}",    "beyond");
     is($c, "\x{100}", "unicode");
-
-    ok(utf8::valid($a), "!utf8::valid basic");
-    ok(utf8::valid($b), "!utf8::valid beyond");
-    ok(utf8::valid($c), " utf8::valid unicode");
-
-    ok(!utf8::is_utf8($a), "!utf8::is_utf8 basic");
-    if (ord('A') == 193) { # EBCDIC.
-	ok( utf8::is_utf8(pack('U',0x0ff)), " utf8::is_utf8 beyond");
-    } else {
-	ok( utf8::is_utf8($b), " utf8::is_utf8 beyond"); # $b stays in UTF-8.
-    }
-    ok( utf8::is_utf8($c), " utf8::is_utf8 unicode");
 }
 
 {
-    eval {utf8::encode("£")};
-    like($@, qr/^Modification of a read-only value attempted/,
-	 "utf8::encode should refuse to touch read-only values");
-}
-
-{
-    my $a = "456\xb6";
-    utf8::upgrade($a);
-
-    my $b = "123456\xb6";
-    $b =~ s/^...//;
-    utf8::upgrade($b);
-    is($b, $a, "utf8::upgrade OffsetOK");
+    use utf8;
+    eval {utf8::encode("Â£")};
+    like($@, qr//, "utf8::encode is a NO-OP");
 }
 
 {
@@ -446,6 +227,7 @@ SKIP: {
 
 {
     # failure of is_utf8_char() without NATIVE_TO_UTF on EBCDIC (0260..027F)
+    use utf8;
     ok(utf8::valid(chr(0x250)), "0x250");
     ok(utf8::valid(chr(0x260)), "0x260");
     ok(utf8::valid(chr(0x270)), "0x270");

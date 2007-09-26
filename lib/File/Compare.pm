@@ -41,7 +41,7 @@ sub compare {
 	open(FROM,"<",$from) or goto fail_open1;
 	unless ($text_mode) {
 	    binmode FROM;
-	    $fromsize = -s FROM;
+	    $fromsize = -s *FROM;
 	}
 	$closefrom = 1;
     }
@@ -59,7 +59,7 @@ sub compare {
 
     if (!$text_mode && $closefrom && $closeto) {
 	# If both are opened files we know they differ if their size differ
-	goto fail_inner if $fromsize != -s TO;
+	goto fail_inner if $fromsize != -s *TO;
     }
 
     if ($text_mode) {
@@ -78,7 +78,7 @@ sub compare {
     }
     else {
 	unless (defined($size) && $size > 0) {
-	    $size = $fromsize || -s TO || 0;
+	    $size = $fromsize || -s *TO || 0;
 	    $size = 1024 if $size < 512;
 	    $size = $Too_Big if $size > $Too_Big;
 	}

@@ -6,7 +6,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Test::More tests => 55;
+use Test::More tests => 47;
 
 use English qw( -no_match_vars ) ;
 use Config;
@@ -34,7 +34,7 @@ $ORS = "\n";
 {
 	local(*IN, *OUT);
 	if ($^O ne 'dos') {
-	    pipe(IN, OUT);
+	    pipe(IN, 'OUT');
 	} else {
 	    open(OUT, ">en.tmp");
 	}
@@ -56,15 +56,6 @@ $ORS = "\n";
 	ok( chomp($foo), '$ORS should be \n' );
 }
 
-is( $FORMAT_NAME, 'OUT', '$FORMAT_NAME' );
-is( $FORMAT_TOP_NAME, 'OUT_TOP', '$FORMAT_TOP_NAME' );
-is( $FORMAT_FORMFEED, "\f", '$FORMAT_FORMFEED' );
-is( $FORMAT_LINES_LEFT, 0, '$FORMAT_LINES_LEFT' );
-is( $FORMAT_LINES_PER_PAGE, 60, '$FORMAT_LINES_PER_PAGE' );
-is( $FORMAT_LINE_BREAK_CHARACTERS, " \n-", '$FORMAT_LINE_BREAK_CHARACTERS');
-is( $FORMAT_PAGE_NUMBER, 0, '$FORMAT_PAGE_NUMBER' );
-is( $ACCUMULATOR, $^A, '$ACCUMULATOR' );
-
 undef $OUTPUT_FIELD_SEPARATOR;
 
 if ($threads) { $" = "\n" } else { $LIST_SEPARATOR = "\n" };
@@ -76,7 +67,7 @@ is( $foo[1], 9, '$LIST_SEPARATOR' );
 undef $OUTPUT_RECORD_SEPARATOR;
 
 eval 'NO SUCH FUNCTION';
-like( $EVAL_ERROR, qr/method/, '$EVAL_ERROR' );
+like( $EVAL_ERROR, qr/syntax error/, '$EVAL_ERROR' );
 
 is( $UID, $<, '$UID' );
 is( $GID, $(, '$GID' );
@@ -117,7 +108,7 @@ is( $INPUT_LINE_NUMBER, 2, '$INPUT_LINE_NUMBER' );
 
 my %hash;
 $SUBSCRIPT_SEPARATOR = '|';
-$hash{d,e,f} = 1;
+$hash{'d','e','f'} = 1;
 $SUBSEP = ',';
 $hash{'a', 'b', 'c'} = 1;
 my @keys = sort keys %hash;

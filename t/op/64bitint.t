@@ -6,8 +6,6 @@ BEGIN {
 		print "1..0 # Skip: no 64-bit types\n";
 		exit(0);
 	}
-	chdir 't' if -d 't';
-	@INC = '../lib';
 }
 
 # This could use many more tests.
@@ -16,6 +14,8 @@ BEGIN {
 # 32+ bit integers don't cause noise
 use warnings;
 no warnings qw(overflow portable);
+
+our $c;
 
 print "1..67\n";
 

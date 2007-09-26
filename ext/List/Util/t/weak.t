@@ -4,7 +4,7 @@ BEGIN {
     unless (-d 'blib') {
 	chdir 't' if -d 't';
 	@INC = '../lib';
-	require Config; import Config;
+	require Config; Config->import;
 	keys %Config; # Silence warning
 	if ($Config{extensions} !~ /\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
@@ -96,7 +96,7 @@ print "# EXITBLOCK\n";
 
 $flag = 0;
 {
-	my $y = bless {}, Dest;
+	my $y = bless {}, 'Dest';
 	Dump($y);
 	print "# 1: $y\n";
 	$y->{Self} = $y;
@@ -126,8 +126,8 @@ print "# FLAGU\n";
 
 $flag = 0;
 {
-	my $y = bless {}, Dest;
-	my $x = bless {}, Dest;
+	my $y = bless {}, 'Dest';
+	my $x = bless {}, 'Dest';
 	$x->{Ref} = $y;
 	$y->{Ref} = $x;
 	$x->{Flag} = \$flag;

@@ -180,6 +180,8 @@ PERLVAR(Iwatchok,	char *)
 PERLVARI(Iregmatch_slab, regmatch_slab *,	NULL)
 PERLVAR(Iregmatch_state, regmatch_state *)
 
+PERLVARI(Idelayedisa,	HV*,	NULL)   /* stash for PL_delaymagic for magic_setisa */
+
 /* Put anything new that is pointer aligned here. */
 
 PERLVAR(Idelaymagic,	U16)		/* ($<,$>) = ... */
@@ -349,10 +351,6 @@ PERLVAR(Ilastfd,	int)		/* what to preserve mode on */
 PERLVAR(Ioldname,	char *)		/* what to preserve mode on */
 PERLVAR(IArgv,		char **)	/* stuff to free from do_aexec, vfork safe */
 PERLVAR(ICmd,		char *)		/* stuff to free from do_aexec, vfork safe */
-/* Elements in this array have ';' appended and are injected as a single line
-   into the tokeniser. You can't put any (literal) newlines into any program
-   you stuff in into this array, as the point where it's injected is expecting
-   a single physical line. */
 PERLVAR(Ipreambleav,	AV *)
 PERLVAR(Imess_sv,	SV *)
 PERLVAR(Iors_sv,	SV *)		/* output record separator $\ */
@@ -477,10 +475,10 @@ PERLVARI(Icollation_standard, bool,	TRUE)
 #endif /* USE_LOCALE_COLLATE */
 
 
-#if defined (PERL_UTF8_CACHE_ASSERT) || defined (DEBUGGING)
+#ifdef PERL_UTF8_CACHE_ASSERT
 #  define PERL___I -1
 #else
-#  define PERL___I 1
+#  define PERL___I -1
 #endif
 PERLVARI(Iutf8cache, I8, PERL___I)	/* Is the utf8 caching code enabled? */
 #undef PERL___I
@@ -514,11 +512,6 @@ PERLVAR(Iutf8_toupper,	SV *)
 PERLVAR(Iutf8_totitle,	SV *)
 PERLVAR(Iutf8_tolower,	SV *)
 PERLVAR(Iutf8_tofold,	SV *)
-PERLVAR(Ilast_swash_hv,	HV *)
-PERLVAR(Ilast_swash_tmps,	U8 *)
-PERLVAR(Ilast_swash_slen,	STRLEN)
-PERLVARA(Ilast_swash_key,10,	U8)
-PERLVAR(Ilast_swash_klen,	U8)	/* Only needs to store 0-10  */
 
 #ifdef FCRYPT
 PERLVARI(Icryptseen,	bool,	FALSE)	/* has fast crypt() been initialized? */
@@ -591,7 +584,7 @@ PERLVARI(Iknown_layers, PerlIO_list_t *,NULL)
 PERLVARI(Idef_layerlist, PerlIO_list_t *,NULL)
 #endif
 
-PERLVARI(Iencoding,	SV*, NULL)		/* character encoding */
+PERLVARI(Iencoding,    SV*, NULL)              /* character encoding */
 
 PERLVAR(Idebug_pad,	struct perl_debug_pad)	/* always needed because of the re extension */
 

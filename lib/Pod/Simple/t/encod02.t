@@ -6,6 +6,7 @@ BEGIN {
 }
 
 use strict;
+use encoding 'latin1';
 use Test;
 BEGIN { plan tests => 4 };
 

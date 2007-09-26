@@ -5,7 +5,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bGDBM_File\b/) {
 	print "1..0 # Skip: GDBM_File was not built\n";
 	exit 0;

@@ -8,9 +8,9 @@ BEGIN {
    my $THISDIR = abs_path(dirname $0);
    unshift @INC, $THISDIR;
    require "testcmp.pl";
-   import TestCompare;
+   TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { File::Spec->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
 }
 
 #use strict;
@@ -33,7 +33,7 @@ BEGIN {
 ## reproducible results between environments
 @ENV{qw(TERMCAP COLUMNS)} = ('co=76:do=^J', 76);
 
-sub catfile(@) { File::Spec->catfile(@_); }
+sub catfile(@) { 'File::Spec'->catfile(@_); }
 
 my $INSTDIR = abs_path(dirname $0);
 $INSTDIR = VMS::Filespec::unixpath($INSTDIR) if $^O eq 'VMS';

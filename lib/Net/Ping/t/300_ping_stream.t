@@ -35,7 +35,7 @@ use Test;
 use Net::Ping;
 plan tests => 22;
 
-my $p = new Net::Ping "stream";
+my $p = Net::Ping->new( "stream");
 
 # new() worked?
 ok !!$p;

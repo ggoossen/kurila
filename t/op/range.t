@@ -1,15 +1,13 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = ('../lib', '.');
-}   
 # Avoid using eq_array below as it uses .. internally.
-require 'test.pl';
+require './test.pl';
 
 use Config;
 
 plan (45);
+
+our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 
 is(join(':',1..5), '1:2:3:4:5');
 

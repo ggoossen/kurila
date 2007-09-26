@@ -11,7 +11,7 @@
 # Version 1.01 $Revision: 1.18 $ $Date: 2001/06/24 17:16:47 $
 
 package Memoize;
-$VERSION = '1.01_02';
+our $VERSION = '1.01_02';
 
 # Compile-time constants
 sub SCALAR () { 0 } 
@@ -28,9 +28,9 @@ use Carp;
 use Exporter;
 use vars qw($DEBUG);
 use Config;                     # Dammit.
-@ISA = qw(Exporter);
-@EXPORT = qw(memoize);
-@EXPORT_OK = qw(unmemoize flush_cache);
+our @ISA = qw(Exporter);
+our @EXPORT = qw(memoize);
+our @EXPORT_OK = qw(unmemoize flush_cache);
 use strict;
 
 my %memotable;
@@ -96,7 +96,7 @@ sub memoize {
 	unless $install_name =~ /::/;
     no strict;
     local($^W) = 0;	       # ``Subroutine $install_name redefined at ...''
-    *{$install_name} = $wrapper; # Install memoized version
+    *{Symbol::qualify_to_ref($install_name)} = $wrapper; # Install memoized version
   }
 
   $revmemotable{$wrapper} = "" . $cref; # Turn code ref into hash key
@@ -292,7 +292,7 @@ sub unmemoize {
   if (defined $name) {
     no strict;
     local($^W) = 0;	       # ``Subroutine $install_name redefined at ...''
-    *{$name} = $tabent->{U}; # Replace with original function
+    *{Symbol::qualify_to_ref($name)} = $tabent->{U}; # Replace with original function
   }
   undef $memotable{$revmemotable{$cref}};
   undef $revmemotable{$cref};
@@ -332,7 +332,7 @@ sub _make_cref {
       croak "Cannot operate on nonexistent function `$fn'";
     }
 #    $cref = \&$name;
-    $cref = *{$name}{CODE};
+    $cref = *{Symbol::qualify_to_ref($name)}{CODE};
   } else {
     my $parent = (caller(1))[3]; # Function that called _make_cref
     croak "Usage: argument 1 to `$parent' must be a function name or reference.\n";

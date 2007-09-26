@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
@@ -63,6 +61,8 @@ is( $r, "5.6" );
 #
 # readline() has special behaviour too
 #
+
+our $fh;
 
 $r = 11;
 BEGIN { *CORE::GLOBAL::readline = sub (;*) { ++$r }; }

@@ -3,7 +3,7 @@ BEGIN {
         chdir 't';
         unshift @INC, '../lib';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
@@ -72,7 +72,7 @@ for my $charset (sort keys %Charset){
     print $dst $uni;
     }else{ # ugh!
     binmode($dst);
-    my $raw = $uni; Encode::_utf8_off($raw);
+    my $raw = $uni;
     print $dst $raw;
     }
 
@@ -88,7 +88,6 @@ for my $charset (sort keys %Charset){
     }else{ # ugh!
     binmode($src);
     $uni = join('', <$src>);
-    Encode::_utf8_on($uni);
     }
     close $src;
 

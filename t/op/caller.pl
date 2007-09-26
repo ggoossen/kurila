@@ -104,11 +104,6 @@ EOE
     is(hint_fetch('dooot'), "FIP\0FOP\0FIDDIT\0FAP", "Can do embedded 0 bytes");
 
     BEGIN {
-	$^H{dooot} = chr 256;
-    }
-    is(hint_fetch('dooot'), chr 256, "Can do Unicode");
-
-    BEGIN {
 	$^H{dooot} = -42;
     }
     is(hint_fetch('dooot'), -42, "Can do IVs");
@@ -120,13 +115,14 @@ EOE
 }
 
 {
+    use utf8;
     my ($k1, $k2, $k3, $k4);
     BEGIN {
 	$k1 = chr 163;
 	$k2 = $k1;
 	$k3 = chr 256;
 	$k4 = $k3;
-	utf8::upgrade $k2;
+	utf8::encode $k2;
 	utf8::encode $k4;
 
 	$^H{$k1} = 1;
@@ -144,8 +140,8 @@ EOE
 	# Perl_refcounted_he_fetch()
 	is(hint_fetch($k2), 2, "UTF-8 or not, it's the same");
     }
-    is(hint_fetch($k3), 3, "Octect sequences and UTF-8 are distinct");
-    is(hint_fetch($k4), 4, "Octect sequences and UTF-8 are distinct");
+    is(hint_fetch($k3), 4, "Octect sequences and UTF-8 are always the same");
+    is(hint_fetch($k4), 4, "Octect sequences and UTF-8 are always the same");
 }
 
 {

@@ -1,13 +1,5 @@
   pp_ctl.c	AOK
  
-     Not enough format arguments	
- 	format STDOUT =
- 	@<<< @<<<
- 	$a
- 	.
- 	write;
-     
-
     Exiting substitution via %s
 	$_ = "abc" ;
 	while ($i ++ == 0)
@@ -59,27 +51,6 @@
 	{ bless [], 'Foo' for 1..10 }
 
 __END__
-# pp_ctl.c
-use warnings 'syntax' ;
-format STDOUT =
-@<<< @<<<
-1
-.
-write;
-EXPECT
-Not enough format arguments at - line 5.
-1
-########
-# pp_ctl.c
-no warnings 'syntax' ;
-format =
-@<<< @<<<
-1
-.
-write ;
-EXPECT
-1
-########
 # pp_ctl.c
 use warnings 'exiting' ;
 $_ = "abc" ;

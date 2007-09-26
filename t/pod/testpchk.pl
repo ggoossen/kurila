@@ -7,9 +7,9 @@ BEGIN {
    my $THISDIR = dirname $0;
    unshift @INC, $THISDIR;
    require "testcmp.pl";
-   import TestCompare;
+   TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { File::Spec->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
    require VMS::Filespec if $^O eq 'VMS';
 }
 

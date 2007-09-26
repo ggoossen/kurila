@@ -24,11 +24,6 @@ typedef OP OP_4tree;			/* Will be redefined later. */
 /* Not for production use: */
 #define PERL_ENABLE_EXPERIMENTAL_REGEX_OPTIMISATIONS 0
 
-/* Activate offsets code - set to if 1 to enable */
-#ifdef DEBUGGING
-#define RE_TRACK_PATTERN_OFFSETS
-#endif
-
 /* Unless the next line is uncommented it is illegal to combine lazy 
    matching with possessive matching. Frankly it doesn't make much sense 
    to allow it as X*?+ matches nothing, X+?+ matches a single char only, 
@@ -289,10 +284,9 @@ struct regnode_charclass_class {	/* has [[:blah:]] classes */
 
 /* Flags for node->flags of ANYOF */
 
-#define ANYOF_CLASS		0x08	/* has [[:blah:]] classes */
 #define ANYOF_INVERT		0x04
 #define ANYOF_FOLD		0x02
-#define ANYOF_LOCALE		0x01
+#define ANYOF_NOTUSED		0x01
 
 /* Used for regstclass only */
 #define ANYOF_EOS		0x10		/* Can match an empty string too */
@@ -345,14 +339,6 @@ struct regnode_charclass_class {	/* has [[:blah:]] classes */
 #define ANYOF_NBLANK	29
 
 #define ANYOF_MAX	32
-
-/* pseudo classes, not stored in the class bitmap, but used as flags
-   during compilation of char classes */
-
-#define ANYOF_VERTWS	(ANYOF_MAX+1)
-#define ANYOF_NVERTWS	(ANYOF_MAX+2)
-#define ANYOF_HORIZWS	(ANYOF_MAX+3)
-#define ANYOF_NHORIZWS	(ANYOF_MAX+4)
 
 /* Backward source code compatibility. */
 
@@ -436,6 +422,7 @@ EXTCONST U8 PL_varies[] = {
     BRANCH, BACK, STAR, PLUS, CURLY, CURLYX, REF, REFF, REFFL,
     WHILEM, CURLYM, CURLYN, BRANCHJ, IFTHEN, SUSPEND, CLUMP,
     NREF, NREFF, NREFFL,
+    ANYOFU, REG_ANYU, LNBREAK,
     0
 };
 #endif
@@ -448,13 +435,6 @@ EXTCONST U8 PL_simple[];
 EXTCONST U8 PL_simple[] = {
     REG_ANY,	SANY,	CANY,
     ANYOF,
-    ALNUM,	ALNUML,
-    NALNUM,	NALNUML,
-    SPACE,	SPACEL,
-    NSPACE,	NSPACEL,
-    DIGIT,	NDIGIT,
-    VERTWS,     NVERTWS,
-    HORIZWS,    NHORIZWS,
     0
 };
 #endif
@@ -509,21 +489,16 @@ struct reg_data {
     void* data[1];
 };
 
-/* Code in S_to_utf8_substr() and S_to_byte_substr() in regexec.c accesses
-   anchored* and float* via array indexes 0 and 1.  */
 #define anchored_substr substrs->data[0].substr
-#define anchored_utf8 substrs->data[0].utf8_substr
 #define anchored_offset substrs->data[0].min_offset
 #define anchored_end_shift substrs->data[0].end_shift
 
 #define float_substr substrs->data[1].substr
-#define float_utf8 substrs->data[1].utf8_substr
 #define float_min_offset substrs->data[1].min_offset
 #define float_max_offset substrs->data[1].max_offset
 #define float_end_shift substrs->data[1].end_shift
 
 #define check_substr substrs->data[2].substr
-#define check_utf8 substrs->data[2].utf8_substr
 #define check_offset_min substrs->data[2].min_offset
 #define check_offset_max substrs->data[2].max_offset
 #define check_end_shift substrs->data[2].end_shift
@@ -783,22 +758,22 @@ re.pm, especially to the documentation.
     const char * const rpv =                          \
         pv_pretty((dsv), (pv), (l), (m), \
             PL_colors[(c1)],PL_colors[(c2)], \
-            PERL_PV_ESCAPE_RE |((isuni) ? PERL_PV_ESCAPE_UNI : 0) );         \
+            ((isuni) ? PERL_PV_ESCAPE_UNI : 0) );         \
     const int rlen = SvCUR(dsv)
 
 #define RE_SV_ESCAPE(rpv,isuni,dsv,sv,m) \
     const char * const rpv =                          \
         pv_pretty((dsv), (SvPV_nolen_const(sv)), (SvCUR(sv)), (m), \
             PL_colors[(c1)],PL_colors[(c2)], \
-            PERL_PV_ESCAPE_RE |((isuni) ? PERL_PV_ESCAPE_UNI : 0) )
+            ((isuni) ? PERL_PV_ESCAPE_UNI : 0) )
 
 #define RE_PV_QUOTED_DECL(rpv,isuni,dsv,pv,l,m)                    \
     const char * const rpv =                                       \
         pv_pretty((dsv), (pv), (l), (m), \
             PL_colors[0], PL_colors[1], \
-            ( PERL_PV_PRETTY_QUOTE | PERL_PV_ESCAPE_RE | PERL_PV_PRETTY_ELIPSES |      \
+            ( PERL_PV_PRETTY_QUOTE | PERL_PV_PRETTY_ELIPSES |      \
               ((isuni) ? PERL_PV_ESCAPE_UNI : 0))                  \
-        )
+        )                                                  
 
 #define RE_SV_DUMPLEN(ItEm) (SvCUR(ItEm) - (SvTAIL(ItEm)!=0))
 #define RE_SV_TAIL(ItEm) (SvTAIL(ItEm) ? "$" : "")

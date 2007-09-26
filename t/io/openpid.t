@@ -35,16 +35,16 @@ $perl .= qq[ "-I../lib"];
 # the other reader reads one line, waits a few seconds and then
 # exits to test the waitpid function.
 #
-$cmd1 = qq/$perl -e "\$|=1; print qq[first process\\n]; sleep 30;"/;
-$cmd2 = qq/$perl -e "\$|=1; print qq[second process\\n]; sleep 30;"/;
-$cmd3 = qq/$perl -e "print <>;"/; # hangs waiting for end of STDIN
-$cmd4 = qq/$perl -e "print scalar <>;"/;
+my $cmd1 = qq/$perl -e "\$|=1; print qq[first process\\n]; sleep 30;"/;
+my $cmd2 = qq/$perl -e "\$|=1; print qq[second process\\n]; sleep 30;"/;
+my $cmd3 = qq/$perl -e "print <>;"/; # hangs waiting for end of STDIN
+my $cmd4 = qq/$perl -e "print scalar <>;"/;
 
 #warn "#$cmd1\n#$cmd2\n#$cmd3\n#$cmd4\n";
 
 # start the processes
-ok( $pid1 = open(FH1, "$cmd1 |"), 'first process started');
-ok( $pid2 = open(FH2, "$cmd2 |"), '    second' );
+ok( my $pid1 = open(FH1, "$cmd1 |"), 'first process started');
+ok( my $pid2 = open(FH2, "$cmd2 |"), '    second' );
 {
     no warnings 'once';
     ok( $pid3 = open(FH3, "| $cmd3"), '    third'  );

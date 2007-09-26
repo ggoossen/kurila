@@ -24,7 +24,7 @@ sub import {    # Exporter not used so we do it on our own
     my $callpkg = caller;
     for my $item (@EXPORT) {
         no strict 'refs';
-        *{"$callpkg\::$item"} = \&{"$item"};
+        *{Symbol::qualify_to_ref("$callpkg\::$item")} = \&{"$item"};
     }
     set_suspects(@_);
 }
@@ -69,12 +69,6 @@ sub guess {
 
     # sanity check
     return unless defined $octet and length $octet;
-
-    # cheat 0: utf8 flag;
-    if ( Encode::is_utf8($octet) ) {
-        return find_encoding('utf8') unless $NoUTFAutoGuess;
-        Encode::_utf8_off($octet);
-    }
 
     # cheat 1: BOM
     use Encode::Unicode;

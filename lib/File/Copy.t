@@ -8,6 +8,7 @@ BEGIN {
 }
 
 use Test::More;
+use strict;
 
 my $TB = Test::More->builder;
 
@@ -48,7 +49,7 @@ for my $cross_partition_test (0..1) {
   copy "file-$$", "copy-$$";
 
   open(F, "copy-$$") or die;
-  $foo = <F>;
+  my $foo = <F>;
   close(F);
 
   is -s "file-$$", -s "copy-$$", 'copy(fn, fn): files of the same size';
@@ -76,7 +77,7 @@ for my $cross_partition_test (0..1) {
   unlink "copy-$$" or die "unlink: $!";
 
   require IO::File;
-  $fh = IO::File->new(">copy-$$") or die "Cannot open copy-$$:$!";
+  my $fh = IO::File->new(">copy-$$") or die "Cannot open copy-$$:$!";
   binmode $fh or die;
   copy("file-$$",$fh);
   $fh->close or die "close: $!";

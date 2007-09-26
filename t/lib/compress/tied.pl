@@ -17,7 +17,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     my $tests ;
     $BadPerl = ($] >= 5.006 and $] <= 5.008) ;
@@ -44,9 +44,9 @@ sub myGZreadFile
     my $init = shift ;
 
 
-    my $fil = new $UncompressClass $filename,
+    my $fil = $UncompressClass-> new( $filename,
                                     -Strict   => 1,
-                                    -Append   => 1
+                                    -Append   => 1)
                                     ;
 
     my $data ;
@@ -73,7 +73,7 @@ sub run
 
             
         my $x ;
-        my $gz = new $CompressClass(\$x); 
+        my $gz = $CompressClass-> new((\$x)); 
 
         my $buff ;
 
@@ -95,12 +95,12 @@ sub run
         title "Testing $UncompressClass";
 
         my $gc ;
-        my $guz = new $CompressClass(\$gc); 
+        my $guz = $CompressClass-> new((\$gc)); 
         $guz->write("abc") ;
         $guz->close();
 
         my $x ;
-        my $gz = new $UncompressClass(\$gc); 
+        my $gz = $UncompressClass-> new((\$gc)); 
 
         my $buff ;
 
@@ -125,7 +125,7 @@ sub run
             # Write
             # these tests come almost 100% from IO::String
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             my $io = $CompressClass->new($name);
 
@@ -150,7 +150,7 @@ sub run
             my $foo = "1234567890";
             
             ok syswrite($io, $foo, length($foo)) == length($foo) ;
-            if ( $] < 5.6 )
+            if ( $[ < 5.6 )
               { is $io->syswrite($foo, length $foo), length $foo }
             else
               { is $io->syswrite($foo), length $foo }
@@ -188,21 +188,21 @@ and a single line.
 
 EOT
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
-            my $iow = new $CompressClass $name ;
+            my $iow = $CompressClass-> new( $name) ;
             print $iow $str ;
             close $iow;
 
             my @tmp;
             my $buf;
             {
-                my $io = new $UncompressClass $name ;
+                my $io = $UncompressClass-> new( $name) ;
             
-                ok ! $io->eof, "  Not EOF";
-                is $io->tell(), 0, "  Tell is 0" ;
+                ok ! $io->eof;
+                is $io->tell(), 0 ;
                 my @lines = <$io>;
-                is @lines, 6, "  Line is 6"
+                is @lines, 6
                     or print "# Got " . scalar(@lines) . " lines, expected 6\n" ;
                 is $lines[1], "of a paragraph\n" ;
                 is join('', @lines), $str ;
@@ -319,13 +319,13 @@ and a single line.
 
 EOT
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
 
             writeFile($name, $str);
             my @tmp;
             my $buf;
             {
-                my $io = new $UncompressClass $name, -Transparent => 1 ;
+                my $io = $UncompressClass-> new( $name, -Transparent => 1) ;
             
                 ok defined $io;
                 ok ! $io->eof;
@@ -450,13 +450,13 @@ EOT
                     {
                         title "Read Tests - buf length $bufsize, Transparent $trans, Append $append" ;
 
-                        my $lex = new LexFile my $name ;
+                        my $lex = LexFile->new( my $name) ;
 
                         if ($trans) {
                             writeFile($name, $str) ;
                         }
                         else {
-                            my $iow = new $CompressClass $name ;
+                            my $iow = $CompressClass-> new( $name) ;
                             print $iow $str ;
                             close $iow;
                         }

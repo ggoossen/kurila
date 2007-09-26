@@ -1,17 +1,6 @@
 CHANGES
 -------
 
-  2.006 1 September 2007
-
-      * Makefile.PL
-        Added INSTALLDIRS directive to install as a core module when built
-        on a perl >= 5.9.
-
-  2.005 18 June 2007
-
-      * Only include ppport.h when not being built with perl.
-        [core patch #30655]
-
   2.004 3 March 2007
 
       * Fixed lvalue substr issue

@@ -8,6 +8,8 @@ use File::Spec::Unix  ();
 use Archive::Tar::File;
 use Archive::Tar::Constant;
 
+use bytes;
+
 my $all_chars         = join '', "\r\n", map( chr, 0..255 ), "zzz\n\r";
 my $start_time        = time() - 1 - TIME_OFFSET;
 my $replace_contents  = $all_chars x 42;
@@ -20,10 +22,6 @@ my @test_files = (
     [    'x/bIn1',        $all_chars                                      ],
     [    'bIn2',          $all_chars x 2                                  ],
     [    'bIn0',          ''                                              ],
-
-    ### we didnt handle 'false' filenames very well across A::T as of version
-    ### 1.32, as reported in #28687. Test for the handling of such files here.
-    [    0,               '',                                             ],
     
     ### keep this one as the last entry
     [    'x/yy/z',        '',               { type  => DIR,

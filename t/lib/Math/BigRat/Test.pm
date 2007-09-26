@@ -45,7 +45,7 @@ BEGIN
   no strict 'refs';
   foreach my $method ( qw/ div acmp floor ceil root sqrt log fac modpow modinv/)
     {
-    *{'b' . $method} = \&{'Math::BigRat::b' . $method};
+    *{Symbol::qualify_to_ref('b' . $method)} = \&{*{Symbol::qualify_to_ref('Math::BigRat::b' . $method)}};
     }
   }
 
@@ -54,10 +54,10 @@ sub fround
   my ($x,$a) = @_;
 
   #print "$a $accuracy $precision $round_mode\n";
-  Math::BigFloat->round_mode($round_mode);
-  Math::BigFloat->accuracy($a || $accuracy);
-  Math::BigFloat->precision(undef);
-  my $y = Math::BigFloat->new($x->bsstr(),undef,undef);
+  'Math::BigFloat'->round_mode($round_mode);
+  'Math::BigFloat'->accuracy($a || $accuracy);
+  'Math::BigFloat'->precision(undef);
+  my $y = 'Math::BigFloat'->new($x->bsstr(),undef,undef);
   $class->new($y->fround($a));
   }
 
@@ -65,10 +65,10 @@ sub ffround
   {
   my ($x,$p) = @_;
 
-  Math::BigFloat->round_mode($round_mode);
-  Math::BigFloat->accuracy(undef);
-  Math::BigFloat->precision($p || $precision);
-  my $y = Math::BigFloat->new($x->bsstr(),undef,undef);
+  'Math::BigFloat'->round_mode($round_mode);
+  'Math::BigFloat'->accuracy(undef);
+  'Math::BigFloat'->precision($p || $precision);
+  my $y = 'Math::BigFloat'->new($x->bsstr(),undef,undef);
   $class->new($y->ffround($p));
   }
 
@@ -89,7 +89,7 @@ sub bstr
 
 #  print " bstr \$x ", $accuracy || $x->{_a} || 'notset', " ", $precision || $x->{_p} || 'notset', "\n";
   return $s.$x->{_n} if $x->{_d}->is_one(); 
-  my $output = Math::BigFloat->new($x->{_n})->bdiv($x->{_d});
+  my $output = 'Math::BigFloat'->new($x->{_n})->bdiv($x->{_d});
   local $Math::BigFloat::accuracy = $accuracy || $x->{_a};
   local $Math::BigFloat::precision = $precision || $x->{_p};
   $s.$output->bstr();
@@ -115,7 +115,7 @@ sub bsstr
 
   my $s = ''; $s = $x->{sign} if $x->{sign} ne '+';     # +3 vs 3
 
-  my $output = Math::BigFloat->new($x->{_n})->bdiv($x->{_d});
+  my $output = 'Math::BigFloat'->new($x->{_n})->bdiv($x->{_d});
   return $s.$output->bsstr();
   }
 

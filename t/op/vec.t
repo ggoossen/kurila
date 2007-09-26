@@ -1,14 +1,7 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require "test.pl";
-plan( tests => 31 );
-
-my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
+require "./test.pl";
+plan( tests => 25 );
 
 is(vec($foo,0,1), 0);
 is(length($foo), 0);
@@ -56,35 +49,11 @@ like($@, qr/^Negative offset to vec in lvalue context/);
 $@ = undef;
 ok(! vec('abcd', 7, 8));
 
-# UTF8
-# N.B. currently curiously coded to circumvent bugs elswhere in UTF8 handling
-
-$foo = "\x{100}" . "\xff\xfe";
-$x = substr $foo, 1;
-is(vec($x, 0, 8), 255);
-$@ = undef;
-eval { vec($foo, 1, 8) };
-ok(! $@);
-$@ = undef;
-eval { vec($foo, 1, 8) = 13 };
-ok(! $@);
-if ($Is_EBCDIC) {
-    is($foo, "\x8c\x0d\xff\x8a\x69"); 
-}
-else {
-    is($foo, "\xc4\x0d\xc3\xbf\xc3\xbe");
-}
-$foo = "\x{100}" . "\xff\xfe";
-$x = substr $foo, 1;
-vec($x, 2, 4) = 7;
-is($x, "\xff\xf7");
-
-# mixed magic
-
-$foo = "\x61\x62\x63\x64\x65\x66";
-is(vec(substr($foo, 2, 2), 0, 16), 25444);
-vec(substr($foo, 1,3), 5, 4) = 3;
-is($foo, "\x61\x62\x63\x34\x65\x66");
+# vec is independent of 'use utf8'
+use utf8;
+$x = "\x{263a}";  # == \xE2\x98\xBA
+is(vec($x, 0, 8), 0xE2);
+no utf8;
 
 # A variation of [perl #20933]
 {

@@ -130,10 +130,10 @@ my %matchers =
 my $testpkgs = {
     # packages to test, with expected types for named funcs
 
-    Digest::MD5 => { perl => [qw/ import /],
+    'Digest::MD5' => { perl => [qw/ import /],
 		     dflt => 'XS' },
 
-    Data::Dumper => { XS => [qw/ bootstrap Dumpxs /],
+    'Data::Dumper' => { XS => [qw/ bootstrap Dumpxs /],
 		      dflt => 'perl' },
     B => { 
 	dflt => 'constant',		# all but 47/297
@@ -154,7 +154,7 @@ my $testpkgs = {
 		  ), $] > 5.009 ? ('unitcheck_av') : ()],
     },
 
-    B::Deparse => { dflt => 'perl',	# 235 functions
+    'B::Deparse' => { dflt => 'perl',	# 235 functions
 
 	XS => [qw( svref_2object perlstring opnumber main_start
 		   main_root main_cv )],
@@ -163,7 +163,7 @@ my $testpkgs = {
 		     CVf_METHOD LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
 		     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
 		     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
-		     OPf_WANT_VOID OPpCONST_ARYBASE OPpCONST_BARE
+		     OPf_WANT_VOID OPpCONST_BARE
 		     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
 		     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
 		     OPpSORT_INPLACE OPpSORT_INTEGER OPpSORT_NUMERIC
@@ -178,7 +178,25 @@ my $testpkgs = {
 
     POSIX => { dflt => 'constant',			# all but 252/589
 	       skip => [qw/ _POSIX_JOB_CONTROL /],	# platform varying
-	       perl => [qw/ import croak AUTOLOAD /],
+	       perl => [qw/ import croak AUTOLOAD load_imports
+                            usage redef unimpl assert tolower toupper closedir
+                            opendir readdir rewinddir errno creat fcntl getgrgid
+                            getgrnam atan2 cos exp fabs log pow sin sqrt getpwnam
+                            getpwuid longjmp setjmp siglongjmp sigsetjmp
+                            kill raise offsetof clearerr fclose fdopen feof fgetc
+                            fgets fileno fopen fprintf fputc fputs
+                            fread freopen fscanf fseek fsync ferror fflush fgetpos fsetpos ftell
+                            fwrite getc getchar gets perror printf putc putchar puts remove rename
+                            rewind scanf sprintf sscanf tmpfile ungetc vfprintf vprintf vsprintf
+                            abs atexit atof atoi atol bsearch calloc div exit free getenv labs
+                            ldiv malloc qsort rand realloc srand system memchr memcmp memcpy
+                            memmove memset strcat strchr strcmp strcpy strcspn strerror strlen
+                            strncat strncmp strncpy strpbrk strrchr strspn strstr strtok chmod
+                            fstat mkdir stat umask wait waitpid gmtime localtime time alarm chdir
+                            chown execl execle execlp execv execve execvp fork getegid geteuid
+                            getgid getgroups getlogin getpgrp getpid getppid getuid isatty link
+                            rmdir setbuf setvbuf sleep unlink utime
+                            /],
 
 	       XS => [qw/ write wctomb wcstombs uname tzset tzname
 		      ttyname tmpnam times tcsetpgrp tcsendbreak
@@ -199,7 +217,7 @@ my $testpkgs = {
 		      /],
 	       },
 
-    IO::Socket => { dflt => 'constant',		# 157/190
+    'IO::Socket' => { dflt => 'constant',		# 157/190
 
 		    perl => [qw/ timeout socktype sockopt sockname
 			     socketpair socket sockdomain sockaddr_un
@@ -251,11 +269,11 @@ if ($opts{r}) {
 
 unless ($opts{a}) {
     unless (@argpkgs) {
-	foreach $pkg (sort keys %$testpkgs) {
+	foreach my $pkg (sort keys %$testpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
 	}
     } else {
-	foreach $pkg (@argpkgs) {
+	foreach my $pkg (@argpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
 	}
     }
@@ -271,9 +289,9 @@ sub test_pkg {
     # build %stash: keys are func-names, vals filled in below
     my (%stash) = map
 	( ($_ => 0)
-	  => ( grep exists &{"$pkg\::$_"}	# grab CODE symbols
+	  => ( grep exists &{*{Symbol::qualify_to_ref("$pkg\::$_")}}	# grab CODE symbols
 	       => grep !/__ANON__/		# but not anon subs
-	       => keys %{$pkg.'::'}		# from symbol table
+	       => keys %{*{Symbol::qualify_to_ref($pkg.'::')}}		# from symbol table
 	       ));
 
     for my $type (keys %matchers) {

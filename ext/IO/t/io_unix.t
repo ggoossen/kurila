@@ -68,7 +68,7 @@ $listen = IO::Socket::UNIX->new(Local => $PATH, Listen => 0);
 unless (defined $listen) {
     eval { require File::Temp };
     unless ($@) {
-	import File::Temp 'mktemp';
+	File::Temp->import( 'mktemp');
 	for my $TMPDIR ($ENV{TMPDIR}, "/tmp") {
 	    if (defined $TMPDIR && -d $TMPDIR && -w $TMPDIR) {
 		$PATH = mktemp("$TMPDIR/sXXXXXXXX");

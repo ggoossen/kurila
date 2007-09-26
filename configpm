@@ -37,7 +37,8 @@ usage: $0  [ options ]
 EOF
 
 use strict;
-use vars qw(%Config $Config_SH_expanded);
+
+our (%Config, $Config_SH_expanded);
 
 my $how_many_common = 22;
 
@@ -156,10 +157,10 @@ sub import {
     foreach my $func (@funcs) {
 	die sprintf qq{"%%s" is not exported by the %%s module\n},
 	    $func, __PACKAGE__ unless $Export_Cache{$func};
-	*{$callpkg.'::'.$func} = \&{$func};
+	*{Symbol::qualify_to_ref($callpkg.'::'.$func)} = \&{$func};
     }
 
-    *{"$callpkg\::Config"} = \%%Config if $export_Config;
+    *{Symbol::qualify_to_ref("$callpkg\::Config")} = \%%Config if $export_Config;
     return;
 }
 
@@ -304,7 +305,7 @@ die if $@;
 
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
-our $Config_SH_expanded = join "\n", '', @v_others;
+$Config_SH_expanded = join "\n", '', @v_others;
 
 my $t = fetch_string ({}, 'ivtype');
 my $s = fetch_string ({}, 'ivsize');
@@ -972,7 +973,7 @@ unshift(@INC,'lib');
 unshift(@INC,'xlib/symbian') if $Opts{cross};
 require $Config_PM;
 require $Config_heavy;
-import Config;
+Config->import();
 
 die "$0: $Config_PM not valid"
 	unless $Config{'PERL_CONFIG_SH'} eq 'true';

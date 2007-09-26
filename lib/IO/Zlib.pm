@@ -6,7 +6,7 @@
 
 package IO::Zlib;
 
-$VERSION = "1.07";
+$VERSION = "1.05_01";
 
 =head1 NAME
 
@@ -290,6 +290,7 @@ it and/or modify it under the same terms as Perl itself.
 require 5.004;
 
 use strict;
+use bytes;
 use vars qw($VERSION $AUTOLOAD @ISA);
 
 use Carp;

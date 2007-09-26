@@ -82,6 +82,7 @@ WriteMakefile(
         : ()
     ),
        
+
     (
       $BUILD_ZLIB
         ? zlib_files($ZLIB_LIB)
@@ -94,8 +95,6 @@ WriteMakefile(
             AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
         : ()
     ),
-
-    INSTALLDIRS => ($] >= 5.009 ? 'perl' : 'site'),
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),    

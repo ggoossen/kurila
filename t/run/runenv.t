@@ -7,7 +7,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
+    require Config; Config->import;
     unless ($Config{'d_fork'}) {
         print "1..0 # Skip: no fork\n";
 	    exit 0;

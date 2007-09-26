@@ -20,13 +20,13 @@ BaseTests("version");
 diag "Tests with empty derived class" unless $ENV{PERL_CORE};
 
 package version::Empty;
-use base version;
+use base 'version';
 $VERSION = 0.01;
 no warnings 'redefine';
 *::qv = sub { return bless version::qv(shift), __PACKAGE__; };
 
 package version::Bad;
-use base version;
+use base 'version';
 sub new { my($self,$n)=@_;  bless \$n, $self }
 
 package main;
@@ -268,9 +268,9 @@ SKIP: {
 
     # test the CVS revision mode
     diag "testing CVS Revision" if $Verbose;
-    $version = new $CLASS qw$Revision: 1.2$;
+    $version = $CLASS->new( qw$Revision: 1.2$);
     ok ( $version == "1.2.0", 'qw$Revision: 1.2$ == 1.2.0' );
-    $version = new $CLASS qw$Revision: 1.2.3.4$;
+    $version = $CLASS->new( qw$Revision: 1.2.3.4$);
     ok ( $version == "1.2.3.4", 'qw$Revision: 1.2.3.4$ == 1.2.3.4' );
     
     # test the CPAN style reduced significant digit form
@@ -480,9 +480,9 @@ EOF
     close F;
     # need to eliminate any other qv()'s
     undef *main::qv;
-    ok(!defined(&{"main\::qv"}), "make sure we cleared qv() properly");
+    ok(!defined(&{Symbol::qualify_to_ref("main\::qv")}), "make sure we cleared qv() properly");
     eval "use lib '.'; use vvv;";
-    ok(defined(&{"main\::qv"}), "make sure we exported qv() properly");
+    ok(defined(&{Symbol::qualify_to_ref("main\::qv")}), "make sure we exported qv() properly");
     isa_ok( qv(1.2), "vvv");
     unlink 'vvv.pm';
 

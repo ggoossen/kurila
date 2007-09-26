@@ -2,7 +2,7 @@
 
 print "1..22\n";
 
-@x = (1, 2, 3);
+my @x = (1, 2, 3);
 if (join(':',@x) eq '1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
 
 if (join('',1,2,3) eq '123') {print "ok 2\n";} else {print "not ok 2\n";}
@@ -45,6 +45,8 @@ if ($f eq 'baeak') {print "ok 6\n";} else {print "# '$f'\nnot ok 6\n";}
   print "ok 10\n";
 };
 
+use utf8;
+
 { my $s = join("", chr(0x1234), chr(0xff));
   print "not " unless length($s) == 2 && $s eq "\x{1234}\x{ff}";
   print "ok 11\n";
@@ -60,9 +62,10 @@ if ($f eq 'baeak') {print "ok 6\n";} else {print "# '$f'\nnot ok 6\n";}
   print "ok 13\n";
 }
 
-{ my $s = join(chr(0xff), chr(0x1234), chr(0xfe));
-  print "not " unless length($s) == 3 && $s eq "\x{1234}\x{ff}\x{fe}";
-  print "ok 14\n";
+{ 
+    my $s = join(chr(0xff), chr(0x1234), chr(0xfe));
+    print "not " unless length($s) == 3 && $s eq "\x{1234}\x{ff}\x{fe}";
+    print "ok 14\n";
 }
 
 { # [perl #24846] $jb2 should be in bytes, not in utf8.

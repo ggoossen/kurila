@@ -5,10 +5,10 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Tie::StdHandle;
-tie *tst,Tie::StdHandle;
+use Tie::Handle;
+tie *tst,'Tie::StdHandle';
 
-$f = 'tst';
+$f = Symbol::qualify_to_ref('tst');
 
 print "1..13\n";
 

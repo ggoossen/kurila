@@ -1,6 +1,8 @@
 # Carp::Heavy uses some variables in common with Carp.
 package Carp;
 
+use strict;
+
 =head1 NAME
 
 Carp::Heavy - heavy machinery, no user serviceable parts inside
@@ -23,6 +25,8 @@ use Carp;  our $VERSION = $Carp::VERSION;
 # croak.  They replace $CarpLevel, which is deprecated.    The
 # $Max(EvalLen|(Arg(Len|Nums)) variables are used to specify how the eval
 # text and function arguments should be formatted when printed.
+
+our (%CarpInternal, %Internal);
 
 # disable these by default, so they can live w/o require Carp
 $CarpInternal{Carp}++;
@@ -52,6 +56,8 @@ sub  longmess_real {
       return longmess_heavy(@_);
     }
 };
+
+our @CARP_NOT;
 
 sub shortmess_real {
     # Icky backwards compatibility wrapper. :-(
@@ -104,22 +110,19 @@ sub format_arg {
   my $arg = shift;
   if (ref($arg)) {
       $arg = defined($overload::VERSION) ? overload::StrVal($arg) : "$arg";
+  }elsif (not defined($arg)) {
+    $arg = 'undef';
   }
-  if (defined($arg)) {
-      $arg =~ s/'/\\'/g;
-      $arg = str_len_trim($arg, $MaxArgLen);
+  $arg =~ s/'/\\'/g;
+  $arg = str_len_trim($arg, $MaxArgLen);
   
-      # Quote it?
-      $arg = "'$arg'" unless $arg =~ /^-?[\d.]+\z/;
-  } else {
-      $arg = 'undef';
-  }
+  # Quote it?
+  $arg = "'$arg'" unless $arg =~ /^-?[\d.]+\z/;
 
   # The following handling of "control chars" is direct from
   # the original code - it is broken on Unicode though.
   # Suggestions?
-  utf8::is_utf8($arg)
-    or $arg =~ s/([[:cntrl:]]|[[:^ascii:]])/sprintf("\\x{%x}",ord($1))/eg;
+  $arg =~ s/([[:cntrl:]]|[[:^ascii:]])/sprintf("\\x{%x}",ord($1))/eg;
   return $arg;
 }
 
@@ -299,9 +302,9 @@ sub trusts_directly {
     my $class = shift;
     no strict 'refs';
     no warnings 'once'; 
-    return @{"$class\::CARP_NOT"}
-      ? @{"$class\::CARP_NOT"}
-      : @{"$class\::ISA"};
+    return @{*{Symbol::qualify_to_ref("$class\::CARP_NOT")}}
+      ? @{*{Symbol::qualify_to_ref("$class\::CARP_NOT")}}
+      : @{*{Symbol::qualify_to_ref("$class\::ISA")}};
 }
 
 1;

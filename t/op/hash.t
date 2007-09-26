@@ -1,8 +1,6 @@
 #!./perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
@@ -30,7 +28,7 @@ ok (Internals::HvREHASH(%h), "20 entries triggers rehash");
 
 
 # second part using an emulation of the PERL_HASH in perl, mounting an
-# attack on a pre-populated hash. This is also useful if you need normal
+# attack on a prepopulated hash. This is also useful if you need normal
 # keys which don't contain \0 -- suitable for stashes
 
 use constant MASK_U32  => 2**32;
@@ -42,12 +40,12 @@ use constant START     => "a";
 my %h2 = map {$_ => 1} 'a'..'cc';
 
 ok (!Internals::HvREHASH(%h2), 
-    "starting with pre-populated non-pathological hash (rehash flag if off)");
+    "starting with pre-populated non-pathalogical hash (rehash flag if off)");
 
 my @keys = get_keys(\%h2);
 $h2{$_}++ for @keys;
 ok (Internals::HvREHASH(%h2), 
-    scalar(@keys) . " colliding into the same bucket keys are triggering rehash");
+    scalar(@keys) . " colliding into the same bucket keys are triggerring rehash");
 
 sub get_keys {
     my $hr = shift;
@@ -97,7 +95,7 @@ sub hash {
     for (@c) {
         # (A % M) + (B % M) == (A + B) % M
         # This works because '+' produces a NV, which is big enough to hold
-        # the intermediate result. We only need the % before any "^" and "&"
+        # the intermidiate result. We only need the % before any "^" and "&"
         # to get the result in the range for an I32.
         # and << doesn't work on NV, so using 1 << 10
         $u += ord;

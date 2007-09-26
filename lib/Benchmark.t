@@ -8,7 +8,7 @@ BEGIN {
 use warnings;
 use strict;
 use vars qw($foo $bar $baz $ballast);
-use Test::More tests => 194;
+use Test::More tests => 192;
 
 use Benchmark qw(:all);
 
@@ -31,7 +31,7 @@ my $Nop_Pattern =
 # Please don't trust the matching parenthises to be useful in this :-)
 my $Default_Pattern = qr/$All_Pattern|$Noc_Pattern/;
 
-my $t0 = new Benchmark;
+my $t0 = Benchmark->new();
 isa_ok ($t0, 'Benchmark', "Ensure we can create a benchmark object");
 
 # We use the benchmark object once we've done some work:
@@ -93,7 +93,7 @@ print "# $in_again iterations\n";
 ok ($in_again > 0, "iters returned positive iterations");
 
 
-my $t1 = new Benchmark;
+my $t1 = Benchmark->new();
 isa_ok ($t1, 'Benchmark', "Create another benchmark object now we're finished");
 
 my $diff = timediff ($t1, $t0);
@@ -224,40 +224,6 @@ like ($got, qr/timing $iterations iterations of\s+Bar\W+Baz\W+Foo\W*?\.\.\./s,
 $got =~ s/.*\.\.\.//s;
 like ($got, qr/\bBar\b.*\bBaz\b.*\bFoo\b/s, 'check output is in sorted order');
 like ($got, $Default_Pattern, 'should find default format somewhere');
-
-
-{ # ensure 'use strict' does not leak from Benchmark.pm into benchmarked code
-    no strict;
-    select OUT;
-
-    eval {
-        timethese( 1, 
-                   { undeclared_var => q{ $i++; $i-- },
-                     symbolic_ref   => q{ $bar = 42;
-                                          $foo = 'bar';
-                                          $q = ${$foo} },
-                   },
-                   'none'
-                  );
-
-    };
-    is( $@, '', q{no strict leakage in name => 'code'} );
-
-    eval {
-        timethese( 1,
-                   { undeclared_var => sub { $i++; $i-- },
-                     symbolic_ref   => sub { $bar = 42;
-                                             $foo = 'bar';
-                                             return ${$foo} },
-                   },
-                   'none'
-                 );
-    };
-    is( $@, '', q{no strict leakage in name => sub { code }} );
-
-    # clear out buffer
-    $out->read;
-}
 
 
 my $code_to_test =  { Foo => sub {$foo+=fib($ballast-2)},

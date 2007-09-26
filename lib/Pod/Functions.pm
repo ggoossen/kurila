@@ -74,6 +74,8 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%Kinds %Type %Flavor %Type_Description @Type_Order);
 
+use Perl6::Form;
+
 our(%Kinds, %Type, %Flavor);
 
 our %Type_Description = (
@@ -137,23 +139,20 @@ while (<DATA>) {
 close DATA;
 
 my( $typedesc, $list );
-unless (caller) { 
+unless (caller) {
     foreach my $type ( @Type_Order ) {
 	$list = join(", ", sort @{$Kinds{$type}});
 	$typedesc = $Type_Description{$type} . ":";
-	write;
-    } 
+
+        print form("",
+                   "{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+                   $typedesc,
+                   "     {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+                   $list,
+                  );
+    }
 }
 
-format = 
-
-^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    $typedesc 
-~~ ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    $typedesc 
- ~~  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	$list
-.
 
 1;
 
@@ -204,8 +203,6 @@ fcntl	File	file control system call
 fileno	I/O	return file descriptor from filehandle
 flock	I/O	lock an entire file with an advisory lock
 fork	Process	create a new process just like this one
-format	I/O	declare a picture format with use by the write() function
-formline	Misc	internal function used for formats
 getc	I/O	get	the next character from the filehandle
 getgrent	User	get next group record 
 getgrgid	User	get group record given group user ID

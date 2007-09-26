@@ -16,7 +16,7 @@ even aim to be entirely accurate.  In some cases perfection has been
 sacrificed in the goal of getting the general idea across.  You are
 I<strongly> advised to follow this introduction with more information
 from the full Perl manual, the table of contents to which can be found
-in L<perltoc>.
+in L<kurilatoc>.
 
 Throughout this document you'll see references to other parts of the
 Perl documentation.  You can read that documentation using the C<perldoc>

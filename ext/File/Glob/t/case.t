@@ -8,7 +8,7 @@ BEGIN {
 	@INC = '.'; 
 	push @INC, '../lib'; 
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bFile\/Glob\b/i) {
         print "1..0\n";
         exit 0;
@@ -25,13 +25,13 @@ print "ok 1\n";
 my $pat = $^O eq "MacOS" ? ":op:G*.t" : "op/G*.t";
 
 # Test the actual use of the case sensitivity tags, via csh_glob()
-import File::Glob ':nocase';
+File::Glob->import(':nocase');
 @a = csh_glob($pat);
 print "not " unless @a >= 8;
 print "ok 2\n";
 
 # This may fail on systems which are not case-PRESERVING
-import File::Glob ':case';
+File::Glob->import(':case');
 @a = csh_glob($pat); # None should be uppercase
 print "not " unless @a == 0;
 print "ok 3\n";

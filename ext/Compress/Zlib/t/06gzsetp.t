@@ -32,7 +32,7 @@ BEGIN
     # use Test::NoWarnings, if available
     $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 }
 
 my $ver = Compress::Zlib::zlib_version();
@@ -56,7 +56,7 @@ is Compress::Zlib::zlib_version, ZLIB_VERSION,
 
     my ($input, $err, $answer, $X, $status, $Answer);
      
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
     ok my $x = gzopen($name, "wb");
 
     $input .= $hello;
@@ -112,7 +112,7 @@ foreach my $CompressClass ('IO::Compress::Gzip',
     #my ($input, $err, $answer, $X, $status, $Answer);
     my $compressed;
 
-    ok my $x = new $CompressClass(\$compressed) ;
+    ok my $x = $CompressClass-> new((\$compressed)) ;
 
     my $input .= $hello;
     is $x->write($hello), $len_hello ;
@@ -125,7 +125,7 @@ foreach my $CompressClass ('IO::Compress::Gzip',
     
     ok $x->close ;
 
-    ok my $k = new $UncompressClass(\$compressed);
+    ok my $k = $UncompressClass-> new((\$compressed));
      
     my $len = length $input ;
     my $uncompressed;

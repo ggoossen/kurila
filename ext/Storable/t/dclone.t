@@ -13,7 +13,7 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -28,7 +28,7 @@ print "1..12\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless {}, CLASS;
+$c = bless {}, 'CLASS';
 $c->{attribute} = 'attrval';
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
@@ -93,7 +93,7 @@ print ref $clone eq ref $empty_string_obj &&
 
 
 # Do not fail if Tie::Hash and/or Tie::StdHash is not available
-if (eval { require Tie::Hash; scalar keys %Tie::StdHash:: }) {
+if (eval { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     tie my %tie, "Tie::StdHash" or die $!;
     $tie{array} = [1,2,3,4];
     $tie{hash} = {1,2,3,4};

@@ -9,8 +9,9 @@
 h Overview
 
   perl			Perl overview (this section)
+  kurilaintro           Perl Kurila introduction
   perlintro		Perl introduction for beginners
-  perltoc		Perl documentation table of contents
+  kurilatoc		Perl Kurila documentation table of contents
 
 h Tutorials
 
@@ -123,11 +124,12 @@ h Internals and C Language Interface
 h Miscellaneous
 
   perlbook		Perl book information
-  perlcommunity		Perl community information
   perltodo		Perl things to do
 
   perldoc		Look up Perl documentation in Pod format
 
+  kurila01delta         Perl Kurila changes in version 0.1
+  kurila02delta         Perl Kurila changes in version 0.2
   perlhist		Perl history records
 d perldelta		Perl changes since previous version
 D perl595delta		Perl changes in version 5.9.5

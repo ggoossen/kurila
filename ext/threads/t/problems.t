@@ -20,7 +20,7 @@ use threads;
 BEGIN {
     eval {
         require threads::shared;
-        threads::shared->import();
+        import threads::shared;
     };
     if ($@ || ! $threads::shared::threads_shared) {
         print("1..0 # Skip: threads::shared not available\n");

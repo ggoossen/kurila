@@ -4,7 +4,7 @@ BEGIN {
   chdir 't' if -d 't';
   @INC = '../lib';
   push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-  require Config; import Config;
+  require Config; Config->import;
   if ($Config{'extensions'} !~ /\bXS\/APItest\b/) {
     # Look, I'm using this fully-qualified variable more than once!
     my $arch = $MacPerl::Architecture;
@@ -31,19 +31,12 @@ sub test_fetch_present;
 sub test_fetch_absent;
 
 my $utf8_for_258 = chr 258;
-utf8::encode $utf8_for_258;
 
 my @testkeys = ('N', chr 198, chr 256);
 my @keys = (@testkeys, $utf8_for_258);
 
-foreach (@keys) {
-  utf8::downgrade $_, 1;
-}
 main_tests (\@keys, \@testkeys, '');
 
-foreach (@keys) {
-  utf8::upgrade $_;
-}
 main_tests (\@keys, \@testkeys, ' [utf8 hash]');
 
 {
@@ -51,8 +44,8 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
   tie %h, 'Tie::StdHash';
   is (XS::APItest::Hash::store(\%h, chr 258,  1), undef);
     
-  ok (!exists $h{$utf8_for_258},
-      "hv_store doesn't insert a key with the raw utf8 on a tied hash");
+  ok (exists $h{$utf8_for_258},
+      "hv_store does insert a key with the raw utf8 on a tied hash");
 }
 
 {
@@ -106,24 +99,11 @@ sub main_tests {
     my $unikey = $key;
     utf8::encode $unikey;
 
-    utf8::downgrade $key, 1;
-    utf8::downgrade $lckey, 1;
-    utf8::downgrade $unikey, 1;
     main_test_inner ($key, $lckey, $unikey, $keys, $description);
 
-    utf8::upgrade $key;
-    utf8::upgrade $lckey;
-    utf8::upgrade $unikey;
     main_test_inner ($key, $lckey, $unikey, $keys,
 		     $description . ' [key utf8 on]');
   }
-
-  # hv_exists was buggy for tied hashes, in that the raw utf8 key was being
-  # used - the utf8 flag was being lost.
-  perform_test (\&test_absent, (chr 258), $keys, '');
-
-  perform_test (\&test_fetch_absent, (chr 258), $keys, '');
-  perform_test (\&test_delete_absent, (chr 258), $keys, '');
 }
 
 sub main_test_inner {
@@ -172,6 +152,7 @@ sub test_absent {
   my ($hash, $key, $printable, $message) = @_;
 
   ok (!exists $hash->{$key}, "hv_exists_ent absent$message $printable");
+
   ok (!XS::APItest::Hash::exists ($hash, $key),
       "hv_exists absent$message $printable");
 }

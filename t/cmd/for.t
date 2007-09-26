@@ -2,6 +2,10 @@
 
 print "1..80\n";
 
+use strict;
+
+our ($i, @x, $y, $c, $foo, @ary, $loop_count, @array, $r, $TODO);
+
 for ($i = 0; $i <= 10; $i++) {
     $x[$i] = $i;
 }
@@ -60,7 +64,7 @@ sub bar {
     return (1, 2, 4);
 }
 
-$a = 0;
+our $a = 0;
 foreach $b (bar()) {
     $a += $b;
 }
@@ -73,7 +77,7 @@ for ("-3" .. "0") {
 print $loop_count == 4 ? "ok" : "not ok", " 12\n";
 
 # modifying arrays in loops is a no-no
-@a = (3,4);
+our @a = (3,4);
 eval { @a = () for (1,2,@a) };
 print $@ =~ /Use of freed value in iteration/ ? "ok" : "not ok", " 13\n";
 
@@ -472,7 +476,7 @@ TODO: {
     no warnings 'reserved';
     local $TODO = "RT #2166: foreach spuriously autovivifies";
     my %h;
-    foreach (@h{a, b}) {}
+    foreach (@h{'a', 'b'}) {}
     if(keys(%h)) {
         print "not ";
     }

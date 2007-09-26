@@ -210,7 +210,6 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	case SVt_PVAV:
 	case SVt_PVHV:
 	case SVt_PVCV:
-	case SVt_PVFM:
 	case SVt_PVIO:
             Perl_croak(aTHX_ "Cannot convert a reference to %s to typeglob",
 		       sv_reftype(has_constant, 0));
@@ -255,7 +254,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	    if (exported_constant)
 		GvIMPORTED_CV_on(gv);
 	} else {
-	    (void) start_subparse(0,0);	/* Create empty CV in compcv. */
+	    (void) start_subparse(0);	/* Create empty CV in compcv. */
 	    GvCV(gv) = PL_compcv;
 	}
 	LEAVE;
@@ -287,7 +286,6 @@ S_gv_init_sv(pTHX_ GV *gv, I32 sv_type)
 #ifdef PERL_DONT_CREATE_GVSV
     case SVt_NULL:
     case SVt_PVCV:
-    case SVt_PVFM:
     case SVt_PVGV:
 	break;
     default:
@@ -809,7 +807,7 @@ GV *
 Perl_gv_fetchsv(pTHX_ SV *name, I32 flags, I32 sv_type) {
     STRLEN len;
     const char * const nambeg = SvPV_const(name, len);
-    return gv_fetchpvn_flags(nambeg, len, flags | SvUTF8(name), sv_type);
+    return gv_fetchpvn_flags(nambeg, len, flags, sv_type);
 }
 
 GV *
@@ -939,9 +937,9 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    else if (IN_PERL_COMPILETIME) {
 		stash = PL_curstash;
 		if (add && (PL_hints & HINT_STRICT_VARS) &&
+		    !(flags & GV_NOTQUAL) &&
 		    sv_type != SVt_PVCV &&
 		    sv_type != SVt_PVGV &&
-		    sv_type != SVt_PVFM &&
 		    sv_type != SVt_PVIO &&
 		    !(len == 1 && sv_type == SVt_PV &&
 		      (*name == 'a' || *name == 'b')) )
@@ -985,8 +983,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		  : sv_type == SVt_PVHV ? "%"
 		  : ""), name);
 	    GV *gv;
-	    if (USE_UTF8_IN_NAMES)
-		SvUTF8_on(err);
 	    qerror(err);
 	    gv = gv_fetchpvn_flags("<none>::", 8, GV_ADDMULTI, SVt_PVHV);
 	    if(!gv) {
@@ -1183,7 +1179,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		sv_type == SVt_PVAV ||
 		sv_type == SVt_PVHV ||
 		sv_type == SVt_PVCV ||
-		sv_type == SVt_PVFM ||
 		sv_type == SVt_PVIO
 		) { break; }
 	    PL_sawampersand = TRUE;
@@ -1230,7 +1225,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	}
 	case '*':
 	case '#':
-	    if (sv_type == SVt_PV && ckWARN2_d(WARN_DEPRECATED, WARN_SYNTAX))
+	    if (sv_type == SVt_PV && ckWARN2(WARN_DEPRECATED, WARN_SYNTAX))
 		Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
 			    "$%c is no longer supported", *name);
 	    break;
@@ -1258,10 +1253,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '8':
 	case '9':
 	case '[':
-	case '^':
-	case '~':
-	case '=':
-	case '%':
 	case '.':
 	case '(':
 	case ')':
@@ -1476,7 +1467,6 @@ Perl_gp_free(pTHX_ GV *gv)
     }
     SvREFCNT_dec(gp->gp_io);
     SvREFCNT_dec(gp->gp_cv);
-    SvREFCNT_dec(gp->gp_form);
 
     Safefree(gp);
     GvGP(gv) = 0;

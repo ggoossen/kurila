@@ -10,7 +10,7 @@ my $t = MyTest->new();
 
 ok($t->plugins());
 
-ok(keys %{MyTest::Plugin::Foo::});
+ok(keys %{Symbol::stash('MyTest::Plugin::Foo')});
 
 
 package MyTest;

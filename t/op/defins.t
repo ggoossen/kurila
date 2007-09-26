@@ -4,27 +4,29 @@
 # test auto defined() test insertion
 #
 
+our $warns;
+
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     $SIG{__WARN__} = sub { $warns++; warn $_[0] };
 }
-require 'test.pl';
+require './test.pl';
 plan( tests => 19 );
 
-$wanted_filename = $^O eq 'VMS' ? '0.' : '0';
-$saved_filename = $^O eq 'MacOS' ? ':0' : './0';
+my $wanted_filename = $^O eq 'VMS' ? '0.' : '0';
+my $saved_filename = $^O eq 'MacOS' ? ':0' : './0';
 
 cmp_ok($warns,'==',0,'no warns at start');
 
+no strict 'subs';
+
 open(FILE,">$saved_filename");
-ok(defined(FILE),'created work file');
+ok(defined('FILE'),'created work file');
 print FILE "1\n";
 print FILE "0";
 close(FILE);
 
 open(FILE,"<$saved_filename");
-ok(defined(FILE),'opened work file');
+ok(defined('FILE'),'opened work file');
 my $seen = 0;
 my $dummy;
 while (my $name = <FILE>)
@@ -44,6 +46,7 @@ cmp_ok($seen,'==',1,'seen in do/while');
 
 seek(FILE,0,0);
 $seen = 0;
+my $name;
 while (($seen ? $dummy : $name) = <FILE> )
  {
   $seen++ if $name eq '0';
@@ -61,7 +64,7 @@ cmp_ok($seen,'==',1,'seen in hash while()');
 close FILE;
 
 opendir(DIR,($^O eq 'MacOS' ? ':' : '.'));
-ok(defined(DIR),'opened current directory');
+ok(defined('DIR'),'opened current directory');
 $seen = 0;
 while (my $name = readdir(DIR))
  {
@@ -122,7 +125,7 @@ cmp_ok($seen,'==',1,'seen in each');
 
 $seen = 0;
 $dummy = '';
-while (($seen ? $dummy : $name) = each %hash)
+while (($seen ? $dummy : my $name) = each %hash)
  {
   $seen++ if $name eq '0';
  }

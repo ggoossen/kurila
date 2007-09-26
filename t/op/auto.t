@@ -1,12 +1,9 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require "test.pl";
+require "./test.pl";
 plan( tests => 37 );
+
+our ($x, $foo, @x, %x);
 
 $x = 10000;
 cmp_ok(0 + ++$x - 1,'==',10000,'scalar ++x - 1');

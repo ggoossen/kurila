@@ -13,7 +13,7 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -27,7 +27,7 @@ print "1..20\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless {}, CLASS;
+$c = bless {}, 'CLASS';
 $c->{attribute} = 'attrval';
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
@@ -69,11 +69,11 @@ print "not " unless open(OUT, '>>store');
 print "ok 7\n";
 binmode OUT;
 
-print "not " unless defined store_fd(\@a, ::OUT);
+print "not " unless defined store_fd(\@a, '::OUT');
 print "ok 8\n";
-print "not " unless defined nstore_fd($foo, ::OUT);
+print "not " unless defined nstore_fd($foo, '::OUT');
 print "ok 9\n";
-print "not " unless defined nstore_fd(\%a, ::OUT);
+print "not " unless defined nstore_fd(\%a, '::OUT');
 print "ok 10\n";
 
 print "not " unless close(OUT);
@@ -82,31 +82,31 @@ print "ok 11\n";
 print "not " unless open(OUT, 'store');
 binmode OUT;
 
-$r = fd_retrieve(::OUT);
+$r = fd_retrieve('::OUT');
 print "not " unless defined $r;
 print "ok 12\n";
 print "not " unless &dump($foo) eq &dump($r);
 print "ok 13\n";
 
-$r = fd_retrieve(::OUT);
+$r = fd_retrieve('::OUT');
 print "not " unless defined $r;
 print "ok 14\n";
 print "not " unless &dump(\@a) eq &dump($r);
 print "ok 15\n";
 
-$r = fd_retrieve(main::OUT);
+$r = fd_retrieve('main::OUT');
 print "not " unless defined $r;
 print "ok 16\n";
 print "not " unless &dump($foo) eq &dump($r);
 print "ok 17\n";
 
-$r = fd_retrieve(::OUT);
+$r = fd_retrieve('::OUT');
 print "not " unless defined $r;
 print "ok 18\n";
 print "not " unless &dump(\%a) eq &dump($r);
 print "ok 19\n";
 
-eval { $r = fd_retrieve(::OUT); };
+eval { $r = fd_retrieve('::OUT'); };
 print "not " unless $@;
 print "ok 20\n";
 

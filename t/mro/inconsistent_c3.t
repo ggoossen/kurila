@@ -38,10 +38,7 @@ except TypeError:
     
     package YX;
     our @ISA = ('Y', 'X');
-
-    package Z;
-    our @ISA = ('XY', 'YX');
 }
 
-eval { mro::get_linear_isa('Z', 'c3') };
+eval { @Z::ISA = ('XY', 'YX') };
 like($@, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');

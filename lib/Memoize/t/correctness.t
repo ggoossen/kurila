@@ -123,7 +123,7 @@ print (("@umr" eq "1 1 1") ? "ok $n\n" : "not ok $n\n"); # Increment once
 $n++;
 print (("@u1r" eq "2 3 4") ? "ok $n\n" : "not ok $n\n"); # Increment thrice
 $n++;
-print ((defined &{"undef"}) ? "not ok $n\n" : "ok $n\n"); # Just in case
+print ((defined &{Symbol::qualify_to_ref("undef")}) ? "not ok $n\n" : "ok $n\n"); # Just in case
 
 print "# $n tests in all.\n";
 

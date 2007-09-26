@@ -1,17 +1,17 @@
 package Digest::SHA;
 
-require 5.003000;
+require 5.006000;
 
 use strict;
+use warnings;
 use integer;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-$VERSION = '5.45';
+our $VERSION = '5.44';
 
 require Exporter;
-require DynaLoader;
-@ISA = qw(Exporter DynaLoader);
-@EXPORT_OK = qw(
+our @ISA = qw(Exporter);
+
+our @EXPORT_OK = qw(
 	hmac_sha1	hmac_sha1_base64	hmac_sha1_hex
 	hmac_sha224	hmac_sha224_base64	hmac_sha224_hex
 	hmac_sha256	hmac_sha256_base64	hmac_sha256_hex
@@ -36,6 +36,11 @@ if ($@) {
 	*hexdigest = \&Hexdigest;
 	*b64digest = \&B64digest;
 }
+
+require XSLoader;
+XSLoader::load('Digest::SHA', $VERSION);
+
+# Preloaded methods go here.
 
 # The following routines aren't time-critical, so they can be left in Perl
 
@@ -113,32 +118,32 @@ sub Addfile {
 	my ($binary, $portable) = map { $_ eq $mode } ("b", "p");
 	my $text = -T $file;
 
-	local *FH;
-	open(FH, "<$file") or _bail("Open failed");
-	binmode(FH) if $binary || $portable;
+	open(my $fh, "<$file")			## no critic
+		or _bail("Open failed");
+	binmode($fh) if $binary || $portable;
 
 	unless ($portable && $text) {
-		$self->_addfile(*FH);
-		close(FH);
+		$self->_addfile($fh);
+		close($fh);
 		return($self);
 	}
 
 	my ($n1, $n2);
 	my ($buf1, $buf2) = ("", "");
 
-	while (($n1 = read(FH, $buf1, 4096))) {
+	while (($n1 = read($fh, $buf1, 4096))) {
 		while (substr($buf1, -1) eq "\015") {
-			$n2 = read(FH, $buf2, 4096);
+			$n2 = read($fh, $buf2, 4096);
 			_bail("Read failed") unless defined $n2;
 			last unless $n2;
 			$buf1 .= $buf2;
 		}
 		$buf1 =~ s/\015?\015\012/\012/g; 	# DOS/Windows
-		$buf1 =~ s/\015/\012/g;          	# early MacOS
+		$buf1 =~ s/\015/\012/g;          	# Apple/MacOS 9
 		$self->add($buf1);
 	}
 	_bail("Read failed") unless defined $n1;
-	close(FH);
+	close($fh);
 
 	$self;
 }
@@ -165,8 +170,6 @@ sub load {
 	return($self);
 }
 
-Digest::SHA->bootstrap($VERSION);
-
 1;
 __END__
 
@@ -174,7 +177,7 @@ __END__
 
 Digest::SHA - Perl extension for SHA-1/224/256/384/512
 
-=head1 SYNOPSIS
+=head1 SYNOPSIS (SHA)
 
 In programs:
 
@@ -401,7 +404,7 @@ its SHA-1/224/256/384/512 digest encoded as a Base64 string.
 It's important to note that the resulting string does B<not> contain
 the padding characters typical of Base64 encodings.  This omission is
 deliberate, and is done to maintain compatibility with the family of
-CPAN Digest modules.  See L</"PADDING OF BASE64 DIGESTS"> for details.
+CPAN Digest modules.  See L</"BASE64 DIGESTS"> for details.
 
 =back
 
@@ -555,7 +558,7 @@ system.  Otherwise, a functionally equivalent substitute is used.
 It's important to note that the resulting string does B<not> contain
 the padding characters typical of Base64 encodings.  This omission is
 deliberate, and is done to maintain compatibility with the family of
-CPAN Digest modules.  See L</"PADDING OF BASE64 DIGESTS"> for details.
+CPAN Digest modules.  See L</"BASE64 DIGESTS"> for details.
 
 =back
 
@@ -611,7 +614,7 @@ in the list.
 It's important to note that the resulting string does B<not> contain
 the padding characters typical of Base64 encodings.  This omission is
 deliberate, and is done to maintain compatibility with the family of
-CPAN Digest modules.  See L</"PADDING OF BASE64 DIGESTS"> for details.
+CPAN Digest modules.  See L</"BASE64 DIGESTS"> for details.
 
 =back
 
@@ -637,7 +640,6 @@ The author is particularly grateful to
 
 	Gisle Aas
 	Chris Carey
-	Jim Doble
 	Julius Duque
 	Jeffrey Friedl
 	Robert Gilmour
@@ -655,7 +657,7 @@ for their valuable comments and suggestions.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2007 Mark Shelor
+Copyright (C) 2003-2006 Mark Shelor
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

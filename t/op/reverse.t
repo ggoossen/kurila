@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 print "1..4\n";
 
 print "not " unless reverse("abc")    eq "cba";
@@ -25,6 +20,7 @@ print "ok 2\n";
 {
     # Unicode.
 
+    use utf8;
     my $a = "\x{263A}\x{263A}x\x{263A}y\x{263A}";
     my $b = scalar reverse($a);
     my $c = scalar reverse($b);

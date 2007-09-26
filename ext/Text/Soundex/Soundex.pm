@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# (c) Copyright 1998-2007 by Mark Mielke
+# (c) Copyright 1998-2003 by Mark Mielke
 #
 # Freedom to use these sources for whatever you want, as long as credit
 # is given where credit is due, is hereby granted. You may make modifications
@@ -19,10 +19,10 @@ use XSLoader ();
 
 use strict;
 
-our $VERSION   = '3.03';
+our $VERSION   = '3.02';
 our @EXPORT_OK = qw(soundex soundex_unicode soundex_nara soundex_nara_unicode
                     $soundex_nocode);
-our @EXPORT    = qw(soundex soundex_nara $soundex_nocode);
+our @EXPORT    = qw(soundex $soundex_nocode);
 our @ISA       = qw(Exporter);
 
 our $nocode;
@@ -34,10 +34,10 @@ our $nocode;
 
 sub soundex_noxs
 {
-    # Original Soundex algorithm
+    # Strict implementation of Knuth's soundex algorithm.
 
     my @results = map {
-        my $code = uc($_);
+        my $code = $_;
         $code =~ tr/AaEeHhIiOoUuWwYyBbFfPpVvCcGgJjKkQqSsXxZzDdTtLlMmNnRr//cd;
 
 	if (length($code)) {
@@ -56,7 +56,11 @@ sub soundex_noxs
 
 sub soundex_nara
 {
-    # US census (NARA) algorithm.
+    # Implementation of NARA's soundex algorithm. If two sounds are
+    # identical, and separated by only an H or a W... they should be
+    # treated as one. This requires an additional "s///", as well as
+    # the "9" character code to represent H and W. ("9" works like "0"
+    # except it combines indentical sounds around it into one)
 
     my @results = map {
 	my $code = uc($_);
@@ -66,7 +70,7 @@ sub soundex_nara
             my $firstchar = substr($code, 0, 1);
 	    $code =~ tr[AaEeHhIiOoUuWwYyBbFfPpVvCcGgJjKkQqSsXxZzDdTtLlMmNnRr]
                        [0000990000009900111111112222222222222222333344555566]s;
-            $code =~ s/(.)9\1/$1/gs;
+            $code =~ s/(.)9\1/$1/g;
 	    ($code = substr($code, 1)) =~ tr/09//d;
 	    substr($firstchar . $code . '000', 0, 4);
 	} else {
@@ -106,11 +110,12 @@ if (defined(&soundex_xs)) {
 
 __END__
 
-# Implementation of the soundex algorithm.
+# Implementation of soundex algorithm as described by Knuth in volume
+# 3 of The Art of Computer Programming.
 #
 # Some of this documention was written by Mike Stok.
 #
-# Examples:
+# Knuth's test cases are:
 #
 # Euler, Ellery -> E460
 # Gauss, Ghosh -> G200
@@ -122,19 +127,14 @@ __END__
 
 =head1 NAME
 
-Text::Soundex - Implementation of the soundex algorithm.
+Text::Soundex - Implementation of the Soundex Algorithm as Described by Knuth
 
 =head1 SYNOPSIS
 
-  use Text::Soundex;
+  use Text::Soundex 'soundex';
 
-  # Original algorithm.
   $code = soundex($name);    # Get the soundex code for a name.
   @codes = soundex(@names);  # Get the list of codes for a list of names.
-
-  # American Soundex variant (NARA) - Used for US census data.
-  $code = soundex_nara($name);    # Get the soundex code for a name.
-  @codes = soundex_nara(@names);  # Get the list of codes for a list of names.
 
   # Redefine the value that soundex() will return if the input string
   # contains no identifiable sounds within it.
@@ -142,24 +142,13 @@ Text::Soundex - Implementation of the soundex algorithm.
 
 =head1 DESCRIPTION
 
-Soundex is a phonetic algorithm for indexing names by sound, as
-pronounced in English. The goal is for names with the same
-pronunciation to be encoded to the same representation so that they
-can be matched despite minor differences in spelling. Soundex is the
-most widely known of all phonetic algorithms and is often used
-(incorrectly) as a synonym for "phonetic algorithm". Improvements to
-Soundex are the basis for many modern phonetic algorithms. (Wikipedia,
-2007)
-
-This module implements the original soundex algorithm developed by
-Robert Russell and Margaret Odell, patented in 1918 and 1922, as well
-as a variation called "American Soundex" used for US census data, and
-current maintained by the National Archives and Records Administration
-(NARA).
-
-The soundex algorithm may be recognized from Donald Knuth's
-B<The Art of Computer Programming>. The algorithm described by
-Knuth is the NARA algorithm.
+This module implements the soundex algorithm as described by Donald Knuth
+in Volume 3 of B<The Art of Computer Programming>.  The algorithm is
+intended to hash words (in particular surnames) into a small space
+using a simple model which approximates the sound of the word when
+spoken by an English speaker.  Each word is reduced to a four
+character string, the first character being an upper case letter and
+the remaining three being digits.
 
 The value returned for strings which have no soundex encoding is
 defined using C<$Text::Soundex::nocode>. The default value is C<undef>,
@@ -174,24 +163,26 @@ argument. In list context, a list is returned in which each element is the
 soundex code for the corresponding argument passed to C<soundex()>. For
 example, the following code assigns @codes the value C<('M200', 'S320')>:
 
-   @codes = soundex qw(Mike Stok);
+  @codes = soundex qw(Mike Stok);
 
 To use C<Text::Soundex> to generate codes that can be used to search one
-of the publically available US Censuses, a variant of the soundex
-algorithm must be used:
+of the publically available US Censuses, a variant of the soundex()
+subroutine must be used:
 
-    use Text::Soundex;
+    use Text::Soundex 'soundex_nara';
     $code = soundex_nara($name);
 
-An example of where these algorithm differ follows:
+The algorithm used by the US Censuses is slightly different than that
+defined by Knuth and others. The descrepancy shows up in names such as
+"Ashcraft":
 
-    use Text::Soundex;
+    use Text::Soundex qw(soundex soundex_nara);
     print soundex("Ashcraft"), "\n";       # prints: A226
     print soundex_nara("Ashcraft"), "\n";  # prints: A261
 
 =head1 EXAMPLES
 
-Donald Knuth's examples of names and the soundex codes they map to
+Knuth's examples of various names and the soundex codes they map to
 are listed below:
 
   Euler, Ellery -> E460

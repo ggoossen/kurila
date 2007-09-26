@@ -159,6 +159,7 @@ my $HEADER=<<"EOF";
 # This file is built by $0 from e.g. UnicodeData.txt.
 # Any changes made here will be lost!
 
+use utf8;
 EOF
 
 sub force_unlink {
@@ -829,10 +830,7 @@ sub UnicodeData_Txt()
 	Table->New(Is => 'Word',   Desc => "[[:Word:]]",   Fuzzy => 0);
     $Cat{SpacePerl} =
 	Table->New(Is => 'SpacePerl', Desc => '\s', Fuzzy => 0);
-    $Cat{VertSpace} =
-	Table->New(Is => 'VertSpace', Desc => '\v', Fuzzy => 0);
-    $Cat{HorizSpace} =
-	Table->New(Is => 'HorizSpace', Desc => '\h', Fuzzy => 0);
+
     my %To;
     $To{Upper} = Table->New();
     $To{Lower} = Table->New();
@@ -888,15 +886,6 @@ sub UnicodeData_Txt()
 
         $Cat{SpacePerl}->$op($code) if $isspace
 	                               && $code != 0x000B; # Backward compat.
-
-        $Cat{VertSpace}->$op($code) if grep {$code == $_} 
-            ( 0x0A..0x0D,0x85,0x2028,0x2029 );
-
-        $Cat{HorizSpace}->$op($code) if grep {$code == $_} (
-            0x09,   0x20,   0xa0,   0x1680, 0x180e, 0x2000, 0x2001, 0x2002,
-            0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200a,
-            0x202f, 0x205f, 0x3000
-        ); 
 
         $Cat{Blank}->$op($code) if $isspace
                                 && !($code == 0x000A ||
@@ -1932,6 +1921,7 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n",
                    "##\n\n",
                    "## Mapping from name to filename in ./lib/gc_sc\n",
+                   "use utf8;\n",
                    "%utf8::Exact = (\n",
                   );
 
@@ -1956,6 +1946,7 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n",
                    "##\n\n",
                    "## Mapping from lc(canonical name) to filename in ./lib\n",
+                   "use utf8;\n",
                    "%utf8::Canonical = (\n",
                   );
         my $Trail = ""; ## used just to keep the spacing pretty
@@ -2027,6 +2018,7 @@ sub SpecialCasing_txt()
 	    (
 	     $HEADER, "\n",
 	     "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
+             "use utf8;\n",
 	     "%utf8::ToSpec$case =\n(\n",
 	    );
 
@@ -2034,7 +2026,7 @@ sub SpecialCasing_txt()
             my ($ix, $code, $to) = @$prop;
             my $tostr =
               join "", map { sprintf "\\x{%s}", $_ } split ' ', $to;
-            push @OUT, sprintf qq["%s" => "$tostr",\n], join("", map { sprintf "\\x%02X", $_ } unpack("U0C*", pack("U", $ix)));
+            push @OUT, sprintf qq["%s" => "$tostr",\n], join("", map { sprintf "\\x[%02X]", $_ } unpack("U0C*", pack("U", $ix)));
 	    # Remove any single-character mappings for
 	    # the same character since we are going for
 	    # the special casing rules.
@@ -2090,12 +2082,13 @@ sub CaseFolding_txt()
 	(
 	 $HEADER, "\n",
 	 "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
+         "use utf8;\n",
 	 "%utf8::ToSpecFold =\n(\n",
 	);
     for my $code (sort { $a <=> $b } keys %Fold) {
         my $foldstr =
           join "", map { sprintf "\\x{%s}", $_ } split ' ', $Fold{$code};
-        push @OUT, sprintf qq["%s" => "$foldstr",\n], join("", map { sprintf "\\x%02X", $_ } unpack("U0C*", pack("U", $code)));
+        push @OUT, sprintf qq["%s" => "$foldstr",\n], join("", map { sprintf "\\x[%02X]", $_ } unpack("U0C*", pack("U", $code)));
     }
     push @OUT, (
                 ");\n\n",

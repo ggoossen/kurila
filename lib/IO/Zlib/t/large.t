@@ -7,6 +7,8 @@ BEGIN {
 
 use IO::Zlib;
 
+use bytes;
+
 sub ok
 {
     my ($no, $ok) = @_ ;

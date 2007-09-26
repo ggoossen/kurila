@@ -36,14 +36,11 @@ extern "C" {
 }
 #endif
 
-#ifndef PATCHLEVEL
+#ifndef PERL_VERSION
 #    include <patchlevel.h>
-#    if !(defined(PERL_VERSION) || (SUBVERSION > 0 && defined(PATCHLEVEL)))
-#        include <could_not_find_Perl_patchlevel.h>
-#    endif
 #endif
 
-#if PATCHLEVEL <= 4 && !defined(PL_dowarn)
+#if PERL_VERSION <= 4 && !defined(PL_dowarn)
    #define PL_dowarn dowarn
 #endif
 
@@ -83,21 +80,7 @@ static const unsigned char index_64[256] = {
     XX,XX,XX,XX, XX,XX,XX,XX, XX,XX,XX,XX, XX,XX,XX,XX,
 };
 
-#ifdef SvPVbyte
-#   if PERL_REVISION == 5 && PERL_VERSION < 7
-       /* SvPVbyte does not work in perl-5.6.1, borrowed version for 5.7.3 */
-#       undef SvPVbyte
-#       define SvPVbyte(sv, lp) \
-          ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK) \
-           ? ((lp = SvCUR(sv)), SvPVX(sv)) : my_sv_2pvbyte(aTHX_ sv, &lp))
-       static char *
-       my_sv_2pvbyte(pTHX_ register SV *sv, STRLEN *lp)
-       {   
-           sv_utf8_downgrade(sv,0);
-           return SvPV(sv,*lp);
-       }
-#   endif
-#else
+#ifndef SvPVbyte
 #   define SvPVbyte SvPV
 #endif
 
@@ -127,9 +110,6 @@ encode_base64(sv,...)
 	int chunk;
 
 	CODE:
-#if PERL_REVISION == 5 && PERL_VERSION >= 6
-	sv_utf8_downgrade(sv, FALSE);
-#endif
 	str = SvPV(sv, rlen); /* SvPV(sv, len) gives warning for signed len */
 	len = (SSize_t)rlen;
 
@@ -282,9 +262,6 @@ encode_qp(sv,...)
 	STRLEN p_len;
 
 	CODE:
-#if PERL_REVISION == 5 && PERL_VERSION >= 6
-	sv_utf8_downgrade(sv, FALSE);
-#endif
 	/* set up EOL from the second argument if present, default to "\n" */
 	if (items > 1 && SvOK(ST(1))) {
 	    eol = SvPV(ST(1), eol_len);

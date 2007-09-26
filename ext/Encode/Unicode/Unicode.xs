@@ -100,10 +100,9 @@ CODE:
     int renewed = SvTRUE(attr("renewed",  7));
     SV *result  = newSVpvn("",0);
     STRLEN ulen;
-    U8 *s = (U8 *)SvPVbyte(str,ulen);
+    U8 *s = (U8 *)SvPV(str,ulen);
     U8 *e = (U8 *)SvEND(str);
     ST(0) = sv_2mortal(result);
-    SvUTF8_on(result);
 
     if (!endian && s+size <= e) {
     UV bom;
@@ -228,7 +227,7 @@ CODE:
     int renewed = SvTRUE(attr("renewed",  7));
     SV *result  = newSVpvn("",0);
     STRLEN ulen;
-    U8 *s = (U8 *)SvPVutf8(utf8,ulen);
+    U8 *s = (U8 *)SvPV(utf8,ulen);
     U8 *e = (U8 *)SvEND(utf8);
     ST(0) = sv_2mortal(result);
     if (!endian) {

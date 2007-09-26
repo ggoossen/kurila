@@ -2,11 +2,6 @@
 
 # Test || in weird situations.
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 
 package Countdown;
 
@@ -23,7 +18,7 @@ sub FETCH {
 
 
 package main;
-require './test.pl';
+BEGIN { require './test.pl' };
 
 plan( tests => 8 );
 

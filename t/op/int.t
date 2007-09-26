@@ -1,11 +1,8 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 print "1..14\n";
+
+our ($x, $y, @x);
 
 # compile time evaluation
 

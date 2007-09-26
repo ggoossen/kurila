@@ -41,16 +41,16 @@ EOM
 
         foreach my $i (1 .. $fingerprint_size-1)
         {
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
         
             title "Fingerprint Truncation - length $i, Transparent $trans";
 
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
 
-            my $gz = new $UncompressClass $name,
+            my $gz = $UncompressClass-> new( $name,
                                           -BlockSize   => $blocksize,
-                                          -Transparent => $trans;
+                                          -Transparent => $trans);
             if ($trans) {
                 ok $gz;
                 ok ! $gz->error() ;
@@ -72,15 +72,15 @@ EOM
         #
         foreach my $i ($fingerprint_size .. $header_size -1)
         {
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
         
             title "Header Truncation - length $i, Transparent $trans";
 
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
-            ok ! defined new $UncompressClass $name,
+            ok ! defined $UncompressClass-> new( $name,
                                               -BlockSize   => $blocksize,
-                                              -Transparent => $trans;
+                                              -Transparent => $trans);
             #ok $gz->eof() ;
         }
 
@@ -89,16 +89,16 @@ EOM
         {
             next if $i == 0 ;
 
-            my $lex = new LexFile my $name ;
+            my $lex = LexFile->new( my $name) ;
         
             title "Compressed Data Truncation - length $i, Transparent $trans";
 
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
-            ok my $gz = new $UncompressClass $name,
+            ok my $gz = $UncompressClass-> new( $name,
                                              -Strict      => 1,
                                              -BlockSize   => $blocksize,
-                                             -Transparent => $trans
+                                             -Transparent => $trans)
                  or diag $$UnError;
 
             my $un ;
@@ -118,16 +118,16 @@ EOM
         {
             foreach my $lax (0, 1)
             {
-                my $lex = new LexFile my $name ;
+                my $lex = LexFile->new( my $name) ;
             
                 ok 1, "Compressed Trailer Truncation - Length $i, Lax $lax, Transparent $trans" ;
                 my $part = substr($compressed, 0, $i);
                 writeFile($name, $part);
-                ok my $gz = new $UncompressClass $name,
+                ok my $gz = $UncompressClass-> new( $name,
                                                  -BlockSize   => $blocksize,
                                                  -Strict      => !$lax,
                                                  -Append      => 1,   
-                                                 -Transparent => $trans;
+                                                 -Transparent => $trans);
                 my $un = '';
                 my $status = 1 ;
                 $status = $gz->read($un) while $status > 0 ;

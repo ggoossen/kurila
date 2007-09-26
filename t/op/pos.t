@@ -1,12 +1,12 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
 plan tests => 6;
+
+our ($x);
 
 $x='banana';
 $x=~/.a/g;

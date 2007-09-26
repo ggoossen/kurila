@@ -24,6 +24,7 @@ use Term::Cap;
 
 use strict;
 use vars qw(@ISA $VERSION);
+use utf8;
 
 @ISA = qw(Pod::Text);
 
@@ -60,7 +61,7 @@ sub new {
     }
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
-    eval { $term = Tgetent Term::Cap { TERM => undef, OSPEED => $ospeed } };
+    eval { $term = Term::Cap->Tgetent( { TERM => undef, OSPEED => $ospeed }) };
     $$self{BOLD} = $$term{_md} || "\e[1m";
     $$self{UNDL} = $$term{_us} || "\e[4m";
     $$self{NORM} = $$term{_me} || "\e[m";
@@ -114,7 +115,7 @@ sub wrap {
     my $shortchar = $char . "{0,$width}";
     my $longchar = $char . "{$width}";
     while (length > $width) {
-        if (s/^($shortchar)\s+// || s/^($longchar)//) {
+        if (s/^($shortchar)[\ \t]+// || s/^($longchar)//) {
             $output .= $spaces . $1 . "\n";
         } else {
             last;

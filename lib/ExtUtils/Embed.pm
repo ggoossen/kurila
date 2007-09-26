@@ -18,7 +18,7 @@ use vars qw(@ISA @EXPORT $VERSION
 	    );
 use strict;
 
-$VERSION = '1.26_01';
+$VERSION = 1.26;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&xsinit &ldopts 
@@ -65,7 +65,7 @@ sub xsinit {
 	$fh = \*STDOUT;
     }
     else {
-	$fh = new FileHandle "> $file";
+	$fh = FileHandle->new("> $file");
     }
 
     push(@mods, static_ext()) if defined $std;
@@ -133,9 +133,7 @@ sub xsi_body {
 
 sub static_ext {
     unless (scalar @Extensions) {
-      my $static_ext = $Config{static_ext};
-      $static_ext =~ s/^\s+//;
-      @Extensions = sort split /\s+/, $static_ext;
+	@Extensions = sort split /\s+/, $Config{static_ext};
 	unshift @Extensions, qw(DynaLoader);
     }
     @Extensions;

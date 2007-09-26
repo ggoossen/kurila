@@ -11,7 +11,7 @@ unless( eval q{require warnings::register; warnings::register->import; 1} ) {
 }
 use vars qw(%attr $VERSION);
 
-$VERSION = '2.13';
+$VERSION = '2.12';
 
 # constant.pm is slow
 sub PUBLIC     () { 2**0  }
@@ -33,13 +33,13 @@ sub import {
     return unless @_;
     my $package = caller(0);
     # avoid possible typo warnings
-    %{"$package\::FIELDS"} = () unless %{"$package\::FIELDS"};
-    my $fields = \%{"$package\::FIELDS"};
+    %{*{Symbol::qualify_to_ref("$package\::FIELDS")}} = () unless %{*{Symbol::qualify_to_ref("$package\::FIELDS")}};
+    my $fields = \%{*{Symbol::qualify_to_ref("$package\::FIELDS")}};
     my $fattr = ($attr{$package} ||= [1]);
     my $next = @$fattr;
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
-    bless \%{"$package\::FIELDS"}, 'pseudohash';
+    bless \%{*{Symbol::qualify_to_ref("$package\::FIELDS")}}, 'pseudohash';
 
     if ($next > $fattr->[0]
         and ($fields->{$_[0]} || 0) >= $fattr->[0])
@@ -89,11 +89,11 @@ sub _dump  # sometimes useful for debugging
 {
     for my $pkg (sort keys %attr) {
         print "\n$pkg";
-        if (@{"$pkg\::ISA"}) {
-            print " (", join(", ", @{"$pkg\::ISA"}), ")";
+        if (@{*{Symbol::qualify_to_ref("$pkg\::ISA")}}) {
+            print " (", join(", ", @{*{Symbol::qualify_to_ref("$pkg\::ISA")}}), ")";
         }
         print "\n";
-        my $fields = \%{"$pkg\::FIELDS"};
+        my $fields = \%{*{Symbol::qualify_to_ref("$pkg\::FIELDS")}};
         for my $f (sort {$fields->{$a} <=> $fields->{$b}} keys %$fields) {
             my $no = $fields->{$f};
             print "   $no: $f";
@@ -114,7 +114,7 @@ if ($] < 5.009) {
   *new = sub {
     my $class = shift;
     $class = ref $class if ref $class;
-    return bless [\%{$class . "::FIELDS"}], $class;
+    return bless [\%{*{Symbol::qualify_to_ref($class . "::FIELDS")}}], $class;
   }
 } else {
   *new = sub {
@@ -124,17 +124,9 @@ if ($] < 5.009) {
     my $self = bless {}, $class;
 
     # The lock_keys() prototype won't work since we require Hash::Util :(
-    &Hash::Util::lock_keys(\%$self, _accessible_keys($class));
+    &Hash::Util::lock_keys(\%$self, keys %{*{Symbol::qualify_to_ref($class.'::FIELDS')}});
     return $self;
   }
-}
-
-sub _accessible_keys {
-    my ($class) = @_;
-    return (
-        keys %{$class.'::FIELDS'},
-        map(_accessible_keys($_), @{$class.'::ISA'}),
-    );
 }
 
 sub phash {

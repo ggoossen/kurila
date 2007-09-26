@@ -1,12 +1,12 @@
 #!./perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }   
 
 plan tests => 1292;
+
+use utf8;
 
 is(
     sprintf("%.40g ",0.01),

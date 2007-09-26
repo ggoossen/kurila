@@ -1,9 +1,10 @@
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 plan tests=>69;
+
+our ($nolv, @array2, %hash2, $blah, $o, $x0, $x1, $xxx,
+     $newvar, $nnewvar, $str, $x, @p, @ary);
 
 sub a : lvalue { my $a = 34; ${\(bless \$a)} }  # Return a temporary
 sub b : lvalue { ${\shift} }
@@ -110,8 +111,9 @@ cmp_ok($blah, '==', 25);
 
 cmp_ok($in, '==', 25);
 
-@a = (1) x 3;
-@b = (undef) x 2;
+my @a = (1) x 3;
+my @b = (undef) x 2;
+my @c;
 $#c = 3;			# These slots are not fillable.
 
 # Explanation: empty slots contain &sv_undef.
@@ -542,7 +544,7 @@ TODO: {
 
 {
     package Foo;
-    sub AUTOLOAD :lvalue { *{$AUTOLOAD} };
+    sub AUTOLOAD :lvalue { no strict 'refs'; *{Symbol::qualify_to_ref($AUTOLOAD)} };
     package main;
     my $foo = bless {},"Foo";
     my $result;

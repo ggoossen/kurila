@@ -3,7 +3,7 @@ package File::Spec::Functions;
 use File::Spec;
 use strict;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
+our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
 
 $VERSION = '1.3';
 
@@ -39,7 +39,7 @@ require Exporter;
 foreach my $meth (@EXPORT, @EXPORT_OK) {
     my $sub = File::Spec->can($meth);
     no strict 'refs';
-    *{$meth} = sub {&$sub('File::Spec', @_)};
+    *{Symbol::qualify_to_ref($meth)} = sub {&$sub('File::Spec', @_)};
 }
 
 

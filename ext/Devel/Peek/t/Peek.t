@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bDevel\/Peek\b/) {
         print "1..0 # Skip: Devel::Peek was not built\n";
         exit 0;
@@ -14,18 +14,17 @@ BEGIN { require "./test.pl"; }
 
 use Devel::Peek;
 
-plan(48);
+plan(24);
 
 our $DEBUG = 0;
 open(SAVERR, ">&STDERR") or die "Can't dup STDERR: $!";
 
 sub do_test {
+    local $Level = $Level + 1;
     my $pattern = pop;
     if (open(OUT,">peek$$")) {
 	open(STDERR, ">&OUT") or die "Can't dup OUT: $!";
 	Dump($_[1]);
-        print STDERR "*****\n";
-        Dump($_[1]); # second dump to compare with the first to make sure nothing changed.
 	open(STDERR, ">&SAVERR") or die "Can't restore STDERR: $!";
 	close(OUT);
 	if (open(IN, "peek$$")) {
@@ -46,15 +45,10 @@ sub do_test {
 	    /mge;
 
 	    print $pattern, "\n" if $DEBUG;
-	    my ($dump, $dump2) = split m/\*\*\*\*\*\n/, scalar <IN>;
+	    my $dump = <IN>;
 	    print $dump, "\n"    if $DEBUG;
 	    like( $dump, qr/\A$pattern\Z/ms );
-
-            local $TODO = $dump2 =~ /OOK/ ? "The hash iterator used in dump.c sets the OOK flag" : undef;
-            is($dump2, $dump);
-
 	    close(IN);
-
             return $1;
 	} else {
 	    die "$0: failed to open peek$$: !\n";
@@ -78,7 +72,7 @@ do_test( 1,
 'SV = PV\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\(POK,pPOK\\)
-  PV = $ADDR "foo"\\\0
+  PV = $ADDR "foo"\\\0 \[UTF8 "foo"\]
   CUR = 3
   LEN = \\d+'
        );
@@ -88,7 +82,7 @@ do_test( 2,
 'SV = PV\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\(.*POK,READONLY,pPOK\\)
-  PV = $ADDR "bar"\\\0
+  PV = $ADDR "bar"\\\0 \[UTF8 "bar"\]
   CUR = 3
   LEN = \\d+');
 
@@ -132,9 +126,9 @@ do_test( 7,
 'SV = PVNV\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\(NOK,pNOK\\)
-  IV = \d+
+  IV = \\d+
   NV = 789\\.(?:1(?:000+\d+)?|0999+\d+)
-  PV = $ADDR "789"\\\0
+  PV = $ADDR "789"\\\0 \\[UTF8 "789"\\]
   CUR = 3
   LEN = \\d+');
 
@@ -160,9 +154,10 @@ do_test(10,
   SV = PV\\($ADDR\\) at $ADDR
     REFCNT = 2
     FLAGS = \\(POK,pPOK\\)
-    PV = $ADDR "foo"\\\0
+    PV = $ADDR "foo"\\\0 \\[UTF8 "foo"\\]
     CUR = 3
-    LEN = \\d+');
+    LEN = \\d+
+');
 
 my $c_pattern;
 if ($type eq 'N') {
@@ -217,7 +212,7 @@ do_test(12,
     MAX = 7
     RITER = -1
     EITER = 0x0
-    Elt "123" HASH = $ADDR' . $c_pattern);
+    Elt "123" \\[UTF8 "123"\\] HASH = $ADDR' . $c_pattern);
 
 do_test(13,
         sub(){@_},
@@ -271,7 +266,6 @@ do_test(14,
        \\d+\\. $ADDR<\\d+> \\(\\d+,\\d+\\) "\\$pattern"
       \\d+\\. $ADDR<\\d+> FAKE "\\$DEBUG" flags=0x0 index=0
       \\d+\\. $ADDR<\\d+> \\(\\d+,\\d+\\) "\\$dump"
-      \\d+\\. $ADDR<\\d+> \\(\\d+,\\d+\\) "\\$dump2"
     OUTSIDE = $ADDR \\(MAIN\\)');
 
 do_test(15,
@@ -290,7 +284,7 @@ do_test(15,
       MG_VIRTUAL = $ADDR
       MG_TYPE = PERL_MAGIC_qr\(r\)
       MG_OBJ = $ADDR
-        PAT = "\(\?-xism:tic\)"
+        PAT = "\(\?-uxism:tic\)"
         REFCNT = 2
     STASH = $ADDR\\t"Regexp"');
 
@@ -323,7 +317,6 @@ do_test(17,
     SV = $ADDR
     REFCNT = 1
     IO = 0x0
-    FORM = 0x0  
     AV = 0x0
     HV = 0x0
     CV = 0x0
@@ -333,27 +326,17 @@ do_test(17,
     FLAGS = $ADDR
     EGV = $ADDR\\t"a"');
 
-if (ord('A') == 193) {
-do_test(18,
-	chr(256).chr(0).chr(512),
-'SV = PV\\($ADDR\\) at $ADDR
-  REFCNT = 1
-  FLAGS = \\((?:PADTMP,)?POK,READONLY,pPOK,UTF8\\)
-  PV = $ADDR "\\\214\\\101\\\0\\\235\\\101"\\\0 \[UTF8 "\\\x\{100\}\\\x\{0\}\\\x\{200\}"\]
-  CUR = 5
-  LEN = \\d+');
-} else {
-do_test(18,
-	chr(256).chr(0).chr(512),
-'SV = PV\\($ADDR\\) at $ADDR
-  REFCNT = 1
-  FLAGS = \\((?:PADTMP,)?POK,READONLY,pPOK,UTF8\\)
-  PV = $ADDR "\\\304\\\200\\\0\\\310\\\200"\\\0 \[UTF8 "\\\x\{100\}\\\x\{0\}\\\x\{200\}"\]
-  CUR = 5
-  LEN = \\d+');
-}
+use utf8;
 
-if (ord('A') == 193) {
+do_test(18,
+	chr(256).chr(0).chr(512),
+'SV = PV\\($ADDR\\) at $ADDR
+  REFCNT = 1
+  FLAGS = \\((?:PADTMP,)?POK,pPOK\\)
+  PV = $ADDR "\\\x\\[c4\\]\\\x\\[80\\]\\\x\\[0\\]\\\x\\[c8\\]\\\x\\[80\\]"\\\0 \\[UTF8 "\\\x\\{100\\}\\\x\\{0\\}\\\x\\{200\\}"\\]
+  CUR = 5
+  LEN = \\d+');
+
 do_test(19,
 	{chr(256)=>chr(512)},
 'SV = RV\\($ADDR\\) at $ADDR
@@ -362,7 +345,7 @@ do_test(19,
   RV = $ADDR
   SV = PVHV\\($ADDR\\) at $ADDR
     REFCNT = 1
-    FLAGS = \\(SHAREKEYS,HASKFLAGS\\)
+    FLAGS = \\(SHAREKEYS\\)
     ARRAY = $ADDR  \\(0:7, 1:1\\)
     hash quality = 100.0%
     KEYS = 1
@@ -370,38 +353,13 @@ do_test(19,
     MAX = 7
     RITER = -1
     EITER = $ADDR
-    Elt "\\\214\\\101" \[UTF8 "\\\x\{100\}"\] HASH = $ADDR
+    Elt "\\\x\\[c4\\]\\\x\\[80\\]" \\[UTF8 "\\\x[{]100[}]"\\] HASH = $ADDR
     SV = PV\\($ADDR\\) at $ADDR
       REFCNT = 1
-      FLAGS = \\(POK,pPOK,UTF8\\)
-      PV = $ADDR "\\\235\\\101"\\\0 \[UTF8 "\\\x\{200\}"\]
+      FLAGS = \\(POK,pPOK\\)
+      PV = $ADDR "\\\x\\[c8\\]\\\x\\[80\\]"\\\0 \\[UTF8 "\\\x[{]200[}]"]
       CUR = 2
       LEN = \\d+');
-} else {
-do_test(19,
-	{chr(256)=>chr(512)},
-'SV = RV\\($ADDR\\) at $ADDR
-  REFCNT = 1
-  FLAGS = \\(ROK\\)
-  RV = $ADDR
-  SV = PVHV\\($ADDR\\) at $ADDR
-    REFCNT = 1
-    FLAGS = \\(SHAREKEYS,HASKFLAGS\\)
-    ARRAY = $ADDR  \\(0:7, 1:1\\)
-    hash quality = 100.0%
-    KEYS = 1
-    FILL = 1
-    MAX = 7
-    RITER = -1
-    EITER = $ADDR
-    Elt "\\\304\\\200" \[UTF8 "\\\x\{100\}"\] HASH = $ADDR
-    SV = PV\\($ADDR\\) at $ADDR
-      REFCNT = 1
-      FLAGS = \\(POK,pPOK,UTF8\\)
-      PV = $ADDR "\\\310\\\200"\\\0 \[UTF8 "\\\x\{200\}"\]
-      CUR = 2
-      LEN = \\d+');
-}
 
 my $x="";
 $x=~/.??/g;
@@ -412,7 +370,7 @@ do_test(20,
   FLAGS = \\(PADMY,SMG,POK,pPOK\\)
   IV = 0
   NV = 0
-  PV = $ADDR ""\\\0
+  PV = $ADDR ""\\\0 \\[UTF8 ""\\]
   CUR = 0
   LEN = \d+
   MAGIC = $ADDR
@@ -435,7 +393,7 @@ do_test(21,
   FLAGS = \\(GMG,SMG,RMG,pIOK,pPOK\\)
   IV = 0
   NV = 0
-  PV = $ADDR "0"\\\0
+  PV = $ADDR "0"\\\0 \\[UTF8 "0"\\]
   CUR = 1
   LEN = \d+
   MAGIC = $ADDR
@@ -472,7 +430,7 @@ do_test(22,
     SV = NULL\\(0x0\\) at $ADDR
       REFCNT = \d+
       FLAGS = \\(READONLY\\)
-    PV = $ADDR ""
+    PV = $ADDR "" \\[UTF8 ""\\]
     CUR = 0
     LEN = 0
     STASH = $ADDR\s+"Foobar"');
@@ -501,7 +459,7 @@ do_test(23,
     SV = PV\\($ADDR\\) at $ADDR
       REFCNT = 1
       FLAGS = \\(.*POK,READONLY,pPOK\\)
-      PV = $ADDR "Perl rules"\\\0
+      PV = $ADDR "Perl rules"\\\0 \\[UTF8 "Perl rules"\\]
       CUR = 10
       LEN = \\d+
     GVGV::GV = $ADDR\\t"main" :: "const"

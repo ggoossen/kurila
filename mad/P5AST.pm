@@ -301,6 +301,7 @@ package P5AST::op_unpack; 	@ISA = 'P5AST::listop';
 package P5AST::op_pack; 	@ISA = 'P5AST::listop';
 package P5AST::op_split; 	@ISA = 'P5AST::listop';
 package P5AST::op_join; 	@ISA = 'P5AST::listop';
+package P5AST::op_say; 	        @ISA = 'P5AST::listop';
 package P5AST::op_list; 	@ISA = 'P5AST::listop';
 package P5AST::op_lslice; 	@ISA = 'P5AST::binop';
 package P5AST::op_anonlist; 	@ISA = 'P5AST::listop';

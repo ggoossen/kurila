@@ -10,12 +10,52 @@ my %Cache;
 
 our (%PropertyAlias, %PA_reverse, %PropValueAlias, %PVA_reverse, %PVA_abbr_map);
 
-sub croak { require Carp; Carp::croak(@_) }
+# sub croak { require Carp; Carp::croak(@_) }
 
 ##
 ## "SWASH" == "SWATCH HASH". A "swatch" is a swatch of the Unicode landscape.
 ## It's a data structure that encodes a set of Unicode characters.
 ##
+
+sub length (_) {
+    BEGIN { utf8::import() }
+    return CORE::length($_[0]);
+}
+
+sub substr ($$;$$) {
+    BEGIN { utf8::import() }
+    return
+	@_ == 2 ? CORE::substr($_[0], $_[1]) :
+	@_ == 3 ? CORE::substr($_[0], $_[1], $_[2]) :
+	          CORE::substr($_[0], $_[1], $_[2], $_[3]) ;
+}
+
+sub ord (_) {
+    BEGIN { utf8::import() }
+    return CORE::ord($_[0]);
+}
+
+sub chr (_) {
+    BEGIN { utf8::import() }
+    return CORE::chr($_[0]);
+}
+
+sub index ($$;$) {
+    BEGIN { utf8::import() }
+    return
+	@_ == 2 ? CORE::index($_[0], $_[1]) :
+	          CORE::index($_[0], $_[1], $_[2]) ;
+}
+
+sub rindex ($$;$) {
+    BEGIN { utf8::import() }
+    return
+	@_ == 2 ? CORE::rindex($_[0], $_[1]) :
+	          CORE::rindex($_[0], $_[1], $_[2]) ;
+}
+
+
+use bytes;
 
 sub SWASHNEW {
     my ($class, $type, $list, $minbits, $none) = @_;
@@ -71,7 +111,7 @@ sub SWASHNEW {
 	    my $caller1 = $type =~ s/(.+)::// ? $1 : caller(1);
 
 	    if (defined $caller1 && $type =~ /^(?:\w+)$/) {
-		my $prop = "${caller1}::$type";
+		my $prop = *{Symbol::qualify_to_ref("${caller1}::$type")};
 		if (exists &{$prop}) {
 		    no strict 'refs';
 		    
@@ -151,10 +191,10 @@ sub SWASHNEW {
 	    if (defined $caller0 && $type =~ /^To(?:\w+)$/) {
 		my $map = $caller0 . "::" . $type;
 
-		if (exists &{$map}) {
+		if (exists &{*{Symbol::qualify_to_ref($map)}}) {
 		    no strict 'refs';
 		    
-		    $list = &{$map};
+		    $list = &{*{Symbol::qualify_to_ref($map)}};
 		    last GETFILE;
 		}
 	    }
@@ -282,5 +322,4 @@ sub SWASHNEW {
 }
 
 # Now SWASHGET is recasted into a C function S_swash_get (see utf8.c).
-
 1;

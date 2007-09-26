@@ -22,7 +22,7 @@ $VERSION = '5.76';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
+@ISA = qw( ExtUtils::MM_Unix );
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 $Revision = $ExtUtils::MakeMaker::Revision;

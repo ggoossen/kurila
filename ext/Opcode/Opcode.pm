@@ -6,7 +6,7 @@ use strict;
 
 our($VERSION, @ISA, @EXPORT_OK);
 
-$VERSION = "1.10";
+$VERSION = "1.09";
 
 use Carp;
 use Exporter ();
@@ -379,8 +379,6 @@ account the magical open of ARGV.
 
     readline rcatline getc read
 
-    formline enterwrite leavewrite
-
     print say sysread syswrite send recv
 
     eof tell seek sysseek
@@ -394,8 +392,6 @@ These are a hotchpotch of opcodes still waiting to be considered
     gvsv gv gelem
 
     padsv padav padhv padany
-
-    once
 
     rv2gv refgen srefgen ref
 
@@ -565,13 +561,14 @@ a tag name but need to be tagged for completeness and documentation.
 
     syscall dump chroot
 
+
 =back
 
 =head1 SEE ALSO
 
-L<ops> -- perl pragma interface to Opcode module.
+ops(3) -- perl pragma interface to Opcode module.
 
-L<Safe> -- Opcode and namespace limited execution compartments
+Safe(3) -- Opcode and namespace limited execution compartments
 
 =head1 AUTHORS
 

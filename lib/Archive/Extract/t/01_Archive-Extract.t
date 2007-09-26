@@ -362,8 +362,6 @@ for my $switch (0,1) {
                         ### if something went wrong with determining the out
                         ### path, don't go deleting stuff.. might be Really Bad
                         my $out_re = quotemeta( $OutDir );
-                        $out_re =~ s/\\(>|\])\z// if IS_VMS; # zap trailing bracket
-
                         if( $ae->extract_path !~ /^$out_re/ ) {   
                             ok( 0, "Extractpath WRONG (".$ae->extract_path.")"); 
                             skip(  "Unsafe operation -- skip cleanup!!!" ), 1;

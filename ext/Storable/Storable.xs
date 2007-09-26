@@ -13,16 +13,6 @@
 #include <perl.h>
 #include <XSUB.h>
 
-#ifndef PATCHLEVEL
-#include <patchlevel.h>		/* Perl's one, needed since 5.6 */
-#endif
-
-#if !defined(PERL_VERSION) || PERL_VERSION < 8
-#define NEED_load_module
-#define NEED_vload_module
-#include "ppport.h"             /* handle old perls */
-#endif
-
 #if 0
 #define DEBUGME /* Debug mode, turns assertions on as well */
 #define DASSERT /* Assertion mode */
@@ -46,34 +36,6 @@
 /*
  * Earlier versions of perl might be used, we can't assume they have the latest!
  */
-
-#ifndef PERL_VERSION		/* For perls < 5.6 */
-#define PERL_VERSION PATCHLEVEL
-#ifndef newRV_noinc
-#define newRV_noinc(sv)		((Sv = newRV(sv)), --SvREFCNT(SvRV(Sv)), Sv)
-#endif
-#if (PATCHLEVEL <= 4)		/* Older perls (<= 5.004) lack PL_ namespace */
-#define PL_sv_yes	sv_yes
-#define PL_sv_no	sv_no
-#define PL_sv_undef	sv_undef
-#if (SUBVERSION <= 4)		/* 5.004_04 has been reported to lack newSVpvn */
-#define newSVpvn newSVpv
-#endif
-#endif						/* PATCHLEVEL <= 4 */
-#ifndef HvSHAREKEYS_off
-#define HvSHAREKEYS_off(hv)	/* Ignore */
-#endif
-#ifndef AvFILLp				/* Older perls (<=5.003) lack AvFILLp */
-#define AvFILLp AvFILL
-#endif
-typedef double NV;			/* Older perls lack the NV type */
-#define	IVdf		"ld"	/* Various printf formats for Perl types */
-#define	UVuf		"lu"
-#define	UVof		"lo"
-#define	UVxf		"lx"
-#define INT2PTR(t,v) (t)(IV)(v)
-#define PTR2UV(v)    (unsigned long)(v)
-#endif						/* PERL_VERSION -- perls < 5.6 */
 
 #ifndef NVef				/* The following were not part of perl 5.6 */
 #if defined(USE_LONG_DOUBLE) && \
@@ -293,26 +255,8 @@ typedef unsigned long stag_t;	/* Used by pre-0.6 binary format */
 #define MY_VERSION "Storable(" XS_VERSION ")"
 
 
-/*
- * Conditional UTF8 support.
- *
- */
-#ifdef SvUTF8_on
-#define STORE_UTF8STR(pv, len)	STORE_PV_LEN(pv, len, SX_UTF8STR, SX_LUTF8STR)
-#define HAS_UTF8_SCALARS
-#ifdef HeKUTF8
-#define HAS_UTF8_HASHES
-#define HAS_UTF8_ALL
-#else
-/* 5.6 perl has utf8 scalars but not hashes */
-#endif
-#else
-#define SvUTF8(sv) 0
-#define STORE_UTF8STR(pv, len) CROAK(("panic: storing UTF8 in non-UTF8 perl"))
-#endif
-#ifndef HAS_UTF8_ALL
 #define UTF8_CROAK() CROAK(("Cannot retrieve UTF8 data in non-UTF8 perl"))
-#endif
+
 #ifndef SvWEAKREF
 #define WEAKREF_CROAK() CROAK(("Cannot retrieve weak references in this perl"))
 #endif
@@ -369,9 +313,6 @@ typedef struct stcxt {
 #ifndef HAS_RESTRICTED_HASHES
         int derestrict;         /* whether to downgrade restrcted hashes */
 #endif
-#ifndef HAS_UTF8_ALL
-        int use_bytes;         /* whether to bytes-ify utf8 */
-#endif
         int accept_future_minor; /* croak immediately on future minor versions?  */
 	int s_dirty;		/* context is dirty due to CROAK() -- can be cleaned */
 	int membuf_ro;		/* true means membuf is read-only and msaved is rw */
@@ -398,14 +339,9 @@ typedef struct stcxt {
 
 #if defined(MULTIPLICITY) || defined(PERL_OBJECT) || defined(PERL_CAPI)
 
-#if (PATCHLEVEL <= 4) && (SUBVERSION < 68)
-#define dSTCXT_SV 									\
-	SV *perinterp_sv = perl_get_sv(MY_VERSION, FALSE)
-#else	/* >= perl5.004_68 */
 #define dSTCXT_SV									\
 	SV *perinterp_sv = *hv_fetch(PL_modglobal,		\
 		MY_VERSION, sizeof(MY_VERSION)-1, TRUE)
-#endif	/* < perl5.004_68 */
 
 #define dSTCXT_PTR(T,name)							\
 	T name = ((perinterp_sv && SvIOK(perinterp_sv) && SvIVX(perinterp_sv)	\
@@ -846,18 +782,10 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
 #define STORABLE_BIN_MAJOR	2		/* Binary major "version" */
 #define STORABLE_BIN_MINOR	7		/* Binary minor "version" */
 
-#if (PATCHLEVEL <= 5)
-#define STORABLE_BIN_WRITE_MINOR	4
-#else 
 /*
  * Perl 5.6.0 onwards can do weak references.
 */
 #define STORABLE_BIN_WRITE_MINOR	7
-#endif /* (PATCHLEVEL <= 5) */
-
-#if (PATCHLEVEL < 8 || (PATCHLEVEL == 8 && SUBVERSION < 1))
-#define PL_sv_placeholder PL_sv_undef
-#endif
 
 /*
  * Useful store shortcuts...
@@ -1060,31 +988,8 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
  * sortsv is not available ( <= 5.6.1 ).
  */
 
-#if (PATCHLEVEL <= 6)
-
-#if defined(USE_ITHREADS)
-
-#define STORE_HASH_SORT \
-        ENTER; { \
-        PerlInterpreter *orig_perl = PERL_GET_CONTEXT; \
-        SAVESPTR(orig_perl); \
-        PERL_SET_CONTEXT(aTHX); \
-        qsort((char *) AvARRAY(av), len, sizeof(SV *), sortcmp); \
-        } LEAVE;
-
-#else /* ! USE_ITHREADS */
-
-#define STORE_HASH_SORT \
-        qsort((char *) AvARRAY(av), len, sizeof(SV *), sortcmp);
-
-#endif  /* USE_ITHREADS */
-
-#else /* PATCHLEVEL > 6 */
-
 #define STORE_HASH_SORT \
         sortsv(AvARRAY(av), len, Perl_sv_cmp);  
-
-#endif /* PATCHLEVEL <= 6 */
 
 static int store(pTHX_ stcxt_t *cxt, SV *sv);
 static SV *retrieve(pTHX_ stcxt_t *cxt, const char *cname);
@@ -1123,7 +1028,6 @@ static const sv_store_t sv_store[] = {
  */
 
 static SV *retrieve_lscalar(pTHX_ stcxt_t *cxt, const char *cname);
-static SV *retrieve_lutf8str(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *old_retrieve_array(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *old_retrieve_hash(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_ref(pTHX_ stcxt_t *cxt, const char *cname);
@@ -1133,7 +1037,6 @@ static SV *retrieve_double(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_byte(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_netint(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_scalar(pTHX_ stcxt_t *cxt, const char *cname);
-static SV *retrieve_utf8str(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_array(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_hash(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_scalar(pTHX_ stcxt_t *cxt, const char *cname);
@@ -1214,8 +1117,8 @@ static const sv_retrieve_t sv_retrieve[] = {
 	(sv_retrieve_t)retrieve_overloaded,	/* SX_OVERLOAD */
 	(sv_retrieve_t)retrieve_tied_key,	/* SX_TIED_KEY */
 	(sv_retrieve_t)retrieve_tied_idx,	/* SX_TIED_IDX */
-	(sv_retrieve_t)retrieve_utf8str,	/* SX_UTF8STR  */
-	(sv_retrieve_t)retrieve_lutf8str,	/* SX_LUTF8STR */
+	(sv_retrieve_t)retrieve_scalar, 	/* SX_UTF8STR */
+	(sv_retrieve_t)retrieve_lscalar,   	/* SX_LUTF8STR */
 	(sv_retrieve_t)retrieve_flag_hash,	/* SX_HASH */
 	(sv_retrieve_t)retrieve_code,		/* SX_CODE */
 	(sv_retrieve_t)retrieve_weakref,	/* SX_WEAKREF */
@@ -1494,9 +1397,6 @@ static void init_retrieve_context(pTHX_ stcxt_t *cxt, int optype, int is_tainted
 #ifndef HAS_RESTRICTED_HASHES
         cxt->derestrict = -1;		/* Fetched from perl if needed */
 #endif
-#ifndef HAS_UTF8_ALL
-        cxt->use_bytes = -1;		/* Fetched from perl if needed */
-#endif
         cxt->accept_future_minor = -1;	/* Fetched from perl if needed */
 }
 
@@ -1542,9 +1442,6 @@ static void clean_retrieve_context(pTHX_ stcxt_t *cxt)
 
 #ifndef HAS_RESTRICTED_HASHES
         cxt->derestrict = -1;		/* Fetched from perl if needed */
-#endif
-#ifndef HAS_UTF8_ALL
-        cxt->use_bytes = -1;		/* Fetched from perl if needed */
 #endif
         cxt->accept_future_minor = -1;	/* Fetched from perl if needed */
 
@@ -2054,15 +1951,9 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
             /* public string - go direct to string read.  */
             goto string_readlen;
         } else if (
-#if (PATCHLEVEL <= 6)
-            /* For 5.6 and earlier NV flag trumps IV flag, so only use integer
-               direct if NV flag is off.  */
-            (flags & (SVf_NOK | SVf_IOK)) == SVf_IOK
-#else
             /* 5.7 rules are that if IV public flag is set, IV value is as
                good, if not better, than NV value.  */
             flags & SVf_IOK
-#endif
             ) {
             iv = SvIV(sv);
             /*
@@ -2125,16 +2016,6 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
             TRACEME(("ok (integer 0x%"UVxf", value = %"IVdf")", PTR2UV(sv), iv));
 	} else if (flags & SVf_NOK) {
             NV nv;
-#if (PATCHLEVEL <= 6)
-            nv = SvNV(sv);
-            /*
-             * Watch for number being an integer in disguise.
-             */
-            if (nv == (NV) (iv = I_V(nv))) {
-                TRACEME(("double %"NVff" is actually integer %"IVdf, nv, iv));
-                goto integer;		/* Share code above */
-            }
-#else
 
             SvIV_please(sv);
 	    if (SvIOK_notUV(sv)) {
@@ -2142,7 +2023,6 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
                 goto integer;		/* Share code above */
             }
             nv = SvNV(sv);
-#endif
 
             if (cxt->netorder) {
                 TRACEME(("double %"NVff" stored as string", nv));
@@ -2167,10 +2047,7 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
           string:
 
             wlen = (I32) len; /* WLEN via STORE_SCALAR expects I32 */
-            if (SvUTF8 (sv))
-                STORE_UTF8STR(pv, wlen);
-            else
-                STORE_SCALAR(pv, wlen);
+            STORE_SCALAR(pv, wlen);
             TRACEME(("ok (scalar 0x%"UVxf" '%s', length = %"IVdf")",
                      PTR2UV(sv), SvPVX(sv), (IV)len));
 	} else
@@ -2226,25 +2103,6 @@ static int store_array(pTHX_ stcxt_t *cxt, AV *av)
 	return 0;
 }
 
-
-#if (PATCHLEVEL <= 6)
-
-/*
- * sortcmp
- *
- * Sort two SVs
- * Borrowed from perl source file pp_ctl.c, where it is used by pp_sort.
- */
-static int
-sortcmp(const void *a, const void *b)
-{
-#if defined(USE_ITHREADS)
-        dTHX;
-#endif /* USE_ITHREADS */
-        return sv_cmp(*(SV * const *) a, *(SV * const *) b);
-}
-
-#endif /* PATCHLEVEL <= 6 */
 
 /*
  * store_hash
@@ -2427,37 +2285,6 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
 
 			keyval = SvPV(key, keylen_tmp);
                         keylen = keylen_tmp;
-#ifdef HAS_UTF8_HASHES
-                        /* If you build without optimisation on pre 5.6
-                           then nothing spots that SvUTF8(key) is always 0,
-                           so the block isn't optimised away, at which point
-                           the linker dislikes the reference to
-                           bytes_from_utf8.  */
-			if (SvUTF8(key)) {
-                            const char *keysave = keyval;
-                            bool is_utf8 = TRUE;
-
-                            /* Just casting the &klen to (STRLEN) won't work
-                               well if STRLEN and I32 are of different widths.
-                               --jhi */
-                            keyval = (char*)bytes_from_utf8((U8*)keyval,
-                                                            &keylen_tmp,
-                                                            &is_utf8);
-
-                            /* If we were able to downgrade here, then than
-                               means that we have  a key which only had chars
-                               0-255, but was utf8 encoded.  */
-
-                            if (keyval != keysave) {
-                                keylen = keylen_tmp;
-                                flags |= SHV_K_WASUTF8;
-                            } else {
-                                /* keylen_tmp can't have changed, so no need
-                                   to assign back to keylen.  */
-                                flags |= SHV_K_UTF8;
-                            }
-                        }
-#endif
 
                         if (flagged_hash) {
                             PUTMARK(flags);
@@ -2544,12 +2371,6 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
                             flags |= SHV_K_ISSV;
                         } else {
                             /* Regular string key. */
-#ifdef HAS_HASH_KEY_FLAGS
-                            if (HEK_UTF8(hek))
-                                flags |= SHV_K_UTF8;
-                            if (HEK_WASUTF8(hek))
-                                flags |= SHV_K_WASUTF8;
-#endif
                             key = HEK_KEY(hek);
                         }
 			/*
@@ -4888,63 +4709,6 @@ static SV *retrieve_scalar(pTHX_ stcxt_t *cxt, const char *cname)
 }
 
 /*
- * retrieve_utf8str
- *
- * Like retrieve_scalar(), but tag result as utf8.
- * If we're retrieving UTF8 data in a non-UTF8 perl, croaks.
- */
-static SV *retrieve_utf8str(pTHX_ stcxt_t *cxt, const char *cname)
-{
-    SV *sv;
-
-    TRACEME(("retrieve_utf8str"));
-
-    sv = retrieve_scalar(aTHX_ cxt, cname);
-    if (sv) {
-#ifdef HAS_UTF8_SCALARS
-        SvUTF8_on(sv);
-#else
-        if (cxt->use_bytes < 0)
-            cxt->use_bytes
-                = (SvTRUE(perl_get_sv("Storable::drop_utf8", TRUE))
-                   ? 1 : 0);
-        if (cxt->use_bytes == 0)
-            UTF8_CROAK();
-#endif
-    }
-
-    return sv;
-}
-
-/*
- * retrieve_lutf8str
- *
- * Like retrieve_lscalar(), but tag result as utf8.
- * If we're retrieving UTF8 data in a non-UTF8 perl, croaks.
- */
-static SV *retrieve_lutf8str(pTHX_ stcxt_t *cxt, const char *cname)
-{
-    SV *sv;
-
-    TRACEME(("retrieve_lutf8str"));
-
-    sv = retrieve_lscalar(aTHX_ cxt, cname);
-    if (sv) {
-#ifdef HAS_UTF8_SCALARS
-        SvUTF8_on(sv);
-#else
-        if (cxt->use_bytes < 0)
-            cxt->use_bytes
-                = (SvTRUE(perl_get_sv("Storable::drop_utf8", TRUE))
-                   ? 1 : 0);
-        if (cxt->use_bytes == 0)
-            UTF8_CROAK();
-#endif
-    }
-    return sv;
-}
-
-/*
  * retrieve_integer
  *
  * Retrieve defined integer.
@@ -5330,21 +5094,12 @@ static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname)
 		store_flags |= HVhek_PLACEHOLD;
 	    }
             if (flags & SHV_K_UTF8) {
-#ifdef HAS_UTF8_HASHES
-                store_flags |= HVhek_UTF8;
-#else
-                if (cxt->use_bytes < 0)
-                    cxt->use_bytes
-                        = (SvTRUE(perl_get_sv("Storable::drop_utf8", TRUE))
-                           ? 1 : 0);
-                if (cxt->use_bytes == 0)
-                    UTF8_CROAK();
-#endif
+                /* drop UTF8 flag */
             }
-#ifdef HAS_UTF8_HASHES
-            if (flags & SHV_K_WASUTF8)
-		store_flags |= HVhek_WASUTF8;
-#endif
+            if (flags & SHV_K_WASUTF8) {
+                /* UTF8 converted back to latin1 ?! */
+                CROAK(("WASUTF8 flag not supported"));
+            }
 
             RLEN(size);						/* Get key size */
             KBUFCHK((STRLEN)size);				/* Grow hash key read pool if needed */
@@ -6065,43 +5820,6 @@ static SV *do_retrieve(
 	KBUFINIT();			 		/* Allocate hash key reading pool once */
 
 	if (!f && in) {
-#ifdef SvUTF8_on
-		if (SvUTF8(in)) {
-			STRLEN length;
-			const char *orig = SvPV(in, length);
-			char *asbytes;
-			/* This is quite deliberate. I want the UTF8 routines
-			   to encounter the '\0' which perl adds at the end
-			   of all scalars, so that any new string also has
-			   this.
-			*/
-			STRLEN klen_tmp = length + 1;
-			bool is_utf8 = TRUE;
-
-			/* Just casting the &klen to (STRLEN) won't work
-			   well if STRLEN and I32 are of different widths.
-			   --jhi */
-			asbytes = (char*)bytes_from_utf8((U8*)orig,
-							 &klen_tmp,
-							 &is_utf8);
-			if (is_utf8) {
-				CROAK(("Frozen string corrupt - contains characters outside 0-255"));
-			}
-			if (asbytes != orig) {
-				/* String has been converted.
-				   There is no need to keep any reference to
-				   the old string.  */
-				in = sv_newmortal();
-				/* We donate the SV the malloc()ed string
-				   bytes_from_utf8 returned us.  */
-				SvUPGRADE(in, SVt_PV);
-				SvPOK_on(in);
-				SvPV_set(in, asbytes);
-				SvLEN_set(in, klen_tmp);
-				SvCUR_set(in, klen_tmp - 1);
-			}
-		}
-#endif
 		MBUF_SAVE_AND_LOAD(in);
 	}
 
@@ -6163,22 +5881,7 @@ static SV *do_retrieve(
 
 	if (!sv) {
 		TRACEME(("retrieve ERROR"));
-#if (PATCHLEVEL <= 4) 
-		/* perl 5.00405 seems to screw up at this point with an
-		   'attempt to modify a read only value' error reported in the
-		   eval { $self = pretrieve(*FILE) } in _retrieve.
-		   I can't see what the cause of this error is, but I suspect a
-		   bug in 5.004, as it seems to be capable of issuing spurious
-		   errors or core dumping with matches on $@. I'm not going to
-		   spend time on what could be a fruitless search for the cause,
-		   so here's a bodge. If you're running 5.004 and don't like
-		   this inefficiency, either upgrade to a newer perl, or you are
-		   welcome to find the problem and send in a patch.
-		 */
-		return newSV(0);
-#else
 		return &PL_sv_undef;		/* Something went wrong, return undef */
-#endif
 	}
 
 	TRACEME(("retrieve got %s(0x%"UVxf")",

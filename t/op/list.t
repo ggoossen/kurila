@@ -1,12 +1,9 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require "test.pl";
+require "./test.pl";
 plan( tests => 57 );
+
+our (@b, @a, @foo, @bar, $c, $d, %c, $x);
 
 @foo = (1, 2, 3, 4);
 cmp_ok($foo[0], '==', 1, 'first elem');

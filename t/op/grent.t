@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
@@ -11,7 +9,8 @@ if ($@ =~ /(The \w+ function is unimplemented)/) {
     skip_all "getgrgid unimplemented";
 }
 
-eval { require Config; import Config; };
+our (%Config, $where);
+eval { require Config; Config->import; };
 my $reason;
 if ($Config{'i_grp'} ne 'define') {
 	$reason = '$Config{i_grp} not defined';
@@ -111,7 +110,7 @@ while (<GR>) {
 	$members_s =~ s/\s*,\s*/,/g;
 	$members_s =~ s/\s+$//;
 	$members_s =~ s/^\s+//;
-	@n = getgrgid($gid_s);
+	my @n = getgrgid($gid_s);
 	# 'nogroup' et al.
 	next unless @n;
 	my ($name,$passwd,$gid,$members) = @n;

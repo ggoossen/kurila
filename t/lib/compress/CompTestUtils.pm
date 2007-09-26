@@ -12,7 +12,6 @@ use Carp ;
 #use Test::More ; 
 
 
-
 sub title
 {
     #diag "" ; 
@@ -179,16 +178,19 @@ sub readHeaderInfo
 some text
 EOM
 
-    ok my $x = new IO::Compress::Gzip $name, %opts 
+    my $x;
+    ok $x = IO::Compress::Gzip->new( $name, %opts) 
         or diag "GzipError is $IO::Compress::Gzip::GzipError" ;
     ok $x->write($string) ;
     ok $x->close ;
 
     #is GZreadFile($name), $string ;
 
-    ok my $gunz = new IO::Uncompress::Gunzip $name, Strict => 0
+    my $gunz;
+    ok $gunz = IO::Uncompress::Gunzip->new( $name, Strict => 0)
         or diag "GunzipError is $IO::Uncompress::Gunzip::GunzipError" ;
-    ok my $hdr = $gunz->getHeaderInfo();
+    my $hdr;
+    ok $hdr = $gunz->getHeaderInfo();
     my $uncomp ;
     ok $gunz->read($uncomp) ;
     ok $uncomp eq $string;
@@ -437,11 +439,11 @@ sub anyUncompress
     }
 
     my $out = '';
-    my $o = new IO::Uncompress::AnyUncompress \$data, 
+    my $o = IO::Uncompress::AnyUncompress->new( \$data, 
                     Append => 1, 
                     Transparent => 0, 
                     RawInflate => 1,
-                    @opts
+                    @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
     1 while $o->read($out) > 0 ;
@@ -497,12 +499,12 @@ sub getHeaders
     }
 
     my $out = '';
-    my $o = new IO::Uncompress::AnyUncompress \$data, 
+    my $o = IO::Uncompress::AnyUncompress->new( \$data, 
                 MultiStream => 1, 
                 Append => 1, 
                 Transparent => 0, 
                 RawInflate => 1,
-                @opts
+                @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
     1 while $o->read($out) > 0 ;
@@ -541,7 +543,7 @@ sub mkComplete
         );
     }
 
-    my $z = new $class( \$buffer, %params)
+    my $z = $class-> new(( \$buffer, %params))
         or croak "Cannot create $class object: $$Error";
     $z->write($data);
     $z->close();
@@ -549,7 +551,7 @@ sub mkComplete
     my $unc = getInverse($class);
     anyUncompress(\$buffer) eq $data
         or die "bad bad bad";
-    my $u = new $unc( \$buffer);
+    my $u = $unc-> new(( \$buffer));
     my $info = $u->getHeaderInfo() ;
 
 
@@ -572,7 +574,6 @@ sub mkEvalErr
 {
     my $string = shift ;
 
-    return "/$string\\s+at \\(eval /" if $] > 5.006 ;
     return "/$string\\s+at /" ;
 }
 

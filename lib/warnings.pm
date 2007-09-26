@@ -288,11 +288,11 @@ our %DeadBits = (
     'void'		=> "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08", # [45]
   );
 
-$NONE     = "\0\0\0\0\0\0\0\0\0\0\0\0";
-$LAST_BIT = 92 ;
-$BYTES    = 12 ;
+our $NONE     = "\0\0\0\0\0\0\0\0\0\0\0\0";
+our $LAST_BIT = 92 ;
+our $BYTES    = 12 ;
 
-$All = "" ; vec($All, $Offsets{'all'}, 2) = 3 ;
+our $All = "" ; vec($All, $Offsets{'all'}, 2) = 3 ;
 
 sub Croaker
 {

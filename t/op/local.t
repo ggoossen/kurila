@@ -1,11 +1,11 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
     require './test.pl';
 }
-plan tests => 122;
+plan tests => 120;
+
+our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
 my $list_assignment_supported = 1;
 
@@ -298,7 +298,7 @@ while (/(o.+?),/gc) {
 	"Local \$_"   => sub { local $_  = 'ok?'; print },	0,
 	"for local"   => sub { for("#ok?\n"){ print } },	1,
     );
-    while ( ($name, $code, $ok) = splice(@tests, 0, 3) ) {
+    while ( my ($name, $code, $ok) = splice(@tests, 0, 3) ) {
 	eval { &$code };
         main::ok(($ok xor $@), "Underscore '$name'");
     }
@@ -307,11 +307,12 @@ while (/(o.+?),/gc) {
 
 {
     # BUG 20001205.22
+    no strict 'subs';
     my %x;
     $x{a} = 1;
     { local $x{b} = 1; }
     ok(! exists $x{b});
-    { local @x{c,d,e}; }
+    { local @x{'c','d','e'}; }
     ok(! exists $x{c});
 }
 
@@ -330,15 +331,6 @@ like($@, qr/Modification of a read-only value attempted/);
 # The s/// adds 'g' magic to $_, but it should remain non-readonly
 eval { for("a") { for $x (1,2) { local $_="b"; s/(.*)/+$1/ } } };
 is($@, "");
-
-# RT #4342 Special local() behavior for $[
-{
-    local $[ = 1;
-    ok(1 == $[, 'lexcical scope of local $[');
-    f();
-}
-
-sub f { ok(0 == $[); }
 
 # sub localisation
 {
@@ -374,6 +366,7 @@ sub f { ok(0 == $[); }
     $h{"\302\240"} = "octects";
     is(scalar keys %h, 2);
     {
+        use utf8;
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
@@ -398,6 +391,7 @@ sub f { ok(0 == $[); }
     $h{"\302\240"} = "octects";
     is(scalar keys %h, 2);
     {
+        use utf8;
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;

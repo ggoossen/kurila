@@ -19,7 +19,6 @@ use ExtUtils::Constant qw (C_constant autoload);
 use File::Spec;
 use Cwd;
 
-my $do_utf_tests = $] > 5.006;
 my $better_than_56 = $] > 5.007;
 # For debugging set this to 1.
 my $keep_files = 0;
@@ -442,7 +441,7 @@ EOT
   print FH ");\n";
   # Print the AUTOLOAD subroutine ExtUtils::Constant generated for us
   print FH autoload ($package, $]);
-  print FH "bootstrap $package \$VERSION;\n1;\n__END__\n";
+  print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
   close FH or die "close $pm: $!\n";
 
   ################ test.pl
@@ -502,12 +501,11 @@ sub end_tests {
   $dummytest += $after_tests;
 }
 
+use utf8;
+
 my $pound;
-if (ord('A') == 193) {  # EBCDIC platform
-  $pound = chr 177; # A pound sign. (Currency)
-} else { # ASCII platform
-  $pound = chr 163; # A pound sign. (Currency)
-}
+$pound = "pound" . chr(163); # A pound sign. (Currency)
+
 my @common_items = (
                     {name=>"perl", type=>"PV",},
                     {name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1},
@@ -784,159 +782,6 @@ $dummytest+=18;
 
   end_tests("Simple tests", \@items, \@export_names, $header, $test_body,
 	    $args);
-}
-
-if ($do_utf_tests) {
-  # utf8 tests
-  start_tests();
-  my ($inf, $pound_bytes, $pound_utf8);
-
-  $inf = chr 0x221E;
-  # Check that we can distiguish the pathological case of a string, and the
-  # utf8 representation of that string.
-  $pound_utf8 = $pound . '1';
-  if ($better_than_56) {
-    $pound_bytes = $pound_utf8;
-    utf8::encode ($pound_bytes);
-  } else {
-    # Must have that "U*" to generate a zero length UTF string that forces
-    # top bit set chars (such as the pound sign) into UTF8, so that the
-    # unpack 'C*' then gets the byte form of the UTF8.
-    $pound_bytes =  pack 'C*', unpack 'C*', $pound_utf8 . pack "U*";
-  }
-
-  my @items = (@common_items,
-               {name=>$inf, type=>"PV", value=>'"Infinity"', macro=>1},
-               {name=>$pound_utf8, type=>"PV", value=>'"1 Pound"', macro=>1},
-               {name=>$pound_bytes, type=>"PV", value=>'"1 Pound (as bytes)"',
-                macro=>1},
-              );
-
-=pod
-
-The above set of names seems to produce a suitably bad set of compile
-problems on a Unicode naive version of ExtUtils::Constant (ie 0.11):
-
-nick@thinking-cap 15439-32-utf$ PERL_CORE=1 ./perl lib/ExtUtils/t/Constant.t
-1..33
-# perl=/stuff/perl5/15439-32-utf/perl
-# ext-30370 being created...
-Wide character in print at lib/ExtUtils/t/Constant.t line 140.
-ok 1
-ok 2
-# make = 'make'
-ExtTest.xs: In function `constant_1':
-ExtTest.xs:80: warning: multi-character character constant
-ExtTest.xs:80: warning: case value out of range
-ok 3
-
-=cut
-
-# Grr `
-
-  # Do this in 7 bit in case someone is testing with some settings that cause
-  # 8 bit files incapable of storing this character.
-  my @values
-    = map {"'" . join (",", unpack "U*", $_ . pack "U*") . "'"}
-      ($pound, $inf, $pound_bytes, $pound_utf8);
-  # Values is a list of strings, such as ('194,163,49', '163,49')
-
-  my $test_body .= "my \$test = $dummytest;\n";
-  $dummytest += 7 * 3; # 3 tests for each of the 7 things:
-
-  $test_body .= << 'EOT';
-
-use utf8;
-my $better_than_56 = $] > 5.007;
-
-my ($pound, $inf, $pound_bytes, $pound_utf8) = map {eval "pack 'U*', $_"}
-EOT
-
-  $test_body .= join ",", @values;
-
-  $test_body .= << 'EOT';
-;
-
-foreach (["perl", "rules", "rules"],
-	 ["/*", "OPEN", "OPEN"],
-	 ["*/", "CLOSE", "CLOSE"],
-	 [$pound, 'Sterling', []],
-         [$inf, 'Infinity', []],
-	 [$pound_utf8, '1 Pound', '1 Pound (as bytes)'],
-	 [$pound_bytes, '1 Pound (as bytes)', []],
-        ) {
-  # Flag an expected error with a reference for the expect string.
-  my ($string, $expect, $expect_bytes) = @$_;
-  (my $name = $string) =~ s/([^ !"#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~])/sprintf '\x{%X}', ord $1/ges;
-  print "# \"$name\" => \'$expect\'\n";
-  # Try to force this to be bytes if possible.
-  if ($better_than_56) {
-    utf8::downgrade ($string, 1);
-  } else {
-    if ($string =~ tr/0-\377// == length $string) {
-      # No chars outside range 0-255
-      $string = pack 'C*', unpack 'U*', ($string . pack 'U*');
-    }
-  }
-EOT
-
-  $test_body .=  "my (\$error, \$got) = ${package}::constant (\$string);\n";
-
-  $test_body .= <<'EOT';
-  if ($error or $got ne $expect) {
-    print "not ok $test # error '$error', got '$got'\n";
-  } else {
-    print "ok $test\n";
-  }
-  $test++;
-  print "# Now upgrade '$name' to utf8\n";
-  if ($better_than_56) {
-    utf8::upgrade ($string);
-  } else {
-    $string = pack ('U*') . $string;
-  }
-EOT
-
-  $test_body .=  "my (\$error, \$got) = ${package}::constant (\$string);\n";
-
-  $test_body .= <<'EOT';
-  if ($error or $got ne $expect) {
-    print "not ok $test # error '$error', got '$got'\n";
-  } else {
-    print "ok $test\n";
-  }
-  $test++;
-  if (defined $expect_bytes) {
-    print "# And now with the utf8 byte sequence for name\n";
-    # Try the encoded bytes.
-    if ($better_than_56) {
-      utf8::encode ($string);
-    } else {
-      $string = pack 'C*', unpack 'C*', $string . pack "U*";
-    }
-EOT
-
-    $test_body .= "my (\$error, \$got) = ${package}::constant (\$string);\n";
-
-    $test_body .= <<'EOT';
-    if (ref $expect_bytes) {
-      # Error expected.
-      if ($error) {
-        print "ok $test # error='$error' (as expected)\n";
-      } else {
-        print "not ok $test # expected error, got no error and '$got'\n";
-      }
-    } elsif ($got ne $expect_bytes) {
-      print "not ok $test # error '$error', expect '$expect_bytes', got '$got'\n";
-    } else {
-      print "ok $test\n";
-    }
-    $test++;
-  }
-}
-EOT
-
-  end_tests("utf8 tests", \@items, [], "#define perl \"rules\"\n", $test_body);
 }
 
 # XXX I think that I should merge this into the utf8 test above.

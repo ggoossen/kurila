@@ -18,7 +18,7 @@ use Carp;
 sub new {
     my ( $class, $data, $encname ) = @_;
     unless ($encname) {
-        $encname = Encode::is_utf8($data) ? 'utf8' : '';
+        $encname = '';
     }
     else {
         my $obj = find_encoding($encname)

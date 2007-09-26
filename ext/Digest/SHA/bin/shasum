@@ -2,10 +2,10 @@
 
 	# shasum: filter for computing SHA digests (analogous to sha1sum)
 	#
-	# Copyright (C) 2003-2007 Mark Shelor, All Rights Reserved
+	# Copyright (C) 2003-2006 Mark Shelor, All Rights Reserved
 	#
-	# Version: 5.45
-	# Tue Jun 26 02:36:00 MST 2007
+	# Version: 5.44
+	# Sat Oct 14 00:42:44 MST 2006
 
 =head1 NAME
 
@@ -38,30 +38,9 @@ shasum - Print or Check SHA Checksums
  is to print a line with checksum, a character indicating type (`*'
  for binary, `?' for portable, ` ' for text), and name for each FILE.
 
-=head1 DESCRIPTION
-
-The I<shasum> script provides the easiest and most convenient way to
-compute SHA message digests.  Rather than writing a program, the user
-simply feeds data to the script via the command line, and waits for
-the results to be printed on standard output.  Data can be fed to
-I<shasum> through files, standard input, or both.
-
-The following command shows how easy it is to compute digests for typical
-inputs such as the NIST test vector "abc":
-
-	perl -e "print qw(abc)" | shasum
-
-Or, if you want to use SHA-256 instead of the default SHA-1, simply say:
-
-	perl -e "print qw(abc)" | shasum -a 256
-
-Since I<shasum> uses the same interface employed by the familiar
-I<sha1sum> program (and its somewhat outmoded anscestor I<md5sum>),
-you can install this script as a convenient drop-in replacement.
-
 =head1 AUTHOR
 
-Copyright (c) 2003-2007 Mark Shelor <mshelor@cpan.org>.
+Copyright (c) 2003-2006 Mark Shelor <mshelor@cpan.org>.
 
 =head1 SEE ALSO
 
@@ -71,10 +50,9 @@ L<Digest::SHA::PurePerl>.
 =cut
 
 use strict;
-use FileHandle;
 use Getopt::Long;
 
-my $VERSION = "5.45";
+my $VERSION = "5.44";
 
 
 	# Try to use Digest::SHA, since it's faster.  If not installed,
@@ -84,10 +62,10 @@ my $MOD_PREFER = "Digest::SHA";
 my $MOD_SECOND = "Digest::SHA::PurePerl";
 
 my $module = $MOD_PREFER;
-eval "require $module";
+eval "require $module";			## no critic
 if ($@) {
 	$module = $MOD_SECOND;
-	eval "require $module";
+	eval "require $module";		## no critic
 	die "Unable to find $MOD_PREFER or $MOD_SECOND\n" if $@;
 }
 
@@ -140,7 +118,7 @@ END_OF_USAGE
 my ($alg, $binary, $check, $text, $status, $warn, $help, $version);
 my ($portable);
 
-eval { Getopt::Long::Configure ("bundling") };
+Getopt::Long::Configure ("bundling");
 GetOptions(
 	'b|binary' => \$binary, 'c|check' => \$check,
 	't|text' => \$text, 'a|algorithm=i' => \$alg,
@@ -220,10 +198,10 @@ if ($check) {
 	my $checkfile = shift(@ARGV);
 	my ($err, $read_errs, $match_errs) = (0, 0, 0);
 	my ($num_files, $num_checksums) = (0, 0);
-	my ($fh, $sum, $fname, $rsp, $digest);
+	my ($fh, $sum, $fname, $rsp);
 
 	die "shasum: $checkfile: $!\n"
-		unless $fh = FileHandle->new($checkfile, "r");
+		unless open($fh, "<$checkfile");	## no critic
 	while (<$fh>) {
 		s/\s+$//;
 		($sum, $modesym, $fname) = /^(\S+) (.)(.*)$/;
@@ -235,7 +213,7 @@ if ($check) {
 			next;
 		}
 		$rsp = "$fname: "; $num_files++;
-		unless ($digest = sumfile($fname)) {
+		unless (my $digest = sumfile($fname)) {
 			$rsp .= "FAILED open or read\n";
 			$err = 1; $read_errs++;
 		}
@@ -246,7 +224,7 @@ if ($check) {
 		}
 		print $rsp unless $status;
 	}
-	$fh->close;
+	close($fh);
 	unless ($status) {
 		warn("shasum: WARNING: $read_errs of $num_files listed " .
 			"files could not be read\n") if $read_errs;
@@ -259,10 +237,8 @@ if ($check) {
 
 	# Compute and display SHA checksums of requested files
 
-my($file, $digest);
-
-for $file (@ARGV) {
-	if ($digest = sumfile($file)) {
+for my $file (@ARGV) {
+	if (my $digest = sumfile($file)) {
 		print "$digest $modesym", "$file\n";
 	}
 }

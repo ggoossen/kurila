@@ -17,7 +17,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 78 + $extra ;
 
@@ -138,7 +138,7 @@ My::testParseParameters();
 {
     title "whatIsInput" ;
 
-    my $lex = new LexFile my $out_file ;
+    my $lex = LexFile->new( my $out_file) ;
     open FH, ">$out_file" ;
     is whatIsInput(*FH), 'handle', "Match filehandle" ;
     close FH ;
@@ -157,7 +157,7 @@ My::testParseParameters();
 {
     title "whatIsOutput" ;
 
-    my $lex = new LexFile my $out_file ;
+    my $lex = LexFile->new( my $out_file) ;
     open FH, ">$out_file" ;
     is whatIsOutput(*FH), 'handle', "Match filehandle" ;
     close FH ;
@@ -178,30 +178,30 @@ My::testParseParameters();
 {
     title "U64" ;
 
-    my $x = new U64();
+    my $x = U64->new();
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 0, "  getLow is 0";
 
-    $x = new U64(1,2);
-    $x = new U64(1,2);
+    $x = U64->new(1,2);
+    $x = U64->new(1,2);
     is $x->getHigh, 1, "  getHigh is 1";
     is $x->getLow, 2, "  getLow is 2";
 
-    $x = new U64(0xFFFFFFFF,2);
+    $x = U64->new(0xFFFFFFFF,2);
     is $x->getHigh, 0xFFFFFFFF, "  getHigh is 0xFFFFFFFF";
     is $x->getLow, 2, "  getLow is 2";
 
-    $x = new U64(7, 0xFFFFFFFF);
+    $x = U64->new(7, 0xFFFFFFFF);
     is $x->getHigh, 7, "  getHigh is 7";
     is $x->getLow, 0xFFFFFFFF, "  getLow is 0xFFFFFFFF";
 
-    $x = new U64(666);
+    $x = U64->new(666);
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 666, "  getLow is 666";
 
     title "U64 - add" ;
 
-    $x = new U64(0, 1);
+    $x = U64->new(0, 1);
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 1, "  getLow is 1";
 
@@ -209,7 +209,7 @@ My::testParseParameters();
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 2, "  getLow is 2";
 
-    $x = new U64(0, 0xFFFFFFFE);
+    $x = U64->new(0, 0xFFFFFFFE);
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 0xFFFFFFFE, "  getLow is 0xFFFFFFFE";
 
@@ -225,8 +225,8 @@ My::testParseParameters();
     is $x->getHigh, 1, "  getHigh is 1";
     is $x->getLow, 1, "  getLow is 1";
 
-    $x = new U64(1, 0xFFFFFFFE);
-    my $y = new U64(2, 3);
+    $x = U64->new(1, 0xFFFFFFFE);
+    my $y = U64->new(2, 3);
 
     $x->add($y);
     is $x->getHigh, 4, "  getHigh is 4";
@@ -234,15 +234,15 @@ My::testParseParameters();
 
     title "U64 - equal" ;
 
-    $x = new U64(0, 1);
+    $x = U64->new(0, 1);
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 1, "  getLow is 1";
 
-    $y = new U64(0, 1);
+    $y = U64->new(0, 1);
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 1, "  getLow is 1";
 
-    my $z = new U64(0, 2);
+    my $z = U64->new(0, 2);
     is $x->getHigh, 0, "  getHigh is 0";
     is $x->getLow, 1, "  getLow is 1";
 

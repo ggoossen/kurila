@@ -184,12 +184,7 @@ PP(pp_rv2gv)
 		    SvSETMAGIC(sv);
 		    goto wasref;
 		}
-		if (PL_op->op_flags & OPf_REF ||
-		    PL_op->op_private & HINT_STRICT_REFS)
-		    DIE(aTHX_ PL_no_usym, "a symbol");
-		if (ckWARN(WARN_UNINITIALIZED))
-		    report_uninit(sv);
-		RETSETUNDEF;
+		DIE(aTHX_ PL_no_usym, "a symbol");
 	    }
 	    if ((PL_op->op_flags & OPf_SPECIAL) &&
 		!(PL_op->op_flags & OPf_MOD))
@@ -203,16 +198,7 @@ PP(pp_rv2gv)
 		sv = temp;
 	    }
 	    else {
-		if (PL_op->op_private & HINT_STRICT_REFS)
-		    DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
-		if ((PL_op->op_private & (OPpLVAL_INTRO|OPpDONT_INIT_GV))
-		    == OPpDONT_INIT_GV) {
-		    /* We are the target of a coderef assignment.  Return
-		       the scalar unchanged, and let pp_sasssign deal with
-		       things.  */
-		    RETURN;
-		}
-		sv = (SV*)gv_fetchsv(sv, GV_ADD, SVt_PVGV);
+		DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
 	    }
 	}
     }
@@ -227,43 +213,10 @@ GV *
 Perl_softref2xv(pTHX_ SV *const sv, const char *const what, const U32 type,
 		SV ***spp)
 {
-    dVAR;
-    GV *gv;
-
-    if (PL_op->op_private & HINT_STRICT_REFS) {
-	if (SvOK(sv))
-	    Perl_die(aTHX_ PL_no_symref_sv, sv, what);
-	else
-	    Perl_die(aTHX_ PL_no_usym, what);
-    }
-    if (!SvOK(sv)) {
-	if (PL_op->op_flags & OPf_REF)
-	    Perl_die(aTHX_ PL_no_usym, what);
-	if (ckWARN(WARN_UNINITIALIZED))
-	    report_uninit(sv);
-	if (type != SVt_PV && GIMME_V == G_ARRAY) {
-	    (*spp)--;
-	    return NULL;
-	}
-	**spp = &PL_sv_undef;
-	return NULL;
-    }
-    if ((PL_op->op_flags & OPf_SPECIAL) &&
-	!(PL_op->op_flags & OPf_MOD))
-	{
-	    gv = gv_fetchsv(sv, 0, type);
-	    if (!gv
-		&& (!is_gv_magical_sv(sv,0)
-		    || !(gv = gv_fetchsv(sv, GV_ADD, type))))
-		{
-		    **spp = &PL_sv_undef;
-		    return NULL;
-		}
-	}
-    else {
-	gv = gv_fetchsv(sv, GV_ADD, type);
-    }
-    return gv;
+    if (SvOK(sv))
+	Perl_die(aTHX_ PL_no_symref_sv, sv, what);
+    else
+	Perl_die(aTHX_ PL_no_usym, what);
 }
 
 PP(pp_rv2sv)
@@ -280,7 +233,6 @@ PP(pp_rv2sv)
 	case SVt_PVAV:
 	case SVt_PVHV:
 	case SVt_PVCV:
-	case SVt_PVFM:
 	case SVt_PVIO:
 	    DIE(aTHX_ "Not a SCALAR reference");
 	default: NOOP;
@@ -335,17 +287,12 @@ PP(pp_pos)
     dVAR; dSP; dTARGET; dPOPss;
 
     if (PL_op->op_flags & OPf_MOD || LVRET) {
-	if (SvTYPE(TARG) < SVt_PVLV) {
-	    sv_upgrade(TARG, SVt_PVLV);
-	    sv_magic(TARG, NULL, PERL_MAGIC_pos, NULL, 0);
-	}
+	TARG = sv_newmortal();
+	sv_upgrade(TARG, SVt_PVLV);
+	sv_magic(TARG, NULL, PERL_MAGIC_pos, NULL, 0);
 
 	LvTYPE(TARG) = '.';
-	if (LvTARG(TARG) != sv) {
-	    if (LvTARG(TARG))
-		SvREFCNT_dec(LvTARG(TARG));
-	    LvTARG(TARG) = SvREFCNT_inc_simple(sv);
-	}
+	LvTARG(TARG) = SvREFCNT_inc_simple(sv);
 	PUSHs(TARG);	/* no SvSETMAGIC */
 	RETURN;
     }
@@ -356,7 +303,7 @@ PP(pp_pos)
 		I32 i = mg->mg_len;
 		if (DO_UTF8(sv))
 		    sv_pos_b2u(sv, &i);
-		PUSHi(i + CopARYBASE_get(PL_curcop));
+		PUSHi(i);
 		RETURN;
 	    }
 	}
@@ -416,7 +363,7 @@ PP(pp_prototype)
 		char str[ MAX_ARGS_OP * 2 + 2 ]; /* One ';', one '\0' */
 
 		if (code == -KEY_chop || code == -KEY_chomp
-			|| code == -KEY_exec || code == -KEY_system)
+			|| code == -KEY_exec || code == -KEY_system || code == -KEY_err)
 		    goto set;
 		if (code == -KEY_mkdir) {
 		    ret = sv_2mortal(newSVpvs("_;$"));
@@ -612,9 +559,6 @@ PP(pp_gelem)
 		deprecate("*glob{FILEHANDLE}");
 		tmpRef = (SV*)GvIOp(gv);
 	    }
-	    else
-		if (strEQ(second_letter, "ORMAT"))
-		    tmpRef = (SV*)GvFORM(gv);
 	    break;
 	case 'G':
 	    if (strEQ(second_letter, "LOB"))
@@ -673,7 +617,7 @@ PP(pp_study)
     }
     s = (unsigned char*)(SvPV(sv, len));
     pos = len;
-    if (pos <= 0 || !SvPOK(sv) || SvUTF8(sv)) {
+    if (pos <= 0 || !SvPOK(sv)) {
 	/* No point in studying a zero length string, and not safe to study
 	   anything that doesn't appear to be a simple scalar (and hence might
 	   change between now and when the regexp engine runs without our set
@@ -814,8 +758,6 @@ PP(pp_undef)
 	if (cv_const_sv((CV*)sv) && ckWARN(WARN_MISC))
 	    Perl_warner(aTHX_ packWARN(WARN_MISC), "Constant subroutine %s undefined",
 		 CvANON((CV*)sv) ? "(anonymous)" : GvENAME(CvGV((CV*)sv)));
-	/* FALLTHROUGH */
-    case SVt_PVFM:
 	{
 	    /* let user-undef'd sub keep its identity */
 	    GV* const gv = CvGV((CV*)sv);
@@ -1559,10 +1501,7 @@ PP(pp_repeat)
 	    }
 	    *SvEND(TARG) = '\0';
 	}
-	if (isutf)
-	    (void)SvPOK_only_UTF8(TARG);
-	else
-	    (void)SvPOK_only(TARG);
+	(void)SvPOK_only(TARG);
 
 	if (PL_op->op_private & OPpREPEAT_DOLIST) {
 	    /* The parser saw this as a list repeat, and there
@@ -2271,9 +2210,7 @@ PP(pp_sle)
     tryAMAGICbinSET_var(amg_type,0);
     {
       dPOPTOPssrl;
-      const int cmp = (IN_LOCALE_RUNTIME
-		 ? sv_cmp_locale(left, right)
-		 : sv_cmp(left, right));
+      const int cmp = sv_cmp(left, right);
       SETs(boolSV(cmp * multiplier < rhs));
       RETURN;
     }
@@ -2304,9 +2241,7 @@ PP(pp_scmp)
     dVAR; dSP; dTARGET;  tryAMAGICbin(scmp,0);
     {
       dPOPTOPssrl;
-      const int cmp = (IN_LOCALE_RUNTIME
-		 ? sv_cmp_locale(left, right)
-		 : sv_cmp(left, right));
+      const int cmp = sv_cmp(left, right);
       SETi( cmp );
       RETURN;
     }
@@ -2471,62 +2406,6 @@ PP(pp_complement)
 	sv_setsv_nomg(TARG, sv);
 	tmps = (U8*)SvPV_force(TARG, len);
 	anum = len;
-	if (SvUTF8(TARG)) {
-	  /* Calculate exact length, let's not estimate. */
-	  STRLEN targlen = 0;
-	  STRLEN l;
-	  UV nchar = 0;
-	  UV nwide = 0;
-	  U8 * const send = tmps + len;
-	  U8 * const origtmps = tmps;
-	  const UV utf8flags = UTF8_ALLOW_ANYUV;
-
-	  while (tmps < send) {
-	    const UV c = utf8n_to_uvchr(tmps, send-tmps, &l, utf8flags);
-	    tmps += l;
-	    targlen += UNISKIP(~c);
-	    nchar++;
-	    if (c > 0xff)
-		nwide++;
-	  }
-
-	  /* Now rewind strings and write them. */
-	  tmps = origtmps;
-
-	  if (nwide) {
-	      U8 *result;
-	      U8 *p;
-
-	      Newx(result, targlen + 1, U8);
-	      p = result;
-	      while (tmps < send) {
-		  const UV c = utf8n_to_uvchr(tmps, send-tmps, &l, utf8flags);
-		  tmps += l;
-		  p = uvchr_to_utf8_flags(p, ~c, UNICODE_ALLOW_ANY);
-	      }
-	      *p = '\0';
-	      sv_usepvn_flags(TARG, (char*)result, targlen,
-			      SV_HAS_TRAILING_NUL);
-	      SvUTF8_on(TARG);
-	  }
-	  else {
-	      U8 *result;
-	      U8 *p;
-
-	      Newx(result, nchar + 1, U8);
-	      p = result;
-	      while (tmps < send) {
-		  const U8 c = (U8)utf8n_to_uvchr(tmps, send-tmps, &l, utf8flags);
-		  tmps += l;
-		  *p++ = ~c;
-	      }
-	      *p = '\0';
-	      sv_usepvn_flags(TARG, (char*)result, nchar, SV_HAS_TRAILING_NUL);
-	      SvUTF8_off(TARG);
-	  }
-	  SETs(TARG);
-	  RETURN;
-	}
 #ifdef LIBERAL
 	{
 	    register long *tmpl;
@@ -2957,15 +2836,6 @@ PP(pp_oct)
     SV* const sv = POPs;
 
     tmps = (SvPV_const(sv, len));
-    if (DO_UTF8(sv)) {
-	 /* If Unicode, try to downgrade
-	  * If not possible, croak. */
-	 SV* const tsv = sv_2mortal(newSVsv(sv));
-	
-	 SvUTF8_on(tsv);
-	 sv_utf8_downgrade(tsv, FALSE);
-	 tmps = SvPV_const(tsv, len);
-    }
     if (PL_op->op_type == OP_HEX)
 	goto hex;
 
@@ -3006,14 +2876,14 @@ PP(pp_length)
 	STRLEN len;
 	const char *const p = SvPV_const(sv, len);
 
-	if (DO_UTF8(sv)) {
+	if (IN_CODEPOINTS) {
 	    SETi(utf8_length((U8*)p, (U8*)p + len));
 	}
 	else
 	    SETi(len);
 
     }
-    else if (DO_UTF8(sv))
+    else if (IN_CODEPOINTS)
 	SETi(sv_len_utf8(sv));
     else
 	SETi(sv_len(sv));
@@ -3026,54 +2896,33 @@ PP(pp_substr)
     SV *sv;
     I32 len = 0;
     STRLEN curlen;
-    STRLEN utf8_curlen;
     I32 pos;
     I32 rem;
     I32 fail;
     const I32 lvalue = PL_op->op_flags & OPf_MOD || LVRET;
     const char *tmps;
-    const I32 arybase = CopARYBASE_get(PL_curcop);
     SV *repl_sv = NULL;
     const char *repl = NULL;
     STRLEN repl_len;
     const int num_args = PL_op->op_private & 7;
-    bool repl_need_utf8_upgrade = FALSE;
-    bool repl_is_utf8 = FALSE;
 
     SvTAINTED_off(TARG);			/* decontaminate */
-    SvUTF8_off(TARG);				/* decontaminate */
     if (num_args > 2) {
 	if (num_args > 3) {
 	    repl_sv = POPs;
 	    repl = SvPV_const(repl_sv, repl_len);
-	    repl_is_utf8 = DO_UTF8(repl_sv) && SvCUR(repl_sv);
 	}
 	len = POPi;
     }
     pos = POPi;
     sv = POPs;
     PUTBACK;
-    if (repl_sv) {
-	if (repl_is_utf8) {
-	    if (!DO_UTF8(sv))
-		sv_utf8_upgrade(sv);
-	}
-	else if (DO_UTF8(sv))
-	    repl_need_utf8_upgrade = TRUE;
-    }
     tmps = SvPV_const(sv, curlen);
-    if (DO_UTF8(sv)) {
-        utf8_curlen = sv_len_utf8(sv);
-	if (utf8_curlen == curlen)
-	    utf8_curlen = 0;
-	else
-	    curlen = utf8_curlen;
-    }
-    else
-	utf8_curlen = 0;
 
-    if (pos >= arybase) {
-	pos -= arybase;
+    if (IN_CODEPOINTS)
+	curlen = sv_len_utf8(sv);
+
+    if (pos >= 0) {
 	rem = curlen-pos;
 	fail = rem;
 	if (num_args > 2) {
@@ -3115,40 +2964,22 @@ PP(pp_substr)
     else {
 	const I32 upos = pos;
 	const I32 urem = rem;
-	if (utf8_curlen)
+	if (IN_CODEPOINTS)
 	    sv_pos_u2b(sv, &pos, &rem);
 	tmps += pos;
-	/* we either return a PV or an LV. If the TARG hasn't been used
-	 * before, or is of that type, reuse it; otherwise use a mortal
-	 * instead. Note that LVs can have an extended lifetime, so also
-	 * dont reuse if refcount > 1 (bug #20933) */
-	if (SvTYPE(TARG) > SVt_NULL) {
-	    if ( (SvTYPE(TARG) == SVt_PVLV)
-		    ? (!lvalue || SvREFCNT(TARG) > 1)
-		    : lvalue)
-	    {
-		TARG = sv_newmortal();
-	    }
+	/* use a mortal for LVs because they can have an extended lifetime */
+	if (lvalue) {
+	    TARG = sv_newmortal();
 	}
 
 	sv_setpvn(TARG, tmps, rem);
 #ifdef USE_LOCALE_COLLATE
 	sv_unmagic(TARG, PERL_MAGIC_collxfrm);
 #endif
-	if (utf8_curlen)
-	    SvUTF8_on(TARG);
 	if (repl) {
 	    SV* repl_sv_copy = NULL;
 
-	    if (repl_need_utf8_upgrade) {
-		repl_sv_copy = newSVsv(repl_sv);
-		sv_utf8_upgrade(repl_sv_copy);
-		repl = SvPV_const(repl_sv_copy, repl_len);
-		repl_is_utf8 = DO_UTF8(repl_sv_copy) && SvCUR(sv);
-	    }
 	    sv_insert(sv, pos, rem, repl, repl_len);
-	    if (repl_is_utf8)
-		SvUTF8_on(sv);
 	    if (repl_sv_copy)
 		SvREFCNT_dec(repl_sv_copy);
 	}
@@ -3163,7 +2994,7 @@ PP(pp_substr)
 		if (isGV_with_GP(sv))
 		    SvPV_force_nolen(sv);
 		else if (SvOK(sv))	/* is it defined ? */
-		    (void)SvPOK_only_UTF8(sv);
+		    (void)SvPOK_only(sv);
 		else
 		    sv_setpvn(sv,"",0);	/* avoid lexical reincarnation */
 	    }
@@ -3173,14 +3004,11 @@ PP(pp_substr)
 		sv_magic(TARG, NULL, PERL_MAGIC_substr, NULL, 0);
 	    }
 
-	    LvTYPE(TARG) = 'x';
-	    if (LvTARG(TARG) != sv) {
-		if (LvTARG(TARG))
-		    SvREFCNT_dec(LvTARG(TARG));
-		LvTARG(TARG) = SvREFCNT_inc_simple(sv);
-	    }
+	    LvTYPE(TARG) = IN_CODEPOINTS ? 'X' : 'x';
+	    LvTARG(TARG) = SvREFCNT_inc_simple(sv);
 	    LvTARGOFF(TARG) = upos;
 	    LvTARGLEN(TARG) = urem;
+
 	}
     }
     SPAGAIN;
@@ -3198,18 +3026,12 @@ PP(pp_vec)
 
     SvTAINTED_off(TARG);		/* decontaminate */
     if (lvalue) {			/* it's an lvalue! */
-	if (SvREFCNT(TARG) > 1)	/* don't share the TARG (#20933) */
-	    TARG = sv_newmortal();
-	if (SvTYPE(TARG) < SVt_PVLV) {
-	    sv_upgrade(TARG, SVt_PVLV);
-	    sv_magic(TARG, NULL, PERL_MAGIC_vec, NULL, 0);
-	}
+	/* always use a mortal for lvalues */
+	TARG = sv_newmortal();
+	sv_upgrade(TARG, SVt_PVLV);
+	sv_magic(TARG, NULL, PERL_MAGIC_vec, NULL, 0);
 	LvTYPE(TARG) = 'v';
-	if (LvTARG(TARG) != src) {
-	    if (LvTARG(TARG))
-		SvREFCNT_dec(LvTARG(TARG));
-	    LvTARG(TARG) = SvREFCNT_inc_simple(src);
-	}
+	LvTARG(TARG) = SvREFCNT_inc_simple(src);
 	LvTARGOFF(TARG) = offset;
 	LvTARGLEN(TARG) = size;
     }
@@ -3231,70 +3053,22 @@ PP(pp_index)
     I32 retval;
     const char *big_p;
     const char *little_p;
-    const I32 arybase = CopARYBASE_get(PL_curcop);
-    bool big_utf8;
-    bool little_utf8;
     const bool is_index = PL_op->op_type == OP_INDEX;
 
     if (MAXARG >= 3) {
-	/* arybase is in characters, like offset, so combine prior to the
-	   UTF-8 to bytes calculation.  */
-	offset = POPi - arybase;
+	offset = POPi;
     }
     little = POPs;
     big = POPs;
     big_p = SvPV_const(big, biglen);
     little_p = SvPV_const(little, llen);
 
-    big_utf8 = DO_UTF8(big);
-    little_utf8 = DO_UTF8(little);
-    if (big_utf8 ^ little_utf8) {
-	/* One needs to be upgraded.  */
-	if (little_utf8 && !PL_encoding) {
-	    /* Well, maybe instead we might be able to downgrade the small
-	       string?  */
-	    char * const pv = (char*)bytes_from_utf8((U8 *)little_p, &llen,
-						     &little_utf8);
-	    if (little_utf8) {
-		/* If the large string is ISO-8859-1, and it's not possible to
-		   convert the small string to ISO-8859-1, then there is no
-		   way that it could be found anywhere by index.  */
-		retval = -1;
-		goto fail;
-	    }
-
-	    /* At this point, pv is a malloc()ed string. So donate it to temp
-	       to ensure it will get free()d  */
-	    little = temp = newSV(0);
-	    sv_usepvn(temp, pv, llen);
-	    little_p = SvPVX(little);
-	} else {
-	    temp = little_utf8
-		? newSVpvn(big_p, biglen) : newSVpvn(little_p, llen);
-
-	    if (PL_encoding) {
-		sv_recode_to_utf8(temp, PL_encoding);
-	    } else {
-		sv_utf8_upgrade(temp);
-	    }
-	    if (little_utf8) {
-		big = temp;
-		big_utf8 = TRUE;
-		big_p = SvPV_const(big, biglen);
-	    } else {
-		little = temp;
-		little_p = SvPV_const(little, llen);
-	    }
-	}
-    }
     if (SvGAMAGIC(big)) {
 	/* Life just becomes a lot easier if I use a temporary here.
 	   Otherwise I need to avoid calls to sv_pos_u2b(), which (dangerously)
 	   will trigger magic and overloading again, as will fbm_instr()
 	*/
 	big = sv_2mortal(newSVpvn(big_p, biglen));
-	if (big_utf8)
-	    SvUTF8_on(big);
 	big_p = SvPVX(big);
     }
     if (SvGAMAGIC(little) || (is_index && !SvOK(little))) {
@@ -3307,15 +3081,13 @@ PP(pp_index)
 	   because data access has side effects.
 	*/
 	little = sv_2mortal(newSVpvn(little_p, llen));
-	if (little_utf8)
-	    SvUTF8_on(little);
 	little_p = SvPVX(little);
     }
 
     if (MAXARG < 3)
 	offset = is_index ? 0 : biglen;
     else {
-	if (big_utf8 && offset > 0)
+	if (IN_CODEPOINTS && offset > 0)
 	    sv_pos_u2b(big, &offset, 0);
 	if (!is_index)
 	    offset += llen;
@@ -3332,13 +3104,12 @@ PP(pp_index)
 	retval = -1;
     else {
 	retval = little_p - big_p;
-	if (retval > 0 && big_utf8)
+	if (retval > 0 && IN_CODEPOINTS)
 	    sv_pos_b2u(big, &retval);
     }
     if (temp)
 	SvREFCNT_dec(temp);
- fail:
-    PUSHi(retval + arybase);
+    PUSHi(retval);
     RETURN;
 }
 
@@ -3362,13 +3133,7 @@ PP(pp_ord)
     STRLEN len;
     const U8 *s = (U8*)SvPV_const(argsv, len);
 
-    if (PL_encoding && SvPOK(argsv) && !DO_UTF8(argsv)) {
-        SV * const tmpsv = sv_2mortal(newSVsv(argsv));
-        s = (U8*)sv_recode_to_utf8(tmpsv, PL_encoding);
-        argsv = tmpsv;
-    }
-
-    XPUSHu(DO_UTF8(argsv) ?
+    XPUSHu(IN_CODEPOINTS ?
 	   utf8n_to_uvchr(s, UTF8_MAXBYTES, 0, UTF8_ALLOW_ANYUV) :
 	   (UV)(*s & 0xff));
 
@@ -3384,7 +3149,7 @@ PP(pp_chr)
     if (((SvIOK_notUV(TOPs) && SvIV(TOPs) < 0)
 	 ||
 	 (SvNOK(TOPs) && SvNV(TOPs) < 0.0))) {
-	if (IN_BYTES) {
+	if ( ! IN_CODEPOINTS ) {
 	    value = POPu; /* chr(-1) eq chr(0xff), etc. */
 	} else {
 	    (void) POPs; /* Ignore the argument value. */
@@ -3396,15 +3161,18 @@ PP(pp_chr)
 
     SvUPGRADE(TARG,SVt_PV);
 
-    if (value > 255 && !IN_BYTES) {
+    if (IN_CODEPOINTS) {
 	SvGROW(TARG, (STRLEN)UNISKIP(value)+1);
 	tmps = (char*)uvchr_to_utf8_flags((U8*)SvPVX(TARG), value, 0);
 	SvCUR_set(TARG, tmps - SvPVX_const(TARG));
 	*tmps = '\0';
 	(void)SvPOK_only(TARG);
-	SvUTF8_on(TARG);
 	XPUSHs(TARG);
 	RETURN;
+    } else if ( ! IN_BYTES ) {
+	if ( ! UNI_IS_INVARIANT(value) )
+	    Perl_warner(aTHX_ packWARN(WARN_MISC),
+			"chr() ambiguous with highbit without use bytes or use utf8");
     }
 
     SvGROW(TARG,2);
@@ -3413,20 +3181,6 @@ PP(pp_chr)
     *tmps++ = (char)value;
     *tmps = '\0';
     (void)SvPOK_only(TARG);
-
-    if (PL_encoding && !IN_BYTES) {
-        sv_recode_to_utf8(TARG, PL_encoding);
-	tmps = SvPVX(TARG);
-	if (SvCUR(TARG) == 0 || !is_utf8_string((U8*)tmps, SvCUR(TARG)) ||
-	    UNICODE_IS_REPLACEMENT(utf8_to_uvchr((U8*)tmps, NULL))) {
-	    SvGROW(TARG, 2);
-	    tmps = SvPVX(TARG);
-	    SvCUR_set(TARG, 1);
-	    *tmps++ = (char)value;
-	    *tmps = '\0';
-	    SvUTF8_off(TARG);
-	}
-    }
 
     XPUSHs(TARG);
     RETURN;
@@ -3440,16 +3194,6 @@ PP(pp_crypt)
     STRLEN len;
     const char *tmps = SvPV_const(left, len);
 
-    if (DO_UTF8(left)) {
-         /* If Unicode, try to downgrade.
-	  * If not possible, croak.
-	  * Yes, we made this up.  */
-	 SV* const tsv = sv_2mortal(newSVsv(left));
-
-	 SvUTF8_on(tsv);
-	 sv_utf8_downgrade(tsv, FALSE);
-	 tmps = SvPV_const(tsv, len);
-    }
 #   ifdef USE_ITHREADS
 #     ifdef HAS_CRYPT_R
     if (!PL_reentrant_buffer->_crypt_struct_buffer) {
@@ -3490,7 +3234,6 @@ PP(pp_ucfirst)
     STRLEN need;
     SV *dest;
     bool inplace = TRUE;
-    bool doing_utf8;
     const int op_type = PL_op->op_type;
     const U8 *s;
     U8 *d;
@@ -3506,28 +3249,32 @@ PP(pp_ucfirst)
 	slen = 0;
     }
 
-    if (slen && DO_UTF8(source) && UTF8_IS_START(*s)) {
-	doing_utf8 = TRUE;
-	utf8_to_uvchr(s, &ulen);
-	if (op_type == OP_UCFIRST) {
-	    toTITLE_utf8(s, tmpbuf, &tculen);
+    if (IN_CODEPOINTS) {
+	if (slen) {
+	    UV u = utf8n_to_uvuni(s, slen, &ulen, 0);
+	    if (u == 0) {
+		/* invalid unicode character, keep it */
+		ulen = 0;
+		tculen = 0;
+	    } else {
+		if (op_type == OP_UCFIRST) {
+		    toTITLE_utf8(s, tmpbuf, &tculen);
+		} else {
+		    toLOWER_utf8(s, tmpbuf, &tculen);
+		}
+	    }
 	} else {
-	    toLOWER_utf8(s, tmpbuf, &tculen);
+	    ulen = 0;
+	    tculen = 0;
 	}
 	/* If the two differ, we definately cannot do inplace.  */
 	inplace = (ulen == tculen);
 	need = slen + 1 - ulen + tculen;
     } else {
-	doing_utf8 = FALSE;
 	need = slen + 1;
     }
 
-    if (SvPADTMP(source) && !SvREADONLY(source) && inplace && SvTEMP(source)) {
-	/* We can convert in place.  */
-
-	dest = source;
-	s = d = (U8*)SvPV_force_nomg(source, slen);
-    } else {
+    {
 	dTARGET;
 
 	dest = TARG;
@@ -3541,7 +3288,8 @@ PP(pp_ucfirst)
 	inplace = FALSE;
     }
 
-    if (doing_utf8) {
+
+    if (IN_CODEPOINTS) {
 	if(!inplace) {
 	    /* slen is the byte length of the whole SV.
 	     * ulen is the byte length of the original Unicode character
@@ -3553,7 +3301,6 @@ PP(pp_ucfirst)
 	    sv_setpvn(dest, (char*)tmpbuf, tculen);
 	    if (slen > ulen)
 	        sv_catpvn(dest, (char*)(s + ulen), slen - ulen);
-	    SvUTF8_on(dest);
 	}
 	else {
 	    Copy(tmpbuf, d, tculen, U8);
@@ -3562,21 +3309,11 @@ PP(pp_ucfirst)
     }
     else {
 	if (*s) {
-	    if (IN_LOCALE_RUNTIME) {
-		TAINT;
-		SvTAINTED_on(dest);
-		*d = (op_type == OP_UCFIRST)
-		    ? toUPPER_LC(*s) : toLOWER_LC(*s);
-	    }
-	    else
-		*d = (op_type == OP_UCFIRST) ? toUPPER(*s) : toLOWER(*s);
+	    *d = (op_type == OP_UCFIRST) ? toUPPER(*s) : toLOWER(*s);
 	} else {
 	    /* See bug #39028  */
 	    *d = *s;
 	}
-
-	if (SvUTF8(source))
-	    SvUTF8_on(dest);
 
 	if (!inplace) {
 	    /* This will copy the trailing NUL  */
@@ -3604,14 +3341,7 @@ PP(pp_uc)
 
     SvGETMAGIC(source);
 
-    if (SvPADTMP(source) && !SvREADONLY(source) && !SvAMAGIC(source)
-	&& SvTEMP(source) && !DO_UTF8(source)) {
-	/* We can convert in place.  */
-
-	dest = source;
-	s = d = (U8*)SvPV_force_nomg(source, len);
-	min = len + 1;
-    } else {
+    {
 	dTARGET;
 
 	dest = TARG;
@@ -3638,10 +3368,7 @@ PP(pp_uc)
 	SETs(dest);
     }
 
-    /* Overloaded values may have toggled the UTF-8 flag on source, so we need
-       to check DO_UTF8 again here.  */
-
-    if (DO_UTF8(source)) {
+    if (IN_CODEPOINTS) {
 	const U8 *const send = s + len;
 	U8 tmpbuf[UTF8_MAXBYTES+1];
 
@@ -3665,22 +3392,13 @@ PP(pp_uc)
 	    d += ulen;
 	    s += u;
 	}
-	SvUTF8_on(dest);
 	*d = '\0';
 	SvCUR_set(dest, d - (U8*)SvPVX_const(dest));
     } else {
 	if (len) {
 	    const U8 *const send = s + len;
-	    if (IN_LOCALE_RUNTIME) {
-		TAINT;
-		SvTAINTED_on(dest);
-		for (; s < send; d++, s++)
-		    *d = toUPPER_LC(*s);
-	    }
-	    else {
-		for (; s < send; d++, s++)
-		    *d = toUPPER(*s);
-	    }
+	    for (; s < send; d++, s++)
+		*d = toUPPER(*s);
 	}
 	if (source != dest) {
 	    *d = '\0';
@@ -3704,14 +3422,7 @@ PP(pp_lc)
 
     SvGETMAGIC(source);
 
-    if (SvPADTMP(source) && !SvREADONLY(source) && !SvAMAGIC(source)
-	&& SvTEMP(source) && !DO_UTF8(source)) {
-	/* We can convert in place.  */
-
-	dest = source;
-	s = d = (U8*)SvPV_force_nomg(source, len);
-	min = len + 1;
-    } else {
+    {
 	dTARGET;
 
 	dest = TARG;
@@ -3741,7 +3452,7 @@ PP(pp_lc)
     /* Overloaded values may have toggled the UTF-8 flag on source, so we need
        to check DO_UTF8 again here.  */
 
-    if (DO_UTF8(source)) {
+    if (IN_CODEPOINTS) {
 	const U8 *const send = s + len;
 	U8 tmpbuf[UTF8_MAXBYTES_CASE+1];
 
@@ -3781,22 +3492,13 @@ PP(pp_lc)
 	    d += ulen;
 	    s += u;
 	}
-	SvUTF8_on(dest);
 	*d = '\0';
 	SvCUR_set(dest, d - (U8*)SvPVX_const(dest));
     } else {
 	if (len) {
 	    const U8 *const send = s + len;
-	    if (IN_LOCALE_RUNTIME) {
-		TAINT;
-		SvTAINTED_on(dest);
-		for (; s < send; d++, s++)
-		    *d = toLOWER_LC(*s);
-	    }
-	    else {
-		for (; s < send; d++, s++)
-		    *d = toLOWER(*s);
-	    }
+	    for (; s < send; d++, s++)
+		*d = toLOWER(*s);
 	}
 	if (source != dest) {
 	    *d = '\0';
@@ -3814,13 +3516,12 @@ PP(pp_quotemeta)
     STRLEN len;
     register const char *s = SvPV_const(sv,len);
 
-    SvUTF8_off(TARG);				/* decontaminate */
     if (len) {
 	register char *d;
 	SvUPGRADE(TARG, SVt_PV);
 	SvGROW(TARG, (len * 2) + 1);
 	d = SvPVX(TARG);
-	if (DO_UTF8(sv)) {
+	if (IN_CODEPOINTS) {
 	    while (len) {
 		if (UTF8_IS_CONTINUED(*s)) {
 		    STRLEN ulen = UTF8SKIP(s);
@@ -3837,7 +3538,6 @@ PP(pp_quotemeta)
 		    len--;
 		}
 	    }
-	    SvUTF8_on(TARG);
 	}
 	else {
 	    while (len--) {
@@ -3848,7 +3548,7 @@ PP(pp_quotemeta)
 	}
 	*d = '\0';
 	SvCUR_set(TARG, d - SvPVX_const(TARG));
-	(void)SvPOK_only_UTF8(TARG);
+	(void)SvPOK_only(TARG);
     }
     else
 	sv_setpvn(TARG, s, len);
@@ -3867,7 +3567,6 @@ PP(pp_aslice)
     register const I32 lval = (PL_op->op_flags & OPf_MOD || LVRET);
 
     if (SvTYPE(av) == SVt_PVAV) {
-	const I32 arybase = CopARYBASE_get(PL_curcop);
 	if (lval && PL_op->op_private & OPpLVAL_INTRO) {
 	    register SV **svp;
 	    I32 max = -1;
@@ -3883,8 +3582,6 @@ PP(pp_aslice)
 	    register SV **svp;
 	    I32 elem = SvIV(*MARK);
 
-	    if (elem > 0)
-		elem -= arybase;
 	    svp = av_fetch(av, elem, lval);
 	    if (lval) {
 		if (!svp || *svp == &PL_sv_undef)
@@ -4066,7 +3763,7 @@ PP(pp_hslice)
         }
 
         he = hv_fetch_ent(hv, keysv, lval, 0);
-        svp = he ? &HeVAL(he) : NULL;
+        svp = he ? &HeVAL(he) : 0;
 
         if (lval) {
             if (!svp || *svp == &PL_sv_undef) {
@@ -4081,8 +3778,7 @@ PP(pp_hslice)
 		    else {
 			STRLEN keylen;
 			const char * const key = SvPV_const(keysv, keylen);
-			SAVEDELETE(hv, savepvn(key,keylen),
-				   SvUTF8(keysv) ? -(I32)keylen : (I32)keylen);
+			SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
 		    }
 		}
             }
@@ -4120,7 +3816,6 @@ PP(pp_lslice)
     SV ** const lastlelem = PL_stack_base + POPMARK;
     SV ** const firstlelem = PL_stack_base + POPMARK + 1;
     register SV ** const firstrelem = lastlelem + 1;
-    const I32 arybase = CopARYBASE_get(PL_curcop);
     I32 is_something_there = FALSE;
 
     register const I32 max = lastrelem - lastlelem;
@@ -4130,8 +3825,6 @@ PP(pp_lslice)
 	I32 ix = SvIV(*lastlelem);
 	if (ix < 0)
 	    ix += max;
-	else
-	    ix -= arybase;
 	if (ix < 0 || ix >= max)
 	    *firstlelem = &PL_sv_undef;
 	else
@@ -4149,8 +3842,6 @@ PP(pp_lslice)
 	I32 ix = SvIV(*lelem);
 	if (ix < 0)
 	    ix += max;
-	else
-	    ix -= arybase;
 	if (ix < 0 || ix >= max)
 	    *lelem = &PL_sv_undef;
 	else {
@@ -4228,8 +3919,6 @@ PP(pp_splice)
 	offset = i = SvIV(*MARK);
 	if (offset < 0)
 	    offset += AvFILLp(ary) + 1;
-	else
-	    offset -= CopARYBASE_get(PL_curcop);
 	if (offset < 0)
 	    DIE(aTHX_ PL_no_aelem, i);
 	if (++MARK < SP) {
@@ -4420,17 +4109,12 @@ PP(pp_push)
 	PUSHi( AvFILL(ary) + 1 );
     }
     else {
-	PL_delaymagic = DM_DELAY;
 	for (++MARK; MARK <= SP; MARK++) {
 	    SV * const sv = newSV(0);
 	    if (*MARK)
 		sv_setsv(sv, *MARK);
 	    av_store(ary, AvFILLp(ary)+1, sv);
 	}
-	if (PL_delaymagic & DM_ARRAY)
-	    mg_set((SV*)ary);
-
-	PL_delaymagic = 0;
 	SP = ORIGMARK;
 	PUSHi( AvFILLp(ary) + 1 );
     }
@@ -4502,7 +4186,6 @@ PP(pp_reverse)
 	STRLEN len;
 	PADOFFSET padoff_du;
 
-	SvUTF8_off(TARG);				/* decontaminate */
 	if (SP - MARK > 1)
 	    do_join(TARG, &PL_sv_no, MARK, SP);
 	else
@@ -4544,7 +4227,7 @@ PP(pp_reverse)
 		*up++ = *down;
 		*down-- = (char)tmp;
 	    }
-	    (void)SvPOK_only_UTF8(TARG);
+	    (void)SvPOK_only(TARG);
 	}
 	SP = MARK + 1;
 	SETTARG;
@@ -4560,14 +4243,14 @@ PP(pp_split)
     SV * const sv = POPs;
     STRLEN len;
     register const char *s = SvPV_const(sv, len);
-    const bool do_utf8 = DO_UTF8(sv);
+    bool do_utf8;
     const char *strend = s + len;
     register PMOP *pm;
     register REGEXP *rx;
     register SV *dstr;
     register const char *m;
     I32 iters = 0;
-    const STRLEN slen = do_utf8 ? utf8_length((U8*)s, (U8*)strend) : (STRLEN)(strend - s);
+    const STRLEN slen = (STRLEN)(strend - s);
     I32 maxiters = slen + 10;
     const char *orig;
     const I32 origlimit = limit;
@@ -4588,10 +4271,9 @@ PP(pp_split)
 	DIE(aTHX_ "panic: pp_split");
     rx = PM_GETRE(pm);
 
-    TAINT_IF((rx->extflags & RXf_PMf_LOCALE) &&
-	     (rx->extflags & (RXf_WHITE | RXf_SKIPWHITE)));
+    do_utf8 = (rx->extflags & RXf_PMf_UTF8) != 0;
 
-    RX_MATCH_UTF8_set(rx, do_utf8);
+    TAINT_IF((rx->extflags & (RXf_WHITE | RXf_SKIPWHITE)));
 
 #ifdef USE_ITHREADS
     if (pm->op_pmreplrootu.op_pmtargetoff) {
@@ -4636,10 +4318,6 @@ PP(pp_split)
 	    while (*s == ' ' || is_utf8_space((U8*)s))
 		s += UTF8SKIP(s);
 	}
-	else if (rx->extflags & RXf_PMf_LOCALE) {
-	    while (isSPACE_LC(*s))
-		s++;
-	}
 	else {
 	    while (isSPACE(*s))
 		s++;
@@ -4664,9 +4342,6 @@ PP(pp_split)
 		    else
 			m += t;
 		}
-            } else if (rx->extflags & RXf_PMf_LOCALE) {
-	        while (m < strend && !isSPACE_LC(*m))
-		    ++m;
             } else {
                 while (m < strend && !isSPACE(*m))
                     ++m;
@@ -4677,8 +4352,6 @@ PP(pp_split)
 	    dstr = newSVpvn(s, m-s);
 	    if (make_mortal)
 		sv_2mortal(dstr);
-	    if (do_utf8)
-		(void)SvUTF8_on(dstr);
 	    XPUSHs(dstr);
 
 	    /* skip the whitespace found last */
@@ -4691,9 +4364,6 @@ PP(pp_split)
 	    if (do_utf8) {
 		while (s < strend && ( *s == ' ' || is_utf8_space((U8*)s) ))
 	            s +=  UTF8SKIP(s);
-            } else if (rx->extflags & RXf_PMf_LOCALE) {
-	        while (s < strend && isSPACE_LC(*s))
-		    ++s;
             } else {
                 while (s < strend && isSPACE(*s))
                     ++s;
@@ -4710,68 +4380,18 @@ PP(pp_split)
 	    dstr = newSVpvn(s, m-s);
 	    if (make_mortal)
 		sv_2mortal(dstr);
-	    if (do_utf8)
-		(void)SvUTF8_on(dstr);
 	    XPUSHs(dstr);
 	    s = m;
 	}
     }
-    else if (rx->extflags & RXf_NULL && !(s >= strend)) {
-        /*
-          Pre-extend the stack, either the number of bytes or
-          characters in the string or a limited amount, triggered by:
-
-          my ($x, $y) = split //, $str;
-            or
-          split //, $str, $i;
-        */
-        const U32 items = limit - 1; 
-        if (items < slen)
-            EXTEND(SP, items);
-        else
-            EXTEND(SP, slen);
-
-        if (do_utf8) {
-            while (--limit) {
-                /* keep track of how many bytes we skip over */
-                m = s;
-                s += UTF8SKIP(s);
-                dstr = newSVpvn(m, s-m);
-
-                if (make_mortal)
-                    sv_2mortal(dstr);
-
-                (void)SvUTF8_on(dstr);
-                PUSHs(dstr);
-
-                if (s >= strend)
-                    break;
-            }
-        } else {
-            while (--limit) {
-                dstr = newSVpvn(s, 1);
-
-                s++;
-
-                if (make_mortal)
-                    sv_2mortal(dstr);
-
-                PUSHs(dstr);
-
-                if (s >= strend)
-                    break;
-            }
-        }
-    }
-    else if (do_utf8 == ((rx->extflags & RXf_UTF8) != 0) &&
-	     (rx->extflags & RXf_USE_INTUIT) && !rx->nparens
+    else if ((rx->extflags & RXf_USE_INTUIT) && !rx->nparens
 	     && (rx->extflags & RXf_CHECK_ALL)
 	     && !(rx->extflags & RXf_ANCH)) {
 	const int tail = (rx->extflags & RXf_INTUIT_TAIL);
 	SV * const csv = CALLREG_INTUIT_STRING(rx);
 
 	len = rx->minlenret;
-	if (len == 1 && !(rx->extflags & RXf_UTF8) && !tail) {
+	if (len == 1 && !(IN_CODEPOINTS) && !tail) {
 	    const char c = *SvPV_nolen_const(csv);
 	    while (--limit) {
 		for (m = s; m < strend && *m != c; m++)
@@ -4781,15 +4401,8 @@ PP(pp_split)
 		dstr = newSVpvn(s, m-s);
 		if (make_mortal)
 		    sv_2mortal(dstr);
-		if (do_utf8)
-		    (void)SvUTF8_on(dstr);
 		XPUSHs(dstr);
-		/* The rx->minlen is in characters but we want to step
-		 * s ahead by bytes. */
- 		if (do_utf8)
-		    s = (char*)utf8_hop((U8*)m, len);
- 		else
-		    s = m + len; /* Fake \n at the end */
+		s = m + len; /* Fake \n at the end */
 	    }
 	}
 	else {
@@ -4800,15 +4413,8 @@ PP(pp_split)
 		dstr = newSVpvn(s, m-s);
 		if (make_mortal)
 		    sv_2mortal(dstr);
-		if (do_utf8)
-		    (void)SvUTF8_on(dstr);
 		XPUSHs(dstr);
-		/* The rx->minlen is in characters but we want to step
-		 * s ahead by bytes. */
- 		if (do_utf8)
-		    s = (char*)utf8_hop((U8*)m, len);
- 		else
-		    s = m + len; /* Fake \n at the end */
+		s = m + len; /* Fake \n at the end */
 	    }
 	}
     }
@@ -4835,8 +4441,6 @@ PP(pp_split)
 	    dstr = newSVpvn(s, m-s);
 	    if (make_mortal)
 		sv_2mortal(dstr);
-	    if (do_utf8)
-		(void)SvUTF8_on(dstr);
 	    XPUSHs(dstr);
 	    if (rx->nparens) {
 		I32 i;
@@ -4854,8 +4458,6 @@ PP(pp_split)
 			dstr = &PL_sv_undef;  /* undef, not "" */
 		    if (make_mortal)
 			sv_2mortal(dstr);
-		    if (do_utf8)
-			(void)SvUTF8_on(dstr);
 		    XPUSHs(dstr);
 		}
 	    }
@@ -4873,8 +4475,6 @@ PP(pp_split)
 	dstr = newSVpvn(s, l);
 	if (make_mortal)
 	    sv_2mortal(dstr);
-	if (do_utf8)
-	    (void)SvUTF8_on(dstr);
 	XPUSHs(dstr);
 	iters++;
     }
@@ -4930,19 +4530,6 @@ PP(pp_split)
     GETTARGET;
     PUSHi(iters);
     RETURN;
-}
-
-PP(pp_once)
-{
-    dSP;
-    SV *const sv = PAD_SVl(PL_op->op_targ);
-
-    if (SvPADSTALE(sv)) {
-	/* First time. */
-	SvPADSTALE_off(sv);
-	RETURNOP(cLOGOP->op_other);
-    }
-    RETURNOP(cLOGOP->op_next);
 }
 
 PP(pp_lock)

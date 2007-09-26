@@ -7,11 +7,6 @@
 # better than having no tests at all, right?
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use strict;
 use Config;
 use File::Spec::Functions;
@@ -33,7 +28,7 @@ BEGIN {
       eval { require IPC::SysV };
       unless ($@) {
 	  $ipcsysv++;
-	  IPC::SysV->import(qw(IPC_PRIVATE IPC_RMID IPC_CREAT S_IRWXU IPC_NOWAIT));
+	  'IPC::SysV'->import(qw(IPC_PRIVATE IPC_RMID IPC_CREAT S_IRWXU IPC_NOWAIT));
       }
   }
 }
@@ -150,7 +145,8 @@ my $TEST = catfile(curdir(), 'TEST');
 	    };
 	}
     }
-    $ENV{PATH} = ($Is_Cygwin) ? '/usr/bin' : '';
+
+    $ENV{PATH} = '';
     delete @ENV{@MoreEnv};
     $ENV{TERM} = 'dumb';
 
@@ -183,7 +179,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (grep { defined and -d and (stat _)[2] & 2 }
+	$tmp = (grep { defined and -d and (stat '_')[2] & 2 }
 		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
 		     @ENV{qw(TMP TEMP)})[0]
 	    or print "# can't find world-writeable directory to test PATH\n";
@@ -301,7 +297,7 @@ SKIP: {
 SKIP: {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
-    my @globs = eval { <*> };
+    my @globs = eval { glob("*") };
     test @globs == 0 && $@ =~ /^Insecure dependency/;
 
     @globs = eval { glob '*' };
@@ -764,7 +760,7 @@ SKIP: {
 
     BEGIN {
 	use vars qw($has_fcntl);
-	eval { require Fcntl; import Fcntl; };
+	eval { require Fcntl; Fcntl->import; };
 	unless ($@) {
 	    $has_fcntl = 1;
 	}

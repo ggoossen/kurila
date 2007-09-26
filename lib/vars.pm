@@ -5,7 +5,8 @@ use 5.006;
 our $VERSION = '1.01';
 
 use warnings::register;
-use strict qw(vars subs);
+use strict;
+no strict 'refs';
 
 sub import {
     my $callpack = caller;
@@ -26,12 +27,12 @@ sub import {
 		}
 	    }
 	    $sym = "${callpack}::$sym" unless $sym =~ /::/;
-	    *$sym =
-		(  $ch eq "\$" ? \$$sym
-		 : $ch eq "\@" ? \@$sym
-		 : $ch eq "\%" ? \%$sym
-		 : $ch eq "\*" ? \*$sym
-		 : $ch eq "\&" ? \&$sym 
+	    *{Symbol::qualify_to_ref($sym)} =
+		(  $ch eq "\$" ? \${*{Symbol::qualify_to_ref($sym)}}
+		 : $ch eq "\@" ? \@{*{Symbol::qualify_to_ref($sym)}}
+		 : $ch eq "\%" ? \%{*{Symbol::qualify_to_ref($sym)}}
+		 : $ch eq "\*" ? \*{Symbol::qualify_to_ref($sym)}
+		 : $ch eq "\&" ? \&{*{Symbol::qualify_to_ref($sym)}}
 		 : do {
 		     require Carp;
 		     Carp::croak("'$_' is not a valid variable name");

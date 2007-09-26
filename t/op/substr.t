@@ -2,11 +2,10 @@
 
 #P = start of string  Q = start of substr  R = end of substr  S = end of string
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
 use warnings ;
+use strict;
+
+our ($w, $FATAL_MSG, $x);
 
 $a = 'abcdefxyz';
 $SIG{__WARN__} = sub {
@@ -23,7 +22,7 @@ $SIG{__WARN__} = sub {
 
 require './test.pl';
 
-plan(334);
+plan(246);
 
 $FATAL_MSG = qr/^substr outside of string/;
 
@@ -36,20 +35,6 @@ eval{substr($a,999,999) = "" ; };# P R Q S
 like ($@, $FATAL_MSG);
 is(substr($a,0,-6), 'abc');  # P=Q R S
 is(substr($a,-3,1), 'x');    # P Q R S
-
-$[ = 1;
-
-is(substr($a,1,3), 'abc' );  # P=Q R S
-is(substr($a,4,3), 'def' );  # P Q R S
-is(substr($a,7,999), 'xyz');# P Q S R
-$b = substr($a,999,999) ; # warn # P R Q S
-is($w--, 1);
-eval{substr($a,999,999) = "" ; } ; # P R Q S
-like ($@, $FATAL_MSG);
-is(substr($a,1,-6), 'abc' );# P=Q R S
-is(substr($a,-3,1), 'x' );  # P Q R S
-
-$[ = 0;
 
 substr($a,3,3) = 'XYZ';
 is($a, 'abcXYZxyz' );
@@ -288,23 +273,28 @@ is($a, 'xxxxefgh');
 
 # utf8 sanity
 {
+    use utf8;
     my $x = substr("a\x{263a}b",0);
-    is(length($x), 3);
     $x = substr($x,1,1);
     is($x, "\x{263a}");
-    $x = $x x 2;
-    is(length($x), 2);
+
+    $x = "\x{263a}\x{263a}";
     substr($x,0,1) = "abcd";
     is($x, "abcd\x{263a}");
-    is(length($x), 5);
     $x = reverse $x;
-    is(length($x), 5);
     is($x, "\x{263a}dcba");
-
-    my $z = 10;
-    $z = "21\x{263a}" . $z;
-    is(length($z), 5);
-    is($z, "21\x{263a}10");
+}
+{
+    # using bytes.
+    no utf8;
+    my $x = substr("a" . utf8::chr(0x263a) . "b",0); # \x{263a} == \xE2\x98\xBA
+    $x = substr($x,1,1);
+    is($x, "\xE2");
+    $x = $x x 2;
+    substr($x,0,1) = "abcd";
+    is($x, "abcd\xE2");
+    $x = reverse $x;
+    is($x, "\xE2dcba");
 }
 
 # replacement should work on magical values
@@ -315,136 +305,13 @@ $data{a} = "firstlast";
 is(substr($data{'a'}, 0, 5, ""), "first");
 is($data{'a'}, "last");
 
-# more utf8
-
-# The following two originally from Ignasi Roca.
-
-$x = "\xF1\xF2\xF3";
-substr($x, 0, 1) = "\x{100}"; # Ignasi had \x{FF}
-is(length($x), 3);
-is($x, "\x{100}\xF2\xF3");
-is(substr($x, 0, 1), "\x{100}");
-is(substr($x, 1, 1), "\x{F2}");
-is(substr($x, 2, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 0, 1) = "\x{100}\x{FF}"; # Ignasi had \x{FF}
-is(length($x), 4);
-is($x, "\x{100}\x{FF}\xF2\xF3");
-is(substr($x, 0, 1), "\x{100}");
-is(substr($x, 1, 1), "\x{FF}");
-is(substr($x, 2, 1), "\x{F2}");
-is(substr($x, 3, 1), "\x{F3}");
-
-# more utf8 lval exercise
-
-$x = "\xF1\xF2\xF3";
-substr($x, 0, 2) = "\x{100}\xFF";
-is(length($x), 3);
-is($x, "\x{100}\xFF\xF3");
-is(substr($x, 0, 1), "\x{100}");
-is(substr($x, 1, 1), "\x{FF}");
-is(substr($x, 2, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 1, 1) = "\x{100}\xFF";
-is(length($x), 4);
-is($x, "\xF1\x{100}\xFF\xF3");
-is(substr($x, 0, 1), "\x{F1}");
-is(substr($x, 1, 1), "\x{100}");
-is(substr($x, 2, 1), "\x{FF}");
-is(substr($x, 3, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 2, 1) = "\x{100}\xFF";
-is(length($x), 4);
-is($x, "\xF1\xF2\x{100}\xFF");
-is(substr($x, 0, 1), "\x{F1}");
-is(substr($x, 1, 1), "\x{F2}");
-is(substr($x, 2, 1), "\x{100}");
-is(substr($x, 3, 1), "\x{FF}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 3, 1) = "\x{100}\xFF";
-is(length($x), 5);
-is($x, "\xF1\xF2\xF3\x{100}\xFF");
-is(substr($x, 0, 1), "\x{F1}");
-is(substr($x, 1, 1), "\x{F2}");
-is(substr($x, 2, 1), "\x{F3}");
-is(substr($x, 3, 1), "\x{100}");
-is(substr($x, 4, 1), "\x{FF}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, -1, 1) = "\x{100}\xFF";
-is(length($x), 4);
-is($x, "\xF1\xF2\x{100}\xFF");
-is(substr($x, 0, 1), "\x{F1}");
-is(substr($x, 1, 1), "\x{F2}");
-is(substr($x, 2, 1), "\x{100}");
-is(substr($x, 3, 1), "\x{FF}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, -1, 0) = "\x{100}\xFF";
-is(length($x), 5);
-is($x, "\xF1\xF2\x{100}\xFF\xF3");
-is(substr($x, 0, 1), "\x{F1}");
-is(substr($x, 1, 1), "\x{F2}");
-is(substr($x, 2, 1), "\x{100}");
-is(substr($x, 3, 1), "\x{FF}");
-is(substr($x, 4, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 0, -1) = "\x{100}\xFF";
-is(length($x), 3);
-is($x, "\x{100}\xFF\xF3");
-is(substr($x, 0, 1), "\x{100}");
-is(substr($x, 1, 1), "\x{FF}");
-is(substr($x, 2, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 0, -2) = "\x{100}\xFF";
-is(length($x), 4);
-is($x, "\x{100}\xFF\xF2\xF3");
-is(substr($x, 0, 1), "\x{100}");
-is(substr($x, 1, 1), "\x{FF}");
-is(substr($x, 2, 1), "\x{F2}");
-is(substr($x, 3, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 0, -3) = "\x{100}\xFF";
-is(length($x), 5);
-is($x, "\x{100}\xFF\xF1\xF2\xF3");
-is(substr($x, 0, 1), "\x{100}");
-is(substr($x, 1, 1), "\x{FF}");
-is(substr($x, 2, 1), "\x{F1}");
-is(substr($x, 3, 1), "\x{F2}");
-is(substr($x, 4, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, 1, -1) = "\x{100}\xFF";
-is(length($x), 4);
-is($x, "\xF1\x{100}\xFF\xF3");
-is(substr($x, 0, 1), "\x{F1}");
-is(substr($x, 1, 1), "\x{100}");
-is(substr($x, 2, 1), "\x{FF}");
-is(substr($x, 3, 1), "\x{F3}");
-
-$x = "\xF1\xF2\xF3";
-substr($x, -1, -1) = "\x{100}\xFF";
-is(length($x), 5);
-is($x, "\xF1\xF2\x{100}\xFF\xF3");
-is(substr($x, 0, 1), "\x{F1}");
-is(substr($x, 1, 1), "\x{F2}");
-is(substr($x, 2, 1), "\x{100}");
-is(substr($x, 3, 1), "\x{FF}");
-is(substr($x, 4, 1), "\x{F3}");
-
 # And tests for already-UTF8 one
 
+use utf8;
 $x = "\x{101}\x{F2}\x{F3}";
 substr($x, 0, 1) = "\x{100}";
 is(length($x), 3);
-is($x, "\x{100}\xF2\xF3");
+is($x, "\x{100}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
 is(substr($x, 1, 1), "\x{F2}");
 is(substr($x, 2, 1), "\x{F3}");
@@ -452,61 +319,63 @@ is(substr($x, 2, 1), "\x{F3}");
 $x = "\x{101}\x{F2}\x{F3}";
 substr($x, 0, 1) = "\x{100}\x{FF}";
 is(length($x), 4);
-is($x, "\x{100}\x{FF}\xF2\xF3");
+is($x, "\x{100}\x{FF}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
 is(substr($x, 1, 1), "\x{FF}");
 is(substr($x, 2, 1), "\x{F2}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, 2) = "\x{100}\xFF";
+substr($x, 0, 2) = "\x{100}\x{FF}";
 is(length($x), 3);
-is($x, "\x{100}\xFF\xF3");
+is($x, "\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
 is(substr($x, 1, 1), "\x{FF}");
 is(substr($x, 2, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 1, 1) = "\x{100}\xFF";
+substr($x, 1, 1) = "\x{100}\x{FF}";
 is(length($x), 4);
-is($x, "\x{101}\x{100}\xFF\xF3");
+is($x, "\x{101}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
 is(substr($x, 1, 1), "\x{100}");
 is(substr($x, 2, 1), "\x{FF}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 2, 1) = "\x{100}\xFF";
+substr($x, 2, 1) = "\x{100}\x{FF}";
 is(length($x), 4);
-is($x, "\x{101}\xF2\x{100}\xFF");
+is($x, "\x{101}\x{F2}\x{100}\x{FF}");
 is(substr($x, 0, 1), "\x{101}");
 is(substr($x, 1, 1), "\x{F2}");
 is(substr($x, 2, 1), "\x{100}");
 is(substr($x, 3, 1), "\x{FF}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 3, 1) = "\x{100}\xFF";
+substr($x, 3, 1) = "\x{100}\x{FF}";
 is(length($x), 5);
-is($x, "\x{101}\x{F2}\x{F3}\x{100}\xFF");
+is($x, "\x{101}\x{F2}\x{F3}\x{100}\x{FF}");
 is(substr($x, 0, 1), "\x{101}");
 is(substr($x, 1, 1), "\x{F2}");
 is(substr($x, 2, 1), "\x{F3}");
 is(substr($x, 3, 1), "\x{100}");
 is(substr($x, 4, 1), "\x{FF}");
 
-$x = "\x{101}\x{F2}\x{F3}";
-substr($x, -1, 1) = "\x{100}\xFF";
-is(length($x), 4);
-is($x, "\x{101}\xF2\x{100}\xFF");
+$x = "\x{101}\x{F2}\x{100}\x{FF}";
+is($x, "\x{101}\x{F2}\x{100}\x{FF}");
+substr($x, -2, 1) = "\x{104}\x{105}";
+is(length($x), 5);
+is($x, "\x{101}\x{F2}\x{104}\x{105}\x{FF}");
 is(substr($x, 0, 1), "\x{101}");
 is(substr($x, 1, 1), "\x{F2}");
-is(substr($x, 2, 1), "\x{100}");
-is(substr($x, 3, 1), "\x{FF}");
+is(substr($x, 2, 1), "\x{104}");
+is(substr($x, 3, 1), "\x{105}");
+is(substr($x, 4, 1), "\x{FF}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, -1, 0) = "\x{100}\xFF";
+substr($x, -1, 0) = "\x{100}\x{FF}";
 is(length($x), 5);
-is($x, "\x{101}\xF2\x{100}\xFF\xF3");
+is($x, "\x{101}\x{F2}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
 is(substr($x, 1, 1), "\x{F2}");
 is(substr($x, 2, 1), "\x{100}");
@@ -514,26 +383,26 @@ is(substr($x, 3, 1), "\x{FF}");
 is(substr($x, 4, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, -1) = "\x{100}\xFF";
+substr($x, 0, -1) = "\x{100}\x{FF}";
 is(length($x), 3);
-is($x, "\x{100}\xFF\xF3");
+is($x, "\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
 is(substr($x, 1, 1), "\x{FF}");
 is(substr($x, 2, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, -2) = "\x{100}\xFF";
+substr($x, 0, -2) = "\x{100}\x{FF}";
 is(length($x), 4);
-is($x, "\x{100}\xFF\xF2\xF3");
+is($x, "\x{100}\x{FF}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
 is(substr($x, 1, 1), "\x{FF}");
 is(substr($x, 2, 1), "\x{F2}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, -3) = "\x{100}\xFF";
+substr($x, 0, -3) = "\x{100}\x{FF}";
 is(length($x), 5);
-is($x, "\x{100}\xFF\x{101}\x{F2}\x{F3}");
+is($x, "\x{100}\x{FF}\x{101}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
 is(substr($x, 1, 1), "\x{FF}");
 is(substr($x, 2, 1), "\x{101}");
@@ -541,18 +410,18 @@ is(substr($x, 3, 1), "\x{F2}");
 is(substr($x, 4, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 1, -1) = "\x{100}\xFF";
+substr($x, 1, -1) = "\x{100}\x{FF}";
 is(length($x), 4);
-is($x, "\x{101}\x{100}\xFF\xF3");
+is($x, "\x{101}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
 is(substr($x, 1, 1), "\x{100}");
 is(substr($x, 2, 1), "\x{FF}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, -1, -1) = "\x{100}\xFF";
+substr($x, -1, -1) = "\x{100}\x{FF}";
 is(length($x), 5);
-is($x, "\x{101}\xF2\x{100}\xFF\xF3");
+is($x, "\x{101}\x{F2}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
 is(substr($x, 1, 1), "\x{F2}");
 is(substr($x, 2, 1), "\x{100}");
@@ -576,24 +445,6 @@ is($x, "ab\x{100}\x{200}");
 
 substr($x = "\x{100}\x{200}", 2, 0, "ab");
 is($x, "\x{100}\x{200}ab");
-
-substr($x = "\xFFb", 0, 0, "\x{100}\x{200}");
-is($x, "\x{100}\x{200}\xFFb");
-
-substr($x = "\x{100}\x{200}", 0, 0, "\xFFb");
-is($x, "\xFFb\x{100}\x{200}");
-
-substr($x = "\xFFb", 1, 0, "\x{100}\x{200}");
-is($x, "\xFF\x{100}\x{200}b");
-
-substr($x = "\x{100}\x{200}", 1, 0, "\xFFb");
-is($x, "\x{100}\xFFb\x{200}");
-
-substr($x = "\xFFb", 2, 0, "\x{100}\x{200}");
-is($x, "\xFFb\x{100}\x{200}");
-
-substr($x = "\x{100}\x{200}", 2, 0, "\xFFb");
-is($x, "\x{100}\x{200}\xFFb");
 
 # [perl #20933]
 { 
@@ -622,6 +473,7 @@ is($x, "\x{100}\x{200}\xFFb");
 
 # multiple assignments to lvalue [perl #24346]   
 {
+    use bytes;
     my $x = "abcdef";
     for (substr($x,1,3)) {
 	is($_, 'bcd');
@@ -653,8 +505,7 @@ is($x, "\x{100}\x{200}\xFFb");
 
 # [perl #29149]
 {
-    my $text  = "0123456789\xED ";
-    utf8::upgrade($text);
+    my $text  = "0123456789\x{ED} ";
     my $pos = 5;
     pos($text) = $pos;
     my $a = substr($text, $pos, $pos);
@@ -662,16 +513,34 @@ is($x, "\x{100}\x{200}\xFFb");
 
 }
 
-# [perl #23765]
-{
-    my $a = pack("C", 0xbf);
-    substr($a, -1) &= chr(0xfeff);
-    is($a, "\xbf");
-}
-
 # [perl #34976] incorrect caching of utf8 substr length
 {
     my  $a = "abcd\x{100}";
     is(substr($a,1,2), 'bc');
     is(substr($a,1,1), 'b');
+}
+
+{
+    # lvalue ref count
+    my $foo = "bar";
+    is(Internals::SvREFCNT(\$foo), 2);
+    substr($foo, -2, 2) = "la";
+    is(Internals::SvREFCNT(\$foo), 2);
+}
+
+# lvalue with regex and eval
+{
+    my $x = "abccd";
+    substr($x, 0, -1) =~ s/(c)/ord($1)/ge;
+    is($x, "ab9999d");
+}
+
+# extended lifetime lvalue
+{
+    my $foo = "bar";
+    is(Internals::SvREFCNT(\$foo), 2);
+    my $y = \ substr($foo, -2, 2);
+    is(Internals::SvREFCNT(\$foo), 3);
+    undef $y;
+    is(Internals::SvREFCNT(\$foo), 2);
 }

@@ -8,17 +8,17 @@ use Carp ;
 use IO::Handle ;
 use Scalar::Util qw(dualvar);
 
-use IO::Compress::Base::Common 2.006 ;
-use Compress::Raw::Zlib 2.006 ;
-use IO::Compress::Gzip 2.006 ;
-use IO::Uncompress::Gunzip 2.006 ;
+use IO::Compress::Base::Common 2.004 ;
+use Compress::Raw::Zlib 2.004 ;
+use IO::Compress::Gzip 2.004 ;
+use IO::Uncompress::Gunzip 2.004 ;
 
 use strict ;
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.006';
+$VERSION = '2.004';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -134,12 +134,12 @@ sub gzopen($$)
     _set_gzerr(0) ;
 
     if ($writing) {
-        $gz = new IO::Compress::Gzip($file, Minimal => 1, AutoClose => 1, 
+        $gz = IO::Compress::Gzip->new($file, Minimal => 1, AutoClose => 1, 
                                      %defOpts) 
             or $Compress::Zlib::gzerrno = $IO::Compress::Gzip::GzipError;
     }
     else {
-        $gz = new IO::Uncompress::Gunzip($file, 
+        $gz = IO::Uncompress::Gunzip->new($file, 
                                          Transparent => 1,
                                          Append => 0, 
                                          AutoClose => 1, 
@@ -180,12 +180,7 @@ sub Compress::Zlib::gzFile::gzreadline
     my $self = shift ;
 
     my $gz = $self->[0] ;
-    {
-        # Maintain backward compatibility with 1.x behaviour
-        # It didn't support $/, so this can't either.
-        local $/ = "\n" ;
-        $_[0] = $gz->getline() ; 
-    }
+    $_[0] = $gz->getline() ; 
     _save_gzerr($gz, 1);
     return defined $_[0] ? length $_[0] : 0 ;
 }
@@ -197,9 +192,6 @@ sub Compress::Zlib::gzFile::gzwrite
 
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
-
-    $] >= 5.008 and (utf8::downgrade($_[0], 1) 
-        or croak "Wide character in gzwrite");
 
     my $status = $gz->write($_[0]) ;
     _save_gzerr($gz);
@@ -309,12 +301,9 @@ sub compress($;$)
         $in = \$_[0] ;
     }
 
-    $] >= 5.008 and (utf8::downgrade($$in, 1) 
-        or croak "Wide character in compress");
-
     my $level = (@_ == 2 ? $_[1] : Z_DEFAULT_COMPRESSION() );
 
-    $x = new Compress::Raw::Zlib::Deflate -AppendOutput => 1, -Level => $level
+    $x = Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level)
             or return undef ;
 
     $err = $x->deflate($in, $output) ;
@@ -339,10 +328,7 @@ sub uncompress($)
         $in = \$_[0] ;
     }
 
-    $] >= 5.008 and (utf8::downgrade($$in, 1) 
-        or croak "Wide character in uncompress");
-
-    $x = new Compress::Raw::Zlib::Inflate -ConsumeInput => 0 or return undef ;
+    $x = Compress::Raw::Zlib::Inflate->new( -ConsumeInput => 0) or return undef ;
  
     $err = $x->inflate($in, $output) ;
     return undef unless $err == Z_STREAM_END() ;
@@ -452,7 +438,7 @@ sub inflate
 
 package Compress::Zlib ;
 
-use IO::Compress::Gzip::Constants 2.006 ;
+use IO::Compress::Gzip::Constants 2.004 ;
 
 sub memGzip($)
 {
@@ -460,9 +446,6 @@ sub memGzip($)
 
   # if the deflation buffer isn't a reference, make it one
   my $string = (ref $_[0] ? $_[0] : \$_[0]) ;
-
-  $] >= 5.008 and (utf8::downgrade($$string, 1) 
-      or croak "Wide character in memGzip");
 
   IO::Compress::Gzip::gzip($string, \$out, Minimal => 1)
       or return undef ;
@@ -535,14 +518,11 @@ sub memGunzip($)
     # if the buffer isn't a reference, make it one
     my $string = (ref $_[0] ? $_[0] : \$_[0]);
  
-    $] >= 5.008 and (utf8::downgrade($$string, 1) 
-        or croak "Wide character in memGunzip");
-
     _removeGzipHeader($string) == Z_OK() 
         or return undef;
      
     my $bufsize = length $$string > 4096 ? length $$string : 4096 ;
-    my $x = new Compress::Raw::Zlib::Inflate({-WindowBits => - MAX_WBITS(),
+    my $x = Compress::Raw::Zlib::Inflate->new({-WindowBits => - MAX_WBITS(),
                          -Bufsize => $bufsize}) 
 
               or return undef;
@@ -657,17 +637,12 @@ C<IO::Compress::Gzip> and C<IO::Uncompress::Gunzip> modules for
 reading/writing gzip files, and the C<Compress::Raw::Zlib> module for some
 low-level zlib access. 
 
-The interface provided by version 2 of this module should be 100% backward
-compatible with version 1. If you find a difference in the expected
-behaviour please contact the author (See L</AUTHOR>). See L<GZIP INTERFACE> 
+The interface provided by version 2 should be 100% backward compatible with
+version 1. If you find a difference in the expected behaviour please
+contact the author (See L</AUTHOR>). See L<GZIP INTERFACE> 
 
-With the creation of the C<IO::Compress> and C<IO::Uncompress> modules no
-new features are planned for C<Compress::Zlib> - the new modules do
-everything that C<Compress::Zlib> does and then some. Development on
-C<Compress::Zlib> will be limited to bug fixes only.
-
-If you are writing new code, your first port of call should be one of the
-new C<IO::Compress> or C<IO::Uncompress> modules.
+If you are writing new code, your first port of call should be to use one
+these new modules.
 
 =head1 GZIP INTERFACE
 
@@ -780,13 +755,11 @@ the case of an error, -1.
 
 It is legal to intermix calls to C<gzread> and C<gzreadline>.
 
-To maintain backward compatibility with version 1.x of this module
-C<gzreadline> ignores the C<$/> variable - it I<always> uses the string
-C<"\n"> as the line delimiter.  
+In addition, C<gzreadline> fully supports the use of of the variable C<$/>
+(C<$INPUT_RECORD_SEPARATOR> or C<$RS> when C<English> is in use) to
+determine what constitutes an end of line. Both paragraph mode and file
+slurp mode are supported. 
 
-If you want to read a gzip file a line at a time and have it respect the
-C<$/> variable (or C<$INPUT_RECORD_SEPARATOR>, or C<$RS> when C<English> is
-in use) see L<IO::Uncompress::Gunzip|IO::Uncompress::Gunzip>.
 
 =item B<$byteswritten = $gz-E<gt>gzwrite($buffer) ;>
 

@@ -61,7 +61,7 @@ Postpone load of modules until a function is used
 
 =item base
 
-Establish an ISA relationship with base classes at compile time
+Establish IS-A relationship with base classes at compile time
 
 =item bigint
 
@@ -99,10 +99,6 @@ Produce verbose warning diagnostics
 
 Allows you to write your script in non-ascii or non-utf8
 
-=item encoding::warnings
-
-Warn on implicit encoding conversions
-
 =item feature
 
 Enable new syntactic features
@@ -131,9 +127,9 @@ Request less of something
 
 Manipulate @INC at compile time
 
-=item locale
+=item mro
 
-Use and avoid POSIX locales for built-in operations
+Method Resolution Order
 
 =item mro
 
@@ -856,14 +852,6 @@ Keep more files open than the system permits
 =item FileHandle
 
 Supply object methods for filehandles
-
-=item Filter::Simple
-
-Simplified source filtering
-
-=item Filter::Util::Call
-
-Perl Source Filter Utility Module
 
 =item FindBin
 
@@ -1617,10 +1605,6 @@ Load the C socket.h defines and structure manipulators
 
 Persistence for Perl data structures
 
-=item Switch
-
-A switch statement for Perl
-
 =item Symbol
 
 Manipulate Perl symbols and their names
@@ -1848,10 +1832,6 @@ Interfaces to some Win32 API Functions
 =item Win32API::File
 
 Low-level access to Win32 system API calls for files/dirs.
-
-=item Win32CORE
-
-Win32 CORE function stubs
 
 =item XS::APItest
 

@@ -1,11 +1,6 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
-print q(1..21
+print q(1..25
 );
 
 # This is() function is written to avoid ""
@@ -35,6 +30,7 @@ sub is {
     return 0;
 }
 
+use bytes;
 is ("\x53", chr 83);
 is ("\x4EE", chr (78) . 'E');
 is ("\x4i", chr (4) . 'i');	# This will warn
@@ -55,9 +51,17 @@ is ("\x{6FQ}z", chr (111) . 'z');
 is ("\x{0x4E}", chr 0);
 is ("\x{x4E}", chr 0);
 
+use utf8;
 is ("\x{0065}", chr 101);
 is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
     chr 114);
 is ("\x{0_06_5}", chr 101);
 is ("\x{1234}", chr 4660);
 is ("\x{10FFFD}", chr 1114109);
+
+use charnames ':full';
+is ("\N{LATIN SMALL LETTER A}", "a");
+is ("\N{NEL}", chr 0x85);
+
+is("\x[65]", chr 101);
+is("\x[FF]", bytes::chr(0xFF));

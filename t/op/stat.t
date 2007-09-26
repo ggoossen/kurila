@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';	# for which_perl() etc
 }
 
@@ -13,24 +11,24 @@ plan tests => 107;
 
 my $Perl = which_perl();
 
-$Is_Amiga   = $^O eq 'amigaos';
-$Is_Cygwin  = $^O eq 'cygwin';
-$Is_Darwin  = $^O eq 'darwin';
-$Is_Dos     = $^O eq 'dos';
-$Is_MacOS   = $^O eq 'MacOS';
-$Is_MPE     = $^O eq 'mpeix';
-$Is_MSWin32 = $^O eq 'MSWin32';
-$Is_NetWare = $^O eq 'NetWare';
-$Is_OS2     = $^O eq 'os2';
-$Is_Solaris = $^O eq 'solaris';
-$Is_VMS     = $^O eq 'VMS';
-$Is_DGUX    = $^O eq 'dgux';
-$Is_MPRAS   = $^O =~ /svr4/ && -f '/etc/.relid';
-$Is_Rhapsody= $^O eq 'rhapsody';
+my $Is_Amiga   = $^O eq 'amigaos';
+my $Is_Cygwin  = $^O eq 'cygwin';
+my $Is_Darwin  = $^O eq 'darwin';
+my $Is_Dos     = $^O eq 'dos';
+my $Is_MacOS   = $^O eq 'MacOS';
+my $Is_MPE     = $^O eq 'mpeix';
+my $Is_MSWin32 = $^O eq 'MSWin32';
+my $Is_NetWare = $^O eq 'NetWare';
+my $Is_OS2     = $^O eq 'os2';
+my $Is_Solaris = $^O eq 'solaris';
+my $Is_VMS     = $^O eq 'VMS';
+my $Is_DGUX    = $^O eq 'dgux';
+my $Is_MPRAS   = $^O =~ /svr4/ && -f '/etc/.relid';
+my $Is_Rhapsody= $^O eq 'rhapsody';
 
-$Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
+my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
 
-$Is_UFS     = $Is_Darwin && (() = `df -t ufs . 2>/dev/null`) == 2;
+my $Is_UFS     = $Is_Darwin && (() = `df -t ufs . 2>/dev/null`) == 2;
 
 my($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
    $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = (0..12);
@@ -48,12 +46,11 @@ close FOO;
 
 open(FOO, ">$tmpfile") || DIE("Can't open temp test file: $!");
 
-my($nlink, $mtime, $ctime) = (stat(FOO))[$NLINK, $MTIME, $CTIME];
+my($nlink, $mtime, $ctime) = (stat(*FOO))[$NLINK, $MTIME, $CTIME];
 
-#nlink should if link support configured in Perl.
+#VMS Fix-me: nlink should work on VMS if applicable link support configured.
 SKIP: {
-    skip "No link count - Hard link support not built in.", 1
-	unless $Config{d_link};
+    skip "No link count", 1 if $Is_VMS;
 
     is($nlink, 1, 'nlink on regular file');
 }
@@ -332,11 +329,11 @@ SKIP: {
 
         open(TTY, $TTY) ||
           warn "Can't open $TTY--run t/TEST outside of make.\n";
-        ok(-t TTY,  '-t');
-        ok(-c TTY,  'tty is -c');
+        ok(-t *TTY,  '-t');
+        ok(-c *TTY,  'tty is -c');
         close(TTY);
     }
-    ok(! -t TTY,    '!-t on closed TTY filehandle');
+    ok(! -t *TTY,    '!-t on closed TTY filehandle');
 
     {
         local $TODO = 'STDIN not a tty when output is to pipe' if $Is_VMS;
@@ -350,7 +347,7 @@ SKIP: {
     skip "We know Win32 thinks '$Null' is a TTY", 1 if $Is_MSWin32;
 
     open(NULL, $Null) or DIE("Can't open $Null: $!");
-    ok(! -t NULL,   'null device is not a TTY');
+    ok(! -t *NULL,   'null device is not a TTY');
     close(NULL);
 }
 
@@ -369,35 +366,35 @@ ok(! -T $Perl,    '!-T');
 
 open(FOO,$statfile);
 SKIP: {
-    eval { -T FOO; };
+    eval { -T *FOO; };
     skip "-T/B on filehandle not implemented", 15 if $@ =~ /not implemented/;
 
     is( $@, '',     '-T on filehandle causes no errors' );
 
-    ok(-T FOO,      '   -T');
-    ok(! -B FOO,    '   !-B');
+    ok(-T *FOO,      '   -T');
+    ok(! -B *FOO,    '   !-B');
 
     $_ = <FOO>;
     like($_, qr/perl/, 'after readline');
-    ok(-T FOO,      '   still -T');
-    ok(! -B FOO,    '   still -B');
+    ok(-T *FOO,      '   still -T');
+    ok(! -B *FOO,    '   still -B');
     close(FOO);
 
     open(FOO,$statfile);
     $_ = <FOO>;
     like($_, qr/perl/,      'reopened and after readline');
-    ok(-T FOO,      '   still -T');
-    ok(! -B FOO,    '   still !-B');
+    ok(-T *FOO,      '   still -T');
+    ok(! -B *FOO,    '   still !-B');
 
     ok(seek(FOO,0,0),   'after seek');
-    ok(-T FOO,          '   still -T');
-    ok(! -B FOO,        '   still !-B');
+    ok(-T *FOO,          '   still -T');
+    ok(! -B *FOO,        '   still !-B');
 
     # It's documented this way in perlfunc *shrug*
     () = <FOO>;
     ok(eof FOO,         'at EOF');
-    ok(-T FOO,          '   still -T');
-    ok(-B FOO,          '   now -B');
+    ok(-T *FOO,          '   still -T');
+    ok(-B *FOO,          '   now -B');
 }
 close(FOO);
 
@@ -483,18 +480,18 @@ ok(unlink($f), 'unlink tmp file');
 SKIP: {
     skip "No dirfd()", 9 unless $Config{d_dirfd} || $Config{d_dir_dd_fd};
     ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $!";
-    ok(stat(DIR), "stat() on dirhandle works"); 
+    ok(stat(*DIR), "stat() on dirhandle works"); 
     ok(-d -r _ , "chained -x's on dirhandle"); 
-    ok(-d DIR, "-d on a dirhandle works");
+    ok(-d *DIR, "-d on a dirhandle works");
 
     # And now for the ambigious bareword case
     ok(open(DIR, "TEST"), 'Can open "TEST" dir')
 	|| diag "Can't open 'TEST':  $!";
-    my $size = (stat(DIR))[7];
+    my $size = (stat(*DIR))[7];
     ok(defined $size, "stat() on bareword works");
     is($size, -s "TEST", "size returned by stat of bareword is for the file");
     ok(-f _, "ambiguous bareword uses file handle, not dir handle");
-    ok(-f DIR);
+    ok(-f *DIR);
     closedir DIR or die $!;
     close DIR or die $!;
 }

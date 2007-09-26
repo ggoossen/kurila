@@ -15,8 +15,6 @@ BEGIN { require "./test.pl"; }
 our $NUM_SECTS;
 chomp(my @strs= grep { !/^\s*\#/ } <DATA>);
 my $out = runperl(progfile => "../ext/re/t/regop.pl", stderr => 1 );
-# VMS currently embeds linefeeds in the output.
-$out =~ s/\cJ//g if $^O = 'VMS';
 my @tests = grep { /\S/ } split /(?=Compiling REx)/, $out;
 # on debug builds we get an EXECUTING... message in there at the top
 shift @tests
@@ -194,51 +192,172 @@ minlen 4
 (checking anchored)
 anchored "ABC" at 0
 ---
-#Compiling REx "(\.COM|\.EXE|\.BAT|\.CMD|\.VBS|\.VBE|\.JS|\.JSE|\.WSF|\.WSH|\.pyo|\.pyc|\.pyw|\.py)$"
-#size 48 nodes first at 3
-#first at 3
-#rarest char
-# at 0
-#   1: OPEN1(3)
-#   3:   EXACTF <.>(5)
-#   5:   TRIE-EXACTF(45)
-#        [Start:2 Words:14 Chars:54 Unique:18 States:29 Minlen:2 Maxlen:3 Start-Class:BCEJPVWbcejpvw]
-#          <.COM>
-#          ...  yada yada ... (dmq)
-#          <.py>
-#  45: CLOSE1(47)
-#  47: EOL(48)
-#  48: END(0)
-#floating ""$ at 3..4 (checking floating) stclass "EXACTF <.>" minlen 3
-#Offsets: [48]
-#        1:1[1] 3:2[1] 5:2[81] 45:83[1] 47:84[1] 48:85[0]
-#Guessing start of match, REx "(\.COM|\.EXE|\.BAT|\.CMD|\.VBS|\.VBE|\.JS|\.JSE|\.WSF|\.WSH|..." against "D:dev/perl/ver/28321_/perl.exe"...
+#Compiling REx "(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\.W"...
+#Got 4916 bytes for offset annotations.
+#study chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkstudy chunkminlen: 3
+#Final program:
+#   1: OPEN1 (3)
+#   3:   BRANCH (48)
+#   4:     ANYOF{i}[.s(# comment
+#)] (15)
+#  15:     ANYOF{i}[Ccs(# comment
+#)] (26)
+#  26:     ANYOF{i}[Oos(# comment
+#)] (37)
+#  37:     ANYOF{i}[Mms(# comment
+#)] (611)
+#  48:   BRANCH (93)
+#  49:     ANYOF{i}[.s(# comment
+#)] (60)
+#  60:     ANYOF{i}[Ees(# comment
+#)] (71)
+#  71:     ANYOF{i}[Xxs(# comment
+#)] (82)
+#  82:     ANYOF{i}[Ees(# comment
+#)] (611)
+#  93:   BRANCH (138)
+#  94:     ANYOF{i}[.s(# comment
+#)] (105)
+# 105:     ANYOF{i}[Bbs(# comment
+#)] (116)
+# 116:     ANYOF{i}[Aas(# comment
+#)] (127)
+# 127:     ANYOF{i}[Tts(# comment
+#)] (611)
+# 138:   BRANCH (183)
+# 139:     ANYOF{i}[.s(# comment
+#)] (150)
+# 150:     ANYOF{i}[Ccs(# comment
+#)] (161)
+# 161:     ANYOF{i}[Mms(# comment
+#)] (172)
+# 172:     ANYOF{i}[Dds(# comment
+#)] (611)
+# 183:   BRANCH (228)
+# 184:     ANYOF{i}[.s(# comment
+#)] (195)
+# 195:     ANYOF{i}[Vvs(# comment
+#)] (206)
+# 206:     ANYOF{i}[Bbs(# comment
+#)] (217)
+# 217:     ANYOF{i}[Sss(# comment
+#)] (611)
+# 228:   BRANCH (273)
+# 229:     ANYOF{i}[.s(# comment
+#)] (240)
+# 240:     ANYOF{i}[Vvs(# comment
+#)] (251)
+# 251:     ANYOF{i}[Bbs(# comment
+#] (262)
+# 262:     ANYOF{i}[Ees(# comment
+#)] (611)
+# 273:   BRANCH (307)
+# 274:     ANYOF{i}[.s(# comment
+#)] (285)
+# 285:     ANYOF{i}[Jjs(# comment
+#)] (296)
+# 296:     ANYOF{i}[Sss(# comment
+#)] (611)
+# 307:   BRANCH (352)
+# 308:     ANYOF{i}[.s(# comment
+#)] (319)
+# 319:     ANYOF{i}[Jjs(# comment
+#)] (330)
+# 330:     ANYOF{i}[Sss(# comment
+#)] (341)
+# 341:     ANYOF{i}[Ees(# comment
+#)] (611)
+# 352:   BRANCH (397)
+#353:     ANYOF{i}[.s(# comment
+#)] (364)
+# 364:     ANYOF{i}[Wws(# comment
+#)] (375)
+# 375:     ANYOF{i}[Sss(# comment
+#)] (386)
+# 386:     ANYOF{i}[Ffs(# comment
+#)] (611)
+# 397:   BRANCH (442)
+# 398:     ANYOF{i}[.s(# comment
+#)] (409)
+# 409:     ANYOF{i}[Wws(# comment
+#)] (420)
+# 420:     ANYOF{i}[Sss(# comment
+#)] (431)
+# 431:     ANYOF{i}[Hhs(# comment
+#)] (611)
+# 442:   BRANCH (487)
+# 443:     ANYOF{i}[.s(# comment
+#)] (454)
+# 454:     ANYOF{i}[Pps(# comment
+#)] (465)
+# 465:     ANYOF{i}[Yys(# comment
+#)] (476)
+# 476:     ANYOF{i}[Oos(# comment
+#)] (611)
+# 487:   BRANCH (532)
+# 488:     ANYOF{i}[.s(# comment
+#)] (499)
+# 499:     ANYOF{i}[Pps(# comment
+#)] (510)
+# 510:     ANYOF{i}[Yys(# comment
+#)] (521)
+# 521:     ANYOF{i}[Ccs(# comment
+#)] (611)
+# 532:   BRANCH (577)
+# 533:     ANYOF{i}[.s(# comment
+#)] (544)
+# 544:     ANYOF{i}[Pps(# comment
+#)] (555)
+# 555:     ANYOF{i}[Yys(# comment
+#)] (566)
+# 566:     ANYOF{i}[Wws(# comment
+#)] (611)
+# 577:   BRANCH (FAIL)
+# 578:     ANYOF{i}[.s(# comment
+#)] (589)
+# 589:     ANYOF{i}[Pps(# comment
+#)] (600)
+# 600:     ANYOF{i}[Yys(# comment
+#)] (611)
+# 611: CLOSE1 (613)
+# 613: EOL (614)
+# 614: END (0)
+#floating ""$ at 3..4 (checking floating) minlen 3 
+#Offsets: [614]
+#	1:1[1] 3:1[1] 4:3[0] 15:4[0] 26:5[0] 37:6[0] 48:7[1] 49:9[0] 60:10[0] 71:11[0] 82:12[0] 93:13[1] 94:15[0] 105:16[0] 116:17[0] 127:18[0] 138:19[1] 139:21[0] 150:22[0] 161:23[0] 172:24[0] 183:25[1] 184:27[0] 195:28[0] 206:29[0] 217:30[0] 228:31[1] 229:33[0] 240:34[0] 251:35[0] 262:36[0] 273:37[1] 274:39[0] 285:40[0] 296:41[0] 307:42[1] 308:44[0] 319:45[0] 330:46[0] 341:47[0] 352:48[1] 353:50[0] 364:51[0] 375:52[0] 386:53[0] 397:54[1] 398:56[0] 409:57[0] 420:58[0] 431:59[0] 442:60[1] 443:62[0] 454:63[0] 465:64[0] 476:65[0] 487:66[1] 488:68[0] 499:69[0] 510:70[0] 521:71[0] 532:72[1] 533:74[0] 544:75[0] 555:76[0] 566:77[0] 577:78[1] 578:80[0] 589:81[0] 600:82[0] 611:83[1] 613:84[1] 614:85[0] 
+#Guessing start of match in sv for REx "(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\.W"... against "D:dev/perl/ver/28321_/perl.exe"
 #Found floating substr ""$ at offset 30...
 #Starting position does not contradict /^/m...
-#Does not contradict STCLASS...
 #Guessed: match at offset 26
-#Matching REx "(\.COM|\.EXE|\.BAT|\.CMD|\.VBS|\.VBE|\.JS|\.JSE|\.WSF|\.WSH|\.pyo|\.pyc|\.pyw|\.py)$..." against ".exe"
-#Matching stclass "EXACTF <.>" against ".exe"
-#  Setting an EVAL scope, savestack=140
-#  26 <21_/perl> <.exe>    |  1:  OPEN1
-#  26 <21_/perl> <.exe>    |  3:  EXACTF <.>
-#  27 <21_/perl.> <exe>    |  5:  TRIE-EXACTF
-#                                 only one match : #2 <.EXE>
-#  30 <21_/perl.exe> <>    | 45:    CLOSE1
-#  30 <21_/perl.exe> <>    | 47:    EOL
-#  30 <21_/perl.exe> <>    | 48:    END
+#Matching REx "(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\.W"... against ".exe"
+#regtry  26 <21_/perl> <.exe>       |  1:OPEN1(3)
+#  26 <21_/perl> <.exe>       |  3:BRANCH(48)
+#  26 <21_/perl> <.exe>       |  4:  ANYOF{i}[.s(# comment
+#)](15)
+#  27 <21_/perl.> <exe>       | 15:  ANYOF{i}[Ccs(# comment
+#)](26)
+#                                    failed...
+#  26 <21_/perl> <.exe>       | 48:BRANCH(93)
+#  26 <21_/perl> <.exe>       | 49:  ANYOF{i}[.s(# comment
+#)](60)
+#  27 <21_/perl.> <exe>       | 60:  ANYOF{i}[Ees(# comment
+#)](71)
+#  28 <21_/perl.e> <xe>       | 71:  ANYOF{i}[Xxs(# comment
+#)](82)
+#  29 <21_/perl.ex> <e>       | 82:  ANYOF{i}[Ees(# comment
+#)](611)
+#  30 <21_/perl.exe> <>       |611:  CLOSE1(613)
+#  30 <21_/perl.exe> <>       |613:  EOL(614)
+#  30 <21_/perl.exe> <>       |614:  END(0)
 #Match successful!
 #POP STATE(1)
 #%MATCHED%
 #Freeing REx: "(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\."......
 %MATCHED%
 floating ""$ at 3..4 (checking floating)
-1:1[1] 3:2[1] 5:2[64] 45:83[1] 47:84[1] 48:85[0]
-stclass EXACTF <.> minlen 3
-Found floating substr ""$ at offset 30...
-Does not contradict STCLASS...
+1:1[1] 3:1[1] 4:3[0] 15:4[0] 26:5[0] 37:6[0] 48:7[1] 49:9[0]
+ANYOF{i}[Ccs(# comment
 Guessed: match at offset 26
-Matching stclass EXACTF <.> against ".exe"
 ---
 #Compiling REx "[q]"
 #size 12 nodes Got 100 bytes for offset annotations.
@@ -258,4 +377,3 @@ Got 100 bytes for offset annotations.
 Offsets: [12]
 1:1[3] 3:4[0]
 %MATCHED%        
-Freeing REx: "[q]"

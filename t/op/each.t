@@ -1,12 +1,13 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
-plan tests => 39;
+plan tests => 35;
+
+our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total, 
+     %hash, @foo, %u, $A, %b);
 
 $h{'abc'} = 'ABC';
 $h{'def'} = 'DEF';
@@ -106,20 +107,23 @@ isnt ($size, (split('/', scalar %hash))[1]);
 
 is (keys(%hash), 10, "keys (%hash)");
 
+{
+no strict;
 is (keys(hash), 10, "keys (hash)");
+}
 
 $i = 0;
-%h = (a => A, b => B, c=> C, d => D, abc => ABC);
-@keys = keys(h);
-@values = values(h);
-while (($key, $value) = each(h)) {
+%h = (a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');
+@keys = keys(%h);
+@values = values(%h);
+while (($key, $value) = each(%h)) {
 	if ($key eq $keys[$i] && $value eq $values[$i] && $key eq lc($value)) {
 		$i++;
 	}
 }
 is ($i, 5);
 
-@tests = (&next_test, &next_test, &next_test);
+our @tests = (&next_test, &next_test, &next_test);
 {
     package Obj;
     sub DESTROY { print "ok $::tests[1] # DESTROY called\n"; }
@@ -133,6 +137,7 @@ is ($i, 5);
 }
 
 # Check for Unicode hash keys.
+use utf8;
 %u = ("\x{12}", "f", "\x{123}", "fo", "\x{1234}",  "foo");
 $u{"\x{12345}"}  = "bar";
 @u{"\x{10FFFD}"} = "zap";
@@ -144,46 +149,32 @@ foreach (keys %u) {
 }
 ok (eq_hash(\%u, \%u2), "copied unicode hash keys correctly?");
 
-$a = "\xe3\x81\x82"; $A = "\x{3042}";
+$a = "\x[e3]\x[81]\x[82]"; $A = "\x{3042}";
 %b = ( $a => "non-utf8");
 %u = ( $A => "utf8");
 
-is (exists $b{$A}, '', "utf8 key in bytes hash");
-is (exists $u{$a}, '', "bytes key in utf8 hash");
+is (exists $b{$A}, '1', "hash uses byte-string");
+is (exists $u{$a}, '1', "hash uses byte-string");
 print "# $b{$_}\n" for keys %b; # Used to core dump before change #8056.
 pass ("if we got here change 8056 worked");
 print "# $u{$_}\n" for keys %u; # Used to core dump before change #8056.
 pass ("change 8056 is thanks to Inaba Hiroto");
 
-# on EBCDIC chars are mapped differently so pick something that needs encoding
-# there too.
-$d = pack("U*", 0xe3, 0x81, 0xAF);
-{ use bytes; $ol = bytes::length($d) }
-cmp_ok ($ol, '>', 3, "check encoding on EBCDIC");
-%u = ($d => "downgrade");
-for (keys %u) {
-    is (length, 3, "check length"); 
-    is ($_, pack("U*", 0xe3, 0x81, 0xAF), "check value");
-}
-{
-    { use bytes; is (bytes::length($d), $ol) }
-}
-
 {
     my %u;
     my $u0 = pack("U0U", 0x00FF);
-    my $b0 = "\xC3\xBF";          # 0xCB 0xBF is U+00FF in UTF-8
+    my $b0 = "\x[C3]\x[BF]";          # 0xCB 0xBF is U+00FF in UTF-8
     my $u1 = pack("U0U", 0x0100);
-    my $b1 = "\xC4\x80";          # 0xC4 0x80 is U+0100 in UTF-8
+    my $b1 = "\x[C4]\x[80]";          # 0xC4 0x80 is U+0100 in UTF-8
 
     $u{$u0} = 1;
     $u{$b0} = 2; 
     $u{$u1} = 3;
     $u{$b1} = 4;
 
-    is(scalar keys %u, 4, "four different Unicode keys"); 
-    is($u{$u0}, 1, "U+00FF        -> 1");
-    is($u{$b0}, 2, "U+00C3 U+00BF -> 2");
-    is($u{$u1}, 3, "U+0100        -> 3 ");
-    is($u{$b1}, 4, "U+00C4 U+0080 -> 4");
+    is(scalar keys %u, 2, "two different keys (byte and unicode are the same)"); 
+    is($u{$u0}, 2, "U+00FF=\\xC3\\xBF  -> 2");
+    is($u{$b0}, 2, "\\xC3\\xBF=U+00FF  -> 2");
+    is($u{$u1}, 4, "U+0100=\\xC4\\x80  -> 4 ");
+    is($u{$b1}, 4, "\\xC4\\x80=U+0100  -> 4");
 }

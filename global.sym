@@ -377,7 +377,6 @@ Perl_get_hv
 Perl_get_cv
 Perl_get_cvn_flags
 Perl_init_i18nl10n
-Perl_init_i18nl14n
 Perl_new_collate
 Perl_new_ctype
 Perl_new_numeric
@@ -392,7 +391,6 @@ Perl_pop_scope
 Perl_push_scope
 Perl_ref
 Perl_regdump
-Perl_regclass_swash
 Perl_pregexec
 Perl_pregfree
 Perl_reg_temp_copy
@@ -653,8 +651,6 @@ Perl_sv_2pvbyte_nolen
 Perl_sv_pv
 Perl_sv_pvutf8
 Perl_sv_pvbyte
-Perl_sv_utf8_upgrade
-Perl_sv_utf8_downgrade
 Perl_sv_utf8_encode
 Perl_sv_utf8_decode
 Perl_sv_force_normal
@@ -698,7 +694,6 @@ Perl_Slab_Free
 Perl_sv_setsv_flags
 Perl_sv_catpvn_flags
 Perl_sv_catsv_flags
-Perl_sv_utf8_upgrade_flags
 Perl_sv_pvn_force_flags
 Perl_sv_copypv
 Perl_my_atof2
@@ -729,7 +724,6 @@ Perl_PerlIO_stdin
 Perl_PerlIO_stdout
 Perl_PerlIO_stderr
 Perl_pad_push
-Perl_find_runcv
 Perl_save_set_svflags
 Perl_hv_assert
 Perl_hv_scalar
@@ -760,5 +754,7 @@ Perl_signbit
 Perl_emulate_cop_io
 Perl_get_re_arg
 Perl_mro_get_linear_isa
+Perl_mro_get_linear_isa_c3
+Perl_mro_get_linear_isa_dfs
 Perl_mro_method_changed_in
 # ex: set ro:

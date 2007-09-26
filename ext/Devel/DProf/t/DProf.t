@@ -4,7 +4,7 @@ BEGIN {
     chdir( 't' ) if -d 't';
     @INC = '../lib';
     require './test.pl';      # for which_perl() etc
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bDevel\/DProf\b/){
       print "1..0 # Skip: Devel::DProf was not built\n";
       exit 0;
@@ -24,7 +24,7 @@ getopts('vI:p:');
 # -I   Add to @INC
 # -p   Name of perl binary
 
-@tests = @ARGV ? @ARGV : sort (<lib/dprof/*_t>, <lib/dprof/*_v>);  # glob-sort, for OS/2
+@tests = @ARGV ? @ARGV : sort (glob("lib/dprof/*_t"), glob("lib/dprof/*_v"));  # glob-sort, for OS/2
 
 $path_sep = $Config{path_sep} || ':';
 $perl5lib = $opt_I || join( $path_sep, @INC );
@@ -47,11 +47,11 @@ sub profile {
 	local $ENV{PERL5LIB} = $perl5lib;
 	my $opt_d = '-d:DProf';
 
-	my $t_start = new Benchmark;
+	my $t_start = Benchmark->new();
 	open( R, "$perl -f \"$opt_d\" $test |" ) || warn "$0: Can't run. $!\n";
 	@results = <R>;
 	close R or warn "Could not close: $!";
-	my $t_total = timediff( new Benchmark, $t_start );
+	my $t_total = timediff( Benchmark->new(), $t_start );
 
 	if( $opt_v ){
 		print "\n";

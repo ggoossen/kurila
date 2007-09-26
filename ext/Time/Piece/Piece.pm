@@ -24,7 +24,7 @@ our %EXPORT_TAGS = (
 
 our $VERSION = '1.11_02';
 
-bootstrap Time::Piece $VERSION;
+Time::Piece->bootstrap($VERSION);
 
 my $DATE_SEP = '-';
 my $TIME_SEP = ':';
@@ -123,7 +123,7 @@ sub export {
     if (exists $_special_exports{$method}) {
       no strict 'refs';
       no warnings 'redefine';
-      *{$to . "::$method"} = $_special_exports{$method}->($class);
+      *{Symbol::qualify_to_ref($to . "::$method")} = $_special_exports{$method}->($class);
     } else {
       $class->SUPER::export($to, $method);
     }

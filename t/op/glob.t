@@ -1,30 +1,27 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
-require 'test.pl';
+require './test.pl';
 plan( tests => 15 );
 
-@oops = @ops = <op/*>;
+our (@oops, @ops, %files, $not, @glops, $x);
+
+@oops = @ops = glob("op/*");
 
 if ($^O eq 'MSWin32') {
-  map { $files{lc($_)}++ } <op/*>;
+  map { $files{lc($_)}++ } glob("op/*");
   map { delete $files{"op/$_"} } split /[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,
 }
 elsif ($^O eq 'VMS') {
-  map { $files{lc($_)}++ } <[.op]*>;
+  map { $files{lc($_)}++ } glob("[.op]*");
   map { s/;.*$//; delete $files{lc($_)}; } split /[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
 }
 elsif ($^O eq 'MacOS') {
-  @oops = @ops = <:op:*>;
-  map { $files{$_}++ } <:op:*>;
+  @oops = @ops = glob(":op:*");
+  map { $files{$_}++ } glob(":op:*");
   map { delete $files{$_} } split /[\s\n]/, `echo :op:\xc5`;
 }
 else {
-  map { $files{$_}++ } <op/*>;
+  map { $files{$_}++ } glob("op/*");
   map { delete $files{$_} } split /[\s\n]/, `echo op/*`;
 }
 ok( !(keys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
@@ -33,12 +30,12 @@ cmp_ok($/,'eq',"\n",'sane input record separator');
 
 $not = '';
 if ($^O eq 'MacOS') {
-    while (<jskdfjskdfj* :op:* jskdjfjkosvk*>) {
+    while (glob("jskdfjskdfj* :op:* jskdjfjkosvk*")) {
 	$not = "not " unless $_ eq shift @ops;
 	$not = "not at all " if $/ eq "\0";
     }
 } else {
-    while (<jskdfjskdfj* op/* jskdjfjkosvk*>) {
+    while (glob("jskdfjskdfj* op/* jskdjfjkosvk*")) {
 	$not = "not " unless $_ eq shift @ops;
 	$not = "not at all " if $/ eq "\0";
     }
@@ -58,9 +55,9 @@ cmp_ok("@glops",'eq',"@oops",'glob operator 2');
 # (this used to dump core)
 my $i = 0;
 for (1..2) {
-    eval "<.>";
+    eval "glob('.')";
     ok(!length($@),"eval'ed a glob $_");
-    undef %File::Glob::;
+    undef %{Symbol::stash('File::Glob')};
     ++$i;
 }
 cmp_ok($i,'==',2,'remore File::Glob stash');

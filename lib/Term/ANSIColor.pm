@@ -104,7 +104,7 @@ sub AUTOLOAD {
                 }
             }
         };
-        goto &$AUTOLOAD;
+        goto &{Symbol::qualify_to_ref($AUTOLOAD)};
     } else {
         require Carp;
         Carp::croak ("undefined subroutine &$AUTOLOAD called");

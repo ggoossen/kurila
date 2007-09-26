@@ -1,0 +1,20 @@
+Changes for 0.16    Thu Jan 25 22:24:36 CET 2007
+=================================================
+* Address #23995: Version parsing code has been
+  improved and now partly relies on version.pm.
+  Previously, versions declared with qv() or
+  ($VERSION) (note the braces) could fail to
+  parse under certain conditions.
+* Add 02_Parse_Version.t to specifically test for
+  this behaviour.
+
+Changes for 0.14    Wed Jan  3 18:27:36 CET 2007
+=================================================
+* Skip $VERSION declarations that are part of the 
+  POD as reported in #24062
+
+Changes for 0.12    Sun Aug 13 14:55:54 CEST 2006
+=================================================
+* Make %INC look ups work correctly under win32,
+  where the directory seperator is not the same
+  as the %INC path seperator

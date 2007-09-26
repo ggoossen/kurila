@@ -197,7 +197,7 @@ sub new {
 
 sub TIEHASH {
     my $pkg = shift;
-    if (defined &{"${pkg}::new"}) {
+    if (defined &{Symbol::qualify_to_ref("${pkg}::new")}) {
 	warnings::warnif("WARNING: calling ${pkg}->new since ${pkg}->TIEHASH is missing");
 	$pkg->new(@_);
     }

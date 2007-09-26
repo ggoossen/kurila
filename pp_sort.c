@@ -1693,11 +1693,7 @@ PP(pp_sort)
 		        ? ( ( ( priv & OPpSORT_INTEGER) || all_SIVs)
 			    ? ( overloading ? S_amagic_i_ncmp : S_sv_i_ncmp)
 			    : ( overloading ? S_amagic_ncmp : S_sv_ncmp ) )
-			: ( IN_LOCALE_RUNTIME
-			    ? ( overloading
-				? (SVCOMPARE_t)S_amagic_cmp_locale
-				: (SVCOMPARE_t)sv_cmp_locale_static)
-			    : ( overloading ? (SVCOMPARE_t)S_amagic_cmp : (SVCOMPARE_t)sv_cmp_static)),
+			: ( overloading ? (SVCOMPARE_t)S_amagic_cmp : (SVCOMPARE_t)sv_cmp_static ),
 		    sort_flags);
 	}
 	if ((priv & OPpSORT_REVERSE) != 0) {
@@ -1901,24 +1897,6 @@ S_amagic_cmp(pTHX_ register SV *str1, register SV *str2)
 	}
     }
     return sv_cmp(str1, str2);
-}
-
-static I32
-S_amagic_cmp_locale(pTHX_ register SV *str1, register SV *str2)
-{
-    dVAR;
-    SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp);
-    if (tmpsv) {
-        if (SvIOK(tmpsv)) {
-            const I32 i = SvIVX(tmpsv);
-            return SORT_NORMAL_RETURN_VALUE(i);
-        }
-	else {
-	    const NV d = SvNV(tmpsv);
-	    return SORT_NORMAL_RETURN_VALUE(d);
-	}
-    }
-    return sv_cmp_locale(str1, str2);
 }
 
 /*

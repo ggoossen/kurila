@@ -3,7 +3,7 @@ BEGIN {
         chdir 't';
         unshift @INC, '../lib';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
@@ -15,6 +15,7 @@ use strict;
 use utf8;
 use Test::More tests => 778;
 use Encode;
+use utf8;
 use Encode::GSM0338;
 
 # The specification of GSM 03.38 is not awfully clear.

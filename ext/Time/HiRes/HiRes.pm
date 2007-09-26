@@ -40,9 +40,9 @@ sub AUTOLOAD {
     }
     {
 	no strict 'refs';
-	*$AUTOLOAD = sub { $val };
+	*{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
     }
-    goto &$AUTOLOAD;
+    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
 }
 
 sub import {
@@ -62,7 +62,7 @@ sub import {
     Time::HiRes->export_to_level(1, $this, @_);
 }
 
-bootstrap Time::HiRes;
+Time::HiRes->bootstrap();
 
 # Preloaded methods go here.
 

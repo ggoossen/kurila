@@ -2,6 +2,10 @@ use File::Spec;
 
 require "test.pl";
 
+require bytes;
+use utf8;
+use strict;
+
 sub unidump {
     join " ", map { sprintf "%04X", $_ } unpack "U*", $_[0];
 }
@@ -9,7 +13,7 @@ sub unidump {
 sub casetest {
     my ($base, $spec, @funcs) = @_;
     # For each provided function run it, and run a version with some extra
-    # characters afterwards. Use a recycling symbol, as it doesn't change case.
+    # characters afterwards. Use a recylcing symbol, as it doesn't change case.
     my $ballast = chr (0x2672) x 3;
     @funcs = map {my $f = $_;
 		  ($f,
@@ -20,7 +24,7 @@ sub casetest {
 		    },
 		   )} @funcs;
 
-    my $file = File::Spec->catfile(File::Spec->catdir(File::Spec->updir,
+    my $file = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
 						      "lib", "unicore", "To"),
 				   "$base.pl");
     my $simple = do $file or die $@;
@@ -71,7 +75,7 @@ sub casetest {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
 	    print $d eq pack("U0U", hex $simple{$i}) ?
-		"ok $test # $i -> $w\n" : "not ok $test # $i -> $e ($w)\n";
+		"ok $test # $i -> $w\n" : "not ok $test # $i -> $e ($w)" . sprintf('%x', ord($d)) . "\n";
 		$test++;
 	}
     }
@@ -79,15 +83,14 @@ sub casetest {
     for my $i (sort keys %$spec) {
 	my $w = unidump($spec->{$i});
 	if (ord('A') == 193 && $i eq "\x8A\x73") {
-	    $w = '0178'; # It's a Latin small Y with diaeresis and not a Latin small letter sharp 's'.
+	    $w = '0178'; # It's a latin small Y with diaresis and not a latin small letter sharp 's'.
 	}
-	my $u = unpack "C0U", $i;
-	my $h = sprintf "%04X", $u;
-	my $c = chr($u); $c .= chr(0x100); chop $c;
+        #my $c = substr $i, 0, 1;
+	my $h = unidump($i);
 	foreach my $func (@funcs) {
-	    my $d = $func->($c);
+	    my $d = $func->($i);
 	    my $e = unidump($d);
-	    if (ord "A" == 193) { # EBCDIC
+	    if (bytes::ord "A" == 193) { # EBCDIC
 		# We need to a little bit of remapping.
 		#
 		# For example, in titlecase (ucfirst) mapping

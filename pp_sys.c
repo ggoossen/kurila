@@ -298,7 +298,9 @@ S_emulate_eaccess(pTHX_ const char* path, Mode_t mode)
     return res;
 }
 #   define PERL_EFF_ACCESS(p,f) (emulate_eaccess((p), (f)))
-#else
+#endif
+
+#if !defined(PERL_EFF_ACCESS)
 /* With it or without it: anyway you get a warning: either that
    it is unused, or it is declared static and never defined.
  */
@@ -476,7 +478,7 @@ PP(pp_die)
     }
     else {
 	tmpsv = TOPs;
-        tmps = SvROK(tmpsv) ? (const char *)NULL : SvPV_const(tmpsv, len);
+        tmps = SvROK(tmpsv) ? NULL : SvPV_const(tmpsv, len);
     }
     if (!tmps || !len) {
 	SV * const error = ERRSV;
@@ -1170,26 +1172,13 @@ Perl_setdefout(pTHX_ GV *gv)
 
 PP(pp_select)
 {
-    dVAR; dSP; dTARGET;
-    HV *hv;
+    dVAR; dSP;
     GV * const newdefout = (PL_op->op_private > 0) ? ((GV *) POPs) : NULL;
     GV * egv = GvEGV(PL_defoutgv);
 
     if (!egv)
 	egv = PL_defoutgv;
-    hv = GvSTASH(egv);
-    if (! hv)
-	XPUSHs(&PL_sv_undef);
-    else {
-	GV * const * const gvp = (GV**)hv_fetch(hv, GvNAME(egv), GvNAMELEN(egv), FALSE);
-	if (gvp && *gvp == egv) {
-	    gv_efullname4(TARG, PL_defoutgv, NULL, TRUE);
-	    XPUSHTARG;
-	}
-	else {
-	    XPUSHs(sv_2mortal(newRV((SV*)egv)));
-	}
-    }
+    XPUSHs( egv ? sv_mortalcopy((SV*)egv) : &PL_sv_undef );
 
     if (newdefout) {
 	if (!GvIO(newdefout))
@@ -1240,207 +1229,9 @@ PP(pp_getc)
 	    len = PerlIO_read(IoIFP(GvIOp(gv)),SvPVX(TARG)+1,len-1);
 	    SvCUR_set(TARG,1+len);
 	}
-	SvUTF8_on(TARG);
     }
     PUSHTARG;
     RETURN;
-}
-
-STATIC OP *
-S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
-{
-    dVAR;
-    register PERL_CONTEXT *cx;
-    const I32 gimme = GIMME_V;
-
-    ENTER;
-    SAVETMPS;
-
-    PUSHBLOCK(cx, CXt_FORMAT, PL_stack_sp);
-    PUSHFORMAT(cx);
-    cx->blk_sub.retop = retop;
-    SAVECOMPPAD();
-    PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
-
-    setdefout(gv);	    /* locally select filehandle so $% et al work */
-    return CvSTART(cv);
-}
-
-PP(pp_enterwrite)
-{
-    dVAR;
-    dSP;
-    register GV *gv;
-    register IO *io;
-    GV *fgv;
-    CV *cv;
-    SV * tmpsv = NULL;
-
-    if (MAXARG == 0)
-	gv = PL_defoutgv;
-    else {
-	gv = (GV*)POPs;
-	if (!gv)
-	    gv = PL_defoutgv;
-    }
-    EXTEND(SP, 1);
-    io = GvIO(gv);
-    if (!io) {
-	RETPUSHNO;
-    }
-    if (IoFMT_GV(io))
-	fgv = IoFMT_GV(io);
-    else
-	fgv = gv;
-
-    if (!fgv)
-	goto not_a_format_reference;
-
-    cv = GvFORM(fgv);
-    if (!cv) {
-	const char *name;
-	tmpsv = sv_newmortal();
-	gv_efullname4(tmpsv, fgv, NULL, FALSE);
-	name = SvPV_nolen_const(tmpsv);
-	if (name && *name)
-	    DIE(aTHX_ "Undefined format \"%s\" called", name);
-
-	not_a_format_reference:
-	DIE(aTHX_ "Not a format reference");
-    }
-    if (CvCLONE(cv))
-	cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
-
-    IoFLAGS(io) &= ~IOf_DIDTOP;
-    return doform(cv,gv,PL_op->op_next);
-}
-
-PP(pp_leavewrite)
-{
-    dVAR; dSP;
-    GV * const gv = cxstack[cxstack_ix].blk_sub.gv;
-    register IO * const io = GvIOp(gv);
-    PerlIO *ofp;
-    PerlIO *fp;
-    SV **newsp;
-    I32 gimme;
-    register PERL_CONTEXT *cx;
-
-    if (!io || !(ofp = IoOFP(io)))
-        goto forget_top;
-
-    DEBUG_f(PerlIO_printf(Perl_debug_log, "left=%ld, todo=%ld\n",
-	  (long)IoLINES_LEFT(io), (long)FmLINES(PL_formtarget)));
-
-    if (IoLINES_LEFT(io) < FmLINES(PL_formtarget) &&
-	PL_formtarget != PL_toptarget)
-    {
-	GV *fgv;
-	CV *cv;
-	if (!IoTOP_GV(io)) {
-	    GV *topgv;
-
-	    if (!IoTOP_NAME(io)) {
-		SV *topname;
-		if (!IoFMT_NAME(io))
-		    IoFMT_NAME(io) = savepv(GvNAME(gv));
-		topname = sv_2mortal(Perl_newSVpvf(aTHX_ "%s_TOP", GvNAME(gv)));
-		topgv = gv_fetchsv(topname, 0, SVt_PVFM);
-		if ((topgv && GvFORM(topgv)) ||
-		  !gv_fetchpvs("top", GV_NOTQUAL, SVt_PVFM))
-		    IoTOP_NAME(io) = savesvpv(topname);
-		else
-		    IoTOP_NAME(io) = savepvs("top");
-	    }
-	    topgv = gv_fetchpv(IoTOP_NAME(io), 0, SVt_PVFM);
-	    if (!topgv || !GvFORM(topgv)) {
-		IoLINES_LEFT(io) = IoPAGE_LEN(io);
-		goto forget_top;
-	    }
-	    IoTOP_GV(io) = topgv;
-	}
-	if (IoFLAGS(io) & IOf_DIDTOP) {	/* Oh dear.  It still doesn't fit. */
-	    I32 lines = IoLINES_LEFT(io);
-	    const char *s = SvPVX_const(PL_formtarget);
-	    if (lines <= 0)		/* Yow, header didn't even fit!!! */
-		goto forget_top;
-	    while (lines-- > 0) {
-		s = strchr(s, '\n');
-		if (!s)
-		    break;
-		s++;
-	    }
-	    if (s) {
-		const STRLEN save = SvCUR(PL_formtarget);
-		SvCUR_set(PL_formtarget, s - SvPVX_const(PL_formtarget));
-		do_print(PL_formtarget, ofp);
-		SvCUR_set(PL_formtarget, save);
-		sv_chop(PL_formtarget, s);
-		FmLINES(PL_formtarget) -= IoLINES_LEFT(io);
-	    }
-	}
-	if (IoLINES_LEFT(io) >= 0 && IoPAGE(io) > 0)
-	    do_print(PL_formfeed, ofp);
-	IoLINES_LEFT(io) = IoPAGE_LEN(io);
-	IoPAGE(io)++;
-	PL_formtarget = PL_toptarget;
-	IoFLAGS(io) |= IOf_DIDTOP;
-	fgv = IoTOP_GV(io);
-	if (!fgv)
-	    DIE(aTHX_ "bad top format reference");
-	cv = GvFORM(fgv);
-	if (!cv) {
-	    SV * const sv = sv_newmortal();
-	    const char *name;
-	    gv_efullname4(sv, fgv, NULL, FALSE);
-	    name = SvPV_nolen_const(sv);
-	    if (name && *name)
-		DIE(aTHX_ "Undefined top format \"%s\" called", name);
-	    else
-		DIE(aTHX_ "Undefined top format called");
-	}
-	if (cv && CvCLONE(cv))
-	    cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
-	return doform(cv, gv, PL_op);
-    }
-
-  forget_top:
-    POPBLOCK(cx,PL_curpm);
-    POPFORMAT(cx);
-    LEAVE;
-
-    fp = IoOFP(io);
-    if (!fp) {
-	if (ckWARN2(WARN_CLOSED,WARN_IO)) {
-	    if (IoIFP(io))
-		report_evil_fh(gv, io, OP_phoney_INPUT_ONLY);
-	    else if (ckWARN(WARN_CLOSED))
-		report_evil_fh(gv, io, PL_op->op_type);
-	}
-	PUSHs(&PL_sv_no);
-    }
-    else {
-	if ((IoLINES_LEFT(io) -= FmLINES(PL_formtarget)) < 0) {
-	    if (ckWARN(WARN_IO))
-		Perl_warner(aTHX_ packWARN(WARN_IO), "page overflow");
-	}
-	if (!do_print(PL_formtarget, fp))
-	    PUSHs(&PL_sv_no);
-	else {
-	    FmLINES(PL_formtarget) = 0;
-	    SvCUR_set(PL_formtarget, 0);
-	    *SvEND(PL_formtarget) = '\0';
-	    if (IoFLAGS(io) & IOf_FLUSH)
-		(void)PerlIO_flush(fp);
-	    PUSHs(&PL_sv_yes);
-	}
-    }
-    /* bad_ofp: */
-    PL_formtarget = PL_bodytarget;
-    PUTBACK;
-    PERL_UNUSED_VAR(newsp);
-    PERL_UNUSED_VAR(gimme);
-    return cx->blk_sub.retop;
 }
 
 PP(pp_prtf)
@@ -1549,8 +1340,6 @@ PP(pp_sysread)
     Sock_size_t bufsize;
     SV *bufsv;
     STRLEN blen;
-    int fp_utf8;
-    int buffer_utf8;
     SV *read_target;
     Size_t got = 0;
     Size_t wanted;
@@ -1596,16 +1385,7 @@ PP(pp_sysread)
 	SETERRNO(EBADF,RMS_IFI);
 	goto say_undef;
     }
-    if ((fp_utf8 = PerlIO_isutf8(IoIFP(io))) && !IN_BYTES) {
-	buffer = SvPVutf8_force(bufsv, blen);
-	/* UTF-8 may not have been set if they are all low bytes */
-	SvUTF8_on(bufsv);
-	buffer_utf8 = 0;
-    }
-    else {
-	buffer = SvPV_force(bufsv, blen);
-	buffer_utf8 = !IN_BYTES && SvUTF8(bufsv);
-    }
+    buffer = SvPV_force(bufsv, blen);
     if (length < 0)
 	DIE(aTHX_ "Negative length");
     wanted = length;
@@ -1639,8 +1419,6 @@ PP(pp_sysread)
 	SvCUR_set(bufsv, count);
 	*SvEND(bufsv) = '\0';
 	(void)SvPOK_only(bufsv);
-	if (fp_utf8)
-	    SvUTF8_on(bufsv);
 	SvSETMAGIC(bufsv);
 	/* This should not be marked tainted if the fp is marked clean */
 	if (!(IoFLAGS(io) & IOf_UNTAINT))
@@ -1654,7 +1432,7 @@ PP(pp_sysread)
     if (PL_op->op_type == OP_RECV)
 	DIE(aTHX_ PL_no_sock_func, "recv");
 #endif
-    if (DO_UTF8(bufsv)) {
+    if (IN_CODEPOINTS) {
 	/* offset adjust in characters not bytes */
 	blen = sv_len_utf8(bufsv);
     }
@@ -1663,7 +1441,7 @@ PP(pp_sysread)
 	    DIE(aTHX_ "Offset outside string");
 	offset += blen;
     }
-    if (DO_UTF8(bufsv)) {
+    if (IN_CODEPOINTS) {
 	/* convert offset-as-chars to offset-as-bytes */
 	if (offset >= (int)blen)
 	    offset += SvCUR(bufsv) - blen;
@@ -1682,20 +1460,7 @@ PP(pp_sysread)
     	Zero(buffer+bufsize, offset-bufsize, char);
     }
     buffer = buffer + offset;
-    if (!buffer_utf8) {
-	read_target = bufsv;
-    } else {
-	/* Best to read the bytes into a new SV, upgrade that to UTF8, then
-	   concatenate it to the current buffer.  */
-
-	/* Truncate the existing buffer to the start of where we will be
-	   reading to:  */
-	SvCUR_set(bufsv, offset);
-
-	read_target = sv_newmortal();
-	SvUPGRADE(read_target, SVt_PV);
-	buffer = SvGROW(read_target, (STRLEN)(length + 1));
-    }
+    read_target = bufsv;
 
     if (PL_op->op_type == OP_SYSREAD) {
 #ifdef PERL_SOCK_SYSREAD_IS_RECV
@@ -1738,7 +1503,7 @@ PP(pp_sysread)
     SvCUR_set(read_target, count+(buffer - SvPVX_const(read_target)));
     *SvEND(read_target) = '\0';
     (void)SvPOK_only(read_target);
-    if (fp_utf8 && !IN_BYTES) {
+    if (IN_CODEPOINTS) {
 	/* Look at utf8 we got back and count the characters */
 	const char *bend = buffer + count;
 	while (buffer < bend) {
@@ -1771,12 +1536,6 @@ PP(pp_sysread)
 	}
 	/* return value is character count */
 	count = got;
-	SvUTF8_on(bufsv);
-    }
-    else if (buffer_utf8) {
-	/* Let svcatsv upgrade the bytes we read in to utf8.
-	   The buffer is a mortal so will be freed soon.  */
-	sv_catsv_nomg(bufsv, read_target);
     }
     SvSETMAGIC(bufsv);
     /* This should not be marked tainted if the fp is marked clean */
@@ -1801,7 +1560,6 @@ PP(pp_send)
     STRLEN blen;
     STRLEN orig_blen_bytes;
     const int op_type = PL_op->op_type;
-    bool doing_utf8;
     U8 *tmpbuf = NULL;
     
     GV *const gv = (GV*)*++MARK;
@@ -1852,40 +1610,13 @@ PP(pp_send)
     /* Do this first to trigger any overloading.  */
     buffer = SvPV_const(bufsv, blen);
     orig_blen_bytes = blen;
-    doing_utf8 = DO_UTF8(bufsv);
-
-    if (PerlIO_isutf8(IoIFP(io))) {
-	if (!SvUTF8(bufsv)) {
-	    /* We don't modify the original scalar.  */
-	    tmpbuf = bytes_to_utf8((const U8*) buffer, &blen);
-	    buffer = (char *) tmpbuf;
-	    doing_utf8 = TRUE;
-	}
-    }
-    else if (doing_utf8) {
-	STRLEN tmplen = blen;
-	U8 * const result = bytes_from_utf8((const U8*) buffer, &tmplen, &doing_utf8);
-	if (!doing_utf8) {
-	    tmpbuf = result;
-	    buffer = (char *) tmpbuf;
-	    blen = tmplen;
-	}
-	else {
-	    assert((char *)result == buffer);
-	    Perl_croak(aTHX_ "Wide character in %s", OP_DESC(PL_op));
-	}
-    }
 
     if (op_type == OP_SYSWRITE) {
 	Size_t length = 0; /* This length is in characters.  */
 	STRLEN blen_chars;
 	IV offset;
 
-	if (doing_utf8) {
-	    if (tmpbuf) {
-		/* The SV is bytes, and we've had to upgrade it.  */
-		blen_chars = orig_blen_bytes;
-	    } else {
+	if (IN_CODEPOINTS) {
 		/* The SV really is UTF-8.  */
 		if (SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
 		    /* Don't call sv_len_utf8 again because it will call magic
@@ -1896,7 +1627,6 @@ PP(pp_send)
 		    /* It's safe, and it may well be cached.  */
 		    blen_chars = sv_len_utf8(bufsv);
 		}
-	    }
 	} else {
 	    blen_chars = blen;
 	}
@@ -1931,9 +1661,9 @@ PP(pp_send)
 	    offset = 0;
 	if (length > blen_chars - offset)
 	    length = blen_chars - offset;
-	if (doing_utf8) {
+	if (IN_CODEPOINTS) {
 	    /* Here we convert length from characters to bytes.  */
-	    if (tmpbuf || SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
+	    if (SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
 		/* Either we had to convert the SV, or the SV is magical, or
 		   the SV has overloading, in which case we can't or mustn't
 		   or mustn't call it again.  */
@@ -1993,7 +1723,7 @@ PP(pp_send)
     if (retval < 0)
 	goto say_undef;
     SP = ORIGMARK;
-    if (doing_utf8)
+    if (IN_CODEPOINTS)
         retval = utf8_length((U8*)buffer, (U8*)buffer + retval);
 
     Safefree(tmpbuf);
@@ -3355,10 +3085,6 @@ PP(pp_fttext)
             odd++;
 #else
 	else if (*s & 128) {
-#ifdef USE_LOCALE
-	    if (IN_LOCALE_RUNTIME && isALPHA_LC(*s))
-		continue;
-#endif
 	    /* utf8 characters don't count as odd */
 	    if (UTF8_IS_START(*s)) {
 		int ulen = UTF8SKIP(s);
@@ -4648,7 +4374,7 @@ PP(pp_ghostent)
     EXTEND(SP, 10);
     if (which == OP_GHBYNAME) {
 #ifdef HAS_GETHOSTBYNAME
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	hent = PerlSock_gethostbyname(name);
 #else
 	DIE(aTHX_ PL_no_sock_func, "gethostbyname");
@@ -4659,7 +4385,7 @@ PP(pp_ghostent)
 	const int addrtype = POPi;
 	SV * const addrsv = POPs;
 	STRLEN addrlen;
-	const char *addr = (char *)SvPVbyte(addrsv, addrlen);
+	const char *addr = (char *)SvPV(addrsv, addrlen);
 
 	hent = PerlSock_gethostbyaddr(addr, (Netdb_hlen_t) addrlen, addrtype);
 #else
@@ -4735,7 +4461,7 @@ PP(pp_gnetent)
 
     if (which == OP_GNBYNAME){
 #ifdef HAS_GETNETBYNAME
-	const char * const name = POPpbytex;
+	const char * const name = POPpx;
 	nent = PerlSock_getnetbyname(name);
 #else
         DIE(aTHX_ PL_no_sock_func, "getnetbyname");
@@ -4808,7 +4534,7 @@ PP(pp_gprotoent)
 
     if (which == OP_GPBYNAME) {
 #ifdef HAS_GETPROTOBYNAME
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	pent = PerlSock_getprotobyname(name);
 #else
 	DIE(aTHX_ PL_no_sock_func, "getprotobyname");
@@ -4868,8 +4594,8 @@ PP(pp_gservent)
 
     if (which == OP_GSBYNAME) {
 #ifdef HAS_GETSERVBYNAME
-	const char * const proto = POPpbytex;
-	const char * const name = POPpbytex;
+	const char * const proto = POPpx;
+	const char * const name = POPpx;
 	sent = PerlSock_getservbyname(name, (proto && !*proto) ? NULL : proto);
 #else
 	DIE(aTHX_ PL_no_sock_func, "getservbyname");
@@ -4877,7 +4603,7 @@ PP(pp_gservent)
     }
     else if (which == OP_GSBYPORT) {
 #ifdef HAS_GETSERVBYPORT
-	const char * const proto = POPpbytex;
+	const char * const proto = POPpx;
 	unsigned short port = (unsigned short)POPu;
 #ifdef HAS_HTONS
 	port = PerlSock_htons(port);
@@ -5096,7 +4822,7 @@ PP(pp_gpwent)
     switch (which) {
     case OP_GPWNAM:
       {
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	pwent  = getpwnam(name);
       }
       break;
@@ -5227,7 +4953,7 @@ PP(pp_gpwent)
 #   ifdef PWGECOS
 	PUSHs(sv = sv_2mortal(newSVpv(pwent->pw_gecos, 0)));
 #   else
-	PUSHs(sv = sv_mortalcopy(&PL_sv_no));
+	PUSHs(sv_mortalcopy(&PL_sv_no));
 #   endif
 #   ifndef INCOMPLETE_TAINTS
 	/* pw_gecos is tainted because user himself can diddle with it. */
@@ -5282,7 +5008,7 @@ PP(pp_ggrent)
     const struct group *grent;
 
     if (which == OP_GGRNAM) {
-	const char* const name = POPpbytex;
+	const char* const name = POPpx;
 	grent = (const struct group *)getgrnam(name);
     }
     else if (which == OP_GGRGID) {

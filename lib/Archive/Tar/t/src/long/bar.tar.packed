@@ -10,7 +10,7 @@ To recreate it use the following command:
 
      uupacktool.pl -p lib/Archive/Tar/t/src/long/bar.tar lib/Archive/Tar/t/src/long/bar.tar.packed
 
-Created at Sun Sep 16 10:56:54 2007
+Created at Thu May 24 15:38:19 2007
 #########################################################################
 __UU__
 M8P``````````````````````````````````````````````````````````

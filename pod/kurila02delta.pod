@@ -1,0 +1,59 @@
+=head1 NAME
+
+kurila02delta - what is new for Perl Kurila 0.2
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 0.2 and Perl Kurila 0.1
+
+=head1 Highlights In Kurila 0.2
+
+=over 4
+
+=item *
+
+Claim to be kurila on more places
+
+=item *
+
+Integrate bleadperl changes
+
+=item *
+
+=back
+
+=head1 Core Enhancements
+
+=head2 Claim to be kurila on more places
+
+The distibution claims to be kurila instead of perl on a few more places, mostly notably REAME and META.yml
+
+=head2 Internal bleadperl changes
+
+bleadperl changes upto 31121 are integrated
+
+=back
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documention has not been updated for many of the changes for kurila.
+
+=head2 Limited platform support
+
+Perl Kurila has ony been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut

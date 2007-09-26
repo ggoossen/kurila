@@ -1,6 +1,8 @@
 #!/usr/bin/perl5.00502
 
-@tests = (split(/\nEND\n/s, <<DONE));
+use strict;
+
+my @tests = (split(/\nEND\n/s, <<DONE));
 TEST1
 This 
 is
@@ -121,11 +123,11 @@ print "1..", 2 +@tests, "\n";
 
 use Text::Wrap;
 
-$rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+my $rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
-$tn = 1;
+my $tn = 1;
 
-@st = @tests;
+my @st = @tests;
 while (@st) {
 	my $in = shift(@st);
 	my $out = shift(@st);

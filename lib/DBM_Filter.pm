@@ -93,15 +93,15 @@ sub _do_Filter_Push
     
         no strict 'refs';
         # does the "DBM_Filter::$class" exist?
-	if ( ! defined %{ "${class}::"} ) {
+	if ( ! %{Symbol::stash( "${class}")} ) {
 	    # Nope, so try to load it.
             eval " require $class ; " ;
             croak "$caller: Cannot Load DBM Filter '$class': $@" if $@;
         }
     
-        my $fetch  = *{ "${class}::Fetch"  }{CODE};
-        my $store  = *{ "${class}::Store"  }{CODE};
-        my $filter = *{ "${class}::Filter" }{CODE};
+        my $fetch  = *{Symbol::qualify_to_ref( "${class}::Fetch")  }{CODE};
+        my $store  = *{Symbol::qualify_to_ref( "${class}::Store")  }{CODE};
+        my $filter = *{Symbol::qualify_to_ref( "${class}::Filter") }{CODE};
         use strict 'refs';
 
         my $count = defined($filter) + defined($store) + defined($fetch) ;
@@ -181,11 +181,11 @@ sub _do_Filter_Push
     $this =~ /^(.*)=/;
     my $type = $1 ;
     no strict 'refs';
-    if ( *{ "${type}::DESTROY" }{CODE} ne \&MyDESTROY )
+    if ( *{Symbol::qualify_to_ref( "${type}::DESTROY") }{CODE} ne \&MyDESTROY )
     {
-        $origDESTROY{$type} = *{ "${type}::DESTROY" }{CODE};
+        $origDESTROY{$type} = *{Symbol::qualify_to_ref( "${type}::DESTROY") }{CODE};
         no warnings 'redefine';
-        *{ "${type}::DESTROY" } = \&MyDESTROY ;
+        *{Symbol::qualify_to_ref( "${type}::DESTROY") } = \&MyDESTROY ;
     }
 }
 

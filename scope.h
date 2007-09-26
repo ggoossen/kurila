@@ -49,11 +49,10 @@
 #define SAVEt_BOOL		38
 #define SAVEt_SET_SVFLAGS	39
 #define SAVEt_SAVESWITCHSTACK	40
-#define SAVEt_COP_ARYBASE	41
-#define SAVEt_RE_STATE		42
-#define SAVEt_COMPILE_WARNINGS	43
-#define SAVEt_STACK_CXPOS	44
-#define SAVEt_PARSER		45
+#define SAVEt_RE_STATE		41
+#define SAVEt_COMPILE_WARNINGS	42
+#define SAVEt_STACK_CXPOS	43
+#define SAVEt_PARSER		44
 
 #ifndef SCOPE_SAVES_SIGNAL_MASK
 #define SCOPE_SAVES_SIGNAL_MASK 0
@@ -185,14 +184,6 @@ Closing bracket on a callback.  See C<ENTER> and L<perlcall>.
 	SSPUSHINT(SAVEt_SAVESWITCHSTACK);		\
 	SWITCHSTACK((f),(t));				\
 	PL_curstackinfo->si_stack = (t);		\
-    } STMT_END
-
-#define SAVECOPARYBASE(c) \
-    STMT_START {					\
-	SSCHECK(3);					\
-	SSPUSHINT(CopARYBASE_get(c));			\
-	SSPUSHPTR(c);					\
-	SSPUSHINT(SAVEt_COP_ARYBASE);			\
     } STMT_END
 
 /* Need to do the cop warnings like this, rather than a "SAVEFREESHAREDPV",

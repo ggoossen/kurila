@@ -80,6 +80,7 @@ sub _prefixify {
     $self->log_verbose("  prefixify $path from $sprefix to $rprefix\n");
 
     # Translate $(PERLPREFIX) to a real path.
+    $rprefix = $self->eliminate_macros($rprefix);
     $rprefix = VMS::Filespec::vmspath($rprefix) if $rprefix;
     $sprefix = VMS::Filespec::vmspath($sprefix) if $sprefix;
 
@@ -195,9 +196,8 @@ sub _infer_xs_spec {
 
   # Need to create with the same name as DynaLoader will load with.
   if (defined &DynaLoader::mod2fname) {
-    my $file = $$spec{module_name} . '.' . $self->{config}->get('dlext');
-    $file =~ tr/:/_/;
-    $file = DynaLoader::mod2fname([$file]);
+    my $file = DynaLoader::mod2fname([$$spec{base_name}]);
+    $file .= '.' . $self->{config}->get('dlext');
     $$spec{lib_file} = File::Spec->catfile($$spec{archdir}, $file);
   }
 
@@ -220,63 +220,12 @@ sub rscan_dir {
   return $result;
 }
 
-=item dist_dir
-
-Inherit the standard version but replace embedded dots with underscores because 
-a dot is the directory delimiter on VMS.
-
-=cut
-
-sub dist_dir {
-  my $self = shift;
-
-  my $dist_dir = $self->SUPER::dist_dir;
-  $dist_dir =~ s/\./_/g;
-  return $dist_dir;
-}
-
-=item man3page_name
-
-Inherit the standard version but chop the extra manpage delimiter off the front if 
-there is one.  The VMS version of splitdir('[.foo]') returns '', 'foo'.
-
-=cut
-
-sub man3page_name {
-  my $self = shift;
-
-  my $mpname = $self->SUPER::man3page_name( shift );
-  $mpname =~ s/^$self->manpage_separator//;
-  return $mpname;
-}
-
-=item expand_test_dir
-
-Inherit the standard version but relativize the paths as the native glob() doesn't
-do that for us.
-
-=cut
-
-sub expand_test_dir {
-  my ($self, $dir) = @_;
-
-  my @reldirs = $self->SUPER::expand_test_dir( $dir );
-
-  for my $eachdir (@reldirs) {
-    my ($v,$d,$f) = File::Spec->splitpath( $eachdir );
-    my $reldir = File::Spec->abs2rel( File::Spec->catpath( $v, $d, '' ) );
-    $eachdir = File::Spec->catfile( $reldir, $f );
-  }
-  return @reldirs;
-}
 
 =back
 
 =head1 AUTHOR
 
-Michael G Schwern <schwern@pobox.com>
-Ken Williams <kwilliams@cpan.org>
-Craig A. Berry <craigberry@mac.com>
+Michael G Schwern <schwern@pobox.com>, Ken Williams <kwilliams@cpan.org>
 
 =head1 SEE ALSO
 

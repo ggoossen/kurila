@@ -178,7 +178,7 @@ sub write_protos {
 	}
 	else {
 	    $retval = "PERL_CALLCONV $splint_flags$retval";
-	    if ($flags =~ /[bp]/) {
+	    if ($flags =~ /p/) {
 		$func = "Perl_$func";
 	    }
 	}
@@ -312,7 +312,7 @@ sub readsyms (\%$) {
 	s/[ \t]*#.*//;		# Delete comments.
 	if (/^\s*(\S+)\s*$/) {
 	    my $sym = $1;
-	    warn "duplicate symbol $sym while processing $file line $.\n"
+	    warn "duplicate symbol $sym while processing $file\n"
 		if exists $$syms{$sym};
 	    $$syms{$sym} = 1;
 	}
@@ -333,7 +333,7 @@ sub readvars(\%$$@) {
 	if (/PERLVARA?I?S?C?\($pre(\w+)/) {
 	    my $sym = $1;
 	    $sym = $pre . $sym if $keep_pre;
-	    warn "duplicate symbol $sym while processing $file line $.\n"
+	    warn "duplicate symbol $sym while processing $file\n"
 		if exists $$syms{$sym};
 	    $$syms{$sym} = $pre || 1;
 	}

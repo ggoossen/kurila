@@ -23,6 +23,7 @@ BEGIN {
 }
 
 use Test::More qw|no_plan|;
+use Test::Differences;
 use IO::Handle;
 
 use Nomad;
@@ -39,56 +40,18 @@ sub p55 {
     `PERL_XMLDUMP='tmp.xml' ../perl -I ../lib tmp.in 2> tmp.err`;
 
     if (-z "tmp.xml") {
-        return ok 0, "MAD dump failed $msg";
+        ok 0, "MAD dump failed $msg" or $TODO or die;
+        return;
     }
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
-    diag($@) if $@;
-    is($output, $input, $msg);
+    # diag($@) if $@;
+    is($output, $input, $msg) or $TODO or die;
 }
 
-undef $/;
-my @prgs = split m/^########\n/m, <DATA>;
-
-use bytes;
-
-for my $prog (@prgs) {
-    my $msg = ($prog =~ s/^#(.*)\n//) && $1;
-    local $TODO = ($msg =~ /TODO/) ? 1 : 0;
-    p55($prog, $msg);
-}
-
-# Files
-use File::Find;
-use Test::Differences;
-
-our %failing = map { $_, 1 } qw|
-../t/comp/require.t
-
-../t/op/array.t
-../t/op/local.t
-../t/op/substr.t
-
-../t/comp/parser.t
-
-../t/op/switch.t
-
-../t/op/attrhand.t
-
-../t/op/symbolcache.t
-
-../t/op/threads.t
-
-../t/op/exec.t
-../t/io/say.t
-|;
-
-my @files;
-find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
-
-for my $file (@files) {
+sub p55_file {
+    my $file = shift;
     my $input;
     local $/ = undef;
-    local $TODO = (exists $failing{$file} ? "Known failure" : undef);
     #warn $file;
     open(my $fh, "<", "$file") or die "Failed open '../t/$file' $!";
     $input = $fh->getline;
@@ -104,15 +67,61 @@ for my $file (@files) {
 
     if (-z "tmp.xml") {
         fail "MAD dump failure of '$file'";
-        next;
+        return;
     }
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
     if ($@) {
         fail "convert xml to p5 failed file: '$file'";
-        diag "error: $@";
-        next;
+        $TODO or die;
+        #diag "error: $@";
+        return;
     }
+    # ok($output eq $input, "p55 '$file'");
     eq_or_diff $output, $input, "p55 '$file'";
+}
+
+undef $/;
+my @prgs = split m/^########\n/m, <DATA>;
+
+use bytes;
+
+for my $prog (@prgs) {
+    my $msg = ($prog =~ s/^#(.*)\n//) && $1;
+    local $TODO = ($msg =~ /TODO/) ? 1 : 0;
+    p55($prog, $msg);
+}
+
+# Files
+use File::Find;
+
+our %failing = map { $_, 1 } qw|
+../t/comp/require.t
+
+../t/io/layers.t
+
+../t/op/array.t
+../t/op/local.t
+../t/op/substr.t
+
+../t/comp/parser.t
+
+../t/op/getppid.t
+
+../t/op/switch.t
+
+../t/op/attrhand.t
+
+../t/op/symbolcache.t
+
+../t/op/threads.t
+|;
+
+my @files;
+find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
+
+for my $file (@files) {
+    local $TODO = (exists $failing{$file} ? "Known failure" : undef);
+    p55_file($file);
 }
 
 __DATA__
@@ -145,7 +154,7 @@ s//m#.#/ge;
 #
 eval { require 5.005 }
 ########
-# Reduced test case from t/io/layers.t
+# TODO Reduced test case from t/io/layers.t
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
 BEGIN { PerlIO::Layer->find("encoding",1);}
 ########
@@ -181,3 +190,27 @@ BEGIN {
     exit 0;
 }
 use foobar;
+########
+# operator with modify TARGET_MY
+my $nc_attempt;
+$nc_attempt = 0+ ($within eq 'other_sub') ;
+########
+# __END__ section
+$foo
+
+__END__
+DATA
+########
+# split with PUSHRE
+@prgs = split "\n########\n", <DATA>;
+########
+# unless(eval { })
+unless (eval { $a }) { $a = $b }
+########
+# local our $...
+local our $TODO
+########
+# 'my' inside prototyped subcall
+sub ok($;$) { }
+ok my $x = "foobar";
+

@@ -13,7 +13,7 @@ BEGIN {
     }
     eval {
         require Time::HiRes;
-        Time::HiRes->import('time');
+        Time::HiRes->import(qw(time));
     };
     if ($@) {
         print("1..0 # Skip: Time::HiRes not available.\n");

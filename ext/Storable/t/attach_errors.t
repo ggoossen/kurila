@@ -19,7 +19,7 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -150,7 +150,7 @@ use Storable ();
 	# and creating a STORABLE_attach.
 	*My::BadThaw::STORABLE_attach = *My::BadThaw::STORABLE_thaw;
 	*My::BadThaw::STORABLE_attach = *My::BadThaw::STORABLE_thaw; # Suppress a warning
-	delete ${'My::BadThaw::'}{STORABLE_thaw};
+	delete ${*{Symbol::qualify_to_ref('My::BadThaw::')}}{STORABLE_thaw};
 
 	# Trigger the error condition
 	my $thawed = undef;

@@ -14,14 +14,14 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD OPpPAD_STATE
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
 	 OPpTRANS_SQUASH OPpTRANS_DELETE OPpTRANS_COMPLEMENT OPpTARGET_MY
-	 OPpCONST_ARYBASE OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
+	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
 	 OPpSORT_REVERSE OPpSORT_INPLACE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
          CVf_METHOD CVf_LOCKED CVf_LVALUE
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL PMf_ONCE
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED),
 	 ($] < 5.009 ? 'PMf_SKIPWHITE' : 'RXf_SKIPWHITE');
-$VERSION = 0.83;
+$VERSION = 0.82;
 use strict;
 use vars qw/$AUTOLOAD/;
 use warnings ();
@@ -438,8 +438,7 @@ sub begin_is_use {
     # Certain pragmas are dealt with using hint bits,
     # so we ignore them here
     if ($module eq 'strict' || $module eq 'integer'
-	|| $module eq 'bytes' || $module eq 'warnings'
-	|| $module eq 'feature') {
+	|| $module eq 'bytes' || $module eq 'warnings') {
 	return "";
     }
 
@@ -462,9 +461,9 @@ sub stash_subs {
 	$stash = \%::;
     }
     else {
-	$pack =~ s/(::)?$/::/;
+	$pack =~ s/(::)?$//;
 	no strict 'refs';
-	$stash = \%$pack;
+	$stash = \%{Symbol::stash($pack)};
     }
     my %stash = svref_2object($stash)->ARRAY;
     while (my ($key, $val) = each %stash) {
@@ -494,11 +493,6 @@ sub stash_subs {
 		next if $self->{'subs_done'}{$$val}++;
 		next if $$val != ${$cv->GV};   # Ignore imposters
 		$self->todo($cv, 0);
-	    }
-	    if (class(my $cv = $val->FORM) ne "SPECIAL") {
-		next if $self->{'forms_done'}{$$val}++;
-		next if $$val != ${$cv->GV};   # Ignore imposters
-		$self->todo($cv, 1);
 	    }
 	    if (class($val->HV) ne "SPECIAL" && $key =~ /::$/) {
 		$self->stash_subs($pack . $key)
@@ -559,10 +553,8 @@ sub new {
     $self->{'use_dumper'} = 0;
     $self->{'use_tabs'} = 0;
 
-    $self->{'ambient_arybase'} = 0;
     $self->{'ambient_warnings'} = undef; # Assume no lexical warnings
     $self->{'ambient_hints'} = 0;
-    $self->{'ambient_hinthash'} = undef;
     $self->init();
 
     while (my $arg = shift @_) {
@@ -605,13 +597,11 @@ sub new {
 sub init {
     my $self = shift;
 
-    $self->{'arybase'}  = $self->{'ambient_arybase'};
     $self->{'warnings'} = defined ($self->{'ambient_warnings'})
 				? $self->{'ambient_warnings'} & WARN_MASK
 				: undef;
     $self->{'hints'}    = $self->{'ambient_hints'};
     $self->{'hints'} &= 0xFF if $] < 5.009;
-    $self->{'hinthash'} = $self->{'ambient_hinthash'};
 
     # also a convenient place to clear out subs_declared
     delete $self->{'subs_declared'};
@@ -669,11 +659,11 @@ sub compile {
 	no strict 'refs';
 	my $laststash = defined $self->{'curcop'}
 	    ? $self->{'curcop'}->stash->NAME : $self->{'curstash'};
-	if (defined *{$laststash."::DATA"}{IO}) {
+	if (defined *{Symbol::qualify_to_ref($laststash."::DATA")}{IO}) {
 	    print "package $laststash;\n"
 		unless $laststash eq $self->{'curstash'};
 	    print "__DATA__\n";
-	    print readline(*{$laststash."::DATA"});
+	    print readline(*{Symbol::qualify_to_ref($laststash."::DATA")});
 	}
     }
 }
@@ -689,7 +679,7 @@ sub coderef2text {
 
 sub ambient_pragmas {
     my $self = shift;
-    my ($arybase, $hint_bits, $warning_bits, $hinthash) = (0, 0);
+    my ($hint_bits, $warning_bits) = (0, 0);
 
     while (@_ > 1) {
 	my $name = shift();
@@ -714,10 +704,6 @@ sub ambient_pragmas {
 		@names = split' ', $val;
 	    }
 	    $hint_bits |= strict::bits(@names);
-	}
-
-	elsif ($name eq '$[') {
-	    $arybase = $val;
 	}
 
 	elsif ($name eq 'integer'
@@ -778,10 +764,6 @@ sub ambient_pragmas {
 	    $hint_bits = $val;
 	}
 
-	elsif ($name eq '%^H') {
-	    $hinthash = $val;
-	}
-
 	else {
 	    croak "Unknown pragma type: $name";
 	}
@@ -790,10 +772,8 @@ sub ambient_pragmas {
 	croak "The ambient_pragmas method expects an even number of args";
     }
 
-    $self->{'ambient_arybase'} = $arybase;
     $self->{'ambient_warnings'} = $warning_bits;
     $self->{'ambient_hints'} = $hint_bits;
-    $self->{'ambient_hinthash'} = $hinthash;
 }
 
 # This method is the inner loop, so try to keep it simple
@@ -854,8 +834,8 @@ Carp::confess("SPECIAL in deparse_sub") if $cv->isa("B::SPECIAL");
 
     local($self->{'curcv'}) = $cv;
     local($self->{'curcvlex'});
-    local(@$self{qw'curstash warnings hints hinthash'})
-		= @$self{qw'curstash warnings hints hinthash'};
+    local(@$self{qw'curstash warnings hints'})
+		= @$self{qw'curstash warnings hints'};
     my $body;
     if (not null $cv->ROOT) {
 	my $lineseq = $cv->ROOT->first;
@@ -894,8 +874,8 @@ sub deparse_format {
     local($self->{'curcv'}) = $form;
     local($self->{'curcvlex'});
     local($self->{'in_format'}) = 1;
-    local(@$self{qw'curstash warnings hints hinthash'})
-		= @$self{qw'curstash warnings hints hinthash'};
+    local(@$self{qw'curstash warnings hints'})
+		= @$self{qw'curstash warnings hints'};
     my $op = $form->ROOT;
     my $kid;
     return "\f." if $op->first->name eq 'stub'
@@ -1132,8 +1112,8 @@ sub scopeop {
     my $kid;
     my @kids;
 
-    local(@$self{qw'curstash warnings hints hinthash'})
-		= @$self{qw'curstash warnings hints hinthash'} if $real_block;
+    local(@$self{qw'curstash warnings hints'})
+		= @$self{qw'curstash warnings hints'} if $real_block;
     if ($real_block) {
 	$kid = $op->first->sibling; # skip enter
 	if (is_miniwhile($kid)) {
@@ -1176,8 +1156,8 @@ sub pp_leave { scopeop(1, @_); }
 sub deparse_root {
     my $self = shift;
     my($op) = @_;
-    local(@$self{qw'curstash warnings hints hinthash'})
-      = @$self{qw'curstash warnings hints hinthash'};
+    local(@$self{qw'curstash warnings hints'})
+      = @$self{qw'curstash warnings hints'};
     my @kids;
     return if null $op->first; # Can happen, e.g., for Bytecode without -k
     for (my $kid = $op->first->sibling; !null($kid); $kid = $kid->sibling) {
@@ -1376,11 +1356,6 @@ sub pp_nextstate {
 	$self->{'curstash'} = $stash;
     }
 
-    if ($self->{'arybase'} != $op->arybase) {
-	push @text, '$[ = '. $op->arybase .";\n";
-	$self->{'arybase'} = $op->arybase;
-    }
-
     my $warnings = $op->warnings;
     my $warning_bits;
     if ($warnings->isa("B::SPECIAL") && $$warnings == 4) {
@@ -1405,12 +1380,6 @@ sub pp_nextstate {
     if ($self->{'hints'} != $op->hints) {
 	push @text, declare_hints($self->{'hints'}, $op->hints);
 	$self->{'hints'} = $op->hints;
-    }
-
-    # hack to check that the hint hash hasn't changed
-    if ("@{[sort %{$self->{'hinthash'} || {}}]}" ne "@{[sort %{$op->hints_hash->HASH || {}}]}") {
-	push @text, declare_hinthash($self->{'hinthash'}, $op->hints_hash->HASH, $self->{indent_size});
-	$self->{'hinthash'} = $op->hints_hash->HASH;
     }
 
     # This should go after of any branches that add statements, to
@@ -1447,25 +1416,6 @@ sub declare_hints {
         $decls .= "no $pragma;\n";
     }
     return $decls;
-}
-
-sub declare_hinthash {
-    my ($from, $to, $indent) = @_;
-    my @decls;
-    for my $key (keys %$to) {
-	next if $key =~ /^open[<>]$/;
-	if (!defined $from->{$key} or $from->{$key} ne $to->{$key}) {
-	    push @decls, qq(\$^H{'$key'} = q($to->{$key}););
-	}
-    }
-    for my $key (keys %$from) {
-	next if $key =~ /^open[<>]$/;
-	if (!exists $to->{$key}) {
-	    push @decls, qq(delete \$^H{'$key'};);
-	}
-    }
-    @decls or return '';
-    return join("\n" . (" " x $indent), "BEGIN {", @decls) . "\n}\n";
 }
 
 sub hint_pragmas {
@@ -2272,7 +2222,6 @@ sub pp_vec { maybe_local(@_, listop(@_, "vec")) }
 sub pp_index { maybe_targmy(@_, \&listop, "index") }
 sub pp_rindex { maybe_targmy(@_, \&listop, "rindex") }
 sub pp_sprintf { maybe_targmy(@_, \&listop, "sprintf") }
-sub pp_formline { listop(@_, "formline") } # see also deparse_format
 sub pp_crypt { maybe_targmy(@_, \&listop, "crypt") }
 sub pp_unpack { listop(@_, "unpack") }
 sub pp_pack { listop(@_, "pack") }
@@ -2446,7 +2395,6 @@ sub indirop {
 
 sub pp_prtf { indirop(@_, "printf") }
 sub pp_print { indirop(@_, "print") }
-sub pp_say  { indirop(@_, "say") }
 sub pp_sort { indirop(@_, "sort") }
 
 sub mapop {
@@ -2591,21 +2539,13 @@ sub pp_cond_expr {
     return $head . join($cuddle, "", @elsifs) . $false;
 }
 
-sub pp_once {
-    my ($self, $op, $cx) = @_;
-    my $cond = $op->first;
-    my $true = $cond->sibling;
-
-    return $self->deparse($true, $cx);
-}
-
 sub loop_common {
     my $self = shift;
     my($op, $cx, $init) = @_;
     my $enter = $op->first;
     my $kid = $enter->sibling;
-    local(@$self{qw'curstash warnings hints hinthash'})
-		= @$self{qw'curstash warnings hints hinthash'};
+    local(@$self{qw'curstash warnings hints'})
+		= @$self{qw'curstash warnings hints'};
     my $head = "";
     my $bare = 0;
     my $body;
@@ -2846,7 +2786,7 @@ sub pp_aelemfast {
 	$name = '$' . $name;
     }
 
-    return $name . "[" .  ($op->private + $self->{'arybase'}) . "]";
+    return $name . "[" .  ($op->private) . "]";
 }
 
 sub rv2x {
@@ -3312,7 +3252,7 @@ sub pp_entersub {
 	no warnings 'uninitialized';
 	$declared = exists $self->{'subs_declared'}{$kid}
 	    || (
-		 defined &{ ${$self->{'curstash'}."::"}{$kid} }
+		 defined &{ ${Symbol::stash($self->{'curstash'})}{$kid} }
 		 && !exists
 		     $self->{'subs_deparsed'}{$self->{'curstash'}."::".$kid}
 		 && defined prototype $self->{'curstash'}."::".$kid
@@ -3732,9 +3672,6 @@ sub const_sv {
 sub pp_const {
     my $self = shift;
     my($op, $cx) = @_;
-    if ($op->private & OPpCONST_ARYBASE) {
-        return '$[';
-    }
 #    if ($op->private & OPpCONST_BARE) { # trouble with `=>' autoquoting
 #	return $self->const_sv($op)->PV;
 #    }
@@ -3747,7 +3684,6 @@ sub dq {
     my $op = shift;
     my $type = $op->name;
     if ($type eq "const") {
-	return '$[' if $op->private & OPpCONST_ARYBASE;
 	return uninterp(escape_str(unback($self->const_sv($op)->as_string)));
     } elsif ($type eq "concat") {
 	my $first = $self->dq($op->first);
@@ -4052,7 +3988,6 @@ sub re_dq {
 
     my $type = $op->name;
     if ($type eq "const") {
-	return '$[' if $op->private & OPpCONST_ARYBASE;
 	my $unbacked = re_unback($self->const_sv($op)->as_string);
 	return re_uninterp_extended(escape_extended_re($unbacked))
 	    if $extended;
@@ -4716,11 +4651,6 @@ They exist principally so that you can write code like:
 
 which specifies that the ambient pragmas are exactly those which
 are in scope at the point of calling.
-
-=item %^H
-
-This parameter is used to specify the ambient pragmas which are
-stored in the special hash %^H.
 
 =back
 

@@ -1,8 +1,11 @@
 #!./perl
 
+BEGIN {
 chdir 't' if -d 't';
 @INC = '../lib';
-require Config; import Config;
+require Config; Config->import;
+}
+
 if (($Config{'extensions'} !~ /\bFcntl\b/) ){
   print "Bail out! Perl configured without Fcntl module\n";
   exit 0;

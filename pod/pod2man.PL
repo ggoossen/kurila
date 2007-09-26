@@ -4,6 +4,8 @@ use Config;
 use File::Basename qw(&basename &dirname);
 use Cwd;
 
+use strict;
+
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you
 # have to mention them as if they were shell variables, not
@@ -13,9 +15,9 @@ use Cwd;
 
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
-$origdir = cwd;
+my $origdir = cwd;
 chdir dirname($0);
-$file = basename($0, '.PL');
+my $file = basename($0, '.PL');
 $file .= '.com' if $^O eq 'VMS';
 
 open OUT,">$file" or die "Can't create $file: $!";

@@ -14,7 +14,7 @@ BEGIN {
   if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
     @INC = ('../lib', '../ext/Devel/PPPort/t') if -d '../lib' && -d '../ext';
-    require Config; import Config;
+    require Config; Config->import;
     use vars '%Config';
     if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
       print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
@@ -30,9 +30,9 @@ BEGIN {
     require 'testutil.pl' if $@;
   }
 
-  if (20) {
+  if (2) {
     load();
-    plan(tests => 20);
+    plan(tests => 2);
   }
 }
 
@@ -44,36 +44,10 @@ package Devel::PPPort;
 use vars '@ISA';
 require DynaLoader;
 @ISA = qw(DynaLoader);
-bootstrap Devel::PPPort;
+Devel::PPPort->bootstrap;
 
 package main;
 
-my $mhx = "mhx";
-
-ok(&Devel::PPPort::SvPVbyte($mhx), 3);
-
-my $i = 42;
-
-ok(&Devel::PPPort::SvPV_nolen($mhx), $i++);
-ok(&Devel::PPPort::SvPV_const($mhx), $i++);
-ok(&Devel::PPPort::SvPV_mutable($mhx), $i++);
-ok(&Devel::PPPort::SvPV_flags($mhx), $i++);
-ok(&Devel::PPPort::SvPV_flags_const($mhx), $i++);
-
-ok(&Devel::PPPort::SvPV_flags_const_nolen($mhx), $i++);
-ok(&Devel::PPPort::SvPV_flags_mutable($mhx), $i++);
-ok(&Devel::PPPort::SvPV_force($mhx), $i++);
-ok(&Devel::PPPort::SvPV_force_nolen($mhx), $i++);
-ok(&Devel::PPPort::SvPV_force_mutable($mhx), $i++);
-
-ok(&Devel::PPPort::SvPV_force_nomg($mhx), $i++);
-ok(&Devel::PPPort::SvPV_force_nomg_nolen($mhx), $i++);
-ok(&Devel::PPPort::SvPV_force_flags($mhx), $i++);
-ok(&Devel::PPPort::SvPV_force_flags_nolen($mhx), $i++);
-ok(&Devel::PPPort::SvPV_force_flags_mutable($mhx), $i++);
-
-ok(&Devel::PPPort::SvPV_nolen_const($mhx), $i++);
-ok(&Devel::PPPort::SvPV_nomg($mhx), $i++);
-ok(&Devel::PPPort::SvPV_nomg_const($mhx), $i++);
-ok(&Devel::PPPort::SvPV_nomg_const_nolen($mhx), $i++);
+ok(&Devel::PPPort::SvPVbyte("mhx"), 3);
+ok(&Devel::PPPort::SvPV_nolen("mhx"), 42);
 

@@ -294,16 +294,9 @@ sub Attribs { {} }
 my %features = (tkRunning => 1, ornaments => 1, 'newTTY' => 1);
 sub Features { \%features }
 
-sub get_line {
-  my $self = shift;
-  my $in = $self->IN;
-  local ($/) = "\n";
-  return scalar <$in>;
-}
-
 package Term::ReadLine;		# So late to allow the above code be defined?
 
-our $VERSION = '1.03';
+our $VERSION = '1.02';
 
 my ($which) = exists $ENV{PERL_RL} ? split /\s+/, $ENV{PERL_RL} : undef;
 if ($which) {
@@ -329,7 +322,7 @@ if (defined &Term::ReadLine::Gnu::readline) {
   @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub);
 } elsif (defined &Term::ReadLine::Perl::readline) {
   @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub);
-} elsif (defined $which && defined &{"Term::ReadLine::$which\::readline"}) {
+} elsif (defined $which && defined &{*{Symbol::qualify_to_ref("Term::ReadLine::$which\::readline")}}) {
   @ISA = "Term::ReadLine::$which";
 } else {
   @ISA = qw(Term::ReadLine::Stub);
@@ -348,7 +341,7 @@ sub LoadTermCap {
   return if defined $terminal;
   
   require Term::Cap;
-  $terminal = Tgetent Term::Cap ({OSPEED => 9600}); # Avoid warning.
+  $terminal = Term::Cap->Tgetent({OSPEED => 9600}); # Avoid warning.
 }
 
 sub ornaments {

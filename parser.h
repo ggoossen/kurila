@@ -14,7 +14,6 @@
 typedef struct {
     YYSTYPE val;    /* semantic value */
     short   state;
-    I32     savestack_ix;	/* size of savestack at this state */
     AV	    *comppad; /* value of PL_comppad when this value was created */
 #ifdef DEBUGGING
     const char  *name; /* token/rule name for -Dpv */
@@ -47,7 +46,6 @@ typedef struct yy_parser {
     bool	lex_dojoin;	/* doing an array interpolation */
     U8		lex_expect;	/* expect after determined token */
     U8		expect;		/* how to interpret ambiguous tokens */
-    I32		lex_formbrack;	/* bracket count at outer format level */
     OP		*lex_inpat;	/* in pattern $) and $| are special */
     OP		*lex_op;	/* extra info to pass back on op */
     SV		*lex_repl;	/* runtime replacement from s/// */
@@ -74,10 +72,10 @@ typedef struct yy_parser {
     line_t	copline;	/* current line number */
     U16		in_my;		/* we're compiling a "my"/"our" declaration */
     U8		lex_state;	/* next token is determined */
-    U8		error_count;	/* how many compile errors so far, max 10 */
-    HV		*in_my_stash;	/* declared class of this "my" declaration */
+    /* space for a U8 here */
     PerlIO	*rsfp;		/* current source file pointer */
     AV		*rsfp_filters;	/* holds chain of active source filters */
+    U8		error_count;	/* how many compile errors so far, max 10 */
 
 #ifdef PERL_MAD
     SV		*endwhite;

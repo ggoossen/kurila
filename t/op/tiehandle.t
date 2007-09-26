@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 my @expect;
 my $data = "";
 my @data = ();
@@ -76,6 +71,8 @@ package main;
 use Symbol;
 
 my $fh = gensym;
+
+our ($r, $text, $ln, @in, @line, $ch, $buf);
 
 @expect = (TIEHANDLE => 'Implement');
 my $ob = tie *$fh,'Implement';

@@ -19,7 +19,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     my $count = 0 ;
     if ($] < 5.005) {
@@ -494,7 +494,7 @@ EOM
 {
     title "Check all bytes can be handled";
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
     my $data = join '', map { chr } 0x00 .. 0xFF;
     $data .= "\r\nabd\r\n";
 
@@ -868,11 +868,8 @@ if ($] >= 5.005)
 {
     title 'CRC32' ;
 
-    # CRC32 of this data should have the high bit set
-    # value in ascii is ZgRNtjgSUW
-    my $data = "\x5a\x67\x52\x4e\x74\x6a\x67\x53\x55\x57"; 
+    my $data = 'ZgRNtjgSUW'; # CRC32 of this data should have the high bit set
     my $expected_crc = 0xCF707A2B ; # 3480255019 
-
     my $crc = crc32($data) ;
     is $crc, $expected_crc;
 }
@@ -880,11 +877,7 @@ if ($] >= 5.005)
 {
     title 'Adler32' ;
 
-    # adler of this data should have the high bit set
-    # value in ascii is lpscOVsAJiUfNComkOfWYBcPhHZ[bT
-    my $data = "\x6c\x70\x73\x63\x4f\x56\x73\x41\x4a\x69\x55\x66" .
-               "\x4e\x43\x6f\x6d\x6b\x4f\x66\x57\x59\x42\x63\x50" .
-               "\x68\x48\x5a\x5b\x62\x54";
+    my $data = 'lpscOVsAJiUfNComkOfWYBcPhHZ[bT'; # adler of this data should have the high bit set
     my $expected_crc = 0xAAD60AC7 ; # 2866154183 
     my $crc = adler32($data) ;
     is $crc, $expected_crc;
@@ -917,7 +910,7 @@ some text
 EOM
 
     my $good ;
-    ok my $x = new IO::Compress::Gzip \$good, Append => 1, -HeaderCRC => 1 ;
+    ok my $x = IO::Compress::Gzip->new( \$good, Append => 1, -HeaderCRC => 1) ;
     ok $x->write($string) ;
     ok  $x->close ;
 
@@ -963,8 +956,8 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = new IO::Compress::Gzip \$truncated, Append => 1, -HeaderCRC => 1, Strict => 0,
-				-ExtraField => "hello" x 10  ;
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, -HeaderCRC => 1, Strict => 0,
+				-ExtraField => "hello" x 10)  ;
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -984,7 +977,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = new IO::Compress::Gzip \$truncated, Append => 1, -Name => $Name;
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, -Name => $Name);
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -1002,7 +995,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = new IO::Compress::Gzip \$truncated, -Comment => $Comment;
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, -Comment => $Comment);
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -1018,7 +1011,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = new IO::Compress::Gzip \$truncated, -HeaderCRC => 1;
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, -HeaderCRC => 1);
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -1034,13 +1027,13 @@ some text
 EOM
 
     my $buffer ;
-    ok  my $x = new IO::Compress::Gzip \$buffer, 
+    ok  my $x = IO::Compress::Gzip->new( \$buffer, 
                              -Append     => 1,
                              -Strict     => 0,
                              -HeaderCRC  => 1,
                              -Name       => "Fred",
                              -ExtraField => "Extra",
-                             -Comment    => 'Comment';
+                             -Comment    => 'Comment');
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -1060,7 +1053,7 @@ some text
 EOM
 
     my $good ;
-    ok  my $x = new IO::Compress::Gzip \$good, Append => 1 ;
+    ok  my $x = IO::Compress::Gzip->new( \$good, Append => 1) ;
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -1135,7 +1128,7 @@ sub trickle
     title "Append & MultiStream Tests";
     # rt.24041
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
     my $data1 = "the is the first";
     my $data2 = "and this is the second";
     my $trailing = "some trailing data";

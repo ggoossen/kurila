@@ -64,7 +64,6 @@ corresponding built-in functions:
     $io->close
     $io->eof
     $io->fileno
-    $io->format_write( [FORMAT_NAME] )
     $io->getc
     $io->read ( BUF, LEN, [OFFSET] )
     $io->print ( ARGS )
@@ -137,8 +136,7 @@ guaranteed.
 =item $io->write ( BUF, LEN [, OFFSET ] )
 
 This C<write> is like C<write> found in C, that is it is the
-opposite of read. The wrapper for the perl C<write> function is
-called C<format_write>.
+opposite of read.
 
 =item $io->error
 
@@ -281,7 +279,6 @@ $VERSION = eval $VERSION;
     format_top_name
     format_line_break_characters
     format_formfeed
-    format_write
 
     print
     printf
@@ -472,7 +469,7 @@ sub stat {
 ##
 
 sub autoflush {
-    my $old = new SelectSaver qualify($_[0], caller);
+    my $old = SelectSaver->new( qualify($_[0], caller));
     my $prev = $|;
     $| = @_ > 1 ? $_[1] : 1;
     $prev;
@@ -512,7 +509,7 @@ sub input_line_number {
 
 sub format_page_number {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $%;
     $% = $_[1] if @_ > 1;
     $prev;
@@ -520,7 +517,7 @@ sub format_page_number {
 
 sub format_lines_per_page {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $=;
     $= = $_[1] if @_ > 1;
     $prev;
@@ -528,7 +525,7 @@ sub format_lines_per_page {
 
 sub format_lines_left {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $-;
     $- = $_[1] if @_ > 1;
     $prev;
@@ -536,7 +533,7 @@ sub format_lines_left {
 
 sub format_name {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $~;
     $~ = qualify($_[1], caller) if @_ > 1;
     $prev;
@@ -544,7 +541,7 @@ sub format_name {
 
 sub format_top_name {
     my $old;
-    $old = new SelectSaver qualify($_[0], caller) if ref($_[0]);
+    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $^;
     $^ = qualify($_[1], caller) if @_ > 1;
     $prev;
@@ -564,27 +561,6 @@ sub format_formfeed {
     my $prev = $^L;
     $^L = $_[1] if @_ > 1;
     $prev;
-}
-
-sub formline {
-    my $io = shift;
-    my $picture = shift;
-    local($^A) = $^A;
-    local($\) = "";
-    formline($picture, @_);
-    print $io $^A;
-}
-
-sub format_write {
-    @_ < 3 || croak 'usage: $io->write( [FORMAT_NAME] )';
-    if (@_ == 2) {
-	my ($io, $fmt) = @_;
-	my $oldfmt = $io->format_name(qualify($fmt,caller));
-	CORE::write($io);
-	$io->format_name($oldfmt);
-    } else {
-	CORE::write($_[0]);
-    }
 }
 
 # XXX undocumented
@@ -610,8 +586,8 @@ sub ioctl {
 sub constant {
     no strict 'refs';
     my $name = shift;
-    (($name =~ /^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{$name})
-	? &{$name}() : undef;
+    (($name =~ /^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::qualify_to_ref($name)}})
+	? &{*{Symbol::qualify_to_ref($name)}}() : undef;
 }
 
 
@@ -620,7 +596,7 @@ sub constant {
 sub printflush {
     my $io = shift;
     my $old;
-    $old = new SelectSaver qualify($io, caller) if ref($io);
+    $old = SelectSaver->new( qualify($io, caller)) if ref($io);
     local $| = 1;
     if(ref($io)) {
         print $io @_;

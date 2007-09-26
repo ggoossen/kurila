@@ -3,7 +3,7 @@ BEGIN {
 
     @INC = '../lib';
 
-    require Config; import Config;
+    require Config; Config->import;
 
     my $reason;
 
@@ -28,7 +28,7 @@ use IPC::Msg;
 print "1..9\n";
 
 my $msq =
-    new IPC::Msg(IPC_PRIVATE, S_IRWXU | S_IRWXG | S_IRWXO)
+    IPC::Msg->new(IPC_PRIVATE, S_IRWXU | S_IRWXG | S_IRWXO)
     || die "msgget: ",$!+0," $!\n";
 	
 print "ok 1\n";

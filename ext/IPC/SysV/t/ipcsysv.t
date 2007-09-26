@@ -3,7 +3,7 @@ BEGIN {
 
     @INC = qw(. ../lib);
 
-    require Config; import Config;
+    require Config; Config->import;
     require 'test.pl';
 }
 

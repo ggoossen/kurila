@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
@@ -69,6 +67,7 @@ qw(foo myfoo bar main  ));
 
 $expect = ":" . join(":", @expect);
 fresh_perl_is(<<'SCRIPT2', $expect,{switches => [''], stdin => '', stderr => 1 },'blocks interact with packages/scopes');
+no strict 'vars';
 BEGIN {$f = 'main'; print ":$f"}
 UNITCHECK {print ":$f"}
 CHECK {print ":$f"}

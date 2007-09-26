@@ -6,9 +6,6 @@ $ENV{LC_ALL} = "C"; # so that external utilities speak English
 $ENV{LANGUAGE} = 'C'; # GNU locale extension
 
 BEGIN {
-    chdir 't';
-    @INC = '../lib';
-
     require Config;
     if ($@) {
 	print "1..0 # Skip: no Config\n";
@@ -16,6 +13,8 @@ BEGIN {
 	Config->import;
     }
 }
+
+our ($groups, $pwgid, $pwgnam, %seen, @gr, $group, $gr1, $gr2, %basegroup);
 
 sub quit {
     print "1..0 # Skip: no `id` or `groups`\n";

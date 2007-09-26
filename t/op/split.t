@@ -1,12 +1,12 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require './test.pl';
 }
 
-plan tests => 135;
+plan tests => 134;
+
+our ($FS, $c, @ary, $x, $foo, $res, @list1, @list2, @a, $p, $n);
 
 $FS = ':';
 
@@ -131,24 +131,17 @@ is($_, "r:m :b");
 
 # unicode splittage
 
-@ary = map {ord} split //, v1.20.300.4000.50000.4000.300.20.1;
-is("@ary", "1 20 300 4000 50000 4000 300 20 1");
+use utf8;
 
 @ary = split(/\x{FE}/, "\x{FF}\x{FE}\x{FD}"); # bug id 20010105.016
 ok(@ary == 2 &&
-   $ary[0] eq "\xFF"   && $ary[1] eq "\xFD" &&
+   $ary[0] eq "\x{FF}"   && $ary[1] eq "\x{FD}" &&
    $ary[0] eq "\x{FF}" && $ary[1] eq "\x{FD}");
 
-@ary = split(/(\x{FE}\xFE)/, "\xFF\x{FF}\xFE\x{FE}\xFD\x{FD}"); # variant of 31
+@ary = split(/(\x{FE}\x{FE})/, "\x{FF}\x{FF}\x{FE}\x{FE}\x{FD}\x{FD}"); # variant of 31
 ok(@ary == 3 &&
-   $ary[0] eq "\xFF\xFF"     &&
-   $ary[0] eq "\x{FF}\xFF"   &&
    $ary[0] eq "\x{FF}\x{FF}" &&
-   $ary[1] eq "\xFE\xFE"     &&
-   $ary[1] eq "\x{FE}\xFE"   &&
-   $ary[1] eq "\x{FE}\x{FE}" &&
-   $ary[2] eq "\xFD\xFD"     &&
-   $ary[2] eq "\x{FD}\xFD"   &&
+   $ary[1] eq "\x{FE}\x{FE}"     &&
    $ary[2] eq "\x{FD}\x{FD}");
 
 {
@@ -228,6 +221,7 @@ ok(@ary == 3 &&
 }
 
 {
+    no utf8;
     my @a = split(/\xFE/, "\xFF\xFE\xFD");
 
     ok(@a == 2 && $a[0] eq "\xFF" && $a[1] eq "\xFD");
@@ -264,7 +258,7 @@ ok(@ary == 3 &&
     for my $u (0, 1) {
 	for my $a (0, 1) {
 	    $_ = 'readin,database,readout';
-	    utf8::upgrade $_ if $u;
+	    utf8::encode $_ if $u;
 	    /(.+)/;
 	    my @d = split /[,]/,$1;
 	    is(join (':',@d), 'readin:database:readout', "[perl #18195]");
@@ -274,13 +268,14 @@ ok(@ary == 3 &&
 
 {
     $p="a,b";
-    utf8::upgrade $p;
+    utf8::encode $p;
     eval { @a=split(/[, ]+/,$p) };
     is ("$@-@a-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
 }
 
 {
-    is (\@a, \@{"a"}, '@a must be global for following test');
+    no strict 'refs';
+    is (\@a, \@{*{Symbol::qualify_to_ref("a")}}, '@a must be global for following test');
     $p="";
     $n = @a = split /,/,$p;
     is ($n, 0, '#21765 - pmreplroot hack used to return undef for 0 iters');
@@ -315,7 +310,7 @@ ok(@ary == 3 &&
 	ord("\f"),      # Cc       <control-000C>
 	ord("\r"),      # Cc       <control-000D>
 	ord(" "),       # Zs       SPACE
-	ord("\N{NEL}"), # Cc       <control-0085>
+        ord("\N{NEL}"), # Cc       <control-0085>
 	ord("\N{NO-BREAK SPACE}"),
 			# Zs       NO-BREAK SPACE
         0x1680,         # Zs       OGHAM SPACE MARK
@@ -331,14 +326,12 @@ ok(@ary == 3 &&
     foreach my $cp (@spaces) {
 	my $msg = sprintf "Space: U+%04x", $cp;
         my $space = chr($cp);
-        my $str="A:$space:B\x{FFFD}";
-        chop $str;
+        my $str="A:$space:B";
 
         my @res=split(/\s+/,$str);
         ok(@res == 2 && join('-',@res) eq "A:-:B", "$msg - /\\s+/");
 
-        my $s2 = "$space$space:A:$space$space:B\x{FFFD}";
-        chop $s2;
+        my $s2 = "$space$space:A:$space$space:B";
 
         my @r2 = split(' ',$s2);
         ok(@r2 == 2 && join('-', @r2) eq ":A:-:B",  "$msg - ' '");

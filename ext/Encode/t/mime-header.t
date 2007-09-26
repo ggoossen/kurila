@@ -7,7 +7,7 @@ BEGIN {
         chdir 't';
         unshift @INC, '../lib';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
@@ -19,10 +19,9 @@ BEGIN {
     $| = 1;
 }
 
-no utf8;
+use utf8;
 
 use strict;
-#use Test::More qw(no_plan);
 use Test::More tests => 12;
 use_ok("Encode::MIME::Header");
 
@@ -36,14 +35,12 @@ EOS
 
 my $dheader=<<"EOS";
 From: Keith Moore <moore\@cs.utk.edu>
-To: Keld J\xF8rn Simonsen <keld\@dkuug.dk>
-CC: Andr\xE9 Pirard <PIRARD\@vm1.ulg.ac.be>
+To: Keld J\x{F8}rn Simonsen <keld\@dkuug.dk>
+CC: Andr\x{E9} Pirard <PIRARD\@vm1.ulg.ac.be>
 Subject: If you can read this you understand the example.
 EOS
 
 is(Encode::decode('MIME-Header', $eheader), $dheader, "decode ASCII (RFC2047)");
-
-use utf8;
 
 my $uheader =<<'EOS';
 From: =?US-ASCII?Q?Keith_Moore?= <moore@cs.utk.edu>

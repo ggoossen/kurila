@@ -4,7 +4,7 @@ BEGIN {
     if ($ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
-	require Config; import Config;
+	require Config; Config->import;
 	keys %Config; # Silence warning
 	if ($Config{extensions} !~ /\bHash\/Util\b/) {
 	    print "1..0 # Skip: Hash::Util was not built\n";

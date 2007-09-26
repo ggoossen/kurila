@@ -441,11 +441,11 @@ sub star2 (**&) { &{$_[2]} }
 sub BAR { "quux" }
 sub Bar::BAZ { "quuz" }
 my $star = 'FOO';
-star FOO, sub {
+star 'FOO', sub {
     print "not " unless $_[0] eq 'FOO';
     print "ok $i - star FOO\n";
 }; $i++;
-star(FOO, sub {
+star('FOO', sub {
 	print "not " unless $_[0] eq 'FOO';
 	print "ok $i - star(FOO)\n";
     }); $i++;
@@ -481,19 +481,19 @@ star(\*FOO, sub {
 	print "not " unless $_[0] eq \*FOO;
 	print "ok $i - star(\\*FOO)\n";
     }); $i++;
-star2 FOO, BAR, sub {
+star2 'FOO', BAR, sub {
     print "not " unless $_[0] eq 'FOO' and $_[1] eq 'BAR';
     print "ok $i - star2 FOO, BAR\n";
 }; $i++;
-star2(Bar::BAZ, FOO, sub {
+star2(Bar::BAZ, 'FOO', sub {
 	print "not " unless $_[0] eq 'Bar::BAZ' and $_[1] eq 'FOO';
 	print "ok $i - star2(Bar::BAZ, FOO)\n"
     }); $i++;
-star2 BAR(), FOO, sub {
+star2 BAR(), 'FOO', sub {
     print "not " unless $_[0] eq 'quux' and $_[1] eq 'FOO';
     print "ok $i - star2 BAR(), FOO\n"
 }; $i++;
-star2(FOO, BAR(), sub {
+star2('FOO', BAR(), sub {
 	print "not " unless $_[0] eq 'FOO' and $_[1] eq 'quux';
 	print "ok $i - star2(FOO, BAR())\n";
     }); $i++;
@@ -523,12 +523,12 @@ star2(*FOO, *BAR, sub {
     }); $i++;
 star2 \*FOO, \*BAR, sub {
     no strict 'refs';
-    print "not " unless $_[0] eq \*{'FOO'} and $_[1] eq \*{'BAR'};
+    print "not " unless $_[0] eq \*{Symbol::qualify_to_ref('FOO')} and $_[1] eq \*{Symbol::qualify_to_ref('BAR')};
     print "ok $i - star2 \*FOO, \*BAR\n";
 }; $i++;
 star2(\*FOO, \*BAR, sub {
 	no strict 'refs';
-	print "not " unless $_[0] eq \*{'FOO'} and $_[1] eq \*{'BAR'};
+	print "not " unless $_[0] eq \*{Symbol::qualify_to_ref('FOO')} and $_[1] eq \*{Symbol::qualify_to_ref('BAR')};
 	print "ok $i - star2(\*FOO, \*BAR)\n";
     }); $i++;
 

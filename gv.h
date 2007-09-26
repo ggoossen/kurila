@@ -16,7 +16,6 @@ struct gp {
     U32		gp_refcnt;	/* how many globs point to this? */
     HV *	gp_hv;		/* hash value */
     AV *	gp_av;		/* array value */
-    CV *	gp_form;	/* format value */
     GV *	gp_egv;		/* effective gv, if *glob */
     line_t	gp_line;	/* line first declared at (for -w) */
     HEK *	gp_file_hek;	/* file first declared in (for -w) */
@@ -92,7 +91,6 @@ Return the SV from the GV.
 #define GvIOp(gv)	(GvGP(gv)->gp_io)
 #define GvIOn(gv)	(GvIO(gv) ? GvIOp(gv) : GvIOp(gv_IOadd(gv)))
 
-#define GvFORM(gv)	(GvGP(gv)->gp_form)
 #define GvAV(gv)	(GvGP(gv)->gp_av)
 
 /* This macro is deprecated.  Do not use! */
@@ -181,7 +179,6 @@ Return the SV from the GV.
 #define DM_UID   0x003
 #define DM_RUID   0x001
 #define DM_EUID   0x002
-#define DM_ARRAY 0x004
 #define DM_GID   0x030
 #define DM_RGID   0x010
 #define DM_EGID   0x020
@@ -205,11 +202,7 @@ Return the SV from the GV.
 #define GV_NOTQUAL	0x80	/* A plain symbol name, not qualified with a
 				   package (so skip checks for :: and ')  */
 
-/*      SVf_UTF8 (more accurately the return value from SvUTF8) is also valid
-	as a flag to gv_fetch_pvn_flags, so ensure it lies outside this range.
-*/
-
-#define GV_NOADD_MASK	(SVf_UTF8|GV_NOADD_NOINIT|GV_NOEXPAND|GV_NOTQUAL)
+#define GV_NOADD_MASK	(GV_NOADD_NOINIT|GV_NOEXPAND|GV_NOTQUAL)
 /* The bit flags that don't cause gv_fetchpv() to add a symbol if not found */
 
 #define gv_fullname3(sv,gv,prefix) gv_fullname4(sv,gv,prefix,TRUE)

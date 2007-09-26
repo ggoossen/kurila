@@ -4,12 +4,12 @@
 # This script is written in euc-jp
 
 BEGIN {
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find('perlio')) {
     print "1..0 # Skip: PerlIO was not built\n";
     exit 0;
     }
@@ -21,10 +21,11 @@ BEGIN {
 }
 
 no utf8; # we have raw Japanese encodings here
+require utf8;
 
 use strict;
 #use Test::More tests => 18;
-use Test::More tests => 15; # black magic tests commented out
+use Test::More tests => 13; # black magic tests commented out
 my $Debug = shift;
 
 no encoding; # ensure
@@ -33,7 +34,7 @@ use encoding "euc-jp";
 
 my $Namae  = "¾®»ô ÃÆ";   # in Japanese, in euc-jp
 my $Name   = "Dan Kogai"; # in English
-# euc-jp in \x format but after the pragma.  But this one will be converted!
+# euc-jp in bytes. Will not be converted
 my $Ynamae = "\xbe\xae\xbb\xf4\x20\xc3\xc6"; 
 
 
@@ -41,19 +42,20 @@ my $str = $Namae; $str =~ s/¾®»ô ÃÆ/Dan Kogai/o;
 is($str, $Name, q{regex});
 $str = $Namae; $str =~ s/$Namae/Dan Kogai/o;
 is($str, $Name, q{regex - with variable});
-is(length($Namae), 4, q{utf8:length});
+is(utf8::length($Namae), 4, q{utf8:length});
 {
     use bytes;
     # converted to UTF-8 so 3*3+1
     is(length($Namae),   10, q{bytes:length}); 
     # 
     is(length($Enamae),   7, q{euc:length}); # 2*3+1
-    is ($Namae, $Ynamae,     q{literal conversions});
-    isnt($Enamae, $Ynamae,   q{before and after}); 
+    isnt ($Namae, $Ynamae,     q{bytes not converted});
+    is ($Namae, Encode::decode('euc-jp', $Ynamae),     q{bytes decoded});
+    is($Enamae, $Ynamae,   q{before and after}); 
     is($Enamae, Encode::encode('euc-jp', $Namae)); 
 }
 # let's test the scope as well.  Must be in utf8 realm
-is(length($Namae), 4, q{utf8:length});
+is(utf8::length($Namae), 4, q{utf8:length});
 
 {
     no encoding;
@@ -75,25 +77,6 @@ ok(! defined(${^ENCODING}), q{not scoped yet});
 #ok(! defined(${^ENCODING}), q{out of black magic});
 use bytes;
 is (length($Namae), 10);
-
-#
-# now something completely different!
-#
-{
-    use encoding "euc-jp", Filter=>1;
-    ok(1, "Filter on");
-    use utf8;
-    no strict 'vars'; # fools
-    # doesn't work w/ "my" as of this writing.
-    # because of  buggy strict.pm and utf8.pm
-    our $¿Í = 2; 
-    #   ^^U+4eba, "human" in CJK ideograph
-    $¿Í++; # a child is born
-    *people = \$¿Í;
-    is ($people, 3, "Filter:utf8 identifier");
-    no encoding;
-    ok(1, "Filter off");
-}
 
 1;
 __END__

@@ -502,7 +502,7 @@ Perl_fbm_compile(pTHX_ SV *sv, U32 flags)
     U32 frequency = 256;
 
     if (flags & FBMcf_TAIL) {
-	MAGIC * const mg = SvUTF8(sv) && SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_utf8) : NULL;
+	MAGIC * const mg = SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_utf8) : NULL;
 	sv_catpvs(sv, "\n");		/* Taken into account in fbm_instr() */
 	if (mg && mg->mg_len >= 0)
 	    mg->mg_len++;
@@ -510,7 +510,7 @@ Perl_fbm_compile(pTHX_ SV *sv, U32 flags)
     s = (U8*)SvPV_force_mutable(sv, len);
     if (len == 0)		/* TAIL might be on a zero-length string. */
 	return;
-    SvUPGRADE(sv, SVt_PVGV);
+    SvUPGRADE(sv, SVt_PVMG);
     SvIOK_off(sv);
     SvNOK_off(sv);
     SvVALID_on(sv);
@@ -781,7 +781,7 @@ Perl_screaminstr(pTHX_ SV *bigstr, SV *littlestr, I32 start_shift, I32 end_shift
     register const unsigned char *littleend;
     I32 found = 0;
 
-    assert(SvTYPE(littlestr) == SVt_PVGV);
+    assert(SvTYPE(littlestr) == SVt_PVMG);
     assert(SvVALID(littlestr));
 
     if (*old_posp == -1
@@ -1307,7 +1307,6 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args, STRLEN* msglen,
 	}
 	else
 	    message = SvPV_const(msv,*msglen);
-	*utf8 = SvUTF8(msv);
     }
     else {
 	message = NULL;
@@ -1443,7 +1442,7 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
     dVAR;
     STRLEN msglen;
     SV * const msv = vmess(pat, args);
-    const I32 utf8 = SvUTF8(msv);
+    const I32 utf8 = 1;
     const char * const message = SvPV_const(msv, msglen);
 
     if (PL_warnhook) {
@@ -1513,7 +1512,7 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 	SV * const msv = vmess(pat, args);
 	STRLEN msglen;
 	const char * const message = SvPV_const(msv, msglen);
-	const I32 utf8 = SvUTF8(msv);
+	const I32 utf8 = 1;
 
 	if (PL_diehook) {
 	    assert(message);
@@ -1521,7 +1520,6 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 	}
 	if (PL_in_eval) {
 	    PL_restartop = die_where(message, msglen);
-	    SvFLAGS(ERRSV) |= utf8;
 	    JMPENV_JUMP(3);
 	}
 	write_to_stderr(message, msglen);
@@ -3441,6 +3439,9 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_substr:
 	result = &PL_vtbl_substr;
 	break;
+    case want_vtbl_substr_utf8:
+	result = &PL_vtbl_substr_utf8;
+	break;
     case want_vtbl_vec:
 	result = &PL_vtbl_vec;
 	break;
@@ -3449,9 +3450,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
 	break;
     case want_vtbl_bm:
 	result = &PL_vtbl_bm;
-	break;
-    case want_vtbl_fm:
-	result = &PL_vtbl_fm;
 	break;
     case want_vtbl_uvar:
 	result = &PL_vtbl_uvar;
@@ -3579,7 +3577,6 @@ Perl_report_evil_fh(pTHX_ const GV *gv, const IO *io, I32 op)
 	    const char * const func =
 		(const char *)
 		(op == OP_READLINE   ? "readline"  :	/* "<HANDLE>" not nice */
-		 op == OP_LEAVEWRITE ? "write" :		/* "write exit" not nice */
 		 op < 0              ? "" :              /* handle phoney cases */
 		 PL_op_desc[op]);
 	    const char * const type =

@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
     push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
     require "../t/test.pl";
-    skip_all("No perlio") unless (find PerlIO::Layer 'perlio');
+    skip_all("No perlio") unless (PerlIO::Layer->find( 'perlio'));
     if (ord("A") == 193) {
 	print "1..0 # Skip: EBCDIC\n";
 	exit 0;
@@ -15,8 +15,10 @@ BEGIN {
 	exit 0;
     }
     plan (9);
-    import Encode qw(:fallback_all);
+    Encode->import( qw(:fallback_all));
 }
+
+use utf8;
 
 # $PerlIO::encoding = 0; # WARN_ON_ERR|PERLQQ;
 
@@ -25,7 +27,7 @@ my $file = "fallback$$.txt";
 {
     my $message = '';
     local $SIG{__WARN__} = sub { $message = $_[0] };
-    $PerlIO::encoding::fallback = Encode::PERLQQ;
+    $PerlIO::encoding::fallback = 'Encode::PERLQQ';
     ok(open(my $fh,">encoding(iso-8859-1)",$file),"opened iso-8859-1 file");
     my $str = "\x{20AC}";
     print $fh $str,"0.02\n";
@@ -38,7 +40,7 @@ my $line = <$fh>;
 is($line,"\\x{20ac}0.02\n","perlqq escapes");
 close($fh);
 
-$PerlIO::encoding::fallback = Encode::HTMLCREF;
+$PerlIO::encoding::fallback = 'Encode::HTMLCREF';
 
 ok(open(my $fh,">encoding(iso-8859-1)",$file),"opened iso-8859-1 file");
 my $str = "\x{20AC}";
@@ -61,10 +63,10 @@ close($fh);
 ok(open($fh,"<encoding(US-ASCII)",$file),"Opened as ASCII");
 my $line = <$fh>;
 printf "# %x\n",ord($line);
-is($line,"\\xA30.02\n","Escaped non-mapped char");
+is($line,"\\x[A3]0.02\n","Escaped non-mapped char");
 close($fh);
 
-$PerlIO::encoding::fallback = Encode::WARN_ON_ERROR;
+$PerlIO::encoding::fallback = 'Encode::WARN_ON_ERROR';
 
 ok(open($fh,"<encoding(US-ASCII)",$file),"Opened as ASCII");
 my $line = <$fh>;

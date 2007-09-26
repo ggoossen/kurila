@@ -14,12 +14,13 @@ BEGIN {
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
+our $loaded;
 BEGIN { $| = 1; print "1..95\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Text::Balanced qw ( extract_quotelike );
 $loaded = 1;
 print "ok 1\n";
-$count=2;
+my $count=2;
 use vars qw( $DEBUG );
 #$DEBUG=1;
 sub debug { print "\t>>>",@_ if $ENV{DEBUG} }
@@ -27,6 +28,7 @@ sub esc   { my $x = shift||'<undef>'; $x =~ s/\n/\\n/gs; $x }
 
 ######################### End of black magic.
 
+our ($cmd, $neg, $str, $var);
 
 $cmd = "print";
 $neg = 0;

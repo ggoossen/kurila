@@ -4,21 +4,21 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.006 qw(:Status createSelfTiedObject);
-use IO::Compress::RawDeflate 2.006 ;
-use IO::Compress::Adapter::Deflate 2.006 ;
-use IO::Compress::Adapter::Identity 2.006 ;
-use IO::Compress::Zlib::Extra 2.006 ;
-use IO::Compress::Zip::Constants 2.006 ;
+use IO::Compress::Base::Common  2.004 qw(:Status createSelfTiedObject);
+use IO::Compress::RawDeflate 2.004 ;
+use IO::Compress::Adapter::Deflate 2.004 ;
+use IO::Compress::Adapter::Identity 2.004 ;
+use IO::Compress::Zlib::Extra 2.004 ;
+use IO::Compress::Zip::Constants 2.004 ;
 
 
-use Compress::Raw::Zlib  2.006 qw(crc32) ;
+use Compress::Raw::Zlib  2.004 qw(crc32) ;
 BEGIN
 {
     eval { require IO::Compress::Adapter::Bzip2 ; 
-           import  IO::Compress::Adapter::Bzip2 2.006 ; 
+           IO::Compress::Adapter::Bzip2->import( 2.004) ; 
            require IO::Compress::Bzip2 ; 
-           import  IO::Compress::Bzip2 2.006 ; 
+           IO::Compress::Bzip2->import( 2.004) ; 
          } ;
 }
 
@@ -27,10 +27,10 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $ZipError);
 
-$VERSION = '2.006';
+$VERSION = '2.004';
 $ZipError = '';
 
-@ISA = qw(Exporter IO::Compress::RawDeflate);
+@ISA = qw(IO::Compress::RawDeflate Exporter);
 @EXPORT_OK = qw( $ZipError zip ) ;
 %EXPORT_TAGS = %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ;
 push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
@@ -90,7 +90,7 @@ sub mkComp
 
     if (! defined *$self->{ZipData}{StartOffset}) {
         *$self->{ZipData}{StartOffset} = 0;
-        *$self->{ZipData}{Offset} = new U64 ;
+        *$self->{ZipData}{Offset} = U64->new() ;
     }
 
     return $obj;    
@@ -441,8 +441,8 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.006 qw(:Parse);
-    use Compress::Raw::Zlib  2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
+    use IO::Compress::Base::Common  2.004 qw(:Parse);
+    use Compress::Raw::Zlib  2.004 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
 
     my @Bzip2 = ();
     

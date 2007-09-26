@@ -1,6 +1,6 @@
 package Math::BigInt::FastCalc;
 
-use 5.006;
+use 5.006002;
 use strict;
 # use warnings;	# dont use warnings for older Perls
 
@@ -11,9 +11,9 @@ use vars qw/@ISA $VERSION $BASE $BASE_LEN/;
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.16';
+$VERSION = '0.15_01';
 
-bootstrap Math::BigInt::FastCalc $VERSION;
+Math::BigInt::FastCalc->bootstrap($VERSION);
 
 ##############################################################################
 # global constants, flags and accessory
@@ -34,13 +34,13 @@ BEGIN
     pow root sqrt log_int fac nok
     digit check
     from_hex from_bin from_oct as_hex as_bin as_oct
-    zeros base_len
+    zeros length base_len
     xor or and
     alen 1ex
     /)
     {
     no strict 'refs';
-    *{'Math::BigInt::FastCalc::_' . $method} = \&{'Math::BigInt::Calc::_' . $method};
+    *{Symbol::qualify_to_ref('Math::BigInt::FastCalc::_' . $method)} = \&{Symbol::qualify_to_ref('Math::BigInt::Calc::_' . $method)};
     }
   my ($AND_BITS, $XOR_BITS, $OR_BITS, $BASE_LEN_SMALL, $MAX_VAL);
  

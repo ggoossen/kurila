@@ -23,7 +23,6 @@ sub encode {
     my $self = shift;
     my $str  = shift;
 
-    utf8::encode($str) if ( Encode::is_utf8($str) );
     Encode::from_to( $str, 'utf8', 'euc-jp' );
 
     my ($trailing_crlf) = ( $str =~ /(\n|\r|\x0d\x0a)$/o );

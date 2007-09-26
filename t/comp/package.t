@@ -2,6 +2,8 @@
 
 print "1..14\n";
 
+no strict 'vars';
+
 $blurfl = 123;
 $foo = 3;
 

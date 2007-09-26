@@ -9,17 +9,14 @@
 # Warn or die msgs (if any) at - line 1234
 #
 
-chdir 't' if -d 't';
-@INC = '../lib';
-$ENV{PERL5LIB} = "../lib";
-
 $|=1;
 
 undef $/;
-@prgs = split /^########\n/m, <DATA>;
+our @prgs = split /^########\n/m, <DATA>;
 
-require './test.pl';
+BEGIN { require './test.pl'; }
 plan(tests => scalar @prgs);
+my $i;
 for (@prgs){
     ++$i;
     my($prog,$expected) = split(/\nEXPECT\n/, $_, 2);
@@ -28,7 +25,6 @@ for (@prgs){
     my ($testname) = $prog =~ /^# (.*)\n/m;
     $testname ||= '';
     $TODO = $testname =~ s/^TODO //;
-    $results =~ s/\n+$//;
     $expected =~ s/\n+$//;
 
     fresh_perl_is($prog, $expected, {}, $testname);
@@ -38,7 +34,7 @@ __END__
 
 # standard behaviour, without any extra references
 use Tie::Hash ;
-tie %h, Tie::StdHash;
+tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 ########
@@ -52,7 +48,8 @@ use Tie::Hash ;
    warn "Untied\n";
   }
 }
-tie %h, Tie::HashUntie;
+our %h;
+tie %h, 'Tie::HashUntie';
 untie %h;
 EXPECT
 Untied
@@ -60,22 +57,22 @@ Untied
 
 # standard behaviour, with 1 extra reference
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 ########
 
 # standard behaviour, with 1 extra reference via tied
 use Tie::Hash ;
-tie %h, Tie::StdHash;
-$a = tied %h;
+tie our %h, 'Tie::StdHash';
+our $a = tied %h;
 untie %h;
 EXPECT
 ########
 
 # standard behaviour, with 1 extra reference which is destroyed
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 $a = 0 ;
 untie %h;
 EXPECT
@@ -83,8 +80,8 @@ EXPECT
 
 # standard behaviour, with 1 extra reference via tied which is destroyed
 use Tie::Hash ;
-tie %h, Tie::StdHash;
-$a = tied %h;
+tie our %h, 'Tie::StdHash';
+our $a = tied %h;
 $a = 0 ;
 untie %h;
 EXPECT
@@ -93,7 +90,7 @@ EXPECT
 # strict behaviour, without any extra references
 use warnings 'untie';
 use Tie::Hash ;
-tie %h, Tie::StdHash;
+tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 ########
@@ -101,7 +98,7 @@ EXPECT
 # strict behaviour, with 1 extra references generating an error
 use warnings 'untie';
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
 untie attempted while 1 inner references still exist at - line 6.
@@ -110,8 +107,8 @@ untie attempted while 1 inner references still exist at - line 6.
 # strict behaviour, with 1 extra references via tied generating an error
 use warnings 'untie';
 use Tie::Hash ;
-tie %h, Tie::StdHash;
-$a = tied %h;
+tie our %h, 'Tie::StdHash';
+our $a = tied %h;
 untie %h;
 EXPECT
 untie attempted while 1 inner references still exist at - line 7.
@@ -120,7 +117,7 @@ untie attempted while 1 inner references still exist at - line 7.
 # strict behaviour, with 1 extra references which are destroyed
 use warnings 'untie';
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+our $a = tie our %h, 'Tie::StdHash';
 $a = 0 ;
 untie %h;
 EXPECT
@@ -129,7 +126,7 @@ EXPECT
 # strict behaviour, with extra 1 references via tied which are destroyed
 use warnings 'untie';
 use Tie::Hash ;
-tie %h, Tie::StdHash;
+tie %h, 'Tie::StdHash';
 $a = tied %h;
 $a = 0 ;
 untie %h;
@@ -139,7 +136,7 @@ EXPECT
 # strict error behaviour, with 2 extra references
 use warnings 'untie';
 use Tie::Hash ;
-$a = tie %h, Tie::StdHash;
+$a = tie %h, 'Tie::StdHash';
 $b = tied %h ;
 untie %h;
 EXPECT
@@ -149,12 +146,12 @@ untie attempted while 2 inner references still exist at - line 7.
 # strict behaviour, check scope of strictness.
 no warnings 'untie';
 use Tie::Hash ;
-$A = tie %H, Tie::StdHash;
+$A = tie %H, 'Tie::StdHash';
 $C = $B = tied %H ;
 {
     use warnings 'untie';
     use Tie::Hash ;
-    tie %h, Tie::StdHash;
+    tie %h, 'Tie::StdHash';
     untie %h;
 }
 untie %H;
@@ -236,7 +233,7 @@ EXPECT
 
 my ($a, $b);
 use Tie::Scalar;
-tie $a,Tie::StdScalar or die;
+tie $a,'Tie::StdScalar' or die;
 vec($b,1,1)=1;
 $a = $b;
 vec($a,1,1)=0;
@@ -247,7 +244,7 @@ EXPECT
 
 # correct unlocalisation of tied hashes (patch #16431)
 use Tie::Hash ;
-tie %tied, Tie::StdHash;
+tie %tied, 'Tie::StdHash';
 { local $hash{'foo'} } warn "plain hash bad unlocalize" if exists $hash{'foo'};
 { local $tied{'foo'} } warn "tied hash bad unlocalize" if exists $tied{'foo'};
 { local $ENV{'foo'}  } warn "%ENV bad unlocalize" if exists $ENV{'foo'};
@@ -258,6 +255,7 @@ EXPECT
 tie FH, 'main';
 EXPECT
 Can't modify constant item in tie at - line 3, near "'main';"
+Bareword "FH" not allowed while "strict subs" in use at - line 3.
 Execution of - aborted due to compilation errors.
 ########
 

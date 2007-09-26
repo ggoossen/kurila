@@ -26,9 +26,9 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
-    plan tests => 29 + $extra ;
+    plan tests => 16 + $extra ;
 
     use_ok('Compress::Zlib', 2);
 }
@@ -40,6 +40,19 @@ BEGIN
 is Compress::Zlib::zlib_version, ZLIB_VERSION, 
     "ZLIB_VERSION matches Compress::Zlib::zlib_version" ;
 
+
+if(0)
+{
+    # length of this string is 2 characters
+    my $s = "\x{df}\x{100}"; 
+
+    my $cs = Compress::Zlib::memGzip($s); 
+
+    # length stored at end of gzip file should be 4
+    my ($crc, $len) = unpack ("VV", substr($cs, -8, 8));
+    
+    is $len, 4, "length is 4";
+}
 
 {
     title "memGzip" ;
@@ -55,37 +68,28 @@ is Compress::Zlib::zlib_version, ZLIB_VERSION,
 }
 
 {
-    title "memGunzip when compressed gzip has been encoded" ;
-    my $s = "hello world" ;
-
-    my $co = Compress::Zlib::memGzip($s);
-    is Compress::Zlib::memGunzip(my $x = $co), $s, "  match uncompressed";
-
-    utf8::upgrade($co);
-     
-    my $un = Compress::Zlib::memGunzip($co);
-    ok $un, "  got uncompressed";
-
-    is $un, $s, "  uncompressed matched original";
-}
-
-{
     title "compress/uncompress";
 
     my $s = "\x{df}\x{100}";                                   
     my $s_copy = $s ;
 
+    #my $cs = compress($s);                      
     my $ces = compress(Encode::encode_utf8($s_copy));
 
     ok $ces, "  compressed ok" ;
 
+    #is $s, $ces ;
+
+    #my $un = uncompress($cs);
+    #is $un, $s;
+ 
     my $un = Encode::decode_utf8(uncompress($ces));
+    #my $un = uncompress($ces);
     is $un, $s, "  decode_utf8 ok";
  
-    utf8::upgrade($ces);
-    $un = Encode::decode_utf8(uncompress($ces));
-    is $un, $s, "  decode_utf8 ok";
- 
+    #$un = Encode::decode_utf8(uncompress($cs));
+    #is $un, $s;
+
 }
 
 {
@@ -95,7 +99,7 @@ is Compress::Zlib::zlib_version, ZLIB_VERSION,
     my $byte_len = length( Encode::encode_utf8($s) );
     my ($uncomp) ;
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name) ;
     ok my $fil = gzopen($name, "wb"), "  gzopen for write ok" ;
 
     is $fil->gzwrite(Encode::encode_utf8($s)), $byte_len, "  wrote $byte_len bytes" ;
@@ -112,28 +116,5 @@ is Compress::Zlib::zlib_version, ZLIB_VERSION,
     is $s, Encode::decode_utf8($uncomp), "  decode_utf8 ok" ;
 }
 
-{
-    title "Catch wide characters";
-
-    my $a = "a\xFF\x{100}";
-    eval { Compress::Zlib::memGzip($a) };
-    like($@, qr/Wide character in memGzip/, "  wide characters in memGzip");
-
-    eval { Compress::Zlib::memGunzip($a) };
-    like($@, qr/Wide character in memGunzip/, "  wide characters in memGunzip");
-
-    eval { Compress::Zlib::compress($a) };
-    like($@, qr/Wide character in compress/, "  wide characters in compress");
-
-    eval { Compress::Zlib::uncompress($a) };
-    like($@, qr/Wide character in uncompress/, "  wide characters in uncompress");
-
-    my $lex = new LexFile my $name ;
-    ok my $fil = gzopen($name, "wb"), "  gzopen for write ok" ;
-
-    eval { $fil->gzwrite($a); } ;
-    like($@, qr/Wide character in gzwrite/, "  wide characters in gzwrite");
-
-    ok ! $fil->gzclose, "  gzclose ok" ;
-}
+# Add tests that check that the module traps use of wide chars
 

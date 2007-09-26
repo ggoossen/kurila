@@ -2,12 +2,12 @@
 # This is the twin of enc_utf8.t .
 
 BEGIN {
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
-    unless (find PerlIO::Layer 'perlio') {
+    unless (PerlIO::Layer->find( 'perlio')) {
     print "1..0 # Skip: PerlIO was not built\n";
     exit 0;
     }
@@ -22,6 +22,7 @@ BEGIN {
 }
 
 use encoding 'euc-jp';
+use utf8;
 
 my @c = (127, 128, 255, 256);
 
@@ -57,7 +58,7 @@ my $f = filename("f" . @f);
 push @f, $f;
 open(F, ">$f") or die "$0: failed to open '$f' for writing: $!";
 binmode(F, ":raw"); # Output raw bytes.
-print F chr(128); # Output illegal UTF-8.
+print F bytes::chr(128); # Output illegal UTF-8.
 close F;
 open(F, $f) or die "$0: failed to open '$f' for reading: $!";
 binmode(F, ":encoding(utf-8)");

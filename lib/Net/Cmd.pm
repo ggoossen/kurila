@@ -22,22 +22,9 @@ BEGIN {
   }
 }
 
-BEGIN {
-  if (!eval { require utf8 }) {
-    *is_utf8 = sub { 0 };
-  }
-  elsif (eval { utf8::is_utf8(undef); 1 }) {
-    *is_utf8 = \&utf8::is_utf8;
-  }
-  elsif (eval { require Encode; Encode::is_utf8(undef); 1 }) {
-    *is_utf8 = \&Encode::is_utf8;
-  }
-  else {
-    *is_utf8 = sub { $_[0] =~ /[^\x00-\xff]/ };
-  }
-}
+my $doUTF8 = eval { require utf8 };
 
-$VERSION = "2.29";
+$VERSION = "2.28";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -95,16 +82,16 @@ sub _print_isa {
     $done{$pkg} = 1;
 
     my $v =
-      defined ${"${pkg}::VERSION"}
-      ? "(" . ${"${pkg}::VERSION"} . ")"
+      defined ${*{Symbol::qualify_to_ref("${pkg}::VERSION")}}
+      ? "(" . ${*{Symbol::qualify_to_ref("${pkg}::VERSION")}} . ")"
       : "";
 
     my $spc = $spc{$pkg};
     $cmd->debug_print(1, "${spc}${pkg}${v}\n");
 
-    if (@{"${pkg}::ISA"}) {
-      @spc{@{"${pkg}::ISA"}} = ("  " . $spc{$pkg}) x @{"${pkg}::ISA"};
-      unshift(@do, @{"${pkg}::ISA"});
+    if (@{*{Symbol::qualify_to_ref("${pkg}::ISA")}}) {
+      @spc{@{*{Symbol::qualify_to_ref("${pkg}::ISA")}}} = ("  " . $spc{$pkg}) x @{*{Symbol::qualify_to_ref("${pkg}::ISA")}};
+      unshift(@do, @{*{Symbol::qualify_to_ref("${pkg}::ISA")}});
     }
   }
 }
@@ -398,10 +385,6 @@ sub datasend {
   my $cmd  = shift;
   my $arr  = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
   my $line = join("", @$arr);
-
-  # encode to individual utf8 bytes if
-  # $line is a string (in internal UTF-8)
-  utf8::encode($line) if is_utf8($line);
 
   return 0 unless defined(fileno($cmd));
 

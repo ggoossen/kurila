@@ -9,7 +9,7 @@ use File::Spec;
 BEGIN {
     if ($^O eq 'VMS') {
         require VMS::Filespec;
-        import VMS::Filespec;
+        VMS::Filespec->import;
     }
 }
 

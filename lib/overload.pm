@@ -2,46 +2,49 @@ package overload;
 
 our $VERSION = '1.06';
 
+use vars qw'%constants %ops';
+
 sub nil {}
 
 sub OVERLOAD {
-  $package = shift;
+  my $package = shift;
   my %arg = @_;
   my ($sub, $fb);
-  $ {$package . "::OVERLOAD"}{dummy}++; # Register with magic by touching.
-  *{$package . "::()"} = \&nil; # Make it findable via fetchmethod.
+  no strict 'refs';
+  $ {*{Symbol::qualify_to_ref($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
+  *{Symbol::qualify_to_ref($package . "::()")} = \&nil; # Make it findable via fetchmethod.
   for (keys %arg) {
     if ($_ eq 'fallback') {
       $fb = $arg{$_};
     } else {
       $sub = $arg{$_};
       if (not ref $sub and $sub !~ /::/) {
-	$ {$package . "::(" . $_} = $sub;
+	$ {*{Symbol::qualify_to_ref($package . "::(" . $_)}} = $sub;
 	$sub = \&nil;
       }
       #print STDERR "Setting `$ {'package'}::\cO$_' to \\&`$sub'.\n";
-      *{$package . "::(" . $_} = \&{ $sub };
+      *{Symbol::qualify_to_ref($package . "::(" . $_)} = \&{ $sub };
     }
   }
-  ${$package . "::()"} = $fb; # Make it findable too (fallback only).
+  ${*{Symbol::qualify_to_ref($package . "::()")}} = $fb; # Make it findable too (fallback only).
 }
 
 sub import {
-  $package = (caller())[0];
+  my $package = (caller())[0];
   # *{$package . "::OVERLOAD"} = \&OVERLOAD;
   shift;
   $package->overload::OVERLOAD(@_);
 }
 
 sub unimport {
-  $package = (caller())[0];
-  ${$package . "::OVERLOAD"}{dummy}++; # Upgrade the table
+  my $package = (caller())[0];
+  ${*{Symbol::qualify_to_ref($package . "::OVERLOAD")}}{dummy}++; # Upgrade the table
   shift;
   for (@_) {
     if ($_ eq 'fallback') {
-      undef $ {$package . "::()"};
+      undef $ {*{Symbol::qualify_to_ref($package . "::()")}};
     } else {
-      delete $ {$package . "::"}{"(" . $_};
+      delete $ {*{Symbol::qualify_to_ref($package . "::")}}{"(" . $_};
     }
   }
 }
@@ -107,7 +110,7 @@ sub mycan {				# Real can would leave stubs.
   my $mro = mro::get_linear_isa($package);
   foreach my $p (@$mro) {
     my $fqmeth = $p . q{::} . $meth;
-    return \*{$fqmeth} if defined &{$fqmeth};
+    return \*{Symbol::qualify_to_ref($fqmeth)} if defined &{Symbol::qualify_to_ref($fqmeth)};
   }
 
   return undef;

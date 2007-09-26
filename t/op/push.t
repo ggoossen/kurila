@@ -1,6 +1,6 @@
 #!./perl
 
-@tests = split(/\n/, <<EOF);
+our @tests = split(/\n/, <<EOF);
 0 3,			0 1 2,		3 4 5 6 7
 0 0 a b c,		,		a b c 0 1 2 3 4 5 6 7
 8 0 a b c,		,		0 1 2 3 4 5 6 7 a b c
@@ -17,25 +17,28 @@ EOF
 print "1..", 4 + @tests, "\n";
 die "blech" unless @tests;
 
-@x = (1,2,3);
+our @x = (1,2,3);
 push(@x,@x);
 if (join(':',@x) eq '1:2:3:1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
 push(@x,4);
 if (join(':',@x) eq '1:2:3:1:2:3:4') {print "ok 2\n";} else {print "not ok 2\n";}
 
 # test for push/pop intuiting @ on array
-push(x,3);
-if (join(':',@x) eq '1:2:3:1:2:3:4:3') {print "ok 3\n";} else {print "not ok 3\n";}
-pop(x);
-if (join(':',@x) eq '1:2:3:1:2:3:4') {print "ok 4\n";} else {print "not ok 4\n";}
+{ no strict 'vars';
+  push(x,3);
+  if (join(':',@x) eq '1:2:3:1:2:3:4:3') {print "ok 3\n";} else {print "not ok 3\n";}
+  pop(x);
+  if (join(':',@x) eq '1:2:3:1:2:3:4') {print "ok 4\n";} else {print "not ok 4\n";}
+}
 
-$test = 5;
-foreach $line (@tests) {
-    ($list,$get,$leave) = split(/,\t*/,$line);
-    ($pos, $len, @list) = split(' ',$list);
-    @get = split(' ',$get);
-    @leave = split(' ',$leave);
+our $test = 5;
+foreach my $line (@tests) {
+    my ($list,$get,$leave) = split(/,\t*/,$line);
+    my ($pos, $len, @list) = split(' ',$list);
+    my @get = split(' ',$get);
+    my @leave = split(' ',$leave);
     @x = (0,1,2,3,4,5,6,7);
+    my @got;
     if (defined $len) {
 	@got = splice(@x, $pos, $len, @list);
     }

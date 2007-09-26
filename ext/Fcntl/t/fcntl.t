@@ -33,10 +33,10 @@ if (sysopen(my $wo, "fcntl$$", O_WRONLY|O_CREAT)) {
 	    } else {
 		print "not ok 5 # sysread failed: $!\n";
 	    }
+            close($ro);
 	} else {
 	    print "not ok 4 # sysopen O_RDONLY failed: $!\n";
 	}
-	close($ro);
     } else {
 	print "not ok 3 # syswrite failed: $!\n";
     }

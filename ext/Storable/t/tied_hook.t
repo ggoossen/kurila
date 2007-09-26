@@ -13,7 +13,7 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -151,9 +151,9 @@ package main;
 $a = 'toto';
 $b = \$a;
 
-$c = tie %hash, TIED_HASH;
-$d = tie @array, TIED_ARRAY;
-tie $scalar, TIED_SCALAR;
+$c = tie %hash, 'TIED_HASH';
+$d = tie @array, 'TIED_ARRAY';
+tie $scalar, 'TIED_SCALAR';
 
 $scalar = 'foo';
 $hash{'attribute'} = 'plain value';

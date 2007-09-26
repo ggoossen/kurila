@@ -1,8 +1,8 @@
 ################################################################################
 ##
-##  $Revision: 15 $
+##  $Revision: 12 $
 ##  $Author: mhx $
-##  $Date: 2007/08/18 20:16:11 +0200 $
+##  $Date: 2007/03/23 17:57:58 +0100 $
 ##
 ################################################################################
 ##
@@ -43,6 +43,7 @@ __UNDEFINED__ PERL_LOADMOD_IMPORT_OPS	0x4
 /* Replace: 0 */
 
 /* Replace perl_eval_pv with eval_pv */
+/* eval_pv depends on eval_sv */
 
 #ifndef eval_pv
 #if { NEED eval_pv }
@@ -128,6 +129,8 @@ vload_module(U32 flags, SV *name, SV *ver, va_list *args)
 
 #endif
 #endif
+
+/* load_module depends on vload_module */
 
 #ifndef load_module
 #if { NEED load_module }
@@ -273,10 +276,11 @@ load_module(flags, name, version, ...)
 	CODE:
 		/* Both SV parameters are donated to the ops built inside
 		   load_module, so we need to bump the refcounts.  */
-		Perl_load_module(aTHX_ flags, SvREFCNT_inc_simple(name),
-		                 SvREFCNT_inc_simple(version), NULL);
+		SvREFCNT_inc(name);
+		SvREFCNT_inc(version);
+		Perl_load_module(aTHX_ flags, name, version, NULL);
 
-=tests plan => 46
+=tests plan => 40
 
 sub eq_array
 {
@@ -320,7 +324,6 @@ for $test (
     print "# --- $description ---\n";
     ok(eq_array( [ &Devel::PPPort::call_sv(\&f, $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_sv(*f,  $flags, @$args) ], $expected));
-    ok(eq_array( [ &Devel::PPPort::call_sv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_pv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_argv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::eval_sv("f(qw(@$args))", $flags) ], $expected));
@@ -331,5 +334,5 @@ ok(&Devel::PPPort::eval_pv('f()', 0), 'y');
 ok(&Devel::PPPort::eval_pv('f(qw(a b c))', 0), 'y');
 
 ok(!defined $::{'less::'}, 1, "Hadn't loaded less yet");
-Devel::PPPort::load_module(0, "less", undef);
+Devel::PPPort::load_module(0, "less", undef);  
 ok(defined $::{'less::'}, 1, "Have now loaded less");

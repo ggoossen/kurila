@@ -26,7 +26,7 @@ Have you read the appropriate manpages?  Here's a brief index:
 			(not a man-page but still useful, a collection
 			 of various essays on Perl techniques)
 
-A crude table of contents for the Perl manpage set is found in L<perltoc>.
+A crude table of contents for the Perl manpage set is found in L<kurilatoc>.
 
 =head2 How can I use Perl interactively?
 

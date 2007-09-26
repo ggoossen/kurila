@@ -8,8 +8,6 @@
  *
  */
 
-/* This structure must the beginning of XPVFM in sv.h  */
-
 struct xpvcv {
     union {
 	NV	xnv_nv;		/* numeric value, if any */
@@ -124,8 +122,7 @@ Returns the stash of the CV.
 #define CvFILEGV(sv)	(gv_fetchfile(CvFILE(sv)))
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define CvDEPTH(sv) (*({const CV *_cv = (CV *)sv; \
-			  assert(SvTYPE(_cv) == SVt_PVCV ||	 \
-				 SvTYPE(_cv) == SVt_PVFM);	 \
+			  assert(SvTYPE(_cv) == SVt_PVCV);	 \
 			  &((XPVCV*)SvANY(_cv))->xiv_u.xivu_i32; \
 			}))
 #else

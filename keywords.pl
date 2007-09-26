@@ -105,6 +105,7 @@ endpwent
 endservent
 eof
 eq
+err
 eval
 exec
 exists
@@ -116,8 +117,6 @@ flock
 for
 foreach
 fork
-format
-formline
 ge
 getc
 getgrent

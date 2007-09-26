@@ -150,7 +150,6 @@ EXTCONST char* const PL_op_name[] = {
 	"index",
 	"rindex",
 	"sprintf",
-	"formline",
 	"ord",
 	"chr",
 	"crypt",
@@ -250,8 +249,6 @@ EXTCONST char* const PL_op_name[] = {
 	"select",
 	"getc",
 	"read",
-	"enterwrite",
-	"leavewrite",
 	"prtf",
 	"print",
 	"say",
@@ -393,7 +390,6 @@ EXTCONST char* const PL_op_name[] = {
 	"getlogin",
 	"syscall",
 	"lock",
-	"once",
 	"custom",
 };
 #endif
@@ -519,7 +515,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"index",
 	"rindex",
 	"sprintf",
-	"formline",
 	"ord",
 	"chr",
 	"crypt",
@@ -619,8 +614,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"select",
 	"getc",
 	"read",
-	"write",
-	"write exit",
 	"printf",
 	"print",
 	"say",
@@ -762,7 +755,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"getlogin",
 	"syscall",
 	"lock",
-	"once",
 	"unknown custom operator",
 };
 #endif
@@ -902,7 +894,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_index),
 	MEMBER_TO_FPTR(Perl_pp_index),	/* Perl_pp_rindex */
 	MEMBER_TO_FPTR(Perl_pp_sprintf),
-	MEMBER_TO_FPTR(Perl_pp_formline),
 	MEMBER_TO_FPTR(Perl_pp_ord),
 	MEMBER_TO_FPTR(Perl_pp_chr),
 	MEMBER_TO_FPTR(Perl_pp_crypt),
@@ -1002,8 +993,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_select),
 	MEMBER_TO_FPTR(Perl_pp_getc),
 	MEMBER_TO_FPTR(Perl_pp_sysread),	/* Perl_pp_read */
-	MEMBER_TO_FPTR(Perl_pp_enterwrite),
-	MEMBER_TO_FPTR(Perl_pp_leavewrite),
 	MEMBER_TO_FPTR(Perl_pp_prtf),
 	MEMBER_TO_FPTR(Perl_pp_print),
 	MEMBER_TO_FPTR(Perl_pp_print),	/* Perl_pp_say */
@@ -1145,7 +1134,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_getlogin),
 	MEMBER_TO_FPTR(Perl_pp_syscall),
 	MEMBER_TO_FPTR(Perl_pp_lock),
-	MEMBER_TO_FPTR(Perl_pp_once),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_custom */
 }
 #endif
@@ -1282,7 +1270,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_index),	/* index */
 	MEMBER_TO_FPTR(Perl_ck_index),	/* rindex */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sprintf */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* formline */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* ord */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* chr */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* crypt */
@@ -1382,8 +1369,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_select),	/* select */
 	MEMBER_TO_FPTR(Perl_ck_eof),	/* getc */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* read */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* enterwrite */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* leavewrite */
 	MEMBER_TO_FPTR(Perl_ck_listiob),	/* prtf */
 	MEMBER_TO_FPTR(Perl_ck_listiob),	/* print */
 	MEMBER_TO_FPTR(Perl_ck_listiob),	/* say */
@@ -1525,7 +1510,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* getlogin */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* syscall */
 	MEMBER_TO_FPTR(Perl_ck_rfun),	/* lock */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* once */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* custom */
 }
 #endif
@@ -1656,15 +1640,14 @@ EXTCONST U32 PL_opargs[] = {
 	0x0122291c,	/* index */
 	0x0122291c,	/* rindex */
 	0x0004280d,	/* sprintf */
-	0x00042805,	/* formline */
-	0x0001379e,	/* ord */
-	0x0001378e,	/* chr */
+	0x0001379c,	/* ord */
+	0x0001378c,	/* chr */
 	0x0002290e,	/* crypt */
-	0x0001368e,	/* ucfirst */
-	0x0001368e,	/* lcfirst */
-	0x0001368e,	/* uc */
-	0x0001368e,	/* lc */
-	0x0001368e,	/* quotemeta */
+	0x0001368c,	/* ucfirst */
+	0x0001368c,	/* lcfirst */
+	0x0001368c,	/* uc */
+	0x0001368c,	/* lc */
+	0x0001368c,	/* quotemeta */
 	0x00000248,	/* rv2av */
 	0x00026c04,	/* aelemfast */
 	0x00026404,	/* aelem */
@@ -1756,8 +1739,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0001c80c,	/* select */
 	0x0001d60c,	/* getc */
 	0x122ec81d,	/* read */
-	0x0001d654,	/* enterwrite */
-	0x00000200,	/* leavewrite */
 	0x0005c815,	/* prtf */
 	0x0005c815,	/* print */
 	0x0005c815,	/* say */
@@ -1899,7 +1880,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0000000c,	/* getlogin */
 	0x0004281d,	/* syscall */
 	0x0000f604,	/* lock */
-	0x00000600,	/* once */
 	0x00000000,	/* custom */
 };
 #endif

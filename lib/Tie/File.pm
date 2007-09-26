@@ -1,13 +1,14 @@
 
 package Tie::File;
 require 5.005;
+use strict;
 use Carp ':DEFAULT', 'confess';
 use POSIX 'SEEK_SET';
 use Fcntl 'O_CREAT', 'O_RDWR', 'LOCK_EX', 'LOCK_SH', 'O_WRONLY', 'O_RDONLY';
 sub O_ACCMODE () { O_RDONLY | O_RDWR | O_WRONLY }
 
 
-$VERSION = "0.97_02";
+our $VERSION = "0.97_02";
 my $DEFAULT_MEMORY_SIZE = 1<<21;    # 2 megabytes
 my $DEFAULT_AUTODEFER_THRESHHOLD = 3; # 3 records
 my $DEFAULT_AUTODEFER_FILELEN_THRESHHOLD = 65536; # 16 disk blocksful
@@ -15,6 +16,8 @@ my $DEFAULT_AUTODEFER_FILELEN_THRESHHOLD = 65536; # 16 disk blocksful
 my %good_opt = map {$_ => 1, "-$_" => 1}
                  qw(memory dw_size mode recsep discipline 
                     autodefer autochomp autodefer_threshhold concurrent);
+
+our (@OFF, @H, $DIAGNOSTIC);
 
 sub TIEARRAY {
   if (@_ % 2 != 0) {
@@ -746,7 +749,6 @@ sub _oadjust {
   my $delta = 0;
   my $delta_recs = 0;
   my $prev_end = -1;
-  my %newkeys;
 
   for (@_) {
     my ($pos, $nrecs, @data) = @$_;
@@ -756,7 +758,6 @@ sub _oadjust {
     # to the first new one of this batch
     for my $i ($prev_end+2 .. $pos - 1) {
       $self->{offsets}[$i] += $delta;
-      $newkey{$i} = $i + $delta_recs;
     }
 
     $prev_end = $pos + @data - 1; # last record moved on this pass 
@@ -775,16 +776,6 @@ sub _oadjust {
       my $oldlen = $self->{offsets}[$i+1] - $self->{offsets}[$i];
       $delta -= $oldlen;
     }
-
-#    # also this data has changed, so update it in the cache
-#    for (0 .. $#data) {
-#      $self->{cache}->update($pos + $_, $data[$_]);
-#    }
-#    if ($delta_recs) {
-#      my @oldkeys = grep $_ >= $pos + @data, $self->{cache}->ckeys;
-#      my @newkeys = map $_ + $delta_recs, @oldkeys;
-#      $self->{cache}->rekey(\@oldkeys, \@newkeys);
-#    }
 
     # replace old offsets with new
     splice @{$self->{offsets}}, $pos, $nrecs+1, @newoff;

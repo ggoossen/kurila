@@ -38,6 +38,13 @@
 # evalled; so something like a\"\x{100}$1 has length 3+length($1).
 
 my $file;
+
+use strict;
+use warnings FATAL=>"all";
+use vars qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
+use vars qw($qr $skip_amp $qr_embed); # set by our callers
+
+
 BEGIN {
     $iters = shift || 1;	# Poor man performance suite, 10000 is OK.
 
@@ -46,16 +53,7 @@ BEGIN {
     if (defined $file) {
 	open TESTS, $file or die "Can't open $file";
     }
-
-    chdir 't' if -d 't';
-    @INC = '../lib';
 }
-
-use strict;
-use warnings FATAL=>"all";
-use vars qw($iters $numtests $bang $ffff $nulnul $OP);
-use vars qw($qr $skip_amp $qr_embed); # set by our callers
-
 
 if (!defined $file) {
     open(TESTS,'op/re_tests') || open(TESTS,'t/op/re_tests')
@@ -66,8 +64,16 @@ my @tests = <TESTS>;
 
 close TESTS;
 
+BEGIN {
+    require utf8;
+    if (1) {
+        $utf8 = "use utf8;\n";
+        utf8->import();
+    }
+}
+
 $bang = sprintf "\\%03o", ord "!"; # \41 would not be portable.
-$ffff  = chr(0xff) x 2;
+$ffff  = "\x[FF]\x[FF]";
 $nulnul = "\0" x 2;
 $OP = $qr ? 'qr' : 'm';
 
@@ -85,20 +91,23 @@ foreach (@tests) {
     chomp;
     s/\\n/\n/g;
     my ($pat, $subject, $result, $repl, $expect, $reason) = split(/\t/,$_,6);
+    if ($result =~ m/c/ and $ENV{PERL_VALGRIND}) {
+        print "ok $test # TODO fix memory leak with compilation error\n";
+        next;
+    }
     $reason = '' unless defined $reason;
     my $input = join(':',$pat,$subject,$result,$repl,$expect);
     $pat = "'$pat'" unless $pat =~ /^[:'\/]/;
     $pat =~ s/(\$\{\w+\})/$1/eeg;
     $pat =~ s/\\n/\n/g;
-    $subject = eval qq("$subject"); die $@ if $@;
-    $expect  = eval qq("$expect"); die $@ if $@;
+    $subject = eval qq(use utf8; "$subject"); die $@ if $@;
+    $expect  = eval qq(use utf8; "$expect"); die $@ if $@;
     $expect = $repl = '-' if $skip_amp and $input =~ /\$[&\`\']/;
     my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
     $result =~ s/B//i unless $skip;
 
-    for my $study ('', 'study $subject', 'utf8::upgrade($subject)',
-		   'utf8::upgrade($subject); study $subject') {
+    for my $study ('', 'study $subject') {
 	# Need to make a copy, else the utf8::upgrade of an alreay studied
 	# scalar confuses things.
 	my $subject = $subject;
@@ -106,6 +115,7 @@ foreach (@tests) {
 	my ($code, $match, $got);
         if ($repl eq 'pos') {
             $code= <<EOFCODE;
+                $utf8;
                 $study;
                 pos(\$subject)=0;
                 \$match = ( \$subject =~ m${pat}g );
@@ -114,6 +124,7 @@ EOFCODE
         }
         elsif ($qr_embed) {
             $code= <<EOFCODE;
+                $utf8;
                 my \$RE = qr$pat;
                 $study;
                 \$match = (\$subject =~ /(?:)\$RE(?:)/) while \$c--;
@@ -122,6 +133,7 @@ EOFCODE
         }
         else {
             $code= <<EOFCODE;
+                $utf8;
                 $study;
                 \$match = (\$subject =~ $OP$pat) while \$c--;
                 \$got = "$repl";
@@ -159,8 +171,8 @@ EOFCODE
 		    print "not ok $test ($study) $input => `$got', match=$match\n$code\n";
 		}
 		else { # better diagnostics
-		    my $s = Data::Dumper->new([$subject],['subject'])->Useqq(1)->Dump;
-		    my $g = Data::Dumper->new([$got],['got'])->Useqq(1)->Dump;
+		    my $s = 'Data::Dumper'->new([$subject],['subject'])->Useqq(1)->Dump;
+		    my $g = 'Data::Dumper'->new([$got],['got'])->Useqq(1)->Dump;
 		    print "not ok $test ($study) $input => `$got', match=$match\n$s\n$g\n$code\n";
 		}
 		next TEST;

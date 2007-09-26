@@ -38,13 +38,13 @@ my $dirs  = join '', map { "    - $_\n" } sort { lc $a cmp lc $b } @dirs;
 open my $fh, ">$file" or die "Can't open $file: $!";
 
 print $fh <<"EOI";
-name: perl
-version: $]
-abstract: Practical Extraction and Report Language
-author: perl5-porters\@perl.org
+name: kurila
+version: 0_02
+abstract: a geneticly modified perl
+author: ~
 license: perl
 distribution_type: core
-private:
+no_index:
   directory:
 $dirs
   file:

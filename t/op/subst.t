@@ -1,13 +1,14 @@
 #!./perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config; import Config;
+    require Config; Config->import;
 }
 
+
 require './test.pl';
-plan( tests => 136 );
+plan( tests => 135 );
+
+our ($x, $snum, $foo, $t, $r, $s);
 
 $x = 'foo';
 $_ = "x";
@@ -375,6 +376,8 @@ ok( $_ eq "C B" && $snum == 12 );
     is($l, $r, "use utf8 \\w");
 }
 
+use utf8;
+
 my $pv1 = my $pv2  = "Andreas J. K\303\266nig";
 $pv1 =~ s/A/\x{100}/;
 substr($pv2,0,1) = "\x{100}";
@@ -409,43 +412,45 @@ SKIP: {
 {
     # SADAHIRO Tomoyuki <bqw10602@nifty.com>
 
+    use utf8;
+
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/\xFF/;
-    like($a, qr/\xFF/);
+    $a =~ s/\x{101}/\x{FF}/;
+    like($a, qr/\x{FF}/);
     is(length($a), 2, "SADAHIRO utf8 s///");
 
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/"\xFF"/e;
-    like($a, qr/\xFF/);
+    $a =~ s/\x{101}/"\x{FF}"/e;
+    like($a, qr/\x{FF}/);
     is(length($a), 2);
 
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/\xFF\xFF\xFF/;
-    like($a, qr/\xFF\xFF\xFF/);
+    $a =~ s/\x{101}/\x{FF}\x{FF}\x{FF}/;
+    like($a, qr/\x{FF}\x{FF}\x{FF}/);
     is(length($a), 4);
 
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/"\xFF\xFF\xFF"/e;
-    like($a, qr/\xFF\xFF\xFF/);
+    $a =~ s/\x{101}/"\x{FF}\x{FF}\x{FF}"/e;
+    like($a, qr/\x{FF}\x{FF}\x{FF}/);
     is(length($a), 4);
 
-    $a = "\xFF\x{101}";
-    $a =~ s/\xFF/\x{100}/;
+    $a = "\x{FF}\x{101}";
+    $a =~ s/\x{FF}/\x{100}/;
     like($a, qr/\x{100}/);
     is(length($a), 2);
 
-    $a = "\xFF\x{101}";
-    $a =~ s/\xFF/"\x{100}"/e;
+    $a = "\x{FF}\x{101}";
+    $a =~ s/\x{FF}/"\x{100}"/e;
     like($a, qr/\x{100}/);
     is(length($a), 2);
 
-    $a = "\xFF";
-    $a =~ s/\xFF/\x{100}/;
+    $a = "\x{FF}";
+    $a =~ s/\x{FF}/\x{100}/;
     like($a, qr/\x{100}/);
     is(length($a), 1);
 
-    $a = "\xFF";
-    $a =~ s/\xFF/"\x{100}"/e;
+    $a = "\x{FF}";
+    $a =~ s/\x{FF}/"\x{100}"/e;
     like($a, qr/\x{100}/);
     is(length($a), 1);
 }
@@ -541,18 +546,6 @@ my $name = "chris";
 is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
 
 
-# [perl #34171] $1 didn't honour 'use bytes' in s//e
-{
-    my $s="\x{100}";
-    my $x;
-    {
-	use bytes;
-	$s=~ s/(..)/$x=$1/e
-    }
-    is(length($x), 2, '[perl #34171]');
-}
-
-
 { # [perl #27940] perlbug: [\x00-\x1f] works, [\c@-\c_] does not
     my $c;
 
@@ -565,11 +558,12 @@ is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
 {
     $_ = "xy";
     no warnings 'uninitialized';
+    no strict 'refs';
     /(((((((((x)))))))))(z)/;	# clear $10
-    s/(((((((((x)))))))))(y)/${10}/;
+    s/(((((((((x)))))))))(y)/${*{Symbol::qualify_to_ref(10)}}/;
     is($_,"y","RT#6006: \$_ eq '$_'");
     $_ = "xr";
-    s/(((((((((x)))))))))(r)/fooba${10}/;
+    s/(((((((((x)))))))))(r)/fooba${*{Symbol::qualify_to_ref(10)}}/;
     is($_,"foobar","RT#6006: \$_ eq '$_'");
 }
 {

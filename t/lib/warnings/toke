@@ -124,22 +124,6 @@ toke.c	AOK
         *foo *foo
 
 __END__
-# toke.c 
-use warnings 'deprecated' ;
-format STDOUT =
-@<<<  @|||  @>>>  @>>>
-$a    $b    "abc" 'def'
-.
-no warnings 'deprecated' ;
-format STDOUT =
-@<<<  @|||  @>>>  @>>>
-$a    $b    "abc" 'def'
-.
-EXPECT
-Use of comma-less variable list is deprecated at - line 5.
-Use of comma-less variable list is deprecated at - line 5.
-Use of comma-less variable list is deprecated at - line 5.
-########
 # toke.c
 use warnings 'deprecated' ;
 $a = <<;
@@ -259,7 +243,9 @@ $a = { def
 no warnings 'reserved' ;
 $a = abc;
 EXPECT
-Unquoted string "abc" may clash with future reserved word at - line 3.
+Bareword "abc" not allowed while "strict subs" in use at - line 3.
+Bareword "abc" not allowed while "strict subs" in use at - line 8.
+Execution of - aborted due to compilation errors.
 ########
 # toke.c
 use warnings 'qw' ;
@@ -359,16 +345,16 @@ Ambiguous use of ${fred} resolved to $fred at - line 4.
 ########
 # toke.c
 use warnings 'syntax' ;
-$a = _123; print "$a\n";		#( 3	string)
+$a = eval "_123"; print "$a\n";		#( 3	string)
 $a = 1_23; print "$a\n";
 $a = 12_3; print "$a\n";
 $a = 123_; print "$a\n";		#  6
-$a = _+123; print "$a\n";		#  7	string)
-$a = +_123; print "$a\n";		#( 8	string)
+$a = eval "_+123"; print "$a\n";		#  7	string)
+$a = eval "+_123"; print "$a\n";		#( 8	string)
 $a = +1_23; print "$a\n";
 $a = +12_3; print "$a\n";
 $a = +123_; print "$a\n";		# 11
-$a = _-123; print "$a\n";		#(12	string)
+$a = eval "_-123"; print "$a\n";		#(12	string)
 $a = -_123; print "$a\n";		#(13	string)
 $a = -1_23; print "$a\n";
 $a = -12_3; print "$a\n";
@@ -400,16 +386,16 @@ $a = 1__23; print "$a\n";		# 40
 $a = 12.3__4; print "$a\n";		# 41
 $a = 12.34e1__2; printf("%.0f\n", $a);	# 42
 no warnings 'syntax' ;
-$a = _123; print "$a\n";
+$a = eval "_123"; print "$a\n";
 $a = 1_23; print "$a\n";
 $a = 12_3; print "$a\n";
 $a = 123_; print "$a\n";
-$a = _+123; print "$a\n";
-$a = +_123; print "$a\n";
+$a = eval "_+123"; print "$a\n";
+$a = eval "+_123"; print "$a\n";
 $a = +1_23; print "$a\n";
 $a = +12_3; print "$a\n";
 $a = +123_; print "$a\n";
-$a = _-123; print "$a\n";
+$a = eval "_-123"; print "$a\n";
 $a = -_123; print "$a\n";
 $a = -1_23; print "$a\n";
 $a = -12_3; print "$a\n";
@@ -462,16 +448,16 @@ Misplaced _ in number at - line 39.
 Misplaced _ in number at - line 40.
 Misplaced _ in number at - line 41.
 Misplaced _ in number at - line 42.
-_123
+
 123
 123
 123
+
+
 123
-_123
 123
 123
-123
--123
+
 -_123
 -123
 -123
@@ -502,16 +488,16 @@ _123
 123
 12.34
 12340000000000
-_123
+
 123
 123
 123
+
+
 123
-_123
 123
 123
-123
--123
+
 -_123
 -123
 -123
@@ -568,6 +554,7 @@ eval <<'EOE';
 #  line 30 "foo"
 warn "yelp";
 {
+  use utf8;
   $_ = " \x{123} " ;
 }
 EOE
@@ -662,6 +649,11 @@ Operator or semicolon missing before *foo at - line 8.
 Ambiguous use of * resolved as operator * at - line 8.
 Operator or semicolon missing before *foo at - line 10.
 Ambiguous use of * resolved as operator * at - line 10.
+Bareword "foo" not allowed while "strict subs" in use at - line 3.
+Bareword "foo" not allowed while "strict subs" in use at - line 6.
+Bareword "foo" not allowed while "strict subs" in use at - line 8.
+Bareword "foo" not allowed while "strict subs" in use at - line 10.
+Execution of - aborted due to compilation errors.
 ########
 # toke.c
 use warnings 'misc' ;

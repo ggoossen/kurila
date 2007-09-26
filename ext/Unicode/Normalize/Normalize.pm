@@ -39,7 +39,7 @@ our %EXPORT_TAGS = (
 
 ######
 
-bootstrap Unicode::Normalize $VERSION;
+Unicode::Normalize->bootstrap( $VERSION);
 
 ######
 

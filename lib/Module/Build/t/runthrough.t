@@ -20,7 +20,7 @@ $dist->remove_file( 't/basic.t' );
 $dist->change_file( 'Build.PL', <<'---' );
 use Module::Build;
 
-my $build = new Module::Build(
+my $build = Module::Build->new(
   module_name => 'Simple',
   scripts     => [ 'script' ],
   license     => 'perl',

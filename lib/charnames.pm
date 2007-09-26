@@ -6,6 +6,8 @@ our $VERSION = '1.06';
 
 use bytes ();		# for $bytes::hint_bits
 
+use utf8;
+
 my %alias1 = (
 		# Icky 3.2 names with parentheses.
 		'LINE FEED'		=> 'LINE FEED (LF)',
@@ -82,6 +84,7 @@ sub alias_file ($)
   0;
 } # alias_file
 
+# This function is used by toke.c to get \N{...}
 # This is not optimized in any way yet
 sub charnames
 {
@@ -384,55 +387,33 @@ U+0084, and U+0099 do not have names even in ISO 6429.
 Since the Unicode standard uses "U+HHHH", so can you: "\N{U+263a}"
 is the Unicode smiley face, or "\N{WHITE SMILING FACE}".
 
-=head1 ALIASES
+=head1 CUSTOM TRANSLATORS
 
-A few aliases have been defined for convenience: instead of having
-to use the official names
+The mechanism of translation of C<\N{...}> escapes is general and not
+hardwired into F<charnames.pm>.  A module can install custom
+translations (inside the scope which C<use>s the module) with the
+following magic incantation:
 
-    LINE FEED (LF)
-    FORM FEED (FF)
-    CARRIAGE RETURN (CR)
-    NEXT LINE (NEL)
+    sub import {
+	shift;
+	$^H{charnames} = \&translator;
+    }
 
-(yes, with parentheses) one can use
+Here translator() is a subroutine which takes C<CHARNAME> as an
+argument, and returns text to insert into the string instead of the
+C<\N{CHARNAME}> escape.  Since the text to insert should be different
+in C<bytes> mode and out of it, the function should check the current
+state of C<bytes>-flag as in:
 
-    LINE FEED
-    FORM FEED
-    CARRIAGE RETURN
-    NEXT LINE
-    LF
-    FF
-    CR
-    NEL
-
-One can also use
-
-    BYTE ORDER MARK
-    BOM
-
-and
-
-    ZWNJ
-    ZWJ
-
-for ZERO WIDTH NON-JOINER and ZERO WIDTH JOINER.
-
-For backward compatibility one can use the old names for
-certain C0 and C1 controls
-
-    old                         new
-
-    HORIZONTAL TABULATION       CHARACTER TABULATION
-    VERTICAL TABULATION         LINE TABULATION
-    FILE SEPARATOR              INFORMATION SEPARATOR FOUR
-    GROUP SEPARATOR             INFORMATION SEPARATOR THREE
-    RECORD SEPARATOR            INFORMATION SEPARATOR TWO
-    UNIT SEPARATOR              INFORMATION SEPARATOR ONE
-    PARTIAL LINE DOWN           PARTIAL LINE FORWARD
-    PARTIAL LINE UP             PARTIAL LINE BACKWARD
-
-but the old names in addition to giving the character
-will also give a warning about being deprecated.
+    use bytes ();			# for $bytes::hint_bits
+    sub translator {
+	if ($^H & $bytes::hint_bits) {
+	    return bytes_translator(@_);
+	}
+	else {
+	    return utf8_translator(@_);
+	}
+    }
 
 =head1 CUSTOM ALIASES
 
@@ -502,33 +483,55 @@ Returns undef if the name is unknown.
 This works only for the standard names, and does not yet apply
 to custom translators.
 
-=head1 CUSTOM TRANSLATORS
+=head1 ALIASES
 
-The mechanism of translation of C<\N{...}> escapes is general and not
-hardwired into F<charnames.pm>.  A module can install custom
-translations (inside the scope which C<use>s the module) with the
-following magic incantation:
+A few aliases have been defined for convenience: instead of having
+to use the official names
 
-    sub import {
-	shift;
-	$^H{charnames} = \&translator;
-    }
+    LINE FEED (LF)
+    FORM FEED (FF)
+    CARRIAGE RETURN (CR)
+    NEXT LINE (NEL)
 
-Here translator() is a subroutine which takes C<CHARNAME> as an
-argument, and returns text to insert into the string instead of the
-C<\N{CHARNAME}> escape.  Since the text to insert should be different
-in C<bytes> mode and out of it, the function should check the current
-state of C<bytes>-flag as in:
+(yes, with parentheses) one can use
 
-    use bytes ();			# for $bytes::hint_bits
-    sub translator {
-	if ($^H & $bytes::hint_bits) {
-	    return bytes_translator(@_);
-	}
-	else {
-	    return utf8_translator(@_);
-	}
-    }
+    LINE FEED
+    FORM FEED
+    CARRIAGE RETURN
+    NEXT LINE
+    LF
+    FF
+    CR
+    NEL
+
+One can also use
+
+    BYTE ORDER MARK
+    BOM
+
+and
+
+    ZWNJ
+    ZWJ
+
+for ZERO WIDTH NON-JOINER and ZERO WIDTH JOINER.
+
+For backward compatibility one can use the old names for
+certain C0 and C1 controls
+
+    old                         new
+
+    HORIZONTAL TABULATION       CHARACTER TABULATION
+    VERTICAL TABULATION         LINE TABULATION
+    FILE SEPARATOR              INFORMATION SEPARATOR FOUR
+    GROUP SEPARATOR             INFORMATION SEPARATOR THREE
+    RECORD SEPARATOR            INFORMATION SEPARATOR TWO
+    UNIT SEPARATOR              INFORMATION SEPARATOR ONE
+    PARTIAL LINE DOWN           PARTIAL LINE FORWARD
+    PARTIAL LINE UP             PARTIAL LINE BACKWARD
+
+but the old names in addition to giving the character
+will also give a warning about being deprecated.
 
 =head1 ILLEGAL CHARACTERS
 

@@ -31,8 +31,8 @@ BEGIN {
 BEGIN { use_ok('Fcntl') };
 BEGIN { use_ok('Compress::Zlib') };
 
-unlink <Op_dbmx*>;
-END { unlink <Op_dbmx*>; }
+unlink glob("Op_dbmx*");
+END { unlink glob("Op_dbmx*"); }
 
 my %h1 = () ;
 my $db1 = tie(%h1, $db_file,'Op_dbmx', O_RDWR|O_CREAT, 0640) ;

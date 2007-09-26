@@ -35,6 +35,8 @@ my @EXPECT_NORMAL = (
     [   [],         'd',        qr/^uuuuuuuu\s*$/ ],
 );
 
+use bytes;
+
 ### includes binary data
 my $ALL_CHARS = join '', "\r\n", map( chr, 1..255 ), "zzz\n\r";
 
@@ -768,7 +770,7 @@ sub slurp_gzfile {
     my $buff;
 
     require IO::Zlib;
-    my $fh = new IO::Zlib;
+    my $fh = IO::Zlib->new();
     $fh->open( $file, READ_ONLY->(1) )
         or warn( "Error opening '$file' with IO::Zlib" ), return undef;
 

@@ -255,8 +255,8 @@ Perl_pad_undef(pTHX_ CV* cv)
 	return;
 
     DEBUG_X(PerlIO_printf(Perl_debug_log,
-	  "Pad undef: cv=0x%"UVxf" padlist=0x%"UVxf" comppad=0x%"UVxf"\n",
-	    PTR2UV(cv), PTR2UV(padlist), PTR2UV(PL_comppad))
+	  "Pad undef: cv=0x%"UVxf" padlist=0x%"UVxf"\n",
+	    PTR2UV(cv), PTR2UV(padlist))
     );
 
     /* detach any '&' anon children in the pad; if afterwards they
@@ -332,33 +332,25 @@ Perl_pad_undef(pTHX_ CV* cv)
 
 Create a new name and associated PADMY SV in the current pad; return the
 offset.
-If C<typestash> is valid, the name is for a typed lexical; set the
-name's stash to that value.
 If C<ourstash> is valid, it's an our lexical, set the name's
 SvOURSTASH to that value
 
 If fake, it means we're cloning an existing entry
 
-=cut
-*/
+=cut */
 
 PADOFFSET
-Perl_pad_add_name(pTHX_ const char *name, HV* typestash, HV* ourstash, bool fake, bool state)
+Perl_pad_add_name(pTHX_ const char *name, HV* ourstash, bool fake, bool state)
 {
     dVAR;
     const PADOFFSET offset = pad_alloc(OP_PADSV, SVs_PADMY);
     SV* const namesv
-	= newSV_type((ourstash || typestash) ? SVt_PVMG : SVt_PVNV);
+	= newSV_type((ourstash) ? SVt_PVMG : SVt_PVNV);
 
     ASSERT_CURPAD_ACTIVE("pad_add_name");
 
     sv_setpv(namesv, name);
 
-    if (typestash) {
-	assert(SvTYPE(namesv) == SVt_PVMG);
-	SvPAD_TYPED_on(namesv);
-	SvSTASH_set(namesv, (HV*)SvREFCNT_inc_simple_NN((SV*)typestash));
-    }
     if (ourstash) {
 	SvPAD_OUR_on(namesv);
 	SvOURSTASH_set(namesv, ourstash);
@@ -670,7 +662,7 @@ the parent pad.
 #define CvCOMPILED(cv)	CvROOT(cv)
 
 /* the CV does late binding of its lexicals */
-#define CvLATE(cv) (CvANON(cv) || SvTYPE(cv) == SVt_PVFM)
+#define CvLATE(cv) (CvANON(cv))
 
 
 STATIC PADOFFSET
@@ -849,8 +841,6 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 
 	new_offset = pad_add_name(
 	    SvPVX_const(*out_name_sv),
-	    SvPAD_TYPED(*out_name_sv)
-		    ? SvSTASH(*out_name_sv) : NULL,
 	    SvOURSTASH(*out_name_sv),
 	    1,  /* fake */
 	    0   /* not a state variable */
@@ -1176,6 +1166,7 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
      * (ie it contains eval '...', //ee, /$var/ or /(?{..})/), Then any
      * anon prototypes in the chain of CVs should be marked as cloneable,
      * so that for example the eval's CV in C<< sub { eval '$x' } >> gets
+>>>>>>> origin/bleadperl~45:pad.c
      * the right CvOUTSIDE.
      * If running with -d, *any* sub may potentially have an eval
      * excuted within it.
@@ -1389,7 +1380,6 @@ S_cv_dump(pTHX_ const CV *cv, const char *title)
 		  title,
 		  PTR2UV(cv),
 		  (CvANON(cv) ? "ANON"
-		   : (SvTYPE(cv) == SVt_PVFM) ? "FORMAT"
 		   : (cv == PL_main_cv) ? "MAIN"
 		   : CvUNIQUE(cv) ? "UNIQUE"
 		   : CvGV(cv) ? GvNAME(CvGV(cv)) : "UNDEFINED"),
@@ -1447,7 +1437,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     if (outside && CvCLONE(outside) && ! CvCLONED(outside))
 	outside = find_runcv(NULL);
     depth = CvDEPTH(outside);
-    assert(depth || SvTYPE(proto) == SVt_PVFM);
+    assert(depth);
     if (!depth)
 	depth = 1;
     assert(CvPADLIST(outside));
@@ -1494,15 +1484,8 @@ Perl_cv_clone(pTHX_ CV *proto)
 	    if (SvFAKE(namesv)) {   /* lexical from outside? */
 		sv = outpad[PARENT_PAD_INDEX(namesv)];
 		assert(sv);
-		/* formats may have an inactive parent */
-		if (SvTYPE(proto) == SVt_PVFM && SvPADSTALE(sv)) {
-		    if (ckWARN(WARN_CLOSURE))
-			Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
-			    "Variable \"%s\" is not available", SvPVX_const(namesv));
-		    sv = NULL;
-		}
 		/* 'my $x if $y' can leave $x stale even in an active sub */
-		else if (!SvPADSTALE(sv)) {
+		if (!SvPADSTALE(sv)) {
 		    SvREFCNT_inc_simple_void_NN(sv);
 		}
 	    }
@@ -1517,9 +1500,6 @@ Perl_cv_clone(pTHX_ CV *proto)
 		else
 		    sv = newSV(0);
 		SvPADMY_on(sv);
-		/* reset the 'assign only once' flag on each state var */
-		if (SvPAD_STATE(namesv))
-		    SvPADSTALE_on(sv);
 	    }
 	}
 	else if (IS_PADGV(ppad[ix]) || IS_PADCONST(ppad[ix])) {
@@ -1661,17 +1641,6 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
     }
 }
 
-
-HV *
-Perl_pad_compname_type(pTHX_ const PADOFFSET po)
-{
-    dVAR;
-    SV* const * const av = av_fetch(PL_comppad_name, po, FALSE);
-    if ( SvPAD_TYPED(*av) ) {
-        return SvSTASH(*av);
-    }
-    return NULL;
-}
 
 /*
  * Local variables:

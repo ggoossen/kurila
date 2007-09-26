@@ -91,9 +91,9 @@ sub stringify {
   return 'undef' unless defined $_ or not $self->{printUndef};
   return $_ . "" if ref \$_ eq 'GLOB';
   { no strict 'refs';
-    $_ = &{'overload::StrVal'}($_)
+    $_ = &{*{Symbol::qualify_to_ref('overload::StrVal')}}($_)
       if $self->{bareStringify} and ref $_
-	and %overload:: and defined &{'overload::StrVal'};
+	and %{Symbol::stash("overload")} and defined &{*{Symbol::qualify_to_ref('overload::StrVal')}};
   }
 
   if ($tick eq 'auto') {
@@ -163,8 +163,8 @@ sub unwrap {
   if (ref $v) {
     my $val = $v;
     { no strict 'refs';
-      $val = &{'overload::StrVal'}($v)
-	if %overload:: and defined &{'overload::StrVal'};
+      $val = &{*{Symbol::qualify_to_ref('overload::StrVal')}}($v)
+	if %{Symbol::stash("overload")} and defined &{*{Symbol::qualify_to_ref('overload::StrVal')}};
     }
     ($address) = $val =~ /(0x[0-9a-f]+)\)$/ ;
     if (!$self->{dumpReused} && defined $address) {
@@ -384,7 +384,7 @@ sub findsubs {
   return undef unless %DB::sub;
   my ($addr, $name, $loc);
   while (($name, $loc) = each %DB::sub) {
-    $addr = \&$name;
+    $addr = \&{*{Symbol::qualify_to_ref($name)}};
     $subs{"$addr"} = $name;
   }
   $self->{subdump} = 0;

@@ -1413,24 +1413,16 @@ Perl_to_utf8_case(pTHX_ const U8 *p, U8* ustrp, STRLEN *lenp,
 		   U8 *t = (U8*)s, *tend = t + len, *d;
 		
 		   d = tmpbuf;
-		   if (SvUTF8(*svp)) {
-			STRLEN tlen = 0;
+		   STRLEN tlen = 0;
 			
-			while (t < tend) {
-			     const UV c = utf8_to_uvchr(t, &tlen);
-			     if (tlen > 0) {
-				  d = uvchr_to_utf8(d, UNI_TO_NATIVE(c));
-				  t += tlen;
-			     }
-			     else
-				  break;
-			}
-		   }
-		   else {
-			while (t < tend) {
-			     d = uvchr_to_utf8(d, UNI_TO_NATIVE(*t));
-			     t++;
-			}
+		   while (t < tend) {
+		       const UV c = utf8_to_uvchr(t, &tlen);
+		       if (tlen > 0) {
+			   d = uvchr_to_utf8(d, UNI_TO_NATIVE(c));
+			   t += tlen;
+		       }
+		       else
+			   break;
 		   }
 		   len = d - tmpbuf;
 		   Copy(tmpbuf, ustrp, len, U8);
@@ -1679,14 +1671,7 @@ Perl_swash_fetch(pTHX_ SV *swash, const U8 *ptr, bool do_utf8)
      * NB: this code assumes that swatches are never modified, once generated!
      */
 
-    if (hv   == PL_last_swash_hv &&
-	klen == PL_last_swash_klen &&
-	(!klen || memEQ((char *)ptr, (char *)PL_last_swash_key, klen)) )
     {
-	tmps = PL_last_swash_tmps;
-	slen = PL_last_swash_slen;
-    }
-    else {
 	/* Try our second-level swatch cache, kept in a hash. */
 	SV** svp = hv_fetch(hv, (const char*)ptr, klen, FALSE);
 
@@ -1713,15 +1698,6 @@ Perl_swash_fetch(pTHX_ SV *swash, const U8 *ptr, bool do_utf8)
 		     || (slen << 3) < needents)
 		Perl_croak(aTHX_ "panic: swash_fetch got improper swatch");
 	}
-
-	PL_last_swash_hv = hv;
-	assert(klen <= sizeof(PL_last_swash_key));
-	PL_last_swash_klen = (U8)klen;
-	/* FIXME change interpvar.h?  */
-	PL_last_swash_tmps = (U8 *) tmps;
-	PL_last_swash_slen = slen;
-	if (klen)
-	    Copy(ptr, PL_last_swash_key, klen, U8);
     }
 
     switch ((int)((slen << 3) / needents)) {
@@ -2206,14 +2182,11 @@ Perl_sv_uni_display(pTHX_ SV *dsv, SV *ssv, STRLEN pvlim, UV flags)
 }
 
 /*
-=for apidoc A|I32|ibcmp_utf8|const char *s1|char **pe1|register UV l1|bool u1|const char *s2|char **pe2|register UV l2|bool u2
+=for apidoc A|I32|ibcmp_utf8|const char *s1|char **pe1|register UV l1|const char *s2|char **pe2|register UV l2
 
 Return true if the strings s1 and s2 differ case-insensitively, false
-if not (if they are equal case-insensitively).  If u1 is true, the
-string s1 is assumed to be in UTF-8-encoded Unicode.  If u2 is true,
-the string s2 is assumed to be in UTF-8-encoded Unicode.  If u1 or u2
-are false, the respective string is assumed to be in native 8-bit
-encoding.
+if not (if they are equal case-insensitively).  s1 and s2 are assumed
+to be in UTF-8 encoded Unicode.
 
 If the pe1 and pe2 are non-NULL, the scanning pointers will be copied
 in there (they will point at the beginning of the I<next> character).
@@ -2231,7 +2204,7 @@ http://www.unicode.org/unicode/reports/tr21/ (Case Mappings).
 
 =cut */
 I32
-Perl_ibcmp_utf8(pTHX_ const char *s1, char **pe1, register UV l1, bool u1, const char *s2, char **pe2, register UV l2, bool u2)
+Perl_ibcmp_utf8(pTHX_ const char *s1, char **pe1, register UV l1, const char *s2, char **pe2, register UV l2)
 {
      dVAR;
      register const U8 *p1  = (const U8*)s1;
@@ -2245,7 +2218,6 @@ Perl_ibcmp_utf8(pTHX_ const char *s1, char **pe1, register UV l1, bool u1, const
      STRLEN n1 = 0, n2 = 0;
      U8 foldbuf1[UTF8_MAXBYTES_CASE+1];
      U8 foldbuf2[UTF8_MAXBYTES_CASE+1];
-     U8 natbuf[1+1];
      STRLEN foldlen1, foldlen2;
      bool match;
      
@@ -2261,47 +2233,35 @@ Perl_ibcmp_utf8(pTHX_ const char *s1, char **pe1, register UV l1, bool u1, const
      if ((e1 == 0 && f1 == 0) || (e2 == 0 && f2 == 0) || (f1 == 0 && f2 == 0))
 	  return 1; /* mismatch; possible infinite loop or false positive */
 
-     if (!u1 || !u2)
-	  natbuf[1] = 0; /* Need to terminate the buffer. */
-
      while ((e1 == 0 || p1 < e1) &&
 	    (f1 == 0 || p1 < f1) &&
 	    (e2 == 0 || p2 < e2) &&
 	    (f2 == 0 || p2 < f2)) {
 	  if (n1 == 0) {
-	       if (u1)
-		    to_utf8_fold(p1, foldbuf1, &foldlen1);
-	       else {
-		    uvuni_to_utf8(natbuf, (UV) NATIVE_TO_UNI(((UV)*p1)));
-		    to_utf8_fold(natbuf, foldbuf1, &foldlen1);
-	       }
+	       to_utf8_fold(p1, foldbuf1, &foldlen1);
 	       q1 = foldbuf1;
 	       n1 = foldlen1;
 	  }
 	  if (n2 == 0) {
-	       if (u2)
-		    to_utf8_fold(p2, foldbuf2, &foldlen2);
-	       else {
-		    uvuni_to_utf8(natbuf, (UV) NATIVE_TO_UNI(((UV)*p2)));
-		    to_utf8_fold(natbuf, foldbuf2, &foldlen2);
-	       }
+	       to_utf8_fold(p2, foldbuf2, &foldlen2);
 	       q2 = foldbuf2;
 	       n2 = foldlen2;
 	  }
 	  while (n1 && n2) {
 	       if ( UTF8SKIP(q1) != UTF8SKIP(q2) ||
 		   (UTF8SKIP(q1) == 1 && *q1 != *q2) ||
-		    memNE((char*)q1, (char*)q2, UTF8SKIP(q1)) )
+		    memNE((char*)q1, (char*)q2, UTF8SKIP(q1)) ) {
 		   return 1; /* mismatch */
+	       }
 	       n1 -= UTF8SKIP(q1);
 	       q1 += UTF8SKIP(q1);
 	       n2 -= UTF8SKIP(q2);
 	       q2 += UTF8SKIP(q2);
 	  }
 	  if (n1 == 0)
-	       p1 += u1 ? UTF8SKIP(p1) : 1;
+	       p1 += UTF8SKIP(p1);
 	  if (n2 == 0)
-	       p2 += u2 ? UTF8SKIP(p2) : 1;
+	       p2 += UTF8SKIP(p2);
 
      }
 

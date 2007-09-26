@@ -3,7 +3,8 @@ use warnings;
 BEGIN {
     chdir 't' if -d 't';
     push @INC ,'../lib';
-    require Config; import Config;
+    our %Config;
+    require Config; Config->import;
     unless ($Config{'useithreads'}) {
         print "1..0 # Skip: no ithreads\n";
         exit 0;

@@ -56,7 +56,7 @@ OUT
 #   Failed test 'is foo like that'
 #   at .* line 1\.
 #                   'foo'
-#     doesn't match '\\(\\?-xism:that\\)'
+#     doesn't match '\\(\\?-uxism:that\\)'
 # Looks like you failed 1 test of 1\\.
 ERR
 

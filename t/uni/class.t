@@ -6,6 +6,8 @@ BEGIN {
 
 plan tests => 4784;
 
+use utf8;
+
 sub MyUniClass {
   <<END;
 0030	004F
@@ -88,7 +90,7 @@ is(($str =~ /(\p{sc:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
 is(($str =~ /(\p{sc=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
 
 use File::Spec;
-my $updir = File::Spec->updir;
+my $updir = 'File::Spec'->updir;
 
 # the %utf8::... hashes are already in existence
 # because utf8_pva.pl was run by utf8_heavy.pl
@@ -125,7 +127,7 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
   next if $abbrev eq "gc_sc";
 
   for (sort keys %$files) {
-    my $filename = File::Spec->catfile(
+    my $filename = 'File::Spec'->catfile(
       $updir => lib => unicore => lib => $abbrev => "$files->{$_}.pl"
     );
 
@@ -146,7 +148,7 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
 # General Category and Script
 for my $p ('gc', 'sc') {
   while (my ($abbr) = each %{ $utf8::PropValueAlias{$p} }) {
-    my $filename = File::Spec->catfile(
+    my $filename = 'File::Spec'->catfile(
       $updir => lib => unicore => lib => gc_sc => "$utf8::PVA_abbr_map{gc_sc}{$abbr}.pl"
     );
 
@@ -182,7 +184,7 @@ SKIP:
 
   my %files;
 
-  my $dirname = File::Spec->catdir($updir => lib => unicore => lib => 'gc_sc');
+  my $dirname = 'File::Spec'->catdir($updir => lib => unicore => lib => 'gc_sc');
   opendir D, $dirname or die $!;
   @files{readdir(D)} = ();
   closedir D;
@@ -191,7 +193,7 @@ SKIP:
     my $leafname = "$utf8::PA_reverse{$_}.pl";
     next unless exists $files{$leafname};
 
-    my $filename = File::Spec->catfile($dirname, $leafname);
+    my $filename = 'File::Spec'->catfile($dirname, $leafname);
 
     my ($h1, $h2) = map hex, (split(/\t/, (do $filename), 3))[0,1];
 
@@ -210,7 +212,7 @@ SKIP:
 
 # test the blocks (InFoobar)
 for (grep $utf8::Canonical{$_} =~ /^In/, keys %utf8::Canonical) {
-  my $filename = File::Spec->catfile(
+  my $filename = 'File::Spec'->catfile(
     $updir => lib => unicore => lib => gc_sc => "$utf8::Canonical{$_}.pl"
   );
 

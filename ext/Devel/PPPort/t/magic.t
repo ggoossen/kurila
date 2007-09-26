@@ -14,7 +14,7 @@ BEGIN {
   if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
     @INC = ('../lib', '../ext/Devel/PPPort/t') if -d '../lib' && -d '../ext';
-    require Config; import Config;
+    require Config; Config->import;
     use vars '%Config';
     if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
       print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
@@ -30,9 +30,9 @@ BEGIN {
     require 'testutil.pl' if $@;
   }
 
-  if (15) {
+  if (13) {
     load();
-    plan(tests => 15);
+    plan(tests => 13);
   }
 }
 
@@ -44,7 +44,7 @@ package Devel::PPPort;
 use vars '@ISA';
 require DynaLoader;
 @ISA = qw(DynaLoader);
-bootstrap Devel::PPPort;
+Devel::PPPort->bootstrap;
 
 package main;
 
@@ -88,8 +88,4 @@ my $ver = eval qq[qv("v1.2.0")];
 ok($[ < 5.009 || $@ eq '');
 ok($@ || Devel::PPPort::SvVSTRING_mg($ver));
 ok(!Devel::PPPort::SvVSTRING_mg(4711));
-
-my $foo = 'bar';
-ok(Devel::PPPort::sv_magic_portable($foo));
-ok($foo eq 'bar');
 

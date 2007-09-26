@@ -268,6 +268,8 @@ END_EXTERN_C
 #define PL_defoutgv		(*Perl_Idefoutgv_ptr(aTHX))
 #undef  PL_defstash
 #define PL_defstash		(*Perl_Idefstash_ptr(aTHX))
+#undef  PL_delayedisa
+#define PL_delayedisa		(*Perl_Idelayedisa_ptr(aTHX))
 #undef  PL_delaymagic
 #define PL_delaymagic		(*Perl_Idelaymagic_ptr(aTHX))
 #undef  PL_diehook
@@ -366,16 +368,6 @@ END_EXTERN_C
 #define PL_known_layers		(*Perl_Iknown_layers_ptr(aTHX))
 #undef  PL_last_in_gv
 #define PL_last_in_gv		(*Perl_Ilast_in_gv_ptr(aTHX))
-#undef  PL_last_swash_hv
-#define PL_last_swash_hv	(*Perl_Ilast_swash_hv_ptr(aTHX))
-#undef  PL_last_swash_key
-#define PL_last_swash_key	(*Perl_Ilast_swash_key_ptr(aTHX))
-#undef  PL_last_swash_klen
-#define PL_last_swash_klen	(*Perl_Ilast_swash_klen_ptr(aTHX))
-#undef  PL_last_swash_slen
-#define PL_last_swash_slen	(*Perl_Ilast_swash_slen_ptr(aTHX))
-#undef  PL_last_swash_tmps
-#define PL_last_swash_tmps	(*Perl_Ilast_swash_tmps_ptr(aTHX))
 #undef  PL_lastfd
 #define PL_lastfd		(*Perl_Ilastfd_ptr(aTHX))
 #undef  PL_lastgotoprobe

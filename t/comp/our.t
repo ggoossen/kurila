@@ -8,10 +8,12 @@ BEGIN {
 
 print "1..7\n";
 
+use strict;
 {
     package TieAll;
     # tie, track, and report what calls are made
     my @calls;
+    use vars '$AUTOLOAD';
     sub AUTOLOAD {
         for ($AUTOLOAD =~ /TieAll::(.*)/) {
             if (/TIE/) { return bless {} }
@@ -26,6 +28,8 @@ print "1..7\n";
         }
     }
 }
+
+no strict 'vars';
 
 tie $x, 'TieAll';
 tie @x, 'TieAll';

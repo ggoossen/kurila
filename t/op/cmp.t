@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-       chdir 't' if -d 't';
-       @INC = '../lib';
-}
-
 # 2s complement assumption. Won't break test, just makes the internals of
 # the SVs less interesting if were not on 2s complement system.
 my $uv_max = ~0;
@@ -29,6 +24,8 @@ my $uv_bigi = $iv_big;
 $uv_bigi |= 0x0;
 
 my @array = qw(perl rules);
+
+our (@FOO, $expect);
 
 # Seems one needs to perform the maths on 'Inf' to get the NV correctly primed.
 @FOO = ('s', 'N/A', 'a', 'NaN', -1, undef, 0, 1, 3.14, 1e37, 0.632120558, -.5,

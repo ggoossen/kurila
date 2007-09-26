@@ -175,9 +175,9 @@ $VERSION = "1.815" ;
 }      
 
 #typedef enum { DB_BTREE, DB_HASH, DB_RECNO } DBTYPE;
-$DB_BTREE = new DB_File::BTREEINFO ;
-$DB_HASH  = new DB_File::HASHINFO ;
-$DB_RECNO = new DB_File::RECNOINFO ;
+$DB_BTREE = DB_File::BTREEINFO->new() ;
+$DB_HASH  = DB_File::HASHINFO->new() ;
+$DB_RECNO = DB_File::RECNOINFO->new() ;
 
 require Tie::Hash;
 require Exporter;
@@ -234,8 +234,8 @@ sub AUTOLOAD {
     my ($error, $val) = constant($constname);
     Carp::croak $error if $error;
     no strict 'refs';
-    *{$AUTOLOAD} = sub { $val };
-    goto &{$AUTOLOAD};
+    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
+    goto &{*{Symbol::qualify_to_ref($AUTOLOAD)}};
 }           
 
 
@@ -250,7 +250,7 @@ eval {
 if ($use_XSLoader)
   { XSLoader::load("DB_File", $VERSION)}
 else
-  { bootstrap DB_File $VERSION }
+  { DB_File->bootstrap( $VERSION) }
 
 # Preloaded methods go here.  Autoload methods go after __END__, and are
 # processed by the autosplit program.

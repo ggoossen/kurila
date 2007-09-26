@@ -1,11 +1,6 @@
 #!./perl
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 BEGIN { require './test.pl'; }
 plan tests => 237;
 
@@ -68,6 +63,7 @@ endpwent ()
 endservent ()
 eof (;*)
 eq ($$)
+err ()
 eval undef
 exec undef
 exists undef
@@ -79,8 +75,8 @@ flock (*$)
 for undef
 foreach undef
 fork ()
-format undef
-formline ($@)
+format unknown
+formline unknown
 ge ($$)
 getc (;*)
 getgrent ()
@@ -260,7 +256,6 @@ wantarray ()
 warn (@)
 when undef
 while undef
-write (;*)
 x unknown
 xor ($$)
 y undef

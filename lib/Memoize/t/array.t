@@ -55,9 +55,9 @@ sub n {
   my $arg = shift;
   my $test = shift;
   if (wantarray) {
-    print ((($arg eq ARRAY) ? '' : 'not '), "ok $test\n"); # List context
+    print ((($arg eq 'ARRAY') ? '' : 'not '), "ok $test\n"); # List context
   } else {
-    print ((($arg eq SCALAR) ? '' : 'not '), "ok $test\n"); # Scalar context
+    print ((($arg eq 'SCALAR') ? '' : 'not '), "ok $test\n"); # Scalar context
   }
 }
 

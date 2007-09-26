@@ -7,15 +7,15 @@
 #
 package B;
 
-our $VERSION = '1.17';
+our $VERSION = '1.16';
 
 use XSLoader ();
 require Exporter;
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
 # walkoptree_slow comes from B.pm (you are there),
 # walkoptree comes from B.xs
-@EXPORT_OK = qw(minus_c ppname save_BEGINs
+our @EXPORT_OK = qw(minus_c ppname save_BEGINs
 		class peekop cast_I32 cstring cchar hash threadsv_names
 		main_root main_start main_cv svref_2object opnumber
 		sub_generation amagic_generation perlstring
@@ -39,8 +39,7 @@ use strict;
 @B::PVMG::ISA = 'B::PVNV';
 # Change in the inheritance hierarchy post 5.9.0
 @B::PVLV::ISA = $] > 5.009 ? 'B::GV' : 'B::PVMG';
-# BM is eliminated post 5.9.5, but effectively is a specialisation of GV now.
-@B::BM::ISA = $] > 5.009005 ? 'B::GV' : 'B::PVMG';
+@B::BM::ISA = 'B::PVMG';
 @B::AV::ISA = 'B::PVMG';
 @B::GV::ISA = 'B::PVMG';
 @B::HV::ISA = 'B::PVMG';
@@ -239,10 +238,10 @@ sub walksymtable {
 	if ($sym =~ /::$/) {
 	    $sym = $prefix . $sym;
 	    if ($sym ne "main::" && $sym ne "<none>::" && &$recurse($sym)) {
-               walksymtable(\%$fullname, $method, $recurse, $sym);
+               walksymtable(\%{*{Symbol::qualify_to_ref($fullname)}}, $method, $recurse, $sym);
 	    }
 	} else {
-           svref_2object(\*$fullname)->$method();
+           svref_2object(\*{Symbol::qualify_to_ref($fullname)})->$method();
 	}
     }
 }
@@ -571,20 +570,20 @@ give incomprehensible results, or worse.
 
 =head2 SV-RELATED CLASSES
 
-B::IV, B::NV, B::RV, B::PV, B::PVIV, B::PVNV, B::PVMG, B::BM (5.9.5 and
-earlier), B::PVLV, B::AV, B::HV, B::CV, B::GV, B::FM, B::IO. These classes
-correspond in the obvious way to the underlying C structures of similar names.
-The inheritance hierarchy mimics the underlying C "inheritance". For 5.9.5
+B::IV, B::NV, B::RV, B::PV, B::PVIV, B::PVNV, B::PVMG, B::BM, B::PVLV,
+B::AV, B::HV, B::CV, B::GV, B::FM, B::IO. These classes correspond in
+the obvious way to the underlying C structures of similar names. The
+inheritance hierarchy mimics the underlying C "inheritance". For 5.9.1
 and later this is:
 
-                           B::SV
-                             |
-                +------------+------------+------------+
-                |            |            |            |
-              B::PV        B::IV        B::NV        B::RV
-                  \         /           /
-                   \       /           /
-                    B::PVIV           /
+                             B::SV
+                               |
+                +--------------+----------+------------+
+                |              |          |            |
+              B::PV          B::IV      B::NV        B::RV
+                   \         /          /
+                    \       /          /
+                     B::PVIV          /
                          \           /
                           \         /
                            \       /
@@ -593,28 +592,26 @@ and later this is:
                                |
                             B::PVMG
                                |
-                   +-----+-----+-----+-----+
-                   |     |     |     |     |
-                 B::AV B::GV B::HV B::CV B::IO
-                         |           |
-                         |           |
-                      B::PVLV      B::FM
+                    +-----+----+------+-----+-----+
+                    |     |    |      |     |     |
+                  B::BM B::AV B::GV B::HV B::CV B::IO
+                               |            |
+                            B::PVLV         |
+                                          B::FM
 
 
-For 5.9.0 and earlier, PVLV is a direct subclass of PVMG, and BM is still
-present as a distinct type, so the base of this diagram is
+For 5.9.0 and earlier, PVLV is a direct subclass of PVMG, so the base
+of this diagram is
 
-
-                               |
-                               |
-                            B::PVMG
-                               |
-            +------+-----+-----+-----+-----+-----+
-            |      |     |     |     |     |     |
-         B::PVLV B::BM B::AV B::GV B::HV B::CV B::IO
-                                           |
-                                           |
-                                         B::FM
+                           |
+                        B::PVMG
+                           |
+         +------+-----+----+------+-----+-----+
+         |      |     |    |      |     |     |
+      B::PVLV B::BM B::AV B::GV B::HV B::CV B::IO
+                                        |
+                                        |
+                                      B::FM
 
 
 Access methods correspond to the underlying C macros for field access,
@@ -1135,8 +1132,6 @@ Only when perl was compiled with ithreads.
 =item file
 
 =item cop_seq
-
-=item arybase
 
 =item line
 

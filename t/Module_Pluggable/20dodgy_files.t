@@ -63,7 +63,7 @@ sub odd_plugins {
 
 
 
-    my $op   = OddTest::Pluggable->new( package => ref($self) );
+    my $op   = 'OddTest::Pluggable'->new( package => ref($self) );
     return $op->plugins(@_);
     
 
