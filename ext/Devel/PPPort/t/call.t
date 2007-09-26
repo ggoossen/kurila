@@ -30,9 +30,9 @@ BEGIN {
     require 'testutil.pl' if $@;
   }
 
-  if (46) {
+  if (40) {
     load();
-    plan(tests => 46);
+    plan(tests => 40);
   }
 }
 
@@ -90,7 +90,6 @@ for $test (
     print "# --- $description ---\n";
     ok(eq_array( [ &Devel::PPPort::call_sv(\&f, $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_sv(*f,  $flags, @$args) ], $expected));
-    ok(eq_array( [ &Devel::PPPort::call_sv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_pv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::call_argv('f', $flags, @$args) ], $expected));
     ok(eq_array( [ &Devel::PPPort::eval_sv("f(qw(@$args))", $flags) ], $expected));
