@@ -523,9 +523,9 @@ is($x, "\x{100}\x{200}ab");
 {
     # lvalue ref count
     my $foo = "bar";
-    is(Internals::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT(\$foo), 2);
     substr($foo, -2, 2) = "la";
-    is(Internals::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT(\$foo), 2);
 }
 
 # lvalue with regex and eval
@@ -538,9 +538,9 @@ is($x, "\x{100}\x{200}ab");
 # extended lifetime lvalue
 {
     my $foo = "bar";
-    is(Internals::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT(\$foo), 2);
     my $y = \ substr($foo, -2, 2);
-    is(Internals::SvREFCNT($foo), 2);
+    is(Internals::SvREFCNT(\$foo), 3);
     undef $y;
-    is(Internals::SvREFCNT($foo), 1);
+    is(Internals::SvREFCNT(\$foo), 2);
 }
