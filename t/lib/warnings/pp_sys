@@ -111,7 +111,7 @@ printf $a "fred";
 no warnings 'unopened' ;
 printf $a "fred";
 EXPECT
-printf() on unopened filehandle abc at - line 4.
+Can't use string ("abc") as a symbol ref while "strict refs" in use at - line 4.
 ########
 # pp_sys.c [pp_prtf]
 use warnings 'closed' ;
@@ -192,7 +192,7 @@ flock() on closed filehandle STDIN at - line 16.
 flock() on closed filehandle STDIN at - line 18.
 	(Are you trying to call flock() on dirhandle STDIN?)
 flock() on unopened filehandle FOO at - line 19.
-flock() on unopened filehandle at - line 20.
+Can't use an undefined value as a symbol reference at - line 20.
 ########
 # pp_sys.c [pp_prtf pp_send pp_bind pp_connect pp_listen pp_accept pp_shutdown pp_ssockopt ppp_getpeername]
 use warnings 'io' ;

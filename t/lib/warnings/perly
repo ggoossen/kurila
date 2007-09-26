@@ -29,3 +29,4 @@ Use of "do" to call subroutines is deprecated at - line 4.
 Use of "do" to call subroutines is deprecated at - line 5.
 Use of "do" to call subroutines is deprecated at - line 7.
 Use of "do" to call subroutines is deprecated at - line 8.
+Can't use string ("fred") as a subroutine ref while "strict refs" in use at - line 7.

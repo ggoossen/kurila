@@ -28,7 +28,7 @@ my $b = $$a;
 no warnings 'uninitialized' ;
 my $c = $$a;
 EXPECT
-Use of uninitialized value $a in scalar dereference at - line 4.
+Can't use an undefined value as a SCALAR reference at - line 4.
 ########
 # pp_pack.c
 use warnings 'pack' ;

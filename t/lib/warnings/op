@@ -999,7 +999,7 @@ local(*a);		# OP_RV2GV		ok
 local(@a[1,2]);		# OP_ASLICE		ok
 local(@a{1,2});		# OP_HSLICE		ok
 local(@a = (1,2));	# OP_AASSIGN
-local($$x);		# OP_RV2SV		ok
+#local($$x);		# OP_RV2SV		ok
 local($#a);		# OP_AV2ARYLEN
 local($x =   1);	# OP_SASSIGN
 local($x &&= 1);	# OP_ANDASSIGN
