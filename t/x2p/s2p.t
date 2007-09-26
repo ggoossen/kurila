@@ -800,7 +800,7 @@ my $sedcmd = [ $psed, '-f', $script, $stdin ];
 my $s2pcmd = [ $s2p,  '-f', $script ];
 my $plcmd  = [ $plsed, $stdin ];
 
-my $switches = '';
+my $switches = [];
 $switches = ['-x'] if $^O eq 'MacOS';
 
 # psed: we create a local copy as linking may not work on some systems.
