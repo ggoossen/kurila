@@ -1281,34 +1281,34 @@ the scalar's value cannot change unless written to.
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define BmFLAGS(sv)							\
 	(*({ SV *const uggh = (SV *) (sv);				\
-		assert(SvTYPE(uggh) == SVt_PVGV);			\
+		assert(SvTYPE(uggh) == SVt_PVMG);			\
 		assert(SvVALID(uggh));					\
-	    &(((XPVGV*) SvANY(uggh))->xnv_u.xbm_s.xbm_flags);		\
+	    &(((XPVMG*) SvANY(uggh))->xnv_u.xbm_s.xbm_flags);		\
 	 }))
 #  define BmRARE(sv)							\
 	(*({ SV *const uggh = (SV *) (sv);				\
-		assert(SvTYPE(uggh) == SVt_PVGV);			\
+		assert(SvTYPE(uggh) == SVt_PVMG);			\
 		assert(SvVALID(uggh));					\
-	    &(((XPVGV*) SvANY(uggh))->xnv_u.xbm_s.xbm_rare);		\
+	    &(((XPVMG*) SvANY(uggh))->xnv_u.xbm_s.xbm_rare);		\
 	 }))
 #  define BmUSEFUL(sv)							\
 	(*({ SV *const uggh = (SV *) (sv);				\
-	    assert(SvTYPE(uggh) == SVt_PVGV);				\
+	    assert(SvTYPE(uggh) == SVt_PVMG);				\
 	    assert(SvVALID(uggh));					\
 	    assert(!SvIOK(uggh));					\
-	    &(((XPVGV*) SvANY(uggh))->xiv_u.xivu_i32);			\
+	    &(((XPVMG*) SvANY(uggh))->xiv_u.xivu_i32);			\
 	 }))
 #  define BmPREVIOUS(sv)						\
 	(*({ SV *const uggh = (SV *) (sv);				\
-		assert(SvTYPE(uggh) == SVt_PVGV);			\
+		assert(SvTYPE(uggh) == SVt_PVMG);			\
 		assert(SvVALID(uggh));					\
-	    &(((XPVGV*) SvANY(uggh))->xnv_u.xbm_s.xbm_previous);	\
+	    &(((XPVMG*) SvANY(uggh))->xnv_u.xbm_s.xbm_previous);	\
 	 }))
 #else
-#  define BmFLAGS(sv)		((XPVGV*) SvANY(sv))->xnv_u.xbm_s.xbm_flags
-#  define BmRARE(sv)		((XPVGV*) SvANY(sv))->xnv_u.xbm_s.xbm_rare
-#  define BmUSEFUL(sv)		((XPVGV*) SvANY(sv))->xiv_u.xivu_i32
-#  define BmPREVIOUS(sv)	((XPVGV*) SvANY(sv))->xnv_u.xbm_s.xbm_previous
+#  define BmFLAGS(sv)		((XPVMG*) SvANY(sv))->xnv_u.xbm_s.xbm_flags
+#  define BmRARE(sv)		((XPVMG*) SvANY(sv))->xnv_u.xbm_s.xbm_rare
+#  define BmUSEFUL(sv)		((XPVMG*) SvANY(sv))->xiv_u.xivu_i32
+#  define BmPREVIOUS(sv)	((XPVMG*) SvANY(sv))->xnv_u.xbm_s.xbm_previous
 
 #endif
 
