@@ -120,7 +120,7 @@ is( $r, 'fooxbarx', '-l with octal number' );
 
 $r = runperl(
     switches	=> [ '-s' ],
-    prog	=> 'for (qw/abc def ghi/) {print defined $$_ ? $$_ : q(-)}',
+    prog	=> 'for (qw/abc def ghi/) {print defined ${*{Symbol::qualify_to_ref($_)}} ? ${*{Symbol::qualify_to_ref($_)}} : q(-)}',
     args	=> [ '--', '-abc=2', '-def', ],
 );
 is( $r, '21-', '-s switch parsing' );
