@@ -35,8 +35,8 @@ sub foo {
 	$ok=1;
 }
 
-my $newaction=POSIX::SigAction->new('::foo', POSIX::SigSet->new(SIGUSR1), 0);
-my $oldaction=POSIX::SigAction->new('::bar', POSIX::SigSet->new(), 0);
+my $newaction=POSIX::SigAction->new(\&foo, POSIX::SigSet->new(SIGUSR1), 0);
+my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0);
 
 {
 	my $bad;
@@ -48,10 +48,10 @@ my $oldaction=POSIX::SigAction->new('::bar', POSIX::SigSet->new(), 0);
 ok($oldaction->{HANDLER} eq 'DEFAULT' ||
    $oldaction->{HANDLER} eq 'IGNORE', $oldaction->{HANDLER});
 
-is($SIG{HUP}, '::foo');
+is($SIG{HUP}, \&foo);
 
 sigaction(SIGHUP, $newaction, $oldaction);
-is($oldaction->{HANDLER}, '::foo');
+is($oldaction->{HANDLER}, \&foo);
 
 ok($oldaction->{MASK}->ismember(SIGUSR1), "SIGUSR1 ismember MASK");
 
