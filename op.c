@@ -629,7 +629,7 @@ S_cop_free(pTHX_ COP* cop)
     CopSTASH_free(cop);
     if (! specialWARN(cop->cop_warnings))
 	PerlMemShared_free(cop->cop_warnings);
-    Perl_refcounted_he_free(aTHX_ cop->cop_hints_hash);
+    SvREFCNT_dec((SV*)cop->cop_hints_hash);
 }
 
 STATIC void
@@ -4100,7 +4100,7 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o)
     cop->cop_hints_hash = PL_curcop->cop_hints_hash;
     if (cop->cop_hints_hash) {
 	HINTS_REFCNT_LOCK;
-	cop->cop_hints_hash->refcounted_he_refcnt++;
+	SvREFCNT_inc(cop->cop_hints_hash);
 	HINTS_REFCNT_UNLOCK;
     }
 
@@ -6809,6 +6809,14 @@ Perl_ck_smartmatch(pTHX_ OP *o)
     return o;
 }
 
+OP *
+Perl_ck_comptfunc(pTHX_ OP *o)
+{
+    OP * const kid = cLISTOPo->op_first;
+    /* SV* comptfunc = o->op_private; */
+    /* call_sv(comptfunc); */
+    return kid;
+}
 
 OP *
 Perl_ck_sassign(pTHX_ OP *o)

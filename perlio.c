@@ -5129,7 +5129,7 @@ Perl_PerlIO_context_layers(pTHX_ const char *mode)
 {
     dVAR;
     const char *direction = NULL;
-    SV *layers;
+    SV **layers;
     /*
      * Need to supply default layer info from open.pm
      */
@@ -5147,11 +5147,11 @@ Perl_PerlIO_context_layers(pTHX_ const char *mode)
     if (!direction)
 	return NULL;
 
-    layers = Perl_refcounted_he_fetch(aTHX_ PL_curcop->cop_hints_hash,
-				      0, direction, 5, 0, 0);
-
+    layers = hv_fetch(PL_curcop->cop_hints_hash, direction, 5, 0);
     assert(layers);
-    return SvOK(layers) ? SvPV_nolen_const(layers) : NULL;
+
+    assert(*layers);
+    return SvOK(*layers) ? SvPV_nolen_const(*layers) : NULL;
 }
 
 

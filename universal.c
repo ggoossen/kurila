@@ -208,6 +208,7 @@ XS(XS_Internals_hash_seed);
 XS(XS_Internals_rehash_seed);
 XS(XS_Internals_HvREHASH);
 XS(XS_Internals_inc_sub_generation);
+XS(XS_Internals_set_hint_hash);
 XS(XS_re_is_regexp); 
 XS(XS_re_regname);
 XS(XS_re_regnames);
@@ -271,6 +272,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXSproto("Internals::hash_seed",XS_Internals_hash_seed, file, "");
     newXSproto("Internals::rehash_seed",XS_Internals_rehash_seed, file, "");
     newXSproto("Internals::HvREHASH", XS_Internals_HvREHASH, file, "\\%");
+    newXSproto("Internals::set_hint_hash", XS_Internals_set_hint_hash, file, "\\%");
     newXSproto("re::is_regexp", XS_re_is_regexp, file, "$");
     newXSproto("re::regname", XS_re_regname, file, ";$$");
     newXSproto("re::regnames", XS_re_regnames, file, ";$");
@@ -1006,6 +1008,19 @@ XS(XS_Internals_HvREHASH)	/* Subject to change  */
 	}
     }
     Perl_croak(aTHX_ "Internals::HvREHASH $hashref");
+}
+
+XS(XS_Internals_set_hint_hash)
+{
+    dVAR;
+    dXSARGS;
+    if (!SvROK(ST(0)))
+	Perl_croak(aTHX_ "Internals::set_hint_hash $hashref");
+    const HV * const hv = (HV *) SvRV(ST(0));
+    if (items == 1 && SvTYPE(hv) == SVt_PVHV) {
+	SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	PL_compiling.cop_hints_hash = SvREFCNT_inc(hv);
+    }
 }
 
 XS(XS_re_is_regexp)

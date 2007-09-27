@@ -4936,6 +4936,7 @@ Perl_yylex(pTHX)
 		int pkgname = 0;
 		const char lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
 		CV *cv;
+		SV **comptfunc;
 #ifdef PERL_MAD
 		SV *nextPL_nextwhite = 0;
 #endif
@@ -4963,6 +4964,14 @@ Perl_yylex(pTHX)
 		    else
 			no_op("Bareword",s);
 		}
+
+		/* Is this a compile time function? */
+/* 		comptfunc = hv_fetch(PL_compiling.cop_hints_hash, PL_tokenbuf, len, FALSE); */
+/* /\* 		Perl_sv_dump(comptfunc); *\/ */
+/* 		if (comptfunc) { */
+/* 		    Perl_warner(aTHX 0, "todo: implement %s, %x, %x", PL_tokenbuf, len, comptfunc); */
+/* 		} */
+ 
 
 		/* Look for a subroutine with this name in current package,
 		   unless name is "Foo::", in which case Foo is a bearword
