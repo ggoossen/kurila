@@ -4547,6 +4547,12 @@ PP(pp_lock)
     RETURN;
 }
 
+PP(pp_comptfunc)
+{
+    dVAR;
+    DIE(aTHX_ "panic: comptfunc should be replaced");
+}
+
 
 PP(unimplemented_op)
 {

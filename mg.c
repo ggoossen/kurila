@@ -672,19 +672,15 @@ Perl_emulate_cop_io(pTHX_ const COP *const c, SV *const sv)
     else {
 	sv_setpvs(sv, "");
 	if ((CopHINTS_get(c) & HINT_LEXICAL_IO_IN)) {
-	    SV *const value = Perl_refcounted_he_fetch(aTHX_
-						       c->cop_hints_hash,
-						       0, "open<", 5, 0, 0);
-	    assert(value);
-	    sv_catsv(sv, value);
+	    SV **const value = hv_fetch(c->cop_hints_hash, "open<", 5, 0);
+	    assert(*value);
+	    sv_catsv(sv, *value);
 	}
 	sv_catpvs(sv, "\0");
 	if ((CopHINTS_get(c) & HINT_LEXICAL_IO_OUT)) {
-	    SV *const value = Perl_refcounted_he_fetch(aTHX_
-						       c->cop_hints_hash,
-						       0, "open>", 5, 0, 0);
-	    assert(value);
-	    sv_catsv(sv, value);
+	    SV **const value = hv_fetch(c->cop_hints_hash, "open>", 5, 0);
+	    assert(*value);
+	    sv_catsv(sv, *value);
 	}
     }
 }
@@ -2268,7 +2264,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	    const char *const start = SvPV(sv, len);
 	    const char *out = (const char*)memchr(start, '\0', len);
 	    SV *tmp;
-	    struct refcounted_he *tmp_he;
 
 
 	    PL_compiling.cop_hints |= HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
@@ -2277,19 +2272,18 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 
 	    /* Opening for input is more common than opening for output, so
 	       ensure that hints for input are sooner on linked list.  */
-	    tmp = sv_2mortal(out ? newSVpvn(out + 1, start + len - out - 1)
-			     : newSVpvs(""));
 
-	    tmp_he
-		= Perl_refcounted_he_new(aTHX_ PL_compiling.cop_hints_hash, 
-					 sv_2mortal(newSVpvs("open>")), tmp);
+	    HV* old_cop_hints_hash = PL_compiling.cop_hints_hash;
+	    PL_compiling.cop_hints_hash = newHVhv(PL_compiling.cop_hints_hash);
+	    SvREFCNT_dec(old_cop_hints_hash);
 
-	    /* The UTF-8 setting is carried over  */
-	    sv_setpvn(tmp, start, out ? (STRLEN)(out - start) : len);
+	    tmp = out ? newSVpvn(out + 1, start + len - out - 1) : newSVpvs("");
+	    hv_store_ent(PL_compiling.cop_hints_hash, 
+			 sv_2mortal(newSVpvs("open>")), tmp, 0);
 
-	    PL_compiling.cop_hints_hash
-		= Perl_refcounted_he_new(aTHX_ tmp_he,
-					 sv_2mortal(newSVpvs("open<")), tmp);
+	    tmp = newSVpvn(start, out ? (STRLEN)(out - start) : len);
+	    hv_store_ent(PL_compiling.cop_hints_hash,
+			 sv_2mortal(newSVpvs("open<")), tmp, 0);
 	}
 	break;
     case '\020':	/* ^P */
@@ -2923,9 +2917,13 @@ Perl_magic_sethint(pTHX_ SV *sv, MAGIC *mg)
        Doing this here saves a lot of doing it manually in perl code (and
        forgetting to do it, and consequent subtle errors.  */
     PL_hints |= HINT_LOCALIZE_HH;
-    PL_compiling.cop_hints_hash
-	= Perl_refcounted_he_new(aTHX_ PL_compiling.cop_hints_hash,
-				 (SV *)mg->mg_ptr, sv);
+
+    /* copy the hash, to preserve the old one */
+    HV * new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
+    SvREFCNT_dec(PL_compiling.cop_hints_hash);
+    PL_compiling.cop_hints_hash = new_hinthash;
+
+    hv_store_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, newSVsv(sv), 0);
     return 0;
 }
 
@@ -2948,9 +2946,13 @@ Perl_magic_clearhint(pTHX_ SV *sv, MAGIC *mg)
     PERL_UNUSED_ARG(sv);
 
     PL_hints |= HINT_LOCALIZE_HH;
-    PL_compiling.cop_hints_hash
-	= Perl_refcounted_he_new(aTHX_ PL_compiling.cop_hints_hash,
-				 (SV *)mg->mg_ptr, &PL_sv_placeholder);
+
+    /* copy the hash, to preserve the old one */
+    HV * new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
+    SvREFCNT_dec(PL_compiling.cop_hints_hash);
+    PL_compiling.cop_hints_hash = new_hinthash;
+
+    hv_delete_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, 0, 0);
     return 0;
 }
 
