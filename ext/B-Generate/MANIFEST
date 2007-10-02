@@ -1,0 +1,11 @@
+Artistic
+Build.PL
+Changes
+Copying
+lib/B/Generate.pm
+lib/B/Generate.xs
+Makefile.PL
+MANIFEST
+META.yml
+t/basic.t
+typemap
