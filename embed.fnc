@@ -1278,8 +1278,7 @@ s	|SV *	|incpush_if_exists|NN SV *dir
 sR	|SV*	|refto		|NN SV* sv
 #endif
 #if defined(PERL_IN_PP_C) || defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
-pRxo	|GV*	|softref2xv	|NN SV *const sv|NN const char *const what \
-				|const U32 type|NN SV ***spp
+pRxo	|GV*	|softref2xv	|NN SV *const sv|NN const char *const what
 #endif
 
 #if defined(PERL_IN_PP_PACK_C) || defined(PERL_DECL_PROT)
@@ -1294,14 +1293,12 @@ s	|int	|div128		|NN SV *pnum|NN bool *done
 s	|const char *|group_end	|NN const char *pat|NN const char *patend|char ender
 sR	|const char *|get_num	|NN const char *ppat|NN I32 *lenptr
 sR	|char *	|sv_exp_grow	|NN SV *sv|STRLEN needed
-snR	|char *	|bytes_to_uni	|NN const U8 *start|STRLEN len|NN char *dest
 #endif
 
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 sR	|OP*	|docatch	|NULLOK OP *o
 s	|void	|docatch_body
 sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|NN OP **opstack|NN OP **oplimit
-snR	|bool	|num_overflow	|NV value|I32 fldsize|I32 frcsize
 sR	|I32	|dopoptoeval	|I32 startingblock
 sR	|I32	|dopoptogiven	|I32 startingblock
 sR	|I32	|dopoptolabel	|NN const char *label
