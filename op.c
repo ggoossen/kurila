@@ -7884,7 +7884,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_HELEM: {
 	    UNOP *rop;
             SV *lexname;
-	    GV **fields;
 	    SV **svp, *sv;
 	    const char *key = NULL;
 	    STRLEN keylen;
@@ -7914,11 +7913,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_HSLICE: {
 	    UNOP *rop;
 	    SV *lexname;
-	    GV **fields;
-	    SV **svp;
-	    const char *key;
-	    STRLEN keylen;
-	    SVOP *first_key_op, *key_op;
 
 	    if ((o->op_private & (OPpLVAL_INTRO))
 		/* I bet there's always a pushmark... */
