@@ -4966,11 +4966,20 @@ Perl_yylex(pTHX)
 		}
 
 		/* Is this a compile time function? */
-/* 		comptfunc = hv_fetch(PL_compiling.cop_hints_hash, PL_tokenbuf, len, FALSE); */
-/* /\* 		Perl_sv_dump(comptfunc); *\/ */
-/* 		if (comptfunc) { */
-/* 		    Perl_warner(aTHX 0, "todo: implement %s, %x, %x", PL_tokenbuf, len, comptfunc); */
-/* 		} */
+		SV **comptfunctable = hv_fetch(PL_compiling.cop_hints_hash, "comptfunc", 9, FALSE);
+		if (comptfunctable && SvROK(*comptfunctable) && SvTYPE(SvRV(*comptfunctable)) == SVt_PVHV) {
+		    comptfunc = hv_fetch((HV *)SvRV(*comptfunctable), PL_tokenbuf, len, FALSE);
+		    if (comptfunc) {
+			yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc(SvRV(*comptfunc)));
+			yylval.opval->op_private = OPpCONST_BARE;
+			PL_expect = XTERM;
+			s = skipspace(s);
+			PL_bufptr = s;
+			PL_last_uni = PL_oldbufptr;
+			PL_last_lop_op = OP_COMPTFUNC;
+			return REPORT( (int)COMPTFUNC );
+		    }
+		}
  
 
 		/* Look for a subroutine with this name in current package,
