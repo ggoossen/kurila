@@ -609,6 +609,7 @@ S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *min
     const STRLEN l = SvCUR(data->last_found);
     const STRLEN old_l = SvCUR(*data->longest);
     GET_RE_DEBUG_FLAGS_DECL;
+    PERL_UNUSED_ARG(pRExC_state);
 
     DEBUG_STUDYDATA("scan commit:",data,0);
     if ((l >= old_l) && ((l > old_l) || (data->flags & SF_BEFORE_EOL))) {
@@ -1820,7 +1821,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 			    "%*sPrefix State: %"UVuf" Idx:%"UVuf" %x, Char='%s'\n",
                             (int)depth * 2 + 2, "",
                             (UV)state, (UV)idx, 
-				       SvCUR(*tmp),
+				       (int)SvCUR(*tmp),
                             pv_pretty(sv, SvPV_nolen_const(*tmp), SvCUR(*tmp), 0, 
 	                        PL_colors[0], PL_colors[1], 0
                             )
@@ -2062,8 +2063,8 @@ S_make_trie_failtable(pTHX_ RExC_state_t *pRExC_state, regnode *source,  regnode
 #define DEBUG_PEEP(str,scan,depth) \
     DEBUG_OPTIMISE_r({if (scan){ \
        SV * const mysv=sv_newmortal(); \
-       PerlIO_printf(Perl_debug_log, "Debug peep start\n"); \
        regnode *Next = regnext(scan); \
+       PerlIO_printf(Perl_debug_log, "Debug peep start\n"); \
        PerlIO_printf(Perl_debug_log, "123 %*s" str ">%3d: %s (%d)\n", \
            (int)depth*2, "", REG_NODE_NUM(scan), SvPV_nolen_const(mysv),\
            Next ? (REG_NODE_NUM(Next)) : 0 ); \
@@ -2096,6 +2097,7 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, I32 *min, U32 flags
 #else
     PERL_UNUSED_ARG(depth);
 #endif
+    PERL_UNUSED_ARG(min);
 #ifndef EXPERIMENTAL_INPLACESCAN
     PERL_UNUSED_ARG(flags);
     PERL_UNUSED_ARG(val);
@@ -5901,16 +5903,8 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
 {
     dVAR;
     register regnode *ret;
-    STRLEN numlen;
-    IV namedclass;
-    char *rangebegin = NULL;
     SV *listsv = NULL;
-    bool optimize_invert   = TRUE;
     AV* unicode_alternate  = NULL;
-
-    regnode * const orig_emit = RExC_emit; /* Save the original RExC_emit in
-        case we need to change the emitted regop to an EXACT. */
-    const char * orig_parse = RExC_parse;
 
     GET_RE_DEBUG_FLAGS_DECL;
 
@@ -6214,8 +6208,9 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         GET_RE_DEBUG_FLAGS_DECL;     /* needed for the offsets */
         
 	if (FOLD) {
+	    UV uvc;
 	    p = SvPV(sv_str, len);
-	    UV uvc = utf8_to_uvchr((U8*)p, &charlen);
+	    uvc = utf8_to_uvchr((U8*)p, &charlen);
 	    ret = regclassfold_value(pRExC_state, uvc);
 	} else {
 	    ret = reg_node(pRExC_state, (U8)EXACT);
@@ -6673,7 +6668,7 @@ tryagain:
 	/* FALL THROUGH */
 
     default:
-        outer_default:{
+    {
 	    register STRLEN len;
 	    register UV ender;
 	    register char *p;
@@ -6802,11 +6797,13 @@ tryagain:
 				if (! UTF) {
 				    vFAIL("\\x{} not allowed outside Unicode match");
 				}
+				{
                                 I32 flags = PERL_SCAN_ALLOW_UNDERSCORES
                                     | PERL_SCAN_DISALLOW_PREFIX;
                                 STRLEN numlen = e - p - 1;
 				ender = grok_hex(p + 1, &numlen, &flags, NULL);
 				p = e + 1;
+				}
 			    }
 			}
 			else {
@@ -7598,7 +7595,7 @@ parseit:
 
 				  if (!unicode_alternate)
 				      unicode_alternate = newAV();
-				  DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "add alternate %p\n", unicode_alternate));
+				  DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "add alternate %p\n", (void*)unicode_alternate));
 				  sv = newSVpvn((char*)foldbuf, foldlen);
 				  av_push(unicode_alternate, sv);
 			      }
@@ -7691,17 +7688,8 @@ S_regclassfold(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 {
     dVAR;
     UV value = 0; /* XXX:dmq: needs to be referenceable (unfortunately) */
-    register regnode *ret;
     STRLEN numlen;
-    IV namedclass;
-    char *rangebegin = NULL;
-    SV *listsv = NULL;
-    bool optimize_invert   = TRUE;
-    AV* unicode_alternate  = NULL;
 
-    regnode * const orig_emit = RExC_emit; /* Save the original RExC_emit in
-        case we need to change the emitted regop to an EXACT. */
-    const char * orig_parse = RExC_parse;
     GET_RE_DEBUG_FLAGS_DECL;
 
     DEBUG_PARSE("clasfold");
@@ -8455,45 +8443,10 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
     } else if (k == LOGICAL)
 	Perl_sv_catpvf(aTHX_ sv, "[%d]", o->flags);	/* 2: embedded, otherwise 1 */
     else if (k == FOLDCHAR)
-	Perl_sv_catpvf(aTHX_ sv, "[0x%"UVXf"]",ARG(o) );	
+	Perl_sv_catpvf(aTHX_ sv, "[0x%"UVXf"]", ARG(o) );	
     else if (k == ANYOF) {
 	int i, rangestart = -1;
 	const U8 flags = ANYOF_FLAGS(o);
-
-	/* Should be synchronized with * ANYOF_ #xdefines in regcomp.h */
-	static const char * const anyofs[] = {
-	    "\\w",
-	    "\\W",
-	    "\\s",
-	    "\\S",
-	    "\\d",
-	    "\\D",
-	    "[:alnum:]",
-	    "[:^alnum:]",
-	    "[:alpha:]",
-	    "[:^alpha:]",
-	    "[:ascii:]",
-	    "[:^ascii:]",
-	    "[:ctrl:]",
-	    "[:^ctrl:]",
-	    "[:graph:]",
-	    "[:^graph:]",
-	    "[:lower:]",
-	    "[:^lower:]",
-	    "[:print:]",
-	    "[:^print:]",
-	    "[:punct:]",
-	    "[:^punct:]",
-	    "[:upper:]",
-	    "[:^upper:]",
-	    "[:xdigit:]",
-	    "[:^xdigit:]",
-	    "[:space:]",
-	    "[:^space:]",
-	    "[:blank:]",
-	    "[:^blank:]"
-	};
-
 	if (flags & ANYOF_FOLD)
 	    sv_catpvs(sv, "{i}");
 	Perl_sv_catpvf(aTHX_ sv, "[%s", PL_colors[0]);
@@ -8524,12 +8477,14 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	{
 	    /* the list sv */
 	    int i = ARG(o);
+	    SV *lv = NULL;
+	    SV * const sw = NULL; /* TODO get swash */
+	
 	    Perl_sv_catpvf(aTHX_ sv, "%c", progi->data->what[i]);
 	    if (progi->data->what[i] == 's') {
 		SV * const rv = (SV*)progi->data->data[i];
 		AV * const av = (AV*)SvRV((SV*)rv);
 		SV **const ary = AvARRAY(av);
-		SV **a, **b;
 		
 		/* See the end of regcomp.c:S_regclass() for
 		 * documentation of these array elements. */
@@ -8537,9 +8492,6 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 		Perl_sv_catpvf(aTHX_ sv, "(%s)", SvPVX_const(ary[0]));
 	    }
 
-	    SV *lv = NULL;
-	    SV * const sw = NULL; /* TODO get swash */
-	
 	    if (lv) {
 		if (sw) {
 		    U8 s[UTF8_MAXBYTES_CASE+1];
