@@ -3711,33 +3711,6 @@ PP(pp_break)
 	return cx->blk_givwhen.leave_op;
 }
 
-STATIC bool
-S_num_overflow(NV value, I32 fldsize, I32 frcsize)
-{
-    /* Can value be printed in fldsize chars, using %*.*f ? */
-    NV pwr = 1;
-    NV eps = 0.5;
-    bool res = FALSE;
-    int intsize = fldsize - (value < 0 ? 1 : 0);
-
-    if (frcsize & 256)
-        intsize--;
-    frcsize &= 255;
-    intsize -= frcsize;
-
-    while (intsize--) pwr *= 10.0;
-    while (frcsize--) eps /= 10.0;
-
-    if( value >= 0 ){
-        if (value + eps >= pwr)
-	    res = TRUE;
-    } else {
-        if (value - eps <= -pwr)
-	    res = TRUE;
-    }
-    return res;
-}
-
 static I32
 S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 {

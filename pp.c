@@ -210,13 +210,13 @@ PP(pp_rv2gv)
 
 /* Helper function for pp_rv2sv and pp_rv2av  */
 GV *
-Perl_softref2xv(pTHX_ SV *const sv, const char *const what, const U32 type,
-		SV ***spp)
+Perl_softref2xv(pTHX_ SV *const sv, const char *const what)
 {
     if (SvOK(sv))
 	Perl_die(aTHX_ PL_no_symref_sv, sv, what);
     else
 	Perl_die(aTHX_ PL_no_usym, what);
+    return NULL;
 }
 
 PP(pp_rv2sv)
@@ -247,7 +247,7 @@ PP(pp_rv2sv)
 		if (SvROK(sv))
 		    goto wasref;
 	    }
-	    gv = Perl_softref2xv(aTHX_ sv, "a SCALAR", SVt_PV, &sp);
+	    gv = Perl_softref2xv(aTHX_ sv, "a SCALAR");
 	    if (!gv)
 		RETURN;
 	}

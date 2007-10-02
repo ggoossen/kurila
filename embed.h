@@ -1289,7 +1289,6 @@
 #define group_end		S_group_end
 #define get_num			S_get_num
 #define sv_exp_grow		S_sv_exp_grow
-#define bytes_to_uni		S_bytes_to_uni
 #endif
 #endif
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
@@ -1297,7 +1296,6 @@
 #define docatch			S_docatch
 #define docatch_body		S_docatch_body
 #define dofindlabel		S_dofindlabel
-#define num_overflow		S_num_overflow
 #define dopoptoeval		S_dopoptoeval
 #define dopoptogiven		S_dopoptogiven
 #define dopoptolabel		S_dopoptolabel
@@ -3564,7 +3562,6 @@
 #define group_end(a,b,c)	S_group_end(aTHX_ a,b,c)
 #define get_num(a,b)		S_get_num(aTHX_ a,b)
 #define sv_exp_grow(a,b)	S_sv_exp_grow(aTHX_ a,b)
-#define bytes_to_uni		S_bytes_to_uni
 #endif
 #endif
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
@@ -3572,7 +3569,6 @@
 #define docatch(a)		S_docatch(aTHX_ a)
 #define docatch_body()		S_docatch_body(aTHX)
 #define dofindlabel(a,b,c,d)	S_dofindlabel(aTHX_ a,b,c,d)
-#define num_overflow		S_num_overflow
 #define dopoptoeval(a)		S_dopoptoeval(aTHX_ a)
 #define dopoptogiven(a)		S_dopoptogiven(aTHX_ a)
 #define dopoptolabel(a)		S_dopoptolabel(aTHX_ a)
