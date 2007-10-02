@@ -84,29 +84,30 @@
      MY = 299,
      MYSUB = 300,
      REQUIRE = 301,
-     COLONATTR = 302,
-     PREC_LOW = 303,
-     DOROP = 304,
-     OROP = 305,
-     ANDOP = 306,
-     NOTOP = 307,
-     ASSIGNOP = 308,
-     DORDOR = 309,
-     OROR = 310,
-     ANDAND = 311,
-     BITOROP = 312,
-     BITANDOP = 313,
-     SHIFTOP = 314,
-     MATCHOP = 315,
-     REFGEN = 316,
-     UMINUS = 317,
-     POWOP = 318,
-     POSTDEC = 319,
-     POSTINC = 320,
-     PREDEC = 321,
-     PREINC = 322,
-     ARROW = 323,
-     PEG = 324
+     COMPTFUNC = 302,
+     COLONATTR = 303,
+     PREC_LOW = 304,
+     DOROP = 305,
+     OROP = 306,
+     ANDOP = 307,
+     NOTOP = 308,
+     ASSIGNOP = 309,
+     DORDOR = 310,
+     OROR = 311,
+     ANDAND = 312,
+     BITOROP = 313,
+     BITANDOP = 314,
+     SHIFTOP = 315,
+     MATCHOP = 316,
+     REFGEN = 317,
+     UMINUS = 318,
+     POWOP = 319,
+     POSTDEC = 320,
+     POSTINC = 321,
+     PREDEC = 322,
+     PREINC = 323,
+     ARROW = 324,
+     PEG = 325
    };
 #endif
 /* Tokens.  */
@@ -154,29 +155,30 @@
 #define MY 299
 #define MYSUB 300
 #define REQUIRE 301
-#define COLONATTR 302
-#define PREC_LOW 303
-#define DOROP 304
-#define OROP 305
-#define ANDOP 306
-#define NOTOP 307
-#define ASSIGNOP 308
-#define DORDOR 309
-#define OROR 310
-#define ANDAND 311
-#define BITOROP 312
-#define BITANDOP 313
-#define SHIFTOP 314
-#define MATCHOP 315
-#define REFGEN 316
-#define UMINUS 317
-#define POWOP 318
-#define POSTDEC 319
-#define POSTINC 320
-#define PREDEC 321
-#define PREINC 322
-#define ARROW 323
-#define PEG 324
+#define COMPTFUNC 302
+#define COLONATTR 303
+#define PREC_LOW 304
+#define DOROP 305
+#define OROP 306
+#define ANDOP 307
+#define NOTOP 308
+#define ASSIGNOP 309
+#define DORDOR 310
+#define OROR 311
+#define ANDAND 312
+#define BITOROP 313
+#define BITANDOP 314
+#define SHIFTOP 315
+#define MATCHOP 316
+#define REFGEN 317
+#define UMINUS 318
+#define POWOP 319
+#define POSTDEC 320
+#define POSTINC 321
+#define PREDEC 322
+#define PREINC 323
+#define ARROW 324
+#define PEG 325
 
 
 
