@@ -23,7 +23,7 @@ sub import {
     }
     foreach my $sym (@EXPORT) {
         no strict 'refs';
-        *{Symbol::qualify_to_ref("${callpack}::$sym")} = \&{Symbol::qualify_to_ref("Shell::$sym")};
+        *{Symbol::fetch_glob("${callpack}::$sym")} = \&{Symbol::fetch_glob("Shell::$sym")};
     }
 }
 
@@ -134,8 +134,8 @@ sub AUTOLOAD {
     my $cmd = $AUTOLOAD;
     $cmd =~ s/^.*:://;
     no strict 'refs';
-    *{Symbol::qualify_to_ref($AUTOLOAD)} = _make_cmd($cmd);
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    *{Symbol::fetch_glob($AUTOLOAD)} = _make_cmd($cmd);
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 1;

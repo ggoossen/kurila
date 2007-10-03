@@ -33,7 +33,7 @@ if (($x...$x) eq "1") {print "ok 9\n";} else {print "not ok 9\n";}
 
 {
     # coredump reported in bug 20001018.008
-    readline(Symbol::qualify_to_ref('UNKNOWN'));
+    readline(Symbol::fetch_glob('UNKNOWN'));
     $. = 1;
     $x = 1..10;
     print "ok 10\n";

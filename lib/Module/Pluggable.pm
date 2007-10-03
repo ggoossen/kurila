@@ -61,10 +61,10 @@ sub import {
 
     no strict 'refs';
     no warnings 'redefine';
-    *{Symbol::qualify_to_ref("$package\::$sub")}    = $subroutine;
-    *{Symbol::qualify_to_ref("$package\::search_path")} = $searchsub;
-    *{Symbol::qualify_to_ref("$package\::only")}        = $onlysub;
-    *{Symbol::qualify_to_ref("$package\::except")}      = $exceptsub;
+    *{Symbol::fetch_glob("$package\::$sub")}    = $subroutine;
+    *{Symbol::fetch_glob("$package\::search_path")} = $searchsub;
+    *{Symbol::fetch_glob("$package\::only")}        = $onlysub;
+    *{Symbol::fetch_glob("$package\::except")}      = $exceptsub;
 
 }
 

@@ -188,7 +188,7 @@ sub xref {
 	    xref($op->pmreplstart);
 	} else {
 	    no strict 'refs';
-	    my $ppname = *{Symbol::qualify_to_ref("pp_$opname")};
+	    my $ppname = *{Symbol::fetch_glob("pp_$opname")};
 	    &$ppname($op) if defined(&$ppname);
 	}
     }
@@ -332,7 +332,7 @@ sub xref_definitions {
         $exclude{$pack."::"} = 1;
     }
     no strict qw(vars refs);
-    walksymtable(\%{*{Symbol::qualify_to_ref("main::")}}, "xref", sub { !defined($exclude{$_[0]}) });
+    walksymtable(\%{*{Symbol::fetch_glob("main::")}}, "xref", sub { !defined($exclude{$_[0]}) });
 }
 
 sub output {

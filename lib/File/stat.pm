@@ -54,7 +54,7 @@ sub stat ($) {
 		no strict 'refs';
 		require Symbol;
                 my ($pkg) = caller();
-		$fh = \*{ Symbol::qualify_to_ref( $pkg . "::" . $arg) };
+		$fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };
 		return unless defined fileno $fh;
 	}
     return populate(CORE::stat $fh);

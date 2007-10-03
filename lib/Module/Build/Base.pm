@@ -680,9 +680,9 @@ sub ACTION_config_data {
       unless ($class->can($property)) {
         no strict 'refs';
 	if ( $type eq 'HASH' ) {
-          *{Symbol::qualify_to_ref("$class\::$property")} = sub {
+          *{Symbol::fetch_glob("$class\::$property")} = sub {
 	    my $self = shift;
-            $self = ${*{Symbol::qualify_to_ref("$self\::properties")}} ||= {} if not ref $self;
+            $self = ${*{Symbol::fetch_glob("$self\::properties")}} ||= {} if not ref $self;
 	    my $x = $self->{properties};
 	    return $x->{$property} unless @_;
 
@@ -704,9 +704,9 @@ sub ACTION_config_data {
 	  };
 
         } else {
-          *{Symbol::qualify_to_ref("$class\::$property")} = sub {
+          *{Symbol::fetch_glob("$class\::$property")} = sub {
 	    my $self = shift;
-            $self = ${*{Symbol::qualify_to_ref("$self\::properties")}} ||= {} if not ref $self;
+            $self = ${*{Symbol::fetch_glob("$self\::properties")}} ||= {} if not ref $self;
 	    $self->{properties}{$property} = shift if @_;
 	    return $self->{properties}{$property};
 	  }
@@ -856,7 +856,7 @@ sub mb_parents {
               # Canonize the :: -> main::, ::foo -> main::foo thing.
               # Should I ever canonize the Foo'Bar = Foo::Bar thing?
               $seen{$c}++ ? () : $c;
-          } @{*{Symbol::qualify_to_ref("$current\::ISA")}};
+          } @{*{Symbol::fetch_glob("$current\::ISA")}};
 
         # I.e., if this class has any parents (at least, ones I've never seen
         # before), push them, in order, onto the stack of classes I need to
@@ -1210,7 +1210,7 @@ sub check_installed_status {
   if ($modname eq 'perl') {
     $status{have} = $self->perl_version;
   
-  } elsif (eval { no strict; $status{have} = ${*{Symbol::qualify_to_ref("${modname}::VERSION")}} }) {
+  } elsif (eval { no strict; $status{have} = ${*{Symbol::fetch_glob("${modname}::VERSION")}} }) {
     # Don't try to load if it's already loaded
     
   } else {
@@ -1843,7 +1843,7 @@ sub super_classes {
   $seen  ||= {};
   
   no strict 'refs';
-  my @super = grep {not $seen->{$_}++} $class, @{*{Symbol::qualify_to_ref( $class . '::ISA')} };
+  my @super = grep {not $seen->{$_}++} $class, @{*{Symbol::fetch_glob( $class . '::ISA')} };
   return @super, map {$self->super_classes($_,$seen)} @super;
 }
 
@@ -1854,7 +1854,7 @@ sub known_actions {
   no strict 'refs';
   
   foreach my $class ($self->super_classes) {
-    foreach ( keys %{*{Symbol::qualify_to_ref( $class . '::')} } ) {
+    foreach ( keys %{*{Symbol::fetch_glob( $class . '::')} } ) {
       $actions{$1}++ if /^ACTION_(\w+)/;
     }
   }
@@ -3053,9 +3053,9 @@ EOF
       # when it actually only takes an input filehandle
 
       my $old_parse_file;
-      $old_parse_file = \&{Symbol::qualify_to_ref("Pod::Simple::parse_file")}
+      $old_parse_file = \&{Symbol::fetch_glob("Pod::Simple::parse_file")}
 	and
-      local *{Symbol::qualify_to_ref("Pod::Simple::parse_file")} = sub {
+      local *{Symbol::fetch_glob("Pod::Simple::parse_file")} = sub {
 	my $self = shift;
 	$self->output_fh($_[1]) if $_[1];
 	$self->$old_parse_file($_[0]);

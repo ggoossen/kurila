@@ -21,8 +21,8 @@ package Socket;
 sub import {
 	my $pkg = caller();
 	no strict 'refs';
-	*{Symbol::qualify_to_ref( $pkg . '::inet_aton') } = \&inet_aton;
-	*{Symbol::qualify_to_ref( $pkg . '::inet_ntoa') } = \&inet_ntoa;
+	*{Symbol::fetch_glob( $pkg . '::inet_aton') } = \&inet_aton;
+	*{Symbol::fetch_glob( $pkg . '::inet_ntoa') } = \&inet_ntoa;
 }
 
 my $fail = 0;

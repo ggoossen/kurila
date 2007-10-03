@@ -659,11 +659,11 @@ sub compile {
 	no strict 'refs';
 	my $laststash = defined $self->{'curcop'}
 	    ? $self->{'curcop'}->stash->NAME : $self->{'curstash'};
-	if (defined *{Symbol::qualify_to_ref($laststash."::DATA")}{IO}) {
+	if (defined *{Symbol::fetch_glob($laststash."::DATA")}{IO}) {
 	    print "package $laststash;\n"
 		unless $laststash eq $self->{'curstash'};
 	    print "__DATA__\n";
-	    print readline(*{Symbol::qualify_to_ref($laststash."::DATA")});
+	    print readline(*{Symbol::fetch_glob($laststash."::DATA")});
 	}
     }
 }

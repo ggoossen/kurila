@@ -54,7 +54,7 @@ foreach(1..3) {
 	print $cpt->reval('$main::foo') == 9	? "ok $t\n" : "not ok $t\n"; $t++;
 	# check we can't see our test package:
 	print $cpt->reval('$test::foo')     	? "not ok $t\n" : "ok $t\n"; $t++;
-	print $cpt->reval('${*{Symbol::qualify_to_ref("test::foo")}}')		? "not ok $t\n" : "ok $t\n"; $t++;
+	print $cpt->reval('${*{Symbol::fetch_glob("test::foo")}}')		? "not ok $t\n" : "ok $t\n"; $t++;
 
 	$cpt->erase;	# erase the compartment, e.g., delete all variables
 

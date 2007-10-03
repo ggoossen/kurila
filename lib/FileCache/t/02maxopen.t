@@ -18,13 +18,13 @@ END{
 {# Test 2: that we actually adhere to maxopen
   for my $path ( @files ){
     cacheout $path;
-    my $sym = Symbol::qualify_to_ref($path);
+    my $sym = Symbol::fetch_glob($path);
     print $sym "$path 1\n";
   }
   
   my @cat;
   for my $path ( @files ){
-    my $sym = Symbol::qualify_to_ref($path);
+    my $sym = Symbol::fetch_glob($path);
     ok(fileno($path) || $path =~ /^(?:foo|bar)$/);
     next unless fileno($path);
     print $sym "$path 2\n";

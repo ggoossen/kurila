@@ -35,7 +35,7 @@ sub import {
 
     if ($] > 5.009002) {
 	no strict 'refs';
-	$symtab = \%{*{Symbol::qualify_to_ref($pkg . '::')}};
+	$symtab = \%{*{Symbol::fetch_glob($pkg . '::')}};
     };
 
     if ( $multiple ) {
@@ -111,13 +111,13 @@ sub import {
 		    $symtab->{$name} = \$scalar;
 		    mro::method_changed_in($pkg);
 		} else {
-		    *{Symbol::qualify_to_ref($full_name)} = sub () { $scalar };
+		    *{Symbol::fetch_glob($full_name)} = sub () { $scalar };
 		}
 	    } elsif (@_) {
 		my @list = @_;
-		*{Symbol::qualify_to_ref($full_name)} = sub () { @list };
+		*{Symbol::fetch_glob($full_name)} = sub () { @list };
 	    } else {
-		*{Symbol::qualify_to_ref($full_name)} = sub () { };
+		*{Symbol::fetch_glob($full_name)} = sub () { };
 	    }
 	}
     }

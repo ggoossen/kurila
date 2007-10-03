@@ -20,9 +20,9 @@ BEGIN {
 BAIL_OUT("No errno's are exported") unless @Errno::EXPORT_OK;
 
 my $err = $Errno::EXPORT_OK[0];
-my $num = &{*{Symbol::qualify_to_ref("Errno::$err")}};
+my $num = &{*{Symbol::fetch_glob("Errno::$err")}};
 
-is($num, &{*{Symbol::qualify_to_ref("Errno::$err")}});
+is($num, &{*{Symbol::fetch_glob("Errno::$err")}});
 
 $! = $num;
 ok(exists $!{$err});

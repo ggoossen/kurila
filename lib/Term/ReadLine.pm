@@ -322,7 +322,7 @@ if (defined &Term::ReadLine::Gnu::readline) {
   @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub);
 } elsif (defined &Term::ReadLine::Perl::readline) {
   @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub);
-} elsif (defined $which && defined &{*{Symbol::qualify_to_ref("Term::ReadLine::$which\::readline")}}) {
+} elsif (defined $which && defined &{*{Symbol::fetch_glob("Term::ReadLine::$which\::readline")}}) {
   @ISA = "Term::ReadLine::$which";
 } else {
   @ISA = qw(Term::ReadLine::Stub);

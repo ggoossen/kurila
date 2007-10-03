@@ -448,7 +448,7 @@ sub new {
         bless $self, $newclass;
         push @Parent, $self;
         require ExtUtils::MY;
-        @{*{Symbol::qualify_to_ref("$newclass\:\:ISA")}} = 'MM';
+        @{*{Symbol::fetch_glob("$newclass\:\:ISA")}} = 'MM';
     }
 
     if (defined $Parent[-2]){
@@ -810,7 +810,7 @@ sub _run_hintfile {
 sub mv_all_methods {
     my($from,$to) = @_;
     no strict 'refs';
-    my($symtab) = \%{*{Symbol::qualify_to_ref("${from}::")}};
+    my($symtab) = \%{*{Symbol::fetch_glob("${from}::")}};
 
     # Here you see the *current* list of methods that are overridable
     # from Makefile.PL via MY:: subroutines. As of VERSION 5.07 I'm
@@ -831,9 +831,9 @@ sub mv_all_methods {
         # standard, we try to enable the next line again. It was
         # commented out until MM 5.23
 
-        next unless defined &{Symbol::qualify_to_ref("${from}::$method")};
+        next unless defined &{Symbol::fetch_glob("${from}::$method")};
 
-        *{Symbol::qualify_to_ref("${to}::$method")} = \&{Symbol::qualify_to_ref("${from}::$method")};
+        *{Symbol::fetch_glob("${to}::$method")} = \&{Symbol::fetch_glob("${from}::$method")};
 
         # delete would do, if we were sure, nobody ever called
         # MY->makeaperl directly

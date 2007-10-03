@@ -221,7 +221,7 @@ XS(XS_Tie_Hash_NamedCapture_FIRSTK);
 XS(XS_Tie_Hash_NamedCapture_NEXTK);
 XS(XS_Tie_Hash_NamedCapture_SCALAR);
 XS(XS_Tie_Hash_NamedCapture_flags);
-XS(XS_Symbol_qualify_to_ref);
+XS(XS_Symbol_fetch_glob);
 XS(XS_Symbol_stash);
 
 void
@@ -284,7 +284,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("Tie::Hash::NamedCapture::NEXTKEY", XS_Tie_Hash_NamedCapture_NEXTK, file);
     newXS("Tie::Hash::NamedCapture::SCALAR", XS_Tie_Hash_NamedCapture_SCALAR, file);
     newXS("Tie::Hash::NamedCapture::flags", XS_Tie_Hash_NamedCapture_flags, file);
-    newXSproto("Symbol::qualify_to_ref", XS_Symbol_qualify_to_ref, file, "$");
+    newXSproto("Symbol::fetch_glob", XS_Symbol_fetch_glob, file, "$");
     newXSproto("Symbol::stash", XS_Symbol_stash, file, "$");
 }
 
@@ -1390,14 +1390,14 @@ XS(XS_Tie_Hash_NamedCapture_flags)
 	return;
 }
 
-XS(XS_Symbol_qualify_to_ref)
+XS(XS_Symbol_fetch_glob)
 {
     dVAR; 
     dXSARGS;
     PERL_UNUSED_VAR(cv);
 
     if (items != 1)
-       Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
+       Perl_croak(aTHX_ "Usage: %s(%s)", "Symbol::fetch_glob", "sv");
 
     ST(0) = (SV*)gv_fetchsv(ST(0), GV_ADD | GV_ADDMULTI, SVt_PVGV);
     ST(0) = newRV_noinc(ST(0));
@@ -1411,7 +1411,7 @@ XS(XS_Symbol_stash)
     PERL_UNUSED_VAR(cv);
 
     if (items != 1)
-       Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
+       Perl_croak(aTHX_ "Usage: %s(%s)", "Symbol::stash", "sv");
 
     ST(0) = (SV*)gv_stashsv(ST(0), GV_ADD);
     ST(0) = newRV_noinc(ST(0));

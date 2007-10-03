@@ -394,7 +394,7 @@ sub FETCH {
     my $proto = prototype("Errno::$errname");
     my $errno = "";
     if (defined($proto) && $proto eq "") {
-	$errno = &{*{Symbol::qualify_to_ref($errname)}};
+	$errno = &{*{Symbol::fetch_glob($errname)}};
         $errno = 0 unless $! == $errno;
     }
     return $errno;

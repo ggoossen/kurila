@@ -71,8 +71,8 @@ sub AUTOLOAD {
     my ($error, $val) = constant($constname);
     Carp::croak $error if $error;
     no strict 'refs';
-    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 use constant FLAG_APPEND             => 1 ;

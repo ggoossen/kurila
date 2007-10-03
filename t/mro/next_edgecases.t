@@ -47,7 +47,7 @@ require q(./test.pl); plan(tests => 11);
         Sub::Name::subname('Bar::bar', $m);
         {
             no strict 'refs';
-            *{Symbol::qualify_to_ref('Bar::bar')} = $m;
+            *{Symbol::fetch_glob('Bar::bar')} = $m;
         }
 
         can_ok($bar, 'bar');
@@ -73,7 +73,7 @@ require q(./test.pl); plan(tests => 11);
         my $m = sub { (shift)->next::method() };
         {
             no strict 'refs';
-            *{Symbol::qualify_to_ref('Baz::bar')} = $m;
+            *{Symbol::fetch_glob('Baz::bar')} = $m;
         }
 
         eval { $baz->bar() };

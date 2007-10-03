@@ -302,9 +302,9 @@ sub trusts_directly {
     my $class = shift;
     no strict 'refs';
     no warnings 'once'; 
-    return @{*{Symbol::qualify_to_ref("$class\::CARP_NOT")}}
-      ? @{*{Symbol::qualify_to_ref("$class\::CARP_NOT")}}
-      : @{*{Symbol::qualify_to_ref("$class\::ISA")}};
+    return @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
+      ? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
+      : @{*{Symbol::fetch_glob("$class\::ISA")}};
 }
 
 1;

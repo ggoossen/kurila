@@ -28,7 +28,7 @@ AUTOLOAD {
     if ($@) {
 	if (substr($sub,-9) eq '::DESTROY') {
 	    no strict 'refs';
-	    *{Symbol::qualify_to_ref($sub)} = sub {};
+	    *{Symbol::fetch_glob($sub)} = sub {};
 	    $@ = undef;
 	} elsif ($@ =~ /^Can't locate/) {
 	    # The load might just have failed because the filename was too
@@ -63,7 +63,7 @@ sub can {
     return unless eval { require $filename };
 
     no strict 'refs';
-    return \&{*{Symbol::qualify_to_ref( $package . '::' . $method)} };
+    return \&{*{Symbol::fetch_glob( $package . '::' . $method)} };
 }
 
 sub find_filename {
@@ -151,8 +151,8 @@ sub import {
     if ($pkg eq 'AutoLoader') {
 	if ( @_ and $_[0] =~ /^&?AUTOLOAD$/ ) {
 	    no strict 'refs';
-	    *{Symbol::qualify_to_ref( $callpkg . '::AUTOLOAD') } = \&AUTOLOAD;
-	    *{Symbol::qualify_to_ref( $callpkg . '::can')      } = \&can;
+	    *{Symbol::fetch_glob( $callpkg . '::AUTOLOAD') } = \&AUTOLOAD;
+	    *{Symbol::fetch_glob( $callpkg . '::can')      } = \&can;
 	}
     }
 
@@ -200,8 +200,8 @@ sub unimport {
 
     for my $exported (qw( AUTOLOAD can )) {
 	my $symname = $callpkg . '::' . $exported;
-	undef *{Symbol::qualify_to_ref($symname) } if \&{*{ Symbol::qualify_to_ref($symname)} } == \&{ $exported };
-	*{ Symbol::qualify_to_ref($symname) } = \&{*{ Symbol::qualify_to_ref($symname)} };
+	undef *{Symbol::fetch_glob($symname) } if \&{*{ Symbol::fetch_glob($symname)} } == \&{ $exported };
+	*{ Symbol::fetch_glob($symname) } = \&{*{ Symbol::fetch_glob($symname)} };
     }
 }
 
