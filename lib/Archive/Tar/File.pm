@@ -41,7 +41,7 @@ my $tmpl = [
 for ( my $i=0; $i<scalar @$tmpl ; $i+=2 ) {
     my $key = $tmpl->[$i];
     no strict 'refs';
-    *{Symbol::qualify_to_ref(__PACKAGE__."::$key")} = sub {
+    *{Symbol::fetch_glob(__PACKAGE__."::$key")} = sub {
         my $self = shift;
         $self->{$key} = $_[0] if @_;
 

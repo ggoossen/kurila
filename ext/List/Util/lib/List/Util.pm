@@ -47,8 +47,8 @@ sub reduce (&@) {
   use vars qw($a $b);
 
   my $caller = caller;
-  local(*{Symbol::qualify_to_ref($caller."::a")}) = \my $a;
-  local(*{Symbol::qualify_to_ref($caller."::b")}) = \my $b;
+  local(*{Symbol::fetch_glob($caller."::a")}) = \my $a;
+  local(*{Symbol::fetch_glob($caller."::b")}) = \my $b;
 
   $a = shift;
   foreach (@_) {

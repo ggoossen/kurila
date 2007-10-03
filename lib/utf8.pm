@@ -26,7 +26,7 @@ our $AUTOLOAD;
 
 sub AUTOLOAD {
     require "utf8_heavy.pl";
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)} if defined &{Symbol::qualify_to_ref($AUTOLOAD)};
+    goto &{Symbol::fetch_glob($AUTOLOAD)} if defined &{Symbol::fetch_glob($AUTOLOAD)};
     require Carp;
     Carp::croak("Undefined subroutine $AUTOLOAD called");
 }

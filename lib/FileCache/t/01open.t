@@ -18,7 +18,7 @@ print "1..1\n";
 
 {# Test 1: that we can open files
      for my $path ( @files ){
-         my $fh = Symbol::qualify_to_ref($path);
+         my $fh = Symbol::fetch_glob($path);
 	 cacheout $path;
 	 print $fh "$path 1\n";
 	 close $fh;

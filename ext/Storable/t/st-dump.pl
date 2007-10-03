@@ -98,7 +98,7 @@ sub recursive_dump {
 
 	croak "Unknown simple type '$ref'" unless defined $dump{$ref};
 
-	&{*{Symbol::qualify_to_ref($dump{$ref})}}($object);	# Dump object
+	&{*{Symbol::fetch_glob($dump{$ref})}}($object);	# Dump object
 	&bless($bless) if $bless;	# Mark it as blessed, if necessary
 
 	$dumped .= "OBJECT $objcount\n";

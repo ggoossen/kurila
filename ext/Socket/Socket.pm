@@ -395,8 +395,8 @@ sub AUTOLOAD {
     if ($error) {
 	croak $error;
     }
-    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 XSLoader::load 'Socket', $VERSION;

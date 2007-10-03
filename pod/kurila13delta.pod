@@ -42,10 +42,10 @@ Integrate bleadperl changes
 
 Usage of a string to lookup a symbol, like for example ${"$class\::VERSION"} will always give an error,
 regardless of "use strict 'refs'".
-You can use C<Symbol::qualify_to_ref> to lookup a symbol.
-Symbol::qualify_to_ref retuns a reference to a glob, thus to use the glob you need to explicitly dereference it.
-For example to get the above ${"$class\::VERSION"} you need C<${*{Symbol::qualify_to_ref("$class\::VERSION")}}>
-Symbol::qualify_to_ref is defined in the Perl core and does not require an C<use Symbol>.
+You can use C<Symbol::fetch_glob> to lookup a symbol.
+Symbol::fetch_glob retuns a reference to a glob, thus to use the glob you need to explicitly dereference it.
+For example to get the above ${"$class\::VERSION"} you need C<${*{Symbol::fetch_glob("$class\::VERSION")}}>
+Symbol::fetch_glob is defined in the Perl core and does not require an C<use Symbol>.
 
 =head2 The <> operator no longer supports glob patterns.
 

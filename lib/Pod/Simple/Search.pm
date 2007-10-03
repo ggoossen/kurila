@@ -625,7 +625,7 @@ sub _accessorize {  # A simple-minded method-maker
   shift;
   no strict 'refs';
   foreach my $attrname (@_) {
-    *{Symbol::qualify_to_ref(caller() . '::' . $attrname)} = sub {
+    *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
       use strict;
       $Carp::CarpLevel = 1,  Carp::croak(
        "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"

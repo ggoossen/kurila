@@ -112,8 +112,8 @@ sub AUTOLOAD {
     my ($error, $val) = constant($constname);
 	croak $error if $error;
     no strict 'refs';
-    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 
@@ -387,7 +387,7 @@ sub xlate {
     $name = "LOG_$name" unless $name =~ /^LOG_/;
     $name = "Sys::Syslog::$name";
     # Can't have just eval { &$name } || -1 because some LOG_XXX may be zero.
-    my $value = eval { no strict 'refs'; &{*{Symbol::qualify_to_ref($name)}} };
+    my $value = eval { no strict 'refs'; &{*{Symbol::fetch_glob($name)}} };
     defined $value ? $value : -1;
 }
 
@@ -413,7 +413,7 @@ sub connect_log {
     while ($proto = shift @fallbackMethods) {
 	no strict 'refs';
 	my $fn = "connect_$proto";
-	$connected = &{*{Symbol::qualify_to_ref($fn)}}(\@errs) if defined &{*{Symbol::qualify_to_ref($fn)}};
+	$connected = &{*{Symbol::fetch_glob($fn)}}(\@errs) if defined &{*{Symbol::fetch_glob($fn)}};
 	last if $connected;
     }
 

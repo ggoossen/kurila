@@ -40,9 +40,9 @@ sub AUTOLOAD {
     }
     {
 	no strict 'refs';
-	*{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
+	*{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
     }
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 sub import {

@@ -29,8 +29,8 @@ foreach my $symbol (@symbols) {
     my ($ps, $ms);
     {
 	no strict 'refs';
-	$ps = svref_2object(\*{Symbol::qualify_to_ref("POSIX::$symbol")});
-	$ms = svref_2object(\*{Symbol::qualify_to_ref("::$symbol")});
+	$ps = svref_2object(\*{Symbol::fetch_glob("POSIX::$symbol")});
+	$ms = svref_2object(\*{Symbol::fetch_glob("::$symbol")});
     }
     isa_ok($ps, 'B::GV');
     is($ps->GvFLAGS() & GVf_IMPORTED_CV, 0,

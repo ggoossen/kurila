@@ -47,14 +47,14 @@ sub AUTOLOAD {
     if ($NON_CONSTS{$constname}) {
         my ($val, $error) = &int_macro_int($constname, $_[0]);
         croak $error if $error;
-        *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { &int_macro_int($constname, $_[0]) };
+        *{Symbol::fetch_glob($AUTOLOAD)} = sub { &int_macro_int($constname, $_[0]) };
     } else {
         my ($error, $val) = constant($constname);
         croak $error if $error;
-	*{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
+	*{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
     }
 
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 package POSIX::SigRt;

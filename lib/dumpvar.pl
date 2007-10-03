@@ -63,9 +63,9 @@ sub stringify {
 
 	return 'undef' unless defined $_ or not $printUndef;
 	return $_ . "" if ref \$_ eq 'GLOB';
-	$_ = &{*{Symbol::qualify_to_ref('overload::StrVal')}}($_) 
+	$_ = &{*{Symbol::fetch_glob('overload::StrVal')}}($_) 
 	  if $bareStringify and ref $_ 
-	    and %{Symbol::stash("overload")} and defined &{*{Symbol::qualify_to_ref('overload::StrVal')}};
+	    and %{Symbol::stash("overload")} and defined &{*{Symbol::fetch_glob('overload::StrVal')}};
 	
 	if ($tick eq 'auto') {
 	    if (ord('A') == 193) {
@@ -160,8 +160,8 @@ sub unwrap {
     # Check for reused addresses
     if (ref $v) { 
       my $val = $v;
-      $val = &{*{Symbol::qualify_to_ref('overload::StrVal')}}($v) 
-	if %{Symbol::stash("overload")} and defined &{*{Symbol::qualify_to_ref('overload::StrVal')}};
+      $val = &{*{Symbol::fetch_glob('overload::StrVal')}}($v) 
+	if %{Symbol::stash("overload")} and defined &{*{Symbol::fetch_glob('overload::StrVal')}};
       # Match type and address.                      
       # Unblessed references will look like TYPE(0x...)
       # Blessed references will look like Class=TYPE(0x...)
@@ -452,7 +452,7 @@ sub findsubs {
   return undef unless %DB::sub;
   my ($addr, $name, $loc);
   while (($name, $loc) = each %DB::sub) {
-    $addr = \&{*{Symbol::qualify_to_ref($name)}};
+    $addr = \&{*{Symbol::fetch_glob($name)}};
     $subs{"$addr"} = $name;
   }
   $subdump = 0;
@@ -463,7 +463,7 @@ sub main::dumpvar {
     my ($package,$m,@vars) = @_;
     local(%address,$key,$val,$^W);
     $package .= "::" unless $package =~ /::$/;
-    *stab = *{Symbol::qualify_to_ref("main::")};
+    *stab = *{Symbol::fetch_glob("main::")};
     while ($package =~ /(\w+?::)/g){
       *stab = $ {stab}{$1};
     }
@@ -532,7 +532,7 @@ sub globUsage {			# glob ref, name
 sub packageUsage {
   my ($package,@vars) = @_;
   $package .= "::" unless $package =~ /::$/;
-  local *stab = *{Symbol::qualify_to_ref("main::")};
+  local *stab = *{Symbol::fetch_glob("main::")};
   while ($package =~ /(\w+?::)/g){
     *stab = $ {stab}{$1};
   }

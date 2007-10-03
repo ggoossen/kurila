@@ -64,7 +64,7 @@ $Pod2man = "pod2man" . ( $Config{'versiononly'} ? $Config{'version'} : '' );
 
 foreach my $subname (map "opt_$_", split '', q{mhlvriFfXqnTdUL}) {
   no strict 'refs';
-  *{Symbol::qualify_to_ref($subname)} = do{ use strict 'refs';  sub () { shift->_elem($subname, @_) } };
+  *{Symbol::fetch_glob($subname)} = do{ use strict 'refs';  sub () { shift->_elem($subname, @_) } };
 }
 
 # And these are so that GetOptsOO knows they take options:

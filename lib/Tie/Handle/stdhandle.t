@@ -8,7 +8,7 @@ BEGIN {
 use Tie::Handle;
 tie *tst,'Tie::StdHandle';
 
-$f = Symbol::qualify_to_ref('tst');
+$f = Symbol::fetch_glob('tst');
 
 print "1..13\n";
 
