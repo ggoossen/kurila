@@ -426,9 +426,11 @@ sub afh { select select *{Symbol::qualify_to_ref(++$f)};
           my $r = *{Symbol::qualify_to_ref($f)}{IO}; delete $X::{$f}; bless $r }
 sub DESTROY { print "destroyed\n" }
 package main;
+print "start\n";
 $x = X->any(); # to bump sv_objcount. IO objs aren't counted??
 *f = X->afh();
 EXPECT
+start
 destroyed
 destroyed
 ########
