@@ -61,7 +61,7 @@ Postpone load of modules until a function is used
 
 =item base
 
-Establish IS-A relationship with base classes at compile time
+Establish an ISA relationship with base classes at compile time
 
 =item bigint
 
@@ -126,10 +126,6 @@ Request less of something
 =item lib
 
 Manipulate @INC at compile time
-
-=item mro
-
-Method Resolution Order
 
 =item mro
 
@@ -228,10 +224,6 @@ Module for manipulations of tar archives
 =item Archive::Tar::File
 
 A subclass for in-memory extracted file from Archive::Tar
-
-=item Attribute::Handlers
-
-Simpler definition of attribute handlers
 
 =item AutoLoader
 
@@ -332,26 +324,6 @@ Wrapper around CPAN.pm without using any XS module
 =item CPAN::Version
 
 Utility functions to compare CPAN versions
-
-=item CPANPLUS
-
-API & CLI access to the CPAN mirrors
-
-=item CPANPLUS::Dist::Base
-
-Base class for custom distribution classes
-
-=item CPANPLUS::Dist::Sample
-
-Sample code to create your own Dist::* plugin
-
-=item CPANPLUS::Shell::Classic
-
-CPAN.pm emulation for CPANPLUS
-
-=item CPANPLUS::Shell::Default::Plugins::HOWTO
-
-Documentation on how to write your own plugins
 
 =item Carp
 
@@ -1832,6 +1804,10 @@ Interfaces to some Win32 API Functions
 =item Win32API::File
 
 Low-level access to Win32 system API calls for files/dirs.
+
+=item Win32CORE
+
+Win32 CORE function stubs
 
 =item XS::APItest
 
