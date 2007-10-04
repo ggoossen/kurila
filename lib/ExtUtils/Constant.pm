@@ -351,10 +351,10 @@ EOT
 #XXX	    *$AUTOLOAD = sub () { $val };
 #XXX	}
 #XXX	else {
-	    *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { $val };
+	    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
 #XXX	}
     }
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 END

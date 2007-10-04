@@ -11,22 +11,22 @@ sub OVERLOAD {
   my %arg = @_;
   my ($sub, $fb);
   no strict 'refs';
-  $ {*{Symbol::qualify_to_ref($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
-  *{Symbol::qualify_to_ref($package . "::()")} = \&nil; # Make it findable via fetchmethod.
+  $ {*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
+  *{Symbol::fetch_glob($package . "::()")} = \&nil; # Make it findable via fetchmethod.
   for (keys %arg) {
     if ($_ eq 'fallback') {
       $fb = $arg{$_};
     } else {
       $sub = $arg{$_};
       if (not ref $sub and $sub !~ /::/) {
-	$ {*{Symbol::qualify_to_ref($package . "::(" . $_)}} = $sub;
+	$ {*{Symbol::fetch_glob($package . "::(" . $_)}} = $sub;
 	$sub = \&nil;
       }
       #print STDERR "Setting `$ {'package'}::\cO$_' to \\&`$sub'.\n";
-      *{Symbol::qualify_to_ref($package . "::(" . $_)} = \&{ $sub };
+      *{Symbol::fetch_glob($package . "::(" . $_)} = \&{ $sub };
     }
   }
-  ${*{Symbol::qualify_to_ref($package . "::()")}} = $fb; # Make it findable too (fallback only).
+  ${*{Symbol::fetch_glob($package . "::()")}} = $fb; # Make it findable too (fallback only).
 }
 
 sub import {
@@ -38,13 +38,13 @@ sub import {
 
 sub unimport {
   my $package = (caller())[0];
-  ${*{Symbol::qualify_to_ref($package . "::OVERLOAD")}}{dummy}++; # Upgrade the table
+  ${*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Upgrade the table
   shift;
   for (@_) {
     if ($_ eq 'fallback') {
-      undef $ {*{Symbol::qualify_to_ref($package . "::()")}};
+      undef $ {*{Symbol::fetch_glob($package . "::()")}};
     } else {
-      delete $ {*{Symbol::qualify_to_ref($package . "::")}}{"(" . $_};
+      delete $ {*{Symbol::fetch_glob($package . "::")}}{"(" . $_};
     }
   }
 }
@@ -110,7 +110,7 @@ sub mycan {				# Real can would leave stubs.
   my $mro = mro::get_linear_isa($package);
   foreach my $p (@$mro) {
     my $fqmeth = $p . q{::} . $meth;
-    return \*{Symbol::qualify_to_ref($fqmeth)} if defined &{Symbol::qualify_to_ref($fqmeth)};
+    return \*{Symbol::fetch_glob($fqmeth)} if defined &{Symbol::fetch_glob($fqmeth)};
   }
 
   return undef;

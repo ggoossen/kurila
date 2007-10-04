@@ -45,7 +45,7 @@ is ($foo, 'global');
     $baz = "valid";
     $bar = 'baz';
     $foo = 'bar';
-    is (${*{Symbol::qualify_to_ref(${*{Symbol::qualify_to_ref($foo)}})}}, 'valid');
+    is (${*{Symbol::fetch_glob(${*{Symbol::fetch_glob($foo)}})}}, 'valid');
 }
 
 # Test real references.
@@ -76,7 +76,7 @@ print ${$ref[1]}[0];
 print @{$ref[2]}[0];
 {
     no strict 'refs';
-    print @{*{Symbol::qualify_to_ref('d')}};
+    print @{*{Symbol::fetch_glob('d')}};
 }
 curr_test($test+4);
 
@@ -382,34 +382,34 @@ TODO: {
 
     isnt ($name1, $name2, "They differ");
 
-    is (${*{Symbol::qualify_to_ref($name1)}}, undef, 'Nothing before we start (scalars)');
-    is (${*{Symbol::qualify_to_ref($name2)}}, undef, 'Nothing before we start');
-    ${*{Symbol::qualify_to_ref($name1)}} = "Yummy";
-    is (${*{Symbol::qualify_to_ref($name1)}}, "Yummy", 'Accessing via the correct name works');
-    is (${*{Symbol::qualify_to_ref($name2)}}, undef,
+    is (${*{Symbol::fetch_glob($name1)}}, undef, 'Nothing before we start (scalars)');
+    is (${*{Symbol::fetch_glob($name2)}}, undef, 'Nothing before we start');
+    ${*{Symbol::fetch_glob($name1)}} = "Yummy";
+    is (${*{Symbol::fetch_glob($name1)}}, "Yummy", 'Accessing via the correct name works');
+    is (${*{Symbol::fetch_glob($name2)}}, undef,
 	'Accessing via a different NUL-containing name gives nothing');
     # defined uses a different code path
-    ok (defined ${*{Symbol::qualify_to_ref($name1)}}, 'defined via the correct name works');
-    ok (!defined ${*{Symbol::qualify_to_ref($name2)}},
+    ok (defined ${*{Symbol::fetch_glob($name1)}}, 'defined via the correct name works');
+    ok (!defined ${*{Symbol::fetch_glob($name2)}},
 	'defined via a different NUL-containing name gives nothing');
 
-    is (*{Symbol::qualify_to_ref($name1)}->[0], undef, 'Nothing before we start (arrays)');
-    is (*{Symbol::qualify_to_ref($name2)}->[0], undef, 'Nothing before we start');
-    *{Symbol::qualify_to_ref($name1)}->[0] = "Yummy";
-    is (*{Symbol::qualify_to_ref($name1)}->[0], "Yummy", 'Accessing via the correct name works');
-    is (*{Symbol::qualify_to_ref($name2)}->[0], undef,
+    is (*{Symbol::fetch_glob($name1)}->[0], undef, 'Nothing before we start (arrays)');
+    is (*{Symbol::fetch_glob($name2)}->[0], undef, 'Nothing before we start');
+    *{Symbol::fetch_glob($name1)}->[0] = "Yummy";
+    is (*{Symbol::fetch_glob($name1)}->[0], "Yummy", 'Accessing via the correct name works');
+    is (*{Symbol::fetch_glob($name2)}->[0], undef,
 	'Accessing via a different NUL-containing name gives nothing');
-    ok (defined *{Symbol::qualify_to_ref($name1)}->[0], 'defined via the correct name works');
-    ok (!defined*{Symbol::qualify_to_ref($name2)}->[0],
+    ok (defined *{Symbol::fetch_glob($name1)}->[0], 'defined via the correct name works');
+    ok (!defined*{Symbol::fetch_glob($name2)}->[0],
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}[2,3];
-    my (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}[2,3];
+    my (undef, $one) = @{*{Symbol::fetch_glob($name1)}}[2,3];
+    my (undef, $two) = @{*{Symbol::fetch_glob($name2)}}[2,3];
     is ($one, undef, 'Nothing before we start (array slices)');
     is ($two, undef, 'Nothing before we start');
-    @{*{Symbol::qualify_to_ref($name1)}}[2,3] = ("Very", "Yummy");
-    (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}[2,3];
-    (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}[2,3];
+    @{*{Symbol::fetch_glob($name1)}}[2,3] = ("Very", "Yummy");
+    (undef, $one) = @{*{Symbol::fetch_glob($name1)}}[2,3];
+    (undef, $two) = @{*{Symbol::fetch_glob($name2)}}[2,3];
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
@@ -417,23 +417,23 @@ TODO: {
     ok (!defined $two,
 	'defined via a different NUL-containing name gives nothing');
 
-    is (*{Symbol::qualify_to_ref($name1)}->{PWOF}, undef, 'Nothing before we start (hashes)');
-    is (*{Symbol::qualify_to_ref($name2)}->{PWOF}, undef, 'Nothing before we start');
-    *{Symbol::qualify_to_ref($name1)}->{PWOF} = "Yummy";
-    is (*{Symbol::qualify_to_ref($name1)}->{PWOF}, "Yummy", 'Accessing via the correct name works');
-    is (*{Symbol::qualify_to_ref($name2)}->{PWOF}, undef,
+    is (*{Symbol::fetch_glob($name1)}->{PWOF}, undef, 'Nothing before we start (hashes)');
+    is (*{Symbol::fetch_glob($name2)}->{PWOF}, undef, 'Nothing before we start');
+    *{Symbol::fetch_glob($name1)}->{PWOF} = "Yummy";
+    is (*{Symbol::fetch_glob($name1)}->{PWOF}, "Yummy", 'Accessing via the correct name works');
+    is (*{Symbol::fetch_glob($name2)}->{PWOF}, undef,
 	'Accessing via a different NUL-containing name gives nothing');
-    ok (defined *{Symbol::qualify_to_ref($name1)}->{PWOF}, 'defined via the correct name works');
-    ok (!defined *{Symbol::qualify_to_ref($name2)}->{PWOF},
+    ok (defined *{Symbol::fetch_glob($name1)}->{PWOF}, 'defined via the correct name works');
+    ok (!defined *{Symbol::fetch_glob($name2)}->{PWOF},
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}{'SNIF', 'BEEYOOP'};
-    my (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}{'SNIF', 'BEEYOOP'};
+    my (undef, $one) = @{*{Symbol::fetch_glob($name1)}}{'SNIF', 'BEEYOOP'};
+    my (undef, $two) = @{*{Symbol::fetch_glob($name2)}}{'SNIF', 'BEEYOOP'};
     is ($one, undef, 'Nothing before we start (hash slices)');
     is ($two, undef, 'Nothing before we start');
-    @{*{Symbol::qualify_to_ref($name1)}}{'SNIF', 'BEEYOOP'} = ("Very", "Yummy");
-    (undef, $one) = @{*{Symbol::qualify_to_ref($name1)}}{'SNIF', 'BEEYOOP'};
-    (undef, $two) = @{*{Symbol::qualify_to_ref($name2)}}{'SNIF', 'BEEYOOP'};
+    @{*{Symbol::fetch_glob($name1)}}{'SNIF', 'BEEYOOP'} = ("Very", "Yummy");
+    (undef, $one) = @{*{Symbol::fetch_glob($name1)}}{'SNIF', 'BEEYOOP'};
+    (undef, $two) = @{*{Symbol::fetch_glob($name2)}}{'SNIF', 'BEEYOOP'};
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
@@ -442,16 +442,16 @@ TODO: {
 	'defined via a different NUL-containing name gives nothing');
 
     $name1 = "Left"; $name2 = "Left\0Right";
-    my $glob2 = *{Symbol::qualify_to_ref($name2)};
+    my $glob2 = *{Symbol::fetch_glob($name2)};
     our $glob1;
 
     is ($glob1, undef, "We get different typeglobs. In fact, undef");
 
-    *{Symbol::qualify_to_ref($name1)} = sub {"One"};
-    *{Symbol::qualify_to_ref($name2)} = sub {"Two"};
+    *{Symbol::fetch_glob($name1)} = sub {"One"};
+    *{Symbol::fetch_glob($name2)} = sub {"Two"};
 
-    is (&{*{Symbol::qualify_to_ref($name1)}}, "One");
-    is (&{*{Symbol::qualify_to_ref($name2)}}, "Two");
+    is (&{*{Symbol::fetch_glob($name1)}}, "One");
+    is (&{*{Symbol::fetch_glob($name2)}}, "Two");
 }
 
 # test derefs after list slice

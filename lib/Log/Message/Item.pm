@@ -55,7 +55,7 @@ sub AUTOLOAD {
     local $Carp::CarpLevel = $Carp::CarpLevel + 3;
 
     {   no strict 'refs';
-        return *{Symbol::qualify_to_ref("Log::Message::Handlers::${AUTOLOAD}")}->(@_);
+        return *{Symbol::fetch_glob("Log::Message::Handlers::${AUTOLOAD}")}->(@_);
     }
 }
 

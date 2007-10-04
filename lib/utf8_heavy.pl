@@ -111,7 +111,7 @@ sub SWASHNEW {
 	    my $caller1 = $type =~ s/(.+)::// ? $1 : caller(1);
 
 	    if (defined $caller1 && $type =~ /^(?:\w+)$/) {
-		my $prop = *{Symbol::qualify_to_ref("${caller1}::$type")};
+		my $prop = *{Symbol::fetch_glob("${caller1}::$type")};
 		if (exists &{$prop}) {
 		    no strict 'refs';
 		    
@@ -191,10 +191,10 @@ sub SWASHNEW {
 	    if (defined $caller0 && $type =~ /^To(?:\w+)$/) {
 		my $map = $caller0 . "::" . $type;
 
-		if (exists &{*{Symbol::qualify_to_ref($map)}}) {
+		if (exists &{*{Symbol::fetch_glob($map)}}) {
 		    no strict 'refs';
 		    
-		    $list = &{*{Symbol::qualify_to_ref($map)}};
+		    $list = &{*{Symbol::fetch_glob($map)}};
 		    last GETFILE;
 		}
 	    }

@@ -422,13 +422,15 @@ no strict "refs";
 package X;
 sub any { bless {} }
 my $f = "FH000"; # just to thwart any future optimisations
-sub afh { select select *{Symbol::qualify_to_ref(++$f)}; 
-          my $r = *{Symbol::qualify_to_ref($f)}{IO}; delete $X::{$f}; bless $r }
+sub afh { select select *{Symbol::fetch_glob(++$f)}; 
+          my $r = *{Symbol::fetch_glob($f)}{IO}; delete $X::{$f}; bless $r }
 sub DESTROY { print "destroyed\n" }
 package main;
+print "start\n";
 $x = X->any(); # to bump sv_objcount. IO objs aren't counted??
 *f = X->afh();
 EXPECT
+start
 destroyed
 destroyed
 ########

@@ -137,28 +137,28 @@ END
 }
 
 sub t_strict_refs {
-    p5convert( 'print {Symbol::qualify_to_ref("STDOUT")} "foo"',
-               'print {Symbol::qualify_to_ref("STDOUT")} "foo"' );
+    p5convert( 'print {Symbol::fetch_glob("STDOUT")} "foo"',
+               'print {Symbol::fetch_glob("STDOUT")} "foo"' );
     p5convert( 'print {"STDOUT"} "foo"',
-               'print {Symbol::qualify_to_ref("STDOUT")} "foo"' );
+               'print {Symbol::fetch_glob("STDOUT")} "foo"' );
     p5convert( 'my $pkg; *{$pkg . "::bar"} = sub { "foo" }',
-               'my $pkg; *{Symbol::qualify_to_ref($pkg . "::bar")} = sub { "foo" }');
+               'my $pkg; *{Symbol::fetch_glob($pkg . "::bar")} = sub { "foo" }');
     p5convert( 'my $pkg; *{"$pkg\::bar"} = sub { "foo" }',
-               'my $pkg; *{Symbol::qualify_to_ref("$pkg\::bar")} = sub { "foo" }');
+               'my $pkg; *{Symbol::fetch_glob("$pkg\::bar")} = sub { "foo" }');
     p5convert( 'my $pkg; ${$pkg . "::bar"} = "noot"',
-               'my $pkg; ${*{Symbol::qualify_to_ref($pkg . "::bar")}} = "noot"');
+               'my $pkg; ${*{Symbol::fetch_glob($pkg . "::bar")}} = "noot"');
     p5convert( 'my $pkg; @{$pkg . "::bar"} = ("noot", "mies")',
-               'my $pkg; @{*{Symbol::qualify_to_ref($pkg . "::bar")}} = ("noot", "mies")');
+               'my $pkg; @{*{Symbol::fetch_glob($pkg . "::bar")}} = ("noot", "mies")');
     p5convert( 'my $pkg; %{$pkg . "::bar"} = { aap => "noot" }',
-               'my $pkg; %{*{Symbol::qualify_to_ref($pkg . "::bar")}} = { aap => "noot" }');
+               'my $pkg; %{*{Symbol::fetch_glob($pkg . "::bar")}} = { aap => "noot" }');
     p5convert( 'my $pkg; &{$pkg . "::bar"} = sub { "foobar" }',
-               'my $pkg; &{*{Symbol::qualify_to_ref($pkg . "::bar")}} = sub { "foobar" }');
+               'my $pkg; &{*{Symbol::fetch_glob($pkg . "::bar")}} = sub { "foobar" }');
     p5convert( 'my $pkg; defined &{$pkg . "::bar"}',
-               'my $pkg; defined &{*{Symbol::qualify_to_ref($pkg . "::bar")}}');
+               'my $pkg; defined &{*{Symbol::fetch_glob($pkg . "::bar")}}');
     p5convert( '*$AUTOLOAD',
-               '*{Symbol::qualify_to_ref($AUTOLOAD)}');
+               '*{Symbol::fetch_glob($AUTOLOAD)}');
     p5convert( 'my $name = "foo"; *$name',
-               'my $name = "foo"; *{Symbol::qualify_to_ref($name)}');
+               'my $name = "foo"; *{Symbol::fetch_glob($name)}');
     p5convert( '*$globref',
                '*$globref');
 
@@ -172,13 +172,13 @@ sub t_strict_refs {
 
     # Fix conversion of addition of additional ref
     p5convert( split(m/^\-{3}\n/m, $_, 2)) for split(m/^={3}\n/m, <<'END');
-@{Symbol::qualify_to_ref("bar")}
+@{Symbol::fetch_glob("bar")}
 ---
-@{*{Symbol::qualify_to_ref("bar")}}
+@{*{Symbol::fetch_glob("bar")}}
 ===
-&{Symbol::qualify_to_ref("bar")}
+&{Symbol::fetch_glob("bar")}
 ---
-&{*{Symbol::qualify_to_ref("bar")}}
+&{*{Symbol::fetch_glob("bar")}}
 ===
 # finding strings
 my $string = "s";
@@ -186,13 +186,13 @@ my $string = "s";
 ---
 # finding strings
 my $string = "s";
-@{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
+@{*{Symbol::fetch_glob($string)}} = sub { 1 };
 ===
 my $string = "s";
 @{$string} = sub { 1 };
 ---
 my $string = "s";
-@{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
+@{*{Symbol::fetch_glob($string)}} = sub { 1 };
 ===
 my $string;
 $string =~ s/a/b/;
@@ -200,7 +200,7 @@ $string =~ s/a/b/;
 ---
 my $string;
 $string =~ s/a/b/;
-@{*{Symbol::qualify_to_ref($string)}} = sub { 1 };
+@{*{Symbol::fetch_glob($string)}} = sub { 1 };
 ===
 my $x = "string";
 sub foo {
@@ -238,7 +238,7 @@ my $subname = "bla";
 $subname->();
 ---
 my $subname = "bla";
-*{Symbol::qualify_to_ref($subname)}->();
+*{Symbol::fetch_glob($subname)}->();
 END
 
 }

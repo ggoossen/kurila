@@ -27,7 +27,7 @@ sub AUTOLOAD
     {
     if ($n eq $name)
       {
-      *{Symbol::qualify_to_ref("bigint::$name")} = sub 
+      *{Symbol::fetch_glob("bigint::$name")} = sub 
         {
         my $self = shift;
         no strict 'refs';
@@ -37,7 +37,7 @@ sub AUTOLOAD
           }
         return Math::BigInt->$name();
         };
-      return &{*{Symbol::qualify_to_ref($name)}};
+      return &{*{Symbol::fetch_glob($name)}};
       }
     }
  
@@ -267,7 +267,7 @@ sub import
   my ($package) = caller();
 
   no strict 'refs';
-  if (!defined &{*{Symbol::qualify_to_ref("${package}::inf")}})
+  if (!defined &{*{Symbol::fetch_glob("${package}::inf")}})
     {
     $self->export_to_level(1,$self,@a);           # export inf and NaN, e and PI
     }

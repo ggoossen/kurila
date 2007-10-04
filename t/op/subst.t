@@ -560,10 +560,10 @@ is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
     no warnings 'uninitialized';
     no strict 'refs';
     /(((((((((x)))))))))(z)/;	# clear $10
-    s/(((((((((x)))))))))(y)/${*{Symbol::qualify_to_ref(10)}}/;
+    s/(((((((((x)))))))))(y)/${*{Symbol::fetch_glob(10)}}/;
     is($_,"y","RT#6006: \$_ eq '$_'");
     $_ = "xr";
-    s/(((((((((x)))))))))(r)/fooba${*{Symbol::qualify_to_ref(10)}}/;
+    s/(((((((((x)))))))))(r)/fooba${*{Symbol::fetch_glob(10)}}/;
     is($_,"foobar","RT#6006: \$_ eq '$_'");
 }
 {

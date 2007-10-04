@@ -38,7 +38,7 @@ sub stub {
     $mod_file =~ tr|/|:| if $^O eq 'MacOS';
     
     $mod_file = File::Spec->catfile($lib, "$mod_file.pm");
-    $fh = Symbol::qualify_to_ref("${module}::DATA");
+    $fh = Symbol::fetch_glob("${module}::DATA");
     my (@BEFORE_DATA, @AFTER_DATA, @AFTER_END);
     @DATA = @STUBS = ();
 

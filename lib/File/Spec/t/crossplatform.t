@@ -43,8 +43,8 @@ foreach my $platform (@platforms) {
     no strict 'refs';
     my $save_w = $^W;
     $^W = 0;
-    local *{Symbol::qualify_to_ref("File::Spec::Mac::rootdir")} = sub { "Macintosh HD:" };
-    local *{Symbol::qualify_to_ref("File::Spec::Win32::_cwd")}  = sub { "C:\\foo" };
+    local *{Symbol::fetch_glob("File::Spec::Mac::rootdir")} = sub { "Macintosh HD:" };
+    local *{Symbol::fetch_glob("File::Spec::Win32::_cwd")}  = sub { "C:\\foo" };
     $^W = $save_w;
     use strict 'refs';
 

@@ -178,7 +178,7 @@ sub check_install {
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION ) {
             no strict 'refs';
-            $href->{version} = ${*{Symbol::qualify_to_ref( "$args->{module}"."::VERSION")} }; 
+            $href->{version} = ${*{Symbol::fetch_glob( "$args->{module}"."::VERSION")} }; 
         }
     }     
 

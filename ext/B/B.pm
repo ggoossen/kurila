@@ -238,10 +238,10 @@ sub walksymtable {
 	if ($sym =~ /::$/) {
 	    $sym = $prefix . $sym;
 	    if ($sym ne "main::" && $sym ne "<none>::" && &$recurse($sym)) {
-               walksymtable(\%{*{Symbol::qualify_to_ref($fullname)}}, $method, $recurse, $sym);
+               walksymtable(\%{*{Symbol::fetch_glob($fullname)}}, $method, $recurse, $sym);
 	    }
 	} else {
-           svref_2object(\*{Symbol::qualify_to_ref($fullname)})->$method();
+           svref_2object(\*{Symbol::fetch_glob($fullname)})->$method();
 	}
     }
 }

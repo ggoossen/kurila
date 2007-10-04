@@ -20,7 +20,7 @@ sub as_heavy {
   # Thus the need to create a lot of identical subroutines
   my $c = (caller(1))[3];
   $c =~ s/.*:://;
-  \&{*{Symbol::qualify_to_ref("Exporter::Heavy::heavy_$c")}};
+  \&{*{Symbol::fetch_glob("Exporter::Heavy::heavy_$c")}};
 }
 
 sub export {
@@ -32,13 +32,13 @@ sub import {
   my $callpkg = caller($ExportLevel);
 
   if ($pkg eq "Exporter" and @_ and $_[0] eq "import") {
-    *{Symbol::qualify_to_ref($callpkg."::import")} = \&import;
+    *{Symbol::fetch_glob($callpkg."::import")} = \&import;
     return;
   }
 
   # We *need* to treat @{"$pkg\::EXPORT_FAIL"} since Carp uses it :-(
-  my($exports, $fail) = (\@{*{Symbol::qualify_to_ref("$pkg\::EXPORT")}}, 
-                         \@{*{Symbol::qualify_to_ref("$pkg\::EXPORT_FAIL")}});
+  my($exports, $fail) = (\@{*{Symbol::fetch_glob("$pkg\::EXPORT")}}, 
+                         \@{*{Symbol::fetch_glob("$pkg\::EXPORT_FAIL")}});
   return export $pkg, $callpkg, @_
     if $Verbose or $Debug or @$fail > 1;
   my $export_cache = ($Cache{$pkg} ||= {});
@@ -47,7 +47,7 @@ sub import {
   local $_;
   if ($args and not %$export_cache) {
     s/^&//, $export_cache->{$_} = 1
-      foreach (@$exports, @{*{Symbol::qualify_to_ref("$pkg\::EXPORT_OK")}});
+      foreach (@$exports, @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}});
   }
   my $heavy;
   # Try very hard not to use {} and hence have to  enter scope on the foreach
@@ -64,7 +64,7 @@ sub import {
   local $SIG{__WARN__} = 
 	sub {require Carp; &Carp::carp};
   # shortcut for the common case of no type character
-  *{Symbol::qualify_to_ref("$callpkg\::$_")} = \&{*{Symbol::qualify_to_ref("$pkg\::$_")}} foreach @_;
+  *{Symbol::fetch_glob("$callpkg\::$_")} = \&{*{Symbol::fetch_glob("$pkg\::$_")}} foreach @_;
 }
 
 # Default methods

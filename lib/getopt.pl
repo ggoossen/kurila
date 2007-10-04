@@ -32,10 +32,10 @@ sub Getopt {
 		shift(@ARGV);
 		$rest = shift(@ARGV);
 	    }
-	    ${*{Symbol::qualify_to_ref("opt_$first")}} = $rest;
+	    ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
 	}
 	else {
-	    ${*{Symbol::qualify_to_ref("opt_$first")}} = 1;
+	    ${*{Symbol::fetch_glob("opt_$first")}} = 1;
 	    if ($rest ne '') {
 		$ARGV[0] = "-$rest";
 	    }

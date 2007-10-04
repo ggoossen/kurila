@@ -293,17 +293,17 @@ sub import {
 
     # To allow overriding, search through the packages
     # Till we find one in which the correct subroutine is defined.
-    my @packages = ($self,@{*{Symbol::qualify_to_ref("$self\:\:ISA")}});
+    my @packages = ($self,@{*{Symbol::fetch_glob("$self\:\:ISA")}});
     foreach $sym (keys %EXPORT) {
 	my $pck;
-	my $def = ${*{Symbol::qualify_to_ref("$self\:\:AutoloadClass")}} || $DefaultClass;
+	my $def = ${*{Symbol::fetch_glob("$self\:\:AutoloadClass")}} || $DefaultClass;
 	foreach $pck (@packages) {
-	    if (defined(&{Symbol::qualify_to_ref("$pck\:\:$sym")})) {
+	    if (defined(&{Symbol::fetch_glob("$pck\:\:$sym")})) {
 		$def = $pck;
 		last;
 	    }
 	}
-	*{Symbol::qualify_to_ref("${callpack}::$sym")} = \&{Symbol::qualify_to_ref("$def\:\:$sym")};
+	*{Symbol::fetch_glob("${callpack}::$sym")} = \&{Symbol::fetch_glob("$def\:\:$sym")};
     }
 }
 
@@ -839,12 +839,12 @@ sub _compile {
 	$func=~/(.+)::([^:]+)$/;
 	($pack,$func_name) = ($1,$2);
 	$pack=~s/::SUPER$//;	# fix another obscure problem
-	$pack = ${*{Symbol::qualify_to_ref("$pack\:\:AutoloadClass")}} || $CGI::DefaultClass
-	    unless defined(${*{Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")}});
+	$pack = ${*{Symbol::fetch_glob("$pack\:\:AutoloadClass")}} || $CGI::DefaultClass
+	    unless defined(${*{Symbol::fetch_glob("$pack\:\:AUTOLOADED_ROUTINES")}});
 
-        my($sub) = \%{*{Symbol::qualify_to_ref("$pack\:\:SUBS")}};
+        my($sub) = \%{*{Symbol::fetch_glob("$pack\:\:SUBS")}};
         unless (%$sub) {
-	   my($auto) = \${*{Symbol::qualify_to_ref("$pack\:\:AUTOLOADED_ROUTINES")}};
+	   my($auto) = \${*{Symbol::fetch_glob("$pack\:\:AUTOLOADED_ROUTINES")}};
 	   local ($@,$!);
 	   eval "package $pack; $$auto";
 	   croak("$AUTOLOAD: $@") if $@;
@@ -918,7 +918,7 @@ sub _setup_symbols {
 	# This is probably extremely evil code -- to be deleted some day.
 	if (/^[-]autoload$/) {
 	    my($pkg) = caller(1);
-	    *{Symbol::qualify_to_ref("${pkg}::AUTOLOAD")} = sub { 
+	    *{Symbol::fetch_glob("${pkg}::AUTOLOAD")} = sub { 
 		my($routine) = $AUTOLOAD;
 		$routine =~ s/^.*::/CGI::/;
 		&$routine;
@@ -3428,7 +3428,7 @@ sub new {
     require Fcntl unless defined &Fcntl::O_RDWR;
     (my $safename = $name) =~ s/([':%])/ sprintf '%%%02X', ord $1 /eg;
     my $fv = ++$FH . $safename;
-    my $ref = \*{Symbol::qualify_to_ref("Fh::$fv")};
+    my $ref = \*{Symbol::fetch_glob("Fh::$fv")};
     $file =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$! || return;
     my $safe = $1;
     sysopen($ref,$safe,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;

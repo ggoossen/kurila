@@ -28,7 +28,7 @@ sub AUTOLOAD {
     my $cmd = $AUTOLOAD;
     $cmd =~ s/.*:://;
     &_make_fatal($cmd, (caller)[0]);
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 sub fill_protos {
@@ -130,7 +130,7 @@ EOS
       $code = eval("package $pkg; use Carp; $code");
       die if $@;
       no warnings;   # to avoid: Subroutine foo redefined ...
-      *{Symbol::qualify_to_ref($sub)} = $code;
+      *{Symbol::fetch_glob($sub)} = $code;
     }
 }
 

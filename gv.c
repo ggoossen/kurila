@@ -1584,6 +1584,8 @@ Perl_Gv_AMupdate(pTHX_ HV *stash)
 		{
 		    /* Can be an import stub (created by "can"). */
 		    const char * const name = (gvsv && SvPOK(gvsv)) ?  SvPVX_const(gvsv) : "???";
+		    if (PL_dirty) 
+			continue; /* ignore error during global destruction */
 		    Perl_croak(aTHX_ "%s method \"%.256s\" overloading \"%s\" "\
 				"in package \"%.256s\"",
 			       (GvCVGEN(gv) ? "Stub found while resolving"

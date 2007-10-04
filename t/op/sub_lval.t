@@ -544,7 +544,7 @@ TODO: {
 
 {
     package Foo;
-    sub AUTOLOAD :lvalue { no strict 'refs'; *{Symbol::qualify_to_ref($AUTOLOAD)} };
+    sub AUTOLOAD :lvalue { no strict 'refs'; *{Symbol::fetch_glob($AUTOLOAD)} };
     package main;
     my $foo = bless {},"Foo";
     my $result;

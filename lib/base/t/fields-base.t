@@ -135,7 +135,7 @@ my %EXPECT = (
 
 while(my($class, $efields) = each %EXPECT) {
     no strict 'refs';
-    my %fields = %{*{Symbol::qualify_to_ref($class.'::FIELDS')}};
+    my %fields = %{*{Symbol::fetch_glob($class.'::FIELDS')}};
     my %expected_fields;
     foreach my $idx (1..@$efields) {
         my $key = $efields->[$idx-1];

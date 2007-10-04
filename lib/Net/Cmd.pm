@@ -82,16 +82,16 @@ sub _print_isa {
     $done{$pkg} = 1;
 
     my $v =
-      defined ${*{Symbol::qualify_to_ref("${pkg}::VERSION")}}
-      ? "(" . ${*{Symbol::qualify_to_ref("${pkg}::VERSION")}} . ")"
+      defined ${*{Symbol::fetch_glob("${pkg}::VERSION")}}
+      ? "(" . ${*{Symbol::fetch_glob("${pkg}::VERSION")}} . ")"
       : "";
 
     my $spc = $spc{$pkg};
     $cmd->debug_print(1, "${spc}${pkg}${v}\n");
 
-    if (@{*{Symbol::qualify_to_ref("${pkg}::ISA")}}) {
-      @spc{@{*{Symbol::qualify_to_ref("${pkg}::ISA")}}} = ("  " . $spc{$pkg}) x @{*{Symbol::qualify_to_ref("${pkg}::ISA")}};
-      unshift(@do, @{*{Symbol::qualify_to_ref("${pkg}::ISA")}});
+    if (@{*{Symbol::fetch_glob("${pkg}::ISA")}}) {
+      @spc{@{*{Symbol::fetch_glob("${pkg}::ISA")}}} = ("  " . $spc{$pkg}) x @{*{Symbol::fetch_glob("${pkg}::ISA")}};
+      unshift(@do, @{*{Symbol::fetch_glob("${pkg}::ISA")}});
     }
   }
 }

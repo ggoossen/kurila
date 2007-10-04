@@ -40,7 +40,7 @@ my $line = <$fh>;
 is($line,"\\x{20ac}0.02\n","perlqq escapes");
 close($fh);
 
-$PerlIO::encoding::fallback = 'Encode::HTMLCREF';
+$PerlIO::encoding::fallback = Encode::HTMLCREF();
 
 ok(open(my $fh,">encoding(iso-8859-1)",$file),"opened iso-8859-1 file");
 my $str = "\x{20AC}";
@@ -66,7 +66,7 @@ printf "# %x\n",ord($line);
 is($line,"\\x[A3]0.02\n","Escaped non-mapped char");
 close($fh);
 
-$PerlIO::encoding::fallback = 'Encode::WARN_ON_ERROR';
+$PerlIO::encoding::fallback = Encode::WARN_ON_ERR();
 
 ok(open($fh,"<encoding(US-ASCII)",$file),"Opened as ASCII");
 my $line = <$fh>;

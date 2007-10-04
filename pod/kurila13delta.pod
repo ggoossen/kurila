@@ -12,15 +12,23 @@ This document describes differences between Perl Kurila 0.2 and Perl Kurila 1.3
 
 =item *
 
-Removal <*>, use glob("*") instead
+Dereference of a string will always give an error, even when not "use strict 'refs'"
 
 =item *
 
-Default C3 method resolution
+The <> operator no longer supports glob patterns
 
 =item *
 
-Default "use strict 'subs'"
+Method resolution changed to default C3
+
+=item *
+
+"use strict 'subs'" is default on
+
+=item *
+
+Typed declarations are no longer possible
 
 =item *
 
@@ -30,22 +38,39 @@ Integrate bleadperl changes
 
 =head1 Core Enhancements
 
-=head2 Removal <*>, use glob("*") instead
+=head2 Dereference of a string will always give an error
 
-The <'pattern'> glob operator, has been removed in favor of the "glob" function.
+Usage of a string to lookup a symbol, like for example ${"$class\::VERSION"} will always give an error,
+regardless of "use strict 'refs'".
+You can use C<Symbol::fetch_glob> to lookup a symbol.
+Symbol::fetch_glob returns a reference to a glob, thus to use the glob you need to explicitly dereference it.
+For example to get the above ${"$class\::VERSION"} you need C<${*{Symbol::fetch_glob("$class\::VERSION")}}>
+Symbol::fetch_glob is defined in the Perl core and does not require an C<use Symbol>.
 
-=head2 Default C3 method resolution
+=head2 The <> operator no longer supports glob patterns.
 
-The default method resolution is not C3, see L<mro> for more information about
+The <'pattern'> glob operator, has been removed in favour of the "glob"
+function.  If you try to use <> with an pattern you get an "Usage of
+the <> operator with a glob pattern, use the 'glob' function instead"
+compile error.
+
+=head2 Default method resolution changed to C3
+
+The default method resolution is changed to C3, see L<mro> for more information about
 the C3 method resolution.
 
-=head2 Default "use strict 'subs'"
+=head2 "use strict 'subs'" is default on
 
 By default "use strict 'subs'" is active. See L<strict> for what this means.
 
+=head2 Typed declarations are no longer possible
+
+Typed declarations like "my Animal::Dog $dog" are no longer allowed.
+You get a "Expected variable after declarator" compile error if you try to use it.
+
 =head2 Internal bleadperl changes
 
-bleadperl changes upto 31540 are integrated
+bleadperl changes up to 31540 are integrated
 
 =back
 
@@ -53,11 +78,11 @@ bleadperl changes upto 31540 are integrated
 
 =head2 Documentation
 
-Documention has not been updated for many of the changes for kurila.
+Documentation has not been updated for many of the changes for kurila.
 
 =head2 Limited platform support
 
-Perl Kurila has ony been tested/build for x86_64-linux-gnu-thread-multi platform.
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
 
 =head1 SEE ALSO
 

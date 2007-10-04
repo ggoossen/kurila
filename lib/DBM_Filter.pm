@@ -99,9 +99,9 @@ sub _do_Filter_Push
             croak "$caller: Cannot Load DBM Filter '$class': $@" if $@;
         }
     
-        my $fetch  = *{Symbol::qualify_to_ref( "${class}::Fetch")  }{CODE};
-        my $store  = *{Symbol::qualify_to_ref( "${class}::Store")  }{CODE};
-        my $filter = *{Symbol::qualify_to_ref( "${class}::Filter") }{CODE};
+        my $fetch  = *{Symbol::fetch_glob( "${class}::Fetch")  }{CODE};
+        my $store  = *{Symbol::fetch_glob( "${class}::Store")  }{CODE};
+        my $filter = *{Symbol::fetch_glob( "${class}::Filter") }{CODE};
         use strict 'refs';
 
         my $count = defined($filter) + defined($store) + defined($fetch) ;
@@ -181,11 +181,11 @@ sub _do_Filter_Push
     $this =~ /^(.*)=/;
     my $type = $1 ;
     no strict 'refs';
-    if ( *{Symbol::qualify_to_ref( "${type}::DESTROY") }{CODE} ne \&MyDESTROY )
+    if ( *{Symbol::fetch_glob( "${type}::DESTROY") }{CODE} ne \&MyDESTROY )
     {
-        $origDESTROY{$type} = *{Symbol::qualify_to_ref( "${type}::DESTROY") }{CODE};
+        $origDESTROY{$type} = *{Symbol::fetch_glob( "${type}::DESTROY") }{CODE};
         no warnings 'redefine';
-        *{Symbol::qualify_to_ref( "${type}::DESTROY") } = \&MyDESTROY ;
+        *{Symbol::fetch_glob( "${type}::DESTROY") } = \&MyDESTROY ;
     }
 }
 
