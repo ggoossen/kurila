@@ -29,7 +29,7 @@ ok(!exists($Config{"\n$first"}),
    "Check that first key with prepended newline isn't falsely existing");
 
 is($Config{PERL_REVISION}, undef, "No PERL_REVISION");
-is($Config{KURILA_VERSION}, 0, "KURILA_REVISION 0");
+is($Config{KURILA_VERSION}, 1, "KURILA_REVISION 1");
 
 ok( exists $Config{cc},      "has cc");
 
