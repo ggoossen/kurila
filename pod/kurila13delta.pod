@@ -43,13 +43,13 @@ Integrate bleadperl changes
 Usage of a string to lookup a symbol, like for example ${"$class\::VERSION"} will always give an error,
 regardless of "use strict 'refs'".
 You can use C<Symbol::fetch_glob> to lookup a symbol.
-Symbol::fetch_glob retuns a reference to a glob, thus to use the glob you need to explicitly dereference it.
+Symbol::fetch_glob returns a reference to a glob, thus to use the glob you need to explicitly dereference it.
 For example to get the above ${"$class\::VERSION"} you need C<${*{Symbol::fetch_glob("$class\::VERSION")}}>
 Symbol::fetch_glob is defined in the Perl core and does not require an C<use Symbol>.
 
 =head2 The <> operator no longer supports glob patterns.
 
-The <'pattern'> glob operator, has been removed in favor of the "glob"
+The <'pattern'> glob operator, has been removed in favour of the "glob"
 function.  If you try to use <> with an pattern you get an "Usage of
 the <> operator with a glob pattern, use the 'glob' function instead"
 compile error.
@@ -70,7 +70,7 @@ You get a "Expected variable after declarator" compile error if you try to use i
 
 =head2 Internal bleadperl changes
 
-bleadperl changes upto 31540 are integrated
+bleadperl changes up to 31540 are integrated
 
 =back
 
@@ -78,11 +78,11 @@ bleadperl changes upto 31540 are integrated
 
 =head2 Documentation
 
-Documention has not been updated for many of the changes for kurila.
+Documentation has not been updated for many of the changes for kurila.
 
 =head2 Limited platform support
 
-Perl Kurila has ony been tested/build for x86_64-linux-gnu-thread-multi platform.
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
 
 =head1 SEE ALSO
 
