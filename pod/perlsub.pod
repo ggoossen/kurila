@@ -1074,7 +1074,7 @@ A C<*> allows the subroutine to accept a bareword, constant, scalar expression,
 typeglob, or a reference to a typeglob in that slot.  The value will be
 available to the subroutine either as a simple scalar, or (in the latter
 two cases) as a reference to the typeglob.  If you wish to always convert
-such arguments to a typeglob reference, use Symbol::qualify_to_ref() as
+such arguments to a typeglob reference, use Symbol::fetch_glob() as
 follows:
 
     use Symbol 'qualify_to_ref';

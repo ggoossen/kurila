@@ -211,7 +211,7 @@ BEGIN {
         
                         ### up the carplevel for the carp emulation
                         ### functions
-        *{Symbol::qualify_to_ref($func)}
+        *{Symbol::fetch_glob($func)}
           = sub {  local $Carp::CarpLevel += 2
                             if grep { $_ eq $func } @EXPORT_OK;
                             

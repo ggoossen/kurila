@@ -6,6 +6,11 @@ Symbol - manipulate Perl symbols and their names
 
 =head1 SYNOPSIS
 
+    print ${*{Symbol::fetch_glob("$class\::VERSION")}};
+    *{Symbol::fetch_glob("foo") = sub { "this is foo" };
+
+    keys %{Symbol::stash("main")};
+
     use Symbol;
 
     $sym = gensym;
@@ -35,6 +40,15 @@ Symbol - manipulate Perl symbols and their names
     print "deleted\n" unless exists $Foo::{'Bar::'};
 
 =head1 DESCRIPTION
+
+C<Symbol::fetch_glob> returns a reference to the glob for the
+specified symbol name. If the symbol does not already exists it will
+be created. If the symbol name is unqualified it will be looked up in
+the calling package.
+
+C<Symbol::stash> returns a refernce to the stash for the specified
+name. If the stash does not already exists it will be created. The
+name of the stash does not include the "::" at the end.
 
 C<Symbol::gensym> creates an anonymous glob and returns a reference
 to it.  Such a glob reference can be used as a file or directory
@@ -135,10 +149,9 @@ sub qualify ($;$) {
     $name;
 }
 
-# sub qualify_to_ref ($) {
-#     no strict 'refs';
-#     return \*{ qualify $_[0], @_ > 1 ? $_[1] : caller };
-# }
+sub qualify_to_ref ($) {
+    return \*{ Symbol::fetch_glob( qualify $_[0], @_ > 1 ? $_[1] : caller ) };
+}
 
 #
 # of Safe.pm lineage

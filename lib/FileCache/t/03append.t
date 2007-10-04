@@ -18,17 +18,17 @@ print "1..2\n";
 {# Test 3: that we open for append on second viewing
      my @cat;
      for my $path ( @files ){
-         my $sym = Symbol::qualify_to_ref($path);
+         my $sym = Symbol::fetch_glob($path);
 	 cacheout $path;
 	 print $sym "$path 3\n";
      }
      for my $path ( @files ){
-         my $sym = Symbol::qualify_to_ref($path);
+         my $sym = Symbol::fetch_glob($path);
 	 cacheout $path;
 	 print $sym "$path 33\n";
      }
      for my $path ( @files ){
-         my $sym = Symbol::qualify_to_ref($path);
+         my $sym = Symbol::fetch_glob($path);
 	 open($sym, '<', $path);
 	 push @cat, do{ local $/; <$sym>};
          close($sym);
@@ -37,12 +37,12 @@ print "1..2\n";
      print "ok 1\n";
      @cat = ();
      for my $path ( @files ){
-         my $sym = Symbol::qualify_to_ref($path);
+         my $sym = Symbol::fetch_glob($path);
 	 cacheout $path;
 	 print $sym "$path 333\n";
      }
      for my $path ( @files ){
-         my $sym = Symbol::qualify_to_ref($path);
+         my $sym = Symbol::fetch_glob($path);
 	 open($sym, '<', $path);
 	 push @cat, do{ local $/; <$sym>};
          close($sym);

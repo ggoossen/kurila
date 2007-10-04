@@ -143,8 +143,8 @@ our ($AUTOLOAD, $counter);
   my $c = ++$counter;
   my $method = $AUTOLOAD; 
   no strict 'refs';
-  *{Symbol::qualify_to_ref($AUTOLOAD)} = sub { "new B: In $method, $c" };
-  goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+  *{Symbol::fetch_glob($AUTOLOAD)} = sub { "new B: In $method, $c" };
+  goto &{Symbol::fetch_glob($AUTOLOAD)};
 };
 
 is(A->eee(), "new B: In A::eee, 4");	# We get a correct $autoload
@@ -153,7 +153,7 @@ is(A->eee(), "new B: In A::eee, 4");	# Which sticks
 {
     # this test added due to bug discovery
     no strict 'refs';
-    is(defined(@{*{Symbol::qualify_to_ref("unknown_package::ISA")}}) ? "defined" : "undefined", "undefined");
+    is(defined(@{*{Symbol::fetch_glob("unknown_package::ISA")}}) ? "defined" : "undefined", "undefined");
 }
 
 # test that failed subroutine calls don't affect method calls

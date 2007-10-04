@@ -90,7 +90,7 @@ sub AUTOLOAD {
 	Carp::croak($error);
     }
     eval "sub $AUTOLOAD { $val }";
-    goto &{Symbol::qualify_to_ref($AUTOLOAD)};
+    goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 XSLoader::load 'File::Glob', $VERSION;

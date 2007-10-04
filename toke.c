@@ -11008,7 +11008,7 @@ S_scan_inputsymbol(pTHX_ char *start)
     */
 
     if (d - PL_tokenbuf != len) {
-	Perl_croak(aTHX_ "<> with something take looks like a glob pattern");
+	Perl_croak(aTHX_ "Usage of the <> operator with a glob pattern, use the 'glob' function instead");
     }
     else {
 	bool readline_overriden = FALSE;

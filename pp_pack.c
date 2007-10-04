@@ -667,23 +667,6 @@ uni_to_bytes(pTHX_ const char **s, const char *end, const char *buf, int buf_len
     return TRUE;
 }
 
-STATIC char *
-S_bytes_to_uni(const U8 *start, STRLEN len, char *dest) {
-    const U8 * const end = start + len;
-
-    while (start < end) {
-	const UV uv = NATIVE_TO_ASCII(*start);
-	if (UNI_IS_INVARIANT(uv))
-	    *dest++ = (char)(U8)UTF_TO_NATIVE(uv);
-	else {
-	    *dest++ = (char)(U8)UTF8_EIGHT_BIT_HI(uv);
-	    *dest++ = (char)(U8)UTF8_EIGHT_BIT_LO(uv);
-	}
-	start++;
-    }
-    return dest;
-}
-
 #define PUSH_BYTES(cur, buf, len)				\
 STMT_START {							\
 	Copy(buf, cur, len, char);				\

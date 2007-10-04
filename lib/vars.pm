@@ -27,12 +27,12 @@ sub import {
 		}
 	    }
 	    $sym = "${callpack}::$sym" unless $sym =~ /::/;
-	    *{Symbol::qualify_to_ref($sym)} =
-		(  $ch eq "\$" ? \${*{Symbol::qualify_to_ref($sym)}}
-		 : $ch eq "\@" ? \@{*{Symbol::qualify_to_ref($sym)}}
-		 : $ch eq "\%" ? \%{*{Symbol::qualify_to_ref($sym)}}
-		 : $ch eq "\*" ? \*{Symbol::qualify_to_ref($sym)}
-		 : $ch eq "\&" ? \&{*{Symbol::qualify_to_ref($sym)}}
+	    *{Symbol::fetch_glob($sym)} =
+		(  $ch eq "\$" ? \${*{Symbol::fetch_glob($sym)}}
+		 : $ch eq "\@" ? \@{*{Symbol::fetch_glob($sym)}}
+		 : $ch eq "\%" ? \%{*{Symbol::fetch_glob($sym)}}
+		 : $ch eq "\*" ? \*{Symbol::fetch_glob($sym)}
+		 : $ch eq "\&" ? \&{*{Symbol::fetch_glob($sym)}}
 		 : do {
 		     require Carp;
 		     Carp::croak("'$_' is not a valid variable name");

@@ -34,7 +34,7 @@ sub import {
     my @imports = @_;
     foreach my $sym (@imports) {
         no strict 'refs';
-	*{Symbol::qualify_to_ref("${callpack}::$sym")} = \&{*{Symbol::qualify_to_ref("${callpack}::$sym")}};
+	*{Symbol::fetch_glob("${callpack}::$sym")} = \&{*{Symbol::fetch_glob("${callpack}::$sym")}};
     }
 };
 

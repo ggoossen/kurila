@@ -410,7 +410,7 @@ sub glob {
     return unless @_;
     my $sym = shift;
     my $callpkg = ($sym =~ s/^GLOBAL_//s ? 'CORE::GLOBAL' : caller(0));
-    *{Symbol::qualify_to_ref($callpkg.'::'.$sym)} = \&{*{Symbol::qualify_to_ref($pkg.'::'.$sym)}} if $sym eq 'glob';
+    *{Symbol::fetch_glob($callpkg.'::'.$sym)} = \&{*{Symbol::fetch_glob($pkg.'::'.$sym)}} if $sym eq 'glob';
     }
 }
 1;

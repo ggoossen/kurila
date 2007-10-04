@@ -16,9 +16,9 @@ sub import {
     my $callpkg = caller();
     no strict 'refs';
     
-    *{Symbol::qualify_to_ref($callpkg."::qv")} = 
+    *{Symbol::fetch_glob($callpkg."::qv")} = 
 	    sub {return bless version::qv(shift), $class }
-	unless defined (&{Symbol::qualify_to_ref("$callpkg\::qv")});
+	unless defined (&{Symbol::fetch_glob("$callpkg\::qv")});
 
 }
 

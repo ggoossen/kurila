@@ -130,15 +130,15 @@ sub import {
 
 # Open in their package.
 sub cacheout_open {
-  return open(*{Symbol::qualify_to_ref(caller(1) . '::' . $_[1])}, $_[0], $_[1]) && $_[1];
+  return open(*{Symbol::fetch_glob(caller(1) . '::' . $_[1])}, $_[0], $_[1]) && $_[1];
 }
 
 # Close in their package.
 sub cacheout_close {
   # Short-circuit in case the filehandle disappeared
   my $pkg = caller($_[1]||0);
-  defined fileno(*{Symbol::qualify_to_ref($pkg . '::' . $_[0])}) &&
-    CORE::close(*{Symbol::qualify_to_ref($pkg . '::' . $_[0])});
+  defined fileno(*{Symbol::fetch_glob($pkg . '::' . $_[0])}) &&
+    CORE::close(*{Symbol::fetch_glob($pkg . '::' . $_[0])});
   delete $isopen{$_[0]};
 }
 

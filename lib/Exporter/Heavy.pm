@@ -31,7 +31,7 @@ sub _rebuild_cache {
     my ($pkg, $exports, $cache) = @_;
     s/^&// foreach @$exports;
     @{$cache}{@$exports} = (1) x @$exports;
-    my $ok = \@{*{Symbol::qualify_to_ref("${pkg}::EXPORT_OK")}};
+    my $ok = \@{*{Symbol::fetch_glob("${pkg}::EXPORT_OK")}};
     if (@$ok) {
 	s/^&// foreach @$ok;
 	@{$cache}{@$ok} = (1) x @$ok;
@@ -61,7 +61,7 @@ sub heavy_export {
 
     my($pkg, $callpkg, @imports) = @_;
     my($type, $sym, $cache_is_current, $oops);
-    my($exports, $export_cache) = (\@{*{Symbol::qualify_to_ref("${pkg}::EXPORT")}},
+    my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("${pkg}::EXPORT")}},
                                    $Exporter::Cache{$pkg} ||= {});
 
     if (@imports) {
@@ -71,7 +71,7 @@ sub heavy_export {
 	}
 
 	if (grep m{^[/!:]}, @imports) {
-	    my $tagsref = \%{*{Symbol::qualify_to_ref("${pkg}::EXPORT_TAGS")}};
+	    my $tagsref = \%{*{Symbol::fetch_glob("${pkg}::EXPORT_TAGS")}};
 	    my $tagdata;
 	    my %imports;
 	    my($remove, $spec, @names, @allexports);
@@ -160,7 +160,7 @@ sub heavy_export {
 	@imports = @$exports;
     }
 
-    my($fail, $fail_cache) = (\@{*{Symbol::qualify_to_ref("${pkg}::EXPORT_FAIL")}},
+    my($fail, $fail_cache) = (\@{*{Symbol::fetch_glob("${pkg}::EXPORT_FAIL")}},
                               $Exporter::FailCache{$pkg} ||= {});
 
     if (@$fail) {
@@ -193,16 +193,16 @@ sub heavy_export {
 
     foreach $sym (@imports) {
 	# shortcut for the common case of no type character
-	(*{Symbol::qualify_to_ref("${callpkg}::$sym")} = \&{*{Symbol::qualify_to_ref("${pkg}::$sym")}}, next)
+	(*{Symbol::fetch_glob("${callpkg}::$sym")} = \&{*{Symbol::fetch_glob("${pkg}::$sym")}}, next)
 	    unless $sym =~ s/^(\W)//;
 	$type = $1;
 	no warnings 'once';
-	*{Symbol::qualify_to_ref("${callpkg}::$sym")} =
-	    $type eq '&' ? \&{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
-	    $type eq '$' ? \${*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
-	    $type eq '@' ? \@{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
-	    $type eq '%' ? \%{*{Symbol::qualify_to_ref("${pkg}::$sym")}} :
-	    $type eq '*' ?  *{Symbol::qualify_to_ref("${pkg}::$sym")} :
+	*{Symbol::fetch_glob("${callpkg}::$sym")} =
+	    $type eq '&' ? \&{*{Symbol::fetch_glob("${pkg}::$sym")}} :
+	    $type eq '$' ? \${*{Symbol::fetch_glob("${pkg}::$sym")}} :
+	    $type eq '@' ? \@{*{Symbol::fetch_glob("${pkg}::$sym")}} :
+	    $type eq '%' ? \%{*{Symbol::fetch_glob("${pkg}::$sym")}} :
+	    $type eq '*' ?  *{Symbol::fetch_glob("${pkg}::$sym")} :
 	    do { require Carp; Carp::croak("Can't export symbol: $type$sym") };
     }
 }
@@ -221,8 +221,8 @@ sub heavy_export_to_level
 sub _push_tags {
     my($pkg, $var, $syms) = @_;
     my @nontag = ();
-    my $export_tags = \%{*{Symbol::qualify_to_ref("${pkg}::EXPORT_TAGS")}};
-    push(@{*{Symbol::qualify_to_ref("${pkg}::$var")}},
+    my $export_tags = \%{*{Symbol::fetch_glob("${pkg}::EXPORT_TAGS")}};
+    push(@{*{Symbol::fetch_glob("${pkg}::$var")}},
 	map { $export_tags->{$_} ? @{$export_tags->{$_}} 
                                  : scalar(push(@nontag,$_),$_) }
 		(@$syms) ? @$syms : keys %$export_tags);

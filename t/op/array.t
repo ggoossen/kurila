@@ -353,14 +353,14 @@ sub test_arylen {
     # Bug #37350
     no strict 'refs';
     my @array = (1..4);
-    $#{*{Symbol::qualify_to_ref(scalar @array)}} = 7;
+    $#{*{Symbol::fetch_glob(scalar @array)}} = 7;
     is ($#{4}, 7);
 
     my $x;
     $#{$x} = 3;
     is(scalar @$x, 4);
 
-    push @{*{Symbol::qualify_to_ref(scalar @array)}}, 23;
+    push @{*{Symbol::fetch_glob(scalar @array)}}, 23;
     is ($4[8], 23);
 }
 {
@@ -368,14 +368,14 @@ sub test_arylen {
     no strict 'refs';
     use vars '@array';
     @array = (1..4);
-    $#{*{Symbol::qualify_to_ref(scalar @array)}} = 7;
+    $#{*{Symbol::fetch_glob(scalar @array)}} = 7;
     is ($#{4}, 7);
 
     my $x;
     $#{$x} = 3;
     is(scalar @$x, 4);
 
-    push @{*{Symbol::qualify_to_ref(scalar @array)}}, 23;
+    push @{*{Symbol::fetch_glob(scalar @array)}}, 23;
     is ($4[8], 23);
 }
 

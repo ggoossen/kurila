@@ -50,7 +50,7 @@ sub import
     my $caller = caller();
     foreach my $sym (@EXPORT) {
         no strict 'refs';
-        *{Symbol::qualify_to_ref($caller.'::'.$sym)} = \&{$sym};
+        *{Symbol::fetch_glob($caller.'::'.$sym)} = \&{$sym};
     }
 }
 

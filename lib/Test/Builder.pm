@@ -1146,7 +1146,7 @@ foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
     };
 
     no strict 'refs';
-    *{Symbol::qualify_to_ref(__PACKAGE__.'::'.$method)} = $code;
+    *{Symbol::fetch_glob(__PACKAGE__.'::'.$method)} = $code;
 }
 
 
@@ -1575,7 +1575,7 @@ sub todo {
     return 0 unless $pack;
 
     no strict 'refs';
-    return defined ${*{Symbol::qualify_to_ref($pack.'::TODO')}} ? ${*{Symbol::qualify_to_ref($pack.'::TODO')}}
+    return defined ${*{Symbol::fetch_glob($pack.'::TODO')}} ? ${*{Symbol::fetch_glob($pack.'::TODO')}}
                                      : 0;
 }
 

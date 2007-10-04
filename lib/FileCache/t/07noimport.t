@@ -17,7 +17,7 @@ plan( tests => 1 );
     my $file = 'foo';
     END { unlink $file }
     FileCache::cacheout($file);
-    $file = Symbol::qualify_to_ref($file);
+    $file = Symbol::fetch_glob($file);
     print $file "bar";
     close $file;
 

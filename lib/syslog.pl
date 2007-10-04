@@ -145,7 +145,7 @@ sub xlate {
     $name = uc $name;
     $name = "LOG_$name" unless $name =~ /^LOG_/;
     $name = "syslog'$name";
-    defined &{*{Symbol::qualify_to_ref($name)}} ? &{*{Symbol::qualify_to_ref($name)}} : -1;
+    defined &{*{Symbol::fetch_glob($name)}} ? &{*{Symbol::fetch_glob($name)}} : -1;
 }
 
 sub connect {

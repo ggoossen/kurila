@@ -265,7 +265,7 @@ use vars qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
 
 sub bootstrap_inherit {
     my $module = $_[0];
-    local *isa = *{Symbol::qualify_to_ref("$module\::ISA")};
+    local *isa = *{Symbol::fetch_glob("$module\::ISA")};
     local @isa = (@isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     bootstrap(@_);

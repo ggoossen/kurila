@@ -90,6 +90,7 @@ ext/B/O.pm		Compiler front-end module (-MO=...)
 ext/B/t/b.t		See if B works
 ext/B/t/concise.t	See whether B::Concise works
 ext/B/t/concise-xs.t	See whether B::Concise recognizes XS functions
+ext/B/t/debugging.t	-Dx optree rendering
 ext/B/t/debug.t		See if B::Debug works
 ext/B/t/deparse.t	See if B::Deparse works
 ext/B/t/f_map			code from perldoc -f map
@@ -106,7 +107,6 @@ ext/B/t/optree_samples.t	various basic codes: if for while
 ext/B/t/optree_sort.t		inplace sort optimization regression
 ext/B/t/optree_specials.t	BEGIN, END, etc code
 ext/B/t/optree_varinit.t	my,our,local var init optimization
-ext/B/t/debugging.t	-Dx optree rendering
 ext/B/t/o.t		See if O works
 ext/B/t/pluglib/B/Lint/Plugin/Test.pm	See if B::Lint works
 ext/B/t/pragma.t	See if user pragmas work.
@@ -947,6 +947,77 @@ ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
 ext/Opcode/Safe.pm		Safe extension Perl module
 ext/Opcode/t/Opcode.t		See if Opcode works
 ext/Opcode/t/ops.t		See if Opcode works
+ext/Perl6-Form/Changes	Perl6-Form
+ext/Perl6-Form/demo/demo_advert.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_after.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_arrowfilled.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_balanced.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_break_width.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_break_word.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_bulletcols.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_censor.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_centred.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_chart.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_checksum.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_columns	Perl6-Form
+ext/Perl6-Form/demo/demo_cruciform.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_currency.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_currency_table.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_data.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_down.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_drill.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_escape.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_farsi.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_fill.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_flow.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_gattaca.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_graph.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_gutter.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_height.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_interline.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_linenums.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_line.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_minimal.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_money.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_multibullets.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_multiline.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_nested.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_newline.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_numbers.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_numlist.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_oddeven.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_options.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_overflowed_columns.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_page.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_pages.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_perl5.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_preset.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_printf.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_quoted_data.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_recipe_overflow.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_recipe.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_simple.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_single.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_slice.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_spill.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_squeeze.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_stages.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_starred.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_starry.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_stretch.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_tabular_points.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_TeX.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_toc.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_userdef.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_verbatim2.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_verbatim.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_vfill.pl	Perl6-Form
+ext/Perl6-Form/demo/demo_zero.pl	Perl6-Form
+ext/Perl6-Form/Form.pm	Perl6-Form
+ext/Perl6-Form/Makefile.PL	Perl6-Form
+ext/Perl6-Form/MANIFEST	Perl6-Form
+ext/Perl6-Form/README	Perl6-Form
+ext/Perl6-Form/t/1.t	Perl6-Form
 ext/PerlIO/encoding/encoding.pm	PerlIO::encoding
 ext/PerlIO/encoding/encoding.xs	PerlIO::encoding
 ext/PerlIO/encoding/Makefile.PL	PerlIO::encoding makefile writer
@@ -1089,6 +1160,7 @@ ext/Storable/t/threads.t	Does Storable work with threads?
 ext/Storable/t/tied_hook.t	See if Storable works
 ext/Storable/t/tied_items.t	See if Storable works
 ext/Storable/t/tied.t		See if Storable works
+ext/Storable/t/utf8hash.t	Perl6-Form
 ext/Storable/t/utf8.t		See if Storable works
 ext/Storable/t/weak.t		Can Storable store weakrefs
 ext/Sys/Hostname/Hostname.pm	Sys::Hostname extension Perl module
@@ -1440,8 +1512,8 @@ lib/AutoSplit.pm		Split up autoload functions
 lib/AutoSplit.t			See if AutoSplit works
 lib/autouse.pm			Load and call a function only when it's used
 lib/autouse.t			See if autouse works
-lib/base.pm			Establish IS-A relationship at compile time
 lib/base/Changes		base.pm changelog
+lib/base.pm			Establish IS-A relationship at compile time
 lib/base/t/base.t		See if base works
 lib/base/t/fields-base.t	See if fields work
 lib/base/t/fields.t		See if fields work
@@ -1456,14 +1528,14 @@ lib/bigint.pl			An arbitrary precision integer arithmetic package
 lib/bigintpl.t			See if bigint.pl works
 lib/bigint.pm			bigint
 lib/bignum.pm			bignum
+lib/bignum/t/big_e_pi.t		See if bignum exports e() and PI()
 lib/bignum/t/bigexp.t		See if bignum works
 lib/bignum/t/bigint.t		See if bigint works
 lib/bignum/t/bignum.t		See if bignum works
 lib/bignum/t/bigrat.t		See if bigrat works
 lib/bignum/t/bii_e_pi.t		See if bigint exports e() and PI()
-lib/bignum/t/bir_e_pi.t		See if bigrat exports e() and PI()
-lib/bignum/t/big_e_pi.t		See if bignum exports e() and PI()
 lib/bignum/t/biinfnan.t		See if bignum works
+lib/bignum/t/bir_e_pi.t		See if bigrat exports e() and PI()
 lib/bignum/t/bninfnan.t		See if bignum works
 lib/bignum/t/bn_lite.t		See if bignum with Math::BigInt::Lite works
 lib/bignum/t/brinfnan.t		See if bignum works
@@ -1722,8 +1794,8 @@ lib/ExtUtils/t/PL_FILES.t	Test PL_FILES in MakeMaker
 lib/ExtUtils/t/pm.t		See if Makemaker can handle PM
 lib/ExtUtils/t/postamble.t	See if postamble works
 lib/ExtUtils/t/prefixify.t	See if MakeMaker can apply a PREFIX
-lib/ExtUtils/t/prereq.t		See if MakeMaker works
 lib/ExtUtils/t/prereq_print.t	See if PREREQ_PRINT works
+lib/ExtUtils/t/prereq.t		See if MakeMaker works
 lib/ExtUtils/t/problems.t	How MakeMaker reacts to build problems
 lib/ExtUtils/t/prompt.t		See if E::MM::prompt() works
 lib/ExtUtils/t/recurs.t		See if recursive builds work
@@ -1921,7 +1993,6 @@ lib/Math/BigInt/t/alias.inc	Support for BigInt tests
 lib/Math/BigInt/t/bare_mbf.t	Test MBF under Math::BigInt::BareCalc
 lib/Math/BigInt/t/bare_mbi.t	Test MBI under Math::BigInt::BareCalc
 lib/Math/BigInt/t/bare_mif.t	Rounding tests under BareCalc
-lib/Math/BigInt/t/big_pi_e.t	test bpi() and bexp()
 lib/Math/BigInt/t/bigfltpm.inc	Shared tests for bigfltpm.t and sub_mbf.t
 lib/Math/BigInt/t/bigfltpm.t	See if BigFloat.pm works
 lib/Math/BigInt/t/bigintc.t	See if BigInt/Calc.pm works
@@ -1929,6 +2000,7 @@ lib/Math/BigInt/t/bigintpm.inc	Shared tests for bigintpm.t and sub_mbi.t
 lib/Math/BigInt/t/bigintpm.t	See if BigInt.pm works
 lib/Math/BigInt/t/bigints.t	See if BigInt.pm works
 lib/Math/BigInt/t/biglog.t	Test the log function
+lib/Math/BigInt/t/big_pi_e.t	test bpi() and bexp()
 lib/Math/BigInt/t/bigroot.t	Test the broot function
 lib/Math/BigInt/t/calling.t	Test calling conventions
 lib/Math/BigInt/t/config.t	Test Math::BigInt->config()
@@ -2748,12 +2820,16 @@ lib/warnings.pm			For "use warnings"
 lib/warnings/register.pm	For "use warnings::register"
 lib/warnings.t			See if warning controls work
 locale.c			locale-specific utility functions
+mad/convert		Utility script to run convert Perl 5 code to Perl Kurila code	
+mad/Convert.pm		Used by	mad/convert
 madly.c				parser code for MAD build
 mad/Nomad.pm			Converts MAD XML dump to Perl 5
 mad/p55				Perl 5 to Perl 5 translator - driver for nomad
 mad/P5AST.pm			Used by nomad
+mad/p5kurila.pl		Script to convert a Perl 5 MAD XML dump to Perl Kurila XML
 mad/P5re.pm			Used by nomad
 mad/PLXML.pm			Used by nomad
+mad/t/kurila.t		Test scrip for Perl 5 to Perl Kurila conversion
 mad/t/p55.t			Test for the Perl 5 to Perl 5 translator
 makeaperl.SH			perl script that produces a new perl binary
 makedef.pl			Create symbol export lists for linking
@@ -2950,7 +3026,9 @@ pod/buildtoc			Update files based on pod.lst
 pod/checkpods.PL		Tool to check for common errors in pods
 pod/kurila01delta.pod	What is new for Perl Kurila 0.1
 pod/kurila02delta.pod	What is new for Perl Kurila 0.2
+pod/kurila13delta.pod	What is new for Perl Kurila 1.3
 pod/kurilaintro.pod	Description of Perl Kurila
+pod/kurilatoc.pod		Perl Kurila documentation table of contents
 pod.lst				List the pods and their roles
 pod/Makefile.SH			generate Makefile which makes pods into something else
 pod/perl5004delta.pod		Perl changes in version 5.004
@@ -3056,7 +3134,6 @@ pod/perlsub.pod			Perl subroutines
 pod/perlsyn.pod			Perl syntax
 pod/perlthrtut.pod		Perl threads tutorial
 pod/perltie.pod			Perl objects hidden behind simple variables
-pod/kurilatoc.pod		Perl Kurila documentation table of contents
 pod/perltodo.pod		Perl things to do
 pod/perltooc.pod		Perl OO tutorial, part 2
 pod/perltoot.pod		Perl OO tutorial, part 1
@@ -3296,6 +3373,7 @@ t/io/pipe.t			See if secure pipes work
 t/io/print.t			See if print commands work
 t/io/read.t			See if read works
 t/io/say.t			See if say works
+t/io/select.t			See if select works
 t/io/tell.t			See if file seeking works
 t/io/through.t			See if pipe passes data intact
 t/io/utf8.t			See if file seeking works
@@ -3321,7 +3399,6 @@ t/lib/contains_pod.xr		Pod-Parser test file
 t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
 t/lib/Dev/Null.pm		Module for testing Test::Harness
-t/lib/Dummy.pm			Module for testing base.pm
 t/lib/dprof/test1_t		Perl code profiler tests
 t/lib/dprof/test1_v		Perl code profiler tests
 t/lib/dprof/test2_t		Perl code profiler tests
@@ -3339,6 +3416,7 @@ t/lib/dprof/test7_v		Perl code profiler tests
 t/lib/dprof/test8_t		Perl code profiler tests
 t/lib/dprof/test8_v		Perl code profiler tests
 t/lib/dprof/V.pm		Perl code profiler tests
+t/lib/Dummy.pm			Module for testing base.pm
 t/lib/feature/err		Tests for enabling/disabling err feature
 t/lib/feature/implicit		Tests for implicit loading of feature.pm
 t/lib/feature/nonesuch		Tests for enabling/disabling nonexistent feature
@@ -3349,9 +3427,9 @@ t/lib/Filter/Simple/FilterOnlyTest.pm	Helper file for Filter::Simple tests
 t/lib/Filter/Simple/FilterTest.pm	Helper file for Filter::Simple tests
 t/lib/Filter/Simple/ImportTest.pm	Helper file for Filter::Simple tests
 t/lib/filter-util.pl		See if Filter::Util::Call works
-t/lib/HasSigDie.pm		Module for testing base.pm
 t/lib/h2ph.h			Test header file for h2ph
 t/lib/h2ph.pht			Generated output from h2ph.h by h2ph, for comparison
+t/lib/HasSigDie.pm		Module for testing base.pm
 t/lib/locale/latin1		Part of locale.t in Latin 1
 t/lib/locale/utf8		Part of locale.t in UTF8
 t/lib/MakeMaker/Test/Setup/BFD.pm	MakeMaker test utilities
@@ -3642,13 +3720,13 @@ t/op/readline.t			See if <> / readline / rcatline work
 t/op/read.t			See if read() works
 t/op/recurse.t			See if deep recursion works
 t/op/ref.t			See if refs and objects work
+t/op/reg_email.t		See if regex recursion works by parsing email addresses
 t/op/regexp_noamp.t		See if regular expressions work with optimizations
 t/op/regexp_notrie.t		See if regular expressions work without trie optimisation
 t/op/regexp_qr_embed.t		See if regular expressions work with embedded qr//
 t/op/regexp_qr.t		See if regular expressions work as qr//
 t/op/regexp.t			See if regular expressions work
 t/op/regexp_trielist.t		See if regular expressions work with trie optimisation
-t/op/reg_email.t		See if regex recursion works by parsing email addresses
 t/op/reg_mesg.t			See if one can get regular expression errors
 t/op/reg_namedcapture.t		Make sure glob assignment doesn't break named capture
 t/op/reg_nc_tie.t	        Test the tied methods of Tie::Hash::NamedCapture
@@ -3783,7 +3861,7 @@ universal.c			The default UNIVERSAL package methods
 unixish.h			Defines that are assumed on Unix
 utf8.c				Unicode routines
 utf8.h				Unicode header
-utfebcdic.h                     Unicode on EBCDIC (UTF-EBCDIC, tr16) header
+utfebcdic.h			Unicode on EBCDIC (UTF-EBCDIC, tr16) header
 util.c				Utility routines
 util.h				Dummy header
 utils/c2ph.PL			program to translate dbx stabs to perl

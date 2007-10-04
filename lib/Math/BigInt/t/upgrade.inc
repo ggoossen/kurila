@@ -12,7 +12,7 @@
 # with ^, since then we test whether it has the proper class and that it left
 # the upgrade variable alone.
 
-my $version = ${Symbol::qualify_to_ref("$class\::VERSION")};
+my $version = ${Symbol::fetch_glob("$class\::VERSION")};
 
 ##############################################################################
 # for testing inheritance of _swap

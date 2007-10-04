@@ -125,7 +125,7 @@ my $Mapping = {
                     qw[_error_msg _error_msg_long]
     ) {
         no strict 'refs';
-        *{Symbol::qualify_to_ref($method)} = sub {
+        *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
                         $self->{$method} = $_[0] if @_;
                         return $self->{$method};

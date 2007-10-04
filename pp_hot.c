@@ -811,8 +811,7 @@ PP(pp_rv2av)
 		    if (SvROK(sv))
 			goto wasref;
 		}
-		gv = Perl_softref2xv(aTHX_ sv, is_pp_rv2av ? an_array : a_hash,
-				     type, &sp);
+		gv = Perl_softref2xv(aTHX_ sv, is_pp_rv2av ? an_array : a_hash);
 		if (!gv)
 		    RETURN;
 	    }
