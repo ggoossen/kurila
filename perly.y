@@ -76,7 +76,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DOLSHARP DO HASHBRACK NOAMP
-%token <i_tkval> LOCAL MY MYSUB REQUIRE COMPTFUNC
+%token <opval> LOCAL MY MYSUB REQUIRE COMPTFUNC
 %token <i_tkval> COLONATTR
 
 %type <ival> prog progstart remember mremember savescope
@@ -1167,31 +1167,7 @@ term	:	termbinop
 			}
 	|	COMPTFUNC listexpr                  /* foo(@args) */
 			{ 
-                            dSP;
-
-                            SV* args_b = newSV(0);
-                            sv_setiv(newSVrv(args_b, "B::LISTOP"), PTR2IV($2));
-
-                            ENTER;
-                            PUSHMARK(SP);
-                            XPUSHs(args_b);
-                            PUTBACK;
-
-                            call_sv(cSVOPx_sv($<opval>1), G_SCALAR);
-
-                            SPAGAIN;
-                            SV* sv = POPs;
-                            $$ = INT2PTR(OP*, SvIV(SvRV(sv)));
-
-                            if (SvREFCNT(args_b) != 1)
-                                yyerror("reference to B::OP argument kept");
-                            SvREFCNT_dec(args_b);
-
-                            LEAVE;
-
-                            /* FIXME save mad */
-                            op_free($<opval>1);
-/* 			  TOKEN_GETMAD($1,$$,'o'); */
+                            $$ = newBINOP(OP_COMPTFUNC, 0, $1, $2);
 			}
 	|	UNIOPSUB
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1)); }

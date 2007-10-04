@@ -392,6 +392,8 @@ EXTCONST char* const PL_op_name[] = {
 	"lock",
 	"comptfunc",
 	"custom",
+	NULL,
+
 };
 #endif
 
