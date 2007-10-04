@@ -177,6 +177,7 @@ for (@ops) {
 }
 
 print <<END;
+\tNULL,\n
 };
 #endif
 

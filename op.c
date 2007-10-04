@@ -6812,10 +6812,42 @@ Perl_ck_smartmatch(pTHX_ OP *o)
 OP *
 Perl_ck_comptfunc(pTHX_ OP *o)
 {
-    OP * const kid = cLISTOPo->op_first;
-    /* SV* comptfunc = o->op_private; */
-    /* call_sv(comptfunc); */
-    return kid;
+    OP * const first = cBINOPo->op_first;
+    OP * newop;
+    SV * sv;
+
+    dSP;
+
+    SV* args_b = NULL;
+
+    ENTER;
+    PUSHMARK(SP);
+    if (first->op_sibling) {
+	args_b = newSV(0);
+	sv_setiv(newSVrv(args_b, "B::LISTOP"), PTR2IV(first->op_sibling));
+	XPUSHs(args_b);
+    }
+    PUTBACK;
+
+    call_sv(cSVOPx_sv(first), G_SCALAR);
+
+    SPAGAIN;
+    sv = POPs;
+    newop = INT2PTR(OP*, SvIV(SvRV(sv)));
+
+    if (!newop)
+	Perl_die(aTHX "No opcode returned by the comptfunc");
+
+    if (args_b && SvREFCNT(args_b) != 1)
+	Perl_die(aTHX "reference to B::OP argument kept");
+    SvREFCNT_dec(args_b);
+
+    LEAVE;
+
+    cBINOPo->op_first = NULL;
+    op_free(o);
+
+    return newop;
 }
 
 OP *
