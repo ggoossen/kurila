@@ -1329,6 +1329,10 @@ List all constants declared in a package
 
 A generic input parsing/checking mechanism.
 
+=item Perl6-Form
+
+Implements the Perl 6 'form' built-in
+
 =item PerlIO
 
 On demand loader for PerlIO layers and root of PerlIO::* name space
