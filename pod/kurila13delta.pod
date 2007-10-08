@@ -6,7 +6,11 @@ kurila13delta - what is new for Perl Kurila 1.3
 
 This document describes differences between Perl Kurila 0.2 and Perl Kurila 1.3
 
-=head1 Highlights In Kurila 1.3
+=head1 Highlights In Perl Kurila 1.3
+
+Perl Kurila 1.3 tries to reduce some ambiguities in Perl code, and to
+simplify the perl internals. Some uncommon and error prone options
+have been removed. More specific:
 
 =over 4
 
