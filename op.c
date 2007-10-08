@@ -6810,7 +6810,7 @@ Perl_ck_smartmatch(pTHX_ OP *o)
 }
 
 OP *
-Perl_ck_comptfunc(pTHX_ OP *o)
+Perl_ck_compsub(pTHX_ OP *o)
 {
     OP * const first = cBINOPo->op_first;
     OP * newop;
@@ -6836,7 +6836,7 @@ Perl_ck_comptfunc(pTHX_ OP *o)
     newop = INT2PTR(OP*, SvIV(SvRV(sv)));
 
     if (!newop)
-	Perl_die(aTHX "No opcode returned by the comptfunc");
+	Perl_die(aTHX "No opcode returned by the compsub");
 
     if (args_b && SvREFCNT(args_b) != 1)
 	Perl_die(aTHX "reference to B::OP argument kept");
@@ -6844,7 +6844,7 @@ Perl_ck_comptfunc(pTHX_ OP *o)
 
     LEAVE;
 
-    cBINOPo->op_first = NULL;
+    cBINOPo->op_first->op_sibling = NULL;
     op_free(o);
 
     return newop;

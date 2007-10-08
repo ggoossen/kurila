@@ -84,7 +84,7 @@
      MY = 299,
      MYSUB = 300,
      REQUIRE = 301,
-     COMPTFUNC = 302,
+     COMPSUB = 302,
      COLONATTR = 303,
      PREC_LOW = 304,
      DOROP = 305,
@@ -155,7 +155,7 @@
 #define MY 299
 #define MYSUB 300
 #define REQUIRE 301
-#define COMPTFUNC 302
+#define COMPSUB 302
 #define COLONATTR 303
 #define PREC_LOW 304
 #define DOROP 305

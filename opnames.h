@@ -372,7 +372,7 @@ typedef enum opcode {
 	OP_GETLOGIN,	/* 354 */
 	OP_SYSCALL,	/* 355 */
 	OP_LOCK,	/* 356 */
-	OP_COMPTFUNC,	/* 357 */
+	OP_COMPSUB,	/* 357 */
 	OP_CUSTOM,	/* 358 */
 	OP_max		
 } opcode;
