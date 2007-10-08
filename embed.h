@@ -1912,7 +1912,7 @@
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
 #define ck_chdir		Perl_ck_chdir
-#define ck_comptfunc		Perl_ck_comptfunc
+#define ck_compsub		Perl_ck_compsub
 #define ck_concat		Perl_ck_concat
 #define ck_defined		Perl_ck_defined
 #define ck_delete		Perl_ck_delete
@@ -1987,7 +1987,7 @@
 #define pp_close		Perl_pp_close
 #define pp_closedir		Perl_pp_closedir
 #define pp_complement		Perl_pp_complement
-#define pp_comptfunc		Perl_pp_comptfunc
+#define pp_compsub		Perl_pp_compsub
 #define pp_concat		Perl_pp_concat
 #define pp_cond_expr		Perl_pp_cond_expr
 #define pp_connect		Perl_pp_connect
@@ -4189,7 +4189,7 @@
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
 #define ck_chdir(a)		Perl_ck_chdir(aTHX_ a)
-#define ck_comptfunc(a)		Perl_ck_comptfunc(aTHX_ a)
+#define ck_compsub(a)		Perl_ck_compsub(aTHX_ a)
 #define ck_concat(a)		Perl_ck_concat(aTHX_ a)
 #define ck_defined(a)		Perl_ck_defined(aTHX_ a)
 #define ck_delete(a)		Perl_ck_delete(aTHX_ a)
@@ -4264,7 +4264,7 @@
 #define pp_close()		Perl_pp_close(aTHX)
 #define pp_closedir()		Perl_pp_closedir(aTHX)
 #define pp_complement()		Perl_pp_complement(aTHX)
-#define pp_comptfunc()		Perl_pp_comptfunc(aTHX)
+#define pp_compsub()		Perl_pp_compsub(aTHX)
 #define pp_concat()		Perl_pp_concat(aTHX)
 #define pp_cond_expr()		Perl_pp_cond_expr(aTHX)
 #define pp_connect()		Perl_pp_connect(aTHX)

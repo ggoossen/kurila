@@ -4547,10 +4547,10 @@ PP(pp_lock)
     RETURN;
 }
 
-PP(pp_comptfunc)
+PP(pp_compsub)
 {
     dVAR;
-    DIE(aTHX_ "panic: comptfunc should be replaced");
+    DIE(aTHX_ "panic: compsub should be replaced");
 }
 
 

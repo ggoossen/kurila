@@ -738,7 +738,6 @@ UNOP_new(class, type, flags, sv_first)
         if (typenum == OP_CUSTOM)
             o->op_ppaddr = custom_op_ppaddr(SvPV_nolen(type));
 #endif
-        PL_curpad = sparepad;
         PL_op = saveop;
         }
             ST(0) = sv_newmortal();
@@ -1349,11 +1348,29 @@ SvPV(sv,...)
   }
 }
 
+MODULE = B::Generate    PACKAGE = B::Generate     PREFIX = B_Generate
+
+int
+allocmy(char* name)
+    CODE:
+        SV **old_curpad           = PL_curpad;
+        AV *old_comppad           = PL_comppad;
+
+        PL_comppad =           *(AV**) av_fetch(CvPADLIST(PL_compcv), 1, 0);
+        PL_curpad            = AvARRAY(PL_comppad);
+        
+        RETVAL = Perl_pad_add_name(name, NULL, FALSE, FALSE);
+
+        PL_comppad = old_comppad;
+        PL_curpad  = old_curpad;
+    OUTPUT:
+        RETVAL
+
 BOOT:
     specialsv_list[0] = Nullsv;
     specialsv_list[1] = &PL_sv_undef;
     specialsv_list[2] = &PL_sv_yes;
     specialsv_list[3] = &PL_sv_no;
-    specialsv_list[4] = pWARN_ALL;
-    specialsv_list[5] = pWARN_NONE;
-    specialsv_list[6] = pWARN_STD;
+    specialsv_list[4] = (SV*) pWARN_ALL;
+    specialsv_list[5] = (SV*) pWARN_NONE;
+    specialsv_list[6] = (SV*) pWARN_STD;

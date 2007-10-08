@@ -1045,8 +1045,8 @@ syscall		syscall			ck_fun		imst@	S L
 # For multi-threading
 lock		lock			ck_rfun		s%	R
 
-# compile time function
+# compilation subroutine
 
-comptfunc		comptfunc			ck_comptfunc		s%	S
+compsub		compsub			ck_compsub		s%	S
 
 custom		unknown custom operator		ck_null		0

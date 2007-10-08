@@ -201,7 +201,7 @@ static const char *const yytname[] =
   "UNLESS", "ELSE", "ELSIF", "CONTINUE", "FOR", "GIVEN", "WHEN", "DEFAULT",
   "LOOPEX", "DOTDOT", "FUNC0", "FUNC1", "FUNC", "UNIOP", "LSTOP", "RELOP",
   "EQOP", "MULOP", "ADDOP", "DOLSHARP", "DO", "HASHBRACK", "NOAMP",
-  "LOCAL", "MY", "MYSUB", "REQUIRE", "COMPTFUNC", "COLONATTR", "PREC_LOW",
+  "LOCAL", "MY", "MYSUB", "REQUIRE", "COMPSUB", "COLONATTR", "PREC_LOW",
   "DOROP", "OROP", "ANDOP", "NOTOP", "','", "ASSIGNOP", "'?'", "':'",
   "DORDOR", "OROR", "ANDAND", "BITOROP", "BITANDOP", "SHIFTOP", "MATCHOP",
   "'!'", "'~'", "REFGEN", "UMINUS", "POWOP", "POSTDEC", "POSTINC",

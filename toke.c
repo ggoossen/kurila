@@ -4936,7 +4936,7 @@ Perl_yylex(pTHX)
 		int pkgname = 0;
 		const char lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
 		CV *cv;
-		SV **comptfunc;
+		SV **compsub;
 #ifdef PERL_MAD
 		SV *nextPL_nextwhite = 0;
 #endif
@@ -4966,18 +4966,18 @@ Perl_yylex(pTHX)
 		}
 
 		/* Is this a compile time function? */
-		SV **comptfunctable = hv_fetch(PL_compiling.cop_hints_hash, "comptfunc", 9, FALSE);
-		if (comptfunctable && SvROK(*comptfunctable) && SvTYPE(SvRV(*comptfunctable)) == SVt_PVHV) {
-		    comptfunc = hv_fetch((HV *)SvRV(*comptfunctable), PL_tokenbuf, len, FALSE);
-		    if (comptfunc) {
-			yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc(SvRV(*comptfunc)));
+		SV **compsubtable = hv_fetch(PL_compiling.cop_hints_hash, "compsub", 7, FALSE);
+		if (compsubtable && SvROK(*compsubtable) && SvTYPE(SvRV(*compsubtable)) == SVt_PVHV) {
+		    compsub = hv_fetch((HV *)SvRV(*compsubtable), PL_tokenbuf, len, FALSE);
+		    if (compsub) {
+			yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc(SvRV(*compsub)));
 			yylval.opval->op_private = OPpCONST_BARE;
 			PL_expect = XTERM;
 			s = skipspace(s);
 			PL_bufptr = s;
 			PL_last_uni = PL_oldbufptr;
-			PL_last_lop_op = OP_COMPTFUNC;
-			return REPORT( (int)COMPTFUNC );
+			PL_last_lop_op = OP_COMPSUB;
+			return REPORT( (int)COMPSUB );
 		    }
 		}
  
