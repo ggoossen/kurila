@@ -16,7 +16,7 @@ Dereference of a string will always give an error, even when not "use strict 're
 
 =item *
 
-The <> operator no longer supports glob patterns
+The <> operator no longer supports glob patterns, use glob() for that
 
 =item *
 
@@ -28,7 +28,7 @@ Method resolution changed to default C3
 
 =item *
 
-Typed declarations are no longer possible
+Typed declarations (like C<my Animal $dog>) are no longer possible
 
 =item *
 
@@ -40,12 +40,12 @@ Integrate bleadperl changes
 
 =head2 Dereference of a string will always give an error
 
-Usage of a string to lookup a symbol, like for example ${"$class\::VERSION"} will always give an error,
+Usage of a string to lookup a symbol, like ${"$class\::VERSION"} will always give an error,
 regardless of "use strict 'refs'".
-You can use C<Symbol::fetch_glob> to lookup a symbol.
+You can use C<Symbol::fetch_glob> to do a symbol lookup.
 Symbol::fetch_glob returns a reference to a glob, thus to use the glob you need to explicitly dereference it.
 For example to get the above ${"$class\::VERSION"} you need C<${*{Symbol::fetch_glob("$class\::VERSION")}}>
-Symbol::fetch_glob is defined in the Perl core and does not require an C<use Symbol>.
+Symbol::fetch_glob is defined in the Perl core and does not require a C<use Symbol>.
 
 =head2 The <> operator no longer supports glob patterns.
 
