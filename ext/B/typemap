@@ -1,17 +1,5 @@
 TYPEMAP
 
-B::OP		T_OP_OBJ
-B::UNOP		T_OP_OBJ
-B::BINOP	T_OP_OBJ
-B::LOGOP	T_OP_OBJ
-B::LISTOP	T_OP_OBJ
-B::PMOP		T_OP_OBJ
-B::SVOP		T_OP_OBJ
-B::PADOP	T_OP_OBJ
-B::PVOP		T_OP_OBJ
-B::LOOP		T_OP_OBJ
-B::COP		T_OP_OBJ
-
 B::SV		T_SV_OBJ
 B::PV		T_SV_OBJ
 B::IV		T_SV_OBJ
@@ -36,14 +24,6 @@ B::HE		T_HE_OBJ
 B::RHE		T_RHE_OBJ
 
 INPUT
-T_OP_OBJ
-	if (SvROK($arg)) {
-	    IV tmp = SvIV((SV*)SvRV($arg));
-	    $var = INT2PTR($type,tmp);
-	}
-	else
-	    croak(\"$var is not a reference\")
-
 T_SV_OBJ
 	if (SvROK($arg)) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
@@ -77,9 +57,6 @@ T_RHE_OBJ
 	    croak(\"$var is not a reference\")
 
 OUTPUT
-T_OP_OBJ
-	sv_setiv(newSVrv($arg, cc_opclassname(aTHX_ (OP*)$var)), PTR2IV($var));
-
 T_SV_OBJ
 	make_sv_object(aTHX_ ($arg), (SV*)($var));
 

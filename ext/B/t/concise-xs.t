@@ -151,6 +151,7 @@ my $testpkgs = {
 		  formfeed end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
 		  begin_av amagic_generation sub_generation address
+                  set_main_start set_main_root fudge
 		  ), $] > 5.009 ? ('unitcheck_av') : ()],
     },
 

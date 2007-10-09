@@ -313,6 +313,7 @@ sub walksymtable {
 }
 
 XSLoader::load 'B';
+require B::Generate;
 
 1;
 
