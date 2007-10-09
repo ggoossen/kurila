@@ -4936,6 +4936,7 @@ Perl_yylex(pTHX)
 		int pkgname = 0;
 		const char lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
 		CV *cv;
+		SV **compsub;
 #ifdef PERL_MAD
 		SV *nextPL_nextwhite = 0;
 #endif
@@ -4963,6 +4964,23 @@ Perl_yylex(pTHX)
 		    else
 			no_op("Bareword",s);
 		}
+
+		/* Is this a compile time function? */
+		SV **compsubtable = hv_fetch(PL_compiling.cop_hints_hash, "compsub", 7, FALSE);
+		if (compsubtable && SvROK(*compsubtable) && SvTYPE(SvRV(*compsubtable)) == SVt_PVHV) {
+		    compsub = hv_fetch((HV *)SvRV(*compsubtable), PL_tokenbuf, len, FALSE);
+		    if (compsub) {
+			yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc(SvRV(*compsub)));
+			yylval.opval->op_private = OPpCONST_BARE;
+			PL_expect = XTERM;
+			s = skipspace(s);
+			PL_bufptr = s;
+			PL_last_uni = PL_oldbufptr;
+			PL_last_lop_op = OP_COMPSUB;
+			return REPORT( (int)COMPSUB );
+		    }
+		}
+ 
 
 		/* Look for a subroutine with this name in current package,
 		   unless name is "Foo::", in which case Foo is a bearword

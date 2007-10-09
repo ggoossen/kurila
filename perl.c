@@ -404,6 +404,8 @@ perl_construct(pTHXx)
 
     PL_hints = DEFAULT_HINTS;
 
+    PL_compiling.cop_hints_hash = newHV();
+
     ENTER;
 }
 
@@ -1049,7 +1051,7 @@ perl_destruct(pTHXx)
     if (!specialWARN(PL_compiling.cop_warnings))
 	PerlMemShared_free(PL_compiling.cop_warnings);
     PL_compiling.cop_warnings = NULL;
-    Perl_refcounted_he_free(aTHX_ PL_compiling.cop_hints_hash);
+    SvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = NULL;
     CopFILE_free(&PL_compiling);
     CopSTASH_free(&PL_compiling);

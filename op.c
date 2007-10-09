@@ -629,7 +629,7 @@ S_cop_free(pTHX_ COP* cop)
     CopSTASH_free(cop);
     if (! specialWARN(cop->cop_warnings))
 	PerlMemShared_free(cop->cop_warnings);
-    Perl_refcounted_he_free(aTHX_ cop->cop_hints_hash);
+    SvREFCNT_dec((SV*)cop->cop_hints_hash);
 }
 
 STATIC void
@@ -4100,7 +4100,7 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o)
     cop->cop_hints_hash = PL_curcop->cop_hints_hash;
     if (cop->cop_hints_hash) {
 	HINTS_REFCNT_LOCK;
-	cop->cop_hints_hash->refcounted_he_refcnt++;
+	SvREFCNT_inc(cop->cop_hints_hash);
 	HINTS_REFCNT_UNLOCK;
     }
 
@@ -6809,6 +6809,46 @@ Perl_ck_smartmatch(pTHX_ OP *o)
     return o;
 }
 
+OP *
+Perl_ck_compsub(pTHX_ OP *o)
+{
+    OP * const first = cBINOPo->op_first;
+    OP * newop;
+    SV * sv;
+
+    dSP;
+
+    SV* args_b = NULL;
+
+    ENTER;
+    PUSHMARK(SP);
+    if (first->op_sibling) {
+	args_b = newSV(0);
+	sv_setiv(newSVrv(args_b, "B::LISTOP"), PTR2IV(first->op_sibling));
+	XPUSHs(args_b);
+    }
+    PUTBACK;
+
+    call_sv(cSVOPx_sv(first), G_SCALAR);
+
+    SPAGAIN;
+    sv = POPs;
+    newop = INT2PTR(OP*, SvIV(SvRV(sv)));
+
+    if (!newop)
+	Perl_die(aTHX "No opcode returned by the compsub");
+
+    if (args_b && SvREFCNT(args_b) != 1)
+	Perl_die(aTHX "reference to B::OP argument kept");
+    SvREFCNT_dec(args_b);
+
+    LEAVE;
+
+    cBINOPo->op_first->op_sibling = NULL;
+    op_free(o);
+
+    return newop;
+}
 
 OP *
 Perl_ck_sassign(pTHX_ OP *o)

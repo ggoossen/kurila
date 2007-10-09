@@ -76,7 +76,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DOLSHARP DO HASHBRACK NOAMP
-%token <i_tkval> LOCAL MY MYSUB REQUIRE
+%token <opval> LOCAL MY MYSUB REQUIRE COMPSUB
 %token <i_tkval> COLONATTR
 
 %type <ival> prog progstart remember mremember savescope
@@ -115,6 +115,7 @@
 %nonassoc RELOP
 %nonassoc UNIOP UNIOPSUB
 %nonassoc REQUIRE
+%nonassoc COMPSUB
 %left <i_tkval> SHIFTOP
 %left ADDOP
 %left MULOP
@@ -1163,6 +1164,10 @@ term	:	termbinop
 	|	REQUIRE term                         /* require Foo */
 			{ $$ = newUNOP(OP_REQUIRE, $1 ? OPf_SPECIAL : 0, $2);
 			  TOKEN_GETMAD($1,$$,'o');
+			}
+	|	COMPSUB listexpr                  /* foo @args */
+			{ 
+                            $$ = newBINOP(OP_COMPSUB, 0, $1, $2);
 			}
 	|	UNIOPSUB
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1)); }

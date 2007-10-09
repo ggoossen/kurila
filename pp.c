@@ -4547,6 +4547,12 @@ PP(pp_lock)
     RETURN;
 }
 
+PP(pp_compsub)
+{
+    dVAR;
+    DIE(aTHX_ "panic: compsub should be replaced");
+}
+
 
 PP(unimplemented_op)
 {

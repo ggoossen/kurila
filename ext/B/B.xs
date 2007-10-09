@@ -21,9 +21,7 @@ typedef FILE * InputStream;
 
 static const char* const svclassnames[] = {
     "B::NULL",
-#if PERL_VERSION >= 9
     "B::BIND",
-#endif
     "B::IV",
     "B::NV",
     "B::RV",
@@ -31,20 +29,11 @@ static const char* const svclassnames[] = {
     "B::PVIV",
     "B::PVNV",
     "B::PVMG",
-#if PERL_VERSION <= 8
-    "B::BM",
-#endif
-#if PERL_VERSION >= 9
     "B::GV",
-#endif
     "B::PVLV",
     "B::AV",
     "B::HV",
     "B::CV",
-#if PERL_VERSION <= 8
-    "B::GV",
-#endif
-    "B::FM",
     "B::IO",
 };
 
@@ -576,9 +565,6 @@ typedef IO	*B__IO;
 
 typedef MAGIC	*B__MAGIC;
 typedef HE      *B__HE;
-#if PERL_VERSION >= 9
-typedef struct refcounted_he	*B__RHE;
-#endif
 
 MODULE = B	PACKAGE = B	PREFIX = B_
 
@@ -1253,14 +1239,6 @@ COP_io(o)
 	ST(0) = make_cop_io_object(aTHX_ sv_newmortal(), o);
 	XSRETURN(1);
 
-B::RHE
-COP_hints_hash(o)
-	B::COP o
-    CODE:
-	RETVAL = o->cop_hints_hash;
-    OUTPUT:
-	RETVAL
-
 #else
 
 B::SV
@@ -1904,17 +1882,3 @@ HeHASH(he)
 B::SV
 HeSVKEY_force(he)
 	B::HE he
-
-MODULE = B	PACKAGE = B::RHE	PREFIX = RHE_
-
-#if PERL_VERSION >= 9
-
-SV*
-RHE_HASH(h)
-	B::RHE h
-    CODE:
-	RETVAL = newRV( (SV*)Perl_refcounted_he_chain_2hv(aTHX_ h) );
-    OUTPUT:
-	RETVAL
-
-#endif

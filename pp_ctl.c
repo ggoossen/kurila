@@ -138,10 +138,9 @@ PP(pp_regcomp)
 	        ReREFCNT_dec(re);
 		PM_SETRE(pm, NULL);	/* crucial if regcomp aborts */
 	    } else if (PL_curcop->cop_hints_hash) {
-	        SV *ptr = Perl_refcounted_he_fetch(aTHX_ PL_curcop->cop_hints_hash, 0,
-				       "regcomp", 7, 0, 0);
-                if (ptr && SvIOK(ptr) && SvIV(ptr))
-                    eng = INT2PTR(regexp_engine*,SvIV(ptr));
+	        SV **ptr = hv_fetch(PL_curcop->cop_hints_hash, "regcomp", 7, 0);
+                if (ptr && *ptr && SvIOK(*ptr) && SvIV(*ptr))
+                    eng = INT2PTR(regexp_engine*,SvIV(*ptr));
 	    }
 
 	    if (PL_op->op_flags & OPf_SPECIAL)
@@ -1197,9 +1196,7 @@ PP(pp_caller)
     }
 
     PUSHs(cx->blk_oldcop->cop_hints_hash ?
-	  sv_2mortal(newRV_noinc(
-	    (SV*)Perl_refcounted_he_chain_2hv(aTHX_
-					      cx->blk_oldcop->cop_hints_hash)))
+	  sv_2mortal(newRV((SV*)cx->blk_oldcop->cop_hints_hash))
 	  : &PL_sv_undef);
     RETURN;
 }
@@ -2940,12 +2937,12 @@ PP(pp_entereval)
     SAVECOMPILEWARNINGS();
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
     if (PL_compiling.cop_hints_hash) {
-	Perl_refcounted_he_free(aTHX_ PL_compiling.cop_hints_hash);
+	SvREFCNT_dec(PL_compiling.cop_hints_hash);
     }
     PL_compiling.cop_hints_hash = PL_curcop->cop_hints_hash;
     if (PL_compiling.cop_hints_hash) {
 	HINTS_REFCNT_LOCK;
-	PL_compiling.cop_hints_hash->refcounted_he_refcnt++;
+	SvREFCNT_inc(PL_compiling.cop_hints_hash);
 	HINTS_REFCNT_UNLOCK;
     }
     /* special case: an eval '' executed within the DB package gets lexically

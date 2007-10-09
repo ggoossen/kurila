@@ -390,7 +390,10 @@ EXTCONST char* const PL_op_name[] = {
 	"getlogin",
 	"syscall",
 	"lock",
+	"compsub",
 	"custom",
+	NULL,
+
 };
 #endif
 
@@ -755,6 +758,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"getlogin",
 	"syscall",
 	"lock",
+	"compsub",
 	"unknown custom operator",
 };
 #endif
@@ -1134,6 +1138,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_getlogin),
 	MEMBER_TO_FPTR(Perl_pp_syscall),
 	MEMBER_TO_FPTR(Perl_pp_lock),
+	MEMBER_TO_FPTR(Perl_pp_compsub),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_custom */
 }
 #endif
@@ -1510,6 +1515,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* getlogin */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* syscall */
 	MEMBER_TO_FPTR(Perl_ck_rfun),	/* lock */
+	MEMBER_TO_FPTR(Perl_ck_compsub),	/* compsub */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* custom */
 }
 #endif
@@ -1880,6 +1886,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x0000000c,	/* getlogin */
 	0x0004281d,	/* syscall */
 	0x0000f604,	/* lock */
+	0x00003604,	/* compsub */
 	0x00000000,	/* custom */
 };
 #endif
