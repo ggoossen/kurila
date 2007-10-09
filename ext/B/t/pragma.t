@@ -21,7 +21,7 @@ BEGIN {    ## no critic strict
 
 use strict;
 use warnings;
-use Test::More tests => 4 * 3;
+use Test::More tests => 3 * 3;
 use B 'svref_2object';
 
 # use Data::Dumper 'Dumper';
@@ -47,10 +47,7 @@ sub foo {
     my $cop = find_op_cop( \&foo, qr/multiply/ );
     isa_ok( $cop, 'B::COP', 'found pp_multiply opnode' );
 
-    my $rhe = $cop->hints_hash;
-    isa_ok( $rhe, 'B::RHE', 'got hints_hash' );
-
-    my $hints_hash = $rhe->HASH;
+    my $hints_hash = $cop->hints_hash;
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
     ok( not( exists $hints_hash->{mypragma} ), q[! exists mypragma] );
@@ -62,10 +59,7 @@ sub foo {
     my $cop = find_op_cop( \&foo, qr/add/ );
     isa_ok( $cop, 'B::COP', 'found pp_add opnode' );
 
-    my $rhe = $cop->hints_hash;
-    isa_ok( $rhe, 'B::RHE', 'got hints_hash' );
-
-    my $hints_hash = $rhe->HASH;
+    my $hints_hash = $cop->hints_hash;
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
     is( $hints_hash->{mypragma}, 42, q[mypragma => 42] );
@@ -77,10 +71,7 @@ sub foo {
     my $cop = find_op_cop( \&foo, qr/subtract/ );
     isa_ok( $cop, 'B::COP', 'found pp_subtract opnode' );
 
-    my $rhe = $cop->hints_hash;
-    isa_ok( $rhe, 'B::RHE', 'got hints_hash' );
-
-    my $hints_hash = $rhe->HASH;
+    my $hints_hash = $cop->hints_hash;
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
     is( $hints_hash->{mypragma}, 0, q[mypragma => 0] );

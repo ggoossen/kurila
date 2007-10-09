@@ -36,7 +36,7 @@ use B::Generate ();
 # this leaks the OP_LIST, and the remaining items in the listop
 BEGIN { compsub::define( fst => sub { my $first = $_[0]->first->sibling;
                                         # remove $first from the list of children of $_[0]
-                                        $_[0]->first->sibling($first->sibling);
+                                        $_[0]->first->set_sibling($first->sibling);
                                         $_[0]->free; undef $_[0];
                                         # free the $_[0] opcode.
                                         return $first;
@@ -84,8 +84,9 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
 ## parsing params, and declaring lexical variables.
 {
     sub parseparams {
+        my $values = { foo => 'foo-value', bar => 'bar-value' }; #pop @_;
         while (my $name = shift @_) {
-            $_[0] = "$name";
+            $_[0] = $values->{$name};
             shift @_;
         }
     }
@@ -100,13 +101,13 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
         while (ref $kid ne "B::NULL") {
             if ($kid->name eq "const") {
                 # allocate a 'my' variable
-                my $targ = B::Generate::allocmy( ${ $kid->sv->object_2svref } );
+                my $targ = B::Generate::allocmy( '$' . ${ $kid->sv->object_2svref } );
                 # introduce the 'my' variable, and insert it into the list of argument.
                 my $padsv = B::OP->new('padsv', B::OPf_MOD);
-                $padsv->private(B::OPpLVAL_INTRO);
-                $padsv->targ($targ);
-                $padsv->sibling($kid->sibling);
-                $kid->sibling($padsv);
+                $padsv->set_private(B::OPpLVAL_INTRO);
+                $padsv->set_targ($targ);
+                $padsv->set_sibling($kid->sibling);
+                $kid->set_sibling($padsv);
                 $kid = $padsv;
 
             } elsif ($kid->name eq "list" or $kid->name eq "pushmark") {
@@ -128,8 +129,12 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
     }
 
     {
-        compfunc1 '$foo', '$bar';
-        is $foo, '$foo', '$foo declared and initialized';
-        is $bar, '$bar';
+        sub foobar {
+            compfunc1 'foo', 'bar';
+            is $foo, 'foo-value', '$foo declared and initialized';
+            is $bar, 'bar-value';
+        }
+
+        foobar( foo => "foo-value", bar => "bar-value" );
     }
 }
