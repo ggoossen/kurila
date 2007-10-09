@@ -7,6 +7,7 @@
 PERL_CKDEF(Perl_ck_anoncode)
 PERL_CKDEF(Perl_ck_bitop)
 PERL_CKDEF(Perl_ck_chdir)
+PERL_CKDEF(Perl_ck_compsub)
 PERL_CKDEF(Perl_ck_concat)
 PERL_CKDEF(Perl_ck_defined)
 PERL_CKDEF(Perl_ck_delete)
@@ -402,5 +403,6 @@ PERL_PPDEF(Perl_pp_egrent)
 PERL_PPDEF(Perl_pp_getlogin)
 PERL_PPDEF(Perl_pp_syscall)
 PERL_PPDEF(Perl_pp_lock)
+PERL_PPDEF(Perl_pp_compsub)
 
 /* ex: set ro: */

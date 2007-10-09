@@ -177,6 +177,7 @@ for (@ops) {
 }
 
 print <<END;
+\tNULL,\n
 };
 #endif
 
@@ -1043,5 +1044,9 @@ syscall		syscall			ck_fun		imst@	S L
 
 # For multi-threading
 lock		lock			ck_rfun		s%	R
+
+# compilation subroutine
+
+compsub		compsub			ck_compsub		s%	S
 
 custom		unknown custom operator		ck_null		0

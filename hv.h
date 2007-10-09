@@ -378,63 +378,13 @@ C<SV*>.
 	->shared_he_he.he_valu.hent_refcount),				\
      hek)
 
-/* This refcounted he structure is used for storing the hints used for lexical
-   pragmas. Without threads, it's basically struct he + refcount.
-   With threads, life gets more complex as the structure needs to be shared
-   between threads (because it hangs from OPs, which are shared), hence the
-   alternate definition and mutex.  */
-
-struct refcounted_he;
-
-#ifdef PERL_CORE
-
-/* Gosh. This really isn't a good name any longer.  */
-struct refcounted_he {
-    struct refcounted_he *refcounted_he_next;	/* next entry in chain */
-#ifdef USE_ITHREADS
-    U32                   refcounted_he_hash;
-    U32                   refcounted_he_keylen;
-#else
-    HEK                  *refcounted_he_hek;	/* hint key */
-#endif
-    union {
-	IV                refcounted_he_u_iv;
-	UV                refcounted_he_u_uv;
-	STRLEN            refcounted_he_u_len;
-	void		 *refcounted_he_u_ptr;	/* Might be useful in future */
-    } refcounted_he_val;
-    U32	                  refcounted_he_refcnt;	/* reference count */
-    /* First byte is flags. Then NUL-terminated value. Then for ithreads,
-       non-NUL terminated key.  */
-    char                  refcounted_he_data[1];
-};
-
-/* Flag bits are HVhek_UTF8, HVhek_WASUTF8, then */
-#define HVrhek_undef	0x00 /* Value is undef. */
-#define HVrhek_delete	0x10 /* Value is placeholder - signifies delete. */
-#define HVrhek_IV	0x20 /* Value is IV. */
-#define HVrhek_UV	0x30 /* Value is UV. */
-#define HVrhek_PV	0x40 /* Value is a string. */
-/* Two spare. As these have to live in the optree, you can't store anything
-   interpreter specific, such as SVs. :-( */
-#define HVrhek_typemask 0x70
-
-#ifdef USE_ITHREADS
-/* A big expression to find the key offset */
-#define REF_HE_KEY(chain)						\
-	((((chain->refcounted_he_data[0] & 0x60) == 0x40)		\
-	    ? chain->refcounted_he_val.refcounted_he_u_len + 1 : 0)	\
-	 + 1 + chain->refcounted_he_data)
-#endif
-
 #  ifdef USE_ITHREADS
-#    define HINTS_REFCNT_LOCK		MUTEX_LOCK(&PL_hints_mutex)
-#    define HINTS_REFCNT_UNLOCK		MUTEX_UNLOCK(&PL_hints_mutex)
+#    define HINTS_REFCNT_LOCK          MUTEX_LOCK(&PL_hints_mutex)
+#    define HINTS_REFCNT_UNLOCK                MUTEX_UNLOCK(&PL_hints_mutex)
 #  else
-#    define HINTS_REFCNT_LOCK		NOOP
-#    define HINTS_REFCNT_UNLOCK		NOOP
+#    define HINTS_REFCNT_LOCK          NOOP
+#    define HINTS_REFCNT_UNLOCK                NOOP
 #  endif
-#endif
 
 #ifdef USE_ITHREADS
 #  define HINTS_REFCNT_INIT		MUTEX_INIT(&PL_hints_mutex)

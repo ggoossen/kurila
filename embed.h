@@ -1144,7 +1144,6 @@
 #define hv_delete_common	S_hv_delete_common
 #define hv_fetch_common		S_hv_fetch_common
 #define clear_placeholders	S_clear_placeholders
-#define refcounted_he_value	S_refcounted_he_value
 #endif
 #endif
 #if defined(PERL_IN_MG_C) || defined(PERL_DECL_PROT)
@@ -1913,6 +1912,7 @@
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
 #define ck_chdir		Perl_ck_chdir
+#define ck_compsub		Perl_ck_compsub
 #define ck_concat		Perl_ck_concat
 #define ck_defined		Perl_ck_defined
 #define ck_delete		Perl_ck_delete
@@ -1987,6 +1987,7 @@
 #define pp_close		Perl_pp_close
 #define pp_closedir		Perl_pp_closedir
 #define pp_complement		Perl_pp_complement
+#define pp_compsub		Perl_pp_compsub
 #define pp_concat		Perl_pp_concat
 #define pp_cond_expr		Perl_pp_cond_expr
 #define pp_connect		Perl_pp_connect
@@ -2564,12 +2565,6 @@
 #define hv_iternext_flags(a,b)	Perl_hv_iternext_flags(aTHX_ a,b)
 #define hv_iterval(a,b)		Perl_hv_iterval(aTHX_ a,b)
 #define hv_ksplit(a,b)		Perl_hv_ksplit(aTHX_ a,b)
-#if defined(PERL_CORE) || defined(PERL_EXT)
-#endif
-#ifdef PERL_CORE
-#endif
-#if defined(PERL_CORE) || defined(PERL_EXT)
-#endif
 #define hv_store(a,b,c,d,e)	Perl_hv_store(aTHX_ a,b,c,d,e)
 #define hv_store_ent(a,b,c,d)	Perl_hv_store_ent(aTHX_ a,b,c,d)
 #define hv_store_flags(a,b,c,d,e,f)	Perl_hv_store_flags(aTHX_ a,b,c,d,e,f)
@@ -3409,7 +3404,6 @@
 #define hv_delete_common(a,b,c,d,e,f,g)	S_hv_delete_common(aTHX_ a,b,c,d,e,f,g)
 #define hv_fetch_common(a,b,c,d,e,f,g,h)	S_hv_fetch_common(aTHX_ a,b,c,d,e,f,g,h)
 #define clear_placeholders(a,b)	S_clear_placeholders(aTHX_ a,b)
-#define refcounted_he_value(a)	S_refcounted_he_value(aTHX_ a)
 #endif
 #endif
 #if defined(PERL_IN_MG_C) || defined(PERL_DECL_PROT)
@@ -4195,6 +4189,7 @@
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
 #define ck_chdir(a)		Perl_ck_chdir(aTHX_ a)
+#define ck_compsub(a)		Perl_ck_compsub(aTHX_ a)
 #define ck_concat(a)		Perl_ck_concat(aTHX_ a)
 #define ck_defined(a)		Perl_ck_defined(aTHX_ a)
 #define ck_delete(a)		Perl_ck_delete(aTHX_ a)
@@ -4269,6 +4264,7 @@
 #define pp_close()		Perl_pp_close(aTHX)
 #define pp_closedir()		Perl_pp_closedir(aTHX)
 #define pp_complement()		Perl_pp_complement(aTHX)
+#define pp_compsub()		Perl_pp_compsub(aTHX)
 #define pp_concat()		Perl_pp_concat(aTHX)
 #define pp_cond_expr()		Perl_pp_cond_expr(aTHX)
 #define pp_connect()		Perl_pp_connect(aTHX)
