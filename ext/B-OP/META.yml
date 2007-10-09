@@ -1,5 +1,5 @@
 ---
-name: B-Generate
+name: B-OP
 version: 1.10
 author:
   - |-
@@ -15,11 +15,11 @@ requires:
   perl: 5.5.62
 dynamic_config: 0
 provides:
-  B::Generate:
-    file: lib/B/Generate.pm
+  B::OP:
+    file: lib/B/OP.pm
     version: 1.10
   B::OP:
-    file: lib/B/Generate.pm
+    file: lib/B/OP.pm
 no_index:
   package: B::OP
 generated_by: Module::Build version 0.2808

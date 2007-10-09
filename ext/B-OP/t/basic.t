@@ -3,7 +3,7 @@
 use Test::More tests => 10;
 
 use B qw(svref_2object);
-BEGIN { use_ok 'B::Generate'; }
+BEGIN { use_ok 'B::OP'; }
 
 CHECK {
     my ($x, $y,$z);

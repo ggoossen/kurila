@@ -1,20 +1,20 @@
-Revision history for Perl extension B::Generate.
+Revision history for Perl extension B::OP.
 
 1.10
-  - License clarification. B::Generate is available under the same
+  - License clarification. B::OP is available under the same
     terms as perl. Dist now includes copy of Artistic and GPL licenses.
 
 1.09
   - Merged distributions:
-    - S/SW/SWALTERS/B-Generate-1.06_1.tar.gz
+    - S/SW/SWALTERS/B-OP-1.06_1.tar.gz
       - Removed ppaddr setting for OP_LIST
       - Call Perl_fold_constants instead of fold_constants
-    - M/MS/MSCHWERN/B-Generate-1.06_2.tar.gz
+    - M/MS/MSCHWERN/B-OP-1.06_2.tar.gz
       - Awesome!
       - fold_constants is called w/ thread context
-    - J/JJ/JJORE/B-Generate-1.07.tar.gz
+    - J/JJ/JJORE/B-OP-1.07.tar.gz
       - Populates specialsv_list
-    - J/JJ/JJORE/B-Generate-1.08.tar.gz
+    - J/JJ/JJORE/B-OP-1.08.tar.gz
       - Nothing interesting, apparently.
     - RT #4747:
       - changes to compile for 5.8.1+ by Jim Cromie <jcromie@cpan.org>
@@ -85,5 +85,5 @@ Revision history for Perl extension B::Generate.
 
 0.01  Sat Dec 23 18:00:08 2000
 	- original version; created by h2xs 1.20 with options
-		-A -n B::Generate
+		-A -n B::OP
 
