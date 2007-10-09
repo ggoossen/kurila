@@ -22,7 +22,7 @@ sub compile_c {
 );
 
 my $build = $class->new(
-    module_name    => 'B::Generate',
+    module_name    => 'B::OP',
     license        => 'perl',
     dynamic_config => 0,
     no_index       => { package => 'B::OP', },

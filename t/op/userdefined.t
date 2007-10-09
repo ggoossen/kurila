@@ -30,7 +30,7 @@ is( (join '*', foo 1, 2), "1*2");
 BEGIN { is $foo_called, 2; }
 
 use B ();
-use B::Generate ();
+use B::OP ();
 
 # fst $arg1, $arg2, ... evaluates only its first argument
 # this leaks the OP_LIST, and the remaining items in the listop
@@ -101,7 +101,7 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
         while (ref $kid ne "B::NULL") {
             if ($kid->name eq "const") {
                 # allocate a 'my' variable
-                my $targ = B::Generate::allocmy( '$' . ${ $kid->sv->object_2svref } );
+                my $targ = B::OP::allocmy( '$' . ${ $kid->sv->object_2svref } );
                 # introduce the 'my' variable, and insert it into the list of argument.
                 my $padsv = B::OP->new('padsv', B::OPf_MOD);
                 $padsv->set_private(B::OPpLVAL_INTRO);

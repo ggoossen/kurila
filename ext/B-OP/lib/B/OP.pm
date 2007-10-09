@@ -1,4 +1,4 @@
-package B::Generate;
+package B::OP;
 
 require 5.005_62;
 use strict;
@@ -10,14 +10,7 @@ use vars qw( @ISA $VERSION );
 @ISA = qw(DynaLoader);
 $VERSION = '1.10';
 
-{
-    # 'no warnings' does not work.
-    local $SIG{__WARN__} = sub {
-        return if $_[0] =~ /Subroutine B(?:::\w+)+ redefined/;
-        warn $_[0];
-    };
-    B::Generate->bootstrap($VERSION);
-}
+B::OP->bootstrap($VERSION);
 
 package B::OP;
 use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
@@ -122,11 +115,11 @@ __END__
 
 =head1 NAME
 
-B::Generate - Create your own op trees. 
+B::OP - Create your own op trees. 
 
 =head1 SYNOPSIS
 
-    use B::Generate;
+    use B::OP;
     # Do nothing, slowly.
       CHECK {
         my $null = new B::OP("null",0);
@@ -167,7 +160,7 @@ new ops, or modify old ones. Now you can.
 
 Well, if you're intimately familiar with Perl's internals, you can.
 
-C<B::Generate> turns C<B>'s accessor methods into get-set methods.
+C<B::OP> turns C<B>'s accessor methods into get-set methods.
 Hence, instead of merely saying
 
     $op2 = $op->next;

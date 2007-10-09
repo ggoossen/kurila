@@ -583,7 +583,7 @@ typedef MAGIC   *B__MAGIC;
 #define OP_private(o)	o->op_private
 #define OP_spare(o)	o->op_spare
 
-MODULE = B::Generate    PACKAGE = B::OP         PREFIX = OP_
+MODULE = B::OP    PACKAGE = B::OP         PREFIX = OP_
 
 B::CV
 OP_find_cv(o)
@@ -746,7 +746,7 @@ OP_convert(o, type, flags)
     OUTPUT:
         o
 
-MODULE = B::Generate    PACKAGE = B::UNOP               PREFIX = UNOP_
+MODULE = B::OP    PACKAGE = B::UNOP               PREFIX = UNOP_
 
 void
 UNOP_set_first(o, first)
@@ -794,7 +794,7 @@ UNOP_new(class, type, flags, sv_first)
             ST(0) = sv_newmortal();
         sv_setiv(newSVrv(ST(0), "B::UNOP"), PTR2IV(o));
 
-MODULE = B::Generate    PACKAGE = B::BINOP              PREFIX = BINOP_
+MODULE = B::OP    PACKAGE = B::BINOP              PREFIX = BINOP_
 
 void
 BINOP_null(o)
@@ -869,7 +869,7 @@ BINOP_new(class, type, flags, sv_first, sv_last)
             ST(0) = sv_newmortal();
         sv_setiv(newSVrv(ST(0), "B::BINOP"), PTR2IV(o));
 
-MODULE = B::Generate    PACKAGE = B::LISTOP             PREFIX = LISTOP_
+MODULE = B::OP    PACKAGE = B::LISTOP             PREFIX = LISTOP_
 
 void
 LISTOP_new(class, type, flags, sv_first, sv_last)
@@ -925,7 +925,7 @@ LISTOP_new(class, type, flags, sv_first, sv_last)
             ST(0) = sv_newmortal();
         sv_setiv(newSVrv(ST(0), "B::LISTOP"), PTR2IV(o));
 
-MODULE = B::Generate    PACKAGE = B::LOGOP              PREFIX = LOGOP_
+MODULE = B::OP    PACKAGE = B::LOGOP              PREFIX = LOGOP_
 
 void
 LOGOP_new(class, type, flags, sv_first, sv_last)
@@ -1049,7 +1049,7 @@ LOGOP_set_other(o, other)
     CODE:
         o->op_other = other;
 
-MODULE = B::Generate    PACKAGE = B::SVOP               PREFIX = SVOP_
+MODULE = B::OP    PACKAGE = B::SVOP               PREFIX = SVOP_
 
 void
 SVOP_set_sv(o, ...)
@@ -1107,7 +1107,7 @@ SVOP_new(class, type, flags, sv)
         sv_setiv(newSVrv(ST(0), "B::SVOP"), PTR2IV(o));
         PL_op = saveop;
 
-MODULE = B::Generate    PACKAGE = B::PADOP              PREFIX = PADOP_
+MODULE = B::OP    PACKAGE = B::PADOP              PREFIX = PADOP_
 
 PADOP_set_padix(o, ...)
         B::PADOP o
@@ -1115,7 +1115,7 @@ PADOP_set_padix(o, ...)
         if (items > 1)
             o->op_padix = (PADOFFSET)SvIV(ST(1));
 
-MODULE = B::Generate    PACKAGE = B::LOOP               PREFIX = LOOP_
+MODULE = B::OP    PACKAGE = B::LOOP               PREFIX = LOOP_
 
 void
 LOOP_set_redoop(o, redoop)
@@ -1138,7 +1138,7 @@ LOOP_set_lastop(o, lastop)
     CODE:
         o->op_lastop = lastop;
 
-MODULE = B::Generate    PACKAGE = B::COP                PREFIX = COP_
+MODULE = B::OP    PACKAGE = B::COP                PREFIX = COP_
 
 B::COP
 COP_new(class, flags, name, sv_first)
@@ -1173,7 +1173,7 @@ COP_new(class, flags, name, sv_first)
             ST(0) = sv_newmortal();
         sv_setiv(newSVrv(ST(0), "B::COP"), PTR2IV(o));
 
-MODULE = B::Generate  PACKAGE = B::SV  PREFIX = Sv
+MODULE = B::OP  PACKAGE = B::SV  PREFIX = Sv
 
 SV*
 Svsv(sv)
@@ -1199,7 +1199,7 @@ SvFLAGS(sv, ...)
     OUTPUT:
         RETVAL
 
-MODULE = B::Generate    PACKAGE = B::PV         PREFIX = Sv
+MODULE = B::OP    PACKAGE = B::PV         PREFIX = Sv
 
 void
 SvPV(sv,...)
@@ -1220,7 +1220,7 @@ SvPV(sv,...)
   }
 }
 
-MODULE = B::Generate	PACKAGE = B::OP		PREFIX = OP_
+MODULE = B::OP	PACKAGE = B::OP		PREFIX = OP_
 size_t
 OP_size(o)
 	B::OP		o
@@ -1310,7 +1310,7 @@ OP_oplist(o)
 
 #define UNOP_first(o)	o->op_first
 
-MODULE = B::Generate	PACKAGE = B::UNOP		PREFIX = UNOP_
+MODULE = B::OP	PACKAGE = B::UNOP		PREFIX = UNOP_
 
 B::OP 
 UNOP_first(o)
@@ -1318,7 +1318,7 @@ UNOP_first(o)
 
 #define BINOP_last(o)	o->op_last
 
-MODULE = B::Generate	PACKAGE = B::BINOP		PREFIX = BINOP_
+MODULE = B::OP	PACKAGE = B::BINOP		PREFIX = BINOP_
 
 B::OP
 BINOP_last(o)
@@ -1326,13 +1326,13 @@ BINOP_last(o)
 
 #define LOGOP_other(o)	o->op_other
 
-MODULE = B::Generate	PACKAGE = B::LOGOP		PREFIX = LOGOP_
+MODULE = B::OP	PACKAGE = B::LOGOP		PREFIX = LOGOP_
 
 B::OP
 LOGOP_other(o)
 	B::LOGOP	o
 
-MODULE = B::Generate	PACKAGE = B::LISTOP		PREFIX = LISTOP_
+MODULE = B::OP	PACKAGE = B::LISTOP		PREFIX = LISTOP_
 
 U32
 LISTOP_children(o)
@@ -1364,7 +1364,7 @@ LISTOP_children(o)
 #endif
 #define PMOP_pmflags(o)		o->op_pmflags
 
-MODULE = B::Generate	PACKAGE = B::PMOP		PREFIX = PMOP_
+MODULE = B::OP	PACKAGE = B::PMOP		PREFIX = PMOP_
 
 void
 PMOP_pmreplroot(o)
@@ -1452,7 +1452,7 @@ PMOP_reflags(o)
 #define SVOP_sv(o)     cSVOPo->op_sv
 #define SVOP_gv(o)     ((GV*)cSVOPo->op_sv)
 
-MODULE = B::Generate	PACKAGE = B::SVOP		PREFIX = SVOP_
+MODULE = B::OP	PACKAGE = B::SVOP		PREFIX = SVOP_
 
 B::SV
 SVOP_sv(o)
@@ -1468,7 +1468,7 @@ SVOP_gv(o)
 			  && SvTYPE(PAD_SVl(o->op_padix)) == SVt_PVGV) \
 			 ? (GV*)PAD_SVl(o->op_padix) : Nullgv)
 
-MODULE = B::Generate	PACKAGE = B::PADOP		PREFIX = PADOP_
+MODULE = B::OP	PACKAGE = B::PADOP		PREFIX = PADOP_
 
 PADOFFSET
 PADOP_padix(o)
@@ -1482,7 +1482,7 @@ B::GV
 PADOP_gv(o)
 	B::PADOP o
 
-MODULE = B::Generate	PACKAGE = B::PVOP		PREFIX = PVOP_
+MODULE = B::OP	PACKAGE = B::PVOP		PREFIX = PVOP_
 
 void
 PVOP_pv(o)
@@ -1510,7 +1510,7 @@ PVOP_pv(o)
 #define LOOP_nextop(o)	o->op_nextop
 #define LOOP_lastop(o)	o->op_lastop
 
-MODULE = B::Generate	PACKAGE = B::LOOP		PREFIX = LOOP_
+MODULE = B::OP	PACKAGE = B::LOOP		PREFIX = LOOP_
 
 
 B::OP
@@ -1538,7 +1538,7 @@ LOOP_lastop(o)
 #  define COP_io(o)	o->cop_io
 #endif
 
-MODULE = B::Generate	PACKAGE = B::COP		PREFIX = COP_
+MODULE = B::OP	PACKAGE = B::COP		PREFIX = COP_
 
 char *
 COP_label(o)
@@ -1607,7 +1607,7 @@ U32
 COP_hints(o)
 	B::COP	o
 
-MODULE = B::Generate	PACKAGE = B::CV		PREFIX = Cv
+MODULE = B::OP	PACKAGE = B::CV		PREFIX = Cv
 
 B::OP
 CvSTART(cv)
@@ -1642,7 +1642,7 @@ Cvnewsub_simple(class, name, block)
         RETVAL
 
 
-MODULE = B::Generate    PACKAGE = B     PREFIX = B_
+MODULE = B::OP    PACKAGE = B     PREFIX = B_
 
 void
 B_walkoptree(opsv, method)
@@ -1698,7 +1698,7 @@ B_set_main_start(...)
         RETVAL
 
 
-MODULE = B::Generate    PACKAGE = B::Generate     PREFIX = B_Generate
+MODULE = B::OP    PACKAGE = B::OP     PREFIX = B_OP
 
 int
 allocmy(char* name)

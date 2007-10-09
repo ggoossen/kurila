@@ -2,8 +2,8 @@ Artistic
 Build.PL
 Changes
 Copying
-lib/B/Generate.pm
-lib/B/Generate.xs
+lib/B/OP.pm
+lib/B/OP.xs
 Makefile.PL
 MANIFEST
 META.yml
