@@ -17,3 +17,9 @@ use B qw|svref_2object|;
     isa_ok($cop->io, "B::PV");
     is $cop->io->sv, ":crlf\0:bytes";
 }
+
+{
+    # new
+    my $op = B::OP->new('null', 0);
+    $op->free;
+}
