@@ -1650,8 +1650,8 @@
 #endif
 #  endif
 #endif
-#ifdef PERL_CORE
 #define find_runcv		Perl_find_runcv
+#ifdef PERL_CORE
 #define free_tied_hv_pool	Perl_free_tied_hv_pool
 #endif
 #if defined(DEBUGGING)
@@ -3921,8 +3921,8 @@
 #endif
 #  endif
 #endif
-#ifdef PERL_CORE
 #define find_runcv(a)		Perl_find_runcv(aTHX_ a)
+#ifdef PERL_CORE
 #define free_tied_hv_pool()	Perl_free_tied_hv_pool(aTHX)
 #endif
 #if defined(DEBUGGING)
