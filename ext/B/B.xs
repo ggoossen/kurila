@@ -70,29 +70,6 @@ make_sv_object(pTHX_ SV *arg, SV *sv)
     return arg;
 }
 
-#if PERL_VERSION >= 9
-static SV *
-make_temp_object(pTHX_ SV *arg, SV *temp)
-{
-    SV *target;
-    const char *const type = svclassnames[SvTYPE(temp)];
-    const IV iv = PTR2IV(temp);
-
-    target = newSVrv(arg, type);
-    sv_setiv(target, iv);
-
-    /* Need to keep our "temp" around as long as the target exists.
-       Simplest way seems to be to hang it from magic, and let that clear
-       it up.  No vtable, so won't actually get in the way of anything.  */
-    sv_magicext(target, temp, PERL_MAGIC_sv, NULL, NULL, 0);
-    /* magic object has had its reference count increased, so we must drop
-       our reference.  */
-    SvREFCNT_dec(temp);
-    return arg;
-}
-
-#endif
-
 static SV *
 make_mg_object(pTHX_ SV *arg, MAGIC *mg)
 {

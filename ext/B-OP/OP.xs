@@ -499,6 +499,26 @@ oplist(pTHX_ OP *o, SV **SP)
 }
 
 static SV *
+make_temp_object(pTHX_ SV *arg, SV *temp)
+{
+    SV *target;
+    const char *const type = svclassnames[SvTYPE(temp)];
+    const IV iv = PTR2IV(temp);
+
+    target = newSVrv(arg, type);
+    sv_setiv(target, iv);
+
+    /* Need to keep our "temp" around as long as the target exists.
+       Simplest way seems to be to hang it from magic, and let that clear
+       it up.  No vtable, so won't actually get in the way of anything.  */
+    sv_magicext(target, temp, PERL_MAGIC_sv, NULL, NULL, 0);
+    /* magic object has had its reference count increased, so we must drop
+       our reference.  */
+    SvREFCNT_dec(temp);
+    return arg;
+}
+
+static SV *
 make_warnings_object(pTHX_ SV *arg, STRLEN *warnings)
 {
     const char *type = 0;
@@ -1576,8 +1596,6 @@ HV*
 COP_hints_hash(o)
 	B::COP	o
 
-#if PERL_VERSION >= 9
-
 void
 COP_warnings(o)
 	B::COP	o
@@ -1591,18 +1609,6 @@ COP_io(o)
 	PPCODE:
 	ST(0) = make_cop_io_object(aTHX_ sv_newmortal(), o);
 	XSRETURN(1);
-
-#else
-
-B::SV
-COP_warnings(o)
-	B::COP	o
-
-B::SV
-COP_io(o)
-	B::COP	o
-
-#endif
 
 U32
 COP_hints(o)
@@ -1699,10 +1705,10 @@ B_set_main_start(...)
         RETVAL
 
 
-MODULE = B::OP    PACKAGE = B::OP     PREFIX = B_OP
+MODULE = B::PAD    PACKAGE = B::PAD     PREFIX = B_PAD_
 
 int
-allocmy(char* name)
+B_PAD_allocmy(char* name)
     CODE:
         SV **old_curpad           = PL_curpad;
         AV *old_comppad           = PL_comppad;
@@ -1716,6 +1722,8 @@ allocmy(char* name)
         PL_curpad  = old_curpad;
     OUTPUT:
         RETVAL
+
+MODULE = B::OP    PACKAGE = B::OP     PREFIX = B_
 
 BOOT:
     specialsv_list[0] = Nullsv;
