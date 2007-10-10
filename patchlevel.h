@@ -123,6 +123,7 @@ hunk.
 #if !defined(PERL_PATCHLEVEL_H_IMPLICIT) && !defined(LOCAL_PATCH_COUNT)
 static const char * const local_patches[] = {
 	NULL
+	,"DEVEL"
 	,NULL
 };
 
