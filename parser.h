@@ -15,6 +15,7 @@ typedef struct {
     YYSTYPE val;    /* semantic value */
     short   state;
     AV	    *comppad; /* value of PL_comppad when this value was created */
+    I32     savestack_ix;	/* size of savestack at this state */
 #ifdef DEBUGGING
     const char  *name; /* token/rule name for -Dpv */
 #endif
