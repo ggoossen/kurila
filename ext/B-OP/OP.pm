@@ -127,131 +127,7 @@ __END__
 
 B::OP - Inspect and manipulate op trees.
 
-=head1 SYNOPSIS
-
-    use B::OP;
-    # Do nothing, slowly.
-      CHECK {
-        my $null = B::OP->new("null",0);
-        my $enter = B::OP->new("enter",0);
-        my $cop = B::COP->new(0, "hiya", 0);
-        my $leave = B::LISTOP->new("leave", 0, $enter, $null);
-        $leave->set_children(3);
-        $enter->set_sibling($cop);
-        $enter->set_next($cop);
-        $cop->set_sibling($null);
-        $null->set_next($leave);
-        $cop->set_next($leave);
-
-        # Tell Perl where to find our tree.
-        B::set_main_root($leave);
-        B::set_main_start($enter);
-      }
-
-=head1 WARNING
-
-This module will create segmentation faults if you don't know how to
-use it properly. Further warning: sometimes B<I> don't know how to use
-it properly.
-
-There B<are> lots of other methods and utility functions, but they are
-not documented here. This is deliberate, rather than just through
-laziness. You are expected to have read the Perl and XS sources to this
-module before attempting to do anything with it.
-
-Patches welcome.
-
 =head1 DESCRIPTION
-
-This module allows you to examine and manipulate the Perl optree in Perl space.
-
-Well, if you're intimately familiar with Perl's internals, you can.
-
-C<B::OP> turns C<B>'s accessor methods into get-set methods.
-Hence, instead of merely saying
-
-    $op2 = $op->next;
-
-you can now say
-
-    $op->next($op2);
-
-to set the next op in the chain. It also adds constructor methods to
-create new ops. This is where it gets really hairy.
-
-    B::OP->new     ( type, flags )
-    B::UNOP->new   ( type, flags, first )
-    B::BINOP->new  ( type, flags, first, last )
-    B::LOGOP->new  ( type, flags, first, other )
-    B::LISTOP->new ( type, flags, first, last )
-    B::COP->new    ( flags, name, first )
-
-In all of the above constructors, C<type> is either a numeric value
-representing the op type (C<62> is the addition operator, for instance)
-or the name of the op. (C<"add">)
-
-(Incidentally, if you know about custom ops and have registed them
-properly with the interpreter, you can create custom ops by name: 
-C<B::OP->new("mycustomop",0)>, or whatever.)
-
-C<first>, C<last> and C<other> are ops to be attached to the current op;
-these should be C<B::OP> objects. If you haven't created the ops yet,
-don't worry; give a false value, and fill them in later:
-
-    $x = B::UNOP->new("negate", 0, undef);
-    # ... create some more ops ...
-    $x->first($y);
-
-In addition, one may create a new C<nextstate> operator with
-
-    B::op->newstate ( flags, label, op)
-
-in the same manner as C<B::COP::new> - this will also, however, add the
-C<lineseq> op.
-
-Finally, you can set the main root and the starting op by passing ops
-to the C<B::set_main_root> and C<B::set_main_start> functions.
-
-This module can obviously be used for all sorts of fun purposes. The
-best one will be in conjuction compilation subs.
-
-=head2 OTHER METHODS
-
-=over 3
-
-=item  $b_sv->sv
-
-Returns a real SV instead of a C<B::SV>. For instance:
-
-    $b_sv = $svop->sv;
-    if ($b_sv->sv == 3) {
-        print "SVOP's SV has an IV of 3\n"
-    }
-
-You can't use this to set the SV. That would be scary.
-
-=item $op->dump
-
-Runs C<Perl_op_dump> on an op; this is roughly equivalent to
-C<B::Debug>, but not quite.
-
-=item $b_sv->dump
-
-Runs C<Perl_sv_dump> on an SV; this is exactly equivalent to
-C<< Devel::Peek::dump($b_sv->sv) >>
-
-=item $b_op->linklist
-
-Sets the C<op_next> pointers in the tree in correct execution order, 
-overwriting the old C<next> pointers. You B<need> to do this once you've
-created an op tree for execution, unless you've carefully threaded it
-together yourself.
-
-=back
-
-=head2 EXPORT
-
-None.
 
 =head2 OP-RELATED CLASSES
 
@@ -446,18 +322,145 @@ Only when perl was compiled with ithreads.
 
 
 
+=head1 CREATING OPTREES
+
+=head2 SYNOPSIS
+
+    use B::OP;
+    # Do nothing, slowly.
+      CHECK {
+        my $null = B::OP->new("null",0);
+        my $enter = B::OP->new("enter",0);
+        my $cop = B::COP->new(0, "hiya", 0);
+        my $leave = B::LISTOP->new("leave", 0, $enter, $null);
+        $leave->set_children(3);
+        $enter->set_sibling($cop);
+        $enter->set_next($cop);
+        $cop->set_sibling($null);
+        $null->set_next($leave);
+        $cop->set_next($leave);
+
+        # Tell Perl where to find our tree.
+        B::set_main_root($leave);
+        B::set_main_start($enter);
+      }
+
+=head2 WARNING
+
+This module will create segmentation faults if you don't know how to
+use it properly. Further warning: sometimes B<I> don't know how to use
+it properly.
+
+There B<are> lots of other methods and utility functions, but they are
+not documented here. This is deliberate, rather than just through
+laziness. You are expected to have read the Perl and XS sources to this
+module before attempting to do anything with it.
+
+Patches welcome.
+
+=head2 DESCRIPTION
+
+This module also allows you to create and manipulate the Perl optree in Perl space.
+
+Well, if you're intimately familiar with Perl's internals, you can.
+
+C<B::OP> turns C<B>'s accessor methods into get-set methods.
+Hence, instead of merely saying
+
+    $op2 = $op->next;
+
+you can now say
+
+    $op->set_next($op2);
+
+to set the next op in the chain. It also adds constructor methods to
+create new ops. This is where it gets really hairy.
+
+    B::OP->new     ( type, flags )
+    B::UNOP->new   ( type, flags, first )
+    B::BINOP->new  ( type, flags, first, last )
+    B::LOGOP->new  ( type, flags, first, other )
+    B::LISTOP->new ( type, flags, first, last )
+    B::COP->new    ( flags, name, first )
+
+In all of the above constructors, C<type> is either a numeric value
+representing the op type (C<62> is the addition operator, for instance)
+or the name of the op. (C<"add">)
+
+(Incidentally, if you know about custom ops and have registed them
+properly with the interpreter, you can create custom ops by name: 
+C<B::OP->new("mycustomop",0)>, or whatever.)
+
+C<first>, C<last> and C<other> are ops to be attached to the current op;
+these should be C<B::OP> objects. If you haven't created the ops yet,
+don't worry; give a false value, and fill them in later:
+
+    $x = B::UNOP->new("negate", 0, undef);
+    # ... create some more ops ...
+    $x->first($y);
+
+In addition, one may create a new C<nextstate> operator with
+
+    B::op->newstate ( flags, label, op)
+
+in the same manner as C<B::COP::new> - this will also, however, add the
+C<lineseq> op.
+
+Finally, you can set the main root and the starting op by passing ops
+to the C<B::set_main_root> and C<B::set_main_start> functions.
+
+This module can obviously be used for all sorts of fun purposes. The
+best one will be in conjuction compilation subs.
+
+=head2 OTHER METHODS
+
+=over 3
+
+=item  $b_sv->sv
+
+Returns a real SV instead of a C<B::SV>. For instance:
+
+    $b_sv = $svop->sv;
+    if ($b_sv->sv == 3) {
+        print "SVOP's SV has an IV of 3\n"
+    }
+
+You can't use this to set the SV. That would be scary.
+
+=item $op->dump
+
+Runs C<Perl_op_dump> on an op; this is roughly equivalent to
+C<B::Debug>, but not quite.
+
+=item $b_sv->dump
+
+Runs C<Perl_sv_dump> on an SV; this is exactly equivalent to
+C<< Devel::Peek::dump($b_sv->sv) >>
+
+=item $b_op->linklist
+
+Sets the C<op_next> pointers in the tree in correct execution order, 
+overwriting the old C<next> pointers. You B<need> to do this once you've
+created an op tree for execution, unless you've carefully threaded it
+together yourself.
+
+=back
+
+=head2 EXPORT
+
+None.
+
 =head1 AUTHOR
 
+Malcolm Beattie, C<mbeattie@sable.ox.ac.uk>
 Simon Cozens, C<simon@cpan.org>
 (Who else?)
 
 =head1 MAINTAINERS
 
-This is just a list of people who have submitted patches to the
-module. To find someone to actually maintain this, please try
-contacting perl5-porters.
+This module is a merge of C<B-Generate> and the C<B::OP> part of C<B>.
 
-Josh ben Jore, Michael Schwern, Jim Cromie, Scott Walters.
+Josh ben Jore, Michael Schwern, Jim Cromie, Scott Walters, Gerard Goossen.
 
 =head1 LICENSE
 
