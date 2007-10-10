@@ -12,6 +12,20 @@ $VERSION = '1.10';
 
 B::OP->bootstrap($VERSION);
 
+@B::OP::ISA = 'B::OBJECT';
+@B::UNOP::ISA = 'B::OP';
+@B::BINOP::ISA = 'B::UNOP';
+@B::LOGOP::ISA = 'B::UNOP';
+@B::LISTOP::ISA = 'B::BINOP';
+@B::SVOP::ISA = 'B::OP';
+@B::PADOP::ISA = 'B::OP';
+@B::PVOP::ISA = 'B::OP';
+@B::LOOP::ISA = 'B::LISTOP';
+@B::PMOP::ISA = 'B::LISTOP';
+@B::COP::ISA = 'B::OP';
+
+@B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP);
+
 use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 
 # This is where we implement op.c in Perl. Sssh.
@@ -108,31 +122,30 @@ sub scope {
 
 1;
 __END__
-# Below is stub documentation for your module. You better edit it!
 
 =head1 NAME
 
-B::OP - Create your own op trees. 
+B::OP - Inspect and manipulate op trees.
 
 =head1 SYNOPSIS
 
     use B::OP;
     # Do nothing, slowly.
       CHECK {
-        my $null = new B::OP("null",0);
-        my $enter = new B::OP("enter",0);
-        my $cop = new B::COP(0, "hiya", 0);
-        my $leave = new B::LISTOP("leave", 0, $enter, $null);
-        $leave->children(3);
-        $enter->sibling($cop);
-        $enter->next($cop);
-        $cop->sibling($null);
-        $null->next($leave);
-        $cop->next($leave);
+        my $null = B::OP->new("null",0);
+        my $enter = B::OP->new("enter",0);
+        my $cop = B::COP->new(0, "hiya", 0);
+        my $leave = B::LISTOP->new("leave", 0, $enter, $null);
+        $leave->set_children(3);
+        $enter->set_sibling($cop);
+        $enter->set_next($cop);
+        $cop->set_sibling($null);
+        $null->set_next($leave);
+        $cop->set_next($leave);
 
         # Tell Perl where to find our tree.
-        B::main_root($leave);
-        B::main_start($enter);
+        B::set_main_root($leave);
+        B::set_main_start($enter);
       }
 
 =head1 WARNING
@@ -150,10 +163,7 @@ Patches welcome.
 
 =head1 DESCRIPTION
 
-Malcolm Beattie's C<B> module allows you to examine the Perl op tree at
-runtime, in Perl space; it's the basis of the Perl compiler. But what it
-doesn't let you do is manipulate that op tree: it won't let you create
-new ops, or modify old ones. Now you can.
+This module allows you to examine and manipulate the Perl optree in Perl space.
 
 Well, if you're intimately familiar with Perl's internals, you can.
 
@@ -169,12 +179,12 @@ you can now say
 to set the next op in the chain. It also adds constructor methods to
 create new ops. This is where it gets really hairy.
 
-    new B::OP     ( type, flags )
-    new B::UNOP   ( type, flags, first )
-    new B::BINOP  ( type, flags, first, last )
-    new B::LOGOP  ( type, flags, first, other )
-    new B::LISTOP ( type, flags, first, last )
-    new B::COP    ( flags, name, first )
+    B::OP->new     ( type, flags )
+    B::UNOP->new   ( type, flags, first )
+    B::BINOP->new  ( type, flags, first, last )
+    B::LOGOP->new  ( type, flags, first, other )
+    B::LISTOP->new ( type, flags, first, last )
+    B::COP->new    ( flags, name, first )
 
 In all of the above constructors, C<type> is either a numeric value
 representing the op type (C<62> is the addition operator, for instance)
@@ -182,31 +192,28 @@ or the name of the op. (C<"add">)
 
 (Incidentally, if you know about custom ops and have registed them
 properly with the interpreter, you can create custom ops by name: 
-C<new B::OP("mycustomop",0)>, or whatever.)
+C<B::OP->new("mycustomop",0)>, or whatever.)
 
 C<first>, C<last> and C<other> are ops to be attached to the current op;
 these should be C<B::OP> objects. If you haven't created the ops yet,
 don't worry; give a false value, and fill them in later:
 
-    $x = new B::UNOP("negate", 0, undef);
+    $x = B::UNOP->new("negate", 0, undef);
     # ... create some more ops ...
     $x->first($y);
 
 In addition, one may create a new C<nextstate> operator with
 
-    newstate B::op ( flags, label, op)
+    B::op->newstate ( flags, label, op)
 
 in the same manner as C<B::COP::new> - this will also, however, add the
 C<lineseq> op.
 
 Finally, you can set the main root and the starting op by passing ops
-to the C<B::main_root> and C<B::main_start> functions.
+to the C<B::set_main_root> and C<B::set_main_start> functions.
 
 This module can obviously be used for all sorts of fun purposes. The
-best one will be in conjuction with source filters; have your source
-filter parse an input file in a foreign language, create an op tree for
-it and get Perl to execute it. Then email me and tell me how you did it.
-And why.
+best one will be in conjuction compilation subs.
 
 =head2 OTHER METHODS
 
@@ -240,17 +247,204 @@ overwriting the old C<next> pointers. You B<need> to do this once you've
 created an op tree for execution, unless you've carefully threaded it
 together yourself.
 
-=item $b_op->free
-
-Runs C<Perl_op_free> on an opcode. Thus frees the opcodes and all the
-child opcodes.
-The object should not be used after this.
-
 =back
 
 =head2 EXPORT
 
 None.
+
+=head2 OP-RELATED CLASSES
+
+C<B::OP>, C<B::UNOP>, C<B::BINOP>, C<B::LOGOP>, C<B::LISTOP>, C<B::PMOP>,
+C<B::SVOP>, C<B::PADOP>, C<B::PVOP>, C<B::LOOP>, C<B::COP>.
+
+These classes correspond in the obvious way to the underlying C
+structures of similar names. The inheritance hierarchy mimics the
+underlying C "inheritance":
+
+                                 B::OP
+                                   |
+                   +---------------+--------+--------+-------+
+                   |               |        |        |       |
+                B::UNOP          B::SVOP B::PADOP  B::COP  B::PVOP
+                 ,'  `-.
+                /       `--.
+           B::BINOP     B::LOGOP
+               |
+               |
+           B::LISTOP
+             ,' `.
+            /     \
+        B::LOOP B::PMOP
+
+Access methods correspond to the underlying C structre field names,
+with the leading "class indication" prefix (C<"op_">) removed.
+
+Most fields also have an set method, prefixed with "set_".
+
+=head2 B::OP Methods
+
+These methods get the values of similarly named fields within the OP
+data structure.  See top of C<op.h> for more info.
+
+=over 4
+
+=item next
+
+=item sibling
+
+=item name
+
+This returns the op name as a string (e.g. "add", "rv2av").
+
+=item ppaddr
+
+This returns the function name as a string (e.g. "PL_ppaddr[OP_ADD]",
+"PL_ppaddr[OP_RV2AV]").
+
+=item desc
+
+This returns the op description from the global C PL_op_desc array
+(e.g. "addition" "array deref").
+
+=item targ
+
+=item type
+
+=item opt
+
+=item flags
+
+=item private
+
+=item spare
+
+=item free
+
+Frees the opcode and all child opcodes.
+The object should not be used after this.
+
+=back
+
+=head2 B::UNOP METHOD
+
+=over 4
+
+=item first
+
+=back
+
+=head2 B::BINOP METHOD
+
+=over 4
+
+=item last
+
+=back
+
+=head2 B::LOGOP METHOD
+
+=over 4
+
+=item other
+
+=back
+
+=head2 B::LISTOP METHOD
+
+=over 4
+
+=item children
+
+=back
+
+=head2 B::PMOP Methods
+
+=over 4
+
+=item pmreplroot
+
+=item pmreplstart
+
+=item pmnext
+
+=item pmregexp
+
+=item pmflags
+
+=item extflags
+
+=item precomp
+
+=item pmoffset
+
+Only when perl was compiled with ithreads.
+
+=back
+
+=head2 B::SVOP METHOD
+
+=over 4
+
+=item sv
+
+=item gv
+
+=back
+
+=head2 B::PADOP METHOD
+
+=over 4
+
+=item padix
+
+=back
+
+=head2 B::PVOP METHOD
+
+=over 4
+
+=item pv
+
+=back
+
+=head2 B::LOOP Methods
+
+=over 4
+
+=item redoop
+
+=item nextop
+
+=item lastop
+
+=back
+
+=head2 B::COP Methods
+
+=over 4
+
+=item label
+
+=item stash
+
+=item stashpv
+
+=item file
+
+=item cop_seq
+
+=item line
+
+=item warnings
+
+=item io
+
+=item hints
+
+=back
+
+
 
 =head1 AUTHOR
 
