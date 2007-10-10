@@ -2230,11 +2230,6 @@ sub ACTION_build {
   $self->depends_on('docs');
 }
 
-# action to satisfy make with PERL_CORE
-sub ACTION_config {
-    my $self = shift;
-}
-
 sub process_files_by_extension {
   my ($self, $ext) = @_;
   
@@ -4029,7 +4024,7 @@ sub _infer_xs_spec {
   pop( @d ) while @d && $d[-1] eq '';
   $spec{module_name} = join( '::', (@d, $file_base) );
 
-  $spec{archdir} = File::Spec->catdir( ( ! $ENV{PERL_CORE} ? ($self->blib, 'arch', 'auto') : ("../../lib/auto") ),
+  $spec{archdir} = File::Spec->catdir($self->blib, 'arch', 'auto',
 				      @d, $file_base);
 
   $spec{bs_file} = File::Spec->catfile($spec{archdir}, "${file_base}.bs");
@@ -4120,14 +4115,6 @@ sub copy_if_modified {
     die "No 'from' parameter given to copy_if_modified";
   }
   
-  if ($ENV{PERL_CORE}) {
-      # install to 'lib' dir in the core, instead of its own.
-      my $blibdir = $self->blib;
-      if ($args{to} =~ m#^\Q$blibdir\E/(?:lib|arch)/#) {
-          $args{to} =~ s#^\Q$blibdir\E/(?:lib|arch)/#../../lib/#;
-      }
-  }
-
   my $to_path;
   if (defined $args{to} and length $args{to}) {
     $to_path = $args{to};
