@@ -49,42 +49,42 @@
      FUNC0SUB = 264,
      UNIOPSUB = 265,
      LSTOPSUB = 266,
-     LABEL = 267,
-     SUB = 268,
-     ANONSUB = 269,
-     PACKAGE = 270,
-     USE = 271,
-     WHILE = 272,
-     UNTIL = 273,
-     IF = 274,
-     UNLESS = 275,
-     ELSE = 276,
-     ELSIF = 277,
-     CONTINUE = 278,
-     FOR = 279,
-     GIVEN = 280,
-     WHEN = 281,
-     DEFAULT = 282,
-     LOOPEX = 283,
-     DOTDOT = 284,
-     FUNC0 = 285,
-     FUNC1 = 286,
-     FUNC = 287,
-     UNIOP = 288,
-     LSTOP = 289,
-     RELOP = 290,
-     EQOP = 291,
-     MULOP = 292,
-     ADDOP = 293,
-     DOLSHARP = 294,
-     DO = 295,
-     HASHBRACK = 296,
-     NOAMP = 297,
-     LOCAL = 298,
-     MY = 299,
-     MYSUB = 300,
-     REQUIRE = 301,
-     COMPSUB = 302,
+     COMPSUB = 267,
+     LABEL = 268,
+     SUB = 269,
+     ANONSUB = 270,
+     PACKAGE = 271,
+     USE = 272,
+     WHILE = 273,
+     UNTIL = 274,
+     IF = 275,
+     UNLESS = 276,
+     ELSE = 277,
+     ELSIF = 278,
+     CONTINUE = 279,
+     FOR = 280,
+     GIVEN = 281,
+     WHEN = 282,
+     DEFAULT = 283,
+     LOOPEX = 284,
+     DOTDOT = 285,
+     FUNC0 = 286,
+     FUNC1 = 287,
+     FUNC = 288,
+     UNIOP = 289,
+     LSTOP = 290,
+     RELOP = 291,
+     EQOP = 292,
+     MULOP = 293,
+     ADDOP = 294,
+     DOLSHARP = 295,
+     DO = 296,
+     HASHBRACK = 297,
+     NOAMP = 298,
+     LOCAL = 299,
+     MY = 300,
+     MYSUB = 301,
+     REQUIRE = 302,
      COLONATTR = 303,
      PREC_LOW = 304,
      DOROP = 305,
@@ -120,42 +120,42 @@
 #define FUNC0SUB 264
 #define UNIOPSUB 265
 #define LSTOPSUB 266
-#define LABEL 267
-#define SUB 268
-#define ANONSUB 269
-#define PACKAGE 270
-#define USE 271
-#define WHILE 272
-#define UNTIL 273
-#define IF 274
-#define UNLESS 275
-#define ELSE 276
-#define ELSIF 277
-#define CONTINUE 278
-#define FOR 279
-#define GIVEN 280
-#define WHEN 281
-#define DEFAULT 282
-#define LOOPEX 283
-#define DOTDOT 284
-#define FUNC0 285
-#define FUNC1 286
-#define FUNC 287
-#define UNIOP 288
-#define LSTOP 289
-#define RELOP 290
-#define EQOP 291
-#define MULOP 292
-#define ADDOP 293
-#define DOLSHARP 294
-#define DO 295
-#define HASHBRACK 296
-#define NOAMP 297
-#define LOCAL 298
-#define MY 299
-#define MYSUB 300
-#define REQUIRE 301
-#define COMPSUB 302
+#define COMPSUB 267
+#define LABEL 268
+#define SUB 269
+#define ANONSUB 270
+#define PACKAGE 271
+#define USE 272
+#define WHILE 273
+#define UNTIL 274
+#define IF 275
+#define UNLESS 276
+#define ELSE 277
+#define ELSIF 278
+#define CONTINUE 279
+#define FOR 280
+#define GIVEN 281
+#define WHEN 282
+#define DEFAULT 283
+#define LOOPEX 284
+#define DOTDOT 285
+#define FUNC0 286
+#define FUNC1 287
+#define FUNC 288
+#define UNIOP 289
+#define LSTOP 290
+#define RELOP 291
+#define EQOP 292
+#define MULOP 293
+#define ADDOP 294
+#define DOLSHARP 295
+#define DO 296
+#define HASHBRACK 297
+#define NOAMP 298
+#define LOCAL 299
+#define MY 300
+#define MYSUB 301
+#define REQUIRE 302
 #define COLONATTR 303
 #define PREC_LOW 304
 #define DOROP 305

@@ -127,7 +127,6 @@ for my $file (@files) {
 __DATA__
 use strict;
 #ABC
-new Foo;
 Foo->new;
 ########
 sub pi() { 3.14 }
