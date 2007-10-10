@@ -66,11 +66,7 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
 
     BEGIN { compsub::define( compfunc1 => sub { my $op = shift;
                                                 my $cvop = B::SVOP->new('const', 0, *func1);
-                                                if ($op) {
-                                                    $op = B::LISTOP->new('list', 0, $op, $cvop);
-                                                } else {
-                                                    $op = B::LISTOP->new('list', 0, $cvop, undef);
-                                                }
+                                                $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)));
                                                 return B::UNOP->new('entersub', B::OPf_STACKED|B::OPf_SPECIAL, $op);
                                             } ); }
 
@@ -83,39 +79,40 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
 
 ## parsing params, and declaring lexical variables.
 {
+    # assumes argument like: 'foo' => \$foo, 'bar' => \$bar, { @_ }
     sub parseparams {
-        my $values = { foo => 'foo-value', bar => 'bar-value' }; #pop @_;
+        my $values = pop @_;
         while (my $name = shift @_) {
             $_[0] = $values->{$name};
             shift @_;
         }
     }
 
+    # assumes argument like C<'foo', 'bar', { @_ }>
+    # this will be converted like C<parseparams('foo', \(my $foo), 'bar', \(my $bar), { @_ })>
     sub compparams {
         my $op = shift;
         $op or return B::UNOP->new('null', 0);
         my $kid = $op->first;
-        my $last;
-        my $list;
-        my $lastli;
         while (ref $kid ne "B::NULL") {
             if ($kid->name eq "const") {
                 # allocate a 'my' variable
-                my $targ = B::OP::allocmy( '$' . ${ $kid->sv->object_2svref } );
+                my $targ = B::PAD::allocmy( '$' . ${ $kid->sv->object_2svref } );
                 # introduce the 'my' variable, and insert it into the list of argument.
                 my $padsv = B::OP->new('padsv', B::OPf_MOD);
                 $padsv->set_private(B::OPpLVAL_INTRO);
                 $padsv->set_targ($targ);
                 $padsv->set_sibling($kid->sibling);
                 $kid->set_sibling($padsv);
-                $kid = $padsv;
 
+                $kid = $padsv;
             } elsif ($kid->name eq "list" or $kid->name eq "pushmark") {
                 # ignore
+            } elsif ($kid->name eq "anonhash") {
+                # ignore, assume it is the last item in the list.
             } else {
                 die "Expected constant opcode but got " . $kid->name;
             }
-            $last = $kid;
             $kid = $kid->sibling;
         }
         my $cvop = B::SVOP->new('const', 0, *parseparams);
@@ -125,12 +122,12 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
     }
 
     BEGIN {
-        compsub::define( compfunc1 => \&compparams )
+        compsub::define( params => \&compparams )
     }
 
     {
         sub foobar {
-            compfunc1 'foo', 'bar';
+            params 'foo', 'bar', { @_ };
             is $foo, 'foo-value', '$foo declared and initialized';
             is $bar, 'bar-value';
         }
