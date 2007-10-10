@@ -30,6 +30,12 @@ compsub - Package for defining compilation subroutines
     ...
     foo $a, $b = (1, 2);
 
+=head1 WARNING
+
+This module will create segmentation faults if you don't know how to
+use it properly. You are expected to be familiar with the perl internals
+to use this module properly.
+
 =head1 DESCRIPTION
 
 =head2 Compilation subroutines
@@ -66,16 +72,24 @@ one of its arguments multiple times, call multiple subroutines with the same arg
 
 =head2 Writing compilation subs
 
-=over
+A compilation subs are lexical scope, and can be declared into the lexical scope
+currently being compiled using:
 
-B::OP
-    compsub::define( foo => \&foo )
+    compsub::define( foo => \&compfoo )
 
-declares a compile time function 'foo'.
+This defines a compilation subroutine C<foo>, which gets compiled using C<compfoo>.
+To declare the function at compile-time, you usually have to define it in a BEGIN block
+or in an C<import> routine.
+When C<foo> is used C<compfoo> gets called with as argument the opcode for the
+list following C<foo>. C<compfoo> is expected to return an opcode, this opcode
+will be inserted in the place where C<foo> is called. Opcodes are instances of
+C<B::OP> or one of its subclasses.
 
 There is no verification of the "correctness" of the opcode tree
-generated, so you may easily created opcode which generates
-segfaults.
+generated, so you may easily created opcode trees which wrong and generate
+segfaults or manipulate random memory and stuff like that.
+
+See also C<B::OP> about creating and maniuplating op trees.
 
 =item Freeing opcodes
 
@@ -90,8 +104,9 @@ it.
 =over 4
 
 =item Calling a subroutine or not depending on some global environment.
+
 This example creates a compilation sub C<debuglog>, which calls C<dolog> if C<$ENV{DEBUG}>
-is set. Thus checking for C<$ENV{DEBUG}> is done at compile time, and if 
+is set. Thus checking for C<$ENV{DEBUG}> is done at compile time, and if
 it not set no code is executed at run-time.
 
 
@@ -120,6 +135,12 @@ it not set no code is executed at run-time.
   debuglog Dump($complexvar);
 
 =item parsing arguments and declaring lexical variables
+
+In this example a keyword C<params> is created.
+This keyword expects a list of compile-time constant string arguments, and
+as last argument a hashref. It creates a lexical scope variable for each
+string argument. At run-time the lexical scoped variables set to the hash value
+with their name.
 
 
     # assumes argument like: 'foo' => \$foo, 'bar' => \$bar, { @_ }
