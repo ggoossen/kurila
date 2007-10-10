@@ -738,34 +738,6 @@ OP_mutate(o, type)
     OUTPUT:
         o
 
-B::OP
-OP_convert(o, type, flags)
-    B::OP o
-    I32 flags
-    I32 type
-    CODE:
-        if (!o || o->op_type != OP_LIST)
-            o = newLISTOP(OP_LIST, 0, o, Nullop);
-        else
-            o->op_flags &= ~OPf_WANT;
-
-        if (!(PL_opargs[type] & OA_MARK) && o->op_type != OP_NULL) {
-            op_clear(o);
-            o->op_targ = o->op_type;
-        }
-
-        o->op_type = type;
-        o->op_ppaddr = PL_ppaddr[type];
-        o->op_flags |= flags;
-
-        o = CALL_FPTR(PL_check[type])(aTHX_ (OP*)o);
-
-        if (o->op_type == type)
-            o = Perl_fold_constants(aTHX_ o);
-
-    OUTPUT:
-        o
-
 MODULE = B::OP    PACKAGE = B::UNOP               PREFIX = UNOP_
 
 void

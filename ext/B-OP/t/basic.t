@@ -14,9 +14,9 @@ CHECK {
     };
     $z = B::BINOP->new("subtract",0,$x->first, $x->last); # Create replacement "subtract"
 
-    $z->next($x->next); # Copy add's "next" across.
-    $y->next($z);       # Tell $y to point to replacement op.
-    $z->targ($x->targ);
+    $z->set_next($x->next); # Copy add's "next" across.
+    $y->set_next($z);       # Tell $y to point to replacement op.
+    $z->set_targ($x->targ);
 
     # Turn 30 into 13
     for(
@@ -24,7 +24,7 @@ CHECK {
         B::opnumber("const") ne $x->type || $x->sv->sv ne 30;
         $x=$x->next
     ) {}
-    $x->sv(13);
+    $x->set_sv(13);
 
     # Turn "bad" into "good"
     for(
@@ -34,7 +34,7 @@ CHECK {
     ) {
 	next unless($x->can('sv'));
 	if($x->sv->PV eq "bad") {
-	    $x->sv("good");
+	    $x->set_sv("good");
 	    last;
 	}
     }
@@ -47,7 +47,7 @@ CHECK {
     ) {
 	next unless($x->can('sv'));
 	if($x->sv->PV eq "lead") {
-	    $x->sv("gold");
+	    $x->set_sv("gold");
 	    last;
 	}
     }
