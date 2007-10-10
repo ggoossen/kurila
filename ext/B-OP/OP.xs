@@ -1109,6 +1109,7 @@ SVOP_new(class, type, flags, sv)
 
 MODULE = B::OP    PACKAGE = B::PADOP              PREFIX = PADOP_
 
+void
 PADOP_set_padix(o, ...)
         B::PADOP o
     CODE:
