@@ -921,7 +921,7 @@ Interaction, perlfaq9 - Networking
 
 =back
 
-=head2 perlfaq1 - General Questions About Perl ($Revision: 9671 $)
+=head2 perlfaq1 - General Questions About Perl ($Revision: 9681 $)
 
 =over 4
 
@@ -935,11 +935,11 @@ Interaction, perlfaq9 - Networking
 
 =item Which version of Perl should I use?
 
-=item What are perl4, perl5, or perl6?
+=item What are Perl 4, Perl 5, or Perl 6?
 
 =item What was Ponie?
 
-=item What is perl6?
+=item What is Perl 6?
 
 =item How stable is Perl?
 
@@ -1113,7 +1113,7 @@ program; what am I doing wrong?
 
 =back
 
-=head2 perlfaq4 - Data Manipulation ($Revision: 9491 $)
+=head2 perlfaq4 - Data Manipulation ($Revision: 9681 $)
 
 =over 4
 
@@ -1646,7 +1646,7 @@ methods?
 
 =back
 
-=head2 perlfaq8 - System Interaction ($Revision: 9667 $)
+=head2 perlfaq8 - System Interaction ($Revision: 9681 $)
 
 =over 4
 
@@ -5551,8 +5551,7 @@ callback
 
 C</m> - RXf_PMf_MULTILINE, C</s> - RXf_PMf_SINGLELINE, C</i> -
 RXf_PMf_FOLD, C</x> - RXf_PMf_EXTENDED, C</p> - RXf_PMf_KEEPCOPY,
-RXf_PMf_LOCALE, RXf_UTF8, RXf_SPLIT, RXf_SKIPWHITE, RXf_START_ONLY,
-RXf_WHITE
+RXf_SKIPWHITE, RXf_PMf_LOCALE, RXf_UTF8, RXf_START_ONLY, RXf_WHITE
 
 =item exec
 
@@ -6020,11 +6019,6 @@ SAVECOMPPAD X<SAVECOMPPAD>, SAVEPADSV X<SAVEPADSV>
 =item GV Functions
 
 is_gv_magical X<is_gv_magical>, is_gv_magical_sv X<is_gv_magical_sv>
-
-=item Hash Manipulation Functions
-
-refcounted_he_chain_2hv X<refcounted_he_chain_2hv>, refcounted_he_free
-X<refcounted_he_free>, refcounted_he_new X<refcounted_he_new>
 
 =item IO Functions
 
@@ -6714,6 +6708,8 @@ locale, the locale pramga has been removed
 
 =item C<(?p{})> has been removed
 
+=item Pseudo-hashes have been removed
+
 =item Removal of the bytecode compiler and of perlcc
 
 =item Removal of the JPL
@@ -6844,6 +6840,8 @@ C<Attribute::Handlers>, C<B::Lint>, C<B>, C<Thread>
 =item strictures and array/hash dereferencing in defined()
 
 =item C<(?p{})> has been removed
+
+=item Pseudo-hashes have been removed
 
 =item Removal of the bytecode compiler and of perlcc
 
@@ -11877,6 +11875,35 @@ escapes
 
 =back
 
+=head2 compsub - Package for defining compilation subroutines
+
+=over 4
+
+=item SYNOPSIS
+
+=item WARNING
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compilation subroutines
+
+=item Using compilation subs
+
+=item Writing compilation subs
+
+Freeing opcodes, Examples, Calling a subroutine or not depending on some
+global environment, parsing arguments and declaring lexical variables
+
+=back
+
+=item AUTHOR
+
+=item BUGS
+
+=back
+
 =head2 constant - Perl pragma to declare constants
 
 =over 4
@@ -13176,11 +13203,26 @@ XSUBANY, CvFLAGS, const_sv
 
 FILL, MAX, KEYS, RITER, NAME, ARRAY, PMROOT
 
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 B-OP, B::OP - Inspect and manipulate op trees.
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
 =item OP-RELATED CLASSES
 
 =item B::OP Methods
 
-next, sibling, name, ppaddr, desc, targ, type, opt, flags, private, spare
+next, sibling, name, ppaddr, desc, targ, type, opt, flags, private, spare,
+free
 
 =item B::UNOP METHOD
 
@@ -13225,7 +13267,31 @@ label, stash, stashpv, file, cop_seq, line, warnings, io, hints
 
 =back
 
+=item CREATING OPTREES
+
+=over 4
+
+=item SYNOPSIS
+
+=item WARNING
+
+=item DESCRIPTION
+
+=item OTHER METHODS
+
+ $b_sv->sv, $op->dump, $b_sv->dump, $b_op->linklist
+
+=item EXPORT
+
+=back
+
 =item AUTHOR
+
+=item MAINTAINERS
+
+=item LICENSE
+
+=item SEE ALSO
 
 =back
 
@@ -13427,6 +13493,92 @@ validate against older perls
 =item BUGS
 
 =item AUTHOR
+
+=back
+
+=head2 B::OP - Inspect and manipulate op trees.
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item OP-RELATED CLASSES
+
+=item B::OP Methods
+
+next, sibling, name, ppaddr, desc, targ, type, opt, flags, private, spare,
+free
+
+=item B::UNOP METHOD
+
+first
+
+=item B::BINOP METHOD
+
+last
+
+=item B::LOGOP METHOD
+
+other
+
+=item B::LISTOP METHOD
+
+children
+
+=item B::PMOP Methods
+
+pmreplroot, pmreplstart, pmnext, pmregexp, pmflags, extflags, precomp,
+pmoffset
+
+=item B::SVOP METHOD
+
+sv, gv
+
+=item B::PADOP METHOD
+
+padix
+
+=item B::PVOP METHOD
+
+pv
+
+=item B::LOOP Methods
+
+redoop, nextop, lastop
+
+=item B::COP Methods
+
+label, stash, stashpv, file, cop_seq, line, warnings, io, hints
+
+=back
+
+=item CREATING OPTREES
+
+=over 4
+
+=item SYNOPSIS
+
+=item WARNING
+
+=item DESCRIPTION
+
+=item OTHER METHODS
+
+ $b_sv->sv, $op->dump, $b_sv->dump, $b_op->linklist
+
+=item EXPORT
+
+=back
+
+=item AUTHOR
+
+=item MAINTAINERS
+
+=item LICENSE
+
+=item SEE ALSO
 
 =back
 
