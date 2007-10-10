@@ -67,7 +67,7 @@
 %token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
 
 %token <opval> WORD METHOD FUNCMETH THING PMFUNC PRIVATEREF
-%token <opval> FUNC0SUB UNIOPSUB LSTOPSUB
+%token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
 %token <p_tkval> LABEL
 %token <i_tkval> SUB ANONSUB PACKAGE USE
 %token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF CONTINUE FOR
@@ -76,7 +76,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DOLSHARP DO HASHBRACK NOAMP
-%token <opval> LOCAL MY MYSUB REQUIRE COMPSUB
+%token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
 %type <ival> prog progstart remember mremember savescope

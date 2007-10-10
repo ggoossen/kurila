@@ -19346,15 +19346,11 @@ EOM
 esac
 
 
-if $test $patchlevel -lt 9; then
-: MAD is not available in 5.8.x or earlier.
-    ans=n;
-else
-    case "$mad" in
-    $define|true|[yY]*)	dflt='y' ;;
-    *)			dflt='n' ;;
-    esac
-    cat <<EOM
+case "$mad" in
+$define|true|[yY]*)	dflt='y' ;;
+*)			dflt='n' ;;
+esac
+cat <<EOM
 
 Would you like to build with Misc Attribute Decoration? This is development
 work leading to a Perl 5 to Perl 6 convertor, which imposes a space and speed
@@ -19362,9 +19358,9 @@ overhead on the interpreter.
 
 If this doesn't make any sense to you, just accept the default '$dflt'.
 EOM
-    rp='Build Perl with MAD?'
-    . ./myread
-fi
+rp='Build Perl with MAD?'
+. ./myread
+
 case "$ans" in
 y|Y)	val="$define"
 	madlyh='madly.h madly.act madly.tab'
