@@ -5228,45 +5228,6 @@ Perl_yylex(pTHX)
 			force_next(WORD);
 			TOKEN(NOAMP);
 		    }
-		}
-
-		/* Guess harder when madskills require "best effort". */
-		if (PL_madskills && (!gv || !GvCVu(gv))) {
-		    int probable_sub = 0;
-		    if (strchr("\"'`$@%0123456789!*+{[<", *s))
-			probable_sub = 1;
-		    else if (isALPHA(*s)) {
-			char tmpbuf[1024];
-			STRLEN tmplen;
-			d = s;
-			d = scan_word(d, tmpbuf, sizeof tmpbuf, TRUE, &tmplen);
-			if (!keyword(tmpbuf, tmplen, 0))
-			    probable_sub = 1;
-			else {
-			    while (d < PL_bufend && isSPACE(*d))
-				d++;
-			    if (*d == '=' && d[1] == '>')
-				probable_sub = 1;
-			}
-		    }
-		    if (probable_sub) {
-			gv = gv_fetchpv(PL_tokenbuf, GV_ADD, SVt_PVCV);
-			op_free(yylval.opval);
-			yylval.opval = newCVREF(0, newGVOP(OP_GV, 0, gv));
-			yylval.opval->op_private |= OPpENTERSUB_NOPAREN;
-			PL_last_lop = PL_oldbufptr;
-			PL_last_lop_op = OP_ENTERSUB;
-			PL_nextwhite = PL_thiswhite;
-			PL_thiswhite = 0;
-			start_force(PL_curforce);
-			NEXTVAL_NEXTTOKE.opval = yylval.opval;
-			PL_expect = XTERM;
-			PL_nextwhite = nextPL_nextwhite;
-			curmad('X', PL_thistoken);
-			PL_thistoken = newSVpvs("");
-			force_next(WORD);
-			TOKEN(NOAMP);
-		    }
 #else
 		    NEXTVAL_NEXTTOKE.opval = yylval.opval;
 		    PL_expect = XTERM;
