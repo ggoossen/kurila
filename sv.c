@@ -9900,13 +9900,6 @@ Perl_cx_dup(pTHX_ PERL_CONTEXT *cxs, I32 ix, I32 max, CLONE_PARAMS* param)
 		ncx->blk_loop.iterix	= cx->blk_loop.iterix;
 		ncx->blk_loop.itermax	= cx->blk_loop.itermax;
 		break;
-	    case CXt_FORMAT:
-		ncx->blk_sub.cv		= cv_dup(cx->blk_sub.cv, param);
-		ncx->blk_sub.gv		= gv_dup(cx->blk_sub.gv, param);
-		ncx->blk_sub.dfoutgv	= gv_dup_inc(cx->blk_sub.dfoutgv, param);
-		ncx->blk_sub.hasargs	= cx->blk_sub.hasargs;
-		ncx->blk_sub.retop	= cx->blk_sub.retop;
-		break;
 	    case CXt_BLOCK:
 	    case CXt_NULL:
 		break;

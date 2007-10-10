@@ -1040,18 +1040,6 @@ Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
     case CXt_NULL:
     case CXt_BLOCK:
 	break;
-    case CXt_FORMAT:
-	PerlIO_printf(Perl_debug_log, "BLK_SUB.CV = 0x%"UVxf"\n",
-		PTR2UV(cx->blk_sub.cv));
-	PerlIO_printf(Perl_debug_log, "BLK_SUB.GV = 0x%"UVxf"\n",
-		PTR2UV(cx->blk_sub.gv));
-	PerlIO_printf(Perl_debug_log, "BLK_SUB.DFOUTGV = 0x%"UVxf"\n",
-		PTR2UV(cx->blk_sub.dfoutgv));
-	PerlIO_printf(Perl_debug_log, "BLK_SUB.HASARGS = %d\n",
-		(int)cx->blk_sub.hasargs);
-	PerlIO_printf(Perl_debug_log, "BLK_SUB.RETOP = 0x%"UVxf"\n",
-		PTR2UV(cx->blk_sub.retop));
-	break;
     case CXt_SUB:
 	PerlIO_printf(Perl_debug_log, "BLK_SUB.CV = 0x%"UVxf"\n",
 		PTR2UV(cx->blk_sub.cv));
