@@ -296,14 +296,6 @@ struct block_sub {
 	cx->blk_sub.lval = 0;
 
 
-#define PUSHFORMAT(cx)							\
-	cx->blk_sub.cv = cv;						\
-	cx->blk_sub.gv = gv;						\
-	cx->blk_sub.retop = NULL;					\
-	cx->blk_sub.hasargs = 0;					\
-	cx->blk_sub.dfoutgv = PL_defoutgv;				\
-	SvREFCNT_inc_void(cx->blk_sub.dfoutgv)
-
 #define POP_SAVEARRAY()						\
     STMT_START {							\
 	SvREFCNT_dec(GvAV(PL_defgv));					\
@@ -346,10 +338,6 @@ struct block_sub {
 	if (sv)								\
 	    SvREFCNT_dec(sv);						\
     } STMT_END
-
-#define POPFORMAT(cx)							\
-	setdefout(cx->blk_sub.dfoutgv);					\
-	SvREFCNT_dec(cx->blk_sub.dfoutgv);
 
 /* eval context */
 struct block_eval {
@@ -620,9 +608,8 @@ struct context {
 #define CXt_LOOP	3
 #define CXt_SUBST	4
 #define CXt_BLOCK	5
-#define CXt_FORMAT	6
-#define CXt_GIVEN	7
-#define CXt_WHEN	8
+#define CXt_GIVEN	6
+#define CXt_WHEN	7
 
 /* private flags for CXt_SUB and CXt_NULL */
 #define CXp_MULTICALL	0x00000400	/* part of a multicall (so don't

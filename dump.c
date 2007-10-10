@@ -1930,7 +1930,7 @@ S_deb_curcv(pTHX_ const I32 ix)
 {
     dVAR;
     const PERL_CONTEXT * const cx = &cxstack[ix];
-    if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT)
+    if (CxTYPE(cx) == CXt_SUB)
         return cx->blk_sub.cv;
     else if (CxTYPE(cx) == CXt_EVAL && !CxTRYBLOCK(cx))
         return PL_compcv;

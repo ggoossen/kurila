@@ -695,7 +695,6 @@ S_dopoptolabel(pTHX_ const char *label)
 	switch (CxTYPE(cx)) {
 	case CXt_SUBST:
 	case CXt_SUB:
-	case CXt_FORMAT:
 	case CXt_EVAL:
 	case CXt_NULL:
 	case CXt_GIVEN:
@@ -783,7 +782,6 @@ S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 	    continue;
 	case CXt_EVAL:
 	case CXt_SUB:
-	case CXt_FORMAT:
 	    DEBUG_l( Perl_deb(aTHX_ "(Found sub #%ld)\n", (long)i));
 	    return i;
 	}
@@ -819,7 +817,6 @@ S_dopoptoloop(pTHX_ I32 startingblock)
 	switch (CxTYPE(cx)) {
 	case CXt_SUBST:
 	case CXt_SUB:
-	case CXt_FORMAT:
 	case CXt_EVAL:
 	case CXt_NULL:
 	    if (ckWARN(WARN_EXITING))
@@ -904,9 +901,6 @@ Perl_dounwind(pTHX_ I32 cxix)
 	    POPLOOP(cx);
 	    break;
 	case CXt_NULL:
-	    break;
-	case CXt_FORMAT:
-	    POPFORMAT(cx);
 	    break;
 	}
 	cxstack_ix--;
@@ -1072,7 +1066,7 @@ PP(pp_caller)
     }
 
     cx = &ccstack[cxix];
-    if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
+    if (CxTYPE(cx) == CXt_SUB) {
         const I32 dbcxix = dopoptosub_at(ccstack, cxix - 1);
 	/* We expect that ccstack[dbcxix] is CXt_SUB, anyway, the
 	   field below is defined for any cx. */
@@ -1104,7 +1098,7 @@ PP(pp_caller)
     PUSHs(sv_2mortal(newSViv((I32)CopLINE(cx->blk_oldcop))));
     if (!MAXARG)
 	RETURN;
-    if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
+    if (CxTYPE(cx) == CXt_SUB) {
 	GV * const cvgv = CvGV(ccstack[cxix].blk_sub.cv);
 	/* So is ccstack[dbcxix]. */
 	if (isGV(cvgv)) {
@@ -1487,10 +1481,6 @@ PP(pp_return)
 	    DIE(aTHX_ "%"SVf" did not return a true value", SVfARG(nsv));
 	}
 	break;
-    case CXt_FORMAT:
-	POPFORMAT(cx);
-	retop = cx->blk_sub.retop;
-	break;
     default:
 	DIE(aTHX_ "panic: return");
     }
@@ -1590,10 +1580,6 @@ PP(pp_last)
     case CXt_EVAL:
 	POPEVAL(cx);
 	nextop = cx->blk_eval.retop;
-	break;
-    case CXt_FORMAT:
-	POPFORMAT(cx);
-	nextop = cx->blk_sub.retop;
 	break;
     default:
 	DIE(aTHX_ "panic: last");
@@ -1998,7 +1984,6 @@ PP(pp_goto)
 		    break;
 		}
 		/* FALL THROUGH */
-	    case CXt_FORMAT:
 	    case CXt_NULL:
 		DIE(aTHX_ "Can't \"goto\" out of a pseudo block");
 	    default:
@@ -2306,7 +2291,7 @@ Perl_find_runcv(pTHX_ U32 *db_seqp)
         I32 ix;
 	for (ix = si->si_cxix; ix >= 0; ix--) {
 	    const PERL_CONTEXT *cx = &(si->si_cxstack[ix]);
-	    if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT) {
+	    if (CxTYPE(cx) == CXt_SUB) {
 		CV * const cv = cx->blk_sub.cv;
 		/* skip DB:: code */
 		if (db_seqp && PL_debstash && CvSTASH(cv) == PL_debstash) {
