@@ -2185,7 +2185,6 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     I32 gimme = G_VOID;
     I32 optype;
     OP dummy;
-    OP *rop;
     char tbuf[TYPE_DIGITS(long) + 12 + 10];
     char *tmpbuf = tbuf;
     char *safestr;
@@ -2243,9 +2242,9 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PUSHEVAL(cx, 0, NULL);
 
     if (runtime)
-	rop = doeval(G_SCALAR, startop, runcv, PL_curcop->cop_seq);
+	(void) doeval(G_SCALAR, startop, runcv, PL_curcop->cop_seq);
     else
-	rop = doeval(G_SCALAR, startop, PL_compcv, PL_cop_seqmax);
+	(void) doeval(G_SCALAR, startop, PL_compcv, PL_cop_seqmax);
     POPBLOCK(cx,PL_curpm);
     POPEVAL(cx);
 
@@ -2263,7 +2262,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(optype);
 
-    return rop;
+    return PL_eval_start;
 }
 
 
@@ -2312,9 +2311,12 @@ Perl_find_runcv(pTHX_ U32 *db_seqp)
  * In the last case, startop is non-null, and contains the address of
  * a pointer that should be set to the just-compiled code.
  * outside is the lexically enclosing CV (if any) that invoked us.
+ * Returns a bool indicating whether the compile was successful; if so,
+ * PL_eval_start contains the first op of the compiled ocde; otherwise,
+ * pushes undef (also croaks if startop != NULL).
  */
 
-STATIC OP *
+STATIC bool
 S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 {
     dVAR; dSP;
@@ -2395,8 +2397,8 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    const SV * const nsv = cx->blk_eval.old_namesv;
 	    (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                           &PL_sv_undef, 0);
-	    DIE(aTHX_ "%sCompilation failed in require",
-		*msg ? msg : "Unknown error\n");
+	    Perl_croak(aTHX_ "%sCompilation failed in require",
+		       *msg ? msg : "Unknown error\n");
 	}
 	else if (startop) {
 	    POPBLOCK(cx,PL_curpm);
@@ -2410,7 +2412,9 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    }
 	}
 	PERL_UNUSED_VAR(newsp);
-	RETPUSHUNDEF;
+	PUSHs(&PL_sv_undef);
+	PUTBACK;
+	return FALSE;
     }
     CopLINE_set(&PL_compiling, 0);
     if (startop) {
@@ -2457,7 +2461,8 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     PL_op = saveop;			/* The caller may need it. */
     PL_parser->lex_state = LEX_NOTPARSING;	/* $^S needs this. */
 
-    RETURNOP(PL_eval_start);
+    PUTBACK;
+    return TRUE;
 }
 
 STATIC PerlIO *
@@ -2854,7 +2859,10 @@ PP(pp_require)
     encoding = PL_encoding;
     PL_encoding = NULL;
 
-    op = DOCATCH(doeval(gimme, NULL, NULL, PL_curcop->cop_seq));
+    if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
+	op = DOCATCH(PL_eval_start);
+    else
+	op = PL_op->op_next;
 
     /* Restore encoding. */
     PL_encoding = encoding;
@@ -2873,7 +2881,7 @@ PP(pp_entereval)
     char *tmpbuf = tbuf;
     char *safestr;
     STRLEN len;
-    OP *ret;
+    bool ok;
     CV* runcv;
     U32 seq;
     HV *saved_hh = NULL;
@@ -2946,13 +2954,13 @@ PP(pp_entereval)
     if (PERLDB_LINE && PL_curstash != PL_debstash)
 	save_lines(CopFILEAV(&PL_compiling), PL_parser->linestr);
     PUTBACK;
-    ret = doeval(gimme, NULL, runcv, seq);
+    ok = doeval(gimme, NULL, runcv, seq);
     if (PERLDB_INTER && was != (I32)PL_sub_generation /* Some subs defined here. */
-	&& ret != PL_op->op_next) {	/* Successive compilation. */
+	&& ok) {
 	/* Copy in anything fake and short. */
 	my_strlcpy(safestr, fakestr, fakelen);
     }
-    return DOCATCH(ret);
+    return ok ? DOCATCH(PL_eval_start) : PL_op->op_next;
 }
 
 PP(pp_leaveeval)
