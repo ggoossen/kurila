@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 10;
+use Test::More tests => 4;
 
 use B qw|svref_2object|;
 
