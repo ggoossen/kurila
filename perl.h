@@ -3563,6 +3563,7 @@ Gid_t getegid (void);
 #  define DEBUG_A_TEST_ (PL_debug & DEBUG_A_FLAG)
 #  define DEBUG_q_TEST_ (PL_debug & DEBUG_q_FLAG)
 #  define DEBUG_Xv_TEST_ (DEBUG_X_TEST_ && DEBUG_v_TEST_)
+#  define DEBUG_Uv_TEST_ (DEBUG_U_TEST_ && DEBUG_v_TEST_)
 
 #ifdef DEBUGGING
 
@@ -3581,7 +3582,6 @@ Gid_t getegid (void);
 #  define DEBUG_U_TEST DEBUG_U_TEST_
 #  define DEBUG_H_TEST DEBUG_H_TEST_
 #  define DEBUG_X_TEST DEBUG_X_TEST_
-#  define DEBUG_Xv_TEST DEBUG_Xv_TEST_
 #  define DEBUG_D_TEST DEBUG_D_TEST_
 #  define DEBUG_S_TEST DEBUG_S_TEST_
 #  define DEBUG_T_TEST DEBUG_T_TEST_
@@ -3591,6 +3591,8 @@ Gid_t getegid (void);
 #  define DEBUG_C_TEST DEBUG_C_TEST_
 #  define DEBUG_A_TEST DEBUG_A_TEST_
 #  define DEBUG_q_TEST DEBUG_q_TEST_
+#  define DEBUG_Xv_TEST DEBUG_Xv_TEST_
+#  define DEBUG_Uv_TEST DEBUG_Uv_TEST_
 
 #  define PERL_DEB(a)                  a
 #  define PERL_DEBUG(a) if (PL_debug)  a
@@ -3625,8 +3627,9 @@ Gid_t getegid (void);
 #  define DEBUG_U(a) DEBUG__(DEBUG_U_TEST, a)
 #  define DEBUG_H(a) DEBUG__(DEBUG_H_TEST, a)
 #  define DEBUG_X(a) DEBUG__(DEBUG_X_TEST, a)
-#  define DEBUG_Xv(a) DEBUG__(DEBUG_Xv_TEST, a)
 #  define DEBUG_D(a) DEBUG__(DEBUG_D_TEST, a)
+#  define DEBUG_Xv(a) DEBUG__(DEBUG_Xv_TEST, a)
+#  define DEBUG_Uv(a) DEBUG__(DEBUG_Uv_TEST, a)
 
 #  define DEBUG_S(a)
 
@@ -3654,7 +3657,6 @@ Gid_t getegid (void);
 #  define DEBUG_U_TEST (0)
 #  define DEBUG_H_TEST (0)
 #  define DEBUG_X_TEST (0)
-#  define DEBUG_Xv_TEST (0)
 #  define DEBUG_D_TEST (0)
 #  define DEBUG_S_TEST (0)
 #  define DEBUG_T_TEST (0)
@@ -3664,6 +3666,8 @@ Gid_t getegid (void);
 #  define DEBUG_C_TEST (0)
 #  define DEBUG_A_TEST (0)
 #  define DEBUG_q_TEST (0)
+#  define DEBUG_Xv_TEST (0)
+#  define DEBUG_Uv_TEST (0)
 
 #  define PERL_DEB(a)
 #  define PERL_DEBUG(a)
@@ -3682,7 +3686,6 @@ Gid_t getegid (void);
 #  define DEBUG_U(a)
 #  define DEBUG_H(a)
 #  define DEBUG_X(a)
-#  define DEBUG_Xv(a)
 #  define DEBUG_D(a)
 #  define DEBUG_S(a)
 #  define DEBUG_T(a)
@@ -3691,6 +3694,8 @@ Gid_t getegid (void);
 #  define DEBUG_C(a)
 #  define DEBUG_A(a)
 #  define DEBUG_q(a)
+#  define DEBUG_Xv(a)
+#  define DEBUG_Uv(a)
 #endif /* DEBUGGING */
 
 

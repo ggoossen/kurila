@@ -5551,7 +5551,8 @@ callback
 
 C</m> - RXf_PMf_MULTILINE, C</s> - RXf_PMf_SINGLELINE, C</i> -
 RXf_PMf_FOLD, C</x> - RXf_PMf_EXTENDED, C</p> - RXf_PMf_KEEPCOPY,
-RXf_SKIPWHITE, RXf_PMf_LOCALE, RXf_UTF8, RXf_START_ONLY, RXf_WHITE
+RXf_PMf_LOCALE, RXf_UTF8, RXf_SPLIT, RXf_SKIPWHITE, RXf_START_ONLY,
+RXf_WHITE
 
 =item exec
 
@@ -5746,6 +5747,10 @@ X<sv_pv>, sv_pvbyte X<sv_pvbyte>, sv_pvbyten X<sv_pvbyten>, sv_pvn
 X<sv_pvn>, sv_pvutf8 X<sv_pvutf8>, sv_pvutf8n X<sv_pvutf8n>, sv_taint
 X<sv_taint>, sv_unref X<sv_unref>, sv_usepvn X<sv_usepvn>, sv_usepvn_mg
 X<sv_usepvn_mg>, sv_uv X<sv_uv>, unpack_str X<unpack_str>
+
+=item Functions in file pp_ctl.c
+
+find_runcv X<find_runcv>
 
 =item Functions in file pp_pack.c
 
@@ -6011,10 +6016,6 @@ PAD_SAVE_SETNULLPAD X<PAD_SAVE_SETNULLPAD>, PAD_SETSV X<PAD_SETSV>,
 PAD_SET_CUR X<PAD_SET_CUR>, PAD_SET_CUR_NOSAVE X<PAD_SET_CUR_NOSAVE>,
 PAD_SV X<PAD_SV>, PAD_SVl X<PAD_SVl>, SAVECLEARSV X<SAVECLEARSV>,
 SAVECOMPPAD X<SAVECOMPPAD>, SAVEPADSV X<SAVEPADSV>
-
-=item Functions in file pp_ctl.c
-
-find_runcv X<find_runcv>
 
 =item GV Functions
 
@@ -6355,19 +6356,45 @@ I<The Road goes ever on and on, down from the door where it began.>
 
 =back
 
-=head2 perltodo - Perl TO-DO List
+=head2 perlcommunity - a brief overview of the Perl community
 
 =over 4
 
 =item DESCRIPTION
 
-=item The roadmap to 5.10
+=over 4
+
+=item Where to find the community
+
+=item Mailing lists and Newsgroups
+
+=item IRC
+
+=item Websites
+
+L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
+
+=item User Groups
+
+=item Workshops
+
+=item Hackathons
+
+=item Conventions
+
+=item Calendar of Perl Events
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perltodo - Perl TO-DO List
 
 =over 4
 
-=item Needed for the final 5.10.0 release
-
-=back
+=item DESCRIPTION
 
 =item Tasks that only need Perl knowledge
 
