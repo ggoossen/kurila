@@ -166,9 +166,7 @@ sub makefile_to_build_args {
     # Do tilde-expansion if it looks like a tilde prefixed path
     ( $val ) = glob( $val ) if $val =~ /^~/;
 
-    if ($key eq "PERL_CORE") {
-        $ENV{PERL_CORE} = 1;
-    } elsif (exists $makefile_to_build{$key}) {
+    if (exists $makefile_to_build{$key}) {
       my $trans = $makefile_to_build{$key};
       push @out, ref($trans) ? $trans->($val) : ("--$trans", $val);
     } elsif (exists $Config{lc($key)}) {
@@ -211,9 +209,6 @@ sub fake_makefile {
   my $class = $args{build_class};
 
   my $perl = $class->find_perl_interpreter;
-  if ($ENV{PERL_CORE}) {
-      $perl = "PERL_CORE=1 $perl -I" . File::Spec->catdir(File::Basename::dirname($perl), 'lib');
-  }
   my $noop = ($class->is_windowsish ? 'rem>nul'  :
 	      $class->is_vmsish     ? 'Continue' :
 	      'true');
