@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..94\n";
+print "1..95\n";
 
 our ($foo, $fact, $ans, $i, $x, $eval);
 
@@ -452,7 +452,14 @@ print "ok $test - eval and last\n"; $test++;
     local $@ = "foo";
     eval undef;
     print "not " unless $@ eq "";
-    print "ok $test # eval unef \n"; $test++;
+    print "ok $test # eval undef \n"; $test++;
+}
+
+{
+    no warnings;
+    eval "/ /a;";
+    print "not " unless $@ =~ /^syntax error/;
+    print "ok $test # eval syntax error, no warnings \n"; $test++;
 }
 
 
