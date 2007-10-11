@@ -2671,6 +2671,8 @@ X<SYS$LOGIN>
 
 =item DESCRIPTION
 
+=item SEE ALSO
+
 =back
 
 =head2 perllexwarn - Perl Lexical Warnings
@@ -2701,8 +2703,6 @@ X<warning, fatal>
 X<warning, reporting> X<warning, registering>
 
 =back
-
-=item TODO
 
 =item SEE ALSO
 
@@ -2900,7 +2900,7 @@ m X</m> X<regex, multiline> X<regexp, multiline> X<regular expression,
 multiline>, s X</s> X<regex, single-line> X<regexp, single-line> X<regular
 expression, single-line>, i X</i> X<regex, case-insensitive> X<regexp,
 case-insensitive> X<regular expression, case-insensitive>, x X</x>, p X</p>
-X<regex, preserve> X<regexp, preserve>
+X<regex, preserve> X<regexp, preserve>, g and c X</g> X</c>
 
 =item Regular Expressions
 
@@ -6491,6 +6491,10 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =over 4
 
 =item Implement $value ~~ 0 .. $range
+
+=item A does() built-in
+
+=item Tied filehandles and write() don't mix
 
 =item Attach/detach debugger from running program
 
@@ -10130,7 +10134,7 @@ C<PATH>, I<nroff>, Permissions
 =item Optional Libraries for Perl on Cygwin
 
 C<-lcrypt>, C<-lgdbm> (C<use GDBM_File>), C<-ldb> (C<use DB_File>),
-C<-lcygipc> (C<use IPC::SysV>), C<-lutil>
+C<cygserver> (C<use IPC::SysV>), C<-lutil>
 
 =item Configure-time Options for Perl on Cygwin
 
@@ -10177,7 +10181,9 @@ C<chown()>, Miscellaneous
 
 =item Prebuilt methods:
 
-C<Cwd::cwd>, C<Cygwin::pid_to_winpid>, C<Cygwin::winpid_to_pid>
+C<Cwd::cwd>, C<Cygwin::pid_to_winpid>, C<Cygwin::winpid_to_pid>,
+C<Cygwin::win_to_posix_path>, C<Cygwin::posix_to_win_path>,
+C<Cygwin::is_binmount>, C<Cygwin::is_textmount>
 
 =back
 
@@ -11895,6 +11901,8 @@ escapes
 
 Freeing opcodes, Examples, Calling a subroutine or not depending on some
 global environment, parsing arguments and declaring lexical variables
+
+=item IMPLEMENTATION
 
 =back
 
@@ -14138,6 +14146,22 @@ FCGI_SOCKET_PATH, FCGI_LISTEN_QUEUE
 
 =back
 
+=head2 CORE - Pseudo-namespace for Perl's core routines
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item OVERRIDING CORE FUNCTIONS
+
+=item AUTHOR
+
+=item SEE ALSO
+
+=back
+
 =head2 CPAN - query, download and build perl modules from CPAN sites
 
 =over 4
@@ -15296,9 +15320,7 @@ abs_path, realpath, fast_abs_path
 
 =back
 
-=head2 DB - programmatic interface to the Perl debugging API (draft,
-subject to
-change)
+=head2 DB - programmatic interface to the Perl debugging API
 
 =over 4
 
@@ -15872,7 +15894,7 @@ $md5->add_bits($bitstring), $md5->digest, $md5->hexdigest, $md5->b64digest
 
 =over 4
 
-=item SYNOPSIS (SHA)
+=item SYNOPSIS
 
 =item SYNOPSIS (HMAC-SHA)
 

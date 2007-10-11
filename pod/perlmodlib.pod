@@ -305,6 +305,10 @@ Backward compatibility module for defunct CGI::Switch
 
 Internal utilities used by CGI module
 
+=item CORE
+
+Pseudo-namespace for Perl's core routines
+
 =item CPAN
 
 Query, download and build perl modules from CPAN sites
@@ -359,7 +363,7 @@ Get pathname of current working directory
 
 =item DB
 
-Programmatic interface to the Perl debugging API (draft, subject to
+Programmatic interface to the Perl debugging API
 
 =item DBM_Filter
 

@@ -39,6 +39,8 @@ which gets initialized to the has value of { @_ }.
 
 =back
 
+See L<compsub> for more information about writing compilation subroutines.
+
 Compilation subroutines are ment mainly as a replacement for source
 filters and indirect object syntax, as a new method of creating new
 semantics. I consider its main advatage the clear syntax in
