@@ -1108,6 +1108,8 @@ _cleaner2:
 	-rmdir lib/Filter/Util lib/IO/Socket
 	-rmdir lib/List lib/MIME lib/Scalar lib/Sys
 	-rmdir lib/threads lib/XS
+	-rmdir lib/CPANPLUS/Dist/Build/t/dummy-*
+	-rmdir lib/CPANPLUS/t/dummy-cpanplus lib/CPANPLUS/t/dummy-localmirror
 	-rm -f cygcrypt-0.dll cygwin1.dll
 	-rm -f lib/ExtUtils/CBuilder/t/libcompilet.dll.a
 	-rm -f lib/ExtUtils/ParseXS/t/libXSTest.dll.a
@@ -1177,10 +1179,10 @@ test_prep: test_prep_pre miniperl$(EXE_EXT) $(unidatafiles) perl$(EXE_EXT) $(dyn
 	PERL=./perl $(MAKE) _test_prep
 
 _test_tty:
-	cd t && $(PERL_DEBUG) $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS) </dev/tty
+	cd t && $(PERL_DEBUG) $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS) $(TEST_FILES) </dev/tty
 
 _test_notty:
-	cd t && $(PERL_DEBUG) PERL_SKIP_TTY_TEST=1 $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS)
+	cd t && $(PERL_DEBUG) PERL_SKIP_TTY_TEST=1 $(LDLIBPTH) $(PERL) $(TESTFILE) $(TEST_ARGS) $(TEST_FILES)
 
 unpack_files:
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib uupacktool.pl -u -m
