@@ -1,0 +1,73 @@
+=head1 NAME
+
+kurila14delta - what is new for Perl Kurila 1.4
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.3 and Perl Kurila 1.4
+
+=head1 Highlights In Perl Kurila 1.4
+
+Perl Kurila 1.4 is release for one experimental new feature:
+"compilation subroutines".
+
+Mainly as a replacement for source filters and indirect object syntax,
+as a new method of creating new semantics. I consider its main advatage 
+the clear syntax in combination with being lexically scoped.
+
+=head1 CONSIDERATIONS
+
+=over 
+
+=item Place of recognizing the token.
+
+I am not exactly sure about the current place of recognizing the
+compilation sub, maybe it should should the same priority as a keyword.
+
+=item Ignoring of parentheses
+
+The decision to not recognize the parenthese after the compilation sub
+(i.e. C<foo($arg1), $arg2> being understood as C<foo $arg1, $arg2>.
+But I am temped to make this also the default for function calls.
+Perl Kurila 1.3 tries to reduce some ambiguities in Perl code, and to
+simplify the perl internals. Some uncommon and error prone options
+have been removed. More specific:
+
+=item Difficulty generating correct optrees
+
+Generates correct optrees is very difficult.
+To have utility functions for some of the standard compile time actions
+would mostly resolve this. Of course it proably will remain
+difficult it you want to do very complex things.
+
+=item The name
+
+I now use compilation sub to refer to calling the sub, but probably
+should be terminoly making a better distinction between the word being
+lexical scoped and the subroutine attached to that word.
+
+=back
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
