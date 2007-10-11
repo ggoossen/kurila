@@ -307,7 +307,8 @@ rgs                                     rgarciasuarez\100free.fr
 sky                                     sky\100nanisky.com
 +                                       artur\100contiller.se
 +                                       arthur\100contiller.se
-steveh                                  steve.hay\100uk.radan.com
+steveh                                  stevehay\100planit.com
++                                       steve.hay\100uk.radan.com
 stevep                                  steve\100fisharerojo.org
 +                                       steve.peters\100gmail.com
 
@@ -335,6 +336,7 @@ ash\100cpan.org                         ash_cpan\100firemirror.com
 avarab\100gmail.com                     avar\100cpan.org
 
 bah\100ecnvantage.com                   bholzman\100longitude.com
+bcarter@gumdrop.flyinganvil.org         q.eibcartereio.=~m-b.{6}-cgimosx@gumdrop.flyinganvil.org
 ben_tilly\100operamail.com              btilly\100gmail.com
 
 chromatic\100wgz.org                    chromatic\100rmci.net
