@@ -87,6 +87,12 @@ ext/B/hints/darwin.pl	Hints for named architecture
 ext/B/hints/openbsd.pl	Hints for named architecture
 ext/B/Makefile.PL	Compiler backend makefile writer
 ext/B/O.pm		Compiler front-end module (-MO=...)
+ext/B-OP/Makefile.PL		Perl space opcode tree inspection and manipulation
+ext/B-OP/OP.pm		Perl space opcode tree inspection and manipulation
+ext/B-OP/OP.xs		Perl space opcode tree inspection and manipulation
+ext/B-OP/t/basic.t		Perl space opcode tree inspection and manipulation
+ext/B-OP/t/b-op.t		Perl space opcode tree inspection and manipulation
+ext/B-OP/typemap		Perl space opcode tree inspection and manipulation
 ext/B/t/b.t		See if B works
 ext/B/t/concise.t	See whether B::Concise works
 ext/B/t/concise-xs.t	See whether B::Concise recognizes XS functions
@@ -390,8 +396,8 @@ ext/Digest/SHA/t/base64.t	See if Digest::SHA works
 ext/Digest/SHA/t/bitbuf.t	See if Digest::SHA works
 ext/Digest/SHA/t/dumpload.t	See if Digest::SHA works
 ext/Digest/SHA/t/fips198.t	See if Digest::SHA works
-ext/Digest/SHA/t/gg.t		See if Digest::SHA works
 ext/Digest/SHA/t/gglong.t	See if Digest::SHA works
+ext/Digest/SHA/t/gg.t		See if Digest::SHA works
 ext/Digest/SHA/t/hmacsha.t	See if Digest::SHA works
 ext/Digest/SHA/t/ireland.t	See if Digest::SHA works
 ext/Digest/SHA/t/methods.t	See if Digest::SHA works
@@ -1604,6 +1610,8 @@ lib/Class/ISA/t/01_old_junk.t	Tests for Class::ISA
 lib/Class/Struct.pm		Declare struct-like datatypes as Perl classes
 lib/Class/Struct.t		See if Class::Struct works
 lib/complete.pl			A command completion subroutine
+lib/compsub.pm			Module for defining compilation subroutines
+lib/compsub.t			See if defining compilation subroutines works
 lib/Config/Extensions.pm	Convenient hash lookup for built extensions
 lib/Config/Extensions.t		See if Config::Extensions works
 lib/Config.t			See if Config works
@@ -3013,6 +3021,7 @@ pod/checkpods.PL		Tool to check for common errors in pods
 pod/kurila01delta.pod	What is new for Perl Kurila 0.1
 pod/kurila02delta.pod	What is new for Perl Kurila 0.2
 pod/kurila13delta.pod	What is new for Perl Kurila 1.3
+pod/kurila14delta.pod	What is new for Perl Kurila 1.4
 pod/kurilaintro.pod	Description of Perl Kurila
 pod/kurilatoc.pod		Perl Kurila documentation table of contents
 pod.lst				List the pods and their roles
