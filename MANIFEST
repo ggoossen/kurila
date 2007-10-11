@@ -41,9 +41,7 @@ Cross/TODO		Cross-compilation
 Cross/warp		Cross-compilation
 cv.h			Code value header
 cygwin/cygwin.c		Additional code for Cygwin port
-cygwin/ld2.in		ld wrapper template for Cygwin port
 cygwin/Makefile.SHs	Shared library generation for Cygwin port
-cygwin/perlld.in	dll generator template for Cygwin port
 deb.c			Debugging routines
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
@@ -295,6 +293,7 @@ ext/Devel/PPPort/parts/inc/uv	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/variables	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/version	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/warn	Devel::PPPort include
+ext/Devel/PPPort/parts/ppport.fnc	Devel::PPPort API listing
 ext/Devel/PPPort/parts/ppptools.pl	Devel::PPPort various utilities
 ext/Devel/PPPort/parts/todo/5004000	Devel::PPPort todo file
 ext/Devel/PPPort/parts/todo/5004010	Devel::PPPort todo file
