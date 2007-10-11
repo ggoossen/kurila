@@ -282,6 +282,7 @@ ext/Devel/PPPort/parts/inc/ppphbin	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/ppphdoc	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/ppphtest	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/pvs	Devel::PPPort include
+ext/Devel/PPPort/parts/inc/shared_pv	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/snprintf	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/strlfuncs	Devel::PPPort include
 ext/Devel/PPPort/parts/inc/SvPV	Devel::PPPort include
@@ -350,6 +351,7 @@ ext/Devel/PPPort/TODO		Devel::PPPort Todo
 ext/Devel/PPPort/t/podtest.t	Devel::PPPort test file
 ext/Devel/PPPort/t/ppphtest.t	Devel::PPPort test file
 ext/Devel/PPPort/t/pvs.t	Devel::PPPort test file
+ext/Devel/PPPort/t/shared_pv.t	Devel::PPPort test file
 ext/Devel/PPPort/t/snprintf.t	Devel::PPPort test file
 ext/Devel/PPPort/t/strlfuncs.t	Devel::PPPort test file
 ext/Devel/PPPort/t/SvPV.t	Devel::PPPort test file
@@ -3699,6 +3701,7 @@ t/op/oct.t			See if oct and hex work
 t/op/ord.t			See if ord works
 t/op/or.t			See if || works in weird situations
 t/op/override.t			See if operator overriding works
+t/op/overload_integer.t			See if overload::constant for integer works after "use".   
 t/op/pack.t			See if pack and unpack work
 t/op/pat.t			See if esoteric patterns work
 t/op/pos.t			See if pos works
