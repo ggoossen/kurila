@@ -11,9 +11,41 @@ This document describes differences between Perl Kurila 1.3 and Perl Kurila 1.4
 Perl Kurila 1.4 is release for one experimental new feature:
 "compilation subroutines".
 
-Mainly as a replacement for source filters and indirect object syntax,
-as a new method of creating new semantics. I consider its main advatage 
-the clear syntax in combination with being lexically scoped.
+Compilation subroutines are lexically scoped keywords with perl sub
+attached to it which gets called during compile time. When the
+keyword is used the arguments to it are normally parsed, but after that
+the perl sub attached to the keyword is called with as argument the argument
+of its keyword as opcode tree. The sub returns an opcode tree.
+Thus the sub receive an opcode tree, and returns a opcode tree.
+
+Examples of things which can be done using compile subroutines: 
+
+=over
+
+=item *
+
+C<debuglog Data::Dumper->Dump($x)> would only execute Dump when
+a debug flag is set.
+
+=item *
+
+C<str_expand 'value'>, would do the string expansion only once, at compile time,
+and give an compile time constant string.
+
+=item *
+
+C<getparams 'foo', 'bar', { @_ }> would generate the lexical vars $foo and $bar
+which gets initialized to the has value of { @_ }.
+
+=back
+
+Compilation subroutines are ment mainly as a replacement for source
+filters and indirect object syntax, as a new method of creating new
+semantics. I consider its main advatage the clear syntax in
+combination with being lexically scoped.
+
+To make it possible to generate new optree B::Generate has been integrated
+into B::OP
 
 =head1 CONSIDERATIONS
 
