@@ -3763,7 +3763,7 @@ PP(pp_hslice)
         }
 
         he = hv_fetch_ent(hv, keysv, lval, 0);
-        svp = he ? &HeVAL(he) : 0;
+        svp = he ? &HeVAL(he) : NULL;
 
         if (lval) {
             if (!svp || *svp == &PL_sv_undef) {
@@ -4109,12 +4109,17 @@ PP(pp_push)
 	PUSHi( AvFILL(ary) + 1 );
     }
     else {
+	PL_delaymagic = DM_DELAY;
 	for (++MARK; MARK <= SP; MARK++) {
 	    SV * const sv = newSV(0);
 	    if (*MARK)
 		sv_setsv(sv, *MARK);
 	    av_store(ary, AvFILLp(ary)+1, sv);
 	}
+	if (PL_delaymagic & DM_ARRAY)
+	    mg_set((SV*)ary);
+
+	PL_delaymagic = 0;
 	SP = ORIGMARK;
 	PUSHi( AvFILLp(ary) + 1 );
     }

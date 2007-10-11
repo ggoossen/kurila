@@ -5133,7 +5133,7 @@ Perl_sv_len_utf8(pTHX_ register SV *sv)
 
 	if (PL_utf8cache) {
 	    STRLEN ulen;
-	    MAGIC *mg = SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_utf8) : 0;
+	    MAGIC *mg = SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_utf8) : NULL;
 
 	    if (mg && mg->mg_len != -1) {
 		ulen = mg->mg_len;
@@ -10691,7 +10691,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 
     PL_sub_generation	= proto_perl->Isub_generation;
     PL_isarev		= hv_dup_inc(proto_perl->Iisarev, param);
-    PL_delayedisa	= hv_dup_inc(proto_perl->Idelayedisa, param);
 
     /* funky return mechanisms */
     PL_forkprocess	= proto_perl->Iforkprocess;
