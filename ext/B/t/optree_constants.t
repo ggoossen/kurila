@@ -88,7 +88,7 @@ pass("RENDER CONSTANT SUBS RETURNING SCALARS");
 for $func (sort keys %$want) {
     # no strict 'refs';	# why not needed ?
     checkOptree ( name      => "$func() as a coderef",
-		  code      => \&{$func},
+		  code      => \&{*{Symbol::fetch_glob($func)}},
 		  noanchors => 1,
 		  expect    => <<EOT_EOT, expect_nt => <<EONT_EONT);
  is a constant sub, optimized to a $want->{$func}[0]

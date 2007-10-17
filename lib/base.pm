@@ -71,7 +71,6 @@ sub import {
     my $fields_base;
 
     my $inheritor = caller(0);
-    my @isa_classes;
 
     my @bases;
     foreach my $base (@_) {
@@ -122,9 +121,7 @@ ERROR
         }
     }
     # Save this until the end so it's all or nothing if the above loop croaks.
-    push @{*{Symbol::fetch_glob("$inheritor\::ISA")}}, @isa_classes;
-
-    push @{"$inheritor\::ISA"}, @bases;
+    push @{*{Symbol::fetch_glob("$inheritor\::ISA")}}, @bases;
 
     if( defined $fields_base ) {
         inherit_fields($inheritor, $fields_base);
