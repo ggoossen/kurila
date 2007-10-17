@@ -4136,6 +4136,7 @@ Perl_getcwd_sv(pTHX_ register SV *sv)
 #endif
 }
 
+#define VERSION_MAX 0x7FFFFFFF
 /*
 =for apidoc scan_version
 
@@ -4167,6 +4168,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     int saw_period = 0;
     int alpha = 0;
     int width = 3;
+    bool vinf = FALSE;
     AV * const av = newAV();
     SV * const hv = newSVrv(rv, "version"); /* create an SV and upgrade the RV */
     (void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
@@ -4216,14 +4218,15 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     if ( saw_period > 1 )
 	qv = 1; /* force quoted version processing */
 
+    last = pos;
     pos = s;
 
     if ( qv )
-	hv_store((HV *)hv, "qv", 2, newSViv(qv), 0);
+	(void)hv_stores((HV *)hv, "qv", newSViv(qv));
     if ( alpha )
-	hv_store((HV *)hv, "alpha", 5, newSViv(alpha), 0);
+	(void)hv_stores((HV *)hv, "alpha", newSViv(alpha));
     if ( !qv && width < 3 )
-	hv_store((HV *)hv, "width", 5, newSViv(width), 0);
+	(void)hv_stores((HV *)hv, "width", newSViv(width));
     
     while (isDIGIT(*pos))
 	pos++;
@@ -4236,7 +4239,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
   		/* this is atoi() that delimits on underscores */
   		const char *end = pos;
   		I32 mult = 1;
- 		I32 orev;
+		I32 orev;
 
 		/* the following if() will only be true after the decimal
 		 * point of a version originally created with a bare
@@ -4245,11 +4248,18 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
  		if ( !qv && s > start && saw_period == 1 ) {
 		    mult *= 100;
  		    while ( s < end ) {
- 			orev = rev;
+			orev = rev;
  			rev += (*s - '0') * mult;
  			mult /= 10;
- 			if ( PERL_ABS(orev) > PERL_ABS(rev) )
- 			    Perl_croak(aTHX_ "Integer overflow in version");
+			if (   (PERL_ABS(orev) > PERL_ABS(rev)) 
+			    || (PERL_ABS(rev) > VERSION_MAX )) {
+			    if(ckWARN(WARN_OVERFLOW))
+				Perl_warner(aTHX_ packWARN(WARN_OVERFLOW), 
+				"Integer overflow in version %d",VERSION_MAX);
+			    s = end - 1;
+			    rev = VERSION_MAX;
+			    vinf = 1;
+			}
  			s++;
 			if ( *s == '_' )
 			    s++;
@@ -4257,18 +4267,29 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
   		}
  		else {
  		    while (--end >= s) {
- 			orev = rev;
+			orev = rev;
  			rev += (*end - '0') * mult;
  			mult *= 10;
- 			if ( PERL_ABS(orev) > PERL_ABS(rev) )
- 			    Perl_croak(aTHX_ "Integer overflow in version");
+			if (   (PERL_ABS(orev) > PERL_ABS(rev)) 
+			    || (PERL_ABS(rev) > VERSION_MAX )) {
+			    if(ckWARN(WARN_OVERFLOW))
+				Perl_warner(aTHX_ packWARN(WARN_OVERFLOW), 
+				"Integer overflow in version");
+			    end = s - 1;
+			    rev = VERSION_MAX;
+			    vinf = 1;
+			}
  		    }
  		} 
   	    }
 
   	    /* Append revision */
 	    av_push(av, newSViv(rev));
-	    if ( *pos == '.' )
+	    if ( vinf ) {
+		s = last;
+		break;
+	    }
+	    else if ( *pos == '.' )
 		s = ++pos;
 	    else if ( *pos == '_' && isDIGIT(pos[1]) )
 		s = ++pos;
@@ -4307,21 +4328,26 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     }
 
     /* need to save off the current version string for later */
-    if ( s > start ) {
+    if ( vinf ) {
+	SV * orig = newSVpvn("v.Inf", sizeof("v.Inf")-1);
+	(void)hv_stores((HV *)hv, "original", orig);
+	(void)hv_stores((HV *)hv, "vinf", newSViv(1));
+    }
+    else if ( s > start ) {
 	SV * orig = newSVpvn(start,s-start);
 	if ( qv && saw_period == 1 && *start != 'v' ) {
 	    /* need to insert a v to be consistent */
 	    sv_insert(orig, 0, 0, "v", 1);
 	}
-	hv_store((HV *)hv, "original", 8, orig, 0);
+	(void)hv_stores((HV *)hv, "original", orig);
     }
     else {
-	hv_store((HV *)hv, "original", 8, newSVpvn("0",1), 0);
+	(void)hv_stores((HV *)hv, "original", newSVpvn("0",1));
 	av_push(av, newSViv(0));
     }
 
     /* And finally, store the AV in the hash */
-    hv_store((HV *)hv, "version", 7, newRV_noinc((SV *)av), 0);
+    (void)hv_stores((HV *)hv, "version", newRV_noinc((SV *)av));
 
     /* fix RT#19517 - special case 'undef' as string */
     if ( *s == 'u' && strEQ(s,"undef") ) {
@@ -4366,21 +4392,21 @@ Perl_new_version(pTHX_ SV *ver)
 
 	/* Begin copying all of the elements */
 	if ( hv_exists((HV *)ver, "qv", 2) )
-	    hv_store((HV *)hv, "qv", 2, &PL_sv_yes, 0);
+	    (void)hv_stores((HV *)hv, "qv", &PL_sv_yes);
 
 	if ( hv_exists((HV *)ver, "alpha", 5) )
-	    hv_store((HV *)hv, "alpha", 5, &PL_sv_yes, 0);
+	    (void)hv_stores((HV *)hv, "alpha", &PL_sv_yes);
 	
 	if ( hv_exists((HV*)ver, "width", 5 ) )
 	{
 	    const I32 width = SvIV(*hv_fetchs((HV*)ver, "width", FALSE));
-	    hv_store((HV *)hv, "width", 5, newSViv(width), 0);
+	    (void)hv_stores((HV *)hv, "width", newSViv(width));
 	}
 
 	if ( hv_exists((HV*)ver, "original", 8 ) )
 	{
 	    SV * pv = *hv_fetchs((HV*)ver, "original", FALSE);
-	    hv_store((HV *)hv, "original", 8, newSVsv(pv), 0);
+	    (void)hv_stores((HV *)hv, "original", newSVsv(pv));
 	}
 
 	sav = (AV *)SvRV(*hv_fetchs((HV*)ver, "version", FALSE));
@@ -4391,7 +4417,7 @@ Perl_new_version(pTHX_ SV *ver)
 	    av_push(av, newSViv(rev));
 	}
 
-	hv_store((HV *)hv, "version", 7, newRV_noinc((SV *)av), 0);
+	(void)hv_stores((HV *)hv, "version", newRV_noinc((SV *)av));
 	return rv;
     }
 #ifdef SvVOK

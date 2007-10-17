@@ -2535,8 +2535,8 @@ $   GOSUB myread
 $   be_case_sensitive = ans
 $! IEEE math?
 $   echo ""
-$   echo "Perl normally uses IEEE format (T_FLOAT) floating point numbers"
-$   echo "internally on Alpha, but if you need G_FLOAT for binary compatibility"
+$   echo "Perl normally uses IEEE format (T_FLOAT) floating point numbers on"
+$   echo "Alpha and Itanium, but if you need G_FLOAT for binary compatibility"
 $   echo "with an external library or existing data, you may wish to disable"
 $   echo "the IEEE math option."
 $   bool_dflt = use_ieee_math
@@ -2929,6 +2929,11 @@ $!
 $ IF use_ieee_math
 $ THEN
 $   extra_flags = "''extra_flags'" + "/float=ieee/ieee=denorm"
+$ ELSE
+$   IF (archname.EQS."VMS_IA64")
+$   THEN
+$     extra_flags = "''extra_flags'" + "/float=g_float"
+$   ENDIF
 $ ENDIF
 $ IF be_case_sensitive
 $ THEN
@@ -6684,6 +6689,7 @@ $ ENDIF
 $ IF use64bitall .OR. use64bitall .EQS. "define" THEN -
     WC "#define USE_64_BIT_ALL"
 $ IF be_case_sensitive THEN WC "#define VMS_WE_ARE_CASE_SENSITIVE"
+$ IF use_ieee_math THEN WC "#define USE_IEEE"
 $ IF d_herrno .EQS. "undef" THEN WC "#define NEED_AN_H_ERRNO"
 $ WC "#define HAS_ENVGETENV"
 $ WC "#define PERL_EXTERNAL_GLOB"
