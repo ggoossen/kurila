@@ -8351,7 +8351,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	    pv_pretty(dsv, STRING(o), STR_LEN(o), 60, 
 	        PL_colors[0], PL_colors[1],
 	        PERL_PV_ESCAPE_UNI_DETECT |
-	        PERL_PV_PRETTY_ELIPSES    |
+	        PERL_PV_PRETTY_ELLIPSES   |
 	        PERL_PV_PRETTY_LTGT    
             ); 
 	Perl_sv_catpvf(aTHX_ sv, " %s", s );
@@ -9270,7 +9270,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
                     elem_ptr ? pv_pretty(sv, SvPV_nolen_const(*elem_ptr), SvCUR(*elem_ptr), 60,
 	                    PL_colors[0], PL_colors[1],
 	                    (PERL_PV_ESCAPE_UNI_DETECT) |
-	                    PERL_PV_PRETTY_ELIPSES    |
+	                    PERL_PV_PRETTY_ELLIPSES    |
 	                    PERL_PV_PRETTY_LTGT
                             )
                             : "???"
