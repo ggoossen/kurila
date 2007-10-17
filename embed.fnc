@@ -1332,7 +1332,6 @@ s	|void	|qsortsvu	|NN SV** array|size_t num_elts|NN SVCOMPARE_t compare
 #endif
 
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
-s	|int	|emulate_eaccess|NN const char* path|Mode_t mode
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
 sR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
 #  endif
@@ -1831,7 +1830,8 @@ Mp	|void	|append_madprops|NULLOK MADPROP* tm|NULLOK OP* o|char slot
 Mp	|void	|addmad		|NULLOK MADPROP* tm|NULLOK MADPROP** root \
 				|char slot
 Mp	|MADPROP*|newMADsv	|char key|NN SV* sv
-Mp	|MADPROP*|newMADPROP	|char key|char type|NULLOK void* val|I32 vlen
+Mp	|MADPROP*|newMADPROP	|char key|char type|NULLOK const void* val \
+				|I32 vlen
 Mp	|void	|mad_free	|NULLOK MADPROP* mp
 
 #  if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)

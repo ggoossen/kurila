@@ -233,10 +233,6 @@ hv_store_ent.
 See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for more
 information on how to use this function on tied hashes.
 
-=cut
-*/
-
-/*
 =for apidoc hv_store_ent
 
 Stores C<val> in a hash.  The hash key is specified as C<key>.  The C<hash>
@@ -262,19 +258,11 @@ hv_store in preference to hv_store_ent.
 See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for more
 information on how to use this function on tied hashes.
 
-=cut
-*/
-
-/*
 =for apidoc hv_exists
 
 Returns a boolean indicating whether the specified hash key exists.  The
 C<klen> is the length of the key.
 
-=cut
-*/
-
-/*
 =for apidoc hv_fetch
 
 Returns the SV which corresponds to the specified key in the hash.  The
@@ -285,10 +273,6 @@ dereferencing it to an C<SV*>.
 See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for more
 information on how to use this function on tied hashes.
 
-=cut
-*/
-
-/*
 =for apidoc hv_exists_ent
 
 Returns a boolean indicating whether the specified hash key exists. C<hash>
@@ -445,7 +429,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 						 | return_svp,
 						 NULL /* no value */,
 						 0 /* compute hash */);
-			if (!entry && (action & HV_FETCH_LVALUE)) {
+			if (!result && (action & HV_FETCH_LVALUE)) {
 			    /* This call will free key if necessary.
 			       Do it this way to encourage compiler to tail
 			       call optimise.  */
@@ -839,10 +823,6 @@ hash and returned to the caller.  The C<klen> is the length of the key.
 The C<flags> value will normally be zero; if set to G_DISCARD then NULL
 will be returned.
 
-=cut
-*/
-
-/*
 =for apidoc hv_delete_ent
 
 Deletes a key/value pair in the hash.  The value SV is removed from the
@@ -1345,9 +1325,9 @@ Perl_newHVhv(pTHX_ HV *ohv)
 
 	hv_iterinit(ohv);
 	while ((entry = hv_iternext_flags(ohv, 0))) {
-	    hv_store_flags(hv, HeKEY(entry), HeKLEN(entry),
-                           newSVsv(HeVAL(entry)), HeHASH(entry),
-                           HeKFLAGS(entry));
+	    (void)hv_store_flags(hv, HeKEY(entry), HeKLEN(entry),
+			         newSVsv(HeVAL(entry)), HeHASH(entry),
+			         HeKFLAGS(entry));
 	}
 	HvRITER_set(ohv, riter);
 	HvEITER_set(ohv, eiter);
@@ -1379,8 +1359,8 @@ Perl_hv_copy_hints_hv(pTHX_ HV *const ohv)
 	    SV *const sv = newSVsv(HeVAL(entry));
 	    sv_magic(sv, NULL, PERL_MAGIC_hintselem,
 		     (char *)newSVhek (HeKEY_hek(entry)), HEf_SVKEY);
-	    hv_store_flags(hv, HeKEY(entry), HeKLEN(entry),
-			   sv, HeHASH(entry), HeKFLAGS(entry));
+	    (void)hv_store_flags(hv, HeKEY(entry), HeKLEN(entry),
+				 sv, HeHASH(entry), HeKFLAGS(entry));
 	}
 	HvRITER_set(ohv, riter);
 	HvEITER_set(ohv, eiter);
@@ -1722,8 +1702,8 @@ Perl_hv_undef(pTHX_ HV *hv)
 
     hfreeentries(hv);
     if (name) {
-        if(PL_stashcache)
-	    hv_delete(PL_stashcache, name, HvNAMELEN_get(hv), G_DISCARD);
+        if (PL_stashcache)
+	    (void)hv_delete(PL_stashcache, name, HvNAMELEN_get(hv), G_DISCARD);
 	hv_name_set(hv, NULL, 0, 0);
     }
     SvFLAGS(hv) &= ~SVf_OOK;
