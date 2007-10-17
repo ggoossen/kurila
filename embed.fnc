@@ -1863,6 +1863,10 @@ sd	|AV*	|mro_get_linear_isa_dfs|NN HV* stash|I32 level
 pd	|void   |mro_isa_changed_in|NN HV* stash
 Apd	|void	|mro_method_changed_in	|NN HV* stash
 p	|void   |boot_core_mro
+Apon	|void	|sys_init	|NN int* argc|NN char*** argv
+Apon	|void	|sys_init3	|NN int* argc|NN char*** argv|NN char*** env
+Apo	|void	|sys_term
+
 
 #if defined(PERL_IN_DUMP_C)
 s	|SV*	|dump_op_flags		|NN const OP* o

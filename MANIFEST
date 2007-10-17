@@ -2008,7 +2008,7 @@ lib/Math/BigInt/t/constant.t	Test Math::BigInt/BigFloat under :constant
 lib/Math/BigInt/t/const_mbf.t	Test Math::BigInt
 lib/Math/BigInt/t/downgrade.t	Test if use Math::BigInt(); under downgrade works
 lib/Math/BigInt/t/_e_math.t	Helper routine in BigFloat for _e math
-lib/Math/BigInt/t/inf_nan.t	Special tests for inf and NaN handling
+lib/Math/BigInt/t/inf_nan.t	Special tests for inf and *NaN* handling
 lib/Math/BigInt/t/isa.t		Test for Math::BigInt inheritance
 lib/Math/BigInt/t/lib_load.t	Test sane lib names
 lib/Math/BigInt/t/mbf_ali.t	Tests for BigFloat
@@ -2016,7 +2016,7 @@ lib/Math/BigInt/t/mbi_ali.t	Tests for BigInt
 lib/Math/BigInt/t/mbimbf.inc	Actual BigInt/BigFloat accuracy, precision and fallback, round_mode tests
 lib/Math/BigInt/t/mbimbf.t	BigInt/BigFloat accuracy, precision and fallback, round_mode
 lib/Math/BigInt/t/mbi_rand.t	Test Math::BigInt randomly
-lib/Math/BigInt/t/nan_cmp.t	overloaded comparision involving NaN
+lib/Math/BigInt/t/nan_cmp.t	overloaded comparision involving *NaN*
 lib/Math/BigInt/t/new_ovld.t	test overloaded numbers in BigFloat's new()
 lib/Math/BigInt/Trace.pm	bignum tracing
 lib/Math/BigInt/t/req_mbf0.t	test: require Math::BigFloat; ->bzero();
@@ -2575,7 +2575,6 @@ lib/Test/Simple/README		Test::Simple README
 lib/Test/Simple/t/00test_harness_check.t	Test::Simple test
 lib/Test/Simple/t/bad_plan.t	Test::Builder plan() test
 lib/Test/Simple/t/bail_out.t	Test::Builder BAIL_OUT test
-lib/Test/Simple/t/BEGIN_use_ok.t	Test::More test
 lib/Test/Simple/t/buffer.t	Test::Builder buffering test
 lib/Test/Simple/t/Builder.t	Test::Builder tests
 lib/Test/Simple/t/carp.t	Test::Builder test
