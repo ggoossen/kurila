@@ -30,7 +30,7 @@ cat >Makefile <<!GROK!THIS!
 
 PERL = ../miniperl
 REALPERL = ../perl
-RUN = $run
+RUN = $run  # Used mainly cross-compilation setups.
 
 !GROK!THIS!
 
