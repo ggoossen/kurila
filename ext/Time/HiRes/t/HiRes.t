@@ -268,7 +268,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	$r = [Time::HiRes::gettimeofday()];
 	$i = 5;
 	if ($use_sigaction) {
-	    $oldaction = new POSIX::SigAction;
+	    $oldaction = POSIX::SigAction->new();
 	    printf "# sigaction tick, ALRM = %d\n", &POSIX::SIGALRM;
 	    # Perl's deferred signals may be too wimpy to break through
 	    # a restartable select(), so use POSIX::sigaction if available.

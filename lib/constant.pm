@@ -102,17 +102,7 @@ sub import {
 	    $declared{$full_name}++;
 	    if ($multiple || @_ == 1) {
 		my $scalar = $multiple ? $constants->{$name} : $_[0];
-		if ($symtab && !exists $symtab->{$name}) {
-		    # No typeglob yet, so we can use a reference as space-
-		    # efficient proxy for a constant subroutine
-		    # The check in Perl_ck_rvconst knows that inlinable
-		    # constants from cv_const_sv are read only. So we have to:
-		    Internals::SvREADONLY($scalar, 1);
-		    $symtab->{$name} = \$scalar;
-		    mro::method_changed_in($pkg);
-		} else {
-		    *{Symbol::fetch_glob($full_name)} = sub () { $scalar };
-		}
+                *{Symbol::fetch_glob($full_name)} = sub () { $scalar };
 	    } elsif (@_) {
 		my @list = @_;
 		*{Symbol::fetch_glob($full_name)} = sub () { @list };
