@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '1.54_01';
+$VERSION = '1.54_02';
 
 require ExtUtils::MM_Any;
 @ISA = qw(ExtUtils::MM_Any);
@@ -35,8 +35,7 @@ BEGIN {
     $Is_SunOS4  = $^O eq 'sunos';
     $Is_Solaris = $^O eq 'solaris';
     $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
-    $Is_BSD     = $^O =~ /^(?:free|net|open)bsd$/ or
-                  $^O eq 'bsdos' or $^O eq 'interix';
+    $Is_BSD     = $^O =~ /^(?:(?:free|net|open)bsd|bsdos|interix|dragonfly)$/;
 }
 
 BEGIN {
