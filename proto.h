@@ -687,23 +687,24 @@ PERL_CALLCONV void	Perl_hv_delayfree_ent(pTHX_ HV* hv, HE* entry)
 PERL_CALLCONV SV*	Perl_hv_delete(pTHX_ HV* tb, const char* key, I32 klen, I32 flags)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV SV*	Perl_hv_delete_ent(pTHX_ HV* tb, SV* key, I32 flags, U32 hash)
-			__attribute__nonnull__(pTHX_2);
+/* PERL_CALLCONV SV*	Perl_hv_delete_ent(pTHX_ HV* tb, SV* key, I32 flags, U32 hash)
+			__attribute__nonnull__(pTHX_2); */
 
 PERL_CALLCONV bool	Perl_hv_exists(pTHX_ HV* tb, const char* key, I32 klen)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV bool	Perl_hv_exists_ent(pTHX_ HV* tb, SV* key, U32 hash)
+/* PERL_CALLCONV bool	Perl_hv_exists_ent(pTHX_ HV* tb, SV* key, U32 hash)
 			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_2);
+			__attribute__nonnull__(pTHX_2); */
 
 PERL_CALLCONV SV**	Perl_hv_fetch(pTHX_ HV* tb, const char* key, I32 klen, I32 lval)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV HE*	Perl_hv_fetch_ent(pTHX_ HV* tb, SV* key, I32 lval, U32 hash)
-			__attribute__nonnull__(pTHX_2);
+/* PERL_CALLCONV HE*	Perl_hv_fetch_ent(pTHX_ HV* tb, SV* key, I32 lval, U32 hash)
+			__attribute__nonnull__(pTHX_2); */
 
+PERL_CALLCONV void*	Perl_hv_common(pTHX_ HV* tb, SV* keysv, const char* key, STRLEN klen, int flags, int action, SV* val, U32 hash);
 PERL_CALLCONV void	Perl_hv_free_ent(pTHX_ HV* hv, HE* entryK)
 			__attribute__nonnull__(pTHX_1);
 
@@ -745,7 +746,7 @@ PERL_CALLCONV void	Perl_hv_ksplit(pTHX_ HV* hv, IV newmax)
 			__attribute__nonnull__(pTHX_1); */
 
 PERL_CALLCONV SV**	Perl_hv_store(pTHX_ HV* tb, const char* key, I32 klen, SV* val, U32 hash);
-PERL_CALLCONV HE*	Perl_hv_store_ent(pTHX_ HV* tb, SV* key, SV* val, U32 hash);
+/* PERL_CALLCONV HE*	Perl_hv_store_ent(pTHX_ HV* tb, SV* key, SV* val, U32 hash); */
 PERL_CALLCONV SV**	Perl_hv_store_flags(pTHX_ HV* tb, const char* key, I32 klen, SV* val, U32 hash, int flags);
 PERL_CALLCONV void	Perl_hv_undef(pTHX_ HV* tb);
 PERL_CALLCONV I32	Perl_ibcmp(pTHX_ const char* a, const char* b, I32 len)
@@ -3023,10 +3024,6 @@ STATIC HEK*	S_share_hek_flags(pTHX_ const char* sv, I32 len, U32 hash, int flags
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-STATIC SV*	S_hv_magic_uvar_xkey(pTHX_ HV* hv, SV* keysv, const char *const key, const STRLEN klen, const int k_flags, int action)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-
 STATIC void	S_hv_notallowed(pTHX_ int flags, const char *key, I32 klen, const char *msg)
 			__attribute__noreturn__
 			__attribute__nonnull__(pTHX_2)
@@ -3036,7 +3033,6 @@ STATIC struct xpvhv_aux*	S_hv_auxinit(HV *hv)
 			__attribute__nonnull__(1);
 
 STATIC SV*	S_hv_delete_common(pTHX_ HV* tb, SV* keysv, const char* key, STRLEN klen, int k_flags, I32 d_flags, U32 hash);
-STATIC HE*	S_hv_fetch_common(pTHX_ HV* tb, SV* keysv, const char* key, STRLEN klen, int flags, int action, SV* val, U32 hash);
 STATIC void	S_clear_placeholders(pTHX_ HV* hb, U32 items)
 			__attribute__nonnull__(pTHX_1);
 

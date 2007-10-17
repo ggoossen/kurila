@@ -246,18 +246,19 @@ Perl_hv_store(pTHX_ HV *hv, const char *key, I32 klen_i32, SV *val, U32 hash)
     klen = klen_i32;
     flags = 0;
 
-    hek = hv_fetch_common (hv, NULL, key, klen, flags,
+    hek = (HE *) hv_common(hv, NULL, key, klen, flags,
 			   (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
     return hek ? &HeVAL(hek) : NULL;
 }
 
-/* XXX This looks like an ideal candidate to inline */
+/* Tricky to inlike this because it needs a temporary variable */
 SV**
 Perl_hv_store_flags(pTHX_ HV *hv, const char *key, I32 klen, SV *val,
                  register U32 hash, int flags)
 {
-    HE * const hek = hv_fetch_common (hv, NULL, key, klen, flags,
-			       (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
+    HE * const hek = (HE *) hv_common(hv, NULL, key, klen, flags,
+				      (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val,
+				      hash);
     return hek ? &HeVAL(hek) : NULL;
 }
 
@@ -290,13 +291,6 @@ information on how to use this function on tied hashes.
 =cut
 */
 
-/* XXX This looks like an ideal candidate to inline */
-HE *
-Perl_hv_store_ent(pTHX_ HV *hv, SV *keysv, SV *val, U32 hash)
-{
-  return hv_fetch_common(hv, keysv, NULL, 0, 0, HV_FETCH_ISSTORE, val, hash);
-}
-
 /*
 =for apidoc hv_exists
 
@@ -315,7 +309,7 @@ Perl_hv_exists(pTHX_ HV *hv, const char *key, I32 klen_i32)
     klen = klen_i32;
     flags = 0;
 
-    return hv_fetch_common(hv, NULL, key, klen, flags, HV_FETCH_ISEXISTS, 0, 0)
+    return hv_common(hv, NULL, key, klen, flags, HV_FETCH_ISEXISTS, 0, 0)
 	? TRUE : FALSE;
 }
 
@@ -343,9 +337,9 @@ Perl_hv_fetch(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 lval)
     klen = klen_i32;
     flags = 0;
 
-    hek = hv_fetch_common (hv, NULL, key, klen, flags,
-			   lval ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE) : HV_FETCH_JUST_SV,
-			   NULL, 0);
+    hek = (HE *) hv_common(hv, NULL, key, klen, flags,
+			   lval ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)
+			   : HV_FETCH_JUST_SV, NULL, 0);
     return hek ? &HeVAL(hek) : NULL;
 }
 
@@ -358,14 +352,6 @@ computed.
 
 =cut
 */
-
-/* XXX This looks like an ideal candidate to inline */
-bool
-Perl_hv_exists_ent(pTHX_ HV *hv, SV *keysv, U32 hash)
-{
-    return hv_fetch_common(hv, keysv, NULL, 0, 0, HV_FETCH_ISEXISTS, 0, hash)
-	? TRUE : FALSE;
-}
 
 /* returns an HE * structure with the all fields set */
 /* note that hent_val will be a mortal sv for MAGICAL hashes */
@@ -386,16 +372,9 @@ information on how to use this function on tied hashes.
 =cut
 */
 
-HE *
-Perl_hv_fetch_ent(pTHX_ HV *hv, SV *keysv, I32 lval, register U32 hash)
-{
-    return hv_fetch_common(hv, keysv, NULL, 0, 0, 
-			   (lval ? HV_FETCH_LVALUE : 0), NULL, hash);
-}
-
-STATIC HE *
-S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
-		  int flags, int action, SV *val, register U32 hash)
+void *
+Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
+	       int flags, int action, SV *val, register U32 hash)
 {
     dVAR;
     XPVHV* xhv;
@@ -406,22 +385,45 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
     if (!hv)
 	return NULL;
+    if (SvTYPE(hv) == SVTYPEMASK)
+	return NULL;
+
+    assert(SvTYPE(hv) == SVt_PVHV);
 
     if (SvSMAGICAL(hv) && SvGMAGICAL(hv) && !(action & HV_DISABLE_UVAR_XKEY)) {
-	keysv = hv_magic_uvar_xkey(hv, keysv, key, klen, flags, action);
-	/* If a fetch-as-store fails on the fetch, then the action is to
-	   recurse once into "hv_store". If we didn't do this, then that
-	   recursive call would call the key conversion routine again.
-	   However, as we replace the original key with the converted
-	   key, this would result in a double conversion, which would show
-	   up as a bug if the conversion routine is not idempotent.  */
-	hash = 0;
+	MAGIC* mg;
+	if ((mg = mg_find((SV*)hv, PERL_MAGIC_uvar))) {
+	    struct ufuncs * const uf = (struct ufuncs *)mg->mg_ptr;
+	    if (uf->uf_set == NULL) {
+		SV* obj = mg->mg_obj;
+
+		if (!keysv) {
+		    keysv = sv_2mortal(newSVpvn(key, klen));
+		}
+		
+		mg->mg_obj = keysv;         /* pass key */
+		uf->uf_index = action;      /* pass action */
+		magic_getuvar((SV*)hv, mg);
+		keysv = mg->mg_obj;         /* may have changed */
+		mg->mg_obj = obj;
+
+		/* If the key may have changed, then we need to invalidate
+		   any passed-in computed hash value.  */
+		hash = 0;
+	    }
+	}
     }
     if (keysv) {
 	if (flags & HVhek_FREEKEY)
 	    Safefree(key);
 	key = SvPV_const(keysv, klen);
 	flags = 0;
+    }
+
+    if (action & HV_DELETE) {
+	return (HE *) hv_delete_common(hv, keysv, key, klen,
+				       flags,
+				       action, hash);
     }
 
     xhv = (XPVHV*)SvANY(hv);
@@ -473,26 +475,25 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 			const char * const nkey = strupr(savepvn(key,klen));
 			/* Note that this fetch is for nkey (the uppercased
 			   key) whereas the store is for key (the original)  */
-			entry = hv_fetch_common(hv, NULL, nkey, klen,
-						HVhek_FREEKEY, /* free nkey */
-						0 /* non-LVAL fetch */
-						| HV_DISABLE_UVAR_XKEY,
-						NULL /* no value */,
-						0 /* compute hash */);
+			void *result = hv_common(hv, NULL, nkey, klen,
+						 HVhek_FREEKEY, /* free nkey */
+						 0 /* non-LVAL fetch */
+						 | HV_DISABLE_UVAR_XKEY,
+						 NULL /* no value */,
+						 0 /* compute hash */);
 			if (!entry && (action & HV_FETCH_LVALUE)) {
 			    /* This call will free key if necessary.
 			       Do it this way to encourage compiler to tail
 			       call optimise.  */
-			    entry = hv_fetch_common(hv, keysv, key, klen,
-						    flags,
-						    HV_FETCH_ISSTORE
-						    | HV_DISABLE_UVAR_XKEY,
-						    newSV(0), hash);
+			    result = hv_common(hv, keysv, key, klen, flags,
+					       HV_FETCH_ISSTORE
+					       | HV_DISABLE_UVAR_XKEY,
+					       newSV(0), hash);
 			} else {
 			    if (flags & HVhek_FREEKEY)
 				Safefree(key);
 			}
-			return entry;
+			return result;
 		    }
 	    }
 #endif
@@ -707,9 +708,8 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	if (env) {
 	    sv = newSVpvn(env,len);
 	    SvTAINTED_on(sv);
-	    return hv_fetch_common(hv, keysv, key, klen, flags,
-				   HV_FETCH_ISSTORE|HV_DISABLE_UVAR_XKEY, sv,
-				   hash);
+	    return hv_common(hv, keysv, key, klen, flags,
+			     HV_FETCH_ISSTORE|HV_DISABLE_UVAR_XKEY, sv, hash);
 	}
     }
 #endif
@@ -732,9 +732,14 @@ S_hv_fetch_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	       which in turn might do some tied magic. So we need to make that
 	       magic check happen.  */
 	    /* gonna assign to this, so it better be there */
-	    return hv_fetch_common(hv, keysv, key, klen, flags,
-				   HV_FETCH_ISSTORE|HV_DISABLE_UVAR_XKEY, val,
-				   hash);
+	    /* If a fetch-as-store fails on the fetch, then the action is to
+	       recurse once into "hv_store". If we didn't do this, then that
+	       recursive call would call the key conversion routine again.
+	       However, as we replace the original key with the converted
+	       key, this would result in a double conversion, which would show
+	       up as a bug if the conversion routine is not idempotent.  */
+	    return hv_common(hv, keysv, key, klen, flags,
+			     HV_FETCH_ISSTORE|HV_DISABLE_UVAR_XKEY, val, hash);
 	    /* XXX Surely that could leak if the fetch-was-store fails?
 	       Just like the hv_fetch.  */
 	}
@@ -873,7 +878,8 @@ Perl_hv_delete(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 flags)
     klen = klen_i32;
     k_flags = 0;
 
-    return hv_delete_common(hv, NULL, key, klen, k_flags, flags, 0);
+    return (SV *) hv_common(hv, NULL, key, klen, k_flags, flags | HV_DELETE,
+			    NULL, 0);
 }
 
 /*
@@ -887,13 +893,6 @@ precomputed hash value, or 0 to ask for it to be computed.
 =cut
 */
 
-/* XXX This looks like an ideal candidate to inline */
-SV *
-Perl_hv_delete_ent(pTHX_ HV *hv, SV *keysv, I32 flags, U32 hash)
-{
-    return hv_delete_common(hv, keysv, NULL, 0, 0, flags, hash);
-}
-
 STATIC SV *
 S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		   int k_flags, I32 d_flags, U32 hash)
@@ -905,21 +904,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     HE *const *first_entry;
     int masked_flags;
 
-    if (!hv)
-	return NULL;
-
-    if (SvSMAGICAL(hv) && SvGMAGICAL(hv)
-	&& !(d_flags & HV_DISABLE_UVAR_XKEY)) {
-	keysv = hv_magic_uvar_xkey(hv, keysv, key, klen, k_flags, HV_DELETE);
-	hash = 0;
-    }
-    if (keysv) {
-	if (k_flags & HVhek_FREEKEY)
-	    Safefree(key);
-	key = SvPV_const(keysv, klen);
-	k_flags = 0;
-    }
-
     if (SvRMAGICAL(hv)) {
 	bool needs_copy;
 	bool needs_store;
@@ -927,10 +911,10 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
 	if (needs_copy) {
 	    SV *sv;
-	    entry = hv_fetch_common(hv, keysv, key, klen,
-				    k_flags & ~HVhek_FREEKEY,
-				    HV_FETCH_LVALUE|HV_DISABLE_UVAR_XKEY,
-				    NULL, hash);
+	    entry = (HE *) hv_common(hv, keysv, key, klen,
+				     k_flags & ~HVhek_FREEKEY,
+				     HV_FETCH_LVALUE|HV_DISABLE_UVAR_XKEY,
+				     NULL, hash);
 	    sv = entry ? HeVAL(entry) : NULL;
 	    if (sv) {
 		if (SvMAGICAL(sv)) {
@@ -2413,30 +2397,6 @@ S_share_hek_flags(pTHX_ const char *str, I32 len, register U32 hash, int flags)
 	Safefree(str);
 
     return HeKEY_hek(entry);
-}
-
-STATIC SV *
-S_hv_magic_uvar_xkey(pTHX_ HV* hv, SV* keysv, const char *const key,
-		     const STRLEN klen, const int k_flags, int action)
-{
-    MAGIC* mg;
-    if ((mg = mg_find((SV*)hv, PERL_MAGIC_uvar))) {
-	struct ufuncs * const uf = (struct ufuncs *)mg->mg_ptr;
-	if (uf->uf_set == NULL) {
-	    SV* obj = mg->mg_obj;
-
-	    if (!keysv) {
-		keysv = sv_2mortal(newSVpvn(key, klen));
-	    }
-		
-	    mg->mg_obj = keysv;         /* pass key */
-	    uf->uf_index = action;      /* pass action */
-	    magic_getuvar((SV*)hv, mg);
-	    keysv = mg->mg_obj;         /* may have changed */
-	    mg->mg_obj = obj;
-	}
-    }
-    return keysv;
 }
 
 I32 *

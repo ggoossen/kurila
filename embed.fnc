@@ -299,11 +299,14 @@ Apd	|void	|hv_clear	|NULLOK HV* tb
 poM	|HV *	|hv_copy_hints_hv|NN HV *const ohv
 Ap	|void	|hv_delayfree_ent|NN HV* hv|NULLOK HE* entry
 Apd	|SV*	|hv_delete	|NULLOK HV* tb|NN const char* key|I32 klen|I32 flags
-Apd	|SV*	|hv_delete_ent	|NULLOK HV* tb|NN SV* key|I32 flags|U32 hash
+Abmd	|SV*	|hv_delete_ent	|NULLOK HV* tb|NN SV* key|I32 flags|U32 hash
 ApdR	|bool	|hv_exists	|NULLOK HV* tb|NN const char* key|I32 klen
-ApdR	|bool	|hv_exists_ent	|NULLOK HV* tb|NN SV* key|U32 hash
+AbmdR	|bool	|hv_exists_ent	|NULLOK HV* tb|NN SV* key|U32 hash
 Apd	|SV**	|hv_fetch	|NULLOK HV* tb|NN const char* key|I32 klen|I32 lval
-Apd	|HE*	|hv_fetch_ent	|NULLOK HV* tb|NN SV* key|I32 lval|U32 hash
+Abmd	|HE*	|hv_fetch_ent	|NULLOK HV* tb|NN SV* key|I32 lval|U32 hash
+Ap	|void*	|hv_common	|NULLOK HV* tb|NULLOK SV* keysv \
+				|NULLOK const char* key|STRLEN klen|int flags \
+				|int action|NULLOK SV* val|U32 hash
 Ap	|void	|hv_free_ent	|NN HV* hv|NULLOK HE* entryK
 Apd	|I32	|hv_iterinit	|NN HV* tb
 ApdR	|char*	|hv_iterkey	|NN HE* entry|NN I32* retlen
@@ -316,7 +319,7 @@ Ap	|void	|hv_ksplit	|NN HV* hv|IV newmax
 Apdbm	|void	|hv_magic	|NN HV* hv|NULLOK GV* gv|int how
 Apd	|SV**	|hv_store	|NULLOK HV* tb|NULLOK const char* key|I32 klen|NULLOK SV* val \
 				|U32 hash
-Apd	|HE*	|hv_store_ent	|NULLOK HV* tb|NULLOK SV* key|NULLOK SV* val|U32 hash
+Abmd	|HE*	|hv_store_ent	|NULLOK HV* tb|NULLOK SV* key|NULLOK SV* val|U32 hash
 ApM	|SV**	|hv_store_flags	|NULLOK HV* tb|NULLOK const char* key|I32 klen|NULLOK SV* val \
 				|U32 hash|int flags
 Apd	|void	|hv_undef	|NULLOK HV* tb
@@ -1127,16 +1130,10 @@ sanR	|HEK*	|save_hek_flags	|NN const char *str|I32 len|U32 hash|int flags
 sn	|void	|hv_magic_check	|NN HV *hv|NN bool *needs_copy|NN bool *needs_store
 s	|void	|unshare_hek_or_pvn|NULLOK const HEK* hek|NULLOK const char* str|I32 len|U32 hash
 sR	|HEK*	|share_hek_flags|NN const char* sv|I32 len|U32 hash|int flags
-sR	|SV*	|hv_magic_uvar_xkey|NN HV* hv|NULLOK SV* keysv \
-				|NULLOK const char *const key \
-				|const STRLEN klen |const int k_flags \
-				|int action
 rs	|void	|hv_notallowed	|int flags|NN const char *key|I32 klen|NN const char *msg
 sn	|struct xpvhv_aux*|hv_auxinit|NN HV *hv
 sM	|SV*	|hv_delete_common|NULLOK HV* tb|NULLOK SV* keysv|NULLOK const char* key \
 		|STRLEN klen|int k_flags|I32 d_flags|U32 hash
-sM	|HE*	|hv_fetch_common|NULLOK HV* tb|NULLOK SV* keysv|NULLOK const char* key \
-		|STRLEN klen|int flags|int action|NULLOK SV* val|U32 hash
 sM	|void	|clear_placeholders	|NN HV* hb|U32 items
 #endif
 
