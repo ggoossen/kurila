@@ -3,10 +3,9 @@
 # Test // and friends.
 
 package main;
-use feature "err";
 require './test.pl';
 
-plan( tests => 35 );
+plan( tests => 31 );
 
 my($x);
 
@@ -20,17 +19,6 @@ $x='';
 is($x // 0, '',		'	// : left-hand operand defined but empty');
 
 like([] // 0, qr/^ARRAY/,	'	// : left-hand operand a referece');
-
-$x=1;
-is(($x err 0), 1,	'	err: left-hand operand defined');
-
-$x = undef;
-is(($x err 1), 1, 	'	err: left-hand operand undef');
-
-$x='';
-is(($x err 0), '',	'	err: left-hand operand defined but empty');
-
-like(([] err 0), qr/^ARRAY/,	'	err: left-hand operand a referece');
 
 $x=undef;
 $x //= 1;

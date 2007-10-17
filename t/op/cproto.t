@@ -63,7 +63,6 @@ endpwent ()
 endservent ()
 eof (;*)
 eq ($$)
-err ()
 eval undef
 exec undef
 exists undef
