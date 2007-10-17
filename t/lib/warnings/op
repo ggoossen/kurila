@@ -683,11 +683,6 @@ use warnings 'misc';
 open FH, "<abc";
 ($_ = <FH>) // ($_ = 1);
 opendir DH, ".";
-<<<<<<< HEAD:t/lib/warnings/op
-$_ = readdir DH err $_ = 1;
-$_ = glob("*") err $_ = 1;
-=======
->>>>>>> 9ca63c4a19f541e4c450f63217c3f423a2c1395e:t/lib/warnings/op
 %a = (1,2,3,4) ;
 EXPECT
 ########

@@ -8,7 +8,7 @@ BEGIN {
 use strict;
 use feature "state";
 
-plan tests => 37;
+plan tests => 44;
 
 ok( ! defined state $uninit, q(state vars are undef by default) );
 
@@ -155,3 +155,43 @@ noseworth(2);
 sub pugnax { my $x = state $y = 42; $y++; $x; }
 
 is( pugnax(), 42, 'scalar state assignment return value' );
+
+
+
+#
+# Redefine.
+#
+{
+    state $x = "one";
+    no warnings;
+    state $x = "two";
+    is $x, "two", "masked"
+}
+
+# normally closureless anon subs share a CV and pad. If the anon sub has a
+# state var, this would mean that it is shared. Check that this doesn't
+# happen
+
+{
+    my @f;
+    push @f, sub { state $x; ++$x } for 1..2;
+    $f[0]->() for 1..10;
+    is $f[0]->(), 11;
+    is $f[1]->(), 1;
+}
+
+# each copy of an anon sub should get its own 'once block'
+
+{
+    my $x; # used to force a closure
+    my @f;
+    push @f, sub { $x=0; state $s ||= $_[0]; $s } for 1..2;
+    is $f[0]->(1), 1;
+    is $f[0]->(2), 1;
+    is $f[1]->(3), 3;
+    is $f[1]->(4), 3;
+}
+
+
+
+

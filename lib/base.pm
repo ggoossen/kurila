@@ -4,7 +4,7 @@ use strict;
 no strict qw(refs subs);
 
 use vars qw($VERSION);
-$VERSION = '2.12';
+$VERSION = '2.13';
 
 # constant.pm is slow
 sub SUCCESS () { 1 }
@@ -71,6 +71,7 @@ sub import {
     my $fields_base;
 
     my $inheritor = caller(0);
+    my @isa_classes;
 
     foreach my $base (@_) {
         if ( $inheritor eq $base ) {
@@ -105,7 +106,7 @@ ERROR
             ${*{Symbol::fetch_glob($base.'::VERSION')}} = "-1, set by base.pm"
               unless defined ${*{Symbol::fetch_glob($base.'::VERSION')}};
         }
-        push @{*{Symbol::fetch_glob("$inheritor\::ISA")}}, $base;
+        push @isa_classes, $base;
 
         if ( has_fields($base) || has_attr($base) ) {
             # No multiple fields inheritance *suck*
@@ -117,6 +118,8 @@ ERROR
             }
         }
     }
+    # Save this until the end so it's all or nothing if the above loop croaks.
+    push @{*{Symbol::fetch_glob("$inheritor\::ISA")}}, @isa_classes;
 
     if( defined $fields_base ) {
         inherit_fields($inheritor, $fields_base);
