@@ -3978,7 +3978,6 @@ Perl_yylex(pTHX)
 		    switch (tmp) {
 		    case KEY_or:
 		    case KEY_and:
-		    case KEY_err:
 		    case KEY_for:
 		    case KEY_unless:
 		    case KEY_if:
@@ -5542,9 +5541,6 @@ Perl_yylex(pTHX)
 	case KEY_eof:
 	    UNI(OP_EOF);
 
-	case KEY_err:
-	    OPERATOR(DOROP);
-
 	case KEY_exp:
 	    UNI(OP_EXP);
 
@@ -6897,14 +6893,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
               if (name[2] == 'f')
               {                                   /* eof        */
                 return -KEY_eof;
-              }
-
-              goto unknown;
-
-            case 'r':
-              if (name[2] == 'r')
-              {                                   /* err        */
-                return (all_keywords || FEATURE_IS_ENABLED("err") ? -KEY_err : 0);
               }
 
               goto unknown;
