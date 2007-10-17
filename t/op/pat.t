@@ -4283,10 +4283,19 @@ ok($@=~/\QSequence \k... not terminated in regex;\E/);
     iseq($_,"!Bang!1!Bang!2!Bang!3!Bang!");
 }
 
+# [perl #45337] utf8 + "[a]a{2}" + /$.../ = panic: sv_len_utf8 cache
+
+{
+    local ${^UTF8CACHE} = -1;
+    use utf8;
+    my $s="[a]a{2}";
+    ok("aaa" =~ /$s/, "#45337");
+}
+
 # Put new tests above the dotted line about a page above this comment
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1784;
+    $::TestCount = 1785;
     print "1..$::TestCount\n";
 }
