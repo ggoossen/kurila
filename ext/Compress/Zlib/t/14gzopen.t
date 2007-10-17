@@ -605,7 +605,7 @@ foreach my $stdio ( ['-', '-'], [*STDIN, *STDOUT])
 {
     title 'gzreadline does not support $/';
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name );
 
     my $a = gzopen($name, "w");
     my $text = "fred\n";
