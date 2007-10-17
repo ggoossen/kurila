@@ -1158,7 +1158,7 @@ Perl_pack_cat(pTHX_ SV *cat, const char *pat, const char *patend, register SV **
 HE *
 Perl_hv_store_ent(pTHX_ HV *hv, SV *keysv, SV *val, U32 hash)
 {
-  return hv_common(hv, keysv, NULL, 0, 0, HV_FETCH_ISSTORE, val, hash);
+  return (HE *)hv_common(hv, keysv, NULL, 0, 0, HV_FETCH_ISSTORE, val, hash);
 }
 
 bool
@@ -1171,7 +1171,7 @@ Perl_hv_exists_ent(pTHX_ HV *hv, SV *keysv, U32 hash)
 HE *
 Perl_hv_fetch_ent(pTHX_ HV *hv, SV *keysv, I32 lval, U32 hash)
 {
-    return hv_common(hv, keysv, NULL, 0, 0, 
+    return (HE *)hv_common(hv, keysv, NULL, 0, 0, 
 		     (lval ? HV_FETCH_LVALUE : 0), NULL, hash);
 }
 
@@ -1180,6 +1180,63 @@ Perl_hv_delete_ent(pTHX_ HV *hv, SV *keysv, I32 flags, U32 hash)
 {
     return (SV *) hv_common(hv, keysv, NULL, 0, 0, flags | HV_DELETE, NULL,
 			    hash);
+}
+
+SV**
+Perl_hv_store_flags(pTHX_ HV *hv, const char *key, I32 klen, SV *val, U32 hash,
+		    int flags)
+{
+    return (SV**) hv_common(hv, NULL, key, klen, flags,
+			    (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
+}
+
+SV**
+Perl_hv_store(pTHX_ HV *hv, const char *key, I32 klen_i32, SV *val, U32 hash)
+{
+    STRLEN klen;
+    int flags;
+
+    klen = klen_i32;
+    flags = 0;
+    return (SV **) hv_common(hv, NULL, key, klen, flags,
+			     (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
+}
+
+bool
+Perl_hv_exists(pTHX_ HV *hv, const char *key, I32 klen_i32)
+{
+    STRLEN klen;
+    int flags;
+
+    klen = klen_i32;
+    flags = 0;
+    return hv_common(hv, NULL, key, klen, flags, HV_FETCH_ISEXISTS, 0, 0)
+	? TRUE : FALSE;
+}
+
+SV**
+Perl_hv_fetch(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 lval)
+{
+    STRLEN klen;
+    int flags;
+
+    klen = klen_i32;
+    flags = 0;
+    return (SV **) hv_common(hv, NULL, key, klen, flags,
+			     lval ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)
+			     : HV_FETCH_JUST_SV, NULL, 0);
+}
+
+SV *
+Perl_hv_delete(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 flags)
+{
+    STRLEN klen;
+    int k_flags;
+
+    klen = klen_i32;
+    k_flags = 0;
+    return (SV *) hv_common(hv, NULL, key, klen, k_flags, flags | HV_DELETE,
+			    NULL, 0);
 }
 
 #endif /* NO_MATHOMS */
