@@ -112,6 +112,41 @@ test_freeent(freeent_function *f) {
 
 
 static I32
+bitflip_key(pTHX_ IV action, SV *field) {
+    MAGIC *mg = mg_find(field, PERL_MAGIC_uvar);
+    SV *keysv;
+    if (mg && (keysv = mg->mg_obj)) {
+	STRLEN len;
+	const char *p = SvPV(keysv, len);
+
+	if (len) {
+	    SV *newkey = newSV(len);
+	    char *new_p = SvPVX(newkey);
+
+	    if (SvUTF8(keysv)) {
+		const char *const end = p + len;
+		while (p < end) {
+		    STRLEN len;
+		    UV chr = utf8_to_uvuni(p, &len);
+		    new_p = uvuni_to_utf8(new_p, chr ^ 32);
+		    p += len;
+		}
+		SvUTF8_on(newkey);
+	    } else {
+		while (len--)
+		    *new_p++ = *p++ ^ 32;
+	    }
+	    *new_p = '\0';
+	    SvCUR_set(newkey, SvCUR(keysv));
+	    SvPOK_on(newkey);
+
+	    mg->mg_obj = newkey;
+	}
+    }
+    return 0;
+}
+
+static I32
 rot13_key(pTHX_ IV action, SV *field) {
     MAGIC *mg = mg_find(field, PERL_MAGIC_uvar);
     SV *keysv;
@@ -195,9 +230,12 @@ rot13_key(pTHX_ IV action, SV *field) {
     return 0;
 }
 
+#include "const-c.inc"
+
 MODULE = XS::APItest:Hash		PACKAGE = XS::APItest::Hash
 
-#define UTF8KLEN(sv, len)   ((I32)len)
+INCLUDE: const-xs.inc
+
 void
 rot13_hash(hash)
 	HV *hash
@@ -210,6 +248,21 @@ rot13_hash(hash)
 
 	    sv_magic((SV*)hash, NULL, PERL_MAGIC_uvar, (char*)&uf, sizeof(uf));
 	}
+
+void
+bitflip_hash(hash)
+	HV *hash
+	CODE:
+	{
+	    struct ufuncs uf;
+	    uf.uf_val = bitflip_key;
+	    uf.uf_set = 0;
+	    uf.uf_index = 0;
+
+	    sv_magic((SV*)hash, NULL, PERL_MAGIC_uvar, (char*)&uf, sizeof(uf));
+	}
+
+#define UTF8KLEN(sv, len)   ((I32)len)
 
 bool
 exists(hash, key_sv)
@@ -225,18 +278,43 @@ exists(hash, key_sv)
         OUTPUT:
         RETVAL
 
+bool
+exists_ent(hash, key_sv)
+	PREINIT:
+	INPUT:
+	HV *hash
+	SV *key_sv
+	CODE:
+	RETVAL = hv_exists_ent(hash, key_sv, 0);
+        OUTPUT:
+        RETVAL
+
 SV *
-delete(hash, key_sv)
+delete(hash, key_sv, flags = 0)
 	PREINIT:
 	STRLEN len;
 	const char *key;
 	INPUT:
 	HV *hash
 	SV *key_sv
+	I32 flags;
 	CODE:
 	key = SvPV(key_sv, len);
 	/* It's already mortal, so need to increase reference count.  */
-	RETVAL = SvREFCNT_inc(hv_delete(hash, key, UTF8KLEN(key_sv, len), 0));
+	RETVAL
+	    = SvREFCNT_inc(hv_delete(hash, key, UTF8KLEN(key_sv, len), flags));
+        OUTPUT:
+        RETVAL
+
+SV *
+delete_ent(hash, key_sv, flags = 0)
+	INPUT:
+	HV *hash
+	SV *key_sv
+	I32 flags;
+	CODE:
+	/* It's already mortal, so need to increase reference count.  */
+	RETVAL = SvREFCNT_inc(hv_delete_ent(hash, key_sv, flags, 0));
         OUTPUT:
         RETVAL
 
@@ -262,7 +340,6 @@ store_ent(hash, key, value)
 	RETVAL = SvREFCNT_inc(HeVAL(result));
         OUTPUT:
         RETVAL
-
 
 SV *
 store(hash, key_sv, value)
@@ -290,6 +367,22 @@ store(hash, key_sv, value)
         OUTPUT:
         RETVAL
 
+SV *
+fetch_ent(hash, key_sv)
+	PREINIT:
+	HE *result;
+	INPUT:
+	HV *hash
+	SV *key_sv
+	CODE:
+	result = hv_fetch_ent(hash, key_sv, 0, 0);
+	if (!result) {
+	    XSRETURN_EMPTY;
+	}
+	/* Force mg_get  */
+	RETVAL = newSVsv(HeVAL(result));
+        OUTPUT:
+        RETVAL
 
 SV *
 fetch(hash, key_sv)
