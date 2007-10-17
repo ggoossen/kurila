@@ -22,9 +22,22 @@ BEGIN {
   }
 }
 
-my $doUTF8 = eval { require utf8 };
+BEGIN {
+  if (!eval { require utf8 }) {
+    *is_utf8 = sub { 0 };
+  }
+  elsif (eval { utf8::is_utf8(undef); 1 }) {
+    *is_utf8 = \&utf8::is_utf8;
+  }
+  elsif (eval { require Encode; Encode::is_utf8(undef); 1 }) {
+    *is_utf8 = \&Encode::is_utf8;
+  }
+  else {
+    *is_utf8 = sub { $_[0] =~ /[^\x00-\xff]/ };
+  }
+}
 
-$VERSION = "2.28";
+$VERSION = "2.29";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 

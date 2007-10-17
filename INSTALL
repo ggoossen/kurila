@@ -14,54 +14,6 @@ some perl5 files might be overwritten (man-pages). Kurila is not very
 well tested, so if something doesn't work it is probably that kurila is 
 broken and not that you do something wrong.
 
-=head1 Reporting Problems
-
-Wherever possible please use the perlbug tool supplied with this Perl
-to report problems, as it automatically includes summary configuration
-information about your perl, which may help us track down problems far
-more quickly. But first you should read the advice in this file,
-carefully re-read the error message and check the relevant manual pages
-on your system, as these may help you find an immediate solution.  If
-you are not sure whether what you are seeing is a bug, you can send a
-message describing the problem to the comp.lang.perl.misc newsgroup to
-get advice.
-
-The perlbug tool is installed along with perl, so after you have
-completed C<make install> it should be possible to run it with plain
-C<perlbug>.  If the install fails, or you want to report problems with
-C<make test> without installing perl, then you can use C<make nok> to
-run perlbug to report the problem, or run it by hand from this source
-directory with C<./perl -Ilib utils/perlbug>
-
-If the build fails too early to run perlbug uninstalled, then please
-B<run> the C<./myconfig> shell script, and mail its output along with
-an accurate description of your problem to perlbug@perl.org
-
-If Configure itself fails, and does not generate a config.sh file
-(needed to run C<./myconfig>), then please mail perlbug@perl.org the
-description of how Configure fails along with details of your system
-- for example the output from running C<uname -a>
-
-Please try to make your message brief but clear.  Brief, clear bug
-reports tend to get answered more quickly.  Please don't worry if your
-written English is not great - what matters is how well you describe
-the important technical details of the problem you have encountered,
-not whether your grammar and spelling is flawless.
-
-Trim out unnecessary information.  Do not include large files (such as
-config.sh or a complete Configure or make log) unless absolutely
-necessary.  Do not include a complete transcript of your build
-session.  Just include the failing commands, the relevant error
-messages, and whatever preceding commands are necessary to give the
-appropriate context.  Plain text should usually be sufficient--fancy
-attachments or encodings may actually reduce the number of people who
-read your message.  Your message will get relayed to over 400
-subscribers around the world so please try to keep it brief but clear.
-
-If you are unsure what makes a good bug report please read "How to
-report Bugs Effectively" by Simon Tatham:
-http://www.chiark.greenend.org.uk/~sgtatham/bugs.html
-
 =head1 SYNOPSIS
 
 First, make sure you have an up-to-date version of Perl.   If you
@@ -75,9 +27,8 @@ tested in development releases and only if they prove themselves to be
 worthy will they be migrated to the maintenance releases.
 
 The basic steps to build and install perl5 on a Unix system with all
-the defaults are:
+the defaults are to run, from a freshly unpacked source tree:
 
-	rm -f config.sh Policy.sh
 	sh Configure -de
 	make
 	make test
@@ -87,23 +38,16 @@ Each of these is explained in further detail below.
 
 The above commands will install Perl to /usr/local (or some other
 platform-specific directory -- see the appropriate file in hints/.)
-If that's not okay with you, can run Configure interactively and use
+If that's not okay with you, can run Configure interactively, by
+just typing "sh Configure" (without the -de args). You can also specify
+any prefix location by adding "-Dprefix='/some/dir'" to Configure's args.
+To explicitly name the perl binary, use the command
+"make install PERLNAME=myperl".
 
-	rm -f config.sh Policy.sh
-	sh Configure
-	make
-	make test
-	make install
-
-	# You may also wish to add these:
-	(cd /usr/include && h2ph *.h sys/*.h)
-	(installhtml --help)
-	(cd pod && make tex && <process the latex files>)
-
-or you can use some of the Configure options described below.
+These options, and many more, are explained in further detail below.
 
 If you have problems, corrections, or questions, please see
-L<"Reporting Problems"> above.
+L<"Reporting Problems"> below.
 
 For information on what's new in this release, see the
 pod/perl5100delta.pod file.  For more detailed information about specific
@@ -128,9 +72,8 @@ proceeding.
 In addition to this file, check if there is a README file specific to
 your operating system, since it may provide additional or different
 instructions for building Perl.  If there is a hint file for your
-system (in the hints/ directory) you should also read that hint file
-for even more information.  (Unixware users should use the svr4.sh or
-the svr5.sh hint file.)
+system (in the hints/ directory) you might also want to read it
+for even more information.
 
 For additional information about porting Perl, see the section on
 L<"Porting information"> below, and look at the files in the Porting/
@@ -152,9 +95,8 @@ using an earlier version of Perl, you will need to rebuild and reinstall
 those extensions.
 
 Pure perl modules without XS or C code should continue to work fine
-without reinstallation.  See the discussions below on
-L<"Coexistence with earlier versions of perl5"> and
-L<"Upgrading from 5.005 or 5.6 to 5.8.0"> for more details.
+without reinstallation.  See the discussion below on
+L<"Coexistence with earlier versions of perl5"> for more details.
 
 The standard extensions supplied with Perl will be handled automatically.
 
@@ -164,54 +106,6 @@ pod/perl5100delta.pod for a description of what's changed.  See your
 installed copy of the perllocal.pod file for a (possibly incomplete)
 list of locally installed modules.  Also see CPAN::autobundle for one
 way to make a "bundle" of your currently installed modules.
-
-=head1 Start with a Fresh Distribution
-
-If you have built perl before, you should clean out the build directory
-with the command
-
-	make distclean
-
-or
-
-	make realclean
-
-The only difference between the two is that make distclean also removes
-your old config.sh and Policy.sh files.
-
-The results of a Configure run are stored in the config.sh and Policy.sh
-files.  If you are upgrading from a previous version of perl, or if you
-change systems or compilers or make other significant changes, or if
-you are experiencing difficulties building perl, you should probably
-not re-use your old config.sh.  Simply remove it
-
-	rm -f config.sh
-
-If you wish to use your old config.sh, be especially attentive to the
-version and architecture-specific questions and answers.  For example,
-the default directory for architecture-dependent library modules
-includes the version name.  By default, Configure will reuse your old
-name (e.g. /opt/perl/lib/i86pc-solaris/5.003) even if you're running
-Configure for a different version, e.g. 5.004.  Similarly, if you used
-a shared libperl.so (see below) with version numbers, you will probably
-want to adjust them as well.
-
-Also, be careful to check your architecture name.  For example, some
-Linux distributions use i386, but Configure uses the output of the arch
-command, which might be i686 instead.  If you pick up a precompiled
-binary, or compile extensions on different systems, they might not all
-agree on the architecture name.
-
-In short, if you wish to use your old config.sh, I recommend running
-Configure interactively rather than blindly accepting the defaults.
-
-If your reason to reuse your old config.sh is to save your particular
-installation choices, then you can probably achieve the same effect by
-using the Policy.sh file.  See the section on L<"Site-wide Policy
-settings"> below.  If you wish to start with a fresh distribution, you
-also need to remove any old Policy.sh files you may have with
-
-	rm -f Policy.sh
 
 =head1 Run Configure
 
@@ -227,6 +121,9 @@ defaults from then on.
 
 After it runs, Configure will perform variable substitution on all the
 *.SH files and offer to run make depend.
+
+The results of a Configure run are stored in the config.sh and Policy.sh
+files.
 
 =head2 Common Configure options
 
@@ -301,7 +198,7 @@ In any case, system administrators are strongly encouraged to put
 into a directory typically found along a user's PATH, or in another
 obvious and convenient place.
 
-=item Building a development release.
+=item Building a development release
 
 For development releases (odd subreleases, like 5.9.x) if you want to
 use Configure -d, you will also need to supply -Dusedevel to Configure,
@@ -316,11 +213,7 @@ output, you can run
 
 	sh Configure -des
 
-For example for my Solaris/x86 system, I usually use
-
-	sh Configure -Dprefix=/opt/perl -Doptimize='-xpentium -xO4' -des
-
-=head2 Altering config.sh variables for C compiler switches etc.
+=head2 Altering Configure variables for C compiler switches etc.
 
 For most users, most of the Configure defaults are fine, or can easily
 be set on the Configure command line.  However, if Configure doesn't
@@ -332,9 +225,9 @@ invocations:
 	sh Configure -Accflags="-DPERL_EXTERNAL_GLOB -DNO_HASH_SEED"
 
 To clarify, those ccflags values are not Configure options; if passed to
-Configure directly, they won't do anything useful (that will define a config.sh
-variable, but without taking any action based upon it).  When passed to the
-compiler, those flags will activate #ifdefd code.
+Configure directly, they won't do anything useful (they will define a
+variable in config.sh, but without taking any action based upon it).
+But when passed to the compiler, those flags will activate #ifdefd code.
 
 For more help on Configure switches, run
 
@@ -353,9 +246,6 @@ On some platforms, perl can be compiled with support for threads.  To
 enable this, run
 
 	sh Configure -Dusethreads
-
-Currently, you need to specify -Dusethreads on the Configure command
-line so that the hint files can make appropriate adjustments.
 
 The default is to compile without thread support.
 
@@ -394,6 +284,10 @@ There's also one known limitation with the current large files
 implementation: unless you also have 64-bit integers (see the next
 section), you cannot use the printf/sprintf non-decimal integer formats
 like C<%x> to print filesizes.  You can use C<%d>, though.
+
+If you want to compile perl without large file support, use
+
+    sh Configure -Uuselargefiles
 
 =head3 64 bit support
 
@@ -484,12 +378,14 @@ recommended.
 Perl can be configured to be 'socksified', that is, to use the SOCKS
 TCP/IP proxy protocol library.  SOCKS is used to give applications
 access to transport layer network proxies.  Perl supports only SOCKS
-Version 5.  You can find more about SOCKS from http://www.socks.nec.com/
+Version 5.  The corresponding Configure option is -Dusesocks.
+You can find more about SOCKS from wikipedia at
+L<http://en.wikipedia.org/wiki/SOCKS>.
 
 =head3 Dynamic Loading
 
-By default, Configure will compile perl to use dynamic loading if
-your system supports it.  If you want to force perl to be compiled
+By default, Configure will compile perl to use dynamic loading.
+If you want to force perl to be compiled completely
 statically, you can either choose this when Configure prompts you or
 you can use the Configure command line option -Uusedl.
 
@@ -1049,7 +945,7 @@ DB or newer releases of version 2.  Configure will automatically detect
 this for you and refuse to try to build DB_File with earlier
 releases of version 2.
 
-If you re-use your old config.sh but change your system (e.g. by
+If you re-use an old config.sh but change your system (e.g. by
 adding libgdbm) Configure will still offer your old choices of extensions
 for the default answer, but it will also point out the discrepancy to
 you.
@@ -1168,8 +1064,9 @@ using DB 3.1.17:
 
 =head2 Overriding an old config.sh
 
-If you want to use your old config.sh but override some of the items
-with command line options, you need to use B<Configure -O>.
+If you want to use an old config.sh produced by a previous run of
+Configure, but override some of the items with command line options, you
+need to use B<Configure -O>.
 
 =head2 GNU-style configure
 
@@ -1248,7 +1145,7 @@ to enable this option.
 =head2 What if it doesn't work?
 
 If you run into problems, try some of the following ideas.
-If none of them help, then see L<"Reporting Problems"> above.
+If none of them help, then see L<"Reporting Problems"> below.
 
 =over 4
 
@@ -1333,11 +1230,7 @@ the list of dynamic extensions to build.)
 
 If you change compilers or make other significant changes, you should
 probably not re-use your old config.sh.  Simply remove it or
-rename it, e.g. mv config.sh config.sh.old.  Then rerun Configure
-with the options you want to use.
-
-This is a common source of problems.  If you change from cc to
-gcc, you should almost always remove your old config.sh.
+rename it, then rerun Configure with the options you want to use.
 
 =item Propagating your changes to config.sh
 
@@ -1399,35 +1292,6 @@ Porting/config.sh to config.sh and edit your config.sh to reflect your
 system's peculiarities.  See Porting/pumpkin.pod for more information.
 You'll probably also have to extensively modify the extension building
 mechanism.
-
-=item Digital UNIX/Tru64 UNIX and BIN_SH
-
-In Digital UNIX/Tru64 UNIX, Configure might abort with
-
-Build a threading Perl? [n]
-Configure[2437]: Syntax error at line 1 : `config.sh' is not expected.
-
-This indicates that Configure is being run with a broken Korn shell
-(even though you think you are using a Bourne shell by using
-"sh Configure" or "./Configure").  The Korn shell bug has been reported
-to Compaq as of February 1999 but in the meanwhile, the reason ksh is
-being used is that you have the environment variable BIN_SH set to
-'xpg4'.  This causes /bin/sh to delegate its duties to /bin/posix/sh
-(a ksh).  Unset the environment variable and rerun Configure.
-
-=item HP-UX 11, pthreads, and libgdbm
-
-If you are running Configure with -Dusethreads in HP-UX 11, be warned
-that POSIX threads and libgdbm (the GNU dbm library) compiled before
-HP-UX 11 do not mix.  This will cause a basic test run by Configure to
-fail
-
-Pthread internal error: message: __libc_reinit() failed, file: ../pthreads/pthread.c, line: 1096
-Return Pointer is 0xc082bf33
-sh: 5345 Quit(coredump)
-
-and Configure will give up.  The cure is to recompile and install
-libgdbm under HP-UX 11.
 
 =item Porting information
 
@@ -1525,7 +1389,7 @@ These errors are normal, and can be ignored:
 If you can't compile successfully, try some of the following ideas.
 If none of them help, and careful reading of the error message and
 the relevant manual pages on your system doesn't help,
-then see L<"Reporting Problems"> above.
+then see L<"Reporting Problems"> below.
 
 =over 4
 
@@ -1818,12 +1682,6 @@ UTS may need one or more of -K or -g, and undef LSTAT.
 FreeBSD can fail the ext/IPC/SysV/t/sem.t test if SysV IPC has not been
 configured in the kernel.  Perl tries to detect this, though, and
 you will get a message telling you what to do.
-
-HP-UX 11 Y2K patch "Y2K-1100 B.11.00.B0125 HP-UX Core OS Year 2000
-Patch Bundle" has been reported to break the io/fs test #18 which
-tests whether utime() can change timestamps.  The Y2K patch seems to
-break utime() so that over NFS the timestamps do not get changed
-(on local filesystems utime() still works).
 
 Building Perl on a system that has also BIND (headers and libraries)
 installed may run into troubles because BIND installs its own netdb.h
@@ -2258,6 +2116,54 @@ and skip installman altogether.
 See also L<"Maintaining completely separate versions"> for another
 approach.
 
+=head1 Reporting Problems
+
+Wherever possible please use the perlbug tool supplied with this Perl
+to report problems, as it automatically includes summary configuration
+information about your perl, which may help us track down problems far
+more quickly. But first you should read the advice in this file,
+carefully re-read the error message and check the relevant manual pages
+on your system, as these may help you find an immediate solution.  If
+you are not sure whether what you are seeing is a bug, you can send a
+message describing the problem to the comp.lang.perl.misc newsgroup to
+get advice.
+
+The perlbug tool is installed along with perl, so after you have
+completed C<make install> it should be possible to run it with plain
+C<perlbug>.  If the install fails, or you want to report problems with
+C<make test> without installing perl, then you can use C<make nok> to
+run perlbug to report the problem, or run it by hand from this source
+directory with C<./perl -Ilib utils/perlbug>
+
+If the build fails too early to run perlbug uninstalled, then please
+B<run> the C<./myconfig> shell script, and mail its output along with
+an accurate description of your problem to perlbug@perl.org
+
+If Configure itself fails, and does not generate a config.sh file
+(needed to run C<./myconfig>), then please mail perlbug@perl.org the
+description of how Configure fails along with details of your system
+- for example the output from running C<uname -a>
+
+Please try to make your message brief but clear.  Brief, clear bug
+reports tend to get answered more quickly.  Please don't worry if your
+written English is not great - what matters is how well you describe
+the important technical details of the problem you have encountered,
+not whether your grammar and spelling is flawless.
+
+Trim out unnecessary information.  Do not include large files (such as
+config.sh or a complete Configure or make log) unless absolutely
+necessary.  Do not include a complete transcript of your build
+session.  Just include the failing commands, the relevant error
+messages, and whatever preceding commands are necessary to give the
+appropriate context.  Plain text should usually be sufficient--fancy
+attachments or encodings may actually reduce the number of people who
+read your message.  Your message will get relayed to over 400
+subscribers around the world so please try to keep it brief but clear.
+
+If you are unsure what makes a good bug report please read "How to
+report Bugs Effectively" by Simon Tatham:
+http://www.chiark.greenend.org.uk/~sgtatham/bugs.html
+
 =head1 Coexistence with earlier versions of perl5
 
 Perl 5.10 is not binary compatible with earlier versions of Perl.
@@ -2366,13 +2272,13 @@ seriously consider using a separate directory, since development
 subversions may not have all the compatibility wrinkles ironed out
 yet.
 
-=head2 Upgrading from 5.005 or 5.6 to 5.8.0
+=head2 Upgrading from 5.8.x or earlier
 
-B<Perl 5.9.0 is binary incompatible with Perl 5.8.x, Perl 5.6.x, 5.005,
-and any earlier Perl release.>  Perl modules having binary parts
+B<Perl 5.10.0 is binary incompatible with Perl 5.8.x and any earlier
+Perl release.>  Perl modules having binary parts
 (meaning that a C compiler is used) will have to be recompiled to be
-used with 5.9.0.  If you find you do need to rebuild an extension with
-5.9.0, you may safely do so without disturbing the older
+used with 5.10.0.  If you find you do need to rebuild an extension with
+5.10.0, you may safely do so without disturbing the older
 installations.  (See L<"Coexistence with earlier versions of perl5">
 above.)
 
@@ -2432,6 +2338,53 @@ Some sites may also wish to make the documentation in the pod/ directory
 available in TeX format.  Type
 
 	(cd pod && make tex && <process the latex files>)
+
+=head1 Starting all over again
+
+If you wish to re-build perl from the same build directory, you should
+clean it out with the command
+
+	make distclean
+
+or
+
+	make realclean
+
+The only difference between the two is that make distclean also removes
+your old config.sh and Policy.sh files.
+
+If you are upgrading from a previous version of perl, or if you
+change systems or compilers or make other significant changes, or if
+you are experiencing difficulties building perl, you should probably
+not re-use your old config.sh.  Simply remove it:
+
+	rm -f config.sh
+
+If you wish to re-use your old config.sh, be especially attentive to the
+version and architecture-specific questions and answers.  For example,
+the default directory for architecture-dependent library modules
+includes the version name.  By default, Configure will reuse your old
+name (e.g. /opt/perl/lib/i86pc-solaris/5.003) even if you're running
+Configure for a different version, e.g. 5.004.  Similarly, if you used
+a shared libperl.so (see below) with version numbers, you will probably
+want to adjust them as well.
+
+Also, be careful to check your architecture name.  For example, some
+Linux distributions use i386, but Configure uses the output of the arch
+command, which might be i686 instead.  If you pick up a precompiled
+binary, or compile extensions on different systems, they might not all
+agree on the architecture name.
+
+In short, if you wish to use your old config.sh, I recommend running
+Configure interactively rather than blindly accepting the defaults.
+
+If your reason to reuse your old config.sh is to save your particular
+installation choices, then you can probably achieve the same effect by
+using the Policy.sh file.  See the section on L<"Site-wide Policy
+settings"> above.  If you wish to start with a fresh distribution, you
+also need to remove any old Policy.sh files you may have with
+
+	rm -f Policy.sh
 
 =head1 Minimizing the Perl installation
 
