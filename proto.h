@@ -3459,7 +3459,6 @@ STATIC char *	S_sv_exp_grow(pTHX_ SV *sv, STRLEN needed)
 STATIC OP*	S_docatch(pTHX_ OP *o)
 			__attribute__warn_unused_result__;
 
-STATIC void	S_docatch_body(pTHX);
 STATIC OP*	S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **oplimit)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1)
@@ -3478,9 +3477,6 @@ STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 			__attribute__nonnull__(pTHX_1);
 
 STATIC I32	S_dopoptoloop(pTHX_ I32 startingblock)
-			__attribute__warn_unused_result__;
-
-STATIC I32	S_dopoptosub(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
 
 STATIC I32	S_dopoptosub_at(pTHX_ const PERL_CONTEXT* cxstk, I32 startingblock)

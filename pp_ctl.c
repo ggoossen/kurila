@@ -38,6 +38,8 @@
 
 #define DOCATCH(o) ((CATCH_GET == TRUE) ? docatch(o) : (o))
 
+#define dopoptosub(plop)	dopoptosub_at(cxstack, (plop))
+
 PP(pp_wantarray)
 {
     dVAR;
@@ -761,13 +763,6 @@ Perl_is_lvalue_sub(pTHX)
 	return cxstack[cxix].blk_sub.lval;
     else
 	return 0;
-}
-
-STATIC I32
-S_dopoptosub(pTHX_ I32 startingblock)
-{
-    dVAR;
-    return dopoptosub_at(cxstack, startingblock);
 }
 
 STATIC I32
@@ -2113,14 +2108,6 @@ S_save_lines(pTHX_ AV *array, SV *sv)
     }
 }
 
-STATIC void
-S_docatch_body(pTHX)
-{
-    dVAR;
-    CALLRUNOPS(aTHX);
-    return;
-}
-
 STATIC OP *
 S_docatch(pTHX_ OP *o)
 {
@@ -2141,7 +2128,7 @@ S_docatch(pTHX_ OP *o)
 	assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL);
 	cxstack[cxstack_ix].blk_eval.cur_top_env = PL_top_env;
  redo_body:
-	docatch_body();
+	CALLRUNOPS(aTHX);
 	break;
     case 3:
 	/* die caught by an inner eval - continue inner loop */
@@ -2532,10 +2519,14 @@ PP(pp_require)
 
     sv = POPs;
     if ( (SvNIOKp(sv) || SvVOK(sv)) && PL_op->op_type != OP_DOFILE) {
-	if ( SvVOK(sv) && ckWARN(WARN_PORTABLE) )	/* require v5.6.1 */
+	if ( SvVOK(sv) && ckWARN(WARN_PORTABLE) ) {	/* require v5.6.1 */
+	    HV * hinthv = GvHV(PL_hintgv);
+	    SV ** ptr = NULL;
+	    if (hinthv) ptr = hv_fetchs(hinthv, "v_string", FALSE);
+	    if ( !(ptr && *ptr && SvIOK(*ptr) && SvIV(*ptr)) )
 		Perl_warner(aTHX_ packWARN(WARN_PORTABLE),
                         "v-string in use/require non-portable");
-
+	}
 	sv = new_version(sv);
 	if (!sv_derived_from(PL_patchlevel, "version"))
 	    upg_version(PL_patchlevel, TRUE);
@@ -2585,10 +2576,11 @@ PP(pp_require)
 	    }
 	}
 
-	/* If we request a version >= 5.9.5, load feature.pm with the
-	 * feature bundle that corresponds to the required version.
-	 * We do this only with use, not require. */
-	if (PL_compcv && vcmp(sv, sv_2mortal(upg_version(newSVnv(5.009005), FALSE))) >= 0) {
+        /* We do this only with use, not require. */
+	if (PL_compcv &&
+	  /* If we request a version >= 5.9.5, load feature.pm with the
+	   * feature bundle that corresponds to the required version. */
+	  (vcmp(sv, sv_2mortal(upg_version(newSVnv(5.009005), FALSE))) >= 0)) {
 	    SV *const importsv = vnormal(sv);
 	    *SvPVX_mutable(importsv) = ':';
 	    ENTER;

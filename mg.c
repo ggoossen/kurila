@@ -1305,11 +1305,13 @@ Perl_csighandler(int sig)
 	   (PL_signals & PERL_SIGNALS_UNSAFE_FLAG))
 	/* Call the perl level handler now--
 	 * with risk we may be in malloc() etc. */
+#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 	(*PL_sighandlerp)(sig, NULL, NULL);
+#else
+	(*PL_sighandlerp)(sig);
+#endif
    else
 	S_raise_signal(aTHX_ sig);
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-#endif
 }
 
 #if defined(FAKE_PERSISTENT_SIGNAL_HANDLERS) || defined(FAKE_DEFAULT_SIGNAL_HANDLERS)
@@ -1344,7 +1346,11 @@ Perl_despatch_signals(pTHX)
 	    PERL_BLOCKSIG_ADD(set, sig);
  	    PL_psig_pend[sig] = 0;
 	    PERL_BLOCKSIG_BLOCK(set);
+#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 	    (*PL_sighandlerp)(sig, NULL, NULL);
+#else
+	    (*PL_sighandlerp)(sig);
+#endif
 	    PERL_BLOCKSIG_UNBLOCK(set);
 	}
     }
@@ -2907,7 +2913,8 @@ int
 Perl_magic_sethint(pTHX_ SV *sv, MAGIC *mg)
 {
     dVAR;
-    assert(mg->mg_len == HEf_SVKEY);
+    if(!(mg->mg_len == HEf_SVKEY))
+	assert(mg->mg_len == HEf_SVKEY);
 
     /* mg->mg_obj isn't being used.  If needed, it would be possible to store
        an alternative leaf in there, with PL_compiling.cop_hints being used if
