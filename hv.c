@@ -588,10 +588,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
         if (action & (HV_FETCH_LVALUE|HV_FETCH_ISSTORE)) {
 	    if (HeKFLAGS(entry) != masked_flags) {
-		/* We match if HVhek_UTF8 bit in our flags and hash key's
-		   match.  But if entry was set previously with HVhek_WASUTF8
-		   and key now doesn't (or vice versa) then we should change
-		   the key's flag, as this is assignment.  */
 		if (HvSHAREKEYS(hv)) {
 		    /* Need to swap the key we have for a key with the flags we
 		       need. As keys are shared we can't just write to the

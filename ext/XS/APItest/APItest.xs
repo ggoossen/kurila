@@ -430,8 +430,6 @@ common(params)
 	    keysv = *svp;
 	if ((svp = hv_fetchs(params, "keypv", 0))) {
 	    key = SvPV_const(*svp, klen);
-	    if (SvUTF8(*svp))
-		flags = HVhek_UTF8;
 	}
 	if ((svp = hv_fetchs(params, "action", 0)))
 	    action = SvIV(*svp);
