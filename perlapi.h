@@ -582,8 +582,6 @@ END_EXTERN_C
 #define PL_sortcop		(*Perl_Isortcop_ptr(aTHX))
 #undef  PL_sortstash
 #define PL_sortstash		(*Perl_Isortstash_ptr(aTHX))
-#undef  PL_spare_510
-#define PL_spare_510		(*Perl_Ispare_510_ptr(aTHX))
 #undef  PL_splitstr
 #define PL_splitstr		(*Perl_Isplitstr_ptr(aTHX))
 #undef  PL_srand_called
@@ -718,8 +716,6 @@ END_EXTERN_C
 #define PL_utf8cache		(*Perl_Iutf8cache_ptr(aTHX))
 #undef  PL_utf8locale
 #define PL_utf8locale		(*Perl_Iutf8locale_ptr(aTHX))
-#undef  PL_v_string_ok
-#define PL_v_string_ok		(*Perl_Iv_string_ok_ptr(aTHX))
 #undef  PL_warnhook
 #define PL_warnhook		(*Perl_Iwarnhook_ptr(aTHX))
 #undef  PL_watchaddr
