@@ -1,6 +1,6 @@
 ### Module::Load::Conditional test suite ###
 
-BEGIN { use FindBin }
+BEGIN { use FindBin; }
 BEGIN { chdir 't' if -d 't' }
 
 use strict;
