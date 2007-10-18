@@ -2508,29 +2508,10 @@ So don't do that!
 
 =head2 How does Perl store UTF-8 strings?
 
-Currently, Perl deals with Unicode strings and non-Unicode strings
-slightly differently. A flag in the SV, C<SVf_UTF8>, indicates that the
-string is internally encoded as UTF-8. Without it, the byte value is the
-codepoint number and vice versa (in other words, the string is encoded
-as iso-8859-1). You can check and manipulate this flag with the
-following macros:
+In Perl Kurila all strings are assumed to be UTF-8. If you want to access
+it like a sequence of codepoints you should assume UTF-8 encoding.
 
-    SvUTF8(sv)
-    SvUTF8_on(sv)
-    SvUTF8_off(sv)
-
-This flag has an important effect on Perl's treatment of the string: if
-Unicode data is not properly distinguished, regular expressions,
-C<length>, C<substr> and other string handling operations will have
-undesirable results.
-
-The problem comes when you have, for instance, a string that isn't
-flagged as UTF-8, and contains a byte sequence that could be UTF-8 -
-especially when combining non-UTF-8 and UTF-8 strings.
-
-Never forget that the C<SVf_UTF8> flag is separate to the PV value; you
-need be sure you don't accidentally knock it off while you're
-manipulating SVs. More specifically, you cannot expect to do this:
+In Perl Kurila there is no SVf_UTF8 flag and you can do things like:
 
     SV *sv;
     SV *nsv;
@@ -2541,24 +2522,6 @@ manipulating SVs. More specifically, you cannot expect to do this:
     frobnicate(p);
     nsv = newSVpvn(p, len);
 
-The C<char*> string does not tell you the whole story, and you can't
-copy or reconstruct an SV just by copying the string value. Check if the
-old SV has the UTF8 flag set, and act accordingly:
-
-    p = SvPV(sv, len);
-    frobnicate(p);
-    nsv = newSVpvn(p, len);
-    if (SvUTF8(sv))
-        SvUTF8_on(nsv);
-
-In fact, your C<frobnicate> function should be made aware of whether or
-not it's dealing with UTF-8 data, so that it can handle the string
-appropriately.
-
-Since just passing an SV to an XS function and copying the data of
-the SV is not enough to copy the UTF8 flags, even less right is just
-passing a C<char *> to an XS function.
-
 =head2 Is there anything else I need to know?
 
 Not really. Just remember these things:
@@ -2567,28 +2530,24 @@ Not really. Just remember these things:
 
 =item *
 
-There's no way to tell if a string is UTF-8 or not. You can tell if an SV
-is UTF-8 by looking at is C<SvUTF8> flag. Don't forget to set the flag if
-something should be UTF-8. Treat the flag as part of the PV, even though
-it's not - if you pass on the PV to somewhere, pass on the flag too.
+You just have a sequence of bytes, you can do with it what you want.
 
 =item *
 
-If a string is UTF-8, B<always> use C<utf8_to_uv> to get at the value,
-unless C<UTF8_IS_INVARIANT(*s)> in which case you can use C<*s>.
+When you want to deal whith codepoints (characters), strings are
+default assumed UTF-8 encoded.
 
 =item *
 
-When writing a character C<uv> to a UTF-8 string, B<always> use
+When writing a codepoint C<uv> to a string, B<always> use
 C<uv_to_utf8>, unless C<UTF8_IS_INVARIANT(uv))> in which case
 you can use C<*s = uv>.
 
 =item *
 
-Mixing UTF-8 and non-UTF-8 strings is tricky. Use C<bytes_to_utf8> to get
-a new string which is UTF-8 encoded. There are tricks you can use to
-delay deciding whether you need to use a UTF-8 string until you get to a
-high character - C<HALF_UPGRADE> is one of those.
+There are no UTF-8 and non-UTF-8 strings. You can combine all strings
+easily, of course when one of the string is not valid UTF-8, then also
+the result will be not valid UTF-8.
 
 =back
 

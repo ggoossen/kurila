@@ -123,19 +123,9 @@ bitflip_key(pTHX_ IV action, SV *field) {
 	    SV *newkey = newSV(len);
 	    char *new_p = SvPVX(newkey);
 
-	    if (SvUTF8(keysv)) {
-		const char *const end = p + len;
-		while (p < end) {
-		    STRLEN len;
-		    UV chr = utf8_to_uvuni((U8 *)p, &len);
-		    new_p = (char *)uvuni_to_utf8((U8 *)new_p, chr ^ 32);
-		    p += len;
-		}
-		SvUTF8_on(newkey);
-	    } else {
-		while (len--)
-		    *new_p++ = *p++ ^ 32;
-	    }
+            while (len--)
+                *new_p++ = *p++ ^ 32;
+
 	    *new_p = '\0';
 	    SvCUR_set(newkey, SvCUR(keysv));
 	    SvPOK_on(newkey);
@@ -221,8 +211,6 @@ rot13_key(pTHX_ IV action, SV *field) {
 	    } while (len--);
 	    SvCUR_set(newkey, SvCUR(keysv));
 	    SvPOK_on(newkey);
-	    if (SvUTF8(keysv))
-		SvUTF8_on(newkey);
 
 	    mg->mg_obj = newkey;
 	}
