@@ -1653,7 +1653,7 @@ sub read_args {
   # De-tilde-ify any path parameters
   for my $key (qw(prefix install_base destdir)) {
     next if !defined $args{$key};
-    $args{$key} = _detildefy($args{$key});
+    $args{$key} = $self->_detildefy($args{$key});
   }
 
   for my $key (qw(install_path)) {
@@ -1661,7 +1661,7 @@ sub read_args {
 
     for my $subkey (keys %{$args{$key}}) {
       next if !defined $args{$key}{$subkey};
-      my $subkey_ext = _detildefy($args{$key}{$subkey});
+      my $subkey_ext = $self->_detildefy($args{$key}{$subkey});
       if ( $subkey eq 'html' ) { # translate for compatability
 	$args{$key}{binhtml} = $subkey_ext;
 	$args{$key}{libhtml} = $subkey_ext;
@@ -1683,7 +1683,7 @@ sub read_args {
 # (bash shell won't expand tildes mid-word: "--foo=~/thing")
 # TODO: handle ~user/foo
 sub _detildefy {
-    my $arg = shift;
+    my ($self, $arg) = @_;
 
     return $arg =~ /^~/ ? (glob $arg)[0] : $arg;
 }
@@ -2186,7 +2186,8 @@ sub ACTION_testcover {
   # See whether any of the *.pm files have changed since last time
   # testcover was run.  If so, start over.
   if (-e 'cover_db') {
-    my $pm_files = $self->rscan_dir(File::Spec->catdir($self->blib, 'lib'), qr{\.pm$} );
+    my $pm_files = $self->rscan_dir
+        (File::Spec->catdir($self->blib, 'lib'), file_qr('\.pm$') );
     my $cover_files = $self->rscan_dir('cover_db', sub {-f $_ and not /\.html$/});
     
     $self->do_system(qw(cover -delete))
@@ -2248,7 +2249,7 @@ sub process_support_files {
   
   push @{$p->{include_dirs}}, $p->{c_source};
   
-  my $files = $self->rscan_dir($p->{c_source}, qr{\.c(pp)?$});
+  my $files = $self->rscan_dir($p->{c_source}, file_qr('\.c(pp)?$'));
   foreach my $file (@$files) {
     push @{$p->{objects}}, $self->compile_c($file);
   }
@@ -2320,7 +2321,8 @@ sub find_PL_files {
   }
   
   return unless -d 'lib';
-  return { map {$_, [/^(.*)\.PL$/]} @{ $self->rscan_dir('lib', qr{\.PL$}) } };
+  return { map {$_, [/^(.*)\.PL$/i ]} @{ $self->rscan_dir('lib',
+                                                          file_qr('\.PL$')) } };
 }
 
 sub find_pm_files  { shift->_find_file_by_type('pm',  'lib') }
@@ -2373,7 +2375,7 @@ sub _find_file_by_type {
   return { map {$_, $_}
 	   map $self->localize_file_path($_),
 	   grep !/\.\#/,
-	   @{ $self->rscan_dir($dir, qr{\.$type$}) } };
+	   @{ $self->rscan_dir($dir, file_qr("\\.$type\$")) } };
 }
 
 sub localize_file_path {
@@ -2445,7 +2447,9 @@ sub ACTION_testpod {
     or die "The 'testpod' action requires Test::Pod version 0.95";
 
   my @files = sort keys %{$self->_find_pods($self->libdoc_dirs)},
-                   keys %{$self->_find_pods($self->bindoc_dirs, exclude => [ qr/\.bat$/ ])}
+                   keys %{$self->_find_pods
+                             ($self->bindoc_dirs,
+                              exclude => [ file_qr('\.bat$') ])}
     or die "Couldn't find any POD files to test\n";
 
   { package Module::Build::PodTester;  # Don't want to pollute the main namespace
@@ -2507,7 +2511,7 @@ sub ACTION_manpages {
 
   foreach my $type ( qw(bin lib) ) {
     my $files = $self->_find_pods( $self->{properties}{"${type}doc_dirs"},
-                                   exclude => [ qr/\.bat$/ ] );
+                                   exclude => [ file_qr('\.bat$') ] );
     next unless %$files;
 
     my $sub = $self->can("manify_${type}_pods");
@@ -2526,7 +2530,7 @@ sub manify_bin_pods {
   my $self    = shift;
 
   my $files   = $self->_find_pods( $self->{properties}{bindoc_dirs},
-                                   exclude => [ qr/\.bat$/ ] );
+                                   exclude => [ file_qr('\.bat$') ] );
   return unless keys %$files;
 
   my $mandir = File::Spec->catdir( $self->blib, 'bindoc' );
@@ -2609,7 +2613,8 @@ sub ACTION_html {
 
   foreach my $type ( qw(bin lib) ) {
     my $files = $self->_find_pods( $self->{properties}{"${type}doc_dirs"},
-				   exclude => [ qr/\.(?:bat|com|html)$/ ] );
+				   exclude => 
+                                        [ file_qr('\.(?:bat|com|html)$') ] );
     next unless %$files;
 
     if ( $self->invoked_action eq 'html' ) {
@@ -2636,7 +2641,7 @@ sub htmlify_pods {
   $self->add_to_cleanup('pod2htm*');
 
   my $pods = $self->_find_pods( $self->{properties}{"${type}doc_dirs"},
-                                exclude => [ qr/\.(?:bat|com|html)$/ ] );
+                                exclude => [ file_qr('\.(?:bat|com|html)$') ] );
   return unless %$pods;  # nothing to do
 
   unless ( -d $htmldir ) {
@@ -2656,7 +2661,7 @@ sub htmlify_pods {
   foreach my $pod ( keys %$pods ) {
 
     my ($name, $path) = File::Basename::fileparse($pods->{$pod},
-						  qr{\.(?:pm|plx?|pod)$});
+                                                 file_qr('\.(?:pm|plx?|pod)$'));
     my @dirs = File::Spec->splitdir( File::Spec->canonpath( $path ) );
     pop( @dirs ) if $dirs[-1] eq File::Spec->curdir;
 
@@ -2746,7 +2751,7 @@ sub ACTION_diff {
   delete $installmap->{read};
   delete $installmap->{write};
 
-  my $text_suffix = qr{\.(pm|pod)$};
+  my $text_suffix = file_qr('\.(pm|pod)$');
 
   while (my $localdir = each %$installmap) {
     my @localparts = File::Spec->splitdir($localdir);
@@ -3203,6 +3208,11 @@ sub ACTION_manifest {
   require ExtUtils::Manifest;  # ExtUtils::Manifest is not warnings clean.
   local ($^W, $ExtUtils::Manifest::Quiet) = (0,1);
   ExtUtils::Manifest::mkmanifest();
+}
+
+# Case insenstive regex for files
+sub file_qr {
+    return File::Spec->case_tolerant ? qr($_[0])i : qr($_[0]);
 }
 
 sub dist_dir {
@@ -3806,8 +3816,22 @@ sub install_map {
     foreach (keys %map) {
       # Need to remove volume from $map{$_} using splitpath, or else
       # we'll create something crazy like C:\Foo\Bar\E:\Baz\Quux
-      my ($volume, $path) = File::Spec->splitpath( $map{$_}, 1 );
-      $map{$_} = File::Spec->catdir($destdir, $path);
+      # VMS will always have the file separate than the path.
+      my ($volume, $path, $file) = File::Spec->splitpath( $map{$_}, 1 );
+
+      # catdir needs a list of directories, or it will create something
+      # crazy like volume:[Foo.Bar.volume.Baz.Quux]
+      my @dirs = File::Spec->splitdir($path);
+
+      # First merge the directories
+      $path = File::Spec->catdir($destdir, @dirs);
+
+      # Then put the file back on if there is one.
+      if ($file ne '') {
+          $map{$_} = File::Spec->catfile($path, $file)
+      } else {
+          $map{$_} = $path;
+      }
     }
   }
   

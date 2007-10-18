@@ -1819,7 +1819,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	Perl_dump_indent(aTHX_ level, file, "  OFP = 0x%"UVxf"\n", PTR2UV(IoOFP(sv)));
 	Perl_dump_indent(aTHX_ level, file, "  DIRP = 0x%"UVxf"\n", PTR2UV(IoDIRP(sv)));
 	Perl_dump_indent(aTHX_ level, file, "  LINES = %"IVdf"\n", (IV)IoLINES(sv));
-	Perl_dump_indent(aTHX_ level, file, "  SUBPROCESS = %"IVdf"\n", (IV)IoSUBPROCESS(sv));
 	if (isPRINT(IoTYPE(sv)))
             Perl_dump_indent(aTHX_ level, file, "  TYPE = '%c'\n", IoTYPE(sv));
 	else
@@ -1834,7 +1833,10 @@ void
 Perl_sv_dump(pTHX_ SV *sv)
 {
     dVAR;
-    do_sv_dump(0, Perl_debug_log, sv, 0, 0, 0, 0);
+    if (SvROK(sv))
+	do_sv_dump(0, Perl_debug_log, sv, 0, 4, 0, 0);
+    else
+	do_sv_dump(0, Perl_debug_log, sv, 0, 0, 0, 0);
 }
 
 int

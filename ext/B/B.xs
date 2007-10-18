@@ -864,10 +864,6 @@ long
 IoLINES(io)
 	B::IO	io
 
-short
-IoSUBPROCESS(io)
-	B::IO	io
-
 bool
 IsSTD(io,name)
 	B::IO	io
