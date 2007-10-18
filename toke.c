@@ -813,8 +813,18 @@ S_incline(pTHX_ const char *s)
     if (t - s > 0) {
 	const STRLEN len = t - s;
 #ifndef USE_ITHREADS
-	const char * const cf = CopFILE(PL_curcop);
-	STRLEN tmplen = cf ? strlen(cf) : 0;
+	SV *const temp_sv = CopFILESV(PL_curcop);
+	const char *cf;
+	STRLEN tmplen;
+
+	if (temp_sv) {
+	    cf = SvPVX(temp_sv);
+	    tmplen = SvCUR(temp_sv);
+	} else {
+	    cf = NULL;
+	    tmplen = 0;
+	}
+
 	if (tmplen > 7 && strnEQ(cf, "(eval ", 6)) {
 	    /* must copy *{"::_<(eval N)[oldfilename:L]"}
 	     * to *{"::_<newfilename"} */
@@ -4790,12 +4800,7 @@ Perl_yylex(pTHX)
 	    else if (!isALPHA(*start) && (PL_expect == XTERM
 			|| PL_expect == XREF || PL_expect == XSTATE
 			|| PL_expect == XTERMORDORDOR)) {
-		/* XXX Use gv_fetchpvn rather than stomping on a const string */
-		const char c = *start;
-		GV *gv;
-		*start = '\0';
-		gv = gv_fetchpv(s, 0, SVt_PVCV);
-		*start = c;
+		GV *const gv = gv_fetchpvn_flags(s, start - s, 0, SVt_PVCV);
 		if (!gv) {
 		    s = scan_num(s, &yylval);
 		    TERM(THING);
@@ -6494,6 +6499,9 @@ S_pending_ident(pTHX)
     PADOFFSET tmp = 0;
     /* pit holds the identifier we read and pending_ident is reset */
     char pit = PL_pending_ident;
+    const STRLEN tokenbuf_len = strlen(PL_tokenbuf);
+    /* All routes through this function want to know if there is a colon.  */
+    const char *const has_colon = (const char*) memchr (PL_tokenbuf, ':', tokenbuf_len);
     PL_pending_ident = 0;
 
     /* PL_realtokenstart = realtokenend = PL_bufptr - SvPVX(PL_linestr); */
@@ -6508,14 +6516,14 @@ S_pending_ident(pTHX)
     */
     if (PL_in_my) {
         if (PL_in_my == KEY_our) {	/* "our" is merely analogous to "my" */
-            if (strchr(PL_tokenbuf,':'))
+            if (has_colon)
                 yyerror(Perl_form(aTHX_ "No package name allowed for "
                                   "variable %s in \"our\"",
                                   PL_tokenbuf));
             tmp = allocmy(PL_tokenbuf);
         }
         else {
-            if (strchr(PL_tokenbuf,':'))
+            if (has_colon)
                 yyerror(Perl_form(aTHX_ PL_no_myglob,
 			    PL_in_my == KEY_my ? "my" : "state", PL_tokenbuf));
 
@@ -6537,7 +6545,7 @@ S_pending_ident(pTHX)
        (although why you'd do that is anyone's guess).
     */
 
-    if (!strchr(PL_tokenbuf,':')) {
+    if (!has_colon) {
 	if (!PL_in_my)
 	    tmp = pad_findmy(PL_tokenbuf);
         if (tmp != NOT_IN_PAD) {
@@ -6548,7 +6556,7 @@ S_pending_ident(pTHX)
 		HEK * const stashname = HvNAME_HEK(stash);
 		SV *  const sym = newSVhek(stashname);
                 sv_catpvs(sym, "::");
-                sv_catpv(sym, PL_tokenbuf+1);
+                sv_catpvn(sym, PL_tokenbuf+1, tokenbuf_len - 1);
                 yylval.opval = (OP*)newSVOP(OP_CONST, 0, sym);
                 yylval.opval->op_private = OPpCONST_ENTERED;
                 gv_fetchsv(sym,
@@ -6591,7 +6599,8 @@ S_pending_ident(pTHX)
        table.
     */
     if (pit == '@' && PL_lex_state != LEX_NORMAL && !PL_lex_brackets) {
-        GV *gv = gv_fetchpv(PL_tokenbuf+1, 0, SVt_PVAV);
+        GV *const gv = gv_fetchpvn_flags(PL_tokenbuf + 1, tokenbuf_len - 1, 0,
+					 SVt_PVAV);
         if ((!gv || ((PL_tokenbuf[0] == '@') ? !GvAV(gv) : !GvHV(gv)))
 		&& ckWARN(WARN_AMBIGUOUS)
 		/* DO NOT warn for @- and @+ */
@@ -6607,10 +6616,11 @@ S_pending_ident(pTHX)
     }
 
     /* build ops for a bareword */
-    yylval.opval = (OP*)newSVOP(OP_CONST, 0, newSVpv(PL_tokenbuf+1, 0));
+    yylval.opval = (OP*)newSVOP(OP_CONST, 0, newSVpvn(PL_tokenbuf + 1,
+						      tokenbuf_len - 1));
     yylval.opval->op_private = OPpCONST_ENTERED;
-    gv_fetchpv(
-	    PL_tokenbuf+1,
+    gv_fetchpvn_flags(
+	    PL_tokenbuf + 1, tokenbuf_len - 1,
 	    /* If the identifier refers to a stash, don't autovivify it.
 	     * Change 24660 had the side effect of causing symbol table
 	     * hashes to always be defined, even if they were freshly
@@ -6623,7 +6633,9 @@ S_pending_ident(pTHX)
 	     * tests still give the expected answers, even though what
 	     * they're actually testing has now changed subtly.
 	     */
-	    (*PL_tokenbuf == '%' && *(d = PL_tokenbuf + strlen(PL_tokenbuf) - 1) == ':' && d[-1] == ':'
+	    (*PL_tokenbuf == '%'
+	     && *(d = PL_tokenbuf + tokenbuf_len - 1) == ':'
+	     && d[-1] == ':'
 	     ? 0
 	     : PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL) : GV_ADD),
 	    ((PL_tokenbuf[0] == '$') ? SVt_PV

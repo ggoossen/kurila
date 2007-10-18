@@ -3025,16 +3025,24 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	}
 	if (!sep || ((sep - name) == 5 && strnEQ(name, "SUPER", 5))) {
 	    /* the method name is unqualified or starts with SUPER:: */
+#ifndef USE_ITHREADS
+	    if (sep)
+		stash = CopSTASH(PL_curcop);
+#else
 	    bool need_strlen = 1;
 	    if (sep) {
 		packname = CopSTASHPV(PL_curcop);
 	    }
-	    else if (stash) {
+	    else
+#endif
+	    if (stash) {
 		HEK * const packhek = HvNAME_HEK(stash);
 		if (packhek) {
 		    packname = HEK_KEY(packhek);
 		    packlen = HEK_LEN(packhek);
+#ifdef USE_ITHREADS
 		    need_strlen = 0;
+#endif
 		} else {
 		    goto croak;
 		}
@@ -3045,8 +3053,10 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 		Perl_croak(aTHX_
 			   "Can't use anonymous symbol table for method lookup");
 	    }
-	    else if (need_strlen)
+#ifdef USE_ITHREADS
+	    if (need_strlen)
 		packlen = strlen(packname);
+#endif
 
 	}
 	else {

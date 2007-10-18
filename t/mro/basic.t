@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-require q(./test.pl); plan(tests => 31);
+require q(./test.pl); plan(tests => 34);
 
 {
     package MRO_A;
