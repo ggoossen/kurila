@@ -492,7 +492,7 @@ Ap	|I32	|mg_size	|NN SV* sv
 Ap	|void	|mini_mktime	|NN struct tm *pm
 EXp	|OP*	|mod		|NULLOK OP* o|I32 type
 p	|int	|mode_from_discipline|NULLOK SV* discp
-Ap	|char*	|moreswitches	|NN char* s
+Ap	|const char*	|moreswitches	|NN const char* s
 p	|OP*	|my		|NN OP* o
 Ap	|NV	|my_atof	|NN const char *s
 #if (!defined(HAS_MEMCPY) && !defined(HAS_BCOPY)) || (!defined(HAS_MEMMOVE) && !defined(HAS_SAFE_MEMCPY) && !defined(HAS_SAFE_BCOPY))
@@ -1119,6 +1119,7 @@ sR	|I32	|do_trans_complex_utf8	|NN SV * const sv
 
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
 s	|void	|gv_init_sv	|NN GV *gv|I32 sv_type
+s	|HV*	|gv_get_super_pkg|NN const char* name|I32 namelen
 s	|HV*	|require_tie_mod|NN GV *gv|NN const char *varpv|NN SV* namesv \
 				|NN const char *methpv|const U32 flags
 #endif

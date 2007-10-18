@@ -1685,7 +1685,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     VOL bool dosearch = FALSE;
     const char *validarg = "";
     register SV *sv;
-    register char *s, c;
+    register char c;
     const char *cddir = NULL;
 #ifdef USE_SITECUSTOMIZE
     bool minus_f = FALSE;
@@ -1700,6 +1700,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     SAVEFREESV(sv);
     init_main_stash();
 
+    {
+	const char *s;
     for (argc--,argv++; argc > 0; argc--,argv++) {
 	if (argv[0][0] != '-' || !argv[0][1])
 	    break;
@@ -1952,7 +1954,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    Perl_croak(aTHX_ "Unrecognized switch: -%s  (-h will show valid options)",s);
 	}
     }
+    }
+
   switch_end:
+
+    {
+	char *s;
 
     if (
 #ifndef SECURE_INTERNAL_GETENV
@@ -1982,7 +1989,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		d = s;
 		if (!*s)
 		    break;
-		if (!strchr("CDIMUdmtwA", *s))
+		if (!strchr("CDIMUdmtw", *s))
 		    Perl_croak(aTHX_ "Illegal switch in PERL5OPT: -%c", *s);
 		while (++s && *s) {
 		    if (isSPACE(*s)) {
@@ -2005,6 +2012,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		}
 	    }
 	}
+    }
     }
 
 #ifdef USE_SITECUSTOMIZE
@@ -2158,6 +2166,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	 }
     }
 
+    {
+	const char *s;
     if ((s = PerlEnv_getenv("PERL_SIGNALS"))) {
 	 if (strEQ(s, "unsafe"))
 	      PL_signals |=  PERL_SIGNALS_UNSAFE_FLAG;
@@ -2166,8 +2176,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	 else
 	      Perl_croak(aTHX_ "PERL_SIGNALS illegal: \"%s\"", s);
     }
+    }
 
 #ifdef PERL_MAD
+    {
+	const char *s;
     if ((s = PerlEnv_getenv("PERL_XMLDUMP"))) {
 	PL_madskills = 1;
 	PL_minus_c = 1;
@@ -2180,9 +2193,14 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	}
 	my_setenv("PERL_XMLDUMP", NULL);	/* hide from subprocs */
     }
+    }
+
+    {
+	const char *s;
     if ((s = PerlEnv_getenv("PERL_MADSKILLS"))) {
 	PL_madskills = atoi(s);
 	my_setenv("PERL_MADSKILLS", NULL);	/* hide from subprocs */
+    }
     }
 #endif
 
@@ -2942,8 +2960,8 @@ Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
 
 /* This routine handles any switches that can be given during run */
 
-char *
-Perl_moreswitches(pTHX_ char *s)
+const char *
+Perl_moreswitches(pTHX_ const char *s)
 {
     dVAR;
     UV rschar;
@@ -3089,7 +3107,7 @@ Perl_moreswitches(pTHX_ char *s)
 	while (*s && isSPACE(*s))
 	    ++s;
 	if (*s) {
-	    char *e, *p;
+	    const char *e, *p;
 	    p = s;
 	    /* ignore trailing spaces (possibly followed by other switches) */
 	    do {
@@ -3138,7 +3156,7 @@ Perl_moreswitches(pTHX_ char *s)
     case 'm':
 	forbid_setid('m', -1);	/* XXX ? */
 	if (*++s) {
-	    char *start;
+	    const char *start;
 	    SV *sv;
 	    const char *use = "use ";
 	    /* -M-foo == 'no foo'	*/
@@ -4245,7 +4263,7 @@ STATIC void
 S_find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
 {
     dVAR;
-    register char *s;
+    const char *s;
     register const char *s2;
 #ifdef MACOS_TRADITIONAL
     int maclines = 0;

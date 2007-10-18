@@ -1095,7 +1095,7 @@ is the recommended Unicode-aware way of saying
 
 #define TRIE_STORE_REVCHAR                                                 \
     STMT_START {                                                           \
-	    unsigned char ooooff = uvc;					   \
+	    char ooooff = (char)uvc;					   	   \
 	    av_push(revcharmap, newSVpvn(&ooooff, 1));			   \
         } STMT_END
 
@@ -6083,7 +6083,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             | PERL_SCAN_DISALLOW_PREFIX
             | (SIZE_ONLY ? PERL_SCAN_SILENT_ILLDIGIT : 0);
         UV cp;
-	unsigned char string;
+	char string;
         len = (STRLEN)(endbrace - name - 2);
         cp = grok_hex(name + 2, &len, &fl, NULL);
         if ( len != (STRLEN)(endbrace - name - 2) ) {
@@ -6093,7 +6093,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             *valuep = cp;
             return NULL;
         }
-	string = (unsigned char) cp;
+	string = (char)cp;
         sv_str= newSVpvn(&string, 1);
     } else {
         /* fetch the charnames handler for this scope */
@@ -9174,7 +9174,7 @@ S_put_byte(pTHX_ SV *sv, int c)
     if (!isPRINT(c))
 	Perl_sv_catpvf(aTHX_ sv, "\\%o", c);
     else {
-	const unsigned char string = (unsigned char) c;
+	const char string = c;
 	if (c == '-' || c == ']' || c == '\\' || c == '^')
 	    sv_catpvs(sv, "\\");
 	sv_catpvn(sv, &string, 1);

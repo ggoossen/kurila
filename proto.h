@@ -1339,7 +1339,7 @@ PERL_CALLCONV void	Perl_mini_mktime(pTHX_ struct tm *pm)
 
 PERL_CALLCONV OP*	Perl_mod(pTHX_ OP* o, I32 type);
 PERL_CALLCONV int	Perl_mode_from_discipline(pTHX_ SV* discp);
-PERL_CALLCONV char*	Perl_moreswitches(pTHX_ char* s)
+PERL_CALLCONV const char*	Perl_moreswitches(pTHX_ const char* s)
 			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV OP*	Perl_my(pTHX_ OP* o)
@@ -2986,6 +2986,9 @@ STATIC I32	S_do_trans_complex_utf8(pTHX_ SV * const sv)
 
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
 STATIC void	S_gv_init_sv(pTHX_ GV *gv, I32 sv_type)
+			__attribute__nonnull__(pTHX_1);
+
+STATIC HV*	S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
 			__attribute__nonnull__(pTHX_1);
 
 STATIC HV*	S_require_tie_mod(pTHX_ GV *gv, const char *varpv, SV* namesv, const char *methpv, const U32 flags)
