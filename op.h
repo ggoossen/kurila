@@ -37,11 +37,7 @@
  *			which may or may not check number of children).
  */
 
-#ifdef DEBUGGING_OPS
-#define OPCODE opcode
-#else
 #define OPCODE U16
-#endif
 
 #ifdef PERL_MAD
 #  define MADPROP_IN_BASEOP	MADPROP*	op_madprop;

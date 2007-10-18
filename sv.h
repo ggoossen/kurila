@@ -633,9 +633,8 @@ struct xpvio {
 	void *	xiou_any;	/* for alignment */
     } xio_dirpu;
     IV		xio_lines;	/* $. */
-    short	xio_subprocess;	/* -| or |- */
     char	xio_type;
-    char	xio_flags;
+    U8		xio_flags;
 };
 #define xio_dirp	xio_dirpu.xiou_dirp
 #define xio_any		xio_dirpu.xiou_any
@@ -1334,7 +1333,6 @@ the scalar's value cannot change unless written to.
 #define IoDIRP(sv)	((XPVIO*)  SvANY(sv))->xio_dirp
 #define IoANY(sv)	((XPVIO*)  SvANY(sv))->xio_any
 #define IoLINES(sv)	((XPVIO*)  SvANY(sv))->xio_lines
-#define IoSUBPROCESS(sv)((XPVIO*)  SvANY(sv))->xio_subprocess
 #define IoTYPE(sv)	((XPVIO*)  SvANY(sv))->xio_type
 #define IoFLAGS(sv)	((XPVIO*)  SvANY(sv))->xio_flags
 
