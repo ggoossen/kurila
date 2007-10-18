@@ -2178,11 +2178,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    if (!PL_xmlfp)
 		Perl_croak(aTHX_ "Can't open %s", s);
 	}
-	my_setenv("PERL_XMLDUMP", Nullch);	/* hide from subprocs */
+	my_setenv("PERL_XMLDUMP", NULL);	/* hide from subprocs */
     }
     if ((s = PerlEnv_getenv("PERL_MADSKILLS"))) {
 	PL_madskills = atoi(s);
-	my_setenv("PERL_MADSKILLS", Nullch);	/* hide from subprocs */
+	my_setenv("PERL_MADSKILLS", NULL);	/* hide from subprocs */
     }
 #endif
 
@@ -3038,6 +3038,7 @@ Perl_moreswitches(pTHX_ char *s)
 	    }
 	    s += strlen(s);
 	    my_setenv("PERL5DB", SvPV_nolen_const(sv));
+	    SvREFCNT_dec(sv);
 	}
 	if (!PL_perldb) {
 	    PL_perldb = PERLDB_ALL;

@@ -8343,19 +8343,17 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
     k = PL_regkind[OP(o)];
 
     if (k == EXACT) {
-	SV * const dsv = sv_2mortal(newSVpvs(""));
+	sv_catpvs(sv, " ");
 	/* Using is_utf8_string() (via PERL_PV_UNI_DETECT) 
 	 * is a crude hack but it may be the best for now since 
 	 * we have no flag "this EXACTish node was UTF-8" 
 	 * --jhi */
-	const char * const s = 
-	    pv_pretty(dsv, STRING(o), STR_LEN(o), 60, 
-	        PL_colors[0], PL_colors[1],
-	        PERL_PV_ESCAPE_UNI_DETECT |
-	        PERL_PV_PRETTY_ELLIPSES   |
-	        PERL_PV_PRETTY_LTGT    
-            ); 
-	Perl_sv_catpvf(aTHX_ sv, " %s", s );
+	pv_pretty(sv, STRING(o), STR_LEN(o), 60, PL_colors[0], PL_colors[1],
+		  PERL_PV_ESCAPE_UNI_DETECT |
+		  PERL_PV_PRETTY_ELLIPSES   |
+		  PERL_PV_PRETTY_LTGT       |
+		  PERL_PV_PRETTY_NOCLEAR
+		  );
     } else if (k == TRIE) {
 	/* print the details of the trie in dumpuntil instead, as
 	 * progi->data isn't available here */
@@ -8384,7 +8382,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
             int i;
             int rangestart = -1;
             U8* bitmap = IS_ANYOF_TRIE(op) ? (U8*)ANYOF_BITMAP(o) : (U8*)TRIE_BITMAP(trie);
-            Perl_sv_catpvf(aTHX_ sv, "[");
+            sv_catpvs(sv, "[");
             for (i = 0; i <= 256; i++) {
                 if (i < 256 && BITMAP_TEST(bitmap,i)) {
                     if (rangestart == -1)
@@ -8401,7 +8399,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
                     rangestart = -1;
                 }
             }
-            Perl_sv_catpvf(aTHX_ sv, "]");
+            sv_catpvs(sv, "]");
         } 
 	 
     } else if (k == CURLY) {

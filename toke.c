@@ -5345,7 +5345,7 @@ Perl_yylex(pTHX)
 			PL_realtokenstart = -1;
 		    }
 		    while ((s = filter_gets(PL_endwhite, PL_rsfp,
-				 SvCUR(PL_endwhite))) != Nullch) ;
+				 SvCUR(PL_endwhite))) != NULL) ;
 		}
 #endif
 		PL_rsfp = NULL;
@@ -6283,7 +6283,7 @@ Perl_yylex(pTHX)
 		    CURMAD('Q', PL_thisclose);
 		    NEXTVAL_NEXTTOKE.opval =
 			(OP*)newSVOP(OP_CONST, 0, PL_lex_stuff);
-		    PL_lex_stuff = Nullsv;
+		    PL_lex_stuff = NULL;
 		    force_next(THING);
 
 		    s = SKIPSPACE2(s,tmpwhite);
