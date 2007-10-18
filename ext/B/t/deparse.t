@@ -349,6 +349,10 @@ state $x = 42;
 {
     my $y = (state $x = 42);
 }
+>>>>
+{
+    my $y = state $x = 42;
+
 ####
 # 48 state vars in anoymous subroutines
 $a = sub {

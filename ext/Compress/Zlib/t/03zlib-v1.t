@@ -1173,7 +1173,7 @@ sub trickle
     title "gzclose & gzflush return codes";
     # rt.29215
 
-    my $lex = new LexFile my $name ;
+    my $lex = LexFile->new( my $name );
     my $data1 = "the is some text";
     my $status;
 
