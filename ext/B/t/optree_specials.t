@@ -99,7 +99,7 @@ checkOptree ( name	=> 'BEGIN',
 # BEGIN 4:
 # 11 <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->11
-# y        <;> nextstate(main 2 -e:1) v:{ ->z
+# y        <;> nextstate(main 2 -e:1) v:>,<,%,{ ->z
 # 10       <1> postinc[t3] sK/1 ->11
 # -           <1> ex-rv2sv sKRM/1 ->10
 # z              <#> gvsv[*beg] s ->10
@@ -149,7 +149,7 @@ EOT_EOT
 # BEGIN 4:
 # 11 <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->11
-# y        <;> nextstate(main 2 -e:1) v:{ ->z
+# y        <;> nextstate(main 2 -e:1) v:>,<,%,{ ->z
 # 10       <1> postinc[t2] sK/1 ->11
 # -           <1> ex-rv2sv sKRM/1 ->10
 # z              <$> gvsv(*beg) s ->10
@@ -164,7 +164,7 @@ checkOptree ( name	=> 'END',
 # END 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 5 -e:6) v:{ ->2
+# 1        <;> nextstate(main 5 -e:6) v:>,<,%,{ ->2
 # 3        <1> postinc[t3] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <#> gvsv[*end] s ->3
@@ -172,7 +172,7 @@ EOT_EOT
 # END 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 5 -e:6) v:{ ->2
+# 1        <;> nextstate(main 5 -e:6) v:>,<,%,{ ->2
 # 3        <1> postinc[t2] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <$> gvsv(*end) s ->3
@@ -187,7 +187,7 @@ checkOptree ( name	=> 'CHECK',
 # CHECK 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 3 -e:4) v:{ ->2
+# 1        <;> nextstate(main 3 -e:4) v:>,<,%,{ ->2
 # 3        <1> postinc[t3] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <#> gvsv[*chk] s ->3
@@ -195,7 +195,7 @@ EOT_EOT
 # CHECK 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 3 -e:4) v:{ ->2
+# 1        <;> nextstate(main 3 -e:4) v:>,<,%,{ ->2
 # 3        <1> postinc[t2] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <$> gvsv(*chk) s ->3
@@ -210,7 +210,7 @@ if ($] >= 5.009) {
 # UNITCHECK 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 3 -e:4) v:{ ->2
+# 1        <;> nextstate(main 3 -e:4) v:>,<,%,{ ->2
 # 3        <1> postinc[t3] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <#> gvsv[*uc] s ->3
@@ -218,7 +218,7 @@ EOT_EOT
 # UNITCHECK 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 3 -e:4) v:{ ->2
+# 1        <;> nextstate(main 3 -e:4) v:>,<,%,{ ->2
 # 3        <1> postinc[t2] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <$> gvsv(*uc) s ->3
@@ -234,7 +234,7 @@ checkOptree ( name	=> 'INIT',
 # INIT 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 4 -e:5) v:{ ->2
+# 1        <;> nextstate(main 4 -e:5) v:>,<,%,{ ->2
 # 3        <1> postinc[t3] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <#> gvsv[*init] s ->3
@@ -242,7 +242,7 @@ EOT_EOT
 # INIT 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
-# 1        <;> nextstate(main 4 -e:5) v:{ ->2
+# 1        <;> nextstate(main 4 -e:5) v:>,<,%,{ ->2
 # 3        <1> postinc[t2] sK/1 ->4
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <$> gvsv(*init) s ->3
@@ -293,27 +293,27 @@ checkOptree ( name	=> 'all of BEGIN END INIT CHECK UNITCHECK -exec',
 # w  <1> entersub[t1] KS*/TARG,2
 # x  <1> leavesub[1 ref] K/REFC,1
 # BEGIN 4:
-# y  <;> nextstate(main 2 -e:1) v:{
+# y  <;> nextstate(main 2 -e:1) v:>,<,%,{
 # z  <#> gvsv[*beg] s
 # 10 <1> postinc[t3] sK/1
 # 11 <1> leavesub[1 ref] K/REFC,1
 # END 1:
-# 12 <;> nextstate(main 5 -e:1) v:{
+# 12 <;> nextstate(main 5 -e:1) v:>,<,%,{
 # 13 <#> gvsv[*end] s
 # 14 <1> postinc[t3] sK/1
 # 15 <1> leavesub[1 ref] K/REFC,1
 # INIT 1:
-# 16 <;> nextstate(main 4 -e:1) v:{
+# 16 <;> nextstate(main 4 -e:1) v:>,<,%,{
 # 17 <#> gvsv[*init] s
 # 18 <1> postinc[t3] sK/1
 # 19 <1> leavesub[1 ref] K/REFC,1
 # CHECK 1:
-# 1a <;> nextstate(main 3 -e:1) v:{
+# 1a <;> nextstate(main 3 -e:1) v:>,<,%,{
 # 1b <#> gvsv[*chk] s
 # 1c <1> postinc[t3] sK/1
 # 1d <1> leavesub[1 ref] K/REFC,1
 # UNITCHECK 1:
-# 1e <;> nextstate(main 6 -e:1) v:{
+# 1e <;> nextstate(main 6 -e:1) v:>,<,%,{
 # 1f <#> gvsv[*uc] s
 # 1g <1> postinc[t3] sK/1
 # 1h <1> leavesub[1 ref] K/REFC,1
@@ -355,27 +355,27 @@ EOT_EOT
 # w  <1> entersub[t1] KS*/TARG,2
 # x  <1> leavesub[1 ref] K/REFC,1
 # BEGIN 4:
-# y  <;> nextstate(main 2 -e:1) v:{
+# y  <;> nextstate(main 2 -e:1) v:>,<,%,{
 # z  <$> gvsv(*beg) s
 # 10 <1> postinc[t2] sK/1
 # 11 <1> leavesub[1 ref] K/REFC,1
 # END 1:
-# 12 <;> nextstate(main 5 -e:1) v:{
+# 12 <;> nextstate(main 5 -e:1) v:>,<,%,{
 # 13 <$> gvsv(*end) s
 # 14 <1> postinc[t2] sK/1
 # 15 <1> leavesub[1 ref] K/REFC,1
 # INIT 1:
-# 16 <;> nextstate(main 4 -e:1) v:{
+# 16 <;> nextstate(main 4 -e:1) v:>,<,%,{
 # 17 <$> gvsv(*init) s
 # 18 <1> postinc[t2] sK/1
 # 19 <1> leavesub[1 ref] K/REFC,1
 # CHECK 1:
-# 1a <;> nextstate(main 3 -e:1) v:{
+# 1a <;> nextstate(main 3 -e:1) v:>,<,%,{
 # 1b <$> gvsv(*chk) s
 # 1c <1> postinc[t2] sK/1
 # 1d <1> leavesub[1 ref] K/REFC,1
 # UNITCHECK 1:
-# 1e <;> nextstate(main 6 -e:1) v:{
+# 1e <;> nextstate(main 6 -e:1) v:>,<,%,{
 # 1f <$> gvsv(*uc) s
 # 1g <1> postinc[t2] sK/1
 # 1h <1> leavesub[1 ref] K/REFC,1
