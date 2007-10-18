@@ -5846,8 +5846,6 @@ extern void moncontrol(int);
 #define PERL_PV_ESCAPE_QUOTE        0x0001
 #define PERL_PV_PRETTY_QUOTE        PERL_PV_ESCAPE_QUOTE
 
-
-#define PERL_PV_PRETTY_ELIPSES      0x0002   /* DEFUNCT */
 #define PERL_PV_PRETTY_ELLIPSES     0x0002
 #define PERL_PV_PRETTY_LTGT         0x0004
 
@@ -5860,6 +5858,8 @@ extern void moncontrol(int);
 #define PERL_PV_ESCAPE_NOBACKSLASH  0x2000
 #define PERL_PV_ESCAPE_NOCLEAR      0x4000
 #define PERL_PV_ESCAPE_RE           0x8000
+
+#define PERL_PV_PRETTY_NOCLEAR      PERL_PV_ESCAPE_NOCLEAR
 
 /* used by pv_display in dump.c*/
 #define PERL_PV_PRETTY_DUMP  PERL_PV_PRETTY_ELLIPSES|PERL_PV_PRETTY_QUOTE
