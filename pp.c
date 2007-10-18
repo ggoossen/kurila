@@ -2753,7 +2753,7 @@ PP(pp_int)
 {
     dVAR; dSP; dTARGET; tryAMAGICun(int);
     {
-      SV *sv = TOPs;
+      dTOPss;
       IV iv;
       /* XXX it's arguable that compiler casting to IV might be subtly
 	 different from modf (for numbers inside (IV_MIN,UV_MAX)) in which
@@ -2765,7 +2765,7 @@ PP(pp_int)
 	if (!tsv)
 	    break;
 	if (SvROK(tsv) && SvRV(tsv) == SvRV(sv)) {
-	    SETi(PTR2IV(SvRV(sv)));
+	    SETu(PTR2UV(SvRV(sv)));
 	    RETURN;
 	}
 	else
@@ -2783,7 +2783,7 @@ PP(pp_int)
 	    SETi(iv);
       }
       else if (SvROK(sv)) {
-	    SETi(iv);
+	    SETu(PTR2UV(SvRV(sv)));
       }
       else {
 	  const NV value = SvNV(sv);

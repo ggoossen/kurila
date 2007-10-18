@@ -2379,9 +2379,8 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     Perl_xmldump_indent(aTHX_ level, file, "<pmop \n");
     level++;
     if (PM_GETRE(pm)) {
-	const char * const s = PM_GETRE(pm)->precomp;
-	SV * const tmpsv = newSVpvn("",0);
-	sv_catxmlpvn(tmpsv, s, strlen(s), 1);
+	const regexp *const r = PM_GETRE(pm);
+	SV * const tmpsv = newSVpvn(r->precomp,r->prelen);
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"%s\"\n",
 	     SvPVX(tmpsv));
 	SvREFCNT_dec(tmpsv);
