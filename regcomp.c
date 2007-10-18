@@ -1095,10 +1095,9 @@ is the recommended Unicode-aware way of saying
 
 #define TRIE_STORE_REVCHAR                                                 \
     STMT_START {                                                           \
-	SV *tmp = newSVpvs("");                                            \
-	Perl_sv_catpvf( aTHX_ tmp, "%C", (int)uvc );                       \
-	av_push( revcharmap, tmp );                                        \
-    } STMT_END
+	    unsigned char ooooff = uvc;					   \
+	    av_push(revcharmap, newSVpvn(&ooooff, 1));			   \
+        } STMT_END
 
 #define TRIE_READ_CHAR STMT_START {                                           \
     wordlen++;                                                                \
@@ -6084,6 +6083,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             | PERL_SCAN_DISALLOW_PREFIX
             | (SIZE_ONLY ? PERL_SCAN_SILENT_ILLDIGIT : 0);
         UV cp;
+	unsigned char string;
         len = (STRLEN)(endbrace - name - 2);
         cp = grok_hex(name + 2, &len, &fl, NULL);
         if ( len != (STRLEN)(endbrace - name - 2) ) {
@@ -6093,7 +6093,8 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             *valuep = cp;
             return NULL;
         }
-        sv_str= Perl_newSVpvf_nocontext("%c",(int)cp);
+	string = (unsigned char) cp;
+        sv_str= newSVpvn(&string, 1);
     } else {
         /* fetch the charnames handler for this scope */
         HV * const table = GvHV(PL_hintgv);
@@ -9162,12 +9163,24 @@ clear_re(pTHX_ void *r)
 STATIC void
 S_put_byte(pTHX_ SV *sv, int c)
 {
-    if (isCNTRL(c) || c == 255 || !isPRINT(c))
-	Perl_sv_catpvf(aTHX_ sv, "\\%.2x", c);
-    else if (c == '-' || c == ']' || c == '\\' || c == '^')
-	Perl_sv_catpvf(aTHX_ sv, "\\%c", c);
-    else
-	Perl_sv_catpvf(aTHX_ sv, "%c", c);
+    /* Our definition of isPRINT() ignores locales, so only bytes that are
+       not part of UTF-8 are considered printable. I assume that the same
+       holds for UTF-EBCDIC.
+       Also, code point 255 is not printable in either (it's E0 in EBCDIC,
+       which Wikipedia says:
+
+       EO, or Eight Ones, is an 8-bit EBCDIC character code represented as all
+       ones (binary 1111 1111, hexadecimal FF). It is similar, but not
+       identical, to the ASCII delete (DEL) or rubout control character.
+       ) So the old condition can be simplified to !isPRINT(c)  */
+    if (!isPRINT(c))
+	Perl_sv_catpvf(aTHX_ sv, "\\%o", c);
+    else {
+	const unsigned char string = (unsigned char) c;
+	if (c == '-' || c == ']' || c == '\\' || c == '^')
+	    sv_catpvs(sv, "\\");
+	sv_catpvn(sv, &string, 1);
+    }
 }
 
 

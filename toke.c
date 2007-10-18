@@ -2730,9 +2730,6 @@ S_readpipe_override(pTHX)
 		newSVOP(OP_CONST, 0, &PL_sv_undef), /* value will be read later */
 		newCVREF(0, newGVOP(OP_GV, 0, gv_readpipe))));
     }
-    else {
-	set_csh();
-    }
 }
 
 #ifdef PERL_MAD 
@@ -3145,8 +3142,10 @@ Perl_yylex(pTHX)
 		else
 		    Perl_croak(aTHX_ "panic: yylex");
 		if (PL_madskills) {
-		    SV* const tmpsv = newSVpvs("");
-		    Perl_sv_catpvf(aTHX_ tmpsv, "\\%c", *s);
+		    SV* const tmpsv = newSVpvs("\\ ");
+		    /* replace the space with the character we want to escape
+		     */
+		    SvPVX(tmpsv)[1] = *s;
 		    curmad('_', tmpsv);
 		}
 		PL_bufptr = s + 1;
@@ -5548,7 +5547,6 @@ Perl_yylex(pTHX)
 	    UNI(OP_EACH);
 
 	case KEY_exec:
-	    set_csh();
 	    LOP(OP_EXEC,XREF);
 
 	case KEY_endhostent:
@@ -5710,7 +5708,6 @@ Perl_yylex(pTHX)
 	    OPERATOR(GIVEN);
 
 	case KEY_glob:
-	    set_csh();
 	    LOP(OP_GLOB,XTERM);
 
 	case KEY_hex:
@@ -6034,11 +6031,9 @@ Perl_yylex(pTHX)
 	    UNI(OP_READDIR);
 
 	case KEY_readline:
-	    set_csh();
 	    UNIDOR(OP_READLINE);
 
 	case KEY_readpipe:
-	    set_csh();
 	    UNIDOR(OP_BACKTICK);
 
 	case KEY_rewinddir:
@@ -6342,7 +6337,6 @@ Perl_yylex(pTHX)
 	    }
 
 	case KEY_system:
-	    set_csh();
 	    LOP(OP_SYSTEM,XREF);
 
 	case KEY_symlink:
@@ -10519,8 +10513,12 @@ S_scan_subst(pTHX_ char *start)
 	PL_sublex_info.super_bufend = PL_bufend;
 	PL_multi_end = 0;
 	pm->op_pmflags |= PMf_EVAL;
-	while (es-- > 0)
-	    sv_catpv(repl, (const char *)(es ? "eval " : "do "));
+	while (es-- > 0) {
+	    if (es)
+		sv_catpvs(repl, "eval ");
+	    else
+		sv_catpvs(repl, "do ");
+	}
 	sv_catpvs(repl, "{");
 	sv_catsv(repl, PL_lex_repl);
 	if (strchr(SvPVX(PL_lex_repl), '#'))
@@ -11813,20 +11811,6 @@ vstring:
     return (char *)s;
 }
 
-STATIC void
-S_set_csh(pTHX)
-{
-#ifdef CSH
-    dVAR;
-    if (!PL_cshlen)
-	PL_cshlen = strlen(PL_cshname);
-#else
-#if defined(USE_ITHREADS)
-    PERL_UNUSED_CONTEXT;
-#endif
-#endif
-}
-
 I32
 Perl_start_subparse(pTHX_ U32 flags)
 {
@@ -11925,8 +11909,10 @@ Perl_yyerror(pTHX_ const char *s)
 	SV * const where_sv = sv_2mortal(newSVpvs("next char "));
 	if (yychar < 32)
 	    Perl_sv_catpvf(aTHX_ where_sv, "^%c", toCTRL(yychar));
-	else if (isPRINT_LC(yychar))
-	    Perl_sv_catpvf(aTHX_ where_sv, "%c", yychar);
+	else if (isPRINT_LC(yychar)) {
+	    const unsigned char string = (unsigned char) yychar;
+	    sv_catpvn(where_sv, &string, 1);
+	}
 	else
 	    Perl_sv_catpvf(aTHX_ where_sv, "\\%03o", yychar & 255);
 	where = SvPVX_const(where_sv);
