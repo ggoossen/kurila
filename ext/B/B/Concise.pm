@@ -299,7 +299,7 @@ sub compileOpts {
 	elsif ($o =~ /^-stash=(.*)/) {
 	    my $pkg = $1;
 	    no strict 'refs';
-	    eval "require $pkg" unless defined %{$pkg.'::'};
+	    eval "require $pkg" unless %{Symbol::stash($pkg)};
 	    push @render_packs, $pkg;
 	}
 	# line-style options
@@ -365,7 +365,7 @@ sub compile {
 	}
 	for my $pkg (@render_packs) {
 	    no strict 'refs';
-	    concise_stashref($order, \%{$pkg.'::'});
+	    concise_stashref($order, \%{Symbol::stash($pkg)});
 	}
 
 	if (!@args or $do_main or @render_packs) {
