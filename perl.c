@@ -2253,8 +2253,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     FREETMPS;
 
 #ifdef MYMALLOC
+    {
+	const char *s;
     if ((s=PerlEnv_getenv("PERL_DEBUG_MSTATS")) && atoi(s) >= 2)
 	dump_mstats("after compilation:");
+    }
 #endif
 
     ENTER;
