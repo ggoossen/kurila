@@ -3567,7 +3567,7 @@ a reference count of other than 1.
 
 (F) You used C<\g0> or similar in a regular expression. You may refer to
 capturing parentheses only with strictly positive integers (normal
-backreferences) or with stricly negative integers (relative
+backreferences) or with strictly negative integers (relative
 backreferences), but using 0 does not make sense.
 
 =item Reference to nonexistent group in regex; marked by <-- HERE in m/%s/
@@ -4743,7 +4743,7 @@ to be huge numbers, and so usually indicates programmer error.
 If you really do mean it, explicitly numify your reference, like so:
 C<$array[0+$ref]>.  This warning is not given for overloaded objects,
 either, because you can overload the numification and stringification
-operators and then you assumedly know what you are doing.
+operators and then you assumably know what you are doing.
 
 =item Use of reserved word "%s" is deprecated
 
@@ -4920,6 +4920,9 @@ C<use 5.006_001>.  This of course won't help: the older Perls
 won't suddenly start understanding newer features, but at least
 they will show a sensible error message indicating the required
 minimum version.
+
+This warning is suppressed if the C<use 5.x.y> is preceded by a
+C<use 5.006> (see C<use VERSION> in L<perlfunc/use>).
 
 =item Warning: something's wrong
 

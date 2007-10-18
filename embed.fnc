@@ -1292,13 +1292,11 @@ sR	|char *	|sv_exp_grow	|NN SV *sv|STRLEN needed
 
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 sR	|OP*	|docatch	|NULLOK OP *o
-s	|void	|docatch_body
 sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|NN OP **opstack|NN OP **oplimit
 sR	|I32	|dopoptoeval	|I32 startingblock
 sR	|I32	|dopoptogiven	|I32 startingblock
 sR	|I32	|dopoptolabel	|NN const char *label
 sR	|I32	|dopoptoloop	|I32 startingblock
-sR	|I32	|dopoptosub	|I32 startingblock
 sR	|I32	|dopoptosub_at	|NN const PERL_CONTEXT* cxstk|I32 startingblock
 sR	|I32	|dopoptowhen	|I32 startingblock
 s	|void	|save_lines	|NULLOK AV *array|NN SV *sv
