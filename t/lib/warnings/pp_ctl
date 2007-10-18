@@ -216,6 +216,7 @@ EXPECT
 use warnings;
 eval 'use 5.006; use 5.10.0';
 EXPECT
+v-string in use/require non-portable at (eval 1) line 2.
 ########
 # pp_ctl.c
 use warnings;

@@ -170,10 +170,24 @@ GP *
 Perl_newGP(pTHX_ GV *const gv)
 {
     GP *gp;
+    U32 hash;
+#ifdef USE_ITHREADS
     const char *const file
 	= (PL_curcop && CopFILE(PL_curcop)) ? CopFILE(PL_curcop) : "";
-    STRLEN len = strlen(file);
-    U32 hash;
+    const STRLEN len = strlen(file);
+#else
+    SV *const temp_sv = CopFILESV(PL_curcop);
+    const char *file;
+    STRLEN len;
+
+    if (temp_sv) {
+	file = SvPVX(temp_sv);
+	len = SvCUR(temp_sv);
+    } else {
+	file = "";
+	len = 0;
+    }
+#endif
 
     PERL_HASH(hash, file, len);
 
@@ -548,7 +562,12 @@ S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
     superisa = GvAVn(gv);
     GvMULTI_on(gv);
     sv_magic((SV*)superisa, (SV*)gv, PERL_MAGIC_isa, NULL, 0);
+#ifdef USE_ITHREADS
     av_push(superisa, newSVpv(CopSTASHPV(PL_curcop), 0));
+#else
+    av_push(superisa, newSVhek(CopSTASH(PL_curcop)
+			       ? HvNAME_HEK(CopSTASH(PL_curcop)) : NULL));
+#endif
 
     return stash;
 }
@@ -1417,7 +1436,8 @@ Perl_gv_check(pTHX_ const HV *stash)
 #ifdef USE_ITHREADS
 		CopFILE(PL_curcop) = (char *)file;	/* set for warning */
 #else
-		CopFILEGV(PL_curcop) = gv_fetchfile(file);
+		CopFILEGV(PL_curcop)
+		    = gv_fetchfile_flags(file, HEK_LEN(GvFILE_HEK(gv)), 0);
 #endif
 		Perl_warner(aTHX_ packWARN(WARN_ONCE),
 			"Name \"%s::%s\" used only once: possible typo",

@@ -6,7 +6,7 @@ BEGIN {
 	@INC = '../lib';
     }
     require Config;
-    import Config;
+    Config->import;
     if ($Config{'extensions'} !~ /\bOpcode\b/) {
 	print "1..0\n";
 	exit 0;
@@ -16,9 +16,9 @@ BEGIN {
 use strict;
 use Test::More;
 use Safe;
-plan(tests => 6);
+plan(tests => 4);
 
-my $c = new Safe;
+my $c = Safe->new;
 $c->permit(qw(require caller));
 
 my $r = $c->reval(q!
@@ -39,8 +39,3 @@ $r = $c->reval(q!
 is( $r, "pwned", "can overriden in compartment" );
 is( (bless[],"Foo")->can("foo"), \&Foo::foo, "... but not outside" );
 
-$r = $c->reval(q!
-    utf8::is_utf8("\x{100}");
-!);
-is( $@, '', 'can call utf8::is_valid' );
-is( $r, 1, '... returns 1' );
