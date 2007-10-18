@@ -1513,7 +1513,8 @@
 #define sublex_start		S_sublex_start
 #define filter_gets		S_filter_gets
 #define tokenize_use		S_tokenize_use
-#define new_constant		S_new_constant
+#endif
+#ifdef PERL_CORE
 #define ao			S_ao
 #define incl_perldb		S_incl_perldb
 #endif
@@ -3779,7 +3780,6 @@
 #define sublex_start()		S_sublex_start(aTHX)
 #define filter_gets(a,b,c)	S_filter_gets(aTHX_ a,b,c)
 #define tokenize_use(a,b)	S_tokenize_use(aTHX_ a,b)
-#define new_constant(a,b,c,d,e,f)	S_new_constant(aTHX_ a,b,c,d,e,f)
 #define ao(a)			S_ao(aTHX_ a)
 #define incl_perldb()		S_incl_perldb(aTHX)
 #endif
