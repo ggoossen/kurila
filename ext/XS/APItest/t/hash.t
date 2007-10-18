@@ -101,8 +101,6 @@ if ($] > 5.009) {
 	test_U_hash(\%hash, \%placebo, [f => 9, g => 10, h => 11], $mapping,
 		    $name);
     }
-    foreach my $upgrade_o (0, 1) {
-	foreach my $upgrade_n (0, 1) {
 	    my (%hash, %placebo);
 	    XS::APItest::Hash::bitflip_hash(\%hash);
 	    foreach my $new (["7", 65, 67, 80],
@@ -111,33 +109,17 @@ if ($] > 5.009) {
 			    ) {
 		foreach my $code (78, 240, 256, 1336) {
 		    my $key = chr $code;
-		    # This is the UTF-8 byte sequence for the key.
-		    my $key_utf8 = $key;
-		    utf8::encode($key_utf8);
-		    if ($upgrade_o) {
-			$key .= chr 256;
-			chop $key;
-		    }
 		    $hash{$key} = $placebo{$key} = $code;
-		    $hash{$key_utf8} = $placebo{$key_utf8} = "$code as UTF-8";
 		}
 		my $name = 'bitflip ' . shift @$new;
 		my @new_kv;
 		foreach my $code (@$new) {
 		    my $key = chr $code;
-		    if ($upgrade_n) {
-			$key .= chr 256;
-			chop $key;
-		    }
 		    push @new_kv, $key, $_;
 		}
 
-		$name .= ' upgraded(orig) ' if $upgrade_o;
-		$name .= ' upgraded(new) ' if $upgrade_n;
 		test_U_hash(\%hash, \%placebo, \@new_kv, \&bitflip, $name);
 	    }
-	}
-    }
 }
 
 exit;
@@ -408,6 +390,7 @@ sub rot13 {
 }
 
 sub bitflip {
+    use bytes;
     my @results = map {join '', map {chr(32 ^ ord $_)} split '', $_} @_;
     wantarray ? @results : $results[0];
 }
