@@ -294,10 +294,14 @@ sub remove_rv2gv {
             next if ($op_rv2gv->att("private") || '') =~ m/STRICT_REFS/;
 
             if (not $op_scope) {
-                $op_scope = $op_rv2gv->insert_new_elt("op_scope");
-                set_madprop($op_scope, "curly_open" => "{");
-                set_madprop($op_scope, "curly_close" => "}");
-                $op_const->move($op_scope);
+                if ($op_rv2gv->name eq "op_null") {
+                    $op_scope = $op_rv2gv;
+                } else {
+                    $op_scope = $op_rv2gv->insert_new_elt("op_scope");
+                    set_madprop($op_scope, "curly_open" => "{");
+                    set_madprop($op_scope, "curly_close" => "}");
+                    $op_const->move($op_scope);
+                }
             }
         } else {
             next if not $op_scope;
@@ -319,21 +323,14 @@ sub remove_rv2gv {
         set_madprop( $op_gv, "value", "Symbol::fetch_glob" );
         $op_const->move($args);
 
-    }
-
-    for my $op_rv2gv (map { $twig->findnodes(qq|//$_|) } (qw|op_rv2sv op_rv2hv op_rv2cv op_rv2av op_null[@was="rv2cv"]|)) {
-        next unless ($op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_null/op_gv[@gv="Symbol::fetch_glob"]|)
-                     or $op_rv2gv->findnodes(q|op_scope/op_entersub/op_null/op_gv[@gv="Symbol::fetch_glob"]|));
-
-        my ($op_scope) = $op_rv2gv->findnodes(q|op_scope|);
-        my ($op_sub) = $op_scope->findnodes(q|op_entersub|);
-
-        my $new_gv = $op_scope->insert_new_elt("op_rv2gv");
-        set_madprop($new_gv, "star", '*');
-        my $new_scope = $new_gv->insert_new_elt("op_scope");
-        set_madprop($new_scope, "curly_open", "{");
-        set_madprop($new_scope, "curly_close", "}");
-        $op_sub->move($new_scope);
+        if ($op_rv2gv->name ne "op_rv2gv") {
+            my $new_gv = $op_scope->insert_new_elt("op_rv2gv");
+            set_madprop($new_gv, "star", '*');
+            my $new_scope = $new_gv->insert_new_elt("op_scope");
+            set_madprop($new_scope, "curly_open", "{");
+            set_madprop($new_scope, "curly_close", "}");
+            $op_sub->move($new_scope);
+        }
     }
 }
 
