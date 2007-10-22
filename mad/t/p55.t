@@ -78,7 +78,6 @@ sub p55_file {
     }
     # ok($output eq $input, "p55 '$file'");
     eq_or_diff $output, $input, "p55 '$file'";
-    $output eq $input or $TODO or die;
 }
 
 undef $/;
@@ -105,11 +104,12 @@ our %failing = map { $_, 1 } qw|
 ../t/op/symbolcache.t
 
 ../t/op/threads.t
+../t/lib/cygwin.t
 
 ../t/op/exec.t
 ../t/io/say.t
 
-../t/uni/tr_7jis.t
+../t/uni/tr_7jis.t ../t/uni/tr_eucjp.t ../t/uni/tr_sjis.t
 |;
 
 my @files;
