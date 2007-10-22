@@ -368,6 +368,14 @@ sub remove_typed_declaration {
     }
 }
 
+sub rename_bit_operators {
+    my $xml = shift;
+    for my $op_bin ($xml->findnodes(qq|//op_bit_or/|)) {
+        next unless get_madprop($op_bin, "operator") eq "|";
+        set_madprop($op_bin, "operator", "|||");
+    }
+}
+
 # parsing
 my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
 
@@ -389,6 +397,8 @@ remove_vstring( $twig );
 
 remove_rv2gv($twig);
 remove_typed_declaration($twig);
+
+rename_bit_operators($twig);
 
 # print
 $twig->print;

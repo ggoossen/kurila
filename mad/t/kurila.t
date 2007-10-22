@@ -30,6 +30,7 @@ t_glob_pattr();
 t_vstring();
 # t_encoding();
 t_typed_declaration();
+t_rename_bit_operators();
 
 sub t_indirect_object_syntax {
     p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
@@ -311,5 +312,17 @@ my Test $x2 :Dokay(1,5);
 ----------
 package Test;
 my $x2 :Dokay(1,5);
+END
+}
+
+sub t_rename_bit_operators {
+    p5convert( split(m/^\-{10}.*\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
+$a | $b;
+----------
+$a ||| $b;
+==========
+$a || $b;
+----------
+$a || $b;
 END
 }
