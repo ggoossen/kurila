@@ -638,7 +638,7 @@ struct madprop {
     char mad_type;
 };
 
-struct token {
+struct madtoken {
     I32 tk_type;
     YYSTYPE tk_lval;
     MADPROP* tk_mad;
@@ -677,6 +677,7 @@ struct token {
  * A       use import args
  * b       format block
  * B       retired stub block
+ * c       the type the opcode is prototyped to
  * C       constant conditional op
  * d       declarator
  * D       do block

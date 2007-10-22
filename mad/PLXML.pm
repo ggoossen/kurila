@@ -1727,16 +1727,6 @@ sub check { 'ck_join' }
 sub flags { 'mst@' }
 sub args { 'S L' }
 
-package PLXML::op_say;
-
-our @ISA = ('PLXML::listop');
-
-sub key { 'say' }
-sub desc { 'say' }
-sub check { 'ck_listiob' }
-sub flags { 'ims@' }
-sub args { 'F? L' }
-
 
 
 # List operators.
@@ -2522,6 +2512,15 @@ sub check { 'ck_listiob' }
 sub flags { 'ims@' }
 sub args { 'F? L' }
 
+package PLXML::op_say;
+
+our @ISA = ('PLXML::listop');
+
+sub key { 'say' }
+sub desc { 'say' }
+sub check { 'ck_listiob' }
+sub flags { 'ims@' }
+sub args { 'F? L' }
 
 
 package PLXML::op_sysopen;

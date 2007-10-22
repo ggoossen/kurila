@@ -1845,7 +1845,7 @@
 #define op_xmldump		Perl_op_xmldump
 #endif
 #ifdef PERL_CORE
-#define newTOKEN		Perl_newTOKEN
+#define newMADTOKEN		Perl_newMADTOKEN
 #define token_free		Perl_token_free
 #define token_getmad		Perl_token_getmad
 #define op_getmad_weak		Perl_op_getmad_weak
@@ -1894,6 +1894,14 @@
 #define mro_method_changed_in	Perl_mro_method_changed_in
 #ifdef PERL_CORE
 #define boot_core_mro		Perl_boot_core_mro
+#endif
+#if defined(PERL_IN_DUMP_C)
+#ifdef PERL_CORE
+#define dump_op_flags		S_dump_op_flags
+#define dump_op_flags_private	S_dump_op_flags_private
+#define dump_op_mad		S_dump_op_mad
+#define dump_op_rest		S_dump_op_rest
+#endif
 #endif
 #if defined(PERL_IN_DUMP_C)
 #ifdef PERL_CORE
@@ -4106,7 +4114,7 @@
 #define xmldump_form(a)		Perl_xmldump_form(aTHX_ a)
 #define xmldump_eval()		Perl_xmldump_eval(aTHX)
 #define sv_catxmlsv(a,b)	Perl_sv_catxmlsv(aTHX_ a,b)
-#define sv_catxmlpvn(a,b,c,d)	Perl_sv_catxmlpvn(aTHX_ a,b,c,d)
+#define sv_catxmlpvn(a,b,c)	Perl_sv_catxmlpvn(aTHX_ a,b,c)
 #define sv_xmlpeek(a)		Perl_sv_xmlpeek(aTHX_ a)
 #define do_pmop_xmldump(a,b,c)	Perl_do_pmop_xmldump(aTHX_ a,b,c)
 #define pmop_xmldump(a)		Perl_pmop_xmldump(aTHX_ a)
@@ -4114,7 +4122,7 @@
 #define op_xmldump(a)		Perl_op_xmldump(aTHX_ a)
 #endif
 #ifdef PERL_CORE
-#define newTOKEN(a,b,c)		Perl_newTOKEN(aTHX_ a,b,c)
+#define newMADTOKEN(a,b,c)	Perl_newMADTOKEN(aTHX_ a,b,c)
 #define token_free(a)		Perl_token_free(aTHX_ a)
 #define token_getmad(a,b,c)	Perl_token_getmad(aTHX_ a,b,c)
 #define op_getmad_weak(a,b,c)	Perl_op_getmad_weak(aTHX_ a,b,c)
@@ -4165,6 +4173,14 @@
 #define mro_method_changed_in(a)	Perl_mro_method_changed_in(aTHX_ a)
 #ifdef PERL_CORE
 #define boot_core_mro()		Perl_boot_core_mro(aTHX)
+#endif
+#if defined(PERL_IN_DUMP_C)
+#ifdef PERL_CORE
+#define dump_op_flags(a)	S_dump_op_flags(aTHX_ a)
+#define dump_op_flags_private(a)	S_dump_op_flags_private(aTHX_ a)
+#define dump_op_mad(a,b,c)	S_dump_op_mad(aTHX_ a,b,c)
+#define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
+#endif
 #endif
 #if defined(PERL_IN_DUMP_C)
 #ifdef PERL_CORE

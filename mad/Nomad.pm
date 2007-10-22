@@ -57,19 +57,19 @@ sub xml_to_p5 {
 
 $::curstate = 0;
 $::prevstate = 0;
-$::curenc = 1;		# start in iso-8859-1, sigh...
+$::curenc = 0;		# start in utf8.
 
 $::H = "HeredocHere000";
 %::H = ();
 
 my @enc = (
     'utf-8',
-    'iso-8859-1',
+    #'iso-8859-1',
 );
 
 my %enc = (
     'utf-8' => 0,
-    'iso-8859-1' => 1,
+    #'iso-8859-1' => 1,
 );
 
 my %madtype = (
@@ -439,9 +439,7 @@ sub newtype {
 sub madness {
     my $self = shift;
     my @keys = split(' ', shift);
-    @keys = map { $_ eq 'd' ? ('k', 'd') : $_ } @keys;
     my @vals = ();
-
     @keys = map { $_ eq 'd' ? ('local', 'd') : $_ } @keys; # always 'local' before 'defintion'
     for my $key (@keys) {
 	my $madprop = $self->{mp}{$key};
@@ -524,6 +522,7 @@ sub hash {
     { 'q', "quote_open" },
     { 'Q', "quote_close" },
     { '=', "assign" },
+    { 'c', "prototyped" },
     { 'X', "value" },
     { 'G', "endsection" },
     { 'g', "forcedword" },
@@ -2907,6 +2906,7 @@ package PLXML::op_enterwrite;
 package PLXML::op_leavewrite;
 package PLXML::op_prtf;
 package PLXML::op_print;
+package PLXML::op_say;
 package PLXML::op_sysopen;
 package PLXML::op_sysseek;
 package PLXML::op_sysread;
