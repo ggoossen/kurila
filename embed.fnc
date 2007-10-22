@@ -1813,7 +1813,7 @@ Mp	|void	|xmldump_sub	|NN const GV* gv
 Mp	|void	|xmldump_form	|NN const GV* gv
 Mp	|void	|xmldump_eval
 Mp	|char*	|sv_catxmlsv	|NN SV *dsv|NN SV *ssv
-Mp	|char*	|sv_catxmlpvn	|NN SV *dsv|NN const char *pv|STRLEN len|int utf8
+Mp	|char*	|sv_catxmlpvn	|NN SV *dsv|NN const char *pv|STRLEN len
 Mp	|char*	|sv_xmlpeek	|NN SV* sv
 Mp	|void	|do_pmop_xmldump|I32 level|NN PerlIO *file \
 				|NULLOK const PMOP *pm
@@ -1821,10 +1821,10 @@ Mp	|void	|pmop_xmldump	|NULLOK const PMOP* pm
 Mp	|void	|do_op_xmldump	|I32 level|NN PerlIO *file|NULLOK const OP *o
 Mp	|void	|op_xmldump	|NN const OP* arg
 
-Mp	|TOKEN*	|newTOKEN	|I32 optype|YYSTYPE lval \
+Mp	|MADTOKEN*	|newMADTOKEN	|I32 optype|YYSTYPE lval \
 				|NULLOK MADPROP* madprop
-Mp	|void	|token_free	|NN TOKEN* arg
-Mp	|void	|token_getmad	|NN TOKEN* arg|NULLOK OP* o|char slot
+Mp	|void	|token_free	|NN MADTOKEN* arg
+Mp	|void	|token_getmad	|NN MADTOKEN* arg|NULLOK OP* o|char slot
 Mp	|void	|op_getmad_weak	|NULLOK OP* from|NULLOK OP* o|char slot
 Mp	|void	|op_getmad	|NULLOK OP* from|NULLOK OP* o|char slot
 Mp	|void	|prepend_madprops|NULLOK MADPROP* mp|NULLOK OP* o|char slot
@@ -1869,6 +1869,13 @@ Apon	|void	|sys_init	|NN int* argc|NN char*** argv
 Apon	|void	|sys_init3	|NN int* argc|NN char*** argv|NN char*** env
 Apo	|void	|sys_term
 
+
+#if defined(PERL_IN_DUMP_C)
+s	|SV*	|dump_op_flags		|NN const OP* o
+s	|SV*	|dump_op_flags_private	|NN const OP* o
+s	|void	|dump_op_mad	|I32 level|NN PerlIO *file|NN const OP *o
+s	|void	|dump_op_rest	|I32 level|NN PerlIO *file|NN const OP *o
+#endif
 
 #if defined(PERL_IN_DUMP_C)
 s	|SV*	|dump_op_flags		|NN const OP* o

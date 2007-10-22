@@ -4554,7 +4554,7 @@ PERL_CALLCONV char*	Perl_sv_catxmlsv(pTHX_ SV *dsv, SV *ssv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV char*	Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len, int utf8)
+PERL_CALLCONV char*	Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
@@ -4572,11 +4572,11 @@ PERL_CALLCONV void	Perl_op_xmldump(pTHX_ const OP* arg)
 			__attribute__nonnull__(pTHX_1);
 
 
-PERL_CALLCONV TOKEN*	Perl_newTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop);
-PERL_CALLCONV void	Perl_token_free(pTHX_ TOKEN* arg)
+PERL_CALLCONV MADTOKEN*	Perl_newMADTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop);
+PERL_CALLCONV void	Perl_token_free(pTHX_ MADTOKEN* arg)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV void	Perl_token_getmad(pTHX_ TOKEN* arg, OP* o, char slot)
+PERL_CALLCONV void	Perl_token_getmad(pTHX_ MADTOKEN* arg, OP* o, char slot)
 			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV void	Perl_op_getmad_weak(pTHX_ OP* from, OP* o, char slot);
@@ -4656,6 +4656,23 @@ PERL_CALLCONV void	Perl_sys_init3(int* argc, char*** argv, char*** env)
 
 PERL_CALLCONV void	Perl_sys_term(pTHX);
 
+
+#if defined(PERL_IN_DUMP_C)
+STATIC SV*	S_dump_op_flags(pTHX_ const OP* o)
+			__attribute__nonnull__(pTHX_1);
+
+STATIC SV*	S_dump_op_flags_private(pTHX_ const OP* o)
+			__attribute__nonnull__(pTHX_1);
+
+STATIC void	S_dump_op_mad(pTHX_ I32 level, PerlIO *file, const OP *o)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
+
+STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
+
+#endif
 
 #if defined(PERL_IN_DUMP_C)
 STATIC SV*	S_dump_op_flags(pTHX_ const OP* o)

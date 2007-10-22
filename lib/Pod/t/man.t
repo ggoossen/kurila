@@ -62,7 +62,7 @@ while (<DATA>) {
     print TMP $input;
     close TMP;
 
-    test_outtmp($expected);
+    test_outtmp($expected, "latin1\nINPUT:\n$input");
 
     unlink('tmp.pod');
 
@@ -71,13 +71,14 @@ while (<DATA>) {
     print TMP2 "\N{BOM}";
     print TMP2 $input;
     close TMP2;
-    test_outtmp($expected);
+    test_outtmp($expected, "UTF-8 BOM\nINPUT:\n$input");
 
     unlink('tmp.pod');
 }
 
 sub test_outtmp {
     my $expected = shift;
+    my $msg = shift;
     open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
@@ -89,12 +90,11 @@ sub test_outtmp {
         $output = <OUT>;
     }
     close OUT;
-    unlink ('out.tmp');
     if ($output eq $expected) {
         print "ok $n\n";
     } else {
-        print "Expected\n========\n$expected\nOutput\n======\n$output\n";
         print "not ok $n\n";
+        print "$msg\n";
     }
     $n++;
 }

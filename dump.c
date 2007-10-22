@@ -607,11 +607,6 @@ S_sequence(pTHX_ register const OP *o)
     if (!o)
 	return;
 
-#ifdef PERL_MAD
-    if (o->op_next == 0)
- 	return;
-#endif
-
     if (!Sequence)
 	Sequence = newHV();
 
@@ -2083,34 +2078,28 @@ Perl_xmldump_eval(pTHX)
 char *
 Perl_sv_catxmlsv(pTHX_ SV *dsv, SV *ssv)
 {
-    return sv_catxmlpvn(dsv, SvPVX(ssv), SvCUR(ssv), IN_CODEPOINTS);
+    return sv_catxmlpvn(dsv, SvPVX(ssv), SvCUR(ssv));
 }
 
 char *
-Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len, int utf8)
+Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len)
 {
     unsigned int c;
     const char * const e = pv + len;
-    const char * const start = pv;
-    STRLEN dsvcur;
     STRLEN cl;
 
     sv_catpvn(dsv,"",0);
-    dsvcur = SvCUR(dsv);	/* in case we have to restart */
 
   retry:
     while (pv < e) {
-	if (utf8) {
-	    c = utf8_to_uvchr((U8*)pv, &cl);
-	    if (cl == 0) {
-		SvCUR(dsv) = dsvcur;
-		pv = start;
-		utf8 = 0;
-		goto retry;
-	    }
-	}
-	else
+	c = utf8n_to_uvchr((U8*)pv, UTF8_MAXBYTES, &cl, 0);
+	if (cl == (STRLEN)-1) {
 	    c = (*pv & 255);
+	    Perl_sv_catpvf(aTHX_ dsv, "STUPIDXML(#x%X)", c);
+	    pv++;
+
+	    goto retry;
+	}
 
 	switch (c) {
 	case 0x00:
@@ -2202,10 +2191,7 @@ Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len, int utf8)
 		Perl_sv_catpvf(aTHX_ dsv, "&#x%X;", c);
 	}
 
-	if (utf8)
-	    pv += UTF8SKIP(pv);
-	else
-	    pv++;
+	pv += cl;
     }
 
     return SvPVX(dsv);
@@ -2380,7 +2366,9 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     level++;
     if (PM_GETRE(pm)) {
 	const regexp *const r = PM_GETRE(pm);
-	SV * const tmpsv = newSVpvn(r->precomp,r->prelen);
+	SV * const tmpsv = newSV(0);
+	Perl_sv_catxmlpvn(tmpsv, r->precomp,r->prelen);
+
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"%s\"\n",
 	     SvPVX(tmpsv));
 	SvREFCNT_dec(tmpsv);
@@ -2424,9 +2412,9 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 'c', "prototyped" },
     { 'G', "endsection" },
     { 'X', "value" },
-    { 'B', "bareword" },
+    { 'g', "forcedword" },
     { '^', "hat" },
-    { ';', "colon" },
+    { ';', "semicolon" },
     { 'o', "operator" },
     { '$', "variable" },
     { '(', "round_open" },
@@ -2565,7 +2553,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    SAVEFREESV(tmpsv2);
 	    gv_fullname3(tmpsv1, (GV*)cSVOPo->op_sv, NULL);
 	    s = SvPV(tmpsv1,len);
-	    sv_catxmlpvn(tmpsv2, s, len, 1);
+	    sv_catxmlpvn(tmpsv2, s, len);
 	    S_xmldump_attr(aTHX_ level, file, "gv=\"%s\"", SvPV(tmpsv2, len));
 	    LEAVE;
 	}
@@ -2676,7 +2664,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 		break;
 	    case MAD_PV:
 		sv_catpv(tmpsv, " val=\"");
-		sv_catxmlpvn(tmpsv, (char*)mp->mad_val, mp->mad_vlen,1);
+		sv_catxmlpvn(tmpsv, (char*)mp->mad_val, mp->mad_vlen);
 		sv_catpv(tmpsv, "\"");
 		Perl_xmldump_indent(aTHX_ level, file, "<mad_pv key=%s/>\n", SvPVX(tmpsv));
 		break;

@@ -78,6 +78,7 @@ sub p55_file {
     }
     # ok($output eq $input, "p55 '$file'");
     eq_or_diff $output, $input, "p55 '$file'";
+    $output eq $input or $TODO or die;
 }
 
 undef $/;
@@ -97,12 +98,6 @@ use File::Find;
 our %failing = map { $_, 1 } qw|
 ../t/comp/require.t
 
-../t/op/array.t
-../t/op/local.t
-../t/op/substr.t
-
-../t/comp/parser.t
-
 ../t/op/switch.t
 
 ../t/op/attrhand.t
@@ -113,6 +108,8 @@ our %failing = map { $_, 1 } qw|
 
 ../t/op/exec.t
 ../t/io/say.t
+
+../t/uni/tr_7jis.t
 |;
 
 my @files;
@@ -133,6 +130,7 @@ my $x = pi;
 ########
 -OS_Code => $a
 ########
+# TODO encoding stuff.
 use encoding 'euc-jp';
 tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
 ########
@@ -156,10 +154,10 @@ eval { require 5.005 }
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
 BEGIN { PerlIO::Layer->find("encoding",1);}
 ########
-# TODO from ../t/op/array.t
+# from ../t/op/array.t
 $[ = 1
 ########
-# TODO from t/comp/parser.t
+# from t/comp/parser.t
 $x = 1 for ($[) = 0;
 ########
 # from t/op/getppid.t
@@ -211,4 +209,7 @@ local our $TODO
 # 'my' inside prototyped subcall
 sub ok($;$) { }
 ok my $x = "foobar";
-
+########
+# LABLE without a statement.
+ LABLE: ;
+ LABLE: $a;
