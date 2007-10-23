@@ -370,9 +370,9 @@ sub remove_typed_declaration {
 sub rename_bit_operators {
     my $xml = shift;
     for my $op_bit (map { $xml->findnodes("//$_") } qw{op_bit_or or op_bit_and op_bit_xor op_complement}) {
-        my $mapping = { '|' => '^|', '|=' => '^|=', '~' => '^~', 
-                        '&amp;' => '^&amp;', '&amp;=' => '^&amp;=',
-                        '^' => '^^', '^=' => '^^=',
+        my $mapping = { '|' => '^|^', '|=' => '^|^=', '~' => '^~^', 
+                        '&amp;' => '^&amp;^', '&amp;=' => '^&amp;^=',
+                        '^' => '^^^', '^=' => '^^^=',
                       };
         next unless my $newop = $mapping->{get_madprop($op_bit, "operator")};
         set_madprop($op_bit, "operator", $newop);
