@@ -34,7 +34,7 @@ sub _exception {
     return $Config{perl_patchlevel} ? 0 : 1    # maintperl then no
 }
 
-sub in_locale { $^H & ( $locale::hint_bits || 0 ) }
+sub in_locale { $^H ^&^ ( $locale::hint_bits || 0 ) }
 
 sub _get_locale_encoding {
     my $locale_encoding;
@@ -131,7 +131,7 @@ sub import {
 
         # implicitly 'use utf8'
         require utf8;      # to fetch $utf8::hint_bits;
-        $^H |= $utf8::hint_bits;
+        $^H ^|^= $utf8::hint_bits;
         eval {
             require Filter::Util::Call;
             Filter::Util::Call->import;

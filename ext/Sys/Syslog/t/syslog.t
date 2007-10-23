@@ -245,8 +245,8 @@ BEGIN { $tests += 3 + 4 * 3 }
 
     my @masks = (
         LOG_MASK(LOG_ERR()), 
-        ~LOG_MASK(LOG_INFO()), 
-        LOG_MASK(LOG_CRIT()) | LOG_MASK(LOG_ERR()) | LOG_MASK(LOG_WARNING()), 
+        ^~^LOG_MASK(LOG_INFO()), 
+        LOG_MASK(LOG_CRIT()) ^|^ LOG_MASK(LOG_ERR()) ^|^ LOG_MASK(LOG_WARNING()), 
     );
 
     for my $newmask (@masks) {

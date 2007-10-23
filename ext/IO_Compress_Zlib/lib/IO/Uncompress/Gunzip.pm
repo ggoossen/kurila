@@ -165,11 +165,11 @@ sub _readGzipHeader($)
 
     # check for use of reserved bits
     return $self->HeaderError("Use of Reserved Bits in FLG field.")
-        if $flag & GZIP_FLG_RESERVED ; 
+        if $flag ^&^ GZIP_FLG_RESERVED ; 
 
     my $EXTRA ;
     my @EXTRA = () ;
-    if ($flag & GZIP_FLG_FEXTRA) {
+    if ($flag ^&^ GZIP_FLG_FEXTRA) {
         $EXTRA = "" ;
         $self->smartReadExact(\$buffer, GZIP_FEXTRA_HEADER_SIZE) 
             or return $self->TruncatedHeader("FEXTRA Length") ;
@@ -188,7 +188,7 @@ sub _readGzipHeader($)
     }
 
     my $origname ;
-    if ($flag & GZIP_FLG_FNAME) {
+    if ($flag ^&^ GZIP_FLG_FNAME) {
         $origname = "" ;
         while (1) {
             $self->smartReadExact(\$buffer, 1) 
@@ -203,7 +203,7 @@ sub _readGzipHeader($)
     }
 
     my $comment ;
-    if ($flag & GZIP_FLG_FCOMMENT) {
+    if ($flag ^&^ GZIP_FLG_FCOMMENT) {
         $comment = "";
         while (1) {
             $self->smartReadExact(\$buffer, 1) 
@@ -217,12 +217,12 @@ sub _readGzipHeader($)
             if *$self->{Strict} && $comment =~ /$GZIP_FCOMMENT_INVALID_CHAR_RE/o ;
     }
 
-    if ($flag & GZIP_FLG_FHCRC) {
+    if ($flag ^&^ GZIP_FLG_FHCRC) {
         $self->smartReadExact(\$buffer, GZIP_FHCRC_SIZE) 
             or return $self->TruncatedHeader("FHCRC");
 
         $HeaderCRC = unpack("v", $buffer) ;
-        my $crc16 = crc32($keep) & 0xFF ;
+        my $crc16 = crc32($keep) ^&^ 0xFF ;
 
         return $self->HeaderError("CRC16 mismatch.")
             if *$self->{Strict} && $crc16 != $HeaderCRC;
@@ -246,11 +246,11 @@ sub _readGzipHeader($)
 
         'MethodID'      => $cm,
         'MethodName'    => $cm == GZIP_CM_DEFLATED ? "Deflated" : "Unknown" ,
-        'TextFlag'      => $flag & GZIP_FLG_FTEXT ? 1 : 0,
-        'HeaderCRCFlag' => $flag & GZIP_FLG_FHCRC ? 1 : 0,
-        'NameFlag'      => $flag & GZIP_FLG_FNAME ? 1 : 0,
-        'CommentFlag'   => $flag & GZIP_FLG_FCOMMENT ? 1 : 0,
-        'ExtraFlag'     => $flag & GZIP_FLG_FEXTRA ? 1 : 0,
+        'TextFlag'      => $flag ^&^ GZIP_FLG_FTEXT ? 1 : 0,
+        'HeaderCRCFlag' => $flag ^&^ GZIP_FLG_FHCRC ? 1 : 0,
+        'NameFlag'      => $flag ^&^ GZIP_FLG_FNAME ? 1 : 0,
+        'CommentFlag'   => $flag ^&^ GZIP_FLG_FCOMMENT ? 1 : 0,
+        'ExtraFlag'     => $flag ^&^ GZIP_FLG_FEXTRA ? 1 : 0,
         'Name'          => $origname,
         'Comment'       => $comment,
         'Time'          => $mtime,

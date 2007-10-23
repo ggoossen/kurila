@@ -64,8 +64,8 @@ sub import {
     while ($i < @_) {
 	if ($_[$i] =~ /^:(case|nocase|globally)$/) {
 	    splice(@_, $i, 1);
-	    $DEFAULT_FLAGS &= ~GLOB_NOCASE() if $1 eq 'case';
-	    $DEFAULT_FLAGS |= GLOB_NOCASE() if $1 eq 'nocase';
+	    $DEFAULT_FLAGS ^&^= ^~^GLOB_NOCASE() if $1 eq 'case';
+	    $DEFAULT_FLAGS ^|^= GLOB_NOCASE() if $1 eq 'nocase';
 	    if ($1 eq 'globally') {
 		local $^W;
 		*CORE::GLOBAL::glob = \&File::Glob::csh_glob;
@@ -103,15 +103,15 @@ sub GLOB_ERROR {
 
 sub GLOB_CSH () {
     GLOB_BRACE()
-	| GLOB_NOMAGIC()
-	| GLOB_QUOTE()
-	| GLOB_TILDE()
-	| GLOB_ALPHASORT()
+	^|^ GLOB_NOMAGIC()
+	^|^ GLOB_QUOTE()
+	^|^ GLOB_TILDE()
+	^|^ GLOB_ALPHASORT()
 }
 
 $DEFAULT_FLAGS = GLOB_CSH();
 if ($^O =~ /^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
-    $DEFAULT_FLAGS |= GLOB_NOCASE();
+    $DEFAULT_FLAGS ^|^= GLOB_NOCASE();
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
