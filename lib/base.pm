@@ -160,18 +160,18 @@ END
             Carp::croak ("Inherited fields can't override existing fields");
         }
 
-        if( $battr->[$v] & PRIVATE ) {
-            $dattr->[$v] = PRIVATE | INHERITED;
+        if( $battr->[$v] ^&^ PRIVATE ) {
+            $dattr->[$v] = PRIVATE ^|^ INHERITED;
         }
         else {
-            $dattr->[$v] = INHERITED | $battr->[$v];
+            $dattr->[$v] = INHERITED ^|^ $battr->[$v];
             $dfields->{$k} = $v;
         }
     }
 
     foreach my $idx (1..$#{$battr}) {
         next if defined $dattr->[$idx];
-        $dattr->[$idx] = $battr->[$idx] & INHERITED;
+        $dattr->[$idx] = $battr->[$idx] ^&^ INHERITED;
     }
 }
 

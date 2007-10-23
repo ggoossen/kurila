@@ -1147,7 +1147,7 @@ sub MSWin_perldoc_tempfile {
       time(),
       $$,
       defined( &Win32::GetTickCount )
-        ? (Win32::GetTickCount() & 0xff)
+        ? (Win32::GetTickCount() ^&^ 0xff)
         : int(rand 256)
        # Under MSWin, $$ values get reused quickly!  So if we ran
        # perldoc foo and then perldoc bar before there was time for

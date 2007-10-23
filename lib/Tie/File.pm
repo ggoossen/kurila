@@ -5,7 +5,7 @@ use strict;
 use Carp ':DEFAULT', 'confess';
 use POSIX 'SEEK_SET';
 use Fcntl 'O_CREAT', 'O_RDWR', 'LOCK_EX', 'LOCK_SH', 'O_WRONLY', 'O_RDONLY';
-sub O_ACCMODE () { O_RDONLY | O_RDWR | O_WRONLY }
+sub O_ACCMODE () { O_RDONLY ^|^ O_RDWR ^|^ O_WRONLY }
 
 
 our $VERSION = "0.97_02";
@@ -82,8 +82,8 @@ sub TIEARRAY {
 
   $opts{autochomp} = 1 unless defined $opts{autochomp};
 
-  $opts{mode} = O_CREAT|O_RDWR unless defined $opts{mode};
-  $opts{rdonly} = (($opts{mode} & O_ACCMODE) == O_RDONLY);
+  $opts{mode} = O_CREAT^|^O_RDWR unless defined $opts{mode};
+  $opts{rdonly} = (($opts{mode} ^&^ O_ACCMODE) == O_RDONLY);
   $opts{sawlastrec} = undef;
 
   my $fh;
@@ -985,8 +985,8 @@ sub _chop_file {
 sub _bufsize {
   my $n = shift;
   return 8192 if $n <= 0;
-  my $b = $n & ~8191;
-  $b += 8192 if $n & 8191;
+  my $b = $n ^&^ ^~^8191;
+  $b += 8192 if $n ^&^ 8191;
   $b;
 }
 
@@ -1006,7 +1006,7 @@ sub flock {
   $op = LOCK_EX unless defined $op;
   my $locked = flock $fh, $op;
   
-  if ($locked && ($op & (LOCK_EX | LOCK_SH))) {
+  if ($locked && ($op ^&^ (LOCK_EX ^|^ LOCK_SH))) {
     # If you're locking the file, then presumably it's because
     # there might have been a write access by another process.
     # In that case, the read cache contents and the offsets table

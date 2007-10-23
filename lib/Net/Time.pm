@@ -59,13 +59,13 @@ sub _socket {
 sub inet_time {
   my $s      = _socket('time', 37, @_) || return undef;
   my $buf    = '';
-  my $offset = 0 | 0;
+  my $offset = 0 ^|^ 0;
 
   return undef
     unless defined $s->recv($buf, length(pack("N", 0)));
 
   # unpack, we | 0 to ensure we have an unsigned
-  my $time = (unpack("N", $buf))[0] | 0;
+  my $time = (unpack("N", $buf))[0] ^|^ 0;
 
   # the time protocol return time in seconds since 1900, convert
   # it to a the required format
@@ -73,13 +73,13 @@ sub inet_time {
   if ($^O eq "MacOS") {
 
     # MacOS return seconds since 1904, 1900 was not a leap year.
-    $offset = (4 * 31536000) | 0;
+    $offset = (4 * 31536000) ^|^ 0;
   }
   else {
 
     # otherwise return seconds since 1972, there were 17 leap years between
     # 1900 and 1972
-    $offset = (70 * 31536000 + 17 * 86400) | 0;
+    $offset = (70 * 31536000 + 17 * 86400) ^|^ 0;
   }
 
   $time - $offset;

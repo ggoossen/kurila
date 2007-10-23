@@ -159,7 +159,7 @@ sub constant {
     }
     else {
         $^H{$_[0]} = $_[1];
-        $^H |= $constants{$_[0]};
+        $^H ^|^= $constants{$_[0]};
     }
     shift, shift;
   }
@@ -169,7 +169,7 @@ sub remove_constant {
   # Arguments: what, sub
   while (@_) {
     delete $^H{$_[0]};
-    $^H &= ~ $constants{$_[0]};
+    $^H ^&^= ^~^ $constants{$_[0]};
     shift, shift;
   }
 }
