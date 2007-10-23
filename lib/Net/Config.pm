@@ -101,10 +101,10 @@ sub requires_firewall {
     $list = [$list] unless ref($list);
     foreach (@$list) {
       my ($net, $bits) = (m#^(\d+\.\d+\.\d+\.\d+)/(\d+)$#) or next;
-      my $mask = ~0 << (32 - $bits);
+      my $mask = ^~^0 << (32 - $bits);
       my $addr = unpack("N", pack("C*", split(/\./, $net)));
 
-      return 0 if (($addr & $mask) == ($quad & $mask));
+      return 0 if (($addr ^&^ $mask) == ($quad ^&^ $mask));
     }
     return 1;
   }

@@ -78,7 +78,7 @@ sub unctrl {
   local($_) = @_;
 
   return \$_ if ref \$_ eq "GLOB";
-  s/([\001-\037\177])/'^'.pack('c',ord($1)^64)/eg;
+  s/([\001-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
   $_;
 }
 
@@ -107,13 +107,13 @@ sub stringify {
     s/([\'\\])/\\$1/g;
   } elsif ($self->{unctrl} eq 'unctrl') {
     s/([\"\\])/\\$1/g ;
-    s/([\000-\037\177])/'^'.pack('c',ord($1)^64)/eg;
+    s/([\000-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
     s/([\200-\377])/'\\0x'.sprintf('%2X',ord($1))/eg
       if $self->{quoteHighBit};
   } elsif ($self->{unctrl} eq 'quote') {
     s/([\"\\\$\@])/\\$1/g if $tick eq '"';
     s/\033/\\e/g;
-    s/([\000-\037\177])/'\\c'.chr(ord($1)^64)/eg;
+    s/([\000-\037\177])/'\\c'.chr(ord($1)^^^64)/eg;
   }
   s/([\200-\377])/'\\'.sprintf('%3o',ord($1))/eg if $self->{quoteHighBit};
   ($noticks || /^\d+(\.\d*)?\Z/)
@@ -274,7 +274,7 @@ sub unwrap {
 sub matchvar {
   $_[0] eq $_[1] or
     ($_[1] =~ /^([!~])(.)([\x00-\xff]*)/) and
-      ($1 eq '!') ^ (eval {($_[2] . "::" . $_[0]) =~ /$2$3/});
+      ($1 eq '!') ^^^ (eval {($_[2] . "::" . $_[0]) =~ /$2$3/});
 }
 
 sub compactDump {

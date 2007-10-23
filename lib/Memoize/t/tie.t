@@ -41,7 +41,7 @@ tryout('Memoize::AnyDBM_File', $file, 1);  # Test 1..4
 sub tryout {
   my ($tiepack, $file, $testno) = @_;
 
-  tie my %cache => $tiepack, $file, O_RDWR | O_CREAT, 0666
+  tie my %cache => $tiepack, $file, O_RDWR ^|^ O_CREAT, 0666
     or die $!;
 
   memoize 'c5', 
