@@ -5141,6 +5141,13 @@ Perl_yylex(pTHX)
 			while (SPACE_OR_TAB(*d))
 			    d++;
 			if (*d == ')' && (sv = gv_const_sv(gv))) {
+#ifdef PERL_MAD
+			    if (PL_madskills) {
+				curmad('X', PL_thistoken);
+				curmad('_', PL_thiswhite);
+				curmad('h', newSVpvn(s, d-s+1));
+			    }
+#endif
 			    s = d + 1;
 			    goto its_constant;
 			}

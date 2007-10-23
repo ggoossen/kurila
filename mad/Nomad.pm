@@ -580,6 +580,7 @@ sub hash {
     { '~', "tilde" },
     { 't', "something_t" },
     { 'F', "format" },
+    { 'h', "constsub_args" },
     );
 
     # We need to guarantee key uniqueness at this point.
@@ -1349,7 +1350,7 @@ sub ast {
 	if (not $$self{mp}{O}) {
 	    push @before, $self->madness('o');	# was unary
 	}
-	my @X = $self->madness(': X');
+	my @X = $self->madness(': X h');
 	if (exists $$self{private} and $$self{private} =~ /BARE/) {
 	    return $self->newtype->new(Kids => [@X]);
 	}
