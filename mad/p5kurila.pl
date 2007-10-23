@@ -5,10 +5,9 @@ use lib "$ENV{madpath}/mad";
 use strict;
 use warnings;
 
-my $filename = shift @ARGV;
-
 use XML::Twig;
 use XML::Twig::XPath;
+use Getopt::Long;
 
 sub fst(@) {
     return $_[0];
@@ -371,32 +370,40 @@ sub remove_typed_declaration {
 sub rename_bit_operators {
     my $xml = shift;
     for my $op_bin ($xml->findnodes(qq|//op_bit_or/|)) {
-        next unless get_madprop($op_bin, "operator") eq "|";
-        set_madprop($op_bin, "operator", "|||");
+        my $mapping = { '|' => '|||', '|=' => '|||=' };
+        next unless my $newop = $mapping->{get_madprop($op_bin, "operator")};
+        set_madprop($op_bin, "operator", $newop);
     }
 }
+
+my $from = 0; # floating point number with starting version of kurila.
+GetOptions("from=f" => \$from);
+
+my $filename = shift @ARGV;
 
 # parsing
 my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
 
 $twig->parsefile( "-" );
 
-# replacing.
-for my $op ($twig->findnodes(q|//op_entersub|)) {
-    entersub_handler($twig, $op);
+if ($from < 1.4 - 0.05) {
+    # replacing.
+    for my $op ($twig->findnodes(q|//op_entersub|)) {
+        entersub_handler($twig, $op);
+    }
+
+    for my $op_const ($twig->findnodes(q|//op_const|)) {
+        const_handler($twig, $op_const);
+    }
+
+    make_glob_sub( $twig );
+    remove_vstring( $twig );
+
+    # add_encoding_latin1($twig);
+
+    remove_rv2gv($twig);
+    remove_typed_declaration($twig);
 }
-
-for my $op_const ($twig->findnodes(q|//op_const|)) {
-    const_handler($twig, $op_const);
-}
-
-make_glob_sub( $twig );
-remove_vstring( $twig );
-
-# add_encoding_latin1($twig);
-
-remove_rv2gv($twig);
-remove_typed_declaration($twig);
 
 rename_bit_operators($twig);
 
