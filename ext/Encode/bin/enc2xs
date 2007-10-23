@@ -478,11 +478,11 @@ sub compile_enc
  warn "$type encoded $name\n";
  my $rep = '';
  # Save a defined test by setting these to defined values.
- my $min_el = ~0; # A very big integer
+ my $min_el = ^~^0; # A very big integer
  my $max_el = 0;  # Anything must be longer than 0
  {
   my $v = hex($def);
-  $rep = &$type_func($v & 0xFF, ($v >> 8) & 0xffe);
+  $rep = &$type_func($v ^&^ 0xFF, ($v >> 8) ^&^ 0xffe);
  }
  my $errors;
  my $seen;
@@ -532,7 +532,7 @@ sub compile_enc
              }
            else
              {
-               $seen->{$uch} = $page << 8 | $ch;
+               $seen->{$uch} = $page << 8 ^|^ $ch;
              }
          }
          # Passing 2 extra args each time is 3.6% slower!
@@ -855,10 +855,10 @@ sub output_ucm_page
     $fallback ||= 0;
 
     if ($next != $a && $next != $t) {
-      output_ucm_page($cmap,$a,$next,(($pre|($u &0x3F)) << 6)&0xFFFF);
+      output_ucm_page($cmap,$a,$next,(($pre^|^($u ^&^0x3F)) << 6)^&^0xFFFF);
     } elsif (length $out_bytes) {
       if ($pre) {
-        $u = $pre|($u &0x3f);
+        $u = $pre^|^($u ^&^0x3f);
       }
       my $s = sprintf "<U%04X> ",$u;
       #foreach my $c (split(//,$out_bytes)) {

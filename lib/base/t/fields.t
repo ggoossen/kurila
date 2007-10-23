@@ -29,7 +29,7 @@ sub show_fields {
     my($base, $mask) = @_;
     no strict 'refs';
     my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
-    return grep { ($fields::attr{$base}[$fields->{$_}] & $mask) == $mask} 
+    return grep { ($fields::attr{$base}[$fields->{$_}] ^&^ $mask) == $mask} 
                 keys %$fields;
 }
 

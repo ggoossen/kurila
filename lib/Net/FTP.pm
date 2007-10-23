@@ -464,7 +464,7 @@ sub get {
   else {
     $loc = \*FD;
 
-    unless (sysopen($loc, $local, O_CREAT | O_WRONLY | ($rest ? O_APPEND: O_TRUNC))) {
+    unless (sysopen($loc, $local, O_CREAT ^|^ O_WRONLY ^|^ ($rest ? O_APPEND: O_TRUNC))) {
       carp "Cannot open Local file $local: $!\n";
       $data->abort;
       return undef;
@@ -807,7 +807,7 @@ sub port {
 
     my ($myport, @myaddr) = ($listen->sockport, split(/\./, $listen->sockhost));
 
-    $port = join(',', @myaddr, $myport >> 8, $myport & 0xff);
+    $port = join(',', @myaddr, $myport >> 8, $myport ^&^ 0xff);
 
     ${*$ftp}{'net_ftp_intern_port'} = 1;
   }
