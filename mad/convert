@@ -29,7 +29,9 @@ use Fatal qw|open close|;
         my $k = $1;
         $ENV{$k} = $ENV{"mad_$k"};
     }
-    my $output = eval { Convert::convert($input, "/usr/bin/perl $kurilapath/mad/p5kurila.pl",
+    my $output = eval { Convert::convert($input,
+                                         "$ENV{madconvert}",
+                                         dumpcommand => "$ENV{madperl}",
                                          switches => join ' ', map { "-I $_" } @lib ) };
     if ($output) {
         if ($input ne $output) {
