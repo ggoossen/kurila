@@ -173,7 +173,7 @@ sub charnames
     $ord = CORE::hex substr($txt, $hexstart, $off[0] - $hexstart);
   }
 
-  if ($^H & $bytes::hint_bits) {	# "use bytes" in effect?
+  if ($^H ^&^ $bytes::hint_bits) {	# "use bytes" in effect?
     use bytes;
     return chr $ord if $ord <= 255;
     my $hex = sprintf "%04x", $ord;

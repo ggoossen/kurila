@@ -210,21 +210,21 @@ sub _pow
 sub _and
   {
   my ($c,$x,$y) = @_;
-  my $u = int($$x) & int($$y); $$x = $u;
+  my $u = int($$x) ^&^ int($$y); $$x = $u;
   return $x;
   }
 
 sub _xor
   {
   my ($c,$x,$y) = @_;
-  my $u = int($$x) ^ int($$y); $$x = $u;
+  my $u = int($$x) ^^^ int($$y); $$x = $u;
   return $x;
   }
 
 sub _or
   {
   my ($c,$x,$y) = @_;
-  my $u = int($$x) | int($$y); $$x = $u;
+  my $u = int($$x) ^|^ int($$y); $$x = $u;
   return $x;
   }
 
@@ -280,14 +280,14 @@ sub _is_even
   {
   # return true if arg is even
   my ($c,$x) = @_;
-  (!($$x & 1)) <=> 0; 
+  (!($$x ^&^ 1)) <=> 0; 
   }
 
 sub _is_odd
   {
   # return true if arg is odd
   my ($c,$x) = @_;
-  ($$x & 1) <=> 0;
+  ($$x ^&^ 1) <=> 0;
   }
 
 sub _is_one

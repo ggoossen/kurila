@@ -228,13 +228,13 @@ use constant HIGH     => 2;
 # OPENFLAGS. If we defined the flag to use with Sysopen here this gives
 # us an optimisation when many temporary files are requested
 
-my $OPENFLAGS = O_CREAT | O_EXCL | O_RDWR;
+my $OPENFLAGS = O_CREAT ^|^ O_EXCL ^|^ O_RDWR;
 
 unless ($^O eq 'MacOS') {
   for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE EXLOCK NOINHERIT /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     no strict 'refs';
-    $OPENFLAGS |= $bit if eval {
+    $OPENFLAGS ^|^= $bit if eval {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
       local $SIG{__DIE__} = sub {};
@@ -257,7 +257,7 @@ unless ($^O eq 'MacOS') {
   for my $oflag (qw/ TEMPORARY /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     no strict 'refs';
-    $OPENTEMPFLAGS |= $bit if eval {
+    $OPENTEMPFLAGS ^|^= $bit if eval {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
       local $SIG{__DIE__} = sub {};
@@ -691,8 +691,8 @@ sub _is_safe {
   # use 022 to check writability
   # Do it with S_IWOTH and S_IWGRP for portability (maybe)
   # mode is in info[2]
-  if (($info[2] & &Fcntl::S_IWGRP) ||   # Is group writable?
-      ($info[2] & &Fcntl::S_IWOTH) ) {  # Is world writable?
+  if (($info[2] ^&^ &Fcntl::S_IWGRP) ||   # Is group writable?
+      ($info[2] ^&^ &Fcntl::S_IWOTH) ) {  # Is world writable?
     # Must be a directory
     unless (-d $path) {
       $$err_ref = "Path ($path) is not a directory"

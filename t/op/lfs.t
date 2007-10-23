@@ -137,7 +137,7 @@ EOF
 open(BIG, ">big") or do { warn "open failed: $!\n"; bye };
 binmode BIG;
 if ($r or not seek(BIG, 5_000_000_000, $SEEK_SET)) {
-    my $err = $r ? 'signal '.($r & 0x7f) : $!;
+    my $err = $r ? 'signal '.($r ^&^ 0x7f) : $!;
     explain("seeking past 2GB failed: $err");
     bye();
 }

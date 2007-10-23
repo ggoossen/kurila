@@ -310,7 +310,7 @@ sub dynamic_lib {
     if ($GCC) { 
 	my $dllname = $self->{BASEEXT} . "." . $self->{DLEXT};
 	$dllname =~ /(....)(.{0,4})/;
-	my $baseaddr = unpack("n", $1 ^ $2);
+	my $baseaddr = unpack("n", $1 ^^^ $2);
 	$otherldflags .= sprintf("-Wl,--image-base,0x%x0000 ", $baseaddr);
     }
 
