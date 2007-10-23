@@ -132,7 +132,7 @@ sub bits
     my $offset = shift ;
     my $mask  = shift ;
 
-    ($data >> $offset ) & $mask & 0xFF ;
+    ($data >> $offset ) ^&^ $mask ^&^ 0xFF ;
 }
 
 

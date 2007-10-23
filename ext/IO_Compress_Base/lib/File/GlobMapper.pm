@@ -285,7 +285,7 @@ sub _parseOutputGlob
     my $string = $self->{OutputGlob} ;
     my $maxwild = $self->{WildCount};
 
-    if ($self->{GlobFlags} & GLOB_TILDE)
+    if ($self->{GlobFlags} ^&^ GLOB_TILDE)
     #if (1)
     {
         $string =~ s{

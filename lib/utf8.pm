@@ -5,21 +5,21 @@ BEGIN {
     $bytes::hint_bits = 0x00000008;
     $utf8::codepoints_hint_bits = 0x00800000;
 
-    $^H |= $utf8::codepoints_hint_bits;
-    $^H &= ~$bytes::hint_bits;
+    $^H ^|^= $utf8::codepoints_hint_bits;
+    $^H ^&^= ^~^$bytes::hint_bits;
 }
 
 our $VERSION = '1.07';
 
 sub import {
-    $^H |= $utf8::hint_bits;
-    $^H |= $utf8::codepoints_hint_bits;
-    $^H &= ~$bytes::hint_bits;
+    $^H ^|^= $utf8::hint_bits;
+    $^H ^|^= $utf8::codepoints_hint_bits;
+    $^H ^&^= ^~^$bytes::hint_bits;
 }
 
 sub unimport {
-    $^H &= ~$utf8::hint_bits;
-    $^H &= ~$utf8::codepoints_hint_bits;
+    $^H ^&^= ^~^$utf8::hint_bits;
+    $^H ^&^= ^~^$utf8::codepoints_hint_bits;
 }
 
 our $AUTOLOAD;

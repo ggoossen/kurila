@@ -77,7 +77,7 @@ use constant GZIP_FLG_FEXTRA                  => 0x04 ;
 use constant GZIP_FLG_FNAME                   => 0x08 ;
 use constant GZIP_FLG_FCOMMENT                => 0x10 ;
 #use constant GZIP_FLG_ENCRYPTED              => 0x20 ; # documented in gzip sources
-use constant GZIP_FLG_RESERVED                => (0x20 | 0x40 | 0x80) ;
+use constant GZIP_FLG_RESERVED                => (0x20 ^|^ 0x40 ^|^ 0x80) ;
 
 use constant GZIP_XFL_DEFAULT                 => 0x00 ;
 

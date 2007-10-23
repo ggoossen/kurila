@@ -1284,7 +1284,7 @@ sub make_executable {
   my $self = shift;
   foreach (@_) {
     my $current_mode = (stat $_)[2];
-    chmod $current_mode | oct(111), $_;
+    chmod $current_mode ^|^ oct(111), $_;
   }
 }
 
@@ -2950,7 +2950,7 @@ sub _add_to_manifest {
     or return;
 
   my $mode = (stat $manifest)[2];
-  chmod($mode | oct(222), $manifest) or die "Can't make $manifest writable: $!";
+  chmod($mode ^|^ oct(222), $manifest) or die "Can't make $manifest writable: $!";
   
   my $fh = IO::File->new("< $manifest") or die "Can't read $manifest: $!";
   my $last_line = (<$fh>)[-1] || "\n";
@@ -4170,7 +4170,7 @@ sub copy_if_modified {
   }
 
   # mode is read-only + (executable if source is executable)
-  my $mode = oct(444) | ( $self->is_executable($file) ? oct(111) : 0 );
+  my $mode = oct(444) ^|^ ( $self->is_executable($file) ? oct(111) : 0 );
   chmod( $mode, $to_path );
 
   return $to_path;

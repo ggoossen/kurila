@@ -56,7 +56,7 @@ if ($child_pid) {
 	    last;
 	}
 	
-	if ($state & NEG1_PROHIBITED) { 
+	if ($state ^&^ NEG1_PROHIBITED) { 
 	    if ($ret == -1) {
 		print "# waitpid should not have returned -1 here!\n";
 		$ok = 0;
@@ -66,7 +66,7 @@ if ($child_pid) {
 		$state = NEG1_REQUIRED;
 	    }
 	}
-	elsif ($state & NEG1_REQUIRED) {
+	elsif ($state ^&^ NEG1_REQUIRED) {
 	    unless ($ret == -1) {
 		print "# waitpid should have returned -1 here\n";
 		$ok = 0;

@@ -33,7 +33,7 @@ BEGIN {
 				 or
 				 substr($dir,0,1) ne "/"
 				 or
-				 (stat $dir)[2] & 002);
+				 (stat $dir)[2] ^&^ 002);
     }
     $ENV{'PATH'} = join($sep,@path);
 }
