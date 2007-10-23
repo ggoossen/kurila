@@ -5921,7 +5921,7 @@ Perl_ck_bitop(pTHX_ OP *o)
 		(right->op_flags & OPf_PARENS) == 0))
 	    if (ckWARN(WARN_PRECEDENCE))
 		Perl_warner(aTHX_ packWARN(WARN_PRECEDENCE),
-			"Possible precedence problem on bitwise %c operator",
+			"Possible precedence problem on bitwise ^%c^ operator",
 			o->op_type == OP_BIT_OR ? '|'
 			    : o->op_type == OP_BIT_AND ? '&' : '^'
 			);
