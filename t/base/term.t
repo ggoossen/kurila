@@ -35,7 +35,7 @@ $x = 1;
 if ($x == '1') {print "ok 4\n";} else {print "not ok 4\n";}
 
 $x = '1E2';
-if (($x | 1) == 101) {print "ok 5\n";} else {print "not ok 5\n";}
+if (($x ^|^ 1) == 101) {print "ok 5\n";} else {print "not ok 5\n";}
 
 # check <> pseudoliteral
 
