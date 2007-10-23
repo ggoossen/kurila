@@ -21,7 +21,7 @@ sub is_executable {
   # file executable".
 
   my ($self, $file) = @_;
-  return +(stat $file)[2] & 0100;
+  return +(stat $file)[2] ^&^ 0100;
 }
 
 sub _startperl { "#! " . shift()->perl }

@@ -41,7 +41,7 @@ unlink glob("Op_dbmx*");
 END { unlink glob("Op_dbmx*"); }
 
 my %h1 = () ;
-my $db1 = tie(%h1, $db_file,'Op_dbmx', O_RDWR|O_CREAT, 0640) ;
+my $db1 = tie(%h1, $db_file,'Op_dbmx', O_RDWR^|^O_CREAT, 0640) ;
 
 ok $db1, "tied to $db_file";
 
@@ -93,7 +93,7 @@ undef $db1;
 
 # read the dbm file without the filter
 my %h2 = () ;
-my $db2 = tie(%h2, $db_file,'Op_dbmx', O_RDWR|O_CREAT, 0640) ;
+my $db2 = tie(%h2, $db_file,'Op_dbmx', O_RDWR^|^O_CREAT, 0640) ;
 
 ok $db2, "tied to $db_file";
 
