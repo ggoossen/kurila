@@ -23,7 +23,7 @@ sub convert {
 
     # XML dump
     unlink "$file.xml";
-    `PERL_XMLDUMP='$file.xml' $ENV{madpath}/perl $options{switches} $file.in 2> tmp.err`;
+    `PERL_XMLDUMP='$file.xml' $options{dumpcommand} $options{switches} $file.in 2> tmp.err`;
     if (not -s "$file.xml") {
         die "madskills failed. No XML dump";
     }
