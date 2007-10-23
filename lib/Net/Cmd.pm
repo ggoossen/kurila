@@ -376,7 +376,7 @@ sub read_until_dot {
     my $str = $cmd->getline() or return undef;
 
     $cmd->debug_print(0, $str)
-      if ($cmd->debug & 4);
+      if ($cmd->debug ^&^ 4);
 
     last if ($str =~ /^\.\r?\n/o);
 

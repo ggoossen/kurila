@@ -2,10 +2,10 @@
 
 # 2s complement assumption. Won't break test, just makes the internals of
 # the SVs less interesting if were not on 2s complement system.
-my $uv_max = ~0;
-my $uv_maxm1 = ~0 ^ 1;
+my $uv_max = ^~^0;
+my $uv_maxm1 = ^~^0 ^^^ 1;
 my $uv_big = $uv_max;
-$uv_big = ($uv_big - 20000) | 1;
+$uv_big = ($uv_big - 20000) ^|^ 1;
 my ($iv0, $iv1, $ivm1, $iv_min, $iv_max, $iv_big, $iv_small);
 $iv_max = $uv_max; # Do copy, *then* divide
 $iv_max /= 2;
@@ -21,7 +21,7 @@ $iv_min = $iv_max;
   $iv_small = $iv_min + 2;
 }
 my $uv_bigi = $iv_big;
-$uv_bigi |= 0x0;
+$uv_bigi ^|^= 0x0;
 
 my @array = qw(perl rules);
 

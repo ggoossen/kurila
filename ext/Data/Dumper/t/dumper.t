@@ -1274,7 +1274,7 @@ EOT
 
   if ($XS) {
 ## XS code flips over at 11 characters ("-" is a char) or larger than int.
-    if (~0 == 0xFFFFFFFF) {
+    if (^~^0 == 0xFFFFFFFF) {
       # 32 bit system
       $WANT = <<'EOT';
 #$VAR1 = 999999999;

@@ -187,7 +187,7 @@ sub untrap { shift->permit(@_) }
 
 sub deny {
     my $obj = shift;
-    $obj->{Mask} |= opset(@_);
+    $obj->{Mask} ^|^= opset(@_);
 }
 sub deny_only {
     my $obj = shift;
@@ -197,7 +197,7 @@ sub deny_only {
 sub permit {
     my $obj = shift;
     # XXX needs testing
-    $obj->{Mask} &= invert_opset opset(@_);
+    $obj->{Mask} ^&^= invert_opset opset(@_);
 }
 sub permit_only {
     my $obj = shift;

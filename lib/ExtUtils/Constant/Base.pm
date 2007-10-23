@@ -472,11 +472,11 @@ sub switch_clause {
   $body .= wrap ($leader, $follower, join (" ", @safe_names) . " */") . "\n";
   # Figure out what to switch on.
   # (RMS, Spread of jump table, Position, Hashref)
-  my @best = (1e38, ~0);
+  my @best = (1e38, ^~^0);
   # Prefer the last character over the others. (As it lets us shorten the
   # memEQ clause at no cost).
   foreach my $i ($namelen - 1, 0 .. ($namelen - 2)) {
-    my ($min, $max) = (~0, 0);
+    my ($min, $max) = (^~^0, 0);
     my %spread;
     if (is_perl56) {
       # Need proper Unicode preserving hash keys for bytes in range 128-255

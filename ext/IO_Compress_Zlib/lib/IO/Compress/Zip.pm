@@ -187,7 +187,7 @@ sub mkHeader
     }
 
     my $gpFlag = 0 ;    
-    $gpFlag |= ZIP_GP_FLAG_STREAMING_MASK
+    $gpFlag ^|^= ZIP_GP_FLAG_STREAMING_MASK
         if *$self->{ZipData}{Stream} ;
 
     my $method = *$self->{ZipData}{Method} ;
@@ -202,7 +202,7 @@ sub mkHeader
     *$self->{ZipData}{MadeBy} = $madeBy;
 
     my $ifa = 0;
-    $ifa |= ZIP_IFA_TEXT_MASK
+    $ifa ^|^= ZIP_IFA_TEXT_MASK
         if $param->value('TextFlag');
 
     $hdr .= pack "V", ZIP_LOCAL_HDR_SIG ; # signature
@@ -524,7 +524,7 @@ sub mkExtendedTime
     {
         if (defined $time)
         {
-            $flags |= $bit;
+            $flags ^|^= $bit;
             $times .= pack("V", $time);
         }
 
