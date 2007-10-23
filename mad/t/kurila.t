@@ -19,7 +19,8 @@ use Convert;
 sub p5convert {
     my ($input, $expected) = @_;
     local $TODO = $TODO || ($input =~ m/^[#]\s*TODO/);
-    my $output = Convert::convert($input, "/usr/bin/env perl ../mad/p5kurila.pl");
+    my $output = Convert::convert($input, "/usr/bin/env perl ../mad/p5kurila.pl",
+                                  dumpcommand => "$ENV{madpath}/perl");
     is($output, $expected) or $TODO or die;
 }
 
@@ -319,11 +320,11 @@ sub t_rename_bit_operators {
     p5convert( split(m/^\-{10}.*\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
 $a | $b;
 ----------
-$a ^| $b;
+$a ^|^ $b;
 ==========
 $a |= $b;
 ----------
-$a ^|= $b;
+$a ^|^= $b;
 ==========
 $a || $b;
 ----------
@@ -331,14 +332,14 @@ $a || $b;
 ==========
 ~$a;
 ----------
-^~$a;
+^~^$a;
 ==========
 $a & $b;
 ----------
-$a ^& $b;
+$a ^&^ $b;
 ==========
 $a ^ $b;
 ----------
-$a ^^ $b;
+$a ^^^ $b;
 END
 }
