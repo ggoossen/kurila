@@ -600,7 +600,7 @@ sub format_linker_cmd {
   ##    a (hopefully unique) image-base from the dll's name
   ## -- BKS, 10-19-1999
   File::Basename::basename( $spec{output} ) =~ /(....)(.{0,4})/;
-  $spec{image_base} = sprintf( "0x%x0000", unpack('n', $1 ^ $2) );
+  $spec{image_base} = sprintf( "0x%x0000", unpack('n', $1 ^^^ $2) );
 
   %spec = $self->write_linker_script(%spec)
     if $spec{use_scripts};

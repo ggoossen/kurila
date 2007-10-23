@@ -203,7 +203,7 @@ sub process_file {
   $size = qr[,\s* (??{ $bal }) ]x; # Third arg (to setpvn)
 
   foreach my $key (keys %output_expr) {
-    BEGIN { $^H |= 0x00200000 }; # Equivalent to: use re 'eval', but hardcoded so we can compile re.xs
+    BEGIN { $^H ^|^= 0x00200000 }; # Equivalent to: use re 'eval', but hardcoded so we can compile re.xs
 
     my ($t, $with_size, $arg, $sarg) =
       ($output_expr{$key} =~
@@ -1132,8 +1132,8 @@ sub INPUT_handler {
       if $arg_list{$var_name}++
 	or defined $argtype_seen{$var_name} and not $processing_arg_with_types;
 
-    $thisdone |= $var_name eq "THIS";
-    $retvaldone |= $var_name eq "RETVAL";
+    $thisdone ^|^= $var_name eq "THIS";
+    $retvaldone ^|^= $var_name eq "RETVAL";
     $var_types{$var_name} = $var_type;
     # XXXX This check is a safeguard against the unfinished conversion of
     # generate_init().  When generate_init() is fixed,

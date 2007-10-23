@@ -42,7 +42,7 @@ if ( $^O eq 'VMS' ) {
 sub tryout {
   my ($tiepack, $file, $testno) = @_;
 
-  tie my %cache => $tiepack, $file, O_RDWR | O_CREAT, 0666
+  tie my %cache => $tiepack, $file, O_RDWR ^|^ O_CREAT, 0666
     or die $!;
 
   memoize 'c5', 

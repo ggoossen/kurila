@@ -142,7 +142,7 @@ sub compare2 {
   } else {
     #ok $out[0], $out[1];
     
-    my $x = $out[0] ^ $out[1];
+    my $x = $out[0] ^^^ $out[1];
     $x =~ m/^(\x00*)/s or die;
     my $at = length($1);
     print "# Difference at byte $at...\n";
