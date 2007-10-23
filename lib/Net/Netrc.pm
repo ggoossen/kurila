@@ -48,7 +48,7 @@ sub _readrc {
     my @stat = stat($file);
 
     if (@stat) {
-      if ($stat[2] & 077) {
+      if ($stat[2] ^&^ 077) {
         carp "Bad permissions: $file";
         return;
       }

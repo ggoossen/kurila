@@ -3431,7 +3431,7 @@ sub new {
     my $ref = \*{Symbol::fetch_glob("Fh::$fv")};
     $file =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$! || return;
     my $safe = $1;
-    sysopen($ref,$safe,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
+    sysopen($ref,$safe,Fcntl::O_RDWR()^|^Fcntl::O_CREAT()^|^Fcntl::O_EXCL(),0600) || return;
     unlink($safe) if $delete;
     CORE::delete Symbol::stash('Fh')->{$fv};
     return bless $ref,$pack;

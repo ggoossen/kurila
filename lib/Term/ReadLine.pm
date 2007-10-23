@@ -198,7 +198,7 @@ sub readline {
   $str = $self->get_line;
   $str =~ s/^\s*\Q$prompt\E// if ($^O eq 'MacOS');
   utf8::upgrade($str)
-      if (${^UNICODE} & PERL_UNICODE_STDIN || defined ${^ENCODING}) &&
+      if (${^UNICODE} ^&^ PERL_UNICODE_STDIN || defined ${^ENCODING}) &&
          utf8::valid($str);
   print $out $rl_term_set[3]; 
   # bug in 5.000: chomping empty string creats length -1:

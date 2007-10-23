@@ -1366,7 +1366,7 @@ sub _ponder_Verbatim {
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
         # one setting everywhere, and 8th wins.
-        s/^([^\t]*)(\t+)/$1.(" " x ((length($2)<<3)-(length($1)&7)))/e
+        s/^([^\t]*)(\t+)/$1.(" " x ((length($2)<<3)-(length($1)^&^7)))/e
       ) {}
 
       # TODO: whinge about (or otherwise treat) unindented or overlong lines
