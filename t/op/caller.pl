@@ -109,7 +109,7 @@ EOE
     is(hint_fetch('dooot'), -42, "Can do IVs");
 
     BEGIN {
-	$^H{dooot} = ~0;
+	$^H{dooot} = ^~^0;
     }
     cmp_ok(hint_fetch('dooot'), '>', 42, "Can do UVs");
 }

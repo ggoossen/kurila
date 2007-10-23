@@ -531,7 +531,7 @@ sub runperl {
 	$ENV{PATH} =~ /(.*)/s;
 	local $ENV{PATH} =
 	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
-		($is_mswin or $is_vms or !(stat && (stat '_')[2]&0022)) }
+		($is_mswin or $is_vms or !(stat && (stat '_')[2]^&^0022)) }
 		    split quotemeta ($sep), $1;
 
 	$runperl =~ /(.*)/s;
