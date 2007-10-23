@@ -78,8 +78,8 @@ sub run
 
   unlink "tmp.out", "tmp.err";
 
-  $? & 128 and $rval{core}   = 1;
-  $? & 127 and $rval{signal} = $? & 127;
+  $? ^&^ 128 and $rval{core}   = 1;
+  $? ^&^ 127 and $rval{signal} = $? ^&^ 127;
 
   return \%rval;
 }

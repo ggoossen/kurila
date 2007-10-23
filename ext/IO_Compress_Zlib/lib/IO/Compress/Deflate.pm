@@ -47,7 +47,7 @@ sub bitmask($$$$)
     my $offset = shift ;
     my $mask   = shift ;
 
-    return $into | (($value & $mask) << $offset ) ;
+    return $into ^|^ (($value ^&^ $mask) << $offset ) ;
 }
 
 sub mkDeflateHdr($$$;$)
