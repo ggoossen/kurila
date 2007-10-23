@@ -92,7 +92,7 @@ sub TIEHASH {
 
     $options ||= 0;
 
-    ${*$dh}{io_dir_unlink} = $options & DIR_UNLINK;
+    ${*$dh}{io_dir_unlink} = $options ^&^ DIR_UNLINK;
     $dh;
 }
 
@@ -122,7 +122,7 @@ sub STORE {
     my($atime,$mtime) = ref($data) ? @$data : ($data,$data);
     my $file = File::Spec->catfile(${*$dh}{io_dir_path}, $key);
     unless(-e $file) {
-	my $io = IO::File->new($file,O_CREAT | O_RDWR);
+	my $io = IO::File->new($file,O_CREAT ^|^ O_RDWR);
 	$io->close if $io;
     }
     utime($atime,$mtime, $file);
