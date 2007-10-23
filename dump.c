@@ -2468,6 +2468,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { '~', "tilde" },
     { 't', "something_t" },
     { 'F', "format" },
+    { 'h', "constsub_args" },
     { 0,   NULL }
 };
 char* slotname(char s) {
