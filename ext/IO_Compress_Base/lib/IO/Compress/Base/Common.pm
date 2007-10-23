@@ -166,10 +166,10 @@ sub whatIs ($;$)
 {
     return 'handle' if isaFilehandle($_[0]);
 
-    my $wantCode = defined $_[1] && $_[1] & WANT_CODE ;
-    my $extended = defined $_[1] && $_[1] & WANT_EXT ;
-    my $undef    = defined $_[1] && $_[1] & WANT_UNDEF ;
-    my $hash     = defined $_[1] && $_[1] & WANT_HASH ;
+    my $wantCode = defined $_[1] && $_[1] ^&^ WANT_CODE ;
+    my $extended = defined $_[1] && $_[1] ^&^ WANT_EXT ;
+    my $undef    = defined $_[1] && $_[1] ^&^ WANT_UNDEF ;
+    my $hash     = defined $_[1] && $_[1] ^&^ WANT_HASH ;
 
     return 'undef'  if ! defined $_[0] && $undef ;
 
@@ -209,8 +209,8 @@ sub Validator::new
 
     local $Carp::CarpLevel = 1;
 
-    my $inType    = $data{inType}    = whatIsInput($_[0], WANT_EXT|WANT_HASH);
-    my $outType   = $data{outType}   = whatIsOutput($_[1], WANT_EXT|WANT_HASH);
+    my $inType    = $data{inType}    = whatIsInput($_[0], WANT_EXT^|^WANT_HASH);
+    my $outType   = $data{outType}   = whatIsOutput($_[1], WANT_EXT^|^WANT_HASH);
 
     my $oneInput  = $data{oneInput}  = oneTarget($inType);
     my $oneOutput = $data{oneOutput} = oneTarget($outType);
@@ -468,7 +468,7 @@ use constant Parse_custom   => 0x12;
 #use constant Parse_store_ref        => 0x100 ;
 use constant Parse_multiple         => 0x100 ;
 use constant Parse_writable         => 0x200 ;
-use constant Parse_writable_scalar  => 0x400 | Parse_writable ;
+use constant Parse_writable_scalar  => 0x400 ^|^ Parse_writable ;
 
 use constant OFF_PARSED     => 0 ;
 use constant OFF_TYPE       => 1 ;
@@ -579,7 +579,7 @@ sub IO::Compress::Base::Parameters::parse
 
         if ($firstTime || ! $sticky) {
             $x = [ $x ]
-                if $type & Parse_multiple;
+                if $type ^&^ Parse_multiple;
 
             $got->{$key} = [0, $type, $value, $x, $first_only, $sticky] ;
         }
@@ -606,14 +606,14 @@ sub IO::Compress::Base::Parameters::parse
             ++ $parsed{$canonkey};
 
             return $self->setError("Muliple instances of '$key' found") 
-                if $parsed && ($type & Parse_multiple) == 0 ;
+                if $parsed && ($type ^&^ Parse_multiple) == 0 ;
 
             my $s ;
             $self->_checkType($key, $value, $type, 1, \$s)
                 or return undef ;
 
             $value = $$value ;
-            if ($type & Parse_multiple) {
+            if ($type ^&^ Parse_multiple) {
                 $got->{$canonkey}[OFF_PARSED] = 1;
                 push @{ $got->{$canonkey}[OFF_FIXED] }, $s ;
             }
@@ -646,7 +646,7 @@ sub IO::Compress::Base::Parameters::_checkType
     #local $Carp::CarpLevel = $level ;
     #print "PARSE $type $key $value $validate $sub\n" ;
 
-    if ($type & Parse_writable_scalar)
+    if ($type ^&^ Parse_writable_scalar)
     {
         return $self->setError("Parameter '$key' not writable")
             if $validate &&  readonly $$value ;
@@ -680,12 +680,12 @@ sub IO::Compress::Base::Parameters::_checkType
 
     $value = $$value ;
 
-    if ($type & Parse_any)
+    if ($type ^&^ Parse_any)
     {
         $$output = $value ;
         return 1;
     }
-    elsif ($type & Parse_unsigned)
+    elsif ($type ^&^ Parse_unsigned)
     {
         return $self->setError("Parameter '$key' must be an unsigned int, got 'undef'")
             if $validate && ! defined $value ;
@@ -695,7 +695,7 @@ sub IO::Compress::Base::Parameters::_checkType
         $$output = defined $value ? $value : 0 ;    
         return 1;
     }
-    elsif ($type & Parse_signed)
+    elsif ($type ^&^ Parse_signed)
     {
         return $self->setError("Parameter '$key' must be a signed int, got 'undef'")
             if $validate && ! defined $value ;
@@ -705,14 +705,14 @@ sub IO::Compress::Base::Parameters::_checkType
         $$output = defined $value ? $value : 0 ;    
         return 1 ;
     }
-    elsif ($type & Parse_boolean)
+    elsif ($type ^&^ Parse_boolean)
     {
         return $self->setError("Parameter '$key' must be an int, got '$value'")
             if $validate && defined $value && $value !~ /^\d*$/;
         $$output =  defined $value ? $value != 0 : 0 ;    
         return 1;
     }
-    elsif ($type & Parse_string)
+    elsif ($type ^&^ Parse_string)
     {
         $$output = defined $value ? $value : "" ;    
         return 1;

@@ -48,8 +48,8 @@ use constant GNAME          => sub { $getgrgid || scalar getgrgid( shift() ) || 
 use constant UID            => $>;
 use constant GID            => (split ' ', $) )[0];
 
-use constant MODE           => do { 0666 & (0777 & ~umask) };
-use constant STRIP_MODE     => sub { shift() & 0777 };
+use constant MODE           => do { 0666 ^&^ (0777 ^&^ ^~^umask) };
+use constant STRIP_MODE     => sub { shift() ^&^ 0777 };
 use constant CHECK_SUM      => "      ";
 
 use constant UNPACK         => 'A100 A8 A8 A8 A12 A12 A8 A1 A100 A6 A2 A32 A32 A8 A8 A155 x12';

@@ -471,11 +471,11 @@ sub _removeGzipHeader($)
 
     return Z_DATA_ERROR()
         unless $magic1 == GZIP_ID1 and $magic2 == GZIP_ID2 and
-           $method == Z_DEFLATED() and !($flags & GZIP_FLG_RESERVED) ;
+           $method == Z_DEFLATED() and !($flags ^&^ GZIP_FLG_RESERVED) ;
     substr($$string, 0, GZIP_MIN_HEADER_SIZE) = '' ;
 
     # skip extra field
-    if ($flags & GZIP_FLG_FEXTRA)
+    if ($flags ^&^ GZIP_FLG_FEXTRA)
     {
         return Z_DATA_ERROR()
             if length($$string) < GZIP_FEXTRA_HEADER_SIZE ;
@@ -489,7 +489,7 @@ sub _removeGzipHeader($)
     }
 
     # skip orig name
-    if ($flags & GZIP_FLG_FNAME)
+    if ($flags ^&^ GZIP_FLG_FNAME)
     {
         my $name_end = index ($$string, GZIP_NULL_BYTE);
         return Z_DATA_ERROR()
@@ -498,7 +498,7 @@ sub _removeGzipHeader($)
     }
 
     # skip comment
-    if ($flags & GZIP_FLG_FCOMMENT)
+    if ($flags ^&^ GZIP_FLG_FCOMMENT)
     {
         my $comment_end = index ($$string, GZIP_NULL_BYTE);
         return Z_DATA_ERROR()
@@ -507,7 +507,7 @@ sub _removeGzipHeader($)
     }
 
     # skip header crc
-    if ($flags & GZIP_FLG_FHCRC)
+    if ($flags ^&^ GZIP_FLG_FHCRC)
     {
         return Z_DATA_ERROR()
             if length ($$string) < GZIP_FHCRC_SIZE ;
