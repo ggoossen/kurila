@@ -267,13 +267,13 @@ sub compileOpts {
 	}
 	# tree-specific
 	elsif ($o eq "-compact") {
-	    $tree_style |= 1;
+	    $tree_style ^|^= 1;
 	} elsif ($o eq "-loose") {
-	    $tree_style &= ~1;
+	    $tree_style ^&^= ^~^1;
 	} elsif ($o eq "-vt") {
-	    $tree_style |= 2;
+	    $tree_style ^|^= 2;
 	} elsif ($o eq "-ascii") {
-	    $tree_style &= ~2;
+	    $tree_style ^&^= ^~^2;
 	}
 	# sequence numbering
 	elsif ($o =~ /^-base(\d+)$/) {
@@ -406,15 +406,15 @@ my $chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 sub op_flags { # common flags (see BASOP.op_flags in op.h)
     my($x) = @_;
     my(@v);
-    push @v, "v" if ($x & 3) == 1;
-    push @v, "s" if ($x & 3) == 2;
-    push @v, "l" if ($x & 3) == 3;
-    push @v, "K" if $x & 4;
-    push @v, "P" if $x & 8;
-    push @v, "R" if $x & 16;
-    push @v, "M" if $x & 32;
-    push @v, "S" if $x & 64;
-    push @v, "*" if $x & 128;
+    push @v, "v" if ($x ^&^ 3) == 1;
+    push @v, "s" if ($x ^&^ 3) == 2;
+    push @v, "l" if ($x ^&^ 3) == 3;
+    push @v, "K" if $x ^&^ 4;
+    push @v, "P" if $x ^&^ 8;
+    push @v, "R" if $x ^&^ 16;
+    push @v, "M" if $x ^&^ 32;
+    push @v, "S" if $x ^&^ 64;
+    push @v, "*" if $x ^&^ 128;
     return join("", @v);
 }
 
@@ -446,7 +446,7 @@ sub seq {
 sub walk_topdown {
     my($op, $sub, $level) = @_;
     $sub->($op, $level);
-    if ($op->flags & OPf_KIDS) {
+    if ($op->flags ^&^ OPf_KIDS) {
 	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
 	    walk_topdown($kid, $sub, $level + 1);
 	}
@@ -662,7 +662,7 @@ sub _flags {
     my($hash, $x) = @_;
     my @s;
     for my $flag (sort {$b <=> $a} keys %$hash) {
-	if ($hash->{$flag} and $x & $flag and $x >= $flag) {
+	if ($hash->{$flag} and $x ^&^ $flag and $x >= $flag) {
 	    $x -= $flag;
 	    push @s, $hash->{$flag};
 	}
@@ -685,7 +685,7 @@ sub concise_sv {
     my($sv, $hr, $preferpv) = @_;
     $hr->{svclass} = class($sv);
     $hr->{svclass} = "UV"
-      if $hr->{svclass} eq "IV" and $sv->FLAGS & SVf_IVisUV;
+      if $hr->{svclass} eq "IV" and $sv->FLAGS ^&^ SVf_IVisUV;
     Carp::cluck("bad concise_sv: $sv") unless $sv and $$sv;
     $hr->{svaddr} = sprintf("%#x", $$sv);
     if ($hr->{svclass} eq "GV") {
@@ -705,13 +705,13 @@ sub concise_sv {
 	}
 	if (class($sv) eq "SPECIAL") {
 	    $hr->{svval} .= ["Null", "sv_undef", "sv_yes", "sv_no"]->[$$sv];
-	} elsif ($preferpv && $sv->FLAGS & SVf_POK) {
+	} elsif ($preferpv && $sv->FLAGS ^&^ SVf_POK) {
 	    $hr->{svval} .= cstring($sv->PV);
-	} elsif ($sv->FLAGS & SVf_NOK) {
+	} elsif ($sv->FLAGS ^&^ SVf_NOK) {
 	    $hr->{svval} .= $sv->NV;
-	} elsif ($sv->FLAGS & SVf_IOK) {
+	} elsif ($sv->FLAGS ^&^ SVf_IOK) {
 	    $hr->{svval} .= $sv->int_value;
-	} elsif ($sv->FLAGS & SVf_POK) {
+	} elsif ($sv->FLAGS ^&^ SVf_POK) {
 	    $hr->{svval} .= cstring($sv->PV);
 	} elsif (class($sv) eq "HV") {
 	    $hr->{svval} .= 'HASH';
@@ -754,7 +754,7 @@ sub concise_op {
 	$h{extarg} = "";
     } elsif ($op->name =~ /^leave(sub(lv)?|write)?$/) {
 	# targ potentially holds a reference count
-	if ($op->private & 64) {
+	if ($op->private ^&^ 64) {
 	    my $refs = "ref" . ($h{targ} != 1 ? "s" : "");
 	    $h{targarglife} = $h{targarg} = "$h{targ} $refs";
 	}
@@ -762,7 +762,7 @@ sub concise_op {
 	my $padname = (($curcv->PADLIST->ARRAY)[0]->ARRAY)[$h{targ}];
 	if (defined $padname and class($padname) ne "SPECIAL") {
 	    $h{targarg}  = $padname->PVX;
-	    if ($padname->FLAGS & SVf_FAKE) {
+	    if ($padname->FLAGS ^&^ SVf_FAKE) {
 		if ($] < 5.009) {
 		    $h{targarglife} = "$h{targarg}:FAKE";
 		} else {
@@ -770,11 +770,11 @@ sub concise_op {
 		    # See changes 19939 and 20005
 		    my $fake = '';
 		    $fake .= 'a'
-		   	if $padname->PARENT_FAKELEX_FLAGS & PAD_FAKELEX_ANON;
+		   	if $padname->PARENT_FAKELEX_FLAGS ^&^ PAD_FAKELEX_ANON;
 		    $fake .= 'm'
-		   	if $padname->PARENT_FAKELEX_FLAGS & PAD_FAKELEX_MULTI;
+		   	if $padname->PARENT_FAKELEX_FLAGS ^&^ PAD_FAKELEX_MULTI;
 		    $fake .= ':' . $padname->PARENT_PAD_INDEX
-			if $curcv->CvFLAGS & CVf_ANON;
+			if $curcv->CvFLAGS ^&^ CVf_ANON;
 		    $h{targarglife} = "$h{targarg}:FAKE:$fake";
 		}
 	    }
@@ -844,7 +844,7 @@ sub concise_op {
 	$h{arg} = "(other->" . seq($op->other) . ")";
     }
     elsif ($h{class} eq "SVOP" or $h{class} eq "PADOP") {
-	unless ($h{name} eq 'aelemfast' and $op->flags & OPf_SPECIAL) {
+	unless ($h{name} eq 'aelemfast' and $op->flags ^&^ OPf_SPECIAL) {
 	    my $idx = ($h{class} eq "SVOP") ? $op->targ : $op->padix;
 	    my $preferpv = $h{name} eq "method_named";
 	    if ($h{class} eq "PADOP" or !${$op->sv}) {
@@ -937,7 +937,7 @@ sub tree {
     my $style = $tree_decorations[$tree_style];
     my($space, $single, $kids, $kid, $nokid, $last, $lead, $size) = @$style;
     my $name = concise_op($op, $level, $treefmt);
-    if (not $op->flags & OPf_KIDS) {
+    if (not $op->flags ^&^ OPf_KIDS) {
 	return $name . "\n";
     }
     my @lines;
