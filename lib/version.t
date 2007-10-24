@@ -536,7 +536,7 @@ SKIP: {
     {
 	my $warning;
 	local $SIG{__WARN__} = sub { $warning = $_[0] };
-	eval 'my $v = $CLASS->new(~0);';
+	eval { my $v = $CLASS->new(^~^0); };
 	unlike($@, qr/Integer overflow in version/, "Too large version");
 	like($warning, qr/Integer overflow in version/, "Too large version");
     }

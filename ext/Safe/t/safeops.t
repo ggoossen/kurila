@@ -160,13 +160,13 @@ sge		$x ge $y
 seq		$x eq $y
 sne		$x ne $y
 scmp		$x cmp $y
-bit_and		$x & $y
-bit_xor		$x ^ $y
-bit_or		$x | $y
+bit_and		$x ^&^ $y
+bit_xor		$x ^^^ $y
+bit_or		$x ^|^ $y
 negate		-$x
 i_negate	SKIP (set by optimizer)
 not		!$x
-complement	~$x
+complement	^~^$x
 atan2		atan2 1
 sin		sin 1
 cos		cos 1

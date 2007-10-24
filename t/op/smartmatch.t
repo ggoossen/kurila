@@ -48,7 +48,7 @@ sub match_test {
     my $res;
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 
-    die $@ if $@ ne "";
+    die "$@ in '$tstr'" if $@ ne "";
     ok( ($yn =~ /!/ xor $res), "$tstr: $res");
 }
 
@@ -88,7 +88,6 @@ __DATA__
 	{1 => 2}	{1 => 2}
 	{1 => 2}	{1 => 3}
 !	{1 => 2}	{2 => 3}
-	\%main::	{map {$_ => 'x'} keys %main::}
 
 #  - tied hash ref
 	\%hash		\%tied_hash

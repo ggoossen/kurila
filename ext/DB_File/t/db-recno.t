@@ -476,7 +476,7 @@ EOM
     my @h ;
     my $X ;
     eval '
-	$X = tie(@h, "SubDB","recno.tmp", O_RDWR|O_CREAT, 0640, $DB_RECNO );
+	$X = tie(@h, "SubDB","recno.tmp", O_RDWR^|^O_CREAT, 0640, $DB_RECNO );
 	' ;
     die "Could not tie: $!" unless $X;
 

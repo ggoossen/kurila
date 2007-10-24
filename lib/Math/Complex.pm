@@ -83,7 +83,7 @@ use overload
 	'=='	=> \&_numeq,
 	'<=>'	=> \&_spaceship,
 	'neg'	=> \&_negate,
-	'~'	=> \&_conjugate,
+	'^~^'	=> \&_conjugate,
 	'abs'	=> \&abs,
 	'sqrt'	=> \&sqrt,
 	'exp'	=> \&exp,

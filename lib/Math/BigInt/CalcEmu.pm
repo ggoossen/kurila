@@ -77,7 +77,7 @@ sub __emu_band
     }
   
   # and the strings together
-  my $r = $bx & $by;
+  my $r = $bx ^&^ $by;
 
   # and reverse the result again
   $bx = reverse $r;
@@ -162,7 +162,7 @@ sub __emu_bior
     }
 
   # or the strings together
-  my $r = $bx | $by;
+  my $r = $bx ^|^ $by;
 
   # and reverse the result again
   $bx = reverse $r;
@@ -248,7 +248,7 @@ sub __emu_bxor
     }
 
   # xor the strings together
-  my $r = $bx ^ $by;
+  my $r = $bx ^^^ $by;
 
   # and reverse the result again
   $bx = reverse $r;

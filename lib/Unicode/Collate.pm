@@ -724,7 +724,7 @@ sub getSortKey
 
     if ($self->{backwardsFlag}) {
 	for (my $v = MinLevel; $v <= MaxLevel; $v++) {
-	    if ($self->{backwardsFlag} & (1 << $v)) {
+	    if ($self->{backwardsFlag} ^&^ (1 << $v)) {
 		@{ $ret[$v-1] } = reverse @{ $ret[$v-1] };
 	    }
 	}
@@ -768,7 +768,7 @@ sub _derivCE_14 {
 	    : 0xFBC0;  # others
 
     my $aaaa = $base + ($u >> 15);
-    my $bbbb = ($u & 0x7FFF) | 0x8000;
+    my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
     return
 	pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u),
 	pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u);
@@ -785,7 +785,7 @@ sub _derivCE_9 {
 	    : 0xFBC0;  # others
 
     my $aaaa = $base + ($u >> 15);
-    my $bbbb = ($u & 0x7FFF) | 0x8000;
+    my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
     return
 	pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u),
 	pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u);
@@ -794,7 +794,7 @@ sub _derivCE_9 {
 sub _derivCE_8 {
     my $code = shift;
     my $aaaa =  0xFF80 + ($code >> 15);
-    my $bbbb = ($code & 0x7FFF) | 0x8000;
+    my $bbbb = ($code ^&^ 0x7FFF) ^|^ 0x8000;
     return
 	pack(VCE_TEMPLATE, NON_VAR, $aaaa, 2, 1, $code),
 	pack(VCE_TEMPLATE, NON_VAR, $bbbb, 0, 0, $code);
@@ -851,7 +851,7 @@ sub _isIllegal {
     my $code = shift;
     return ! defined $code                      # removed
 	|| ($code < 0 || 0x10FFFF < $code)      # out of range
-	|| (($code & 0xFFFE) == 0xFFFE)         # ??FFF[EF] (cf. utf8.c)
+	|| (($code ^&^ 0xFFFE) == 0xFFFE)         # ??FFF[EF] (cf. utf8.c)
 	|| (0xD800 <= $code && $code <= 0xDFFF) # unpaired surrogates
 	|| (0xFDD0 <= $code && $code <= 0xFDEF) # other non-characters
     ;

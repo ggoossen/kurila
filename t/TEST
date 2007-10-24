@@ -342,12 +342,12 @@ EOT
 	    unless (/^\#/) {
 		if ($trailing_leader) {
 		    # shouldn't be anything following a postfix 1..n
-		    $failure = 'FAILED--extra output after trailing 1..n';
+		    $failure ||= 'FAILED--extra output after trailing 1..n';
 		    last;
 		}
 		if (/^1\.\.([0-9]+)( todo ([\d ]+))?/) {
 		    if ($seen_leader) {
-			$failure = 'FAILED--seen duplicate leader';
+			$failure ||= 'FAILED--seen duplicate leader';
 			last;
 		    }
 		    $max = $1;
@@ -358,7 +358,7 @@ EOT
 			# 1..n appears at end of file
 			$trailing_leader = 1;
 			if ($next != $max) {
-			    $failure = "FAILED--expected $max tests, saw $next";
+			    $failure ||= "FAILED--expected $max tests, saw $next";
 			    last;
 			}
 		    }
@@ -388,12 +388,11 @@ EOT
 			    $istodo = 1 if $todo{$num};
 
 			    if( $not && !$istodo ) {
-				$failure = "FAILED at test $num";
-				last;
+				$failure ||= "FAILED at test $num";
 			    }
 			}
 			else {
-			    $failure ="FAILED--expected test $next, saw test $num";
+			    $failure ||="FAILED--expected test $next, saw test $num";
 			    last;
 			}
 		    }
@@ -404,7 +403,7 @@ EOT
 			# module tests are allowed extra output,
 			# because Test::Harness allows it
 			next if $test =~ /^\W*(ext|lib)\b/;
-			$failure = "FAILED--unexpected output at test $next";
+			$failure ||= "FAILED--unexpected output at test $next";
 			last;
 		    }
 		}

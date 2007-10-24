@@ -61,10 +61,10 @@ $a = ":="; split /($a)/o, "a:=b:=c"; print "@_"
 EXPECT
 a := b := c
 ########
-$cusp = ~0 ^ (~0 >> 1);
+$cusp = ^~^0 ^^^ (^~^0 >> 1);
 use integer;
 $, = " ";
-print +($cusp - 1) % 8, $cusp % 8, -$cusp % 8, 8 | (($cusp + 1) % 8 + 7), "!\n";
+print +($cusp - 1) % 8, $cusp % 8, -$cusp % 8, 8 ^|^ (($cusp + 1) % 8 + 7), "!\n";
 EXPECT
 7 0 0 8 !
 ########
