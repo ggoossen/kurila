@@ -571,7 +571,7 @@ EOM
     {
         title "Header Corruption - Fail HeaderCRC";
         my $buffer = $good ;
-        substr($buffer, 10, 1) = chr((ord(substr($buffer, 10, 1)) + 1) & 0xFF);
+        substr($buffer, 10, 1) = chr((ord(substr($buffer, 10, 1)) + 1) ^&^ 0xFF);
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0, Strict => 1)
          or print "# $GunzipError\n";
