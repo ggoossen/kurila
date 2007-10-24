@@ -143,7 +143,7 @@ sub new
     croak("icmp ping requires root privilege") if ($> and $^O ne 'VMS' and $^O ne 'cygwin');
     $self->{"proto_num"} = (getprotobyname('icmp'))[2] ||
       croak("Can't get icmp protocol by name");
-    $self->{"pid"} = $$ & 0xffff;           # Save lower 16 bits of pid
+    $self->{"pid"} = $$ ^&^ 0xffff;           # Save lower 16 bits of pid
     $self->{"fh"} = FileHandle->new();
     socket($self->{"fh"}, PF_INET, SOCK_RAW, $self->{"proto_num"}) ||
       croak("icmp socket error - $!");
@@ -328,7 +328,7 @@ sub socket_blocking_mode
       return;
   }
   if ($flags = fcntl($fh, F_GETFL, 0)) {
-    $flags = $block ? ($flags & ~O_NONBLOCK) : ($flags | O_NONBLOCK);
+    $flags = $block ? ($flags ^&^ ^~^O_NONBLOCK) : ($flags ^|^ O_NONBLOCK);
     if (!fcntl($fh, F_SETFL, $flags)) {
       croak("fcntl F_SETFL: $!");
     }
@@ -526,8 +526,8 @@ sub checksum
     $chk += $short;
   }                                           # Add the odd byte in
   $chk += (unpack("C", substr($msg, $len_msg - 1, 1)) << 8) if $len_msg % 2;
-  $chk = ($chk >> 16) + ($chk & 0xffff);      # Fold high into low
-  return(~(($chk >> 16) + $chk) & 0xffff);    # Again and complement
+  $chk = ($chk >> 16) + ($chk ^&^ 0xffff);      # Fold high into low
+  return(^~^(($chk >> 16) + $chk) ^&^ 0xffff);    # Again and complement
 }
 
 

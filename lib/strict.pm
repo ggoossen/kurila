@@ -20,7 +20,7 @@ sub bits {
     my @wrong;
     foreach my $s (@_) {
 	push @wrong, $s unless exists $bitmask{$s};
-        $bits |= $bitmask{$s} || 0;
+        $bits ^|^= $bitmask{$s} || 0;
     }
     if (@wrong) {
         require Carp;
@@ -33,12 +33,12 @@ my $default_bits = bits(qw(refs subs vars));
 
 sub import {
     shift;
-    $^H |= @_ ? bits(@_) : $default_bits;
+    $^H ^|^= @_ ? bits(@_) : $default_bits;
 }
 
 sub unimport {
     shift;
-    $^H &= ~ (@_ ? bits(@_) : $default_bits);
+    $^H ^&^= ^~^ (@_ ? bits(@_) : $default_bits);
 }
 
 1;

@@ -178,7 +178,7 @@ sub _move_file_at_boot { #XXX OS-SPECIFIC
         return 0;
     }
     my $opts= Win32API::File::MOVEFILE_DELAY_UNTIL_REBOOT();
-    $opts= $opts | Win32API::File::MOVEFILE_REPLACE_EXISTING()
+    $opts= $opts ^|^ Win32API::File::MOVEFILE_REPLACE_EXISTING()
         unless ref $target;
 
     _chmod( 0666, $file );
@@ -666,8 +666,8 @@ sub install { #XXX OS-SPECIFIC
             utime($atime,$mtime + $Is_VMS,$targetfile) unless $nonono>1;
 
 
-            $mode = 0444 | ( $mode & 0111 ? 0111 : 0 );
-            $mode = $mode | 0222
+            $mode = 0444 ^|^ ( $mode ^&^ 0111 ? 0111 : 0 );
+            $mode = $mode ^|^ 0222
                 if $realtarget ne $targetfile;
             _chmod( $mode, $targetfile, $verbose );
         } else {
@@ -711,7 +711,7 @@ sub _do_cleanup {
         die _estr "Operation not completed! ",
             "You must reboot to complete the installation.",
             "Sorry.";
-    } elsif (defined $MUST_REBOOT & $verbose) {
+    } elsif (defined $MUST_REBOOT ^&^ $verbose) {
         warn _estr "Installation will be completed at the next reboot.\n",
              "However it is not necessary to reboot immediately.\n";
     }
@@ -1018,7 +1018,7 @@ sub pm_to_blib {
         }
         my($mode,$atime,$mtime) = (stat $from)[2,8,9];
         utime($atime,$mtime+$Is_VMS,$to);
-        _chmod(0444 | ( $mode & 0111 ? 0111 : 0 ),$to);
+        _chmod(0444 ^|^ ( $mode ^&^ 0111 ? 0111 : 0 ),$to);
         next unless $from =~ /\.pm$/;
         _autosplit($to,$autodir);
     }

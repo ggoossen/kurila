@@ -11,39 +11,26 @@ see L<perlreftut>.
 
 =head1 DESCRIPTION
 
-Before release 5 of Perl it was difficult to represent complex data
-structures, because all references had to be symbolic--and even then
-it was difficult to refer to a variable instead of a symbol table entry.
-Perl now not only makes it easier to use symbolic references to variables,
-but also lets you have "hard" references to any piece of data or code.
-Any scalar may hold a hard reference.  Because arrays and hashes contain
-scalars, you can now easily build arrays of arrays, arrays of hashes,
+References are references to any piece of data or code.
+Any scalar may hold a reference.  Because arrays and hashes contain
+scalars, you can build arrays of arrays, arrays of hashes,
 hashes of arrays, arrays of hashes of functions, and so on.
 
-Hard references are smart--they keep track of reference counts for you,
+References are smart--they keep track of reference counts for you,
 automatically freeing the thing referred to when its reference count goes
 to zero.  (Reference counts for values in self-referential or
 cyclic data structures may not go to zero without a little help; see
 L<perlobj/"Two-Phased Garbage Collection"> for a detailed explanation.)
 If that thing happens to be an object, the object is destructed.  See
-L<perlobj> for more about objects.  (In a sense, everything in Perl is an
-object, but we usually reserve the word for references to objects that
-have been officially "blessed" into a class package.)
+L<perlobj> for more about objects.
 
-Symbolic references are names of variables or other objects, just as a
-symbolic link in a Unix filesystem contains merely the name of a file.
-The C<*glob> notation is something of a symbolic reference.  (Symbolic
-references are sometimes called "soft references", but please don't call
-them that; references are confusing enough without useless synonyms.)
-X<reference, symbolic> X<reference, soft>
-X<symbolic reference> X<soft reference>
-
-In contrast, hard references are more like hard links in a Unix file
+References are like hard links in a Unix file
 system: They are used to access an underlying object without concern for
-what its (other) name is.  When the word "reference" is used without an
-adjective, as in the following paragraph, it is usually talking about a
-hard reference.
-X<reference, hard> X<hard reference>
+what its (other) name is.
+
+Prior to Perl Kurila there were what was called symbolic references and
+hard references. Symbol references don't exist in Perl Kurila and all
+references are hard references.
 
 References are easy to use in Perl.  There is just one overriding
 principle: Perl does no implicit referencing or dereferencing.  When a
@@ -215,13 +202,7 @@ objects are just references to a special type of object that happens to know
 which package it's associated with.  Constructors are just special subroutines
 that know how to create that association.  They do so by starting with an
 ordinary reference, and it remains an ordinary reference even while it's also
-being an object.  Constructors are often named C<new()>.  You I<can> call them
-indirectly:
-
-    $objref = new Doggie( Tail => 'short', Ears => 'long' );
-
-But that can produce ambiguous syntax in certain cases, so it's often
-better to use the direct method invocation approach:
+being an object.  Constructors are often named C<new()>.  You I<can> call them:
 
     $objref   = Doggie->new(Tail => 'short', Ears => 'long');
 
@@ -254,7 +235,6 @@ known as foo).
     $coderef   = *handler{CODE};
     $ioref     = *STDIN{IO};
     $globref   = *foo{GLOB};
-    $formatref = *foo{FORMAT};
 
 All of these are self-explanatory except for C<*foo{IO}>.  It returns
 the IO handle, used for file handles (L<perlfunc/open>), sockets
@@ -414,8 +394,8 @@ civility though.
 
 =back
 
-Using a string or number as a reference produces a symbolic reference,
-as explained above.  Using a reference as a number produces an
+Using a string or number as a reference produces an error.
+Using a reference as a number produces an
 integer representing its storage location in memory.  The only
 useful thing to be done with this is to compare two references
 numerically to see whether they refer to the same location.
@@ -462,106 +442,8 @@ as:
 X<reference, symbolic> X<reference, soft>
 X<symbolic reference> X<soft reference>
 
-We said that references spring into existence as necessary if they are
-undefined, but we didn't say what happens if a value used as a
-reference is already defined, but I<isn't> a hard reference.  If you
-use it as a reference, it'll be treated as a symbolic
-reference.  That is, the value of the scalar is taken to be the I<name>
-of a variable, rather than a direct link to a (possibly) anonymous
-value.
-
-People frequently expect it to work like this.  So it does.
-
-    $name = "foo";
-    $$name = 1;			# Sets $foo
-    ${$name} = 2;		# Sets $foo
-    ${$name x 2} = 3;		# Sets $foofoo
-    $name->[0] = 4;		# Sets $foo[0]
-    @$name = ();		# Clears @foo
-    &$name();			# Calls &foo() (as in Perl 4)
-    $pack = "THAT";
-    ${"${pack}::$name"} = 5;	# Sets $THAT::foo without eval
-
-This is powerful, and slightly dangerous, in that it's possible
-to intend (with the utmost sincerity) to use a hard reference, and
-accidentally use a symbolic reference instead.  To protect against
-that, you can say
-
-    use strict 'refs';
-
-and then only hard references will be allowed for the rest of the enclosing
-block.  An inner block may countermand that with
-
-    no strict 'refs';
-
-Only package variables (globals, even if localized) are visible to
-symbolic references.  Lexical variables (declared with my()) aren't in
-a symbol table, and thus are invisible to this mechanism.  For example:
-
-    local $value = 10;
-    $ref = "value";
-    {
-	my $value = 20;
-	print $$ref;
-    }
-
-This will still print 10, not 20.  Remember that local() affects package
-variables, which are all "global" to the package.
-
-=head2 Not-so-symbolic references
-
-A new feature contributing to readability in perl version 5.001 is that the
-brackets around a symbolic reference behave more like quotes, just as they
-always have within a string.  That is,
-
-    $push = "pop on ";
-    print "${push}over";
-
-has always meant to print "pop on over", even though push is
-a reserved word.  This has been generalized to work the same outside
-of quotes, so that
-
-    print ${push} . "over";
-
-and even
-
-    print ${ push } . "over";
-
-will have the same effect.  (This would have been a syntax error in
-Perl 5.000, though Perl 4 allowed it in the spaceless form.)  This
-construct is I<not> considered to be a symbolic reference when you're
-using strict refs:
-
-    use strict 'refs';
-    ${ bareword };	# Okay, means $bareword.
-    ${ "bareword" };	# Error, symbolic reference.
-
-Similarly, because of all the subscripting that is done using single
-words, we've applied the same rule to any bareword that is used for
-subscripting a hash.  So now, instead of writing
-
-    $array{ "aaa" }{ "bbb" }{ "ccc" }
-
-you can write just
-
-    $array{ aaa }{ bbb }{ ccc }
-
-and not worry about whether the subscripts are reserved words.  In the
-rare event that you do wish to do something like
-
-    $array{ shift }
-
-you can force interpretation as a reserved word by adding anything that
-makes it more than a bareword:
-
-    $array{ shift() }
-    $array{ +shift }
-    $array{ shift @_ }
-
-The C<use warnings> pragma or the B<-w> switch will warn you if it
-interprets a reserved word as a string.
-But it will no longer warn you about using lowercase words, because the
-string is effectively quoted.
+Symbolic references have been removed from Perl Kurila. Using a string as 
+a reference produces an error.
 
 =head2 Pseudo-hashes: Using an array as a hash
 X<pseudo-hash> X<pseudo hash> X<pseudohash>

@@ -22,9 +22,9 @@ my $dummyfile = './dummydb';
 use Fcntl;
 my %args = ( DB_File => [],
              GDBM_File => [$dummyfile, 2, 0666],
-             ODBM_File => [$dummyfile, O_RDWR|O_CREAT, 0666],
-             NDBM_File => [$dummyfile, O_RDWR|O_CREAT, 0666],
-             SDBM_File => [$dummyfile, O_RDWR|O_CREAT, 0666],
+             ODBM_File => [$dummyfile, O_RDWR^|^O_CREAT, 0666],
+             NDBM_File => [$dummyfile, O_RDWR^|^O_CREAT, 0666],
+             SDBM_File => [$dummyfile, O_RDWR^|^O_CREAT, 0666],
            );
 for $mod (qw(DB_File GDBM_File SDBM_File ODBM_File NDBM_File)) {
   eval {

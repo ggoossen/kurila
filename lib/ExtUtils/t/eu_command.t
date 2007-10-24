@@ -116,21 +116,21 @@ BEGIN {
         @ARGV = ( '0100', $Testfile );
         ExtUtils::Command::chmod();
 
-        is( ((stat($Testfile))[2] & 07777) & 0700,
+        is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
             0100, 'change a file to execute-only' );
 
         # change a file to read-only
         @ARGV = ( '0400', $Testfile );
         ExtUtils::Command::chmod();
 
-        is( ((stat($Testfile))[2] & 07777) & 0700,
+        is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0500 : 0400), 'change a file to read-only' );
 
         # change a file to write-only
         @ARGV = ( '0200', $Testfile );
         ExtUtils::Command::chmod();
 
-        is( ((stat($Testfile))[2] & 07777) & 0700,
+        is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0700 : 0200), 'change a file to write-only' );
     }
 
@@ -140,7 +140,7 @@ BEGIN {
     ExtUtils::Command::chmod();
     is_deeply( \@ARGV, \@orig_argv, 'chmod preserves @ARGV' );
 
-    is( ((stat($Testfile))[2] & 07777) & 0700,
+    is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
         ($^O eq 'vos' ? 0700 : 0600), 'change a file to read-write' );
 
 
@@ -160,21 +160,21 @@ BEGIN {
         @ARGV = ( '0100', 'testdir' );
         ExtUtils::Command::chmod();
 
-        is( ((stat('testdir'))[2] & 07777) & 0700,
+        is( ((stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
             0100, 'change a dir to execute-only' );
 
         # change a dir to read-only
         @ARGV = ( '0400', 'testdir' );
         ExtUtils::Command::chmod();
 
-        is( ((stat('testdir'))[2] & 07777) & 0700,
+        is( ((stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0500 : 0400), 'change a dir to read-only' );
 
         # change a dir to write-only
         @ARGV = ( '0200', 'testdir' );
         ExtUtils::Command::chmod();
 
-        is( ((stat('testdir'))[2] & 07777) & 0700,
+        is( ((stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0700 : 0200), 'change a dir to write-only' );
 
         @ARGV = ('testdir');
