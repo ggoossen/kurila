@@ -482,7 +482,7 @@ do_test(23,
 
 # isUV should show on PVMG
 do_test(24,
-	do { my $v = $1; $v = ~0; $v },
+	do { my $v = $1; $v = ^~^0; $v },
 'SV = PVMG\\($ADDR\\) at $ADDR
   REFCNT = 1
   FLAGS = \\(IOK,pIOK,IsUV\\)

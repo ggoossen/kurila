@@ -50,7 +50,7 @@ SKIP: {
     }
 }
 
-is(~0, -1, "signed instead of unsigned");
+is(^~^0, -1, "signed instead of unsigned");
 
 # [perl #38485] use integer; 0x80000000/-1;
 SKIP: {

@@ -105,7 +105,7 @@ else {
 }
 
 # check for csh style globbing
-@a = bsd_glob('{a,b}', GLOB_BRACE | GLOB_NOMAGIC);
+@a = bsd_glob('{a,b}', GLOB_BRACE ^|^ GLOB_NOMAGIC);
 unless (@a == 2 and $a[0] eq 'a' and $a[1] eq 'b') {
     print "not ";
 }
@@ -113,7 +113,7 @@ print "ok 7\n";
 
 @a = bsd_glob(
     '{TES*,doesntexist*,a,b}',
-    GLOB_BRACE | GLOB_NOMAGIC | ($^O eq 'VMS' ? GLOB_NOCASE : 0)
+    GLOB_BRACE ^|^ GLOB_NOMAGIC ^|^ ($^O eq 'VMS' ? GLOB_NOCASE : 0)
 );
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
@@ -135,7 +135,7 @@ unless (@a == 3
 
 # "~" should expand to $ENV{HOME}
 $ENV{HOME} = "sweet home";
-@a = bsd_glob('~', GLOB_TILDE | GLOB_NOMAGIC);
+@a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC);
 unless ($^O eq "MacOS" || (@a == 1 and $a[0] eq $ENV{HOME})) {
     print "not ";
 }

@@ -34,7 +34,7 @@ unlink glob("Op_dbmx.*");
 
 umask(0);
 my %h ;
-ok(1, tie %h,'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640);
+ok(1, tie %h,'SDBM_File','Op_dbmx', O_RDWR^|^O_CREAT, 0640);
 
 my $Dfile = "Op_dbmx.pag";
 if (! -e $Dfile) {
@@ -46,7 +46,7 @@ if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'NetWare' || 
 else {
     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
      $blksize,$blocks) = stat($Dfile);
-    print (($mode & 0777) == ($^O eq 'vos' ? 0750 : 0640) ? "ok 2\n" : "not ok 2\n");
+    print (($mode ^&^ 0777) == ($^O eq 'vos' ? 0750 : 0640) ? "ok 2\n" : "not ok 2\n");
 }
 my $i = 0;
 while (my ($key,$value) = each(%h)) {
@@ -234,7 +234,7 @@ unlink glob("Op_dbmx*"), $Dfile;
    }
    
    unlink glob("Op_dbmx*");
-   ok(21, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
+   ok(21, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR^|^O_CREAT, 0640)) ;
 
    $db->filter_fetch_key   (sub { $fetch_key = $_ }) ;
    $db->filter_store_key   (sub { $store_key = $_ }) ;
@@ -331,7 +331,7 @@ unlink glob("Op_dbmx*"), $Dfile;
     my (%h, $db) ;
 
     unlink glob("Op_dbmx*");
-    ok(42, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
+    ok(42, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR^|^O_CREAT, 0640)) ;
 
     my %result = () ;
 
@@ -394,7 +394,7 @@ unlink glob("Op_dbmx*"), $Dfile;
    my (%h, $db) ;
    unlink glob("Op_dbmx*");
 
-   ok(65, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
+   ok(65, $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR^|^O_CREAT, 0640)) ;
 
    $db->filter_store_key (sub { $_ = $h{$_} }) ;
 
@@ -420,7 +420,7 @@ unlink glob("Op_dbmx*"), $Dfile;
     my $a = "";
     local $SIG{__WARN__} = sub {$a = $_[0]} ;
     
-    ok(67, tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
+    ok(67, tie(%h, 'SDBM_File','Op_dbmx', O_RDWR^|^O_CREAT, 0640)) ;
     $h{ABC} = undef;
     ok(68, $a eq "") ;
 
@@ -442,7 +442,7 @@ unlink glob("Op_dbmx*"), $Dfile;
     unlink glob("Op_dbmx*");
     my $bad_key = 0 ;
     my %h = () ;
-    ok(69, my $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640)) ;
+    ok(69, my $db = tie(%h, 'SDBM_File','Op_dbmx', O_RDWR^|^O_CREAT, 0640)) ;
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
     $db->filter_store_key (sub { $bad_key = 1 if /^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
 
@@ -478,7 +478,7 @@ unlink glob("Op_dbmx*"), $Dfile;
    my %h ;
    unlink glob("Op1_dbmx*");
 
-   ok(75, my $db = tie(%h, 'SDBM_File','Op1_dbmx', O_RDWR|O_CREAT, 0640)) ;
+   ok(75, my $db = tie(%h, 'SDBM_File','Op1_dbmx', O_RDWR^|^O_CREAT, 0640)) ;
 
    $db->filter_fetch_key   (sub { }) ;
    $db->filter_store_key   (sub { }) ;

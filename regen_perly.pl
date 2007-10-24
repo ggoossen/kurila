@@ -273,9 +273,9 @@ sub my_system {
     if ($? == -1) {
 	die "failed to execute command '@_': $!\n";
     }
-    elsif ($? & 127) {
+    elsif ($? ^&^ 127) {
 	die sprintf "command '@_' died with signal %d\n",
-	    ($? & 127);
+	    ($? ^&^ 127);
     }
     elsif ($? >> 8) {
 	die sprintf "command '@_' exited with value %d\n", $? >> 8;

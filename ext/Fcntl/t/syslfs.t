@@ -79,7 +79,7 @@ if ($^O eq 'unicos') {
 # consume less blocks than one megabyte (assuming nobody has
 # one megabyte blocks...)
 
-sysopen(BIG, "big1", O_WRONLY|O_CREAT|O_TRUNC) or
+sysopen(BIG, "big1", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
     do { warn "sysopen big1 failed: $!\n"; bye };
 sysseek(BIG, 1_000_000, SEEK_SET) or
     do { warn "sysseek big1 failed: $!\n"; bye };
@@ -92,7 +92,7 @@ my @s1 = stat("big1");
 
 print "# s1 = @s1\n";
 
-sysopen(BIG, "big2", O_WRONLY|O_CREAT|O_TRUNC) or
+sysopen(BIG, "big2", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
     do { warn "sysopen big2 failed: $!\n"; bye };
 sysseek(BIG, 2_000_000, SEEK_SET) or
     do { warn "sysseek big2 failed: $!\n"; bye };
@@ -129,13 +129,13 @@ my $syswrite = syswrite(BIG, "big");
 exit 0;
 EOF
 
-sysopen(BIG, "big", O_WRONLY|O_CREAT|O_TRUNC) or
+sysopen(BIG, "big", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
 	do { warn "sysopen 'big' failed: $!\n"; bye };
 my $sysseek = sysseek(BIG, 5_000_000_000, SEEK_SET);
 unless (! $r && defined $sysseek && $sysseek == 5_000_000_000) {
     $sysseek = 'undef' unless defined $sysseek;
     explain("seeking past 2GB failed: ",
-	    $r ? 'signal '.($r & 0x7f) : "$! (sysseek returned $sysseek)");
+	    $r ? 'signal '.($r ^&^ 0x7f) : "$! (sysseek returned $sysseek)");
     bye();
 }
 
