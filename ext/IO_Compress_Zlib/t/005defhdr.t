@@ -242,12 +242,12 @@ EOM
         my $fdict  = shift ;
         my $level  = shift ;
 
-        my $cmf  = ($method & 0x0F) ;
-           $cmf |= (($cinfo  & 0x0F) << 4) ;
-        my $flg  = (($level & 0x03) << 6) ;
-           $flg |= (($fdict & 0x01) << 5) ;
+        my $cmf  = ($method ^&^ 0x0F) ;
+           $cmf ^|^= (($cinfo  ^&^ 0x0F) << 4) ;
+        my $flg  = (($level ^&^ 0x03) << 6) ;
+           $flg ^|^= (($fdict ^&^ 0x01) << 5) ;
         my $fcheck = 31 - ($cmf * 256 + $flg) % 31 ;
-        $flg |= $fcheck ;
+        $flg ^|^= $fcheck ;
         #print "check $fcheck\n";
 
         return pack("CC", $cmf, $flg) ;

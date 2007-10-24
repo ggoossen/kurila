@@ -89,11 +89,11 @@ sub check
 
     my $aok = 1 ;
 
-    $aok &= is $?, 0, "  exit status is 0" ;
+    $aok ^&^= is $?, 0, "  exit status is 0" ;
 
-    $aok &= is readFile($stderr), '', "  no stderr" ;
+    $aok ^&^= is readFile($stderr), '', "  no stderr" ;
 
-    $aok &= is $stdout, $expected, "  expected content is ok"
+    $aok ^&^= is $stdout, $expected, "  expected content is ok"
         if defined $expected ;
 
     if (! $aok) {
