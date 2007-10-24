@@ -61,14 +61,14 @@ sub load {
 sub libPath_find {
   my ($name, $flags, @path) = (shift, shift);
   $flags = 0x7 unless defined $flags;
-  push @path, split /;/, OS2::extLibpath	if $flags & 0x1;	# BEGIN
-  push @path, split /;/, OS2::libPath		if $flags & 0x2;
-  push @path, split /;/, OS2::extLibpath(1)	if $flags & 0x4;	# END
+  push @path, split /;/, OS2::extLibpath	if $flags ^&^ 0x1;	# BEGIN
+  push @path, split /;/, OS2::libPath		if $flags ^&^ 0x2;
+  push @path, split /;/, OS2::extLibpath(1)	if $flags ^&^ 0x4;	# END
   s,(?![/\\])$,/,  for @path;
   s,\\,/,g	   for @path;
   $name .= ".dll" unless $name =~ /\.[^\\\/]*$/;
   $_ .= $name for @path;
-  return grep -f $_, @path if $flags & 0x8;
+  return grep -f $_, @path if $flags ^&^ 0x8;
   -f $_ and return $_ for @path;
   return;
 }

@@ -264,13 +264,13 @@ sub check_graph_consistency {
         = @_;
     my $all_passed = 1;
     $all_passed
-      &= is ($slowc, $slowr, "left col tag should be top row tag");
+      ^&^= is ($slowc, $slowr, "left col tag should be top row tag");
     $all_passed
-      &= is ($fastc, $fastr, "right col tag should be bottom row tag");
-    $all_passed &=
+      ^&^= is ($fastc, $fastr, "right col tag should be bottom row tag");
+    $all_passed ^&^=
       like ($slowslow, qr/^-+/, "should be dash for comparing slow with slow");
     $all_passed
-      &= is ($slowslow, $fastfast, "slow v slow should be same as fast v fast");
+      ^&^= is ($slowslow, $fastfast, "slow v slow should be same as fast v fast");
     my $slowrate = $slowratet;
     my $fastrate = $fastratet;
     my ($slow_is_rate, $fast_is_rate);
@@ -284,13 +284,13 @@ sub check_graph_consistency {
     }
     if ($ratetext =~ /rate/i) {
         $all_passed
-          &= ok ($slow_is_rate, "slow should be expressed as a rate");
+          ^&^= ok ($slow_is_rate, "slow should be expressed as a rate");
         $all_passed
-          &= ok ($fast_is_rate, "fast should be expressed as a rate");
+          ^&^= ok ($fast_is_rate, "fast should be expressed as a rate");
     } else {
-        $all_passed &=
+        $all_passed ^&^=
           ok (!$slow_is_rate, "slow should be expressed as a iters per second");
-        $all_passed &=
+        $all_passed ^&^=
           ok (!$fast_is_rate, "fast should be expressed as a iters per second");
     }
 
@@ -309,14 +309,14 @@ sub check_graph_consistency {
         }
     } else {
         $all_passed
-          &= is ($slowrate, $fastrate,
+          ^&^= is ($slowrate, $fastrate,
                  "slow rate isn't less than fast rate, so should be the same");
 	# In OpenBSD the $slowfast is sometimes a really, really, really
 	# small number less than zero, and this gets stringified as -0.
         $all_passed
-          &= like ($slowfast, qr/^-?0$/, "slowfast should be zero");
+          ^&^= like ($slowfast, qr/^-?0$/, "slowfast should be zero");
         $all_passed
-          &= like ($fastslow, qr/^-?0$/, "fastslow should be zero");
+          ^&^= like ($fastslow, qr/^-?0$/, "fastslow should be zero");
     }
     return $all_passed;
 }
@@ -332,7 +332,7 @@ sub check_graph_vs_output {
                                  $slowr, $slowratet, $slowslow, $slowfastt,
                                  $fastr, $fastratet, $fastslowt, $fastfast);
     $all_passed
-      &= is_deeply ($chart, [['', $ratetext, $slowc, $fastc],
+      ^&^= is_deeply ($chart, [['', $ratetext, $slowc, $fastc],
                              [$slowr, $slowratet, $slowslow, $slowfastt],
                              [$fastr, $fastratet, $fastslowt, $fastfast]],
                     "check the chart layout matches the formatted output");

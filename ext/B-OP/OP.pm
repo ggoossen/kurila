@@ -55,17 +55,17 @@ sub append_elem {
     return $first unless $last  and $$last;
 
     if ( $first->type() != $type
-        or ( $type == OP_LIST and ( $first->flags & B::OPf_PARENS ) ) )
+        or ( $type == OP_LIST and ( $first->flags ^&^ B::OPf_PARENS ) ) )
     {
         return B::LISTOP->new( $type, 0, $first, $last );
     }
 
-    if ( $first->flags() & B::OPf_KIDS ) {
+    if ( $first->flags() ^&^ B::OPf_KIDS ) {
 
         $first->last->sibling($last);
     }
     else {
-        $first->flags( $first->flags | B::OPf_KIDS );
+        $first->flags( $first->flags ^|^ B::OPf_KIDS );
         $first->first($last);
     }
     $first->last($last);
@@ -81,25 +81,25 @@ sub prepend_elem {
     if ( $type == OP_LIST ) {
         $first->sibling( $last->first->sibling );
         $last->first->sibling($first);
-        $last->flags( $last->flags & ~B::OPf_PARENS )
-            unless ( $first->flags & B::OPf_PARENS );
+        $last->flags( $last->flags ^&^ ^~^B::OPf_PARENS )
+            unless ( $first->flags ^&^ B::OPf_PARENS );
     }
     else {
-        unless ( $last->flags & B::OPf_KIDS ) {
+        unless ( $last->flags ^&^ B::OPf_KIDS ) {
             $last->last($first);
-            $last->flags( $last->flags | B::OPf_KIDS );
+            $last->flags( $last->flags ^|^ B::OPf_KIDS );
         }
         $first->sibling( $last->first );
         $last->first($first);
     }
-    $last->flags( $last->flags | B::OPf_KIDS );
+    $last->flags( $last->flags ^|^ B::OPf_KIDS );
     return $last;    # I cannot believe this works.
 }
 
 sub scope {
     my $o = shift;
     return unless $o and $$o;
-    if ( $o->flags & B::OPf_PARENS ) {
+    if ( $o->flags ^&^ B::OPf_PARENS ) {
         $o = B::OP->prepend_elem( B::opnumber("lineseq"),
             B::OP->new( "enter", 0 ), $o );
         $o->type( B::opnumber("leave") );

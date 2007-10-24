@@ -40,7 +40,7 @@ use strict 'vars';
 my $max_chain = $ENV{PERL_TEST_NUMCONVERTS} || 2;
 
 # Bulk out if unsigned type is hopelessly wrong:
-my $max_uv1 = ~0;
+my $max_uv1 = ^~^0;
 my $max_uv2 = sprintf "%u", $max_uv1 ** 6; # 6 is an arbitrary number here
 my $big_iv = do {use integer; $max_uv1 * 16}; # 16 is an arbitrary number here
 my $max_uv_less3 = $max_uv1 - 3;
@@ -69,7 +69,7 @@ $num += 10**$_ - 4**$_ for 1.. $max_chain;
 $num *= $st_t;
 print "1..$num\n";		# In fact 15 times more subsubtests...
 
-my $max_uv = ~0;
+my $max_uv = ^~^0;
 my $max_iv = int($max_uv/2);
 my $zero = 0;
 
@@ -103,7 +103,7 @@ my $max_uv_p1 = "$max_uv"; $max_uv_p1+=0; $max_uv_p1++;
 my $temp = $max_uv_p1;
 my $max_uv_p1_as_iv;
 {use integer; $max_uv_p1_as_iv = 0 + sprintf "%s", $temp}
-my $max_uv_p1_as_uv = 0 | sprintf "%s", $temp;
+my $max_uv_p1_as_uv = 0 ^|^ sprintf "%s", $temp;
 
 my @opnames = split //, "-+UINPuinp";
 
@@ -139,7 +139,7 @@ for my $num_chain (1..$max_chain) {
 	    $inpt = $num;	# Try to not contaminate $num...
 	    $inpt = "$inpt";
 	    if ($first == 2) {
-	      $inpt = $max_uv & $inpt; # U 2
+	      $inpt = $max_uv ^&^ $inpt; # U 2
 	    } elsif ($first == 3) {
 	      use integer; $inpt += $zero; # I 3
 	    } elsif ($first == 4) {
@@ -162,7 +162,7 @@ for my $num_chain (1..$max_chain) {
 		  } elsif ($curop == 1) {
 		    ++$inpt;	# + 1
 		  } else {
-		    $inpt = $max_uv & $inpt; # U 2
+		    $inpt = $max_uv ^&^ $inpt; # U 2
 		  }
 		} elsif ($curop == 3) {
 		  use integer; $inpt += $zero;
@@ -173,7 +173,7 @@ for my $num_chain (1..$max_chain) {
 		if ($curop == 5) {
 		  $inpt = "$inpt"; # P 5
 		} elsif ($curop == 6) {
-		  $max_uv & $inpt; # u 6
+		  $max_uv ^&^ $inpt; # u 6
 		} else {
 		  use integer; $inpt + $zero;
 		}
@@ -217,12 +217,12 @@ for my $num_chain (1..$max_chain) {
               # (Only shows up for 64 bit UVs and NVs with 64 bit mantissas,
               #  and on Crays (64 bit integers, 48 bit mantissas) IIRC)
 	      print "# ok, \"$max_uv_p1\" correctly converts to IV \"$max_uv_p1_as_iv\"\n";
-	    } elsif ($opnames[$last] eq 'U' and $ans[1] eq ~0
+	    } elsif ($opnames[$last] eq 'U' and $ans[1] eq ^~^0
 		     and $ans[0] eq $max_uv_p1_as_uv) {
               # as aboce
 	      print "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
 	    } elsif (grep {/^N$/} @opnames[@{$curops[0]}]
-		     and $ans[0] == $ans[1] and $ans[0] <= ~0
+		     and $ans[0] == $ans[1] and $ans[0] <= ^~^0
                      # First must be in E notation (ie not just digits) and
                      # second must still be an integer.
 		     # eg 1.84467440737095516e+19

@@ -10,7 +10,7 @@ my $kingdom = $Config{byteorder} =~ /23/ ? "Lillput" : "Belfuscu";
 
 my $frozen = freeze
   ["This file was written with $Storable::VERSION on perl $]",
-   "$kingdom was correct", (~0 ^ (~0 >> 1) ^ 2),
+   "$kingdom was correct", (^~^0 ^^^ (^~^0 >> 1) ^^^ 2),
    "The End"];
 
 my $ivsize = $Config{ivsize} || $Config{longsize};

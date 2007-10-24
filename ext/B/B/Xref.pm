@@ -227,7 +227,7 @@ sub pp_nextstate {
 sub pp_padsv {
     my $op = shift;
     $top = $pad[$op->targ];
-    process($top, $op->private & OPpLVAL_INTRO ? "intro" : "used");
+    process($top, $op->private ^&^ OPpLVAL_INTRO ? "intro" : "used");
 }
 
 sub pp_padav { pp_padsv(@_) }
@@ -236,7 +236,7 @@ sub pp_padhv { pp_padsv(@_) }
 sub deref {
     my ($op, $var, $as) = @_;
     $var->[1] = $as . $var->[1];
-    process($var, $op->private & OPpOUR_INTRO ? "intro" : "used");
+    process($var, $op->private ^&^ OPpOUR_INTRO ? "intro" : "used");
 }
 
 sub pp_rv2cv { deref(shift, $top, "&"); }
@@ -257,8 +257,8 @@ sub pp_gvsv {
 	$gv = $op->gv;
 	$top = [$gv->STASH->NAME, '$', $gv->SAFENAME];
     }
-    process($top, $op->private & OPpLVAL_INTRO ||
-                  $op->private & OPpOUR_INTRO   ? "intro" : "used");
+    process($top, $op->private ^&^ OPpLVAL_INTRO ||
+                  $op->private ^&^ OPpOUR_INTRO   ? "intro" : "used");
 }
 
 sub pp_gv {
@@ -273,7 +273,7 @@ sub pp_gv {
 	$gv = $op->gv;
 	$top = [$gv->STASH->NAME, "*", $gv->SAFENAME];
     }
-    process($top, $op->private & OPpLVAL_INTRO ? "intro" : "used");
+    process($top, $op->private ^&^ OPpLVAL_INTRO ? "intro" : "used");
 }
 
 sub pp_const {
@@ -282,7 +282,7 @@ sub pp_const {
     # constant could be in the pad (under useithreads)
     if ($$sv) {
 	$top = ["?", "",
-		(class($sv) ne "SPECIAL" && $sv->FLAGS & SVf_POK)
+		(class($sv) ne "SPECIAL" && $sv->FLAGS ^&^ SVf_POK)
 		? cstring($sv->PV) : "?"];
     }
     else {

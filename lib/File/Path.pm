@@ -731,8 +731,8 @@ sub _rmtree {
             if (!chdir($root)) {
                 # see if we can escalate privileges to get in
                 # (e.g. funny protection mask such as -w- instead of rwx)
-                $perm &= 07777;
-                my $nperm = $perm | 0700;
+                $perm ^&^= 07777;
+                my $nperm = $perm ^|^ 0700;
                 if (!($arg->{safe} or $nperm == $perm or chmod($nperm, $root))) {
                     _error($arg, "cannot make child directory read-write-exec", $canon);
                     next ROOT_DIR;
@@ -751,8 +751,8 @@ sub _rmtree {
             ($ldev eq $device and $lino eq $inode)
                 or _croak("directory $canon changed before chdir, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");
 
-            $perm &= 07777; # don't forget setuid, setgid, sticky bits
-            my $nperm = $perm | 0700;
+            $perm ^&^= 07777; # don't forget setuid, setgid, sticky bits
+            my $nperm = $perm ^|^ 0700;
 
 	    # notabene: 0700 is for making readable in the first place,
 	    # it's also intended to change it to writable in case we have
@@ -825,7 +825,7 @@ sub _rmtree {
                     print "skipped $root\n" if $arg->{verbose};
                     next ROOT_DIR;
 	    }
-                if (!chmod $perm | 0700, $root) {
+                if (!chmod $perm ^|^ 0700, $root) {
                     if ($Force_Writeable) {
                         _error($arg, "cannot make directory writeable", $canon);
                     }
@@ -858,7 +858,7 @@ sub _rmtree {
                 next ROOT_DIR;
 	    }
 
-            my $nperm = $perm & 07777 | 0600;
+            my $nperm = $perm ^&^ 07777 ^|^ 0600;
             if ($nperm != $perm and not chmod $nperm, $root) {
                 if ($Force_Writeable) {
                     _error($arg, "cannot make file writeable", $canon);

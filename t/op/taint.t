@@ -178,7 +178,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (grep { defined and -d and (stat '_')[2] & 2 }
+	$tmp = (grep { defined and -d and (stat '_')[2] ^&^ 2 }
 		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
 		     @ENV{qw(TMP TEMP)})[0]
 	    or print "# can't find world-writeable directory to test PATH\n";
@@ -621,10 +621,10 @@ SKIP: {
 # test bitwise ops (regression bug)
 {
     my $why = "y";
-    my $j = "x" | $why;
+    my $j = "x" ^|^ $why;
     test not tainted $j;
     $why = $TAINT."y";
-    $j = "x" | $why;
+    $j = "x" ^|^ $why;
     test     tainted $j;
 }
 
@@ -683,7 +683,7 @@ SKIP: {
         skip "msg*() not available", 1 unless $Config{d_msg};
 
 	no strict 'subs';
-	my $id = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU);
+	my $id = msgget(IPC_PRIVATE, IPC_CREAT ^|^ S_IRWXU);
 
 	my $sent      = "message";
 	my $type_sent = 1234;
@@ -788,22 +788,22 @@ SKIP: {
 	eval { sysopen(my $tr, $evil, &O_TRUNC) };
 	test $@ =~ /^Insecure dependency/, $@;
 	
-	eval { sysopen(my $ro, "foo", &O_RDONLY | $TAINT0) };
+	eval { sysopen(my $ro, "foo", &O_RDONLY ^|^ $TAINT0) };
 	test $@ !~ /^Insecure dependency/, $@;
 	
-	eval { sysopen(my $wo, "foo", &O_WRONLY | $TAINT0) };
+	eval { sysopen(my $wo, "foo", &O_WRONLY ^|^ $TAINT0) };
 	test $@ =~ /^Insecure dependency/, $@;
 
-	eval { sysopen(my $rw, "foo", &O_RDWR | $TAINT0) };
+	eval { sysopen(my $rw, "foo", &O_RDWR ^|^ $TAINT0) };
 	test $@ =~ /^Insecure dependency/, $@;
 
-	eval { sysopen(my $ap, "foo", &O_APPEND | $TAINT0) };
+	eval { sysopen(my $ap, "foo", &O_APPEND ^|^ $TAINT0) };
 	test $@ =~ /^Insecure dependency/, $@;
 	
-	eval { sysopen(my $cr, "foo", &O_CREAT | $TAINT0) };
+	eval { sysopen(my $cr, "foo", &O_CREAT ^|^ $TAINT0) };
 	test $@ =~ /^Insecure dependency/, $@;
 
-	eval { sysopen(my $tr, "foo", &O_TRUNC | $TAINT0) };
+	eval { sysopen(my $tr, "foo", &O_TRUNC ^|^ $TAINT0) };
 	test $@ =~ /^Insecure dependency/, $@;
 
 	eval { sysopen(my $ro, "foo", &O_RDONLY, $TAINT0) };

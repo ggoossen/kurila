@@ -57,21 +57,21 @@ our $test;
 
     my $x = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\n";
 
-    @res = map($_&$x,("sferics\n"));
+    @res = map($_^&^$x,("sferics\n"));
     cmp_ok( scalar(@res), '==', 1, 'binand map nr 1');
     cmp_ok( $res[0], 'eq', "sferics\n", 'binand map is 1');
 
     @res = map
-            ($_ & $x, ("sferics\n"));
+            ($_ ^&^ $x, ("sferics\n"));
     cmp_ok( scalar(@res), '==', 1, 'binand map nr 2');
     cmp_ok( $res[0], 'eq', "sferics\n", 'binand map is 2');
 
-    @res = map { $_ & $x } ("sferics\n");
+    @res = map { $_ ^&^ $x } ("sferics\n");
     cmp_ok( scalar(@res), '==', 1, 'binand map nr 3');
     cmp_ok( $res[0], 'eq', "sferics\n", 'binand map is 3');
 
     @res = map
-             { $_&$x } ("sferics\n");
+             { $_^&^$x } ("sferics\n");
     cmp_ok( scalar(@res), '==', 1, 'binand map nr 4');
     cmp_ok( $res[0], 'eq', "sferics\n", 'binand map is 4');
 
@@ -108,21 +108,21 @@ our $test;
     cmp_ok( scalar(@res), '==', 1, 'no paren deref linefeed  nr');
     cmp_ok( $res[0], 'eq', 'chobb', 'no paren deref linefeed  is');
 
-    @res = grep($_&"X", ("bodine"));
+    @res = grep($_^&^"X", ("bodine"));
     cmp_ok( scalar(@res), '==', 1, 'binand X grep nr');
     cmp_ok( $res[0], 'eq', 'bodine', 'binand X grep is');
 
     @res = grep
-           ($_&"X", ("bodine"));
+           ($_^&^"X", ("bodine"));
     cmp_ok( scalar(@res), '==', 1, 'binand X linefeed grep nr');
     cmp_ok( $res[0], 'eq', 'bodine', 'binand X linefeed grep is');
 
-    @res = grep {$_&"X"} ("bodine");
+    @res = grep {$_^&^"X"} ("bodine");
     cmp_ok( scalar(@res), '==', 1, 'no paren binand X grep nr');
     cmp_ok( $res[0], 'eq', 'bodine', 'no paren binand X grep is');
 
     @res = grep
-           {$_&"X"} ("bodine");
+           {$_^&^"X"} ("bodine");
     cmp_ok( scalar(@res), '==', 1, 'no paren binand X linefeed grep nr');
     cmp_ok( $res[0], 'eq', 'bodine', 'no paren binand X linefeed grep is');
 }

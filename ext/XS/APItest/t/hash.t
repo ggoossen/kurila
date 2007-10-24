@@ -391,6 +391,6 @@ sub rot13 {
 
 sub bitflip {
     use bytes;
-    my @results = map {join '', map {chr(32 ^ ord $_)} split '', $_} @_;
+    my @results = map {join '', map {chr(32 ^^^ ord $_)} split '', $_} @_;
     wantarray ? @results : $results[0];
 }

@@ -96,14 +96,14 @@ $s2 = opset('padav');
 $s3 = opset('padsv', 'padav', 'padhv');
 
 # Non-negated
-print (($s1 | $s2) eq opset($s1,$s2) ? "ok $t\n":"not ok $t\n"); $t++;
-print (($s2 & $s3) eq opset($s2)     ? "ok $t\n":"not ok $t\n"); $t++;
-print (($s2 ^ $s3) eq opset('padsv','padhv') ? "ok $t\n":"not ok $t\n"); $t++;
+print (($s1 ^|^ $s2) eq opset($s1,$s2) ? "ok $t\n":"not ok $t\n"); $t++;
+print (($s2 ^&^ $s3) eq opset($s2)     ? "ok $t\n":"not ok $t\n"); $t++;
+print (($s2 ^^^ $s3) eq opset('padsv','padhv') ? "ok $t\n":"not ok $t\n"); $t++;
 
 # Negated, e.g., with possible extra bits in last byte beyond last op bit.
 # The extra bits mean we can't just say ~mask eq invert_opset(mask).
 
-@o1 = opset_to_ops(           ~ $s3);
+@o1 = opset_to_ops(           ^~^ $s3);
 @o2 = opset_to_ops(invert_opset $s3);
 print "@o1" eq "@o2" ? "ok $t\n":"not ok $t\n"; $t++;
 

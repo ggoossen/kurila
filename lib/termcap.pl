@@ -75,7 +75,7 @@ sub Tgetent {
 	    s/\\(200)/pack('c',0)/eg;			# NUL character
 	    s/\\(0\d\d)/pack('c',oct($1))/eg;	# octal
 	    s/\\(0x[0-9A-Fa-f][0-9A-Fa-f])/pack('c',hex($1))/eg;	# hex
-	    s/\\(\d\d\d)/pack('c',$1 & 0177)/eg;
+	    s/\\(\d\d\d)/pack('c',$1 ^&^ 0177)/eg;
 	    s/\\n/\n/g;
 	    s/\\r/\r/g;
 	    s/\\t/\t/g;
@@ -83,7 +83,7 @@ sub Tgetent {
 	    s/\\f/\f/g;
 	    s/\\\^/\377/g;
 	    s/\^\?/\177/g;
-	    s/\^(.)/pack('c',ord($1) & 31)/eg;
+	    s/\^(.)/pack('c',ord($1) ^&^ 31)/eg;
 	    s/\\(.)/$1/g;
 	    s/\377/^/g;
 	    $TC{$entry} = $_ if $TC{$entry} eq '';

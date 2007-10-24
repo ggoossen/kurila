@@ -501,7 +501,7 @@ sub generate_perlpod {
   }
   # want at least 2 spaces padding
   $maxlength += 2;
-  $maxlength = ($maxlength + 3) & ~3;
+  $maxlength = ($maxlength + 3) ^&^ ^~^3;
   # sprintf gives $1.....$2 where ... are spaces:
   return unexpand (map {ref $_ ? sprintf "%-${maxlength}s%s\n", @$_ : $_}
 		   @output);

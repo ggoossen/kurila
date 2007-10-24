@@ -176,7 +176,7 @@ ok(16, $@ =~ /^DB_File::BTREEINFO::FETCH - Unknown element 'fred' at/ ) ;
 # Now check the interface to BTREE
 
 my ($X, %h) ;
-ok(17, $X = tie(%h, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE )) ;
+ok(17, $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )) ;
 die "Could not tie: $!" unless $X;
 
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
@@ -184,7 +184,7 @@ my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
 
 my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
 
-ok(18, ($mode & 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
+ok(18, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
    || $noMode{$^O} );
 
 my ($key, $value, $i);
@@ -472,7 +472,7 @@ unlink $Dfile;
 
 # Now try an in memory file
 my $Y;
-ok(72, $Y = tie(%h, 'DB_File',undef, O_RDWR|O_CREAT, 0640, $DB_BTREE ));
+ok(72, $Y = tie(%h, 'DB_File',undef, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ));
 
 # fd with an in memory file should return failure
 $status = $Y->fd ;
@@ -486,7 +486,7 @@ untie %h ;
 my $bt = DB_File::BTREEINFO->new() ;
 $bt->{flags} = R_DUP ;
 my ($YY, %hh);
-ok(74, $YY = tie(%hh, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $bt )) ;
+ok(74, $YY = tie(%hh, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $bt )) ;
 
 $hh{'Wall'} = 'Larry' ;
 $hh{'Wall'} = 'Stone' ; # Note the duplicate key
@@ -548,9 +548,9 @@ $dbh3->{compare} = sub { length $_[0] <=> length $_[1] } ;
  
  
 my (%g, %k);
-tie(%h, 'DB_File',$Dfile1, O_RDWR|O_CREAT, 0640, $dbh1 ) or die $!;
-tie(%g, 'DB_File',$Dfile2, O_RDWR|O_CREAT, 0640, $dbh2 ) or die $!;
-tie(%k, 'DB_File',$Dfile3, O_RDWR|O_CREAT, 0640, $dbh3 ) or die $!;
+tie(%h, 'DB_File',$Dfile1, O_RDWR^|^O_CREAT, 0640, $dbh1 ) or die $!;
+tie(%g, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) or die $!;
+tie(%k, 'DB_File',$Dfile3, O_RDWR^|^O_CREAT, 0640, $dbh3 ) or die $!;
  
 my @Keys = qw( 0123 12 -1234 9 987654321 def  ) ;
 my (@srt_1, @srt_2, @srt_3);
@@ -593,7 +593,7 @@ unlink $Dfile1, $Dfile2, $Dfile3 ;
 # clear
 # #####
 
-ok(87, tie(%h, 'DB_File', $Dfile1, O_RDWR|O_CREAT, 0640, $DB_BTREE ) );
+ok(87, tie(%h, 'DB_File', $Dfile1, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 foreach (1 .. 10)
   { $h{$_} = $_ * 100 }
 
@@ -622,7 +622,7 @@ unlink $Dfile1 ;
 
     my $filename = "xyz" ;
     my @x ;
-    eval { tie @x, 'DB_File', $filename, O_RDWR|O_CREAT, 0640, $DB_BTREE ; } ;
+    eval { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ; } ;
     ok(90, $@ =~ /^DB_File can only tie an associative array to a DB_BTREE database/) ;
     unlink $filename ;
 }
@@ -739,7 +739,7 @@ EOM
 	   $_ eq 'original' ;
    }
    
-   ok(101, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE ) );
+   ok(101, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 
    $db->filter_fetch_key   (sub { $fetch_key = $_ }) ;
    $db->filter_store_key   (sub { $store_key = $_ }) ;
@@ -836,7 +836,7 @@ EOM
     my (%h, $db) ;
 
     unlink $Dfile;
-    ok(122, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE ) );
+    ok(122, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 
     my %result = () ;
 
@@ -899,7 +899,7 @@ EOM
    my (%h, $db) ;
    unlink $Dfile;
 
-   ok(145, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE ) );
+   ok(145, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 
    $db->filter_store_key (sub { $_ = $h{$_} }) ;
 
@@ -939,7 +939,7 @@ EOM
     $DB_BTREE->{'compare'} = \&Compare ;
 
     unlink "tree" ;
-    tie %h, "DB_File", "tree", O_RDWR|O_CREAT, 0640, $DB_BTREE 
+    tie %h, "DB_File", "tree", O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
         or die "Cannot open file 'tree': $!\n" ;
 
     # Add a key/value pair to the file
@@ -988,7 +988,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{'flags'} = R_DUP ;
  
-    tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0640, $DB_BTREE 
+    tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
 	or die "Cannot open $filename: $!\n";
  
     # Add some key/value pairs to the file
@@ -1040,7 +1040,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0640, $DB_BTREE 
+    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
 	or die "Cannot open $filename: $!\n";
  
     # Add some key/value pairs to the file
@@ -1095,7 +1095,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0640, $DB_BTREE 
+    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
 	or die "Cannot open $filename: $!\n";
  
     my $cnt  = $x->get_dup("Wall") ;
@@ -1144,7 +1144,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0640, $DB_BTREE 
+    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
 	or die "Cannot open $filename: $!\n";
 
     $found = ( $x->find_dup("Wall", "Larry") == 0 ? "" : "not") ; 
@@ -1179,7 +1179,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0640, $DB_BTREE 
+    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
 	or die "Cannot open $filename: $!\n";
 
     $x->del_dup("Wall", "Larry") ;
@@ -1222,7 +1222,7 @@ EOM
     $filename = "tree" ;
     unlink $filename ;
 
-    $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0640, $DB_BTREE
+    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE
         or die "Cannot open $filename: $!\n";
  
     # Add some key/value pairs to the file
@@ -1309,7 +1309,7 @@ EOM
     my $a = "";
     local $SIG{__WARN__} = sub {$a = $_[0]} ;
     
-    tie %h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0664, $DB_BTREE
+    tie %h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE
 	or die "Can't open file: $!\n" ;
     $h{ABC} = undef;
     ok(154, $a eq "") ;
@@ -1329,7 +1329,7 @@ EOM
     my $a = "";
     local $SIG{__WARN__} = sub {$a = $_[0]} ;
     
-    tie %h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0664, $DB_BTREE
+    tie %h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE
 	or die "Can't open file: $!\n" ;
     %h = (); ;
     ok(155, $a eq "") ;
@@ -1352,7 +1352,7 @@ EOM
     my $bad_key = 0 ;
     my %h = () ;
     my $db ;
-    ok(156, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE ) );
+    ok(156, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
     $db->filter_store_key (sub { $bad_key = 1 if /^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
 
@@ -1433,8 +1433,8 @@ ok(165,1);
  
  
     my (%h);
-    ok(166, tie(%hash1, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $dbh1 ) );
-    ok(167, tie(%hash2, 'DB_File',$Dfile2, O_RDWR|O_CREAT, 0640, $dbh2 ) );
+    ok(166, tie(%hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $dbh1 ) );
+    ok(167, tie(%hash2, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) );
 
     $hash1{DEFG} = 5;
     $hash1{XYZ} = 2;
@@ -1460,7 +1460,7 @@ ok(165,1);
    my (%h, $db) ;
    unlink $Dfile;
 
-   ok(172, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE ) );
+   ok(172, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 
    $db->filter_fetch_key   (sub { }) ;
    $db->filter_store_key   (sub { }) ;
@@ -1505,7 +1505,7 @@ ok(165,1);
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   ok(178, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE ) );
+   ok(178, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 
 
    $db->filter_fetch_key   (sub { $_ = unpack("i", $_) } );
@@ -1558,7 +1558,7 @@ ok(165,1);
     my $Dfile = "xxy.db";
     unlink $Dfile;
 
-    ok(188, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_BTREE ));
+    ok(188, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ));
 
     my $warned = '';
     local $SIG{__WARN__} = sub {$warned = $_[0]} ;

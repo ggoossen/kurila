@@ -85,7 +85,7 @@ sub main'syslog {
 	elsif ($num <= &LOG_PRIMASK) {
 	    die "syslog: too many levels given: $_\n" if defined($numpri);
 	    $numpri = $num;
-	    return 0 unless &LOG_MASK($numpri) & $maskpri;
+	    return 0 unless &LOG_MASK($numpri) ^&^ $maskpri;
 	}
 	else {
 	    die "syslog: too many facilities given: $_\n" if defined($numfac);

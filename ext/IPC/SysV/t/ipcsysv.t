@@ -152,7 +152,7 @@ SKIP: {
     my $nsem = 5;
 
     my $test_name = 'sem acquire';
-    $sem = semget(IPC_PRIVATE, $nsem, $perm | IPC_CREAT);
+    $sem = semget(IPC_PRIVATE, $nsem, $perm ^|^ IPC_CREAT);
     if ($sem) {
         pass($test_name);
     }

@@ -82,7 +82,7 @@ sub get_keys {
     while (@keys < THRESHOLD+2) {
         # next if exists $hash->{$s};
         $hash = hash($s);
-        next unless ($hash & $mask) == 0;
+        next unless ($hash ^&^ $mask) == 0;
         $c++;
         printf "# %2d: %5s, %10s\n", $c, $s, $hash;
         push @keys, $s;
@@ -109,10 +109,10 @@ sub hash {
         # and << doesn't work on NV, so using 1 << 10
         $u += ord;
         $u += $u * (1 << 10); $u %= MASK_U32;
-        $u ^= $u >> 6;
+        $u ^^^= $u >> 6;
     }
     $u += $u << 3;  $u %= MASK_U32;
-    $u ^= $u >> 11; $u %= MASK_U32;
+    $u ^^^= $u >> 11; $u %= MASK_U32;
     $u += $u << 15; $u %= MASK_U32;
     $u;
 }
