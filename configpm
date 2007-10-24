@@ -324,8 +324,8 @@ if ($s == 4 || $s == 8) {
     $byteorder_code = <<"EOT";
 
 my \$i = 0;
-foreach my \$c ($list) { \$i |= ord(\$c); \$i <<= 8 }
-\$i |= ord(1);
+foreach my \$c ($list) { \$i ^|^= ord(\$c); \$i <<= 8 }
+\$i ^|^= ord(1);
 our \$byteorder = join('', unpack('$format', pack('$f', \$i)));
 EOT
 } else {
