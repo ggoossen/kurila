@@ -1103,7 +1103,7 @@ this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
             }
         }
         my $sleep = 1;
-        while (!CPAN::_flock($fh, LOCK_EX|LOCK_NB)) {
+        while (!CPAN::_flock($fh, LOCK_EX^|^LOCK_NB)) {
             if ($sleep>10) {
                 $CPAN::Frontend->mydie("Giving up\n");
             }
@@ -2020,11 +2020,11 @@ sub o {
             while (@o_what) {
                 my($what) = shift @o_what;
                 if ($what =~ s/^-// && exists $CPAN::DEBUG{$what}) {
-                    $CPAN::DEBUG &= $CPAN::DEBUG ^ $CPAN::DEBUG{$what};
+                    $CPAN::DEBUG ^&^= $CPAN::DEBUG ^^^ $CPAN::DEBUG{$what};
                     next;
                 }
                 if ( exists $CPAN::DEBUG{$what} ) {
-                    $CPAN::DEBUG |= $CPAN::DEBUG{$what};
+                    $CPAN::DEBUG ^|^= $CPAN::DEBUG{$what};
                 } elsif ($what =~ /^\d/) {
                     $CPAN::DEBUG = $what;
                 } elsif (lc $what eq 'all') {
@@ -2037,7 +2037,7 @@ sub o {
                     my($known) = 0;
                     for (keys %CPAN::DEBUG) {
                         next unless lc($_) eq lc($what);
-                        $CPAN::DEBUG |= $CPAN::DEBUG{$_};
+                        $CPAN::DEBUG ^|^= $CPAN::DEBUG{$_};
                         $known = 1;
                     }
                     $CPAN::Frontend->myprint("unknown argument [$what]\n")
@@ -2059,7 +2059,7 @@ sub o {
             for $k (sort {$CPAN::DEBUG{$a} <=> $CPAN::DEBUG{$b}} keys %CPAN::DEBUG) {
                 $v = $CPAN::DEBUG{$k};
                 $CPAN::Frontend->myprint(sprintf "    %-14s(%s)\n", $k, $v)
-                    if $v & $CPAN::DEBUG;
+                    if $v ^&^ $CPAN::DEBUG;
             }
         } else {
             $CPAN::Frontend->myprint("Debugging turned off completely.\n");
@@ -3031,7 +3031,7 @@ sub print_ornamented {
         # note: deprecated, need to switch to $LANG and $LC_*
         # courtesy jhi:
         $swhat
-            =~ s{([\xC0-\xDF])([\x80-\xBF])}{chr(ord($1)<<6&0xC0|ord($2)&0x3F)}eg; #};
+            =~ s{([\xC0-\xDF])([\x80-\xBF])}{chr(ord($1)<<6^&^0xC0^|^ord($2)^&^0x3F)}eg; #};
     }
     if ($self->colorize_output) {
         if ( $CPAN::DEBUG && $swhat =~ /^Debug\(/ ) {
@@ -3658,7 +3658,7 @@ sub _ftp_statistics {
     open $fh, "+>>$file" or $CPAN::Frontend->mydie("Could not open '$file': $!");
     my $sleep = 1;
     my $waitstart;
-    while (!CPAN::_flock($fh, $locktype|LOCK_NB)) {
+    while (!CPAN::_flock($fh, $locktype^|^LOCK_NB)) {
         $waitstart ||= localtime();
         if ($sleep>3) {
             $CPAN::Frontend->mywarn("Waiting for a read lock on '$file' (since $waitstart)\n");
@@ -3819,7 +3819,7 @@ sub ftp_get {
         return;
     }
     return 0 unless defined $ftp;
-    $ftp->debug(1) if $CPAN::DEBUG{'FTP'} & $CPAN::DEBUG;
+    $ftp->debug(1) if $CPAN::DEBUG{'FTP'} ^&^ $CPAN::DEBUG;
     $class->debug(qq[Going to login("anonymous","$Config::Config{cf_email}")]);
     unless ( $ftp->login("anonymous",$Config::Config{'cf_email'}) ) {
         my $msg = $ftp->message;
@@ -3903,7 +3903,7 @@ sub localize {
         }
     }
 
-    if (-f $aslocal && -r _ && !($force & 1)) {
+    if (-f $aslocal && -r _ && !($force ^&^ 1)) {
         my $size;
         if ($size = -s $aslocal) {
             $self->debug("aslocal[$aslocal]size[$size]") if $CPAN::DEBUG;
@@ -3951,7 +3951,7 @@ sub localize {
     my(@reordered,$last);
     my $ccurllist = $self->_get_urllist;
     $last = $#$ccurllist;
-    if ($force & 2) { # local cpans probably out of date, don't reorder
+    if ($force ^&^ 2) { # local cpans probably out of date, don't reorder
         @reordered = (0..$last);
     } else {
         @reordered =
@@ -4455,7 +4455,7 @@ config variable with
         $timestamp = $mtime ||= 0;
         my($netrc) = CPAN::FTP::netrc->new;
         my($netrcfile) = $netrc->netrc;
-        my($verbose) = $CPAN::DEBUG{'FTP'} & $CPAN::DEBUG ? " -v" : "";
+        my($verbose) = $CPAN::DEBUG{'FTP'} ^&^ $CPAN::DEBUG ? " -v" : "";
         my $targetfile = File::Basename::basename($aslocal);
         my(@dialog);
         push(
@@ -4591,11 +4591,11 @@ sub ls {
     my(@rwx) = ('---','--x','-w-','-wx','r--','r-x','rw-','rwx');
     my(@moname) = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
     my $tmpmode = $mode;
-    my $tmp = $rwx[$tmpmode & 7];
+    my $tmp = $rwx[$tmpmode ^&^ 7];
     $tmpmode >>= 3;
-    $tmp = $rwx[$tmpmode & 7] . $tmp;
+    $tmp = $rwx[$tmpmode ^&^ 7] . $tmp;
     $tmpmode >>= 3;
-    $tmp = $rwx[$tmpmode & 7] . $tmp;
+    $tmp = $rwx[$tmpmode ^&^ 7] . $tmp;
     substr($tmp,2,1) =~ tr/-x/Ss/ if -u _;
     substr($tmp,5,1) =~ tr/-x/Ss/ if -g _;
     substr($tmp,8,1) =~ tr/-x/Tt/ if -k _;
@@ -4648,7 +4648,7 @@ sub new {
     $fh = FileHandle->new or die "Could not create a filehandle";
 
     if($fh->open($file)) {
-        $protected = ($mode & 077) == 0;
+        $protected = ($mode ^&^ 077) == 0;
         local($/) = "";
       NETRC: while (<$fh>) {
             my(@tokens) = split " ", $_;
@@ -4994,7 +4994,7 @@ sub reanimate_build_dir {
 #-> sub CPAN::Index::reload_x ;
 sub reload_x {
     my($cl,$wanted,$localname,$force) = @_;
-    $force |= 2; # means we're dealing with an index here
+    $force ^|^= 2; # means we're dealing with an index here
     CPAN::HandleConfig->load; # we should guarantee loading wherever
                               # we rely on Config XXX
     $localname ||= $wanted;
@@ -5003,14 +5003,14 @@ sub reload_x {
     if (
         -f $abs_wanted &&
         -M $abs_wanted < $CPAN::Config->{'index_expire'} &&
-        !($force & 1)
+        !($force ^&^ 1)
        ) {
         my $s = $CPAN::Config->{'index_expire'} == 1 ? "" : "s";
         $cl->debug(qq{$abs_wanted younger than $CPAN::Config->{'index_expire'} }.
                    qq{day$s. I\'ll use that.});
         return $abs_wanted;
     } else {
-        $force |= 1; # means we're quite serious about it.
+        $force ^|^= 1; # means we're quite serious about it.
     }
     return CPAN::FTP->localize($wanted,$abs_wanted,$force);
 }

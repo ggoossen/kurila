@@ -114,10 +114,10 @@ while (<DATA>)
       } elsif ($f eq "bdiv-list"){
       $try .= 'join (",",$x->bdiv($y));';
       # overload via x=
-      } elsif ($f =~ /^.=$/){
+      } elsif ($f =~ /^\W+=$/){
       $try .= "\$x $f \$y;";
       # overload via x
-      } elsif ($f =~ /^.$/){
+      } elsif ($f =~ /^\W+$/){
       $try .= "\$x $f \$y;";
       } elsif ($f eq "bmod"){
       $try .= '$x % $y;';
@@ -165,11 +165,11 @@ while (<DATA>)
       }elsif ($f eq "blog"){
         $try .= "\$x->blog(\$y);";
       }elsif ($f eq "band"){
-        $try .= "\$x & \$y;";
+        $try .= "\$x ^&^ \$y;";
       }elsif ($f eq "bior"){
-        $try .= "\$x | \$y;";
+        $try .= "\$x ^|^ \$y;";
       }elsif ($f eq "bxor"){
-        $try .= "\$x ^ \$y;";
+        $try .= "\$x ^^^ \$y;";
       }elsif ($f eq "bpow"){
         $try .= "\$x ** \$y;";
       } elsif( $f eq "bmodinv") {
@@ -235,24 +235,24 @@ print "# Tried: '$try'\n" if !ok ($ans1, $class->new(10) ** 10);
 
 $x = $class->new(3);
 $y = $class->new(4);
-$z = $x & $y;
+$z = $x ^&^ $y;
 ok ($x,3);
 ok ($y,4);
 ok ($z,0);
-$z = $x | $y;
+$z = $x ^|^ $y;
 ok ($x,3);
 ok ($y,4);
 ok ($z,7);
 $x = $class->new(1);
 $y = $class->new(2);
-$z = $x | $y;
+$z = $x ^|^ $y;
 ok ($x,1);
 ok ($y,2);
 ok ($z,3);
 
 $x = $class->new(5);
 $y = $class->new(4);
-$z = $x ^ $y;
+$z = $x ^^^ $y;
 ok ($x,5);
 ok ($y,4);
 ok ($z,1);
@@ -330,15 +330,15 @@ $try = "\$x = $class\->new(3); \$x = 20 % \$x;";
 $try .= "'ok' if \$x == 2;"; $ans = eval $try;
 print "# For '$try'\n" if (!ok "$ans" , "ok" ); 
 
-$try = "\$x = $class\->new(7); \$x = 20 & \$x;";
+$try = "\$x = $class\->new(7); \$x = 20 ^&^ \$x;";
 $try .= "'ok' if \$x == 4;"; $ans = eval $try;
 print "# For '$try'\n" if (!ok "$ans" , "ok" ); 
 
-$try = "\$x = $class\->new(7); \$x = 0x20 | \$x;";
+$try = "\$x = $class\->new(7); \$x = 0x20 ^|^ \$x;";
 $try .= "'ok' if \$x == 0x27;"; $ans = eval $try;
 print "# For '$try'\n" if (!ok "$ans" , "ok" ); 
 
-$try = "\$x = $class\->new(7); \$x = 0x20 ^ \$x;";
+$try = "\$x = $class\->new(7); \$x = 0x20 ^^^ \$x;";
 $try .= "'ok' if \$x == 0x27;"; $ans = eval $try;
 print "# For '$try'\n" if (!ok "$ans" , "ok" ); 
 
@@ -729,11 +729,11 @@ __DATA__
 &/=
 100:3:33
 -8:2:-4
-&|=
+&^|^=
 2:1:3
-&&=
+&^&^=
 5:7:5
-&^=
+&^^^=
 5:7:2
 &blog
 NaNlog:2:NaN

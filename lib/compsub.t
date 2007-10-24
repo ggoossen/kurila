@@ -67,7 +67,7 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
     BEGIN { compsub::define( compfunc1 => sub { my $op = shift;
                                                 my $cvop = B::SVOP->new('const', 0, *func1);
                                                 $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)));
-                                                return B::UNOP->new('entersub', B::OPf_STACKED|B::OPf_SPECIAL, $op);
+                                                return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op);
                                             } ); }
 
     is( (compfunc1), "func1 called. args: ");
@@ -117,7 +117,7 @@ like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
         }
         my $cvop = B::SVOP->new('const', 0, *parseparams);
         $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)));
-        my $entersubop = B::UNOP->new('entersub', B::OPf_STACKED|B::OPf_SPECIAL, $op);
+        my $entersubop = B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op);
         return $entersubop;
     }
 

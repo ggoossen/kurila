@@ -475,7 +475,7 @@ EOM
     my %h ;
     my $X ;
     eval '
-	$X = tie(%h, "SubDB","dbhash.tmp", O_RDWR|O_CREAT, 0640, $DB_HASH );
+	$X = tie(%h, "SubDB","dbhash.tmp", O_RDWR^|^O_CREAT, 0640, $DB_HASH );
 	' ;
 
     main::ok(54, $@ eq "") ;

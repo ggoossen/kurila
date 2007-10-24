@@ -3639,7 +3639,7 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch, SV *sv,
            into VMS's 255 character buffer.
         */
         if( PL_doextract )
-            code = "(1../^#!.*perl/i)|/^\\s*#(?!\\s*((ifn?|un)def|(el|end)?if|define|include|else|error|pragma)\\b)/||!($|=1)||print";
+            code = "(1../^#!.*perl/i)||/^\\s*#(?!\\s*((ifn?|un)def|(el|end)?if|define|include|else|error|pragma)\\b)/||!($|=1)||print";
         else
             code = "/^\\s*#(?!\\s*((ifn?|un)def|(el|end)?if|define|include|else|error|pragma)\\b)/||!($|=1)||print";
 

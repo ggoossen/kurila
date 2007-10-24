@@ -51,9 +51,9 @@ use overload
 '*='	=>	sub { $_[0]->bmul($_[1]); },
 '/='	=>	sub { scalar $_[0]->bdiv($_[1]); },
 '%='	=>	sub { $_[0]->bmod($_[1]); },
-'^='	=>	sub { $_[0]->bxor($_[1]); },
-'&='	=>	sub { $_[0]->band($_[1]); },
-'|='	=>	sub { $_[0]->bior($_[1]); },
+'^^^='	=>	sub { $_[0]->bxor($_[1]); },
+'^&^='	=>	sub { $_[0]->band($_[1]); },
+'^|^='	=>	sub { $_[0]->bior($_[1]); },
 
 '**='	=>	sub { $_[0]->bpow($_[1]); },
 '<<='	=>	sub { $_[0]->blsft($_[1]); },
@@ -98,7 +98,7 @@ use overload
 'neg'	=>	sub { $_[0]->copy()->bneg(); }, 
 'abs'	=>	sub { $_[0]->copy()->babs(); },
 'sqrt'  =>	sub { $_[0]->copy()->bsqrt(); },
-'~'	=>	sub { $_[0]->copy()->bnot(); },
+'^~^'	=>	sub { $_[0]->copy()->bnot(); },
 
 # for subtract it's a bit tricky to not modify b: b-a => -a+b
 '-'	=>	sub { my $c = $_[0]->copy; $_[2] ?
@@ -122,13 +122,13 @@ use overload
 '>>'	=>	sub { 
    $_[2] ? ref($_[0])->new($_[1])->brsft($_[0]) : $_[0]->copy->brsft($_[1]);
   }, 
-'&'	=>	sub { 
+'^&^'	=>	sub { 
    $_[2] ? ref($_[0])->new($_[1])->band($_[0]) : $_[0]->copy->band($_[1]);
   }, 
-'|'	=>	sub { 
+'^|^'	=>	sub { 
    $_[2] ? ref($_[0])->new($_[1])->bior($_[0]) : $_[0]->copy->bior($_[1]);
   }, 
-'^'	=>	sub { 
+'^^^'	=>	sub { 
    $_[2] ? ref($_[0])->new($_[1])->bxor($_[0]) : $_[0]->copy->bxor($_[1]);
   }, 
 

@@ -694,7 +694,7 @@ EOM
     my %h ;
     my $X ;
     eval '
-	$X = tie(%h, "SubDB","dbbtree.tmp", O_RDWR|O_CREAT, 0640, $DB_BTREE );
+	$X = tie(%h, "SubDB","dbbtree.tmp", O_RDWR^|^O_CREAT, 0640, $DB_BTREE );
 	' ;
 
     main::ok(92, $@ eq "") ;

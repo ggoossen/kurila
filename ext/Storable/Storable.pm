@@ -23,12 +23,10 @@ our @EXPORT_OK = qw(
         file_magic read_magic
 );
 
-use AutoLoader;
 use FileHandle;
 use vars qw($canonical $forgive_me $VERSION);
 
 $VERSION = '2.16';
-*AUTOLOAD = \&AutoLoader::AUTOLOAD;		# Grrr...
 
 #
 # Use of Log::Agent is optional
@@ -69,8 +67,6 @@ sub retrieve_fd { &fd_retrieve }		# Backward compatibility
 $Storable::downgrade_restricted = 1;
 $Storable::accept_future_minor = 1;
 Storable->bootstrap;
-1;
-__END__
 #
 # Use of Log::Agent is optional. If it hasn't imported these subs then
 # Autoloader will kindly supply our fallback implementation.
@@ -87,6 +83,8 @@ sub logcarp {
 #
 # Determine whether locking is possible, but only when needed.
 #
+
+our %Config;
 
 sub CAN_FLOCK; my $CAN_FLOCK; sub CAN_FLOCK {
 	return $CAN_FLOCK if defined $CAN_FLOCK;
@@ -159,7 +157,7 @@ sub read_magic {
 	my $major = $net_order >> 1;
 	return undef if $major > 4; # sanity (assuming we never go that high)
 	$info{major} = $major;
-	$net_order &= 0x01;
+	$net_order ^&^= 0x01;
 	if ($major > 1) {
 	    return undef unless length($buf);
 	    my $minor = ord(substr($buf, 0, 1, ""));

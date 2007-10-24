@@ -66,7 +66,7 @@ BEGIN {
     eval q*
 	print "not " if $^H{foo} ne "a";
 	print "ok 13 - \$^H{foo} is 'a' at eval-\"\" time\n";
-	print "not " unless $^H & 0x00020000;
+	print "not " unless $^H ^&^ 0x00020000;
 	print "ok 14 - \$^H contains HINT_LOCALIZE_HH at eval\"\"-time\n";
     *;
 }
@@ -86,7 +86,7 @@ require 'test.pl';
 
 # bug #27040: hints hash was being double-freed
 my $result = runperl(
-    prog => '$^H |= 0x20000; eval q{BEGIN { $^H |= 0x20000 }}',
+    prog => '$^H ^|^= 0x20000; eval q{BEGIN { $^H ^|^= 0x20000 }}',
     stderr => 1
 );
 print "not " if length $result;

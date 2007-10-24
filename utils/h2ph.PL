@@ -43,8 +43,8 @@ use File::Path qw(mkpath);
 use Getopt::Std;
 
 # Make sure read permissions for all are set:
-if (defined umask && (umask() & 0444)) {
-    umask (umask() & ~0444);
+if (defined umask && (umask() ^&^ 0444)) {
+    umask (umask() ^&^ ^~^0444);
 }
 
 getopts('Dd:rlhaQe');

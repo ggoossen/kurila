@@ -287,7 +287,7 @@ like($@, qr/no method found/);
   sub { *{Symbol::fetch_glob("Oscalar::$AUTOLOAD")} = sub {"_!_" . shift() . "_!_"} ;
 	goto &{Symbol::fetch_glob("Oscalar::$AUTOLOAD")}};
 
-eval "package Oscalar; sub comple; use overload '~' => 'comple'";
+eval "package Oscalar; sub comple; use overload '^~^' => 'comple'";
 
 $na = eval { ^~^$a };		# Hash was not updated
 like($@, qr/no method found/);
@@ -344,7 +344,7 @@ is(overload::StrVal(\$aI), "@{[\$aI]}");
   package OscalarII;
   @ISA = 'OscalarI';
   sub Oscalar::lshft {"_<<_" . shift() . "_<<_"}
-  eval "package OscalarI; use overload '<<' => 'lshft', '|' => 'lshft'";
+  eval "package OscalarI; use overload '<<' => 'lshft', '^|^' => 'lshft'";
 }
 
 $aaII = "087";
@@ -1259,9 +1259,9 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     sub new { bless \$_[1], $_[0] }
 
     use overload
-          "&=" => sub { bit->new($_[0]->val . ' & ' . $_[1]->val) }, 
-          "^=" => sub { bit->new($_[0]->val . ' ^ ' . $_[1]->val) },
-          "|"  => sub { bit->new($_[0]->val . ' | ' . $_[1]->val) }, # |= by fallback
+          "^&^=" => sub { bit->new($_[0]->val . ' & ' . $_[1]->val) }, 
+          "^^^=" => sub { bit->new($_[0]->val . ' ^ ' . $_[1]->val) },
+          "^|^"  => sub { bit->new($_[0]->val . ' | ' . $_[1]->val) }, # |= by fallback
           ;
 
     sub val { ${$_[0]} }

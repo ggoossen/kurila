@@ -230,12 +230,12 @@ $n >> $n			# right_shift
 $n <=> $n			# ncmp
 $n <=> $n			# i_ncmp
 $n cmp $n			# scmp
-$n & $n				# bit_and
-$n ^ $n				# bit_xor
-$n | $n				# bit_or
+$n ^&^ $n				# bit_and
+$n ^^^ $n				# bit_xor
+$n ^|^ $n				# bit_or
 -$n				# negate
 -$n				# i_negate
-~$n				# complement
+^~^$n				# complement
 atan2 $n,$n			# atan2
 sin $n				# sin
 cos $n				# cos

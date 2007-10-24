@@ -132,10 +132,10 @@ while (<DATA>)
       } elsif ($f eq "bdiv-list"){
       $try .= 'join (",",$x->bdiv($y));';
       # overload via x=
-      } elsif ($f =~ /^.=$/){
+      } elsif ($f =~ /^\W+=$/){
       $try .= "\$x $f \$y;";
       # overload via x
-      } elsif ($f =~ /^.$/){
+      } elsif ($f =~ /^\W+$/){
       $try .= "\$x $f \$y;";
       } elsif ($f eq "bmod"){
       $try .= '$x % $y;';
@@ -177,11 +177,11 @@ while (<DATA>)
           $try .= "\$x >> \$y;";
           }
       }elsif ($f eq "band"){
-        $try .= "\$x & \$y;";
+        $try .= "\$x ^&^ \$y;";
       }elsif ($f eq "bior"){
-        $try .= "\$x | \$y;";
+        $try .= "\$x ^|^ \$y;";
       }elsif ($f eq "bxor"){
-        $try .= "\$x ^ \$y;";
+        $try .= "\$x ^^^ \$y;";
       }elsif ($f eq "bpow"){
         $try .= "\$x ** \$y;";
       }elsif ($f eq "digit"){
@@ -281,11 +281,11 @@ __DATA__
 &/=
 100:3:33.33333333333333333333333333333333333333
 -8:2:-4
-&|=
+&^|^=
 2:1:3
-&&=
+&^&^=
 5:7:5
-&^=
+&^^^=
 5:7:2
 &is_negative
 0:0

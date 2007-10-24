@@ -140,8 +140,8 @@ sub write {
   require IO::File;
   require Data::Dumper;
 
-  my $mode_orig = (stat $me)[2] & 07777;
-  chmod($mode_orig | 0222, $me); # Make it writeable
+  my $mode_orig = (stat $me)[2] ^&^ 07777;
+  chmod($mode_orig ^|^ 0222, $me); # Make it writeable
   my $fh = IO::File->new($me, 'r+') or die "Can't rewrite $me: $!";
   seek($fh, 0, 0);
   while (<$fh>) {
