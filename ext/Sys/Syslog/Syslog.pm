@@ -297,7 +297,7 @@ sub syslog {
 	elsif ($num <= &LOG_PRIMASK) {
 	    croak "syslog: too many levels given: $_" if defined $numpri;
 	    $numpri = $num;
-	    return 0 unless LOG_MASK($numpri) & $maskpri;
+	    return 0 unless LOG_MASK($numpri) ^&^ $maskpri;
 	}
 	else {
 	    croak "syslog: too many facilities given: $_" if defined $numfac;

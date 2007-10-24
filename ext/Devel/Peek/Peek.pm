@@ -32,10 +32,10 @@ sub import {
     my $flags = ($db[0] =~ m/$ops_rx/ and $1);
     $flags = 'st' unless defined $flags;
     my $f = 0;
-    $f |= 2  if $flags =~ /s/;
-    $f |= 8  if $flags =~ /t/;
-    $f |= 64 if $flags =~ /P/;
-    $^D |= $f if $f;
+    $f ^|^= 2  if $flags =~ /s/;
+    $f ^|^= 8  if $flags =~ /t/;
+    $f ^|^= 64 if $flags =~ /P/;
+    $^D ^|^= $f if $f;
   }
   unshift @_, $c;
   goto &Exporter::import;
@@ -52,7 +52,7 @@ our $D_flags = 'psltocPmfrxuLHXDSTR';
 sub debug_flags (;$) {
   my $out = "";
   for my $i (0 .. length($D_flags)-1) {
-    $out .= substr $D_flags, $i, 1 if $^D & (1<<$i);
+    $out .= substr $D_flags, $i, 1 if $^D ^&^ (1<<$i);
   }
   my $arg = shift;
   my $num = $arg;
@@ -60,8 +60,8 @@ sub debug_flags (;$) {
     die "unknown flags in debug_flags()" if $arg =~ /[^-$D_flags]/;
     my ($on,$off) = split /-/, "$arg-";
     $num = $^D;
-    $num |=  (1<<index($D_flags, $_)) for split //, $on;
-    $num &= ~(1<<index($D_flags, $_)) for split //, $off;
+    $num ^|^=  (1<<index($D_flags, $_)) for split //, $on;
+    $num ^&^= ^~^(1<<index($D_flags, $_)) for split //, $off;
   }
   $^D = $num if defined $arg;
   $out
