@@ -93,28 +93,28 @@ for my $test (
 			    : "its_dead_jim\n";
 
 	$@ = "before\n";
-	ok(eq_array( [ call_pv('d', $flags|G_EVAL|$keep, @$args) ], 
-		    $flags & (G_ARRAY|G_DISCARD) ? [0] : [ undef, 1 ]),
+	ok(eq_array( [ call_pv('d', $flags^|^G_EVAL^|^$keep, @$args) ], 
+		    $flags ^&^ (G_ARRAY^|^G_DISCARD) ? [0] : [ undef, 1 ]),
 		    "$desc G_EVAL call_pv('d')");
 	is($@, $exp_err, "$desc G_EVAL call_pv('d') - \$@");
 
 	$@ = "before\n";
-	ok(eq_array( [ eval_sv('d()', $flags|$keep) ],
-		    $flags & (G_ARRAY|G_DISCARD) ? [0] : [ undef, 1 ]),
+	ok(eq_array( [ eval_sv('d()', $flags^|^$keep) ],
+		    $flags ^&^ (G_ARRAY^|^G_DISCARD) ? [0] : [ undef, 1 ]),
 		    "$desc eval_sv('d()')");
 	is($@, $exp_err, "$desc eval_sv('d()') - \$@");
 
 	$@ = "before\n";
-	ok(eq_array( [ call_method('d', $flags|G_EVAL|$keep, $obj, @$args) ],
-		    $flags & (G_ARRAY|G_DISCARD) ? [0] : [ undef, 1 ]),
+	ok(eq_array( [ call_method('d', $flags^|^G_EVAL^|^$keep, $obj, @$args) ],
+		    $flags ^&^ (G_ARRAY^|^G_DISCARD) ? [0] : [ undef, 1 ]),
 		    "$desc G_EVAL call_method('d')");
 	is($@, $exp_err, "$desc G_EVAL call_method('d') - \$@");
     }
 
-    ok(eq_array( [ sub { call_pv('f', $flags|G_NOARGS, "bad") }->(@$args) ],
+    ok(eq_array( [ sub { call_pv('f', $flags^|^G_NOARGS, "bad") }->(@$args) ],
 	$expected), "$description G_NOARGS call_pv('f')");
 
-    ok(eq_array( [ sub { eval_sv('f(@_)', $flags|G_NOARGS) }->(@$args) ],
+    ok(eq_array( [ sub { eval_sv('f(@_)', $flags^|^G_NOARGS) }->(@$args) ],
 	$expected), "$description G_NOARGS eval_sv('f(@_)')");
 
     # XXX call_method(G_NOARGS) isn't tested: I'm assuming
@@ -124,7 +124,7 @@ for my $test (
 	[ "its_dead_jim\n" ]), "$description eval { call_pv('d') }");
 
     ok(eq_array( [ eval { eval_sv('d', $flags), $@ }, $@ ],
-	[ ($flags & (G_ARRAY|G_DISCARD)) ? (0) : (undef, 1),
+	[ ($flags ^&^ (G_ARRAY^|^G_DISCARD)) ? (0) : (undef, 1),
 		"its_dead_jim\n", '' ]),
 	"$description eval { eval_sv('d') }");
 

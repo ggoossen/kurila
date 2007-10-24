@@ -18,11 +18,11 @@ sub set_cbreak {
 
     @ary = unpack($sgttyb_t,$sgttyb);
     if ($on) {
-        $ary[4] |= $CBREAK;
-        $ary[4] &= ~$ECHO;
+        $ary[4] ^|^= $CBREAK;
+        $ary[4] ^&^= ^~^$ECHO;
     } else {
-        $ary[4] &= ~$CBREAK;
-        $ary[4] |= $ECHO;
+        $ary[4] ^&^= ^~^$CBREAK;
+        $ary[4] ^|^= $ECHO;
     }
     $sgttyb = pack($sgttyb_t,@ary);
     ioctl(STDIN,$TIOCSETP,$sgttyb)

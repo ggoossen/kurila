@@ -48,11 +48,11 @@ for my $tie ("", ", tied") {
 
 { my $x; tiex $x if $tie; $x x= 1;   ok uninitialized, "x=$tie"; }
 
-{ my $x; tiex $x if $tie; $x &= 1;   ok uninitialized, "&=$tie"; }
+{ my $x; tiex $x if $tie; $x ^&^= 1;   ok uninitialized, "&=$tie"; }
 
 { local $TODO = $tie && '[perl #17809] pp_bit_or & pp_bit_xor';
-    { my $x; tiex $x if $tie; $x |= 1;   ok ! uninitialized, "|=$tie"; }
-    { my $x; tiex $x if $tie; $x ^= 1;   ok ! uninitialized, "^=$tie"; }
+    { my $x; tiex $x if $tie; $x ^|^= 1;   ok ! uninitialized, "|=$tie"; }
+    { my $x; tiex $x if $tie; $x ^^^= 1;   ok ! uninitialized, "^=$tie"; }
 }
 
 { my $x; tiex $x if $tie; $x &&= 1;  ok ! uninitialized, "&&=$tie"; }
@@ -61,11 +61,11 @@ for my $tie ("", ", tied") {
 { my $x; tiex $x if $tie; $x <<= 1;  ok uninitialized, "<<=$tie"; }
 { my $x; tiex $x if $tie; $x >>= 1;  ok uninitialized, ">>=$tie"; }
 
-{ my $x; tiex $x if $tie; $x &= "x"; ok uninitialized, "&=$tie, string"; }
+{ my $x; tiex $x if $tie; $x ^&^= "x"; ok uninitialized, "&=$tie, string"; }
 
 { local $TODO = $tie && '[perl #17809] pp_bit_or & pp_bit_xor';
-    { my $x; tiex $x if $tie; $x |= "x"; ok ! uninitialized, "|=$tie, string"; }
-    { my $x; tiex $x if $tie; $x ^= "x"; ok ! uninitialized, "^=$tie, string"; }
+    { my $x; tiex $x if $tie; $x ^|^= "x"; ok ! uninitialized, "|=$tie, string"; }
+    { my $x; tiex $x if $tie; $x ^^^= "x"; ok ! uninitialized, "^=$tie, string"; }
 }
 
 { use integer;

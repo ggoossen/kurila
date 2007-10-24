@@ -278,7 +278,7 @@ is("b${a}c", "bxxc");
 
 # Negative overloading:
 
-$na = eval { ~$a };
+$na = eval { ^~^$a };
 like($@, qr/no method found/);
 
 # Check AUTOLOADING:
@@ -289,24 +289,24 @@ like($@, qr/no method found/);
 
 eval "package Oscalar; sub comple; use overload '~' => 'comple'";
 
-$na = eval { ~$a };		# Hash was not updated
+$na = eval { ^~^$a };		# Hash was not updated
 like($@, qr/no method found/);
 
 bless \$x, 'Oscalar';
 
-$na = eval { ~$a };		# Hash updated
+$na = eval { ^~^$a };		# Hash updated
 warn "`$na', $@" if $@;
 ok !$@;
 is($na, '_!_xx_!_');
 
 $na = 0;
 
-$na = eval { ~$aI };		# Hash was not updated
+$na = eval { ^~^$aI };		# Hash was not updated
 like($@, qr/no method found/);
 
 bless \$x, 'OscalarI';
 
-$na = eval { ~$aI };
+$na = eval { ^~^$aI };
 print $@;
 
 ok(!$@);
@@ -351,7 +351,7 @@ $aaII = "087";
 $aII = \$aaII;
 bless $aII, 'OscalarII';
 bless \$fake, 'OscalarI';		# update the hash
-is(($aI | 3), '_<<_xx_<<_');
+is(($aI ^|^ 3), '_<<_xx_<<_');
 # warn $aII << 3;
 is(($aII << 3), '_<<_087_<<_');
 
@@ -1271,17 +1271,17 @@ foreach my $op (qw(<=> == != < <= > >=)) {
     my $a = bit->new(my $va = 'a');
     my $b = bit->new(my $vb = 'b');
 
-    $a &= $b;
+    $a ^&^= $b;
     is($a->val, 'a & b', "overloaded &= works");
 
     my $c = bit->new(my $vc = 'c');
 
-    $b ^= $c;
+    $b ^^^= $c;
     is($b->val, 'b ^ c', "overloaded ^= works");
 
     my $d = bit->new(my $vd = 'd');
 
-    $c |= $d;
+    $c ^|^= $d;
     is($c->val, 'c | d', "overloaded |= (by fallback) works");
 }
 

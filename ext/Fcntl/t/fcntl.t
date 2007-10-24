@@ -16,7 +16,7 @@ print "1..7\n";
 
 print "ok 1\n";
 
-if (sysopen(my $wo, "fcntl$$", O_WRONLY|O_CREAT)) {
+if (sysopen(my $wo, "fcntl$$", O_WRONLY^|^O_CREAT)) {
     print "ok 2\n";
     if (syswrite($wo, "foo") == 3) {
 	print "ok 3\n";

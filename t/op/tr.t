@@ -8,7 +8,7 @@ plan tests => 107;
 
 our ($x, $f);
 
-my $Is_EBCDIC = (ord('i') == 0x89 & ord('J') == 0xd1);
+my $Is_EBCDIC = (ord('i') == 0x89 ^&^ ord('J') == 0xd1);
 
 $_ = "abcdefghijklmnopqrstuvwxyz";
 

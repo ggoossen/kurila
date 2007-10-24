@@ -80,7 +80,7 @@ umask(022);
 SKIP: {
     skip "bogus umask", 1 if ($^O eq 'MSWin32') || ($^O eq 'NetWare') || ($^O eq 'epoc') || $Is_MacOS;
 
-    is((umask(0)&0777), 022, 'umask'),
+    is((umask(0)^&^0777), 022, 'umask'),
 }
 
 open(FH,'>x') || die "Can't create x";
@@ -113,7 +113,7 @@ SKIP: {
 #      if ($^O eq 'cygwin') { # new files on cygwin get rwx instead of rw-
 #          is($mode & 0777, 0777, "mode of triply-linked file");
 #      } else {
-            is($mode & 0777, 0666, "mode of triply-linked file");
+            is($mode ^&^ 0777, 0666, "mode of triply-linked file");
 #      }
     }
 }
@@ -131,7 +131,7 @@ SKIP: {
     SKIP: {
 	skip "no mode checks", 1 if $skip_mode_checks;
 
-        is($mode & 0777, $newmode, "chmod going through");
+        is($mode ^&^ 0777, $newmode, "chmod going through");
     }
 
     $newmode = 0700;
@@ -146,7 +146,7 @@ SKIP: {
     SKIP: {
 	skip "no mode checks", 1 if $skip_mode_checks;
 
-        is($mode & 0777, $newmode, "chmod going through to c");
+        is($mode ^&^ 0777, $newmode, "chmod going through to c");
     }
 
     ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
@@ -155,7 +155,7 @@ SKIP: {
     SKIP: {
 	skip "no mode checks", 1 if $skip_mode_checks;
 
-        is($mode & 0777, $newmode, "chmod going through to x");
+        is($mode ^&^ 0777, $newmode, "chmod going through to x");
     }
 
     is(unlink('b','x'), 2, "unlink two files");
@@ -178,13 +178,13 @@ SKIP: {
     $mode = (stat "a")[2];
     SKIP: {
         skip "no mode checks", 1 if $skip_mode_checks;
-        is($mode & 0777, 0, "perm reset");
+        is($mode ^&^ 0777, 0, "perm reset");
     }
     is(chmod($newmode, "a"), 1, "fchmod");
     $mode = (stat $fh)[2];
     SKIP: { 
         skip "no mode checks", 1 if $skip_mode_checks;
-        is($mode & 0777, $newmode, "perm restored");
+        is($mode ^&^ 0777, $newmode, "perm restored");
     }
 }
 

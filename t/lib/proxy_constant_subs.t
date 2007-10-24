@@ -33,9 +33,9 @@ foreach my $symbol (@symbols) {
 	$ms = svref_2object(\*{Symbol::fetch_glob("::$symbol")});
     }
     isa_ok($ps, 'B::GV');
-    is($ps->GvFLAGS() & GVf_IMPORTED_CV, 0,
+    is($ps->GvFLAGS() ^&^ GVf_IMPORTED_CV, 0,
        "GVf_IMPORTED_CV not set on original");
     isa_ok($ms, 'B::GV');
-    is($ms->GvFLAGS() & GVf_IMPORTED_CV, GVf_IMPORTED_CV,
+    is($ms->GvFLAGS() ^&^ GVf_IMPORTED_CV, GVf_IMPORTED_CV,
        "GVf_IMPORTED_CV set on imported GV");
 }
