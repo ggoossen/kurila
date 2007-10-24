@@ -620,13 +620,6 @@ package Maintainers;
 		'CPAN'		=> 1,
 		},
 
-	'Package::Constants' =>
-		{
-		'MAINTAINER'	=> 'kane',
-		'FILES'		=> q[lib/Package/Constants lib/Package/Constants.pm],
-		'CPAN'		=> 1,
-		},
-
 	'Params::Check' =>
 		{
 		'MAINTAINER'	=> 'kane',

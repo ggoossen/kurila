@@ -22,7 +22,7 @@ sub handle_file {
     my $file    = shift or die "Need file\n". usage();
     my $outfile = shift || '';
     $file = vms_check_name($file) if $^O eq 'VMS';
-    my $mode    = (stat($file))[2] & 07777;
+    my $mode    = (stat($file))[2] ^&^ 07777;
 
     open my $fh, "<", $file
         or do { warn "Could not open input file $file: $!"; exit 0 };

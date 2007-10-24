@@ -151,7 +151,7 @@ print $foo;
   $^Q = 5; #  This should be an unused ^Var.
   $N = 5;
   # The second caret here should be interpreted as an xor
-  if (($^Q^XX) != 3) { print "not " } 
+  if (($^Q^^^XX) != 3) { print "not " } 
   print "ok 36\n";
 #  if (($N  ^  XX()) != 3) { print "not " } 
 #  print "ok 32\n";

@@ -168,19 +168,19 @@ BEGIN
   my ($x,$y,$z);
   do {
     $AND_BITS++;
-    $x = CORE::oct('0b' . '1' x $AND_BITS); $y = $x & $x;
+    $x = CORE::oct('0b' . '1' x $AND_BITS); $y = $x ^&^ $x;
     $z = (2 ** $AND_BITS) - 1;
     } while ($AND_BITS < $max && $x == $z && $y == $x);
   $AND_BITS --;						# retreat one step
   do {
     $XOR_BITS++;
-    $x = CORE::oct('0b' . '1' x $XOR_BITS); $y = $x ^ 0;
+    $x = CORE::oct('0b' . '1' x $XOR_BITS); $y = $x ^^^ 0;
     $z = (2 ** $XOR_BITS) - 1;
     } while ($XOR_BITS < $max && $x == $z && $y == $x);
   $XOR_BITS --;						# retreat one step
   do {
     $OR_BITS++;
-    $x = CORE::oct('0b' . '1' x $OR_BITS); $y = $x | $x;
+    $x = CORE::oct('0b' . '1' x $OR_BITS); $y = $x ^|^ $x;
     $z = (2 ** $OR_BITS) - 1;
     } while ($OR_BITS < $max && $x == $z && $y == $x);
   $OR_BITS --;						# retreat one step
@@ -1259,13 +1259,13 @@ sub _is_zero
 sub _is_even
   {
   # return true if arg is even
-  (!($_[1]->[0] & 1)) <=> 0; 
+  (!($_[1]->[0] ^&^ 1)) <=> 0; 
   }
 
 sub _is_odd
   {
   # return true if arg is even
-  (($_[1]->[0] & 1)) <=> 0; 
+  (($_[1]->[0] ^&^ 1)) <=> 0; 
   }
 
 sub _is_one
@@ -1608,7 +1608,7 @@ sub _fac
 
   # If n is even, set n = n -1
   my $k = _num($c,$cx); my $even = 1;
-  if (($k & 1) == 0)
+  if (($k ^&^ 1) == 0)
     {
     $even = $k; $k --;
     }
@@ -1899,11 +1899,11 @@ sub _sqrt
   if ((length($lastelem) <= 3) && ($elems > 1))
     {
     # right-align with zero pad
-    my $len = length($lastelem) & 1;
+    my $len = length($lastelem) ^&^ 1;
     print "$lastelem => " if DEBUG;
     $lastelem .= substr($x->[-2] . '0' x $BASE_LEN,0,$BASE_LEN);
     # former odd => make odd again, or former even to even again
-    $lastelem = $lastelem / 10 if (length($lastelem) & 1) != $len;
+    $lastelem = $lastelem / 10 if (length($lastelem) ^&^ 1) != $len;
     print "$lastelem\n" if DEBUG;
     }
 
@@ -1920,9 +1920,9 @@ sub _sqrt
   # 144000 000000 => sqrt(144000) => guess 379
 
   print "$lastelem (elems $elems) => " if DEBUG;
-  $lastelem = $lastelem / 10 if ($elems & 1 == 1);		# odd or even?
+  $lastelem = $lastelem / 10 if ($elems ^&^ 1 == 1);		# odd or even?
   my $g = sqrt($lastelem); $g =~ s/\.//;			# 2.345 => 2345
-  $r -= 1 if $elems & 1 == 0;					# 70 => 7
+  $r -= 1 if $elems ^&^ 1 == 0;					# 70 => 7
 
   # padd with zeros if result is too short
   $x->[$l--] = int(substr($g . '0' x $r,0,$r+1));
@@ -2093,7 +2093,7 @@ sub _and
 #    _add($c,$x, _mul($c, _new( $c, ($xrr & $yrr) ), $m) );
     
     # 0+ due to '&' doesn't work in strings
-    _add($c,$x, _mul($c, [ 0+$xr->[0] & 0+$yr->[0] ], $m) );
+    _add($c,$x, _mul($c, [ 0+$xr->[0] ^&^ 0+$yr->[0] ], $m) );
     _mul($c,$m,$mask);
     }
   $x;
@@ -2123,7 +2123,7 @@ sub _xor
     #_add($c,$x, _mul($c, _new( $c, ($xrr ^ $yrr) ), $m) );
 
     # 0+ due to '^' doesn't work in strings
-    _add($c,$x, _mul($c, [ 0+$xr->[0] ^ 0+$yr->[0] ], $m) );
+    _add($c,$x, _mul($c, [ 0+$xr->[0] ^^^ 0+$yr->[0] ], $m) );
     _mul($c,$m,$mask);
     }
   # the loop stops when the shorter of the two numbers is exhausted
@@ -2159,7 +2159,7 @@ sub _or
 #    _add($c,$x, _mul($c, _new( $c, ($xrr | $yrr) ), $m) );
     
     # 0+ due to '|' doesn't work in strings
-    _add($c,$x, _mul($c, [ 0+$xr->[0] | 0+$yr->[0] ], $m) );
+    _add($c,$x, _mul($c, [ 0+$xr->[0] ^|^ 0+$yr->[0] ], $m) );
     _mul($c,$m,$mask);
     }
   # the loop stops when the shorter of the two numbers is exhausted
