@@ -34,12 +34,11 @@ use Fatal qw|open close|;
                                          dumpcommand => "$ENV{madperl}",
                                          switches => join ' ', map { "-I $_" } @lib ) };
     if ($output) {
-        if ($input ne $output) {
-            seek $fh, 0, 0;
-            truncate $fh, 0;
-            $fh->print($output);
-            close $fh or die;
-        }
+#         if ($input ne $output) {
+        open my $fh, '>', "$filename.p5k" or die;
+        $fh->print($output);
+        close $fh or die;
+#         }
     } else {
         warn "Failed converting $filename:\n\n$@\n\n";
     }
