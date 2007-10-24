@@ -253,7 +253,7 @@ like( $@, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in a restricted ha
     foreach my $usekeys (0..7) {
       my @usekeys;
       for my $bits (0,1,2) {
-	push @usekeys, $keys[$bits] if $usekeys & (1 << $bits);
+	push @usekeys, $keys[$bits] if $usekeys ^&^ (1 << $bits);
       }
       my %clean = map {$_ => length $_} @usekeys;
       my %target;

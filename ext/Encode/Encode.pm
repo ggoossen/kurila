@@ -144,7 +144,7 @@ sub encode($$;$) {
         Carp::croak("Unknown encoding '$name'");
     }
     my $octets = $enc->encode( $string, $check );
-    $_[1] = $string if $check and !ref $check and !( $check & LEAVE_SRC() );
+    $_[1] = $string if $check and !ref $check and !( $check ^&^ LEAVE_SRC() );
     return $octets;
 }
 *str2bytes = \&encode;
@@ -160,7 +160,7 @@ sub decode($$;$) {
         Carp::croak("Unknown encoding '$name'");
     }
     my $string = $enc->decode( $octets, $check );
-    $_[1] = $octets if $check and !ref $check and !( $check & LEAVE_SRC() );
+    $_[1] = $octets if $check and !ref $check and !( $check ^&^ LEAVE_SRC() );
     return $string;
 }
 *bytes2str = \&decode;

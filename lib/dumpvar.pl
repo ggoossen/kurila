@@ -45,7 +45,7 @@ sub unctrl {
 	    # EBCDIC has no concept of "\cA" or "A" being related
 	    # to each other by a linear/boolean mapping.
 	} else {
-	    s/([\001-\037\177])/'^'.pack('c',ord($1)^64)/eg;
+	    s/([\001-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
 	}
 	$_;
 }
@@ -86,7 +86,7 @@ sub stringify {
 	  s/([\'\\])/\\$1/g;
 	} elsif ($unctrl eq 'unctrl') {
 	  s/([\"\\])/\\$1/g ;
-	  s/([\000-\037\177])/'^'.pack('c',ord($1)^64)/eg;
+	  s/([\000-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
 	  # uniescape?
 	  s/([\200-\377])/'\\0x'.sprintf('%2X',ord($1))/eg 
 	    if $quoteHighBit;
@@ -109,7 +109,7 @@ sub stringify {
 # Ensure a resulting \ is escaped to be \\
 sub _escaped_ord {
     my $chr = shift;
-    $chr = chr(ord($chr)^64);
+    $chr = chr(ord($chr)^^^64);
     $chr =~ s{\\}{\\\\}g;
     return $chr;
 }
@@ -316,13 +316,13 @@ sub matchlex {
   (my $var = $_[0]) =~ s/.//;
   $var eq $_[1] or 
     ($_[1] =~ /^([!~])(.)([\x00-\xff]*)/) and 
-      ($1 eq '!') ^ (eval { $var =~ /$2$3/ });
+      ($1 eq '!') ^^^ (eval { $var =~ /$2$3/ });
 }
 
 sub matchvar {
   $_[0] eq $_[1] or 
     ($_[1] =~ /^([!~])(.)([\x00-\xff]*)/) and 
-      ($1 eq '!') ^ (eval {($_[2] . "::" . $_[0]) =~ /$2$3/});
+      ($1 eq '!') ^^^ (eval {($_[2] . "::" . $_[0]) =~ /$2$3/});
 }
 
 sub compactDump {

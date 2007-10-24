@@ -6,12 +6,12 @@ $bytes::hint_bits = 0x00000008;
 $bytes::codepoints_hint_bits = 0x01000000;
 
 sub import {
-    $^H |= $bytes::hint_bits;
-    $^H &= ~$bytes::codepoints_hint_bits;
+    $^H ^|^= $bytes::hint_bits;
+    $^H ^&^= ^~^$bytes::codepoints_hint_bits;
 }
 
 sub unimport {
-    $^H &= ~$bytes::hint_bits;
+    $^H ^&^= ^~^$bytes::hint_bits;
 }
 
 our $AUTOLOAD;

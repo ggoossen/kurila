@@ -69,12 +69,12 @@ our %flags = (
     STACK           => 0x280000,
     BUFFERS         => 0x400000,
 );
-$flags{ALL} = -1 & ~($flags{OFFSETS}|$flags{OFFSETSDBG}|$flags{BUFFERS});
-$flags{All} = $flags{all} = $flags{DUMP} | $flags{EXECUTE};
-$flags{Extra} = $flags{EXECUTE} | $flags{COMPILE};
-$flags{More} = $flags{MORE} = $flags{All} | $flags{TRIEC} | $flags{TRIEM} | $flags{STATE};
-$flags{State} = $flags{DUMP} | $flags{EXECUTE} | $flags{STATE};
-$flags{TRIE} = $flags{DUMP} | $flags{EXECUTE} | $flags{TRIEC};
+$flags{ALL} = -1 ^&^ ^~^($flags{OFFSETS}^|^$flags{OFFSETSDBG}^|^$flags{BUFFERS});
+$flags{All} = $flags{all} = $flags{DUMP} ^|^ $flags{EXECUTE};
+$flags{Extra} = $flags{EXECUTE} ^|^ $flags{COMPILE};
+$flags{More} = $flags{MORE} = $flags{All} ^|^ $flags{TRIEC} ^|^ $flags{TRIEM} ^|^ $flags{STATE};
+$flags{State} = $flags{DUMP} ^|^ $flags{EXECUTE} ^|^ $flags{STATE};
+$flags{TRIE} = $flags{DUMP} ^|^ $flags{EXECUTE} ^|^ $flags{TRIEC};
 
 my $installed;
 my $installed_error;
@@ -124,9 +124,9 @@ sub bits {
             for my $idx ($idx+1..$#_) {
                 if ($flags{$_[$idx]}) {
                     if ($on) {
-                        ${^RE_DEBUG_FLAGS} |= $flags{$_[$idx]};
+                        ${^RE_DEBUG_FLAGS} ^|^= $flags{$_[$idx]};
                     } else {
-                        ${^RE_DEBUG_FLAGS} &= ~ $flags{$_[$idx]};
+                        ${^RE_DEBUG_FLAGS} ^&^= ^~^ $flags{$_[$idx]};
                     }
                 } else {
                     require Carp;
@@ -141,7 +141,7 @@ sub bits {
 	    _load_unload($on);
 	    last;
         } elsif (exists $bitmask{$s}) {
-	    $bits |= $bitmask{$s};
+	    $bits ^|^= $bitmask{$s};
 	} elsif ($EXPORT_OK{$s}) {
 	    _do_install();
 	    require Exporter;
@@ -158,12 +158,12 @@ sub bits {
 
 sub import {
     shift;
-    $^H |= bits(1, @_);
+    $^H ^|^= bits(1, @_);
 }
 
 sub unimport {
     shift;
-    $^H &= ~ bits(0, @_);
+    $^H ^&^= ^~^ bits(0, @_);
 }
 
 1;

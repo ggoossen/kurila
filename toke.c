@@ -3950,10 +3950,18 @@ Perl_yylex(pTHX)
 
     case '^':
 	s++;
-	BOop(OP_BIT_XOR);
-    case '[':
-	PL_lex_brackets++;
-	/* FALL THROUGH */
+	if ( ! strchr("^&|~", *s ) )
+	    Perl_croak(aTHX_ "Expected ^,&,| or ~ after a ^, but found '%c'", *s);
+	s++;
+	if (*s != '^')
+	    Perl_croak(aTHX_ "Expected a '^' after ^%c'", *(s-1));
+	s++;
+	switch (*(s-2)) {
+	case '^': BOop(OP_BIT_XOR);
+	case '&': BAop(OP_BIT_AND);
+	case '|': BOop(OP_BIT_OR);
+	case '~': OPERATOR('~');
+	}
     case '~':
 	if (s[1] == '~'
 	    && (PL_expect == XOPERATOR || PL_expect == XTERMORDORDOR))
@@ -3961,6 +3969,10 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    Eop(OP_SMARTMATCH);
 	}
+	Perl_croak(aTHX_ "Unknown operator '~' found");
+    case '[':
+	PL_lex_brackets++;
+	/* FALL THROUGH */
     case ',':
 	{
 	    const char tmp = *s++;
@@ -4370,14 +4382,7 @@ Perl_yylex(pTHX)
 	    AOPERATOR(ANDAND);
 	s--;
 	if (PL_expect == XOPERATOR) {
-	    if (PL_bufptr == PL_linestart && ckWARN(WARN_SEMICOLON)
-		&& isIDFIRST_lazy_if(s,UTF))
-	    {
-		CopLINE_dec(PL_curcop);
-		Perl_warner(aTHX_ packWARN(WARN_SEMICOLON), PL_warn_nosemi);
-		CopLINE_inc(PL_curcop);
-	    }
-	    BAop(OP_BIT_AND);
+	    no_op("'&'", s);
 	}
 
 	s = scan_ident(s - 1, PL_bufend, PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
@@ -4395,7 +4400,7 @@ Perl_yylex(pTHX)
 	if (*s++ == '|')
 	    AOPERATOR(OROR);
 	s--;
-	BOop(OP_BIT_OR);
+	Perl_croak(aTHX_ "Unknown operator '|' found. Did you mean '||' or '^|'?");
     case '=':
 	s++;
 	{
