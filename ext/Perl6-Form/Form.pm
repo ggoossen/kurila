@@ -83,7 +83,7 @@ sub strings_or_undef {
 	return $val;
 }
 
-my $unlimited = ~0>>1;			# Ersatz infinity
+my $unlimited = ^~^0>>1;			# Ersatz infinity
 
 sub height_vals {
 	my ($vals) = @_;
@@ -1047,12 +1047,12 @@ sub make_cols($$\@\%$) {
 sub make_underline {
 	my ($under, $prevline, $nextline) = @_;
 	$under =~ s/(\n*)\z//;
-	my $trail = "$1"|"\n";
+	my $trail = "$1"^|^"\n";
 	for my $l ($nextline, $prevline) {
 		$l = join "", map {$_->{literal} ? ${$_->{src}} : '*'x$_->{width} } @$l;
 		$l =~ s{(.)}{$1 =~ /\s/ ? "\0" : "\1"}ges;
 	}
-	$nextline |= $prevline;
+	$nextline ^|^= $prevline;
 	$nextline =~ s{\0}{ }g;
 	$nextline =~ s{(\cA+)}{my $len=length($1); substr($under x $len,0,$len)}ge;
 	$nextline .= $trail;

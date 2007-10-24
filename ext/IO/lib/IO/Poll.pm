@@ -79,7 +79,7 @@ sub poll {
 
     while(($fd,$iom) = each %{$self->[0]}) {
 	$mask   = 0;
-	$mask  |= $_ for values(%$iom);
+	$mask  ^|^= $_ for values(%$iom);
 	push(@poll,$fd => $mask);
     }
 
@@ -101,7 +101,7 @@ sub events {
     my $io = shift;
     my $fd = fileno($io);
     exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io} 
-                ? $self->[1]{$fd} & ($self->[0]{$fd}{$io}|POLLHUP|POLLERR|POLLNVAL)
+                ? $self->[1]{$fd} ^&^ ($self->[0]{$fd}{$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
 	: 0;
 }
 
@@ -121,8 +121,8 @@ sub handles {
 
     while(($fd,$ev) = each %{$self->[1]}) {
 	while (($io,$mask) = each %{$self->[0]{$fd}}) {
-	    $mask |= POLLHUP|POLLERR|POLLNVAL;  # must allow these
-	    push @handles,$self->[2]{$io} if ($ev & $mask) & $events;
+	    $mask ^|^= POLLHUP^|^POLLERR^|^POLLNVAL;  # must allow these
+	    push @handles,$self->[2]{$io} if ($ev ^&^ $mask) ^&^ $events;
 	}
     }
     return @handles;
