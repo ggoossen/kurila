@@ -23,7 +23,7 @@ print "1..67\n";
 # digit of 16**n will always be six. Hence 16**n - 1 will always end in 5.
 # Assumption is that UVs will always be a multiple of 4 bits long.
 
-my $UV_max = ~0;
+my $UV_max = ^~^0;
 die "UV_max eq '$UV_max', doesn't end in 5; your UV isn't 4n bits long :-(."
   unless $UV_max =~ /5$/;
 my $UV_max_less3 = $UV_max - 3;
@@ -252,7 +252,7 @@ print "not " unless vec($x, 0, 64) == 0 && vec($x, 2, 64) == 0;
 print "ok 40\n";
 
 
-print "not " unless ~0 == 0xffffffffffffffff;
+print "not " unless ^~^0 == 0xffffffffffffffff;
 print "ok 41\n";
 
 print "not " unless (0xffffffff<<32) == 0xffffffff00000000;
@@ -267,32 +267,32 @@ print "ok 44\n";
 print "not " unless (sprintf "%#Vx", 1<<63) eq '0x8000000000000000';
 print "ok 45\n";
 
-print "not " unless (0x8000000000000000 | 1) == 0x8000000000000001;
+print "not " unless (0x8000000000000000 ^|^ 1) == 0x8000000000000001;
 print "ok 46\n";
 
 print "not "
-    unless (0xf000000000000000 & 0x8000000000000000) == 0x8000000000000000;
+    unless (0xf000000000000000 ^&^ 0x8000000000000000) == 0x8000000000000000;
 print "ok 47\n";
 
 print "not "
-    unless (0xf000000000000000 ^ 0xfffffffffffffff0) == 0x0ffffffffffffff0;
+    unless (0xf000000000000000 ^^^ 0xfffffffffffffff0) == 0x0ffffffffffffff0;
 print "ok 48\n";
 
 
 print "not "
-    unless (sprintf "%b", ~0)   eq
+    unless (sprintf "%b", ^~^0)   eq
            '1111111111111111111111111111111111111111111111111111111111111111';
 print "ok 49\n";
 
 print "not "
-    unless (sprintf "%64b", ~0) eq
+    unless (sprintf "%64b", ^~^0) eq
            '1111111111111111111111111111111111111111111111111111111111111111';
 print "ok 50\n";
 
-print "not " unless (sprintf "%d", ~0>>1) eq '9223372036854775807';
+print "not " unless (sprintf "%d", ^~^0>>1) eq '9223372036854775807';
 print "ok 51\n";
 
-print "not " unless (sprintf "%u", ~0)    eq '18446744073709551615';
+print "not " unless (sprintf "%u", ^~^0)    eq '18446744073709551615';
 print "ok 52\n";
 
 # If the 53..55 fail you have problems in the parser's string->int conversion,
@@ -328,8 +328,8 @@ if ($num eq $string) {
 # Test that sv_2nv then sv_2uv is the same as sv_2uv direct
 $num = 4294967297;
 $string = "4294967297";
-$num &= 0;
-$string &= 0;
+$num ^&^= 0;
+$string ^&^= 0;
 if ($num eq $string) {
   print "ok 57\n";
 } else {

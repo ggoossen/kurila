@@ -100,9 +100,9 @@ sub _dump  # sometimes useful for debugging
             my $fattr = $attr{$pkg}[$no];
             if (defined $fattr) {
                 my @a;
-                push(@a, "public")    if $fattr & PUBLIC;
-                push(@a, "private")   if $fattr & PRIVATE;
-                push(@a, "inherited") if $fattr & INHERITED;
+                push(@a, "public")    if $fattr ^&^ PUBLIC;
+                push(@a, "private")   if $fattr ^&^ PRIVATE;
+                push(@a, "inherited") if $fattr ^&^ INHERITED;
                 print "\t(", join(", ", @a), ")";
             }
             print "\n";

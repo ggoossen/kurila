@@ -547,8 +547,8 @@ sub ln {
 sub _manicopy_chmod {
     my($srcFile, $dstFile) = @_;
 
-    my $perm = 0444 | (stat $srcFile)[2] & 0700;
-    chmod( $perm | ( $perm & 0100 ? 0111 : 0 ), $dstFile );
+    my $perm = 0444 ^|^ (stat $srcFile)[2] ^&^ 0700;
+    chmod( $perm ^|^ ( $perm ^&^ 0100 ? 0111 : 0 ), $dstFile );
 }
 
 # Files that are often modified in the distdir.  Don't hard link them.

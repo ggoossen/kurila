@@ -61,21 +61,21 @@ BEGIN {
 #
 sub sub {
   push(@stack, $DB::single);
-  $DB::single &= 1;
-  $DB::single |= 4 if $#stack == $deep;
+  $DB::single ^&^= 1;
+  $DB::single ^|^= 4 if $#stack == $deep;
   if ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY' or not defined wantarray) {
     &$DB::sub;
-    $DB::single |= pop(@stack);
+    $DB::single ^|^= pop(@stack);
     $DB::ret = undef;
   }
   elsif (wantarray) {
     @DB::ret = &$DB::sub;
-    $DB::single |= pop(@stack);
+    $DB::single ^|^= pop(@stack);
     @DB::ret;
   }
   else {
     $DB::ret = &$DB::sub;
-    $DB::single |= pop(@stack);
+    $DB::single ^|^= pop(@stack);
     $DB::ret;
   }
 }
@@ -105,7 +105,7 @@ sub DB {
   my ($stop, $action);
   if (($stop,$action) = split(/\0/,$DB::dbline{$DB::lineno})) {
     if ($stop eq '1') {
-      $DB::signal |= 1;
+      $DB::signal ^|^= 1;
     }
     else {
       $stop = 0 unless $stop;			# avoid un_init warning
@@ -119,7 +119,7 @@ sub DB {
   }
   $evalarg = $action, &eval if $action;
   if ($DB::single || $DB::signal) {
-    _outputall($#stack . " levels deep in subroutine calls.\n") if $DB::single & 4;
+    _outputall($#stack . " levels deep in subroutine calls.\n") if $DB::single ^&^ 4;
     $DB::single = 0;
     $DB::signal = 0;
     $running = 0;
@@ -218,7 +218,7 @@ sub cont {
   my $i = shift;
   $s->set_tbreak($i) if $i;
   for ($i = 0; $i <= $#stack;) {
-	$stack[$i++] &= ~1;
+	$stack[$i++] ^&^= ^~^1;
   }
   $DB::single = 0;
   $running = 1;
@@ -233,7 +233,7 @@ sub ret {
   my $s = shift;
   my $i = shift;      # how many levels to get to DB sub
   $i = 0 unless defined $i;
-  $stack[$#stack-$i] |= 1;
+  $stack[$#stack-$i] ^|^= 1;
   $DB::single = 0;
   $running = 1;
 }
@@ -253,8 +253,8 @@ sub backtrace {
     for (@a) {
       s/'/\\'/g;
       s/([^\0]*)/'$1'/ unless /^-?[\d.]+$/;
-      s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
-      s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+      s/([\200-\377])/sprintf("M-%c",ord($1)^&^0177)/eg;
+      s/([\0-\37\177])/sprintf("^%c",ord($1)^^^64)/eg;
     }
     $w = $w ? '@ = ' : '$ = ';
     $a = $h ? '(' . join(', ', @a) . ')' : '';
