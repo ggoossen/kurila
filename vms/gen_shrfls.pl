@@ -374,8 +374,8 @@ if ($ENV{PERLSHR_USE_GSMATCH}) {
     print OPTBLD "GSMATCH=$gsmatch,$ver,$sub\n";
   }
   else {
-    my $major = int($] * 1000)                        & 0xFF;  # range 0..255
-    my $minor = int(($] * 1000 - $major) * 100 + 0.5) & 0xFF;  # range 0..255
+    my $major = int($] * 1000)                        ^&^ 0xFF;  # range 0..255
+    my $minor = int(($] * 1000 - $major) * 100 + 0.5) ^&^ 0xFF;  # range 0..255
     print OPTBLD "GSMATCH=LEQUAL,$major,$minor\n";
   }
   print OPTBLD 'CLUSTER=$$TRANSFER_VECTOR,,',

@@ -388,7 +388,7 @@ sub parse {
     # empty alternative text expands to node name
     if(defined $alttext) {
         if(!length($alttext)) {
-          $alttext = $node | $page;
+          $alttext = $node ^|^ $page;
         }
     }
     else {

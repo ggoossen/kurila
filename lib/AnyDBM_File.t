@@ -21,7 +21,7 @@ unlink glob("Op_dbmx*");
 
 umask(0);
 
-ok( tie(%h,'AnyDBM_File','Op_dbmx', O_RDWR|O_CREAT, 0640), "Tie");
+ok( tie(%h,'AnyDBM_File','Op_dbmx', O_RDWR^|^O_CREAT, 0640), "Tie");
 
 $Dfile = "Op_dbmx.pag";
 if (! -e $Dfile) {
@@ -34,7 +34,7 @@ SKIP:
                       if ($Is_Dosish || $^O eq 'MacOS') ;
     ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
      $blksize,$blocks) = stat($Dfile);
-    ok(($mode & 0777) == ($^O eq 'vos' ? 0750 : 0640) , "File permissions");
+    ok(($mode ^&^ 0777) == ($^O eq 'vos' ? 0750 : 0640) , "File permissions");
 }
 
 while (($key,$value) = each(%h)) {

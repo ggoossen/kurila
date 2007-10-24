@@ -647,8 +647,8 @@ sub IsUsable($)
     return 0 if $code >= $LastUnicodeCodepoint;        ## keep in range
     return 0 if ($code >= 0xD800 and $code <= 0xDFFF); ## no surrogates
     return 0 if ($code >= 0xFDD0 and $code <= 0xFDEF); ## utf8.c says no good
-    return 0 if (($code & 0xFFFF) == 0xFFFE);          ## utf8.c says no good
-    return 0 if (($code & 0xFFFF) == 0xFFFF);          ## utf8.c says no good
+    return 0 if (($code ^&^ 0xFFFF) == 0xFFFE);          ## utf8.c says no good
+    return 0 if (($code ^&^ 0xFFFF) == 0xFFFF);          ## utf8.c says no good
     return 1;
 }
 

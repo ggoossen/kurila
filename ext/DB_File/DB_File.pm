@@ -267,13 +267,13 @@ sub tie_hash_or_array
     $arg[4] = tied %{ $arg[4] } 
 	if @arg >= 5 && ref $arg[4] && $arg[4] =~ /=HASH/ && tied %{ $arg[4] } ;
 
-    $arg[2] = O_CREAT()|O_RDWR() if @arg >=3 && ! defined $arg[2];
+    $arg[2] = O_CREAT()^|^O_RDWR() if @arg >=3 && ! defined $arg[2];
     $arg[3] = 0666               if @arg >=4 && ! defined $arg[3];
 
     # make recno in Berkeley DB version 2 (or better) work like 
     # recno in version 1.
     if ($db_version >= 4 and ! $tieHASH) {
-        $arg[2] |= O_CREAT();
+        $arg[2] ^|^= O_CREAT();
     }
 
     if ($db_version > 1 and defined $arg[4] and $arg[4] =~ /RECNO/ and 

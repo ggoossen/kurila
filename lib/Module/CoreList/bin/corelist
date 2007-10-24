@@ -136,7 +136,7 @@ while (@ARGV) {
 	    if (@mod) {
 		module_version($_, $ver) for @mod;
 	    } else {
-		$ver |= '';
+		$ver ^|^= '';
 		print "\n$mod $ver has no match in CORE (or so I think)\n";
 	    }
 

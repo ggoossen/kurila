@@ -55,9 +55,9 @@ if ($^O ne 'VMS') {
 
     $exit = run('kill 15, $$; sleep(1);');
 
-    is( $exit & 127, 15,            'Term by signal' );
-    ok( !($exit & 128),             'No core dump' );
-    is( $? & 127, 15,               'Term by signal $?' );
+    is( $exit ^&^ 127, 15,            'Term by signal' );
+    ok( !($exit ^&^ 128),             'No core dump' );
+    is( $? ^&^ 127, 15,               'Term by signal $?' );
     isnt( ${^CHILD_ERROR_NATIVE},  0, 'Term by signal ${^CHILD_ERROR_NATIVE}' );
     SKIP: {
       skip("No POSIX", 3) unless $posix_ok;
@@ -96,23 +96,23 @@ if ($^O ne 'VMS') {
 
   $exit = run("exit 268632065"); # %CLI-S-NORMAL
   is( $exit >> 8, 0,             'PERL success exit' );
-  is( ${^CHILD_ERROR_NATIVE} & 7, 1, 'VMS success exit' );
+  is( ${^CHILD_ERROR_NATIVE} ^&^ 7, 1, 'VMS success exit' );
 
   $exit = run("exit 268632067");  # %CLI-I-NORMAL
   is( $exit >> 8, 0,             'PERL informational exit' );
-  is( ${^CHILD_ERROR_NATIVE} & 7, 3, 'VMS informational exit' );
+  is( ${^CHILD_ERROR_NATIVE} ^&^ 7, 3, 'VMS informational exit' );
 
   $exit = run("exit 268632064");  # %CLI-W-NORMAL
   is( $exit >> 8, 1,             'Perl warning exit' );
-  is( ${^CHILD_ERROR_NATIVE} & 7, 0, 'VMS warning exit' );
+  is( ${^CHILD_ERROR_NATIVE} ^&^ 7, 0, 'VMS warning exit' );
 
   $exit = run("exit 268632066");  # %CLI-E-NORMAL
   is( $exit >> 8, 2,             'Perl error exit' );
-  is( ${^CHILD_ERROR_NATIVE} & 7, 2, 'VMS error exit' );
+  is( ${^CHILD_ERROR_NATIVE} ^&^ 7, 2, 'VMS error exit' );
 
   $exit = run("exit 268632068");  # %CLI-F-NORMAL
   is( $exit >> 8, 4,             'Perl fatal error exit' );
-  is( ${^CHILD_ERROR_NATIVE} & 7, 4, 'VMS fatal exit' );
+  is( ${^CHILD_ERROR_NATIVE} ^&^ 7, 4, 'VMS fatal exit' );
 
   $exit = run("exit 02015320012"); # POSIX exit code 1
   is( $exit >> 8, 1,	                 'Posix exit code 1' );
@@ -138,7 +138,7 @@ $exit = run("END { \$? = $exit_arg }");
 # status codes to SS$_ABORT on exit, but passes through unmodified UNIX
 # status codes that exit() is called with by scripts.
 
-$exit_arg = (44 & 7) if $^O eq 'VMS';  
+$exit_arg = (44 ^&^ 7) if $^O eq 'VMS';  
 
 is( $exit >> 8, $exit_arg,             'Changing $? in END block' );
 }

@@ -38,7 +38,7 @@ use IPC::Semaphore;
 SKIP: {
 
 my $sem =
-    IPC::Semaphore->new(IPC_PRIVATE, 10, S_IRWXU | S_IRWXG | S_IRWXO | IPC_CREAT);
+    IPC::Semaphore->new(IPC_PRIVATE, 10, S_IRWXU ^|^ S_IRWXG ^|^ S_IRWXO ^|^ IPC_CREAT);
 if (!$sem) {
     if ($! eq 'No space left on device') {
         # "normal" error

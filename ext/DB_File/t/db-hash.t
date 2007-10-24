@@ -138,7 +138,7 @@ ok(14, $@ =~ /^DB_File::HASHINFO::FETCH - Unknown element 'fred' at/ );
 
 # Now check the interface to HASH
 my ($X, %h);
-ok(15, $X = tie(%h, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+ok(15, $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 die "Could not tie: $!" unless $X;
 
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
@@ -146,7 +146,7 @@ my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
 
 my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
 
-ok(16, ($mode & 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640) ||
+ok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640) ||
    $noMode{$^O} );
 
 my ($key, $value, $i);
@@ -348,7 +348,7 @@ unlink $Dfile;
 # clear
 # #####
 
-ok(44, tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+ok(44, tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 foreach (1 .. 10)
   { $h{$_} = $_ * 100 }
 
@@ -374,7 +374,7 @@ unlink $Dfile ;
 
 
 # Now try an in memory file
-ok(47, $X = tie(%h, 'DB_File',undef, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+ok(47, $X = tie(%h, 'DB_File',undef, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
 # fd with an in memory file should return fail
 $status = $X->fd ;
@@ -390,7 +390,7 @@ untie %h ;
     my $hi = DB_File::HASHINFO->new() ;
     $::count = 0 ;
     $hi->{hash} = sub { ++$::count ; length $_[0] } ;
-    ok(49, tie %x, 'DB_File', $filename, O_RDWR|O_CREAT, 0640, $hi ) ;
+    ok(49, tie %x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $hi ) ;
     $h{"abc"} = 123 ;
     ok(50, $h{"abc"} == 123) ;
     untie %x ;
@@ -403,7 +403,7 @@ untie %h ;
 
     my $filename = "xyz" ;
     my @x ;
-    eval { tie @x, 'DB_File', $filename, O_RDWR|O_CREAT, 0640, $DB_HASH ; } ;
+    eval { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_HASH ; } ;
     ok(52, $@ =~ /^DB_File can only tie an associative array to a DB_HASH database/) ;
     unlink $filename ;
 }
@@ -533,7 +533,7 @@ EOM
 	   $_ eq 'original' ;
    }
    
-   ok(63, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+   ok(63, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
    $db->filter_fetch_key   (sub { $fetch_key = $_ }) ;
    $db->filter_store_key   (sub { $store_key = $_ }) ;
@@ -646,7 +646,7 @@ EOM
     my (%h, $db) ;
 
     unlink $Dfile;
-    ok(92, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+    ok(92, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
     my %result = () ;
 
@@ -709,7 +709,7 @@ EOM
    my (%h, $db) ;
    unlink $Dfile;
 
-   ok(115, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+   ok(115, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
    $db->filter_store_key (sub { $_ = $h{$_} }) ;
 
@@ -735,7 +735,7 @@ EOM
     our (%h, $k, $v);
 
     unlink "fruit" ;
-    tie %h, "DB_File", "fruit", O_RDWR|O_CREAT, 0640, $DB_HASH 
+    tie %h, "DB_File", "fruit", O_RDWR^|^O_CREAT, 0640, $DB_HASH 
         or die "Cannot open file 'fruit': $!\n";
 
     # Add a few key/value pairs to the file
@@ -824,7 +824,7 @@ EOM
     my $bad_key = 0 ;
     my %h = () ;
     my $db ;
-    ok(120, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+    ok(120, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
     $db->filter_store_key (sub { $bad_key = 1 if /^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
 
@@ -903,8 +903,8 @@ EOM
  
  
     my (%h);
-    ok(127, tie(%hash1, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $dbh1 ) );
-    ok(128, tie(%hash2, 'DB_File',$Dfile2, O_RDWR|O_CREAT, 0640, $dbh2 ) );
+    ok(127, tie(%hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $dbh1 ) );
+    ok(128, tie(%hash2, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) );
 
     $hash1{DEFG} = 5;
     $hash1{XYZ} = 2;
@@ -937,7 +937,7 @@ EOM
     $warn_count = 0;
     untie %hash1;
     unlink $Dfile;
-    tie %hash1, 'DB_File',$Dfile, O_RDWR|O_CREAT, undef;
+    tie %hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, undef;
     ok(134, $warn_count == 0);
     untie %hash1;
     unlink $Dfile;
@@ -958,7 +958,7 @@ EOM
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   ok(136, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+   ok(136, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
    $db->filter_fetch_key   (sub { }) ;
    $db->filter_store_key   (sub { }) ;
@@ -1003,7 +1003,7 @@ EOM
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   ok(142, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+   ok(142, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
 
    $db->filter_fetch_key   (sub { $_ = unpack("i", $_) } );
@@ -1055,7 +1055,7 @@ EOM
     my $Dfile = "xxy.db";
     unlink $Dfile;
 
-    ok(152, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+    ok(152, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
     my $warned = '';
     local $SIG{__WARN__} = sub {$warned = $_[0]} ;
@@ -1168,7 +1168,7 @@ EOM
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   ok(162, $db = tie(%h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_HASH ) );
+   ok(162, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
 
    {

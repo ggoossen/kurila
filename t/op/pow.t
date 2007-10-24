@@ -6,7 +6,7 @@ BEGIN {
 }
 
 # This calcualtion ought to be within 0.001 of the right answer.
-my $bits_in_uv = int (0.001 + log (~0+1) / log 2);
+my $bits_in_uv = int (0.001 + log (^~^0+1) / log 2);
 
 # 3**30 < 2**48, don't trust things outside that range on a Cray
 # Likewise other 3 should not overflow 48 bits if I did my sums right.
@@ -44,10 +44,10 @@ is(-3**3, -27);
 
 # Ought to be 32, 64, 36 or something like that.
 
-my $remainder = $bits_in_uv & 3;
+my $remainder = $bits_in_uv ^&^ 3;
 
 cmp_ok ($remainder, '==', 0, 'Sanity check bits in UV calculation')
-    or printf "# ~0 is %d (0x%d) which gives $bits_in_uv bits\n", ~0, ~0;
+    or printf "# ~0 is %d (0x%d) which gives $bits_in_uv bits\n", ^~^0, ^~^0;
 
 # These are a lot of brute force tests to see how accurate $m ** $n is.
 # Unfortunately rather a lot of perl programs expect 2 ** $n to be integer

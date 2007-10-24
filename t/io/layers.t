@@ -32,8 +32,8 @@ my $DOSISH    = $^O =~ /^(?:MSWin32|os2|dos|NetWare|mint)$/ ? 1 : 0;
 my $NONSTDIO  = exists $ENV{PERLIO} && $ENV{PERLIO} ne 'stdio'     ? 1 : 0;
 my $FASTSTDIO = $Config{d_faststdio} && $Config{usefaststdio}      ? 1 : 0;
 my $UTF8_STDIN;
-if (${^UNICODE} & 1) {
-    if (${^UNICODE} & 64) {
+if (${^UNICODE} ^&^ 1) {
+    if (${^UNICODE} ^&^ 64) {
 	# Conditional on the locale
 	$UTF8_STDIN = ${^UTF8LOCALE};
     } else {
@@ -184,7 +184,7 @@ SKIP: {
 
 	check([ @results ],
 	      [ "stdio",    undef,        sub { $_[0] > 0 },
-		"encoding", "iso-8859-1", sub { $_[0] & PerlIO::F_UTF8() } ],
+		"encoding", "iso-8859-1", sub { $_[0] ^&^ PerlIO::F_UTF8() } ],
 	      ":raw:encoding(latin1)");
     }
 

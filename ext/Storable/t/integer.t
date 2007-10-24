@@ -30,20 +30,20 @@ use Test::More;
 use Storable qw (dclone store retrieve freeze thaw nstore nfreeze);
 use strict;
 
-my $max_uv = ~0;
-my $max_uv_m1 = ~0 ^ 1;
+my $max_uv = ^~^0;
+my $max_uv_m1 = ^~^0 ^^^ 1;
 # Express it in this way so as not to use any addition, as 5.6 maths would
 # do this in NVs on 64 bit machines, and we're overflowing IVs so can't use
 # use integer.
-my $max_iv_p1 = $max_uv ^ ($max_uv >> 1);
+my $max_iv_p1 = $max_uv ^^^ ($max_uv >> 1);
 my $lots_of_9C = do {
-  my $temp = sprintf "%#x", ~0;
+  my $temp = sprintf "%#x", ^~^0;
   $temp =~ s/ff/9c/g;
   local $^W;
   eval $temp;
 };
 
-my $max_iv = ~0 >> 1;
+my $max_iv = ^~^0 >> 1;
 my $min_iv = do {use integer; -$max_iv-1}; # 2s complement assumption
 
 my @processes = (["dclone", \&do_clone],
@@ -159,7 +159,7 @@ foreach (@processes) {
       my $copy_s3 = eval $copy_s1;
       die "Was supposed to have number $copy_s3, got error $@"
 	unless defined $copy_s3;
-      my $bit = ok (($copy_s3 ^ $copy1) == 0, "$process $copy1 (bitpattern)");
+      my $bit = ok (($copy_s3 ^^^ $copy1) == 0, "$process $copy1 (bitpattern)");
       # This is sick. 5.005_03 survives without the IV/UV flag, and somehow
       # gets it right, providing you don't have side effects of conversion.
 #      local $TODO;

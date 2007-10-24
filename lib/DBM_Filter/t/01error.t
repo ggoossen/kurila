@@ -66,7 +66,7 @@ END { unlink glob("Op_dbmx*"); }
 
 my %h1 = () ;
 my %h2 = () ;
-$db = tie(%h1, $db_file,'Op_dbmx', O_RDWR|O_CREAT, 0640) ;
+$db = tie(%h1, $db_file,'Op_dbmx', O_RDWR^|^O_CREAT, 0640) ;
 
 ok $db, "tied to $db_file ok";
 

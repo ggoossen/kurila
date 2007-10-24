@@ -203,11 +203,11 @@ ok(16, $@ =~ /^DB_File::RECNOINFO::FETCH - Unknown element 'fred' at/ );
 
 my $X  ;
 my @h ;
-ok(17, $X = tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO ) ;
+ok(17, $X = tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) ;
 
 my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
 
-ok(18, ((stat($Dfile))[2] & 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
+ok(18, ((stat($Dfile))[2] ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
 	||  $noMode{$^O} );
 
 #my $l = @h ;
@@ -332,7 +332,7 @@ unlink $Dfile;
 
     my @h = () ;
     my $dbh = DB_File::RECNOINFO->new() ;
-    ok(59, tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $dbh ) ;
+    ok(59, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
     $h[0] = "abc" ;
     $h[1] = "def" ;
     $h[3] = "ghi" ;
@@ -348,7 +348,7 @@ unlink $Dfile;
     my @h = () ;
     my $dbh = DB_File::RECNOINFO->new() ;
     $dbh->{bval} = "-" ;
-    ok(62, tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $dbh ) ;
+    ok(62, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
     $h[0] = "abc" ;
     $h[1] = "def" ;
     $h[3] = "ghi" ;
@@ -367,7 +367,7 @@ unlink $Dfile;
     my $dbh = DB_File::RECNOINFO->new() ;
     $dbh->{flags} = R_FIXEDLEN ;
     $dbh->{reclen} = 5 ;
-    ok(65, tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $dbh ) ;
+    ok(65, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
     $h[0] = "abc" ;
     $h[1] = "def" ;
     $h[3] = "ghi" ;
@@ -387,7 +387,7 @@ unlink $Dfile;
     $dbh->{flags} = R_FIXEDLEN ;
     $dbh->{bval} = "-" ;
     $dbh->{reclen} = 5 ;
-    ok(68, tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $dbh ) ;
+    ok(68, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
     $h[0] = "abc" ;
     $h[1] = "def" ;
     $h[3] = "ghi" ;
@@ -404,7 +404,7 @@ unlink $Dfile;
 
     my $filename = "xyz" ;
     my %x ;
-    eval { tie %x, 'DB_File', $filename, O_RDWR|O_CREAT, 0640, $DB_RECNO ; } ;
+    eval { tie %x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ; } ;
     ok(71, $@ =~ /^DB_File can only tie an array to a DB_RECNO database/) ;
     unlink $filename ;
 }
@@ -510,7 +510,7 @@ EOM
     # test $#
     my $self ;
     unlink $Dfile;
-    ok(83, $self = tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO ) ;
+    ok(83, $self = tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) ;
     $h[0] = "abc" ;
     $h[1] = "def" ;
     $h[2] = "ghi" ;
@@ -593,7 +593,7 @@ EOM
 	   $_ eq 'original' ;
    }
    
-   ok(99, $db = tie(@h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO ) );
+   ok(99, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) );
 
    $db->filter_fetch_key   (sub { $fetch_key = $_ }) ;
    $db->filter_store_key   (sub { $store_key = $_ }) ;
@@ -690,7 +690,7 @@ EOM
     my (@h, $db) ;
 
     unlink $Dfile;
-    ok(121, $db = tie(@h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO ) );
+    ok(121, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) );
 
     my %result = () ;
 
@@ -753,7 +753,7 @@ EOM
    my (@h, $db) ;
    unlink $Dfile;
 
-   ok(145, $db = tie(@h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO ) );
+   ok(145, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) );
 
    $db->filter_store_key (sub { $_ = $h[0] }) ;
 
@@ -781,7 +781,7 @@ EOM
     unlink $filename ;
 
     my @h ;
-    my $x = tie @h, "DB_File", $filename, O_RDWR|O_CREAT, 0640, $DB_RECNO 
+    my $x = tie @h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_RECNO 
         or die "Cannot open file 'text': $!\n" ;
 
     # Add a few key/value pairs to the file
@@ -839,7 +839,7 @@ EOM
 
     unlink $file ;
 
-    $H = tie @h, "DB_File", $file, O_RDWR|O_CREAT, 0640, $DB_RECNO 
+    $H = tie @h, "DB_File", $file, O_RDWR^|^O_CREAT, 0640, $DB_RECNO 
         or die "Cannot open file $file: $!\n" ;
     
     # first create a text file to play with
@@ -946,7 +946,7 @@ EOM
     my $a = "";
     local $SIG{__WARN__} = sub {$a = $_[0]} ;
     
-    tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0664, $DB_RECNO 
+    tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_RECNO 
 	or die "Can't open file: $!\n" ;
     $h[0] = undef;
     ok(150, $a eq "") ;
@@ -966,7 +966,7 @@ EOM
     unlink $Dfile;
     my @h ;
     
-    tie @h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0664, $DB_RECNO 
+    tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_RECNO 
 	or die "Can't open file: $!\n" ;
     @h = (); ;
     ok(152, $a eq "") ;
@@ -982,7 +982,7 @@ EOM
    my (@h, $db) ;
    unlink $Dfile;
 
-   ok(154, $db = tie(@h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO ) );
+   ok(154, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) );
 
    $db->filter_fetch_key   (sub { }) ;
    $db->filter_store_key   (sub { }) ;
@@ -1025,7 +1025,7 @@ EOM
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   ok(159, $db = tie(@h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO ) );
+   ok(159, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) );
 
 
    $db->filter_fetch_key   (sub { ++ $_ } );
@@ -1078,7 +1078,7 @@ EOM
     my $Dfile = "xxy.db";
     unlink $Dfile;
 
-    ok(169, $db = tie(@h, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0640, $DB_RECNO) );
+    ok(169, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO) );
 
     my $warned = '';
     local $SIG{__WARN__} = sub {$warned = $_[0]} ;
@@ -1204,7 +1204,7 @@ exit unless $FA ;
     unlink $Dfile;
     my @tied ;
     
-    tie @tied, 'DB_File', $Dfile, O_RDWR|O_CREAT, 0664, $DB_RECNO 
+    tie @tied, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_RECNO 
 	or die "Can't open file: $!\n" ;
 
     # uninitialized offset
@@ -1390,7 +1390,7 @@ sub test_splice {
     unlink $tmp;
     
     my @h;
-    my $H = tie @h, 'DB_File', $tmp, O_CREAT|O_RDWR, 0644, $DB_RECNO
+    my $H = tie @h, 'DB_File', $tmp, O_CREAT^|^O_RDWR, 0644, $DB_RECNO
       or die "cannot open $tmp: $!";
 
     my $i = 0;
