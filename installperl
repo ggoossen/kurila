@@ -154,7 +154,7 @@ close SCRIPTS;
 
 if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
 
-my @pods = $nopods ? () : (glob("pod/*.pod"), 'x2p/a2p.pod');
+my @pods = $nopods ? () : (glob("pod/*.pod"));
 
 # Specify here any .pm files that are actually architecture-dependent.
 # (Those included with XS extensions under ext/ are automatically
@@ -316,9 +316,6 @@ if ($Is_VMS) {
         safe_unlink("$installbin/$ndbg$perl$exe_ext");
         copy("$ndbg$perl$exe_ext", "$installbin/$ndbg$perl$exe_ext");
         chmod(0755, "$installbin/$ndbg$perl$exe_ext");
-	safe_unlink("$installbin/${dbg}a2p$exe_ext");
-	copy("x2p/${dbg}a2p$exe_ext", "$installbin/${dbg}a2p$exe_ext");
-	chmod(0755, "$installbin/${dbg}a2p$exe_ext");
     }
 }
 elsif ($^O eq 'mpeix') {
@@ -493,18 +490,6 @@ if ($Config{installusrbinperl} && $Config{installusrbinperl} eq 'define' &&
 	copy($instperl, $usrbinperl);
 
 	$mainperl_is_instperl = 1;
-    }
-}
-
-# Make links to ordinary names if installbin directory isn't current directory.
-if (!$Is_NetWare && $dbg eq '') {
-    if (! samepath($installbin, 'x2p')) {
-	my $base = 'a2p';
-	$base .= $ver if $versiononly;
-	safe_unlink("$installbin/$base$exe_ext");
-	copy("x2p/a2p$exe_ext", "$installbin/$base$exe_ext");
-	strip("$installbin/$base$exe_ext");
-	chmod(0755, "$installbin/$base$exe_ext");
     }
 }
 
