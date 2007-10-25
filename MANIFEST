@@ -3848,8 +3848,6 @@ t/run/switchF.t			Test the -F switch
 t/run/switchI.t			Test the -I switch
 t/run/switchn.t			Test the -n switch
 t/run/switchp.t			Test the -p switch
-t/run/switchPx.aux		Data for switchPx.t
-t/run/switchPx.t		Test the -Px combination
 t/run/switcht.t			Test the -t switch
 t/run/switchx2.aux		Data for switchx.t
 t/run/switchx.aux		Data for switchx.t
