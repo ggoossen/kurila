@@ -91,7 +91,6 @@ my @exe = qw(
     *.SH
     vms/ext/Stdio/test.pl
     vms/ext/filespec.t
-    x2p/*.SH
     Porting/findrfuncs
     Porting/genlog
     Porting/makerel

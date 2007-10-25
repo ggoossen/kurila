@@ -977,13 +977,6 @@ package Maintainers;
 		'FILES'		=> q[ext/DynaLoader/t/XSLoader.t ext/DynaLoader/XSLoader_pm.PL],
 		'CPAN'		=> 1,
 		},
-
-	's2p' =>
-		{
-		'MAINTAINER'	=> 'laun',
-		'FILES'		=> q[x2p/s2p.PL],
-		'CPAN'		=> 0,
-		},
 	);
 
 1;

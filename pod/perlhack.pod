@@ -2134,10 +2134,6 @@ Tests for the core support of Unicode.
 
 Windows-specific tests.
 
-=item F<t/x2p>
-
-A test suite for the s2p converter.
-
 =back
 
 The core uses the same testing style as the rest of Perl, a simple

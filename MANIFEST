@@ -3868,7 +3868,6 @@ t/uni/tr_utf8.t			See if Unicode tr/// in utf8 works
 t/uni/upper.t			See if Unicode casing works
 t/win32/system.t		See if system works in Win*
 t/win32/system_tests		Test runner for system.t
-t/x2p/s2p.t			See if s2p/psed work
 uconfig.h			Configuration header for microperl
 uconfig.sh			Configuration script for microperl
 universal.c			The default UNIVERSAL package methods
@@ -4008,23 +4007,5 @@ win32/wince.c			WinCE port
 win32/wince.h			WinCE port
 win32/wincesck.c		WinCE port
 writemain.SH			Generate perlmain.c from miniperlmain.c+extensions
-x2p/a2p.c			Output of a2p.y run through byacc
-x2p/a2p.h			Global declarations
-x2p/a2p.pod			Pod for awk to perl translator
-x2p/a2p.y			A yacc grammar for awk
-x2p/a2py.c			Awk compiler, sort of
-x2p/cflags.SH			A script that emits C compilation flags per file
-x2p/EXTERN.h			Same as above
-x2p/find2perl.PL		A find to perl translator
-x2p/hash.c			Hashes again
-x2p/hash.h			Public declarations for the above
-x2p/INTERN.h			Same as above
-x2p/Makefile.SH			Precursor to Makefile
-x2p/s2p.PL			Sed to perl translator
-x2p/str.c			String handling package
-x2p/str.h			Public declarations for the above
-x2p/util.c			Utility routines
-x2p/util.h			Public declarations for the above
-x2p/walk.c			Parse tree walker
 XSUB.h				Include file for extension subroutines
 xsutils.c			Additional bundled package methods not in UNIVERSAL::

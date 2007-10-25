@@ -63,11 +63,9 @@ case "$ccname" in
     gcc) LC_ALL=C ; export LC_ALL ;;
 esac
 
-# We need .. when we are in the x2p directory if we are using the
-# cppstdin wrapper script.
-# Put .. and . first so that we pick up the present cppstdin, not
+# Put . first so that we pick up the present cppstdin, not
 # an older one lying about in /usr/local/bin.
-PATH=".$path_sep..$path_sep$PATH"
+PATH=".$path_sep$PATH"
 export PATH
 
 case "$osname" in
