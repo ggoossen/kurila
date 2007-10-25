@@ -130,7 +130,6 @@ my $x = pi;
 ########
 -OS_Code => $a
 ########
-# TODO encoding stuff.
 use encoding 'euc-jp';
 tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
 ########
@@ -213,3 +212,11 @@ ok my $x = "foobar";
 # LABLE without a statement.
  LABLE: ;
  LABLE: $a;
+########
+# TODO pod with invalid UTF-8
+=head3 Gearman
+
+I know Ask Bj�rn Hansen has implemented a transport for the C<gearman> distributed
+job system, though it's not on CPAN at the time of writing this.
+
+=head1 CONNECTING
