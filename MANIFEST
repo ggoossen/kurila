@@ -1981,18 +1981,6 @@ lib/Log/Message/t/02_Log-Message.t	Log::Message tests
 lib/Log/Message/t/conf/config_file	Log::Message tests
 lib/Log/Message/t/conf/LoadMe.pl	Log::Message tests
 lib/look.pl			A "look" equivalent
-lib/Math/BigRat.pm		Math::BigRat
-lib/Math/BigRat/t/big_ap.t		Math::BigRat test
-lib/Math/BigRat/t/bigfltpm.inc		Math::BigRat test
-lib/Math/BigRat/t/bigfltrt.t		Math::BigRat test
-lib/Math/BigRat/t/biglog.t		Math::BigRat test
-lib/Math/BigRat/t/bigratpm.inc		Math::BigRat test
-lib/Math/BigRat/t/bigratpm.t		Math::BigRat test
-lib/Math/BigRat/t/bigrat.t		Math::BigRat test
-lib/Math/BigRat/t/bigratup.t	test under $Math::BigInt::upgrade
-lib/Math/BigRat/t/bigroot.t		Math::BigRat test
-lib/Math/BigRat/t/requirer.t	see if require works properly
-lib/Math/BigRat/t/trap.t	see if trap_nan and trap_inf work
 lib/Math/Complex.pm		A Complex package
 lib/Math/Complex.t		See if Math::Complex works
 lib/Math/Trig.pm		A simple interface to complex trigonometry
@@ -3385,7 +3373,6 @@ t/lib/MakeMaker/Test/Setup/PL_FILES.pm	MakeMaker test utilities
 t/lib/MakeMaker/Test/Setup/Problem.pm	MakeMaker test utilities
 t/lib/MakeMaker/Test/Setup/Recurs.pm	MakeMaker test utilities
 t/lib/MakeMaker/Test/Utils.pm	MakeMaker test utilities
-t/lib/Math/BigRat/Test.pm		Math::BigRat test helper
 t/lib/mypragma.pm		An example user pragma
 t/lib/mypragma.t		Test the example user pragma
 t/lib/NoExporter.pm			Part of Test-Simple
