@@ -1611,8 +1611,9 @@ my $pmfile = __FILE__;
 open FH, $pmfile or die "Could not open '$pmfile': $!";
 local $/ = "";
 my @podpara;
+my $in_over;
 while (<FH>) {
-    next if 1 .. /^=over/;
+    next if not $in_over = /^=over/;
     chomp;
     push @podpara, $_;
     last if /^=back/;

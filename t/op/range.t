@@ -5,7 +5,7 @@ require './test.pl';
 
 use Config;
 
-plan (45);
+plan (46);
 
 our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 
@@ -186,3 +186,6 @@ is(join(":", map "[$_]", @foo), '[]');
     @foo=(); push @foo, $_ for $1.."";
     is(join(":", map "[$_]", @foo), '');
 }
+
+eval 'scalar(1..3)';
+like($@, qr/range operator \.\. can only be used in list context/);
