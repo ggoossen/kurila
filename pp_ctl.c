@@ -536,10 +536,7 @@ PP(pp_range)
     dVAR;
     if (GIMME == G_ARRAY)
 	return NORMAL;
-    if (SvTRUEx(PAD_SV(PL_op->op_targ)))
-	return cLOGOP->op_other;
-    else
-	return NORMAL;
+    DIE(aTHX_ "range operator .. can only be used in list context.");
 }
 
 PP(pp_flip)
@@ -547,43 +544,8 @@ PP(pp_flip)
     dVAR;
     dSP;
 
-    if (GIMME == G_ARRAY) {
-	RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
-    }
-    else {
-	dTOPss;
-	SV * const targ = PAD_SV(PL_op->op_targ);
-	int flip = 0;
-
-	if (PL_op->op_private & OPpFLIP_LINENUM) {
-	    if (GvIO(PL_last_in_gv)) {
-		flip = SvIV(sv) == (IV)IoLINES(GvIOp(PL_last_in_gv));
-	    }
-	    else {
-		GV * const gv = gv_fetchpvs(".", GV_ADD|GV_NOTQUAL, SVt_PV);
-		if (gv && GvSV(gv))
-		    flip = SvIV(sv) == SvIV(GvSV(gv));
-	    }
-	} else {
-	    flip = SvTRUE(sv);
-	}
-	if (flip) {
-	    sv_setiv(PAD_SV(cUNOP->op_first->op_targ), 1);
-	    if (PL_op->op_flags & OPf_SPECIAL) {
-		sv_setiv(targ, 1);
-		SETs(targ);
-		RETURN;
-	    }
-	    else {
-		sv_setiv(targ, 0);
-		SP--;
-		RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
-	    }
-	}
-	sv_setpvn(TARG, "", 0);
-	SETs(targ);
-	RETURN;
-    }
+    assert(GIMME == G_ARRAY);
+    RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
 }
 
 /* This code tries to decide if "$left .. $right" should use the
@@ -601,72 +563,46 @@ PP(pp_flop)
 {
     dVAR; dSP;
 
-    if (GIMME == G_ARRAY) {
-	dPOPPOPssrl;
+    assert(GIMME == G_ARRAY);
+    dPOPPOPssrl;
 
-	SvGETMAGIC(left);
-	SvGETMAGIC(right);
+    SvGETMAGIC(left);
+    SvGETMAGIC(right);
 
-	if (RANGE_IS_NUMERIC(left,right)) {
-	    register IV i, j;
-	    IV max;
-	    if ((SvOK(left) && SvNV(left) < IV_MIN) ||
-		(SvOK(right) && SvNV(right) > IV_MAX))
-		DIE(aTHX_ "Range iterator outside integer range");
-	    i = SvIV(left);
-	    max = SvIV(right);
-	    if (max >= i) {
-		j = max - i + 1;
-		EXTEND_MORTAL(j);
-		EXTEND(SP, j);
-	    }
-	    else
-		j = 0;
-	    while (j--) {
-		SV * const sv = sv_2mortal(newSViv(i++));
-		PUSHs(sv);
-	    }
+    if (RANGE_IS_NUMERIC(left,right)) {
+	register IV i, j;
+	IV max;
+	if ((SvOK(left) && SvNV(left) < IV_MIN) ||
+	    (SvOK(right) && SvNV(right) > IV_MAX))
+	    DIE(aTHX_ "Range iterator outside integer range");
+	i = SvIV(left);
+	max = SvIV(right);
+	if (max >= i) {
+	    j = max - i + 1;
+	    EXTEND_MORTAL(j);
+	    EXTEND(SP, j);
 	}
-	else {
-	    SV * const final = sv_mortalcopy(right);
-	    STRLEN len;
-	    const char * const tmps = SvPV_const(final, len);
-
-	    SV *sv = sv_mortalcopy(left);
-	    SvPV_force_nolen(sv);
-	    while (!SvNIOKp(sv) && SvCUR(sv) <= len) {
-		XPUSHs(sv);
-	        if (strEQ(SvPVX_const(sv),tmps))
-	            break;
-		sv = sv_2mortal(newSVsv(sv));
-		sv_inc(sv);
-	    }
+	else
+	    j = 0;
+	while (j--) {
+	    SV * const sv = sv_2mortal(newSViv(i++));
+	    PUSHs(sv);
 	}
     }
     else {
-	dTOPss;
-	SV * const targ = PAD_SV(cUNOP->op_first->op_targ);
-	int flop = 0;
-	sv_inc(targ);
+	SV * const final = sv_mortalcopy(right);
+	STRLEN len;
+	const char * const tmps = SvPV_const(final, len);
 
-	if (PL_op->op_private & OPpFLIP_LINENUM) {
-	    if (GvIO(PL_last_in_gv)) {
-		flop = SvIV(sv) == (IV)IoLINES(GvIOp(PL_last_in_gv));
-	    }
-	    else {
-		GV * const gv = gv_fetchpvs(".", GV_ADD|GV_NOTQUAL, SVt_PV);
-		if (gv && GvSV(gv)) flop = SvIV(sv) == SvIV(GvSV(gv));
-	    }
+	SV *sv = sv_mortalcopy(left);
+	SvPV_force_nolen(sv);
+	while (!SvNIOKp(sv) && SvCUR(sv) <= len) {
+	    XPUSHs(sv);
+	    if (strEQ(SvPVX_const(sv),tmps))
+		break;
+	    sv = sv_2mortal(newSVsv(sv));
+	    sv_inc(sv);
 	}
-	else {
-	    flop = SvTRUE(sv);
-	}
-
-	if (flop) {
-	    sv_setiv(PAD_SV(((UNOP*)cUNOP->op_first)->op_first->op_targ), 0);
-	    sv_catpvs(targ, "E0");
-	}
-	SETs(targ);
     }
 
     RETURN;
