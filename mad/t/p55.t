@@ -219,4 +219,8 @@ ok my $x = "foobar";
 I know Ask Bj√rn Hansen has implemented a transport for the C<gearman> distributed
 job system, though it's not on CPAN at the time of writing this.
 
-=head1 CONNECTING
+=cut
+########
+# TODO do not execute CHECK block
+CHECK { die; }
+
