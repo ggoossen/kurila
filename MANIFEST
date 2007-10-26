@@ -1336,18 +1336,6 @@ global.sym			Symbols that need hiding when embedded
 globvar.sym			Global variables that need hiding when embedded
 gv.c				Glob value code
 gv.h				Glob value header
-h2pl/cbreak2.pl			cbreak routines using .pl
-h2pl/cbreak.pl			cbreak routines using .ph
-h2pl/eg/sizeof.ph		Sample sizeof array initialization
-h2pl/eg/sys/errno.pl		Sample translated errno.pl
-h2pl/eg/sysexits.pl		Sample translated sysexits.pl
-h2pl/eg/sys/ioctl.pl		Sample translated ioctl.pl
-h2pl/getioctlsizes		Program to extract types from ioctl.h
-h2pl/mksizes			Program to make %sizeof array
-h2pl/mkvars			Program to make .pl from .ph files
-h2pl/README			How to turn .ph files into .pl files
-h2pl/tcbreak			cbreak test routine using .ph
-h2pl/tcbreak2			cbreak test routine using .pl
 handy.h				Handy definitions
 hints/3b1cc			Hints for named architecture
 hints/3b1.sh			Hints for named architecture
