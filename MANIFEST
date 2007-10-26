@@ -1457,7 +1457,6 @@ intrpvar.h			Variables held in each interpreter instance
 iperlsys.h			Perl's interface to the system
 keywords.h			The keyword numbers
 keywords.pl			Program to write keywords.h
-lib/abbrev.pl			An abbreviation table builder
 lib/AnyDBM_File.pm		Perl module to emulate dbmopen
 lib/AnyDBM_File.t		See if AnyDBM_File works
 lib/Archive/Extract.pm	Archive::Extract
@@ -1514,17 +1513,11 @@ lib/base/t/version.t		See if base works with versions
 lib/base/t/warnings.t		See if base works with warnings
 lib/Benchmark.pm		Measure execution time
 lib/Benchmark.t			See if Benchmark works
-lib/bigfloat.pl			An arbitrary precision floating point package
-lib/bigfloatpl.t		See if bigfloat.pl works
-lib/bigint.pl			An arbitrary precision integer arithmetic package
-lib/bigintpl.t			See if bigint.pl works
-lib/bigrat.pl			An arbitrary precision rational arithmetic package
 lib/blib.pm			For "use blib"
 lib/blib.t			blib.pm test
 lib/bytes_heavy.pl		Support routines for byte pragma
 lib/bytes.pm			Pragma to enable byte operations
 lib/bytes.t			bytes.pm test
-lib/cacheout.pl			Manages output filehandles when you need too many
 lib/Carp/Heavy.pm		Error message workhorse
 lib/Carp.pm			Error message base class
 lib/Carp.t			See if Carp works
@@ -1586,7 +1579,6 @@ lib/Class/ISA/t/00_about_verbose.t	Tests for Class::ISA
 lib/Class/ISA/t/01_old_junk.t	Tests for Class::ISA
 lib/Class/Struct.pm		Declare struct-like datatypes as Perl classes
 lib/Class/Struct.t		See if Class::Struct works
-lib/complete.pl			A command completion subroutine
 lib/compsub.pm			Module for defining compilation subroutines
 lib/compsub.t			See if defining compilation subroutines works
 lib/Config/Extensions.pm	Convenient hash lookup for built extensions
@@ -1651,7 +1643,6 @@ lib/Digest/t/digest.t		See if Digest extensions work
 lib/Digest/t/file.t		See if Digest extensions work
 lib/DirHandle.pm		like FileHandle only for directories
 lib/DirHandle.t			See if DirHandle works
-lib/dotsh.pl			Code to "dot" in a shell script
 lib/Dumpvalue.pm		Screen dump of perl values
 lib/Dumpvalue.t			See if Dumpvalue works
 lib/dumpvar.pl			A variable dumper
@@ -1661,7 +1652,6 @@ lib/English.t			See if English works
 lib/Env.pm			Map environment into ordinary variables
 lib/Env/t/array.t		See if Env works for arrays
 lib/Env/t/env.t			See if Env works
-lib/exceptions.pl		catch and throw routines
 lib/Exporter/Heavy.pm		Complicated routines for Exporter
 lib/Exporter.pm			Exporter base class
 lib/Exporter.t			See if Exporter works
@@ -1782,7 +1772,6 @@ lib/ExtUtils/t/writemakefile_args.t	See if WriteMakefile works
 lib/ExtUtils/t/xs.t		Part of MakeMaker's test suite
 lib/ExtUtils/typemap		Extension interface types
 lib/ExtUtils/xsubpp		External subroutine preprocessor
-lib/fastcwd.pl			a faster but more dangerous getcwd
 lib/Fatal.pm			Make errors in functions/builtins fatal
 lib/Fatal.t			See if Fatal works
 lib/feature.pm			Pragma to enable new syntax
@@ -1843,26 +1832,18 @@ lib/filetest.pm			For "use filetest"
 lib/filetest.t			See if filetest works
 lib/FindBin.pm			Find name of currently executing program
 lib/FindBin.t			See if FindBin works
-lib/finddepth.pl		A depth-first find emulator--used by find2perl
-lib/find.pl			A find emulator--used by find2perl
-lib/flush.pl			Routines to do single flush
-lib/getcwd.pl			A getcwd() emulator
 lib/Getopt/Long/CHANGES		Getopt::Long changes
 lib/Getopt/Long.pm		Fetch command options (GetOptions)
 lib/Getopt/Long/README		Getopt::Long README
 lib/Getopt/Long/t/gol-basic.t	See if Getopt::Long works
-lib/Getopt/Long/t/gol-compat.t	See if Getopt::Long works
 lib/Getopt/Long/t/gol-linkage.t	See if Getopt::Long works
 lib/Getopt/Long/t/gol-oo.t	See if Getopt::Long works
 lib/Getopt/Long/t/gol-xargv.t	See if Getopt::Long works
 lib/Getopt/Long/t/gol-xstring.t	See if Getopt::Long works
-lib/getopt.pl			Perl library supporting option parsing
-lib/getopts.pl			Perl library supporting option parsing
 lib/Getopt/Std.pm		Fetch command options (getopt, getopts)
 lib/Getopt/Std.t		See if Getopt::Std and Getopt::Long work
 lib/h2ph.t			See if h2ph works like it should
 lib/h2xs.t			See if h2xs produces expected lists of files
-lib/hostname.pl			Old hostname code
 lib/I18N/Collate.pm		Routines to do strxfrm-based collation
 lib/I18N/Collate.t		See if I18N::Collate works
 lib/I18N/LangTags/ChangeLog	I18N::LangTags
@@ -1956,7 +1937,6 @@ lib/Log/Message/t/01_Log-Message-Config.t	Log::Message tests
 lib/Log/Message/t/02_Log-Message.t	Log::Message tests
 lib/Log/Message/t/conf/config_file	Log::Message tests
 lib/Log/Message/t/conf/LoadMe.pl	Log::Message tests
-lib/look.pl			A "look" equivalent
 lib/Math/Complex.pm		A Complex package
 lib/Math/Complex.t		See if Math::Complex works
 lib/Math/Trig.pm		A simple interface to complex trigonometry
@@ -2125,7 +2105,6 @@ lib/Net/t/nntp.t		libnet
 lib/Net/t/require.t		libnet
 lib/Net/t/smtp.t		libnet
 lib/Net/t/time.t		libnet
-lib/newgetopt.pl		A perl library supporting long option parsing
 lib/NEXT/Changes		NEXT
 lib/NEXT.pm			Pseudo-class NEXT for method redispatch
 lib/NEXT/README			NEXT
@@ -2395,7 +2374,6 @@ lib/Pod/t/Usage.t		See if Pod::Usage works
 lib/Pod/t/user.t		See if Pod::LaTeX works
 lib/Pod/t/utils.t		Test for Pod::ParseUtils
 lib/Pod/Usage.pm		Pod-Parser - print usage messages
-lib/pwd.pl			Routines to keep track of PWD environment variable
 lib/Search/Dict.pm		Perform binary search on dictionaries
 lib/Search/Dict.t		See if Search::Dict works
 lib/SelectSaver.pm		Enforce proper select scoping
@@ -2423,7 +2401,6 @@ lib/Term/ANSIColor/ChangeLog	Term::ANSIColor
 lib/Term/ANSIColor.pm		Perl module supporting termcap usage
 lib/Term/ANSIColor/README	Term::ANSIColor
 lib/Term/ANSIColor/t/basic.t	Tests for Term::ANSIColor
-lib/termcap.pl			Perl library supporting termcap usage
 lib/Term/Cap.pm			Perl module supporting termcap usage
 lib/Term/Cap.t			See if Term::Cap works
 lib/Term/Complete.pm		A command completion subroutine
