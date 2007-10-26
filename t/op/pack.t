@@ -10,7 +10,7 @@ my $no_endianness = $] > 5.009 ? '' :
 my $no_signedness = $] > 5.009 ? '' :
   "Signed/unsigned pack modifiers not available on this perl";
 
-plan tests => 14651;
+plan tests => 14650;
 
 use strict;
 use warnings qw(FATAL all);
@@ -168,12 +168,6 @@ sub list_eq ($$) {
 
     is(scalar(@y), 2);
     is($y[1], 130);
-    $x = pack('w*', 5000000000); $y = '';
-    eval {
-    use Math::BigInt;
-    $y = pack('w*', 'Math::BigInt'->new(5000000000));
-    };
-    is($x, $y);
 
     $x = pack 'w', ^~^0;
     $y = pack 'w', (^~^0).'';

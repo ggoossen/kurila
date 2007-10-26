@@ -141,8 +141,8 @@ if ($] >= 5.006) {
     eval '
         $a = []; $#$a = 2; $a->[1] = undef;
         $b = thaw freeze $a;
-        @a = map { ~~ exists $a->[$_] } 0 .. $#$a;
-        @b = map { ~~ exists $b->[$_] } 0 .. $#$b;
+        @a = map { exists $a->[$_] } 0 .. $#$a;
+        @b = map { exists $b->[$_] } 0 .. $#$b;
         ok 20, "@a" eq "@b";
     ';
 }
