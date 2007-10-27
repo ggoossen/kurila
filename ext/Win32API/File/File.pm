@@ -182,11 +182,11 @@ sub fileConstant
 	Carp::croak( 'Usage: ',__PACKAGE__,'::fileConstant("CONST_NAME")' );
     }
     my $proto= prototype $name;
-    if(  defined \&$name
+    if(  defined \&*{Symbol::fetch_glob($name)}
      &&  defined $proto
      &&  "" eq $proto  ) {
 	no strict 'refs';
-	return &$name;
+	return &*{Symbol::fetch_glob($name)};
     }
     return undef;
 }
@@ -301,15 +301,15 @@ sub OsFHandleOpen {
 	    $pref= "<";
 	}
     }
-    $mode |= O_APPEND   if  $access =~ /a/i;
+    $mode ^|^= O_APPEND   if  $access =~ /a/i;
     #$mode |= O_TEXT   if  $access =~ /t/i;
     # Some versions of the Fcntl module are broken and won't autoload O_TEXT:
     if(  $access =~ /t/i  ) {
 	my $o_text= eval "O_TEXT";
 	$o_text= 0x4000   if  $@;
-	$mode |= $o_text;
+	$mode ^|^= $o_text;
     }
-    $mode |= O_BINARY   if  $access =~ /b/i;
+    $mode ^|^= O_BINARY   if  $access =~ /b/i;
     my $fd = eval { OsFHandleOpenFd( $osfh, $mode ) };
     if ($@) {
 	return tie *{$fh}, __PACKAGE__, $osfh;
@@ -382,12 +382,12 @@ sub setFilePointer {
     my ($pos_low, $pos_high) = ($pos, 0);
 
     if ($_64BITINT) {
-	$pos_low  = ($pos & $FFFFFFFF);
-	$pos_high = (($pos >> $THIRTY_TWO) & $FFFFFFFF);
+	$pos_low  = ($pos ^&^ $FFFFFFFF);
+	$pos_high = (($pos >> $THIRTY_TWO) ^&^ $FFFFFFFF);
     }
     elsif (UNIVERSAL::isa($pos => 'Math::BigInt')) {
-	$pos_low  = ($pos & $FFFFFFFF)->numify();
-	$pos_high = (($pos >> $THIRTY_TWO) & $FFFFFFFF)->numify();
+	$pos_low  = ($pos ^&^ $FFFFFFFF)->numify();
+	$pos_high = (($pos >> $THIRTY_TWO) ^&^ $FFFFFFFF)->numify();
     }
 
     my $retval = SetFilePointer($handle, $pos_low, $pos_high, $from_where);
@@ -416,7 +416,7 @@ sub attrLetsToBits
     foreach(  split(//,$lets)  ) {
 	croak "Win32API::File::attrLetsToBits: Unknown attribute letter ($_)"
 	  unless  exists $a{$_};
-	$bits |= $a{$_};
+	$bits ^|^= $a{$_};
     }
     return $bits;
 }
@@ -444,7 +444,7 @@ sub createFile
         my @err= grep( ! $_createFile_Opts{$_}, keys(%$opts) );
 	@err  and  croak "_createFile:  Invalid options (@err)";
 	$flags= $opts->{Flags}		if  exists( $opts->{Flags} );
-	$flags |= attrLetsToBits( $opts->{Attributes} )
+	$flags ^|^= attrLetsToBits( $opts->{Attributes} )
 					if  exists( $opts->{Attributes} );
 	$sec= $opts->{Security}		if  exists( $opts->{Security} );
 	$model= $opts->{Model}		if  exists( $opts->{Model} );
@@ -459,8 +459,8 @@ sub createFile
 	$create= $c   if  "" ne $c  &&  "" eq $create;
 	local( $_ )= $svAccess;
 	$svAccess= 0;
-	$svAccess |= GENERIC_READ()   if  /r/i;
-	$svAccess |= GENERIC_WRITE()   if  /w/i;
+	$svAccess ^|^= GENERIC_READ()   if  /r/i;
+	$svAccess ^|^= GENERIC_WRITE()   if  /w/i;
     } elsif(  "?" eq $svAccess  ) {
 	croak
 	  "Win32API::File::createFile:  \$svAccess can use the following:\n",
@@ -496,8 +496,8 @@ sub createFile
 	    croak "Win32API::File::createFile: \$create must not use ",
 	      qq<both "c" and "e" ($create)>;
 	}
-	my $r= ( $svAccess & GENERIC_READ() ) == GENERIC_READ();
-	my $w= ( $svAccess & GENERIC_WRITE() ) == GENERIC_WRITE();
+	my $r= ( $svAccess ^&^ GENERIC_READ() ) == GENERIC_READ();
+	my $w= ( $svAccess ^&^ GENERIC_WRITE() ) == GENERIC_WRITE();
 	if(  ! $k  &&  ! $t  &&  ! $n  ) {
 	    if(  $w  &&  ! $r  ) {		$t= 1;
 	    } else {				$k= 1; }
@@ -527,7 +527,7 @@ sub createFile
         my @s= split(//,$svShare);
 	$svShare= 0;
 	foreach( @s ) {
-	    $svShare |= $s{$_};
+	    $svShare ^|^= $s{$_};
 	}
     } elsif(  $svShare == 0  &&  $svShare !~ /^[-+.]*0/  ) {
 	croak "Win32API::File::createFile: Invalid \$svShare ($svShare)";
@@ -744,9 +744,9 @@ sub FILENO {
 	my $mode   = $access eq 'rw' ? O_RDWR :
 		$access eq 'w' ? O_WRONLY : O_RDONLY;
 
-	$mode |= O_APPEND if $self->_append();
+	$mode ^|^= O_APPEND if $self->_append();
 
-	$mode |= O_TEXT   if not $self->_binmode();
+	$mode ^|^= O_TEXT   if not $self->_binmode();
 
 	return $self->_fileno ( OsfHandleOpenFd (
 		$self->win32_handle, $mode

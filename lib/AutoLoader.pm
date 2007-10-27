@@ -1,7 +1,6 @@
 package AutoLoader;
 
 use strict;
-use 5.006_001;
 
 our($VERSION, $AUTOLOAD);
 

@@ -48,7 +48,7 @@ if ($opts{'zip'}) {
     print STDERR "zipping...\n";
   }
   chdir $opts{'distdir'};
-  unlink <*.zip>;
+  unlink glob("*.zip");
   `zip -R perl-$opts{'cross-name'} *`;
   exit;
 }

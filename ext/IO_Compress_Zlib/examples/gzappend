@@ -12,7 +12,7 @@ my $output = shift @ARGV ;
 
 @ARGV = '-' unless @ARGV ;
 
-my $gz = new IO::Compress::Gzip $output, Merge => 1
+my $gz = IO::Compress::Gzip->new( $output, Merge => 1)
      or die "Cannot open $output: $GzipError\n" ;
 
 $gz->write( [@ARGV] )

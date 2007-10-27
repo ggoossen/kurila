@@ -1,6 +1,5 @@
 package File::CheckTree;
 
-use 5.006;
 use Cwd;
 use Exporter;
 use File::Spec;

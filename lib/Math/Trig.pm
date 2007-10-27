@@ -7,7 +7,6 @@
 require Exporter;
 package Math::Trig;
 
-use 5.005;
 use strict;
 
 use Math::Complex 1.36;

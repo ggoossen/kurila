@@ -1,7 +1,6 @@
 # EXTRACT VARIOUSLY DELIMITED TEXT SEQUENCES FROM STRINGS.
 # FOR FULL DOCUMENTATION SEE Balanced.pod
 
-use 5.005;
 use strict;
 
 package Text::Balanced;

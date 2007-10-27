@@ -2,7 +2,6 @@
 # $Id: ucm2table,v 2.1 2006/05/03 18:24:10 dankogai Exp $
 #
 
-use 5.006;
 use strict;
 use Getopt::Std;
 my %Opt;

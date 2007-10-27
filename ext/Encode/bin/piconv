@@ -1,7 +1,6 @@
 #!./perl
 # $Id: piconv,v 2.3 2007/04/06 12:53:41 dankogai Exp $
 #
-use 5.8.0;
 use strict;
 use Encode ;
 use Encode::Alias;

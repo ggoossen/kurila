@@ -114,7 +114,7 @@ sub AUTOLOAD
 	no strict 'refs';
 	my %seen;
 	my @every = map { my $sub = "${_}::$wanted_method";
-		          !*{$sub}{CODE} || $seen{$sub}++ ? () : $sub
+		          !*{Symbol::fetch_glob($sub)}{CODE} || $seen{$sub}++ ? () : $sub
 		        } @forebears
 				unless $wanted_method eq 'AUTOLOAD';
 
@@ -135,7 +135,7 @@ sub AUTOLOAD
 	}
 
 	@every = map { my $sub = "${_}::AUTOLOAD";
-		       !*{$sub}{CODE} || $seen{$sub}++ ? () : "${_}::AUTOLOAD"
+		       !*{Symbol::fetch_glob($sub)}{CODE} || $seen{$sub}++ ? () : "${_}::AUTOLOAD"
 		     } @forebears;
 	if ($want) {
 		return map { $$_ = ref($self)."::EVERY::".$wanted_method;

@@ -1,7 +1,6 @@
 #!/usr/local/bin/perl -w
 use strict;
 
-use 5.007003;
 use Hash::Util qw(lock_hash unlock_hash lock_keys);
 use Storable qw(nfreeze);
 

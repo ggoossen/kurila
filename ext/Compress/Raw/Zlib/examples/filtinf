@@ -8,7 +8,7 @@ use warnings ;
 binmode STDIN;
 binmode STDOUT;
 
-my $x = new Compress::Raw::Zlib::Inflate
+my $x = Compress::Raw::Zlib::Inflate->new()
    or die "Cannot create a inflation stream\n" ;
 
 my $input = '' ;

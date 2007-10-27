@@ -1,6 +1,5 @@
 package File::Compare;
 
-use 5.006;
 use strict;
 use warnings;
 our($VERSION, @ISA, @EXPORT, @EXPORT_OK, $Too_Big);

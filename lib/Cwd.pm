@@ -729,7 +729,7 @@ if (exists $METHOD_MAP{$^O}) {
   foreach my $name (keys %$map) {
     local $^W = 0;  # assignments trigger 'subroutine redefined' warning
     no strict 'refs';
-    *{$name} = \&{$map->{$name}};
+    *{Symbol::fetch_glob($name)} = \&{$map->{$name}};
   }
 }
 

@@ -13,7 +13,7 @@ my $file ;
 @ARGV = '-' unless @ARGV ;
 
 foreach $file (@ARGV) {
-    my $gz = new IO::Uncompress::Gunzip $file 
+    my $gz = IO::Uncompress::Gunzip->new( $file) 
          or die "Cannot uncompress $file: $GunzipError\n" ;
 
      while (<$gz>) {

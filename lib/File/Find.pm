@@ -1,5 +1,4 @@
 package File::Find;
-use 5.006;
 use strict;
 use warnings;
 use warnings::register;

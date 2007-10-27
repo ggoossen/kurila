@@ -1,6 +1,5 @@
 package Opcode;
 
-use 5.006_001;
 
 use strict;
 

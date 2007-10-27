@@ -9,11 +9,10 @@
 
 package Data::Dumper;
 
-$VERSION = '2.121_14';
-
+$VERSION = '2.121_14'
 #$| = 1;
 
-use 5.006_001;
+;
 require Exporter;
 require overload;
 

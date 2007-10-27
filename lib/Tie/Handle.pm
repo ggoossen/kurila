@@ -1,6 +1,5 @@
 package Tie::Handle;
 
-use 5.006_001;
 our $VERSION = '4.1';
 
 # Tie::StdHandle used to be inside Tie::Handle.  For backwards compatibility

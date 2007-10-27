@@ -1,6 +1,5 @@
 package Test::Builder;
 
-use 5.004;
 
 # $^C was only introduced in 5.005-ish.  We do this to prevent
 # use of uninitialized value warnings in older perls.

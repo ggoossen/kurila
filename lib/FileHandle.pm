@@ -1,6 +1,5 @@
 package FileHandle;
 
-use 5.006;
 use strict;
 our($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 

@@ -181,7 +181,6 @@ Tom Christiansen <F<tchrist@mox.perl.com>>, 25 June 1995.
 =cut
 
 use strict;
-use 5.009001;
 use Carp;
 $Carp::Internal{__PACKAGE__.""}++;
 

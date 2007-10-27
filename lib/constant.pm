@@ -1,5 +1,4 @@
 package constant;
-use 5.005;
 use strict;
 use warnings::register;
 

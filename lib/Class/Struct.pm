@@ -2,7 +2,6 @@ package Class::Struct;
 
 ## See POD after __END__
 
-use 5.006_001;
 
 use strict;
 use warnings::register;

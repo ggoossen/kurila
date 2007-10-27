@@ -15,7 +15,7 @@ my $s;
 
 foreach $file (@ARGV) {
     
-    my $gz = new IO::Uncompress::Gunzip $file
+    my $gz = IO::Uncompress::Gunzip->new( $file)
          or die "Cannot open $file: $GunzipError\n" ;
 
     print $buffer

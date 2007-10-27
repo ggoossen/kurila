@@ -19,7 +19,7 @@ $indir =~ s|\\|/|g ;
 
 my %seen;
 
-foreach $file (<$idir/*>) {
+foreach $file (glob($idir/*)) {
   next if $file =~ /\.(exe|bak)/i;
   $base = $file;
   $base =~ s/\.$//;		# just in case...

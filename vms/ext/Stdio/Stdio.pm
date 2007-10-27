@@ -26,7 +26,7 @@ $VERSION = '2.3';
                                     &setdef &sync &tmpnam &vmsopen &vmssysopen
                                     &waitfh &writeof ) ] );
 
-bootstrap VMS::Stdio $VERSION;
+VMS::Stdio->bootstrap( $VERSION);
 
 sub AUTOLOAD {
     my($constname) = $AUTOLOAD;
@@ -34,15 +34,15 @@ sub AUTOLOAD {
     if ($constname =~ /^O_/) {
       my($val) = constant($constname);
       defined $val or croak("Unknown VMS::Stdio constant $constname");
-      *$AUTOLOAD = sub { $val; }
+      *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val; }
     }
     else { # We don't know about it; hand off to IO::File
       require IO::File;
 
-      *$AUTOLOAD = eval "sub { shift->IO::File::$constname(\@_) }";
+      *{Symbol::fetch_glob($AUTOLOAD)} = eval "sub { shift->IO::File::$constname(\@_) }";
       croak "Error autoloading IO::File::$constname: $@" if $@;
     }
-    goto &$AUTOLOAD;
+    goto &*{Symbol::fetch_glob($AUTOLOAD)};
 }
 
 sub DESTROY { close($_[0]); }
@@ -67,7 +67,7 @@ sub AUTOLOAD {
     Carp::carp("Old function &fgetname is now &getname");
     goto &VMS::Stdio::getname;
   }
-  else { goto &{"VMS::Stdio::$func"}; }
+  else { goto &{*{Symbol::fetch_glob("VMS::Stdio::$func")}}; }
 }
 
 package VMS::Stdio;  # in case we ever use AutoLoader
