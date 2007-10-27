@@ -4392,9 +4392,7 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
     right->op_next = flop;
 
     range->op_targ = pad_alloc(OP_RANGE, SVs_PADMY);
-    sv_upgrade(PAD_SV(range->op_targ), SVt_PVNV);
     flip->op_targ = pad_alloc(OP_RANGE, SVs_PADMY);
-    sv_upgrade(PAD_SV(flip->op_targ), SVt_PVNV);
 
     flip->op_private =  left->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
     flop->op_private = right->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
