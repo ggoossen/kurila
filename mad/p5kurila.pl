@@ -379,6 +379,25 @@ sub rename_bit_operators {
     }
 }
 
+sub remove_useversion {
+    my $xml = shift;
+    for my $op_x ($xml->findnodes(q{//mad_op[@key='use']})) {
+        next if ($op_x->findnodes(q{op_const[@private='BARE']}));
+        # convert to dummy constant.
+        my $op = $op_x->parent->parent;
+        $op_x->delete();
+
+        my ($madprops) = $op->findnodes("madprops");
+
+        my $ws = get_madprop($op, "wsbefore-operator");
+        $ws =~ s/\&\#xA$//; # remove newline.
+        #set_madprop($op, "value", "XX");
+        set_madprop($op, "wsbefore-value", $ws);
+
+        $madprops->insert_new_elt('first_child', "mad_sv", { key => "value", val => '' } );
+    }
+}
+
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
 
@@ -409,6 +428,8 @@ if ($from < 1.4 - 0.05) {
 }
 
 rename_bit_operators($twig);
+
+remove_useversion($twig);
 
 # print
 $twig->print;
