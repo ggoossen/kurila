@@ -1,6 +1,5 @@
 package SelfLoader;
 
-use 5.009005; # due to new regexp features
 use strict;
 
 use Exporter;

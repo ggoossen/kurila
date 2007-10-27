@@ -21,16 +21,16 @@ XSLoader::load 'OS2::PrfDB', $VERSION;
 # Preloaded methods go here.
 
 sub AnyIni {
-  new_from_int OS2::PrfDB::Hini OS2::Prf::System(0), 
-  'Anyone of two "systemish" databases', 1;
+  OS2::PrfDB::Hini->new_from_int( OS2::Prf::System(0), 
+  'Anyone of two "systemish" databases', 1);
 }
 
 sub UserIni {
-  new_from_int OS2::PrfDB::Hini OS2::Prf::System(1), 'User settings database', 1;
+  OS2::PrfDB::Hini->new_from_int( OS2::Prf::System(1), 'User settings database', 1);
 }
 
 sub SystemIni {
-  new_from_int OS2::PrfDB::Hini OS2::Prf::System(2),'System settings database',1;
+  OS2::PrfDB::Hini->new_from_int( OS2::Prf::System(2),'System settings database',1);
 }
 
 # Internal structure 0 => HINI, 1 => array of entries, 2 => iterator.
@@ -39,7 +39,7 @@ sub TIEHASH {
   die "Usage: tie %arr, OS2::PrfDB, filename\n" unless @_ == 2;
   my ($obj, $file) = @_;
   my $hini = ref $file eq 'OS2::PrfDB::Hini' ? $file 
-					     : new OS2::PrfDB::Hini $file;
+					     : OS2::PrfDB::Hini->new( $file);
   die "Error opening profile database `$file': $!" unless $hini;
   # print "tiehash `@_', hini $hini\n" if $debug;
   bless [$hini, undef, undef];
@@ -136,7 +136,7 @@ sub TIEHASH {
   die "Usage: tie %arr, OS2::PrfDB::Sub, filename, appname\n" unless @_ == 3;
   my ($obj, $file, $app) = @_;
   my $hini = ref $file eq 'OS2::PrfDB::Hini' ? $file 
-					     : new OS2::PrfDB::Hini $file;
+					     : OS2::PrfDB::Hini->new( $file);
   die "Error opening profile database `$file': $!" unless $hini;
   # print "tiehash `@_', hini $hini\n" if $debug;
   bless [$hini, undef, undef, $app];

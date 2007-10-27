@@ -1,5 +1,4 @@
 package Shell;
-use 5.006_001;
 use strict;
 use warnings;
 use File::Spec::Functions;

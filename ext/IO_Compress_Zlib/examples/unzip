@@ -10,7 +10,7 @@ die "Usage: zipcat file"
 
 my $file = $ARGV[0] ;
 
-my $fh = new IO::File "<$file"
+my $fh = IO::File->new( "<$file")
             or die "Cannot open '$file': $!\n";
 
 while ()
@@ -53,7 +53,7 @@ while ()
 
     warn "Writing file '$filename' $compressedMethod\n";
 
-    mkpath basename $filename;
+    basename->mkpath( $filename);
 
     rawinflate $fh  => $filename,
         Transparent => 1,

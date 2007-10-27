@@ -30,7 +30,6 @@ package Getopt::Long;
 
 ################ Module Preamble ################
 
-use 5.004;
 
 use strict;
 

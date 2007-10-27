@@ -3,7 +3,7 @@ use AutoSplit;
 
 sub splitthis {
 my ($top,$base,$dest) = @_;
-my $d = new DirHandle $base;
+my $d = DirHandle->new( $base);
 if (defined $d) {
 	while (defined($_ = $d->read)) {
 		next if $_ eq ".";

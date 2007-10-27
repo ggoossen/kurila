@@ -2,9 +2,8 @@ package Tie::RefHash;
 
 use vars qw/$VERSION/;
 
-$VERSION = "1.37";
-
-use 5.005;
+$VERSION = "1.37"
+;
 
 =head1 NAME
 

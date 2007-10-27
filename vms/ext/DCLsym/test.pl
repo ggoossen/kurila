@@ -3,7 +3,7 @@ print "1..15\n";
 require VMS::DCLsym or die "failed 1\n";
 print "ok 1\n";
 
-tie %syms, VMS::DCLsym or die "failed 2\n";
+tie %syms, 'VMS::DCLsym' or die "failed 2\n";
 print "ok 2\n";
 
 $name = 'FOO_'.time();
@@ -26,7 +26,7 @@ print +($! ? "(\$! = $!) not " : ''),"ok 7\n";
 print +(defined($syms{$name}) ? 'not ' : ''),"ok 8\n";
 undef %syms;
 
-$obj = new VMS::DCLsym 'GLOBAL';
+$obj = VMS::DCLsym->new( 'GLOBAL');
 print +($obj ? '' : 'not '),"ok 9\n";
 
 print +($obj->clearcache(0) ? '' : 'not '),"ok 10\n";

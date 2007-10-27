@@ -1,6 +1,5 @@
 package ExtUtils::Installed;
 
-use 5.00503;
 use strict;
 use Carp qw();
 use ExtUtils::Packlist;

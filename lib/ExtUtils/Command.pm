@@ -1,6 +1,5 @@
 package ExtUtils::Command;
 
-use 5.00503;
 use strict;
 use Carp;
 use File::Copy;

@@ -6,7 +6,6 @@
 
 package IO::Pipe;
 
-use 5.006_001;
 
 use IO::Handle;
 use strict;

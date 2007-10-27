@@ -66,21 +66,21 @@ sub TIESCALAR
 {
 	my ($obj, $name) = @_;
 	$name =~ s/^([\w!?]+)/\U$1\E/;
-	return bless \$name, OS2::REXX::_SCALAR;
+	return bless \$name, 'OS2::REXX::_SCALAR';
 }	
 
 sub TIEARRAY
 {
 	my ($obj, $name) = @_;
 	$name =~ s/^([\w!?]+)/\U$1\E/;
-	return bless [$name, 0], OS2::REXX::_ARRAY;
+	return bless [$name, 0], 'OS2::REXX::_ARRAY';
 }
 
 sub TIEHASH
 {
 	my ($obj, $name) = @_;
 	$name =~ s/^([\w!?]+)/\U$1\E/;
-	return bless {Stem => $name}, OS2::REXX::_HASH;
+	return bless {Stem => $name}, 'OS2::REXX::_HASH';
 }
 
 #############################################################################

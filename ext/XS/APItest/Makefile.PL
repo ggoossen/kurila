@@ -1,4 +1,3 @@
-use 5.008;
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant 0.11 'WriteConstants';
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence

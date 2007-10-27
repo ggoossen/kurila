@@ -1,6 +1,5 @@
 package Time::localtime;
 use strict;
-use 5.006_001;
 
 use Time::tm;
 

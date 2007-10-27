@@ -1,6 +1,5 @@
 package Test::Simple;
 
-use 5.004;
 
 use strict 'vars';
 use vars qw($VERSION @ISA @EXPORT);

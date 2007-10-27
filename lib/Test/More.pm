@@ -1,6 +1,5 @@
 package Test::More;
 
-use 5.004;
 
 use strict;
 

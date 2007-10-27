@@ -27,7 +27,7 @@ open OUT, ">$file" or die "Can't create $file: $!";
 open PATCH_LEVEL, "<" . catfile(updir, "patchlevel.h")
     or die "Can't open patchlevel.h: $!";
 
-my $patchlevel_date = (stat PATCH_LEVEL)[9];
+my $patchlevel_date = (stat *PATCH_LEVEL)[9];
 
 while (<PATCH_LEVEL>) {
     last if $_ =~ /^\s*static\s+(?:const\s+)?char.*?local_patches\[\]\s*=\s*{\s*$/;

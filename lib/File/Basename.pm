@@ -48,7 +48,6 @@ BEGIN {
 
 
 use strict;
-use 5.006;
 use warnings;
 our(@ISA, @EXPORT, $VERSION, $Fileparse_fstype, $Fileparse_igncase);
 require Exporter;

@@ -252,7 +252,6 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 
 =cut
 
-use 5.006_001;
 use strict;
 our($VERSION, @EXPORT_OK, @ISA);
 use Carp;

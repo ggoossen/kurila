@@ -8,7 +8,7 @@ use warnings ;
 binmode STDIN;
 binmode STDOUT;
 
-my $x = new Compress::Raw::Zlib::Deflate()
+my $x = Compress::Raw::Zlib::Deflate->new()
    or die "Cannot create a deflation stream\n" ;
 
 my $output = '' ;

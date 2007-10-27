@@ -1,4 +1,3 @@
-use 5.7.2;
 use strict;
 use ExtUtils::MakeMaker;
 use File::Spec::Functions;
