@@ -24,14 +24,16 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_remove_useversion();
+t_rename_bit_operators();
+t_typed_declaration();
+
 t_strict_refs();
 t_indirect_object_syntax();
 t_barewords();
 t_glob_pattr();
 t_vstring();
 # t_encoding();
-t_typed_declaration();
-t_rename_bit_operators();
 
 sub t_indirect_object_syntax {
     p5convert( split(m/^\-{10}\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
@@ -290,9 +292,9 @@ require v5.6;
 ----------
 require v5.6;
 ==========
-use v5.6;
+use version v0.2;
 ----------
-use v5.6;
+use version v0.2;
 ==========
 "foo$\value"
 ----------
@@ -313,6 +315,21 @@ my Test $x2 :Dokay(1,5);
 ----------
 package Test;
 my $x2 :Dokay(1,5);
+END
+}
+
+sub t_remove_useversion {
+    p5convert( split(m/^\-{10}.*\n/m, $_, 2)) for split(m/^={10}\n/m, <<'END');
+#bla
+use v5.6.0;
+#arg
+----------
+#bla
+#arg
+==========
+use version;
+----------
+use version;
 END
 }
 
