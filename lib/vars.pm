@@ -1,6 +1,5 @@
 package vars;
 
-use 5.006;
 
 our $VERSION = '1.01';
 

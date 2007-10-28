@@ -1,5 +1,4 @@
 package Perl6::Form;
-use 5.008;
 
 our $VERSION = '0.04';
 
