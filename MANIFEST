@@ -1548,23 +1548,7 @@ lib/CPAN/t/10version.t		See if CPAN the module works
 lib/CPAN/t/11mirroredby.t		See if CPAN::Mirrored::By works
 lib/CPAN/Tarzip.pm		helper package for CPAN.pm
 lib/CPAN/Version.pm		Simple math with different flavors of version strings
-lib/ctime.pl			A ctime workalike
 lib/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
-lib/DBM_Filter/Changes		DBM Filter Change history
-lib/DBM_Filter/compress.pm	DBM Filter to compress keys/values
-lib/DBM_Filter/encode.pm	DBM Filter for encoding
-lib/DBM_Filter/int32.pm		DBM Filter for creating int32 keys/values
-lib/DBM_Filter/null.pm		DBM Filter for null termination
-lib/DBM_Filter.pm		DBM Filter module
-lib/DBM_Filter/t/01error.t	test DBM_Filter::null
-lib/DBM_Filter/t/02core.t	test DBM_Filter::null
-lib/DBM_Filter/t/compress.t	test DBM_Filter::compress
-lib/DBM_Filter/t/encode.t	test DBM_Filter::encode
-lib/DBM_Filter/t/int32.t	test DBM_Filter::int32
-lib/DBM_Filter/t/null.t		test DBM_Filter::null
-lib/DBM_Filter/t/utf8.t		test DBM_Filter::utf8
-lib/DBM_Filter/utf8.pm		DBM Filter for UTF-8 Encoding
-lib/dbm_filter_util.pl		Utility functions used by DBM Filter tests
 lib/DB.pm			Debugger API (draft)
 lib/DB.t			See if DB works
 lib/Devel/InnerPackage.pm	Find inner packages

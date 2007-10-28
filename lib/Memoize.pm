@@ -328,7 +328,7 @@ sub _make_cref {
       $name = $uppack . '::' . $fn;
     }
     no strict;
-    if (defined $name and !defined(&*{Symbol::fetch_glob($name)})) {
+    if (defined $name and !defined(&{*{Symbol::fetch_glob($name)}})) {
       croak "Cannot operate on nonexistent function `$fn'";
     }
 #    $cref = \&$name;
