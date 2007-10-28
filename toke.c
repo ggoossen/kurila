@@ -1434,13 +1434,10 @@ Perl_str_to_version(pTHX_ SV *sv)
 /*
  * S_force_version
  * Forces the next token to be a version number.
- * If the next token appears to be an invalid version number, (e.g. "v2b"),
- * and if "guessing" is TRUE, then no new token is created (and the caller
- * must use an alternative parsing method).
  */
 
 STATIC char *
-S_force_version(pTHX_ char *s, int guessing)
+S_force_version(pTHX_ char *s)
 {
     dVAR;
     OP *version = NULL;
@@ -1474,16 +1471,6 @@ S_force_version(pTHX_ char *s, int guessing)
 		SvNOK_on(ver);		/* hint that it is a version */
 	    }
         }
-	else if (guessing) {
-#ifdef PERL_MAD
-	    if (PL_madskills) {
-		sv_free(PL_nextwhite);	/* let next token collect whitespace */
-		PL_nextwhite = 0;
-		s = SvPVX(PL_linestr) + startoff;
-	    }
-#endif
-	    return s;
-	}
     }
 
 #ifdef PERL_MAD
@@ -2947,20 +2934,11 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 		    is_use ? "use" : "no"));
     s = SKIPSPACE1(s);
     if (isDIGIT(*s) || (*s == 'v' && isDIGIT(s[1]))) {
-	s = force_version(s, TRUE);
-	if (*s == ';' || (s = SKIPSPACE1(s), *s == ';')) {
-	    start_force(PL_curforce);
-	    NEXTVAL_NEXTTOKE.opval = NULL;
-	    force_next(WORD);
-	}
-	else if (*s == 'v') {
-	    s = force_word(s,WORD,FALSE,TRUE,FALSE);
-	    s = force_version(s, FALSE);
-	}
+	DIE(aTHX "use VERSION is not allowed");
     }
     else {
 	s = force_word(s,WORD,FALSE,TRUE,FALSE);
-	s = force_version(s, FALSE);
+	s = force_version(s);
     }
     yylval.ival = is_use;
     return s;
@@ -5989,19 +5967,15 @@ Perl_yylex(pTHX)
 
 	case KEY_require:
 	    s = SKIPSPACE1(s);
-	    if (isDIGIT(*s)) {
-		s = force_version(s, FALSE);
+	    if (isDIGIT(*s) || ((*s == 'v') && isDIGIT(s[1]))) {
+		DIE(aTHX_ "require VERSION not allowed");
 	    }
-	    else if (*s != 'v' || !isDIGIT(s[1])
-		    || (s = force_version(s, TRUE), *s == 'v'))
-	    {
-		*PL_tokenbuf = '\0';
-		s = force_word(s,WORD,TRUE,TRUE,FALSE);
-		if (isIDFIRST_lazy_if(PL_tokenbuf,UTF))
-		    gv_stashpvn(PL_tokenbuf, strlen(PL_tokenbuf), GV_ADD);
-		else if (*s == '<')
-		    yyerror("<> should be quotes");
-	    }
+	    *PL_tokenbuf = '\0';
+	    s = force_word(s,WORD,TRUE,TRUE,FALSE);
+	    if (isIDFIRST_lazy_if(PL_tokenbuf,UTF))
+		gv_stashpvn(PL_tokenbuf, strlen(PL_tokenbuf), GV_ADD);
+	    else if (*s == '<')
+		yyerror("<> should be quotes");
 	    if (orig_keyword == KEY_require) {
 		orig_keyword = 0;
 		yylval.ival = 1;

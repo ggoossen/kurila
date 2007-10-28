@@ -3756,7 +3756,7 @@
 #ifdef PERL_CORE
 #define check_uni()		S_check_uni(aTHX)
 #define force_next(a)		S_force_next(aTHX_ a)
-#define force_version(a,b)	S_force_version(aTHX_ a,b)
+#define force_version(a)	S_force_version(aTHX_ a)
 #define force_word(a,b,c,d,e)	S_force_word(aTHX_ a,b,c,d,e)
 #define tokeq(a)		S_tokeq(aTHX_ a)
 #define readpipe_override()	S_readpipe_override(aTHX)
