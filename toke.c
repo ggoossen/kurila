@@ -5520,13 +5520,6 @@ Perl_yylex(pTHX)
 	case KEY_delete:
 	    UNI(OP_DELETE);
 
-	case KEY_dbmopen:
-	    gv_fetchpvs("AnyDBM_File::ISA", GV_ADDMULTI, SVt_PVAV);
-	    LOP(OP_DBMOPEN,XTERM);
-
-	case KEY_dbmclose:
-	    UNI(OP_DBMCLOSE);
-
 	case KEY_dump:
 	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
 	    LOOPX(OP_DUMP);
@@ -8587,18 +8580,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
         case 'd':
           switch (name[1])
           {
-            case 'b':
-              if (name[2] == 'm' &&
-                  name[3] == 'o' &&
-                  name[4] == 'p' &&
-                  name[5] == 'e' &&
-                  name[6] == 'n')
-              {                                   /* dbmopen    */
-                return -KEY_dbmopen;
-              }
-
-              goto unknown;
-
             case 'e':
               if (name[2] == 'f')
               {
@@ -9047,20 +9028,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
             default:
               goto unknown;
           }
-
-        case 'd':
-          if (name[1] == 'b' &&
-              name[2] == 'm' &&
-              name[3] == 'c' &&
-              name[4] == 'l' &&
-              name[5] == 'o' &&
-              name[6] == 's' &&
-              name[7] == 'e')
-          {                                       /* dbmclose   */
-            return -KEY_dbmclose;
-          }
-
-          goto unknown;
 
         case 'e':
           if (name[1] == 'n' &&

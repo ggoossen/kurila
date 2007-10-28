@@ -268,8 +268,6 @@ binmode		binmode FOO
 tie		tie
 untie		untie
 tied		tied
-dbmopen		dbmopen
-dbmclose	dbmclose
 sselect		SKIP (set by optimizer)
 select		select FOO
 getc		getc FOO

@@ -12,7 +12,7 @@ stuff:
     gethostbyaddr getnetbyname getnetbyaddr getprotobyname getprotobynumber
     getservbyname getservbyport sethostent setnetent setprotoent setservent
     getpwnam getpwuid getgrnam getgrgid waitpid setpgrp setpriority
-    getpriority syscall dbmopen ioctl fcntl truncate getsockopt setsockopt
+    getpriority syscall ioctl fcntl truncate getsockopt setsockopt
     semctl semop semget msgget msgctl msgsnd msgrcv shmget shmctl shmread
     shmwrite
 

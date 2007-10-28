@@ -1618,7 +1618,6 @@ sub pp_fileno { unop(@_, "fileno") }
 sub pp_umask { unop(@_, "umask") }
 sub pp_untie { unop(@_, "untie") }
 sub pp_tied { unop(@_, "tied") }
-sub pp_dbmclose { unop(@_, "dbmclose") }
 sub pp_getc { unop(@_, "getc") }
 sub pp_eof { unop(@_, "eof") }
 sub pp_tell { unop(@_, "tell") }
@@ -2280,7 +2279,6 @@ sub pp_open { listop(@_, "open") }
 sub pp_pipe_op { listop(@_, "pipe") }
 sub pp_tie { listop(@_, "tie") }
 sub pp_binmode { listop(@_, "binmode") }
-sub pp_dbmopen { listop(@_, "dbmopen") }
 sub pp_sselect { listop(@_, "select") }
 sub pp_select { listop(@_, "select") }
 sub pp_read { listop(@_, "read") }

@@ -243,8 +243,6 @@ EXTCONST char* const PL_op_name[] = {
 	"tie",
 	"untie",
 	"tied",
-	"dbmopen",
-	"dbmclose",
 	"sselect",
 	"select",
 	"getc",
@@ -611,8 +609,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"tie",
 	"untie",
 	"tied",
-	"dbmopen",
-	"dbmclose",
 	"select system call",
 	"select",
 	"getc",
@@ -991,8 +987,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_tie),
 	MEMBER_TO_FPTR(Perl_pp_untie),
 	MEMBER_TO_FPTR(Perl_pp_tied),
-	MEMBER_TO_FPTR(Perl_pp_dbmopen),
-	MEMBER_TO_FPTR(Perl_pp_untie),	/* Perl_pp_dbmclose */
 	MEMBER_TO_FPTR(Perl_pp_sselect),
 	MEMBER_TO_FPTR(Perl_pp_select),
 	MEMBER_TO_FPTR(Perl_pp_getc),
@@ -1368,8 +1362,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* tie */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* untie */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* tied */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* dbmopen */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* dbmclose */
 	MEMBER_TO_FPTR(Perl_ck_select),	/* sselect */
 	MEMBER_TO_FPTR(Perl_ck_select),	/* select */
 	MEMBER_TO_FPTR(Perl_ck_eof),	/* getc */
@@ -1739,8 +1731,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0042e855,	/* tie */
 	0x0000f614,	/* untie */
 	0x0000f604,	/* tied */
-	0x00228814,	/* dbmopen */
-	0x00009614,	/* dbmclose */
 	0x02222808,	/* sselect */
 	0x0001c80c,	/* select */
 	0x0001d60c,	/* getc */

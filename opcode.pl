@@ -52,7 +52,6 @@ my @raw_alias = (
 
 		 Perl_pp_goto => ['dump'],
 		 Perl_pp_require => ['dofile'],
-		 Perl_pp_untie => ['dbmclose'],
 		 Perl_pp_sysread => [qw(read recv)],
 		 Perl_pp_sysseek => ['seek'],
 		 Perl_pp_ioctl => ['fcntl'],
@@ -842,8 +841,6 @@ binmode		binmode			ck_fun		s@	F S?
 tie		tie			ck_fun		idms@	R S L
 untie		untie			ck_fun		is%	R
 tied		tied			ck_fun		s%	R
-dbmopen		dbmopen			ck_fun		is@	H S S
-dbmclose	dbmclose		ck_fun		is%	H
 
 sselect		select system call	ck_select	t@	S S S S
 select		select			ck_select	st@	F?

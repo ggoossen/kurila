@@ -404,7 +404,6 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     tie untie
 
-    dbmopen dbmclose
     sselect select
     pipe_op sockpair
 
