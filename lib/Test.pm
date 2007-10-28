@@ -1,5 +1,4 @@
 
-require 5.004;
 package Test;
 # Time-stamp: "2004-04-28 21:46:51 ADT"
 

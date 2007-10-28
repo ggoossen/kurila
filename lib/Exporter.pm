@@ -1,7 +1,5 @@
 package Exporter;
 
-require 5.006;
-
 # Be lean.
 use strict;
 no strict 'refs';
