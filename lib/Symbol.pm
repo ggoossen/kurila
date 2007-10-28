@@ -92,8 +92,6 @@ you reload the C<Foo> module afterwards.
 
 =cut
 
-BEGIN { require 5.005; }
-
 use strict;
 
 require Exporter;

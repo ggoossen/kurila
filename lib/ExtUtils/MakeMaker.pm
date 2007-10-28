@@ -1,8 +1,6 @@
 # $Id: /mirror/svn.schwern.org/CPAN/ExtUtils-MakeMaker/trunk/lib/ExtUtils/MakeMaker.pm 32261 2007-07-03T08:08:29.826721Z schwern  $
 package ExtUtils::MakeMaker;
 
-BEGIN {require 5.005_03;}
-
 require Exporter;
 use ExtUtils::MakeMaker::Config;
 use Carp ();

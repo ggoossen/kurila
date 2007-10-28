@@ -1,6 +1,6 @@
 package DirHandle;
 
-our $VERSION = '1.01'
+our $VERSION = '1.01';
 =head1 NAME 
 
 DirHandle - supply object methods for directory handles
@@ -40,7 +40,6 @@ with a volume name, a relative pathname should always begin with a
 
 =cut
 
-;
 use Carp;
 use Symbol;
 

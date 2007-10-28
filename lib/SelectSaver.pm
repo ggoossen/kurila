@@ -1,6 +1,6 @@
 package SelectSaver;
 
-our $VERSION = '1.01'
+our $VERSION = '1.01';
 =head1 NAME
 
 SelectSaver - save and restore selected file handle
@@ -33,7 +33,6 @@ that was selected when it was created.
 
 =cut
 
-;
 use Carp;
 use Symbol;
 
