@@ -1109,21 +1109,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    GvMULTI_on(gv);
 		    sv_magic((SV*)av, (SV*)gv, PERL_MAGIC_isa, NULL, 0);
 		    /* NOTE: No support for tied ISA */
-		    if ((add & GV_ADDMULTI) && strEQ(nambeg,"AnyDBM_File::ISA")
-			&& AvFILLp(av) == -1)
-			{
-			    const char *pname;
-			    av_push(av, newSVpvn(pname = "NDBM_File",9));
-			    gv_stashpvn(pname, 9, GV_ADD);
-			    av_push(av, newSVpvn(pname = "DB_File",7));
-			    gv_stashpvn(pname, 7, GV_ADD);
-			    av_push(av, newSVpvn(pname = "GDBM_File",9));
-			    gv_stashpvn(pname, 9, GV_ADD);
-			    av_push(av, newSVpvn(pname = "SDBM_File",9));
-			    gv_stashpvn(pname, 9, GV_ADD);
-			    av_push(av, newSVpvn(pname = "ODBM_File",9));
-			    gv_stashpvn(pname, 9, GV_ADD);
-			}
 		}
 		break;
 	    case 'O':
