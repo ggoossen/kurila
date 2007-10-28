@@ -21293,19 +21293,14 @@ set X $dynamic_ext $static_ext $nonxs_ext
 shift
 extensions="$*"
 
-# Sanity check:  We require an extension suitable for use with
-# AnyDBM_File, as well as Fcntl and IO.  (Failure to have these
+# Sanity check:  We require Fcntl and IO.  (Failure to have these
 # should show up as failures in the test suite, but it's helpful to
 # catch them now.) The 'extensions' list is normally sorted
 # alphabetically, so we need to accept either
-#    DB_File ... Fcntl ... IO  ....
-# or something like
-#    Fcntl ... NDBM_File ... IO  ....
+#    Fcntl ... IO  ....
 case " $extensions"  in
-*"_File "*" Fcntl "*" IO "*) ;; # DB_File
-*" Fcntl "*"_File "*" IO "*) ;; # GDBM_File
-*" Fcntl "*" IO "*"_File "*) ;; # NDBM_File
-*) echo "WARNING: Extensions DB_File or *DBM_File, Fcntl, and IO not configured." >&4
+*" Fcntl "*" IO "*) ;;
+*) echo "WARNING: Extensions Fcntl, and IO not configured." >&4
    echo "WARNING: The Perl you are building will be quite crippled." >& 4
    ;;
 esac

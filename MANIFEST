@@ -1445,8 +1445,6 @@ intrpvar.h			Variables held in each interpreter instance
 iperlsys.h			Perl's interface to the system
 keywords.h			The keyword numbers
 keywords.pl			Program to write keywords.h
-lib/AnyDBM_File.pm		Perl module to emulate dbmopen
-lib/AnyDBM_File.t		See if AnyDBM_File works
 lib/Archive/Extract.pm	Archive::Extract
 lib/Archive/Extract/t/01_Archive-Extract.t	Archive::Extract tests
 lib/Archive/Extract/t/src/double_dir.zip.packed	Archive::Extract tests
