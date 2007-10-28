@@ -1,6 +1,6 @@
 package FileCache;
 
-our $VERSION = '1.07'
+our $VERSION = '1.07';
 =head1 NAME
 
 FileCache - keep more files open than the system permits
@@ -77,7 +77,6 @@ so you may have to set I<maxopen> yourself.
 
 =cut
 
-;
 use Carp;
 use strict;
 no strict 'refs';

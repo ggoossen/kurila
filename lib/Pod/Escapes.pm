@@ -1,5 +1,4 @@
 
-require 5;
 #                        The documentation is at the end.
 # Time-stamp: "2004-05-07 15:31:25 ADT"
 package Pod::Escapes;
