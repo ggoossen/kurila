@@ -1,7 +1,6 @@
 
 package Compress::Raw::Zlib;
 
-require 5.004 ;
 require Exporter;
 use AutoLoader;
 use Carp ;

@@ -126,7 +126,6 @@ This document was last revised 22-Feb-1996, for Perl 5.002.
 =cut
 
 package VMS::Filespec;
-require 5.002;
 
 our $VERSION = '1.11';
 

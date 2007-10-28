@@ -5,7 +5,6 @@
 ### http://www.opengroup.org/onlinepubs/007904975/utilities/pax.html
 
 package Archive::Tar;
-require 5.005_03;
 
 use strict;
 use vars qw[$DEBUG $error $VERSION $WARN $FOLLOW_SYMLINK $CHOWN $CHMOD

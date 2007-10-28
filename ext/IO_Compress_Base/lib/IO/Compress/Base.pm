@@ -1,7 +1,6 @@
 
 package IO::Compress::Base ;
 
-require 5.004 ;
 
 use strict ;
 use warnings;

@@ -2,7 +2,6 @@ package ExtUtils::Command::MM;
 
 use strict;
 
-require 5.005_03;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT);
 @ISA = qw(Exporter);

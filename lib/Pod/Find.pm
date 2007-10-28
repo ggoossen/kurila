@@ -14,7 +14,6 @@ package Pod::Find;
 
 use vars qw($VERSION);
 $VERSION = 1.34;   ## Current version of this package
-require  5.005;   ## requires this Perl version or later
 use Carp;
 
 #############################################################################

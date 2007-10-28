@@ -1,6 +1,5 @@
 #!./miniperl
 
-require 5.002;
 use ExtUtils::ParseXS qw(process_file);
 use Getopt::Long;
 

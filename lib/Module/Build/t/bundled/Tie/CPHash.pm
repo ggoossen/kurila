@@ -18,7 +18,6 @@ package Tie::CPHash;
 # Case preserving but case insensitive hash
 #---------------------------------------------------------------------
 
-require 5.000;
 use strict;
 use vars qw(@ISA $VERSION);
 

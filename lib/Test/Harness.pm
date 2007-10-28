@@ -2,7 +2,6 @@
 
 package Test::Harness;
 
-require 5.00405;
 use Test::Harness::Straps;
 use Test::Harness::Assert;
 use Exporter;

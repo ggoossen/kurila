@@ -5,7 +5,6 @@
 # Use $ENV{FORCE_NANOSLEEP_SCAN} to force rescanning whether there
 # really is hope.
 
-require 5.002;
 
 use Config;
 use ExtUtils::MakeMaker;

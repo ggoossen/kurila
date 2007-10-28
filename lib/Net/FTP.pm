@@ -8,7 +8,6 @@
 
 package Net::FTP;
 
-require 5.001;
 
 use strict;
 use vars qw(@ISA $VERSION);

@@ -1,9 +1,8 @@
 package IPC::Open2;
 
 use strict;
-our ($VERSION, @ISA, @EXPORT);
-
-require 5.000;
+our ($VERSION, @ISA, @EXPORT)
+;
 require Exporter;
 
 $VERSION	= 1.02;

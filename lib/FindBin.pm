@@ -93,7 +93,6 @@ under the same terms as Perl itself.
 
 package FindBin;
 use Carp;
-require 5.000;
 require Exporter;
 use Cwd qw(getcwd cwd abs_path);
 use Config;

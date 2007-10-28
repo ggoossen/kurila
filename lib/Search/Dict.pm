@@ -1,5 +1,4 @@
 package Search::Dict;
-require 5.000;
 require Exporter;
 
 use strict;

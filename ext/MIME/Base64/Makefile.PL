@@ -1,4 +1,3 @@
-require 5.006;
 use ExtUtils::MakeMaker;
 
 my @makefileopts;
