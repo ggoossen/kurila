@@ -1,6 +1,5 @@
 package Safe;
 
-use 5.003_11;
 use strict;
 
 $Safe::VERSION = "2.12";
