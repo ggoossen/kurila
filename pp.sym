@@ -255,8 +255,6 @@ Perl_pp_binmode
 Perl_pp_tie
 Perl_pp_untie
 Perl_pp_tied
-Perl_pp_dbmopen
-Perl_pp_dbmclose
 Perl_pp_sselect
 Perl_pp_select
 Perl_pp_getc

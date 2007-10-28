@@ -86,8 +86,6 @@ connect
 continue
 cos
 crypt
-dbmclose
-dbmopen
 default
 defined
 delete

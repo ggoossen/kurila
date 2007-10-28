@@ -45,8 +45,6 @@ connect (*$)
 continue ()
 cos (_)
 crypt ($$)
-dbmclose (\%)
-dbmopen (\%$$)
 defined undef
 delete undef
 die (@)

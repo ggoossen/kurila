@@ -179,8 +179,6 @@ connect	Socket	connect to a remote socket
 continue	Flow	optional trailing block in a while or foreach 
 cos	Math	cosine function
 crypt	String	one-way passwd-style encryption
-dbmclose	Objects,I/O	breaks binding on a tied dbm file
-dbmopen	Objects,I/O	create binding on a tied dbm file
 defined	Misc	test whether a value, variable, or function is defined
 delete	HASH	deletes a value from a hash
 die	I/O,Flow	raise an exception or bail out

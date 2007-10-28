@@ -928,59 +928,6 @@ PP(pp_tied)
     RETPUSHUNDEF;
 }
 
-PP(pp_dbmopen)
-{
-    dVAR; dSP;
-    dPOPPOPssrl;
-    HV* stash;
-    GV *gv;
-
-    HV * const hv = (HV*)POPs;
-    SV * const sv = sv_2mortal(newSVpvs("AnyDBM_File"));
-    stash = gv_stashsv(sv, 0);
-    if (!stash || !(gv = gv_fetchmethod(stash, "TIEHASH"))) {
-	PUTBACK;
-	require_pv("AnyDBM_File.pm");
-	SPAGAIN;
-	if (!(gv = gv_fetchmethod(stash, "TIEHASH")))
-	    DIE(aTHX_ "No dbm on this machine");
-    }
-
-    ENTER;
-    PUSHMARK(SP);
-
-    EXTEND(SP, 5);
-    PUSHs(sv);
-    PUSHs(left);
-    if (SvIV(right))
-	PUSHs(sv_2mortal(newSVuv(O_RDWR|O_CREAT)));
-    else
-	PUSHs(sv_2mortal(newSVuv(O_RDWR)));
-    PUSHs(right);
-    PUTBACK;
-    call_sv((SV*)GvCV(gv), G_SCALAR);
-    SPAGAIN;
-
-    if (!sv_isobject(TOPs)) {
-	SP--;
-	PUSHMARK(SP);
-	PUSHs(sv);
-	PUSHs(left);
-	PUSHs(sv_2mortal(newSVuv(O_RDONLY)));
-	PUSHs(right);
-	PUTBACK;
-	call_sv((SV*)GvCV(gv), G_SCALAR);
-	SPAGAIN;
-    }
-
-    if (sv_isobject(TOPs)) {
-	sv_unmagic((SV *) hv, PERL_MAGIC_tied);
-	sv_magic((SV*)hv, TOPs, PERL_MAGIC_tied, NULL, 0);
-    }
-    LEAVE;
-    RETURN;
-}
-
 PP(pp_sselect)
 {
 #ifdef HAS_SELECT

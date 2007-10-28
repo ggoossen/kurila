@@ -620,11 +620,6 @@ PP(pp_dofile)
     return pp_require();
 }
 
-PP(pp_dbmclose)
-{
-    return pp_untie();
-}
-
 PP(pp_read)
 {
     return pp_sysread();

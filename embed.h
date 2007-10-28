@@ -1997,8 +1997,6 @@
 #define pp_continue		Perl_pp_continue
 #define pp_cos			Perl_pp_cos
 #define pp_crypt		Perl_pp_crypt
-#define pp_dbmclose		Perl_pp_dbmclose
-#define pp_dbmopen		Perl_pp_dbmopen
 #define pp_dbstate		Perl_pp_dbstate
 #define pp_defined		Perl_pp_defined
 #define pp_delete		Perl_pp_delete
@@ -4276,8 +4274,6 @@
 #define pp_continue()		Perl_pp_continue(aTHX)
 #define pp_cos()		Perl_pp_cos(aTHX)
 #define pp_crypt()		Perl_pp_crypt(aTHX)
-#define pp_dbmclose()		Perl_pp_dbmclose(aTHX)
-#define pp_dbmopen()		Perl_pp_dbmopen(aTHX)
 #define pp_dbstate()		Perl_pp_dbstate(aTHX)
 #define pp_defined()		Perl_pp_defined(aTHX)
 #define pp_delete()		Perl_pp_delete(aTHX)

@@ -132,7 +132,7 @@ C<delete>, C<each>, C<exists>, C<keys>, C<values>
 =item Input and output functions
 X<I/O> X<input> X<output> X<dbm>
 
-C<binmode>, C<close>, C<closedir>, C<dbmclose>, C<dbmopen>, C<die>, C<eof>,
+C<binmode>, C<close>, C<closedir>, C<die>, C<eof>,
 C<fileno>, C<flock>, C<format>, C<getc>, C<print>, C<printf>, C<read>,
 C<readdir>, C<rewinddir>, C<say>, C<seek>, C<seekdir>, C<select>, C<syscall>,
 C<sysread>, C<sysseek>, C<syswrite>, C<tell>, C<telldir>, C<truncate>,
@@ -191,7 +191,7 @@ C<do>, C<import>, C<no>, C<package>, C<require>, C<use>
 =item Keywords related to classes and object-orientation
 X<object> X<class> X<package>
 
-C<bless>, C<dbmclose>, C<dbmopen>, C<package>, C<ref>, C<tie>, C<tied>,
+C<bless>, C<package>, C<ref>, C<tie>, C<tied>,
 C<untie>, C<use>
 
 =item Low-level socket functions
@@ -240,10 +240,6 @@ C<ucfirst>, C<untie>, C<use>, C<when>
 * - C<sub> was a keyword in perl4, but in perl5 it is an
 operator, which can be used in expressions.
 
-=item Functions obsoleted in perl5
-
-C<dbmclose>, C<dbmopen>
-
 =back
 
 =head2 Portability
@@ -256,7 +252,7 @@ functionality may differ slightly.  The Perl functions affected
 by this are:
 
 C<-X>, C<binmode>, C<chmod>, C<chown>, C<chroot>, C<crypt>,
-C<dbmclose>, C<dbmopen>, C<dump>, C<endgrent>, C<endhostent>,
+C<dump>, C<endgrent>, C<endhostent>,
 C<endnetent>, C<endprotoent>, C<endpwent>, C<endservent>, C<exec>,
 C<fcntl>, C<flock>, C<fork>, C<getgrent>, C<getgrgid>, C<gethostbyname>,
 C<gethostent>, C<getlogin>, C<getnetbyaddr>, C<getnetbyname>, C<getnetent>,
@@ -1048,56 +1044,6 @@ of the situation by trying to downgrade (a copy of the string)
 the string back to an eight-bit byte string before calling crypt()
 (on that copy).  If that works, good.  If not, crypt() dies with
 C<Wide character in crypt>.
-
-=item dbmclose HASH
-X<dbmclose>
-
-[This function has been largely superseded by the C<untie> function.]
-
-Breaks the binding between a DBM file and a hash.
-
-=item dbmopen HASH,DBNAME,MASK
-X<dbmopen> X<dbm> X<ndbm> X<sdbm> X<gdbm>
-
-[This function has been largely superseded by the C<tie> function.]
-
-This binds a dbm(3), ndbm(3), sdbm(3), gdbm(3), or Berkeley DB file to a
-hash.  HASH is the name of the hash.  (Unlike normal C<open>, the first
-argument is I<not> a filehandle, even though it looks like one).  DBNAME
-is the name of the database (without the F<.dir> or F<.pag> extension if
-any).  If the database does not exist, it is created with protection
-specified by MASK (as modified by the C<umask>).  If your system supports
-only the older DBM functions, you may perform only one C<dbmopen> in your
-program.  In older versions of Perl, if your system had neither DBM nor
-ndbm, calling C<dbmopen> produced a fatal error; it now falls back to
-sdbm(3).
-
-If you don't have write access to the DBM file, you can only read hash
-variables, not set them.  If you want to test whether you can write,
-either use file tests or try setting a dummy hash entry inside an C<eval>,
-which will trap the error.
-
-Note that functions such as C<keys> and C<values> may return huge lists
-when used on large DBM files.  You may prefer to use the C<each>
-function to iterate over large DBM files.  Example:
-
-    # print out history file offsets
-    dbmopen(%HIST,'/usr/lib/news/history',0666);
-    while (($key,$val) = each %HIST) {
-	print $key, ' = ', unpack('L',$val), "\n";
-    }
-    dbmclose(%HIST);
-
-See also L<AnyDBM_File> for a more general description of the pros and
-cons of the various dbm approaches, as well as L<DB_File> for a particularly
-rich implementation.
-
-You can control which DBM library you use by loading that library
-before you call dbmopen():
-
-    use DB_File;
-    dbmopen(%NS_Hist, "$ENV{HOME}/.netscape/history.db")
-	or die "Can't open netscape history file: $!";
 
 =item defined EXPR
 X<defined> X<undef> X<undefined>
