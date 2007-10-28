@@ -1863,35 +1863,6 @@ lib/Math/Complex.pm		A Complex package
 lib/Math/Complex.t		See if Math::Complex works
 lib/Math/Trig.pm		A simple interface to complex trigonometry
 lib/Math/Trig.t			See if Math::Trig works
-lib/Memoize/AnyDBM_File.pm	Memoize glue layer for AnyDBM_File
-lib/Memoize/ExpireFile.pm	Memoize expiry manager test scaffold
-lib/Memoize/Expire.pm		Memoize expiry manager example
-lib/Memoize/ExpireTest.pm	Memoize expiry manager test scaffold
-lib/Memoize/NDBM_File.pm	Memoize glue layer for NDBM_File
-lib/Memoize.pm			Memoize
-lib/Memoize/README		Memoize release notes
-lib/Memoize/SDBM_File.pm	Memoize glue layer for SDBM_File
-lib/Memoize/Storable.pm		Memoize glue layer for Storable
-lib/Memoize/t/array_confusion.t		Memoize ambiguous array return tests
-lib/Memoize/t/array.t		Memoize array context return tests
-lib/Memoize/t/correctness.t	Memoize basic correctness tests
-lib/Memoize/t/errors.t		Memoize PEBKAC detection tests
-lib/Memoize/t/expfile.t		Memoize expiry manager tests
-lib/Memoize/t/expire.t		Memoize expiry manager tests
-lib/Memoize/t/expmod_n.t	Memoize expiry manager tests
-lib/Memoize/t/expmod_t.t	Memoize expiry manager (timed) tests
-lib/Memoize/t/flush.t		Memoize 'flush_cache' function tests
-lib/Memoize/t/normalize.t	Memoize 'normalizer' feature tests
-lib/Memoize/TODO		Memoize to-do list
-lib/Memoize/t/prototype.t	Memoize prototyped function handling tests
-lib/Memoize/t/speed.t		"Makes functions faster" advertisement test
-lib/Memoize/t/tiefeatures.t	Memoize FAULT / MERGE / HASH options test
-lib/Memoize/t/tie_gdbm.t	Memoize GDBM interface test
-lib/Memoize/t/tie_ndbm.t	Memoize NDBM interface test
-lib/Memoize/t/tie_sdbm.t	Memoize SDBM interface test
-lib/Memoize/t/tie_storable.t	Memoize Storable interface test
-lib/Memoize/t/tie.t		Memoize tied file test
-lib/Memoize/t/unmemoize.t	Memoize 'unmemoize' function test
 lib/Module/Build/API.pod	Module::Build
 lib/Module/Build/Authoring.pod	Module::Build
 lib/Module/Build/Base.pm	Module::Build
@@ -2519,8 +2490,6 @@ lib/Tie/Handle/stdhandle_from_handle.t	Test for Tie::StdHandle/Handle backwards 
 lib/Tie/Handle/stdhandle.t	Test for Tie::StdHandle
 lib/Tie/Hash/NamedCapture.pm	Implements %- and %+ behaviour
 lib/Tie/Hash.pm			Base class for tied hashes
-lib/Tie/Memoize.pm		Base class for memoized tied hashes
-lib/Tie/Memoize.t		Test for Memoize.t
 lib/Tie/RefHash.pm		Base class for tied hashes with references as keys
 lib/Tie/RefHash/rebless.t	Test for Tie::RefHash with rebless
 lib/Tie/RefHash/refhash.t	Test for Tie::RefHash and Tie::RefHash::Nestable
