@@ -1,6 +1,5 @@
 
 require 5;
-use 5.006;  # we use some open(X, "<", $y) syntax 
 package Pod::Perldoc;
 use strict;
 use warnings;
