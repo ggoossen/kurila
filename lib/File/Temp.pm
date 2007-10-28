@@ -134,7 +134,6 @@ that the file will not exist by the time the caller opens the filename.
 
 # 5.6.0 gives us S_IWOTH, S_IWGRP, our and auto-vivifying filehandls
 # People would like a version on 5.004 so give them what they want :-)
-use 5.004;
 use strict;
 use Carp;
 use File::Spec 0.8;

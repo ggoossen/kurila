@@ -508,7 +508,6 @@ it under the same terms as Perl itself.
 
 =cut
 
-use 5.005_04;
 use strict;
 
 use Cwd 'getcwd';
