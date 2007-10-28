@@ -2,7 +2,6 @@
 # Time-stamp: "2004-10-06 23:26:33 ADT"
 # Sean M. Burke <sburke@cpan.org>
 
-require 5.000;
 package I18N::LangTags;
 use strict;
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION %Panic);

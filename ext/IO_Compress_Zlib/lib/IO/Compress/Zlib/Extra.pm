@@ -1,6 +1,5 @@
 package IO::Compress::Zlib::Extra;
 
-require 5.004 ;
 
 use strict ;
 use warnings;

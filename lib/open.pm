@@ -1,9 +1,8 @@
 package open;
 use warnings;
 
-our $VERSION = '1.05';
-
-require 5.008001; # for PerlIO::get_layers()
+our $VERSION = '1.05'
+;
 
 my $locale_encoding;
 

@@ -16,7 +16,6 @@
 
 package Pod::Text::Termcap;
 
-require 5.004;
 
 use Pod::Text ();
 use POSIX ();

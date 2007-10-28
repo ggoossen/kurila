@@ -12,7 +12,6 @@
 #
 
 package Text::Soundex;
-require 5.006;
 
 use Exporter ();
 use XSLoader ();

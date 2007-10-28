@@ -1,6 +1,5 @@
 package IO::Uncompress::Unzip;
 
-require 5.004 ;
 
 # for RFC1952
 

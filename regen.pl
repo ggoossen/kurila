@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-require 5.003;	# keep this compatible, an old perl is all we may have before
                 # we build the new one
 
 # The idea is to move the regen_headers target out of the Makefile so that

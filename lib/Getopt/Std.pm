@@ -1,5 +1,4 @@
 package Getopt::Std;
-require 5.000;
 require Exporter;
 
 use strict;

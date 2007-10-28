@@ -16,7 +16,6 @@
 
 package Pod::Text::Color;
 
-require 5.004;
 
 use Pod::Text ();
 use Term::ANSIColor qw(colored);

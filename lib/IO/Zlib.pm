@@ -6,8 +6,7 @@
 
 package IO::Zlib;
 
-$VERSION = "1.07";
-
+$VERSION = "1.07"
 =head1 NAME
 
 IO::Zlib - IO:: style interface to L<Compress::Zlib>
@@ -287,7 +286,7 @@ it and/or modify it under the same terms as Perl itself.
 
 =cut
 
-require 5.004;
+;
 
 use strict;
 use bytes;

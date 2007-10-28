@@ -1,6 +1,5 @@
 package B::OP;
 
-require 5.005_62;
 use strict;
 use warnings;
 use B;

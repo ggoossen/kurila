@@ -17,7 +17,6 @@
 
 package Pod::PlainText;
 
-require 5.005;
 
 use Carp qw(carp croak);
 use Pod::Select ();

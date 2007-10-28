@@ -35,7 +35,6 @@
 #
 # Author: Charles Bailey  bailey@newman.upenn.edu
 
-require 5.000;
 
 $debug = $ENV{'GEN_SHRFLS_DEBUG'};
 

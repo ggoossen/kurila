@@ -7,7 +7,6 @@
 # The sisify.pl utility is licensed under the same terms as Perl itself.
 #
 
-require 5.008;
 
 use strict;
 

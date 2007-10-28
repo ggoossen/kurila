@@ -6,7 +6,6 @@
 
 package Net::SMTP;
 
-require 5.001;
 
 use strict;
 use vars qw($VERSION @ISA);

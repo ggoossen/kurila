@@ -11,7 +11,6 @@
 
 package DB_File::HASHINFO ;
 
-require 5.00404;
 
 use warnings;
 use strict;

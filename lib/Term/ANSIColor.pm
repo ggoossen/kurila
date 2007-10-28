@@ -15,7 +15,6 @@
 ##############################################################################
 
 package Term::ANSIColor;
-require 5.001;
 
 use strict;
 use vars qw($AUTOLOAD $AUTORESET $EACHLINE @ISA @EXPORT @EXPORT_OK

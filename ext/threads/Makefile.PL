@@ -1,6 +1,5 @@
 # Module makefile for threads (using ExtUtils::MakeMaker)
 
-require 5.008;
 
 use strict;
 use warnings;

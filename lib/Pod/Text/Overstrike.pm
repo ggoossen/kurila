@@ -24,7 +24,6 @@
 
 package Pod::Text::Overstrike;
 
-require 5.004;
 
 use Pod::Text ();
 

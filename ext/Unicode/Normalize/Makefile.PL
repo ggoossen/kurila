@@ -1,4 +1,3 @@
-require 5.006001;
 use ExtUtils::MakeMaker;
 
 my $clean = {};

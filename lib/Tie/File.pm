@@ -1,6 +1,5 @@
 
 package Tie::File;
-require 5.005;
 use strict;
 use Carp ':DEFAULT', 'confess';
 use POSIX 'SEEK_SET';

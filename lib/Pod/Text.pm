@@ -24,7 +24,6 @@
 
 package Pod::Text;
 
-require 5.004;
 
 use strict;
 use utf8;

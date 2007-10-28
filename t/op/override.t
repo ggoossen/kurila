@@ -33,9 +33,8 @@ require Foo::Bar;
 is( $r, join($dirsep, "Foo", "Bar.pm") );
 
 require 'Foo';
-is( $r, "Foo" );
-
-require 5.6;
+is( $r, "Foo" )
+;
 is( $r, "5.6" );
 
 require v5.6;

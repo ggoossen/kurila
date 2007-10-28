@@ -1,5 +1,4 @@
 package Term::Complete;
-require 5.000;
 require Exporter;
 
 use strict;

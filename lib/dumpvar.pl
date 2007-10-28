@@ -1,4 +1,3 @@
-require 5.002;			# For (defined ref)
 package dumpvar;
 
 # Needed for PrettyPrinter only:

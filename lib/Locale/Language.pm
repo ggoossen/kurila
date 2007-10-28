@@ -6,7 +6,6 @@
 
 package Locale::Language;
 use strict;
-require 5.002;
 
 require Exporter;
 

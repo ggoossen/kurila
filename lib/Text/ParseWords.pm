@@ -2,9 +2,8 @@ package Text::ParseWords;
 
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $PERL_SINGLE_QUOTE);
-$VERSION = "3.26";
-
-require 5.000;
+$VERSION = "3.26"
+;
 
 use Exporter;
 @ISA = qw(Exporter);

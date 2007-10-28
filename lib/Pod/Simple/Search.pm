@@ -1,5 +1,4 @@
 
-require 5.005;
 package Pod::Simple::Search;
 use strict;
 

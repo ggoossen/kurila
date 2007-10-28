@@ -6,7 +6,6 @@
 
 package IO::Socket;
 
-require 5.006;
 
 use IO::Handle;
 use Socket 1.3;

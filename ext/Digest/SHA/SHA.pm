@@ -1,6 +1,5 @@
 package Digest::SHA;
 
-require 5.003000;
 
 use strict;
 use integer;
