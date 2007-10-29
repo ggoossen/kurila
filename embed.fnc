@@ -254,7 +254,7 @@ Ap	|void	|pmop_dump	|NULLOK PMOP* pm
 Ap	|void	|dump_packsubs	|NN const HV* stash
 Ap	|void	|dump_sub	|NN const GV* gv
 Apd	|void	|fbm_compile	|NN SV* sv|U32 flags
-ApdR	|char*	|fbm_instr	|NN unsigned char* big|NN unsigned char* bigend \
+ApdR	|char*	|fbm_instr	|NN char* big|NN char* bigend \
 				|NN SV* littlesv|U32 flags
 p	|char*	|find_script	|NN const char *scriptname|bool dosearch \
 				|NULLOK const char *const *const search_ext|I32 flags
@@ -360,10 +360,10 @@ ApPR	|bool	|is_uni_lower	|UV c
 ApPR	|bool	|is_uni_print	|UV c
 ApPR	|bool	|is_uni_punct	|UV c
 ApPR	|bool	|is_uni_xdigit	|UV c
-Ap	|UV	|to_uni_upper	|UV c|NN U8 *p|NN STRLEN *lenp
-Ap	|UV	|to_uni_title	|UV c|NN U8 *p|NN STRLEN *lenp
-Ap	|UV	|to_uni_lower	|UV c|NN U8 *p|NN STRLEN *lenp
-Ap	|UV	|to_uni_fold	|UV c|NN U8 *p|NN STRLEN *lenp
+Ap	|UV	|to_uni_upper	|UV c|NN char *p|NN STRLEN *lenp
+Ap	|UV	|to_uni_title	|UV c|NN char *p|NN STRLEN *lenp
+Ap	|UV	|to_uni_lower	|UV c|NN char *p|NN STRLEN *lenp
+Ap	|UV	|to_uni_fold	|UV c|NN char *p|NN STRLEN *lenp
 ApPR	|bool	|is_uni_alnum_lc|UV c
 ApPR	|bool	|is_uni_alnumc_lc|UV c
 ApPR	|bool	|is_uni_idfirst_lc|UV c
@@ -378,26 +378,26 @@ ApPR	|bool	|is_uni_lower_lc|UV c
 ApPR	|bool	|is_uni_print_lc|UV c
 ApPR	|bool	|is_uni_punct_lc|UV c
 ApPR	|bool	|is_uni_xdigit_lc|UV c
-Apd	|STRLEN	|is_utf8_char	|NN const U8 *p
-Apd	|bool	|is_utf8_string	|NN const U8 *s|STRLEN len
-Apdmb	|bool	|is_utf8_string_loc|NN const U8 *s|STRLEN len|NULLOK const U8 **p
-Apd	|bool	|is_utf8_string_loclen|NN const U8 *s|STRLEN len|NULLOK const U8 **ep|NULLOK STRLEN *el
-ApR	|bool	|is_utf8_alnum	|NN const U8 *p
-ApR	|bool	|is_utf8_alnumc	|NN const U8 *p
-ApR	|bool	|is_utf8_idfirst|NN const U8 *p
-ApR	|bool	|is_utf8_idcont	|NN const U8 *p
-ApR	|bool	|is_utf8_alpha	|NN const U8 *p
-ApR	|bool	|is_utf8_ascii	|NN const U8 *p
-ApR	|bool	|is_utf8_space	|NN const U8 *p
-ApR	|bool	|is_utf8_cntrl	|NN const U8 *p
-ApR	|bool	|is_utf8_digit	|NN const U8 *p
-ApR	|bool	|is_utf8_graph	|NN const U8 *p
-ApR	|bool	|is_utf8_upper	|NN const U8 *p
-ApR	|bool	|is_utf8_lower	|NN const U8 *p
-ApR	|bool	|is_utf8_print	|NN const U8 *p
-ApR	|bool	|is_utf8_punct	|NN const U8 *p
-ApR	|bool	|is_utf8_xdigit	|NN const U8 *p
-ApR	|bool	|is_utf8_mark	|NN const U8 *p
+Apd	|STRLEN	|is_utf8_char	|NN const char *p
+Apd	|bool	|is_utf8_string	|NN const char *s|STRLEN len
+Apdmb	|bool	|is_utf8_string_loc|NN const char *s|STRLEN len|NULLOK const char **p
+Apd	|bool	|is_utf8_string_loclen|NN const char *s|STRLEN len|NULLOK const char **ep|NULLOK STRLEN *el
+ApR	|bool	|is_utf8_alnum	|NN const char *p
+ApR	|bool	|is_utf8_alnumc	|NN const char *p
+ApR	|bool	|is_utf8_idfirst|NN const char *p
+ApR	|bool	|is_utf8_idcont	|NN const char *p
+ApR	|bool	|is_utf8_alpha	|NN const char *p
+ApR	|bool	|is_utf8_ascii	|NN const char *p
+ApR	|bool	|is_utf8_space	|NN const char *p
+ApR	|bool	|is_utf8_cntrl	|NN const char *p
+ApR	|bool	|is_utf8_digit	|NN const char *p
+ApR	|bool	|is_utf8_graph	|NN const char *p
+ApR	|bool	|is_utf8_upper	|NN const char *p
+ApR	|bool	|is_utf8_lower	|NN const char *p
+ApR	|bool	|is_utf8_print	|NN const char *p
+ApR	|bool	|is_utf8_punct	|NN const char *p
+ApR	|bool	|is_utf8_xdigit	|NN const char *p
+ApR	|bool	|is_utf8_mark	|NN const char *p
 p	|OP*	|jmaybe		|NN OP* arg
 pP	|I32	|keyword	|NN const char* d|I32 len|bool all_keywords
 Ap	|void	|leave_scope	|I32 base
@@ -905,15 +905,15 @@ Apd	|void	|sv_vsetpvfn	|NN SV* sv|NN const char* pat|STRLEN patlen \
 				|NULLOK bool *maybe_tainted
 ApR	|NV	|str_to_version	|NN SV *sv
 Ap	|SV*	|swash_init	|NN const char* pkg|NN const char* name|NN SV* listsv|I32 minbits|I32 none
-Ap	|UV	|swash_fetch	|NN SV *swash|NN const U8 *ptr|bool do_utf8
+Ap	|UV	|swash_fetch	|NN SV *swash|NN const char *ptr|bool do_utf8
 Ap	|void	|taint_env
 Ap	|void	|taint_proper	|NULLOK const char* f|NN const char* s
-Apd	|UV	|to_utf8_case	|NN const U8 *p|NN U8* ustrp|NULLOK STRLEN *lenp \
+Apd	|UV	|to_utf8_case	|NN const char *p|NN char* ustrp|NULLOK STRLEN *lenp \
 				|NN SV **swashp|NN const char *normal|NN const char *special
-Apd	|UV	|to_utf8_lower	|NN const U8 *p|NN U8* ustrp|NULLOK STRLEN *lenp
-Apd	|UV	|to_utf8_upper	|NN const U8 *p|NN U8* ustrp|NULLOK STRLEN *lenp
-Apd	|UV	|to_utf8_title	|NN const U8 *p|NN U8* ustrp|NULLOK STRLEN *lenp
-Apd	|UV	|to_utf8_fold	|NN const U8 *p|NN U8* ustrp|NULLOK STRLEN *lenp
+Apd	|UV	|to_utf8_lower	|NN const char *p|NN char* ustrp|NULLOK STRLEN *lenp
+Apd	|UV	|to_utf8_upper	|NN const char *p|NN char* ustrp|NULLOK STRLEN *lenp
+Apd	|UV	|to_utf8_title	|NN const char *p|NN char* ustrp|NULLOK STRLEN *lenp
+Apd	|UV	|to_utf8_fold	|NN const char *p|NN char* ustrp|NULLOK STRLEN *lenp
 #if defined(UNLINK_ALL_VERSIONS)
 Ap	|I32	|unlnk		|NN const char* f
 #endif
@@ -930,35 +930,35 @@ p	|OP *	|utilize	|int aver|I32 floor|NULLOK OP* version \
 #else
 p	|void	|utilize	|int aver|I32 floor|NULLOK OP* version|NN OP* idop|NULLOK OP* arg
 #endif
-Ap	|U8*	|utf16_to_utf8	|NN U8* p|NN U8 *d|I32 bytelen|NN I32 *newlen
-Ap	|U8*	|utf16_to_utf8_reversed|NN U8* p|NN U8 *d|I32 bytelen|NN I32 *newlen
-AdpPR	|STRLEN	|utf8_length	|NN const U8* s|NN const U8 *e
-ApdPR	|IV	|utf8_distance	|NN const U8 *a|NN const U8 *b
-ApdPR	|U8*	|utf8_hop	|NN const U8 *s|I32 off
-ApMd	|U8*	|utf8_to_bytes	|NN U8 *s|NN STRLEN *len
-ApMd	|U8*	|bytes_from_utf8|NN const U8 *s|NN STRLEN *len|NULLOK bool *is_utf8
-ApMd	|U8*	|bytes_to_utf8	|NN const U8 *s|NN STRLEN *len
-Apd	|UV	|utf8_to_uvchr	|NN const U8 *s|NULLOK STRLEN *retlen
-Apd	|UV	|utf8_to_uvuni	|NN const U8 *s|NULLOK STRLEN *retlen
+Ap	|char*	|utf16_to_utf8	|NN const char* p|NN char *d|I32 bytelen|NN I32 *newlen
+Ap	|char*	|utf16_to_utf8_reversed|NN char* p|NN char *d|I32 bytelen|NN I32 *newlen
+AdpPR	|STRLEN	|utf8_length	|NN const char* s|NN const char *e
+ApdPR	|IV	|utf8_distance	|NN const char *a|NN const char *b
+ApdPR	|char*	|utf8_hop	|NN const char *s|I32 off
+ApMd	|char*	|utf8_to_bytes	|NN char *s|NN STRLEN *len
+ApMd	|char*	|bytes_from_utf8|NN const char *s|NN STRLEN *len|NULLOK bool *is_utf8
+ApMd	|char*	|bytes_to_utf8	|NN const char *s|NN STRLEN *len
+Apd	|UV	|utf8_to_uvchr	|NN const char *s|NULLOK STRLEN *retlen
+Apd	|UV	|utf8_to_uvuni	|NN const char *s|NULLOK STRLEN *retlen
 
 #ifdef EBCDIC
-Adp	|UV	|utf8n_to_uvchr	|NN const U8 *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
+Adp	|UV	|utf8n_to_uvchr	|NN const char *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
 #else
-Adpbm	|UV	|utf8n_to_uvchr	|NN const U8 *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
+Adpbm	|UV	|utf8n_to_uvchr	|NN const char *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
 #endif
 
-Adp	|UV	|utf8n_to_uvuni	|NN const U8 *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
+Adp	|UV	|utf8n_to_uvuni	|NN const char *s|STRLEN curlen|NULLOK STRLEN *retlen|U32 flags
 
 #ifdef EBCDIC
-Apd	|U8*	|uvchr_to_utf8	|NN U8 *d|UV uv
+Apd	|char*	|uvchr_to_utf8	|NN char *d|UV uv
 #else
-Apdbm	|U8*	|uvchr_to_utf8	|NN U8 *d|UV uv
+Apdbm	|char*	|uvchr_to_utf8	|NN char *d|UV uv
 #endif
 
-Apbm	|U8*	|uvuni_to_utf8	|NN U8 *d|UV uv
-Ap	|U8*	|uvchr_to_utf8_flags	|NN U8 *d|UV uv|UV flags
-Apd	|U8*	|uvuni_to_utf8_flags	|NN U8 *d|UV uv|UV flags
-Apd	|char*	|pv_uni_display	|NN SV *dsv|NN const U8 *spv|STRLEN len|STRLEN pvlim|UV flags
+Apbm	|char*	|uvuni_to_utf8	|NN char *d|UV uv
+Ap	|char*	|uvchr_to_utf8_flags	|NN char *d|UV uv|UV flags
+Apd	|char*	|uvuni_to_utf8_flags	|NN char *d|UV uv|UV flags
+Apd	|char*	|pv_uni_display	|NN SV *dsv|NN const char *spv|STRLEN len|STRLEN pvlim|UV flags
 ApdR	|char*	|sv_uni_display	|NN SV *dsv|NN SV *ssv|STRLEN pvlim|UV flags
 EXp	|void	|vivify_defelem	|NN SV* sv
 p	|void	|vivify_ref	|NN SV* sv|U32 to_what
@@ -1255,7 +1255,7 @@ s	|void	|init_predump_symbols
 rs	|void	|my_exit_jump
 s	|void	|nuke_stacks
 s	|int	|open_script	|NN const char *scriptname|bool dosearch \
-				|NN SV *sv|NN int *suidscript|NN PerlIO **rsfpp
+				|NN int *suidscript|NN PerlIO **rsfpp
 s	|void	|usage		|NN const char *name
 s	|void	|validate_suid	|NN const char *validarg \
 				|NN const char *scriptname|int fdscript \
@@ -1325,7 +1325,6 @@ s	|I32	|sv_i_ncmp	|NN SV *a|NN SV *b
 s	|I32	|amagic_ncmp	|NN SV *a|NN SV *b
 s	|I32	|amagic_i_ncmp	|NN SV *a|NN SV *b
 s	|I32	|amagic_cmp	|NN SV *a|NN SV *b
-s	|I32	|amagic_cmp_locale|NN SV *a|NN SV *b
 s	|I32	|sortcv		|NN SV *a|NN SV *b
 s	|I32	|sortcv_xsub	|NN SV *a|NN SV *b
 s	|I32	|sortcv_stacked	|NN SV *a|NN SV *b
@@ -1372,7 +1371,7 @@ Esn	|void	|cl_or		|NN const struct RExC_state_t* state|NN struct regnode_charcla
 Es	|I32	|study_chunk	|NN struct RExC_state_t* state|NN regnode **scanp \
 				|NN I32 *minlenp|NN I32 *deltap \
 				|NN regnode *last|NULLOK struct scan_data_t *data \
-				|I32 stopparen|NULLOK U8* recursed \
+				|I32 stopparen|NULLOK char* recursed \
 				|NULLOK struct regnode_charclass_class *and_withp \
 				|U32 flags|U32 depth
 EsRn	|U32	|add_data	|NN struct RExC_state_t* state|U32 n|NN const char *s
@@ -1409,14 +1408,14 @@ Es	|U8	|regtail_study	|NN struct RExC_state_t *state|NN regnode *p|NN const regn
 ERs	|I32	|regmatch	|NN regmatch_info *reginfo|NN regnode *prog
 ERs	|I32	|regrepeat	|NN const regexp *prog|NN const regnode *p|I32 max|int depth
 ERs	|I32	|regtry		|NN regmatch_info *reginfo|NN char **startpos
-ERs	|bool	|reginclass	|NULLOK const regexp *prog|NN const regnode *n|NN const U8 *p|NULLOK STRLEN *lenp
+ERs	|bool	|reginclass	|NULLOK const regexp *prog|NN const regnode *n|NN const char *p|NULLOK STRLEN *lenp
 Es	|CHECKPOINT|regcppush	|I32 parenfloor
 Es	|char*	|regcppop	|NN const regexp *rex
 ERsn	|char*	|reghop3	|NN char *pos|I32 off|NN const char *lim
 ERsn	|char*	|reghop3c	|NN char *pos|I32 off|NN const char *lim
 ERsn	|char*	|reghop3x	|NN char *pos|I32 off|NN const char *lim
 ERsn	|char*	|reghop4	|NN char *pos|I32 off|NN const char *llim|NN const char *rlim
-ERsn	|U8*	|reghopmaybe3	|NN U8 *pos|I32 off|NN const U8 *lim
+ERsn	|char*	|reghopmaybe3	|NN char *pos|I32 off|NN const char *lim
 ERs	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c|NN char *s|NN const char *strend|NULLOK regmatch_info *reginfo
 Es	|void	|swap_match_buff|NN regexp * prog
 ERs	|I32	|reg_check_named_buff_matched	|NN const regexp *rex|NN const regnode *prog
@@ -1464,17 +1463,17 @@ s	|int	|sv_2iuv_non_preserve	|NN SV *sv|I32 numtype
 #  endif
 sR	|I32	|expect_number	|NN char** pattern
 #
-sn	|STRLEN	|sv_pos_u2b_forwards|NN const U8 *const start \
-		|NN const U8 *const send|STRLEN uoffset
-sn	|STRLEN	|sv_pos_u2b_midway|NN const U8 *const start \
-		|NN const U8 *send|STRLEN uoffset|STRLEN uend
+sn	|STRLEN	|sv_pos_u2b_forwards|NN const char *const start \
+		|NN const char *const send|STRLEN uoffset
+sn	|STRLEN	|sv_pos_u2b_midway|NN const char *const start \
+		|NN const char *send|STRLEN uoffset|STRLEN uend
 s	|STRLEN	|sv_pos_u2b_cached|NN SV *sv|NN MAGIC **mgp \
-		|NN const U8 *const start|NN const U8 *const send \
+		|NN const char *const start|NN const char *const send \
 		|STRLEN uoffset|STRLEN uoffset0|STRLEN boffset0
 s	|void	|utf8_mg_pos_cache_update|NN SV *sv|NN MAGIC **mgp \
 		|STRLEN byte|STRLEN utf8|STRLEN blen
-s	|STRLEN	|sv_pos_b2u_midway|NN const U8 *s|NN const U8 *const target \
-		|NN const U8 *end|STRLEN endu
+s	|STRLEN	|sv_pos_b2u_midway|NN const char *s|NN const char *const target \
+		|NN const char *end|STRLEN endu
 sn	|char *	|F0convert	|NV nv|NN char *endbuf|NN STRLEN *len
 #  if defined(PERL_OLD_COPY_ON_WRITE)
 sM	|void	|sv_release_COW	|NN SV *sv|NN const char *pvx|NN SV *after
@@ -1509,7 +1508,7 @@ s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 s	|void	|update_debugger_info|NULLOK SV *orig_sv \
 				|NULLOK const char *buf|STRLEN len
 sR	|char*	|skipspace	|NN char *s
-sR	|char*	|swallow_bom	|NN U8 *s
+sR	|char*	|swallow_bom	|NN char *s
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what
 s	|bool	|feature_is_enabled|NN const char* name|STRLEN namelen
@@ -1566,8 +1565,8 @@ sn	|NV|mulexp10	|NV value|I32 exponent
 #endif
 
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
-sRn	|STRLEN	|is_utf8_char_slow|NN const U8 *s|const STRLEN len
-sR	|bool	|is_utf8_common	|NN const U8 *const p|NN SV **swash|NN const char * const swashname
+sRn	|STRLEN	|is_utf8_char_slow|NN const char *s|const STRLEN len
+sR	|bool	|is_utf8_common	|NN const char *const p|NN SV **swash|NN const char * const swashname
 sR	|SV*	|swash_get	|NN SV* swash|UV start|UV span
 #endif
 

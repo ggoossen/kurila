@@ -2045,7 +2045,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     {
 	int suidscript;
 	const int fdscript
-	    = open_script(scriptname, dosearch, sv, &suidscript, &rsfp);
+	    = open_script(scriptname, dosearch, &suidscript, &rsfp);
 
 	validate_suid(validarg, scriptname, fdscript, suidscript,
 		linestr_sv, rsfp);
@@ -2976,7 +2976,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	 SvREFCNT_dec(PL_rs);
 	 if (s[1] == 'x' && s[2]) {
 	      const char *e = s+=2;
-	      U8 *tmps;
+	      char *tmps;
 
 	      while (*e)
 		e++;
@@ -2990,7 +2990,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	      }
 	      PL_rs = newSVpvs("");
 	      SvGROW(PL_rs, (STRLEN)(UNISKIP(rschar) + 1));
-	      tmps = (U8*)SvPVX(PL_rs);
+	      tmps = SvPVX(PL_rs);
 	      uvchr_to_utf8(tmps, rschar);
 	      SvCUR_set(PL_rs, UNISKIP(rschar));
 	 }
@@ -3500,15 +3500,9 @@ S_init_main_stash(pTHX)
 }
 
 STATIC int
-S_open_script(pTHX_ const char *scriptname, bool dosearch, SV *sv,
+S_open_script(pTHX_ const char *scriptname, bool dosearch,
 	      int *suidscript, PerlIO **rsfpp)
 {
-#ifndef IAMSUID
-    const char *quote;
-    const char *code;
-    const char *cpp_discard_flag;
-    const char *perl;
-#endif
     int fdscript = -1;
     dVAR;
 
@@ -4533,8 +4527,6 @@ Perl_init_argv_symbols(pTHX_ register int argc, register char **argv)
 	for (; argc > 0; argc--,argv++) {
 	    SV * const sv = newSVpv(argv[0],0);
 	    av_push(GvAVn(PL_argvgv),sv);
-	    if (PL_unicode & PERL_UNICODE_WIDESYSCALLS_FLAG) /* Sarathy? */
-		 (void)sv_utf8_decode(sv);
 	}
     }
 }

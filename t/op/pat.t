@@ -20,10 +20,19 @@ eval 'use Config';          #  Defaults assumed if this fails
 
 
 # use utf8;
+# use charnames ':full';
+#     my $SIGMA = "\N{GREEK CAPITAL LETTER SIGMA}";
+#     my $char  = "\N{COMBINING GREEK PERISPOMENI}";
 # use re Debug => 'ALL';
 
-# "123" =~ /^.*1/; # .*23\x{100}$/, 'uft8 + multiple floating substr');
-# ok("123\x{100}" =~ /^.*1/); # .*23\x{100}$/, 'uft8 + multiple floating substr');
+#     print "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
+# 	  /fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/ &&
+# 	$& eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" ? "ok\n" : "not XXX";
+# # # "123" =~ /^.*1/; # .*23\x{100}$/, 'uft8 + multiple floating substr');
+# # # ok("123\x{100}" =~ /^.*1/); # .*23\x{100}$/, 'uft8 + multiple floating substr');
+
+# #     # Before #13843 this was failing by matching falsely.
+# #     print "_:$char:_" =~ m/_:$SIGMA:_/i ? "not ok 786\n" : "ok 786\n";
 
 # __END__
 

@@ -131,11 +131,11 @@ STATIC I32
 S_do_trans_simple_utf8(pTHX_ SV * const sv)
 {
     dVAR;
-    U8 *s;
-    U8 *send;
-    U8 *d;
-    U8 *start;
-    U8 *dstart, *dend;
+    char *s;
+    char *send;
+    char *d;
+    char *start;
+    char *dstart, *dend;
     I32 matches = 0;
     const I32 grows = PL_op->op_private & OPpTRANS_GROWS;
     STRLEN len;
@@ -151,9 +151,8 @@ S_do_trans_simple_utf8(pTHX_ SV * const sv)
     const UV none = svp ? SvUV(*svp) : 0x7fffffff;
     const UV extra = none + 1;
     UV final = 0;
-    U8 hibit = 0;
 
-    s = (U8*)SvPV(sv, len);
+    s = SvPV(sv, len);
     send = s + len;
     start = s;
 
@@ -163,7 +162,7 @@ S_do_trans_simple_utf8(pTHX_ SV * const sv)
 
     if (grows) {
 	/* d needs to be bigger than s, in case e.g. upgrading is required */
-	Newx(d, len * 3 + UTF8_MAXBYTES, U8);
+	Newx(d, len * 3 + UTF8_MAXBYTES, char);
 	dend = d + len * 3;
 	dstart = d;
     }
@@ -181,7 +180,7 @@ S_do_trans_simple_utf8(pTHX_ SV * const sv)
 	}
 	else if (uv == none) {
 	    const int i = UTF8SKIP(s);
-	    Move(s, d, i, U8);
+	    Move(s, d, i, char);
 	    d += i;
 	    s += i;
 	}
@@ -198,16 +197,14 @@ S_do_trans_simple_utf8(pTHX_ SV * const sv)
 	    const STRLEN nlen = dend - dstart + len + UTF8_MAXBYTES;
 	    if (!grows)
 		Perl_croak(aTHX_ "panic: do_trans_simple_utf8 line %d",__LINE__);
-	    Renew(dstart, nlen + UTF8_MAXBYTES, U8);
+	    Renew(dstart, nlen + UTF8_MAXBYTES, char);
 	    d = dstart + clen;
 	    dend = dstart + nlen;
 	}
     }
-    if (grows || hibit) {
-	sv_setpvn(sv, (char*)dstart, d - dstart);
+    if (grows) {
+	sv_setpvn(sv, dstart, d - dstart);
 	Safefree(dstart);
-	if (grows && hibit)
-	    Safefree(start);
     }
     else {
 	*d = '\0';
@@ -222,9 +219,8 @@ STATIC I32
 S_do_trans_count_utf8(pTHX_ SV * const sv)
 {
     dVAR;
-    const U8 *s;
-    const U8 *start = NULL;
-    const U8 *send;
+    const char *s;
+    const char *send;
     I32 matches = 0;
     STRLEN len;
 
@@ -238,9 +234,8 @@ S_do_trans_count_utf8(pTHX_ SV * const sv)
     SV* const * const svp = hv_fetchs(hv, "NONE", FALSE);
     const UV none = svp ? SvUV(*svp) : 0x7fffffff;
     const UV extra = none + 1;
-    U8 hibit = 0;
 
-    s = (const U8*)SvPV_const(sv, len);
+    s = SvPV_const(sv, len);
     send = s + len;
 
     while (s < send) {
@@ -249,8 +244,6 @@ S_do_trans_count_utf8(pTHX_ SV * const sv)
 	    matches++;
 	s += UTF8SKIP(s);
     }
-    if (hibit)
-        Safefree(start);
 
     return matches;
 }
@@ -259,8 +252,8 @@ STATIC I32
 S_do_trans_complex_utf8(pTHX_ SV * const sv)
 {
     dVAR;
-    U8 *start, *send;
-    U8 *d;
+    char *start, *send;
+    char *d;
     I32 matches = 0;
     const I32 squash   = PL_op->op_private & OPpTRANS_SQUASH;
     const I32 del      = PL_op->op_private & OPpTRANS_DELETE;
@@ -278,10 +271,9 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
     UV final = 0;
     bool havefinal = FALSE;
     STRLEN len;
-    U8 *dstart, *dend;
-    U8 hibit = 0;
+    char *dstart, *dend;
 
-    U8 *s = (U8*)SvPV(sv, len);
+    char *s = SvPV(sv, len);
     send = s + len;
     start = s;
 
@@ -293,7 +285,7 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 
     if (grows) {
 	/* d needs to be bigger than s, in case e.g. upgrading is required */
-	Newx(d, len * 3 + UTF8_MAXBYTES, U8);
+	Newx(d, len * 3 + UTF8_MAXBYTES, char);
 	dend = d + len * 3;
 	dstart = d;
     }
@@ -312,7 +304,7 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 		const STRLEN nlen = dend - dstart + len + UTF8_MAXBYTES;
 		if (!grows)
 		    Perl_croak(aTHX_ "panic: do_trans_complex_utf8 line %d",__LINE__);
-		Renew(dstart, nlen + UTF8_MAXBYTES, U8);
+		Renew(dstart, nlen + UTF8_MAXBYTES, char);
 		d = dstart + clen;
 		dend = dstart + nlen;
 	    }
@@ -327,7 +319,7 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 	    }
 	    else if (uv == none) {	/* "none" is unmapped character */
 		const int i = UTF8SKIP(s);
-		Move(s, d, i, U8);
+		Move(s, d, i, char);
 		d += i;
 		s += i;
 		puv = 0xfeedface;
@@ -346,7 +338,7 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 		    STRLEN len;
 		    uv = utf8n_to_uvuni(s, send - s, &len, UTF8_ALLOW_DEFAULT);
 		    if (uv != puv) {
-			Move(s, d, len, U8);
+			Move(s, d, len, char);
 			d += len;
 			puv = uv;
 		    }
@@ -366,7 +358,7 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 		const STRLEN nlen = dend - dstart + len + UTF8_MAXBYTES;
 		if (!grows)
 		    Perl_croak(aTHX_ "panic: do_trans_complex_utf8 line %d",__LINE__);
-		Renew(dstart, nlen + UTF8_MAXBYTES, U8);
+		Renew(dstart, nlen + UTF8_MAXBYTES, char);
 		d = dstart + clen;
 		dend = dstart + nlen;
 	    }
@@ -378,7 +370,7 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 	    }
 	    else if (uv == none) {	/* "none" is unmapped character */
 		const int i = UTF8SKIP(s);
-		Move(s, d, i, U8);
+		Move(s, d, i, char);
 		d += i;
 		s += i;
 		continue;
@@ -393,11 +385,9 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
 	    s += UTF8SKIP(s);
 	}
     }
-    if (grows || hibit) {
+    if (grows) {
 	sv_setpvn(sv, (char*)dstart, d - dstart);
 	Safefree(dstart);
-	if (grows && hibit)
-	    Safefree(start);
     }
     else {
 	*d = '\0';
@@ -792,7 +782,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	    s = send - 1;
 	    while (s > start && UTF8_IS_CONTINUATION(*s))
 		s--;
-	    if (is_utf8_string((U8*)s, send - s)) {
+	    if (is_utf8_string(s, send - s)) {
 		sv_setpvn(astr, s, send - s);
 		*s = '\0';
 		SvCUR_set(sv, s - start);
@@ -1081,9 +1071,11 @@ Perl_do_kv(pTHX)
 	    i = 0;
 	    while (hv_iternext(keys)) i++;
 	}
-	dTARGET;
-	PUSHi( i );
-	RETURN;
+	{
+	    dTARGET;
+	    PUSHi( i );
+	    RETURN;
+	}
     }
 
     EXTEND(SP, HvKEYS(keys) * (dokeys + dovalues));

@@ -563,8 +563,8 @@ PP(pp_flop)
 {
     dVAR; dSP;
 
-    assert(GIMME == G_ARRAY);
     dPOPPOPssrl;
+    assert(GIMME == G_ARRAY);
 
     SvGETMAGIC(left);
     SvGETMAGIC(right);

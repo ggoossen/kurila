@@ -569,12 +569,12 @@ then.
 */
 
 char *
-Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *littlestr, U32 flags)
+Perl_fbm_instr(pTHX_ char *big, register char *bigend, SV *littlestr, U32 flags)
 {
-    register unsigned char *s;
+    register char *s;
     STRLEN l;
-    register const unsigned char *little
-	= (const unsigned char *)SvPV_const(littlestr,l);
+    register const char *little
+	= SvPV_const(littlestr,l);
     register STRLEN littlelen = l;
     register const I32 multiline = flags & FBMrf_MULTILINE;
 
@@ -583,8 +583,8 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 	     && ((STRLEN)(bigend - big) == littlelen - 1)
 	     && (littlelen == 1
 		 || (*big == *little &&
-		     memEQ((char *)big, (char *)little, littlelen - 1))))
-	    return (char*)big;
+		     memEQ(big, little, littlelen - 1))))
+	    return big;
 	return NULL;
     }
 
@@ -594,36 +594,36 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 	    if (SvTAIL(littlestr) && !multiline) { /* Anchor only! */
 		/* Know that bigend != big.  */
 		if (bigend[-1] == '\n')
-		    return (char *)(bigend - 1);
-		return (char *) bigend;
+		    return (bigend - 1);
+		return bigend;
 	    }
 	    s = big;
 	    while (s < bigend) {
 		if (*s == *little)
-		    return (char *)s;
+		    return s;
 		s++;
 	    }
 	    if (SvTAIL(littlestr))
-		return (char *) bigend;
+		return bigend;
 	    return NULL;
 	}
 	if (!littlelen)
-	    return (char*)big;		/* Cannot be SvTAIL! */
+	    return big;		/* Cannot be SvTAIL! */
 
 	/* littlelen is 2 */
 	if (SvTAIL(littlestr) && !multiline) {
 	    if (bigend[-1] == '\n' && bigend[-2] == *little)
-		return (char*)bigend - 2;
+		return bigend - 2;
 	    if (bigend[-1] == *little)
-		return (char*)bigend - 1;
+		return bigend - 1;
 	    return NULL;
 	}
 	{
 	    /* This should be better than FBM if c1 == c2, and almost
 	       as good otherwise: maybe better since we do less indirection.
 	       And we save a lot of memory by caching no table. */
-	    const unsigned char c1 = little[0];
-	    const unsigned char c2 = little[1];
+	    const char c1 = little[0];
+	    const char c2 = little[1];
 
 	    s = big + 1;
 	    bigend--;
@@ -631,7 +631,7 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 		while (s <= bigend) {
 		    if (s[0] == c2) {
 			if (s[-1] == c1)
-			    return (char*)s - 1;
+			    return s - 1;
 			s += 2;
 			continue;
 		    }
@@ -640,7 +640,7 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 			if (s == bigend)
 			    goto check_1char_anchor;
 			if (s[1] == c2)
-			    return (char*)s;
+			    return s;
 			else {
 			    s++;
 			    goto next_chars;
@@ -655,11 +655,11 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 	    while (s <= bigend) {
 		if (s[0] == c1) {
 		    if (s[-1] == c1)
-			return (char*)s - 1;
+			return s - 1;
 		    if (s == bigend)
 			goto check_1char_anchor;
 		    if (s[1] == c1)
-			return (char*)s;
+			return s;
 		    s += 3;
 		}
 		else
@@ -668,35 +668,35 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 	}
       check_1char_anchor:		/* One char and anchor! */
 	if (SvTAIL(littlestr) && (*bigend == *little))
-	    return (char *)bigend;	/* bigend is already decremented. */
+	    return bigend;	/* bigend is already decremented. */
 	return NULL;
     }
     if (SvTAIL(littlestr) && !multiline) {	/* tail anchored? */
 	s = bigend - littlelen;
 	if (s >= big && bigend[-1] == '\n' && *s == *little
 	    /* Automatically of length > 2 */
-	    && memEQ((char*)s + 1, (char*)little + 1, littlelen - 2))
+	    && memEQ(s + 1, little + 1, littlelen - 2))
 	{
-	    return (char*)s;		/* how sweet it is */
+	    return s;		/* how sweet it is */
 	}
 	if (s[1] == *little
-	    && memEQ((char*)s + 2, (char*)little + 1, littlelen - 2))
+	    && memEQ(s + 2, little + 1, littlelen - 2))
 	{
-	    return (char*)s + 1;	/* how sweet it is */
+	    return s + 1;	/* how sweet it is */
 	}
 	return NULL;
     }
     if (!SvVALID(littlestr)) {
-	char * const b = ninstr((char*)big,(char*)bigend,
-			 (char*)little, (char*)little + littlelen);
+	char * const b = ninstr(big,bigend,
+			 little, little + littlelen);
 
 	if (!b && SvTAIL(littlestr)) {	/* Automatically multiline!  */
 	    /* Chop \n from littlestr: */
 	    s = bigend - littlelen + 1;
 	    if (*s == *little
-		&& memEQ((char*)s + 1, (char*)little + 1, littlelen - 2))
+		&& memEQ(s + 1, little + 1, littlelen - 2))
 	    {
-		return (char*)s;
+		return s;
 	    }
 	    return NULL;
 	}
@@ -708,9 +708,9 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 	return NULL;
 
     {
-	register const unsigned char * const table
+	register const char * const table
 	    = little + littlelen + PERL_FBM_TABLE_OFFSET;
-	register const unsigned char *oldlittle;
+	register const char *oldlittle;
 
 	--littlelen;			/* Last char found by table lookup */
 
@@ -721,13 +721,13 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 	    register I32 tmp;
 
 	  top2:
-	    if ((tmp = table[*s])) {
+	    if ((tmp = table[(U8)*s])) {
 		if ((s += tmp) < bigend)
 		    goto top2;
 		goto check_end;
 	    }
 	    else {		/* less expensive than calling strncmp() */
-		register unsigned char * const olds = s;
+		register char * const olds = s;
 
 		tmp = littlelen;
 
@@ -740,15 +740,15 @@ Perl_fbm_instr(pTHX_ unsigned char *big, register unsigned char *bigend, SV *lit
 			goto top2;
 		    goto check_end;
 		}
-		return (char *)s;
+		return s;
 	    }
 	}
       check_end:
 	if ( s == bigend
 	     && (BmFLAGS(littlestr) & FBMcf_TAIL)
-	     && memEQ((char *)(bigend - littlelen),
-		      (char *)(oldlittle - littlelen), littlelen) )
-	    return (char*)bigend - littlelen;
+	     && memEQ((bigend - littlelen),
+		      (oldlittle - littlelen), littlelen) )
+	    return bigend - littlelen;
 	return NULL;
     }
 }

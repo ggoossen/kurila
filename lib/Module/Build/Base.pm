@@ -1,7 +1,6 @@
 package Module::Build::Base;
 
 use strict;
-BEGIN { require 5.00503 }
 
 use Carp;
 use Config;

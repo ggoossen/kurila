@@ -565,7 +565,7 @@ PERL_CALLCONV void	Perl_dump_sub(pTHX_ const GV* gv)
 PERL_CALLCONV void	Perl_fbm_compile(pTHX_ SV* sv, U32 flags)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV char*	Perl_fbm_instr(pTHX_ unsigned char* big, unsigned char* bigend, SV* littlesv, U32 flags)
+PERL_CALLCONV char*	Perl_fbm_instr(pTHX_ char* big, char* bigend, SV* littlesv, U32 flags)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
@@ -865,19 +865,19 @@ PERL_CALLCONV bool	Perl_is_uni_xdigit(pTHX_ UV c)
 			__attribute__warn_unused_result__
 			__attribute__pure__;
 
-PERL_CALLCONV UV	Perl_to_uni_upper(pTHX_ UV c, U8 *p, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_uni_upper(pTHX_ UV c, char *p, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 
-PERL_CALLCONV UV	Perl_to_uni_title(pTHX_ UV c, U8 *p, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_uni_title(pTHX_ UV c, char *p, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 
-PERL_CALLCONV UV	Perl_to_uni_lower(pTHX_ UV c, U8 *p, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_uni_lower(pTHX_ UV c, char *p, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 
-PERL_CALLCONV UV	Perl_to_uni_fold(pTHX_ UV c, U8 *p, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_uni_fold(pTHX_ UV c, char *p, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 
@@ -937,79 +937,79 @@ PERL_CALLCONV bool	Perl_is_uni_xdigit_lc(pTHX_ UV c)
 			__attribute__warn_unused_result__
 			__attribute__pure__;
 
-PERL_CALLCONV STRLEN	Perl_is_utf8_char(pTHX_ const U8 *p)
+PERL_CALLCONV STRLEN	Perl_is_utf8_char(pTHX_ const char *p)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_string(pTHX_ const U8 *s, STRLEN len)
+PERL_CALLCONV bool	Perl_is_utf8_string(pTHX_ const char *s, STRLEN len)
 			__attribute__nonnull__(pTHX_1);
 
-/* PERL_CALLCONV bool	Perl_is_utf8_string_loc(pTHX_ const U8 *s, STRLEN len, const U8 **p)
+/* PERL_CALLCONV bool	Perl_is_utf8_string_loc(pTHX_ const char *s, STRLEN len, const char **p)
 			__attribute__nonnull__(pTHX_1); */
 
-PERL_CALLCONV bool	Perl_is_utf8_string_loclen(pTHX_ const U8 *s, STRLEN len, const U8 **ep, STRLEN *el)
+PERL_CALLCONV bool	Perl_is_utf8_string_loclen(pTHX_ const char *s, STRLEN len, const char **ep, STRLEN *el)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_alnum(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_alnum(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_alnumc(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_alnumc(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_idfirst(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_idfirst(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_idcont(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_idcont(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_alpha(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_alpha(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_ascii(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_ascii(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_space(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_space(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_cntrl(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_cntrl(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_digit(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_digit(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_graph(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_graph(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_upper(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_upper(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_lower(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_lower(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_print(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_print(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_punct(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_punct(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_xdigit(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_xdigit(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV bool	Perl_is_utf8_mark(pTHX_ const U8 *p)
+PERL_CALLCONV bool	Perl_is_utf8_mark(pTHX_ const char *p)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
@@ -2454,7 +2454,7 @@ PERL_CALLCONV SV*	Perl_swash_init(pTHX_ const char* pkg, const char* name, SV* l
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 
-PERL_CALLCONV UV	Perl_swash_fetch(pTHX_ SV *swash, const U8 *ptr, bool do_utf8)
+PERL_CALLCONV UV	Perl_swash_fetch(pTHX_ SV *swash, const char *ptr, bool do_utf8)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
@@ -2462,26 +2462,26 @@ PERL_CALLCONV void	Perl_taint_env(pTHX);
 PERL_CALLCONV void	Perl_taint_proper(pTHX_ const char* f, const char* s)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV UV	Perl_to_utf8_case(pTHX_ const U8 *p, U8* ustrp, STRLEN *lenp, SV **swashp, const char *normal, const char *special)
+PERL_CALLCONV UV	Perl_to_utf8_case(pTHX_ const char *p, char* ustrp, STRLEN *lenp, SV **swashp, const char *normal, const char *special)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_4)
 			__attribute__nonnull__(pTHX_5)
 			__attribute__nonnull__(pTHX_6);
 
-PERL_CALLCONV UV	Perl_to_utf8_lower(pTHX_ const U8 *p, U8* ustrp, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_utf8_lower(pTHX_ const char *p, char* ustrp, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV UV	Perl_to_utf8_upper(pTHX_ const U8 *p, U8* ustrp, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_utf8_upper(pTHX_ const char *p, char* ustrp, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV UV	Perl_to_utf8_title(pTHX_ const U8 *p, U8* ustrp, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_utf8_title(pTHX_ const char *p, char* ustrp, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV UV	Perl_to_utf8_fold(pTHX_ const U8 *p, U8* ustrp, STRLEN *lenp)
+PERL_CALLCONV UV	Perl_to_utf8_fold(pTHX_ const char *p, char* ustrp, STRLEN *lenp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
@@ -2513,86 +2513,86 @@ PERL_CALLCONV void	Perl_utilize(pTHX_ int aver, I32 floor, OP* version, OP* idop
 			__attribute__nonnull__(pTHX_4);
 
 #endif
-PERL_CALLCONV U8*	Perl_utf16_to_utf8(pTHX_ U8* p, U8 *d, I32 bytelen, I32 *newlen)
+PERL_CALLCONV char*	Perl_utf16_to_utf8(pTHX_ const char* p, char *d, I32 bytelen, I32 *newlen)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_4);
 
-PERL_CALLCONV U8*	Perl_utf16_to_utf8_reversed(pTHX_ U8* p, U8 *d, I32 bytelen, I32 *newlen)
+PERL_CALLCONV char*	Perl_utf16_to_utf8_reversed(pTHX_ char* p, char *d, I32 bytelen, I32 *newlen)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_4);
 
-PERL_CALLCONV STRLEN	Perl_utf8_length(pTHX_ const U8* s, const U8 *e)
+PERL_CALLCONV STRLEN	Perl_utf8_length(pTHX_ const char* s, const char *e)
 			__attribute__warn_unused_result__
 			__attribute__pure__
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV IV	Perl_utf8_distance(pTHX_ const U8 *a, const U8 *b)
+PERL_CALLCONV IV	Perl_utf8_distance(pTHX_ const char *a, const char *b)
 			__attribute__warn_unused_result__
 			__attribute__pure__
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV U8*	Perl_utf8_hop(pTHX_ const U8 *s, I32 off)
+PERL_CALLCONV char*	Perl_utf8_hop(pTHX_ const char *s, I32 off)
 			__attribute__warn_unused_result__
 			__attribute__pure__
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV U8*	Perl_utf8_to_bytes(pTHX_ U8 *s, STRLEN *len)
+PERL_CALLCONV char*	Perl_utf8_to_bytes(pTHX_ char *s, STRLEN *len)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV U8*	Perl_bytes_from_utf8(pTHX_ const U8 *s, STRLEN *len, bool *is_utf8)
+PERL_CALLCONV char*	Perl_bytes_from_utf8(pTHX_ const char *s, STRLEN *len, bool *is_utf8)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV U8*	Perl_bytes_to_utf8(pTHX_ const U8 *s, STRLEN *len)
+PERL_CALLCONV char*	Perl_bytes_to_utf8(pTHX_ const char *s, STRLEN *len)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV UV	Perl_utf8_to_uvchr(pTHX_ const U8 *s, STRLEN *retlen)
+PERL_CALLCONV UV	Perl_utf8_to_uvchr(pTHX_ const char *s, STRLEN *retlen)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV UV	Perl_utf8_to_uvuni(pTHX_ const U8 *s, STRLEN *retlen)
+PERL_CALLCONV UV	Perl_utf8_to_uvuni(pTHX_ const char *s, STRLEN *retlen)
 			__attribute__nonnull__(pTHX_1);
 
 
 #ifdef EBCDIC
-PERL_CALLCONV UV	Perl_utf8n_to_uvchr(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
+PERL_CALLCONV UV	Perl_utf8n_to_uvchr(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 			__attribute__nonnull__(pTHX_1);
 
 #else
-/* PERL_CALLCONV UV	Perl_utf8n_to_uvchr(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
+/* PERL_CALLCONV UV	Perl_utf8n_to_uvchr(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 			__attribute__nonnull__(pTHX_1); */
 
 #endif
 
-PERL_CALLCONV UV	Perl_utf8n_to_uvuni(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
+PERL_CALLCONV UV	Perl_utf8n_to_uvuni(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 			__attribute__nonnull__(pTHX_1);
 
 
 #ifdef EBCDIC
-PERL_CALLCONV U8*	Perl_uvchr_to_utf8(pTHX_ U8 *d, UV uv)
+PERL_CALLCONV char*	Perl_uvchr_to_utf8(pTHX_ char *d, UV uv)
 			__attribute__nonnull__(pTHX_1);
 
 #else
-/* PERL_CALLCONV U8*	Perl_uvchr_to_utf8(pTHX_ U8 *d, UV uv)
+/* PERL_CALLCONV char*	Perl_uvchr_to_utf8(pTHX_ char *d, UV uv)
 			__attribute__nonnull__(pTHX_1); */
 
 #endif
 
-/* PERL_CALLCONV U8*	Perl_uvuni_to_utf8(pTHX_ U8 *d, UV uv)
+/* PERL_CALLCONV char*	Perl_uvuni_to_utf8(pTHX_ char *d, UV uv)
 			__attribute__nonnull__(pTHX_1); */
 
-PERL_CALLCONV U8*	Perl_uvchr_to_utf8_flags(pTHX_ U8 *d, UV uv, UV flags)
+PERL_CALLCONV char*	Perl_uvchr_to_utf8_flags(pTHX_ char *d, UV uv, UV flags)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV U8*	Perl_uvuni_to_utf8_flags(pTHX_ U8 *d, UV uv, UV flags)
+PERL_CALLCONV char*	Perl_uvuni_to_utf8_flags(pTHX_ char *d, UV uv, UV flags)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV char*	Perl_pv_uni_display(pTHX_ SV *dsv, const U8 *spv, STRLEN len, STRLEN pvlim, UV flags)
+PERL_CALLCONV char*	Perl_pv_uni_display(pTHX_ SV *dsv, const char *spv, STRLEN len, STRLEN pvlim, UV flags)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
@@ -3371,11 +3371,10 @@ STATIC void	S_my_exit_jump(pTHX)
 			__attribute__noreturn__;
 
 STATIC void	S_nuke_stacks(pTHX);
-STATIC int	S_open_script(pTHX_ const char *scriptname, bool dosearch, SV *sv, int *suidscript, PerlIO **rsfpp)
+STATIC int	S_open_script(pTHX_ const char *scriptname, bool dosearch, int *suidscript, PerlIO **rsfpp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_3)
-			__attribute__nonnull__(pTHX_4)
-			__attribute__nonnull__(pTHX_5);
+			__attribute__nonnull__(pTHX_4);
 
 STATIC void	S_usage(pTHX_ const char *name)
 			__attribute__nonnull__(pTHX_1);
@@ -3559,10 +3558,6 @@ STATIC I32	S_amagic_cmp(pTHX_ SV *a, SV *b)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-STATIC I32	S_amagic_cmp_locale(pTHX_ SV *a, SV *b)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-
 STATIC I32	S_sortcv(pTHX_ SV *a, SV *b)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -3700,7 +3695,7 @@ STATIC void	S_cl_or(const struct RExC_state_t* state, struct regnode_charclass_c
 			__attribute__nonnull__(2)
 			__attribute__nonnull__(3);
 
-STATIC I32	S_study_chunk(pTHX_ struct RExC_state_t* state, regnode **scanp, I32 *minlenp, I32 *deltap, regnode *last, struct scan_data_t *data, I32 stopparen, U8* recursed, struct regnode_charclass_class *and_withp, U32 flags, U32 depth)
+STATIC I32	S_study_chunk(pTHX_ struct RExC_state_t* state, regnode **scanp, I32 *minlenp, I32 *deltap, regnode *last, struct scan_data_t *data, I32 stopparen, char* recursed, struct regnode_charclass_class *and_withp, U32 flags, U32 depth)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3)
@@ -3782,7 +3777,7 @@ STATIC I32	S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-STATIC bool	S_reginclass(pTHX_ const regexp *prog, const regnode *n, const U8 *p, STRLEN *lenp)
+STATIC bool	S_reginclass(pTHX_ const regexp *prog, const regnode *n, const char *p, STRLEN *lenp)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
@@ -3812,7 +3807,7 @@ STATIC char*	S_reghop4(char *pos, I32 off, const char *llim, const char *rlim)
 			__attribute__nonnull__(3)
 			__attribute__nonnull__(4);
 
-STATIC U8*	S_reghopmaybe3(U8 *pos, I32 off, const U8 *lim)
+STATIC char*	S_reghopmaybe3(char *pos, I32 off, const char *lim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3);
@@ -3919,15 +3914,15 @@ STATIC I32	S_expect_number(pTHX_ char** pattern)
 			__attribute__nonnull__(pTHX_1);
 
 #
-STATIC STRLEN	S_sv_pos_u2b_forwards(const U8 *const start, const U8 *const send, STRLEN uoffset)
+STATIC STRLEN	S_sv_pos_u2b_forwards(const char *const start, const char *const send, STRLEN uoffset)
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(2);
 
-STATIC STRLEN	S_sv_pos_u2b_midway(const U8 *const start, const U8 *send, STRLEN uoffset, STRLEN uend)
+STATIC STRLEN	S_sv_pos_u2b_midway(const char *const start, const char *send, STRLEN uoffset, STRLEN uend)
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(2);
 
-STATIC STRLEN	S_sv_pos_u2b_cached(pTHX_ SV *sv, MAGIC **mgp, const U8 *const start, const U8 *const send, STRLEN uoffset, STRLEN uoffset0, STRLEN boffset0)
+STATIC STRLEN	S_sv_pos_u2b_cached(pTHX_ SV *sv, MAGIC **mgp, const char *const start, const char *const send, STRLEN uoffset, STRLEN uoffset0, STRLEN boffset0)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3)
@@ -3937,7 +3932,7 @@ STATIC void	S_utf8_mg_pos_cache_update(pTHX_ SV *sv, MAGIC **mgp, STRLEN byte, S
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-STATIC STRLEN	S_sv_pos_b2u_midway(pTHX_ const U8 *s, const U8 *const target, const U8 *end, STRLEN endu)
+STATIC STRLEN	S_sv_pos_b2u_midway(pTHX_ const char *s, const char *const target, const char *end, STRLEN endu)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
@@ -4029,7 +4024,7 @@ STATIC char*	S_skipspace(pTHX_ char *s)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-STATIC char*	S_swallow_bom(pTHX_ U8 *s)
+STATIC char*	S_swallow_bom(pTHX_ char *s)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
@@ -4132,11 +4127,11 @@ STATIC NV	S_mulexp10(NV value, I32 exponent);
 #endif
 
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
-STATIC STRLEN	S_is_utf8_char_slow(const U8 *s, const STRLEN len)
+STATIC STRLEN	S_is_utf8_char_slow(const char *s, const STRLEN len)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1);
 
-STATIC bool	S_is_utf8_common(pTHX_ const U8 *const p, SV **swash, const char * const swashname)
+STATIC bool	S_is_utf8_common(pTHX_ const char *const p, SV **swash, const char * const swashname)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
