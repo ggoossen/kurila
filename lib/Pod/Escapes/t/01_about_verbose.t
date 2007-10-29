@@ -5,7 +5,6 @@ BEGIN {
     }
 }
 
-require 5;
 # Time-stamp: "2004-04-27 19:44:49 ADT"
 
 # Summary of, well, things.

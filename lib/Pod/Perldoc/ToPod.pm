@@ -7,7 +7,6 @@
 # the Perl code (or whatever non-pod stuff is in the source file).
 
 
-require 5;
 package Pod::Perldoc::ToPod;
 use strict;
 use warnings;

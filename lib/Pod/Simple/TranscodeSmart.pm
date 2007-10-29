@@ -1,5 +1,4 @@
 
-require 5;
 ## Anything before 5.8.0 is GIMPY!
 ## This module is to be use()'d only by Pod::Simple::Transcode
 

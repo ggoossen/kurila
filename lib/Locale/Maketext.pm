@@ -1,7 +1,6 @@
 
 # Time-stamp: "2004-03-30 16:33:31 AST"
 
-require 5;
 package Locale::Maketext;
 use strict;
 use vars qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS

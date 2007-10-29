@@ -1,5 +1,4 @@
 
-require 5;
 use Test;
 BEGIN { plan tests => 11; }
 use Locale::Maketext 1.01;

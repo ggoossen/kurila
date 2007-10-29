@@ -1,5 +1,4 @@
 
-require 5;
 package Pod::Simple::PullParserEndToken;
 use Pod::Simple::PullParserToken ();
 @ISA = ('Pod::Simple::PullParserToken');

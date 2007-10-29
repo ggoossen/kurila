@@ -1,5 +1,4 @@
 
-require 5;
 ## This module is to be use()'d only by Pod::Simple::Transcode
 
 package Pod::Simple::TranscodeDumb;

@@ -1,5 +1,4 @@
 
-require 5;
 use Test;
 # Time-stamp: "2004-07-01 14:33:50 ADT"
 BEGIN { plan tests => 20; }

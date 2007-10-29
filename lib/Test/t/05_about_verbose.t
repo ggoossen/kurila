@@ -1,4 +1,3 @@
-require 5;
 # Time-stamp: "2004-04-24 16:53:03 ADT"
 
 # Summary of, well, things.

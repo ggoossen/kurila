@@ -1,5 +1,4 @@
 
-require 5;
 package Pod::Perldoc::ToChecker;
 use strict;
 use warnings;

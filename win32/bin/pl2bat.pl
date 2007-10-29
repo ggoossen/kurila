@@ -1,7 +1,6 @@
     eval 'exec perl -x -S "$0" ${1+"$@"}'
-	if 0;	# In case running under some shell
-
-require 5;
+	if 0
+;	# In case running under some shell
 use Getopt::Std;
 use Config;
 

@@ -1,5 +1,4 @@
 
-require 5;
 package Pod::Perldoc::ToXml;
 use strict;
 use warnings;

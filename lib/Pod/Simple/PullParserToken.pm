@@ -1,5 +1,4 @@
 
-require 5;
 package Pod::Simple::PullParserToken;
  # Base class for tokens gotten from Pod::Simple::PullParser's $parser->get_token
 @ISA = ();
