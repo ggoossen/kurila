@@ -2,7 +2,6 @@
 # Time-stamp: "2004-12-29 20:01:02 AST" -*-Perl-*-
 
 package Class::ISA;
-require 5;
 use strict;
 use vars qw($Debug $VERSION);
 $VERSION = '0.33';

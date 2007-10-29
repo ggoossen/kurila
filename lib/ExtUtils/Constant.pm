@@ -90,9 +90,7 @@ C<undef>.  The value of the macro is not needed.
 
 =cut
 
-if ($] >= 5.006) {
-  eval "use warnings; 1" or die $@;
-}
+use warnings;
 use strict;
 use Carp qw(croak cluck);
 
@@ -344,16 +342,7 @@ EOT
   }
 
   $func .= <<'END';
-    {
-	no strict 'refs';
-	# Fixed between 5.005_53 and 5.005_61
-#XXX	if ($] >= 5.00561) {
-#XXX	    *$AUTOLOAD = sub () { $val };
-#XXX	}
-#XXX	else {
-	    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-#XXX	}
-    }
+    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
     goto &{Symbol::fetch_glob($AUTOLOAD)};
 }
 
