@@ -347,6 +347,10 @@ use version;
 ==========
 require 5;
 ----------
+==========
+BEGIN { require 5; }
+----------
+BEGIN {  }
 END
 }
 
