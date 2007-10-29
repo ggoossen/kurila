@@ -1,6 +1,5 @@
 
 
-require 5;
 package Pod::Simple::SimpleTree;
 use strict;
 use Carp ();

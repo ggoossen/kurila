@@ -1,7 +1,6 @@
 
 # Time-stamp: "2004-06-20 21:47:55 ADT"
 
-require 5;
 package I18N::LangTags::Detect;
 use strict;
 

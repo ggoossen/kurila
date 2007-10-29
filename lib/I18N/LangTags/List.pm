@@ -1,5 +1,4 @@
 
-require 5;
 package I18N::LangTags::List;
 #  Time-stamp: "2004-10-06 23:26:21 ADT"
 use strict;

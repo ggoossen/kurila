@@ -116,8 +116,7 @@ BEGIN { *OverridenPop::pop = sub { ::is( $_[0][0], "ok" ) }; }
     eval {
         local *CORE::GLOBAL::require = sub {
             CORE::require($_[0]);
-        };
-        require 5;
+        }        ;
         require Text::ParseWords;
     };
     is $@, '';

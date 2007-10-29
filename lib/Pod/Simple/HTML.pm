@@ -1,5 +1,4 @@
 
-require 5;
 package Pod::Simple::HTML;
 use strict;
 use Pod::Simple::PullParser ();

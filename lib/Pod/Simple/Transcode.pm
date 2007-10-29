@@ -1,5 +1,4 @@
 
-require 5;
 package Pod::Simple::Transcode;
 
 use strict;

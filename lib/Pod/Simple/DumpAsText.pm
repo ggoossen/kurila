@@ -1,5 +1,4 @@
 
-require 5;
 package Pod::Simple::DumpAsText;
 $VERSION = '2.02';
 use Pod::Simple ();

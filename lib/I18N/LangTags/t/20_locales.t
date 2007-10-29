@@ -1,4 +1,3 @@
-require 5;
  # Time-stamp: "2004-10-06 23:07:06 ADT"
 use strict;
 use Test;

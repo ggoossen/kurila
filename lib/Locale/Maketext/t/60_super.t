@@ -1,5 +1,4 @@
 
-require 5;
 use strict;
 use Test;
 
