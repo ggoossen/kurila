@@ -2864,38 +2864,6 @@ Converts the PV of an SV to its UTF-8-encoded form.
 
 Obsolete function which used to:
 
-=cut
-*/
-
-/*
-=for apidoc sv_utf8_encode
-
-A NOOP
-
-=cut
-*/
-
-void
-Perl_sv_utf8_encode(pTHX_ register SV *sv)
-{
-    return;
-}
-
-/*
-=for apidoc sv_utf8_decode
-
-A NOOP
-
-=cut
-*/
-
-bool
-Perl_sv_utf8_decode(pTHX_ register SV *sv)
-{
-    return TRUE;
-}
-
-/*
 =for apidoc sv_setsv
 
 Copies the contents of the source SV C<ssv> into the destination SV
@@ -5131,7 +5099,7 @@ Perl_sv_len_utf8(pTHX_ register SV *sv)
     else
     {
 	STRLEN len;
-	const U8 *s = (U8*)SvPV_const(sv, len);
+	const char *s = SvPV_const(sv, len);
 
 	if (PL_utf8cache) {
 	    STRLEN ulen;
@@ -5173,10 +5141,10 @@ Perl_sv_len_utf8(pTHX_ register SV *sv)
 /* Walk forwards to find the byte corresponding to the passed in UTF-8
    offset.  */
 static STRLEN
-S_sv_pos_u2b_forwards(const U8 *const start, const U8 *const send,
+S_sv_pos_u2b_forwards(const char *const start, const char *const send,
 		      STRLEN uoffset)
 {
-    const U8 *s = start;
+    const char *s = start;
 
     while (s < send && uoffset--)
 	s += UTF8SKIP(s);
@@ -5192,7 +5160,7 @@ S_sv_pos_u2b_forwards(const U8 *const start, const U8 *const send,
    whether to walk forwards or backwards to find the byte corresponding to
    the passed in UTF-8 offset.  */
 static STRLEN
-S_sv_pos_u2b_midway(const U8 *const start, const U8 *send,
+S_sv_pos_u2b_midway(const char *const start, const char *send,
 		      STRLEN uoffset, STRLEN uend)
 {
     STRLEN backw = uend - uoffset;
@@ -5220,8 +5188,8 @@ S_sv_pos_u2b_midway(const U8 *const start, const U8 *send,
    will be used to reduce the amount of linear searching. The cache will be
    created if necessary, and the found value offered to it for update.  */
 static STRLEN
-S_sv_pos_u2b_cached(pTHX_ SV *sv, MAGIC **mgp, const U8 *const start,
-		    const U8 *const send, STRLEN uoffset,
+S_sv_pos_u2b_cached(pTHX_ SV *sv, MAGIC **mgp, const char *const start,
+		    const char *const send, STRLEN uoffset,
 		    STRLEN uoffset0, STRLEN boffset0) {
     STRLEN boffset = 0; /* Actually always set, but let's keep gcc happy.  */
     bool found = FALSE;
@@ -5340,16 +5308,16 @@ type coercion.
 void
 Perl_sv_pos_u2b(pTHX_ register SV *sv, I32* offsetp, I32* lenp)
 {
-    const U8 *start;
+    const char *start;
     STRLEN len;
 
     if (!sv)
 	return;
 
-    start = (U8*)SvPV_const(sv, len);
+    start = SvPV_const(sv, len);
     if (len) {
 	STRLEN uoffset = (STRLEN) *offsetp;
-	const U8 * const send = start + len;
+	const char * const send = start + len;
 	MAGIC *mg = NULL;
 	const STRLEN boffset = sv_pos_u2b_cached(sv, &mg, start, send,
 					     uoffset, 0, 0);
@@ -5420,7 +5388,7 @@ S_utf8_mg_pos_cache_update(pTHX_ SV *sv, MAGIC **mgp, STRLEN byte, STRLEN utf8,
     assert(cache);
 
     if (PL_utf8cache < 0) {
-	const U8 *start = (const U8 *) SvPVX_const(sv);
+	const char *start = SvPVX_const(sv);
 	const STRLEN realutf8 = utf8_length(start, start + byte);
 
 	if (realutf8 != utf8) {
@@ -5536,7 +5504,7 @@ S_utf8_mg_pos_cache_update(pTHX_ SV *sv, MAGIC **mgp, STRLEN byte, STRLEN utf8,
    assumption is made as in S_sv_pos_u2b_midway(), namely that walking
    backward is half the speed of walking forward. */
 static STRLEN
-S_sv_pos_b2u_midway(pTHX_ const U8 *s, const U8 *const target, const U8 *end,
+S_sv_pos_b2u_midway(pTHX_ const char *s, const char *const target, const char *end,
 		    STRLEN endu)
 {
     const STRLEN forw = target - s;
@@ -5575,18 +5543,18 @@ Handles magic and type coercion.
 void
 Perl_sv_pos_b2u(pTHX_ register SV* sv, I32* offsetp)
 {
-    const U8* s;
+    const char* s;
     const STRLEN byte = *offsetp;
     STRLEN len = 0; /* Actually always set, but let's keep gcc happy.  */
     STRLEN blen;
     MAGIC* mg = NULL;
-    const U8* send;
+    const char* send;
     bool found = FALSE;
 
     if (!sv)
 	return;
 
-    s = (const U8*)SvPV_const(sv, blen);
+    s = SvPV_const(sv, blen);
 
     if (blen < byte)
 	Perl_croak(aTHX_ "panic: sv_pos_b2u: bad byte offset");
@@ -6171,7 +6139,7 @@ screamer2:
 	}
 	else {
 	    cnt = PerlIO_read(fp,(char*)buf, sizeof(buf));
-	    /* Accomodate broken VAXC compiler, which applies U8 cast to
+	    /* Accomodate broken VAXC compiler, which applies char cast to
 	     * both args of ?: operator, causing EOF to change into 255
 	     */
 	    if (cnt > 0)
@@ -7994,7 +7962,7 @@ Usually used via one of its frontends C<sv_vcatpvf> and C<sv_vcatpvf_mg>.
 
 
 #define VECTORIZE_ARGS	vecsv = va_arg(*args, SV*);\
-			vecstr = (U8*)SvPV_const(vecsv,veclen);
+			vecstr = SvPV_const(vecsv,veclen);
 
 /* XXX maybe_tainted is never assigned to, so the doc above is lying. */
 
@@ -8103,13 +8071,13 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 #endif
 
 	char esignbuf[4];
-	U8 utf8buf[UTF8_MAXBYTES+1];
+	char utf8buf[UTF8_MAXBYTES+1];
 	STRLEN esignlen = 0;
 
 	const char *eptr = NULL;
 	STRLEN elen = 0;
 	SV *vecsv = NULL;
-	const U8 *vecstr = NULL;
+	const char *vecstr = NULL;
 	STRLEN veclen = 0;
 	char c = 0;
 	int i;
@@ -8291,7 +8259,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    }
 	    else if (efix ? (efix > 0 && efix <= svmax) : svix < svmax) {
 		vecsv = svargs[efix ? efix-1 : svix++];
-		vecstr = (U8*)SvPV_const(vecsv,veclen);
+		vecstr = SvPV_const(vecsv,veclen);
 
 		/* if this is a version object, we need to convert
 		 * back into v-string notation and then let the
@@ -8306,12 +8274,12 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    }
 		    vecsv = sv_newmortal();
 		    scan_vstring(version, version + veclen, vecsv);
-		    vecstr = (U8*)SvPV_const(vecsv, veclen);
+		    vecstr = SvPV_const(vecsv, veclen);
 		    Safefree(version);
 		}
 	    }
 	    else {
-		vecstr = (U8*)"";
+		vecstr = "";
 		veclen = 0;
 	    }
 	}
@@ -8434,7 +8402,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 	    uv = (args) ? va_arg(*args, int) : SvIV(argsv);
 	    if ((!UNI_IS_INVARIANT(uv) && IN_CODEPOINTS)) {
 		eptr = (char*)utf8buf;
-		elen = uvchr_to_utf8((U8*)eptr, uv) - utf8buf;
+		elen = uvchr_to_utf8(eptr, uv) - utf8buf;
 		is_utf8 = TRUE;
 	    }
 	    else {
@@ -8527,7 +8495,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    uv = utf8n_to_uvchr(vecstr, veclen, &ulen,
 					UTF8_ALLOW_ANYUV);
 		else {
-		    uv = *vecstr;
+		    uv = (U8)*vecstr;
 		    ulen = 1;
 		}
 		vecstr += ulen;
@@ -8614,7 +8582,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    uv = utf8n_to_uvchr(vecstr, veclen, &ulen,
 					UTF8_ALLOW_ANYUV);
 		else {
-		    uv = *vecstr;
+		    uv = (U8)*vecstr;
 		    ulen = 1;
 		}
 		vecstr += ulen;

@@ -708,7 +708,7 @@ XS(XS_utf8_valid)
 	SV * const sv = ST(0);
 	STRLEN len;
 	const char * const s = SvPV_const(sv,len);
-	if (is_utf8_string((const U8*)s,len))
+	if (is_utf8_string(s,len))
 	    XSRETURN_YES;
 	else
 	    XSRETURN_NO;
@@ -1014,9 +1014,10 @@ XS(XS_Internals_set_hint_hash)
 {
     dVAR;
     dXSARGS;
+    const HV* hv;
     if (!SvROK(ST(0)))
 	Perl_croak(aTHX_ "Internals::set_hint_hash $hashref");
-    const HV * const hv = (HV *) SvRV(ST(0));
+    hv = (HV *) SvRV(ST(0));
     if (items == 1 && SvTYPE(hv) == SVt_PVHV) {
 	SvREFCNT_dec(PL_compiling.cop_hints_hash);
 	PL_compiling.cop_hints_hash = SvREFCNT_inc(hv);

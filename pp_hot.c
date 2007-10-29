@@ -1194,7 +1194,7 @@ PP(pp_match)
     const I32 oldsave = PL_savestack_ix;
     I32 update_minmatch = 1;
     I32 had_zerolen = 0;
-    U32 gpos = 0;
+    void* gpos = NULL;
 
     if (PL_op->op_flags & OPf_STACKED)
 	TARG = POPs;
@@ -1253,7 +1253,7 @@ PP(pp_match)
 		    r_flags |= REXEC_IGNOREPOS;
 		    rx->offs[0].end = rx->offs[0].start = mg->mg_len;
 		} else if (rx->extflags & RXf_GPOS_FLOAT) 
-		    gpos = mg->mg_len;
+		    gpos = INT2PTR(void*, mg->mg_len);
 		else 
 		    rx->offs[0].end = rx->offs[0].start = mg->mg_len;
 		minmatch = (mg->mg_flags & MGf_MINMATCH) ? rx->gofs + 1 : 0;
@@ -1298,7 +1298,7 @@ play_it_again:
 	     && !SvROK(TARG))	/* Cannot trust since INTUIT cannot guess ^ */
 	    goto yup;
     }
-    if (CALLREGEXEC(rx, (char*)s, (char *)strend, (char*)truebase, minmatch, TARG, INT2PTR(void*, gpos), r_flags))
+    if (CALLREGEXEC(rx, (char*)s, (char *)strend, (char*)truebase, minmatch, TARG, gpos, r_flags))
     {
 	PL_curpm = pm;
 	if (dynpm->op_pmflags & PMf_ONCE) {
@@ -1655,15 +1655,15 @@ Perl_do_readline(pTHX)
 	    }
 	} else if (PerlIO_isutf8(fp)) { /* OP_READLINE, OP_RCATLINE */
 	     if (ckWARN(WARN_UTF8)) {
-		const U8 * const s = (const U8*)SvPVX_const(sv) + offset;
+		const char * const s = SvPVX_const(sv) + offset;
 		const STRLEN len = SvCUR(sv) - offset;
-		const U8 *f;
+		const char *f;
 
 		if (!is_utf8_string_loc(s, len, &f))
 		    /* Emulate :encoding(utf8) warning in the same case. */
 		    Perl_warner(aTHX_ packWARN(WARN_UTF8),
 				"utf8 \"\\x%02X\" does not map to Unicode",
-				f < (U8*)SvEND(sv) ? *f : 0);
+				f < SvEND(sv) ? *f : 0);
 	     }
 	}
 	if (gimme == G_ARRAY) {
@@ -2953,7 +2953,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	    /* this isn't the name of a filehandle either */
 	    if (!packname ||
 		((UTF8_IS_START(*packname) && DO_UTF8(sv))
-		    ? !isIDFIRST_utf8((U8*)packname)
+		    ? !isIDFIRST_utf8(packname)
 		    : !isIDFIRST(*packname)
 		))
 	    {

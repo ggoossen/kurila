@@ -149,10 +149,10 @@ encoded character.
  */
 #define isIDFIRST_lazy_if(p,c) ((IN_BYTES || (!c || (*((const U8*)p) < 0xc0))) \
 				? isIDFIRST(*(p)) \
-				: isIDFIRST_utf8((const U8*)p))
+				: isIDFIRST_utf8(p))
 #define isALNUM_lazy_if(p,c)   ((IN_BYTES || (!c || (*((const U8*)p) < 0xc0))) \
 				? isALNUM(*(p)) \
-				: isALNUM_utf8((const U8*)p))
+				: isALNUM_utf8(p))
 
 
 #endif /* EBCDIC vs ASCII */
@@ -327,11 +327,12 @@ encoded character.
  * (2) it allows code points past U+10FFFF.
  * The Perl_is_utf8_char() full "slow" code will handle the Perl
  * "extended UTF-8". */
-#define IS_UTF8_CHAR(p, n)	\
-	((n) == 1 ? IS_UTF8_CHAR_1(p) : \
- 	 (n) == 2 ? IS_UTF8_CHAR_2(p) : \
-	 (n) == 3 ? IS_UTF8_CHAR_3(p) : \
-	 (n) == 4 ? IS_UTF8_CHAR_4(p) : 0)
+static __inline__ int IS_UTF8_CHAR(const char* p, int n) {
+    return ((n) == 1 ? IS_UTF8_CHAR_1((U8*)p) :
+            (n) == 2 ? IS_UTF8_CHAR_2((U8*)p) :
+            (n) == 3 ? IS_UTF8_CHAR_3((U8*)p) :
+            (n) == 4 ? IS_UTF8_CHAR_4((U8*)p) : 0);
+}
 
 #define IS_UTF8_CHAR_FAST(n) ((n) <= 4)
 

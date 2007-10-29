@@ -2363,7 +2363,7 @@ C<strend>.  It returns C<NULL> if the string can't be found.  The C<sv>
 does not have to be fbm_compiled, but the search will not be as fast
 then.
 
-	char*	fbm_instr(unsigned char* big, unsigned char* bigend, SV* littlesv, U32 flags)
+	char*	fbm_instr(char* big, char* bigend, SV* littlesv, U32 flags)
 
 =for hackers
 Found in file util.c
@@ -6053,29 +6053,6 @@ C<len>, and already meets the requirements for storing in C<SvPVX>)
 =for hackers
 Found in file sv.c
 
-=item sv_utf8_decode
-X<sv_utf8_decode>
-
-A NOOP
-
-NOTE: this function is experimental and may change or be
-removed without notice.
-
-	bool	sv_utf8_decode(SV *sv)
-
-=for hackers
-Found in file sv.c
-
-=item sv_utf8_encode
-X<sv_utf8_encode>
-
-A NOOP
-
-	void	sv_utf8_encode(SV *sv)
-
-=for hackers
-Found in file sv.c
-
 =item sv_vcatpvf
 X<sv_vcatpvf>
 
@@ -6175,7 +6152,7 @@ is unchanged. Do nothing if C<is_utf8> points to 0. Sets C<is_utf8> to
 NOTE: this function is experimental and may change or be
 removed without notice.
 
-	U8*	bytes_from_utf8(const U8 *s, STRLEN *len, bool *is_utf8)
+	char*	bytes_from_utf8(const char *s, STRLEN *len, bool *is_utf8)
 
 =for hackers
 Found in file utf8.c
@@ -6193,7 +6170,7 @@ see sv_recode_to_utf8().
 NOTE: this function is experimental and may change or be
 removed without notice.
 
-	U8*	bytes_to_utf8(const U8 *s, STRLEN *len)
+	char*	bytes_to_utf8(const char *s, STRLEN *len)
 
 =for hackers
 Found in file utf8.c
@@ -6232,7 +6209,7 @@ character.  Note that an INVARIANT (i.e. ASCII) character is a valid
 UTF-8 character.  The actual number of bytes in the UTF-8 character
 will be returned if it is valid, otherwise 0.
 
-	STRLEN	is_utf8_char(const U8 *p)
+	STRLEN	is_utf8_char(const char *p)
 
 =for hackers
 Found in file utf8.c
@@ -6247,7 +6224,7 @@ because a valid ASCII string is a valid UTF-8 string.
 
 See also is_utf8_string_loclen() and is_utf8_string_loc().
 
-	bool	is_utf8_string(const U8 *s, STRLEN len)
+	bool	is_utf8_string(const char *s, STRLEN len)
 
 =for hackers
 Found in file utf8.c
@@ -6261,7 +6238,7 @@ case of "utf8ness failure") or the location s+len (in the case of
 
 See also is_utf8_string_loclen() and is_utf8_string().
 
-	bool	is_utf8_string_loc(const U8 *s, STRLEN len, const U8 **p)
+	bool	is_utf8_string_loc(const char *s, STRLEN len, const char **p)
 
 =for hackers
 Found in file utf8.c
@@ -6276,7 +6253,7 @@ encoded characters in the C<el>.
 
 See also is_utf8_string_loc() and is_utf8_string().
 
-	bool	is_utf8_string_loclen(const U8 *s, STRLEN len, const U8 **ep, STRLEN *el)
+	bool	is_utf8_string_loclen(const char *s, STRLEN len, const char **ep, STRLEN *el)
 
 =for hackers
 Found in file utf8.c
@@ -6297,7 +6274,7 @@ UNI_DISPLAY_BACKSLASH and UNI_DISPLAY_ISPRINT turned on.
 
 The pointer to the PV of the dsv is returned.
 
-	char*	pv_uni_display(SV *dsv, const U8 *spv, STRLEN len, STRLEN pvlim, UV flags)
+	char*	pv_uni_display(SV *dsv, const char *spv, STRLEN len, STRLEN pvlim, UV flags)
 
 =for hackers
 Found in file utf8.c
@@ -6378,7 +6355,7 @@ Perl_to_utf8_case().
 The "normal" is a string like "ToLower" which means the swash
 %utf8::ToLower.
 
-	UV	to_utf8_case(const U8 *p, U8* ustrp, STRLEN *lenp, SV **swashp, const char *normal, const char *special)
+	UV	to_utf8_case(const char *p, char* ustrp, STRLEN *lenp, SV **swashp, const char *normal, const char *special)
 
 =for hackers
 Found in file utf8.c
@@ -6395,7 +6372,7 @@ three characters).
 The first character of the foldcased version is returned
 (but note, as explained above, that there may be more.)
 
-	UV	to_utf8_fold(const U8 *p, U8* ustrp, STRLEN *lenp)
+	UV	to_utf8_fold(const char *p, char* ustrp, STRLEN *lenp)
 
 =for hackers
 Found in file utf8.c
@@ -6411,7 +6388,7 @@ lowercase version may be longer than the original character.
 The first character of the lowercased version is returned
 (but note, as explained above, that there may be more.)
 
-	UV	to_utf8_lower(const U8 *p, U8* ustrp, STRLEN *lenp)
+	UV	to_utf8_lower(const char *p, char* ustrp, STRLEN *lenp)
 
 =for hackers
 Found in file utf8.c
@@ -6427,7 +6404,7 @@ titlecase version may be longer than the original character.
 The first character of the titlecased version is returned
 (but note, as explained above, that there may be more.)
 
-	UV	to_utf8_title(const U8 *p, U8* ustrp, STRLEN *lenp)
+	UV	to_utf8_title(const char *p, char* ustrp, STRLEN *lenp)
 
 =for hackers
 Found in file utf8.c
@@ -6443,7 +6420,7 @@ the uppercase version may be longer than the original character.
 The first character of the uppercased version is returned
 (but note, as explained above, that there may be more.)
 
-	UV	to_utf8_upper(const U8 *p, U8* ustrp, STRLEN *lenp)
+	UV	to_utf8_upper(const char *p, char* ustrp, STRLEN *lenp)
 
 =for hackers
 Found in file utf8.c
@@ -6460,7 +6437,7 @@ length, in bytes, of that character.
 
 Allows length and flags to be passed to low level routine.
 
-	UV	utf8n_to_uvchr(const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
+	UV	utf8n_to_uvchr(const char *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 
 =for hackers
 Found in file utf8.c
@@ -6486,7 +6463,7 @@ the strict UTF-8 encoding (see F<utf8.h>).
 
 Most code should use utf8_to_uvchr() rather than call this directly.
 
-	UV	utf8n_to_uvuni(const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
+	UV	utf8n_to_uvuni(const char *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 
 =for hackers
 Found in file utf8.c
@@ -6500,7 +6477,7 @@ and C<b>.
 WARNING: use only if you *know* that the pointers point inside the
 same UTF-8 buffer.
 
-	IV	utf8_distance(const U8 *a, const U8 *b)
+	IV	utf8_distance(const char *a, const char *b)
 
 =for hackers
 Found in file utf8.c
@@ -6515,7 +6492,7 @@ WARNING: do not use the following unless you *know* C<off> is within
 the UTF-8 data pointed to by C<s> *and* that on entry C<s> is aligned
 on the first byte of character or just after the last byte of a character.
 
-	U8*	utf8_hop(const U8 *s, I32 off)
+	char*	utf8_hop(const char *s, I32 off)
 
 =for hackers
 Found in file utf8.c
@@ -6527,7 +6504,7 @@ Return the length of the UTF-8 char encoded string C<s> in characters.
 Stops at C<e> (inclusive).  If C<e E<lt> s> or if the scan would end
 up past C<e>, croaks.
 
-	STRLEN	utf8_length(const U8* s, const U8 *e)
+	STRLEN	utf8_length(const char* s, const char *e)
 
 =for hackers
 Found in file utf8.c
@@ -6545,7 +6522,7 @@ If you need a copy of the string, see C<bytes_from_utf8>.
 NOTE: this function is experimental and may change or be
 removed without notice.
 
-	U8*	utf8_to_bytes(U8 *s, STRLEN *len)
+	char*	utf8_to_bytes(char *s, STRLEN *len)
 
 =for hackers
 Found in file utf8.c
@@ -6560,7 +6537,7 @@ length, in bytes, of that character.
 If C<s> does not point to a well-formed UTF-8 character, zero is
 returned and retlen is set, if possible, to -1.
 
-	UV	utf8_to_uvchr(const U8 *s, STRLEN *retlen)
+	UV	utf8_to_uvchr(const char *s, STRLEN *retlen)
 
 =for hackers
 Found in file utf8.c
@@ -6578,7 +6555,7 @@ an index into the Unicode semantic tables (e.g. swashes).
 If C<s> does not point to a well-formed UTF-8 character, zero is
 returned and retlen is set, if possible, to -1.
 
-	UV	utf8_to_uvuni(const U8 *s, STRLEN *retlen)
+	UV	utf8_to_uvuni(const char *s, STRLEN *retlen)
 
 =for hackers
 Found in file utf8.c
@@ -6597,7 +6574,7 @@ is the recommended wide native character-aware way of saying
 
     *(d++) = uv;
 
-	U8*	uvchr_to_utf8(U8 *d, UV uv)
+	char*	uvchr_to_utf8(char *d, UV uv)
 
 =for hackers
 Found in file utf8.c
@@ -6624,7 +6601,7 @@ is the recommended Unicode-aware way of saying
 
     *(d++) = uv;
 
-	U8*	uvuni_to_utf8_flags(U8 *d, UV uv, UV flags)
+	char*	uvuni_to_utf8_flags(char *d, UV uv, UV flags)
 
 =for hackers
 Found in file utf8.c

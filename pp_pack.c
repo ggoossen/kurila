@@ -601,7 +601,7 @@ STATIC U8
 uni_to_byte(pTHX_ const char **s, const char *end, I32 datumtype)
 {
     STRLEN retlen;
-    UV val = utf8n_to_uvchr((U8 *) *s, end-*s, &retlen,
+    UV val = utf8n_to_uvchr(*s, end-*s, &retlen,
 			 ckWARN(WARN_UTF8) ? 0 : UTF8_ALLOW_ANY);
     /* We try to process malformed UTF-8 as much as possible (preferrably with
        warnings), but these two mean we make no progress in the string and
@@ -633,7 +633,7 @@ uni_to_bytes(pTHX_ const char **s, const char *end, const char *buf, int buf_len
 	UTF8_CHECK_ONLY : (UTF8_CHECK_ONLY | UTF8_ALLOW_ANY);
     for (;buf_len > 0; buf_len--) {
 	if (from >= end) return FALSE;
-	val = utf8n_to_uvchr((U8 *) from, end-from, &retlen, flags);
+	val = utf8n_to_uvchr(from, end-from, &retlen, flags);
 	if (retlen == (STRLEN) -1 || retlen == 0) {
 	    from += UTF8SKIP(from);
 	    bad |= 1;
@@ -652,7 +652,7 @@ uni_to_bytes(pTHX_ const char **s, const char *end, const char *buf, int buf_len
 	    const int flags = ckWARN(WARN_UTF8) ? 0 : UTF8_ALLOW_ANY;
 	    for (ptr = *s; ptr < from; ptr += UTF8SKIP(ptr)) {
 		if (ptr >= end) break;
-		utf8n_to_uvuni((U8 *) ptr, end-ptr, &retlen, flags);
+		utf8n_to_uvuni(ptr, end-ptr, &retlen, flags);
 	    }
 	    if (from > end) from = end;
 	}
@@ -707,7 +707,7 @@ STMT_START {					\
 STMT_START {							\
     STRLEN retlen;						\
     if (str >= end) break;					\
-    val = utf8n_to_uvchr((U8 *) str, end-str, &retlen, utf8_flags);	\
+    val = utf8n_to_uvchr(str, end-str, &retlen, utf8_flags);	\
     if (retlen == (STRLEN) -1 || retlen == 0) {			\
 	*cur = '\0';						\
 	Perl_croak(aTHX_ "Malformed UTF-8 string in pack");	\
@@ -1181,8 +1181,8 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
 		from = group ? strbeg + group->strbeg : strbeg;
 	    }
 	    sv = from <= s ?
-		newSVuv(  u8 ? (UV) utf8_length((const U8*)from, (const U8*)s) : (UV) (s-from)) :
-		newSViv(-(u8 ? (IV) utf8_length((const U8*)s, (const U8*)from) : (IV) (from-s)));
+		newSVuv(  u8 ? (UV) utf8_length(from, s) : (UV) (s-from)) :
+		newSViv(-(u8 ? (IV) utf8_length(s, from) : (IV) (from-s)));
 	    XPUSHs(sv_2mortal(sv));
 	    break;
 	}
@@ -1253,7 +1253,7 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
             I32 ai32;
  	    if (!len)			/* Avoid division by 0 */
  		len = 1;
-	    if (utf8) ai32 = utf8_length((U8 *) strbeg, (U8 *) s) % len;
+	    if (utf8) ai32 = utf8_length(strbeg, s) % len;
 	    else      ai32 = (s - strbeg)                         % len;
 	    if (ai32 == 0) break;
 	    len -= ai32;
@@ -1314,7 +1314,7 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
 		if (0 && (symptr->flags & FLAG_WAS_UTF8)) { /* utf8 disabled */
 		    for (ptr = s+len-1; ptr >= s; ptr--)
 			if (*ptr != 0 && !UTF8_IS_CONTINUATION(*ptr) &&
-			    !is_utf8_space((U8 *) ptr)) break;
+			    !is_utf8_space(ptr)) break;
 		    if (ptr >= s) ptr += UTF8SKIP(ptr);
 		    else ptr++;
 		    if (ptr > s+len)
@@ -1475,7 +1475,7 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
 	    while (len-- > 0 && s < strend) {
 		STRLEN retlen;
 		UV auv;
-		auv = utf8n_to_uvuni((U8*)s, strend - s, &retlen, ckWARN(WARN_UTF8) ? 0 : UTF8_ALLOW_ANYUV);
+		auv = utf8n_to_uvuni(s, strend - s, &retlen, ckWARN(WARN_UTF8) ? 0 : UTF8_ALLOW_ANYUV);
 		if (retlen == (STRLEN) -1 || retlen == 0)
 		    Perl_croak(aTHX_ "Malformed UTF-8 string in unpack");
 		s += retlen;
@@ -2391,7 +2391,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 	    I32 ai32;
 	    if (!len)			/* Avoid division by 0 */
 		len = 1;
-	    if (utf8) ai32 = utf8_length((U8 *) start, (U8 *) cur) % len;
+	    if (utf8) ai32 = utf8_length(start, cur) % len;
 	    else      ai32 = (cur - start) % len;
 	    if (ai32 == 0) goto no_change;
 	    len -= ai32;
@@ -2607,7 +2607,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 		    GROWING(0, cat, start, cur, len+UTF8_MAXLEN);
 		    end = start+SvLEN(cat);
 		}
-		cur = (char *) uvuni_to_utf8_flags((U8 *) cur, auv,
+		cur = (char *) uvuni_to_utf8_flags(cur, auv,
 						   warn_utf8 ?
 						   0 : UNICODE_ALLOW_ANY);
 	    }

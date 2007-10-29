@@ -2968,8 +2968,8 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 			      ((SVOP*)repl)->op_sv;
     STRLEN tlen;
     STRLEN rlen;
-    const U8 *t = (U8*)SvPV_const(tstr, tlen);
-    const U8 *r = (U8*)SvPV_const(rstr, rlen);
+    const char *t = SvPV_const(tstr, tlen);
+    const char *r = SvPV_const(rstr, rlen);
     register I32 i;
     register I32 j;
     I32 grows = 0;
@@ -2987,8 +2987,8 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
     if (o->op_private & OPpTRANS_UTF8) {
 	SV* const listsv = newSVpvs("# comment\n");
 	SV* transv = NULL;
-	const U8* tend = t + tlen;
-	const U8* rend = r + rlen;
+	const char* tend = t + tlen;
+	const char* rend = r + rlen;
 	STRLEN ulen;
 	UV tfirst = 1;
 	UV tlast = 0;
@@ -3002,8 +3002,8 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 	I32 bits;
 	I32 havefinal = 0;
 	U32 final = 0;
-	U8* tsave = NULL;
-	U8* rsave = NULL;
+	char* tsave = NULL;
+	char* rsave = NULL;
 	const U32 flags = UTF8_ALLOW_DEFAULT;
 
 /* There are several snags with this code on EBCDIC:
@@ -3013,7 +3013,7 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 */
 
 	if (complement) {
-	    U8 tmpbuf[UTF8_MAXBYTES+1];
+	    char tmpbuf[UTF8_MAXBYTES+1];
 	    UV *cp;
 	    UV nextmin = 0;
 	    Newx(cp, 2*tlen, UV);
@@ -3022,7 +3022,7 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 	    while (t < tend) {
 		cp[2*i] = utf8n_to_uvuni(t, tend-t, &ulen, flags);
 		t += ulen;
-		if (t < tend && NATIVE_TO_UTF(*t) == 0xff) {
+		if (t < tend && (U8)NATIVE_TO_UTF(*t) == 0xff) {
 		    t++;
 		    cp[2*i+1] = utf8n_to_uvuni(t, tend-t, &ulen, flags);
 		    t += ulen;
@@ -3040,7 +3040,7 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 		    t = uvuni_to_utf8(tmpbuf,nextmin);
 		    sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
 		    if (diff > 1) {
-			U8  range_mark = UTF_TO_NATIVE(0xff);
+			char range_mark = UTF_TO_NATIVE((char)0xff);
 			t = uvuni_to_utf8(tmpbuf, val - 1);
 			sv_catpvn(transv, (char *)&range_mark, 1);
 			sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
@@ -3053,13 +3053,13 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 	    t = uvuni_to_utf8(tmpbuf,nextmin);
 	    sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
 	    {
-		U8 range_mark = UTF_TO_NATIVE(0xff);
+		char range_mark = UTF_TO_NATIVE((char)0xff);
 		sv_catpvn(transv, (char *)&range_mark, 1);
 	    }
 	    t = uvuni_to_utf8_flags(tmpbuf, 0x7fffffff,
 				    UNICODE_ALLOW_SUPER);
 	    sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
-	    t = (const U8*)SvPVX_const(transv);
+	    t = SvPVX_const(transv);
 	    tlen = SvCUR(transv);
 	    tend = t + tlen;
 	    Safefree(cp);
@@ -3080,7 +3080,7 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 	    if (tfirst > tlast) {
 		tfirst = (I32)utf8n_to_uvuni(t, tend - t, &ulen, flags);
 		t += ulen;
-		if (t < tend && NATIVE_TO_UTF(*t) == 0xff) {	/* illegal utf8 val indicates range */
+		if (t < tend && (U8)NATIVE_TO_UTF(*t) == 0xff) {	/* illegal utf8 val indicates range */
 		    t++;
 		    tlast = (I32)utf8n_to_uvuni(t, tend - t, &ulen, flags);
 		    t += ulen;
@@ -3094,7 +3094,7 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 		if (r < rend) {
 		    rfirst = (I32)utf8n_to_uvuni(r, rend - r, &ulen, flags);
 		    r += ulen;
-		    if (r < rend && NATIVE_TO_UTF(*r) == 0xff) {	/* illegal utf8 val indicates range */
+		    if (r < rend && (U8)NATIVE_TO_UTF(*r) == 0xff) {	/* illegal utf8 val indicates range */
 			r++;
 			rlast = (I32)utf8n_to_uvuni(r, rend - r, &ulen, flags);
 			r += ulen;
@@ -3195,21 +3195,21 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
     if (complement) {
 	Zero(tbl, 256, short);
 	for (i = 0; i < (I32)tlen; i++)
-	    tbl[t[i]] = -1;
+	    tbl[(U8)t[i]] = -1;
 	for (i = 0, j = 0; i < 256; i++) {
 	    if (!tbl[i]) {
 		if (j >= (I32)rlen) {
 		    if (del)
 			tbl[i] = -2;
 		    else if (rlen)
-			tbl[i] = r[j-1];
+			tbl[i] = (U8)r[j-1];
 		    else
 			tbl[i] = (short)i;
 		}
 		else {
-		    if (i < 128 && r[j] >= 128)
+		    if (i < 128 && (U8)r[j] >= 128)
 			grows = 1;
-		    tbl[i] = r[j++];
+		    tbl[i] = (U8)r[j++];
 		}
 	    }
 	}
@@ -3230,7 +3230,7 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 	    }
 	    tbl[0x100] = (short)(rlen - j);
 	    for (i=0; i < (I32)rlen - j; i++)
-		tbl[0x101+i] = r[j+i];
+		tbl[0x101+i] = (U8)r[j+i];
 	}
     }
     else {
@@ -3247,16 +3247,14 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 	for (i = 0, j = 0; i < (I32)tlen; i++,j++) {
 	    if (j >= (I32)rlen) {
 		if (del) {
-		    if (tbl[t[i]] == -1)
-			tbl[t[i]] = -2;
+		    if (tbl[(U8)t[i]] == -1)
+			tbl[(U8)t[i]] = -2;
 		    continue;
 		}
 		--j;
 	    }
-	    if (tbl[t[i]] == -1) {
-		if (t[i] < 128 && r[j] >= 128)
-		    grows = 1;
-		tbl[t[i]] = r[j];
+	    if (tbl[(U8)t[i]] == -1) {
+		tbl[(U8)t[i]] = (U8)r[j];
 	    }
 	}
     }

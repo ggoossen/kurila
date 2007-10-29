@@ -205,7 +205,7 @@ typedef struct RExC_state_t {
 
 
 
-#define PBYTE(u8str,paren) ((U8*)(u8str))[(paren) >> 3]
+#define PBYTE(u8str,paren) ((u8str))[(paren) >> 3]
 #define PBITVAL(paren) (1 << ((paren) & 7))
 #define PAREN_TEST(u8str,paren) ( PBYTE(u8str,paren) & PBITVAL(paren))
 #define PAREN_SET(u8str,paren) PBYTE(u8str,paren) |= PBITVAL(paren)
@@ -1101,7 +1101,7 @@ is the recommended Unicode-aware way of saying
 
 #define TRIE_READ_CHAR STMT_START {                                           \
     wordlen++;                                                                \
-	uvc = (U32)*uc;                                                       \
+	uvc = (U8)*uc;                                                       \
 	len = 1;                                                              \
 } STMT_END
 
@@ -1192,7 +1192,6 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     AV *revcharmap = newAV();
     regnode *cur;
     STRLEN len = 0;
-    UV uvc = 0;
     U16 curword = 0;
     U32 next_alloc = 0;
     regnode *jumper = NULL;
@@ -1272,8 +1271,8 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 
     for ( cur = first ; cur < last ; cur = regnext( cur ) ) {
         regnode * const noper = NEXTOPER( cur );
-        const U8 *uc = (U8*)STRING( noper );
-        const U8 * const e  = uc + STR_LEN( noper );
+        const char *uc = STRING( noper );
+        const char * const e  = uc + STR_LEN( noper );
         U32 wordlen      = 0;         /* required init */
         STRLEN chars = 0;
 	bool set_bit = 1;
@@ -1285,6 +1284,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 	TRIE_BITMAP_SET(trie,*uc); 
 
         for ( ; uc < e ; uc += len ) {
+	    U8 uvc = 0;
             TRIE_CHARCOUNT(trie)++;
             TRIE_READ_CHAR;
             chars++;
@@ -1369,14 +1369,15 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         for ( cur = first ; cur < last ; cur = regnext( cur ) ) {
 
 	    regnode * const noper = NEXTOPER( cur );
-	    U8 *uc           = (U8*)STRING( noper );
-	    const U8 * const e = uc + STR_LEN( noper );
+	    char *uc           = STRING( noper );
+	    const char * const e = uc + STR_LEN( noper );
 	    U32 state        = 1;         /* required init */
 	    U16 charid       = 0;         /* sanity init */
             U32 wordlen      = 0;         /* required init */
 
             if (OP(noper) != NOTHING) {
                 for ( ; uc < e ; uc += len ) {
+		    U8 uvc;
 
                     TRIE_READ_CHAR;
 
@@ -1553,8 +1554,8 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         for ( cur = first ; cur < last ; cur = regnext( cur ) ) {
 
 	    regnode * const noper   = NEXTOPER( cur );
-	    const U8 *uc     = (U8*)STRING( noper );
-	    const U8 * const e = uc + STR_LEN( noper );
+	    const char *uc     = STRING( noper );
+	    const char * const e = uc + STR_LEN( noper );
 
             U32 state        = 1;         /* required init */
 
@@ -1566,6 +1567,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
             if ( OP(noper) != NOTHING ) {
                 for ( ; uc < e ; uc += len ) {
 
+		    U8 uvc;
                     TRIE_READ_CHAR;
 
 		    charid = trie->charmap[ uvc ];
@@ -1661,7 +1663,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         trie->statecount = laststate;
 
         for ( state = 1 ; state < laststate ; state++ ) {
-            U8 flag = 0;
+            char flag = 0;
 	    const U32 stateidx = TRIE_NODEIDX( state );
 	    const U32 o_used = trie->trans[ stateidx ].check;
 	    U32 used = trie->trans[ stateidx ].check;
@@ -1785,7 +1787,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                     {
                         if ( ++count > 1 ) {
                             SV **tmp = av_fetch( revcharmap, ofs, 0);
-			    const U8 *ch = (U8*)SvPV_nolen_const( *tmp );
+			    const char *ch = SvPV_nolen_const( *tmp );
                             if ( state == 1 ) break;
                             if ( count == 2 ) {
                                 Zero(trie->bitmap, ANYOF_BITMAP_SIZE, char);
@@ -1796,7 +1798,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                                         (UV)state));
 				if (idx >= 0) {
 				    SV ** const tmp = av_fetch( revcharmap, idx, 0);
-				    const U8 * const ch = (U8*)SvPV_nolen_const( *tmp );
+				    const char * const ch = SvPV_nolen_const( *tmp );
 
                                     TRIE_BITMAP_SET(trie,*ch);
                                     DEBUG_OPTIMISE_r(
@@ -2203,7 +2205,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			regnode *last,
 			scan_data_t *data,
 			I32 stopparen,
-			U8* recursed,
+			char* recursed,
 			struct regnode_charclass_class *and_withp,
 			U32 flags, U32 depth)
 			/* scanp: Start here (read-write). */
@@ -2604,7 +2606,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                     end   = RExC_opend;
                 }
                 if (!recursed) {
-                    Newxz(recursed, (((RExC_npar)>>3) +1), U8);
+                    Newxz(recursed, (((RExC_npar)>>3) +1), char);
                     SAVEFREEPV(recursed);
                 }
                 if (!PAREN_TEST(recursed,paren+1)) {
@@ -2646,7 +2648,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 	else if (OP(scan) == EXACT) {
 	    I32 l = STR_LEN(scan);
 	    UV uc;
-	    uc = *((U8*)STRING(scan));
+	    uc = *(STRING(scan));
 	    min += l;
 	    if (flags & SCF_DO_SUBSTR) { /* Update longest substr. */
 		/* The code below prefers earlier match for fixed
@@ -2662,8 +2664,8 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		    MAGIC * const mg = SvMAGICAL(sv) ?
 			mg_find(sv, PERL_MAGIC_utf8) : NULL;
 		    if (mg && mg->mg_len >= 0)
-			mg->mg_len += utf8_length((U8*)STRING(scan),
-						  (U8*)STRING(scan)+STR_LEN(scan));
+			mg->mg_len += utf8_length(STRING(scan),
+						  STRING(scan)+STR_LEN(scan));
 		}
 		data->last_end = data->pos_min + l;
 		data->pos_min += l; /* As in the first entry. */
@@ -2753,7 +2755,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		next = regnext(scan);
 		if (OP(scan) == CURLYX) {
 		    I32 lp = (data ? *(data->last_closep) : 0);
-		    scan->flags = ((lp <= (I32)U8_MAX) ? (U8)lp : U8_MAX);
+		    scan->flags = ((lp <= (I32)U8_MAX) ? lp : U8_MAX);
 		}
 		scan = NEXTOPER(scan) + EXTRA_STEP_2ARGS;
 		next_is_eval = (OP(scan) == EVAL);
@@ -2866,7 +2868,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			RExC_close_parens[ARG(nxt1)-1]=nxt+2; /*close->while*/
 		    }
 		    /* Now we know that nxt2 is the only contents: */
-		    oscan->flags = (U8)ARG(nxt);
+		    oscan->flags = ARG(nxt);
 		    OP(oscan) = CURLYN;
 		    OP(nxt1) = NOTHING;	/* was OPEN. */
 
@@ -3506,7 +3508,6 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 #else
 	else if (PL_regkind[OP(scan)] == TRIE) {
 	    reg_trie_data *trie = (reg_trie_data*)RExC_rxi->data->data[ ARG(scan) ];
-	    U8*bang=NULL;
 	    
 	    min += trie->minlen;
 	    delta += (trie->maxlen - trie->minlen);
@@ -3572,11 +3573,11 @@ S_add_data(RExC_state_t *pRExC_state, U32 n, const char *s)
 	   sizeof(*RExC_rxi->data) + sizeof(void*) * (count + n - 1),
 	   char, struct reg_data);
     if(count)
-	Renew(RExC_rxi->data->what, count + n, U8);
+	Renew(RExC_rxi->data->what, count + n, char);
     else
-	Newx(RExC_rxi->data->what, n, U8);
+	Newx(RExC_rxi->data->what, n, char);
     RExC_rxi->data->count = count + n;
-    Copy(s, RExC_rxi->data->what + count, n, U8);
+    Copy(s, RExC_rxi->data->what + count, n, char);
     return count;
 }
 
@@ -4648,11 +4649,11 @@ Perl_reg_numbered_buff_length(pTHX_ REGEXP * const rx, const SV * const sv,
   getlen:
     if (i > 0 && IN_CODEPOINTS) {
         const char * const s = rx->subbeg + s1;
-        const U8 *ep;
+        const char *ep;
         STRLEN el;
 
         i = t1 - s1;
-        if (is_utf8_string_loclen((U8*)s, i, &ep, &el))
+        if (is_utf8_string_loclen(s, i, &ep, &el))
 			i = el;
     }
     return i;
@@ -4686,7 +4687,7 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags) {
 	if (UTF)
 	    do {
 		RExC_parse += UTF8SKIP(RExC_parse);
-	    } while (isALNUM_utf8((U8*)RExC_parse));
+	    } while (isALNUM_utf8(RExC_parse));
 	else
 	    do {
 		RExC_parse++;
@@ -5943,7 +5944,7 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
 
 		    Perl_sv_catpvf(aTHX_ listsv, "%04"UVxf"\n", value);
 		    if (FOLD) {
-			 U8 foldbuf[UTF8_MAXBYTES_CASE+1];
+			 char foldbuf[UTF8_MAXBYTES_CASE+1];
 			 STRLEN foldlen;
 			 const UV f = to_uni_fold(value, foldbuf, &foldlen);
 
@@ -6169,7 +6170,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         if (len) {
             STRLEN numlen = 1;
             if ( UTF ) {
-                *valuep = utf8_to_uvchr((U8*)p, &numlen);
+                *valuep = utf8_to_uvchr(p, &numlen);
                 /* XXXX
                   We have to turn on utf8 for high bit chars otherwise
                   we get failures with
@@ -6215,7 +6216,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
 	if (FOLD) {
 	    UV uvc;
 	    p = SvPV(sv_str, len);
-	    uvc = utf8_to_uvchr((U8*)p, &charlen);
+	    uvc = utf8_to_uvchr(p, &charlen);
 	    ret = regclassfold_value(pRExC_state, uvc);
 	} else {
 	    ret = reg_node(pRExC_state, (U8)EXACT);
@@ -6227,10 +6228,10 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
 	    /* len is the length written, charlen is the size the char read */
 	    for ( len = 0; p < pend; p += charlen ) {
 		if (UTF) {
-		    UV uvc = utf8_to_uvchr((U8*)p, &charlen);
+		    UV uvc = utf8_to_uvchr(p, &charlen);
 		    if (FOLD) {
 			STRLEN foldlen,numlen;
-			U8 tmpbuf[UTF8_MAXBYTES_CASE+1], *foldbuf;
+			char tmpbuf[UTF8_MAXBYTES_CASE+1], *foldbuf;
 			uvc = toFOLD_uni(uvc, tmpbuf, &foldlen);
 			/* Emit all the Unicode characters. */
                     
@@ -6323,7 +6324,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 
 
 tryagain:
-    switch ((U8)*RExC_parse) {
+    switch (*RExC_parse) {
     case '^':
 	RExC_seen_zerolen++;
 	nextchar(pRExC_state);
@@ -6520,7 +6521,7 @@ tryagain:
 		  /* a lovely hack--pretend we saw [\pX] instead */
 		    RExC_end = strchr(RExC_parse, '}');
 		    if (!RExC_end) {
-		        const U8 c = (U8)*RExC_parse;
+		        const char c = *RExC_parse;
 			RExC_parse += 2;
 			RExC_end = oldregxend;
 			vFAIL2("Missing right brace on \\%c{}", c);
@@ -6679,7 +6680,7 @@ tryagain:
 	    register char *p;
 	    char *s;
 	    STRLEN foldlen;
-	    U8 tmpbuf[UTF8_MAXBYTES_CASE+1], *foldbuf;
+	    char tmpbuf[UTF8_MAXBYTES_CASE+1], *foldbuf;
 
             parse_start = RExC_parse - 1;
 
@@ -6710,7 +6711,7 @@ tryagain:
 
 		if (RExC_flags & RXf_PMf_EXTENDED)
 		    p = regwhite( pRExC_state, p );
-		switch ((U8)*p) {
+		switch (*p) {
 		case '^':
 		case '$':
 		case '.':
@@ -6851,7 +6852,7 @@ tryagain:
 		  normal_default:
 		    if (UTF8_IS_START(*p) && UTF) {
 			STRLEN numlen;
-			ender = utf8n_to_uvchr((U8*)p, RExC_end - p,
+			ender = utf8n_to_uvchr(p, RExC_end - p,
 					       &numlen, UTF8_ALLOW_DEFAULT);
 			p += numlen;
 		    }
@@ -7009,10 +7010,10 @@ S_regpposixcc(pTHX_ RExC_state_t *pRExC_state, I32 value)
     if (value == '[' && RExC_parse + 1 < RExC_end &&
 	/* I smell either [: or [= or [. -- POSIX has been here, right? */
 	POSIXCC(UCHARAT(RExC_parse))) {
-	const char c = UCHARAT(RExC_parse);
+	const char c = *RExC_parse;
 	char* const s = RExC_parse++;
 	
-	while (RExC_parse < RExC_end && UCHARAT(RExC_parse) != c)
+	while (RExC_parse < RExC_end && *RExC_parse != c)
 	    RExC_parse++;
 	if (RExC_parse == RExC_end)
 	    /* Grandfather lone [:, [=, [. */
@@ -7246,7 +7247,7 @@ parseit:
 	if (!range)
 	    rangebegin = RExC_parse;
 	if (UTF) {
-	    value = utf8n_to_uvchr((U8*)RExC_parse,
+	    value = utf8n_to_uvchr(RExC_parse,
 				   RExC_end - RExC_parse,
 				   &numlen, UTF8_ALLOW_DEFAULT);
 	    RExC_parse += numlen;
@@ -7259,7 +7260,7 @@ parseit:
 	    namedclass = regpposixcc(pRExC_state, value);
 	else if (value == '\\') {
 	    if (UTF) {
-		value = utf8n_to_uvchr((U8*)RExC_parse,
+		value = utf8n_to_uvchr(RExC_parse,
 				   RExC_end - RExC_parse,
 				   &numlen, UTF8_ALLOW_DEFAULT);
 		RExC_parse += numlen;
@@ -7298,9 +7299,9 @@ parseit:
 		char *e;
 		UV n;
 		if (RExC_parse >= RExC_end)
-		    vFAIL2("Empty \\%c{}", (U8)value);
+		    vFAIL2("Empty \\%c{}", value);
 		if (*RExC_parse == '{') {
-		    const U8 c = (U8)value;
+		    const char c = (char)value;
 		    e = strchr(RExC_parse++, '}');
                     if (!e)
                         vFAIL2("Missing right brace on \\%c{}", c);
@@ -7559,7 +7560,7 @@ parseit:
 		else if (prevnatvalue == natvalue) {
 		    Perl_sv_catpvf(aTHX_ listsv, "%04"UVxf"\n", natvalue);
 		    if (FOLD) {
-			 U8 foldbuf[UTF8_MAXBYTES_CASE+1];
+			 char foldbuf[UTF8_MAXBYTES_CASE+1];
 			 STRLEN foldlen;
 			 const UV f = to_uni_fold(natvalue, foldbuf, &foldlen);
 
@@ -7700,7 +7701,7 @@ S_regclassfold(pTHX_ RExC_state_t *pRExC_state, U32 depth)
     DEBUG_PARSE("clasfold");
 
     if (UTF) {
-	value = utf8n_to_uvchr((U8*)RExC_parse,
+	value = utf8n_to_uvchr(RExC_parse,
 			       RExC_end - RExC_parse,
 			       &numlen, UTF8_ALLOW_DEFAULT);
 	RExC_parse += numlen;
@@ -7710,7 +7711,7 @@ S_regclassfold(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 
     if (value == '\\') {
 	if (UTF) {
-	    value = utf8n_to_uvchr((U8*)RExC_parse,
+	    value = utf8n_to_uvchr(RExC_parse,
 				   RExC_end - RExC_parse,
 				   &numlen, UTF8_ALLOW_DEFAULT);
 	    RExC_parse += numlen;
@@ -7797,7 +7798,7 @@ S_anyof_get_swash(pTHX_ RExC_state_t *pRExC_state, regnode* ret, SV* listsv, AV*
 
 	if (sw) {
             /* use the swash to fill the ANYOF_BITMAP */
-            U8 tmpbuf[UTF8_MAXBYTES_CASE+1];
+            char tmpbuf[UTF8_MAXBYTES_CASE+1];
             UV value;
             ANYOF_BITMAP_ZERO(ret);
             for (value = 0; value < 256; ++value) {
@@ -7983,7 +7984,7 @@ STATIC STRLEN
 S_reguni(pTHX_ const RExC_state_t *pRExC_state, UV uv, char* s)
 {
     dVAR;
-    return SIZE_ONLY ? UNISKIP(uv) : (uvchr_to_utf8((U8*)s, uv) - (U8*)s);
+    return SIZE_ONLY ? UNISKIP(uv) : (uvchr_to_utf8(s, uv) - s);
 }
 
 /*
@@ -8497,7 +8498,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 
 	    if (lv) {
 		if (sw) {
-		    U8 s[UTF8_MAXBYTES_CASE+1];
+		    char s[UTF8_MAXBYTES_CASE+1];
 		
 		    for (i = 0; i <= 256; i++) { /* just the first 256 */
 			uvchr_to_utf8(s, i);
@@ -8508,14 +8509,14 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 			} else if (rangestart != -1) {
 			    if (i <= rangestart + 3)
 				for (; rangestart < i; rangestart++) {
-				    const U8 * const e = uvchr_to_utf8(s,rangestart);
-				    U8 *p;
+				    const char * const e = uvchr_to_utf8(s,rangestart);
+				    char *p;
 				    for(p = s; p < e; p++)
 					put_byte(sv, *p);
 				}
 			    else {
-				const U8 *e = uvchr_to_utf8(s,rangestart);
-				U8 *p;
+				const char *e = uvchr_to_utf8(s,rangestart);
+				char *p;
 				for (p = s; p < e; p++)
 				    put_byte(sv, *p);
 				sv_catpvs(sv, "-");
@@ -8941,7 +8942,7 @@ Perl_regdupe_internal(pTHX_ REGEXP * const r, CLONE_PARAMS *param)
 
 	Newxc(d, sizeof(struct reg_data) + count*sizeof(void *),
 		char, struct reg_data);
-	Newx(d->what, count, U8);
+	Newx(d->what, count, char);
 
 	d->count = count;
 	for (i = 0; i < count; i++) {

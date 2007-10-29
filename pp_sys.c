@@ -1378,7 +1378,7 @@ PP(pp_sysread)
 	if (offset >= (int)blen)
 	    offset += SvCUR(bufsv) - blen;
 	else
-	    offset = utf8_hop((U8 *)buffer,offset) - (U8 *) buffer;
+	    offset = utf8_hop(buffer,offset) - buffer;
     }
  more_bytes:
     bufsize = SvCUR(bufsv);
@@ -1492,7 +1492,7 @@ PP(pp_send)
     STRLEN blen;
     STRLEN orig_blen_bytes;
     const int op_type = PL_op->op_type;
-    U8 *tmpbuf = NULL;
+    char *tmpbuf = NULL;
     
     GV *const gv = (GV*)*++MARK;
     if (PL_op->op_type == OP_SYSWRITE
@@ -1554,7 +1554,7 @@ PP(pp_send)
 		    /* Don't call sv_len_utf8 again because it will call magic
 		       or overloading a second time, and we might get back a
 		       different result.  */
-		    blen_chars = utf8_length((U8*)buffer, (U8*)buffer + blen);
+		    blen_chars = utf8_length(buffer, buffer + blen);
 		} else {
 		    /* It's safe, and it may well be cached.  */
 		    blen_chars = sv_len_utf8(bufsv);
@@ -1600,8 +1600,8 @@ PP(pp_send)
 		   the SV has overloading, in which case we can't or mustn't
 		   or mustn't call it again.  */
 
-		buffer = (const char*)utf8_hop((const U8 *)buffer, offset);
-		length = utf8_hop((U8 *)buffer, length) - (U8 *)buffer;
+		buffer = utf8_hop(buffer, offset);
+		length = utf8_hop(buffer, length) - buffer;
 	    } else {
 		/* It's a real UTF-8 SV, and it's not going to change under
 		   us.  Take advantage of any cache.  */
@@ -1656,7 +1656,7 @@ PP(pp_send)
 	goto say_undef;
     SP = ORIGMARK;
     if (IN_CODEPOINTS)
-        retval = utf8_length((U8*)buffer, (U8*)buffer + retval);
+        retval = utf8_length(buffer, buffer + retval);
 
     Safefree(tmpbuf);
 #if Size_t_size > IVSIZE

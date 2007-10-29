@@ -390,7 +390,7 @@ and check for NULL.
 
 /* an accepting state/position*/
 struct _reg_trie_accepted {
-    U8   *endpos;
+    char   *endpos;
     U16  wordnum;
 };
 typedef struct _reg_trie_accepted reg_trie_accepted;

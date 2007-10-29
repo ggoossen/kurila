@@ -309,7 +309,7 @@ Perl_mg_length(pTHX_ SV *sv)
     }
 
     if (DO_UTF8(sv)) {
-        const U8 *s = (U8*)SvPV_const(sv, len);
+        const char *s = SvPV_const(sv, len);
 	len = utf8_length(s, s + len);
     }
     else
@@ -557,7 +557,7 @@ Perl_magic_regdatum_get(pTHX_ SV *sv, MAGIC *mg)
 		    if (i > 0 && IN_CODEPOINTS) {
 			const char * const b = rx->subbeg;
 			if (b)
-			    i = utf8_length((U8*)b, (U8*)(b+i));
+			    i = utf8_length(b, (b+i));
 		    }
 
 		    sv_setiv(sv, i);
@@ -2277,6 +2277,7 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	    const char *const start = SvPV(sv, len);
 	    const char *out = (const char*)memchr(start, '\0', len);
 	    SV *tmp;
+	    HV* old_cop_hints_hash;
 
 
 	    PL_compiling.cop_hints |= HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
@@ -2286,17 +2287,17 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	    /* Opening for input is more common than opening for output, so
 	       ensure that hints for input are sooner on linked list.  */
 
-	    HV* old_cop_hints_hash = PL_compiling.cop_hints_hash;
+	    old_cop_hints_hash = PL_compiling.cop_hints_hash;
 	    PL_compiling.cop_hints_hash = newHVhv(PL_compiling.cop_hints_hash);
 	    SvREFCNT_dec(old_cop_hints_hash);
 
 	    tmp = out ? newSVpvn(out + 1, start + len - out - 1) : newSVpvs("");
-	    hv_store_ent(PL_compiling.cop_hints_hash, 
-			 sv_2mortal(newSVpvs("open>")), tmp, 0);
+	    (void)hv_store_ent(PL_compiling.cop_hints_hash, 
+			       sv_2mortal(newSVpvs("open>")), tmp, 0);
 
 	    tmp = newSVpvn(start, out ? (STRLEN)(out - start) : len);
-	    hv_store_ent(PL_compiling.cop_hints_hash,
-			 sv_2mortal(newSVpvs("open<")), tmp, 0);
+	    (void)hv_store_ent(PL_compiling.cop_hints_hash,
+			       sv_2mortal(newSVpvs("open<")), tmp, 0);
 	}
 	break;
     case '\020':	/* ^P */
@@ -2913,6 +2914,7 @@ int
 Perl_magic_sethint(pTHX_ SV *sv, MAGIC *mg)
 {
     dVAR;
+    HV * new_hinthash;
     if(!(mg->mg_len == HEf_SVKEY))
 	assert(mg->mg_len == HEf_SVKEY);
 
@@ -2927,11 +2929,11 @@ Perl_magic_sethint(pTHX_ SV *sv, MAGIC *mg)
     PL_hints |= HINT_LOCALIZE_HH;
 
     /* copy the hash, to preserve the old one */
-    HV * new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
+    new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
     SvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = new_hinthash;
 
-    hv_store_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, newSVsv(sv), 0);
+    (void)hv_store_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, newSVsv(sv), 0);
     return 0;
 }
 
@@ -2947,6 +2949,7 @@ int
 Perl_magic_clearhint(pTHX_ SV *sv, MAGIC *mg)
 {
     dVAR;
+    HV * new_hinthash;
     PERL_UNUSED_ARG(sv);
 
     assert(mg->mg_len == HEf_SVKEY);
@@ -2956,11 +2959,11 @@ Perl_magic_clearhint(pTHX_ SV *sv, MAGIC *mg)
     PL_hints |= HINT_LOCALIZE_HH;
 
     /* copy the hash, to preserve the old one */
-    HV * new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
+    new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
     SvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = new_hinthash;
 
-    hv_delete_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, 0, 0);
+    (void)hv_delete_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, 0, 0);
     return 0;
 }
 

@@ -1322,7 +1322,6 @@
 #define amagic_ncmp		S_amagic_ncmp
 #define amagic_i_ncmp		S_amagic_i_ncmp
 #define amagic_cmp		S_amagic_cmp
-#define amagic_cmp_locale	S_amagic_cmp_locale
 #define sortcv			S_sortcv
 #define sortcv_xsub		S_sortcv_xsub
 #define sortcv_stacked		S_sortcv_stacked
@@ -3513,7 +3512,7 @@
 #define init_predump_symbols()	S_init_predump_symbols(aTHX)
 #define my_exit_jump()		S_my_exit_jump(aTHX)
 #define nuke_stacks()		S_nuke_stacks(aTHX)
-#define open_script(a,b,c,d,e)	S_open_script(aTHX_ a,b,c,d,e)
+#define open_script(a,b,c,d)	S_open_script(aTHX_ a,b,c,d)
 #define usage(a)		S_usage(aTHX_ a)
 #define validate_suid(a,b,c,d,e,f)	S_validate_suid(aTHX_ a,b,c,d,e,f)
 #endif
@@ -3592,7 +3591,6 @@
 #define amagic_ncmp(a,b)	S_amagic_ncmp(aTHX_ a,b)
 #define amagic_i_ncmp(a,b)	S_amagic_i_ncmp(aTHX_ a,b)
 #define amagic_cmp(a,b)		S_amagic_cmp(aTHX_ a,b)
-#define amagic_cmp_locale(a,b)	S_amagic_cmp_locale(aTHX_ a,b)
 #define sortcv(a,b)		S_sortcv(aTHX_ a,b)
 #define sortcv_xsub(a,b)	S_sortcv_xsub(aTHX_ a,b)
 #define sortcv_stacked(a,b)	S_sortcv_stacked(aTHX_ a,b)

@@ -1420,7 +1420,7 @@ Perl_str_to_version(pTHX_ SV *sv)
     while (start < end) {
 	STRLEN skip;
 	UV n;
-	n = utf8n_to_uvchr((U8*)start, len, &skip, 0);
+	n = utf8n_to_uvchr(start, len, &skip, 0);
 	if( n > 128 )
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
 			"High bit scalar value");
@@ -1845,14 +1845,12 @@ S_scan_const(pTHX_ char *start)
     bool dorange = FALSE;			/* are we in a translit range? */
     bool didrange = FALSE;		        /* did we just finish a range? */
     I32  has_utf8 = FALSE;			/* Output constant is UTF8 */
-    I32  this_utf8 = UTF;			/* The source string is assumed to be UTF8 */
     bool in_codepoints = (IN_CODEPOINTS != 0);  /* PL_curtoken can be changed ?! */
     UV uv;
 
     if (PL_lex_inwhat == OP_TRANS && PL_sublex_info.sub_op) {
 	/* If we are doing a trans and we know we want UTF8 set expectation */
 	has_utf8   = PL_sublex_info.sub_op->op_private & (OPpTRANS_UTF8);
-	this_utf8  = has_utf8;
     }
 
 
@@ -1868,7 +1866,7 @@ S_scan_const(pTHX_ char *start)
 
 		if (has_utf8
 		    ) {
-		    char * const c = (char*)utf8_hop((U8*)d, -1);
+		    char * const c = (char*)utf8_hop(d, -1);
 		    char *e = d++;
 		    while (e-- > c)
 			*(e + 1) = *e;
@@ -2081,9 +2079,9 @@ S_scan_const(pTHX_ char *start)
 			uv = grok_hex(s, &len, &flags, NULL);
 			s += len;
 			if ( ! in_codepoints ) {
-		        *d++ = (char)uv;
-				continue;
-		    }
+			    *d++ = (char)uv;
+			    continue;
+			}
 		}
 
 	      NUM_ESCAPE_INSERT:
@@ -2096,7 +2094,7 @@ S_scan_const(pTHX_ char *start)
 		   to cover EBCDIC
 		*/
 		if (!UNI_IS_INVARIANT(NATIVE_TO_UNI(uv))) {
-		    d = (char*)uvchr_to_utf8((U8*)d, uv);
+		    d = (char*)uvchr_to_utf8(d, uv);
 		    has_utf8 = TRUE;
 		    if (PL_lex_inwhat == OP_TRANS &&
 			PL_sublex_info.sub_op) {
@@ -2154,10 +2152,10 @@ S_scan_const(pTHX_ char *start)
 		     * gets revoked, but the semantics is still
 		     * desireable for charnames. --jhi */
 		    {
-			 UV uv = utf8_to_uvchr((const U8*)str, 0);
+			 UV uv = utf8_to_uvchr(str, 0);
 
 			 if (uv < 0x100) {
-			      U8 tmpbuf[UTF8_MAXBYTES+1], *d;
+			      char tmpbuf[UTF8_MAXBYTES+1], *d;
 
 			      d = uvchr_to_utf8(tmpbuf, UNI_TO_NATIVE(uv));
 			      sv_setpvn(res, (char *)tmpbuf, d - tmpbuf);
@@ -2186,7 +2184,7 @@ S_scan_const(pTHX_ char *start)
 	    case 'c':
 		s++;
 		if (s < send) {
-		    U8 c = *s++;
+		    char c = *s++;
 		    *d++ = NATIVE_TO_UNI(toCTRL(c));
 		}
 		else {
@@ -2223,9 +2221,9 @@ S_scan_const(pTHX_ char *start)
 	} /* end if (backslash) */
 
     default_action:
-	if (!NATIVE_IS_INVARIANT((U8)(*s)) && ! IN_BYTES) {
+	if (!NATIVE_IS_INVARIANT((*s)) && ! IN_BYTES) {
 	    STRLEN len;
-	    utf8n_to_uvchr((U8*)s, send - s, &len, 0); /* validate UTF-8 */
+	    utf8n_to_uvchr(s, send - s, &len, 0); /* validate UTF-8 */
 	    has_utf8 = TRUE;
 	    while (len--)
 		*d++ = *s++;
@@ -2274,7 +2272,7 @@ S_scan_const(pTHX_ char *start)
     } else
 	SvREFCNT_dec(sv);
 
-    if ( has_utf8 && ! in_codepoints && ! PL_encoding && ! IN_BYTES )
+    if ( has_utf8 && ! in_codepoints && ! PL_encoding )
 	Perl_warner(aTHX_ packWARN(WARN_MISC),
 		    "utf8 found, but not 'use utf8'");
     return s;
@@ -2388,7 +2386,7 @@ S_intuit_more(pTHX_ register char *s)
 		if (s[1]) {
 		    if (strchr("wds]",s[1]))
 			weight += 100;
-		    else if (seen[(U8)'\''] || seen[(U8)'"'])
+		    else if (seen['\''] || seen['"'])
 			weight += 1;
 		    else if (strchr("rnftbxcav",s[1]))
 			weight += 40;
@@ -2934,7 +2932,7 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 		    is_use ? "use" : "no"));
     s = SKIPSPACE1(s);
     if (isDIGIT(*s) || (*s == 'v' && isDIGIT(s[1]))) {
-	DIE(aTHX "use VERSION is not allowed");
+	yyerror(Perl_form(aTHX_ "use VERSION is not valid in Perl Kurila"));
     }
     else {
 	s = force_word(s,WORD,FALSE,TRUE,FALSE);
@@ -3315,7 +3313,7 @@ Perl_yylex(pTHX)
     default:
 	if (isIDFIRST_lazy_if(s,UTF))
 	    goto keylookup;
-	len = UTF ? Perl_utf8_length(aTHX_ (U8 *) PL_linestart, (U8 *) s) : (STRLEN) (s - PL_linestart);
+	len = UTF ? Perl_utf8_length(aTHX_ PL_linestart, s) : (STRLEN) (s - PL_linestart);
 	Perl_croak(aTHX_ "Unrecognized character \\x%02X in column %d", *s & 255, (int) len + 1);
     case 4:
     case 26:
@@ -3459,7 +3457,7 @@ Perl_yylex(pTHX)
 		bof = PerlIO_tell(PL_rsfp) == (Off_t)SvCUR(PL_linestr);
 		if (bof) {
 		    PL_bufend = SvPVX(PL_linestr) + SvCUR(PL_linestr);
-		    s = swallow_bom((U8*)s);
+		    s = swallow_bom(s);
 		}
 	    }
 	    if (PL_doextract) {
@@ -4731,7 +4729,7 @@ Perl_yylex(pTHX)
 	/* FIXME. I think that this can be const if char *d is replaced by
 	   more localised variables.  */
 	for (d = SvPV(PL_lex_stuff, len); len; len--, d++) {
-	    if (*d == '$' || *d == '@' || *d == '\\' || !UTF8_IS_INVARIANT((U8)*d)) {
+	    if (*d == '$' || *d == '@' || *d == '\\' || !UTF8_IS_INVARIANT(*d)) {
 		yylval.ival = OP_STRINGIFY;
 		break;
 	    }
@@ -4925,7 +4923,8 @@ Perl_yylex(pTHX)
 		int pkgname = 0;
 		const char lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
 		CV *cv;
-		SV **compsub;
+		SV **compsubtable;
+
 #ifdef PERL_MAD
 		SV *nextPL_nextwhite = 0;
 #endif
@@ -4955,11 +4954,11 @@ Perl_yylex(pTHX)
 		}
 
 		/* Is this a compile time function? */
-		SV **compsubtable = hv_fetch(PL_compiling.cop_hints_hash, "compsub", 7, FALSE);
+		compsubtable = hv_fetch(PL_compiling.cop_hints_hash, "compsub", 7, FALSE);
 		if (compsubtable && SvROK(*compsubtable) && SvTYPE(SvRV(*compsubtable)) == SVt_PVHV) {
-		    compsub = hv_fetch((HV *)SvRV(*compsubtable), PL_tokenbuf, len, FALSE);
+		    SV **compsub = hv_fetch((HV *)SvRV(*compsubtable), PL_tokenbuf, len, FALSE);
 		    if (compsub) {
-			yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc(SvRV(*compsub)));
+			yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc_NN(SvRV(*compsub)));
 			yylval.opval->op_private = OPpCONST_BARE;
 			PL_expect = XTERM;
 			s = skipspace(s);
@@ -5968,7 +5967,7 @@ Perl_yylex(pTHX)
 	case KEY_require:
 	    s = SKIPSPACE1(s);
 	    if (isDIGIT(*s) || ((*s == 'v') && isDIGIT(s[1]))) {
-		DIE(aTHX_ "require VERSION not allowed");
+		yyerror(Perl_form(aTHX_ "require VERSION is not valid in Perl Kurila"));
 	    }
 	    *PL_tokenbuf = '\0';
 	    s = force_word(s,WORD,TRUE,TRUE,FALSE);
@@ -10123,10 +10122,10 @@ S_scan_word(pTHX_ register char *s, char *dest, STRLEN destlen, int allow_packag
 	    *d++ = *s++;
 	    *d++ = *s++;
 	}
-	else if (UTF && UTF8_IS_START(*s) && isALNUM_utf8((U8*)s)) {
+	else if (UTF && UTF8_IS_START(*s) && isALNUM_utf8(s)) {
 	    char *t = s + UTF8SKIP(s);
 	    size_t len;
-	    while (UTF8_IS_CONTINUED(*t) && is_utf8_mark((U8*)t))
+	    while (UTF8_IS_CONTINUED(*t) && is_utf8_mark(t))
 		t += UTF8SKIP(t);
 	    len = t - s;
 	    if (d + len > e)
@@ -10176,9 +10175,9 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 		*d++ = *s++;
 		*d++ = *s++;
 	    }
-	    else if (UTF && UTF8_IS_START(*s) && isALNUM_utf8((U8*)s)) {
+	    else if (UTF && UTF8_IS_START(*s) && isALNUM_utf8(s)) {
 		char *t = s + UTF8SKIP(s);
-		while (UTF8_IS_CONTINUED(*t) && is_utf8_mark((U8*)t))
+		while (UTF8_IS_CONTINUED(*t) && is_utf8_mark(t))
 		    t += UTF8SKIP(t);
 		if (d + (t - s) > e)
 		    Perl_croak(aTHX_ ident_too_long);
@@ -10231,7 +10230,7 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 		char *end = s;
 		while ((end < send && isALNUM_lazy_if(end,UTF)) || *end == ':') {
 		    end += UTF8SKIP(end);
-		    while (end < send && UTF8_IS_CONTINUED(*end) && is_utf8_mark((U8*)end))
+		    while (end < send && UTF8_IS_CONTINUED(*end) && is_utf8_mark(end))
 			end += UTF8SKIP(end);
 		}
 		Copy(s, d, end - s, char);
@@ -11058,7 +11057,7 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
     I32 brackets = 1;			/* bracket nesting level */
     bool has_utf8 = FALSE;		/* is there any utf8 content? */
     I32 termcode;			/* terminating char. code */
-    U8 termstr[UTF8_MAXBYTES];		/* terminating string */
+    char termstr[UTF8_MAXBYTES];		/* terminating string */
     STRLEN termlen;			/* length of terminating string */
     int last_off = 0;			/* last position for nesting bracket */
 #ifdef PERL_MAD
@@ -11089,8 +11088,8 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
 	termlen = 1;
     }
     else {
-	termcode = utf8_to_uvchr((U8*)s, &termlen);
-	Copy(s, termstr, termlen, U8);
+	termcode = utf8_to_uvchr(s, &termlen);
+	Copy(s, termstr, termlen, char);
 	if (!UTF8_IS_INVARIANT(term))
 	    has_utf8 = TRUE;
     }
@@ -11221,7 +11220,7 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
 		    if (s+termlen <= PL_bufend && memEQ(s, (char*)termstr, termlen))
 			break;
 		}
-		else if (!has_utf8 && !UTF8_IS_INVARIANT((U8)*s) && UTF)
+		else if (!has_utf8 && !UTF8_IS_INVARIANT(*s) && UTF)
 		    has_utf8 = TRUE;
 		*to = *s;
 	    }
@@ -11250,7 +11249,7 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
 		    break;
 		else if (*s == PL_multi_open)
 		    brackets++;
-		else if (!has_utf8 && !UTF8_IS_INVARIANT((U8)*s) && UTF)
+		else if (!has_utf8 && !UTF8_IS_INVARIANT(*s) && UTF)
 		    has_utf8 = TRUE;
 		*to = *s;
 	    }
@@ -11917,37 +11916,38 @@ Perl_yyerror(pTHX_ const char *s)
 #endif
 
 STATIC char*
-S_swallow_bom(pTHX_ U8 *s)
+S_swallow_bom(pTHX_ char *s)
 {
     dVAR;
+    U8 *u8s = (U8*)s;
     const STRLEN slen = SvCUR(PL_linestr);
-    switch (s[0]) {
+    switch (u8s[0]) {
     case 0xFF:
-	if (s[1] == 0xFE) {
+	if (u8s[1] == 0xFE) {
 	    /* UTF-16 little-endian? (or UTF32-LE?) */
-	    if (s[2] == 0 && s[3] == 0)  /* UTF-32 little-endian */
+	    if (u8s[2] == 0 && u8s[3] == 0)  /* UTF-32 little-endian */
 		Perl_croak(aTHX_ "Unsupported script encoding UTF32-LE");
 #ifndef PERL_NO_UTF16_FILTER
 	    if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF16-LE script encoding (BOM)\n");
-	    s += 2;
+	    u8s += 2;
 	utf16le:
-	    if (PL_bufend > (char*)s) {
-		U8 *news;
+	    if (PL_bufend > (char*)u8s) {
+		char *news;
 		I32 newlen;
 
 		filter_add(utf16rev_textfilter, NULL);
-		Newx(news, (PL_bufend - (char*)s) * 3 / 2 + 1, U8);
-		utf16_to_utf8_reversed(s, news,
+		Newx(news, (PL_bufend - (char*)u8s) * 3 / 2 + 1, char);
+		utf16_to_utf8_reversed((char*)u8s, news,
 				       PL_bufend - (char*)s - 1,
 				       &newlen);
 		sv_setpvn(PL_linestr, (const char*)news, newlen);
 #ifdef PERL_MAD
-		s = (U8*)SvPVX(PL_linestr);
-  		Copy(news, s, newlen, U8);
+		s = SvPVX(PL_linestr);
+  		Copy(news, s, newlen, char);
 		s[newlen] = '\0';
 #endif
 		Safefree(news);
-		s = (U8*)SvPVX(PL_linestr);
+		s = SvPVX(PL_linestr);
 #ifdef PERL_MAD
 		/* FIXME - is this a general bug fix?  */
 		s[newlen] = '\0';
@@ -11960,23 +11960,23 @@ S_swallow_bom(pTHX_ U8 *s)
 	}
 	break;
     case 0xFE:
-	if (s[1] == 0xFF) {   /* UTF-16 big-endian? */
+	if ((U8)s[1] == 0xFF) {   /* UTF-16 big-endian? */
 #ifndef PERL_NO_UTF16_FILTER
 	    if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16BE script encoding (BOM)\n");
 	    s += 2;
 	utf16be:
 	    if (PL_bufend > (char *)s) {
-		U8 *news;
+		char *news;
 		I32 newlen;
 
 		filter_add(utf16_textfilter, NULL);
-		Newx(news, (PL_bufend - (char*)s) * 3 / 2 + 1, U8);
-		utf16_to_utf8(s, news,
-			      PL_bufend - (char*)s,
+		Newx(news, (PL_bufend - (char*)u8s) * 3 / 2 + 1, char);
+		utf16_to_utf8((char*)u8s, news,
+			      PL_bufend - (char*)u8s,
 			      &newlen);
 		sv_setpvn(PL_linestr, (const char*)news, newlen);
 		Safefree(news);
-		s = (U8*)SvPVX(PL_linestr);
+		u8s = (U8*)SvPVX(PL_linestr);
 		PL_bufend = SvPVX(PL_linestr) + newlen;
 	    }
 #else
@@ -11985,20 +11985,20 @@ S_swallow_bom(pTHX_ U8 *s)
 	}
 	break;
     case 0xEF:
-	if (slen > 2 && s[1] == 0xBB && s[2] == 0xBF) {
+	if (slen > 2 && u8s[1] == 0xBB && u8s[2] == 0xBF) {
 	    if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-8 script encoding (BOM)\n");
-	    s += 3;                      /* UTF-8 */
+	    u8s += 3;                      /* UTF-8 */
 	}
 	break;
     case 0:
 	if (slen > 3) {
-	     if (s[1] == 0) {
-		  if (s[2] == 0xFE && s[3] == 0xFF) {
+	     if (u8s[1] == 0) {
+		  if (u8s[2] == 0xFE && u8s[3] == 0xFF) {
 		       /* UTF-32 big-endian */
 		       Perl_croak(aTHX_ "Unsupported script encoding UTF32-BE");
 		  }
 	     }
-	     else if (s[2] == 0 && s[3] != 0) {
+	     else if (u8s[2] == 0 && u8s[3] != 0) {
 		  /* Leading bytes
 		   * 00 xx 00 xx
 		   * are a good indicator of UTF-16BE. */
@@ -12008,15 +12008,15 @@ S_swallow_bom(pTHX_ U8 *s)
 	}
 #ifdef EBCDIC
     case 0xDD:
-        if (slen > 3 && s[1] == 0x73 && s[2] == 0x66 && s[3] == 0x73) {
+        if (slen > 3 && u8s[1] == 0x73 && u8s[2] == 0x66 && u8s[3] == 0x73) {
             if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-8 script encoding (BOM)\n");
-            s += 4;                      /* UTF-8 */
+            u8s += 4;                      /* UTF-8 */
         }
         break;
 #endif
 
     default:
-	 if (slen > 3 && s[1] == 0 && s[2] != 0 && s[3] == 0) {
+	 if (slen > 3 && u8s[1] == 0 && u8s[2] != 0 && u8s[3] == 0) {
 		  /* Leading bytes
 		   * xx 00 xx 00
 		   * are a good indicator of UTF-16LE. */
@@ -12024,7 +12024,7 @@ S_swallow_bom(pTHX_ U8 *s)
 	      goto utf16le;
 	 }
     }
-    return (char*)s;
+    return (char*)u8s;
 }
 
 
@@ -12040,11 +12040,11 @@ utf16_textfilter(pTHX_ int idx, SV *sv, int maxlen)
 			  FPTR2DPTR(void *, utf16_textfilter),
 			  idx, maxlen, (int) count));
     if (count) {
-	U8* tmps;
+	char* tmps;
 	I32 newlen;
-	Newx(tmps, SvCUR(sv) * 3 / 2 + 1, U8);
+	Newx(tmps, SvCUR(sv) * 3 / 2 + 1, char);
 	Copy(SvPVX_const(sv), tmps, old, char);
-	utf16_to_utf8((U8*)SvPVX_const(sv) + old, tmps + old,
+	utf16_to_utf8(SvPVX_const(sv) + old, tmps + old,
 		      SvCUR(sv) - old, &newlen);
 	sv_usepvn(sv, (char*)tmps, (STRLEN)newlen + old);
     }
@@ -12063,11 +12063,11 @@ utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen)
 			  FPTR2DPTR(void *, utf16rev_textfilter),
 			  idx, maxlen, (int) count));
     if (count) {
-	U8* tmps;
+	char* tmps;
 	I32 newlen;
-	Newx(tmps, SvCUR(sv) * 3 / 2 + 1, U8);
+	Newx(tmps, SvCUR(sv) * 3 / 2 + 1, char);
 	Copy(SvPVX_const(sv), tmps, old, char);
-	utf16_to_utf8((U8*)SvPVX_const(sv) + old, tmps + old,
+	utf16_to_utf8(SvPVX_const(sv) + old, tmps + old,
 		      SvCUR(sv) - old, &newlen);
 	sv_usepvn(sv, (char*)tmps, (STRLEN)newlen + old);
     }
@@ -12113,7 +12113,7 @@ Perl_scan_vstring(pTHX_ const char *s, const char *e, SV *sv)
     }
 
     if (!isALPHA(*pos)) {
-	U8 tmpbuf[UTF8_MAXBYTES+1];
+	char tmpbuf[UTF8_MAXBYTES+1];
 
 	if (*s == 'v')
 	    s++;  /* get past 'v' */
@@ -12122,7 +12122,7 @@ Perl_scan_vstring(pTHX_ const char *s, const char *e, SV *sv)
 
 	for (;;) {
 	    /* this is atoi() that tolerates underscores */
-	    U8 *tmpend;
+	    char *tmpend;
 	    UV rev = 0;
 	    const char *end = pos;
 	    UV mult = 1;

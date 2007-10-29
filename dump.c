@@ -207,21 +207,21 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
 	    sv_setpvn(dsv, "", 0);
     }
     
-    if ((flags & PERL_PV_ESCAPE_UNI_DETECT) && is_utf8_string((U8*)pv, count))
+    if ((flags & PERL_PV_ESCAPE_UNI_DETECT) && is_utf8_string(pv, count))
         isuni = 1;
     
     for ( ; (pv < end && (!max || (wrote < max))) ; pv += readsize ) {
-        const UV u= (isuni) ? utf8n_to_uvchr((U8*)pv, end - pv, &readsize, UTF8_CHECK_ONLY) : (U8)*pv;            
+        const UV u= (isuni) ? utf8n_to_uvchr(pv, end - pv, &readsize, UTF8_CHECK_ONLY) : (U8)*pv;            
         const U8 c = (U8)u & 0xFF;
         
-	if ( readsize == -1 ) {
+	if ( readsize == (STRLEN)-1 ) {
 	    chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
-                                      "%cx[%"UVxf"]", esc, (U8)*pv);
+                                      "%cx[%c]", esc, *pv);
 	    readsize = 1;
         } else if ( ( u > 255 ) || (flags & PERL_PV_ESCAPE_ALL)) {
             if (flags & PERL_PV_ESCAPE_FIRSTCHAR) 
                 chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
-                                      "%"UVxf, esc, u);
+                                      "%c%"UVxf, esc, u);
             else
                 chsize = my_snprintf( octbuf, PV_ESCAPE_OCTBUFSIZE, 
                                       "%cx{%"UVxf"}", esc, u);
