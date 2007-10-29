@@ -708,8 +708,8 @@ Perl_fbm_instr(pTHX_ char *big, register char *bigend, SV *littlestr, U32 flags)
 	return NULL;
 
     {
-	register const char * const table
-	    = little + littlelen + PERL_FBM_TABLE_OFFSET;
+	register const U8 * const table
+	    = (U8*)little + littlelen + PERL_FBM_TABLE_OFFSET;
 	register const char *oldlittle;
 
 	--littlelen;			/* Last char found by table lookup */

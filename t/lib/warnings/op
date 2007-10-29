@@ -197,7 +197,7 @@ sort(1,2) ;		# OP_SORT
 reverse(1,2) ;		# OP_REVERSE
 			# OP_RANGE
 			# OP_FLIP
-(1 ..2) ;		# OP_FLOP
+         		# OP_FLOP
 caller ;		# OP_CALLER
 fileno STDIN ;		# OP_FILENO
 eof STDIN ;		# OP_EOF
@@ -236,7 +236,6 @@ Useless use of join or string in void context at - line 33.
 Useless use of list slice in void context at - line 34.
 Useless use of sort in void context at - line 37.
 Useless use of reverse in void context at - line 38.
-Useless use of range (or flop) in void context at - line 41.
 Useless use of caller in void context at - line 42.
 Useless use of fileno in void context at - line 43.
 Useless use of eof in void context at - line 44.
@@ -299,7 +298,7 @@ sort(1,2) ;		# OP_SORT
 reverse(1,2) ;		# OP_REVERSE
 			# OP_RANGE
 			# OP_FLIP
-(1 ..2) ;		# OP_FLOP
+        		# OP_FLOP
 caller ;		# OP_CALLER
 fileno STDIN ;		# OP_FILENO
 eof STDIN ;		# OP_EOF
@@ -903,57 +902,57 @@ Use of /g modifier is meaningless in split at - line 4.
 ########
 # op.c
 use warnings 'precedence';
-$a = $b & $c == $d;
-$a = $b ^ $c != $d;
-$a = $b | $c > $d;
-$a = $b < $c & $d;
-$a = $b >= $c ^ $d;
-$a = $b <= $c | $d;
-$a = $b <=> $c & $d;
-$a &= $b == $c; $a |= $b == $c; $a ^= $b == $c; # shouldn't warn
+$a = $b ^&^ $c == $d;
+$a = $b ^^^ $c != $d;
+$a = $b ^|^ $c > $d;
+$a = $b < $c ^&^ $d;
+$a = $b >= $c ^^^ $d;
+$a = $b <= $c ^|^ $d;
+$a = $b <=> $c ^&^ $d;
+$a ^&^= $b == $c; $a ^|^= $b == $c; $a ^^^= $b == $c; # shouldn't warn
 no warnings 'precedence';
-$a = $b & $c == $d;
-$a = $b ^ $c != $d;
-$a = $b | $c > $d;
-$a = $b < $c & $d;
-$a = $b >= $c ^ $d;
-$a = $b <= $c | $d;
-$a = $b <=> $c & $d;
+$a = $b ^&^ $c == $d;
+$a = $b ^^^ $c != $d;
+$a = $b ^|^ $c > $d;
+$a = $b < $c ^&^ $d;
+$a = $b >= $c ^^^ $d;
+$a = $b <= $c ^|^ $d;
+$a = $b <=> $c ^&^ $d;
 EXPECT
-Possible precedence problem on bitwise & operator at - line 3.
-Possible precedence problem on bitwise ^ operator at - line 4.
-Possible precedence problem on bitwise | operator at - line 5.
-Possible precedence problem on bitwise & operator at - line 6.
-Possible precedence problem on bitwise ^ operator at - line 7.
-Possible precedence problem on bitwise | operator at - line 8.
-Possible precedence problem on bitwise & operator at - line 9.
+Possible precedence problem on bitwise ^&^ operator at - line 3.
+Possible precedence problem on bitwise ^^^ operator at - line 4.
+Possible precedence problem on bitwise ^|^ operator at - line 5.
+Possible precedence problem on bitwise ^&^ operator at - line 6.
+Possible precedence problem on bitwise ^^^ operator at - line 7.
+Possible precedence problem on bitwise ^|^ operator at - line 8.
+Possible precedence problem on bitwise ^&^ operator at - line 9.
 ########
 # op.c
 use integer;
 use warnings 'precedence';
-$a = $b & $c == $d;
-$a = $b ^ $c != $d;
-$a = $b | $c > $d;
-$a = $b < $c & $d;
-$a = $b >= $c ^ $d;
-$a = $b <= $c | $d;
-$a = $b <=> $c & $d;
+$a = $b ^&^ $c == $d;
+$a = $b ^^^ $c != $d;
+$a = $b ^|^ $c > $d;
+$a = $b < $c ^&^ $d;
+$a = $b >= $c ^^^ $d;
+$a = $b <= $c ^|^ $d;
+$a = $b <=> $c ^&^ $d;
 no warnings 'precedence';
-$a = $b & $c == $d;
-$a = $b ^ $c != $d;
-$a = $b | $c > $d;
-$a = $b < $c & $d;
-$a = $b >= $c ^ $d;
-$a = $b <= $c | $d;
-$a = $b <=> $c & $d;
+$a = $b ^&^ $c == $d;
+$a = $b ^^^ $c != $d;
+$a = $b ^|^ $c > $d;
+$a = $b < $c ^&^ $d;
+$a = $b >= $c ^^^ $d;
+$a = $b <= $c ^|^ $d;
+$a = $b <=> $c ^&^ $d;
 EXPECT
-Possible precedence problem on bitwise & operator at - line 4.
-Possible precedence problem on bitwise ^ operator at - line 5.
-Possible precedence problem on bitwise | operator at - line 6.
-Possible precedence problem on bitwise & operator at - line 7.
-Possible precedence problem on bitwise ^ operator at - line 8.
-Possible precedence problem on bitwise | operator at - line 9.
-Possible precedence problem on bitwise & operator at - line 10.
+Possible precedence problem on bitwise ^&^ operator at - line 4.
+Possible precedence problem on bitwise ^^^ operator at - line 5.
+Possible precedence problem on bitwise ^|^ operator at - line 6.
+Possible precedence problem on bitwise ^&^ operator at - line 7.
+Possible precedence problem on bitwise ^^^ operator at - line 8.
+Possible precedence problem on bitwise ^|^ operator at - line 9.
+Possible precedence problem on bitwise ^&^ operator at - line 10.
 ########
 # op.c
 
@@ -975,9 +974,9 @@ local($x -=  1);	# OP_SUBTRACT
 local($x .=  1);	# OP_CONCAT
 local($x <<= 1);	# OP_LEFT_SHIFT
 local($x >>= 1);	# OP_RIGHT_SHIFT
-local($x &=  1);	# OP_BIT_AND
-local($x ^=  1);	# OP_BIT_XOR
-local($x |=  1);	# OP_BIT_OR
+local($x ^&^=  1);	# OP_BIT_AND
+local($x ^^^=  1);	# OP_BIT_XOR
+local($x ^|^=  1);	# OP_BIT_OR
 {
     use integer;
     local($x *= 1);	# OP_I_MULTIPLY

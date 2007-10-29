@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 236;
+plan tests => 234;
 
 while (<DATA>) {
     chomp;

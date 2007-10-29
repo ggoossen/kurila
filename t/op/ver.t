@@ -9,14 +9,12 @@ $DOWARN = 1; # enable run-time warnings now
 use Config;
 
 require "./test.pl";
-plan( tests => 51 );
+plan( tests => 49 );
 
 use utf8;
 
 eval 'use v5.5.640';
-is( $@, '', "use v5.5.640; $@");
-
-require_ok('v5.5.640');
+like( $@, qr/use VERSION is not valid in Perl Kurila/, "use v5.5.640;");
 
 # printing characters should work
 if (ord("\t") == 9) { # ASCII
@@ -53,9 +51,7 @@ is(v1.20.300.4000, "\x{1}\x{14}\x{12c}\x{fa0}",'compare embedded \x{} string');
 #
 # now do the same without the "v"
 eval 'use 5.5.640';
-is( $@, '', "use 5.5.640; $@");
-
-require_ok('5.5.640');
+like( $@, qr/use VERSION is not valid in Perl Kurila/, "use 5.5.640;");
 
 # hash keys too
 if (ord("\t") == 9) { # ASCII

@@ -1663,7 +1663,7 @@ Perl_do_readline(pTHX)
 		    /* Emulate :encoding(utf8) warning in the same case. */
 		    Perl_warner(aTHX_ packWARN(WARN_UTF8),
 				"utf8 \"\\x%02X\" does not map to Unicode",
-				f < SvEND(sv) ? *f : 0);
+				f < SvEND(sv) ? (U8)*f : 0);
 	     }
 	}
 	if (gimme == G_ARRAY) {

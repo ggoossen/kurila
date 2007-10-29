@@ -47,14 +47,14 @@ my $refdump = <<'EO_DX_OUT';
         {
 5           TYPE = const  ===> 6
             FLAGS = (SCALAR)
-            SV = PV("foo"\0)
+            SV = PV("foo"\0) [UTF8 "foo"]
         }
     }
 }
 EO_DX_OUT
 
 # escape the regex chars in the reference dump
-$refdump =~ s/([{}()\\])/\\$1/gms;
+$refdump =~ s/([{}()\\\[\]])/\\$1/gms;
 
 my $qr = qr/$refdump/;
 # diag($qr);
