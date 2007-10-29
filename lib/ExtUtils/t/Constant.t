@@ -415,7 +415,7 @@ EOT
   push @files, $pm;
   open FH, ">$pm" or die "open >$pm: $!\n";
   print FH "package $package;\n";
-  print FH "use $];\n";
+  print FH "use kurila;\n";
 
   print FH <<'EOT';
 

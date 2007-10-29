@@ -1,7 +1,6 @@
 #! perl -w
 
 use strict ;
-require 5.004 ;
 
 use private::MakeUtil;
 use ExtUtils::MakeMaker 5.16 ;

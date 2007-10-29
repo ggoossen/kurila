@@ -4,7 +4,6 @@
 # It may eventually be expanded to generate many executables, as
 # explained in the preface of /Programming Perl/ 3e.
 
-require 5;
 use strict;
 use Config;
 use File::Basename qw(&basename &dirname);
