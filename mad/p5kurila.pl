@@ -398,7 +398,7 @@ sub remove_useversion {
     }
     for my $op_x ($xml->findnodes(q{//op_require})) {
         my ($const) = $op_x->findnodes(q{op_const});
-        next unless $const and $const->att('NV') || $const->att('IV');
+        next unless $const and $const->att('NV') || $const->att('IV') || ($const->att('PVIV') || '') =~ m/^v?\d/;
         set_madprop($op_x, "operator", '');
         set_madprop($const, "wsbefore-value", '');
         set_madprop($const, "value", '');
