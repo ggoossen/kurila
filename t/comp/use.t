@@ -6,7 +6,7 @@ BEGIN {
     $INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
-print "1..63\n";
+print "1..25\n";
 
 # Can't require test.pl, as we're testing the use/require mechanism here.
 
@@ -63,44 +63,13 @@ sub isnt ($$;$) {
 }
 
 eval "use 5.000";	# implicit semicolon
-is ($@, '');
+like ($@, qr/use VERSION is not valid in Perl Kurila/);
 
 eval "use 5.000;";
-is ($@, '');
+like ($@, qr/use VERSION is not valid in Perl Kurila/);
 
 eval "use 6.000;";
-like ($@, qr/Perl v6\.0\.0 required--this is only \Q$^V\E, stopped/);
-
-eval "no 6.000;";
-is ($@, '');
-
-eval "no 5.000;";
-like ($@, qr/Perls since v5\.0\.0 too modern--this is \Q$^V\E, stopped/);
-
-eval "use 5.6;";
-like ($@, qr/Perl v5\.600\.0 required \(did you mean v5\.6\.0\?\)--this is only \Q$^V\E, stopped/);
-
-eval "use 5.8;";
-like ($@, qr/Perl v5\.800\.0 required \(did you mean v5\.8\.0\?\)--this is only \Q$^V\E, stopped/);
-
-eval "use 5.9;";
-like ($@, qr/Perl v5\.900\.0 required \(did you mean v5\.9\.0\?\)--this is only \Q$^V\E, stopped/);
-
-eval "use 5.10;";
-like ($@, qr/Perl v5\.100\.0 required \(did you mean v5\.10\.0\?\)--this is only \Q$^V\E, stopped/);
-
-eval sprintf "use %.6f;", $];
-is ($@, '');
-
-
-eval sprintf "use %.6f;", $] - 0.000001;
-is ($@, '');
-
-eval sprintf("use %.6f;", $] + 1);
-like ($@, qr/Perl v6.\d+.\d+ required--this is only \Q$^V\E, stopped/);
-
-eval sprintf "use %.6f;", $] + 0.00001;
-like ($@, qr/Perl v5.\d+.\d+ required--this is only \Q$^V\E, stopped/);
+like ($@, qr/use VERSION is not valid in Perl Kurila/);
 
 { use lib }	# check that subparse saves pending tokens
 
@@ -197,55 +166,3 @@ if ($^O eq 'MacOS') {
     like ($@, qr/^xxx defines neither package nor VERSION--version check failed at/);
     unlink 'xxx.pm';
 }
-
-my @ver = split /\./, sprintf "%vd", $^V;
-
-foreach my $index (-3..+3) {
-    foreach my $v (0, 1) {
-	my @parts = @ver;
-	if ($index) {
-	    if ($index < 0) {
-		# Jiggle one of the parts down
-		--$parts[-$index - 1];
-		if ($parts[-$index - 1] < 0) {
-		    # perl's version number ends with '.0'
-		    $parts[-$index - 1] = 0;
-		    $parts[-$index - 2] -= 2;
-		}
-	    } else {
-		# Jiggle one of the parts up
-		++$parts[$index - 1];
-	    }
-	}
-	my $v_version = sprintf "v%d.%d.%d", @parts;
-	my $version;
-	if ($v) {
-	    $version = $v_version;
-	} else {
-	    $version = $parts[0] + $parts[1] / 1000 + $parts[2] / 1000000;
-	}
-
-	eval "use $version";
-	if ($index > 0) {
-	    # The future
-	    like ($@,
-		  qr/Perl $v_version required--this is only \Q$^V\E, stopped/,
-		  "use $version");
-	} else {
-	    # The present or past
-	    is ($@, '', "use $version");
-	}
-
-	eval "no $version";
-	if ($index <= 0) {
-	    # The present or past
-	    like ($@,
-		  qr/Perls since $v_version too modern--this is \Q$^V\E, stopped/,
-		  "no $version");
-	} else {
-	    # future
-	    is ($@, '', "no $version");
-	}
-    }
-}
-

@@ -13,12 +13,6 @@ say "Hello", "world";
 EXPECT
 Helloworld
 ########
-# VERSION requirement, v-dotted notation
-use v5.9.5;
-say "Hello", "world";
-EXPECT
-Helloworld
-########
 # VERSION requirement, decimal notation
 use 5.009005;
 say defined $INC{"feature.pm"} ? "Helloworld" : "Good bye";

@@ -15,7 +15,7 @@ krunch.pm krunch.pmc whap.pm whap.pmc);
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
 my $Is_UTF8   = (${^OPEN} || "") =~ /:utf8/;
-my $total_tests = 49;
+my $total_tests = 37;
 if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
 
@@ -35,56 +35,8 @@ sub write_file {
     close REQ or die "Could not close $f: $!";
 }
 
-eval {require 5.005};
-print "# $@\nnot " if $@;
-print "ok ",$i++,"\n";
-
-eval { require 5.005 };
-print "# $@\nnot " if $@;
-print "ok ",$i++,"\n";
-
-eval { require 5.005; };
-print "# $@\nnot " if $@;
-print "ok ",$i++,"\n";
-
-eval {
-    require 5.005
-};
-print "# $@\nnot " if $@;
-print "ok ",$i++,"\n";
-
-# new style version numbers
-
-eval { require v5.5.630; };
-print "# $@\nnot " if $@;
-print "ok ",$i++,"\n";
-
-eval { require 10.0.2; };
-print "# $@\nnot " unless $@ =~ /^Perl v10\.0\.2 required/;
-print "ok ",$i++,"\n";
-
-eval q{ use v5.5.630; };
-print "# $@\nnot " if $@;
-print "ok ",$i++,"\n";
-
-eval q{ use 10.0.2; };
-print "# $@\nnot " unless $@ =~ /^Perl v10\.0\.2 required/;
-print "ok ",$i++,"\n";
-
-my $ver = 5.005_63;
-eval { require $ver; };
-print "# $@\nnot " if $@;
-print "ok ",$i++,"\n";
-
-# check inaccurate fp
-$ver = 10.2;
-eval { require $ver; };
-print "# $@\nnot " unless $@ =~ /^Perl v10\.200.0 required/;
-print "ok ",$i++,"\n";
-
-$ver = 10.000_02;
-eval { require $ver; };
-print "# $@\nnot " unless $@ =~ /^Perl v10\.0\.20 required/;
+eval 'require 5.005';
+print "not " unless $@;
 print "ok ",$i++,"\n";
 
 print "not " unless 5.5.1 gt v5.5;

@@ -404,10 +404,10 @@ Perl_utf8n_to_uvuni(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flag
 {
     dVAR;
     const char * const s0 = s;
-    UV uv = *s, ouv = 0;
+    UV uv = (U8)*s, ouv = 0;
     STRLEN len = 1;
     const bool dowarn = ckWARN_d(WARN_UTF8);
-    const UV startbyte = *s;
+    const UV startbyte = (U8)*s;
     STRLEN expectlen = 0;
     U32 warning = 0;
 
@@ -432,7 +432,7 @@ Perl_utf8n_to_uvuni(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flag
     if (UTF8_IS_INVARIANT(uv)) {
 	if (retlen)
 	    *retlen = 1;
-	return (UV) (NATIVE_TO_UTF(*s));
+	return (UV) (NATIVE_TO_UTF((U8)*s));
     }
 
     if (UTF8_IS_CONTINUATION(uv) &&
@@ -493,7 +493,7 @@ Perl_utf8n_to_uvuni(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flag
 	    goto malformed;
 	}
 	else
-	    uv = UTF8_ACCUMULATE(uv, *s);
+	    uv = UTF8_ACCUMULATE(uv, (U8)*s);
 	if (!(uv > ouv)) {
 	    /* These cannot be allowed. */
 	    if (uv == ouv) {
@@ -550,11 +550,11 @@ malformed:
 	case UTF8_WARN_NON_CONTINUATION:
 	    if (s == s0)
 	        Perl_sv_catpvf(aTHX_ sv, "(unexpected non-continuation byte 0x%02"UVxf", immediately after start byte 0x%02"UVxf")",
-                           (UV)s[1], startbyte);
+                           (UV)(U8)s[1], startbyte);
 	    else {
 		const int len = (int)(s-s0);
 	        Perl_sv_catpvf(aTHX_ sv, "(unexpected non-continuation byte 0x%02"UVxf", %d byte%s after start byte 0x%02"UVxf", expected %d bytes)",
-                           (UV)s[1], len, len > 1 ? "s" : "", startbyte, (int)expectlen);
+                           (UV)(U8)s[1], len, len > 1 ? "s" : "", startbyte, (int)expectlen);
 	    }
 
 	    break;

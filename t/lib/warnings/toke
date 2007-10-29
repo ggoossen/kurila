@@ -143,16 +143,6 @@ EXPECT
 \1 better written as $1 at - line 3.
 ########
 # toke.c
-use warnings 'semicolon' ;
-$a = 1
-&time ;
-no warnings 'semicolon' ;
-$a = 1
-&time ;
-EXPECT
-Semicolon seems to be missing at - line 3.
-########
-# toke.c
 use warnings 'syntax' ;
 my $a =+ 2 ;
 $a =- 2 ;
@@ -172,12 +162,8 @@ Reversed %= operator at - line 6.
 Reversed &= operator at - line 7.
 Reversed .= operator at - line 8.
 Reversed ^= operator at - line 9.
-Reversed |= operator at - line 10.
-Reversed <= operator at - line 11.
 syntax error at - line 8, near "=."
-syntax error at - line 9, near "=^"
-syntax error at - line 10, near "=|"
-Unterminated <> operator at - line 11.
+Expected ^,&,| or ~ after a ^, but found ' ' at - line 9.
 ########
 # toke.c
 no warnings 'syntax' ;
@@ -187,15 +173,11 @@ $a =* 2 ;
 $a =% 2 ;
 $a =& 2 ;
 $a =. 2 ;
-$a =^ 2 ;
-$a =| 2 ;
 $a =< 2 ;
 $a =/ 2 ;
 EXPECT
 syntax error at - line 8, near "=."
-syntax error at - line 9, near "=^"
-syntax error at - line 10, near "=|"
-Unterminated <> operator at - line 11.
+Unterminated <> operator at - line 9.
 ########
 # toke.c
 use warnings 'syntax' ;
@@ -831,12 +813,7 @@ $a !=~ tr/1//;
 $a !=~ s/1//;
 EXPECT
 !=~ should be !~ at - line 4.
-!=~ should be !~ at - line 5.
-!=~ should be !~ at - line 6.
-!=~ should be !~ at - line 7.
-!=~ should be !~ at - line 8.
-!=~ should be !~ at - line 9.
-!=~ should be !~ at - line 10.
+Unknown operator '~' found at - line 4.
 ########
 # toke.c
 our $foo :unique;

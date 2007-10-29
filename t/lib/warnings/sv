@@ -91,40 +91,40 @@ package main ;
 tie $A, 'fred' ;
 use warnings 'uninitialized' ;
 $B = 0 ;
-$B |= $A ;
+$B ^|^= $A ;
 no warnings 'uninitialized' ;
 $B = 0 ;
-$B |= $A ;
+$B ^|^= $A ;
 EXPECT
 Use of uninitialized value $A in bitwise or (|) at - line 10.
 ########
 # sv.c
 use warnings 'uninitialized' ;
 my $Y = 1 ; 
-my $x = 1 | $a[$Y] ;
+my $x = 1 ^|^ $a[$Y] ;
 no warnings 'uninitialized' ;
 my $Y = 1 ; 
-$x = 1 | $b[$Y] ;
+$x = 1 ^|^ $b[$Y] ;
 EXPECT
 Use of uninitialized value within @a in bitwise or (|) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
 my $Y = 1 ; 
-my $x = 1 & $a[$Y] ;
+my $x = 1 ^&^ $a[$Y] ;
 no warnings 'uninitialized' ;
 my $Y = 1 ; 
-$x = 1 & $b[$Y] ;
+$x = 1 ^&^ $b[$Y] ;
 EXPECT
 Use of uninitialized value within @a in bitwise and (&) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
 my $Y = 1 ; 
-my $x = ~$a[$Y] ;
+my $x = ^~^$a[$Y] ;
 no warnings 'uninitialized' ;
 my $Y = 1 ; 
-$x = ~$b[$Y] ;
+$x = ^~^$b[$Y] ;
 EXPECT
 Use of uninitialized value within @a in 1's complement (~) at - line 4.
 ########
@@ -248,9 +248,9 @@ Argument "def" isn't numeric in integer addition (+) at - line 4.
 ########
 # sv.c
 use warnings 'numeric' ;
-my $x = 1 & "def" ;
+my $x = 1 ^&^ "def" ;
 no warnings 'numeric' ;
-my $z = 1 & "def" ;
+my $z = 1 ^&^ "def" ;
 EXPECT
 Argument "def" isn't numeric in bitwise and (&) at - line 3.
 ########

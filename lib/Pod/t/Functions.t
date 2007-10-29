@@ -96,11 +96,10 @@ Functions for real %HASHes:
      delete, each, exists, keys, values
 
 Input and output functions:
-     binmode, close, closedir, die, eof,
-     fileno, flock, getc, print, printf, read, readdir,
-     readline, rewinddir, seek, seekdir, select, syscall,
-     sysread, sysseek, syswrite, tell, telldir, truncate, warn,
-     write
+     binmode, close, closedir, die, eof, fileno, flock, getc,
+     print, printf, read, readdir, readline, rewinddir, seek,
+     seekdir, select, syscall, sysread, sysseek, syswrite,
+     tell, telldir, truncate, warn, write
 
 Functions for fixed length data or records:
      pack, read, syscall, sysread, sysseek, syswrite, unpack,
@@ -131,8 +130,7 @@ Keywords related to perl modules:
      do, import, no, package, require, use
 
 Keywords related to classes and object-orientedness:
-     bless, package, ref, tie, tied, untie,
-     use
+     bless, package, ref, tie, tied, untie, use
 
 Low-level socket functions:
      accept, bind, connect, getpeername, getsockname,
