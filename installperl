@@ -1,7 +1,6 @@
 #!./perl
 
 BEGIN {
-    require 5.004;
     chdir '..' if !-d 'lib' and -d '../lib';
     @INC = 'lib';
     $ENV{PERL5LIB} = 'lib';
