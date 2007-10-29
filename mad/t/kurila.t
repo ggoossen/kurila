@@ -330,6 +330,23 @@ use v5.6.0;
 use version;
 ----------
 use version;
+==========
+#foo
+require 5.6;
+#bar
+require version;
+----------
+#foo
+#bar
+require version;
+==========
+require 5.6;
+use version;
+----------
+use version;
+==========
+require 5;
+----------
 END
 }
 

@@ -396,6 +396,16 @@ sub remove_useversion {
 
         $madprops->insert_new_elt('first_child', "mad_sv", { key => "value", val => '' } );
     }
+    for my $op_x ($xml->findnodes(q{//op_require})) {
+        my ($const) = $op_x->findnodes(q{op_const});
+        next unless $const and $const->att('NV') || $const->att('IV');
+        set_madprop($op_x, "operator", '');
+        set_madprop($const, "wsbefore-value", '');
+        set_madprop($const, "value", '');
+        if (my $ons = $op_x->prev_sibling('op_nextstate')) {
+            $ons->delete;
+        }
+    }
 }
 
 my $from = 0; # floating point number with starting version of kurila.
