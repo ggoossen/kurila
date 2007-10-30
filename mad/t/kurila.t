@@ -288,10 +288,6 @@ is($vs,"\x{1}\x{14}\x{12c}\x{fa0}","v-string ne \\x{}");
 ----------
 1 if /vt100/;
 ==========
-require v5.6;
-----------
-require v5.6;
-==========
 use version v0.2;
 ----------
 use version v0.2;
@@ -351,6 +347,9 @@ require 5;
 BEGIN { require 5; }
 ----------
 BEGIN {  }
+==========
+require 5.6.0;
+----------
 END
 }
 
