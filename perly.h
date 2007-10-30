@@ -106,8 +106,11 @@
      POSTINC = 321,
      PREDEC = 322,
      PREINC = 323,
-     ARROW = 324,
-     PEG = 325
+     DEREFHSH = 324,
+     DEREFARY = 325,
+     DEREFSCL = 326,
+     ARROW = 327,
+     PEG = 328
    };
 #endif
 /* Tokens.  */
@@ -177,8 +180,11 @@
 #define POSTINC 321
 #define PREDEC 322
 #define PREINC 323
-#define ARROW 324
-#define PEG 325
+#define DEREFHSH 324
+#define DEREFARY 325
+#define DEREFSCL 326
+#define ARROW 327
+#define PEG 328
 
 
 

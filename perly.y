@@ -123,7 +123,7 @@
 %right <i_tkval> '!' '~' UMINUS REFGEN
 %right <i_tkval> POWOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
-%left <i_tkval> ARROW
+%left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
 %left '[' '{'
@@ -1071,6 +1071,11 @@ term	:	termbinop
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
 			}
+        |       term DEREFARY
+                        {
+                            $$ = newAVREF($1);
+                            TOKEN_GETMAD($1,$$,'A');
+                        }
 	|	scalar	%prec '('
 			{ $$ = $1; }
 	|	star	%prec '('

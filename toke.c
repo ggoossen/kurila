@@ -3848,8 +3848,23 @@ Perl_yylex(pTHX)
 		    s = force_word(s,METHOD,FALSE,TRUE,FALSE);
 		    TOKEN(ARROW);
 		}
-		else if (*s == '$')
+		else if (*s == '&') {
+		    s++;
 		    OPERATOR(ARROW);
+		}
+		else if (*s == '$') {
+/* 		    s++; */
+		    OPERATOR(ARROW);
+/* 		    OPERATOR(DEREFSCL); */
+		}
+		else if (*s == '@') {
+		    s++;
+		    OPERATOR(DEREFARY);
+		}
+		else if (*s == '%') {
+		    s++;
+		    OPERATOR(DEREFHSH);
+		} 
 		else
 		    TERM(ARROW);
 	    }
