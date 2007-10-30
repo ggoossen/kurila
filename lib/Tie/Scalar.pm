@@ -53,8 +53,7 @@ has sample code as well:
 
 The method invoked by the command C<tie $scalar, classname>. Associates a new
 scalar instance with the specified class. C<LIST> would represent additional
-arguments (along the lines of L<AnyDBM_File> and compatriots) needed to
-complete the association.
+arguments needed to complete the association.
 
 =item FETCH this
 
