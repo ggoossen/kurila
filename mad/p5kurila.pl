@@ -412,7 +412,7 @@ sub change_deref {
     my $xml = shift;
     # '->$...' to '->&$...'
     for my $op_method ($xml->findnodes(q{//op_method})) {
-        next unless $op_method->findnodes(q{op_null[@was='rv2sv']});
+        next if $op_method->findnodes(q{op_const[@private='BARE']});
         set_madprop($op_method->parent, 'bigarrow', "-&gt;&amp;");
     }
 }
