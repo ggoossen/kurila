@@ -24,6 +24,7 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_change_deref();
 t_remove_useversion();
 t_rename_bit_operators();
 t_typed_declaration();
@@ -378,5 +379,17 @@ $a ^&^ $b;
 $a ^ $b;
 ----------
 $a ^^^ $b;
+END
+}
+
+sub t_change_deref {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+Foo->$bar();
+----
+Foo->&$bar();
+====
+@{[1,2,3]}
+----
+[1,2,3]->@
 END
 }

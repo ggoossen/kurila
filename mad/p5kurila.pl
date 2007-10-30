@@ -408,6 +408,15 @@ sub remove_useversion {
     }
 }
 
+sub change_deref {
+    my $xml = shift;
+    # '->$...' to '->&$...'
+    for my $op_method ($xml->findnodes(q{//op_method})) {
+        next unless $op_method->findnodes(q{op_null[@was='rv2sv']});
+        set_madprop($op_method->parent, 'bigarrow', "-&gt;&amp;");
+    }
+}
+
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
 
@@ -437,9 +446,12 @@ if ($from < 1.4 - 0.05) {
     remove_typed_declaration($twig);
 }
 
-rename_bit_operators($twig);
+if ($from < 1.405) {
+    rename_bit_operators($twig);
+    remove_useversion($twig);
+}
 
-remove_useversion($twig);
+change_deref($twig);
 
 # print
 $twig->print;
