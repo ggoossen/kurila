@@ -15,7 +15,7 @@ my %modules;
 my $db_file;
 BEGIN {
     use Config;
-    foreach (qw/SDBM_File GDBM_File ODBM_File NDBM_File DB_File/) {
+    foreach (qw/DB_File/) {
         if ($Config{extensions} =~ /\b$_\b/) {
             $db_file = $_;
             last;
@@ -31,14 +31,13 @@ BEGIN {
     $db_file     => q| ::is( ref $db_file->can('TIEHASH'), 'CODE' ) |,  # 5.0
     'Socket'     => q| ::is( ref Socket->can('inet_aton'),'CODE' ) |,    # 5.0
     'Time::HiRes'=> q| ::is( ref Time::HiRes->can('usleep'),'CODE' ) |,  # 5.7.3
+    'Fcntl'      => q| ::is( ref Fcntl->can('O_BINARY'),'CODE' ) |,
 );
 
 plan tests => 22 + keys(%modules) * 3;
 
-
 # Try to load the module
 use_ok( 'DynaLoader' );
-
 
 # Check functions
 can_ok( 'DynaLoader' => 'bootstrap'               ); # defined in Perl section

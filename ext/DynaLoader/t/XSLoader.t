@@ -10,7 +10,6 @@ BEGIN {
 use strict;
 use Config;
 
-my $db_file;
 BEGIN {
     eval "use Test::More";
     if ($@) {
@@ -19,12 +18,6 @@ BEGIN {
     }
 
     use Config;
-    foreach (qw/SDBM_File GDBM_File ODBM_File NDBM_File DB_File/) {
-        if ($Config{extensions} =~ /\b$_\b/) {
-            $db_file = $_;
-            last;
-        }
-    }
 }
 
 
@@ -32,7 +25,6 @@ my %modules = (
     # ModuleName  => q|code to check that it was loaded|,
     'Cwd'        => q| ::can_ok( 'Cwd' => 'fastcwd'         ) |,  # 5.7 ?
     'File::Glob' => q| ::can_ok( 'File::Glob' => 'doglob'   ) |,  # 5.6
-    $db_file     => q| ::can_ok( $db_file => 'TIEHASH'      ) |,  # 5.0
     'Socket'     => q| ::can_ok( 'Socket' => 'inet_aton'    ) |,  # 5.0
     'Time::HiRes'=> q| ::can_ok( 'Time::HiRes' => 'usleep'  ) |,  # 5.7.3
 );

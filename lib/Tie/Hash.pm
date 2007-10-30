@@ -72,7 +72,7 @@ descriptive, as well as example code:
 
 The method invoked by the command C<tie %hash, classname>. Associates a new
 hash instance with the specified class. C<LIST> would represent additional
-arguments (along the lines of L<AnyDBM_File> and compatriots) needed to
+arguments needed to
 complete the association.
 
 =item STORE this, key, value
@@ -179,7 +179,7 @@ to find out what happens when C<SCALAR> does not exist.
 =head1 MORE INFORMATION
 
 The packages relating to various DBM-related implementations (F<DB_File>,
-F<NDBM_File>, etc.) show examples of general tied hashes, as does the
+etc.) show examples of general tied hashes, as does the
 L<Config> module. While these do not utilize B<Tie::Hash>, they serve as
 good working examples.
 
