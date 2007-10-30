@@ -642,11 +642,15 @@ sub blockast {
 
 package PLXML::mad_pv;
 
+require utf8;
+require bytes;
+
 sub pair {
     my $self = shift;
     my $key = $$self{key};
     my $val = $$self{val};
     $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
+    $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/bytes::chr(hex $1)/eg;
     return $key,$val;
 }
 
@@ -657,6 +661,7 @@ sub pair {
     my $key = $$self{key};
     my $val = $$self{val};
     $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
+    $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/bytes::chr(hex $1)/eg;
     return $key,$val;
 }
 

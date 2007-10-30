@@ -44,6 +44,7 @@ sub p55 {
         return;
     }
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
+    $output = Encode::decode('utf8', $output);
     # diag($@) if $@;
     is($output, $input, $msg) or $TODO or die;
 }
@@ -95,8 +96,6 @@ for my $prog (@prgs) {
 use File::Find;
 
 our %failing = map { $_, 1 } qw|
-../t/comp/require.t
-
 ../t/op/switch.t
 
 ../t/op/attrhand.t
@@ -107,7 +106,6 @@ our %failing = map { $_, 1 } qw|
 ../t/lib/cygwin.t
 
 ../t/op/exec.t
-../t/io/say.t
 
 ../t/uni/tr_7jis.t ../t/uni/tr_eucjp.t ../t/uni/tr_sjis.t
 |;
@@ -121,6 +119,14 @@ for my $file (@files) {
 }
 
 __DATA__
+# pod with invalid UTF-8
+=head3 Gearman
+
+I know Ask Bj�rn Hansen has implemented a transport for the C<gearman> distributed
+job system, though it's not on CPAN at the time of writing this.
+
+=cut
+########
 use strict;
 #ABC
 Foo->new;
@@ -130,6 +136,7 @@ my $x = pi;
 ########
 -OS_Code => $a
 ########
+# TODO
 use encoding 'euc-jp';
 tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
 ########
@@ -145,9 +152,6 @@ s//$#foo/ge;
 ########
 #
 s//m#.#/ge;
-########
-#
-eval { require 5.005 }
 ########
 # Reduced test case from t/io/layers.t
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
@@ -212,14 +216,6 @@ ok my $x = "foobar";
 # LABLE without a statement.
  LABLE: ;
  LABLE: $a;
-########
-# TODO pod with invalid UTF-8
-=head3 Gearman
-
-I know Ask Bj�rn Hansen has implemented a transport for the C<gearman> distributed
-job system, though it's not on CPAN at the time of writing this.
-
-=cut
 ########
 # TODO do not execute CHECK block
 CHECK { die; }
