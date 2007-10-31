@@ -986,11 +986,7 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
 		sv_catpvn(tmpsv, &tmp, 1);
 	    sv_catpv(tmpsv, "'=");
 	    switch (mp->mad_type) {
-	    case MAD_NULL:
-		sv_catpv(tmpsv, "NULL");
-		Perl_dump_indent(aTHX_ level, file, "%s\n", SvPVX(tmpsv));
-		break;
-	    case MAD_PV:
+	    case MAD_SV:
 		sv_catpv(tmpsv, "<");
 		sv_catpvn(tmpsv, (char*)mp->mad_val, mp->mad_vlen);
 		sv_catpv(tmpsv, ">");
@@ -2634,64 +2630,75 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
 
     if (PL_madskills && o->op_madprop) {
-	char prevkey = '\0';
 	SV * const tmpsv = newSVpvn("", 0);
 	const MADPROP* mp = o->op_madprop;
 
-	if (!contents) {
-	    contents = 1;
-	    PerlIO_printf(file, ">\n");
-	}
-	Perl_xmldump_indent(aTHX_ level, file, "<madprops>\n");
+        if (!contents) {
+            contents = 1;
+            PerlIO_printf(file, ">\n");
+        }
+        Perl_xmldump_indent(aTHX_ level, file, "<madprops>\n");
 	level++;
 	while (mp) {
 	    char tmp = mp->mad_key;
-	    sv_setpvn(tmpsv,"\"",1);
+	    sv_setpvn(tmpsv,"",0);
 	    if (tmp) {
 		if (slotname(tmp))
 		    sv_catpv(tmpsv, slotname(tmp));
 		else
 		    Perl_croak(aTHX_ "madprop error: Unknow slot '%c'.", tmp);
 	    }
-	    if ((tmp == '_') || (tmp == '#')) { /* '_' '#' whitespace belong to the previous token. */
-		sv_catpv(tmpsv, "-");
-		sv_catpv(tmpsv, slotname(prevkey));
-	    }
-	    else
-		prevkey = tmp;
-	    sv_catpv(tmpsv, "\"");
 	    switch (mp->mad_type) {
-	    case MAD_NULL:
-		sv_catpv(tmpsv, "NULL");
-		Perl_xmldump_indent(aTHX_ level, file, "<mad_null key=%s/>\n", SvPVX(tmpsv));
-		break;
-	    case MAD_PV:
-		sv_catpv(tmpsv, " val=\"");
-		sv_catxmlpvn(tmpsv, (char*)mp->mad_val, mp->mad_vlen);
-		sv_catpv(tmpsv, "\"");
-		Perl_xmldump_indent(aTHX_ level, file, "<mad_pv key=%s/>\n", SvPVX(tmpsv));
-		break;
 	    case MAD_SV:
 		sv_catpv(tmpsv, " val=\"");
 		sv_catxmlsv(tmpsv, (SV*)mp->mad_val);
-		sv_catpv(tmpsv, "\"");
-		Perl_xmldump_indent(aTHX_ level, file, "<mad_sv key=%s/>\n", SvPVX(tmpsv));
+		sv_catpv(tmpsv, "\" ");
+
+		{
+		    const MADPROP* next = mp->mad_next;
+		    if (next) {
+			char xnext = next->mad_key;
+			if ((xnext == '_') || (xnext == '#')) { /* '_' '#' whitespace belong to the previous token. */
+			    sv_catpv(tmpsv, slotname(xnext));
+			    sv_catpv(tmpsv, "=\"");
+			    sv_catxmlsv(tmpsv, (SV*)next->mad_val);
+			    sv_catpv(tmpsv, "\" ");
+			    mp = next;
+			}
+		    }
+		    next = mp->mad_next;
+		    if (next) {
+			char xnext = next->mad_key;
+			if ((xnext == '_') || (xnext == '#')) { /* '_' '#' whitespace belong to the previous token. */
+			    sv_catpv(tmpsv, slotname(xnext));
+			    sv_catpv(tmpsv, "=\"");
+			    sv_catxmlsv(tmpsv, (SV*)next->mad_val);
+			    sv_catpv(tmpsv, "\" ");
+			    mp = next;
+			}
+		    }
+		}
+
+		sv_catpv(tmpsv, "/>\n");
+		Perl_xmldump_indent(aTHX_ level, file, "<mad_%s", SvPVX(tmpsv));
 		break;
 	    case MAD_OP:
+		/* in next loop */
 		if ((OP*)mp->mad_val) {
-		    Perl_xmldump_indent(aTHX_ level, file, "<mad_op key=%s>\n", SvPVX(tmpsv));
+		    Perl_xmldump_indent(aTHX_ level, file, "<mad_op key=\"%s\">\n", SvPVX(tmpsv));
 		    do_op_xmldump(level+1, file, (OP*)mp->mad_val);
 		    Perl_xmldump_indent(aTHX_ level, file, "</mad_op>\n");
 		}
 		break;
 	    default:
-		Perl_xmldump_indent(aTHX_ level, file, "<mad_unk key=%s/>\n", SvPVX(tmpsv));
+		Perl_croak(aTHX_ "unknown MAD_type");
 		break;
 	    }
 	    mp = mp->mad_next;
 	}
+
 	level--;
-	Perl_xmldump_indent(aTHX_ level, file, "</madprops>\n");
+ 	Perl_xmldump_indent(aTHX_ level, file, "</madprops>\n");
 
 	SvREFCNT_dec(tmpsv);
     }

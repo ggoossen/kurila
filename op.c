@@ -2796,11 +2796,6 @@ Perl_mad_free(pTHX_ MADPROP* mp)
 /*    if (PL_parser && PL_parser->lex_state != LEX_NOTPARSING && mp->mad_vlen)
 	PerlIO_printf(PerlIO_stderr(), "DESTROYING '%c'=<%s>\n", mp->mad_key & 255, mp->mad_val); */
     switch (mp->mad_type) {
-    case MAD_NULL:
-	break;
-    case MAD_PV:
-	Safefree((char*)mp->mad_val);
-	break;
     case MAD_OP:
 	if (mp->mad_vlen)	/* vlen holds "strong/weak" boolean */
 	    op_free((OP*)mp->mad_val);
