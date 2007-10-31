@@ -1001,7 +1001,7 @@ BEGIN {
 	'use' => sub {			# use
 	    my $self = shift;
 	    my @newkids;
-	    my @module = $self->madness('U');
+	    my @module = $self->madness('U') or die "use should have 'U' madness";
 	    my @args = $self->madness('A');
 	    my $module = $module[-1]{Kids}[-1];
 	    if ($module->uni eq 'bytes') {
@@ -1086,7 +1086,7 @@ BEGIN {
 	    my $self = shift;
 	    return P5AST::quote->new(Kids => [$self->madness('q = Q')])
 	},
-	'X' => sub {				# random literal
+	'value' => sub {				# random literal
 	    my $self = shift;
 	    return P5AST::token->new(Kids => [$self->madness('X')])
 	},

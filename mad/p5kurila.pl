@@ -30,22 +30,20 @@ sub entersub_handler {
     return if (get_madprop($sub, "bigarrow") || '') eq "-&gt;";
 
     # make indirect object syntax.
-    my $madprops = ($twig->findnodes([$sub], qq|madprops|))[0] || $sub->insert_new_elt("madprops");
-
-    $madprops->insert_new_elt( "mad_sv", { key => "bigarrow", val => "-&gt;" } );
-    $madprops->insert_new_elt( "mad_sv", { key => "round_open", val => "(" } );
-    $madprops->insert_new_elt( "mad_sv", { key => "round_close", val => ")" } );
+    set_madprop($sub, "bigarrow", "-&gt;");
+    set_madprop($sub, "round_open", "(");
+    set_madprop($sub, "round_close", ")");
 
     # move widespace from method to object and visa versa.
-    my ($method_ws) = $twig->findnodes([$method_named],
-                                       qq|madprops/mad_op/op_method/op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
-    my ($obj_ws) = $twig->findnodes([$sub], qq|op_const/madprops/mad_sv[\@key="wsbefore-value"]|);
-    if ($method_ws and $obj_ws) {
-        my $x_method_ws = $method_ws->att('val');
-        my $x_obj_ws = $obj_ws->att('val');
+    my ($method_mad) = $twig->findnodes([$method_named],
+                                       qq|madprops/mad_op/op_method/op_const/madprops/mad_value|);
+    my ($obj_mad) = $twig->findnodes([$sub], qq|op_const/madprops/mad_value|);
+    if ($method_mad and $obj_mad) {
+        my $x_method_ws = $method_mad->att('wsbefore');
+        my $x_obj_ws = $obj_mad->att('wsbefore');
         $x_obj_ws =~ s/\s+$//;
-        $method_ws->set_att("val" => $x_obj_ws);
-        $obj_ws->set_att("val" => $x_method_ws);
+        $method_mad->set_att("wsbefore" => $x_obj_ws);
+        $obj_mad->set_att("wsbefore" => $x_method_ws);
     }
 }
 
@@ -58,7 +56,7 @@ sub const_handler {
     return unless $const->att('private') && ($const->att('private') =~ m/BARE/);
     return unless $const->att('flags') =~ "SCALAR";
 
-    return if $const->findnodes(q|madprops/mad_sv[@key="forcedword"][@val="forced"]|);
+    return if (get_madprop($const, "forcedword") || '') eq "forced";
 
     # no conversion if 'use strict' is active.
     return if $const->att('private') && ($const->att('private') =~ m/STRICT/);
@@ -76,24 +74,23 @@ sub const_handler {
         my $x = ($const->parent->tag eq "op_null" and ! $const->parent->att('was')) ? $const->parent : $const;
         my ($next) = $x->parent->child($x->pos + 1);
         if (get_madprop($const, "value") =~ m/^\w+$/) {
-            return if $next && $twig->findnodes([$next], q|madprops/mad_sv[@key="comma"][@val="=&gt;"]|);
-            return if $twig->findnodes([$const->parent], q|madprops/mad_sv[@key="bigarrow"]|); # [@val="-&gt;"]|);
+            return if $next && (get_madprop($next, "comma") || '') eq "=&gt;";
+            return if get_madprop($const->parent, "bigarrow");
         }
     }
 
     # "-x XX"
     if ($const->parent->tag =~ m/^op_(ft.*|truncate|chdir|stat|lstat)$/ or
-        $const->findnodes(q|madprops/mad_sv[@key="prototyped"][@val="*"]|)
+        (get_madprop($const, "prototyped") || '') eq "*"
        ) {
-        my ($val) = $twig->findnodes([$const], q|madprops/mad_sv[@key="value"]|);
-        $val->att("val") eq "_" and return; # not for -x '_'
+        get_madprop($const, "value") eq "_" and return; # not for -x '_'
 
         # Add '*' to make it a glob
         $const->set_tag("op_rv2gv");
-        $val->set_att( "val", "*" . $val->att("val") );
-        $val->set_att( "key", "star" );
-        my ($wsval) = $twig->findnodes([$const], q|madprops/mad_sv[@key="wsbefore-value"]|);
-        $wsval->set_att( "key", "wsbefore-star" ) if $wsval;
+        set_madprop($const, "star", "*" . get_madprop($const, "value"), get_madprop($const, "value", 'wsbefore'));
+        del_madprop($const, "value");
+#         my ($wsval) = $twig->findnodes([$const], q|madprops/mad_sv[@key="wsbefore-value"]|);
+#         $wsval->set_att( "key", "wsbefore-star" ) if $wsval;
         $const->insert_new_elt( "op_const" );
         return;
     }
@@ -115,12 +112,11 @@ sub const_handler {
     # Make it a string constant
     my ($madprops) = $twig->findnodes([$const], q|madprops|);
     $const->del_att('private');
-    my ($const_ws) = $twig->findnodes([$const], q|madprops/mad_sv[@key="wsbefore-value"]|);
-    my $ws = $const_ws && $const_ws->att('val');
-    $const_ws->delete if $const_ws;
-    $madprops->insert_new_elt( "mad_sv", { key => 'wsbefore-quote_open', val => $ws } );
-    $madprops->insert_new_elt( "mad_sv", { key => 'quote_open', val => q|'| } );
-    $madprops->insert_new_elt( 'last_child', "mad_sv", { key => 'quote_close', val => q|'| } );
+    my ($const_ws) = get_madprop($const, "value", 'wsbefore');
+    #set_madprop($const, "value", get_madprop($const, "value"), ''); # delete ws.
+    #$const_ws->delete if $const_ws;
+    set_madprop($const, "quote_open", q|'|, $const_ws);
+    set_madprop($const, "quote_close", q|'|, '');
     set_madprop($const, "assign" => get_madprop($const, "value"));
     del_madprop($const, "value");
 }
@@ -145,26 +141,27 @@ sub add_encoding_latin1 {
 
 sub del_madprop {
     my ($op, $key) = @_;
-    my ($madsv) = $op->findnodes(qq|madprops/mad_sv[\@key="$key"]|);
+    my ($madsv) = $op->findnodes(qq|madprops/mad_$key|);
     $madsv->delete if $madsv;
 }
 
 sub set_madprop {
-    my ($op, $key, $val) = @_;
+    my ($op, $key, $val, $ws) = @_;
     my ($madprops) = $op->findnodes("madprops");
     $madprops ||= $op->insert_new_elt("madprops");
-    my ($madsv) = $op->findnodes(qq|madprops/mad_sv[\@key="$key"]|);
+    my ($madsv) = $op->findnodes(qq|madprops/mad_$key|);
     if ($madsv) {
         $madsv->set_att("val", $val);
     } else {
-        $madprops->insert_new_elt("mad_sv", { key => $key, val => $val } );
+        $madsv = $madprops->insert_new_elt("mad_$key", { val => $val } );
     }
+    defined $ws and $madsv->set_att("wsbefore", $ws);
 }
 
 sub get_madprop {
-    my ($op, $key) = @_;
-    my ($madsv) = $op->findnodes(qq|madprops/mad_sv[\@key="$key"]|);
-    return $madsv && $madsv->att("val");
+    my ($op, $key, $attr) = @_;
+    my ($madsv) = $op->findnodes(qq|madprops/mad_$key|);
+    return $madsv && $madsv->att($attr || "val");
 }
 
 sub rename_madprop {
@@ -179,11 +176,10 @@ sub make_glob_sub {
         next if not get_madprop($op_glob, "quote_open");
         set_madprop($op_glob, "round_open", "(");
         set_madprop($op_glob, "round_close", ")");
-        set_madprop($op_glob, "operator", "glob");
+        set_madprop($op_glob, "operator", "glob", get_madprop($op_glob, 'quote_open', 'wsbefore'));
         del_madprop($op_glob, "assign");
         del_madprop($op_glob, "quote_open");
         del_madprop($op_glob, "quote_close");
-        rename_madprop($op_glob, "wsbefore-quote_open", "wsbefore-operator");
 
         my ($op_c) = $op_glob->findnodes(q|op_entersub/op_null/op_concat|);
         if ($op_c) {
@@ -259,17 +255,15 @@ sub remove_rv2gv {
         my $op_sub = $op_scope->insert_new_elt("op_entersub");
 
         # ()
-        my $madprops = $op_sub->insert_new_elt("madprops");
-        $madprops->insert_new_elt("mad_sv", { key => "round_open", val => "(" });
-        $madprops->insert_new_elt("mad_sv", { key => "round_close", val => ")" });
+        set_madprop($op_sub, "round_open", "(");
+        set_madprop($op_sub, "round_close", ")");
 
         #args
         my $args = $op_sub->insert_new_elt("op_null", { was => "list" });
-        $args->insert_new_elt("op_gv")->insert_new_elt("madprops")
-          ->insert_new_elt("mad_sv", { key => "value", val => "Symbol::stash" });
+        set_madprop($args->insert_new_elt("op_gv"), "value", "Symbol::stash");
         $op_const->move($args);
 
-        $_->set_att('val', '%') for $op_rv2hv->findnodes(q*madprops/mad_sv[@key='hsh']*);
+        set_madprop($op_rv2hv, 'hsh', '%') if get_madprop($op_rv2hv, 'hsh');
         set_madprop($op_const, quote_open => '&#34;');
         my $name = $op_const->att('PV');
         $name =~ s/::$//;
@@ -389,19 +383,19 @@ sub remove_useversion {
 
         my ($madprops) = $op->findnodes("madprops");
 
-        my $ws = get_madprop($op, "wsbefore-operator");
+        my $ws = get_madprop($op, "operator", 'wsbefore');
         $ws =~ s/\&\#xA$//; # remove newline.
         #set_madprop($op, "value", "XX");
-        set_madprop($op, "wsbefore-value", $ws);
+        set_madprop($op, "value", $ws);
 
-        $madprops->insert_new_elt('first_child', "mad_sv", { key => "value", val => '' } );
+        set_madprop($op, "null_type", "value");
+        #$madprops->insert_new_elt('first_child', "mad_sv", { key => "value", val => '' } );
     }
     for my $op_x ($xml->findnodes(q{//op_require})) {
         my ($const) = $op_x->findnodes(q{op_const});
         next unless $const and (get_madprop($const, 'value') || '') =~ m/^v?\d/;
         set_madprop($op_x, "operator", '');
-        set_madprop($const, "wsbefore-value", '');
-        set_madprop($const, "value", '');
+        set_madprop($const, "value", '', '');
         if (my $ons = $op_x->prev_sibling('op_nextstate')) {
             $ons->delete;
         }
@@ -440,7 +434,7 @@ if ($from < 1.4 - 0.05) {
     make_glob_sub( $twig );
     remove_vstring( $twig );
 
-    # add_encoding_latin1($twig);
+#     # add_encoding_latin1($twig);
 
     remove_rv2gv($twig);
     remove_typed_declaration($twig);
