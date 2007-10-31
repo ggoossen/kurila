@@ -34,7 +34,7 @@ anonymous subroutine.
       my $code = sub {
         return 'B::foo => ' . (shift)->next::method();
       };
-      return (shift)->$code;
+      return (shift)->&$code;
     }
 
     sub bar {
@@ -42,9 +42,9 @@ anonymous subroutine.
         my $code2 = sub {
           return 'B::bar => ' . (shift)->next::method();
         };
-        return (shift)->$code2;
+        return (shift)->&$code2;
       };
-      return (shift)->$code1;
+      return (shift)->&$code1;
     }
 }
 

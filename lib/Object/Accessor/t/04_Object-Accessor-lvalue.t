@@ -38,10 +38,10 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
 {   ok( $Object->mk_accessors( $Acc ),
                                 "Accessor '$Acc' created" );
     
-    eval { $Object->$Acc = $$ };
+    eval { $Object->&$Acc = $$ };
     ok( !$@,                    "lvalue assign successful $@" );
-    ok( $Object->$Acc,          "Accessor '$Acc' set" );
-    is( $Object->$Acc, $$,      "   Contains proper value" );
+    ok( $Object->&$Acc,          "Accessor '$Acc' set" );
+    is( $Object->&$Acc, $$,      "   Contains proper value" );
 }
 
 ### test allow handlers
@@ -60,10 +60,10 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
                                 "       Got warning about allow handlers" );
     }
 
-    ok( eval{ $clone->$acc = $$ },      
+    ok( eval{ $clone->&$acc = $$ },      
                                 "   Allow handler ignored" );       
     ok( ! $@,                   "   No error occurred" );
-    is( $clone->$acc, $$,       "   Setting '$acc' worked" );
+    is( $clone->&$acc, $$,       "   Setting '$acc' worked" );
 }
 
 ### test registering callbacks

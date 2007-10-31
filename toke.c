@@ -3843,19 +3843,19 @@ Perl_yylex(pTHX)
 	    }
 	    else if (*s == '>') {
 		s++;
+		if (*s == '&') {
+		    s++;
+		    OPERATOR(ARROW);
+		}
 		s = SKIPSPACE1(s);
 		if (isIDFIRST_lazy_if(s,UTF)) {
 		    s = force_word(s,METHOD,FALSE,TRUE,FALSE);
 		    TOKEN(ARROW);
 		}
-		else if (*s == '&') {
-		    s++;
-		    OPERATOR(ARROW);
-		}
 		else if (*s == '$') {
-/* 		    s++; */
 		    OPERATOR(ARROW);
-/* 		    OPERATOR(DEREFSCL); */
+		    s++;
+		    OPERATOR(DEREFSCL);
 		}
 		else if (*s == '@') {
 		    s++;

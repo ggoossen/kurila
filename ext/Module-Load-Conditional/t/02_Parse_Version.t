@@ -12,7 +12,7 @@ use_ok( $Class );
 
 ### versions that should parse
 {   for my $str ( __PACKAGE__->_succeed ) {
-        my $res = $Class->$Meth( $str, $Verbose );
+        my $res = $Class->&$Meth( $str, $Verbose );
         ok( defined $res,       "String '$str' identified as version string" );
         
         ### XXX version.pm 0.69 pure perl fails tests under 5.6.2.
@@ -40,7 +40,7 @@ use_ok( $Class );
 
 ### version that should fail
 {   for my $str ( __PACKAGE__->_fail ) {
-        my $res = $Class->$Meth( $str, $Verbose );
+        my $res = $Class->&$Meth( $str, $Verbose );
         ok( ! defined $res,     "String '$str' is not a version string" );
     }
 }    

@@ -12,7 +12,7 @@ BEGIN { use_ok('Time::Piece'); }
 my $class = 'Time::Piece::Twin';
 
 for my $method (qw(new localtime gmtime)) {
-  my $piece = $class->$method;
+  my $piece = $class->&$method;
   isa_ok($piece, $class, "timepiece made via $method");
 }
 

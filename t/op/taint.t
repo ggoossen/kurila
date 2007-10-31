@@ -1181,7 +1181,7 @@ SKIP:
 
     package main;
     my $o = bless [], 'AUTOLOAD_TAINT';
-    $o->$TAINT;
+    $o->&$TAINT;
     $o->untainted;
 }
 

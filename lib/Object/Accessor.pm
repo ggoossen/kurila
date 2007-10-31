@@ -306,8 +306,8 @@ sub mk_verify {
     
     my $fail;
     for my $name ( $self->ls_accessors ) {
-        unless( allow( $self->$name, $self->ls_allow( $name ) ) ) {
-            my $val = defined $self->$name ? $self->$name : '<undef>';
+        unless( allow( $self->&$name, $self->ls_allow( $name ) ) ) {
+            my $val = defined $self->&$name ? $self->&$name : '<undef>';
 
             __PACKAGE__->___error("'$name' ($val) is invalid");
             $fail++;
@@ -393,7 +393,7 @@ sub can {
     ### it's an accessor we provide;
     if( UNIVERSAL::isa( $self, 'HASH' ) and exists $self->{$method} ) {
         __PACKAGE__->___debug( "Can '$method' -- provided by object" );
-        return sub { $self->$method(@_); }
+        return sub { $self->&$method(@_); }
     }
 
     ### we don't support it
@@ -451,7 +451,7 @@ sub ___autoload {
                 my $cur = $self->{$method}->[VALUE];
                 
                 tie ${$_[0]}, __PACKAGE__ . '::TIE', 
-                        sub { $self->$method( $cur ) };
+                        sub { $self->&$method( $cur ) };
     
                 ${$_[0]} = $val;
             

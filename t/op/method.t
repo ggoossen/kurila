@@ -22,23 +22,23 @@ sub Pack::method { shift; join(",", "method", @_) }
 my $mname = "method";
 
 is(Pack->method("a","b","c"), "method,a,b,c");
-is(Pack->$mname("a","b","c"), "method,a,b,c");
+is(Pack->&$mname("a","b","c"), "method,a,b,c");
 
 is(Pack->method(), "method");
-is(Pack->$mname(), "method");
+is(Pack->&$mname(), "method");
 is(Pack->method, "method");
-is(Pack->$mname, "method");
+is(Pack->&$mname, "method");
 
 is($obj->method("a","b","c"), "method,a,b,c");
-is($obj->$mname("a","b","c"), "method,a,b,c");
+is($obj->&$mname("a","b","c"), "method,a,b,c");
 
 is($obj->method(0), "method,0");
 is($obj->method(1), "method,1");
 
 is($obj->method(), "method");
-is($obj->$mname(), "method");
+is($obj->&$mname(), "method");
 is($obj->method, "method");
-is($obj->$mname, "method");
+is($obj->&$mname, "method");
 
 is( A->d, "C::d");		# Update hash table;
 

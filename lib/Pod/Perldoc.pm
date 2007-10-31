@@ -991,7 +991,7 @@ sub render_findings {
     foreach my $f (@{ $self->{'formatter_switches'} || [] }) {
       my($switch, $value, $silent_fail) = @$f;
       if( $formatter->can($switch) ) {
-        eval { $formatter->$switch( defined($value) ? $value : () ) };
+        eval { $formatter->&$switch( defined($value) ? $value : () ) };
         warn "Got an error when setting $formatter_class\->$switch:\n$@\n"
          if $@;
       } else {

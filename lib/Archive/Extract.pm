@@ -334,8 +334,8 @@ sub extract {
         while( my($type,$method) = each %$Mapping ) {
 
             ### call the corresponding method if the type is OK ###
-            if( $self->$type) {
-                $ok = $self->$method();
+            if( $self->&$type) {
+                $ok = $self->&$method();
             }
         }
 
@@ -510,7 +510,7 @@ sub _untar {
          @methods = reverse @methods if $PREFER_BIN;
 
     for my $method (@methods) {
-        $self->_extractor($method) && return 1 if $self->$method();
+        $self->_extractor($method) && return 1 if $self->&$method();
     }
 
     return $self->_error(loc("Unable to untar file '%1'", $self->archive));
@@ -729,7 +729,7 @@ sub _gunzip {
        @methods = reverse @methods if $PREFER_BIN;
 
     for my $method (@methods) {
-        $self->_extractor($method) && return 1 if $self->$method();
+        $self->_extractor($method) && return 1 if $self->&$method();
     }
 
     return $self->_error(loc("Unable to gunzip file '%1'", $self->archive));
@@ -818,7 +818,7 @@ sub _uncompress {
          @methods = reverse @methods if $PREFER_BIN;
 
     for my $method (@methods) {
-        $self->_extractor($method) && return 1 if $self->$method();
+        $self->_extractor($method) && return 1 if $self->&$method();
     }
 
     return $self->_error(loc("Unable to untar file '%1'", $self->archive));
@@ -879,7 +879,7 @@ sub _unzip {
        @methods = reverse @methods if $PREFER_BIN;
 
     for my $method (@methods) {
-        $self->_extractor($method) && return 1 if $self->$method();
+        $self->_extractor($method) && return 1 if $self->&$method();
     }
 
     return $self->_error(loc("Unable to gunzip file '%1'", $self->archive));
@@ -1031,7 +1031,7 @@ sub _bunzip2 {
        @methods = reverse @methods if $PREFER_BIN;
 
     for my $method (@methods) {
-        $self->_extractor($method) && return 1 if $self->$method();
+        $self->_extractor($method) && return 1 if $self->&$method();
     }
 
     return $self->_error(loc("Unable to bunzip2 file '%1'", $self->archive));

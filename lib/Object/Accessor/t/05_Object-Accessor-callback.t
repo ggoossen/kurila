@@ -49,7 +49,7 @@ my $Sub         = sub {
     ok( $Object->mk_accessors( $Acc ),
                                 "   Accessor '$Acc' created" );
     can_ok( $Object,            $Func );
-    ok( $Object->$Func( $Sub ), "   Callback registered" );
+    ok( $Object->&$Func( $Sub ), "   Callback registered" );
 }
 
 ### test ___get and ___set
@@ -75,7 +75,7 @@ my $Sub         = sub {
     my $clone   = $Object->mk_clone;
 
     $Called = 0;
-    is( $clone->$Acc, $RetVal,   "   Method '$Acc' returns '$RetVal' " );
+    is( $clone->&$Acc, $RetVal,   "   Method '$Acc' returns '$RetVal' " );
     is( $clone->___get($Acc), undef,
                                 "   Direct get returns <undef>" );    
     ok( $Called,                "   Callback called" );
@@ -83,11 +83,11 @@ my $Sub         = sub {
     
     #diag("Running SET tests on regular objects");
     $Called = 0;
-    ok( $clone->$Acc($SetVal),  "   Setting $Acc" );
+    ok( $clone->&$Acc($SetVal),  "   Setting $Acc" );
     ok( $Called,                "   Callback called" );
 
     $Called = 0;
-    is( $clone->$Acc, $RetVal,  "   Returns $RetVal" );
+    is( $clone->&$Acc, $RetVal,  "   Returns $RetVal" );
     ok( $Called,                "   Callback called" );
 
     $Called = 0;

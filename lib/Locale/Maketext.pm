@@ -212,7 +212,7 @@ sub maketext {
         return &{$fail}($handle, $phrase, @_);
          # If it ever returns, it should return a good value.
       } else { # It's a method name
-        return $handle->$fail($phrase, @_);
+        return $handle->&$fail($phrase, @_);
          # If it ever returns, it should return a good value.
       }
     } else {

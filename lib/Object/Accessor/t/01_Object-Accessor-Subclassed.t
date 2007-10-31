@@ -28,8 +28,8 @@ my $Object  = $MyClass->new;
 {   ok( $Object->mk_accessors( $Acc ),
                                 "Accessor '$Acc' created" );
     ok( $Object->can( $Acc ),   "   Object can '$Acc'" );
-    ok( $Object->$Acc(1),       "   Objects '$Acc' set" );
-    ok( $Object->$Acc(),        "   Objects '$Acc' retrieved" );
+    ok( $Object->&$Acc(1),       "   Objects '$Acc' set" );
+    ok( $Object->&$Acc(),        "   Objects '$Acc' retrieved" );
 }    
     
 ### check if we do the right thing when we call an accessor that's
@@ -43,7 +43,7 @@ my $Object  = $MyClass->new;
 
 ### check if a method called on a class, that's not actually there
 ### doesn't get confused as an object call;
-{   eval { $MyClass->$$ };
+{   eval { $MyClass->&$$ };
 
     ok( $@,                     "Calling '$$' on '$MyClass' dies" );
     like( $@, qr/from somewhere else/,

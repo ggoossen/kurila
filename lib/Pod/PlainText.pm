@@ -148,7 +148,7 @@ sub command {
     return if ($$self{EXCLUDE} && $command ne 'end');
     $self->item ("\n") if defined $$self{ITEM};
     $command = 'cmd_' . $command;
-    $self->$command (@_);
+    $self->&$command (@_);
 }
 
 # Called for a verbatim paragraph.  Gets the paragraph, the line number, and

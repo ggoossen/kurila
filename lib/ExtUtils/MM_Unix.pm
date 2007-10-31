@@ -671,7 +671,7 @@ sub dist_core {
     {
         my $method = $target.'_target';
         $make_frag .= "\n";
-        $make_frag .= $self->$method();
+        $make_frag .= $self->&$method();
     }
 
     return $make_frag;
@@ -1321,7 +1321,7 @@ sub init_MANPODS {
         }
         else {
             my $init_method = "init_${man}PODS";
-            $self->$init_method();
+            $self->&$init_method();
 	}
     }
 }
