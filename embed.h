@@ -1851,6 +1851,7 @@
 #define op_getmad		Perl_op_getmad
 #define prepend_madprops	Perl_prepend_madprops
 #define append_madprops		Perl_append_madprops
+#define append_madprops_pv	Perl_append_madprops_pv
 #define addmad			Perl_addmad
 #define newMADsv		Perl_newMADsv
 #define newMADPROP		Perl_newMADPROP
@@ -4125,6 +4126,7 @@
 #define op_getmad(a,b,c)	Perl_op_getmad(aTHX_ a,b,c)
 #define prepend_madprops(a,b,c)	Perl_prepend_madprops(aTHX_ a,b,c)
 #define append_madprops(a,b,c)	Perl_append_madprops(aTHX_ a,b,c)
+#define append_madprops_pv(a,b,c)	Perl_append_madprops_pv(aTHX_ a,b,c)
 #define addmad(a,b,c)		Perl_addmad(aTHX_ a,b,c)
 #define newMADsv(a,b)		Perl_newMADsv(aTHX_ a,b)
 #define newMADPROP(a,b,c,d)	Perl_newMADPROP(aTHX_ a,b,c,d)

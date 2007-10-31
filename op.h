@@ -720,6 +720,8 @@ struct madtoken {
  * X       random thing
  * _       whitespace/comments preceding anything else
  * ~       =~ operator
+ * >       op_null type (not a token)
+ * <       op_null type first (not a token)
  */
 
 /*

@@ -113,20 +113,13 @@ our %failing = map { $_, 1 } qw|
 my @files;
 find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
 
+$ENV{PERL_CORE}=1;
 for my $file (@files) {
     local $TODO = (exists $failing{$file} ? "Known failure" : undef);
     p55_file($file);
 }
 
 __DATA__
-# pod with invalid UTF-8
-=head3 Gearman
-
-I know Ask Bj�rn Hansen has implemented a transport for the C<gearman> distributed
-job system, though it's not on CPAN at the time of writing this.
-
-=cut
-########
 use strict;
 #ABC
 Foo->new;
@@ -141,7 +134,7 @@ use encoding 'euc-jp';
 tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
 ########
 sub ok($$) { }
-BEGIN { ok(1, 2, ); }
+#BEGIN { ok(1, 2, ); }
 ########
 for (my $i=0; $i<3; $i++) { }
 ########
@@ -222,4 +215,15 @@ CHECK { die; }
 ########
 # new named method call syntax
 Foo->&$bar();
+########
+# pod with invalid UTF-8
+=head3 Gearman
 
+I know Ask Bj�rn Hansen has implemented a transport for the C<gearman> distributed
+job system, though it's not on CPAN at the time of writing this.
+
+=cut
+########
+@INC = qw(foo bar);
+########
+if (int(1.23) == 1) { print "1"; } else { print "2"; }

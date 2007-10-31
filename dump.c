@@ -2469,6 +2469,8 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 't', "something_t" },
     { 'F', "format" },
     { 'h', "constsub_args" },
+    { '>', "null_type" },
+    { '<', "null_type_first" },
     { 0,   NULL }
 };
 char* slotname(char s) {
