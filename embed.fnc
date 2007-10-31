@@ -1828,6 +1828,7 @@ Mp	|void	|op_getmad_weak	|NULLOK OP* from|NULLOK OP* o|char slot
 Mp	|void	|op_getmad	|NULLOK OP* from|NULLOK OP* o|char slot
 Mp	|void	|prepend_madprops|NULLOK MADPROP* mp|NULLOK OP* o|char slot
 Mp	|void	|append_madprops|NULLOK MADPROP* tm|NULLOK OP* o|char slot
+Mp	|void	|append_madprops_pv|NN const char* v|NULLOK OP* o|char slot
 Mp	|void	|addmad		|NULLOK MADPROP* tm|NULLOK MADPROP** root \
 				|char slot
 Mp	|MADPROP*|newMADsv	|char key|NN SV* sv

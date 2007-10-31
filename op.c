@@ -2739,6 +2739,12 @@ Perl_append_madprops(pTHX_ MADPROP* tm, OP* o, char slot)
 }
 
 void
+Perl_append_madprops_pv(pTHX_ const char* v, OP* o, char slot)
+{
+    append_madprops(newMADsv(slot, newSVpv(v, 0)), o, slot);
+}
+
+void
 Perl_addmad(pTHX_ MADPROP* tm, MADPROP** root, char slot)
 {
     MADPROP* mp;
@@ -3636,8 +3642,10 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     if (idop->op_type != OP_CONST)
 	Perl_croak(aTHX_ "Module name must be constant");
 
-    if (PL_madskills)
+    if (PL_madskills) {
 	op_getmad(idop,pegop,'U');
+	append_madprops_pv("use", pegop, '>');
+    }
 
     veop = NULL;
 
@@ -4325,6 +4333,7 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
 	    live = newUNOP(OP_NULL, 0, live);
 	    op_getmad(first, live, 'C');
 	    op_getmad(dead, live, left ? 'e' : 't');
+	    append_madprops_pv("const_cond", live, '<');
 	} else {
 	    op_free(first);
 	    op_free(dead);

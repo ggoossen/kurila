@@ -598,7 +598,6 @@ sub hash {
 	$hash{$k} = $v;
     }
     $hash{FIRST} = $firstthing;
-    $hash{LAST} = $lastthing;
     return \%hash;
 }
 
@@ -967,7 +966,7 @@ my %astmad;
 
 BEGIN {
     %astmad = (
-	'p' => sub {		# peg for #! line, etc.
+	'peg' => sub {		# peg for #! line, etc.
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('p G');
@@ -984,7 +983,7 @@ BEGIN {
 	    push @newkids, $self->madness(')');
 	    return P5AST::parens->new(Kids => [@newkids])
 	},
-	'~' => sub {				# binding operator
+	'bind_match' => sub {				# binding operator
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $$self{Kids}[0]->ast($self,@_);
@@ -992,14 +991,14 @@ BEGIN {
 	    push @newkids, $$self{Kids}[1]->ast($self,@_);
 	    return P5AST::bindop->new(Kids => [@newkids])
 	},
-	';' => sub {		# null statements/blocks
+	'nullstatement' => sub {		# null statements/blocks
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('{ ; }');
 	    $::curstate = 0;
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
-	'I' => sub {		# if or unless statement keyword
+	'if' => sub {		# if or unless statement keyword
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('L I (');
@@ -1015,7 +1014,7 @@ BEGIN {
 	    push @{$subkids[0]{Kids}}, $self->madness(')');
 	    return bless($newself, 'P5AST::condstate');
 	},
-	'U' => sub {			# use
+	'use' => sub {			# use
 	    my $self = shift;
 	    my @newkids;
 	    my @module = $self->madness('U');
@@ -1060,14 +1059,14 @@ BEGIN {
 	    push @newkids, $condkids[2]->ast($self,@_);
 	    return P5AST::ternary->new(Kids => [@newkids])
 	},
-	'&' => sub {			# subroutine
+	'sub' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('d n s a : { & } ;');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
-	'i' => sub {			# modifier if
+	'modif' => sub {			# modifier if
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('i');
@@ -1080,7 +1079,7 @@ BEGIN {
 	    unshift @newkids, @subkids;
 	    return P5AST::condmod->new(Kids => [@newkids])
 	},
-	'P' => sub {				# package declaration
+	'package' => sub {				# package declaration
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('o');
@@ -1099,7 +1098,7 @@ BEGIN {
 	    my $self = shift;
 	    return P5AST::qwliteral->new(Kids => [$self->madness('x')])
 	},
-	'q' => sub {				# random quote
+	'quote' => sub {				# random quote
 	    my $self = shift;
 	    return P5AST::quote->new(Kids => [$self->madness('q = Q')])
 	},
@@ -1107,7 +1106,7 @@ BEGIN {
 	    my $self = shift;
 	    return P5AST::token->new(Kids => [$self->madness('X')])
 	},
-	':' => sub {				# attr list
+	'attrlist' => sub {				# attr list
 	    my $self = shift;
 	    return P5AST::attrlist->new(Kids => [$self->madness(':')])
 	},
@@ -1118,7 +1117,7 @@ BEGIN {
 	    push @newkids, $$self{Kids}[0]->ast($self,@_);
 	    return P5AST::listelem->new(Kids => [@newkids])
 	},
-	'C' => sub {				# constant conditional
+	'const_cond' => sub {				# constant conditional
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $$self{Kids}[0]->ast($self,@_);
@@ -1151,21 +1150,21 @@ BEGIN {
 	    }
 	    return P5AST::op_null->new(Kids => [@newkids])
 	},
-	'+' => sub {				# unary +
+	'unary+' => sub {				# unary +
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('+');
 	    push @newkids, $$self{Kids}[0]->ast($self,@_);
 	    return P5AST::preplus->new(Kids => [@newkids])
 	},
-	'D' => sub {				# do block
+	'do' => sub {				# do block
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('D');
 	    push @newkids, $$self{Kids}[0]->ast($self,@_);
 	    return P5AST::doblock->new(Kids => [@newkids])
 	},
-	'3' => sub {				# C-style for loop
+	'cfor' => sub {				# C-style for loop
 	    my $self = shift;
 	    my @newkids;
 
@@ -1210,7 +1209,7 @@ BEGIN {
 	    $::curstate = 0;
 	    return P5AST::cfor->new(Kids => [@newkids])
 	},
-	'o' => sub {			# random useless operator
+	'operator' => sub {			# random useless operator
 	    my $self = shift;
 	    my @newkids;
 	    push @newkids, $self->madness('o');
@@ -1245,7 +1244,6 @@ BEGIN {
 sub ast {
     my $self = shift;
     my $was = $$self{was} || 'peg';
-    my $mad = $$self{mp}{FIRST} || "unknown";
 
     # First try for a "was".
     my $meth = "PLXML::op_${was}::astnull";
@@ -1253,11 +1251,23 @@ sub ast {
 	return $self->$meth(@_);
     }
 
-    # Look at first madprop.
-    if (exists $astmad{$mad}) {
-	return $astmad{$mad}->($self);
+    if (%{$self->{mp}}) {
+        my $nulltype = $$self{mp}{null_type_first} || $self->{mp}{null_type};
+        if ($nulltype) {
+            if (exists $astmad{$nulltype}) {
+                return $astmad{$nulltype}->($self);
+            }
+            die "unknwon type '$nulltype'";
+        }
+
+        # Look at first madprop.
+        my $mad = $$self{mp}{FIRST} || "unknown";
+        die "mad with thing should be '$mad'";
+        if (exists $astmad{$mad}) {
+            return $astmad{$mad}->($self);
+        }
+        warn "No mad $mad" unless $mad eq 'unknown';
     }
-    warn "No mad $mad" unless $mad eq 'unknown';
 
     # Do something generic.
     my @newkids;
@@ -1597,7 +1607,7 @@ package PLXML::op_srefgen;
 sub ast {
     my @newkids;
     my $self = shift;
-    if ($$self{mp}{FIRST} and $$self{mp}{FIRST} eq '{') {
+    if ($self->{mp}{'{'}) {
 	local $::curstate;	# this is officially a block, so hide it
 	local $::curenc = $::curenc;
 	push @newkids, $self->madness('{');
@@ -2695,10 +2705,8 @@ sub astnull {
 sub ast {
     my $self = shift;
 
-    my $mad = $$self{mp}{FIRST} || "unknown";
-
     my @retval;
-    if ($mad eq 'w') {
+    if ($self->{mp}{w}) {
 	my @newkids;
 	my @tmpkids;
 	push @tmpkids, $self->{Kids};
