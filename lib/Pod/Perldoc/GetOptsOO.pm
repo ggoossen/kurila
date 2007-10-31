@@ -60,14 +60,14 @@ sub getopts {
       }
 
       DEBUG > 3 and print " $method => $rest\n";
-      $target->$method( $rest );
+      $target->&$method( $rest );
 
     # Otherwise, it's not argumental...
     } else {
 
       if( $target->can( $method = "opt_$first" ) ) {
         DEBUG > 3 and print " $method is true ($truth)\n";
-        $target->$method( $truth );
+        $target->&$method( $truth );
 
       # Otherwise it's an unknown option...
 

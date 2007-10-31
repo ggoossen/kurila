@@ -559,7 +559,7 @@ sub AUTOLOAD
     $AUTOLOAD =~ s/.*:://;
     $AUTOLOAD =~ tr/a-z/A-Z/;
 
-    return tied(*{$self})->$AUTOLOAD(@_);
+    return tied(*{$self})->&$AUTOLOAD(@_);
 }
 
 sub gzopen_external {

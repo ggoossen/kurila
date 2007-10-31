@@ -29,7 +29,7 @@ sub make_ppd {
   my %dist;
   foreach my $info (qw(name author abstract version)) {
     my $method = "dist_$info";
-    $dist{$info} = $build->$method() or die "Can't determine distribution's $info\n";
+    $dist{$info} = $build->&$method() or die "Can't determine distribution's $info\n";
   }
   $dist{version} = $self->_ppd_version($dist{version});
 
@@ -55,7 +55,7 @@ PPD
   # conflicts either.
   
   foreach my $type (qw(requires)) {
-    my $prereq = $build->$type();
+    my $prereq = $build->&$type();
     while (my ($modname, $spec) = each %$prereq) {
       next if $modname eq 'perl';
 

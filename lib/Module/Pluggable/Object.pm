@@ -103,7 +103,7 @@ sub plugins {
         # are we instantiating or requring?
         if (defined $self->{'instantiate'}) {
             my $method = $self->{'instantiate'};
-            return map { ($_->can($method)) ? $_->$method(@_) : () } keys %plugins;
+            return map { ($_->can($method)) ? $_->&$method(@_) : () } keys %plugins;
         } else { 
             # no? just return the names
             return keys %plugins;

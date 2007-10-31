@@ -469,7 +469,7 @@ sub _unoverload {
     foreach my $thing (@_) {
         if( $self->_is_object($$thing) ) {
             if( my $string_meth = overload::Method($$thing, $type) ) {
-                $$thing = $$thing->$string_meth();
+                $$thing = $$thing->&$string_meth();
             }
         }
     }
@@ -695,7 +695,7 @@ sub cmp_ok {
     my $unoverload = $numeric_cmps{$type} ? '_unoverload_num'
                                           : '_unoverload_str';
 
-    $self->$unoverload(\$got, \$expect);
+    $self->&$unoverload(\$got, \$expect);
 
 
     my $test;

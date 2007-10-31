@@ -313,7 +313,7 @@ sub _default
 	foreach my $arg ( @$args )
 		{
 		if( $options{f} ) { CPAN::Shell->force( $method, $arg ) }
-		else              { CPAN::Shell->$method( $arg )        }
+		else              { CPAN::Shell->&$method( $arg )        }
 		}
 	}
 

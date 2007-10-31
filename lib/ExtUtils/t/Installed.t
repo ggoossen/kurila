@@ -283,7 +283,7 @@ $ei->{yesmod} = {
 
 # these should all croak
 foreach my $sub (qw( validate packlist version )) {
-    eval { $ei->$sub('nomod') };
+    eval { $ei->&$sub('nomod') };
     like( $@, qr/nomod is not installed/,
 	  "$sub() should croak when asked about uninstalled module" );
 }

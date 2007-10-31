@@ -219,4 +219,7 @@ ok my $x = "foobar";
 ########
 # TODO do not execute CHECK block
 CHECK { die; }
+########
+# new named method call syntax
+Foo->&$bar();
 

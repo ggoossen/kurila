@@ -633,7 +633,7 @@ END
             my(%a) = %{$self->{$section} || {}};
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
             push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
-            push @{$self->{RESULT}}, $self->nicetext($self->$method( %a ));
+            push @{$self->{RESULT}}, $self->nicetext($self->&$method( %a ));
         }
     }
 

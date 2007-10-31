@@ -338,11 +338,11 @@ for (
 
         my $elt;
         if ( not $op->isa('B::PADOP') ) {
-            $elt = $op->$attr;
+            $elt = $op->&$attr;
         }
         return $elt if eval { $elt->isa('B::SV') };
 
-        my $ix         = $op->$pad_attr;
+        my $ix         = $op->&$pad_attr;
         my @entire_pad = $curcv->PADLIST->ARRAY;
         my @elts       = map +( $_->ARRAY )[$ix], @entire_pad;
         ($elt) = first {
@@ -361,7 +361,7 @@ sub B::OP::lint {
 
     # Call all registered plugins
     my $m;
-    $m = $_->can('match'), $op->$m( \%check ) for @plugins;
+    $m = $_->can('match'), $op->&$m( \%check ) for @plugins;
     return;
 }
 
@@ -381,7 +381,7 @@ sub B::COP::lint {
 
     # Call all registered plugins
     my $m;
-    $m = $_->can('match'), $op->$m( \%check ) for @plugins;
+    $m = $_->can('match'), $op->&$m( \%check ) for @plugins;
     return;
 }
 
@@ -446,7 +446,7 @@ PRIVATE_NAMES: {
 
     # Call all registered plugins
     my $m;
-    $m = $_->can('match'), $op->$m( \%check ) for @plugins;
+    $m = $_->can('match'), $op->&$m( \%check ) for @plugins;
     return;
 }
 
@@ -477,7 +477,7 @@ IMPLICIT_WRITE: {
 
     # Call all registered plugins
     my $m;
-    $m = $_->can('match'), $op->$m( \%check ) for @plugins;
+    $m = $_->can('match'), $op->&$m( \%check ) for @plugins;
     return;
 }
 
@@ -502,7 +502,7 @@ IMPLICIT_FOO: {
 
     # Call all registered plugins
     my $m;
-    $m = $_->can('match'), $op->$m( \%check ) for @plugins;
+    $m = $_->can('match'), $op->&$m( \%check ) for @plugins;
     return;
 }
 
@@ -632,7 +632,7 @@ UNDEFINED_SUBS: {
 
     # Call all registered plugins
     my $m;
-    $m = $_->can('match'), $op->$m( \%check ) for @plugins;
+    $m = $_->can('match'), $op->&$m( \%check ) for @plugins;
     return;
 }
 

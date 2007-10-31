@@ -85,7 +85,7 @@ for my $f ( @test_files ) {
         ) {
             my $method = 'is_' . $name;
             
-            ok(!$obj->$method(),               "   Object is not a '$name'");
+            ok(!$obj->&$method(),               "   Object is not a '$name'");
         }
     }        
 

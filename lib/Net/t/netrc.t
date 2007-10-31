@@ -117,10 +117,10 @@ is( Net::Netrc->lookup('abadname')->{login}, 'baz',
 # now test these accessors
 my $instance = bless({}, 'Net::Netrc');
 for my $accessor (qw( login account password )) {
-	is( $instance->$accessor(), undef, 
+	is( $instance->&$accessor(), undef, 
 		"$accessor() should return undef if $accessor is not set" );
 	$instance->{$accessor} = $accessor;
-	is( $instance->$accessor(), $accessor,
+	is( $instance->&$accessor(), $accessor,
 		"$accessor() should return value when $accessor is set" );
 }
 

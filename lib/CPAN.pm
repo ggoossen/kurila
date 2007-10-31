@@ -143,7 +143,7 @@ sub soft_chdir_with_alternatives ($);
         @export{@EXPORT} = '';
         CPAN::HandleConfig->load unless $CPAN::Config_loaded++;
         if (exists $export{$l}) {
-            CPAN::Shell->$l(@_);
+            CPAN::Shell->&$l(@_);
         } else {
             die(qq{Unknown CPAN command "$AUTOLOAD". }.
                 qq{Type ? for help.\n});
@@ -269,7 +269,7 @@ ReadLine support %s
                 next SHELLCOMMAND unless @line;
             $CPAN::META->debug("line[".join("|",@line)."]") if $CPAN::DEBUG;
             my $command = shift @line;
-            eval { CPAN::Shell->$command(@line) };
+            eval { CPAN::Shell->&$command(@line) };
             if ($@) {
                 my $err = "$@";
                 if ($err =~ /\S/) {
@@ -876,7 +876,7 @@ $Help = {
         if ($l =~ /^w/) {
             # XXX needs to be reconsidered
             if ($CPAN::META->has_inst('CPAN::WAIT')) {
-                CPAN::WAIT->$l(@_);
+                CPAN::WAIT->&$l(@_);
             } else {
                 $CPAN::Frontend->mywarn(qq{
 Commands starting with "w" require CPAN::WAIT to be installed.
@@ -1167,7 +1167,7 @@ sub DESTROY {
 sub anycwd () {
     my $getcwd;
     $getcwd = $CPAN::Config->{'getcwd'} || 'cwd';
-    CPAN->$getcwd();
+    CPAN->&$getcwd();
 }
 
 #-> sub CPAN::cwd ;
@@ -1887,7 +1887,7 @@ sub globls {
         }
         for my $pragma (@$pragmas) {
             if ($author->can($pragma)) {
-                $author->$pragma();
+                $author->&$pragma();
             }
         }
         push @results, $author->ls($pathglob,$silent); # silent if
@@ -1896,7 +1896,7 @@ sub globls {
         for my $pragma (@$pragmas) {
             my $unpragma = "un$pragma";
             if ($author->can($unpragma)) {
-                $author->$unpragma();
+                $author->&$unpragma();
             }
         }
     }
@@ -2889,7 +2889,7 @@ sub expand_by_method {
                     next;
                 }
                 for my $method (@$methods) {
-                    my $match = eval {$obj->$method() =~ /$regex/i};
+                    my $match = eval {$obj->&$method() =~ /$regex/i};
                     if ($@) {
                         my($err) = $@ =~ /^(.+) at .+? line \d+\.$/;
                         $err ||= $@; # if we were too restrictive above
@@ -2914,7 +2914,7 @@ that may go away anytime.\n"
                           {$a->id cmp $b->id}
                           $CPAN::META->all_objects($class)
                          ) {
-                my $lhs = $self->$method() or next; # () for 5.00503
+                my $lhs = $self->&$method() or next; # () for 5.00503
                 if ($matchcrit) {
                     push @m, $self if $lhs =~ m/$matchcrit/;
                 } else {
@@ -3251,7 +3251,7 @@ sub rematein {
         } elsif ($CPAN::META->exists('CPAN::Author',uc($s))) {
             $obj = $CPAN::META->instance('CPAN::Author',uc($s));
             if ($meth =~ /^(dump|ls|reports)$/) {
-                $obj->$meth();
+                $obj->&$meth();
             } else {
                 $CPAN::Frontend->mywarn(
                                         join "",
@@ -3330,7 +3330,7 @@ to find objects with matching identifiers.
             if ($pragma
                 &&
                 $obj->can($pragma)) {
-                $obj->$pragma($meth);
+                $obj->&$pragma($meth);
             }
         }
         if (UNIVERSAL::can($obj, 'called_for')) {
@@ -3341,7 +3341,7 @@ to find objects with matching identifiers.
 
         push @qcopy, $obj;
         if ($meth =~ /^(report)$/) { # they came here with a pragma?
-            $self->$meth($obj);
+            $self->&$meth($obj);
         } elsif (! UNIVERSAL::can($obj,$meth)) {
             # Must never happen
             my $serialized = "";
@@ -3358,7 +3358,7 @@ to find objects with matching identifiers.
             }
             CPAN->debug("Going to panic. meth[$meth]s[$s]") if $CPAN::DEBUG;
             $CPAN::Frontend->mydie("Panic: obj[$serialized] cannot meth[$meth]");
-        } elsif ($obj->$meth()) {
+        } elsif ($obj->&$meth()) {
             CPAN::Queue->delete($s);
             CPAN->debug("From queue deleted. meth[$meth]s[$s]") if $CPAN::DEBUG;
         } else {
@@ -3369,7 +3369,7 @@ to find objects with matching identifiers.
         for my $pragma (@pragma) {
             my $unpragma = "un$pragma";
             if ($obj->can($unpragma)) {
-                $obj->$unpragma();
+                $obj->&$unpragma();
             }
         }
         CPAN::Queue->delete_first($s);
@@ -3417,7 +3417,7 @@ sub recent {
               $distro =~ s|.*?/authors/id/./../||;
               my $size   = $eitem->findvalue("enclosure/\@length");
               my $desc   = $eitem->findvalue("description");
-               $desc =~ s/.+? - //;
+              $desc =~ s/.+? - //;
               $CPAN::Frontend->myprint("$distro [$size b]\n    $desc\n");
               push @distros, $distro;
           }
@@ -4107,7 +4107,7 @@ sub hostdlxxx {
     my $h = shift;
     $h = [ grep /^\Q$scheme\E:/, @$h ] if $scheme;
     my $method = "host$level";
-    $self->$method($h, @_);
+    $self->&$method($h, @_);
 }
 
 sub _set_attempt {
@@ -8798,7 +8798,7 @@ sub goto {
     # and run where we left off
 
     my($method) = (caller(1))[3];
-    CPAN->instance("CPAN::Distribution",$goto)->$method();
+    CPAN->instance("CPAN::Distribution",$goto)->&$method();
     CPAN::Queue->delete_first($goto);
 }
 
@@ -9573,7 +9573,7 @@ Going to $meth that.
         $self->debug("type[$type] s[$s]") if $CPAN::DEBUG;
         my $obj = $CPAN::META->instance($type,$s);
         $obj->{reqtype} = $self->{reqtype};
-        $obj->$meth();
+        $obj->&$meth();
     }
 }
 
@@ -10073,7 +10073,7 @@ sub rematein {
         }
 
     my $success = eval {
-        $pack->$meth();
+        $pack->&$meth();
     };
     my $err = $@;
     $pack->unforce if $pack->can("unforce") && exists $self->{force_update};

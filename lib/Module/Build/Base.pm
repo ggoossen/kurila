@@ -133,7 +133,7 @@ sub _construct {
     if (exists $p->{$_}) {
       my $vals = delete $p->{$_};
       while (my ($k, $v) = each %$vals) {
-	$self->$_($k, $v);
+	$self->&$_($k, $v);
       }
     }
   }
@@ -974,7 +974,7 @@ sub _pod_parse {
   require Module::Build::PodParser;
   my $parser = Module::Build::PodParser->new(fh => $fh);
   my $method = "get_$part";
-  return $p->{$member} = $parser->$method();
+  return $p->{$member} = $parser->&$method();
 }
 
 sub version_from_file { # Method provided for backwards compatability
@@ -1038,7 +1038,7 @@ sub write_config {
   -d $self->{properties}{config_dir} or die "Can't mkdir $self->{properties}{config_dir}: $!";
   
   my @items = @{ $self->prereq_action_types };
-  $self->_write_data('prereqs', { map { $_, $self->$_() } @items });
+  $self->_write_data('prereqs', { map { $_, $self->&$_() } @items });
   $self->_write_data('build_params', [$self->{args}, $self->{config}->values_set, $self->{properties}]);
 
   # Set a new magic number and write it to a file
@@ -1090,7 +1090,7 @@ sub prereq_failures {
   my ($self, $info) = @_;
 
   my @types = @{ $self->prereq_action_types };
-  $info ||= {map {$_, $self->$_()} @types};
+  $info ||= {map {$_, $self->&$_()} @types};
 
   my $out;
 
@@ -1126,7 +1126,7 @@ sub _enum_prereqs {
   my %prereqs;
   foreach my $type ( @{ $self->prereq_action_types } ) {
     if ( $self->can( $type ) ) {
-      my $prereq = $self->$type() || {};
+      my $prereq = $self->&$type() || {};
       $prereqs{$type} = $prereq if %$prereq;
     }
   }
@@ -1331,7 +1331,7 @@ sub print_build_script {
   
   my $closedata="";
 
-  my %q = map {$_, $self->$_()} qw(config_dir base_dir);
+  my %q = map {$_, $self->&$_()} qw(config_dir base_dir);
 
   my $case_tolerant = 0+(File::Spec->can('case_tolerant')
 			 && File::Spec->case_tolerant);
@@ -1416,7 +1416,7 @@ sub create_build_script {
   $self->write_config;
   
   my ($build_script, $dist_name, $dist_version)
-    = map $self->$_(), qw(build_script dist_name dist_version);
+    = map $self->&$_(), qw(build_script dist_name dist_version);
   
   if ( $self->delete_filetree($build_script) ) {
     $self->log_info("Removed previous script '$build_script'\n\n");
@@ -1480,7 +1480,7 @@ sub _call_action {
   local $self->{action} = $action;
   my $method = "ACTION_$action";
   die "No action '$action' defined, try running the 'help' action.\n" unless $self->can($method);
-  return $self->$method();
+  return $self->&$method();
 }
 
 sub cull_options {
@@ -1939,7 +1939,7 @@ sub ACTION_prereq_report {
 sub prereq_report {
   my $self = shift;
   my @types = @{ $self->prereq_action_types };
-  my $info = { map { $_ => $self->$_() } @types };
+  my $info = { map { $_ => $self->&$_() } @types };
 
   my $output = '';
   foreach my $type (@types) {
@@ -2218,7 +2218,7 @@ sub ACTION_code {
   foreach my $element (@{$self->build_elements}) {
     my $method = "process_${element}_files";
     $method = "process_files_by_extension" unless $self->can($method);
-    $self->$method($element);
+    $self->&$method($element);
   }
 
   $self->depends_on('config_data');
@@ -2234,7 +2234,7 @@ sub process_files_by_extension {
   my ($self, $ext) = @_;
   
   my $method = "find_${ext}_files";
-  my $files = $self->can($method) ? $self->$method() : $self->_find_file_by_type($ext,  'lib');
+  my $files = $self->can($method) ? $self->&$method() : $self->_find_file_by_type($ext,  'lib');
   
   while (my ($file, $dest) = each %$files) {
     $self->copy_if_modified(from => $file, to => File::Spec->catfile($self->blib, $dest) );
@@ -2517,9 +2517,9 @@ sub ACTION_manpages {
     next unless defined( $sub );
 
     if ( $self->invoked_action eq 'manpages' ) {
-      $self->$sub();
+      $self->&$sub();
     } elsif ( $self->_is_default_installable("${type}doc") ) {
-      $self->$sub();
+      $self->&$sub();
     }
   }
 
@@ -3062,7 +3062,7 @@ EOF
       local *{Symbol::fetch_glob("Pod::Simple::parse_file")} = sub {
 	my $self = shift;
 	$self->output_fh($_[1]) if $_[1];
-	$self->$old_parse_file($_[0]);
+	$self->&$old_parse_file($_[0]);
       }
         if $Pod::Text::VERSION
 	  == 3.01; # Split line to avoid evil version-finder
@@ -3372,7 +3372,7 @@ sub prepare_metadata {
 
   foreach (qw(dist_name dist_version dist_author dist_abstract license)) {
     (my $name = $_) =~ s/^dist_//;
-    $add_node->($name, $self->$_());
+    $add_node->($name, $self->&$_());
     die "ERROR: Missing required field '$_' for META.yml\n"
       unless defined($node->{$name}) && length($node->{$name});
   }
