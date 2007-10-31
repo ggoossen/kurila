@@ -640,7 +640,7 @@ case 2:
 			  token_getmad((ps[0].val.i_tkval),(yyval.opval),';');
 			  if (PL_parser->rsfp_filters &&
 				      AvFILLp(PL_parser->rsfp_filters) >= 0)
-			      append_madprops(newMADPROP('!', MAD_PV, "", 0), (yyval.opval), 0);
+			      append_madprops_pv("sourcefilter", (yyval.opval), '!');
 #else
 			  utilize(IVAL((ps[-6].val.i_tkval)), (ps[-5].val.ival), (ps[-3].val.opval), (ps[-2].val.opval), (ps[-1].val.opval));
 			  (yyval.opval) = (OP*)NULL;

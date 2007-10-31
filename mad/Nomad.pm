@@ -530,8 +530,6 @@ sub hash {
     { '(', "round_open" },
     { ')', "round_close" },
     { 'U', "use" },
-    { '_', "wsbefore" },
-    { '#', "wsafter" },
     { 'O', "replacedoperator" },
     { 'A', "bigarrow" },
     { 'a', "arrow" },
@@ -582,15 +580,26 @@ sub hash {
     my %hash = ();
     # We need to guarantee key uniqueness at this point.
     for my $kid (@{$$self{Kids}}) {
-	my ($k,$v) = $kid->pair($self, @_);
-        if ($k =~ m/^ws(before|after)-(.*)$/) {
-            $k = ($1 eq "before" ? '_' : '#') . ($mapping{$2} || $2);
+        if ((ref $kid) =~ m/mad_op$/) {
+            my $name = $kid->{key};
+            my $k = $mapping{$name} || $name;
+            die "duplicate key $k - '$hash{$k}'" if exists $hash{$k};
+            $hash{$k} = $kid;
+        } else {
+            (ref $kid) =~ m/\:\:mad_(.*)$/;
+            my $name = $1;
+            my $k = $mapping{$name} || $name;
+            my $val = $kid->{val};
+            $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
+            die "duplicate key $k - '$hash{$k}' - '$val'" if exists $hash{$k} and $hash{$k} ne $val;
+            $hash{$k} = $val;
+            if ($kid->{wsbefore}) {
+                $hash{'_' . $k} = $kid->{wsbefore};
+            }
+            if ($kid->{wsafter}) {
+                $hash{'#' . $k} = $kid->{wsafter};
+            }
         }
-        else {
-            $k = $mapping{$k} || $k;
-        }
-        die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne $v;
-	$hash{$k} = $v;
     }
     return \%hash;
 }
@@ -631,26 +640,6 @@ sub blockast {
     else {
 	return P5AST::op_lineseq->new(Kids => [@vals]);
     }
-}
-
-package PLXML::mad_pv;
-
-sub pair {
-    my $self = shift;
-    my $key = $$self{key};
-    my $val = $$self{val};
-    $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
-    return $key,$val;
-}
-
-package PLXML::mad_sv;
-
-sub pair {
-    my $self = shift;
-    my $key = $$self{key};
-    my $val = $$self{val};
-    $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
-    return $key,$val;
 }
 
 package PLXML::baseop;
@@ -932,7 +921,6 @@ package PLXML;
 package PLXML::Characters;
 package PLXML::madprops;
 package PLXML::mad_op;
-package PLXML::mad_pv;
 package PLXML::baseop;
 package PLXML::baseop_unop;
 package PLXML::binop;

@@ -158,7 +158,7 @@ PERLVAR(Ireg_state,	struct re_save_state)
 
 PERLVAR(Iregdummy,	regnode)	/* from regcomp.c */
 
-PERLVARI(Idumpindent,	U16,	4)	/* number of blanks per dump
+PERLVARI(Idumpindent,	U16,	2)	/* number of blanks per dump
 					   indentation level */
 
 
