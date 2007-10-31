@@ -3133,6 +3133,7 @@ Perl_madlex(pTHX)
 	    PL_thiswhite = 0;
 	}
 	else if (PL_thisopen) {
+	    curmad('<', newSVpv("quote", 0));
 	    CURMAD('q', PL_thisopen);
 	    if (PL_thistoken)
 		sv_free(PL_thistoken);

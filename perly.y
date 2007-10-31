@@ -222,6 +222,7 @@ line	:	label cond
                               PL_parser->copline = NOLINE;
 			      TOKEN_FREE($1);
 			      TOKEN_GETMAD($2,$$,';');
+			      append_madprops_pv("nullstatement",$$,'>');
 			  }
 			  PL_parser->expect = XSTATE;
 			}
@@ -251,10 +252,12 @@ sideff	:	error
 	|	expr IF expr
 			{ $$ = newLOGOP(OP_AND, 0, $3, $1);
 			  TOKEN_GETMAD($2,$$,'i');
+                          append_madprops_pv("modif", $$, '>');
 			}
 	|	expr UNLESS expr
 			{ $$ = newLOGOP(OP_OR, 0, $3, $1);
 			  TOKEN_GETMAD($2,$$,'i');
+                          append_madprops_pv("modif", $$, '>');
 			}
 	|	expr WHILE expr
 			{ $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1);
@@ -285,6 +288,7 @@ else	:	/* NULL */
 			  TOKEN_GETMAD($1,$$,'I');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($4,$$,')');
+                          append_madprops_pv("if", $$, '>');
 			}
 	;
 
@@ -296,6 +300,7 @@ cond	:	IF '(' remember mexpr ')' mblock else
 			  TOKEN_GETMAD($1,$$,'I');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
+                          append_madprops_pv("if", $$, '>');
 			}
 	|	UNLESS '(' remember miexpr ')' mblock else
 			{ PL_parser->copline = (line_t)IVAL($1);
@@ -304,6 +309,7 @@ cond	:	IF '(' remember mexpr ')' mblock else
 			  TOKEN_GETMAD($1,$$,'I');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
+                          append_madprops_pv("if", $$, '>');
 			}
 	;
 
@@ -403,6 +409,7 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 			  token_getmad($8,forop,'2');
 			  token_getmad($11,forop,')');
 			  token_getmad($1,forop,'L');
+                          append_madprops_pv("cfor", forop, '>');
 #else
 			  if ($5) {
 				forop = append_elem(OP_LINESEQ,
@@ -502,6 +509,7 @@ decl	:	format
 peg	:	PEG
 			{ $$ = newOP(OP_NULL,0);
 			  TOKEN_GETMAD($1,$$,'p');
+                          append_madprops_pv("peg",$$,'>');
 			}
 	;
 
@@ -510,6 +518,7 @@ format	:	FORMAT startformsub formname block
 #ifdef MAD
 			  $$ = newFORM($2, $3, $4);
 			  prepend_madprops($1->tk_mad, $$, 'F');
+                          append_madprops_pv("format", $$, '>');
 			  $1->tk_mad = 0;
 			  token_free($1);
 #else
@@ -550,6 +559,7 @@ subrout	:	SUB startsub subname proto subattrlist subbody
 			      op_getmad($5,$$,'h');
 			      token_getmad($1,$$,'d');
 			      append_madprops($6->op_madprop, $$, 0);
+                              append_madprops_pv("sub", $$, '<');
 			      $6->op_madprop = 0;
 			    }
 #else
@@ -596,6 +606,7 @@ subattrlist:	/* NULL */
 	|	COLONATTR THING
 			{ $$ = $2;
 			  TOKEN_GETMAD($1,$$,':');
+                          append_madprops_pv("attrlist",$$,'>');
 			}
 	|	COLONATTR
 			{ $$ = IF_MAD(
@@ -603,6 +614,7 @@ subattrlist:	/* NULL */
 				    (OP*)NULL
 				);
 			  TOKEN_GETMAD($1,$$,':');
+                          append_madprops_pv("attrlist",$$,'>');
 			}
 	;
 
@@ -610,6 +622,7 @@ subattrlist:	/* NULL */
 myattrlist:	COLONATTR THING
 			{ $$ = $2;
 			  TOKEN_GETMAD($1,$$,':');
+                          append_madprops_pv("attrlist",$$,'>');
 			}
 	|	COLONATTR
 			{ $$ = IF_MAD(
@@ -617,6 +630,7 @@ myattrlist:	COLONATTR THING
 				    (OP*)NULL
 				);
 			  TOKEN_GETMAD($1,$$,':');
+                          append_madprops_pv("attrlist",$$,'>');
 			}
 	;
 
@@ -637,6 +651,7 @@ package :	PACKAGE WORD ';'
 			  $$ = package($2);
 			  token_getmad($1,$$,'o');
 			  token_getmad($3,$$,';');
+                          append_madprops_pv("package",$$,'>');
 #else
 			  package($2);
 			  $$ = (OP*)NULL;
@@ -666,14 +681,17 @@ use	:	USE startsub
 expr	:	expr ANDOP expr
 			{ $$ = newLOGOP(OP_AND, 0, $1, $3);
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	expr OROP expr
 			{ $$ = newLOGOP(IVAL($2), 0, $1, $3);
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	expr DOROP expr
 			{ $$ = newLOGOP(OP_DOR, 0, $1, $3);
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	argexpr %prec PREC_LOW
 	;
@@ -685,6 +703,7 @@ argexpr	:	argexpr ','
 			  OP* op = newNULLLIST();
 			  token_getmad($2,op,',');
 			  $$ = append_elem(OP_LIST, $1, op);
+                          append_madprops_pv(",", op, '>');
 #else
 			  $$ = $1;
 #endif
@@ -695,6 +714,7 @@ argexpr	:	argexpr ','
 			  DO_MAD(
 			      term = newUNOP(OP_NULL, 0, term);
 			      token_getmad($2,term,',');
+                              append_madprops_pv(",", term, '>');
 			  )
 			  $$ = append_elem(OP_LIST, $1, term);
 			}
@@ -873,40 +893,49 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
 termbinop:	term ASSIGNOP term                     /* $x = $y */
 			{ $$ = newASSIGNOP(OPf_STACKED, $1, IVAL($2), $3);
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term POWOP term                        /* $x ** $y */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term MULOP term                        /* $x * $y, $x x $y */
 			{   if (IVAL($2) != OP_REPEAT)
 				scalar($1);
 			    $$ = newBINOP(IVAL($2), 0, $1, scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term ADDOP term                        /* $x + $y */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term SHIFTOP term                      /* $x >> $y, $x << $y */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term RELOP term                        /* $x > $y, etc. */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term EQOP term                         /* $x == $y, $x eq $y */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term BITANDOP term                     /* $x & $y */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term BITOROP term                      /* $x | $y */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term DOTDOT term                       /* $x..$y, $x...$y */
 			{
@@ -923,14 +952,17 @@ termbinop:	term ASSIGNOP term                     /* $x = $y */
 	|	term ANDAND term                       /* $x && $y */
 			{ $$ = newLOGOP(OP_AND, 0, $1, $3);
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term OROR term                         /* $x || $y */
 			{ $$ = newLOGOP(OP_OR, 0, $1, $3);
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term DORDOR term                       /* $x // $y */
 			{ $$ = newLOGOP(OP_DOR, 0, $1, $3);
 			  TOKEN_GETMAD($2,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	term MATCHOP term                      /* $x =~ /$y/ */
 			{ $$ = bind_match(IVAL($2), $1, $3);
@@ -938,6 +970,9 @@ termbinop:	term ASSIGNOP term                     /* $x = $y */
 				($$->op_type == OP_NOT
 				    ? ((UNOP*)$$)->op_first : $$),
 				'~');
+                          append_madprops_pv("bind_match",
+                                             ($$->op_type == OP_NOT ? ((UNOP*)$$)->op_first : $$),
+                                             '>');
 			}
     ;
 
@@ -952,6 +987,7 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 				    $2
 				);
 			  TOKEN_GETMAD($1,$$,'+');
+                          append_madprops_pv("unary+",$$,'>');
 			}
 	|	'!' term                               /* !$x */
 			{ $$ = newUNOP(OP_NOT, 0, scalar($2));
@@ -1025,6 +1061,7 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 	|	DO block	%prec '('               /* do { code */
 			{ $$ = newUNOP(OP_NULL, OPf_SPECIAL, scope($2));
 			  TOKEN_GETMAD($1,$$,'D');
+                          append_madprops_pv("do",$$,'>');
 			}
 	|	DO WORD '(' ')'                         /* do somesub() */
 			{ $$ = newUNOP(OP_ENTERSUB,
@@ -1079,10 +1116,12 @@ term	:	termbinop
 			{ $$ = newCONDOP(0, $1, $3, $5);
 			  TOKEN_GETMAD($2,$$,'?');
 			  TOKEN_GETMAD($4,$$,':');
+                          append_madprops_pv("?",$$,'>');
 			}
 	|	REFGEN term                          /* \$x, \@y, \%z */
 			{ $$ = newUNOP(OP_REFGEN, 0, mod($2,OP_REFGEN));
 			  TOKEN_GETMAD($1,$$,'o');
+                          append_madprops_pv("operator",$$,'>');
 			}
 	|	myattrterm	%prec UNIOP
 			{ $$ = $1; }
@@ -1092,6 +1131,7 @@ term	:	termbinop
 			}
 	|	'(' expr ')'
 			{ $$ = sawparens(IF_MAD(newUNOP(OP_NULL,0,$2), $2));
+                          append_madprops_pv("(", $$, '>');
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
 			}
@@ -1290,6 +1330,7 @@ listexprcom:	/* NULL */
 			  OP* op = newNULLLIST();
 			  token_getmad($2,op,',');
 			  $$ = append_elem(OP_LIST, $1, op);
+                          append_madprops_pv(",", op, '>');
 #else
 			  $$ = $1;
 #endif

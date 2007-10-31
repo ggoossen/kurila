@@ -80,12 +80,13 @@ sub p55_file {
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
     if ($@) {
         fail "convert xml to p5 failed file: '$file'";
-        #$TODO or die;
-        #diag "error: $@";
+        diag "error: $@";
+        $TODO or die;
         return;
     }
     # ok($output eq $input, "p55 '$file'");
     eq_or_diff $output, $input, "p55 '$file'";
+    $output eq $input or $TODO or die;
 }
 
 undef $/;
@@ -147,7 +148,7 @@ use encoding 'euc-jp';
 tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
 ########
 sub ok($$) { }
-BEGIN { ok(1, 2, ); }
+#BEGIN { ok(1, 2, ); }
 ########
 for (my $i=0; $i<3; $i++) { }
 ########
@@ -224,3 +225,22 @@ local our $TODO
 ########
 # TODO state; op_once
 state $x = 4;
+########
+# TODO do not execute CHECK block
+CHECK { die; }
+########
+# pod with invalid UTF-8
+=head3 Gearman
+
+I know Ask Bj�rn Hansen has implemented a transport for the C<gearman> distributed
+job system, though it's not on CPAN at the time of writing this.
+
+=cut
+########
+@INC = qw(foo bar);
+########
+if (int(1.23) == 1) { print "1"; } else { print "2"; }
+########
+my $value;
+$value !~ tr/\0-\377//c;
+
