@@ -624,10 +624,8 @@ struct loop {
 #endif
 
 #ifdef PERL_MAD
-#  define MAD_NULL 1
-#  define MAD_PV 2
-#  define MAD_OP 3
-#  define MAD_SV 4
+#  define MAD_OP 1
+#  define MAD_SV 2
 
 struct madprop {
     MADPROP* mad_next;
