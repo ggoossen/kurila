@@ -2009,12 +2009,11 @@ PP(pp_exit)
     }
     PL_exit_flags |= PERL_EXIT_EXPECTED;
 #ifdef PERL_MAD
-    /* KLUDGE: disable exit 0 in BEGIN blocks when we're just compiling */
-    if (anum || !(PL_minus_c && PL_madskills))
-	my_exit(anum);
-#else
-    my_exit(anum);
+    /* KLUDGE: When making a MAD dump the exit code is overriden */
+    if (PL_minus_c && PL_madskills)
+	anum = anum ? 3 : 2;
 #endif
+    my_exit(anum);
     PUSHs(&PL_sv_undef);
     RETURN;
 }

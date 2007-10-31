@@ -37,7 +37,7 @@ sub p55 {
     close $infile;
 
     unlink "tmp.xml";
-    `PERL_XMLDUMP='tmp.xml' ../perl -I ../lib tmp.in 2> tmp.err`;
+    my $returncode = system("PERL_XMLDUMP='tmp.xml' ../perl -I ../lib tmp.in 2> tmp.err");
 
     if (-z "tmp.xml") {
         ok 0, "MAD dump failed $msg" or $TODO or die;
@@ -64,7 +64,16 @@ sub p55_file {
     }
 
     unlink "tmp.xml";
-    `PERL_XMLDUMP='tmp.xml' ../perl $switches -I ../lib $file 2> tmp.err`;
+    my $returncode = system("PERL_XMLDUMP='tmp.xml' ../perl $switches -I ../lib $file 2> tmp.err > tmp.err");
+    if (($returncode >> 8) == 2) {
+        # exitcode '2' means a exit 0 in a BEGIN block.
+      SKIP: { skip "$file has a 'exit 0' in a BEGIN block", 1; }
+        return;
+    }
+    if ($returncode) {
+        fail "MAD dump of '$file' failed.";
+        return;
+    }
 
     if (-z "tmp.xml") {
         fail "MAD dump failure of '$file'";
@@ -73,7 +82,7 @@ sub p55_file {
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
     if ($@) {
         fail "convert xml to p5 failed file: '$file'";
-        $TODO or die;
+        #$TODO or die;
         #diag "error: $@";
         return;
     }
@@ -102,18 +111,19 @@ our %failing = map { $_, 1 } qw|
 
 ../t/op/symbolcache.t
 
-../t/op/threads.t
-../t/lib/cygwin.t
-
 ../t/op/exec.t
 
 ../t/uni/tr_7jis.t ../t/uni/tr_eucjp.t ../t/uni/tr_sjis.t
+
+** sources filters **
+../ext/Encode/t/jperl.t
 |;
 
 my @files;
 find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
 
-$ENV{PERL_CORE}=1;
+$ENV{PERL_CORE} = 1;
+
 for my $file (@files) {
     local $TODO = (exists $failing{$file} ? "Known failure" : undef);
     p55_file($file);
@@ -227,3 +237,6 @@ job system, though it's not on CPAN at the time of writing this.
 @INC = qw(foo bar);
 ########
 if (int(1.23) == 1) { print "1"; } else { print "2"; }
+########
+# TODO state; op_once
+state $x = 4;
