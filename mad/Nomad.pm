@@ -510,10 +510,6 @@ sub ast {
 
 sub hash {
     my $self = shift;
-    my @pairs;
-    my %hash = ();
-    my $firstthing = '';
-    my $lastthing = '';
     
     my %mapping = map { reverse(%$_) } (
     { 'd', "defintion" },
@@ -583,6 +579,7 @@ sub hash {
     { 'h', "constsub_args" },
     );
 
+    my %hash = ();
     # We need to guarantee key uniqueness at this point.
     for my $kid (@{$$self{Kids}}) {
 	my ($k,$v) = $kid->pair($self, @_);
@@ -592,12 +589,9 @@ sub hash {
         else {
             $k = $mapping{$k} || $k;
         }
-	$firstthing ||= $k;
         die "duplicate key $k - '$hash{$k}' - '$v'" if exists $hash{$k} and $hash{$k} ne $v;
-        $lastthing = $k;
 	$hash{$k} = $v;
     }
-    $hash{FIRST} = $firstthing;
     return \%hash;
 }
 
@@ -1253,20 +1247,10 @@ sub ast {
 
     if (%{$self->{mp}}) {
         my $nulltype = $$self{mp}{null_type_first} || $self->{mp}{null_type};
-        if ($nulltype) {
-            if (exists $astmad{$nulltype}) {
-                return $astmad{$nulltype}->($self);
-            }
-            die "unknwon type '$nulltype'";
+        if (exists $astmad{$nulltype}) {
+            return $astmad{$nulltype}->($self);
         }
-
-        # Look at first madprop.
-        my $mad = $$self{mp}{FIRST} || "unknown";
-        die "mad with thing should be '$mad'";
-        if (exists $astmad{$mad}) {
-            return $astmad{$mad}->($self);
-        }
-        warn "No mad $mad" unless $mad eq 'unknown';
+        die "unknwon type '$nulltype'";
     }
 
     # Do something generic.
