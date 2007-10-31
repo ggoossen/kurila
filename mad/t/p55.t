@@ -124,7 +124,7 @@ our %failing = map { $_, 1 } qw|
 |;
 
 my @files;
-find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../');
+find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t');
 
 $ENV{PERL_CORE} = 1;
 
