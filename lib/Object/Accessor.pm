@@ -307,7 +307,7 @@ sub mk_verify {
     my $fail;
     for my $name ( $self->ls_accessors ) {
         unless( allow( $self->?$name, $self->ls_allow( $name ) ) ) {
-            my $val = defined $self->?$name ? $self->&$name : '<undef>';
+            my $val = defined $self->?$name ? $self->?$name : '<undef>';
 
             __PACKAGE__->___error("'$name' ($val) is invalid");
             $fail++;

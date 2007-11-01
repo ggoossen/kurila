@@ -445,7 +445,7 @@ sub t_intuit_more {
         my ($const) = $op_null->findnodes(q{op_const});
         next unless $const and (($const->att('PV') || '') =~ m/^[\[]/) and 
           $const->att('PV') eq (get_madprop($const, 'value') || '');
-        set_madprop($const, "value", "(?:" . get_madprop($const, 'value') . ")");
+        set_madprop($const, "value", "(?:)" . get_madprop($const, 'value'));
     }
 }
 

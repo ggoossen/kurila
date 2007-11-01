@@ -62,7 +62,7 @@ is ($class->path(), File::Spec->path(), 'path() same as File::Spec->path()');
 
 foreach (qw/updir curdir rootdir/)
   {
-  is ($class->?$_(), File::Spec->&$_(), $_ );
+  is ($class->?$_(), File::Spec->?$_(), $_ );
   }
 
 foreach ( qw /
