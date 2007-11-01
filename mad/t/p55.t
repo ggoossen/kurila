@@ -224,7 +224,7 @@ ok my $x = "foobar";
 CHECK { die; }
 ########
 # new named method call syntax
-Foo->&$bar();
+Foo->?$bar();
 ########
 # pod with invalid UTF-8
 =head3 Gearman
@@ -240,3 +240,6 @@ if (int(1.23) == 1) { print "1"; } else { print "2"; }
 ########
 # TODO state; op_once
 state $x = 4;
+########
+my $x;
+"$x->@"
