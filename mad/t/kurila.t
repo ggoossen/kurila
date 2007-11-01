@@ -165,14 +165,14 @@ sub t_strict_refs {
     p5convert( 'my $pkg; defined &{$pkg . "::bar"}',
                'my $pkg; defined (Symbol::fetch_glob($pkg . "::bar")->*)->&');
     p5convert( '*$AUTOLOAD',
-               '*{Symbol::fetch_glob($AUTOLOAD)}');
+               'Symbol::fetch_glob($AUTOLOAD)->*');
     p5convert( 'my $name = "foo"; *$name',
-               'my $name = "foo"; *{Symbol::fetch_glob($name)}');
+               'my $name = "foo"; Symbol::fetch_glob($name)->*');
     p5convert( '*$globref',
-               '*$globref');
+               '$globref->*');
 
     p5convert( 'my $pkg; keys %Package::',
-               'my $pkg; keys %{Symbol::stash("Package")}');
+               'my $pkg; keys Symbol::stash("Package")->%');
     {
         local $TODO = 1;
         p5convert( 'my $pkg; $Package::{"var"}',
@@ -187,13 +187,13 @@ my $string = "s";
 ---
 # finding strings
 my $string = "s";
-@{*{Symbol::fetch_glob($string)}} = sub { 1 };
+(Symbol::fetch_glob($string)->*)->@ = sub { 1 };
 ===
 my $string = "s";
 @{$string} = sub { 1 };
 ---
 my $string = "s";
-@{*{Symbol::fetch_glob($string)}} = sub { 1 };
+(Symbol::fetch_glob($string)->*)->@ = sub { 1 };
 ===
 my $string;
 $string =~ s/a/b/;
@@ -201,7 +201,7 @@ $string =~ s/a/b/;
 ---
 my $string;
 $string =~ s/a/b/;
-@{*{Symbol::fetch_glob($string)}} = sub { 1 };
+(Symbol::fetch_glob($string)->*)->@ = sub { 1 };
 ===
 my $x = "string";
 sub foo {
@@ -212,34 +212,34 @@ sub foo {
 my $x = "string";
 sub foo {
   my $h;
-  @{$h} = ();
+  $h->@ = ();
 }
 ===
 # not if 'use strict'
 use strict;
 my $string = "s";
-@$string= sub { 1 };
+@$string = sub { 1 };
 ---
 # not if 'use strict'
 use strict;
 my $string = "s";
-@$string= sub { 1 };
+$string->@ = sub { 1 };
 ===
 # variable is a hard ref
 my $ref = "s";
 $ref = [];
-@$ref= sub { 1 };
+@$ref = sub { 1 };
 ---
 # variable is a hard ref
 my $ref = "s";
 $ref = [];
-@$ref= sub { 1 };
+$ref->@ = sub { 1 };
 ===
 my $subname = "bla";
 $subname->();
 ---
 my $subname = "bla";
-*{Symbol::fetch_glob($subname)}->();
+Symbol::fetch_glob($subname)->*->();
 END
 
 }
@@ -442,11 +442,19 @@ $foo->%
 ----
 $foo->*
 ====
+&$foo
+----
+$foo->&
+====
 sub foo { [2, 4] }
 @{foo(1,2)}
 ----
 sub foo { [2, 4] }
 foo(1,2)->@
+====
+$$foo[1]
+----
+$foo->@[1]
 END
 
 sub t_intuit_more {

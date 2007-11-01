@@ -116,7 +116,7 @@ sub const_handler {
     #set_madprop($const, "value", get_madprop($const, "value"), ''); # delete ws.
     #$const_ws->delete if $const_ws;
     set_madprop($const, "quote_open", q|'|, wsbefore => $const_ws);
-    set_madprop($const, "quote_close", q|'|, '');
+    set_madprop($const, "quote_close", q|'|, wsbefore => '');
     set_madprop($const, "assign" => get_madprop($const, "value"));
     del_madprop($const, "value");
 }
@@ -146,6 +146,7 @@ sub del_madprop {
 }
 
 sub set_madprop {
+    @_ % 2 or Carp::confess("invalid number of arguments");
     my ($op, $key, $val, %ws) = @_;
     my ($madprops) = $op->findnodes("madprops");
     $madprops ||= $op->insert_new_elt("madprops");
@@ -341,8 +342,7 @@ sub remove_vstring {
         next if $op_const->parent->tag eq "op_require";
         next if $op_const->parent->tag eq "op_concat";
 
-        set_madprop($op_const, "wsbefore-quote_open", wsbefore => get_madprop($op_const, "wsbefore-value"));
-        set_madprop($op_const, "quote_open", "&#34;");
+        set_madprop($op_const, "quote_open", "&#34;", wsbefore => get_madprop($op_const, "value", "wsbefore"));
         set_madprop($op_const, "quote_close", "&#34;");
         my $v = get_madprop($op_const, "value");
         $v =~ s/^v//;
@@ -413,16 +413,21 @@ sub change_deref {
     }
 
     # '@{...}' to '...->@', etc.
-    for (['@', 'ary', 'av'], [qw|$ variable sv|], [qw|% hsh hv|], [qw|* star gv|]) {
+    for (['@', 'ary', 'av'], [qw|$ variable sv|], [qw|% hsh hv|], [qw|* star gv|], [qw|&amp; ampersand cv|]) {
         my ($sigil, $token, $xv) = @$_;
-        for my $rv2av ($xml->findnodes("//op_rv2$xv")) {
-            next unless (get_madprop($rv2av, $token) || '') eq $sigil;
+        for my $rv2av ($xml->findnodes("//op_rv2$xv"), $xml->findnodes("//op_null[\@was='rv2$xv']")) {
+            next unless (get_madprop($rv2av, $token) || '') eq $sigil or # =~ m/^([\$\@\%*]|&amp;)$/ or
+              (get_madprop($rv2av, 'variable') || '') eq '$' or # sigil change
+              (get_madprop($rv2av, 'ary') || '') eq '@';        # sigil change
+            set_madprop($rv2av, 'variable', '');
+            set_madprop($rv2av, 'ary', '');
             set_madprop($rv2av, $token, '');
             set_madprop($rv2av, 'arrow', '-&gt;' . $sigil);
             if (my ($scope) = $rv2av->findnodes('op_scope')) {
                 set_madprop($rv2av, 'arrow', "-&gt;$sigil", wsafter => get_madprop($scope, 'curly_close', 'wsafter'));
                 my $round = (not map { $scope->findnodes($_) }
-                             qw{op_anonlist op_null[@was="aelem"] op_null[@was="helem"] op_helem op_aelem op_entersub });
+                             qw{op_anonlist op_null[@was="aelem"] op_null[@was="helem"]
+                                op_helem op_aelem op_entersub op_padsv });
                 set_madprop($scope, 'curly_open', $round ? '(' : '');
                 set_madprop($scope, 'curly_close', ($round ? ')' : ''), wsafter => '');
             }
