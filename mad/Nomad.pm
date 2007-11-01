@@ -1533,6 +1533,7 @@ sub astnull {
     else {
 	push @newkids, $$self{Kids}[0]->ast(@_);
     }
+    push @newkids, $self->madness('a');
     return P5AST::op_rv2cv->new(Kids => [@newkids]);
 }
 
@@ -1544,6 +1545,7 @@ sub ast {
     if (@{$$self{Kids}}) {
 	push @newkids, $$self{Kids}[0]->ast();
     }
+    push @newkids, $self->madness('a');
     return $self->newtype->new(Kids => [@newkids]);
 }
 
