@@ -2312,6 +2312,8 @@ S_intuit_more(pTHX_ register char *s)
     if (!PL_lex_inpat)
 	return TRUE;
 
+    return TRUE;
+
     /* In a pattern, so maybe we have {n,m}. */
     if (*s == '{') {
 	s++;
