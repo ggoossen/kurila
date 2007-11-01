@@ -765,7 +765,7 @@ case 2:
 #line 772 "perly.y"
     {
                             (yyval.opval) = newAVREF((ps[(1) - (2)].val.opval));
-                            TOKEN_GETMAD((ps[(1) - (2)].val.opval),(yyval.opval),'A');
+                            TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                             if (IVAL((ps[(2) - (2)].val.i_tkval)) == OP_JOIN) {
                                 /* creates a join when ending list */
                                 OP* list = newSVOP(OP_CONST, 0, newSVpvs(" ")); /* TODO: change to $" */
@@ -779,7 +779,7 @@ case 2:
 #line 783 "perly.y"
     {
                             (yyval.opval) = newSVREF((ps[(1) - (2)].val.opval));
-                            TOKEN_GETMAD((ps[(1) - (2)].val.opval),(yyval.opval),'A');
+                            TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                         ;}
     break;
 
@@ -787,7 +787,7 @@ case 2:
 #line 788 "perly.y"
     {
                             (yyval.opval) = newSVREF((ps[(1) - (2)].val.opval));
-                            TOKEN_GETMAD((ps[(1) - (2)].val.opval),(yyval.opval),'A');
+                            TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                         ;}
     break;
 
@@ -795,7 +795,7 @@ case 2:
 #line 793 "perly.y"
     {
                             (yyval.opval) = newGVREF(0, (ps[(1) - (2)].val.opval));
-                            TOKEN_GETMAD((ps[(1) - (2)].val.opval),(yyval.opval),'A');
+                            TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                         ;}
     break;
 
@@ -803,7 +803,7 @@ case 2:
 #line 798 "perly.y"
     {
                             (yyval.opval) = newCVREF(0, (ps[(1) - (2)].val.opval));
-                            TOKEN_GETMAD((ps[(1) - (2)].val.opval),(yyval.opval),'A');
+                            TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                         ;}
     break;
 

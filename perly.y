@@ -771,7 +771,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
         |       term DEREFARY                /* somearef->@ */
                         {
                             $$ = newAVREF($1);
-                            TOKEN_GETMAD($1,$$,'A');
+                            TOKEN_GETMAD($2,$$,'a');
                             if (IVAL($2) == OP_JOIN) {
                                 /* creates a join when ending list */
                                 OP* list = newSVOP(OP_CONST, 0, newSVpvs(" ")); /* TODO: change to $" */
@@ -782,22 +782,22 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
         |       term DEREFSCL                /* somearef->$ */
                         {
                             $$ = newSVREF($1);
-                            TOKEN_GETMAD($1,$$,'A');
+                            TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFHSH                /* somearef->% */
                         {
                             $$ = newSVREF($1);
-                            TOKEN_GETMAD($1,$$,'A');
+                            TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFSTAR                /* somearef->* */
                         {
                             $$ = newGVREF(0, $1);
-                            TOKEN_GETMAD($1,$$,'A');
+                            TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFAMP                /* somearef->& */
                         {
                             $$ = newCVREF(0, $1);
-                            TOKEN_GETMAD($1,$$,'A');
+                            TOKEN_GETMAD($2,$$,'a');
                         }
 	|	scalar '[' expr ']'          /* $array[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0, oopsAV($1), scalar($3));
