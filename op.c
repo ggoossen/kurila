@@ -3637,10 +3637,12 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     if (idop->op_type != OP_CONST)
 	Perl_croak(aTHX_ "Module name must be constant");
 
+#ifdef PERL_MAD
     if (PL_madskills) {
 	op_getmad(idop,pegop,'U');
 	append_madprops_pv("use", pegop, '>');
     }
+#endif
 
     veop = NULL;
 
