@@ -433,6 +433,10 @@ sub t_intuit_more {
 m/$foo[:]/
 ----
 m/$foo(?:[:])/
+====
+s/abc/[/;
+----
+s/abc/[/;
 END
 }
 

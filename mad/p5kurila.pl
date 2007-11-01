@@ -429,10 +429,14 @@ sub change_deref {
 
 sub t_intuit_more {
     my $xml = shift;
+
+    # remove $foo[..] where intuit_more would return false.
     for my $op_null ($xml->findnodes(q{//op_null})) {
         next unless (get_madprop($op_null, 'null_type') || '') eq ",";
+        next if $op_null->parent->tag eq "op_subst";
         my ($const) = $op_null->findnodes(q{op_const});
-        next unless $const and (($const->att('PV') || '') =~ m/^[\[\{]/) and $const->att('PV') eq get_madprop($const, 'value');
+        next unless $const and (($const->att('PV') || '') =~ m/^[\[]/) and 
+          $const->att('PV') eq (get_madprop($const, 'value') || '');
         set_madprop($const, "value", "(?:" . get_madprop($const, 'value') . ")");
     }
 }
