@@ -123,7 +123,7 @@
 %right <i_tkval> '!' '~' UMINUS REFGEN
 %right <i_tkval> POWOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
-%left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH
+%left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
 %left '[' '{'
@@ -778,6 +778,26 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
                                 append_elem(OP_LIST, list, $$);
                                 $$ = convert(OP_JOIN, 0, list);
                             }
+                        }
+        |       term DEREFSCL                /* somearef->$ */
+                        {
+                            $$ = newSVREF($1);
+                            TOKEN_GETMAD($1,$$,'A');
+                        }
+        |       term DEREFHSH                /* somearef->% */
+                        {
+                            $$ = newSVREF($1);
+                            TOKEN_GETMAD($1,$$,'A');
+                        }
+        |       term DEREFSTAR                /* somearef->* */
+                        {
+                            $$ = newGVREF(0, $1);
+                            TOKEN_GETMAD($1,$$,'A');
+                        }
+        |       term DEREFAMP                /* somearef->& */
+                        {
+                            $$ = newCVREF(0, $1);
+                            TOKEN_GETMAD($1,$$,'A');
                         }
 	|	scalar '[' expr ']'          /* $array[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0, oopsAV($1), scalar($3));
