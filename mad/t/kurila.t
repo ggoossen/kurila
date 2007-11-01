@@ -24,6 +24,7 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_intuit_more();
 t_change_deref();
 t_remove_useversion();
 t_rename_bit_operators();
@@ -398,10 +399,41 @@ Foo->bar()
 ----
 Foo->bar()
 ====
-#@{[1,2,3]}
-#[1,2,3]->@
+#ABC
+@$foo;
+#DEF
 ----
-#@{[1,2,3]}
-#[1,2,3]->@
+#ABC
+$foo->@;
+#DEF
+====
+@{[1,2,3]}
+----
+[1,2,3]->@
+====
+my ($x) = @_
+----
+my ($x) = @_
+====
+@{$foo||[]}
+----
+($foo||[])->@
+====
+@{$foo[1]}
+----
+$foo[1]->@
+====
+@{$foo{bar}}
+----
+$foo{bar}->@
 END
+
+sub t_intuit_more {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+m/$foo[:]/
+----
+m/$foo(?:[:])/
+END
+}
+
 }
