@@ -768,6 +768,21 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
 			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
 			}
+        |       scalar DEREFARY                /* $foo->@ */
+                        {
+                            $$ = newAVREF($1);
+                            TOKEN_GETMAD($1,$$,'A');
+                        }
+        |       term DEREFARY                /* somearef->@ */
+                        {
+                            $$ = newAVREF($1);
+                            TOKEN_GETMAD($1,$$,'A');
+                        }
+        |       subscripted DEREFARY                /* somearef->@ */
+                        {
+                            $$ = newAVREF($1);
+                            TOKEN_GETMAD($1,$$,'A');
+                        }
 	|	scalar '[' expr ']'          /* $array[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0, oopsAV($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'[');
@@ -1108,11 +1123,6 @@ term	:	termbinop
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
 			}
-        |       term DEREFARY
-                        {
-                            $$ = newAVREF($1);
-                            TOKEN_GETMAD($1,$$,'A');
-                        }
 	|	scalar	%prec '('
 			{ $$ = $1; }
 	|	star	%prec '('

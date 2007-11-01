@@ -2305,9 +2305,9 @@ S_intuit_more(pTHX_ register char *s)
     dVAR;
     if (PL_lex_brackets)
 	return TRUE;
-    if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{'))
+    if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{' || s[2] == '@'))
 	return TRUE;
-    if (*s != '{' && *s != '[')
+    if (*s != '{' && *s != '[' && *s != '@')
 	return FALSE;
     if (!PL_lex_inpat)
 	return TRUE;
@@ -3848,6 +3848,17 @@ Perl_yylex(pTHX)
 		    s++;
 		    OPERATOR(ARROW);
 		}
+		else if (*s == '@') {
+		    s++;
+		    if (PL_lex_state == LEX_INTERPNORMAL) {
+			if (*s == '-' && s[1] == '>')
+			    PL_lex_state = LEX_INTERPENDMAYBE;
+			else if (*s != '[' && *s != '{')
+			    PL_lex_state = LEX_INTERPEND;
+/* 			PL_lex_dojoin = TRUE; */
+		    }
+		    TERM(DEREFARY);
+		}
 		s = SKIPSPACE1(s);
 		if (isIDFIRST_lazy_if(s,UTF)) {
 		    s = force_word(s,METHOD,FALSE,TRUE,FALSE);
@@ -3857,10 +3868,6 @@ Perl_yylex(pTHX)
 		    OPERATOR(ARROW);
 		    s++;
 		    OPERATOR(DEREFSCL);
-		}
-		else if (*s == '@') {
-		    s++;
-		    OPERATOR(DEREFARY);
 		}
 		else if (*s == '%') {
 		    s++;
