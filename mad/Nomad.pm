@@ -1483,7 +1483,7 @@ sub ast {
     my @newkids;
     push @newkids, $self->madness('dx d ( * $');
     push @newkids, $$self{Kids}[0]->ast();
-    push @newkids, $self->madness(')');
+    push @newkids, $self->madness(') a');
     return $self->newtype->new(Kids => [@newkids]);
 }
 

@@ -237,7 +237,7 @@ is(
     eval q[
 	our $x = 'x';
 	sub Foo::x : lvalue { $x }
-	Foo->$x = 'ok';
+	Foo->&$x = 'ok';
     ] || $@, 'ok'
 );
 

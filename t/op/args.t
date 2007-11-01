@@ -9,32 +9,32 @@ sub new1 { bless \@_ }
 {
     my $x = new1("x");
     my $y = new1("y");
-    is("@$y","y");
-    is("@$x","x");
+    is("$y->@","y");
+    is("$x->@","x");
 }
 
 sub new2 { splice @_, 0, 0, "a", "b", "c"; return \@_ }
 {
     my $x = new2("x");
     my $y = new2("y");
-    is("@$x","a b c x");
-    is("@$y","a b c y");
+    is("$x->@","a b c x");
+    is("$y->@","a b c y");
 }
 
 sub new3 { goto &new1 }
 {
     my $x = new3("x");
     my $y = new3("y");
-    is("@$y","y");
-    is("@$x","x");
+    is("$y->@","y");
+    is("$x->@","x");
 }
 
 sub new4 { goto &new2 }
 {
     my $x = new4("x");
     my $y = new4("y");
-    is("@$x","a b c x");
-    is("@$y","a b c y");
+    is("$x->@","a b c x");
+    is("$y->@","a b c y");
 }
 
 # see if POPSUB gets to see the right pad across a dounwind() with

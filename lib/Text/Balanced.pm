@@ -797,7 +797,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 	}
 	else
 	{
-		$$textref =~ /\G$ldel1[^\\$ldel1]*(\\.[^\\$ldel1]*)*$ldel1/gcs
+		$$textref =~ /\G$ldel1(?:[^\\)$ldel1]*(\\.[^\\$ldel1]*)*$ldel1/gcs
 		|| do { pos $$textref = $startpos; return };
         $ld2pos = $rd1pos = pos($$textref)-1;
 	}

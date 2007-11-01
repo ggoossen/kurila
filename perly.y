@@ -768,20 +768,16 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
 			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
 			}
-        |       scalar DEREFARY                /* $foo->@ */
-                        {
-                            $$ = newAVREF($1);
-                            TOKEN_GETMAD($1,$$,'A');
-                        }
         |       term DEREFARY                /* somearef->@ */
                         {
                             $$ = newAVREF($1);
                             TOKEN_GETMAD($1,$$,'A');
-                        }
-        |       subscripted DEREFARY                /* somearef->@ */
-                        {
-                            $$ = newAVREF($1);
-                            TOKEN_GETMAD($1,$$,'A');
+                            if (IVAL($2) == OP_JOIN) {
+                                /* creates a join when ending list */
+                                OP* list = newSVOP(OP_CONST, 0, newSVpvs(" ")); /* TODO: change to $" */
+                                append_elem(OP_LIST, list, $$);
+                                $$ = convert(OP_JOIN, 0, list);
+                            }
                         }
 	|	scalar '[' expr ']'          /* $array[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0, oopsAV($1), scalar($3));
