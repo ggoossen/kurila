@@ -27,6 +27,7 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_space_func();
 t_intuit_more();
 t_change_deref();
 t_remove_useversion();
@@ -456,6 +457,7 @@ $$foo[1]
 ----
 $foo->@[1]
 END
+}
 
 sub t_intuit_more {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
@@ -469,4 +471,22 @@ s/abc/[/;
 END
 }
 
+sub t_space_func {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+sub foo { }
+foo (1, 2);
+----
+sub foo { }
+foo(1, 2);
+====
+my @foo;
+push (@foo, 1, 2);
+----
+my @foo;
+push(@foo, 1, 2);
+====
+print ( (1,2,3));
+----
+print( (1,2,3));
+END
 }

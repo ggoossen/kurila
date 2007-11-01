@@ -449,6 +449,16 @@ sub t_intuit_more {
     }
 }
 
+sub t_space_func {
+    my $xml = shift;
+    for my $op ($xml->findnodes(q{//*})) {
+        next unless get_madprop($op, "round_open", 'wsbefore');
+        next if (get_madprop($op, "null_type") || '') eq "(";
+        next if $op->att('flags') =~ m/PARENS/;
+        set_madprop($op, "round_open", get_madprop($op, "round_open"), wsbefore => '');
+    }
+}
+
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
 
@@ -488,6 +498,7 @@ if ($from < 1.415) {
 }
 
 t_intuit_more($twig);
+t_space_func($twig);
 
 # print
 $twig->print;
