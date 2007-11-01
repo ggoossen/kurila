@@ -175,7 +175,7 @@ sub digest_file
     #print "$file $method\n";
 
     open(FILE, $file) or die "Can't open $file: $!";
-    my $digest = Digest::MD5->new->addfile(*FILE)->&$method();
+    my $digest = Digest::MD5->new->addfile(*FILE)->?$method();
     close(FILE);
 
     $digest;

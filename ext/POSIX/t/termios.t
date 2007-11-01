@@ -64,7 +64,7 @@ for my $i (0..NCCS()-1) {
 
 # testing getcflag()
 for my $method (@getters) {
-    $r = eval { $termios->&$method() };
+    $r = eval { $termios->?$method() };
     is( $@, '', "calling $method()" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );
 }

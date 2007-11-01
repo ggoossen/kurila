@@ -280,7 +280,7 @@ sub _dump {
     # implementation.
     my $freezer = $s->{freezer};
     if ($freezer and UNIVERSAL::can($val, $freezer)) {
-      eval { $val->&$freezer() };
+      eval { $val->?$freezer() };
       warn "WARNING(Freezer method call failed): $@" if $@;
     }
 

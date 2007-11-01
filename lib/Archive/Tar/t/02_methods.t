@@ -507,7 +507,7 @@ SKIP: {
         ### extract it by full path and object
         for my $arg ( $obj, $obj->full_path ) {
 
-            ok( $tar->&$meth( $arg ),
+            ok( $tar->?$meth( $arg ),
                                     "Extracted '$name' to cwd() with $meth" );
             ok( -e $obj->full_path, "   Extracted file exists" );
             rm( $obj->full_path ) unless $NO_UNLINK;
@@ -520,7 +520,7 @@ SKIP: {
         my $outpath = File::Spec->catdir( @ROOT );
         my $outfile = File::Spec->catfile( $outpath, $$ ); #$obj->full_path );
 
-        ok( $tar->&$meth( $obj->full_path, $outfile ),
+        ok( $tar->?$meth( $obj->full_path, $outfile ),
                                     "Extracted file '$name' to $outpath with $meth" );
         ok( -e $outfile,            "   Extracted file '$outfile' exists" );
         rm( $outfile ) unless $NO_UNLINK;

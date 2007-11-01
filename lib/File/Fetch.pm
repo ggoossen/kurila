@@ -156,7 +156,7 @@ result of $ff->output_file will be used.
         }
         
         for (qw[path file]) {
-            unless( $args->&$_ ) {
+            unless( $args->?$_ ) {
                 return File::Fetch->_error(loc("No '%1' specified",$_));
             }
         }
@@ -356,7 +356,7 @@ sub fetch {
         ### it doesn't matter how you quote, it always fails.
         local $IPC::Cmd::USE_IPC_RUN = 0;
         
-        if( my $file = $self->&$sub( 
+        if( my $file = $self->?$sub( 
                         to => $out_to
         )){
 

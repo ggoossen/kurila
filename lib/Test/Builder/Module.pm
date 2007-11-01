@@ -97,7 +97,7 @@ sub import {
 
     $test->plan(@_);
 
-    $class->&$_export_to_level(1, $class, @imports);
+    $class->?$_export_to_level(1, $class, @imports);
 }
 
 

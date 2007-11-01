@@ -330,10 +330,10 @@ sub _get_conf {
     my $self = shift;
     my $what = shift;
 
-    return defined $self->{CONFIG}->&$what()
-                ?  $self->{CONFIG}->&$what()
-                :  defined $CONFIG->&$what()
-                        ?  $CONFIG->&$what()
+    return defined $self->{CONFIG}->?$what()
+                ?  $self->{CONFIG}->?$what()
+                :  defined $CONFIG->?$what()
+                        ?  $CONFIG->?$what()
                         :  undef;           # should never get here
 }
 
@@ -417,7 +417,7 @@ sub store {
 
         my $sub = $args->{level};
 
-        $item->&$sub( @$extra );
+        $item->?$sub( @$extra );
     }
 
     return 1;
