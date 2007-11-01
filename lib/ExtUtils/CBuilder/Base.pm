@@ -194,7 +194,7 @@ sub _do_link {
   
   my $objects = delete $args{objects};
   $objects = [$objects] unless ref $objects;
-  my $out = $args{$type} || $self->&$type($objects->[0]);
+  my $out = $args{$type} || $self->?$type($objects->[0]);
   
   my @temp_files;
   @temp_files =

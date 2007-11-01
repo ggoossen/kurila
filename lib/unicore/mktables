@@ -845,28 +845,28 @@ sub UnicodeData_Txt()
 
         my $MajorCat = substr($cat, 0, 1); ## L, M, Z, S, etc
 
-        $Assigned->&$op($code);
-        $Name->&$op($code, $name);
-        $General->&$op($code, $cat);
+        $Assigned->?$op($code);
+        $Name->?$op($code, $name);
+        $General->?$op($code, $cat);
 
         ## add to the sub category (e.g. "Lu", "Nd", "Cf", ..)
         $Cat{$cat}      ||= Table->New(Is   => $cat,
                                        Desc => "General Category '$cat'",
                                        Fuzzy => 0);
-        $Cat{$cat}->&$op($code);
+        $Cat{$cat}->?$op($code);
 
         ## add to the major category (e.g. "L", "N", "C", ...)
         $Cat{$MajorCat} ||= Table->New(Is => $MajorCat,
                                        Desc => "Major Category '$MajorCat'",
                                        Fuzzy => 0);
-        $Cat{$MajorCat}->&$op($code);
+        $Cat{$MajorCat}->?$op($code);
 
-        ($General{$name} ||= Table->New)->&$op($code, $name);
+        ($General{$name} ||= Table->New)->?$op($code, $name);
 
         # 005F: SPACING UNDERSCORE
-        $Cat{Word}->&$op($code)  if $cat =~ /^[LMN]|Pc/;
-        $Cat{Alnum}->&$op($code) if $cat =~ /^[LM]|Nd/;
-        $Cat{Alpha}->&$op($code) if $cat =~ /^[LM]/;
+        $Cat{Word}->?$op($code)  if $cat =~ /^[LMN]|Pc/;
+        $Cat{Alnum}->?$op($code) if $cat =~ /^[LM]|Nd/;
+        $Cat{Alpha}->?$op($code) if $cat =~ /^[LM]/;
 
 	my $isspace = 
 	    ($cat =~ /Zs|Zl|Zp/ &&
@@ -881,12 +881,12 @@ sub UnicodeData_Txt()
 
 	    ;
 
-        $Cat{Space}->&$op($code) if $isspace;
+        $Cat{Space}->?$op($code) if $isspace;
 
-        $Cat{SpacePerl}->&$op($code) if $isspace
+        $Cat{SpacePerl}->?$op($code) if $isspace
 	                               && $code != 0x000B; # Backward compat.
 
-        $Cat{Blank}->&$op($code) if $isspace
+        $Cat{Blank}->?$op($code) if $isspace
                                 && !($code == 0x000A ||
 				     $code == 0x000B ||
 				     $code == 0x000C ||
@@ -894,18 +894,18 @@ sub UnicodeData_Txt()
 				     $code == 0x0085 ||
 				     $cat =~ /^Z[lp]/);
 
-        $Cat{Digit}->&$op($code) if $cat eq "Nd";
-        $Cat{Upper}->&$op($code) if $cat eq "Lu";
-        $Cat{Lower}->&$op($code) if $cat eq "Ll";
-        $Cat{Title}->&$op($code) if $cat eq "Lt";
-        $Cat{ASCII}->&$op($code) if $code <= 0x007F;
-        $Cat{Cntrl}->&$op($code) if $cat =~ /^C/;
+        $Cat{Digit}->?$op($code) if $cat eq "Nd";
+        $Cat{Upper}->?$op($code) if $cat eq "Lu";
+        $Cat{Lower}->?$op($code) if $cat eq "Ll";
+        $Cat{Title}->?$op($code) if $cat eq "Lt";
+        $Cat{ASCII}->?$op($code) if $code <= 0x007F;
+        $Cat{Cntrl}->?$op($code) if $cat =~ /^C/;
 	my $isgraph = !$isspace && $cat !~ /Cc|Cs|Cn/;
-        $Cat{Graph}->&$op($code) if $isgraph;
-        $Cat{Print}->&$op($code) if $isgraph || $isspace;
-        $Cat{Punct}->&$op($code) if $cat =~ /^P/;
+        $Cat{Graph}->?$op($code) if $isgraph;
+        $Cat{Print}->?$op($code) if $isgraph || $isspace;
+        $Cat{Punct}->?$op($code) if $cat =~ /^P/;
 
-        $Cat{XDigit}->&$op($code) if ($code >= 0x30 && $code <= 0x39)  ## 0..9
+        $Cat{XDigit}->?$op($code) if ($code >= 0x30 && $code <= 0x39)  ## 0..9
                                  || ($code >= 0x41 && $code <= 0x46)  ## A..F
                                  || ($code >= 0x61 && $code <= 0x66); ## a..f
     }

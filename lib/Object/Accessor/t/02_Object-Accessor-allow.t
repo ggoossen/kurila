@@ -45,8 +45,8 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
     {   my $warning;
         local $SIG{__WARN__} = sub { $warning .= "@_" };
     
-        ok( !$Object->&$Acc( $0 ),   "'$Acc' NOT set to '$0'" );
-        is( $Object->&$Acc(), undef, "   '$Acc' still holds '<undef>'" );
+        ok( !$Object->?$Acc( $0 ),   "'$Acc' NOT set to '$0'" );
+        is( $Object->?$Acc(), undef, "   '$Acc' still holds '<undef>'" );
         like( $warning, $Err_re,    "   Warnings logged" );
     
         ### reset warnings;
@@ -64,8 +64,8 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
     {   my $warning;
         local $SIG{__WARN__} = sub { $warning .= "@_" };
     
-        ok( $Object->&$Acc( $$ ),    "'$Acc' set to '$$'" );
-        is( $Object->&$Acc(), $$,    "   '$Acc' still holds '$$'" );
+        ok( $Object->?$Acc( $$ ),    "'$Acc' set to '$$'" );
+        is( $Object->?$Acc(), $$,    "   '$Acc' still holds '$$'" );
         ok(!$warning,               "   No warnings logged" );
 
         ### reset warnings;

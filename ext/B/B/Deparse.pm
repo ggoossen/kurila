@@ -792,7 +792,7 @@ sub deparse {
     Carp::confess("Null op in deparse") if !defined($op)
 					|| class($op) eq "NULL";
     my $meth = "pp_" . $op->name;
-    return $self->&$meth($op, $cx);
+    return $self->?$meth($op, $cx);
 }
 
 sub indent {

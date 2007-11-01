@@ -587,7 +587,7 @@ for my $test ( sort keys %samples ) {
     }
 
     for my $field ( sort keys %$expect ) {
-        is( $results->&$field(), $expect->{$field}, "Field $field" );
+        is( $results->?$field(), $expect->{$field}, "Field $field" );
     }
 } # for %samples
 

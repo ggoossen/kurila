@@ -114,7 +114,7 @@ sub set {
 	$ds = $self->stat
 		or return undef;
 	my($key,$val);
-	$ds->&$key($val)
+	$ds->?$key($val)
 	    while(($key,$val) = each %arg);
     }
 

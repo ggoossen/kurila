@@ -38,13 +38,13 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
 ### scoped variables
 {   ok( 1,                      "Testing scoped values" );
 
-    $Object->&$Acc( $$ );
-    is( $Object->&$Acc, $$,      "   Value set to $$" );
+    $Object->?$Acc( $$ );
+    is( $Object->?$Acc, $$,      "   Value set to $$" );
     
     ### set it to a scope
-    {   $Object->&$Acc( $0 => \my $temp );
-        is( $Object->&$Acc, $0,  "   Value set to $0" );
+    {   $Object->?$Acc( $0 => \my $temp );
+        is( $Object->?$Acc, $0,  "   Value set to $0" );
     }
     
-    is( $Object->&$Acc, $$,      "   Value restored to $$" );
+    is( $Object->?$Acc, $$,      "   Value restored to $$" );
 }    

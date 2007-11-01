@@ -86,7 +86,7 @@ for my $entry (@$map) {
     isa_ok( $ff, "File::Fetch" );
 
     for my $acc ( keys %$entry ) {
-        is( $ff->&$acc(), $entry->{$acc},
+        is( $ff->?$acc(), $entry->{$acc},
                     "   Accessor '$acc' ok" );
     }
 }

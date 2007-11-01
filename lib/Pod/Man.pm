@@ -268,7 +268,7 @@ sub _handle_element_start {
         DEBUG > 4 and print "Pending: [", pretty ($$self{PENDING}), "]\n";
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
-        $self->&$method ($attrs, '');
+        $self->?$method ($attrs, '');
     } else {
         DEBUG > 2 and print "No $method start method, skipping\n";
     }
@@ -290,7 +290,7 @@ sub _handle_element_end {
         DEBUG > 4 and print "Popped: [", pretty ($tag), "]\n";
         DEBUG > 4 and print "Pending: [", pretty ($$self{PENDING}), "]\n";
         my $method = 'cmd_' . $method;
-        my $text = $self->&$method ($$tag[0], $$tag[2]);
+        my $text = $self->?$method ($$tag[0], $$tag[2]);
         if (defined $text) {
             if (@{ $$self{PENDING} } > 1) {
                 $$self{PENDING}[-1][2] .= $text;
@@ -300,7 +300,7 @@ sub _handle_element_end {
         }
     } elsif ($self->can ("end_$method")) {
         my $method = 'end_' . $method;
-        $self->&$method ();
+        $self->?$method ();
     } else {
         DEBUG > 2 and print "No $method end method, skipping\n";
     }

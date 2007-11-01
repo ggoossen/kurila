@@ -68,9 +68,9 @@ ok $a->isa("HASH");
 ok $a->can("eat");
 ok ! $a->can("sleep");
 ok my $ref = $a->can("drink");        # returns a coderef
-is $a->&$ref("tea"), "drinking tea"; # ... which works
+is $a->?$ref("tea"), "drinking tea"; # ... which works
 ok $ref = $a->can("sing");
-eval { $a->&$ref() };
+eval { $a->?$ref() };
 ok $@;                                # ... but not if no actual subroutine
 
 ok (!Cedric->isa('Programmer'));

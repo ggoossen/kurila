@@ -125,7 +125,7 @@ sub edit {
     $o = shift @args;
     $DB::single = 1;
     if($can{$o}) {
-        $self->&$o(args => \@args); # o conf init => sub init => sub load
+        $self->?$o(args => \@args); # o conf init => sub init => sub load
         return 1;
     } else {
         CPAN->debug("o[$o]") if $CPAN::DEBUG;
@@ -698,7 +698,7 @@ sub prefs_lookup {
         my($l) = $AUTOLOAD;
         $CPAN::Frontend->mywarn("Dispatching deprecated method '$l' to CPAN::HandleConfig\n");
         $l =~ s/.*:://;
-        CPAN::HandleConfig->&$l(@_);
+        CPAN::HandleConfig->?$l(@_);
     }
 }
 

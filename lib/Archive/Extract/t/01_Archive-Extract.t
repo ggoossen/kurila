@@ -193,7 +193,7 @@ if( $Debug ) {
 
     can_ok( $Class, $meth );
 
-    my @types = $Class->&$meth;
+    my @types = $Class->?$meth;
     ok( scalar(@types),         "   Got a list of types" );
     
     for my $type ( @types ) {
@@ -229,7 +229,7 @@ SKIP: {   my $meth = '__get_extract_dir';
                                 : $_
                       } $dir, File::Spec->catfile( $dir, [keys %$tmpl]->[0] );
         
-        my $res = $Class->&$meth( \@files );
+        my $res = $Class->?$meth( \@files );
         $res = &Win32::GetShortPathName( $res ) if IS_WIN32;
 
         ok( $res,               "Found extraction dir '$res'" );
@@ -255,7 +255,7 @@ for my $switch (0,1) {
         isa_ok( $ae, $Class );
 
         my $method = $tmpl->{$archive}->{method};
-        ok( $ae->&$method(),         "Archive type recognized properly" );
+        ok( $ae->?$method(),         "Archive type recognized properly" );
 
     ### 10 tests from here on down ###
     SKIP: {

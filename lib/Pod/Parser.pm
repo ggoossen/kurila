@@ -761,9 +761,9 @@ sub parse_text {
             return  $self->interior_sequence($iseq->name, $args, $iseq);
         };
     }
-    ref $xseq_sub    or  $xseq_sub   = sub { shift()->&$expand_seq(@_) };
-    ref $xtext_sub   or  $xtext_sub  = sub { shift()->&$expand_text(@_) };
-    ref $xptree_sub  or  $xptree_sub = sub { shift()->&$expand_ptree(@_) };
+    ref $xseq_sub    or  $xseq_sub   = sub { shift()->?$expand_seq(@_) };
+    ref $xtext_sub   or  $xtext_sub  = sub { shift()->?$expand_text(@_) };
+    ref $xptree_sub  or  $xptree_sub = sub { shift()->?$expand_ptree(@_) };
 
     ## Keep track of the "current" interior sequence, and maintain a stack
     ## of "in progress" sequences.
@@ -859,7 +859,7 @@ sub parse_text {
        my $errmsg = "*** ERROR: unterminated ${cmd}${ldelim}...${rdelim}".
                     " at line $line in file $file\n";
        (ref $errorsub) and &{$errorsub}($errmsg)
-           or (defined $errorsub) and $self->&$errorsub($errmsg)
+           or (defined $errorsub) and $self->?$errorsub($errmsg)
                or  warn($errmsg);
        $seq_stack[-1]->append($expand_seq ? &$xseq_sub($self,$seq) : $seq);
        $seq = $seq_stack[-1];
@@ -1088,7 +1088,7 @@ sub parse_from_filehandle {
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
                          " in paragraph at line $nlines in file $file\n";
             (ref $errorsub) and &{$errorsub}($errmsg)
-                or (defined $errorsub) and $self->&$errorsub($errmsg)
+                or (defined $errorsub) and $self->?$errorsub($errmsg)
                     or  warn($errmsg);
         }
 

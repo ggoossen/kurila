@@ -28,14 +28,14 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
     local $SIG{__WARN__} = sub { $warning .= "@_" };
 
     ok(!$Object->can($Acc),     "Cannot '$Acc'" );
-    ok(!$Object->&$Acc(),        "   Method '$Acc' returns false" );
+    ok(!$Object->?$Acc(),        "   Method '$Acc' returns false" );
     like( $warning, $Err_re,    "   Warning logged" );
 
     ### check fatal error
     {   local $Object::Accessor::FATAL = 1;
         local $Object::Accessor::FATAL = 1; # stupid warnings
 
-        my $rv = eval { $Object->&$Acc() };
+        my $rv = eval { $Object->?$Acc() };
 
         ok( $@,                 "Cannot '$Acc' -- dies" );
         ok(!$rv,                "   Method '$Acc' returns false" );
@@ -57,8 +57,8 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
 ### try to use the accessor
 {   for my $var ($0, $$) {
 
-        ok( $Object->&$Acc( $var ),  "'$Acc' set to '$var'" );
-        is( $Object->&$Acc(), $var,  "   '$Acc' still holds '$var'" );
+        ok( $Object->?$Acc( $var ),  "'$Acc' set to '$var'" );
+        is( $Object->?$Acc(), $var,  "   '$Acc' still holds '$var'" );
 
         my $sub = $Object->can( $Acc );
         ok( $sub,                   "Retrieved '$Acc' coderef" );
@@ -66,7 +66,7 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
         is( $sub->(), $var,         "   '$Acc' via coderef holds '$var'" );
 
         ok( $sub->(1),              "   '$Acc' set via coderef to '1'" );
-        is( $Object->&$Acc(), 1,     "   '$Acc' still holds '1'" );
+        is( $Object->?$Acc(), 1,     "   '$Acc' still holds '1'" );
     }
 }
 
@@ -92,17 +92,17 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
                                     "   Only expected accessors found" );
 
     for my $acc ( @list ) {
-        ok( !defined( $clone->&$acc() ),
+        ok( !defined( $clone->?$acc() ),
                                     "   Accessor '$acc' is empty" );
     }
 }
 
 ### flush the original values
-{   my $val = $Object->&$Acc();
+{   my $val = $Object->?$Acc();
     ok( $val,                       "Objects '$Acc' has a value" );
 
     ok( $Object->mk_flush,          "   Object flushed" );
-    ok( !$Object->&$Acc(),           "   Objects '$Acc' is now empty" );
+    ok( !$Object->?$Acc(),           "   Objects '$Acc' is now empty" );
 }
 
 ### check that only our original object can do '$Acc'
@@ -113,7 +113,7 @@ $Object::Accessor::DEBUG = $Object::Accessor::DEBUG = 1 if @ARGV;
 
 
     ok(!$other->can($Acc),          "Cannot '$Acc' via other object" );
-    ok(!$other->&$Acc(),             "   Method '$Acc' returns false" );
+    ok(!$other->?$Acc(),             "   Method '$Acc' returns false" );
     like( $warning, $Err_re,        "   Warning logged" );
 }
 

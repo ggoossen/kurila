@@ -782,7 +782,7 @@ sub list_files {
         ### this does the same as the above.. just needs a +{ }
         ### to make sure perl doesn't confuse it for a block
         return map {    my $o=$_;
-                        +{ map { $_ => $o->&$_() } @$aref }
+                        +{ map { $_ => $o->?$_() } @$aref }
                     } @{$self->_data};
     }
 }
@@ -1114,17 +1114,17 @@ sub _format_tar_entry {
                 PACK,
                 $file,
 
-                (map { sprintf( $f1, $entry->&$_() ) } qw[mode uid gid]),
-                (map { sprintf( $f2, $entry->&$_() ) } qw[size mtime]),
+                (map { sprintf( $f1, $entry->?$_() ) } qw[mode uid gid]),
+                (map { sprintf( $f2, $entry->?$_() ) } qw[size mtime]),
 
                 "",  # checksum field - space padded a bit down
 
-                (map { $entry->&$_() }                 qw[type linkname magic]),
+                (map { $entry->?$_() }                 qw[type linkname magic]),
 
                 $entry->version || TAR_VERSION,
 
-                (map { $entry->&$_() }                 qw[uname gname]),
-                (map { sprintf( $f1, $entry->&$_() ) } qw[devmajor devminor]),
+                (map { $entry->?$_() }                 qw[uname gname]),
+                (map { sprintf( $f1, $entry->?$_() ) } qw[devmajor devminor]),
 
                 ($no_prefix ? '' : $prefix)
     );
