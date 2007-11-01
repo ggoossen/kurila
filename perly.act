@@ -101,7 +101,7 @@ case 2:
                               PL_parser->copline = NOLINE;
 			      TOKEN_FREE((ps[(1) - (2)].val.p_tkval));
 			      TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),';');
-			      append_madprops_pv("nullstatement",(yyval.opval),'>');
+			      APPEND_MADPROPS_PV("nullstatement",(yyval.opval),'>');
 			  }
 			  PL_parser->expect = XSTATE;
 			;}
@@ -140,7 +140,7 @@ case 2:
 #line 249 "perly.y"
     { (yyval.opval) = newLOGOP(OP_AND, 0, (ps[(3) - (3)].val.opval), (ps[(1) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'i');
-                          append_madprops_pv("modif", (yyval.opval), '>');
+                          APPEND_MADPROPS_PV("modif", (yyval.opval), '>');
 			;}
     break;
 
@@ -148,7 +148,7 @@ case 2:
 #line 254 "perly.y"
     { (yyval.opval) = newLOGOP(OP_OR, 0, (ps[(3) - (3)].val.opval), (ps[(1) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'i');
-                          append_madprops_pv("modif", (yyval.opval), '>');
+                          APPEND_MADPROPS_PV("modif", (yyval.opval), '>');
 			;}
     break;
 
@@ -194,7 +194,7 @@ case 2:
 			  TOKEN_GETMAD((ps[(1) - (6)].val.i_tkval),(yyval.opval),'I');
 			  TOKEN_GETMAD((ps[(2) - (6)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(4) - (6)].val.i_tkval),(yyval.opval),')');
-                          append_madprops_pv("if", (yyval.opval), '>');
+                          APPEND_MADPROPS_PV("if", (yyval.opval), '>');
 			;}
     break;
 
@@ -206,7 +206,7 @@ case 2:
 			  TOKEN_GETMAD((ps[(1) - (7)].val.i_tkval),(yyval.opval),'I');
 			  TOKEN_GETMAD((ps[(2) - (7)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(5) - (7)].val.i_tkval),(yyval.opval),')');
-                          append_madprops_pv("if", (yyval.opval), '>');
+                          APPEND_MADPROPS_PV("if", (yyval.opval), '>');
 			;}
     break;
 
@@ -218,7 +218,7 @@ case 2:
 			  TOKEN_GETMAD((ps[(1) - (7)].val.i_tkval),(yyval.opval),'I');
 			  TOKEN_GETMAD((ps[(2) - (7)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(5) - (7)].val.i_tkval),(yyval.opval),')');
-                          append_madprops_pv("if", (yyval.opval), '>');
+                          APPEND_MADPROPS_PV("if", (yyval.opval), '>');
 			;}
     break;
 
@@ -336,7 +336,7 @@ case 2:
 			  token_getmad((ps[(8) - (12)].val.i_tkval),forop,'2');
 			  token_getmad((ps[(11) - (12)].val.i_tkval),forop,')');
 			  token_getmad((ps[(1) - (12)].val.p_tkval),forop,'L');
-                          append_madprops_pv("cfor", forop, '>');
+                          APPEND_MADPROPS_PV("cfor", forop, '>');
 #else
 			  if ((ps[(5) - (12)].val.opval)) {
 				forop = append_elem(OP_LINESEQ,
@@ -447,7 +447,7 @@ case 2:
 #line 504 "perly.y"
     { (yyval.opval) = newOP(OP_NULL,0);
 			  TOKEN_GETMAD((ps[(1) - (1)].val.i_tkval),(yyval.opval),'p');
-                          append_madprops_pv("peg",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("peg",(yyval.opval),'>');
 			;}
     break;
 
@@ -478,7 +478,7 @@ case 2:
 			      op_getmad((ps[(5) - (6)].val.opval),(yyval.opval),'a');
 			      token_getmad((ps[(1) - (6)].val.i_tkval),(yyval.opval),'d');
 			      append_madprops((ps[(6) - (6)].val.opval)->op_madprop, (yyval.opval), 0);
-                              append_madprops_pv("sub", (yyval.opval), '<');
+                              APPEND_MADPROPS_PV("sub", (yyval.opval), '<');
 			      (ps[(6) - (6)].val.opval)->op_madprop = 0;
 			    }
 #else
@@ -524,7 +524,7 @@ case 2:
 #line 577 "perly.y"
     { (yyval.opval) = (ps[(2) - (2)].val.opval);
 			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),':');
-                          append_madprops_pv("attrlist",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("attrlist",(yyval.opval),'>');
 			;}
     break;
 
@@ -535,7 +535,7 @@ case 2:
 				    Nullop
 				);
 			  TOKEN_GETMAD((ps[(1) - (1)].val.i_tkval),(yyval.opval),':');
-                          append_madprops_pv("attrlist",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("attrlist",(yyval.opval),'>');
 			;}
     break;
 
@@ -543,7 +543,7 @@ case 2:
 #line 593 "perly.y"
     { (yyval.opval) = (ps[(2) - (2)].val.opval);
 			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),':');
-                          append_madprops_pv("attrlist",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("attrlist",(yyval.opval),'>');
 			;}
     break;
 
@@ -554,7 +554,7 @@ case 2:
 				    Nullop
 				);
 			  TOKEN_GETMAD((ps[(1) - (1)].val.i_tkval),(yyval.opval),':');
-                          append_madprops_pv("attrlist",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("attrlist",(yyval.opval),'>');
 			;}
     break;
 
@@ -581,7 +581,7 @@ case 2:
 			  (yyval.opval) = package((ps[(2) - (3)].val.opval));
 			  token_getmad((ps[(1) - (3)].val.i_tkval),(yyval.opval),'o');
 			  token_getmad((ps[(3) - (3)].val.i_tkval),(yyval.opval),';');
-                          append_madprops_pv("package",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("package",(yyval.opval),'>');
 #else
 			  package((ps[(2) - (3)].val.opval));
 			  (yyval.opval) = Nullop;
@@ -603,7 +603,7 @@ case 2:
 			  token_getmad((ps[(7) - (7)].val.i_tkval),(yyval.opval),';');
 			  if (PL_parser->rsfp_filters &&
 				      AvFILLp(PL_parser->rsfp_filters) >= 0)
-			      append_madprops_pv("sourcefilter", (yyval.opval), '!');
+			      APPEND_MADPROPS_PV("sourcefilter", (yyval.opval), '!');
 #else
 			  utilize(IVAL((ps[(1) - (7)].val.i_tkval)), (ps[(2) - (7)].val.ival), (ps[(4) - (7)].val.opval), (ps[(5) - (7)].val.opval), (ps[(6) - (7)].val.opval));
 			  (yyval.opval) = Nullop;
@@ -615,7 +615,7 @@ case 2:
 #line 652 "perly.y"
     { (yyval.opval) = newLOGOP(OP_AND, 0, (ps[(1) - (3)].val.opval), (ps[(3) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -623,7 +623,7 @@ case 2:
 #line 657 "perly.y"
     { (yyval.opval) = newLOGOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, (ps[(1) - (3)].val.opval), (ps[(3) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -631,7 +631,7 @@ case 2:
 #line 662 "perly.y"
     { (yyval.opval) = newLOGOP(OP_DOR, 0, (ps[(1) - (3)].val.opval), (ps[(3) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -642,7 +642,7 @@ case 2:
 			  OP* op = newNULLLIST();
 			  token_getmad((ps[(2) - (2)].val.i_tkval),op,',');
 			  (yyval.opval) = append_elem(OP_LIST, (ps[(1) - (2)].val.opval), op);
-                          append_madprops_pv(",", op, '>');
+                          APPEND_MADPROPS_PV(",", op, '>');
 #else
 			  (yyval.opval) = (ps[(1) - (2)].val.opval);
 #endif
@@ -656,7 +656,7 @@ case 2:
 			  DO_MAD(
 			      term = newUNOP(OP_NULL, 0, term);
 			      token_getmad((ps[(2) - (3)].val.i_tkval),term,',');
-                              append_madprops_pv(",", term, '>');
+                              APPEND_MADPROPS_PV(",", term, '>');
 			  )
 			  (yyval.opval) = append_elem(OP_LIST, (ps[(1) - (3)].val.opval), term);
 			;}
@@ -935,7 +935,7 @@ case 2:
 #line 895 "perly.y"
     { (yyval.opval) = newASSIGNOP(OPf_STACKED, (ps[(1) - (3)].val.opval), IVAL((ps[(2) - (3)].val.i_tkval)), (ps[(3) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -943,7 +943,7 @@ case 2:
 #line 900 "perly.y"
     { (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, scalar((ps[(1) - (3)].val.opval)), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -953,7 +953,7 @@ case 2:
 				scalar((ps[(1) - (3)].val.opval));
 			    (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, (ps[(1) - (3)].val.opval), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -961,7 +961,7 @@ case 2:
 #line 912 "perly.y"
     { (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, scalar((ps[(1) - (3)].val.opval)), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -969,7 +969,7 @@ case 2:
 #line 917 "perly.y"
     { (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, scalar((ps[(1) - (3)].val.opval)), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -977,7 +977,7 @@ case 2:
 #line 922 "perly.y"
     { (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, scalar((ps[(1) - (3)].val.opval)), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -985,7 +985,7 @@ case 2:
 #line 927 "perly.y"
     { (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, scalar((ps[(1) - (3)].val.opval)), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -993,7 +993,7 @@ case 2:
 #line 932 "perly.y"
     { (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, scalar((ps[(1) - (3)].val.opval)), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -1001,7 +1001,7 @@ case 2:
 #line 937 "perly.y"
     { (yyval.opval) = newBINOP(IVAL((ps[(2) - (3)].val.i_tkval)), 0, scalar((ps[(1) - (3)].val.opval)), scalar((ps[(3) - (3)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -1024,7 +1024,7 @@ case 2:
 #line 954 "perly.y"
     { (yyval.opval) = newLOGOP(OP_AND, 0, (ps[(1) - (3)].val.opval), (ps[(3) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -1032,7 +1032,7 @@ case 2:
 #line 959 "perly.y"
     { (yyval.opval) = newLOGOP(OP_OR, 0, (ps[(1) - (3)].val.opval), (ps[(3) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -1040,7 +1040,7 @@ case 2:
 #line 964 "perly.y"
     { (yyval.opval) = newLOGOP(OP_DOR, 0, (ps[(1) - (3)].val.opval), (ps[(3) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -1051,7 +1051,7 @@ case 2:
 				((yyval.opval)->op_type == OP_NOT
 				    ? ((UNOP*)(yyval.opval))->op_first : (yyval.opval)),
 				'~');
-                          append_madprops_pv("bind_match",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("bind_match",(yyval.opval),'>');
 			;}
     break;
 
@@ -1069,7 +1069,7 @@ case 2:
 				    (ps[(2) - (2)].val.opval)
 				);
 			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'+');
-                          append_madprops_pv("unary+",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("unary+",(yyval.opval),'>');
 			;}
     break;
 
@@ -1174,7 +1174,7 @@ case 2:
 #line 1061 "perly.y"
     { (yyval.opval) = newUNOP(OP_NULL, OPf_SPECIAL, scope((ps[(2) - (2)].val.opval)));
 			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'D');
-                          append_madprops_pv("do",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("do",(yyval.opval),'>');
 			;}
     break;
 
@@ -1237,7 +1237,7 @@ case 2:
     { (yyval.opval) = newCONDOP(0, (ps[(1) - (5)].val.opval), (ps[(3) - (5)].val.opval), (ps[(5) - (5)].val.opval));
 			  TOKEN_GETMAD((ps[(2) - (5)].val.i_tkval),(yyval.opval),'?');
 			  TOKEN_GETMAD((ps[(4) - (5)].val.i_tkval),(yyval.opval),':');
-                          append_madprops_pv("?",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("?",(yyval.opval),'>');
 			;}
     break;
 
@@ -1245,7 +1245,7 @@ case 2:
 #line 1121 "perly.y"
     { (yyval.opval) = newUNOP(OP_REFGEN, 0, mod((ps[(2) - (2)].val.opval),OP_REFGEN));
 			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'o');
-                          append_madprops_pv("operator",(yyval.opval),'>');
+                          APPEND_MADPROPS_PV("operator",(yyval.opval),'>');
 			;}
     break;
 
@@ -1264,7 +1264,7 @@ case 2:
   case 154:
 #line 1132 "perly.y"
     { (yyval.opval) = sawparens(IF_MAD(newUNOP(OP_NULL,0,(ps[(2) - (3)].val.opval)), (ps[(2) - (3)].val.opval)));
-                          append_madprops_pv("(", (yyval.opval), '>');
+                          APPEND_MADPROPS_PV("(", (yyval.opval), '>');
 			  TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(3) - (3)].val.i_tkval),(yyval.opval),')');
 			;}
@@ -1578,7 +1578,7 @@ case 2:
 			  OP* op = newNULLLIST();
 			  token_getmad((ps[(2) - (2)].val.i_tkval),op,',');
 			  (yyval.opval) = append_elem(OP_LIST, (ps[(1) - (2)].val.opval), op);
-                          append_madprops_pv(",", op, '>');
+                          APPEND_MADPROPS_PV(",", op, '>');
 #else
 			  (yyval.opval) = (ps[(1) - (2)].val.opval);
 #endif
