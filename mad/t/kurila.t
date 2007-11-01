@@ -463,11 +463,17 @@ sub t_intuit_more {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
 m/$foo[:]/
 ----
-m/$foo(?:[:])/
+m/$foo(?:)[:]/
 ====
 s/abc/[/;
 ----
 s/abc/[/;
+====
+my $ldel1;
+m/\G$ldel1(?:)[^\\$ldel1]*(\\.[^\\$ldel1]*)*$ldel1/gcs
+----
+my $ldel1;
+m/\G$ldel1(?:)[^\\$ldel1]*(\\.[^\\$ldel1]*)*$ldel1/gcs
 END
 }
 
