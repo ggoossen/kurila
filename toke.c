@@ -2282,22 +2282,8 @@ S_scan_const(pTHX_ char *start)
  * Returns TRUE if there's more to the expression (e.g., a subscript),
  * FALSE otherwise.
  *
- * It deals with "$foo[3]" and /$foo[3]/ and /$foo[0123456789$]+/
- *
- * ->[ and ->{ return TRUE
- * { and [ outside a pattern are always subscripts, so return TRUE
- * if we're outside a pattern and it's not { or [, then return FALSE
- * if we're in a pattern and the first char is a {
- *   {4,5} (any digits around the comma) returns FALSE
- * if we're in a pattern and the first char is a [
- *   [] returns FALSE
- *   [SOMETHING] has a funky algorithm to decide whether it's a
- *      character class or not.  It has to deal with things like
- *      /$foo[-3]/ and /$foo[$bar]/ as well as /$foo[$\d]+/
- * anything else returns TRUE
+ * { and [ and ->[ and ->{ and ->@ return TRUE
  */
-
-/* This is the one truly awful dwimmer necessary to conflate C and sed. */
 
 STATIC int
 S_intuit_more(pTHX_ register char *s)
@@ -2307,132 +2293,8 @@ S_intuit_more(pTHX_ register char *s)
 	return TRUE;
     if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{' || s[2] == '@'))
 	return TRUE;
-    if (*s != '{' && *s != '[' && *s != '@')
+    if (*s != '{' && *s != '[')
 	return FALSE;
-    if (!PL_lex_inpat)
-	return TRUE;
-
-    return TRUE;
-
-    /* In a pattern, so maybe we have {n,m}. */
-    if (*s == '{') {
-	s++;
-	if (!isDIGIT(*s))
-	    return TRUE;
-	while (isDIGIT(*s))
-	    s++;
-	if (*s == ',')
-	    s++;
-	while (isDIGIT(*s))
-	    s++;
-	if (*s == '}')
-	    return FALSE;
-	return TRUE;
-	
-    }
-
-    /* On the other hand, maybe we have a character class */
-
-    s++;
-    if (*s == ']' || *s == '^')
-	return FALSE;
-    else {
-        /* this is terrifying, and it works */
-	int weight = 2;		/* let's weigh the evidence */
-	char seen[256];
-	unsigned char un_char = 255, last_un_char;
-	const char * const send = strchr(s,']');
-	char tmpbuf[sizeof PL_tokenbuf * 4];
-
-	if (!send)		/* has to be an expression */
-	    return TRUE;
-
-	Zero(seen,256,char);
-	if (*s == '$')
-	    weight -= 3;
-	else if (isDIGIT(*s)) {
-	    if (s[1] != ']') {
-		if (isDIGIT(s[1]) && s[2] == ']')
-		    weight -= 10;
-	    }
-	    else
-		weight -= 100;
-	}
-	for (; s < send; s++) {
-	    last_un_char = un_char;
-	    un_char = (unsigned char)*s;
-	    switch (*s) {
-	    case '@':
-	    case '&':
-	    case '$':
-		weight -= seen[un_char] * 10;
-		if (isALNUM_lazy_if(s+1,UTF)) {
-		    int len;
-		    scan_ident(s, send, tmpbuf, sizeof tmpbuf, FALSE);
-		    len = (int)strlen(tmpbuf);
-		    if (len > 1 && gv_fetchpvn_flags(tmpbuf, len, 0, SVt_PV))
-			weight -= 100;
-		    else
-			weight -= 10;
-		}
-		else if (*s == '$' && s[1] &&
-		  strchr("[#!%*<>()-=",s[1])) {
-		    if (/*{*/ strchr("])} =",s[2]))
-			weight -= 10;
-		    else
-			weight -= 1;
-		}
-		break;
-	    case '\\':
-		un_char = 254;
-		if (s[1]) {
-		    if (strchr("wds]",s[1]))
-			weight += 100;
-		    else if (seen['\''] || seen['"'])
-			weight += 1;
-		    else if (strchr("rnftbxcav",s[1]))
-			weight += 40;
-		    else if (isDIGIT(s[1])) {
-			weight += 40;
-			while (s[1] && isDIGIT(s[1]))
-			    s++;
-		    }
-		}
-		else
-		    weight += 100;
-		break;
-	    case '-':
-		if (s[1] == '\\')
-		    weight += 50;
-		if (strchr("aA01! ",last_un_char))
-		    weight += 30;
-		if (strchr("zZ79~",s[1]))
-		    weight += 30;
-		if (last_un_char == 255 && (isDIGIT(s[1]) || s[1] == '$'))
-		    weight -= 5;	/* cope with negative subscript */
-		break;
-	    default:
-		if (!isALNUM(last_un_char)
-		    && !(last_un_char == '$' || last_un_char == '@'
-			 || last_un_char == '&')
-		    && isALPHA(*s) && s[1] && isALPHA(s[1])) {
-		    char *d = tmpbuf;
-		    while (isALPHA(*s))
-			*d++ = *s++;
-		    *d = '\0';
-		    if (keyword(tmpbuf, d - tmpbuf, 0))
-			weight -= 150;
-		}
-		if (un_char == last_un_char + 1)
-		    weight += 5;
-		weight -= seen[un_char];
-		break;
-	    }
-	    seen[un_char]++;
-	}
-	if (weight >= 0)	/* probably a character class */
-	    return FALSE;
-    }
 
     return TRUE;
 }
@@ -3852,12 +3714,11 @@ Perl_yylex(pTHX)
 		}
 		else if (*s == '@') {
 		    s++;
-		    if (PL_lex_state == LEX_INTERPNORMAL) {
-			if (*s == '-' && s[1] == '>')
-			    PL_lex_state = LEX_INTERPENDMAYBE;
-			else if (*s != '[' && *s != '{')
-			    PL_lex_state = LEX_INTERPEND;
-/* 			PL_lex_dojoin = TRUE; */
+		    yylval.ival=0;
+		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
+			/* ->@ closes the interpoltion and creates a join */
+			PL_lex_state = LEX_INTERPEND;
+			yylval.ival = OP_JOIN;
 		    }
 		    TERM(DEREFARY);
 		}
@@ -3867,7 +3728,6 @@ Perl_yylex(pTHX)
 		    TOKEN(ARROW);
 		}
 		else if (*s == '$') {
-		    OPERATOR(ARROW);
 		    s++;
 		    OPERATOR(DEREFSCL);
 		}
@@ -4156,12 +4016,8 @@ Perl_yylex(pTHX)
 	else
 	    --PL_lex_brackets;
 	if (PL_lex_state == LEX_INTERPNORMAL) {
-	    if (PL_lex_brackets == 0) {
-		if (*s == '-' && s[1] == '>')
-		    PL_lex_state = LEX_INTERPENDMAYBE;
-		else if (*s != '[' && *s != '{')
-		    PL_lex_state = LEX_INTERPEND;
-	    }
+	    if ( ! intuit_more(s))
+		PL_lex_state = LEX_INTERPEND;
 	}
 	TERM(']');
     case '{':
@@ -4328,24 +4184,15 @@ Perl_yylex(pTHX)
 	else
 	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets];
 	if (PL_lex_state == LEX_INTERPNORMAL) {
+	    if ( ! intuit_more(s))
+		PL_lex_state = LEX_INTERPEND;
 	    if (PL_lex_brackets == 0) {
 		if (PL_expect & XFAKEBRACK) {
 		    PL_expect &= XENUMMASK;
 		    PL_lex_state = LEX_INTERPEND;
 		    PL_bufptr = s;
-#if 0
-		    if (PL_madskills) {
-			if (!PL_thiswhite)
-			    PL_thiswhite = newSVpvs("");
-			sv_catpvn(PL_thiswhite,"}",1);
-		    }
-#endif
 		    return yylex();	/* ignore fake brackets */
 		}
-		if (*s == '-' && s[1] == '>')
-		    PL_lex_state = LEX_INTERPENDMAYBE;
-		else if (*s != '[' && *s != '{')
-		    PL_lex_state = LEX_INTERPEND;
 	    }
 	}
 	if (PL_expect & XFAKEBRACK) {
@@ -10215,8 +10062,13 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
     *d = '\0';
     d = dest;
     if (*d) {
-	if (PL_lex_state != LEX_NORMAL)
-	    PL_lex_state = LEX_INTERPENDMAYBE;
+	if (PL_lex_state != LEX_NORMAL) {
+	    if (intuit_more(s)) {
+		PL_lex_state = LEX_INTERPNORMAL;
+	    } else {
+		PL_lex_state = LEX_INTERPEND;
+	    }
+	}
 	return s;
     }
     if (*s == '$' && s[1] &&

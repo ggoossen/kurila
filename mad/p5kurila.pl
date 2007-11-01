@@ -412,17 +412,20 @@ sub change_deref {
         set_madprop($op_method->parent, 'bigarrow', "-&gt;&amp;");
     }
 
-    # '@{...}' to '...->@'
-    for my $rv2av ($xml->findnodes(q{//op_rv2av})) {
-        next unless (get_madprop($rv2av, 'ary') || '') eq '@';
-        set_madprop($rv2av, 'ary', '');
-        set_madprop($rv2av, 'arrow', '-&gt;@');
-        if (my ($scope) = $rv2av->findnodes('op_scope')) {
-            set_madprop($rv2av, 'arrow', '-&gt;@', wsafter => get_madprop($scope, 'curly_close', 'wsafter'));
-            my $round = (not map { $scope->findnodes($_) }
-                         qw{op_anonlist op_null[@was="aelem"] op_null[@was="helem"] op_helem op_aelem });
-            set_madprop($scope, 'curly_open', $round ? '(' : '');
-            set_madprop($scope, 'curly_close', ($round ? ')' : ''), wsafter => '');
+    # '@{...}' to '...->@', etc.
+    for (['@', 'ary', 'av'], [qw|$ variable sv|], [qw|% hsh hv|], [qw|* star gv|]) {
+        my ($sigil, $token, $xv) = @$_;
+        for my $rv2av ($xml->findnodes("//op_rv2$xv")) {
+            next unless (get_madprop($rv2av, $token) || '') eq $sigil;
+            set_madprop($rv2av, $token, '');
+            set_madprop($rv2av, 'arrow', '-&gt;' . $sigil);
+            if (my ($scope) = $rv2av->findnodes('op_scope')) {
+                set_madprop($rv2av, 'arrow', "-&gt;$sigil", wsafter => get_madprop($scope, 'curly_close', 'wsafter'));
+                my $round = (not map { $scope->findnodes($_) }
+                             qw{op_anonlist op_null[@was="aelem"] op_null[@was="helem"] op_helem op_aelem op_entersub });
+                set_madprop($scope, 'curly_open', $round ? '(' : '');
+                set_madprop($scope, 'curly_close', ($round ? ')' : ''), wsafter => '');
+            }
         }
     }
 }

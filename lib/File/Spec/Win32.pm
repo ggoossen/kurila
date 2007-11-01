@@ -112,7 +112,7 @@ sub file_name_is_absolute {
     if ($file =~ m{^($VOL_RX)}o) {
       my $vol = $1;
       return ($vol =~ m{^$UNC_RX}o ? 2
-	      : $file =~ m{^$DRIVE_RX[\\/]}o ? 2
+	      : $file =~ m{^$DRIVE_RX(?:[\\/])}o ? 2
 	      : 0);
     }
     return $file =~  m{^[\\/]} ? 1 : 0;

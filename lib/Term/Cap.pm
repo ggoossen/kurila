@@ -219,7 +219,7 @@ sub Tgetent { ## public -- static method
     my $foo = (exists $ENV{TERMCAP} ? $ENV{TERMCAP} : '');
 
     # $entry is the extracted termcap entry
-    if (($foo !~ m:^/:s) && ($foo =~ m/(^|\|)${termpat}[:|]/s)) {
+    if (($foo !~ m:^/:s) && ($foo =~ m/(^|\|)${termpat}(?:[:|])/s)) {
 	$entry = $foo;
     }
 
@@ -239,7 +239,7 @@ sub Tgetent { ## public -- static method
               {
                 my $tmp = `infocmp -C 2>/dev/null`;
                 $tmp =~ s/^#.*\n//gm; # remove comments
-                if (( $tmp !~ m%^/%s ) && ( $tmp =~ /(^|\|)${termpat}[:|]/s)) {
+                if (( $tmp !~ m%^/%s ) && ( $tmp =~ /(^|\|)${termpat}(?:[:|])/s)) {
                    $entry = $tmp;
                 }
               };

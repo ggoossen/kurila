@@ -18,6 +18,9 @@ use Convert;
 
 sub p5convert {
     my ($input, $expected) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     local $TODO = $TODO || ($input =~ m/^[#]\s*TODO/);
     my $output = Convert::convert($input, "/usr/bin/env perl ../mad/p5kurila.pl",
                                   dumpcommand => "$ENV{madpath}/perl");
@@ -148,19 +151,19 @@ sub t_strict_refs {
     p5convert( 'print {"STDOUT"} "foo"',
                'print {Symbol::fetch_glob("STDOUT")} "foo"' );
     p5convert( 'my $pkg; *{$pkg . "::bar"} = sub { "foo" }',
-               'my $pkg; *{Symbol::fetch_glob($pkg . "::bar")} = sub { "foo" }');
+               'my $pkg; Symbol::fetch_glob($pkg . "::bar")->* = sub { "foo" }');
     p5convert( 'my $pkg; *{"$pkg\::bar"} = sub { "foo" }',
-               'my $pkg; *{Symbol::fetch_glob("$pkg\::bar")} = sub { "foo" }');
+               'my $pkg; Symbol::fetch_glob("$pkg\::bar")->* = sub { "foo" }');
     p5convert( 'my $pkg; ${$pkg . "::bar"} = "noot"',
-               'my $pkg; ${*{Symbol::fetch_glob($pkg . "::bar")}} = "noot"');
+               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->$ = "noot"');
     p5convert( 'my $pkg; @{$pkg . "::bar"} = ("noot", "mies")',
-               'my $pkg; @{*{Symbol::fetch_glob($pkg . "::bar")}} = ("noot", "mies")');
+               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->@ = ("noot", "mies")');
     p5convert( 'my $pkg; %{$pkg . "::bar"} = { aap => "noot" }',
-               'my $pkg; %{*{Symbol::fetch_glob($pkg . "::bar")}} = { aap => "noot" }');
+               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->% = { aap => "noot" }');
     p5convert( 'my $pkg; &{$pkg . "::bar"} = sub { "foobar" }',
-               'my $pkg; &{*{Symbol::fetch_glob($pkg . "::bar")}} = sub { "foobar" }');
+               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->& = sub { "foobar" }');
     p5convert( 'my $pkg; defined &{$pkg . "::bar"}',
-               'my $pkg; defined &{*{Symbol::fetch_glob($pkg . "::bar")}}');
+               'my $pkg; defined (Symbol::fetch_glob($pkg . "::bar")->*)->&');
     p5convert( '*$AUTOLOAD',
                '*{Symbol::fetch_glob($AUTOLOAD)}');
     p5convert( 'my $name = "foo"; *$name',
@@ -426,6 +429,24 @@ $foo[1]->@
 @{$foo{bar}}
 ----
 $foo{bar}->@
+====
+$$foo
+----
+$foo->$
+====
+%$foo
+----
+$foo->%
+====
+*$foo
+----
+$foo->*
+====
+sub foo { [2, 4] }
+@{foo(1,2)}
+----
+sub foo { [2, 4] }
+foo(1,2)->@
 END
 
 sub t_intuit_more {
