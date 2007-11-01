@@ -3708,7 +3708,7 @@ Perl_yylex(pTHX)
 	    }
 	    else if (*s == '>') {
 		s++;
-		if (*s == '&') {
+		if (*s == '?') {
 		    s++;
 		    OPERATOR(ARROW);
 		}
@@ -3722,19 +3722,43 @@ Perl_yylex(pTHX)
 		    }
 		    TERM(DEREFARY);
 		}
+		else if (*s == '$') {
+		    s++;
+		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
+			/* ->$ closes the interpoltion and creates a join */
+			PL_lex_state = LEX_INTERPEND;
+		    }
+		    OPERATOR(DEREFSCL);
+		}
+		else if (*s == '%') {
+		    s++;
+		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
+			/* ->$ closes the interpoltion and creates a join */
+			PL_lex_state = LEX_INTERPEND;
+		    }
+		    OPERATOR(DEREFHSH);
+		} 
+		else if (*s == '*') {
+		    s++;
+		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
+			/* ->$ closes the interpoltion and creates a join */
+			PL_lex_state = LEX_INTERPEND;
+		    }
+		    OPERATOR(DEREFSTAR);
+		} 
+		else if (*s == '&') {
+		    s++;
+		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
+			/* ->$ closes the interpoltion and creates a join */
+			PL_lex_state = LEX_INTERPEND;
+		    }
+		    OPERATOR(DEREFSTAR);
+		} 
 		s = SKIPSPACE1(s);
 		if (isIDFIRST_lazy_if(s,UTF)) {
 		    s = force_word(s,METHOD,FALSE,TRUE,FALSE);
 		    TOKEN(ARROW);
 		}
-		else if (*s == '$') {
-		    s++;
-		    OPERATOR(DEREFSCL);
-		}
-		else if (*s == '%') {
-		    s++;
-		    OPERATOR(DEREFHSH);
-		} 
 		else
 		    TERM(ARROW);
 	    }
