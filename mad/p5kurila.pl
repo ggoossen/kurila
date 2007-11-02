@@ -468,7 +468,12 @@ sub t_parenthesis {
         set_madprop($op, "round_open", get_madprop($op, "round_open", 'wsbefore') ? '' : ' ');
         set_madprop($op, "round_close", '');
 
+        # only statement.
         next if $op->prev_sibling('op_nextstate');
+        # rhs of an assignment
+        next if $op->parent->tag eq "op_sassign" and $op->pos() == 2;
+        # rhs of a .= assignment
+        next if (get_madprop($op->parent, 'operator') || '') =~ m/^?\=$/ and $op->pos() == 3;
 
         my $op_null = XML::Twig::Elt->new("op_null");
         $op->replace_with($op_null);
