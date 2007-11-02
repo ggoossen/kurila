@@ -42,12 +42,12 @@ sub source_path {
     # okay,
 
   } elsif( -e
-    ($thefile = File::Spec::->catfile( File::Spec::->curdir, 'corpus', 'nonesuch.txt' ))
+    ($thefile = File::Spec->catfile( File::Spec->curdir, 'corpus', 'nonesuch.txt' ))
    #or (print("# Nope, not $thefile\n"), 0)
   ) {
     # okay,
   } elsif (-e
-    ($thefile = File::Spec::->catfile( File::Spec::->curdir, 't', 'corpus', 'nonesuch.txt' ))
+    ($thefile = File::Spec->catfile( File::Spec->curdir, 't', 'corpus', 'nonesuch.txt' ))
    #or (print("# Nope, not $thefile\n"), 0)
   ) {
     # okay,

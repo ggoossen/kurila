@@ -254,7 +254,7 @@ sub _store {
 		}
 		flock(FILE, LOCK_EX) ||
 			logcroak "can't get exclusive lock on $file: $!";
-		truncate FILE, 0;
+		truncate *FILE, 0;
 		# Unlocking will happen when FILE is closed
 	} else {
 		open(FILE, ">$file") || logcroak "can't create $file: $!";

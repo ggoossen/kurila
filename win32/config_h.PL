@@ -4,7 +4,7 @@ BEGIN
  {
   require "Config.pm";
   die "Config.pm:$@" if $@;
-  Config::->import;
+  Config->import;
  }
 use File::Compare qw(compare);
 use File::Copy qw(copy);

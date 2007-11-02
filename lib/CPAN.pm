@@ -1257,7 +1257,7 @@ sub has_usable {
                            ],
                'File::HomeDir' => [
                                    sub {require File::HomeDir;
-                                        unless (File::HomeDir::->VERSION >= 0.52) {
+                                        unless (File::HomeDir->VERSION >= 0.52) {
                                             for ("Will not use File::HomeDir, need 0.52\n") {
                                                 $CPAN::Frontend->mywarn($_);
                                                 die $_;
@@ -1267,7 +1267,7 @@ sub has_usable {
                                   ],
                'Archive::Tar' => [
                                   sub {require Archive::Tar;
-                                       unless (Archive::Tar::->VERSION >= 1.00) {
+                                       unless (Archive::Tar->VERSION >= 1.00) {
                                             for ("Will not use Archive::Tar, need 1.00\n") {
                                                 $CPAN::Frontend->mywarn($_);
                                                 die $_;
