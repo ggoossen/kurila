@@ -33,29 +33,29 @@ sub source_path {
     }
 } 
   my @bits;
-  if(-e( File::Spec::->catdir( @bits =
+  if(-e( File::Spec->catdir( @bits =
     source_path('corpus') ) ) )
    {
     # OK
     print "# 1Bits: @bits\n";
-  } elsif( -e (File::Spec::->catdir( @bits =
-    (File::Spec::->curdir, 'corpus') ) )
+  } elsif( -e (File::Spec->catdir( @bits =
+    (File::Spec->curdir, 'corpus') ) )
   ) {
     # OK
     print "# 2Bits: @bits\n";
-  } elsif ( -e (File::Spec::->catdir( @bits =
-    (File::Spec::->curdir, 't', 'corpus') ) )
+  } elsif ( -e (File::Spec->catdir( @bits =
+    (File::Spec->curdir, 't', 'corpus') ) )
   ) {
     # OK
     print "# 3Bits: @bits\n";
   } else {
     die "Can't find the corpusdir";
   }
-  my $corpusdir = File::Spec::->catdir( @bits);
+  my $corpusdir = File::Spec->catdir( @bits);
   print "#Corpusdir: $corpusdir\n";
 
   opendir(INDIR, $corpusdir) or die "Can't opendir corpusdir : $!";
-  my @f = map File::Spec::->catfile(@bits, $_), readdir(INDIR);
+  my @f = map File::Spec->catfile(@bits, $_), readdir(INDIR);
   closedir(INDIR);
   my %f;
   @f{@f} = ();
