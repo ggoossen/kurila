@@ -11,7 +11,7 @@ sub is_dumb  {0}
 sub is_smart {1}
 
 sub all_encodings {
-  return Encode::->encodings(':all');
+  return Encode->encodings(':all');
 }
 
 sub encoding_is_available {

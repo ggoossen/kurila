@@ -501,11 +501,14 @@ if ($from < 1.405) {
 }
 
 if ($from < 1.415) {
-    change_deref($twig);
+    #change_deref($twig);
 }
 
-t_intuit_more($twig);
-t_space_func($twig);
+for my $op_const ($twig->findnodes(q|//op_const|)) {
+    const_handler($twig, $op_const);
+}
+#t_intuit_more($twig);
+#t_space_func($twig);
 
 # print
 $twig->print;

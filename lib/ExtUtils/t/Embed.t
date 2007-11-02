@@ -115,8 +115,8 @@ if ($^O eq 'VMS') {
      $testlib = $Config{'libperl'};
      my $srclib = $testlib;
      $testlib =~ s/.+(?=\.[^.]*)/libperl/;
-     $testlib = File::Spec::->catfile($lib, $testlib);
-     $srclib = File::Spec::->catfile($lib, $srclib);
+     $testlib = File::Spec->catfile($lib, $testlib);
+     $srclib = File::Spec->catfile($lib, $srclib);
      if (-f $srclib) {
        unlink $testlib if -f $testlib;
        my $ln_or_cp = $Config{'ln'} || $Config{'cp'};
