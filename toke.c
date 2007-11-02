@@ -4949,12 +4949,7 @@ Perl_yylex(pTHX)
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;
 		    /* Is there a prototype? */
-		    if (
-#ifdef PERL_MAD
-			cv &&
-#endif
-			SvPOK(cv))
-		    {
+		    if (SvPOK(cv)) {
 			STRLEN protolen;
 			const char *proto = SvPV_const((SV*)cv, protolen);
 			if (!protolen)
@@ -4972,28 +4967,23 @@ Perl_yylex(pTHX)
 			}
 		    }
 #ifdef PERL_MAD
-		    {
-			if (PL_madskills) {
-			    PL_nextwhite = PL_thiswhite;
-			    PL_thiswhite = 0;
-			}
-			start_force(PL_curforce);
-			NEXTVAL_NEXTTOKE.opval = yylval.opval;
-			PL_expect = XTERM;
-			if (PL_madskills) {
-			    PL_nextwhite = nextPL_nextwhite;
-			    curmad('X', PL_thistoken);
-			    PL_thistoken = newSVpvs("");
-			}
-			force_next(WORD);
-			TOKEN(NOAMP);
+		    if (PL_madskills) {
+			PL_nextwhite = PL_thiswhite;
+			PL_thiswhite = 0;
 		    }
-#else
+		    start_force(PL_curforce);
+#endif
 		    NEXTVAL_NEXTTOKE.opval = yylval.opval;
 		    PL_expect = XTERM;
+#ifdef PERL_MAD
+		    if (PL_madskills) {
+			PL_nextwhite = nextPL_nextwhite;
+			curmad('X', PL_thistoken);
+			PL_thistoken = newSVpvs("");
+		    }
+#endif
 		    force_next(WORD);
 		    TOKEN(NOAMP);
-#endif
 		}
 
 		/* Call it a bare word */
