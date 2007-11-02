@@ -514,6 +514,18 @@ print(1) + 2;
 #ABC
 (print 1) + 2;
 ====
+$a = lc($a);
+----
+$a = lc $a;
+====
+$a .= lc($a);
+----
+$a .= lc $a;
+====
+lc $a and uc $a
+----
+lc $a and uc $a
+====
 for (1..2) { }
 ----
 for (1..2) { }
