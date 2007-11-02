@@ -317,7 +317,6 @@ static struct debug_tokens {
     { FUNC0,		TOKENTYPE_OPNUM,	"FUNC0" },
     { FUNC0SUB,		TOKENTYPE_OPVAL,	"FUNC0SUB" },
     { FUNC1,		TOKENTYPE_OPNUM,	"FUNC1" },
-    { FUNCMETH,		TOKENTYPE_OPVAL,	"FUNCMETH" },
     { GIVEN,		TOKENTYPE_IVAL,		"GIVEN" },
     { HASHBRACK,	TOKENTYPE_NONE,		"HASHBRACK" },
     { IF,		TOKENTYPE_IVAL,		"IF" },
@@ -2300,100 +2299,6 @@ S_intuit_more(pTHX_ register char *s)
 }
 
 /*
- * S_intuit_method
- *
- * Does all the checking to disambiguate
- *   foo bar
- * between foo(bar) and bar->foo.  Returns 0 if not a method, otherwise
- * FUNCMETH (bar->foo(args)) or METHOD (bar->foo args).
- *
- * First argument is the stuff after the first token, e.g. "bar".
- *
- * Not a method if bar is a filehandle.
- * Not a method if foo is a subroutine prototyped to take a filehandle.
- * Not a method if it's really "Foo $bar"
- * Method if it's "foo $bar"
- * Not a method if it's really "print foo $bar"
- * Method if it's really "foo package::" (interpreted as package->foo)
- * Not a method if bar is known to be a subroutine ("sub bar; foo bar")
- * Not a method if bar is a filehandle or package, but is quoted with
- *   =>
- */
-
-STATIC int
-S_intuit_method(pTHX_ char *start, GV *gv, CV *cv)
-{
-    dVAR;
-    char *s = start + (*start == '$');
-    char tmpbuf[sizeof PL_tokenbuf];
-    STRLEN len;
-    GV* indirgv;
-#ifdef PERL_MAD
-    int soff;
-#endif
-
-    if (gv) {
-	if (SvTYPE(gv) == SVt_PVGV && GvIO(gv))
-	    return 0;
-	if (cv) {
-	    if (SvPOK(cv)) {
-		const char *proto = SvPVX_const(cv);
-		if (proto) {
-		    if (*proto == ';')
-			proto++;
-		    if (*proto == '*')
-			return 0;
-		}
-	    }
-	} else
-	    gv = NULL;
-    }
-    s = scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
-    /* start is the beginning of the possible filehandle/object,
-     * and s is the end of it
-     * tmpbuf is a copy of it
-     */
-
-    if (!keyword(tmpbuf, len, 0)) {
-	if (len > 2 && tmpbuf[len - 2] == ':' && tmpbuf[len - 1] == ':') {
-	    len -= 2;
-	    tmpbuf[len] = '\0';
-#ifdef PERL_MAD
-	    soff = s - SvPVX(PL_linestr);
-#endif
-	    goto bare_package;
-	}
-	indirgv = gv_fetchpvn_flags(tmpbuf, len, 0, SVt_PVCV);
-	if (indirgv && GvCVu(indirgv))
-	    return 0;
-	/* filehandle makes it a method */
-	if (GvIO(indirgv)) {
-#ifdef PERL_MAD
-	    soff = s - SvPVX(PL_linestr);
-#endif
-	    s = PEEKSPACE(s);
-	    if ((PL_bufend - s) >= 2 && *s == '=' && *(s+1) == '>')
-		return 0;	/* no assumptions -- "=>" quotes bearword */
-      bare_package:
-	    start_force(PL_curforce);
-	    NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST, 0,
-						   newSVpvn(tmpbuf,len));
-	    NEXTVAL_NEXTTOKE.opval->op_private = OPpCONST_BARE;
-	    if (PL_madskills)
-		curmad('X', newSVpvn(start,SvPVX(PL_linestr) + soff - start));
-	    PL_expect = XTERM;
-	    force_next(WORD);
-	    PL_bufptr = s;
-#ifdef PERL_MAD
-	    PL_bufptr = SvPVX(PL_linestr) + soff; /* restart before space */
-#endif
-	    return *s == '(' ? FUNCMETH : METHOD;
-	}
-    }
-    return 0;
-}
-
-/*
  * S_incl_perldb
  * Return a string of Perl code to load the debugger.  If PERL5DB
  * is set, it will return the contents of that, otherwise a
@@ -2705,7 +2610,6 @@ Perl_madlex(pTHX)
     /* opval doesn't need a TOKEN since it can already store mp */
     case WORD:
     case METHOD:
-    case FUNCMETH:
     case THING:
     case PMFUNC:
     case PRIVATEREF:
@@ -4867,32 +4771,22 @@ Perl_yylex(pTHX)
  
 
 		/* Look for a subroutine with this name in current package,
-		   unless name is "Foo::", in which case Foo is a bearword
-		   (and a package name). */
+		   unless name is "Foo::" which isn't allowed. */
 
-		if (len > 2 && !PL_madskills &&
+		if (len > 2 &&
 		    PL_tokenbuf[len - 2] == ':' && PL_tokenbuf[len - 1] == ':')
 		{
-		    if (ckWARN(WARN_BAREWORD)
-			&& ! gv_fetchpvn_flags(PL_tokenbuf, len, 0, SVt_PVHV))
-			Perl_warner(aTHX_ packWARN(WARN_BAREWORD),
-		  	    "Bareword \"%s\" refers to nonexistent package",
-			     PL_tokenbuf);
-		    len -= 2;
-		    PL_tokenbuf[len] = '\0';
-		    gv = NULL;
-		    gvp = 0;
+		    /* And if "Foo::", then that's what it certainly is. */
+		    Perl_croak(aTHX_ "Bareword \"%s\" refering to a package are not allowed", PL_tokenbuf);
 		}
-		else {
-		    if (!gv) {
-			/* Mustn't actually add anything to a symbol table.
-			   But also don't want to "initialise" any placeholder
-			   constants that might already be there into full
-			   blown PVGVs with attached PVCV.  */
-			gv = gv_fetchpvn_flags(PL_tokenbuf, len,
-					       GV_NOADD_NOINIT, SVt_PVCV);
-		    }
-		    len = 0;
+
+		if (!gv) {
+		    /* Mustn't actually add anything to a symbol table.
+		       But also don't want to "initialise" any placeholder
+		       constants that might already be there into full
+		       blown PVGVs with attached PVCV.  */
+		    gv = gv_fetchpvn_flags(PL_tokenbuf, len,
+					   GV_NOADD_NOINIT, SVt_PVCV);
 		}
 
 		/* if we saw a global override before, get the right name */
@@ -4902,9 +4796,6 @@ Perl_yylex(pTHX)
 		    sv_catpv(sv,PL_tokenbuf);
 		}
 		else {
-		    /* If len is 0, newSVpv does strlen(), which is correct.
-		       If len is non-zero, then it will be the true length,
-		       and so the scalar will be created correctly.  */
 		    sv = newSVpv(PL_tokenbuf,len);
 		}
 #ifdef PERL_MAD
@@ -4920,11 +4811,6 @@ Perl_yylex(pTHX)
 		CLINE;
 		yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv);
 		yylval.opval->op_private = OPpCONST_BARE;
-
-		/* And if "Foo::", then that's what it certainly is. */
-
-		if (len)
-		    goto safe_bareword;
 
 		/* Do the explicit type check so that we don't need to force
 		   the initialisation of the symbol table to have a real GV.
@@ -4957,12 +4843,6 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 		    PL_nextwhite = nextPL_nextwhite;	/* assume no & deception */
 #endif
-
-		    /* Two barewords in a row may indicate method call. */
-
-		    if ((isIDFIRST_lazy_if(s,UTF) || *s == '$') &&
-			(tmp = intuit_method(s, gv, cv)))
-			return REPORT(tmp);
 
 		    /* If not a declared subroutine, it's an indirect object. */
 		    /* (But it's an indir obj regardless for sort.) */
@@ -5134,7 +5014,6 @@ Perl_yylex(pTHX)
 		    }
 		}
 
-	    safe_bareword:
 		if ((lastchar == '*' || lastchar == '%' || lastchar == '&')
 		    && ckWARN_d(WARN_AMBIGUOUS)) {
 		    Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),

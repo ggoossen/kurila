@@ -1514,7 +1514,6 @@ s	|void	|checkcomma	|NN const char *s|NN const char *name \
 s	|bool	|feature_is_enabled|NN const char* name|STRLEN namelen
 s	|void	|force_ident	|NN const char *s|int kind
 s	|void	|incline	|NN const char *s
-s	|int	|intuit_method	|NN char *s|NULLOK GV *gv|NULLOK CV *cv
 s	|int	|intuit_more	|NN char *s
 s	|I32	|lop		|I32 f|int x|NN char *s
 rs	|void	|missingterm	|NULLOK char *s
