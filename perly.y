@@ -66,7 +66,7 @@
 
 %token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
 
-%token <opval> WORD METHOD FUNCMETH THING PMFUNC PRIVATEREF
+%token <opval> WORD METHOD THING PMFUNC PRIVATEREF
 %token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
 %token <p_tkval> LABEL
 %token <i_tkval> SUB ANONSUB PACKAGE USE
@@ -718,20 +718,6 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 				append_elem(OP_LIST, scalar($1),
 				    newUNOP(OP_METHOD, 0, $3)));
 			  TOKEN_GETMAD($2,$$,'A');
-			}
-	|	METHOD indirob listexpr              /* new Class @args */
-			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST,
-				    prepend_elem(OP_LIST, $2, $3),
-				    newUNOP(OP_METHOD, 0, $1)));
-			}
-	|	FUNCMETH indirob '(' listexprcom ')' /* method $object (@args) */
-			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST,
-				    prepend_elem(OP_LIST, $2, $4),
-				    newUNOP(OP_METHOD, 0, $1)));
-			  TOKEN_GETMAD($3,$$,'(');
-			  TOKEN_GETMAD($5,$$,')');
 			}
 	|	LSTOP listexpr                       /* print @args */
 			{ $$ = convert(IVAL($1), 0, $2);

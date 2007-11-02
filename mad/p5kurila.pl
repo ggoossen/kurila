@@ -96,7 +96,13 @@ sub const_handler {
     }
 
     # keep Foo::Bar->new()
-    return if $const->parent->tag eq "op_entersub";
+    if ($const->parent->tag eq "op_entersub") {
+        # but change Foo::->new() to Foo->new()
+        if (get_madprop($const, 'value') =~ m/(.*)\:\:$/) {
+            set_madprop($const, 'value', $1);
+        }
+        return;
+    }
 
     # keep qq| $aap{noot} |
     if (($const->parent->tag eq "op_helem" or
@@ -455,6 +461,7 @@ sub t_space_func {
         next unless get_madprop($op, "round_open", 'wsbefore');
         next if (get_madprop($op, "null_type") || '') eq "(";
         next if $op->att('flags') =~ m/PARENS/;
+        next unless get_madprop($op, "operator") or $op->tag eq "op_entersub";
         set_madprop($op, "round_open", get_madprop($op, "round_open"), wsbefore => '');
     }
 }
