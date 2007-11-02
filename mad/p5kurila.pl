@@ -8,6 +8,7 @@ use warnings;
 use XML::Twig;
 use XML::Twig::XPath;
 use Getopt::Long;
+use Carp::Assert;
 
 sub fst(@) {
     return $_[0];
@@ -169,6 +170,7 @@ sub set_madprop {
 
 sub get_madprop {
     my ($op, $key, $attr) = @_;
+    assert($op);
     my ($madsv) = $op->findnodes(qq|madprops/mad_$key|);
     return $madsv && $madsv->att($attr || "val");
 }
@@ -455,14 +457,34 @@ sub t_intuit_more {
     }
 }
 
-sub t_space_func {
+sub t_parenthesis {
     my $xml = shift;
     for my $op ($xml->findnodes(q{//*})) {
-        next unless get_madprop($op, "round_open", 'wsbefore');
-        next if (get_madprop($op, "null_type") || '') eq "(";
-        next if $op->att('flags') =~ m/PARENS/;
+        next unless get_madprop($op, "round_open");
+#         next if (get_madprop($op, "null_type") || '') eq "(";
+#         next if $op->att('flags') =~ m/PARENS/;
         next unless get_madprop($op, "operator") or $op->tag eq "op_entersub";
-        set_madprop($op, "round_open", get_madprop($op, "round_open"), wsbefore => '');
+#        set_madprop($op, "round_open", get_madprop($op, "round_open"), wsbefore => '');
+        set_madprop($op, "round_open", get_madprop($op, "round_open", 'wsbefore') ? '' : ' ');
+        set_madprop($op, "round_close", '');
+
+        next if $op->prev_sibling('op_nextstate');
+
+        my $op_null = XML::Twig::Elt->new("op_null");
+        $op->replace_with($op_null);
+        $op->move($op_null);
+        set_madprop($op_null, "null_type", "(");
+        if ($op->tag eq "op_entersub") {
+            my $func = $op->child(-1)->child(-1);
+            $func = $func->child(-1) if $func->tag eq "op_null";
+            set_madprop($op_null, "round_open", "(", wsbefore => get_madprop($func, "value", 'wsbefore'));
+            set_madprop($func, "value", get_madprop($func, "value"), wsbefore => '');
+        }
+        else {
+            set_madprop($op_null, "round_open", "(", wsbefore => get_madprop($op, "operator", 'wsbefore'));
+            set_madprop($op, "operator", get_madprop($op, "operator"), wsbefore => '');
+        }
+        set_madprop($op_null, "round_close", ")");
     }
 }
 
@@ -472,7 +494,9 @@ GetOptions("from=f" => \$from);
 my $filename = shift @ARGV;
 
 # parsing
-my $twig= XML::Twig->new( keep_spaces => 1, keep_encoding => 1 );
+my $twig= XML::Twig->new( # keep_spaces => 1,
+                         discard_spaces => 1,
+ keep_encoding => 1 );
 
 $twig->parsefile( "-" );
 
@@ -501,14 +525,14 @@ if ($from < 1.405) {
 }
 
 if ($from < 1.415) {
-    #change_deref($twig);
+    change_deref($twig);
 }
 
 for my $op_const ($twig->findnodes(q|//op_const|)) {
     const_handler($twig, $op_const);
 }
-#t_intuit_more($twig);
-#t_space_func($twig);
+t_intuit_more($twig);
+t_parenthesis($twig);
 
 # print
 $twig->print;
