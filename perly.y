@@ -703,6 +703,7 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
+                          APPEND_MADPROPS_PV("func", $$, '>');
 			}
 	|	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
@@ -712,22 +713,26 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			  TOKEN_GETMAD($2,$$,'A');
 			  TOKEN_GETMAD($4,$$,'(');
 			  TOKEN_GETMAD($6,$$,')');
+                          APPEND_MADPROPS_PV("method", $$, '>');
 			}
 	|	term ARROW method                     /* $foo->bar */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST, scalar($1),
 				    newUNOP(OP_METHOD, 0, $3)));
 			  TOKEN_GETMAD($2,$$,'A');
+                          APPEND_MADPROPS_PV("method", $$, '>');
 			}
 	|	LSTOP listexpr                       /* print @args */
 			{ $$ = convert(IVAL($1), 0, $2);
 			  TOKEN_GETMAD($1,$$,'o');
+                          APPEND_MADPROPS_PV("listop", $$, '>');
 			}
 	|	FUNC '(' listexprcom ')'             /* print (@args) */
 			{ $$ = convert(IVAL($1), 0, $3);
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($4,$$,')');
+                          APPEND_MADPROPS_PV("func", $$, '>');
 			}
 	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
 			{ SvREFCNT_inc_simple_void(PL_compcv);
@@ -736,6 +741,7 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				 append_elem(OP_LIST,
 				   prepend_elem(OP_LIST, $<opval>4, $5), $1));
+                          APPEND_MADPROPS_PV("listop", $$, '>');
 			}
 	;
 
@@ -957,7 +963,10 @@ termbinop:	term ASSIGNOP term                     /* $x = $y */
 				($$->op_type == OP_NOT
 				    ? ((UNOP*)$$)->op_first : $$),
 				'~');
-                          APPEND_MADPROPS_PV("bind_match",$$,'>');
+                          APPEND_MADPROPS_PV("bind_match",
+				($$->op_type == OP_NOT
+				    ? ((UNOP*)$$)->op_first : $$),
+                                             '>');
 			}
     ;
 
@@ -1177,12 +1186,14 @@ term	:	termbinop
 			      }
 			      token_getmad($2,op,'(');
 			      token_getmad($4,op,')');
+                              APPEND_MADPROPS_PV("amper", $$, '>');
 			  })
 			}
 	|	NOAMP WORD listexpr                  /* foo(@args) */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 			    append_elem(OP_LIST, $3, scalar($2)));
 			  TOKEN_GETMAD($1,$$,'o');
+                          APPEND_MADPROPS_PV("noamp", $$, '>');
 			}
 	|	LOOPEX  /* loop exiting command (goto, last, dump, etc) */
 			{ $$ = newOP(IVAL($1), OPf_SPECIAL);
@@ -1222,10 +1233,14 @@ term	:	termbinop
                             $$ = newBINOP(OP_COMPSUB, 0, $1, $2);
 			}
 	|	UNIOPSUB
-			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1)); }
+			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1)); 
+                          APPEND_MADPROPS_PV("uniop", $$, '>');
+                        }
 	|	UNIOPSUB term                        /* Sub treated as unop */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-			    append_elem(OP_LIST, $2, scalar($1))); }
+			    append_elem(OP_LIST, $2, scalar($1)));
+                          APPEND_MADPROPS_PV("uniop", $$, '>');
+                        }
 	|	FUNC0                                /* Nullary operator */
 			{ $$ = newOP(IVAL($1), 0);
 			  TOKEN_GETMAD($1,$$,'o');
@@ -1247,12 +1262,14 @@ term	:	termbinop
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
+                          APPEND_MADPROPS_PV("func1", $$, '>');
 			}
 	|	FUNC1 '(' expr ')'                   /* not($foo) */
 			{ $$ = newUNOP(IVAL($1), 0, $3);
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($4,$$,')');
+                          APPEND_MADPROPS_PV("func1", $$, '>');
 			}
 	|	PMFUNC '(' argexpr ')'		/* m//, s///, tr/// */
 			{ $$ = pmruntime($1, $3, 1);
