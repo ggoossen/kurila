@@ -1169,11 +1169,14 @@ term	:	termbinop
 	|	THING	%prec '('
 			{ $$ = $1; }
 	|	amper                                /* &foo; */
-			{ $$ = newUNOP(OP_ENTERSUB, 0, scalar($1)); }
+			{ $$ = newUNOP(OP_ENTERSUB, 0, scalar($1));
+                              APPEND_MADPROPS_PV("amper", $$, '>');
+                        }
 	|	amper '(' ')'                        /* &foo() */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1));
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
+                          APPEND_MADPROPS_PV("amper", $$, '>');
 			}
 	|	amper '(' expr ')'                   /* &foo(@args) */
 			{
