@@ -44,8 +44,7 @@ sub p55 {
         return;
     }
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
-    $output = Encode::decode('utf8', $output);
-    # diag($@) if $@;
+    diag($@) if $@;
     is($output, $input, $msg) or $TODO or die;
 }
 
@@ -245,3 +244,7 @@ my $x;
 "$x->@"
 ########
 $a !~ tr/a-z//;
+########
+my $msg = "ce ºtii tu, bã ?\n";
+use utf8;
+my $msg = "ce ºtii tu, bã ?\n";
