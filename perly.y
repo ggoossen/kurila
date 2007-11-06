@@ -1214,14 +1214,17 @@ term	:	termbinop
 	|	UNIOP                                /* Unary op, $_ implied */
 			{ $$ = newOP(IVAL($1), 0);
 			  TOKEN_GETMAD($1,$$,'o');
+                          APPEND_MADPROPS_PV("uniop", $$, '>');
 			}
 	|	UNIOP block                          /* eval { foo }* */
 			{ $$ = newUNOP(IVAL($1), 0, $2);
 			  TOKEN_GETMAD($1,$$,'o');
+                          APPEND_MADPROPS_PV("uniop", $$, '>');
 			}
 	|	UNIOP term                           /* Unary op */
 			{ $$ = newUNOP(IVAL($1), 0, $2);
 			  TOKEN_GETMAD($1,$$,'o');
+                          APPEND_MADPROPS_PV("uniop", $$, '>');
 			}
 	|	REQUIRE                              /* require, $_ implied */
 			{ $$ = newOP(OP_REQUIRE, $1 ? OPf_SPECIAL : 0);
