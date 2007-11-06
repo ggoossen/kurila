@@ -23,6 +23,8 @@ sub xml_to_p5 {
     $deinterpolate = $options{'deinterpolate'};
     my $YAML = $options{'YAML'};
 
+    $::curenc = 0;		# start in utf8.
+
     local $SIG{__DIE__} = sub {
         my $e = shift;
         $e =~ s/\n$/\n    [NODE $filename line $::prevstate->{line}]/ if $::prevstate;
@@ -370,7 +372,11 @@ sub uni { my $self = shift; $$self{uni}; }	# internal stuff all in utf8
 sub enc {
     my $self = shift;
     my $enc = $enc[$$self{enc} || 0];
-    return encode($enc, $$self{uni});
+    if ( ! $self->{enc} ) {
+        # use encode_utf8 to keep malformed utf8 data intact.
+        return Encode::encode_utf8($self->{uni});
+    }
+    return encode($enc, $self->{uni});
 }
 
 package p5::closequote;	BEGIN { @p5::closequote::ISA = 'p5::punct'; }
@@ -590,20 +596,21 @@ sub hash {
             my $name = $1;
             my $k = $mapping{$name} || $name;
             my $val = $kid->{val};
+            sub my_decode_utf8 { my $x = shift; Encode::_utf8_on($x); return $x; }
             $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
-            $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/bytes::chr(hex $1)/eg;
+            $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/my_decode_utf8(bytes::chr(hex $1))/eg;
             die "duplicate key $k - '$hash{$k}' - '$val'" if exists $hash{$k} and $hash{$k} ne $val;
             $hash{$k} = $val;
             if ($kid->{wsbefore}) {
                 $val = $kid->{wsbefore};
                 $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
-                $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/bytes::chr(hex $1)/eg;
+                $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/my_decode_utf8(bytes::chr(hex $1))/eg;
                 $hash{'_' . $k} = $val;
             }
             if ($kid->{wsafter}) {
                 $val = $kid->{wsafter};
                 $val =~ s/STUPIDXML\(#x(\w+)\)/chr(hex $1)/eg;
-                $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/bytes::chr(hex $1)/eg;
+                $val =~ s/STUPIDXML\(#x\[(\w+)\]\)/my_decode_utf8(bytes::chr(hex $1))/eg;
                 $hash{'#' . $k} = $val;
             }
         }
