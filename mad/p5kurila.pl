@@ -73,7 +73,7 @@ sub const_handler {
     {
         # keep qq| foo => |
         my $x = ($const->parent->tag eq "op_null" and ! $const->parent->att('was')) ? $const->parent : $const;
-        my ($next) = $x->parent->child($x->pos + 1);
+        my $next = $x->parent->child($x->pos);
         if (get_madprop($const, "value") =~ m/^\w+$/) {
             return if $next && (get_madprop($next, "comma") || '') eq "=&gt;";
             return if get_madprop($const->parent, "bigarrow");
@@ -412,14 +412,17 @@ sub remove_useversion {
     }
 }
 
-sub change_deref {
+sub change_deref_method {
     my $xml = shift;
     # '->$...' to '->&$...'
     for my $op_method ($xml->findnodes(q{//op_method})) {
         next if $op_method->findnodes(q{op_const[@private='BARE']});
         set_madprop($op_method->parent, 'bigarrow', "-&gt;&amp;");
     }
+}
 
+sub change_deref {
+    my $xml = shift;
     # '@{...}' to '...->@', etc.
     for (['@', 'ary', 'av'], [qw|$ variable sv|], [qw|% hsh hv|], [qw|* star gv|], [qw|&amp; ampersand cv|]) {
         my ($sigil, $token, $xv) = @$_;
@@ -443,7 +446,7 @@ sub change_deref {
     }
 }
 
-sub t_intuit_more {
+sub intuit_more {
     my $xml = shift;
 
     # remove $foo[..] where intuit_more would return false.
@@ -530,14 +533,14 @@ if ($from < 1.405) {
 }
 
 if ($from < 1.415) {
-    change_deref($twig);
+    change_deref_method($twig);
 }
 
 for my $op_const ($twig->findnodes(q|//op_const|)) {
     const_handler($twig, $op_const);
 }
-t_intuit_more($twig);
-t_parenthesis($twig);
+intuit_more($twig);
+#t_parenthesis($twig);
 
 # print
 $twig->print;
