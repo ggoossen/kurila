@@ -248,3 +248,8 @@ $a !~ tr/a-z//;
 my $msg = "ce 尊tii tu, b達 ?\n";
 use utf8;
 my $msg = "ce 尊tii tu, b達 ?\n";
+#######
+use strict;
+use utf8;
+use encoding 'euc-jp';
+is('123', "これはDATAファイルハンドルのテストです。"."\n");

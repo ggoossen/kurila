@@ -1262,13 +1262,6 @@ S_curmad(pTHX_ char slot, SV *sv)
 
     if (PL_faketokens)
 	sv_setpvn(sv, "", 0);
-    else {
-	if (!IN_BYTES) {
-	    if (PL_encoding) {
-		sv_recode_to_utf8(sv, PL_encoding);
-	    }
-	}
-    }
 
     /* keep a slot open for the head of the list? */
     if (slot != '_' && *where && (*where)->mad_key == '^') {

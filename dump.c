@@ -2089,7 +2089,7 @@ Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len)
   retry:
     while (pv < e) {
 	c = utf8n_to_uvchr((U8*)pv, UTF8_MAXBYTES, &cl, UTF8_CHECK_ONLY);
-	if (cl == (STRLEN)-1) {
+	if ( (cl == (STRLEN)-1) || (c > 0xFF) ) {
 	    c = ((U8)*pv & 0xFF);
 	    Perl_sv_catpvf(aTHX_ dsv, "STUPIDXML(#x[%X])", c);
 	    pv++;
