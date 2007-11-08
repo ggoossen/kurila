@@ -27,9 +27,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_parenthesis();
+#t_parenthesis();
+#t_change_deref();
 t_intuit_more();
-t_change_deref();
+t_change_deref_method();
 t_remove_useversion();
 t_rename_bit_operators();
 t_typed_declaration();
@@ -151,32 +152,32 @@ END
 
 sub t_strict_refs {
     p5convert( 'print {Symbol::fetch_glob("STDOUT")} "foo"',
-               'print {(Symbol::fetch_glob "STDOUT")} "foo"' );
+               'print {Symbol::fetch_glob("STDOUT")} "foo"' );
     p5convert( 'print {"STDOUT"} "foo"',
                'print {Symbol::fetch_glob("STDOUT")} "foo"' );
     p5convert( 'my $pkg; *{$pkg . "::bar"} = sub { "foo" }',
-               'my $pkg; Symbol::fetch_glob($pkg . "::bar")->* = sub { "foo" }');
+               'my $pkg; *{Symbol::fetch_glob($pkg . "::bar")} = sub { "foo" }');
     p5convert( 'my $pkg; *{"$pkg\::bar"} = sub { "foo" }',
-               'my $pkg; Symbol::fetch_glob("$pkg\::bar")->* = sub { "foo" }');
+               'my $pkg; *{Symbol::fetch_glob("$pkg\::bar")} = sub { "foo" }');
     p5convert( 'my $pkg; ${$pkg . "::bar"} = "noot"',
-               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->$ = "noot"');
+               'my $pkg; ${*{Symbol::fetch_glob($pkg . "::bar")}} = "noot"');
     p5convert( 'my $pkg; @{$pkg . "::bar"} = ("noot", "mies")',
-               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->@ = ("noot", "mies")');
+               'my $pkg; @{*{Symbol::fetch_glob($pkg . "::bar")}} = ("noot", "mies")');
     p5convert( 'my $pkg; %{$pkg . "::bar"} = { aap => "noot" }',
-               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->% = { aap => "noot" }');
+               'my $pkg; %{*{Symbol::fetch_glob($pkg . "::bar")}} = { aap => "noot" }');
     p5convert( 'my $pkg; &{$pkg . "::bar"} = sub { "foobar" }',
-               'my $pkg; (Symbol::fetch_glob($pkg . "::bar")->*)->& = sub { "foobar" }');
+               'my $pkg; &{*{Symbol::fetch_glob($pkg . "::bar")}} = sub { "foobar" }');
     p5convert( 'my $pkg; defined &{$pkg . "::bar"}',
-               'my $pkg; defined (Symbol::fetch_glob($pkg . "::bar")->*)->&');
+               'my $pkg; defined &{*{Symbol::fetch_glob($pkg . "::bar")}}');
     p5convert( '*$AUTOLOAD',
-               'Symbol::fetch_glob($AUTOLOAD)->*');
+               '*{Symbol::fetch_glob($AUTOLOAD)}');
     p5convert( 'my $name = "foo"; *$name',
-               'my $name = "foo"; Symbol::fetch_glob($name)->*');
+               'my $name = "foo"; *{Symbol::fetch_glob($name)}');
     p5convert( '*$globref',
-               '$globref->*');
+               '*$globref');
 
     p5convert( 'my $pkg; keys %Package::',
-               'my $pkg; keys Symbol::stash("Package")->%');
+               'my $pkg; keys %{Symbol::stash("Package")}');
     {
         local $TODO = 1;
         p5convert( 'my $pkg; $Package::{"var"}',
@@ -191,13 +192,13 @@ my $string = "s";
 ---
 # finding strings
 my $string = "s";
-(Symbol::fetch_glob($string)->*)->@ = sub { 1 };
+@{*{Symbol::fetch_glob($string)}} = sub { 1 };
 ===
 my $string = "s";
 @{$string} = sub { 1 };
 ---
 my $string = "s";
-(Symbol::fetch_glob($string)->*)->@ = sub { 1 };
+@{*{Symbol::fetch_glob($string)}} = sub { 1 };
 ===
 my $string;
 $string =~ s/a/b/;
@@ -205,7 +206,7 @@ $string =~ s/a/b/;
 ---
 my $string;
 $string =~ s/a/b/;
-(Symbol::fetch_glob($string)->*)->@ = sub { 1 };
+@{*{Symbol::fetch_glob($string)}} = sub { 1 };
 ===
 my $x = "string";
 sub foo {
@@ -216,7 +217,7 @@ sub foo {
 my $x = "string";
 sub foo {
   my $h;
-  $h->@ = ();
+  @{$h} = ();
 }
 ===
 # not if 'use strict'
@@ -227,7 +228,7 @@ my $string = "s";
 # not if 'use strict'
 use strict;
 my $string = "s";
-$string->@ = sub { 1 };
+@$string = sub { 1 };
 ===
 # variable is a hard ref
 my $ref = "s";
@@ -237,13 +238,13 @@ $ref = [];
 # variable is a hard ref
 my $ref = "s";
 $ref = [];
-$ref->@ = sub { 1 };
+@$ref = sub { 1 };
 ===
 my $subname = "bla";
 $subname->();
 ---
 my $subname = "bla";
-Symbol::fetch_glob($subname)->*->();
+*{Symbol::fetch_glob($subname)}->();
 END
 
 }
@@ -387,6 +388,14 @@ $a ^&^ $b;
 $a ^ $b;
 ----------
 $a ^^^ $b;
+END
+}
+
+sub t_change_deref_method {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+Foo->$bar();
+----
+Foo->&$bar();
 END
 }
 
