@@ -233,7 +233,7 @@ xor		$x xor $y
 cond_expr	$x ? 1 : 0
 andassign	$x &&= $y
 orassign	$x ||= $y
-method		Foo->$x()
+method		Foo->?$x()
 entersub	f()
 leavesub	sub f{} f()
 leavesublv	sub f:lvalue{return $x} f()
