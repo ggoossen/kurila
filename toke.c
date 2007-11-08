@@ -10177,7 +10177,6 @@ S_scan_subst(pTHX_ char *start)
     if (PL_madskills) {
 	CURMAD('q', PL_thisopen);
 	CURMAD('_', PL_thiswhite);
-	CURMAD('E', PL_thisstuff);
 	CURMAD('Q', PL_thisclose);
 	PL_realtokenstart = s - SvPVX(PL_linestr);
     }
@@ -10285,7 +10284,6 @@ S_scan_trans(pTHX_ char *start)
     if (PL_madskills) {
 	CURMAD('q', PL_thisopen);
 	CURMAD('_', PL_thiswhite);
-	CURMAD('E', PL_thisstuff);
 	CURMAD('Q', PL_thisclose);
 	PL_realtokenstart = s - SvPVX(PL_linestr);
     }

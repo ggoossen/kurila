@@ -681,7 +681,6 @@ struct madtoken {
  * D       do block
  * e       unreached "else" (see C)
  * e       expression producing E
- * E       tr/E/R/, /E/
  * f       folded constant op
  * F       peg op for format
  * g       op was forced to be a word

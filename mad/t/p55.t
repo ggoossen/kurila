@@ -112,8 +112,6 @@ our %failing = map { $_, 1 } qw|
 
 ../t/op/exec.t
 
-../t/uni/tr_7jis.t ../t/uni/tr_eucjp.t ../t/uni/tr_sjis.t
-
 ** sources filters **
 ../ext/Encode/t/jperl.t
 |;
@@ -245,11 +243,11 @@ my $x;
 ########
 $a !~ tr/a-z//;
 ########
+s/foo/$bar/;
+s/$foo/$bar/;
+########
+$a =~ s/$foo/$bar/;
+########
 my $msg = "ce 尊tii tu, b達 ?\n";
 use utf8;
 my $msg = "ce 尊tii tu, b達 ?\n";
-#######
-use strict;
-use utf8;
-use encoding 'euc-jp';
-is('123', "これはDATAファイルハンドルのテストです。"."\n");

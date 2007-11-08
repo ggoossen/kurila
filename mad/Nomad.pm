@@ -372,6 +372,7 @@ sub uni { my $self = shift; $$self{uni}; }	# internal stuff all in utf8
 sub enc {
     my $self = shift;
     my $enc = $enc[$$self{enc} || 0];
+
     if ( ! $self->{enc} ) {
         # use encode_utf8 to keep malformed utf8 data intact.
         return Encode::encode_utf8($self->{uni});
@@ -526,7 +527,6 @@ sub hash {
     { '=', "assign" },
     { 'c', "prototyped" },
     { 'X', "value" },
-    { 'G', "endsection" },
     { 'g', "forcedword" },
     { '^', "hat" },
     { ';', "semicolon" },
@@ -543,11 +543,9 @@ sub hash {
     { 's', "sub" },
     { ',', "comma" },
     { 'p', "peg" },
-    { 'E', "evaluated" },
     { 'z', "subst_open" },
     { 'R', "subst_replacement" },
     { 'Z', "subst_close" },
-    { 'e', "trans_something_e" },
     { 'r', "trans_something_r" },
     { '3', "arg_3" },
     { '2', "arg_2" },
@@ -960,7 +958,14 @@ BEGIN {
 	'peg' => sub {		# peg for #! line, etc.
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('p G');
+	    push @newkids, $self->madness('p');
+
+            # endsection is unencoded.
+            {
+                local $::curenc = 0;
+                push @newkids, $self->madness('endsection');
+            }
+
 	    $::curstate = 0;
 	    return P5AST::peg->new(Kids => [@newkids])
 	},
@@ -1115,7 +1120,7 @@ BEGIN {
 	    my @folded = $self->madness('C');
 	    if (@folded) {
 		my @t = $self->madness('t');
-		my @e = $self->madness('e');
+		my @e = $self->madness('trans_something_e');
 		if (@e) {
 		    return P5AST::op_cond_expr->new(
 			Kids => [
@@ -1476,8 +1481,8 @@ sub ast {
     if ($$self{mp}{X}) {
 	return $self->madness('X m');
     }
-    if ($$self{mp}{e}) {
-	return $self->madness('e m');
+    if ($$self{mp}{trans_something_e}) {
+	return $self->madness('trans_something_e m');
     }
     return $$self{Kids}[1]->ast($self,@_), $self->madness('m');
 }
@@ -1744,10 +1749,13 @@ sub ast {
     my $X = p5::token->new($$self{mp}{X});
     my @lfirst = $self->madness('q');
     my @llast = $self->madness('Q');
-    push @newkids,
-	@lfirst,
-	$self->madness('E'),	# XXX s/b e probably
-	@llast;
+    push @newkids, @lfirst;
+    if ($self->{mp}{trans_something_e}) {
+        push @newkids, $self->madness('trans_something_e');	# XXX s/b e probably
+    } else {
+        push @newkids, $self->{Kids}[-1]->ast($self, @_);
+    }
+    push @newkids, @llast;
     my @rfirst = $self->madness('z');
     my @rlast = $self->madness('Z');
     my @mods = $self->madness('m');
@@ -1781,10 +1789,10 @@ sub ast {
     my @llast = $self->madness('Q');
     push @newkids,
 	@lfirst,
-	$self->madness('E'),
+	$self->madness('trans_something_e'),
 	@llast;
     my @rfirst = $self->madness('z');
-    my @repl = $self->madness('R');
+    my @repl = $self->madness('r');
     my @rlast = $self->madness('Z');
     my @mods = $self->madness('m');
     if ($rfirst[-1]->uni ne $llast[-1]->uni) {
@@ -2717,8 +2725,8 @@ sub ast {
 	if ($$self{mp}{t}) {
 	    push @before, $self->madness('t');
 	}
-	elsif ($$self{mp}{e}) {
-	    push @after, $self->madness('e');
+	elsif ($$self{mp}{trans_something_e}) {
+	    push @after, $self->madness('trans_something_e');
 	}
 	return P5AST::op_cond->new(Kids => [@before, $retval, @after]);
     }
@@ -2743,7 +2751,7 @@ sub ast {
     my @folded = $self->madness('C');
     if (@folded) {
 	my @t = $self->madness('t');
-	my @e = $self->madness('e');
+	my @e = $self->madness('trans_something_e');
 	if (@e) {
 	    return $self->newtype->new(
 		Kids => [
