@@ -1096,7 +1096,12 @@ BEGIN {
 	},
 	'quote' => sub {				# random quote
 	    my $self = shift;
-	    return P5AST::quote->new(Kids => [$self->madness('q = Q')])
+            my @kids;
+            {
+                local $::curenc = 0;
+                push @kids, $self->madness('=');
+            }
+	    return P5AST::quote->new(Kids => [$self->madness('q'), @kids, $self->madness('Q')])
 	},
 	'value' => sub {				# random literal
 	    my $self = shift;

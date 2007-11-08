@@ -251,3 +251,6 @@ $a =~ s/$foo/$bar/;
 my $msg = "ce ºtii tu, bã ?\n";
 use utf8;
 my $msg = "ce ºtii tu, bã ?\n";
+########
+use encoding 'latin1';
+my @a = qw{bl� arg};
