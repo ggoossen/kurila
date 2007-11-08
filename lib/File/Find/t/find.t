@@ -7,11 +7,9 @@ my %Expect_Dir  = (); # what we expect for $File::Find::dir
 my $symlink_exists = eval { symlink("",""); 1 };
 my $warn_msg;
 
+use Carp::Heavy (); # make sure Carp::Heavy is already loaded, because @INC is relative
 
 BEGIN {
-    chdir 't' if -d 't';
-    unshift @INC => '../lib';
-
     $SIG{'__WARN__'} = sub { $warn_msg = $_[0]; warn "# $_[0]"; }
 }
 
