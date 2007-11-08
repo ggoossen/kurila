@@ -1021,7 +1021,7 @@ BEGIN {
 	    }
 	    elsif ($module->uni eq 'utf8') {
 		if ($$self{mp}{o} eq 'no') {
-		    $::curenc = Nomad::encnum('iso-8859-1');
+		    $::curenc = 0;
 		}
 		else {
 		    $::curenc = Nomad::encnum('utf-8');
