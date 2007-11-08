@@ -6,13 +6,8 @@ my %Expect_Name = (); # what we expect for $File::Find::name/fullname
 my %Expect_Dir  = (); # what we expect for $File::Find::dir
 my ($cwd, $cwd_untainted);
 
-
-BEGIN {
-    chdir 't' if -d 't';
-    unshift @INC => '../lib';
-}
-
 use Config;
+use Carp::Heavy ();
 
 BEGIN {
     if ($^O ne 'VMS') {
