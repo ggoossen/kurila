@@ -31,7 +31,6 @@ sub convert {
 
     # sanity Perl 5 to Perl 5 works.
     my $p5 = Nomad::xml_to_p5( input => "$file.xml" );
-    $p5 = Encode::decode('utf8', $p5);
     if ($p5 ne $input) {
         use Text::Diff;
         warn diff(\$input, \$p5);
@@ -45,7 +44,7 @@ sub convert {
     }
 
     # XML back to Perl 5
-    return Encode::decode('utf8', Nomad::xml_to_p5( input => "$file.xml" ));
+    return Nomad::xml_to_p5( input => "$file.xml" );
 }
 
 1;
