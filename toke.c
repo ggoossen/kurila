@@ -3649,7 +3649,7 @@ Perl_yylex(pTHX)
 			/* ->$ closes the interpoltion and creates a join */
 			PL_lex_state = LEX_INTERPEND;
 		    }
-		    OPERATOR(DEREFSTAR);
+		    OPERATOR(DEREFAMP);
 		} 
 		s = SKIPSPACE1(s);
 		if (isIDFIRST_lazy_if(s,UTF)) {
