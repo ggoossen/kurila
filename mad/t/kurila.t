@@ -395,7 +395,7 @@ sub t_change_deref_method {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
 Foo->$bar();
 ----
-Foo->&$bar();
+Foo->?$bar();
 END
 }
 

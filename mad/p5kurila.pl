@@ -417,7 +417,7 @@ sub change_deref_method {
     # '->$...' to '->&$...'
     for my $op_method ($xml->findnodes(q{//op_method})) {
         next if $op_method->findnodes(q{op_const[@private='BARE']});
-        set_madprop($op_method->parent, 'bigarrow', "-&gt;&amp;");
+        set_madprop($op_method->parent, 'bigarrow', "-&gt;?");
     }
 }
 
