@@ -5,12 +5,11 @@ our $VERSION = '1.11';
 # (feature name) => (internal name, used in %^H)
 my %feature = (
     switch => 'feature_switch',
-    say    => "feature_say",
     state  => "feature_state",
 );
 
 my %feature_bundle = (
-    "5.10.0" => [qw(switch say state)],
+    "5.10.0" => [qw(switch state)],
 );
 
 # latest version here
@@ -27,13 +26,13 @@ feature - Perl pragma to enable new syntactic features
 
 =head1 SYNOPSIS
 
-    use feature qw(switch say);
+    use feature qw(switch);
     given ($foo) {
-	when (1)	  { say "\$foo == 1" }
-	when ([2,3])	  { say "\$foo == 2 || \$foo == 3" }
-	when (/^a[bc]d$/) { say "\$foo eq 'abd' || \$foo eq 'acd'" }
-	when ($_ > 100)   { say "\$foo > 100" }
-	default		  { say "None of the above" }
+	when (1)	  { print "\$foo == 1" }
+	when ([2,3])	  { print "\$foo == 2 || \$foo == 3" }
+	when (/^a[bc]d$/) { print "\$foo eq 'abd' || \$foo eq 'acd'" }
+	when ($_ > 100)   { print "\$foo > 100" }
+	default		  { print "None of the above" }
     }
 
     use feature ':5.10'; # loads all features available in perl 5.10
@@ -79,13 +78,6 @@ C<use feature 'switch'> tells the compiler to enable the Perl 6
 given/when construct.
 
 See L<perlsyn/"Switch statements"> for details.
-
-=head2 The 'say' feature
-
-C<use feature 'say'> tells the compiler to enable the Perl 6
-C<say> function.
-
-See L<perlfunc/say> for details.
 
 =head2 the 'state' feature
 

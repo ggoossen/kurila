@@ -219,7 +219,6 @@ rewinddir
 rindex
 rmdir
 s
-say
 scalar
 seek
 seekdir

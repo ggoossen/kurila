@@ -2434,7 +2434,6 @@ sub indirop {
 
 sub pp_prtf { indirop(@_, "printf") }
 sub pp_print { indirop(@_, "print") }
-sub pp_say  { indirop(@_, "say") }
 sub pp_sort { indirop(@_, "sort") }
 
 sub mapop {

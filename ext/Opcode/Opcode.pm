@@ -378,7 +378,7 @@ account the magical open of ARGV.
 
     readline rcatline getc read
 
-    print say sysread syswrite send recv
+    print sysread syswrite send recv
 
     eof tell seek sysseek
 

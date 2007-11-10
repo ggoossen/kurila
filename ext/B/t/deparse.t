@@ -339,8 +339,8 @@ my $bar;
 # 44
 'Foo'->bar;
 ####
-# 45 say
-say 'foo';
+# 45
+1; # was 'say'
 ####
 # 46 state vars
 state $x = 42;

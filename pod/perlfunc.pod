@@ -134,7 +134,7 @@ X<I/O> X<input> X<output> X<dbm>
 
 C<binmode>, C<close>, C<closedir>, C<die>, C<eof>,
 C<fileno>, C<flock>, C<format>, C<getc>, C<print>, C<printf>, C<read>,
-C<readdir>, C<rewinddir>, C<say>, C<seek>, C<seekdir>, C<select>, C<syscall>,
+C<readdir>, C<rewinddir>, C<seek>, C<seekdir>, C<select>, C<syscall>,
 C<sysread>, C<sysseek>, C<syswrite>, C<tell>, C<telldir>, C<truncate>,
 C<warn>, C<write>
 
@@ -4671,20 +4671,6 @@ the C<rmtree> function of the L<File::Path> module.
 =item s///
 
 The substitution operator.  See L<perlop>.
-
-=item say FILEHANDLE LIST
-X<say>
-
-=item say LIST
-
-=item say
-
-Just like C<print>, but implicitly appends a newline.
-C<say LIST> is simply an abbreviation for C<{ local $\ = "\n"; print
-LIST }>.
-
-This keyword is only available when the "say" feature is
-enabled: see L<feature>.
 
 =item scalar EXPR
 X<scalar> X<context>
