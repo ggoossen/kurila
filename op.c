@@ -408,12 +408,6 @@ S_op_destroy(pTHX_ OP *o)
     FreeOp(o);
 }
 
-#ifdef USE_ITHREADS
-#  define forget_pmop(a,b)	S_forget_pmop(aTHX_ a,b)
-#else
-#  define forget_pmop(a,b)	S_forget_pmop(aTHX_ a)
-#endif
-
 /* Destructor */
 
 void
@@ -446,7 +440,6 @@ Perl_op_free(pTHX_ OP *o)
 	    if (refcnt) {
 		/* Need to find and remove any pattern match ops from the list
 		   we maintain for reset().  */
-		find_and_forget_pmops(o);
 		return;
 	    }
 	    }
@@ -601,7 +594,6 @@ Perl_op_clear(pTHX_ OP *o)
     case OP_MATCH:
     case OP_QR:
 clear_pmop:
-	forget_pmop(cPMOPo, 1);
 	cPMOPo->op_pmreplrootu.op_pmreplroot = NULL;
         /* we use the "SAFE" version of the PM_ macros here
          * since sv_clean_all might release some PMOPs
@@ -638,65 +630,6 @@ S_cop_free(pTHX_ COP* cop)
     if (! specialWARN(cop->cop_warnings))
 	PerlMemShared_free(cop->cop_warnings);
     SvREFCNT_dec((SV*)cop->cop_hints_hash);
-}
-
-STATIC void
-S_forget_pmop(pTHX_ PMOP *const o
-#ifdef USE_ITHREADS
-	      , U32 flags
-#endif
-	      )
-{
-    HV * const pmstash = PmopSTASH(o);
-    if (pmstash && !SvIS_FREED(pmstash)) {
-	MAGIC * const mg = mg_find((SV*)pmstash, PERL_MAGIC_symtab);
-	if (mg) {
-	    PMOP **const array = (PMOP**) mg->mg_ptr;
-	    U32 count = mg->mg_len / sizeof(PMOP**);
-	    U32 i = count;
-
-	    while (i--) {
-		if (array[i] == o) {
-		    /* Found it. Move the entry at the end to overwrite it.  */
-		    array[i] = array[--count];
-		    mg->mg_len = count * sizeof(PMOP**);
-		    /* Could realloc smaller at this point always, but probably
-		       not worth it. Probably worth free()ing if we're the
-		       last.  */
-		    if(!count) {
-			Safefree(mg->mg_ptr);
-			mg->mg_ptr = NULL;
-		    }
-		    break;
-		}
-	    }
-	}
-    }
-    if (PL_curpm == o) 
-	PL_curpm = NULL;
-#ifdef USE_ITHREADS
-    if (flags)
-	PmopSTASH_free(o);
-#endif
-}
-
-STATIC void
-S_find_and_forget_pmops(pTHX_ OP *o)
-{
-    if (o->op_flags & OPf_KIDS) {
-        OP *kid = cUNOPo->op_first;
-	while (kid) {
-	    switch (kid->op_type) {
-	    case OP_SUBST:
-	    case OP_PUSHRE:
-	    case OP_MATCH:
-	    case OP_QR:
-		forget_pmop((PMOP*)kid, 0);
-	    }
-	    find_and_forget_pmops(kid);
-	    kid = kid->op_sibling;
-	}
-    }
 }
 
 void
@@ -3499,7 +3432,6 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	    repl->op_next = (OP*)rcop;
 
 	    pm->op_pmreplrootu.op_pmreplroot = scalar((OP*)rcop);
-	    assert(!(pm->op_pmflags & PMf_ONCE));
 	    pm->op_pmstashstartu.op_pmreplstart = LINKLIST(rcop);
 	    rcop->op_next = 0;
 	}
@@ -4019,47 +3951,11 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	if (right && right->op_type == OP_SPLIT && !PL_madskills) {
 	    OP* tmpop = ((LISTOP*)right)->op_first;
 	    if (tmpop && (tmpop->op_type == OP_PUSHRE)) {
-		PMOP * const pm = (PMOP*)tmpop;
-		if (left->op_type == OP_RV2AV &&
-		    !(left->op_private & OPpLVAL_INTRO) &&
-		    !(o->op_private & OPpASSIGN_COMMON) )
-		{
-		    tmpop = ((UNOP*)left)->op_first;
-		    if (tmpop->op_type == OP_GV
-#ifdef USE_ITHREADS
-			&& !pm->op_pmreplrootu.op_pmtargetoff
-#else
-			&& !pm->op_pmreplrootu.op_pmtargetgv
-#endif
-			) {
-#ifdef USE_ITHREADS
-			pm->op_pmreplrootu.op_pmtargetoff
-			    = cPADOPx(tmpop)->op_padix;
-			cPADOPx(tmpop)->op_padix = 0;	/* steal it */
-#else
-			pm->op_pmreplrootu.op_pmtargetgv
-			    = (GV*)cSVOPx(tmpop)->op_sv;
-			cSVOPx(tmpop)->op_sv = NULL;	/* steal it */
-#endif
-			pm->op_pmflags |= PMf_ONCE;
-			tmpop = cUNOPo->op_first;	/* to list (nulled) */
-			tmpop = ((UNOP*)tmpop)->op_first; /* to pushmark */
-			tmpop->op_sibling = NULL;	/* don't free split */
-			right->op_next = tmpop->op_next;  /* fix starting loc */
-			op_free(o);			/* blow off assign */
-			right->op_flags &= ~OPf_WANT;
-				/* "I don't know and I don't care." */
-			return right;
-		    }
-		}
-		else {
-                   if (PL_modcount < RETURN_UNLIMITED_NUMBER &&
-		      ((LISTOP*)right)->op_last->op_type == OP_CONST)
-		    {
-			SV *sv = ((SVOP*)((LISTOP*)right)->op_last)->op_sv;
-			if (SvIVX(sv) == 0)
-			    sv_setiv(sv, PL_modcount+1);
-		    }
+		if (PL_modcount < RETURN_UNLIMITED_NUMBER &&
+		    ((LISTOP*)right)->op_last->op_type == OP_CONST) {
+		    SV *sv = ((SVOP*)((LISTOP*)right)->op_last)->op_sv;
+		    if (SvIVX(sv) == 0)
+			sv_setiv(sv, PL_modcount+1);
 		}
 	    }
 	}
@@ -7933,7 +7829,6 @@ Perl_peep(pTHX_ register OP *o)
 	    break;
 
 	case OP_SUBST:
-	    assert(!(cPMOP->op_pmflags & PMf_ONCE));
 	    while (cPMOP->op_pmstashstartu.op_pmreplstart &&
 		   cPMOP->op_pmstashstartu.op_pmreplstart->op_type == OP_NULL)
 		cPMOP->op_pmstashstartu.op_pmreplstart
@@ -8272,9 +8167,7 @@ Perl_peep(pTHX_ register OP *o)
 	
 	case OP_QR:
 	case OP_MATCH:
-	    if (!(cPMOP->op_pmflags & PMf_ONCE)) {
-		assert (!cPMOP->op_pmstashstartu.op_pmreplstart);
-	    }
+	    assert (!cPMOP->op_pmstashstartu.op_pmreplstart);
 	    break;
 	}
 	oldop = o;

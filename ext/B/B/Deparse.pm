@@ -18,7 +18,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPpSORT_REVERSE OPpSORT_INPLACE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
          CVf_METHOD CVf_LOCKED CVf_LVALUE
-	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL PMf_ONCE
+	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED),
 	 ($] < 5.009 ? 'PMf_SKIPWHITE' : 'RXf_SKIPWHITE');
 $VERSION = 0.83;
@@ -4168,10 +4168,7 @@ sub matchop {
     $flags .= "s" if $op->pmflags ^&^ PMf_SINGLELINE;
     $flags .= "x" if $op->pmflags ^&^ PMf_EXTENDED;
     $flags = $matchwords{$flags} if $matchwords{$flags};
-    if ($op->pmflags ^&^ PMf_ONCE) { # only one kind of delimiter works here
-	$re =~ s/\?/\\?/g;
-	$re = "?$re?";
-    } elsif ($quote) {
+    if ($quote) {
 	$re = single_delim($name, $delim, $re);
     }
     $re = $re . $flags if $quote;
