@@ -4222,7 +4222,7 @@ Perl_yylex(pTHX)
 		    while (t < PL_bufend && isSPACE(*t))
 			++t;
 
-		    if (*t == '/' || *t == '?' ||
+		    if (*t == '/' ||
 			((*t == 'm' || *t == 's' || *t == 'y')
 			 && !isALNUM(t[1])) ||
 			(*t == 't' && t[1] == 'r' && !isALNUM(t[2])))
@@ -4388,7 +4388,7 @@ Perl_yylex(pTHX)
 		    PL_expect = XTERM;		/* e.g. print $fh 3 */
 		else if (*s == '.' && isDIGIT(s[1]))
 		    PL_expect = XTERM;		/* e.g. print $fh .3 */
-		else if ((*s == '?' || *s == '-' || *s == '+')
+		else if ((*s == '-' || *s == '+')
 			 && !isSPACE(s[1]) && s[1] != '=')
 		    PL_expect = XTERM;		/* e.g. print $fh -1 */
 		else if (*s == '/' && !isSPACE(s[1]) && s[1] != '='
@@ -4443,23 +4443,17 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    AOPERATOR(DORDOR);
 	}
-     case '?':			/* may either be conditional or pattern */
-	 if(PL_expect == XOPERATOR) {
-	     char tmp = *s++;
-	     if(tmp == '?') {
-    	          OPERATOR('?');
-	     }
-             else {
-	         tmp = *s++;
-	         if(tmp == '/') {
-	             /* A // operator. */
-	            AOPERATOR(DORDOR);
-	         }
-	         else {
-	             s--;
-	             Mop(OP_DIVIDE);
-	         }
-	     }
+	if(PL_expect == XOPERATOR) {
+	    char tmp = *s++;
+	    tmp = *s++;
+	    if(tmp == '/') {
+		/* A // operator. */
+		AOPERATOR(DORDOR);
+	    }
+	    else {
+		s--;
+		Mop(OP_DIVIDE);
+	    }
 	 }
 	 else {
 	     /* Disable warning on "study /blah/" */
@@ -4472,6 +4466,10 @@ Perl_yylex(pTHX)
 	     s = scan_pat(s,OP_MATCH);
 	     TERM(sublex_start());
 	 }
+
+    case '?':			/* conditional */
+	 s++;
+	 OPERATOR('?');
 
     case '.':
 	if (PL_expect == XOPERATOR || !isDIGIT(s[1])) {
