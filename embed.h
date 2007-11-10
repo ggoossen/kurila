@@ -1502,7 +1502,6 @@
 #define feature_is_enabled	S_feature_is_enabled
 #define force_ident		S_force_ident
 #define incline			S_incline
-#define intuit_method		S_intuit_method
 #define intuit_more		S_intuit_more
 #define lop			S_lop
 #define missingterm		S_missingterm
@@ -2219,7 +2218,6 @@
 #define pp_rv2hv		Perl_pp_rv2hv
 #define pp_rv2sv		Perl_pp_rv2sv
 #define pp_sassign		Perl_pp_sassign
-#define pp_say			Perl_pp_say
 #define pp_scalar		Perl_pp_scalar
 #define pp_schomp		Perl_pp_schomp
 #define pp_schop		Perl_pp_schop
@@ -3775,7 +3773,6 @@
 #define feature_is_enabled(a,b)	S_feature_is_enabled(aTHX_ a,b)
 #define force_ident(a,b)	S_force_ident(aTHX_ a,b)
 #define incline(a)		S_incline(aTHX_ a)
-#define intuit_method(a,b,c)	S_intuit_method(aTHX_ a,b,c)
 #define intuit_more(a)		S_intuit_more(aTHX_ a)
 #define lop(a,b,c)		S_lop(aTHX_ a,b,c)
 #define missingterm(a)		S_missingterm(aTHX_ a)
@@ -4496,7 +4493,6 @@
 #define pp_rv2hv()		Perl_pp_rv2hv(aTHX)
 #define pp_rv2sv()		Perl_pp_rv2sv(aTHX)
 #define pp_sassign()		Perl_pp_sassign(aTHX)
-#define pp_say()		Perl_pp_say(aTHX)
 #define pp_scalar()		Perl_pp_scalar(aTHX)
 #define pp_schomp()		Perl_pp_schomp(aTHX)
 #define pp_schop()		Perl_pp_schop(aTHX)

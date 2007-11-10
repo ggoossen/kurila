@@ -249,7 +249,6 @@ EXTCONST char* const PL_op_name[] = {
 	"read",
 	"prtf",
 	"print",
-	"say",
 	"sysopen",
 	"sysseek",
 	"sysread",
@@ -615,7 +614,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"read",
 	"printf",
 	"print",
-	"say",
 	"sysopen",
 	"sysseek",
 	"sysread",
@@ -993,7 +991,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_sysread),	/* Perl_pp_read */
 	MEMBER_TO_FPTR(Perl_pp_prtf),
 	MEMBER_TO_FPTR(Perl_pp_print),
-	MEMBER_TO_FPTR(Perl_pp_print),	/* Perl_pp_say */
 	MEMBER_TO_FPTR(Perl_pp_sysopen),
 	MEMBER_TO_FPTR(Perl_pp_sysseek),
 	MEMBER_TO_FPTR(Perl_pp_sysread),
@@ -1368,7 +1365,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* read */
 	MEMBER_TO_FPTR(Perl_ck_listiob),	/* prtf */
 	MEMBER_TO_FPTR(Perl_ck_listiob),	/* print */
-	MEMBER_TO_FPTR(Perl_ck_listiob),	/* say */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysopen */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysseek */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysread */
@@ -1737,7 +1733,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x122ec81d,	/* read */
 	0x0005c815,	/* prtf */
 	0x0005c815,	/* print */
-	0x0005c815,	/* say */
 	0x1222c804,	/* sysopen */
 	0x0022c804,	/* sysseek */
 	0x122ec81d,	/* sysread */

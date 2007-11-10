@@ -513,6 +513,8 @@ BEGIN {eval 'use IO::Handle'};	# Needed for flush only? breaks under miniperl
 # Debugger for Perl 5.00x; perl5db.pl patch level:
 $VERSION = 1.30;
 
+use Carp::Heavy;
+
 $header = "perl5db.pl version $VERSION";
 
 =head1 DEBUGGER ROUTINES
@@ -3428,7 +3430,7 @@ any variables we might want to address in the C<DB> package.
 
             # Make sure the flag that says "the debugger's running" is
             # still on, to make sure we get control again.
-            $evalarg = "\$^D = \$^D | \$DB::db_stop;\n$cmd";
+            $evalarg = "\$^D = \$^D ^|^ \$DB::db_stop;\n$cmd";
 
             # Run *our* eval that executes in the caller's context.
             &eval;
@@ -7601,9 +7603,10 @@ sub dbwarn {
 
     # Load Carp if we can. If $^S is false (current thing being compiled isn't
     # done yet), we may not be able to do a require.
-    eval { require Carp }
-      if defined $^S;    # If error/warning during compilation,
+    if (defined $^S) {    # If error/warning during compilation,
                          # require may be broken.
+        eval { require Carp; };
+    }
 
     # Use the core warn() unless Carp loaded OK.
     CORE::warn( @_,
@@ -7662,6 +7665,7 @@ sub dbdie {
     # The code used to check $^S to see if compiliation of the current thing
     # hadn't finished. We don't do it anymore, figuring eval is pretty stable.
     eval { require Carp };
+    die if $@;
 
     die( @_,
         "\nCannot print stack trace, load with -MCarp option to see stack" )

@@ -83,7 +83,6 @@ my @raw_alias = (
 		 Perl_pp_or => ['orassign'],
 		 Perl_pp_ucfirst => ['lcfirst'],
 		 Perl_pp_sle => [qw(slt sgt sge)],
-		 Perl_pp_print => ['say'],
 		 Perl_pp_index => ['rindex'],
 		 Perl_pp_oct => ['hex'],
 		 Perl_pp_shift => ['pop'],
@@ -850,7 +849,6 @@ read		read			ck_fun		imst@	F R S S?
 
 prtf		printf			ck_listiob	ims@	F? L
 print		print			ck_listiob	ims@	F? L
-say		say			ck_listiob	ims@	F? L
 
 sysopen		sysopen			ck_fun		s@	F S S S?
 sysseek		sysseek			ck_fun		s@	F S S

@@ -3149,7 +3149,7 @@ sub e_method {
     my $obj = $self->deparse($info->{object}, 24);
 
     my $meth = $info->{method};
-    $meth = $self->deparse($meth, 1) if $info->{variable_method};
+    $meth = '?' . $self->deparse($meth, 1) if $info->{variable_method};
     my $args = join(", ", map { $self->deparse($_, 6) } @{$info->{args}} );
     my $kid = $obj . "->" . $meth;
     if (length $args) {

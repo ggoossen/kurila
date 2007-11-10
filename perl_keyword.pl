@@ -8,7 +8,7 @@ use warnings;
 my @pos = qw(__DATA__ __END__ AUTOLOAD BEGIN CHECK DESTROY default defined
 	    delete do END else eval elsif exists for foreach given grep
 	    goto glob INIT if last local m my map next no our pos print printf
-	    package prototype q qr qq qw qx redo return require s say scalar sort
+	    package prototype q qr qq qw qx redo return require s scalar sort
 	    split state study sub tr tie tied use undef UNITCHECK until untie
 	    unless when while y);
 
@@ -41,8 +41,6 @@ my %feature_kw = (
 	default => 'switch',
 	# continue is already a keyword
 	break   => 'switch',
-
-	say     => 'say',
 
 	err	=> 'err',
 
