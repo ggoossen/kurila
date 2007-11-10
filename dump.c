@@ -522,10 +522,7 @@ Perl_do_pmop_dump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     }
     Perl_dump_indent(aTHX_ level, file, "{\n");
     level++;
-    if (pm->op_pmflags & PMf_ONCE)
-	ch = '?';
-    else
-	ch = '/';
+    ch = '/';
     if (PM_GETRE(pm))
 	Perl_dump_indent(aTHX_ level, file, "PMf_PRE %c%s%c%s\n",
 	     ch, PM_GETRE(pm)->precomp, ch,
@@ -551,16 +548,6 @@ S_pm_description(pTHX_ const PMOP *pm)
     SV * const desc = newSVpvs("");
     const REGEXP * const regex = PM_GETRE(pm);
     const U32 pmflags = pm->op_pmflags;
-
-    if (pmflags & PMf_ONCE)
-	sv_catpv(desc, ",ONCE");
-#ifdef USE_ITHREADS
-    if (SvREADONLY(PL_regex_pad[pm->op_pmoffset]))
-        sv_catpv(desc, ":USED");
-#else
-    if (pmflags & PMf_USED)
-        sv_catpv(desc, ":USED");
-#endif
 
     if (regex) {
         if (regex->extflags & RXf_TAINTED)
@@ -2088,7 +2075,7 @@ Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len)
 
   retry:
     while (pv < e) {
-	c = utf8n_to_uvchr((U8*)pv, UTF8_MAXBYTES, &cl, UTF8_CHECK_ONLY);
+	c = utf8n_to_uvchr(pv, UTF8_MAXBYTES, &cl, UTF8_CHECK_ONLY);
 	if ( (cl == (STRLEN)-1) ) {
 	    c = ((U8)*pv & 0xFF);
 	    Perl_sv_catpvf(aTHX_ dsv, "STUPIDXML(#x[%X])", c);
@@ -2469,7 +2456,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { '<', "null_type_first" },
     { 0,   NULL }
 };
-char* slotname(char s) {
+const char* slotname(char s) {
     int i=0;
     while (slotnames[i].slot != 0) {
 	if (slotnames[i].slot == s)

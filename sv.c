@@ -6892,25 +6892,6 @@ Perl_sv_reset(pTHX_ register const char *s, HV *stash)
     if (!stash)
 	return;
 
-    if (!*s) {		/* reset ?? searches */
-	MAGIC * const mg = mg_find((SV *)stash, PERL_MAGIC_symtab);
-	if (mg) {
-	    const U32 count = mg->mg_len / sizeof(PMOP**);
-	    PMOP **pmp = (PMOP**) mg->mg_ptr;
-	    PMOP *const *const end = pmp + count;
-
-	    while (pmp < end) {
-#ifdef USE_ITHREADS
-                SvREADONLY_off(PL_regex_pad[(*pmp)->op_pmoffset]);
-#else
-		(*pmp)->op_pmflags &= ~PMf_USED;
-#endif
-		++pmp;
-	    }
-	}
-	return;
-    }
-
     /* reset variables */
 
     if (!HvARRAY(stash))

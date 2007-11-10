@@ -4311,7 +4311,7 @@ PP(pp_split)
 	ary = GvAVn(PL_defgv);
     else
 	ary = NULL;
-    if (ary && (gimme != G_ARRAY || (pm->op_pmflags & PMf_ONCE))) {
+    if (ary && (gimme != G_ARRAY)) {
 	realarray = 1;
 	PUTBACK;
 	av_extend(ary,0);

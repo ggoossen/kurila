@@ -1211,19 +1211,12 @@ PP(pp_match)
     TAINT_NOT;
 
     /* PMdf_USED is set after a ?? matches once */
-    if (
-#ifdef USE_ITHREADS
-        SvREADONLY(PL_regex_pad[pm->op_pmoffset])
-#else
-        pm->op_pmflags & PMf_USED
-#endif
-    ) {
+    if (0) {
       failure:
 	if (gimme == G_ARRAY)
 	    RETURN;
 	RETPUSHNO;
     }
-
 
 
     /* empty pattern special-cased to use last successful pattern if possible */
@@ -1297,13 +1290,6 @@ play_it_again:
     if (CALLREGEXEC(rx, (char*)s, (char *)strend, (char*)truebase, minmatch, TARG, gpos, r_flags))
     {
 	PL_curpm = pm;
-	if (dynpm->op_pmflags & PMf_ONCE) {
-#ifdef USE_ITHREADS
-            SvREADONLY_on(PL_regex_pad[dynpm->op_pmoffset]);
-#else
-	    dynpm->op_pmflags |= PMf_USED;
-#endif
-        }
 	goto gotcha;
     }
     else
@@ -1397,13 +1383,6 @@ yup:					/* Confirmed by INTUIT */
 	RX_MATCH_TAINTED_on(rx);
     TAINT_IF(RX_MATCH_TAINTED(rx));
     PL_curpm = pm;
-    if (dynpm->op_pmflags & PMf_ONCE) {
-#ifdef USE_ITHREADS
-        SvREADONLY_on(PL_regex_pad[dynpm->op_pmoffset]);
-#else
-        dynpm->op_pmflags |= PMf_USED;
-#endif
-    }
     if (RX_MATCH_COPIED(rx))
 	Safefree(rx->subbeg);
     RX_MATCH_COPIED_off(rx);
