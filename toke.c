@@ -5797,10 +5797,6 @@ Perl_yylex(pTHX)
 	    else
 		TOKEN(1);	/* force error */
 
-	case KEY_say:
-	    checkcomma(s,PL_tokenbuf,"filehandle");
-	    LOP(OP_SAY,XREF);
-
 	case KEY_chomp:
 	    UNI(OP_CHOMP);
 	
@@ -6768,14 +6764,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
         case 's':
           switch (name[1])
           {
-            case 'a':
-              if (name[2] == 'y')
-              {                                   /* say        */
-                return KEY_say;
-              }
-
-              goto unknown;
-
             case 'i':
               if (name[2] == 'n')
               {                                   /* sin        */

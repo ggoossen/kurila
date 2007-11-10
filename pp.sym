@@ -261,7 +261,6 @@ Perl_pp_getc
 Perl_pp_read
 Perl_pp_prtf
 Perl_pp_print
-Perl_pp_say
 Perl_pp_sysopen
 Perl_pp_sysseek
 Perl_pp_sysread

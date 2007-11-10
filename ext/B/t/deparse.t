@@ -331,7 +331,7 @@ my $f = sub {
 ####
 # 42
 my $bar;
-'Foo'->$bar('orz');
+'Foo'->?$bar('orz');
 ####
 # 43
 'Foo'->bar('orz');
@@ -352,7 +352,7 @@ state $x = 42;
 >>>>
 {
     my $y = state $x = 42;
-
+}
 ####
 # 48 state vars in anoymous subroutines
 $a = sub {

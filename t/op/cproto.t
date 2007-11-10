@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 234;
+plan tests => 233;
 
 while (<DATA>) {
     chomp;
@@ -179,7 +179,6 @@ rewinddir (*)
 rindex ($$;$)
 rmdir (_)
 s undef
-say undef
 scalar undef
 seek (*$$)
 seekdir (*$)

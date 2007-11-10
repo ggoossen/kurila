@@ -4042,9 +4042,6 @@ STATIC void	S_force_ident(pTHX_ const char *s, int kind)
 STATIC void	S_incline(pTHX_ const char *s)
 			__attribute__nonnull__(pTHX_1);
 
-STATIC int	S_intuit_method(pTHX_ char *s, GV *gv, CV *cv)
-			__attribute__nonnull__(pTHX_1);
-
 STATIC int	S_intuit_more(pTHX_ char *s)
 			__attribute__nonnull__(pTHX_1);
 
