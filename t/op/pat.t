@@ -114,32 +114,10 @@ if (/^$_$/) {print "ok 23\n";} else {print "not ok 23\n";}
 # used to be a test for $*
 if ("ab\ncd\n" =~ /^cd/m) {print "ok 24\n";} else {print "not ok 24\n";}
 
-$XXX{123} = 123;
-$XXX{234} = 234;
-$XXX{345} = 345;
-
-@XXX = ('ok 25','not ok 25', 'ok 26','not ok 26','not ok 27');
-while ($_ = shift(@XXX)) {
-    ?(.*)? && (print $1,"\n");
-    /not/ && reset;
-    if (/not ok 26/) {
-      if ($^O eq 'VMS') {
-	$_ = shift(@XXX);
-      }
-      else {
-	reset 'X';
-      }
-   }
+# once pattern has been removed.
+for (25..27) {
+    print "ok $_\n";
 }
-
-if ($^O ne 'VMS') {
-  while (my ($key,$val) = each(%XXX)) {
-    print "not ok 27\n";
-    exit;
-  }
-}
-
-print "ok 27\n";
 
 'cde' =~ /[^ab]*/;
 'xyz' =~ //;
@@ -2614,31 +2592,6 @@ print "# some Unicode properties\n";
     $test++;
 }
 
-{
-    print "# [ID 20020412.005] wrong pmop flags checked when empty pattern\n";
-    # requires reuse of last successful pattern
-    $test = 898;
-    $test =~ /\d/;
-    for (0 .. 1) {
-	my $match = ?? + 0;
-	if ($match != $_) {
-	    print "ok $test\n";
-	} else {
-	    printf "not ok %s\t# 'match once' %s on %s iteration\n", $test,
-		    $match ? 'succeeded' : 'failed', $_ ? 'second' : 'first';
-	}
-	++$test;
-    }
-    $test =~ /(\d)/;
-    my $result = join '', $test =~ //g;
-    if ($result eq $test) {
-	print "ok $test\n";
-    } else {
-	printf "not ok %s\t# expected '%s', got '%s'\n", $test, $test, $result;
-    }
-    ++$test;
-}
-
 print "# user-defined character properties\n";
 
 sub InKana1 {
@@ -2671,7 +2624,7 @@ sub InNotKana {
 END
 }
 
-$test = 901;
+$test = 898;
 
 print "\x{3040}" =~ /\p{InKana1}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 print "\x{303F}" =~ /\P{InKana1}/ ? "ok $test\n" : "not ok $test\n"; $test++;
@@ -2701,7 +2654,6 @@ print "e" =~ /\P{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 
 if (!$ENV{PERL_SKIP_PSYCHO_TEST}){
     print "# [ID 20020630.002] utf8 regex only matches 32k\n";
-    $test = 911;
     for ([ 'byte', "\x{ff}" ], [ 'utf8', "\x{1ff}" ]) {
 	my($type, $char) = @$_;
 	for my $len (32000, 32768, 33000) {
@@ -2715,7 +2667,7 @@ if (!$ENV{PERL_SKIP_PSYCHO_TEST}){
     ok(1,'Skipped Psycho') for 1..12;
 }
 
-$test = 923;
+$test = 920;
 
 $a = bless qr/foo/, 'Foo';
 print(('goodfood' =~ $a ? '' : 'not '),
@@ -4305,6 +4257,6 @@ ok($@=~/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1785;
+    $::TestCount = 1782;
     print "1..$::TestCount\n";
 }
