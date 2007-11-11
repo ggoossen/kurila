@@ -1378,24 +1378,6 @@ B::OP
 PMOP_pmreplstart(o)
 	B::PMOP		o
 
-#ifdef USE_ITHREADS
-
-IV
-PMOP_pmoffset(o)
-	B::PMOP		o
-
-char*
-PMOP_pmstashpv(o)
-	B::PMOP		o
-
-#else
-
-B::HV
-PMOP_pmstash(o)
-	B::PMOP		o
-
-#endif
-
 U32
 PMOP_pmflags(o)
 	B::PMOP		o
