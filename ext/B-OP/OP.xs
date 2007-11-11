@@ -1349,12 +1349,6 @@ LISTOP_children(o)
 #endif
 #define PMOP_pmnext(o)		o->op_pmnext
 #define PMOP_pmregexp(o)	PM_GETRE(o)
-#ifdef USE_ITHREADS
-#define PMOP_pmoffset(o)	o->op_pmoffset
-#define PMOP_pmstashpv(o)	PmopSTASHPV(o);
-#else
-#define PMOP_pmstash(o)		PmopSTASH(o);
-#endif
 #define PMOP_pmflags(o)		o->op_pmflags
 
 MODULE = B::OP	PACKAGE = B::PMOP		PREFIX = PMOP_
