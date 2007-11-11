@@ -536,7 +536,6 @@ Perl_sv_cat_decode
 Perl_sv_reftype
 Perl_sv_replace
 Perl_sv_report_used
-Perl_sv_reset
 Perl_sv_setpvf
 Perl_sv_vsetpvf
 Perl_sv_setiv

@@ -5742,9 +5742,6 @@ Perl_yylex(pTHX)
 	    s = skipspace(s);
 	    return REPORT( (int)REQUIRE );
 
-	case KEY_reset:
-	    UNI(OP_RESET);
-
 	case KEY_redo:
 	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
 	    LOOPX(OP_REDO);
@@ -7576,16 +7573,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
         case 'r':
           switch (name[1])
           {
-            case 'e':
-              if (name[2] == 's' &&
-                  name[3] == 'e' &&
-                  name[4] == 't')
-              {                                   /* reset      */
-                return -KEY_reset;
-              }
-
-              goto unknown;
-
             case 'm':
               if (name[2] == 'd' &&
                   name[3] == 'i' &&

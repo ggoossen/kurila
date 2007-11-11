@@ -4381,7 +4381,7 @@ the sections using `cperl-pod-head-face', `cperl-pod-face',
 		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>"
 		"\\|"
 		;; 1+6+2+1=10 extra () before this:
-		"\\([?/<]\\)"	; /blah/ or ?blah? or <file*glob>
+		"\\([/<]\\)"	; /blah/ or ?blah? or <file*glob>
 		"\\|"
 		;; 1+6+2+1+1=11 extra () before this:
 		"\\<sub\\>[ \t]*\\([a-zA-Z_:'0-9]+[ \t]*\\)?\\(([^()]*)\\)"
@@ -4636,7 +4636,7 @@ the sections using `cperl-pod-head-face', `cperl-pod-face',
 		;; 1+6+2=9 extra () before this:
 		;; "\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>"
 		;; "\\|"
-		;; "\\([?/<]\\)"	; /blah/ or ?blah? or <file*glob>
+		;; "\\([/<]\\)"	; /blah/ or ?blah? or <file*glob>
 		(setq b1 (if (match-beginning 10) 10 11)
 		      argument (buffer-substring
 				(match-beginning b1) (match-end b1))
@@ -5841,7 +5841,7 @@ indentation and initial hashes.  Behaves usually outside of comment."
 	      ;; "not" "oct" "open" "opendir" "or" "ord" "pack" "pipe"
 	      ;; "quotemeta" "rand" "read" "readdir" "readline"
 	      ;; "readlink" "readpipe" "recv" "ref" "rename" "require"
-	      ;; "reset" "reverse" "rewinddir" "rindex" "rmdir" "seek"
+	      ;; "reverse" "rewinddir" "rindex" "rmdir" "seek"
 	      ;; "seekdir" "select" "semctl" "semget" "semop" "send"
 	      ;; "setgrent" "sethostent" "setnetent" "setpgrp"
 	      ;; "setpriority" "setprotoent" "setpwent" "setservent"
@@ -7737,7 +7737,6 @@ recv(SOCKET,SCALAR,LEN,FLAGS)
 redo [LABEL]
 rename(OLDNAME,NEWNAME)
 require [FILENAME | PERL_VERSION]
-reset[(EXPR)]
 return(LIST)
 reverse(LIST)
 rewinddir(DIRHANDLE)

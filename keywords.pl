@@ -212,7 +212,6 @@ redo
 ref
 rename
 require
-reset
 return
 reverse
 rewinddir

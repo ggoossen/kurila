@@ -219,7 +219,6 @@ Perl_pp_leavesublv
 Perl_pp_caller
 Perl_pp_warn
 Perl_pp_die
-Perl_pp_reset
 Perl_pp_lineseq
 Perl_pp_nextstate
 Perl_pp_dbstate
