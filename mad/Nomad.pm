@@ -827,6 +827,9 @@ sub ast {
     elsif ($$self{mp}{q}) {
 	push @newkids, $self->madness('q = Q m');
     }
+    elsif ($$self{mp}{trans_something_e}) {
+	push @newkids, $self->madness('trans_something_e');
+    }
     elsif ($$self{mp}{X}) {
 	push @newkids, $self->madness('X m');
     }
