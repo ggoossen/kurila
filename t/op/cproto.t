@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 233;
+plan tests => 232;
 
 while (<DATA>) {
     chomp;
@@ -172,7 +172,6 @@ redo undef
 ref (_)
 rename ($$)
 require undef
-reset (;$)
 return undef
 reverse (@)
 rewinddir (*)

@@ -553,8 +553,6 @@ about calling environment and args.
 
     entereval -- can be used to hide code from initial compile
 
-    reset
-
     dbstate -- perl -d version of nextstate(ment) opcode
 
 =item :dangerous
