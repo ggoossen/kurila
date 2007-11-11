@@ -22,7 +22,7 @@ BEGIN {
 $|  = 1;
 use warnings;
 use strict;
-use Test::More tests => 57;
+use Test::More tests => 59;
 
 BEGIN { use_ok( 'B' ); }
 
@@ -162,6 +162,8 @@ is(B::opnumber("pp_null"), 0, "Testing opnumber with opname (pp_null)");
 like(B::hash("wibble"), qr/0x[0-9a-f]*/, "Testing B::hash()");
 is(B::cstring("wibble"), '"wibble"', "Testing B::cstring()");
 is(B::perlstring("wibble"), '"wibble"', "Testing B::perlstring()");
+is(B::perlstring("\n"), '"\n"', "Testing B::perlstring()");
+is(B::perlstring("\""), '"\""', "Testing B::perlstring()");
 is(B::class(bless {}, "Wibble::Bibble"), "Bibble", "Testing B::class()");
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()");
 is(B::opnumber("chop"), 38, "Testing opnumber with opname (chop)");
