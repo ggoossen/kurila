@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 61);
+plan(tests => 60);
 
 use Config;
 
@@ -304,17 +304,11 @@ __EOF__
 # Tests for -E
 
 $r = runperl(
-    switches	=> [ '-E', '"say q(Hello, world!)"']
-);
-is( $r, "Hello, world!\n", "-E say" );
-
-
-$r = runperl(
-    switches	=> [ '-E', '"undef ~~ undef and say q(Hello, world!)"']
+    switches	=> [ '-E', '"undef ~~ undef and print qq(Hello, world!\n)"']
 );
 is( $r, "Hello, world!\n", "-E ~~" );
 
 $r = runperl(
-    switches	=> [ '-E', '"given(undef) {when(undef) { say q(Hello, world!)"}}']
+    switches	=> [ '-E', '"given(undef) {when(undef) { print qq(Hello, world!\n)"}}']
 );
 is( $r, "Hello, world!\n", "-E given" );
