@@ -1325,7 +1325,7 @@ sub astnull {
     my $self = shift;
     my @newkids;
     return unless $$self{mp};
-    push @newkids, $self->madness('q = Q X : f O ( )');
+    push @newkids, $self->madness('q = Q X h : f O ( )');
     return P5AST::op_const->new(Kids => [@newkids]);
 }
 
