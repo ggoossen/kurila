@@ -5648,17 +5648,6 @@ time you'll want to use C<sv_setsv> or one of its many macro front-ends.
 =for hackers
 Found in file sv.c
 
-=item sv_reset
-X<sv_reset>
-
-Underlying implementation for the C<reset> Perl function.
-Note that the perl-level function is vaguely deprecated.
-
-	void	sv_reset(const char* s, HV* stash)
-
-=for hackers
-Found in file sv.c
-
 =item sv_rvweaken
 X<sv_rvweaken>
 

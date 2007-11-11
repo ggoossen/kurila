@@ -2360,9 +2360,6 @@ PERL_CALLCONV void	Perl_sv_replace(pTHX_ SV* sv, SV* nsv)
 			__attribute__nonnull__(pTHX_2);
 
 PERL_CALLCONV void	Perl_sv_report_used(pTHX);
-PERL_CALLCONV void	Perl_sv_reset(pTHX_ const char* s, HV* stash)
-			__attribute__nonnull__(pTHX_1);
-
 PERL_CALLCONV void	Perl_sv_setpvf(pTHX_ SV* sv, const char* pat, ...)
 			__attribute__format__(__printf__,pTHX_2,pTHX_3)
 			__attribute__nonnull__(pTHX_1)

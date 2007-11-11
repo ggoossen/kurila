@@ -207,7 +207,6 @@ EXTCONST char* const PL_op_name[] = {
 	"caller",
 	"warn",
 	"die",
-	"reset",
 	"lineseq",
 	"nextstate",
 	"dbstate",
@@ -572,7 +571,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"caller",
 	"warn",
 	"die",
-	"symbol reset",
 	"line sequence",
 	"next statement",
 	"debug next statement",
@@ -949,7 +947,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_caller),
 	MEMBER_TO_FPTR(Perl_pp_warn),
 	MEMBER_TO_FPTR(Perl_pp_die),
-	MEMBER_TO_FPTR(Perl_pp_reset),
 	MEMBER_TO_FPTR(Perl_pp_null),	/* Perl_pp_lineseq */
 	MEMBER_TO_FPTR(Perl_pp_nextstate),
 	MEMBER_TO_FPTR(Perl_pp_dbstate),
@@ -1323,7 +1320,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* caller */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* warn */
 	MEMBER_TO_FPTR(Perl_ck_die),	/* die */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* reset */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* lineseq */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* nextstate */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* dbstate */
@@ -1691,7 +1687,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00013608,	/* caller */
 	0x0000481d,	/* warn */
 	0x0000485d,	/* die */
-	0x00013614,	/* reset */
 	0x00000800,	/* lineseq */
 	0x00001404,	/* nextstate */
 	0x00001404,	/* dbstate */

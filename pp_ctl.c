@@ -1126,16 +1126,6 @@ PP(pp_caller)
     RETURN;
 }
 
-PP(pp_reset)
-{
-    dVAR;
-    dSP;
-    const char * const tmps = (MAXARG < 1) ? (const char *)"" : POPpconstx;
-    sv_reset(tmps, CopSTASH(PL_curcop));
-    PUSHs(&PL_sv_yes);
-    RETURN;
-}
-
 /* like pp_nextstate, but used instead when the debugger is active */
 
 PP(pp_dbstate)

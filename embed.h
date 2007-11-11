@@ -896,7 +896,6 @@
 #define sv_reftype		Perl_sv_reftype
 #define sv_replace		Perl_sv_replace
 #define sv_report_used		Perl_sv_report_used
-#define sv_reset		Perl_sv_reset
 #define sv_setpvf		Perl_sv_setpvf
 #define sv_vsetpvf		Perl_sv_vsetpvf
 #define sv_setiv		Perl_sv_setiv
@@ -2199,7 +2198,6 @@
 #define pp_rename		Perl_pp_rename
 #define pp_repeat		Perl_pp_repeat
 #define pp_require		Perl_pp_require
-#define pp_reset		Perl_pp_reset
 #define pp_return		Perl_pp_return
 #define pp_reverse		Perl_pp_reverse
 #define pp_rewinddir		Perl_pp_rewinddir
@@ -3154,7 +3152,6 @@
 #define sv_reftype(a,b)		Perl_sv_reftype(aTHX_ a,b)
 #define sv_replace(a,b)		Perl_sv_replace(aTHX_ a,b)
 #define sv_report_used()	Perl_sv_report_used(aTHX)
-#define sv_reset(a,b)		Perl_sv_reset(aTHX_ a,b)
 #define sv_vsetpvf(a,b,c)	Perl_sv_vsetpvf(aTHX_ a,b,c)
 #define sv_setiv(a,b)		Perl_sv_setiv(aTHX_ a,b)
 #define sv_setpviv(a,b)		Perl_sv_setpviv(aTHX_ a,b)
@@ -4464,7 +4461,6 @@
 #define pp_rename()		Perl_pp_rename(aTHX)
 #define pp_repeat()		Perl_pp_repeat(aTHX)
 #define pp_require()		Perl_pp_require(aTHX)
-#define pp_reset()		Perl_pp_reset(aTHX)
 #define pp_return()		Perl_pp_return(aTHX)
 #define pp_reverse()		Perl_pp_reverse(aTHX)
 #define pp_rewinddir()		Perl_pp_rewinddir(aTHX)
