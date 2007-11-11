@@ -6,7 +6,6 @@ use Carp;
 
 require Exporter;
 require DynaLoader;
-use AutoLoader;
 
 our @ISA = qw(Exporter DynaLoader);
 

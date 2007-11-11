@@ -2,7 +2,6 @@
 package Compress::Raw::Zlib;
 
 require Exporter;
-use AutoLoader;
 use Carp ;
 
 #use Parse::Parameters;

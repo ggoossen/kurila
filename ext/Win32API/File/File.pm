@@ -243,16 +243,6 @@ sub fileLastError {
     return $_error;
 }
 
-# Since we ISA DynaLoader which ISA AutoLoader, we ISA AutoLoader so we
-# need this next chunk to prevent Win32API::File->nonesuch() from
-# looking for "nonesuch.al" and producing confusing error messages:
-use vars qw($AUTOLOAD);
-sub AUTOLOAD {
-    require Carp;
-    Carp::croak(
-      "Can't locate method $AUTOLOAD via package Win32API::File" );
-}
-
 # Replace "&rout;" with "goto &rout;" when that is supported on Win32.
 
 # Aliases for non-Unicode functions:

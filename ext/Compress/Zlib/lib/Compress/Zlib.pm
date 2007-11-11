@@ -2,7 +2,6 @@
 package Compress::Zlib;
 
 require Exporter;
-use AutoLoader;
 use Carp ;
 use IO::Handle ;
 use Scalar::Util qw(dualvar);
