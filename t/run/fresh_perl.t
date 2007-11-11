@@ -574,29 +574,6 @@ die qr(x)
 EXPECT
 (?-uxism:x)
 ########
-# Inaba Hiroto
-reset;
-if (0) {
-  if ("" =~ //) {
-  }
-}
-########
-# Nicholas Clark
-$ENV{TERM} = 0;
-reset;
-// if 0;
-########
-# Vadim Konovalov
-use strict;
-sub new_pmop($) {
-    my $pm = shift;
-    return eval "sub {shift=~/$pm/}";
-}
-new_pmop "abcdef"; reset;
-new_pmop "abcdef"; reset;
-new_pmop "abcdef"; reset;
-new_pmop "abcdef"; reset;
-########
 # David Dyck
 # coredump in 5.7.1
 close STDERR; die;

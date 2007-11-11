@@ -519,7 +519,7 @@ no warnings 'bareword' ;
 #line 25 "bar"
 $a = FRED:: ;
 EXPECT
-Bareword "FRED::" refers to nonexistent package at bar line 25.
+Bareword "FRED::" refering to a package are not allowed at bar line 25.
 ########
 # toke.c
 use warnings 'ambiguous' ;

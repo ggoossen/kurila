@@ -998,7 +998,7 @@ my @a;
 $v = 1 + splice @a, $m1, $g1;
 
 my $x = bless [], 'Z';
-eval { $x->$m1() };
+eval { $x->?$m1() };
 
 eval { &$m1() };
 eval { &$g1() };
@@ -1006,9 +1006,6 @@ eval { &$g1() };
 warn $m1,$g1,"foo";
 
 eval { die $m1, $g1 };
-
-reset $m1;
-reset $g1;
 EXPECT
 Use of uninitialized value $m1 in subroutine dereference at - line 5.
 Use of uninitialized value $m1 in subroutine dereference at - line 5.
@@ -1027,8 +1024,6 @@ Use of uninitialized value $g1 in warn at - line 18.
 foo at - line 18.
 Use of uninitialized value $m1 in die at - line 20.
 Use of uninitialized value $g1 in die at - line 20.
-Use of uninitialized value $m1 in symbol reset at - line 22.
-Use of uninitialized value $g1 in symbol reset at - line 23.
 ########
 use warnings 'uninitialized';
 my ($m1);

@@ -44,28 +44,20 @@ sub myno () { return 1!=1 }
 sub pi () { 3.14159 };
 
 my $want = {	# expected types, how value renders in-line, todos (maybe)
-    mystr	=> [ 'PV', '"'.mystr.'"' ],
-    myhref	=> [ 'RV', '\\\\HASH'],
+    mystr	=> [ 'PVIV', '"'.mystr.'"' ],
+    myhref	=> [ 'PVIV', ''],
     pi		=> [ 'NV', pi ],
-    myglob	=> [ 'RV', '\\\\' ],
-    mysub	=> [ 'RV', '\\\\' ],
-    myunsub	=> [ 'RV', '\\\\' ],
+    myglob	=> [ 'PVIV', '' ],
+    mysub	=> [ 'PVIV', '' ],
+    myunsub	=> [ 'PVIV', '' ],
     # these are not inlined, at least not per BC::Concise
     #myyes	=> [ 'RV', ],
     #myno	=> [ 'RV', ],
-    $] > 5.009 ? (
-    myaref	=> [ 'RV', '\\\\' ],
-    myfl	=> [ 'NV', myfl ],
-    myint	=> [ 'IV', myint ],
-    myrex	=> [ 'RV', '\\\\' ],
-    myundef	=> [ 'NULL', ],
-    ) : (
     myaref	=> [ 'PVIV', '' ],
     myfl	=> [ 'PVNV', myfl ],
     myint	=> [ 'PVIV', myint ],
     myrex	=> [ 'PVNV', '' ],
     myundef	=> [ 'PVIV', ],
-    )
 };
 
 use constant WEEKDAYS
@@ -217,19 +209,11 @@ EOT_EOT
 # 8        <@> prtf sK ->9
 # 2           <0> pushmark s ->3
 # 3           <$> const(PV "myint %d mystr %s myfl %f pi %f\n") s ->4
-# 4           <$> const(IV 42) s ->5
-# 5           <$> const(PV "hithere") s ->6
-# 6           <$> const(NV 1.414213) s ->7
+# 4           <$> const(PVIV 42) s ->5
+# 5           <$> const(PVIV "hithere") s ->6
+# 6           <$> const(PVNV 1.414213) s ->7
 # 7           <$> const(NV 3.14159) s ->8
 EONT_EONT
-
-if($] < 5.009) {
-    # 5.8.x's use constant has larger types
-    foreach ($expect, $expect_nt) {
-	s/IV 42/PV$&/;
-	s/NV 1.41/PV$&/;
-    }
-}
 
 checkOptree ( name	=> 'call many in a print statement',
 	      code	=> \&printem,
