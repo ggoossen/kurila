@@ -5,9 +5,8 @@ use strict;
 use Carp;
 
 require Exporter;
-require AutoLoader;
 
-our @ISA     = qw/ Exporter AutoLoader /;
+our @ISA     = qw/ Exporter /;
 our @EXPORT  = qw/ hostname /;
 
 our $VERSION;
@@ -16,14 +15,8 @@ our $host;
 
 BEGIN {
     $VERSION = '1.11';
-    {
-	local $SIG{__DIE__};
-	eval {
-	    require XSLoader;
-	    XSLoader::load('Sys::Hostname', $VERSION);
-	};
-	warn $@ if $@;
-    }
+    use XSLoader ();
+    XSLoader::load('Sys::Hostname', $VERSION);
 }
 
 

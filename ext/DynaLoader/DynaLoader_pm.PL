@@ -88,9 +88,6 @@ BEGIN {
     our $VERSION = '1.08';
 }
 
-require AutoLoader;
-*AUTOLOAD = \&AutoLoader::AUTOLOAD;
-
 use Config;
 
 # enable debug/trace messages from DynaLoader perl code
@@ -415,9 +412,6 @@ sub bootstrap {
 #    return undef;
 #}
 
-
-# Let autosplit and the autoloader deal with these functions:
-__END__
 
 
 sub dl_findfile {

@@ -180,7 +180,6 @@ $DB_RECNO = DB_File::RECNOINFO->new() ;
 
 require Tie::Hash;
 require Exporter;
-use AutoLoader;
 BEGIN {
     $use_XSLoader = 1 ;
     { local $SIG{__DIE__} ; eval { require XSLoader } ; }

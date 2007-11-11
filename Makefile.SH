@@ -833,11 +833,6 @@ sperl$(OBJ_EXT): perl.c $(h)
 .PHONY: preplibrary
 preplibrary: miniperl$(EXE_EXT) $(CONFIGPM) lib/lib.pm $(PREPLIBRARY_LIBPERL)
 	@sh ./makedir lib/auto
-	@echo "	AutoSplitting perl library"
-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib -e 'use AutoSplit; \
-		autosplit_lib_modules(@ARGV)' lib/*.pm
-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib -e 'use AutoSplit; \
-		autosplit_lib_modules(@ARGV)' lib/*/*.pm
 	$(MAKE) lib/re.pm
 
 lib/Config.pod: config.sh miniperl$(EXE_EXT) configpm Porting/Glossary
