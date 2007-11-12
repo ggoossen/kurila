@@ -204,7 +204,7 @@ sub getoptions {
 	# Locally set exception handler to default, otherwise it will
 	# be called implicitly here, and again explicitly when we try
 	# to deliver the messages.
-	local ($SIG{__DIE__}) = '__DEFAULT__';
+	local ($SIG{__DIE__}) = 'DEFAULT';
 	$ret = Getopt::Long::GetOptions (@_);
     };
 
@@ -587,7 +587,7 @@ sub GetOptionsFromArray($@) {
 			    if $debug;
 			my $eval_error = do {
 			    local $@;
-			    local $SIG{__DIE__}  = '__DEFAULT__';
+			    local $SIG{__DIE__}  = 'DEFAULT';
 			    eval {
 				&{$linkage{$opt}}
 				  (Getopt::Long::CallBack->new
