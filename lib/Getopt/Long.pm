@@ -705,7 +705,7 @@ sub GetOptionsFromArray($@) {
 		  if $debug;
 		my $eval_error = do {
 		    local $@;
-		    local $SIG{__DIE__}  = '__DEFAULT__';
+		    local $SIG{__DIE__}  = 'DEFAULT';
 		    eval { &$cb ($tryopt) };
 		    $@;
 		};
