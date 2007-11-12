@@ -4296,8 +4296,6 @@ PP(pp_split)
 
     do_utf8 = (rx->extflags & RXf_PMf_UTF8) != 0;
 
-    TAINT_IF((rx->extflags & (RXf_WHITE | RXf_SKIPWHITE)));
-
 #ifdef USE_ITHREADS
     if (pm->op_pmreplrootu.op_pmtargetoff) {
 	ary = GvAVn((GV*)PAD_SVl(pm->op_pmreplrootu.op_pmtargetoff));
