@@ -1458,14 +1458,7 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 #endif
     }
     else {
-	if (ckWARN(WARN_SIGNAL))
-	    Perl_warner(aTHX_ packWARN(WARN_SIGNAL), "signal handler set to string");
-	if (!strchr(s,':') && !strchr(s,'\''))
-	    Perl_sv_insert(aTHX_ sv, 0, 0, STR_WITH_LEN("main::"));
-	if (i)
-	    (void)rsignal(i, PL_csighandlerp);
-	else
-	    *svp = SvREFCNT_inc_simple_NN(sv);
+	Perl_croak(aTHX_  "signal handler can not be set to string");
     }
 #ifdef HAS_SIGPROCMASK
     if(i)
