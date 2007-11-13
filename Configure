@@ -4094,7 +4094,7 @@ esac
 echo " "
 echo "Getting the current patchlevel..." >&4
 if $test -r $rsrc/patchlevel.h;then
-	revision=`awk '/define[ 	]+KURILA_REVISION/ {print $3}' $rsrc/patchlevel.h`
+	revision=`awk '/define[ 	]+KURILA_REVISION/ {print $3}' $rsrc/patchlevel.h|sed 's/\"`
 	patchlevel=`awk '/define[ 	]+KURILA_VERSION/ {print $3}' $rsrc/patchlevel.h`
 	subversion=`awk '/define[ 	]+KURILA_SUBVERSION/ {print $3}' $rsrc/patchlevel.h`
 	api_revision=`awk '/define[ 	]+KURILA_API_REVISION/ {print $3}' $rsrc/patchlevel.h`
