@@ -13,11 +13,11 @@
 /* do not adjust the whitespace! Configure expects the numbers to be
  * exactly on the third column */
 
-#define KURILA_REVISION kurila
+#define KURILA_REVISION "kurila"
 #define KURILA_VERSION 1
 #define KURILA_SUBVERSION 4
 
-/* Fake Perl version 5.9.5 */
+/* Fake Perl version 5.10.0 */
 #define PERL_REVISION	5		/* age */
 #define PERL_VERSION	10		/* epoch */
 #define PERL_SUBVERSION	0		/* generation */

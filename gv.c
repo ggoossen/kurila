@@ -1317,19 +1317,15 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case ']':
 	{
 	    SV * const sv = GvSVn(gv);
-	    if (!sv_derived_from(PL_patchlevel, "version"))
-		upg_version(PL_patchlevel, TRUE);
-	    GvSV(gv) = vnumify(PL_patchlevel);
+	    /* pretend we are 5.10.0 */
+	    sv_setpv(sv, "5.010000");
 	    SvREADONLY_on(GvSV(gv));
-	    SvREFCNT_dec(sv);
 	}
 	break;
 	case '\026':	/* $^V */
 	{
 	    SV * const sv = GvSVn(gv);
-	    GvSV(gv) = new_version(PL_patchlevel);
-	    SvREADONLY_on(GvSV(gv));
-	    SvREFCNT_dec(sv);
+	    sv_setsv(sv, PL_patchlevel);
 	}
 	break;
 	}
