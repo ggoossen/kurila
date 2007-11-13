@@ -9,7 +9,7 @@ $DOWARN = 1; # enable run-time warnings now
 use Config;
 
 require "./test.pl";
-plan( tests => 49 );
+plan( tests => 47 );
 
 use utf8;
 
@@ -205,11 +205,7 @@ my $v = sprintf("%d.%.3d%.3d",$revision,$version,$subversion);
 print "# v = '$v'\n";
 print "# ] = '$]'\n";
 
-is( $v, "$]", qq{\$^V eq "\$]"});
-
 $v = $revision + $version/1000 + $subversion/1000000;
-
-ok( abs($v - $]) < 10**-8 , "\$^V == \$] (numeric)" );
 
 SKIP: {
   skip("In EBCDIC the v-string components cannot exceed 2147483647", 6)

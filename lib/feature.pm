@@ -13,7 +13,7 @@ my %feature_bundle = (
 );
 
 # latest version here
-$feature_bundle{"5.10"} = $feature_bundle{sprintf("%vd",$^V)};
+$feature_bundle{"5.10"} = $feature_bundle{"5.10.0"};
 
 $feature_bundle{"5.9.5"} = $feature_bundle{"5.10.0"};
 

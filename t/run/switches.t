@@ -235,7 +235,7 @@ SWTESTPM
 {
     local $TODO = '';   # these ones should work on VMS
 
-    my $v = sprintf "%vd", $^V;
+    my (undef, $v) = split m/-/, $^V;
     like( runperl( switches => ['-v'] ),
 	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q$Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
           '-v looks okay' );
