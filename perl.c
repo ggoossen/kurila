@@ -3235,12 +3235,12 @@ Perl_moreswitches(pTHX_ const char *s)
 	    upg_version(PL_patchlevel, TRUE);
 #if !defined(DGUX)
 	PerlIO_printf(PerlIO_stdout(),
-		Perl_form(aTHX_ "\nThis is kurila, %"SVf
+		Perl_form(aTHX_ "\nThis is kurila, v%d.%d"
 #ifdef KURILA_PATCHNUM
 			  " DEVEL" STRINGIFY(KURILA_PATCHNUM)
 #endif
 			  " built for %s",
-			  SVfARG(vstringify(PL_patchlevel)),
+			  KURILA_VERSION, KURILA_SUBVERSION,
 			  ARCHNAME));
 #else /* DGUX */
 /* Adjust verbose output as in the perl that ships with the DG/UX OS from EMC */
