@@ -20,7 +20,7 @@ $has_echo = $^O ne 'MSWin32';
 $alarmed = 0;
 sub arm      { $alarmed = 0; alarm(shift) if $has_alarm }
 sub alarmed  { $alarmed = 1 }
-$SIG{ALRM} = 'alarmed'                    if $has_alarm;
+$SIG{ALRM} = \&alarmed                    if $has_alarm;
 
 if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
   print "ok 1\n";

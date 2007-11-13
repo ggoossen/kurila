@@ -131,7 +131,7 @@ wait;				# Collect from $pid
 pipe(READER,'WRITER') || die "Can't open pipe";
 close READER;
 
-$SIG{'PIPE'} = 'broken_pipe';
+$SIG{'PIPE'} = \&broken_pipe;
 
 sub broken_pipe {
     $SIG{'PIPE'} = 'IGNORE';       # loop preventer

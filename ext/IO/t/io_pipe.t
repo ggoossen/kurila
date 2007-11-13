@@ -128,7 +128,7 @@ if ($is_win32) {
     $pipe = IO::Pipe->new();
     $pipe->writer;
 
-    $SIG{'PIPE'} = 'broken_pipe';
+    $SIG{'PIPE'} = \&broken_pipe;
 
     sub broken_pipe {
     print "ok 9\n";
