@@ -133,7 +133,7 @@ sub warnhook {
   print "WARNHOOK\n";
   eval('die("foooo\n")');
 }
-$SIG{'__WARN__'} = 'warnhook';
+$SIG{'__WARN__'} = \&warnhook;
 warn("dfsds\n");
 print "END\n";
 EXPECT

@@ -1377,7 +1377,7 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
     if ( ! (SvTYPE(sv) == SVt_PVGV || SvROK(sv)) ) {
 	const char *s = SvOK(sv) ? SvPV_force(sv,len) : "DEFAULT";
 	if ( ! (strEQ(s,"IGNORE") || strEQ(s,"DEFAULT") || !*s)) {
-	    Perl_croak(aTHX_  "signal handler should be glob or refernce or 'DEFAULT or 'IGNORE'");
+	    Perl_croak(aTHX_  "signal handler should be glob or reference or 'DEFAULT or 'IGNORE'");
 	}
     }
 

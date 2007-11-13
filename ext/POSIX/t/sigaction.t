@@ -80,10 +80,10 @@ ok($ok10, "SIGHUP handler called");
 
 is(ref($SIG{HUP}), 'CODE');
 
-sigaction(SIGHUP, POSIX::SigAction->new('::foo'));
+sigaction(SIGHUP, POSIX::SigAction->new(\&::foo));
 # Make sure the signal mask gets restored after sigaction croak()s.
 eval {
-	my $act=POSIX::SigAction->new('::foo');
+	my $act=POSIX::SigAction->new(\&::foo);
 	delete $act->{HANDLER};
 	sigaction(SIGINT, $act);
 };
@@ -141,12 +141,12 @@ SKIP: {
     sigaction("FOOBAR", $newaction);
     ok(1, "no coredump, still alive");
 
-    $newaction = POSIX::SigAction->new("hup20");
+    $newaction = POSIX::SigAction->new(\&hup20);
     sigaction("SIGHUP", $newaction);
     kill "HUP", $$;
     is($hup20, 1);
 
-    $newaction = POSIX::SigAction->new("hup21");
+    $newaction = POSIX::SigAction->new(\&hup21);
     sigaction("HUP", $newaction);
     kill "HUP", $$;
     is ($hup21, 1);
@@ -200,7 +200,7 @@ SKIP: {
     sub hiphup {
 	is($_[1]->{signo}, SIGHUP, "SA_SIGINFO got right signal");
     }
-    my $act = POSIX::SigAction->new('hiphup', 0, SA_SIGINFO);
+    my $act = POSIX::SigAction->new(\&hiphup, 0, SA_SIGINFO);
     sigaction(SIGHUP, $act);
     kill 'HUP', $$;
 }

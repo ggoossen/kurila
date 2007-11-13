@@ -34,17 +34,17 @@ is( $SIG{AFAKE}, \&sigtrap::handler_die, 'install the die handler' );
 is( $SIG{FAKE2}, \&sigtrap::handler_traceback, 'install traceback handler' );
 
 my @normal = qw( HUP INT PIPE TERM );
-@SIG{@normal} = 1 x @normal;
+@SIG{@normal} = '' x @normal;
 sigtrap->import('normal-signals');
 is( (grep { ref $_ } @SIG{@normal}), @normal, 'check normal-signals set' );
 
 my @error = qw( ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP );
-@SIG{@error} = 1 x @error;
+@SIG{@error} = '' x @error;
 sigtrap->import('error-signals');
 is( (grep { ref $_ } @SIG{@error}), @error, 'check error-signals set' );
 
 my @old = qw( ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP );
-@SIG{@old} = 1 x @old;
+@SIG{@old} = '' x @old;
 sigtrap->import('old-interface-signals');
 is( (grep { ref $_ } @SIG{@old}), @old, 'check old-interface-signals set' );
 

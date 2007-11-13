@@ -272,7 +272,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	    printf "# sigaction tick, ALRM = %d\n", &POSIX::SIGALRM;
 	    # Perl's deferred signals may be too wimpy to break through
 	    # a restartable select(), so use POSIX::sigaction if available.
-	    POSIX::sigaction(&POSIX::SIGALRM, POSIX::SigAction->new("tick"),
+	    POSIX::sigaction(&POSIX::SIGALRM, POSIX::SigAction->new(\&tick),
 			     $oldaction)
 		or die "Error setting SIGALRM handler with sigaction: $!\n";
 	} else {
