@@ -1840,12 +1840,6 @@ S_scan_const(pTHX_ char *start)
     bool in_codepoints = (IN_CODEPOINTS != 0);  /* PL_curtoken can be changed ?! */
     UV uv;
 
-    if (PL_lex_inwhat == OP_TRANS && PL_sublex_info.sub_op) {
-	/* If we are doing a trans and we know we want UTF8 set expectation */
-	has_utf8   = PL_sublex_info.sub_op->op_private & (OPpTRANS_UTF8);
-    }
-
-
     while (s < send || dorange) {
         /* get transliterations out of the way (they're most literal) */
 	if (PL_lex_inwhat == OP_TRANS) {
@@ -1856,8 +1850,7 @@ S_scan_const(pTHX_ char *start)
 		I32 max;			/* last character in range */
 
 
-		if (has_utf8
-		    ) {
+		if ( in_codepoints ) {
 		    char * const c = (char*)utf8_hop(d, -1);
 		    char *e = d++;
 		    while (e-- > c)
@@ -1897,8 +1890,7 @@ S_scan_const(pTHX_ char *start)
 		if (didrange) {
 		    Perl_croak(aTHX_ "Ambiguous range in transliteration operator");
 		}
-		if (has_utf8
-		    ) {
+		if (in_codepoints) {
 		    *d++ = (char)UTF_TO_NATIVE(0xff);	/* use illegal utf8 byte--see pmtrans */
 		    s++;
 		    continue;
@@ -2093,10 +2085,6 @@ S_scan_const(pTHX_ char *start)
 			if ( ! ( in_codepoints || IN_BYTES))
 			    Perl_warner(aTHX_ packWARN(WARN_UTF8),
 					"Codepoints or bytes");
-			if (in_codepoints) {
-			    PL_sublex_info.sub_op->op_private |=
-				OPpTRANS_UTF8;
-			}
 		    }
 		}
 		else {
@@ -2264,9 +2252,9 @@ S_scan_const(pTHX_ char *start)
     } else
 	SvREFCNT_dec(sv);
 
-    if ( has_utf8 && ! in_codepoints && ! PL_encoding )
-	Perl_warner(aTHX_ packWARN(WARN_MISC),
-		    "utf8 found, but not 'use utf8'");
+/*     if ( has_utf8 && ! in_codepoints && ! PL_encoding ) */
+/* 	Perl_warner(aTHX_ packWARN(WARN_MISC), */
+/* 		    "utf8 found, but not 'use utf8'"); */
     return s;
 }
 
