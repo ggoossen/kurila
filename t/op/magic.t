@@ -82,7 +82,7 @@ else {
 
     $| = 1;		# command buffering
 
-    $SIG{"INT"} = "ok3";     kill "INT",$$; sleep 1;
+    $SIG{"INT"} = \&ok3;     kill "INT",$$; sleep 1;
     $SIG{"INT"} = "IGNORE";  kill "INT",$$; sleep 1; print "ok 4\n";
     $SIG{"INT"} = "DEFAULT"; kill "INT",$$; sleep 1; print "not ok 4\n";
 
@@ -112,7 +112,7 @@ END
 	return sub { $x };
     }
     $| = 1;		# command buffering
-    $SIG{"INT"} = "ok5";
+    $SIG{"INT"} = \&ok5;
     {
 	local $SIG{"INT"}=x();
 	print ""; # Needed to expose failure in 5.8.0 (why?)

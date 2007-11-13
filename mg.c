@@ -1368,12 +1368,20 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
      */
     SV* to_dec = NULL;
     STRLEN len;
+    const char *s;
 #ifdef HAS_SIGPROCMASK
     sigset_t set, save;
     SV* save_sv;
 #endif
 
-    register const char *s = MgPV_const(mg,len);
+    if ( ! (SvTYPE(sv) == SVt_PVGV || SvROK(sv)) ) {
+	const char *s = SvOK(sv) ? SvPV_force(sv,len) : "DEFAULT";
+	if ( ! (strEQ(s,"IGNORE") || strEQ(s,"DEFAULT") || !*s)) {
+	    Perl_croak(aTHX_  "signal handler should be glob or refernce or 'DEFAULT or 'IGNORE'");
+	}
+    }
+
+    s = MgPV_const(mg,len);
     if (*s == '_') {
 	if (strEQ(s,"__DIE__"))
 	    svp = &PL_diehook;
@@ -1446,7 +1454,7 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 #endif
 	}
     }
-    else if (strEQ(s,"DEFAULT") || !*s) {
+    else {
 	if (i)
 #ifdef FAKE_DEFAULT_SIGNAL_HANDLERS
 	  {
@@ -1456,9 +1464,6 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 #else
 	    (void)rsignal(i, (Sighandler_t) SIG_DFL);
 #endif
-    }
-    else {
-	Perl_croak(aTHX_  "signal handler can not be set to string");
     }
 #ifdef HAS_SIGPROCMASK
     if(i)
