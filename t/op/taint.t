@@ -12,7 +12,7 @@ use Config;
 use File::Spec::Functions;
 
 BEGIN { require './test.pl'; }
-plan tests => 271;
+plan tests => 269;
 
 $| = 1;
 
@@ -70,18 +70,6 @@ my $TAINT0;
     no warnings;
     $TAINT0 = 0 + $TAINT;
 }
-
-    my $filename = "./taintB$$";	# NB: $filename isn't tainted!
-    END { unlink $filename if defined $filename }
-    my $foo = $filename . $TAINT;
-    unlink $filename;	# in any case
-
-#     ok !eval { open FOO, $foo }, 'open for read';
-#     test $@ eq '', $@;		# NB: This should be allowed
-
-    open FOO, "<:encoding(latin1)", $foo; #}, 'open for read using encoding';
-    #test $@ eq '', $@;		# NB: This should be allowed
-__END__
 
 # This taints each argument passed. All must be lvalues.
 # Side effect: It also stringifies them. :-(
@@ -415,10 +403,7 @@ SKIP: {
     $foo = $filename . $TAINT;
     unlink $filename;	# in any case
 
-    ok !eval { open FOO, $foo }, 'open for read';
-    test $@ eq '', $@;		# NB: This should be allowed
-
-    ok !eval { open FOO, "<:encoding(latin1)", $foo }, 'open for read using encoding';
+    test !eval { open FOO, $foo }, 'open for read';
     test $@ eq '', $@;		# NB: This should be allowed
 
     # Try first new style but allow also old style.
@@ -1259,10 +1244,6 @@ SKIP:
     my @values = split(/\s+/, $value . $TAINT, 2);
     ok(tainted($values[1]), "result of split is tainted if input was tainted");
 }
-
-# {
-#     open my $my, "<:encoding(latin1)", "op/taint.t" . $TAINT or die "Failed opening op/taint.t";
-# }
 
 # This may bomb out with the alarm signal so keep it last
 SKIP: {
