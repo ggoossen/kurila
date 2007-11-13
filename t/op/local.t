@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 120;
+plan tests => 121;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -217,20 +217,21 @@ is($a[0].$a[1], "Xb");
 
 # now try the same for %SIG
 
-$SIG{TERM} = 'foo';
+eval { $SIG{TERM} = 'foo' };
+like $@, qr/signal handler should be glob or .../;
 $SIG{INT} = \&foo;
 $SIG{__WARN__} = $SIG{INT};
 {
     local($SIG{TERM}) = $SIG{TERM};
     local($SIG{INT}) = $SIG{INT};
     local($SIG{__WARN__}) = $SIG{__WARN__};
-    is($SIG{TERM}, 'main::foo');
+    is($SIG{TERM}, undef);
     is($SIG{INT}, \&foo);
     is($SIG{__WARN__}, \&foo);
     local($SIG{INT});
     delete $SIG{__WARN__};
 }
-is($SIG{TERM}, 'main::foo');
+is($SIG{TERM}, undef);
 is($SIG{INT}, \&foo);
 is($SIG{__WARN__}, \&foo);
 {
