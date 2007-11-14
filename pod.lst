@@ -129,6 +129,9 @@ h Miscellaneous
 
   perldoc		Look up Perl documentation in Pod format
 
+  kurila15delta         What is new for Perl Kurila 1.5
+  kurila14delta         What is new for Perl Kurila 1.4
+  kurila13delta         What is new for Perl Kurila 1.3
   kurila01delta         Perl Kurila changes in version 0.1
   kurila02delta         Perl Kurila changes in version 0.2
   perlhist		Perl history records

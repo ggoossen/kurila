@@ -25,6 +25,7 @@ For ease of access, the Perl manual has been split up into several sections.
 =head2 Overview
 
     perl		Perl overview (this section)
+    kurilaintro         Description of Perl Kurila
     perlintro		Perl introduction for beginners
     kurilatoc		Kurila documentation table of contents
 
@@ -145,6 +146,11 @@ For ease of access, the Perl manual has been split up into several sections.
     perldoc		Look up Perl documentation in Pod format
 
     perlhist		Perl history records
+    kurila15delta       What is new for Perl Kurila 1.5
+    kurila14delta       What is new for Perl Kurila 1.4
+    kurila13delta       What is new for Perl Kurila 1.3
+    kurila02delta       What is new for Perl Kurila 0.2
+    kurila01delta       What is new for Perl Kurila 0.1
     perldelta		Perl changes since previous version
     perl595delta	Perl changes in version 5.9.5
     perl594delta	Perl changes in version 5.9.4
