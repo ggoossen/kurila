@@ -63,18 +63,6 @@ Postpone load of modules until a function is used
 
 Establish an ISA relationship with base classes at compile time
 
-=item bigint
-
-Transparent BigInteger support for Perl
-
-=item bignum
-
-Transparent BigNumber support for Perl
-
-=item bigrat
-
-Transparent BigNumber/BigRational support for Perl
-
 =item blib
 
 Use MakeMaker's uninstalled version of a package
@@ -86,6 +74,10 @@ Force byte semantics rather than character semantics
 =item charnames
 
 Define character names for C<\N{named}> string literal escapes
+
+=item compsub
+
+Package for defining compilation subroutines
 
 =item constant
 
@@ -159,10 +151,6 @@ Control sort() behaviour
 
 Restrict unsafe constructs
 
-=item subs
-
-Predeclare sub names
-
 =item threads
 
 Perl interpreter-based threads
@@ -209,10 +197,6 @@ don't have the gdbm library.
 
 =over 12
 
-=item AnyDBM_File
-
-Provide framework for multiple DBMs
-
 =item Archive::Extract
 
 A generic archive extracting mechanism
@@ -236,6 +220,10 @@ Split a package for autoloading
 =item B
 
 The Perl Compiler
+
+=item B-OP
+
+Inspect and manipulate op trees.
 
 =item B::Concise
 
@@ -268,42 +256,6 @@ Generates cross reference reports for Perl programs
 =item Benchmark
 
 Benchmark running times of Perl code
-
-=item CGI
-
-Simple Common Gateway Interface Class
-
-=item CGI::Apache
-
-Backward compatibility module for CGI.pm
-
-=item CGI::Carp
-
-CGI routines for writing to the HTTPD (or other) error log
-
-=item CGI::Cookie
-
-Interface to Netscape Cookies
-
-=item CGI::Fast
-
-CGI Interface for Fast CGI
-
-=item CGI::Pretty
-
-Module to produce nicely formatted HTML code
-
-=item CGI::Push
-
-Simple Interface to Server Push
-
-=item CGI::Switch
-
-Backward compatibility module for defunct CGI::Switch
-
-=item CGI::Util
-
-Internal utilities used by CGI module
 
 =item CORE
 
@@ -369,30 +321,6 @@ Get pathname of current working directory
 
 Programmatic interface to the Perl debugging API
 
-=item DBM_Filter
-
-Filter DBM keys/values 
-
-=item DBM_Filter::compress
-
-Filter for DBM_Filter
-
-=item DBM_Filter::encode
-
-Filter for DBM_Filter
-
-=item DBM_Filter::int32
-
-Filter for DBM_Filter
-
-=item DBM_Filter::null
-
-Filter for DBM_Filter
-
-=item DBM_Filter::utf8
-
-Filter for DBM_Filter
-
 =item DB_File
 
 Perl5 access to Berkeley DB version 1.x
@@ -436,10 +364,6 @@ Digest base class
 =item Digest::file
 
 Calculate digests of files
-
-=item DirHandle
-
-Supply object methods for directory handles
 
 =item Dumpvalue
 
@@ -825,10 +749,6 @@ Return name and handle of a temporary file safely
 
 By-name interface to Perl's built-in stat() functions
 
-=item FileCache
-
-Keep more files open than the system permits
-
 =item FileHandle
 
 Supply object methods for filehandles
@@ -836,10 +756,6 @@ Supply object methods for filehandles
 =item FindBin
 
 Locate directory of original perl script
-
-=item GDBM_File
-
-Perl5 access to the gdbm library.
 
 =item Getopt::Long
 
@@ -969,10 +885,6 @@ Read RFC 1951 files/buffers
 
 Read zip files/buffers
 
-=item IO::Zlib
-
-IO:: style interface to L<Compress::Zlib>
-
 =item IPC::Cmd
 
 Finding and running system commands made easy
@@ -1057,30 +969,6 @@ Encoding and decoding of base64 strings
 
 Encoding and decoding of quoted-printable strings
 
-=item Math::BigFloat
-
-Arbitrary size floating point math package
-
-=item Math::BigInt
-
-Arbitrary size integer/float math package
-
-=item Math::BigInt::Calc
-
-Pure Perl module to support Math::BigInt
-
-=item Math::BigInt::CalcEmu
-
-Emulate low-level math with BigInt code
-
-=item Math::BigInt::FastCalc
-
-Math::BigInt::Calc with some XS for more speed
-
-=item Math::BigRat
-
-Arbitrary big rational numbers
-
 =item Math::Complex
 
 Complex numbers and associated mathematical functions
@@ -1088,38 +976,6 @@ Complex numbers and associated mathematical functions
 =item Math::Trig
 
 Trigonometric functions
-
-=item Memoize
-
-Make functions faster by trading space for time
-
-=item Memoize::AnyDBM_File
-
-Glue to provide EXISTS for AnyDBM_File for Storable use
-
-=item Memoize::Expire
-
-Plug-in module for automatic expiration of memoized values
-
-=item Memoize::ExpireFile
-
-Test for Memoize expiration semantics
-
-=item Memoize::ExpireTest
-
-Test for Memoize expiration semantics
-
-=item Memoize::NDBM_File
-
-Glue to provide EXISTS for NDBM_File for Storable use
-
-=item Memoize::SDBM_File
-
-Glue to provide EXISTS for SDBM_File for Storable use
-
-=item Memoize::Storable
-
-Store Memoized data in Storable database
 
 =item Module::Build
 
@@ -1245,10 +1101,6 @@ Automatically give your module the ability to have plugins
 
 Automatically give your module the ability to have plugins
 
-=item NDBM_File
-
-Tied access to ndbm files
-
 =item NEXT
 
 Provide a pseudo-class NEXT (et al) that allows method redispatch
@@ -1280,10 +1132,6 @@ OO interface to users netrc file
 =item Net::POP3
 
 Post Office Protocol 3 Client class (RFC1939)
-
-=item Net::Ping
-
-Check a remote host for reachability
 
 =item Net::SMTP
 
@@ -1317,10 +1165,6 @@ By-name interface to Perl's built-in getserv*() functions
 
 Generic interface to Perl Compiler backends
 
-=item ODBM_File
-
-Tied access to odbm files
-
 =item Opcode
 
 Disable named opcodes when compiling perl code
@@ -1328,10 +1172,6 @@ Disable named opcodes when compiling perl code
 =item POSIX
 
 Perl interface to IEEE Std 1003.1
-
-=item Package::Constants
-
-List all constants declared in a package
 
 =item Params::Check
 
@@ -1553,10 +1393,6 @@ Convert POD data to ASCII text with format escapes
 
 Print a usage message from embedded pod documentation
 
-=item SDBM_File
-
-Tied access to sdbm files
-
 =item Safe
 
 Compile and execute code in restricted compartments
@@ -1568,10 +1404,6 @@ A selection of general-utility scalar subroutines
 =item Search::Dict
 
 Search for key in dictionary file
-
-=item SelectSaver
-
-Save and restore selected file handle
 
 =item SelfLoader
 
@@ -1744,10 +1576,6 @@ Base class definitions for tied hashes
 =item Tie::Hash::NamedCapture
 
 Named regexp capture buffers
-
-=item Tie::Memoize
-
-Add data to hash when needed
 
 =item Tie::RefHash
 
