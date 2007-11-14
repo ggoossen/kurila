@@ -13,13 +13,23 @@ sub ok {
     return $ok;
 }
 
-print "1..28\n";
+print "1..31\n";
 
 our ($a, $b, $c, $dx) = qw(foo bar);
 
 ok("$a"     eq "foo",    "verifying assign");
 ok("$a$b"   eq "foobar", "basic concatenation");
 ok("$c$a$c" eq "foo",    "concatenate undef, fore and aft");
+
+# Array and derefence, this doesn't really belong in 'op/concat' but I
+# couldn't find a better place
+
+my @x = qw|aap noot|;
+my $dx = [@x];
+
+ok("@x" eq "aap noot");
+ok("@$dx" eq "aap noot");
+ok("$dx->@" eq "aap noot");
 
 # Okay, so that wasn't very challenging.  Let's go Unicode.
 
