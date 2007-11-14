@@ -1290,27 +1290,6 @@ Here is the output (split into several lines):
  lowercase lowercase line-noise lowercase lowercase line-noise
  MiXeD line-noise. That's all!
 
-=item ?PATTERN?
-X<?>
-
-This is just like the C</pattern/> search, except that it matches only
-once between calls to the reset() operator.  This is a useful
-optimization when you want to see only the first occurrence of
-something in each file of a set of files, for instance.  Only C<??>
-patterns local to the current package are reset.
-
-    while (<>) {
-	if (?^$?) {
-			    # blank line between header and body
-	}
-    } continue {
-	reset if eof;	    # clear ?? status for next file
-    }
-
-This usage is vaguely deprecated, which means it just might possibly
-be removed in some distant future version of Perl, perhaps somewhere
-around the year 2168.
-
 =item s/PATTERN/REPLACEMENT/msixpogce
 X<substitute> X<substitution> X<replace> X<regexp, replace>
 X<regexp, substitute> X</m> X</s> X</i> X</x> X</p> X</o> X</g> X</c> X</e>
