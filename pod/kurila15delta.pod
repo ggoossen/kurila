@@ -1,0 +1,123 @@
+=head1 NAME
+
+kurila15delta - what is new for Perl Kurila 1.5
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.4 and Perl Kurila 1.5
+
+=head1 Highlights In Perl Kurila 1.5
+
+=over 4
+
+=item *
+
+New dereference syntax: $ref->$, $ref->@, $ref->%, $ref->&, $ref->*
+
+=item *
+
+Method calls using $obj->?$name instead of $obj->$name
+
+=item *
+
+Improved Perl 5 to Kurila conversion script.
+
+=item *
+
+The bit operators &, |, ^, ~ are renamed to ^&^, ^|^, ^^^, ^~^.
+
+=item *
+
+C<use kurila 1.5> should be used to indicate kurila is required.
+
+=item *
+
+In m/$term[...]/ the [...] always indicates a subscript and never a character class
+
+=item *
+
+Removal of the match once ?PATTERN? operator
+
+=item *
+
+The C<..> operator in scalar context will give an error.
+
+=back
+
+=head1 Core Enhancements
+
+=head2 New dereference syntax: $ref->$, $ref->@, $ref->%, $ref->&, $ref->*
+
+There is new dereference syntax "->." where . can be any of the sigils $,@,%,& or *.
+Which will dereference to the type indicated by the sigil. The precedence of the
+operator is the same as that of "->".
+
+=head2 Method calls using $obj->?$name instead of $obj->$name
+
+The call methods with run-time name lookup, C,$obj->?$name> has to be
+used instead of old C<$obj->$name>. The old $obj->$name will be parsed 
+using the above mentioned new dereference syntax as C<$obj ->$ name>, and
+normally give a syntax error.
+
+=head2 Improved Perl 5 to Kurila conversion script.
+
+The Perl 5 to Kurila converted (in the 'mad' directory), has had many
+improvements, and is far less likely to fail.
+
+=head2 The bit operators &, |, ^, ~ are renamed to ^&^, ^|^, ^^^, ^~^.
+
+The bit operators &, |, ^ and ~ have been renamed to ^&^, ^|^, ^^^ and ^~^ respectively.
+A '^' which does not start one of these operators will give a compile error.
+Use of a single '&', '|' and '~' where an operator is expected will give a compile error.
+
+=head2 C<use kurila 1.5> should be used to indicate kurila is required.
+
+C<use kurila> should be used to indicate that kurila is required.
+C<use VERSION> and C<require VERSION> give an error that the code 
+isn't Perl Kurila. 
+
+=head2 In m/$term[...]/ the [...] always indicates a subscript and never a character class
+
+In regexes instead of guessing whether in $term[...] the [...] is a subscripts
+or a character class, the [] are always interpreted as a subscript.
+
+=head2 Removal of the match once ?PATTERN? operator
+
+The ?PATTERN? has been removed. A '?' is now always parsed as
+the conditional operator "?:".
+
+=head2 The C<..> operator in scalar context (the flip-flop operator) will give an error.
+
+Use of C<..> operator in scalar context will give a compile error.
+
+=head2 The C<dbmopen>, C<dbmclose> and C<reset> keywords have been removed.
+
+The C<dbmopen>, C<dbmclose> and C<reset> are not longer keywords.
+
+=head2 Integrate bleadperl changes
+
+bleadperl changes up to Change 32130 are integrated.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut

@@ -2682,7 +2682,7 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 		    is_use ? "use" : "no"));
     s = SKIPSPACE1(s);
     if (isDIGIT(*s) || (*s == 'v' && isDIGIT(s[1]))) {
-	yyerror(Perl_form(aTHX_ "use VERSION is not valid in Perl Kurila"));
+	yyerror(Perl_form(aTHX_ "use VERSION is not valid in Perl Kurila (this is probably Perl 5 code)"));
     }
     else {
 	s = force_word(s,WORD,FALSE,TRUE,FALSE);
@@ -4144,7 +4144,7 @@ Perl_yylex(pTHX)
 	if (*s++ == '|')
 	    AOPERATOR(OROR);
 	s--;
-	Perl_croak(aTHX_ "Unknown operator '|' found. Did you mean '||' or '^|'?");
+	Perl_croak(aTHX_ "Unknown operator '|' found. Did you mean '||' or '^|^'?");
     case '=':
 	s++;
 	{
@@ -5709,7 +5709,7 @@ Perl_yylex(pTHX)
 	case KEY_require:
 	    s = SKIPSPACE1(s);
 	    if (isDIGIT(*s) || ((*s == 'v') && isDIGIT(s[1]))) {
-		yyerror(Perl_form(aTHX_ "require VERSION is not valid in Perl Kurila"));
+		yyerror(Perl_form(aTHX_ "require VERSION is not valid in Perl Kurila (this is probably Perl 5 code)"));
 	    }
 	    *PL_tokenbuf = '\0';
 	    s = force_word(s,WORD,TRUE,TRUE,FALSE);
