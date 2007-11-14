@@ -772,7 +772,7 @@ case 2:
   case 96:
 #line 780 "perly.y"
     {
-                            (yyval.opval) = newSVREF((ps[(1) - (2)].val.opval));
+                            (yyval.opval) = newHVREF((ps[(1) - (2)].val.opval));
                             TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                         ;}
     break;

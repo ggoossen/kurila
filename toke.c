@@ -3602,7 +3602,7 @@ Perl_yylex(pTHX)
 		    yylval.ival=0;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->@ closes the interpoltion and creates a join */
-			PL_lex_state = LEX_INTERPEND;
+			PL_lex_state = LEX_INTERPENDEND;
 			yylval.ival = OP_JOIN;
 		    }
 		    TERM(DEREFARY);

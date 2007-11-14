@@ -778,7 +778,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} */
                         }
         |       term DEREFHSH                /* somearef->% */
                         {
-                            $$ = newSVREF($1);
+                            $$ = newHVREF($1);
                             TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFSTAR                /* somearef->* */

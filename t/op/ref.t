@@ -3,7 +3,7 @@
 require './test.pl';
 use strict qw(refs subs);
 
-plan(122);
+plan(127);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -142,6 +142,20 @@ $anonhash = {};
 is (ref $anonhash, 'HASH');
 $anonhash2 = {FOO => 'BAR', ABC => 'XYZ',};
 is (join('', sort values %$anonhash2), 'BARXYZ');
+
+# Test ->[$@%&*] derefence syntax
+{
+    my $z = \66;
+    is($z->$, 66);
+    my $y = [1,2,3,4];
+    is(join(':', $y->@), "1:2:3:4");
+    my $x = { aap => 'noot', mies => "teun" };
+    is("".$x->%, "".%$x);
+    my $w = \*foo428;
+    is("" . $w->*, "*main::foo428");
+    my $v = sub { return $_[0]; };
+    is($v->&(55), 55);
+}
 
 # Test bless operator.
 
