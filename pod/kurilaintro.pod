@@ -1,6 +1,6 @@
 =head1 NAME
 
-perlkurila -- description of Perl Kurila
+kurilaintro -- description of Perl Kurila
 
 =head1 DESCRIPTION
 

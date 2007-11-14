@@ -182,10 +182,13 @@ close MASTER;
   @manipods{@manipods} = @manipods;
   @manireadmes{@manireadmes} = @manireadmes;
 
+  my $in_perlpod;
   open(PERLPOD, "perl.pod") || die "$0: opening perl.pod failed: $!\n";
   while (<PERLPOD>) {
-    if (/^For ease of access, /../^\(If you're intending /) {
-      if (/^\s+(perl\S*)\s+\w/) {
+    $in_perlpod ||= /^For ease of access/;
+    $in_perlpod &&= ! /^\(If you're intending /;
+    if ($in_perlpod) {
+      if (/^\s+((?:perl|kurila)\S*)\s+\w/) {
 	push @perlpods, "$1.pod";
       }
     }
