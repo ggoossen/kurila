@@ -25,6 +25,42 @@ No. There is a lot of Perl 5 code. You can probably convert Perl 5 code to Kuril
 much problems, but if you are happy with Perl 5, you can stay using it.
 Both can be installed at the same time.
 
+=head2 Major changes compared to Perl 5
+
+=over 4
+
+=item * 
+
+Added compilations subroutines, see L<compsub>.
+
+=item * 
+
+Lexical scoped byte vs codepoint semantics
+
+=item *
+
+Bit &, |, ^, ~ operator renamed to ^&^, ^|^, ^^^, ^~^
+
+=item *
+
+Strings are internally always encoded using UTF-8
+
+=item *
+
+String dereference will always result in an error
+
+=item *
+
+Default 'C3' method resolution
+
+=item *
+
+Removal of a lot of deprecated syntax, keywords, operators.
+Including indirect object syntax, formats, <> as glob operator, 
+?PATTERN?, C<..> as flip-flop operator.
+
+=back
+
 =head2 Audience
 
 Kurila has just started, so at the moment it is primary interesting
