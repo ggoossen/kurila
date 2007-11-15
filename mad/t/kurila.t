@@ -15,6 +15,7 @@ use Fatal qw|open close|;
 
 use Convert;
 
+my $from = 1.5;
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -29,6 +30,9 @@ sub p5convert {
 
 #t_parenthesis();
 #t_change_deref();
+t_use_pkg_version();
+t_vstring();
+
 t_intuit_more();
 t_change_deref_method();
 t_remove_useversion();
@@ -305,6 +309,10 @@ use version v0.2;
 "foo$\value"
 ----------
 "foo$\value"
+==========
+100.200.300
+----------
+"\x{64}\x{c8}\x{12c}"
 END
 }
 
@@ -543,4 +551,22 @@ for (1..2) { }
 ----
 (@a)[1]
 END
+
+sub t_use_pkg_version {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+BEGIN {
+    $Foo::VERSION = 0.9;
+    $INC{'Foo.pm'} = 1;
+}
+use Foo 0.9;
+----
+BEGIN {
+    $Foo::VERSION = 0.9;
+    $INC{'Foo.pm'} = 1;
+}
+use Foo v0.9;
+====
+END
+}
+
 }
