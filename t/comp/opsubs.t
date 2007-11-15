@@ -12,7 +12,10 @@ This test verifies this behavior for nine different operators.
 
 =cut
 
-use Test::More tests => 36;
+#use Test::More tests => 36;
+BEGIN { require "./test.pl" }
+
+plan tests => 36;
 
 sub m  { return "m-".shift }
 sub q  { return "q-".shift }
@@ -64,7 +67,7 @@ eval "qx('unqualified'".
 SKIP: {
     skip("external command not portable on VMS", 1) if $^O eq 'VMS';
     TODO: {
-	local $TODO = $^O eq 'MSWin32' ? "Tainting of PATH not working of Windows" : $TODO;
+	local our $TODO = $^O eq 'MSWin32' ? "Tainting of PATH not working of Windows" : $TODO;
 	like( $@, qr/^Insecure/, "qx('unqualified') doesn't work" );
     }
 }

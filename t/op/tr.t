@@ -64,39 +64,19 @@ is($@, '',      '    no error');
 use utf8;
 
 # check tr handles UTF8 correctly
-($x = 256.65.258) =~ tr/a/b/;
-is($x, 256.65.258,  'handles UTF8');
+($x = "\x{100}A\x{100}") =~ tr/a/b/;
+is($x, "\x{100}A\x{100}",  'handles UTF8');
 is(length $x, 3);
 
 $x =~ tr/A/B/;
 is(length $x, 3);
-if (ord("\t") == 9) { # ASCII
-    is($x, 256.66.258);
-}
-else {
-    is($x, 256.65.258);
-}
-
-# EBCDIC variants of the above tests
-($x = 256.193.258) =~ tr/a/b/;
-is(length $x, 3);
-is($x, 256.193.258);
-
-$x =~ tr/A/B/;
-is(length $x, 3);
-if (ord("\t") == 9) { # ASCII
-    is($x, 256.193.258);
-}
-else {
-    is($x, 256.194.258);
-}
-
+is($x, "\x{100}B\x{100}");
 
 {
     my $l = chr(300); my $r = chr(400);
     $x = 200.300.400;
     $x =~ tr/\x{12c}/\x{190}/;
-    is($x, 200.400.400,     
+    is($x, 200.300.400,
                         'changing UTF8 chars in a UTF8 string, same length');
     is(length $x, 3);
 

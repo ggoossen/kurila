@@ -6,7 +6,7 @@ BEGIN {
     $INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
-print "1..25\n";
+print "1..26\n";
 
 # Can't require test.pl, as we're testing the use/require mechanism here.
 
@@ -71,88 +71,77 @@ like ($@, qr/use VERSION is not valid in Perl Kurila/);
 eval "use 6.000;";
 like ($@, qr/use VERSION is not valid in Perl Kurila/);
 
-{ use lib }	# check that subparse saves pending tokens
+# fake package 'testuse'
+our $testimport;
+our $version_check;
+$INC{'testuse.pm'} = 1;
+*testuse::import = sub { $testimport = [@_] };
+*testuse::VERSION = sub { $version_check = $_[1] };
 
-local $lib::VERSION = 1.0;
+# test calling of 'VERSION' and 'import' with correct arguments
+eval "use testuse v0.9";
+is ($@, '');
+is $version_check->{'original'}, "v0.9";
+is @{$testimport}, 1, "import called with only packagename";
 
-eval "use lib 0.9";
+# test the default VERSION check.
+undef *testuse::VERSION;
+$testuse::VERSION = 1.0;
+
+eval "use testuse v0.9";
 is ($@, '');
 
-eval "use lib 1.0";
+eval "use testuse v1.0";
 is ($@, '');
 
-eval "use lib 1.01";
-isnt ($@, '');
+eval "use testuse v1.01";
+like ($@, qr/testuse version v1.1.0 required--this is only version v1.0.0/);
 
-
-eval "use lib 0.9 qw(fred)";
+eval "use testuse v0.9 qw(fred)";
 is ($@, '');
+is $testimport->[1], "fred";
 
-if ($^O eq 'MacOS') {
-    is($INC[0], ":fred:");
-} else {
-    is($INC[0], "fred");
-}
-
-eval "use lib 1.0 qw(joe)";
+eval "use testuse v1.0 qw(joe)";
 is ($@, '');
+is $testimport->[1], "joe";
 
-
-if ($^O eq 'MacOS') {
-    is($INC[0], ":joe:");
-} else {
-    is($INC[0], "joe");
-}
-
-
-eval "use lib 1.01 qw(freda)";
+eval "use testuse v1.01 qw(freda)";
 isnt($@, '');
-
-if ($^O eq 'MacOS') {
-    isnt($INC[0], ":freda:");
-} else {
-    isnt($INC[0], "freda");
-}
+is $testimport->[1], "joe", "testimport is still 'joe'";
 
 {
-    local $lib::VERSION = 35.36;
-    eval "use lib v33.55";
+    local $testuse::VERSION = 35.36;
+    eval "use testuse v33.55";
     is ($@, '');
 
-    eval "use lib v100.105";
-    like ($@, qr/lib version v100.105.0 required--this is only version v35\.360\.0/);
+    eval "use testuse v100.105";
+    like ($@, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);
 
-    eval "use lib 33.55";
+    eval "use testuse v33.55";
     is ($@, '');
 
-    eval "use lib 100.105";
-    like ($@, qr/lib version 100.105 required--this is only version 35.36/);
-
-    local $lib::VERSION = '35.36';
-    eval "use lib v33.55";
+    local $testuse::VERSION = '35.36';
+    eval "use testuse v33.55";
     like ($@, '');
 
-    eval "use lib v100.105";
-    like ($@, qr/lib version v100.105.0 required--this is only version v35\.360\.0/);
+    eval "use testuse v100.105";
+    like ($@, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);
 
-    eval "use lib 33.55";
+    eval "use testuse v33.55";
     is ($@, '');
 
-    eval "use lib 100.105";
-    like ($@, qr/lib version 100.105 required--this is only version 35.36/);
+    eval "use testuse v100.105";
+    like ($@, qr/testuse version v100.105.0 required--this is only version v35.360.0/);
 
-    local $lib::VERSION = v35.36;
-    eval "use lib v33.55";
+    local $testuse::VERSION = v35.36;
+    eval "use testuse v33.55";
     is ($@, '');
 
-    eval "use lib v100.105";
-    like ($@, qr/lib version v100.105.0 required--this is only version v35\.36\.0/);
+    eval "use testuse v100.105";
+    like ($@, qr/testuse version v100.105.0 required--this is only version v35\.36\.0/);
 
-    eval "use lib 33.55";
+    eval "use testuse v33.55";
     is ($@, '');
-
-    eval "use lib 100.105";
-    like ($@, qr/lib version 100.105 required--this is only version v35.36/);
 }
 
 
@@ -162,7 +151,7 @@ if ($^O eq 'MacOS') {
     open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
     print F "1;\n";
     close F;
-    eval "use lib '.'; use xxx 3;";
+    eval "use lib '.'; use xxx v3;";
     like ($@, qr/^xxx defines neither package nor VERSION--version check failed at/);
     unlink 'xxx.pm';
 }

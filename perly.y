@@ -631,7 +631,7 @@ package :	PACKAGE WORD ';'
 
 use	:	USE startsub
 			{ CvSPECIAL_on(PL_compcv); /* It's a BEGIN {} */ }
-		    WORD WORD listexpr ';'
+		    THING WORD listexpr ';'
 			{ SvREFCNT_inc_simple_void(PL_compcv);
 #ifdef MAD
 			  $$ = utilize(IVAL($1), $2, $4, $5, $6);

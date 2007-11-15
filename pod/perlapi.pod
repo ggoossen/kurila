@@ -4754,16 +4754,6 @@ Set the value of the UV pointer in sv to val.  See C<SvIV_set>.
 =for hackers
 Found in file sv.h
 
-=item SvVOK
-X<SvVOK>
-
-Returns a boolean indicating whether the SV contains a v-string.
-
-	bool	SvVOK(SV* sv)
-
-=for hackers
-Found in file sv.h
-
 =item sv_catpvn_nomg
 X<sv_catpvn_nomg>
 

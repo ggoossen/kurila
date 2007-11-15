@@ -681,16 +681,7 @@ XS(XS_version_qv)
     SP -= items;
     {
 	SV *	ver = ST(0);
-	if ( !SvVOK(ver) ) { /* only need to do with if not already v-string */
-	    SV * const rv = sv_newmortal();
-	    sv_setsv(rv,ver); /* make a duplicate */
-	    upg_version(rv, TRUE);
-	    PUSHs(rv);
-	}
-	else
-	{
-	    PUSHs(sv_2mortal(new_version(ver)));
-	}
+	PUSHs(sv_2mortal(new_version(ver)));
 
 	PUTBACK;
 	return;
