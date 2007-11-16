@@ -283,16 +283,15 @@ SKIP: {
     # test reformed UNIVERSAL::VERSION
     diag "Replacement UNIVERSAL::VERSION tests" if $Verbose;
 
-    my $error_regex = $] < 5.006
-	? 'version \d required'
-	: 'does not define \$...::VERSION';
+    my $error_regex = 'does not define \$...::VERSION';
+    
     
     {
 	open F, ">aaa.pm" or die "Cannot open aaa.pm: $!\n";
 	print F "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
 	close F;
 
-	$version = 0.58;
+	$version = v0.580;
 	eval "use lib '.'; use aaa $version";
 	unlike($@, qr/aaa version $version/,
 		'Replacement eval works with exact version');
@@ -302,17 +301,11 @@ SKIP: {
 	cmp_ok($new_version,'==',$version, "Called as class method");
 
 	eval "print Completely::Unknown::Module->VERSION";
-	if ( $] < 5.008 ) {
-	    unlike($@, qr/$error_regex/,
-		"Don't freak if the module doesn't even exist");
-	}
-	else {
-	    unlike($@, qr/defines neither package nor VERSION/,
-		"Don't freak if the module doesn't even exist");
-	}
+        unlike($@, qr/$error_regex/,
+               "Don't freak if the module doesn't even exist");
 
 	# this should fail even with old UNIVERSAL::VERSION
-	$version += 0.01;
+	$version = v0.590;
 	eval "use lib '.'; use aaa $version";
 	like($@, qr/aaa version $version/,
 		'Replacement eval works with incremented version');
@@ -323,11 +316,6 @@ SKIP: {
 	unlike($@, qr/aaa version $version/,
 		'Replacement eval works with single digit');
 	
-	# this would fail with old UNIVERSAL::VERSION
-	$version += 0.1;
-	eval "use lib '.'; use aaa $version";
-	like($@, qr/aaa version $version/,
-		'Replacement eval works with incremented digit');
 	unlink 'aaa.pm';
     }
 
@@ -336,15 +324,9 @@ SKIP: {
 	print F "1;\n";
 	close F;
 
-	eval "use lib '.'; use xxx 3;";
-	if ( $] < 5.008 ) {
-	    like($@, qr/$error_regex/,
-		'Replacement handles modules without package or VERSION'); 
-	}
-	else {
-	    like($@, qr/defines neither package nor VERSION/,
-		'Replacement handles modules without package or VERSION'); 
-	}
+	eval "use lib '.'; use xxx v3;";
+        like($@, qr/xxx defines neither package nor VERSION/,
+             'Replacement handles modules without package or VERSION'); 
 	eval "use lib '.'; use xxx; \$version = xxx->VERSION";
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without package or VERSION'); 
@@ -356,7 +338,7 @@ SKIP: {
 	open F, ">yyy.pm" or die "Cannot open yyy.pm: $!\n";
 	print F "package yyy;\n#look ma no VERSION\n1;\n";
 	close F;
-	eval "use lib '.'; use yyy 3;";
+	eval "use lib '.'; use yyy v3;";
 	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use yyy; print yyy->VERSION";
@@ -369,7 +351,7 @@ SKIP: {
 	open F, ">zzz.pm" or die "Cannot open zzz.pm: $!\n";
 	print F "package zzz;\n\@VERSION = ();\n1;\n";
 	close F;
-	eval "use lib '.'; use zzz 3;";
+	eval "use lib '.'; use zzz v3;";
 	like ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use zzz; print zzz->VERSION";
@@ -379,17 +361,15 @@ SKIP: {
     }
 
 SKIP: 	{
-	skip 'Cannot test bare v-strings with Perl < 5.6.0', 4
-		if $] < 5.006_000; 
 	diag "Tests with v-strings" if $Verbose;
-	$version = $CLASS->new("\x{1}\x{2}\x{3}");
+	$version = $CLASS->new(v1.2.3);
 	ok("$version" == "v1.2.3", '"$version" == 1.2.3');
-	$version = $CLASS->new("\x{1}\x{0}\x{0}");
+	$version = $CLASS->new(v1.0.0);
 	$new_version = $CLASS->new(1);
 	ok($version == $new_version, '$version == $new_version');
 	skip "version require'd instead of use'd, cannot test qv", 1
 	    if defined $no_qv;
-	$version = qv("\x{1}\x{2}\x{3}");
+	$version = qv(v1.2.3);
 	ok("$version" == "v1.2.3", 'v-string initialized qv()');
     }
 
@@ -445,20 +425,16 @@ use version; \$VERSION = qv('0.0.4');
 EOF
 	close F;
 
-	eval "use lib '.'; use www 0.000008;";
-	like ($@, qr/^www version 0.000008 required/,
+	eval "use lib '.'; use www v0.000008;";
+	like ($@, qr/^www version v0.8.0 required/,
 	    "Make sure very small versions don't freak"); 
-	eval "use lib '.'; use www 1;";
-	like ($@, qr/^www version 1 required/,
+	eval "use lib '.'; use www v1;";
+	like ($@, qr/^www version v1.0.0 required/,
 	    "Comparing vs. version with no decimal"); 
-	eval "use lib '.'; use www 1.;";
-	like ($@, qr/^www version 1 required/,
+	eval "use lib '.'; use www v1.;";
+	like ($@, qr/^www version v1.0.0 required/,
 	    "Comparing vs. version with decimal only"); 
 
-	if ( $] < 5.006_000 ) {
-	    unlink 'www.pm';
-	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3; 
-	}
 	eval "use lib '.'; use www v0.0.8;";
 	my $regex = "^www version v0.0.8 required";
 	like ($@, qr/$regex/, "Make sure very small versions don't freak"); 
@@ -497,8 +473,8 @@ package uuu;
 1;
 EOF
 	close F;
-	eval "use lib '.'; use uuu 1.001;";
-	like ($@, qr/^uuu version 1.001 required/,
+	eval "use lib '.'; use uuu v1.001;";
+	like ($@, qr/^uuu version v1.1.0 required/,
 	    "User typed numeric so we error with numeric"); 
 	eval "use lib '.'; use uuu v1.1.0;";
 	like ($@, qr/^uuu version v1.1.0 required/,

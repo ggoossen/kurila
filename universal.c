@@ -681,7 +681,10 @@ XS(XS_version_qv)
     SP -= items;
     {
 	SV *	ver = ST(0);
-	PUSHs(sv_2mortal(new_version(ver)));
+        SV * const rv = sv_newmortal();
+        sv_setsv(rv,ver); /* make a duplicate */
+        upg_version(rv, TRUE);
+        PUSHs(rv);
 
 	PUTBACK;
 	return;

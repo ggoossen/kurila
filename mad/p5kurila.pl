@@ -350,12 +350,13 @@ sub remove_vstring {
         next if get_madprop($op_const->parent, "quote_open");
         next if $op_const->parent->tag eq "mad_op";
         next if $op_const->parent->tag eq "op_require";
-        next if $op_const->parent->tag eq "op_concat";
+        next if not $op_const->att('PVMG');
 
         set_madprop($op_const, "quote_open", "&#34;", wsbefore => get_madprop($op_const, "value", "wsbefore"));
         set_madprop($op_const, "quote_close", "&#34;");
         my $v = get_madprop($op_const, "value");
         $v =~ s/^v//;
+        $v =~ s/_//g; # strip '_'
         $v =~ m/^[\d.]+$/ or die "Invalid string '$v'";
         $v =~ s/(\d+)/ sprintf '\x{%x}', $1 /ge;
         $v =~ s/[.]//g;
@@ -554,4 +555,4 @@ remove_vstring( $twig );
 use_pkg_version($twig);
 
 # print
-$twig->print;
+$twig->print( pretty_print => 'indented' );
