@@ -217,7 +217,7 @@ static const char* const lex_state_names[] = {
  */
 
 #ifdef DEBUGGING /* Serve -DT. */
-#   define REPORT(retval) tokereport((I32)retval)
+#   define REPORT(retval) tokereport((I32)retval, &yylval)
 #else
 #   define REPORT(retval) (retval)
 #endif
@@ -362,7 +362,7 @@ static struct debug_tokens {
 /* dump the returned token in rv, plus any optional arg in yylval */
 
 STATIC int
-S_tokereport(pTHX_ I32 rv)
+S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 {
     dVAR;
     if (DEBUG_T_TEST) {
@@ -391,22 +391,22 @@ S_tokereport(pTHX_ I32 rv)
 	case TOKENTYPE_GVVAL: /* doesn't appear to be used */
 	    break;
 	case TOKENTYPE_IVAL:
-	    Perl_sv_catpvf(aTHX_ report, "(ival=%"IVdf")", (IV)yylval.ival);
+	    Perl_sv_catpvf(aTHX_ report, "(ival=%"IVdf")", (IV)lvalp->ival);
 	    break;
 	case TOKENTYPE_OPNUM:
 	    Perl_sv_catpvf(aTHX_ report, "(ival=op_%s)",
-				    PL_op_name[yylval.ival]);
+				    PL_op_name[lvalp->ival]);
 	    break;
 	case TOKENTYPE_PVAL:
-	    Perl_sv_catpvf(aTHX_ report, "(pval=\"%s\")", yylval.pval);
+	    Perl_sv_catpvf(aTHX_ report, "(pval=\"%s\")", lvalp->pval);
 	    break;
 	case TOKENTYPE_OPVAL:
-	    if (yylval.opval) {
+	    if (lvalp->opval) {
 		Perl_sv_catpvf(aTHX_ report, "(opval=op_%s)",
-				    PL_op_name[yylval.opval->op_type]);
-		if (yylval.opval->op_type == OP_CONST) {
+				    PL_op_name[lvalp->opval->op_type]);
+		if (lvalp->opval->op_type == OP_CONST) {
 		    Perl_sv_catpvf(aTHX_ report, " %s",
-			SvPEEK(cSVOPx_sv(yylval.opval)));
+			SvPEEK(cSVOPx_sv(lvalp->opval)));
 		}
 
 	    }
@@ -1290,6 +1290,12 @@ STATIC void
 S_force_next(pTHX_ I32 type)
 {
     dVAR;
+#ifdef DEBUGGING
+    if (DEBUG_T_TEST) {
+        PerlIO_printf(Perl_debug_log, "### forced token:\n");
+	tokereport(THING, &NEXTVAL_NEXTTOKE);
+    }
+#endif
 #ifdef PERL_MAD
     if (PL_curforce < 0)
 	start_force(PL_lasttoke);
@@ -1433,7 +1439,7 @@ S_force_version(pTHX_ char *s)
 {
     dVAR;
     OP *version = NULL;
-    char *d;
+    const char *d;
 #ifdef PERL_MAD
     I32 startoff = s - SvPVX(PL_linestr);
 #endif
@@ -1441,28 +1447,19 @@ S_force_version(pTHX_ char *s)
     s = SKIPSPACE1(s);
 
     d = s;
-    if (*d == 'v')
-	d++;
-    if (isDIGIT(*d)) {
-	while (isDIGIT(*d) || *d == '_' || *d == '.')
-	    d++;
+    if (*d == 'v' && isDIGIT(d[1])) {
+	SV *sv;
+
+	sv = newSV(5); /* preallocate storage space */
+	s = scan_vstring(s, PL_bufend, sv);
+	version = newSVOP(OP_CONST, 0, sv);
+
 #ifdef PERL_MAD
 	if (PL_madskills) {
 	    start_force(PL_curforce);
 	    curmad('X', newSVpvn(s,d-s));
 	}
 #endif
-        if (*d == ';' || isSPACE(*d) || *d == '}' || !*d) {
-	    SV *ver;
-            s = scan_num(s, &yylval);
-            version = yylval.opval;
-	    ver = cSVOPx(version)->op_sv;
-	    if (SvPOK(ver) && !SvNIOK(ver)) {
-		SvUPGRADE(ver, SVt_PVNV);
-		SvNV_set(ver, str_to_version(ver));
-		SvNOK_on(ver);		/* hint that it is a version */
-	    }
-        }
     }
 
 #ifdef PERL_MAD
@@ -1475,7 +1472,7 @@ S_force_version(pTHX_ char *s)
     /* NOTE: The parser sees the package name and the VERSION swapped */
     start_force(PL_curforce);
     NEXTVAL_NEXTTOKE.opval = version;
-    force_next(WORD);
+    force_next(THING);
 
     return s;
 }
@@ -4540,7 +4537,9 @@ Perl_yylex(pTHX)
 	    while (isDIGIT(*start) || *start == '_')
 		start++;
 	    if (*start == '.' && isDIGIT(start[1])) {
-		s = scan_num(s, &yylval);
+		SV* sv = newSV(5); /* preallocate storage space */
+		s = scan_vstring(s, PL_bufend, sv);
+		yylval.opval = newSVOP(OP_CONST, 0, sv);
 		TERM(THING);
 	    }
 	    /* avoid v123abc() or $h{v1}, allow C<print v10;> */
@@ -4549,7 +4548,9 @@ Perl_yylex(pTHX)
 			|| PL_expect == XTERMORDORDOR)) {
 		GV *const gv = gv_fetchpvn_flags(s, start - s, 0, SVt_PVCV);
 		if (!gv) {
-		    s = scan_num(s, &yylval);
+		    SV* sv = newSV(5); /* preallocate storage space */
+		    s = scan_vstring(s, PL_bufend, sv);
+		    yylval.opval = newSVOP(OP_CONST, 0, sv);
 		    TERM(THING);
 		}
 	    }
@@ -11359,8 +11360,7 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
 	    }
 	    if (*s == '.' && isDIGIT(s[1])) {
 		/* oops, it's really a v-string, but without the "v" */
-		s = start;
-		goto vstring;
+		Perl_croak(aTHX_ "Too many decimal points in number");
 	    }
 	}
 
@@ -11450,13 +11450,6 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
 	    sv = S_new_constant(aTHX_ PL_tokenbuf, d - PL_tokenbuf,
 				key, keylen, sv, NULL, NULL, 0);
 	}
-	break;
-
-    /* if it starts with a v, it could be a v-string */
-    case 'v':
-vstring:
-		sv = newSV(5); /* preallocate storage space */
-		s = scan_vstring(s, PL_bufend, sv);
 	break;
     }
 
@@ -11791,7 +11784,6 @@ Perl_scan_vstring(pTHX_ const char *s, const char *e, SV *sv)
 {
     dVAR;
     const char *pos = s;
-    const char *start = s;
     if (*pos == 'v') pos++;  /* get past 'v' */
     while (pos < e && (isDIGIT(*pos) || *pos == '_'))
 	pos++;
@@ -11807,51 +11799,7 @@ Perl_scan_vstring(pTHX_ const char *s, const char *e, SV *sv)
 	}
     }
 
-    if (!isALPHA(*pos)) {
-	char tmpbuf[UTF8_MAXBYTES+1];
-
-	if (*s == 'v')
-	    s++;  /* get past 'v' */
-
-	sv_setpvn(sv, "", 0);
-
-	for (;;) {
-	    /* this is atoi() that tolerates underscores */
-	    char *tmpend;
-	    UV rev = 0;
-	    const char *end = pos;
-	    UV mult = 1;
-	    while (--end >= s) {
-		if (*end != '_') {
-		    const UV orev = rev;
-		    rev += (*end - '0') * mult;
-		    mult *= 10;
-		    if (orev > rev && ckWARN_d(WARN_OVERFLOW))
-			Perl_warner(aTHX_ packWARN(WARN_OVERFLOW),
-				    "Integer overflow in decimal number");
-		}
-	    }
-#ifdef EBCDIC
-	    if (rev > 0x7FFFFFFF)
-		 Perl_croak(aTHX_ "In EBCDIC the v-string components cannot exceed 2147483647");
-#endif
-	    /* Append native character for the rev point */
-	    tmpend = uvchr_to_utf8(tmpbuf, rev);
-	    sv_catpvn(sv, (const char*)tmpbuf, tmpend - tmpbuf);
-	    if (pos + 1 < e && *pos == '.' && isDIGIT(pos[1]))
-		 s = ++pos;
-	    else {
-		 s = pos;
-		 break;
-	    }
-	    while (pos < e && (isDIGIT(*pos) || *pos == '_'))
-		 pos++;
-	}
-	SvPOK_on(sv);
-	sv_magic(sv,NULL,PERL_MAGIC_vstring,(const char*)start, pos-start);
-	SvRMAGICAL_on(sv);
-    }
-    return (char *)s;
+    return (char *)scan_version(s, sv, 1);
 }
 
 /*

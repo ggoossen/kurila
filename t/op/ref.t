@@ -3,7 +3,7 @@
 require './test.pl';
 use strict qw(refs subs);
 
-plan(127);
+plan(126);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -55,10 +55,9 @@ $BAR = \$BAZ;
 $BAZ = "hit";
 is ($$$FOO, 'hit');
 
-# test that ref(vstring) makes sense
-my $vstref = \"\x{1}";
-is (ref($vstref), "VSTRING", "ref(vstr) eq VSTRING");
-like ( $vstref, qr/VSTRING\(0x[0-9a-f]+\)/, '\vstr is also VSTRING');
+# test that vstring are blessed 'version' objects
+my $vstref = v1;
+is (ref($vstref), "version", "ref(vstr) eq 'version'");
 
 # Test references to real arrays.
 

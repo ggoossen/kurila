@@ -3579,30 +3579,24 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     veop = NULL;
 
     if (version) {
-	SV * const vesv = ((SVOP*)version)->op_sv;
+	OP *pack;
+	SV *meth;
 
 	if (PL_madskills)
 	    op_getmad(version,pegop,'V');
-	if (!arg && !SvNIOKp(vesv)) {
-	    arg = version;
-	}
-	else {
-	    OP *pack;
-	    SV *meth;
 
-	    if (version->op_type != OP_CONST || !SvNIOKp(vesv))
-		Perl_croak(aTHX_ "Version number must be constant number");
+	if (version->op_type != OP_CONST)
+	    Perl_croak(aTHX_ "Version number must be constant number");
 
-	    /* Make copy of idop so we don't free it twice */
-	    pack = newSVOP(OP_CONST, 0, newSVsv(((SVOP*)idop)->op_sv));
+	/* Make copy of idop so we don't free it twice */
+	pack = newSVOP(OP_CONST, 0, newSVsv(((SVOP*)idop)->op_sv));
 
-	    /* Fake up a method call to VERSION */
-	    meth = newSVpvs_share("VERSION");
-	    veop = convert(OP_ENTERSUB, OPf_STACKED|OPf_SPECIAL,
-			    append_elem(OP_LIST,
-					prepend_elem(OP_LIST, pack, list(version)),
-					newSVOP(OP_METHOD_NAMED, 0, meth)));
-	}
+	/* Fake up a method call to VERSION */
+	meth = newSVpvs_share("VERSION");
+	veop = convert(OP_ENTERSUB, OPf_STACKED|OPf_SPECIAL,
+		       append_elem(OP_LIST,
+				   prepend_elem(OP_LIST, pack, list(version)),
+				   newSVOP(OP_METHOD_NAMED, 0, meth)));
     }
 
     /* Fake up an import/unimport */
@@ -3610,11 +3604,6 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	if (PL_madskills)
 	    op_getmad(arg,pegop,'S');
 	imop = arg;		/* no import on explicit () */
-    }
-    else if (SvNIOKp(((SVOP*)idop)->op_sv)) {
-	imop = NULL;		/* use 5.0; */
-	if (!aver)
-	    idop->op_private |= OPpCONST_NOVER;
     }
     else {
 	SV *meth;
