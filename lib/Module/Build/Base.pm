@@ -8,7 +8,7 @@ use File::Copy ();
 use File::Find ();
 use File::Path ();
 use File::Basename ();
-use File::Spec 0.82 ();
+use File::Spec v0.82 ();
 use File::Compare ();
 use Data::Dumper ();
 use IO::File ();

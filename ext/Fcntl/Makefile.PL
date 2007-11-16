@@ -1,5 +1,5 @@
 use ExtUtils::MakeMaker;
-use ExtUtils::Constant 0.11 'WriteConstants';
+use ExtUtils::Constant v0.11 'WriteConstants';
 WriteMakefile(
     NAME 	=> 'Fcntl',
     MAN3PODS 	=> {}, 	# Pods will be built by installman.

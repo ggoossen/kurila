@@ -136,9 +136,9 @@ that the file will not exist by the time the caller opens the filename.
 # People would like a version on 5.004 so give them what they want :-)
 use strict;
 use Carp;
-use File::Spec 0.8;
+use File::Spec v0.8;
 use File::Path qw/ rmtree /;
-use Fcntl 1.03;
+use Fcntl v1.03;
 use IO::Seekable; # For SEEK_*
 use Errno;
 require VMS::Stdio if $^O eq 'VMS';

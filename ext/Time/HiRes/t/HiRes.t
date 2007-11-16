@@ -16,7 +16,7 @@ BEGIN { $| = 1; print "1..38\n"; }
 
 END { print "not ok 1\n" unless $loaded }
 
-use Time::HiRes 1.9704; # Remember to bump this once in a while.
+use Time::HiRes v1.9704; # Remember to bump this once in a while.
 use Time::HiRes qw(tv_interval);
 
 $loaded = 1;

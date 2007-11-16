@@ -238,7 +238,7 @@ C</=item mine/../=(item|back)/>
 use strict;
 #use diagnostics;
 use Carp;
-use Pod::Parser 1.04;
+use Pod::Parser v1.04;
 use vars qw(@ISA @EXPORT $MAX_HEADING_LEVEL);
 
 @ISA = qw(Pod::Parser);

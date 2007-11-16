@@ -8,7 +8,7 @@ package IO::Socket;
 
 
 use IO::Handle;
-use Socket 1.3;
+use Socket v1.3;
 use Carp;
 use strict;
 our(@ISA, $VERSION, @EXPORT_OK);

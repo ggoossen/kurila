@@ -28,7 +28,7 @@ BEGIN {
 
 plan(tests => 69);
 
-use Math::Trig 1.03;
+use Math::Trig v1.03;
 
 my $pip2 = pi / 2;
 

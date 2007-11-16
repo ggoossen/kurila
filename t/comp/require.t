@@ -39,19 +39,19 @@ eval 'require 5.005';
 print "not " unless $@;
 print "ok ",$i++,"\n";
 
-print "not " unless 5.5.1 gt v5.5;
+print "not " unless "\x{5}\x{5}\x{1}" gt "\x{5}\x{5}";
 print "ok ",$i++,"\n";
 
 {
     use utf8;
-    print "not " unless v5.5.640 eq "\x{5}\x{5}\x{280}";
+    print "not " unless "\x{5}\x{5}\x{280}" eq "\x{5}\x{5}\x{280}";
     print "ok ",$i++,"\n";
 
-    print "not " unless v7.15 eq "\x{7}\x{f}";
+    print "not " unless "\x{7}\x{f}" eq "\x{7}\x{f}";
     print "ok ",$i++,"\n";
 
     print "not "
-      unless v1.20.300.4000.50000.600000 eq "\x{1}\x{14}\x{12c}\x{fa0}\x{c350}\x{927c0}";
+      unless "\x{1}\x{14}\x{12c}\x{fa0}\x{c350}\x{927c0}" eq "\x{1}\x{14}\x{12c}\x{fa0}\x{c350}\x{927c0}";
     print "ok ",$i++,"\n";
 }
 
