@@ -34,8 +34,8 @@ if( eval 'our $foo' ) {
 }
 
 if( eval 'require version; "version"->import' ) {
-    $versions{q[use version; $VERSION = qv(1.2.3);]} = qv(1.2.3);
-    $versions{q[$VERSION = qv(1.2.3)]}               = qv(1.2.3);
+    $versions{q[use version; $VERSION = qv(1.2.3);]} = qv("\x{1}\x{2}\x{3}");
+    $versions{q[$VERSION = qv(1.2.3)]}               = qv("\x{1}\x{2}\x{3}");
 }
 
 plan tests => 2 * keys %versions;

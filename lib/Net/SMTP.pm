@@ -9,7 +9,7 @@ package Net::SMTP;
 
 use strict;
 use vars qw($VERSION @ISA);
-use Socket 1.3;
+use Socket v1.3;
 use Carp;
 use IO::Socket;
 use Net::Cmd;

@@ -21,7 +21,7 @@ use Test::More  (grep { /isvstring/ } @Scalar::Util::EXPORT_FAIL)
 
 Scalar::Util->import(qw[isvstring]);
 
-$vs = ord("A") == 193 ? 241.75.240 : 49.46.48;
+$vs = ord("A") == 193 ? "\x{f1}\x{4b}\x{f0}" : "\x{31}\x{2e}\x{30}";
 
 ok( $vs == "1.0",	'dotted num');
 ok( isvstring($vs),	'isvstring');

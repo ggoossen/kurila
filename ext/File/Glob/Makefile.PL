@@ -1,5 +1,5 @@
 use ExtUtils::MakeMaker;
-use ExtUtils::Constant 0.11 'WriteConstants';
+use ExtUtils::Constant v0.11 'WriteConstants';
 WriteMakefile(
     NAME		=> 'File::Glob',
     VERSION_FROM	=> 'Glob.pm',

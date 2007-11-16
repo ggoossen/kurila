@@ -15,7 +15,7 @@ BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
           : sub() {0}
       }
 
-use Text::Wrap 98.112902 (); # was 2001.0131, but I don't think we need that
+use Text::Wrap v98.112902 (); # was 2001.0131, but I don't think we need that
 $Text::Wrap::wrap = 'overflow';
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

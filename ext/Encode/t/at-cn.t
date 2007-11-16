@@ -117,7 +117,7 @@ run_tests('Simplified Chinese + ASCII', {
 });
 
 run_tests('Traditional Chinese', {
-    'utf',	=> 20094.65306.20803.12289.20136.12289.21033.12289.35998,
+    'utf',	=> "\x{4e7e}\x{ff1a}\x{5143}\x{3001}\x{4ea8}\x{3001}\x{5229}\x{3001}\x{8c9e}",
     'gb12345-raw'	=> 'G,#:T*!":`!"@{!"Uj',
     'gbk'	=> 'วฌฃบิชกขบเกขภ๛กขุ‘',
 });

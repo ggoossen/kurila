@@ -6,7 +6,7 @@ use bytes;
 use Test::More ; 
 use CompTestUtils;
 
-use Compress::Raw::Zlib 2 ;
+use Compress::Raw::Zlib v2 ;
 
 BEGIN 
 { 

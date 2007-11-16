@@ -1046,8 +1046,8 @@ sub new
 package main;
 
 
-my $utfvar = utf8_o->new( 200.2.1);
-is("$utfvar", 200.2.1); # 223 - stringify
+my $utfvar = utf8_o->new( "\x{c8}\x{2}\x{1}");
+is("$utfvar", "\x{c8}\x{2}\x{1}"); # 223 - stringify
 is("a$utfvar", "a".200.2.1); # 224 - overload via sv_2pv_flags
 
 # 225..227 -- more %{} tests.  Hangs in 5.6.0, okay in later releases.
