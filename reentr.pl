@@ -670,7 +670,7 @@ EOF
 	    }
 	    my $b = $a;
 	    my $w = '';
-	    substr($b, 0, $seenu{$func}) = '';
+	    substr($b, 0, $seenu{$func}, '');
 	    if ($func =~ /^random$/) {
 		$true = "PL_reentrant_buffer->_random_retval";
 	    } elsif ($b =~ /R/) {

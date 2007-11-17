@@ -37,7 +37,7 @@ is($a, 'main::foo');
 is(ref(\$b), 'GLOB');
 
 # typeglobs as lvalues
-substr($foo, 0, 1) = "XXX";
+substr($foo, 0, 1, "XXX");
 is(ref(\$foo), 'SCALAR');
 is($foo, 'XXXmain::bar');
 

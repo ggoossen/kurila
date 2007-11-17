@@ -74,7 +74,7 @@ find( sub { push @files, $File::Find::name; return }, $outdir );
   ok($long) or print "# How odd, no zikzik file in $outdir!?\n";
   if($long) {
     $long =~ s{zikzik\.html?$}{}s;
-    for(@files) { substr($_, 0, length($long)) = '' }
+    for(@files) { substr($_, 0, length($long), '') }
     @files = grep length($_), @files;
   }
 }

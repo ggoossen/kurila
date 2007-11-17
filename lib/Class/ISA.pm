@@ -193,7 +193,7 @@ sub self_and_super_path {
     unshift @in_stack,
       map
         { my $c = $_; # copy, to avoid being destructive
-          substr($c,0,2) = "main::" if substr($c,0,2) eq '::';
+          substr($c,0,2, "main::") if substr($c,0,2) eq '::';
            # Canonize the :: -> main::, ::foo -> main::foo thing.
            # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
           $seen{$c}++ ? () : $c;

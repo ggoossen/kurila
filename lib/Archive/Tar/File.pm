@@ -444,7 +444,7 @@ sub validate {
     my $raw = $self->raw;
 
     ### don't know why this one is different from the one we /write/ ###
-    substr ($raw, 148, 8) = "        ";
+    substr ($raw, 148, 8, "        ");
 	return unpack ("%16C*", $raw) == $self->chksum ? 1 : 0;
 }
 

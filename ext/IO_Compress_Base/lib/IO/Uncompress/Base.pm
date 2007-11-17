@@ -48,7 +48,7 @@ sub smartRead
     if ( length *$self->{Prime} ) {
         #$$out = substr(*$self->{Prime}, 0, $size, '') ;
         $$out = substr(*$self->{Prime}, 0, $size) ;
-        substr(*$self->{Prime}, 0, $size) =  '' ;
+        substr(*$self->{Prime}, 0, $size,  '') ;
         if (length $$out == $size) {
             *$self->{InputLengthRemaining} -= length $$out
                 if defined *$self->{InputLength};
@@ -76,7 +76,7 @@ sub smartRead
         if (length $$out > $size ) {
             #*$self->{Prime} = substr($$out, $size, length($$out), '');
             *$self->{Prime} = substr($$out, $size, length($$out));
-            substr($$out, $size, length($$out)) =  '';
+            substr($$out, $size, length($$out),  '');
         }
 
        *$self->{EventEof} = 1 if $got <= 0 ;
@@ -86,9 +86,9 @@ sub smartRead
        my $buf = *$self->{Buffer} ;
        $$buf = '' unless defined $$buf ;
        #$$out = '' unless defined $$out ;
-       substr($$out, $offset) = substr($$buf, *$self->{BufferOffset}, $get_size);
+       substr($$out, $offset, undef, substr($$buf, *$self->{BufferOffset}, $get_size));
        if (*$self->{ConsumeInput})
-         { substr($$buf, 0, $get_size) = '' }
+         { substr($$buf, 0, $get_size, '') }
        else  
          { *$self->{BufferOffset} += length($$out) - $offset }
     }
@@ -138,7 +138,7 @@ sub smartSeek
       { *$self->{FH}->seek($offset, SEEK_SET) }
     else {
         *$self->{BufferOffset} = $offset ;
-        substr(${ *$self->{Buffer} }, *$self->{BufferOffset}) = ''
+        substr(${ *$self->{Buffer} }, *$self->{BufferOffset}, undef, '')
             if $truncate;
         return 1;
     }
@@ -156,7 +156,7 @@ sub smartWrite
     }
     else {
        my $buf = *$self->{Buffer} ;
-       substr($$buf, *$self->{BufferOffset}, length $out_data) = $out_data ;
+       substr($$buf, *$self->{BufferOffset}, length $out_data, $out_data) ;
        *$self->{BufferOffset} += length($out_data) ;
        return 1;
     }
@@ -1051,13 +1051,13 @@ sub read
         $$buffer .= "\x00" x ($offset - length($$buffer))
             if $offset > length($$buffer) ;
         #substr($$buffer, $offset) = substr($$out_buffer, 0, $length, '') ;
-        substr($$buffer, $offset) = substr($$out_buffer, 0, $length) ;
-        substr($$out_buffer, 0, $length) =  '' ;
+        substr($$buffer, $offset, undef, substr($$out_buffer, 0, $length)) ;
+        substr($$out_buffer, 0, $length,  '') ;
     }
     else {
         #$$buffer .= substr($$out_buffer, 0, $length, '') ;
         $$buffer .= substr($$out_buffer, 0, $length) ;
-        substr($$out_buffer, 0, $length) =  '' ;
+        substr($$out_buffer, 0, $length,  '') ;
     }
 
     return $length ;
@@ -1104,7 +1104,7 @@ sub _getline
         if (length(*$self->{Pending}) && 
                     ($offset = index(*$self->{Pending}, $/)) >=0) {
             my $l = substr(*$self->{Pending}, 0, $offset + length $/ );
-            substr(*$self->{Pending}, 0, $offset + length $/) = '';    
+            substr(*$self->{Pending}, 0, $offset + length $/, '');    
             return \$l;
         }
 
@@ -1112,7 +1112,7 @@ sub _getline
             my $offset = index($line, $/);
             if ($offset >= 0) {
                 my $l = substr($line, 0, $offset + length $/ );
-                substr($line, 0, $offset + length $/) = '';    
+                substr($line, 0, $offset + length $/, '');    
                 $$p = $line;
                 return \$l;
             }

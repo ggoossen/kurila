@@ -380,7 +380,7 @@ use utf8;
 
 my $pv1 = my $pv2  = "Andreas J. K\303\266nig";
 $pv1 =~ s/A/\x{100}/;
-substr($pv2,0,1) = "\x{100}";
+substr($pv2,0,1, "\x{100}");
 is($pv1, $pv2);
 
 SKIP: {

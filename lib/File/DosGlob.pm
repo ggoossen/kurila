@@ -35,7 +35,7 @@ sub doglob {
 	# wildcards with a drive prefix such as h:*.pm must be changed
 	# to h:./*.pm to expand correctly
 	if ($pat =~ m|^([A-Za-z]:)[^/\\]|s) {
-	    substr($_,0,2) = $1 . "./";
+	    substr($_,0,2, $1 . "./");
 	}
 	if ($pat =~ m|^(.*)([\\/])([^\\/]*)\z|s) {
 	    ($head, $sepchr, $tail) = ($1,$2,$3);

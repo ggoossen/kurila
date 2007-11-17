@@ -277,12 +277,12 @@ unless ($Library) {
   # printf "# oldchk = 0x%08x\n", $oldchk;
   # printf "# newchk = 0x%08x\n", $newchk;
 
-  substr($app,  8, 4) = pack('V', $uid);
-  substr($app, 12, 4) = pack('V', $uidcrc);
-  substr($app, 24, 4) = pack('V', $newchk);
+  substr($app,  8, 4, pack('V', $uid));
+  substr($app, 12, 4, pack('V', $uidcrc));
+  substr($app, 24, 4, pack('V', $newchk));
   
   my $UID_OFFSET = 0x0C7C; # This is where the uid is in the $app.
-  substr($app, $UID_OFFSET, 4) = substr($app, 8, 4); # Copy the uid also here.
+  substr($app, $UID_OFFSET, 4, substr($app, 8, 4)); # Copy the uid also here.
 
   if (open(my $fh, ">$AppName.app")) {
     binmode($fh);

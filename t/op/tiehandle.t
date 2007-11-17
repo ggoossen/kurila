@@ -50,7 +50,7 @@ sub GETC {
 
 sub READ {
     ::compare(READ => @_);
-    substr($_[1],$_[3] || 0) = substr($data,0,$_[2]);
+    substr($_[1],$_[3] || 0, undef, substr($data,0,$_[2]));
     3;
 }
 

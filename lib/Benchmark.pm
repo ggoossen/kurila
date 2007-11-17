@@ -1032,7 +1032,7 @@ sub cmpthese{
 
     # Dump the output
     my $format = join( ' ', map { "%${_}s" } @col_widths ) . "\n";
-    substr( $format, 1, 0 ) = '-';
+    substr( $format, 1, 0, '-' );
     for ( @rows ) {
 	printf $format, @$_;
     }

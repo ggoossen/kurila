@@ -58,8 +58,8 @@ sub iso_euc {
 sub euc_iso {
     no warnings qw(uninitialized);
     my $r_str = shift;
-    substr( $$r_str, 0, 0 ) =
-      $ESC{'2022_KR'};    # put the designator at the beg.
+    substr( $$r_str, 0, 0,
+      $ESC{'2022_KR'} );    # put the designator at the beg.
     $$r_str =~
       s{                         # move KS X 1001 characters in GR to GL
         ($RE{EUC_C}+)                     # and enclose them with SO and SI

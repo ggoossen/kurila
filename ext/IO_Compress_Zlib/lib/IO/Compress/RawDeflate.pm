@@ -211,7 +211,7 @@ sub createMerge
 
 
     if ( $outType eq 'buffer') 
-      { substr( ${ *$self->{Buffer} }, $end_offset) = '' }
+      { substr( ${ *$self->{Buffer} }, $end_offset, undef, '') }
     elsif ($outType eq 'handle' || $outType eq 'filename') {
         *$self->{FH} = *$inf->{FH} ;
         delete *$inf->{FH};

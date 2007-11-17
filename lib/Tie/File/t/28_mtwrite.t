@@ -191,7 +191,7 @@ sub mkrand {
   my @c = ('a' .. 'z', 'A' .. 'Z', 0..9, $:);
   my $d = "";
   $d .= $c[rand @c] until length($d) >= $len;
-  substr($d, $len) = ""; # chop it off to the proper length
+  substr($d, $len, undef, ""); # chop it off to the proper length
   $d;
 }
 

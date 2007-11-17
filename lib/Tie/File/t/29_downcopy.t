@@ -249,7 +249,7 @@ sub try {
     int(8192*5/length($d))+1; # at least 5 blocks' worth
   my $oldfile = $d x $recs;
   my $flen = defined($FLEN) ? $FLEN : $recs * 17;
-  substr($oldfile, $FLEN) = "" if defined $FLEN;  # truncate
+  substr($oldfile, $FLEN, undef, "") if defined $FLEN;  # truncate
   print F $oldfile;
   close F;
 
@@ -265,7 +265,7 @@ sub try {
     substr($expected, $pos, $len, substr($old, 0, $len, ""));
     $x_retval = $old;
   } else {
-    substr($expected, $pos) = $old;
+    substr($expected, $pos, undef, $old);
     $x_retval = "";
   }
 

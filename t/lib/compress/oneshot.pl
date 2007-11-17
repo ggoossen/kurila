@@ -250,7 +250,7 @@ sub run
 
         # corrupt the compressed data
         #substr($out, -10, 10) = "x" x 10 ;
-        substr($out, int(length($out)/3), 10) = 'abcdeabcde';
+        substr($out, int(length($out)/3), 10, 'abcdeabcde');
 
         my $result;
         ok ! $FuncInverse->(\$out => \$result, Transparent => 0), "  $TopTypeInverse ok";

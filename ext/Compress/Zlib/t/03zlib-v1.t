@@ -132,7 +132,7 @@ ok $hello eq $uncompr ;
 $compr = compress(\$hello) ;
 ok $compr ne "" ;
 
-substr($compr,0, 1) = "\xFF";
+substr($compr,0, 1, "\xFF");
 ok !defined uncompress (\$compr) ;
 
 # deflate/inflate - small buffer
@@ -456,37 +456,37 @@ EOM
 
     # corrupt header - 1st byte wrong
     my $bad = $keep ;
-    substr($bad, 0, 1) = "\xFF" ;
+    substr($bad, 0, 1, "\xFF") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt header - 2st byte wrong
     $bad = $keep ;
-    substr($bad, 1, 1) = "\xFF" ;
+    substr($bad, 1, 1, "\xFF") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt header - method not deflated
     $bad = $keep ;
-    substr($bad, 2, 1) = "\xFF" ;
+    substr($bad, 2, 1, "\xFF") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt header - reserverd bits used
     $bad = $keep ;
-    substr($bad, 3, 1) = "\xFF" ;
+    substr($bad, 3, 1, "\xFF") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt trailer - length wrong
     $bad = $keep ;
-    substr($bad, -8, 4) = "\xFF" x 4 ;
+    substr($bad, -8, 4, "\xFF" x 4) ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt trailer - CRC wrong
     $bad = $keep ;
-    substr($bad, -4, 4) = "\xFF" x 4 ;
+    substr($bad, -4, 4, "\xFF" x 4) ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 }
@@ -924,7 +924,7 @@ EOM
     {
         title "Header Corruption - Fingerprint wrong 1st byte" ;
         my $buffer = $good ;
-        substr($buffer, 0, 1) = 'x' ;
+        substr($buffer, 0, 1, 'x') ;
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
     }
@@ -932,7 +932,7 @@ EOM
     {
         title "Header Corruption - Fingerprint wrong 2nd byte" ;
         my $buffer = $good ;
-        substr($buffer, 1, 1) = "\xFF" ;
+        substr($buffer, 1, 1, "\xFF") ;
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
     }
@@ -940,7 +940,7 @@ EOM
     {
         title "Header Corruption - CM not 8";
         my $buffer = $good ;
-        substr($buffer, 2, 1) = 'x' ;
+        substr($buffer, 2, 1, 'x') ;
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
     }
@@ -948,7 +948,7 @@ EOM
     {
         title "Header Corruption - Use of Reserved Flags";
         my $buffer = $good ;
-        substr($buffer, 3, 1) = "\xff";
+        substr($buffer, 3, 1, "\xff");
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
     }
@@ -968,7 +968,7 @@ EOM
     ok  $x->write($string) ;
     ok  $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
 
     ok ! Compress::Zlib::memGunzip(\$truncated) ;
 
@@ -988,7 +988,7 @@ EOM
     ok  $x->write($string) ;
     ok  $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
 
     ok ! Compress::Zlib::memGunzip(\$truncated) ;
 }
@@ -1006,7 +1006,7 @@ EOM
     ok  $x->write($string) ;
     ok  $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
     ok ! Compress::Zlib::memGunzip(\$truncated) ;
 }
 
@@ -1022,7 +1022,7 @@ EOM
     ok  $x->write($string) ;
     ok  $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
 
     ok ! Compress::Zlib::memGunzip(\$truncated) ;
 }
@@ -1070,7 +1070,7 @@ EOM
         title "Trailer Corruption - Trailer truncated to $got bytes" ;
         my $buffer = $good ;
 
-        substr($buffer, $trim) = '';
+        substr($buffer, $trim, undef, '');
 
         ok my $u = Compress::Zlib::memGunzip(\$buffer) ;
         ok $u eq $string;
@@ -1080,7 +1080,7 @@ EOM
     {
         title "Trailer Corruption - Length Wrong, CRC Correct" ;
         my $buffer = $good ;
-        substr($buffer, -4, 4) = pack('V', 1234);
+        substr($buffer, -4, 4, pack('V', 1234));
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
     }
@@ -1088,8 +1088,8 @@ EOM
     {
         title "Trailer Corruption - Length Wrong, CRC Wrong" ;
         my $buffer = $good ;
-        substr($buffer, -4, 4) = pack('V', 1234);
-        substr($buffer, -8, 4) = pack('V', 1234);
+        substr($buffer, -4, 4, pack('V', 1234));
+        substr($buffer, -8, 4, pack('V', 1234));
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
 

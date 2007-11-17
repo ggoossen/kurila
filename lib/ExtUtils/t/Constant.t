@@ -840,7 +840,7 @@ EOT
     # Yes, the last time round the loop appends a z to the string.
     for my $i (0 .. length $thisname) {
       my $copyname = $thisname;
-      substr ($copyname, $i, 1) = 'z';
+      substr ($copyname, $i, 1, 'z');
       $test_body .= explict_call_constant ($copyname,
                                            $copyname eq $thisname
                                              ? $thisname : undef);

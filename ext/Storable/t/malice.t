@@ -137,7 +137,7 @@ sub test_things {
   my $copy;
   if ($isfile) {
     $copy = $contents;
-    substr ($copy, 0, 4) = 'iron';
+    substr ($copy, 0, 4, 'iron');
     test_corrupt ($copy, $sub, "/^File is not a perl storable/",
                   "magic number");
   }
@@ -154,7 +154,7 @@ sub test_things {
   # Engineer answers "Well, allowing for a small safety margin,   18"
   # )
   my $minor4 = $header->{minor} + 4;
-  substr ($copy, $file_magic + 1, 1) = chr $minor4;
+  substr ($copy, $file_magic + 1, 1, chr $minor4);
   {
     # Now by default newer minor version numbers are not a pain.
     $clone = &$sub($copy);
@@ -169,14 +169,14 @@ sub test_things {
 
   $copy = $contents;
   my $major1 = $header->{major} + 1;
-  substr ($copy, $file_magic, 1) = chr 2*$major1;
+  substr ($copy, $file_magic, 1, chr 2*$major1);
   test_corrupt ($copy, $sub,
                 "/^Storable binary image v$major1\.$header->{minor} more recent than I am \\(v$header->{major}\.$minor\\)/",
                 "higher major");
 
   # Continue messing with the previous copy
   my $minor1 = $header->{minor} - 1;
-  substr ($copy, $file_magic + 1, 1) = chr $minor1;
+  substr ($copy, $file_magic + 1, 1, chr $minor1);
   test_corrupt ($copy, $sub,
                 "/^Storable binary image v$major1\.$minor1 more recent than I am \\(v$header->{major}\.$minor\\)/",
               "higher major, lower minor");
@@ -186,8 +186,7 @@ sub test_things {
     # All these are omitted from the network order header.
     # I'm not sure if it's correct to omit the byte size stuff.
     $copy = $contents;
-    substr ($copy, $file_magic + 3, length $header->{byteorder})
-      = reverse $header->{byteorder};
+    substr ($copy, $file_magic + 3, length $header->{byteorder}, reverse $header->{byteorder});
 
     test_corrupt ($copy, $sub, "/^Byte order is not compatible/",
                   "byte order");
@@ -198,7 +197,7 @@ sub test_things {
              ['nvsize', "Double"]) {
       my ($key, $name) = @$_;
       $copy = $contents;
-      substr ($copy, $where++, 1) = chr 0;
+      substr ($copy, $where++, 1, chr 0);
       test_corrupt ($copy, $sub, "/^$name size is not compatible/",
                     "$name size");
     }
@@ -215,13 +214,13 @@ sub test_things {
                 "bogus tag");
 
   # Now drop the minor version number
-  substr ($copy, $file_magic + 1, 1) = chr $minor1;
+  substr ($copy, $file_magic + 1, 1, chr $minor1);
 
   test_corrupt ($copy, $sub,
                 "/^Corrupted storable $what \\(binary v$header->{major}.$minor1\\)/",
                 "bogus tag, minor less 1");
   # Now increase the minor version number
-  substr ($copy, $file_magic + 1, 1) = chr $minor4;
+  substr ($copy, $file_magic + 1, 1, chr $minor4);
 
   # local $Storable::DEBUGME = 1;
   # This is the delayed croak

@@ -115,6 +115,6 @@ print "ok 3\n";
     print length $a == 198 ? "ok 18\n" : "not ok 18\n";
     $a = chr(256) x 999;
     print length $a == 999 ? "ok 19\n" : "not ok 19\n";
-    substr($a, 0, 1) = '';
+    substr($a, 0, 1, '');
     print length $a == 998 ? "ok 20\n" : "not ok 20\n";
 }
