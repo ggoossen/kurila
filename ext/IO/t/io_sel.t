@@ -12,7 +12,7 @@ select(STDOUT); $| = 1;
 
 print "1..23\n";
 
-use IO::Select 1.09;
+use IO::Select v1.09;
 
 my $sel = IO::Select->new(\*STDIN);
 $sel->add(4, 5) == 2 or print "not ";

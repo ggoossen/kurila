@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.006 qw(createSelfTiedObject);
+use IO::Compress::Base::Common v2.006 qw(createSelfTiedObject);
 
-use IO::Uncompress::Base 2.006 ;
+use IO::Uncompress::Base v2.006 ;
 
 
 require Exporter ;
@@ -56,7 +56,7 @@ sub anyuncompress
 
 sub getExtraParams
 {
-    use IO::Compress::Base::Common 2.006 qw(:Parse);
+    use IO::Compress::Base::Common v2.006 qw(:Parse);
     return ( 'RawInflate' => [1, 1, Parse_boolean,  0] ) ;
 }
 

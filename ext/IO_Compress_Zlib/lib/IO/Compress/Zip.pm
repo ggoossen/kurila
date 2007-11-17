@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.006 qw(:Status createSelfTiedObject);
-use IO::Compress::RawDeflate 2.006 ;
-use IO::Compress::Adapter::Deflate 2.006 ;
-use IO::Compress::Adapter::Identity 2.006 ;
-use IO::Compress::Zlib::Extra 2.006 ;
-use IO::Compress::Zip::Constants 2.006 ;
+use IO::Compress::Base::Common  v2.006 qw(:Status createSelfTiedObject);
+use IO::Compress::RawDeflate v2.006 ;
+use IO::Compress::Adapter::Deflate v2.006 ;
+use IO::Compress::Adapter::Identity v2.006 ;
+use IO::Compress::Zlib::Extra v2.006 ;
+use IO::Compress::Zip::Constants v2.006 ;
 
 
-use Compress::Raw::Zlib  2.006 qw(crc32) ;
+use Compress::Raw::Zlib  v2.006 qw(crc32) ;
 BEGIN
 {
     eval { require IO::Compress::Adapter::Bzip2 ; 
@@ -441,8 +441,8 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.006 qw(:Parse);
-    use Compress::Raw::Zlib  2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
+    use IO::Compress::Base::Common  v2.006 qw(:Parse);
+    use Compress::Raw::Zlib  v2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
 
     my @Bzip2 = ();
     

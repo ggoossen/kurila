@@ -727,9 +727,6 @@ Unsets the PV status of an SV.
 Tells an SV that it is a string and disables all other OK bits.
 Will also turn off the UTF-8 status.
 
-=for apidoc Am|bool|SvVOK|SV* sv
-Returns a boolean indicating whether the SV contains a v-string.
-
 =for apidoc Am|U32|SvOOK|SV* sv
 Returns a U32 indicating whether the SvIVX is a valid offset value for
 the SvPVX.  This hack is used internally to speed up removal of characters
@@ -882,12 +879,6 @@ in gv.h: */
 				 SvFLAGS(sv) &= ~(SVf_OK|		\
 						  SVf_IVisUV),	\
 				    SvFLAGS(sv) |= (SVf_POK|SVp_POK))
-
-#define SvVOK(sv)		(SvMAGICAL(sv)				\
-				 && mg_find(sv,PERL_MAGIC_vstring))
-/* returns the vstring magic, if any */
-#define SvVSTRING_mg(sv)	(SvMAGICAL(sv) \
-				 ? mg_find(sv,PERL_MAGIC_vstring) : NULL)
 
 #define SvOOK(sv)		(SvFLAGS(sv) & SVf_OOK)
 #define SvOOK_on(sv)		((void)SvIOK_off(sv), SvFLAGS(sv) |= SVf_OOK)

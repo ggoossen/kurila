@@ -7,13 +7,13 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Uncompress::RawInflate  2.006 ;
-use IO::Compress::Base::Common  2.006 qw(:Status createSelfTiedObject);
-use IO::Uncompress::Adapter::Identity 2.006 ;
-use IO::Compress::Zlib::Extra 2.006 ;
-use IO::Compress::Zip::Constants 2.006 ;
+use IO::Uncompress::RawInflate  v2.006 ;
+use IO::Compress::Base::Common  v2.006 qw(:Status createSelfTiedObject);
+use IO::Uncompress::Adapter::Identity v2.006 ;
+use IO::Compress::Zlib::Extra v2.006 ;
+use IO::Compress::Zip::Constants v2.006 ;
 
-use Compress::Raw::Zlib  2.006 qw(crc32) ;
+use Compress::Raw::Zlib  v2.006 qw(crc32) ;
 
 BEGIN
 {
@@ -59,7 +59,7 @@ sub unzip
 
 sub getExtraParams
 {
-    use IO::Compress::Base::Common  2.006 qw(:Parse);
+    use IO::Compress::Base::Common  v2.006 qw(:Parse);
 
     
     return (

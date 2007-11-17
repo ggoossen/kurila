@@ -3,7 +3,7 @@
 use strict ;
 
 use private::MakeUtil;
-use ExtUtils::MakeMaker 5.16 ;
+use ExtUtils::MakeMaker v5.16 ;
 use ExtUtils::Install (); # only needed to check for version
 
 my $ZLIB_LIB ;

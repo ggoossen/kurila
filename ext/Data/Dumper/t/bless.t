@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More 0.60;
+use Test::More v0.60;
 
 # Test::More 0.60 required because:
 # - is_deeply(undef, $not_undef); now works. [rt.cpan.org 9441]

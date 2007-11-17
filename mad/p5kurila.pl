@@ -342,18 +342,21 @@ sub remove_vstring {
     my $twig = shift;
 
     for my $op_const ($twig->findnodes(q|//op_const|), $twig->findnodes(q|op_null[@was="const"]|)) {
-        next unless (get_madprop($op_const, "value") || '') =~ m/\Av/;
+        # starts with a 'v' or a digital with at least two '.'
+        next unless (get_madprop($op_const, "value") || '') =~ m/\A(v|\d.*[.].*[.])/;
+
         next if get_madprop($op_const, "forcedword");
         next if $op_const->att('private') && ($op_const->att('private') =~ m/BARE/);
         next if get_madprop($op_const->parent, "quote_open");
         next if $op_const->parent->tag eq "mad_op";
         next if $op_const->parent->tag eq "op_require";
-        next if $op_const->parent->tag eq "op_concat";
+        next if not $op_const->att('PVMG');
 
         set_madprop($op_const, "quote_open", "&#34;", wsbefore => get_madprop($op_const, "value", "wsbefore"));
         set_madprop($op_const, "quote_close", "&#34;");
         my $v = get_madprop($op_const, "value");
         $v =~ s/^v//;
+        $v =~ s/_//g; # strip '_'
         $v =~ m/^[\d.]+$/ or die "Invalid string '$v'";
         $v =~ s/(\d+)/ sprintf '\x{%x}', $1 /ge;
         $v =~ s/[.]//g;
@@ -496,6 +499,16 @@ sub t_parenthesis {
     }
 }
 
+sub use_pkg_version {
+    my $xml = shift;
+    # "use MODULE 0.9" to "use MODULE v0.9"
+    for my $madv ($xml->findnodes(qq|//mad_op[\@key='version']|)) {
+        my $const = $madv->child(0);
+        next if get_madprop($const, 'value') =~ m/^v/;
+        set_madprop($const, 'value', "v" . get_madprop($const, 'value'));
+    }
+}
+
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
 
@@ -519,7 +532,6 @@ if ($from < 1.4 - 0.05) {
     }
 
     make_glob_sub( $twig );
-    remove_vstring( $twig );
 
 #     # add_encoding_latin1($twig);
 
@@ -527,20 +539,20 @@ if ($from < 1.4 - 0.05) {
     remove_typed_declaration($twig);
 }
 
-if ($from < 1.405) {
+if ($from < 1.5 - 0.05) {
     rename_bit_operators($twig);
     remove_useversion($twig);
-}
-
-if ($from < 1.415) {
     change_deref_method($twig);
-}
 
-for my $op_const ($twig->findnodes(q|//op_const|)) {
-    const_handler($twig, $op_const);
+    for my $op_const ($twig->findnodes(q|//op_const|)) {
+        const_handler($twig, $op_const);
+    }
+    intuit_more($twig);
 }
-intuit_more($twig);
 #t_parenthesis($twig);
 
+remove_vstring( $twig );
+use_pkg_version($twig);
+
 # print
-$twig->print;
+$twig->print( pretty_print => 'indented' );

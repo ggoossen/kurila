@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA $VERSION);
 use Carp;
 
-use Socket 1.3;
+use Socket v1.3;
 use IO::Socket;
 use Time::Local;
 use Net::Cmd;

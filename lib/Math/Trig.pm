@@ -9,7 +9,7 @@ package Math::Trig;
 
 use strict;
 
-use Math::Complex 1.36;
+use Math::Complex v1.36;
 use Math::Complex qw(:trig :pi);
 
 use vars qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);

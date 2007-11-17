@@ -468,18 +468,6 @@ CODE:
 OUTPUT:
   RETVAL
 
-void
-isvstring(sv)
-       SV *sv
-PROTOTYPE: $
-CODE:
-#ifdef SvVOK
-  ST(0) = boolSV(SvVOK(sv));
-  XSRETURN(1);
-#else
-	croak("vstrings are not implemented in this release of perl");
-#endif
-
 int
 looks_like_number(sv)
 	SV *sv
@@ -533,7 +521,7 @@ BOOT:
     HV *lu_stash = gv_stashpvn("List::Util", 10, TRUE);
     GV *rmcgv = *(GV**)hv_fetch(lu_stash, "REAL_MULTICALL", 14, TRUE);
     SV *rmcsv;
-#if !defined(SvWEAKREF) || !defined(SvVOK)
+#if !defined(SvWEAKREF)
     HV *su_stash = gv_stashpvn("Scalar::Util", 12, TRUE);
     GV *vargv = *(GV**)hv_fetch(su_stash, "EXPORT_FAIL", 11, TRUE);
     AV *varav;
@@ -547,9 +535,6 @@ BOOT:
 #ifndef SvWEAKREF
     av_push(varav, newSVpv("weaken",6));
     av_push(varav, newSVpv("isweak",6));
-#endif
-#ifndef SvVOK
-    av_push(varav, newSVpv("isvstring",9));
 #endif
 #ifdef REAL_MULTICALL
     sv_setsv(rmcsv, &PL_sv_yes);

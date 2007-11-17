@@ -126,7 +126,7 @@ $data =~ s{^__UNSUPPORTED_API__(\s*?)^}
           {join "\n", @todo}gem;
 
 $data =~ s{__MIN_PERL__}{5.003}g;
-$data =~ s{__MAX_PERL__}{5.10.0}g;
+$data =~ s{__MAX_PERL__}{"\x{5}\x{a}\x{0}"}g;
 
 open FH, ">PPPort.pm" or die "PPPort.pm: $!\n";
 print FH $data;

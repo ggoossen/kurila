@@ -6,7 +6,7 @@ use Test::Harness;
 use Test::Harness::Util qw( all_in blibdirs shuffle );
 
 use Getopt::Long;
-use Pod::Usage 1.12;
+use Pod::Usage v1.12;
 use File::Spec;
 
 use vars qw( $VERSION );
