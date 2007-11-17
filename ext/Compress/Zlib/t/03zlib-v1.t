@@ -829,7 +829,7 @@ if ($] >= 5.005)
     ok $k = inflateInit() ;
      
     #($Z, $status) = $k->inflate(substr($Y, 0, -1)) ;
-    ($Z, $status) = $k->inflate(substr($Y, 0)) ;
+    ($Z, $status) = $k->inflate($Y);
      
     ok $status == Z_STREAM_END ;
     ok $contents eq $Z ;
@@ -857,7 +857,7 @@ if ($] >= 5.005)
      
     ok $k = inflateInit() ;
      
-    $Z = $k->inflate(substr($Y, 0, -1)) ;
+    $Z = $k->inflate($Y);
     #$Z = $k->inflate(substr($Y, 0)) ;
      
     ok $contents eq $Z ;

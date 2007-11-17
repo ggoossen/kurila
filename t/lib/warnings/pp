@@ -36,16 +36,6 @@ EXPECT
 substr outside of string at - line 4.
 ########
 # pp.c
-use warnings 'substr' ;
-$a = "ab" ; 
-$b = \$a ;  
-substr($b, 1,1) = "ab" ;
-no warnings 'substr' ;
-substr($b, 1,1) = "ab" ;
-EXPECT
-Attempt to use reference as lvalue in substr at - line 5.
-########
-# pp.c
 use warnings 'uninitialized' ;
 *x = *{ undef() };
 no warnings 'uninitialized' ;

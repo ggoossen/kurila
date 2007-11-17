@@ -1,12 +1,5 @@
 #!./perl 
 
-BEGIN {
-    unless(grep /blib/, @INC) {
-        chdir 't' if -d 't';
-        @INC = '../lib' if -d '../lib';
-    }
-}
- 
 use warnings;
 use strict;
 use Config;
@@ -1067,7 +1060,7 @@ EOM
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
         $remember{$key} = $value ;
-        $db->put(substr($key,0), $value) ;
+        $db->put($key, $value) ;
     }
 
     ok 153, $warned eq '' 
@@ -1080,7 +1073,7 @@ EOM
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
         $remember{$key} = $value ;
-        $db->put($key, substr($value,0)) ;
+        $db->put($key, $value) ;
     }
 
     ok 154, $warned eq '' 
@@ -1116,9 +1109,9 @@ EOM
 
     my %bad = () ;
     $key = '';
-    for ($status = $db->seq(substr($key,0), substr($value,0), R_FIRST ) ;
+    for ($status = $db->seq($key, $value, R_FIRST ) ;
          $status == 0 ;
-         $status = $db->seq(substr($key,0), substr($value,0), R_NEXT ) ) {
+         $status = $db->seq($key, $value, R_NEXT ) ) {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined $remember{$key} && defined $value && 

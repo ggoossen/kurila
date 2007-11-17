@@ -9,7 +9,7 @@ use bytes;
 #use lib qw(t t/compress);
 
 use Carp ;
-#use Test::More ; 
+use Test::More ; 
 
 
 sub title
@@ -153,7 +153,7 @@ sub hexDump
     $d = '' unless defined $d ;
     #while (read(STDIN, $data, 16)) {
     while (my $data = substr($d, 0, 16)) {
-        substr($d, 0, 16) = '' ;
+        substr($d, 0, 16, '') ;
         printf "# %8.8lx    ", $offset;
         $offset += 16;
 
@@ -433,7 +433,7 @@ sub anyUncompress
     {
 
         my $got = substr($data, 0, length($already));
-        substr($data, 0, length($already)) = '';
+        substr($data, 0, length($already), '');
 
         is $got, $already, '  Already OK' ;
     }
@@ -493,7 +493,7 @@ sub getHeaders
     {
 
         my $got = substr($data, 0, length($already));
-        substr($data, 0, length($already)) = '';
+        substr($data, 0, length($already), '');
 
         is $got, $already, '  Already OK' ;
     }

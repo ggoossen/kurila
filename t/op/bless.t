@@ -38,7 +38,7 @@ $e1 = bless sub { 1 }, "E";
 expected($e1, "E", "CODE");
 $f1 = bless \[], "F";
 expected($f1, "F", "REF");
-$g1 = bless \substr("test", 1, 2), "G";
+$g1 = bless \vec("test", 1, 2), "G";
 expected($g1, "G", "LVALUE");
 
 # blessing ref to object doesn't modify object

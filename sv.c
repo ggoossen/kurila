@@ -4287,12 +4287,6 @@ Perl_sv_magic(pTHX_ register SV *sv, SV *obj, int how, const char *name, I32 nam
     case PERL_MAGIC_utf8:
 	vtable = &PL_vtbl_utf8;
 	break;
-    case PERL_MAGIC_substr:
-	vtable = &PL_vtbl_substr;
-	break;
-    case PERL_MAGIC_substr_utf8:
-	vtable = &PL_vtbl_substr_utf8;
-	break;
     case PERL_MAGIC_defelem:
 	vtable = &PL_vtbl_defelem;
 	break;

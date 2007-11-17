@@ -22,16 +22,7 @@ BEGIN
         if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
 
-    my $count = 0 ;
-    if ($] < 5.005) {
-        $count = 189 ;
-    }
-    elsif ($] >= 5.006) {
-        $count = 243 ;
-    }
-    else {
-        $count = 201 ;
-    }
+    my $count = 261 ;
 
     plan tests => $count + $extra;
 
@@ -598,8 +589,6 @@ for my $consume ( 0 .. 1)
 
 foreach (1 .. 2)
 {
-    next if $[ < 5.005 ;
-
     title 'test inflate/deflate with a substr';
 
     my $contents = '' ;
@@ -620,7 +609,7 @@ foreach (1 .. 2)
      
     my $Z; 
     my $keep = $X ;
-    $status = $k->inflate(substr($X, 0), $Z) ;
+    $status = $k->inflate($X, $Z) ;
      
     cmp_ok $status, '==', Z_STREAM_END ;
     #print "status $status X [$X]\n" ;
@@ -701,7 +690,7 @@ if ($] >= 5.005)
     ok my $k = Compress::Raw::Zlib::Inflate->new( -AppendOutput => 1,
                                              -ConsumeInput => 1) ;
      
-    cmp_ok $k->inflate(substr($X, 0, -1), $Z), '==', Z_STREAM_END ; ;
+    cmp_ok $k->inflate($X, $Z), '==', Z_STREAM_END ; ;
      
     ok $hello eq $Z ;
     is $X, $append;
@@ -711,7 +700,7 @@ if ($] >= 5.005)
     ok $k = Compress::Raw::Zlib::Inflate->new( -AppendOutput => 1,
                                           -ConsumeInput => 0) ;
      
-    cmp_ok $k->inflate(substr($X, 0, -1), $Z), '==', Z_STREAM_END ; ;
+    cmp_ok $k->inflate($X, $Z), '==', Z_STREAM_END ; ;
     #cmp_ok $k->inflate(substr($X, 0), $Z), '==', Z_STREAM_END ; ;
      
     ok $hello eq $Z ;
@@ -745,16 +734,16 @@ foreach (1 .. 2)
     my $Answer = '';
     foreach (@hello)
     {
-        $status = $x->deflate($_, substr($Answer, length($Answer))) ;
+        $status = $x->deflate($_, $Answer);
         last unless $status == Z_OK ;
     
     }
      
     cmp_ok $status, '==', Z_OK ;
     
-    cmp_ok  $x->flush(substr($Answer, length($Answer))), '==', Z_OK ;
+    cmp_ok  $x->flush($Answer), '==', Z_OK ;
      
-    #cmp_ok length $Answer, ">", 0 ;
+    cmp_ok length $Answer, ">", 0 ;
 
     my @Answer = split('', $Answer) ;
     
@@ -769,7 +758,9 @@ foreach (1 .. 2)
     $Z = 1 ;#x 2000 ;
     foreach (@Answer)
     {
-        $status = $k->inflate($_, substr($GOT, length($GOT))) ;
+        my $buf;
+        $status = $k->inflate($_, $buf);
+        $GOT .= $buf;
         last if $status == Z_STREAM_END or $status != Z_OK ;
     }
      
@@ -795,14 +786,14 @@ foreach (1 .. 2)
     my $Answer = '';
     foreach (@hello)
     {
-        $status = $x->deflate($_, substr($Answer, 0)) ;
+        $status = $x->deflate($_, $Answer) ;
         last unless $status == Z_OK ;
     
     }
      
     cmp_ok $status, '==', Z_OK ;
     
-    cmp_ok  $x->flush(substr($Answer, 0)), '==', Z_OK ;
+    cmp_ok  $x->flush($Answer), '==', Z_OK ;
      
     my @Answer = split('', $Answer) ;
      
@@ -816,7 +807,7 @@ foreach (1 .. 2)
     $Z = 1 ;#x 2000 ;
     foreach (@Answer)
     {
-        $status = $k->inflate($_, substr($GOT, 0)) ;
+        $status = $k->inflate($_, $GOT) ;
         last if $status == Z_STREAM_END or $status != Z_OK ;
     }
      
