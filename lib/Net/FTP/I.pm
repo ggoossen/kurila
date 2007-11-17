@@ -39,7 +39,7 @@ sub read {
 
   $n = length($buf);
 
-  substr(${*$data}, 0, $n) = '';
+  substr(${*$data}, 0, $n, '');
 
   ${*$data}{'net_ftp_bytesread'} += $n;
 

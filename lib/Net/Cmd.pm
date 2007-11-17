@@ -291,7 +291,7 @@ sub getline {
         return undef;
       }
 
-      substr($buf, 0, 0) = $partial;    ## prepend from last sysread
+      substr($buf, 0, 0, $partial);    ## prepend from last sysread
 
       my @buf = split(/\015?\012/, $buf, -1);    ## break into lines
 
@@ -424,7 +424,7 @@ sub datasend {
 
   $line =~ s/\015?\012(\.?)/\015\012$1$1/sg;
 
-  substr($line, 0, 0) = $first_ch;
+  substr($line, 0, 0, $first_ch);
 
   ${*$cmd}{'net_cmd_last_ch'} = substr($line, -1, 1);
 
@@ -560,8 +560,8 @@ sub READ {
   }
 
   $_[0] = '';
-  substr($_[0], $offset + 0) = substr(${*$cmd}{'net_cmd_readbuf'}, 0, $len);
-  substr(${*$cmd}{'net_cmd_readbuf'}, 0, $len) = '';
+  substr($_[0], $offset + 0, undef, substr(${*$cmd}{'net_cmd_readbuf'}, 0, $len));
+  substr(${*$cmd}{'net_cmd_readbuf'}, 0, $len, '');
   delete ${*$cmd}{'net_cmd_readbuf'} if $done;
 
   return length $_[0];

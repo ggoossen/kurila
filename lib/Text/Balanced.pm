@@ -68,7 +68,7 @@ sub _succeed
 		if ($extralen) {	# CORRECT FILLET
 			my $extra = substr($res[0], $extrapos-$oppos, $extralen, "\n");
 			$res[1] = "$extra$res[1]";
-			eval { substr($$textref,$remainderpos,0) = $extra;
+			eval { substr($$textref,$remainderpos,0, $extra);
 			       substr($$textref,$extrapos,$extralen,"\n")} ;
 				#REARRANGE HERE DOC AND FILLET IF POSSIBLE
 			pos($$textref) = $remainderpos-$extralen+1; # RESET \G
@@ -84,7 +84,7 @@ sub _succeed
 		substr($match,$extrapos-$_[0]-$startlen,$extralen,"") if $extralen;
 		my $extra = $extralen
 			? substr($$textref, $extrapos, $extralen)."\n" : "";
-		eval {substr($$textref,$_[4],$_[1]+$_[5])=$extra} ;	#CHOP OUT PREFIX & MATCH, IF POSSIBLE
+		eval {substr($$textref,$_[4],$_[1]+$_[5],$extra)} ;	#CHOP OUT PREFIX & MATCH, IF POSSIBLE
 		pos($$textref) = $_[4];				# RESET \G
 		return $match;
 	}
@@ -971,7 +971,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 	return @fields if wantarray;
 
 	$firstpos ||= 0;
-	eval { substr($$textref,$firstpos,$lastpos-$firstpos)="";
+	eval { substr($$textref,$firstpos,$lastpos-$firstpos,"");
 	       pos $$textref = $firstpos };
 	return $fields[0];
 }

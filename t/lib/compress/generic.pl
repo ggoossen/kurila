@@ -1171,7 +1171,7 @@ foreach my $fb (qw(filename buffer filehandle))
             if ($append || $fb eq 'filehandle')
             {
                 is substr($data, 0, length($already)), $already, "  got prefix";
-                substr($data, 0, length($already)) = '';
+                substr($data, 0, length($already), '');
             }
 
 
@@ -1282,7 +1282,7 @@ foreach my $append (0, 1)
     if ($append)
     {
         is substr($output, 0, length($already)), $already, "  got prefix";
-        substr($output, 0, length($already)) = '';
+        substr($output, 0, length($already), '');
     }
     is $output, $string, '  Got uncompressed data' ;
 }

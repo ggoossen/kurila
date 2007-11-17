@@ -270,7 +270,7 @@ sub str_len_trim {
   my $str = shift;
   my $max = shift || 0;
   if (2 < $max and $max < length($str)) {
-    substr($str, $max - 3) = '...';
+    substr($str, $max - 3, undef, '...');
   }
   return $str;
 }

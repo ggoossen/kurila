@@ -39,8 +39,8 @@ sub compare_addr {
 		abs(length($a) - length ($b)),
 		$_[length($a) < length ($b) ? 1 : 0],
 		"consider decreasing bufsize of recfrom.";
-	    substr($a, $min) = "";
-	    substr($b, $min) = "";
+	    substr($a, $min, undef, "");
+	    substr($b, $min, undef, "");
 	}
 	return 0;
     }

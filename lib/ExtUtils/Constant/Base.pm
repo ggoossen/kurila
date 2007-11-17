@@ -127,7 +127,7 @@ sub memEQ_clause {
   if (ref $checked_at) {
     # regexp won't work on 5.6.1 without use utf8; in turn that won't work
     # on 5.005_03.
-    substr ($name, 0, length $$checked_at,) = '';
+    substr ($name, 0, length $$checked_at,, '');
     $front_chop = C_stringify ($$checked_at);
     undef $checked_at;
   }

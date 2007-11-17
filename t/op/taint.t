@@ -659,7 +659,7 @@ SKIP: {
         if (defined $id) {
             if (shmwrite($id, $sent, 0, 60)) {
                 if (shmread($id, $rcvd, 0, 60)) {
-                    substr($rcvd, index($rcvd, "\0")) = '';
+                    substr($rcvd, index($rcvd, "\0"), undef, '');
                 } else {
                     warn "# shmread failed: $!\n";
                 }

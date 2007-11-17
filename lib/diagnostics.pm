@@ -635,7 +635,7 @@ sub shorten {
     if (length($line) > 79 and index($line, "\n") == -1) {
 	my $space_place = rindex($line, ' ', 79);
 	if ($space_place != -1) {
-	    substr($line, $space_place, 1) = "\n\t";
+	    substr($line, $space_place, 1, "\n\t");
 	} 
     } 
     return $line;

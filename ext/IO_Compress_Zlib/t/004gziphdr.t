@@ -534,7 +534,7 @@ EOM
     {
         title "Header Corruption - Fingerprint wrong 1st byte" ;
         my $buffer = $good ;
-        substr($buffer, 0, 1) = 'x' ;
+        substr($buffer, 0, 1, 'x') ;
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
         ok $GunzipError =~ /Header Error: Bad Magic/;
@@ -543,7 +543,7 @@ EOM
     {
         title "Header Corruption - Fingerprint wrong 2nd byte" ;
         my $buffer = $good ;
-        substr($buffer, 1, 1) = "\xFF" ;
+        substr($buffer, 1, 1, "\xFF") ;
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
         ok $GunzipError =~ /Header Error: Bad Magic/;
@@ -553,7 +553,7 @@ EOM
     {
         title "Header Corruption - CM not 8";
         my $buffer = $good ;
-        substr($buffer, 2, 1) = 'x' ;
+        substr($buffer, 2, 1, 'x') ;
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
         like $GunzipError, '/Header Error: Not Deflate \(CM is \d+\)/';
@@ -562,7 +562,7 @@ EOM
     {
         title "Header Corruption - Use of Reserved Flags";
         my $buffer = $good ;
-        substr($buffer, 3, 1) = "\xff";
+        substr($buffer, 3, 1, "\xff");
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
         like $GunzipError, '/Header Error: Use of Reserved Bits in FLG field./';
@@ -571,7 +571,7 @@ EOM
     {
         title "Header Corruption - Fail HeaderCRC";
         my $buffer = $good ;
-        substr($buffer, 10, 1) = chr((ord(substr($buffer, 10, 1)) + 1) ^&^ 0xFF);
+        substr($buffer, 10, 1, chr((ord(substr($buffer, 10, 1)) + 1) ^&^ 0xFF));
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0, Strict => 1)
          or print "# $GunzipError\n";
@@ -717,7 +717,7 @@ EOM
     ok $x->write($string) ;
     ok $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
     #my $lex = new LexFile my $name ;
     #writeFile($name, $truncated) ;
 
@@ -745,7 +745,7 @@ EOM
     ok $x->write($string) ;
     ok $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
 
     my $g = IO::Uncompress::Gunzip->new( \$truncated, -Transparent => 0); 
     ok ! $g 
@@ -768,7 +768,7 @@ EOM
     ok $x->write($string) ;
     ok $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
     #my $lex = new LexFile my $name ;
     #writeFile($name, $truncated) ;
 
@@ -793,7 +793,7 @@ EOM
     ok $x->write($string) ;
     ok $x->close ;
 
-    substr($truncated, $index) = '' ;
+    substr($truncated, $index, undef, '') ;
     my $lex = LexFile->new( my $name) ;
     writeFile($name, $truncated) ;
 
@@ -836,9 +836,9 @@ EOM
         title "Trailer Corruption - Trailer truncated to $got bytes" ;
         my $buffer = $good ;
         my $expected_trailing = substr($good, -8, 8) ;
-        substr($expected_trailing, $trim) = '';
+        substr($expected_trailing, $trim, undef, '');
 
-        substr($buffer, $trim) = '';
+        substr($buffer, $trim, undef, '');
         writeFile($name, $buffer) ;
 
         foreach my $strict (0, 1)
@@ -868,7 +868,7 @@ EOM
         title "Trailer Corruption - Length Wrong, CRC Correct" ;
         my $buffer = $good ;
         my $actual_len = unpack("V", substr($buffer, -4, 4));
-        substr($buffer, -4, 4) = pack('V', $actual_len + 1);
+        substr($buffer, -4, 4, pack('V', $actual_len + 1));
         writeFile($name, $buffer) ;
 
         foreach my $strict (0, 1)
@@ -900,7 +900,7 @@ EOM
         title "Trailer Corruption - Length Correct, CRC Wrong" ;
         my $buffer = $good ;
         my $actual_crc = unpack("V", substr($buffer, -8, 4));
-        substr($buffer, -8, 4) = pack('V', $actual_crc+1);
+        substr($buffer, -8, 4, pack('V', $actual_crc+1));
         writeFile($name, $buffer) ;
 
         foreach my $strict (0, 1)
@@ -931,8 +931,8 @@ EOM
         my $buffer = $good ;
         my $actual_len = unpack("V", substr($buffer, -4, 4));
         my $actual_crc = unpack("V", substr($buffer, -8, 4));
-        substr($buffer, -4, 4) = pack('V', $actual_len+1);
-        substr($buffer, -8, 4) = pack('V', $actual_crc+1);
+        substr($buffer, -4, 4, pack('V', $actual_len+1));
+        substr($buffer, -8, 4, pack('V', $actual_crc+1));
         writeFile($name, $buffer) ;
 
         foreach my $strict (0, 1)

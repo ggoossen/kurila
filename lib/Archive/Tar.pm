@@ -327,7 +327,7 @@ sub _read_tar {
             }
 
             ### throw away trailing garbage ###
-            substr ($$data, $entry->size) = "" if defined $$data;
+            substr ($$data, $entry->size, undef, "") if defined $$data;
 
             ### part II of the @LongLink munging -- need to do /after/
             ### the checksum check.
@@ -347,7 +347,7 @@ sub _read_tar {
 
                 ### cut data + size by that many bytes
                 $entry->size( $entry->size - $nulls );
-                substr ($$data, $entry->size) = "";
+                substr ($$data, $entry->size, undef, "");
             }
         }
 
@@ -1105,7 +1105,7 @@ sub _format_tar_entry {
 
     ### not sure why this is... ###
     my $l = PREFIX_LENGTH; # is ambiguous otherwise...
-    substr ($prefix, 0, -$l) = "" if length $prefix >= PREFIX_LENGTH;
+    substr ($prefix, 0, -$l, "") if length $prefix >= PREFIX_LENGTH;
 
     my $f1 = "%06o"; my $f2  = "%11o";
 
@@ -1130,7 +1130,7 @@ sub _format_tar_entry {
     );
 
     ### add the checksum ###
-    substr($tar,148,7) = sprintf("%6o\0", unpack("%16C*",$tar));
+    substr($tar,148,7, sprintf("%6o\0", unpack("%16C*",$tar)));
 
     return $tar;
 }

@@ -131,7 +131,7 @@ sub FETCH {
   $rec = $self->_fetch($n) unless defined $rec;
 
   # inlined _chomp1
-  substr($rec, - $self->{recseplen}) = ""
+  substr($rec, - $self->{recseplen}, undef, "")
     if defined $rec && $self->{autochomp};
   $rec;
 }
@@ -143,7 +143,7 @@ sub _chomp {
   if ($self->{autochomp}) {
     for (@_) {
       next unless defined;
-      substr($_, - $self->{recseplen}) = "";
+      substr($_, - $self->{recseplen}, undef, "");
     }
   }
 }
@@ -153,7 +153,7 @@ sub _chomp1 {
   my ($self, $rec) = @_;
   return $rec unless $self->{autochomp};
   return unless defined $rec;
-  substr($rec, - $self->{recseplen}) = "";
+  substr($rec, - $self->{recseplen}, undef, "");
   $rec;
 }
 

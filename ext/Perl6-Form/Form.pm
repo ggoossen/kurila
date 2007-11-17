@@ -281,14 +281,14 @@ sub jleft {
 	$_[0] =~ s/^\s+// unless $val{precropped};
 	my $len = length $_[0];
 	$_[0] .= fillpat($val{pos}+$len, $val{post}, $val{width}-$len);
-	substr($_[0],$val{width}) = "" unless $val{stretch};
+	substr($_[0],$val{width}, undef, "") unless $val{stretch};
  }
 
  sub jright {
 	my (undef, %val) = @_;
 	$_[0] =~ s/\s+$// unless $val{precropped};
 	$_[0] = fillpat($val{pos}, $val{pre}, $val{width}-length($_[0])) . $_[0];
-	substr($_[0],0,-$val{width}) = "" unless $val{stretch};
+	substr($_[0],0,-$val{width}, "") unless $val{stretch};
  }
 
  sub jcentre {
@@ -1342,12 +1342,12 @@ sub break_at {
 			unless (/\G (?=$lit_hy|($ws)$wsnzw|\z|\n|\r) /gcx) {
 				if ($last_breakable <= $reslen) {
 					pos() -= $reslen-$last_breakable;
-					substr($res,$last_breakable) = "";
+					substr($res,$last_breakable, undef, "");
 				}
 				elsif ($reslen > $hylen) {
 					if ($res =~ /\S\S\S{$hylen}$/) {
 						pos() -= $hylen;
-						substr($res,-$hylen) = $hyphen;
+						substr($res,-$hylen, undef, $hyphen);
 					}
 					elsif ($res =~ s/(\S+)$//) {
 						pos() -= length($1);

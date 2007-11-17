@@ -275,7 +275,7 @@ sub try {
     int(8192*5/length($d))+1; # at least 5 blocks' worth
   my $oldfile = $d x $recs;
   my $flen = defined($FLEN) ? $FLEN : $recs * 17;
-  substr($oldfile, $FLEN) = "" if defined $FLEN;  # truncate
+  substr($oldfile, $FLEN, undef, "") if defined $FLEN;  # truncate
   print F $oldfile;
   close F;
 
@@ -283,7 +283,7 @@ sub try {
 
   my $newdata = "-" x $newlen;
   my $expected = $oldfile;
-  substr($expected, $pos, $len) = $newdata;
+  substr($expected, $pos, $len, $newdata);
 
   my $o = tie my @lines, 'Tie::File', $file or die $!;
   $o->_twrite($newdata, $pos, $len);

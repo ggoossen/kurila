@@ -99,7 +99,7 @@ sub writeAt
             or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
     }
     else {
-        substr(${ *$self->{Buffer} }, $offset, length($data)) = $data ;
+        substr(${ *$self->{Buffer} }, $offset, length($data), $data) ;
     }
 
     return 1;

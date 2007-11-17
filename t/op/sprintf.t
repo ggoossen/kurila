@@ -65,7 +65,7 @@ for ($i = 1; @tests; $i++) {
     ($template, $data, $result, $comment) = @{shift @tests};
     $w = undef;
     $x = sprintf(">$template<", @$data);
-    substr($x, -1, 0) = $w if $w;
+    substr($x, -1, 0, $w) if $w;
     # $x may have 3 exponent digits, not 2
     my $y = $x;
     if ($y =~ s/([Ee][-+])0(\d)/$1$2/) {

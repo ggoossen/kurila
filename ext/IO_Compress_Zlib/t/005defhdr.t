@@ -217,7 +217,7 @@ EOM
     {
         title "Header Corruption - FCHECK failure - 1st byte wrong";
         my $buffer = $good ;
-        substr($buffer, 0, 1) = "\x00" ;
+        substr($buffer, 0, 1, "\x00") ;
 
         ok ! IO::Uncompress::Inflate->new( \$buffer, -Transparent => 0)  ;
         like $IO::Uncompress::Inflate::InflateError, '/Header Error: CRC mismatch/',
@@ -227,7 +227,7 @@ EOM
     {
         title "Header Corruption - FCHECK failure - 2nd byte wrong";
         my $buffer = $good ;
-        substr($buffer, 1, 1) = "\x00" ;
+        substr($buffer, 1, 1, "\x00") ;
 
         ok ! IO::Uncompress::Inflate->new( \$buffer, -Transparent => 0)  ;
         like $IO::Uncompress::Inflate::InflateError, '/Header Error: CRC mismatch/',
@@ -258,7 +258,7 @@ EOM
         my $buffer = $good ;
         my $header = mkZlibHdr(3, 6, 0, 3);
 
-        substr($buffer, 0, 2) = $header;
+        substr($buffer, 0, 2, $header);
 
         my $un = IO::Uncompress::Inflate->new( \$buffer, -Transparent => 0)  ;
         ok ! IO::Uncompress::Inflate->new( \$buffer, -Transparent => 0)  ;
@@ -288,9 +288,9 @@ EOM
             title "Trailer Corruption - Trailer truncated to $got bytes, strict $s" ;
             my $buffer = $good ;
             my $expected_trailing = substr($good, -4, 4) ;
-            substr($expected_trailing, $trim) = '';
+            substr($expected_trailing, $trim, undef, '');
 
-            substr($buffer, $trim) = '';
+            substr($buffer, $trim, undef, '');
             writeFile($name, $buffer) ;
 
             ok my $gunz = IO::Uncompress::Inflate->new( $name, Strict => $s);
@@ -316,7 +316,7 @@ EOM
         title "Trailer Corruption - CRC Wrong, strict" ;
         my $buffer = $good ;
         my $crc = unpack("N", substr($buffer, -4, 4));
-        substr($buffer, -4, 4) = pack('N', $crc+1);
+        substr($buffer, -4, 4, pack('N', $crc+1));
         writeFile($name, $buffer) ;
 
         ok my $gunz = IO::Uncompress::Inflate->new( $name, Strict => 1);
@@ -334,7 +334,7 @@ EOM
         title "Trailer Corruption - CRC Wrong, no strict" ;
         my $buffer = $good ;
         my $crc = unpack("N", substr($buffer, -4, 4));
-        substr($buffer, -4, 4) = pack('N', $crc+1);
+        substr($buffer, -4, 4, pack('N', $crc+1));
         writeFile($name, $buffer) ;
 
         ok my $gunz = IO::Uncompress::Inflate->new( $name, Strict => 0);

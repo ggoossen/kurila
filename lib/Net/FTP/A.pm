@@ -63,7 +63,7 @@ sub read {
   }
 
   $buf = substr(${*$data}, 0, $size);
-  substr(${*$data}, 0, $size) = '';
+  substr(${*$data}, 0, $size, '');
 
   length $buf;
 }

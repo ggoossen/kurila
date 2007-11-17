@@ -74,7 +74,7 @@ sub cat_decode {
 
     my $ini_pos = pos($$rsrc);
 
-    substr( $src, 0, $pos ) = '';
+    substr( $src, 0, $pos, '' );
 
     my $ini_len = bytes::length($src);
 

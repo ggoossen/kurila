@@ -1785,7 +1785,7 @@ sub WriteAllMappings()
 		    "$Type$Name";
 
                 $filename =~ s/[^\w_]+/_/g; # "L&" -> "L_"
-                substr($filename, 8) = '' if length($filename) > 8;
+                substr($filename, 8, undef, '') if length($filename) > 8;
 
                 ##
                 ## Make sure the basename doesn't conflict with something we
@@ -1805,7 +1805,7 @@ sub WriteAllMappings()
                     ## is acceptable.
                     my $delta = length($filename) + length($num) - 8;
                     if ($delta > 0) {
-                        substr($filename, -$delta) = $num;
+                        substr($filename, -$delta, undef, $num);
                     } else {
                         $filename .= $num;
                     }

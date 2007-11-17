@@ -99,7 +99,7 @@ sub STORE {
 	    $record = "\2". $key . $val;
 	    die "panic" unless length($record) == $rlen;
 	    $writeoffset = $offset unless defined $writeoffset;
-	    substr($$self[0], $writeoffset, $rlen) = $record;
+	    substr($$self[0], $writeoffset, $rlen, $record);
 	    ++$$self[5];
 	    return;
 	}
@@ -109,7 +109,7 @@ sub STORE {
 	elsif (substr($record, 1, $klen) eq $key) {
 	    $record = "\2". $key . $val;
 	    die "panic" unless length($record) == $rlen;
-	    substr($$self[0], $offset, $rlen) = $record;
+	    substr($$self[0], $offset, $rlen, $record);
 	    return;
 	}
 	&rehash;
@@ -129,7 +129,7 @@ sub DELETE {
 	elsif (ord($record) == 1) {
 	}
 	elsif (substr($record, 1, $klen) eq $key) {
-	    substr($$self[0], $offset, 1) = "\1";
+	    substr($$self[0], $offset, 1, "\1");
 	    return substr($record, 1+$klen, $vlen);
 	    --$$self[5];
 	}

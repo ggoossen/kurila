@@ -110,7 +110,7 @@ sub try {
     int(8192*5/length($d))+1; # at least 5 blocks' worth
   my $oldfile = $d x $recs;
   my $flen = defined($FLEN) ? $FLEN : $recs * 17;
-  substr($oldfile, $FLEN) = "" if defined $FLEN;  # truncate
+  substr($oldfile, $FLEN, undef, "") if defined $FLEN;  # truncate
   print F $oldfile;
   close F;
 
@@ -120,9 +120,9 @@ sub try {
   # then behave *as if* we had specified the whole rest of the file
   my $expected = $oldfile;
   if (defined $len) {
-    substr($expected, $dst, $len) = substr($expected, $src, $len);
+    substr($expected, $dst, $len, substr($expected, $src, $len));
   } else {
-    substr($expected, $dst) = substr($expected, $src);
+    substr($expected, $dst, undef, substr($expected, $src));
   }
 
   my $o = tie my @lines, 'Tie::File', $file or die $!;

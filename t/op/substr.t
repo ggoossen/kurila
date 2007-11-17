@@ -31,24 +31,24 @@ is(substr($a,3,3), 'def');   # P Q R S
 is(substr($a,6,999), 'xyz'); # P Q S R
 $b = substr($a,999,999) ; # warn # P R Q S
 is ($w--, 1);
-eval{substr($a,999,999) = "" ; };# P R Q S
+eval{substr($a,999,999, "") ; };# P R Q S
 like ($@, $FATAL_MSG);
 is(substr($a,0,-6), 'abc');  # P=Q R S
 is(substr($a,-3,1), 'x');    # P Q R S
 
-substr($a,3,3) = 'XYZ';
+substr($a,3,3, 'XYZ');
 is($a, 'abcXYZxyz' );
-substr($a,0,2) = '';
+substr($a,0,2, '');
 is($a, 'cXYZxyz' );
-substr($a,0,0) = 'ab';
+substr($a,0,0, 'ab');
 is($a, 'abcXYZxyz' );
-substr($a,0,0) = '12345678';
+substr($a,0,0, '12345678');
 is($a, '12345678abcXYZxyz' );
-substr($a,-3,3) = 'def';
+substr($a,-3,3, 'def');
 is($a, '12345678abcXYZdef');
-substr($a,-3,3) = '<';
+substr($a,-3,3, '<');
 is($a, '12345678abcXYZ<' );
-substr($a,-1,1) = '12345678';
+substr($a,-1,1, '12345678');
 is($a, '12345678abcXYZ12345678' );
 
 $a = 'abcdefxyz';
@@ -57,7 +57,7 @@ is(substr($a,6), 'xyz' );        # P Q R=S
 is(substr($a,-3), 'xyz' );       # P Q R=S
 $b = substr($a,999,999) ; # warning   # P R=S Q
 is($w--, 1);
-eval{substr($a,999,999) = "" ; } ;    # P R=S Q
+eval{substr($a,999,999, "") ; } ;    # P R=S Q
 like($@, $FATAL_MSG);
 is(substr($a,0), 'abcdefxyz');  # P=Q R=S
 is(substr($a,9), '');           # P Q=R=S
@@ -68,11 +68,11 @@ $a = '54321';
 
 $b = substr($a,-7, 1) ; # warn  # Q R P S
 is($w--, 1);
-eval{substr($a,-7, 1) = "" ; }; # Q R P S
+eval{substr($a,-7, 1, "") ; }; # Q R P S
 like($@, $FATAL_MSG);
 $b = substr($a,-7,-6) ; # warn  # Q R P S
 is($w--, 1);
-eval{substr($a,-7,-6) = "" ; }; # Q R P S
+eval{substr($a,-7,-6, "") ; }; # Q R P S
 like($@, $FATAL_MSG);
 is(substr($a,-5,-7), '');  # R P=Q S
 is(substr($a, 2,-7), '');  # R P Q S
@@ -86,19 +86,19 @@ is(substr($a, 5,-5), '');  # P=R Q S
 is(substr($a, 5,-3), '');  # P R Q=S
 $b = substr($a, 7,-7) ; # warn  # R P S Q
 is($w--, 1);
-eval{substr($a, 7,-7) = "" ; }; # R P S Q
+eval{substr($a, 7,-7, "") ; }; # R P S Q
 like($@, $FATAL_MSG);
 $b = substr($a, 7,-5) ; # warn  # P=R S Q
 is($w--, 1);
-eval{substr($a, 7,-5) = "" ; }; # P=R S Q
+eval{substr($a, 7,-5, "") ; }; # P=R S Q
 like($@, $FATAL_MSG);
 $b = substr($a, 7,-3) ; # warn  # P Q S Q
 is($w--, 1);
-eval{substr($a, 7,-3) = "" ; }; # P Q S Q
+eval{substr($a, 7,-3, "") ; }; # P Q S Q
 like($@, $FATAL_MSG);
 $b = substr($a, 7, 0) ; # warn  # P S Q=R
 is($w--, 1);
-eval{substr($a, 7, 0) = "" ; }; # P S Q=R
+eval{substr($a, 7, 0, "") ; }; # P S Q=R
 like($@, $FATAL_MSG);
 
 is(substr($a,-7,2), '');   # Q P=R S
@@ -141,64 +141,64 @@ is(substr($a,0), '');      # P=Q=R=S
 is(substr($a,0,-1), '');   # R P=Q=S
 $b = substr($a,-2, 0) ; # warn  # Q=R P=S
 is($w--, 1);
-eval{substr($a,-2, 0) = "" ; }; # Q=R P=S
+eval{substr($a,-2, 0, "") ; }; # Q=R P=S
 like($@, $FATAL_MSG);
 
 $b = substr($a,-2, 1) ; # warn  # Q R P=S
 is($w--, 1);
-eval{substr($a,-2, 1) = "" ; }; # Q R P=S
+eval{substr($a,-2, 1, "") ; }; # Q R P=S
 like($@, $FATAL_MSG);
 
 $b = substr($a,-2,-1) ; # warn  # Q R P=S
 is($w--, 1);
-eval{substr($a,-2,-1) = "" ; }; # Q R P=S
+eval{substr($a,-2,-1, "") ; }; # Q R P=S
 like($@, $FATAL_MSG);
 
 $b = substr($a,-2,-2) ; # warn  # Q=R P=S
 is($w--, 1);
-eval{substr($a,-2,-2) = "" ; }; # Q=R P=S
+eval{substr($a,-2,-2, "") ; }; # Q=R P=S
 like($@, $FATAL_MSG);
 
 $b = substr($a, 1,-2) ; # warn  # R P=S Q
 is($w--, 1);
-eval{substr($a, 1,-2) = "" ; }; # R P=S Q
+eval{substr($a, 1,-2, "") ; }; # R P=S Q
 like($@, $FATAL_MSG);
 
 $b = substr($a, 1, 1) ; # warn  # P=S Q R
 is($w--, 1);
-eval{substr($a, 1, 1) = "" ; }; # P=S Q R
+eval{substr($a, 1, 1, "") ; }; # P=S Q R
 like($@, $FATAL_MSG);
 
 $b = substr($a, 1, 0) ;# warn   # P=S Q=R
 is($w--, 1);
-eval{substr($a, 1, 0) = "" ; }; # P=S Q=R
+eval{substr($a, 1, 0, "") ; }; # P=S Q=R
 like($@, $FATAL_MSG);
 
 $b = substr($a,1) ; # warning   # P=R=S Q
 is($w--, 1);
-eval{substr($a,1) = "" ; };     # P=R=S Q
+eval{substr($a,1, undef, "") ; };     # P=R=S Q
 like($@, $FATAL_MSG);
 
 my $a = 'zxcvbnm';
-substr($a,2,0) = '';
+substr($a,2,0, '');
 is($a, 'zxcvbnm');
-substr($a,7,0) = '';
+substr($a,7,0, '');
 is($a, 'zxcvbnm');
-substr($a,5,0) = '';
+substr($a,5,0, '');
 is($a, 'zxcvbnm');
-substr($a,0,2) = 'pq';
+substr($a,0,2, 'pq');
 is($a, 'pqcvbnm');
-substr($a,2,0) = 'r';
+substr($a,2,0, 'r');
 is($a, 'pqrcvbnm');
-substr($a,8,0) = 'asd';
+substr($a,8,0, 'asd');
 is($a, 'pqrcvbnmasd');
-substr($a,0,2) = 'iop';
+substr($a,0,2, 'iop');
 is($a, 'ioprcvbnmasd');
-substr($a,0,5) = 'fgh';
+substr($a,0,5, 'fgh');
 is($a, 'fghvbnmasd');
-substr($a,3,5) = 'jkl';
+substr($a,3,5, 'jkl');
 is($a, 'fghjklsd');
-substr($a,3,2) = '1234';
+substr($a,3,2, '1234');
 is($a, 'fgh1234lsd');
 
 
@@ -207,11 +207,11 @@ for (0,1) {
   my $txt;
   unless ($_) {
     $txt = "Foo";
-    substr($txt, -1) = "X";
+    substr($txt, -1, undef, "X");
     is($txt, "FoX");
   }
   else {
-    substr($txt, 0, 1) = "X";
+    substr($txt, 0, 1, "X");
     is($txt, "X");
   }
 }
@@ -220,7 +220,7 @@ $w = 0 ;
 # coercion of references
 {
   my $s = [];
-  substr($s, 0, 1) = 'Foo';
+  substr($s, 0, 1, 'Foo');
   is (substr($s,0,7), "FooRRAY");
   is ($w,2);
   $w = 0;
@@ -279,7 +279,7 @@ is($a, 'xxxxefgh');
     is($x, "\x{263a}");
 
     $x = "\x{263a}\x{263a}";
-    substr($x,0,1) = "abcd";
+    substr($x,0,1, "abcd");
     is($x, "abcd\x{263a}");
     $x = reverse $x;
     is($x, "\x{263a}dcba");
@@ -291,7 +291,7 @@ is($a, 'xxxxefgh');
     $x = substr($x,1,1);
     is($x, "\xE2");
     $x = $x x 2;
-    substr($x,0,1) = "abcd";
+    substr($x,0,1, "abcd");
     is($x, "abcd\xE2");
     $x = reverse $x;
     is($x, "\xE2dcba");
@@ -309,7 +309,7 @@ is($data{'a'}, "last");
 
 use utf8;
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, 1) = "\x{100}";
+substr($x, 0, 1, "\x{100}");
 is(length($x), 3);
 is($x, "\x{100}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
@@ -317,7 +317,7 @@ is(substr($x, 1, 1), "\x{F2}");
 is(substr($x, 2, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, 1) = "\x{100}\x{FF}";
+substr($x, 0, 1, "\x{100}\x{FF}");
 is(length($x), 4);
 is($x, "\x{100}\x{FF}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
@@ -326,7 +326,7 @@ is(substr($x, 2, 1), "\x{F2}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, 2) = "\x{100}\x{FF}";
+substr($x, 0, 2, "\x{100}\x{FF}");
 is(length($x), 3);
 is($x, "\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
@@ -334,7 +334,7 @@ is(substr($x, 1, 1), "\x{FF}");
 is(substr($x, 2, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 1, 1) = "\x{100}\x{FF}";
+substr($x, 1, 1, "\x{100}\x{FF}");
 is(length($x), 4);
 is($x, "\x{101}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
@@ -343,7 +343,7 @@ is(substr($x, 2, 1), "\x{FF}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 2, 1) = "\x{100}\x{FF}";
+substr($x, 2, 1, "\x{100}\x{FF}");
 is(length($x), 4);
 is($x, "\x{101}\x{F2}\x{100}\x{FF}");
 is(substr($x, 0, 1), "\x{101}");
@@ -352,7 +352,7 @@ is(substr($x, 2, 1), "\x{100}");
 is(substr($x, 3, 1), "\x{FF}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 3, 1) = "\x{100}\x{FF}";
+substr($x, 3, 1, "\x{100}\x{FF}");
 is(length($x), 5);
 is($x, "\x{101}\x{F2}\x{F3}\x{100}\x{FF}");
 is(substr($x, 0, 1), "\x{101}");
@@ -363,7 +363,7 @@ is(substr($x, 4, 1), "\x{FF}");
 
 $x = "\x{101}\x{F2}\x{100}\x{FF}";
 is($x, "\x{101}\x{F2}\x{100}\x{FF}");
-substr($x, -2, 1) = "\x{104}\x{105}";
+substr($x, -2, 1, "\x{104}\x{105}");
 is(length($x), 5);
 is($x, "\x{101}\x{F2}\x{104}\x{105}\x{FF}");
 is(substr($x, 0, 1), "\x{101}");
@@ -373,7 +373,7 @@ is(substr($x, 3, 1), "\x{105}");
 is(substr($x, 4, 1), "\x{FF}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, -1, 0) = "\x{100}\x{FF}";
+substr($x, -1, 0, "\x{100}\x{FF}");
 is(length($x), 5);
 is($x, "\x{101}\x{F2}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
@@ -383,7 +383,7 @@ is(substr($x, 3, 1), "\x{FF}");
 is(substr($x, 4, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, -1) = "\x{100}\x{FF}";
+substr($x, 0, -1, "\x{100}\x{FF}");
 is(length($x), 3);
 is($x, "\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
@@ -391,7 +391,7 @@ is(substr($x, 1, 1), "\x{FF}");
 is(substr($x, 2, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, -2) = "\x{100}\x{FF}";
+substr($x, 0, -2, "\x{100}\x{FF}");
 is(length($x), 4);
 is($x, "\x{100}\x{FF}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
@@ -400,7 +400,7 @@ is(substr($x, 2, 1), "\x{F2}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 0, -3) = "\x{100}\x{FF}";
+substr($x, 0, -3, "\x{100}\x{FF}");
 is(length($x), 5);
 is($x, "\x{100}\x{FF}\x{101}\x{F2}\x{F3}");
 is(substr($x, 0, 1), "\x{100}");
@@ -410,7 +410,7 @@ is(substr($x, 3, 1), "\x{F2}");
 is(substr($x, 4, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, 1, -1) = "\x{100}\x{FF}";
+substr($x, 1, -1, "\x{100}\x{FF}");
 is(length($x), 4);
 is($x, "\x{101}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
@@ -419,7 +419,7 @@ is(substr($x, 2, 1), "\x{FF}");
 is(substr($x, 3, 1), "\x{F3}");
 
 $x = "\x{101}\x{F2}\x{F3}";
-substr($x, -1, -1) = "\x{100}\x{FF}";
+substr($x, -1, -1, "\x{100}\x{FF}");
 is(length($x), 5);
 is($x, "\x{101}\x{F2}\x{100}\x{FF}\x{F3}");
 is(substr($x, 0, 1), "\x{101}");
@@ -524,7 +524,7 @@ is($x, "\x{100}\x{200}ab");
     # lvalue ref count
     my $foo = "bar";
     is(Internals::SvREFCNT(\$foo), 2);
-    substr($foo, -2, 2) = "la";
+    substr($foo, -2, 2, "la");
     is(Internals::SvREFCNT(\$foo), 2);
 }
 

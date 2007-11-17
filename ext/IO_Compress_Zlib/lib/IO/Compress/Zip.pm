@@ -295,12 +295,12 @@ sub mkTrailer
     }
 
     if (! *$self->{ZipData}{Zip64})
-      { substr($ctl, 16, length $data) = $data }
+      { substr($ctl, 16, length $data, $data) }
     else {
-        substr($ctl, 16, length $crc32) = $crc32 ;
+        substr($ctl, 16, length $crc32, $crc32) ;
         my $s  = *$self->{UnCompSize}->getPacked_V64() ; # Uncompressed size
            $s .= *$self->{CompSize}->getPacked_V64() ;   # Compressed size
-        substr($ctl, *$self->{ZipData}{StartOffset64}, length $s) = $s ;
+        substr($ctl, *$self->{ZipData}{StartOffset64}, length $s, $s) ;
     }
 
     *$self->{ZipData}{Offset}->add(length($hdr));
