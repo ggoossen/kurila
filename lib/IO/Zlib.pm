@@ -463,7 +463,9 @@ sub READ
 
     $$bufref = "" unless defined($$bufref);
 
-    my $bytesread = $self->{'file'}->gzread(substr($$bufref,$offset),$nbytes);
+    my $mybuf;
+    my $bytesread = $self->{'file'}->gzread($mybuf,$nbytes);
+    substr($$bufref, $offset, undef, $mybuf);
 
     return undef if $bytesread < 0;
 

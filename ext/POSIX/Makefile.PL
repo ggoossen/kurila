@@ -1,9 +1,6 @@
-# Explicitly avoid including '.' in @INC; autoloader gets confused since it
-# can find POSIX.pm, but can't find autosplit.ix.
-BEGIN { @INC = '../../lib';}
-#
+
 use ExtUtils::MakeMaker;
-use ExtUtils::Constant 0.11 'WriteConstants';
+use ExtUtils::Constant v0.11 'WriteConstants';
 use Config;
 my $rt_signals;
 if ($Config{sig_name} =~ /\bRTMIN\b/ && $Config{sig_name} =~ /\bRTMAX\b/) {

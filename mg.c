@@ -151,7 +151,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_vec:
     case PERL_MAGIC_vstring:
     case PERL_MAGIC_utf8:
-    case PERL_MAGIC_substr:
     case PERL_MAGIC_defelem:
     case PERL_MAGIC_arylen:
     case PERL_MAGIC_pos:
@@ -1905,51 +1904,6 @@ Perl_magic_setglob(pTHX_ SV *sv, MAGIC *mg)
     if (GvGP(sv))
 	gp_free((GV*)sv);
     GvGP(sv) = gp_ref(GvGP(gv));
-    return 0;
-}
-
-int
-Perl_magic_getsubstr(pTHX_ SV *sv, MAGIC *mg)
-{
-    STRLEN len;
-    SV * const lsv = LvTARG(sv);
-    const char * const tmps = SvPV_const(lsv,len);
-    I32 offs = LvTARGOFF(sv);
-    I32 rem = LvTARGLEN(sv);
-    PERL_UNUSED_ARG(mg);
-
-    if (LvTYPE(sv) == 'X')  /* Uppercase is with utf8 */
-	sv_pos_u2b(lsv, &offs, &rem);
-    if (offs > (I32)len)
-	offs = len;
-    if (rem + offs > (I32)len)
-	rem = len - offs;
-    sv_setpvn(sv, tmps + offs, (STRLEN)rem);
-    return 0;
-}
-
-int
-Perl_magic_setsubstr(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    STRLEN len;
-    const char * const tmps = SvPV_const(sv, len);
-    SV * const lsv = LvTARG(sv);
-    I32 lvoff = LvTARGOFF(sv);
-    I32 lvlen = LvTARGLEN(sv);
-    PERL_UNUSED_ARG(mg);
-
-    if (LvTYPE(sv) == 'X') {  /* Uppercase is with utf8 */
- 	sv_pos_u2b(lsv, &lvoff, &lvlen);
-	sv_insert(lsv, lvoff, lvlen, tmps, len);
-	LvTARGLEN(sv) = sv_len_utf8(sv);
-    }
-    else {
-	sv_insert(lsv, lvoff, lvlen, tmps, len);
-	LvTARGLEN(sv) = len;
-    }
-
-
     return 0;
 }
 

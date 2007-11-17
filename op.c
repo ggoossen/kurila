@@ -1429,10 +1429,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if (type != OP_SASSIGN)
 	    goto nomod;
 	goto lvalue_func;
-    case OP_SUBSTR:
-	if (o->op_private == 4) /* don't allow 4 arg substr as lvalue */
-	    goto nomod;
-	/* FALL THROUGH */
     case OP_POS:
     case OP_VEC:
 	if (type == OP_LEAVESUBLV)

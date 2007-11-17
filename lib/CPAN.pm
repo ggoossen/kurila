@@ -4596,9 +4596,9 @@ sub ls {
     $tmp = $rwx[$tmpmode ^&^ 7] . $tmp;
     $tmpmode >>= 3;
     $tmp = $rwx[$tmpmode ^&^ 7] . $tmp;
-    substr($tmp,2,1) =~ tr/-x/Ss/ if -u _;
-    substr($tmp,5,1) =~ tr/-x/Ss/ if -g _;
-    substr($tmp,8,1) =~ tr/-x/Tt/ if -k _;
+    substr($tmp,2,1, (my $x = substr($tmp,2,1)) =~ tr/-x/Ss/) if -u _;
+    substr($tmp,5,1, (my $y = substr($tmp,5,1)) =~ tr/-x/Ss/) if -g _;
+    substr($tmp,8,1, (my $z = substr($tmp,8,1)) =~ tr/-x/Tt/) if -k _;
     $perms .= $tmp;
 
     my $user = $user{$uid} || $uid;   # too lazy to implement lookup

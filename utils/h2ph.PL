@@ -450,9 +450,9 @@ sub expr {
                 $index++;
             }
             # tack } on the end, replacing )
-            substr($_, $index - 1, 1) = "}";
+            substr($_, $index - 1, 1, "}");
             # remove pesky * operators within the sizeof argument
-            substr($_, 0, $index - 1) =~ s/\*//g;
+            substr($_, 0, $index - 1, (my $x = substr($_, 0, $index -1)) =~ s/\*//g);
             next;
         };
 	# Eliminate typedefs

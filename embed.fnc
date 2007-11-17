@@ -434,7 +434,6 @@ p	|int	|magic_getnkeys	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getpack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getpos	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getsig	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_getsubstr|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_gettaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getvec	|NN SV* sv|NN MAGIC* mg
@@ -460,7 +459,6 @@ p	|int	|magic_setpack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setpos	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setregexp|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setsig	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_setsubstr|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_settaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setuvar	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setvec	|NN SV* sv|NN MAGIC* mg

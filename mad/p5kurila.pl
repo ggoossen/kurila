@@ -509,6 +509,32 @@ sub use_pkg_version {
     }
 }
 
+sub lvalue_subs {
+    my $xml = shift;
+    for my $op ($xml->findnodes(qq|//op_substr|)) {
+        next unless ($op->parent->tag eq "op_sassign");
+        next unless $op->pos == 3;
+        my $assign = $op->parent;
+
+        if ($op->children_count < 4+1) {
+            # create third argument 'undef'
+            my $third = $op->insert_new_elt('last_child', 'op_null');
+            set_madprop($third, "comma", ",");
+            set_madprop($third, "null_type", ",");
+            my $third_v = $third->insert_new_elt('last_child', "op_const");
+            set_madprop($third_v, "value", 'undef', wsbefore => ' ');
+        }
+
+        # move rhs to 4th argument
+        my $fourth = $op->insert_new_elt('last_child', 'op_null');
+        set_madprop($fourth, "comma", ",");
+        set_madprop($fourth, "null_type", ",");
+        $assign->child(1)->move($fourth);
+        
+        $op->replace($assign);
+    }
+}
+
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
 
@@ -551,8 +577,12 @@ if ($from < 1.5 - 0.05) {
 }
 #t_parenthesis($twig);
 
-remove_vstring( $twig );
-use_pkg_version($twig);
+if ($from < 1.6 - 0.05) {
+    remove_vstring( $twig );
+    use_pkg_version($twig);
+}
+
+lvalue_subs( $twig );
 
 # print
 $twig->print( pretty_print => 'indented' );

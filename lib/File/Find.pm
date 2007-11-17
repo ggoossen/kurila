@@ -1019,12 +1019,12 @@ sub _find_dir($$$) {
 		}
 		else {
 		    if ( substr($name,-2) eq '/.' ) {
-			substr($name, length($name) == 2 ? -1 : -2, undef, '');
+			substr($name, (length($name) == 2 ? -1 : -2), undef, '');
 		    }
 		    $dir = $p_dir;
 		    $_ = ($no_chdir ? $dir_name : $dir_rel );
 		    if ( substr($_,-2) eq '/.' ) {
-			substr($_, length($_) == 2 ? -1 : -2, undef, '');
+			substr($_, (length($_) == 2 ? -1 : -2), undef, '');
 		    }
 		}
 		{ $wanted_callback->() }; # protect against wild "next"
@@ -1238,12 +1238,12 @@ sub _find_dir_symlnk($$$) {
 		}
 		else {
 		    if ( substr($name,-2) eq '/.' ) {
-			substr($name, length($name) == 2 ? -1 : -2, undef, ''); # $File::Find::name
+			substr($name, (length($name) == 2 ? -1 : -2), undef, ''); # $File::Find::name
 		    }
 		    $dir = $p_dir; # $File::Find::dir
 		    $_ = ($no_chdir ? $dir_name : $dir_rel); # $_
 		    if ( substr($_,-2) eq '/.' ) {
-			substr($_, length($_) == 2 ? -1 : -2, undef, '');
+			substr($_, (length($_) == 2 ? -1 : -2), undef, '');
 		    }
 		}
 

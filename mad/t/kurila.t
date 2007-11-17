@@ -30,6 +30,8 @@ sub p5convert {
 
 #t_parenthesis();
 #t_change_deref();
+t_lvalue_subs();
+die "STOP";
 t_use_pkg_version();
 t_vstring();
 
@@ -551,6 +553,7 @@ for (1..2) { }
 ----
 (@a)[1]
 END
+}
 
 sub t_use_pkg_version {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
@@ -568,5 +571,27 @@ use Foo v0.9;
 ====
 END
 }
+
+sub t_lvalue_subs {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+substr($a, 2) = "bar";
+----
+substr($a, 2, undef, "bar");
+====
+substr($a, 2, 3) = "bar";
+----
+substr($a, 2, 3, "bar");
+====
+$a = substr($a, 2);
+----
+$a = substr($a, 2);
+====
+$a = "foobar";
+substr($a, 2) = "bar";
+----
+$a = "foobar";
+substr($a, 2, undef, "bar");
+====
+END
 
 }

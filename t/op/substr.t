@@ -22,7 +22,7 @@ $SIG{__WARN__} = sub {
 
 require './test.pl';
 
-plan(246);
+plan(235);
 
 $FATAL_MSG = qr/^substr outside of string/;
 
@@ -202,6 +202,10 @@ substr($a,3,2, '1234');
 is($a, 'fgh1234lsd');
 
 
+my $txt = "Foo";
+substr($txt, -1, undef, "X");
+is($txt, "FoX");
+
 # with lexicals (and in re-entered scopes)
 for (0,1) {
   my $txt;
@@ -222,7 +226,7 @@ $w = 0 ;
   my $s = [];
   substr($s, 0, 1, 'Foo');
   is (substr($s,0,7), "FooRRAY");
-  is ($w,2);
+  is ($w,2, " # TODO warn about coercion of references" );
   $w = 0;
 }
 
@@ -239,13 +243,13 @@ is($a, "abcxyz");
 is(substr($a, 3, -1, ""), "xy");
 is($a, "abcz");
 
-is(substr($a, 3, undef, "xy"), "");
-is($a, "abcxyz");
-is($w, 3);
+is(substr($a, 3, undef, "xy"), "z");
+is($a, "abcxy");
+is($w, 0);
 
 $w = 0;
 
-is(substr($a, 3, 9999999, ""), "xyz");
+is(substr($a, 3, 9999999, ""), "xy");
 is($a, "abc");
 eval{substr($a, -99, 0, "") };
 like($@, $FATAL_MSG);
@@ -454,16 +458,6 @@ is($x, "\x{100}\x{200}ab");
     is(join("", map { $$_ } @r), "ab");
 }
 
-# [perl #23207]
-{
-    sub ss {
-	substr($_[0],0,1) ^^^= substr($_[0],1,1) ^^^=
-	substr($_[0],0,1) ^^^= substr($_[0],1,1);
-    }
-    my $x = my $y = 'AB'; ss $x; ss $y;
-    is($x, $y);
-}
-
 # [perl #24605]
 {
     my $x = "0123456789\x{500}";
@@ -473,34 +467,14 @@ is($x, "\x{100}\x{200}ab");
 
 # multiple assignments to lvalue [perl #24346]   
 {
-    use bytes;
+    is(ref \substr($x,1,3), "SCALAR", "not an lvalue");
     my $x = "abcdef";
     for (substr($x,1,3)) {
 	is($_, 'bcd');
 	$_ = 'XX';
 	is($_, 'XX');
-	is($x, 'aXXef'); 
-	$_ = "\xFF";
-	is($_, "\xFF"); 
-	is($x, "a\xFFef");
-	$_ = "\xF1\xF2\xF3\xF4\xF5\xF6";
-	is($_, "\xF1\xF2\xF3\xF4\xF5\xF6");
-	is($x, "a\xF1\xF2\xF3\xF4\xF5\xF6ef"); 
-	$_ = 'YYYY';
-	is($_, 'YYYY'); 
-	is($x, 'aYYYYef');
+	is($x, 'abcdef'); 
     }
-}
-
-# [perl #24200] string corruption with lvalue sub
-
-{
-    my $foo = "a";
-    sub bar: lvalue { substr $foo, 0 }
-    bar = "XXX";
-    is(bar, 'XXX');
-    $foo = '123456789';
-    is(bar, '123456789');
 }
 
 # [perl #29149]
@@ -525,22 +499,5 @@ is($x, "\x{100}\x{200}ab");
     my $foo = "bar";
     is(Internals::SvREFCNT(\$foo), 2);
     substr($foo, -2, 2, "la");
-    is(Internals::SvREFCNT(\$foo), 2);
-}
-
-# lvalue with regex and eval
-{
-    my $x = "abccd";
-    substr($x, 0, -1) =~ s/(c)/ord($1)/ge;
-    is($x, "ab9999d");
-}
-
-# extended lifetime lvalue
-{
-    my $foo = "bar";
-    is(Internals::SvREFCNT(\$foo), 2);
-    my $y = \ substr($foo, -2, 2);
-    is(Internals::SvREFCNT(\$foo), 3);
-    undef $y;
     is(Internals::SvREFCNT(\$foo), 2);
 }

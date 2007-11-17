@@ -1842,7 +1842,7 @@ sub map_type {
   $type =~ s/^array\(([^,]*),(.*)\).*/$1 */s;
   if ($varname) {
     if ($varname && $type =~ / \( \s* \* (?= \s* \) ) /xg) {
-      (substr $type, pos $type, 0) = " $varname ";
+      substr $type, pos $type, 0, " $varname ";
     } else {
       $type .= "\t$varname";
     }

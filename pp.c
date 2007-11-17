@@ -2917,12 +2917,12 @@ PP(pp_substr)
     I32 pos;
     I32 rem;
     I32 fail;
-    const I32 lvalue = PL_op->op_flags & OPf_MOD || LVRET;
     const char *tmps;
     SV *repl_sv = NULL;
     const char *repl = NULL;
     STRLEN repl_len;
     const int num_args = PL_op->op_private & 7;
+    bool has_len = FALSE;
 
     SvTAINTED_off(TARG);			/* decontaminate */
     if (num_args > 2) {
@@ -2930,7 +2930,13 @@ PP(pp_substr)
 	    repl_sv = POPs;
 	    repl = SvPV_const(repl_sv, repl_len);
 	}
-	len = POPi;
+	if (SvOK(TOPs)) {
+	    len = POPi;
+	    has_len = TRUE;
+	}
+	else {
+	    (void)POPs;
+	}
     }
     pos = POPi;
     sv = POPs;
@@ -2943,7 +2949,7 @@ PP(pp_substr)
     if (pos >= 0) {
 	rem = curlen-pos;
 	fail = rem;
-	if (num_args > 2) {
+	if (has_len) {
 	    if (len < 0) {
 		rem += len;
 		if (rem < 0)
@@ -2955,7 +2961,7 @@ PP(pp_substr)
     }
     else {
 	pos += curlen;
-	if (num_args < 3)
+	if ( ! has_len )
 	    rem = curlen;
 	else if (len >= 0) {
 	    rem = pos+len;
@@ -2973,22 +2979,16 @@ PP(pp_substr)
 	rem -= pos;
     }
     if (fail < 0) {
-	if (lvalue || repl)
+	if (repl)
 	    Perl_croak(aTHX_ "substr outside of string");
 	if (ckWARN(WARN_SUBSTR))
 	    Perl_warner(aTHX_ packWARN(WARN_SUBSTR), "substr outside of string");
 	RETPUSHUNDEF;
     }
     else {
-	const I32 upos = pos;
-	const I32 urem = rem;
 	if (IN_CODEPOINTS)
 	    sv_pos_u2b(sv, &pos, &rem);
 	tmps += pos;
-	/* use a mortal for LVs because they can have an extended lifetime */
-	if (lvalue) {
-	    TARG = sv_newmortal();
-	}
 
 	sv_setpvn(TARG, tmps, rem);
 #ifdef USE_LOCALE_COLLATE
@@ -3000,33 +3000,6 @@ PP(pp_substr)
 	    sv_insert(sv, pos, rem, repl, repl_len);
 	    if (repl_sv_copy)
 		SvREFCNT_dec(repl_sv_copy);
-	}
-	else if (lvalue) {		/* it's an lvalue! */
-	    if (!SvGMAGICAL(sv)) {
-		if (SvROK(sv)) {
-		    SvPV_force_nolen(sv);
-		    if (ckWARN(WARN_SUBSTR))
-			Perl_warner(aTHX_ packWARN(WARN_SUBSTR),
-				"Attempt to use reference as lvalue in substr");
-		}
-		if (isGV_with_GP(sv))
-		    SvPV_force_nolen(sv);
-		else if (SvOK(sv))	/* is it defined ? */
-		    (void)SvPOK_only(sv);
-		else
-		    sv_setpvn(sv,"",0);	/* avoid lexical reincarnation */
-	    }
-
-	    if (SvTYPE(TARG) < SVt_PVLV) {
-		sv_upgrade(TARG, SVt_PVLV);
-		sv_magic(TARG, NULL, PERL_MAGIC_substr, NULL, 0);
-	    }
-
-	    LvTYPE(TARG) = IN_CODEPOINTS ? 'X' : 'x';
-	    LvTARG(TARG) = SvREFCNT_inc_simple(sv);
-	    LvTARGOFF(TARG) = upos;
-	    LvTARGLEN(TARG) = urem;
-
 	}
     }
     SPAGAIN;

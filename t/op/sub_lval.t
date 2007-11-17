@@ -1,7 +1,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests=>69;
+plan tests=>68;
 
 our ($nolv, @array2, %hash2, $blah, $o, $x0, $x1, $xxx,
      $newvar, $nnewvar, $str, $x, @p, @ary);
@@ -429,11 +429,6 @@ sub hslice : lvalue { @hash{"c", "b"} }
 (hslice()) = ("CISC", "BogoMIPS");
 is(join("/",@hash{"c","a","b"}), "CISC/Alpha/BogoMIPS");
 }
-
-$str = "Hello, world!";
-sub sstr : lvalue { substr($str, 1, 4) }
-sstr() = "i";
-is($str, "Hi, world!");
 
 $str = "Made w/ JavaScript";
 sub veclv : lvalue { vec($str, 2, 32) }
