@@ -5,11 +5,11 @@ use strict ;
 use warnings;
 use bytes;
 
-use Compress::Raw::Zlib  2.006 ;
-use IO::Compress::Base::Common  2.006 qw(:Status createSelfTiedObject);
+use Compress::Raw::Zlib  v2.006 ;
+use IO::Compress::Base::Common  v2.006 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base  2.006 ;
-use IO::Uncompress::Adapter::Inflate  2.006 ;
+use IO::Uncompress::Base  v2.006 ;
+use IO::Uncompress::Adapter::Inflate  v2.006 ;
 
 
 

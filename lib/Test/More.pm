@@ -660,7 +660,7 @@ sub use_ok ($;@) {
 
     local($@,$!,$SIG{__DIE__});   # isolate eval
 
-    if( @imports == 1 and $imports[0] =~ /^\d+(?:\.\d+)?$/ ) {
+    if( @imports == 1 and $imports[0] =~ /^v\d+(?:\.\d+)?$/ ) {
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         eval <<USE;

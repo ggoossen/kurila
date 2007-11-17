@@ -5,7 +5,7 @@ package IO::Compress::Base ;
 use strict ;
 use warnings;
 
-use IO::Compress::Base::Common 2.006 ;
+use IO::Compress::Base::Common v2.006 ;
 
 use IO::File ;
 use Scalar::Util qw(blessed readonly);

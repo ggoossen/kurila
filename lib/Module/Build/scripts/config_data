@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
-use Module::Build 0.25;
+use Module::Build v0.25;
 use Getopt::Long;
 
 my %opt_defs = (

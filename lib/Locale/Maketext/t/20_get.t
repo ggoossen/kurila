@@ -1,7 +1,7 @@
 
 use Test;
 BEGIN { plan tests => 11; }
-use Locale::Maketext 1.01;
+use Locale::Maketext v1.01;
 print "# Hi there...\n";
 ok 1;
 

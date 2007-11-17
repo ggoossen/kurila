@@ -13,7 +13,7 @@ use bytes;
 use Test::More ;
 use CompTestUtils;
  
-use Compress::Zlib 2 ;
+use Compress::Zlib v2 ;
 
 use IO::Compress::Gzip ;
 use IO::Uncompress::Gunzip ;

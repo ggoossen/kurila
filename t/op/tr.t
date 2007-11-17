@@ -1,10 +1,10 @@
-# tr.t
+#!./perl
 
 BEGIN {
     require './test.pl';
 }
 
-plan tests => 107;
+plan tests => 103;
 
 our ($x, $f);
 
@@ -64,67 +64,47 @@ is($@, '',      '    no error');
 use utf8;
 
 # check tr handles UTF8 correctly
-($x = 256.65.258) =~ tr/a/b/;
-is($x, 256.65.258,  'handles UTF8');
+($x = "\x{100}A\x{100}") =~ tr/a/b/;
+is($x, "\x{100}A\x{100}",  'handles UTF8');
 is(length $x, 3);
 
 $x =~ tr/A/B/;
 is(length $x, 3);
-if (ord("\t") == 9) { # ASCII
-    is($x, 256.66.258);
-}
-else {
-    is($x, 256.65.258);
-}
-
-# EBCDIC variants of the above tests
-($x = 256.193.258) =~ tr/a/b/;
-is(length $x, 3);
-is($x, 256.193.258);
-
-$x =~ tr/A/B/;
-is(length $x, 3);
-if (ord("\t") == 9) { # ASCII
-    is($x, 256.193.258);
-}
-else {
-    is($x, 256.194.258);
-}
-
+is($x, "\x{100}B\x{100}");
 
 {
     my $l = chr(300); my $r = chr(400);
-    $x = 200.300.400;
+    $x = "\x{c8}\x{12c}\x{190}";
     $x =~ tr/\x{12c}/\x{190}/;
-    is($x, 200.400.400,     
+    is($x, "\x{c8}\x{190}\x{190}",
                         'changing UTF8 chars in a UTF8 string, same length');
     is(length $x, 3);
 
-    $x = 200.300.400;
+    $x = "\x{c8}\x{12c}\x{190}";
     $x =~ tr/\x{12c}/\x{be8}/;
-    is($x, 200.3048.400,    '    more bytes');
+    is($x, "\x{c8}\x{be8}\x{190}",    '    more bytes');
     is(length $x, 3);
 
-    $x = 100.125.60;
+    $x = "\x{64}\x{7d}\x{3c}";
     $x =~ tr/\x{64}/\x{190}/;
-    is($x, 400.125.60,      'Putting UT8 chars into a non-UTF8 string');
+    is($x, "\x{190}\x{7d}\x{3c}",      'Putting UT8 chars into a non-UTF8 string');
     is(length $x, 3);
 
-    $x = 400.125.60;
+    $x = "\x{190}\x{7d}\x{3c}";
     $x =~ tr/\x{190}/\x{64}/;
-    is($x, 100.125.60,      'Removing UTF8 chars from UTF8 string');
+    is($x, "\x{64}\x{7d}\x{3c}",      'Removing UTF8 chars from UTF8 string');
     is(length $x, 3);
 
     $x = "\x{190}abc\x{190}";
     $y = $x =~ tr/\x{190}/\x{190}/;
     is($y, 2,               'Counting UTF8 chars in UTF8 string');
 
-    $x = 60.400.125.60.400;
+    $x = "\x{3c}\x{190}\x{7d}\x{3c}\x{190}";
     $y = $x =~ tr/\x{3c}/\x{3c}/;
     is($y, 2,               '         non-UTF8 chars in UTF8 string');
 
     # 17 - counting UTF8 chars in non-UTF8 string
-    $x = 200.125.60;
+    $x = "\x{c8}\x{7d}\x{3c}";
     $y = $x =~ tr/\x{190}/\x{190}/;
     is($y, 0,               '         UTF8 chars in non-UTFs string');
 }

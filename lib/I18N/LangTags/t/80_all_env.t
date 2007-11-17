@@ -2,7 +2,7 @@
 use Test;
 # Time-stamp: "2004-07-01 14:33:50 ADT"
 BEGIN { plan tests => 20; }
-use I18N::LangTags::Detect 1.01;
+use I18N::LangTags::Detect v1.01;
 print "# Hi there...\n";
 ok 1;
 

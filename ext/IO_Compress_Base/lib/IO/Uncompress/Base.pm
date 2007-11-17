@@ -15,7 +15,7 @@ $VERSION = '2.006';
 use constant G_EOF => 0 ;
 use constant G_ERR => -1 ;
 
-use IO::Compress::Base::Common 2.006 ;
+use IO::Compress::Base::Common v2.006 ;
 #use Parse::Parameters ;
 
 use IO::File ;

@@ -23,7 +23,7 @@ use vars qw($bar);
 use Opcode 1.00, qw(opdesc opset opset_to_ops opset_to_hex
 	opmask_add full_opset empty_opset opcodes opmask define_optag);
 
-use Safe 1.00;
+use Safe v1.00;
 
 my $last_test; # initalised at end
 print "1..$last_test\n";

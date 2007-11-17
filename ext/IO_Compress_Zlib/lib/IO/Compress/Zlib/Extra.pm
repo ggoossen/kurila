@@ -9,7 +9,7 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS);
 
 $VERSION = '2.006';
 
-use IO::Compress::Gzip::Constants 2.006 ;
+use IO::Compress::Gzip::Constants v2.006 ;
 
 sub ExtraFieldError
 {

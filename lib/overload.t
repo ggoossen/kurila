@@ -47,7 +47,7 @@ sub numify { 0 + "${$_[0]}" }	# Not needed, additional overhead
 package main;
 
 $| = 1;
-use Test::More tests => 535;
+use Test::More tests => 534;
 
 
 $a = Oscalar->new( "087");
@@ -1046,9 +1046,8 @@ sub new
 package main;
 
 
-my $utfvar = utf8_o->new( 200.2.1);
-is("$utfvar", 200.2.1); # 223 - stringify
-is("a$utfvar", "a".200.2.1); # 224 - overload via sv_2pv_flags
+my $utfvar = utf8_o->new( "\x{c8}\x{2}\x{1}");
+is("$utfvar", "\x{c8}\x{2}\x{1}"); # 223 - stringify
 
 # 225..227 -- more %{} tests.  Hangs in 5.6.0, okay in later releases.
 # Basically this example implements strong encapsulation: if Hderef::import()

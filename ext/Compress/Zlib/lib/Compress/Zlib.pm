@@ -6,10 +6,10 @@ use Carp ;
 use IO::Handle ;
 use Scalar::Util qw(dualvar);
 
-use IO::Compress::Base::Common 2.006 ;
-use Compress::Raw::Zlib 2.006 ;
-use IO::Compress::Gzip 2.006 ;
-use IO::Uncompress::Gunzip 2.006 ;
+use IO::Compress::Base::Common v2.006 ;
+use Compress::Raw::Zlib v2.006 ;
+use IO::Compress::Gzip v2.006 ;
+use IO::Uncompress::Gunzip v2.006 ;
 
 use strict ;
 use warnings ;
@@ -441,7 +441,7 @@ sub inflate
 
 package Compress::Zlib ;
 
-use IO::Compress::Gzip::Constants 2.006 ;
+use IO::Compress::Gzip::Constants v2.006 ;
 
 sub memGzip($)
 {

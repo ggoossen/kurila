@@ -152,7 +152,7 @@ like $@, qr/begins with '__'/;
 # Check on declared() and %declared. This sub should be EXACTLY the
 # same as the one quoted in the docs!
 sub declared ($) {
-    use constant 1.01;              # don't omit this!
+    use constant v1.01;              # don't omit this!
     my $name = shift;
     $name =~ s/^::/main::/;
     my $pkg = caller;
