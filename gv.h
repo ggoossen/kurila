@@ -206,8 +206,6 @@ Return the SV from the GV.
 #define GV_NOADD_MASK	(GV_NOADD_NOINIT|GV_NOEXPAND|GV_NOTQUAL)
 /* The bit flags that don't cause gv_fetchpv() to add a symbol if not found */
 
-#define gv_fullname3(sv,gv,prefix) gv_fullname4(sv,gv,prefix,TRUE)
-#define gv_efullname3(sv,gv,prefix) gv_efullname4(sv,gv,prefix,TRUE)
 #define gv_fetchmethod(stash, name) gv_fetchmethod_autoload(stash, name, TRUE)
 
 /*

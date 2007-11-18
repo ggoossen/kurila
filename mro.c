@@ -985,7 +985,7 @@ XS(XS_mro_nextcan)
             /* we found a real sub here */
             sv = sv_2mortal(newSV(0));
 
-            gv_efullname3(sv, cvgv, NULL);
+            gv_efullname4(sv, cvgv, NULL, TRUE);
 
             fq_subname = SvPVX(sv);
             fq_subname_len = SvCUR(sv);

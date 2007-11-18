@@ -61,9 +61,9 @@ EOF
 ok 2, print WRITE "hi kid\n";
 ok 3, <READ> =~ /^hi kid\r?\n$/;
 ok 4, <ERROR> =~ /^hi error\r?\n$/;
-ok 5, close(WRITE), $!;
-ok 6, close(READ), $!;
-ok 7, close(ERROR), $!;
+ok 5, close(*WRITE), $!;
+ok 6, close(*READ), $!;
+ok 7, close(*ERROR), $!;
 $reaped_pid = waitpid $pid, 0;
 ok 8, $reaped_pid == $pid, $reaped_pid;
 ok 9, $? == 0, $?;
@@ -93,8 +93,8 @@ print scalar <READ>;
 waitpid $pid, 0;
 
 # dup writer
-ok 14, pipe PIPE_READ, PIPE_WRITE;
-$pid = open3 '<&PIPE_READ', 'READ', '',
+ok 14, pipe *PIPE_READ, *PIPE_WRITE;
+$pid = open3 '<&PIPE_READ', *READ, undef,
 		    $perl, '-e', cmd_line('print scalar <STDIN>');
 close PIPE_READ;
 print PIPE_WRITE "ok 15\n";

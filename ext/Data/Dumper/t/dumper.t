@@ -47,7 +47,7 @@ sub TEST {
   }
   $name = $name ? " - $name" : '';
   print( ($t eq $WANT and not $@) ? "ok $TNUM$name\n"
-	: "not ok $TNUM$name\n--Expected--\n$WANT\n--Got--\n$@$t\n");
+	: "not ok $TNUM$name\n--Input--\n$string\nExpected--\n$WANT\n--Got--\n$@$t\n");
 
   ++$TNUM;
   if ($Is_ebcdic) { # EBCDIC.

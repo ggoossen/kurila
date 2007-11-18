@@ -40,7 +40,7 @@ is( $d->stringify(), 'undef', 'stringify handles undef okay' );
 $d->{printUndef} = 0;
 is( $d->stringify(), "''", 'stringify skips undef when asked nicely' );
 
-is( $d->stringify(*FOO), *FOO . "", 'stringify stringifies globs alright' );
+is( $d->stringify(*FOO), '*main::FOO', 'stringify stringifies globs alright' );
 
 # check for double-quotes if there's an unprintable character
 $d->{tick} = 'auto';

@@ -8,8 +8,8 @@
 $| = 1;
 
 # for testing TEST only
-#BEGIN { require '../lib/strict.pm'; strict->import() };
-#BEGIN { require '../lib/warnings.pm'; warnings->import() };
+BEGIN { require '../lib/strict.pm'; strict->import() };
+BEGIN { require '../lib/warnings.pm'; warnings->import() };
 
 # Let tests know they're running in the perl core.  Useful for modules
 # which live dual lives on CPAN.
@@ -30,6 +30,7 @@ our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
 	$::with_utf8 = 1 if $1 eq 'utf8';
 	$::with_utf16 = 1 if $1 eq 'utf16';
 	$::taintwarn = 1 if $1 eq 'taintwarn';
+	$::failed = 1 if $1 eq 'failed';
 	$ENV{PERL_CORE_MINITEST} = 1 if $1 eq 'minitest';
 	if ($1 =~ /^deparse(,.+)?$/) {
 	    $::deparse = 1;
@@ -101,6 +102,13 @@ sub _quote_args {
 
 sub _populate_hash {
     return map {$_, 1} split /\s+/, $_[0];
+}
+
+if ($::failed) {
+    # get tests to run from TEST_FAILED
+    open my $fh, "<", "TEST_FAILED";
+    push @ARGV, map { chomp; $_ } <$fh>;
+    close $fh;
 }
 
 unless (@ARGV) {
@@ -236,6 +244,15 @@ EOT
     my $totmax = 0;
     my %failed_tests;
 
+    {
+        # read previously failed tests
+        if (-e 'TEST_FAILED') {
+            open my $fh, "<", "TEST_FAILED" or die;
+            while (<$fh>) { chomp; $failed_tests{$_} = 0; }
+            close $fh;
+        }
+    }
+
     while (my $test = shift @tests) {
         my $test_start_time = $show_elapsed_time ? Time::HiRes::time() : 0;
 
@@ -342,12 +359,10 @@ EOT
 		if ($trailing_leader) {
 		    # shouldn't be anything following a postfix 1..n
 		    $failure ||= 'FAILED--extra output after trailing 1..n';
-		    last;
 		}
 		if (/^1\.\.([0-9]+)( todo ([\d ]+))?/) {
 		    if ($seen_leader) {
 			$failure ||= 'FAILED--seen duplicate leader';
-			last;
 		    }
 		    $max = $1;
 		    %todo = map { $_ => 1 } split / /, $3 if $3;
@@ -358,7 +373,6 @@ EOT
 			$trailing_leader = 1;
 			if ($next != $max) {
 			    $failure ||= "FAILED--expected $max tests, saw $next";
-			    last;
 			}
 		    }
 		    else {
@@ -392,7 +406,6 @@ EOT
 			}
 			else {
 			    $failure ||="FAILED--expected test $next, saw test $num";
-			    last;
 			}
 		    }
 		    elsif (/^Bail out!\s*(.*)/i) { # magic words
@@ -403,7 +416,6 @@ EOT
 			# because Test::Harness allows it
 			next if $test =~ /^\W*(ext|lib)\b/;
 			$failure ||= "FAILED--unexpected output at test $next";
-			last;
 		    }
 		}
 	    }
@@ -492,6 +504,7 @@ EOT
 	    ++$failed_tests{$test};
 	}
 	else {
+            delete $failed_tests{$test};
 	    if ($max) {
 		my $elapsed;
 		if ( $show_elapsed_time ) {
@@ -523,7 +536,7 @@ EOT
 	my $pct = $tested_files ? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) : "0.00";
 	my $s = $::bad_files == 1 ? "" : "s";
 	warn "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
-	for my $test ( sort keys %failed_tests ) {
+	for my $test ( sort grep { $failed_tests{$_} } keys %failed_tests ) {
 	    print "\t$test\n";
 	}
 	warn <<'SHRDLU_1';
@@ -562,6 +575,14 @@ SHRDLU_5
 	    }
 	}
     }
+
+    {
+        # write failed tests
+        open my $fh, ">", "TEST_FAILED" or die;
+        print $fh "$_\n" for reverse sort keys %failed_tests;
+        close $fh;
+    }
+
     my ($user,$sys,$cuser,$csys) = times;
     print sprintf("u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d\n",
 	$user,$sys,$cuser,$csys,$tested_files,$totmax);

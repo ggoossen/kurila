@@ -96,7 +96,7 @@ SKIP: {
         $r = eval { openlog('perl', 'ndelay', 'local0') } || 0;
         skip "can't connect to syslog", 6 if $@ =~ /^no connection to syslog available/;
         is( $@, '', "openlog() called with facility 'local0'" );
-        ok( $r, "openlog() should return true: '$r'" );
+        ok( $r, "openlog() should return true" );
 
         # syslog()
         $r = eval { syslog('info', "$test_string by connecting to a $sock_type socket") } || 0;

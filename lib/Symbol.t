@@ -1,11 +1,8 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
+use TestInit;
 
-use Test::More tests => 24;
+use Test::More tests => 26;
 
 BEGIN { $_ = 'foo'; }  # because Symbol used to clobber $_
 
@@ -78,9 +75,13 @@ use Symbol qw(qualify qualify_to_ref);  # must import into this package too
 ::ok( Symbol::fetch_glob("x") eq \*foo::x, "fetch_glob with unqualified name" );
 ::ok( Symbol::fetch_glob("foo::x") eq \*foo::x, "fetch_glob with qualified name" );
 
+# test stash()
 ::ok( (ref Symbol::stash("foo")) eq "HASH", "stash returns a ref to a hash" );
 
-# test stash()
+# glob_name
+
+::is( Symbol::glob_name(*FOO), "foo::FOO", "glob_name");
+::is( Symbol::glob_name(*main::FOO), "main::FOO", "glob_name");
 
 # tests for delete_package
 package main;

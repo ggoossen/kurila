@@ -855,8 +855,9 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
               sv_catpvn(retval, tmpbuf, len);
 	}
 	else if (realtype == SVt_PVGV) {/* GLOBs can end up with scribbly names */
-	    c = SvPV(val, i);
-	    ++c; --i;			/* just get the name */
+            SV* name = sv_newmortal();
+	    gv_efullname4(name, (GV*)val, NULL, TRUE);
+            c = SvPV(name, i);
 	    if (i >= 6 && strncmp(c, "main::", 6) == 0) {
 		c += 4;
 		i -= 4;

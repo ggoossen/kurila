@@ -88,7 +88,7 @@ sub stringify {
   my $tick = $self->{tick};
 
   return 'undef' unless defined $_ or not $self->{printUndef};
-  return $_ . "" if ref \$_ eq 'GLOB';
+  return '*' . Symbol::glob_name($_) if ref \$_ eq 'GLOB';
   { no strict 'refs';
     $_ = &{*{Symbol::fetch_glob('overload::StrVal')}}($_)
       if $self->{bareStringify} and ref $_
@@ -174,7 +174,7 @@ sub unwrap {
       }
     }
   } elsif (ref \$v eq 'GLOB') {
-    $address = "$v" . "";	# To avoid a bug with globs
+    $address = '*' . Symbol::glob_name($v);	# To avoid a bug with globs
     $address{$address}++ ;
     if ( $address{$address} > 1 ) {
       print "${sp}*DUMPED_GLOB*\n" ;
@@ -263,7 +263,7 @@ sub unwrap {
     }
   } elsif (ref \$v eq 'GLOB') {
     if ($self->{globPrint}) {
-      $self->dumpglob('', $s, "{$v}", $v, 1);
+      $self->dumpglob('', $s, "{*" . Symbol::glob_name($v) . "}", $v, 1);
     } elsif (defined ($fileno = fileno(\$v))) {
       print( (' ' x $s) .  "FileHandle({$v}) => fileno($fileno)\n" );
     }

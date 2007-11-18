@@ -1,13 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    if ($^O eq 'MacOS') { 
-	@INC = qw(: ::lib ::macos:lib); 
-    } else { 
-	@INC = '.'; 
-	push @INC, '../lib'; 
-    }
     require Config; Config->import;
     if ($Config{'extensions'} !~ /\bFile\/Glob\b/i) {
         print "1..0\n";
@@ -112,7 +105,7 @@ unless (@a == 2 and $a[0] eq 'a' and $a[1] eq 'b') {
 print "ok 7\n";
 
 @a = bsd_glob(
-    '{TES*,doesntexist*,a,b}',
+    '{TES?,doesntexist*,a,b}',
     GLOB_BRACE ^|^ GLOB_NOMAGIC ^|^ ($^O eq 'VMS' ? GLOB_NOCASE : 0)
 );
 

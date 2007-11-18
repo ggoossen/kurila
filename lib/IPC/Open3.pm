@@ -153,26 +153,26 @@ sub xfork {
 }
 
 sub xpipe {
-    pipe $_[0], $_[1] or croak "$Me: pipe($_[0], $_[1]) failed: $!";
+    pipe $_[0], $_[1] or croak "$Me: pipe(" . Symbol::glob_name($_[0]) . ", " . Symbol::glob_name($_[1]) . ") failed: $!";
 }
 
 # I tried using a * prototype character for the filehandle but it still
 # disallows a bearword while compiling under strict subs.
 
 sub xopen {
-    open $_[0], $_[1] or croak "$Me: open($_[0], $_[1]) failed: $!";
+    open $_[0], $_[1], $_[2] or croak "$Me: open(...)"; # . Symbol::glob_name($_[0]) . ", $_[1], " . Symbol::glob_name($_[2]) . ") failed: $!";
 }
 
 sub xclose {
-    close $_[0] or croak "$Me: close($_[0]) failed: $!";
+    close $_[0] or croak "$Me: close(*" . Symbol::glob_name($_[0]) . ") failed: $!";
 }
 
 sub fh_is_fd {
-    return $_[0] =~ /\A=?(\d+)\z/;
+    return ref \$_[0] eq "SCALAR" && $_[0] =~ /\A=?(\d+)\z/;
 }
 
 sub xfileno {
-    return $1 if $_[0] =~ /\A=?(\d+)\z/;  # deal with fh just being an fd
+    return $1 if ref \$_[0] eq "SCALAR" and $_[0] =~ /\A=?(\d+)\z/;  # deal with fh just being an fd
     return fileno $_[0];
 }
 
@@ -192,8 +192,8 @@ sub _open3 {
     # tchrist 5-Mar-00
 
     unless (eval  {
-	$dad_wtr = $_[1] = gensym unless defined $dad_wtr && length $dad_wtr;
-	$dad_rdr = $_[2] = gensym unless defined $dad_rdr && length $dad_rdr;
+	$dad_wtr = $_[1] = gensym unless defined $dad_wtr;
+	$dad_rdr = $_[2] = gensym unless defined $dad_rdr;
 	1; }) 
     {
 	# must strip crud for croak to add back, or looks ugly
@@ -203,14 +203,15 @@ sub _open3 {
 
     $dad_err ||= $dad_rdr;
 
-    $dup_wtr = ($dad_wtr =~ s/^[<>]&//);
-    $dup_rdr = ($dad_rdr =~ s/^[<>]&//);
-    $dup_err = ($dad_err =~ s/^[<>]&//);
+
+    $dup_wtr = (ref \$dad_wtr eq "SCALAR" and $dad_wtr =~ s/^[<>]&//);
+    $dup_rdr = (ref \$dad_rdr eq "SCALAR" and $dad_rdr =~ s/^[<>]&//);
+    $dup_err = (ref \$dad_err eq "SCALAR" and $dad_err =~ s/^[<>]&//);
 
     # force unqualified filehandles into caller's package
-    $dad_wtr = *{Symbol::fetch_glob(qualify $dad_wtr, $package)} unless ref $dad_wtr or fh_is_fd($dad_wtr);
-    $dad_rdr = *{Symbol::fetch_glob(qualify $dad_rdr, $package)} unless ref $dad_rdr or fh_is_fd($dad_rdr);
-    $dad_err = *{Symbol::fetch_glob(qualify $dad_err, $package)} unless ref $dad_err or fh_is_fd($dad_err);
+    $dad_wtr = \*{Symbol::fetch_glob(qualify $dad_wtr, $package)} unless ref \$dad_wtr ne "SCALAR" or fh_is_fd($dad_wtr);
+    $dad_rdr = \*{Symbol::fetch_glob(qualify $dad_rdr, $package)} unless ref \$dad_rdr ne "SCALAR" or fh_is_fd($dad_rdr);
+    $dad_err = \*{Symbol::fetch_glob(qualify $dad_err, $package)} unless ref \$dad_err ne "SCALAR" or fh_is_fd($dad_err);
 
     my $kid_rdr = gensym;
     my $kid_wtr = gensym;
@@ -218,7 +219,7 @@ sub _open3 {
 
     xpipe $kid_rdr, $dad_wtr if !$dup_wtr;
     xpipe $dad_rdr, $kid_wtr if !$dup_rdr;
-    xpipe $dad_err, $kid_err if !$dup_err && $dad_err ne $dad_rdr;
+    xpipe $dad_err, $kid_err if !$dup_err && Symbol::glob_name(*$dad_err) ne Symbol::glob_name(*$dad_rdr);
 
     $kidpid = $do_spawn ? -1 : xfork;
     if ($kidpid == 0) {		# Kid
@@ -227,38 +228,38 @@ sub _open3 {
 	untie *STDOUT;
 	# If she wants to dup the kid's stderr onto her stdout I need to
 	# save a copy of her stdout before I put something else there.
-	if ($dad_rdr ne $dad_err && $dup_err
+	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*) && $dup_err
 		&& xfileno($dad_err) == fileno(STDOUT)) {
 	    my $tmp = gensym;
-	    xopen($tmp, ">&$dad_err");
+	    xopen($tmp, ">&", $dad_err);
 	    $dad_err = $tmp;
 	}
 
 	if ($dup_wtr) {
-	    xopen \*STDIN,  "<&$dad_wtr" if fileno(STDIN) != xfileno($dad_wtr);
+	    xopen \*STDIN,  "<&", $dad_wtr if fileno(STDIN) != xfileno($dad_wtr);
 	} else {
 	    xclose $dad_wtr;
-	    xopen \*STDIN,  "<&=" . fileno $kid_rdr;
+	    xopen \*STDIN,  "<&=", fileno $kid_rdr;
 	}
 	if ($dup_rdr) {
-	    xopen \*STDOUT, ">&$dad_rdr" if fileno(STDOUT) != xfileno($dad_rdr);
+	    xopen \*STDOUT, ">&", $dad_rdr if fileno(STDOUT) != xfileno($dad_rdr);
 	} else {
 	    xclose $dad_rdr;
-	    xopen \*STDOUT, ">&=" . fileno $kid_wtr;
+	    xopen \*STDOUT, ">&=", $kid_wtr;
 	}
-	if ($dad_rdr ne $dad_err) {
+	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*)) {
 	    if ($dup_err) {
 		# I have to use a fileno here because in this one case
 		# I'm doing a dup but the filehandle might be a reference
 		# (from the special case above).
-		xopen \*STDERR, ">&" . xfileno($dad_err)
+		xopen \*STDERR, ">&", xfileno($dad_err)
 		    if fileno(STDERR) != xfileno($dad_err);
 	    } else {
 		xclose $dad_err;
-		xopen \*STDERR, ">&=" . fileno $kid_err;
+		xopen \*STDERR, ">&=", fileno $kid_err;
 	    }
 	} else {
-	    xopen \*STDERR, ">&STDOUT" if fileno(STDERR) != fileno(STDOUT);
+	    xopen \*STDERR, ">&", \*STDOUT if fileno(STDERR) != fileno(STDOUT);
 	}
 	return 0 if ($cmd[0] eq '-');
 	local($")=(" ");
@@ -312,7 +313,7 @@ sub _open3 {
 
     xclose $kid_rdr if !$dup_wtr;
     xclose $kid_wtr if !$dup_rdr;
-    xclose $kid_err if !$dup_err && $dad_rdr ne $dad_err;
+    xclose $kid_err if !$dup_err && Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*);
     # If the write handle is a dup give it away entirely, close my copy
     # of it.
     xclose $dad_wtr if $dup_wtr;
