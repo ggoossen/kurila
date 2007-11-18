@@ -24,7 +24,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 5;
+plan tests => 4;
 
 use encoding "greek"; # iso 8859-7
 use utf8;
@@ -32,7 +32,6 @@ use utf8;
 # U+0391, \x[C1], \301, GREEK CAPITAL LETTER ALPHA
 # U+03B1, \x[E1], \341, GREEK SMALL LETTER ALPHA
 
-ok("\xC1"    eq chr(0xC1),  '\xXX and ord(0xXX) the same');
 ok("\x{C1}"  eq chr(0xC1),  '\xXX and ord(0xXX) the same');
 is( eval qq|use encoding 'greek'; "\x[C1]"|, "\x{391}", "source is decoded" );
 

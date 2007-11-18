@@ -21,7 +21,7 @@ is((unpack('C',substr($foo,1,1)) ^&^ 255), 0xf1);
 is(vec($foo,2,4), 1);;
 is(vec($foo,3,4), 15);
 vec($Vec, 0, 32) = 0xbaddacab;
-is($Vec, "\xba\xdd\xac\xab");
+is($Vec, "\x[baddacab]");
 is(vec($Vec, 0, 32), 3135089835);
 
 # ensure vec() handles numericalness correctly

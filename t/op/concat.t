@@ -106,14 +106,14 @@ sub beq { use bytes; $_[0] eq $_[1]; }
     use utf8;
     my($l, $r, $c);
 
-    ($l, $r, $c) = ("\x{101}", "\xfe", "\x{101}\xfe");
+    ($l, $r, $c) = ("\x{101}", "\x[fe]", "\x{101}\x[fe]");
     ok(beq($l.$r, $c), "concat utf8 and byte");
     ok(beq($l, "\x{101}"), "right not changed after concat u+b");
-    ok(beq($r, "\xfe"), "left not changed after concat u+b");
+    ok(beq($r, "\x[fe]"), "left not changed after concat u+b");
 
-    ($l, $r, $c) = ("\xfe", "\x{101}", "\xfe\x{101}");
+    ($l, $r, $c) = ("\x[fe]", "\x{101}", "\x[fe]\x{101}");
     ok(beq($l.$r, $c), "concat byte and utf8");
-    ok(beq($l, "\xfe"), "right not changed after concat b+u");
+    ok(beq($l, "\x[fe]"), "right not changed after concat b+u");
     ok(beq($r, "\x{101}"), "left not changed after concat b+u");
 }
 
@@ -134,11 +134,11 @@ sub beq { use bytes; $_[0] eq $_[1]; }
     # [perl #26905] "use bytes" doesn't apply byte semantics to concatenation
     use utf8;
 
-    my $p = "\xB6"; # PILCROW SIGN (ASCII/EBCDIC), 2bytes in UTF-X
+    my $p = "\x{B6}"; # PILCROW SIGN (ASCII/EBCDIC), 2bytes in UTF-X
     my $u = "\x{100}";
     my $b = pack 'a*', "\x{100}";
-    my $pu = "\xB6\x{100}";
-    my $up = "\x{100}\xB6";
+    my $pu = "\x{B6}\x{100}";
+    my $up = "\x{100}\x{B6}";
     my $x1 = $p;
     my $y1 = $u;
 

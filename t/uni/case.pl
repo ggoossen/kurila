@@ -82,9 +82,6 @@ sub casetest {
 
     for my $i (sort keys %$spec) {
 	my $w = unidump($spec->{$i});
-	if (ord('A') == 193 && $i eq "\x8A\x73") {
-	    $w = '0178'; # It's a Latin small Y with diaeresis and not a Latin small letter sharp 's'.
-	}
         #my $c = substr $i, 0, 1;
 	my $h = unidump($i);
 	foreach my $func (@funcs) {

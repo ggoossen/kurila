@@ -55,7 +55,7 @@ our $test;
     cmp_ok( scalar(@res), '==', 1, 'no paren deref map nr');
     cmp_ok( $res[0], 'eq', 'chobb', 'no paren deref map is');
 
-    my $x = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\n";
+    my $x = "\x[FFFFFFFFFFFFFF]\n";
 
     @res = map($_^&^$x,("sferics\n"));
     cmp_ok( scalar(@res), '==', 1, 'binand map nr 1');

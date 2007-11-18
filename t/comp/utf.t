@@ -23,7 +23,7 @@ BEGIN { require "./test.pl"; }
 
 plan(tests => 18);
 
-my $BOM = "\xFE\xFF";
+my $BOM = "\x[FEFF]";
 
 sub test {
     my ($enc, $tag, $bom) = @_;

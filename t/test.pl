@@ -496,7 +496,7 @@ sub _create_runperl { # Create the string to qx in runperl().
 	_quote_args(\$runperl, $args{args});
     }
     $runperl .= ' 2>&1'          if  $args{stderr} && !$is_macos;
-    $runperl .= " \xB3 Dev:Null" if !$args{stderr} &&  $is_macos;
+    $runperl .= " \x[B3] Dev:Null" if !$args{stderr} &&  $is_macos;
     if ($args{verbose}) {
 	my $runperldisplay = $runperl;
 	$runperldisplay =~ s/\n/\n\#/g;

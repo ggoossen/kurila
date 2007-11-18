@@ -1407,31 +1407,10 @@ S_force_ident(pTHX_ register const char *s, int kind)
     }
 }
 
-NV
-Perl_str_to_version(pTHX_ SV *sv)
-{
-    NV retval = 0.0;
-    NV nshift = 1.0;
-    STRLEN len;
-    const char *start = SvPV_const(sv,len);
-    const char * const end = start + len;
-    while (start < end) {
-	STRLEN skip;
-	UV n;
-	n = utf8n_to_uvchr(start, len, &skip, 0);
-	if( n > 128 )
-	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-			"High bit scalar value");
-	retval += ((NV)n)/nshift;
-	start += skip;
-	nshift *= 1000;
-    }
-    return retval;
-}
-
 /*
  * S_force_version
  * Forces the next token to be a version number.
+ * Emits a NULL token if there there isn't a version.
  */
 
 STATIC char *
@@ -1823,6 +1802,188 @@ S_sublex_done(pTHX)
 		
 */
 
+STATIC const char *
+S_parse_escape(pTHX_ const char *s, char **d, const char *send)
+{
+    U32 uv;
+
+    switch (*s) {
+
+	/* quoted - in transliterations */
+        case '-':
+	    if (PL_lex_inwhat == OP_TRANS) {
+		*(*d)++ = *s++;
+		return s;
+	    }
+	    /* FALL THROUGH */
+    default:
+    {
+	if ((isALPHA(*s) || isDIGIT(*s)) &&
+	    ckWARN(WARN_MISC))
+	    Perl_warner(aTHX_ packWARN(WARN_MISC),
+			"Unrecognized escape \\%c passed through",
+			*s);
+	/* default action is to copy the quoted character */
+	*(*d)++ = *s++;
+	return s;
+    }
+
+    /* \132 indicates an octal constant */
+    case '0': case '1': case '2': case '3':
+    case '4': case '5': case '6': case '7':
+    {
+	I32 flags = 0;
+	STRLEN len = 3;
+	uv = grok_oct(s, &len, &flags, NULL);
+	s += len;
+	*(*d)++ = (char) uv;
+	return s;
+    }
+
+    /* \x24 indicates a hex constant */
+    case 'x':
+	++s;
+	if (*s == '[') {
+	    /* \x[XX] insert byte XX */
+	    s++;
+	    while ( *s != ']' ) {
+		STRLEN len = 2;
+		I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+		uv = grok_hex(s, &len, &flags, NULL);
+		s += len;
+		*(*d)++ = (char)uv;
+		if (s >= send)
+		    Perl_croak("Missing right square bracket on \\x[]");
+	    }
+	    s += 1;
+	    return s;
+	}
+	if (*s == '{') {
+	    /* \x{XX} insert codepoint XX */
+	    char* const e = strchr(s, '}');
+	    I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
+		PERL_SCAN_DISALLOW_PREFIX;
+	    STRLEN len;
+
+	    ++s;
+	    if (!e) {
+		yyerror("Missing right brace on \\x{}");
+		return s;
+	    }
+	    len = e - s;
+	    uv = grok_hex(s, &len, &flags, NULL);
+	    s = e + 1;
+	}
+	else {
+	    /* \xXX insert byte or codepoint depending on IN_CODEPOINTS */
+	    STRLEN len = 2;
+	    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+	    uv = grok_hex(s, &len, &flags, NULL);
+	    s += len;
+	    Perl_warner(aTHX_ packWARN(WARN_UTF8),
+			"\\xXX are assumed bytes");
+	    *(*d)++ = (char)uv;
+	    return s;
+	}
+
+      NUM_ESCAPE_INSERT:
+	/* Insert oct or hex escaped character.
+	 * There will always enough room in sv since such
+	 * escapes will be longer than any UTF-8 sequence
+	 * they can end up as. */
+	
+	/* We need to map to chars to ASCII before doing the tests
+	   to cover EBCDIC
+		*/
+	if (!UNI_IS_INVARIANT(uv)) {
+	    *d = uvchr_to_utf8(*d, uv);
+	}
+	else {
+	    *(*d)++ = (char) uv;
+	}
+	return s;
+	
+	/* \N{LATIN SMALL LETTER A} is a named character */
+    case 'N':
+	++s;
+	if (*s == '{') {
+	    const char* e = strchr(s, '}');
+	    SV *res;
+	    STRLEN len;
+	    const char *str;
+	    
+	    if (!e || (e >= send)) {
+		yyerror("Missing right brace on \\N{}");
+		return s;
+	    }
+	    if (e > s + 2 && s[1] == 'U' && s[2] == '+') {
+		/* \N{U+...} */
+		I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
+		    PERL_SCAN_DISALLOW_PREFIX;
+		s += 3;
+		len = e - s;
+		uv = grok_hex(s, &len, &flags, NULL);
+		if ( e > s && len != (STRLEN)(e - s) ) {
+		    uv = 0xFFFD;
+		}
+		s = e + 1;
+		goto NUM_ESCAPE_INSERT;
+	    }
+	    res = newSVpvn(s + 1, e - s - 1);
+	    res = new_constant( NULL, 0, "charnames",
+				res, NULL, s - 2, e - s + 3 );
+	    str = SvPV_const(res,len);
+	    if (len > (STRLEN)(e - s + 4)) { /* I _guess_ 4 is \N{} --jhi */
+		yyerror("panic: \\N{...} replacement too long");
+	    }
+	    Copy(str, *d, len, char);
+	    (*d) += len;
+	    SvREFCNT_dec(res);
+	    s = e + 1;
+	}
+	else
+	    yyerror("Missing braces on \\N{}");
+	return s;
+
+	/* \c is a control character */
+    case 'c':
+	s++;
+	if (s < send) {
+	    char c = *s++;
+	    *(*d)++ = NATIVE_TO_UNI(toCTRL(c));
+	}
+	else {
+	    yyerror("Missing control char name in \\c");
+	}
+	return s;
+
+	/* printf-style backslashes, formfeeds, newlines, etc */
+    case 'b':
+	*(*d)++ = '\b';
+	break;
+    case 'n':
+	*(*d)++ = '\n';
+	break;
+    case 'r':
+	*(*d)++ = '\r';
+	break;
+    case 'f':
+	*(*d)++ = '\f';
+	break;
+    case 't':
+	*(*d)++ = '\t';
+	break;
+    case 'e':
+	*(*d)++ = ASCII_TO_UNI('\033');
+	break;
+    case 'a':
+	*(*d)++ = ASCII_TO_UNI('\007');
+	break;
+    } /* end switch */
+
+    return s+1;
+}
+
 STATIC char *
 S_scan_const(pTHX_ char *start)
 {
@@ -1835,7 +1996,6 @@ S_scan_const(pTHX_ char *start)
     bool didrange = FALSE;		        /* did we just finish a range? */
     I32  has_utf8 = FALSE;			/* Output constant is UTF8 */
     bool in_codepoints = (IN_CODEPOINTS != 0);  /* PL_curtoken can be changed ?! */
-    UV uv;
 
     while (s < send || dorange) {
         /* get transliterations out of the way (they're most literal) */
@@ -1999,201 +2159,9 @@ S_scan_const(pTHX_ char *start)
 		}
 		/* FALL THROUGH */
 	    default:
-	        {
-		    if ((isALPHA(*s) || isDIGIT(*s)) &&
-			ckWARN(WARN_MISC))
-			Perl_warner(aTHX_ packWARN(WARN_MISC),
-				    "Unrecognized escape \\%c passed through",
-				    *s);
-		    /* default action is to copy the quoted character */
-		    goto default_action;
-		}
+		s = (char*)S_parse_escape(s, &d, send);
+	    }
 
-	    /* \132 indicates an octal constant */
-	    case '0': case '1': case '2': case '3':
-	    case '4': case '5': case '6': case '7':
-		{
-                    I32 flags = 0;
-                    STRLEN len = 3;
-		    uv = grok_oct(s, &len, &flags, NULL);
-		    s += len;
-		    *d++ = (char) uv;
-		    continue;
-		}
-
-	    /* \x24 indicates a hex constant */
-	    case 'x':
-		++s;
-		if (*s == '[') {
-		    /* \x[XX] insert byte XX */
-		    STRLEN len = 2;
-		    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
-		    s++;
-		    uv = grok_hex(s, &len, &flags, NULL);
-		    s += len;
-		    *d++ = (char)uv;
-		    if ((s >= send) || (*s != ']'))
-			yyerror("Missing right square bracket on \\x[]");
-		    s += 1;
-		    continue;
-		}
-		if (*s == '{') {
-			/* \x{XX} insert codepoint XX */
-		    char* const e = strchr(s, '}');
-                    I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
-                      PERL_SCAN_DISALLOW_PREFIX;
-		    STRLEN len;
-
-                    ++s;
-		    if (!e) {
-				yyerror("Missing right brace on \\x{}");
-				continue;
-		    }
-                    len = e - s;
-		    uv = grok_hex(s, &len, &flags, NULL);
-		    s = e + 1;
-		}
-		else {
-			/* \xXX insert byte or codepoint depending on IN_CODEPOINTS */
-			STRLEN len = 2;
-			I32 flags = PERL_SCAN_DISALLOW_PREFIX;
-			uv = grok_hex(s, &len, &flags, NULL);
-			s += len;
-			if ( ! in_codepoints ) {
-			    *d++ = (char)uv;
-			    continue;
-			}
-		}
-
-	      NUM_ESCAPE_INSERT:
-		/* Insert oct or hex escaped character.
-		 * There will always enough room in sv since such
-		 * escapes will be longer than any UTF-8 sequence
-		 * they can end up as. */
-		
-		/* We need to map to chars to ASCII before doing the tests
-		   to cover EBCDIC
-		*/
-		if (!UNI_IS_INVARIANT(NATIVE_TO_UNI(uv))) {
-		    d = (char*)uvchr_to_utf8(d, uv);
-		    has_utf8 = TRUE;
-		    if (PL_lex_inwhat == OP_TRANS &&
-			PL_sublex_info.sub_op) {
-			if ( ! ( in_codepoints || IN_BYTES))
-			    Perl_warner(aTHX_ packWARN(WARN_UTF8),
-					"Codepoints or bytes");
-		    }
-		}
-		else {
-		    *d++ = (char) uv;
-		}
-		continue;
-
- 	    /* \N{LATIN SMALL LETTER A} is a named character */
- 	    case 'N':
- 		++s;
- 		if (*s == '{') {
- 		    char* e = strchr(s, '}');
- 		    SV *res;
- 		    STRLEN len;
- 		    const char *str;
-
- 		    if (!e) {
-			yyerror("Missing right brace on \\N{}");
-			e = s - 1;
-			goto cont_scan;
-		    }
-		    if (e > s + 2 && s[1] == 'U' && s[2] == '+') {
-		        /* \N{U+...} */
-		        I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
-			  PERL_SCAN_DISALLOW_PREFIX;
-		        s += 3;
-			len = e - s;
-			uv = grok_hex(s, &len, &flags, NULL);
-			if ( e > s && len != (STRLEN)(e - s) ) {
-			    uv = 0xFFFD;
-			}
-			s = e + 1;
-			goto NUM_ESCAPE_INSERT;
-		    }
-		    res = newSVpvn(s + 1, e - s - 1);
-		    res = new_constant( NULL, 0, "charnames",
-					res, NULL, s - 2, e - s + 3 );
-		    str = SvPV_const(res,len);
-#ifdef EBCDIC_NEVER_MIND
-		    /* charnames uses pack U and that has been
-		     * recently changed to do the below uni->native
-		     * mapping, so this would be redundant (and wrong,
-		     * the code point would be doubly converted).
-		     * But leave this in just in case the pack U change
-		     * gets revoked, but the semantics is still
-		     * desireable for charnames. --jhi */
-		    {
-			 UV uv = utf8_to_uvchr(str, 0);
-
-			 if (uv < 0x100) {
-			      char tmpbuf[UTF8_MAXBYTES+1], *d;
-
-			      d = uvchr_to_utf8(tmpbuf, UNI_TO_NATIVE(uv));
-			      sv_setpvn(res, (char *)tmpbuf, d - tmpbuf);
-			      str = SvPV_const(res, len);
-			 }
-		    }
-#endif
-		    has_utf8 = TRUE;
-		    if (len > (STRLEN)(e - s + 4)) { /* I _guess_ 4 is \N{} --jhi */
-			const char * const odest = SvPVX_const(sv);
-
-			SvGROW(sv, (SvLEN(sv) + len - (e - s + 4)));
-			d = SvPVX(sv) + (d - odest);
-		    }
-		    Copy(str, d, len, char);
-		    d += len;
-		    SvREFCNT_dec(res);
-		  cont_scan:
-		    s = e + 1;
-		}
-		else
-		    yyerror("Missing braces on \\N{}");
-		continue;
-
-	    /* \c is a control character */
-	    case 'c':
-		s++;
-		if (s < send) {
-		    char c = *s++;
-		    *d++ = NATIVE_TO_UNI(toCTRL(c));
-		}
-		else {
-		    yyerror("Missing control char name in \\c");
-		}
-		continue;
-
-	    /* printf-style backslashes, formfeeds, newlines, etc */
-	    case 'b':
-		*d++ = NATIVE_TO_UNI('\b');
-		break;
-	    case 'n':
-		*d++ = NATIVE_TO_UNI('\n');
-		break;
-	    case 'r':
-		*d++ = NATIVE_TO_UNI('\r');
-		break;
-	    case 'f':
-		*d++ = NATIVE_TO_UNI('\f');
-		break;
-	    case 't':
-		*d++ = NATIVE_TO_UNI('\t');
-		break;
-	    case 'e':
-		*d++ = ASCII_TO_UNI('\033');
-		break;
-	    case 'a':
-		*d++ = ASCII_TO_UNI('\007');
-		break;
-	    } /* end switch */
-
-	    s++;
 	    continue;
 	} /* end if (backslash) */
 

@@ -1188,8 +1188,8 @@ if (/(\C)/g) {
 
 {
     no utf8;
-    ok("\x8e" =~ /[\x89-\x91]/);
-    ok("\xce" =~ /[\xc9-\xd1]/);
+    ok("\x[8e]" =~ /[\x89-\x91]/);
+    ok("\x[ce]" =~ /[\xc9-\xd1]/);
 }
 
 ok("\x{ab}" =~ /\x{ab}/);
@@ -1881,48 +1881,48 @@ $test = 687;
 {
     # Check that \x## works. 5.6.1 and 5.005_03 fail some of these.
     no utf8;
-    $x = "\x4e" . "E";
+    $x = "\x[4e]" . "E";
     ok ($x =~ /^\x4EE$/, "Check only 2 bytes of hex are matched.");
 
-    $x = "\x4e" . "i";
+    $x = "\x[4e]" . "i";
     ok ($x =~ /^\x4Ei$/, "Check that invalid hex digit stops it (2)");
 
-    $x = "\x4" . "j";
+    $x = "\x[04]" . "j";
     ok ($x =~ /^\x4j$/,  "Check that invalid hex digit stops it (1)");
 
-    $x = "\x0" . "k";
+    $x = "\0" . "k";
     ok ($x =~ /^\xk$/,   "Check that invalid hex digit stops it (0)");
 
-    $x = "\x0" . "x";
+    $x = "\0" . "x";
     ok ($x =~ /^\xx$/, "\\xx isn't to be treated as \\0");
 
-    $x = "\x0" . "xa";
+    $x = "\0" . "xa";
     ok ($x =~ /^\xxa$/, "\\xxa isn't to be treated as \\xa");
 
-    $x = "\x9" . "_b";
+    $x = "\x[09]" . "_b";
     ok ($x =~ /^\x9_b$/, "\\x9_b isn't to be treated as \\x9b");
 
     print "# and now again in [] ranges\n";
 
-    $x = "\x4e" . "E";
+    $x = "\x[4e]" . "E";
     ok ($x =~ /^[\x4EE]{2}$/, "Check only 2 bytes of hex are matched.");
 
-    $x = "\x4e" . "i";
+    $x = "\x[4e]" . "i";
     ok ($x =~ /^[\x4Ei]{2}$/, "Check that invalid hex digit stops it (2)");
 
-    $x = "\x4" . "j";
+    $x = "\x[04]" . "j";
     ok ($x =~ /^[\x4j]{2}$/,  "Check that invalid hex digit stops it (1)");
 
-    $x = "\x0" . "k";
+    $x = "\0" . "k";
     ok ($x =~ /^[\xk]{2}$/,   "Check that invalid hex digit stops it (0)");
 
-    $x = "\x0" . "x";
+    $x = "\0" . "x";
     ok ($x =~ /^[\xx]{2}$/, "\\xx isn't to be treated as \\0");
 
-    $x = "\x0" . "xa";
+    $x = "\0" . "xa";
     ok ($x =~ /^[\xxa]{3}$/, "\\xxa isn't to be treated as \\xa");
 
-    $x = "\x9" . "_b";
+    $x = "\x[09]" . "_b";
     ok ($x =~ /^[\x9_b]{3}$/, "\\x9_b isn't to be treated as \\x9b");
 
 }
@@ -4066,7 +4066,7 @@ sub kt
 }
 {
     local $Message = "Various whitespace special patterns";
-    my @lb=( "\x0D\x0A",
+    my @lb=( "\x{0D}\x{0A}",
              map { chr( $_ ) } ( 0x0A..0x0D,0x85,0x2028,0x2029 ));
     foreach my $t ([\@lb,qr/\R/,qr/\R+/],){
         my $ary=shift @$t;
@@ -4134,7 +4134,7 @@ sub kt
 
 # length() on captures, the numbered ones end up in Perl_magic_len
 {
-    my $_ = "aoeu \xe6var ook";
+    my $_ = "aoeu \x{e6}var ook";
     /^ \w+ \s (?<eek>\S+)/x;
 
     iseq( length($`), 0, 'length $`' );

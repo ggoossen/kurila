@@ -1318,8 +1318,7 @@ EOT
 #$VAR1 = "\$b\"\@\\\x{00a3}";
 EOT
 
-        $a = "\$b\"\@\\\xA3\x{100}";
-	chop $a;
+        $a = "\$b\"\@\\\x{A3}";
 	TEST q(Data::Dumper->Dump([$a])), "utf8 flag with \" and \$";
 	if ($XS) {
 	    $WANT = <<'EOT';

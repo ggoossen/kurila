@@ -18,7 +18,7 @@ elsif ($^O eq 'VMS') {
 elsif ($^O eq 'MacOS') {
   @oops = @ops = glob(":op:*");
   map { $files{$_}++ } glob(":op:*");
-  map { delete $files{$_} } split /[\s\n]/, `echo :op:\xc5`;
+  map { delete $files{$_} } split /[\s\n]/, `echo :op:\x[c5]`;
 }
 else {
   map { $files{$_}++ } glob("op/*");

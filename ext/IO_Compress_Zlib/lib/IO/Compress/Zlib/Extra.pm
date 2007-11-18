@@ -41,7 +41,7 @@ sub validateExtraFieldPair
 
     # Check that the 2nd byte of the ID isn't 0    
     return ExtraFieldError("SubField ID 2nd byte is 0x00")
-        if $strict && $gzipMode && substr($pair->[0], 1, 1) eq "\x00" ;
+        if $strict && $gzipMode && substr($pair->[0], 1, 1) eq "\x[00]" ;
 
     return ExtraFieldError("SubField Data too long")
         if length $pair->[1] > GZIP_FEXTRA_SUBFIELD_MAX_SIZE ;
