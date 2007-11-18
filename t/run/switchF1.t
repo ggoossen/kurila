@@ -21,7 +21,7 @@ ok'4
 EOT
 
 # 2 of the characters toke.c used to use to quote the split parameter:
-$prog =~ s/QQ/\x01\x80/;
+$prog =~ s/QQ/\x[0180]/;
 # These 2 plus ~ # and ' were enough to make perl choke
 print F $prog;
 close F or die "Close $file: $!";

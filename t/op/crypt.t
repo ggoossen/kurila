@@ -30,7 +30,7 @@ SKIP: {
 
 use utf8;
 
-$a = "a\xFF\x{100}";
+$a = "a\x[FF]\x{100}";
 
 eval {$b = crypt($a, "cd")};
 is($@, '',   "treat all strings as byte-strings");
@@ -39,5 +39,5 @@ chop $a; # throw away the wide character
 
 eval {$b = crypt($a, "cd")};
 is($@, '',                   "downgrade to eight bit characters");
-is($b, crypt("a\xFF", "cd"), "downgrade results agree");
+is($b, crypt("a\x[FF]", "cd"), "downgrade results agree");
 

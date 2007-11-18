@@ -113,7 +113,7 @@ is(join('', (@x) x -14),    '',                     '(@x) x -14');
 #
 # jhi@iki.fi
 #
-is("\xdd" x 24, "\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd", 'Dec C bug');
+is("\x[dd]" x 24, "\x[dddddddddddddddddddddddddddddddddddddddddddddddd]", 'Dec C bug');
 
 
 # When we use a list repeat in a scalar context, it behaves like

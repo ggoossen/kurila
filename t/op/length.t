@@ -24,7 +24,7 @@ print "ok 3\n";
     $test++;
 
     use bytes;
-    print "not " unless $a eq "\x41" && length($a) == 1;
+    print "not " unless $a eq "\x[41]" && length($a) == 1;
     print "ok 5\n";
     $test++;
 }
@@ -38,7 +38,7 @@ print "ok 3\n";
     $test++;
 
     no utf8;
-    print "not " unless $a eq "\xc3\xbf" && length($a) == 2;
+    print "not " unless $a eq "\x[c3bf]" && length($a) == 2;
     print "ok 7\n";
     $test++;
 }
@@ -51,7 +51,7 @@ print "ok 3\n";
     $test++;
 
     use bytes;
-    print "not " unless $a eq "\xc4\x80" && length($a) == 2;
+    print "not " unless $a eq "\x[c480]" && length($a) == 2;
     print "ok 9\n";
     $test++;
 }
@@ -65,7 +65,7 @@ print "ok 3\n";
     $test++;
 
     use bytes;
-    print "not " unless $a eq "\xc4\x80\xc2\x80" && length($a) == 4;
+    print "not " unless $a eq "\x[c480c280]" && length($a) == 4;
     print "ok 11\n";
     $test++;
 }
@@ -78,7 +78,7 @@ print "ok 3\n";
     $test++;
 
     use bytes;
-    print "not " unless $a eq "\xc2\x80\xc4\x80" && length($a) == 4;
+    print "not " unless $a eq "\x[c280c480]" && length($a) == 4;
     print "ok 13\n";
     $test++;
 }

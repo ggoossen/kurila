@@ -30,14 +30,17 @@ sub is {
     return 0;
 }
 
-use bytes;
-is ("\x53", chr 83);
-is ("\x4EE", chr (78) . 'E');
-is ("\x4i", chr (4) . 'i');	# This will warn
-is ("\xh", chr (0) . 'h');	# This will warn
-is ("\xx", chr (0) . 'x');	# This will warn
-is ("\xx9", chr (0) . 'x9');	# This will warn. \x9 is tab in EBCDIC too?
-is ("\x9_E", chr (9) . '_E');	# This will warn
+{
+    use bytes;
+    local $SIG{__WARN__} = sub { };
+    is (eval '"\x53"', chr 83);
+    is (eval '"\x4EE"', chr (78) . 'E');
+    is (eval '"\x4i"', chr (4) . 'i');	# This will warn
+    is (eval '"\xh"', chr (0) . 'h');	# This will warn
+    is (eval '"\xx"', chr (0) . 'x');	# This will warn
+    is (eval '"\xx9"', chr (0) . 'x9');	# This will warn. \x9 is tab in EBCDIC too?
+    is (eval '"\x9_E"', chr (9) . '_E');	# This will warn
+}
 
 is ("\x{4E}", chr 78);
 is ("\x{6_9}", chr 105);

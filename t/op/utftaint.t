@@ -20,7 +20,7 @@ my $arg = $ENV{PATH}; # a tainted value
 use utf8;
 use constant UTF8 => "\x{1234}";
 
-for my $ary ([ascii => 'perl'], [latin1 => "\xB6"], [utf8 => "\x{100}"]) {
+for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"], [utf8 => "\x{100}"]) {
     my $encode = $ary->[0];
     my $string = $ary->[1];
 
@@ -54,7 +54,7 @@ for my $ary ([ascii => 'perl'], [latin1 => "\xB6"], [utf8 => "\x{100}"]) {
 }
 
 
-for my $ary ([ascii => 'perl'], [latin1 => "\xB6"], [utf8 => "\x{100}"]) {
+for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"], [utf8 => "\x{100}"]) {
     my $encode = $ary->[0];
 
     my $utf8 = pack('U*') . $ary->[1];
@@ -80,7 +80,7 @@ for my $ary ([ascii => 'perl'], [latin1 => "\xB6"], [utf8 => "\x{100}"]) {
 }
 
 
-for my $ary ([ascii => 'perl'], [latin1 => "\xB6"]) {
+for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"]) {
     my $encode = $ary->[0];
 
     my $up   = pack('U*') . $ary->[1];

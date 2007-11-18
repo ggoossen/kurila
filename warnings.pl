@@ -207,10 +207,10 @@ sub printTree
 
 ###########################################################################
 
-sub mkHexOct
+sub mkHex
 {
-    my ($f, $max, @a) = @_ ;
-    my $mask = "\x00" x $max ;
+    my ($max, @a) = @_ ;
+    my $mask = "\x[00]" x $max;
     my $string = "" ;
 
     foreach (@a) {
@@ -218,26 +218,9 @@ sub mkHexOct
     }
 
     foreach (unpack("C*", $mask)) {
-        if ($f eq 'x') {
-            $string .= '\x' . sprintf("%2.2x", $_)
-        }
-        else {
-            $string .= '\\' . sprintf("%o", $_)
-        }
+        $string .= sprintf("%2.2x", $_);
     }
-    return $string ;
-}
-
-sub mkHex
-{
-    my($max, @a) = @_;
-    return mkHexOct("x", $max, @a);
-}
-
-sub mkOct
-{
-    my($max, @a) = @_;
-    return mkHexOct("o", $max, @a);
+    return "\\x[$string]";
 }
 
 ###########################################################################

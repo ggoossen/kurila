@@ -15,10 +15,10 @@ is(chr(ord("A")), "A");
 {
     # byte characters
     use bytes;
-    is(chr(  0), "\x00");
-    is(chr(127), "\x7F");
-    is(chr(128), "\x80");
-    is(chr(255), "\xFF");
+    is(chr(  0), "\x[00]");
+    is(chr(127), "\x[7F]");
+    is(chr(128), "\x[80]");
+    is(chr(255), "\x[FF]");
 }
 
 {
@@ -32,19 +32,19 @@ is(chr(ord("A")), "A");
 
 {
     # ASCII characters
-    is chr(0x65), "\x65";
+    is chr(0x65), "\x[65]";
     my $warn;
     $SIG{__WARN__} = sub { $warn = shift };
-    is chr(0x80), "\x80";
+    is chr(0x80), "\x[80]";
     like $warn, qr"chr\(\) ambiguous with highbit without use bytes or use utf8", "highbit warning";
 }
 
 {
     use bytes;
-    is(chr(-0.1), "\x00");
-    is(chr(-1  ), "\xFF");
-    is(chr(-2  ), "\xFE");
-    is(chr(-3.0), "\xFD");
+    is(chr(-0.1), "\x[00]");
+    is(chr(-1  ), "\x[FF]");
+    is(chr(-2  ), "\x[FE]");
+    is(chr(-3.0), "\x[FD]");
 }
 
 {

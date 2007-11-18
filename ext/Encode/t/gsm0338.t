@@ -30,16 +30,16 @@ my $chk = Encode::LEAVE_SRC();
 # escapes
 # see http://www.csoft.co.uk/sms/character_sets/gsm.htm
 my %esc_seq = (
-	       "\x{20ac}" => "\x1b\x65",
-	       "\x0c"     => "\x1b\x0A",
-	       "["        => "\x1b\x3C",
-	       "\\"       => "\x1b\x2F",
-	       "]"        => "\x1b\x3E",
-	       "^"        => "\x1b\x14",
-	       "{"        => "\x1b\x28",
-	       "|"        => "\x1b\x40",
-	       "}"        => "\x1b\x29",
-	       "~"        => "\x1b\x3D",
+	       "\x{20ac}" => "\x[1b65]",
+	       "\x{0c}"     => "\x[1b0A]",
+	       "["        => "\x[1b3C]",
+	       "\\"       => "\x[1b2F]",
+	       "]"        => "\x[1b3E]",
+	       "^"        => "\x[1b14]",
+	       "{"        => "\x[1b28]",
+	       "|"        => "\x[1b40]",
+	       "}"        => "\x[1b29]",
+	       "~"        => "\x[1b3D]",
 );
 
 my %unesc_seq = reverse %esc_seq;
@@ -57,24 +57,24 @@ for my $c ( map { chr } 0 .. 127 ) {
     # default character set
     is decode( "gsm0338", $c, $chk ), $u,
       sprintf( "decode \\x%02X", ord($c) );
-    eval { decode( "gsm0338", $c . "\xff", $chk ) };
+    eval { decode( "gsm0338", $c . "\x{ff}", $chk ) };
     ok( $@, $@ );
     is encode( "gsm0338", $u, $chk ), $c, sprintf( "encode %s", eu($u) );
     eval { encode( "gsm0338", $u . "\x{3000}", $chk ) };
     ok( $@, $@ );
 
     # nasty atmark
-    if ( $c eq "\x00" ) {
-        is decode( "gsm0338", "\x00" . $c, $chk ), "\x00",
+    if ( $c eq "\x[00]" ) {
+        is decode( "gsm0338", "\x[00]" . $c, $chk ), "\x[00]",
           sprintf( '@@ =>: \x00+\x%02X', ord($c) );
     }
     else {
-        is decode( "gsm0338", "\x00" . $c ), '@' . decode( "gsm0338", $c ),
+        is decode( "gsm0338", "\x[00]" . $c ), '@' . decode( "gsm0338", $c ),
           sprintf( '@: decode \x00+\x%02X', ord($c) );
     }
 
     # escape seq.
-    my $ecs = "\x1b" . $c;
+    my $ecs = "\x{1b}" . $c;
     if ( $unesc_seq{$ecs} ) {
         is decode( "gsm0338", $ecs, $chk ), $unesc_seq{$ecs},
           sprintf( "ESC: decode ESC+\\x%02X", ord($c) );
@@ -83,7 +83,7 @@ for my $c ( map { chr } 0 .. 127 ) {
     }
     else {
         is decode( "gsm0338", $ecs, $chk ),
-          "\xA0" . decode( "gsm0338", $c ),
+          "\x{A0}" . decode( "gsm0338", $c ),
           sprintf( "decode ESC+\\x%02X", ord($c) );
     }
 }

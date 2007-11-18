@@ -859,7 +859,7 @@ sub seek
     my $offset = $target - $here ;
 
     my $buffer ;
-    defined $self->syswrite("\x00" x $offset)
+    defined $self->syswrite("\0" x $offset)
         or return 0;
 
     return 1 ;

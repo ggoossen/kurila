@@ -46,7 +46,7 @@ for my $size ( 16, 32, 64 ) {
   }
 }
 
-my $IsTwosComplement = pack('i', -1) eq "\xFF" x $Config{intsize};
+my $IsTwosComplement = pack('i', -1) eq "\x[FF]" x $Config{intsize};
 print "# \$IsTwosComplement = $IsTwosComplement\n";
 
 sub is_valid_error
@@ -469,7 +469,7 @@ EOUU
 
     is(unpack('u', $uu), $in);
 
-    $in = "\x1f\x8b\x08\x08\x58\xdc\xc4\x35\x02\x03\x4a\x41\x50\x55\x00\xf3\x2a\x2d\x2e\x51\x48\xcc\xcb\x2f\xc9\x48\x2d\x52\x08\x48\x2d\xca\x51\x28\x2d\x4d\xce\x4f\x49\x2d\xe2\x02\x00\x64\x66\x60\x5c\x1a\x00\x00\x00";
+    $in = "\x[1f]\x[8b]\x[08]\x[08]\x[58]\x[dc]\x[c4]\x[35]\x[02]\x[03]\x[4a]\x[41]\x[50]\x[55]\x[00]\x[f3]\x[2a]\x[2d]\x[2e]\x[51]\x[48]\x[cc]\x[cb]\x[2f]\x[c9]\x[48]\x[2d]\x[52]\x[08]\x[48]\x[2d]\x[ca]\x[51]\x[28]\x[2d]\x[4d]\x[ce]\x[4f]\x[49]\x[2d]\x[e2]\x[02]\x[00]\x[64]\x[66]\x[60]\x[5c]\x[1a]\x[00]\x[00]\x[00]";
     $uu = <<'EOUU';
 M'XL("%C<Q#4"`TI!4%4`\RHM+E%(S,LOR4@M4@A(+<I1*"U-SD])+>("`&1F
 &8%P:````
@@ -684,17 +684,17 @@ numbers_with_total ('Q', sub {
 
 print "# pack nvNV byteorders\n";
 
-is(pack("n", 0xdead), "\xde\xad");
-is(pack("v", 0xdead), "\xad\xde");
-is(pack("N", 0xdeadbeef), "\xde\xad\xbe\xef");
-is(pack("V", 0xdeadbeef), "\xef\xbe\xad\xde");
+is(pack("n", 0xdead), "\x[dead]");
+is(pack("v", 0xdead), "\x[adde]");
+is(pack("N", 0xdeadbeef), "\x[deadbeef]");
+is(pack("V", 0xdeadbeef), "\x[efbeadde]");
 
 SKIP: {
   skip $no_signedness, 4 if $no_signedness;
-  is(pack("n!", 0xdead), "\xde\xad");
-  is(pack("v!", 0xdead), "\xad\xde");
-  is(pack("N!", 0xdeadbeef), "\xde\xad\xbe\xef");
-  is(pack("V!", 0xdeadbeef), "\xef\xbe\xad\xde");
+  is(pack("n!", 0xdead), "\x[dead]");
+  is(pack("v!", 0xdead), "\x[adde]");
+  is(pack("N!", 0xdeadbeef), "\x[deadbeef]");
+  is(pack("V!", 0xdeadbeef), "\x[efbeadde]");
 }
 
 print "# test big-/little-endian conversion\n";
@@ -766,30 +766,30 @@ SKIP: {
         if is_valid_error($@);
 
       my $len = length $nat;
-      is($_, "\xFF"x$len) for $nat, $be, $le;
+      is($_, "\x[FF]"x$len) for $nat, $be, $le;
 
       my(@val,@ref);
       if ($len >= 8) {
         @val = (-2, -81985529216486896, -9223372036854775808);
-        @ref = ("\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFE",
-                "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
-                "\x80\x00\x00\x00\x00\x00\x00\x00");
+        @ref = ("\x[FFFFFFFFFFFFFFFE]",
+                "\x[FEDCBA9876543210]",
+                "\x[8000000000000000]");
       }
       elsif ($len >= 4) {
         @val = (-2, -19088744, -2147483648);
-        @ref = ("\xFF\xFF\xFF\xFE",
-                "\xFE\xDC\xBA\x98",
-                "\x80\x00\x00\x00");
+        @ref = ("\x[FFFFFFFE]",
+                "\x[FEDCBA98]",
+                "\x[80000000]");
       }
       else {
         @val = (-2, -292, -32768);
-        @ref = ("\xFF\xFE",
-                "\xFE\xDC",
-                "\x80\x00");
+        @ref = ("\x[FFFE]",
+                "\x[FEDC]",
+                "\x[8000]");
       }
       for my $x (@ref) {
         if ($len > length $x) {
-          $x = $x . "\xFF" x ($len - length $x);
+          $x = $x . "\x[FF]" x ($len - length $x);
         }
       }
 
@@ -989,7 +989,7 @@ EOPOEMSNIPPET
 
   # shorts (of all flavours) didn't calculate checksums > 32 bits with floating
   # point, so a pathologically long pattern would wrap at 32 bits.
-  my $pat = "\xff\xff"x65538; # Start with it long, to save any copying.
+  my $pat = "\x[ffff]"x65538; # Start with it long, to save any copying.
   foreach (4,3,2,1,0) {
     my $len = 65534 + $_;
     is(unpack ("%33n$len", $pat), 65535 * $len);
@@ -1055,11 +1055,11 @@ foreach (
 }
 
 {
-    is((unpack("w/a*", "\x02abc"))[0], "ab");
+    is((unpack("w/a*", "\x[02]abc"))[0], "ab");
 
     # "w/a*" should be seen as one unit
 
-    is(scalar unpack("w/a*", "\x02abc"), "ab");
+    is(scalar unpack("w/a*", "\x[02]abc"), "ab");
 }
 
 SKIP: {
@@ -1249,10 +1249,10 @@ SKIP: {
   eval { my $buf = pack( '(c/*a*)', 'AAA', 'BB' ); };
   like( $@, qr{'/' does not take a repeat count} );
 
-  eval { my @inf = unpack( 'c/1a', "\x03AAA\x02BB" ); };
+  eval { my @inf = unpack( 'c/1a', "\x[03]AAA\x[02]BB" ); };
   like( $@, qr{'/' does not take a repeat count} );
 
-  eval { my @inf = unpack( 'c/*a', "\x03AAA\x02BB" ); };
+  eval { my @inf = unpack( 'c/*a', "\x[03]AAA\x[02]BB" ); };
   like( $@, qr{'/' does not take a repeat count} );
 
   # white space where possible
@@ -1385,14 +1385,14 @@ is(scalar unpack('A /A /A Z20', '3004bcde'), 'bcde');
   my $t = 'C[3]  x!8 C[2]';
   my @a = (0x73..0x77);
   my $p = pack($t, @a);
-  is($p, "\x73\x74\x75\0\0\0\0\0\x76\x77");
+  is($p, "\x[737475]\0\0\0\0\0\x[7677]");
   my @b = unpack $t, $p;
   is(scalar @b, scalar @a);
   is("@b", "@a", 'x!8');
   $t = 'x[5] C[6] X!8 C[2]';
   @a = (0x73..0x7a);
   $p = pack($t, @a);
-  is($p, "\0\0\0\0\0\x73\x74\x75\x79\x7a");
+  is($p, "\0\0\0\0\0\x[737475797a]");
   @b = unpack $t, $p;
   @a = (0x73..0x75, 0x79, 0x7a, 0x79, 0x7a);
   is(scalar @b, scalar @a);
@@ -1494,7 +1494,7 @@ $_ = pack('c', 65); # 'A' would not be EBCDIC-friendly
 is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 
 {
-    my $a = "X\x0901234567\n" x 100; # \t would not be EBCDIC TAB
+    my $a = "X\x[09]01234567\n" x 100; # \t would not be EBCDIC TAB
     my @a = unpack("(a1 c/a)*", $a);
     is(scalar @a, 200,       "[perl #15288]");
     is($a[-1], "01234567\n", "[perl #15288]");
@@ -1556,7 +1556,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 {
     # Encoding neutrality
     # String we will pull apart and rebuild in several ways:
-    my $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
+    my $down = "\x[f8f9fafbfcfdfeff0506]";
     my $up   = $down;
     utf8::encode($up);
 
@@ -1564,13 +1564,13 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
         # [expected result,
         #  how many chars it should progress,
         #  (optional) expected result of pack]
-        (a5 => ["\xf8\xf9\xfa\xfb\xfc", 5],
-         A5 => ["\xf8\xf9\xfa\xfb\xfc", 5],
-         Z5 => ["\xf8\xf9\xfa\xfb\xfc", 5, "\xf8\xf9\xfa\xfb\x00\xfd"],
-         b21 => ["000111111001111101011", 3, "\xf8\xf9\x1a\xfb"],
-         B21 => ["111110001111100111111", 3, "\xf8\xf9\xf8\xfb"],
-         H5 => ["f8f9f", 3, "\xf8\xf9\xf0\xfb"],
-         h5 => ["8f9fa", 3, "\xf8\xf9\x0a\xfb"],
+        (a5 => ["\x[f8f9fafbfc]", 5],
+         A5 => ["\x[f8f9fafbfc]", 5],
+         Z5 => ["\x[f8f9fafbfc]", 5, "\x[f8f9fafb00fd]"],
+         b21 => ["000111111001111101011", 3, "\x[f8f91afb]"],
+         B21 => ["111110001111100111111", 3, "\x[f8f9f8fb]"],
+         H5 => ["f8f9f", 3, "\x[f8f9f0fb]"],
+         h5 => ["8f9fa", 3, "\x[f8f90afb]"],
          "s<"  => [-1544, 2],
          "s>"  => [-1799, 2],
          "S<"  => [0xf9f8, 2],
@@ -1623,7 +1623,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     # use utf8 neutrality, numbers
     for ( ( map { [$_, -2.68] } qw(s S i I l L j J f d F D q Q
                                    s! S! i! I! l! L! n! N! v! V!)),
-          ['C', 253], ['u', "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06"],
+          ['C', 253], ['u', "\x[f8f9fafbfcfdfeff0506]"],
           ['U', 0x300], ['a3', "abc"], ['a0', ''],
           ['A3', "abc"], ['Z3', "ghi"]
         ) {
@@ -1656,7 +1656,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     # Harder cases for the neutrality test
 
     # u format
-    my $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
+    my $down = "\x[f8f9fafbfcfdfeff0506]";
     my $up   = $down;
     utf8::encode($up);
     is(pack("u", $down), pack("u", $up), "u pack is neutral");
@@ -1665,21 +1665,21 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 
     # p/P format
     # This actually only tests something if the address contains a byte >= 0x80
-    my $str = "abc\xa5\x00\xfede";
+    my $str = "abc\x[a500fe]de";
     $down = pack("p", $str);
     is(pack("P", $str), $down);
     is(pack("U0C0p", $str), $down);
     is(pack("U0C0P", $str), $down);
-    is(unpack("p", $down), "abc\xa5", "unpack p downgraded");
+    is(unpack("p", $down), "abc\x[a5]", "unpack p downgraded");
     $up   = $down;
     utf8::encode($up);
-    is(unpack("p", $up), "abc\xa5", "unpack p upgraded");
+    is(unpack("p", $up), "abc\x[a5]", "unpack p upgraded");
 
-    is(unpack("P7", $down), "abc\xa5\x00\xfed", "unpack P downgraded");
-    is(unpack("P7", $up),   "abc\xa5\x00\xfed", "unpack P upgraded");
+    is(unpack("P7", $down), "abc\x[a500fe]d", "unpack P downgraded");
+    is(unpack("P7", $up),   "abc\x[a500fe]d", "unpack P upgraded");
 
     # x, X and @
-    $down = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff\x05\x06";
+    $down = "\x[f8f9fafbfcfdfeff0506]";
     $up   = $down;
     utf8::encode($up);
 
@@ -1702,17 +1702,17 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     is(unpack('@5X!8W', $down), 0xf8, "X! moving on downgraded string");
     is(unpack('@5X!8W', $up),   0xf8, "X! moving on upgraded string");
 
-    is(pack("W2x", 0xfa, 0xe3), "\xfa\xe3\x00", "x on downgraded string");
-    is(pack("W2x!4", 0xfa, 0xe3), "\xfa\xe3\x00\x00",
+    is(pack("W2x", 0xfa, 0xe3), "\x[fae300]", "x on downgraded string");
+    is(pack("W2x!4", 0xfa, 0xe3), "\x[fae30000]",
        "x! on downgraded string");
-    is(pack("W2x!2", 0xfa, 0xe3), "\xfa\xe3", "x! on downgraded string");
-    is(pack("W2x", 0xfa, 0xe3), "\xfa\xe3\x00", "x on upgraded string");
-    is(pack("W2x!4", 0xfa, 0xe3), "\xfa\xe3\x00\x00",
+    is(pack("W2x!2", 0xfa, 0xe3), "\x[fae3]", "x! on downgraded string");
+    is(pack("W2x", 0xfa, 0xe3), "\x[fae300]", "x on upgraded string");
+    is(pack("W2x!4", 0xfa, 0xe3), "\x[fae30000]",
        "x! on upgraded string");
-    is(pack("W2x!2", 0xfa, 0xe3), "\xfa\xe3", "x! on upgraded string");
-    is(pack("W2X", 0xfa, 0xe3), "\xfa", "X on downgraded string");
-    is(pack("W2X!2", 0xfa, 0xe3), "\xfa\xe3", "X! on downgraded string");
-    is(pack("W3X!2", 0xfa, 0xe3, 0xa6), "\xfa\xe3", "X! on downgraded string");
+    is(pack("W2x!2", 0xfa, 0xe3), "\x[fae3]", "x! on upgraded string");
+    is(pack("W2X", 0xfa, 0xe3), "\x[fa]", "X on downgraded string");
+    is(pack("W2X!2", 0xfa, 0xe3), "\x[fae3]", "X! on downgraded string");
+    is(pack("W3X!2", 0xfa, 0xe3, 0xa6), "\x[fae3]", "X! on downgraded string");
 
     # backward eating through a ( moves the group starting point backwards
     is(pack("a*(Xa)", "abc", "q"), "abq",
@@ -1755,13 +1755,13 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     $TODO = "find out what pack('A*') is supposed to do";
 
     # unpack("A*", $unicode) strips general unicode spaces
-    is(unpack("A*", "ab \n\xa0 \0"), "ab \n\xa0",
-       'normal A* strip leaves \xa0');
-    is(unpack("U0C0A*", "ab \n\xa0 \0"), "ab \n\xa0",
-       'normal A* strip leaves \xa0 even if it got upgraded for technical reasons');
+    is(unpack("A*", "ab \n\x{a0} \0"), "ab \n\x{a0}",
+       'normal A* strip leaves \x{a0}');
+    is(unpack("U0C0A*", "ab \n\x{a0} \0"), "ab \n\x{a0}",
+       'normal A* strip leaves \x{a0} even if it got upgraded for technical reasons');
     is(unpack("A*", pack("a*(U0U)a*", "ab \n", 0xa0, " \0")), "ab",
-       'upgraded strings A* removes \xa0');
-    is(unpack("A*", pack("a*(U0UU)a*", "ab \n", 0xa0, 0x1680, " \0")), "ab\x0a\x{1680}",
+       'upgraded strings A* removes \x{a0}');
+    is(unpack("A*", pack("a*(U0UU)a*", "ab \n", 0xa0, 0x1680, " \0")), "ab\x{0a}\x{1680}",
        'upgraded strings A* removes all unicode whitespace');
     is(unpack("A5", pack("a*(U0U)a*", "ab \n", 0x1680, "def", "ab")), "ab",
        'upgraded strings A5 removes all unicode whitespace');
@@ -1838,20 +1838,20 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     is(pack("(a)5 .", 1..5, 3), "123", ". relative to string start, shorten");
     eval { () = pack("(a)5 .", 1..5, -3) };
     like($@, qr{'\.' outside of string in pack}, "Proper error message");
-    is(pack("(a)5 .", 1..5, 8), "12345\x00\x00\x00",
+    is(pack("(a)5 .", 1..5, 8), "12345\0\0\0",
        ". relative to string start, extend");
     is(pack("(a)5 .", 1..5, 5), "12345", ". relative to string start, keep");
 
     is(pack("(a)5 .0", 1..5, -3), "12",
        ". relative to string current, shorten");
-    is(pack("(a)5 .0", 1..5, 2), "12345\x00\x00",
+    is(pack("(a)5 .0", 1..5, 2), "12345\0\0",
        ". relative to string current, extend");
     is(pack("(a)5 .0", 1..5, 0), "12345",
        ". relative to string current, keep");
 
     is(pack("(a)5 (.)", 1..5, -3), "12",
        ". relative to group, shorten");
-    is(pack("(a)5 (.)", 1..5, 2), "12345\x00\x00",
+    is(pack("(a)5 (.)", 1..5, 2), "12345\0\0",
        ". relative to group, extend");
     is(pack("(a)5 (.)", 1..5, 0), "12345",
        ". relative to group, keep");
@@ -1860,24 +1860,24 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
        ". relative to group, shorten");
     is(pack("(a)3 ((a)2 .)", 1..5, 2), "12345",
        ". relative to group, keep");
-    is(pack("(a)3 ((a)2 .)", 1..5, 4), "12345\x00\x00",
+    is(pack("(a)3 ((a)2 .)", 1..5, 4), "12345\0\0",
        ". relative to group, extend");
 
     is(pack("(a)3 ((a)2 .2)", 1..5, 2), "12",
        ". relative to counted group, shorten");
-    is(pack("(a)3 ((a)2 .2)", 1..5, 7), "12345\x00\x00",
+    is(pack("(a)3 ((a)2 .2)", 1..5, 7), "12345\0\0",
        ". relative to counted group, extend");
     is(pack("(a)3 ((a)2 .2)", 1..5, 5), "12345",
        ". relative to counted group, keep");
 
     is(pack("(a)3 ((a)2 .*)", 1..5, 2), "12",
        ". relative to start, shorten");
-    is(pack("(a)3 ((a)2 .*)", 1..5, 7), "12345\x00\x00",
+    is(pack("(a)3 ((a)2 .*)", 1..5, 7), "12345\0\0",
        ". relative to start, extend");
     is(pack("(a)3 ((a)2 .*)", 1..5, 5), "12345",
        ". relative to start, keep");
 
-    is(pack('(a)5 (. @2 a)', 1..5, -3, "a"), "12\x00\x00a",
+    is(pack('(a)5 (. @2 a)', 1..5, -3, "a"), "12\0\0a",
        ". based shrink properly updates group starts");
 }
 {

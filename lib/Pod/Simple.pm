@@ -39,8 +39,7 @@ BEGIN {
     die "MANY_LINES is too small (", MANY_LINES(), ")!\nAborting";
   }
   if(defined &UNICODE) { }
-  elsif($] >= 5.008)   { *UNICODE = sub() {1}  }
-  else                 { *UNICODE = sub() {''} }
+  else                 { *UNICODE = sub() {1} }
 }
 if(DEBUG > 2) {
   print "# We are ", ASCII ? '' : 'not ', "in ASCII-land\n";
@@ -1322,10 +1321,6 @@ sub _treat_Es {
         DEBUG > 1 and print "I don't know how to deal with E<$content>.\n";
         $self->whine( $start_line, "Unknown E content in E<$content>" );
         $replacer = "E<$content>"; # better than nothing
-      } elsif($charnum >= 255 and !UNICODE) {
-        $replacer = ASCII ? "\xA4" : "?";
-        DEBUG > 1 and print "This Perl version can't handle ", 
-          "E<$content> (chr $charnum), so replacing with $replacer\n";
       } else {
         $replacer = Pod::Escapes::e2char($content);
         DEBUG > 1 and print " Replacing E<$content> with $replacer\n";

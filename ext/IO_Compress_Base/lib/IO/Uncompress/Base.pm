@@ -1048,7 +1048,7 @@ sub read
     $out_buffer = \*$self->{Pending} ;
 
     if ($offset) { 
-        $$buffer .= "\x00" x ($offset - length($$buffer))
+        $$buffer .= "\0" x ($offset - length($$buffer))
             if $offset > length($$buffer) ;
         #substr($$buffer, $offset) = substr($$out_buffer, 0, $length, '') ;
         substr($$buffer, $offset, undef, substr($$out_buffer, 0, $length)) ;

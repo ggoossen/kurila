@@ -37,7 +37,7 @@ is(ord($x), 0x1234, 'runtime ord \x{....}');
     my $x = "\x{101}";
     use bytes;
     is(ord($x), 196, "ord using bytes, returns the first byte");
-    is(chr(256), "\x00", "chr using bytes, only returns modulo 0x100");
+    is(chr(256), "\x[00]", "chr using bytes, only returns modulo 0x100");
 }
 
 {

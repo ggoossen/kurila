@@ -98,15 +98,15 @@ sub testwarn {
     testwarn("\0" x 12, 'no bits');
 
     use warnings;
-    BEGIN { check_bits( ${^WARNING_BITS}, "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x05", 'default bits on via "use warnings"' ); }
-    BEGIN { testwarn("\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x05", 'all'); }
+    BEGIN { check_bits( ${^WARNING_BITS}, "\x[555555555555555555555505]", 'default bits on via "use warnings"' ); }
+    BEGIN { testwarn("\x[555555555555555555555505]", 'all'); }
     # run-time :
     # the warning mask has been extended by warnings::register
-    testwarn("\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15", 'ahead of w::r');
+    testwarn("\x[555555555555555555555515]", 'ahead of w::r');
 
     use warnings::register;
-    BEGIN { check_bits( ${^WARNING_BITS}, "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15", 'warning bits on via "use warnings::register"' ) }
-    testwarn("\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15", 'following w::r');
+    BEGIN { check_bits( ${^WARNING_BITS}, "\x[555555555555555555555515]", 'warning bits on via "use warnings::register"' ) }
+    testwarn("\x[555555555555555555555515]", 'following w::r');
 }
 
 
