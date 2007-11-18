@@ -224,6 +224,7 @@ XS(XS_Tie_Hash_NamedCapture_SCALAR);
 XS(XS_Tie_Hash_NamedCapture_flags);
 XS(XS_Symbol_fetch_glob);
 XS(XS_Symbol_stash);
+XS(XS_Symbol_glob_name);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -287,6 +288,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("Tie::Hash::NamedCapture::SCALAR", XS_Tie_Hash_NamedCapture_SCALAR, file);
     newXS("Tie::Hash::NamedCapture::flags", XS_Tie_Hash_NamedCapture_flags, file);
     newXSproto("Symbol::fetch_glob", XS_Symbol_fetch_glob, file, "$");
+    newXSproto("Symbol::glob_name", XS_Symbol_glob_name, file, "$");
     newXSproto("Symbol::stash", XS_Symbol_stash, file, "$");
 }
 
@@ -1411,6 +1413,25 @@ XS(XS_Symbol_fetch_glob)
 
     ST(0) = (SV*)gv_fetchsv(ST(0), GV_ADD | GV_ADDMULTI, SVt_PVGV);
     ST(0) = newRV_noinc(ST(0));
+    XSRETURN(1);
+}
+
+XS(XS_Symbol_glob_name)
+{
+    dVAR; 
+    dXSARGS;
+    SV * const sv = sv_newmortal();
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "Symbol::glob_name", "gv");
+
+    if (SvTYPE(ST(0)) != SVt_PVGV)
+       Perl_croak(aTHX_ "Argument must be glob");
+
+    gv_efullname4(sv, (GV*)ST(0), NULL, TRUE);
+    ST(0) = sv;
+    
     XSRETURN(1);
 }
 

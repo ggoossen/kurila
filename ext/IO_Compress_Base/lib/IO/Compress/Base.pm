@@ -120,7 +120,7 @@ sub output
     }
 
     if ( defined *$self->{FH} ) {
-        defined *$self->{FH}->write( $data, length $data )
+        defined IO::Handle::write(*$self->{FH}, $data, length $data )
           or return $self->saveErrorString(0, $!, $!); 
     }
     else {
@@ -247,7 +247,7 @@ sub _create
             if ($outType eq 'handle') {
                 *$obj->{FH} = $outValue ;
                 setBinModeOutput(*$obj->{FH}) ;
-                $outValue->flush() ;
+                IO::Handle::flush($outValue);
                 *$obj->{Handle} = 1 ;
                 if ($appendOutput)
                 {
@@ -664,7 +664,7 @@ sub flush
         if $status == STATUS_ERROR;
 
     if ( defined *$self->{FH} ) {
-        *$self->{FH}->clearerr();
+        IO::Handle::clearerr(*$self->{FH});
     }
 
     *$self->{CompSize}->add(length $outBuffer) ;
@@ -673,7 +673,7 @@ sub flush
         or return 0;
 
     if ( defined *$self->{FH} ) {
-        defined *$self->{FH}->flush()
+        defined IO::Handle::flush(*$self->{FH})
             or return $self->saveErrorString(0, $!, $!); 
     }
 
@@ -764,7 +764,7 @@ sub close
         #if (! *$self->{Handle} || *$self->{AutoClose}) {
         if ((! *$self->{Handle} || *$self->{AutoClose}) && ! *$self->{StdIO}) {
             $! = 0 ;
-            *$self->{FH}->close()
+            close(*$self->{FH})
                 or return $self->saveErrorString(0, $!, $!); 
         }
         delete *$self->{FH} ;
@@ -878,7 +878,7 @@ sub fileno
 {
     my $self     = shift ;
     return defined *$self->{FH} 
-            ? *$self->{FH}->fileno() 
+            ? fileno(*$self->{FH}) 
             : undef ;
 }
 

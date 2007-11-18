@@ -470,7 +470,7 @@ sub _dump {
       }
     }
     if (ref($ref) eq 'GLOB' or "$ref" =~ /=GLOB\([^()]+\)$/) {  # glob
-      my $name = substr($val, 1);
+      my $name = Symbol::glob_name($val);
       if ($name =~ /^[A-Za-z_][\w:]*$/) {
 	$name =~ s/^main::/::/;
 	$sname = $name;

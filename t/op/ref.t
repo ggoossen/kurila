@@ -151,7 +151,7 @@ is (join('', sort values %$anonhash2), 'BARXYZ');
     my $x = { aap => 'noot', mies => "teun" };
     is("".$x->%, "".%$x);
     my $w = \*foo428;
-    is("" . $w->*, "*main::foo428");
+    is(Symbol::glob_name($w->*), "main::foo428");
     my $v = sub { return $_[0]; };
     is($v->&(55), 55);
 }

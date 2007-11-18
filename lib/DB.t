@@ -214,7 +214,7 @@ SKIP: {
         my $db = DB->loadfile($file);
         like( $db, qr!$file\z!, '... should find loaded file from partial name');
 
-        is( *DB::dbline, *{ Symbol::fetch_glob("_<$db") } , 
+        is( Symbol::glob_name(*DB::dbline), "main::_<$db" , 
                 '... should set *DB::dbline to associated glob');
         is( $DB::filename, $db, '... should set $DB::filename to file name' );
 

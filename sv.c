@@ -1694,13 +1694,14 @@ Perl_looks_like_number(pTHX_ SV *sv)
 STATIC bool
 S_glob_2number(pTHX_ GV * const gv)
 {
+    Perl_croak(aTHX "Tried to use glob as number");
     const U32 wasfake = SvFLAGS(gv) & SVf_FAKE;
     SV *const buffer = sv_newmortal();
 
     /* FAKE globs can get coerced, so need to turn this off temporarily if it
        is on.  */
     SvFAKE_off(gv);
-    gv_efullname3(buffer, gv, "*");
+    gv_efullname4(buffer, gv, "*", TRUE);
     SvFLAGS(gv) |= wasfake;
 
     /* We know that all GVs stringify to something that is not-a-number,
@@ -1715,13 +1716,14 @@ S_glob_2number(pTHX_ GV * const gv)
 STATIC char *
 S_glob_2pv(pTHX_ GV * const gv, STRLEN * const len)
 {
+    Perl_croak(aTHX "Tried to use glob as string");
     const U32 wasfake = SvFLAGS(gv) & SVf_FAKE;
     SV *const buffer = sv_newmortal();
 
     /* FAKE globs can get coerced, so need to turn this off temporarily if it
        is on.  */
     SvFAKE_off(gv);
-    gv_efullname3(buffer, gv, "*");
+    gv_efullname4(buffer, gv, "*", TRUE);
     SvFLAGS(gv) |= wasfake;
 
     assert(SvPOK(buffer));
@@ -3478,7 +3480,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV *sstr, I32 flags)
 	    /* FAKE globs can get coerced, so need to turn this off
 	       temporarily if it is on.  */
 	    SvFAKE_off(sstr);
-	    gv_efullname3(dstr, (GV *)sstr, "*");
+	    gv_efullname4(dstr, (GV *)sstr, "*", TRUE);
 	    SvFLAGS(sstr) |= wasfake;
 	}
 	else
@@ -6973,7 +6975,7 @@ Perl_sv_2cv(pTHX_ SV *sv, HV **st, GV **gvp, I32 lref)
 	    SV *tmpsv;
 	    ENTER;
 	    tmpsv = newSV(0);
-	    gv_efullname3(tmpsv, gv, NULL);
+	    gv_efullname4(tmpsv, gv, NULL,TRUE);
 	    /* XXX this is probably not what they think they're getting.
 	     * It has the same effect as "sub name;", i.e. just a forward
 	     * declaration! */
@@ -7415,7 +7417,7 @@ S_sv_unglob(pTHX_ SV *sv)
 
     assert(SvTYPE(sv) == SVt_PVGV);
     SvFAKE_off(sv);
-    gv_efullname3(temp, (GV *) sv, "*");
+    gv_efullname4(temp, (GV *) sv, "*", TRUE);
 
     if (GvGP(sv)) {
         if(GvCVu((GV*)sv) && (stash = GvSTASH((GV*)sv)) && HvNAME_get(stash))

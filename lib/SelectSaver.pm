@@ -40,7 +40,7 @@ sub new {
     @_ >= 1 && @_ <= 2 or croak 'usage: new SelectSaver [FILEHANDLE]';
     my $fh = select;
     my $self = bless \$fh, $_[0];
-    select qualify($_[1], caller) if @_ > 1;
+    select $_[1] if @_ > 1;
     $self;
 }
 

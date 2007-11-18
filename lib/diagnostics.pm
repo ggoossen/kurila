@@ -414,7 +414,7 @@ my %msg;
     } 
 
 
-    close POD_DIAG unless *main::DATA eq *POD_DIAG;
+    close POD_DIAG unless Symbol::glob_name(*POD_DIAG) eq 'main::DATA';
 
     die "No diagnostics?" unless %msg;
 

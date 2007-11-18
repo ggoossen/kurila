@@ -236,8 +236,8 @@ sub set_source {
   if(!defined $_[0]) {
     Carp::croak("Can't use empty-string as a source for set_source");
   } elsif(ref(\( $_[0] )) eq 'GLOB') {
-    $self->{'source_filename'} = '' . ($handle = $_[0]);
-    DEBUG and print "$self 's source is glob $_[0]\n";
+    $self->{'source_filename'} = '*' . Symbol::glob_name($handle = $_[0]);
+    DEBUG and print "$self 's source is glob " . Symbol::glob_name($_[0]) . "\n";
     # and fall thru   
   } elsif(ref( $_[0] ) eq 'SCALAR') {
     $self->{'source_scalar_ref'} = $_[0];

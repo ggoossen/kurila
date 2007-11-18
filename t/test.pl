@@ -119,6 +119,7 @@ sub ok ($@) {
 
 sub _q {
     my $x = shift;
+    return "GLOB('" . Symbol::glob_name($x) . ")" if ref \$x eq "GLOB";
     return 'undef' unless defined $x;
     my $q = $x;
     $q =~ s/\\/\\\\/g;
@@ -170,7 +171,11 @@ sub is ($$@) {
         # undef only matches undef
         $pass = !defined $got && !defined $expected;
     }
-    else {
+    elsif (ref \$got eq "GLOB") {
+        "GLOB('" . Symbol::glob_name($got) . ')';
+        $got = "GLOB('" . Symbol::glob_name($got) . ')';
+        $pass = 0;
+    } else {
         $pass = $got eq $expected;
     }
 

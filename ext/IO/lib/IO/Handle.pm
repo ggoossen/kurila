@@ -341,19 +341,14 @@ sub _open_mode_string {
 sub fdopen {
     @_ == 3 or croak 'usage: $io->fdopen(FD, MODE)';
     my ($io, $fd, $mode) = @_;
-    local(*GLOB);
 
-    if (ref($fd) && "".$fd =~ /GLOB\(/o) {
-	# It's a glob reference; Alias it as we cannot get name of anon GLOBs
-	my $n = qualify(*GLOB);
-	*GLOB = *{*$fd};
-	$fd =  $n;
-    } elsif ($fd =~ m#^\d+$#) {
+    my $fdmode = '&';
+    if (!ref($fd) && $fd =~ m#^\d+$#) {
 	# It's an FD number; prefix with "=".
-	$fd = "=$fd";
+	$fdmode .= "=";
     }
 
-    open($io, _open_mode_string($mode) . '&' . $fd)
+    open($io, _open_mode_string($mode) . $fdmode, $fd)
 	? $io : undef;
 }
 

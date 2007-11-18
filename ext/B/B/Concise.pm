@@ -149,7 +149,7 @@ sub concise_stashref {
 	*s = $h->{$k};
 	my $coderef = *s{CODE} or next;
 	reset_sequence();
-	print "FUNC: ", *s, "\n";
+	print "FUNC: *", Symbol::glob_name(*s), "\n";
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	eval { concise_cv_obj($order, $codeobj, $k) };

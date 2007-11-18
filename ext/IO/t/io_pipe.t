@@ -78,7 +78,7 @@ if($pid)
   print $pipe "Xk 5\n";
   print $pipe "oY 6\n";
   $pipe->close;
-  wait;
+  waitpid($pid, 0);
  }
 elsif(defined $pid)
  {
@@ -122,6 +122,7 @@ if ($is_win32) {
   die;
  }
 }
+
 if ($is_win32) {
     print "ok $_ # skipped: $is_win32\n" for 9;
 } else {

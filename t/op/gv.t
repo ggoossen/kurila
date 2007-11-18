@@ -7,7 +7,7 @@
 use warnings;
 
 require './test.pl';
-plan( tests => 155 );
+plan( tests => 141 );
 
 # type coersion on assignment
 $foo = 'foo';
@@ -21,25 +21,10 @@ $foo = *main::bar;
 ok($foo);
 is(ref(\$foo), 'GLOB');
 
-unlike ($foo, qr/abcd/);
+is(Symbol::glob_name($foo), 'main::bar');
 is(ref(\$foo), 'GLOB');
-
-is($foo, '*main::bar');
-is(ref(\$foo), 'GLOB');
-
-# type coersion on substitutions that match
-$a = *main::foo;
-$b = $a;
-$a =~ s/^X//;
-is(ref(\$a), 'GLOB');
-$a =~ s/^\*//;
-is($a, 'main::foo');
-is(ref(\$b), 'GLOB');
-
-# typeglobs as lvalues
-substr($foo, 0, 1, "XXX");
-is(ref(\$foo), 'SCALAR');
-is($foo, 'XXXmain::bar');
+eval { my $x = "$foo" };
+like($@, qr/Tried to use glob as string/);
 
 # returning glob values
 sub foo {
@@ -63,7 +48,7 @@ is(ref(\$baa), 'GLOB');
 
 { package Foo::Bar; no warnings 'once'; $test=1; }
 ok(exists $Foo::{'Bar::'});
-is($Foo::{'Bar::'}, '*Foo::Bar::');
+is(Symbol::glob_name($Foo::{'Bar::'}), 'Foo::Bar::');
 
 
 # test undef operator clearing out entire glob
@@ -90,27 +75,16 @@ is (scalar %foo, 0);
     my $copy = *PWOMPF;
     foreach ($copy, *SKREEE) {
 	$msg = '';
-	my $victim = sprintf "%d", $_;
-	like($msg, qr/Argument "\*main::[A-Z]{6}" isn't numeric in sprintf/,
-	     "Warning on conversion to IV");
-	is($victim, 0);
+	eval { $victim = sprintf "%d", $_ };
+        like($@, qr/Tried to use glob as number/);
 
-	$msg = '';
-	$victim = sprintf "%u", $_;
-	like($msg, qr/Argument "\*main::[A-Z]{6}" isn't numeric in sprintf/,
-	     "Warning on conversion to UV");
-	is($victim, 0);
+	eval { $victim = sprintf "%u", $_ };
+        like($@, qr/Tried to use glob as number/);
+	eval { $victim = sprintf "%e", $_ };
+        like($@, qr/Tried to use glob as number/);
 
-	$msg = '';
-	$victim = sprintf "%e", $_;
-	like($msg, qr/Argument "\*main::[A-Z]{6}" isn't numeric in sprintf/,
-	     "Warning on conversion to NV");
-	like($victim, qr/^0\.0+E\+?00/i, "Expect floating point zero");
-
-	$msg = '';
-	$victim = sprintf "%s", $_;
-	is($msg, '', "No warning on stringification");
-	is($victim, '' . $_);
+	eval { $victim = sprintf "%s", $_ };
+        like($@, qr/Tried to use glob as string/);
     }
 }
 
@@ -127,7 +101,7 @@ print ${*x{SCALAR}}, @{*x{ARRAY}}, %{*x{HASH}}, &{*x{CODE}};
 
 curr_test(++$test);
 *x = *STDOUT;
-is (*{*x{GLOB}}, "*main::STDOUT");
+is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 
 {
     my $test = curr_test();
@@ -241,7 +215,7 @@ is($j[0], 1);
     my $v;
     sub f { $_[0] = 0; $_[0] = "a"; $_[0] = *DATA }
     f($v);
-    is ($v, '*main::DATA');
+    is (Symbol::glob_name($v), 'main::DATA');
     my $x = <$v>;
     is ($x, "perl\n");
 }
@@ -297,6 +271,7 @@ is ($proto, "pie", "String is promoted to prototype");
 # A reference to a value is used to generate a constant subroutine
 foreach my $value (3, "Perl rules", \42, qr/whatever/, [1,2,3], {1=>2},
 		   \*STDIN, \&ok, \undef, *STDOUT) {
+    local $TODO = "glob get stringified somewhere";
     delete $::{oonk};
     $::{oonk} = \$value;
     $proto = eval 'prototype \&oonk';

@@ -1110,7 +1110,7 @@ PP(pp_select)
 
     if (!egv)
 	egv = PL_defoutgv;
-    XPUSHs( egv ? sv_mortalcopy((SV*)egv) : &PL_sv_undef );
+    XPUSHs( egv ? sv_2mortal(newRV_inc((SV*)egv)) : &PL_sv_undef );
 
     if (newdefout) {
 	if (!GvIO(newdefout))

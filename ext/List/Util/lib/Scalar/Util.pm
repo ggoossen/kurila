@@ -96,7 +96,7 @@ sub reftype ($) {
       $t = eval {
 	  # we have a GLOB or an IO. Stringify a GLOB gives it's name
 	  my $q = *$r;
-	  $q =~ /^\*/ ? "GLOB" : "IO";
+	  Symbol::glob_name($q) ? "GLOB" : "IO";
 	}
 	or do {
 	  # OK, if we don't have a GLOB what parts of

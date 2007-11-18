@@ -302,7 +302,7 @@ STATIC const char*
 S_gv_ename(pTHX_ GV *gv)
 {
     SV* const tmpsv = sv_newmortal();
-    gv_efullname3(tmpsv, gv, NULL);
+    gv_efullname4(tmpsv, gv, NULL, TRUE);
     return SvPV_nolen_const(tmpsv);
 }
 
@@ -4862,7 +4862,7 @@ Perl_cv_ckproto_len(pTHX_ const CV *cv, const GV *gv, const char *p,
 	SV* name = NULL;
 
 	if (gv)
-	    gv_efullname3(name = sv_newmortal(), gv, NULL);
+	    gv_efullname4(name = sv_newmortal(), gv, NULL, TRUE);
 	sv_setpvs(msg, "Prototype mismatch:");
 	if (name)
 	    Perl_sv_catpvf(aTHX_ msg, " sub %"SVf, SVfARG(name));
@@ -5351,7 +5351,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    Perl_sv_setpvf(aTHX_ sv, "%s:%ld-%ld",
 			   CopFILE(PL_curcop),
 			   (long)PL_subline, (long)CopLINE(PL_curcop));
-	    gv_efullname3(tmpstr, gv, NULL);
+	    gv_efullname4(tmpstr, gv, NULL,TRUE);
 	    (void)hv_store(GvHV(PL_DBsub), SvPVX_const(tmpstr),
 		    SvCUR(tmpstr), sv, 0);
 	    hv = GvHVn(db_postponed);
@@ -7764,8 +7764,9 @@ Perl_peep(pTHX_ register OP *o)
 		GV * const gv = cGVOPo_gv;
 		if (SvTYPE(gv) == SVt_PVGV && GvCV(gv) && SvPVX_const(GvCV(gv))) {
 		    /* XXX could check prototype here instead of just carping */
-		    SV * const sv = sv_newmortal();
-		    gv_efullname3(sv, gv, NULL);
+                    SV * const sv = sv_newmortal();
+                    gv_efullname4(sv, gv, NULL, TRUE);
+
 		    Perl_warner(aTHX_ packWARN(WARN_PROTOTYPE),
 				"%"SVf"() called too early to check prototype",
 				SVfARG(sv));

@@ -64,7 +64,7 @@ for my $cross_partition_test (0..1) {
   unlink "copy-$$" or die "unlink: $!";
 
   open(F,"file-$$");
-  copy(*F, "copy-$$");
+  copy(\*F, "copy-$$");
   open(R, "copy-$$") or die "open copy-$$: $!"; $foo = <R>; close(R);
   is $foo, "ok\n", 'copy(*F, fn): same contents';
   unlink "copy-$$" or die "unlink: $!";

@@ -61,7 +61,7 @@ sub stringify {
 	my $tick = $tick;
 
 	return 'undef' unless defined $_ or not $printUndef;
-	return $_ . "" if ref \$_ eq 'GLOB';
+	return '*' . Symbol::glob_name($_) if ref \$_ eq 'GLOB';
 	$_ = &{*{Symbol::fetch_glob('overload::StrVal')}}($_) 
 	  if $bareStringify and ref $_ 
 	    and %{Symbol::stash("overload")} and defined &{*{Symbol::fetch_glob('overload::StrVal')}};

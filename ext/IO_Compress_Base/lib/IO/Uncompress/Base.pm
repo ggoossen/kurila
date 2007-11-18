@@ -65,7 +65,7 @@ sub smartRead
     #}
 
     if (defined *$self->{FH})
-      { *$self->{FH}->read($$out, $get_size, $offset) }
+      { read(*$self->{FH}, $$out, $get_size, $offset) }
     elsif (defined *$self->{InputEvent}) {
         my $got = 1 ;
         while (length $$out < $size) {
@@ -175,7 +175,7 @@ sub smartEof
     return 0 if length *$self->{Prime} || *$self->{PushMode};
 
     if (defined *$self->{FH})
-     { *$self->{FH}->eof() }
+     { eof(*$self->{FH}) }
     elsif (defined *$self->{InputEvent})
      { *$self->{EventEof} }
     else 
@@ -1226,7 +1226,7 @@ sub close
         #if ( *$self->{AutoClose}) {
             local $.; 
             $! = 0 ;
-            $status = *$self->{FH}->close();
+            $status = close(*$self->{FH});
             return $self->saveErrorString(0, $!, $!)
                 if !*$self->{InNew} && $self->saveStatus($!) != 0 ;
         }

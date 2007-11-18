@@ -112,7 +112,11 @@ sub format_arg {
       $arg = defined($overload::VERSION) ? overload::StrVal($arg) : "$arg";
   }
   if (defined($arg)) {
-      $arg =~ s/'/\\'/g;
+      if (ref \$arg eq "GLOB") {
+          $arg = '*' . Symbol::glob_name($arg);
+      } else {
+          $arg =~ s/'/\\'/g;
+      }
       $arg = str_len_trim($arg, $MaxArgLen);
   
       # Quote it?

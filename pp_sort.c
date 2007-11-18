@@ -1523,7 +1523,7 @@ PP(pp_sort)
 		}
 		else if (gv) {
 		    SV *tmpstr = sv_newmortal();
-		    gv_efullname3(tmpstr, gv, NULL);
+		    gv_efullname4(tmpstr, gv, NULL, TRUE);
 		    DIE(aTHX_ "Undefined sort subroutine \"%"SVf"\" called",
 			SVfARG(tmpstr));
 		}

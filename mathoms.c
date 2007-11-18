@@ -49,8 +49,6 @@ PERL_CALLCONV char * Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp);
 PERL_CALLCONV char * Perl_sv_pvbyte(pTHX_ SV *sv);
 PERL_CALLCONV char * Perl_sv_pvutf8(pTHX_ SV *sv);
 PERL_CALLCONV NV Perl_huge(void);
-PERL_CALLCONV void Perl_gv_fullname3(pTHX_ SV *sv, const GV *gv, const char *prefix);
-PERL_CALLCONV void Perl_gv_efullname3(pTHX_ SV *sv, const GV *gv, const char *prefix);
 PERL_CALLCONV GV * Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name);
 PERL_CALLCONV HE * Perl_hv_iternext(pTHX_ HV *hv);
 PERL_CALLCONV void Perl_hv_magic(pTHX_ HV *hv, GV *gv, int how);
@@ -431,32 +429,6 @@ Perl_huge(void)
 #  endif
 }
 #endif
-
-/* compatibility with versions <= 5.003. */
-void
-Perl_gv_fullname(pTHX_ SV *sv, const GV *gv)
-{
-    gv_fullname3(sv, gv, sv == (const SV*)gv ? "*" : "");
-}
-
-/* compatibility with versions <= 5.003. */
-void
-Perl_gv_efullname(pTHX_ SV *sv, const GV *gv)
-{
-    gv_efullname3(sv, gv, sv == (const SV*)gv ? "*" : "");
-}
-
-void
-Perl_gv_fullname3(pTHX_ SV *sv, const GV *gv, const char *prefix)
-{
-    gv_fullname4(sv, gv, prefix, TRUE);
-}
-
-void
-Perl_gv_efullname3(pTHX_ SV *sv, const GV *gv, const char *prefix)
-{
-    gv_efullname4(sv, gv, prefix, TRUE);
-}
 
 /*
 =for apidoc gv_fetchmethod

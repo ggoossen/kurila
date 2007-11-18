@@ -1243,7 +1243,7 @@ sub run
 
         for my $stdin ('-', *STDIN) # , \*STDIN)
         {
-            title "$TopType - From stdin (via $stdin) to Buffer content, InputLength" ;
+            title "$TopType - From stdin to Buffer content, InputLength" ;
 
             my $lex = LexFile->new( my $in_file) ;
             my $expected = $buffer ;
