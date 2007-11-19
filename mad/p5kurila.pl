@@ -535,6 +535,32 @@ sub lvalue_subs {
     }
 }
 
+sub qq_block_escape {
+    my $op = shift;
+
+    for my $prop (qw|assign value|) {
+        my $v = get_madprop($op, $prop);
+        next unless $v;
+        $v =~ s/([}{])/\\$1/g;
+        set_madprop($op, $prop, $v);
+    }
+    for my $child ($op->children) {
+        next if $child->tag eq "madprops";
+        qq_block_escape($child);
+    }
+}
+
+sub qq_block {
+    # escape '{' and '}' inside a double quoted string
+    my $xml = shift;
+    for my $mad_quote ($xml->findnodes(qq|//madprops/mad_null_type_first[\@val="quote"]|)) {
+        my $op = $mad_quote->parent->parent;
+        next unless get_madprop($op, "quote_open") =~ m/^(&#34;|&lt;&lt;[^'])/;
+
+        qq_block_escape($op);
+    }
+}
+
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
 
@@ -580,9 +606,10 @@ if ($from < 1.5 - 0.05) {
 if ($from < 1.6 - 0.05) {
     remove_vstring( $twig );
     use_pkg_version($twig);
+    lvalue_subs( $twig );
 }
 
-lvalue_subs( $twig );
+qq_block( $twig );
 
 # print
 $twig->print( pretty_print => 'indented' );
