@@ -140,8 +140,6 @@ Perl_gv_fetchmeth_autoload
 Perl_gv_fetchmethod
 Perl_gv_fetchmethod_autoload
 Perl_gv_fetchpv
-Perl_gv_fullname
-Perl_gv_fullname3
 Perl_gv_fullname4
 Perl_gv_init
 Perl_gv_name_set
@@ -464,6 +462,7 @@ Perl_scan_bin
 Perl_scan_hex
 Perl_scan_num
 Perl_scan_oct
+Perl_parse_escape
 Perl_screaminstr
 Perl_setdefout
 Perl_share_hek
@@ -561,7 +560,6 @@ Perl_sv_usepvn
 Perl_sv_usepvn_flags
 Perl_sv_vcatpvfn
 Perl_sv_vsetpvfn
-Perl_str_to_version
 Perl_swash_init
 Perl_swash_fetch
 Perl_taint_env

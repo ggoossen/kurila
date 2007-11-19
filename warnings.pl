@@ -5,6 +5,7 @@ $VERSION = '1.02_02';
 BEGIN {
   push @INC, './lib';
 }
+use kurila;
 use strict ;
 
 sub DEFAULT_ON  () { 1 }

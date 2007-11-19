@@ -647,14 +647,6 @@ PERL_CALLCONV GV*	Perl_gv_fetchmethod_autoload(pTHX_ HV* stash, const char* name
 PERL_CALLCONV GV*	Perl_gv_fetchpv(pTHX_ const char* name, I32 add, I32 sv_type)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV void	Perl_gv_fullname(pTHX_ SV* sv, const GV* gv)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-
-/* PERL_CALLCONV void	Perl_gv_fullname3(pTHX_ SV* sv, const GV* gv, const char* prefix)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2); */
-
 PERL_CALLCONV void	Perl_gv_fullname4(pTHX_ SV* sv, const GV* gv, const char* prefix, bool keepmain)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1132,10 +1124,6 @@ PERL_CALLCONV int	Perl_magic_getsig(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV int	Perl_magic_getsubstr(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-
 PERL_CALLCONV int	Perl_magic_gettaint(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1235,10 +1223,6 @@ PERL_CALLCONV int	Perl_magic_setregexp(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_2);
 
 PERL_CALLCONV int	Perl_magic_setsig(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-
-PERL_CALLCONV int	Perl_magic_setsubstr(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
@@ -2106,6 +2090,12 @@ PERL_CALLCONV NV	Perl_scan_oct(pTHX_ const char* start, STRLEN len, STRLEN* retl
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_3);
 
+PERL_CALLCONV const char*	Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3)
+			__attribute__nonnull__(pTHX_4);
+
 PERL_CALLCONV OP*	Perl_scope(pTHX_ OP* o);
 PERL_CALLCONV char*	Perl_screaminstr(pTHX_ SV *bigstr, SV *littlestr, I32 start_shift, I32 end_shift, I32 *oldposp, I32 last)
 			__attribute__nonnull__(pTHX_1)
@@ -2441,10 +2431,6 @@ PERL_CALLCONV void	Perl_sv_vcatpvfn(pTHX_ SV* sv, const char* pat, STRLEN patlen
 PERL_CALLCONV void	Perl_sv_vsetpvfn(pTHX_ SV* sv, const char* pat, STRLEN patlen, va_list* args, SV** svargs, I32 svmax, bool *maybe_tainted)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
-
-PERL_CALLCONV NV	Perl_str_to_version(pTHX_ SV *sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV SV*	Perl_swash_init(pTHX_ const char* pkg, const char* name, SV* listsv, I32 minbits, I32 none)
 			__attribute__nonnull__(pTHX_1)

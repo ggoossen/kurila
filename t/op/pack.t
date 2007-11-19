@@ -369,10 +369,12 @@ sub foo { my $a = "a"; return $a . $a++ . $a++ }
 {
   use warnings qw(NONFATAL all);;
   my $warning;
-  local $SIG{__WARN__} = sub {
-      $warning = $_[0];
-  };
-  my $junk = pack("p", &foo);
+  {
+      local $SIG{__WARN__} = sub {
+          $warning = $_[0];
+      };
+      my $junk = pack("p", &foo);
+  }
 
   like($warning, qr/temporary val/);
 }

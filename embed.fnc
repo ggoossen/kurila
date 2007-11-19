@@ -770,6 +770,7 @@ Apd	|NV	|scan_bin	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Apd	|NV	|scan_hex	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Ap	|char*	|scan_num	|NN const char* s|NN YYSTYPE *lvalp
 Apd	|NV	|scan_oct	|NN const char* start|STRLEN len|NN STRLEN* retlen
+Apd     |const char*  |parse_escape   |NN const char *s|NN char *d|NN STRLEN *l|NN const char *send
 p	|OP*	|scope		|NULLOK OP* o
 Ap	|char*	|screaminstr	|NN SV *bigstr|NN SV *littlestr|I32 start_shift \
 				|I32 end_shift|NN I32 *oldposp|I32 last

@@ -602,7 +602,7 @@ ok($c == 3, "# TODO lexical scope?");
 
 sub must_warn_pat {
     my $warn_pat = shift;
-    return sub { print "not " unless $_[0] =~ /$warn_pat/ }
+    return sub { print "not  # warning: $_[0]" unless $_[0] =~ /$warn_pat/ }
 }
 
 sub must_warn {
@@ -1188,8 +1188,8 @@ if (/(\C)/g) {
 
 {
     no utf8;
-    ok("\x[8e]" =~ /[\x89-\x91]/);
-    ok("\x[ce]" =~ /[\xc9-\xd1]/);
+    ok("\x[8e]" =~ /[\x[89]-\x[91]]/);
+    ok("\x[ce]" =~ /[\x[c9]-\x[d1]]/);
 }
 
 ok("\x{ab}" =~ /\x{ab}/);
@@ -1905,25 +1905,25 @@ $test = 687;
     print "# and now again in [] ranges\n";
 
     $x = "\x[4e]" . "E";
-    ok ($x =~ /^[\x4EE]{2}$/, "Check only 2 bytes of hex are matched.");
+    ok ($x =~ /^[\x[4E]E]{2}$/, "Check only 2 bytes of hex are matched.");
 
     $x = "\x[4e]" . "i";
-    ok ($x =~ /^[\x4Ei]{2}$/, "Check that invalid hex digit stops it (2)");
+    ok ($x =~ /^[\x[4E]i]{2}$/, "Check that invalid hex digit stops it (2)");
 
     $x = "\x[04]" . "j";
-    ok ($x =~ /^[\x4j]{2}$/,  "Check that invalid hex digit stops it (1)");
+    ok ($x =~ /^[\x[04]j]{2}$/,  "Check that invalid hex digit stops it (1)");
 
     $x = "\0" . "k";
-    ok ($x =~ /^[\xk]{2}$/,   "Check that invalid hex digit stops it (0)");
+    ok ($x =~ /^[\x[00]k]{2}$/,   "Check that invalid hex digit stops it (0)");
 
     $x = "\0" . "x";
-    ok ($x =~ /^[\xx]{2}$/, "\\xx isn't to be treated as \\0");
+    ok ($x =~ /^[\x[00]x]{2}$/, "\\xx isn't to be treated as \\0");
 
     $x = "\0" . "xa";
-    ok ($x =~ /^[\xxa]{3}$/, "\\xxa isn't to be treated as \\xa");
+    ok ($x =~ /^[\x[00]xa]{3}$/, "\\xxa isn't to be treated as \\xa");
 
     $x = "\x[09]" . "_b";
-    ok ($x =~ /^[\x9_b]{3}$/, "\\x9_b isn't to be treated as \\x9b");
+    ok ($x =~ /^[\x[9]_b]{3}$/, "\\x9_b isn't to be treated as \\x9b");
 
 }
 
@@ -3305,7 +3305,7 @@ if ($ordA == 193) {
             1;
         }
 EOFTEST
-        ok($w=~/Ignoring zero length/,
+        ok($w=~/Zero length.*replacement character/,
             "Got expected zero length warning");
         warn $code;                    
         
@@ -3930,6 +3930,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     $doit->(\@spats,@sstrs);
     $doit->(\@dpats,@dstrs);
 }
+
 {
     local $Message = "\$REGMARK";
     our @r=();
