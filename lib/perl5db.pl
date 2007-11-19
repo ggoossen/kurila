@@ -3688,7 +3688,7 @@ sub sub {
         # Called in array context. call sub and capture output.
         # DB::DB will recursively get control again if appropriate; we'll come
         # back here when the sub is finished.
-	@ret = &$sub;
+	@ret = &{Symbol::fetch_glob($sub)->*};
 
         # Pop the single-step value back off the stack.
         $single ^|^= $stack[ $stack_depth-- ];

@@ -503,7 +503,7 @@ sub _dump {
       $out .= $val;
     }
     else {				 # string
-      if ($s->{useqq} or $val =~ m/[\x80-\xFF]/) {
+      if ($s->{useqq} or $val =~ m/[\x[80]-\x[FF]]/) {
         # Fall back to qq if there's Unicode
 	$out .= qquote($val, $s->{useqq});
       }
@@ -660,7 +660,7 @@ sub qquote {
   local($_) = shift;
   s/([\\\"\@\$])/\\$1/g;
   my $bytes; { use bytes; $bytes = length }
-  s/([^\x00-\x7f])/'\x'.sprintf("%02x",ord($1))/ge if $bytes > length;
+  s/([^\x[00]-\x[7f]])/'\x'.sprintf("[%02x]",ord($1))/ge if $bytes > length;
   return qq("$_") unless 
     /[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
