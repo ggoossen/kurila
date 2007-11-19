@@ -7321,6 +7321,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 		d = SvPV_mutable(buf, len);
 		RExC_parse = (char*)parse_escape(aTHX_ RExC_parse-1, d, &len, RExC_end);
 
+		/* extract character from escape sequence, there should be exactly one character */
 		if (UTF) {
 		    if (len == 0) {
 			vWARN(RExC_parse, "Zero length escape sequence in character class replaced with the replacement character");
@@ -7345,6 +7346,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 			    value = UNICODE_REPLACEMENT;
 		    }
 		}
+
 		break;
 	    }
 
