@@ -7234,11 +7234,10 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 	checkposixcc(pRExC_state);
 
     /* allow 1st char to be ] (allowing it to be - is dealt with later) */
-    if (UCHARAT(RExC_parse) == ']')
+    if (*RExC_parse == ']')
 	goto charclassloop;
 
-parseit:
-    while (RExC_parse < RExC_end && UCHARAT(RExC_parse) != ']') {
+    while (RExC_parse < RExC_end && *RExC_parse != ']') {
 
     charclassloop:
 
@@ -7259,45 +7258,19 @@ parseit:
 	if (value == '[' && POSIXCC(nextvalue))
 	    namedclass = regpposixcc(pRExC_state, value);
 	else if (value == '\\') {
-	    if (UTF) {
-		value = utf8n_to_uvchr(RExC_parse,
-				   RExC_end - RExC_parse,
-				   &numlen, UTF8_ALLOW_DEFAULT);
-		RExC_parse += numlen;
-	    }
-	    else
-		value = UCHARAT(RExC_parse++);
-	    /* Some compilers cannot handle switching on 64-bit integer
-	     * values, therefore value cannot be an UV.  Yes, this will
-	     * be a problem later if we want switch on Unicode.
-	     * A similar issue a little bit later when switching on
-	     * namedclass. --jhi */
-	    switch ((I32)value) {
+	    switch (*RExC_parse++) {
 	    case 'w':	namedclass = ANYOF_ALNUM;	break;
 	    case 'W':	namedclass = ANYOF_NALNUM;	break;
 	    case 's':	namedclass = ANYOF_SPACE;	break;
 	    case 'S':	namedclass = ANYOF_NSPACE;	break;
 	    case 'd':	namedclass = ANYOF_DIGIT;	break;
 	    case 'D':	namedclass = ANYOF_NDIGIT;	break;
-            case 'N':  /* Handle \N{NAME} in class */
-                {
-                    /* We only pay attention to the first char of 
-                    multichar strings being returned. I kinda wonder
-                    if this makes sense as it does change the behaviour
-                    from earlier versions, OTOH that behaviour was broken
-                    as well. */
-                    UV v; /* value is register so we cant & it /grrr */
-                    if (reg_namedseq(pRExC_state, &v)) {
-                        goto parseit;
-                    }
-                    value= v; 
-                }
-                break;
 	    case 'p':
 	    case 'P':
 		{
 		char *e;
 		UV n;
+                value = *(RExC_parse-1);
 		if (RExC_parse >= RExC_end)
 		    vFAIL2("Empty \\%c{}", value);
 		if (*RExC_parse == '{') {
@@ -7337,51 +7310,44 @@ parseit:
 
 		}
 		break;
-	    case 'n':	value = '\n';			break;
-	    case 'r':	value = '\r';			break;
-	    case 't':	value = '\t';			break;
-	    case 'f':	value = '\f';			break;
-	    case 'b':	value = '\b';			break;
-	    case 'e':	value = ASCII_TO_NATIVE('\033');break;
-	    case 'a':	value = ASCII_TO_NATIVE('\007');break;
-	    case 'x':
-		if (*RExC_parse == '{') {
-                    I32 flags = PERL_SCAN_ALLOW_UNDERSCORES
-                        | PERL_SCAN_DISALLOW_PREFIX;
-		    char * const e = strchr(RExC_parse++, '}');
-                    if (!e)
-                        vFAIL("Missing right brace on \\x{}");
+	    default:
+	    {
+		STRLEN len;
+		STRLEN numlen;
+		char* d;
+		/* use temporary buffer of at least the length of the parsed string */
+		SV* buf = newSV(RExC_end - RExC_parse + 1);
+		SvPOK_on(buf);
+		d = SvPV_mutable(buf, len);
+		RExC_parse = (char*)parse_escape(aTHX_ RExC_parse-1, d, &len, RExC_end);
 
-		    numlen = e - RExC_parse;
-		    value = grok_hex(RExC_parse, &numlen, &flags, NULL);
-		    RExC_parse = e + 1;
+		if (UTF) {
+		    if (len == 0) {
+			vWARN(RExC_parse, "Zero length escape sequence in character class replaced with the replacement character");
+			value = UNICODE_REPLACEMENT;
+		    } else {
+			value = utf8n_to_uvchr(d,
+					       len,
+					       &numlen, UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY);
+			if (numlen == (STRLEN)-1) {
+			    vWARN(RExC_parse, "Invalid UTF sequence");
+			    value = UNICODE_REPLACEMENT;
+			} else if (numlen != len) {
+			    vWARN(RExC_parse, "Escape sequence did not correspond to one character");
+			}
+		    }
 		}
 		else {
-                    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
-		    numlen = 2;
-		    value = grok_hex(RExC_parse, &numlen, &flags, NULL);
-		    RExC_parse += numlen;
+		    value = (U8)*d; /* cast to _unsigned_ */
+		    if (len != 1) {
+			vWARN(RExC_parse, "Escape sequence did not correspond to one byte");
+			if (len == 0)
+			    value = UNICODE_REPLACEMENT;
+		    }
 		}
 		break;
-	    case 'c':
-		value = UCHARAT(RExC_parse++);
-		value = toCTRL(value);
-		break;
-	    case '0': case '1': case '2': case '3': case '4':
-	    case '5': case '6': case '7': case '8': case '9':
-		{
-		    I32 flags = 0;
-		    numlen = 3;
-		    value = grok_oct(--RExC_parse, &numlen, &flags, NULL);
-		    RExC_parse += numlen;
-		    break;
-		}
-	    default:
-		if (!SIZE_ONLY && isALPHA(value) && ckWARN(WARN_REGEXP))
-		    vWARN2(RExC_parse,
-			   "Unrecognized escape \\%c in character class passed through",
-			   (int)value);
-		break;
+	    }
+
 	    }
 	} /* end of \blah */
 #ifdef EBCDIC
