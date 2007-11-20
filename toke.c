@@ -2813,18 +2813,14 @@ Perl_yylex(pTHX)
 		}
 		return REPORT(')');
 	    }
+	    if (PL_bufptr != PL_bufend) {
+		PL_bufptr += 2;
 #ifdef PERL_MAD
-	    while (PL_bufptr != PL_bufend &&
-	      PL_bufptr[0] == '\\' && PL_bufptr[1] == 'E') {
 		if (!PL_thiswhite)
 		    PL_thiswhite = newSVpvs("");
 		sv_catpvn(PL_thiswhite, PL_bufptr, 2);
-		PL_bufptr += 2;
-	    }
-#else
-	    if (PL_bufptr != PL_bufend)
-		PL_bufptr += 2;
 #endif
+	    }
 	    PL_lex_state = LEX_INTERPCONCAT;
 	    return yylex();
 	}
@@ -3959,7 +3955,11 @@ Perl_yylex(pTHX)
 	    PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
 	    PL_expect = XSTATE;
 	    break;
-	default: {
+	default:
+	    yyerror("panic: Unknown PL_expect");
+	    break;
+	case XSTATE:
+	case XREF: {
 		const char *t;
 		if (PL_oldoldbufptr == PL_last_lop)
 		    PL_lex_brackstack[PL_lex_brackets++] = XTERM;
@@ -3991,6 +3991,10 @@ Perl_yylex(pTHX)
 		 * potentially break current behavior of eval"".
 		 * GSAR 97-07-21
 		 */
+
+/* 		yyerror("{ ... } unknown hash or block"); */
+/* 		break; */
+
 		t = s;
 		if (*s == '\'' || *s == '"' || *s == '`') {
 		    /* common case: get past first string, handling escapes */
