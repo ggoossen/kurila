@@ -4,6 +4,7 @@
 
 package Pod::Simple::Checker;
 use strict;
+use utf8;
 use Carp ();
 use Pod::Simple::Methody ();
 use Pod::Simple ();
@@ -90,9 +91,9 @@ sub emit_par {
   my $indent = ' ' x ( 2 * $self->{'Indent'} + ($tweak_indent||0) );
    # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
 
-  $self->{'Thispara'} =~ tr{\xAD}{}d if Pod::Simple::ASCII;
+  $self->{'Thispara'} =~ tr{\x{AD}}{}d if Pod::Simple::ASCII;
   my $out = Text::Wrap::wrap($indent, $indent, $self->{'Thispara'} .= "\n");
-  $out =~ tr{\xA0}{ } if Pod::Simple::ASCII;
+  $out =~ tr{\x{A0}}{ } if Pod::Simple::ASCII;
   print {$self->{'output_fh'}} $out,
     #"\n"
   ;
@@ -107,8 +108,8 @@ sub end_Verbatim  {
   return unless $_[0]{'Errata_seen'};
   my $self = shift;
   if(Pod::Simple::ASCII) {
-    $self->{'Thispara'} =~ tr{\xA0}{ };
-    $self->{'Thispara'} =~ tr{\xAD}{}d;
+    $self->{'Thispara'} =~ tr{\x{A0}}{ };
+    $self->{'Thispara'} =~ tr{\x{AD}}{}d;
   }
 
   my $i = ' ' x ( 2 * $self->{'Indent'} + 4);

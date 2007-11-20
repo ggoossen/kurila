@@ -290,7 +290,7 @@ sub accept_codes {  # Add some codes
       # A good-enough check that it's good as an XML Name symbol:
       Carp::croak "\"$new_code\" isn't a valid element name"
         if $new_code =~
-          m/[\x00-\x2C\x2F\x39\x3B-\x40\x5B-\x5E\x60\x7B-\x7F]/
+          m/[\x[00]-\x[2C]\x[2F]\x[39]\x[3B]-\x[40]\x[5B]-\x[5E]\x[60]\x[7B]-\x[7F]]/
             # Characters under 0x80 that aren't legal in an XML Name.
         or $new_code =~ m/^[-\.0-9]/s
         or $new_code =~ m/:[-\.0-9]/s;
@@ -325,7 +325,7 @@ sub unaccept_codes { # remove some codes
       # A good-enough check that it's good as an XML Name symbol:
       Carp::croak "\"$new_code\" isn't a valid element name"
         if $new_code =~
-          m/[\x00-\x2C\x2F\x39\x3B-\x40\x5B-\x5E\x60\x7B-\x7F]/
+          m/\x[00]-\x[2C]\x[2F]\x[39]\x[3B]-\x[40]\x[5B]-\x[5E]\x[60]\x[7B]-\x[7F]/
             # Characters under 0x80 that aren't legal in an XML Name.
         or $new_code =~ m/^[-\.0-9]/s
         or $new_code =~ m/:[-\.0-9]/s;

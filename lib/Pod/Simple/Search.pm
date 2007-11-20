@@ -660,8 +660,8 @@ sub _esc {
   my $in = $_[0];
   return 'undef' unless defined $in;
   $in =~
-    s<([^\x20\x21\x23\x27-\x3F\x41-\x5B\x5D-\x7E])>
-     <'\\x'.(unpack("H2",$1))>eg;
+    s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
+     <'\\x['.(unpack("H2",$1).']')>eg;
   return qq{"$in"};
 }
 

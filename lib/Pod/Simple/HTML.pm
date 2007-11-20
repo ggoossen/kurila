@@ -637,7 +637,7 @@ sub section_escape {
 sub section_name_tidy {
   my($self, $section) = @_;
   $section =~ tr/ /_/;
-  $section =~ tr/\x00-\x1F\x80-\x9F//d if 'A' eq chr(65); # drop crazy characters
+  $section =~ tr/\x[00]-\x[1F]\x[80]-\x[9F]//d; # drop crazy characters
   $section = $self->unicode_escape_url($section);
   $section = '_' unless length $section;
   return $section;
@@ -649,7 +649,7 @@ sub pagepath_url_escape { shift->general_url_escape(@_) }
 sub general_url_escape {
   my($self, $string) = @_;
  
-  $string =~ s/([^\x00-\xFF])/join '', map sprintf('%%%02X',$_), unpack 'C*', $1/eg;
+  $string =~ s/([^\x[00]-\x[FF]])/join '', map sprintf('%%%02X',$_), unpack 'C*', $1/eg;
      # express Unicode things as urlencode(utf(orig)).
   
   # A pretty conservative escaping, behoovey even for query components
@@ -768,7 +768,7 @@ sub linearize_tokens {  # self, tokens
 
 sub unicode_escape_url {
   my($self, $string) = @_;
-  $string =~ s/([^\x00-\xFF])/'('.ord($1).')'/eg;
+  $string =~ s/([^\x[00]-\x[FF]])/'('.ord($1).')'/eg;
     #  Turn char 1234 into "(1234)"
   return $string;
 }
