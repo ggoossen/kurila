@@ -1070,17 +1070,6 @@ sub maybe_my {
 
 # pp_padany -- does not exist after parsing
 
-sub AUTOLOAD {
-    if ($AUTOLOAD =~ s/^.*::pp_//) {
-	warn "unexpected OP_".uc $AUTOLOAD;
-	return "XXX";
-    } else {
-	die "Undefined subroutine $AUTOLOAD called";
-    }
-}
-
-sub DESTROY {}	#	Do not AUTOLOAD
-
 # $root should be the op which represents the root of whatever
 # we're sequencing here. If it's undefined, then we don't append
 # any subroutine declarations to the deparsed ops, otherwise we
