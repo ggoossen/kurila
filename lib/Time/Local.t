@@ -1,12 +1,5 @@
 #!./perl
 
-BEGIN {
-  if ($ENV{PERL_CORE}){
-    chdir('t') if -d 't';
-    @INC = ('.', '../lib');
-  }
-}
-
 use strict;
 
 use Test::More;
@@ -78,7 +71,6 @@ $tests += @neg_time * 12;
 $tests += @bad_time;
 $tests += @years;
 $tests += 10;
-$tests += 2 if $ENV{PERL_CORE};
 $tests += 8 if $ENV{MAINTAINER};
 
 plan tests => $tests;

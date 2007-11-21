@@ -62,6 +62,6 @@ my $c = chr(0x100);
 
 {
     fresh_perl_like ('use bytes; bytes::moo()',
-		     qr/Undefined subroutine bytes::moo/, {stderr=>1},
+		     qr/Undefined subroutine &bytes::moo/, {stderr=>1},
 		    "Check Carp is loaded for AUTOLOADing errors")
 }
