@@ -19,7 +19,6 @@ BEGIN {
 use strict;
 use IO::Handle;
 use IPC::Open2;
-#require 'open2.pl'; use subs 'open2';
 
 my $perl = './perl';
 
