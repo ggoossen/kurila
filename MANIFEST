@@ -1434,7 +1434,6 @@ lib/Benchmark.pm		Measure execution time
 lib/Benchmark.t			See if Benchmark works
 lib/blib.pm			For "use blib"
 lib/blib.t			blib.pm test
-lib/bytes_heavy.pl		Support routines for byte pragma
 lib/bytes.pm			Pragma to enable byte operations
 lib/bytes.t			bytes.pm test
 lib/Carp/Heavy.pm		Error message workhorse
