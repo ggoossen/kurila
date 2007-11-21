@@ -2,8 +2,10 @@ package bytes;
 
 our $VERSION = '1.03';
 
-$bytes::hint_bits = 0x00000008;
-$bytes::codepoints_hint_bits = 0x01000000;
+BEGIN {
+    $bytes::hint_bits = 0x00000008;
+    $bytes::codepoints_hint_bits = 0x01000000;
+}
 
 sub import {
     $^H ^|^= $bytes::hint_bits;
@@ -14,13 +16,13 @@ sub unimport {
     $^H ^&^= ^~^$bytes::hint_bits;
 }
 
+BEGIN { bytes::import() }
+
 sub length (_) {
-    BEGIN { bytes::import() }
     return CORE::length($_[0]);
 }
 
 sub substr ($$;$$) {
-    BEGIN { bytes::import() }
     return
 	@_ == 2 ? CORE::substr($_[0], $_[1]) :
 	@_ == 3 ? CORE::substr($_[0], $_[1], $_[2]) :
@@ -28,28 +30,26 @@ sub substr ($$;$$) {
 }
 
 sub ord (_) {
-    BEGIN { bytes::import() }
     return CORE::ord($_[0]);
 }
 
 sub chr (_) {
-    BEGIN { bytes::import() }
     return CORE::chr($_[0]);
 }
 
 sub index ($$;$) {
-    BEGIN { bytes::import() }
     return
 	@_ == 2 ? CORE::index($_[0], $_[1]) :
 	          CORE::index($_[0], $_[1], $_[2]) ;
 }
 
 sub rindex ($$;$) {
-    BEGIN { bytes::import() }
     return
 	@_ == 2 ? CORE::rindex($_[0], $_[1]) :
 	          CORE::rindex($_[0], $_[1], $_[2]) ;
 }
+
+BEGIN { bytes::import() }
 
 1;
 __END__

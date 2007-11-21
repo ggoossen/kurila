@@ -1,4 +1,5 @@
 package utf8;
+
 use strict;
 use warnings;
 
@@ -17,47 +18,9 @@ our (%PropertyAlias, %PA_reverse, %PropValueAlias, %PVA_reverse, %PVA_abbr_map);
 ## It's a data structure that encodes a set of Unicode characters.
 ##
 
-sub length (_) {
-    BEGIN { utf8::import() }
-    return CORE::length($_[0]);
-}
-
-sub substr ($$;$$) {
-    BEGIN { utf8::import() }
-    return
-	@_ == 2 ? CORE::substr($_[0], $_[1]) :
-	@_ == 3 ? CORE::substr($_[0], $_[1], $_[2]) :
-	          CORE::substr($_[0], $_[1], $_[2], $_[3]) ;
-}
-
-sub ord (_) {
-    BEGIN { utf8::import() }
-    return CORE::ord($_[0]);
-}
-
-sub chr (_) {
-    BEGIN { utf8::import() }
-    return CORE::chr($_[0]);
-}
-
-sub index ($$;$) {
-    BEGIN { utf8::import() }
-    return
-	@_ == 2 ? CORE::index($_[0], $_[1]) :
-	          CORE::index($_[0], $_[1], $_[2]) ;
-}
-
-sub rindex ($$;$) {
-    BEGIN { utf8::import() }
-    return
-	@_ == 2 ? CORE::rindex($_[0], $_[1]) :
-	          CORE::rindex($_[0], $_[1], $_[2]) ;
-}
-
-
 use bytes;
 
-sub SWASHNEW {
+sub SWASHNEW_real {
     my ($class, $type, $list, $minbits, $none) = @_;
     local $^D = 0 if $^D;
 
@@ -288,13 +251,13 @@ sub SWASHNEW {
 		my ($c,$t) = split(/::/, $name, 2);	# bogus use of ::, really
 		my $subobj;
 		if ($c eq 'utf8') {
-		    $subobj = utf8->SWASHNEW($t, "", $minbits, 0);
+		    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0);
 		}
 		elsif (exists &$name) {
-		    $subobj = utf8->SWASHNEW($name, "", $minbits, 0);
+		    $subobj = SWASHNEW_real('utf8', $name, "", $minbits, 0);
 		}
 		elsif ($c =~ /^([0-9a-fA-F]+)/) {
-		    $subobj = utf8->SWASHNEW("", $c, $minbits, 0);
+		    $subobj = SWASHNEW_real('utf8', "", $c, $minbits, 0);
 		}
 		return $subobj unless ref $subobj;
 		push @extras, $name => $subobj;
