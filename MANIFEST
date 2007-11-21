@@ -1413,7 +1413,6 @@ lib/Archive/Tar/t/src/long/foo.tgz.packed	Archive::Tar tests
 lib/Archive/Tar/t/src/short/b	Archive::Tar tests
 lib/Archive/Tar/t/src/short/bar.tar.packed	Archive::Tar tests
 lib/Archive/Tar/t/src/short/foo.tgz.packed	Archive::Tar tests
-lib/assert.pl			assertion and panic with stack trace
 lib/attributes.pm		For "sub foo : attrlist"
 lib/AutoLoader.pm		Autoloader base class
 lib/AutoLoader.t		See if AutoLoader works
@@ -1705,7 +1704,6 @@ lib/I18N/LangTags/t/55_supers_strict.t	See whether I18N::LangTags works
 lib/I18N/LangTags/t/80_all_env.t	See whether I18N::LangTags works
 lib/if.pm			For "use if"
 lib/if.t			Tests for "use if"
-lib/importenv.pl		Perl routine to get environment into variables
 lib/integer.pm			For "use integer"
 lib/integer.t			For "use integer" testing
 lib/Internals.t			For Internals::* testing
@@ -1910,8 +1908,6 @@ lib/Object/Accessor/t/02_Object-Accessor-allow.t	Object::Accessor tests
 lib/Object/Accessor/t/03_Object-Accessor-local.t	Object::Accessor tests
 lib/Object/Accessor/t/04_Object-Accessor-lvalue.t	Object::Accessor tests
 lib/Object/Accessor/t/05_Object-Accessor-callback.t	Object::Accessor tests
-lib/open2.pl			Open a two-ended pipe (uses IPC::Open2)
-lib/open3.pl			Open a three-ended pipe (uses IPC::Open3)
 lib/open.pm			Pragma to specify default I/O layers
 lib/open.t			See if the open pragma works
 lib/overload.pm			Module for overloading perl operators
@@ -2172,20 +2168,16 @@ lib/SelectSaver.t		See if SelectSaver works
 lib/SelfLoader-buggy.t		See if SelfLoader works
 lib/SelfLoader.pm		Load functions only on demand
 lib/SelfLoader.t		See if SelfLoader works
-lib/shellwords.pl		Perl library to split into words with shell quoting
 lib/sigtrap.pm			For trapping an abort and giving traceback
 lib/sigtrap.t			See if sigtrap works
 lib/sort.pm			For "use sort"
 lib/sort.t			See if "use sort" works
-lib/stat.pl			Perl library supporting stat function
 lib/strict.pm			For "use strict"
 lib/strict.t			See if strictures work
 lib/subs.pm			Declare overriding subs
 lib/subs.t			See if subroutine pseudo-importation works
 lib/Symbol.pm			Symbol table manipulation routines
 lib/Symbol.t			See if Symbol works
-lib/syslog.pl			Perl library supporting syslogging
-lib/tainted.pl			Old code for tainting
 lib/Term/ANSIColor/ChangeLog	Term::ANSIColor
 lib/Term/ANSIColor.pm		Perl module supporting termcap usage
 lib/Term/ANSIColor/README	Term::ANSIColor
@@ -2415,7 +2407,6 @@ lib/Tie/SubstrHash.pm		Compact hash for known key, value and table size
 lib/Tie/SubstrHash.t		Test for Tie::SubstrHash
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
 lib/Time/gmtime.t		Test for Time::gmtime
-lib/timelocal.pl		Perl library supporting inverse of localtime, gmtime
 lib/Time/Local.pm		Reverse translation of localtime, gmtime
 lib/Time/Local.t		See if Time::Local works
 lib/Time/localtime.pm		By-name interface to Perl's builtin localtime
@@ -2481,7 +2472,6 @@ lib/User/pwent.t		See if User::pwent works
 lib/utf8_heavy.pl		Support routines for utf8 pragma
 lib/utf8.pm			Pragma to control Unicode support
 lib/utf8.t			See if utf8 operations work
-lib/validate.pl			Perl library supporting wholesale file mode validation
 lib/vars_carp.t			See if "use vars" doesn't load Carp.pm per default
 lib/vars.pm			Declare pseudo-imported global variables
 lib/vars.t			See if "use vars" works
