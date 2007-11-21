@@ -456,37 +456,37 @@ EOM
 
     # corrupt header - 1st byte wrong
     my $bad = $keep ;
-    substr($bad, 0, 1, "\xFF") ;
+    substr($bad, 0, 1, "\x[FF]") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt header - 2st byte wrong
     $bad = $keep ;
-    substr($bad, 1, 1, "\xFF") ;
+    substr($bad, 1, 1, "\x[FF]") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt header - method not deflated
     $bad = $keep ;
-    substr($bad, 2, 1, "\xFF") ;
+    substr($bad, 2, 1, "\x[FF]") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt header - reserverd bits used
     $bad = $keep ;
-    substr($bad, 3, 1, "\xFF") ;
+    substr($bad, 3, 1, "\x[FF]") ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt trailer - length wrong
     $bad = $keep ;
-    substr($bad, -8, 4, "\xFF" x 4) ;
+    substr($bad, -8, 4, "\x[FF]" x 4) ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 
     # corrupt trailer - CRC wrong
     $bad = $keep ;
-    substr($bad, -4, 4, "\xFF" x 4) ;
+    substr($bad, -4, 4, "\x[FF]" x 4) ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
 }

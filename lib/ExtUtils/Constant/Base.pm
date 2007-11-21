@@ -7,9 +7,6 @@ use Text::Wrap;
 use ExtUtils::Constant::Utils qw(C_stringify perl_stringify);
 $VERSION = '0.04';
 
-use constant is_perl56 => ($] < 5.007 && $] > 5.005_50);
-
-
 =head1 NAME
 
 ExtUtils::Constant::Base - base class for ExtUtils::Constant objects
@@ -478,11 +475,6 @@ sub switch_clause {
   foreach my $i ($namelen - 1, 0 .. ($namelen - 2)) {
     my ($min, $max) = (^~^0, 0);
     my %spread;
-    if (is_perl56) {
-      # Need proper Unicode preserving hash keys for bytes in range 128-255
-      # here too, for some reason. grr 5.6.1 yet again.
-      tie %spread, 'ExtUtils::Constant::Aaargh56Hash';
-    }
     foreach (@names) {
       my $char = substr $_, $i, 1;
       my $ord = ord $char;
@@ -801,11 +793,6 @@ sub C_constant {
     ($namelen, $items) = @$breakout;
   } else {
     $items = {};
-    if (is_perl56) {
-      # Need proper Unicode preserving hash keys.
-      require ExtUtils::Constant::Aaargh56Hash;
-      tie %$items, 'ExtUtils::Constant::Aaargh56Hash';
-    }
     $breakout ||= 3;
     $default_type ||= $self->default_type();
     if (!ref $what) {

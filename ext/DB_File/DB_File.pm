@@ -226,17 +226,6 @@ push @ISA, qw(Tie::Hash Exporter);
 
 );
 
-sub AUTOLOAD {
-    my($constname);
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    my ($error, $val) = constant($constname);
-    Carp::croak $error if $error;
-    no strict 'refs';
-    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-    goto &{*{Symbol::fetch_glob($AUTOLOAD)}};
-}           
-
-
 eval {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;

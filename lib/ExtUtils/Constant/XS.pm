@@ -1,7 +1,7 @@
 package ExtUtils::Constant::XS;
 
 use strict;
-use vars qw($VERSION %XS_Constant %XS_TypeSet @ISA @EXPORT_OK $is_perl56);
+use vars qw($VERSION %XS_Constant %XS_TypeSet @ISA @EXPORT_OK);
 use Carp;
 use ExtUtils::Constant::Utils 'perl_stringify';
 require ExtUtils::Constant::Base;
@@ -11,8 +11,6 @@ require ExtUtils::Constant::Base;
 @EXPORT_OK = qw(%XS_Constant %XS_TypeSet);
 
 $VERSION = '0.02';
-
-$is_perl56 = ($] < 5.007 && $] > 5.005_50);
 
 =head1 NAME
 
@@ -76,18 +74,6 @@ sub header {
     next if $_ eq '';
     push @lines, "#define PERL_constant_IS$_\t$start\n"; $start++;
   }
-  push @lines, << 'EOT';
-
-#ifndef NVTYPE
-typedef double NV; /* 5.6 and later define NVTYPE, and typedef NV to it.  */
-#endif
-#ifndef aTHX_
-#define aTHX_ /* 5.6 or later define this for threading support.  */
-#endif
-#ifndef pTHX_
-#define pTHX_ /* 5.6 or later define this for threading support.  */
-#endif
-EOT
 
   return join '', @lines;
 }

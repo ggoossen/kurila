@@ -397,18 +397,6 @@ sub sockaddr_un {
     }
 }
 
-sub AUTOLOAD {
-    my($constname);
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&Socket::constant not defined" if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
-    if ($error) {
-	croak $error;
-    }
-    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
-}
-
 XSLoader::load 'Socket', $VERSION;
 
 1;

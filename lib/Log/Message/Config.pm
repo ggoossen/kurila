@@ -95,14 +95,8 @@ sub _read_config_file {
     return $conf;
 }
 
-sub AUTOLOAD {
-    $AUTOLOAD =~ s/.+:://;
-
-    my $self = shift;
-
-    return $self->{ lc $AUTOLOAD } if exists $self->{ lc $AUTOLOAD };
-
-    die loc(q[No such accessor '%1' for class '%2'], $AUTOLOAD, ref $self);
+for my $name (qw|private verbose tag level remove chrono|) {
+    Symbol::fetch_glob($name)->* = sub { return $_[0]->{$name} };
 }
 
 sub DESTROY { 1 }

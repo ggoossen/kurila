@@ -45,18 +45,12 @@ sub remove {
     return splice( @{$self->{STACK}}, $item->id, 1, undef );
 }
 
-sub AUTOLOAD {
-    my $self = $_[0];
+for my $name (qw|when id message parent level tag longmess shortmess|) {
+    Symbol::fetch_glob($name)->* = sub { return $_[0]->{$name} };
+}
 
-    $AUTOLOAD =~ s/.+:://;
-
-    return $self->{$AUTOLOAD} if exists $self->{$AUTOLOAD};
-
-    local $Carp::CarpLevel = $Carp::CarpLevel + 3;
-
-    {   no strict 'refs';
-        return *{Symbol::fetch_glob("Log::Message::Handlers::${AUTOLOAD}")}->(@_);
-    }
+for my $name (keys Symbol::stash("Log::Message::Handlers")->%) {
+    Symbol::fetch_glob($name)->* = Symbol::fetch_glob("Log::Message::Handlers::$name")->*;
 }
 
 sub DESTROY { 1 }

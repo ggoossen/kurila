@@ -812,6 +812,7 @@ sub doConstants {
 	ExtUtils::Constant::WriteConstants(
 					   NAME => 'Time::HiRes',
 					   NAMES => \@names,
+                                           PROXYSUBS => 1,
 					  );
     } else {
         my $file;

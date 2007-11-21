@@ -77,22 +77,6 @@ sub import {
     goto &Exporter::import;
 }
 
-sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.  If a constant is not found then control is passed
-    # to the AUTOLOAD in AutoLoader.
-
-    my $constname;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    my ($error, $val) = constant($constname);
-    if ($error) {
-	require Carp;
-	Carp::croak($error);
-    }
-    eval "sub $AUTOLOAD { $val }";
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
-}
-
 XSLoader::load 'File::Glob', $VERSION;
 
 # Preloaded methods go here.

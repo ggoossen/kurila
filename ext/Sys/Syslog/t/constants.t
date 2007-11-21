@@ -15,10 +15,10 @@ my $callpack = my $testpack = 'Sys::Syslog';
 eval "use $callpack";
 
 eval "${callpack}::This()";
-like( $@, "/^This is not a valid $testpack macro/", "trying a non-existing macro");
+like( $@, "/^Undefined subroutine/", "trying a non-existing macro");
 
 eval "${callpack}::NOSUCHNAME()";
-like( $@, "/^NOSUCHNAME is not a valid $testpack macro/", "trying a non-existing macro");
+like( $@, "/^Undefined subroutine/", "trying a non-existing macro");
 
 # Testing all macros
 if(@names) {

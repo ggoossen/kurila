@@ -39,14 +39,10 @@ BEGIN
     *zlib_version = \&Compress::Raw::Zlib::zlib_version;
 }
 
-sub AUTOLOAD {
-    my($constname);
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    my ($error, $val) = Compress::Raw::Zlib::constant($constname);
-    Carp::croak $error if $error;
-    no strict 'refs';
-    *{$AUTOLOAD} = sub { $val };
-    goto &{$AUTOLOAD};
+# typeglob constants.
+for my $name (qw|DEF_WBITS MAX_MEM_LEVEL MAX_WBITS OS_CODE|,
+              grep { m/^Z_/ } @Compress::Raw::Zlib::EXPORT) {
+    Symbol::fetch_glob($name)->* = Symbol::fetch_glob("Compress::Raw::Zlib::$name")->*;
 }
 
 use constant FLAG_APPEND             => 1 ;

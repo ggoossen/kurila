@@ -37,21 +37,7 @@ no utf8; # Ironic, no?
 #
 #
 
-plan tests => 37;
-
-{
-    my ($a, $b);
-
-    { use bytes; $a = "\xc3\xa4" }
-    { use utf8;  $b = "\xe4"     }
-
-    my $test = 68;
-
-    ok($a eq $b);
-
-    { use utf8; ok($a eq $b) }
-}
-
+plan tests => 36;
 
 {
     # bug id 20000730.004

@@ -289,15 +289,15 @@ printf F "%z\n" ;
 my $a = sprintf "%z" ;
 printf F "%" ;
 $a = sprintf "%" ;
-printf F "%\x02" ;
-$a = sprintf "%\x02" ;
+printf F "%\x{02}" ;
+$a = sprintf "%\x{02}" ;
 no warnings 'printf' ;
 printf F "%z\n" ;
 $a = sprintf "%z" ;
 printf F "%" ;
 $a = sprintf "%" ;
-printf F "%\x02" ;
-$a = sprintf "%\x02" ;
+printf F "%\x{02}" ;
+$a = sprintf "%\x{02}" ;
 EXPECT
 Invalid conversion in printf: "%z" at - line 4.
 Invalid conversion in sprintf: "%z" at - line 5.

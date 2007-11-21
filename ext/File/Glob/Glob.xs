@@ -12,8 +12,6 @@ typedef struct {
 
 START_MY_CXT
 
-#define GLOB_ERROR	(MY_CXT.x_GLOB_ERROR)
-
 #include "const-c.inc"
 
 #ifdef WIN32
@@ -53,7 +51,7 @@ PPCODE:
 
 	/* call glob */
 	retval = bsd_glob(pattern, flags, errfunc, &pglob);
-	GLOB_ERROR = retval;
+        MY_CXT.x_GLOB_ERROR = retval;
 
 	/* return any matches found */
 	EXTEND(sp, pglob.gl_pathc);
@@ -68,5 +66,16 @@ PPCODE:
 
 	bsd_globfree(&pglob);
     }
+
+IV
+GLOB_ERROR()
+PROTOTYPE:
+PPCODE:
+        {
+            	dMY_CXT;
+
+                PUSHs(sv_2mortal(newSViv(MY_CXT.x_GLOB_ERROR)));
+        }
+                
 
 INCLUDE: const-xs.inc

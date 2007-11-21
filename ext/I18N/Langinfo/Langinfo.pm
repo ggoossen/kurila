@@ -73,29 +73,6 @@ our @EXPORT_OK = qw(
 
 our $VERSION = '0.02';
 
-sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.
-
-    my $constname;
-    our $AUTOLOAD;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&I18N::Langinfo::constant not defined" if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
-    if ($error) { croak $error; }
-    {
-	no strict 'refs';
-	# Fixed between 5.005_53 and 5.005_61
-#XXX	if ($] >= 5.00561) {
-#XXX	    *$AUTOLOAD = sub () { $val };
-#XXX	}
-#XXX	else {
-	    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-#XXX	}
-    }
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
-}
-
 I18N::Langinfo->bootstrap( $VERSION);
 
 1;

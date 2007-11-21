@@ -40,6 +40,7 @@ if (eval {require ExtUtils::Constant; 1}) {
   ExtUtils::Constant::WriteConstants(
                                      NAME => 'I18N::Langinfo',
                                      NAMES => \@names,
+                                     PROXYSUBS => 1,
                                     );
 } else {
   use File::Copy;

@@ -169,11 +169,11 @@ if (eval {require ExtUtils::Constant; 1}) {
     push @names, {name => 'ZLIB_VERSION', type => 'PV' };
 
     ExtUtils::Constant::WriteConstants(
-                                     NAME => 'Zlib',
-                                     NAMES => \@names,
-                                     C_FILE  => 'constants.h',
-                                     XS_FILE  => 'constants.xs',
-                                                                       
+                                       NAME => 'Compress::Raw::Zlib',
+                                       NAMES => \@names,
+                                       C_FILE  => 'constants.h',
+                                       XS_FILE  => 'constants.xs',
+                                       PROXYSUBS => 1,
                                     );
 } 
 else {

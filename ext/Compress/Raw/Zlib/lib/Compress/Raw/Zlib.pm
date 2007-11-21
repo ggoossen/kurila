@@ -11,9 +11,11 @@ use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.006';
-$XS_VERSION = $VERSION; 
-$VERSION = eval $VERSION;
+BEGIN {
+    $VERSION = '2.006';
+    $XS_VERSION = $VERSION; 
+    $VERSION = eval $VERSION;
+}
 
 @ISA = qw(Exporter);
 # Items to export into callers namespace by default. Note: do not export
@@ -63,32 +65,16 @@ $VERSION = eval $VERSION;
 );
 
 
-sub AUTOLOAD {
-    my($constname);
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    my ($error, $val) = constant($constname);
-    Carp::croak $error if $error;
-    no strict 'refs';
-    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
-}
-
 use constant FLAG_APPEND             => 1 ;
 use constant FLAG_CRC                => 2 ;
 use constant FLAG_ADLER              => 4 ;
 use constant FLAG_CONSUME_INPUT      => 8 ;
 
-eval {
+
+BEGIN {
     require XSLoader;
     XSLoader::load('Compress::Raw::Zlib', $XS_VERSION);
-    1;
-} 
-or do {
-    require DynaLoader;
-    local @ISA = qw(DynaLoader);
-    Compress::Raw::Zlib->bootstrap( $XS_VERSION) ; 
-};
- 
+}
 
 use constant Parse_any      => 0x01;
 use constant Parse_unsigned => 0x02;
