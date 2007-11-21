@@ -1,4 +1,4 @@
-print "1..3\n";
+print "1..2\n";
 
 use Digest;
 
@@ -24,13 +24,9 @@ $d = Digest->new("Dummy");
 print "not " unless $d->digest eq "ooo";
 print "ok 1\n";
 
-$d = Digest->Dummy;
-print "not " unless $d->digest eq "ooo";
-print "ok 2\n";
-
 $Digest::MMAP{"Dummy-24"} = [["NotThere"], "NotThereEither", ["Digest::Dummy", 24]];
 $d = Digest->new("Dummy-24");
 print "not " unless $d->digest eq "24";
-print "ok 3\n";
+print "ok 2\n";
 
 

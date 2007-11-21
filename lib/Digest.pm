@@ -45,13 +45,6 @@ sub new
     die $err;
 }
 
-sub AUTOLOAD
-{
-    my $class = shift;
-    my $algorithm = substr($AUTOLOAD, rindex($AUTOLOAD, '::')+2);
-    $class->new($algorithm, @_);
-}
-
 1;
 
 __END__

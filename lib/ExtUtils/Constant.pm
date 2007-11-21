@@ -19,7 +19,7 @@ ExtUtils::Constant - generate XS code to import C header constants
 =head1 DESCRIPTION
 
 ExtUtils::Constant facilitates generating C and XS wrapper code to allow
-perl modules to AUTOLOAD constants defined in C library header files.
+perl modules to export constants defined in C library header files.
 It is principally used by the C<h2xs> utility, on which this code is based.
 It doesn't contain the routines to scan header files to extract these
 constants.
@@ -102,7 +102,7 @@ use ExtUtils::Constant::XS qw(%XS_Constant %XS_TypeSet);
 
 %EXPORT_TAGS = ( 'all' => [ qw(
 	XS_constant constant_types return_clause memEQ_clause C_stringify
-	C_constant autoload WriteConstants WriteMakefileSnippet
+	C_constant WriteConstants WriteMakefileSnippet
 ) ] );
 
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -288,69 +288,6 @@ EOT
 
   return $xs;
 }
-
-
-=item autoload PACKAGE, VERSION, AUTOLOADER
-
-A function to generate the AUTOLOAD subroutine for the module I<PACKAGE>
-I<VERSION> is the perl version the code should be backwards compatible with.
-It defaults to the version of perl running the subroutine.  If I<AUTOLOADER>
-is true, the AUTOLOAD subroutine falls back on AutoLoader::AUTOLOAD for all
-names that the constant() routine doesn't recognise.
-
-=cut
-
-# ' # Grr. syntax highlighters that don't grok pod.
-
-sub autoload {
-  my ($module, $compat_version, $autoloader) = @_;
-  $compat_version ||= $];
-  croak "Can't maintain compatibility back as far as version $compat_version"
-    if $compat_version < 5;
-  my $func = "sub AUTOLOAD {\n"
-  . "    # This AUTOLOAD is used to 'autoload' constants from the constant()\n"
-  . "    # XS function.";
-  $func .= "  If a constant is not found then control is passed\n"
-  . "    # to the AUTOLOAD in AutoLoader." if $autoloader;
-
-
-  $func .= "\n\n"
-  . "    my \$constname;\n";
-  $func .=
-    "    our \$AUTOLOAD;\n"  if ($compat_version >= 5.006);
-
-  $func .= <<"EOT";
-    (\$constname = \$AUTOLOAD) =~ s/.*:://;
-    croak "&${module}::constant not defined" if \$constname eq 'constant';
-    my (\$error, \$val) = constant(\$constname);
-EOT
-
-  if ($autoloader) {
-    $func .= <<'EOT';
-    if ($error) {
-	if ($error =~  /is not a valid/) {
-	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
-	    goto &AutoLoader::AUTOLOAD;
-	} else {
-	    croak $error;
-	}
-    }
-EOT
-  } else {
-    $func .=
-      "    if (\$error) { croak \$error; }\n";
-  }
-
-  $func .= <<'END';
-    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
-}
-
-END
-
-  return $func;
-}
-
 
 =item WriteMakefileSnippet
 

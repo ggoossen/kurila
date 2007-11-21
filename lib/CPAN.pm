@@ -64,7 +64,6 @@ $CPAN::Defaultrecent ||= "http://cpan.uwinnipeg.ca/htdocs/cpan.xml";
 
 # our globals are getting a mess
 use vars qw(
-            $AUTOLOAD
             $Be_Silent
             $CONFIG_DIRTY
             $Defaultdocs
@@ -80,7 +79,6 @@ use vars qw(
             $SQLite
             $Suppress_readline
             $VERSION
-            $autoload_recursion
             $term
             @Defaultsites
             @EXPORT
@@ -119,38 +117,6 @@ $MAX_RECURSION = 32;
             );
 
 sub soft_chdir_with_alternatives ($);
-
-{
-    $autoload_recursion ||= 0;
-
-    #-> sub CPAN::AUTOLOAD ;
-    sub AUTOLOAD {
-        $autoload_recursion++;
-        my($l) = $AUTOLOAD;
-        $l =~ s/.*:://;
-        if ($CPAN::Signal) {
-            warn "Refusing to autoload '$l' while signal pending";
-            $autoload_recursion--;
-            return;
-        }
-        if ($autoload_recursion > 1) {
-            my $fullcommand = join " ", map { "'$_'" } $l, @_;
-            warn "Refusing to autoload $fullcommand in recursion\n";
-            $autoload_recursion--;
-            return;
-        }
-        my(%export);
-        @export{@EXPORT} = '';
-        CPAN::HandleConfig->load unless $CPAN::Config_loaded++;
-        if (exists $export{$l}) {
-            CPAN::Shell->?$l(@_);
-        } else {
-            die(qq{Unknown CPAN command "$AUTOLOAD". }.
-                qq{Type ? for help.\n});
-        }
-        $autoload_recursion--;
-    }
-}
 
 #-> sub CPAN::shell ;
 sub shell {
@@ -798,7 +764,6 @@ package CPAN::Shell;
 use strict;
 use vars qw(
             $ADVANCED_QUERY
-            $AUTOLOAD
             $COLOR_REGISTERED
             $Help
             $autoload_recursion
@@ -852,47 +817,6 @@ $Help = {
          u => "display uninstalled modules",
          upgrade => "combine 'r' command with immediate installation",
         };
-{
-    $autoload_recursion   ||= 0;
-
-    #-> sub CPAN::Shell::AUTOLOAD ;
-    sub AUTOLOAD {
-        $autoload_recursion++;
-        my($l) = $AUTOLOAD;
-        my $class = shift(@_);
-        # warn "autoload[$l] class[$class]";
-        $l =~ s/.*:://;
-        if ($CPAN::Signal) {
-            warn "Refusing to autoload '$l' while signal pending";
-            $autoload_recursion--;
-            return;
-        }
-        if ($autoload_recursion > 1) {
-            my $fullcommand = join " ", map { "'$_'" } $l, @_;
-            warn "Refusing to autoload $fullcommand in recursion\n";
-            $autoload_recursion--;
-            return;
-        }
-        if ($l =~ /^w/) {
-            # XXX needs to be reconsidered
-            if ($CPAN::META->has_inst('CPAN::WAIT')) {
-                CPAN::WAIT->?$l(@_);
-            } else {
-                $CPAN::Frontend->mywarn(qq{
-Commands starting with "w" require CPAN::WAIT to be installed.
-Please consider installing CPAN::WAIT to use the fulltext index.
-For this you just need to type
-    install CPAN::WAIT
-});
-            }
-        } else {
-            $CPAN::Frontend->mywarn(qq{Unknown shell command '$l'. }.
-                                    qq{Type ? for help.
-});
-        }
-        $autoload_recursion--;
-    }
-}
 
 package CPAN;
 use strict;
