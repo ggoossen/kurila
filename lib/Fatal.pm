@@ -23,13 +23,6 @@ sub import {
     }
 };
 
-sub AUTOLOAD {
-    my $cmd = $AUTOLOAD;
-    $cmd =~ s/.*:://;
-    &_make_fatal($cmd, (caller)[0]);
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
-}
-
 sub fill_protos {
   my $proto = shift;
   my ($n, $isref, @out, @out1, $seen_semi) = -1;

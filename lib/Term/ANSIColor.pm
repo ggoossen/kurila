@@ -87,27 +87,17 @@ for (reverse sort keys %attributes) {
 # generated subs into pass-through functions that don't add any escape
 # sequences.  This is to make it easier to write scripts that also work on
 # systems without any ANSI support, like Windows consoles.
-sub AUTOLOAD {
+for my $attr (keys %attributes) {
     my $enable_colors = !defined $ENV{ANSI_COLORS_DISABLED};
-    my $sub;
-    ($sub = $AUTOLOAD) =~ s/^.*:://;
-    my $attr = $attributes{lc $sub};
-    if ($sub =~ /^[A-Z_]+$/ && defined $attr) {
-        $attr = $enable_colors ? "\e[" . $attr . 'm' : '';
-        eval qq {
-            sub $AUTOLOAD {
-                if (\$AUTORESET && \@_) {
-                    '$attr' . "\@_" . "\e[0m";
-                } else {
-                    ('$attr' . "\@_");
-                }
+    Symbol::fetch_glob(uc $attr)->* =
+        sub {
+            my $xattr = $enable_colors ? "\e[" . $attr . 'm' : '';
+            if (\$AUTORESET && \@_) {
+                '$xattr' . "\@_" . "\e[0m";
+            } else {
+                ('$xattr' . "\@_");
             }
         };
-        goto &{Symbol::fetch_glob($AUTOLOAD)};
-    } else {
-        require Carp;
-        Carp::croak ("undefined subroutine &$AUTOLOAD called");
-    }
 }
 
 ##############################################################################

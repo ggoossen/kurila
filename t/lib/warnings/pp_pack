@@ -49,7 +49,7 @@ Explicit blessing to '' (assuming package main) at - line 3.
 ########
 # pp.c
 use utf8 ;
-$_ = "\x80  \xff" ;
+$_ = "\x[80]  \x[ff]" ;
 reverse ;
 EXPECT
 ########

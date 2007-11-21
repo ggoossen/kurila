@@ -229,14 +229,14 @@ static MGVTBL not_defined_vtbl = {
 
 EXPLODE
 
-{
-    my $key = $symbol_table;
-    # Just seems tidier (and slightly more space efficient) not to have keys
-    # such as Fcntl::
-    $key =~ s/::$//;
-    my $key_len = length $key;
+    {
+        my $key = $symbol_table;
+        # Just seems tidier (and slightly more space efficient) not to have keys
+        # such as Fcntl::
+        $key =~ s/::$//;
+        my $key_len = length $key;
 
-    print $c_fh <<"MISSING";
+        print $c_fh <<"MISSING";
 
 #ifndef SYMBIAN
 
@@ -273,7 +273,7 @@ get_missing_hash(pTHX) {
 
 MISSING
 
-}
+    }
 
     print $xs_fh <<"EOBOOT";
 BOOT:

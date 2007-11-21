@@ -350,7 +350,7 @@ sub format_text {
     # <Data> blocks.
     if ($convert) {
         if (ASCII) {
-            $text =~ s/(\\|[^\x00-\x7F])/$ESCAPES{ord ($1)} || "X"/eg;
+            $text =~ s/(\\|[^\x{00}-\x{7F}])/$ESCAPES{ord ($1)} || "X"/eg;
         } else {
             $text =~ s/(\\)/$ESCAPES{ord ($1)} || "X"/eg;
         }

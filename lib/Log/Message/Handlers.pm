@@ -123,6 +123,17 @@ sub trace {
     }
 }
 
+=head add_handler
+
+=cut
+
+sub add_handler {
+    my ($class, $name, $handler) = @_;
+
+    Symbol::fetch_glob($name)->* = \&$handler;
+    Symbol::fetch_glob("Log::Message::Item::$name")->* = \&$handler;
+}
+
 =head1 Custom Handlers
 
 If you wish to provide your own handlers, you can simply do the

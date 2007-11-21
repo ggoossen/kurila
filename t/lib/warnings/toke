@@ -645,6 +645,14 @@ $a = "\m" ;
 EXPECT
 Unrecognized escape \m passed through at - line 3.
 ########
+use warnings 'misc' ;
+my $a =~ m/[a\mb]/ ;
+no warnings 'misc' ;
+$a =~ m/[a\mb]/ ;
+EXPECT
+Unrecognized escape \m passed through at - line 2.
+Unrecognized escape \m passed through at - line 2.
+########
 # toke.c
 use warnings 'portable' ;
 my $a =  0b011111111111111111111111111111110 ;

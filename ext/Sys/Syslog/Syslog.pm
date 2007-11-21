@@ -120,21 +120,6 @@ my @fallbackMethods = ();
 my $err_sub = $options{nofatal} ? \&warnings::warnif : \&croak;
 
 
-sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.
-    no strict 'vars';
-    my $constname;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "Sys::Syslog::constant() not defined" if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
-    croak $error if $error;
-    no strict 'refs';
-    *{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
-}
-
-
 sub openlog {
     ($ident, my $logopt, $facility) = @_;
 

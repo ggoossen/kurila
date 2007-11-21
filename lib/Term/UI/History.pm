@@ -74,9 +74,9 @@ BEGIN {
 }
 
 
-{   package Log::Message::Handlers;
-    
-    sub history {
+{   
+    Log::Message::Handlers->add_handler('history',
+    sub {
         my $self    = shift;
         my $verbose = shift;
            $verbose = 1 unless defined $verbose;    # default to true
@@ -92,6 +92,7 @@ BEGIN {
 
         return;
     }
+                                        );
 }
 
 

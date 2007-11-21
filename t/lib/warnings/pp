@@ -93,3 +93,5 @@ use utf8 ;
 $_ = "\x80  \xff" ;
 reverse ;
 EXPECT
+\xXX are assumed bytes at - line 3.
+\xXX are assumed bytes at - line 3.

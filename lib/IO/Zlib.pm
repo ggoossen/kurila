@@ -554,14 +554,12 @@ sub opened
     return defined tied(*{$self})->{'file'};
 }
 
-sub AUTOLOAD
-{
-    my $self = shift;
-
-    $AUTOLOAD =~ s/.*:://;
-    $AUTOLOAD =~ tr/a-z/A-Z/;
-
-    return tied(*{$self})->?$AUTOLOAD(@_);
+for my $name (qw|OPEN CLOSE READ READLINE PRINT PRINTF GETC BINMODE WRITE EOF TELL SEEK FILENO|) {
+    Symbol::fetch_glob(lc $name)->* =
+        sub {
+            my $self = shift;
+            tied(*{$self})->?$name(@_);
+        };
 }
 
 sub gzopen_external {
@@ -580,7 +578,7 @@ sub gzopen_external {
 	    binmode $fh;
 	    my $sig;
 	    my $rdb = read($fh, $sig, 2);
-	    if ($rdb == 2 && $sig eq "\x1F\x8B") {
+	    if ($rdb == 2 && $sig eq "\x[1F8B]") {
 		my $ropen = sprintf $gzip_read_open, $filename;
 		if (open($fh, $ropen)) {
 		    binmode $fh;

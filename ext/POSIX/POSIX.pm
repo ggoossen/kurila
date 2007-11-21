@@ -34,27 +34,8 @@ my %NON_CONSTS = (map {($_,1)}
                   qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
 
-sub AUTOLOAD {
-    no strict;
-    no warnings 'uninitialized';
-    if ($AUTOLOAD =~ /::(_?[a-z])/) {
-	# require AutoLoader;
-        croak "subroutine $AUTOLOAD does not exist";
-    }
-    local $! = 0;
-    my $constname = $AUTOLOAD;
-    $constname =~ s/.*:://;
-    if ($NON_CONSTS{$constname}) {
-        my ($val, $error) = &int_macro_int($constname, $_[0]);
-        croak $error if $error;
-        *{Symbol::fetch_glob($AUTOLOAD)} = sub { &int_macro_int($constname, $_[0]) };
-    } else {
-        my ($error, $val) = constant($constname);
-        croak $error if $error;
-	*{Symbol::fetch_glob($AUTOLOAD)} = sub { $val };
-    }
-
-    goto &{Symbol::fetch_glob($AUTOLOAD)};
+for my $name (keys %NON_CONSTS) {
+    *{Symbol::fetch_glob($name)} = sub { &int_macro_int($name, $_[0]) };
 }
 
 package POSIX::SigRt;

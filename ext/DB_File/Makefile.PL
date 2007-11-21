@@ -96,4 +96,5 @@ my @names = qw(
                     NAMES => \@names,
                     C_FILE  => 'constants.h',
                     XS_FILE  => 'constants.xs',
+                    PROXYSUBS => 1,
                   );

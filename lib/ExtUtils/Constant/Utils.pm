@@ -1,14 +1,12 @@
 package ExtUtils::Constant::Utils;
 
 use strict;
-use vars qw($VERSION @EXPORT_OK @ISA $is_perl56);
+use vars qw($VERSION @EXPORT_OK @ISA);
 use Carp;
 
 @ISA = 'Exporter';
 @EXPORT_OK = qw(C_stringify perl_stringify);
 $VERSION = '0.01';
-
-$is_perl56 = ($] < 5.007 && $] > 5.005_50);
 
 =head1 NAME
 
@@ -44,9 +42,6 @@ sub C_stringify {
   # grr 5.6.1
   confess "Wide character in '$_' intended as a C identifier"
     if tr/\0-\377// != length;
-  # grr 5.6.1 moreso because its regexps will break on data that happens to
-  # be utf8, which includes my 8 bit test cases.
-  $_ = pack 'C*', unpack 'U*', $_ . pack 'U*' if $is_perl56;
   s/\\/\\\\/g;
   s/([\"\'])/\\$1/g;	# Grr. fix perl mode.
   s/\n/\\n/g;		# Ensure newlines don't end up in octal
