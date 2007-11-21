@@ -21,10 +21,6 @@ sub new {
     bless {@_}, $class;
 }
 
-sub AUTOLOAD {
-    warn "AUTOLOAD $P5AST::AUTOLOAD(" . join(',', @_) . ")\n";
-}
-
 sub DESTROY { }
 
 sub p5arraytext {

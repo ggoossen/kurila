@@ -401,11 +401,6 @@ package p5::token;	BEGIN { @p5::token::ISA = 'p5::text'; }
 
 package PLXML;
 
-sub AUTOLOAD {
-    ::x("AUTOLOAD $PLXML::AUTOLOAD", @_);
-    return "[[[ $PLXML::AUTOLOAD ]]]";
-}
-
 sub prepreproc {
     my $self = shift;
     my $kids = $$self{Kids};
