@@ -1904,13 +1904,6 @@ lib/Net/t/nntp.t		libnet
 lib/Net/t/require.t		libnet
 lib/Net/t/smtp.t		libnet
 lib/Net/t/time.t		libnet
-lib/NEXT/Changes		NEXT
-lib/NEXT.pm			Pseudo-class NEXT for method redispatch
-lib/NEXT/README			NEXT
-lib/NEXT/t/actual.t		NEXT
-lib/NEXT/t/actuns.t		NEXT
-lib/NEXT/t/next.t		NEXT
-lib/NEXT/t/unseen.t		NEXT
 lib/Object/Accessor.pm	Object::Accessor
 lib/Object/Accessor/t/00_Object-Accessor.t	Object::Accessor tests
 lib/Object/Accessor/t/01_Object-Accessor-Subclassed.t	Object::Accessor tests
@@ -3287,7 +3280,6 @@ t/mro/next_goto.t		mro tests
 t/mro/next_inanon.t		mro tests
 t/mro/next_ineval.t		mro tests
 t/mro/next_method.t		mro tests
-t/mro/next_NEXT.t		mro tests
 t/mro/next_skip.t		mro tests
 t/mro/overload_c3.t		mro tests
 t/mro/overload_dfs.t		mro tests
