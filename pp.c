@@ -329,8 +329,6 @@ PP(pp_rv2cv)
 	if (CvCLONE(cv))
 	    cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
 	if ((PL_op->op_private & OPpLVAL_INTRO)) {
-	    if (gv && GvCV(gv) == cv && (gv = gv_autoload4(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), FALSE)))
-		cv = GvCV(gv);
 	    if (!CvLVALUE(cv))
 		DIE(aTHX_ "Can't modify non-lvalue subroutine call");
 	}
@@ -3738,8 +3736,8 @@ PP(pp_hslice)
               * element by using EXISTS and DELETE if possible.
               * Fallback to FETCH and STORE otherwise */
              && (stash = SvSTASH(SvRV(SvTIED_obj((SV*)hv, mg))))
-             && gv_fetchmethod_autoload(stash, "EXISTS", TRUE)
-             && gv_fetchmethod_autoload(stash, "DELETE", TRUE));
+             && gv_fetchmethod(stash, "EXISTS")
+             && gv_fetchmethod(stash, "DELETE"));
     }
 
     while (++MARK <= SP) {

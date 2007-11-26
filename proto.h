@@ -607,10 +607,6 @@ PERL_CALLCONV GV*	Perl_gv_HVadd(pTHX_ GV* gv)
 PERL_CALLCONV GV*	Perl_gv_IOadd(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
 
-PERL_CALLCONV GV*	Perl_gv_autoload4(pTHX_ HV* stash, const char* name, STRLEN len, I32 method)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_2);
-
 PERL_CALLCONV void	Perl_gv_check(pTHX_ const HV* stash)
 			__attribute__nonnull__(pTHX_1);
 
@@ -635,13 +631,7 @@ PERL_CALLCONV GV*	Perl_gv_fetchfile_flags(pTHX_ const char *const name, const ST
 PERL_CALLCONV GV*	Perl_gv_fetchmeth(pTHX_ HV* stash, const char* name, STRLEN len, I32 level)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV GV*	Perl_gv_fetchmeth_autoload(pTHX_ HV* stash, const char* name, STRLEN len, I32 level)
-			__attribute__nonnull__(pTHX_2);
-
-/* PERL_CALLCONV GV*	Perl_gv_fetchmethod(pTHX_ HV* stash, const char* name)
-			__attribute__nonnull__(pTHX_2); */
-
-PERL_CALLCONV GV*	Perl_gv_fetchmethod_autoload(pTHX_ HV* stash, const char* name, I32 autoload)
+PERL_CALLCONV GV*	Perl_gv_fetchmethod(pTHX_ HV* stash, const char* name)
 			__attribute__nonnull__(pTHX_2);
 
 PERL_CALLCONV GV*	Perl_gv_fetchpv(pTHX_ const char* name, I32 add, I32 sv_type)

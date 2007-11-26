@@ -883,7 +883,7 @@ PP(pp_untie)
     if ((mg = SvTIED_mg(sv, how))) {
 	SV * const obj = SvRV(SvTIED_obj(sv, mg));
         if (obj) {
-	    GV * const gv = gv_fetchmethod_autoload(SvSTASH(obj), "UNTIE", FALSE);
+	    GV * const gv = gv_fetchmethod(SvSTASH(obj), "UNTIE");
 	    CV *cv;
 	    if (gv && isGV(gv) && (cv = GvCV(gv))) {
 	       PUSHMARK(SP);

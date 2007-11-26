@@ -352,7 +352,7 @@ XS(XS_UNIVERSAL_can)
     }
 
     if (pkg) {
-	GV * const gv = gv_fetchmethod_autoload(pkg, name, FALSE);
+	GV * const gv = gv_fetchmethod(pkg, name);
         if (gv && isGV(gv))
 	    rv = sv_2mortal(newRV((SV*)GvCV(gv)));
     }

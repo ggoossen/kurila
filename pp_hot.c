@@ -1707,8 +1707,8 @@ PP(pp_helem)
 			* element by using EXISTS and DELETE if possible.
 			* Fallback to FETCH and STORE otherwise */
 		    && (stash = SvSTASH(SvRV(SvTIED_obj((SV*)hv, mg))))
-		    && gv_fetchmethod_autoload(stash, "EXISTS", TRUE)
-		    && gv_fetchmethod_autoload(stash, "DELETE", TRUE)
+		    && gv_fetchmethod(stash, "EXISTS")
+		    && gv_fetchmethod(stash, "DELETE")
 		)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
@@ -2619,17 +2619,10 @@ PP(pp_entersub)
 	/* should call AUTOLOAD now? */
 	else {
 try_autoload:
-	    if ((autogv = gv_autoload4(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv),
-				   FALSE)))
-	    {
-		cv = GvCV(autogv);
-	    }
 	    /* sorry */
-	    else {
-		sub_name = sv_newmortal();
-		gv_efullname4(sub_name, gv, NULL, TRUE);
-		DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
-	    }
+	    sub_name = sv_newmortal();
+	    gv_efullname4(sub_name, gv, NULL, TRUE);
+	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
 	}
 	if (!cv)
 	    DIE(aTHX_ "Not a CODE reference");
@@ -2984,7 +2977,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	/* This code tries to figure out just what went wrong with
 	   gv_fetchmethod.  It therefore needs to duplicate a lot of
 	   the internals of that function.  We can't move it inside
-	   Perl_gv_fetchmethod_autoload(), however, since that would
+	   Perl_gv_fetchmethod(), however, since that would
 	   cause UNIVERSAL->can("NoSuchPackage::foo") to croak, and we
 	   don't want that.
 	*/
