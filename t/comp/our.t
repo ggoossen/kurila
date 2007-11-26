@@ -6,53 +6,11 @@ BEGIN {
     require './test.pl';
 }
 
-print "1..7\n";
+print "1..1\n";
 
 use strict;
-{
-    package TieAll;
-    # tie, track, and report what calls are made
-    my @calls;
-    use vars '$AUTOLOAD';
-    sub AUTOLOAD {
-        for ($AUTOLOAD =~ /TieAll::(.*)/) {
-            if (/TIE/) { return bless {} }
-            elsif (/calls/) { return join ',', splice @calls }
-            else {
-               push @calls, $_;
-	       # FETCHSIZE doesn't like undef
-	       # if FIRSTKEY, see if NEXTKEY is also called
-               return 1 if /FETCHSIZE|FIRSTKEY/;
-               return;
-            }
-        }
-    }
-}
 
 no strict 'vars';
-
-tie $x, 'TieAll';
-tie @x, 'TieAll';
-tie %x, 'TieAll';
-
-{our $x;}
-is(TieAll->calls, '', 'our $x has no runtime effect');
-
-{our ($x);}
-is(TieAll->calls, '', 'our ($x) has no runtime effect');
-
-{our %x;}
-is(TieAll->calls, '', 'our %x has no runtime effect');
-
-{our (%x);}
-is(TieAll->calls, '', 'our (%x) has no runtime effect');
-
-{our @x;}
-is(TieAll->calls, '', 'our @x has no runtime effect');
-
-{our (@x);}
-is(TieAll->calls, '', 'our (@x) has no runtime effect');
-
 
 $y = 1;
 {

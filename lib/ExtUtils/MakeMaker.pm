@@ -101,7 +101,6 @@ my %Special_Sigs = (
  postamble  => 'HASH',
  realclean  => 'HASH',
  test       => 'HASH',
- tool_autosplit => 'HASH',
 );
 
 @Att_Sigs{keys %Recognized_Att_Keys} = ('') x keys %Recognized_Att_Keys;
@@ -245,7 +244,6 @@ sub full_setup {
     PPM_INSTALL_SCRIPT PREREQ_FATAL PREREQ_PM PREREQ_PRINT PRINT_PREREQ
     SIGN SKIP TYPEMAPS VERSION VERSION_FROM XS XSOPT XSPROTOARG
     XS_VERSION clean depend dist dynamic_lib linkext macro realclean
-    tool_autosplit
 
     MACPERL_SRC MACPERL_LIB MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC
     MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED
@@ -266,7 +264,7 @@ sub full_setup {
         qw(
 
  post_initialize const_config constants platform_constants 
- tool_autosplit tool_xsubpp tools_other 
+ tool_xsubpp tools_other 
 
  makemakerdflt
 
@@ -2316,10 +2314,6 @@ Anything put here will be passed to MY::postamble() if you have one.
 =item test
 
   {TESTS => 't/*.t'}
-
-=item tool_autosplit
-
-  {MAXLEN => 8}
 
 =back
 

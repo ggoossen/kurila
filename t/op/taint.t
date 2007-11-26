@@ -12,7 +12,7 @@ use Config;
 use File::Spec::Functions;
 
 BEGIN { require './test.pl'; }
-plan tests => 269;
+plan tests => 267;
 
 $| = 1;
 
@@ -1165,24 +1165,6 @@ SKIP:
 	};
 	test $@ =~ /Insecure \$ENV/, 'popen neglects %ENV check';
     }
-}
-
-{
-    package AUTOLOAD_TAINT;
-    sub AUTOLOAD {
-        our $AUTOLOAD;
-        return if $AUTOLOAD =~ /DESTROY/;
-        if ($AUTOLOAD =~ /untainted/) {
-            main::ok(!main::tainted($AUTOLOAD), '$AUTOLOAD can be untainted');
-        } else {
-            main::ok(main::tainted($AUTOLOAD), '$AUTOLOAD can be tainted');
-        }
-    }
-
-    package main;
-    my $o = bless [], 'AUTOLOAD_TAINT';
-    $o->?$TAINT;
-    $o->untainted;
 }
 
 {

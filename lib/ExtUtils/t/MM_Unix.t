@@ -117,7 +117,6 @@ foreach ( qw /
   test
   test_via_harness
   test_via_script
-  tool_autosplit
   tool_xsubpp
   tools_other
   top_targets

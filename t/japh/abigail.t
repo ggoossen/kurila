@@ -320,27 +320,6 @@ SWITCHES
 -l
 SKIP: Times::JulianDay not part of the main distribution.
 
-#######  Autoload 1.
-sub _'_{$_'_=~s/$a/$_/}map{$$_=$Z++}Y,a..z,A..X;*{($_::_=sprintf+q=%X==>"$A$Y".
-"$b$r$T$u")=~s~0~O~g;map+_::_,U=>T=>L=>$Z;$_::_}=*_;sub _{print+/.*::(.*)/s};;;
-*{chr($b*$e)}=*_'_;*__=*{chr(1<<$e)};                # Perl 5.6.0 broke this...
-_::_(r(e(k(c(a(H(__(l(r(e(P(__(r(e(h(t(o(n(a(__(t(us(J())))))))))))))))))))))))
-EXPECT: Just__another__Perl__Hacker
-
-#######  Autoload 2.
-$"=$,;*{;qq{@{[(A..Z)[qq[0020191411140003]=~m[..]g]]}}}=*_=sub{print/::(.*)/};
-$\=$/;q<Just another Perl Hacker>->();
-
-#######  Autoload 3.
-$"=$,;*{;qq{@{[(A..Z)[qq[0020191411140003]=~m[..]g]]}}}=*_;
-sub   _   {push         @_ => /::(.*)/s and goto &{ shift}}
-sub shift {print shift; @_              and goto &{+shift}}
-Hack ("Just", "Perl ", " ano", "er\n", "ther "); # YYYYMMDD
-
-#######  Autoload 4.
-$, = " "; sub AUTOLOAD {($AUTOLOAD =~ /::(.*)/) [0];}
-print+Just (), another (), Perl (), Hacker ();
-
 #######  Look ma! No letters!
 $@="\145\143\150\157\040\042\112\165\163\164\040\141\156\157\164".
    "\150\145\162\040\120\145\162\154\040\110\141\143\153\145\162".

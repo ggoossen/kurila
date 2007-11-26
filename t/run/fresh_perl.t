@@ -447,47 +447,6 @@ foo
 bar
 BEGIN failed--compilation aborted at - line 8.
 ########
-package X;
-@ISA='Y';
-sub new {
-    my $class = shift;
-    my $self = { };
-    bless $self, $class;
-    my $init = shift;
-    $self->foo($init);
-    print "new", $init;
-    return $self;
-}
-sub DESTROY {
-    my $self = shift;
-    print "DESTROY", $self->foo;
-}
-package Y;
-sub attribute {
-    my $self = shift;
-    my $var = shift;
-    if (@_ == 0) {
-	return $self->{$var};
-    } elsif (@_ == 1) {
-	$self->{$var} = shift;
-    }
-}
-sub AUTOLOAD {
-    $AUTOLOAD =~ /::([^:]+)$/;
-    my $method = $1;
-    splice @_, 1, 0, $method;
-    goto &attribute;
-}
-package main;
-my $x = X->new(1);
-for (2..3) {
-    my $y = X->new($_);
-    print $y->foo;
-}
-print $x->foo;
-EXPECT
-new1new22DESTROY2new33DESTROY31DESTROY1
-########
 re();
 sub re {
     my $re = join '', eval 'qr/(??{ $obj->method })/';

@@ -15,7 +15,7 @@ BEGIN {
 # use warnings;
 use strict;
 use ExtUtils::MakeMaker;
-use ExtUtils::Constant qw (C_constant autoload);
+use ExtUtils::Constant qw (C_constant);
 use File::Spec;
 use Cwd;
 
@@ -360,6 +360,7 @@ sub write_and_run_extension {
 				     XS_FH => \*XS,
 				     NAME => $package,
 				     NAMES => $items,
+                                     PROXYSUBS => 1,
 				     @$wc_args,
 				     );
 
@@ -426,7 +427,7 @@ use Carp;
 
 require Exporter;
 require DynaLoader;
-use vars qw ($VERSION @ISA @EXPORT_OK $AUTOLOAD);
+use vars qw ($VERSION @ISA @EXPORT_OK);
 
 $VERSION = '0.01';
 @ISA = qw(Exporter DynaLoader);
@@ -438,8 +439,6 @@ EOT
   # Print the names of all our autoloaded constants
   print FH "\t$_\n" foreach (@$export_names);
   print FH ");\n";
-  # Print the AUTOLOAD subroutine ExtUtils::Constant generated for us
-  print FH autoload ($package, $]);
   print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
   close FH or die "close $pm: $!\n";
 

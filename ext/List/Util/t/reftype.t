@@ -53,7 +53,3 @@ package MyTie;
 sub TIEHANDLE { bless {} }
 sub DESTROY {}
 
-sub AUTOLOAD {
-  warn "$AUTOLOAD called";
-  exit 1; # May be in an eval
-}

@@ -1364,54 +1364,9 @@ Finally, some built-ins (e.g. C<exists> or C<grep>) can't be overridden.
 =head2 Autoloading
 X<autoloading> X<AUTOLOAD>
 
-If you call a subroutine that is undefined, you would ordinarily
+If you call a subroutine that is undefined, you 
 get an immediate, fatal error complaining that the subroutine doesn't
-exist.  (Likewise for subroutines being used as methods, when the
-method doesn't exist in any base class of the class's package.)
-However, if an C<AUTOLOAD> subroutine is defined in the package or
-packages used to locate the original subroutine, then that
-C<AUTOLOAD> subroutine is called with the arguments that would have
-been passed to the original subroutine.  The fully qualified name
-of the original subroutine magically appears in the global $AUTOLOAD
-variable of the same package as the C<AUTOLOAD> routine.  The name
-is not passed as an ordinary argument because, er, well, just
-because, that's why.  (As an exception, a method call to a nonexistent
-C<import> or C<unimport> method is just skipped instead.)
-
-Many C<AUTOLOAD> routines load in a definition for the requested
-subroutine using eval(), then execute that subroutine using a special
-form of goto() that erases the stack frame of the C<AUTOLOAD> routine
-without a trace.  (See the source to the standard module documented
-in L<AutoLoader>, for example.)  But an C<AUTOLOAD> routine can
-also just emulate the routine and never define it.   For example,
-let's pretend that a function that wasn't defined should just invoke
-C<system> with those arguments.  All you'd do is:
-
-    sub AUTOLOAD {
-	my $program = $AUTOLOAD;
-	$program =~ s/.*:://;
-	system($program, @_);
-    }
-    date();
-    who('am', 'i');
-    ls('-l');
-
-In fact, if you predeclare functions you want to call that way, you don't
-even need parentheses:
-
-    use subs qw(date who ls);
-    date;
-    who "am", "i";
-    ls '-l';
-
-A more complete example of this is the standard Shell module, which
-can treat undefined subroutine calls as calls to external programs.
-
-Mechanisms are available to help modules writers split their modules
-into autoloadable files.  See the standard AutoLoader module
-described in L<AutoLoader> and in L<AutoSplit>, the standard
-SelfLoader modules in L<SelfLoader>, and the document on adding C
-functions to Perl code in L<perlxs>.
+exist.
 
 =head2 Subroutine Attributes
 X<attribute> X<subroutine, attribute> X<attrs>

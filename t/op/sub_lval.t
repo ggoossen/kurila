@@ -1,7 +1,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests=>68;
+plan tests=>66;
 
 our ($nolv, @array2, %hash2, $blah, $o, $x0, $x1, $xxx,
      $newvar, $nnewvar, $str, $x, @p, @ary);
@@ -370,10 +370,6 @@ $a = \&lv1nn;
 $a->() = 8;
 is($nnewvar, '8');
 
-eval 'sub AUTOLOAD : lvalue { $newvar }';
-foobar() = 12;
-is($newvar, "12");
-
 {
 my %hash; my @array;
 sub alv : lvalue { $array[1] }
@@ -537,13 +533,3 @@ TODO: {
     is($line, "zeroonetwothree");
 }
 
-{
-    package Foo;
-    sub AUTOLOAD :lvalue { no strict 'refs'; *{Symbol::fetch_glob($AUTOLOAD)} };
-    package main;
-    my $foo = bless {},"Foo";
-    my $result;
-    $foo->bar = sub { $result = "bar" };
-    $foo->bar;
-    is ($result, 'bar', "RT #41550");
-}

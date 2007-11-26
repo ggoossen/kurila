@@ -18,9 +18,8 @@ sub OVERLOAD {
       $fb = $arg{$_};
     } else {
       $sub = $arg{$_};
-      if (not ref $sub and $sub !~ /::/) {
-	$ {*{Symbol::fetch_glob($package . "::(" . $_)}} = $sub;
-	$sub = \&nil;
+      if (not ref $sub) {
+          die "Overloading requires subref, got '$sub'";
       }
       #print STDERR "Setting `$ {'package'}::\cO$_' to \\&`$sub'.\n";
       *{Symbol::fetch_glob($package . "::(" . $_)} = \&{ $sub };

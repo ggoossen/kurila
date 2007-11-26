@@ -5,7 +5,6 @@ use vars qw(@ISA @EXPORT $VERSION $MUST_REBOOT %Config);
 $VERSION = '1.44';
 $VERSION = eval $VERSION;
 
-use AutoSplit;
 use Carp ();
 use Config qw(%Config);
 use Cwd qw(cwd);
@@ -1018,31 +1017,8 @@ sub pm_to_blib {
         my($mode,$atime,$mtime) = (stat $from)[2,8,9];
         utime($atime,$mtime+$Is_VMS,$to);
         _chmod(0444 ^|^ ( $mode ^&^ 0111 ? 0111 : 0 ),$to);
-        next unless $from =~ /\.pm$/;
-        _autosplit($to,$autodir);
     }
 }
-
-
-=begin _private
-
-=item _autosplit
-
-From 1.0307 back, AutoSplit will sometimes leave an open filehandle to
-the file being split.  This causes problems on systems with mandatory
-locking (ie. Windows).  So we wrap it and close the filehandle.
-
-=end _private
-
-=cut
-
-sub _autosplit { #XXX OS-SPECIFIC
-    my $retval = autosplit(@_);
-    close *AutoSplit::IN if defined *AutoSplit::IN{IO};
-
-    return $retval;
-}
-
 
 package ExtUtils::Install::Warn;
 

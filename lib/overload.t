@@ -29,9 +29,8 @@ use overload (
 '**'	=>	sub { Oscalar->new(
 		       $_[2]? $_[1]**${$_[0]} : ${$_[0]}-$_[1])},
 
-qw(
-""	stringify
-0+	numify)			# Order of arguments insignificant
+'""'	=> \&stringify,
+'0+'	=> \&numify,			# Order of arguments insignificant
 );
 
 sub new {
@@ -47,7 +46,7 @@ sub numify { 0 + "${$_[0]}" }	# Not needed, additional overhead
 package main;
 
 $| = 1;
-use Test::More tests => 534;
+use Test::More tests => 528;
 
 
 $a = Oscalar->new( "087");
@@ -281,40 +280,12 @@ is("b${a}c", "bxxc");
 $na = eval { ^~^$a };
 like($@, qr/no method found/);
 
-# Check AUTOLOADING:
+eval "package Oscalar; sub numify { return '_!_' . shift() . '_!_' } use overload '0+' => \\&numify";
+is $@, '';
+eval "package Oscalar; sub rshft { return '_!_' . shift() . '_!_' } use overload '>>' => \\&rshft";
+is $@, '';
 
-*Oscalar::AUTOLOAD = 
-  sub { *{Symbol::fetch_glob("Oscalar::$AUTOLOAD")} = sub {"_!_" . shift() . "_!_"} ;
-	goto &{Symbol::fetch_glob("Oscalar::$AUTOLOAD")}};
-
-eval "package Oscalar; sub comple; use overload '^~^' => 'comple'";
-
-$na = eval { ^~^$a };		# Hash was not updated
-like($@, qr/no method found/);
-
-bless \$x, 'Oscalar';
-
-$na = eval { ^~^$a };		# Hash updated
-warn "`$na', $@" if $@;
-ok !$@;
-is($na, '_!_xx_!_');
-
-$na = 0;
-
-$na = eval { ^~^$aI };		# Hash was not updated
-like($@, qr/no method found/);
-
-bless \$x, 'OscalarI';
-
-$na = eval { ^~^$aI };
-print $@;
-
-ok(!$@);
-is($na, '_!_xx_!_');
-
-eval "package Oscalar; sub rshft; use overload '>>' => 'rshft'";
-
-$na = eval { $aI >> 1 };	# Hash was not updated
+$na = eval { $aI >> 1 };       # Hash was not updated
 like($@, qr/no method found/);
 
 bless \$x, 'OscalarI';
@@ -338,22 +309,6 @@ ok(! defined overload::Method($a, '<'));
 
 like (overload::StrVal($aI), qr/^OscalarI=SCALAR\(0x[\da-fA-F]+\)$/);
 is(overload::StrVal(\$aI), "@{[\$aI]}");
-
-# Check overloading by methods (specified deep in the ISA tree).
-{
-  package OscalarII;
-  @ISA = 'OscalarI';
-  sub Oscalar::lshft {"_<<_" . shift() . "_<<_"}
-  eval "package OscalarI; use overload '<<' => 'lshft', '^|^' => 'lshft'";
-}
-
-$aaII = "087";
-$aII = \$aaII;
-bless $aII, 'OscalarII';
-bless \$fake, 'OscalarI';		# update the hash
-is(($aI ^|^ 3), '_<<_xx_<<_');
-# warn $aII << 3;
-is(($aII << 3), '_<<_087_<<_');
 
 {
   BEGIN { $int = 7; overload::constant 'integer' => sub {$int++; shift}; }
@@ -1097,7 +1052,7 @@ like ($@, qr/zap/);
 
 {
     package Numify;
-    use overload (qw(0+ numify fallback 1));
+    use overload ('0+' => \&numify, fallback => 1);
 
     sub new {
 	my $val = $_[1];

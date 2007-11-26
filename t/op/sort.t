@@ -403,7 +403,7 @@ sub ok { main::cmp_ok($_[0],'eq',$_[1],$_[2]);
 
 {
     package Oscalar;
-    use overload (qw("" stringify 0+ numify fallback 1));
+    use overload ('""' => \&stringify, '0+' => \&numify, fallback => 1);
 
     sub new {
 	bless [$_[1], $_[2]], $_[0];

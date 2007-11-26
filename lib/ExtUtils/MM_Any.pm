@@ -1611,34 +1611,6 @@ sub test_via_script {
 }
 
 
-=head3 tool_autosplit
-
-Defines a simple perl call that runs autosplit. May be deprecated by
-pm_to_blib soon.
-
-=cut
-
-sub tool_autosplit {
-    my($self, %attribs) = @_;
-
-    my $maxlen = $attribs{MAXLEN} ? '$$AutoSplit::Maxlen=$attribs{MAXLEN};' 
-                                  : '';
-
-    my $asplit = $self->oneliner(sprintf <<'PERL_CODE', $maxlen);
-use AutoSplit; %s autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)
-PERL_CODE
-
-    return sprintf <<'MAKE_FRAG', $asplit;
-# Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = %s
-
-MAKE_FRAG
-
-}
-
-
-
-
 =head2 File::Spec wrappers
 
 ExtUtils::MM_Any is a subclass of File::Spec.  The methods noted here
