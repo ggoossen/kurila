@@ -1702,7 +1702,7 @@ Perl_magic_scalarpack(pTHX_ HV *hv, MAGIC *mg)
     SV * const tied = SvTIED_obj((SV*)hv, mg);
     HV * const pkg = SvSTASH((SV*)SvRV(tied));
    
-    if (!gv_fetchmethod_autoload(pkg, "SCALAR", FALSE)) {
+    if (!gv_fetchmethod(pkg, "SCALAR")) {
         SV *key;
         if (HvEITER_get(hv))
             /* we are in an iteration so the hash cannot be empty */

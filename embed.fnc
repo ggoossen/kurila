@@ -273,7 +273,6 @@ Ap	|GP*	|gp_ref		|NULLOK GP* gp
 Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv
 Ap	|GV*	|gv_IOadd	|NN GV* gv
-ApR	|GV*	|gv_autoload4	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 method
 Ap	|void	|gv_check	|NN const HV* stash
 Ap	|void	|gv_efullname	|NN SV* sv|NN const GV* gv
 Apmb	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
@@ -282,9 +281,7 @@ Ap	|GV*	|gv_fetchfile	|NN const char* name
 Ap	|GV*	|gv_fetchfile_flags|NN const char *const name|const STRLEN len\
 				|const U32 flags
 Apd	|GV*	|gv_fetchmeth	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
-Apd	|GV*	|gv_fetchmeth_autoload	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
-Apdmb	|GV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
-Apd	|GV*	|gv_fetchmethod_autoload|NULLOK HV* stash|NN const char* name|I32 autoload
+Apdb	|GV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
 Ap	|GV*	|gv_fetchpv	|NN const char* name|I32 add|I32 sv_type
 Ap	|void	|gv_fullname4	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix|bool keepmain
 pMox	|GP *	|newGP		|NN GV *const gv

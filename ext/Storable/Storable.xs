@@ -1569,7 +1569,7 @@ static int last_op_in_netorder(pTHX)
 /*
  * pkg_fetchmeth
  *
- * A wrapper on gv_fetchmethod_autoload() which caches results.
+ * A wrapper on gv_fetchmethod() which caches results.
  *
  * Returns the routine reference as an SV*, or null if neither the package
  * nor its ancestors know about the method.
@@ -1590,7 +1590,7 @@ static SV *pkg_fetchmeth(
 	 * in the Perl core.
 	 */
 
-	gv = gv_fetchmethod_autoload(pkg, method, FALSE);
+	gv = gv_fetchmethod(pkg, method);
 	if (gv && isGV(gv)) {
 		sv = newRV((SV*) GvCV(gv));
 		TRACEME(("%s->%s: 0x%"UVxf, hvname, method, PTR2UV(sv)));
@@ -2826,7 +2826,7 @@ static int store_hook(
 	/* We can't use pkg_can here because it only caches one method per
 	 * package */
 	{ 
-	    GV* gv = gv_fetchmethod_autoload(pkg, "STORABLE_attach", FALSE);
+	    GV* gv = gv_fetchmethod(pkg, "STORABLE_attach");
 	    if (gv && isGV(gv)) {
 	        if (count > 1)
 	            CROAK(("Freeze cannot return references if %s class is using STORABLE_attach", classname));
@@ -4119,7 +4119,7 @@ static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname)
 
 	/* Handle attach case; again can't use pkg_can because it only
 	 * caches one method */
-	attach = gv_fetchmethod_autoload(SvSTASH(sv), "STORABLE_attach", FALSE);
+	attach = gv_fetchmethod(SvSTASH(sv), "STORABLE_attach");
 	if (attach && isGV(attach)) {
 	    SV* attached;
 	    SV* attach_hook = newRV((SV*) GvCV(attach));

@@ -10161,7 +10161,7 @@ do_mark_cloneable_stash(pTHX_ SV *sv)
 {
     const HEK * const hvname = HvNAME_HEK((HV*)sv);
     if (hvname) {
-	GV* const cloner = gv_fetchmethod_autoload((HV*)sv, "CLONE_SKIP", 0);
+	GV* const cloner = gv_fetchmethod((HV*)sv, "CLONE_SKIP");
 	SvFLAGS(sv) |= SVphv_CLONEABLE; /* clone objects by default */
 	if (cloner && GvCV(cloner)) {
 	    dSP;
@@ -10901,7 +10901,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     */
     while(av_len(param->stashes) != -1) {
 	HV* const stash = (HV*) av_shift(param->stashes);
-	GV* const cloner = gv_fetchmethod_autoload(stash, "CLONE", 0);
+	GV* const cloner = gv_fetchmethod(stash, "CLONE");
 	if (cloner && GvCV(cloner)) {
 	    dSP;
 	    ENTER;

@@ -430,20 +430,6 @@ Perl_huge(void)
 }
 #endif
 
-/*
-=for apidoc gv_fetchmethod
-
-See L<gv_fetchmethod_autoload>.
-
-=cut
-*/
-
-GV *
-Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
-{
-    return gv_fetchmethod_autoload(stash, name, TRUE);
-}
-
 HE *
 Perl_hv_iternext(pTHX_ HV *hv)
 {

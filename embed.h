@@ -260,15 +260,13 @@
 #define gv_AVadd		Perl_gv_AVadd
 #define gv_HVadd		Perl_gv_HVadd
 #define gv_IOadd		Perl_gv_IOadd
-#define gv_autoload4		Perl_gv_autoload4
 #define gv_check		Perl_gv_check
 #define gv_efullname		Perl_gv_efullname
 #define gv_efullname4		Perl_gv_efullname4
 #define gv_fetchfile		Perl_gv_fetchfile
 #define gv_fetchfile_flags	Perl_gv_fetchfile_flags
 #define gv_fetchmeth		Perl_gv_fetchmeth
-#define gv_fetchmeth_autoload	Perl_gv_fetchmeth_autoload
-#define gv_fetchmethod_autoload	Perl_gv_fetchmethod_autoload
+#define gv_fetchmethod		Perl_gv_fetchmethod
 #define gv_fetchpv		Perl_gv_fetchpv
 #define gv_fullname4		Perl_gv_fullname4
 #define gv_init			Perl_gv_init
@@ -2514,15 +2512,13 @@
 #define gv_AVadd(a)		Perl_gv_AVadd(aTHX_ a)
 #define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
 #define gv_IOadd(a)		Perl_gv_IOadd(aTHX_ a)
-#define gv_autoload4(a,b,c,d)	Perl_gv_autoload4(aTHX_ a,b,c,d)
 #define gv_check(a)		Perl_gv_check(aTHX_ a)
 #define gv_efullname(a,b)	Perl_gv_efullname(aTHX_ a,b)
 #define gv_efullname4(a,b,c,d)	Perl_gv_efullname4(aTHX_ a,b,c,d)
 #define gv_fetchfile(a)		Perl_gv_fetchfile(aTHX_ a)
 #define gv_fetchfile_flags(a,b,c)	Perl_gv_fetchfile_flags(aTHX_ a,b,c)
 #define gv_fetchmeth(a,b,c,d)	Perl_gv_fetchmeth(aTHX_ a,b,c,d)
-#define gv_fetchmeth_autoload(a,b,c,d)	Perl_gv_fetchmeth_autoload(aTHX_ a,b,c,d)
-#define gv_fetchmethod_autoload(a,b,c)	Perl_gv_fetchmethod_autoload(aTHX_ a,b,c)
+#define gv_fetchmethod(a,b)	Perl_gv_fetchmethod(aTHX_ a,b)
 #define gv_fetchpv(a,b,c)	Perl_gv_fetchpv(aTHX_ a,b,c)
 #define gv_fullname4(a,b,c,d)	Perl_gv_fullname4(aTHX_ a,b,c,d)
 #ifdef PERL_CORE

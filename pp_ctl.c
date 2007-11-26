@@ -1688,15 +1688,7 @@ PP(pp_goto)
 	    if (!CvROOT(cv) && !CvXSUB(cv)) {
 		const GV * const gv = CvGV(cv);
 		if (gv) {
-		    GV *autogv;
 		    SV *tmpstr;
-		    /* autoloaded stub? */
-		    if (cv != GvCV(gv) && (cv = GvCV(gv)))
-			goto retry;
-		    autogv = gv_autoload4(GvSTASH(gv), GvNAME(gv),
-					  GvNAMELEN(gv), FALSE);
-		    if (autogv && (cv = GvCV(autogv)))
-			goto retry;
 		    tmpstr = sv_newmortal();
 		    gv_efullname4(tmpstr, gv, NULL, TRUE);
 		    DIE(aTHX_ "Goto undefined subroutine &%"SVf"", SVfARG(tmpstr));

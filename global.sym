@@ -128,7 +128,6 @@ Perl_gp_ref
 Perl_gv_AVadd
 Perl_gv_HVadd
 Perl_gv_IOadd
-Perl_gv_autoload4
 Perl_gv_check
 Perl_gv_efullname
 Perl_gv_efullname3
@@ -136,9 +135,7 @@ Perl_gv_efullname4
 Perl_gv_fetchfile
 Perl_gv_fetchfile_flags
 Perl_gv_fetchmeth
-Perl_gv_fetchmeth_autoload
 Perl_gv_fetchmethod
-Perl_gv_fetchmethod_autoload
 Perl_gv_fetchpv
 Perl_gv_fullname4
 Perl_gv_init
