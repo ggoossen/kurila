@@ -1475,8 +1475,6 @@ lib/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
 lib/DB.pm			Debugger API (draft)
 lib/DB.t			See if DB works
 lib/Devel/InnerPackage.pm	Find inner packages
-lib/Devel/SelfStubber.pm	Generate stubs for SelfLoader.pm
-lib/Devel/SelfStubber.t		See if Devel::SelfStubber works
 lib/diagnostics.pm		Print verbose diagnostics
 lib/diagnostics.t		See if diagnostics.pm works
 lib/Digest/base.pm		Digest extensions
@@ -2152,9 +2150,6 @@ lib/Search/Dict.pm		Perform binary search on dictionaries
 lib/Search/Dict.t		See if Search::Dict works
 lib/SelectSaver.pm		Enforce proper select scoping
 lib/SelectSaver.t		See if SelectSaver works
-lib/SelfLoader-buggy.t		See if SelfLoader works
-lib/SelfLoader.pm		Load functions only on demand
-lib/SelfLoader.t		See if SelfLoader works
 lib/sigtrap.pm			For trapping an abort and giving traceback
 lib/sigtrap.t			See if sigtrap works
 lib/sort.pm			For "use sort"
