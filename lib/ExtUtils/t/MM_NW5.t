@@ -242,19 +242,6 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
           'pm_to_blib' );
 }
 
-# tool_autosplit()
-{
-    my %attribs = ( MAXLEN => 255 );
-    like( $MM->tool_autosplit( %attribs ),
-          qr/^\#\ Usage:\ \$\(AUTOSPLITFILE\)
-             \ FileToSplit\ AutoDirToSplitInto.+
-             AUTOSPLITFILE\ =\ \$\(PERLRUN\)\ .+
-             \$AutoSplit::Maxlen=$attribs{MAXLEN};
-          /xms,
-          'tool_autosplit()' );
-}
-
-
 # xs_o() should look into that
 # top_targets() should look into that
 

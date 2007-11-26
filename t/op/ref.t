@@ -3,7 +3,7 @@
 require './test.pl';
 use strict qw(refs subs);
 
-plan(126);
+plan(125);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -356,11 +356,6 @@ curr_test($test+4);
 is (runperl (switches=>['-l'],
 	     prog=> 'print 1; print qq-*$\*-;print 1;'),
     "1\n*\n*\n1\n");
-
-# bug #21347
-
-runperl(prog => 'sub UNIVERSAL::AUTOLOAD { qr// } a->p' );
-is ($?, 0, 'UNIVERSAL::AUTOLOAD called when freeing qr//');
 
 runperl(prog => 'sub UNIVERSAL::DESTROY { warn } bless \$a, "A"', stderr => 1);
 is ($?, 0, 'warn called inside UNIVERSAL::DESTROY');

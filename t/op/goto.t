@@ -8,7 +8,7 @@ BEGIN {
 
 use warnings;
 use strict;
-plan tests => 58;
+plan tests => 57;
 our $TODO;
 
 our $foo;
@@ -58,7 +58,7 @@ sub bar {
 exit;
 
 FINALE:
-is(curr_test(), 16, 'FINALE');
+is(curr_test(), 15, 'FINALE');
 
 # does goto LABEL handle block contexts correctly?
 # note that this scope-hopping differs from last & next,
@@ -285,16 +285,6 @@ $::LINE = __LINE__ + 1;
   sub start	{ push @_, 1, "foo", {}; goto &show; }
   for (1..3)	{ $i = $_; start(bless([$_]), 'bar'); }
 }
-
-sub auto {
-    goto &loadit;
-}
-
-sub AUTOLOAD { $ok = 1 if "@_" eq "foo" }
-
-$ok = 0;
-auto("foo");
-ok($ok, 'autoload');
 
 {
     my $wherever = 'FINALE';

@@ -167,21 +167,7 @@ in the current class for efficiency.  Changing @ISA or defining new
 subroutines invalidates the cache and causes Perl to do the lookup again.
 
 If neither the current class, its named base classes, nor the UNIVERSAL
-class contains the requested method, these three places are searched
-all over again, this time looking for a method named AUTOLOAD().  If an
-AUTOLOAD is found, this method is called on behalf of the missing method,
-setting the package global $AUTOLOAD to be the fully qualified name of
-the method that was intended to be called.
-X<AUTOLOAD>
-
-If none of that works, Perl finally gives up and complains.
-
-If you want to stop the AUTOLOAD inheritance say simply
-X<AUTOLOAD>
-
-	sub AUTOLOAD;
-
-and the call will die using the name of the sub being called.
+class contains the requested method, Perl finally gives up and complains.
 
 Perl classes do method inheritance only.  Data inheritance is left up
 to the class itself.  By and large, this is not a problem in Perl,

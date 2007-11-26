@@ -47,7 +47,6 @@ $VERSION = eval $VERSION;
 );
 
 BOOT_XS: {
-    # If I inherit DynaLoader then I inherit AutoLoader and I DON'T WANT TO
     require DynaLoader;
 
     # DynaLoader calls dl_load_flags as a static method.

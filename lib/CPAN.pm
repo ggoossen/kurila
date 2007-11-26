@@ -569,7 +569,7 @@ use strict;
 
 package CPAN::Exception::RecursiveDependency;
 use strict;
-use overload '""' => "as_string";
+use overload '""' => \&as_string;
 
 # a module sees its distribution (no version)
 # a distribution sees its prereqs (which are module names) (usually with versions)
@@ -641,7 +641,7 @@ sub as_string {
 
 package CPAN::Exception::yaml_not_installed;
 use strict;
-use overload '""' => "as_string";
+use overload '""' => \&as_string;
 
 sub new {
     my($class,$module,$file,$during) = @_;
@@ -655,7 +655,7 @@ sub as_string {
 
 package CPAN::Exception::yaml_process_error;
 use strict;
-use overload '""' => "as_string";
+use overload '""' => \&as_string;
 
 sub new {
     my($class,$module,$file,$during,$error) = @_;
@@ -694,7 +694,7 @@ sub as_string {
     }
 }
 
-package CPAN::Prompt; use overload '""' => "as_string";
+package CPAN::Prompt; use overload '""' => \&as_string;
 use vars qw($prompt);
 $prompt = "cpan> ";
 $CPAN::CurrentCommandId ||= 0;
@@ -713,7 +713,7 @@ sub as_string {
     }
 }
 
-package CPAN::URL; use overload '""' => "as_string", fallback => 1;
+package CPAN::URL; use overload '""' => \&as_string, fallback => 1;
 # accessors: TEXT(the url string), FROM(DEF=>defaultlist,USER=>urllist),
 # planned are things like age or quality
 sub new {
@@ -735,7 +735,7 @@ sub text {
 }
 
 package CPAN::Distrostatus;
-use overload '""' => "as_string",
+use overload '""' => \&as_string,
     fallback => 1;
 sub new {
     my($class,$arg) = @_;

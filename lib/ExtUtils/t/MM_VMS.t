@@ -27,7 +27,6 @@ BEGIN {
                    cflags
                    const_cccmd
                    pm_to_blib
-                   tool_autosplit
                    tool_xsubpp
                    tools_other
                    dist

@@ -155,7 +155,7 @@ require Symbol if $] < 5.006;
 
 ### For the OO interface
 use base qw/ IO::Handle IO::Seekable /;
-use overload '""' => "STRINGIFY", fallback => 1;
+use overload '""' => \&STRINGIFY, fallback => 1;
 
 # use 'our' on v5.6.0
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG $KEEP_ALL);
@@ -624,7 +624,8 @@ sub _replace_XX {
   # Don't want to always use substr when not required though.
 
   if ($ignore) {
-    substr($path, 0, - $ignore, (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/$CHARS[ int( rand( $#CHARS ) ) ]/ge);
+      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/$CHARS[ int( rand( $#CHARS ) ) ]/ge;
+      substr($path, 0, - $ignore, $x);
   } else {
     $path =~ s/X(?=X*\z)/$CHARS[ int( rand( $#CHARS ) ) ]/ge;
   }

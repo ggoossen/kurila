@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-print "1..71\n";
+print "1..57\n";
 
 @A::ISA = 'B';
 @B::ISA = 'C';
@@ -97,59 +97,6 @@ is(A->d, "C::d");
 A->d;
 is(eval { A->x } || "nope", "nope");
 
-eval <<'EOF';
-sub C::e;
-BEGIN { *B::e = \&C::e }	# Shouldn't prevent AUTOLOAD in original pkg
-sub Y::f;
-our $counter = 0;
-
-@X::ISA = 'Y';
-@Y::ISA = 'B';
-
-sub B::AUTOLOAD {
-  my $c = ++$counter;
-  my $method = $B::AUTOLOAD; 
-  my $msg = "B: In $method, $c";
-  eval "sub $method { \$msg }";
-  goto &$method;
-}
-sub C::AUTOLOAD {
-  my $c = ++$counter;
-  my $method = $C::AUTOLOAD; 
-  my $msg = "C: In $method, $c";
-  eval "sub $method { \$msg }";
-  goto &$method;
-}
-EOF
-
-is($@, '', "correct eval");
-
-is(A->e(), "C: In C::e, 1");	# We get a correct autoload
-is(A->e(), "C: In C::e, 1");	# Which sticks
-
-is(A->ee(), "B: In A::ee, 2"); # We get a generic autoload, method in top
-is(A->ee(), "B: In A::ee, 2"); # Which sticks
-
-is(Y->f(), "B: In Y::f, 3");	# We vivify a correct method
-is(Y->f(), "B: In Y::f, 3");	# Which sticks
-
-# This test is not intended to be reasonable. It is here just to let you
-# know that you broke some old construction. Feel free to rewrite the test
-# if your patch breaks it.
-
-our ($AUTOLOAD, $counter);
-
-*B::AUTOLOAD = sub {
-  my $c = ++$counter;
-  my $method = $AUTOLOAD; 
-  no strict 'refs';
-  *{Symbol::fetch_glob($AUTOLOAD)} = sub { "new B: In $method, $c" };
-  goto &{Symbol::fetch_glob($AUTOLOAD)};
-};
-
-is(A->eee(), "new B: In A::eee, 4");	# We get a correct $autoload
-is(A->eee(), "new B: In A::eee, 4");	# Which sticks
-
 {
     # this test added due to bug discovery
     no strict 'refs';
@@ -229,8 +176,6 @@ is( Foo->boogie(), "yes, sir!");
 # This is actually testing parsing of indirect objects and undefined subs
 #   print foo("bar") where foo does not exist is not an indirect object.
 #   print foo "bar"  where foo does not exist is an indirect object.
-eval 'sub AUTOLOAD { "ok ", shift, "\n"; }';
-ok(1);
 
 # Bug ID 20010902.002
 is(
@@ -240,22 +185,6 @@ is(
 	Foo->?$x = 'ok';
     ] || $@, 'ok'
 );
-
-# An autoloaded, inherited DESTROY may be invoked differently than normal
-# methods, and has been known to give rise to spurious warnings
-# eg <200203121600.QAA11064@gizmo.fdgroup.co.uk>
-
-{
-    use warnings;
-    my $w = '';
-    local $SIG{__WARN__} = sub { $w = $_[0] };
-
-    sub AutoDest::Base::AUTOLOAD {}
-    @AutoDest::ISA = qw(AutoDest::Base);
-    { my $x = bless {}, 'AutoDest'; }
-    $w =~ s/\n//g;
-    is($w, '');
-}
 
 # [ID 20020305.025] PACKAGE::SUPER doesn't work anymore
 
@@ -274,20 +203,3 @@ sub Bminor::test {
 }
 Bminor->test('y', 'z');
 is("@X", "Amajor Bminor x y Bminor Bminor y z");
-
-package main;
-for my $meth (['Bar', 'Foo::Bar'],
-	      ['SUPER::Bar', 'main::SUPER::Bar'],
-	      ['Xyz::SUPER::Bar', 'Xyz::SUPER::Bar'])
-{
-    fresh_perl_is(<<EOT,
-package UNIVERSAL; our \$AUTOLOAD; sub AUTOLOAD { my \$c = shift; print "\$c \$AUTOLOAD\\n" }
-sub DESTROY {} # IO object destructor called in MacOS, because of Mac::err
-package Xyz;
-package main; Foo->$meth->[0]();
-EOT
-	"Foo $meth->[1]",
-	{ switches => [ '-w' ] },
-	"check if UNIVERSAL::AUTOLOAD works",
-    );
-}
