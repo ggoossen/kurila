@@ -119,10 +119,10 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(collate_xfrm setlocale LC_COLLATE);
 our @EXPORT_OK = qw();
 
-use overload qw(
-fallback	1
-cmp		collate_cmp
-);
+use overload (
+              'fallback'	=> 1,
+              'cmp'		=> \&collate_cmp,
+             );
 
 our($LOCALE, $C);
 
