@@ -1814,8 +1814,9 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
 	    uv = grok_hex(s, &len, &flags, NULL);
 	    s += len;
-	    Perl_warner(aTHX_ packWARN(WARN_UTF8),
-			"\\xXX are assumed bytes");
+	    if ( ! UNI_IS_INVARIANT(uv) )
+		Perl_warner(aTHX_ packWARN(WARN_UTF8),
+			    "\\xXX are assumed bytes");
 	    *d = (char)uv;
 	    *l = 1;
 	    return s;
