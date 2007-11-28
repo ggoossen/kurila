@@ -179,7 +179,7 @@ my $testpkgs = {
 
     POSIX => { dflt => 'constant',			# all but 252/589
 	       skip => [qw/ _POSIX_JOB_CONTROL /],	# platform varying
-	       perl => [qw/ import croak AUTOLOAD load_imports
+	       perl => [qw/ import croak load_imports
                             usage redef unimpl assert tolower toupper closedir
                             opendir readdir rewinddir errno creat fcntl getgrgid
                             getgrnam atan2 cos exp fabs log pow sin sqrt getpwnam
@@ -197,6 +197,9 @@ my $testpkgs = {
                             chown execl execle execlp execv execve execvp fork getegid geteuid
                             getgid getgroups getlogin getpgrp getpid getppid getuid isatty link
                             rmdir setbuf setvbuf sleep unlink utime
+
+                            S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
+                            WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG
                             /],
 
 	       XS => [qw/ write wctomb wcstombs uname tzset tzname
