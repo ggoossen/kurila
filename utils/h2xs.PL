@@ -73,11 +73,6 @@ Perl module. See the B<-X> option.
 
 =over 5
 
-=item B<-A>, B<--omit-autoload>
-
-Omit all autoload facilities.  This is the same as B<-c> but also
-removes the S<C<use AutoLoader>> statement from the .pm file.
-
 =item B<-B>, B<--beta-version>
 
 Use an alpha/beta style version number.  Causes version number to
@@ -249,11 +244,6 @@ Do not use C<Exporter> and/or export any symbol.
 
 Do not use C<Devel::PPPort>: no portability to older version.
 
-=item B<--skip-autoloader>
-
-Do not use the module C<AutoLoader>; but keep the constant() function
-and C<sub AUTOLOAD> for constants.
-
 =item B<--skip-strict>
 
 Do not use the pragma C<strict>.
@@ -300,7 +290,7 @@ also the section on L<LIMITATIONS of B<-x>>.
     # Extension is ONC::RPC.  Still finds <rpcsvc/rusers.h>
     h2xs -n ONC::RPC rpcsvc/rusers
 
-    # Without constant() or AUTOLOAD
+    # Without constant headers
     h2xs -c rpcsvc/rusers
 
     # Creates templates for an extension named RPC
@@ -426,7 +416,7 @@ Larry Wall and others
 
 =head1 SEE ALSO
 
-L<perl>, L<perlxstut>, L<ExtUtils::MakeMaker>, and L<AutoLoader>.
+L<perl>, L<perlxstut>, L<ExtUtils::MakeMaker>
 
 =head1 DIAGNOSTICS
 
@@ -508,7 +498,7 @@ use Config;
 use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::columns = 80;
-use ExtUtils::Constant qw (WriteConstants WriteMakefileSnippet autoload);
+use ExtUtils::Constant qw (WriteConstants WriteMakefileSnippet);
 use File::Compare;
 use File::Path;
 
@@ -518,7 +508,6 @@ sub usage {
 h2xs [OPTIONS ... ] [headerfile [extra_libraries]]
 version: $H2XS_VERSION
 OPTIONS:
-    -A, --omit-autoload   Omit all autoloading facilities (implies -c).
     -B, --beta-version    Use beta \$VERSION of 0.00_01 (ignored if -v).
     -C, --omit-changes    Omit creating the Changes file, add HISTORY heading
                           to stub POD.
@@ -555,7 +544,6 @@ OPTIONS:
         --use-old-tests   Use the module Test rather than Test::More.
         --skip-exporter   Do not export symbols.
         --skip-ppport     Do not use portability layer.
-        --skip-autoloader Do not use the module C<AutoLoader>.
         --skip-strict     Do not use the pragma C<strict>.
         --skip-warnings   Do not use the pragma C<warnings>.
     -v, --version         Specify a version number for this extension.
@@ -598,7 +586,6 @@ my ($opt_A,
     $old_test,
     $skip_exporter,
     $skip_ppport,
-    $skip_autoloader,
     $skip_strict,
     $skip_warnings,
     $use_xsloader
@@ -608,7 +595,6 @@ Getopt::Long::Configure('bundling');
 Getopt::Long::Configure('pass_through');
 
 my %options = (
-                'omit-autoload|A'    => \$opt_A,
                 'beta-version|B'     => \$opt_B,
                 'omit-changes|C'     => \$opt_C,
                 'cpp-flags|F=s'      => \$opt_F,
@@ -637,7 +623,6 @@ my %options = (
                 'use-old-tests'      => \$old_test,
                 'skip-exporter'      => \$skip_exporter,
                 'skip-ppport'        => \$skip_ppport,
-                'skip-autoloader'    => \$skip_autoloader,
                 'skip-warnings'      => \$skip_warnings,
                 'skip-strict'        => \$skip_strict,
                 'use-xsloader'       => \$use_xsloader,
@@ -701,9 +686,6 @@ EOF
         $opt_B = $beta_version;
     }
 }
-
-# -A implies -c.
-$skip_autoloader = $opt_c = 1 if $opt_A;
 
 # -X implies -c and -f
 $opt_c = $opt_f = 1 if $opt_X;
@@ -1096,14 +1078,6 @@ END
 
 print PM "use warnings;\n" unless $skip_warnings or $compat_version < 5.006;
 
-unless( $opt_X || $opt_c || $opt_A ){
-	# we'll have an AUTOLOAD(), and it will have $AUTOLOAD and
-	# will want Carp.
-	print PM <<'END';
-use Carp;
-END
-}
-
 print PM <<'END' unless $skip_exporter;
 
 require Exporter;
@@ -1114,24 +1088,6 @@ print PM <<"END" if $use_Dyna;  # use DynaLoader, unless XS was disabled
 require DynaLoader;
 END
 
-
-# Are we using AutoLoader or not?
-unless ($skip_autoloader) { # no autoloader whatsoever.
-	unless ($opt_c) { # we're doing the AUTOLOAD
-		print PM "use AutoLoader;\n";
-	}
-	else {
-		print PM "use AutoLoader qw(AUTOLOAD);\n"
-	}
-}
-
-if ( $compat_version < 5.006 ) {
-    my $vars = '$VERSION @ISA';
-    $vars .= ' @EXPORT @EXPORT_OK %EXPORT_TAGS' unless $skip_exporter;
-    $vars .= ' $AUTOLOAD' unless $opt_X || $opt_c || $opt_A;
-    $vars .= ' $XS_VERSION' if $opt_B && !$opt_X;
-    print PM "use vars qw($vars);";
-}
 
 # Determine @ISA.
 my @modISA;
@@ -1179,8 +1135,6 @@ if (@vdecls) {
     printf PM "our(@{[ join ', ', map '$'.$_, @vdecls ]});\n\n";
 }
 
-
-print PM autoload ($module, $compat_version) unless $opt_c or $opt_X;
 
 if( ! $opt_X ){ # print bootstrap, unless XS is disabled
   if ($use_Dyna) {
@@ -1466,6 +1420,7 @@ if( ! $opt_c ) {
                    DEFAULT_TYPE => $opt_t,
                    NAME =>         $module,
                    NAMES =>        \@const_names,
+                   PROXYSUBS =>    1,
                  );
   print XS "#include \"$constscfname\"\n";
 }
