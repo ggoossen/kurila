@@ -6,7 +6,6 @@ use strict;
 package Text::Balanced;
 
 use Exporter;
-use SelfLoader;
 use vars qw { $VERSION @ISA %EXPORT_TAGS };
 
 use version; $VERSION = qv('2.0.0');
