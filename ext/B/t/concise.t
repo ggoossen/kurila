@@ -19,7 +19,7 @@ BEGIN {
 
 use strict;
 
-plan tests => 156;
+plan tests => 154;
 
 require_ok("B::Concise");
 
@@ -369,30 +369,6 @@ SKIP: {
     }
 }
 
-
-# test proper NULLING of pointer, derefd by CvSTART, when a coderef is
-# undefd.  W/o this, the pointer can dangle into freed and reused
-# optree mem, which no longer points to opcodes.
-
-# Using B::Concise to render Config::AUTOLOAD's optree at BEGIN-time
-# triggers this obscure bug, cuz AUTOLOAD has a bootstrap version,
-# which is used at load-time then undeffed.  It is normally
-# re-vivified later, but not in time for this (BEGIN/CHECK)-time
-# rendering.
-
-$out = runperl ( switches => ["-MO=Concise,Config::AUTOLOAD"],
-		 prog => 'use Config; BEGIN { $Config{awk} }',
-		 stderr => 1 );
-
-like($out, qr/Config::AUTOLOAD exists in stash, but has no START/,
-    "coderef properly undefined");
-
-$out = runperl ( switches => ["-MO=Concise,Config::AUTOLOAD"],
-		 prog => 'use Config; CHECK { $Config{awk} }',
-		 stderr => 1 );
-
-like($out, qr/Config::AUTOLOAD exists in stash, but has no START/,
-    "coderef properly undefined");
 
 # test -stash and -src rendering
 # todo: stderr=1 puts '-e syntax OK' into $out,
