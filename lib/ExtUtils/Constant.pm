@@ -312,6 +312,7 @@ ExtUtils::Constant::WriteConstants(
                                    NAME         => '$args{NAME}',
                                    NAMES        => \\\@names,
                                    DEFAULT_TYPE => '$args{DEFAULT_TYPE}',
+                                   PROXYSUBS    => 1,
 EOT
   foreach (qw (C_FILE XS_FILE)) {
     next unless exists $args{$_};
