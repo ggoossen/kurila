@@ -6789,7 +6789,7 @@ tryagain:
                            ender = grok_hex(p, &len, &flags, NULL);
                            p += len;
                            if (*p != ']')
-                               yyerror("Missing right square bracket on \\x[]");
+                               vFAIL("Missing right square bracket on \\x[]");
                            p += 1;
                        }
                        else if (*p == '{') {
