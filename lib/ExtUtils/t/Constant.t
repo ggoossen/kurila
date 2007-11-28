@@ -646,7 +646,7 @@ $test++;
 my $notdef = eval { NOTDEF; };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@ !~ /Your vendor has not defined ExtTest macro NOTDEF/) {
+} elsif ($@ !~ /Undefined subroutine .*NOTDEF called/) {
   print "not ok $test # \$@='$@'\n";
 } else {
   print "ok $test\n";
@@ -657,7 +657,7 @@ $test++;
 my $notthere = eval { &ExtTest::NOTTHERE; };
 if (defined $notthere) {
   print "not ok $test # \$notthere='$notthere'\n";
-} elsif ($@ !~ /NOTTHERE is not a valid ExtTest macro/) {
+} elsif ($@ !~ /Undefined subroutine .*NOTTHERE called/) {
   chomp $@;
   print "not ok $test # \$@='$@'\n";
 } else {
@@ -696,7 +696,7 @@ $test++;
 $notdef = eval { &ExtTest::So };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@ !~ /^So is not a valid ExtTest macro/) {
+} elsif ($@ !~ /^Undefined subroutine .*So called/) {
   print "not ok $test # \$@='$@'\n";
 } else {
   print "ok $test\n";
@@ -707,7 +707,7 @@ $test++;
 $notdef = eval { &ExtTest::EW };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@ !~ /^EW is not a valid ExtTest macro/) {
+} elsif ($@ !~ /^Undefined subroutine .*EW called/) {
   print "not ok $test # \$@='$@'\n";
 } else {
   print "ok $test\n";
