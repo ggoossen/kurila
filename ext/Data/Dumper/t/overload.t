@@ -1,27 +1,12 @@
 #!./perl -w
 
 use strict;
-our %Config;
-
-BEGIN {
-    if ($ENV{PERL_CORE}){
-        chdir 't' if -d 't';
-        @INC = '../lib';
-        require Config; Config->import;
-        no warnings 'once';
-        if ($Config{'extensions'} !~ /\bData\/Dumper\b/) {
-            print "1..0 # Skip: Data::Dumper was not built\n";
-            exit 0;
-        }
-    }
-}
-
 use Data::Dumper;
 
 print "1..1\n";
 
 package Foo;
-use overload '""' => 'as_string';
+use overload '""' => \&as_string;
 
 sub new { bless { foo => "bar" }, shift }
 sub as_string { "%%%%" }
