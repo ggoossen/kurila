@@ -46,8 +46,8 @@ my %nc = (
     smtp_hosts      => [ \$InternetConfig{ kICSMTPHost() } ],
     ftp_testhost    => \$InternetConfig{ kICFTPHost() } ? \$InternetConfig{ kICFTPHost()} : undef,
     ph_hosts        => [ \$InternetConfig{ kICPhHost() }   ],
-    ftp_ext_passive => \$InternetConfig{"646F676F\xA5UsePassiveMode"} || 0,
-    ftp_int_passive => \$InternetConfig{"646F676F\xA5UsePassiveMode"} || 0,
+    ftp_ext_passive => \$InternetConfig{"646F676F\x[A5]UsePassiveMode"} || 0,
+    ftp_int_passive => \$InternetConfig{"646F676F\x[A5]UsePassiveMode"} || 0,
     socks_hosts     => 
     	\$InternetConfig{ kICUseSocks() }    ? [ \$InternetConfig{ kICSocksHost() }    ] : [],
     ftp_firewall    => 
