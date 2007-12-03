@@ -1801,8 +1801,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 
 	    ++s;
 	    if (!e) {
-		yyerror("Missing right brace on \\x{}");
-		return s;
+		Perl_croak("Missing right brace on \\x{}");
 	    }
 	    len = e - s;
 	    uv = grok_hex(s, &len, &flags, NULL);
@@ -1852,8 +1851,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    const char *str;
 	    
 	    if (!e || (e >= send)) {
-		yyerror("Missing right brace on \\N{}");
-		return s;
+		Perl_croak("Missing right brace on \\N{}");
 	    }
 	    if (e > s + 2 && s[1] == 'U' && s[2] == '+') {
 		/* \N{U+...} */
@@ -1873,7 +1871,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 				res, NULL, s - 2, e - s + 3 );
 	    str = SvPV_const(res,len);
 	    if (len > (STRLEN)(e - s + 4)) { /* I _guess_ 4 is \N{} --jhi */
-		yyerror("panic: \\N{...} replacement too long");
+		Perl_croak("panic: \\N{...} replacement too long");
 	    }
 	    Copy(str, d, len, char);
 	    *l = len;
@@ -1881,7 +1879,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    s = e + 1;
 	}
 	else
-	    yyerror("Missing braces on \\N{}");
+	    Perl_croak("Missing braces on \\N{}");
 	return s;
 
 	/* \c is a control character */
@@ -1893,7 +1891,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    *l = 1;
 	}
 	else {
-	    yyerror("Missing control char name in \\c");
+	    Perl_croak("Missing control char name in \\c");
 	}
 	return s;
 
