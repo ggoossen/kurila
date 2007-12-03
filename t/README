@@ -29,3 +29,28 @@ t/base/ directory fail.
 Tests in the t/comp/, t/cmd/, t/run/, t/io/, t/op/ and t/uni/ directories
 should also be runnable by miniperl and not require Config.pm, but
 failures to comply will not cause TEST to abort like for t/base/.
+
+
+test directories:
+- base: base test, they don't use test.pl or any other module and
+  runnable by miniperl like they are now.
+- cmd: (commands?) compound statements, ???
+- comp: compiler: op.c, toke.c and perly.y
+- io: io tests, doio.c and perlio.c
+- lib: testing libs (things in "lib") and testing libraries.
+- op: opcodes, test the execution of opcodes, testing the code in pp*.c
+- mro: method resolution.
+- uni: unicode.
+
+
+I would like to add:
+- lex: lexer tests, testing of "toke.c" and "perly.*"
+        current tests: t/op/chars.t, t/op/ver.t
+- sv: testing of SVs. sv.c, av.c, sv.c, hv.c, mg.c taint.c and gv.c
+        current tests: t/op/annonsubs.t t/op/array.t t/op/hash.t t/op/gv.t
+- regexp: regexp tests.
+        current test: t/op/reg*.t
+- arch: Architecture dependent features.
+        current test: t/op/64bitint.t
+
+
