@@ -45,8 +45,6 @@ print OUT <<'!NO!SUBS!';
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-require 5.004;
-
 use Getopt::Long qw(GetOptions);
 use Pod::Man ();
 use Pod::Usage qw(pod2usage);

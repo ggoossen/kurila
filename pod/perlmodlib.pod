@@ -209,14 +209,6 @@ Module for manipulations of tar archives
 
 A subclass for in-memory extracted file from Archive::Tar
 
-=item AutoLoader
-
-Load subroutines only on demand
-
-=item AutoSplit
-
-Split a package for autoloading
-
 =item B
 
 The Perl Compiler
@@ -236,10 +228,6 @@ Walk Perl syntax tree, printing debug info about ops
 =item B::Deparse
 
 Perl compiler backend to produce perl code
-
-=item B::Lint
-
-Perl lint
 
 =item B::Showlex
 
@@ -341,10 +329,6 @@ Find all the inner packages of a package
 
 A data debugging tool for the XS programmer
 
-=item Devel::SelfStubber
-
-Generate stubs for a SelfLoading module
-
 =item Digest
 
 Modules that calculate message digests
@@ -404,10 +388,6 @@ Internally used by Encode
 =item Encode::EBCDIC
 
 EBCDIC Encodings
-
-=item Encode::Encoder
-
-Object Oriented Encoder
 
 =item Encode::Encoding
 
@@ -1101,10 +1081,6 @@ Automatically give your module the ability to have plugins
 
 Automatically give your module the ability to have plugins
 
-=item NEXT
-
-Provide a pseudo-class NEXT (et al) that allows method redispatch
-
 =item Net::Cmd
 
 Network Command class (as used by FTP, SMTP etc)
@@ -1404,14 +1380,6 @@ A selection of general-utility scalar subroutines
 =item Search::Dict
 
 Search for key in dictionary file
-
-=item SelfLoader
-
-Load functions only on demand
-
-=item Shell
-
-Run shell commands transparently within perl
 
 =item Socket
 
