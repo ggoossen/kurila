@@ -1,0 +1,96 @@
+=head1 NAME
+
+kurila16delta - what is new for Perl Kurila 1.6
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.5 and Perl Kurila 1.6
+
+=head1 Highlights In Perl Kurila 1.6
+
+=over 4
+
+=item *
+
+An error is raised if an undefined subroutine is called (Any AUTOLOAD subroutine is ignored).
+
+=item *
+
+v-syntax create 'version' objects.
+
+=item *
+
+v-syntax must be used to do version checks
+
+=item *
+
+If a globs is attempted to be stringied or numified an error is given.
+
+=back
+
+
+
+=head1 Core Enhancements
+
+=head2 An error is raised if an undefined subroutine is called.
+
+If you call a undefined subroutine and it isn't defined you get an error.
+B<No> attempt to use AUTOLOAD is made. The same applies of course to method
+calls: if the method isn't found an error is raised.
+
+=head2 v-strings create 'version' objects.
+
+Use of v-string create version objects, i.e. C<v1.2.3> would be similar 
+to C<version->new("v1.2.3")>. Use of numbers with multiple decimal dots (like
+C<1.2.3>, thus without a 'v'), will give a compile error. There is no VSTRING type.
+
+=head2 v-syntax must be used to do version checks
+
+The C<VERSION> in C< use Module VERSION LIST > and C< use Module VERSION > should be v-syntax,
+i.e. a 'v' followed by a digit, anything else will not be seen as a version.
+
+=head2 Globs throw an error when stringified or numified.
+
+There is a new function C<Symbol::glob_name($glob)> which returns the name
+of the glob. Symbol::glob_name returns the name fully qualified, but without a leading '*'.
+For example: C< Symbol::glob_name(*STDERR) eq "main::STDERR" >
+
+
+
+=head1 Modules and Pragmas
+
+=head2 Removal of the modules AutoLoader, AutoSplit, SelfLoader, Encode::Encoder, FileCache, Object::Accessor, NEXT, Shell
+
+Most of these modules don't work without AUTOLOAD, but there should be no reason to use them.
+
+
+=head2 Adjustment for removal of AUTOLOAD
+
+Many modules have small adjust, because of the removal of AUTOLOAD. Including ExtUtils::Constant
+of which ExtUtils::Constants::WriteConstants should be used with C<PROXYSUBS => 1>.
+
+
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
