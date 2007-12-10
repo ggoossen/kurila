@@ -55,11 +55,7 @@ sub import {
         if ($fno and $fno != $next) {
             require Carp;
             if ($fno < $fattr->[0]) {
-              if ($] < 5.006001) {
-                warn("Hides field '$f' in base class") if $^W;
-              } else {
                 warnings::warnif("Hides field '$f' in base class") ;
-              }
             } else {
                 Carp::croak("Field name '$f' already in use");
             }
@@ -109,14 +105,7 @@ sub _dump  # sometimes useful for debugging
     }
 }
 
-if ($] < 5.009) {
-  *new = sub {
-    my $class = shift;
-    $class = ref $class if ref $class;
-    return bless [\%{*{Symbol::fetch_glob($class . "::FIELDS")}}], $class;
-  }
-} else {
-  *new = sub {
+sub new {
     my $class = shift;
     $class = ref $class if ref $class;
     require Hash::Util;
@@ -125,7 +114,6 @@ if ($] < 5.009) {
     # The lock_keys() prototype won't work since we require Hash::Util :(
     &Hash::Util::lock_keys(\%$self, _accessible_keys($class));
     return $self;
-  }
 }
 
 sub _accessible_keys {
@@ -137,38 +125,7 @@ sub _accessible_keys {
 }
 
 sub phash {
-    die "Pseudo-hashes have been removed from Perl" if $] >= 5.009;
-    my $h;
-    my $v;
-    if (@_) {
-       if (ref $_[0] eq 'ARRAY') {
-           my $a = shift;
-           @$h{@$a} = 1 .. @$a;
-           if (@_) {
-               $v = shift;
-               unless (! @_ and ref $v eq 'ARRAY') {
-                   require Carp;
-                   Carp::croak ("Expected at most two array refs\n");
-               }
-           }
-       }
-       else {
-           if (@_ % 2) {
-               require Carp;
-               Carp::croak ("Odd number of elements initializing pseudo-hash\n");
-           }
-           my $i = 0;
-           @$h{grep ++$i % 2, @_} = 1 .. @_ / 2;
-           $i = 0;
-           $v = [grep $i++ % 2, @_];
-       }
-    }
-    else {
-       $h = {};
-       $v = [];
-    }
-    [ $h, @$v ];
-
+    die "Pseudo-hashes have been removed from Perl";
 }
 
 1;

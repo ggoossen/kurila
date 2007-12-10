@@ -76,13 +76,8 @@ print "# \$Test::Harness::Switches: $Test::Harness::Switches\n" if $Test::Harnes
 @ARGV = File::Spec->curdir unless @ARGV;
 my @argv_globbed;
 my @tests;
-if ( $] >= 5.006001 ) {
     require File::Glob;
     @argv_globbed = map { File::Glob::bsd_glob($_) } @ARGV;
-}
-else {
-    @argv_globbed = map { glob } @ARGV;
-}
 
 for ( @argv_globbed ) {
     push( @tests, -d $_ ? all_in( { recurse => $recurse, start => $_ } ) : $_ )

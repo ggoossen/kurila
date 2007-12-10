@@ -846,11 +846,7 @@ TEST q(Data::Dumper->new([$b],['b'])->Purity(1)->Dumpxs;)
 #$a = "\x{9c10}";
 EOT
 
-  if($] >= 5.007) {
     TEST q(Data::Dumper->Dump([$a], ['a'])), "\\x{9c10}";
-  } else {
-    SKIP_TEST "Incomplete support for UTF-8 in old perls";
-  }
   TEST q(Data::Dumper->Dumpxs([$a], ['a'])), "XS \\x{9c10}"
 	if $XS;
 }
@@ -1374,13 +1370,8 @@ EOT
   $ping = 5;
   %ping = (chr (0xDECAF) x 4  =>\$ping);
   for $Data::Dumper::Sortkeys (0, 1) {
-    if($] >= 5.007) {
       TEST q(Data::Dumper->Dump([\\*ping, \\%ping], ['*ping', '*pong']));
       TEST q(Data::Dumper->Dumpxs([\\*ping, \\%ping], ['*ping', '*pong'])) if $XS;
-    } else {
-      SKIP_TEST "Incomplete support for UTF-8 in old perls";
-      SKIP_TEST "Incomplete support for UTF-8 in old perls";
-    }
   }
 }
 

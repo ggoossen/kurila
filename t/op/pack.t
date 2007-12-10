@@ -5,10 +5,8 @@ BEGIN {
 }
 
 # This is truth in an if statement, and could be a skip message
-my $no_endianness = $] > 5.009 ? '' :
-  "Endianness pack modifiers not available on this perl";
-my $no_signedness = $] > 5.009 ? '' :
-  "Signed/unsigned pack modifiers not available on this perl";
+my $no_endianness = '';
+my $no_signedness = '';
 
 plan tests => 14650;
 

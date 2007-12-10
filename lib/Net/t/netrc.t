@@ -47,7 +47,7 @@ ok( exists $INC{'Net/Netrc.pm'}, 'should be able to use Net::Netrc' );
 
 SKIP: {
 	skip('incompatible stat() handling for OS', 4), next SKIP 
-		if ($^O =~ /os2|win32|macos|cygwin/i or $] < 5.005);
+		if ($^O =~ /os2|win32|macos|cygwin/i);
 	
 	my $warn;
 	local $SIG{__WARN__} = sub {

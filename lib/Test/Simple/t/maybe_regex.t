@@ -16,17 +16,11 @@ use Test::More tests => 13;
 use Test::Builder;
 my $Test = Test::Builder->new;
 
-SKIP: {
-    skip "qr// added in 5.005", 3 if $] < 5.005;
-
-    # 5.004 can't even see qr// or it pukes in compile.
-    eval q{
+{
            my $r = $Test->maybe_regex(qr/^FOO$/i);
            ok(defined $r, 'qr// detected');
            ok(('foo' =~ /$r/), 'qr// good match');
            ok(('bar' !~ /$r/), 'qr// bad match');
-          };
-    die $@ if $@;
 }
 
 {

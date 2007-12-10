@@ -21,8 +21,7 @@ use Pod::Escapes ();
 {
   my @out;
   push @out,
-    "\n\nPerl v",
-    defined($^V) ? sprintf('%vd', $^V) : $],
+    "\n\nPerl $^V",
     " under $^O ",
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
       ? ("(Win32::BuildNumber ", &Win32::BuildNumber(), ")") : (),

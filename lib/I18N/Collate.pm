@@ -130,7 +130,7 @@ our $please_use_I18N_Collate_even_if_deprecated = 0;
 sub new {
   my $new = $_[1];
 
-  if (warnings::enabled() && $] >= 5.003_06) {
+  if (warnings::enabled()) {
     unless ($please_use_I18N_Collate_even_if_deprecated) {
       warnings::warn <<___EOD___;
 ***

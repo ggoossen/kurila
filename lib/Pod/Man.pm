@@ -182,13 +182,7 @@ sub init_page {
 
     # We used to try first to get the version number from a local binary, but
     # we shouldn't need that any more.  Get the version from the running Perl.
-    # Work a little magic to handle subversions correctly under both the
-    # pre-5.6 and the post-5.6 version numbering schemes.
-    my @version = ($] =~ /^(\d+)\.(\d{3})(\d{0,3})$/);
-    $version[2] ||= 0;
-    $version[2] *= 10 ** (3 - length $version[2]);
-    for (@version) { $_ += 0 }
-    my $version = join ('.', @version);
+    my $version = $^V;
 
     # Set the defaults for page titles and indentation if the user didn't
     # override anything.

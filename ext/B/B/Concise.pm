@@ -47,8 +47,7 @@ my %style =
     "(?(#seq)?)#noise#arg(?([#targarg])?)"],
    "debug" =>
    ["#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
-    . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n" .
-    ($] > 5.009 ? '' : "\top_seq\t\t#seqnum\n")
+    . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
     . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
     . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
     . "(?(\top_sv\t\t#svaddr\n)?)",
@@ -491,15 +490,9 @@ sub walk_exec {
 		push @$targ, $ar;
 		push @todo, [$op->pmreplstart, $ar];
 	    } elsif ($name =~ /^enter(loop|iter)$/) {
-		if ($] > 5.009) {
-		    $labels{${$op->nextop}} = "NEXT";
-		    $labels{${$op->lastop}} = "LAST";
-		    $labels{${$op->redoop}} = "REDO";
-		} else {
-		    $labels{$op->nextop->seq} = "NEXT";
-		    $labels{$op->lastop->seq} = "LAST";
-		    $labels{$op->redoop->seq} = "REDO";		
-		}
+                $labels{${$op->nextop}} = "NEXT";
+                $labels{${$op->lastop}} = "LAST";
+                $labels{${$op->redoop}} = "REDO";
 	    }
 	}
     }
@@ -587,7 +580,7 @@ $priv{$_}{128} = "LVINTRO"
        "padav", "padhv", "enteriter");
 $priv{$_}{64} = "REFC" for ("leave", "leavesub", "leavesublv", "leavewrite");
 $priv{"aassign"}{64} = "COMMON";
-$priv{"aassign"}{32} = $] < 5.009 ? "PHASH" : "STATE";
+$priv{"aassign"}{32} = "STATE";
 $priv{"sassign"}{32} = "STATE";
 $priv{"sassign"}{64} = "BKWARD";
 $priv{$_}{64} = "RTIME" for ("match", "subst", "substcont", "qr");
@@ -630,7 +623,7 @@ $priv{"exit"}{128} = "VMS";
 $priv{$_}{2} = "FTACCESS"
   for ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec");
 $priv{"entereval"}{2} = "HAS_HH";
-if ($] >= 5.009) {
+{
   # Stacked filetests are post 5.8.x
   $priv{$_}{4} = "FTSTACKED"
     for ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
@@ -763,9 +756,6 @@ sub concise_op {
 	if (defined $padname and class($padname) ne "SPECIAL") {
 	    $h{targarg}  = $padname->PVX;
 	    if ($padname->FLAGS ^&^ SVf_FAKE) {
-		if ($] < 5.009) {
-		    $h{targarglife} = "$h{targarg}:FAKE";
-		} else {
 		    # These changes relate to the jumbo closure fix.
 		    # See changes 19939 and 20005
 		    my $fake = '';
@@ -776,7 +766,6 @@ sub concise_op {
 		    $fake .= ':' . $padname->PARENT_PAD_INDEX
 			if $curcv->CvFLAGS ^&^ CVf_ANON;
 		    $h{targarglife} = "$h{targarg}:FAKE:$fake";
-		}
 	    }
 	    else {
 		my $intro = $padname->COP_SEQ_RANGE_LOW - $cop_seq_base;
@@ -858,13 +847,8 @@ sub concise_op {
     }
     $h{seq} = $h{hyphseq} = seq($op);
     $h{seq} = "" if $h{seq} eq "-";
-    if ($] > 5.009) {
-	$h{opt} = $op->opt;
-	$h{label} = $labels{$$op};
-    } else {
-	$h{seqnum} = $op->seq;
-	$h{label} = $labels{$op->seq};
-    }
+    $h{opt} = $op->opt;
+    $h{label} = $labels{$$op};
     $h{next} = $op->next;
     $h{next} = (class($h{next}) eq "NULL") ? "(end)" : seq($h{next});
     $h{nextaddr} = sprintf("%#x", $ {$op->next});

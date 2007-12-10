@@ -474,7 +474,7 @@ if ($have_nanosleep) {
 # Find the loop size N (a for() loop 0..N-1)
 # that will take more than T seconds.
 
-if ($have_ualarm && $] >= 5.008001) {
+if ($have_ualarm) {
     # http://groups.google.com/group/perl.perl5.porters/browse_thread/thread/adaffaaf939b042e/20dafc298df737f0%2320dafc298df737f0?sa=X&oi=groupsr&start=0&num=3
     # Perl changes [18765] and [18770], perl bug [perl #20920]
 

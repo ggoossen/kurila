@@ -1115,7 +1115,7 @@ sub find_perl {
 
     unless ($perl) {
         my ($component,$perl_name);
-      DIST_PERLNAME: foreach $perl_name ($^X, 'perl', 'perl5', "perl$]") {
+      DIST_PERLNAME: foreach $perl_name ($^X, 'perl', 'perl5', "perl$^V") {
           PATH_COMPONENT: foreach $component (File::Spec->path(),
                                                 $Config::Config{'binexp'}) {
                 next unless defined($component) && $component;
@@ -6303,7 +6303,7 @@ sub satisfy_configure_requires {
     if ($prereq[0][0] eq "perl") {
         my $need = "requires perl '$prereq[0][1]'";
         my $id = $self->pretty_id;
-        $CPAN::Frontend->mywarn("$id $need; you have only $]; giving up\n");
+        $CPAN::Frontend->mywarn("$id $need; you have only $^V; giving up\n");
         $self->{make} = CPAN::Distrostatus->new("NO $need");
         $self->store_persistent_state;
         return $self->goodbye("[prereq] -- NOT OK");
@@ -7400,7 +7400,6 @@ is part of the perl-%s distribution. To install that, you need to run
 # This needs a handler that can be turned on or off:
 #        $switch = "-MExtUtils::MakeMaker ".
 #            "-Mops=:default,:filesys_read,:filesys_open,require,chdir"
-#            if $] > 5.00310;
         my $makepl_arg = $self->make_x_arg("pl");
         $ENV{PERL5_CPAN_IS_EXECUTING} = File::Spec->catfile($self->{build_dir},
                                                             "Makefile.PL");
@@ -7525,7 +7524,7 @@ is part of the perl-%s distribution. To install that, you need to run
         if ($prereq[0][0] eq "perl") {
             my $need = "requires perl '$prereq[0][1]'";
             my $id = $self->pretty_id;
-            $CPAN::Frontend->mywarn("$id $need; you have only $]; giving up\n");
+            $CPAN::Frontend->mywarn("$id $need; you have only $^V; giving up\n");
             $self->{make} = CPAN::Distrostatus->new("NO $need");
             $self->store_persistent_state;
             return $self->goodbye("[prereq] -- NOT OK");
@@ -8081,7 +8080,7 @@ sub unsat_prereq {
   NEED: while (my($need_module, $need_version) = each %merged) {
         my($available_version,$available_file,$nmo);
         if ($need_module eq "perl") {
-            $available_version = $];
+            $available_version = $^V;
             $available_file = $^X;
         } else {
             $nmo = $CPAN::META->instance("CPAN::Module",$need_module);

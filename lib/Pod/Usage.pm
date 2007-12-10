@@ -431,14 +431,8 @@ use File::Spec;
 use vars qw(@ISA @EXPORT);
 @EXPORT = qw(&pod2usage);
 BEGIN {
-    if ( $] >= 5.005_58 ) {
        require Pod::Text;
        @ISA = qw( Pod::Text );
-    }
-    else {
-       require Pod::PlainText;
-       @ISA = qw( Pod::PlainText );
-    }
 }
 
 

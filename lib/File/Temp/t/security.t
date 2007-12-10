@@ -26,16 +26,10 @@ my $skipplat = ( (
 		  $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'os2' || $^O eq 'dos' || $^O eq 'mpeix' || $^O eq 'MacOS'
 		  ) ? 1 : 0 );
 
-# Can not run high security tests in perls before 5.6.0
-my $skipperl  = ($] < 5.006 ? 1 : 0 );
-
 # Determine whether we need to skip things and why
 my $skip = 0;
 if ($skipplat) {
   $skip = "Skip Not supported on this platform";
-} elsif ($skipperl) {
-  $skip = "Skip Perl version must be v5.6.0 for these tests";
-
 }
 
 print "# We will be skipping some tests : $skip\n" if $skip;

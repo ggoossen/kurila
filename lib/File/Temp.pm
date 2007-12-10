@@ -150,9 +150,6 @@ require VMS::Stdio if $^O eq 'VMS';
 # switch the calls to croak from _gettemp() to use die.
 require Carp::Heavy;
 
-# Need the Symbol package if we are running older perl
-require Symbol if $] < 5.006;
-
 ### For the OO interface
 use base qw/ IO::Handle IO::Seekable /;
 use overload '""' => \&STRINGIFY, fallback => 1;
@@ -471,11 +468,6 @@ sub _gettemp {
     # Try to open the file if requested
     if ($options{"open"}) {
       my $fh;
-
-      # If we are running before perl5.6.0 we can not auto-vivify
-      if ($] < 5.006) {
-	$fh = &Symbol::gensym;
-      }
 
       # Try to make sure this will be marked close-on-exec
       # XXX: Win32 doesn't respect this, nor the proper fcntl,
@@ -2115,11 +2107,6 @@ simply examine the return value of C<safe_level>.
       if (($level != STANDARD) && ($level != MEDIUM) && ($level != HIGH)) {
 	carp "safe_level: Specified level ($level) not STANDARD, MEDIUM or HIGH - ignoring\n" if $^W;
       } else {
-	# Dont allow this on perl 5.005 or earlier
-	if ($] < 5.006 && $level != STANDARD) {
-	  # Cant do MEDIUM or HIGH checks
-	  croak "Currently requires perl 5.006 or newer to do the safe checks";
-	}
 	# Check that we are allowed to change level
 	# Silently ignore if we can not.
         $LEVEL = $level if _can_do_level($level);
