@@ -491,7 +491,8 @@ use strict;
 my( $H2XS_VERSION ) = ' $Revision: 1.23 $ ' =~ /\$Revision:\s+([^\s]+)/;
 my $TEMPLATE_VERSION = '0.01';
 my @ARGS = @ARGV;
-my $compat_version = $^V;
+require kurila;
+my $compat_version = $kurila::VERSION;
 
 use Getopt::Long;
 use Config;
@@ -631,30 +632,6 @@ my %options = (
 GetOptions(%options) || usage;
 
 usage if $opt_h;
-
-if( $opt_b ){
-    usage "You cannot use -b and -m at the same time.\n" if ($opt_b && $opt_m);
-    $opt_b =~ /^v?(\d+)\.(\d+)\.(\d+)/ ||
-    usage "You must provide the backwards compatibility version in X.Y.Z form. "
-          .  "(i.e. 5.5.0)\n";
-    my ($maj,$min,$sub) = ($1,$2,$3);
-    if ($maj < 5 || ($maj == 5 && $min < 6)) {
-        $compat_version =
-	    $sub ? sprintf("%d.%03d%02d",$maj,$min,$sub) :
-	           sprintf("%d.%03d",    $maj,$min);
-    } else {
-        $compat_version = sprintf("%d.%03d%03d",$maj,$min,$sub);
-    }
-} else {
-    my ($maj,$min,$sub) = $compat_version =~ /(\d+)\.(\d\d\d)(\d*)/;
-    $sub ||= 0;
-    warn sprintf <<'EOF', $maj,$min,$sub;
-Defaulting to backwards compatibility with perl %d.%d.%d
-If you intend this module to be compatible with earlier perl versions, please
-specify a minimum perl version with the -b option.
-
-EOF
-}
 
 if( $opt_B ){
     $TEMPLATE_VERSION = '0.00_01';
@@ -1069,21 +1046,21 @@ warn "Writing $ext$modpname/$modpmname\n";
 print PM <<"END";
 package $module;
 
-use $compat_version;
+use kurila v$compat_version;
 END
 
 print PM <<"END" unless $skip_strict;
 use strict;
 END
 
-print PM "use warnings;\n" unless $skip_warnings or $compat_version < 5.006;
+print PM "use warnings;\n" unless $skip_warnings;
 
 print PM <<'END' unless $skip_exporter;
 
 require Exporter;
 END
 
-my $use_Dyna = (not $opt_X and $compat_version < 5.006 and not $use_xsloader);
+my $use_Dyna = (not $opt_X and not $use_xsloader);
 print PM <<"END" if $use_Dyna;  # use DynaLoader, unless XS was disabled
 require DynaLoader;
 END
@@ -1094,7 +1071,6 @@ my @modISA;
 push @modISA, 'Exporter'	unless $skip_exporter;
 push @modISA, 'DynaLoader' 	if $use_Dyna;  # no XS
 my $myISA = "our \@ISA = qw(@modISA);";
-$myISA =~ s/^our // if $compat_version < 5.006;
 
 print PM "\n$myISA\n\n";
 
@@ -1128,7 +1104,6 @@ if ($opt_B) {
 }
 $tmp .= "\n";
 
-$tmp =~ s/^our //mg if $compat_version < 5.006;
 print PM $tmp;
 
 if (@vdecls) {
@@ -1850,18 +1825,8 @@ open(PL, ">Makefile.PL") || die "Can't create $ext$modpname/Makefile.PL: $!\n";
 
 my $prereq_pm = '';
 
-if ( $compat_version < 5.00702 and $new_test )
-{
-  $prereq_pm .= q%'Test::More'  =>  0, %;
-}
-
-if ( $compat_version < 5.00600 and !$opt_X and $use_xsloader)
-{
-  $prereq_pm .= q%'XSLoader'  =>  0, %;
-}
-
 print PL <<"END";
-use $compat_version;
+use kurila v$compat_version;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -1972,11 +1937,6 @@ my $rmheadeq = "=" x length($rmhead);
 
 my $rm_prereq;
 
-if ( $compat_version < 5.00702 and $new_test )
-{
-   $rm_prereq = 'Test::More';
-}
-else
 {
    $rm_prereq = 'blah blah blah';
 }
@@ -2042,7 +2002,7 @@ _END_
 
 my $test_mod = 'Test::More';
 
-if ( $old_test or ($compat_version < 5.007 and not $new_test ))
+if ( $old_test )
 {
   my $test_mod = 'Test';
 
