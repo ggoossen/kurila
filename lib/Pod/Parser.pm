@@ -204,12 +204,6 @@ use strict;
 use Pod::InputObjects;
 use Carp;
 use Exporter;
-BEGIN {
-   if ($] < 5.6) {
-      require Symbol;
-      Symbol->import();
-   }
-}
 @ISA = qw(Exporter);
 
 ## These "variables" are used as local "glob aliases" for performance
@@ -1155,9 +1149,6 @@ sub parse_from_file {
     my %opts = (ref $_[0] eq 'HASH') ? %{ shift() } : ();
     my ($infile, $outfile) = @_;
     my ($in_fh,  $out_fh);
-    if ($] < 5.006) {
-      ($in_fh,  $out_fh) = (gensym(), gensym());
-    }
     my ($close_input, $close_output) = (0, 0);
     local *myData = $self;
     local *_;

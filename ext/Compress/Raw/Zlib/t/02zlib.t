@@ -668,7 +668,6 @@ foreach (1 .. 2)
 
 }
 
-if ($] >= 5.005)
 {
     title 'test inflate input parameter via substr';
 
@@ -714,8 +713,6 @@ if ($] >= 5.005)
     Compress::Raw::Zlib::InflateScan->new->resetLastBlockByte(undef);
     ok 1, "resetLastBlockByte(undef) is ok" ;
 }
-
-exit if $] < 5.006 ;
 
 title 'Looping Append test with substr output - substr the end of the string';
 foreach (1 .. 2)

@@ -674,14 +674,6 @@ sub mkCheckRex {
 
     $str =~ s/^\# //mg;	# ease cut-paste testcase authoring
 
-    if ($] < 5.009) {
-	# add 5.8 private flags, which bleadperl (5.9.1) doesn't have/use/render
-	# works because it adds no wildcards, which are butchered below..
-        $str =~ s|(mapstart l?K\*?)|$1/2|mg;
-        $str =~ s|(grepstart l?K\*?)|$1/2|msg;
-        $str =~ s|(mapwhile.*? l?K)|$1/1|msg;
-	$str =~ s|(grepwhile.*? l?K)|$1/1|msg;
-    }
     $tc->{wantstr} = $str;
 
     # make targ args wild

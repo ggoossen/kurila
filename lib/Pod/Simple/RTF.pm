@@ -433,7 +433,7 @@ END
   # None of the following things should need escaping, I dare say!
     $tag, 
     $ISA[0], $ISA[0]->VERSION(),
-    $], scalar(gmtime),
+    $^V, scalar(gmtime),
   ;
 }
 

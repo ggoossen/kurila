@@ -72,7 +72,7 @@ sub configure
   }
   else {
     # Devel::PPPort is in the core since 5.7.3
-    push @moreopts, INSTALLDIRS => ($] >= 5.007003 ? 'perl' : 'site');
+    push @moreopts, INSTALLDIRS => ('perl');
   }
 
   if ($opt{'apicheck'}) {

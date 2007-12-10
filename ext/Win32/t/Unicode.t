@@ -4,10 +4,6 @@ use Cwd qw(cwd);
 use Win32;
 
 BEGIN {
-    unless (defined &Win32::BuildNumber && Win32::BuildNumber() >= 820 or $] >= 5.008009) {
-	print "1..0 # Skip: Needs ActivePerl 820 or Perl 5.8.9 or later\n";
-	exit 0;
-    }
     if ((((Win32::FsType())[1] & 4) == 0) || (Win32::FsType() =~ /^FAT/)) {
 	print "1..0 # Skip: Filesystem doesn't support Unicode\n";
 	exit 0;

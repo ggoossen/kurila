@@ -8,10 +8,8 @@ WriteMakefile(
     'NAME'	=> 'Win32API::File',
     'VERSION_FROM' => 'File.pm', # finds $VERSION
     (  $Config{archname} =~ /-object\b/i  ?  ( 'CAPI' => 'TRUE' )  :  ()  ),
-    (  $] < 5.005  ?  ()  :
-	( 'AUTHOR'		=> 'Tye McQueen <tye@metronet.com>',
-	  'ABSTRACT_FROM'	=> 'File.pm' )
-    ),
+    'AUTHOR'		=> 'Tye McQueen <tye@metronet.com>',
+    'ABSTRACT_FROM'	=> 'File.pm',
     'postamble' => { IMPORT_LIST => [qw(/._/ !/[a-z]/ :MEDIA_TYPE)],
 		     IFDEF => "!/[a-z\\d]/",
 		     CPLUSPLUS => 1,

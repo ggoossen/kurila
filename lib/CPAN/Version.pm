@@ -31,8 +31,7 @@ sub vcmp {
     CPAN->debug("l[$l] r[$r]") if $CPAN::DEBUG;
     my $lvstring = "v0";
     my $rvstring = "v0";
-    if ($] >= 5.006
-     && $l =~ /^v/
+    if ($l =~ /^v/
      && $r =~ /^v/) {
         $lvstring = $self->vstring($l);
         $rvstring = $self->vstring($r);
@@ -95,20 +94,6 @@ sub readable {
     # We'll have to decide about a new rule here then, depending on what
     # will be the prevailing versioning behavior then.
 
-    if ($] < 5.006) { # or whenever v-strings were introduced
-        # we get them wrong anyway, whatever we do, because 5.005 will
-        # have already interpreted 0.2.4 to be "0.24". So even if he
-        # indexer sends us something like "v0.2.4" we compare wrongly.
-
-        # And if they say v1.2, then the old perl takes it as "v12"
-
-        if (defined $CPAN::Frontend) {
-            $CPAN::Frontend->mywarn("Suspicious version string seen [$n]\n");
-        } else {
-            warn("Suspicious version string seen [$n]\n");
-        }
-        return $n;
-    }
     my $better = sprintf "v%vd", $n;
     CPAN->debug("n[$n] better[$better]") if $CPAN::DEBUG;
     return $better;

@@ -12,7 +12,6 @@ use Test;
 
 my @them;
 BEGIN { plan('tests' => 41) };
-BEGIN { print "# Perl version $] under $^O\n" }
 
 use Pod::Escapes qw(:ALL);
 ok 1;

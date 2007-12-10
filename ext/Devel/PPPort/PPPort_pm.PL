@@ -514,7 +514,7 @@ sub _init_data
 {
   $data = do { local $/; <DATA> };
   my $pkg = 'Devel::PPPort';
-  $data =~ s/__PERL_VERSION__/$]/g;
+  $data =~ s/__PERL_VERSION__/$^V/g;
   $data =~ s/__VERSION__/$VERSION/g;
   $data =~ s/__PKG__/$pkg/g;
   $data =~ s/^\|>//gm;

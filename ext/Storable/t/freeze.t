@@ -137,7 +137,6 @@ ok 18, !$@;
 thaw $frozen;			# used to segfault here
 ok 19, 1;
 
-if ($] >= 5.006) {
     eval '
         $a = []; $#$a = 2; $a->[1] = undef;
         $b = thaw freeze $a;
@@ -145,7 +144,3 @@ if ($] >= 5.006) {
         @b = map { exists $b->[$_] } 0 .. $#$b;
         ok 20, "@a" eq "@b";
     ';
-}
-else {
-    print "ok 20 # skipped (no av_exists)\n";
-}

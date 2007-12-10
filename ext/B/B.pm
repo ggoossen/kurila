@@ -23,8 +23,8 @@ our @EXPORT_OK = qw(minus_c ppname save_BEGINs
 		parents comppadlist sv_undef compile_stats timing_info
 		begin_av init_av check_av end_av regex_padav dowarn defstash
 		curstash warnhook diehook inc_gv @optype @specialsv_name
+                unitcheck_av
 		);
-push @EXPORT_OK, qw(unitcheck_av) if $] > 5.009;
 
 sub OPf_KIDS ();
 use strict;
@@ -38,7 +38,7 @@ use strict;
 @B::PVNV::ISA = qw(B::PVIV B::NV);
 @B::PVMG::ISA = 'B::PVNV';
 # Change in the inheritance hierarchy post 5.9.0
-@B::PVLV::ISA = $] > 5.009 ? 'B::GV' : 'B::PVMG';
+@B::PVLV::ISA = 'B::GV';
 @B::BM::ISA = 'B::PVMG';
 @B::AV::ISA = 'B::PVMG';
 @B::GV::ISA = 'B::PVMG';

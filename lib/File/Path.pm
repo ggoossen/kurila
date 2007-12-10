@@ -514,14 +514,6 @@ use Cwd 'getcwd';
 use File::Basename ();
 use File::Spec     ();
 
-BEGIN {
-    if ($] < 5.006) {
-        # can't say 'opendir my $dh, $dirname'
-        # need to initialise $dh
-        eval "use Symbol";
-    }
-}
-
 use Exporter ();
 use vars qw($VERSION @ISA @EXPORT);
 $VERSION = '2.01';
@@ -764,7 +756,6 @@ sub _rmtree {
             }
 
             my $d;
-            $d = gensym() if $] < 5.006;
             if (!opendir $d, $curdir) {
                 _error($arg, "cannot opendir", $canon);
                 @files = ();

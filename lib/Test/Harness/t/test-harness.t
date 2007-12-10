@@ -498,9 +498,6 @@ tie *NULL, 'Dev::Null' or die $!;
 
 for my $test ( sort keys %samples ) {
 SKIP: {
-    skip "-t introduced in 5.8.0", $tests_per_loop
-        if ($test eq 'taint_warn') && ($] < 5.008);
-
     my $expect = $samples{$test};
 
     # execute_tests() runs the tests but skips the formatting.

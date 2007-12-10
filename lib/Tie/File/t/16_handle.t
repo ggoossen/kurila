@@ -83,10 +83,6 @@ untie @a;
      print "ok $N # skipped ($^O has broken pipe semantics)\n";
      last;
    }
-   if ($] < 5.006) {
-     print "ok $N # skipped - 5.005_03 panics after this test\n";
-     last;
-   }
    my $pipe_succeeded = eval {pipe *R, *W};
    if ($@) {
      chomp $@;

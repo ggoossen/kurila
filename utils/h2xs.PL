@@ -491,7 +491,7 @@ use strict;
 my( $H2XS_VERSION ) = ' $Revision: 1.23 $ ' =~ /\$Revision:\s+([^\s]+)/;
 my $TEMPLATE_VERSION = '0.01';
 my @ARGS = @ARGV;
-my $compat_version = $];
+my $compat_version = $^V;
 
 use Getopt::Long;
 use Config;
@@ -1869,9 +1869,8 @@ WriteMakefile(
     NAME              => '$module',
     VERSION_FROM      => '$modpmname', # finds \$VERSION
     PREREQ_PM         => {$prereq_pm}, # e.g., Module::Name => 1.1
-    (\$] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => '$modpmname', # retrieve abstract from module
-       AUTHOR         => '$author <$email>') : ()),
+    ABSTRACT_FROM  => '$modpmname', # retrieve abstract from module
+    AUTHOR         => '$author <$email>',
 END
 if (!$opt_X) { # print C stuff, unless XS is disabled
   $opt_F = '' unless defined $opt_F;
