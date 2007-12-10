@@ -179,10 +179,6 @@ our $VERSION = "1.23";
 
 my( $i, $n ) = ( 1, scalar( @modules ) );
 foreach my $module ( @modules ) {
- SKIP: {
-    skip( "No our() support until perl 5.6", 2 )
-	if $] < 5.006 && $module =~ /\bour\b/;
-
     $dist->change_file( 'lib/Simple.pm', $module );
     $dist->regen;
 
@@ -195,7 +191,6 @@ foreach my $module ( @modules ) {
 	"correct module version ($i of $n)" );
     is( $warnings, '', 'no warnings from parsing' );
     $i++;
-  }
 }
 
 # revert to pristine state

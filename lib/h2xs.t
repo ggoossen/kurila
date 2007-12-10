@@ -62,7 +62,7 @@ $thisversion =~ s/^v//;
 rmtree($name);
 
 my @tests = (
-"-f -n $name", $], <<"EOXSFILES",
+"-f -n $name", $^V, <<"EOXSFILES",
 Defaulting to backwards compatibility with perl $thisversion
 If you intend this module to be compatible with earlier perl versions, please
 specify a minimum perl version with the -b option.
@@ -79,7 +79,7 @@ Writing $name/Changes
 Writing $name/MANIFEST
 EOXSFILES
 
-"-f -n $name -b $thisversion", $], <<"EOXSFILES",
+"-f -n $name -b $thisversion", $^V, <<"EOXSFILES",
 Writing $name/ppport.h
 Writing $name/lib/$name.pm
 Writing $name/$name.xs
@@ -118,7 +118,7 @@ Writing $name/Changes
 Writing $name/MANIFEST
 EOXSFILES
 
-"\"-X\" -f -n $name -b $thisversion", $], <<"EONOXSFILES",
+"\"-X\" -f -n $name -b $thisversion", $^V, <<"EONOXSFILES",
 Writing $name/lib/$name.pm
 Writing $name/Makefile.PL
 Writing $name/README
@@ -127,7 +127,7 @@ Writing $name/Changes
 Writing $name/MANIFEST
 EONOXSFILES
 
-"-f -n $name -b $thisversion $header", $], <<"EOXSFILES",
+"-f -n $name -b $thisversion $header", $^V, <<"EOXSFILES",
 Writing $name/ppport.h
 Writing $name/lib/$name.pm
 Writing $name/$name.xs
@@ -212,7 +212,8 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   foreach my $leaf (File::Spec->catfile('lib', "$name.pm"), 'Makefile.PL') {
     my $file = File::Spec->catfile($name, $leaf);
     if (ok (open (FILE, $file), "open $file")) {
-      my $match = qr/use $version;/;
+        require kurila;
+      my $match = qr/use kurila v$kurila::VERSION;/;
       my $found;
       while (<FILE>) {
         last if $found = /$match/;

@@ -317,7 +317,7 @@ sub full_setup {
           );
 
     # 5.5.3 doesn't have any concept of vendor libs
-    push @Get_from_Config, qw( vendorarchexp vendorlibexp ) if $] >= 5.006;
+    push @Get_from_Config, qw( vendorarchexp vendorlibexp );
 
     foreach my $item (@attrib_help){
         $Recognized_Att_Keys{$item} = 1;

@@ -9,7 +9,6 @@ use vars qw($D $N);
 # $CPAN::DEBUG = 16384;
 
 while (<DATA>) {
-  next if tr/.// > 1 && $]<5.006; # multidot tests are not for pre-5.6.0
   last if /^__END__$/;
   chomp;
   s/\s*#.*//;

@@ -70,7 +70,7 @@ like( $@, qr/^syslog: expecting argument \$format/,
     "calling syslog() with one empty argument" );
 
 
-my $test_string = "uid $< is testing Perl $] syslog(3) capabilities";
+my $test_string = "uid $< is testing Perl $^V syslog(3) capabilities";
 my $r = 0;
 
 BEGIN { $tests += 8 }

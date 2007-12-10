@@ -1497,7 +1497,6 @@ sub test_splice {
 	
 	if (defined $sw and defined $msw) {
 	    $msw =~ s/ \(.+\)$//;
-	    $msw =~ s/ in splice$// if $] < 5.006;
 	    if ($sw ne $msw) {
 		return "different warning: '$sw' vs '$msw'";
 	    }

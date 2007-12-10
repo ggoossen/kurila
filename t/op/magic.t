@@ -34,7 +34,7 @@ sub skip {
     return 1;
 }
 
-print "1..58\n";
+print "1..57\n";
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
 my $Is_NetWare  = $^O eq 'NetWare';
@@ -275,7 +275,6 @@ EOF
 }
 
 # $], $^O, $^T
-ok $] >= 5.00319, $];
 ok $^O;
 ok $^T > 850000000, $^T;
 

@@ -20,21 +20,14 @@ WriteMakefile(
     (
       $ENV{SKIP_FOR_CORE}
         ? (MAN3PODS    => {})
-	    : (PREREQ_PM   => { 'Scalar::Util'  => 0,
-		                    $] >= 5.005 && $] < 5.006   
-                                ? ('File::BSDGlob' => 0) 
-                                : () }
+        : (PREREQ_PM   => { 'Scalar::Util'  => 0, }
 	      )
     ),
        
-    (
-    $] >= 5.005
-        ? (ABSTRACT_FROM => 'lib/IO/Compress/Base.pm',
-            AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
-        : ()
-    ),
+    ABSTRACT_FROM => 'lib/IO/Compress/Base.pm',
+    AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
-    INSTALLDIRS => ($] >= 5.009 ? 'perl' : 'site'),
+    INSTALLDIRS => 'perl',
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),

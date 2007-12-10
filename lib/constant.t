@@ -181,7 +181,6 @@ ok $constant::declared{'Other::IN_OTHER_PACK'};
 @warnings = ();
 eval q{
     no warnings;
-    #local $^W if $] < 5.006;
     use warnings 'constant';
     use constant 'BEGIN' => 1 ;
     use constant 'INIT' => 1 ;
@@ -297,7 +296,7 @@ sub zit;
     eval 'use constant zit => 4; 1' or die $@;
 
     # empty prototypes are reported differently in different versions
-    my $no_proto = $] < 5.008 ? "" : ": none";
+    my $no_proto = ": none";
 
     is(scalar @warnings, 1, "1 warning");
     like ($warnings[0], qr/^Prototype mismatch: sub main::zit$no_proto vs \(\)/,

@@ -11,7 +11,7 @@ if (-f "Normalize.xs") {
 }
 
 WriteMakefile(
-    'INSTALLDIRS'	=> $] >= 5.007002 ? 'perl' : 'site',
+    'INSTALLDIRS'	=> 'perl',
     'NAME'		=> 'Unicode::Normalize',
     'VERSION_FROM'	=> 'Normalize.pm', # finds $VERSION
     'clean'		=> $clean,

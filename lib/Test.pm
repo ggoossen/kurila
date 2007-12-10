@@ -176,7 +176,7 @@ sub plan {
 	print $TESTOUT "1..$max\n";
     }
     ++$planned;
-    print $TESTOUT "# Running under perl version $] for $^O",
+    print $TESTOUT "# Running under perl version $^V for $^O",
       (chr(65) eq 'A') ? "\n" : " in a non-ASCII world\n";
 
     print $TESTOUT "# Win32::BuildNumber ", &Win32::BuildNumber(), "\n"

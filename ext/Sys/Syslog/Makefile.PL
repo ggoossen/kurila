@@ -7,13 +7,6 @@ use File::Path;
 use File::Spec;
 
 
-# create a typemap for Perl 5.6
-if ($] < 5.008) {
-    open(TYPEMAP, ">typemap") or die "fatal: can't write typemap: $!";
-    print TYPEMAP "const char *\t\tT_PV\n";
-    close(TYPEMAP);
-}
-
 # create a lib/ dir in order to avoid warnings in Test::Distribution
 mkdir "lib", 0755;
 
