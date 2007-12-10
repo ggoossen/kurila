@@ -535,6 +535,17 @@ sub lvalue_subs {
     }
 }
 
+sub rename_pointy_ops {
+    my $xml = shift;
+    for my $op ($xml->findnodes(qq|//op_readline|)) {
+        get_madprop($op, "value") =~ m/^&lt;(.*)&gt;$/ or next;
+        my $fh = $1;
+        my $list_cont = $op->att("flags") =~ m/LIST/;
+        set_madprop($op, "value" => $fh . ($list_cont ? "->getlines()" : "->getline()") );
+    }
+}
+
+
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
 
@@ -580,9 +591,10 @@ if ($from < 1.5 - 0.05) {
 if ($from < 1.6 - 0.05) {
     remove_vstring( $twig );
     use_pkg_version($twig);
+    lvalue_subs( $twig );
 }
 
-lvalue_subs( $twig );
+rename_pointy_ops( $twig );
 
 # print
 $twig->print( pretty_print => 'indented' );

@@ -30,8 +30,9 @@ sub p5convert {
 
 #t_parenthesis();
 #t_change_deref();
+t_pointy_op();
+die;
 t_lvalue_subs();
-die "STOP";
 t_use_pkg_version();
 t_vstring();
 
@@ -593,5 +594,20 @@ $a = "foobar";
 substr($a, 2, undef, "bar");
 ====
 END
+}
 
+sub t_pointy_op {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my $fh;
+my $x = <$fh>;
+----
+my $fh;
+my $x = $fh->getline();
+====
+my $fh;
+my @x = <$fh>;
+----
+my $fh;
+my @x = $fh->getlines();
+END
 }
