@@ -28,11 +28,7 @@ BEGIN {
     }
 
     $| = 1;
-    if ($] == 5.008) {
-        print("1..11\n");   ### Number of tests that will be run ###
-    } else {
-        print("1..15\n");   ### Number of tests that will be run ###
-    }
+    print("1..15\n");   ### Number of tests that will be run ###
 };
 
 print("ok 1 - Loaded\n");
@@ -64,7 +60,6 @@ sub is($$$)
 
 # This tests for too much destruction which was caused by cloning stashes
 # on join which led to double the dataspace under 5.8.0
-if ($] != 5.008)
 {
     sub Foo::DESTROY
     {
@@ -90,13 +85,9 @@ if ($] != 5.008)
 
 {
     lock($test);
-    if ($] == 5.008 || $] >= 5.008003) {
-        threads->create( sub {1} )->join;
-        my $not = eval { Config::myconfig() } ? '' : 'not ';
-        print "${not}ok $test - Are we able to call Config::myconfig after clone\n";
-    } else {
-        print "ok $test # Skip Are we able to call Config::myconfig after clone\n";
-    }
+    threads->create( sub {1} )->join;
+    my $not = eval { Config::myconfig() } ? '' : 'not ';
+    print "${not}ok $test - Are we able to call Config::myconfig after clone\n";
     $test++;
 }
 
@@ -118,7 +109,7 @@ threads->create(sub {
         print $@ =~ /read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_array\n";
         $test++;
-        if ($] >= 5.008003 && $^O ne 'MSWin32') {
+        if ($^O ne 'MSWin32') {
             eval { $unique_hash{abc} = 1 };
             print $@ =~ /disallowed/
               ? '' : 'not ', "ok $test # TODO $TODO - unique_hash\n";
@@ -133,13 +124,9 @@ threads->create(sub {
 for my $decl ('my $x : unique', 'sub foo : unique') {
     {
         lock($test);
-        if ($] >= 5.008005) {
-            eval $decl;
-            print $@ =~ /^The 'unique' attribute may only be applied to 'our' variables/
-                    ? '' : 'not ', "ok $test - $decl\n";
-        } else {
-            print("ok $test # Skip $decl\n");
-        }
+        eval $decl;
+        print $@ =~ /^The 'unique' attribute may only be applied to 'our' variables/
+          ? '' : 'not ', "ok $test - $decl\n";
         $test++;
     }
 }

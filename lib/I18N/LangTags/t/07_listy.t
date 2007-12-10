@@ -6,8 +6,6 @@ BEGIN { plan tests => 17 };
 BEGIN { ok 1 }
 use I18N::LangTags::List;
 
-print "# Perl v$], I18N::LangTags::List v$I18N::LangTags::List::VERSION\n";
-
 ok  I18N::LangTags::List::name('fr'), 'French';
 ok  I18N::LangTags::List::name('fr-fr');
 ok !I18N::LangTags::List::name('El Zorcho');

@@ -412,24 +412,11 @@ sub WriteConstants {
 
   my $c_fh = $ARGS{C_FH};
   if (!$c_fh) {
-      if ($] <= 5.008) {
-	  # We need these little games, rather than doing things
-	  # unconditionally, because we're used in core Makefile.PLs before
-	  # IO is available (needed by filehandle), but also we want to work on
-	  # older perls where undefined scalars do not automatically turn into
-	  # anonymous file handles.
-	  require FileHandle;
-	  $c_fh = FileHandle->new();
-      }
       open $c_fh, ">$ARGS{C_FILE}" or die "Can't open $ARGS{C_FILE}: $!";
   }
 
   my $xs_fh = $ARGS{XS_FH};
   if (!$xs_fh) {
-      if ($] <= 5.008) {
-	  require FileHandle;
-	  $xs_fh = FileHandle->new();
-      }
       open $xs_fh, ">$ARGS{XS_FILE}" or die "Can't open $ARGS{XS_FILE}: $!";
   }
 

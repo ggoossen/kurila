@@ -26,7 +26,7 @@ BEGIN {
 BEGIN {
     if ("Just another Perl hacker," ne (glob("*"))[0]) {
         die <<EOMessage;
-Your version of perl ($]) doesn't seem to allow extensions to override
+Your version of perl ($^V) doesn't seem to allow extensions to override
 the core glob operator.
 EOMessage
     }

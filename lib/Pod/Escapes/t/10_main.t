@@ -13,7 +13,6 @@ use utf8;
 
 my @them;
 BEGIN { plan('tests' => 63) };
-BEGIN { print "# Perl version $] under $^O\n" }
 
 use Pod::Escapes qw(:ALL);
 ok 1;

@@ -82,11 +82,6 @@ my $HACK = 1;
 
 ok 1;
 
-my $skippy =  ($] < 5.008) ? "skip because perl ($]) pre-dates v5.8.0" : 0;
-if($skippy) {
-  print "# This is just perl v$], so I'm skipping many many tests.\n";
-}
-
 {
   my @x = @testfiles;
   print "# Files to test:\n";
@@ -165,12 +160,8 @@ foreach my $f (@testfiles) {
     next;
   }
 
-  if($skippy) {
-    skip $skippy, 0;
-  } else {
-    print "#  $outfilename and $xml don't match!\n";
-    ok 0;
-  }
+  print "#  $outfilename and $xml don't match!\n";
+  ok 0;
 
 }
 

@@ -149,7 +149,7 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 {
     # although it *should* if you're talking about magicals
 
-    my $a = Symbol::fetch_glob("]");
+    my $a = Symbol::fetch_glob("^V");
     ok(defined ${$a});
     ok(defined *{$a});
 

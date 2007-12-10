@@ -204,7 +204,6 @@ EOI
 
 # test CLONE_SKIP() functionality
 SKIP: {
-    skip('CLONE_SKIP not implemented in Perl < 5.8.7', 5) if ($] < 5.008007);
 
     my %c : shared;
     my %d : shared;

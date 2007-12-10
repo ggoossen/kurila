@@ -15,16 +15,7 @@ use Test;
 use strict;
 use warnings;
 
-BEGIN {
-    use Unicode::Collate;
-
-    unless (exists &Unicode::Collate::bootstrap or 5.008 <= $]) {
-	print "1..0 # skipped: XSUB, or Perl 5.8.0 or later".
-		" needed for this test\n";
-	print $@;
-	exit;
-    }
-}
+use Unicode::Collate;
 
 BEGIN { plan tests => 40 };
 

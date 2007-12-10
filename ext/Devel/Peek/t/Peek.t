@@ -36,15 +36,9 @@ sub do_test {
 	    # handle DEBUG_LEAKING_SCALARS prefix
 	    $pattern =~ s/^(\s*)(SV =.* at )/(?:$1ALLOCATED at .*?\n)?$1$2/mg;
 
-	    $pattern =~ s/^ *\$XSUB *\n/
-		($] < 5.009) ? "    XSUB = 0\n    XSUBANY = 0\n" : '';
-	    /mge;
-	    $pattern =~ s/^ *\$ROOT *\n/
-		($] < 5.009) ? "    ROOT = 0x0\n" : '';
-	    /mge;
-	    $pattern =~ s/^ *\$IVNV *\n/
-		($] < 5.009) ? "    IV = 0\n    NV = 0\n" : '';
-	    /mge;
+	    $pattern =~ s/^ *\$XSUB *\n//mge;
+	    $pattern =~ s/^ *\$ROOT *\n//mge;
+	    $pattern =~ s/^ *\$IVNV *\n//mge;
 
 	    print $pattern, "\n" if $DEBUG;
 	    my ($dump, $dump2) = split m/\*\*\*\*\*\n/, scalar <IN>;

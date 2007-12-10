@@ -26,12 +26,8 @@ WriteMakefile(
             ?  ('LICENSE'  => 'perl')
             : ()
     ),
-    (
-        $] >= 5.005
-            ? (ABSTRACT_FROM => 'DB_File.pm',
-                AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
-            : ()
-    ),
+              ABSTRACT_FROM => 'DB_File.pm',
+              AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
 	'depend'	=> {'version$(OBJ_EXT)' => 'version.c'},
 	'clean'		=> {FILES => 'constants.h constants.xs'},

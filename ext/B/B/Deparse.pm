@@ -19,8 +19,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
          CVf_METHOD CVf_LOCKED CVf_LVALUE
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL
-	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED),
-	 ($] < 5.009 ? 'PMf_SKIPWHITE' : 'RXf_SKIPWHITE');
+	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
 $VERSION = 0.83;
 use strict;
 use vars qw/$AUTOLOAD/;
@@ -603,7 +602,6 @@ sub init {
 				? $self->{'ambient_warnings'} ^&^ WARN_MASK
 				: undef;
     $self->{'hints'}    = $self->{'ambient_hints'};
-    $self->{'hints'} ^&^= 0xFF if $] < 5.009;
     $self->{'hinthash'} = $self->{'ambient_hinthash'};
 
     # also a convenient place to clear out subs_declared
@@ -4200,8 +4198,7 @@ sub pp_split {
     # handle special case of split(), and split(' ') that compiles to /\s+/
     $kid = $op->first;
     if ( $kid->flags ^&^ OPf_SPECIAL
-	 and ( $] < 5.009 ? $kid->pmflags ^&^ PMf_SKIPWHITE()
-	      : $kid->reflags ^&^ RXf_SKIPWHITE() ) ) {
+	 and ( $kid->reflags ^&^ RXf_SKIPWHITE() ) ) {
 	$exprs[0] = "' '";
     }
 

@@ -18,7 +18,7 @@ if ($^O eq 'VMS') {
     }
 }
 
-push(@extra, 'INSTALLDIRS'  => 'perl') if $] >= 5.008;
+push(@extra, 'INSTALLDIRS'  => 'perl');
 push(@extra, 'MAN3PODS' => {}) if $PERL_CORE; # Pods built by installman.
 
 WriteMakefile(

@@ -8,10 +8,6 @@
 #
 
 sub BEGIN {
-    if ($] < 5.006) {
-	print "1..0 # Skip: no utf8 support\n";
-	exit 0;
-    }
     if ($ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');

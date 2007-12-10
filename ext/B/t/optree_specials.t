@@ -27,7 +27,7 @@ BEGIN {
 use OptreeCheck;	# ALSO DOES @ARGV HANDLING !!!!!!
 use Config;
 
-plan tests => 7 + ($] > 5.009 ? 1 : 0);
+plan tests => 8;
 
 require_ok("B::Concise");
 
@@ -44,8 +44,7 @@ my $src = q[our ($beg, $chk, $init, $end, $uc) = qq{'foo'}; BEGIN { $beg++ } CHE
 my @warnings_todo;
 @warnings_todo = (todo =>
    "Change 23768 (Remove Carp from warnings.pm) alters expected output, not"
-   . "propagated to 5.8.x")
-    if $] < 5.009;
+                  . "propagated to 5.8.x");
 
 checkOptree ( name	=> 'BEGIN',
 	      bcopts	=> 'BEGIN',
@@ -203,7 +202,6 @@ EOT_EOT
 # 2              <$> gvsv(*chk) s ->3
 EONT_EONT
 
-if ($] >= 5.009) {
     checkOptree ( name	=> 'UNITCHECK',
 		  bcopts=> 'UNITCHECK',
 		  prog	=> $src,
@@ -226,7 +224,6 @@ EOT_EOT
 # -           <1> ex-rv2sv sKRM/1 ->3
 # 2              <$> gvsv(*uc) s ->3
 EONT_EONT
-}
 
 checkOptree ( name	=> 'INIT',
 	      bcopts	=> 'INIT',

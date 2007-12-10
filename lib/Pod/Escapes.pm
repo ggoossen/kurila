@@ -69,11 +69,7 @@ sub e2char {
   
   # Normal handling:
   if($in =~ m/^\d+$/s) {
-    if($] < 5.007  and  $in > 255) { # can't be trusted with Unicode
-      return $FAR_CHAR;
-    } else {
       return chr($in);
-    }
   } else {
     return $Name2character{$in}; # returns undef if unknown
   }
@@ -378,14 +374,8 @@ sub e2charnum {
   %Name2character = ();
   my($name, $number);
   while( ($name, $number) = each %Name2character_number) {
-    if($] < 5.007  and  $number > 255) {
-      $Name2character{$name} = $FAR_CHAR;
-      # substitute for Unicode characters, for perls
-      #  that can't reliable handle them
-    } else {
       $Name2character{$name} = chr $number;
       # normal case
-    }
   }
   # So they resolve 'right' even in EBCDIC-land
   $Name2character{'lt'  }   = '<';
