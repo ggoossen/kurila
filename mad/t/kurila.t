@@ -602,12 +602,18 @@ my $fh;
 my $x = <$fh>;
 ----
 my $fh;
-my $x = $fh->getline();
+my $x = ~< $fh;
 ====
-my $fh;
-my @x = <$fh>;
+my @x = <FH>;
 ----
-my $fh;
-my @x = $fh->getlines();
+my @x = ~< *FH;
+====
+<>;
+----
+ ~< *ARGV;
+====
+$a=<F>;
+----
+$a= ~< *F;
 END
 }

@@ -6,7 +6,7 @@ BEGIN {
 
 plan tests => 18;
 
-eval { for (\2) { $_ = <FH> } };
+eval { for (\2) { $_ = ~< *FH } };
 like($@, 'Modification of a read-only value attempted', '[perl #19566]');
 
 {
@@ -41,7 +41,7 @@ foreach my $l (1, 82) {
   my $k = $l;
   $k = 'k' x $k;
   my $copy = $k;
-  $k = <DATA>;
+  $k = ~< *DATA;
   is ($k, "moo\n", 'catline to COW sv for length ' . length $copy);
 }
 
@@ -65,13 +65,13 @@ SKIP: {
   skip "you can read directories as plain files", 2 unless( $err );
 
   $!=0;
-  open F, 'File::Spec'->curdir and $_=<F>;
+  open F, 'File::Spec'->curdir and $_= ~< *F;
   ok( $!==$err && !defined($_) => 'readline( DIRECTORY )' );
   close F;
 
   $!=0;
   { local $/;
-    open F, 'File::Spec'->curdir and $_=<F>;
+    open F, 'File::Spec'->curdir and $_= ~< *F;
     ok( $!==$err && !defined($_) => 'readline( DIRECTORY ) slurp mode' );
     close F;
   }

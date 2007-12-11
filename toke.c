@@ -3705,6 +3705,12 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    Eop(OP_SMARTMATCH);
 	}
+
+
+	if (s[1] == '<') {
+	    s += 2;
+	    UNI(OP_READLINE);
+	}
 	Perl_croak(aTHX_ "Unknown operator '~' found");
     case '[':
 	PL_lex_brackets++;
