@@ -70,7 +70,7 @@ xsubpp:		xsubpp.PL ../config.sh
 clean:
 
 realclean:
-	rm -rf $(plextract) pstruct $(plextractexe)
+	rm -rf $(plextract) $(plextractexe)
 	rm -f ../t/_h2ph_pre.ph
 
 clobber:	realclean

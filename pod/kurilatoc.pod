@@ -4654,7 +4654,7 @@ L<config_data|config_data>, L<libnetcfg|libnetcfg>, L<perlivp>
 
 =item Development
 
-L<perlbug|perlbug>, L<h2ph|h2ph>, L<c2ph|c2ph> and L<pstruct|pstruct>,
+L<perlbug|perlbug>, L<h2ph|h2ph>,
 L<h2xs|h2xs>, L<enc2xs>, L<xsubpp>, L<dprofpp|dprofpp>, L<prove>,
 L<corelist>
 
@@ -27914,8 +27914,6 @@ don't all have manual pages yet:
 =over 4
 
 =item a2p
-
-=item c2ph
 
 =item dprofpp
 
