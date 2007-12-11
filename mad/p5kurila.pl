@@ -538,10 +538,10 @@ sub lvalue_subs {
 sub rename_pointy_ops {
     my $xml = shift;
     for my $op ($xml->findnodes(qq|//op_readline|)) {
-        get_madprop($op, "value") =~ m/^&lt;(.*)&gt;$/ or next;
-        my $fh = $1;
-        my $list_cont = $op->att("flags") =~ m/LIST/;
-        set_madprop($op, "value" => $fh . ($list_cont ? "->getlines()" : "->getline()") );
+        my $v = get_madprop($op, "value") or next;
+        $v =~ s/^&lt;/~&lt; /;
+        $v =~ s/&gt;$//;
+        set_madprop($op, "value" => $v);
     }
 }
 
