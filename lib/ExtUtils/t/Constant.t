@@ -19,7 +19,6 @@ use ExtUtils::Constant qw (C_constant);
 use File::Spec;
 use Cwd;
 
-my $better_than_56 = $] > 5.007;
 # For debugging set this to 1.
 my $keep_files = 0;
 $| = 1;
@@ -30,7 +29,7 @@ my $perl = $^X;
 # only need it when $^X isn't absolute, which is going to be 5.8.0 or later
 # (where ExtUtils::Constant is in the core, and tests against the uninstalled
 # perl)
-$perl = File::Spec->rel2abs ($perl) unless $] < 5.006;
+$perl = File::Spec->rel2abs ($perl);
 # ExtUtils::Constant::C_constant uses $^X inside a comment, and we want to
 # compare output to ensure that it is the same. We were probably run as ./perl
 # whereas we will run the child with the full path in $perl. So make $^X for
@@ -234,23 +233,7 @@ sub build_and_run {
   $realtest++;
 
   if (defined $expect) {
-      # -x is busted on Win32 < 5.6.1, so we emulate it.
-      my $regen;
-      if( $^O eq 'MSWin32' && $] <= 5.006001 ) {
-	  open(REGENTMP, ">regentmp") or die $!;
-	  open(XS, "$package.xs")     or die $!;
-	  my $saw_shebang;
-	  while(<XS>) {
-	      $saw_shebang++ if /^#!.*/i ;
-	      print REGENTMP $_ if $saw_shebang;
-	  }
-	  close XS;  close REGENTMP;
-	  $regen = `$runperl regentmp`;
-	  unlink 'regentmp';
-      }
-      else {
-	  $regen = `$runperl -x $package.xs`;
-      }
+      my $regen = `$runperl -x $package.xs`;
       if ($?) {
 	  print "not ok $realtest # $runperl -x $package.xs failed: $?\n";
 	  } else {
@@ -327,9 +310,8 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
               'NAME'		=> "$package",
               'VERSION_FROM'	=> "$package.pm", # finds \$VERSION
-              (\$] >= 5.005 ?
-               (#ABSTRACT_FROM => "$package.pm", # XXX add this
-                AUTHOR     => "$0") : ())
+              #ABSTRACT_FROM => "$package.pm", # XXX add this
+              AUTHOR     => "$0",
              );
 EOT
 
@@ -421,7 +403,7 @@ EOT
 
 use strict;
 EOT
-  printf FH "use warnings;\n" unless $] < 5.006;
+  printf FH "use warnings;\n";
   print FH <<'EOT';
 use Carp;
 
@@ -512,7 +494,7 @@ my @common_items = (
                    );
 
 my @args = undef;
-push @args, [PROXYSUBS => 1] if $] > 5.009002;
+push @args, [PROXYSUBS => 1];
 foreach my $args (@args)
 {
   # Simple tests

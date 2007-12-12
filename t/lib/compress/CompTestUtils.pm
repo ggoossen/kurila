@@ -566,7 +566,7 @@ sub mkErr
 
     $file = quotemeta($file);
 
-    return "/$string\\s+at $file line $line/" if $] >= 5.006 ;
+    return "/$string\\s+at $file line $line/";
     return "/$string\\s+at /" ;
 }
 

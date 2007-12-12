@@ -31,7 +31,7 @@ check_contents("$:$:$:$:");
 check_contents("");
 
 # (11-20) EXISTS
-if ($] >= 5.006) {
+{
   eval << 'TESTS';
 print !exists $a[0] ? "ok $N\n" : "not ok $N\n";
 $N++;
@@ -57,17 +57,12 @@ $N++;
 print !exists $a[-4] ? "ok $N\n" : "not ok $N\n";
 $N++;
 TESTS
-  } else {                      # perl 5.005 doesn't have exists $array[1]
-    for (11..20) {
-      print "ok $_ \# skipped (no exists for arrays)\n";
-          $N++;
-    }
-  }
+}
 
 my $del;
 
 # (21-35) DELETE
-if ($] >= 5.006) {
+{
   eval << 'TESTS';
 $del = delete $a[0];
 check_contents("$:$:GIVE ME PIE$:");
@@ -92,11 +87,6 @@ expect($del, undef);
 
 
 TESTS
-  } else {                      # perl 5.005 doesn't have delete $array[1]
-    for (21..35) {
-      print "ok $_ \# skipped (no delete for arrays)\n";
-          $N++;
-    }
   }
 
 use POSIX 'SEEK_SET';

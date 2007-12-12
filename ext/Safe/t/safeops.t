@@ -49,7 +49,6 @@ plan(tests => scalar @op);
 sub testop {
     my ($op, $opname, $code) = @_;
     pass("$op : skipped") and return if $code =~ /^SKIP/;
-    pass("$op : skipped") and return if $code =~ m://: && $] < 5.009; # no dor
     my $c = Safe->new();
     $c->deny_only($op);
     $c->reval($code);

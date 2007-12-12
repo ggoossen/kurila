@@ -1182,14 +1182,7 @@ sub perl_version {
   # Check the current perl interpreter
   # It's much more convenient to use $] here than $^V, but 'man
   # perlvar' says I'm not supposed to.  Bloody tyrant.
-  return $^V ? $self->perl_version_to_float(sprintf "%vd", $^V) : $];
-}
-
-sub perl_version_to_float {
-  my ($self, $version) = @_;
-  $version =~ s/\./../;
-  $version =~ s/\.(\d+)/sprintf '%03d', $1/eg;
-  return $version;
+  return $^V;
 }
 
 sub _parse_conditions {

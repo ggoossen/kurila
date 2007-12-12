@@ -226,8 +226,7 @@ MAKE_FRAG
     }
 
     # Reconstruct the X.Y.Z version.
-    my $version = join '.', map { sprintf "%d", $_ }
-                              $] =~ /(\d)\.(\d{3})(\d{2})/;
+    my $version = $^V;
     $m .= sprintf '	$(LD) $(LDFLAGS) $(OBJECT:.obj=.obj) -desc "Perl %s Extension ($(BASEEXT))  XS_VERSION: $(XS_VERSION)" -nlmversion $(NLM_VERSION)', $version;
 
     # Taking care of long names like FileHandle, ByteLoader, SDBM_File etc

@@ -166,8 +166,7 @@ sub version_mess ($;$) {
 	$v = '[unknown]' unless defined $v;
 	my $myv = $VERSION;
 	$myv .= ' [paranoid]' unless $STANDARD_HELP_VERSION;
-	my $perlv = $];
-	$perlv = sprintf "%vd", $^V if $] >= 5.006;
+	my $perlv = $^V;
 	print $h <<EOH;
 $0 version $v calling Getopt::Std::getopts (version $myv),
 running under Perl version $perlv.

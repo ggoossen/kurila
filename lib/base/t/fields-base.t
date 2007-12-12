@@ -1,11 +1,5 @@
 #!/usr/bin/perl -w
 
-my ($Has_PH, $Field);
-BEGIN { 
-    $Has_PH = $] < 5.009;
-    $Field = $Has_PH ? "pseudo-hash field" : "class field";
-}
-
 my $W;
 
 BEGIN {

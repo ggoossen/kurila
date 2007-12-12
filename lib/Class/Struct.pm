@@ -15,9 +15,6 @@ require Exporter;
 
 $VERSION = '0.63';
 
-## Tested on 5.002 and 5.003 without class membership tests:
-my $CHECK_CLASS_MEMBERSHIP = ($] >= 5.003_95);
-
 my $print = 0;
 sub printem {
     if (@_) { $print = shift }
@@ -215,9 +212,7 @@ sub struct {
                 $sel = "->{\$i}";
             }
             elsif( defined $classes{$name} ){
-                if ( $CHECK_CLASS_MEMBERSHIP ) {
-                    $out .= "    croak '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '$classes{$name}');\n";
-                }
+                $out .= "    croak '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '$classes{$name}');\n";
             }
             $out .= "    croak 'Too many args to $name' if \@_ > 1;\n";
             $out .= "    \@_ ? ($pre\$r->$elem$sel = shift$pst) : $pre\$r->$elem$sel$pst;\n";

@@ -9,7 +9,7 @@ use Storable qw(freeze thaw);
 my $kingdom = $Config{byteorder} =~ /23/ ? "Lillput" : "Belfuscu";
 
 my $frozen = freeze
-  ["This file was written with $Storable::VERSION on perl $]",
+  ["This file was written with $Storable::VERSION on perl $^V",
    "$kingdom was correct", (^~^0 ^^^ (^~^0 >> 1) ^^^ 2),
    "The End"];
 
@@ -28,7 +28,7 @@ This length difference should only happen on perl 5.6.x configured with IVs as
 long long on Unix, OS/2 or any platform that runs the Configure stript (ie not
 MS Windows)
 
-This is perl $], sizeof(long) is $Config{longsize}, IVs are '$ivtype', sizeof(IV) is $ivsize,
+This is perl $^V, sizeof(long) is $Config{longsize}, IVs are '$ivtype', sizeof(IV) is $ivsize,
 byteorder is '$Config{byteorder}', Storable $Storable::VERSION writes a byteorder of '$storebyteorder'
 EOM
   exit; # Grr '

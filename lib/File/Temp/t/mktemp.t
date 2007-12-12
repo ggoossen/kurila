@@ -26,7 +26,7 @@ print "# MKSTEMP: FH is $fh File is $template fileno=".fileno($fh)."\n";
 ok( (-e $template) );
 
 # Autoflush
-$fh->autoflush(1) if $] >= 5.006;
+$fh->autoflush(1);
 
 # Try printing something to the file
 my $string = "woohoo\n";

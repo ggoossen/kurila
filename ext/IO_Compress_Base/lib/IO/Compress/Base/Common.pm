@@ -77,7 +77,7 @@ sub getEncoding($$$)
 
 our ($needBinmode);
 $needBinmode = ($^O eq 'MSWin32' || 
-                    ($] >= 5.006 && eval ' ${^UNICODE} || ${^UTF8LOCALE} '))
+                    (eval ' ${^UNICODE} || ${^UTF8LOCALE} '))
                     ? 1 : 1 ;
 
 sub setBinModeInput($)
@@ -429,7 +429,7 @@ sub createSelfTiedObject
     my $error_ref = shift ;
 
     my $obj = bless Symbol::gensym(), ref($class) || $class;
-    tie *$obj, $obj if $] >= 5.005;
+    tie *$obj, $obj;
     *$obj->{Closed} = 1 ;
     $$error_ref = '';
     *$obj->{Error} = $error_ref ;

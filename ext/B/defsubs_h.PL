@@ -55,19 +55,7 @@ foreach my $const (qw(
   doconst($const);
  }
 
-if ($] < 5.009) {
-    # This is only present in 5.10, but it's useful to B::Deparse to be able
-    # to import a dummy value from B
-    doconst('OPpPAD_STATE');
-}
-
-if ($] >= 5.009) {
-    # Constant not present in 5.8.x
-    doconst('CVf_ISXSUB');
-} else {
-    # Constant not present after 5.8.x
-    doconst('AVf_REAL');
-}  
+doconst('CVf_ISXSUB');
 
 foreach my $tuple (['op.h'],['cop.h'],['regexp.h','RXf_'])
  {
