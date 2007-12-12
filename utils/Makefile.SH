@@ -43,8 +43,7 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift)"
 # Files to be built with variable substitution after miniperl is
 # available.  Dependencies handled manually below (for now).
 
-pl = h2ph h2xs dprofpp
-plextract = perlbug perlivp
+plextract = perlbug perlivp dprofpp
 plfix = h2xs h2ph perldoc pl2pm libnetcfg
 
 all: $(plextract) $(plfix)
