@@ -107,7 +107,7 @@ sub _populate_hash {
 if ($::failed) {
     # get tests to run from TEST_FAILED
     open my $fh, "<", "TEST_FAILED";
-    push @ARGV, map { chomp; $_ } <$fh>;
+    push @ARGV, map { chomp; $_ } ~< $fh;
     close $fh;
 }
 
@@ -124,7 +124,7 @@ unless (@ARGV) {
     if (-f $configsh) {
 	my (%extensions, %known_extensions);
 	open FH, $configsh or die "Can't open $configsh: $!";
-	while (<FH>) {
+	while ( ~< *FH) {
 	    if (/^extensions=['"](.*)['"]$/) {
 		# Deliberate string interpolation to avoid triggering possible
 		# $1 resetting bugs.
@@ -149,7 +149,7 @@ unless (@ARGV) {
     my $mani = File::Spec->catfile($updir, "MANIFEST");
     if (open(MANI, $mani)) {
 	my $ext_pat = $^O eq 'MSWin32' ? '(?:win32/)?ext' : 'ext';
-	while (<MANI>) { # similar code in t/harness
+	while ( ~< *MANI) { # similar code in t/harness
 	    if (m!^($ext_pat/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!) {
 		my $t = $1;
 		my $extension = $2;
@@ -193,7 +193,7 @@ elsif ($::with_utf16) {
 		if (open(A, $a)) {
 		    if (open(U, ">$u")) {
 			print U pack("$f", 0xFEFF) if $b;
-			while (<A>) {
+			while ( ~< *A) {
 			    print U pack("$f*", unpack("C*", $_));
 			}
 			close(U);
@@ -248,7 +248,7 @@ EOT
         # read previously failed tests
         if (-e 'TEST_FAILED') {
             open my $fh, "<", "TEST_FAILED" or die;
-            while (<$fh>) { chomp; $failed_tests{$_} = 0; }
+            while ( ~< $fh) { chomp; $failed_tests{$_} = 0; }
             close $fh;
         }
     }
@@ -281,7 +281,7 @@ EOT
 	# $test = $OVER{$test} if exists $OVER{$test};
 
 	open(SCRIPT,"<",$test) or die "Can't run $test.\n";
-	$_ = <SCRIPT>;
+	$_ = ~< *SCRIPT;
 	close(SCRIPT) unless ($type eq 'deparse');
 	if ($::with_utf16) {
 	    $_ =~ tr/\0//d;
@@ -303,7 +303,7 @@ EOT
 	my $file_opts = "";
 	if ($type eq 'deparse') {
 	    # Look for #line directives which change the filename
-	    while (<SCRIPT>) {
+	    while ( ~< *SCRIPT) {
 		$file_opts .= ",-f$3$4"
 			if /^#\s*line\s+(\d+)\s+((\w+)|"([^"]+)")/;
 	    }
@@ -350,7 +350,7 @@ EOT
 	my $trailing_leader = 0;
 	my $max;
 	my %todo;
-	while (<RESULTS>) {
+	while ( ~< *RESULTS) {
 	    next if /^\s*$/; # skip blank lines
 	    if ($::verbose) {
 		print $_;
@@ -430,7 +430,7 @@ EOT
 	    my @valgrind;
 	    if (-e $valgrind_log) {
 		if (open(V, $valgrind_log)) {
-		    @valgrind = <V>;
+		    @valgrind = ~< *V;
 		    close V;
 		} else {
 		    warn "$0: Failed to open '$valgrind_log': $!\n";

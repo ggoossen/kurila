@@ -43,7 +43,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	my $pos = tell $fh; # pos must be behind "xxx", before "\nxxy\n"
 	seek $fh, $pos, 0;
 	$/ = "\n";
-	$s = ~< $fh. ~< $fh;
+	$s = ( ~< $fh ) . ~< $fh;
 	ok($s eq "\nxxy\n");
     }
 
