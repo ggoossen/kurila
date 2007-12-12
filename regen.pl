@@ -7,6 +7,8 @@
 # wish to make a clean source tree but with current headers without running
 # anything else.
 
+use kurila;
+
 use strict;
 my $perl = $^X;
 

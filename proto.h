@@ -3955,10 +3955,6 @@ STATIC char*	S_scan_ident(pTHX_ char *s, const char *send, char *dest, STRLEN de
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 
-STATIC char*	S_scan_inputsymbol(pTHX_ char *start)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-
 STATIC char*	S_scan_pat(pTHX_ char *start, I32 type)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);

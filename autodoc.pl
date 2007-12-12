@@ -42,7 +42,7 @@ sub walk_table (&@) {
 	chomp;
 	next if /^:/;
 	while (s|\\\s*$||) {
-	    $_ .= <IN>;
+	    $_ .= ~< *IN;
 	    chomp;
 	}
 	s/\s+$//;
