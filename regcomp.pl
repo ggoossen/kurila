@@ -3,6 +3,7 @@ BEGIN {
     require 'regen_lib.pl';
 }
 #use Fatal qw(open close rename chmod unlink);
+use kurila;
 use strict;
 use warnings;
 
@@ -11,7 +12,7 @@ open DESC, 'regcomp.sym';
 my $ind = 0;
 my (@name,@rest,@type,@code,@args,@longj);
 my ($desc,$lastregop);
-while (<DESC>) {
+while ( ~< *DESC) {
     s/#.*$//;
     next if /^\s*$/;
     s/\s*\z//;
@@ -198,10 +199,10 @@ EOP
 open my $fh,"<","regexp.h" or die "Can't read regexp.h: $!";
 my %rxfv;
 my $val;
-while (<$fh>) {
+while ( ~< $fh) {
     if (/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i) {
         $rxfv{$1}= eval $2;
-        $val|=$rxfv{$1};
+        $val^|^=$rxfv{$1};
     }
 }    
 my %vrxf=reverse %rxfv;
