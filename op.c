@@ -7774,7 +7774,8 @@ Perl_peep(pTHX_ register OP *o)
 	    }
 	    else if (o->op_next->op_type == OP_READLINE
 		    && o->op_next->op_next->op_type == OP_CONCAT
-		    && (o->op_next->op_next->op_flags & OPf_STACKED))
+		    && (o->op_next->op_next->op_flags & OPf_STACKED)
+         	    && !PL_madskills)
 	    {
 		/* Turn "$a .= <FH>" into an OP_RCATLINE. AMS 20010917 */
 		o->op_type   = OP_RCATLINE;
