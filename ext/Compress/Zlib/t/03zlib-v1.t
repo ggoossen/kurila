@@ -21,13 +21,7 @@ BEGIN
     $extra = 1
         if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
-    my $count = 0 ;
-    if ($] < 5.005) {
-        $count = 390 ;
-    }
-    else {
-        $count = 401 ;
-    }
+    my $count = 401 ;
 
 
     plan tests => $count + $extra ;
@@ -808,7 +802,6 @@ EOM
 
 }
 
-if ($] >= 5.005)
 {
     # test inflate with a substr
 
@@ -837,7 +830,6 @@ if ($] >= 5.005)
     
 }
 
-if ($] >= 5.005)
 {
     # deflate/inflate in scalar context
 

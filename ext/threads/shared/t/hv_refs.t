@@ -85,15 +85,10 @@ ok(10, keys %foo == 0, "And make sure we realy have deleted the values");
     my $h = {a=>14};
     my $r = \$h->{a};
     share($r);
-    if ($] > 5.008) {
         eval { lock($r); };
         ok(14, !$@, "lock on helems ref: $@");
         eval { lock($h->{a}); };
         ok(15, !$@, "lock on helems: $@");
-    } else {
-        ok(14, 1, "skipped.  < 5.8");
-        ok(15, 1, "skipped.  < 5.8");
-    }
 }
 {
     my $object : shared = &share({});

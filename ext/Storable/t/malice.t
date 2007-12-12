@@ -39,7 +39,7 @@ $other_magic = 7 + length $byteorder;
 $network_magic = 2;
 $major = 2;
 $minor = 7;
-$minor_write = $] > 5.005_50 ? 7 : 4;
+$minor_write = 7;
 
 use Test::More;
 
@@ -81,7 +81,7 @@ sub test_header {
     is ($header->{intsize}, $Config{intsize}, "int size");
     is ($header->{longsize}, $Config{longsize}, "long size");
  SKIP: {
-	skip ("No \$Config{prtsize} on this perl version ($])", 1)
+	skip ("No \$Config{prtsize} on this perl version ($^V)", 1)
 	    unless defined $Config{ptrsize};
 	is ($header->{ptrsize}, $Config{ptrsize}, "long size");
     }

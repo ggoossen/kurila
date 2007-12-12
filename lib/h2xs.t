@@ -55,18 +55,14 @@ if ($^O eq 'MacOS') {
 # not already be found in the t/ subdirectory for perl.
 my $name = 'h2xst';
 my $header = "$name.h";
-my $thisversion = "5.10.0";
-$thisversion =~ s/^v//;
+require kurila;
+my $thisversion = $kurila::VERSION;
 
 # If this test has failed previously a copy may be left.
 rmtree($name);
 
 my @tests = (
-"-f -n $name", $], <<"EOXSFILES",
-Defaulting to backwards compatibility with perl $thisversion
-If you intend this module to be compatible with earlier perl versions, please
-specify a minimum perl version with the -b option.
-
+"-f -n $name", $^V, <<"EOXSFILES",
 Writing $name/ppport.h
 Writing $name/lib/$name.pm
 Writing $name/$name.xs
@@ -79,46 +75,7 @@ Writing $name/Changes
 Writing $name/MANIFEST
 EOXSFILES
 
-"-f -n $name -b $thisversion", $], <<"EOXSFILES",
-Writing $name/ppport.h
-Writing $name/lib/$name.pm
-Writing $name/$name.xs
-Writing $name/fallback/const-c.inc
-Writing $name/fallback/const-xs.inc
-Writing $name/Makefile.PL
-Writing $name/README
-Writing $name/t/$name.t
-Writing $name/Changes
-Writing $name/MANIFEST
-EOXSFILES
-
-"-f -n $name -b 5.6.1", "5.006001", <<"EOXSFILES",
-Writing $name/ppport.h
-Writing $name/lib/$name.pm
-Writing $name/$name.xs
-Writing $name/fallback/const-c.inc
-Writing $name/fallback/const-xs.inc
-Writing $name/Makefile.PL
-Writing $name/README
-Writing $name/t/$name.t
-Writing $name/Changes
-Writing $name/MANIFEST
-EOXSFILES
-
-"-f -n $name -b 5.5.3", "5.00503", <<"EOXSFILES",
-Writing $name/ppport.h
-Writing $name/lib/$name.pm
-Writing $name/$name.xs
-Writing $name/fallback/const-c.inc
-Writing $name/fallback/const-xs.inc
-Writing $name/Makefile.PL
-Writing $name/README
-Writing $name/t/$name.t
-Writing $name/Changes
-Writing $name/MANIFEST
-EOXSFILES
-
-"\"-X\" -f -n $name -b $thisversion", $], <<"EONOXSFILES",
+"\"-X\" -f -n $name", $^V, <<"EONOXSFILES",
 Writing $name/lib/$name.pm
 Writing $name/Makefile.PL
 Writing $name/README
@@ -127,7 +84,7 @@ Writing $name/Changes
 Writing $name/MANIFEST
 EONOXSFILES
 
-"-f -n $name -b $thisversion $header", $], <<"EOXSFILES",
+"-f -n $name -b $thisversion $header", $^V, <<"EOXSFILES",
 Writing $name/ppport.h
 Writing $name/lib/$name.pm
 Writing $name/$name.xs
@@ -212,7 +169,8 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   foreach my $leaf (File::Spec->catfile('lib', "$name.pm"), 'Makefile.PL') {
     my $file = File::Spec->catfile($name, $leaf);
     if (ok (open (FILE, $file), "open $file")) {
-      my $match = qr/use $version;/;
+        require kurila;
+      my $match = qr/use kurila v$kurila::VERSION;/;
       my $found;
       while (<FILE>) {
         last if $found = /$match/;

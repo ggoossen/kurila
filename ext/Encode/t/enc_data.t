@@ -14,10 +14,6 @@ BEGIN {
     print "1..0 # encoding pragma does not support EBCDIC platforms\n";
     exit(0);
     }
-    if ($] <= 5.008 and !$Config{perl_patchlevel}){
-    print "1..0 # Skip: Perl 5.8.1 or later required\n";
-    exit 0;
-    }
 }
 
 

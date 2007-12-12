@@ -216,9 +216,9 @@ sub pod_find
                 else {
                     $dirs_visited{$item} = 1;
                 }
-                if($opts{-perl} && /^(\d+\.[\d_]+)\z/s && eval "$1" != $]) {
+                if($opts{-perl} && /^(\d+\.[\d_]+)\z/s && eval "$1" != $^V) {
                     $File::Find::prune = 1;
-                    warn "Perl $] version mismatch on $_, skipping.\n"
+                    warn "Perl $^V version mismatch on $_, skipping.\n"
                         if($opts{-verbose});
                 }
                 return;

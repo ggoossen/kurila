@@ -100,7 +100,7 @@ sub new {
   return bless($s, $c);
 }
 
-if ($] >= 5.006) {
+{
   # Packed numeric addresses take less memory. Plus pack is faster than sprintf
   *init_refaddr_format = sub {};
 
@@ -108,18 +108,6 @@ if ($] >= 5.006) {
     require Scalar::Util;
     pack "J", Scalar::Util::refaddr(shift);
   };
-} else {
-  *init_refaddr_format = sub {
-    require Config;
-    my $f = $Config::Config{uvxformat};
-    $f =~ tr/"//d;
-    our $refaddr_format = "0x%" . $f;
-  };
-
-  *format_refaddr = sub {
-    require Scalar::Util;
-    sprintf our $refaddr_format, Scalar::Util::refaddr(shift);
-  }
 }
 
 #

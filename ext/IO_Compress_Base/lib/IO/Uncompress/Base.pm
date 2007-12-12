@@ -1216,8 +1216,7 @@ sub close
 
     return 1 if *$self->{Closed} ;
 
-    untie *$self 
-        if $] >= 5.008 ;
+    untie *$self ;
 
     my $status = 1 ;
 

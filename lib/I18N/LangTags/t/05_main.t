@@ -6,7 +6,7 @@ BEGIN { plan tests => 64 };
 BEGIN { ok 1 }
 use I18N::LangTags (':ALL');
 
-print "# Perl v$], I18N::LangTags v$I18N::LangTags::VERSION\n";
+print "# Perl $^V, I18N::LangTags v$I18N::LangTags::VERSION\n";
 
 ok !is_language_tag('');
 ok  is_language_tag('fr');
@@ -40,7 +40,6 @@ ok grep $_ eq 'it', panic_languages('es');
 
 
 print "# Now the ::List tests...\n";
-print "# Perl v$], I18N::LangTags::List v$I18N::LangTags::List::VERSION\n";
 
 use I18N::LangTags::List;
 foreach my $lt (qw(

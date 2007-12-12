@@ -19,7 +19,7 @@ use vars qw(
 use vars qw($Revision);
 use strict;
 
-$VERSION = '6.36_01';
+$VERSION = v6.36_01;
 ($Revision) = q$Revision: 32261 $ =~ /Revision:\s+(\S+)/;
 
 @ISA = qw(Exporter);
@@ -317,7 +317,7 @@ sub full_setup {
           );
 
     # 5.5.3 doesn't have any concept of vendor libs
-    push @Get_from_Config, qw( vendorarchexp vendorlibexp ) if $] >= 5.006;
+    push @Get_from_Config, qw( vendorarchexp vendorlibexp );
 
     foreach my $item (@attrib_help){
         $Recognized_Att_Keys{$item} = 1;

@@ -89,13 +89,11 @@ WriteMakefile(
     ),
       
     (
-      $] >= 5.005
-        ? (ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
-            AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
-        : ()
+     (ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
+      AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
     ),
 
-    INSTALLDIRS => ($] >= 5.009 ? 'perl' : 'site'),
+    INSTALLDIRS => ('perl'),
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),    

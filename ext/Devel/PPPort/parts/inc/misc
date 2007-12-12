@@ -403,17 +403,11 @@ $_ = "Fred";
 ok(&Devel::PPPort::DEFSV(), "Fred");
 ok(&Devel::PPPort::UNDERBAR(), "Fred");
 
-if ($] >= 5.009002) {
   eval q{
     my $_ = "Tony";
     ok(&Devel::PPPort::DEFSV(), "Fred");
     ok(&Devel::PPPort::UNDERBAR(), "Tony");
   };
-}
-else {
-  ok(1);
-  ok(1);
-}
 
 eval { 1 };
 ok(!&Devel::PPPort::ERRSV());
@@ -455,6 +449,6 @@ ok(join(':', Devel::PPPort::xsreturn(1)), 'test1:test2');
 ok(Devel::PPPort::PERL_ABS(42), 42);
 ok(Devel::PPPort::PERL_ABS(-13), 13);
 
-ok(Devel::PPPort::SVf(42), $] >= 5.004 ? '[42]' : '42');
-ok(Devel::PPPort::SVf('abc'), $] >= 5.004 ? '[abc]' : 'abc');
+ok(Devel::PPPort::SVf(42), '[42]');
+ok(Devel::PPPort::SVf('abc'), '[abc]');
 

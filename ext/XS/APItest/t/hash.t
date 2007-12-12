@@ -88,7 +88,7 @@ foreach my $in ("", "N", "a\0b") {
     is ($got, $in, "test_share_unshare_pvn");
 }
 
-if ($] > 5.009) {
+{
     foreach ([\&XS::APItest::Hash::rot13_hash, \&rot13, "rot 13"],
 	     [\&XS::APItest::Hash::bitflip_hash, \&bitflip, "bitflip"],
 	    ) {

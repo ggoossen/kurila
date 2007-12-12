@@ -5,7 +5,6 @@ BEGIN { plan tests => 22 };
 BEGIN { ok 1 }
 use I18N::LangTags (':ALL');
 
-print "# Perl v$], I18N::LangTags v$I18N::LangTags::VERSION\n";
 print "#  Loaded from ", $INC{'I18N/LangTags.pm'} || "??", "\n";
 
 ok lc locale2language_tag('en'),    'en';

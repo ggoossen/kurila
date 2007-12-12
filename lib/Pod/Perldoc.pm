@@ -111,7 +111,7 @@ sub opt_M_with { # specify formatter class name(s)
 
 sub opt_V { # report version and exit
   print join '',
-    "Perldoc v$VERSION, under perl v$] for $^O",
+    "Perldoc v$VERSION, under perl $^V for $^O",
 
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
      ? (" (win32 build ", &Win32::BuildNumber(), ")") : (),
@@ -1162,10 +1162,6 @@ sub MSWin_perldoc_tempfile {
   while($counter < 50) {
     my $fh;
     # If we are running before perl5.6.0, we can't autovivify
-    if ($] < 5.006) {
-      require Symbol;
-      $fh = Symbol::gensym();
-    }
     DEBUG > 3 and print "About to try making temp file $spec\n";
     return($fh, $spec) if open($fh, ">", $spec);    # XXX 5.6ism
     $self->aside("Can't create temp file $spec: $!\n");
@@ -1482,10 +1478,6 @@ sub new_output_file {
 
   my $fh;
   # If we are running before perl5.6.0, we can't autovivify
-  if ($] < 5.006) {
-    require Symbol;
-    $fh = Symbol::gensym();
-  }
   DEBUG > 3 and print "About to try writing to specified output file $outspec\n";
   die "Can't write-open $outspec: $!"
    unless open($fh, ">", $outspec); # XXX 5.6ism

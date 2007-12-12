@@ -738,8 +738,6 @@ UTILS		=			\
 		..\utils\dprofpp	\
 		..\utils\perlbug	\
 		..\utils\pl2pm 		\
-		..\utils\c2ph		\
-		..\utils\pstruct	\
 		..\utils\h2xs		\
 		..\utils\perldoc	\
 		..\utils\perlivp	\
@@ -1533,7 +1531,7 @@ distclean: realclean
 	    perlwin32.pod \
 	    pod2html pod2latex pod2man pod2text pod2usage \
 	    podchecker podselect
-	-cd ..\utils && del /f h2ph splain perlbug pl2pm c2ph pstruct h2xs \
+	-cd ..\utils && del /f h2ph splain perlbug pl2pm h2xs \
 	    perldoc perlivp dprofpp libnetcfg enc2xs piconv cpan *.bat \
 	    xsubpp instmodsh prove ptar ptardiff cpanp-run-perl cpanp cpan2dist shasum corelist config_data
 	-cd ..\x2p && del /f find2perl s2p psed *.bat

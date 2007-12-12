@@ -144,13 +144,6 @@ sub _make_search_callback {
       print "Looking in dir $file\n" if $verbose;
 
       unless ($laborious) { # $laborious overrides pruning
-        if( m/^(\d+\.[\d_]{3,})\z/s
-             and do { my $x = $1; $x =~ tr/_//d; $x != $] }
-           ) {
-          $verbose and print "Perl $] version mismatch on $_, skipping.\n";
-          return 'PRUNE';
-        }
-
         if( m/^([A-Za-z][a-zA-Z0-9_]*)\z/s ) {
           $verbose and print "$_ is a well-named module subdir.  Looking....\n";
         } else {

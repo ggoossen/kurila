@@ -2006,7 +2006,6 @@ make install will install the following:
 
 	cppstdin	This is used by perl -P, if your cc -E can't
 			read from stdin.
-	c2ph, pstruct	Scripts for handling C structures in header files.
 	s2p		sed-to-perl translator
 	find2perl	find-to-perl translator
 	h2ph		Extract constants and simple macros from C headers

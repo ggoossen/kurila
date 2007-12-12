@@ -30,12 +30,9 @@ sub import {
     my $multiple  = ref $_[0];
     my $pkg = caller;
     my $symtab;
-    my $str_end = $] >= 5.006 ? "\\z" : "\\Z";
+    my $str_end = "\\z";
 
-    if ($] > 5.009002) {
-	no strict 'refs';
-	$symtab = \%{*{Symbol::fetch_glob($pkg . '::')}};
-    };
+    $symtab = \%{*{Symbol::fetch_glob($pkg . '::')}};
 
     if ( $multiple ) {
 	if (ref $_[0] ne 'HASH') {
