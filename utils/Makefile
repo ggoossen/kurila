@@ -11,10 +11,9 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift)"
 # Files to be built with variable substitution after miniperl is
 # available.  Dependencies handled manually below (for now).
 
-pl = c2ph.PL config_data.PL corelist.PL cpan.PL h2ph.PL h2xs.PL instmodsh.PL perlbug.PL perldoc.PL perlivp.PL pl2pm.PL prove.PL ptar.PL ptardiff.PL shasum.PL splain.PL dprofpp.PL libnetcfg.PL piconv.PL enc2xs.PL xsubpp.PL
-plextract = c2ph config_data corelist cpan h2ph instmodsh perlbug perldoc perlivp pl2pm prove ptar ptardiff shasum splain dprofpp libnetcfg piconv enc2xs xsubpp
-plextractexe = ./c2ph ./config_data ./corelist ./cpan ./h2ph ./instmodsh ./perlbug ./perldoc ./perlivp ./pl2pm ./prove ./ptar ./ptardiff ./shasum ./splain ./dprofpp ./libnetcfg ./piconv ./enc2xs ./xsubpp
-plfix = h2xs
+pl = h2ph h2xs dprofpp
+plextract = perlbug perlivp
+plfix = h2xs h2ph perldoc pl2pm libnetcfg
 
 all: $(plextract) $(plfix)
 
@@ -25,47 +24,69 @@ $(plfix):
 	$(CPS) $@.pl $@
 	$(RUN) $(PERL) $(FIXIN) $@
 
-c2ph:		c2ph.PL ../config.sh
+cpan: ../lib/CPAN/bin/cpan ../config.sh
+	$(CPS) ../lib/CPAN/bin/cpan $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-cpan:		cpan.PL ../config.sh
+config_data: ../lib/Module/Build/scripts/$@ ../config.sh
+	$(CPS) ../lib/Module/Build/scripts/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-config_data:	config_data.PL ../config.sh
+corelist: ../lib/Module/CoreList/bin/$@ ../config.sh
+	$(CPS) ../lib/Module/CoreList/bin/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-corelist:	corelist.PL ../config.sh
-
-h2ph:		h2ph.PL ../config.sh
+h2ph:		h2ph.pl ../config.sh
 
 h2xs:		h2xs.pl ../config.sh
 
-instmodsh:	instmodsh.PL ../config.sh
+instmodsh: ../lib/ExtUtils/$@ ../config.sh
+	$(CPS) ../lib/ExtUtils/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
 perlbug:	perlbug.PL ../config.sh ../patchlevel.h
 
-perldoc:	perldoc.PL ../config.sh
+perldoc:	perldoc.pl ../config.sh
 
 perlivp:	perlivp.PL ../config.sh
 
-prove:		prove.PL ../config.sh
+prove: ../lib/Test/Harness/bin/$@ ../config.sh
+	$(CPS) ../lib/Test/Harness/bin/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-ptar:		ptar.PL ../config.sh
+ptar: ../lib/Archive/Tar/bin/$@ ../config.sh
+	$(CPS) ../lib/Archive/Tar/bin/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-ptardiff:	ptardiff.PL ../config.sh
+ptardiff: ../lib/Archive/Tar/bin/$@ ../config.sh
+	$(CPS) ../lib/Archive/Tar/bin/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-pl2pm:		pl2pm.PL ../config.sh
+pl2pm:		pl2pm.pl ../config.sh
 
-shasum:		shasum.PL ../config.sh
+shasum: ../lib/Digest/SHA/bin/$@ ../config.sh
+	$(CPS) ../lib/Digest/SHA/bin/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-splain:		splain.PL ../config.sh ../lib/diagnostics.pm
+splain: ../lib/diagnostics.pm ../config.sh
+	$(CPS) ../lib/diagnostics.pm $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
 dprofpp:	dprofpp.PL ../config.sh
 
-libnetcfg:	libnetcfg.PL ../config.sh
+libnetcfg:	libnetcfg.pl ../config.sh
 
-piconv:		piconv.PL ../config.sh
+piconv: ../ext/Encode/bin/$@ ../config.sh
+	$(CPS) ../ext/Encode/bin/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-enc2xs:		enc2xs.PL ../config.sh
+enc2xs: ../ext/Encode/bin/$@ ../config.sh
+	$(CPS) ../ext/Encode/bin/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
-xsubpp:		xsubpp.PL ../config.sh
+xsubpp: ../ext/Encode/$@ ../config.sh
+	$(CPS) ../ext/Encode/$@ $@
+	$(RUN) $(PERL) $(FIXIN) $@
 
 clean:
 
