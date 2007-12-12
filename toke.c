@@ -1432,25 +1432,20 @@ S_force_version(pTHX_ char *s)
 	sv = newSV(5); /* preallocate storage space */
 	s = scan_vstring(s, PL_bufend, sv);
 	version = newSVOP(OP_CONST, 0, sv);
-
-#ifdef PERL_MAD
-	if (PL_madskills) {
-	    start_force(PL_curforce);
-	    curmad('X', newSVpvn(s,s-d));
-	}
-#endif
     }
 
+    /* NOTE: The parser sees the package name and the VERSION swapped */
+    start_force(PL_curforce);
+    NEXTVAL_NEXTTOKE.opval = version;
 #ifdef PERL_MAD
     if (PL_madskills && !version) {
 	sv_free(PL_nextwhite);	/* let next token collect whitespace */
 	PL_nextwhite = 0;
 	s = SvPVX(PL_linestr) + startoff;
+    } else {
+	curmad('X', newSVpvn(d,s-d));
     }
 #endif
-    /* NOTE: The parser sees the package name and the VERSION swapped */
-    start_force(PL_curforce);
-    NEXTVAL_NEXTTOKE.opval = version;
     force_next(THING);
 
     return s;
