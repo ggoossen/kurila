@@ -20,7 +20,7 @@ for ("*$foo", "\\*$foo") {
     print "not " if $@;
     print "ok $i\n"; ++$i;
 
-    print "not " if $@ or scalar( ~< $foo) !~ m|^#!./perl|;
+    print "not " if $@ or scalar( ~< *FOO ) !~ m|^#!./perl|;
     print "ok $i\n"; ++$i;
     eval qq{ close FOO };
     print "not " if $@;
