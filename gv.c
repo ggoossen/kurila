@@ -1205,10 +1205,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    break;
 	case ']':
 	{
-	    SV * const sv = GvSVn(gv);
-	    /* pretend we are 5.10.0 */
-	    sv_setpv(sv, "5.010000");
-	    SvREADONLY_on(GvSV(gv));
+	    Perl_croak(aTHX "$] is obsolete. Use $^V or $kurila::VERSION");
 	}
 	break;
 	case '\026':	/* $^V */

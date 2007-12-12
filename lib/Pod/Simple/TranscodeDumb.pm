@@ -40,7 +40,7 @@ sub make_transcoder {
   my $x;
   return sub {;
     #foreach $x (@_) {
-    #  if(Pod::Simple::ASCII and !Pod::Simple::UNICODE and $] > 5.005) {
+    #  if(Pod::Simple::ASCII and !Pod::Simple::UNICODE) {
     #    # We're in horrible gimp territory, so we need to knock out
     #    # all the highbit things
     #    $x =

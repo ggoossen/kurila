@@ -18,15 +18,9 @@ sub B::OP::debug {
 	op_targ		%d
 	op_type		%d
 EOT
-    if ($] > 5.009) {
-	printf <<'EOT', $op->opt;
+    printf <<'EOT', $op->opt;
 	op_opt		%d
 EOT
-    } else {
-	printf <<'EOT', $op->seq;
-	op_seq		%d
-EOT
-    }
     printf <<'EOT', $op->flags, $op->private;
 	op_flags	%d
 	op_private	%d
@@ -228,9 +222,6 @@ sub B::AV::debug {
 	FILL		%d
 	MAX		%d
 	OFF		%d
-EOT
-    printf <<'EOT', $av->AvFLAGS if $] < 5.009;
-	AvFLAGS		%d
 EOT
 }
 

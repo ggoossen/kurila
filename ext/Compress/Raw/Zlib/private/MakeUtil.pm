@@ -135,11 +135,6 @@ sub UpDowngrade
     {
         $upgrade = 1;
     }
-    else
-    {
-        $do_downgrade = 1
-            if $] < 5.006001 ;
-    }
 
 #    else
 #    {
@@ -158,7 +153,6 @@ sub UpDowngrade
                             s/^(\s*)(use\s+warnings)/${1}local (\$^W) = 1; #$2/ ;
                         };
     }
-    #elsif ($] >= 5.006001 || $upgrade) {
     elsif ($upgrade) {
         # From: local ($^W) = 1; # use|no warnings "blah"
         # To:   use|no warnings "blah"
@@ -180,7 +174,6 @@ sub UpDowngrade
             }
           };
     }
-    #elsif ($] >= 5.006000 || $upgrade) {
     elsif ($upgrade) {
         $our_sub = sub {
 	    if ( /^(\s*)use\s+vars\s+qw\((.*?)\)/ ) {

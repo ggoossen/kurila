@@ -205,8 +205,8 @@ sub SearchPerls
 sub perl_version
 {
   my $perl = shift;
-  my $ver = `$perl -e 'print \$]' 2>&1`;
-  return $? == 0 && $ver =~ /^\d+\.\d+/ && $ver >= 5 ? $ver : 0;
+  my $ver = `$perl -e 'print \$^V' 2>&1`;
+  return $? == 0 && $ver =~ /^\w+\.\d+\.\d+/ && $ver >= 5 ? $ver : 0;
 }
 
 sub parse_version

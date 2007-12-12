@@ -151,8 +151,7 @@ my $testpkgs = {
 		  formfeed end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
 		  begin_av amagic_generation sub_generation address
-                  set_main_start set_main_root fudge
-		  ), $] > 5.009 ? ('unitcheck_av') : ()],
+                  set_main_start set_main_root fudge unitcheck_av)],
     },
 
     'B::Deparse' => { dflt => 'perl',	# 235 functions
@@ -174,7 +173,7 @@ my $testpkgs = {
 		     PMf_MULTILINE PMf_SINGLELINE
 		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
 		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN OPpPAD_STATE
-		     /, $] > 5.009 ? ('RXf_SKIPWHITE') : ('PMf_SKIPWHITE')],
+		     /, 'RXf_SKIPWHITE'],
 		 },
 
     POSIX => { dflt => 'constant',			# all but 252/589
@@ -229,8 +228,8 @@ my $testpkgs = {
 			     register_domain recv protocol peername
 			     new listen import getsockopt croak
 			     connected connect configure confess close
-			     carp bind atmark accept
-			     /, $] > 5.009 ? ('blocking') : () ],
+			     carp bind atmark accept blocking
+                             /],
 
 		    XS => [qw/ unpack_sockaddr_un unpack_sockaddr_in
 			   sockatmark sockaddr_family pack_sockaddr_un
@@ -360,7 +359,7 @@ sub render {
 sub corecheck {
     eval { require Module::CoreList };
     if ($@) {
-	warn "Module::CoreList not available on $]\n";
+	warn "Module::CoreList not available on $^V\n";
 	return;
     }
     my $mods = $Module::CoreList::version{'5.009002'};

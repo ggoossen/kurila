@@ -23,15 +23,7 @@ unless ($@) {
 
 sub _exception {
     my $name = shift;
-    $] > 5.008 and return 0;    # 5.8.1 or higher then no
-    my %utfs = map { $_ => 1 }
-      qw(utf8 UCS-2BE UCS-2LE UTF-16 UTF-16BE UTF-16LE
-      UTF-32 UTF-32BE UTF-32LE);
-    $utfs{$name} or return 0;    # UTFs or no
-    require Config;
-    Config->import();
-    our %Config;
-    return $Config{perl_patchlevel} ? 0 : 1    # maintperl then no
+    return 0;    # 5.8.1 or higher then no
 }
 
 sub in_locale { $^H ^&^ ( $locale::hint_bits || 0 ) }

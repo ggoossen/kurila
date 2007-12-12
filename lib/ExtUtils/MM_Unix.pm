@@ -1025,7 +1025,7 @@ WARNING
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace >= 2);
 
-            my $version_check = qq{$abs -le "\$] >= $ver; print qq{VER_OK}"};
+            my $version_check = qq{$abs -le "\$^V >= $ver; print qq{VER_OK}"};
             $version_check = "$Config{run} $version_check"
                 if defined $Config{run} and length $Config{run};
 
@@ -2990,12 +2990,10 @@ PPD_OUT
     }
 
     my $archname = $Config{archname};
-    if ($] >= 5.008) {
         # archname did not change from 5.6 to 5.8, but those versions may
         # not be not binary compatible so now we append the part of the
         # version that changes when binary compatibility may change
         $archname .= "-". substr($Config{version},0,3);
-    }
     $ppd_xml .= sprintf <<'PPD_OUT', $archname;
         <OS NAME="$(OSNAME)" />
         <ARCHITECTURE NAME="%s" />

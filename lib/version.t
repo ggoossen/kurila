@@ -463,9 +463,6 @@ EOF
     unlink 'vvv.pm';
 
 SKIP: {
-	if ( $] < 5.006_000 ) {
-	    skip 'Cannot "use" extended versions with Perl < 5.6.0', 3; 
-	}
 	open F, ">uuu.pm" or die "Cannot open uuu.pm: $!\n";
 	print F <<"EOF";
 package uuu;

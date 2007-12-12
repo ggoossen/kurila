@@ -409,10 +409,7 @@ store({}, $file);
         map {$_ => 5.004} qw(byteorder intsize longsize)
     );
     for my $attr (keys %attrs) {
-        SKIP: {
-            skip "attribute $attr not available on this version of Perl", 1 if $attrs{$attr} > $];
-            is($info->{$attr}, $Config{$attr}, "$attr match Config");
-        }
+        is($info->{$attr}, $Config{$attr}, "$attr match Config");
     }
 }
 

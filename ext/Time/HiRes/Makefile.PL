@@ -745,16 +745,12 @@ EOM
 sub doMakefile {
     my @makefileopts = ();
 
-    if ($] >= 5.005) {
-	push (@makefileopts,
-	    'AUTHOR'    => 'Jarkko Hietaniemi <jhi@iki.fi>',
-	    'ABSTRACT_FROM' => 'HiRes.pm',
-	);
 	DEFINE('ATLEASTFIVEOHOHFIVE');
-    }
 
     push (@makefileopts,
 	'NAME'	=> 'Time::HiRes',
+	'AUTHOR'    => 'Jarkko Hietaniemi <jhi@iki.fi>',
+	'ABSTRACT_FROM' => 'HiRes.pm',
 	'VERSION_FROM' => 'HiRes.pm', # finds $VERSION
 	'LIBS'	=> $LIBS,   # e.g., '-lm'
 	'DEFINE'	=> $DEFINE,     # e.g., '-DHAS_SOMETHING'
@@ -762,7 +758,7 @@ sub doMakefile {
 	  # Do not even think about 'INC' => '-I/usr/ucbinclude',
 	  # Solaris will avenge.
 	'INC'	=> '',     # e.g., '-I/usr/include/other'
-	'INSTALLDIRS' => ($] >= 5.008 ? 'perl' : 'site'),
+	'INSTALLDIRS' => 'perl',
 	'dist'      => {
 	    'CI'       => 'ci -l',
 	    'COMPRESS' => 'gzip -9f',
@@ -830,9 +826,6 @@ sub doConstants {
 
 sub main {
     print "Configuring Time::HiRes...\n";
-    if ($] == 5.007002) {
-	die "Cannot Configure Time::HiRes for Perl $], aborting.\n";
-    }
 
     if ($^O =~ /Win32/i) {
       DEFINE('SELECT_IS_BROKEN');
