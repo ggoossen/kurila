@@ -1,8 +1,4 @@
 BEGIN {
-	unless ($] >= 5.006) {
-		print "1..0\n";
-		exit(0);
-	}
         if ($ENV{PERL_CORE}) {
                 chdir 't' if -d 't';
                 @INC = '../lib';

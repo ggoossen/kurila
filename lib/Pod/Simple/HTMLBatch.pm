@@ -97,7 +97,7 @@ sub new {
     esc(
       ref($new),
       eval {$new->VERSION} || $VERSION,
-      $], scalar(gmtime), scalar(localtime), 
+      $^V, scalar(gmtime), scalar(localtime), 
   )));
 
   return $new;

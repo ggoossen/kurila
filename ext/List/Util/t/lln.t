@@ -21,9 +21,9 @@ foreach my $num (qw(1 -1 +1 1.0 +1.0 -1.0 -1.0e-12)) {
   ok(looks_like_number($num), "'$num'");
 }
 
-is(!!looks_like_number("Inf"),	    $] >= 5.006001,	'Inf');
-is(!!looks_like_number("Infinity"), $] >= 5.008,	'Infinity');
-is(!!looks_like_number("NaN"),	    $] >= 5.008,	'NaN');
+is(!!looks_like_number("Inf"),	    1,	'Inf');
+is(!!looks_like_number("Infinity"), 1,	'Infinity');
+is(!!looks_like_number("NaN"),	    1,	'NaN');
 is(!!looks_like_number("foo"),	    '',			'foo');
 is(!!looks_like_number(undef),	    '',           	'undef');
 is(!!looks_like_number({}),	    '',			'HASH Ref');

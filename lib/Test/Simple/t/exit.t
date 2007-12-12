@@ -15,11 +15,6 @@ unless( eval { require File::Spec } ) {
     exit 0;
 }
 
-if( $^O eq 'VMS' && $] <= 5.00503 ) {
-    print "1..0 # Skip test will hang on older VMS perls\n";
-    exit 0;
-}
-
 if( $^O eq 'MacOS' ) {
     print "1..0 # Skip exit status broken on Mac OS\n";
     exit 0;
@@ -80,9 +75,6 @@ while( my($test_name, $exit_codes) = each %Tests ) {
     my $Perl = $^X;
 
     if( $^O eq 'VMS' ) {
-        # VMS can't use its own $^X in a system call until almost 5.8
-        $Perl = "MCR $^X" if $] < 5.007003;
-
         # Quiet noisy 'SYS$ABORT'.  'hushed' only exists in 5.6 and up,
         # but it doesn't do any harm on eariler perls.
         $Perl .= q{ -"Mvmsish=hushed"};

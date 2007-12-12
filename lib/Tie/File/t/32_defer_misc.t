@@ -26,7 +26,7 @@ print $o ? "ok $N\n" : "not ok $N\n";
 $N++;
 
 # (3-6) EXISTS
-if ($] >= 5.006) {
+{
   eval << 'TESTS';
 $o->defer;
 expect(not exists $a[4]);
@@ -35,11 +35,6 @@ expect(exists $a[4]);
 check_contents($data);          # nothing written yet
 $o->discard;
 TESTS
-} else {
-    for (3..6) {
-      print "ok $_ \# skipped (no exists for arrays)\n";
-          $N++;
-    }
 }
 
 # (7-10) FETCHSIZE
@@ -89,7 +84,7 @@ $o->flush;
 check_contents("0$:1$:2$:3$:"); # file now 4 records long
 
 # (35-53) DELETE
-if ($] >= 5.006) {
+{
   eval << 'TESTS';
 my $del;
 $o->defer;
@@ -115,11 +110,6 @@ check_contents("0$:1$:");       # no change yet
 $o->flush;
 check_contents("$:1$:");        # record 0 is NOT 'cookies';
 TESTS
-} else {
-    for (35..53) {
-      print "ok $_ \# skipped (no delete for arrays)\n";
-          $N++;
-    }
 }
 
 ################################################################

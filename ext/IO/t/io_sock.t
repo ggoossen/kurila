@@ -33,7 +33,7 @@ BEGIN {
     }
 }
 
-my $has_perlio = $] >= 5.008 && PerlIO::Layer->find( 'perlio');
+my $has_perlio = PerlIO::Layer->find( 'perlio');
 
 $| = 1;
 print "1..26\n";

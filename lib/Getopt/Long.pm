@@ -1397,8 +1397,7 @@ sub VersionMessage(@) {
 	       " version ",
 	       defined($Getopt::Long::VERSION_STRING)
 	         ? $Getopt::Long::VERSION_STRING : $VERSION, ";",
-	       " Perl version ",
-	       $] >= 5.006 ? sprintf("%vd", $^V) : $],
+	       " Perl version $^V",
 	       ")\n");
     exit($pa->{-exitval}) unless $pa->{-exitval} eq "NOEXIT";
 }

@@ -256,7 +256,7 @@ sub run {
     # Unix can handle 2>&1 and OS/2 from 5.005_54 up.
     # This makes our failure diagnostics nicer to read.
     if( MM->os_flavor_is('Unix') or
-        ($] > 5.00554 and MM->os_flavor_is('OS/2'))
+        (MM->os_flavor_is('OS/2'))
       ) {
         return `$cmd 2>&1`;
     }

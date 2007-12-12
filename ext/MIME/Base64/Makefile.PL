@@ -4,9 +4,7 @@ my @makefileopts;
 if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     push @makefileopts, MAN3PODS => {};
 }
-if ($] >= 5.008) {
-    push @makefileopts, INSTALLDIRS => 'perl';
-}
+push @makefileopts, INSTALLDIRS => 'perl';
 
 WriteMakefile(
     NAME	 => 'MIME::Base64',
