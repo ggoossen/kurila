@@ -1436,7 +1436,7 @@ S_force_version(pTHX_ char *s)
 #ifdef PERL_MAD
 	if (PL_madskills) {
 	    start_force(PL_curforce);
-	    curmad('X', newSVpvn(s,d-s));
+	    curmad('X', newSVpvn(s,s-d));
 	}
 #endif
     }
