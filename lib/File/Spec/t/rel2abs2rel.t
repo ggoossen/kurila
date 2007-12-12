@@ -50,7 +50,7 @@ sub sayok{
     local *F;
     open(F, "rel2abs2rel$$.tmp");
     local $/ = undef;
-    my $output = <F>;
+    my $output = ~< *F;
     close(F);
     return $output;
 }

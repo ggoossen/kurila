@@ -42,7 +42,7 @@ for my $i (0..$#c) {
   my $file = filename("f$i");
   open(F, "<$file") or die "$0: failed to open '$file' for reading: $!";
   binmode(F, ":utf8");
-  my $c = <F>;
+  my $c = ~< *F;
   my $o = ord($c);
   print $o == $c[$i] ? "ok $t - utf8 I/O $c[$i]\n" : "not ok $t - utf8 I/O $c[$i]: $o != $c[$i]\n";
   $t++;
@@ -60,7 +60,7 @@ binmode(F, ":encoding(utf-8)");
 {
     local $^W = 1;
     local $SIG{__WARN__} = sub { $a = shift };
-    eval { <F> }; # This should get caught.
+    eval { ~< *F }; # This should get caught.
 }
 close F;
 print $a =~ qr{^utf8 "\\x80" does not map to Unicode} ?

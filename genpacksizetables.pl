@@ -61,7 +61,7 @@ sub make_tables {
 my @lines = grep {
     s/#.*//;
     /\S/;
-} <DATA>;
+} ~< *DATA;
 
 my %asciimap  = map {chr $_, chr $_} 0..255;
 my %ebcdicmap = map {chr $_, Encode::encode("posix-bc", chr $_)} 0..255;

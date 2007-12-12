@@ -80,7 +80,7 @@ foreach my $file (
   open(IN, $precooked) or die "Can't read-open $precooked: $!";
   {
     local $/;
-    push @out, <IN>;
+    push @out, ~< *IN;
   }
   close(IN);
   print "#   ", length($out[-1]), " bytes pulled in.\n";

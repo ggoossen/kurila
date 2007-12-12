@@ -15,7 +15,7 @@ BEGIN {
 	}
 }
 
-my @vecs = map { eval } <DATA>;
+my @vecs = map { eval } ~< *DATA;
 $#vecs -= 2 if $MODULE eq "Digest::SHA::PurePerl";
 
 my $numtests = scalar(@vecs) / 2;

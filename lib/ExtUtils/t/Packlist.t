@@ -130,7 +130,7 @@ like( $@, qr/^Can't open file/, 'read() should croak with bad packfile name' );
 # and more read() tests
 SKIP: {
 	skip("cannot open file for reading: $!", 5) unless $file_is_ready;
-	my $file = do { local $/ = <IN> };
+	my $file = do { local $/ = ~< *IN };
 
 	like( $file, qr/single\n/, 'key with value should be available' );
 	like( $file, qr!/\./abc\n!, 'key with no value should also be present' );

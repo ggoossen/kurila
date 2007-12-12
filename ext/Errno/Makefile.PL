@@ -7,7 +7,7 @@ my $arch = "$Config{'archname'}-$Config{'osvers'}";
 my $got = "";
 if (-e 'arch.txt') {
     open my $in, "<", "arch.txt" or die "Can't read 'arch.txt': $!";
-    $got = <$in>;
+    $got = ~< $in;
     close $in;
 }
 if ($got ne $arch) {

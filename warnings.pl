@@ -350,7 +350,7 @@ EOM
 
 close WARN ;
 
-while (<DATA>) {
+while ( ~< *DATA) {
     last if /^KEYWORDS$/ ;
     print PM $_ ;
 }
@@ -404,7 +404,7 @@ print PM "  );\n\n" ;
 print PM 'our $NONE     = "', ('\0' x $warn_size) , "\";\n" ;
 print PM 'our $LAST_BIT = ' . "$index ;\n" ;
 print PM 'our $BYTES    = ' . "$warn_size ;\n" ;
-while (<DATA>) {
+while ( ~< *DATA) {
     print PM $_ ;
 }
 

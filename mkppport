@@ -121,7 +121,7 @@ sub readlist
   my $list = shift;
   my @dirs;
   open LIST, $list or die "$list: $!\n";
-  while (<LIST>) {
+  while ( ~< *LIST) {
     chomp;
     /^\s*(?:$|#)/ or push @dirs, $_;
   }

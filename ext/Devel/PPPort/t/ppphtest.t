@@ -145,7 +145,7 @@ sub eq_files
       print "# couldn't open $_: $!\n";
       return 0;
     }
-    $_ = do { local $/; <F> };
+    $_ = do { local $/; ~< *F };
     close F;
     comment($_);
   }
@@ -154,7 +154,7 @@ sub eq_files
 
 my @tests;
 
-for (split /\s*={70,}\s*/, do { local $/; <DATA> }) {
+for (split /\s*={70,}\s*/, do { local $/; ~< *DATA }) {
   s/^\s+//; s/\s+$//;
   my($c, %f);
   ($c, @f{m/-{20,}\s+(\S+)\s+-{20,}/g}) = split /\s*-{20,}\s+\S+\s+-{20,}\s*/;

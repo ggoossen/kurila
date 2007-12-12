@@ -20,10 +20,10 @@ my %filetags = ();
 my %files = ();
 my @lines = ();
 
-while (<>) {
+while ( ~< *ARGV) {
   if ($_ eq "\x0C\n") {
     ##Grab next line and parse it for the filename
-    $_ = <>;
+    $_ = ~< *ARGV;
     chomp;
     s/,\d+$//;
     $filename = $_;
@@ -50,7 +50,7 @@ while (<>) {
 
 foreach $filename (keys %files) {
   open FILE, $filename or die "Couldn't open $filename: $!\n";
-  @lines = <FILE>;
+  @lines = ~< *FILE;
   close FILE;
   chomp @lines;
   foreach $tag ( @{$filetags{$filename}} ) {

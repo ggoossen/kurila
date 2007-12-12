@@ -53,7 +53,7 @@ foreach my $file (
     open(IN, $precooked) or die "Can't read-open $precooked: $!";
     {
       local $/;
-      $compstring = <IN>;
+      $compstring = ~< *IN;
     }
     close(IN);
 

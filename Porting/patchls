@@ -169,7 +169,7 @@ foreach my $argv (@ARGV) {
     print "Reading $in...\n" if $::opt_v and @ARGV > 1;
     $ls = $ls{$in} ||= { is_in => 1, in => $in };
     my $type;
-    while (<F>) {
+    while ( ~< *F) {
 	unless (/^([-+*]{3}) / || /^(Index):/) {
 	    # not an interesting patch line
 	    # but possibly meta-information or prologue
@@ -226,16 +226,16 @@ foreach my $argv (@ARGV) {
 	my $chip;
 	my $dir; ($dir = $in) =~ s:[\\/]patch$::;
 	if (!$ls->{From} && (open(CHIP,"$dir/article") || open(CHIP,"$dir/bug"))) {
-	    get_meta_info($ls, $_) while (<CHIP>);
+	    get_meta_info($ls, $_) while ( ~< *CHIP);
 	    $is_chip = 1;
 	}
 	if (open CHIP,"<$dir/from") {
-	    chop($chip = <CHIP>);
+	    chop($chip = ~< *CHIP);
 	    $ls->{From} = { $chip => 1 };
 	    $is_chip = 1;
 	}
 	if (open CHIP,"<$dir/tag") {
-	    chop($chip = <CHIP>);
+	    chop($chip = ~< *CHIP);
 	    $ls->{Title} = { $chip => 1 };
 	    $is_chip = 1;
 	}

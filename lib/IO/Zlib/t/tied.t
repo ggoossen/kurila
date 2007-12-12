@@ -34,7 +34,7 @@ ok(4, untie *OUT);
 
 ok(5, tie *IN, "IO::Zlib", $name, "rb");
 ok(6, !eof IN);
-ok(7, <IN> eq "hello - 123\n");
+ok(7, ~< *IN eq "hello - 123\n");
 ok(8, read(IN, $uncomp, 1024) == length($hello));
 ok(9, eof IN);
 ok(10, untie *IN);

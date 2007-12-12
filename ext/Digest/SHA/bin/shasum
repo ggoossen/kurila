@@ -224,7 +224,7 @@ if ($check) {
 
 	die "shasum: $checkfile: $!\n"
 		unless $fh = FileHandle->new($checkfile, "r");
-	while (<$fh>) {
+	while ( ~< $fh) {
 		s/\s+$//;
 		($sum, $modesym, $fname) = /^(\S+) (.)(.*)$/;
 		($binary, $portable, $text) =

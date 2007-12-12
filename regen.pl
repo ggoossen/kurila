@@ -34,7 +34,7 @@ sub do_cksum {
 	local *FH;
 	if (open(FH, $f)) {
 	    local $/;
-	    $cksum{$f} = unpack("%32C*", <FH>);
+	    $cksum{$f} = unpack("%32C*", ~< *FH);
 	    close FH;
 	} else {
 	    warn "$0: $f: $!\n";

@@ -1076,7 +1076,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
         local (*FIXOUT);
         open( FIXIN, $file ) or croak "Can't process '$file': $!";
         local $/ = "\n";
-        chomp( my $line = <FIXIN> );
+        chomp( my $line = ~< *FIXIN );
         next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
         # Now figure out the interpreter name.
         my ( $cmd, $arg ) = split ' ', $line, 2;
@@ -1139,7 +1139,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
         # Print out the new #! line (or equivalent).
         local $\;
         local $/;
-        print FIXOUT $shb, <FIXIN>;
+        print FIXOUT $shb, ~< *FIXIN;
         close FIXIN;
         close FIXOUT;
 
@@ -1278,7 +1278,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	} elsif (($Is_VMS || $Is_Dos) && $name =~ /[._]pl$/i) {
 	    # case-insensitive filesystem, one dot per name, so foo.h.PL
 	    # under Unix appears as foo.h_pl under VMS or fooh.pl on Dos
-	    local($/); open(PL,$name); my $txt = <PL>; close PL;
+	    local($/); open(PL,$name); my $txt = ~< *PL; close PL;
 	    if ($txt =~ /Extracting \S+ \(with variable substitutions/) {
 		($pl_files{$name} = $name) =~ s/[._]pl\z//i ;
 	    }
@@ -1333,7 +1333,7 @@ sub _has_pod {
     local *FH;
     my($ispod)=0;
     if (open(FH,"<$file")) {
-	while (<FH>) {
+	while ( ~< *FH) {
 	    if (/^=(?:head\d+|item|pod)\b/) {
 		$ispod=1;
 		last;
@@ -2670,7 +2670,7 @@ sub parse_abstract {
     my $inpod = 0;
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
-    while (<FH>) {
+    while ( ~< *FH) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if !$inpod;
         chop;
@@ -2705,7 +2705,7 @@ sub parse_version {
     local $_;
     open(FH,$parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
-    while (<FH>) {
+    while ( ~< *FH) {
 	$inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
 	next if $inpod || /^\s*#/;
 	chop;

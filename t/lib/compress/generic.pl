@@ -529,7 +529,7 @@ EOM
     my $fh1 ;
     ok $fh1 = 'IO::File'->new( "<$name") ;
     # skip leading junk
-    my $line = <$fh1> ;
+    my $line = ~< $fh1 ;
     ok $line eq $header ;
 
     ok my $x = $UncompressClass-> new( $fh1, Append => 1)  ;

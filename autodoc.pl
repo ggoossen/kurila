@@ -38,7 +38,7 @@ sub walk_table (&@) {
     }
     print $F $leader if $leader;
     seek IN, 0, 0;		# so we may restart
-    while (<IN>) {
+    while ( ~< *IN) {
 	chomp;
 	next if /^:/;
 	while (s|\\\s*$||) {
@@ -73,7 +73,7 @@ sub autodoc ($$) { # parse a file and extract documentation info
     my($fh,$file) = @_;
     my($in, $doc, $line);
 FUNC:
-    while (defined($in = <$fh>)) {
+    while (defined($in = ~< $fh)) {
         if ($in=~ /^=head1 (.*)/) {
             $curheader = $1;
             next FUNC;
@@ -85,7 +85,7 @@ FUNC:
 	    my($flags, $ret, $name, @args) = split /\|/, $proto;
 	    my $docs = "";
 DOC:
-	    while (defined($doc = <$fh>)) {
+	    while (defined($doc = ~< $fh)) {
 		$line++;
 		last DOC if $doc =~ /^=\w+/;
 		if ($doc =~ m:^\*/$:) {
@@ -171,7 +171,7 @@ my $file;
 my $MANIFEST = do {
   local ($/, *FH);
   open FH, "MANIFEST" or die "Can't open MANIFEST: $!";
-  <FH>;
+  ~< *FH;
 };
 
 for $file (($MANIFEST =~ /^(\S+\.c)\t/gm), ($MANIFEST =~ /^(\S+\.h)\t/gm)) {

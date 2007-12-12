@@ -10,8 +10,8 @@ my $output = 'plnr_out.pod';
 
 my $test = 0;
 print "1..7\n";
-while( <DATA> ) {
-    my $expected = $header.<DATA>; 
+while( ~< *DATA ) {
+    my $expected = $header. ~< *DATA; 
 
     open(IN, '>', $input) or die $!;
     print IN $header, $_;
@@ -22,7 +22,7 @@ while( <DATA> ) {
     $parser->parse_from_filehandle(\*IN,\*OUT);
 
     open OUT, '<', $output or die $!;
-    my $returned; { local $/; $returned = <OUT>; }
+    my $returned; { local $/; $returned = ~< *OUT; }
     
     unless( $returned eq $expected ) {
        print map { s/^/\#/mg; $_; }

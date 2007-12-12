@@ -200,7 +200,7 @@ sub filter {
     my $fh = IO::File->new( $_) or die "$0: cannot open $_ ($!)\n";
     # Process outputs can interrupt each other, so sort by pid first
     my %pid; local $_;
-    while (<$fh>) {
+    while ( ~< $fh) {
       chomp;
       s/^==(\d+)==\s?// and push @{$pid{$1}}, $_;
     }

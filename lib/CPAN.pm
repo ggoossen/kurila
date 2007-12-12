@@ -195,7 +195,7 @@ ReadLine support %s
                 $|=1;
             }
             print $prompt;
-            last SHELLCOMMAND unless defined ($_ = <> );
+            last SHELLCOMMAND unless defined ($_ = ~< *ARGV );
             if ($Echo_readline) {
                 # backdoor: I could not find a way to record sessions
                 print $_;
@@ -413,7 +413,7 @@ sub _yaml_loadfile {
             local *FH;
             open FH, $local_file or die "Could not open '$local_file': $!";
             local $/;
-            my $ystream = <FH>;
+            my $ystream = ~< *FH;
             my @yaml;
             eval { @yaml = $code->($ystream); };
             if ($@) {
@@ -891,8 +891,8 @@ sub checklock {
     if (-f $lockfile && -M _ > 0) {
         my $fh = FileHandle->new($lockfile) or
             $CPAN::Frontend->mydie("Could not open lockfile '$lockfile': $!");
-        my $otherpid  = <$fh>;
-        my $otherhost = <$fh>;
+        my $otherpid  = ~< $fh;
+        my $otherhost = ~< $fh;
         $fh->close;
         if (defined $otherpid && $otherpid) {
             chomp $otherpid;
@@ -1355,7 +1355,7 @@ sub readhist {
     my($fh) = FileHandle->new;
     open $fh, "<$histfile" or last;
     local $/ = "\n";
-    while (<$fh>) {
+    while ( ~< $fh) {
         chomp;
         $term->AddHistory($_);
     }
@@ -2189,7 +2189,7 @@ sub _reload_this {
             $CPAN::Frontend->mydie("Could not open $file: $!");
         local($/);
         local $^W = 1;
-        my $content = <$fh>;
+        my $content = ~< $fh;
         CPAN->debug(sprintf("reload file[%s] content[%s...]",$file,substr($content,0,128)))
             if $CPAN::DEBUG;
         delete $INC{$f};
@@ -2654,7 +2654,7 @@ sub status {
     my $ps = FileHandle->new;
     open $ps, "/proc/$$/status";
     my $vm = 0;
-    while (<$ps>) {
+    while ( ~< $ps) {
         next unless /VmSize:\s+(\d+)/;
         $vm = $1;
         last;
@@ -4263,7 +4263,7 @@ Trying with "$funkyftp$src_switch" to get
                     my $content = do { local *FH;
                                        open FH, $asl_ungz or die;
                                        local $/;
-                                       <FH> };
+                                       ~< *FH };
                     if ($content =~ /^<.*(<title>[45]|Error [45])/si) {
                         $CPAN::Frontend->mywarn(qq{
 No success, the file that lynx has downloaded looks like an error message:
@@ -4574,7 +4574,7 @@ sub new {
     if($fh->open($file)) {
         $protected = ($mode ^&^ 077) == 0;
         local($/) = "";
-      NETRC: while (<$fh>) {
+      NETRC: while ( ~< $fh) {
             my(@tokens) = split " ", $_;
           TOKEN: while (@tokens) {
                 my($t) = shift @tokens;
@@ -4950,7 +4950,7 @@ sub rd_authindex {
     tie *FH, 'CPAN::Tarzip', $index_target;
     local($/) = "\n";
     local($_);
-    push @lines, split /\012/ while <FH>;
+    push @lines, split /\012/ while ~< *FH;
     my $i = 0;
     my $painted = 0;
     foreach (@lines) {
@@ -5642,7 +5642,7 @@ sub dir_listing {
     # though.)
     $fh = FileHandle->new;
     if (open($fh, $lc_want)) {
-        my $line = <$fh>; close $fh;
+        my $line = ~< $fh; close $fh;
         unlink($lc_want) unless $line =~ /PGP/;
     }
 
@@ -5684,7 +5684,7 @@ sub dir_listing {
     my($cksum);
     if (open $fh, $lc_file) {
         local($/);
-        my $eval = <$fh>;
+        my $eval = ~< $fh;
         $eval =~ s/\015?\012/\n/g;
         close $fh;
         my($comp) = Safe->new();
@@ -6445,7 +6445,7 @@ sub try_download {
                 open FH, $system or die "Could not fork '$system': $!";
                 local $/ = "\n";
                 my $pversion;
-              PARSEVERSION: while (<FH>) {
+              PARSEVERSION: while ( ~< *FH) {
                     if (/^patch\s+([\d\.]+)/) {
                         $pversion = $1;
                         last PARSEVERSION;
@@ -6580,7 +6580,7 @@ We\'ll try to build it with that Makefile then.
             # name parsen und prereq
             my($state) = "poddir";
             my($name, $prereq) = ("", "");
-            while (<$fh>) {
+            while ( ~< $fh) {
                 if ($state eq "poddir" && /^=head\d\s+(\S+)/) {
                     if ($1 eq 'NAME') {
                         $state = "name";
@@ -6883,7 +6883,7 @@ Displaying file
   $local_file
 with pager "$pager"
 });
-    $fh_pager->print(<$fh_readme>);
+    $fh_pager->print( ~< $fh_readme);
     $fh_pager->close;
 }
 
@@ -6983,7 +6983,7 @@ sub CHECKSUM_check_file {
     my $fh = FileHandle->new;
     if (open $fh, $chk_file) {
         local($/);
-        my $eval = <$fh>;
+        my $eval = ~< $fh;
         $eval =~ s/\015?\012/\n/g;
         close $fh;
         my($comp) = Safe->new();
@@ -7798,7 +7798,7 @@ sub _find_prefs {
                     no strict;
                     open FH, "<$abs" or $CPAN::Frontend->mydie("Could not open '$abs': $!");
                     local $/;
-                    my $eval = <FH>;
+                    my $eval = ~< *FH;
                     close FH;
                     eval $eval;
                     if ($@) {
@@ -8320,7 +8320,7 @@ sub prereq_pm {
             $fh = FileHandle->new("<$makefile\0")) {
             CPAN->debug("Getting prereq from Makefile") if $CPAN::DEBUG;
             local($/) = "\n";
-            while (<$fh>) {
+            while ( ~< $fh) {
                 last if /MakeMaker post_initialize section/;
                 my($p) = m{^[\#]
                            \s+PREREQ_PM\s+=>\s+(.+)
@@ -8359,7 +8359,7 @@ sub prereq_pm {
                                        or $CPAN::Frontend->mydie("Could not open ".
                                                                  "'$build_prereqs': $!");
                                    local $/;
-                                   <FH>;
+                                   ~< *FH;
                                };
                 my $bphash = eval $content;
                 if ($@) {
@@ -8867,7 +8867,7 @@ sub install {
     $CPAN::META->set_perl5lib;
     my($pipe) = FileHandle->new("$system $stderr |");
     my($makeout) = "";
-    while (<$pipe>) {
+    while ( ~< $pipe) {
         print $_; # intentionally NOT use Frontend->myprint because it
                   # looks irritating when we markup in color what we
                   # just pass through from an external program
@@ -8945,7 +8945,7 @@ sub _check_binary {
         $pid = open README, "which $binary|"
             or $CPAN::Frontend->mywarn(qq{Could not fork 'which $binary': $!\n});
         return unless $pid;
-        while (<README>) {
+        while ( ~< *README) {
             $out .= $_;
         }
         close README
@@ -9018,7 +9018,7 @@ Could not fork '$html_converter $saved_file': $!});
                 $fh = FileHandle->new();
                 open $fh, ">$filename" or die;
             }
-            while (<README>) {
+            while ( ~< *README) {
                 $fh->print($_);
             }
             close README or
@@ -9047,7 +9047,7 @@ Displaying URL
 with pager "$pager"
 });
             $CPAN::Frontend->mysleep(1);
-            $fh_pager->print(<FH>);
+            $fh_pager->print( ~< *FH);
             $fh_pager->close;
         } else {
             # coldn't find the web browser or html converter
@@ -9377,7 +9377,7 @@ sub contains {
     open($fh,$inst_file) or die "Could not open '$inst_file': $!";
     my $in_cont = 0;
     $self->debug("inst_file[$inst_file]") if $CPAN::DEBUG;
-    while (<$fh>) {
+    while ( ~< $fh) {
         $in_cont = m/^=(?!head1\s+CONTENTS)/ ? 0 :
             m/^=head1\s+CONTENTS/ ? 1 : $in_cont;
         next unless $in_cont;
@@ -9424,7 +9424,7 @@ sub find_bundle_file {
     my $bundle_filename = $what;
     $bundle_filename =~ s|Bundle.*/||;
     my $bundle_unixpath;
-    while (<$fh>) {
+    while ( ~< $fh) {
         next if /^\s*\#/;
         my($file) = /(\S+)/;
         if ($file =~ m|\Q$what\E$|) {
@@ -9804,7 +9804,7 @@ sub as_string {
                 $lfre .= "\\.pm\$";
                 my($lfl); # local file file
                 local $/ = "\n";
-                my(@mflines) = <$mfh>;
+                my(@mflines) = ~< $mfh;
                 for (@mflines) {
                     s/^\s+//;
                     s/\s.*//s;
@@ -9854,7 +9854,7 @@ sub manpage_headline {
             or $Carp::Frontend->mydie("Couldn't open $locf: $!");
         my $inpod = 0;
         local $/ = "\n";
-        while (<$fh>) {
+        while ( ~< $fh) {
             $inpod = m/^=(?!head1\s+NAME\s*$)/ ? 0 :
                 m/^=head1\s+NAME\s*$/ ? 1 : $inpod;
             next unless $inpod;

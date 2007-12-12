@@ -14,7 +14,7 @@ sub slurp {
   local (*FH, $/);
   open FH, "<$file" or die "Can't open '$file': $!";
   binmode FH;
-  my $contents = <FH>;
+  my $contents = ~< *FH;
   die "Can't read $file: $!" unless defined $contents;
   return $contents;
 }

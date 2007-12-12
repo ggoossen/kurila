@@ -113,7 +113,7 @@ if($pid = fork()) {
   SERVER_LOOP:
     while (1) {
        last SERVER_LOOP unless $sock = $listen->accept;
-       while (<$sock>) {
+       while ( ~< $sock) {
            last SERVER_LOOP if /^quit/;
            last if /^done/;
            print;
@@ -225,7 +225,7 @@ local @data;
 if( !open( SRC, "< $0")) {
     print "not ok 15 - $!\n";
 } else {
-    @data = <SRC>;
+    @data = ~< *SRC;
     close(SRC);
     print "ok 15\n";
 }
@@ -255,7 +255,7 @@ if( $server_pid) {
 	$sock->print("send\n");
 
 	my @array = ();
-	while( <$sock>) {
+	while( ~< $sock) {
 	    push( @array, $_);
 	}
 
@@ -293,17 +293,17 @@ if( $server_pid) {
 
 	if ($has_perlio) {
 	    $sock->print("ping \x{100}\n");
-	    chomp(my $pong = scalar <$sock>);
+	    chomp(my $pong = scalar ~< $sock);
 	    print $pong =~ /^pong (.+)$/ && $1 eq "\x{100}" ?
 		"ok 20\n" : "not ok 20\n";
 
 	    $sock->print("ord \x{100}\n");
-	    chomp(my $ord = scalar <$sock>);
+	    chomp(my $ord = scalar ~< $sock);
 	    print $ord == 0x100 ?
 		"ok 21\n" : "not ok 21\n";
 
 	    $sock->print("chr 0x100\n");
-	    chomp(my $chr = scalar <$sock>);
+	    chomp(my $chr = scalar ~< $sock);
 	    print $chr eq "\x{100}" ?
 		"ok 22\n" : "not ok 22\n";
 	} else {
@@ -314,7 +314,7 @@ if( $server_pid) {
 
 	my @array = ();
 	while( !eof( $sock ) ){
-	    while( <$sock>) {
+	    while( ~< $sock) {
 		push( @array, $_);
 		last;
 	    }
@@ -354,7 +354,7 @@ if( $server_pid) {
 	# Do not print ok/not ok for this binmode() since there's
 	# a race condition with our client, just die if we fail.
 	if ($has_perlio) { binmode($sock, ":utf8") or die }
-	while (<$sock>) {
+	while ( ~< $sock) {
 	    last SERVER_LOOP if /^quit/;
 	    last if /^done/;
 	    if (/^ping (.+)/) {

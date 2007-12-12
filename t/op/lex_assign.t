@@ -24,7 +24,7 @@ pos $posstr = 3;
 $nn = $n = 2;
 sub subb {"in s"}
 
-@INPUT = <DATA>;
+@INPUT = ~< *DATA;
 @simple_input = grep /^\s*\w+\s*\$\w+\s*[#\n]/, @INPUT;
 print "1..", (11 + @INPUT + @simple_input), "\n";
 $ord = 0;

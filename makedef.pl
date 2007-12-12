@@ -99,7 +99,7 @@ elsif ($PLATFORM eq 'MacOS') {
 
 unless ($PLATFORM eq 'win32' || $PLATFORM eq 'wince' || $PLATFORM eq 'MacOS' || $PLATFORM eq 'netware') {
     open(CFG,$config_sh) || die "Cannot open $config_sh: $!\n";
-    while (<CFG>) {
+    while ( ~< *CFG) {
 	if (/^(?:ccflags|optimize)='(.+)'$/) {
 	    $_ = $1;
 	    $define{$1} = 1 while /-D(\w+)/g;
@@ -117,14 +117,14 @@ unless ($PLATFORM eq 'win32' || $PLATFORM eq 'wince' || $PLATFORM eq 'MacOS' || 
 }
 if ($PLATFORM eq 'win32' || $PLATFORM eq 'wince') {
     open(CFG,"<..\\$config_sh") || die "Cannot open ..\\$config_sh: $!\n";
-    if ((join '', <CFG>) =~ /^static_ext='(.*)'$/m) {
+    if ((join '', ~< *CFG) =~ /^static_ext='(.*)'$/m) {
         $static_ext = $1;
     }
     close(CFG);
 }
 
 open(CFG,$config_h) || die "Cannot open $config_h: $!\n";
-while (<CFG>) {
+while ( ~< *CFG) {
     $define{$1} = 1 if /^\s*#\s*define\s+(MYMALLOC)\b/;
     $define{$1} = 1 if /^\s*#\s*define\s+(MULTIPLICITY)\b/;
     $define{$1} = 1 if /^\s*#\s*define\s+(PERL_\w+)\b/;
@@ -177,10 +177,10 @@ if ($PLATFORM =~ /^win(?:32|ce)$/) {
 }
 elsif ($PLATFORM eq 'os2') {
     if (open my $fh, '<', 'perl5.def') {
-      while (<$fh>) {
+      while ( ~< $fh) {
 	last if /^\s*EXPORTS\b/;
       }
-      while (<$fh>) {
+      while ( ~< $fh) {
 	$ordinal{$1} = $2 if /^\s*"(\w+)"\s*(?:=\s*"\w+"\s*)?\@(\d+)\s*$/;
 	# This allows skipping ordinals which were used in older versions
 	$sym_ord = $1 if /^\s*;\s*LAST_ORDINAL\s*=\s*(\d+)\s*$/;
@@ -922,7 +922,7 @@ sub readvar {
     my $proc = shift || sub { "PL_$_[2]" };
     open(VARS,$file) || die "Cannot open $file: $!\n";
     my @syms;
-    while (<VARS>) {
+    while ( ~< *VARS) {
 	# All symbols have a Perl_ prefix because that's what embed.h
 	# sticks in front of them.  The A?I?S?C? is strictly speaking
 	# wrong.
@@ -1146,7 +1146,7 @@ if ($define{'USE_PERLIO'}) {
 
 for my $syms (@syms) {
     open (GLOBAL, "<$syms") || die "failed to open $syms: $!\n";
-    while (<GLOBAL>) {
+    while ( ~< *GLOBAL) {
 	next if (!/^[A-Za-z]/);
 	# Functions have a Perl_ prefix
 	# Variables have a PL_ prefix
@@ -1193,7 +1193,7 @@ sub try_symbol {
     emit_symbol($symbol);
 }
 
-while (<DATA>) {
+while ( ~< *DATA) {
     try_symbol($_);
 }
 
@@ -1370,7 +1370,7 @@ if ($PLATFORM =~ /^win(?:32|ce)$/) {
 elsif ($PLATFORM eq 'os2') {
     my (%mapped, @missing);
     open MAP, 'miniperl.map' or die 'Cannot read miniperl.map';
-    /^\s*[\da-f:]+\s+(\w+)/i and $mapped{$1}++ foreach <MAP>;
+    /^\s*[\da-f:]+\s+(\w+)/i and $mapped{$1}++ foreach ~< *MAP;
     close MAP or die 'Cannot close miniperl.map';
 
     @missing = grep { !exists $mapped{$_} }
@@ -1381,7 +1381,7 @@ elsif ($PLATFORM eq 'os2') {
 elsif ($PLATFORM eq 'MacOS') {
     open MACSYMS, 'macperl.sym' or die 'Cannot read macperl.sym';
 
-    while (<MACSYMS>) {
+    while ( ~< *MACSYMS) {
 	try_symbol($_);
     }
 

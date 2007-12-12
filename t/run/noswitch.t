@@ -5,7 +5,7 @@ BEGIN {
     *ARGV = *DATA;
 }
 print "ok 1\n";
-print <>;
+print ~< *ARGV;
 print "ok 3\n";
 
 __DATA__

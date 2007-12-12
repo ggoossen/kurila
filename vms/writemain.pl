@@ -17,7 +17,7 @@ open (IN,"${dir}miniperlmain.c")
 open (OUT,">${dir}perlmain.c")
   || die "$0: Can't open ${dir}perlmain.c: $!\n";
 
-while (<IN>) {
+while ( ~< *IN) {
   print OUT;
   last if /Do not delete this line--writemain depends on it/;
 }

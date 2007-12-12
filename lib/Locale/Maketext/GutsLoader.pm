@@ -30,7 +30,7 @@ if($@) {
   open(IN, $path) or die "Can't read-open $path\nAborting";
   
   my $source;
-  { local $/;  $source = <IN>; }
+  { local $/;  $source = ~< *IN; }
   close(IN);
   unless( $source =~ s/\b(use utf8)/# $1/ ) {
     Locale::Maketext::DEBUG and

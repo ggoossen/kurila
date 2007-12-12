@@ -81,7 +81,7 @@ sub _validate {
                     local *FH;
                     open FH, $path or die "Could not open '$path': $!";
                     local $/;
-                    <FH>;
+                    ~< *FH;
                 };
                 $VAR1 = undef;
                 eval $content;
@@ -116,7 +116,7 @@ sub yaml {
         local *FH;
         open FH, $path or die "Could not open '$path': $!";
         local $/;
-        <FH>;
+        ~< *FH;
     };
     return $content;
 }

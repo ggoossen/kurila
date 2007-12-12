@@ -8,7 +8,7 @@ BEGIN {
 
 $| = 1;
 undef $/;
-my @prgs = split "\n########\n", <DATA>;
+my @prgs = split "\n########\n", ~< *DATA;
 print "1..", scalar @prgs, "\n";
 
 my $Is_VMS = $^O eq 'VMS';

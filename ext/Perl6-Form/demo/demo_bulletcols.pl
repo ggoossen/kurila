@@ -2,7 +2,7 @@ use Perl6::Form;
 
 my $bullet = "<>";
 
-my @items = <DATA>;
+my @items = ~< *DATA;
 s/\\n/\n/g for @items;
 s/\\r/\r/g for @items;
 

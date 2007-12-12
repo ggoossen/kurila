@@ -33,7 +33,7 @@ ok( (print $fh $a), "print to output file");
 ok( close($fh), 'close output file');
 
 ok( open($fh,"<via(PerlIO::via::QuotedPrint)", $tmp), 'open QuotedPrint for input');
-{ local $/; $b = <$fh> }
+{ local $/; $b = ~< $fh }
 ok( close($fh), "close input file");
 
 is($a, $b, 'compare original data with filtered version');
@@ -57,7 +57,7 @@ is($a, $b, 'compare original data with filtered version');
     my $fd2 = open($fh,"<$tmp") && fileno($fh);
     is($fd2,$fd,"Wrong fd number after failed open");
 
-    my $data = <$fh>;
+    my $data = ~< $fh;
 
     is($data,"Hello\n","File clobbered by failed open");
 

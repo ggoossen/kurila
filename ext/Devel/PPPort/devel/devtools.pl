@@ -71,8 +71,8 @@ sub run
 
   my %rval = (
     status    => $? >> 8,
-    stdout    => [<$out>],
-    stderr    => [<$err>],
+    stdout    => [ ~< $out],
+    stderr    => [ ~< $err],
     didnotrun => 0,
   );
 
@@ -100,7 +100,7 @@ sub ask($)
   my $a;
   local $| = 1;
   print "\n$q [y/n] ";
-  do { $a = <>; } while ($a !~ /^\s*([yn])\s*$/i);
+  do { $a = ~< *ARGV; } while ($a !~ /^\s*([yn])\s*$/i);
   return lc $1 eq 'y';
 }
 

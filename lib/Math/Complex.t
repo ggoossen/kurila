@@ -35,7 +35,7 @@ if ($^O eq 'unicos') { 	# For some reason root() produces very inaccurate
 }			# cos(), sin(), cosh(), sinh().  The division
 			# of doubles is the current suspect.
 
-while (<DATA>) {
+while ( ~< *DATA) {
 	s/^\s+//;
 	next if $_ eq '' || /^\#/;
 	chomp;

@@ -38,7 +38,7 @@ my $out = tie *OUT, 'TieOut';
 my $writable = 1;
 
 if (open(TCOUT, ">tcout")) {
-	print TCOUT <DATA>;
+	print TCOUT ~< *DATA;
 	close TCOUT;
 } else {
 	$writable = 0;

@@ -46,7 +46,7 @@ if ($ENV{PATH} =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
 }
 
 if (open(GCC, "gcc -v 2>&1 |")) {
-   while (<GCC>) {
+   while ( ~< *GCC) {
      # print;
      if (/Reading specs from (.+?)\\Epoc32\\/i) {
        $SYMBIAN_ROOT = $1;

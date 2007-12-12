@@ -180,7 +180,7 @@ END { unlink $file; }
 }
 {
     open my $_, $file or die "Can't open $file: $!";
-    my $x = <$_>;
+    my $x = ~< $_;
     ok( $x eq "hello\n", 'reading from <$_> works' );
     close $_;
 }

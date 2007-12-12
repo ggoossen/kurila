@@ -375,7 +375,7 @@ sub _switches {
 
     local *TEST;
     open(TEST, $file) or print "can't open $file. $!\n";
-    my $shebang = <TEST>;
+    my $shebang = ~< *TEST;
     close(TEST) or print "can't close $file. $!\n";
 
     my $taint = ( $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/ );

@@ -31,7 +31,7 @@ $fh = (FileHandle->new( "./TEST", O_RDONLY)
   and print "ok 2\n";
 
 
-$buffer = <$fh>;
+$buffer = ~< $fh;
 print $buffer eq "#!./perl\n" ? "ok 3\n" : "not ok 3\n";
  $fh->
 
@@ -43,15 +43,15 @@ close $fh;
 
 $fh = FileHandle->new();
 
-print "not " unless ($fh->open("< TEST") && <$fh> eq $buffer);
+print "not " unless ($fh->open("< TEST") && ~< $fh eq $buffer);
 print "ok 5\n";
 
 $fh->seek(0,0);
-print "#possible mixed CRLF/LF in t/TEST\nnot " unless (<$fh> eq $buffer);
+print "#possible mixed CRLF/LF in t/TEST\nnot " unless ( ~< $fh eq $buffer);
 print "ok 6\n";
 
 $fh->seek(0,2);
-$line = <$fh>;
+$line = ~< $fh;
 print "not " if (defined($line) || !$fh->eof);
 print "ok 7\n";
 

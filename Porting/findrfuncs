@@ -26,7 +26,7 @@ my $EXE = '';
 
 if (open(CONFIG, "config.sh")) {
     local $/;
-    my $CONFIG = <CONFIG>;
+    my $CONFIG = ~< *CONFIG;
     $SO  = $1 if $CONFIG =~ /^so='(\w+)'/m;
     $EXE = $1 if $CONFIG =~ /^_exe='\.(\w+)'/m;
     close(CONFIG);
@@ -52,7 +52,7 @@ find(sub {
 	open F, "<$File::Find::name"
 	    or die "Can't open $File::Find::name: $!";
 	my $line;
-	while (defined ($line = <F>)) {
+	while (defined ($line = ~< *F)) {
 	    if ($line =~ /\b(\w+_r)\b/) {
 		#warn "$1 => $File::Find::name\n";
 		$rfuncs{$1}->{$File::Find::name}++;

@@ -1,5 +1,5 @@
 local $/;
-$_ = <ARGV>;
+$_ = ~< *ARGV;
 
 my @accv = /(^-+ \w+ -- \d+ --(?:.(?!^-))+)/msg;
 my @leak = /(\d+ bytes? in \d+ leaks? .+? created at:(?:.(?!^[\d-]))+)/msg;

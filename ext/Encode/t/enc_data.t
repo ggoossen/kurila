@@ -27,10 +27,10 @@ my @a;
 
 {
 local $TODO = "decode of data section";
-is <DATA>, "これはDATAファイルハンドルのテストです。"."\n";
+is ~< *DATA, "これはDATAファイルハンドルのテストです。"."\n";
 }
 
-while (<DATA>) {
+while ( ~< *DATA) {
   $_ = Encode::decode('euc-jp', $_);
   chomp;
   tr/ぁ-んァ-ン/ァ-ンぁ-ん/;

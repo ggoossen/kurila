@@ -23,7 +23,7 @@ sub censored() {
 	       };
 }
 
-my $script = do{local$/;<DATA>};
+my $script = do{local$/; ~< *DATA};
 
 print form censored,
 	 "[Ye following tranfcript hath been cenfored by Order of ye King]\n\n",

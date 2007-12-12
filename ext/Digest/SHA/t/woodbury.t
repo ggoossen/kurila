@@ -19,7 +19,7 @@ BEGIN {
 	}
 }
 
-my @plex = map { eval } <DATA>;
+my @plex = map { eval } ~< *DATA;
 
 my $numtests = scalar(@plex) / 3;
 print "1..$numtests\n";

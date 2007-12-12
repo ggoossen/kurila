@@ -31,10 +31,10 @@ print "ok 1\n";
 
 my $parser = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
-while (<DATA>) {
+while ( ~< *DATA) {
     next until $_ eq "###\n";
     open (TMP, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         print TMP $_;
     }
@@ -46,12 +46,12 @@ while (<DATA>) {
     my $output;
     {
         local $/;
-        $output = <TMP>;
+        $output = ~< *TMP;
     }
     close TMP;
     unlink ('tmp.pod', 'out.tmp');
     my $expected = '';
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }

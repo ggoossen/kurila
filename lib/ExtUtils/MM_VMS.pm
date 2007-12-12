@@ -130,7 +130,7 @@ sub guess_name {
       }
     }
     if (open(PM,"${defpm}.pm")){
-        while (<PM>) {
+        while ( ~< *PM) {
             if (/^\s*package\s+([^;]+)/i) {
                 $defname = $1;
                 last;
@@ -1441,7 +1441,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	if (-f $extralibs ) {
 	    my %seenthis;
 	    open LIST,$extralibs or warn $!,next;
-	    while (<LIST>) {
+	    while ( ~< *LIST) {
 		chomp;
 		# Include a library in the link only once, unless it's mentioned
 		# multiple times within a single extension's options file, in which
@@ -1457,7 +1457,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	# Get full name of extension for ExtUtils::Miniperl
 	if (-f $extopt) {
 	    open OPT,$extopt or die $!;
-	    while (<OPT>) {
+	    while ( ~< *OPT) {
 		next unless /(?:UNIVERSAL|VECTOR)=boot_([\w_]+)/;
 		my $pkg = $1;
 		$pkg =~ s#__*#::#g;

@@ -31,7 +31,7 @@ my @FILES = qw(
 
 {
     local($^I, @ARGV) = ('.orig', @FILES);
-    while (<>) {
+    while ( ~< *ARGV) {
 	if ($r) {
 	    s/\015\012/\012/;		# Curliffs to liffs.
 	} else {

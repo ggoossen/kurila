@@ -77,7 +77,7 @@ sub getPerlFiles
 
         open M, "<$manifest"
             or die "Cannot open '$manifest': $!\n";
-        while (<M>)
+        while ( ~< *M)
         {
             chomp ;
             next if /^\s*#/ || /^\s*$/ ;
@@ -219,7 +219,7 @@ sub doUpDown
     local ($^I) = ($^O eq 'VMS') ? "_bak" : ".bak";
     local (@ARGV) = shift;
  
-    while (<>)
+    while ( ~< *ARGV)
     {
         print, last if /^__(END|DATA)__/ ;
 
@@ -230,7 +230,7 @@ sub doUpDown
 
     return if eof ;
 
-    while (<>)
+    while ( ~< *ARGV)
       { print }
 }
 
@@ -254,7 +254,7 @@ sub doUpDownViaCopy
     {
         open F, "<$file"
             or die "Cannot open $file: $!\n" ;
-        while (<F>)
+        while ( ~< *F)
         {
             if (/^__(END|DATA)__/)
             {
@@ -269,7 +269,7 @@ sub doUpDownViaCopy
 
         if (! eof F)
         {
-            while (<F>)
+            while ( ~< *F)
               { push @keep, $_ }
         }
         close F;

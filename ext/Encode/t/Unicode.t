@@ -121,10 +121,10 @@ for my $file (@file){
     my $content;
     if (PerlIO::Layer->find('perlio')){
     binmode $fh => ':utf8';
-    $content = join('' => <$fh>);
+    $content = join('' => ~< $fh);
     }else{ # ugh!
     binmode $fh;
-    $content = join('' => <$fh>);
+    $content = join('' => ~< $fh);
     }
     close $fh;
     is(decode("UTF-7", encode("UTF-7", $content)), $content, 

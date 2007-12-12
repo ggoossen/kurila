@@ -53,7 +53,7 @@ SKIP: {
     CORE::open($writer = \*WRITER, ">&=".$fds[1]);
     print $writer "ok 6\n";
     close $writer;
-    print <$reader>;
+    print ~< $reader;
     close $reader;
     next_test();
 }

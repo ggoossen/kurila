@@ -8,7 +8,7 @@ while ($work)
  {
   open(PIPE,"make $targ 2>&1 |") || die "Cannot open pipe to make:$!";
   my %fix;
-  while (<PIPE>)
+  while ( ~< *PIPE)
    {
     if (/^(.*):(\d+):\s+\`(\w+)'\s+undeclared/ && -f $1 )
      {
@@ -34,7 +34,7 @@ while ($work)
     @ARGV = ($file);
     $. = 0;
     local $^I = '.sav';
-    while (<>)
+    while ( ~< *ARGV)
      {
       while (@ar && $. == $ar[0][0])
        {

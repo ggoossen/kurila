@@ -33,7 +33,7 @@ my @statefiles = ("dl001.tmp", "dl256.tmp", "dl384.tmp", "dl512.tmp");
 for (@statefiles) {
 	push @tempfiles, $_;
 	my $fh = FileHandle->new($_, "w");
-	for (1 .. 8) { my $line = <DATA>; print $fh $line }
+	for (1 .. 8) { my $line = ~< *DATA; print $fh $line }
 	$fh->close;
 }
 my $tmpfile = "dumpload.tmp";

@@ -60,7 +60,7 @@ if (!defined $file) {
 	|| open(TESTS,':op:re_tests') || die "Can't open re_tests";
 }
 
-my @tests = <TESTS>;
+my @tests = ~< *TESTS;
 
 close TESTS;
 

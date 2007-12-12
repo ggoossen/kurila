@@ -12,7 +12,7 @@
 $|=1;
 
 undef $/;
-our @prgs = split /^########\n/m, <DATA>;
+our @prgs = split /^########\n/m, ~< *DATA;
 
 BEGIN { require './test.pl'; }
 plan(tests => scalar @prgs);

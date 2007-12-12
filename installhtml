@@ -251,7 +251,7 @@ foreach my $dir (@splithead) {
 	die "$0: error opening $file.html for input: $!\n";
     $/ = "";
     my @data = ();
-    while (<H>) {
+    while ( ~< *H) {
 	last if /name="name"/i;
 	$_ =~ s{href="#(.*)">}{
 	    my $url = "$pod/$1.html" ;
@@ -327,7 +327,7 @@ sub create_index {
 
 	open(IN, "<$dir/$file") ||
 	    die "$0: error opening $dir/$file for input: $!\n";
-	@filedata = <IN>;
+	@filedata = ~< *IN;
 	close(IN);
 
 	# pull out the NAME section
@@ -438,7 +438,7 @@ sub splitpod {
     $/ = "";
     open(SPLITIN, "<$pod") ||
 	die "$0: error opening $pod for input: $!\n";
-    @filedata = <SPLITIN>;
+    @filedata = ~< *SPLITIN;
     close(SPLITIN) ||
 	die "$0: error closing $pod: $!\n";
 

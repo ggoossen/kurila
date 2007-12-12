@@ -11,7 +11,7 @@ my $x = deflateInit()
    or die "Cannot create a deflation stream\n" ;
 
 my ($output, $status) ;
-while (<>)
+while ( ~< *ARGV)
 {
     ($output, $status) = $x->deflate($_) ;
 

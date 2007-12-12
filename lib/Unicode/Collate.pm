@@ -305,7 +305,7 @@ sub read_table {
 	croak("$PACKAGE: Can't locate $f in \@INC (\@INC contains: @INC)");
     }
 
-    while (my $line = <$fh>) {
+    while (my $line = ~< $fh) {
 	next if $line =~ /^\s*#/;
 	unless ($line =~ s/^\s*\@//) {
 	    $self->parseEntry($line);

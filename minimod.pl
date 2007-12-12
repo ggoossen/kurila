@@ -34,7 +34,7 @@ $head= <<'EOF!HEAD';
 END
 
 open MINI, "miniperlmain.c";
-while (<MINI>) {
+while ( ~< *MINI) {
     last if /Do not delete this line--writemain depends on it/;
     print;
 }
@@ -44,7 +44,7 @@ EOF!HEAD
 $tail=<<'EOF!TAIL';
 END
 
-while (<MINI>) {
+while ( ~< *MINI) {
     print unless /dXSUB_SYS/;
 }
 close MINI;

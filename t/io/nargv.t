@@ -17,7 +17,7 @@ for my $i ( 1,2,5,4,3 ) {
     local $_;
     @ARGV = mkfiles(1..3);
     my $n = 0;
-    while (<>) {
+    while ( ~< *ARGV) {
 	print STDOUT "# initial \@ARGV: [@ARGV]\n";
 	if ($n++ == 2) {
 	    other();
@@ -29,7 +29,7 @@ for my $i ( 1,2,5,4,3 ) {
 $^I = undef;
 @ARGV = mkfiles(1..3);
 my $n = 0;
-while (<>) {
+while ( ~< *ARGV) {
     print STDOUT "#final \@ARGV: [@ARGV]\n";
     if ($n++ == 2) {
 	other();
@@ -50,7 +50,7 @@ sub other {
     local *ARGVOUT;
     local $_;
     @ARGV = mkfiles(5, 4);
-    while (<>) {
+    while ( ~< *ARGV) {
 	print STDOUT "# inner \@ARGV: [@ARGV]\n";
 	show();
     }

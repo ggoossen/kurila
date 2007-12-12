@@ -60,7 +60,7 @@ my $contents;
 {
     local $/;
     open I, "<", 'db.out' or die $!;
-    $contents = <I>;
+    $contents = ~< *I;
     close(I);
 }
 

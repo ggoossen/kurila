@@ -41,7 +41,7 @@ sub do_test {
 	    $pattern =~ s/^ *\$IVNV *\n//mge;
 
 	    print $pattern, "\n" if $DEBUG;
-	    my ($dump, $dump2) = split m/\*\*\*\*\*\n/, scalar <IN>;
+	    my ($dump, $dump2) = split m/\*\*\*\*\*\n/, scalar ~< *IN;
 	    print $dump, "\n"    if $DEBUG;
 	    like( $dump, qr/\A$pattern\Z/ms );
 

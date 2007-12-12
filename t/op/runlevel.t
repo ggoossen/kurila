@@ -15,7 +15,7 @@ $ENV{PERL5LIB} = "../lib" unless $Is_VMS;
 $|=1;
 
 undef $/;
-our @prgs = split "\n########\n", <DATA>;
+our @prgs = split "\n########\n", ~< *DATA;
 print "1..", scalar @prgs, "\n";
 
 our $tmpfile = "runltmp000";

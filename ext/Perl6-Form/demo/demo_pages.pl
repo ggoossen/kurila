@@ -1,6 +1,6 @@
 use Perl6::Form;
 
-my @text = <DATA>;
+my @text = ~< *DATA;
 
 my %page = (
 	header => { first => qq{Hamlet's soliloquy begins...\n\n},

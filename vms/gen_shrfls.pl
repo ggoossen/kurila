@@ -44,7 +44,7 @@ if ($ARGV[0] eq '-f') {
   open(INP,$ARGV[1]) or die "Can't read input file $ARGV[1]: $!\n";
   print "Input taken from file $ARGV[1]\n" if $debug;
   @ARGV = ();
-  while (<INP>) {
+  while ( ~< *INP) {
     chomp;
     push(@ARGV,split(/\|/,$_));
   }
@@ -78,7 +78,7 @@ if ($docc) {
   # Go see what is enabled in config.sh
   $config = $dir . "config.sh";
   open CONFIG, "< $config";
-  while(<CONFIG>) {
+  while( ~< *CONFIG) {
     $use_threads++ if /usethreads='(define|yes|true|t|y|1)'/i;
     $use_mymalloc++ if /usemymalloc='(define|yes|true|t|y|1)'/i;
     $care_about_case++ if /d_vms_case_sensitive_symbols='(define|yes|true|t|y|1)'/i;
@@ -197,23 +197,23 @@ else {
 %checkh = map { $_,1 } qw( bytecode byterun intrpvar perlapi perlio perliol 
                            perlvars proto regcomp thrdvar thread );
 $ckfunc = 0;
-LINE: while (<CPP>) {
+LINE: while ( ~< *CPP) {
   while (/^#.*vmsish\.h/i .. /^#.*perl\.h/i) {
     while (/__VMS_PROTOTYPES__/i .. /__VMS_SEPYTOTORP__/i) {
       print "vms_proto>> $_" if $debug > 2;
       if (/^\s*EXT(CONST|\s+)/) { &scan_var($_);  }
       else        { &scan_func($_); }
-      last LINE unless defined($_ = <CPP>);
+      last LINE unless defined($_ = ~< *CPP);
     }
     print "vmsish.h>> $_" if $debug > 2;
     if (/^\s*EXT(CONST|\s+)/) { &scan_var($_); }
-    last LINE unless defined($_ = <CPP>);
+    last LINE unless defined($_ = ~< *CPP);
   }    
   while (/^#.*opcode\.h/i .. /^#.*perl\.h/i) {
     print "opcode.h>> $_" if $debug > 2;
     if (/^OP \*\s/) { &scan_func($_); }
     if (/^\s*EXT(CONST|\s+)/) { &scan_var($_); }
-    last LINE unless defined($_ = <CPP>);
+    last LINE unless defined($_ = ~< *CPP);
   }
   # Check for transition to new header file
   if (/^# \d+ "(\S+)"/) {
@@ -237,7 +237,7 @@ LINE: while (<CPP>) {
 }
 close CPP;
 
-while (<DATA>) {
+while ( ~< *DATA) {
   next if /^#/;
   s/\s+#.*\n//;
   next if /^\s*$/;
@@ -386,7 +386,7 @@ elsif (@symfiles) { $incstr .= ',' . join(',',@symfiles); }
 print OPTBLD "$libperl/Include=($incstr)\n";
 print OPTBLD "$libperl/Library\n";
 open(RTLOPT,$rtlopt) or die "$0: Can't read options file $rtlopt: $!\n";
-while (<RTLOPT>) { print OPTBLD; }
+while ( ~< *RTLOPT) { print OPTBLD; }
 close RTLOPT;
 close OPTBLD;
 

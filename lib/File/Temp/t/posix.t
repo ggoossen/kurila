@@ -58,7 +58,7 @@ if (defined $fh) {
   ok( seek($fh,0,0) );
 
   # Read from it
-  my $line = <$fh>;
+  my $line = ~< $fh;
 
   print "# TMPFILE: Read line: $line";
   ok( $original, $line);

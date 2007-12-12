@@ -29,7 +29,7 @@ undef $io;
 
 $io = IO::File->new;
 ok($io->open("io_utf8", "<:utf8"), "open <:utf8");
-is(ord(<$io>), 256, "readline chr(256)");
+is(ord( ~< $io), 256, "readline chr(256)");
 undef $io;
 
 END {

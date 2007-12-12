@@ -173,7 +173,7 @@ my %seend; # the type of this function's "D"
 my %seenm; # all the types
 my %seenu; # the length of the argument list of this function
 
-while (<DATA>) { # Read in the protypes.
+while ( ~< *DATA) { # Read in the protypes.
     next if /^\s+$/;
     chomp;
     my ($func, $hdr, $type, @p) = split(/\s*\|\s*/, $_, -1);

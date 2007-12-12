@@ -5,7 +5,7 @@
 use strict;
 my @lines;
 my ($head, $tail);
-while (<>){
+while ( ~< *ARGV){
     unless (m/^<U/o){
         unless(@lines){
         $head .= $_;

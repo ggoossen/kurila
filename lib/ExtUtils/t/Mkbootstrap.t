@@ -32,7 +32,7 @@ SKIP: {
 	ok( -s 'mkboot.bso', 'Mkbootstrap should backup the .bs file' );
 	local *IN;
 	if (open(IN, 'mkboot.bso')) {
-		chomp ($file_is_ready = <IN>);
+		chomp ($file_is_ready = ~< *IN);
 		close IN;
 	}
 
@@ -106,7 +106,7 @@ SKIP: {
 SKIP: {
 	skip("cannot read .bs file: $!", 2) unless $file_is_ready;
 
-	my $file = do { local $/ = <IN> };
+	my $file = do { local $/ = ~< *IN };
 
 	# filename should be in header
 	like( $file, qr/# dasboot DynaLoader/, 'file should have boilerplate' );
@@ -138,7 +138,7 @@ SKIP: {
 SKIP: {
 	skip("cannot open dasboot.bs for reading: $!", 3) unless $file_is_ready;
 
-	my $file = do { local $/ = <IN> };
+	my $file = do { local $/ = ~< *IN };
 	is( $out->read, "Writing dasboot.bs\n", 'should hush without Verbose set' );
 
 	# and find our hidden tribute to a fine example

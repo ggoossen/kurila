@@ -519,7 +519,7 @@ sub next_line
             }
 	    if ($in =~ /^\#ifdef __LANGUAGE_PASCAL__/) {
 		# Tru64 disassembler.h evilness: mixed C and Pascal.
-		while (<IN>) {
+		while ( ~< *IN) {
 		    last if /^\#endif/;
 		}
 		$in = "";
@@ -527,7 +527,7 @@ sub next_line
 	    }
 	    if ($in =~ /^extern inline / && # Inlined assembler.
 		$^O eq 'linux' && $file =~ m!(?:^|/)asm/[^/]+\.h$!) {
-		while (<IN>) {
+		while ( ~< *IN) {
 		    last if /^}/;
 		}
 		$in = "";
@@ -682,7 +682,7 @@ sub queue_includes_from
     return if ($file eq "-");
 
     open HEADER, $file or return;
-        while (defined($line = <HEADER>)) {
+        while (defined($line = ~< *HEADER)) {
             while (/\\$/) { # Handle continuation lines
                 chop $line;
                 $line .= <HEADER>;
@@ -725,7 +725,7 @@ sub build_preamble_if_necessary
     if (-r $preamble) {
         # Extract version number from first line of preamble:
         open  PREAMBLE, $preamble or die "Cannot open $preamble:  $!";
-            my $line = <PREAMBLE>;
+            my $line = ~< *PREAMBLE;
             $line =~ /(\b\d+\b)/;
         close PREAMBLE            or die "Cannot close $preamble:  $!";
 

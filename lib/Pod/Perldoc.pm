@@ -697,7 +697,7 @@ sub grand_search_init {
             my $searchfor = catfile split '::', $_;
             $self->aside( "Searching for '$searchfor' in $self->{'podidx'}\n" );
             local $_;
-            while (<PODIDX>) {
+            while ( ~< *PODIDX) {
                 chomp;
                 push(@found, $_) if m,/$searchfor(?:\.(?:pod|pm))?\z,i;
             }
@@ -879,14 +879,14 @@ sub search_perlfunc {
 
     # Skip introduction
     local $_;
-    while (<PFUNC>) {
+    while ( ~< *PFUNC) {
         last if /^=head2 $re/;
     }
 
     # Look for our function
     my $found = 0;
     my $inlist = 0;
-    while (<PFUNC>) {  # "The Mothership Connection is here!"
+    while ( ~< *PFUNC) {  # "The Mothership Connection is here!"
         if ( m/^=item\s+$search_re\b/ )  {
             $found = 1;
         }
@@ -936,7 +936,7 @@ EOD
         die "invalid file spec: $!" if $file =~ /[<>|]/;
         open(INFAQ, "<", $file)  # XXX 5.6ism
          or die "Can't read-open $file: $!\nAborting";
-        while (<INFAQ>) {
+        while ( ~< *INFAQ) {
             if ( m/^=head2\s+.*(?:$search_key)/i ) {
                 $found = 1;
                 push @$pod, "=head1 Found in $file\n\n" unless $found_in{$file}++;
@@ -1326,7 +1326,7 @@ sub page_module_file {
 	      $any_error = 1;
 	      next;
 	    }
-	    while (<TMP>) {
+	    while ( ~< *TMP) {
 	        print or die "Can't print to stdout: $!";
 	    } 
 	    close TMP  or die "Can't close while $output: $!";
@@ -1433,7 +1433,7 @@ sub containspod {
 
     local($_);
     open(TEST,"<", $file) 	or die "Can't open $file: $!";   # XXX 5.6ism
-    while (<TEST>) {
+    while ( ~< *TEST) {
 	if (/^=head/) {
 	    close(TEST) 	or die "Can't close $file: $!";
 	    return 1;
@@ -1542,7 +1542,7 @@ sub page {  # apply a pager to the output file
         $self->aside("Sending unpaged output to STDOUT.\n");
 	open(TMP, "<", $output)  or  die "Can't open $output: $!"; # XXX 5.6ism
 	local $_;
-	while (<TMP>) {
+	while ( ~< *TMP) {
 	    print or die "Can't print to stdout: $!";
 	} 
 	close TMP  or die "Can't close while $output: $!";

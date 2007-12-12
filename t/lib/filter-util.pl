@@ -11,7 +11,7 @@ sub readFile
 
     open (F, "<$filename") 
 	or die "Cannot open $filename: $!\n" ;
-    while (<F>)
+    while ( ~< *F)
       { $string .= $_ }
     close F ;
     $string ;

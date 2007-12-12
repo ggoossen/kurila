@@ -298,7 +298,7 @@ sub get_line {
   my $self = shift;
   my $in = $self->IN;
   local ($/) = "\n";
-  return scalar <$in>;
+  return scalar ~< $in;
 }
 
 package Term::ReadLine;		# So late to allow the above code be defined?
@@ -406,7 +406,7 @@ sub get_line {
   $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
   my $in = $self->IN;
   local ($/) = "\n";
-  return scalar <$in>;
+  return scalar ~< $in;
 }
 
 1;

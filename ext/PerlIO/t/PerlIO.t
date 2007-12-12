@@ -48,14 +48,14 @@ ok(open($binfh, "<:raw",  $bin));
 
 ok(open($utffh, "<:utf8", $utf));
 
-is(scalar <$txtfh>, "foo\n");
-is(scalar <$txtfh>, "bar\n");
+is(scalar ~< $txtfh, "foo\n");
+is(scalar ~< $txtfh, "bar\n");
 
-is(scalar <$binfh>, "foo\n");
-is(scalar <$binfh>, "bar\n");
+is(scalar ~< $binfh, "foo\n");
+is(scalar ~< $binfh, "bar\n");
 
-is(scalar <$utffh>,  "foo\x{ff}\n");
-is(scalar <$utffh>, "bar\x{abcd}\n");
+is(scalar ~< $utffh,  "foo\x{ff}\n");
+is(scalar ~< $utffh, "bar\x{abcd}\n");
 
 ok(eof($txtfh));;
 
@@ -79,7 +79,7 @@ ok(close($utffh));
 
     select STDOUT;
     ok( seek($x,0,0),           '       seek' );
-    is( scalar <$x>, "ok\n",    '       readline' );
+    is( scalar ~< $x, "ok\n",    '       readline' );
     ok( tell($x) >= 3,          '       tell' );
 
     # test magic temp file over STDOUT
@@ -102,7 +102,7 @@ ok(close($utffh));
 
     select STDOUT;
     ok( seek($x,0,0),           '       seek' );
-    is( scalar <$x>, "ok\n",    '       readline' );
+    is( scalar ~< $x, "ok\n",    '       readline' );
     ok( tell($x) >= 3,          '       tell' );
 
   TODO: {

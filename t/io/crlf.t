@@ -21,13 +21,13 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     ok(open(FOO,"<:crlf",$file));
 
     my $text;
-    { local $/; $text = <FOO> }
+    { local $/; $text = ~< *FOO }
     is(count_chars($text, "\015\012"), 0);
     is(count_chars($text, "\n"), 2000);
 
     binmode(FOO);
     seek(FOO,0,0);
-    { local $/; $text = <FOO> }
+    { local $/; $text = ~< *FOO }
     is(count_chars($text, "\015\012"), 2000);
 
     SKIP:
@@ -39,11 +39,11 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	my $fcontents = join "", map {"$_\015\012"} "a".."zzz";
 	open my $fh, "<:crlf", \$fcontents;
 	local $/ = "xxx";
-	local $_ = <$fh>;
+	local $_ = ~< $fh;
 	my $pos = tell $fh; # pos must be behind "xxx", before "\nxxy\n"
 	seek $fh, $pos, 0;
 	$/ = "\n";
-	$s = <$fh>.<$fh>;
+	$s = ~< $fh. ~< $fh;
 	ok($s eq "\nxxy\n");
     }
 
@@ -65,7 +65,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	    close FOO;
 	    open(FOO, "<$file");
 	    binmode(FOO);
-	    my $foo = scalar <FOO>;
+	    my $foo = scalar ~< *FOO;
 	    close FOO;
 	    print join(" ", "#", map { sprintf("%02x", $_) } unpack("C*", $foo)),
 	    "\n";

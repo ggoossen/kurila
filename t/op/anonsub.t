@@ -15,7 +15,7 @@ our $i = 0;
 $|=1;
 
 undef $/;
-my @prgs = split "\n########\n", <DATA>;
+my @prgs = split "\n########\n", ~< *DATA;
 print "1..", 6 + scalar @prgs, "\n";
 
 my $tmpfile = "asubtmp000";

@@ -40,7 +40,7 @@ sub read_file {
     my ($fn, $sub) = @_;
     if (open(my $fh, $fn)) {
 	local $_;
-	while (<$fh>) {
+	while ( ~< $fh) {
 	    &$sub;
 	}
     } else {

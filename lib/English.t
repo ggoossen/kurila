@@ -49,7 +49,7 @@ $ORS = "\n";
 	ok( !($close) == $CHILD_ERROR, '$CHILD_ERROR should be false' );
 
 	open(IN, "<en.tmp") if ($^O eq 'dos');
-	my $foo = <IN>;
+	my $foo = ~< *IN;
 	like( $foo, qr/ok 7/, '$OFS' );
 
 	# chomp is true because $ORS is "\n"
@@ -100,9 +100,9 @@ ok( !$PERLDB, '$PERLDB should be false' );
 
 {
 	local $INPUT_RECORD_SEPARATOR = "\n\n";
-	like( <DATA>, qr/a paragraph./, '$INPUT_RECORD_SEPARATOR' );
+	like( ~< *DATA, qr/a paragraph./, '$INPUT_RECORD_SEPARATOR' );
 }
-like( <DATA>, qr/second paragraph..\z/s, '$INPUT_RECORD_SEPARATOR' );
+like( ~< *DATA, qr/second paragraph..\z/s, '$INPUT_RECORD_SEPARATOR' );
 
 is( $INPUT_LINE_NUMBER, 2, '$INPUT_LINE_NUMBER' );
 

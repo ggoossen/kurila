@@ -61,7 +61,7 @@ for $file (all_files_in_dir('parts/inc')) {
   }
 }
 
-my $data = do { local $/; <DATA> };
+my $data = do { local $/; ~< *DATA };
 
 for $sec (keys %SECTION) {
   my $code = $SECTION{$sec}{code};

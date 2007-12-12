@@ -817,7 +817,7 @@ sub doConstants {
 	    local $/;
 	    open IN, "<$fallback" or die "Can't open $fallback: $!";
 	    open OUT, ">$file" or die "Can't open $file: $!";
-	    print OUT <IN> or die $!;
+	    print OUT ~< *IN or die $!;
 	    close OUT or die "Can't close $file: $!";
 	    close IN or die "Can't close $fallback: $!";
 	}

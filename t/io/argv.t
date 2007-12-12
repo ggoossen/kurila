@@ -46,7 +46,7 @@ is($x, "1a line\n2a line\n", '<> from two files');
 }
 
 @ARGV = ('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
-while (<>) {
+while ( ~< *ARGV) {
     $y .= $. . $_;
     if (eof()) {
 	is($., 3, '$. counts <>');
@@ -64,16 +64,16 @@ close TRY or die "Could not close: $!";
 $^I = '_bak';   # not .bak which confuses VMS
 $/ = undef;
 my $i = 7;
-while (<>) {
+while ( ~< *ARGV) {
     s/^/ok $i\n/;
     ++$i;
     print;
     next_test();
 }
 open(TRY, '<Io_argv1.tmp') or die "Can't open temp file: $!";
-print while <TRY>;
+print while ~< *TRY;
 open(TRY, '<Io_argv2.tmp') or die "Can't open temp file: $!";
-print while <TRY>;
+print while ~< *TRY;
 close TRY or die "Could not close: $!";
 undef $^I;
 
@@ -88,7 +88,7 @@ open STDIN, 'Io_argv1.tmp' or die $!;
 @ARGV = ();
 ok( !eof(),     'STDIN has something' );
 
-is( <>, "ok 7\n" );
+is( ~< *ARGV, "ok 7\n" );
 
 open STDIN, $devnull or die $!;
 @ARGV = ();
@@ -106,18 +106,18 @@ ok( eof(),      'eof() true after closing ARGV' );
 {
     local $/;
     open F, 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $!";
-    <F>;	# set $. = 1
-    is( <F>, undef );
+    ~< *F;	# set $. = 1
+    is( ~< *F, undef );
 
     open F, $devnull or die;
-    ok( defined(<F>) );
+    ok( defined( ~< *F) );
 
-    is( <F>, undef );
-    is( <F>, undef );
+    is( ~< *F, undef );
+    is( ~< *F, undef );
 
     open F, $devnull or die;	# restart cycle again
-    ok( defined(<F>) );
-    is( <F>, undef );
+    ok( defined( ~< *F) );
+    is( ~< *F, undef );
     close F or die "Could not close: $!";
 }
 

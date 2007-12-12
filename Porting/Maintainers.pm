@@ -23,7 +23,7 @@ use Getopt::Long;
 
 my %MANIFEST;
 if (open(MANIFEST, "MANIFEST")) {
-    while (<MANIFEST>) {
+    while ( ~< *MANIFEST) {
 	if (/^(\S+)\t+(.+)$/) {
 	    $MANIFEST{$1}++;
 	}

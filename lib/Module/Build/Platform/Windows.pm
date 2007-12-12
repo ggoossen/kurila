@@ -127,7 +127,7 @@ EOT
   $start = "#!perl" unless $start =~ /^#!.*perl/;
 
   my $in = IO::File->new("< $opts{in}") or die "Can't open $opts{in}: $!";
-  my @file = <$in>;
+  my @file = ~< $in;
   $in->close;
 
   foreach my $line ( @file ) {

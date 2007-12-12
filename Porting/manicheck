@@ -40,7 +40,7 @@ my %mani;
 my %mand = qw(. 1);
 use File::Basename qw(dirname);
 
-while (<MANIFEST>) {
+while ( ~< *MANIFEST) {
   if (/^(\S+)\t+(.+)$/) {
     $mani{$1}++;
     my $d = dirname($1);

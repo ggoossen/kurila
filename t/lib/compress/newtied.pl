@@ -142,7 +142,7 @@ EOT
                 ok ! eof $io;
                 is $io->tell(), 0 ;
                 is tell($io), 0 ;
-                my @lines = <$io>;
+                my @lines = ~< $io;
                 is @lines, 6
                     or print "# Got " . scalar(@lines) . " lines, expected 6\n" ;
                 is $lines[1], "of a paragraph\n" ;
@@ -157,7 +157,7 @@ EOT
 
                 ok ! ( defined($io->getline)  ||
                           (@tmp = $io->getlines) ||
-                          defined(<$io>)         ||
+                          defined( ~< $io)         ||
                           defined($io->getc)     ||
                           read($io, $buf, 100)   != 0) ;
             }
@@ -173,7 +173,7 @@ EOT
             
                 $io = $UncompressClass->new($name);
                 ok ! $io->eof;
-                my $line = <$io>;
+                my $line = ~< $io;
                 ok $line eq $str;
                 ok $io->eof;
             }
@@ -182,7 +182,7 @@ EOT
                 local $/ = "";  # paragraph mode
                 my $io = $UncompressClass->new($name);
                 ok ! $io->eof;
-                my @lines = <$io>;
+                my @lines = ~< $io;
                 ok $io->eof;
                 ok @lines == 2 
                     or print "# Got " . scalar(@lines) . " lines, expected 2\n" ;
@@ -198,7 +198,7 @@ EOT
                 my $no = 0;
                 my $err = 0;
                 ok ! $io->eof;
-                while (<$io>) {
+                while ( ~< $io) {
                     push(@lines, $_);
                     $err++ if $. != ++$no;
                 }
