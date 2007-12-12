@@ -46,7 +46,7 @@ print OUTFIL "#> Lines beginning with \"#>\" were commented out during the\n";
 print OUTFIL "#> conversion process.  For more information, see $0\n";
 print OUTFIL "#>\n";
 
-while (<INFIL>) {
+while ( ~< *INFIL) {
   s/$infile/$outfile/eoi;
   if (/^\#/) { 
     if (!/^\#\:/) {print OUTFIL;}
@@ -98,7 +98,7 @@ while (<INFIL>) {
                            # someday, check for "" and skip contents
       last if $end;
       print OUTFIL $conditions[0] ? "#> " : "",$_;
-      $_ = <INFIL>;
+      $_ = ~< *INFIL;
       m#(.*)(\$\(MACROEND\))?#;
     }
   }

@@ -67,12 +67,12 @@ my @names = qw(
     # Check the constants above all appear in @EXPORT in DB_File.pm
     my %names = map { $_, 1} @names;
     open F, "<DB_File.pm" or die "Cannot open DB_File.pm: $!\n";
-    while (<F>)
+    while ( ~< *F)
     {
         last if /^\s*\@EXPORT\s+=\s+qw\(/ ;
     }
 
-    while (<F>)
+    while ( ~< *F)
     {
         last if /^\s*\)/ ;
         /(\S+)/ ;

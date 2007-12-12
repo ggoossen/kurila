@@ -22,7 +22,7 @@ $|=1;
 our (@prgs, $tmpfile, $CAT, $status, $i);
 
 undef $/;
-@prgs = split "\n########\n", <DATA>;
+@prgs = split "\n########\n", ~< *DATA;
 print "1..", scalar @prgs, "\n";
 
 $tmpfile = "forktmp000";

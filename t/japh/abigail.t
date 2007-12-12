@@ -157,7 +157,7 @@ plan tests => 130;
 
     my @progs;
     my $key;
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if /^__END__$/;
 
         if (/^#{7}(?:\s+(.*))?/) {

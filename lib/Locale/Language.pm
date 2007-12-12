@@ -108,7 +108,7 @@ sub all_language_names
     local $_;
 
 
-    while (<DATA>)
+    while ( ~< *DATA)
     {
         next unless /\S/;
         chop;

@@ -210,7 +210,7 @@ sub ldopts {
 	    if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld"))) {
 		local(*FH); 
 		if(open(FH, $extra)) {
-		    my($libs) = <FH>; chomp $libs;
+		    my($libs) = ~< *FH; chomp $libs;
 		    push @potential_libs, split /\s+/, $libs;
 		}
 		else {  

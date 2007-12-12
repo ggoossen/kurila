@@ -36,7 +36,7 @@ use File::Spec;
 my $xsubpp = File::Spec->catfile(File::Spec->catdir(File::Spec->updir, "lib", "ExtUtils"), "xsubpp");
 
 if (open(XSUBPP, $xsubpp)) {
-    print OUT <XSUBPP>;
+    print OUT ~< *XSUBPP;
     close XSUBPP;
 } else {
     die "$0: cannot find '$xsubpp'\n";

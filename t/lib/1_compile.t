@@ -15,7 +15,7 @@ use File::Spec::Functions;
 
 # Okay, this is the list.
 
-my @Core_Modules = grep /\S/, <DATA>;
+my @Core_Modules = grep /\S/, ~< *DATA;
 chomp @Core_Modules;
 
 if (eval { require Socket }) {

@@ -161,7 +161,7 @@ sub search_paths {
                 my $pkg_file = catfile($sp, $directory, "$name$suffix");
                 open PKGFILE, "<$pkg_file" or die "search_paths: Can't open $pkg_file: $!";
                 my $in_pod = 0;
-                while ( my $line = <PKGFILE> ) {
+                while ( my $line = ~< *PKGFILE ) {
                     $in_pod = 1 if $line =~ m/^=\w/;
                     $in_pod = 0 if $line =~ /^=cut/;
                     next if ($in_pod || $line =~ /^=cut/);  # skip pod text

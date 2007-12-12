@@ -56,9 +56,9 @@ sub _init_optags {
 
     local($_);
     local($/) = "\n=cut"; # skip to optags definition section
-    <DATA>;
+    ~< *DATA;
     $/ = "\n=";		# now read in 'pod section' chunks
-    while(<DATA>) {
+    while( ~< *DATA) {
 	next unless m/^item\s+(:\w+)/;
 	my $tag = $1;
 

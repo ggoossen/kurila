@@ -20,7 +20,7 @@ sub loadopts {
 	local (*F);
 	open OPTF, $optfile or die "Can't open $optfile: $!\n";
 	my @opts;
-	chomp(my $line = <OPTF>);
+	chomp(my $line = ~< *OPTF);
 	my @vars = split(/\t+~\t+/, $line);
 	for (@vars) {
 	    push(@opts, $_) unless (/^\s*$/);
@@ -44,7 +44,7 @@ my $pl_h = '../patchlevel.h';
 
 if (-e $pl_h) {
     open PL, "<$pl_h" or die "Can't open $pl_h: $!";
-    while (<PL>) {
+    while ( ~< *PL) {
 	if (/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
 	    $opt{$1} = $2;
 	}
@@ -65,7 +65,7 @@ $opt{'usemymalloc'} = 'y' if $opt{'d_mymalloc'} eq 'define';
 $opt{libpth} = mungepath($opt{libpth}) if exists $opt{libpth};
 $opt{incpath} = mungepath($opt{incpath}) if exists $opt{incpath};
 
-while (<>) {
+while ( ~< *ARGV) {
     s/~([\w_]+)~/$opt{$1}/g;
     if (/^([\w_]+)=(.*)$/) {
 	my($k,$v) = ($1,$2);

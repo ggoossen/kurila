@@ -375,14 +375,14 @@ SKIP: {
     ok(-T *FOO,      '   -T');
     ok(! -B *FOO,    '   !-B');
 
-    $_ = <FOO>;
+    $_ = ~< *FOO;
     like($_, qr/perl/, 'after readline');
     ok(-T *FOO,      '   still -T');
     ok(! -B *FOO,    '   still -B');
     close(FOO);
 
     open(FOO,$statfile);
-    $_ = <FOO>;
+    $_ = ~< *FOO;
     like($_, qr/perl/,      'reopened and after readline');
     ok(-T *FOO,      '   still -T');
     ok(! -B *FOO,    '   still !-B');
@@ -392,7 +392,7 @@ SKIP: {
     ok(! -B *FOO,        '   still !-B');
 
     # It's documented this way in perlfunc *shrug*
-    () = <FOO>;
+    () = ~< *FOO;
     ok(eof FOO,         'at EOF');
     ok(-T *FOO,          '   still -T');
     ok(-B *FOO,          '   now -B');

@@ -86,7 +86,7 @@ sub Process_File
 	if($ext eq '.t') {
 
 		open(FH, "+< $FileToProcess") or die "Unable to open the file,  $FileToProcess  for reading and writing.\n";
-		@ARRAY = <FH>;	# Get the contents of the file into an array.
+		@ARRAY = ~< *FH;	# Get the contents of the file into an array.
 
 		foreach $Line(@ARRAY)	# Get each line of the file.
 		{

@@ -13,7 +13,7 @@ my $x = Compress::Raw::Zlib::Deflate->new()
 
 my $output = '' ;
 
-while (<>)
+while ( ~< *ARGV)
 {
     $x->deflate($_, $output) == Z_OK 
         or die "deflate failed\n" ;

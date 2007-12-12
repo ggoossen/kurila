@@ -48,7 +48,7 @@ if ($is_win32) {
     print "ok $_ # skipped: $is_win32\n" for 1..4;
 } else {
     $pipe = IO::Pipe->new()->reader($perl, '-e', 'print qq(not ok 1\n)');
-    while (<$pipe>) {
+    while ( ~< $pipe) {
       s/^not //;
       print;
     }
@@ -101,7 +101,7 @@ if ($is_win32) {
     if($pid)
  {
   $pipe->reader;
-  while(<$pipe>) {
+  while( ~< $pipe) {
       s/^not //;
       print;
   }

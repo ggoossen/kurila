@@ -159,7 +159,7 @@ sub prompt ($;$) {
         print "$def\n";
     }
     else {
-        $ans = <STDIN>;
+        $ans = ~< *STDIN;
         if( defined $ans ) {
             chomp $ans;
         }

@@ -67,7 +67,7 @@ OUT
 
 ok( open(MAKEFILE, $Makefile) ) or diag "Can't open $Makefile: $!";
 { local $/; 
-  like( <MAKEFILE>, qr/^\# This makes sure the postamble gets written\n/m,
+  like( ~< *MAKEFILE, qr/^\# This makes sure the postamble gets written\n/m,
         'postamble added to the Makefile' );
 }
 close MAKEFILE;

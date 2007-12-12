@@ -140,7 +140,7 @@ if (exists $opt{'f'}) {
     # -F is followed by name of file containing list of filenames
     my $flist = $opt{'f'};
     open(FLIST,$flist) || die "Cannot open $flist:$!";
-    chomp(@encfiles = <FLIST>);
+    chomp(@encfiles = ~< *FLIST);
     close(FLIST);
 } else {
     @encfiles = @ARGV;
@@ -372,7 +372,7 @@ sub compile_ucm
  my $u2e = {};
  my $cs;
  my %attr;
- while (<$fh>)
+ while ( ~< $fh)
   {
    s/#.*$//;
    last if /^\s*CHARMAP\s*$/i;
@@ -405,7 +405,7 @@ sub compile_ucm
  print "Reading $name ($cs)\n";
  my $nfb = 0;
  my $hfb = 0;
- while (<$fh>)
+ while ( ~< $fh)
   {
    s/#.*$//;
    last if /^\s*END\s+CHARMAP\s*$/i;
@@ -466,7 +466,7 @@ sub compile_enc
  my $u2e = {};
 
  my $type;
- while ($type = <$fh>)
+ while ($type = ~< $fh)
   {
    last if $type !~ /^\s*#/;
   }
@@ -474,7 +474,7 @@ sub compile_enc
  return if $type eq 'E';
  # Do the hash lookup once, rather than once per function call. 4% speedup.
  my $type_func = $encode_types{$type};
- my ($def,$sym,$pages) = split(/\s+/,scalar(<$fh>));
+ my ($def,$sym,$pages) = split(/\s+/,scalar( ~< $fh));
  warn "$type encoded $name\n";
  my $rep = '';
  # Save a defined test by setting these to defined values.
@@ -490,7 +490,7 @@ sub compile_enc
  $seen = {} unless $opt{Q};
  do
   {
-   my $line = <$fh>;
+   my $line = ~< $fh;
    chomp($line);
    my $page = hex($line);
    my $ch = 0;
@@ -498,7 +498,7 @@ sub compile_enc
    do
     {
      # So why is it 1% faster to leave the my here?
-     my $line = <$fh>;
+     my $line = ~< $fh;
      $line =~ s/\r\n$/\n/;
      die "$.:${line}Line should be exactly 65 characters long including
      newline (".length($line).")" unless length ($line) == 65;
@@ -1041,7 +1041,7 @@ sub _print_expand{
     }	   
     open my $out, ">$dst" or die "$!";
     my $asis = 0;
-    while (<$in>){ 
+    while ( ~< $in){ 
     if (/^#### END_OF_HEADER/){
         $asis = 1; next;
     }	  

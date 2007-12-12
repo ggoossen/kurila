@@ -491,7 +491,7 @@ sub contains_pod {
   }
   
   local $/ = undef;
-  my $pod = <POD>;
+  my $pod = ~< *POD;
   close(POD) || die "Error closing $file: $!\n";
   unless($pod =~ /^=(head\d|pod|over|item)\b/m) {
     warn "No POD in $file, skipping.\n"

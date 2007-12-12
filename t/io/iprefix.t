@@ -20,7 +20,7 @@ for my $file (@tfiles) {
 
 @ARGV = @tfiles;
 
-while (<>) {
+while ( ~< *ARGV) {
     s/foo/bar/;
 }
 continue {

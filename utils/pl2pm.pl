@@ -31,14 +31,14 @@ use warnings;
 
 my %keyword = ();
 
-while (<DATA>) {
+while ( ~< *DATA) {
     chomp;
     $keyword{$_} = 1;
 }
 
 local $/;
 
-while (<>) {
+while ( ~< *ARGV) {
     my $newname = $ARGV;
     $newname =~ s/\.pl$/.pm/ || next;
     $newname =~ s#(.*/)?(\w+)#$1\u$2#;

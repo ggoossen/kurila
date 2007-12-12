@@ -254,7 +254,7 @@ sub _path2modname {
       my $in_pod = 0;
       my $in_name = 0;
       my $line;
-      while ($line = <PODFILE>) {
+      while ($line = ~< *PODFILE) {
         chomp $line;
         $in_pod = 1 if ($line =~ m/^=\w/);
         $in_pod = 0 if ($line =~ m/^=cut/);
@@ -380,7 +380,7 @@ sub run {
     } else {
       # Sane case: file is readable
       my $lines = 0;
-      while(<INPOD>) {
+      while( ~< *INPOD) {
         last if $lines++ > $MAX_VERSION_WITHIN; # some degree of sanity
         if( s/^\s*\$VERSION\s*=\s*//s and m/\d/ ) {
           DEBUG and print "Found version line (#$lines): $_";
@@ -598,7 +598,7 @@ sub contains_pod {
    # avoid totally hogging the processor on OSs with poor process control
   
   local $_;
-  while( <MAYBEPOD> ) {
+  while( ~< *MAYBEPOD ) {
     if(m/^=(head\d|pod|over|item)\b/s) {
       close(MAYBEPOD) || die "Bizarre error closing $file: $!\nAborting";
       chomp;

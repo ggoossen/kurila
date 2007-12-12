@@ -39,7 +39,7 @@ my $script = File::Spec->catfile(
             ), "corelist");
 
 if (open(IN, $script)) {
-    print OUT <IN>;
+    print OUT ~< *IN;
     close IN;
 } else {
     die "$0: cannot find '$script'\n";

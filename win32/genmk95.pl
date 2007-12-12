@@ -27,7 +27,7 @@ _EOH_
 
 my $inrec = 0;
 
-while (<$in>)
+while ( ~< $in)
 {
  chomp;
  if (/^[^#.\t][^#=]*?:(?:[^=]|$)/)
@@ -37,7 +37,7 @@ while (<$in>)
        print $out "$_\n";
        while (/\\\s*$/)
        {
-          chomp($_ = <$in>);
+          chomp($_ = ~< $in);
           print $out "$_\n";
        }
        print $out "@[\n";
@@ -68,7 +68,7 @@ while (<$in>)
 LINE_CONT:
     if ($two =~ /\\\s*$/)
     {
-       chomp ($two .= "\n" . scalar <$in>);
+       chomp ($two .= "\n" . scalar ~< $in);
        goto LINE_CONT;
     }
     s/^\s*// for ($one, $two);

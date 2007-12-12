@@ -357,7 +357,7 @@ sub _get_install_skip {
             if $verbose;
         if (open my $fh,$skip ) {
             my @patterns;
-            while (<$fh>) {
+            while ( ~< $fh) {
                 chomp;
                 next if /^\s*(?:#|$)/;
                 print "\tSkip pattern: $_\n" if $verbose>3;

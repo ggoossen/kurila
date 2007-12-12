@@ -192,7 +192,7 @@ sub perllocal_install {
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
-    @ARGV = split /\|/, <STDIN> if $Is_VMS;
+    @ARGV = split /\|/, ~< *STDIN if $Is_VMS;
 
     my $pod;
     $pod = sprintf <<POD, scalar localtime;

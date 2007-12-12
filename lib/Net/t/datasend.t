@@ -32,7 +32,7 @@ BEGIN {
     my $self = shift;
     seek($self,0,0);
     local $/ = undef;
-    scalar(<$self>);
+    scalar( ~< $self);
   }
 
   sub response {

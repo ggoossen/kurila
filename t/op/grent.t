@@ -23,13 +23,13 @@ if (not defined $where) {	# Try NIS.
     foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat)) {
         if (-x $ypcat &&
             open(GR, "$ypcat group 2>/dev/null |") &&
-            defined(<GR>)) 
+            defined( ~< *GR)) 
         {
             print "# `ypcat group` worked\n";
 
             # Check to make sure we're really using NIS.
             if( open(NSSW, "/etc/nsswitch.conf" ) ) {
-                my($group) = grep /^\s*group:/, <NSSW>;
+                my($group) = grep /^\s*group:/, ~< *NSSW;
 
                 # If there's no group line, assume it default to compat.
                 if( !$group || $group !~ /(nis|compat)/ ) {
@@ -49,7 +49,7 @@ if (not defined $where) {	# Try NetInfo.
     foreach my $nidump (qw(/usr/bin/nidump)) {
         if (-x $nidump &&
             open(GR, "$nidump group . 2>/dev/null |") &&
-            defined(<GR>)) 
+            defined( ~< *GR)) 
         {
             $where = "NetInfo group - $nidump";
             undef $reason;
@@ -60,7 +60,7 @@ if (not defined $where) {	# Try NetInfo.
 
 if (not defined $where) {	# Try local.
     my $GR = "/etc/group";
-    if (-f $GR && open(GR, $GR) && defined(<GR>)) {
+    if (-f $GR && open(GR, $GR) && defined( ~< *GR)) {
         undef $reason;
         $where = "local $GR";
     }
@@ -88,7 +88,7 @@ print "# where $where\n";
 
 ok( setgrent(), 'setgrent' ) || print "# $!\n";
 
-while (<GR>) {
+while ( ~< *GR) {
     chomp;
     # LIMIT -1 so that groups with no users don't fall off
     my @s = split /:/, $_, -1;
@@ -101,7 +101,7 @@ while (<GR>) {
     }
     if ($n == $max) {
 	local $/;
-	my $junk = <GR>;
+	my $junk = ~< *GR;
 	last;
     }
     # In principle we could whine if @s != 4 but do we know enough

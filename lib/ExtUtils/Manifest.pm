@@ -313,7 +313,7 @@ sub maniread {
         return $read;
     }
     local $_;
-    while (<M>){
+    while ( ~< *M){
         chomp;
         next if /^\s*#/;
 
@@ -350,7 +350,7 @@ sub _maniskip {
     _check_mskip_directives($mfile) if -f $mfile;
     local(*M, $_);
     open M, $mfile or open M, $DEFAULT_MSKIP or return sub {0};
-    while (<M>){
+    while ( ~< *M){
 	chomp;
 	s/\r//;
 	next if /^#/;
@@ -384,7 +384,7 @@ sub _check_mskip_directives {
         warn "Problem opening $mfile: $!";
         return;
     }
-    while (<M>) {
+    while ( ~< *M) {
         if (/^#!include_default\s*$/) {
 	    if (my @default = _include_mskip_file()) {
 	        push @lines, @default;
@@ -434,7 +434,7 @@ sub _include_mskip_file {
     }
     my @lines = ();
     push @lines, "\n#!start included $mskip\n";
-    push @lines, $_ while <M>;
+    push @lines, $_ while ~< *M;
     close M;
     push @lines, "#!end included $mskip\n\n";
     return @lines;
@@ -498,7 +498,7 @@ sub cp_if_diff {
     open(F,"< $from\0") or die "Can't read $from: $!\n";
     if (open(T,"< $to\0")) {
         local $_;
-	while (<F>) { $diff++,last if $_ ne <T>; }
+	while ( ~< *F) { $diff++,last if $_ ne ~< *T; }
 	$diff++ unless eof(T);
 	close T;
     }
@@ -642,7 +642,7 @@ sub _fix_manifest {
 
     # Yes, we should be using seek(), but I'd like to avoid loading POSIX
     # to get SEEK_*
-    my @manifest = <MANIFEST>;
+    my @manifest = ~< *MANIFEST;
     close MANIFEST;
 
     unless( $manifest[-1] =~ /\n\z/ ) {

@@ -9,7 +9,7 @@ while ($work)
  {
   open(PIPE,"$^X -w $inc -M$targ -e '' 2>&1 |") || die "Cannot open pipe to child:$!";
   my %fix;
-  while (<PIPE>)
+  while ( ~< *PIPE)
    {
     if (/^Ambiguous call resolved as CORE::(\w+)\(\), qualify as such or use \& at (\S+) line (\d+)/
          && -f $2 )
@@ -32,7 +32,7 @@ while ($work)
     @ARGV = ($file);
     $. = 0;
     local $^I = '.sav';
-    while (<>)
+    while ( ~< *ARGV)
      {
       while (@ar && $. == $ar[0][0])
        {

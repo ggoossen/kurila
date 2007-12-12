@@ -37,7 +37,7 @@ find(sub {
 }, 'lib', 'ext', 'vms/ext', 'symbian/ext');
 
 if (open my $ucdv, "<", "lib/unicore/version") {
-    chomp (my $ucd = <$ucdv>);
+    chomp (my $ucd = ~< $ucdv);
     $lines{sprintf "\t%-24s=> '$ucd',\n", "'Unicode'"}++;
     close $ucdv;
     }

@@ -95,7 +95,7 @@ sub decomposeHangul {
     croak "$PACKAGE: neither unicore/CompositionExclusions.txt "
 	. "nor unicode/CompExcl.txt is found in @INC" unless defined $f;
 
-    while (<$fh>) {
+    while ( ~< $fh) {
 	next if /^#/ or /^$/;
 	s/#.*//;
 	$Exclus{ hex($1) } = 1 if /([0-9A-Fa-f]+)/;

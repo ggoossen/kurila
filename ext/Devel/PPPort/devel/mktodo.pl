@@ -237,11 +237,11 @@ sub load_todo
 
   if (-e $file) {
     my $f = IO::File->new( $file) or die "cannot open $file: $!\n";
-    my $ver = <$f>;
+    my $ver = ~< $f;
     chomp $ver;
     if ($ver eq $expver) {
       my %sym;
-      while (<$f>) {
+      while ( ~< $f) {
         chomp;
         /^(\w+)\s+#\s+(.*)/ or goto nuke_file;
         exists $sym{$1} and goto nuke_file;
@@ -329,7 +329,7 @@ sub get_apicheck_symbol_map
   my %symmap;
   my $cur;
 
-  while (<$fh>) {
+  while ( ~< $fh) {
     next if /^#/;
     if (defined $cur) {
       for my $sym (/\b([A-Za-z_]\w+)\b/g) {

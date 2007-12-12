@@ -31,7 +31,7 @@ my %embed = map { ( $_->{name} => $_ ) }
 
 my(%provides, %prototypes, %explicit);
 
-my $data = do { local $/; <DATA> };
+my $data = do { local $/; ~< *DATA };
 $data =~ s{^\%(include)\s+(\w+)((?:[^\S\r\n]+.*?)?)\s*$}
           {eval "$1('$2', $3)" or die $@}gem;
 

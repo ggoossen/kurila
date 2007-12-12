@@ -1,6 +1,6 @@
 use Perl6::Form 'drill';
 
-@data = map [split /[\t\n]+/], <DATA>;
+@data = map [split /[\t\n]+/], ~< *DATA;
 ($name, $payment) = drill @data, [], [0..1];
 
 print form

@@ -31,7 +31,7 @@ EOS
 my $prev = "";
 my %map;
 
-while (<DATA>) {
+while ( ~< *DATA) {
     chomp;
     s/\\100/\@/g;
     $_ = lc;
@@ -122,7 +122,7 @@ if (@authors) {
   my %raw;
   foreach my $filename (@authors) {
     open FH, "<$filename" or die "Can't open $filename: $!";
-    while (<FH>) {
+    while ( ~< *FH) {
       next if /^\#/;
       next if /^-- /;
       if (/<([^>]+)>/) {
@@ -146,7 +146,7 @@ if (@authors) {
   ++$authors{'?'};
 }
 
-while (<>) {
+while ( ~< *ARGV) {
   next if /^-+/;
   if (m!^\[\s+(\d+)\]\s+By:\s+(\S+)\s+on!) {
     # new patch
@@ -158,7 +158,7 @@ while (<>) {
     die "Duplicate Log:" if $log;
     $log = $_;
     my $prefix = " " x length $1;
-    LOG: while (<>) {
+    LOG: while ( ~< *ARGV) {
       next if /^$/;
       s/^\t/        /;
       if (s/^$prefix//) {

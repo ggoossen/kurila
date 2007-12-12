@@ -547,7 +547,7 @@ sub import_program
 
     ## Read from data, up to next __END__. This will be &dodir.
     local($/) = "\n__END__";
-    $prog = <DATA>;
+    $prog = ~< *DATA;
     close(DATA);
 
     $prog =~ s/\beval\b//g;       ## remove any 'eval'
@@ -653,7 +653,7 @@ sub read_rc
 
     print "reading RC file: $file\n" if $show;
 
-    while (defined($_ = ($use_default ? shift(@default) : <RC>))) {
+    while (defined($_ = ($use_default ? shift(@default) : ~< *RC))) {
 	$ln = ++$line_num;			     ## note starting line num.
         $_ .= <RC>, $line_num++ while s/\\\n?$/\n/;  ## allow continuations
 	next if /^\s*(#.*)?$/;          ## skip blank or comment-only lines.
@@ -766,7 +766,7 @@ sub clear_message
 ##
 sub strip {
     seek(DATA, 0, 0) || die "$0: can't reset internal pointer.\n";
-    while(<DATA>) {
+    while( ~< *DATA) {
       print, next if /INLINE_LITERAL_TEXT/.../INLINE_LITERAL_TEXT/;
       ## must mention INLINE_LITERAL_TEXT on this line!
       s/\#\#.*|^\s+|\s+$//; ## remove cruft

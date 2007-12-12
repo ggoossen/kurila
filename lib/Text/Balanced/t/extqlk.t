@@ -32,7 +32,7 @@ our ($cmd, $neg, $str, $var);
 
 $cmd = "print";
 $neg = 0;
-while (defined($str = <DATA>))
+while (defined($str = ~< *DATA))
 {
 	chomp $str;
 	if ($str =~ s/\A# USING://)                 { $neg = 0; $cmd = $str; next; }

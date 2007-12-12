@@ -766,7 +766,7 @@ if( @path_h ){
             # Function prototypes are processed below.
       open(CH, "<$rel_path_h") || die "Can't open $rel_path_h: $!\n";
     defines:
-      while (<CH>) {
+      while ( ~< *CH) {
 	if ($pre_sub_tri_graphs) {
 	    # Preprocess all tri-graphs
 	    # including things stuck in quoted string constants.
@@ -819,7 +819,7 @@ if( @path_h ){
 	# Work from miniperl too - on "normal" systems
         my $SEEK_SET = eval 'use Fcntl qw/SEEK_SET/; SEEK_SET' or 0;
         seek CH, 0, $SEEK_SET;
-        my $src = do { local $/; <CH> };
+        my $src = do { local $/; ~< *CH };
         close CH;
         no warnings 'uninitialized';
 
@@ -1662,7 +1662,7 @@ sub get_typemap {
     open(TYPEMAP, $typemap)
       or warn ("Warning: could not open typemap file '$typemap': $!\n"), next;
     my $mode = 'Typemap';
-    while (<TYPEMAP>) {
+    while ( ~< *TYPEMAP) {
       next if /^\s*\#/;
       if (/^INPUT\s*$/)   { $mode = 'Input'; next; }
       elsif (/^OUTPUT\s*$/)  { $mode = 'Output'; next; }

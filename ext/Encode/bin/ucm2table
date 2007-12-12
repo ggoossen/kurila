@@ -9,7 +9,7 @@ getopts("aeu", \%Opt);
 my %Chartab;
 
 my $Hex = '[0-9A-Fa-f]';
-while(<>){
+while( ~< *ARGV){
     chomp;
     my ($uni, $enc, $fb) = 
         /^<U($Hex+)>\s+(\S+)\s+\|(\d)/o or next;

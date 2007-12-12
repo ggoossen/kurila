@@ -36,7 +36,7 @@ my $file = "fallback$$.txt";
 }
 
 open($fh,$file) || die "File cannot be re-opened";
-my $line = <$fh>;
+my $line = ~< $fh;
 is($line,"\\x{20ac}0.02\n","perlqq escapes");
 close($fh);
 
@@ -48,7 +48,7 @@ print $fh $str,"0.02\n";
 close($fh);
 
 open($fh,$file) || die "File cannot be re-opened";
-my $line = <$fh>;
+my $line = ~< $fh;
 is($line,"&#8364;0.02\n","HTML escapes");
 close($fh);
 
@@ -61,7 +61,7 @@ close($fh);
 }
 
 ok(open($fh,"<encoding(US-ASCII)",$file),"Opened as ASCII");
-my $line = <$fh>;
+my $line = ~< $fh;
 printf "# %x\n",ord($line);
 is($line,"\\x[A3]0.02\n","Escaped non-mapped char");
 close($fh);
@@ -69,7 +69,7 @@ close($fh);
 $PerlIO::encoding::fallback = Encode::WARN_ON_ERR();
 
 ok(open($fh,"<encoding(US-ASCII)",$file),"Opened as ASCII");
-my $line = <$fh>;
+my $line = ~< $fh;
 printf "# %x\n",ord($line);
 is($line,"\x{FFFD}0.02\n","Unicode replacement char");
 close($fh);

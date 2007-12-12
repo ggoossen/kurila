@@ -190,14 +190,14 @@ if (@SisPl) {
   if (open(my $fi, "default.pl")) {
     my $fn = "default.pl.new";
     if (open(my $fo, ">$fn")) {
-      while (<$fi>) {
+      while ( ~< $fi) {
 	last unless /^\#/;
 	print $fo $_;
       }
       print $fo "use lib qw(\\system\\apps\\$AppName \\system\\apps\\$AppName\\lib);\n";
       printf $fo qq[# %d "$SisPl[0]"\n], $.;
       print $fo $_;
-      while (<$fi>) {
+      while ( ~< $fi) {
 	print $fo $_;
       }
       close($fo);
@@ -254,7 +254,7 @@ unless ($Library) {
   my $cmd = "uidcrc $uids |";
 
   if (open(my $fh, $cmd)) {
-    my $line = <$fh>;
+    my $line = ~< $fh;
     close($fh);
     # 0x10000079 0x100039ce 0x0acebabe 0xc82b1900
     $line =~ s/\r?\n$//;

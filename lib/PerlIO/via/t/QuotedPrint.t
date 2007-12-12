@@ -71,7 +71,7 @@ ok(
  open( my $in,'<:via(QuotedPrint)', $file ),
  "opening '$file' for reading"
 );
-is( $decoded,join( '',<$in> ),		'check decoding' );
+is( $decoded,join( '', ~< $in ),		'check decoding' );
 ok( close( $in ),			'close decoding handle' );
 
 # Remove whatever we created now

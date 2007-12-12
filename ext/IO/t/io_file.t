@@ -38,7 +38,7 @@ if( $^O =~ /MSWin32/ ) {
     isa_ok( $fh,                $Class );
     ok( $fh->open($File),       "   Opened '$File'" );
     
-    my $cont = do { local $/; <$fh> };
+    my $cont = do { local $/; ~< $fh };
     unlike( $cont, qr/$Expect/, "   Content match fails without binmode" );
 }    
 
@@ -49,7 +49,7 @@ if( $^O =~ /MSWin32/ ) {
     ok( $fh->open($File),       "   Opened '$File' $!" );
     ok( $fh->binmode,           "   binmode enabled" );
     
-    my $cont = do { local $/; <$fh> };
+    my $cont = do { local $/; ~< $fh };
     like( $cont, qr/$Expect/,   "   Content match passes with binmode" );
 }
     

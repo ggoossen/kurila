@@ -286,7 +286,7 @@ sub walksymtable {
 	my $default = $section->default;
 
 	seek($output_fh, 0, 0);
-	while (<$output_fh>) {
+	while ( ~< $output_fh) {
 	    chomp;
 	    s/^(.*?)\t//;
 	    if ($1 eq $name) {

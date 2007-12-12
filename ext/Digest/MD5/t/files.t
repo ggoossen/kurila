@@ -190,7 +190,7 @@ sub cat_file
     # For PerlIO in case of UTF-8 locales.
     eval 'binmode(FILE, ":bytes")';
 
-    my $tmp = <FILE>;
+    my $tmp = ~< *FILE;
     close(FILE);
     $tmp;
 }

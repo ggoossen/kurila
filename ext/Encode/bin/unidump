@@ -28,7 +28,7 @@ sub do_perl{
     my $string = shift;
     $Opt{P} and print "#!$^X -w\nprint\n";
     unless ($string){
-    while(<>){
+    while( ~< *ARGV){
         use utf8;
         $linebuf .=  Encode::decode($Opt{f}, $_);
         while($linebuf){
@@ -72,7 +72,7 @@ sub do_dump{
     my $string = shift;
     !$Opt{p} and exists $Opt{H} and print_H();
     unless ($string){
-    while(<>){
+    while( ~< *ARGV){
         use utf8;
         $linebuf .=  Encode::decode($Opt{f}, $_);
         while (length($linebuf) > $CPL){

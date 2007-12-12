@@ -81,7 +81,7 @@ open MASTER, $masterpodfile or die "$0: Can't open $masterpodfile: $!";
 
 my ($delta_source, $delta_target);
 
-foreach (<MASTER>) {
+foreach ( ~< *MASTER) {
   next if /^\#/;
 
   # At least one upper case letter somewhere in the first group
@@ -170,7 +170,7 @@ close MASTER;
   @sources{values %Copies} = ();
 
   open(MANI, "../MANIFEST") || die "$0: opening ../MANIFEST failed: $!";
-  while (<MANI>) {
+  while ( ~< *MANI) {
     if (m!^pod/([^.]+\.pod)\s+!i) {
       push @manipods, $1;
     } elsif (m!^README\.(\S+)\s+!i) {
@@ -184,7 +184,7 @@ close MASTER;
 
   my $in_perlpod;
   open(PERLPOD, "perl.pod") || die "$0: opening perl.pod failed: $!\n";
-  while (<PERLPOD>) {
+  while ( ~< *PERLPOD) {
     $in_perlpod ||= /^For ease of access/;
     $in_perlpod &&= ! /^\(If you're intending /;
     if ($in_perlpod) {
@@ -244,7 +244,7 @@ close MASTER;
       }
       else {
 	my $line;
-	while ($line = <F>) {
+	while ($line = ~< *F) {
 	  if ($line =~ /^=head1\s+NAME\b/) {
 	    push @modpods, $file;
 	    #warn "GOOD $file\n";
@@ -376,13 +376,13 @@ sub podset {
     local @ARGV = @_;
     my $pod;
 
-    while(<>) {
+    while( ~< *ARGV) {
 	tr/\015//d;
 	if (s/^=head1 (NAME)\s*/=head2 /) {
 	    $pod = path2modname($ARGV);
 	    unhead1();
 	    output "\n \n\n=head2 ";
-	    $_ = <>;
+	    $_ = ~< *ARGV;
 	    if ( /^\s*$pod\b/ ) {
 		s/$pod\.pm/$pod/;       # '.pm' in NAME !?
 		output $_;
@@ -709,7 +709,7 @@ while (my ($target, $name) = each %Targets) {
   }
   print "Now processing $name\n" if $Verbose;
   open THING, $name or die "Can't open $name: $!";
-  my @orig = <THING>;
+  my @orig = ~< *THING;
   my $orig = join '', @orig;
   close THING;
   my @new = do {

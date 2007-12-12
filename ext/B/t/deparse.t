@@ -39,7 +39,7 @@ ok($deparse);
 }
 
 $/ = "\n####\n";
-while (<DATA>) {
+while ( ~< *DATA) {
     chomp;
     s/#\s*(.*)$//mg;
     my ($num, $testname) = $1 =~ m/(\d+)\s*(.*)/;

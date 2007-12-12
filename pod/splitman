@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-while (<>) {
+while ( ~< *ARGV) {
     if ($seqno = 1 .. /^\.TH/) {
 	unless ($seqno =~ /e/i) {
 	    $header .= $_;

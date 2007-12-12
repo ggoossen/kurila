@@ -42,7 +42,7 @@ is( getc(F), $chr );
 is( getc(F), "\n" );
 seek(F,0,0);
 binmode(F,":utf8");
-is( scalar(<F>), "\x{100}\x[c2]\x[a3]\n" );
+is( scalar( ~< *F), "\x{100}\x[c2]\x[a3]\n" );
 seek(F,0,0);
 $buf = chr(0x200);
 $count = read(F,$buf,2,1);
@@ -59,13 +59,13 @@ close(F);
     close F;
 
     open F, "<:utf8", 'a' or die $!;
-    $x = <F>;
+    $x = ~< *F;
     chomp($x);
     is( $x, chr(300) );
 
     open F, "a" or die $!; # Not UTF
     binmode(F, ":bytes");
-    $x = <F>;
+    $x = ~< *F;
     chomp($x);
     $chr = bytes::chr(196).bytes::chr(172);
     is( $x, $chr );
@@ -93,13 +93,13 @@ close(F);
 
     open F, "a" or die $!; # Not UTF
     binmode(F, ":bytes");
-    $x = <F>;
+    $x = ~< *F;
     chomp($x);
     $chr = chr(300).chr(130);
     is( $x, $chr, sprintf('(%vd)', $x) );
 
     open F, "<:utf8", "a" or die $!;
-    $x = <F>;
+    $x = ~< *F;
     chomp($x);
     close F;
     is( $x, chr(300).chr(130), sprintf('(%vd)', $x) );
@@ -127,7 +127,7 @@ close F;
 
 open F, "<", "a" or die $!;
 binmode(F, ":bytes");
-$x = <F>; chomp $x;
+$x = ~< *F; chomp $x;
 $chr = chr(130);
 is( $x, $a . $chr );
 
@@ -142,7 +142,7 @@ close F;
 
 open F, "<", "a" or die $!;
 binmode(F, ":bytes");
-$x = <F>; chomp $x;
+$x = ~< *F; chomp $x;
 SKIP: {
     skip("Defaulting to UTF-8 output means that we can't generate a mangled file")
 	if $UTF8_OUTPUT;
@@ -154,7 +154,7 @@ SKIP: {
 SKIP: {
 	my @warnings;
 	open F, "<:utf8", "a" or die $!;
-	$x = <F>; chomp $x;
+	$x = ~< *F; chomp $x;
 	local $SIG{__WARN__} = sub { push @warnings, $_[0]; };
 	eval { sprintf "%vd\n", $x };
 	is (scalar @warnings, 1);
@@ -249,7 +249,7 @@ is($failed, undef);
     close F;
     open F, "<:utf8", "a";
     undef $@;
-    my $line = <F>;
+    my $line = ~< *F;
     my ($chrE4, $chrF6) = ("E4", "F6");
     like( $@, qr/utf8 "\\x$chrE4" does not map to Unicode .+ <F> line 1/,
 	  "<:utf8 readline must warn about bad utf8");

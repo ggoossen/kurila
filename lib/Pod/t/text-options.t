@@ -30,16 +30,16 @@ $loaded = 1;
 print "ok 1\n";
 
 my $n = 2;
-while (<DATA>) {
+while ( ~< *DATA) {
     my %options;
     next until $_ eq "###\n";
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         my ($option, $value) = split;
         $options{$option} = $value;
     }
     open (TMP, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         print TMP $_;
     }
@@ -52,12 +52,12 @@ while (<DATA>) {
     my $output;
     {
         local $/;
-        $output = <TMP>;
+        $output = ~< *TMP;
     }
     close TMP;
     unlink ('tmp.pod', 'out.tmp');
     my $expected = '';
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }

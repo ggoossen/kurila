@@ -38,7 +38,7 @@ $ntest = 1;
 
 open F, "fails";
 my $O;
-while (<F>) { $O .= $_; }
+while ( ~< *F) { $O .= $_; }
 close F;
 unlink "fails";
 

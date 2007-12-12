@@ -62,7 +62,7 @@ $RESTRICTED_CROAK = "/^Cannot retrieve restricted hash/";
 my %tests;
 {
   local $/ = "\n\nend\n";
-  while (<DATA>) {
+  while ( ~< *DATA) {
     next unless /\S/s;
     unless (/begin ([0-7]{3}) ([^\n]*)\n(.*)$/s) {
       s/\n.*//s;

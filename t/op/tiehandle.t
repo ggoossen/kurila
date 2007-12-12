@@ -89,12 +89,12 @@ is($r, 2);
 
 $text = (@data = ("the line\n"))[0];
 @expect = (READLINE => $ob);
-$ln = <$fh>;
+$ln = ~< $fh;
 is($ln, $text);
 
 @expect = ();
 @in = @data = qw(a line at a time);
-@line = <$fh>;
+@line = ~< $fh;
 @expect = @in;
 compare(@line);
 
@@ -234,7 +234,7 @@ is($r, 1);
     local *TEST;
     tie *TEST, 'CHOMP';
     my $data;
-    chomp($data = <TEST>);
+    chomp($data = ~< *TEST);
     is($data, 'foobar');
 
     package CHOMP;

@@ -81,7 +81,7 @@ my_system("$bison -d -o $tmpc_file $y_file");
 
 open CTMPFILE, $tmpc_file or die "Can't open $tmpc_file: $!\n";
 my $clines;
-{ local $/; $clines = <CTMPFILE>; }
+{ local $/; $clines = ~< *CTMPFILE; }
 die "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file;
 close CTMPFILE;
@@ -112,7 +112,7 @@ open TMPH_FILE, $tmph_file or die "Can't open $tmph_file: $!\n";
 chmod 0644, $h_file;
 open H_FILE, ">$h_file" or die "Can't open $h_file: $!\n";
 my $endcore_done = 0;
-while (<TMPH_FILE>) {
+while ( ~< *TMPH_FILE) {
     print H_FILE "#ifdef PERL_CORE\n" if $. == 1;
     if (!$endcore_done and /YYSTYPE_IS_DECLARED/) {
 	print H_FILE "#endif /* PERL_CORE */\n";
@@ -220,7 +220,7 @@ sub make_type_tab {
     my %types;
     my $default_token;
     open my $fh, '<', $y_file or die "Can't open $y_file: $!\n";
-    while (<$fh>) {
+    while ( ~< $fh) {
 	if (/(\$\d+)\s*=/) {
 	    warn "$y_file:$.: dangerous assignment to $1: $_";
 	}

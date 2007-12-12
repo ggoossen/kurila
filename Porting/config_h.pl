@@ -14,7 +14,7 @@ use warnings;
 my ($cSH, $ch, @ch, %ch) = ("config_h.SH");
 open $ch, "<$cSH" or die "Cannot open $cSH: $!\n";
 {   local $/ = "\n\n";
-    @ch = <$ch>;
+    @ch = ~< $ch;
     close  $ch;
     }
 

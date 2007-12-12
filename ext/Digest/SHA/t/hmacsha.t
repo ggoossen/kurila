@@ -17,7 +17,7 @@ BEGIN {
 	}
 }
 
-my @data = map { eval } <DATA>;
+my @data = map { eval } ~< *DATA;
 
 my $numtests = scalar @data;
 print "1..$numtests\n";

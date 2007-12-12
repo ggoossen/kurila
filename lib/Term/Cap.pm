@@ -96,7 +96,7 @@ output the string to $FH if specified.
 # in $Term::Cap::VMS_TERMCAP before Tgetent is called.
 
 if ( $^O eq 'VMS') {
-       chomp (my @entry = <DATA>);
+       chomp (my @entry = ~< *DATA);
        $VMS_TERMCAP = join '', @entry;
 }
 

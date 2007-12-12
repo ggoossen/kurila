@@ -180,7 +180,7 @@ is($j[0], 1);
 {
     # does pp_readline() handle glob-ness correctly?
     my $g = *foo;
-    $g = <DATA>;
+    $g = ~< *DATA;
     is ($g, "Perl\n");
 }
 
@@ -216,7 +216,7 @@ is($j[0], 1);
     sub f { $_[0] = 0; $_[0] = "a"; $_[0] = *DATA }
     f($v);
     is (Symbol::glob_name($v), 'main::DATA');
-    my $x = <$v>;
+    my $x = ~< $v;
     is ($x, "perl\n");
 }
 

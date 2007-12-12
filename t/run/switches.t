@@ -286,11 +286,11 @@ __EOF__
     runperl( switches => ['-pi.bak'], prog => 's/foo/bar/', args => ['file'] );
 
     open(FILE, "file") or die "$0: Failed to open 'file': $!";
-    chomp(my @file = <FILE>);
+    chomp(my @file = ~< *FILE);
     close FILE;
 
     open(BAK, "file.bak") or die "$0: Failed to open 'file': $!";
-    chomp(my @bak = <BAK>);
+    chomp(my @bak = ~< *BAK);
     close BAK;
 
     is(join(":", @file),

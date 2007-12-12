@@ -21,7 +21,7 @@ sub loadopts {
 	local (*F);
 	open OPTF, $optfile or die "Can't open $optfile: $!\n";
 	my @opts;
-	chomp(my $line = <OPTF>);
+	chomp(my $line = ~< *OPTF);
 	my @vars = split(/\t+~\t+/, $line);
 	for (@vars) {
 	    push(@opts, $_) unless (/^\s*$/);
@@ -56,7 +56,7 @@ my $pl_h = '../patchlevel.h';
 
 if (-e $pl_h) {
     open PL, "<$pl_h" or die "Can't open $pl_h: $!";
-    while (<PL>) {
+    while ( ~< *PL) {
 	if (/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
 	    $opt{$1} = $2;
 	}
@@ -71,7 +71,7 @@ my $patch_file = '../.patch';
 
 if (-e $patch_file) {
     open my $fh, "<", $patch_file or die "Can't open $patch_file: $!";
-    chomp($opt{PERL_PATCHLEVEL} = <$fh>);
+    chomp($opt{PERL_PATCHLEVEL} = ~< $fh);
     close $fh;
 }
 
@@ -126,7 +126,7 @@ if ($opt{useithreads} eq 'define' && $opt{ccflags} =~ /-DPERL_IMPLICIT_SYS\b/) {
     $opt{d_pseudofork} = 'define';
 }
 
-while (<>) {
+while ( ~< *ARGV) {
     s/~([\w_]+)~/$opt{$1}/g;
     if (/^([\w_]+)=(.*)$/) {
 	my($k,$v) = ($1,$2);

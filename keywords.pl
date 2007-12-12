@@ -27,7 +27,7 @@ EOM
 # Read & print data.
 
 my $keynum = 0;
-while (<DATA>) {
+while ( ~< *DATA) {
     chop;
     next unless $_;
     next if /^#/;

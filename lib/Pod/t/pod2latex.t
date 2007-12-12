@@ -30,7 +30,7 @@ ok(1);
 # the DATA filehandle and store it in a scalar.
 # Do this until we read an =pod
 my @reference;
-while (my $line = <DATA>) {
+while (my $line = ~< *DATA) {
   last if $line =~ /^=pod/;
   push(@reference,$line);
 }
@@ -57,7 +57,7 @@ close(OUTFH) or die "Error closing OUTFH test.tex: $!\n";
 
 # Now read in OUTFH and compare
 open(INFH, "< test.tex") or die "Unable to read test tex file: $!\n";
-my @output = <INFH>;
+my @output = ~< *INFH;
 
 ok(@output, @reference);
 for my $i (0..$#reference) {

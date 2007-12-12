@@ -87,7 +87,7 @@ eval {
     my $fh;
     open($fh,'README');
     binmode($fh);
-    my $data = <$fh>;
+    my $data = ~< $fh;
     print $tfh $data;
     close($fh);
     print $tfhSP $data;

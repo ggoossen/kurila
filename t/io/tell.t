@@ -19,11 +19,11 @@ open($TST, 'harness') || (die "Can't open harness");
 binmode $TST if $Is_Dosish;
 if (eof(TST)) { print "not ok 1\n"; } else { print "ok 1\n"; }
 
-$firstline = <$TST>;
+$firstline = ~< $TST;
 $secondpos = tell;
 
 $x = 0;
-while (<TST>) {
+while ( ~< *TST) {
     if (eof) {$x++;}
 }
 if ($x == 1) { print "ok 2\n"; } else { print "not ok 2\n"; }
@@ -36,7 +36,7 @@ if (seek($TST,0,0)) { print "ok 4\n"; } else { print "not ok 4\n"; }
 
 if (eof) { print "not ok 5\n"; } else { print "ok 5\n"; }
 
-if ($firstline eq <TST>) { print "ok 6\n"; } else { print "not ok 6\n"; }
+if ($firstline eq ~< *TST) { print "ok 6\n"; } else { print "not ok 6\n"; }
 
 if ($secondpos == tell) { print "ok 7\n"; } else { print "not ok 7\n"; }
 
@@ -67,7 +67,7 @@ binmode OTHER if (($^O eq 'MSWin32') || ($^O eq 'NetWare'));
     if ($. == 0) { print "ok 16\n"; } else { print "not ok 16\n"; }
 
     $. = 5;
-    scalar <OTHER>;
+    scalar ~< *OTHER;
     if ($. == 6) { print "ok 17\n"; } else { print "not ok 17\n"; }
 }
 
@@ -76,7 +76,7 @@ if ($. == $curline) { print "ok 18\n"; } else { print "not ok 18\n"; }
 {
     local($.);
 
-    scalar <OTHER>;
+    scalar ~< *OTHER;
     if ($. == 7) { print "ok 19\n"; } else { print "not ok 19\n"; }
 }
 
@@ -132,7 +132,7 @@ if (0)
 
 if (tell($tst) == 0) { print "ok 27\n"; } else { print "not ok 27\n"; }
 
-$line = <$tst>;
+$line = ~< $tst;
 
 if ($line eq "fred\n") { print "ok 29\n"; } else { print "not ok 29\n"; }
 

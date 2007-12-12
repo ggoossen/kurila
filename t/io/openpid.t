@@ -57,7 +57,7 @@ my $killsig = 'HUP';
 $killsig = 1 unless $Config{sig_name} =~ /\bHUP\b/;
 
 # get message from first process and kill it
-chomp($from_pid1 = scalar(<FH1>));
+chomp($from_pid1 = scalar( ~< *FH1));
 is( $from_pid1, 'first process',    'message from first process' );
 
 $kill_cnt = kill $killsig, $pid1;
@@ -65,7 +65,7 @@ is( $kill_cnt, 1,   'first process killed' ) ||
   print "# errno == $!\n";
 
 # get message from second process and kill second process and reader process
-chomp($from_pid2 = scalar(<FH2>));
+chomp($from_pid2 = scalar( ~< *FH2));
 is( $from_pid2, 'second process',   'message from second process' );
 
 $kill_cnt = kill $killsig, $pid2, $pid3;

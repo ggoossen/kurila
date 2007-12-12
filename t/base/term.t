@@ -45,7 +45,7 @@ if ($^O eq 'MacOS') {
 	open(try, "/dev/null") || open(try,"nla0:") || (die "Can't open /dev/null.");
 }
 
-if (<try> eq '') {
+if ( ~< *try eq '') {
     print "ok 6\n";
 }
 else {
@@ -54,4 +54,4 @@ else {
 }
 
 open(try, "harness") || (die "Can't open harness.");
-if (<try> ne '') {print "ok 7\n";} else {print "not ok 7\n";}
+if ( ~< *try ne '') {print "ok 7\n";} else {print "not ok 7\n";}

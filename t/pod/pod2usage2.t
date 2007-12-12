@@ -21,7 +21,7 @@ sub getoutput
   }
   if($pid) {
     # parent
-    my @out = <IN>;
+    my @out = ~< *IN;
     close(IN);
     my $exit = $?>>8;
     s/^/#/ for @out;

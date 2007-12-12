@@ -6,7 +6,7 @@ open (OUT, ">perlmodlib.pod") or die $!;
 my (@pragma, @mod, @MANIFEST);
 
 open (MANIFEST, "../MANIFEST") or die $!;
-@MANIFEST = grep !m</(?:t|demo)/>, <MANIFEST>;
+@MANIFEST = grep !m</(?:t|demo)/>, ~< *MANIFEST;
 push @MANIFEST, 'lib/Config.pod', 'lib/Errno.pm', 'lib/lib.pm',
     'lib/DynaLoader.pm', 'lib/XSLoader.pm';
 
@@ -29,7 +29,7 @@ for (@MANIFEST) {
      my $foundit=0;
      {
 	 local $/="";
-	 while (<MOD>) {
+	 while ( ~< *MOD) {
 	     next unless /^=head1 NAME/;
 	     $foundit++;
 	     last;
@@ -39,7 +39,7 @@ for (@MANIFEST) {
 	 warn "$filename missing =head1 NAME (okay if there is respective .pod)\n";
 	 next;
      }
-     my $title = <MOD>;
+     my $title = ~< *MOD;
      chomp($title);
      close MOD;
 

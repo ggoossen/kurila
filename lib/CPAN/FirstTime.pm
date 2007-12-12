@@ -1349,7 +1349,7 @@ sub read_mirrored_by {
     my $fh = FileHandle->new;
     $fh->open($local) or die "Couldn't open $local: $!";
     local $/ = "\012";
-    while (<$fh>) {
+    while ( ~< $fh) {
         ($host) = /^([\w\.\-]+)/ unless defined $host;
         next unless defined $host;
         next unless /\s+dst_(dst|location)/;
@@ -1612,7 +1612,7 @@ open FH, $pmfile or die "Could not open '$pmfile': $!";
 local $/ = "";
 my @podpara;
 my $in_over;
-while (<FH>) {
+while ( ~< *FH) {
     next if not $in_over = /^=over/;
     chomp;
     push @podpara, $_;

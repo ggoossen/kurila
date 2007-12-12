@@ -23,13 +23,13 @@ foreach (sort glob($^O eq 'MacOS' ? ":lib:strict:*" : "lib/strict/*")) {
     next if -d || /(~|\.orig|,v)$/;
 
     open F, "<$_" or die "Cannot open $_: $!\n" ;
-    while (<F>) {
+    while ( ~< *F) {
 	last if /^__END__/ ;
     }
 
     {
         local $/ = undef;
-        @prgs = (@prgs, split "\n########\n", <F>) ;
+        @prgs = (@prgs, split "\n########\n", ~< *F) ;
     }
     close F or die "Could not close: $!" ;
 }

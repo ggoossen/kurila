@@ -21,7 +21,7 @@ sub restore {
   my $self = shift;
 
   my $fh = IO::File->new("< $self->{file}") or die "Can't read $self->{file}: $!";
-  $self->{disk} = eval do {local $/; <$fh>};
+  $self->{disk} = eval do {local $/; ~< $fh};
   die $@ if $@;
   $self->{new} = {};
 }

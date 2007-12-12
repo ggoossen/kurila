@@ -727,7 +727,7 @@ sub fill_srclines {
     open (my $fh, '<', $fullnm)
 	or warn "# $fullnm: $!, (chdirs not supported by this feature yet)\n"
 	and return;
-    my @l = <$fh>;
+    my @l = ~< $fh;
     chomp @l;
     unshift @l, $fullnm; # like @{_<$fullnm} in debug, array starts at 1
     $srclines{$fullnm} = \@l;
