@@ -3088,7 +3088,7 @@ Perl_yylex(pTHX)
 		PL_preambleav = NULL;
 	    }
 	    if (PL_minus_n || PL_minus_p) {
-		sv_catpvs(PL_linestr, "LINE: while (<>) {");
+		sv_catpvs(PL_linestr, "LINE: while (~< *ARGV) {");
 		if (PL_minus_l)
 		    sv_catpvs(PL_linestr,"chomp;");
 		if (PL_minus_a) {
@@ -4225,7 +4225,7 @@ Perl_yylex(pTHX)
 		s = scan_heredoc(s);
 		TERM(sublex_start());
 	    }
-	    Perl_croak(aTHX_ "Operator '<', '<=' or '<=>' found, but did no operator expected");
+	    Perl_croak("No operator expected, but found '<', '<=' or '<=>' operator");
 	}
 	s++;
 	{

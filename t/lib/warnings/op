@@ -45,8 +45,8 @@
        use warnings 'bareword'; my $x = print(ABC || 1);
  
      Value of %s may be \"0\"; use \"defined\" 
-	$x = 1 if $x = <FH> ;
-	$x = 1 while $x = <FH> ;
+	$x = 1 if $x = ~< *FH ;
+	$x = 1 while $x = ~< *FH ;
 
      Subroutine fred redefined at -e line 1.
        sub fred{1;} sub fred{1;}
@@ -626,9 +626,9 @@ Bareword found in conditional at - line 3.
 # op.c
 use warnings 'misc' ;
 open FH, "<abc" ;
-$x = 1 if $x = <FH> ;
+$x = 1 if $x = ~< *FH ;
 no warnings 'misc' ;
-$x = 1 if $x = <FH> ;
+$x = 1 if $x = ~< *FH ;
 EXPECT
 Value of <HANDLE> construct can be "0"; test with defined() at - line 4.
 ########
@@ -680,7 +680,7 @@ Value of readdir() operator can be "0"; test with defined() at - line 4.
 # op.c
 use warnings 'misc';
 open FH, "<abc";
-($_ = <FH>) // ($_ = 1);
+($_ = ~< *FH) // ($_ = 1);
 opendir DH, ".";
 %a = (1,2,3,4) ;
 EXPECT

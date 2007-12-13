@@ -37,8 +37,8 @@ $perl .= qq[ "-I../lib"];
 #
 my $cmd1 = qq/$perl -e "\$|=1; print qq[first process\\n]; sleep 30;"/;
 my $cmd2 = qq/$perl -e "\$|=1; print qq[second process\\n]; sleep 30;"/;
-my $cmd3 = qq/$perl -e "print <>;"/; # hangs waiting for end of STDIN
-my $cmd4 = qq/$perl -e "print scalar <>;"/;
+my $cmd3 = qq/$perl -e "print ~< *ARGV;"/; # hangs waiting for end of STDIN
+my $cmd4 = qq/$perl -e "print scalar ~< *ARGV;"/;
 
 #warn "#$cmd1\n#$cmd2\n#$cmd3\n#$cmd4\n";
 

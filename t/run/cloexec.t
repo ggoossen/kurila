@@ -81,7 +81,7 @@ my $Child_prog = <<'CHILD_PROG';
 my $fd = shift;
 print qq{childfd=$fd\n};
 open INHERIT, qq{<&=$fd} or die qq{open $fd: $!};
-my $line = <INHERIT>;
+my $line = ~< *INHERIT;
 close INHERIT or die qq{close $fd: $!};
 print $line
 CHILD_PROG

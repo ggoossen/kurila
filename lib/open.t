@@ -70,7 +70,7 @@ SKIP: {
     print O chr(0x100);
     close O;
     open(I, "<utf8");
-    is(ord(<I>), 0x100, ":utf8 single wide character round-trip");
+    is(ord(~<*I), 0x100, ":utf8 single wide character round-trip");
     close I;
 EOE
 
@@ -213,6 +213,6 @@ open(O, ">koi8");
 print O chr(0x430); # Unicode CYRILLIC SMALL LETTER A = KOI8-R 0xc1
 close O;
 open(I, "<koi8");
-printf "%#x\n", ord(<I>), "\n"; # this should print 0xc1
+printf "%#x\n", ord(~<*I), "\n"; # this should print 0xc1
 close I;
 %%%

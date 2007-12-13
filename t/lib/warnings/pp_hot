@@ -7,7 +7,7 @@
     print STDIN "abc" ;
 
   Filehandle %s opened only for output		[pp_print]
-    $a = <STDOUT> ;
+    $a = ~< *STDOUT ;
 
   print() on closed filehandle %s		[pp_print]
     close STDIN ; print STDIN "abc" ;
@@ -26,12 +26,12 @@
 
   Filehandle %s opened only for output		[Perl_do_readline] 
   	open (FH, ">./xcv") ;
-	my $a = <FH> ;
+	my $a = ~< *FH ;
 
   glob failed (can't start child: %s)		[Perl_do_readline] <<TODO
 
   readline() on closed filehandle %s		[Perl_do_readline]
-    close STDIN ; $a = <STDIN>;
+    close STDIN ; $a = ~< *STDIN;
 
   readline() on closed filehandle %s		[Perl_do_readline]
     readline(NONESUCH);
@@ -171,12 +171,12 @@ Reference found where even-sized list expected at - line 3.
 ########
 # pp_hot.c [Perl_do_readline]
 use warnings 'closed' ;
-close STDIN        ; $a = <STDIN> ;
-opendir STDIN, "." ; $a = <STDIN> ;
+close STDIN        ; $a = ~< *STDIN ;
+opendir STDIN, "." ; $a = ~< *STDIN ;
 closedir STDIN;
 no warnings 'closed' ;
-opendir STDIN, "." ; $a = <STDIN> ;
-$a = <STDIN> ;
+opendir STDIN, "." ; $a = ~< *STDIN ;
+$a = ~< *STDIN ;
 EXPECT
 readline() on closed filehandle STDIN at - line 3.
 readline() on closed filehandle STDIN at - line 4.
@@ -186,17 +186,17 @@ readline() on closed filehandle STDIN at - line 4.
 use warnings 'io' ;
 my $file = "./xcv" ; unlink $file ;
 open (FH, ">$file") or die $! ;
-my $a = <FH> ;
+my $a = ~< *FH ;
 no warnings 'io' ;
-$a = <FH> ;
+$a = ~< *FH ;
 use warnings 'io' ;
 open(FOO, ">&FH") or die $! ;
-$a = <FOO> ;
+$a = ~< *FOO ;
 no warnings 'io' ;
-$a = <FOO> ;
+$a = ~< *FOO ;
 use warnings 'io' ;
-$a = <FOO> ;
-$a = <FH> ;
+$a = ~< *FOO ;
+$a = ~< *FH ;
 close (FH) or die $! ;
 close (FOO) or die $! ;
 unlink $file ;

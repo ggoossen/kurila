@@ -29,7 +29,7 @@ END { unlink @tmpfiles }
 $r = runperl(
     switches	=> [ '-0', ],
     stdin	=> 'foo\0bar\0baz\0',
-    prog	=> 'print qq(<$_>) while <>',
+    prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
 is( $r, "<foo\0><bar\0><baz\0>", "-0" );
 
@@ -50,7 +50,7 @@ is( $r, "foo\0bar\0baz\0", "-0 before a -l" );
 $r = runperl(
     switches	=> [ sprintf("-0%o", ord 'x') ],
     stdin	=> 'fooxbarxbazx',
-    prog	=> 'print qq(<$_>) while <>',
+    prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
 is( $r, "<foox><barx><bazx>", "-0 with octal number" );
 

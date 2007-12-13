@@ -222,7 +222,7 @@ sub charinfo {
     if (defined $UNICODEFH) {
 	use Search::Dict v1.02;
 	if (look($UNICODEFH, "$hexk;", { xfrm => sub { $_[0] =~ /^([^;]+);(.+)/; sprintf "%06X;$2", hex($1) } } ) >= 0) {
-	    my $line = <$UNICODEFH>;
+	    my $line = ~< $UNICODEFH;
 	    return unless defined $line;
 	    chomp $line;
 	    my %prop;
@@ -311,7 +311,7 @@ sub _charblocks {
     unless (@BLOCKS) {
 	if (openunicode(\$BLOCKSFH, "Blocks.txt")) {
 	    local $_;
-	    while (<$BLOCKSFH>) {
+	    while ( ~< $BLOCKSFH) {
 		if (/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/) {
 		    my ($lo, $hi) = (hex($1), hex($2));
 		    my $subrange = [ $lo, $hi, $3 ];
@@ -373,7 +373,7 @@ sub _charscripts {
     unless (@SCRIPTS) {
 	if (openunicode(\$SCRIPTSFH, "Scripts.txt")) {
 	    local $_;
-	    while (<$SCRIPTSFH>) {
+	    while ( ~< $SCRIPTSFH) {
 		if (/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
 		    my ($lo, $hi) = (hex($1), $2 ? hex($2) : hex($1));
 		    my $script = lc($3);
@@ -621,7 +621,7 @@ sub _compexcl {
     unless (%COMPEXCL) {
 	if (openunicode(\$COMPEXCLFH, "CompositionExclusions.txt")) {
 	    local $_;
-	    while (<$COMPEXCLFH>) {
+	    while ( ~< $COMPEXCLFH) {
 		if (/^([0-9A-F]+)\s+\#\s+/) {
 		    my $code = hex($1);
 		    $COMPEXCL{$code} = undef;
@@ -692,7 +692,7 @@ sub _casefold {
     unless (%CASEFOLD) {
 	if (openunicode(\$CASEFOLDFH, "CaseFolding.txt")) {
 	    local $_;
-	    while (<$CASEFOLDFH>) {
+	    while ( ~< $CASEFOLDFH) {
 		if (/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
 		    my $code = hex($1);
 		    $CASEFOLD{$code} = { code    => $1,
@@ -773,7 +773,7 @@ sub _casespec {
     unless (%CASESPEC) {
 	if (openunicode(\$CASESPECFH, "SpecialCasing.txt")) {
 	    local $_;
-	    while (<$CASESPECFH>) {
+	    while ( ~< $CASESPECFH) {
 		if (/^([0-9A-F]+); ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; (\w+(?: \w+)*)?/) {
 		    my ($hexcode, $lower, $title, $upper, $condition) =
 			($1, $2, $3, $4, $5);
@@ -861,7 +861,7 @@ sub _namedseq {
     unless (%NAMEDSEQ) {
 	if (openunicode(\$NAMEDSEQFH, "NamedSequences.txt")) {
 	    local $_;
-	    while (<$NAMEDSEQFH>) {
+	    while ( ~< $NAMEDSEQFH) {
 		if (/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
 		    my ($n, $s) = ($1, $2);
 		    my @s = map { chr(hex($_)) } split(' ', $s);
@@ -905,7 +905,7 @@ my $UNICODEVERSION;
 sub UnicodeVersion {
     unless (defined $UNICODEVERSION) {
 	openunicode(\$VERSIONFH, "version");
-	chomp($UNICODEVERSION = <$VERSIONFH>);
+	chomp($UNICODEVERSION = ~< $VERSIONFH);
 	close($VERSIONFH);
 	croak __PACKAGE__, "::VERSION: strange version '$UNICODEVERSION'"
 	    unless $UNICODEVERSION =~ /^\d+(?:\.\d+)+$/;

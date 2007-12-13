@@ -581,7 +581,7 @@ loop since it has no way to know what $pattern will be.
 
 	@patterns = qw( foo bar baz );
 
-	LINE: while( <DATA> )
+	LINE: while( ~< *DATA )
 		{
 		foreach $pattern ( @patterns )
 			{
@@ -602,7 +602,7 @@ but faster.
 
 	@patterns = map { qr/\b$_\b/i } qw( foo bar baz );
 
-	LINE: while( <> )
+	LINE: while( ~< *ARGV )
 		{
 		foreach $pattern ( @patterns )
 			{
@@ -617,7 +617,7 @@ backtracking though.
 
 	$regex = join '|', qw( foo bar baz );
 
-	LINE: while( <> )
+	LINE: while( ~< *ARGV )
 		{
 		print if /\b(?:$regex)\b/i;
 		}

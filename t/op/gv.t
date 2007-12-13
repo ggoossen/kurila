@@ -204,7 +204,7 @@ is($j[0], 1);
     # do_readline by checking SvOK. AMS, 20020918
     my $x = "not ";
     $x  = undef;
-    $x .= <DATA>;
+    $x .= ~< *DATA;
     is ($x, "Rules\n");
 }
 
@@ -429,7 +429,7 @@ is (ref \$::{plunk}, 'GLOB', "Symbol table has full typeglob");
        "Can't trip up general keyword overloading");
 
     $CORE::GLOBAL::{"readline"}=[];
-    eval "<STDOUT> if 0";
+    eval "~< *STDOUT if 0";
     is($@, '', "Can't trip up readline overloading");
 
     $CORE::GLOBAL::{"readpipe"}=[];

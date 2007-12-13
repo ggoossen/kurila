@@ -17,7 +17,7 @@ $|=1;
 my @prgs;
 {
     local $/;
-    @prgs = split "########\n", <DATA>;
+    @prgs = split "########\n", ~< *DATA;
     close DATA;
 }
 
