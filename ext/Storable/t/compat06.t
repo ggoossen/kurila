@@ -89,12 +89,12 @@ my $r = ROOT->make;
 
 my $data = '';
 if (!$is_EBCDIC) {			# ASCII machine
-	while (<DATA>) {
+	while ( ~< *DATA) {
 		next if /^#/;
 	    $data .= unpack("u", $_);
 	}
 } else {
-	while (<DATA>) {
+	while ( ~< *DATA) {
 		next if /^#$/;		# skip comments
 		next if /^#\s+/;	# skip comments
 		next if /^[^#]/;	# skip uuencoding for ASCII machines

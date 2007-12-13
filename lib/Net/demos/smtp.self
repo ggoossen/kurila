@@ -59,7 +59,7 @@ if($smtp->mail($user) && $smtp->to($user))
  {
   $smtp->data();
 
-  map { s/-USER-/$user/g } @data=<DATA>;
+  map { s/-USER-/$user/g } @data= ~< *DATA;
 
   $smtp->datasend(@data);
   $smtp->dataend;

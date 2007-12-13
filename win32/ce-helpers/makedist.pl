@@ -141,7 +141,7 @@ sub copy($$) {
   open my $fh, "<$fnfrom" or die "can not open $fnfrom: $!";
   binmode $fh;
   local $/;
-  my $ffrom = <$fh>;
+  my $ffrom = ~< $fh;
   if ($opts{'strip-pod'}) {
     # actually following regexp is suspicious to not work everywhere.
     # but we've checked on our set of modules, and it's fit for our purposes

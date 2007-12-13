@@ -26,7 +26,7 @@ $TESTERR = *STDERR{IO};
 $ntest = 1;
 
 open F, "todo";
-my $out = join '', <F>;
+my $out = join '', ~< *F;
 close F;
 unlink "todo";
 

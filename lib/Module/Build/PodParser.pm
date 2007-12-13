@@ -32,13 +32,13 @@ sub _myparse_from_filehandle {
   my ($self, $fh) = @_;
   
   local $_;
-  while (<$fh>) {
+  while ( ~< $fh) {
     next unless /^=(?!cut)/ .. /^=cut/;  # in POD
     last if ($self->{abstract}) = /^  (?:  [a-z:]+  \s+ - \s+  )  (.*\S)  /ix;
   }
   
   my @author;
-  while (<$fh>) {
+  while ( ~< $fh) {
     next unless /^=head1\s+AUTHORS?/ ... /^=/;
     next if /^=/;
     push @author, $_ if /\@/;

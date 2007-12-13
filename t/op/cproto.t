@@ -4,7 +4,7 @@
 BEGIN { require './test.pl'; }
 plan tests => 232;
 
-while (<DATA>) {
+while ( ~< *DATA) {
     chomp;
     (my $keyword, my $proto, local $TODO) = split " ", $_, 3;
     if ($proto eq 'undef') {

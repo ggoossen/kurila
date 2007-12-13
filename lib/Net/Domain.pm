@@ -128,7 +128,7 @@ sub _hostdomain {
   local ($_);
 
   if (open(RES, "/etc/resolv.conf")) {
-    while (<RES>) {
+    while ( ~< *RES) {
       $domain = $1
         if (/\A\s*(?:domain|search)\s+(\S+)/);
     }

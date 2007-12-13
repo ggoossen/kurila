@@ -242,7 +242,7 @@ EOF
 sub fake_prereqs {
   my $file = File::Spec->catfile('_build', 'prereqs');
   my $fh = IO::File->new("< $file") or die "Can't read $file: $!";
-  my $prereqs = eval do {local $/; <$fh>};
+  my $prereqs = eval do {local $/; ~< $fh};
   close $fh;
   
   my @prereq;

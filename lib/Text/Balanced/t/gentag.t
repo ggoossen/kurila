@@ -30,7 +30,7 @@ our ($cmd, $neg, $str, $var);
 
 $cmd = "print";
 $neg = 0;
-while (defined($str = <DATA>))
+while (defined($str = ~< *DATA))
 {
 	chomp $str;
 	$str =~ s/\\n/\n/g;

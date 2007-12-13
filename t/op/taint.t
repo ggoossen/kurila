@@ -285,7 +285,7 @@ SKIP: {
 
     my $block;
     sysread(FILE, $block, 100);
-    my $line = <FILE>;
+    my $line = ~< *FILE;
     close FILE;
     test tainted $block;
     test tainted $line;
@@ -719,8 +719,8 @@ SKIP: {
 
     open IN, $TEST or warn "$0: cannot read $TEST: $!" ;
     local $/;
-    my $a = <IN>;
-    my $b = <IN>;
+    my $a = ~< *IN;
+    my $b = ~< *IN;
 
     ok tainted($a) && tainted($b) && !defined($b);
 
@@ -731,7 +731,7 @@ SKIP: {
     # bug id 20001004.007
 
     open IN, $TEST or warn "$0: cannot read $TEST: $!" ;
-    my $a = <IN>;
+    my $a = ~< *IN;
 
     my $c = { a => 42,
 	      b => $a };
@@ -1201,7 +1201,7 @@ SKIP:
     # Rather nice code to get a tainted undef by from Rick Delaney
     open FH, "test.pl" or die $!;
     seek FH, 0, 2 or die $!;
-    $tainted = <FH>;
+    $tainted = ~< *FH;
 
     eval 'eval $tainted';
     like ($@, qr/^Insecure dependency in eval/);

@@ -78,12 +78,12 @@ sub process_file {
     }
     
     if ($^O eq 'MacOS') {
-	while(<FH>) {
+	while( ~< *FH) {
 	    $err{$1} = $2
 		if /^\s*#\s*define\s+(E\w+)\s+(\d+)/;
 	}
     } else {
-	while(<FH>) {
+	while( ~< *FH) {
 	    $err{$1} = 1
 		if /^\s*#\s*define\s+(E\w+)\s+/;
             if ($IsMSWin32) {
@@ -199,7 +199,7 @@ sub get_files {
 	else {
 	    $pat = '^#\s*(?:line)?\s*\d+\s+"([^"]+)"';
 	}
-	while(<CPPO>) {
+	while( ~< *CPPO) {
 	    if ($^O eq 'os2' or $IsMSWin32 or $^O eq 'NetWare') {
 		if (/$pat/o) {
 		   my $f = $1;
@@ -273,7 +273,7 @@ sub write_errno_pm {
 
 	%err = ();
 
-	while(<CPPO>) {
+	while( ~< *CPPO) {
 	    my($name,$expr);
 	    next unless ($name, $expr) = /"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
 	    next if $name eq $expr;
@@ -314,7 +314,7 @@ EOF
             system("cc -o errno errno.c");
             unlink("errno.c");
             if (open(C, "./errno|")) {
-		while (<C>) {
+		while ( ~< *C) {
 		    if (/^(\w+) (-?\d+)$/) { $err{$1} = $2 }
 		}
 		close(C);

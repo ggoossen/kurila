@@ -542,8 +542,8 @@ sub rename_pointy_ops {
     my $xml = shift;
     for my $op ($xml->findnodes(qq|//op_readline|)) {
         my $v = get_madprop($op, "value") or next;
-        $v =~ s/^&lt;//;
-        $v =~ s/&gt;$//;
+        $v =~ m/^&lt;(.*)&gt;$/ or next;
+        $v = $1;
         $v ||= "ARGV";
         $v = "*" . $v if $v =~ m/^\w/;
         set_madprop($op, "value" => "~&lt; " . $v, 

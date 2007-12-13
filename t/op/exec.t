@@ -51,7 +51,7 @@ is( $exit, 0, '  exited 0' );
 # Some basic piped commands.  Some OS's have trouble with "helpfully"
 # putting newlines on the end of piped output.  So we split this into
 # newline insensitive and newline sensitive tests.
-my $echo_out = `$Perl -e "print 'ok'" | $Perl -le "print <STDIN>"`;
+my $echo_out = `$Perl -e "print 'ok'" | $Perl -le "print ~< *STDIN"`;
 $echo_out =~ s/\n\n/\n/g;
 is( $echo_out, "ok\n", 'piped echo emulation');
 
@@ -63,16 +63,16 @@ is( $echo_out, "ok\n", 'piped echo emulation');
     is( scalar `$Perl -e "print 'ok'"`,
         "ok", 'no extra newlines on ``' );
 
-    is( scalar `$Perl -e "print 'ok'" | $Perl -e "print <STDIN>"`, 
+    is( scalar `$Perl -e "print 'ok'" | $Perl -e "print ~< *STDIN"`, 
         "ok", 'no extra newlines on pipes');
 
-    is( scalar `$Perl -le "print 'ok'" | $Perl -le "print <STDIN>"`, 
+    is( scalar `$Perl -le "print 'ok'" | $Perl -le "print ~< *STDIN"`, 
         "ok\n\n", 'doubled up newlines');
 
-    is( scalar `$Perl -e "print 'ok'" | $Perl -le "print <STDIN>"`, 
+    is( scalar `$Perl -e "print 'ok'" | $Perl -le "print ~< *STDIN"`, 
         "ok\n", 'extra newlines on inside pipes');
 
-    is( scalar `$Perl -le "print 'ok'" | $Perl -e "print <STDIN>"`, 
+    is( scalar `$Perl -le "print 'ok'" | $Perl -e "print ~< *STDIN"`, 
         "ok\n", 'extra newlines on outgoing pipes');
 
     {

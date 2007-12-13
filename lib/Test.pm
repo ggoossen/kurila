@@ -200,7 +200,7 @@ sub _read_program {
   return unless defined $file and length $file
     and -e $file and -f _ and -r _;
   open(SOURCEFILE, "<$file") || return;
-  $Program_Lines{$file} = [<SOURCEFILE>];
+  $Program_Lines{$file} = [ ~< *SOURCEFILE];
   close(SOURCEFILE);
 
   foreach my $x (@{$Program_Lines{$file}})
@@ -512,7 +512,7 @@ sub _diff_complain_external {
         print $TESTERR "#\n# $prefix $diff_cmd\n";
         if (open(DIFF, "$diff_cmd |")) {
             local $_;
-            while (<DIFF>) {
+            while ( ~< *DIFF) {
                 print $TESTERR "# $prefix $_";
             }
             close(DIFF);

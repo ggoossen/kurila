@@ -27,7 +27,7 @@ my $tempfile = "ireland.tmp";
 END { 1 while unlink $tempfile }
 
 my $fh = FileHandle->new($tempfile, "w");
-while (<DATA>) { print $fh $_ }  close($fh);
+while (~< *DATA) { print $fh $_ }  close($fh);
 
 my $rsp = "b9045a713caed5dff3d3b783e98d1ce5778d8bc331ee4119d707072312af06a7";
 

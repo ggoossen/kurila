@@ -128,8 +128,8 @@ SKIP: {
     open(G, "<dup$$") or die;
     {
 	my $line;
-	$line = <G>; chomp $line; is($line, "ggg");
-	$line = <G>; chomp $line; is($line, "fff");
+	$line = ~< *G; chomp $line; is($line, "ggg");
+	$line = ~< *G; chomp $line; is($line, "fff");
     }
     close G;
 
@@ -146,9 +146,9 @@ SKIP: {
     open(UTFIN, "<:utf8", "dup$$") or die $!;
     {
 	my $line;
-	$line = <UTFIN>; is($line, $message);
-	$line = <UTFIN>; is($line, $message);
-	$line = <UTFIN>; is($line, $message);
+	$line = ~< *UTFIN; is($line, $message);
+	$line = ~< *UTFIN; is($line, $message);
+	$line = ~< *UTFIN; is($line, $message);
     }
     close UTFIN;
 

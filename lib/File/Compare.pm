@@ -64,8 +64,8 @@ sub compare {
     if ($text_mode) {
 	local $/ = "\n";
 	my ($fline,$tline);
-	while (defined($fline = <FROM>)) {
-	    goto fail_inner unless defined($tline = <TO>);
+	while (defined($fline = ~< *FROM)) {
+	    goto fail_inner unless defined($tline = ~< *TO);
 	    if (ref $size) {
 		# $size contains ref to comparison function
 		goto fail_inner if &$size($fline, $tline);
@@ -73,7 +73,7 @@ sub compare {
 		goto fail_inner if $fline ne $tline;
 	    }
 	}
-	goto fail_inner if defined($tline = <TO>);
+	goto fail_inner if defined($tline = ~< *TO);
     }
     else {
 	unless (defined($size) && $size > 0) {

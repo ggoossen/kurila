@@ -1055,7 +1055,7 @@ sub parse_from_filehandle {
     my $tied_fh = (/^(?:GLOB|FileHandle|IO::\w+)$/  or  tied $in_fh);
 
     ## Read paragraphs line-by-line
-    while (defined ($textline = $tied_fh ? <$in_fh> : $in_fh->getline)) {
+    while (defined ($textline = $tied_fh ? ~< $in_fh : $in_fh->getline)) {
         $textline = $self->preprocess_line($textline, ++$nlines);
         next  unless ((defined $textline)  &&  (length $textline));
 

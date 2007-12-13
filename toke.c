@@ -3083,7 +3083,7 @@ Perl_yylex(pTHX)
 		PL_preambleav = NULL;
 	    }
 	    if (PL_minus_n || PL_minus_p) {
-		sv_catpvs(PL_linestr, "LINE: while (<>) {");
+		sv_catpvs(PL_linestr, "LINE: while (~< *ARGV) {");
 		if (PL_minus_l)
 		    sv_catpvs(PL_linestr,"chomp;");
 		if (PL_minus_a) {
@@ -4216,11 +4216,11 @@ Perl_yylex(pTHX)
 	if (PL_expect != XOPERATOR) {
 	    if (s[1] != '<' && !strchr(s,'>'))
 		check_uni();
-	    if (s[1] == '<')
+	    if (s[1] == '<') {
 		s = scan_heredoc(s);
-	    else
-		s = scan_inputsymbol(s);
-	    TERM(sublex_start());
+		TERM(sublex_start());
+	    }
+	    Perl_croak("No operator expected, but found '<', '<=' or '<=>' operator");
 	}
 	s++;
 	{
@@ -10532,162 +10532,6 @@ retval:
     yylval.ival = op_type;
     return s;
 }
-
-/* scan_inputsymbol
-   takes: current position in input buffer
-   returns: new position in input buffer
-   side-effects: yylval and lex_op are set.
-
-   This code handles:
-
-   <>		read from ARGV
-   <FH> 	read from filehandle
-   <pkg::FH>	read from package qualified filehandle
-   <pkg'FH>	read from package qualified filehandle
-   <$fh>	read from filehandle in $fh
-   <*.h>	filename glob
-
-*/
-
-STATIC char *
-S_scan_inputsymbol(pTHX_ char *start)
-{
-    dVAR;
-    register char *s = start;		/* current position in buffer */
-    char *end;
-    I32 len;
-
-    char *d = PL_tokenbuf;					/* start of temp holding space */
-    const char * const e = PL_tokenbuf + sizeof PL_tokenbuf;	/* end of temp holding space */
-
-    end = strchr(s, '\n');
-    if (!end)
-	end = PL_bufend;
-    s = delimcpy(d, e, s + 1, end, '>', &len);	/* extract until > */
-
-    /* die if we didn't have space for the contents of the <>,
-       or if it didn't end, or if we see a newline
-    */
-
-    if (len >= (I32)sizeof PL_tokenbuf)
-	Perl_croak(aTHX_ "Excessively long <> operator");
-    if (s >= end)
-	Perl_croak(aTHX_ "Unterminated <> operator");
-
-    s++;
-
-    /* check for <$fh>
-       Remember, only scalar variables are interpreted as filehandles by
-       this code.  Anything more complex (e.g., <$fh{$num}>) will be
-       treated as a glob() call.
-       This code makes use of the fact that except for the $ at the front,
-       a scalar variable and a filehandle look the same.
-    */
-    if (*d == '$' && d[1]) d++;
-
-    /* allow <Pkg'VALUE> or <Pkg::VALUE> */
-    while (*d && (isALNUM_lazy_if(d,UTF) || *d == '\'' || *d == ':'))
-	d++;
-
-    /* If we've tried to read what we allow filehandles to look like, and
-       there's still text left, then it must be a glob() and not a getline.
-       Use scan_str to pull out the stuff between the <> and treat it
-       as nothing more than a string.
-    */
-
-    if (d - PL_tokenbuf != len) {
-	Perl_croak(aTHX_ "Usage of the <> operator with a glob pattern, use the 'glob' function instead");
-    }
-    else {
-	bool readline_overriden = FALSE;
-	GV *gv_readline;
-	GV **gvp;
-    	/* we're in a filehandle read situation */
-	d = PL_tokenbuf;
-
-	/* turn <> into <ARGV> */
-	if (!len)
-	    Copy("ARGV",d,5,char);
-
-	/* Check whether readline() is overriden */
-	gv_readline = gv_fetchpvs("readline", GV_NOTQUAL, SVt_PVCV);
-	if ((gv_readline
-		&& GvCVu(gv_readline) && GvIMPORTED_CV(gv_readline))
-		||
-		((gvp = (GV**)hv_fetchs(PL_globalstash, "readline", FALSE))
-		 && (gv_readline = *gvp) && isGV_with_GP(gv_readline)
-		&& GvCVu(gv_readline) && GvIMPORTED_CV(gv_readline)))
-	    readline_overriden = TRUE;
-
-	/* if <$fh>, create the ops to turn the variable into a
-	   filehandle
-	*/
-	if (*d == '$') {
-	    /* try to find it in the pad for this block, otherwise find
-	       add symbol table ops
-	    */
-	    const PADOFFSET tmp = pad_findmy(d);
-	    if (tmp != NOT_IN_PAD) {
-		if (PAD_COMPNAME_FLAGS_isOUR(tmp)) {
-		    HV * const stash = PAD_COMPNAME_OURSTASH(tmp);
-		    HEK * const stashname = HvNAME_HEK(stash);
-		    SV * const sym = sv_2mortal(newSVhek(stashname));
-		    sv_catpvs(sym, "::");
-		    sv_catpv(sym, d+1);
-		    d = SvPVX(sym);
-		    goto intro_sym;
-		}
-		else {
-		    OP * const o = newOP(OP_PADSV, 0);
-		    o->op_targ = tmp;
-		    PL_lex_op = readline_overriden
-			? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST, o,
-				    newCVREF(0, newGVOP(OP_GV,0,gv_readline))))
-			: (OP*)newUNOP(OP_READLINE, 0, o);
-		}
-	    }
-	    else {
-		GV *gv;
-		++d;
-intro_sym:
-		gv = gv_fetchpv(d,
-				(PL_in_eval
-				 ? (GV_ADDMULTI | GV_ADDINEVAL)
-				 : GV_ADDMULTI),
-				SVt_PV);
-		PL_lex_op = readline_overriden
-		    ? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
-			    append_elem(OP_LIST,
-				newUNOP(OP_RV2SV, 0, newGVOP(OP_GV, 0, gv)),
-				newCVREF(0, newGVOP(OP_GV, 0, gv_readline))))
-		    : (OP*)newUNOP(OP_READLINE, 0,
-			    newUNOP(OP_RV2SV, 0,
-				newGVOP(OP_GV, 0, gv)));
-	    }
-	    if (!readline_overriden)
-		PL_lex_op->op_flags |= OPf_SPECIAL;
-	    /* we created the ops in PL_lex_op, so make yylval.ival a null op */
-	    yylval.ival = OP_NULL;
-	}
-
-	/* If it's none of the above, it must be a literal filehandle
-	   (<Foo::BAR> or <FOO>) so build a simple readline OP */
-	else {
-	    GV * const gv = gv_fetchpv(d, GV_ADD, SVt_PVIO);
-	    PL_lex_op = readline_overriden
-		? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
-			append_elem(OP_LIST,
-			    newGVOP(OP_GV, 0, gv),
-			    newCVREF(0, newGVOP(OP_GV, 0, gv_readline))))
-		: (OP*)newUNOP(OP_READLINE, 0, newGVOP(OP_GV, 0, gv));
-	    yylval.ival = OP_NULL;
-	}
-    }
-
-    return s;
-}
-
 
 /* scan_str
    takes: start position in buffer

@@ -54,7 +54,7 @@ sub rttest{
     my ($name, $nchar, $nrt, $nok);
     open my $rfh, "<$ucm" or die "$ucm:$!";
     # <U0000> \x00 |0 # <control>
-    while(<$rfh>){
+    while( ~< $rfh){
     s/#.*//o; /^$/ and next;
     unless ($name){
         /^<code_set_name>\s+"([^\"]+)"/io or next;

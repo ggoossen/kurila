@@ -13,7 +13,7 @@ $VERSION = '0.35';
   my $count = 0;
   my($disrec,$tag,$name);
   my $last_name = '';
-  while(<I18N::LangTags::List::DATA>) {
+  while( ~< *I18N::LangTags::List::DATA) {
     if($seeking) {
       $seeking = 0 if m/=for woohah/;
     } elsif( ($disrec, $tag, $name) =

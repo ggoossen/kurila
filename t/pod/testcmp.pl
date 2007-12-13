@@ -61,8 +61,8 @@ sub testcmp( $ $ ; $) {
    my ($line, $diffs)    = (0, 0);
   
    while ( defined($f1text) and defined($f2text) ) {
-      defined($f1text = <$fh1>)  and  chomp($f1text);
-      defined($f2text = <$fh2>)  and  chomp($f2text);
+      defined($f1text = ~< $fh1)  and  chomp($f1text);
+      defined($f2text = ~< $fh2)  and  chomp($f2text);
       ++$line;
       last unless ( defined($f1text) and defined($f2text) );
       # kill any extra line endings

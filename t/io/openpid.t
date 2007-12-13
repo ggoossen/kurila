@@ -37,8 +37,8 @@ $perl .= qq[ "-I../lib"];
 #
 my $cmd1 = qq/$perl -e "\$|=1; print qq[first process\\n]; sleep 30;"/;
 my $cmd2 = qq/$perl -e "\$|=1; print qq[second process\\n]; sleep 30;"/;
-my $cmd3 = qq/$perl -e "print <>;"/; # hangs waiting for end of STDIN
-my $cmd4 = qq/$perl -e "print scalar <>;"/;
+my $cmd3 = qq/$perl -e "print ~< *ARGV;"/; # hangs waiting for end of STDIN
+my $cmd4 = qq/$perl -e "print scalar ~< *ARGV;"/;
 
 #warn "#$cmd1\n#$cmd2\n#$cmd3\n#$cmd4\n";
 
@@ -57,7 +57,7 @@ my $killsig = 'HUP';
 $killsig = 1 unless $Config{sig_name} =~ /\bHUP\b/;
 
 # get message from first process and kill it
-chomp($from_pid1 = scalar(<FH1>));
+chomp($from_pid1 = scalar( ~< *FH1));
 is( $from_pid1, 'first process',    'message from first process' );
 
 $kill_cnt = kill $killsig, $pid1;
@@ -65,7 +65,7 @@ is( $kill_cnt, 1,   'first process killed' ) ||
   print "# errno == $!\n";
 
 # get message from second process and kill second process and reader process
-chomp($from_pid2 = scalar(<FH2>));
+chomp($from_pid2 = scalar( ~< *FH2));
 is( $from_pid2, 'second process',   'message from second process' );
 
 $kill_cnt = kill $killsig, $pid2, $pid3;

@@ -9,7 +9,7 @@ def
 --FILE--
 # taint.c
 open(FH, "<abc") ;
-$a = <FH> ;
+$a = ~< *FH ;
 close FH ;
 chdir $a ;
 print "xxx\n" ;
@@ -22,7 +22,7 @@ def
 --FILE--
 # taint.c
 open(FH, "<abc") ;
-$a = <FH> ;
+$a = ~< *FH ;
 close FH ;
 chdir $a;
 no warnings 'taint' ;
@@ -43,7 +43,7 @@ def
 --FILE--
 # taint.c
 open(FH, "<abc") ;
-$a = <FH> ;
+$a = ~< *FH ;
 close FH ;
 chdir $a;
 no warnings 'taint' ;

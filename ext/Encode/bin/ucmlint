@@ -53,7 +53,7 @@ for $ARGV (@ARGV){
     %Hdr = %U2E = %E2U = ();
     $in_charmap = $nerror = $nwarning = 0;
     $. = 0;
-    while(<UCM>){
+    while( ~< *UCM){
     chomp;
     s/\s*#.*$//o; /^$/ and next;
     if ($_ eq "CHARMAP"){ 

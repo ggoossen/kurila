@@ -150,7 +150,7 @@ sub process_file {
     my $mode = 'Typemap';
     my $junk = "" ;
     my $current = \$junk;
-    while (<TYPEMAP>) {
+    while ( ~< *TYPEMAP) {
       next if /^\s*		#/;
         my $line_no = $. + 1;
       if (/^INPUT\s*$/) {
@@ -256,7 +256,7 @@ EOM
     if $WantLineNumbers;
 
   firstmodule:
-  while (<$FH>) {
+  while ( ~< $FH) {
     if (/^=/) {
       my $podstartline = $.;
       do {
@@ -280,7 +280,7 @@ EOM
 	  next firstmodule
 	}
 	
-      } while (<$FH>);
+      } while ( ~< $FH);
       # At this point $. is at end of file so die won't state the start
       # of the problem, and as we haven't yet read any lines &death won't
       # show the correct line in the message either.
@@ -1474,7 +1474,7 @@ EOF
     # non-blank line
 
     # skip leading blank lines
-    while (<$FH>) {
+    while ( ~< $FH) {
       last unless /^\s*$/ ;
     }
 
@@ -1602,11 +1602,11 @@ sub fetch_para {
   for (;;) {
     # Skip embedded PODs
     while ($lastline =~ /^=/) {
-      while ($lastline = <$FH>) {
+      while ($lastline = ~< $FH) {
 	last if ($lastline =~ /^=cut\s*$/);
       }
       death ("Error: Unterminated pod") unless $lastline;
-      $lastline = <$FH>;
+      $lastline = ~< $FH;
       chomp $lastline;
       $lastline =~ s/^\s+$//;
     }
@@ -1624,11 +1624,11 @@ sub fetch_para {
     }
 
     # Read next line and continuation lines
-    last unless defined($lastline = <$FH>);
+    last unless defined($lastline = ~< $FH);
     $lastline_no = $.;
     my $tmp_line;
     $lastline .= $tmp_line
-      while ($lastline =~ /\\$/ && defined($tmp_line = <$FH>));
+      while ($lastline =~ /\\$/ && defined($tmp_line = ~< $FH));
 
     chomp $lastline;
     $lastline =~ s/^\s+$//;

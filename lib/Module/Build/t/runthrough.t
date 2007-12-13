@@ -146,7 +146,7 @@ SKIP: {
 
   # Make sure all of the above was done by the new version of Module::Build
   my $fh = IO::File->new(File::Spec->catfile($dist->dirname, 'META.yml'));
-  my $contents = do {local $/; <$fh>};
+  my $contents = do {local $/; ~< $fh};
   $contents =~ /Module::Build version ([0-9_.]+)/m;
   cmp_ok $1, '==', $mb->VERSION, "Check version used to create META.yml: $1 == " . $mb->VERSION;
 
@@ -174,7 +174,7 @@ SKIP: {
   SKIP: {
     skip("We do not rewrite shebang on VMS", 1) if $^O eq 'VMS';
   my $fh = IO::File->new($blib_script);
-  my $first_line = <$fh>;
+  my $first_line = ~< $fh;
   isnt $first_line, "#!perl -w\n", "should rewrite the shebang line";
   }
 }

@@ -65,13 +65,13 @@ unless ( $scheme eq 'perlio' ) {
         $ifh or open $ifh, "<", $argv or next;
         binmode $ifh;
         if ( $scheme eq 'from_to' ) {    # default
-            while (<$ifh>) {
+            while ( ~< $ifh) {
                 Encode::from_to( $_, $from, $to, $Opt{check} );
                 print;
             }
         }
         elsif ( $scheme eq 'decode_encode' ) {    # step-by-step
-            while (<$ifh>) {
+            while ( ~< $ifh) {
                 my $decoded = decode( $from, $_, $Opt{check} );
                 my $encoded = encode( $to, $decoded );
                 print $encoded;
@@ -90,7 +90,7 @@ else {
         my $ifh = ref $argv ? $argv : undef;
         $ifh or open $ifh, "<", $argv or next;
         binmode $ifh => "raw:encoding($from)";
-        print while (<$ifh>);
+        print while ( ~< $ifh);
     }
 }
 

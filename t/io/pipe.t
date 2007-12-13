@@ -34,7 +34,7 @@ SKIP: {
     skip "Doesn't work here yet", 6 if $^O eq 'vmesa';
 
     if (open(PIPE, "-|")) {
-	while(<PIPE>) {
+	while( ~< *PIPE) {
 	    s/^not //;
 	    print;
 	}
@@ -53,7 +53,7 @@ SKIP: {
 
     my $raw = "abc\nrst\rxyz\r\nfoo\n";
     if (open(PIPE, "-|")) {
-	$_ = join '', <PIPE>;
+	$_ = join '', ~< *PIPE;
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
 	my @r  = map ord, split //, $raw;
 	my @r1 = map ord, split //, $raw1;
@@ -78,7 +78,7 @@ SKIP: {
 	close PIPE;        # avoid zombies
     }
     else {
-	$_ = join '', <STDIN>;
+	$_ = join '', ~< *STDIN;
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
 	my @r  = map ord, split //, $raw;
 	my @r1 = map ord, split //, $raw1;
@@ -101,7 +101,7 @@ SKIP: {
 
         if ($pid = fork) {
             close WRITER;
-            while(<READER>) {
+            while( ~< *READER) {
                 s/^not //;
                 y/A-Z/a-z/;
                 print;

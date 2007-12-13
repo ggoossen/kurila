@@ -24,7 +24,7 @@ my $fh;
 my $var = "aaa\n";
 ok(open($fh,"+<",\$var));
 
-is(<$fh>, $var);
+is( ~< $fh, $var);
 
 ok(eof($fh));
 
@@ -36,7 +36,7 @@ is($var, "bbb\n");
 $var = "foo\nbar\n";
 ok(seek($fh,0,SEEK_SET));
 ok(!eof($fh));
-is(<$fh>, "foo\n");
+is( ~< $fh, "foo\n");
 ok(close $fh, $!);
 
 # Test that semantics are similar to normal file-based I/O
@@ -76,7 +76,7 @@ close $fh;
 # cause problems
 $var = "line one\nline two\line three\n";
 open $fh, "<", \$var;
-while (<$fh>) {
+while ( ~< $fh) {
     $var = "foo";
 }
 close $fh;
@@ -90,18 +90,18 @@ print $fh "xxx\n";
 open $dup,'+<&',$fh;
 print $dup "yyy\n";
 seek($dup,0,SEEK_SET);
-is(<$dup>, "xxx\n");
-is(<$dup>, "yyy\n");
+is( ~< $dup, "xxx\n");
+is( ~< $dup, "yyy\n");
 close($fh);
 close($dup);
 
 open $fh, '<', \42;
-is(<$fh>, "42", "reading from non-string scalars");
+is( ~< $fh, "42", "reading from non-string scalars");
 close $fh;
 
 { package P; sub TIESCALAR {bless{}} sub FETCH { "shazam" } }
 tie $p, 'P'; open $fh, '<', \$p;
-is(<$fh>, "shazam", "reading from magic scalars");
+is( ~< $fh, "shazam", "reading from magic scalars");
 
 {
     use warnings;
@@ -116,7 +116,7 @@ is(<$fh>, "shazam", "reading from magic scalars");
 my $data = "a non-empty PV";
 $data = undef;
 open(MEM, '<', \$data) or die "Fail: $!\n";
-my $x = join '', <MEM>;
+my $x = join '', ~< *MEM;
 is($x, '');
 
 {
@@ -128,7 +128,7 @@ a third line
 EOF
     open(F, '<', \$s) or die "Could not open string as a file";
     local $/ = "";
-    my $ln = <F>;
+    my $ln = ~< *F;
     close F;
     is($ln, $s, "[perl #35929]");
 }
@@ -143,7 +143,7 @@ EOF
     close F;
     # but we can read from it
     ok(open(F, '<', $ro), $!);
-    is(<F>, 43);
+    is( ~< *F, 43);
     close F;
 }
 

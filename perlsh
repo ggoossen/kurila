@@ -8,7 +8,7 @@
 
 $/ = "\n\n";	# set paragraph mode
 $SHlinesep = "\n";
-while (defined($SHcmd = <>)) {
+while (defined($SHcmd = ~< *ARGV)) {
     $/ = $SHlinesep;
     eval $SHcmd; print $@ || "\n";
     $SHlinesep = $/; $/ = '';

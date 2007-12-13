@@ -33,7 +33,7 @@ SKIP: {
 	skip(qq[cannot test with PERL_UNICODE locale "" or /[SO]/], 1);
     }
     $r = runperl( switches => [ '-CI', '-w' ],
-		  prog     => 'use utf8; print ord(<STDIN>)',
+		  prog     => 'use utf8; print ord( ~< *STDIN)',
 		  stderr   => 1,
 		  stdin    => $b );
     like( $r, qr/^256(?:\r?\n)?$/s, '-CI: read in UTF-8 input' );
@@ -52,7 +52,7 @@ like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' );
 push @tmpfiles, "out";
 
 $r = runperl( switches => [ '-Ci', '-w' ],
-	      prog     => 'use utf8; open(F, q(<out)); print ord(<F>); close F',
+	      prog     => 'use utf8; open(F, q(<out)); print ord(~< *F); close F',
               stderr   => 1 );
 like( $r, qr/^256(?:\r?\n)?$/s, '-Ci: auto-UTF-8 open for input' );
 

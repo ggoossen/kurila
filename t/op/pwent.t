@@ -21,7 +21,7 @@ BEGIN {
 	foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat)) {
 	    if (-x $ypcat &&
 		open(PW, "$ypcat passwd 2>/dev/null |") &&
-		defined(<PW>)) {
+		defined( ~< *PW)) {
 		$where = "NIS passwd";
 		undef $reason;
 		last;
@@ -33,7 +33,7 @@ BEGIN {
 	foreach my $nidump (qw(/usr/bin/nidump)) {
 	    if (-x $nidump &&
 		open(PW, "$nidump passwd . 2>/dev/null |") &&
-		defined(<PW>)) {
+		defined( ~< *PW)) {
 		$where = "NetInfo passwd";
 		undef $reason;
 		last;
@@ -43,7 +43,7 @@ BEGIN {
 
     if (not defined $where) {	# Try local.
 	my $PW = "/etc/passwd";
-	if (-f $PW && open(PW, $PW) && defined(<PW>)) {
+	if (-f $PW && open(PW, $PW) && defined( ~< *PW)) {
 	    $where = $PW;
 	    undef $reason;
 	}
@@ -53,7 +53,7 @@ BEGIN {
      foreach my $niscat (qw(/bin/niscat)) {
          if (-x $niscat &&
            open(PW, "$niscat passwd.org_dir 2>/dev/null |") &&
-           defined(<PW>)) {
+           defined( ~< *PW)) {
            $where = "NIS+ $niscat passwd.org_dir";
            undef $reason;
            last;
@@ -84,7 +84,7 @@ print "# where $where\n";
 
 setpwent();
 
-while (<PW>) {
+while ( ~< *PW) {
     chomp;
     # LIMIT -1 so that users with empty shells don't fall off
     my @s = split /:/, $_, -1;
@@ -103,7 +103,7 @@ while (<PW>) {
     }
     if ($n == $max) {
 	local $/;
-	my $junk = <PW>;
+	my $junk = ~< *PW;
 	last;
     }
     # In principle we could whine if @s != 7 but do we know enough

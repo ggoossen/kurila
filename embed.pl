@@ -90,11 +90,11 @@ sub walk_table (&@) {
     }
     print $F $leader if $leader;
     seek IN, 0, 0;		# so we may restart
-    while (<IN>) {
+    while ( ~< *IN) {
 	chomp;
 	next if /^:/;
 	while (s|\\$||) {
-	    $_ .= <IN>;
+	    $_ .= ~< *IN;
 	    chomp;
 	}
 	s/\s+$//;
@@ -126,7 +126,7 @@ sub munge_c_files () {
 	}
     } '/dev/null', '', '';
     local $^I = '.bak';
-    while (<>) {
+    while ( ~< *ARGV) {
 	s{(\b(\w+)[ \t]*\([ \t]*(?!aTHX))}
 	 {
 	    my $repl = $1;
@@ -307,7 +307,7 @@ sub readsyms (\%$) {
     local (*FILE, $_);
     open(FILE, "< $file")
 	or die "embed.pl: Can't open $file: $!\n";
-    while (<FILE>) {
+    while ( ~< *FILE) {
 	s/[ \t]*#.*//;		# Delete comments.
 	if (/^\s*(\S+)\s*$/) {
 	    my $sym = $1;
@@ -327,7 +327,7 @@ sub readvars(\%$$@) {
     local (*FILE, $_);
     open(FILE, "< $file")
 	or die "embed.pl: Can't open $file: $!\n";
-    while (<FILE>) {
+    while ( ~< *FILE) {
 	s/[ \t]*#.*//;		# Delete comments.
 	if (/PERLVARA?I?S?C?\($pre(\w+)/) {
 	    my $sym = $1;

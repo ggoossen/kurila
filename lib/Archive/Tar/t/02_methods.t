@@ -719,7 +719,7 @@ sub check_tar_extract {
 
         ok( $fh,                    "   Opening file" );
 
-        my $content = do{local $/;<$fh>}; chomp $content;
+        my $content = do{local $/; ~< $fh}; chomp $content;
         like( $content, qr/$econtent/,
                                     "   Contents OK" );
 
@@ -761,7 +761,7 @@ sub slurp_binfile {
 
     binmode $fh;
     local $/;
-    return <$fh>;
+    return ~< $fh;
 }
 
 sub slurp_gzfile {

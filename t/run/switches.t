@@ -29,7 +29,7 @@ END { unlink @tmpfiles }
 $r = runperl(
     switches	=> [ '-0', ],
     stdin	=> 'foo\0bar\0baz\0',
-    prog	=> 'print qq(<$_>) while <>',
+    prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
 is( $r, "<foo\0><bar\0><baz\0>", "-0" );
 
@@ -50,7 +50,7 @@ is( $r, "foo\0bar\0baz\0", "-0 before a -l" );
 $r = runperl(
     switches	=> [ sprintf("-0%o", ord 'x') ],
     stdin	=> 'fooxbarxbazx',
-    prog	=> 'print qq(<$_>) while <>',
+    prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
 is( $r, "<foox><barx><bazx>", "-0 with octal number" );
 
@@ -286,11 +286,11 @@ __EOF__
     runperl( switches => ['-pi.bak'], prog => 's/foo/bar/', args => ['file'] );
 
     open(FILE, "file") or die "$0: Failed to open 'file': $!";
-    chomp(my @file = <FILE>);
+    chomp(my @file = ~< *FILE);
     close FILE;
 
     open(BAK, "file.bak") or die "$0: Failed to open 'file': $!";
-    chomp(my @bak = <BAK>);
+    chomp(my @bak = ~< *BAK);
     close BAK;
 
     is(join(":", @file),

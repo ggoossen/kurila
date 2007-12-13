@@ -38,7 +38,7 @@ open STDOUT, ">&SAVEOUT" or diag $!;
 my ($curfile, $cursub, $curpack) = ('') x 3;
 our %xreftable = ();
 open XREF, $file or die "# Can't open $file: $!\n";
-while (<XREF>) {
+while ( ~< *XREF) {
     chomp;
     if (/^File (.*)/) {
 	$curfile = $1;

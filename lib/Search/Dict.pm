@@ -72,8 +72,8 @@ sub look {
 	$mid = int(($max + $min) / 2);
 	seek($fh, $mid * $blksize, 0)
 	    or return -1;
-	<$fh> if $mid;			# probably a partial line
-	$_ = <$fh>;
+	~< $fh if $mid;			# probably a partial line
+	$_ = ~< $fh;
 	$_ = $xfrm->($_) if defined $xfrm;
 	chomp;
 	s/[^\w\s]//g if $dict;
@@ -89,10 +89,10 @@ sub look {
     $min *= $blksize;
     seek($fh,$min,0)
 	or return -1;
-    <$fh> if $min;
+    ~< $fh if $min;
     for (;;) {
 	$min = tell($fh);
-	defined($_ = <$fh>)
+	defined($_ = ~< $fh)
 	    or last;
 	$_ = $xfrm->($_) if defined $xfrm;
 	chomp;

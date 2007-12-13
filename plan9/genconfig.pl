@@ -30,7 +30,7 @@ unshift(@INC,'lib');  # In case someone didn't define Perl_Root
 if ($ARGV[0] eq '-f') {
   open(ARGS,$ARGV[1]) or die "Can't read data from $ARGV[1]: $!\n";
   @ARGV = ();
-  while (<ARGS>) {
+  while ( ~< *ARGS) {
     push(@ARGV,split(/\|/,$_));
   }
   close ARGS;
@@ -173,7 +173,7 @@ print OUT "myuname='Plan9 $myname $osvers $p9p_objtype'\n";
 # Before we read the C header file, find out what config.sh constants are
 # equivalent to the C preprocessor macros
 if (open(SH,"${outdir}config_h.SH")) {
-  while (<SH>) {
+  while ( ~< *SH) {
     next unless m%^#(?!if).*\$%;
     s/^#//; s!(.*?)\s*/\*.*!$1!;
     my(@words) = split;
@@ -197,16 +197,16 @@ else { warn "Couldn't read ${outfile}config_h.SH: $!\n"; }
 $pp_vars{PLAN9} = 'define'; #Plan 9 specific
 
 # OK, now read the C header file, and retcon statements into config.sh
-while (<IN>) {  # roll through the comment header in config.h
+while ( ~< *IN) {  # roll through the comment header in config.h
   last if /config-start/;
 }
 
-while (<IN>) {
+while ( ~< *IN) {
   chop;
   while (/\\\s*$/) {  # pick up contination lines
     my $line = $_;
     $line =~ s/\\\s*$//;
-    $_ = <IN>;
+    $_ = ~< *IN;
     s/^\s*//;
     $_ = $line . $_;
   }              
@@ -266,7 +266,7 @@ foreach (sort keys %val_vars) {
 # print OUT "libc='",join(' ',@crtls),"'\n";
 
 if (open(PL,"${outdir}patchlevel.h")) {
-  while (<PL>) {
+  while ( ~< *PL) {
     if    (/^#define PERL_VERSION\s+(\S+)/) {
       print OUT "PERL_VERSION='$1'\n";
       print OUT "PATCHLEVEL='$1'\n";		# XXX compat

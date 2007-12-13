@@ -13,7 +13,7 @@ BEGIN {
 use strict;
 BEGIN { require "./test.pl"; }
 our $NUM_SECTS;
-chomp(my @strs= grep { !/^\s*\#/ } <DATA>);
+chomp(my @strs= grep { !/^\s*\#/ } ~< *DATA);
 my $out = runperl(progfile => "../ext/re/t/regop.pl", stderr => 1 );
 # VMS currently embeds linefeeds in the output.
 $out =~ s/\cJ//g if $^O = 'VMS';

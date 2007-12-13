@@ -8,8 +8,8 @@ use Config;
 open (PERLM,"<perlmain.c") or die "Can't load perlmain.c: $!";
 open (MAKEFILE,"<makefile.pl") or die "Can't load makefile.pl: $!";
 undef $/;
-$perlmain=<PERLM>;
-$makefile=<MAKEFILE>;
+$perlmain= ~< *PERLM;
+$makefile= ~< *MAKEFILE;
 
 ($_) = $makefile =~ /\bNAME\b.*=>\W*([\w\:]+)/; # extract module name
 $badname=join ("__",map {lc substr ($_,0,8)} split /:+/); # dosify

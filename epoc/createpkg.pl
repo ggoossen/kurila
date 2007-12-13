@@ -31,7 +31,7 @@ find(\&filefound, cwd.'/lib');
 
 open IN,  "<Artistic";
 open OUT, ">Artistic.txt";
-while (my $line = <IN>) {
+while (my $line = ~< *IN) {
   chomp $line;
   print OUT "$line\r\n";
 }

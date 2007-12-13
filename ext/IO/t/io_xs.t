@@ -31,7 +31,7 @@ $x = IO::File->new_tmpfile() or print "not ";
 print "ok 1\n";
 print $x "ok 2\n";
 $x->seek(0,SEEK_SET);
-print <$x>;
+print ~< $x;
 
 $x->seek(0,SEEK_SET);
 print $x "not ok 3\n";
@@ -39,7 +39,7 @@ $p = $x->getpos;
 print $x "ok 3\n";
 $x->flush;
 $x->setpos($p);
-print scalar <$x>;
+print scalar ~< $x;
 
 $! = 0;
 $x->setpos(undef);

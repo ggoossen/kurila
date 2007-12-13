@@ -36,18 +36,18 @@ my $have_encoding = eval { require PerlIO::encoding; 1; } && ! $@;
 
 my $parser = Pod::Man->new or die "Cannot create parser\n";
 my $n = 2;
-while (<DATA>) {
+while ( ~< *DATA) {
     next until $_ eq "###\n";
 
     my $input = "";
-    while (<DATA>) {
+    while ( ~< *DATA) {
         no warnings 'utf8'; # No invalid unicode warnings.
         $_ = Encode::decode('iso-8859-1', $_); # DATA is ISO 8859-e encoded
         last if $_ eq "###\n";
         $input .= $_;
     }
     my $expected = '';
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }
@@ -83,11 +83,11 @@ sub test_outtmp {
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
     open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
-    while (<OUT>) { last if /^\.nh/ }
+    while ( ~< *OUT) { last if /^\.nh/ }
     my $output;
     {
         local $/;
-        $output = <OUT>;
+        $output = ~< *OUT;
     }
     close OUT;
     if ($output eq $expected) {

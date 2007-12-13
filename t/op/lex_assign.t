@@ -24,7 +24,7 @@ pos $posstr = 3;
 $nn = $n = 2;
 sub subb {"in s"}
 
-@INPUT = <DATA>;
+@INPUT = ~< *DATA;
 @simple_input = grep /^\s*\w+\s*\$\w+\s*[#\n]/, @INPUT;
 print "1..", (11 + @INPUT + @simple_input), "\n";
 $ord = 0;
@@ -196,7 +196,7 @@ ref $xref			# ref
 ref $cstr			# ref nonref
 `$runme -e "print qq[1\\n]"`				# backtick skip(MSWin32)
 `$undefed`			# backtick undef skip(MSWin32)
-<OP>				# readline
+~< *OP				# readline
 'faked'				# rcatline
 (@z = (1 .. 3))			# aassign
 chop $chopit			# chop

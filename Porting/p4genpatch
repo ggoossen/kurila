@@ -38,7 +38,7 @@ for my $p4opt (qw(p)) {
 my $system = "p4 @P4opt describe -s $CHANGE |";
 open my $p4, $system or die "Could not run $system";
 my @action;
-while (<$p4>) {
+while ( ~< $p4) {
   print;
   next unless m|($OPT{b})|;
   my($prefix) = $1;

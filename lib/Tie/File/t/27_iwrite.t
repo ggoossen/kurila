@@ -201,7 +201,7 @@ sub try {
   binmode F;
   my $actual;
   { local $/;
-    $actual = <F>;
+    $actual = ~< *F;
   }
   close F;
 

@@ -49,9 +49,9 @@ STDERR->autoflush;
 print "1..7\n";
 
 ok 1, $pid = open2 'READ', 'WRITE', $perl, '-e',
-	cmd_line('print scalar <STDIN>');
+	cmd_line('print scalar ~< *STDIN');
 ok 2, print WRITE "hi kid\n";
-ok 3, <READ> =~ /^hi kid\r?\n$/;
+ok 3, (~< *READ) =~ /^hi kid\r?\n$/;
 ok 4, close(WRITE), $!;
 ok 5, close(READ), $!;
 $reaped_pid = waitpid $pid, 0;

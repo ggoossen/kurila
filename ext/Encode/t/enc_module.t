@@ -53,7 +53,7 @@ my @cmp = qw/初期文字列 テスト文字列/;
 open STDIN, "<", $file0 or die "$file0:$!";
 $obj = Mod_EUCJP->new;
 my $i = 0;
-while(<STDIN>){
+while( ~< *STDIN){
     s/\r?\n\z//;
     is ($cmp[$i++], $_, "encoding vs. STDIN - $i");
 }

@@ -46,7 +46,7 @@ my $how_many_common = 22;
 my %Common;
 
 while ($how_many_common--) {
-    $_ = <DATA>;
+    $_ = ~< *DATA;
     chomp;
     /^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
     $Common{$1} = $1;
@@ -187,7 +187,7 @@ my %seen_quotes;
 {
   my ($name, $val);
   open(CONFIG_SH, $Config_SH) || die "Can't open $Config_SH: $!";
-  while (<CONFIG_SH>) {
+  while ( ~< *CONFIG_SH) {
     next if m:^#!/bin/sh:;
 
     # Catch PERL_CONFIG_SH=true and PERL_VERSION=n line from Configure.
@@ -452,8 +452,8 @@ $heavy_txt .= join('', @non_v) . "\n";
 # copy config summary format from the myconfig.SH script
 $heavy_txt .= "our \$summary = <<'!END!';\n";
 open(MYCONFIG,"<myconfig.SH") || die "open myconfig.SH failed: $!";
-1 while defined($_ = <MYCONFIG>) && !/^Summary of/;
-do { $heavy_txt .= $_ } until !defined($_ = <MYCONFIG>) || /^\s*$/;
+1 while defined($_ = ~< *MYCONFIG) && !/^Summary of/;
+do { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || /^\s*$/;
 close(MYCONFIG);
 
 $heavy_txt .= "\n!END!\n" . <<'EOT';
@@ -655,7 +655,7 @@ ENDOFSET
     my ($f) = grep -r, qw(GNUMakefile Makefile);
     my $dll;
     if (open my $fh, '<', $f) {
-	while (<$fh>) {
+	while ( ~< $fh) {
 	    $dll = $1, last if /^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
 	}
     }
@@ -892,9 +892,9 @@ EOF
 }
 
 if ($Opts{glossary}) {
-    <GLOS>;				# Skip the "DO NOT EDIT"
-    <GLOS>;				# Skip the preamble
-  while (<GLOS>) {
+    ~< *GLOS;				# Skip the "DO NOT EDIT"
+    ~< *GLOS;				# Skip the preamble
+  while ( ~< *GLOS) {
     process;
     print CONFIG_POD;
   }
@@ -923,8 +923,8 @@ my $orig_heavy_txt = "";
 {
     local $/;
     my $fh;
-    $orig_config_txt = <$fh> if open $fh, "<", $Config_PM;
-    $orig_heavy_txt  = <$fh> if open $fh, "<", $Config_heavy;
+    $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM;
+    $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy;
 }
 
 if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {

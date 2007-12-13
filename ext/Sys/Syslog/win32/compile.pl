@@ -9,7 +9,7 @@ my $name = shift || 'PerlLog';
 
 # get the version from the message file
 open(my $msgfh, '<', "$name.mc") or die "fatal: Can't read file '$name.mc': $!\n";
-my $top = <$msgfh>;
+my $top = ~< $msgfh;
 close($msgfh);
 
 my ($version) = $top =~ /Sys::Syslog Message File (\d+\.\d+\.\d+)/
@@ -25,7 +25,7 @@ system(qq{ link -nodefaultlib -incremental:no -release /nologo -base:0x60000000 
 # uuencode the resource file
 open(my $rsrc, '<', "$name.RES") or die "fatal: Can't read resource file '$name.RES': $!";
 binmode($rsrc);
-my $uudata = pack "u", do { local $/; <$rsrc> };
+my $uudata = pack "u", do { local $/; ~< $rsrc };
 close($rsrc);
 
 open(my $uufh, '>', "$name\_RES.uu") or die "fatal: Can't write file '$name\_RES.uu': $!";
@@ -35,7 +35,7 @@ close($uufh);
 # uuencode the DLL
 open(my $dll, '<', "$name.dll") or die "fatal: Can't read DLL '$name.dll': $!";
 binmode($dll);
-$uudata = pack "u", do { local $/; <$dll> };
+$uudata = pack "u", do { local $/; ~< $dll };
 close($dll);
 
 open($uufh, '>', "$name\_dll.uu") or die "fatal: Can't write file '$name\_dll.uu': $!";
@@ -47,7 +47,7 @@ open(my $header, '<', "$name.h") or die "fatal: Can't read header file '$name.h'
 my %vals;    
 my $max = 0;
 
-while (<$header>) {
+while ( ~< $header) {
     if (/^#define\s+(\w+)\s+(\d+)$/ || /^#define\s+(\w+)\s+\(\(DWORD\)(\d+)L\)/) {
         $vals{$1} = $2;
         if (substr($1, 0, 1) eq 'C') {
@@ -73,7 +73,7 @@ for my $name (sort {$fac{$a} <=> $fac{$b}} keys %fac) {
 
 # write the Sys::Syslog::Win32 module
 open my $out, '>', "Win32.pm" or die "fatal: Can't write Win32.pm: $!";
-my $template = join '', <DATA>;
+my $template = join '', ~< *DATA;
 $template =~ s/__CONSTANT__/$hash/;
 $template =~ s/__F2C__/$f2c/;
 $template =~ s/__NAME_VER__/$name/;

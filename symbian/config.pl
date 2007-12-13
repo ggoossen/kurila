@@ -211,7 +211,7 @@ my %config;
 
 sub load_config_sh {
     if ( open( CONFIG_SH, "symbian/config.sh" ) ) {
-        while (<CONFIG_SH>) {
+        while ( ~< *CONFIG_SH) {
             if (/^(\w+)=['"]?(.*?)["']?$/) {
                 my ( $var, $val ) = ( $1, $2 );
                 $val =~ s/x.y.z/$R_V_SV/gi;
@@ -235,7 +235,7 @@ sub create_config_h {
         print "\tconfig.h\n";
         push @unclean, "config.h";
         if ( open( CONFIG_H_SH, "config_h.SH" ) ) {
-            while (<CONFIG_H_SH>) {
+            while ( ~< *CONFIG_H_SH) {
                 last if /\#ifndef _config_h_/;
             }
             print CONFIG_H <<__EOF__;
@@ -249,7 +249,7 @@ sub create_config_h {
 
 #ifndef _config_h_
 __EOF__
-            while (<CONFIG_H_SH>) {
+            while ( ~< *CONFIG_H_SH) {
                 last if /!GROK!THIS/;
                 s/\$(\w+)/exists $config{$1} ? $config{$1} : (warn "$0: config.sh missing '$1'\n", "")/eg;
                 s/^#undef\s+(\S+).+/#undef $1/g;
@@ -375,7 +375,7 @@ $mdl
 $AIF
 __EOF__
         if ( open( DEMOS, "perl symbian\\demo_pl list |" ) ) {
-            while (<DEMOS>) {
+            while ( ~< *DEMOS) {
                 chomp;
 		if (defined $S90SDK) {
                     print PERLAPP_PKG qq["$_"-"!:\\Mydocs\\Perl\\$_"\n];

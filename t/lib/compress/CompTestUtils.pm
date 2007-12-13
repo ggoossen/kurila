@@ -80,7 +80,7 @@ sub readFile
     {
         my $pos = tell($f);
         seek($f, 0,0);
-        @strings = <$f> ;	
+        @strings = ~< $f ;	
         seek($f, 0, $pos);
     }
     else
@@ -88,7 +88,7 @@ sub readFile
         open (F, "<$f") 
             or croak "Cannot open $f: $!\n" ;
         binmode F;
-        @strings = <F> ;	
+        @strings = ~< *F ;	
         close F ;
     }
 

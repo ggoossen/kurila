@@ -26,11 +26,11 @@ sub dprofpp {
 	my $switches = shift;
 
         open( D, "$perl \"-I../lib\" $dpp \"$switches\" 2> err |" ) || warn "$0: Can't run. $!\n";
-	@results = <D>;
+	@results = ~< *D;
 	close D;
 
 	open( D, "<err" ) || warn "$0: Can't open: $!\n";
-	@err = <D>;
+	@err = ~< *D;
 	close D;
 	push( @results, @err ) if @err;
 

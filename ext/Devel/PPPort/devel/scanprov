@@ -53,7 +53,7 @@ for my $p (@perls) {
   chomp $archlib;
   local @ARGV = glob "$archlib/CORE/*.h";
   my %sym;
-  while (<>) { $sym{$_}++ for /(\w+)/g; }
+  while ( ~< *ARGV) { $sym{$_}++ for /(\w+)/g; }
   @provided = map { $sym{$_} or $v{$p->{todo}}{$_}++; $sym{$_} ? $_ : () } @provided;
 }
 

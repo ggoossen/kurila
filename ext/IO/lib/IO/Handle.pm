@@ -401,7 +401,7 @@ sub printf {
 sub getline {
     @_ == 1 or croak 'usage: $io->getline()';
     my $this = shift;
-    return scalar <$this>;
+    return scalar ~< $this;
 } 
 
 *gets = \&getline;  # deprecated
@@ -411,7 +411,7 @@ sub getlines {
     wantarray or
 	croak 'Can\'t call $io->getlines in a scalar context, use $io->getline';
     my $this = shift;
-    return <$this>;
+    return ~< $this;
 }
 
 sub truncate {

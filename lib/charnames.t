@@ -281,7 +281,7 @@ END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs;
 {   local $/ = undef;
-    @prgs = split "\n########\n", <DATA>;
+    @prgs = split "\n########\n", ~< *DATA;
     }
 
 my $i = 46;

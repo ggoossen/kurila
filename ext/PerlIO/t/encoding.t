@@ -47,10 +47,10 @@ if (open(UTF, "<$utf")) {
     binmode(UTF, ":bytes");
     if (ord('A') == 193) { # EBCDIC
 	# alpha beta gamma in UTF-EBCDIC Unicode (0x3b1 0x3b2 0x3b3)
-	print "not " unless <UTF> eq "\xb4\x58\xb4\x59\xb4\x62";
+	print "not " unless ~< *UTF eq "\xb4\x58\xb4\x59\xb4\x62";
     } else {
 	# alpha beta gamma in UTF-8 Unicode (0x3b1 0x3b2 0x3b3)
-	print "not " unless <UTF> eq "\xce\xb1\xce\xb2\xce\xb3";
+	print "not " unless ~< *UTF eq "\xce\xb1\xce\xb2\xce\xb3";
     }
     print "ok 4\n";
     close UTF;
@@ -70,7 +70,7 @@ if (open(UTF, "<$utf")) {
 
 if (open(GRK, "<$grk")) {
     binmode(GRK, ":bytes");
-    print "not " unless <GRK> eq "\xe1\xe2\xe3";
+    print "not " unless ~< *GRK eq "\xe1\xe2\xe3";
     print "ok 8\n";
     close GRK;
 }
@@ -145,7 +145,7 @@ close(F);
 
 # Read file back as UTF-8 
 open(F,'<:encoding(utf-8)',$threebyte) || die "Cannot open $threebyte:$!";
-my $dstr = <F>;
+my $dstr = ~< *F;
 close(F);
 print "not " unless ($dstr eq $str);
 print "ok 14\n";
@@ -160,7 +160,7 @@ if (ord('A') == 193) { # EBCDIC
 close(F);
 
 open(F,'<:encoding(utf-8)',$threebyte) || die "Cannot open $threebyte:$!";
-$dstr = join(":", <F>);
+$dstr = join(":", ~< *F);
 close(F);
 if (ord('A') == 193) { # EBCDIC
     print "not " unless $dstr eq "foo\\x8C\\x80\\x80\\x80bar\n:\\x80foo\n";

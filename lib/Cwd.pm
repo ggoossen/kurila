@@ -703,7 +703,7 @@ sub _qnx_abs_path {
 
     defined( open(REALPATH, '-|') || exec '/usr/bin/fullpath', '-t', $path ) or
       die "Can't open /usr/bin/fullpath: $!";
-    my $realpath = <REALPATH>;
+    my $realpath = ~< *REALPATH;
     close REALPATH;
     chomp $realpath;
     return $realpath;

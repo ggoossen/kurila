@@ -26,17 +26,17 @@ use Safe;
 my @op;
 my %code;
 
-while (<DATA>) {
+while ( ~< *DATA) {
     chomp;
     die "Can't match $_" unless /^([a-z_0-9]+)\t+(.*)/;
     $code{$1} = $2;
 }
 
 open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $!";
-while (<$fh>) {
+while ( ~< $fh) {
     last if /^__END__/;
 }
-while (<$fh>) {
+while ( ~< $fh) {
     chomp;
     next if !$_ or /^#/;
     my ($op, $opname) = split /\t+/;
@@ -94,8 +94,8 @@ srefgen		SKIP \$x
 ref		ref
 bless		bless
 backtick	qx/ls/
-readline	<FH>
-rcatline	SKIP (set by optimizer) $x .= <F>
+readline	~< *FH
+rcatline	SKIP (set by optimizer) $x .= ~< *F
 regcmaybe	SKIP (internal)
 regcreset	SKIP (internal)
 regcomp		SKIP (internal)

@@ -47,7 +47,7 @@ if ($config eq "") {
 open(FILE, "$config") || die("Unable to open $config");
 
 my $line_in;
-while ($line_in = <FILE>) {
+while ($line_in = ~< *FILE) {
 	if ($line_in =~ /^#/) {
 		next;
 	}

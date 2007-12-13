@@ -31,7 +31,7 @@ close TRY or die "Could not close: $!";
 open(TRY,'Comp.try') || (die "Can't reopen temp file.");
 my $count = 0;
 my $z = '';
-while (<TRY>) {
+while ( ~< *TRY) {
     $z .= $_;
     $count = $count + 1;
 }

@@ -2,7 +2,7 @@ use Perl6::Form;
 
 my $bullet = "<>";
 
-my @items = <DATA>;
+my @items = ~< *DATA;
 
 for my $item (@items) {
 	print form "{'{*}'} {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",

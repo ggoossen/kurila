@@ -279,13 +279,13 @@ BEGIN {
     ExtUtils::Command::dos2unix();
 
     open(FILE, 'd2utest/foo');
-    is( join('', <FILE>), "stuff\012and thing\012", 'dos2unix' );
+    is( join('', ~< *FILE), "stuff\012and thing\012", 'dos2unix' );
     close FILE;
 
     open(FILE, 'd2utest/bar');
     binmode(FILE);
     ok( -B 'd2utest/bar' );
-    is( join('', <FILE>), $bin, 'dos2unix preserves binaries');
+    is( join('', ~< *FILE), $bin, 'dos2unix preserves binaries');
     close FILE;
 }
 

@@ -42,7 +42,7 @@ foreach my $file (@w_files) {
 
     open F, "<$file" or die "Cannot open $file: $!\n" ;
     my $line = 0;
-    while (<F>) {
+    while ( ~< *F) {
         $line++;
 	last if /^__END__/ ;
     }
@@ -50,7 +50,7 @@ foreach my $file (@w_files) {
     {
         local $/ = undef;
         $files++;
-        @prgs = (@prgs, $file, split "\n########\n", <F>) ;
+        @prgs = (@prgs, $file, split "\n########\n", ~< *F) ;
     }
     close F ;
 }

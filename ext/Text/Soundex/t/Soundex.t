@@ -26,7 +26,7 @@ use Text::Soundex;
 $test = 0;
 print "1..13\n";
 
-while (<DATA>)
+while ( ~< *DATA)
 {
   chop;
   next if /^\s*;?#/;

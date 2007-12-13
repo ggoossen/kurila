@@ -1,6 +1,6 @@
 package Module::Build::ConfigData;
 use strict;
-my $arrayref = eval do {local $/; <DATA>}
+my $arrayref = eval do {local $/; ~< *DATA}
   or die "Couldn't load ConfigData data: $@";
 close DATA;
 my ($config, $features, $auto_features) = @$arrayref;
@@ -28,7 +28,7 @@ sub write {
   chmod($mode_orig ^|^ 0222, $me); # Make it writeable
   my $fh = IO::File->new($me, 'r+') or die "Can't rewrite $me: $!";
   seek($fh, 0, 0);
-  while (<$fh>) {
+  while ( ~< $fh) {
     last if /^__DATA__$/;
   }
   die "Couldn't find __DATA__ token in $me" if eof($fh);

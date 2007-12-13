@@ -58,7 +58,7 @@ for my $charset (sort keys %Charset){
     binmode($src, ":bytes"); # needed when :utf8 in default open layer
     }
 
-    $txt = join('',<$src>);
+    $txt = join('', ~< $src);
     close($src);
     
     eval{ $uni = $transcoder->decode($txt, 1) }; 
@@ -84,10 +84,10 @@ for my $charset (sort keys %Charset){
     open $src, "<$src_utf" or die "$src_utf : $!";
     if (PerlIO::Layer->find('perlio')){
     binmode($src, ":utf8");
-    $uni = join('', <$src>);
+    $uni = join('', ~< $src);
     }else{ # ugh!
     binmode($src);
-    $uni = join('', <$src>);
+    $uni = join('', ~< $src);
     }
     close $src;
 

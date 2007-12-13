@@ -6032,7 +6032,7 @@ sub load_hist {
     open my $fh, "<", $histfile or return;
     local $/ = "\n";
     @hist = ();
-    while (<$fh>) {
+    while ( ~< $fh) {
         chomp;
         push @hist, $_;
     }
@@ -6097,7 +6097,7 @@ qq[3>&1 xterm -title "Daughter Perl debugger $pids $name" -e sh -c 'tty 1>&3;\
  sleep 10000000' |];
 
     # Get the output from 'tty' and clean it up a little.
-    my $tty = <XT>;
+    my $tty = ~< *XT;
     chomp $tty;
 
     $pidprompt = '';    # Shown anyway in titlebar

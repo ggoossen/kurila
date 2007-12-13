@@ -36,7 +36,7 @@ if (join(' ',@y) eq '0 2 4 6 8 10 12 14 16 18 20') {
 
 open(foo,'./TEST') || open(foo,'TEST') || open(foo,'t/TEST');
 $x = 0;
-$x++ while <foo>;
+$x++ while ~< *foo;
 print $x > 50 && $x < 1000 ? "ok 8\n" : "not ok 8\n";
 
 $x = -0.5;

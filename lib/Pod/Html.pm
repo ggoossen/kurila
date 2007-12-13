@@ -387,7 +387,7 @@ sub pod2html {
     # read the pod a paragraph at a time
     warn "Scanning for sections in input file(s)\n" if $Verbose;
     $/ = "";
-    my @poddata  = <POD>;
+    my @poddata  = ~< *POD;
     close(POD);
 
     # be eol agnostic
@@ -787,12 +787,12 @@ sub load_cache {
     $/ = "\n";
 
     # is it the same podpath?
-    $_ = <CACHE>;
+    $_ = ~< *CACHE;
     chomp($_);
     $tests++ if (join(":", @$podpath) eq $_);
 
     # is it the same podroot?
-    $_ = <CACHE>;
+    $_ = ~< *CACHE;
     chomp($_);
     $tests++ if ($podroot eq $_);
 
@@ -803,7 +803,7 @@ sub load_cache {
     }
 
     warn "loading item cache\n" if $Verbose;
-    while (<CACHE>) {
+    while ( ~< *CACHE) {
 	/(.*?) (.*)$/;
 	$Items{$1} = $2;
     }
@@ -816,12 +816,12 @@ sub load_cache {
     $tests = 0;
 
     # is it the same podpath?
-    $_ = <CACHE>;
+    $_ = ~< *CACHE;
     chomp($_);
     $tests++ if (join(":", @$podpath) eq $_);
 
     # is it the same podroot?
-    $_ = <CACHE>;
+    $_ = ~< *CACHE;
     chomp($_);
     $tests++ if ($podroot eq $_);
 
@@ -832,7 +832,7 @@ sub load_cache {
     }
 
     warn "loading directory cache\n" if $Verbose;
-    while (<CACHE>) {
+    while ( ~< *CACHE) {
 	/(.*?) (.*)$/;
 	$Pages{$1} = $2;
     }
@@ -886,7 +886,7 @@ sub scan_podpath {
 	    foreach $pod (@files) {
 		open(POD, "<$dirname/$pod") ||
 		    die "$0: error opening $dirname/$pod for input: $!\n";
-		@poddata = <POD>;
+		@poddata = ~< *POD;
 		close(POD);
 		clean_data( \@poddata );
 
@@ -905,7 +905,7 @@ sub scan_podpath {
 	    $pod = $1;
 	    open(POD, "<$pod") ||
 		die "$0: error opening $pod for input: $!\n";
-	    @poddata = <POD>;
+	    @poddata = ~< *POD;
 	    close(POD);
 	    clean_data( \@poddata );
 
@@ -985,7 +985,7 @@ sub scan_dir {
 	    local *F;
 	    if (open(F, "$dir/$_")) {
 		my $line;
-		while (defined($line = <F>)) {
+		while (defined($line = ~< *F)) {
 		    if ($line =~ /^=(?:pod|head1)/) {
 			$Pages{$_}  = "" unless defined $Pages{$_};
 			$Pages{$_} .= "$dir/$_.pod:";

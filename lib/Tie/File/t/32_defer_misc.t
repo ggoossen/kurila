@@ -172,7 +172,7 @@ sub check_contents {
   seek FH, 0, SEEK_SET;
 
   my $a;
-  { local $/; $a = <FH> }
+  { local $/; $a = ~< *FH }
   $a = "" unless defined $a;
   if ($a eq $x) {
     print "ok $N\n";

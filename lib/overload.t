@@ -666,7 +666,7 @@ else {
   $iter = iterator->new(5);
   is(scalar glob("${iter}"), '5');
   $acc = '';
-  $acc .= " $out" while $out = <$iter>;
+  $acc .= " $out" while $out = ~< $iter;
   is($acc, ' 4 3 2 1 0');
 }
 {
