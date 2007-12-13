@@ -4244,6 +4244,11 @@ Perl_yylex(pTHX)
 	    char tmp = *s++;
 	    if (tmp == '<')
 		SHop(OP_LEFT_SHIFT);
+
+	    if ((tmp == '+') && (*s == '>')) {
+		s++;
+		Eop(OP_NCMP);
+	    }
 	    Perl_croak("'<' is reserved for hashes");
 	}
     case '>':
