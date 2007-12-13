@@ -187,7 +187,7 @@ open (DOC, ">pod/perlapi.pod") or
 binmode DOC;
 
 walk_table {	# load documented functions into appropriate hash
-    if (@_ > 1) {
+    if (@_ +> 1) {
 	my($flags, $retval, $func, @args) = @_;
 	return "" unless $flags =~ /d/;
 	$func =~ s/\t//g; $flags =~ s/p//; # clean up fields from embed.pl

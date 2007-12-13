@@ -85,8 +85,8 @@ sub safeUntie
 
 my $Dfile = "dbhash.tmp";
 my $Dfile2 = "dbhash2.tmp";
-my $null_keys_allowed = ($DB_File::db_ver < 2.004010 
-				|| $DB_File::db_ver >= 3.1 );
+my $null_keys_allowed = ($DB_File::db_ver +< 2.004010 
+				|| $DB_File::db_ver +>= 3.1 );
 
 unlink $Dfile;
 
@@ -248,13 +248,13 @@ ok(27, $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for ($i = 1; $i < 200; $i++) { $h{$i + 0} = $i + 0; }
-for ($i = 1; $i < 200; $i++) { $ok = 0 unless $h{$i} == $i; }
+for ($i = 1; $i +< 200; $i++) { $h{$i + 0} = $i + 0; }
+for ($i = 1; $i +< 200; $i++) { $ok = 0 unless $h{$i} == $i; }
 ok(28, $ok );
 
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
-ok(29, $size > 0 );
+ok(29, $size +> 0 );
 
 @h{0..200} = 200..400;
 my @foo = @h{0..200};
@@ -388,7 +388,7 @@ untie %h ;
     ok(50, $h{"abc"} == 123) ;
     untie %x ;
     unlink $filename ;
-    ok(51, $::count >0) ;
+    ok(51, $::count +>0) ;
 }
 
 {
@@ -907,7 +907,7 @@ EOM
     $hash2{xyz} = 2;
     $hash2{abcde} = 5;
 
-    ok(129, $h1_count > 0);
+    ok(129, $h1_count +> 0);
     ok(130, $h1_count == $h2_count);
 
     ok(131, safeUntie \%hash1);
@@ -1138,7 +1138,7 @@ EOM
       or print "# Caught warning [$warned]\n" ;
     $warned = '';
 
-    my $no_NULL = ($DB_File::db_ver >= 2.003016 && $DB_File::db_ver < 3.001) ;
+    my $no_NULL = ($DB_File::db_ver +>= 2.003016 && $DB_File::db_ver +< 3.001) ;
     print "# db_ver $DB_File::db_ver\n";
     $value = '' ;
     $db->get(undef, $value) ;

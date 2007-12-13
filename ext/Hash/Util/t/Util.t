@@ -311,7 +311,7 @@ like( $@, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in a restricted ha
 }
 
 my $hash_seed = hash_seed();
-ok($hash_seed >= 0, "hash_seed $hash_seed");
+ok($hash_seed +>= 0, "hash_seed $hash_seed");
 
 {
     package Minder;

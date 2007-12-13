@@ -99,8 +99,8 @@ my $lex = LexFile->new( my $name) ;
     		      -ExtraField => "";
     my $after = time ;
 
-    ok $hdr->{Time} >= $before ;
-    ok $hdr->{Time} <= $after ;
+    ok $hdr->{Time} +>= $before ;
+    ok $hdr->{Time} +<= $after ;
 
     ok defined $hdr->{Name} ;
     ok $hdr->{Name} eq "";
@@ -128,8 +128,8 @@ my $lex = LexFile->new( my $name) ;
     			      -ExtraField => "\x00";
     my $after = time ;
 
-    ok $hdr->{Time} >= $before ;
-    ok $hdr->{Time} <= $after ;
+    ok $hdr->{Time} +>= $before ;
+    ok $hdr->{Time} +<= $after ;
     ok $hdr->{Name} eq "a";
     ok $hdr->{Comment} eq "b";
     is $hdr->{ExtraFlags}, 0;
@@ -492,7 +492,7 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
     my $status  = 1;
 
     $status = $x->read($data)
-        while $status >  0;
+        while $status +>  0;
     is $status, 0 ;
     is $data, '';
     ok ! $x->error() ;
@@ -825,7 +825,7 @@ EOM
     ok my $gunz = IO::Uncompress::Gunzip->new( $name, 
                                        -Strict   => 1);
     my $uncomp ;
-    1 while  $gunz->read($uncomp) > 0 ;
+    1 while  $gunz->read($uncomp) +> 0 ;
     ok $gunz->close() ;
     ok $uncomp eq $string 
 	or print "# got [$uncomp] wanted [$string]\n";;
@@ -847,12 +847,12 @@ EOM
             my $uncomp ;
             if ($strict)
             {
-                ok $gunz->read($uncomp) < 0 ;
+                ok $gunz->read($uncomp) +< 0 ;
                 like $GunzipError, "/Trailer Error: trailer truncated. Expected 8 bytes, got $got/";
             }
             else
             {
-                ok   $gunz->read($uncomp) > 0 ;
+                ok   $gunz->read($uncomp) +> 0 ;
                 ok ! $GunzipError ;
                 my $expected = substr($buffer, - $got);
                 is  $gunz->trailingData(),  $expected_trailing;
@@ -878,13 +878,13 @@ EOM
             my $uncomp ;
             if ($strict)
             {
-                ok $gunz->read($uncomp) < 0 ;
+                ok $gunz->read($uncomp) +< 0 ;
                 my $got_len = $actual_len + 1;
                 like $GunzipError, "/Trailer Error: ISIZE mismatch. Got $got_len, expected $actual_len/";
             }
             else
             {
-                ok   $gunz->read($uncomp) > 0 ;
+                ok   $gunz->read($uncomp) +> 0 ;
                 ok ! $GunzipError ;
                 #is   $gunz->trailingData(), substr($buffer, - $got) ;
             }
@@ -910,12 +910,12 @@ EOM
             my $uncomp ;
             if ($strict)
             {
-                ok $gunz->read($uncomp) < 0 ;
+                ok $gunz->read($uncomp) +< 0 ;
                 like $GunzipError, '/Trailer Error: CRC mismatch/';
             }
             else
             {
-                ok   $gunz->read($uncomp) > 0 ;
+                ok   $gunz->read($uncomp) +> 0 ;
                 ok ! $GunzipError ;
             }
             ok ! $gunz->trailingData() ;
@@ -942,12 +942,12 @@ EOM
             my $uncomp ;
             if ($strict)
             {
-                ok $gunz->read($uncomp) < 0 ;
+                ok $gunz->read($uncomp) +< 0 ;
                 like $GunzipError, '/Trailer Error: CRC mismatch/';
             }
             else
             {
-                ok   $gunz->read($uncomp) > 0 ;
+                ok   $gunz->read($uncomp) +> 0 ;
                 ok ! $GunzipError ;
             }
             ok $gunz->eof() ;

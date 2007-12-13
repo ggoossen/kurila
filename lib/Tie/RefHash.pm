@@ -140,7 +140,7 @@ sub TIEHASH {
       # but make this a weak reference, so that there are no leaks
       Scalar::Util::weaken( $thread_object_registry[-1] );
 
-      if ( ++$count > 1000 ) {
+      if ( ++$count +> 1000 ) {
         # this ensures we don't fill up with a huge array dead weakrefs
         @thread_object_registry = grep { defined } @thread_object_registry;
         $count = 0;

@@ -148,17 +148,17 @@ sub read_magic {
     return undef unless length($buf);
 
     my $net_order;
-    if ($magic eq "perl-store" && ord(substr($buf, 0, 1)) > 1) {
+    if ($magic eq "perl-store" && ord(substr($buf, 0, 1)) +> 1) {
 	$info{version} = -1;
 	$net_order = 0;
     }
     else {
 	$net_order = ord(substr($buf, 0, 1, ""));
 	my $major = $net_order >> 1;
-	return undef if $major > 4; # sanity (assuming we never go that high)
+	return undef if $major +> 4; # sanity (assuming we never go that high)
 	$info{major} = $major;
 	$net_order ^&^= 0x01;
-	if ($major > 1) {
+	if ($major +> 1) {
 	    return undef unless length($buf);
 	    my $minor = ord(substr($buf, 0, 1, ""));
 	    $info{minor} = $minor;
@@ -175,13 +175,13 @@ sub read_magic {
     unless ($net_order) {
 	return undef unless length($buf);
 	my $len = ord(substr($buf, 0, 1, ""));
-	return undef unless length($buf) >= $len;
+	return undef unless length($buf) +>= $len;
 	return undef unless $len == 4 || $len == 8;  # sanity
 	$info{byteorder} = substr($buf, 0, $len, "");
 	$info{intsize} = ord(substr($buf, 0, 1, ""));
 	$info{longsize} = ord(substr($buf, 0, 1, ""));
 	$info{ptrsize} = ord(substr($buf, 0, 1, ""));
-	if ($info{version_nv} >= 2.002) {
+	if ($info{version_nv} +>= 2.002) {
 	    return undef unless length($buf);
 	    $info{nvsize} = ord(substr($buf, 0, 1, ""));
 	}

@@ -39,14 +39,14 @@ like($@, qr/^Insecure dependency/,              'open with tainted data');
 eval { $testfd = open($file, O_RDONLY, 0) };
 is($@, "",                                  'open with untainted data');
 
-read($testfd, $buffer, 2) if $testfd > 2;
+read($testfd, $buffer, 2) if $testfd +> 2;
 is( $buffer, "#!",	                          '    read' );
 ok(tainted($buffer),                          '    scalar tainted');
 
 TODO: {
     local $TODO = "POSIX::read won't taint an array element";
 
-    read($testfd, $buffer[1], 2) if $testfd > 2;
+    read($testfd, $buffer[1], 2) if $testfd +> 2;
 
     is( $buffer[1], "./",	                      '    read' );
     ok(tainted($buffer[1]),                       '    array element tainted');

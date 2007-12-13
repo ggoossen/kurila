@@ -128,7 +128,7 @@ sub DumpElem {
       && (ref $v eq 'ARRAY' and !grep(ref $_, @$v) )) {
     my $depth = $#$v;
     ($shortmore, $depth) = (' ...', $self->{arrayDepth} - 1)
-      if $self->{arrayDepth} and $depth >= $self->{arrayDepth};
+      if $self->{arrayDepth} and $depth +>= $self->{arrayDepth};
     my @a = map $self->stringify($_), @$v[0..$depth];
     print "0..$#{$v}  @a$shortmore\n";
   } elsif ($self->{veryCompact} && ref $v
@@ -136,7 +136,7 @@ sub DumpElem {
     my @a = sort keys %$v;
     my $depth = $#a;
     ($shortmore, $depth) = (' ...', $self->{hashDepth} - 1)
-      if $self->{hashDepth} and $depth >= $self->{hashDepth};
+      if $self->{hashDepth} and $depth +>= $self->{hashDepth};
     my @b = map {$self->stringify($_) . " => " . $self->stringify($$v{$_})}
       @a[0..$depth];
     local $" = ', ';
@@ -168,7 +168,7 @@ sub unwrap {
     ($address) = $val =~ /(0x[0-9a-f]+)\)$/ ;
     if (!$self->{dumpReused} && defined $address) {
       $address{$address}++ ;
-      if ( $address{$address} > 1 ) {
+      if ( $address{$address} +> 1 ) {
 	print "${sp}-> REUSED_ADDRESS\n" ;
 	return ;
       }
@@ -176,7 +176,7 @@ sub unwrap {
   } elsif (ref \$v eq 'GLOB') {
     $address = '*' . Symbol::glob_name($v);	# To avoid a bug with globs
     $address{$address}++ ;
-    if ( $address{$address} > 1 ) {
+    if ( $address{$address} +> 1 ) {
       print "${sp}*DUMPED_GLOB*\n" ;
       return ;
     }
@@ -193,11 +193,11 @@ sub unwrap {
     my @sortKeys = sort keys(%$v) ;
     my $more;
     my $tHashDepth = $#sortKeys ;
-    $tHashDepth = $#sortKeys < $self->{hashDepth}-1 ? $#sortKeys : $self->{hashDepth}-1
+    $tHashDepth = $#sortKeys +< $self->{hashDepth}-1 ? $#sortKeys : $self->{hashDepth}-1
       unless $self->{hashDepth} eq '' ;
-    $more = "....\n" if $tHashDepth < $#sortKeys ;
+    $more = "....\n" if $tHashDepth +< $#sortKeys ;
     my $shortmore = "";
-    $shortmore = ", ..." if $tHashDepth < $#sortKeys ;
+    $shortmore = ", ..." if $tHashDepth +< $#sortKeys ;
     $#sortKeys = $tHashDepth ;
     if ($self->{compactDump} && !grep(ref $_, values %{$v})) {
       $short = $sp;
@@ -207,7 +207,7 @@ sub unwrap {
       }
       $short .= join ', ', @keys;
       $short .= $shortmore;
-      (print "$short\n"), return if length $short <= $self->{compactDump};
+      (print "$short\n"), return if length $short +<= $self->{compactDump};
     }
     for my $key (@sortKeys) {
       return if $DB::signal and $self->{stopDbSignal};
@@ -220,13 +220,13 @@ sub unwrap {
   } elsif ( UNIVERSAL::isa($v, 'ARRAY') ) {
     my $tArrayDepth = $#{$v} ;
     my $more ;
-    $tArrayDepth = $#$v < $self->{arrayDepth}-1 ? $#$v : $self->{arrayDepth}-1
+    $tArrayDepth = $#$v +< $self->{arrayDepth}-1 ? $#$v : $self->{arrayDepth}-1
       unless  $self->{arrayDepth} eq '' ;
-    $more = "....\n" if $tArrayDepth < $#{$v} ;
+    $more = "....\n" if $tArrayDepth +< $#{$v} ;
     my $shortmore = "";
-    $shortmore = " ..." if $tArrayDepth < $#{$v} ;
+    $shortmore = " ..." if $tArrayDepth +< $#{$v} ;
     if ($self->{compactDump} && !grep(ref $_, @{$v})) {
-      if ($#$v >= 0) {
+      if ($#$v +>= 0) {
 	$short = $sp . "0..$#{$v}  " .
 	  join(" ", 
 	       map {exists $v->[$_] ? $self->stringify($v->[$_]) : "empty"} ($[..$tArrayDepth)
@@ -234,7 +234,7 @@ sub unwrap {
       } else {
 	$short = $sp . "empty array";
       }
-      (print "$short\n"), return if length $short <= $self->{compactDump};
+      (print "$short\n"), return if length $short +<= $self->{compactDump};
     }
     for my $num ($[ .. $tArrayDepth) {
       return if $DB::signal and $self->{stopDbSignal};
@@ -280,7 +280,7 @@ sub compactDump {
   my $self = shift;
   $self->{compactDump} = shift if @_;
   $self->{compactDump} = 6*80-1 
-    if $self->{compactDump} and $self->{compactDump} < 2;
+    if $self->{compactDump} and $self->{compactDump} +< 2;
   $self->{compactDump};
 }
 
@@ -446,7 +446,7 @@ sub arrayUsage {		# array ref, name
   my $size = 0;
   map {$size += $self->scalarUsage($_)} @{$_[0]};
   my $len = @{$_[0]};
-  print "\@$_[1] = $len item", ($len > 1 ? "s" : ""), " (data: $size bytes)\n"
+  print "\@$_[1] = $len item", ($len +> 1 ? "s" : ""), " (data: $size bytes)\n"
       if defined $_[1];
   $self->{CompleteTotal} +=  $size;
   $size;
@@ -460,7 +460,7 @@ sub hashUsage {			# hash ref, name
   my $values = $self->arrayUsage(\@values);
   my $len = @keys;
   my $total = $keys + $values;
-  print "\%$_[1] = $len item", ($len > 1 ? "s" : ""),
+  print "\%$_[1] = $len item", ($len +> 1 ? "s" : ""),
     " (keys: $keys; values: $values; total: $total bytes)\n"
       if defined $_[1];
   $total;

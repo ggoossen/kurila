@@ -489,7 +489,7 @@ sub have_old_bunzip2 {
     
     my ($version) = $buffer =~ /version \s+ (\d+)/ix;
 
-    return 1 if $version < 1;
+    return 1 if $version +< 1;
     return;
 }
 
@@ -639,7 +639,7 @@ sub _untar_at {
     if( $self->is_tgz ) {
         my $use_list = { 'Compress::Zlib' => '0.0' };
            $use_list->{ 'IO::Zlib' } = '0.0'
-                if $Archive::Tar::VERSION >= '0.99';
+                if $Archive::Tar::VERSION +>= '0.99';
 
         unless( can_load( modules => $use_list ) ) {
             my $which = join '/', sort keys %$use_list;
@@ -792,7 +792,7 @@ sub _gunzip_cz {
                             $self->_gunzip_to, $! ));
 
     my $buffer;
-    $fh->print($buffer) while $gz->gzread($buffer) > 0;
+    $fh->print($buffer) while $gz->gzread($buffer) +> 0;
     $fh->close;
 
     ### set what files where extract, and where they went ###

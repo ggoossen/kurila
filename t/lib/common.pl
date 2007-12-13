@@ -90,7 +90,7 @@ for (@prgs){
 	die "Internal error: test $_ didn't split into pairs, got " .
 		scalar(@files) . "[" . join("%%%%", @files) ."]\n"
 	    if @files % 2 ;
-	while (@files > 2) {
+	while (@files +> 2) {
 	    my $filename = shift @files ;
 	    my $code = shift @files ;
     	    push @temps, $filename ;
@@ -165,7 +165,7 @@ for (@prgs){
 	}
     }
     die "$0: can't have OPTION regex and random\n"
-        if $option_regex + $option_random > 1;
+        if $option_regex + $option_random +> 1;
     my $ok = 0;
     if ($results =~ s/^SKIPPED\n//) {
 	print "$results\n" ;

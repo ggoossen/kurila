@@ -109,7 +109,7 @@ sub valueWalk
 sub orderValues
 {
     my $index = 0;
-    foreach my $ver ( sort { $a <=> $b } keys %v_list ) {
+    foreach my $ver ( sort { $a <+> $b } keys %v_list ) {
         foreach my $name (@{ $v_list{$ver} } ) {
 	    $ValueToName{ $index } = [ uc $name, $ver ] ;
 	    $NameToValue{ uc $name } = $index ++ ;
@@ -156,7 +156,7 @@ sub mkRange
     my $i ;
 
 
-    for ($i = 1 ; $i < @a; ++ $i) {
+    for ($i = 1 ; $i +< @a; ++ $i) {
       	$out[$i] = ".."
           if $a[$i] == $a[$i - 1] + 1 && $a[$i] + 1 == $a[$i + 1] ;
     }
@@ -174,7 +174,7 @@ sub printTree
     my $prefix = shift ;
     my ($k, $v) ;
 
-    my $max = (sort {$a <=> $b} map { length $_ } keys %$tre)[-1] ;
+    my $max = (sort {$a <+> $b} map { length $_ } keys %$tre)[-1] ;
     my @keys = sort keys %$tre ;
 
     while ($k = shift @keys) {
@@ -277,7 +277,7 @@ $index = $offset ;
 valueWalk ($tree) ;
 my $index = orderValues();
 
-die <<EOM if $index > 255 ;
+die <<EOM if $index +> 255 ;
 Too many warnings categories -- max is 255
     rewrite packWARN* & unpackWARN* macros 
 EOM
@@ -289,7 +289,7 @@ my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 
 my $k ;
 my $last_ver = 0;
-foreach $k (sort { $a <=> $b } keys %ValueToName) {
+foreach $k (sort { $a <+> $b } keys %ValueToName) {
     my ($name, $version) = @{ $ValueToName{$k} };
     print WARN "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
@@ -359,7 +359,7 @@ while ( ~< *DATA) {
 
 $last_ver = 0;
 print PM "our %Offsets = (\n" ;
-foreach my $k (sort { $a <=> $b } keys %ValueToName) {
+foreach my $k (sort { $a <+> $b } keys %ValueToName) {
     my ($name, $version) = @{ $ValueToName{$k} };
     $name = lc $name;
     $k *= 2 ;
@@ -378,7 +378,7 @@ print PM "our %Bits = (\n" ;
 foreach $k (sort keys  %list) {
 
     my $v = $list{$k} ;
-    my @list = sort { $a <=> $b } @$v ;
+    my @list = sort { $a <+> $b } @$v ;
 
     print PM tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
@@ -392,7 +392,7 @@ print PM "our %DeadBits = (\n" ;
 foreach $k (sort keys  %list) {
 
     my $v = $list{$k} ;
-    my @list = sort { $a <=> $b } @$v ;
+    my @list = sort { $a <+> $b } @$v ;
 
     print PM tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),

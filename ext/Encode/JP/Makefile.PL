@@ -143,7 +143,7 @@ sub postamble
     foreach my $file (@{$tables{$table}})
     {
         $str .= $continuator.' '.$self->catfile($dir,$file);
-        if ( length($str)-$lengthsofar > 128*$numlines )
+        if ( length($str)-$lengthsofar +> 128*$numlines )
         {
         $continuator .= " \\\n\t";
         $numlines++;

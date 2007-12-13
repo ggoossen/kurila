@@ -130,7 +130,7 @@ sub load_loc {
     return $Loc{$pkg} if exists $Loc{$pkg};
 
     eval { require Locale::Maketext::Lexicon; 1 }   or return;
-    $Locale::Maketext::Lexicon::VERSION > 0.20	    or return;
+    $Locale::Maketext::Lexicon::VERSION +> 0.20	    or return;
     eval { require File::Spec; 1 }		    or return;
 
     my $path = $args{Path} || $class->auto_path($args{Class}) or return;
@@ -246,7 +246,7 @@ sub _default_gettext {
 	$digit . (
 	    $1 ? (
 		($1 eq 'tense') ? (($3 eq 'present') ? 'ing' : 'ed') :
-		($1 eq 'quant') ? ' ' . (($digit > 1) ? ($4 || "$3s") : $3) :
+		($1 eq 'quant') ? ' ' . (($digit +> 1) ? ($4 || "$3s") : $3) :
 		''
 	    ) : ''
 	);

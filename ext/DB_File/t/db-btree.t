@@ -23,7 +23,7 @@ BEGIN {
 BEGIN
 {
     if ($^O eq 'darwin'
-	&& (split(/\./, $Config{osvers}))[0] < 7 # Mac OS X 10.3 == Darwin 7
+	&& (split(/\./, $Config{osvers}))[0] +< 7 # Mac OS X 10.3 == Darwin 7
 	&& $Config{db_version_major} == 1
 	&& $Config{db_version_minor} == 0
 	&& $Config{db_version_patch} == 0) {
@@ -57,7 +57,7 @@ sub lexical
     my(@a) = unpack ("C*", $a) ;
     my(@b) = unpack ("C*", $b) ;
 
-    my $len = (@a > @b ? @b : @a) ;
+    my $len = (@a +> @b ? @b : @a) ;
     my $i = 0 ;
 
     foreach $i ( 0 .. $len -1) {
@@ -129,8 +129,8 @@ sub safeUntie
 
 
 my $db185mode =  ($DB_File::db_version == 1 && ! $DB_File::db_185_compat) ;
-my $null_keys_allowed = ($DB_File::db_ver < 2.004010 
-				|| $DB_File::db_ver >= 3.1 );
+my $null_keys_allowed = ($DB_File::db_ver +< 2.004010 
+				|| $DB_File::db_ver +>= 3.1 );
 
 my $Dfile = "dbbtree.tmp";
 unlink $Dfile;
@@ -297,13 +297,13 @@ ok(30, $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for ($i = 1; $i < 200; $i++) { $h{$i + 0} = $i + 0; }
-for ($i = 1; $i < 200; $i++) { $ok = 0 unless $h{$i} == $i; }
+for ($i = 1; $i +< 200; $i++) { $h{$i + 0} = $i + 0; }
+for ($i = 1; $i +< 200; $i++) { $ok = 0 unless $h{$i} == $i; }
 ok(31, $ok);
 
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
-ok(32, $size > 0 );
+ok(32, $size +> 0 );
 
 @h{0..200} = 200..400;
 my @foo = @h{0..200};
@@ -538,13 +538,13 @@ my $Dfile3 = "btree3" ;
 my $dbh1 = DB_File::BTREEINFO->new() ;
 $dbh1->{compare} = sub { 
 	no warnings 'numeric' ;
-	$_[0] <=> $_[1] } ; 
+	$_[0] <+> $_[1] } ; 
  
 my $dbh2 = DB_File::BTREEINFO->new() ;
 $dbh2->{compare} = sub { $_[0] cmp $_[1] } ;
  
 my $dbh3 = DB_File::BTREEINFO->new() ;
-$dbh3->{compare} = sub { length $_[0] <=> length $_[1] } ;
+$dbh3->{compare} = sub { length $_[0] <+> length $_[1] } ;
  
  
 my (%g, %k);
@@ -556,10 +556,10 @@ my @Keys = qw( 0123 12 -1234 9 987654321 def  ) ;
 my (@srt_1, @srt_2, @srt_3);
 { 
   no warnings 'numeric' ;
-  @srt_1 = sort { $a <=> $b } @Keys ; 
+  @srt_1 = sort { $a <+> $b } @Keys ; 
 }
 @srt_2 = sort { $a cmp $b } @Keys ;
-@srt_3 = sort { length $a <=> length $b } @Keys ;
+@srt_3 = sort { length $a <+> length $b } @Keys ;
  
 foreach (@Keys) {
     $h{$_} = 1 ;
@@ -1444,7 +1444,7 @@ ok(165,1);
     $hash2{xyz} = 2;
     $hash2{abcde} = 5;
 
-    ok(168, $h1_count > 0);
+    ok(168, $h1_count +> 0);
     ok(169, $h1_count == $h2_count);
 
     ok(170, safeUntie \%hash1);
@@ -1648,7 +1648,7 @@ ok(165,1);
       or print "# Caught warning [$warned]\n" ;
     $warned = '';
 
-    my $no_NULL = ($DB_File::db_ver >= 2.003016 && $DB_File::db_ver < 3.001) ;
+    my $no_NULL = ($DB_File::db_ver +>= 2.003016 && $DB_File::db_ver +< 3.001) ;
     print "# db_ver $DB_File::db_ver\n";
     $value = '' ;
     $db->get(undef, $value) ;

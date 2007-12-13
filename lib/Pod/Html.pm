@@ -424,7 +424,7 @@ sub pod2html {
     # put a title in the HTML file if one wasn't specified
     if ($Title eq '') {
 	TITLE_SEARCH: {
- 	    for (my $i = 0; $i < @poddata; $i++) {
+ 	    for (my $i = 0; $i +< @poddata; $i++) {
 		if ($poddata[$i] =~ /^=head1\s*NAME\b/m) {
  		    for my $para ( @poddata[$i, $i+1] ) {
 			last TITLE_SEARCH
@@ -437,7 +437,7 @@ sub pod2html {
     }
     if (!$Title and $Podfile =~ /\.pod\z/) {
 	# probably a split pod so take first =head[12] as title
- 	for (my $i = 0; $i < @poddata; $i++) {
+ 	for (my $i = 0; $i +< @poddata; $i++) {
 	    last if ($Title) = $poddata[$i] =~ /^=head[12]\s*(.*)/;
 	}
 	warn "adopted '$Title' as title for $Podfile\n"
@@ -576,7 +576,7 @@ END_OF_INDEX
 		# have some ...\t...\t...\n pattern
 		if( $text =~ /\t/ ){
 		    my @lines = split( "\n", $text );
-		    if( @lines > 1 ){
+		    if( @lines +> 1 ){
 			my $all = 2;
 			foreach my $line ( @lines ){
 			    if( $line =~ /\S/ && $line !~ /\t/ ){
@@ -584,7 +584,7 @@ END_OF_INDEX
 				last if $all == 0;
 			    }
 			}
-			if( $all > 0 ){
+			if( $all +> 0 ){
 			    $text =~ s/\t+/<td>/g;
 			    $text =~ s/^/<tr><td>/gm;
 			    $text = '<table cellspacing="0" cellpadding="0">' .
@@ -1031,10 +1031,10 @@ sub scan_headings {
         $title = process_text( \$otitle );
 
 	    while ($which_head != $listdepth) {
-		if ($which_head > $listdepth) {
+		if ($which_head +> $listdepth) {
 		    $index .= "\n" . ("\t" x $listdepth) . "<ul>\n";
 		    $listdepth++;
-		} elsif ($which_head < $listdepth) {
+		} elsif ($which_head +< $listdepth) {
 		    $listdepth--;
 		    $index .= "\n" . ("\t" x $listdepth) . "</ul>\n";
 		}
@@ -1562,7 +1562,7 @@ sub process_text1($$;$$){
 	### my $x = $par =~ /[BI]</ ? 'yes' : 'no' ;
         ### print STDERR "-->call emit_C($par) lev=$lev, par with BI=$x\n";
 
-	$res = emit_C( $text, $lev > 1 || ($par =~ /[BI]</) );
+	$res = emit_C( $text, $lev +> 1 || ($par =~ /[BI]</) );
 
     } elsif( $func eq 'E' ){
 	# E<x> - convert to character
@@ -1594,7 +1594,7 @@ sub process_text1($$;$$){
         # b) C<...> is stripped and treated as C<>
         if( $par =~ /^C<(.*)>$/ ){
 	    my $text = depod( $1 );
- 	    return emit_C( $text, $lev > 1 || ($par =~ /[BI]</) );
+ 	    return emit_C( $text, $lev +> 1 || ($par =~ /[BI]</) );
 	}
 
 	# analyze the contents
@@ -1720,7 +1720,7 @@ sub process_text1($$;$$){
 	    my $pt = $1;
             $pt .= $2 if !$3 &&  $lev == 1;
 	    $res .= $lev == 1 ? pure_text( $pt ) : inIS_text( $pt );
-	    return $res if !$3 && $lev > 1;
+	    return $res if !$3 && $lev +> 1;
             if( $3 ){
 		$res .= process_text1( $lev, $rstr, $3, closing $4 );
  	    }
@@ -2025,7 +2025,7 @@ sub relative_url {
 # after the entire pod file has been read and converted.
 #
 sub finish_list {
-    while ($Listlevel > 0) {
+    while ($Listlevel +> 0) {
 	print HTML "</dl>\n";
 	$Listlevel--;
     }

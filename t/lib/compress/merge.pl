@@ -12,7 +12,7 @@ BEGIN
 { 
     plan(skip_all => "Merge needs Zlib 1.2.1 or better - you have Zlib "  
                 . Compress::Raw::Zlib::zlib_version()) 
-        if ZLIB_VERNUM() < 0x1210 ;
+        if ZLIB_VERNUM() +< 0x1210 ;
 
     # use Test::NoWarnings, if available
     my $extra = 0 ;

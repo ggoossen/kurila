@@ -141,7 +141,7 @@ sub qualify ($;$) {
 	    $pkg = "main";
 	}
 	else {
-	    $pkg = (@_ > 1) ? $_[1] : caller;
+	    $pkg = (@_ +> 1) ? $_[1] : caller;
 	}
 	$name = $pkg . "::" . $name;
     }
@@ -149,7 +149,7 @@ sub qualify ($;$) {
 }
 
 sub qualify_to_ref ($) {
-    return \*{ Symbol::fetch_glob( qualify $_[0], @_ > 1 ? $_[1] : caller ) };
+    return \*{ Symbol::fetch_glob( qualify $_[0], @_ +> 1 ? $_[1] : caller ) };
 }
 
 #

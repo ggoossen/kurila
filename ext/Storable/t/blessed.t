@@ -79,7 +79,7 @@ ok 2, $@ eq '';
 # Construct a pool of objects
 my @pool;
 
-for (my $i = 0; $i < 10; $i++) {
+for (my $i = 0; $i +< 10; $i++) {
 	push(@pool, SHORT_NAME->make);
 	push(@pool, SHORT_NAME_WITH_HOOK->make);
 	push(@pool, $name->make);
@@ -99,7 +99,7 @@ ok 8, ref $y->[2] eq $name;
 ok 9, ref $y->[3] eq "${name}_WITH_HOOK";
 
 my $good = 1;
-for (my $i = 0; $i < 10; $i++) {
+for (my $i = 0; $i +< 10; $i++) {
 	do { $good = 0; last } unless ref $y->[4*$i]   eq 'SHORT_NAME';
 	do { $good = 0; last } unless ref $y->[4*$i+1] eq 'SHORT_NAME_WITH_HOOK';
 	do { $good = 0; last } unless ref $y->[4*$i+2] eq $name;

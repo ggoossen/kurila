@@ -294,7 +294,7 @@ sub expected_tests {
 
     if( @_ ) {
         $self->croak("Number of tests must be a positive integer.  You gave it '$max'")
-          unless $max =~ /^\+?\d+$/ and $max > 0;
+          unless $max =~ /^\+?\d+$/ and $max +> 0;
 
         $self->{Expected_Tests} = $max;
         $self->{Have_Plan}      = 1;
@@ -1455,7 +1455,7 @@ sub current_test {
 
         # If the test counter is being pushed forward fill in the details.
         my $test_results = $self->{Test_Results};
-        if( $num > @$test_results ) {
+        if( $num +> @$test_results ) {
             my $start = @$test_results ? @$test_results : 0;
             for ($start..$num-1) {
                 $test_results->[$_] = &share({
@@ -1468,7 +1468,7 @@ sub current_test {
             }
         }
         # If backward, wipe history.  Its their funeral.
-        elsif( $num < @$test_results ) {
+        elsif( $num +< @$test_results ) {
             $#{$test_results} = $num - 1;
         }
     }
@@ -1618,7 +1618,7 @@ error message.
 sub _sanity_check {
     my $self = shift;
 
-    $self->_whoa($self->{Curr_Test} < 0,  'Says here you ran a negative number of tests!');
+    $self->_whoa($self->{Curr_Test} +< 0,  'Says here you ran a negative number of tests!');
     $self->_whoa(!$self->{Have_Plan} and $self->{Curr_Test}, 
           'Somehow your tests ran without a plan!');
     $self->_whoa($self->{Curr_Test} != @{ $self->{Test_Results} },
@@ -1724,13 +1724,13 @@ sub _ending {
 
         my $num_extra = $self->{Curr_Test} - $self->{Expected_Tests};
 
-        if( $num_extra < 0 ) {
+        if( $num_extra +< 0 ) {
             my $s = $self->{Expected_Tests} == 1 ? '' : 's';
             $self->diag(<<"FAIL");
 Looks like you planned $self->{Expected_Tests} test$s but only ran $self->{Curr_Test}.
 FAIL
         }
-        elsif( $num_extra > 0 ) {
+        elsif( $num_extra +> 0 ) {
             my $s = $self->{Expected_Tests} == 1 ? '' : 's';
             $self->diag(<<"FAIL");
 Looks like you planned $self->{Expected_Tests} test$s but ran $num_extra extra.
@@ -1758,7 +1758,7 @@ FAIL
 
         my $exit_code;
         if( $num_failed ) {
-            $exit_code = $num_failed <= 254 ? $num_failed : 254;
+            $exit_code = $num_failed +<= 254 ? $num_failed : 254;
         }
         elsif( $num_extra != 0 ) {
             $exit_code = 255;

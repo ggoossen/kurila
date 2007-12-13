@@ -884,7 +884,7 @@ EOM
 
     # now print the records in reverse order
     print "\nREVERSE\n" ;
-    for ($i = $H->length - 1 ; $i >= 0 ; -- $i)
+    for ($i = $H->length - 1 ; $i +>= 0 ; -- $i)
       { print "$i: $h[$i]\n" }
 
     # same again, but use the API functions instead
@@ -1544,7 +1544,7 @@ sub list_diff {
     my ($a, $b) = @_;
     my @a = @$a; my @b = @$b;
     return 1 if (scalar @a) != (scalar @b);
-    for (my $i = 0; $i < @a; $i++) {
+    for (my $i = 0; $i +< @a; $i++) {
 	my ($ae, $be) = ($a[$i], $b[$i]);
 	if (defined $ae and defined $be) {
 	    return 1 if $ae ne $be;
@@ -1571,8 +1571,8 @@ sub rand_test {
     my @contexts = qw<list scalar void>;
     my $context = $contexts[int(rand @contexts)];
     return [ rand_list(),
-	     (rand() < 0.5) ? (int(rand(20)) - 10) : undef,
-	     (rand() < 0.5) ? (int(rand(20)) - 10) : undef,
+	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
+	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
 	     rand_list(),
 	     $context ];
 }
@@ -1582,7 +1582,7 @@ sub rand_list {
     die 'usage: rand_list()' if @_;
     my @r;
 
-    while (rand() > 0.1 * (scalar @r + 1)) {
+    while (rand() +> 0.1 * (scalar @r + 1)) {
 	push @r, rand_word();
     }
     return \@r;
@@ -1593,7 +1593,7 @@ sub rand_word {
     die 'usage: rand_word()' if @_;
     my $r = '';
     my @chars = qw<a b c d e f g h i j k l m n o p q r s t u v w x y z>;
-    while (rand() > 0.1 * (length($r) + 1)) {
+    while (rand() +> 0.1 * (length($r) + 1)) {
 	$r .= $chars[int(rand(scalar @chars))];
     }
     return $r;

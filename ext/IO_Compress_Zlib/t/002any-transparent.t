@@ -61,7 +61,7 @@ EOM
         ok $unc, "  AnyInflate object when -Transparent => 1"  ;
 
         my $uncomp ;
-        ok $unc->read($uncomp) > 0 ;
+        ok $unc->read($uncomp) +> 0 ;
         ok $unc->eof() ;
         #ok $unc->type eq $Type;
 

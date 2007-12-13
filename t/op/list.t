@@ -56,7 +56,7 @@ cmp_ok(join(':',@foo),'eq','6','scalar assign to array');
 
 {
     my ($a, $b, $c);
-    for ($x = 0; $x < 3; $x = $x + 1) {
+    for ($x = 0; $x +< 3; $x = $x + 1) {
         ($a, $b, $c) = 
               $x == 0 ?  ('a','b','c')
             : $x == 1 ?  ('d','e','f')
@@ -82,7 +82,7 @@ cmp_ok(join(':',@foo),'eq','6','scalar assign to array');
 
 {
     my ($a, $b, $c);
-    for ($x = 0; $x < 3; $x = $x + 1) {
+    for ($x = 0; $x +< 3; $x = $x + 1) {
         ($a, $b, $c) = do {
             if ($x == 0) {
                 ('a','b','c');

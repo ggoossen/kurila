@@ -54,7 +54,7 @@ while ( ~< *DATA) {
 	my @args = split(/:/);
 	if ($test_set == 1) {
 		my $i;
-		for ($i = 0; $i < @set; $i++) {
+		for ($i = 0; $i +< @set; $i++) {
 			# complex number
 			$target = $set[$i];
 			# textual value as found in set definition
@@ -473,7 +473,7 @@ sub test {
 	$test++;
 	my $i;
 	$baop = 1 if ($op =~ s/;=$//);
-	for ($i = 0; $i < @args; $i++) {
+	for ($i = 0; $i +< @args; $i++) {
 		$val = value($args[$i]);
 		push @script, "\$z$i = $val;\n";
 	}
@@ -493,7 +493,7 @@ sub test {
 		}
 		push @script, "\$res = $try; ";
 		push @script, "check($test, '$try', \$res, \$z$#args, $args);\n";
-		if (@args > 2 and $baop) { # binary assignment ops
+		if (@args +> 2 and $baop) { # binary assignment ops
 			$test++;
 			# check the op= works
 			push @script, <<EOB;
@@ -525,7 +525,7 @@ sub set {
 	my @set = split(/;\s*/, $set);
 	my @res;
 	my $i;
-	for ($i = 0; $i < @set; $i++) {
+	for ($i = 0; $i +< @set; $i++) {
 		push(@{$valref}, $set[$i]);
 		my $val = value($set[$i]);
 		push @script, "\$s$i = $val;\n";
@@ -568,9 +568,9 @@ sub check {
 	    ||
 	    ($expected =~ /^-?\d/ && $got == $expected)
 	    ||
-	    (abs(Math::Complex->make($got) - Math::Complex->make($expected)) < $eps)
+	    (abs(Math::Complex->make($got) - Math::Complex->make($expected)) +< $eps)
 	    ||
-	    (abs($got - $expected) < $eps)
+	    (abs($got - $expected) +< $eps)
 	    ) {
 		print "ok $test\n";
 	} else {

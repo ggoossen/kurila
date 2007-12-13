@@ -89,11 +89,11 @@ sub mkHeader
     $level = 6 
         if $level == Z_DEFAULT_COMPRESSION ;
 
-    if (ZLIB_VERNUM >= 0x1210)
+    if (ZLIB_VERNUM +>= 0x1210)
     {
-        if ($strategy >= Z_HUFFMAN_ONLY || $level < 2)
+        if ($strategy +>= Z_HUFFMAN_ONLY || $level +< 2)
          {  $lflag = ZLIB_FLG_LEVEL_FASTEST }
-        elsif ($level < 6)
+        elsif ($level +< 6)
          {  $lflag = ZLIB_FLG_LEVEL_FAST }
         elsif ($level == 6)
          {  $lflag = ZLIB_FLG_LEVEL_DEFAULT }
@@ -103,7 +103,7 @@ sub mkHeader
     else
     {
         $lflag = ($level - 1) >> 1 ;
-        $lflag = 3 if $lflag > 3 ;
+        $lflag = 3 if $lflag +> 3 ;
     }
 
      #my $wbits = (MAX_WBITS - 8) << 4 ;

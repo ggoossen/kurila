@@ -39,7 +39,7 @@ sub myGZreadFile
 
     my $data = '';
     $data = $init if defined $init ;
-    1 while $fil->read($data) > 0;
+    1 while $fil->read($data) +> 0;
 
     $fil->close ;
     return $data ;
@@ -86,7 +86,7 @@ EOM
           ok my $x = $UncompressClass-> new( $name, -Append => 1)  ;
 
           my $len ;
-          1 while ($len = $x->read($uncomp)) > 0 ;
+          1 while ($len = $x->read($uncomp)) +> 0 ;
 
           is $len, 0, "read returned 0";
 
@@ -115,7 +115,7 @@ EOM
           my $x ;
           ok $x = $UncompressClass-> new((\$buffer, Append => 1))  ;
 
-          1 while $x->read($uncomp) > 0  ;
+          1 while $x->read($uncomp) +> 0  ;
 
           ok $x->close ;
         }

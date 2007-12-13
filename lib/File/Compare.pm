@@ -23,7 +23,7 @@ sub compare {
       unless(@_ == 2 || @_ == 3);
 
     my ($from,$to,$size) = @_;
-    my $text_mode = defined($size) && (ref($size) eq 'CODE' || $size < 0);
+    my $text_mode = defined($size) && (ref($size) eq 'CODE' || $size +< 0);
 
     my ($fromsize,$closefrom,$closeto);
     local (*FROM, *TO);
@@ -76,20 +76,20 @@ sub compare {
 	goto fail_inner if defined($tline = ~< *TO);
     }
     else {
-	unless (defined($size) && $size > 0) {
+	unless (defined($size) && $size +> 0) {
 	    $size = $fromsize || -s *TO || 0;
-	    $size = 1024 if $size < 512;
-	    $size = $Too_Big if $size > $Too_Big;
+	    $size = 1024 if $size +< 512;
+	    $size = $Too_Big if $size +> $Too_Big;
 	}
 
 	my ($fr,$tr,$fbuf,$tbuf);
 	$fbuf = $tbuf = '';
-	while(defined($fr = read(FROM,$fbuf,$size)) && $fr > 0) {
+	while(defined($fr = read(FROM,$fbuf,$size)) && $fr +> 0) {
 	    unless (defined($tr = read(TO,$tbuf,$fr)) && $tbuf eq $fbuf) {
 		goto fail_inner;
 	    }
 	}
-	goto fail_inner if defined($tr = read(TO,$tbuf,$size)) && $tr > 0;
+	goto fail_inner if defined($tr = read(TO,$tbuf,$size)) && $tr +> 0;
     }
 
     close(TO) || goto fail_open2 if $closeto;

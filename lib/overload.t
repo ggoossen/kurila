@@ -636,7 +636,7 @@ is($b, "_<oups1
   package sorting;
   use overload 'cmp' => \&comp;
   sub new { my ($p, $v) = @_; bless \$v, $p }
-  sub comp { my ($x,$y) = @_; ($$x * 3 % 10) <=> ($$y * 3 % 10) or $$x cmp $$y }
+  sub comp { my ($x,$y) = @_; ($$x * 3 % 10) <+> ($$y * 3 % 10) or $$x cmp $$y }
 }
 {
   my @arr = map sorting->new($_), 0..12;
@@ -648,7 +648,7 @@ is($b, "_<oups1
   package iterator;
   use overload '<>' => \&iter;
   sub new { my ($p, $v) = @_; bless \$v, $p }
-  sub iter { my ($x) = @_; return undef if $$x < 0; return $$x--; }
+  sub iter { my ($x) = @_; return undef if $$x +< 0; return $$x--; }
 }
 
 # XXX iterator overload not intended to work with CORE::GLOBAL?
@@ -721,7 +721,7 @@ else {
   is(&$deref(6), 40);
   sub xxx_goto { goto &$deref }
   is(xxx_goto(7), 41);
-  my $srt = bless { c => sub {$b <=> $a}
+  my $srt = bless { c => sub {$b <+> $a}
 		  }, 'deref';
   *srt = \&$srt;
   my @sorted = sort srt 11, 2, 5, 1, 22;

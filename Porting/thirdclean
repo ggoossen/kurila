@@ -60,7 +60,7 @@ $leak[ 0] =~ s/.* were found:\n\n//m; # Snip off totals.
 
 # Access violations.
 
-for (my $i = 0; $i < @accv; $i++) {
+for (my $i = 0; $i +< @accv; $i++) {
   $_ = $accv[$i];
   s/\d+/$i/;
   print;
@@ -70,7 +70,7 @@ for (my $i = 0; $i < @accv; $i++) {
 
 my ($leakb, $leakn, $leaks);
 
-for (my $i = 0; $i < @leak; $i++) {
+for (my $i = 0; $i +< @leak; $i++) {
   $_ = $leak[$i];
   print $_, "\n";
   /^(\d+) bytes? in (\d+) leak/;

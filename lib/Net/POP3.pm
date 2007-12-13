@@ -82,10 +82,10 @@ sub debug_text { $_[2] =~ /^(pass|rpop)/i ? "$1 ....\n" : $_[2]; }
 
 
 sub login {
-  @_ >= 1 && @_ <= 3 or croak 'usage: $pop3->login( USER, PASS )';
+  @_ +>= 1 && @_ +<= 3 or croak 'usage: $pop3->login( USER, PASS )';
   my ($me, $user, $pass) = @_;
 
-  if (@_ <= 2) {
+  if (@_ +<= 2) {
     ($user, $pass) = $me->_lookup_credentials($user);
   }
 
@@ -95,7 +95,7 @@ sub login {
 
 
 sub apop {
-  @_ >= 1 && @_ <= 3 or croak 'usage: $pop3->apop( USER, PASS )';
+  @_ +>= 1 && @_ +<= 3 or croak 'usage: $pop3->apop( USER, PASS )';
   my ($me, $user, $pass) = @_;
   my $banner;
   my $md;
@@ -114,7 +114,7 @@ sub apop {
   return undef
     unless ($banner = (${*$me}{'net_pop3_banner'} =~ /(<.*>)/)[0]);
 
-  if (@_ <= 2) {
+  if (@_ +<= 2) {
     ($user, $pass) = $me->_lookup_credentials($user);
   }
 

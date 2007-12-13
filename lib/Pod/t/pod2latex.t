@@ -66,7 +66,7 @@ for my $i (0..$#reference) {
   # if we are running a new version of Pod::ParseUtils we need
   # to change the link text. This is a kluge until we drop support
   # for older versions of Pod::ParseUtils
-  if ($linkver < 0.29 && $output[$i] =~ /manpage/) {
+  if ($linkver +< 0.29 && $output[$i] =~ /manpage/) {
     # convert our expectations from new to old new format 
     $reference[$i] =~ s/Standard link: \\emph\{Pod::LaTeX\}/Standard link: the \\emph\{Pod::LaTeX\} manpage/;
     $reference[$i] =~ s/\\textsf\{sec\} in \\emph\{Pod::LaTeX\}/the section on \\textsf\{sec\} in the \\emph\{Pod::LaTeX\} manpage/;

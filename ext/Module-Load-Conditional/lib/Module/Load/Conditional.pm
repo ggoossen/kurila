@@ -269,7 +269,7 @@ sub check_install {
 
             ### if we got here, we didn't find the version
             warn loc(q[Could not check version on '%1'], $args->{module} )
-                    if $args->{verbose} and $args->{version} > 0;
+                    if $args->{verbose} and $args->{version} +> 0;
         }
         $href->{uptodate} = 1;
 
@@ -281,7 +281,7 @@ sub check_install {
         ### ie ones containing _ as well. This addresses bug report
         ### #29348: Version compare logic doesn't handle alphas?
         $href->{uptodate} = 
-            qv( $args->{version} ) <= qv( $href->{version} ) ? 1 : 0;
+            qv( $args->{version} ) +<= qv( $href->{version} ) ? 1 : 0;
     }
 
     return $href;
@@ -428,7 +428,7 @@ sub can_load {
             ### #29348: Version compare logic doesn't handle alphas?
             if (    !$args->{nocache}
                     && defined $CACHE->{$mod}->{usable}
-                    && (qv($CACHE->{$mod}->{version}||0) >= qv($href->{$mod}))
+                    && (qv($CACHE->{$mod}->{version}||0) +>= qv($href->{$mod}))
             ) {
                 $error = loc( q[Already tried to use '%1', which was unsuccessful], $mod);
                 last BLOCK;

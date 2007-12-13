@@ -463,7 +463,7 @@ sub contract_name_Mac {
 	else {
 	    # need to move up the tree, but
 	    # only if it's not a volume name
-	    for (my $i=1; $i<$colon_count; $i++) {
+	    for (my $i=1; $i+<$colon_count; $i++) {
 		unless ($cdir =~ /^[^:]+:$/) { # volume name
 		    $cdir =~ s/[^:]+:$//;
 		}
@@ -519,7 +519,7 @@ sub PathCombine($$) {
 
 	# (simple) check for recursion
 	my $newlen= length($AbsName);
-	if ($newlen <= length($Base)) {
+	if ($newlen +<= length($Base)) {
 	    if (($newlen == length($Base) || substr($Base,$newlen,1) eq '/')
 		&& $AbsName eq substr($Base,0,$newlen))
 	    {
@@ -538,7 +538,7 @@ sub Follow_SymLink($) {
 
     while (-l _) {
 	if ($SLnkSeen{$DEV, $INO}++) {
-	    if ($follow_skip < 2) {
+	    if ($follow_skip +< 2) {
 		die "$AbsName is encountered a second time";
 	    }
 	    else {
@@ -547,7 +547,7 @@ sub Follow_SymLink($) {
 	}
 	$NewName= PathCombine($AbsName, readlink($AbsName));
 	unless(defined $NewName) {
-	    if ($follow_skip < 2) {
+	    if ($follow_skip +< 2) {
 		die "$AbsName is a recursive symbolic link";
 	    }
 	    else {
@@ -562,7 +562,7 @@ sub Follow_SymLink($) {
     }
 
     if ($full_check && defined $DEV && $SLnkSeen{$DEV, $INO}++) {
-	if ( ($follow_skip < 1) || ((-d _) && ($follow_skip < 2)) ) {
+	if ( ($follow_skip +< 1) || ((-d _) && ($follow_skip +< 2)) ) {
 	    die "$AbsName encountered a second time";
 	}
 	else {
@@ -900,7 +900,7 @@ sub _find_dir($$$) {
         # (if $nlink >= 2, and $avoid_nlink == 0, this will switch back)
         $no_nlink = $avoid_nlink;
         # if dir has wrong nlink count, force switch to slower stat method
-        $no_nlink = 1 if ($nlink < 2);
+        $no_nlink = 1 if ($nlink +< 2);
 
 	if ($nlink == 2 && !$no_nlink) {
 	    # This dir has no subdirectories.
@@ -932,7 +932,7 @@ sub _find_dir($$$) {
 
 	    for my $FN (@filenames) {
 		next if $FN =~ $File::Find::skip_pattern;
-		if ($subcount > 0 || $no_nlink) {
+		if ($subcount +> 0 || $no_nlink) {
 		    # Seen all the subdirs?
 		    # check for directoriness.
 		    # stat is faster for a file in the current directory
@@ -963,7 +963,7 @@ sub _find_dir($$$) {
     continue {
 	while ( defined ($SE = pop @Stack) ) {
 	    ($Level, $p_dir, $dir_rel, $nlink) = @$SE;
-	    if ($CdLvl > $Level && !$no_chdir) {
+	    if ($CdLvl +> $Level && !$no_chdir) {
 		my $tmp;
 		if ($Is_MacOS) {
 		    $tmp = (':' x ($CdLvl-$Level)) . ':';
@@ -1007,7 +1007,7 @@ sub _find_dir($$$) {
                 $_ = $File::Find::current_dir;
 		$post_process->();		# End-of-directory processing
 	    }
-	    elsif ( $nlink < 0 ) {  # must be finddepth, report dirname now
+	    elsif ( $nlink +< 0 ) {  # must be finddepth, report dirname now
 		$name = $dir_name;
 		if ($Is_MacOS) {
 		    if ($dir_rel eq ':') { # must be the top dir, where we started
@@ -1219,7 +1219,7 @@ sub _find_dir_symlnk($$$) {
 		$dir_pref = "$dir_name/";
 		$loc_pref = "$dir_loc/";
 	    }
-	    if ( $byd_flag < 0 ) {  # must be finddepth, report dirname now
+	    if ( $byd_flag +< 0 ) {  # must be finddepth, report dirname now
 		unless ($no_chdir || ($dir_rel eq $File::Find::current_dir)) {
 		    unless (chdir $updir_loc) { # $updir_loc (parent dir) is always untainted
 			warnings::warnif "Can't cd to $updir_loc: $!\n";

@@ -55,7 +55,7 @@ sub gzip {
         my $gz = Compress::Zlib::gzopen($write, "wb")
             or $CPAN::Frontend->mydie("Cannot gzopen $write: $! (pwd is $cwd)\n");
         $gz->gzwrite($buffer)
-            while read($fhw,$buffer,4096) > 0 ;
+            while read($fhw,$buffer,4096) +> 0 ;
         $gz->gzclose() ;
         $fhw->close;
         return 1;
@@ -76,7 +76,7 @@ sub gunzip {
         my $gz = Compress::Zlib::gzopen($read, "rb")
             or $CPAN::Frontend->mydie("Cannot gzopen $read: $!\n");
         $fhw->print($buffer)
-        while $gz->gzread($buffer) > 0 ;
+        while $gz->gzread($buffer) +> 0 ;
         $CPAN::Frontend->mydie("Error reading from $read: $!\n")
             if $gz->gzerror != Compress::Zlib::Z_STREAM_END();
         $gz->gzclose() ;
@@ -104,7 +104,7 @@ sub gtest {
             or $CPAN::Frontend->mydie(sprintf("Cannot gzopen %s: %s\n",
                                               $read,
                                               $Compress::Zlib::gzerrno));
-        while ($gz->gzread($buffer) > 0 ) {
+        while ($gz->gzread($buffer) +> 0 ) {
             $len += length($buffer);
             $buffer = "";
         }
@@ -159,7 +159,7 @@ sub READLINE {
         my $gz = $self->{GZ};
         my($line,$bytesread);
         $bytesread = $gz->gzreadline($line);
-        return undef if $bytesread <= 0;
+        return undef if $bytesread +<= 0;
         return $line;
     } else {
         my $fh = $self->{FH};

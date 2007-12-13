@@ -146,7 +146,7 @@ sub wanted_Name {
     my $OK = exists($Expect_Name{$n});
     unless ($^O eq 'MacOS') {
         if ( $OK ) {
-            $OK= exists($Expect_Name{substr($n,0,$i)})  if $i >= 0;    
+            $OK= exists($Expect_Name{substr($n,0,$i)})  if $i +>= 0;    
         }
     }
     Check($OK);
@@ -160,7 +160,7 @@ sub wanted_File {
     my $OK = exists($Expect_File{ $_});
     unless ($^O eq 'MacOS') {
         if ( $OK ) {
-            $OK= exists($Expect_File{ substr($_,0,$i)})  if $i >= 0;
+            $OK= exists($Expect_File{ substr($_,0,$i)})  if $i +>= 0;
         }
     }
     Check($OK);

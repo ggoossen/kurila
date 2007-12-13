@@ -198,7 +198,7 @@ sub find_modules {
     5.009005 => [perl => 31562],
 );
 
-for my $version ( sort { $a <=> $b } keys %released ) {
+for my $version ( sort { $a <+> $b } keys %released ) {
     my $family = int ($version * 1000) / 1000;
     push @{ $families{ $family }} , $version;
 }

@@ -40,7 +40,7 @@ sub access {
 
 sub has_data {
   my $self = shift;
-  return keys %{$self->read()} > 0;
+  return keys %{$self->read()} +> 0;
 }
 
 sub exists {

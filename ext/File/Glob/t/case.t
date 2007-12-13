@@ -27,7 +27,7 @@ my $pat = $^O eq "MacOS" ? ":op:G*.t" : "op/G*.t";
 # Test the actual use of the case sensitivity tags, via csh_glob()
 File::Glob->import(':nocase');
 @a = csh_glob($pat);
-print "not " unless @a >= 8;
+print "not " unless @a +>= 8;
 print "ok 2\n";
 
 # This may fail on systems which are not case-PRESERVING
@@ -38,7 +38,7 @@ print "ok 3\n";
 
 # Test the explicit use of the GLOB_NOCASE flag
 @a = bsd_glob($pat, GLOB_NOCASE);
-print "not " unless @a >= 3;
+print "not " unless @a +>= 3;
 print "ok 4\n";
 
 # Test Win32 backslash nastiness...
@@ -47,7 +47,7 @@ if ($^O ne 'MSWin32' && $^O ne 'NetWare') {
 }
 else {
     @a = File::Glob::glob("op\\g*.t");
-    print "not " unless @a >= 8;
+    print "not " unless @a +>= 8;
     print "ok 5\n";
     mkdir "[]", 0;
     @a = File::Glob::glob("\\[\\]", GLOB_QUOTE);

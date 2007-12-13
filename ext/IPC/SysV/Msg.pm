@@ -85,7 +85,7 @@ sub remove {
 }
 
 sub rcv {
-    @_ <= 5 && @_ >= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
+    @_ +<= 5 && @_ +>= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
     my $self = shift;
     my $buf = "";
     msgrcv($$self,$buf,$_[1],$_[2] || 0, $_[3] || 0) or
@@ -96,7 +96,7 @@ sub rcv {
 }
 
 sub snd {
-    @_ <= 4 && @_ >= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
+    @_ +<= 4 && @_ +>= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
     my $self = shift;
     msgsnd($$self,pack("l! a*",$_[0],$_[1]), $_[2] || 0);
 }

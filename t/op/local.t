@@ -277,7 +277,7 @@ my $iter = 0;
 while (/(o.+?),/gc) {
     is($1, "o $iter");
     foreach (1..1) { $iter++ }
-    if ($iter > 2) { fail("endless loop"); last; }
+    if ($iter +> 2) { fail("endless loop"); last; }
 }
 
 {

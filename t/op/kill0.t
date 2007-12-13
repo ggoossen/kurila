@@ -28,4 +28,4 @@ for my $pid (1 .. $total) {
 }
 # It is highly unlikely that all of the above PIDs are genuinely in use,
 # so $count should be less than $total.
-ok( $count < $total, 'kill(0, $pid) returns false if $pid does not exist' );
+ok( $count +< $total, 'kill(0, $pid) returns false if $pid does not exist' );

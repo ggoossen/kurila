@@ -204,7 +204,7 @@ sub check {
   $N++;
 
   my $b = $o->{cache}->bytes;
-  print $b <= $MAX 
+  print $b +<= $MAX 
     ? "ok $N\n" 
     : "not ok $N # $b bytes cached, should be <= $MAX\n";
   $N++;

@@ -17,12 +17,12 @@ sub vcmp {
     }
     CPAN->debug("l[$l] r[$r]") if $CPAN::DEBUG;
     for ($l,$r) {
-        next unless tr/.// > 1 || /^v/;
+        next unless tr/.// +> 1 || /^v/;
         s/^v?/v/;
         1 while s/\.0+(\d)/.$1/; # remove leading zeroes per group
     }
     CPAN->debug("l[$l] r[$r]") if $CPAN::DEBUG;
-    if ($l=~/^v/ <=> $r=~/^v/) {
+    if ($l=~/^v/ <+> $r=~/^v/) {
         for ($l,$r) {
             next if /^v/;
             $_ = $self->float2vv($_);
@@ -39,11 +39,11 @@ sub vcmp {
     }
 
     return (
-            ($l ne "undef") <=> ($r ne "undef")
+            ($l ne "undef") <+> ($r ne "undef")
             ||
             $lvstring cmp $rvstring
             ||
-            $l <=> $r
+            $l <+> $r
             ||
             $l cmp $r
     );
@@ -51,12 +51,12 @@ sub vcmp {
 
 sub vgt {
     my($self,$l,$r) = @_;
-    $self->vcmp($l,$r) > 0;
+    $self->vcmp($l,$r) +> 0;
 }
 
 sub vlt {
     my($self,$l,$r) = @_;
-    0 + ($self->vcmp($l,$r) < 0);
+    0 + ($self->vcmp($l,$r) +< 0);
 }
 
 sub vstring {
@@ -89,7 +89,7 @@ sub readable {
     my($self,$n) = @_;
     $n =~ /^([\w\-\+\.]+)/;
 
-    return $1 if defined $1 && length($1)>0;
+    return $1 if defined $1 && length($1)+>0;
     # if the first user reaches version v43, he will be treated as "+".
     # We'll have to decide about a new rule here then, depending on what
     # will be the prevailing versioning behavior then.

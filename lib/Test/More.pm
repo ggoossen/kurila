@@ -170,7 +170,7 @@ sub import_extra {
 
     my @other = ();
     my $idx = 0;
-    while( $idx <= $#{$list} ) {
+    while( $idx +<= $#{$list} ) {
         my $item = $list->[$idx];
 
         if( defined $item and $item eq 'no_diag' ) {
@@ -1188,10 +1188,10 @@ sub _eq_array  {
     return 1 if $a1 eq $a2;
 
     my $ok = 1;
-    my $max = $#$a1 > $#$a2 ? $#$a1 : $#$a2;
+    my $max = $#$a1 +> $#$a2 ? $#$a1 : $#$a2;
     for (0..$max) {
-        my $e1 = $_ > $#$a1 ? $DNE : $a1->[$_];
-        my $e2 = $_ > $#$a2 ? $DNE : $a2->[$_];
+        my $e1 = $_ +> $#$a1 ? $DNE : $a1->[$_];
+        my $e2 = $_ +> $#$a2 ? $DNE : $a2->[$_];
 
         push @Data_Stack, { type => 'ARRAY', idx => $_, vals => [$e1, $e2] };
         $ok = _deep_check($e1,$e2);
@@ -1318,7 +1318,7 @@ sub _eq_hash {
     return 1 if $a1 eq $a2;
 
     my $ok = 1;
-    my $bigger = keys %$a1 > keys %$a2 ? $a1 : $a2;
+    my $bigger = keys %$a1 +> keys %$a2 ? $a1 : $a2;
     foreach my $k (keys %$bigger) {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;

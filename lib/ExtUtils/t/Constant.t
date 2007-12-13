@@ -171,11 +171,11 @@ sub build_and_run {
   # Convert from days to seconds
   $timewarp *= 86400;
   print "# Makefile.PL is $timewarp second(s) older than $makefile$makefile_ext\n";
-  if ($timewarp < 0) {
+  if ($timewarp +< 0) {
       # Sleep for a while to catch up.
       $timewarp = -$timewarp;
       $timewarp+=2;
-      $timewarp = 10 if $timewarp > 10;
+      $timewarp = 10 if $timewarp +> 10;
       print "# Sleeping for $timewarp second(s) to try to resolve this\n";
       sleep $timewarp;
   }

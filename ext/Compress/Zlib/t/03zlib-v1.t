@@ -891,7 +891,7 @@ EOM
 
     ok my $compressed = Compress::Zlib::memGzip(\$contents) ;
 
-    ok length $compressed > 4096 ;
+    ok length $compressed +> 4096 ;
     ok my $out = Compress::Zlib::memGunzip(\$compressed) ;
      
     ok $contents eq $out ;
@@ -1110,7 +1110,7 @@ sub trickle
     my $input;
     $fil = gzopen($name, "rb") ;
     ok $fil, "opened ok";
-    while ($fil->gzread($input, 50000) > 0)
+    while ($fil->gzread($input, 50000) +> 0)
     {
         $got .= $input;
         $input = '';

@@ -60,7 +60,7 @@ sub commentless {
 }
 
 
-for (my $x=0; $x < @got; $x++) {
+for (my $x=0; $x +< @got; $x++) {
     ok commentless($got[$x]), commentless($expect[$x]."\n");
 }
 

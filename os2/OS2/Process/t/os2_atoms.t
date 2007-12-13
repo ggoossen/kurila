@@ -49,10 +49,10 @@ my $a2 = AddAtom("perltest//p$$", $tbl);
 ok($a2, 'Add another unknown atom per string');
 is(AddAtom("perltest//p$$", $tbl), $a2, 'Add same unknown atom per string');
 isnt($a1, $a2, 'Different strings result in different atoms');
-ok($a1 > 0, 'Atom positive');
-ok($a2 > 0, 'Another atom positive');
-ok($a1 < 0x10000, 'Atom small');
-ok($a2 < 0x10000, 'Another atom small');
+ok($a1 +> 0, 'Atom positive');
+ok($a2 +> 0, 'Another atom positive');
+ok($a1 +< 0x10000, 'Atom small');
+ok($a2 +< 0x10000, 'Another atom small');
 
 is(AtomLength($a1, $tbl), length "perltest//pp$$", 'AtomLength of known atom');
 is(AtomLength($a2, $tbl), length "perltest//p$$", 'AtomLength of another known atom');

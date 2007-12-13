@@ -117,7 +117,7 @@ sub bulk_process {
             ( $out, $file ) = ( $file, $out ) if $opts->{'p'};
             if (-e $out) {
                 my $changed = -M _;
-                if ($changed < $LastUpdate and $changed < -M $file) {
+                if ($changed +< $LastUpdate and $changed +< -M $file) {
                     print "Skipping '$file' as '$out' is up-to-date.\n"
                         if $opts->{'v'};
                     next;

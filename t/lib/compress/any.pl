@@ -62,7 +62,7 @@ sub run
                 ok $unc, "  Created $AnyClass object" 
                     or print "# $$AnyError\n";
                 my $uncomp ;
-                1 while  $unc->read($uncomp) > 0 ;
+                1 while  $unc->read($uncomp) +> 0 ;
                 #ok $unc->read($uncomp) > 0 
                 #    or print "# $$AnyError\n";
                 my $y;
@@ -81,7 +81,7 @@ sub run
                 ok $unc, "  Created $AnyClass object" 
                     or print "# $$AnyError\n";
                 my $uncomp ;
-                1 while  $unc->read($uncomp, 100) > 0 ;
+                1 while  $unc->read($uncomp, 100) +> 0 ;
                 #ok $unc->read($uncomp) > 0 
                 #    or print "# $$AnyError\n";
                 my $y;

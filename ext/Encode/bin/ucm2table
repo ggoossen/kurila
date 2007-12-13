@@ -31,13 +31,13 @@ while( ~< *ARGV){
 
 my $start = $Opt{a} ? 0x20 : 0xa0;
 
-for (my $x = $start; $x <= 0xffff; $x += 32) {
+for (my $x = $start; $x +<= 0xffff; $x += 32) {
     my $line =  '';
     for my $i (0..31){
     my $num = $x+$i; $num eq 0x7f and next; # skip delete
     my $char = $Chartab{$num};
     $line .= !$char ? " " : 
-        ($num < 0x7f ) ? " $char" : $char ;
+        ($num +< 0x7f ) ? " $char" : $char ;
     }
     $line =~ /^\s+$/o and next;
     printf "0x%04x: $line\n", $x;

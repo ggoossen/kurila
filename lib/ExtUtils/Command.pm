@@ -178,7 +178,7 @@ sub mv {
     my @src = @ARGV;
     my $dst = pop @src;
 
-    croak("Too many arguments") if (@src > 1 && ! -d $dst);
+    croak("Too many arguments") if (@src +> 1 && ! -d $dst);
 
     my $nok = 0;
     foreach my $src (@src) {
@@ -204,7 +204,7 @@ sub cp {
     my @src = @ARGV;
     my $dst = pop @src;
 
-    croak("Too many arguments") if (@src > 1 && ! -d $dst);
+    croak("Too many arguments") if (@src +> 1 && ! -d $dst);
 
     my $nok = 0;
     foreach my $src (@src) {

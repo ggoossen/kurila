@@ -31,7 +31,7 @@ use_ok( $Class );
         ###         perl5-porters/2007-01/msg00805.html)
 
         ### Quell "Argument isn't numeric in gt" warnings...
-        my $bool = do { local $^W; $res > 0 };
+        my $bool = do { local $^W; $res +> 0 };
         
         ok( $bool,              "   Version is '$res'" );
         isnt( $res, '0.0',      "   Not the default value" );

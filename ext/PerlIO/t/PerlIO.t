@@ -80,7 +80,7 @@ ok(close($utffh));
     select STDOUT;
     ok( seek($x,0,0),           '       seek' );
     is( scalar ~< $x, "ok\n",    '       readline' );
-    ok( tell($x) >= 3,          '       tell' );
+    ok( tell($x) +>= 3,          '       tell' );
 
     # test magic temp file over STDOUT
     open OLDOUT, ">&STDOUT" or die "cannot dup STDOUT: $!";
@@ -103,7 +103,7 @@ ok(close($utffh));
     select STDOUT;
     ok( seek($x,0,0),           '       seek' );
     is( scalar ~< $x, "ok\n",    '       readline' );
-    ok( tell($x) >= 3,          '       tell' );
+    ok( tell($x) +>= 3,          '       tell' );
 
   TODO: {
         local $TODO = "broken";

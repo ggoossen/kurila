@@ -29,7 +29,7 @@ sub carp {
 BEGIN { attributes->bootstrap }
 
 sub import {
-    @_ > 2 && ref $_[2] or do {
+    @_ +> 2 && ref $_[2] or do {
 	require Exporter;
 	goto &Exporter::import;
     };

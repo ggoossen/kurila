@@ -101,7 +101,7 @@ sub getopt (;$$) {
 	    shift @ARGV;
 	    last;
 	}
-	if (index($argumentative,$first) >= 0) {
+	if (index($argumentative,$first) +>= 0) {
 	    if ($rest ne '') {
 		shift(@ARGV);
 	    }
@@ -235,7 +235,7 @@ sub getopts ($;$) {
 	    last;
 	}
 	my $pos = index($argumentative,$first);
-	if ($pos >= 0) {
+	if ($pos +>= 0) {
 	    if (defined($args[$pos+1]) and ($args[$pos+1] eq ':')) {
 		shift(@ARGV);
 		if ($rest eq '') {

@@ -668,7 +668,7 @@ To install C::Scan, execute
    perl -MCPAN -e "install C::Scan"
 EOD
   unless ($tmask_all) {
-    $C::Scan::VERSION >= 0.70
+    $C::Scan::VERSION +>= 0.70
       or die <<EOD;
 C::Scan v. 0.70 or later required unless you use -o . option.
 You have version $C::Scan::VERSION installed as $INC{'C/Scan.pm'}.
@@ -676,7 +676,7 @@ To install C::Scan, execute
    perl -MCPAN -e "install C::Scan"
 EOD
   }
-  if (($opt_m || $opt_a) && $C::Scan::VERSION < 0.73) {
+  if (($opt_m || $opt_a) && $C::Scan::VERSION +< 0.73) {
     die <<EOD;
 C::Scan v. 0.73 or later required to use -m or -a options.
 You have version $C::Scan::VERSION installed as $INC{'C/Scan.pm'}.
@@ -928,7 +928,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
       if ($opt_m) {
 	%vdecl_hash = %{ $c->get('vdecl_hash') };
 	@vdecls = sort keys %vdecl_hash;
-	for (local $_ = 0; $_ < @vdecls; ++$_) {
+	for (local $_ = 0; $_ +< @vdecls; ++$_) {
 	  my $var = $vdecls[$_];
 	  my($type, $post) = @{ $vdecl_hash{$var} };
 	  if (defined $post) {
@@ -985,7 +985,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
     # eval {require 'dumpvar.pl'; ::dumpValue( [\@td, \%td] ); 1} or warn $@;
     my $n = 0;
     my %bad_macs;
-    while (keys %td > $n) {
+    while (keys %td +> $n) {
       $n = keys %td;
       my ($k, $v);
       while (($k, $v) = each %seen_define) {

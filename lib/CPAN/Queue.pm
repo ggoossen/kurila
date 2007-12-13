@@ -127,14 +127,14 @@ sub jumpqueue {
             $reqtype = "b";
         }
         my $jumped = 0;
-        for (my $i=0; $i<$#All;$i++) { #prevent deep recursion
+        for (my $i=0; $i+<$#All;$i++) { #prevent deep recursion
             # CPAN->debug("i[$i]this[$All[$i]{qmod}]what[$what]") if $CPAN::DEBUG;
             if ($All[$i]{qmod} eq $what) {
                 $jumped++;
-                if ($jumped >= 50) {
+                if ($jumped +>= 50) {
                     die "PANIC: object[$what] 50 instances on the queue, looks like ".
                         "some recursiveness has hit";
-                } elsif ($jumped > 25) { # one's OK if e.g. just processing
+                } elsif ($jumped +> 25) { # one's OK if e.g. just processing
                                     # now; more are OK if user typed
                                     # it several times
                     my $sleep = sprintf "%.1f", $jumped/10;

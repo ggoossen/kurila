@@ -33,7 +33,7 @@ sub do_perl{
         $linebuf .=  Encode::decode($Opt{f}, $_);
         while($linebuf){
         my $chr =  render_p(substr($linebuf, 0, 1, ''));
-        length($outbuf) + length($chr) > $CPL and print_P();
+        length($outbuf) + length($chr) +> $CPL and print_P();
         $outbuf .= $chr;
         }
     }
@@ -41,7 +41,7 @@ sub do_perl{
     }else{
     while($string){
         my $chr =  render_p(substr($string, 0, 1, ''));
-        length($outbuf) + length($chr) > $CPL and print_P();
+        length($outbuf) + length($chr) +> $CPL and print_P();
         $outbuf .= $chr;
     }
     }
@@ -75,7 +75,7 @@ sub do_dump{
     while( ~< *ARGV){
         use utf8;
         $linebuf .=  Encode::decode($Opt{f}, $_);
-        while (length($linebuf) > $CPL){
+        while (length($linebuf) +> $CPL){
         my $chunk = substr($linebuf, 0, $CPL, '');
         print_C($chunk, $linenum++);
         $Opt{H} and $linenum % $Opt{H} == $CPL-1 and print_S();
@@ -120,11 +120,11 @@ sub print_C{
     use utf8;
     my $chr = substr($chunk,$i,1);
     my $ord = ord($chr);
-    my $fmt = $ord <= 0xffff ? "  %04x" : " %05x";
+    my $fmt = $ord +<= 0xffff ? "  %04x" : " %05x";
     push @ord, (sprintf $fmt, $ord);
     $Opt{C} and push @chr, render_c($chr);
     }
-    if (++$end < 7){
+    if (++$end +< 7){
     for my $i ($end..7){
         push @ord, (" " x 6);
     }

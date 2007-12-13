@@ -155,7 +155,7 @@ GetOptions(
 usage(0)
 	if $help;
 usage(1, "shasum: Ambiguous file mode\n")
-	if scalar(grep { defined $_ } ($binary, $portable, $text)) > 1;
+	if scalar(grep { defined $_ } ($binary, $portable, $text)) +> 1;
 usage(1, "shasum: --warn option used only when verifying checksums\n")
 	if $warn && !$check;
 usage(1, "shasum: --status option used only when verifying checksums\n")

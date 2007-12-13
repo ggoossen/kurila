@@ -184,7 +184,7 @@ sub module_version {
 
 sub numify_version {
     my $ver = shift;
-    if ( index( $ver, q{.}, index( $ver, q{.} ) ) >= 0 ) {
+    if ( index( $ver, q{.}, index( $ver, q{.} ) ) +>= 0 ) {
 	eval { require version };
 	if ($@) {
 	    die "You need to install version.pm to use dotted version numbers\n";

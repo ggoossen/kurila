@@ -554,7 +554,7 @@ sub timediff {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for (my $i=0; $i < @$a; ++$i) {
+    for (my $i=0; $i +< @$a; ++$i) {
 	push(@r, $a->[$i] - $b->[$i]);
     }
     #die "Bad timediff(): ($r[1] + $r[2]) <= 0 (@$a[1,2]|@$b[1,2])\n"
@@ -572,7 +572,7 @@ sub timesum {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for (my $i=0; $i < @$a; ++$i) {
+    for (my $i=0; $i +< @$a; ++$i) {
  	push(@r, $a->[$i] + $b->[$i]);
     }
     bless \@r;
@@ -596,7 +596,7 @@ sub timestr {
     # format a time in the required style, other formats may be added here
     $style ||= $Default_Style;
     return '' if $style eq 'none';
-    $style = ($ct>0) ? 'all' : 'noc' if $style eq 'auto';
+    $style = ($ct+>0) ? 'all' : 'noc' if $style eq 'auto';
     my $s = "@t $style"; # default for unknown style
     my $w = $hirestime ? "%2g" : "%2d";
     $s = sprintf("$w wallclock secs (%$f usr %$f sys + %$f cusr %$f csys = %$f CPU)",
@@ -629,7 +629,7 @@ sub runloop {
     my($n, $c) = @_;
 
     $n+=0; # force numeric now, so garbage won't creep into the eval
-    croak "negative loopcount $n" if $n<0;
+    croak "negative loopcount $n" if $n+<0;
     confess usage unless defined $c;
     my($t0, $t1, $td); # before, after, difference
 
@@ -718,12 +718,12 @@ sub countit {
 
     if ( not defined $tmax or $tmax == 0 ) {
 	$tmax = $default_for;
-    } elsif ( $tmax < 0 ) {
+    } elsif ( $tmax +< 0 ) {
 	$tmax = -$tmax;
     }
 
     die "countit($tmax, ...): timelimit cannot be less than $min_for.\n"
-	if $tmax < $min_for;
+	if $tmax +< $min_for;
 
     my ($n, $tc);
 
@@ -732,20 +732,20 @@ sub countit {
     for ($n = 1; ; $n *= 2 ) {
 	my $td = timeit($n, $code);
 	$tc = $td->[1] + $td->[2];
-	if ( $tc <= 0 and $n > 1024 ) {
-	    ++$zeros > 16
+	if ( $tc +<= 0 and $n +> 1024 ) {
+	    ++$zeros +> 16
 	        and die "Timing is consistently zero in estimation loop, cannot benchmark. N=$n\n";
 	} else {
 	    $zeros = 0;
 	}
-	last if $tc > 0.1;
+	last if $tc +> 0.1;
     }
 
     my $nmin = $n;
 
     # Get $n high enough that we can guess the final $n with some accuracy.
     my $tpra = 0.1 * $tmax; # Target/time practice.
-    while ( $tc < $tpra ) {
+    while ( $tc +< $tpra ) {
 	# The 5% fudge is to keep us from iterating again all
 	# that often (this speeds overall responsiveness when $tmax is big
 	# and we guess a little low).  This does not noticably affect 
@@ -754,7 +754,7 @@ sub countit {
 	my $td = timeit($n, $code);
 	my $new_tc = $td->[1] + $td->[2];
         # Make sure we are making progress.
-        $tc = $new_tc > 1.2 * $tc ? $new_tc : 1.2 * $tc;
+        $tc = $new_tc +> 1.2 * $tc ? $new_tc : 1.2 * $tc;
     }
 
     # Now, do the 'for real' timing(s), repeating until we exceed
@@ -781,17 +781,17 @@ sub countit {
 	$cutot += $td->[3];
 	$cstot += $td->[4];
 	$ttot = $utot + $stot;
-	last if $ttot >= $tmax;
-	if ( $ttot <= 0 ) {
-	    ++$zeros > 16
+	last if $ttot +>= $tmax;
+	if ( $ttot +<= 0 ) {
+	    ++$zeros +> 16
 	        and die "Timing is consistently zero, cannot benchmark. N=$n\n";
 	} else {
 	    $zeros = 0;
 	}
-        $ttot = 0.01 if $ttot < 0.01;
+        $ttot = 0.01 if $ttot +< 0.01;
 	my $r = $tmax / $ttot - 1; # Linear approximation.
 	$n = int( $r * $ntot );
-	$n = $nmin if $n < $nmin;
+	$n = $nmin if $n +< $nmin;
     }
 
     return bless [ $rtot, $utot, $stot, $cutot, $cstot, $ntot ];
@@ -801,7 +801,7 @@ sub countit {
 
 sub n_to_for {
     my $n = shift;
-    return $n == 0 ? $default_for : $n < 0 ? -$n : undef;
+    return $n == 0 ? $default_for : $n +< 0 ? -$n : undef;
 }
 
 $_Usage{timethis} = <<'USAGE';
@@ -816,8 +816,8 @@ sub timethis{
     die usage unless defined $code and
                      (!ref $code or ref $code eq 'CODE');
 
-    if ( $n > 0 ) {
-	croak "non-integer loopcount $n, stopped" if int($n)<$n;
+    if ( $n +> 0 ) {
+	croak "non-integer loopcount $n, stopped" if int($n)+<$n;
 	$t = timeit($n, $code);
 	$title = "timethis $n" unless defined $title;
     } else {
@@ -837,9 +837,9 @@ sub timethis{
     # Don't assume that your benchmark is ok simply because
     # you don't get this warning!
     print "            (warning: too few iterations for a reliable count)\n"
-	if     $n < $Min_Count
-	    || ($t->real < 1 && $n < 1000)
-	    || $t->cpu_a < $Min_CPU;
+	if     $n +< $Min_Count
+	    || ($t->real +< 1 && $n +< 1000)
+	    || $t->cpu_a +< $Min_CPU;
     $t;
 }
 
@@ -856,16 +856,16 @@ sub timethese{
     my @names = sort keys %$alt;
     $style = "" unless defined $style;
     print "Benchmark: " unless $style eq 'none';
-    if ( $n > 0 ) {
-	croak "non-integer loopcount $n, stopped" if int($n)<$n;
+    if ( $n +> 0 ) {
+	croak "non-integer loopcount $n, stopped" if int($n)+<$n;
 	print "timing $n iterations of" unless $style eq 'none';
     } else {
 	print "running" unless $style eq 'none';
     }
     print " ", join(', ',@names) unless $style eq 'none';
-    unless ( $n > 0 ) {
+    unless ( $n +> 0 ) {
 	my $for = n_to_for( $n );
-	print ", each" if $n > 1 && $style ne 'none';
+	print ", each" if $n +> 1 && $style ne 'none';
 	print " for at least $for CPU seconds" unless $style eq 'none';
     }
     print "...\n" unless $style eq 'none';
@@ -921,10 +921,10 @@ sub cmpthese{
     }
 
     # Sort by rate
-    @vals = sort { $a->[7] <=> $b->[7] } @vals;
+    @vals = sort { $a->[7] <+> $b->[7] } @vals;
 
     # If more than half of the rates are greater than one...
-    my $display_as_rate = @vals ? ($vals[$#vals>>1]->[7] > 1) : 0;
+    my $display_as_rate = @vals ? ($vals[$#vals>>1]->[7] +> 1) : 0;
 
     my @rows;
     my @col_widths;
@@ -948,7 +948,7 @@ sub cmpthese{
         # Column 0 = test name
 	push @row, $row_val->[0];
 	$col_widths[0] = length( $row_val->[0] )
-	    if length( $row_val->[0] ) > $col_widths[0];
+	    if length( $row_val->[0] ) +> $col_widths[0];
 
         # Column 1 = performance
 	my $row_rate = $row_val->[7];
@@ -959,13 +959,13 @@ sub cmpthese{
 	# Only give a few decimal places before switching to sci. notation,
 	# since the results aren't usually that accurate anyway.
 	my $format = 
-	   $rate >= 100 ? 
+	   $rate +>= 100 ? 
 	       "%0.0f" : 
-	   $rate >= 10 ?
+	   $rate +>= 10 ?
 	       "%0.1f" :
-	   $rate >= 1 ?
+	   $rate +>= 1 ?
 	       "%0.2f" :
-	   $rate >= 0.1 ?
+	   $rate +>= 0.1 ?
 	       "%0.3f" :
 	       "%0.2e";
 
@@ -975,11 +975,11 @@ sub cmpthese{
 	my $formatted_rate = sprintf( $format, $rate );
 	push @row, $formatted_rate;
 	$col_widths[1] = length( $formatted_rate )
-	    if length( $formatted_rate ) > $col_widths[1];
+	    if length( $formatted_rate ) +> $col_widths[1];
 
         # Columns 2..N = performance ratios
 	my $skip_rest = 0;
-	for ( my $col_num = 0 ; $col_num < @vals ; ++$col_num ) {
+	for ( my $col_num = 0 ; $col_num +< @vals ; ++$col_num ) {
 	    my $col_val = $vals[$col_num];
 	    my $out;
 	    if ( $skip_rest ) {
@@ -995,11 +995,11 @@ sub cmpthese{
 	    }
 	    push @row, $out;
 	    $col_widths[$col_num+2] = length( $out )
-		if length( $out ) > $col_widths[$col_num+2];
+		if length( $out ) +> $col_widths[$col_num+2];
 
 	    # A little wierdness to set the first column width properly
 	    $col_widths[$col_num+2] = length( $col_val->[0] )
-		if length( $col_val->[0] ) > $col_widths[$col_num+2];
+		if length( $col_val->[0] ) +> $col_widths[$col_num+2];
 	}
 	push @rows, \@row;
     }
@@ -1009,24 +1009,24 @@ sub cmpthese{
     # Equalize column widths in the chart as much as possible without
     # exceeding 80 characters.  This does not use or affect cols 0 or 1.
     my @sorted_width_refs = 
-       sort { $$a <=> $$b } map { \$_ } @col_widths[2..$#col_widths];
+       sort { $$a <+> $$b } map { \$_ } @col_widths[2..$#col_widths];
     my $max_width = ${$sorted_width_refs[-1]};
 
     my $total = @col_widths - 1 ;
     for ( @col_widths ) { $total += $_ }
 
     STRETCHER:
-    while ( $total < 80 ) {
+    while ( $total +< 80 ) {
 	my $min_width = ${$sorted_width_refs[0]};
 	last
 	   if $min_width == $max_width;
 	for ( @sorted_width_refs ) {
 	    last 
-		if $$_ > $min_width;
+		if $$_ +> $min_width;
 	    ++$$_;
 	    ++$total;
 	    last STRETCHER
-		if $total >= 80;
+		if $total +>= 80;
 	}
     }
 

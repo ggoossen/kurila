@@ -29,14 +29,14 @@ $Is_UWin    = $^O eq 'uwin';
 $Is_OS390   = $^O eq 'os390';
 
 ok( $testfd = open("TEST", O_RDONLY, 0),        'O_RDONLY with open' );
-read($testfd, $buffer, 4) if $testfd > 2;
+read($testfd, $buffer, 4) if $testfd +> 2;
 is( $buffer, "#!./",                      '    with read' );
 
 TODO:
 {
     local $TODO = "read to array element not working";
 
-    read($testfd, $buffer[1], 5) if $testfd > 2;
+    read($testfd, $buffer[1], 5) if $testfd +> 2;
     is( $buffer[1], "perl\n",	               '    read to array element' );
 }
 
@@ -47,7 +47,7 @@ SKIP: {
     skip("no pipe() support on DOS", 2) if $Is_Dos;
 
     @fds = POSIX::pipe();
-    ok( $fds[0] > $testfd,      'POSIX::pipe' );
+    ok( $fds[0] +> $testfd,      'POSIX::pipe' );
 
     CORE::open($reader = \*READER, "<&=".$fds[0]);
     CORE::open($writer = \*WRITER, ">&=".$fds[1]);
@@ -120,7 +120,7 @@ SKIP: {
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE;
     skip("_POSIX_OPEN_MAX undefined ($fds[1])",  1) unless &_POSIX_OPEN_MAX;
 
-    ok( &_POSIX_OPEN_MAX >= 16, "The minimum allowed values according to susv2" );
+    ok( &_POSIX_OPEN_MAX +>= 16, "The minimum allowed values according to susv2" );
 
 }
 
@@ -145,7 +145,7 @@ SKIP: {
 
     # we're just checking that strtod works, not how accurate it is
     ($n, $x) = &POSIX::strtod('3.14159_OR_SO');
-    ok((abs("3.14159" - $n) < 1e-6) && ($x == 6), 'strtod works');
+    ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
     &POSIX::setlocale(&POSIX::LC_NUMERIC, $lc) if $Config{d_setlocale};
 }
@@ -189,8 +189,8 @@ try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
 	if ($Is_W32 and (($Config{cc} eq 'cl' and
-	                 $Config{ccversion} =~ /^(\d+)/ and $1 >= 14) or
-	                 (Win32::GetOSVersion())[1] >= 6));
+	                 $Config{ccversion} =~ /^(\d+)/ and $1 +>= 14) or
+	                 (Win32::GetOSVersion())[1] +>= 6));
 
     try_strftime("Thu Feb 29 00:00:60 1996 060", 60,0,-24, 30,1,96);
 }

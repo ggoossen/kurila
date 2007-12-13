@@ -11,7 +11,7 @@ sub foo2 {
 }
 sub bar {
 	print "in bar(@_)\n";
-	if( @_ > 0 ){
+	if( @_ +> 0 ){
 		&yeppers;
 	}
 }

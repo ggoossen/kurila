@@ -323,7 +323,7 @@ sub perror {
 }
 
 sub printf {
-    usage "printf(pattern, args...)" if @_ < 1;
+    usage "printf(pattern, args...)" if @_ +< 1;
     CORE::printf STDOUT @_;
 }
 
@@ -957,10 +957,10 @@ require Exporter;
 package POSIX::SigAction;
 
 sub new { bless {HANDLER => $_[1], MASK => $_[2], FLAGS => $_[3] || 0, SAFE => 0}, $_[0] }
-sub handler { $_[0]->{HANDLER} = $_[1] if @_ > 1; $_[0]->{HANDLER} };
-sub mask    { $_[0]->{MASK}    = $_[1] if @_ > 1; $_[0]->{MASK} };
-sub flags   { $_[0]->{FLAGS}   = $_[1] if @_ > 1; $_[0]->{FLAGS} };
-sub safe    { $_[0]->{SAFE}    = $_[1] if @_ > 1; $_[0]->{SAFE} };
+sub handler { $_[0]->{HANDLER} = $_[1] if @_ +> 1; $_[0]->{HANDLER} };
+sub mask    { $_[0]->{MASK}    = $_[1] if @_ +> 1; $_[0]->{MASK} };
+sub flags   { $_[0]->{FLAGS}   = $_[1] if @_ +> 1; $_[0]->{FLAGS} };
+sub safe    { $_[0]->{SAFE}    = $_[1] if @_ +> 1; $_[0]->{SAFE} };
 
 package POSIX::SigRt;
 
@@ -973,7 +973,7 @@ sub _init {
 
 sub _croak {
     &_init unless defined $_sigrtn;
-    die "POSIX::SigRt not available" unless defined $_sigrtn && $_sigrtn > 0;
+    die "POSIX::SigRt not available" unless defined $_sigrtn && $_sigrtn +> 0;
 }
 
 sub _getsig {
@@ -987,7 +987,7 @@ sub _getsig {
 
 sub _exist {
     my $rtsig = _getsig($_[1]);
-    my $ok    = $rtsig >= $_SIGRTMIN && $rtsig <= $_SIGRTMAX;
+    my $ok    = $rtsig +>= $_SIGRTMIN && $rtsig +<= $_SIGRTMAX;
     ($rtsig, $ok);
 }
 

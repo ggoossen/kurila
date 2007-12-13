@@ -33,11 +33,11 @@ sub compare_addr {
     my $a = shift;
     my $b = shift;
     if (length($a) != length $b) {
-	my $min = (length($a) < length $b) ? length($a) : length $b;
+	my $min = (length($a) +< length $b) ? length($a) : length $b;
 	if ($min and substr($a, 0, $min) eq substr($b, 0, $min)) {
 	    printf "# Apparently: %d bytes junk at the end of %s\n# %s\n",
 		abs(length($a) - length ($b)),
-		$_[length($a) < length ($b) ? 1 : 0],
+		$_[length($a) +< length ($b) ? 1 : 0],
 		"consider decreasing bufsize of recfrom.";
 	    substr($a, $min, undef, "");
 	    substr($b, $min, undef, "");

@@ -75,7 +75,7 @@ sub _doit {
     
           $io->fdopen($save, $mode);
           $save->close or croak "Cannot close $!";
-          croak "IO::Pipe: Cannot spawn-NOWAIT: $err" if not $pid or $pid < 0;
+          croak "IO::Pipe: Cannot spawn-NOWAIT: $err" if not $pid or $pid +< 0;
           return $pid;
         } else {
           exec @_ or
@@ -90,7 +90,7 @@ sub _doit {
 }
 
 sub reader {
-    @_ >= 1 or croak 'usage: $pipe->reader( [SUB_COMMAND_ARGS] )';
+    @_ +>= 1 or croak 'usage: $pipe->reader( [SUB_COMMAND_ARGS] )';
     my $me = shift;
 
     return undef
@@ -114,7 +114,7 @@ sub reader {
 }
 
 sub writer {
-    @_ >= 1 or croak 'usage: $pipe->writer( [SUB_COMMAND_ARGS] )';
+    @_ +>= 1 or croak 'usage: $pipe->writer( [SUB_COMMAND_ARGS] )';
     my $me = shift;
 
     return undef

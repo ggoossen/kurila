@@ -175,10 +175,10 @@ sub change {
 sub _checkLevel {
     my $level = shift;
     my $key   = shift; # 'level' or 'backwards'
-    MinLevel <= $level or croak sprintf
+    MinLevel +<= $level or croak sprintf
 	"Illegal level %d (in value for key '%s') lower than %d.",
 	    $level, $key, MinLevel;
-    $level <= MaxLevel or croak sprintf
+    $level +<= MaxLevel or croak sprintf
 	"Unsupported level %d (in value for key '%s') higher than %d.",
 	    $level, $key, MaxLevel;
 }
@@ -281,7 +281,7 @@ sub new
     $self->{normalization} = 'NFD'
 	if ! exists $self->{normalization};
     $self->{rearrange} = $self->{rearrangeTable} ||
-	($self->{UCA_Version} <= 11 ? $DefaultRearrange : [])
+	($self->{UCA_Version} +<= 11 ? $DefaultRearrange : [])
 	if ! exists $self->{rearrange};
     $self->{backwards} = $self->{backwardsTable}
 	if ! exists $self->{backwards};
@@ -394,8 +394,8 @@ sub parseEntry
 
     $self->{mapping}{$entry} = $is_L3_ignorable ? [] : \@key;
 
-    if (@uv > 1) {
-	(!$self->{maxlength}{$uv[0]} || $self->{maxlength}{$uv[0]} < @uv)
+    if (@uv +> 1) {
+	(!$self->{maxlength}{$uv[0]} || $self->{maxlength}{$uv[0]} +< @uv)
 	    and $self->{maxlength}{$uv[0]} = @uv;
     }
 }
@@ -437,7 +437,7 @@ sub visualizeSortKey
     my $self = shift;
     my $view = join " ", map sprintf("%04X", $_), unpack(KEY_TEMPLATE, shift);
 
-    if ($self->{UCA_Version} <= 8) {
+    if ($self->{UCA_Version} +<= 8) {
 	$view =~ s/ ?0000 ?/|/g;
     } else {
 	$view =~ s/\b0000\b/|/g;
@@ -460,7 +460,7 @@ sub splitEnt
     my $map  = $self->{mapping};
     my $max  = $self->{maxlength};
     my $reH  = $self->{rearrangeHash};
-    my $ver9 = $self->{UCA_Version} >= 9 && $self->{UCA_Version} <= 11;
+    my $ver9 = $self->{UCA_Version} +>= 9 && $self->{UCA_Version} +<= 11;
 
     my ($str, @buf);
 
@@ -484,8 +484,8 @@ sub splitEnt
     # Character positions are not kept if rearranged,
     # then neglected if $wLen is true.
     if ($reH && ! $wLen) {
-	for (my $i = 0; $i < @src; $i++) {
-	    if (exists $reH->{ $src[$i] } && $i + 1 < @src) {
+	for (my $i = 0; $i +< @src; $i++) {
+	    if (exists $reH->{ $src[$i] } && $i + 1 +< @src) {
 		($src[$i], $src[$i+1]) = ($src[$i+1], $src[$i]);
 		$i++;
 	    }
@@ -493,13 +493,13 @@ sub splitEnt
     }
 
     # remove a code point marked as a completely ignorable.
-    for (my $i = 0; $i < @src; $i++) {
+    for (my $i = 0; $i +< @src; $i++) {
 	$src[$i] = undef
 	    if _isIllegal($src[$i]) || ($ver9 &&
 		$map->{ $src[$i] } && @{ $map->{ $src[$i] } } == 0);
     }
 
-    for (my $i = 0; $i < @src; $i++) {
+    for (my $i = 0; $i +< @src; $i++) {
 	my $jcps = $src[$i];
 
 	# skip removed code point
@@ -518,7 +518,7 @@ sub splitEnt
 	    my $jcpsLen = 1;
 	    my $maxLen = $max->{$jcps};
 
-	    for (my $p = $i + 1; $jcpsLen < $maxLen && $p < @src; $p++) {
+	    for (my $p = $i + 1; $jcpsLen +< $maxLen && $p +< @src; $p++) {
 		next if ! defined $src[$p];
 		$temp_jcps .= CODE_SEP . $src[$p];
 		$jcpsLen++;
@@ -541,7 +541,7 @@ sub splitEnt
 		my $preCC = 0;
 		my $curCC = 0;
 
-		for (my $p = $i + 1; $p < @src; $p++) {
+		for (my $p = $i + 1; $p +< @src; $p++) {
 		    next if ! defined $src[$p];
 		    $curCC = $CVgetCombinClass->($src[$p]);
 		    last unless $curCC;
@@ -586,7 +586,7 @@ sub getWt
 	if $map->{$u};
 
     # JCPS must not be a contraction, then it's a code point.
-    if (Hangul_SIni <= $u && $u <= Hangul_SFin) {
+    if (Hangul_SIni +<= $u && $u +<= Hangul_SFin) {
 	my $hang = $self->{overrideHangul};
 	my @hangulCE;
 	if ($hang) {
@@ -631,7 +631,7 @@ sub getWt
 	return map _varCE($vbl, $_),
 	    $cjk
 		? map(pack(VCE_TEMPLATE, NON_VAR, @$_), &$cjk($u))
-		: defined $cjk && $self->{UCA_Version} <= 8 && $u < 0x10000
+		: defined $cjk && $self->{UCA_Version} +<= 8 && $u +< 0x10000
 		    ? _uideoCE_8($u)
 		    : $der->($u);
     }
@@ -649,7 +649,7 @@ sub getSortKey
     my $self = shift;
     my $lev  = $self->{level};
     my $rEnt = $self->splitEnt(shift); # get an arrayref of JCPS
-    my $v2i  = $self->{UCA_Version} >= 9 &&
+    my $v2i  = $self->{UCA_Version} +>= 9 &&
 		$self->{variable} ne 'non-ignorable';
 
     my @buf; # weight arrays
@@ -701,28 +701,28 @@ sub getSortKey
 	    }
 	}
 	foreach my $v (0..$lev-1) {
-	    0 < $wt[$v] and push @{ $ret[$v] }, $wt[$v];
+	    0 +< $wt[$v] and push @{ $ret[$v] }, $wt[$v];
 	}
     }
 
     # modification of tertiary weights
     if ($self->{upper_before_lower}) {
 	foreach my $w (@{ $ret[2] }) {
-	    if    (0x8 <= $w && $w <= 0xC) { $w -= 6 } # lower
-	    elsif (0x2 <= $w && $w <= 0x6) { $w += 6 } # upper
+	    if    (0x8 +<= $w && $w +<= 0xC) { $w -= 6 } # lower
+	    elsif (0x2 +<= $w && $w +<= 0x6) { $w += 6 } # upper
 	    elsif ($w == 0x1C)             { $w += 1 } # square upper
 	    elsif ($w == 0x1D)             { $w -= 1 } # square lower
 	}
     }
     if ($self->{katakana_before_hiragana}) {
 	foreach my $w (@{ $ret[2] }) {
-	    if    (0x0F <= $w && $w <= 0x13) { $w -= 2 } # katakana
-	    elsif (0x0D <= $w && $w <= 0x0E) { $w += 5 } # hiragana
+	    if    (0x0F +<= $w && $w +<= 0x13) { $w -= 2 } # katakana
+	    elsif (0x0D +<= $w && $w +<= 0x0E) { $w += 5 } # hiragana
 	}
     }
 
     if ($self->{backwardsFlag}) {
-	for (my $v = MinLevel; $v <= MaxLevel; $v++) {
+	for (my $v = MinLevel; $v +<= MaxLevel; $v++) {
 	    if ($self->{backwardsFlag} ^&^ (1 << $v)) {
 		@{ $ret[$v-1] } = reverse @{ $ret[$v-1] };
 	    }
@@ -759,10 +759,10 @@ sub sort {
 sub _derivCE_14 {
     my $u = shift;
     my $base =
-	(CJK_UidIni  <= $u && $u <= CJK_UidF41)
+	(CJK_UidIni  +<= $u && $u +<= CJK_UidF41)
 	    ? 0xFB40 : # CJK
-	(CJK_ExtAIni <= $u && $u <= CJK_ExtAFin ||
-	 CJK_ExtBIni <= $u && $u <= CJK_ExtBFin)
+	(CJK_ExtAIni +<= $u && $u +<= CJK_ExtAFin ||
+	 CJK_ExtBIni +<= $u && $u +<= CJK_ExtBFin)
 	    ? 0xFB80   # CJK ext.
 	    : 0xFBC0;  # others
 
@@ -776,10 +776,10 @@ sub _derivCE_14 {
 sub _derivCE_9 {
     my $u = shift;
     my $base =
-	(CJK_UidIni  <= $u && $u <= CJK_UidFin)
+	(CJK_UidIni  +<= $u && $u +<= CJK_UidFin)
 	    ? 0xFB40 : # CJK
-	(CJK_ExtAIni <= $u && $u <= CJK_ExtAFin ||
-	 CJK_ExtBIni <= $u && $u <= CJK_ExtBFin)
+	(CJK_ExtAIni +<= $u && $u +<= CJK_ExtAFin ||
+	 CJK_ExtBIni +<= $u && $u +<= CJK_ExtBFin)
 	    ? 0xFB80   # CJK ext.
 	    : 0xFBC0;  # others
 
@@ -807,12 +807,12 @@ sub _uideoCE_8 {
 sub _isUIdeo {
     my ($u, $uca_vers) = @_;
     return(
-	(CJK_UidIni <= $u &&
-	    ($uca_vers >= 14 ? ( $u <= CJK_UidF41) : ($u <= CJK_UidFin)))
+	(CJK_UidIni +<= $u &&
+	    ($uca_vers +>= 14 ? ( $u +<= CJK_UidF41) : ($u +<= CJK_UidFin)))
 		||
-	(CJK_ExtAIni <= $u && $u <= CJK_ExtAFin)
+	(CJK_ExtAIni +<= $u && $u +<= CJK_ExtAFin)
 		||
-	(CJK_ExtBIni <= $u && $u <= CJK_ExtBFin)
+	(CJK_ExtBIni +<= $u && $u +<= CJK_ExtBFin)
     );
 }
 
@@ -849,10 +849,10 @@ sub _decompHangul {
 sub _isIllegal {
     my $code = shift;
     return ! defined $code                      # removed
-	|| ($code < 0 || 0x10FFFF < $code)      # out of range
+	|| ($code +< 0 || 0x10FFFF +< $code)      # out of range
 	|| (($code ^&^ 0xFFFE) == 0xFFFE)         # ??FFF[EF] (cf. utf8.c)
-	|| (0xD800 <= $code && $code <= 0xDFFF) # unpaired surrogates
-	|| (0xFDD0 <= $code && $code <= 0xFDEF) # other non-characters
+	|| (0xD800 +<= $code && $code +<= 0xDFFF) # unpaired surrogates
+	|| (0xFDD0 +<= $code && $code +<= 0xFDEF) # other non-characters
     ;
 }
 
@@ -860,10 +860,10 @@ sub _isIllegal {
 sub getHST {
     my $u = shift;
     return
-	Hangul_LIni <= $u && $u <= Hangul_LFin || $u == Hangul_LFill ? "L" :
-	Hangul_VIni <= $u && $u <= Hangul_VFin	     ? "V" :
-	Hangul_TIni <= $u && $u <= Hangul_TFin	     ? "T" :
-	Hangul_SIni <= $u && $u <= Hangul_SFin ?
+	Hangul_LIni +<= $u && $u +<= Hangul_LFin || $u == Hangul_LFill ? "L" :
+	Hangul_VIni +<= $u && $u +<= Hangul_VFin	     ? "V" :
+	Hangul_TIni +<= $u && $u +<= Hangul_TFin	     ? "T" :
+	Hangul_SIni +<= $u && $u +<= Hangul_SFin ?
 	    ($u - Hangul_SBase) % Hangul_TCount ? "LVT" : "LV" : "";
 }
 
@@ -920,20 +920,20 @@ sub index
     my $len  = length($str);
     my $subE = $self->splitEnt(shift);
     my $pos  = @_ ? shift : 0;
-       $pos  = 0 if $pos < 0;
+       $pos  = 0 if $pos +< 0;
     my $grob = shift;
 
     my $lev  = $self->{level};
-    my $v2i  = $self->{UCA_Version} >= 9 &&
+    my $v2i  = $self->{UCA_Version} +>= 9 &&
 		$self->{variable} ne 'non-ignorable';
 
     if (! @$subE) {
-	my $temp = $pos <= 0 ? 0 : $len <= $pos ? $len : $pos;
+	my $temp = $pos +<= 0 ? 0 : $len +<= $pos ? $len : $pos;
 	return $grob
 	    ? map([$_, 0], $temp..$len)
 	    : wantarray ? ($temp,0) : $temp;
     }
-    $len < $pos
+    $len +< $pos
 	and return wantarray ? () : NOMATCHPOS;
     my $strE = $self->splitEnt($pos ? substr($str, $pos) : $str, TRUE);
     @$strE
@@ -970,11 +970,11 @@ sub index
     my $end = @$strE - 1;
 
     $last_is_variable = FALSE; # reuse
-    for (my $i = 0; $i <= $end; ) { # no $i++
+    for (my $i = 0; $i +<= $end; ) { # no $i++
 	my $found_base = 0;
 
 	# fetch a grapheme
-	while ($i <= $end && $found_base == 0) {
+	while ($i +<= $end && $found_base == 0) {
 	    for my $vwt ($self->getWt($strE->[$i][0])) {
 		my($var, @wt) = unpack(VCE_TEMPLATE, $vwt);
 		my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
@@ -1008,7 +1008,7 @@ sub index
 	}
 
 	# try to match
-	while ( @strWt > @subWt || (@strWt == @subWt && $i > $end) ) {
+	while ( @strWt +> @subWt || (@strWt == @subWt && $i +> $end) ) {
 	    if ($iniPos[0] != NOMATCHPOS &&
 		    $finPos[$#subWt] != NOMATCHPOS &&
 			_eqArray(\@strWt, \@subWt, $lev)) {

@@ -109,7 +109,7 @@ sub test_security {
   }
 
   # Explicitly 
-  if ( $< < File::Temp->top_system_uid() ){
+  if ( $< +< File::Temp->top_system_uid() ){
       skip("Skip Test inappropriate for root", 1);
       eval q{ END { skip($skip,1); } 1; } || die;
       return;

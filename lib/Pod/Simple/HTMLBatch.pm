@@ -152,10 +152,10 @@ sub _batch_convert_main {
   $self->muse( "Starting batch conversion to \"$outdir\"" );
 
   my $progress = $self->progress;
-  if(!$progress and $self->verbose > 0 and $self->verbose() <= 5) {
+  if(!$progress and $self->verbose +> 0 and $self->verbose() +<= 5) {
     require Pod::Simple::Progress;
     $progress = Pod::Simple::Progress->new(
-        ($self->verbose  < 2) ? () # Default omission-delay
+        ($self->verbose  +< 2) ? () # Default omission-delay
       : ($self->verbose == 2) ? 1  # Reduce the omission-delay
                               : 0  # Eliminate the omission-delay
     );
@@ -178,7 +178,7 @@ sub _batch_convert_main {
 
   $progress and $progress->goal($total);
   $self->muse("Now converting pod files to HTML.",
-    ($total > 25) ? "  This will take a while more." : ()
+    ($total +> 25) ? "  This will take a while more." : ()
   );
 
   $self->_spray_css(        $outdir );
@@ -237,10 +237,10 @@ sub _do_one_batch_conversion {
   my $progress = $self->progress;
 
   my $page = $self->html_render_class->new;
-  if(DEBUG > 5) {
+  if(DEBUG +> 5) {
     $self->muse($self->{"__batch_conv_page_count"} + 1, "/$total: ",
       ref($page), " render ($depth) $module => $outfile");
-  } elsif(DEBUG > 2) {
+  } elsif(DEBUG +> 2) {
     $self->muse($self->{"__batch_conv_page_count"} + 1, "/$total: $module => $outfile")
   }
 
@@ -269,7 +269,7 @@ sub _do_one_batch_conversion {
   $self->batch_mode_page_object_kill($page, $module, $infile, $outfile, $depth)
    if $self->can('batch_mode_page_object_kill');
     
-  DEBUG > 4 and printf "%s %sb < $infile %s %sb\n",
+  DEBUG +> 4 and printf "%s %sb < $infile %s %sb\n",
      $outfile, -s $outfile, $infile, -s $infile
   ;
 
@@ -294,7 +294,7 @@ sub note_for_contents_file {
      [ join("::", @$namelets), $infile, $outfile, $namelets ]
      #            0               1         2         3
     ;
-    DEBUG > 3 and print "Noting @$c[-1]\n";
+    DEBUG +> 3 and print "Noting @$c[-1]\n";
   }
   return;
 }
@@ -414,7 +414,7 @@ sub _prep_contents_breakdown {
     my $fgroup = $toplevel_form_freq{$toplevel};
     $toplevel_form_freq{$toplevel} =
     (
-      sort { $fgroup->{$b} <=> $fgroup->{$a}  or  $a cmp $b }
+      sort { $fgroup->{$b} <+> $fgroup->{$a}  or  $a cmp $b }
         keys %$fgroup
       # This hash is extremely unlikely to have more than 4 members, so this
       # sort isn't so very wasteful
@@ -438,14 +438,14 @@ sub _contents_filespec {
 
 sub makepath {
   my($self, $outdir, $namelets) = @_;
-  return unless @$namelets > 1;
+  return unless @$namelets +> 1;
   for my $i (0 .. ($#$namelets - 1)) {
     my $dir = $self->filespecsys->catdir( $outdir, @$namelets[0 .. $i] );
     if(-e $dir) {
       die "$dir exists but not as a directory!?" unless -d $dir;
       next;
     }
-    DEBUG > 3 and print "  Making $dir\n";
+    DEBUG +> 3 and print "  Making $dir\n";
     mkdir $dir, 0777
      or die "Can't mkdir $dir: $!\nAborting"
     ;
@@ -533,7 +533,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
   {
     my $search = $SEARCH_CLASS->new;
     DEBUG and print "Searching via $search\n";
-    $search->verbose(1) if DEBUG > 10;
+    $search->verbose(1) if DEBUG +> 10;
     $search->progress( $self->progress->copy->goal(0) ) if $self->progress;
     $search->shadows(0);  # don't bother noting shadowed files
     $search->inc(     $dirs ? 0      :  1 );
@@ -543,7 +543,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
   }
 
   $self->muse("That's odd... no modules found!") unless keys %$m2p;
-  if( DEBUG > 4 ) {
+  if( DEBUG +> 4 ) {
     print "Modules found (name => path):\n";
     foreach my $m (sort {lc($a) cmp lc($b)} keys %$m2p) {
       print "  $m  $$m2p{$m}\n";
@@ -565,7 +565,7 @@ sub _wopen {
   my($self, $outpath) = @_;
   require Symbol;
   my $out_fh = Symbol::gensym();
-  DEBUG > 5 and print "Write-opening to $outpath\n";
+  DEBUG +> 5 and print "Write-opening to $outpath\n";
   return $out_fh if open($out_fh, "> $outpath");
   require Carp;  
   Carp::croak("Can't write-open $outpath: $!");
@@ -607,9 +607,9 @@ sub _spray_css {
     my $outfile;
     if( ref($chunk->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.css$)} ) {
       $outfile = $self->filespecsys->catfile( $outdir, $1 );
-      DEBUG > 5 and print "Noting $$chunk[0] as a file I'll create.\n";
+      DEBUG +> 5 and print "Noting $$chunk[0] as a file I'll create.\n";
     } else {
-      DEBUG > 5 and print "OK, noting $$chunk[0] as an external CSS.\n";
+      DEBUG +> 5 and print "OK, noting $$chunk[0] as an external CSS.\n";
       # Requires no further attention.
       next;
     }
@@ -619,7 +619,7 @@ sub _spray_css {
     print $Cssout ${$chunk->[-1]}
      or warn "Couldn't print to $outfile: $!\nAbort writing to $outfile at all";
     close($Cssout);
-    DEBUG > 5 and print "Wrote $outfile\n";
+    DEBUG +> 5 and print "Wrote $outfile\n";
   }
 
   return;
@@ -772,9 +772,9 @@ sub _spray_javascript {
     
     if( ref($script->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.js$)} ) {
       $outfile = $self->filespecsys->catfile( $outdir, $1 );
-      DEBUG > 5 and print "Noting $$script[0] as a file I'll create.\n";
+      DEBUG +> 5 and print "Noting $$script[0] as a file I'll create.\n";
     } else {
-      DEBUG > 5 and print "OK, noting $$script[0] as an external JavaScript.\n";
+      DEBUG +> 5 and print "OK, noting $$script[0] as an external JavaScript.\n";
       next;
     }
     
@@ -784,7 +784,7 @@ sub _spray_javascript {
     print $Jsout ${$script->[-1]}
      or warn "Couldn't print to $outfile: $!\nAbort writing to $outfile at all";
     close($Jsout);
-    DEBUG > 5 and print "Wrote $outfile\n";
+    DEBUG +> 5 and print "Wrote $outfile\n";
   }
 
   return;

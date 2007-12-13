@@ -40,7 +40,7 @@ is( ExtUtils::Packlist::FETCH($pl, 'foo'), 'bar', 'check FETCH()' );
 SKIP: {
 	$pl->{data}{bar} = 'baz';
 	skip('not enough keys to test FIRSTKEY', 2)
-      unless keys %{ $pl->{data} } > 2;
+      unless keys %{ $pl->{data} } +> 2;
 
 	# get the first and second key
 	my ($first, $second) = keys %{ $pl->{data} };

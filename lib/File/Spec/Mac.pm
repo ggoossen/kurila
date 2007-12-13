@@ -542,9 +542,9 @@ sub splitdir {
 	}
 
 	while ($sep || $directories) {
-		if (length($sep) > 1) {
+		if (length($sep) +> 1) {
 			my $updir_count = length($sep) - 1;
-			for (my $i=0; $i<$updir_count; $i++) {
+			for (my $i=0; $i+<$updir_count; $i++) {
 				# push '::' updir_count times;
 				# simulate Unix '..' updirs
 				push (@result, '::');

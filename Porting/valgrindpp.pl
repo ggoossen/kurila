@@ -122,16 +122,16 @@ sub summary {
 
   if ($opt{top}) {
     for my $what (qw(error leak)) {
-      my @t = sort { $top{$b}{$what} <=> $top{$a}{$what} or $a cmp $b }
+      my @t = sort { $top{$b}{$what} <+> $top{$a}{$what} or $a cmp $b }
               grep $top{$_}{$what}, keys %top;
-      @t > $opt{top} and splice @t, $opt{top};
+      @t +> $opt{top} and splice @t, $opt{top};
       my $n = @t;
-      my $s = $n > 1 ? 's' : '';
+      my $s = $n +> 1 ? 's' : '';
       my $prev = 0;
       print $fh "Top $n test scripts for ${what}s:\n\n";
       for my $i (1 .. $n) {
         $n = $top{$t[$i-1]}{$what};
-        $s = $n > 1 ? 's' : '';
+        $s = $n +> 1 ? 's' : '';
         printf $fh "    %3s %-40s %3d $what$s\n",
                    $n != $prev ? "$i." : '', $t[$i-1], $n;
         $prev = $n;
@@ -148,7 +148,7 @@ sub summary {
     print $fh qq("$e"\n);
     for my $frame (sort keys %{$ne{$e}}) {
       my $data = $ne{$e}{$frame};
-      my $count = $data->{count} > 1 ? " [$data->{count} paths]" : '';
+      my $count = $data->{count} +> 1 ? " [$data->{count} paths]" : '';
       print $fh ' 'x4, "$frame$count\n",
                 format_tests($data->{tests}), "\n";
     }
@@ -162,7 +162,7 @@ sub summary {
     for my $frames (sort keys %{$nl{$l}}) {
       my $data = $nl{$l}{$frames};
       my @stack = split /</, $frames;
-      $data->{count} > 1 and $stack[-1] .= " [$data->{count} paths]";
+      $data->{count} +> 1 and $stack[-1] .= " [$data->{count} paths]";
       print $fh join('', map { ' 'x4 . "$_:$stack[$_]\n" } 0 .. $#stack ),
                 format_tests($data->{tests}), "\n\n";
     }
@@ -178,7 +178,7 @@ sub format_tests {
   }
   else {
     my $count = keys %$tests;
-    my $s = $count > 1 ? 's' : '';
+    my $s = $count +> 1 ? 's' : '';
     return $indent . "triggered by $count test$s";
   }
 }
@@ -237,7 +237,7 @@ sub filter {
         $hidden && $func =~ $hidden and @stack = (), last;
 
         # Add stack frame if it's within our threshold
-        if ($inperl <= $opt{frames}) {
+        if ($inperl +<= $opt{frames}) {
           push @stack, $inperl ? "$func:$file:$lineno" : $func;
         }
       }
@@ -262,7 +262,7 @@ sub filter {
 
 sub debug {
   my $level = shift;
-  $opt{verbose} >= $level and print STDERR @_;
+  $opt{verbose} +>= $level and print STDERR @_;
 }
 
 __END__

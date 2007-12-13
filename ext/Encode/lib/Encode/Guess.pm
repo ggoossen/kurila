@@ -104,7 +104,7 @@ sub guess {
             $be == $le
               and return
               "Encodings ambiguous between $utf BE and LE ($be, $le)";
-            $utf .= ( $be > $le ) ? 'BE' : 'LE';
+            $utf .= ( $be +> $le ) ? 'BE' : 'LE';
             return find_encoding($utf);
         }
     }

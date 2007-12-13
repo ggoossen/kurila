@@ -64,7 +64,7 @@ sub wraplist {
       # foreach(@array) does) (5.00307)
       next unless $word =~ /\w/;
       $line .= ' ' if length($line);
-      if ($hlen > 80) { $line .= "\\\n\t"; $hlen = 0; }
+      if ($hlen +> 80) { $line .= "\\\n\t"; $hlen = 0; }
       $line .= $word;
       $hlen += length($word) + 2;
     }
@@ -176,13 +176,13 @@ sub find_perl {
         # executable that's less likely to be from an old installation.
         @snames = sort { my($ba) = $a =~ m!([^:>\]/]+)$!;  # basename
                          my($bb) = $b =~ m!([^:>\]/]+)$!;
-                         my($ahasdir) = (length($a) - length($ba) > 0);
-                         my($bhasdir) = (length($b) - length($bb) > 0);
+                         my($ahasdir) = (length($a) - length($ba) +> 0);
+                         my($bhasdir) = (length($b) - length($bb) +> 0);
                          if    ($ahasdir and not $bhasdir) { return 1; }
                          elsif ($bhasdir and not $ahasdir) { return -1; }
-                         else { $bb =~ /\d/ <=> $ba =~ /\d/
+                         else { $bb =~ /\d/ <+> $ba =~ /\d/
                                   or substr($ba,0,1) cmp substr($bb,0,1)
-                                  or length($bb) <=> length($ba) } } @$names;
+                                  or length($bb) <+> length($ba) } } @$names;
     }
     else {
         @sdirs  = @$dirs;
@@ -191,7 +191,7 @@ sub find_perl {
 
     # Image names containing Perl version use '_' instead of '.' under VMS
     foreach $name (@snames) { $name =~ s/\.(\d+)$/_$1/; }
-    if ($trace >= 2){
+    if ($trace +>= 2){
 	print "Looking for perl $ver by these names:\n";
 	print "\t@snames,\n";
 	print "in these dirs:\n";
@@ -213,7 +213,7 @@ sub find_perl {
 	}
     }
     foreach $name (@cand) {
-	print "Checking $name\n" if ($trace >= 2);
+	print "Checking $name\n" if ($trace +>= 2);
 	# If it looks like a potential command, try it without the MCR
         if ($name =~ /^[\w\-\$]+$/) {
             open(TCF,">temp_mmvms.com") || die('unable to open temp file');
@@ -229,7 +229,7 @@ sub find_perl {
         }
 	next unless $vmsfile = $self->maybe_command($name);
 	$vmsfile =~ s/;[\d\-]*$//;  # Clip off version number; we can use a newer version as well
-	print "Executing $vmsfile\n" if ($trace >= 2);
+	print "Executing $vmsfile\n" if ($trace +>= 2);
         open(TCF,">temp_mmvms.com") || die('unable to open temp file');
         print TCF "\$ set message/nofacil/nosever/noident/notext\n";
         print TCF "\$ mcr $vmsfile -e \"require $ver; print \"\"VER_OK\\n\"\"\" \n";
@@ -965,7 +965,7 @@ $(BASEEXT).opt : Makefile.PL
 	$tmp = shift @omods;
 	foreach $elt (@omods) {
 	    $tmp .= ",$elt";
-		if (length($tmp) > 80) { push @lines, $tmp;  $tmp = ''; }
+		if (length($tmp) +> 80) { push @lines, $tmp;  $tmp = ''; }
 	}
 	push @lines, $tmp;
 	push @m, '(', join( qq[, -\\n\\t"";" >>\$(MMS\$TARGET)\n\t\$(PERL) -e "print ""], @lines),')';
@@ -976,7 +976,7 @@ $(BASEEXT).opt : Makefile.PL
 	my($lib); my($line) = '';
 	foreach $lib (split ' ', $self->{LDLOADLIBS}) {
 	    $lib =~ s%\$%\\\$%g;  # Escape '$' in VMS filespecs
-	    if (length($line) + length($lib) > 160) {
+	    if (length($line) + length($lib) +> 160) {
 		push @m, "\t\$(PERL) -e \"print qq{$line}\" >>\$(MMS\$TARGET)\n";
 		$line = $lib . '\n';
 	    }
@@ -1430,7 +1430,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     # (e.g. Intuit::DWIM will precede Intuit, so unresolved
     # references from [.intuit.dwim]dwim.obj can be found
     # in [.intuit]intuit.olb).
-    for (sort { length($a) <=> length($b) } keys %olbs) {
+    for (sort { length($a) <+> length($b) } keys %olbs) {
 	next unless $olbs{$_} =~ /\Q$self->{LIB_EXT}\E$/;
 	my($dir) = $self->fixpath($_,1);
 	my($extralibs) = $dir . "extralibs.ld";
@@ -1623,23 +1623,23 @@ sub prefixify {
                $Config{lc $var} || $Config{lc $var_no_install};
 
     if( !$path ) {
-        print STDERR "  no Config found for $var.\n" if $Verbose >= 2;
+        print STDERR "  no Config found for $var.\n" if $Verbose +>= 2;
         $path = $self->_prefixify_default($rprefix, $default);
     }
     elsif( !$self->{ARGS}{PREFIX} || !$self->file_name_is_absolute($path) ) {
         # do nothing if there's no prefix or if its relative
     }
     elsif( $sprefix eq $rprefix ) {
-        print STDERR "  no new prefix.\n" if $Verbose >= 2;
+        print STDERR "  no new prefix.\n" if $Verbose +>= 2;
     }
     else {
 
-        print STDERR "  prefixify $var => $path\n"     if $Verbose >= 2;
-        print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
+        print STDERR "  prefixify $var => $path\n"     if $Verbose +>= 2;
+        print STDERR "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
         my($path_vol, $path_dirs) = $self->splitpath( $path );
         if( $path_vol eq $Config{vms_prefix}.':' ) {
-            print STDERR "  $Config{vms_prefix}: seen\n" if $Verbose >= 2;
+            print STDERR "  $Config{vms_prefix}: seen\n" if $Verbose +>= 2;
 
             $path_dirs =~ s{^\[}{\[.} unless $path_dirs =~ m{^\[\.};
             $path = $self->_catprefix($rprefix, $path_dirs);
@@ -1649,7 +1649,7 @@ sub prefixify {
         }
     }
 
-    print "    now $path\n" if $Verbose >= 2;
+    print "    now $path\n" if $Verbose +>= 2;
     return $self->{uc $var} = $path;
 }
 
@@ -1657,14 +1657,14 @@ sub prefixify {
 sub _prefixify_default {
     my($self, $rprefix, $default) = @_;
 
-    print STDERR "  cannot prefix, using default.\n" if $Verbose >= 2;
+    print STDERR "  cannot prefix, using default.\n" if $Verbose +>= 2;
 
     if( !$default ) {
-        print STDERR "No default!\n" if $Verbose >= 1;
+        print STDERR "No default!\n" if $Verbose +>= 1;
         return;
     }
     if( !$rprefix ) {
-        print STDERR "No replacement prefix!\n" if $Verbose >= 1;
+        print STDERR "No replacement prefix!\n" if $Verbose +>= 1;
         return '';
     }
 

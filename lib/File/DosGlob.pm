@@ -84,7 +84,7 @@ sub doglob {
 	    # if name does not have a dot in it *and* pattern
 	    # has a dot *and* name is shorter than 9 chars.
 	    #
-	    if (index($e,'.') == -1 and length($e) < 9
+	    if (index($e,'.') == -1 and length($e) +< 9
 	        and index($pat,'\\.') != -1) {
 		push(@matched, "$head$e"), next INNER if &$matchsub("$e.");
 	    }

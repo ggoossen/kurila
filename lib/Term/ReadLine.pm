@@ -391,7 +391,7 @@ sub register_Tk {
 }
 
 sub tkRunning {
-  $Term::ReadLine::toloop = $_[1] if @_ > 1;
+  $Term::ReadLine::toloop = $_[1] if @_ +> 1;
   $Term::ReadLine::toloop;
 }
 

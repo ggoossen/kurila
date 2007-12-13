@@ -18,7 +18,7 @@ BEGIN {
 our $HAS_PERLIO = 0;
 eval { require PerlIO::encoding };
 unless ($@) {
-    $HAS_PERLIO = ( PerlIO::encoding->VERSION >= 0.02 );
+    $HAS_PERLIO = ( PerlIO::encoding->VERSION +>= 0.02 );
 }
 
 sub _exception {
@@ -130,7 +130,7 @@ sub import {
             filter_add(
                 sub {
                     my $status = filter_read();
-                    if ( $status > 0 ) {
+                    if ( $status +> 0 ) {
                         $_ = $enc->decode( $_, 1 );
                         DEBUG and warn $_;
                     }

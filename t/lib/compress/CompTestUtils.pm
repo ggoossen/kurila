@@ -125,7 +125,7 @@ sub GZreadFile
         or croak "Cannopt open '$filename': $Compress::Zlib::gzerrno" ;
 
     $uncomp .= $line 
-        while $fil->gzread($line) > 0;
+        while $fil->gzread($line) +> 0;
 
     $fil->gzclose ;
     return $uncomp ;
@@ -162,7 +162,7 @@ sub hexDump
             printf('%2.2x ', $_);
         }
         print "   " x (16 - @array)
-            if @array < 16 ;
+            if @array +< 16 ;
         $data =~ tr/\0-\37\177-\377/./;
         print "  $data\n";
     }
@@ -230,7 +230,7 @@ sub uncompressBuffer
 
     my $out ;
     my $obj = $mapping{$compWith}->new( \$buffer, -Append => 1);
-    1 while $obj->read($out) > 0 ;
+    1 while $obj->read($out) +> 0 ;
     return $out ;
 
 }
@@ -446,7 +446,7 @@ sub anyUncompress
                     @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
-    1 while $o->read($out) > 0 ;
+    1 while $o->read($out) +> 0 ;
 
     croak "Error uncompressing -- " . $o->error()
         if $o->error() ;
@@ -507,7 +507,7 @@ sub getHeaders
                 @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
-    1 while $o->read($out) > 0 ;
+    1 while $o->read($out) +> 0 ;
 
     croak "Error uncompressing -- " . $o->error()
         if $o->error() ;
@@ -595,7 +595,7 @@ sub dumpObj
     my $max = 0 ;;
     foreach my $k (keys %{ *$obj })
     {
-        $max = length $k if length $k > $max ;
+        $max = length $k if length $k +> $max ;
     }
 
     foreach my $k (sort keys %{ *$obj })

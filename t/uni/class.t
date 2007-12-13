@@ -104,12 +104,12 @@ sub char_range {
 
     my $str;
 
-    if (ord('A') == 193 && $h1 < 256) {
+    if (ord('A') == 193 && $h1 +< 256) {
 	my $h3 = ($h2 || $h1) + 1;
 	if ($h3 - $h1 == 1) {
 	    $str = join "", pack 'U*', $h1 .. $h3; # Using pack since chr doesn't generate Unicode chars for value < 256.
-	} elsif ($h3 - $h1 > 1) {
-	    for (my $i = $h1; $i <= $h3; $i++) {
+	} elsif ($h3 - $h1 +> 1) {
+	    for (my $i = $h1; $i +<= $h3; $i++) {
 		$str = join "", $str, pack 'U*', $i;
 	    }
 	}

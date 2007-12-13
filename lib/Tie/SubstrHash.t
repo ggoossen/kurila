@@ -66,13 +66,13 @@ my $hashsize = 119;                # arbitrary values from my data
 my %test;
 tie %test, "Tie::SubstrHash", 13, 86, $hashsize;
 
-for (my $i = 1; $i <= $hashsize; $i++) {
+for (my $i = 1; $i +<= $hashsize; $i++) {
         my $key1 = $i + 100_000;           # fix to uniform 6-digit numbers
         my $key2 = "abcdefg$key1";
         $test{$key2} = ("abcdefgh" x 10) . "$key1";
 }
 
-for (my $i = 1; $i <= $hashsize; $i++) {
+for (my $i = 1; $i +<= $hashsize; $i++) {
         my $key1 = $i + 100_000;
         my $key2 = "abcdefg$key1";
 	unless ($test{$key2}) {

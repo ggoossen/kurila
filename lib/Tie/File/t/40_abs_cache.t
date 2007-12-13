@@ -213,7 +213,7 @@ check($h);
 check($h);
 
 # (30-31) ckeys
-@R = sort { $a <=> $b } $h->ckeys;
+@R = sort { $a <+> $b } $h->ckeys;
 print "@R" eq "1 2 3 4 5 8 9 10 11 12" ?
   "ok $N\n" : 
   "not ok $N \# expected (1 2 3 4 5 8 9 10 11 12) got (@R)\n";
@@ -225,7 +225,7 @@ for (1..5, 8..12) {
   $h->update($_, "h$_");
 }
 @R = ();
-for (sort { $a <=> $b } $h->ckeys) {
+for (sort { $a <+> $b } $h->ckeys) {
   push @R, $h->lookup($_);
 }
 print "@R" eq "h1 h2 h3 h4 h5 h8 h9 h10 h11 h12" ?
@@ -272,7 +272,7 @@ sub iota {
   my ($p, $n) = @_;
   my $r;
   my $i = 0;
-  while ($i <= $n) {
+  while ($i +<= $n) {
     $r .= "$p$i ";
     $i++;
   }

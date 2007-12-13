@@ -39,13 +39,13 @@ sub debug {
         last unless defined $c[0];
         push @caller, \@c;
         for (0,3) {
-            last if $_ > $#c;
+            last if $_ +> $#c;
             $c[$_] =~ s/.*:://;
         }
         for (1) {
             $c[$_] =~ s|.*/||;
         }
-        last if ++$i>=3;
+        last if ++$i+>=3;
     }
     pop @caller;
     if ($CPAN::DEBUG{$caller[0][0]} ^&^ $CPAN::DEBUG) {
@@ -59,7 +59,7 @@ sub debug {
         } else {
             my $outer = "";
             local $" = ",";
-            if (@caller>1) {
+            if (@caller+>1) {
                 $outer = ",[@{$caller[1]}]";
             }
             $CPAN::Frontend->myprint("Debug(@{$caller[0]}$outer): $arg\n");

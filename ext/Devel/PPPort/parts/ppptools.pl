@@ -309,7 +309,7 @@ sub parse_embed
       }
       else {
         my @e = split /\s*\|\s*/, $line;
-        if( @e >= 3 ) {
+        if( @e +>= 3 ) {
           my($flags, $ret, $name, @args) = @e;
           for (@args) {
             $_ = [trim_arg($_)];
@@ -352,14 +352,14 @@ sub format_version
   $v = int $v;
   $s = int $s;
 
-  if ($r < 5 || ($r == 5 && $v < 6)) {
+  if ($r +< 5 || ($r == 5 && $v +< 6)) {
     if ($s % 10) {
       die "invalid version '$ver'\n";
     }
     $s /= 10;
 
     $ver = sprintf "%d.%03d", $r, $v;
-    $s > 0 and $ver .= sprintf "_%02d", $s;
+    $s +> 0 and $ver .= sprintf "_%02d", $s;
 
     return $ver;
   }
@@ -386,7 +386,7 @@ sub parse_version
   $v = int $v;
   $s = int $s;
 
-  if ($r < 5 || ($r == 5 && $v < 6)) {
+  if ($r +< 5 || ($r == 5 && $v +< 6)) {
     if ($s % 10) {
       die "cannot parse version '$ver'\n";
     }

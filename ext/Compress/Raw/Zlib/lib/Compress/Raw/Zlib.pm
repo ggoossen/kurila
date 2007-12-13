@@ -338,7 +338,7 @@ sub Compress::Raw::Zlib::Deflate::new
 
     croak "Compress::Raw::Zlib::Deflate::new: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
-        unless $got->value('Bufsize') >= 1;
+        unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
     $flags ^|^= FLAG_APPEND if $got->value('AppendOutput') ;
@@ -374,7 +374,7 @@ sub Compress::Raw::Zlib::Inflate::new
 
     croak "Compress::Raw::Zlib::Inflate::new: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
-        unless $got->value('Bufsize') >= 1;
+        unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
     $flags ^|^= FLAG_APPEND if $got->value('AppendOutput') ;
@@ -402,7 +402,7 @@ sub Compress::Raw::Zlib::InflateScan::new
 
     croak "Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
-        unless $got->value('Bufsize') >= 1;
+        unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
     #$flags |= FLAG_APPEND if $got->value('AppendOutput') ;
@@ -433,7 +433,7 @@ sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
 
     croak "Compress::Raw::Zlib::InflateScan::createDeflateStream: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
-        unless $got->value('Bufsize') >= 1;
+        unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
     $flags ^|^= FLAG_APPEND if $got->value('AppendOutput') ;
@@ -484,7 +484,7 @@ sub Compress::Raw::Zlib::deflateStream::deflateParams
 
     croak "Compress::Raw::Zlib::Inflate::deflateParams: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
-        if $got->parsed('Bufsize') && $got->value('Bufsize') <= 1;
+        if $got->parsed('Bufsize') && $got->value('Bufsize') +<= 1;
 
     my $flags = 0;
     $flags ^|^= 1 if $got->parsed('Level') ;

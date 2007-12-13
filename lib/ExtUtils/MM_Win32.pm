@@ -343,7 +343,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
       .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)});
 
       # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
-      if ($Config{ivsize} == 4 && $Config{cc} eq 'cl' and $Config{ccversion} =~ /^(\d+)/ and $1 >= 14) 
+      if ($Config{ivsize} == 4 && $Config{cc} eq 'cl' and $Config{ccversion} =~ /^(\d+)/ and $1 +>= 14) 
     {
         push(@m,
           q{

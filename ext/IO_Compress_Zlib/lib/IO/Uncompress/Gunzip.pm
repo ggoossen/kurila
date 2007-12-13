@@ -116,7 +116,7 @@ sub chkTrailer
 sub isGzipMagic
 {
     my $buffer = shift ;
-    return 0 if length $buffer < GZIP_ID_SIZE ;
+    return 0 if length $buffer +< GZIP_ID_SIZE ;
     my ($id1, $id2) = unpack("C C", $buffer) ;
     return $id1 == GZIP_ID1 && $id2 == GZIP_ID2 ;
 }

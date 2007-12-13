@@ -393,7 +393,7 @@ sub print {
 }
 
 sub printf {
-    @_ >= 2 or croak 'usage: $io->printf(FMT,[ARGS])';
+    @_ +>= 2 or croak 'usage: $io->printf(FMT,[ARGS])';
     my $this = shift;
     printf $this @_;
 }
@@ -430,14 +430,14 @@ sub sysread {
 }
 
 sub write {
-    @_ >= 2 && @_ <= 4 or croak 'usage: $io->write(BUF [, LEN [, OFFSET]])';
+    @_ +>= 2 && @_ +<= 4 or croak 'usage: $io->write(BUF [, LEN [, OFFSET]])';
     local($\) = "";
     $_[2] = length($_[1]) unless defined $_[2];
     print { $_[0] } substr($_[1], $_[3] || 0, $_[2]);
 }
 
 sub syswrite {
-    @_ >= 2 && @_ <= 4 or croak 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
+    @_ +>= 2 && @_ +<= 4 or croak 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
     if (defined($_[2])) {
 	syswrite($_[0], $_[1], $_[2], $_[3] || 0);
     } else {
@@ -457,7 +457,7 @@ sub stat {
 sub autoflush {
     my $old = SelectSaver->new( qualify($_[0], caller));
     my $prev = $|;
-    $| = @_ > 1 ? $_[1] : 1;
+    $| = @_ +> 1 ? $_[1] : 1;
     $prev;
 }
 
@@ -465,7 +465,7 @@ sub output_field_separator {
     carp "output_field_separator is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $,;
-    $, = $_[1] if @_ > 1;
+    $, = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -473,7 +473,7 @@ sub output_record_separator {
     carp "output_record_separator is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $\;
-    $\ = $_[1] if @_ > 1;
+    $\ = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -481,7 +481,7 @@ sub input_record_separator {
     carp "input_record_separator is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $/;
-    $/ = $_[1] if @_ > 1;
+    $/ = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -489,7 +489,7 @@ sub input_line_number {
     local $.;
     () = tell qualify($_[0], caller) if ref($_[0]);
     my $prev = $.;
-    $. = $_[1] if @_ > 1;
+    $. = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -497,7 +497,7 @@ sub format_page_number {
     my $old;
     $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $%;
-    $% = $_[1] if @_ > 1;
+    $% = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -505,7 +505,7 @@ sub format_lines_per_page {
     my $old;
     $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $=;
-    $= = $_[1] if @_ > 1;
+    $= = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -513,7 +513,7 @@ sub format_lines_left {
     my $old;
     $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $-;
-    $- = $_[1] if @_ > 1;
+    $- = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -521,7 +521,7 @@ sub format_name {
     my $old;
     $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $~;
-    $~ = qualify($_[1], caller) if @_ > 1;
+    $~ = qualify($_[1], caller) if @_ +> 1;
     $prev;
 }
 
@@ -529,7 +529,7 @@ sub format_top_name {
     my $old;
     $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
     my $prev = $^;
-    $^ = qualify($_[1], caller) if @_ > 1;
+    $^ = qualify($_[1], caller) if @_ +> 1;
     $prev;
 }
 
@@ -537,7 +537,7 @@ sub format_line_break_characters {
     carp "format_line_break_characters is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $:;
-    $: = $_[1] if @_ > 1;
+    $: = $_[1] if @_ +> 1;
     $prev;
 }
 
@@ -545,7 +545,7 @@ sub format_formfeed {
     carp "format_formfeed is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $^L;
-    $^L = $_[1] if @_ > 1;
+    $^L = $_[1] if @_ +> 1;
     $prev;
 }
 

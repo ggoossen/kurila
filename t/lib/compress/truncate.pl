@@ -103,7 +103,7 @@ EOM
 
             my $un ;
             my $status = 1 ;
-            $status = $gz->read($un) while $status > 0 ;
+            $status = $gz->read($un) while $status +> 0 ;
             cmp_ok $status, "<", 0 ;
             ok $gz->error() ;
             ok $gz->eof() ;
@@ -130,7 +130,7 @@ EOM
                                                  -Transparent => $trans);
                 my $un = '';
                 my $status = 1 ;
-                $status = $gz->read($un) while $status > 0 ;
+                $status = $gz->read($un) while $status +> 0 ;
 
                 if ($lax)
                 {

@@ -28,16 +28,16 @@ ok ((257 << 7) == 32896);
 ok ((33023 >> 7) == 257);
 
 # signed vs. unsigned
-ok ((^~^0 > 0 && do { use integer; ^~^0 } == -1));
+ok ((^~^0 +> 0 && do { use integer; ^~^0 } == -1));
 
 my $bits = 0;
 for (my $i = ^~^0; $i; $i >>= 1) { ++$bits; }
 my $cusp = 1 << ($bits - 1);
 
 
-ok (($cusp ^&^ -1) > 0 && do { use integer; $cusp ^&^ -1 } < 0);
-ok (($cusp ^|^ 1) > 0 && do { use integer; $cusp ^|^ 1 } < 0);
-ok (($cusp ^^^ 1) > 0 && do { use integer; $cusp ^^^ 1 } < 0);
+ok (($cusp ^&^ -1) +> 0 && do { use integer; $cusp ^&^ -1 } +< 0);
+ok (($cusp ^|^ 1) +> 0 && do { use integer; $cusp ^|^ 1 } +< 0);
+ok (($cusp ^^^ 1) +> 0 && do { use integer; $cusp ^^^ 1 } +< 0);
 ok ((1 << ($bits - 1)) == $cusp &&
     do { use integer; 1 << ($bits - 1) } == -$cusp);
 ok (($cusp >> 1) == ($cusp / 2) &&

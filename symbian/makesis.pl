@@ -150,11 +150,11 @@ for my $target (@target) {
 
     die "$0: Bad version for $target\n"
       unless defined $MAJOR
-      && ( $MAJOR eq 0 || $MAJOR > 0 )
+      && ( $MAJOR eq 0 || $MAJOR +> 0 )
       && defined $MINOR
-      && ( $MINOR eq 0 || $MINOR > 0 )
+      && ( $MINOR eq 0 || $MINOR +> 0 )
       && defined $PATCH
-      && ( $PATCH eq 0 || $PATCH > 0 );
+      && ( $PATCH eq 0 || $PATCH +> 0 );
 
      my $ProductId =
          defined $S60SDK ?
