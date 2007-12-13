@@ -36,7 +36,7 @@ print $fh $string;
 ok(seek( $fh, 0, 0));
 
 # Read from the file
-my $line = <$fh>;
+my $line = ~< $fh;
 
 # compare with previous string
 ok($string, $line);

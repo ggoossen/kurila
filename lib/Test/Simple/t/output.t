@@ -46,7 +46,7 @@ close *$out;
 
 undef $out;
 open(IN, $tmpfile) or die $!;
-chomp(my $line = <IN>);
+chomp(my $line = ~< *IN);
 close IN;
 
 ok($line eq 'hi!');
@@ -59,7 +59,7 @@ close *$out;
 undef $out;
 select $old;
 open(IN, $tmpfile) or die $!;
-my @lines = <IN>;
+my @lines = ~< *IN;
 close IN;
 
 ok($lines[1] =~ /Hello!/);

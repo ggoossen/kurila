@@ -314,7 +314,7 @@ sub getchar {
 
 sub gets {
     usage "gets()" if @_ != 0;
-    scalar <STDIN>;
+    scalar ~< *STDIN;
 }
 
 sub perror {

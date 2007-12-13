@@ -45,10 +45,10 @@ sub testread ($$$$$$$) {
   my ($fh, $str, $read_c, $how_r, $write_c, $how_w, $why) = @_;
   my $buf = '';
   if ($how_r eq 'readline_all') {
-    $buf .= $_ while <$fh>;
+    $buf .= $_ while ~< $fh;
   } elsif ($how_r eq 'readline') {
     $/ = \$read_c;
-    $buf .= $_ while <$fh>;
+    $buf .= $_ while ~< $fh;
   } elsif ($how_r eq 'read') {
     my($in, $c);
     $buf .= $in while $c = read($fh, $in, $read_c);

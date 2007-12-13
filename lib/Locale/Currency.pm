@@ -109,7 +109,7 @@ sub all_currency_names
     local $_;
 
 
-    while (<DATA>)
+    while ( ~< *DATA)
     {
         next unless /\S/;
         chop;

@@ -56,7 +56,7 @@ SKIP: {
         ok( -s $file,           "   File has size" );
     
         open my $fh, $file or skip "Could not open $file: $!", 2;
-        my $cont = do { local $/; <$fh> };
+        my $cont = do { local $/; ~< $fh };
         chomp $cont;
         
         is( $cont, $str,        "   File has same content" );

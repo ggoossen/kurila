@@ -1,6 +1,6 @@
 use Perl6::Form;
 
-my @text = <DATA>;
+my @text = ~< *DATA;
 
 my @title = ("Hamlet's Soliloquy","W. Shakespeare");
 

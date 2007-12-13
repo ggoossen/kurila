@@ -8,7 +8,7 @@ use vars qw($D $N);
 # use CPAN;
 # $CPAN::DEBUG = 16384;
 
-while (<DATA>) {
+while ( ~< *DATA) {
   last if /^__END__$/;
   chomp;
   s/\s*#.*//;

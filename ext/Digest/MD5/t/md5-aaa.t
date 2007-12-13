@@ -13,7 +13,7 @@ use Digest::MD5 qw(md5_hex);
 my $Is_EBCDIC = ord('A') == 193;
 
 my $testno = 0;
-while (<DATA>) {
+while ( ~< *DATA) {
     if (!$Is_EBCDIC) {
 	next if /^EBCDIC/;
     }

@@ -19,40 +19,40 @@ open TESTFILE, "<./foo";
 binmode TESTFILE;
 
 # Check the default $/
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "1\n") {print "ok 1\n";} else {print "not ok 1\n";}
 
 # explicitly set to \n
 $/ = "\n";
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "12\n") {print "ok 2\n";} else {print "not ok 2\n";}
 
 # Try a non line terminator
 $/ = 3;
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "123") {print "ok 3\n";} else {print "not ok 3\n";}
 
 # Eat the line terminator
 $/ = "\n";
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 
 # How about a larger terminator
 $/ = "34";
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "1234") {print "ok 4\n";} else {print "not ok 4\n";}
 
 # Eat the line terminator
 $/ = "\n";
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 
 # Does paragraph mode work?
 $/ = '';
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "1234\n12345\n\n") {print "ok 5\n";} else {print "not ok 5\n";}
 
 # Try slurping the rest of the file
 $/ = undef;
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "123456\n1234567\n") {print "ok 6\n";} else {print "not ok 6\n";}
 
 # try the record reading tests. New file so we don't have to worry about
@@ -68,29 +68,29 @@ binmode TESTFILE;
 
 # Test straight number
 $/ = \2;
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "12") {print "ok 7\n";} else {print "not ok 7\n";}
 
 # Test stringified number
 $/ = \"2";
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "34") {print "ok 8\n";} else {print "not ok 8\n";}
 
 # Integer variable
 $foo = 2;
 $/ = \$foo;
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "56") {print "ok 9\n";} else {print "not ok 9\n";}
 
 # String variable
 $foo = "2";
 $/ = \$foo;
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "78") {print "ok 10\n";} else {print "not ok 10\n";}
 
 # Naughty straight number - should get the rest of the file
 $/ = \0;
-$bar = <TESTFILE>;
+$bar = ~< *TESTFILE;
 if ($bar eq "90123456789012345678901234567890") {print "ok 11\n";} else {print "not ok 11\n";}
 
 close TESTFILE;
@@ -116,16 +116,16 @@ if ($^O eq 'VMS') {
 
   open TESTFILE, "<./foo.bar";
   $/ = \10;
-  $bar = <TESTFILE>;
+  $bar = ~< *TESTFILE;
   if ($bar eq "foo\n") {print "ok 12\n";} else {print "not ok 12\n";}
-  $bar = <TESTFILE>;
+  $bar = ~< *TESTFILE;
   if ($bar eq "foobar\n") {print "ok 13\n";} else {print "not ok 13\n";}
   # can we do a short read?
   $/ = \2;
-  $bar = <TESTFILE>;
+  $bar = ~< *TESTFILE;
   if ($bar eq "ba") {print "ok 14\n";} else {print "not ok 14\n";}
   # do we get the rest of the record?
-  $bar = <TESTFILE>;
+  $bar = ~< *TESTFILE;
   if ($bar eq "z\n") {print "ok 15\n";} else {print "not ok 15\n";}
 
   close TESTFILE;
@@ -141,7 +141,7 @@ $/ = "\n";
 # see if open/readline/close work on our and my variables
 {
     if (open our $T, "./foo") {
-        my $line = <$T>;
+        my $line = ~< $T;
 	print "# $line\n";
 	length($line) == 40 or print "not ";
         close $T or print "not ";
@@ -154,7 +154,7 @@ $/ = "\n";
 
 {
     if (open my $T, "./foo") {
-        my $line = <$T>;
+        my $line = ~< $T;
 	print "# $line\n";
 	length($line) == 40 or print "not ";
         close $T or print "not ";

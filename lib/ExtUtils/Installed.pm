@@ -191,7 +191,7 @@ sub _module_name {
 
     my $module = '';
     if (open PACKFH, $file) {
-        while (<PACKFH>) {
+        while ( ~< *PACKFH) {
             if (/package\s+(\S+)\s*;/) {
                 my $pack = $1;
                 # Make a sanity check, that lower case $module

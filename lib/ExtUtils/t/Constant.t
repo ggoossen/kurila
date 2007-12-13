@@ -216,7 +216,7 @@ sub build_and_run {
 
   if (open OUTPUT, "<$output") {
     local $/; # Slurp it - faster.
-    print <OUTPUT>;
+    print ~< *OUTPUT;
     close OUTPUT or print "# Close $output failed: $!\n";
   } else {
     # Harness will report missing test results at this point.

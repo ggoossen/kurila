@@ -1009,7 +1009,7 @@ sub OptreeCheck::processExamples {
     foreach my $file (@files) {
 	open (my $fh, $file) or die "cant open $file: $!\n";
 	$/ = "";
-	my @chunks = <$fh>;
+	my @chunks = ~< $fh;
 	print preamble (scalar @chunks);
 	foreach my $t (@chunks) {
 	    print "\n\n=for gentest\n\n# chunk: $t=cut\n\n";

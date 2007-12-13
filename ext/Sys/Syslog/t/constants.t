@@ -7,7 +7,7 @@ use Test::More;
 my $macrosall = $ENV{PERL_CORE} ? File::Spec->catfile(qw(.. ext Sys Syslog macros.all))
                                 : 'macros.all';
 open(MACROS, $macrosall) or plan skip_all => "can't read '$macrosall': $!";
-my @names = map {chomp;$_} <MACROS>;
+my @names = map {chomp;$_} ~< *MACROS;
 close(MACROS);
 plan tests => @names * 2 + 2;
 

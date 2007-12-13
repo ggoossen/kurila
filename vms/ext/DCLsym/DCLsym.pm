@@ -104,7 +104,7 @@ sub FIRSTKEY {
     # We should eventually replace this with a C routine which walks the
     # CLI symbol table directly.  If I ever get 'hold of an I&DS manual . . .
     open(P,'Show Symbol * |');
-    while (<P>) {
+    while ( ~< *P) {
       ($name,$eqs,$val) = /^\s+(\S+) (=+) (.+)/
         or carp "VMS::DCLsym: unparseable line $_";
       $name =~ s#\*##;

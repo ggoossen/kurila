@@ -39,7 +39,7 @@ ok($deparse);
 }
 
 $/ = "\n####\n";
-while (<DATA>) {
+while ( ~< *DATA) {
     chomp;
     s/#\s*(.*)$//mg;
     my ($num, $testname) = $1 =~ m/(\d+)\s*(.*)/;
@@ -94,7 +94,7 @@ $b = <<'EOF';
 BEGIN { $^I = ".bak"; }
 BEGIN { $^W = 1; }
 BEGIN { $/ = "\n"; $\ = "\n"; }
-LINE: while (defined($_ = <ARGV>)) {
+LINE: while (defined($_ = ~< *ARGV)) {
     chomp $_;
     our(@F) = split(' ', $_, 0);
     '???';
@@ -206,7 +206,7 @@ $x{warn()};
 ####
 # 13
 my $foo;
-$_ .= <ARGV> . <$foo>;
+$_ .= ~<(*ARGV) . ~<($foo);
 ####
 # 14
 use utf8;

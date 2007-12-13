@@ -29,7 +29,7 @@ sub fork_and_retrieve {
     if ($pid) {
 	# parent
 	close $w;
-	$_ = <$r>;
+	$_ = ~< $r;
 	chomp;
 	die "Garbled output '$_'"
 	    unless my ($first, $second) = /^(\d+),(\d+)\z/;

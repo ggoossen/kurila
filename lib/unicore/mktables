@@ -79,7 +79,7 @@ if ($FileList) {
     my @input;
     my @output;
     for my $list ( \@input, \@output ) {
-        while (<$fh>) {
+        while ( ~< $fh) {
             s/^ \s+ | \s+ $//xg;
             next if /^ \s* (?: \# .* )? $/x;
             last if /^ =+ $/x;
@@ -185,7 +185,7 @@ sub WriteIfChanged($\@)
     my $TextToWrite = join '', @$lines;
     if (open IN, $file) {
         local($/) = undef;
-        my $PreviousText = <IN>;
+        my $PreviousText = ~< *IN;
         close IN;
         if ($PreviousText eq $TextToWrite) {
             print "$file unchanged.\n" if $Verbose;
@@ -266,7 +266,7 @@ sub Build_Aliases()
 
     open PA, "< PropertyAliases.txt"
 	or confess "Can't open PropertyAliases.txt: $!";
-    while (<PA>) {
+    while ( ~< *PA) {
 	s/#.*//;
 	s/\s+$//;
 	next if /^$/;
@@ -286,7 +286,7 @@ sub Build_Aliases()
 
     open PVA, "< PropValueAliases.txt"
 	or confess "Can't open PropValueAliases.txt: $!";
-    while (<PVA>) {
+    while ( ~< *PVA) {
 	s/#.*//;
 	s/\s+$//;
 	next if /^$/;
@@ -928,7 +928,7 @@ sub UnicodeData_Txt()
                                Desc  => '(for internal casefolding use)',
                                Fuzzy => 0);
 
-    while (<IN>)
+    while ( ~< *IN)
     {
         next unless /^[0-9A-Fa-f]+;/;
         s/\s+$//;
@@ -1182,7 +1182,7 @@ sub LineBreak_Txt()
     my $Lbrk = Table->New();
     my %Lbrk;
 
-    while (<IN>)
+    while ( ~< *IN)
     {
         next unless /^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
 
@@ -1225,7 +1225,7 @@ sub ArabicShaping_txt()
 
     my %JoinType;
 
-    while (<IN>)
+    while ( ~< *IN)
     {
 	next unless /^[0-9A-Fa-f]+;/;
 	s/\s+$//;
@@ -1263,7 +1263,7 @@ sub EastAsianWidth_txt()
 
     my %EAW;
 
-    while (<IN>)
+    while ( ~< *IN)
     {
 	next unless /^[0-9A-Fa-f]+(\.\.[0-9A-Fa-f]+)?;/;
 	s/#.*//;
@@ -1300,7 +1300,7 @@ sub HangulSyllableType_txt()
 
     my %HST;
 
-    while (<IN>)
+    while ( ~< *IN)
     {
         next unless /^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
 	my ($first, $last, $pv) = (hex($1), hex($2||""), $3);
@@ -1330,7 +1330,7 @@ sub Jamo_txt()
     }
     my $Short = Table->New();
 
-    while (<IN>)
+    while ( ~< *IN)
     {
 	next unless /^([0-9A-Fa-f]+)\s*;\s*(\w*)/;
 	my ($code, $short) = (hex($1), $2);
@@ -1351,7 +1351,7 @@ sub Scripts_txt()
     if (not open(IN, "Scripts.txt")) {
         die "$0: Scripts.txt: $!\n";
     }
-    while (<IN>) {
+    while ( ~< *IN) {
         next unless /^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(.+?)\s*\#/;
 
         # Wait until all the scripts have been read since
@@ -1421,7 +1421,7 @@ sub Blocks_txt()
         die "$0: Blocks.txt: $!\n";
     }
 
-    while (<IN>)
+    while ( ~< *IN)
     {
         #next if not /Private Use$/;
 	next if not /^([0-9A-Fa-f]+)\.\.([0-9A-Fa-f]+)\s*;\s*(.+?)\s*$/;
@@ -1460,7 +1460,7 @@ sub PropList_txt()
         die "$0: PropList.txt: $!\n";
     }
 
-    while (<IN>)
+    while ( ~< *IN)
     {
 	next unless /^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(.+?)\s*\#/;
 
@@ -1666,7 +1666,7 @@ sub MakePropTestScript()
     if (not open OUT, ">TestProp.pl") {
         die "$0: TestProp.pl: $!\n";
     }
-    print OUT <DATA>;
+    print OUT ~< *DATA;
 
     while (my ($Name, $Table) = each %ExactNameToTest)
     {
@@ -1982,7 +1982,7 @@ sub SpecialCasing_txt()
     if (not open IN, "SpecialCasing.txt") {
         die "$0: SpecialCasing.txt: $!\n";
     }
-    while (<IN>) {
+    while ( ~< *IN) {
         next unless /^[0-9A-Fa-f]+;/;
         s/\#.*//;
         s/\s+$//;
@@ -2055,7 +2055,7 @@ sub CaseFolding_txt()
     my $Fold = Table->New();
     my %Fold;
 
-    while (<IN>) {
+    while ( ~< *IN) {
 	# Skip status 'S', simple case folding
 	next unless /^([0-9A-Fa-f]+)\s*;\s*([CFI])\s*;\s*([0-9A-Fa-f]+(?: [0-9A-Fa-f]+)*)\s*;/;
 

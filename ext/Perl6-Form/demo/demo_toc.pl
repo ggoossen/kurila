@@ -1,6 +1,6 @@
 use Perl6::Form;
 
-for (<DATA>) {
+for ( ~< *DATA) {
 	($title, $page) = split /[\t\n]+/;
 	push @contents, $title;
 	push @page, $page;

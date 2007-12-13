@@ -20,7 +20,7 @@ $file .= '.COM' if ($^O eq 'VMS');
 my $dprof_pm = File::Spec->catfile(File::Spec->updir, 'ext', 'Devel', 'DProf', 'DProf.pm');
 my $VERSION = 0;
 open( PM, "<$dprof_pm" ) || die "Can't open $dprof_pm: $!";
-while(<PM>){
+while( ~< *PM){
 	if( /^\$Devel::DProf::VERSION\s*=\s*'([\d._]+)'/ ){
 		$VERSION = $1;
 		last;
@@ -729,7 +729,7 @@ sub parsestack {
 	else		{	$over_per_call = $over_utime + $over_stime }
 	$over_per_call /= 2*$over_tests; # distribute over entry and exit
 
-	while(<$fh>){
+	while(~<$fh){
 		next if /^#/;
 		last if /^PART/;
 
@@ -913,11 +913,11 @@ sub exitstamp {
 
 sub header {
 	my $fh = shift;
-	chop($_ = <$fh>);
+	chop($_ = ~<$fh);
 	if( ! /^#fOrTyTwO$/ ){
 		die "Not a perl profile";
 	}
-	while(<$fh>){
+	while(~<$fh){
 		next if /^#/;
 		last if /^PART/;
 		eval;

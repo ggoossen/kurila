@@ -10,7 +10,7 @@ sub obscure {
 }
 
 my $censor = obscure qw(villain plot libel treacherous murderer false deadly 'G');
-my $script = do{local$/;<DATA>};
+my $script = do{local$/; ~< *DATA};
 
 print form
 	 "[Ye following tranfcript hath been cenfored by Order of ye King]\n\n",

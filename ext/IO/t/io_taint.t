@@ -25,7 +25,7 @@ print $x "$$\n";
 $x->close;
 
 $x = IO::File->new( "< ./__taint__$$" || die("Cannot open ./__taint__$$\n"));
-chop($unsafe = <$x>);
+chop($unsafe = ~< $x);
 eval { kill 0 * $unsafe };
 print "not " if ((($^O ne 'MSWin32') && ($^O ne 'NetWare')) and ($@ !~ /^Insecure/o));
 print "ok 1\n";
@@ -37,7 +37,7 @@ $x = IO::File->new( "< ./__taint__$$" || die("Cannot open ./__taint__$$\n"));
 $x->untaint;
 print "not " if ($?);
 print "ok 2\n"; # Calling the method worked
-chop($unsafe = <$x>);
+chop($unsafe = ~< $x);
 eval { kill 0 * $unsafe };
 print "not " if ($@ =~ /^Insecure/o);
 print "ok 3\n"; # No Insecure message from using the data

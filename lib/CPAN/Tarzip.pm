@@ -163,7 +163,7 @@ sub READLINE {
         return $line;
     } else {
         my $fh = $self->{FH};
-        return scalar <$fh>;
+        return scalar ~< $fh;
     }
 }
 

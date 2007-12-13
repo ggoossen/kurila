@@ -28,11 +28,11 @@ $tst = IO::File->new("$tell_file","r") || die("Can't open $tell_file");
 binmode $tst; # its a nop unless it matters. Was only if ($^O eq 'MSWin32' or $^O eq 'dos');
 if ($tst->eof) { print "not ok 1\n"; } else { print "ok 1\n"; }
 
-$firstline = <$tst>;
+$firstline = ~< $tst;
 $secondpos = tell;
 
 $x = 0;
-while (<$tst>) {
+while ( ~< $tst) {
     if (eof) {$x++;}
 }
 if ($x == 1) { print "ok 2\n"; } else { print "not ok 2\n"; }
@@ -45,7 +45,7 @@ if ($tst->seek(0,0)) { print "ok 4\n"; } else { print "not ok 4\n"; }
 
 if (eof) { print "not ok 5\n"; } else { print "ok 5\n"; }
 
-if ($firstline eq <$tst>) { print "ok 6\n"; } else { print "not ok 6\n"; }
+if ($firstline eq ~< $tst) { print "ok 6\n"; } else { print "not ok 6\n"; }
 
 if ($secondpos == tell) { print "ok 7\n"; } else { print "not ok 7\n"; }
 

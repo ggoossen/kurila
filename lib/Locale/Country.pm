@@ -268,7 +268,7 @@ sub _code2codeset
     local $_;
 
 
-    while (<DATA>)
+    while ( ~< *DATA)
     {
         next unless /\S/;
         chop;

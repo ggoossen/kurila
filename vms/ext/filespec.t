@@ -5,7 +5,7 @@ BEGIN { unshift(@INC,'../lib') if -d '../lib'; }
 use VMS::Filespec;
 use File::Spec;
 
-foreach (<DATA>) {
+foreach (~< *DATA) {
   chomp;
   s/\s*#.*//;
   next if /^\s*$/;

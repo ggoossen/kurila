@@ -27,7 +27,7 @@ sub parse_file {
     open(FH,$parsefile) or warn "Could not open '$parsefile': $!";
 
     my $inpod = 0;
-    while (<FH>) {
+    while ( ~< *FH) {
 	$inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
 	next if $inpod || /^\s*\#/;
 	chomp;

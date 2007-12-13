@@ -8,7 +8,7 @@ local $/ = '';
 $level = 0;
 
 $cur = '';
-while (<>) {
+while ( ~< *ARGV) {
 
     next unless /^=(?!cut)/ .. /^=cut/;
 

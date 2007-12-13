@@ -249,7 +249,7 @@ CONFIG: {
 	    for my $file ( (map { "$_/$WHOAMI.pm" } @INC), $0) {
 		warn "Checking $file\n" if $DEBUG;
 		if (open(POD_DIAG, $file)) {
-		    while (<POD_DIAG>) {
+		    while ( ~< *POD_DIAG) {
 			next unless
 			    /^__END__\s*# wish diag dbase were more accessible/;
 			print STDERR "podfile is $file\n" if $DEBUG;
@@ -324,7 +324,7 @@ my %msg;
     local $/ = '';
     my $header;
     my $for_item;
-    while (<POD_DIAG>) {
+    while ( ~< *POD_DIAG) {
 
 	unescape();
 	if ($PRETTY) {
@@ -368,7 +368,7 @@ my %msg;
 	else {
 	    $header = $1;
 	    while( $header =~ /[;,]\z/ ) {
-		<POD_DIAG> =~ /^\s*(.*?)\s*\z/;
+		~< *POD_DIAG =~ /^\s*(.*?)\s*\z/;
 		$header .= ' '.$1;
 	    }
 	}
@@ -432,7 +432,7 @@ my %msg;
 
 if ($standalone) {
     if (!@ARGV and -t *STDIN) { print STDERR "$0: Reading from STDIN\n" } 
-    while (defined (my $error = <>)) {
+    while (defined (my $error = ~< *ARGV)) {
 	splainthis($error) || print THITHER $error;
     } 
     exit;

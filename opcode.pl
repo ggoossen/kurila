@@ -19,7 +19,7 @@ select OC;
 my %seen;
 my (@ops, %desc, %check, %ckname, %flags, %args);
 
-while (<DATA>) {
+while ( ~< *DATA) {
     chop;
     next unless $_;
     next if /^#/;
@@ -330,17 +330,17 @@ my %OP_IS_FILETEST;
 for (@ops) {
     my $argsum = 0;
     my $flags = $flags{$_};
-    $argsum |= 1 if $flags =~ /m/;		# needs stack mark
-    $argsum |= 2 if $flags =~ /f/;		# fold constants
-    $argsum |= 4 if $flags =~ /s/;		# always produces scalar
-    $argsum |= 8 if $flags =~ /t/;		# needs target scalar
-    $argsum |= (8|256) if $flags =~ /T/;	# ... which may be lexical
-    $argsum |= 16 if $flags =~ /i/;		# always produces integer
-    $argsum |= 32 if $flags =~ /I/;		# has corresponding int op
-    $argsum |= 64 if $flags =~ /d/;		# danger, unknown side effects
-    $argsum |= 128 if $flags =~ /u/;		# defaults to $_
+    $argsum ^|^= 1 if $flags =~ /m/;		# needs stack mark
+    $argsum ^|^= 2 if $flags =~ /f/;		# fold constants
+    $argsum ^|^= 4 if $flags =~ /s/;		# always produces scalar
+    $argsum ^|^= 8 if $flags =~ /t/;		# needs target scalar
+    $argsum ^|^= (8^|^256) if $flags =~ /T/;	# ... which may be lexical
+    $argsum ^|^= 16 if $flags =~ /i/;		# always produces integer
+    $argsum ^|^= 32 if $flags =~ /I/;		# has corresponding int op
+    $argsum ^|^= 64 if $flags =~ /d/;		# danger, unknown side effects
+    $argsum ^|^= 128 if $flags =~ /u/;		# defaults to $_
     $flags =~ /([\W\d_])/ or die qq[Opcode "$_" has no class indicator];
-    $argsum |= $opclass{$1} << 9;
+    $argsum ^|^= $opclass{$1} << 9;
     my $mul = 0x2000;				# 2 ^ OASHIFT
     for my $arg (split(' ',$args{$_})) {
 	if ($arg =~ /^F/) {
@@ -351,7 +351,7 @@ for (@ops) {
         die "op = $_, arg = $arg\n" unless length($arg) == 1;
 	$argnum += $argnum{$arg};
 	warn "# Conflicting bit 32 for '$_'.\n"
-	    if $argnum & 8 and $mul == 0x10000000;
+	    if $argnum ^&^ 8 and $mul == 0x10000000;
 	$argsum += $argnum * $mul;
 	$mul <<= 4;
     }

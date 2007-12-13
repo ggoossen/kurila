@@ -1477,7 +1477,6 @@
 #define scan_const		S_scan_const
 #define scan_heredoc		S_scan_heredoc
 #define scan_ident		S_scan_ident
-#define scan_inputsymbol	S_scan_inputsymbol
 #define scan_pat		S_scan_pat
 #define scan_str		S_scan_str
 #define scan_subst		S_scan_subst
@@ -3731,7 +3730,6 @@
 #define scan_const(a)		S_scan_const(aTHX_ a)
 #define scan_heredoc(a)		S_scan_heredoc(aTHX_ a)
 #define scan_ident(a,b,c,d,e)	S_scan_ident(aTHX_ a,b,c,d,e)
-#define scan_inputsymbol(a)	S_scan_inputsymbol(aTHX_ a)
 #define scan_pat(a,b)		S_scan_pat(aTHX_ a,b)
 #define scan_str(a,b,c)		S_scan_str(aTHX_ a,b,c)
 #define scan_subst(a)		S_scan_subst(aTHX_ a)

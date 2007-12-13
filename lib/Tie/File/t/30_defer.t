@@ -223,7 +223,7 @@ untie @a;
 # (79) We can't use check_contents any more, because the object is dead
 open F, "< $file" or die;
 binmode F;
-{ local $/ ; $z = <F> }
+{ local $/ ; $z = ~< *F }
 close F;
 my $x = join("$:", qw(flushed recordB recordC
                       recordZ record4 recordE record6 record7)) . "$:";
@@ -302,7 +302,7 @@ sub check_contents {
   seek FH, 0, SEEK_SET;
 
   my $a;
-  { local $/; $a = <FH> }
+  { local $/; $a = ~< *FH }
   $a = "" unless defined $a;
   if ($a eq $x) {
     print "ok $N\n";

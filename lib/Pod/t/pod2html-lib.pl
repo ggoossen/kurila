@@ -25,7 +25,7 @@ sub convert_n_test {
     {
 	local $/;
 	# expected
-	$expect = <DATA>;
+	$expect = ~< *DATA;
 	$expect =~ s/\[PERLADMIN\]/$Config::Config{perladmin}/;
 	if (ord("A") == 193) { # EBCDIC.
 	    $expect =~ s/item_mat_3c_21_3e/item_mat_4c_5a_6e/;
@@ -33,7 +33,7 @@ sub convert_n_test {
 
 	# result
 	open my $in, $outfile or die "cannot open $outfile: $!";
-	$result = <$in>;
+	$result = ~< $in;
 	close $in;
     }
 
@@ -47,7 +47,7 @@ sub convert_n_test {
 	    close $tmpfile;
 	    my $diffopt = $^O eq 'linux' ? 'u' : 'c';
 	    open my $diff, "diff -$diffopt $expectfile $outfile |" or die $!;
-	    print "# $_" while <$diff>;
+	    print "# $_" while ~< $diff;
 	    close $diff;
 	    unlink $expectfile;
 	}

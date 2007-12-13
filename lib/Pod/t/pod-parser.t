@@ -38,11 +38,11 @@ open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
 $parser->parse_from_file ({ -cutting => 0 }, 'tmp.pod', \*OUT);
 close OUT;
 open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
-while (<OUT>) { last if /^\.nh/ }
+while ( ~< *OUT) { last if /^\.nh/ }
 my $output;
 {
     local $/;
-    $output = <OUT>;
+    $output = ~< *OUT;
 }
 close OUT;
 if ($output eq "Some random \\fBtext\\fR.\n") {
@@ -60,7 +60,7 @@ close OUT;
 open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
 {
     local $/;
-    $output = <OUT>;
+    $output = ~< *OUT;
 }
 close OUT;
 if ($output eq "    Some random text.\n\n") {

@@ -258,7 +258,7 @@ sub _new_from_file {
 
             ### binmode needed to read files properly on win32 ###
             binmode $fh;
-            $data = do { local $/; <$fh> };
+            $data = do { local $/; ~< $fh };
             close $fh;
         }
     }

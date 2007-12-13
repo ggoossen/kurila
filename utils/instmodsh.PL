@@ -36,7 +36,7 @@ use File::Spec;
 my $instmodsh = File::Spec->catfile(File::Spec->catdir(File::Spec->updir, "lib", "ExtUtils"), "instmodsh");
 
 if (open(INSTMODSH, $instmodsh)) {
-    print OUT <INSTMODSH>;
+    print OUT ~< *INSTMODSH;
     close INSTMODSH;
 } else {
     die "$0: cannot find '$instmodsh'\n";

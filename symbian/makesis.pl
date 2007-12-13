@@ -74,7 +74,7 @@ for my $target (@target) {
 
         open( my $cfg, "symbian/install.cfg" )
           or die "$!: symbian/install.cfg: $!\n";
-        while (<$cfg>) {
+        while ( ~< $cfg) {
             next unless /^lib\s+(.+)/;
             chomp;
             my $f = $1;
@@ -99,7 +99,7 @@ for my $target (@target) {
             $ext =~ s!-!::!g;
             print "\t$ext\n";
             if ( open( my $pkg, $lst ) ) {
-                while (<$pkg>) {
+                while ( ~< $pkg) {
                     if (m!^"(.+)"-"(.+)"$!) {
                         my ( $src, $dst ) = ( $1, $2 );
                         $copy{$src} = $dst;

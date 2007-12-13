@@ -172,7 +172,7 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
         require kurila;
       my $match = qr/use kurila v$kurila::VERSION;/;
       my $found;
-      while (<FILE>) {
+      while ( ~< *FILE) {
         last if $found = /$match/;
       }
       ok ($found, "looking for /$match/ in $file");

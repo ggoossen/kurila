@@ -11,7 +11,7 @@ binmode STDOUT;	# gzopen only sets it on the fd
 my $gz = gzopen('-', "wb")
 	  or die "Cannot open stdout: $gzerrno\n" ;
 
-while (<>) {
+while ( ~< *ARGV) {
     $gz->gzwrite($_) 
 	or die "error writing: $gzerrno\n" ;
 }

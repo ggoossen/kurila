@@ -233,7 +233,7 @@ sub check_contents {
   print $integrity ? "ok $N\n" : "not ok $N\n";
   $N++;
   my $a;
-  { local $/; $a = <FH> }
+  { local $/; $a = ~< *FH }
   $a = "" unless defined $a;
   if ($a eq $x) {
     print "ok $N\n";

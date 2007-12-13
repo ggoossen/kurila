@@ -74,7 +74,7 @@ sub _read_config_file {
                         return {}
                     );
 
-    while(<$FH>) {
+    while( ~< $FH) {
         next if     /\s*#/;
         next unless /\S/;
 

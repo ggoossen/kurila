@@ -411,7 +411,7 @@ sub parse_file {
     splice @lines;
     for($i = MANY_LINES; $i--;) {  # read those many lines at a time
       local $/ = $NL;
-      push @lines, scalar(<$source>);  # readline
+      push @lines, scalar( ~< $source );  # readline
       last unless defined $lines[-1];
        # but pass thru the undef, which will set source_dead to true
     }

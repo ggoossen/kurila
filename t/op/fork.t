@@ -22,14 +22,14 @@ $|=1;
 our (@prgs, $tmpfile, $CAT, $status, $i);
 
 undef $/;
-@prgs = split "\n########\n", <DATA>;
+@prgs = split "\n########\n", ~< *DATA;
 print "1..", scalar @prgs, "\n";
 
 $tmpfile = "forktmp000";
 1 while -f ++$tmpfile;
 END { close TEST; unlink $tmpfile if $tmpfile; }
 
-$CAT = (($^O eq 'MSWin32') ? '.\perl -e "print <>"' : (($^O eq 'NetWare') ? 'perl -e "print <>"' : 'cat'));
+$CAT = (($^O eq 'MSWin32') ? '.\perl -e "print ~< *ARGV"' : (($^O eq 'NetWare') ? 'perl -e "print ~< *ARGV"' : 'cat'));
 
 for (@prgs){
     my $switch;
@@ -391,7 +391,7 @@ if (pipe_to_fork($parent, $child)) {
 }
 else {
     # child
-    while (<$child>) { print; }
+    while (~< $child) { print; }
     close $child;
     exit;
 }
@@ -408,7 +408,7 @@ sub pipe_from_fork ($$) {
 
 if (pipe_from_fork($parent, $child)) {
     # parent
-    while (<$parent>) { print; }
+    while (~< $parent) { print; }
     close $parent;
 }
 else {
@@ -457,7 +457,7 @@ if ($pid == 0) {
 } else {
     my $rand_parent = rand;
     close WTR;
-    chomp(my $rand_child  = <RDR>);
+    chomp(my $rand_child  = ~< *RDR);
     close RDR;
     print $rand_child ne $rand_parent, "\n";
 }

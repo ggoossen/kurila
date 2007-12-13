@@ -141,7 +141,7 @@ foreach my $f (@testfiles) {
   open(IN, "<$xml") or die "Can't read-open $xml: $!";
   #binmode(IN);
   local $/;
-  my $xmlsource = <IN>;
+  my $xmlsource = ~< *IN;
   close(IN);
   
   print "# There's errata!\n" if $outstring =~ m/start_line="-321"/;

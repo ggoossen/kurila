@@ -321,9 +321,9 @@ if (defined $fh) {
   # open from perl, and check contents
   open($fh, "< $testfile");
   ok($fh);
-  my $line = <$fh>;
+  my $line = ~< $fh;
   ok($line,$lines[0]);
-  $line = <$fh>;
+  $line = ~< $fh;
   ok($line,$lines[1]);
 
   ok(close($fh));

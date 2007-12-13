@@ -90,7 +90,7 @@ my $ppd_out = run("$make ppd");
 is( $?, 0,                      '  exited normally' ) || diag $ppd_out;
 ok( open(PPD, 'Big-Dummy.ppd'), '  .ppd file generated' );
 my $ppd_html;
-{ local $/; $ppd_html = <PPD> }
+{ local $/; $ppd_html = ~< *PPD }
 close PPD;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0,01,0,0">}m, 
                                                            '  <SOFTPKG>' );
@@ -196,7 +196,7 @@ SKIP: {
     ok( open(PERLLOCAL, $files{'perllocal.pod'} ) ) || 
         diag("Can't open $files{'perllocal.pod'}: $!");
     { local $/;
-      unlike(<PERLLOCAL>, qr/other/, 'DESTDIR should not appear in perllocal');
+      unlike( ~< *PERLLOCAL, qr/other/, 'DESTDIR should not appear in perllocal');
     }
     close PERLLOCAL;
 
@@ -250,7 +250,7 @@ ok( -f $meta_yml,    'META.yml written to dist dir' );
 ok( !-e "META_new.yml", 'temp META.yml file not left around' );
 
 ok open META, $meta_yml or diag $!;
-my @meta = <META>;
+my @meta = ~< *META;
 like $meta[-1], '/\n$/', "META.yml ends with a newline";
 ok close META;
 

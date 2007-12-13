@@ -1484,7 +1484,6 @@ sR	|char*	|scan_const	|NN char *start
 sR	|char*	|scan_heredoc	|NN char *s
 s	|char*	|scan_ident	|NN char *s|NN const char *send|NN char *dest \
 				|STRLEN destlen|I32 ck_uni
-sR	|char*	|scan_inputsymbol|NN char *start
 sR	|char*	|scan_pat	|NN char *start|I32 type
 sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims
 sR	|char*	|scan_subst	|NN char *start

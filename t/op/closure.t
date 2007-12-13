@@ -452,8 +452,8 @@ END
 	      print PERL $code;
 	      close PERL;
 	      { local $/;
-	        $output = join '', <READ>;
-	        $errors = join '', <READ2>; }
+	        $output = join '', ~< *READ;
+	        $errors = join '', ~< *READ2; }
 	      close READ;
 	      close READ2;
 	    }
@@ -470,20 +470,20 @@ END
 	      # this process, and then foul our pipe back to parent by
 	      # redirecting output in the child.
 	      open PERL,"$cmd |" or die "Can't open pipe: $!\n";
-	      { local $/; $output = join '', <PERL> }
+	      { local $/; $output = join '', ~< *PERL }
 	      close PERL;
 	    } else {
 	      my $outfile = "tout$$";  $outfile++ while -e $outfile;
 	      push @tmpfiles, $outfile;
 	      system "$cmd >$outfile";
-	      { local $/; open IN, $outfile; $output = <IN>; close IN }
+	      { local $/; open IN, $outfile; $output = ~< *IN; close IN }
 	    }
 	    if ($?) {
 	      printf "not ok: exited with error code %04X\n", $?;
 	      $debugging or do { 1 while unlink @tmpfiles };
 	      exit;
 	    }
-	    { local $/; open IN, $errfile; $errors = <IN>; close IN }
+	    { local $/; open IN, $errfile; $errors = ~< *IN; close IN }
 	    1 while unlink @tmpfiles;
 	  }
 	  print $output;

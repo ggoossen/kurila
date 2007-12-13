@@ -76,7 +76,7 @@ Concatenates all files mentioned on command line to STDOUT.
 sub cat ()
 {
  expand_wildcards();
- print while (<>);
+ print while ( ~< *ARGV);
 }
 
 =item eqtime
@@ -309,7 +309,7 @@ sub dos2unix {
 	open ORIG, $_ or do { warn "dos2unix can't open $_: $!"; return };
 	open TEMP, ">$temp" or 
 	    do { warn "dos2unix can't create .dos2unix_tmp: $!"; return };
-        while (my $line = <ORIG>) { 
+        while (my $line = ~< *ORIG) { 
             $line =~ s/\015\012/\012/g;
             print TEMP $line;
         }

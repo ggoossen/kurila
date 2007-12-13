@@ -55,7 +55,7 @@ $/ = "\x0a"; # may fix VMS problem for test #28 and #29
 for my $src (sort keys %e) {
     my $ufile = File::Spec->catfile($dir,"$src.utf");
     open my $fh, "<:utf8", $ufile or die "$ufile : $!";
-    my @uline = <$fh>;
+    my @uline = ~< $fh;
     my $utext = join('' => @uline);
     close $fh;
 
@@ -99,7 +99,7 @@ for my $src (sort keys %e) {
         my $dtext;
         open $fh, "<:encoding($e)", $pfile or die "$pfile : $!";
         $fh->autoflush(0);
-        $dtext = join('' => <$fh>);
+        $dtext = join('' => ~< $fh);
         close $fh;
         $seq++;
         ok($utext eq $dtext, "<:encoding($e)");
@@ -110,7 +110,7 @@ for my $src (sort keys %e) {
         if (perlio_ok($e) or $DEBUG){
         $dtext = '';
         open $fh, "<:encoding($e)", $pfile or die "$pfile : $!";
-        while(defined(my $l = <$fh>)) {
+        while(defined(my $l = ~< $fh)) {
             $dtext .= $l;
         }
         close $fh;
@@ -138,7 +138,7 @@ SKIP:{
 
     my $file = File::Spec->catfile($dir,"jisx0208.utf");
     open my $fh, "<:utf8", $file or die "$file : $!";
-    my $str = join('' => <$fh>);
+    my $str = join('' => ~< $fh);
     close $fh;
     my %bom = (
            'UTF-16BE' => pack('n', 0xFeFF),
@@ -154,7 +154,7 @@ SKIP:{
     my $utf_nobom = $utf; $utf_nobom =~ s/(LE|BE)$//o;
     # reading
     open $fh, "<:encoding($utf_nobom)", $sfile or die "$sfile : $!";
-    my $cmp = join '' => <$fh>;
+    my $cmp = join '' => ~< $fh;
     close $fh;
     is($str, $cmp, "<:encoding($utf_nobom) eq $utf");
     unlink $sfile;  $seq++;

@@ -123,7 +123,7 @@ sub get_token {
       for(my $i = Pod::Simple::MANY_LINES; $i--;) {
         DEBUG > 3 and print " Fetching a line from source filehandle $fh...\n";
         local $/ = $Pod::Simple::NL;
-        push @lines, scalar(<$fh>); # readline
+        push @lines, scalar( ~< $fh); # readline
         DEBUG > 3 and print "  Line is: ",
           defined($lines[-1]) ? $lines[-1] : "<undef>\n";
         unless( defined $lines[-1] ) {

@@ -41,7 +41,7 @@ by hand by running 'make install' under the directory
 EOM
 
     print "Do you want to continue? [Y/N]: " ;
-    my $answer = <STDIN> ;
+    my $answer = ~< STDIN ;
 
     if ($answer =~ /^yes|y/i)
     {
@@ -144,12 +144,12 @@ if (eval {require ExtUtils::Constant; 1}) {
     # Check the constants above all appear in @EXPORT in Zlib.pm
     my %names = map { $_, 1} @names, 'ZLIB_VERSION';
     open F, "<lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
-    while (<F>)
+    while (~< *F)
     {
         last if /^\s*\@EXPORT\s+=\s+qw\(/ ;
     }
 
-    while (<F>)
+    while (~< *F)
     {
         last if /^\s*\)/ ;
         /(\S+)/ ;
@@ -196,7 +196,7 @@ sub ParseCONFIG
     print "Parsing $CONFIG...\n" ;
 
     open(F, "<$CONFIG") or die "Cannot open file $CONFIG: $!\n" ;
-    while (<F>) {
+    while (~< *F) {
 	s/^\s*|\s*$//g ;
 	next if /^\s*$/ or /^\s*#/ ;
 	s/\s*#\s*$// ;

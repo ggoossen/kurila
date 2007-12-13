@@ -84,7 +84,7 @@ sub process {
     my $start= $Config{startperl};
     $start= "#!perl"   unless  $start =~ /^#!.*perl/;
     open( FILE, $file ) or die "$0: Can't open $file: $!";
-    @file = <FILE>;
+    @file = ~< *FILE;
     foreach $line ( @file ) {
 	$linenum++;
 	if ( $line =~ /^:endofperl\b/ ) {

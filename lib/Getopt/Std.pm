@@ -204,7 +204,7 @@ EOH
 	my $has_pod;
 	if ( defined $0 and $0 ne '-e' and -f $0 and -r $0
 	     and open my $script, '<', $0 ) {
-	    while (<$script>) {
+	    while ( ~< $script) {
 		$has_pod = 1, last if /^=(pod|head1)/;
 	    }
 	}

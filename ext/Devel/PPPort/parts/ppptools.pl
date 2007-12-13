@@ -46,9 +46,9 @@ sub parse_todo
 
   for $todo (all_files_in_dir($dir)) {
     open TODO, $todo or die "cannot open $todo: $!\n";
-    my $perl = <TODO>;
+    my $perl = ~< *TODO;
     chomp $perl;
-    while (<TODO>) {
+    while ( ~< *TODO) {
       chomp;
       s/#.*//;
       s/^\s+//; s/\s+$//;
@@ -82,7 +82,7 @@ sub parse_partspec
   local *F;
 
   open F, $file or die "$file: $!\n";
-  while (<F>) {
+  while ( ~< *F) {
     /[ \t]+$/ and warn "$file:$.: warning: trailing whitespace\n";
     if ($section eq 'implementation') {
       m!//! && !m!(?:=~|s/).*//! && !m!(?:ht|f)tp://!
@@ -285,8 +285,8 @@ sub parse_embed
     open FILE, $file or die "$file: $!\n";
     my($line, $l);
 
-    while (defined($line = <FILE>)) {
-      while ($line =~ /\\$/ && defined($l = <FILE>)) {
+    while (defined($line = ~< *FILE)) {
+      while ($line =~ /\\$/ && defined($l = ~< *FILE)) {
         $line =~ s/\\\s*//;
         $line .= $l;
       }

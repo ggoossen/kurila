@@ -63,7 +63,7 @@ foreach my $tuple (['op.h'],['cop.h'],['regexp.h','RXf_'])
   my $pfx = $tuple->[1] || '';
   my $path = File::Spec->catfile($headerpath, $file);
   open(OPH,"$path") || die "Cannot open $path:$!";
-  while (<OPH>)
+  while ( ~< *OPH)
    {  
     doconst($1) if (/#define\s+($pfx\w+)\s+([\(\)\|\dx]+)\s*(?:$|\/\*)/);
    }  

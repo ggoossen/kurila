@@ -33,10 +33,10 @@ print "ok 1\n";
 my $man = Pod::Man->new or die "Cannot create parser\n";
 my $text = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
-while (<DATA>) {
+while ( ~< *DATA) {
     next until $_ eq "###\n";
     open (TMP, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         print TMP $_;
     }
@@ -47,15 +47,15 @@ while (<DATA>) {
     close IN;
     close OUT;
     open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
-    while (<OUT>) { last if /^\.nh/ }
+    while ( ~< *OUT) { last if /^\.nh/ }
     my $output;
     {
         local $/;
-        $output = <OUT>;
+        $output = ~< *OUT;
     }
     close OUT;
     my $expected = '';
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }
@@ -74,12 +74,12 @@ while (<DATA>) {
     open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
     {
         local $/;
-        $output = <OUT>;
+        $output = ~< *OUT;
     }
     close OUT;
     unlink ('tmp.pod', 'out.tmp');
     $expected = '';
-    while (<DATA>) {
+    while ( ~< *DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }

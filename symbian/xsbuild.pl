@@ -190,7 +190,7 @@ sub read_mmp {
     my ( $conf, $mmp ) = @_;
     if ( -r $mmp && open( MMP, "<$mmp" ) ) {
         print "\tReading $mmp...\n";
-        while (<MMP>) {
+        while ( ~< *MMP) {
             chomp;
             $conf->{TARGET}     = $1 if /^TARGET\s+(.+)$/;
             $conf->{TARGETPATH} = $1 if /^TARGETPATH\s+(.+)$/;
@@ -591,7 +591,7 @@ sub xsconfig {
         if ( -f "Makefile" ) {
             print "\tReading MakeMaker Makefile...\n";
             if ( open( MAKEFILE, "Makefile" ) ) {
-                while (<MAKEFILE>) {
+                while ( ~< *MAKEFILE) {
                     for my $m (@MM) {
                         if (m!^$m = (.+)!) {
                             $MM{$m} = $1;
@@ -662,7 +662,7 @@ __EOF__
                 if ( open( SUBMF, $submf ) ) {
                     if ( update_dir($d) ) {
                         my @subsrc;
-                        while (<SUBMF>) {
+                        while ( ~< *SUBMF) {
                             next if 1 .. /postamble/;
                             if (m!^(\w+_t)\.c : !) {
                                 system_echo(
@@ -785,7 +785,7 @@ for my $ext (@ARGV) {
           or die "$0: symbian/install.cfg: $!\n";
         my $extdir = $dir;
         $extdir =~ s:^ext\\::;
-        while (<$cfg>) {
+        while ( ~< $cfg) {
             next unless /^ext\s+(.+)/;
             chomp;
             my $ext = $1;
@@ -890,7 +890,7 @@ __EOF__
 	unless (defined $basef) {
 	    die "$0: failed to find .def for $base\n";
 	}
-        while (<$def>) {
+        while ( ~< $def) {
             next while 1 .. /^EXPORTS/;
             if (/^\s*(\w+) \@ (\d+) /) {
                 $symbol{$1} = $2;

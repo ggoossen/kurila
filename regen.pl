@@ -7,6 +7,8 @@
 # wish to make a clean source tree but with current headers without running
 # anything else.
 
+use kurila;
+
 use strict;
 my $perl = $^X;
 
@@ -34,7 +36,7 @@ sub do_cksum {
 	local *FH;
 	if (open(FH, $f)) {
 	    local $/;
-	    $cksum{$f} = unpack("%32C*", <FH>);
+	    $cksum{$f} = unpack("%32C*", ~< *FH);
 	    close FH;
 	} else {
 	    warn "$0: $f: $!\n";

@@ -27,7 +27,7 @@ sub OPEN
 }
 
 sub READ     { read($_[0],$_[1],$_[2]) }
-sub READLINE { my $fh = $_[0]; <$fh> }
+sub READLINE { my $fh = $_[0]; ~< $fh }
 sub GETC     { getc($_[0]) }
 
 sub WRITE

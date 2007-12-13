@@ -349,7 +349,7 @@ sub _backticks {
     local *FH;
     my $pid = open *FH, "-|";
     if ($pid) {
-      return wantarray ? <FH> : join '', <FH>;
+      return wantarray ? ~< *FH : join '', ~< *FH;
     } else {
       die "Can't execute @cmd: $!\n" unless defined $pid;
       exec { $cmd[0] } @cmd;
@@ -477,7 +477,7 @@ sub _readline {
   my $self = shift;
   return undef if $self->_is_unattended;
 
-  my $answer = <STDIN>;
+  my $answer = ~< *STDIN;
   chomp $answer if defined $answer;
   return $answer;
 }
@@ -1009,7 +1009,7 @@ sub read_config {
   my $file = $self->config_file('build_params')
     or die "Can't find 'build_params' in " . $self->config_dir;
   my $fh = IO::File->new($file) or die "Can't read '$file': $!";
-  my $ref = eval do {local $/; <$fh>};
+  my $ref = eval do {local $/; ~< $fh};
   die if $@;
   my $c;
   ($self->{args}, $c, $self->{properties}) = @$ref;
@@ -1355,7 +1355,7 @@ sub magic_number_matches {
   return 0 unless -e '$q{magic_numfile}';
   local *FH;
   open FH, '$q{magic_numfile}' or return 0;
-  my \$filenum = <FH>;
+  my \$filenum = ~< *FH;
   close FH;
   return \$filenum == $magic_number;
 }
@@ -1755,7 +1755,7 @@ sub read_modulebuildrc {
       or die "Can't open $modulebuildrc: $!";
 
   my %options; my $buffer = '';
-  while (defined( my $line = <$fh> )) {
+  while (defined( my $line = ~< $fh )) {
     chomp( $line );
     $line =~ s/#.*$//;
     next unless length( $line );
@@ -1871,13 +1871,13 @@ sub get_action_docs {
 
     # Skip to ACTIONS section
     local $_;
-    while (<$fh>) {
+    while ( ~< $fh) {
       last if /^=head1 ACTIONS\s/;
     }
 
     # Look for our action and determine the style
     my $style;
-    while (<$fh>) {
+    while ( ~< $fh) {
       last if /^=head1 /;
 
       # only item and head2 are allowed (3&4 are not in 5.005)
@@ -1892,7 +1892,7 @@ sub get_action_docs {
     # and the content
     if($style eq 'item') {
       my ($found, $inlist) = (0, 0);
-      while (<$fh>) {
+      while ( ~< $fh) {
         if (/^=(item|back)/) {
           last unless $inlist;
         }
@@ -1903,7 +1903,7 @@ sub get_action_docs {
     }
     else { # head2 style
       # stop at anything equal or greater than the found level
-      while (<$fh>) {
+      while ( ~< $fh) {
         last if(/^=(?:head[12]|cut)/);
         push @docs, $_;
       }
@@ -2389,7 +2389,7 @@ sub fix_shebang_line { # Adapted from fixin() in ExtUtils::MM_Unix 1.35
   for my $file (@files) {
     my $FIXIN = IO::File->new($file) or die "Can't process '$file': $!";
     local $/ = "\n";
-    chomp(my $line = <$FIXIN>);
+    chomp(my $line = ~< $FIXIN);
     next unless $line =~ s/^\s*\#!\s*//;     # Not a shbang file.
     
     my ($cmd, $arg) = (split(' ', $line, 2), '');
@@ -2413,7 +2413,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     # Print out the new #! line (or equivalent).
     local $\;
     undef $/; # Was localized above
-    print $FIXOUT $shb, <$FIXIN>;
+    print $FIXOUT $shb, ~< $FIXIN;
     close $FIXIN;
     close $FIXOUT;
     
@@ -2589,7 +2589,7 @@ sub contains_pod {
   return '' unless -T $file;  # Only look at text files
   
   my $fh = IO::File->new( $file ) or die "Can't open $file: $!";
-  while (my $line = <$fh>) {
+  while (my $line = ~< $fh) {
     return 1 if $line =~ /^\=(?:head|pod|item)/;
   }
   
@@ -2945,7 +2945,7 @@ sub _add_to_manifest {
   chmod($mode ^|^ oct(222), $manifest) or die "Can't make $manifest writable: $!";
   
   my $fh = IO::File->new("< $manifest") or die "Can't read $manifest: $!";
-  my $last_line = (<$fh>)[-1] || "\n";
+  my $last_line = ( ~< $fh)[-1] || "\n";
   my $has_newline = $last_line =~ /\n$/;
   $fh->close;
 

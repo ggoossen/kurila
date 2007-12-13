@@ -13,7 +13,7 @@ use ExtUtils::Embed;
 use File::Spec;
 
 open(my $fh,">embed_test.c") || die "Cannot open embed_test.c:$!";
-print $fh <DATA>;
+print $fh ~< *DATA;
 close($fh);
 
 $| = 1;

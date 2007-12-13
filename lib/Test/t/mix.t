@@ -32,7 +32,7 @@ $TESTERR = *STDERR{IO};
 $ntest = 1;
 
 open F, "mix";
-my $out = join '', <F>;
+my $out = join '', ~< *F;
 close F;
 unlink "mix";
 

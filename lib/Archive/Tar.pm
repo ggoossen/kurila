@@ -1074,7 +1074,7 @@ sub write {
     ### did you want it written to a file, or returned as a string? ###
     my $rv =  length($file) ? 1
                         : $HAS_PERLIO ? $dummy
-                        : do { seek $handle, 0, 0; local $/; <$handle> };
+                        : do { seek $handle, 0, 0; local $/; ~< $handle };
 
     ### make sure to close the handle;
     close $handle;

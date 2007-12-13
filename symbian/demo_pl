@@ -26,7 +26,7 @@ my $extract = $action eq 'extract';
 my $cleanup = $action eq 'cleanup';
 
 my $fh;
-while (<DATA>) {
+while ( ~< *DATA) {
    if (/^-- (.+\.pl)$/) {
       if ($cleanup) {
          print "Deleting $1\n";

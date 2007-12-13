@@ -13,7 +13,7 @@ close tmp or die "Could not close: $!";
 # test "last" command
 
 open(fh,'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-while (<fh>) {
+while ( ~< *fh) {
     last if /vt100/;
 }
 if (!eof && /vt100/) {print "ok 1\n";} else {print "not ok 1 $_\n";}
@@ -22,7 +22,7 @@ if (!eof && /vt100/) {print "ok 1\n";} else {print "not ok 1 $_\n";}
 
 $bad = '';
 open(fh,'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-while (<fh>) {
+while ( ~< *fh) {
     next if /vt100/;
     $bad = 1 if /vt100/;
 }
@@ -32,7 +32,7 @@ if (!eof || /vt100/ || $bad) {print "not ok 2\n";} else {print "ok 2\n";}
 
 $bad = '';
 open(fh,'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-while (<fh>) {
+while ( ~< *fh) {
     if (s/vt100/VT100/g) {
 	s/VT100/Vt100/g;
 	redo;
@@ -48,7 +48,7 @@ if (!eof || $bad) {print "not ok 3\n";} else {print "ok 3\n";}
 
 $badcont = '';
 open(fh,'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-line: while (<fh>) {
+line: while ( ~< *fh) {
     if (/vt100/) {last line;}
 } continue {
     $badcont = 1 if /vt100/;
@@ -61,7 +61,7 @@ if (!$badcont) {print "ok 5\n";} else {print "not ok 5\n";}
 $bad = '';
 $badcont = 1;
 open(fh,'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-entry: while (<fh>) {
+entry: while ( ~< *fh) {
     next entry if /vt100/;
     $bad = 1 if /vt100/;
 } continue {
@@ -75,7 +75,7 @@ if (!$badcont) {print "ok 7\n";} else {print "not ok 7\n";}
 $bad = '';
 $badcont = '';
 open(fh,'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-loop: while (<fh>) {
+loop: while ( ~< *fh) {
     if (s/vt100/VT100/g) {
 	s/VT100/Vt100/g;
 	redo loop;

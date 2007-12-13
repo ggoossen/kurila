@@ -71,7 +71,7 @@ sub stderr_of { save_handle(\*STDERR, @_) }
 sub slurp {
   my $fh = IO::File->new($_[0]) or die "Can't open $_[0]: $!";
   local $/;
-  return scalar <$fh>;
+  return scalar ~< $fh;
 }
 
 sub exe_exts {

@@ -33,7 +33,7 @@ undef $o;
 untie @a;
 open F, "< $file" or die "Couldn't open file $file: $!";
 binmode F;
-my $a = do {local $/ ; <F> };
+my $a = do {local $/ ; ~< *F };
 my $x = "fish\r\ndog\r\ncarrot\r\n" ;
 if ($a eq $x) {
   print "ok $N\n";

@@ -29,7 +29,7 @@ $patchlevel ||= $Config{version};
 $patchlevel = qq["$patchlevel"];
 
 open(SH,"<$name") || die "Cannot open $name:$!";
-while (<SH>)
+while ( ~< *SH)
  {
   last if /^\s*sed/;
  }
@@ -54,7 +54,7 @@ die "$str:$@" if $@;
 
 open(H,">$file.new") || die "Cannot open $file.new:$!";
 #binmode H;		# no CRs (which cause a spurious rebuild)
-while (<SH>)
+while ( ~< *SH)
  {
   last if /^$term$/o;
   s/\$([\w_]+)/Config($1)/eg;

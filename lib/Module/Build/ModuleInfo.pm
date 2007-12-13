@@ -175,7 +175,7 @@ sub _parse_fh {
   my $pod_sect = '';
   my $pod_data = '';
 
-  while (defined( my $line = <$fh> )) {
+  while (defined( my $line = ~< $fh )) {
 
     chomp( $line );
     next if $line =~ /^\s*#/;

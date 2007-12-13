@@ -311,7 +311,7 @@ else {
 			    : (`echo \$__NoNeSuCh` eq "foo\n") );
 	if ($^O =~ /^(linux|freebsd)$/ &&
 	    open CMDLINE, "/proc/$$/cmdline") {
-	    chomp(my $line = scalar <CMDLINE>);
+	    chomp(my $line = scalar ~< *CMDLINE);
 	    my $me = (split /\0/, $line)[0];
 	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');
 	    close CMDLINE;

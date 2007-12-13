@@ -50,7 +50,7 @@ sub file_eq {
     my $val = shift;
 
     open IN, $f or die "open $f: $!";
-    chomp(my $line = <IN>);
+    chomp(my $line = ~< *IN);
     close IN;
 
     print "# got $line\n";
@@ -139,7 +139,7 @@ my $cmd = _create_runperl(
 			  sprintf('print qq[ok $_] for (%d..%d)', $t, $t+2));
 print "# cmd = '$cmd'\n";
 open my $CMD, "$cmd |" or die "Can't open pipe to '$cmd': $!";
-while (<$CMD>) {
+while ( ~< $CMD) {
     system("$runperl -e 0");
     print;
 }

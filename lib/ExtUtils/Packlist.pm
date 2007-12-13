@@ -120,7 +120,7 @@ my $fh = mkfh();
 open($fh, "<$packfile") || Carp::croak("Can't open file $packfile: $!");
 $self->{data} = {};
 my ($line);
-while (defined($line = <$fh>))
+while (defined($line = ~< $fh))
    {
    chomp $line;
    my ($key, $data) = $line;

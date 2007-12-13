@@ -1,6 +1,6 @@
 use Perl6::Form;
 
-my @data = <DATA>;
+my @data = ~< *DATA;
 
 for (@data) {
 	my ($pid, $cmd, $time, $cpu) = split;

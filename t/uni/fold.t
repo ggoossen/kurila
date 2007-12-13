@@ -16,7 +16,7 @@ use constant EBCDIC => ord 'A' == 193;
 if (open(CF, $CF)) {
     my @CF;
 
-    while (<CF>) {
+    while ( ~< *CF) {
 	# Skip S since we are going for 'F'ull case folding
         if (/^([0-9A-F]+); ([CFI]); ((?:[0-9A-F]+)(?: [0-9A-F]+)*); \# (.+)/) {
 	    next if EBCDIC && hex $1 < 0x100;

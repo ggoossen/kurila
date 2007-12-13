@@ -43,7 +43,7 @@ sub eight_dot_three {
 my %dir;
 
 if (open(MANIFEST, "MANIFEST")) {
-    while (<MANIFEST>) {
+    while ( ~< *MANIFEST) {
 	chomp;
 	s/\s.+//;
 	unless (-f) {

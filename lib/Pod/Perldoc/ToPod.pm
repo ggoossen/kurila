@@ -27,7 +27,7 @@ sub parse_from_file {
   
   # A hack for finding things between =foo and =cut, inclusive
   local $_;
-  while (<IN>) {
+  while ( ~< *IN) {
     if(  m/^=(\w+)/s ) {
       if($cut_mode = ($1 eq 'cut')) {
         print $outfh "\n=cut\n\n";

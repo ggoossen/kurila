@@ -62,7 +62,7 @@ sub _readrc {
   if ($fh = FileHandle->new($file, "r")) {
     my ($mach, $macdef, $tok, @tok) = (0, 0);
 
-    while (<$fh>) {
+    while ( ~< $fh) {
       undef $macdef if /\A\n\Z/;
 
       if ($macdef) {

@@ -236,7 +236,7 @@ sub check_install {
             if( $FIND_VERSION ) {
                 
                 my $in_pod = 0;
-                while (local $_ = <$fh> ) {
+                while (local $_ = ~< $fh ) {
     
                     ### stolen from EU::MM_Unix->parse_version to address
                     ### #24062: "Problem with CPANPLUS 0.076 misidentifying

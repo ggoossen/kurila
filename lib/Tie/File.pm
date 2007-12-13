@@ -899,7 +899,7 @@ sub _read_record {
   my $rec;
   { local $/ = $self->{recsep};
     my $fh = $self->{fh};
-    $rec = <$fh>;
+    $rec = ~< $fh;
   }
   return unless defined $rec;
   if (substr($rec, -$self->{recseplen}) ne $self->{recsep}) {
@@ -1308,7 +1308,7 @@ sub _check_integrity {
     local $. = 0;
     local $/ = $rs;
 
-    while (<F>) {
+    while ( ~< *F) {
       my $n = $. - 1;
       my $cached = $self->{cache}->_produce($n);
       my $offset = $self->{offsets}[$.];
