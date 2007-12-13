@@ -540,6 +540,8 @@ sub force_m {
 
 sub rename_pointy_ops {
     my $xml = shift;
+
+    # rename '<FH>' to '~< *FH'
     for my $op ($xml->findnodes(qq|//op_readline|)) {
         my $v = get_madprop($op, "value") or next;
         $v =~ m/^&lt;(.*)&gt;$/ or next;
@@ -548,6 +550,16 @@ sub rename_pointy_ops {
         $v = "*" . $v if $v =~ m/^\w/;
         set_madprop($op, "value" => "~&lt; " . $v, 
                     wsbefore => get_madprop($op, "value", "wsbefore") || " " );
+    }
+
+    # rename '<' to '+<'
+    for my $op (map { $xml->findnodes(qq'//$_') } qw|op_lt op_le op_gt op_ge |) {
+        set_madprop($op, operator => '+' . get_madprop($op, "operator") );
+    }
+    # rename '<=>' to '<+>'
+    for my $op ($xml->findnodes(qq'//op_ncmp')) {
+        next unless get_madprop($op, "operator") eq "&lt;=&gt;";
+        set_madprop($op, operator => '&lt;+&gt;');
     }
 }
 
