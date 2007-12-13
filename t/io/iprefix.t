@@ -27,11 +27,11 @@ continue {
     print;
 }
 
-is ( runperl( prog => 'print<>;', args => \@tfiles ),
+is ( runperl( prog => 'print ~< *ARGV;', args => \@tfiles ),
      "bar\nbar\nbar\n", 
      "file contents properly replaced" );
 
-is ( runperl( prog => 'print<>;', args => \@tfiles_bak ), 
+is ( runperl( prog => 'print ~< *ARGV;', args => \@tfiles_bak ), 
      "foo\nfoo\nfoo\n", 
      "backup file contents stay the same" );
 

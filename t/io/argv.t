@@ -18,21 +18,21 @@ print TRY "a line\n";
 close TRY or die "Could not close: $!";
 
 $x = runperl(
-    prog	=> 'while (<>) { print $., $_; }',
+    prog	=> 'while (~< *ARGV) { print $., $_; }',
     args	=> [ 'Io_argv1.tmp', 'Io_argv1.tmp' ],
 );
-is($x, "1a line\n2a line\n", '<> from two files');
+is($x, "1a line\n2a line\n", '~< *ARGV from two files');
 
 {
     $x = runperl(
-	prog	=> 'while (<>) { print $_; }',
+	prog	=> 'while (~< *ARGV) { print $_; }',
 	stdin	=> "foo\n",
 	args	=> [ 'Io_argv1.tmp', '-' ],
     );
     is($x, "a line\nfoo\n", '   from a file and STDIN');
 
     $x = runperl(
-	prog	=> 'while (<>) { print $_; }',
+	prog	=> 'while (~< *ARGV) { print $_; }',
 	stdin	=> "foo\n",
     );
     is($x, "foo\n", '   from just STDIN');
@@ -49,11 +49,11 @@ is($x, "1a line\n2a line\n", '<> from two files');
 while ( ~< *ARGV) {
     $y .= $. . $_;
     if (eof()) {
-	is($., 3, '$. counts <>');
+	is($., 3, '$. counts ~< *ARGV');
     }
 }
 
-is($y, "1a line\n2a line\n3a line\n", '<> from @ARGV');
+is($y, "1a line\n2a line\n3a line\n", '~< *ARGV from @ARGV');
 
 
 open(TRY, '>Io_argv1.tmp') or die "Can't open temp file: $!";
@@ -128,7 +128,7 @@ print OUT "foo";
 close OUT;
 open IN, "Io_argv3.tmp" or die "Can't open temp file: $!";
 *ARGV = *IN;
-while (<>) {
+while (~< *ARGV) {
     print;
     print "bar" if eof();
 }

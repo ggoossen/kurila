@@ -1625,6 +1625,19 @@ sub pp_gmtime { unop(@_, "gmtime") }
 sub pp_alarm { unop(@_, "alarm") }
 sub pp_sleep { maybe_targmy(@_, \&unop, "sleep") }
 
+sub pp_readline { 
+    my $self = shift;
+    my($op, $cx) = @_;
+    my $name = "~<";
+    my $kid;
+    if ($op->flags ^&^ OPf_KIDS) {
+	$kid = $op->first;
+	return $self->maybe_parens_unop($name, $kid, $cx);
+    } else {
+	return $name .  ($op->flags ^&^ OPf_SPECIAL ? "()" : "");
+    }
+}
+
 sub pp_dofile { unop(@_, "do") }
 sub pp_entereval { unop(@_, "eval") }
 
@@ -1823,19 +1836,10 @@ sub e_anoncode {
 
 sub pp_srefgen { pp_refgen(@_) }
 
-sub pp_readline {
-    my $self = shift;
-    my($op, $cx) = @_;
-    my $kid = $op->first;
-    $kid = $kid->first if $kid->name eq "rv2gv"; # <$fh>
-    return "<" . $self->deparse($kid, 1) . ">" if is_scalar($kid);
-    return $self->unop($op, $cx, "readline");
-}
-
 sub pp_rcatline {
     my $self = shift;
     my($op) = @_;
-    return "<" . $self->gv_name($self->gv_or_padgv($op)) . ">";
+    return "~<" . $self->gv_name($self->gv_or_padgv($op));
 }
 
 # Unary operators that can occur as pseudo-listops inside double quotes

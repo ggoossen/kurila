@@ -116,7 +116,7 @@ sub find_api
   grep { exists $API{$_} } $code =~ /(\w+)/mg;
 }
 
-while (<DATA>) {
+while (~< *DATA) {
   if ($hint) {
     my $h = $hint->[0] eq 'Hint' ? \%hints : \%warnings;
     if (m{^\s*\*\s(.*?)\s*$}) {
@@ -284,7 +284,7 @@ for $filename (@files) {
 
   info("Scanning $filename ...");
 
-  my $c = do { local $/; <IN> };
+  my $c = do { local $/; ~< *IN };
   close IN;
 
   my %file = (orig => $c, changes => 0);
@@ -631,7 +631,7 @@ sub run_diff
     close F;
 
     if (open F, "$prog $file $tmp |") {
-      while (<F>) {
+      while (~< *F) {
         s/\Q$tmp\E/$file.patched/;
         $diff .= $_;
       }
@@ -758,7 +758,7 @@ sub hint
 
 sub usage
 {
-  my($usage) = do { local(@ARGV,$/)=($0); <> } =~ /^=head\d$HS+SYNOPSIS\s*^(.*?)\s*^=/ms;
+  my($usage) = do { local(@ARGV,$/)=($0); ~< *ARGV } =~ /^=head\d$HS+SYNOPSIS\s*^(.*?)\s*^=/ms;
   my %M = ( 'I' => '*' );
   $usage =~ s/^\s*perl\s+\S+/$^X $0/;
   $usage =~ s/([A-Z])<([^>]+)>/$M{$1}$2$M{$1}/g;
@@ -776,7 +776,7 @@ ENDUSAGE
 
 sub strip
 {
-  my $self = do { local(@ARGV,$/)=($0); <> };
+  my $self = do { local(@ARGV,$/)=($0); ~< *ARGV };
   my($copy) = $self =~ /^=head\d\s+COPYRIGHT\s*^(.*?)^=\w+/ms;
   $copy =~ s/^(?=\S+)/    /gms;
   $self =~ s/^$HS+Do NOT edit.*?(?=^-)/$copy/ms;

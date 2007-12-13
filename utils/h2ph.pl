@@ -499,7 +499,7 @@ sub next_line
     my $pre_sub_tri_graphs = 1;
 
     READ: while (not eof IN) {
-        $in  .= <IN>;
+        $in  .= ~< *IN;
         chomp $in;
         next unless length $in;
 
@@ -685,7 +685,7 @@ sub queue_includes_from
         while (defined($line = ~< *HEADER)) {
             while (/\\$/) { # Handle continuation lines
                 chop $line;
-                $line .= <HEADER>;
+                $line .= ~< *HEADER;
             }
 
             if ($line =~ /^#\s*include\s+<(.*?)>/) {

@@ -61,7 +61,7 @@ END { 1 while unlink $STATE110, $STATE011 }
 
 for ($STATE011, $STATE110) {
 	my $fh = FileHandle->new($_, "w");
-	for (1 .. 8) { my $line = <DATA>; print $fh $line }
+	for (1 .. 8) { my $line = ~< *DATA; print $fh $line }
 	$fh->close;
 }
 

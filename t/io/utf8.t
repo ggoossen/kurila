@@ -214,7 +214,7 @@ is($failed, undef);
 
 	    my $s = chr($v->[0]);
 
-	    $s .= <F>;
+	    $s .= ~< *F;
 	    is( $s, chr($v->[0]) . chr($u->[0]), 'rcatline utf8' );
 	    close F;
 	    $t++;
@@ -254,7 +254,7 @@ is($failed, undef);
     like( $@, qr/utf8 "\\x$chrE4" does not map to Unicode .+ <F> line 1/,
 	  "<:utf8 readline must warn about bad utf8");
     undef $@;
-    $line .= <F>;
+    $line .= ~< *F;
     like( $@, qr/utf8 "\\x$chrF6" does not map to Unicode .+ <F> line 2/,
 	  "<:utf8 rcatline must warn about bad utf8");
     close F;

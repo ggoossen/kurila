@@ -83,7 +83,7 @@ $x=0x0eabcd; print $x->ref;
 EXPECT
 Can't call method "ref" without a package or object reference at - line 1.
 ########
-chop ($str .= <DATA>);
+chop ($str .= ~< *DATA);
 ########
 $x=2;$y=3;$x<$y ? $x : $y += 23;print $x;
 EXPECT
@@ -93,7 +93,7 @@ eval 'sub bar {print "In bar"}';
 ########
 system './perl -ne "print if eof" /dev/null' unless $^O eq 'MacOS'
 ########
-chop($file = <DATA>);
+chop($file = ~< *DATA);
 ########
 package N;
 sub new {my ($obj,$n)=@_; bless \$n}  
@@ -230,7 +230,7 @@ BEGIN failed--compilation aborted at - line 1.
     local(*FOO);
     tie(*FOO,'foo');
     print FOO "sentence.", "reversed", "a", "is", "This";
-    print "-- ", <FOO>, " --\n";
+    print "-- ", (~< *FOO), " --\n";
     my($buf,$len,$offset);
     $buf = "string";
     $len = 10; $offset = 1;

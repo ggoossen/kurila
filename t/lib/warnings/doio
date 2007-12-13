@@ -228,19 +228,19 @@ mkdir $filename, 0777
 {
     local (@ARGV) = ($filename) ;
     local ($^I) = "" ;
-    my $x = <> ;
+    my $x = ~< *ARGV ;
 }
 {
     no warnings 'inplace' ;
     local (@ARGV) = ($filename) ;
     local ($^I) = "" ;
-    my $x = <> ;
+    my $x = ~< *ARGV ;
 }
 {
     use warnings 'inplace' ;
     local (@ARGV) = ($filename) ;
     local ($^I) = "" ;
-    my $x = <> ;
+    my $x = ~< *ARGV ;
 }
 rmdir $filename ;
 EXPECT

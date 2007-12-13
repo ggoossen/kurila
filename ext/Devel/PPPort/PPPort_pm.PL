@@ -512,7 +512,7 @@ $VERSION = do { my @r = '$Snapshot: /Devel-PPPort/3.13 $' =~ /(\d+\.\d+(?:_\d+)?
 
 sub _init_data
 {
-  $data = do { local $/; <DATA> };
+  $data = do { local $/; ~< *DATA };
   my $pkg = 'Devel::PPPort';
   $data =~ s/__PERL_VERSION__/$^V/g;
   $data =~ s/__VERSION__/$VERSION/g;
