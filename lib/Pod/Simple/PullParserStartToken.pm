@@ -23,7 +23,7 @@ sub attr_hash { $_[0][2] ||= {} }
 sub attr      {
   if(@_ == 2) {      # Reading: $token->attr('attrname')
     ${$_[0][2] || return undef}{ $_[1] };
-  } elsif(@_ > 2) {  # Writing: $token->attr('attrname', 'newval')
+  } elsif(@_ +> 2) {  # Writing: $token->attr('attrname', 'newval')
     ${$_[0][2] ||= {}}{ $_[1] } = $_[2];
   } else {
     require Carp;

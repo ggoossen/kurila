@@ -84,10 +84,10 @@ for (@time, @neg_time) {
         skip '1970 test on VOS fails.', 12
             if $^O eq 'vos' && $year == 70;
         skip 'this platform does not support negative epochs.', 12
-            if $year < 70 && ! $neg_epoch_ok;
+            if $year +< 70 && ! $neg_epoch_ok;
 
         {
-            my $year_in = $year < 70 ? $year + 1900 : $year;
+            my $year_in = $year +< 70 ? $year + 1900 : $year;
             my $time = timelocal($sec,$min,$hour,$mday,$mon,$year_in);
 
             my($s,$m,$h,$D,$M,$Y) = localtime($time);
@@ -101,7 +101,7 @@ for (@time, @neg_time) {
         }
 
         {
-            my $year_in = $year < 70 ? $year + 1900 : $year;
+            my $year_in = $year +< 70 ? $year + 1900 : $year;
             my $time = timegm($sec,$min,$hour,$mday,$mon,$year_in);
 
             my($s,$m,$h,$D,$M,$Y) = gmtime($time);

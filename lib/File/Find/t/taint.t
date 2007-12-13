@@ -24,7 +24,7 @@ BEGIN {
 	##
 	## Match the directory taint tests in mg.c::Perl_magic_setenv()
 	##
-	push(@path,$dir) unless (length($dir) >= 256
+	push(@path,$dir) unless (length($dir) +>= 256
 				 or
 				 substr($dir,0,1) ne "/"
 				 or

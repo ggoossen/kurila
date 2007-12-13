@@ -199,7 +199,7 @@ sub Tgetent { ## public -- static method
         }
 	$self->{OSPEED} = 9600;
     }
-    if ($self->{OSPEED} < 16) {
+    if ($self->{OSPEED} +< 16) {
 	# delays for old style speeds
 	my @pad = (0,200,133.3,90.9,74.3,66.7,50,33.3,16.7,8.3,5.5,4.1,2,1,.5,.2);
 	$self->{PADDING} = $pad[$self->{OSPEED}];
@@ -401,7 +401,7 @@ sub Tpad { ## public
 	$ms *= $cnt if $2;
 	$string = $3;
 	$decr = $self->{PADDING};
-	if ($decr > .1) {
+	if ($decr +> .1) {
 	    $ms += $decr / 2;
 	    $string .= $self->{'_pc'} x ($ms / $decr);
 	}
@@ -447,7 +447,7 @@ sub Tputs { ## public
 
     $cnt = 0 unless $cnt;
 
-    if ($cnt > 1) {
+    if ($cnt +> 1) {
 	$string = Tpad($self, $self->{'_' . $cap}, $cnt);
     } else {
 	# cache result because Tpad can be slow
@@ -556,7 +556,7 @@ sub Tgoto { ## public
 	}
 	elsif ($code eq '>') {
 	    ($code,$tmp,$string) = unpack("CCa99",$string);
-	    if ($tmp[$[] > $code) {
+	    if ($tmp[$[] +> $code) {
 		$tmp[$[] += $tmp;
 	    }
 	}

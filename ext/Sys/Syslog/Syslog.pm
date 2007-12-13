@@ -275,10 +275,10 @@ sub syslog {
 
     foreach (@words) {
 	$num = xlate($_);		    # Translate word to number.
-	if ($num < 0) {
+	if ($num +< 0) {
 	    croak "syslog: invalid level/facility: $_"
 	}
-	elsif ($num <= &LOG_PRIMASK) {
+	elsif ($num +<= &LOG_PRIMASK) {
 	    croak "syslog: too many levels given: $_" if defined $numpri;
 	    $numpri = $num;
 	    return 0 unless LOG_MASK($numpri) ^&^ $maskpri;
@@ -337,7 +337,7 @@ sub syslog {
     # want to do at this point is to fallback onto a different
     # connection method.
     while (scalar @fallbackMethods || $syslog_send) {
-	if ($failed && (time - $fail_time) > 60) {
+	if ($failed && (time - $fail_time) +> 60) {
 	    # it's been a while... maybe things have been fixed
 	    @fallbackMethods = ();
 	    disconnect_log();
@@ -381,7 +381,7 @@ sub _syslog_send_console {
 	if ($options{nowait}) {
 	    return 1;
 	} else {
-	    if (waitpid($pid, 0) >= 0) {
+	    if (waitpid($pid, 0) +>= 0) {
 	    	return ($? >> 8);
 	    } else {
 		# it's possible that the caller has other

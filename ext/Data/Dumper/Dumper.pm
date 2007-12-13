@@ -93,7 +93,7 @@ sub new {
 	     deparse	=> $Deparse,	# use B::Deparse for coderefs
 	   };
 
-  if ($Indent > 0) {
+  if ($Indent +> 0) {
     $s->{xpad} = "  ";
     $s->{sep} = "\n";
   }
@@ -226,7 +226,7 @@ sub Dumpperl {
     my $valstr;
     {
       local($s->{apad}) = $s->{apad};
-      $s->{apad} .= ' ' x (length($name) + 3) if $s->{indent} >= 2;
+      $s->{apad} .= ' ' x (length($name) + 3) if $s->{indent} +>= 2;
       $valstr = $s->_dump($val, $name);
     }
 
@@ -283,7 +283,7 @@ sub _dump {
       # keep a tab on it so that we dont fall into recursive pit
       if (exists $s->{seen}{$id}) {
 #	if ($s->{expdepth} < $s->{level}) {
-	  if ($s->{purity} and $s->{level} > 0) {
+	  if ($s->{purity} and $s->{level} +> 0) {
 	    $out = ($realtype eq 'HASH')  ? '{}' :
 	      ($realtype eq 'ARRAY') ? '[]' :
 		'do{my $o}' ;
@@ -325,8 +325,8 @@ sub _dump {
     # representation of the thing we are currently examining
     # at this depth (i.e., 'Foo=ARRAY(0xdeadbeef)'). 
     if (!$s->{purity}
-	and $s->{maxdepth} > 0
-	and $s->{level} >= $s->{maxdepth})
+	and $s->{maxdepth} +> 0
+	and $s->{level} +>= $s->{maxdepth})
     {
       return qq['$val'];
     }
@@ -335,7 +335,7 @@ sub _dump {
     if ($realpack) {
       $out = $s->{'bless'} . '( ';
       $blesspad = $s->{apad};
-      $s->{apad} .= '       ' if ($s->{indent} >= 2);
+      $s->{apad} .= '       ' if ($s->{indent} +>= 2);
     }
 
     $s->{level}++;
@@ -364,9 +364,9 @@ sub _dump {
       $mname .= '->' if $mname =~ /^\*.+\{[A-Z]+\}$/;
       for $v (@$val) {
 	$sname = $mname . '[' . $i . ']';
-	$out .= $pad . $ipad . '#' . $i if $s->{indent} >= 3;
+	$out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
 	$out .= $pad . $ipad . $s->_dump($v, $sname);
-	$out .= "," if $i++ < $#$val;
+	$out .= "," if $i++ +< $#$val;
       }
       $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
       $out .= ($name =~ /^\@/) ? ')' : ']';
@@ -405,9 +405,9 @@ sub _dump {
 	$out .= $pad . $ipad . $nk . $pair;
 
 	# temporarily alter apad
-	$s->{apad} .= (" " x (length($nk) + 4)) if $s->{indent} >= 2;
+	$s->{apad} .= (" " x (length($nk) + 4)) if $s->{indent} +>= 2;
 	$out .= $s->_dump($val->{$k}, $sname) . ",";
-	$s->{apad} = $lpad if $s->{indent} >= 2;
+	$s->{apad} = $lpad if $s->{indent} +>= 2;
       }
       if (substr($out, -1) eq ',') {
 	chop $out;
@@ -478,7 +478,7 @@ sub _dump {
 	  # _dump can push into @post, so we hold our place using $postlen
 	  my $postlen = scalar @post;
 	  $post[$postlen] = "\*$sname = ";
-	  local ($s->{apad}) = " " x length($post[$postlen]) if $s->{indent} >= 2;
+	  local ($s->{apad}) = " " x length($post[$postlen]) if $s->{indent} +>= 2;
 	  $post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}");
 	}
       }
@@ -648,7 +648,7 @@ sub qquote {
   local($_) = shift;
   s/([\\\"\@\$])/\\$1/g;
   my $bytes; { use bytes; $bytes = length }
-  s/([^\x[00]-\x[7f]])/'\x'.sprintf("[%02x]",ord($1))/ge if $bytes > length;
+  s/([^\x[00]-\x[7f]])/'\x'.sprintf("[%02x]",ord($1))/ge if $bytes +> length;
   return qq("$_") unless 
     /[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 

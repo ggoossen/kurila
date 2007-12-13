@@ -252,18 +252,18 @@ sub tie_hash_or_array
         if defined $arg[1] ;
 
     $arg[4] = tied %{ $arg[4] } 
-	if @arg >= 5 && ref $arg[4] && $arg[4] =~ /=HASH/ && tied %{ $arg[4] } ;
+	if @arg +>= 5 && ref $arg[4] && $arg[4] =~ /=HASH/ && tied %{ $arg[4] } ;
 
-    $arg[2] = O_CREAT()^|^O_RDWR() if @arg >=3 && ! defined $arg[2];
-    $arg[3] = 0666               if @arg >=4 && ! defined $arg[3];
+    $arg[2] = O_CREAT()^|^O_RDWR() if @arg +>=3 && ! defined $arg[2];
+    $arg[3] = 0666               if @arg +>=4 && ! defined $arg[3];
 
     # make recno in Berkeley DB version 2 (or better) work like 
     # recno in version 1.
-    if ($db_version >= 4 and ! $tieHASH) {
+    if ($db_version +>= 4 and ! $tieHASH) {
         $arg[2] ^|^= O_CREAT();
     }
 
-    if ($db_version > 1 and defined $arg[4] and $arg[4] =~ /RECNO/ and 
+    if ($db_version +> 1 and defined $arg[4] and $arg[4] =~ /RECNO/ and 
 	$arg[1] and ! -e $arg[1]) {
 	open(FH, ">$arg[1]") or return undef ;
 	close FH ;
@@ -308,12 +308,12 @@ sub STORESIZE
     my $length = shift ;
     my $current_length = $self->length() ;
 
-    if ($length < $current_length) {
+    if ($length +< $current_length) {
 	my $key ;
-        for ($key = $current_length - 1 ; $key >= $length ; -- $key)
+        for ($key = $current_length - 1 ; $key +>= $length ; -- $key)
 	  { $self->del($key) }
     }
-    elsif ($length > $current_length) {
+    elsif ($length +> $current_length) {
         $self->put($length-1, "") ;
     }
 }
@@ -340,9 +340,9 @@ sub SPLICE
     # 'If OFFSET is negative then it start that far from the end of
     # the array.'
     # 
-    if ($offset < 0) {
+    if ($offset +< 0) {
 	my $new_offset = $size + $offset;
-	if ($new_offset < 0) {
+	if ($new_offset +< 0) {
 	    die "Modification of non-creatable array value attempted, "
 	      . "subscript $offset";
 	}
@@ -354,7 +354,7 @@ sub SPLICE
 	$length = 0;
     }
 
-    if ($offset > $size) {
+    if ($offset +> $size) {
  	$offset = $size;
 	warnings::warnif('misc', 'splice() offset past end of array')
             if $splice_end_array;
@@ -368,10 +368,10 @@ sub SPLICE
     # 'If LENGTH is negative, leave that many elements off the end of
     # the array.'
     # 
-    if ($length < 0) {
+    if ($length +< 0) {
 	$length = $size - $offset + $length;
 
-	if ($length < 0) {
+	if ($length +< 0) {
 	    # The user must have specified a length bigger than the
 	    # length of the array passed in.  But perl's splice()
 	    # doesn't catch this, it just behaves as for length=0.
@@ -380,7 +380,7 @@ sub SPLICE
 	}
     }
 
-    if ($length > $size - $offset) {
+    if ($length +> $size - $offset) {
 	$length = $size - $offset;
     }
 
@@ -432,7 +432,7 @@ sub SPLICE
     while (defined (my $elem = shift @list)) {
 	my $old_pos = $pos;
 	my $status;
-	if ($pos >= $num_elems) {
+	if ($pos +>= $num_elems) {
 	    $status = $self->put($pos, $elem);
 	}
 	else {

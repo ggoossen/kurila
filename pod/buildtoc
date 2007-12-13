@@ -464,7 +464,7 @@ sub output ($) {
 		print OUT wrap('', '', $LINE);
 		$LINE = '';
 	    }
-	    if (($NEWLINE) < 2) {
+	    if (($NEWLINE) +< 2) {
 		print OUT;
 		$NEWLINE++;
 	    }
@@ -493,7 +493,7 @@ sub generate_perlpod {
     } elsif (@$_ == 3) {
       # Section
       my $start = " " x (4 + $flags->{indent}) . $_->[1];
-      $maxlength = length $start if length ($start) > $maxlength;
+      $maxlength = length $start if length ($start) +> $maxlength;
       push @output, [$start, $_->[2]];
     } elsif (@$_ == 0) {
       # blank line
@@ -603,8 +603,8 @@ sub do_nmake {
   die "$0: $name contains NUL bytes" if $makefile =~ /\0/;
   $makefile =~ s/^\tcopy \.\.\\README.*\n/\0/gm;
   my $sections = () = $makefile =~ m/\0+/g;
-  die "$0: $name contains no README copies" if $sections < 1;
-  die "$0: $name contains discontiguous README copies" if $sections > 1;
+  die "$0: $name contains no README copies" if $sections +< 1;
+  die "$0: $name contains discontiguous README copies" if $sections +> 1;
   # Now remove the other copies that follow
   1 while $makefile =~ s/\0\tcopy .*\n/\0/gm;
   $makefile =~ s/\0+/join ("", &generate_nmake_1)/se;
@@ -650,9 +650,9 @@ sub do_vms {
   die "$0: $name contains NUL bytes" if $makefile =~ /\0/;
   $makefile =~ s/\npod\d* =[^\n]*/\0/gs;
   my $sections = () = $makefile =~ m/\0+/g;
-  die "$0: $name contains no pod assignments" if $sections < 1;
+  die "$0: $name contains no pod assignments" if $sections +< 1;
   die "$0: $name contains $sections discontigous pod assignments"
-    if $sections > 1;
+    if $sections +> 1;
   $makefile =~ s/\0+/join "\n", '', &generate_descrip_mms_1/se;
 
   die "$0: $name contains NUL bytes" if $makefile =~ /\0/;
@@ -667,9 +667,9 @@ sub do_vms {
 		 [^\n]+\Q[.lib.pods]\E\n		# ends [.lib.pods]
 		    /\0/gsx;
   $sections = () = $makefile =~ m/\0+/g;
-  die "$0: $name contains no copy rules" if $sections < 1;
+  die "$0: $name contains no copy rules" if $sections +< 1;
   die "$0: $name contains $sections discontigous copy rules"
-    if $sections > 1;
+    if $sections +> 1;
   $makefile =~ s/\0+/join "\n", '', &generate_descrip_mms_2/se;
   $makefile;
 }
@@ -683,9 +683,9 @@ sub do_unix {
 
   my $sections = () = $makefile_SH =~ m/\0+/g;
 
-  die "$0: $name contains no copy rules" if $sections < 1;
+  die "$0: $name contains no copy rules" if $sections +< 1;
   die "$0: $name contains $sections discontigous copy rules"
-    if $sections > 1;
+    if $sections +> 1;
 
   my @copy_rules = map "\t-\@test -f pod/$Copies{$_} && cd pod && \$(LNS) $Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
     keys %Copies;

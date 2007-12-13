@@ -113,7 +113,7 @@ sub new {
 }
 
 # Translate a font string into an escape.
-sub toescape { (length ($_[0]) > 1 ? '\f(' : '\f') . $_[0] }
+sub toescape { (length ($_[0]) +> 1 ? '\f(' : '\f') . $_[0] }
 
 # Determine which fonts the user wishes to use and store them in the object.
 # Regular, italic, bold, and bold-italic are constants, but the fixed width
@@ -126,7 +126,7 @@ sub init_fonts {
     # are the right length.
     for (qw/fixed fixedbold fixeditalic fixedbolditalic/) {
         my $font = $$self{$_};
-        if (defined ($font) && (length ($font) < 1 || length ($font) > 2)) {
+        if (defined ($font) && (length ($font) +< 1 || length ($font) +> 2)) {
             croak qq(roff font should be 1 or 2 chars, not "$font");
         }
     }
@@ -221,7 +221,7 @@ sub init_page {
 # according to the current formatting instructions as we do.
 sub _handle_text {
     my ($self, $text) = @_;
-    DEBUG > 3 and print "== $text\n";
+    DEBUG +> 3 and print "== $text\n";
     my $tag = $$self{PENDING}[-1];
     $$tag[2] .= $self->format_text ($$tag[1], $text);
 }
@@ -241,7 +241,7 @@ sub method_for_element {
 # text and nested elements.  Otherwise, if start_element is defined, call it.
 sub _handle_element_start {
     my ($self, $element, $attrs) = @_;
-    DEBUG > 3 and print "++ $element (<", join ('> <', %$attrs), ">)\n";
+    DEBUG +> 3 and print "++ $element (<", join ('> <', %$attrs), ">)\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, we need to accumulate the contents of the
@@ -249,7 +249,7 @@ sub _handle_element_start {
     # <Para> so that IN_NAME isn't still set for the first heading after the
     # NAME heading.
     if ($self->can ("cmd_$method")) {
-        DEBUG > 2 and print "<$element> starts saving a tag\n";
+        DEBUG +> 2 and print "<$element> starts saving a tag\n";
         $$self{IN_NAME} = 0 if ($element ne 'Para');
 
         # How we're going to format embedded text blocks depends on the tag
@@ -259,12 +259,12 @@ sub _handle_element_start {
         my $formatting = $$self{PENDING}[-1][1];
         $formatting = $self->formatting ($formatting, $element);
         push (@{ $$self{PENDING} }, [ $attrs, $formatting, '' ]);
-        DEBUG > 4 and print "Pending: [", pretty ($$self{PENDING}), "]\n";
+        DEBUG +> 4 and print "Pending: [", pretty ($$self{PENDING}), "]\n";
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
         $self->?$method ($attrs, '');
     } else {
-        DEBUG > 2 and print "No $method start method, skipping\n";
+        DEBUG +> 2 and print "No $method start method, skipping\n";
     }
 }
 
@@ -273,20 +273,20 @@ sub _handle_element_start {
 # an end_ method for the element, call that.
 sub _handle_element_end {
     my ($self, $element) = @_;
-    DEBUG > 3 and print "-- $element\n";
+    DEBUG +> 3 and print "-- $element\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, pull off the pending text and pass it to
     # the handler along with the saved attribute hash.
     if ($self->can ("cmd_$method")) {
-        DEBUG > 2 and print "</$element> stops saving a tag\n";
+        DEBUG +> 2 and print "</$element> stops saving a tag\n";
         my $tag = pop @{ $$self{PENDING} };
-        DEBUG > 4 and print "Popped: [", pretty ($tag), "]\n";
-        DEBUG > 4 and print "Pending: [", pretty ($$self{PENDING}), "]\n";
+        DEBUG +> 4 and print "Popped: [", pretty ($tag), "]\n";
+        DEBUG +> 4 and print "Pending: [", pretty ($$self{PENDING}), "]\n";
         my $method = 'cmd_' . $method;
         my $text = $self->?$method ($$tag[0], $$tag[2]);
         if (defined $text) {
-            if (@{ $$self{PENDING} } > 1) {
+            if (@{ $$self{PENDING} } +> 1) {
                 $$self{PENDING}[-1][2] .= $text;
             } else {
                 $self->output ($text);
@@ -296,7 +296,7 @@ sub _handle_element_end {
         my $method = 'end_' . $method;
         $self->?$method ();
     } else {
-        DEBUG > 2 and print "No $method end method, skipping\n";
+        DEBUG +> 2 and print "No $method end method, skipping\n";
     }
 }
 
@@ -413,7 +413,7 @@ sub quote_literal {
 sub guesswork {
     my $self = shift;
     local $_ = shift;
-    DEBUG > 5 and print "   Guesswork called on [$_]\n";
+    DEBUG +> 5 and print "   Guesswork called on [$_]\n";
 
     # By the time we reach this point, all hypens will be escaped by adding a
     # backslash.  We want to undo that escaping if they're part of regular
@@ -521,7 +521,7 @@ sub guesswork {
     }
 
     # Done.
-    DEBUG > 5 and print "   Guesswork returning [$_]\n";
+    DEBUG +> 5 and print "   Guesswork returning [$_]\n";
     return $_;
 }
 
@@ -661,9 +661,9 @@ sub protect {
 # body.
 sub makespace {
     my ($self) = @_;
-    $self->output (".PD\n") if $$self{ITEMS} > 1;
+    $self->output (".PD\n") if $$self{ITEMS} +> 1;
     $$self{ITEMS} = 0;
-    $self->output ($$self{INDENT} > 0 ? ".Sp\n" : ".PP\n")
+    $self->output ($$self{INDENT} +> 0 ? ".Sp\n" : ".PP\n")
         if $$self{NEEDSPACE};
 }
 
@@ -728,7 +728,7 @@ sub start_document {
     }
     my $date = $$self{date} || $self->devise_date;
     $self->preamble ($name, $section, $date)
-        unless $self->bare_output or DEBUG > 9;
+        unless $self->bare_output or DEBUG +> 9;
 
     # Initialize a few per-document variables.
     $$self{INDENT}    = 0;      # Current indentation level.
@@ -785,8 +785,8 @@ sub devise_title {
         my @dirs = File::Spec->splitdir ($dirs);
         my $cut = 0;
         my $i;
-        for ($i = 0; $i < scalar @dirs; $i++) {
-            if ($dirs[$i] eq 'lib' && $i+1 < scalar(@dirs) && $dirs[$i + 1] =~ /perl/) {
+        for ($i = 0; $i +< scalar @dirs; $i++) {
+            if ($dirs[$i] eq 'lib' && $i+1 +< scalar(@dirs) && $dirs[$i + 1] =~ /perl/) {
                 $cut = $i + 2;
                 last;
             } elsif ($dirs[$i] =~ /perl/) {
@@ -795,7 +795,7 @@ sub devise_title {
                 last;
             }
         }
-        if ($cut > 0) {
+        if ($cut +> 0) {
             splice (@dirs, 0, $cut);
             shift @dirs if ($dirs[0] =~ /^(site|vendor)(_perl)?$/);
             shift @dirs if ($dirs[0] =~ /^[\d.]+$/);
@@ -945,7 +945,7 @@ sub cmd_verbatim {
         last if /^\s*$/;
         $unbroken++;
     }
-    $unbroken = 10 if ($unbroken > 12 && !$$self{MAGIC_VNOPAGEBREAK_LIMIT});
+    $unbroken = 10 if ($unbroken +> 12 && !$$self{MAGIC_VNOPAGEBREAK_LIMIT});
 
     # Prepend a null token to each line.
     $text =~ s/^/\\&/gm;
@@ -981,7 +981,7 @@ sub heading_common {
 
     # This should never happen; it means that we have a heading after =item
     # without an intervening =back.  But just in case, handle it anyway.
-    if ($$self{ITEMS} > 1) {
+    if ($$self{ITEMS} +> 1) {
         $$self{ITEMS} = 0;
         $self->output (".PD\n");
     }
@@ -1078,7 +1078,7 @@ sub over_common_start {
     my ($self, $type, $attrs) = @_;
     my $line = $$attrs{start_line};
     my $indent = $$attrs{indent};
-    DEBUG > 3 and print " Starting =over $type (line $line, indent ",
+    DEBUG +> 3 and print " Starting =over $type (line $line, indent ",
         ($indent || '?'), "\n";
 
     # Find the indentation level.
@@ -1090,7 +1090,7 @@ sub over_common_start {
     # pending indentation for the last level that we saw and haven't acted on
     # yet.  SHIFTS is the stack of indentations that we've actually emitted
     # code for.
-    if (@{ $$self{SHIFTS} } < @{ $$self{INDENTS} }) {
+    if (@{ $$self{SHIFTS} } +< @{ $$self{INDENTS} }) {
         $self->output (".RS $$self{INDENT}\n");
         push (@{ $$self{SHIFTS} }, $$self{INDENT});
     }
@@ -1112,19 +1112,19 @@ sub over_common_start {
 # .RE and then a new .RS to unconfuse *roff.
 sub over_common_end {
     my ($self) = @_;
-    DEBUG > 3 and print " Ending =over\n";
+    DEBUG +> 3 and print " Ending =over\n";
     $$self{INDENT} = pop @{ $$self{INDENTS} };
     pop @{ $$self{ITEMTYPES} };
 
     # If we emitted code for that indentation, end it.
-    if (@{ $$self{SHIFTS} } > @{ $$self{INDENTS} }) {
+    if (@{ $$self{SHIFTS} } +> @{ $$self{INDENTS} }) {
         $self->output (".RE\n");
         pop @{ $$self{SHIFTS} };
     }
 
     # If we're still in an indentation, *roff will have now lost track of the
     # right depth of that indentation, so fix that.
-    if (@{ $$self{INDENTS} } > 0) {
+    if (@{ $$self{INDENTS} } +> 0) {
         $self->output (".RE\n");
         $self->output (".RS $$self{INDENT}\n");
     }
@@ -1151,7 +1151,7 @@ sub end_over_block  { $_[0]->over_common_end }
 sub item_common {
     my ($self, $type, $attrs, $text) = @_;
     my $line = $$attrs{start_line};
-    DEBUG > 3 and print "  $type item (line $line): $text\n";
+    DEBUG +> 3 and print "  $type item (line $line): $text\n";
 
     # Clean up the text.  We want to end up with two variables, one ($text)
     # which contains any body text after taking out the item portion, and

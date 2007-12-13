@@ -92,7 +92,7 @@ SKIP: {
     my $utf8 = '';
     for my $j (0,0x10){
     for my $i (0..0xffff){
-        $j == 0 and (0xD800 <= $i && $i <= 0xDFFF) and next;
+        $j == 0 and (0xD800 +<= $i && $i +<= 0xDFFF) and next;
         $utf8 .= ord($j+$i);
     }
     for my $major ('UTF-16', 'UTF-32'){

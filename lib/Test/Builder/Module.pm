@@ -108,7 +108,7 @@ sub _strip_imports {
     my @imports = ();
     my @other   = ();
     my $idx = 0;
-    while( $idx <= $#{$list} ) {
+    while( $idx +<= $#{$list} ) {
         my $item = $list->[$idx];
 
         if( defined $item and $item eq 'import' ) {

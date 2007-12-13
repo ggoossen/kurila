@@ -1404,7 +1404,7 @@ SKIP: {
     }
 }
 
-ok(1) while $test < 576;
+ok(1) while $test +< 576;
 
 {
     $_ = "abc\x{100}\x{200}\x{300}\x{380}\x{400}defg";
@@ -1927,7 +1927,7 @@ $test = 687;
 
 }
 
-ok(1) while $test < 715;
+ok(1) while $test +< 715;
 
 {
     # high bit bug -- japhy
@@ -3069,7 +3069,7 @@ ok(("abc" =~ /^abc(\z)??/) && !defined($1),
     $count{$_}++ for @got;
     my $ok=1;
     for (@nums) {
-        $ok=0 if --$count{$_}<0;
+        $ok=0 if --$count{$_}+<0;
     }
     ok($ok,"Trie min count matches");
 }
@@ -3242,7 +3242,7 @@ if ($ordA == 193) {
     my $str = '';
 
     # create some random junk. Inefficient, but it works.
-    for ($i = 0 ; $i < $size ; $i++) {
+    for ($i = 0 ; $i +< $size ; $i++) {
         $str .= $chars[int(rand(@chars))];
     }
 
@@ -3866,7 +3866,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     while (m#(\G|\n)([^\n]*)\n#gsx) 
     { 
         push @res,"$2"; 
-        last if @res>3;
+        last if @res+>3;
     }
     iseq("@res","A B C","RT#6893: /g pattern shouldn't infinite loop");
 }

@@ -328,7 +328,7 @@ sub next_todo {
 	$self->{'subs_declared'}{$name} = 1;
 	if ($name eq "BEGIN") {
 	    my $use_dec = $self->begin_is_use($cv);
-	    if (defined ($use_dec) and $self->{'expand'} < 5) {
+	    if (defined ($use_dec) and $self->{'expand'} +< 5) {
 		return () if 0 == length($use_dec);
 		return $use_dec;
 	    }
@@ -647,7 +647,7 @@ sub compile {
 	$self->{'curcvlex'} = undef;
 	print $self->print_protos;
 	@{$self->{'subs_todo'}} =
-	  sort {$a->[0] <=> $b->[0]} @{$self->{'subs_todo'}};
+	  sort {$a->[0] <+> $b->[0]} @{$self->{'subs_todo'}};
 	print $self->indent($self->deparse_root(main_root)), "\n"
 	  unless null main_root;
 	my @text;
@@ -682,7 +682,7 @@ sub ambient_pragmas {
     my $self = shift;
     my ($hint_bits, $warning_bits, $hinthash) = (0, 0);
 
-    while (@_ > 1) {
+    while (@_ +> 1) {
 	my $name = shift();
 	my $val  = shift();
 
@@ -957,7 +957,7 @@ sub is_scalar {
 sub maybe_parens {
     my $self = shift;
     my($text, $cx, $prec) = @_;
-    if ($prec < $cx              # unary ops nest just fine
+    if ($prec +< $cx              # unary ops nest just fine
 	or $prec == $cx and $cx != 4 and $cx != 16 and $cx != 21
 	or $self->{'parens'})
     {
@@ -974,7 +974,7 @@ sub maybe_parens {
 sub maybe_parens_unop {
     my $self = shift;
     my($name, $kid, $cx) = @_;
-    if ($cx > 16 or $self->{'parens'}) {
+    if ($cx +> 16 or $self->{'parens'}) {
 	$kid =  $self->deparse($kid, 1);
  	if ($name eq "umask" && $kid =~ /^\d+$/) {
 	    $kid = sprintf("%#o", $kid);
@@ -1001,7 +1001,7 @@ sub maybe_parens_unop {
 sub maybe_parens_func {
     my $self = shift;
     my($func, $text, $cx, $prec) = @_;
-    if ($prec <= $cx or substr($text, 0, 1) eq "(" or $self->{'parens'}) {
+    if ($prec +<= $cx or substr($text, 0, 1) eq "(" or $self->{'parens'}) {
 	return "$func($text)";
     } else {
 	return "$func $text";
@@ -1084,11 +1084,11 @@ sub lineseq {
 	my $nseq;
 	$nseq = $self->find_scope_st($root->sibling) if ${$root->sibling};
 	$limit_seq = $nseq if !defined($limit_seq)
-			   or defined($nseq) && $nseq < $limit_seq;
+			   or defined($nseq) && $nseq +< $limit_seq;
     }
     $limit_seq = $self->{'limit_seq'}
 	if defined($self->{'limit_seq'})
-	&& (!defined($limit_seq) || $self->{'limit_seq'} < $limit_seq);
+	&& (!defined($limit_seq) || $self->{'limit_seq'} +< $limit_seq);
     local $self->{'limit_seq'} = $limit_seq;
 
     $self->walk_lineseq($root, \@ops,
@@ -1133,7 +1133,7 @@ sub scopeop {
     for (; !null($kid); $kid = $kid->sibling) {
 	push @kids, $kid;
     }
-    if ($cx > 0) { # inside an expression, (a do {} while for lineseq)
+    if ($cx +> 0) { # inside an expression, (a do {} while for lineseq)
 	return "do {\n\t" . $self->lineseq($op, @kids) . "\n\b}";
     } else {
 	my $lineseq = $self->lineseq($op, @kids);
@@ -1167,11 +1167,11 @@ sub deparse_root {
 sub walk_lineseq {
     my ($self, $op, $kids, $callback) = @_;
     my @kids = @$kids;
-    for (my $i = 0; $i < @kids; $i++) {
+    for (my $i = 0; $i +< @kids; $i++) {
 	my $expr = "";
 	if (is_state $kids[$i]) {
 	    $expr = $self->deparse($kids[$i++], 0);
-	    if ($i > $#kids) {
+	    if ($i +> $#kids) {
 		$callback->($expr, $i);
 		last;
 	    }
@@ -1243,7 +1243,7 @@ sub lex_in_scope {
     return 0 if !exists $self->{'curcvlex'}{$name};
     for my $a (@{$self->{'curcvlex'}{$name}}) {
 	my ($st, $en) = @$a;
-	return 1 if $seq > $st && $seq <= $en;
+	return 1 if $seq +> $st && $seq +<= $en;
     }
     return 0;
 }
@@ -1257,7 +1257,7 @@ sub populate_curcvlex {
 	my @padlist = $padlist->ARRAY;
 	my @ns = $padlist[0]->ARRAY;
 
-	for (my $i=0; $i<@ns; ++$i) {
+	for (my $i=0; $i+<@ns; ++$i) {
 	    next if class($ns[$i]) eq "SPECIAL";
 	    next if $ns[$i]->FLAGS ^&^ SVpad_OUR;  # Skip "our" vars
 	    if (class($ns[$i]) eq "PV") {
@@ -1290,14 +1290,14 @@ sub find_scope {
 	    if ($o->name =~ /^pad.v$/ && $o->private ^&^ OPpLVAL_INTRO) {
 		my $s = int($self->padname_sv($o->targ)->COP_SEQ_RANGE_LOW);
 		my $e = $self->padname_sv($o->targ)->COP_SEQ_RANGE_HIGH;
-		$scope_st = $s if !defined($scope_st) || $s < $scope_st;
-		$scope_en = $e if !defined($scope_en) || $e > $scope_en;
+		$scope_st = $s if !defined($scope_st) || $s +< $scope_st;
+		$scope_en = $e if !defined($scope_en) || $e +> $scope_en;
 		return ($scope_st, $scope_en);
 	    }
 	    elsif (is_state($o)) {
 		my $c = $o->cop_seq;
-		$scope_st = $c if !defined($scope_st) || $c < $scope_st;
-		$scope_en = $c if !defined($scope_en) || $c > $scope_en;
+		$scope_st = $c if !defined($scope_st) || $c +< $scope_st;
+		$scope_en = $c if !defined($scope_en) || $c +> $scope_en;
 		return ($scope_st, $scope_en);
 	    }
 	    elsif ($o->flags ^&^ OPf_KIDS) {
@@ -1319,7 +1319,7 @@ sub cop_subs {
 	and my $nseq = $self->find_scope_st($op->sibling) ) {
 	$seq = $nseq;
     }
-    $seq = $out_seq if defined($out_seq) && $out_seq < $seq;
+    $seq = $out_seq if defined($out_seq) && $out_seq +< $seq;
     return $self->seq_subs($seq);
 }
 
@@ -1330,7 +1330,7 @@ sub seq_subs {
 
     return "" if !defined $seq;
     while (scalar(@{$self->{'subs_todo'}})
-	   and $seq > $self->{'subs_todo'}[0][0]) {
+	   and $seq +> $self->{'subs_todo'}[0][0]) {
 	push @text, $self->next_todo;
     }
     return @text;
@@ -1469,7 +1469,7 @@ sub baseop {
 sub pp_stub {
     my $self = shift;
     my($op, $cx, $name) = @_;
-    if ($cx >= 1) {
+    if ($cx +>= 1) {
 	return "()";
     }
     else {
@@ -1538,7 +1538,7 @@ sub pp_i_negate { pp_negate(@_) }
 sub pp_not {
     my $self = shift;
     my($op, $cx) = @_;
-    if ($cx <= 4) {
+    if ($cx +<= 4) {
 	$self->pfixop($op, $cx, "not ", 4);
     } else {
 	$self->pfixop($op, $cx, "!", 21);	
@@ -1778,7 +1778,7 @@ sub anon_hash_or_list {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
     }
-    if ($pre eq "{" and $cx < 1) {
+    if ($pre eq "{" and $cx +< 1) {
 	# Disambiguate that it's not a block
 	$pre = "+{";
     }
@@ -2164,18 +2164,18 @@ sub logop {
     my ($op, $cx, $lowop, $lowprec, $highop, $highprec, $blockname) = @_;
     my $left = $op->first;
     my $right = $op->first->sibling;
-    if ($cx < 1 and is_scope($right) and $blockname
-	and $self->{'expand'} < 7)
+    if ($cx +< 1 and is_scope($right) and $blockname
+	and $self->{'expand'} +< 7)
     { # if ($a) {$b}
 	$left = $self->deparse($left, 1);
 	$right = $self->deparse($right, 0);
 	return "$blockname ($left) {\n\t$right\n\b}\cK";
-    } elsif ($cx < 1 and $blockname and not $self->{'parens'}
-	     and $self->{'expand'} < 7) { # $b if $a
+    } elsif ($cx +< 1 and $blockname and not $self->{'parens'}
+	     and $self->{'expand'} +< 7) { # $b if $a
 	$right = $self->deparse($right, 1);
 	$left = $self->deparse($left, 1);
 	return "$right $blockname $left";
-    } elsif ($cx > $lowprec and $highop) { # $a && $b
+    } elsif ($cx +> $lowprec and $highop) { # $a && $b
 	$left = $self->deparse_binop_left($op, $left, $highprec);
 	$right = $self->deparse_binop_right($op, $right, $highprec);
 	return $self->maybe_parens("$left $highop $right", $cx, $highprec);
@@ -2212,7 +2212,7 @@ sub listop {
     my $self = shift;
     my($op, $cx, $name) = @_;
     my(@exprs);
-    my $parens = ($cx >= 5) || $self->{'parens'};
+    my $parens = ($cx +>= 5) || $self->{'parens'};
     my $kid = $op->first->sibling;
     return $name if null $kid;
     my $first;
@@ -2347,7 +2347,7 @@ sub pp_truncate {
     my $self = shift;
     my($op, $cx) = @_;
     my(@exprs);
-    my $parens = ($cx >= 5) || $self->{'parens'};
+    my $parens = ($cx +>= 5) || $self->{'parens'};
     my $kid = $op->first->sibling;
     my $fh;
     if ($op->flags ^&^ OPf_SPECIAL) {
@@ -2412,7 +2412,7 @@ sub indirop {
 	# 3)". Unfortunately, we'll currently think the parens are
 	# necessary more often that they really are, because we don't
 	# distinguish which side of an assignment we're on.
-	if ($cx >= 5) {
+	if ($cx +>= 5) {
 	    return "($name2 $args)";
 	} else {
 	    return "$name2 $args";
@@ -2538,9 +2538,9 @@ sub pp_cond_expr {
     my $true = $cond->sibling;
     my $false = $true->sibling;
     my $cuddle = $self->{'cuddle'};
-    unless ($cx < 1 and (is_scope($true) and $true->name ne "null") and
+    unless ($cx +< 1 and (is_scope($true) and $true->name ne "null") and
 	    (is_scope($false) || is_ifelse_cont($false))
-	    and $self->{'expand'} < 7) {
+	    and $self->{'expand'} +< 7) {
 	$cond = $self->deparse($cond, 8);
 	$true = $self->deparse($true, 6);
 	$false = $self->deparse($false, 8);
@@ -2657,7 +2657,7 @@ sub loop_common {
 	    push @states, $state;
 	}
 	$body = $self->lineseq(undef, @states);
-	if (defined $cond and not is_scope $cont and $self->{'expand'} < 3) {
+	if (defined $cond and not is_scope $cont and $self->{'expand'} +< 3) {
 	    $head = "for ($init; $cond; " . $self->deparse($cont, 1) .") ";
 	    $cont = "\cK";
 	} else {
@@ -2724,7 +2724,7 @@ sub pp_null {
 	return $self->maybe_parens($self->deparse($op->first, 20) . " =~ "
 				   . $self->deparse($op->first->sibling, 20),
 				   $cx, 20);
-    } elsif ($op->flags ^&^ OPf_SPECIAL && $cx < 1 && !$op->targ) {
+    } elsif ($op->flags ^&^ OPf_SPECIAL && $cx +< 1 && !$op->targ) {
 	return "do {\n\t". $self->deparse($op->first, $cx) ."\n\b};";
     } elsif (!null($op->first->sibling) and
 	     $op->first->sibling->name eq "null" and
@@ -2887,7 +2887,7 @@ sub list_const {
 	return "()";
     } elsif (@a == 1) {
 	return $a[0];
-    } elsif ( @a > 2 and !grep(!/^-?\d+$/, @a)) {
+    } elsif ( @a +> 2 and !grep(!/^-?\d+$/, @a)) {
 	# collapse (-1,0,1,2) into (-1..2)
 	my ($s, $e) = @a[0,-1];
 	my $i = $s;
@@ -3458,7 +3458,7 @@ my %unctrl = # portable to to EBCDIC
 # character escapes, but not delimiters that might need to be escaped
 sub escape_str { # ASCII, UTF8
     my($str) = @_;
-    $str =~ s/(.)/ord($1) > 255 ? sprintf("\\x{%x}", ord($1)) : $1/eg;
+    $str =~ s/(.)/ord($1) +> 255 ? sprintf("\\x{%x}", ord($1)) : $1/eg;
     $str =~ s/\a/\\a/g;
 #    $str =~ s/\cH/\\b/g; # \b means something different in a regex
     $str =~ s/\t/\\t/g;
@@ -3475,7 +3475,7 @@ sub escape_str { # ASCII, UTF8
 # Leave whitespace unmangled.
 sub escape_extended_re {
     my($str) = @_;
-    $str =~ s/(.)/ord($1) > 255 ? sprintf("\\x{%x}", ord($1)) : $1/eg;
+    $str =~ s/(.)/ord($1) +> 255 ? sprintf("\\x{%x}", ord($1)) : $1/eg;
     $str =~ s/([[:^print:]])/
 	($1 =~ y! \t\n!!) ? $1 : sprintf("\\%03o", ord($1))/ge;
     $str =~ s/\n/\n\f/g;
@@ -3513,7 +3513,7 @@ sub balanced_delim {
 	    } elsif ($c eq $close) {
 		$fail = 1 if $last_bs;
 		$cnt--;
-		if ($cnt < 0) {
+		if ($cnt +< 0) {
 		    # qq()() isn't ")("
 		    $fail = 1;
 		    last;
@@ -3591,7 +3591,7 @@ sub const {
 
     if ($sv->FLAGS ^&^ SVf_IOK) {
 	my $str = $sv->int_value;
-	$str = $self->maybe_parens($str, $cx, 21) if $str < 0;
+	$str = $self->maybe_parens($str, $cx, 21) if $str +< 0;
 	return $str;
     } elsif ($sv->FLAGS ^&^ SVf_NOK) {
 	my $nv = $sv->NV;
@@ -3604,7 +3604,7 @@ sub const {
 		return $self->maybe_parens("-.0", $cx, 21);
 	    }
 	} elsif (1/$nv == 0) {
-	    if ($nv > 0) {
+	    if ($nv +> 0) {
 		# positive infinity
 		return $self->maybe_parens("9**9**9", $cx, 22);
 	    } else {
@@ -3638,7 +3638,7 @@ sub const {
 		return $self->maybe_parens("$mant * 2**$exp", $cx, 19);
 	    }
 	}
-	$str = $self->maybe_parens($str, $cx, 21) if $nv < 0;
+	$str = $self->maybe_parens($str, $cx, 21) if $nv +< 0;
 	return $str;
     } elsif ($sv->FLAGS ^&^ SVf_ROK && $sv->can("RV")) {
 	my $ref = $sv->RV;
@@ -3799,7 +3799,7 @@ sub pchr { # ASCII
 	return '\\\\';
     } elsif ($n == ord "-") {
 	return "\\-";
-    } elsif ($n >= ord(' ') and $n <= ord('~')) {
+    } elsif ($n +>= ord(' ') and $n +<= ord('~')) {
 	return chr($n);
     } elsif ($n == ord "\a") {
 	return '\\a';
@@ -3815,7 +3815,7 @@ sub pchr { # ASCII
 	return '\\f';
     } elsif ($n == ord "\r") {
 	return '\\r';
-    } elsif ($n >= ord("\cA") and $n <= ord("\cZ")) {
+    } elsif ($n +>= ord("\cA") and $n +<= ord("\cZ")) {
 	return '\\c' . chr(ord("@") + $n);
     } else {
 #	return '\x' . sprintf("%02x", $n);
@@ -3826,13 +3826,13 @@ sub pchr { # ASCII
 sub collapse {
     my(@chars) = @_;
     my($str, $c, $tr) = ("");
-    for ($c = 0; $c < @chars; $c++) {
+    for ($c = 0; $c +< @chars; $c++) {
 	$tr = $chars[$c];
 	$str .= pchr($tr);
-	if ($c <= $#chars - 2 and $chars[$c + 1] == $tr + 1 and
+	if ($c +<= $#chars - 2 and $chars[$c + 1] == $tr + 1 and
 	    $chars[$c + 2] == $tr + 2)
 	{
-	    for (; $c <= $#chars-1 and $chars[$c + 1] == $chars[$c] + 1; $c++)
+	    for (; $c +<= $#chars-1 and $chars[$c + 1] == $chars[$c] + 1; $c++)
 	      {}
 	    $str .= "-";
 	    $str .= pchr($chars[$c]);
@@ -3851,16 +3851,16 @@ sub tr_decode_byte {
     {
 	$tr = $table[ord "-"];
 	$table[ord "-"] = -1;
-	if ($tr >= 0) {
+	if ($tr +>= 0) {
 	    @from = ord("-");
 	    @to = $tr;
 	} else { # -2 ==> delete
 	    $delhyphen = 1;
 	}
     }
-    for ($c = 0; $c < @table; $c++) {
+    for ($c = 0; $c +< @table; $c++) {
 	$tr = $table[$c];
-	if ($tr >= 0) {
+	if ($tr +>= 0) {
 	    push @from, $c; push @to, $tr;
 	} elsif ($tr == -2) {
 	    push @delfrom, $c;
@@ -3871,7 +3871,7 @@ sub tr_decode_byte {
 	my @newfrom = ();
 	my %from;
 	@from{@from} = (1) x @from;
-	for ($c = 0; $c < 256; $c++) {
+	for ($c = 0; $c +< 256; $c++) {
 	    push @newfrom, $c unless $from{$c};
 	}
 	@from = @newfrom;
@@ -3960,7 +3960,7 @@ sub tr_decode_utf8 {
 	}
 	@from = ();
 	for my $range (@newfrom) {
-	    if ($range->[0] <= $range->[1]) {
+	    if ($range->[0] +<= $range->[1]) {
 		push @from, $range;
 	    }
 	}
@@ -3968,7 +3968,7 @@ sub tr_decode_utf8 {
     my($from, $to, $diff);
     for my $chunk (@from) {
 	$diff = $chunk->[1] - $chunk->[0];
-	if ($diff > 1) {
+	if ($diff +> 1) {
 	    $from .= tr_chr($chunk->[0]) . "-" . tr_chr($chunk->[1]);
 	} elsif ($diff == 1) {
 	    $from .= tr_chr($chunk->[0]) . tr_chr($chunk->[1]);
@@ -3978,7 +3978,7 @@ sub tr_decode_utf8 {
     }
     for my $chunk (@to) {
 	$diff = $chunk->[1] - $chunk->[0];
-	if ($diff > 1) {
+	if ($diff +> 1) {
 	    $to .= tr_chr($chunk->[0]) . "-" . tr_chr($chunk->[1]);
 	} elsif ($diff == 1) {
 	    $to .= tr_chr($chunk->[0]) . tr_chr($chunk->[1]);
@@ -4190,7 +4190,7 @@ sub pp_split {
     my $gv = 0;
     if (ref($replroot) eq "B::GV") {
 	$gv = $replroot;
-    } elsif (!ref($replroot) and $replroot > 0) {
+    } elsif (!ref($replroot) and $replroot +> 0) {
 	$gv = $self->padval($replroot);
     }
     $ary = $self->stash_variable('@', $self->gv_name($gv)) if $gv;

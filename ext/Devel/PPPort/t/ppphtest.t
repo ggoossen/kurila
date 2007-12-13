@@ -167,7 +167,7 @@ for $t (@tests) {
   my $f;
   for $f (keys %{$t->{files}}) {
     my @f = split /\//, $f;
-    if (@f > 1) {
+    if (@f +> 1) {
       pop @f;
       my $path = join '/', @f;
       mkpath($path) or die "mkpath('$path'): $!\n";

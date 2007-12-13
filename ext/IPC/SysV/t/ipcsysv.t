@@ -64,7 +64,7 @@ skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
 
     $msg = msgget(IPC_PRIVATE, $perm);
     # Very first time called after machine is booted value may be 0 
-    if (!(defined($msg) && $msg >= 0)) {
+    if (!(defined($msg) && $msg +>= 0)) {
         skip( "msgget failed: $!", 6);
     }
     else {
@@ -162,7 +162,7 @@ SKIP: {
             if $! eq 'No space left on device';
 
         # Very first time called after machine is booted value may be 0 
-        die "semget: $!\n" unless defined($sem) && $sem >= 0;
+        die "semget: $!\n" unless defined($sem) && $sem +>= 0;
     }
 
     my $data;

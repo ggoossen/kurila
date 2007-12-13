@@ -74,7 +74,7 @@ sub http_accept_langs {
   # Hm.  Should I just move this into I18N::LangTags at some point?
   no integer;
 
-  my $in = (@_ > 1) ? $_[1] : $ENV{'HTTP_ACCEPT_LANGUAGE'};
+  my $in = (@_ +> 1) ? $_[1] : $ENV{'HTTP_ACCEPT_LANGUAGE'};
   # (always ends up untainting)
 
   return() unless defined $in and length $in;
@@ -119,7 +119,7 @@ sub http_accept_langs {
   return _normalize(
     # Read off %pref, in descending key order...
     map @{$pref{$_}},
-    sort {$b <=> $a}
+    sort {$b <+> $a}
     keys %pref
   );
 }
@@ -146,7 +146,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
     eval "require $module"; # used to be "use $module", but no point in that.
   }
   if($@) {
-    print "Error using $module \: $@\n" if DEBUG > 1;
+    print "Error using $module \: $@\n" if DEBUG +> 1;
     return $tried{$module} = 0;
   } else {
     print " OK, $module is used\n" if DEBUG;

@@ -6,7 +6,7 @@ use strict;
 
 our ($i, @x, $y, $c, $foo, @ary, $loop_count, @array, $r, $TODO);
 
-for ($i = 0; $i <= 10; $i++) {
+for ($i = 0; $i +<= 10; $i++) {
     $x[$i] = $i;
 }
 $y = $x[10];
@@ -22,7 +22,7 @@ if (join(' ', @x) eq '0 1 2 3 4 5 6 7 8 9 10') {
 $i = $c = 0;
 for (;;) {
 	$c++;
-	last if $i++ > 10;
+	last if $i++ +> 10;
 }
 if ($c == 12) {print "ok 2\n";} else {print "not ok 2\n";}
 

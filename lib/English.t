@@ -85,7 +85,7 @@ like( $EXECUTABLE_NAME, qr/perl/i, '$EXECUTABLE_NAME' );
 is( $OSNAME, $Config{osname}, '$OSNAME' );
 
 # may be non-portable
-ok( $SYSTEM_FD_MAX >= 2, '$SYSTEM_FD_MAX should be at least 2' );
+ok( $SYSTEM_FD_MAX +>= 2, '$SYSTEM_FD_MAX should be at least 2' );
 
 is( $INPLACE_EDIT, '.inplace', '$INPLACE_EDIT' );
 

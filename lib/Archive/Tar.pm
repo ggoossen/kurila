@@ -237,7 +237,7 @@ sub _read_tar {
 
     ### set a cap on the amount of files to extract ###
     my $limit   = 0;
-    $limit = 1 if $count > 0;
+    $limit = 1 if $count +> 0;
 
     my $tarfile = [ ];
     my $chunk;
@@ -305,7 +305,7 @@ sub _read_tar {
                 ### bytes ends up in the ->name area.
                 ### clean it up, if need be
                 my $name = $entry->name;
-                $name = substr($name, 0, 100) if length $name > 100;
+                $name = substr($name, 0, 100) if length $name +> 100;
                 $name =~ s/\n/ /g;
 
                 $self->_error( $name . qq[: checksum error] );
@@ -320,7 +320,7 @@ sub _read_tar {
             ### can't do lazy loading since IO::Zlib doesn't support 'seek'
             ### this is because Compress::Zlib doesn't support it =/
             ### this reads in the whole data in one read() call.
-            if( $handle->read( $$data, $block ) < $block ) {
+            if( $handle->read( $$data, $block ) +< $block ) {
                 $self->_error( qq[Read error on tarfile (missing data) '].
                                     $entry->full_path ."' at offset $offset" );
                 next LOOP;
@@ -1001,8 +1001,8 @@ sub write {
 
         ### names are too long, and will get truncated if we don't add a
         ### '@LongLink' file...
-        my $make_longlink = (   length($clone->name)    > NAME_LENGTH or
-                                length($clone->prefix)  > PREFIX_LENGTH
+        my $make_longlink = (   length($clone->name)    +> NAME_LENGTH or
+                                length($clone->prefix)  +> PREFIX_LENGTH
                             ) || 0;
 
         ### perhaps we need to make a longlink file?
@@ -1105,7 +1105,7 @@ sub _format_tar_entry {
 
     ### not sure why this is... ###
     my $l = PREFIX_LENGTH; # is ambiguous otherwise...
-    substr ($prefix, 0, -$l, "") if length $prefix >= PREFIX_LENGTH;
+    substr ($prefix, 0, -$l, "") if length $prefix +>= PREFIX_LENGTH;
 
     my $f1 = "%06o"; my $f2  = "%11o";
 

@@ -64,7 +64,7 @@ sub make {
 	$self->{h} = $h;
 	$self->{ref} = \%hash;
 	my @pool;
-	for (my $i = 0; $i < 5; $i++) {
+	for (my $i = 0; $i +< 5; $i++) {
 		push(@pool, SIMPLE->make($i));
 	}
 	$self->{obj} = \@pool;
@@ -123,7 +123,7 @@ ok 7, $hash_fetch == 2;
 
 my $num = $r->num;
 my $ok = 1;
-for (my $i = 0; $i < @$num; $i++) {
+for (my $i = 0; $i +< @$num; $i++) {
 	do { $ok = 0; last } unless $num->[$i] == $y->num->[$i];
 }
 ok 8, $ok;

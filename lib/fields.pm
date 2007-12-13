@@ -40,8 +40,8 @@ sub import {
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
     bless \%{*{Symbol::fetch_glob("$package\::FIELDS")}}, 'pseudohash';
 
-    if ($next > $fattr->[0]
-        and ($fields->{$_[0]} || 0) >= $fattr->[0])
+    if ($next +> $fattr->[0]
+        and ($fields->{$_[0]} || 0) +>= $fattr->[0])
     {
         # There are already fields not belonging to base classes.
         # Looks like a possible module reload...
@@ -54,7 +54,7 @@ sub import {
         # have not changed.
         if ($fno and $fno != $next) {
             require Carp;
-            if ($fno < $fattr->[0]) {
+            if ($fno +< $fattr->[0]) {
                 warnings::warnif("Hides field '$f' in base class") ;
             } else {
                 Carp::croak("Field name '$f' already in use");
@@ -64,7 +64,7 @@ sub import {
         $fattr->[$next] = ($f =~ /^_/) ? PRIVATE : PUBLIC;
         $next += 1;
     }
-    if (@$fattr > $next) {
+    if (@$fattr +> $next) {
         # Well, we gave them the benefit of the doubt by guessing the
         # module was reloaded, but they appear to be declaring fields
         # in more than one place.  We can't be sure (without some extra
@@ -89,7 +89,7 @@ sub _dump  # sometimes useful for debugging
         }
         print "\n";
         my $fields = \%{*{Symbol::fetch_glob("$pkg\::FIELDS")}};
-        for my $f (sort {$fields->{$a} <=> $fields->{$b}} keys %$fields) {
+        for my $f (sort {$fields->{$a} <+> $fields->{$b}} keys %$fields) {
             my $no = $fields->{$f};
             print "   $no: $f";
             my $fattr = $attr{$pkg}[$no];

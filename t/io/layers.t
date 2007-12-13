@@ -92,12 +92,12 @@ SKIP: {
 	    }
 	} elsif (!$FASTSTDIO && !$DOSISH) {
 	    splice(@$result, 0, 2, "stdio")
-		if @$result >= 2 &&
+		if @$result +>= 2 &&
 		   $result->[0] eq "unix" &&
 		   $result->[1] eq "perlio";
 	} elsif ($DOSISH) {
 	    splice(@$result, 0, 2, "stdio")
-		if @$result >= 2 &&
+		if @$result +>= 2 &&
 		   $result->[0] eq "unix" &&
 		   $result->[1] eq "crlf";
 	}
@@ -109,7 +109,7 @@ SKIP: {
 	}
 	my $n = scalar @$expected;
 	is(scalar @$result, $n, "$id - layers == $n");
-	for (my $i = 0; $i < $n; $i++) {
+	for (my $i = 0; $i +< $n; $i++) {
 	    my $j = $expected->[$i];
 	    if (ref $j eq 'CODE') {
 		ok($j->($result->[$i]), "$id - $i is ok");
@@ -183,7 +183,7 @@ SKIP: {
 	splice(@results, 1, 2) if $NONSTDIO;
 
 	check([ @results ],
-	      [ "stdio",    undef,        sub { $_[0] > 0 },
+	      [ "stdio",    undef,        sub { $_[0] +> 0 },
 		"encoding", "iso-8859-1", sub { $_[0] ^&^ PerlIO::F_UTF8() } ],
 	      ":raw:encoding(latin1)");
     }

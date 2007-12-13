@@ -96,8 +96,8 @@ ok (!Cedric->isa('Programmer'));
 my $b = 'abc';
 my @refs = qw(SCALAR SCALAR     LVALUE      GLOB ARRAY HASH CODE);
 my @vals = (  \$b,   \3.14, \vec($b,1,1), \*b,  [],  {}, sub {} );
-for (my $p=0; $p < @refs; $p++) {
-    for (my $q=0; $q < @vals; $q++) {
+for (my $p=0; $p +< @refs; $p++) {
+    for (my $q=0; $q +< @vals; $q++) {
         is UNIVERSAL::isa($vals[$p], $refs[$q]), ($p==$q or $p+$q==1);
     };
 };

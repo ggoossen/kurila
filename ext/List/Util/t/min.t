@@ -31,6 +31,6 @@ $v = min(2,1);
 is($v, 1, '2-arg reverse ordered');
 
 my @a = map { rand() } 1 .. 20;
-my @b = sort { $a <=> $b } @a;
+my @b = sort { $a <+> $b } @a;
 $v = min(@a);
 is($v, $b[0], '20-arg random order');

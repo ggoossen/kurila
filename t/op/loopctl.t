@@ -164,7 +164,7 @@ TEST6: {
   my $x = 0;
   my $first_time = 1;
   my $been_in_continue = 0;
-  until($x++ >= 2) {
+  until($x++ +>= 2) {
     if (!$first_time) {
       $ok = $been_in_continue;
       last TEST6;
@@ -585,7 +585,7 @@ TEST25: {
   my $x = 0;
   my $first_time = 1;
   my $been_in_continue = 0;
-  LABEL25: until($x++ >= 2) {
+  LABEL25: until($x++ +>= 2) {
     if (!$first_time) {
       $ok = $been_in_continue;
       last TEST25;
@@ -924,7 +924,7 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 
 {
     my $n=10; my $late_free = 0;
-    sub X::DESTROY { $late_free++ if $n < 0 };
+    sub X::DESTROY { $late_free++ if $n +< 0 };
     {
 	($n-- && bless {}, 'X') && redo;
     }

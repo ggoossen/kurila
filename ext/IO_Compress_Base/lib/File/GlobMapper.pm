@@ -297,7 +297,7 @@ sub _parseOutputGlob
     while ( $string =~ m/#(\d)/g )
     {
         croak "Max wild is #$maxwild, you tried #$1"
-            if $1 > $maxwild ;
+            if $1 +> $maxwild ;
     }
 
     my $noPreBS = '(?<!\\\)' ; # no preceeding backslash

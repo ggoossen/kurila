@@ -58,11 +58,11 @@ for my $i (0..$#FOO) {
 	  ($FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j],
 	   $FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j],
 	   $FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j], $FOO[$j]);
-	my $cmp = $i1 <=> $j1;
-	if (!defined($cmp) ? !($i2 < $j2)
-	    : ($cmp == -1 && $i2 < $j2 ||
-	       $cmp == 0  && !($i2 < $j2) ||
-	       $cmp == 1  && !($i2 < $j2)))
+	my $cmp = $i1 <+> $j1;
+	if (!defined($cmp) ? !($i2 +< $j2)
+	    : ($cmp == -1 && $i2 +< $j2 ||
+	       $cmp == 0  && !($i2 +< $j2) ||
+	       $cmp == 1  && !($i2 +< $j2)))
 	{
 	    print "ok $ok\n";
 	}
@@ -81,10 +81,10 @@ for my $i (0..$#FOO) {
 	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '==');
 	}
 	$ok++;
-	if (!defined($cmp) ? !($i5 > $j5)
-	    : ($cmp == -1 && !($i5 > $j5) ||
-	       $cmp == 0  && !($i5 > $j5) ||
-	       $cmp == 1  && ($i5 > $j5)))
+	if (!defined($cmp) ? !($i5 +> $j5)
+	    : ($cmp == -1 && !($i5 +> $j5) ||
+	       $cmp == 0  && !($i5 +> $j5) ||
+	       $cmp == 1  && ($i5 +> $j5)))
 	{
 	    print "ok $ok\n";
 	}
@@ -92,10 +92,10 @@ for my $i (0..$#FOO) {
 	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '>');
 	}
 	$ok++;
-	if (!defined($cmp) ? !($i6 >= $j6)
-	    : ($cmp == -1 && !($i6 >= $j6) ||
-	       $cmp == 0  && $i6 >= $j6 ||
-	       $cmp == 1  && $i6 >= $j6))
+	if (!defined($cmp) ? !($i6 +>= $j6)
+	    : ($cmp == -1 && !($i6 +>= $j6) ||
+	       $cmp == 0  && $i6 +>= $j6 ||
+	       $cmp == 1  && $i6 +>= $j6))
 	{
 	    print "ok $ok\n";
 	}
@@ -115,10 +115,10 @@ for my $i (0..$#FOO) {
 	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '!=');
 	}
 	$ok++;
-	if (!defined($cmp) ? !($i8 <= $j8)
-	    : ($cmp == -1 && $i8 <= $j8 ||
-	       $cmp == 0  && $i8 <= $j8 ||
-	       $cmp == 1  && !($i8 <= $j8)))
+	if (!defined($cmp) ? !($i8 +<= $j8)
+	    : ($cmp == -1 && $i8 +<= $j8 ||
+	       $cmp == 0  && $i8 +<= $j8 ||
+	       $cmp == 1  && !($i8 +<= $j8)))
 	{
 	    print "ok $ok\n";
 	}
@@ -126,7 +126,7 @@ for my $i (0..$#FOO) {
 	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '<=');
 	}
 	$ok++;
-        my $pmc =  $j16 <=> $i16; # cmp it in reverse
+        my $pmc =  $j16 <+> $i16; # cmp it in reverse
         # Should give -ve of other answer, or undef for NaNs
         # a + -a should be zero. not zero is truth. which avoids using ==
 	if (defined($cmp) ? !($cmp + $pmc) : !defined $pmc)

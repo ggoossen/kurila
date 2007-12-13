@@ -32,9 +32,9 @@ sub _drop_oldenc {
     # If we find a match, we pop the old stack (once, since
     # the utf8 is just a flag on the encoding layer)
     my ($h, @new) = @_;
-    return unless @new >= 1 && $new[-1] =~ /^:encoding\(.+\)$/;
+    return unless @new +>= 1 && $new[-1] =~ /^:encoding\(.+\)$/;
     my @old = PerlIO::get_layers($h);
-    return unless @old >= 3 &&
+    return unless @old +>= 3 &&
 	          $old[-1] eq 'utf8' &&
                   $old[-2] =~ /^encoding\(.+\)$/;
     require Encode;

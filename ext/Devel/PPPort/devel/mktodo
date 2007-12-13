@@ -40,7 +40,7 @@ my $outdir = 'parts/todo';
 my $install = '/tmp/perl/install/default';
 # my $install = '/tmp/perl/install/thread';
 
-my @perls = sort { $b->{version} <=> $a->{version} }
+my @perls = sort { $b->{version} <+> $a->{version} }
             map { { version => `$_ -e 'printf "%.6f", \$]'`, path => $_ } }
             ('bleadperl', glob "$install/*/bin/perl5.*");
 

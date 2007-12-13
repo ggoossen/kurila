@@ -136,17 +136,17 @@ unless ($have_gettimeofday) {
 else {
     my @one = gettimeofday();
     ok 2, @one == 2, 'gettimeofday returned ', 0+@one, ' args';
-    ok 3, $one[0] > 850_000_000, "@one too small";
+    ok 3, $one[0] +> 850_000_000, "@one too small";
 
     sleep 1;
 
     my @two = gettimeofday();
-    ok 4, ($two[0] > $one[0] || ($two[0] == $one[0] && $two[1] > $one[1])),
+    ok 4, ($two[0] +> $one[0] || ($two[0] == $one[0] && $two[1] +> $one[1])),
     	    "@two is not greater than @one";
 
     my $f = Time::HiRes::time();
-    ok 5, $f > 850_000_000, "$f too small";
-    ok 6, $f - $two[0] < 2, "$f - $two[0] >= 2";
+    ok 5, $f +> 850_000_000, "$f too small";
+    ok 6, $f - $two[0] +< 2, "$f - $two[0] >= 2";
 }
 
 unless ($have_usleep) {
@@ -169,14 +169,14 @@ else {
 	usleep(500_000);
         my $f2 = Time::HiRes::time();
 	my $d = $f2 - $f;
-	ok 8, $d > 0.4 && $d < 0.9, "slept $d secs $f to $f2";
+	ok 8, $d +> 0.4 && $d +< 0.9, "slept $d secs $f to $f2";
     }
 }
 
 # Two-arg tv_interval() is always available.
 {
     my $f = tv_interval [5, 100_000], [10, 500_000];
-    ok 9, abs($f - 5.4) < 0.001, $f;
+    ok 9, abs($f - 5.4) +< 0.001, $f;
 }
 
 unless ($have_gettimeofday) {
@@ -185,7 +185,7 @@ unless ($have_gettimeofday) {
 else {
     my $r = [gettimeofday()];
     my $f = tv_interval $r;
-    ok 10, $f < 2, $f;
+    ok 10, $f +< 2, $f;
 }
 
 unless ($have_usleep && $have_gettimeofday) {
@@ -195,7 +195,7 @@ else {
     my $r = [ gettimeofday() ];
     Time::HiRes::sleep( 0.5 );
     my $f = tv_interval $r;
-    ok 11, $f > 0.4 && $f < 0.9, "slept $f instead of 0.5 secs.";
+    ok 11, $f +> 0.4 && $f +< 0.9, "slept $f instead of 0.5 secs.";
 }
 
 unless ($have_ualarm && $have_alarm) {
@@ -211,7 +211,7 @@ else {
     ok 12, $one == $two || $two == $three, "slept too long, $one $two $three";
     print "# tick = $tick, one = $one, two = $two, three = $three\n";
 
-    $tick = 0; ualarm(10_000, 10_000); while ($tick < 3) { }
+    $tick = 0; ualarm(10_000, 10_000); while ($tick +< 3) { }
     ok 13, 1;
     ualarm(0);
     print "# tick = $tick, one = $one, two = $two, three = $three\n";
@@ -230,7 +230,7 @@ unless ($have_gettimeofday) {
  # $s should be, at worst, equal to $n
  # (time() may be rounding down, up, or closest),
  # but allow 10% of slop.
- ok 14, abs($s) / $n <= 1.10, "Time::HiRes::time() not close to time()";
+ ok 14, abs($s) / $n +<= 1.10, "Time::HiRes::time() not close to time()";
  print "# s = $s, n = $n, s/n = ", abs($s)/$n, "\n";
 }
 
@@ -249,7 +249,7 @@ unless (   defined &Time::HiRes::gettimeofday
     use Time::HiRes qw(time alarm sleep);
     eval { require POSIX };
     my $use_sigaction =
-	!$@ && defined &POSIX::sigaction && &POSIX::SIGALRM > 0;
+	!$@ && defined &POSIX::sigaction && &POSIX::SIGALRM +> 0;
 
     my ($f, $r, $i, $not, $ok);
 
@@ -280,7 +280,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	    $SIG{ALRM} = "tick";
 	}
 
-	while ($i > 0)
+	while ($i +> 0)
 	{
 	    alarm(0.3);
 	    select (undef, undef, undef, 3);
@@ -292,7 +292,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	    # will get about 3.3 seconds: 3 from the select, 0.3
 	    # from the alarm.  If this happens, let's just skip
 	    # this particular test.  --jhi
-	    if (abs($ival/3.3 - 1) < $limit) {
+	    if (abs($ival/3.3 - 1) +< $limit) {
 		$ok = 
  "Skip: your select() may get restarted by your SIGALRM (or just retry test)";
 		undef $not;
@@ -300,7 +300,7 @@ unless (   defined &Time::HiRes::gettimeofday
 		}
 	    my $exp = 0.3 * (5 - $i);
 	    # This test is more sensitive, so impose a softer limit.
-	    if (abs($ival/$exp - 1) > 3*$limit) {
+	    if (abs($ival/$exp - 1) +> 3*$limit) {
 		my $ratio = abs($ival/$exp);
 		$not = "while: $exp sleep took $ival ratio $ratio";
 		last;
@@ -318,7 +318,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	print "# Tick! $i $ival\n";
 	my $exp = 0.3 * (5 - $i);
 	# This test is more sensitive, so impose a softer limit.
-	if (abs($ival/$exp - 1) > 4*$limit) {
+	if (abs($ival/$exp - 1) +> 4*$limit) {
 	    my $ratio = abs($ival/$exp);
 	    $not = "tick: $exp sleep took $ival ratio $ratio";
 	    $i = 0;
@@ -359,7 +359,7 @@ unless (   defined &Time::HiRes::setitimer
 
     # Assume interval timer granularity of $limit * 0.5 seconds.  Too bold?
     my $virt = getitimer(&ITIMER_VIRTUAL);
-    print "not " unless defined $virt && abs($virt / 0.5) - 1 < $limit;
+    print "not " unless defined $virt && abs($virt / 0.5) - 1 +< $limit;
     print "ok 18\n";
 
     print "# getitimer: ", join(" ", getitimer(ITIMER_VIRTUAL)), "\n";
@@ -394,8 +394,8 @@ if ($have_gettimeofday &&
 
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n";
 
-    if ($td < $sleep * (1 + $limit)) {
-	print $a < $limit ? "ok 20 # $msg" : "not ok 20 # $msg";
+    if ($td +< $sleep * (1 + $limit)) {
+	print $a +< $limit ? "ok 20 # $msg" : "not ok 20 # $msg";
     } else {
 	print "ok 20 # Skip: $msg";
     }
@@ -407,8 +407,8 @@ if ($have_gettimeofday &&
 
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n";
 
-    if ($td < $sleep * (1 + $limit)) {
-	print $a < $limit ? "ok 21 # $msg" : "not ok 21 # $msg";
+    if ($td +< $sleep * (1 + $limit)) {
+	print $a +< $limit ? "ok 21 # $msg" : "not ok 21 # $msg";
     } else {
 	print "ok 21 # Skip: $msg";
     }
@@ -438,7 +438,7 @@ else {
 	nanosleep(500_000_000);
         my $f2 = Time::HiRes::time();
 	my $d = $f2 - $f;
-	ok 23, $d > 0.4 && $d < 0.9, "slept $d secs $f to $f2";
+	ok 23, $d +> 0.4 && $d +< 0.9, "slept $d secs $f to $f2";
     }
 }
 
@@ -487,11 +487,11 @@ if ($have_ualarm) {
  N: {
      do {
 	 my $t0 = time();
-	 for ($i = 0; $i < $DelayN; $i++) { }
+	 for ($i = 0; $i +< $DelayN; $i++) { }
 	 my $t1 = time();
 	 my $dt = $t1 - $t0;
 	 print "# N = $DelayN, t1 = $t1, t0 = $t0, dt = $dt\n";
-	 last N if $dt > $T;
+	 last N if $dt +> $T;
 	 $DelayN *= 2;
      } while (1);
  }
@@ -501,7 +501,7 @@ if ($have_ualarm) {
 	my $c = @_ ? shift : 1;
 	my $n = $c * $DelayN;
 	my $i;
-	for ($i = 0; $i < $n; $i++) { }
+	for ($i = 0; $i +< $n; $i++) { }
     };
 
     # Next setup a periodic timer (the two-argument alarm() of
@@ -522,7 +522,7 @@ if ($have_ualarm) {
     $SIG{ALRM} = sub {
 	$a++;
 	print "# Alarm $a - ", time(), "\n";
-	alarm(0) if $a >= $A; # Disarm the alarm.
+	alarm(0) if $a +>= $A; # Disarm the alarm.
 	$Delay->(2); # Try burning CPU at least for 2T seconds.
     }; 
 
@@ -549,12 +549,12 @@ if ($have_clock_gettime &&
 	    my $T = 1.5;
 	    sleep($T);
 	    my $t1 = clock_gettime(&CLOCK_REALTIME);
-	    if ($t0 > 0 && $t1 > $t0) {
+	    if ($t0 +> 0 && $t1 +> $t0) {
 		print "# t1 = $t1, t0 = $t0\n";
 		my $dt = $t1 - $t0;
 		my $rt = abs(1 - $dt / $T);
 		print "# dt = $dt, rt = $rt\n";
-		if ($rt <= 2 * $limit) {
+		if ($rt +<= 2 * $limit) {
 		    $ok = 1;
 		    last TRY;
 		}
@@ -578,7 +578,7 @@ if ($have_clock_gettime &&
 
 if ($have_clock_getres) {
     my $tr = clock_getres();
-    if ($tr > 0) {
+    if ($tr +> 0) {
 	print "ok 31 # tr = $tr\n";
     } else {
 	print "not ok 31 # tr = $tr\n";
@@ -593,7 +593,7 @@ if ($have_clock_nanosleep &&
     my $s = 1.5e9;
     my $t = clock_nanosleep(&CLOCK_REALTIME, $s);
     my $r = abs(1 - $t / $s);
-    if ($r < 2 * $limit) {
+    if ($r +< 2 * $limit) {
 	print "ok 32\n";
     } else {
 	print "not ok 32 # $t = $t, r = $r\n";
@@ -607,14 +607,14 @@ if ($have_clock) {
     my @clock = clock();
     print "# clock = @clock\n";
     for my $i (1..3) {
-	for (my $j = 0; $j < 1e6; $j++) { }
+	for (my $j = 0; $j +< 1e6; $j++) { }
 	push @clock, clock();
 	print "# clock = @clock\n";
     }
-    if ($clock[0] >= 0 &&
-	$clock[1] > $clock[0] &&
-	$clock[2] > $clock[1] &&
-	$clock[3] > $clock[2]) {
+    if ($clock[0] +>= 0 &&
+	$clock[1] +> $clock[0] &&
+	$clock[2] +> $clock[1] &&
+	$clock[3] +> $clock[2]) {
 	print "ok 33\n";
     } else {
 	print "not ok 33\n";
@@ -645,8 +645,8 @@ if ($have_ualarm) {
 	my $r = $dt / ($n/1e6);
 	print "# r = $r\n";
 	ok $i,
-	($n < 1_000_000 || # Too much noise.
-	 $r >= 0.8 && $r <= 1.6), "ualarm($n) close enough";
+	($n +< 1_000_000 || # Too much noise.
+	 $r +>= 0.8 && $r +<= 1.6), "ualarm($n) close enough";
     }
 } else {
     print "# No ualarm\n";
@@ -680,19 +680,19 @@ if ($^O =~ /^(cygwin|MSWin)/) {
     my $ai = 0;
     my $mi = 0;
     my $ss = 0;
-    for (my $i = 1; $i < @atime; $i++) {
-	if ($atime[$i] >= $atime[$i-1]) {
+    for (my $i = 1; $i +< @atime; $i++) {
+	if ($atime[$i] +>= $atime[$i-1]) {
 	    $ai++;
 	}
-	if ($atime[$i] > int($atime[$i])) {
+	if ($atime[$i] +> int($atime[$i])) {
 	    $ss++;
 	}
     }
-    for (my $i = 1; $i < @mtime; $i++) {
-	if ($mtime[$i] >= $mtime[$i-1]) {
+    for (my $i = 1; $i +< @mtime; $i++) {
+	if ($mtime[$i] +>= $mtime[$i-1]) {
 	    $mi++;
 	}
-	if ($mtime[$i] > int($mtime[$i])) {
+	if ($mtime[$i] +> int($mtime[$i])) {
 	    $ss++;
 	}
     }
@@ -702,8 +702,8 @@ if ($^O =~ /^(cygwin|MSWin)/) {
     if ($ss == 0) {
 	print "# No subsecond timestamps detected\n";
 	skip 38;
-    } elsif ($mi/(@mtime-1) >= 0.75 && $ai/(@atime-1) >= 0.75 &&
-	     $ss/(@mtime+@atime) >= 0.2) {
+    } elsif ($mi/(@mtime-1) +>= 0.75 && $ai/(@atime-1) +>= 0.75 &&
+	     $ss/(@mtime+@atime) +>= 0.2) {
 	print "ok 38\n";
     } else {
 	print "not ok 38\n";

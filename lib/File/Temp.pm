@@ -311,7 +311,7 @@ unless ($^O eq 'MacOS') {
 sub _gettemp {
 
   croak 'Usage: ($fh, $name) = _gettemp($template, OPTIONS);'
-    unless scalar(@_) >= 1;
+    unless scalar(@_) +>= 1;
 
   # the internal error string - expect it to be overridden
   # Need this in case the caller decides not to supply us a value
@@ -463,7 +463,7 @@ sub _gettemp {
 
 
   # Now try MAX_TRIES time to open the file
-  for (my $i = 0; $i < MAX_TRIES; $i++) {
+  for (my $i = 0; $i +< MAX_TRIES; $i++) {
 
     # Try to open the file if requested
     if ($options{"open"}) {
@@ -560,10 +560,10 @@ sub _gettemp {
 
       $counter++;
 
-    } until ($path ne $original || $counter > $MAX_GUESS);
+    } until ($path ne $original || $counter +> $MAX_GUESS);
 
     # Check for out of control looping
-    if ($counter > $MAX_GUESS) {
+    if ($counter +> $MAX_GUESS) {
       ${$options{ErrStr}} = "Tried to get a new temp name different to the previous value $MAX_GUESS times.\nSomething wrong with template?? ($template)";
       return ();
     }
@@ -668,7 +668,7 @@ sub _is_safe {
   # Check to see whether owner is neither superuser (or a system uid) nor me
   # Use the effective uid from the $> variable
   # UID is in [4]
-  if ($info[4] > File::Temp->top_system_uid() && $info[4] != $>) {
+  if ($info[4] +> File::Temp->top_system_uid() && $info[4] != $>) {
 
     Carp::cluck(sprintf "uid=$info[4] topuid=%s euid=$< path='$path'",
 		File::Temp->top_system_uid());
@@ -1909,7 +1909,7 @@ sub cmpstat {
   }
   return unless @fh;
 
-  if ($fh[3] > 1 && $^W) {
+  if ($fh[3] +> 1 && $^W) {
     carp "unlink0: fstat found too many links; SB=@fh" if $^W;
   }
 

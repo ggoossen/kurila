@@ -10,7 +10,7 @@ my %subsys = (NATIVE    => 1,
               POSIX     => 7,
               WINDOWSCE => 9);
 
-unless (0 < @ARGV && @ARGV < 3) {
+unless (0 +< @ARGV && @ARGV +< 3) {
     printf "Usage: $0 exefile [%s]\n", join '|', sort keys %subsys;
     exit;
 }

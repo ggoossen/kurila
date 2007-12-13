@@ -47,7 +47,7 @@ sub ReadHeaderInfo
     #ok $inf->read($uncomp) ;
     my $actual = 0 ;
     my $status = 1 ;
-    while (($status = $inf->read($uncomp)) > 0) {
+    while (($status = $inf->read($uncomp)) +> 0) {
         $actual += $status ;
     }
 
@@ -77,7 +77,7 @@ sub ReadHeaderInfoZlib
     #ok $inf->read($uncomp) ;
     my $actual = 0 ;
     my $status = 1 ;
-    while (($status = $inf->read($uncomp)) > 0) {
+    while (($status = $inf->read($uncomp)) +> 0) {
         $actual += $status ;
     }
 
@@ -174,7 +174,7 @@ EOM
 
         while (my ($k, $v) = each %$expect)
         {
-            if (ZLIB_VERNUM >= 0x1220)
+            if (ZLIB_VERNUM +>= 0x1220)
               { is $hdr->{$k}, $v, "  $k is $v" }
             else
               { ok 1, "  Skip test for $k" }
@@ -297,7 +297,7 @@ EOM
             my $uncomp ;
             if ($s)
             {
-                ok $gunz->read($uncomp) < 0 ;
+                ok $gunz->read($uncomp) +< 0 ;
                 like $IO::Uncompress::Inflate::InflateError,"/Trailer Error: trailer truncated. Expected 4 bytes, got $got/",
                     "Trailer Error";
             }
@@ -321,7 +321,7 @@ EOM
 
         ok my $gunz = IO::Uncompress::Inflate->new( $name, Strict => 1);
         my $uncomp ;
-        ok $gunz->read($uncomp) < 0 ;
+        ok $gunz->read($uncomp) +< 0 ;
         like $IO::Uncompress::Inflate::InflateError,'/Trailer Error: CRC mismatch/',
             "Trailer Error: CRC mismatch";
         ok $gunz->eof() ;
@@ -339,7 +339,7 @@ EOM
 
         ok my $gunz = IO::Uncompress::Inflate->new( $name, Strict => 0);
         my $uncomp ;
-        ok $gunz->read($uncomp) >= 0  ;
+        ok $gunz->read($uncomp) +>= 0  ;
         ok $gunz->eof() ;
         ok ! $gunz->trailingData() ;
         ok $uncomp eq $string;

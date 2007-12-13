@@ -338,7 +338,7 @@ sub GetOptionsFromArray($@) {
     # Be careful not to interpret '<>' as option starters.
     if ( @optionlist && $optionlist[0] =~ /^\W+$/
 	 && !($optionlist[0] eq '<>'
-	      && @optionlist > 0
+	      && @optionlist +> 0
 	      && ref($optionlist[1])) ) {
 	$prefix = shift (@optionlist);
 	# Turn into regexp. Needs to be parenthesized!
@@ -362,12 +362,12 @@ sub GetOptionsFromArray($@) {
 
 	if ( $opt eq '<>' ) {
 	    if ( (defined $userlinkage)
-		&& !(@optionlist > 0 && ref($optionlist[0]))
+		&& !(@optionlist +> 0 && ref($optionlist[0]))
 		&& (exists $userlinkage->{$opt})
 		&& ref($userlinkage->{$opt}) ) {
 		unshift (@optionlist, $userlinkage->{$opt});
 	    }
-	    unless ( @optionlist > 0
+	    unless ( @optionlist +> 0
 		    && ref($optionlist[0]) && ref($optionlist[0]) eq 'CODE' ) {
 		$error .= "Option spec <> requires a reference to a subroutine\n";
 		# Kill the linkage (to avoid another error).
@@ -393,7 +393,7 @@ sub GetOptionsFromArray($@) {
 	# If no linkage is supplied in the @optionlist, copy it from
 	# the userlinkage if available.
 	if ( defined $userlinkage ) {
-	    unless ( @optionlist > 0 && ref($optionlist[0]) ) {
+	    unless ( @optionlist +> 0 && ref($optionlist[0]) ) {
 		if ( exists $userlinkage->{$orig} &&
 		     ref($userlinkage->{$orig}) ) {
 		    print STDERR ("=> found userlinkage for \"$orig\": ",
@@ -409,7 +409,7 @@ sub GetOptionsFromArray($@) {
 	}
 
 	# Copy the linkage. If omitted, link to global variable.
-	if ( @optionlist > 0 && ref($optionlist[0]) ) {
+	if ( @optionlist +> 0 && ref($optionlist[0]) ) {
 	    print STDERR ("=> link \"$orig\" to $optionlist[0]\n")
 		if $debug;
 	    my $rl = ref($linkage{$orig} = shift (@optionlist));
@@ -466,14 +466,14 @@ sub GetOptionsFromArray($@) {
     $error = 0;
 
     # Supply --version and --help support, if needed and allowed.
-    if ( defined($auto_version) ? $auto_version : ($requested_version >= 2.3203) ) {
+    if ( defined($auto_version) ? $auto_version : ($requested_version +>= 2.3203) ) {
 	if ( !defined($opctl{version}) ) {
 	    $opctl{version} = ['','version',0,CTL_DEST_CODE,undef];
 	    $linkage{version} = \&VersionMessage;
 	}
 	$auto_version = 1;
     }
-    if ( defined($auto_help) ? $auto_help : ($requested_version >= 2.3203) ) {
+    if ( defined($auto_help) ? $auto_help : ($requested_version +>= 2.3203) ) {
 	if ( !defined($opctl{help}) && !defined($opctl{'?'}) ) {
 	    $opctl{help} = $opctl{'?'} = ['','help',0,CTL_DEST_CODE,undef];
 	    $linkage{help} = \&HelpMessage;
@@ -493,7 +493,7 @@ sub GetOptionsFromArray($@) {
 
     # Process argument list
     my $goon = 1;
-    while ( $goon && @$argv > 0 ) {
+    while ( $goon && @$argv +> 0 ) {
 
 	# Get next argument.
 	$opt = shift (@$argv);
@@ -663,11 +663,11 @@ sub GetOptionsFromArray($@) {
 		}
 
 		$argcnt++;
-		last if $argcnt >= $ctl->[CTL_AMAX] && $ctl->[CTL_AMAX] != -1;
+		last if $argcnt +>= $ctl->[CTL_AMAX] && $ctl->[CTL_AMAX] != -1;
 		undef($arg);
 
 		# Need more args?
-		if ( $argcnt < $ctl->[CTL_AMIN] ) {
+		if ( $argcnt +< $ctl->[CTL_AMIN] ) {
 		    if ( @$argv ) {
 			if ( ValidValue($ctl, $argv->[0], 1, $argend, $prefix) ) {
 			    $arg = shift(@$argv);
@@ -852,7 +852,7 @@ sub ParseOptionSpec ($$) {
 	return (undef, "Max must be greater than zero in option spec: \"$opt\"\n")
 	  if defined($ma) && !$ma;
 	return (undef, "Max less than min in option spec: \"$opt\"\n")
-	  if defined($ma) && $ma < $mi;
+	  if defined($ma) && $ma +< $mi;
 
 	# Fields are hard-wired here.
 	$entry = [$type,$orig,undef,$dest,$mi,$ma||-1];
@@ -863,7 +863,7 @@ sub ParseOptionSpec ($$) {
     foreach ( @names ) {
 
 	$_ = lc ($_)
-	  if $ignorecase > (($bundling && length($_) == 1) ? 1 : 0);
+	  if $ignorecase +> (($bundling && length($_) == 1) ? 1 : 0);
 
 	if ( exists $opctl->{$_} ) {
 	    $dups .= "Duplicate specification \"$opt\" for option \"$_\"\n";
@@ -931,7 +931,7 @@ sub FindOption ($$$$$) {
 	$tryopt = $ignorecase ? lc($opt) : $opt;
 
 	# If bundling == 2, long options can override bundles.
-	if ( $bundling == 2 && length($tryopt) > 1
+	if ( $bundling == 2 && length($tryopt) +> 1
 	     && defined ($opctl->{$tryopt}) ) {
 	    print STDERR ("=> $starter$tryopt overrides unbundling\n")
 	      if $debug;
@@ -939,9 +939,9 @@ sub FindOption ($$$$$) {
 	else {
 	    $tryopt = $opt;
 	    # Unbundle single letter option.
-	    $rest = length ($tryopt) > 0 ? substr ($tryopt, 1) : '';
+	    $rest = length ($tryopt) +> 0 ? substr ($tryopt, 1) : '';
 	    $tryopt = substr ($tryopt, 0, 1);
-	    $tryopt = lc ($tryopt) if $ignorecase > 1;
+	    $tryopt = lc ($tryopt) if $ignorecase +> 1;
 	    print STDERR ("=> $starter$tryopt unbundled from ",
 			  "$starter$tryopt$rest\n") if $debug;
 	    $rest = undef unless $rest ne '';
@@ -963,7 +963,7 @@ sub FindOption ($$$$$) {
 		      "out of ", scalar(@names), "\n") if $debug;
 
 	# Check for ambiguous results.
-	unless ( (@hits <= 1) || (grep ($_ eq $opt, @hits) == 1) ) {
+	unless ( (@hits +<= 1) || (grep ($_ eq $opt, @hits) == 1) ) {
 	    # See if all matches are for the same option.
 	    my %hit;
 	    foreach ( @hits ) {
@@ -1061,7 +1061,7 @@ sub FindOption ($$$$$) {
     # Check if there is an option argument available.
     if ( defined $optarg
 	 ? ($optarg eq '')
-	 : !(defined $rest || @$argv > 0) ) {
+	 : !(defined $rest || @$argv +> 0) ) {
 	# Complain if this option needs an argument.
 #	if ( $mand && !($type eq 's' ? defined($optarg) : 0) ) {
 	if ( $mand ) {
@@ -1388,7 +1388,7 @@ sub VersionMessage(@) {
 
     my $v = $main::VERSION;
     my $fh = $pa->{-output} ||
-      ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} < 2) ? \*STDOUT : \*STDERR;
+      ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} +< 2) ? \*STDOUT : \*STDERR;
 
     print $fh (defined($pa->{-message}) ? $pa->{-message} : (),
 	       $0, defined $v ? " version $v" : (),
@@ -1432,7 +1432,7 @@ sub setup_pa_args($@) {
     @_ = () if @_ == 2 && $_[0] eq $tag;
 
     my $pa;
-    if ( @_ > 1 ) {
+    if ( @_ +> 1 ) {
 	$pa = { @_ };
     }
     else {

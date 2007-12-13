@@ -33,7 +33,7 @@ for (@prgs){
 	die "Internal error test $i didn't split into pairs, got " . 
 		scalar(@files) . "[" . join("%%%%", @files) ."]\n"
 	    if @files % 2 ;
-	while (@files > 2) {
+	while (@files +> 2) {
 	    my $filename = shift @files ;
 	    my $code = shift @files ;
     	    push @temps, $filename ;

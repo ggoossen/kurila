@@ -74,7 +74,7 @@ sub dequeue  {
     my $q = shift;
     lock(@$q);
     cond_wait @$q until @$q;
-    cond_signal @$q if @$q > 1;
+    cond_signal @$q if @$q +> 1;
     return shift @$q;
 }
 

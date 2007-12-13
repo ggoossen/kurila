@@ -95,7 +95,7 @@ while (my ($key, $val) = each %uhash) {
   # hash keys are always stored downgraded to bytes if possible, with a flag
   # to say "promote back to utf8"
   # Whereas scalars are stored as is.
-  utf8::encode ($key) if ord $key > 256;
+  utf8::encode ($key) if ord $key +> 256;
   $pre58{$key} = $val;
   utf8::encode ($val) unless $val eq "ch\xe5teau";
   $pre56{$key} = $val;

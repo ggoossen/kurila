@@ -40,7 +40,7 @@ sub myGZreadFile
 
     my $data ;
     $data = $init if defined $init ;
-    1 while $fil->read($data) > 0;
+    1 while $fil->read($data) +> 0;
 
     $fil->close ;
     return $data ;
@@ -451,11 +451,11 @@ EOT
                         is $io->tell(), 0;
 
                         if ($append) {
-                            1 while $io->read($buf, $bufsize) > 0;
+                            1 while $io->read($buf, $bufsize) +> 0;
                         }
                         else {
                             my $tmp ;
-                            $buf .= $tmp while $io->read($tmp, $bufsize) > 0 ;
+                            $buf .= $tmp while $io->read($tmp, $bufsize) +> 0 ;
                         }
                         is length $buf, length $str;
                         ok $buf eq $str ;

@@ -15,18 +15,18 @@ our $beg = time;
 our $now;
 while (($now = time) == $beg) { sleep 1 }
 
-ok($now > $beg && $now - $beg < 10,             'very basic time test');
+ok($now +> $beg && $now - $beg +< 10,             'very basic time test');
 
 our $i;
-for ($i = 0; $i < 1_000_000; $i++) {
+for ($i = 0; $i +< 1_000_000; $i++) {
     for my $j (1..100) {}; # burn some user cycles
     ($nowuser, $nowsys) = times;
-    $i = 2_000_000 if $nowuser > $beguser && ( $nowsys >= $begsys ||
+    $i = 2_000_000 if $nowuser +> $beguser && ( $nowsys +>= $begsys ||
                                             (!$nowsys && !$begsys));
-    last if time - $beg > 20;
+    last if time - $beg +> 20;
 }
 
-ok($i >= 2_000_000, 'very basic times test');
+ok($i +>= 2_000_000, 'very basic times test');
 
 our ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
 our ($xsec,$foo) = localtime($now);

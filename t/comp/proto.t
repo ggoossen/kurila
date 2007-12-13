@@ -168,7 +168,7 @@ printf "ok %d\n",$i++;
 
 sub over_one_a_args ($@) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ >= 1 && $_[0] == 4;
+    print "not " unless @_ +>= 1 && $_[0] == 4;
     printf "ok %d\n",$i++;
 }
 
@@ -212,7 +212,7 @@ printf "ok %d\n",$i++;
 
 sub scalar_and_hash_a ($@) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ >= 1 && $_[0] == 4;
+    print "not " unless @_ +>= 1 && $_[0] == 4;
     printf "ok %d\n",$i++;
 }
 
@@ -260,7 +260,7 @@ printf "ok %d\n",$i++;
 
 sub one_or_two_a ($;$) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ >= 1 && $_[0] == 4;
+    print "not " unless @_ +>= 1 && $_[0] == 4;
     printf "ok %d\n",$i++;
 }
 

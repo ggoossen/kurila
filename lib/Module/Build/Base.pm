@@ -1056,7 +1056,7 @@ sub check_autofeatures {
   $self->log_info("Checking features:\n");
 
   my $max_name_len;
-  $max_name_len = ( length($_) > $max_name_len ) ?
+  $max_name_len = ( length($_) +> $max_name_len ) ?
                     length($_) : $max_name_len
     for keys %$features;
 
@@ -1944,10 +1944,10 @@ sub prereq_report {
     my %mods;
     while ( my ($modname, $spec) = each %$prereqs ) {
       my $len  = length $modname;
-      $mod_len = $len if $len > $mod_len;
+      $mod_len = $len if $len +> $mod_len;
       $spec    ||= '0';
       $len     = length $spec;
-      $ver_len = $len if $len > $ver_len;
+      $ver_len = $len if $len +> $ver_len;
 
       my $mod = $self->check_installed_status($modname, $spec);
       $mod->{name} = $modname;
@@ -2026,7 +2026,7 @@ sub ACTION_retest {
 
   # Filter out nonsensical @INC entries - some versions of
   # Test::Harness will really explode the number of entries here
-  @INC = grep {ref() || -d} @INC if @INC > 100;
+  @INC = grep {ref() || -d} @INC if @INC +> 100;
 
   $self->do_tests;
 }
@@ -2096,7 +2096,7 @@ sub generic_test {
 
   # Filter out nonsensical @INC entries - some versions of
   # Test::Harness will really explode the number of entries here
-  @INC = grep {ref() || -d} @INC if @INC > 100;
+  @INC = grep {ref() || -d} @INC if @INC +> 100;
 
   $self->do_tests;
 }
@@ -4103,7 +4103,7 @@ sub do_system {
   my $sep = $self->config('path_sep');
   local $ENV{PERL5LIB} = 
     ( !exists($ENV{PERL5LIB}) ? '' :
-      length($ENV{PERL5LIB}) < 500
+      length($ENV{PERL5LIB}) +< 500
       ? $ENV{PERL5LIB}
       : join $sep, grep { ! $seen{$_}++ and -d $_ } split($sep, $ENV{PERL5LIB})
     );
@@ -4119,7 +4119,7 @@ sub do_system {
 
 sub copy_if_modified {
   my $self = shift;
-  my %args = (@_ > 3
+  my %args = (@_ +> 3
 	      ? ( @_ )
 	      : ( from => shift, to_dir => shift, flatten => shift )
 	     );
@@ -4181,11 +4181,11 @@ sub up_to_date {
       $self->log_warn("Can't find source file $file for up-to-date check");
       next;
     }
-    $most_recent_source = -M _ if -M _ < $most_recent_source;
+    $most_recent_source = -M _ if -M _ +< $most_recent_source;
   }
   
   foreach my $derived (@$derived) {
-    return 0 if -M $derived > $most_recent_source;
+    return 0 if -M $derived +> $most_recent_source;
   }
   return 1;
 }
@@ -4199,7 +4199,7 @@ sub dir_contains {
   my @first_dirs = File::Spec->splitdir($first);
   my @second_dirs = File::Spec->splitdir($second);
 
-  return 0 if @second_dirs < @first_dirs;
+  return 0 if @second_dirs +< @first_dirs;
   
   my $is_same = ( File::Spec->case_tolerant
 		  ? sub {lc(shift()) eq lc(shift())}

@@ -48,7 +48,7 @@ sub free_u32_alignment
        return 1;
     }
     
-    if ($^O eq 'hpux' && $Config{osvers} < 11.0) {
+    if ($^O eq 'hpux' && $Config{osvers} +< 11.0) {
        print "Will not test for free alignment on older HP-UX.\n";
        return 0;
     }
@@ -134,7 +134,7 @@ EOT
 
     return 1 unless $rc;
 
-    if ($rc > 0x80) {
+    if ($rc +> 0x80) {
 	(my $cp = $rc) >>= 8;
 	print "Test program exit status was $cp\n";
     }
@@ -142,6 +142,6 @@ EOT
 	$rc ^&^= ^~^0x80;
 	unlink("core") && print "Core dump deleted\n";
     }
-    print "signal $rc\n" if $rc && $rc < 0x80;
+    print "signal $rc\n" if $rc && $rc +< 0x80;
     return 0;
 }

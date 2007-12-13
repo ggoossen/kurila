@@ -166,7 +166,7 @@ foreach my $argv (@ARGV) {
 	warn "Unable to open $in: $!\n";
 	next;
     }
-    print "Reading $in...\n" if $::opt_v and @ARGV > 1;
+    print "Reading $in...\n" if $::opt_v and @ARGV +> 1;
     $ls = $ls{$in} ||= { is_in => 1, in => $in };
     my $type;
     while ( ~< *F) {
@@ -249,7 +249,7 @@ foreach my $argv (@ARGV) {
     $ls->{category} = $::opt_c
 	? categorize_files([keys %{ $ls->{out} }], $::opt_v) : '';
 }
-print scalar(@ARGV)." files read.\n" if $::opt_v and @ARGV > 1;
+print scalar(@ARGV)." files read.\n" if $::opt_v and @ARGV +> 1;
 
 
 # --- Firstly we filter and sort as needed ---
@@ -339,7 +339,7 @@ if ($::opt_I) {
 unless ($::opt_c and $::opt_m) {
     foreach $ls (@ls) {
 	next unless ($::opt_i) ? $ls->{is_out} : $ls->{is_in};
-	next if $::opt_X and keys %{$ls->{out}} <= 1;
+	next if $::opt_X and keys %{$ls->{out}} +<= 1;
 	list_files_by_patch($ls);
     }
 }
@@ -413,7 +413,7 @@ sub trim_name {		# reduce/tidy file paths from diff lines
     elsif (defined $::opt_p) {
 	# strip on -p levels of directory prefix
 	my $dc = $::opt_p;
-	$name =~ s:^[^/]+/(.+)$:$1: while $dc-- > 0;
+	$name =~ s:^[^/]+/(.+)$:$1: while $dc-- +> 0;
     }
     else {	# try to strip off leading path to perl directory
 	# if absolute path, strip down to any *perl* directory first
@@ -461,7 +461,7 @@ sub list_files_by_patch {
     if ($::opt_l) {	# -l = no listing, just names
 	print "$ls->{in}";
 	my $n = keys %{ $ls->{out} };
-	print " ($n patches)" if $::opt_n and $n>1;
+	print " ($n patches)" if $::opt_n and $n+>1;
 	print "\n";
 	return;
     }
@@ -478,7 +478,7 @@ sub list_files_by_patch {
     my $n = @v;
     my $v = "@v";
     print $::opt_m ? "  Files:  ".my_wrap("","          ",$v) : $v;
-    print " ($n patches)" if $::opt_n and $n>1;
+    print " ($n patches)" if $::opt_n and $n+>1;
     print "\n";
 }
 
@@ -517,12 +517,12 @@ sub categorize_files {
 	print "Couldn't categorise $_\n" if $::opt_v;
 	$c{OTHER} += 1;
     }
-    if (keys %c > 1) {	# sort to find category with highest score
+    if (keys %c +> 1) {	# sort to find category with highest score
       refine:
 	++$refine;
-	my @c = sort { $c{$b} <=> $c{$a} || $a cmp $b } keys %c;
+	my @c = sort { $c{$b} <+> $c{$a} || $a cmp $b } keys %c;
 	my @v = map  { $c{$_} } @c;
-	if (@v > 1 and $refine <= 1 and "@v" =~ /^(\d) \1/
+	if (@v +> 1 and $refine +<= 1 and "@v" =~ /^(\d) \1/
 		and $c[0] =~ m/^(DOC|TESTS|OTHER)/) { # rare
 	    print "Tie, promoting $c[1] over $c[0]\n" if $::opt_d;
 	    ++$c{$c[1]};

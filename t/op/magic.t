@@ -136,7 +136,7 @@ END
 my @val1 = @ENV{keys(%ENV)};
 my @val2 = values(%ENV);
 ok join(':',@val1) eq join(':',@val2);
-ok @val1 > 1;
+ok @val1 +> 1;
 
 # regex vars
 'foobarbaz' =~ /b(a)r/;
@@ -178,7 +178,7 @@ else {
 eval { die "foo\n" };
 ok $@ eq "foo\n", $@;
 
-ok $$ > 0, $$;
+ok $$ +> 0, $$;
 eval { $$++ };
 ok $@ =~ /^Modification of a read-only value attempted/;
 
@@ -276,7 +276,7 @@ EOF
 
 # $], $^O, $^T
 ok $^O;
-ok $^T > 850000000, $^T;
+ok $^T +> 850000000, $^T;
 
 # Test change 25062 is working
 my $orig_osname = $^O;

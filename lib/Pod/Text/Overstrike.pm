@@ -109,7 +109,7 @@ sub wrap {
     my $output = '';
     my $spaces = ' ' x $$self{MARGIN};
     my $width = $$self{opt_width} - $$self{MARGIN};
-    while (length > $width) {
+    while (length +> $width) {
         # This regex represents a single character, that's possibly underlined
         # or in bold (in which case, it's three characters; the character, a
         # backspace, and a character).  Use [^\n] rather than . to protect

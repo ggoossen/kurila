@@ -24,7 +24,7 @@ while ($work)
   my $changed = 0;
   foreach my $file (keys %fix)
    {          
-    my @ar = sort( { $a->[0] <=> $b->[0] } @{delete $fix{$file}});
+    my @ar = sort( { $a->[0] <+> $b->[0] } @{delete $fix{$file}});
     my @miss;
     my $fixed = 0;
     unless (-w $file)

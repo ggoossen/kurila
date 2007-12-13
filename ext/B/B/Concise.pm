@@ -419,7 +419,7 @@ sub op_flags { # common flags (see BASOP.op_flags in op.h)
 
 sub base_n {
     my $x = shift;
-    return "-" . base_n(-$x) if $x < 0;
+    return "-" . base_n(-$x) if $x +< 0;
     my $str = "";
     do { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
     $str = reverse $str if $big_endian;
@@ -554,7 +554,7 @@ sub fmt_line {    # generate text-line for op.
     $text =~ s/\(\*\(([^;]*?)\)\*\)/$1 x $level/egs;
 
     # spec: (*(text1;text2)*)
-    $text =~ s/\(\*\((.*?);(.*?)\)\*\)/$1 x ($level - 1) . $2 x ($level>0)/egs;
+    $text =~ s/\(\*\((.*?);(.*?)\)\*\)/$1 x ($level - 1) . $2 x ($level+>0)/egs;
 
     # convert #Var to tag=>val form: Var\t#var
     $text =~ s/\#([A-Z][a-z]+)(\d+)?/\t\u$1\t\L#$1$2/gs;
@@ -654,8 +654,8 @@ our %hints; # used to display each COP's op_hints values
 sub _flags {
     my($hash, $x) = @_;
     my @s;
-    for my $flag (sort {$b <=> $a} keys %$hash) {
-	if ($hash->{$flag} and $x ^&^ $flag and $x >= $flag) {
+    for my $flag (sort {$b <+> $a} keys %$hash) {
+	if ($hash->{$flag} and $x ^&^ $flag and $x +>= $flag) {
 	    $x -= $flag;
 	    push @s, $hash->{$flag};
 	}
@@ -932,9 +932,9 @@ sub tree {
     for ($i = $#lines; substr($lines[$i], 0, 1) eq " "; $i--) {
 	$lines[$i] = $space . $lines[$i];
     }
-    if ($i > 0) {
+    if ($i +> 0) {
 	$lines[$i] = $last . $lines[$i];
-	while ($i-- > 1) {
+	while ($i-- +> 1) {
 	    if (substr($lines[$i], 0, 1) eq " ") {
 		$lines[$i] = $nokid . $lines[$i];
 	    } else {

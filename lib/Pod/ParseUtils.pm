@@ -88,7 +88,7 @@ method or by calling the B<file()> method with a scalar argument.
 
 # The POD file name the list appears in
 sub file {
-   return (@_ > 1) ? ($_[0]->{-file} = $_[1]) : $_[0]->{-file};
+   return (@_ +> 1) ? ($_[0]->{-file} = $_[1]) : $_[0]->{-file};
 }
 
 =item $list-E<gt>start()
@@ -102,7 +102,7 @@ argument.
 
 # The line in the file the node appears
 sub start {
-   return (@_ > 1) ? ($_[0]->{-start} = $_[1]) : $_[0]->{-start};
+   return (@_ +> 1) ? ($_[0]->{-start} = $_[1]) : $_[0]->{-start};
 }
 
 =item $list-E<gt>indent()
@@ -116,7 +116,7 @@ with a scalar argument.
 
 # indent level
 sub indent {
-   return (@_ > 1) ? ($_[0]->{-indent} = $_[1]) : $_[0]->{-indent};
+   return (@_ +> 1) ? ($_[0]->{-indent} = $_[1]) : $_[0]->{-indent};
 }
 
 =item $list-E<gt>type()
@@ -131,7 +131,7 @@ with a scalar argument.
 
 # The type of the list (UL, OL, ...)
 sub type {
-   return (@_ > 1) ? ($_[0]->{-type} = $_[1]) : $_[0]->{-type};
+   return (@_ +> 1) ? ($_[0]->{-type} = $_[1]) : $_[0]->{-type};
 }
 
 =item $list-E<gt>rx()
@@ -148,7 +148,7 @@ with a scalar argument.
 
 # The regular expression to simplify the items
 sub rx {
-   return (@_ > 1) ? ($_[0]->{-rx} = $_[1]) : $_[0]->{-rx};
+   return (@_ +> 1) ? ($_[0]->{-rx} = $_[1]) : $_[0]->{-rx};
 }
 
 =item $list-E<gt>item()
@@ -184,7 +184,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # lists's parent object
 sub parent {
-   return (@_ > 1) ? ($_[0]->{-parent} = $_[1]) : $_[0]->{-parent};
+   return (@_ +> 1) ? ($_[0]->{-parent} = $_[1]) : $_[0]->{-parent};
 }
 
 =item $list-E<gt>tag()
@@ -202,7 +202,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # list's object
 sub tag {
-   return (@_ > 1) ? ($_[0]->{-tag} = $_[1]) : $_[0]->{-tag};
+   return (@_ +> 1) ? ($_[0]->{-tag} = $_[1]) : $_[0]->{-tag};
 }
 
 #-----------------------------------------------------------------------------
@@ -459,7 +459,7 @@ have to be implemented in the translator.
 
 #' retrieve/set markuped text
 sub markup {
-    return (@_ > 1) ? ($_[0]->{_markup} = $_[1]) : $_[0]->{_markup};
+    return (@_ +> 1) ? ($_[0]->{_markup} = $_[1]) : $_[0]->{_markup};
 }
 
 =item $link-E<gt>text()
@@ -509,12 +509,12 @@ the link was encountered in. Has to be filled in manually.
 
 # The line in the file the link appears
 sub line {
-    return (@_ > 1) ? ($_[0]->{-line} = $_[1]) : $_[0]->{-line};
+    return (@_ +> 1) ? ($_[0]->{-line} = $_[1]) : $_[0]->{-line};
 }
 
 # The POD file name the link appears in
 sub file {
-    return (@_ > 1) ? ($_[0]->{-file} = $_[1]) : $_[0]->{-file};
+    return (@_ +> 1) ? ($_[0]->{-file} = $_[1]) : $_[0]->{-file};
 }
 
 =item $link-E<gt>page()
@@ -525,7 +525,7 @@ This method sets or returns the POD page this link points to.
 
 # The POD page the link appears on
 sub page {
-    if (@_ > 1) {
+    if (@_ +> 1) {
         $_[0]->{-page} = $_[1];
         $_[0]->_construct_text();
     }
@@ -540,7 +540,7 @@ As above, but the destination node text of the link.
 
 # The link destination
 sub node {
-    if (@_ > 1) {
+    if (@_ +> 1) {
         $_[0]->{-node} = $_[1];
         $_[0]->_construct_text();
     }
@@ -555,7 +555,7 @@ Sets or returns an alternative text specified in the link.
 
 # Potential alternative text
 sub alttext {
-    if (@_ > 1) {
+    if (@_ +> 1) {
         $_[0]->{-alttext} = $_[1];
         $_[0]->_construct_text();
     }
@@ -571,7 +571,7 @@ there is also C<hyperlink>, derived from e.g. C<LE<lt>http://perl.comE<gt>>
 
 # The type: item or headn
 sub type {
-    return (@_ > 1) ? ($_[0]->{-type} = $_[1]) : $_[0]->{-type};
+    return (@_ +> 1) ? ($_[0]->{-type} = $_[1]) : $_[0]->{-type};
 }
 
 =item $link-E<gt>link()
@@ -729,7 +729,7 @@ Set/retrieve the POD document name (e.g. "Pod::Parser").
 
 # The POD page
 sub page {
-   return (@_ > 1) ? ($_[0]->{-page} = $_[1]) : $_[0]->{-page};
+   return (@_ +> 1) ? ($_[0]->{-page} = $_[1]) : $_[0]->{-page};
 }
 
 =item $cacheitem-E<gt>description()
@@ -741,7 +741,7 @@ section.
 
 # The POD description, taken out of NAME if present
 sub description {
-   return (@_ > 1) ? ($_[0]->{-description} = $_[1]) : $_[0]->{-description};
+   return (@_ +> 1) ? ($_[0]->{-description} = $_[1]) : $_[0]->{-description};
 }
 
 =item $cacheitem-E<gt>path()
@@ -752,7 +752,7 @@ Set/retrieve the POD file storage path.
 
 # The file path
 sub path {
-   return (@_ > 1) ? ($_[0]->{-path} = $_[1]) : $_[0]->{-path};
+   return (@_ +> 1) ? ($_[0]->{-path} = $_[1]) : $_[0]->{-path};
 }
 
 =item $cacheitem-E<gt>file()
@@ -763,7 +763,7 @@ Set/retrieve the POD file name.
 
 # The POD file name
 sub file {
-   return (@_ > 1) ? ($_[0]->{-file} = $_[1]) : $_[0]->{-file};
+   return (@_ +> 1) ? ($_[0]->{-file} = $_[1]) : $_[0]->{-file};
 }
 
 =item $cacheitem-E<gt>nodes()

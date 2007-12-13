@@ -193,7 +193,7 @@ f1();
 # erroneous popping of the inner BLOCK context
 
 undef $ok;
-for ($count=0; $count<2; $count++) {
+for ($count=0; $count+<2; $count++) {
     my $x = 1;
     goto LABEL29;
     LABEL29:

@@ -100,7 +100,7 @@ sub new {
 
   $new->accept_codes(@_to_accept);
   $new->accept_codes('VerbatimFormatted');
-  DEBUG > 2 and print "To accept: ", join(' ',@_to_accept), "\n";
+  DEBUG +> 2 and print "To accept: ", join(' ',@_to_accept), "\n";
   $new->doc_lang(
     (  $ENV{'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ? $1
     : ($ENV{'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ? hex($1)
@@ -160,13 +160,13 @@ sub do_middle {      # the main work
   
     if( ($type = $token->type) eq 'text' ) {
       if( $self->{'rtfverbatim'} ) {
-        DEBUG > 1 and print "  $type " , $token->text, " in verbatim!\n";
+        DEBUG +> 1 and print "  $type " , $token->text, " in verbatim!\n";
         rtf_esc_codely($scratch = $token->text);
         print $fh $scratch;
         next;
       }
 
-      DEBUG > 1 and print "  $type " , $token->text, "\n";
+      DEBUG +> 1 and print "  $type " , $token->text, "\n";
       
       $scratch = $token->text;
       $scratch =~ tr/\t\cb\cc/ /d;
@@ -204,7 +204,7 @@ sub do_middle {      # the main work
       print $fh $scratch;
 
     } elsif( $type eq 'start' ) {
-      DEBUG > 1 and print "  +$type ",$token->tagname,
+      DEBUG +> 1 and print "  +$type ",$token->tagname,
         " (", map("<$_> ", %{$token->attr_hash}), ")\n";
 
       if( ($tagname = $token->tagname) eq 'Verbatim'
@@ -217,12 +217,12 @@ sub do_middle {      # the main work
         if($next->type eq 'text') {
           my $t = $next->text_r;
           while( $$t =~ m/$/mg ) {
-            last if  ++$line_count  > 15; # no point in counting further
+            last if  ++$line_count  +> 15; # no point in counting further
           }
-          DEBUG > 3 and print "    verbatim line count: $line_count\n";
+          DEBUG +> 3 and print "    verbatim line count: $line_count\n";
         }
         $self->unget_token($next);
-        $self->{'rtfkeep'} = ($line_count > 15) ? '' : '\keepn' ;     
+        $self->{'rtfkeep'} = ($line_count +> 15) ? '' : '\keepn' ;     
 
       } elsif( $tagname =~ m/^item-/s ) {
         my @to_unget;
@@ -240,11 +240,11 @@ sub do_middle {      # the main work
            # of removes, and operates on the beginning instead of the end!
           
           if($to_unget[-1]->type eq 'text') {
-            if( ($text_count_here += length ${$to_unget[-1]->text_r}) > 150 ){
-              DEBUG > 1 and print "    item-* is too long to be keepn'd.\n";
+            if( ($text_count_here += length ${$to_unget[-1]->text_r}) +> 150 ){
+              DEBUG +> 1 and print "    item-* is too long to be keepn'd.\n";
               last;
             }
-          } elsif (@to_unget > 1 and
+          } elsif (@to_unget +> 1 and
             $to_unget[-2]->type eq 'end' and
             $to_unget[-2]->tagname =~ m/^item-/s
           ) {
@@ -253,15 +253,15 @@ sub do_middle {      # the main work
               $to_unget[-1]->type eq 'start' and
               $to_unget[-1]->tagname eq 'Para';
 
-            DEBUG > 1 and printf "    item-* before %s(%s) %s keepn'd.\n",
+            DEBUG +> 1 and printf "    item-* before %s(%s) %s keepn'd.\n",
               $to_unget[-1]->type,
               $to_unget[-1]->can('tagname') ? $to_unget[-1]->tagname : '',
               $self->{'rtfitemkeepn'} ? "gets" : "doesn't get";
             last;
-          } elsif (@to_unget > 40) {
-            DEBUG > 1 and print "    item-* now has too many tokens (",
+          } elsif (@to_unget +> 40) {
+            DEBUG +> 1 and print "    item-* now has too many tokens (",
               scalar(@to_unget),
-              (DEBUG > 4) ? (q<: >, map($_->dump, @to_unget)) : (),
+              (DEBUG +> 4) ? (q<: >, map($_->dump, @to_unget)) : (),
               ") to be keepn'd.\n";
             last; # give up
           }
@@ -304,7 +304,7 @@ sub do_middle {      # the main work
       }
 
     } elsif( $type eq 'end' ) {
-      DEBUG > 1 and print "  -$type ",$token->tagname,"\n";
+      DEBUG +> 1 and print "  -$type ",$token->tagname,"\n";
       if( ($tagname = $token->tagname) =~ m/^over-/s ) {
         DEBUG and print "Indenting back $indent_stack[-1] twips.\n";
         $self->{'rtfindent'} -= pop @indent_stack;

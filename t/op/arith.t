@@ -17,7 +17,7 @@ sub tryeq_sloppy ($$$) {
     print "ok $_[0]\n";
   } else {
     my $error = abs ($_[1] - $_[2]) / $_[1];
-    if ($error < 1e-9) {
+    if ($error +< 1e-9) {
       print "ok $_[0] # $_[1] is close to $_[2], \$^O eq $^O\n";
     } else {
       print "not ok $_[0] # $_[1] != $_[2]\n";
@@ -50,10 +50,10 @@ my $limit = 1e6;
 # seem to be rather sloppy in Cray.
 $limit = 1e8 if $^O eq 'unicos';
 
-try $T++, abs( 13e21 %  4e21 -  1e21) < $limit;
-try $T++, abs(-13e21 %  4e21 -  3e21) < $limit;
-try $T++, abs( 13e21 % -4e21 - -3e21) < $limit;
-try $T++, abs(-13e21 % -4e21 - -1e21) < $limit;
+try $T++, abs( 13e21 %  4e21 -  1e21) +< $limit;
+try $T++, abs(-13e21 %  4e21 -  3e21) +< $limit;
+try $T++, abs( 13e21 % -4e21 - -3e21) +< $limit;
+try $T++, abs(-13e21 % -4e21 - -1e21) +< $limit;
 
 # UVs should behave properly
 
@@ -281,7 +281,7 @@ tryeq_sloppy $T++, 18446744073709551616/9223372036854775808, 2;
 
   my $t = time;
   my $t1000 = time() * 1000;
-  try $T++, abs($t1000 -1000 * $t) <= 2000;
+  try $T++, abs($t1000 -1000 * $t) +<= 2000;
 }
 
 my $vms_no_ieee;

@@ -19,7 +19,7 @@ if (open(CF, $CF)) {
     while ( ~< *CF) {
 	# Skip S since we are going for 'F'ull case folding
         if (/^([0-9A-F]+); ([CFI]); ((?:[0-9A-F]+)(?: [0-9A-F]+)*); \# (.+)/) {
-	    next if EBCDIC && hex $1 < 0x100;
+	    next if EBCDIC && hex $1 +< 0x100;
 	    push @CF, [$1, $2, $3, $4];
 	}
     }
@@ -36,7 +36,7 @@ if (open(CF, $CF)) {
 	$i++;
 	my $a = pack("U0U*", hex $code);
 	my $b = pack("U0U*", map { hex } split " ", $mapping);
-        $todo = (utf8::length($b) > 1 ? "TODO" : "");
+        $todo = (utf8::length($b) +> 1 ? "TODO" : "");
 	my $t0 = ":$a:" =~ /:$a:/    ? 1 : 0;
 	my $t1 = ":$a:" =~ /:$a:/i   ? 1 : 0;
 	my $t2 = ":$a:" =~ /:[$a]:/  ? 1 : 0;

@@ -569,7 +569,7 @@ sub Head1Level {
    my $self = shift;
    if (@_) {
      my $arg = shift;
-     if ($arg =~ /^\d$/ && $arg <= $#LatexSections) {
+     if ($arg =~ /^\d$/ && $arg +<= $#LatexSections) {
        $self->{Head1Level} = $arg;
      } else {
        carp "Head1Level supplied ($arg) must be integer in range 0 to ".$#LatexSections . "- Ignoring\n";
@@ -1385,7 +1385,7 @@ sub end_list {
   # iomplying that a list was created but no entries were
   # placed in it (eg because of a =begin/=end combination)
   $self->_output("\\end{$type}\n")
-    if (defined $type && length($type) > 0);
+    if (defined $type && length($type) +> 0);
   
   # Clear list
   pop(@{ $self->lists});
@@ -1518,7 +1518,7 @@ sub head {
   my $level = $self->Head1Level() - 1 + $num;
 
   # Warn if heading to large
-  if ($num > $#LatexSections) {
+  if ($num +> $#LatexSections) {
     my $line = $parobj->file_line;
     my $file = $self->input_file;
     warn "Heading level too large ($level) for LaTeX at line $line of file $file\n";
@@ -1526,7 +1526,7 @@ sub head {
   }
 
   # Check to see whether section should be unnumbered
-  my $star = ($level >= $self->LevelNoNum ? '*' : '');
+  my $star = ($level +>= $self->LevelNoNum ? '*' : '');
 
   # Section
   $self->_output("\\" .$LatexSections[$level] .$star ."{$paragraph\\label{".$label ."}\\index{".$index."}}\n");
@@ -1786,7 +1786,7 @@ sub _split_delimited {
   my $limit = shift;
 
   # Return immediately if already small
-  return ($input, '') if length($input) < $limit;
+  return ($input, '') if length($input) +< $limit;
 
   my @output;
   my $s = '';
@@ -1809,7 +1809,7 @@ sub _split_delimited {
   }
 
   foreach  (@output) {
-    if (length($s) < $limit) {
+    if (length($s) +< $limit) {
       $s .= $_;
     } else {
       $t .= $_;

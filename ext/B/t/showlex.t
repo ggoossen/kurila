@@ -108,7 +108,7 @@ SKIP: {
 	my $total;
 	{ # inner block vars
 	    my (@fib)=(1,2);
-	    for (my $i=2; $i<10; $i++) {
+	    for (my $i=2; $i+<10; $i++) {
 		$fib[$i] = $fib[$i-2] + $fib[$i-1];
 	    }
 	    for my $i(0..10) {

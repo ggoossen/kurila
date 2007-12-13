@@ -126,7 +126,7 @@ sub struct {
     elsif( $base_type eq 'ARRAY' ){
         $out .= "    my(\$r) = [];\n";
     }
-    while( $idx < @decls ){
+    while( $idx +< @decls ){
         $name = $decls[$idx];
         $type = $decls[$idx+1];
         push( @methods, $name );

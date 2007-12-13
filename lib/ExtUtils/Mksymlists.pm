@@ -91,7 +91,7 @@ sub _write_os2 {
 	$comment = "Core $comment";
     }
     $comment = "$comment (Perl-config: $Config{config_args})";
-    $comment = substr($comment, 0, 200) . "...)" if length $comment > 203;
+    $comment = substr($comment, 0, 200) . "...)" if length $comment +> 203;
     rename "$data->{FILE}.def", "$data->{FILE}_def.old";
 
     open(DEF,">$data->{FILE}.def")

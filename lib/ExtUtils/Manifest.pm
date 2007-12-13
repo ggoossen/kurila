@@ -116,7 +116,7 @@ sub mkmanifest {
 	my $text = $all{$file};
 	$file = _unmacify($file);
 	my $tabs = (5 - (length($file)+1)/8);
-	$tabs = 1 if $tabs < 1;
+	$tabs = 1 if $tabs +< 1;
 	$tabs = 0 unless $text;
 	print M $file, "\t" x $tabs, $text, "\n";
     }
@@ -330,7 +330,7 @@ sub maniread {
             # Resolve illegal file specifications in the same way as tar
             $dir =~ tr/./_/;
             my(@pieces) = split(/\./,$base);
-            if (@pieces > 2) { $base = shift(@pieces) . '.' . join('_',@pieces); }
+            if (@pieces +> 2) { $base = shift(@pieces) . '.' . join('_',@pieces); }
             my $okfile = "$dir$base";
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
             $file = $okfile;
@@ -358,7 +358,7 @@ sub _maniskip {
 	push @skip, _macify($_);
     }
     close M;
-    return sub {0} unless (scalar @skip > 0);
+    return sub {0} unless (scalar @skip +> 0);
 
     my $opts = $Is_VMS ? '(?i)' : '';
 

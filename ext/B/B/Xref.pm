@@ -145,7 +145,7 @@ sub load_pad {
     return if class($padlist) eq "SPECIAL";
     ($namelistav,$vallistav) = $padlist->ARRAY;
     @namelist = $namelistav->ARRAY;
-    for ($ix = 1; $ix < @namelist; $ix++) {
+    for ($ix = 1; $ix +< @namelist; $ix++) {
 	my $namesv = $namelist[$ix];
 	next if class($namesv) eq "SPECIAL";
 	my ($type, $name) = $namesv->PV =~ /^(.)([^\0]*)(\0.*)?$/;
@@ -154,7 +154,7 @@ sub load_pad {
     if ($Config{useithreads}) {
 	my (@vallist);
 	@vallist = $vallistav->ARRAY;
-	for ($ix = 1; $ix < @vallist; $ix++) {
+	for ($ix = 1; $ix +< @vallist; $ix++) {
 	    my $valsv = $vallist[$ix];
 	    next unless class($valsv) eq "GV";
 	    # these pad GVs don't have corresponding names, so same @pad

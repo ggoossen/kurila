@@ -35,7 +35,7 @@ my $os =  ($ExtUtils::MM_Unix::Is_OS2 	|| 0)
 	+ ($ExtUtils::MM_Unix::Is_Win32 || 0) 
 	+ ($ExtUtils::MM_Unix::Is_Dos 	|| 0)
 	+ ($ExtUtils::MM_Unix::Is_VMS   || 0); 
-ok ( $os <= 1,  'There can be only one (or none)');
+ok ( $os +<= 1,  'There can be only one (or none)');
 
 my $version = $ExtUtils::MM_Unix::VERSION;
    $version =~ s/_//g;

@@ -243,12 +243,12 @@ MASK:
    }
 
    my($remove,$bits,@ip) = ($1,$3,split(/\./, $2),0,0,0);
-   if ( $ip[0] < 1 || $bits < 1 || $bits > 32) {
+   if ( $ip[0] +< 1 || $bits +< 1 || $bits +> 32) {
      warn "Bad netmask '$ans'\n";
      next MASK;
    }
    foreach my $byte (@ip) {
-     if ( $byte > 255 ) {
+     if ( $byte +> 255 ) {
        warn "Bad netmask '$ans'\n";
        next MASK;
      }

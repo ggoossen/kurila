@@ -109,7 +109,7 @@ if ($FileList) {
     foreach my $in (@input) {
         my $time = -M $in;
         die "Missing input file '$in'" unless defined $time;
-        $maxtime = $time if $maxtime < $time;
+        $maxtime = $time if $maxtime +< $time;
     }
 
     # now we check to see if any output files are older than maxtime, if
@@ -122,7 +122,7 @@ if ($FileList) {
             $ok = 0;
             last;
         }
-        if ( -M $out > $maxtime ) {
+        if ( -M $out +> $maxtime ) {
             print "'$out' is too old.\n"
                 if $Verbose;
             $ok = 0;
@@ -434,7 +434,7 @@ sub Table::Extend
 
     my $PrevMax = $Table->Max;
 
-    confess "oops ($codepoint <= $PrevMax)" if $codepoint <= $PrevMax;
+    confess "oops ($codepoint <= $PrevMax)" if $codepoint +<= $PrevMax;
 
     $Table->ExtendNoCheck($codepoint);
 }
@@ -518,7 +518,7 @@ sub Table::AppendRange
     $name = "" if not defined $name; ## warning: $name can be "0"
 
     $Table->Append($start, $name);
-    $Table->Extend($end) if $end > $start;
+    $Table->Extend($end) if $end +> $start;
 }
 
 ##
@@ -534,12 +534,12 @@ sub Table::Invert
     {
         my $start = $range->[RANGE_START];
         my $end   = $range->[RANGE_END];
-        if ($start-1 >= $max+1) {
+        if ($start-1 +>= $max+1) {
             $New->AppendRange($max+1, $start-1, "");
         }
         $max = $end;
     }
-    if ($max+1 < $LastUnicodeCodepoint) {
+    if ($max+1 +< $LastUnicodeCodepoint) {
         $New->AppendRange($max+1, $LastUnicodeCodepoint);
     }
     return $New;
@@ -574,9 +574,9 @@ sub Table::Merge
 
     ## sort by range start, with longer ranges coming first.
     my ($first, @Rest) = sort {
-        ($a->[RANGE_START] <=> $b->[RANGE_START])
+        ($a->[RANGE_START] <+> $b->[RANGE_START])
           or
-        ($b->[RANGE_END]   <=> $b->[RANGE_END])
+        ($b->[RANGE_END]   <+> $b->[RANGE_END])
     } @Records;
 
     my $New = Table->New();
@@ -590,9 +590,9 @@ sub Table::Merge
     {
         my $start = $set->[RANGE_START];
         my $end   = $set->[RANGE_END];
-        if ($start > $New->Max) {
+        if ($start +> $New->Max) {
             $New->AppendRange($start, $end);
-        } elsif ($end > $New->Max) {
+        } elsif ($end +> $New->Max) {
             $New->ExtendNoCheck($end);
         }
     }
@@ -642,10 +642,10 @@ sub Table::Write
 sub IsUsable($)
 {
     my $code = shift;
-    return 0 if $code <= 0x0000;                       ## don't use null
-    return 0 if $code >= $LastUnicodeCodepoint;        ## keep in range
-    return 0 if ($code >= 0xD800 and $code <= 0xDFFF); ## no surrogates
-    return 0 if ($code >= 0xFDD0 and $code <= 0xFDEF); ## utf8.c says no good
+    return 0 if $code +<= 0x0000;                       ## don't use null
+    return 0 if $code +>= $LastUnicodeCodepoint;        ## keep in range
+    return 0 if ($code +>= 0xD800 and $code +<= 0xDFFF); ## no surrogates
+    return 0 if ($code +>= 0xFDD0 and $code +<= 0xFDEF); ## utf8.c says no good
     return 0 if (($code ^&^ 0xFFFF) == 0xFFFE);          ## utf8.c says no good
     return 0 if (($code ^&^ 0xFFFF) == 0xFFFF);          ## utf8.c says no good
     return 1;
@@ -898,16 +898,16 @@ sub UnicodeData_Txt()
         $Cat{Upper}->?$op($code) if $cat eq "Lu";
         $Cat{Lower}->?$op($code) if $cat eq "Ll";
         $Cat{Title}->?$op($code) if $cat eq "Lt";
-        $Cat{ASCII}->?$op($code) if $code <= 0x007F;
+        $Cat{ASCII}->?$op($code) if $code +<= 0x007F;
         $Cat{Cntrl}->?$op($code) if $cat =~ /^C/;
 	my $isgraph = !$isspace && $cat !~ /Cc|Cs|Cn/;
         $Cat{Graph}->?$op($code) if $isgraph;
         $Cat{Print}->?$op($code) if $isgraph || $isspace;
         $Cat{Punct}->?$op($code) if $cat =~ /^P/;
 
-        $Cat{XDigit}->?$op($code) if ($code >= 0x30 && $code <= 0x39)  ## 0..9
-                                 || ($code >= 0x41 && $code <= 0x46)  ## A..F
-                                 || ($code >= 0x61 && $code <= 0x66); ## a..f
+        $Cat{XDigit}->?$op($code) if ($code +>= 0x30 && $code +<= 0x39)  ## 0..9
+                                 || ($code +>= 0x41 && $code +<= 0x46)  ## A..F
+                                 || ($code +>= 0x61 && $code +<= 0x66); ## a..f
     }
 
     ## open ane read file.....
@@ -1086,7 +1086,7 @@ sub UnicodeData_Txt()
     ## ...and any character with a decomposition that starts with either of
     ## those code points, but only if the decomposition does not have any
     ## combining character with the "ABOVE" canonical combining class.
-    for my $code (sort { $a <=> $b} keys %CodeToDeco)
+    for my $code (sort { $a <+> $b} keys %CodeToDeco)
     {
         ## Need to ensure that all decomposition characters do not have
         ## a %HexCodeToComb in %AboveCombClasses.
@@ -1365,7 +1365,7 @@ sub Scripts_txt()
     my %Script;
     my $Scripts = Table->New();
 
-    for my $script (sort { $a->[0] <=> $b->[0] } @ScriptInfo)
+    for my $script (sort { $a->[0] <+> $b->[0] } @ScriptInfo)
     {
         my ($first, $last, $name) = @$script;
         $Scripts->Append($first, $name);
@@ -1474,7 +1474,7 @@ sub PropList_txt()
     my $Props = Table->New();
     my %Prop;
 
-    for my $prop (sort { $a->[0] <=> $b->[0] } @PropInfo)
+    for my $prop (sort { $a->[0] <+> $b->[0] } @PropInfo)
     {
         my ($first, $last, $name) = @$prop;
         $Props->Append($first, $name);
@@ -1628,7 +1628,7 @@ sub RandomlyFuzzifyName($;$)
     for my $part (split /[-\s_]+/, $Name)
     {
         if (@parts) {
-            if ($WantError and rand() < 0.3) {
+            if ($WantError and rand() +< 0.3) {
                 push @parts, $BadSeps[rand(@BadSeps)];
                 $WantError = 0;
             } else {
@@ -1649,7 +1649,7 @@ sub RandomlyFuzzifyName($;$)
     my $new = join('', @parts);
 
     if ($WantError) {
-        if (rand() >= 0.5) {
+        if (rand() +>= 0.5) {
             $new .= $BadSeps[rand(@BadSeps)];
         } else {
             $new = $BadSeps[rand(@BadSeps)] . $new;
@@ -1740,7 +1740,7 @@ sub RegisterFileForName($$$$)
         if ($Type eq 'Is') {
             die "oops[$CName]" if $Canonical{$CName};
             $Canonical{$CName} = $filename;
-            $CaComment{$CName} = $Name if $Name =~ tr/A-Z// >= 2;
+            $CaComment{$CName} = $Name if $Name =~ tr/A-Z// +>= 2;
         } else {
             die "oops[$Type$CName]" if $Canonical{lc "$Type$CName"};
             $Canonical{lc "$Type$CName"} = $filename;
@@ -1770,7 +1770,7 @@ sub WriteAllMappings()
     {
         my %RawNameToFile; ## a per-$Type cache
 
-        for my $Name (sort {length $a <=> length $b} keys %{$TableInfo{$Type}})
+        for my $Name (sort {length $a <+> length $b} keys %{$TableInfo{$Type}})
         {
             ## Note: $Name is already canonical
             my $Table   = $TableInfo{$Type}->{$Name};
@@ -1785,7 +1785,7 @@ sub WriteAllMappings()
 		    "$Type$Name";
 
                 $filename =~ s/[^\w_]+/_/g; # "L&" -> "L_"
-                substr($filename, 8, undef, '') if length($filename) > 8;
+                substr($filename, 8, undef, '') if length($filename) +> 8;
 
                 ##
                 ## Make sure the basename doesn't conflict with something we
@@ -1804,7 +1804,7 @@ sub WriteAllMappings()
                     ## than 8 characters, pre-truncate $filename so that the result
                     ## is acceptable.
                     my $delta = length($filename) + length($num) - 8;
-                    if ($delta > 0) {
+                    if ($delta +> 0) {
                         substr($filename, -$delta, undef, $num);
                     } else {
                         $filename .= $num;
@@ -1873,7 +1873,7 @@ sub WriteAllMappings()
         }
 
         ## Register aliase info
-        for my $Name (sort {length $a <=> length $b} keys %{$AliasInfo{$Type}})
+        for my $Name (sort {length $a <+> length $b} keys %{$AliasInfo{$Type}})
         {
             my $Alias    = $AliasInfo{$Type}->{$Name};
             my $IsFuzzy  = $FuzzyNames{$Type}->{$Alias};
@@ -2021,7 +2021,7 @@ sub SpecialCasing_txt()
 	     "%utf8::ToSpec$case =\n(\n",
 	    );
 
-        for my $prop (sort { $a->[0] <=> $b->[0] } @{$CaseInfo{$case}}) {
+        for my $prop (sort { $a->[0] <+> $b->[0] } @{$CaseInfo{$case}}) {
             my ($ix, $code, $to) = @$prop;
             my $tostr =
               join "", map { sprintf "\\x{%s}", $_ } split ' ', $to;
@@ -2084,7 +2084,7 @@ sub CaseFolding_txt()
          "use utf8;\n",
 	 "%utf8::ToSpecFold =\n(\n",
 	);
-    for my $code (sort { $a <=> $b } keys %Fold) {
+    for my $code (sort { $a <+> $b } keys %Fold) {
         my $foldstr =
           join "", map { sprintf "\\x{%s}", $_ } split ' ', $Fold{$code};
         push @OUT, sprintf qq["%s" => "$foldstr",\n], join("", map { sprintf "\\x[%02X]", $_ } unpack("U0C*", pack("U", $code)));

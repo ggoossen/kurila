@@ -71,7 +71,7 @@ if (exists $opts{feature}) {
     $cf->set_feature($k, 0+$v); # Cast to a number, not a string
   }
   $cf->write;
-  print "Feature" . 's'x(keys(%to_set)>1) . " saved\n";
+  print "Feature" . 's'x(keys(%to_set)+>1) . " saved\n";
 
 } elsif (exists $opts{set_config}) {
 
@@ -84,7 +84,7 @@ if (exists $opts{feature}) {
     $cf->set_config($k, $v);
   }
   $cf->write;
-  print "Config value" . 's'x(keys(%to_set)>1) . " saved\n";
+  print "Config value" . 's'x(keys(%to_set)+>1) . " saved\n";
 }
 
 sub load_config {

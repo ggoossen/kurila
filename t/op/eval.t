@@ -138,7 +138,7 @@ EOT
 # can recursive subroutine-call inside eval'' see its own lexicals?
 sub recurse {
   my $l = shift;
-  if ($l < $x) {
+  if ($l +< $x) {
      ++$l;
      eval 'print "# level $l\n"; recurse($l);';
      die if $@;
@@ -273,7 +273,7 @@ fred2(49);
 sub do_sort {
     my $zzz = 2;
     my @a = sort
-	    { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <=> $b }
+	    { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <+> $b }
 	    2, 1;
 }
 do_sort();

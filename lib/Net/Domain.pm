@@ -37,7 +37,7 @@ sub _hostname {
       $host = gethostbyaddr($a, Socket::AF_INET());
       last if defined $host;
     }
-    if (defined($host) && index($host, '.') > 0) {
+    if (defined($host) && index($host, '.') +> 0) {
       $fqdn = $host;
       ($host, $domain) = $fqdn =~ /^([^\.]+)\.(.*)$/;
     }
@@ -49,7 +49,7 @@ sub _hostname {
   elsif ($^O eq 'VMS') {    ## multiple varieties of net s/w makes this hard
     $host = $ENV{'UCX$INET_HOST'}      if defined($ENV{'UCX$INET_HOST'});
     $host = $ENV{'MULTINET_HOST_NAME'} if defined($ENV{'MULTINET_HOST_NAME'});
-    if (index($host, '.') > 0) {
+    if (index($host, '.') +> 0) {
       $fqdn = $host;
       ($host, $domain) = $fqdn =~ /^([^\.]+)\.(.*)$/;
     }
@@ -192,7 +192,7 @@ sub _hostdomain {
     # look at real name & aliases
     my $site;
     foreach $site ($info[0], split(/ /, $info[1])) {
-      if (rindex($site, ".") > 0) {
+      if (rindex($site, ".") +> 0) {
 
         # Extract domain from FQDN
 

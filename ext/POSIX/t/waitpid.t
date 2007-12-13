@@ -42,14 +42,14 @@ my $child_pid = fork();
 if ($child_pid) {
     my $ok = 1;
 
-    while ($count++ < $max_count) {   
+    while ($count++ +< $max_count) {   
 	my $begin_time = time();        
 	my $ret = waitpid( -1, WNOHANG );          
 	my $elapsed_time = time() - $begin_time;
 	
 	printf( "# waitpid(-1,WNOHANG) returned %d after %.2f seconds\n",
 		$ret, $elapsed_time );
-	if ($elapsed_time > 0.5) {
+	if ($elapsed_time +> 0.5) {
 	    printf( "# %.2f seconds in non-blocking waitpid is too long!\n",
 		    $elapsed_time );
 	    $ok = 0;

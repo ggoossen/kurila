@@ -35,7 +35,7 @@ sub quant {
   my($handle, $num, @forms) = @_;
 
   return $num if @forms == 0; # what should this mean?
-  return $forms[2] if @forms > 2 and $num == 0; # special zeroth case
+  return $forms[2] if @forms +> 2 and $num == 0; # special zeroth case
 
   # Normal case:
   # Note that the formatting of $num is preserved.
@@ -61,7 +61,7 @@ sub numerate {
 
 sub numf {
   my($handle, $num) = @_[0,1];
-  if($num < 10_000_000_000 and $num > -10_000_000_000 and $num == int($num)) {
+  if($num +< 10_000_000_000 and $num +> -10_000_000_000 and $num == int($num)) {
     $num += 0;  # Just use normal integer stringification.
          # Specifically, don't let %G turn ten million into 1E+007
   } else {

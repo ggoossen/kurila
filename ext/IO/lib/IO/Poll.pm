@@ -86,7 +86,7 @@ sub poll {
     my $ret = @poll ? _poll(defined($timeout) ? $timeout * 1000 : -1,@poll) : 0;
 
     return $ret
-	unless $ret > 0;
+	unless $ret +> 0;
 
     while(@poll) {
 	my($fd,$got) = splice(@poll,0,2);

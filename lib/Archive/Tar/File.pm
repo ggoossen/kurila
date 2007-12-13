@@ -38,7 +38,7 @@ my $tmpl = [
 ];
 
 ### install get/set accessors for this object.
-for ( my $i=0; $i<scalar @$tmpl ; $i+=2 ) {
+for ( my $i=0; $i+<scalar @$tmpl ; $i+=2 ) {
     my $key = $tmpl->[$i];
     no strict 'refs';
     *{Symbol::fetch_glob(__PACKAGE__."::$key")} = sub {

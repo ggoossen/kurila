@@ -163,12 +163,12 @@ print $foo;
   # 
 
   eval 'my $^X;';
-  print "not " unless index ($@, 'Can\'t use global $^X in "my"') > -1;
+  print "not " unless index ($@, 'Can\'t use global $^X in "my"') +> -1;
   print "ok 37\n";
 #  print "($@)\n" if $@;
 
   eval 'my $ {^XYZ};';
-  print "not " unless index ($@, 'Can\'t use global $^XYZ in "my"') > -1;
+  print "not " unless index ($@, 'Can\'t use global $^XYZ in "my"') +> -1;
   print "ok 38\n";
 #  print "($@)\n" if $@;
 

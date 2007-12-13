@@ -86,7 +86,7 @@ cmp_ok("@b",'eq',"3 2 1",'reverse 4');
 cmp_ok("@b",'eq',"4 3 2 1",'reverse 5');
 
 @a = (10,2,3,4);
-@b = sort {$a <=> $b;} @a;
+@b = sort {$a <+> $b;} @a;
 cmp_ok("@b",'eq',"2 3 4 10",'sort numeric');
 
 our $sub = 'Backwards';
@@ -120,7 +120,7 @@ cmp_ok("@b",'eq','1 2 3 4','reverse then sort');
 
 
 
-sub twoface { no warnings 'redefine'; *twoface = sub { $a <=> $b }; &twoface }
+sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface }
 eval { @b = sort twoface 4,1,3,2 };
 cmp_ok("@b",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
@@ -133,7 +133,7 @@ cmp_ok("@b",'eq','4 3 2 1','twoface redefinition');
 
 {
   no warnings 'redefine';
-  *twoface = sub { *twoface = *Backwards_other; $a <=> $b };
+  *twoface = sub { *twoface = *Backwards_other; $a <+> $b };
 }
 
 eval { @b = sort twoface 4,1,9,5 };
@@ -144,7 +144,7 @@ ok(($@ eq "" && "@b" eq "1 4 5 9"),'redefinition should not take effect during t
   *twoface = sub {
                  eval 'sub twoface { $a <=> $b }';
 		 die($@ eq "" ? "good\n" : "bad\n");
-		 $a <=> $b;
+		 $a <+> $b;
 	       };
 }
 eval { @b = sort twoface 4,1 };
@@ -226,7 +226,7 @@ our ($sortsub, $sortglob, $sortglobr, $sortname);
 @a = ( 5, 19, 1996, 255, 90 );
 @b = sort {
     my $dummy;		# force blockness
-    return $b <=> $a
+    return $b <+> $a
 } @a;
 cmp_ok("@b",'eq','1996 255 90 19 5','force blockness');
 
@@ -258,13 +258,13 @@ cmp_ok($x,'eq',$expected,'b cmp a');
 
 
 
-$x = join('', sort { $a <=> $b } 3, 1, 2);
+$x = join('', sort { $a <+> $b } 3, 1, 2);
 cmp_ok($x,'eq','123',q(optimized-away comparison block doesn't take any other arguments away with it));
 
 # test sorting in non-main package
 package Foo;
 @a = ( 5, 19, 1996, 255, 90 );
-@b = sort { $b <=> $a } @a;
+@b = sort { $b <+> $a } @a;
 main::cmp_ok("@b",'eq','1996 255 90 19 5','not in main:: 1');
 
 
@@ -281,11 +281,11 @@ sub test_if_list {
 
 
 }
-my $m = sub { $a <=> $b };
+my $m = sub { $a <+> $b };
 
 sub cxt_one { sort $m test_if_list() }
 cxt_one();
-sub cxt_two { sort { $a <=> $b } test_if_list() }
+sub cxt_two { sort { $a <+> $b } test_if_list() }
 cxt_two();
 sub cxt_three { sort &test_if_list() }
 cxt_three();
@@ -316,7 +316,7 @@ sub cxt_six { sort test_if_scalar 1,2 }
     @b = sort {
 	$def = 1 if defined $Bar::a;
 	Bar::reenter() unless $init++;
-	$a <=> $b
+	$a <+> $b
     } qw/4 3 1 2/;
     main::cmp_ok("@b",'eq','1 2 3 4','reenter 1');
 
@@ -349,11 +349,11 @@ sub ok { main::cmp_ok($_[0],'eq',$_[1],$_[2]);
     @a = qw(b a c); $r1 = \$a[1]; @a = sort @a; $r2 = \$a[0];
     ok "$r1-@a", "$r2-a b c", "inplace sort of lexical";
 
-    @g = (2,3,1); $r1 = \$g[1]; @g = sort { $b <=> $a } @g; $r2 = \$g[0];
+    @g = (2,3,1); $r1 = \$g[1]; @g = sort { $b <+> $a } @g; $r2 = \$g[0];
     ok "$r1-@g", "$r2-3 2 1", "inplace reversed sort of global";
 
     @g = (2,3,1);
-    $r1 = \$g[1]; @g = sort { $a<$b?1:$a>$b?-1:0 } @g; $r2 = \$g[0];
+    $r1 = \$g[1]; @g = sort { $a+<$b?1:$a+>$b?-1:0 } @g; $r2 = \$g[0];
     ok "$r1-@g", "$r2-3 2 1", "inplace custom sort of global";
 
     sub mysort { $b cmp $a };
@@ -382,14 +382,14 @@ sub ok { main::cmp_ok($_[0],'eq',$_[1],$_[2]);
     @a = qw(b a c); @a = ((sort @a), 'x');
     ok "@a", "a b c x", "un-inplace sort of lexical 2";
 
-    @g = (2,3,1); @g = ('0', sort { $b <=> $a } @g);
+    @g = (2,3,1); @g = ('0', sort { $b <+> $a } @g);
     ok "@g", "0 3 2 1", "un-inplace reversed sort of global";
-    @g = (2,3,1); @g = ((sort { $b <=> $a } @g),'4');
+    @g = (2,3,1); @g = ((sort { $b <+> $a } @g),'4');
     ok "@g", "3 2 1 4", "un-inplace reversed sort of global 2";
 
-    @g = (2,3,1); @g = ('0', sort { $a<$b?1:$a>$b?-1:0 } @g);
+    @g = (2,3,1); @g = ('0', sort { $a+<$b?1:$a+>$b?-1:0 } @g);
     ok "@g", "0 3 2 1", "un-inplace custom sort of global";
-    @g = (2,3,1); @g = ((sort { $a<$b?1:$a>$b?-1:0 } @g),'4');
+    @g = (2,3,1); @g = ((sort { $a+<$b?1:$a+>$b?-1:0 } @g),'4');
     ok "@g", "3 2 1 4", "un-inplace custom sort of global 2";
 
     @a = qw(b c a); @a = ('x', sort mysort @a);
@@ -430,7 +430,7 @@ ok join(" ", map {0+$_} @input), "0 1 2 3 4 5 6 7 8",
 
 # This won't be very interesting
 @input = &generate;
-@output = sort {$a <=> $b} @input;
+@output = sort {$a <+> $b} @input;
 ok "@output", "A A A B B B C C C", 'stable $a <=> $b sort';
 
 @input = &generate;
@@ -569,27 +569,27 @@ sub generate1 {
 ok "@output", "A B C D E F G H I", 'stable $a cmp $b sort';
 
 @input = &generate1;
-@output = sort {$a <=> $b} @input;
+@output = sort {$a <+> $b} @input;
 ok "@output", "A B C D E F G H I", 'stable $a <=> $b sort';
 
 @input = &generate1;
-@input = sort {$a <=> $b} @input;
+@input = sort {$a <+> $b} @input;
 ok "@input", "A B C D E F G H I", 'stable $a <=> $b in place sort';
 
 @input = &generate1;
-@output = sort {$b <=> $a} @input;
+@output = sort {$b <+> $a} @input;
 ok "@output", "G H I D E F A B C", 'stable $b <=> $a sort';
 
 @input = &generate1;
-@input = sort {$b <=> $a} @input;
+@input = sort {$b <+> $a} @input;
 ok "@input", "G H I D E F A B C", 'stable $b <=> $a in place sort';
 
 # test that optimized {$b cmp $a} and {$b <=> $a} remain stable
 # (new in 5.9) without overloading
 { no warnings;
-@b = sort { $b <=> $a } @input = qw/5first 6first 5second 6second/;
+@b = sort { $b <+> $a } @input = qw/5first 6first 5second 6second/;
 ok "@b" , "6first 6second 5first 5second", "optimized {$b <=> $a} without overloading" ;
-@input = sort {$b <=> $a} @input;
+@input = sort {$b <+> $a} @input;
 ok "@input" , "6first 6second 5first 5second","inline optimized {$b <=> $a} without overloading" ;
 };
 
@@ -607,43 +607,43 @@ $output = reverse sort @input;
 ok $output, "IHGFEDCBA", "Reversed stable sort in scalar context";
 
 @input = &generate1;
-@output = reverse sort {$a <=> $b} @input;
+@output = reverse sort {$a <+> $b} @input;
 ok "@output", "I H G F E D C B A", 'reversed stable $a <=> $b sort';
 
 @input = &generate1;
-@input = reverse sort {$a <=> $b} @input;
+@input = reverse sort {$a <+> $b} @input;
 ok "@input", "I H G F E D C B A", 'revesed stable $a <=> $b in place sort';
 
 @input = &generate1;
-$output = reverse sort {$a <=> $b} @input;
+$output = reverse sort {$a <+> $b} @input;
 ok $output, "IHGFEDCBA", 'reversed stable $a <=> $b sort in scalar context';
 
 @input = &generate1;
-@output = reverse sort {$b <=> $a} @input;
+@output = reverse sort {$b <+> $a} @input;
 ok "@output", "C B A F E D I H G", 'reversed stable $b <=> $a sort';
 
 @input = &generate1;
-@input = reverse sort {$b <=> $a} @input;
+@input = reverse sort {$b <+> $a} @input;
 ok "@input", "C B A F E D I H G", 'revesed stable $b <=> $a in place sort';
 
 @input = &generate1;
-$output = reverse sort {$b <=> $a} @input;
+$output = reverse sort {$b <+> $a} @input;
 ok $output, "CBAFEDIHG", 'reversed stable $b <=> $a sort in scalar context';
 
 @input = &generate1;
-@output = reverse sort {stuff || $a <=> $b} @input;
+@output = reverse sort {stuff || $a <+> $b} @input;
 ok "@output", "I H G F E D C B A", 'reversed stable complex sort';
 
 @input = &generate1;
-@input = reverse sort {stuff || $a <=> $b} @input;
+@input = reverse sort {stuff || $a <+> $b} @input;
 ok "@input", "I H G F E D C B A", 'revesed stable complex in place sort';
 
 @input = &generate1;
-$output = reverse sort {stuff || $a <=> $b} @input;
+$output = reverse sort {stuff || $a <+> $b} @input;
 ok $output, "IHGFEDCBA", 'reversed stable complex sort in scalar context';
 
 sub sortnumr {
-    reverse sort {$a <=> $b} @_;
+    reverse sort {$a <+> $b} @_;
 }
 
 @output = sortnumr &generate1;
@@ -653,7 +653,7 @@ $output = sortnumr &generate1;
 ok $output, "IHGFEDCBA", 'reversed stable $a <=> $b sort return scalar context';
 
 sub sortnumrba {
-    reverse sort {$b <=> $a} @_;
+    reverse sort {$b <+> $a} @_;
 }
 
 @output = sortnumrba &generate1;
@@ -663,7 +663,7 @@ $output = sortnumrba &generate1;
 ok $output, "CBAFEDIHG", 'reversed stable $b <=> $a sort return scalar context';
 
 sub sortnumrq {
-    reverse sort {stuff || $a <=> $b} @_;
+    reverse sort {stuff || $a <+> $b} @_;
 }
 
 @output = sortnumrq &generate1;
@@ -704,7 +704,7 @@ main::cmp_ok(substr($@,0,length($fail_msg)),'eq',$fail_msg,'goto out of a pseudo
 
 
 
-sub self_immolate {undef &self_immolate; $a<=>$b}
+sub self_immolate {undef &self_immolate; $a<+>$b}
 eval { @output = sort self_immolate 1,2,3 };
 $fail_msg = q(Can't undef active subroutine);
 main::cmp_ok(substr($@,0,length($fail_msg)),'eq',$fail_msg,'undef active subr');
@@ -719,7 +719,7 @@ main::cmp_ok(substr($@,0,length($fail_msg)),'eq',$fail_msg,'undef active subr');
 	if (!defined($n)) {  # No arg means we're being called by sort()
 	    return 1;
 	}
-	if ($n<5) { rec($n+1); }
+	if ($n+<5) { rec($n+1); }
 	else { () = sort rec 1,2; }
 
 	$failed = 1 if !defined $n;
@@ -742,7 +742,7 @@ my $answer = "good";
     sub foo {
 	$answer = "something was unexpectedly defined or undefined" if
 	defined($a) || defined($b) || !defined($main::a) || !defined($main::b);
-	$main::a <=> $main::b;
+	$main::a <+> $main::b;
     }
 }
 
@@ -753,7 +753,7 @@ main::cmp_ok($answer,'eq','good','sort subr called from other package');
 # sort in package1 is active should set $package2::a/b.
 
 $answer = "good";
-my @list = sort { A::min(@$a) <=> A::min(@$b) }
+my @list = sort { A::min(@$a) <+> A::min(@$b) }
   [3, 1, 5], [2, 4], [0];
 
 main::cmp_ok($answer,'eq','good','bug 36430');
@@ -762,7 +762,7 @@ package A;
 sub min {
   my @list = sort {
     $answer = '$a and/or $b are not defined ' if !defined($a) || !defined($b);
-    $a <=> $b;
+    $a <+> $b;
   } @_;
   $list[0];
 }
@@ -777,7 +777,7 @@ main::cmp_ok(substr($@,0,length($fail_msg)),'eq',$fail_msg,'bug 7567');
 
 
 # Sorting shouldn't increase the refcount of a sub
-sub foo {(1+$a) <=> (1+$b)}
+sub foo {(1+$a) <+> (1+$b)}
 my $refcnt = &Internals::SvREFCNT(\&foo);
 @output = sort foo 3,7,9;
 package Foo;
@@ -793,15 +793,15 @@ main::cmp_ok(substr($@,0,length($fail_msg)),'eq',$fail_msg,'in-place sort of rea
 
 
 # Using return() should be okay even in a deeper context
-@b = sort {while (1) {return ($a <=> $b)} } 1..10;
+@b = sort {while (1) {return ($a <+> $b)} } 1..10;
 ok("@b", "1 2 3 4 5 6 7 8 9 10", "return within loop");
 
 # Using return() should be okay even if there are other items
 # on the stack at the time.
-@b = sort {$_ = ($a<=>$b) + do{return $b<=> $a}} 1..10;
+@b = sort {$_ = ($a<+>$b) + do{return $b<+> $a}} 1..10;
 ok("@b", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");
 
 # As above, but with a sort sub rather than a sort block.
-sub ret_with_stacked { $_ = ($a<=>$b) + do {return $b <=> $a} }
+sub ret_with_stacked { $_ = ($a<+>$b) + do {return $b <+> $a} }
 @b = sort ret_with_stacked 1..10;
 ok("@b", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");

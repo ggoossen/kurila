@@ -185,7 +185,7 @@ sub _handle_element_end {
         my $method = 'cmd_' . $method;
         my $text = $self->?$method (@$tag);
         if (defined $text) {
-            if (@{ $$self{PENDING} } > 1) {
+            if (@{ $$self{PENDING} } +> 1) {
                 $$self{PENDING}[-1][1] .= $text;
             } else {
                 $self->output ($text);
@@ -211,7 +211,7 @@ sub wrap {
     my $output = '';
     my $spaces = ' ' x $$self{MARGIN};
     my $width = $$self{opt_width} - $$self{MARGIN};
-    while (length > $width) {
+    while (length +> $width) {
         if (s/^([^\n]{0,$width})[ \t]+// || s/^([^\n]{$width})//) {
             $output .= $spaces . $1 . "\n";
         } else {
@@ -297,7 +297,7 @@ sub item {
     my $indent = $$self{INDENTS}[-1];
     $indent = $$self{opt_indent} unless defined $indent;
     my $margin = ' ' x $$self{opt_margin};
-    my $fits = ($$self{MARGIN} - $indent >= length ($tag) + 1);
+    my $fits = ($$self{MARGIN} - $indent +>= length ($tag) + 1);
 
     # If the tag doesn't fit, or if we have no associated text, print out the
     # tag separately.  Otherwise, put the tag in the margin of the paragraph.
@@ -305,7 +305,7 @@ sub item {
         my $realindent = $$self{MARGIN};
         $$self{MARGIN} = $indent;
         my $output = $self->reformat ($tag);
-        $output =~ s/^$margin /$margin:/ if ($$self{opt_alt} && $indent > 0);
+        $output =~ s/^$margin /$margin:/ if ($$self{opt_alt} && $indent +> 0);
         $output =~ s/\n*$/\n/;
 
         # If the text is just whitespace, we have an empty item paragraph;
@@ -321,7 +321,7 @@ sub item {
         my $space = ' ' x $indent;
         $space =~ s/^$margin /$margin:/ if $$self{opt_alt};
         $text = $self->reformat ($text);
-        $text =~ s/^$margin /$margin:/ if ($$self{opt_alt} && $indent > 0);
+        $text =~ s/^$margin /$margin:/ if ($$self{opt_alt} && $indent +> 0);
         my $tagspace = ' ' x length $tag;
         $text =~ s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item";
         $self->output ($text);

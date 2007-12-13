@@ -33,7 +33,7 @@ sub encode($$;$) {
     my $len = length($str);
     pos($str) = 0;
     my $bytes = '';
-    while ( pos($str) < $len ) {
+    while ( pos($str) +< $len ) {
         if ( $str =~ /\G($re_asis+)/ogc ) {
             $bytes .= $1;
         }
@@ -61,7 +61,7 @@ sub decode($$;$) {
     my $len = length($bytes);
     my $str = "";
     no warnings 'uninitialized';
-    while ( pos($bytes) < $len ) {
+    while ( pos($bytes) +< $len ) {
         if ( $bytes =~ /\G([^+]+)/ogc ) {
             $str .= $1;
         }

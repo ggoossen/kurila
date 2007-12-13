@@ -38,7 +38,7 @@ my $COUNTRIES = [];
 sub code2script
 {
     my $code = shift;
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $code;
@@ -81,7 +81,7 @@ sub code2script
 sub script2code
 {
     my $script = shift;
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $script;
@@ -131,7 +131,7 @@ sub script_code2code
 #=======================================================================
 sub all_script_codes
 {
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
     return keys %{ $CODES->[$codeset] };
 }
@@ -144,7 +144,7 @@ sub all_script_codes
 #=======================================================================
 sub all_script_names
 {
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
     return values %{ $CODES->[$codeset] };
 }

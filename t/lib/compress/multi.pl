@@ -121,7 +121,7 @@ EOM
                     isa_ok $gz, $UncompressClass, '    $gz' ;
 
                     my $un = '';
-                    1 while $gz->read($un) > 0 ;
+                    1 while $gz->read($un) +> 0 ;
                     #print "[[$un]]\n" while $gz->read($un) > 0 ;
                     ok ! $gz->error(), "      ! error()"
                         or diag "Error is " . $gz->error() ;

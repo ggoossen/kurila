@@ -66,9 +66,9 @@ sub get_keys {
     # of entries the number of mask bits can be higher
     my $keys = scalar keys %$hr;
     my $bits = $keys ? log($keys)/log(2) : 0;
-    $bits = $min_bits if $min_bits > $bits;
+    $bits = $min_bits if $min_bits +> $bits;
 
-    $bits = int($bits) < $bits ? int($bits) + 1 : int($bits);
+    $bits = int($bits) +< $bits ? int($bits) + 1 : int($bits);
     # need to add 2 bits to cover the internal split cases
     $bits += 2;
     my $mask = 2**$bits-1;
@@ -79,7 +79,7 @@ sub get_keys {
     my $c = 0;
     # get 2 keys on top of the THRESHOLD
     my $hash;
-    while (@keys < THRESHOLD+2) {
+    while (@keys +< THRESHOLD+2) {
         # next if exists $hash->{$s};
         $hash = hash($s);
         next unless ($hash ^&^ $mask) == 0;

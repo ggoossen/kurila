@@ -86,7 +86,7 @@ sub getpid {
 }
 
 sub op {
-    @_ >= 4 || croak '$sem->op( OPLIST )';
+    @_ +>= 4 || croak '$sem->op( OPLIST )';
     my $self = shift;
     croak 'Bad arg count' if @_ % 3;
     my $data = pack("s!*",@_);

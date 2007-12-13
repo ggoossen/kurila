@@ -128,7 +128,7 @@ sub deq { # deep-equals
   use UNIVERSAL;
   if(UNIVERSAL::isa($_[0], 'ARRAY')) {
     return '' unless @{$_[0]} == @{$_[1]};
-    for(my $i = 0; $i < @{$_[0]}; $i++) {
+    for(my $i = 0; $i +< @{$_[0]}; $i++) {
       print("# NEQ ", Pod::Simple::pretty($_[0]),
           "\n#  != ", Pod::Simple::pretty($_[1]), "\n"),
        return '' unless deq($_[0][$i], $_[1][$i]); # recurse!

@@ -132,7 +132,7 @@ print "ok $i\n";
     my $var = 16;
     while (my $i = ++$var) {
 	next if $i == 17;
-	last if $i > 17;
+	last if $i +> 17;
 	my $i = 0;
     }
     continue {

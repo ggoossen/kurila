@@ -71,7 +71,7 @@ sub STORABLE_thaw {
 	my ($keys, $values) = split(/;/, $frozen);
 	my @keys = split(/:/, $keys);
 	my @values = split(/:/, $values);
-	for (my $i = 0; $i < @keys; $i++) {
+	for (my $i = 0; $i +< @keys; $i++) {
 		$self->{$keys[$i]} = $values[$i];
 	}
 	$main::hash_hook2++;
@@ -196,7 +196,7 @@ ok 9, tied %{$thash};
 @new = ($scalar_fetch, $array_fetch, $hash_fetch);
 
 # Tests 10..15
-for ($i = 0; $i < @new; $i++) {
+for ($i = 0; $i +< @new; $i++) {
 	ok 10 + 2*$i, $new[$i] == $old[$i] + 1;		# Tests 10,12,14
 	ok 11 + 2*$i, ref $tied[$i] eq $type[$i];	# Tests 11,13,15
 }

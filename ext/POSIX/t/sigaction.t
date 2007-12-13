@@ -181,10 +181,10 @@ ok($ok, "safe signal delivery must work");
 SKIP: {
     eval 'use POSIX qw(%SIGRT SIGRTMIN SIGRTMAX); scalar %SIGRT + SIGRTMIN() + SIGRTMAX()';
     $@					# POSIX did not exort
-    || SIGRTMIN() < 0 || SIGRTMAX() < 0	# HP-UX 10.20 exports both as -1
-    || SIGRTMIN() > $Config{sig_count}	# AIX 4.3.3 exports bogus 888 and 999
+    || SIGRTMIN() +< 0 || SIGRTMAX() +< 0	# HP-UX 10.20 exports both as -1
+    || SIGRTMIN() +> $Config{sig_count}	# AIX 4.3.3 exports bogus 888 and 999
 	and skip("no SIGRT signals", 4);
-    ok(SIGRTMAX() > SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
+    ok(SIGRTMAX() +> SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
     is(scalar %SIGRT, SIGRTMAX() - SIGRTMIN() + 1, "scalar SIGRT");
     my $sigrtmin;
     my $h = sub { $sigrtmin = 1 };
