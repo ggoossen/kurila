@@ -137,7 +137,7 @@ EOT
 $versiononly = 1 if $Config{versiononly} && !defined $versiononly;
 my (@scripts, @tolink);
 open SCRIPTS, "utils.lst" or die "Can't open utils.lst: $!";
-while (<SCRIPTS>) {
+while (~< *SCRIPTS) {
     next if /^#/;
     s/\s*#\s*pod\s*=.*//; # install script regardless of pod location
     next if /a2p/; # a2p is binary, to be installed separately
@@ -633,7 +633,7 @@ sub yn {
     my($answer);
     my($default) = $prompt =~ m/\[([yn])\]\s*$/i;
     print STDERR $prompt;
-    chop($answer = <STDIN>);
+    chop($answer = ~< *STDIN);
     $answer = $default if $answer =~ m/^\s*$/;
     ($answer =~ m/^[yY]/);
 }
