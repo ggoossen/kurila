@@ -252,7 +252,7 @@ EXPECT
 ########
 # used to attach defelem magic to all immortal values,
 # which made restore of local $_ fail.
-foo(2>1);
+foo(2+>1);
 sub foo { bar() for @_;  }
 sub bar { local $_; }
 print "ok\n";

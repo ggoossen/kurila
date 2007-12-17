@@ -62,7 +62,7 @@ my $maxbits = 8 * 127;
 
 $state = $MODULE->new(1);
 
-while ($reps > $maxbits) {
+while ($reps +> $maxbits) {
 	my $num = int(rand($maxbits));
 	$state->add_bits($ONEBITS, $num);
 	$reps -= $num;

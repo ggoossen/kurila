@@ -24,7 +24,7 @@ open(F,"+>:utf8",'a');
 print F chr(0x100)."\x[c2]\x[a3]";
 cmp_ok( tell(F), '==', 4, tell(F) );
 print F "\n";
-cmp_ok( tell(F), '>=', 5, tell(F) );
+cmp_ok( tell(F), '+>=', 5, tell(F) );
 seek(F,0,0);
 is( getc(F), chr(0x100) );
 is( getc(F), "\x[c2]\x[a3]" );

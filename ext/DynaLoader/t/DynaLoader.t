@@ -105,7 +105,7 @@ SKIP: {
     # looks pretty much Unix-like.
     skip "dl_findfile test not appropriate on $^O", 1
 	unless -d '/usr' && -f '/bin/ls';
-    cmp_ok( scalar @files, '>=', 1, "array should contain one result result or more: libc => (@files)" );
+    cmp_ok( scalar @files, '+>=', 1, "array should contain one result result or more: libc => (@files)" );
 }
 
 # Now try to load well known XS modules

@@ -740,7 +740,7 @@ foreach (1 .. 2)
     
     cmp_ok  $x->flush($Answer), '==', Z_OK ;
      
-    cmp_ok length $Answer, ">", 0 ;
+    cmp_ok length $Answer, "+>", 0 ;
 
     my @Answer = split('', $Answer) ;
     

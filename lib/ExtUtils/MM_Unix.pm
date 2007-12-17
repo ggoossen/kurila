@@ -1025,7 +1025,7 @@ WARNING
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace +>= 2);
 
-            my $version_check = qq{$abs -le "\$^V >= $ver; print qq{VER_OK}"};
+            my $version_check = qq{$abs -le "\$^V =~ m/^\Q$ver\E/; print qq{VER_OK}"};
             $version_check = "$Config{run} $version_check"
                 if defined $Config{run} and length $Config{run};
 
@@ -1944,7 +1944,7 @@ sub init_PERL {
     }
 
     $self->{PERL} ||=
-        $self->find_perl(5.0, \@perls, \@defpath, $Verbose );
+        $self->find_perl('kurila', \@perls, \@defpath, $Verbose );
     # don't check if perl is executable, maybe they have decided to
     # supply switches with perl
 

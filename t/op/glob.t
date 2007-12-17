@@ -81,7 +81,7 @@ SKIP: {
     ok($ok,'test definedness with LOGOP');
 }
 
-cmp_ok(scalar(@oops),'>',0,'glob globbed something');
+cmp_ok(scalar(@oops),'+>',0,'glob globbed something');
 
 *aieee = 4;
 pass('Can assign integers to typeglobs');

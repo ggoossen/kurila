@@ -54,7 +54,7 @@ sub parse_todo
       s/^\s+//; s/\s+$//;
       /^\s*$/ and next;
       /^\w+$/ or die "invalid identifier: $_\n";
-      exists $todo{$_} and die "duplicate identifier: $_ ($todo{$_} <=> $perl)\n";
+      exists $todo{$_} and die "duplicate identifier: $_ ($todo{$_} <+> $perl)\n";
       $todo{$_} = $perl;
     }
     close TODO;

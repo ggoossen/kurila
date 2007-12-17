@@ -278,15 +278,15 @@ ok ! $fil->gzclose ;
     # now try to read it back in
     ok $fil = gzopen($name, "rb"), '  gzopen for read ok' ;
     ok ! $fil->gzeof(), '    !gzeof' ;
-    cmp_ok $fil->gzreadline($line), '>', 0, '    gzreadline' ;
+    cmp_ok $fil->gzreadline($line), '+>', 0, '    gzreadline' ;
     is $fil->gztell(), length $line1, '    gztell ok' ;
     ok ! $fil->gzeof(), '    !gzeof' ;
     is $line, $line1, '    got expected line' ;
-    cmp_ok $fil->gzread($line, length $line2), '>', 0, '    gzread ok' ;
+    cmp_ok $fil->gzread($line, length $line2), '+>', 0, '    gzread ok' ;
     is $fil->gztell(), length($line1)+length($line2), '    gztell ok' ;
     ok ! $fil->gzeof(), '    !gzeof' ;
     is $line, $line2, '    read expected block' ;
-    cmp_ok $fil->gzread($line, length $line3), '>', 0, '    gzread ok' ;
+    cmp_ok $fil->gzread($line, length $line3), '+>', 0, '    gzread ok' ;
     is $fil->gztell(), length($text), '    gztell ok' ;
     ok   $fil->gzeof(), '    !gzeof' ;
     is $line, $line3, '    read expected block' ;
