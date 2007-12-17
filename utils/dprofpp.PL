@@ -576,7 +576,7 @@ sub settime {
   else{
     $$runtime = ($rrun_ustime - $overhead)/$hz;
   }
-  $$runtime = 0 unless $$runtime > 0;
+  $$runtime = 0 unless $$runtime +> 0;
 }
 
 sub exclusives_in_tree {
@@ -587,13 +587,13 @@ sub exclusives_in_tree {
   for $kid (keys %{$deep_times->{kids}}) {
     $kids_time += $deep_times->{kids}{$kid}{incl_time};
   }
-  $kids_time = 0 unless $kids_time >= 0;
+  $kids_time = 0 unless $kids_time +>= 0;
   $deep_times->{excl_time} = $deep_times->{incl_time} - $kids_time;
-  $deep_times->{excl_time} = 0 unless $deep_times->{excl_time} >= 0;
+  $deep_times->{excl_time} = 0 unless $deep_times->{excl_time} +>= 0;
   for $kid (keys %{$deep_times->{kids}}) {
     exclusives_in_tree($deep_times->{kids}{$kid});
   }
-  $deep_times->{incl_time} = 0 unless $deep_times->{incl_time} >= 0;
+  $deep_times->{incl_time} = 0 unless $deep_times->{incl_time} +>= 0;
   $deep_times->{kids_time} = $kids_time;
 }
 
@@ -686,7 +686,7 @@ sub add_to_tree {
   if ($name ne $curdeep_times->[-1]{name} and $opt_A) {
     $name = $curdeep_times->[-1]{name};
   }
-  die "Shorted?!" unless @$curdeep_times >= 2;
+  die "Shorted?!" unless @$curdeep_times +>= 2;
   my $entry = $curdeep_times->[-2]{kids}{$name} ||= {
     count => 0,
     kids => {}, 
@@ -866,7 +866,7 @@ sub parsestack {
 	}
 	if (defined $opt_g) {
 	  $runtime = $ctimes->{$opt_g}/$hz;
-	  $runtime = 0 unless $runtime > 0;
+	  $runtime = 0 unless $runtime +> 0;
 	}
 }
 
@@ -949,7 +949,7 @@ sub run_profiler {
 	my @script_parts = split /\s+/, $script;
 
 	system $startperl, "-d:$profiler", @script_parts;
-	if( $? / 256 > 0 ){
+	if( $? / 256 +> 0 ){
 		my $cmd = join ' ', @script_parts;
 		die "Failed: $startperl -d:$profiler $cmd: $!";
 	}

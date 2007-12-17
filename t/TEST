@@ -94,7 +94,7 @@ sub _quote_args {
     foreach (split(/\s+/,$args)) {
        # In VMS protect with doublequotes because otherwise
        # DCL will lowercase -- unless already doublequoted.
-       $_ = q(").$_.q(") if ($^O eq 'VMS') && !/^\"/ && length($_) > 0;
+       $_ = q(").$_.q(") if ($^O eq 'VMS') && !/^\"/ && length($_) +> 0;
        $argstring .= ' ' . $_;
     }
     return $argstring;
@@ -232,7 +232,7 @@ EOT
     foreach (@::path_to_name{@tests}) {
 	s/\.\w+\z/./;
 	my $len = length ;
-	$maxlen = $len if $len > $maxlen;
+	$maxlen = $len if $len +> $maxlen;
     }
     # + 3 : we want three dots between the test name and the "ok"
     my $dotdotdot = $maxlen + 3 ;
@@ -316,7 +316,7 @@ EOT
 	    my $deparse_cmd =
 		"./perl $testswitch $switch -I../lib -MO=-qq,Deparse,-sv1.,".
 		"-l$::deparse_opts$file_opts ".
-		"$test > $test.dp ".
+		"$test +> $test.dp ".
 		"&& ./perl $testswitch $switch -I../lib $test.dp |";
 	    open(RESULTS, $deparse_cmd)
 		or print "can't deparse '$deparse_cmd': $!.\n";
@@ -544,7 +544,7 @@ EOT
 ### them individually and examine any diagnostic messages they produce.
 ### See the INSTALL document's section on "make test".
 SHRDLU_1
-	warn <<'SHRDLU_2' if $good_files / $total_files > 0.8;
+	warn <<'SHRDLU_2' if $good_files / $total_files +> 0.8;
 ### You have a good chance to get more information by running
 ###   ./perl harness
 ### in the 't' directory since most (>=80%) of the tests succeeded.

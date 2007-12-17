@@ -67,7 +67,7 @@ ok($h{foo}, 'foobar42');
 ok($h{bar}, 42);
 
 &Devel::PPPort::sv_setnv_mg($h{PI}, 3.14159);
-ok(abs($h{PI} - 3.14159) +< 0.01);
+ok(abs($h{PI} - 3.14159) < 0.01);
 
 &Devel::PPPort::sv_setpv_mg($h{mhx}, 'mhx');
 ok($h{mhx}, 'mhx');
@@ -85,7 +85,7 @@ ok($h{sv}, 4711);
 ok($h{sv}, 'Perl');
 
 my $ver = eval qq[qv("v1.2.0")];
-ok($[ +< 5.009 || $@ eq '');
+ok($[ < 5.009 || $@ eq '');
 ok($@ || Devel::PPPort::SvVSTRING_mg($ver));
 ok(!Devel::PPPort::SvVSTRING_mg(4711));
 

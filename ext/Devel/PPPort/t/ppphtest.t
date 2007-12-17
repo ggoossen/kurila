@@ -703,7 +703,7 @@ for (@o) {
   exists $p{$name} and $fail++;
   $p{$name} = defined $flags ? { map { ($_ => 1) } $flags =~ /(\w+)/g } : '';
 }
-ok(@o > 100);
+ok(@o +> 100);
 ok($fail, 0);
 
 ok(exists $p{call_sv});
@@ -744,7 +744,7 @@ for (@o) {
   exists $p{$name} and $fail++;
   $p{$name} = $ver;
 }
-ok(@o > 100);
+ok(@o +> 100);
 ok($fail, 0);
 
 ok(exists $p{utf8_distance});

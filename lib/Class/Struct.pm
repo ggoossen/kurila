@@ -214,7 +214,7 @@ sub struct {
             elsif( defined $classes{$name} ){
                 $out .= "    croak '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '$classes{$name}');\n";
             }
-            $out .= "    croak 'Too many args to $name' if \@_ > 1;\n";
+            $out .= "    croak 'Too many args to $name' if \@_ +> 1;\n";
             $out .= "    \@_ ? ($pre\$r->$elem$sel = shift$pst) : $pre\$r->$elem$sel$pst;\n";
             $out .= "  }\n";
         }

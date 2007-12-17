@@ -106,7 +106,7 @@ EOM
     my $data;
     ok(msgctl($msg,IPC_STAT,$data),'msgctl IPC_STAT call');
 
-    cmp_ok(length($data),'>',0,'msgctl IPC_STAT data');
+    cmp_ok(length($data),'+>',0,'msgctl IPC_STAT data');
 
     my $test_name = 'message get call';
     my $msgbuf;
@@ -168,7 +168,7 @@ SKIP: {
     my $data;
     ok(semctl($sem,0,IPC_STAT,$data),'sem data call');
 
-    cmp_ok(length($data),'>',0,'sem data len');
+    cmp_ok(length($data),'+>',0,'sem data len');
 
     ok(semctl($sem,0,SETALL,pack("s!*",(0) x $nsem)), 'set all sems');
 

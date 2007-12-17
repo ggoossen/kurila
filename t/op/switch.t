@@ -298,10 +298,10 @@ sub check_outside1 { is($_, "outside", "\$_ lexically scoped") }
     my $twenty_five = 25;
     my $ok;
     given($twenty_five) {
-	when ($_ > 40) { $ok = "forty" }
-	when ($_ > 30) { $ok = "thirty" }
-	when ($_ > 20) { $ok = "twenty" }
-	when ($_ > 10) { $ok = "ten" }
+	when ($_ +> 40) { $ok = "forty" }
+	when ($_ +> 30) { $ok = "thirty" }
+	when ($_ +> 20) { $ok = "twenty" }
+	when ($_ +> 10) { $ok = "ten" }
 	default        { $ok = "default" }
     }
     is($ok, "twenty", $test);

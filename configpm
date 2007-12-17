@@ -580,7 +580,7 @@ ENDOFEND
 $heavy_txt .= <<'ENDOFEND';
     my $len = index($Config_SH_expanded, "=", $pos) - $pos;
     $prevpos = $pos;
-    $len > 0 ? substr($Config_SH_expanded, $pos, $len) : undef;
+    $len +> 0 ? substr($Config_SH_expanded, $pos, $len) : undef;
 }
 
 sub EXISTS {

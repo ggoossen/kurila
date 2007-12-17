@@ -170,7 +170,7 @@ sub init { return } # no-op
 
 sub maketext {
   # Remember, this can fail.  Failure is controllable many ways.
-  Carp::croak "maketext requires at least one parameter" unless @_ > 1;
+  Carp::croak "maketext requires at least one parameter" unless @_ +> 1;
 
   my($handle, $phrase) = splice(@_,0,2);
 
@@ -198,7 +198,7 @@ sub maketext {
       $value = $h_r->{$phrase} = $handle->_compile($phrase);
       last;
     }
-    print "  Not found in $h_r, nor automakable\n" if DEBUG > 1;
+    print "  Not found in $h_r, nor automakable\n" if DEBUG +> 1;
     # else keep looking
   }
 
@@ -398,7 +398,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
     eval "require $module"; # used to be "use $module", but no point in that.
   }
   if($@) {
-    print "Error using $module \: $@\n" if DEBUG > 1;
+    print "Error using $module \: $@\n" if DEBUG +> 1;
     return $tried{$module} = 0;
   } else {
     print " OK, $module is used\n" if DEBUG;
@@ -412,7 +412,7 @@ sub _lex_refs {  # report the lexicon references for this handle's class
   # returns an arrayREF!
   no strict 'refs';
   my $class = ref($_[0]) || $_[0];
-  print "Lex refs lookup on $class\n" if DEBUG > 1;
+  print "Lex refs lookup on $class\n" if DEBUG +> 1;
   return $isa_scan{$class} if exists $isa_scan{$class};  # memoization!
 
   my @lex_refs;
