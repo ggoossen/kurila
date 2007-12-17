@@ -4253,15 +4253,10 @@ Perl_yylex(pTHX)
 	}
     case '>':
 	s++;
-	{
-	    const char tmp = *s++;
-	    if (tmp == '>')
-		SHop(OP_RIGHT_SHIFT);
-	    else if (tmp == '=')
-		Rop(OP_GE);
-	}
-	s--;
-	Rop(OP_GT);
+	if (*s++ == '>')
+	    SHop(OP_RIGHT_SHIFT);
+	
+	Perl_croak("'>' is reserved for hashes");
 
     case '$':
 	CLINE;
