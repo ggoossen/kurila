@@ -255,7 +255,7 @@ sub rename {
 	    last if CORE::rename($to, "$to.$i");
 	}
 	warn("Cannot rename to `$to.$i': $!"), return 0 
-	    if $i >= 50;	# Give up!
+	    if $i +>= 50;	# Give up!
     }
     link($from,$to) || return 0;
     unlink($from);
