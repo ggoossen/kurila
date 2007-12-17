@@ -187,7 +187,7 @@ ok 9, tied %{$thash};
 @new = ($scalar_fetch, $array_fetch, $hash_fetch);
 
 # Tests 10..15
-for ($i = 0; $i < @new; $i++) {
+for ($i = 0; $i +< @new; $i++) {
 	print "not " unless $new[$i] == $old[$i] + 1;
 	printf "ok %d\n", 10 + 2*$i;	# Tests 10,12,14
 	print "not " unless ref $tied[$i] eq $type[$i];

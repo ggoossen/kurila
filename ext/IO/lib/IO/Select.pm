@@ -102,7 +102,7 @@ sub can_read
  my $timeout = shift;
  my $r = $vec->[VEC_BITS];
 
- defined($r) && (select($r,undef,undef,$timeout) > 0)
+ defined($r) && (select($r,undef,undef,$timeout) +> 0)
     ? handles($vec, $r)
     : ();
 }
@@ -113,7 +113,7 @@ sub can_write
  my $timeout = shift;
  my $w = $vec->[VEC_BITS];
 
- defined($w) && (select(undef,$w,undef,$timeout) > 0)
+ defined($w) && (select(undef,$w,undef,$timeout) +> 0)
     ? handles($vec, $w)
     : ();
 }
@@ -124,7 +124,7 @@ sub has_exception
  my $timeout = shift;
  my $e = $vec->[VEC_BITS];
 
- defined($e) && (select(undef,undef,$e,$timeout) > 0)
+ defined($e) && (select(undef,undef,$e,$timeout) +> 0)
     ? handles($vec, $e)
     : ();
 }
@@ -167,11 +167,11 @@ sub as_string  # for debugging
 sub _max
 {
  my($a,$b,$c) = @_;
- $a > $b
-    ? $a > $c
+ $a +> $b
+    ? $a +> $c
         ? $a
         : $c
-    : $b > $c
+    : $b +> $c
         ? $b
         : $c;
 }
@@ -188,7 +188,7 @@ sub select
  my $wb = defined $w ? $w->[VEC_BITS] : undef;
  my $eb = defined $e ? $e->[VEC_BITS] : undef;
 
- if(select($rb,$wb,$eb,$t) > 0)
+ if(select($rb,$wb,$eb,$t) +> 0)
   {
    my @r = ();
    my @w = ();
@@ -197,7 +197,7 @@ sub select
                 defined $w ? scalar(@$w)-1 : 0,
                 defined $e ? scalar(@$e)-1 : 0);
 
-   for( ; $i >= FIRST_FD ; $i--)
+   for( ; $i +>= FIRST_FD ; $i--)
     {
      my $j = $i - FIRST_FD;
      push(@r, $r->[$i])
@@ -222,7 +222,7 @@ sub handles
  my $i;
  my $max = scalar(@$vec) - 1;
 
- for ($i = FIRST_FD; $i <= $max; $i++)
+ for ($i = FIRST_FD; $i +<= $max; $i++)
   {
    next unless defined $vec->[$i];
    push(@h, $vec->[$i])

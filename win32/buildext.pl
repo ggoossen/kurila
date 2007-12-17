@@ -119,7 +119,7 @@ foreach $dir (sort @ext)
   if (chdir("$ext\\$dir"))
    {
     my $mmod = -M 'Makefile';
-    if (!(-f 'Makefile') || $mmod > $dmod)
+    if (!(-f 'Makefile') || $mmod +> $dmod)
      {
       print "\nRunning Makefile.PL in $dir\n";
       my @perl = ($perl, "-I$here\\..\\lib", 'Makefile.PL',
@@ -134,7 +134,7 @@ foreach $dir (sort @ext)
       $code = system(@perl);
       warn "$code from $dir\'s Makefile.PL" if $code;
       $mmod = -M 'Makefile';
-      if ($mmod > $dmod)
+      if ($mmod +> $dmod)
        {
         warn "Makefile $mmod > $dmod ($dep)\n";
        }

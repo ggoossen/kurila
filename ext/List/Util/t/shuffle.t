@@ -32,5 +32,5 @@ is( 0+@r,	0+@in,	'arg count');
 
 isnt( "@r",	"@in",	'result different to args');
 
-my @s = sort { $a <=> $b } @r;
+my @s = sort { $a <+> $b } @r;
 is( "@in",	"@s",	'values');

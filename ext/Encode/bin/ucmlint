@@ -61,7 +61,7 @@ for $ARGV (@ARGV){
         for my $must (qw/code_set_name mb_cur_min mb_cur_max/){
         exists $Hdr{$must} or nit "<$must> nonexistent";
         }
-        $Hdr{mb_cur_min} > $Hdr{mb_cur_max}
+        $Hdr{mb_cur_min} +> $Hdr{mb_cur_max}
         and nit sprintf("mb_cur_min(%d) > mb_cur_max(%d)",
                 $Hdr{mb_cur_min},$Hdr{mb_cur_max});
         $in_charmap = 1;
@@ -124,7 +124,7 @@ for $ARGV (@ARGV){
     checkRT();
     printf ("$ARGV: %s error%s found\n", 
         ($nerror == 0 ? 'no' : $nerror),
-        ($nerror > 1 ? 's' : ''));
+        ($nerror +> 1 ? 's' : ''));
 }
 
 exit;

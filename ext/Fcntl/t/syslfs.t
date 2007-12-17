@@ -7,7 +7,7 @@ BEGIN {
 	@INC = '../lib';
 	require Config; Config->import;
 	# Don't bother if there are no quad offsets.
-	if ($Config{lseeksize} < 8) {
+	if ($Config{lseeksize} +< 8) {
 		print "1..0 # Skip: no 64-bit file offsets\n";
 		exit(0);
 	}

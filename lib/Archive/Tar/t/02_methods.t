@@ -64,7 +64,7 @@ my $LONG_FILE = qq[directory/really-really-really-really-really-really-really-re
 
 ### wintendo can't deal with too long paths, so we might have to skip tests ###
 my $TOO_LONG    =   ($^O eq 'MSWin32' or $^O eq 'cygwin' or $^O eq 'VMS')
-                    && length( cwd(). $LONG_FILE ) > 247;
+                    && length( cwd(). $LONG_FILE ) +> 247;
 
 ### warn if we are going to skip long file names
 if ($TOO_LONG) {
@@ -662,8 +662,8 @@ sub check_tgz_file {
     is( TAR_END x 2, substr($contents, -(BLOCK*2)),
                                 "   Ends with 1024 null bytes" );
 
-    cmp_ok( $filesize, '<',  $uncompressedsize,
-                                "   Compressed size < uncompressed size" );
+    cmp_ok( $filesize, '+<',  $uncompressedsize,
+                                "   Compressed size +< uncompressed size" );
 
     return $contents;
 }
@@ -774,7 +774,7 @@ sub slurp_gzfile {
     $fh->open( $file, READ_ONLY->(1) )
         or warn( "Error opening '$file' with IO::Zlib" ), return undef;
 
-    $str .= $buff while $fh->read( $buff, 4096 ) > 0;
+    $str .= $buff while $fh->read( $buff, 4096 ) +> 0;
     $fh->close();
     return $str;
 }

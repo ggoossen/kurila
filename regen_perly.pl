@@ -36,7 +36,7 @@ use strict;
 
 my $bison = 'bison';
 
-if (@ARGV >= 2 and $ARGV[0] eq '-b') {
+if (@ARGV +>= 2 and $ARGV[0] eq '-b') {
     shift;
     $bison = shift;
 }

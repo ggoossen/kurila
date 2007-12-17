@@ -70,7 +70,7 @@ print $a + 1 == 0     ? "ok 19\n" : "not ok 19 #" . $a + 1 . "\n";
 
 sub ok { # Can't assume too much of floating point numbers.
     my ($a, $b, $c) = @_;
-    abs($a - $b) <= $c;
+    abs($a - $b) +<= $c;
 }
 
 $a = 0.1; "$a";
@@ -172,7 +172,7 @@ else
 
 $a = 0.00049999999999999999999999999999999999999;
 $b = 0.0005000000000000000104;
-print $a <= $b ? "ok 46\n" : "not ok 46\n";
+print $a +<= $b ? "ok 46\n" : "not ok 46\n";
 
 if ($^O eq 'ultrix' || $^O eq 'VMS') {
   # Ultrix enters looong nirvana over this. VMS blows up when configured with
@@ -182,7 +182,7 @@ if ($^O eq 'ultrix' || $^O eq 'VMS') {
   print "ok 47\n";
 } else {
   $a = 0.00000000000000000000000000000000000000000000000000000000000000000001;
-  print $a > 0 ? "ok 47\n" : "not ok 47\n";
+  print $a +> 0 ? "ok 47\n" : "not ok 47\n";
 }
 
 $a = 80000.0000000000000000000000000;

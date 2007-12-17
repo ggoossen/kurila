@@ -47,8 +47,8 @@ cmp_ok($t->datetime, 'eq','2000-02-29T12:34:56');
 cmp_ok($t->daylight_savings, '==', 0);
 
 # ->tzoffset?
-cmp_ok(($t->julian_day / 2451604.0243 ) - 1, '<', 0.001);
-cmp_ok(($t->mjd        /   51603.52426) - 1, '<', 0.001);
+cmp_ok(($t->julian_day / 2451604.0243 ) - 1, '+<', 0.001);
+cmp_ok(($t->mjd        /   51603.52426) - 1, '+<', 0.001);
 cmp_ok($t->week, '==', 9);
 
 # strftime tests

@@ -40,7 +40,7 @@
     Deep recursion on subroutine \"%s\"
 	sub fred
 	{
-    	  fred() if $a++ < 200
+    	  fred() if $a++ +< 200
 	}
 	 
 	fred()
@@ -150,7 +150,7 @@ use warnings 'recursion' ;
 BEGIN { warn "PREFIX\n" ;}
 sub fred
 {
-    fred() if $a++ < 200
+    fred() if $a++ +< 200
 }
  
 fred()
@@ -162,7 +162,7 @@ no warnings 'recursion' ;
 BEGIN { warn "PREFIX\n" ;}
 sub fred
 {
-    fred() if $a++ < 200
+    fred() if $a++ +< 200
 }
  
 fred()

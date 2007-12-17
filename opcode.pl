@@ -656,20 +656,20 @@ stringify	string			ck_fun		fsT@	S
 left_shift	left bitshift (<<)	ck_bitop	fsT2	S S
 right_shift	right bitshift (>>)	ck_bitop	fsT2	S S
 
-lt		numeric lt (<)		ck_null		Iifs2	S S
-i_lt		integer lt (<)		ck_null		ifs2	S S
-gt		numeric gt (>)		ck_null		Iifs2	S S
-i_gt		integer gt (>)		ck_null		ifs2	S S
-le		numeric le (<=)		ck_null		Iifs2	S S
-i_le		integer le (<=)		ck_null		ifs2	S S
-ge		numeric ge (>=)		ck_null		Iifs2	S S
-i_ge		integer ge (>=)		ck_null		ifs2	S S
+lt		numeric lt (+<)		ck_null		Iifs2	S S
+i_lt		integer lt (+<)		ck_null		ifs2	S S
+gt		numeric gt (+>)		ck_null		Iifs2	S S
+i_gt		integer gt (+>)		ck_null		ifs2	S S
+le		numeric le (+<=)		ck_null		Iifs2	S S
+i_le		integer le (+<=)		ck_null		ifs2	S S
+ge		numeric ge (+>=)		ck_null		Iifs2	S S
+i_ge		integer ge (+>=)		ck_null		ifs2	S S
 eq		numeric eq (==)		ck_null		Iifs2	S S
 i_eq		integer eq (==)		ck_null		ifs2	S S
 ne		numeric ne (!=)		ck_null		Iifs2	S S
 i_ne		integer ne (!=)		ck_null		ifs2	S S
-ncmp		numeric comparison (<=>)	ck_null		Iifst2	S S
-i_ncmp		integer comparison (<=>)	ck_null		ifst2	S S
+ncmp		numeric comparison (<+>)	ck_null		Iifst2	S S
+i_ncmp		integer comparison (<+>)	ck_null		ifst2	S S
 
 slt		string lt		ck_null		ifs2	S S
 sgt		string gt		ck_null		ifs2	S S
@@ -679,14 +679,14 @@ seq		string eq		ck_null		ifs2	S S
 sne		string ne		ck_null		ifs2	S S
 scmp		string comparison (cmp)	ck_null		ifst2	S S
 
-bit_and		bitwise and (&)		ck_bitop	fst2	S S
-bit_xor		bitwise xor (^)		ck_bitop	fst2	S S
-bit_or		bitwise or (|)		ck_bitop	fst2	S S
+bit_and		bitwise and (^&^)		ck_bitop	fst2	S S
+bit_xor		bitwise xor (^^^)		ck_bitop	fst2	S S
+bit_or		bitwise or (^|^)		ck_bitop	fst2	S S
 
 negate		negation (-)		ck_null		Ifst1	S
 i_negate	integer negation (-)	ck_null		ifsT1	S
 not		not			ck_null		ifs1	S
-complement	1's complement (~)	ck_bitop	fst1	S
+complement	1's complement (^~^)	ck_bitop	fst1	S
 
 smartmatch	smart match		ck_smartmatch	s2
 

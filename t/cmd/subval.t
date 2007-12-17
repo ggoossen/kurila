@@ -54,7 +54,7 @@ sub fib {
     my($arg) = @_;
     my($foo);
     $level++;
-    if ($arg <= 2) {
+    if ($arg +<= 2) {
 	$foo = 1;
     }
     else {
@@ -66,7 +66,7 @@ sub fib {
 
 @good = (0,1,1,2,3,5,8,13,21,34,55,89);
 
-for ($i = 1; $i <= 10; $i++) {
+for ($i = 1; $i +<= 10; $i++) {
     $foo = $i + 12;
     if (&fib($i) == $good[$i]) {
 	print "ok $foo\n";

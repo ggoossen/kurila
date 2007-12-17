@@ -47,7 +47,7 @@ my $max_uv_less3 = $max_uv1 - 3;
 
 print "# max_uv1 = $max_uv1, max_uv2 = $max_uv2, big_iv = $big_iv\n";
 print "# max_uv_less3 = $max_uv_less3\n";
-if ($max_uv1 ne $max_uv2 or $big_iv > $max_uv1 or $max_uv1 == $max_uv_less3) {
+if ($max_uv1 ne $max_uv2 or $big_iv +> $max_uv1 or $max_uv1 == $max_uv_less3) {
   print "1..0 # skipped: unsigned perl arithmetic is not sane";
   eval { require Config; Config->import };
   use vars qw(%Config);
@@ -126,7 +126,7 @@ for my $num_chain (1..$max_chain) {
     for my $first (2..5) {
       for my $last (2..5) {
 	$nok = 0;
-	my @otherops = grep $_ <= 3, @$op;
+	my @otherops = grep $_ +<= 3, @$op;
 	my @curops = ($op,\@otherops);
 
 	for my $num (@list) {
@@ -155,8 +155,8 @@ for my $num_chain (1..$max_chain) {
 	    #  and "$tmp" ne "$tmp1"; # Already the coercion gives problems...
 
 	    for my $curop (@{$curops[$short]}) {
-	      if ($curop < 5) {
-		if ($curop < 3) {
+	      if ($curop +< 5) {
+		if ($curop +< 3) {
 		  if ($curop == 0) {
 		    --$inpt;	# - 0
 		  } elsif ($curop == 1) {
@@ -169,7 +169,7 @@ for my $num_chain (1..$max_chain) {
 		} else {
 		  $inpt += $zero; # N 4
 		}
-	      } elsif ($curop < 8) {
+	      } elsif ($curop +< 8) {
 		if ($curop == 5) {
 		  $inpt = "$inpt"; # P 5
 		} elsif ($curop == 6) {
@@ -222,7 +222,7 @@ for my $num_chain (1..$max_chain) {
               # as aboce
 	      print "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
 	    } elsif (grep {/^N$/} @opnames[@{$curops[0]}]
-		     and $ans[0] == $ans[1] and $ans[0] <= ^~^0
+		     and $ans[0] == $ans[1] and $ans[0] +<= ^~^0
                      # First must be in E notation (ie not just digits) and
                      # second must still be an integer.
 		     # eg 1.84467440737095516e+19

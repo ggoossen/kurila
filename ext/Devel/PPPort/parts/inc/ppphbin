@@ -72,7 +72,7 @@ if (exists $opt{'compat-version'}) {
     die "Invalid version number format: '$opt{'compat-version'}'\n";
   }
   die "Only Perl 5 is supported\n" if $r != 5;
-  die "Invalid version number: $opt{'compat-version'}\n" if $v >= 1000 || $s >= 1000;
+  die "Invalid version number: $opt{'compat-version'}\n" if $v +>= 1000 || $s +>= 1000;
   $opt{'compat-version'} = sprintf "%d.%03d%03d", $r, $v, $s;
 }
 else {
@@ -83,9 +83,9 @@ my %API = map { /^(\w+)\|([^|]*)\|([^|]*)\|(\w*)$/
                 ? ( $1 => {
                       ($2                  ? ( base     => $2 ) : ()),
                       ($3                  ? ( todo     => $3 ) : ()),
-                      (index($4, 'v') >= 0 ? ( varargs  => 1  ) : ()),
-                      (index($4, 'p') >= 0 ? ( provided => 1  ) : ()),
-                      (index($4, 'n') >= 0 ? ( nothxarg => 1  ) : ()),
+                      (index($4, 'v') +>= 0 ? ( varargs  => 1  ) : ()),
+                      (index($4, 'p') +>= 0 ? ( provided => 1  ) : ()),
+                      (index($4, 'n') +>= 0 ? ( nothxarg => 1  ) : ()),
                     } )
                 : die "invalid spec: $_" } qw(
 __PERL_API__
@@ -316,7 +316,7 @@ for $filename (@files) {
       $file{uses_Perl}{$func}++ if $c =~ /\bPerl_$func\b/;
       if (exists $API{$func}{provided}) {
         $file{uses_provided}{$func}++;
-        if (!exists $API{$func}{base} || $API{$func}{base} > $opt{'compat-version'}) {
+        if (!exists $API{$func}{base} || $API{$func}{base} +> $opt{'compat-version'}) {
           $file{uses}{$func}++;
           my @deps = rec_depend($func);
           if (@deps) {
@@ -330,7 +330,7 @@ for $filename (@files) {
           }
         }
       }
-      if (exists $API{$func}{todo} && $API{$func}{todo} > $opt{'compat-version'}) {
+      if (exists $API{$func}{todo} && $API{$func}{todo} +> $opt{'compat-version'}) {
         if ($c =~ /\b$func\b/) {
           $file{uses_todo}{$func}++;
         }
@@ -357,7 +357,7 @@ for $filename (@files) {
 # Globally resolve NEED_'s
 my $need;
 for $need (keys %{$global{needs}}) {
-  if (@{$global{needs}{$need}} > 1) {
+  if (@{$global{needs}{$need}} +> 1) {
     my @targets = @{$global{needs}{$need}};
     my @t = grep $files{$_}{needed_global}{$need}, @targets;
     @targets = @t if @t;
@@ -678,7 +678,7 @@ sub parse_version
   $v = int $v;
   $s = int $s;
 
-  if ($r < 5 || ($r == 5 && $v < 6)) {
+  if ($r +< 5 || ($r == 5 && $v +< 6)) {
     if ($s % 10) {
       die "cannot parse version '$ver'\n";
     }
@@ -697,14 +697,14 @@ sub format_version
   $v = int $v;
   $s = int $s;
 
-  if ($r < 5 || ($r == 5 && $v < 6)) {
+  if ($r +< 5 || ($r == 5 && $v +< 6)) {
     if ($s % 10) {
       die "invalid version '$ver'\n";
     }
     $s /= 10;
 
     $ver = sprintf "%d.%03d", $r, $v;
-    $s > 0 and $ver .= sprintf "_%02d", $s;
+    $s +> 0 and $ver .= sprintf "_%02d", $s;
 
     return $ver;
   }

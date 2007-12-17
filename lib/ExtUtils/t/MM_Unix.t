@@ -35,11 +35,11 @@ my $os =  ($ExtUtils::MM_Unix::Is_OS2 	|| 0)
 	+ ($ExtUtils::MM_Unix::Is_Win32 || 0) 
 	+ ($ExtUtils::MM_Unix::Is_Dos 	|| 0)
 	+ ($ExtUtils::MM_Unix::Is_VMS   || 0); 
-ok ( $os <= 1,  'There can be only one (or none)');
+ok ( $os +<= 1,  'There can be only one (or none)');
 
 my $version = $ExtUtils::MM_Unix::VERSION;
    $version =~ s/_//g;
-cmp_ok ($version, '>=', '1.12606', 'Should be at least version 1.12606');
+cmp_ok ($version, '+>=', '1.12606', 'Should be at least version 1.12606');
 
 # when the following calls like canonpath, catdir etc are replaced by
 # File::Spec calls, the test's become a bit pointless

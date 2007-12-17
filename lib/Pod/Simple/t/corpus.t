@@ -70,7 +70,7 @@ sub source_path {
       last;
     }
   }
-  die "Too few test files (".@testfiles.")" unless @ARGV or @testfiles > 20;
+  die "Too few test files (".@testfiles.")" unless @ARGV or @testfiles +> 20;
 
   @testfiles = @ARGV if @ARGV and !grep !m/\.txt/, @ARGV;
 
@@ -125,7 +125,7 @@ foreach my $f (@testfiles) {
 
   # foo.xml.out is not a portable filename. foo.xml_out may be a bit more portable
 
-  my $outfilename = ($HACK > 1) ? $wouldxml{$f} : "$wouldxml{$f}_out";
+  my $outfilename = ($HACK +> 1) ? $wouldxml{$f} : "$wouldxml{$f}_out";
   if($HACK) {
     open OUT, ">$outfilename" or die "Can't write-open $outfilename: $!\n";
     binmode(OUT);

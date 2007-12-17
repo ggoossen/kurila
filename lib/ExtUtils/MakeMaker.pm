@@ -325,7 +325,7 @@ sub full_setup {
     foreach my $item (@Get_from_Config) {
         $Recognized_Att_Keys{uc $item} = $Config{$item};
         print "Attribute '\U$item\E' => '$Config{$item}'\n"
-            if ($Verbose >= 2);
+            if ($Verbose +>= 2);
     }
 
     #
@@ -412,7 +412,7 @@ sub new {
               $prereq, $self->{PREREQ_PM}{$prereq} 
                    unless $self->{PREREQ_FATAL};
             $unsatisfied{$prereq} = 'not installed';
-        } elsif ($pr_version < $self->{PREREQ_PM}->{$prereq} ){
+        } elsif ($pr_version +< $self->{PREREQ_PM}->{$prereq} ){
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
               $prereq, $self->{PREREQ_PM}{$prereq}, 
                 ($pr_version || 'unknown version') 
@@ -439,7 +439,7 @@ sub new {
     local @Parent = @Parent;    # Protect against non-local exits
     {
         no strict 'refs';
-        print "Blessing Object into class [$newclass]\n" if $Verbose>=2;
+        print "Blessing Object into class [$newclass]\n" if $Verbose+>=2;
         mv_all_methods("MY",$newclass);
         bless $self, $newclass;
         push @Parent, $self;
@@ -470,7 +470,7 @@ sub new {
                 # the argument if not already absolute.
                 my @cmd = split /\s+/, $self->{$key};
                 $cmd[1] = $self->catfile('[-]',$cmd[1])
-                  unless (@cmd < 2) || $self->file_name_is_absolute($cmd[1]);
+                  unless (@cmd +< 2) || $self->file_name_is_absolute($cmd[1]);
                 $self->{$key} = join(' ', @cmd);
             }
         }
@@ -583,7 +583,7 @@ END
 
 #   MakeMaker 'CONFIGURE' Parameters:
 END
-        if (scalar(keys %configure_att) > 0) {
+        if (scalar(keys %configure_att) +> 0) {
             foreach my $key (sort keys %configure_att){
                next if $key eq 'ARGS';
                my($v) = neatvalue($configure_att{$key});
@@ -623,7 +623,7 @@ END
         my $method = $section;
         $method .= '_target' unless $self->can($method);
 
-        print "Processing Makefile '$section' section\n" if ($Verbose >= 2);
+        print "Processing Makefile '$section' section\n" if ($Verbose +>= 2);
         my($skipit) = $self->skipcheck($section);
         if ($skipit){
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";

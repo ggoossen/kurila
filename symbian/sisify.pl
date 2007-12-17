@@ -120,7 +120,7 @@ if (!defined $AppName) {
   if (defined $Library) {
     $AppName = $SisDir[0];
     $AppName =~ tr!/!-!;
-  } elsif (@SisPl > 0 && $SisPl[0] =~ /^(.+)\.pl$/i) {
+  } elsif (@SisPl +> 0 && $SisPl[0] =~ /^(.+)\.pl$/i) {
     $AppName = basename($1);
   }
 }

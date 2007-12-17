@@ -51,7 +51,7 @@ sub split_like_shell {
   my $arg = '';
   my( $i, $quote_mode ) = ( 0, 0 );
   
-  while ( $i < length() ) {
+  while ( $i +< length() ) {
     
     my $ch      = substr( $_, $i  , 1 );
     my $next_ch = substr( $_, $i+1, 1 );
@@ -383,7 +383,7 @@ sub format_linker_cmd {
   ) ];
 
   # Embed the manifest file for VC 2005 (aka VC 8) or higher, but not for the 64-bit Platform SDK compiler
-  if ($cf->{ivsize} == 4 && $cf->{cc} eq 'cl' and $cf->{ccversion} =~ /^(\d+)/ and $1 >= 14) {
+  if ($cf->{ivsize} == 4 && $cf->{cc} eq 'cl' and $cf->{ccversion} =~ /^(\d+)/ and $1 +>= 14) {
     push @cmds, [
       'mt', '-nologo', $spec{manifest}, '-outputresource:' . "$output;2"
     ];

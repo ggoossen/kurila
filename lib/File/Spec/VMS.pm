@@ -354,7 +354,7 @@ sub abs2rel {
 
     # @basechunks now contains the directories to climb out of,
     # @pathchunks now has the directories to descend in to.
-    if ((@basechunks > 0) || ($basechunks != $pathchunks)) {
+    if ((@basechunks +> 0) || ($basechunks != $pathchunks)) {
       $path_directories = join '.', ('-' x @basechunks, @pathchunks) ;
     }
     else {

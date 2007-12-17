@@ -55,7 +55,7 @@ foreach $filename (keys %files) {
   chomp @lines;
   foreach $tag ( @{$filetags{$filename}} ) {
     $line = $lines[$tags{$tag}{LINE_NO}-1];
-    if (length($line) >= 50) {
+    if (length($line) +>= 50) {
       $line = substr($line,0,50);
     }
     else {

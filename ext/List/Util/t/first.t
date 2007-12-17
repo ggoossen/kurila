@@ -47,16 +47,16 @@ sub foobar {  first { !defined(wantarray) || wantarray } "not ","not ","not " }
 is($v, undef, 'wantarray');
 
 # Can we leave the sub with 'return'?
-$v = first {return ($_>6)} 2,4,6,12;
+$v = first {return ($_+>6)} 2,4,6,12;
 is($v, 12, 'return');
 
 # ... even in a loop?
-$v = first {while(1) {return ($_>6)} } 2,4,6,12;
+$v = first {while(1) {return ($_+>6)} } 2,4,6,12;
 is($v, 12, 'return from loop');
 
 # Does it work from another package?
 { package Foo;
-  ::is(List::Util::first(sub{$_>4},(1..4,24)), 24, 'other package');
+  ::is(List::Util::first(sub{$_+>4},(1..4,24)), 24, 'other package');
 }
 
 # Can we undefine a first sub while it's running?
@@ -77,7 +77,7 @@ is($@, '', 'redefine self');
     sub rec { my $n = shift;
         if (!defined($n)) {  # No arg means we're being called by first()
             return 1; }
-        if ($n<5) { rec($n+1); }
+        if ($n+<5) { rec($n+1); }
         else { $v = first \&rec, 1,2; }
         $failed = 1 if !defined $n;
     }
@@ -89,7 +89,7 @@ is($@, '', 'redefine self');
 # Calling a sub from first should leave its refcount unchanged.
 SKIP: {
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT;
-    sub huge {$_>1E6}
+    sub huge {$_+>1E6}
     my $refcnt = &Internals::SvREFCNT(\&huge);
     $v = first \&huge, 1..6;
     is(&Internals::SvREFCNT(\&huge), $refcnt, "Refcount unchanged");

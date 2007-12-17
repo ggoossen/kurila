@@ -790,11 +790,11 @@ sub parse_text {
                        -ldelim => $ldelim_orig,  -rdelim => $rdelim,
                        -file   => $file,    -line   => $line
                    );
-            (@seq_stack > 1)  and  $seq->nested($seq_stack[-1]);
+            (@seq_stack +> 1)  and  $seq->nested($seq_stack[-1]);
             push @seq_stack, $seq;
         }
         ## Look for sequence ending
-        elsif ( @seq_stack > 1 ) {
+        elsif ( @seq_stack +> 1 ) {
             ## Make sure we match the right kind of closing delimiter
             my ($seq_end, $post_seq) = ("", "");
             if ( ($ldelim eq '<'   and  /\A(.*?)(>)/s)
@@ -822,7 +822,7 @@ sub parse_text {
                 $seq_stack[-1]->append($expand_seq ? &$xseq_sub($self,$seq)
                                                    : $seq);
                 ## Remember the current cmd-name and left-delimiter
-                if(@seq_stack > 1) {
+                if(@seq_stack +> 1) {
                     $cmd = $seq_stack[-1]->name;
                     $ldelim = $seq_stack[-1]->ldelim;
                     $rdelim = $seq_stack[-1]->rdelim;
@@ -843,8 +843,8 @@ sub parse_text {
     }
 
     ## Handle unterminated sequences
-    my $errorsub = (@seq_stack > 1) ? $self->errorsub() : undef;
-    while (@seq_stack > 1) {
+    my $errorsub = (@seq_stack +> 1) ? $self->errorsub() : undef;
+    while (@seq_stack +> 1) {
        ($cmd, $file, $line) = ($seq->name, $seq->file_line);
        $ldelim  = $seq->ldelim;
        ($rdelim = $ldelim) =~ tr/</>/;
@@ -1076,7 +1076,7 @@ sub parse_from_filehandle {
                                      && (length $paragraph));
 
         ## Issue a warning about any non-empty blank lines
-        if (length($1) > 0 and $myOpts{'-warnings'} and ! $myData{_CUTTING}) {
+        if (length($1) +> 0 and $myOpts{'-warnings'} and ! $myData{_CUTTING}) {
             my $errorsub = $self->errorsub();
             my $file = $self->input_file();
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
@@ -1279,7 +1279,7 @@ is used to issue error messages (this is the default behavior).
 =cut
 
 sub errorsub {
-   return (@_ > 1) ? ($_[0]->{_ERRORSUB} = $_[1]) : $_[0]->{_ERRORSUB};
+   return (@_ +> 1) ? ($_[0]->{_ERRORSUB} = $_[1]) : $_[0]->{_ERRORSUB};
 }
 
 ##---------------------------------------------------------------------------
@@ -1300,7 +1300,7 @@ result.
 =cut
 
 sub cutting {
-   return (@_ > 1) ? ($_[0]->{_CUTTING} = $_[1]) : $_[0]->{_CUTTING};
+   return (@_ +> 1) ? ($_[0]->{_CUTTING} = $_[1]) : $_[0]->{_CUTTING};
 }
 
 ##---------------------------------------------------------------------------
@@ -1576,7 +1576,7 @@ sub _pop_input_stream {
     local *input_stack = $myData{_INPUT_STREAMS};
 
     ## Perform end-of-input and/or end-of-document processing
-    $self->end_input()  if (@input_stack > 0);
+    $self->end_input()  if (@input_stack +> 0);
     $self->end_pod()    if (@input_stack == 1);
 
     ## Restore cutting state to whatever it was before we started
@@ -1586,7 +1586,7 @@ sub _pop_input_stream {
 
     ## Dont forget to reset the input indicators
     my $input_top = undef;
-    if (@input_stack > 0) {
+    if (@input_stack +> 0) {
        $input_top = $myData{_TOP_STREAM} = $input_stack[-1];
        $myData{_INFILE}  = $input_top->name();
        $myData{_INPUT}   = $input_top->handle();

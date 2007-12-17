@@ -136,7 +136,7 @@ sub _isRawx
 
     my $buffer = '';
 
-    $self->smartRead(\$buffer, *$self->{BlockSize}) >= 0  
+    $self->smartRead(\$buffer, *$self->{BlockSize}) +>= 0  
         or return $self->saveErrorString(undef, "No data to read");
 
     my $temp_buf = $magic . $buffer ;
@@ -206,7 +206,7 @@ sub inflateSync
         {
             $status = $self->smartRead(\$temp_buf, *$self->{BlockSize}) ;
             return $self->saveErrorString(0, "Error Reading Data")
-                if $status < 0  ;
+                if $status +< 0  ;
 
             if ($status == 0 ) {
                 *$self->{EndStream} = 1 ;
@@ -277,10 +277,10 @@ sub scan
     my $len = 0;
 
     $len = $self->_raw_read(\$buffer, 1) 
-        while ! *$self->{EndStream} && $len >= 0 ;
+        while ! *$self->{EndStream} && $len +>= 0 ;
 
     #return $len if $len < 0 ? $len : 0 ;
-    return $len < 0 ? 0 : 1 ;
+    return $len +< 0 ? 0 : 1 ;
 }
 
 sub zap

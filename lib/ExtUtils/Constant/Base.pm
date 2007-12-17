@@ -124,13 +124,13 @@ sub memEQ_clause {
   if (ref $checked_at) {
     # regexp won't work on 5.6.1 without use utf8; in turn that won't work
     # on 5.005_03.
-    substr ($name, 0, length $$checked_at,, '');
+    substr ($name, 0, length $$checked_at, '');
     $front_chop = C_stringify ($$checked_at);
     undef $checked_at;
   }
   my $len = length $name;
 
-  if ($len < 2) {
+  if ($len +< 2) {
     return $indent . "{\n"
 	if (defined $checked_at and $checked_at == 0) or $len == 0;
     # We didn't switch, drop through to the code for the 2 character string
@@ -139,7 +139,7 @@ sub memEQ_clause {
 
   my $name_param = $self->name_param;
 
-  if ($len < 3 and defined $checked_at) {
+  if ($len +< 3 and defined $checked_at) {
     my $check;
     if ($checked_at == 1) {
       $check = 0;
@@ -478,9 +478,9 @@ sub switch_clause {
     foreach (@names) {
       my $char = substr $_, $i, 1;
       my $ord = ord $char;
-      confess "char $ord is out of range" if $ord > 255;
-      $max = $ord if $ord > $max;
-      $min = $ord if $ord < $min;
+      confess "char $ord is out of range" if $ord +> 255;
+      $max = $ord if $ord +> $max;
+      $min = $ord if $ord +< $min;
       push @{$spread{$char}}, $_;
       # warn "$_ $char";
     }
@@ -501,7 +501,7 @@ sub switch_clause {
     my $ss;
     $ss += @$_ * @$_ foreach values %spread;
     my $rms = sqrt ($ss / keys %spread);
-    if ($rms < $best[0] || ($rms == $best[0] && ($max - $min) < $best[1])) {
+    if ($rms +< $best[0] || ($rms == $best[0] && ($max - $min) +< $best[1])) {
       @best = ($rms, $max - $min, $i, \%spread);
     }
   }
@@ -511,7 +511,7 @@ sub switch_clause {
   my ($offset, $best) = @best[2,3];
   $body .= $indent . "/* Offset $offset gives the best switch position.  */\n";
 
-  my $do_front_chop = $offset == 0 && $namelen > 2;
+  my $do_front_chop = $offset == 0 && $namelen +> 2;
   if ($do_front_chop) {
     $body .= $indent . "switch (*" . $self->name_param() . "++) {\n";
   } else {
@@ -520,15 +520,15 @@ sub switch_clause {
   foreach my $char (sort keys %$best) {
     confess sprintf "'$char' is %d bytes long, not 1", length $char
       if length ($char) != 1;
-    confess sprintf "char %#X is out of range", ord $char if ord ($char) > 255;
+    confess sprintf "char %#X is out of range", ord $char if ord ($char) +> 255;
     $body .= $indent . "case '" . C_stringify ($char) . "':\n";
     foreach my $thisone (sort {
 	# Deal with the case of an item actually being an array ref to 1 or 2
 	# hashrefs. Don't assign to $a or $b, as they're aliases to the orignal
-	my $l = ref $a eq 'ARRAY' ? ($a->[0] || $->[1]) : $a;
-	my $r = ref $b eq 'ARRAY' ? ($b->[0] || $->[1]) : $b;
+	my $l = ref $a eq 'ARRAY' ? ($a->[0] || $-+>[1]) : $a;
+	my $r = ref $b eq 'ARRAY' ? ($b->[0] || $-+>[1]) : $b;
 	# Sort by weight first
-	($r->{weight} || 0) <=> ($l->{weight} || 0)
+	($r->{weight} || 0) <+> ($l->{weight} || 0)
 	    # Sort equal weights by name
 	    or $l->{name} cmp $r->{name}}
 			 # If this looks evil, maybe it is.  $items is a
@@ -855,7 +855,7 @@ sub C_constant {
         } else {
           $body .= $self->match_clause (undef, $only_thing);
         }
-      } elsif (@{$by_length[$i]} < $breakout) {
+      } elsif (@{$by_length[$i]} +< $breakout) {
         $body .= $self->switch_clause ({indent=>4},
 				       $i, $items, @{$by_length[$i]});
       } else {

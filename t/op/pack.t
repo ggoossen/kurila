@@ -339,7 +339,7 @@ sub list_eq ($$) {
 
     # I'm getting about 1e-16 on FreeBSD
     my $quotient = int (100 * ($y - $big) / $big);
-    ok($quotient < 2 && $quotient > -2,
+    ok($quotient +< 2 && $quotient +> -2,
        "Round trip pack, unpack 'w' of $big is within 1% ($quotient%)");
   }
 
@@ -407,11 +407,11 @@ while (my ($base, $expect) = splice @lengths, 0, 2) {
       skip $no_endianness, 1 if $no_endianness && $format =~ m/[<>]/;
       skip $no_signedness, 1 if $no_signedness && $format =~ /[nNvV]!/;
       my $len = length(pack($format, 0));
-      if ($expect > 0) {
+      if ($expect +> 0) {
 	is($expect, $len, "format '$format'");
       } else {
 	$expect = -$expect;
-	ok ($len >= $expect, "format '$format'") ||
+	ok ($len +>= $expect, "format '$format'") ||
 	  print "# format '$format' has length $len, expected >= $expect\n";
       }
     }
@@ -522,8 +522,8 @@ print "# packing native shorts/ints/longs\n";
 is(length(pack("s!", 0)), $Config{shortsize});
 is(length(pack("i!", 0)), $Config{intsize});
 is(length(pack("l!", 0)), $Config{longsize});
-ok(length(pack("s!", 0)) <= length(pack("i!", 0)));
-ok(length(pack("i!", 0)) <= length(pack("l!", 0)));
+ok(length(pack("s!", 0)) +<= length(pack("i!", 0)));
+ok(length(pack("i!", 0)) +<= length(pack("l!", 0)));
 is(length(pack("i!", 0)), length(pack("i", 0)));
 
 sub numbers {
@@ -578,7 +578,7 @@ sub numbers_with_total {
 
       SKIP: {
         skip "cannot test checksums over $skip_if_longer_than bits", 1
-          if $len > $skip_if_longer_than;
+          if $len +> $skip_if_longer_than;
 
         # Our problem with testing this portably is that the checksum code in
         # pp_unpack is able to cast signed to unsigned, and do modulo 2**n
@@ -592,7 +592,7 @@ sub numbers_with_total {
         my $max_p1 = $max + 1;
         my ($max_is_integer, $max_p1_is_integer);
         $max_p1_is_integer = 1 unless $max_p1 + 1 == $max_p1;
-        $max_is_integer = 1 if $max - 1 < ^~^0;
+        $max_is_integer = 1 if $max - 1 +< ^~^0;
 
         my $calc_sum;
         if (ref $total) {
@@ -604,7 +604,7 @@ sub numbers_with_total {
             # Need this to make sure that -1 + (~0+1) is ~0 (ie still integer)
             $calc_sum = $total - $mult;
             $calc_sum -= $mult * $max;
-            if ($calc_sum < 0) {
+            if ($calc_sum +< 0) {
                 $calc_sum += 1;
                 $calc_sum += $max;
             }
@@ -622,7 +622,7 @@ sub numbers_with_total {
         } else {
             my $delta = 1.000001;
             if ($format =~ tr /dDfF//
-                && ($calc_sum <= $sum * $delta && $calc_sum >= $sum / $delta)) {
+                && ($calc_sum +<= $sum * $delta && $calc_sum +>= $sum / $delta)) {
                 pass ("unpack '%$_$format' gave $sum, expected $calc_sum");
             } else {
                 my $text = ref $total ? &$total($len) : $total;
@@ -674,7 +674,7 @@ numbers_with_total ('q', -1,
 # or where rounding is down not up on binary conversion (crays)
 numbers_with_total ('Q', sub {
                       my $len = shift;
-                      $len = 65 if $len > 65; # unmasked total is 2**65-1 here
+                      $len = 65 if $len +> 65; # unmasked total is 2**65-1 here
                       my $total = 1 + 2 * (int (2**($len - 1)) - 1);
                       return 0 if $total == $total - 1; # Overflowed integers
                       return $total; # NVs still accurate to nearest integer
@@ -769,13 +769,13 @@ SKIP: {
       is($_, "\x[FF]"x$len) for $nat, $be, $le;
 
       my(@val,@ref);
-      if ($len >= 8) {
+      if ($len +>= 8) {
         @val = (-2, -81985529216486896, -9223372036854775808);
         @ref = ("\x[FFFFFFFFFFFFFFFE]",
                 "\x[FEDCBA9876543210]",
                 "\x[8000000000000000]");
       }
-      elsif ($len >= 4) {
+      elsif ($len +>= 4) {
         @val = (-2, -19088744, -2147483648);
         @ref = ("\x[FFFFFFFE]",
                 "\x[FEDCBA98]",
@@ -788,7 +788,7 @@ SKIP: {
                 "\x[8000]");
       }
       for my $x (@ref) {
-        if ($len > length $x) {
+        if ($len +> length $x) {
           $x = $x . "\x[FF]" x ($len - length $x);
         }
       }

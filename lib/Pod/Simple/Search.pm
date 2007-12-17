@@ -163,19 +163,19 @@ sub _make_search_callback {
         m/\.(pod|pm|plx?)\z/i || -x _ and -T _
          # Note that the cheapest operation (the RE) is run first.
       ) {
-        $verbose > 1 and print " Brushing off uninteresting $file\n";
+        $verbose +> 1 and print " Brushing off uninteresting $file\n";
         return;
       }
     } else {
       unless( m/^[-_a-zA-Z0-9]+\.(?:pod|pm|plx?)\z/is ) {
-        $verbose > 1 and print " Brushing off oddly-named $file\n";
+        $verbose +> 1 and print " Brushing off oddly-named $file\n";
         return;
       }
     }
 
     $verbose and print "Considering item $file\n";
     my $name = $self->_path2modname( $file, $shortname, $modname_bits );
-    $verbose > 0.01 and print " Nominating $file as $name\n";
+    $verbose +> 0.01 and print " Nominating $file as $name\n";
         
     if($limit_re and $name !~ m/$limit_re/i) {
       $verbose and print "Shunning $name as not matching $limit_re\n";
@@ -297,17 +297,17 @@ sub _recurse_dir {
   my $recursor;
   $recursor = sub {
     my($dir_long, $dir_bare) = @_;
-    if( @$modname_bits >= 10 ) {
+    if( @$modname_bits +>= 10 ) {
       $verbose and print "Too deep! [@$modname_bits]\n";
       return;
     }
 
     unless(-d $dir_long) {
-      $verbose > 2 and print "But it's not a dir! $dir_long\n";
+      $verbose +> 2 and print "But it's not a dir! $dir_long\n";
       return;
     }
     unless( opendir(INDIR, $dir_long) ) {
-      $verbose > 2 and print "Can't opendir $dir_long : $!\n";
+      $verbose +> 2 and print "Can't opendir $dir_long : $!\n";
       closedir(INDIR);
       return
     }
@@ -334,13 +334,13 @@ sub _recurse_dir {
         my $rv = $callback->( $i_full, $i, 1, $modname_bits ) || '';
 
         if($rv eq 'PRUNE') {
-          $verbose > 1 and print "OK, pruning";
+          $verbose +> 1 and print "OK, pruning";
         } else {
           # Otherwise, recurse into it
           $recursor->( File::Spec->catdir($dir_long, $i) , $i);
         }
       } else {
-        $verbose > 1 and print "Skipping oddity $i_full\n";
+        $verbose +> 1 and print "Skipping oddity $i_full\n";
       }
     }
     pop @$modname_bits;
@@ -381,7 +381,7 @@ sub run {
       # Sane case: file is readable
       my $lines = 0;
       while( ~< *INPOD) {
-        last if $lines++ > $MAX_VERSION_WITHIN; # some degree of sanity
+        last if $lines++ +> $MAX_VERSION_WITHIN; # some degree of sanity
         if( s/^\s*\$VERSION\s*=\s*//s and m/\d/ ) {
           DEBUG and print "Found version line (#$lines): $_";
           s/\s*\#.*//s;
@@ -588,7 +588,7 @@ sub contains_pod {
   my $verbose = $self->{'verbose'};
 
   # check for one line of POD
-  $verbose > 1 and print " Scanning $file for pod...\n";
+  $verbose +> 1 and print " Scanning $file for pod...\n";
   unless( open(MAYBEPOD,"<$file") ) {
     print "Error: $file is unreadable: $!\n";
     return undef;
@@ -602,12 +602,12 @@ sub contains_pod {
     if(m/^=(head\d|pod|over|item)\b/s) {
       close(MAYBEPOD) || die "Bizarre error closing $file: $!\nAborting";
       chomp;
-      $verbose > 1 and print "  Found some pod ($_) in $file\n";
+      $verbose +> 1 and print "  Found some pod ($_) in $file\n";
       return 1;
     }
   }
   close(MAYBEPOD) || die "Bizarre error closing $file: $!\nAborting";
-  $verbose > 1 and print "  No POD in $file, skipping.\n";
+  $verbose +> 1 and print "  No POD in $file, skipping.\n";
   return 0;
 }
 

@@ -76,7 +76,7 @@ ok( defined(-d -e 'TEST') );
 ok( defined(-e -d 'TEST') );
 ok( ! -f -d 'op' );
 ok( -x -d -x 'op' );
-ok( (-s -f 'TEST' > 1), "-s returns real size" );
+ok( (-s -f 'TEST' +> 1), "-s returns real size" );
 ok( -f -s 'TEST' == 1 );
 
 # test that _ is a bareword after filetest operators

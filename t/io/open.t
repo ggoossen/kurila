@@ -45,14 +45,14 @@ my $Perl = which_perl();
     ok( open(my $f,'>', 'afile'),       "open(my \$f, '>', 'afile')" );
     ok( (print $f "a row\n"),           '       print');
     ok( close($f),                      '       close' );
-    ok( -s 'afile' < 10,                '       -s' );
+    ok( -s 'afile' +< 10,                '       -s' );
 }
 
 {
     ok( open(my $f,'>>', 'afile'),      "open(my \$f, '>>', 'afile')" );
     ok( (print $f "a row\n"),           '       print' );
     ok( close($f),                      '       close' );
-    ok( -s 'afile' > 10,                '       -s'    );
+    ok( -s 'afile' +> 10,                '       -s'    );
 }
 
 {
@@ -65,7 +65,7 @@ my $Perl = which_perl();
 }
 
 {
-    ok( -s 'afile' < 20,                '-s' );
+    ok( -s 'afile' +< 20,                '-s' );
 
     ok( open(my $f, '+<', 'afile'),     'open +<' );
     my @rows = ~< $f;
@@ -73,7 +73,7 @@ my $Perl = which_perl();
     ok( seek($f, 0, 1),                 '       seek cur' );
     ok( (print $f "yet another row\n"), '       print' );
     ok( close($f),                      '       close' );
-    ok( -s 'afile' > 20,                '       -s' );
+    ok( -s 'afile' +> 20,                '       -s' );
 
     unlink("afile");
 }
@@ -142,14 +142,14 @@ like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
     ok( open(local $f,'>', 'afile'),    'open local $f, ">", ...' );
     ok( (print $f "a row\n"),           '       print');
     ok( close($f),                      '       close');
-    ok( -s 'afile' < 10,                '       -s' );
+    ok( -s 'afile' +< 10,                '       -s' );
 }
 
 {
     ok( open(local $f,'>>', 'afile'),   'open local $f, ">>", ...' );
     ok( (print $f "a row\n"),           '       print');
     ok( close($f),                      '       close');
-    ok( -s 'afile' > 10,                '       -s' );
+    ok( -s 'afile' +> 10,                '       -s' );
 }
 
 {
@@ -159,7 +159,7 @@ like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
     ok( close($f),                      '       close' );
 }
 
-ok( -s 'afile' < 20,                '       -s' );
+ok( -s 'afile' +< 20,                '       -s' );
 
 {
     ok( open(local $f, '+<', 'afile'),  'open local $f, "+<", ...' );
@@ -168,7 +168,7 @@ ok( -s 'afile' < 20,                '       -s' );
     ok( seek($f, 0, 1),                 '       seek cur' );
     ok( (print $f "yet another row\n"), '       print' );
     ok( close($f),                      '       close' );
-    ok( -s 'afile' > 20,                '       -s' );
+    ok( -s 'afile' +> 20,                '       -s' );
 
     unlink("afile");
 }

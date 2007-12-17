@@ -86,7 +86,7 @@ skip $^O eq 'VMS' ? '-- case may or may not be preserved' : 0,
 my %count;
 for(values %$where2name) { ++$count{$_} };
 #print pretty(\%count), "\n\n";
-delete @count{ grep $count{$_} < 2, keys %count };
+delete @count{ grep $count{$_} +< 2, keys %count };
 my $shadowed = join "|", sort keys %count;
 ok $shadowed, "hinkhonk::Glunk|hinkhonk::Vliff|perlthng|squaa::Vliff";
 

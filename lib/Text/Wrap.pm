@@ -36,7 +36,7 @@ sub wrap
 	my $t = expand(join("", (map { /\s+\z/ ? ( $_ ) : ($_, ' ') } @t), $tail));
 	my $lead = $ip;
 	my $ll = $columns - length(expand($ip)) - 1;
-	$ll = 0 if $ll < 0;
+	$ll = 0 if $ll +< 0;
 	my $nll = $columns - length(expand($xp)) - 1;
 	my $nl = "";
 	my $remainder = "";
@@ -62,7 +62,7 @@ sub wrap
 			$remainder = $2;
 		} elsif ($huge eq 'die') {
 			die "couldn't wrap '$t'";
-		} elsif ($columns < 2) {
+		} elsif ($columns +< 2) {
 			warnings::warnif "Increasing \$Text::Wrap::columns from $columns to 2";
 			$columns = 2;
 			return ($ip, $xp, @t);

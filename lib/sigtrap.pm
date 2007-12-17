@@ -62,7 +62,7 @@ sub import {
 	    $untrapped = 0;
 	}
 	elsif ($_ =~ /^\d/) {
-	    $VERSION >= $_ or croak "sigtrap.pm version $_ required,"
+	    $VERSION +>= $_ or croak "sigtrap.pm version $_ required,"
 		    	    	    	. " but this is only version $VERSION";
 	}
 	else {

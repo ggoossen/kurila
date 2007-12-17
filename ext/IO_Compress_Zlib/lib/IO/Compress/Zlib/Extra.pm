@@ -44,7 +44,7 @@ sub validateExtraFieldPair
         if $strict && $gzipMode && substr($pair->[0], 1, 1) eq "\x[00]" ;
 
     return ExtraFieldError("SubField Data too long")
-        if length $pair->[1] > GZIP_FEXTRA_SUBFIELD_MAX_SIZE ;
+        if length $pair->[1] +> GZIP_FEXTRA_SUBFIELD_MAX_SIZE ;
 
 
     return undef ;
@@ -65,13 +65,13 @@ sub parseRawExtra
     my $XLEN = length $data ;
 
     return ExtraFieldError("Too Large")
-        if $XLEN > GZIP_FEXTRA_MAX_SIZE;
+        if $XLEN +> GZIP_FEXTRA_MAX_SIZE;
 
     my $offset = 0 ;
-    while ($offset < $XLEN) {
+    while ($offset +< $XLEN) {
 
         return ExtraFieldError("Truncated in FEXTRA Body Section")
-            if $offset + GZIP_FEXTRA_SUBFIELD_HEADER_SIZE  > $XLEN ;
+            if $offset + GZIP_FEXTRA_SUBFIELD_HEADER_SIZE  +> $XLEN ;
 
         my $id = substr($data, $offset, GZIP_FEXTRA_SUBFIELD_ID_SIZE);    
         $offset += GZIP_FEXTRA_SUBFIELD_ID_SIZE;
@@ -81,7 +81,7 @@ sub parseRawExtra
         $offset += GZIP_FEXTRA_SUBFIELD_LEN_SIZE ;
 
         return ExtraFieldError("Truncated in FEXTRA Body Section")
-            if $offset + $subLen > $XLEN ;
+            if $offset + $subLen +> $XLEN ;
 
         my $bad = validateExtraFieldPair( [$id, 
                                            substr($data, $offset, $subLen)], 
@@ -162,7 +162,7 @@ sub parseExtraField
             return ExtraFieldError("Not even number of elements")
                 unless @$data % 2  == 0;
 
-            for (my $ix = 0; $ix <= length(@$data) -1 ; $ix += 2) {
+            for (my $ix = 0; $ix +<= length(@$data) -1 ; $ix += 2) {
                 my $bad = validateExtraFieldPair([$data->[$ix],
                                                   $data->[$ix+1]], 
                                                  $strict, $gzipMode) ;
@@ -185,7 +185,7 @@ sub parseExtraField
     }
 
     return ExtraFieldError("Too Large")
-        if length $out > GZIP_FEXTRA_MAX_SIZE;
+        if length $out +> GZIP_FEXTRA_MAX_SIZE;
 
     $_[0] = $out ;
 

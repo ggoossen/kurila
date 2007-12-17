@@ -23,20 +23,20 @@ unless (eval 'use open ":std"; 1') {
 }
 
 
-ok( eval "use if ($v_minus > \$x), strict => 'bla'; 12" eq 12,
+ok( eval "use if ($v_minus +> \$x), strict => 'bla'; 12" eq 12,
     '"use if" with a false condition, fake pragma');
 
-ok( eval "use if ($v_minus > \$x), strict => 'bla'; 12" eq 12,
+ok( eval "use if ($v_minus +> \$x), strict => 'bla'; 12" eq 12,
     '"use if" with a false condition and a pragma');
 
-ok( eval "use if ($v_plus > \$x), strict => 'refs'; 12" eq 12,
+ok( eval "use if ($v_plus +> \$x), strict => 'refs'; 12" eq 12,
     '"use if" with a true condition, fake pragma');
 
-ok( (not defined eval "use if ($v_plus > \$x), strict => 'bla'; 12"
+ok( (not defined eval "use if ($v_plus +> \$x), strict => 'bla'; 12"
      and $@ =~ /while "strict refs" in use/),
     '"use if" with a true condition and a pragma');
 
 # Old version had problems with the module name `open', which is a keyword too
 # Use 'open' =>, since pre-5.6.0 could interpret differently
-ok( (eval "use if ($v_plus > \$x), 'open' => IN => ':crlf'; 12" || 0) eq 12,
+ok( (eval "use if ($v_plus +> \$x), 'open' => IN => ':crlf'; 12" || 0) eq 12,
     '"use if" with open');

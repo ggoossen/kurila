@@ -50,8 +50,8 @@ $OPT{min}    = parse_version($OPT{min}) - 1e-10;
 sub cs($;$$) { my $x = shift; my($s, $p) = @_ ? @_ : ('', 's'); ($x, $x == 1 ? $s : $p) }
 
 my @GoodPerls = map  { $_->[0] }
-                sort { $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0] }
-                grep { $_->[1] >= $OPT{min} }
+                sort { $a->[1] <+> $b->[1] or $a->[0] cmp $b->[0] }
+                grep { $_->[1] +>= $OPT{min} }
                 map  { [$_ => perl_version($_)] }
                 @ARGV ? SearchPerls(@ARGV) : FindPerls();
 
@@ -62,7 +62,7 @@ unless (@GoodPerls) {
 
 my $maxlen = max(map length, @GoodPerls) + 3;
 my $mmalen = max(map length, @{$OPT{mmargs}});
-$maxlen += $mmalen+3 if $mmalen > 0;
+$maxlen += $mmalen+3 if $mmalen +> 0;
 
 my $rep = Soak::Reporter->new( verbose => $OPT{verbose}
                              , color   => $OPT{color}
@@ -206,7 +206,7 @@ sub perl_version
 {
   my $perl = shift;
   my $ver = `$perl -e 'print \$^V' 2>&1`;
-  return $? == 0 && $ver =~ /^\w+\.\d+\.\d+/ && $ver >= 5 ? $ver : 0;
+  return $? == 0 && $ver =~ /^\w+\.\d+\.\d+/ && $ver +>= 5 ? $ver : 0;
 }
 
 sub parse_version

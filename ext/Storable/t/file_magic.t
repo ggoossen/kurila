@@ -399,7 +399,7 @@ store({}, $file);
     is($info->{version_nv}, Storable::BIN_WRITE_VERSION_NV, "version_nv match");
     is($info->{major}, 2, "sane major");
     ok($info->{minor}, "have minor");
-    ok($info->{minor} >= Storable::BIN_WRITE_MINOR, "large enough minor");
+    ok($info->{minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
 
     ok(!$info->{netorder}, "no netorder");
 
@@ -424,7 +424,7 @@ nstore({}, $file);
     is($info->{version_nv}, Storable::BIN_WRITE_VERSION_NV, "version_nv match");
     is($info->{major}, 2, "sane major");
     ok($info->{minor}, "have minor");
-    ok($info->{minor} >= Storable::BIN_WRITE_MINOR, "large enough minor");
+    ok($info->{minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
 
     ok($info->{netorder}, "no netorder");
     for (qw(byteorder intsize longsize ptrsize nvsize)) {

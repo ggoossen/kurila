@@ -1122,7 +1122,7 @@ TERNARY_CONDITIONALS: {
     $a[0] = $^X;
     my $i = 0;
     while($a[0]=~ m/(.)/g ) {
-	last if $i++ > 10000;
+	last if $i++ +> 10000;
     }
     cmp_ok $i, '<', 10000, "infinite m//g";
 }

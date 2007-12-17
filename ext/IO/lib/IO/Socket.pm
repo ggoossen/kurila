@@ -204,10 +204,10 @@ sub bind {
 }
 
 sub listen {
-    @_ >= 1 && @_ <= 2 or croak 'usage: $sock->listen([QUEUE])';
+    @_ +>= 1 && @_ +<= 2 or croak 'usage: $sock->listen([QUEUE])';
     my($sock,$queue) = @_;
     $queue = 5
-	unless $queue && $queue > 0;
+	unless $queue && $queue +> 0;
 
     return listen($sock, $queue) ? $sock
 				 : undef;
@@ -258,7 +258,7 @@ sub connected {
 }
 
 sub send {
-    @_ >= 2 && @_ <= 4 or croak 'usage: $sock->send(BUF, [FLAGS, [TO]])';
+    @_ +>= 2 && @_ +<= 4 or croak 'usage: $sock->send(BUF, [FLAGS, [TO]])';
     my $sock  = $_[0];
     my $flags = $_[2] || 0;
     my $peer  = $_[3] || $sock->peername;

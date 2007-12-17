@@ -23,7 +23,7 @@ while ( ~< *ARGV){
 
 print $head;
 for (sort {
-    hex($a->[0]) <=> hex($b->[0]) # Unicode descending order
+    hex($a->[0]) <+> hex($b->[0]) # Unicode descending order
     or $a->[2] cmp $b->[2] # fallback descending order
     or $a->[1] cmp $b->[1] # Encoding descending order
     }

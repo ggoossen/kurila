@@ -95,7 +95,7 @@ sub assignment_clause_for_type {
     return map {"$typeset->[$_]$_[$_];"} 0 .. $#$typeset;
   } elsif (defined $typeset) {
     confess "Aggregate value given for type $type"
-      if @_ > 1;
+      if @_ +> 1;
     return "$typeset$_[0];";
   }
   return ();

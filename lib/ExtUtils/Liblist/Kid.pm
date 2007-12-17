@@ -120,8 +120,8 @@ sub _unix_os2_ext {
 			$ma =~ s/\b(\d)\b/0$1/g;
 			$mb =~ tr/A-Za-z/0/s;
 			$mb =~ s/\b(\d)\b/0$1/g;
-			while (length($ma) < length($mb)) { $ma .= ".00"; }
-			while (length($mb) < length($ma)) { $mb .= ".00"; }
+			while (length($ma) +< length($mb)) { $ma .= ".00"; }
+			while (length($mb) +< length($ma)) { $mb .= ".00"; }
 			# Comparison deliberately backwards
 			$mb cmp $ma;} @fullname)[0];
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
@@ -202,7 +202,7 @@ sub _unix_os2_ext {
 	}
 	warn "Note (probably harmless): "
 		     ."No library found for -l$thislib\n"
-	    unless $found_lib>0;
+	    unless $found_lib+>0;
     }
 
     unless( $found ) {
@@ -349,7 +349,7 @@ sub _win32_ext {
 	# give up
 	warn "Note (probably harmless): "
 		     ."No library found for $thislib\n"
-	    unless $found_lib>0;
+	    unless $found_lib+>0;
 
     }
 
@@ -434,7 +434,7 @@ sub _vms_ext {
   # path in a logical name.)
   foreach $dir (@dirs) {
     unless (-d $dir) {
-      warn "Skipping nonexistent Directory $dir\n" if $verbose > 1;
+      warn "Skipping nonexistent Directory $dir\n" if $verbose +> 1;
       $dir = '';
       next;
     }
@@ -475,7 +475,7 @@ sub _vms_ext {
         my($type);
 
         $name = "$dir$variant";
-        warn "\tChecking $name\n" if $verbose > 2;
+        warn "\tChecking $name\n" if $verbose +> 2;
         $fullname = VMS::Filespec::rmsexpand($name);
         if (defined $fullname and -f $fullname) {
           # It's got its own suffix, so we'll have to figure out the type
@@ -523,7 +523,7 @@ sub _vms_ext {
         if ($cand eq 'VAXCCURSE') { unshift @{$found{$ctype}}, $cand; }  
         else                      { push    @{$found{$ctype}}, $cand; }
         warn "\tFound as $cand (really $fullname), type $ctype\n" 
-          if $verbose > 1;
+          if $verbose +> 1;
 	push @flibs, $name unless $libs_seen{$fullname}++;
         next LIB;
       }

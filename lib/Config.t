@@ -14,7 +14,7 @@ use strict;
 
 # Some (safe?) bets.
 
-ok(keys %Config > 500, "Config has more than 500 entries");
+ok(keys %Config +> 500, "Config has more than 500 entries");
 
 my ($first) = Config::config_sh() =~ /^(\S+)=/m;
 die "Can't find first entry in Config::config_sh()" unless defined $first;

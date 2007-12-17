@@ -26,7 +26,7 @@ our $DEBUGME = shift || 0;
 use Storable qw(store nstore retrieve thaw freeze);
 {
     no warnings;
-    $Storable::DEBUGME = ($DEBUGME > 1);
+    $Storable::DEBUGME = ($DEBUGME +> 1);
 }
 # Better than no plan, because I was getting out of memory errors, at which
 # point Test::More tidily prints up 1..79 as if I meant to finish there.

@@ -80,20 +80,20 @@ BEGIN {
     # to the beginning of the day in Win95.
     # There's a small chance of a 1 second flutter here.
     my $stamp = (stat($ARGV[0]))[9];
-    cmp_ok( abs($now - $stamp), '<=', 1, 'checking modify time stamp' ) ||
+    cmp_ok( abs($now - $stamp), '+<=', 1, 'checking modify time stamp' ) ||
       diag "mtime == $stamp, should be $now";
 
     @ARGV = qw(newfile);
     touch();
 
     my $new_stamp = (stat('newfile'))[9];
-    cmp_ok( abs($new_stamp - $stamp), '>=', 2,  'newer file created' );
+    cmp_ok( abs($new_stamp - $stamp), '+>=', 2,  'newer file created' );
 
     @ARGV = ('newfile', $Testfile);
     eqtime();
 
     $stamp = (stat($Testfile))[9];
-    cmp_ok( abs($new_stamp - $stamp), '<=', 1, 'eqtime' );
+    cmp_ok( abs($new_stamp - $stamp), '+<=', 1, 'eqtime' );
 
     # eqtime use to clear the contents of the file being equalized!
     open(FILE, ">>$Testfile") || die $!;

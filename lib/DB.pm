@@ -97,7 +97,7 @@ sub DB {
   # not attached to a filename, but instead stored in Dev:Pseudo)
   # since this is done late, $DB::filename will be "wrong" after
   # skippkg
-  if ($^O eq 'MacOS' && $#DB::dbline < 0) {
+  if ($^O eq 'MacOS' && $#DB::dbline +< 0) {
     $DB::filename = 'Dev:Pseudo';
     *DB::dbline = "::_<$DB::filename";
   }
@@ -217,7 +217,7 @@ sub cont {
   my $s = shift;
   my $i = shift;
   $s->set_tbreak($i) if $i;
-  for ($i = 0; $i <= $#stack;) {
+  for ($i = 0; $i +<= $#stack;) {
 	$stack[$i++] ^&^= ^~^1;
   }
   $DB::single = 0;
@@ -368,7 +368,7 @@ sub lineevents {
   my $i;
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
-  for ($i = 1; $i <= $#DB::dbline; $i++) {
+  for ($i = 1; $i +<= $#DB::dbline; $i++) {
     $ret{$i} = [$DB::dbline[$i], split(/\0/, $DB::dbline{$i})] 
       if defined $DB::dbline{$i};
   }
@@ -416,7 +416,7 @@ sub _find_subline {
   my($fname, $from, $to) = ($DB::sub{$name} =~ /^(.*):(\d+)-(\d+)$/);
   if ($from) {
     local *DB::dbline = "::_<$fname";
-    ++$from while $DB::dbline[$from] == 0 && $from < $to;
+    ++$from while $DB::dbline[$from] == 0 && $from +< $to;
     return $from;
   }
   return undef;
@@ -439,7 +439,7 @@ sub clr_breaks {
     }
   }
   else {
-    for ($i = 1; $i <= $#DB::dbline ; $i++) {
+    for ($i = 1; $i +<= $#DB::dbline ; $i++) {
       if (defined $DB::dbline{$i}) {
         $DB::dbline{$i} =~ s/^[^\0]+//;
         if ($DB::dbline{$i} =~ s/^\0?$//) {
@@ -482,7 +482,7 @@ sub clr_actions {
     }
   }
   else {
-    for ($i = 1; $i <= $#DB::dbline ; $i++) {
+    for ($i = 1; $i +<= $#DB::dbline ; $i++) {
       if (defined $DB::dbline{$i}) {
 	$DB::dbline{$i} =~ s/\0[^\0]*//;
 	delete $DB::dbline{$i} if $DB::dbline{$i} =~ s/^\0?$//;

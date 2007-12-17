@@ -173,7 +173,7 @@ sub validate {
             }
 
             # stop on 1st warning within a bundle of tests
-            last if $Warnings > $oldwarnings;
+            last if $Warnings +> $oldwarnings;
         }
     }
 

@@ -505,7 +505,7 @@ sub retrieve {
 
     my @rv = map {
                 $args->{remove} ? $_->remove : $_
-           } scalar @list > $amount
+           } scalar @list +> $amount
                             ? splice(@list,0,$amount)
                             : @list;
 

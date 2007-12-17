@@ -75,7 +75,7 @@ sub DELETE {
 sub EXISTS {
   my ($self, $key) = @_;
   die unless @_ == 2;
-  return OS2::Prf::GetLength($self->[0]->[0], $key, undef) >= 0;
+  return OS2::Prf::GetLength($self->[0]->[0], $key, undef) +>= 0;
 }
 
 sub FIRSTKEY {
@@ -93,7 +93,7 @@ sub FIRSTKEY {
 sub NEXTKEY {
   # print "nextkey `@_'\n" if $debug;
   my $self = shift;
-  return undef unless $self->[2]++ < $#{$self->[1]};
+  return undef unless $self->[2]++ +< $#{$self->[1]};
   my $key = $self->[1]->[$self->[2]];
   return $key; #, OS2::Prf::Get($self->[0]->[0], $self->[2], $key));
 }
@@ -165,7 +165,7 @@ sub DELETE {
 sub EXISTS {
   my ($self, $key) = @_;
   die unless @_ == 2;
-  return OS2::Prf::GetLength($self->[0]->[0], $self->[3], $key) >= 0;
+  return OS2::Prf::GetLength($self->[0]->[0], $self->[3], $key) +>= 0;
 }
 
 sub FIRSTKEY {
@@ -183,7 +183,7 @@ sub FIRSTKEY {
 sub NEXTKEY {
   # print "nextkey `@_'\n" if $debug;
   my $self = shift;
-  return undef unless $self->[2]++ < $#{$self->[1]};
+  return undef unless $self->[2]++ +< $#{$self->[1]};
   my $key = $self->[1]->[$self->[2]];
   return $key; #, OS2::Prf::Get($self->[0]->[0], $self->[2], $key));
 }

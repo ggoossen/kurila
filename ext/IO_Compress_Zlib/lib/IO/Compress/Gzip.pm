@@ -131,7 +131,7 @@ sub ckParams
             my $value = $got->value('OS_Code');
 
             return $self->saveErrorString(undef, "OS_Code must be between 0 and 255, got '$value'")
-                if $value < 0 || $value > 255 ;
+                if $value +< 0 || $value +> 255 ;
             
         }
 

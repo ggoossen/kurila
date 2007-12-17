@@ -68,7 +68,7 @@ sub look {
     # find the right block
     my($min, $max) = (0, int($size / $blksize));
     my $mid;
-    while ($max - $min > 1) {
+    while ($max - $min +> 1) {
 	$mid = int(($max + $min) / 2);
 	seek($fh, $mid * $blksize, 0)
 	    or return -1;
@@ -78,7 +78,7 @@ sub look {
 	chomp;
 	s/[^\w\s]//g if $dict;
 	$_ = lc $_   if $fold;
-	if (defined($_) && $comp->($_, $key) < 0) {
+	if (defined($_) && $comp->($_, $key) +< 0) {
 	    $min = $mid;
 	}
 	else {
@@ -98,7 +98,7 @@ sub look {
 	chomp;
 	s/[^\w\s]//g if $dict;
 	$_ = lc $_   if $fold;
-	last if $comp->($_, $key) >= 0;
+	last if $comp->($_, $key) +>= 0;
     }
     seek($fh,$min,0);
     $min;

@@ -41,111 +41,111 @@ my $x;
 my $y;
 
 $x = unpack "q", pack "q", $q;
-print "not " unless $x == $q && $x > $f;
+print "not " unless $x == $q && $x +> $f;
 print "ok 1\n";
 
 
 $x = sprintf("%lld", 12345678901);
-print "not " unless $x eq $q && $x > $f;
+print "not " unless $x eq $q && $x +> $f;
 print "ok 2\n";
 
 
 $x = sprintf("%lld", $q);
-print "not " unless $x == $q && $x eq $q && $x > $f;
+print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 3\n";
 
 $x = sprintf("%Ld", $q);
-print "not " unless $x == $q && $x eq $q && $x > $f;
+print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 4\n";
 
 $x = sprintf("%qd", $q);
-print "not " unless $x == $q && $x eq $q && $x > $f;
+print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 5\n";
 
 
 $x = sprintf("%llx", $q);
-print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) > $f;
+print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) +> $f;
 print "ok 6\n";
 
 $x = sprintf("%Lx", $q);
-print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) > $f;
+print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) +> $f;
 print "ok 7\n";
 
 $x = sprintf("%qx", $q);
-print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) > $f;
+print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) +> $f;
 print "ok 8\n";
 
 
 $x = sprintf("%llo", $q);
-print "not " unless oct("0$x") == 0133767016065 && oct($x) > $f;
+print "not " unless oct("0$x") == 0133767016065 && oct($x) +> $f;
 print "ok 9\n";
 
 $x = sprintf("%Lo", $q);
-print "not " unless oct("0$x") == 0133767016065 && oct($x) > $f;
+print "not " unless oct("0$x") == 0133767016065 && oct($x) +> $f;
 print "ok 10\n";
 
 $x = sprintf("%qo", $q);
-print "not " unless oct("0$x") == 0133767016065 && oct($x) > $f;
+print "not " unless oct("0$x") == 0133767016065 && oct($x) +> $f;
 print "ok 11\n";
 
 
 $x = sprintf("%llb", $q);
 print "not " unless oct("0b$x") == 0b1011011111110111000001110000110101 &&
-                    oct("0b$x") > $f;
+                    oct("0b$x") +> $f;
 print "ok 12\n";
 
 $x = sprintf("%Lb", $q);
 print "not " unless oct("0b$x") == 0b1011011111110111000001110000110101 &&
-                                   oct("0b$x") > $f;
+                                   oct("0b$x") +> $f;
 print "ok 13\n";
 
 $x = sprintf("%qb", $q);
 print "not " unless oct("0b$x") == 0b1011011111110111000001110000110101 &&
-                    oct("0b$x") > $f;
+                    oct("0b$x") +> $f;
 print "ok 14\n";
 
 
 $x = sprintf("%llu", $q);
-print "not " unless $x eq $q && $x > $f;
+print "not " unless $x eq $q && $x +> $f;
 print "ok 15\n";
 
 $x = sprintf("%Lu", $q);
-print "not " unless $x == $q && $x eq $q && $x > $f;
+print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 16\n";
 
 $x = sprintf("%qu", $q);
-print "not " unless $x == $q && $x eq $q && $x > $f;
+print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 17\n";
 
 
 $x = sprintf("%D", $q);
-print "not " unless $x == $q && $x eq $q && $x > $f;
+print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 18\n";
 
 $x = sprintf("%U", $q);
-print "not " unless $x == $q && $x eq $q && $x > $f;
+print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 19\n";
 
 $x = sprintf("%O", $q);
-print "not " unless oct($x) == $q && oct($x) > $f;
+print "not " unless oct($x) == $q && oct($x) +> $f;
 print "ok 20\n";
 
 
 $x = $q + $r;
-print "not " unless $x == 35802467913 && $x > $f;
+print "not " unless $x == 35802467913 && $x +> $f;
 print "ok 21\n";
 
 $x = $q - $r;
-print "not " unless $x == -11111110111 && -$x > $f;
+print "not " unless $x == -11111110111 && -$x +> $f;
 print "ok 22\n";
 
 if ($^O ne 'unicos') {
     $x = $q * 1234567;
-    print "not " unless $x == 15241567763770867 && $x > $f;
+    print "not " unless $x == 15241567763770867 && $x +> $f;
     print "ok 23\n";
 
     $x /= 1234567;
-    print "not " unless $x == $q && $x > $f;
+    print "not " unless $x == $q && $x +> $f;
     print "ok 24\n";
 
     $x = 98765432109 % 12345678901;
@@ -245,7 +245,7 @@ $x = '';
 print "not " unless (vec($x, 1, 64) = $q) == $q;
 print "ok 38\n";
 
-print "not " unless vec($x, 1, 64) == $q && vec($x, 1, 64) > $f;
+print "not " unless vec($x, 1, 64) == $q && vec($x, 1, 64) +> $f;
 print "ok 39\n";
 
 print "not " unless vec($x, 0, 64) == 0 && vec($x, 2, 64) == 0;

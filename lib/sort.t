@@ -17,7 +17,7 @@ BEGIN {
     # for casual testing.  There are some cutoffs (~256)
     # in pp_sort that should be tested, but 10_000 is ample.
     $WellSoaked = 10_000;			# <= $BigEnough
-    for (my $ts = 3; $ts < $WellSoaked; $ts *= 10**(1/3)) {
+    for (my $ts = 3; $ts +< $WellSoaked; $ts *= 10**(1/3)) {
 	push(@TestSizes, int($ts));		# about 3 per decade
     }
 }
@@ -43,11 +43,11 @@ sub genarray {
     my ($items, $i);
     my @a;
 
-    if    ($size < 0) { $size = 0; }	# avoid complexity with sqrt
-    elsif ($size > $BigEnough) { $size = $BigEnough; }
+    if    ($size +< 0) { $size = 0; }	# avoid complexity with sqrt
+    elsif ($size +> $BigEnough) { $size = $BigEnough; }
     $#a = $size - 1;			# preallocate array
     $items = int(sqrt($size));		# number of distinct items
-    for ($i = 0; $i < $size; ++$i) {
+    for ($i = 0; $i +< $size; ++$i) {
 	$a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
     }
     return \@a;
@@ -61,7 +61,7 @@ sub checkorder {
     my $status = '';			# so far, so good
     my ($i, $disorder);
 
-    for ($i = 0; $i < $#$aref; ++$i) {
+    for ($i = 0; $i +< $#$aref; ++$i) {
 	# Equality shouldn't happen, but catch it in the contents check
 	next if ($aref->[$i] le $aref->[$i+1]);
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq
@@ -86,7 +86,7 @@ sub checkequal {
     if (@$aref != @$bref) {
 	$status = "Sizes differ: " . @$aref . " vs " . @$bref;
     } else {
-	for ($i = 0; $i < @$aref; ++$i) {
+	for ($i = 0; $i +< @$aref; ++$i) {
 	    next if ($aref->[$i] eq $bref->[$i]);
 	    $status = "Element $i differs: $aref->[$i] vs $bref->[$i]";
 	    last;
@@ -128,7 +128,7 @@ sub main {
     # If the following test (#58) fails, see the comments in pp_sort.c
     # for Perl_sortsv().
     if ($expect_unstable) {
-	ok($unstable_num > 0, 'Instability ok');
+	ok($unstable_num +> 0, 'Instability ok');
     }
 }
 

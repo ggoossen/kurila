@@ -112,8 +112,8 @@ is($count, $removed, "removed directory safe mode");
 # existence of E is neither here nor there
 $dir = catdir($tmp_base, 'E', updir(), 'Y');
 @created =mkpath($dir);
-cmp_ok(scalar(@created), '>=', 1, "made one or more dirs because of ..");
-cmp_ok(scalar(@created), '<=', 2, "made less than two dirs because of ..");
+cmp_ok(scalar(@created), '+>=', 1, "made one or more dirs because of ..");
+cmp_ok(scalar(@created), '+<=', 2, "made less than two dirs because of ..");
 ok( -d catdir($tmp_base, 'Y'), "directory after parent" );
 
 @created = mkpath(catdir(curdir(), $tmp_base));

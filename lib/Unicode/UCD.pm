@@ -208,7 +208,7 @@ sub charinfo {
     my $hexk = sprintf("%06X", $code);
     my($rcode,$rname,$rdec);
     foreach my $range (@CharinfoRanges){
-      if ($range->[0] <= $code && $code <= $range->[1]) {
+      if ($range->[0] +<= $code && $code +<= $range->[1]) {
         $rcode = $hexk;
 	$rcode =~ s/^0+//;
 	$rcode =  sprintf("%04X", hex($rcode));
@@ -221,7 +221,7 @@ sub charinfo {
     openunicode(\$UNICODEFH, "UnicodeData.txt");
     if (defined $UNICODEFH) {
 	use Search::Dict v1.02;
-	if (look($UNICODEFH, "$hexk;", { xfrm => sub { $_[0] =~ /^([^;]+);(.+)/; sprintf "%06X;$2", hex($1) } } ) >= 0) {
+	if (look($UNICODEFH, "$hexk;", { xfrm => sub { $_[0] =~ /^([^;]+);(.+)/; sprintf "%06X;$2", hex($1) } } ) +>= 0) {
 	    my $line = ~< $UNICODEFH;
 	    return unless defined $line;
 	    chomp $line;
@@ -253,17 +253,17 @@ sub charinfo {
 sub _search { # Binary search in a [[lo,hi,prop],[...],...] table.
     my ($table, $lo, $hi, $code) = @_;
 
-    return if $lo > $hi;
+    return if $lo +> $hi;
 
     my $mid = int(($lo+$hi) / 2);
 
-    if ($table->[$mid]->[0] < $code) {
-	if ($table->[$mid]->[1] >= $code) {
+    if ($table->[$mid]->[0] +< $code) {
+	if ($table->[$mid]->[1] +>= $code) {
 	    return $table->[$mid]->[2];
 	} else {
 	    _search($table, $mid + 1, $hi, $code);
 	}
-    } elsif ($table->[$mid]->[0] > $code) {
+    } elsif ($table->[$mid]->[0] +> $code) {
 	_search($table, $lo, $mid - 1, $code);
     } else {
 	return $table->[$mid]->[2];
@@ -384,7 +384,7 @@ sub _charscripts {
 		}
 	    }
 	    close($SCRIPTSFH);
-	    @SCRIPTS = sort { $a->[0] <=> $b->[0] } @SCRIPTS;
+	    @SCRIPTS = sort { $a->[0] <+> $b->[0] } @SCRIPTS;
 	}
     }
 }

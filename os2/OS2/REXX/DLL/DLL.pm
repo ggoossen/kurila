@@ -44,17 +44,17 @@ my $new_dll = sub {
 };
 
 sub new {
-  confess 'Usage: OS2::DLL->new( <file> [<dirs>] )' unless @_ >= 2;
+  confess 'Usage: OS2::DLL->new( <file> [<dirs>] )' unless @_ +>= 2;
   $new_dll->(1, @_);
 }
 
 sub module {
-  confess 'Usage: OS2::DLL->module( <file> [<dirs>] )' unless @_ >= 2;
+  confess 'Usage: OS2::DLL->module( <file> [<dirs>] )' unless @_ +>= 2;
   $new_dll->(0, @_);
 }
 
 sub load {
-  confess 'Usage: load OS2::DLL <file> [<dirs>]' unless $#_ >= 1;
+  confess 'Usage: load OS2::DLL <file> [<dirs>]' unless $#_ +>= 1;
   $load_with_dirs->(@_, @libs);
 }
 

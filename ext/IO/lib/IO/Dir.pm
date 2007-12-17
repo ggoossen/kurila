@@ -25,7 +25,7 @@ $VERSION = eval $VERSION;
 sub DIR_UNLINK () { 1 }
 
 sub new {
-    @_ >= 1 && @_ <= 2 or croak 'usage: new IO::Dir [DIRNAME]';
+    @_ +>= 1 && @_ +<= 2 or croak 'usage: new IO::Dir [DIRNAME]';
     my $class = shift;
     my $dh = gensym;
     if (@_) {

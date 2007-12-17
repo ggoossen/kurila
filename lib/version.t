@@ -37,7 +37,7 @@ ok( $testobj->stringify eq "1.002003", "Stringified correctly" );
 ok( $testobj->normal eq "v1.2.3", "Normalified correctly" );
 
 my $verobj = version->new("1.2.4");
-ok( $verobj > $testobj, "Comparison vs parent class" );
+ok( $verobj +> $testobj, "Comparison vs parent class" );
 ok( $verobj gt $testobj, "Comparison vs parent class" );
 BaseTests("version::Empty");
 
@@ -53,7 +53,7 @@ like($@, qr/Invalid version object/,
 eval { my $string = $testobj->stringify };
 like($@, qr/Invalid version object/,
     "Bad subclass stringify");
-eval { my $test = $testobj > 1.0 };
+eval { my $test = $testobj +> 1.0 };
 like($@, qr/Invalid version object/,
     "Bad subclass vcmp");
 
@@ -146,7 +146,7 @@ sub BaseTests {
     
     # Test comparison operators with self
     diag "tests with self" if $Verbose;
-    is ( $version <=> $version, 0, '$version <=> $version == 0' );
+    is ( $version <+> $version, 0, '$version <=> $version == 0' );
     ok ( $version == $version, '$version == $version' );
     
     # Test Numeric Comparison operators
@@ -155,22 +155,22 @@ sub BaseTests {
     $new_version = "5.8.0";
     diag "numeric tests with non-objects" if $Verbose;
     ok ( $version == $version, '$version == $version' );
-    ok ( $version < $new_version, '$version < $new_version' );
-    ok ( $new_version > $version, '$new_version > $version' );
+    ok ( $version +< $new_version, '$version < $new_version' );
+    ok ( $new_version +> $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
     
     # now test with existing object
     $new_version = $CLASS->new($new_version);
     diag "numeric tests with objects" if $Verbose;
-    ok ( $version < $new_version, '$version < $new_version' );
-    ok ( $new_version > $version, '$new_version > $version' );
+    ok ( $version +< $new_version, '$version < $new_version' );
+    ok ( $new_version +> $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
     
     # now test with actual numbers
     diag "numeric tests with numbers" if $Verbose;
     ok ( $version->numify() == 5.006001, '$version->numify() == 5.006001' );
-    ok ( $version->numify() <= 5.006001, '$version->numify() <= 5.006001' );
-    ok ( $version->numify() < 5.008, '$version->numify() < 5.008' );
+    ok ( $version->numify() +<= 5.006001, '$version->numify() <= 5.006001' );
+    ok ( $version->numify() +< 5.008, '$version->numify() < 5.008' );
     #ok ( $version->numify() > v5.005_02, '$version->numify() > 5.005_02' );
     
     # test with long decimals
@@ -187,39 +187,39 @@ sub BaseTests {
     $version = $CLASS->new("1.2.3");
     $new_version = "1.2.3_4";
     diag "numeric tests with alpha-style non-objects" if $Verbose;
-    ok ( $version < $new_version, '$version < $new_version' );
-    ok ( $new_version > $version, '$new_version > $version' );
+    ok ( $version +< $new_version, '$version < $new_version' );
+    ok ( $new_version +> $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
     
     $version = $CLASS->new("1.2.4");
     diag "numeric tests with alpha-style non-objects"
 	if $Verbose;
-    ok ( $version > $new_version, '$version > $new_version' );
-    ok ( $new_version < $version, '$new_version < $version' );
+    ok ( $version +> $new_version, '$version > $new_version' );
+    ok ( $new_version +< $version, '$new_version < $version' );
     ok ( $version != $new_version, '$version != $new_version' );
     
     # now test with alpha version form with object
     $version = $CLASS->new("1.2.3");
     $new_version = $CLASS->new("1.2.3_4");
     diag "tests with alpha-style objects" if $Verbose;
-    ok ( $version < $new_version, '$version < $new_version' );
-    ok ( $new_version > $version, '$new_version > $version' );
+    ok ( $version +< $new_version, '$version < $new_version' );
+    ok ( $new_version +> $version, '$new_version > $version' );
     ok ( $version != $new_version, '$version != $new_version' );
     ok ( !$version->is_alpha, '!$version->is_alpha');
     ok ( $new_version->is_alpha, '$new_version->is_alpha');
     
     $version = $CLASS->new("1.2.4");
     diag "tests with alpha-style objects" if $Verbose;
-    ok ( $version > $new_version, '$version > $new_version' );
-    ok ( $new_version < $version, '$new_version < $version' );
+    ok ( $version +> $new_version, '$version > $new_version' );
+    ok ( $new_version +< $version, '$new_version < $version' );
     ok ( $version != $new_version, '$version != $new_version' );
     
     $version = $CLASS->new("1.2.3.4");
     $new_version = $CLASS->new("1.2.3_4");
     diag "tests with alpha-style objects with same subversion"
 	if $Verbose;
-    ok ( $version > $new_version, '$version > $new_version' );
-    ok ( $new_version < $version, '$new_version < $version' );
+    ok ( $version +> $new_version, '$version > $new_version' );
+    ok ( $new_version +< $version, '$new_version < $version' );
     ok ( $version != $new_version, '$version != $new_version' );
     
     diag "test implicit [in]equality" if $Verbose;
@@ -229,11 +229,11 @@ sub BaseTests {
     $new_version = $CLASS->new("1.2.3_0");
     ok ( $version == $new_version, '$version == $new_version' );
     $new_version = $CLASS->new("1.2.3.1");
-    ok ( $version < $new_version, '$version < $new_version' );
+    ok ( $version +< $new_version, '$version < $new_version' );
     $new_version = $CLASS->new("1.2.3_1");
-    ok ( $version < $new_version, '$version < $new_version' );
+    ok ( $version +< $new_version, '$version < $new_version' );
     $new_version = $CLASS->new("1.1.999");
-    ok ( $version > $new_version, '$version > $new_version' );
+    ok ( $version +> $new_version, '$version > $new_version' );
     
     # that which is not expressly permitted is forbidden
     diag "forbidden operations" if $Verbose;
@@ -277,8 +277,8 @@ SKIP: {
     diag "testing CPAN-style versions" if $Verbose;
     $version = $CLASS->new("1.23_01");
     is ( "$version" , "1.23_01", "CPAN-style alpha version" );
-    ok ( $version > 1.23, "1.23_01 > 1.23");
-    ok ( $version < 1.24, "1.23_01 < 1.24");
+    ok ( $version +> 1.23, "1.23_01 > 1.23");
+    ok ( $version +< 1.24, "1.23_01 < 1.24");
 
     # test reformed UNIVERSAL::VERSION
     diag "Replacement UNIVERSAL::VERSION tests" if $Verbose;

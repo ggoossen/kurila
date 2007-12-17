@@ -20,8 +20,8 @@ SKIP: {
     my $pig = Pigs->new;
     $pig->takeoff;
 
-    ok( $pig->altitude > 0,         'Pig is airborne' );
-    ok( $pig->airspeed > 0,         '  and moving'    );
+    ok( $pig->altitude +> 0,         'Pig is airborne' );
+    ok( $pig->airspeed +> 0,         '  and moving'    );
 }
 
 

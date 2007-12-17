@@ -175,7 +175,7 @@ sub charnames
 
   if ($^H ^&^ $bytes::hint_bits) {	# "use bytes" in effect?
     use bytes;
-    return chr $ord if $ord <= 255;
+    return chr $ord if $ord +<= 255;
     my $hex = sprintf "%04x", $ord;
     if (not defined $fname) {
       $fname = substr $txt, $off[0] + 2, $off[1] - $off[0] - 2;
@@ -272,7 +272,7 @@ sub viacode
   }
 
   # checking the length first is slightly faster
-  if (length($hex) > 5 && hex($hex) > 0x10FFFF) {
+  if (length($hex) +> 5 && hex($hex) +> 0x10FFFF) {
     carp "Unicode characters only allocated up to U+10FFFF (you asked for U+$hex)";
     return;
   }
@@ -304,7 +304,7 @@ sub vianame
   $txt = do "unicore/Name.pl" unless $txt;
 
   my $pos = index $txt, "\t\t$arg\n";
-  if ($[ <= $pos) {
+  if ($[ +<= $pos) {
     my $posLF = rindex $txt, "\n", $pos;
     (my $code = substr $txt, $posLF + 1, 6) =~ tr/\t//d;
     return $vianame{$arg} = CORE::hex $code;

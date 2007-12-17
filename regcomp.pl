@@ -63,7 +63,7 @@ $lastregop ||= $ind;
 my $tot = $ind;
 close DESC;
 die "Too many regexp/state opcodes! Maximum is 256, but there are $lastregop in file!"
-    if $lastregop>256;
+    if $lastregop+>256;
 
 my $tmp_h = 'tmp_reg.h';
 
@@ -91,13 +91,13 @@ EOP
 ;
 
 
-for ($ind=1; $ind <= $lastregop ; $ind++) {
+for ($ind=1; $ind +<= $lastregop ; $ind++) {
   my $oind = $ind - 1;
   printf OUT "#define\t%*s\t%d\t/* %#04x %s */\n",
     -$width, $name[$ind], $ind-1, $ind-1, $rest[$ind];
 }
 print OUT "\t/* ------------ States ------------- */\n";
-for ( ; $ind <= $tot ; $ind++) {
+for ( ; $ind +<= $tot ; $ind++) {
   printf OUT "#define\t%*s\t(REGNODE_MAX + %d)\t/* %s */\n",
     -$width, $name[$ind], $ind - $lastregop, $rest[$ind];
 }
@@ -113,7 +113,7 @@ EXTCONST U8 PL_regkind[] = {
 EOP
 
 $ind = 0;
-while (++$ind <= $tot) {
+while (++$ind +<= $tot) {
   printf OUT "\t%*s\t/* %*s */\n",
              -1-$twidth, "$type[$ind],", -$width, $name[$ind];
   print OUT "\t/* ------------ States ------------- */\n"
@@ -131,7 +131,7 @@ static const U8 regarglen[] = {
 EOP
 
 $ind = 0;
-while (++$ind <= $lastregop) {
+while (++$ind +<= $lastregop) {
   my $size = 0;
   $size = "EXTRA_SIZE(struct regnode_$args[$ind])" if $args[$ind];
   
@@ -148,7 +148,7 @@ static const char reg_off_by_arg[] = {
 EOP
 
 $ind = 0;
-while (++$ind <= $lastregop) {
+while (++$ind +<= $lastregop) {
   my $size = $longj[$ind] || 0;
 
   printf OUT "\t%d,\t/* %*s */\n",
@@ -171,7 +171,7 @@ EOP
 $ind = 0;
 my $ofs = 1;
 my $sym = "";
-while (++$ind <= $tot) {
+while (++$ind +<= $tot) {
   my $size = $longj[$ind] || 0;
 
   printf OUT "\t%*s\t/* $sym%#04x */\n",

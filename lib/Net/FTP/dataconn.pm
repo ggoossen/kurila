@@ -88,7 +88,7 @@ sub _select {
   while (1) {
     $nfound = select($rout = $rin, $wout = $win, undef, $tout = $timeout);
 
-    last if $nfound >= 0;
+    last if $nfound +>= 0;
 
     croak "select: $!"
       unless $!{EINTR};

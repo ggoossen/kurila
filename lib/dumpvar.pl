@@ -51,7 +51,7 @@ sub unctrl {
 
 sub uniescape {
     join("",
-	 map { $_ > 255 ? sprintf("\\x{%04X}", $_) : chr($_) }
+	 map { $_ +> 255 ? sprintf("\\x{%04X}", $_) : chr($_) }
 	     unpack("U*", $_[0]));
 }
 
@@ -115,14 +115,14 @@ sub _escaped_ord {
 
 sub ShortArray {
   my $tArrayDepth = $#{$_[0]} ; 
-  $tArrayDepth = $#{$_[0]} < $arrayDepth-1 ? $#{$_[0]} : $arrayDepth-1 
+  $tArrayDepth = $#{$_[0]} +< $arrayDepth-1 ? $#{$_[0]} : $arrayDepth-1 
     unless  $arrayDepth eq '' ; 
   my $shortmore = "";
-  $shortmore = " ..." if $tArrayDepth < $#{$_[0]} ;
+  $shortmore = " ..." if $tArrayDepth +< $#{$_[0]} ;
   if (!grep(ref $_, @{$_[0]})) {
     $short = "0..$#{$_[0]}  '" . 
       join("' '", @{$_[0]}[0..$tArrayDepth]) . "'$shortmore";
-    return $short if length $short <= $compactDump;
+    return $short if length $short +<= $compactDump;
   }
   undef;
 }
@@ -176,7 +176,7 @@ sub unwrap {
 
       if (!$dumpReused && defined $address) { 
 	$address{$address}++ ;
-	if ( $address{$address} > 1 ) { 
+	if ( $address{$address} +> 1 ) { 
 	  print "${sp}-> REUSED_ADDRESS\n" ; 
 	  return ; 
 	} 
@@ -185,7 +185,7 @@ sub unwrap {
       # This is a raw glob. Special handling for that.
       $address = "$v" . "";	# To avoid a bug with globs
       $address{$address}++ ;
-      if ( $address{$address} > 1 ) { 
+      if ( $address{$address} +> 1 ) { 
 	print "${sp}*DUMPED_GLOB*\n" ; 
 	return ; 
       } 
@@ -204,11 +204,11 @@ sub unwrap {
 	my @sortKeys = sort keys(%$v) ;
 	undef $more ; 
 	$tHashDepth = $#sortKeys ; 
-	$tHashDepth = $#sortKeys < $hashDepth-1 ? $#sortKeys : $hashDepth-1
+	$tHashDepth = $#sortKeys +< $hashDepth-1 ? $#sortKeys : $hashDepth-1
 	  unless $hashDepth eq '' ; 
-	$more = "....\n" if $tHashDepth < $#sortKeys ; 
+	$more = "....\n" if $tHashDepth +< $#sortKeys ; 
 	$shortmore = "";
-	$shortmore = ", ..." if $tHashDepth < $#sortKeys ; 
+	$shortmore = ", ..." if $tHashDepth +< $#sortKeys ; 
 	$#sortKeys = $tHashDepth ; 
 	if ($compactDump && !grep(ref $_, values %{$v})) {
 	  #$short = $sp . 
@@ -223,7 +223,7 @@ sub unwrap {
 	  }
 	  $short .= join ', ', @keys;
 	  $short .= $shortmore;
-	  (print "$short\n"), return if length $short <= $compactDump;
+	  (print "$short\n"), return if length $short +<= $compactDump;
 	}
 	for $key (@sortKeys) {
 	    return if $DB::signal;
@@ -239,15 +239,15 @@ sub unwrap {
 	$tArrayDepth = $#{$v} ; 
 	undef $more ; 
         # Bigger than the max?
-	$tArrayDepth = $#{$v} < $arrayDepth-1 ? $#{$v} : $arrayDepth-1 
+	$tArrayDepth = $#{$v} +< $arrayDepth-1 ? $#{$v} : $arrayDepth-1 
 	  if defined $arrayDepth && $arrayDepth ne '';
         # Yep. Don't show it all.
-	$more = "....\n" if $tArrayDepth < $#{$v} ; 
+	$more = "....\n" if $tArrayDepth +< $#{$v} ; 
 	$shortmore = "";
-	$shortmore = " ..." if $tArrayDepth < $#{$v} ;
+	$shortmore = " ..." if $tArrayDepth +< $#{$v} ;
 
 	if ($compactDump && !grep(ref $_, @{$v})) {
-	  if ($#$v >= 0) {
+	  if ($#$v +>= 0) {
 	    $short = $sp . "0..$#{$v}  " . 
 	      join(" ", 
 		   map {exists $v->[$_] ? stringify $v->[$_] : "empty"} ($[..$tArrayDepth)
@@ -255,7 +255,7 @@ sub unwrap {
 	  } else {
 	    $short = $sp . "empty array";
 	  }
-	  (print "$short\n"), return if length $short <= $compactDump;
+	  (print "$short\n"), return if length $short +<= $compactDump;
 	}
 	#if ($compactDump && $short = ShortArray($v)) {
 	#  print "$short\n";
@@ -326,7 +326,7 @@ sub matchvar {
 
 sub compactDump {
   $compactDump = shift if @_;
-  $compactDump = 6*80-1 if $compactDump and $compactDump < 2;
+  $compactDump = 6*80-1 if $compactDump and $compactDump +< 2;
   $compactDump;
 }
 
@@ -498,7 +498,7 @@ sub arrayUsage {		# array ref, name
   my $size = 0;
   map {$size += scalarUsage($_)} @{$_[0]};
   my $len = @{$_[0]};
-  print "\@$_[1] = $len item", ($len > 1 ? "s" : ""),
+  print "\@$_[1] = $len item", ($len +> 1 ? "s" : ""),
     " (data: $size bytes)\n"
       if defined $_[1];
   $CompleteTotal +=  $size;
@@ -512,7 +512,7 @@ sub hashUsage {		# hash ref, name
   my $values = arrayUsage \@values;
   my $len = @keys;
   my $total = $keys + $values;
-  print "\%$_[1] = $len item", ($len > 1 ? "s" : ""),
+  print "\%$_[1] = $len item", ($len +> 1 ? "s" : ""),
     " (keys: $keys; values: $values; total: $total bytes)\n"
       if defined $_[1];
   $total;

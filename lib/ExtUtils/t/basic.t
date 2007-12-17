@@ -69,7 +69,7 @@ ok( -e $makefile,       'Makefile exists' );
 
 # -M is flakey on VMS
 my $mtime = (stat($makefile))[9];
-cmp_ok( $Touch_Time, '<=', $mtime,  '  its been touched' );
+cmp_ok( $Touch_Time, '+<=', $mtime,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
 

@@ -87,7 +87,7 @@ ok $names, "squaa::Glunk|squaa::Vliff|squaa::Vliff|squaa::Vliff|squaa::Wowo";
 my %count;
 for(values %$where2name) { ++$count{$_} };
 #print pretty(\%count), "\n\n";
-delete @count{ grep $count{$_} < 2, keys %count };
+delete @count{ grep $count{$_} +< 2, keys %count };
 my $shadowed = join "|", sort keys %count;
 ok $shadowed, "squaa::Vliff";
 

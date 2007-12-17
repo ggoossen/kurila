@@ -25,41 +25,41 @@ sub trimsym {
     if (ref $self) { $silent ||= $self->{'__S!lent'}; }
     $silent ||= 0;
   }
-  return $name if (length $name <= $maxlen);
+  return $name if (length $name +<= $maxlen);
 
   my $trimmed = $name;
   # First, just try to remove duplicated delimiters
   $trimmed =~ s/__/_/g;
-  if (length $trimmed > $maxlen) {
+  if (length $trimmed +> $maxlen) {
     # Next, all duplicated chars
     $trimmed =~ s/(.)\1+/$1/g;
-    if (length $trimmed > $maxlen) {
+    if (length $trimmed +> $maxlen) {
       my $squeezed = $trimmed;
       my($xs,$prefix,$func) = $trimmed =~ /^(XS_)?(.*)_([^_]*)$/;
       $xs ||= '';
       my $frac = 3; # replaces broken length-based calculations but w/same result
       my $pat = '([^_])';
-      if (length $func <= 12) {  # Try to preserve short function names
-        if ($frac > 1) { $pat .= '[^A-Z_]{' . ($frac - 1) . '}'; }
+      if (length $func +<= 12) {  # Try to preserve short function names
+        if ($frac +> 1) { $pat .= '[^A-Z_]{' . ($frac - 1) . '}'; }
         $prefix =~ s/$pat/$1/g;
         $squeezed = "$xs$prefix" . "_$func";
-        if (length $squeezed > $maxlen) {
+        if (length $squeezed +> $maxlen) {
           $pat =~ s/A-Z//;
           $prefix =~ s/$pat/$1/g;
           $squeezed = "$xs$prefix" . "_$func";
         }
       }
       else { 
-        if ($frac > 1) { $pat .= '[^A-Z_]{' . ($frac - 1) . '}'; }
+        if ($frac +> 1) { $pat .= '[^A-Z_]{' . ($frac - 1) . '}'; }
         $squeezed = "$prefix$func";
         $squeezed =~ s/$pat/$1/g;
-        if (length "$xs$squeezed" > $maxlen) {
+        if (length "$xs$squeezed" +> $maxlen) {
           $pat =~ s/A-Z//;
           $squeezed =~ s/$pat/$1/g;
         }
         $squeezed = "$xs$squeezed";
       }
-      if (length $squeezed <= $maxlen) { $trimmed = $squeezed; }
+      if (length $squeezed +<= $maxlen) { $trimmed = $squeezed; }
       else {
         my $frac = int((length $trimmed - $maxlen) / length $trimmed + 0.5);
         my $pat = '(.).{$frac}';

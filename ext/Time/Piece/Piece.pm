@@ -85,7 +85,7 @@ sub parse {
     my $proto = shift;
     my $class = ref($proto) || $proto;
     my @components;
-    if (@_ > 1) {
+    if (@_ +> 1) {
         @components = @_;
     }
     else {
@@ -222,7 +222,7 @@ sub _year {
 sub yy {
     my $time = shift;
     my $res = $time->[c_year] % 100;
-    return $res > 9 ? $res : "0$res";
+    return $res +> 9 ? $res : "0$res";
 }
 
 sub wday {
@@ -300,7 +300,7 @@ sub tzoffset {
     my $delta = 24 * (&$j(CORE::localtime $epoch) - &$j(CORE::gmtime $epoch));
 
     # Return value in seconds rounded to nearest minute.
-    return Time::Seconds->new( int($delta * 60 + ($delta >= 0 ? 0.5 : -0.5)) * 60 );
+    return Time::Seconds->new( int($delta * 60 + ($delta +>= 0 ? 0.5 : -0.5)) * 60 );
 }
 
 sub epoch {
@@ -385,8 +385,8 @@ sub _jd {
     my ($y, $m, $d, $h, $n, $s) = @_;
 
     # Adjust input parameters according to the month
-    $y = ( $m > 2 ? $y : $y - 1);
-    $m = ( $m > 2 ? $m - 3 : $m + 9);
+    $y = ( $m +> 2 ? $y : $y - 1);
+    $m = ( $m +> 2 ? $m - 3 : $m + 9);
 
     # Calculate the Julian Date (assuming Julian calendar)
     my $J = int( 365.25 *( $y + 4712) )
@@ -573,7 +573,7 @@ sub add {
 }
 
 use overload
-        '<=>' => \&compare;
+        '<+>' => \&compare;
 
 sub get_epochs {
     my ($lhs, $rhs, $reverse) = @_;
@@ -588,7 +588,7 @@ sub get_epochs {
 
 sub compare {
     my ($lhs, $rhs) = get_epochs(@_);
-    return $lhs <=> $rhs;
+    return $lhs <+> $rhs;
 }
 
 1;

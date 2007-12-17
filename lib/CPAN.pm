@@ -336,7 +336,7 @@ Trying '$root' as temporary haven.
         if (chdir $cwd->[0]) {
             return;
         } else {
-            if (@$cwd>1) {
+            if (@$cwd+>1) {
                 $CPAN::Frontend->mywarn(qq{Could not chdir to "$cwd->[0]": $!
 Trying to chdir to "$cwd->[1]" instead.
 });
@@ -375,7 +375,7 @@ sub _yaml_module () {
         &&
         $CPAN::META->has_inst($yaml_module)
         &&
-        $YAML::VERSION < 0.60
+        $YAML::VERSION +< 0.60
         &&
         !$Have_warned->{"YAML"}++
        ) {
@@ -470,7 +470,7 @@ sub _init_sqlite () {
 {
     my $negative_cache = {};
     sub _sqlite_running {
-        if ($negative_cache->{time} && time < $negative_cache->{time} + 60) {
+        if ($negative_cache->{time} && time +< $negative_cache->{time} + 60) {
             # need to cache the result, otherwise too slow
             return $negative_cache->{fact};
         } else {
@@ -594,7 +594,7 @@ sub new {
         if ($xo->isa("CPAN::Module")) {
             my $have = $xo->inst_version || "N/A";
             my($want,$d,$want_type);
-            if ($i>0 and $d = $deps[$i-1]{name}) {
+            if ($i+>0 and $d = $deps[$i-1]{name}) {
                 my $do = CPAN::Shell->expandany($d);
                 $want = $do->{prereq_pm}{requires}{$x};
                 if (defined $want) {
@@ -888,7 +888,7 @@ sub all_objects {
 sub checklock {
     my($self) = @_;
     my $lockfile = File::Spec->catfile($CPAN::Config->{cpan_home},".lock");
-    if (-f $lockfile && -M _ > 0) {
+    if (-f $lockfile && -M _ +> 0) {
         my $fh = FileHandle->new($lockfile) or
             $CPAN::Frontend->mydie("Could not open lockfile '$lockfile': $!");
         my $otherpid  = ~< $fh;
@@ -1028,7 +1028,7 @@ this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
         }
         my $sleep = 1;
         while (!CPAN::_flock($fh, LOCK_EX^|^LOCK_NB)) {
-            if ($sleep>10) {
+            if ($sleep+>10) {
                 $CPAN::Frontend->mydie("Giving up\n");
             }
             $CPAN::Frontend->mysleep($sleep++);
@@ -1051,7 +1051,7 @@ this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
       # no blocks!!!
         my $sig = shift;
         &cleanup if $Signal;
-        die "Got yet another signal" if $Signal > 1;
+        die "Got yet another signal" if $Signal +> 1;
         $CPAN::Frontend->mydie("Got another SIG$sig") if $Signal;
         $CPAN::Frontend->mywarn("Caught SIG$sig, trying to continue\n");
         $Signal++;
@@ -1181,7 +1181,7 @@ sub has_usable {
                            ],
                'File::HomeDir' => [
                                    sub {require File::HomeDir;
-                                        unless (File::HomeDir->VERSION >= 0.52) {
+                                        unless (File::HomeDir->VERSION +>= 0.52) {
                                             for ("Will not use File::HomeDir, need 0.52\n") {
                                                 $CPAN::Frontend->mywarn($_);
                                                 die $_;
@@ -1191,7 +1191,7 @@ sub has_usable {
                                   ],
                'Archive::Tar' => [
                                   sub {require Archive::Tar;
-                                       unless (Archive::Tar->VERSION >= 1.00) {
+                                       unless (Archive::Tar->VERSION +>= 1.00) {
                                             for ("Will not use Archive::Tar, need 1.00\n") {
                                                 $CPAN::Frontend->mywarn($_);
                                                 die $_;
@@ -1380,7 +1380,7 @@ sub savehist {
         return;
     }
     my @h = $CPAN::term->GetHistory;
-    splice @h, 0, @h-$histsize if @h>$histsize;
+    splice @h, 0, @h-$histsize if @h+>$histsize;
     my($fh) = FileHandle->new;
     open $fh, ">$histfile" or $CPAN::Frontend->mydie("Couldn't open >$histfile: $!");
     local $\ = local $, = "\n";
@@ -1409,7 +1409,7 @@ sub is_installed {
 sub _list_sorted_descending_is_tested {
     my($self) = @_;
     sort
-        { ($self->{is_tested}{$b}||0) <=> ($self->{is_tested}{$a}||0) }
+        { ($self->{is_tested}{$b}||0) <+> ($self->{is_tested}{$a}||0) }
             keys %{$self->{is_tested}}
 }
 
@@ -1430,9 +1430,9 @@ sub set_perl5lib {
     #$CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB.\n");
 
     my @dirs = map {("$_/blib/arch", "$_/blib/lib")} $self->_list_sorted_descending_is_tested;
-    if (@dirs < 12) {
+    if (@dirs +< 12) {
         $CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB for '$for'\n");
-    } elsif (@dirs < 24) {
+    } elsif (@dirs +< 24) {
         my @d = map {my $cp = $_;
                      $cp =~ s/^\Q$CPAN::Config->{build_dir}\E/%BUILDDIR%/;
                      $cp
@@ -1518,7 +1518,7 @@ sub entries {
         }
     }
     chdir $cwd or Carp::croak("Can't chdir to $cwd: $!");
-    sort { -M $a <=> -M $b} @entries;
+    sort { -M $a <+> -M $b} @entries;
 }
 
 #-> sub CPAN::CacheMgr::disk_usage ;
@@ -1666,14 +1666,14 @@ sub scan_cache {
     my $painted = 0;
     for $e (@entries) {
         my $symbol = ".";
-        if ($self->{DU} > $self->{MAX}) {
+        if ($self->{DU} +> $self->{MAX}) {
             $symbol = "-";
             $self->disk_usage($e,1);
         } else {
             $self->disk_usage($e);
         }
         $i++;
-        while (($painted/76) < ($i/@entries)) {
+        while (($painted/76) +< ($i/@entries)) {
             $CPAN::Frontend->myprint($symbol);
             $painted++;
         }
@@ -1780,7 +1780,7 @@ sub globls {
         }
         push @accept, $_;
     }
-    my $silent = @accept>1;
+    my $silent = @accept+>1;
     my $last_alpha = "";
     my @results;
     for my $a (@accept) {
@@ -1980,7 +1980,7 @@ sub o {
         if ($CPAN::DEBUG) {
             $CPAN::Frontend->myprint("Options set for debugging ($CPAN::DEBUG):\n");
             my($k,$v);
-            for $k (sort {$CPAN::DEBUG{$a} <=> $CPAN::DEBUG{$b}} keys %CPAN::DEBUG) {
+            for $k (sort {$CPAN::DEBUG{$a} <+> $CPAN::DEBUG{$b}} keys %CPAN::DEBUG) {
                 $v = $CPAN::DEBUG{$k};
                 $CPAN::Frontend->myprint(sprintf "    %-14s(%s)\n", $k, $v)
                     if $v ^&^ $CPAN::DEBUG;
@@ -2033,7 +2033,7 @@ sub hosts {
         my $start;
         if (@$attempts) {
             $start = $attempts->[-1]{start};
-            if ($#$attempts > 0) {
+            if ($#$attempts +> 0) {
                 for my $i (0..$#$attempts-1) {
                     my $url = $attempts->[$i]{url} or next;
                     $S{no}{$url}++;
@@ -2077,17 +2077,17 @@ sub hosts {
         $R .= sprintf "\nSuccessful downloads:
    N       kB  secs      kB/s url\n";
         my $i = 20;
-        for (sort { $b->[3] <=> $a->[3] } @{$res->{ok}}) {
+        for (sort { $b->[3] <+> $a->[3] } @{$res->{ok}}) {
             $R .= sprintf "%4d %8d %5d %9.1f %s\n", @$_;
-            last if --$i<=0;
+            last if --$i+<=0;
         }
     }
     if ($res->{no} && @{$res->{no}}) {
         $R .= sprintf "\nUnsuccessful downloads:\n";
         my $i = 20;
-        for (sort { $b->[0] <=> $a->[0] } @{$res->{no}}) {
+        for (sort { $b->[0] <+> $a->[0] } @{$res->{no}}) {
             $R .= sprintf "%4d %s\n", @$_;
-            last if --$i<=0;
+            last if --$i+<=0;
         }
     }
     $CPAN::Frontend->myprint($R);
@@ -2175,7 +2175,7 @@ sub _reload_this {
     }
     my $mtime = (stat $file)[9];
     if ($reload->{$f}) {
-    } elsif ($^T < $mtime) {
+    } elsif ($^T +< $mtime) {
         # since we started the file has changed, force it to be reloaded
         $reload->{$f} = -1;
     } else {
@@ -2320,9 +2320,9 @@ sub scripts {
     }
     for (sort keys %stems) {
         my $highest;
-        if (@{$stems{$_}} > 1) {
+        if (@{$stems{$_}} +> 1) {
             $highest = List::Util::reduce {
-                Sort::Versions::versioncmp($a,$b) > 0 ? $a : $b
+                Sort::Versions::versioncmp($a,$b) +> 0 ? $a : $b
               } @{$stems{$_}};
         } else {
             $highest = $stems{$_}[0];
@@ -2515,7 +2515,7 @@ sub _u_r_common {
     }
     if ($what eq "r") {
         if ($version_zeroes) {
-            my $s_has = $version_zeroes > 1 ? "s have" : " has";
+            my $s_has = $version_zeroes +> 1 ? "s have" : " has";
             $CPAN::Frontend->myprint(qq{$version_zeroes installed module$s_has }.
                                      qq{a version number of 0\n});
             if ($CPAN::Config->{show_zero_versions}) {
@@ -2529,7 +2529,7 @@ sub _u_r_common {
             }
         }
         if ($version_undefs) {
-            my $s_has = $version_undefs > 1 ? "s have" : " has";
+            my $s_has = $version_undefs +> 1 ? "s have" : " has";
             $CPAN::Frontend->myprint(qq{$version_undefs installed module$s_has no }.
                                      qq{parseable version number\n});
             if ($CPAN::Config->{show_unparsable_versions}) {
@@ -2628,14 +2628,14 @@ sub failed {
         if ($debug) {
             $print = join "",
                 map { sprintf "%5d %-45s: %s %s\n", @$_ }
-                    sort { $a->[0] <=> $b->[0] } @failed;
+                    sort { $a->[0] <+> $b->[0] } @failed;
         } else {
             $print = join "",
                 map { sprintf " %-45s: %s %s\n", @$_[1..3] }
                     sort {
-                        $a->[0] <=> $b->[0]
+                        $a->[0] <+> $b->[0]
                             ||
-                                $a->[4] <=> $b->[4]
+                                $a->[4] <+> $b->[4]
                        } @failed;
         }
         $CPAN::Frontend->myprint("Failed during $scope:\n$print");
@@ -3055,16 +3055,16 @@ sub unrecoverable_error {
     my @lines = split /\n/, $what;
     my $longest = 0;
     for my $l (@lines) {
-        $longest = length $l if length $l > $longest;
+        $longest = length $l if length $l +> $longest;
     }
-    $longest = 62 if $longest > 62;
+    $longest = 62 if $longest +> 62;
     for my $l (@lines) {
         if ($l =~ /^\s*$/) {
             $l = "\n";
             next;
         }
         $l = "==> $l";
-        if (length $l < 66) {
+        if (length $l +< 66) {
             $l = pack "A66 A*", $l, "<==";
         }
         $l .= "\n";
@@ -3079,7 +3079,7 @@ sub mysleep {
     if (CPAN->has_inst("Time::HiRes")) {
         Time::HiRes::sleep($sleep);
     } else {
-        sleep($sleep < 1 ? 1 : int($sleep + 0.5));
+        sleep($sleep +< 1 ? 1 : int($sleep + 0.5));
     }
 }
 
@@ -3367,7 +3367,7 @@ sub recent {
               my $desc   = $eitem->findvalue("*[local-name(.) = 'description']");
               my $i = 0;
             SUBDIRTEST: while () {
-                  last SUBDIRTEST if ++$i >= 6; # half a dozen must do!
+                  last SUBDIRTEST if ++$i +>= 6; # half a dozen must do!
                   if (my @ret = $self->globls("$distro*")) {
                       @ret = grep {$_->[2] !~ /meta/} @ret;
                       @ret = grep {length $_->[2]} @ret;
@@ -3584,13 +3584,13 @@ sub _ftp_statistics {
     my $waitstart;
     while (!CPAN::_flock($fh, $locktype^|^LOCK_NB)) {
         $waitstart ||= localtime();
-        if ($sleep>3) {
+        if ($sleep+>3) {
             $CPAN::Frontend->mywarn("Waiting for a read lock on '$file' (since $waitstart)\n");
         }
         $CPAN::Frontend->mysleep($sleep);
-        if ($sleep <= 3) {
+        if ($sleep +<= 3) {
             $sleep+=0.33;
-        } elsif ($sleep <=6) {
+        } elsif ($sleep +<=6) {
             $sleep+=0.11;
         }
     }
@@ -3657,8 +3657,8 @@ sub _add_to_statistics {
         # them settable; YAML.pm 0.62 is unacceptably slow with 999;
         # YAML::Syck 0.82 has no noticable performance problem with 999;
         while (
-               @{$fullstats->{history}} > 99
-               || $time - $fullstats->{history}[0]{start} > 14*86400
+               @{$fullstats->{history}} +> 99
+               || $time - $fullstats->{history}[0]{start} +> 14*86400
               ) {
             shift @{$fullstats->{history}}
         }
@@ -3693,7 +3693,7 @@ sub _recommend_url_for {
         my $fullstats = $self->_ftp_statistics();
         my $history = $fullstats->{history} || [];
         while (my $last = pop @$history) {
-            last if $last->{end} - time > 3600; # only young results are interesting
+            last if $last->{end} - time +> 3600; # only young results are interesting
             next unless $last->{file}; # dirname of nothing dies!
             next unless $file eq File::Basename::dirname($last->{file});
             return $last->{thesiteurl};
@@ -3701,7 +3701,7 @@ sub _recommend_url_for {
     }
     if ($CPAN::Config->{randomize_urllist}
         &&
-        rand(1) < $CPAN::Config->{randomize_urllist}
+        rand(1) +< $CPAN::Config->{randomize_urllist}
        ) {
         $urllist->[int rand scalar @$urllist];
     } else {
@@ -3807,7 +3807,7 @@ sub localize {
         # Comment by AK on 2000-09-03: Uniq short filenames would be
         # available in CHECKSUMS file
         my($name, $path) = File::Basename::fileparse($aslocal, '');
-        if (length($name) > 31) {
+        if (length($name) +> 31) {
             $name =~ s/(
                         \.(
                            readme(\.(gz|Z))? |
@@ -3819,7 +3819,7 @@ sub localize {
                        )$//x;
             my $suf = $1;
             my $size = 31 - length($suf);
-            while (length($name) > $size) {
+            while (length($name) +> $size) {
                 chop $name;
             }
             $name .= $suf;
@@ -3881,13 +3881,13 @@ sub localize {
         @reordered =
             sort {
                 (substr($ccurllist->[$b],0,4) eq "file")
-                    <=>
+                    <+>
                 (substr($ccurllist->[$a],0,4) eq "file")
                     or
                 defined($ThesiteURL)
                     and
                 ($ccurllist->[$b] eq $ThesiteURL)
-                    <=>
+                    <+>
                 ($ccurllist->[$a] eq $ThesiteURL)
             } 0..$last;
     }
@@ -4420,7 +4420,7 @@ $dialog
                 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
                     $atime,$mtime,$ctime,$blksize,$blocks) = stat($aslocal);
                 $mtime ||= 0;
-                if ($mtime > $timestamp) {
+                if ($mtime +> $timestamp) {
                     $CPAN::Frontend->myprint("GOT $aslocal\n");
                     $ThesiteURL = $ro_url;
                     return $aslocal;
@@ -4458,7 +4458,7 @@ $dialog
         ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
             $atime,$mtime,$ctime,$blksize,$blocks) = stat($aslocal);
         $mtime ||= 0;
-        if ($mtime > $timestamp) {
+        if ($mtime +> $timestamp) {
             $CPAN::Frontend->myprint("GOT $aslocal\n");
             $ThesiteURL = $ro_url;
             return $aslocal;
@@ -4531,7 +4531,7 @@ sub ls {
     my($sec,$min,$hour,$mday,$mon,$year) = localtime($mtime);
     my($timeyear);
     my($moname) = $moname[$mon];
-    if (-M _ > 365.25 / 2) {
+    if (-M _ +> 365.25 / 2) {
         $timeyear = $year + 1900;
     }
     else {
@@ -4623,7 +4623,7 @@ sub gnu_cpl {
     return () unless @perlret;
     my($newtext) = $text;
     for (my $i = length($text)+1;;$i++) {
-        last unless length($perlret[0]) && length($perlret[0]) >= $i;
+        last unless length($perlret[0]) && length($perlret[0]) +>= $i;
         my $try = substr($perlret[0],0,$i);
         my @tries = grep {substr($_,0,$i) eq $try} @perlret;
         # warn "try[$try]tries[@tries]";
@@ -4750,7 +4750,7 @@ sub reload {
     # XXX check if a newer one is available. (We currently read it
     # from time to time)
     for ($CPAN::Config->{index_expire}) {
-        $_ = 0.001 unless $_ && $_ > 0.001;
+        $_ = 0.001 unless $_ && $_ +> 0.001;
     }
     unless (1 || $CPAN::Have_warned->{readmetadatacache}++) {
         # debug here when CPAN doesn't seem to read the Metadata
@@ -4761,11 +4761,11 @@ sub reload {
         $self->read_metadata_cache;
         $CPAN::META->{PROTOCOL} ||= "1.0";
     }
-    if ( $CPAN::META->{PROTOCOL} < PROTOCOL  ) {
+    if ( $CPAN::META->{PROTOCOL} +< PROTOCOL  ) {
         # warn "Setting last_time to 0";
         $LAST_TIME = 0; # No warning necessary
     }
-    if ($LAST_TIME + $CPAN::Config->{index_expire}*86400 > $time
+    if ($LAST_TIME + $CPAN::Config->{index_expire}*86400 +> $time
         and ! $force) {
         # called too often
         # CPAN->debug("LAST_TIME[$LAST_TIME]index_expire[$CPAN::Config->{index_expire}]time[$time]");
@@ -4843,7 +4843,7 @@ sub reanimate_build_dir {
     my $restored = 0;
     $CPAN::Frontend->myprint("Going to read $CPAN::Config->{build_dir}/\n");
     my @candidates = map { $_->[0] }
-        sort { $b->[1] <=> $a->[1] }
+        sort { $b->[1] <+> $a->[1] }
             map { [ $_, -M File::Spec->catfile($d,$_) ] }
                 grep {/\.yml$/} readdir $dh;
   DISTRO: for $i (0..$#candidates) {
@@ -4901,7 +4901,7 @@ sub reanimate_build_dir {
             $restored++;
         }
         $i++;
-        while (($painted/76) < ($i/@candidates)) {
+        while (($painted/76) +< ($i/@candidates)) {
             $CPAN::Frontend->myprint(".");
             $painted++;
         }
@@ -4926,7 +4926,7 @@ sub reload_x {
                                          $localname);
     if (
         -f $abs_wanted &&
-        -M $abs_wanted < $CPAN::Config->{'index_expire'} &&
+        -M $abs_wanted +< $CPAN::Config->{'index_expire'} &&
         !($force ^&^ 1)
        ) {
         my $s = $CPAN::Config->{'index_expire'} == 1 ? "" : "s";
@@ -4964,7 +4964,7 @@ sub rd_authindex {
             CPAN->debug(sprintf "line[%s]", $_) if $CPAN::DEBUG;
         }
         $i++;
-        while (($painted/76) < ($i/@lines)) {
+        while (($painted/76) +< ($i/@lines)) {
             $CPAN::Frontend->myprint(".");
             $painted++;
         }
@@ -5049,10 +5049,10 @@ happen.\a
             require Time::Local;
             my(@d) = $last_updated =~ / (\d+) (\w+) (\d+) (\d+):(\d+):(\d+) /;
             $d[1] = index("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec", $d[1])/4;
-            $age -= $d[1]>=0 ? Time::Local::timegm(@d[5,4,3,0,1,2]) : 0;
+            $age -= $d[1]+>=0 ? Time::Local::timegm(@d[5,4,3,0,1,2]) : 0;
         }
         $age /= 3600*24;
-        if ($age > 30) {
+        if ($age +> 30) {
 
             $CPAN::Frontend
                 ->mywarn(sprintf
@@ -5061,7 +5061,7 @@ happen.\a
   I'll continue but problems seem likely to happen.\a\n},
                          $age);
 
-        } elsif ($age < -1) {
+        } elsif ($age +< -1) {
 
             $CPAN::Frontend
                 ->mywarn(sprintf
@@ -5099,7 +5099,7 @@ happen.\a
             )
         ) {
             local($^W)= 0;
-            if ($version > $CPAN::VERSION) {
+            if ($version +> $CPAN::VERSION) {
                 $CPAN::Frontend->mywarn(qq{
   New CPAN.pm version (v$version) available.
   [Currently running version is v$CPAN::VERSION]
@@ -5174,7 +5174,7 @@ happen.\a
             }
         }
         $i++;
-        while (($painted/76) < ($i/@lines)) {
+        while (($painted/76) +< ($i/@lines)) {
             $CPAN::Frontend->myprint(".");
             $painted++;
         }
@@ -5236,7 +5236,7 @@ sub rd_modlist {
         delete $ret->{$_}{modid}; # not needed here, maybe elsewhere
         $obj->set(%{$ret->{$_}});
         $i++;
-        while (($painted/76) < ($i/$until)) {
+        while (($painted/76) +< ($i/$until)) {
             $CPAN::Frontend->myprint(".");
             $painted++;
         }
@@ -5282,7 +5282,7 @@ sub read_metadata_cache {
         return;
     }
     if (exists $cache->{PROTOCOL}) {
-        if (PROTOCOL > $cache->{PROTOCOL}) {
+        if (PROTOCOL +> $cache->{PROTOCOL}) {
             $CPAN::Frontend->mywarn(sprintf("Ignoring Metadata cache written ".
                                             "with protocol v%s, requiring v%s\n",
                                             $cache->{PROTOCOL},
@@ -5311,7 +5311,7 @@ sub read_metadata_cache {
         $CPAN::Frontend->myprint("Warning: Found no data in $metadata_file\n");
         return;
     }
-    if ($idcnt < 1000) {
+    if ($idcnt +< 1000) {
         $CPAN::Frontend->myprint("Warning: Found only $idcnt objects ".
                                  "in $metadata_file\n");
         return;
@@ -5524,7 +5524,7 @@ sub dump {
     local $Data::Dumper::Sortkeys;
     $Data::Dumper::Sortkeys = 1;
     my $out = Data::Dumper::Dumper($what ? eval $what : $self);
-    if (length $out > 100000) {
+    if (length $out +> 100000) {
         my $fh_pager = FileHandle->new;
         local($SIG{PIPE}) = "IGNORE";
         my $pager = $CPAN::Config->{'pager'} || "cat";
@@ -5615,7 +5615,7 @@ sub ls {
             $CPAN::Frontend->mydie("Text::Glob not installed, cannot proceed");
         }
     }
-    unless ($silent >= 2) {
+    unless ($silent +>= 2) {
         $CPAN::Frontend->myprint(join "", map {
             sprintf("%8d %10s %s/%s\n", $_->[0], $_->[1], $id, $_->[2])
         } sort { $a->[2] cmp $b->[2] } @dl);
@@ -5650,7 +5650,7 @@ sub dir_listing {
     # connect "force" argument with "index_expire".
     my $force = $self->{force};
     if (my @stat = stat $lc_want) {
-        $force ||= $stat[9] + $CPAN::Config->{index_expire}*86400 <= time;
+        $force ||= $stat[9] + $CPAN::Config->{index_expire}*86400 +<= time;
     }
     my $lc_file;
     if ($may_ftp) {
@@ -5882,7 +5882,7 @@ sub color_cmd_tmps {
     return if exists $self->{incommandcolor}
         && $color==1
         && $self->{incommandcolor}==$color;
-    if ($depth>=$CPAN::MAX_RECURSION) {
+    if ($depth+>=$CPAN::MAX_RECURSION) {
         die(CPAN::Exception::RecursiveDependency->new($ancestors));
     }
     # warn "color_cmd_tmps $depth $color " . $self->id; # sleep 1;
@@ -6288,7 +6288,7 @@ sub satisfy_configure_requires {
     my @prereq = $self->unsat_prereq("configure_requires_later") or return 1;
     if ($self->{configure_requires_later}) {
         for my $k (keys %{$self->{configure_requires_later_for}||{}}) {
-            if ($self->{configure_requires_later_for}{$k}>1) {
+            if ($self->{configure_requires_later_for}{$k}+>1) {
                 # we must not come here a second time
                 $CPAN::Frontend->mywarn("Panic: Some prerequisites is not available, please investigate...");
                 require YAML::Syck;
@@ -6351,7 +6351,7 @@ sub run_MM_or_MB {
     }
     return unless $self->patch;
     if (lc($prefer_installer) eq "rand") {
-        $prefer_installer = rand()<.5 ? "eumm" : "mb";
+        $prefer_installer = rand()+<.5 ? "eumm" : "mb";
     }
     if (lc($prefer_installer) eq "mb") {
         $self->{modulebuild} = 1;
@@ -7021,7 +7021,7 @@ for further processing, but got garbage instead.
             my $dg = Digest::SHA->new(256);
             my($data,$ref);
             $ref = \$data;
-            while ($fh->READ($ref, 4096) > 0) {
+            while ($fh->READ($ref, 4096) +> 0) {
                 $dg->add($data);
             }
             my $hexdigest = $dg->hexdigest;
@@ -7341,7 +7341,7 @@ is part of the perl-%s distribution. To install that, you need to run
                     # Trying an already failed 'make' (unless somebody else blocks)
                 } else {
                     # introduced for turning recursion detection into a distrostatus
-                    my $error = length $self->{make}>3
+                    my $error = length $self->{make}+>3
                         ? substr($self->{make},3) : "Unknown error";
                     $CPAN::Frontend->mywarn("Could not make: $error\n");
                     $self->store_persistent_state;
@@ -7666,7 +7666,7 @@ sub _run_via_expect_anyorder {
             return $expo->exitstatus();
         } elsif ($ran_into_timeout) {
             # warn "DEBUG: they are asking a question, but[$but]";
-            for (my $i = 0; $i <= $#expectacopy; $i+=2) {
+            for (my $i = 0; $i +<= $#expectacopy; $i+=2) {
                 my($next,$send) = @expectacopy[$i,$i+1];
                 my $regex = eval "qr{$next}";
                 # warn "DEBUG: will compare with regex[$regex].";
@@ -7692,7 +7692,7 @@ sub _run_via_expect_deterministic {
     my $ran_into_timeout;
     my $timeout = $expect_model->{timeout} || 15; # currently unsettable
     my $expecta = $expect_model->{talk};
-  EXPECT: for (my $i = 0; $i <= $#$expecta; $i+=2) {
+  EXPECT: for (my $i = 0; $i +<= $#$expecta; $i+=2) {
         my($re,$send) = @$expecta[$i,$i+1];
         CPAN->debug("timeout[$timeout]re[$re]") if $CPAN::DEBUG;
         my $regex = eval "qr{$re}";
@@ -7921,7 +7921,7 @@ sub prefs {
                             );
             my $filler1 = "_" x 22;
             my $filler2 = int(66 - length($bs))/2;
-            $filler2 = 0 if $filler2 < 0;
+            $filler2 = 0 if $filler2 +< 0;
             $filler2 = " " x $filler2;
             $CPAN::Frontend->myprint("
 $filler1 D i s t r o P r e f s $filler1
@@ -7996,7 +7996,7 @@ sub follow_prereqs {
     my($filler1,$filler2,$filler3,$filler4);
     # $DB::single=1;
     my $unsat = "Unsatisfied dependencies detected during";
-    my $w = length($unsat) > length($pretty_id) ? length($unsat) : length($pretty_id);
+    my $w = length($unsat) +> length($pretty_id) ? length($unsat) : length($pretty_id);
     {
         my $r = int(($w - length($unsat))/2);
         my $l = $w - length($unsat) - $r;
@@ -8283,7 +8283,7 @@ sub prereq_pm {
             if ($yaml->{generated_by} &&
                 $yaml->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
                 my $eummv = do { local $^W = 0; $1+0; };
-                if ($eummv < 6.2501) {
+                if ($eummv +< 6.2501) {
                     # thanks to Slaven for digging that out: MM before
                     # that could be wrong because it could reflect a
                     # previous release
@@ -8432,7 +8432,7 @@ sub test {
              $self->{make} =~ /^NO/
             ) and push @e, "Can't test without successful make";
         $self->{badtestcnt} ||= 0;
-        if ($self->{badtestcnt} > 0) {
+        if ($self->{badtestcnt} +> 0) {
             require Data::Dumper;
             CPAN->debug(sprintf "NOREPEAT[%s]", Data::Dumper::Dumper($self)) if $CPAN::DEBUG;
             push @e, "Won't repeat unsuccessful test during this command";
@@ -8544,7 +8544,7 @@ sub test {
 
             # local $CPAN::DEBUG = 16; # Distribution
             for my $m (keys %{$self->{sponsored_mods}}) {
-                next unless $self->{sponsored_mods}{$m} > 0;
+                next unless $self->{sponsored_mods}{$m} +> 0;
                 my $m_obj = CPAN::Shell->expand("Module",$m) or next;
                 # XXX we need available_version which reflects
                 # $ENV{PERL5LIB} so that already tested but not yet
@@ -8888,7 +8888,7 @@ sub install {
                                              q{make_install_make_command});
         if (
             $makeout =~ /permission/s
-            && $> > 0
+            && $> +> 0
             && (
                 ! $mimc
                 || $mimc eq (CPAN::HandleConfig->prefs_lookup($self,
@@ -9309,7 +9309,7 @@ sub color_cmd_tmps {
     return if exists $self->{incommandcolor}
         && $color==1
         && $self->{incommandcolor}==$color;
-    if ($depth>=$CPAN::MAX_RECURSION) {
+    if ($depth+>=$CPAN::MAX_RECURSION) {
         die(CPAN::Exception::RecursiveDependency->new($ancestors));
     }
     # warn "color_cmd_tmps $depth $color " . $self->id; # sleep 1;
@@ -9598,7 +9598,7 @@ sub color_cmd_tmps {
         && $color==1
         && $self->{incommandcolor}==$color;
     return if $color==0 && !$self->{incommandcolor};
-    if ($color>=1) {
+    if ($color+>=1) {
         if ( $self->uptodate ) {
             $self->{incommandcolor} = $color;
             return;
@@ -9615,7 +9615,7 @@ sub color_cmd_tmps {
                     if (my $prereq_pm = $obj->prereq_pm) {
                         for my $k (keys %$prereq_pm) {
                             if (my $want_version = $prereq_pm->{$k}{$self->id}) {
-                                if (CPAN::Version->vcmp($have_version,$want_version) >= 0) {
+                                if (CPAN::Version->vcmp($have_version,$want_version) +>= 0) {
                                     $self->{incommandcolor} = $color;
                                     return;
                                 }
@@ -9629,7 +9629,7 @@ sub color_cmd_tmps {
         $self->{incommandcolor} = $color; # set me before recursion,
                                           # so we can break it
     }
-    if ($depth>=$CPAN::MAX_RECURSION) {
+    if ($depth+>=$CPAN::MAX_RECURSION) {
         die(CPAN::Exception::RecursiveDependency->new($ancestors));
     }
     # warn "color_cmd_tmps $depth $color " . $self->id; # sleep 1;
@@ -9809,7 +9809,7 @@ sub as_string {
                     s/^\s+//;
                     s/\s.*//s;
                 }
-                while (length($lfre)>5 and !$lfl) {
+                while (length($lfre)+>5 and !$lfl) {
                     ($lfl) = grep /$lfre/, @mflines;
                     CPAN->debug("lfl[$lfl]lfre[$lfre]") if $CPAN::DEBUG;
                     $lfre =~ s/.+?\.//;

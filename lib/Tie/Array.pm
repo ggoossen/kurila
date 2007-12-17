@@ -24,7 +24,7 @@ sub POP
  my $obj = shift;
  my $newsize = $obj->FETCHSIZE - 1;
  my $val;
- if ($newsize >= 0)
+ if ($newsize +>= 0)
   {
    $val = $obj->FETCH($newsize);
    $obj->STORESIZE($newsize);
@@ -36,36 +36,36 @@ sub SPLICE {
     my $obj = shift;
     my $sz  = $obj->FETCHSIZE;
     my $off = (@_) ? shift : 0;
-    $off += $sz if ($off < 0);
+    $off += $sz if ($off +< 0);
     my $len = (@_) ? shift : $sz - $off;
-    $len += $sz - $off if $len < 0;
+    $len += $sz - $off if $len +< 0;
     my @result;
-    for (my $i = 0; $i < $len; $i++) {
+    for (my $i = 0; $i +< $len; $i++) {
         push(@result,$obj->FETCH($off+$i));
     }
-    $off = $sz if $off > $sz;
-    $len -= $off + $len - $sz if $off + $len > $sz;
-    if (@_ > $len) {
+    $off = $sz if $off +> $sz;
+    $len -= $off + $len - $sz if $off + $len +> $sz;
+    if (@_ +> $len) {
         # Move items up to make room
         my $d = @_ - $len;
         my $e = $off+$len;
         $obj->EXTEND($sz+$d);
-        for (my $i=$sz-1; $i >= $e; $i--) {
+        for (my $i=$sz-1; $i +>= $e; $i--) {
             my $val = $obj->FETCH($i);
             $obj->STORE($i+$d,$val);
         }
     }
-    elsif (@_ < $len) {
+    elsif (@_ +< $len) {
         # Move items down to close the gap
         my $d = $len - @_;
         my $e = $off+$len;
-        for (my $i=$off+$len; $i < $sz; $i++) {
+        for (my $i=$off+$len; $i +< $sz; $i++) {
             my $val = $obj->FETCH($i);
             $obj->STORE($i-$d,$val);
         }
         $obj->STORESIZE($sz-$d);
     }
-    for (my $i=0; $i < @_; $i++) {
+    for (my $i=0; $i +< @_; $i++) {
         $obj->STORE($off+$i,$_[$i]);
     }
     return wantarray ? @result : pop @result;
@@ -103,7 +103,7 @@ sub SPLICE
  my $ob  = shift;
  my $sz  = $ob->FETCHSIZE;
  my $off = @_ ? shift : 0;
- $off   += $sz if $off < 0;
+ $off   += $sz if $off +< 0;
  my $len = @_ ? shift : $sz-$off;
  return splice(@$ob,$off,$len,@_);
 }

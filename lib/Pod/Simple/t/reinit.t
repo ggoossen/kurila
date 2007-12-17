@@ -75,7 +75,7 @@ foreach my $file (
       $x =~ m/^(\x00*)/s or die;
       my $at = length($1);
       print "# Difference at byte $at...\n";
-      if($at > 10) {
+      if($at +> 10) {
         $at -= 5;
       }
       {

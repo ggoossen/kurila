@@ -90,7 +90,7 @@ sub writeAt
     if (defined *$self->{FH}) {
         my $here = tell(*$self->{FH});
         return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) 
-            if $here < 0 ;
+            if $here +< 0 ;
         seek(*$self->{FH}, $offset, SEEK_SET)
             or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
         defined *$self->{FH}->write($data, length $data)
@@ -314,7 +314,7 @@ sub _def
     my $name = (caller(1))[3] ;
 
     $obj->croakError("$name: expected at least 1 parameters\n")
-        unless @_ >= 1 ;
+        unless @_ +>= 1 ;
 
     my $input = shift ;
     my $haveOut = @_ ;
@@ -481,14 +481,14 @@ sub _wr2
         my $status ;
         my $buff ;
         my $count = 0 ;
-        while (($status = read($fh, $buff, 16 * 1024)) > 0) {
+        while (($status = read($fh, $buff, 16 * 1024)) +> 0) {
             $count += length $buff;
             defined $self->syswrite($buff, @_) 
                 or return undef ;
         }
 
         return $self->saveErrorString(undef, $!, $!) 
-            if $status < 0 ;
+            if $status +< 0 ;
 
         if ( (!$isFilehandle || *$self->{AutoClose}) && $input ne '-')
         {    
@@ -574,22 +574,22 @@ sub syswrite
     }
 
 
-    if (@_ > 1) {
+    if (@_ +> 1) {
         my $slen = defined $$buffer ? length($$buffer) : 0;
         my $len = $slen;
         my $offset = 0;
-        $len = $_[1] if $_[1] < $len;
+        $len = $_[1] if $_[1] +< $len;
 
-        if (@_ > 2) {
+        if (@_ +> 2) {
             $offset = $_[2] || 0;
             $self->croakError(*$self->{ClassName} . "::write: offset outside string") 
-                if $offset > $slen;
-            if ($offset < 0) {
+                if $offset +> $slen;
+            if ($offset +< 0) {
                 $offset += $slen;
-                $self->croakError( *$self->{ClassName} . "::write: offset outside string") if $offset < 0;
+                $self->croakError( *$self->{ClassName} . "::write: offset outside string") if $offset +< 0;
             }
             my $rem = $slen - $offset;
-            $len = $rem if $rem < $len;
+            $len = $rem if $rem +< $len;
         }
 
         $buffer = \substr($$buffer, $offset, $len) ;
@@ -852,7 +852,7 @@ sub seek
 
     # Outlaw any attempt to seek backwards
     $self->croakError(*$self->{ClassName} . "::seek: cannot seek backwards")
-        if $target < $here ;
+        if $target +< $here ;
 
     # Walk the file to the new offset
     my $offset = $target - $here ;

@@ -51,7 +51,7 @@ while ( ~< $header) {
     if (/^#define\s+(\w+)\s+(\d+)$/ || /^#define\s+(\w+)\s+\(\(DWORD\)(\d+)L\)/) {
         $vals{$1} = $2;
         if (substr($1, 0, 1) eq 'C') {
-            $max = $2 if $max < $2;
+            $max = $2 if $max +< $2;
         }
     }
 }
@@ -60,14 +60,14 @@ close($header);
 
 my ($hash, $f2c, %fac);
 
-for my $name (sort { substr($a,0,1) cmp substr($b,0,1) || $vals{$a} <=> $vals{$b} } keys %vals) {
+for my $name (sort { substr($a,0,1) cmp substr($b,0,1) || $vals{$a} <+> $vals{$b} } keys %vals) {
     $hash .= "    $name => $vals{$name},\n" ;
     if ($name =~ /^CAT_(\w+)$/) {
         $fac{$1} = $vals{$name};
     }
 }
 
-for my $name (sort {$fac{$a} <=> $fac{$b}} keys %fac) {
+for my $name (sort {$fac{$a} <+> $fac{$b}} keys %fac) {
     $f2c .= "    Sys::Syslog::LOG_$name() => '$name',\n";
 }    
 

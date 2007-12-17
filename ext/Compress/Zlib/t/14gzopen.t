@@ -185,13 +185,13 @@ ok ! $fil->gzeof() ;
 my $line = '';
 for my $i (0 .. @text -2)
 {
-    ok $fil->gzreadline($line) > 0;
+    ok $fil->gzreadline($line) +> 0;
     is $line, $text[$i] ;
     ok ! $fil->gzeof() ;
 }
 
 # now read the last line
-ok $fil->gzreadline($line) > 0;
+ok $fil->gzreadline($line) +> 0;
 is $line, $text[-1] ;
 ok $fil->gzeof() ;
 
@@ -216,7 +216,7 @@ ok $fil = gzopen($name, "rb") ;
 ok ! $fil->gzeof() ;
 my $i = 0 ;
 my @got = ();
-while ($fil->gzreadline($line) > 0) {
+while ($fil->gzreadline($line) +> 0) {
     $got[$i] = $line ;    
     ++ $i ;
 }
@@ -243,7 +243,7 @@ ok ! $fil->gzclose ;
 # now try to read it back in
 ok $fil = gzopen($name, "rb") ;
 @got = () ; $i = 0 ;
-while ($fil->gzreadline($line) > 0) {
+while ($fil->gzreadline($line) +> 0) {
     $got[$i] = $line ;    
     ++ $i ;
 }
@@ -278,15 +278,15 @@ ok ! $fil->gzclose ;
     # now try to read it back in
     ok $fil = gzopen($name, "rb"), '  gzopen for read ok' ;
     ok ! $fil->gzeof(), '    !gzeof' ;
-    cmp_ok $fil->gzreadline($line), '>', 0, '    gzreadline' ;
+    cmp_ok $fil->gzreadline($line), '+>', 0, '    gzreadline' ;
     is $fil->gztell(), length $line1, '    gztell ok' ;
     ok ! $fil->gzeof(), '    !gzeof' ;
     is $line, $line1, '    got expected line' ;
-    cmp_ok $fil->gzread($line, length $line2), '>', 0, '    gzread ok' ;
+    cmp_ok $fil->gzread($line, length $line2), '+>', 0, '    gzread ok' ;
     is $fil->gztell(), length($line1)+length($line2), '    gztell ok' ;
     ok ! $fil->gzeof(), '    !gzeof' ;
     is $line, $line2, '    read expected block' ;
-    cmp_ok $fil->gzread($line, length $line3), '>', 0, '    gzread ok' ;
+    cmp_ok $fil->gzread($line, length $line3), '+>', 0, '    gzread ok' ;
     is $fil->gztell(), length($text), '    gztell ok' ;
     ok   $fil->gzeof(), '    !gzeof' ;
     is $line, $line3, '    read expected block' ;

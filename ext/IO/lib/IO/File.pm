@@ -155,7 +155,7 @@ eval {
 sub new {
     my $type = shift;
     my $class = ref($type) || $type || "IO::File";
-    @_ >= 0 && @_ <= 3
+    @_ +>= 0 && @_ +<= 3
 	or croak "usage: new $class [FILENAME [,MODE [,PERMS]]]";
     my $fh = $class->SUPER::new();
     if (@_) {
@@ -170,9 +170,9 @@ sub new {
 ##
 
 sub open {
-    @_ >= 2 && @_ <= 4 or croak 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
+    @_ +>= 2 && @_ +<= 4 or croak 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
     my ($fh, $file) = @_;
-    if (@_ > 2) {
+    if (@_ +> 2) {
 	my ($mode, $perms) = @_[2, 3];
 	if ($mode =~ /^\d+$/) {
 	    defined $perms or $perms = 0666;

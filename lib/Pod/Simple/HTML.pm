@@ -175,7 +175,7 @@ sub new {
   $new->accept_targets( 'html', 'HTML' );
   $new->accept_codes('VerbatimFormatted');
   $new->accept_codes(@_to_accept);
-  DEBUG > 2 and print "To accept: ", join(' ',@_to_accept), "\n";
+  DEBUG +> 2 and print "To accept: ", join(' ',@_to_accept), "\n";
 
   $new->perldoc_url_prefix(  $Perldoc_URL_Prefix  );
   $new->perldoc_url_postfix( $Perldoc_URL_Postfix );
@@ -374,7 +374,7 @@ sub index_as_html {
 
   my $points = $self->{'PSHTML_index_points'} || [];
   
-  @$points > 1 or return qq[<div class='indexgroupEmpty'></div>\n];
+  @$points +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
    # There's no point in having a 0-item or 1-item index, I dare say.
   
   my(@out) = qq{\n<div class='indexgroup'>};
@@ -395,9 +395,9 @@ sub index_as_html {
     }
     
     # Get to target_level by opening or closing ULs
-    while($level > $target_level)
+    while($level +> $target_level)
      { --$level; push @out, ("  " x $level) . "</ul>"; }
-    while($level < $target_level)
+    while($level +< $target_level)
      { ++$level; push @out, ("  " x ($level-1))
        . "<ul   class='indexList indexList$level'>"; }
 
@@ -578,11 +578,11 @@ sub do_pod_link {
     # An early hack:
     my $complete_url = $self->resolve_pod_link_by_table($to, $section);
     if( $complete_url ) {
-      DEBUG > 1 and print "resolve_pod_link_by_table(T,S) gives ",
+      DEBUG +> 1 and print "resolve_pod_link_by_table(T,S) gives ",
         $complete_url, "\n  (Returning that.)\n";
       return $complete_url;
     } else {
-      DEBUG > 4 and print " resolve_pod_link_by_table(T,S)", 
+      DEBUG +> 4 and print " resolve_pod_link_by_table(T,S)", 
        " didn't return anything interesting.\n";
     }
   }
@@ -591,14 +591,14 @@ sub do_pod_link {
     # Give this routine first hack again
     my $there = $self->resolve_pod_link_by_table($to);
     if(defined $there and length $there) {
-      DEBUG > 1
+      DEBUG +> 1
        and print "resolve_pod_link_by_table(T) gives $there\n";
     } else {
       $there = 
         $self->resolve_pod_page_link($to, $section);
          # (I pass it the section value, but I don't see a
          #  particular reason it'd use it.)
-      DEBUG > 1 and print "resolve_pod_page_link gives ", $to || "(nil)", "\n";
+      DEBUG +> 1 and print "resolve_pod_page_link gives ", $to || "(nil)", "\n";
       unless( defined $there and length $there ) {
         DEBUG and print "Can't resolve $to\n";
         return undef;
@@ -693,7 +693,7 @@ sub resolve_pod_page_link_singleton_mode {
 
 sub resolve_pod_page_link_batch_mode {
   my($self, $to) = @_;
-  DEBUG > 1 and print " During batch mode, resolving $to ...\n";
+  DEBUG +> 1 and print " During batch mode, resolving $to ...\n";
   my @path = grep length($_), split m/::/s, $to, -1;
   unless( @path ) { # sanity
     DEBUG and print "Very odd!  Splitting $to gives (nil)!\n";
@@ -702,7 +702,7 @@ sub resolve_pod_page_link_batch_mode {
   $self->batch_mode_rectify_path(\@path);
   my $out = join('/', map $self->pagepath_url_escape($_), @path)
     . $HTML_EXTENSION;
-  DEBUG > 1 and print " => $out\n";
+  DEBUG +> 1 and print " => $out\n";
   return $out;
 }
 
@@ -710,7 +710,7 @@ sub batch_mode_rectify_path {
   my($self, $pathbits) = @_;
   my $level = $self->batch_mode_current_level;
   $level--; # how many levels up to go to get to the root
-  if($level < 1) {
+  if($level +< 1) {
     unshift @$pathbits, '.'; # just to be pretty
   } else {
     unshift @$pathbits, ('..') x $level;
@@ -760,7 +760,7 @@ sub linearize_tokens {  # self, tokens
       }
     }
   }
-  return undef if length $out > $Linearization_Limit;
+  return undef if length $out +> $Linearization_Limit;
   return $out;
 }
 

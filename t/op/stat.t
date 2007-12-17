@@ -303,7 +303,7 @@ SKIP: {
             $_ = "$bin/$_";
             $cnt++;
             $uid++ if -u;
-            last if $uid && $uid < $cnt;
+            last if $uid && $uid +< $cnt;
         }
     }
     closedir BIN;
@@ -312,7 +312,7 @@ SKIP: {
 
     isnt($cnt, 0,    'found some programs');
     isnt($uid, 0,    '  found some setuid programs');
-    ok($uid < $cnt,  "    they're not all setuid");
+    ok($uid +< $cnt,  "    they're not all setuid");
 }
 
 
@@ -461,9 +461,9 @@ my @a = stat $f;
 print "# time=$^T, stat=(@a)\n";
 my @b = (-M _, -A _, -C _);
 print "# -MAC=(@b)\n";
-ok( (-M _) < 0, 'negative -M works');
-ok( (-A _) < 0, 'negative -A works');
-ok( (-C _) < 0, 'negative -C works');
+ok( (-M _) +< 0, 'negative -M works');
+ok( (-A _) +< 0, 'negative -A works');
+ok( (-C _) +< 0, 'negative -C works');
 ok(unlink($f), 'unlink tmp file');
 
 {

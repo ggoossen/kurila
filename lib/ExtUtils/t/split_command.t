@@ -24,7 +24,7 @@ my $perl = which_perl;
 my $mm = bless { NAME => "Foo" }, "MM";
 
 # I don't expect anything to have a length shorter than 256 chars.
-cmp_ok( $mm->max_exec_len, '>=', 256,   'max_exec_len' );
+cmp_ok( $mm->max_exec_len, '+>=', 256,   'max_exec_len' );
 
 my $echo = $mm->oneliner(q{print @ARGV}, ['-l']);
 

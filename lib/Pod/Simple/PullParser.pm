@@ -89,7 +89,7 @@ sub new {
   $self->{'text_token_class'}  ||= 'Pod::Simple::PullParserTextToken';
   $self->{'end_token_class'}   ||= 'Pod::Simple::PullParserEndToken';
 
-  DEBUG > 1 and print "New pullparser object: $self\n";
+  DEBUG +> 1 and print "New pullparser object: $self\n";
 
   return $self;
 }
@@ -98,8 +98,8 @@ sub new {
 
 sub get_token {
   my $self = shift;
-  DEBUG > 1 and print "\nget_token starting up on $self.\n";
-  DEBUG > 2 and print " Items in token-buffer (",
+  DEBUG +> 1 and print "\nget_token starting up on $self.\n";
+  DEBUG +> 2 and print " Items in token-buffer (",
    scalar( @{ $self->{'token_buffer'} } ) ,
    ") :\n", map(
      "    " . $_->dump . "\n", @{ $self->{'token_buffer'} }
@@ -109,7 +109,7 @@ sub get_token {
   ;
 
   until( @{ $self->{'token_buffer'} } ) {
-    DEBUG > 3 and print "I need to get something into my empty token buffer...\n";
+    DEBUG +> 3 and print "I need to get something into my empty token buffer...\n";
     if($self->{'source_dead'}) {
       DEBUG and print "$self 's source is dead.\n";
       push @{ $self->{'token_buffer'} }, undef;
@@ -121,10 +121,10 @@ sub get_token {
       DEBUG and print "$self 's source is filehandle $fh.\n";
       # Read those many lines at a time
       for(my $i = Pod::Simple::MANY_LINES; $i--;) {
-        DEBUG > 3 and print " Fetching a line from source filehandle $fh...\n";
+        DEBUG +> 3 and print " Fetching a line from source filehandle $fh...\n";
         local $/ = $Pod::Simple::NL;
         push @lines, scalar( ~< $fh); # readline
-        DEBUG > 3 and print "  Line is: ",
+        DEBUG +> 3 and print "  Line is: ",
           defined($lines[-1]) ? $lines[-1] : "<undef>\n";
         unless( defined $lines[-1] ) {
           DEBUG and print "That's it for that source fh!  Killing.\n";
@@ -138,7 +138,7 @@ sub get_token {
 
       }
       
-      if(DEBUG > 8) {
+      if(DEBUG +> 8) {
         print "* I've gotten ", scalar(@lines), " lines:\n";
         foreach my $l (@lines) {
           if(defined $l) {
@@ -156,7 +156,7 @@ sub get_token {
       DEBUG and print "$self 's source is arrayref $self->{'source_arrayref'}, with ",
        scalar(@{$self->{'source_arrayref'}}), " items left in it.\n";
 
-      DEBUG > 3 and print "  Fetching ", Pod::Simple::MANY_LINES, " lines.\n";
+      DEBUG +> 3 and print "  Fetching ", Pod::Simple::MANY_LINES, " lines.\n";
       $self->SUPER::parse_lines(
         splice @{ $self->{'source_arrayref'} },
         0,
@@ -176,7 +176,7 @@ sub get_token {
         (pos(${ $self->{'source_scalar_ref'} }) || 0),
         " characters left to parse.\n";
 
-      DEBUG > 3 and print " Fetching a line from source-string...\n";
+      DEBUG +> 3 and print " Fetching a line from source-string...\n";
       if( ${ $self->{'source_scalar_ref'} } =~
         m/([^\n\r]*)((?:\r?\n)?)/g
       ) {
@@ -220,7 +220,7 @@ sub unget_token {
   }
   
   unshift @{$self->{'token_buffer'}}, @_;
-  DEBUG > 1 and print "Token buffer now has ",
+  DEBUG +> 1 and print "Token buffer now has ",
    scalar(@{$self->{'token_buffer'}}), " items in it.\n";
   return;
 }
@@ -347,7 +347,7 @@ sub _get_titled_section {
   my $para_text_content;
 
   while(
-    ++$token_count <= ($max_token || 1_000_000)
+    ++$token_count +<= ($max_token || 1_000_000)
     and defined(my $token = $self->get_token)
   ) {
     push @to_unget, $token;
@@ -386,7 +386,7 @@ sub _get_titled_section {
             )\)/sx
             # avoid accepting things like =head1 Thingy Thongy (DESCRIPTION)
           and ($max_content_length
-            ? (length($head1_text_content) <= $max_content_length) # sanity
+            ? (length($head1_text_content) +<= $max_content_length) # sanity
             : 1)
         ) {
           DEBUG and print "  It looks titular: \"$head1_text_content\".\n",
@@ -427,7 +427,7 @@ sub _get_titled_section {
 
         if( $para_text_content =~ m/\S/
           and ($max_content_length
-           ? (length($para_text_content) <= $max_content_length)
+           ? (length($para_text_content) +<= $max_content_length)
            : 1)
         ) {
           # Some minimal sanity constraints, I think.
@@ -467,7 +467,7 @@ sub _get_titled_section {
 
 sub _handle_element_start {
   my $self = shift;   # leaving ($element_name, $attr_hash_r)
-  DEBUG > 2 and print "++ $_[0] (", map("<$_> ", %{$_[1]}), ")\n";
+  DEBUG +> 2 and print "++ $_[0] (", map("<$_> ", %{$_[1]}), ")\n";
   
   push @{ $self->{'token_buffer'} },
        $self->{'start_token_class'}->new(@_);
@@ -476,7 +476,7 @@ sub _handle_element_start {
 
 sub _handle_text {
   my $self = shift;   # leaving ($text)
-  DEBUG > 2 and print "== $_[0]\n";
+  DEBUG +> 2 and print "== $_[0]\n";
   push @{ $self->{'token_buffer'} },
        $self->{'text_token_class'}->new(@_);
   return;
@@ -484,7 +484,7 @@ sub _handle_text {
 
 sub _handle_element_end {
   my $self = shift;   # leaving ($element_name);
-  DEBUG > 2 and print "-- $_[0]\n";
+  DEBUG +> 2 and print "-- $_[0]\n";
   push @{ $self->{'token_buffer'} }, 
        $self->{'end_token_class'}->new(@_);
   return;

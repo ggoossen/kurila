@@ -231,7 +231,7 @@ sub ok {
   @_ == 1 or croak 'usage: $obj->ok()';
 
   my $code = $_[0]->code;
-  0 < $code && $code < 400;
+  0 +< $code && $code +< 400;
 }
 
 
@@ -268,7 +268,7 @@ sub getline {
     my $rout;
 
     my $select_ret = select($rout = $rin, undef, undef, $timeout);
-    if ($select_ret > 0) {
+    if ($select_ret +> 0) {
       unless (sysread($cmd, $buf = "", 1024)) {
         carp(ref($cmd) . ": Unexpected EOF on command channel")
           if $cmd->debug;
@@ -424,7 +424,7 @@ sub datasend {
   while ($len) {
     my $wout;
     my $s = select(undef, $wout = $win, undef, $timeout);
-    if ((defined $s and $s > 0) or -f $cmd)    # -f for testing on win32
+    if ((defined $s and $s +> 0) or -f $cmd)    # -f for testing on win32
     {
       my $w = syswrite($cmd, $line, $len, $offset);
       unless (defined($w)) {
@@ -468,7 +468,7 @@ sub rawdatasend {
   local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
   while ($len) {
     my $wout;
-    if (select(undef, $wout = $win, undef, $timeout) > 0) {
+    if (select(undef, $wout = $win, undef, $timeout) +> 0) {
       my $w = syswrite($cmd, $line, $len, $offset);
       unless (defined($w)) {
         carp("$cmd: $!") if $cmd->debug;
@@ -539,7 +539,7 @@ sub READ {
   my ($len, $offset) = @_[1, 2];
   return unless exists ${*$cmd}{'net_cmd_readbuf'};
   my $done = 0;
-  while (!$done and length(${*$cmd}{'net_cmd_readbuf'}) < $len) {
+  while (!$done and length(${*$cmd}{'net_cmd_readbuf'}) +< $len) {
     ${*$cmd}{'net_cmd_readbuf'} .= $cmd->getline() or return;
     $done++ if ${*$cmd}{'net_cmd_readbuf'} =~ s/^\.\r?\n\Z//m;
   }

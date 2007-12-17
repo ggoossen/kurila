@@ -89,7 +89,7 @@ sub _readrc {
         }
 
         last TOKEN
-          unless @tok > 1;
+          unless @tok +> 1;
 
         $tok = shift(@tok);
 

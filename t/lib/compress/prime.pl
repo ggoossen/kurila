@@ -75,7 +75,7 @@ EOM
                 ok ! $gz->error() ;
                 my $un ;
                 my $status = 1 ;
-                $status = $gz->read($un) while $status > 0 ;
+                $status = $gz->read($un) while $status +> 0 ;
                 is $status, 0 ;
                 ok ! $gz->error() 
                     or print "Error is '" . $gz->error() . "'\n";

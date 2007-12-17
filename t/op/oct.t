@@ -17,7 +17,7 @@ sub test ($$$) {
     die "Unknown action 'act'";
   }
   if ($value == $result) {
-    if ($^O eq 'VMS' && length $string > 256) {
+    if ($^O eq 'VMS' && length $string +> 256) {
       $string = '';
     } else {
       $string = "\"$string\"";

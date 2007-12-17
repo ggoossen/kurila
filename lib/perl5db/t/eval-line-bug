@@ -16,7 +16,7 @@ for my $q (1 .. 10) {
 sub factorial
 {
     my $i = shift;
-    return +($i < 2) ? 1 : $i*factorial($i-1);
+    return +($i +< 2) ? 1 : $i*factorial($i-1);
 }
 
 my $j = 4;

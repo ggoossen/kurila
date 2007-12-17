@@ -193,7 +193,7 @@ f1();
 # erroneous popping of the inner BLOCK context
 
 undef $ok;
-for ($count=0; $count<2; $count++) {
+for ($count=0; $count+<2; $count++) {
     my $x = 1;
     goto LABEL29;
     LABEL29:
@@ -405,14 +405,14 @@ a32039();
     my $r = runperl(
 		stderr => 1,
 		prog =>
-'for ($_=0;$_<3;$_++){A: if($_==1){next} if($_==2){$_++;goto A}}print qq(ok\n)'
+'for ($_=0;$_+<3;$_++){A: if($_==1){next} if($_==2){$_++;goto A}}print qq(ok\n)'
     );
     is($r, "ok\n", 'next and goto');
 
     $r = runperl(
 		stderr => 1,
 		prog =>
-'for ($_=0;$_<3;$_++){A: if($_==1){$_++;redo} if($_==2){$_++;goto A}}print qq(ok\n)'
+'for ($_=0;$_+<3;$_++){A: if($_==1){$_++;redo} if($_==2){$_++;goto A}}print qq(ok\n)'
     );
     is($r, "ok\n", 'redo and goto');
 }

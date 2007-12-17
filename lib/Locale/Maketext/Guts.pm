@@ -44,7 +44,7 @@ sub _compile {
        $
      )>xgs
     ) {
-      print "  \"$1\"\n" if DEBUG > 2;
+      print "  \"$1\"\n" if DEBUG +> 2;
 
       if($1 eq '[' or $1 eq '') {       # "[" or end
         # Whether this is "[" or end, force processing of any
@@ -57,7 +57,7 @@ sub _compile {
           }
         } else {
           if($1 eq '') {
-            print "   [end-string]\n" if DEBUG > 2;
+            print "   [end-string]\n" if DEBUG +> 2;
           } else {
             $in_group = 1;
           }
@@ -89,12 +89,12 @@ sub _compile {
         if($in_group) {
           $in_group = 0;
           
-          print "   --Closing group [$c[-1]]\n" if DEBUG > 2;
+          print "   --Closing group [$c[-1]]\n" if DEBUG +> 2;
           
           # And now process the group...
           
           if(!length($c[-1]) or $c[-1] =~ m/^\s+$/s) {
-            DEBUG > 2 and print "   -- (Ignoring)\n";
+            DEBUG +> 2 and print "   -- (Ignoring)\n";
             $c[-1] = ''; # reset out chink
             next;
           }
@@ -237,7 +237,7 @@ sub _compile {
   if(@code == 0) { # not possible?
     print "Empty code\n" if DEBUG;
     return \'';
-  } elsif(@code > 1) { # most cases, presumably!
+  } elsif(@code +> 1) { # most cases, presumably!
     unshift @code, "join '',\n";
   }
   unshift @code, "use strict; sub {\n";
@@ -260,11 +260,11 @@ sub _die_pointing {
 
   my $pointy;
   my $pos = pos($_[0]) - (defined($_[2]) ? $_[2] : 0) - 1;
-  if($pos < 1) {
+  if($pos +< 1) {
     $pointy = "^=== near there\n";
   } else { # we need to space over
     my $first_tab = index($_[0], "\t");
-    if($pos > 2 and ( -1 == $first_tab  or  $first_tab > pos($_[0]))) {
+    if($pos +> 2 and ( -1 == $first_tab  or  $first_tab +> pos($_[0]))) {
       # No tabs, or the first tab is harmlessly after where we will point to,
       # AND we're far enough from the margin that we can draw a proper arrow.
       $pointy = ('=' x $pos) . "^ near there\n";

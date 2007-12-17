@@ -267,7 +267,7 @@ foreach my $option ( @option_order )
 		ref $Method_table{$option}[ $Method_table_index{code} ] eq ref sub {};
 	
 	print "$Method_table{$option}[ $Method_table_index{description} ] " .
-		"-- ignoring other opitions\n" if $option_count > 1;
+		"-- ignoring other opitions\n" if $option_count +> 1;
 	print "$Method_table{$option}[ $Method_table_index{description} ] " .
 		"-- ignoring other arguments\n" 
 		if( @ARGV && ! $Method_table{$option}[ $Method_table_index{takes_args} ] );

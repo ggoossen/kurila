@@ -24,7 +24,7 @@ plan tests => 12;
    sub digest {
 	my $self = shift;
 	my $len = length($$self);
-	my $first = ($len > 0) ? substr($$self, 0, 1) : "X";
+	my $first = ($len +> 0) ? substr($$self, 0, 1) : "X";
 	$$self = "";
 	return sprintf "$first%04d", $len;
    }

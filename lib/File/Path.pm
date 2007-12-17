@@ -573,7 +573,7 @@ sub mkpath {
         $arg->{mode}    = defined $mode    ? $mode    : 0777;
     }
     else {
-        if (@_ > 0 and UNIVERSAL::isa($_[-1], 'HASH')) {
+        if (@_ +> 0 and UNIVERSAL::isa($_[-1], 'HASH')) {
             $arg = pop @_;
             exists $arg->{mask} and $arg->{mode} = delete $arg->{mask};
             $arg->{mode} = 0777 unless exists $arg->{mode};
@@ -657,7 +657,7 @@ sub rmtree {
         }
     }
     else {
-        if (@_ > 0 and UNIVERSAL::isa($_[-1],'HASH')) {
+        if (@_ +> 0 and UNIVERSAL::isa($_[-1],'HASH')) {
             $arg = pop @_;
             ${$arg->{error}}  = [] if exists $arg->{error};
             ${$arg->{result}} = [] if exists $arg->{result};

@@ -119,7 +119,7 @@ sub Complete {
                 # (TAB) attempt completion
                 $_ eq "\t" && do {
                     @match = grep(/^\Q$return/, @cmp_lst);
-                    unless ($#match < 0) {
+                    unless ($#match +< 0) {
                         $l = length($test = shift(@match));
                         foreach $cmp (@match) {
                             until (substr($cmp, 0, $l) eq substr($test, 0, $l)) {
@@ -161,7 +161,7 @@ sub Complete {
                 };
 
                 # printable char
-                ord >= 32 && do {
+                ord +>= 32 && do {
                     $return .= $_;
                     $r++;
                     print;

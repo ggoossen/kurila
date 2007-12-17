@@ -182,7 +182,7 @@ if ($opt{'test-archives'}) {
   for my $perl (@perls) {
     eval {
       my $d = extract_source($perl{$perl});
-      if ($opt{'test-archives'} > 2) {
+      if ($opt{'test-archives'} +> 2) {
         my $cwd2 = cwd;
         chdir $d or die "chdir $d: $!\n";
         patch_source($perl{$perl}{version});
@@ -282,7 +282,7 @@ sub extract_source
     $target = $t;
   }
 
-  if ($opt{'test-archives'} == 0 || $opt{'test-archives'} > 1) {
+  if ($opt{'test-archives'} == 0 || $opt{'test-archives'} +> 1) {
     if (-d $target) {
       print "removing old build directory $target\n";
       rmtree($target);

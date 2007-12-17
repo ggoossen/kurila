@@ -103,7 +103,7 @@ sub isZlibMagic
     my $buffer = shift ;
 
     return 0 
-        if length $buffer < ZLIB_HEADER_SIZE ;
+        if length $buffer +< ZLIB_HEADER_SIZE ;
 
     my $hdr = unpack("n", $buffer) ;
     #return 0 if $hdr % 31 != 0 ;
@@ -121,7 +121,7 @@ sub isZlibMagic
     my $cinfo = bits($CMF, ZLIB_CMF_CINFO_OFFSET, ZLIB_CMF_CINFO_BITS) ;
     return $self->HeaderError("CINFO > " . ZLIB_CMF_CINFO_MAX . 
                               " (CINFO is $cinfo)") 
-        if $cinfo > ZLIB_CMF_CINFO_MAX ;
+        if $cinfo +> ZLIB_CMF_CINFO_MAX ;
 
     return 1;    
 }

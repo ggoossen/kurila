@@ -44,7 +44,7 @@ if ($opts{'clean-exts'}) {
 
 # zip
 if ($opts{'zip'}) {
-  if ($opts{'verbose'} >=1) {
+  if ($opts{'verbose'} +>=1) {
     print STDERR "zipping...\n";
   }
   chdir $opts{'distdir'};
@@ -66,7 +66,7 @@ chdir $cwd;
 #inclusions
 #...
 #copy them
-if ($opts{'verbose'} >=1) {
+if ($opts{'verbose'} +>=1) {
   print STDERR "Copying perl lib files...\n";
 }
 for (@lfiles) {
@@ -86,7 +86,7 @@ chdir $cwd;
 #...
 #copy them
 #{s[/(\w+)/\1\.pm][/$1.pm]} @efiles;
-if ($opts{'verbose'} >=1) {
+if ($opts{'verbose'} +>=1) {
   print STDERR "Copying perl core extensions...\n";
 }
 for (@efiles) {
@@ -107,7 +107,7 @@ if ($opts{adaptation}) {
 }
 
 # Config.pm, perl binaries
-if ($opts{'verbose'} >=1) {
+if ($opts{'verbose'} +>=1) {
   print STDERR "Copying Config.pm, perl.dll and perl.exe...\n";
 }
 copy "../xlib/$opts{'cross-name'}/Config.pm", "$opts{distdir}/lib/Config.pm";
@@ -124,7 +124,7 @@ my @afiles;
 chdir "../xlib/$opts{'cross-name'}/auto";
 find({no_chdir=>1,wanted=>sub{push @afiles, $_ if /\.(dll|bs)$/}},'.');
 chdir $cwd;
-if ($opts{'verbose'} >=1) {
+if ($opts{'verbose'} +>=1) {
   print STDERR "Copying binaries for perl core extensions...\n";
 }
 for (@afiles) {
@@ -156,7 +156,7 @@ sub copy($$) {
   open my $fhout, ">$fnto";
   binmode $fhout;
   print $fhout $ffrom;
-  if ($opts{'verbose'} >=2) {
+  if ($opts{'verbose'} +>=2) {
     print STDERR "copying $fnfrom=>$fnto\n";
   }
 }

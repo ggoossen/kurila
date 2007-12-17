@@ -12,17 +12,17 @@ BEGIN {
 use strict;
 
 sub gcd {
-    return gcd($_[0] - $_[1], $_[1]) if ($_[0] > $_[1]);
-    return gcd($_[0], $_[1] - $_[0]) if ($_[0] < $_[1]);
+    return gcd($_[0] - $_[1], $_[1]) if ($_[0] +> $_[1]);
+    return gcd($_[0], $_[1] - $_[0]) if ($_[0] +< $_[1]);
     $_[0];
 }
 
 sub factorial {
-    $_[0] < 2 ? 1 : $_[0] * factorial($_[0] - 1);
+    $_[0] +< 2 ? 1 : $_[0] * factorial($_[0] - 1);
 }
 
 sub fibonacci {
-    $_[0] < 2 ? 1 : fibonacci($_[0] - 2) + fibonacci($_[0] - 1);
+    $_[0] +< 2 ? 1 : fibonacci($_[0] - 2) + fibonacci($_[0] - 1);
 }
 
 # Highly recursive, highly aggressive.
@@ -40,7 +40,7 @@ sub ackermann {
 # Highly recursive, highly boring.
 
 sub takeuchi {
-    $_[1] < $_[0] ?
+    $_[1] +< $_[0] ?
 	takeuchi(takeuchi($_[0] - 1, $_[1], $_[2]),
 		 takeuchi($_[1] - 1, $_[2], $_[0]),
 		 takeuchi($_[2] - 1, $_[0], $_[1]))
@@ -104,7 +104,7 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
     local $^W = 0; # We do not need recursion depth warning.
 
     sub sillysum {
-	return $_[0] + ($_[0] > 0 ? sillysum($_[0] - 1) : 0);
+	return $_[0] + ($_[0] +> 0 ? sillysum($_[0] - 1) : 0);
     }
 
     is(sillysum(1000), 1000*1001/2, "recursive sum of 1..1000");
@@ -117,7 +117,7 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 	$r = runperl(
 		     nolib => 1,
 		     stderr => 1,
-		     prog => q{our $d=0; our $e=1; sub c { ++$d; if ($d > 66000) { $e=0 } else { c(); c() unless $d % 32768 } --$d } c(); exit $e});
+		     prog => q{our $d=0; our $e=1; sub c { ++$d; if ($d +> 66000) { $e=0 } else { c(); c() unless $d % 32768 } --$d } c(); exit $e});
     };
   SKIP: {
       skip("Out of memory -- increase your data/heap?", 2)

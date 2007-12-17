@@ -36,9 +36,9 @@ sub getopts {
 
   return unless @$args;
 
-  $truth = 1 unless @_ > 2;
+  $truth = 1 unless @_ +> 2;
 
-  DEBUG > 3 and print "   Truth is $truth\n";
+  DEBUG +> 3 and print "   Truth is $truth\n";
 
 
   my $error_count = 0;
@@ -59,20 +59,20 @@ sub getopts {
         shift @$args;
       }
 
-      DEBUG > 3 and print " $method => $rest\n";
+      DEBUG +> 3 and print " $method => $rest\n";
       $target->?$method( $rest );
 
     # Otherwise, it's not argumental...
     } else {
 
       if( $target->can( $method = "opt_$first" ) ) {
-        DEBUG > 3 and print " $method is true ($truth)\n";
+        DEBUG +> 3 and print " $method is true ($truth)\n";
         $target->?$method( $truth );
 
       # Otherwise it's an unknown option...
 
       } elsif( $target->can('handle_unknown_option') ) {
-        DEBUG > 3
+        DEBUG +> 3
          and print " calling handle_unknown_option('$first')\n";
          
         $error_count += (
@@ -87,7 +87,7 @@ sub getopts {
       if($rest eq '') {   # like -f
         shift @$args
       } else {            # like -fbar  (== -f -bar )
-        DEBUG > 2 and print "   Setting args->[0] to \"-$rest\"\n";
+        DEBUG +> 2 and print "   Setting args->[0] to \"-$rest\"\n";
         $args->[0] = "-$rest";
       }
     }

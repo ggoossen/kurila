@@ -126,7 +126,7 @@ sub struct {
     elsif( $base_type eq 'ARRAY' ){
         $out .= "    my(\$r) = [];\n";
     }
-    while( $idx < @decls ){
+    while( $idx +< @decls ){
         $name = $decls[$idx];
         $type = $decls[$idx+1];
         push( @methods, $name );
@@ -214,7 +214,7 @@ sub struct {
             elsif( defined $classes{$name} ){
                 $out .= "    croak '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '$classes{$name}');\n";
             }
-            $out .= "    croak 'Too many args to $name' if \@_ > 1;\n";
+            $out .= "    croak 'Too many args to $name' if \@_ +> 1;\n";
             $out .= "    \@_ ? ($pre\$r->$elem$sel = shift$pst) : $pre\$r->$elem$sel$pst;\n";
             $out .= "  }\n";
         }

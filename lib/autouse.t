@@ -33,7 +33,7 @@ ok( max(@a), 5.5);
 
 
 # first() has a prototype of &@.  Make sure that's preserved.
-ok( (first { $_ > 3 } @a), 4);
+ok( (first { $_ +> 3 } @a), 4);
 
 
 # Example from the docs.

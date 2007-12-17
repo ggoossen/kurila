@@ -24,7 +24,7 @@ sub do_not_edit ($)
 
     my $years = '1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007';
 
-    $years =~ s/1999,/1999,\n  / if length $years > 40;
+    $years =~ s/1999,/1999,\n  / if length $years +> 40;
 
     my $warning = <<EOW;
  -*- buffer-read-only: t -*-
@@ -121,7 +121,7 @@ sub munge_c_files () {
 	return;
     }
     walk_table {
-	if (@_ > 1) {
+	if (@_ +> 1) {
 	    $functions->{$_[2]} = \@_ if $_[@_-1] =~ /\.\.\./;
 	}
     } '/dev/null', '', '';
@@ -260,7 +260,7 @@ sub write_protos {
   my %seen;
   sub write_global_sym {
       my $ret = "";
-      if (@_ > 1) {
+      if (@_ +> 1) {
 	  my ($flags,$retval,$func,@args) = @_;
 	  # If a function is defined twice, for example before and after an
 	  # #else, only process the flags on the first instance for global.sym
@@ -356,7 +356,7 @@ sub undefine ($) {
 sub hide ($$) {
     my ($from, $to) = @_;
     my $t = int(length($from) / 8);
-    "#define $from" . "\t" x ($t < 3 ? 3 - $t : 1) . "$to\n";
+    "#define $from" . "\t" x ($t +< 3 ? 3 - $t : 1) . "$to\n";
 }
 
 sub bincompat_var ($$) {
@@ -489,7 +489,7 @@ walk_table {
 		my $alist = join(",", @az[0..$args-1]);
 		$ret = "#define $func($alist)";
 		my $t = int(length($ret) / 8);
-		$ret .=  "\t" x ($t < 4 ? 4 - $t : 1);
+		$ret .=  "\t" x ($t +< 4 ? 4 - $t : 1);
 		if ($flags =~ /s/) {
 		    $ret .= "S_$func(aTHX";
 		}

@@ -7,7 +7,7 @@
     my $what = shift;
     $what eq 'tests' or die "cannot plan anything but tests";
     $__total = shift;
-    defined $__total && $__total > 0 or die "need a positive number of tests";
+    defined $__total && $__total +> 0 or die "need a positive number of tests";
     print "1..$__total\n";
   }
 
