@@ -67,8 +67,8 @@ sub parse_from_file {
     and my ($cols) = `stty -a` =~ m/\bcolumns\s+(\d+)/
   ) {
     my $c = $cols * 39 / 40;
-    $cols = $c > $cols - 2 ? $c : $cols -2;
-    $command .= ' -rLL=' . (int $c) . 'n' if $cols > 80;
+    $cols = $c +> $cols - 2 ? $c : $cols -2;
+    $command .= ' -rLL=' . (int $c) . 'n' if $cols +> 80;
   }
 
   if('Pod::Perldoc::IS_Cygwin') {

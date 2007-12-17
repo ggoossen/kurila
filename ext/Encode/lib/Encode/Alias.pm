@@ -24,7 +24,7 @@ sub find_alias {
     my $find  = shift;
     unless ( exists $Alias{$find} ) {
         $Alias{$find} = undef;    # Recursion guard
-        for ( my $i = 0 ; $i < @Alias ; $i += 2 ) {
+        for ( my $i = 0 ; $i +< @Alias ; $i += 2 ) {
             my $alias = $Alias[$i];
             my $val   = $Alias[ $i + 1 ];
             my $new;

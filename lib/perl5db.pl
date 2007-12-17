@@ -1865,7 +1865,7 @@ sub DB {
         if ($runnonstop) {    # Disable until signal
                 # If there's any call stack in place, turn off single
                 # stepping into subs throughout the stack.
-            for ( $i = 0 ; $i <= $stack_depth ; ) {
+            for ( $i = 0 ; $i +<= $stack_depth ; ) {
                 $stack[ $i++ ] ^&^= ^~^1;
             }
 
@@ -1913,7 +1913,7 @@ sub DB {
 
     # we need to check for pseudofiles on Mac OS (these are files
     # not attached to a filename, but instead stored in Dev:Pseudo)
-    if ( $^O eq 'MacOS' && $#dbline < 0 ) {
+    if ( $^O eq 'MacOS' && $#dbline +< 0 ) {
         $filename_ini = $filename = 'Dev:Pseudo';
         *dbline = $main::{ '_<' . $filename };
     }
@@ -1946,7 +1946,7 @@ sub DB {
 
     # If we have any watch expressions ...
     if ( $trace ^&^ 2 ) {
-        for ( my $n = 0 ; $n <= $#to_watch ; $n++ ) {
+        for ( my $n = 0 ; $n +<= $#to_watch ; $n++ ) {
             $evalarg = $to_watch[$n];
             local $onetimeDump;    # Tell DB::eval() to not output results
 
@@ -2092,7 +2092,7 @@ number information, and print that.
             $after = ( $dbline[$line] =~ /\n$/ ? '' : "\n" );
 
             # Break up the prompt if it's really long.
-            if ( length($prefix) > 30 ) {
+            if ( length($prefix) +> 30 ) {
                 $position = "$prefix$line):\n$line:\t$dbline[$line]$after";
                 $prefix   = "";
                 $infix    = ":\t";
@@ -2113,7 +2113,7 @@ number information, and print that.
 
             # Scan forward, stopping at either the end or the next
             # unbreakable line.
-            for ( $i = $line + 1 ; $i <= $max && $dbline[$i] == 0 ; ++$i )
+            for ( $i = $line + 1 ; $i +<= $max && $dbline[$i] == 0 ; ++$i )
             {    #{ vi
 
                 # Drop out on null statements, block closers, and comments.
@@ -2275,7 +2275,7 @@ it up.
             # Empty input means repeat the last command.
             $cmd =~ /^$/ && ( $cmd = $laststep );
             chomp($cmd);    # get rid of the annoying extra newline
-            push( @hist, $cmd ) if length($cmd) > 1;
+            push( @hist, $cmd ) if length($cmd) +> 1;
             push( @truehist, $cmd );
 			share(@hist);
 			share(@truehist);
@@ -2567,7 +2567,7 @@ C<$start>) in C<$cmd> to be executed later.
 
                     # back up by a window; go to 1 if back too far.
                     $start -= $incr + $window + 1;
-                    $start = 1 if $start <= 0;
+                    $start = 1 if $start +<= 0;
                     $incr  = $window - 1;
 
                     # Generate and execute a "l +" command (handled below).
@@ -2655,7 +2655,7 @@ so a null command knows what to re-execute.
 
                 # n - next
                 $cmd =~ /^n$/ && do {
-                    end_report(), next CMD if $finished and $level <= 1;
+                    end_report(), next CMD if $finished and $level +<= 1;
 
                     # Single step, but don't enter subs.
                     $single = 2;
@@ -2677,7 +2677,7 @@ subs. Also saves C<s> as C<$lastcmd>.
 
                     # Get out and restart the command loop if program
                     # has finished.
-                    end_report(), next CMD if $finished and $level <= 1;
+                    end_report(), next CMD if $finished and $level +<= 1;
 
                     # Single step should enter subs.
                     $single = 1;
@@ -2701,7 +2701,7 @@ in this and all call levels above this one.
 
                     # Hey, show's over. The debugged program finished
                     # executing already.
-                    end_report(), next CMD if $finished and $level <= 1;
+                    end_report(), next CMD if $finished and $level +<= 1;
 
                     # Capture the place to put a one-time break.
                     $subname = $i = $1;
@@ -2746,7 +2746,7 @@ in this and all call levels above this one.
                             # Scan forward to the first executable line
                             # after the 'sub whatever' line.
                             $max = $#dbline;
-                            ++$i while $dbline[$i] == 0 && $i < $max;
+                            ++$i while $dbline[$i] == 0 && $i +< $max;
                         } ## end if ($i)
 
                         # We didn't find a sub by that name.
@@ -2790,7 +2790,7 @@ in this and all call levels above this one.
                     } ## end if ($i)
 
                     # Turn off stack tracing from here up.
-                    for ( $i = 0 ; $i <= $stack_depth ; ) {
+                    for ( $i = 0 ; $i +<= $stack_depth ; ) {
                         $stack[ $i++ ] ^&^= ^~^1;
                     }
                     last CMD;
@@ -2810,7 +2810,7 @@ appropriately, and force us out of the command loop.
                 $cmd =~ /^r$/ && do {
 
                     # Can't do anythign if the program's over.
-                    end_report(), next CMD if $finished and $level <= 1;
+                    end_report(), next CMD if $finished and $level +<= 1;
 
                     # Turn on stack trace.
                     $stack[$stack_depth] ^|^= 1;
@@ -3009,7 +3009,7 @@ into C<$cmd>, and redoes the loop to execute it.
                 $cmd =~ /^$rc+\s*(-)?(\d+)?$/ && do {
 
                     # No arguments, take one thing off history.
-                    pop(@hist) if length($cmd) > 1;
+                    pop(@hist) if length($cmd) +> 1;
 
                     # Relative (- found)?
                     #  Y - index back from most recent (by 1 if bare minus)
@@ -3056,7 +3056,7 @@ If a command is found, it is placed in C<$cmd> and executed via C<redo>.
                     $pat = "^$1";
 
                     # Toss off last entry if length is >1 (and it always is).
-                    pop(@hist) if length($cmd) > 1;
+                    pop(@hist) if length($cmd) +> 1;
 
                     # Look backward through the history.
                     for ( $i = $#hist ; $i ; --$i ) {
@@ -3130,12 +3130,12 @@ Prints the contents of C<@hist> (if any).
                     $end = $2 ? ( $#hist - $2 ) : 0;
 
                     # Set to the minimum if less than zero.
-                    $hist = 0 if $hist < 0;
+                    $hist = 0 if $hist +< 0;
 
                     # Start at the end of the array.
                     # Stay in while we're still above the ending value.
                     # Tick back by one each time around the loop.
-                    for ( $i = $#hist ; $i > $end ; $i-- ) {
+                    for ( $i = $#hist ; $i +> $end ; $i-- ) {
 
                         # Print the command  unless it has no arguments.
                         print $OUT "$i: ", $hist[$i], "\n"
@@ -3641,7 +3641,7 @@ sub sub {
 
     # If the last ten characters are '::AUTOLOAD', note we've traced
     # into AUTOLOAD for $sub.
-    if ( length($sub) > 10 && substr( $sub, -10, 10 ) eq '::AUTOLOAD' ) {
+    if ( length($sub) +> 10 && substr( $sub, -10, 10 ) eq '::AUTOLOAD' ) {
         $al = " for $$sub" if defined $$sub;
     }
 
@@ -3977,7 +3977,7 @@ sub delete_action {
             local *dbline = $main::{ '_<' . $file };
             my $max = $#dbline;
             my $was;
-            for ( $i = 1 ; $i <= $max ; $i++ ) {
+            for ( $i = 1 ; $i +<= $max ; $i++ ) {
                 if ( defined $dbline{$i} ) {
                     $dbline{$i} =~ s/\0[^\0]*//;
                     delete $dbline{$i} if $dbline{$i} eq '';
@@ -4202,13 +4202,13 @@ sub breakable_line {
     my $i = $from;
 
     # If there are at least 2 arguments, we're trying to search a range.
-    if ( @_ >= 2 ) {
+    if ( @_ +>= 2 ) {
 
         # $delta is positive for a forward search, negative for a backward one.
-        my $delta = $from < $to ? +1 : -1;
+        my $delta = $from +< $to ? +1 : -1;
 
         # Keep us from running off the ends of the file.
-        my $limit = $delta > 0 ? $#dbline : 1;
+        my $limit = $delta +> 0 ? $#dbline : 1;
 
         # Clever test. If you're a mathematician, it's obvious why this
         # test works. If not:
@@ -4238,7 +4238,7 @@ sub breakable_line {
         #    (negative), giving a positive (>0) value, so we'll set $limit to
         #    $to.
 
-        $limit = $to if ( $limit - $to ) * $delta > 0;
+        $limit = $to if ( $limit - $to ) * $delta +> 0;
 
         # The real search loop.
         # $i starts at $from (the point we want to start searching from).
@@ -4247,7 +4247,7 @@ sub breakable_line {
         # We stay in as long as we haven't hit an executable line
         # ($dbline[$i] == 0 means not executable) and we haven't reached
         # the limit yet (test similar to the above).
-        $i += $delta while $dbline[$i] == 0 and ( $limit - $i ) * $delta > 0;
+        $i += $delta while $dbline[$i] == 0 and ( $limit - $i ) * $delta +> 0;
 
     } ## end if (@_ >= 2)
 
@@ -4256,7 +4256,7 @@ sub breakable_line {
 
     # Format the message and print it: no breakable lines in range.
     my ( $pl, $upto ) = ( '', '' );
-    ( $pl, $upto ) = ( 's', "..$to" ) if @_ >= 2 and $from != $to;
+    ( $pl, $upto ) = ( 's', "..$to" ) if @_ +>= 2 and $from != $to;
 
     # If there's a filename in filename_error, we'll see it.
     # If not, not.
@@ -4298,7 +4298,7 @@ sub break_on_line {
     my ( $i, $cond ) = @_;
 
     # Always true if no condition supplied.
-    $cond = 1 unless @_ >= 2;
+    $cond = 1 unless @_ +>= 2;
 
     my $inii  = $i;
     my $after = '';
@@ -4349,7 +4349,7 @@ sub break_on_filename_line {
     my ( $f, $i, $cond ) = @_;
 
     # Always true if condition left off.
-    $cond = 1 unless @_ >= 3;
+    $cond = 1 unless @_ +>= 3;
 
     # Switch the magical hash temporarily.
     local *dbline = $main::{ '_<' . $f };
@@ -4376,7 +4376,7 @@ sub break_on_filename_line_range {
     my $i = breakable_line_in_filename( $f, $from, $to );
 
     # Always true if missing.
-    $cond = 1 unless @_ >= 3;
+    $cond = 1 unless @_ +>= 3;
 
     # Add the breakpoint.
     break_on_filename_line( $f, $i, $cond );
@@ -4414,7 +4414,7 @@ sub break_subroutine {
       or die "Subroutine $subname not found.\n";
 
     # Null condition changes to '1' (always true).
-    $cond = 1 unless @_ >= 2;
+    $cond = 1 unless @_ +>= 2;
 
     # Put a break the first place possible in the range of lines
     # that make up this subroutine.
@@ -4446,7 +4446,7 @@ sub cmd_b_sub {
     my ( $subname, $cond ) = @_;
 
     # Add always-true condition if we have none.
-    $cond = 1 unless @_ >= 2;
+    $cond = 1 unless @_ +>= 2;
 
     # If the subname isn't a code reference, qualify it so that
     # break_subroutine() will work right.
@@ -4579,7 +4579,7 @@ sub delete_breakpoint {
             my $was;
 
             # For all lines in this file ...
-            for ( $i = 1 ; $i <= $max ; $i++ ) {
+            for ( $i = 1 ; $i +<= $max ; $i++ ) {
 
                 # If there's a breakpoint or action on this line ...
                 if ( defined $dbline{$i} ) {
@@ -4873,7 +4873,7 @@ sub cmd_l {
         # Subrange is 'start-stop'. If this is less than a window full,
         # swap it to 'start+', which will list a window from the start point.
         if ($subrange) {
-            if ( eval($subrange) < -$window ) {
+            if ( eval($subrange) +< -$window ) {
                 $subrange =~ s/-.*/+/;
             }
 
@@ -4922,12 +4922,12 @@ sub cmd_l {
         $end = ( !defined $2 ) ? $max : ( $4 ? $4 : $2 );
 
         # Go on to the end, and then stop.
-        $end = $max if $end > $max;
+        $end = $max if $end +> $max;
 
         # Determine start line.
         $i    = $2;
         $i    = $line if $i eq '.';
-        $i    = 1 if $i < 1;
+        $i    = 1 if $i +< 1;
         $incr = $end - $i;
 
         # If we're running under a slave editor, force it to show the lines.
@@ -4943,7 +4943,7 @@ sub cmd_l {
         # - whether a line has a break or not
         # - whether a line has an action or not
         else {
-            for ( ; $i <= $end ; $i++ ) {
+            for ( ; $i +<= $end ; $i++ ) {
 
                 # Check for breakpoints and actions.
                 my ( $stop, $action );
@@ -4976,7 +4976,7 @@ sub cmd_l {
         # Save the point we last listed to in case another relative 'l'
         # command is desired. Don't let it run off the end.
         $start = $i;
-        $start = $max if $start > $max;
+        $start = $max if $start +> $max;
     } ## end elsif ($line =~ /^((-?[\d\$\.]+)([-,]([\d\$\.]+))?)?/)
 } ## end sub cmd_l
 
@@ -5024,7 +5024,7 @@ sub cmd_L {
                         # in this file?
 
             # For each line in the file ...
-            for ( $i = 1 ; $i <= $max ; $i++ ) {
+            for ( $i = 1 ; $i +<= $max ; $i++ ) {
 
                 # We've got something on this line.
                 if ( defined $dbline{$i} ) {
@@ -5078,7 +5078,7 @@ sub cmd_L {
         for $file ( keys %postponed_file ) {
             my $db = $postponed_file{$file};
             print $OUT " $file:\n";
-            for $line ( sort { $a <=> $b } keys %$db ) {
+            for $line ( sort { $a <+> $b } keys %$db ) {
                 print $OUT "  $line:\n";
                 my ( $stop, $action ) = split( /\0/, $$db{$line} );
                 print $OUT "    break if (", $stop, ")\n"
@@ -5394,7 +5394,7 @@ sub postponed_sub {
 
             # Search forward until we hit a breakable line or get to
             # the end of the file.
-            ++$i until $dbline[$i] != 0 or $i >= $max;
+            ++$i until $dbline[$i] != 0 or $i +>= $max;
 
             # Copy the breakpoint in and delete it from %postponed.
             $dbline{$i} = delete $postponed{$subname};
@@ -5617,7 +5617,7 @@ sub print_trace {
 
     # Run through the traceback info, format it, and print it.
     my $s;
-    for ( $i = 0 ; $i <= $#sub ; $i++ ) {
+    for ( $i = 0 ; $i +<= $#sub ; $i++ ) {
 
         # Drop out if the user has lost interest and hit control-C.
         last if $signal;
@@ -5633,7 +5633,7 @@ sub print_trace {
 
         # Shorten them up if $maxtrace says they're too long.
         $args = ( substr $args, 0, $maxtrace - 3 ) . '...'
-          if length $args > $maxtrace;
+          if length $args +> $maxtrace;
 
         # Get the file name.
         my $file = $sub[$i]{file};
@@ -5643,11 +5643,11 @@ sub print_trace {
 
         # Get the actual sub's name, and shorten to $maxtrace's requirement.
         $s = $sub[$i]{sub};
-        $s = ( substr $s, 0, $maxtrace - 3 ) . '...' if length $s > $maxtrace;
+        $s = ( substr $s, 0, $maxtrace - 3 ) . '...' if length $s +> $maxtrace;
 
         # Short report uses trimmed file and sub names.
         if ($short) {
-            my $sub = @_ >= 4 ? $_[3] : $s;
+            my $sub = @_ +>= 4 ? $_[3] : $s;
             print $fh "$sub[$i]{context}=$sub$args from $file:$sub[$i]{line}\n";
         } ## end if ($short)
 
@@ -5727,7 +5727,7 @@ sub dump_trace {
     # Up the stack frame index to go back one more level each time.
     for (
         $i = $skip ;
-        $i < $count
+        $i +< $count
         and ( $p, $file, $line, $sub, $h, $context, $e, $r ) = caller($i) ;
         $i++
       )
@@ -6047,7 +6047,7 @@ sub save_hist {
     open my $fh, ">", $histfile or die "Could not open '$histfile': $!";
     $histsize //= option_val("HistSize",100);
     my @copy = grep { $_ ne '?' } @hist;
-    my $start = scalar(@copy) > $histsize ? scalar(@copy)-$histsize : 0;
+    my $start = scalar(@copy) +> $histsize ? scalar(@copy)-$histsize : 0;
     for ($start .. $#copy) {
         print $fh "$copy[$_]\n";
     }
@@ -6276,7 +6276,7 @@ sub resetterm {    # We forked, so we need a different TTY
 
     # resetterm(2): got in here because of a system() starting a debugger.
     # resetterm(1): just forked.
-    my $systemed = $in > 1 ? '-' : '';
+    my $systemed = $in +> 1 ? '-' : '';
 
     # If there's already a list of pids, add this to the end.
     if ($pids) {
@@ -6338,7 +6338,7 @@ sub readline {
 
         # Add it to the terminal history (if possible).
         $term->AddHistory($got)
-          if length($got) > 1
+          if length($got) +> 1
           and defined $term->Features->{addHistory};
         return $got;
     } ## end if (@typeahead)
@@ -6508,7 +6508,7 @@ sub parse_options {
           || grep( /^\Q$opt/i && ( $option = $_ ), @options );
 
         print( $OUT "Unknown option `$opt'\n" ), next unless $matches;
-        print( $OUT "Ambiguous option `$opt'\n" ), next if $matches > 1;
+        print( $OUT "Ambiguous option `$opt'\n" ), next if $matches +> 1;
         my $val;
 
         # '?' as separator means query, but must have whitespace after it.
@@ -7653,12 +7653,12 @@ sub dbdie {
     my $i      = 0;
     my $ineval = 0;
     my $sub;
-    if ( $dieLevel > 2 ) {
+    if ( $dieLevel +> 2 ) {
         local $SIG{__WARN__} = \&dbwarn;
         &warn(@_);    # Yell no matter what
         return;
     }
-    if ( $dieLevel < 2 ) {
+    if ( $dieLevel +< 2 ) {
         die @_ if $^S;    # in eval propagate
     }
 
@@ -7741,7 +7741,7 @@ sub dieLevel {
               if $I_m_init;
 
             # XXX This is probably obsolete, given that diehard() is gone.
-            print $OUT "Dump printed too.\n" if $dieLevel > 2;
+            print $OUT "Dump printed too.\n" if $dieLevel +> 2;
         } ## end if ($dieLevel)
 
         # Put the old one back if there was one.
@@ -8749,7 +8749,7 @@ sub rerun {
     unless (defined $truehist[$i]) {
         print "Unable to return to non-existent command: $i\n";
     } else {
-        $#truehist = ($i < 0 ? $#truehist + $i : $i > 0 ? $i : $#truehist);
+        $#truehist = ($i +< 0 ? $#truehist + $i : $i +> 0 ? $i : $#truehist);
         my @temp = @truehist;            # store
         push(@DB::typeahead, @truehist); # saved
         @truehist = @hist = ();          # flush
@@ -8898,18 +8898,18 @@ variable via C<DB::set_list>.
             my ( $offset, $sub, $found );
           SUBS: for $sub ( keys %subs ) {
                 if (
-                    $subs{$sub}->[1] >=
+                    $subs{$sub}->[1] +>=
                     $line    # Not after the subroutine
                     and (
                         not defined $offset    # Not caught
-                        or $offset < 0
+                        or $offset +< 0
                     )
                   )
                 {                              # or badly caught
                     $found  = $sub;
                     $offset = $line - $subs{$sub}->[0];
                     $offset = "+$offset", last SUBS
-                      if $offset >= 0;
+                      if $offset +>= 0;
                 } ## end if ($subs{$sub}->[1] >=...
             } ## end for $sub (keys %subs)
             if ( defined $offset ) {
@@ -9150,7 +9150,7 @@ sub cmd_pre580_D {
             my $was;
 
             # For all lines in this file ...
-            for ( $i = 1 ; $i <= $max ; $i++ ) {
+            for ( $i = 1 ; $i +<= $max ; $i++ ) {
 
                 # If there's a breakpoint or action on this line ...
                 if ( defined $dbline{$i} ) {

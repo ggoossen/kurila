@@ -184,7 +184,7 @@ sub split_like_shell {
   my $arg = '';
   my( $i, $quote_mode ) = ( 0, 0 );
   
-  while ( $i < length() ) {
+  while ( $i +< length() ) {
     
     my $ch      = substr( $_, $i  , 1 );
     my $next_ch = substr( $_, $i+1, 1 );

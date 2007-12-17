@@ -3632,8 +3632,25 @@ Perl_yylex(pTHX)
 
     case '+':
 	{
-	    const char tmp = *s++;
-	    if (*s == tmp) {
+	    s++;
+	    if (*s == '<') {
+		s++;
+		if (*s == '=') {
+		    s++;
+		    Rop(OP_LE);
+		}
+		Rop(OP_LT);
+	    }
+	    if (*s == '>') {
+		s++;
+		if (*s == '=') {
+		    s++;
+		    Rop(OP_GE);
+		}
+		Rop(OP_GT);
+	    }
+
+	    if (*s == '+') {
 		s++;
 		if (PL_expect == XOPERATOR)
 		    TERM(POSTINC);
@@ -4227,27 +4244,19 @@ Perl_yylex(pTHX)
 	    char tmp = *s++;
 	    if (tmp == '<')
 		SHop(OP_LEFT_SHIFT);
-	    if (tmp == '=') {
-		tmp = *s++;
-		if (tmp == '>')
-		    Eop(OP_NCMP);
-		s--;
-		Rop(OP_LE);
+
+	    if ((tmp == '+') && (*s == '>')) {
+		s++;
+		Eop(OP_NCMP);
 	    }
+	    Perl_croak("'<' is reserved for hashes");
 	}
-	s--;
-	Rop(OP_LT);
     case '>':
 	s++;
-	{
-	    const char tmp = *s++;
-	    if (tmp == '>')
-		SHop(OP_RIGHT_SHIFT);
-	    else if (tmp == '=')
-		Rop(OP_GE);
-	}
-	s--;
-	Rop(OP_GT);
+	if (*s++ == '>')
+	    SHop(OP_RIGHT_SHIFT);
+	
+	Perl_croak("'>' is reserved for hashes");
 
     case '$':
 	CLINE;

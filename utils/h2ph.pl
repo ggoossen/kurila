@@ -352,7 +352,7 @@ while (defined (my $file = next_file())) {
     }
 }
 
-if ($opt_e && (scalar(keys %bad_file) > 0)) {
+if ($opt_e && (scalar(keys %bad_file) +> 0)) {
     warn "Was unable to convert the following files:\n";
     warn "\t" . join("\n\t",sort(keys %bad_file)) . "\n";
 }
@@ -372,7 +372,7 @@ sub expr {
 	s/^0X([0-9A-F]+)[UL]*//i
 	    && do {my $hex = $1;
 		   $hex =~ s/^0+//;
-		   if (length $hex > 8 && !$Config{use64bitint}) {
+		   if (length $hex +> 8 && !$Config{use64bitint}) {
 		       # Croak if nv_preserves_uv_bits < 64 ?
 		       $new .=         hex(substr($hex, -8)) +
 			       2**32 * hex(substr($hex,  0, -8));
@@ -408,7 +408,7 @@ sub expr {
             $_ = "{" . "$_";
             my $index = 1;
             # find balanced closing paren
-            while ($index <= length($_) && $lvl > 0) {
+            while ($index +<= length($_) && $lvl +> 0) {
                 $lvl++ if substr($_, $index, 1) eq "(";
                 $lvl-- if substr($_, $index, 1) eq ")";
                 $index++;

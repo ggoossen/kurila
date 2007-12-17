@@ -98,7 +98,7 @@ sub test_truncated {
     # local $Storable::DEBUGME = 1;
     my $clone = &$sub($short);
     is (defined ($clone), '', "truncated $what to $i should fail");
-    if ($i < $magic_len) {
+    if ($i +< $magic_len) {
       like ($@, "/^Magic number checking on storable $what failed/",
           "Should croak with magic number warning");
     } else {

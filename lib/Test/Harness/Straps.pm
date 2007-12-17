@@ -180,7 +180,7 @@ sub _analyze_line {
 
         $results->inc_ok if $point->pass;
 
-        if ( ($point->number > 100_000) && ($point->number > ($self->{max}||100_000)) ) {
+        if ( ($point->number +> 100_000) && ($point->number +> ($self->{max}||100_000)) ) {
             if ( !$self->{too_many_tests}++ ) {
                 warn "Enormous test number seen [test ", $point->number, "]\n";
                 warn "Can't detailize, too big.\n";
@@ -552,7 +552,7 @@ sub _is_header {
 
     if( my($max, $extra) = $line =~ /^1\.\.(\d+)(.*)/ ) {
         $self->{max}  = $max;
-        assert( $self->{max} >= 0,  'Max # of tests looks right' );
+        assert( $self->{max} +>= 0,  'Max # of tests looks right' );
 
         if( defined $extra ) {
             my($todo, $skip, $reason) = $extra =~ /$Extra_Header_Re/xo;

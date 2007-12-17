@@ -31,7 +31,7 @@ sub copy {
 
 sub reach {
   my($self, $point, $note) = @_;
-  if( (my $now = time) >= $self->{'quiet_until'}) {
+  if( (my $now = time) +>= $self->{'quiet_until'}) {
     my $goal;
     my    $to = $self->{'to'};
     print $to join('',

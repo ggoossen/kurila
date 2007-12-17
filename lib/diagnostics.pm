@@ -377,7 +377,7 @@ my %msg;
 	$header =~ s/[A-Z]<(.*?)>/$1/g;
 
         my @toks = split( /(%l?[dx]|%c|%(?:\.\d+)?s)/, $header );
-	if (@toks > 1) {
+	if (@toks +> 1) {
             my $conlen = 0;
             for my $i (0..$#toks){
                 if( $i % 2 ){
@@ -420,7 +420,7 @@ my %msg;
 
     # Apply patterns in order of decreasing sum of lengths of fixed parts
     # Seems the best way of hitting the right one.
-    for my $hdr ( sort { $transfmt{$b}{len} <=> $transfmt{$a}{len} }
+    for my $hdr ( sort { $transfmt{$b}{len} <+> $transfmt{$a}{len} }
                   keys %transfmt ){
         $transmo .= $transfmt{$hdr}{pat};
     }
@@ -632,7 +632,7 @@ sub unescape {
 
 sub shorten {
     my $line = $_[0];
-    if (length($line) > 79 and index($line, "\n") == -1) {
+    if (length($line) +> 79 and index($line, "\n") == -1) {
 	my $space_place = rindex($line, ' ', 79);
 	if ($space_place != -1) {
 	    substr($line, $space_place, 1, "\n\t");

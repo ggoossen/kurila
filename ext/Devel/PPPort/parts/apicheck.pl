@@ -273,7 +273,7 @@ HEAD
     for ($ver, $sub) {
       s/^0+(\d)/$1/
     }
-    if ($ver < 6 && $sub > 0) {
+    if ($ver +< 6 && $sub +> 0) {
       $sub =~ s/0$// or die;
     }
     print OUT "#if PERL_VERSION > $ver || (PERL_VERSION == $ver && PERL_SUBVERSION >= $sub) /* TODO */\n";

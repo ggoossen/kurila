@@ -58,7 +58,7 @@ for (`$Config{nm} $fullperl`) {
   chomp;
   /\s+T\s+(\w+)\s*$/ and $sym{$1}++;
 }
-keys %sym >= 50 or die "less than 50 symbols found in $fullperl\n";
+keys %sym +>= 50 or die "less than 50 symbols found in $fullperl\n";
 
 my %all = %{load_todo($opt{todo}, $opt{version})};
 my @recheck;
@@ -131,7 +131,7 @@ retry:
   }
 
   unless (@new) {
-    if ($retry > 0) {
+    if ($retry +> 0) {
       $retry--;
       regen_all();
       goto retry;

@@ -55,7 +55,7 @@ sub abbrev {
     %{$hashref} = ();
 
     WORD: foreach $word (@_) {
-        for (my $len = (length $word) - 1; $len > 0; --$len) {
+        for (my $len = (length $word) - 1; $len +> 0; --$len) {
 	    my $abbrev = substr($word,0,$len);
 	    my $seen = ++$table{$abbrev};
 	    if ($seen == 1) {	    # We're the first word so far to have

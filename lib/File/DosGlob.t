@@ -24,7 +24,7 @@ if ($^O eq 'MacOS') {
 my @r = glob;
 print "not " if $_ ne $expected;
 print "ok 1\n";
-print "# |@r|\nnot " if @r < 9;
+print "# |@r|\nnot " if @r +< 9;
 print "ok 2\n";
 
 # check if <*/*> works
@@ -34,7 +34,7 @@ if ($^O eq 'MacOS') {
     @r = glob("*/a*.t");
 }
 # atleast {argv,abbrev,anydbm,autoloader,append,arith,array,assignwarn,auto}.t
-print "# |@r|\nnot " if @r < 9;
+print "# |@r|\nnot " if @r +< 9;
 print "ok 3\n";
 my $r = scalar @r;
 

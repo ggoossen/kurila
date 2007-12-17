@@ -38,39 +38,39 @@ sub FIRSTKEY {
   my $eas = shift;
   $eas->[3] = _count($eas->[0]);
   $eas->[4] = 1;
-  return undef if $eas->[4] > $eas->[3];
+  return undef if $eas->[4] +> $eas->[3];
   return _get_name($eas->[0], $eas->[4]);
 }
 
 sub NEXTKEY {
   my $eas = shift;
   $eas->[4]++;
-  return undef if $eas->[4] > $eas->[3];
+  return undef if $eas->[4] +> $eas->[3];
   return _get_name($eas->[0], $eas->[4]);
 }
 
 sub FETCH {
   my $eas = shift;
   my $index = _find($eas->[0], shift);
-  return undef if $index <= 0;
+  return undef if $index +<= 0;
   return value($eas->[0], $index);
 }
 
 sub EXISTS {
   my $eas = shift;
-  return _find($eas->[0], shift) > 0;
+  return _find($eas->[0], shift) +> 0;
 }
 
 sub STORE {
   my $eas = shift;
   $eas->[5] = 1;
-  add($eas->[0], shift, shift) > 0 or die "Error setting EA: $!";
+  add($eas->[0], shift, shift) +> 0 or die "Error setting EA: $!";
 }
 
 sub DELETE {
   my $eas = shift;
   my $index = _find($eas->[0], shift);
-  return undef if $index <= 0;
+  return undef if $index +<= 0;
   my $value = value($eas->[0], $index);
   _delete($eas->[0], $index) and die "Error deleting EA: $!";
   $eas->[5] = 1;

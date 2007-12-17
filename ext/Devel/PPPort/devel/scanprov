@@ -35,7 +35,7 @@ my @provided = grep { !exists $embed{$_} }
 
 my $install = '/tmp/perl/install/default';
 
-my @perls = sort { $b->{version} <=> $a->{version} }
+my @perls = sort { $b->{version} <+> $a->{version} }
             map { { version => `$_ -e 'printf "%.6f", \$]'`, path => $_ } }
             ('bleadperl', glob "$install/*/bin/perl5.*");
 

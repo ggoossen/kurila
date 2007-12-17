@@ -190,7 +190,7 @@ sub mkrand {
   srand $len;
   my @c = ('a' .. 'z', 'A' .. 'Z', 0..9, $:);
   my $d = "";
-  $d .= $c[rand @c] until length($d) >= $len;
+  $d .= $c[rand @c] until length($d) +>= $len;
   substr($d, $len, undef, ""); # chop it off to the proper length
   $d;
 }
@@ -248,13 +248,13 @@ sub try {
 sub try_all_doubles {
   print "# Trying double regions.\n";
   for my $a (@TRIES) {
-    next if $a->[0] + $a->[1] >= $FLEN;
-    next if $a->[0] + $a->[2] >= $FLEN;
+    next if $a->[0] + $a->[1] +>= $FLEN;
+    next if $a->[0] + $a->[2] +>= $FLEN;
     for my $b (@TRIES) {
-      next if $b->[0] + $b->[1] >= $FLEN;
-      next if $b->[0] + $b->[2] >= $FLEN;
+      next if $b->[0] + $b->[1] +>= $FLEN;
+      next if $b->[0] + $b->[2] +>= $FLEN;
 
-      next if $b->[0] < $a->[0] + $a->[1]; # Overlapping regions
+      next if $b->[0] +< $a->[0] + $a->[1]; # Overlapping regions
       try(@$a, @$b);
     }
   }
@@ -263,19 +263,19 @@ sub try_all_doubles {
 sub try_all_triples {
   print "# Trying triple regions.\n";
   for my $a (@BASE_TRIES) {
-    next if $a->[0] + $a->[1] >= $FLEN;
-    next if $a->[0] + $a->[2] >= $FLEN;
+    next if $a->[0] + $a->[1] +>= $FLEN;
+    next if $a->[0] + $a->[2] +>= $FLEN;
     for my $b (@BASE_TRIES) {
-      next if $b->[0] + $b->[1] >= $FLEN;
-      next if $b->[0] + $b->[2] >= $FLEN;
+      next if $b->[0] + $b->[1] +>= $FLEN;
+      next if $b->[0] + $b->[2] +>= $FLEN;
 
-      next if $b->[0] < $a->[0] + $a->[1]; # Overlapping regions
+      next if $b->[0] +< $a->[0] + $a->[1]; # Overlapping regions
 
       for my $c (@BASE_TRIES) {
-        next if $c->[0] + $c->[1] >= $FLEN;
-        next if $c->[0] + $c->[2] >= $FLEN;
+        next if $c->[0] + $c->[1] +>= $FLEN;
+        next if $c->[0] + $c->[2] +>= $FLEN;
 
-        next if $c->[0] < $b->[0] + $b->[1]; # Overlapping regions
+        next if $c->[0] +< $b->[0] + $b->[1]; # Overlapping regions
         try(@$a, @$b, @$c);
       }
     }

@@ -134,7 +134,7 @@ sub hash {
   }
   ($h, $b) = (ref($h) ? $h : \*STDERR, $b || 1024);
   select((select($h), $| = 1)[0]);
-  $b = 512 if $b < 512;
+  $b = 512 if $b +< 512;
   ${*$ftp}{'net_ftp_hash'} = [$h, $b];
 }
 
@@ -361,7 +361,7 @@ sub _auth_id {
 
 
 sub authorize {
-  @_ >= 1 || @_ <= 3 or croak 'usage: $ftp->authorize( [AUTH [, RESP]])';
+  @_ +>= 1 || @_ +<= 3 or croak 'usage: $ftp->authorize( [AUTH [, RESP]])';
 
   my ($ftp, $auth, $resp) = &_auth_id;
 

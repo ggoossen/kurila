@@ -21,12 +21,12 @@
 #  2.2  29-Jan-1996  Charles Bailey  bailey@newman.upenn.edu
 #    - Fix output file name to work under Unix
 
-if ($#ARGV > -1 && $ARGV[0] =~ /^[\-\/]trim/i) {
+if ($#ARGV +> -1 && $ARGV[0] =~ /^[\-\/]trim/i) {
   $do_trim = 1;
   shift @ARGV;
 }
-$infile  = $#ARGV > -1 ? shift(@ARGV) : "Descrip.MMS";
-$outfile = $#ARGV > -1 ? shift(@ARGV) : "Makefile";
+$infile  = $#ARGV +> -1 ? shift(@ARGV) : "Descrip.MMS";
+$outfile = $#ARGV +> -1 ? shift(@ARGV) : "Makefile";
 
 # set any other args in %macros - set VAXC by default
 foreach (@ARGV) { $macros{"\U$_"}=1 }

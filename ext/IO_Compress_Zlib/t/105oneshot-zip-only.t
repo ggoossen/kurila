@@ -113,8 +113,8 @@ sub zipGetHeader
     my $after = time ;
 
     ok ! defined $hdr->{Name}, "  Name is undef";
-    cmp_ok $hdr->{Time} >> 1, '>=', $before >> 1, "  Time is ok";
-    cmp_ok $hdr->{Time} >> 1, '<=', $after >> 1, "  Time is ok";
+    cmp_ok $hdr->{Time} >> 1, '+>=', $before >> 1, "  Time is ok";
+    cmp_ok $hdr->{Time} >> 1, '+<=', $after >> 1, "  Time is ok";
 
     $fh->close;
 
@@ -125,8 +125,8 @@ sub zipGetHeader
     $after = time ;
 
     ok ! defined $hdr->{Name}, "  Name is undef";
-    cmp_ok $hdr->{Time} >> 1, '>=', $before >> 1, "  Time is ok";
-    cmp_ok $hdr->{Time} >> 1, '<=', $after >> 1, "  Time is ok";
+    cmp_ok $hdr->{Time} >> 1, '+>=', $before >> 1, "  Time is ok";
+    cmp_ok $hdr->{Time} >> 1, '+<=', $after >> 1, "  Time is ok";
 }
 
 for my $stream (0, 1)

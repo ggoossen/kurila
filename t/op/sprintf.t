@@ -19,7 +19,7 @@ my $Is_VMS_VAX = 0;
 if ($^O eq 'VMS') {
     my $hw_model;
     chomp($hw_model = `write sys\$output f\$getsyi("HW_MODEL")`);
-    $Is_VMS_VAX = $hw_model < 1024 ? 1 : 0;
+    $Is_VMS_VAX = $hw_model +< 1024 ? 1 : 0;
 }
 
 # No %Config.
@@ -97,7 +97,7 @@ for ($i = 1; @tests; $i++) {
 	    # Only compare on the the first pair of digits, as numeric
 	    # compares don't like 2.6.10-3mdksmp or 2.6.8-24.10-default
 	    s/^(\d+(\.\d+)?).*/$1/ for $osv, $vsn;
-	    $skip = $vsn ? ($osv <= $vsn ? 1 : 0) : 1;
+	    $skip = $vsn ? ($osv +<= $vsn ? 1 : 0) : 1;
 	}
 	$skip and $comment =~ s/$/, failure expected on $^O $osv/;
     }

@@ -38,7 +38,7 @@ my $COUNTRIES = [];
 sub code2country
 {
     my $code = shift;
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $code;
@@ -81,7 +81,7 @@ sub code2country
 sub country2code
 {
     my $country = shift;
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $country;
@@ -131,7 +131,7 @@ sub country_code2code
 #=======================================================================
 sub all_country_codes
 {
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
     return keys %{ $CODES->[$codeset] };
 }
@@ -144,7 +144,7 @@ sub all_country_codes
 #=======================================================================
 sub all_country_names
 {
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
     return values %{ $CODES->[$codeset] };
 }
@@ -164,7 +164,7 @@ sub alias_code
 {
     my $alias = shift;
     my $real  = shift;
-    my $codeset = @_ > 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
     my $country;
 
@@ -200,7 +200,7 @@ sub rename_country
 {
     my $code     = shift;
     my $new_name = shift;
-    my $codeset = @_ > 0 ? shift : _code2codeset($code);
+    my $codeset = @_ +> 0 ? shift : _code2codeset($code);
     my $country;
     my $c;
 

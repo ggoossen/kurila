@@ -20,14 +20,14 @@ eval {
     alarm 3;
 
     # perlfunc recommends against using sleep in combination with alarm.
-    1 while (time - $start_time < 6);
+    1 while (time - $start_time +< 6);
 };
 alarm 0;
 my $diff = time - $start_time;
 
 # alarm time might be one second less than you said.
 is( $@, "ALARM!\n",             'alarm w/$SIG{ALRM} vs inf loop' );
-ok( abs($diff - 3) <= 1,   "   right time" );
+ok( abs($diff - 3) +<= 1,   "   right time" );
 
 
 my $start_time = time;
@@ -45,7 +45,7 @@ is( $@, "ALARM!\n",             'alarm w/$SIG{ALRM} vs system()' );
 {
     local $TODO = "Why does system() block alarm() on $^O?"
 		if $^O eq 'VMS' || $^O eq'MacOS' || $^O eq 'dos';
-    ok( abs($diff - 3) <= 1,   "   right time (waited $diff secs for 3-sec alarm)" );
+    ok( abs($diff - 3) +<= 1,   "   right time (waited $diff secs for 3-sec alarm)" );
 }
 
 

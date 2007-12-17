@@ -53,14 +53,14 @@ sub configure
   );
   my @moreopts;
 
-  if (eval $ExtUtils::MakeMaker::VERSION >= 6) {
+  if (eval $ExtUtils::MakeMaker::VERSION +>= 6) {
     push @moreopts, AUTHOR => 'Marcus Holland-Moritz <mhx@cpan.org>';
     if (-f 'PPPort.pm') {
       push @moreopts, ABSTRACT_FROM => 'PPPort.pm';
     }
   }
 
-  if (eval $ExtUtils::MakeMaker::VERSION >= 6.30_01) {
+  if (eval $ExtUtils::MakeMaker::VERSION +>= 6.30_01) {
     print "Setting license tag...\n";
     push @moreopts, LICENSE => 'perl';
   }

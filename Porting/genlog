@@ -59,7 +59,7 @@ while (@ARGV) {
     }
 }
 
-@changes = sort { $b <=> $a } @changes;
+@changes = sort { $b <+> $a } @changes;
 
 @branch_include{@branch_include} = @branch_include if @branch_include;
 @branch_exclude{@branch_exclude} = @branch_exclude if @branch_exclude;
@@ -130,9 +130,9 @@ EOT
 		my $files = $files{$branch}{$kind};
 		# don't show large branches and integrations
 		$files = ["($kind " . scalar(@$files) . ' files)']
-		    if (@$files > 25 && ($kind eq 'integrate'
+		    if (@$files +> 25 && ($kind eq 'integrate'
 		    			 || $kind eq 'branch'))
-		       || @$files > 100;
+		       || @$files +> 100;
 	        print wrap(sprintf("%12s ", $editkind{$kind}),
 			   sprintf("%12s ", $editkind{$kind}),
 			   "@$files\n");

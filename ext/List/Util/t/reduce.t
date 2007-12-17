@@ -29,7 +29,7 @@ $v = reduce { $a / $b } 6;
 is( $v,	6,	'one arg');
 
 @a = map { rand } 0 .. 20;
-$v = reduce { $a < $b ? $a : $b } @a;
+$v = reduce { $a +< $b ? $a : $b } @a;
 is( $v,	min(@a),	'min');
 
 @a = map { pack("C", int(rand(256))) } 0 .. 20;
@@ -48,7 +48,7 @@ is( $v,	6,	'call sub');
 $v = reduce { eval { die }; $a + $b } 0,1,2,3,4;
 is( $v,	10,	'use eval{}');
 
-$v = !defined eval { reduce { die if $b > 2; $a + $b } 0,1,2,3,4 };
+$v = !defined eval { reduce { die if $b +> 2; $a + $b } 0,1,2,3,4 };
 ok($v, 'die');
 
 sub foobar { reduce { (defined(wantarray) && !wantarray) ? $a+1 : 0 } 0,1,2,3 }
@@ -104,7 +104,7 @@ is($@, '', 'redefine self');
     sub rec { my $n = shift;
         if (!defined($n)) {  # No arg means we're being called by reduce()
             return 1; }
-        if ($n<5) { rec($n+1); }
+        if ($n+<5) { rec($n+1); }
         else { $v = reduce \&rec, 1,2; }
         $failed = 1 if !defined $n;
     }

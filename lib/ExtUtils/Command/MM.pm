@@ -120,8 +120,8 @@ sub pod2man {
         my ($pod, $man) = splice(@ARGV, 0, 2);
 
         next if ((-e $man) &&
-                 (-M $man < -M $pod) &&
-                 (-M $man < -M "Makefile"));
+                 (-M $man +< -M $pod) &&
+                 (-M $man +< -M "Makefile"));
 
         print "Manifying $man\n";
 

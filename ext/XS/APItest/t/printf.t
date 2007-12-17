@@ -42,7 +42,7 @@ ok open(my $foo, "<foo.out"), "open foo.out";
 # now test the output
 my @output = map { chomp; $_ } ~< $foo;
 close $foo;
-ok @output >= 4, "captured at least four output lines";
+ok @output +>= 4, "captured at least four output lines";
 
 is($output[0], "5.000", "print_double");
 is($output[1], "3", "print_int");

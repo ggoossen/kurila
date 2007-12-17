@@ -368,7 +368,7 @@ sub split_on_head {
     my($pod, $dirname, $filename);
 
     # split the files specified in @splithead on =head[1-6] pod directives
-    print "splitting files by head.\n" if $verbose && $#splithead >= 0;
+    print "splitting files by head.\n" if $verbose && $#splithead +>= 0;
     foreach $pod (@splithead) {
 	# figure out the directory name and filename
 	$pod      =~ s,^([^/]*)$,/$1,;
@@ -390,7 +390,7 @@ sub split_on_item {
     my($podroot, $splitdirs, $ignore, @splititem) = @_;
     my($pwd, $dirname, $filename);
 
-    print "splitting files by item.\n" if $verbose && $#splititem >= 0;
+    print "splitting files by item.\n" if $verbose && $#splititem +>= 0;
     $pwd = getcwd();
     my $splitter = File::Spec->rel2abs("$splitpod/splitpod", $pwd);
     my $perl = File::Spec->rel2abs($^X, $pwd);
@@ -444,11 +444,11 @@ sub splitpod {
 
     # restore the file internally by =head[1-6] sections
     @poddata = ();
-    for ($i = 0, $j = -1; $i <= $#filedata; $i++) {
+    for ($i = 0, $j = -1; $i +<= $#filedata; $i++) {
 	$j++ if ($filedata[$i] =~ /^\s*=head[1-6]/);
-	if ($j >= 0) { 
+	if ($j +>= 0) { 
 	    $poddata[$j]  = "" unless defined $poddata[$j];
-	    $poddata[$j] .= "\n$filedata[$i]" if $j >= 0;
+	    $poddata[$j] .= "\n$filedata[$i]" if $j +>= 0;
 	}
     }
 
@@ -474,11 +474,11 @@ sub splitpod {
     $nextsec    = $1;
 
     # for each section of the file create a separate pod file
-    for ($i = 0; $i <= $#poddata; $i++) {
+    for ($i = 0; $i +<= $#poddata; $i++) {
 	# determine the "prev" and "next" links
 	$prevsec = $section;
 	$section = $nextsec;
-	if ($i < $#poddata) {
+	if ($i +< $#poddata) {
 	    $poddata[$i+1] =~ /^\s*=head[1-6]\s+(.*)/;
 	    $nextsec       = $1;
 	} else {
@@ -588,7 +588,7 @@ sub runpod2html {
     # make sure the destination directories exist
     @dirs = split("/", $html);
     $dir  = "$htmldir/";
-    for ($i = 0; $i < $#dirs; $i++) {
+    for ($i = 0; $i +< $#dirs; $i++) {
 	if (! -d "$dir$dirs[$i]") {
 	    mkdir("$dir$dirs[$i]", 0755) ||
 		die "$0: error creating directory $dir$dirs[$i]: $!\n";
@@ -606,7 +606,7 @@ sub runpod2html {
 	"--header",
 	($doindex ? "--index" : "--noindex"),
 	"--" . ($recurse ? "" : "no") . "recurse",
-	($#libpods >= 0) ? "--libpods=" . join(":", @libpods) : "",
+	($#libpods +>= 0) ? "--libpods=" . join(":", @libpods) : "",
 	"--infile=$podroot/$pod", "--outfile=$htmldir/$html");
     die "$0: error running $pod2html: $!\n" if $?;
 }

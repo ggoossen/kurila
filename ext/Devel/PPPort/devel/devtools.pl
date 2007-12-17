@@ -118,7 +118,7 @@ sub ask_or_quit
 sub eta
 {
   my($start, $i, $n) = @_;
-  return "--:--:--" if $i < 3;
+  return "--:--:--" if $i +< 3;
   my $elapsed = tv_interval($start);
   my $h = int($elapsed*($n-$i)/$i);
   my $s = $h % 60; $h /= 60;

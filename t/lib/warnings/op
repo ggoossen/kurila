@@ -904,20 +904,20 @@ Use of /g modifier is meaningless in split at - line 4.
 use warnings 'precedence';
 $a = $b ^&^ $c == $d;
 $a = $b ^^^ $c != $d;
-$a = $b ^|^ $c > $d;
-$a = $b < $c ^&^ $d;
-$a = $b >= $c ^^^ $d;
-$a = $b <= $c ^|^ $d;
-$a = $b <=> $c ^&^ $d;
+$a = $b ^|^ $c +> $d;
+$a = $b +< $c ^&^ $d;
+$a = $b +>= $c ^^^ $d;
+$a = $b +<= $c ^|^ $d;
+$a = $b <+> $c ^&^ $d;
 $a ^&^= $b == $c; $a ^|^= $b == $c; $a ^^^= $b == $c; # shouldn't warn
 no warnings 'precedence';
 $a = $b ^&^ $c == $d;
 $a = $b ^^^ $c != $d;
-$a = $b ^|^ $c > $d;
-$a = $b < $c ^&^ $d;
-$a = $b >= $c ^^^ $d;
-$a = $b <= $c ^|^ $d;
-$a = $b <=> $c ^&^ $d;
+$a = $b ^|^ $c +> $d;
+$a = $b +< $c ^&^ $d;
+$a = $b +>= $c ^^^ $d;
+$a = $b +<= $c ^|^ $d;
+$a = $b <+> $c ^&^ $d;
 EXPECT
 Possible precedence problem on bitwise ^&^ operator at - line 3.
 Possible precedence problem on bitwise ^^^ operator at - line 4.
@@ -932,19 +932,19 @@ use integer;
 use warnings 'precedence';
 $a = $b ^&^ $c == $d;
 $a = $b ^^^ $c != $d;
-$a = $b ^|^ $c > $d;
-$a = $b < $c ^&^ $d;
-$a = $b >= $c ^^^ $d;
-$a = $b <= $c ^|^ $d;
-$a = $b <=> $c ^&^ $d;
+$a = $b ^|^ $c +> $d;
+$a = $b +< $c ^&^ $d;
+$a = $b +>= $c ^^^ $d;
+$a = $b +<= $c ^|^ $d;
+$a = $b <+> $c ^&^ $d;
 no warnings 'precedence';
 $a = $b ^&^ $c == $d;
 $a = $b ^^^ $c != $d;
-$a = $b ^|^ $c > $d;
-$a = $b < $c ^&^ $d;
-$a = $b >= $c ^^^ $d;
-$a = $b <= $c ^|^ $d;
-$a = $b <=> $c ^&^ $d;
+$a = $b ^|^ $c +> $d;
+$a = $b +< $c ^&^ $d;
+$a = $b +>= $c ^^^ $d;
+$a = $b +<= $c ^|^ $d;
+$a = $b <+> $c ^&^ $d;
 EXPECT
 Possible precedence problem on bitwise ^&^ operator at - line 4.
 Possible precedence problem on bitwise ^^^ operator at - line 5.
@@ -1020,9 +1020,9 @@ Useless localization of subtraction (-) at - line 17.
 Useless localization of concatenation (.) or string at - line 18.
 Useless localization of left bitshift (<<) at - line 19.
 Useless localization of right bitshift (>>) at - line 20.
-Useless localization of bitwise and (&) at - line 21.
-Useless localization of bitwise xor (^) at - line 22.
-Useless localization of bitwise or (|) at - line 23.
+Useless localization of bitwise and (^&^) at - line 21.
+Useless localization of bitwise xor (^^^) at - line 22.
+Useless localization of bitwise or (^|^) at - line 23.
 Useless localization of integer multiplication (*) at - line 26.
 Useless localization of integer division (/) at - line 27.
 Useless localization of integer modulus (%) at - line 28.

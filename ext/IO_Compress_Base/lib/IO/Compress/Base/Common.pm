@@ -866,7 +866,7 @@ sub add
      
     my $available = MAX32 - $self->[LOW] ;
 
-    if ($value > $available) {
+    if ($value +> $available) {
        ++ $self->[HIGH] ;
        $self->[LOW] = $value - $available - 1;
     }

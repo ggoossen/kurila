@@ -15,7 +15,7 @@ plan tests => 4, todo => [2,3];
 # line 15
 ok(sub { 
        my $r = 0;
-       for (my $x=0; $x < 10; $x++) {
+       for (my $x=0; $x +< 10; $x++) {
 	   $r += $x*($r+1);
        }
        $r

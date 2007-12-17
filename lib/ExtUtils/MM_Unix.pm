@@ -987,7 +987,7 @@ Finds the executables PERL and FULLPERL
 sub find_perl {
     my($self, $ver, $names, $dirs, $trace) = @_;
     my($name, $dir);
-    if ($trace >= 2){
+    if ($trace +>= 2){
         print "Looking for perl $ver by these names:
 @$names
 in these dirs:
@@ -1021,11 +1021,11 @@ WARNING
             } else {                                            # foo/bar
                 $abs = $self->catfile($Curdir, $name);
             }
-            print "Checking $abs\n" if ($trace >= 2);
+            print "Checking $abs\n" if ($trace +>= 2);
             next unless $self->maybe_command($abs);
-            print "Executing $abs\n" if ($trace >= 2);
+            print "Executing $abs\n" if ($trace +>= 2);
 
-            my $version_check = qq{$abs -le "\$^V >= $ver; print qq{VER_OK}"};
+            my $version_check = qq{$abs -le "\$^V =~ m/^\Q$ver\E/; print qq{VER_OK}"};
             $version_check = "$Config{run} $version_check"
                 if defined $Config{run} and length $Config{run};
 
@@ -1046,7 +1046,7 @@ WARNING
             if ($val =~ /^VER_OK/m) {
                 print "Using PERL=$abs\n" if $trace;
                 return $abs;
-            } elsif ($trace >= 2) {
+            } elsif ($trace +>= 2) {
                 print "Result: '$val' ".($? >> 8)."\n";
             }
         }
@@ -1481,7 +1481,7 @@ sub init_PM {
 
     if (@{$self->{PMLIBDIRS}}){
 	print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
-	    if ($Verbose >= 2);
+	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
             if (-d $_){
@@ -1506,7 +1506,7 @@ sub init_PM {
 	    my($inst) = $self->catfile($prefix,$striplibpath);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
-	    print "libscan($path) => '$inst'\n" if ($Verbose >= 2);
+	    print "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
 	    return unless $inst;
 	    $self->{PM}{$path} = $inst;
 	}, @{$self->{PMLIBDIRS}});
@@ -1944,7 +1944,7 @@ sub init_PERL {
     }
 
     $self->{PERL} ||=
-        $self->find_perl(5.0, \@perls, \@defpath, $Verbose );
+        $self->find_perl('kurila', \@perls, \@defpath, $Verbose );
     # don't check if perl is executable, maybe they have decided to
     # supply switches with perl
 
@@ -2215,7 +2215,7 @@ sub installbin {
 
 	local($_) = $path; # for backwards compatibility
 	my $to = $self->libscan($path);
-	print "libscan($from) => '$to'\n" if ($Verbose >=2);
+	print "libscan($from) => '$to'\n" if ($Verbose +>=2);
 
         $to = vmsify($to) if $Is_VMS;
 	$fromto{$from} = $to;
@@ -3063,20 +3063,20 @@ sub prefixify {
 
     $rprefix .= '/' if $sprefix =~ m|/$|;
 
-    print STDERR "  prefixify $var => $path\n" if $Verbose >= 2;
-    print STDERR "    from $sprefix to $rprefix\n" if $Verbose >= 2;
+    print STDERR "  prefixify $var => $path\n" if $Verbose +>= 2;
+    print STDERR "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
     if( $self->{ARGS}{PREFIX} && $self->file_name_is_absolute($path) && 
         $path !~ s{^\Q$sprefix\E\b}{$rprefix}s ) 
     {
 
-        print STDERR "    cannot prefix, using default.\n" if $Verbose >= 2;
-        print STDERR "    no default!\n" if !$default && $Verbose >= 2;
+        print STDERR "    cannot prefix, using default.\n" if $Verbose +>= 2;
+        print STDERR "    no default!\n" if !$default && $Verbose +>= 2;
 
         $path = $self->catdir($rprefix, $default) if $default;
     }
 
-    print "    now $path\n" if $Verbose >= 2;
+    print "    now $path\n" if $Verbose +>= 2;
     return $self->{uc $var} = $path;
 }
 

@@ -134,7 +134,7 @@ for my $src (sort keys %e) {
 SKIP:{
     my $pev = PerlIO::encoding->VERSION;
     skip "PerlIO::encoding->VERSION = $pev <= 0.07 ", 6
-    unless ($pev >= 0.07 or $DEBUG);
+    unless ($pev +>= 0.07 or $DEBUG);
 
     my $file = File::Spec->catfile($dir,"jisx0208.utf");
     open my $fh, "<:utf8", $file or die "$file : $!";

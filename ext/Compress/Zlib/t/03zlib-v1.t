@@ -891,7 +891,7 @@ EOM
 
     ok my $compressed = Compress::Zlib::memGzip(\$contents) ;
 
-    ok length $compressed > 4096 ;
+    ok length $compressed +> 4096 ;
     ok my $out = Compress::Zlib::memGunzip(\$compressed) ;
      
     ok $contents eq $out ;
@@ -924,7 +924,7 @@ EOM
     {
         title "Header Corruption - Fingerprint wrong 2nd byte" ;
         my $buffer = $good ;
-        substr($buffer, 1, 1, "\xFF") ;
+        substr($buffer, 1, 1, "\x[FF]") ;
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
     }
@@ -940,7 +940,7 @@ EOM
     {
         title "Header Corruption - Use of Reserved Flags";
         my $buffer = $good ;
-        substr($buffer, 3, 1, "\xff");
+        substr($buffer, 3, 1, "\x[ff]");
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
     }
@@ -1096,7 +1096,7 @@ sub slurp
     my $input;
     my $fil = gzopen($name, "rb") ;
     ok $fil , "opened $name";
-    cmp_ok $fil->gzread($input, 50000), ">", 0, "read more than zero bytes";
+    cmp_ok $fil->gzread($input, 50000), "+>", 0, "read more than zero bytes";
     ok ! $fil->gzclose(), "closed ok";
 
     return $input;
@@ -1110,7 +1110,7 @@ sub trickle
     my $input;
     $fil = gzopen($name, "rb") ;
     ok $fil, "opened ok";
-    while ($fil->gzread($input, 50000) > 0)
+    while ($fil->gzread($input, 50000) +> 0)
     {
         $got .= $input;
         $input = '';

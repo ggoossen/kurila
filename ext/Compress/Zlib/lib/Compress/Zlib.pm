@@ -72,7 +72,7 @@ sub _set_gzerr
     if ($value == 0) {
         $Compress::Zlib::gzerrno = 0 ;
     }
-    elsif ($value == Z_ERRNO() || $value > 2) {
+    elsif ($value == Z_ERRNO() || $value +> 2) {
         $Compress::Zlib::gzerrno = $! ;
     }
     else {
@@ -352,7 +352,7 @@ sub deflateInit(@)
 
     croak "Compress::Zlib::deflateInit: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
-        unless $got->value('Bufsize') >= 1;
+        unless $got->value('Bufsize') +>= 1;
 
     my $obj ;
  
@@ -383,7 +383,7 @@ sub inflateInit(@)
 
     croak "Compress::Zlib::inflateInit: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
-        unless $got->value('Bufsize') >= 1;
+        unless $got->value('Bufsize') +>= 1;
 
     my $status = 0 ;
     my $obj ;
@@ -458,7 +458,7 @@ sub _removeGzipHeader($)
     my $string = shift ;
 
     return Z_DATA_ERROR() 
-        if length($$string) < GZIP_MIN_HEADER_SIZE ;
+        if length($$string) +< GZIP_MIN_HEADER_SIZE ;
 
     my ($magic1, $magic2, $method, $flags, $time, $xflags, $oscode) = 
         unpack ('CCCCVCC', $$string);
@@ -472,12 +472,12 @@ sub _removeGzipHeader($)
     if ($flags ^&^ GZIP_FLG_FEXTRA)
     {
         return Z_DATA_ERROR()
-            if length($$string) < GZIP_FEXTRA_HEADER_SIZE ;
+            if length($$string) +< GZIP_FEXTRA_HEADER_SIZE ;
 
         my ($extra_len) = unpack ('v', $$string);
         $extra_len += GZIP_FEXTRA_HEADER_SIZE;
         return Z_DATA_ERROR()
-            if length($$string) < $extra_len ;
+            if length($$string) +< $extra_len ;
 
         substr($$string, 0, $extra_len, '');
     }
@@ -504,7 +504,7 @@ sub _removeGzipHeader($)
     if ($flags ^&^ GZIP_FLG_FHCRC)
     {
         return Z_DATA_ERROR()
-            if length ($$string) < GZIP_FHCRC_SIZE ;
+            if length ($$string) +< GZIP_FHCRC_SIZE ;
         substr($$string, 0, GZIP_FHCRC_SIZE, '');
     }
     
@@ -520,7 +520,7 @@ sub memGunzip($)
     _removeGzipHeader($string) == Z_OK() 
         or return undef;
      
-    my $bufsize = length $$string > 4096 ? length $$string : 4096 ;
+    my $bufsize = length $$string +> 4096 ? length $$string : 4096 ;
     my $x = Compress::Raw::Zlib::Inflate->new({-WindowBits => - MAX_WBITS(),
                          -Bufsize => $bufsize}) 
 
@@ -531,7 +531,7 @@ sub memGunzip($)
     return undef 
         unless $status == Z_STREAM_END();
 
-    if (length $$string >= 8)
+    if (length $$string +>= 8)
     {
         my ($crc, $len) = unpack ("VV", substr($$string, 0, 8));
         substr($$string, 0, 8, '');

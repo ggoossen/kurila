@@ -127,7 +127,7 @@ sub encode($$;$) {
         my $subline = '';
         for my $word (@word) {
             use bytes ();
-            if ( bytes::length($subline) + bytes::length($word) >
+            if ( bytes::length($subline) + bytes::length($word) +>
                 $obj->{bpl} )
             {
                 push @subline, $subline;
@@ -157,7 +157,7 @@ sub _encode {
     my $chunk  = '';
     while ( utf8::length( my $chr = utf8::substr( $str, 0, 1, '' ) ) ) {
         use bytes ();
-        if ( bytes::length($chunk) + bytes::length($chr) > $llen ) {
+        if ( bytes::length($chunk) + bytes::length($chr) +> $llen ) {
             push @result, SINGLE->{$enc}($chunk);
             $chunk = '';
         }

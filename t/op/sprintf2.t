@@ -91,7 +91,7 @@ sub mysprintf_int_flags {
     die "wrong format $fmt" if $fmt !~ /^%([-+ 0]+)([1-9][0-9]*)d\z/;
     my $flag  = $1;
     my $width = $2;
-    my $sign  = $num < 0 ? '-' :
+    my $sign  = $num +< 0 ? '-' :
 		$flag =~ /\+/ ? '+' :
 		$flag =~ /\ / ? ' ' :
 		'';

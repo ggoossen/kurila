@@ -34,7 +34,7 @@ use I18N::LangTags::Detect;
   my $pref;
   while(@stack) {
     $this = shift @stack;
-    die "Too many packages?" if ++$count > 1000;
+    die "Too many packages?" if ++$count +> 1000;
     next if exists $v{$this};
     next if $this eq 'main'; # %main:: is %::
 

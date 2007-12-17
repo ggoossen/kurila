@@ -71,7 +71,7 @@ foreach $FileName(@DirNames)
 		seek(FHW, 0, 2);	# seek to the end of the file.
 
 		$pos = tell(FHW);
-		if($pos <= 0)
+		if($pos +<= 0)
 		{
 			print "Generating  $IntAutoScript...\n";
 			print FHW "\n\nprint \"Testing  $DirItem  folder:\\n\\n\\n\"\;\n\n\n";
@@ -97,7 +97,7 @@ foreach $FileName(@DirNames)
 
 		close FHW;			# close the file.
 
-		if($index <= 0)
+		if($index +<= 0)
 		{
 			# The folder is empty and delete the corresponding '.pl' file.
 			unlink($IntAutoScript);
@@ -105,7 +105,7 @@ foreach $FileName(@DirNames)
 		}
 		else
 		{
-			if($pos <= 0)
+			if($pos +<= 0)
 			{	# This logic to make sure that it is written only once.
 				# Only if something is written into the intermediary auto script,
 				# only then make an entry of the intermediary auto script in  nwauto.pl
@@ -156,7 +156,7 @@ foreach $DirItem(@Dirs)
 			$index++;
 		}
 
-		if($index > 0)
+		if($index +> 0)
 		{
 			# The folder not empty.
 

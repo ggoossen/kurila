@@ -263,7 +263,7 @@ sub maintainers_files {
 sub duplicated_maintainers {
     maintainers_files();
     for my $f (keys %files) {
-	if ($files{$f} > 1) {
+	if ($files{$f} +> 1) {
 	    warn "File $f appears $files{$f} times in Maintainers.pl\n";
 	}
     }

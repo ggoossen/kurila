@@ -313,20 +313,20 @@ $v = $g1 ^&^ $g2;
 $v = $g1 ^^^ $g2;
 $v = ^~^$g1;
 EXPECT
-Use of uninitialized value $m1 in bitwise or (|) at - line 5.
-Use of uninitialized value $m2 in bitwise or (|) at - line 5.
-Use of uninitialized value $m1 in bitwise and (&) at - line 6.
-Use of uninitialized value $m2 in bitwise and (&) at - line 6.
-Use of uninitialized value $m1 in bitwise xor (^) at - line 7.
-Use of uninitialized value $m2 in bitwise xor (^) at - line 7.
-Use of uninitialized value $m1 in 1's complement (~) at - line 8.
-Use of uninitialized value $g1 in bitwise or (|) at - line 10.
-Use of uninitialized value $g2 in bitwise or (|) at - line 10.
-Use of uninitialized value $g1 in bitwise and (&) at - line 11.
-Use of uninitialized value $g2 in bitwise and (&) at - line 11.
-Use of uninitialized value $g1 in bitwise xor (^) at - line 12.
-Use of uninitialized value $g2 in bitwise xor (^) at - line 12.
-Use of uninitialized value $g1 in 1's complement (~) at - line 13.
+Use of uninitialized value $m1 in bitwise or (^|^) at - line 5.
+Use of uninitialized value $m2 in bitwise or (^|^) at - line 5.
+Use of uninitialized value $m1 in bitwise and (^&^) at - line 6.
+Use of uninitialized value $m2 in bitwise and (^&^) at - line 6.
+Use of uninitialized value $m1 in bitwise xor (^^^) at - line 7.
+Use of uninitialized value $m2 in bitwise xor (^^^) at - line 7.
+Use of uninitialized value $m1 in 1's complement (^~^) at - line 8.
+Use of uninitialized value $g1 in bitwise or (^|^) at - line 10.
+Use of uninitialized value $g2 in bitwise or (^|^) at - line 10.
+Use of uninitialized value $g1 in bitwise and (^&^) at - line 11.
+Use of uninitialized value $g2 in bitwise and (^&^) at - line 11.
+Use of uninitialized value $g1 in bitwise xor (^^^) at - line 12.
+Use of uninitialized value $g2 in bitwise xor (^^^) at - line 12.
+Use of uninitialized value $g1 in 1's complement (^~^) at - line 13.
 ########
 use warnings 'uninitialized';
 my ($v);
@@ -441,13 +441,13 @@ eval {$v = $m1 / $g1};
 $v = $m2 / 2;
 eval {$v = $m1 % $g1};
 $v = $m2 % 2;
-$v = $m1 < $g1;
-$v = $m1 > $g1;
-$v = $m1 <= $g1;
-$v = $m1 >= $g1;
+$v = $m1 +< $g1;
+$v = $m1 +> $g1;
+$v = $m1 +<= $g1;
+$v = $m1 +>= $g1;
 $v = $m1 == $g1;
 $v = $m1 != $g1;
-$v = $m1 <=> $g1;
+$v = $m1 <+> $g1;
 $v = -$m1;
 EXPECT
 Use of uninitialized value $g1 in integer addition (+) at - line 6.
@@ -461,20 +461,20 @@ Use of uninitialized value $m2 in integer division (/) at - line 10.
 Use of uninitialized value $g1 in integer modulus (%) at - line 11.
 Use of uninitialized value $m1 in integer modulus (%) at - line 11.
 Use of uninitialized value $m2 in integer modulus (%) at - line 12.
-Use of uninitialized value $g1 in integer lt (<) at - line 13.
-Use of uninitialized value $m1 in integer lt (<) at - line 13.
-Use of uninitialized value $g1 in integer gt (>) at - line 14.
-Use of uninitialized value $m1 in integer gt (>) at - line 14.
-Use of uninitialized value $g1 in integer le (<=) at - line 15.
-Use of uninitialized value $m1 in integer le (<=) at - line 15.
-Use of uninitialized value $g1 in integer ge (>=) at - line 16.
-Use of uninitialized value $m1 in integer ge (>=) at - line 16.
+Use of uninitialized value $g1 in integer lt (+<) at - line 13.
+Use of uninitialized value $m1 in integer lt (+<) at - line 13.
+Use of uninitialized value $g1 in integer gt (+>) at - line 14.
+Use of uninitialized value $m1 in integer gt (+>) at - line 14.
+Use of uninitialized value $g1 in integer le (+<=) at - line 15.
+Use of uninitialized value $m1 in integer le (+<=) at - line 15.
+Use of uninitialized value $g1 in integer ge (+>=) at - line 16.
+Use of uninitialized value $m1 in integer ge (+>=) at - line 16.
 Use of uninitialized value $g1 in integer eq (==) at - line 17.
 Use of uninitialized value $m1 in integer eq (==) at - line 17.
 Use of uninitialized value $g1 in integer ne (!=) at - line 18.
 Use of uninitialized value $m1 in integer ne (!=) at - line 18.
-Use of uninitialized value $g1 in integer comparison (<=>) at - line 19.
-Use of uninitialized value $m1 in integer comparison (<=>) at - line 19.
+Use of uninitialized value $g1 in integer comparison (<+>) at - line 19.
+Use of uninitialized value $m1 in integer comparison (<+>) at - line 19.
 Use of uninitialized value $m1 in integer negation (-) at - line 20.
 ########
 use warnings 'uninitialized';
@@ -508,8 +508,8 @@ our ($g1);
 
 my @sort;
 @sort = sort $m1, $g1;
-@sort = sort {$a <=> $b} $m1, $g1;
-sub sortf {$a-1 <=> $b-1};
+@sort = sort {$a <+> $b} $m1, $g1;
+sub sortf {$a-1 <+> $b-1};
 @sort = sort  &sortf, $m1, $g1;
 EXPECT
 Use of uninitialized value $m1 in sort at - line 6.
@@ -538,12 +538,12 @@ $v = $m2 / 2;
 eval { $v = $m1 % $g1 };
 $v = $m2 % 2;
 $v = $m1 == $g1;
-$v = $m1 >= $g1;
-$v = $m1 >  $g1;
-$v = $m1 <= $g1;
-$v = $m1 <  $g1;
+$v = $m1 +>= $g1;
+$v = $m1 +>  $g1;
+$v = $m1 +<= $g1;
+$v = $m1 +<  $g1;
 $v = $m1 *  $g1;
-$v = $m1 <=>$g1;
+$v = $m1 <+>$g1;
 $v = $m1 != $g1;
 $v = $m1   -$g1;
 $v = $m1 ** $g1;
@@ -558,18 +558,18 @@ Use of uninitialized value $m1 in modulus (%) at - line 7.
 Use of uninitialized value $m2 in modulus (%) at - line 8.
 Use of uninitialized value $g1 in numeric eq (==) at - line 9.
 Use of uninitialized value $m1 in numeric eq (==) at - line 9.
-Use of uninitialized value $g1 in numeric ge (>=) at - line 10.
-Use of uninitialized value $m1 in numeric ge (>=) at - line 10.
-Use of uninitialized value $g1 in numeric gt (>) at - line 11.
-Use of uninitialized value $m1 in numeric gt (>) at - line 11.
-Use of uninitialized value $g1 in numeric le (<=) at - line 12.
-Use of uninitialized value $m1 in numeric le (<=) at - line 12.
-Use of uninitialized value $g1 in numeric lt (<) at - line 13.
-Use of uninitialized value $m1 in numeric lt (<) at - line 13.
+Use of uninitialized value $g1 in numeric ge (+>=) at - line 10.
+Use of uninitialized value $m1 in numeric ge (+>=) at - line 10.
+Use of uninitialized value $g1 in numeric gt (+>) at - line 11.
+Use of uninitialized value $m1 in numeric gt (+>) at - line 11.
+Use of uninitialized value $g1 in numeric le (+<=) at - line 12.
+Use of uninitialized value $m1 in numeric le (+<=) at - line 12.
+Use of uninitialized value $g1 in numeric lt (+<) at - line 13.
+Use of uninitialized value $m1 in numeric lt (+<) at - line 13.
 Use of uninitialized value $g1 in multiplication (*) at - line 14.
 Use of uninitialized value $m1 in multiplication (*) at - line 14.
-Use of uninitialized value $g1 in numeric comparison (<=>) at - line 15.
-Use of uninitialized value $m1 in numeric comparison (<=>) at - line 15.
+Use of uninitialized value $g1 in numeric comparison (<+>) at - line 15.
+Use of uninitialized value $m1 in numeric comparison (<+>) at - line 15.
 Use of uninitialized value $g1 in numeric ne (!=) at - line 16.
 Use of uninitialized value $m1 in numeric ne (!=) at - line 16.
 Use of uninitialized value $g1 in subtraction (-) at - line 17.

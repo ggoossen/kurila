@@ -26,7 +26,7 @@ for my $constant (@constants) {
         is( $@, '', "calling langinfo() with $constant" );
         skip "returned string was empty, skipping next two tests", 2 unless $string;
         ok( defined $string, "checking if the returned string is defined" );
-        cmp_ok( length($string), '>=', 1, "checking if the returned string has a positive length" );
+        cmp_ok( length($string), '+>=', 1, "checking if the returned string has a positive length" );
     }
 }
 

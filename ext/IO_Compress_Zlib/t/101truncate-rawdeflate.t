@@ -63,7 +63,7 @@ foreach my $CompressClass ( 'IO::Compress::RawDeflate')
                                   -Transparent => 0)))
             or diag "$$Error\n";
     my $un;
-    ok $gz->read($un) > 0 ;
+    ok $gz->read($un) +> 0 ;
     ok $gz->close();
     ok $un eq $hello ;
     
@@ -118,8 +118,8 @@ foreach my $CompressClass ( 'IO::Compress::RawDeflate')
                                              -Transparent => $trans);
             my $un ;
             my $status = 1 ;
-            $status = $gz->read($un) while $status > 0 ;
-            ok $status < 0 ;
+            $status = $gz->read($un) while $status +> 0 ;
+            ok $status +< 0 ;
             ok $gz->eof() ;
             ok $gz->error() ;
             $gz->close();

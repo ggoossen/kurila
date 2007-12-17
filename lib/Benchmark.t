@@ -17,7 +17,7 @@ my $delta = 0.4;
 # Some timing ballast
 sub fib {
   my $n = shift;
-  return $n if $n < 2;
+  return $n if $n +< 2;
   fib($n-1) + fib($n-2);
 }
 $ballast = 15;
@@ -62,7 +62,7 @@ isa_ok($threesecs, 'Benchmark', "countit 0, CODEREF");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_threesecs = $threesecs->iters;
 print "# $in_threesecs iterations\n";
-ok ($in_threesecs > 0, "iters returned positive iterations");
+ok ($in_threesecs +> 0, "iters returned positive iterations");
 
 my $estimate = int (100 * $in_threesecs / 3) / 100;
 print "# from the 3 second run estimate $estimate iterations in 1 second...\n";
@@ -72,14 +72,14 @@ isa_ok($onesec, 'Benchmark', "countit 1, CODEREF");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_onesec = $onesec->iters;
 print "# $in_onesec iterations\n";
-ok ($in_onesec > 0, "iters returned positive iterations");
+ok ($in_onesec +> 0, "iters returned positive iterations");
 
 {
   my $difference = $in_onesec - $estimate;
   my $actual = abs ($difference / $in_onesec);
-  ok ($actual < $delta, "is $in_onesec within $delta of estimate ($estimate)");
+  ok ($actual +< $delta, "is $in_onesec within $delta of estimate ($estimate)");
   print "# $in_onesec is between " . ($delta / 2) .
-    " and $delta of estimate. Not that safe.\n" if $actual > $delta/2;
+    " and $delta of estimate. Not that safe.\n" if $actual +> $delta/2;
 }
 
 # I found that the eval'ed version was 3 times faster than the coderef.
@@ -90,7 +90,7 @@ isa_ok($onesec, 'Benchmark', "countit 1, eval");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_again = $again->iters;
 print "# $in_again iterations\n";
-ok ($in_again > 0, "iters returned positive iterations");
+ok ($in_again +> 0, "iters returned positive iterations");
 
 
 my $t1 = Benchmark->new();
@@ -189,8 +189,8 @@ like ($got, $Nop_Pattern, 'specify format as nop');
     select(STDOUT);
     isa_ok($got, 'Benchmark',
            "timethis, at least 2 seconds with format 'none'");
-    ok ($foo > 0, "benchmarked code was run");
-    ok ($end - $start > 1, "benchmarked code ran for over 1 second");
+    ok ($foo +> 0, "benchmarked code was run");
+    ok ($end - $start +> 1, "benchmarked code ran for over 1 second");
 
     $got = $out->read();
     # Remove any warnings about having too few iterations.
@@ -242,10 +242,10 @@ my $results;
     isa_ok($results->{Foo}, 'Benchmark', "Foo value");
     isa_ok($results->{Bar}, 'Benchmark', "Bar value");
     eq_set([keys %$results], [qw(Foo Bar)], 'should be exactly two objects');
-    ok ($foo > 0, "Foo code was run");
-    ok ($bar > 0, "Bar code was run");
+    ok ($foo +> 0, "Foo code was run");
+    ok ($bar +> 0, "Bar code was run");
 
-    ok (($end - $start) > 0.1, "benchmarked code ran for over 0.1 seconds");
+    ok (($end - $start) +> 0.1, "benchmarked code ran for over 0.1 seconds");
 
     $got = $out->read();
     # Remove any warnings about having too few iterations.
@@ -296,14 +296,14 @@ sub check_graph_consistency {
 
     (my $slowfast = $slowfastt) =~ s!%!!;
     (my $fastslow = $fastslowt) =~ s!%!!;
-    if ($slowrate < $fastrate) {
+    if ($slowrate +< $fastrate) {
         pass ("slow rate is less than fast rate");
-        unless (ok ($slowfast <= 0 && $slowfast >= -100,
+        unless (ok ($slowfast +<= 0 && $slowfast +>= -100,
                     "slowfast should be less than or equal to zero, and >= -100")) {
           print STDERR "# slowfast $slowfast\n";
           $all_passed = 0;
         }
-        unless (ok ($fastslow > 0, "fastslow should be > 0")) {
+        unless (ok ($fastslow +> 0, "fastslow should be > 0")) {
           print STDERR "# fastslow $fastslow\n";
           $all_passed = 0;
         }
@@ -357,7 +357,7 @@ sub check_graph {
     my $chart = cmpthese( -0.1, { a => "++\$i", b => "\$i = sqrt(\$i++)" }, "auto" ) ;
     my $end = times;
     select(STDOUT);
-    ok (($end - $start) > 0.05, "benchmarked code ran for over 0.05 seconds");
+    ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
 
     $got = $out->read();
     # Remove any warnings about having too few iterations.
@@ -379,7 +379,7 @@ sub check_graph {
     my $chart = cmpthese( -0.1, { a => "++\$i", b => "\$i = sqrt(\$i++)" } ) ;
     my $end = times;
     select(STDOUT);
-    ok (($end - $start) > 0.05, "benchmarked code ran for over 0.05 seconds");
+    ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
 
     $got = $out->read();
     # Remove any warnings about having too few iterations.
@@ -399,8 +399,8 @@ sub check_graph {
     select(OUT);
     my $chart = cmpthese( 10, $code_to_test, 'nop' ) ;
     select(STDOUT);
-    ok ($foo > 0, "Foo code was run");
-    ok ($bar > 0, "Bar code was run");
+    ok ($foo +> 0, "Foo code was run");
+    ok ($bar +> 0, "Bar code was run");
 
     $got = $out->read();
     # Remove any warnings about having too few iterations.
@@ -419,8 +419,8 @@ sub check_graph {
     select(OUT);
     my $chart = cmpthese( 10, $code_to_test, 'none' ) ;
     select(STDOUT);
-    ok ($foo > 0, "Foo code was run");
-    ok ($bar > 0, "Bar code was run");
+    ok ($foo +> 0, "Foo code was run");
+    ok ($bar +> 0, "Bar code was run");
 
     $got = $out->read();
     # Remove any warnings about having too few iterations.

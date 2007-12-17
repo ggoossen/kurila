@@ -45,7 +45,7 @@ $data =~ s{^(.*)__PROVIDED_API__(\s*?)^}
 {
   my $len = 0;
   for (keys %explicit) {
-    length > $len and $len = length;
+    length +> $len and $len = length;
   }
   my $format = sprintf '%%-%ds  %%-%ds  %%s', $len+2, $len+5;
   $len = 3*$len + 23;
@@ -325,7 +325,7 @@ sub check
 {
   my $level = shift;
 
-  if (exists $ENV{DPPP_CHECK_LEVEL} and $ENV{DPPP_CHECK_LEVEL} >= $level) {
+  if (exists $ENV{DPPP_CHECK_LEVEL} and $ENV{DPPP_CHECK_LEVEL} +>= $level) {
     print STDERR @_, "\n";
   }
 }

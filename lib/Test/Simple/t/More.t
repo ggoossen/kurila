@@ -143,7 +143,7 @@ is( Test::Builder->new, Test::More->builder,    'builder()' );
 
 cmp_ok(42, '==', 42,        'cmp_ok ==');
 cmp_ok('foo', 'eq', 'foo',  '       eq');
-cmp_ok(42.5, '<', 42.6,     '       <');
+cmp_ok(42.5, '+<', 42.6,     '       +<');
 cmp_ok(0, '||', 1,          '       ||');
 
 

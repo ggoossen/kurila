@@ -231,17 +231,17 @@ my($x, @a);
 $x = 1 foreach (@a);
 ####
 # 19
-for (my $i = 0; $i < 2;) {
+for (my $i = 0; $i +< 2;) {
     my $z = 1;
 }
 ####
 # 20
-for (my $i = 0; $i < 2; ++$i) {
+for (my $i = 0; $i +< 2; ++$i) {
     my $z = 1;
 }
 ####
 # 21
-for (my $i = 0; $i < 2; ++$i) {
+for (my $i = 0; $i +< 2; ++$i) {
     my $z = 1;
 }
 ####
@@ -292,7 +292,7 @@ print((sort {$b cmp $a} @x));
 ####
 # 31
 my @x;
-print((reverse sort {$b <=> $a} @x));
+print((reverse sort {$b <+> $a} @x));
 ####
 # 32
 our @a;

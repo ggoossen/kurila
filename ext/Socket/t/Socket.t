@@ -46,7 +46,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 	$read = sysread(T,$buff,10);	# Connection may be granted, then closed!
 	arm(0);
 
-	while ($read > 0 && length($buff) < 5) {
+	while ($read +> 0 && length($buff) +< 5) {
 	    # adjust for fact that TCP doesn't guarantee size of reads/writes
 	    arm(5);
 	    $read = sysread(T,$buff,10,length($buff));
@@ -90,7 +90,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
 	$read = sysread(S,$buff,10);	# Connection may be granted, then closed!
 	arm(0);
 
-	while ($read > 0 && length($buff) < 5) {
+	while ($read +> 0 && length($buff) +< 5) {
 	    # adjust for fact that TCP doesn't guarantee size of reads/writes
 	    arm(5);
 	    $read = sysread(S,$buff,10,length($buff));

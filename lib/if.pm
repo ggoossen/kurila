@@ -5,7 +5,7 @@ $VERSION = '0.05';
 sub work {
   my $method = shift() ? 'import' : 'unimport';
   die "Too few arguments to `use if' (some code returning an empty list in list context?)"
-    unless @_ >= 2;
+    unless @_ +>= 2;
   return unless shift;		# CONDITION
 
   my $p = $_[0];		# PACKAGE

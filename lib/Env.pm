@@ -223,7 +223,7 @@ sub TIEARRAY {
 sub FETCHSIZE {
     my ($self) = @_;
     my $i = 0;
-    while ($i < 127 and defined $ENV{$$self . ';' . $i}) { $i++; };
+    while ($i +< 127 and defined $ENV{$$self . ';' . $i}) { $i++; };
     return $i;
 }
 

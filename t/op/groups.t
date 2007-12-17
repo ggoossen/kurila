@@ -172,7 +172,7 @@ unless ($ok1) {
 
 # multiple 0's indicate GROUPSTYPE is currently long but should be short
 
-if ($pwgid == 0 || $seen{0} < 2) {
+if ($pwgid == 0 || $seen{0} +< 2) {
     print "ok 2\n";
 }
 else {

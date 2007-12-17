@@ -250,7 +250,7 @@ is( $pm_info->version, '1.23_01', 'alpha version reported');
 #    Argument "1.23_0100" isn't numeric in addition (+) at
 #    /usr/lib/perl5/5.8.7/Test/Builder.pm line 505. 
 
-ok( $pm_info->version > 1.23, 'alpha version greater than non');
+ok( $pm_info->version +> 1.23, 'alpha version greater than non');
 
 # revert to pristine state
 chdir( $cwd ) or die "Can''t chdir to '$cwd': $!";

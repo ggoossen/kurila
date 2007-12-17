@@ -181,7 +181,7 @@ foreach my $j (0x1161..0x1175, 0x11A8..0x11C2) {
 sub getCanonList {
     my @src = @_;
     my @dec = map {
-	(SBase <= $_ && $_ <= SFinal) ? decomposeHangul($_)
+	(SBase +<= $_ && $_ +<= SFinal) ? decomposeHangul($_)
 	    : $Canon{$_} ? @{ $Canon{$_} } : $_
 		} @src;
     return join(" ",@src) eq join(" ",@dec) ? @dec : getCanonList(@dec);
@@ -191,7 +191,7 @@ sub getCanonList {
 sub getCompatList {
     my @src = @_;
     my @dec = map {
-	(SBase <= $_ && $_ <= SFinal) ? decomposeHangul($_)
+	(SBase +<= $_ && $_ +<= SFinal) ? decomposeHangul($_)
 	    : $Compat{$_} ? @{ $Compat{$_} } : $_
 		} @src;
     return join(" ",@src) eq join(" ",@dec) ? @dec : getCompatList(@dec);
@@ -217,7 +217,7 @@ sub split_into_char {
     my $uni = shift;
     my $len = length($uni);
     my @ary;
-    for(my $i = 0; $i < $len; ++$i) {
+    for(my $i = 0; $i +< $len; ++$i) {
 	push @ary, ord(substr($uni,$i,1));
     }
     return @ary;
@@ -271,7 +271,7 @@ binmode FH; select FH;
 EOF
 
 foreach my $tbl (@boolfunc) {
-    my @temp = sort {$a <=> $b} keys %{$tbl->{hash}};
+    my @temp = sort {$a <+> $b} keys %{$tbl->{hash}};
     my $type = $tbl->{type};
     my $name = $tbl->{name};
     print "$type is$name (UV uv)\n{\nreturn\n\t";
@@ -304,7 +304,7 @@ foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = {\n";
     $compinit .= join ",\n",
 	map sprintf("\t{ %d, %d }", $_, $CompList{$i}{$_}),
-	    sort {$a <=> $b } keys %{ $CompList{$i} };
+	    sort {$a <+> $b } keys %{ $CompList{$i} };
     $compinit .= ",\n{0,0}\n};\n\n"; # with sentinel
 }
 
@@ -363,17 +363,17 @@ EOF
 
     foreach my $uv (keys %$hash) {
 	croak sprintf("a Unicode code point 0x%04X over 0x10FFFF.", $uv)
-	    unless $uv <= 0x10FFFF;
+	    unless $uv +<= 0x10FFFF;
 	my @c = unpack 'CCCC', pack 'N', $uv;
 	$val{ $c[1] }{ $c[2] }{ $c[3] } = $hash->{$uv};
     }
 
-    foreach my $p (sort { $a <=> $b } keys %val) {
+    foreach my $p (sort { $a <+> $b } keys %val) {
 	next if ! $val{ $p };
-	for (my $r = 0; $r < 256; $r++) {
+	for (my $r = 0; $r +< 256; $r++) {
 	    next if ! $val{ $p }{ $r };
 	    printf "static $type ${head}_%02x_%02x [256] = {\n", $p, $r;
-	    for (my $c = 0; $c < 256; $c++) {
+	    for (my $c = 0; $c +< 256; $c++) {
 		print "\t", defined $val{$p}{$r}{$c}
 		    ? "($type)".$val{$p}{$r}{$c}
 		    : $null;
@@ -383,10 +383,10 @@ EOF
 	    print "};\n\n";
 	}
     }
-    foreach my $p (sort { $a <=> $b } keys %val) {
+    foreach my $p (sort { $a <+> $b } keys %val) {
 	next if ! $val{ $p };
 	printf "static $type* ${head}_%02x [256] = {\n", $p;
-	for (my $r = 0; $r < 256; $r++) {
+	for (my $r = 0; $r +< 256; $r++) {
 	    print $val{ $p }{ $r }
 		? sprintf("${head}_%02x_%02x", $p, $r)
 		: "NULL";
@@ -396,7 +396,7 @@ EOF
 	print "};\n\n";
     }
     print "static $type** $head [] = {\n";
-    for (my $p = 0; $p <= 0x10; $p++) {
+    for (my $p = 0; $p +<= 0x10; $p++) {
 	print $val{ $p } ? sprintf("${head}_%02x", $p) : "NULL";
 	print ','  if $p != 0x10;
 	print "\n";

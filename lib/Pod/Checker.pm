@@ -638,7 +638,7 @@ Set (if argument specified) and retrieve the number of errors found.
 =cut
 
 sub num_errors {
-   return (@_ > 1) ? ($_[0]->{_NUM_ERRORS} = $_[1]) : $_[0]->{_NUM_ERRORS};
+   return (@_ +> 1) ? ($_[0]->{_NUM_ERRORS} = $_[1]) : $_[0]->{_NUM_ERRORS};
 }
 
 ##################################
@@ -650,7 +650,7 @@ Set (if argument specified) and retrieve the number of warnings found.
 =cut
 
 sub num_warnings {
-   return (@_ > 1) ? ($_[0]->{_NUM_WARNINGS} = $_[1]) : $_[0]->{_NUM_WARNINGS};
+   return (@_ +> 1) ? ($_[0]->{_NUM_WARNINGS} = $_[1]) : $_[0]->{_NUM_WARNINGS};
 }
 
 ##################################
@@ -663,7 +663,7 @@ found in the C<=head1 NAME> section.
 =cut
 
 sub name {
-    return (@_ > 1 && $_[1]) ?
+    return (@_ +> 1 && $_[1]) ?
         ($_[0]->{-name} = $_[1]) : $_[0]->{-name};  
 }
 
@@ -788,8 +788,8 @@ sub end_pod {
 
     # check the internal nodes for uniqueness. This pertains to
     # =headX, =item and X<...>
-    if($self->{-warnings} && $self->{-warnings}>1) {
-      foreach(grep($self->{_unique_nodes}->{$_} > 1,
+    if($self->{-warnings} && $self->{-warnings}+>1) {
+      foreach(grep($self->{_unique_nodes}->{$_} +> 1,
         keys %{$self->{_unique_nodes}})) {
           $self->poderror({ -line => '-', -file => $infile,
             -severity => 'WARNING',
@@ -925,7 +925,7 @@ sub command {
         elsif($cmd =~ /^head(\d+)/) {
             my $hnum = $1;
             $self->{"_have_head_$hnum"}++; # count head types
-            if($hnum > 1 && !$self->{"_have_head_".($hnum -1)}) {
+            if($hnum +> 1 && !$self->{"_have_head_".($hnum -1)}) {
               $self->poderror({ -line => $line, -file => $file,
                    -severity => 'WARNING', 
                    -msg => "=head$hnum without preceding higher level"});
@@ -934,7 +934,7 @@ sub command {
             if(defined $self->{_commands_in_head} &&
               $self->{_commands_in_head} == 0 &&
               defined $self->{_last_head} &&
-              $self->{_last_head} >= $hnum) {
+              $self->{_last_head} +>= $hnum) {
                 $self->poderror({ -line => $line, -file => $file,
                      -severity => 'WARNING', 
                      -msg => "empty section in previous paragraph"});
@@ -1076,7 +1076,7 @@ sub _check_ptree {
         unless(ref) {
             # count the unescaped angle brackets
             # complain only when warning level is greater than 1
-            if($self->{-warnings} && $self->{-warnings}>1) {
+            if($self->{-warnings} && $self->{-warnings}+>1) {
               my $count;
               if($count = tr/<>/<>/) {
                 $self->poderror({ -line => $line, -file => $file,
@@ -1109,7 +1109,7 @@ sub _check_ptree {
         }
         if($cmd eq 'E') {
             # preserve entities
-            if(@$contents > 1 || ref $$contents[0] || $$contents[0] !~ /^\w+$/) {
+            if(@$contents +> 1 || ref $$contents[0] || $$contents[0] !~ /^\w+$/) {
                 $self->poderror({ -line => $line, -file => $file,
                     -severity => 'ERROR', 
                     -msg => "garbled entity " . $_->raw_text()});
@@ -1130,7 +1130,7 @@ sub _check_ptree {
                 $val = $ent;
             }
             if(defined $val) {
-                if($val>0 && $val<256) {
+                if($val+>0 && $val+<256) {
                     $text .= chr($val);
                 }
                 else {

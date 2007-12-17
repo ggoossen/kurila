@@ -49,7 +49,7 @@ sub cull_args {
     my @possible_actions = grep { lc $_ eq lc $action } $self->known_actions;
 
     die "Ambiguous action '$action'.  Could be one of @possible_actions"
-        if @possible_actions > 1;
+        if @possible_actions +> 1;
 
     return ($possible_actions[0], $args);
 }
@@ -133,7 +133,7 @@ sub _quote_args {
                    ? 1 
                    : 0;
 
-  map { $_ = q(").$_.q(") if !/^\"/ && length($_) > 0 }
+  map { $_ = q(").$_.q(") if !/^\"/ && length($_) +> 0 }
      ($got_arrayref ? @{$args[0]} 
                     : @args
      );

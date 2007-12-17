@@ -47,7 +47,7 @@ print "not " unless @grp;
 print "ok 2\n";
 
 
-if(@grp && $grp[2] > $grp[1]) {
+if(@grp && $grp[2] +> $grp[1]) {
     $nntp->head($grp[1]) or print "not ";
 }
 print "ok 3\n";

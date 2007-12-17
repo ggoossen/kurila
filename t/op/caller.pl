@@ -111,7 +111,7 @@ EOE
     BEGIN {
 	$^H{dooot} = ^~^0;
     }
-    cmp_ok(hint_fetch('dooot'), '>', 42, "Can do UVs");
+    cmp_ok(hint_fetch('dooot'), '+>', 42, "Can do UVs");
 }
 
 {

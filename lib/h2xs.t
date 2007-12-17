@@ -99,7 +99,7 @@ EOXSFILES
 );
 
 my $total_tests = 3; # opening, closing and deleting the header file.
-for (my $i = $#tests; $i > 0; $i-=3) {
+for (my $i = $#tests; $i +> 0; $i-=3) {
   # 1 test for running it, 1 test for the expected result, and 1 for each file
   # plus 1 to open and 1 to check for the use in lib/$name.pm and Makefile.PL
   # And 1 more for our check for "bonus" files, 2 more for ExtUtil::Manifest.

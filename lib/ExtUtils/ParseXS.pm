@@ -837,7 +837,7 @@ EOF
       }
       elsif ($ProtoThisXSUB eq 1) {
 	my $s = ';';
-	if ($min_args < $num_args)  {
+	if ($min_args +< $num_args)  {
 	  $s = '';
 	  $proto_arg[$min_args] .= ";" ;
 	}
@@ -1343,7 +1343,7 @@ sub REQUIRE_handler ()
       unless $Ver =~ /^\d+(\.\d*)?/ ;
 
     death ("Error: xsubpp $Ver (or better) required--this is only $VERSION.")
-      unless $VERSION >= $Ver ;
+      unless $VERSION +>= $Ver ;
   }
 
 sub VERSIONCHECK_handler ()

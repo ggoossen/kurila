@@ -47,7 +47,7 @@ sub todo {
 
 my $MAXPROC = 40;
 my $MAXURL  = 10;
-my $MAXFORK = $MAXPROC < $MAXURL ? 1 : $MAXPROC / $MAXURL;
+my $MAXFORK = $MAXPROC +< $MAXURL ? 1 : $MAXPROC / $MAXURL;
 
 select(STDERR); $| = 1;
 select(STDOUT); $| = 1;
@@ -59,7 +59,7 @@ while (@urls) {
 
     todo();
 
-    for ($i = 0; $i < $MAXFORK; $i++) {
+    for ($i = 0; $i +< $MAXFORK; $i++) {
 	$list[$i] = [ splice @urls, 0, $MAXURL ];
 	$pid = fork;
 	die "Failed to fork: $!\n" unless defined $pid;

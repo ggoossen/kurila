@@ -59,7 +59,7 @@ if ($debugging) {
 # Build some arbitrarily complex data structure starting with a top level hash
 # (deeper levels contain scalars, references to hashes or references to arrays);
 
-for (my $i = 0; $i < $hashsize; $i++) {
+for (my $i = 0; $i +< $hashsize; $i++) {
 	my($k) = int(rand(1_000_000));
 	$k = MD5->hexhash($k) if $gotmd5 and int(rand(2));
 	$a1{$k} = { key => "$k", "value" => $i };
@@ -111,7 +111,7 @@ $x1 = freeze(\%a1);
 $x2 = freeze(\%a2);
 $x3 = freeze($a3);
 
-ok 1, (length($x1) > $hashsize);	# sanity check
+ok 1, (length($x1) +> $hashsize);	# sanity check
 ok 2, length($x1) == length($x2);	# idem
 ok 3, $x1 eq $x2;
 ok 4, $x1 eq $x3;

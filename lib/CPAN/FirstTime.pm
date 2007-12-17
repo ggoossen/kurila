@@ -600,16 +600,16 @@ sub init {
                 unless ($@) {
                     if (time == $current_second) {
                         $current_second_count++;
-                        if ($current_second_count > 20) {
+                        if ($current_second_count +> 20) {
                             # I don't like more than 20 prompts per second
                             $i_am_mad++;
                         }
                     } else {
                         $current_second = time;
                         $current_second_count = 0;
-                        $i_am_mad-- if $i_am_mad>0;
+                        $i_am_mad-- if $i_am_mad+>0;
                     }
-                    if ($i_am_mad>0) {
+                    if ($i_am_mad+>0) {
                         #require Carp;
                         #Carp::cluck("SLEEEEEEEEPIIIIIIIIIIINGGGGGGGGGGG");
                         Time::HiRes::sleep(0.1);
@@ -685,7 +685,7 @@ Shall we use it as the general CPAN build and cache directory?
                 } else {
                     $CPAN::Frontend->mywarn("Couldn't find directory $ans\n".
                                             "or directory is not writable. Please retry.\n");
-                    if (++$loop > 5) {
+                    if (++$loop +> 5) {
                         $CPAN::Frontend->mydie("Giving up");
                     }
                 }
@@ -1204,14 +1204,14 @@ sub conf_sites {
     my $m = 'MIRRORED.BY';
     my $mby = File::Spec->catfile($CPAN::Config->{keep_source_where},$m);
     File::Path::mkpath(File::Basename::dirname($mby));
-    if (-f $mby && -f $m && -M $m < -M $mby) {
+    if (-f $mby && -f $m && -M $m +< -M $mby) {
         require File::Copy;
         File::Copy::copy($m,$mby) or die "Could not update $mby: $!";
     }
     my $loopcount = 0;
     local $^T = time;
     my $overwrite_local = 0;
-    if ($mby && -f $mby && -M _ <= 60 && -s _ > 0) {
+    if ($mby && -f $mby && -M _ +<= 60 && -s _ +> 0) {
         my $mtime = localtime((stat _)[9]);
         my $prompt = qq{Found $mby as of $mtime
 
@@ -1231,7 +1231,7 @@ Shall I use the local database in $mby?};
         } elsif ( ! -f $mby ) {
             $CPAN::Frontend->myprint(qq{You have no $mby\n  I\'m trying to fetch one\n});
             $mby = CPAN::FTP->localize($m,$mby,3);
-        } elsif (-M $mby > 60 && $loopcount == 0) {
+        } elsif (-M $mby +> 60 && $loopcount == 0) {
             $CPAN::Frontend->myprint(qq{Your $mby is older than 60 days,\n  I\'m trying }.
                                      qq{to fetch one\n});
             $mby = CPAN::FTP->localize($m,$mby,3);
@@ -1274,11 +1274,11 @@ sub picklist {
 
         # display, at most, 15 items at a time
         my $limit = $#{ $items } - $pos;
-        $limit = 15 if $limit > 15;
+        $limit = 15 if $limit +> 15;
 
         # show the next $limit items, get the new position
         $pos = display_some($items, $limit, $pos, $default);
-        $pos = 0 if $pos >= @$items;
+        $pos = 0 if $pos +>= @$items;
 
         my $num = prompt($prompt,$default);
 
@@ -1289,7 +1289,7 @@ sub picklist {
         }
         my $i = scalar @$items;
         unrangify(\@nums);
-        if (grep (/\D/ || $_ < 1 || $_ > $i, @nums)) {
+        if (grep (/\D/ || $_ +< 1 || $_ +> $i, @nums)) {
             $CPAN::Frontend->mywarn("invalid items entered, try again\n");
             if ("@nums" =~ /\D/) {
                 $CPAN::Frontend->mywarn("(we are expecting only numbers between 1 and $i)\n");
@@ -1338,7 +1338,7 @@ sub display_some {
                                      (@$items - $pos),
                                      $hit_what,
                                     ))
-        if $pos < @$items;
+        if $pos +< @$items;
     return $pos;
 }
 
@@ -1388,7 +1388,7 @@ sub read_mirrored_by {
     foreach $cont (@cont) {
         my @c = sort keys %{$all{$cont}};
         @cont{@c} = map ($cont, 0..$#c);
-        @c = map ("$_ ($cont)", @c) if @cont > 1;
+        @c = map ("$_ ($cont)", @c) if @cont +> 1;
         push (@countries, @c);
     }
     if (@previous_urls && @countries) {
@@ -1410,7 +1410,7 @@ sub read_mirrored_by {
             my @u = sort keys %{$all{$cont{$bare_country}}{$bare_country}};
             @u = grep (! $seen{$_}, @u);
             @u = map ("$_ ($bare_country)", @u)
-                if @countries > 1;
+                if @countries +> 1;
             push (@urls, @u);
         }
     }
@@ -1460,7 +1460,7 @@ later if you\'re sure it\'s right.\n},
                                   ));
             }
         } else {
-            if (++$eacnt >= 5) {
+            if (++$eacnt +>= 5) {
                 $CPAN::Frontend->
                     mywarn("Giving up.\n");
                 $CPAN::Frontend->mysleep(5);

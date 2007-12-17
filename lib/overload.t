@@ -16,7 +16,7 @@ use overload (
 '+'	=>	sub { Oscalar->new( $ {$_[0]}+$_[1])},
 '-'	=>	sub { Oscalar->new(
 		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
-'<=>'	=>	sub { Oscalar->new(
+'<+>'	=>	sub { Oscalar->new(
 		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
 'cmp'	=>	sub { Oscalar->new(
 		       $_[2]? ($_[1] cmp ${$_[0]}) : (${$_[0]} cmp $_[1]))},
@@ -305,7 +305,7 @@ ok(overload::Overloaded($aI));
 ok(!overload::Overloaded('overload'));
 
 ok(! defined overload::Method($aI, '<<'));
-ok(! defined overload::Method($a, '<'));
+ok(! defined overload::Method($a, '+<'));
 
 like (overload::StrVal($aI), qr/^OscalarI=SCALAR\(0x[\da-fA-F]+\)$/);
 is(overload::StrVal(\$aI), "@{[\$aI]}");
@@ -636,7 +636,7 @@ is($b, "_<oups1
   package sorting;
   use overload 'cmp' => \&comp;
   sub new { my ($p, $v) = @_; bless \$v, $p }
-  sub comp { my ($x,$y) = @_; ($$x * 3 % 10) <=> ($$y * 3 % 10) or $$x cmp $$y }
+  sub comp { my ($x,$y) = @_; ($$x * 3 % 10) <+> ($$y * 3 % 10) or $$x cmp $$y }
 }
 {
   my @arr = map sorting->new($_), 0..12;
@@ -648,7 +648,7 @@ is($b, "_<oups1
   package iterator;
   use overload '<>' => \&iter;
   sub new { my ($p, $v) = @_; bless \$v, $p }
-  sub iter { my ($x) = @_; return undef if $$x < 0; return $$x--; }
+  sub iter { my ($x) = @_; return undef if $$x +< 0; return $$x--; }
 }
 
 # XXX iterator overload not intended to work with CORE::GLOBAL?
@@ -721,7 +721,7 @@ else {
   is(&$deref(6), 40);
   sub xxx_goto { goto &$deref }
   is(xxx_goto(7), 41);
-  my $srt = bless { c => sub {$b <=> $a}
+  my $srt = bless { c => sub {$b <+> $a}
 		  }, 'deref';
   *srt = \&$srt;
   my @sorted = sort srt 11, 2, 5, 1, 22;
@@ -1089,7 +1089,7 @@ my ($two, $one, $un, $deux) = map {Numify->new( $_)} 2, 1, 1, 2;
 my ($ein, $zwei) = (1, 2);
 
 my %map = (one => 1, un => 1, ein => 1, deux => 2, two => 2, zwei => 2);
-foreach my $op (qw(<=> == != < <= > >=)) {
+foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     foreach my $l (keys %map) {
 	foreach my $r (keys %map) {
 	    my $ocode = "\$$l $op \$$r";

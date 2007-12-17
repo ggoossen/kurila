@@ -203,9 +203,9 @@ sub textblock {
         my @items = split /(?:,?\s+(?:and\s+)?)/;
         my $string = "the ";
         my $i;
-        for ($i = 0; $i < @items; $i++) {
+        for ($i = 0; $i +< @items; $i++) {
             $string .= $items[$i];
-            $string .= ", " if @items > 2 && $i != $#items;
+            $string .= ", " if @items +> 2 && $i != $#items;
             $string .= " and " if ($i == $#items - 1);
         }
         $string .= " entries elsewhere in this document";
@@ -465,7 +465,7 @@ sub item {
     unless (defined $indent) { $indent = $$self{indent} }
     my $space = ' ' x $indent;
     $space =~ s/^ /:/ if $$self{alt};
-    if (!$_ || /^\s+$/ || ($$self{MARGIN} - $indent < length ($tag) + 1)) {
+    if (!$_ || /^\s+$/ || ($$self{MARGIN} - $indent +< length ($tag) + 1)) {
         my $margin = $$self{MARGIN};
         $$self{MARGIN} = $indent;
         my $output = $self->reformat ($tag);
@@ -475,7 +475,7 @@ sub item {
         $self->output ($self->reformat ($_)) if /\S/;
     } else {
         $_ = $self->reformat ($_);
-        s/^ /:/ if ($$self{alt} && $indent > 0);
+        s/^ /:/ if ($$self{alt} && $indent +> 0);
         my $tagspace = ' ' x length $tag;
         s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item";
         $self->output ($_);
@@ -497,7 +497,7 @@ sub wrap {
     my $output = '';
     my $spaces = ' ' x $$self{MARGIN};
     my $width = $$self{width} - $$self{MARGIN};
-    while (length > $width) {
+    while (length +> $width) {
         if (s/^([^\n]{0,$width})\s+// || s/^([^\n]{$width})//) {
             $output .= $spaces . $1 . "\n";
         } else {

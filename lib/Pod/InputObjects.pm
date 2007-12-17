@@ -166,7 +166,7 @@ contents of the given argument.
 =cut
 
 sub name {
-   (@_ > 1)  and  $_[0]->{'-name'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-name'} = $_[1];
    return $_[0]->{'-name'};
 }
 
@@ -210,7 +210,7 @@ state is restored to this value.
 =cut
 
 sub was_cutting {
-   (@_ > 1)  and  $_[0]->{-was_cutting} = $_[1];
+   (@_ +> 1)  and  $_[0]->{-was_cutting} = $_[1];
    return $_[0]->{-was_cutting};
 }
 
@@ -293,7 +293,7 @@ the name of the command (I<without> any leading C<=> prefix).
 =cut
 
 sub cmd_name {
-   (@_ > 1)  and  $_[0]->{'-name'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-name'} = $_[1];
    return $_[0]->{'-name'};
 }
 
@@ -311,7 +311,7 @@ This method will return the corresponding text of the paragraph.
 =cut
 
 sub text {
-   (@_ > 1)  and  $_[0]->{'-text'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-text'} = $_[1];
    return $_[0]->{'-text'};
 }       
 
@@ -377,7 +377,7 @@ This method will get/set the corresponding parse-tree of the paragraph's text.
 =cut
 
 sub parse_tree {
-   (@_ > 1)  and  $_[0]->{'-ptree'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-ptree'} = $_[1];
    return $_[0]->{'-ptree'};
 }       
 
@@ -456,7 +456,7 @@ sub new {
     my $class = ref($this) || $this;
 
     ## See if first argument has no keyword
-    if (((@_ <= 2) or (@_ % 2)) and $_[0] !~ /^-\w/) {
+    if (((@_ +<= 2) or (@_ % 2)) and $_[0] !~ /^-\w/) {
        ## Yup - need an implicit '-name' before first parameter
        unshift @_, '-name';
     }
@@ -505,7 +505,7 @@ The name of the interior sequence command.
 =cut
 
 sub cmd_name {
-   (@_ > 1)  and  $_[0]->{'-name'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-name'} = $_[1];
    return $_[0]->{'-name'};
 }
 
@@ -632,7 +632,7 @@ sequence (should be "<").
 =cut
 
 sub left_delimiter {
-   (@_ > 1)  and  $_[0]->{'-ldelim'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-ldelim'} = $_[1];
    return $_[0]->{'-ldelim'};
 }
 
@@ -649,7 +649,7 @@ sequence (should be ">").
 =cut
 
 sub right_delimiter {
-   (@_ > 1)  and  $_[0]->{'-rdelim'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-rdelim'} = $_[1];
    return $_[0]->{'-rdelim'};
 }
 
@@ -670,7 +670,7 @@ sequence's text.
 =cut
 
 sub parse_tree {
-   (@_ > 1)  and  $_[0]->{'-ptree'} = $_[1];
+   (@_ +> 1)  and  $_[0]->{'-ptree'} = $_[1];
    return $_[0]->{'-ptree'};
 }       
 
@@ -782,7 +782,7 @@ children for the top node.
 
 sub top {
    my $self = shift;
-   if (@_ > 0) {
+   if (@_ +> 0) {
       @{ $self } = (@_ == 1  and  ref $_[0]) ? ${ @_ } : @_;
    }
    return $self;
@@ -805,7 +805,7 @@ children for the top node.
 
 sub children {
    my $self = shift;
-   if (@_ > 0) {
+   if (@_ +> 0) {
       @{ $self } = (@_ == 1  and  ref $_[0]) ? ${ @_ } : @_;
    }
    return @{ $self };

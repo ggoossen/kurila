@@ -20,9 +20,9 @@ sub read {
   my $size = shift || croak 'read($buf,$size,[$offset])';
   my $timeout = @_ ? shift: $data->timeout;
 
-  if (length(${*$data}) < $size && !${*$data}{'net_ftp_eof'}) {
+  if (length(${*$data}) +< $size && !${*$data}{'net_ftp_eof'}) {
     my $blksize = ${*$data}{'net_ftp_blksize'};
-    $blksize = $size if $size > $blksize;
+    $blksize = $size if $size +> $blksize;
 
     my $l = 0;
     my $n;
@@ -54,7 +54,7 @@ sub read {
       unless (length(${*$data})) {
 
         redo READ
-          if ($n > 0);
+          if ($n +> 0);
 
         $size = length(${*$data})
           if ($n == 0);
@@ -99,7 +99,7 @@ sub write {
       or croak "Timeout";
 
     $off += $wrote;
-    $wrote = syswrite($data, substr($tmp, $off), $len > $blksize ? $blksize : $len);
+    $wrote = syswrite($data, substr($tmp, $off), $len +> $blksize ? $blksize : $len);
     return undef
       unless defined($wrote);
     $len -= $wrote;

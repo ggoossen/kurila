@@ -145,7 +145,7 @@ sub display {
         if (defined $x and not ref $x) {
             my $y = '';
             foreach my $c (unpack("U*", $x)) {
-                if ($c > 255) {
+                if ($c +> 255) {
                     $y .= sprintf "\\x{%x}", $c;
                 } elsif ($backslash_escape{$c}) {
                     $y .= $backslash_escape{$c};
@@ -246,7 +246,7 @@ sub within ($$$@) {
     } elsif ($got !~ tr/0-9// or $expected !~ tr/0-9// or $range !~ tr/0-9//) {
         # This is a fail
         unshift @mess, "# got, expected and range must be numeric\n";
-    } elsif ($range < 0) {
+    } elsif ($range +< 0) {
         # This is also a fail
         unshift @mess, "# range must not be negative\n";
     } elsif ($range == 0) {
@@ -254,10 +254,10 @@ sub within ($$$@) {
         $pass = $got == $expected;
     } elsif ($expected == 0) {
         # If expected is 0, treat range as absolute
-        $pass = ($got <= $range) && ($got >= - $range);
+        $pass = ($got +<= $range) && ($got +>= - $range);
     } else {
         my $diff = $got - $expected;
-        $pass = abs ($diff / $expected) < $range;
+        $pass = abs ($diff / $expected) +< $range;
     }
     unless ($pass) {
         if ($got eq $expected) {
@@ -411,7 +411,7 @@ sub _quote_args {
     foreach (@$args) {
 	# In VMS protect with doublequotes because otherwise
 	# DCL will lowercase -- unless already doublequoted.
-       $_ = q(").$_.q(") if $is_vms && !/^\"/ && length($_) > 0;
+       $_ = q(").$_.q(") if $is_vms && !/^\"/ && length($_) +> 0;
 	$$runperl .= ' ' . $_;
     }
 }
@@ -680,7 +680,7 @@ sub _fresh_perl {
     unless( $name ) {
         my $first_line;
         ($first_line, $name) = $prog =~ /^((.{1,50}).*)/;
-        $name .= '...' if length $first_line > length $name;
+        $name .= '...' if length $first_line +> length $name;
     }
 
     _ok($pass, _where(), "fresh_perl - $name");

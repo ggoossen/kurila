@@ -22,12 +22,12 @@ sub read {
 
   my $n;
 
-  if ($size > length ${*$data} and !${*$data}{'net_ftp_eof'}) {
+  if ($size +> length ${*$data} and !${*$data}{'net_ftp_eof'}) {
     $data->can_read($timeout)
       or croak "Timeout";
 
     my $blksize = ${*$data}{'net_ftp_blksize'};
-    $blksize = $size if $size > $blksize;
+    $blksize = $size if $size +> $blksize;
 
     unless ($n = sysread($data, ${*$data}, $blksize, length ${*$data})) {
       return undef unless defined $n;
@@ -64,11 +64,11 @@ sub write {
   my $off  = 0;
 
   my $blksize = ${*$data}{'net_ftp_blksize'};
-  while ($sent > 0) {
+  while ($sent +> 0) {
     $data->can_write($timeout)
       or croak "Timeout";
 
-    my $n = syswrite($data, $buf, $sent > $blksize ? $blksize : $sent, $off);
+    my $n = syswrite($data, $buf, $sent +> $blksize ? $blksize : $sent, $off);
     return undef unless defined($n);
     $sent -= $n;
     $off += $n;

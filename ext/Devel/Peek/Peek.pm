@@ -27,7 +27,7 @@ sub import {
   my @db = grep m/$ops_rx/, @_;
   @_ = grep !m/$ops_rx/, @_;
   if (@db) {
-    die "Too many :opd options" if @db > 1;
+    die "Too many :opd options" if @db +> 1;
     runops_debug(1);
     my $flags = ($db[0] =~ m/$ops_rx/ and $1);
     $flags = 'st' unless defined $flags;
@@ -43,7 +43,7 @@ sub import {
 
 sub DumpWithOP ($;$) {
    local($Devel::Peek::dump_ops)=1;
-   my $depth = @_ > 1 ? $_[1] : 4 ;
+   my $depth = @_ +> 1 ? $_[1] : 4 ;
    Dump($_[0],$depth);
 }
 

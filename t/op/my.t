@@ -63,16 +63,16 @@ print "ok 22\n";
 
 my $j = 5;
 while (my $i = --$j) {
-    print("not "), last unless $i > 0;
+    print("not "), last unless $i +> 0;
 }
 continue {
-    print("not "), last unless $i > 0;
+    print("not "), last unless $i +> 0;
 }
 print "ok 23\n";
 
 $j = 5;
-for (my $i = 0; (my $k = $i) < $j; ++$i) {
-    print("not "), last unless $i >= 0 && $i < $j && $i == $k;
+for (my $i = 0; (my $k = $i) +< $j; ++$i) {
+    print("not "), last unless $i +>= 0 && $i +< $j && $i == $k;
 }
 print "ok 24\n";
 print "not " if defined $k;
@@ -130,5 +130,5 @@ print "ok 34\n";
     print "not " if defined $test;
     print "ok $count\n";
     $test = 42;
-    goto loop if ++$count < 37;
+    goto loop if ++$count +< 37;
 }

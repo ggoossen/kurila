@@ -87,7 +87,7 @@ sub cat_decode {    # ($obj, $dst, $src, $pos, $trm, $chk)
             }
             $chunk = Encode::decode( 'euc-jp', $chunk, 0 );
         }
-        elsif ( ( my $npos = index( $chunk, $trm ) ) >= 0 ) {
+        elsif ( ( my $npos = index( $chunk, $trm ) ) +>= 0 ) {
             $$rdst .= substr( $chunk, 0, $npos + length($trm) );
             $$rpos += length($esc) + $npos + length($trm);
             pos($$rsrc) = $opos;

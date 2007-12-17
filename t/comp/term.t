@@ -10,7 +10,7 @@ if ($x eq '\n') {print "ok 1\n";} else {print "not ok 1\n";}
 
 $x = "#2\t:$x: eq :\\n:\n";
 print $x;
-unless (index($x,'\\\\')>0) {print "ok 2\n";} else {print "not ok 2\n";}
+unless (index($x,'\\\\')+>0) {print "ok 2\n";} else {print "not ok 2\n";}
 
 if (length('\\\\') == 2) {print "ok 3\n";} else {print "not ok 3\n";}
 

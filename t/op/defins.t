@@ -79,7 +79,7 @@ while (($seen ? $dummy : $name) = readdir(DIR))
  {
   $seen++ if $name eq $wanted_filename;
  }
-cmp_ok($seen,'>',0,'saw file in while() ternary');
+cmp_ok($seen,'+>',0,'saw file in while() ternary');
 
 rewinddir(DIR);
 $seen = 0;
@@ -102,7 +102,7 @@ while (($seen ? $dummy : $name) = glob('*'))
  {
   $seen++ if $name eq $wanted_filename;
  }
-cmp_ok($seen,'>',0,'saw file in glob hash while() ternary');
+cmp_ok($seen,'+>',0,'saw file in glob hash while() ternary');
 
 $seen = 0;
 while ($where{$seen} = glob('*'))

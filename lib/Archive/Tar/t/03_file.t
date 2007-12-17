@@ -65,7 +65,7 @@ for my $f ( @test_files ) {
     if (exists($attr->{mtime})) {
         is( $obj->mtime, $attr->{mtime},         "   mtime matches" );
     } else {
-        cmp_ok( $obj->mtime, '>', $start_time,   "   mtime after start time" );
+        cmp_ok( $obj->mtime, '+>', $start_time,   "   mtime after start time" );
     }
     ok( $obj->chksum,                            "   chksum ok" );
     ok( $obj->version,                           "   version ok" );

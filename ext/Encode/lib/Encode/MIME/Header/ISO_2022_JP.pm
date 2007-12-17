@@ -43,7 +43,7 @@ sub _mime_unstructured_header {
 
     @wordstmp = split /\s+/, $oldheader;
 
-    for ( $i = 0 ; $i < $#wordstmp ; $i++ ) {
+    for ( $i = 0 ; $i +< $#wordstmp ; $i++ ) {
         if (    $wordstmp[$i] !~ /^[\x21-\x7E]+$/
             and $wordstmp[ $i + 1 ] !~ /^[\x21-\x7E]+$/ )
         {
@@ -59,7 +59,7 @@ sub _mime_unstructured_header {
     for my $word (@words) {
         if ( $word =~ /^[\x21-\x7E]+$/ ) {
             $header =~ /(?:.*\n)*(.*)/;
-            if ( length($1) + length($word) > $bpl ) {
+            if ( length($1) + length($word) +> $bpl ) {
                 $header .= "\n $word";
             }
             else {
@@ -95,7 +95,7 @@ sub _add_encoded_word {
 
         if (
             length($line) + 22 +
-            ( $target =~ /^(?:$RE{EUC_0212}|$RE{EUC_C})/o ) * 8 > $bpl )
+            ( $target =~ /^(?:$RE{EUC_0212}|$RE{EUC_C})/o ) * 8 +> $bpl )
         {
             $line =~ s/[ \t\n\r]*$/\n/;
             $result .= $line;
@@ -109,7 +109,7 @@ sub _add_encoded_word {
             my $encoded =
               HEAD . MIME::Base64::encode_base64( $iso_2022_jp, '' ) . TAIL;
 
-            if ( length($encoded) + length($line) > $bpl ) {
+            if ( length($encoded) + length($line) +> $bpl ) {
                 $target =~
                   s/($RE{EUC_0212}|$RE{EUC_KANA}|$RE{EUC_C}|$RE{ASCII})$//o;
                 $str = $1 . $str;

@@ -61,7 +61,7 @@ $VERSION = '1.06';
 sub import {
     require Exporter;
     my $i = 1;
-    while ($i < @_) {
+    while ($i +< @_) {
 	if ($_[$i] =~ /^:(case|nocase|globally)$/) {
 	    splice(@_, $i, 1);
 	    $DEFAULT_FLAGS ^&^= ^~^GLOB_NOCASE() if $1 eq 'case';
@@ -102,7 +102,7 @@ if ($^O =~ /^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
 
 sub bsd_glob {
     my ($pat,$flags) = @_;
-    $flags = $DEFAULT_FLAGS if @_ < 2;
+    $flags = $DEFAULT_FLAGS if @_ +< 2;
     return doglob($pat,$flags);
 }
 

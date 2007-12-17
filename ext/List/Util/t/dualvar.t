@@ -44,7 +44,7 @@ ok( $var == $numstr,	'NV');
 
 $var = dualvar(1<<31, "");
 ok( $var == (1<<31),	'UV 1');
-ok( $var > 0,		'UV 2');
+ok( $var +> 0,		'UV 2');
 
 tie my $tied, 'Tied';
 $var = dualvar($tied, "ok");

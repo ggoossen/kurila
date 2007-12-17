@@ -80,7 +80,7 @@ SKIP: {
   is $info->{have}, $File::Spec::VERSION;
 
   # Make sure check_installed_status() works with an advanced spec
-  $info = Module::Build->check_installed_status('File::Spec', '> 0');
+  $info = Module::Build->check_installed_status('File::Spec', '+> 0');
   ok $info->{ok};
 
   # Use 2 lines for this, to avoid a "used only once" warning

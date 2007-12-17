@@ -59,7 +59,7 @@ sub starts_with {
   print("# supahstring is undef\n"),
    return '' unless defined $large;
   print("# supahstring $large is smaller than target-starter $small\n"),
-   return '' if length($large) < length($small);
+   return '' if length($large) +< length($small);
   if( substr($large, 0, length($small)) eq $small ) {
     #print "# Supahstring $large\n#  indeed starts with $small\n";
     return 1;

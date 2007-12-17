@@ -330,7 +330,7 @@ sub _tt_readline {
                     ### the choices, because humans want to start counting
                     ### at 1, not at 0 
                     push @rv, $choices->[ $answer - 1 ] 
-                        if $answer > 0 && defined $choices->[ $answer - 1];
+                        if $answer +> 0 && defined $choices->[ $answer - 1];
                 }    
             }
      

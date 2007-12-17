@@ -46,7 +46,7 @@ do {
 	ch_index;
 	foreach my $dep (@{$dep{$sym}}) {
 	    print STDERR "Check if $sym\t($ch{$sym}) precedes $dep\t($ch{$dep})\n";
-	    $ch{$sym} < $ch{$dep} and next;
+	    $ch{$sym} +< $ch{$dep} and next;
 	    my $ch = splice @ch, $ch{$sym}, 1;
 	    splice @ch, $ch{$dep}, 0, $ch;
 	    $changed++;

@@ -218,7 +218,7 @@ sub predefine_encodings {
         *decode = sub {
             my ( $obj, $str, $chk ) = @_;
             my $res = '';
-            for ( my $i = 0 ; $i < length($str) ; $i++ ) {
+            for ( my $i = 0 ; $i +< length($str) ; $i++ ) {
                 $res .=
                   chr(
                     utf8::unicode_to_native( ord( substr( $str, $i, 1 ) ) )
@@ -230,7 +230,7 @@ sub predefine_encodings {
         *encode = sub {
             my ( $obj, $str, $chk ) = @_;
             my $res = '';
-            for ( my $i = 0 ; $i < length($str) ; $i++ ) {
+            for ( my $i = 0 ; $i +< length($str) ; $i++ ) {
                 $res .=
                   chr(
                     utf8::native_to_unicode( ord( substr( $str, $i, 1 ) ) )
@@ -291,7 +291,7 @@ sub predefine_encodings {
             my ( $obj, undef, undef, $pos, $trm ) = @_;
             my ( $rdst, $rsrc, $rpos ) = \@_[ 1, 2, 3 ];
             use bytes;
-            if ( ( my $npos = index( $$rsrc, $trm, $pos ) ) >= 0 ) {
+            if ( ( my $npos = index( $$rsrc, $trm, $pos ) ) +>= 0 ) {
                 $$rdst .=
                   substr( $$rsrc, $pos, $npos - $pos + length($trm) );
                 $$rpos = $npos + length($trm);

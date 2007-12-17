@@ -170,7 +170,7 @@ sub colored {
         my $attr = color (@codes);
         join '',
             map { $_ ne $EACHLINE ? $attr . $_ . "\e[0m" : $_ }
-                grep { length ($_) > 0 }
+                grep { length ($_) +> 0 }
                     split (/(\Q$EACHLINE\E)/, $string);
     } else {
         color (@codes) . $string . "\e[0m";

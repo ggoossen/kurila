@@ -215,7 +215,7 @@ sub SWASHNEW_real {
 	$extras = join '', grep /^[^0-9a-fA-F]/, @tmp;
 	$list = join '',
 	    map  { $_->[1] }
-	    sort { $a->[0] <=> $b->[0] }
+	    sort { $a->[0] <+> $b->[0] }
 	    map  { /^([0-9a-fA-F]+)/; [ CORE::hex($1), $_ ] }
 	    grep { /^([0-9a-fA-F]+)/ and not $seen{$1}++ } @tmp; # XXX doesn't do ranges right
     }
@@ -225,19 +225,19 @@ sub SWASHNEW_real {
 	$list =~ s/\tXXXX$/\t$hextra/mg;
     }
 
-    if ($minbits != 1 && $minbits < 32) { # not binary property
+    if ($minbits != 1 && $minbits +< 32) { # not binary property
 	my $top = 0;
 	while ($list =~ /^([0-9a-fA-F]+)(?:[\t]([0-9a-fA-F]+)?)(?:[ \t]([0-9a-fA-F]+))?/mg) {
 	    my $min = CORE::hex $1;
 	    my $max = defined $2 ? CORE::hex $2 : $min;
 	    my $val = defined $3 ? CORE::hex $3 : 0;
 	    $val += $max - $min if defined $3;
-	    $top = $val if $val > $top;
+	    $top = $val if $val +> $top;
 	}
 	my $topbits =
-	    $top > 0xffff ? 32 :
-	    $top > 0xff ? 16 : 8;
-	$bits = $topbits if $bits < $topbits;
+	    $top +> 0xffff ? 32 :
+	    $top +> 0xff ? 16 : 8;
+	$bits = $topbits if $bits +< $topbits;
     }
 
     my @extras;
@@ -261,7 +261,7 @@ sub SWASHNEW_real {
 		}
 		return $subobj unless ref $subobj;
 		push @extras, $name => $subobj;
-		$bits = $subobj->{BITS} if $bits < $subobj->{BITS};
+		$bits = $subobj->{BITS} if $bits +< $subobj->{BITS};
 	    }
 	}
     }

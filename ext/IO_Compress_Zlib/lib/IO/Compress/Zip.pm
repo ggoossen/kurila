@@ -194,7 +194,7 @@ sub mkHeader
 
     my $version = $ZIP_CM_MIN_VERSIONS{$method};
     $version = ZIP64_MIN_VERSION
-        if ZIP64_MIN_VERSION > $version && *$self->{ZipData}{Zip64};
+        if ZIP64_MIN_VERSION +> $version && *$self->{ZipData}{Zip64};
     my $madeBy = ($param->value('OS_Code') << 8) + $version;
     my $extract = $version;
 

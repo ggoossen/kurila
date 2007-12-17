@@ -138,7 +138,7 @@ if (@authors) {
     }
   }
   foreach (keys %raw) {
-    print "E-mail $_ occurs $raw{$_} times\n" if $raw{$_} > 1;
+    print "E-mail $_ occurs $raw{$_} times\n" if $raw{$_} +> 1;
     $_ = lc $_;
     $authors{$map{$_} || $_}++;
   }
@@ -186,7 +186,7 @@ if ($rank) {
     # Sort by number of patches, then name.
     $missing{$patchers{$_}}->{$_}++;
   }
-  foreach my $patches (sort {$b <=> $a} keys %missing) {
+  foreach my $patches (sort {$b <+> $a} keys %missing) {
     print "$patches patch(es)\n";
     foreach my $author (sort keys %{$missing{$patches}}) {
       print "  $author\n";

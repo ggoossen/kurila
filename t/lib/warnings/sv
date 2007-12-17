@@ -96,7 +96,7 @@ no warnings 'uninitialized' ;
 $B = 0 ;
 $B ^|^= $A ;
 EXPECT
-Use of uninitialized value $A in bitwise or (|) at - line 10.
+Use of uninitialized value $A in bitwise or (^|^) at - line 10.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -106,7 +106,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; 
 $x = 1 ^|^ $b[$Y] ;
 EXPECT
-Use of uninitialized value within @a in bitwise or (|) at - line 4.
+Use of uninitialized value within @a in bitwise or (^|^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -116,7 +116,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; 
 $x = 1 ^&^ $b[$Y] ;
 EXPECT
-Use of uninitialized value within @a in bitwise and (&) at - line 4.
+Use of uninitialized value within @a in bitwise and (^&^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -126,7 +126,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; 
 $x = ^~^$b[$Y] ;
 EXPECT
-Use of uninitialized value within @a in 1's complement (~) at - line 4.
+Use of uninitialized value within @a in 1's complement (^~^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -252,7 +252,7 @@ my $x = 1 ^&^ "def" ;
 no warnings 'numeric' ;
 my $z = 1 ^&^ "def" ;
 EXPECT
-Argument "def" isn't numeric in bitwise and (&) at - line 3.
+Argument "def" isn't numeric in bitwise and (^&^) at - line 3.
 ########
 # sv.c
 use warnings 'numeric' ;

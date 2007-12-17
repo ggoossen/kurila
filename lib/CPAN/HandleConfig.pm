@@ -645,10 +645,10 @@ sub cpl {
             (
              @words == 3
              ||
-             @words >= 4 && length($word)
+             @words +>= 4 && length($word)
             )) {
         return sort grep /^\Q$word\E/, keys %keys;
-    } elsif (@words >= 4) {
+    } elsif (@words +>= 4) {
         return ();
     }
     my %seen;

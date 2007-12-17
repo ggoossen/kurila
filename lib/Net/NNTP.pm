@@ -119,7 +119,7 @@ sub postok {
 
 
 sub article {
-  @_ >= 1 && @_ <= 3 or croak 'usage: $nntp->article( [ MSGID ], [ FH ] )';
+  @_ +>= 1 && @_ +<= 3 or croak 'usage: $nntp->article( [ MSGID ], [ FH ] )';
   my $nntp = shift;
   my @fh;
 
@@ -132,7 +132,7 @@ sub article {
 
 
 sub articlefh {
-  @_ >= 1 && @_ <= 2 or croak 'usage: $nntp->articlefh( [ MSGID ] )';
+  @_ +>= 1 && @_ +<= 2 or croak 'usage: $nntp->articlefh( [ MSGID ] )';
   my $nntp = shift;
 
   return unless $nntp->_ARTICLE(@_);
@@ -159,7 +159,7 @@ sub authinfo_simple {
 
 
 sub body {
-  @_ >= 1 && @_ <= 3 or croak 'usage: $nntp->body( [ MSGID ], [ FH ] )';
+  @_ +>= 1 && @_ +<= 3 or croak 'usage: $nntp->body( [ MSGID ], [ FH ] )';
   my $nntp = shift;
   my @fh;
 
@@ -172,7 +172,7 @@ sub body {
 
 
 sub bodyfh {
-  @_ >= 1 && @_ <= 2 or croak 'usage: $nntp->bodyfh( [ MSGID ] )';
+  @_ +>= 1 && @_ +<= 2 or croak 'usage: $nntp->bodyfh( [ MSGID ] )';
   my $nntp = shift;
   return unless $nntp->_BODY(@_);
   return $nntp->tied_fh;
@@ -180,7 +180,7 @@ sub bodyfh {
 
 
 sub head {
-  @_ >= 1 && @_ <= 3 or croak 'usage: $nntp->head( [ MSGID ], [ FH ] )';
+  @_ +>= 1 && @_ +<= 3 or croak 'usage: $nntp->head( [ MSGID ], [ FH ] )';
   my $nntp = shift;
   my @fh;
 
@@ -193,7 +193,7 @@ sub head {
 
 
 sub headfh {
-  @_ >= 1 && @_ <= 2 or croak 'usage: $nntp->headfh( [ MSGID ] )';
+  @_ +>= 1 && @_ +<= 2 or croak 'usage: $nntp->headfh( [ MSGID ] )';
   my $nntp = shift;
   return unless $nntp->_HEAD(@_);
   return $nntp->tied_fh;
@@ -249,7 +249,7 @@ sub help {
 
 
 sub ihave {
-  @_ >= 2 or croak 'usage: $nntp->ihave( MESSAGE-ID [, MESSAGE ])';
+  @_ +>= 2 or croak 'usage: $nntp->ihave( MESSAGE-ID [, MESSAGE ])';
   my $nntp = shift;
   my $mid  = shift;
 
@@ -280,7 +280,7 @@ sub list {
 
 
 sub newgroups {
-  @_ >= 2 or croak 'usage: $nntp->newgroups( SINCE [, DISTRIBUTIONS ])';
+  @_ +>= 2 or croak 'usage: $nntp->newgroups( SINCE [, DISTRIBUTIONS ])';
   my $nntp = shift;
   my $time = _timestr(shift);
   my $dist = shift || "";
@@ -295,7 +295,7 @@ sub newgroups {
 
 
 sub newnews {
-  @_ >= 2 && @_ <= 4
+  @_ +>= 2 && @_ +<= 4
     or croak 'usage: $nntp->newnews( SINCE [, GROUPS [, DISTRIBUTIONS ]])';
   my $nntp = shift;
   my $time = _timestr(shift);
@@ -326,7 +326,7 @@ sub next {
 
 
 sub post {
-  @_ >= 1 or croak 'usage: $nntp->post( [ MESSAGE ] )';
+  @_ +>= 1 or croak 'usage: $nntp->post( [ MESSAGE ] )';
   my $nntp = shift;
 
   $nntp->_POST() && $nntp->datasend(@_)
@@ -466,7 +466,7 @@ sub xgtitle {
 
 
 sub xhdr {
-  @_ >= 2 && @_ <= 4 or croak 'usage: $nntp->xhdr( HEADER, [ MESSAGE-SPEC ] )';
+  @_ +>= 2 && @_ +<= 4 or croak 'usage: $nntp->xhdr( HEADER, [ MESSAGE-SPEC ] )';
   my $nntp = shift;
   my $hdr  = shift;
   my $arg  = _msg_arg(@_);
@@ -563,7 +563,7 @@ sub _msg_arg {
         $arg .= "-"
           if $spec->[1] != $spec->[0];
         $arg .= $spec->[1]
-          if $spec->[1] > $spec->[0];
+          if $spec->[1] +> $spec->[0];
       }
     }
     else {

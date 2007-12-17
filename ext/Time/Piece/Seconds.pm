@@ -77,7 +77,7 @@ sub _get_ovlvals {
 
 sub compare {
     my ($lhs, $rhs) = _get_ovlvals(@_);
-    return $lhs <=> $rhs;
+    return $lhs <+> $rhs;
 }
 
 sub add {

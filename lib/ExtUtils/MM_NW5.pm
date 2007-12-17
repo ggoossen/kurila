@@ -89,7 +89,7 @@ sub init_platform {
 
     # If the final binary name is greater than 8 chars,
     # truncate it here.
-    if(length($self->{'BASEEXT'}) > 8) {
+    if(length($self->{'BASEEXT'}) +> 8) {
         $self->{'NLM_SHORT_NAME'} = substr($self->{'BASEEXT'},0,8);
     }
 

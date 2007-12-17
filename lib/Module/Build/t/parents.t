@@ -31,21 +31,21 @@ package main;
 
 ok my @parents = MySub1->mb_parents;
 # There will be at least one platform class in between.
-ok @parents >= 2;
+ok @parents +>= 2;
 # They should all inherit from Module::Build::Base;
 ok ! grep { !$_->isa('Module::Build::Base') } @parents;
 is $parents[0], 'Module::Build';
 is $parents[-1], 'Module::Build::Base';
 
 ok @parents = MySub2->mb_parents;
-ok @parents >= 3;
+ok @parents +>= 3;
 ok ! grep { !$_->isa('Module::Build::Base') } @parents;
 is $parents[0], 'MySub1';
 is $parents[1], 'Module::Build';
 is $parents[-1], 'Module::Build::Base';
 
 ok @parents = MySub3->mb_parents;
-ok @parents >= 4;
+ok @parents +>= 4;
 ok ! grep { !$_->isa('Module::Build::Base') } @parents;
 is $parents[0], 'MySub2';
 is $parents[1], 'MySub1';
@@ -53,7 +53,7 @@ is $parents[2], 'Module::Build';
 is $parents[-1], 'Module::Build::Base';
 
 ok @parents = MyBulk->mb_parents;
-ok @parents >= 5;
+ok @parents +>= 5;
 ok ! grep { !$_->isa('Module::Build::Base') } @parents;
 is $parents[0], 'MySub2';
 is $parents[1], 'MySub1';

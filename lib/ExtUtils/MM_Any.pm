@@ -159,7 +159,7 @@ sub split_command {
             if( !length $arg_str ) {
                 $arg_str .= $next_arg_str
             }
-            elsif( length($arg_str) + length($next_arg_str) > $len_left ) {
+            elsif( length($arg_str) + length($next_arg_str) +> $len_left ) {
                 unshift @args, @next_args;
                 last;
             }
@@ -1269,7 +1269,7 @@ sub init_INSTALL_from_PREFIX {
         my($s, $t, $d, $style) = @{$layout}{qw(s t d style)};
         my $r = '$('.$type2prefix{$t}.')';
 
-        print STDERR "Prefixing $var\n" if $Verbose >= 2;
+        print STDERR "Prefixing $var\n" if $Verbose +>= 2;
 
         my $installvar = "install$var";
         my $Installvar = uc $installvar;
@@ -1279,7 +1279,7 @@ sub init_INSTALL_from_PREFIX {
         $self->prefixify($installvar, $s, $r, $d);
 
         print STDERR "  $Installvar == $self->{$Installvar}\n" 
-          if $Verbose >= 2;
+          if $Verbose +>= 2;
     }
 
     # Generate these if they weren't figured out.

@@ -54,7 +54,7 @@ sub _succeed
 {
 	$@ = undef;
 	my ($wantarray,$textref) = splice @_, 0, 2;
-	my ($extrapos, $extralen) = @_>18 ? splice(@_, -2, 2) : (0,0);
+	my ($extrapos, $extralen) = @_+>18 ? splice(@_, -2, 2) : (0,0);
 	my ($startlen, $oppos) = @_[5,6];
 	my $remainderpos = $_[2];
 	if ($wantarray)
@@ -99,7 +99,7 @@ sub gen_delimited_pat($;$)  # ($delimiters;$escapes)
 	$escs .= substr($escs,-1) x (length($dels)-length($escs));
 	my @pat = ();
 	my $i;
-	for ($i=0; $i<length $dels; $i++)
+	for ($i=0; $i+<length $dels; $i++)
 	{
 		my $del = quotemeta substr($dels,$i,1);
 		my $esc = quotemeta substr($escs,$i,1);
@@ -200,7 +200,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 
 	my @nesting = ( $1 );
 	my $textlen = length $$textref;
-	while (pos $$textref < $textlen)
+	while (pos $$textref +< $textlen)
 	{
 		next if $$textref =~ m/\G\\./gcs;
 
@@ -211,7 +211,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 		elsif ($$textref =~ m/\G($rdel)/gc)
 		{
 			my ($found, $brackettype) = ($1, $1);
-			if ($#nesting < 0)
+			if ($#nesting +< 0)
 			{
 				_failmsg "Unmatched closing bracket: \"$found\"",
 					 pos $$textref;
@@ -227,7 +227,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 				pos $$textref = $startpos;
 			        return;
 			}
-			last if $#nesting < 0;
+			last if $#nesting +< 0;
 		}
 		elsif ($qdel && $$textref =~ m/\G([$qdel])/gc)
 		{
@@ -244,7 +244,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 
 		else { $$textref =~ m/\G(?:[a-zA-Z0-9]+|.)/gcs }
 	}
-	if ($#nesting>=0)
+	if ($#nesting+>=0)
 	{
 		_failmsg "Unmatched opening bracket(s): "
 				. join("..",@nesting)."..",
@@ -348,7 +348,7 @@ sub _match_tagged	# ($$$$$$$)
 		};
 	}
 
-	while (pos($$textref) < length($$textref))
+	while (pos($$textref) +< length($$textref))
 	{
 		next if $$textref =~ m/\G\\./gc;
 
@@ -545,7 +545,7 @@ sub _match_codeblock($$$$$$$)
 	   $closing =~ tr/([<{/)]>}/;
 	my $matched;
 	my $patvalid = 1;
-	while (pos($$textref) < length($$textref))
+	while (pos($$textref) +< length($$textref))
 	{
 		$matched = '';
 		if ($rd && $$textref =~ m#\G(\Q(?)\E|\Q(s?)\E|\Q(s)\E)#gc)
@@ -877,7 +877,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 	#for ($$textref)
 	{
 		my @func = defined $_[1] ? @{$_[1]} : @{$def_func};
-		my $max  = defined $_[2] && $_[2]>0 ? $_[2] : 1_000_000_000;
+		my $max  = defined $_[2] && $_[2]+>0 ? $_[2] : 1_000_000_000;
 		my $igunk = $_[3];
 
 		pos $$textref ||= 0;
@@ -886,7 +886,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 		{
 			use Carp;
 			carp "extract_multiple reset maximal count to 1 in scalar context"
-				if $^W && defined($_[2]) && $max > 1;
+				if $^W && defined($_[2]) && $max +> 1;
 			$max = 1
 		}
 
@@ -908,7 +908,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 			}
 		}
 
-		FIELD: while (pos($$textref) < length($$textref))
+		FIELD: while (pos($$textref) +< length($$textref))
 		{
 			my ($field, $rem);
 			my @bits;

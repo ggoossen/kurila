@@ -467,7 +467,7 @@ sub READ
     my $bytesread = $self->{'file'}->gzread($mybuf,$nbytes);
     substr($$bufref, $offset, undef, $mybuf);
 
-    return undef if $bytesread < 0;
+    return undef if $bytesread +< 0;
 
     return $bytesread;
 }
@@ -478,13 +478,13 @@ sub READLINE
 
     my $line;
 
-    return () if $self->{'file'}->gzreadline($line) <= 0;
+    return () if $self->{'file'}->gzreadline($line) +<= 0;
 
     return $line unless wantarray;
 
     my @lines = $line;
 
-    while ($self->{'file'}->gzreadline($line) > 0)
+    while ($self->{'file'}->gzreadline($line) +> 0)
     {
         push @lines, $line;
     }
@@ -499,7 +499,7 @@ sub WRITE
     my $length = shift;
     my $offset = shift;
 
-    croak "IO::Zlib::WRITE: too long LENGTH" unless $offset + $length <= length($buf);
+    croak "IO::Zlib::WRITE: too long LENGTH" unless $offset + $length +<= length($buf);
 
     return $self->{'file'}->gzwrite(substr($buf,$offset,$length));
 }

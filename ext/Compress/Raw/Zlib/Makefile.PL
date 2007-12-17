@@ -22,7 +22,7 @@ my $USE_PPPORT_H = ($ENV{PERL_CORE}) ? '' : '-DUSE_PPPORT_H';
 # ExtUtils::Install.
 
 # Don't ask if MM_USE_DEFAULT is set -- enables perl core building on cygwin
-if ($^O =~ /cygwin/i and $ExtUtils::Install::VERSION < 1.39 
+if ($^O =~ /cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
         and not ($ENV{PERL_MM_USE_DEFAULT} or $ENV{PERL_CORE}))
 {
     print <<EOM ;
@@ -140,7 +140,9 @@ my @names = qw(
 );
     #ZLIB_VERNUM
 
-if (eval {require ExtUtils::Constant; 1}) {
+require ExtUtils::Constant;
+
+{
     # Check the constants above all appear in @EXPORT in Zlib.pm
     my %names = map { $_, 1} @names, 'ZLIB_VERSION';
     open F, "<lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
@@ -174,14 +176,6 @@ if (eval {require ExtUtils::Constant; 1}) {
                                        PROXYSUBS => 1,
                                     );
 } 
-else {
-    foreach my $name (qw( constants.h constants.xs ))
-    {
-        my $from = catfile('fallback', $name);
-        copy ($from, $name)
-          or die "Can't copy $from to $name: $!";
-    }
-}
 
 sub ParseCONFIG
 {
@@ -262,7 +256,7 @@ sub ParseCONFIG
 
 	die "GZIP_OS_CODE not 'AUTO_DETECT' or a number between 0 and 255\n"
 	   unless uc $GZIP_OS_CODE eq 'AUTO_DETECT'
-                    || ( $GZIP_OS_CODE =~ /^(\d+)$/ && $1 >= 0 && $1 <= 255) ;
+                    || ( $GZIP_OS_CODE =~ /^(\d+)$/ && $1 +>= 0 && $1 +<= 255) ;
 
     if (uc $GZIP_OS_CODE eq 'AUTO_DETECT')
     {

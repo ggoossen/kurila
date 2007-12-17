@@ -277,7 +277,7 @@ sub _init_headings {
     ## Initialize current section heading titles if necessary
     unless (defined $myData{_SECTION_HEADINGS}) {
         local *section_headings = $myData{_SECTION_HEADINGS} = [];
-        for (my $i = 0; $i < $MAX_HEADING_LEVEL; ++$i) {
+        for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
             $section_headings[$i] = '';
         }
     }
@@ -305,7 +305,7 @@ sub curr_headings {
     my $self = shift;
     $self->_init_headings()  unless (defined $self->{_SECTION_HEADINGS});
     my @headings = @{ $self->{_SECTION_HEADINGS} };
-    return (@_ > 0  and  $_[0] =~ /^\d+$/) ? $headings[$_[0] - 1] : @headings;
+    return (@_ +> 0  and  $_[0] =~ /^\d+$/) ? $headings[$_[0] - 1] : @headings;
 }
 
 ##---------------------------------------------------------------------------
@@ -357,7 +357,7 @@ sub select {
     my $add = ($sections[0] eq "+") ? shift(@sections) : "";
 
     ## Reset the set of sections to use
-    unless (@sections > 0) {
+    unless (@sections +> 0) {
         delete $myData{_SELECTED_SECTIONS}  unless ($add);
         return;
     }
@@ -446,11 +446,11 @@ sub match_section {
     ## Return true if no restrictions were explicitly specified
     my $selections = (exists $myData{_SELECTED_SECTIONS})
                        ?  $myData{_SELECTED_SECTIONS}  :  undef;
-    return  1  unless ((defined $selections) && (@{$selections} > 0));
+    return  1  unless ((defined $selections) && (@{$selections} +> 0));
 
     ## Default any unspecified sections to the current one
     my @current_headings = $self->curr_headings();
-    for (my $i = 0; $i < $MAX_HEADING_LEVEL; ++$i) {
+    for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
         (defined $headings[$i])  or  $headings[$i] = $current_headings[$i];
     }
 
@@ -464,7 +464,7 @@ sub match_section {
         ## the results of matching a given element of the spec.
         ##------------------------------------------------------
         $match = 1;
-        for (my $i = 0; $i < $MAX_HEADING_LEVEL; ++$i) {
+        for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
             $match  ^&^= ($negated ? ($headings[$i] !~ /${regex}/)
@@ -512,7 +512,7 @@ sub is_selected {
         ## Reset the current section heading at this level
         $myData{_SECTION_HEADINGS}->[$level - 1] = $heading;
         ## Reset subsection headings of this one to empty
-        for (my $i = $level; $i < $MAX_HEADING_LEVEL; ++$i) {
+        for (my $i = $level; $i +< $MAX_HEADING_LEVEL; ++$i) {
             $myData{_SECTION_HEADINGS}->[$i] = '';
         }
     }
@@ -624,7 +624,7 @@ sub podselect {
             ++$num_inputs;
         }
     }
-    $pod_parser->parse_from_file("-")  unless ($num_inputs > 0);
+    $pod_parser->parse_from_file("-")  unless ($num_inputs +> 0);
 }
 
 #############################################################################
@@ -677,7 +677,7 @@ sub _compile_section_spec {
     @regexs = split('/', $_, $MAX_HEADING_LEVEL);
 
     ## Set default regex for ommitted levels
-    for (my $i = 0; $i < $MAX_HEADING_LEVEL; ++$i) {
+    for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
         $regexs[$i]  = '.*'  unless ((defined $regexs[$i])
                                      && (length $regexs[$i]));
     }

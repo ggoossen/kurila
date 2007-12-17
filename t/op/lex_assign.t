@@ -227,8 +227,8 @@ $n . $a=='2fake'		# concat with self
 "$n"				# stringify
 $n << $n			# left_shift
 $n >> $n			# right_shift
-$n <=> $n			# ncmp
-$n <=> $n			# i_ncmp
+$n <+> $n			# ncmp
+$n <+> $n			# i_ncmp
 $n cmp $n			# scmp
 $n ^&^ $n				# bit_and
 $n ^^^ $n				# bit_xor

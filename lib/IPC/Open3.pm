@@ -183,7 +183,7 @@ sub _open3 {
     my($package, $dad_wtr, $dad_rdr, $dad_err, @cmd) = @_;
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
-    if (@cmd > 1 and $cmd[0] eq '-') {
+    if (@cmd +> 1 and $cmd[0] eq '-') {
 	croak "Arguments don't make sense when the command is '-'"
     }
 
@@ -323,7 +323,7 @@ sub _open3 {
 }
 
 sub open3 {
-    if (@_ < 4) {
+    if (@_ +< 4) {
 	local $" = ', ';
 	croak "open3(@_): not enough arguments";
     }
@@ -358,7 +358,7 @@ sub spawn_with_handles {
 
     unless (@errs) {
 	$pid = eval { system 1, @_ }; # 1 == P_NOWAIT
-	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $!" if !$pid || $pid < 0;
+	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $!" if !$pid || $pid +< 0;
     }
 
     foreach $fd (@$fds) {

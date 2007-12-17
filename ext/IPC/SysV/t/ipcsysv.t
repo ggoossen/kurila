@@ -64,7 +64,7 @@ skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
 
     $msg = msgget(IPC_PRIVATE, $perm);
     # Very first time called after machine is booted value may be 0 
-    if (!(defined($msg) && $msg >= 0)) {
+    if (!(defined($msg) && $msg +>= 0)) {
         skip( "msgget failed: $!", 6);
     }
     else {
@@ -106,7 +106,7 @@ EOM
     my $data;
     ok(msgctl($msg,IPC_STAT,$data),'msgctl IPC_STAT call');
 
-    cmp_ok(length($data),'>',0,'msgctl IPC_STAT data');
+    cmp_ok(length($data),'+>',0,'msgctl IPC_STAT data');
 
     my $test_name = 'message get call';
     my $msgbuf;
@@ -162,13 +162,13 @@ SKIP: {
             if $! eq 'No space left on device';
 
         # Very first time called after machine is booted value may be 0 
-        die "semget: $!\n" unless defined($sem) && $sem >= 0;
+        die "semget: $!\n" unless defined($sem) && $sem +>= 0;
     }
 
     my $data;
     ok(semctl($sem,0,IPC_STAT,$data),'sem data call');
 
-    cmp_ok(length($data),'>',0,'sem data len');
+    cmp_ok(length($data),'+>',0,'sem data len');
 
     ok(semctl($sem,0,SETALL,pack("s!*",(0) x $nsem)), 'set all sems');
 

@@ -26,12 +26,12 @@ print eval '"ok 7\n";';
 # calculate a factorial with recursive evals
 
 $foo = 5;
-$fact = 'our @x; if ($foo <= 1) {1;} else {push(@x,$foo--); (eval $fact) * pop(@x);}';
+$fact = 'our @x; if ($foo +<= 1) {1;} else {push(@x,$foo--); (eval $fact) * pop(@x);}';
 $ans = eval $fact;
 if ($ans == 120) {print "ok 8\n";} else {print "not ok 8\n";}
 
 $foo = 5;
-$fact = 'local($foo)=$foo; $foo <= 1 ? 1 : $foo-- * (eval $fact);';
+$fact = 'local($foo)=$foo; $foo +<= 1 ? 1 : $foo-- * (eval $fact);';
 $ans = eval $fact;
 if ($ans == 120) {print "ok 9\n";} else {print "not ok 9 $ans\n";}
 
@@ -138,7 +138,7 @@ EOT
 # can recursive subroutine-call inside eval'' see its own lexicals?
 sub recurse {
   my $l = shift;
-  if ($l < $x) {
+  if ($l +< $x) {
      ++$l;
      eval 'print "# level $l\n"; recurse($l);';
      die if $@;
@@ -273,7 +273,7 @@ fred2(49);
 sub do_sort {
     my $zzz = 2;
     my @a = sort
-	    { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <=> $b }
+	    { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <+> $b }
 	    2, 1;
 }
 do_sort();
@@ -286,7 +286,7 @@ eval q{
     sub fred3 {
 	my $l = shift;
 	my $r = -2;
-	return 1 if $l < 1;
+	return 1 if $l +< 1;
 	return 0 if eval '$zzz' != 1;
 	return 0 if       $yyy  != 9;
 	return 0 if eval '$yyy' != 9;
