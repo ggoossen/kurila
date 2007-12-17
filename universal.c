@@ -248,7 +248,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
 	newXS("version::numify", XS_version_numify, file);
 	newXS("version::normal", XS_version_normal, file);
 	newXS("version::(cmp", XS_version_vcmp, file);
-	newXS("version::(<=>", XS_version_vcmp, file);
+	newXS("version::(<+>", XS_version_vcmp, file);
 	newXS("version::vcmp", XS_version_vcmp, file);
 	newXS("version::(bool", XS_version_boolean, file);
 	newXS("version::boolean", XS_version_boolean, file);

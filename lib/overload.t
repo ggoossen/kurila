@@ -16,7 +16,7 @@ use overload (
 '+'	=>	sub { Oscalar->new( $ {$_[0]}+$_[1])},
 '-'	=>	sub { Oscalar->new(
 		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
-'<=>'	=>	sub { Oscalar->new(
+'<+>'	=>	sub { Oscalar->new(
 		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
 'cmp'	=>	sub { Oscalar->new(
 		       $_[2]? ($_[1] cmp ${$_[0]}) : (${$_[0]} cmp $_[1]))},
@@ -305,7 +305,7 @@ ok(overload::Overloaded($aI));
 ok(!overload::Overloaded('overload'));
 
 ok(! defined overload::Method($aI, '<<'));
-ok(! defined overload::Method($a, '<'));
+ok(! defined overload::Method($a, '+<'));
 
 like (overload::StrVal($aI), qr/^OscalarI=SCALAR\(0x[\da-fA-F]+\)$/);
 is(overload::StrVal(\$aI), "@{[\$aI]}");
@@ -1089,7 +1089,7 @@ my ($two, $one, $un, $deux) = map {Numify->new( $_)} 2, 1, 1, 2;
 my ($ein, $zwei) = (1, 2);
 
 my %map = (one => 1, un => 1, ein => 1, deux => 2, two => 2, zwei => 2);
-foreach my $op (qw(<=> == != < <= > >=)) {
+foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     foreach my $l (keys %map) {
 	foreach my $r (keys %map) {
 	    my $ocode = "\$$l $op \$$r";

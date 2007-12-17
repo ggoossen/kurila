@@ -88,10 +88,10 @@ push(@script, <<'EOT');
     my $z = cplx(  1,  1);
     $z->abs(3 * sqrt(2));
     print "# $test Re(z) = ",$z->Re(), " Im(z) = ", $z->Im(), " z = $z\n";
-    print 'not ' unless (abs($z) - 3 * sqrt(2)) < $eps and
-                        (arg($z) - pi / 4     ) < $eps and
-                        (Re($z) - 3           ) < $eps and
-                        (Im($z) - 3           ) < $eps;
+    print 'not ' unless (abs($z) - 3 * sqrt(2)) +< $eps and
+                        (arg($z) - pi / 4     ) +< $eps and
+                        (Re($z) - 3           ) +< $eps and
+                        (Im($z) - 3           ) +< $eps;
 EOT
     push(@script, qq(print "ok $test\\n"}\n));
 
@@ -101,10 +101,10 @@ push(@script, <<'EOT');
     my $z = cplx(  1,  1);
     $z->arg(-3 / 4 * pi);
     print "# $test Re(z) = ",$z->Re(), " Im(z) = ", $z->Im(), " z = $z\n";
-    print 'not ' unless (arg($z) + 3 / 4 * pi) < $eps and
-                        (abs($z) - sqrt(2)   ) < $eps and
-                        (Re($z) + 1          ) < $eps and
-                        (Im($z) + 1          ) < $eps;
+    print 'not ' unless (arg($z) + 3 / 4 * pi) +< $eps and
+                        (abs($z) - sqrt(2)   ) +< $eps and
+                        (Re($z) + 1          ) +< $eps and
+                        (Im($z) + 1          ) +< $eps;
 EOT
     push(@script, qq(print "ok $test\\n"}\n));
 }
@@ -429,19 +429,19 @@ EOS
 EOS
     $test++;
     push @script, <<EOS;
-    print (abs(atan2(0, cplx(0, 1))) < $eps ? "ok $test\n" : "not ok $test\n");
+    print (abs(atan2(0, cplx(0, 1))) +< $eps ? "ok $test\n" : "not ok $test\n");
 EOS
     $test++;
     push @script, <<EOS;
-    print (abs(atan2(cplx(0, 1), 0) - \$pip2) < $eps ? "ok $test\n" : "not ok $test\n");
+    print (abs(atan2(cplx(0, 1), 0) - \$pip2) +< $eps ? "ok $test\n" : "not ok $test\n");
 EOS
     $test++;
     push @script, <<EOS;
-    print (abs(atan2(cplx(0, 1), cplx(0, 1)) - \$pip4) < $eps ? "ok $test\n" : "not ok $test\n");
+    print (abs(atan2(cplx(0, 1), cplx(0, 1)) - \$pip4) +< $eps ? "ok $test\n" : "not ok $test\n");
 EOS
     $test++;
     push @script, <<EOS;
-    print (abs(atan2(cplx(0, 1), cplx(1, 1)) - cplx(0.553574358897045, 0.402359478108525)) < $eps ? "ok $test\n" : "not ok $test\n");
+    print (abs(atan2(cplx(0, 1), cplx(1, 1)) - cplx(0.553574358897045, 0.402359478108525)) +< $eps ? "ok $test\n" : "not ok $test\n");
 EOS
 }
 
@@ -479,7 +479,7 @@ sub test {
 	}
 	if (defined $z) {
 		$args = "'$op'";		# Really the value
-		$try = "abs(\$z0 - \$z1) <= $eps ? \$z1 : \$z0";
+		$try = "abs(\$z0 - \$z1) +<= $eps ? \$z1 : \$z0";
 		push @script, "\$res = $try; ";
 		push @script, "check($test, $args[0], \$res, \$z$#args, $args);\n";
 	} else {
@@ -668,7 +668,7 @@ __END__
 (-3,4):(-3,-4)
 [2,pi/2]:[2,-(pi)/2]
 
-&<
+&+<
 (3,4):(1,2):0
 (3,4):(3,2):0
 (3,4):(3,8):1

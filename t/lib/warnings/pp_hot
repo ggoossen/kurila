@@ -39,10 +39,10 @@
   glob failed (child exited with status %d%s)	[Perl_do_readline] <<TODO
 
   Deep recursion on subroutine \"%s\"		[Perl_sub_crush_depth]
-    sub fred { fred() if $a++ < 200} fred()
+    sub fred { fred() if $a++ +< 200} fred()
 
   Deep recursion on anonymous subroutine 	[Perl_sub_crush_depth]
-    $a = sub { &$a if $a++ < 200} &$a
+    $a = sub { &$a if $a++ +< 200} &$a
 
   Use of reference "%s" as array index [pp_aelem]
     $x[\1]
@@ -210,7 +210,7 @@ Filehandle FH opened only for output at - line 15.
 use warnings 'recursion' ;
 sub fred 
 { 
-    fred() if $a++ < 200
+    fred() if $a++ +< 200
 } 
 {
   local $SIG{__WARN__} = sub {
@@ -225,7 +225,7 @@ ok
 no warnings 'recursion' ;
 sub fred 
 { 
-    fred() if $a++ < 200
+    fred() if $a++ +< 200
 } 
 {
   local $SIG{__WARN__} = sub {
@@ -240,7 +240,7 @@ EXPECT
 use warnings 'recursion' ;
 $b = sub 
 { 
-    &$b if $a++ < 200
+    &$b if $a++ +< 200
 }  ;
 
 &$b ;
@@ -251,7 +251,7 @@ Deep recursion on anonymous subroutine at - line 5.
 no warnings 'recursion' ;
 $b = sub 
 { 
-    &$b if $a++ < 200
+    &$b if $a++ +< 200
 }  ;
 
 &$b ;

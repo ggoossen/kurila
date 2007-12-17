@@ -19,7 +19,7 @@ my @MonthDays = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 my $ThisYear    = ( localtime() )[5];
 my $Breakpoint  = ( $ThisYear + 50 ) % 100;
 my $NextCentury = $ThisYear - $ThisYear % 100;
-$NextCentury += 100 if $Breakpoint < 50;
+$NextCentury += 100 if $Breakpoint +< 50;
 my $Century = $NextCentury - 100;
 my $SecOff  = 0;
 
@@ -91,39 +91,39 @@ sub _timegm {
 sub timegm {
     my ( $sec, $min, $hour, $mday, $month, $year ) = @_;
 
-    if ( $year >= 1000 ) {
+    if ( $year +>= 1000 ) {
         $year -= 1900;
     }
-    elsif ( $year < 100 and $year >= 0 ) {
-        $year += ( $year > $Breakpoint ) ? $Century : $NextCentury;
+    elsif ( $year +< 100 and $year +>= 0 ) {
+        $year += ( $year +> $Breakpoint ) ? $Century : $NextCentury;
     }
 
     unless ( $Options{no_range_check} ) {
-        if ( abs($year) >= 0x7fff ) {
+        if ( abs($year) +>= 0x7fff ) {
             $year += 1900;
             croak
                 "Cannot handle date ($sec, $min, $hour, $mday, $month, *$year*)";
         }
 
         croak "Month '$month' out of range 0..11"
-            if $month > 11
-            or $month < 0;
+            if $month +> 11
+            or $month +< 0;
 
 	my $md = $MonthDays[$month];
         ++$md
             if $month == 1 && _is_leap_year( $year + 1900 );
 
-        croak "Day '$mday' out of range 1..$md"  if $mday > $md or $mday < 1;
-        croak "Hour '$hour' out of range 0..23"  if $hour > 23  or $hour < 0;
-        croak "Minute '$min' out of range 0..59" if $min > 59   or $min < 0;
-        croak "Second '$sec' out of range 0..59" if $sec > 59   or $sec < 0;
+        croak "Day '$mday' out of range 1..$md"  if $mday +> $md or $mday +< 1;
+        croak "Hour '$hour' out of range 0..23"  if $hour +> 23  or $hour +< 0;
+        croak "Minute '$min' out of range 0..59" if $min +> 59   or $min +< 0;
+        croak "Second '$sec' out of range 0..59" if $sec +> 59   or $sec +< 0;
     }
 
     my $days = _daygm( undef, undef, undef, $mday, $month, $year );
 
-    unless ($Options{no_range_check} or abs($days) < $MaxDay) {
+    unless ($Options{no_range_check} or abs($days) +< $MaxDay) {
         my $msg = '';
-        $msg .= "Day too big - $days > $MaxDay\n" if $days > $MaxDay;
+        $msg .= "Day too big - $days > $MaxDay\n" if $days +> $MaxDay;
 
 	$year += 1900;
         $msg .=  "Cannot handle date ($sec, $min, $hour, $mday, $month, $year)";
@@ -168,7 +168,7 @@ sub timelocal {
     # the _second_ hour after a DST change where the local time moves
     # backward.
     if ( ! $dst_off &&
-         ( ( $ref_t - SECS_PER_HOUR ) - _timegm( localtime( $loc_t - SECS_PER_HOUR ) ) < 0 )
+         ( ( $ref_t - SECS_PER_HOUR ) - _timegm( localtime( $loc_t - SECS_PER_HOUR ) ) +< 0 )
        ) {
         return $loc_t - SECS_PER_HOUR;
     }
@@ -176,7 +176,7 @@ sub timelocal {
     # Adjust for DST change
     $loc_t += $dst_off;
 
-    return $loc_t if $dst_off > 0;
+    return $loc_t if $dst_off +> 0;
 
     # If the original date was a non-extent gap in a forward DST jump,
     # we should now have the wrong answer - undo the DST adjustment

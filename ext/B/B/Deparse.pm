@@ -266,8 +266,8 @@ use warnings ();
 # 18 left        + - .
 # 17 left        << >>
 # 16 nonassoc    named unary operators
-# 15 nonassoc    < > <= >= lt gt le ge
-# 14 nonassoc    == != <=> eq ne cmp
+# 15 nonassoc    +< +> +<= +>= lt gt le ge
+# 14 nonassoc    == != <+> eq ne cmp
 # 13 left        &
 # 12 left        | ^
 # 11 left        &&
@@ -2052,24 +2052,24 @@ sub pp_pow { maybe_targmy(@_, \&binop, "**", 22, ASSIGN) }
 
 sub pp_left_shift { maybe_targmy(@_, \&binop, "<<", 17, ASSIGN) }
 sub pp_right_shift { maybe_targmy(@_, \&binop, ">>", 17, ASSIGN) }
-sub pp_bit_and { maybe_targmy(@_, \&binop, "&", 13, ASSIGN) }
-sub pp_bit_or { maybe_targmy(@_, \&binop, "|", 12, ASSIGN) }
-sub pp_bit_xor { maybe_targmy(@_, \&binop, "^", 12, ASSIGN) }
+sub pp_bit_and { maybe_targmy(@_, \&binop, "^&^", 13, ASSIGN) }
+sub pp_bit_or { maybe_targmy(@_, \&binop, "^|^", 12, ASSIGN) }
+sub pp_bit_xor { maybe_targmy(@_, \&binop, "^^^", 12, ASSIGN) }
 
 sub pp_eq { binop(@_, "==", 14) }
 sub pp_ne { binop(@_, "!=", 14) }
-sub pp_lt { binop(@_, "<", 15) }
-sub pp_gt { binop(@_, ">", 15) }
-sub pp_ge { binop(@_, ">=", 15) }
-sub pp_le { binop(@_, "<=", 15) }
-sub pp_ncmp { binop(@_, "<=>", 14) }
+sub pp_lt { binop(@_, "+<", 15) }
+sub pp_gt { binop(@_, "+>", 15) }
+sub pp_ge { binop(@_, "+>=", 15) }
+sub pp_le { binop(@_, "+<=", 15) }
+sub pp_ncmp { binop(@_, "<+>", 14) }
 sub pp_i_eq { binop(@_, "==", 14) }
 sub pp_i_ne { binop(@_, "!=", 14) }
-sub pp_i_lt { binop(@_, "<", 15) }
-sub pp_i_gt { binop(@_, ">", 15) }
-sub pp_i_ge { binop(@_, ">=", 15) }
-sub pp_i_le { binop(@_, "<=", 15) }
-sub pp_i_ncmp { binop(@_, "<=>", 14) }
+sub pp_i_lt { binop(@_, "+<", 15) }
+sub pp_i_gt { binop(@_, "+>", 15) }
+sub pp_i_ge { binop(@_, "+>=", 15) }
+sub pp_i_le { binop(@_, "+<=", 15) }
+sub pp_i_ncmp { binop(@_, "<+>", 14) }
 
 sub pp_seq { binop(@_, "eq", 14) }
 sub pp_sne { binop(@_, "ne", 14) }
@@ -2386,8 +2386,8 @@ sub indirop {
 	$kid = $kid->sibling;
     }
     if ($name eq "sort" && $op->private ^&^ (OPpSORT_NUMERIC ^|^ OPpSORT_INTEGER)) {
-	$indir = ($op->private ^&^ OPpSORT_DESCEND) ? '{$b <=> $a} '
-						  : '{$a <=> $b} ';
+	$indir = ($op->private ^&^ OPpSORT_DESCEND) ? '{$b <+> $a} '
+						  : '{$a <+> $b} ';
     }
     elsif ($name eq "sort" && $op->private ^&^ OPpSORT_DESCEND) {
 	$indir = '{$b cmp $a} ';

@@ -85,7 +85,7 @@ Can't call method "ref" without a package or object reference at - line 1.
 ########
 chop ($str .= ~< *DATA);
 ########
-$x=2;$y=3;$x<$y ? $x : $y += 23;print $x;
+$x=2;$y=3;$x+<$y ? $x : $y += 23;print $x;
 EXPECT
 25
 ########
@@ -139,7 +139,7 @@ print scalar ("foo","bar")
 EXPECT
 bar
 ########
-sub by_number { $a <=> $b; };# inline function for sort below
+sub by_number { $a <+> $b; };# inline function for sort below
 $as_ary{0}="a0";
 @ordered_array=sort by_number keys(%as_ary);
 ########

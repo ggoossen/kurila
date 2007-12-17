@@ -1189,7 +1189,7 @@ sub _parse_conditions {
   my ($self, $spec) = @_;
 
   if ($spec =~ /^\s*([\w.]+)\s*$/) { # A plain number, maybe with dots, letters, and underscores
-    return (">= $spec");
+    return ("+>= $spec");
   } else {
     return split /\s*,\s*/, $spec;
   }
@@ -1222,13 +1222,13 @@ sub check_installed_status {
   my @conditions = $self->_parse_conditions($spec);
   
   foreach (@conditions) {
-    my ($op, $version) = /^\s*  (<=?|>=?|==|!=)  \s*  ([\w.]+)  \s*$/x
+    my ($op, $version) = /^\s*  (\+<=?|\+>=?|==|!=)  \s*  ([\w.]+)  \s*$/x
       or die "Invalid prerequisite condition '$_' for $modname";
     
     $version = $self->perl_version_to_float($version)
       if $modname eq 'perl';
     
-    next if $op eq '>=' and !$version;  # Module doesn't have to actually define a $VERSION
+    next if $op eq '+>=' and !$version;  # Module doesn't have to actually define a $VERSION
     
     unless ($self->compare_versions( $status{have}, $op, $version )) {
       $status{message} = "$modname ($status{have}) is installed, but we need version $op $version";

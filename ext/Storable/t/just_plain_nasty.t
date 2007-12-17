@@ -31,7 +31,7 @@ BEGIN {
         exit;
     }
     require File::Spec;
-    if ($File::Spec::VERSION < 0.8) {
+    if ($File::Spec::VERSION +< 0.8) {
         print "1..0 # Skip: newer File::Spec needed\n";
         exit 0;
     }
@@ -47,7 +47,7 @@ BEGIN {
 {
     package Banana;
     use overload   
-	'<=>' => \&compare,
+	'<+>' => \&compare,
 	    '==' => \&equal,
 		'""' => \&real,
 		fallback => 1;

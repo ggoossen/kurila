@@ -82,7 +82,7 @@ sub state110 {
 	}
 	$bitstr = pack("B*", "110" x $reps);
 	$state->reset;
-	for ($i = 0; $i < $loops; $i++) {
+	for ($i = 0; $i +< $loops; $i++) {
 		$state->add_bits($bitstr, 3 * $reps);
 	}
 	$state->add_bits($bitstr, $rest);
@@ -103,7 +103,7 @@ sub state011 {
 	}
 	$bitstr = pack("B*", "011" x $reps);
 	$state->reset;
-	for ($i = 0; $i < $loops; $i++) {
+	for ($i = 0; $i +< $loops; $i++) {
 		$state->add_bits($bitstr, 3 * $reps);
 	}
 	$state->add_bits($bitstr, $rest);
@@ -116,7 +116,7 @@ my $i;
 my $testnum = 1;
 
 my $state110 = state110();
-for ($i = 0; $i < @vec110/2; $i++) {
+for ($i = 0; $i +< @vec110/2; $i++) {
 	my $state = $state110->clone;
 	$state->add_bits($vec110[2*$i]);
 	print "not " unless $state->hexdigest eq $vec110[2*$i+1];
@@ -124,7 +124,7 @@ for ($i = 0; $i < @vec110/2; $i++) {
 }
 
 my $state011 = state011();
-for ($i = 0; $i < @vec011/2; $i++) {
+for ($i = 0; $i +< @vec011/2; $i++) {
 	my $state = $state011->clone;
 	$state->add_bits($vec011[2*$i]);
 	print "not " unless $state->hexdigest eq $vec011[2*$i+1];

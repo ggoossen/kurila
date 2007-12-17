@@ -138,19 +138,19 @@ concat		$x . $y
 stringify	"$x"
 left_shift	$x << 1
 right_shift	$x >> 1
-lt		$x < $y
+lt		$x +< $y
 i_lt		SKIP (set by optimizer)
-gt		$x > $y
+gt		$x +> $y
 i_gt		SKIP (set by optimizer)
-le		$i <= $y
+le		$i +<= $y
 i_le		SKIP (set by optimizer)
-ge		$i >= $y
+ge		$i +>= $y
 i_ge		SKIP (set by optimizer)
 eq		$x == $y
 i_eq		SKIP (set by optimizer)
 ne		$x != $y
 i_ne		SKIP (set by optimizer)
-ncmp		$i <=> $y
+ncmp		$i <+> $y
 i_ncmp		SKIP (set by optimizer)
 slt		$x lt $y
 sgt		$x gt $y

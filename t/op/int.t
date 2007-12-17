@@ -23,7 +23,7 @@ print $x == -7 ? "ok 5\n" : "# expected -7, got $x\nnot ok 5\n";
     use integer;
     $x = length("abc") % -10;
     $y = (3/-10)*-10;
-    print $x+$y == 3 && abs($x) < 10 ? "ok 6\n" : "not ok 6\n";
+    print $x+$y == 3 && abs($x) +< 10 ? "ok 6\n" : "not ok 6\n";
 }
 
 # check bad strings still get converted
