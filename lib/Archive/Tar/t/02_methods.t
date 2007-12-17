@@ -662,8 +662,8 @@ sub check_tgz_file {
     is( TAR_END x 2, substr($contents, -(BLOCK*2)),
                                 "   Ends with 1024 null bytes" );
 
-    cmp_ok( $filesize, '<',  $uncompressedsize,
-                                "   Compressed size < uncompressed size" );
+    cmp_ok( $filesize, '+<',  $uncompressedsize,
+                                "   Compressed size +< uncompressed size" );
 
     return $contents;
 }

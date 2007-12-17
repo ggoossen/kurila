@@ -142,7 +142,7 @@ ok(($@ eq "" && "@b" eq "1 4 5 9"),'redefinition should not take effect during t
 {
   no warnings 'redefine';
   *twoface = sub {
-                 eval 'sub twoface { $a <=> $b }';
+                 eval 'sub twoface { $a <+> $b }';
 		 die($@ eq "" ? "good\n" : "bad\n");
 		 $a <+> $b;
 	       };
@@ -240,10 +240,10 @@ cmp_ok($x,'eq',$expected,'b cmp a');
 
 {
     use integer;
-    @b = sort { $a <=> $b } @a;
+    @b = sort { $a <+> $b } @a;
     cmp_ok("@b",'eq','5 19 90 255 1996','integer a <=> b');
 
-    @b = sort { $b <=> $a } @a;
+    @b = sort { $b <+> $a } @a;
     cmp_ok("@b",'eq','1996 255 90 19 5','integer b <=> a');
 
     $x = join('', sort { $a cmp $b } @harry);

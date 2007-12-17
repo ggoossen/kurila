@@ -573,7 +573,7 @@ sub add {
 }
 
 use overload
-        '<=>' => \&compare;
+        '<+>' => \&compare;
 
 sub get_epochs {
     my ($lhs, $rhs, $reverse) = @_;

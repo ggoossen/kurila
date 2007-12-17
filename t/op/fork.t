@@ -126,7 +126,7 @@ sub forkit {
 	print "pid $$ failed to fork\n";
     }
 }
-while ($i++ < 3) { do { forkit(); }; }
+while ($i++ +< 3) { do { forkit(); }; }
 EXPECT
 iteration 1 start
 iteration 1 parent

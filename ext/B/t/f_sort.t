@@ -204,7 +204,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@articles = sort {$a <=> $b} @files; },
+	    code   => q{@articles = sort {$a <+> $b} @files; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 546 (eval 15):1) v
 # 2  <0> pushmark s
@@ -241,7 +241,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@articles = sort {$b <=> $a} @files; },
+	    code   => q{@articles = sort {$b <+> $a} @files; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 587 (eval 26):1) v
 # 2  <0> pushmark s
@@ -279,7 +279,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@eldest = sort { $age{$b} <=> $age{$a} } keys %age; },
+	    code   => q{@eldest = sort { $age{$b} <+> $age{$a} } keys %age; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 592 (eval 28):1) v
 # 2  <0> pushmark s
@@ -321,7 +321,7 @@ sub byage {
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{sub byage { $age{$a} <=> $age{$b}; } @sortedclass = sort byage @class; },
+	    code   => q{sub byage { $age{$a} <+> $age{$b}; } @sortedclass = sort byage @class; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 597 (eval 30):1) v
 # 2  <0> pushmark s
@@ -497,7 +497,7 @@ sort { $b->[1] <=> $a->[1]
 checkOptree(name   => q{Compound sort/map Expression },
 	    bcopts => q{-exec},
 	    code   => q{ @new = map { $_->[0] }
-			 sort { $b->[1] <=> $a->[1] || $a->[2] cmp $b->[2] }
+			 sort { $b->[1] <+> $a->[1] || $a->[2] cmp $b->[2] }
 			 map { [$_, /=(\d+)/, uc($_)] } @old; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 609 (eval 34):3) v:{
@@ -742,7 +742,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@articles = sort {$FooPack::b <=> $FooPack::a} @files; },
+	    code   => q{@articles = sort {$FooPack::b <+> $FooPack::a} @files; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 667 (eval 44):1) v
 # 2  <0> pushmark s
@@ -779,7 +779,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@result = sort { $a <=> $b } grep { $_ == $_ } @input; },
+	    code   => q{@result = sort { $a <+> $b } grep { $_ == $_ } @input; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 673 (eval 46):1) v
 # 2  <0> pushmark s
@@ -832,7 +832,7 @@ sort { $a <=> $b } @input;
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{sort { $a <=> $b } @input; },
+	    code   => q{sort { $a <+> $b } @input; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 678 (eval 48):1) v
 # 2  <0> pushmark s
@@ -859,7 +859,7 @@ sort { $a <=> $b } grep { $_ == $_ } @input;
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{sort { $a <=> $b } grep { $_ == $_ } @input; },
+	    code   => q{sort { $a <+> $b } grep { $_ == $_ } @input; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 684 (eval 50):1) v
 # 2  <0> pushmark s
@@ -902,7 +902,7 @@ $s = sort { $a <=> $b } @input;
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{$s = sort { $a <=> $b } @input; },
+	    code   => q{$s = sort { $a <+> $b } @input; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 689 (eval 52):1) v:{
 # 2  <0> pushmark s
@@ -932,7 +932,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{$s = sort { $a <=> $b } grep { $_ == $_ } @input; },
+	    code   => q{$s = sort { $a <+> $b } grep { $_ == $_ } @input; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 695 (eval 54):1) v:{
 # 2  <0> pushmark s

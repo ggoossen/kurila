@@ -483,20 +483,20 @@ sub rtf_esc {
   if(!defined wantarray) { # void context: alter in-place!
     for(@_) {
       s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/$Escape{$1}/g;  # ESCAPER
-      s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)<32768)?ord($1):(ord($1)-65536)).'?'/eg;
+      s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'/eg;
     }
     return;
   } elsif(wantarray) {  # return an array
     return map {; ($x = $_) =~
       s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/$Escape{$1}/g;  # ESCAPER
-      $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)<32768)?ord($1):(ord($1)-65536)).'?'/eg;
+      $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'/eg;
       $x;
     } @_;
   } else { # return a single scalar
     ($x = ((@_ == 1) ? $_[0] : join '', @_)
     ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/$Escape{$1}/g;  # ESCAPER
              # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)<32768)?ord($1):(ord($1)-65536)).'?'/eg;
+    $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'/eg;
     return $x;
   }
 }
@@ -512,20 +512,20 @@ sub rtf_esc_codely {
   if(!defined wantarray) { # void context: alter in-place!
     for(@_) {
       s/([F\x00-\x1F\\\{\}\x7F-\xFF])/$Escape{$1}/g;  # ESCAPER
-      s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)<32768)?ord($1):(ord($1)-65536)).'?'/eg;
+      s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'/eg;
     }
     return;
   } elsif(wantarray) {  # return an array
     return map {; ($x = $_) =~
       s/([F\x00-\x1F\\\{\}\x7F-\xFF])/$Escape{$1}/g;  # ESCAPER
-      $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)<32768)?ord($1):(ord($1)-65536)).'?'/eg;
+      $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'/eg;
       $x;
     } @_;
   } else { # return a single scalar
     ($x = ((@_ == 1) ? $_[0] : join '', @_)
     ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/$Escape{$1}/g;  # ESCAPER
              # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)<32768)?ord($1):(ord($1)-65536)).'?'/eg;
+    $x =~ s/([^\x00-\xFF])/'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'/eg;
     return $x;
   }
 }

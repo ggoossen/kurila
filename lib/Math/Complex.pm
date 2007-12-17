@@ -81,7 +81,7 @@ use overload
 	'/'	=> \&_divide,
 	'**'	=> \&_power,
 	'=='	=> \&_numeq,
-	'<=>'	=> \&_spaceship,
+	'<+>'	=> \&_spaceship,
 	'neg'	=> \&_negate,
 	'^~^'	=> \&_conjugate,
 	'abs'	=> \&abs,

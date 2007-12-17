@@ -140,7 +140,9 @@ my @names = qw(
 );
     #ZLIB_VERNUM
 
-if (eval {require ExtUtils::Constant; 1}) {
+require ExtUtils::Constant;
+
+{
     # Check the constants above all appear in @EXPORT in Zlib.pm
     my %names = map { $_, 1} @names, 'ZLIB_VERSION';
     open F, "<lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
@@ -174,14 +176,6 @@ if (eval {require ExtUtils::Constant; 1}) {
                                        PROXYSUBS => 1,
                                     );
 } 
-else {
-    foreach my $name (qw( constants.h constants.xs ))
-    {
-        my $from = catfile('fallback', $name);
-        copy ($from, $name)
-          or die "Can't copy $from to $name: $!";
-    }
-}
 
 sub ParseCONFIG
 {

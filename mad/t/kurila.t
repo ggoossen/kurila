@@ -635,5 +635,11 @@ $a .= ~< *F;
 3 <=> 4;
 ----
 3 <+> 4;
+====
+use integer;
+@a = sort { $a <=> $b } @a;
+----
+use integer;
+@a = sort { $a <+> $b } @a;
 END
 }

@@ -151,7 +151,7 @@ my $x = 0;
 sub f {
     eval { my @a = ($^X . "x" , eval_sv(q(die "inner\n"), 0)) ; };
     $x++;
-    $a <=> $b;
+    $a <+> $b;
 }
 
 eval { my @a = sort f 2, 1;  $x++};

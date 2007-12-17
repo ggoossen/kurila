@@ -125,8 +125,8 @@ sub mycan {				# Real can would leave stubs.
 
 %ops = ( with_assign	  => "+ - * / % ** << >> x .",
 	 assign		  => "+= -= *= /= %= **= <<= >>= x= .=",
-	 num_comparison	  => "< <= >  >= == !=",
-	 '3way_comparison'=> "<=> cmp",
+	 num_comparison	  => "+< +<= +>  +>= == !=",
+	 '3way_comparison'=> "<+> cmp",
 	 str_comparison	  => "lt le gt ge eq ne",
 	 binary		  => '^&^ ^&^= ^|^ ^|^= ^^^ ^^^=',
 	 unary		  => "neg ! ^~^",

@@ -104,7 +104,7 @@ EOM
             my $un ;
             my $status = 1 ;
             $status = $gz->read($un) while $status +> 0 ;
-            cmp_ok $status, "<", 0 ;
+            cmp_ok $status, "+<", 0 ;
             ok $gz->error() ;
             ok $gz->eof() ;
             $gz->close();
@@ -143,7 +143,7 @@ EOM
                 }
                 else
                 {
-                    cmp_ok $status, "<", 0 
+                    cmp_ok $status, "+<", 0 
                         or diag "Status $status Error is " . $gz->error() ;
                     ok $gz->eof()
                         or diag "Status $status Error is " . $gz->error() ;

@@ -69,7 +69,7 @@ no_warnings;
 
 
 #line 64
-cmp_ok( undef, '<=', 2, '  undef <= 2' );
+cmp_ok( undef, '+<=', 2, '  undef +<= 2' );
 warnings_like("Use of uninitialized value.* at $Filename line 64\\.\n");
 
 

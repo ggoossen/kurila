@@ -30,7 +30,7 @@ sub deg2rad { PI * $_[0] / 180 }
 
 my $ninety = deg2rad 90;
 
-cmp_ok abs($ninety - 1.5707), '<', 0.0001, '    in math expression';
+cmp_ok abs($ninety - 1.5707), '+<', 0.0001, '    in math expression';
 
 use constant UNDEF1	=> undef;	# the right way
 use constant UNDEF2	=>	;	# the weird way
@@ -103,14 +103,14 @@ is ZERO3, '0.0';
     use constant PI	=> 3.141;
 }
 
-cmp_ok(abs(PI - 3.1416), '<', 0.0001);
+cmp_ok(abs(PI - 3.1416), '+<', 0.0001);
 is Other::PI, 3.141;
 
 use constant E2BIG => $! = 7;
 cmp_ok E2BIG, '==', 7;
 # This is something like "Arg list too long", but the actual message
 # text may vary, so we can't test much better than this.
-cmp_ok length(E2BIG), '>', 6;
+cmp_ok length(E2BIG), '+>', 6;
 
 is @warnings, 0 or diag join "\n", "unexpected warning", @warnings;
 @warnings = ();		# just in case

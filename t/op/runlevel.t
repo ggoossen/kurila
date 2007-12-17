@@ -161,7 +161,7 @@ STR
 OK
 ########
 sub foo {
-  $a <=> $b unless eval('$a == 0 ? bless undef : ($a <=> $b)');
+  $a <+> $b unless eval('$a == 0 ? bless undef : ($a <+> $b)');
 }
 our @a = (3, 2, 0, 1);
 @a = sort foo @a;
@@ -171,7 +171,7 @@ EXPECT
 ########
 sub foo {
   goto bar if $a == 0 || $b == 0;
-  $a <=> $b;
+  $a <+> $b;
 }
 our @a = (3, 2, 0, 1);
 @a = sort foo @a;
@@ -186,10 +186,10 @@ our %seen = ();
 sub sortfn {
   (split(/./, 'x'x10000))[0];
   my (@y) = ( 4, 6, 5);
-  @y = sort { $a <=> $b } @y;
+  @y = sort { $a <+> $b } @y;
   my $t = "sortfn ".join(', ', @y)."\n";
   print $t if ($seen{$t}++ == 0);
-  return $_[0] <=> $_[1];
+  return $_[0] <+> $_[1];
 }
 our @x = ( 3, 2, 1 );
 @x = sort { &sortfn($a, $b) } @x;
@@ -199,7 +199,7 @@ sortfn 4, 5, 6
 ---- 1, 2, 3
 ########
 our @a = (3, 2, 1);
-@a = sort { eval('die("no way")') ,  $a <=> $b} @a;
+@a = sort { eval('die("no way")') ,  $a <+> $b} @a;
 print join(", ", @a)."\n";
 EXPECT
 1, 2, 3
@@ -257,7 +257,7 @@ EXPECT
 Can't find label bbb at - line 8.
 ########
 sub foo {
-  $a <=> $b unless eval('$a == 0 ? die("foo\n") : ($a <=> $b)');
+  $a <+> $b unless eval('$a == 0 ? die("foo\n") : ($a <+> $b)');
 }
 our @a = (3, 2, 0, 1);
 @a = sort foo @a;

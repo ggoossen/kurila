@@ -114,10 +114,10 @@ iter		(<>
 int		(int
 
 # These 12 feature in the next switch statement
-lt		(<
-le		(<=
-gt		(>
-ge		(>=
+lt		(+<
+le		(+<=
+gt		(+>
+ge		(+>=
 eq		(==
 ne		(!=
 slt		(lt
@@ -150,7 +150,7 @@ bor		(^|^
 bor_ass		(^|^=
 bxor		(^^^
 bxor_ass	(^^^=
-ncmp		(<=>
+ncmp		(<+>
 scmp		(cmp
 compl		(^~^
 atan2		(atan2

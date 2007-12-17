@@ -197,7 +197,7 @@ sub findgteprime { # find the smallest prime integer greater than or equal to
     use integer;
 
     my $num = ceil(shift);
-    return 2 if $num <= 2;
+    return 2 if $num +<= 2;
 
     $num++ unless $num % 2;
     my $i;
@@ -206,11 +206,11 @@ sub findgteprime { # find the smallest prime integer greater than or equal to
 
   NUM:
     for (;; $num += 2) {
-	if ($sqrtnumsquared < $num) {
+	if ($sqrtnumsquared +< $num) {
 	    $sqrtnum++;
 	    $sqrtnumsquared = $sqrtnum * $sqrtnum;
 	}
-        for ($i = 3; $i <= $sqrtnum; $i += 2) {
+        for ($i = 3; $i +<= $sqrtnum; $i += 2) {
             next NUM unless $num % $i;
         }
         return $num;

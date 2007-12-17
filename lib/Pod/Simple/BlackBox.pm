@@ -43,10 +43,10 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
  
   my $scratch;
 
-  DEBUG > 4 and 
+  DEBUG +> 4 and 
    print "# Parsing starting at line ", $self->{'line_count'}, ".\n";
 
-  DEBUG > 5 and
+  DEBUG +> 5 and
    print "#  About to parse lines: ",
      join(' ', map defined($_) ? "[$_]" : "EOF", @_), "\n";
 
@@ -60,12 +60,12 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
   my $line;
   foreach my $source_line (@_) {
     if( $self->{'source_dead'} ) {
-      DEBUG > 4 and print "# Source is dead.\n";
+      DEBUG +> 4 and print "# Source is dead.\n";
       last;
     }
 
     unless( defined $source_line ) {
-      DEBUG > 4 and print "# Undef-line seen.\n";
+      DEBUG +> 4 and print "# Undef-line seen.\n";
 
       push @$paras, ['~end', {'start_line' => $self->{'line_count'}}];
       push @$paras, $paras->[-1], $paras->[-1];
@@ -82,7 +82,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
        # tr/// modding the (potentially read-only) original source line!
     
     } else {
-      DEBUG > 2 and print "First line: [$source_line]\n";
+      DEBUG +> 2 and print "First line: [$source_line]\n";
 
       if( ($line = $source_line) =~ s/^\xEF\xBB\xBF//s ) {
         DEBUG and print "UTF-8 BOM seen.  Faking a '=encoding utf8'.\n";
@@ -114,14 +114,14 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         # TODO: implement somehow?
         
       } else {
-        DEBUG > 2 and print "First line is BOM-less.  Faking a '=encoding latin1'.\n";
+        DEBUG +> 2 and print "First line is BOM-less.  Faking a '=encoding latin1'.\n";
         $self->_handle_encoding_line( "=encoding latin1" );
         ($line = $source_line) =~ tr/\n\r//d;
       }
     }
 
 
-    DEBUG > 5 and print "# Parsing line: [$line]\n";
+    DEBUG +> 5 and print "# Parsing line: [$line]\n";
 
     if(!$self->{'in_pod'}) {
       if($line =~ m/^=([a-zA-Z]+)/s) {
@@ -144,7 +144,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
           # And fall thru to the pod-mode block further down
         }
       } else {
-        DEBUG > 5 and print "# It's a code-line.\n";
+        DEBUG +> 5 and print "# It's a code-line.\n";
         $code_handler->(map $_, $line, $self->{'line_count'}, $self)
          if $code_handler;
         # Note: this may cause code to be processed out of order relative
@@ -157,7 +157,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
           # That RE is from perlsyn, section "Plain Old Comments (Not!)",
           #$fname = $2 if defined $2;
           #DEBUG > 1 and defined $2 and print "# Setting fname to \"$fname\"\n";
-          DEBUG > 1 and print "# Setting nextline to $1\n";
+          DEBUG +> 1 and print "# Setting nextline to $1\n";
           $self->{'line_count'} = $1 - 1;
         }
         
@@ -178,7 +178,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
     if($line =~ m/^=cut/s) {
       # here ends the pod block, and therefore the previous pod para
-      DEBUG > 1 and print "Noting =cut at line ${$self}{'line_count'}\n";
+      DEBUG +> 1 and print "Noting =cut at line ${$self}{'line_count'}\n";
       $self->{'in_pod'} = 0;
       # ++$self->{'pod_para_count'};
       $self->_ponder_paragraph_buffer();
@@ -191,12 +191,12 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       
     } elsif($line =~ m/^\s*$/s) {  # it's a blank line
       if(!$self->{'start_of_pod_block'} and @$paras and $paras->[-1][0] eq '~Verbatim') {
-        DEBUG > 1 and print "Saving blank line at line ${$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Saving blank line at line ${$self}{'line_count'}\n";
         push @{$paras->[-1]}, $line;
       }  # otherwise it's not interesting
       
       if(!$self->{'start_of_pod_block'} and !$self->{'last_was_blank'}) {
-        DEBUG > 1 and print "Noting para ends with blank line at ${$self}{'line_count'}\n"; 
+        DEBUG +> 1 and print "Noting para ends with blank line at ${$self}{'line_count'}\n"; 
       }
       
       $self->{'last_was_blank'} = 1;
@@ -215,18 +215,18 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
          # by now it's safe to consider the previous paragraph as done.
                 
         push @$paras, $new; # the new incipient paragraph
-        DEBUG > 1 and print "Starting new ${$paras}[-1][0] para at line ${$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Starting new ${$paras}[-1][0] para at line ${$self}{'line_count'}\n";
         
       } elsif($line =~ m/^\s/s) {
 
         if(!$self->{'start_of_pod_block'} and @$paras and $paras->[-1][0] eq '~Verbatim') {
-          DEBUG > 1 and print "Resuming verbatim para at line ${$self}{'line_count'}\n";
+          DEBUG +> 1 and print "Resuming verbatim para at line ${$self}{'line_count'}\n";
           push @{$paras->[-1]}, $line;
         } else {
           ++$self->{'pod_para_count'};
           $self->_ponder_paragraph_buffer();
            # by now it's safe to consider the previous paragraph as done.
-          DEBUG > 1 and print "Starting verbatim para at line ${$self}{'line_count'}\n";
+          DEBUG +> 1 and print "Starting verbatim para at line ${$self}{'line_count'}\n";
           push @$paras, ['~Verbatim', {'start_line' => $self->{'line_count'}}, $line];
         }
       } else {
@@ -234,14 +234,14 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         $self->_ponder_paragraph_buffer();
          # by now it's safe to consider the previous paragraph as done.
         push @$paras, ['~Para',  {'start_line' => $self->{'line_count'}}, $line];
-        DEBUG > 1 and print "Starting plain para at line ${$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Starting plain para at line ${$self}{'line_count'}\n";
       }
       $self->{'last_was_blank'} = $self->{'start_of_pod_block'} = 0;
 
     } else {
       # It's a non-blank line /continuing/ the current para
       if(@$paras) {
-        DEBUG > 2 and print "Line ${$self}{'line_count'} continues current paragraph\n";
+        DEBUG +> 2 and print "Line ${$self}{'line_count'} continues current paragraph\n";
         push @{$paras->[-1]}, $line;
       } else {
         # Unexpected case!
@@ -252,7 +252,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
     
   } # ends the big while loop
 
-  DEBUG > 1 and print(pretty(@$paras), "\n");
+  DEBUG +> 1 and print(pretty(@$paras), "\n");
   return $self;
 }
 
@@ -264,7 +264,7 @@ sub _handle_encoding_line {
   # The point of this routine is to set $self->{'_transcoder'} as indicated.
 
   return $line unless $line =~ m/^=encoding\s+(\S+)\s*$/s;
-  DEBUG > 1 and print "Found an encoding line \"=encoding $1\"\n";
+  DEBUG +> 1 and print "Found an encoding line \"=encoding $1\"\n";
 
   my $e    = $1;
   my $orig = $e;
@@ -279,7 +279,7 @@ sub _handle_encoding_line {
   if (
     # OK, let's turn on the encoding
     do {
-      DEBUG > 1 and print " Setting encoding to $e\n";
+      DEBUG +> 1 and print " Setting encoding to $e\n";
       $self->{'encoding'} = $e;
       1;
     }
@@ -344,12 +344,12 @@ sub _handle_encoding_second_level {
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
 
-  DEBUG > 2 and print "Ogling encoding directive: =encoding $content\n";
+  DEBUG +> 2 and print "Ogling encoding directive: =encoding $content\n";
   
   if($content eq 'ALREADYDONE') {
     # It's already been handled.  Check for errors.
     if(! $self->{'encoding_command_statuses'} ) {
-      DEBUG > 2 and print " CRAZY ERROR: It wasn't really handled?!\n";
+      DEBUG +> 2 and print " CRAZY ERROR: It wasn't really handled?!\n";
     } elsif( $self->{'encoding_command_statuses'}[-1] ) {
       $self->whine( $para->[1]{'start_line'},
         sprintf "Couldn't do %s: %s",
@@ -357,7 +357,7 @@ sub _handle_encoding_second_level {
           $self->{'encoding_command_statuses'}[-1],
       );
     } else {
-      DEBUG > 2 and print " (Yup, it was successfully handled already.)\n";
+      DEBUG +> 2 and print " (Yup, it was successfully handled already.)\n";
     }
     
   } else {
@@ -384,7 +384,7 @@ sub _gen_errata {
 
   my @out;
   
-  foreach my $line (sort {$a <=> $b} keys %{$self->{'errata'}}) {
+  foreach my $line (sort {$a <+> $b} keys %{$self->{'errata'}}) {
     push @out,
       ['=item', {'start_line' => $m}, "Around line $line:"],
       map( ['~Para', {'start_line' => $m, '~cooked' => 1},
@@ -460,7 +460,7 @@ sub _ponder_paragraph_buffer {
 
   my $scratch;
 
-  DEBUG > 10 and print "# Paragraph buffer: <<", pretty($paras), ">>\n";
+  DEBUG +> 10 and print "# Paragraph buffer: <<", pretty($paras), ">>\n";
 
   # We have something in our buffer.  So apparently the document has started.
   unless($self->{'doc_has_started'}) {
@@ -506,7 +506,7 @@ sub _ponder_paragraph_buffer {
     $para = shift @$paras;
     $para_type = $para->[0];
 
-    DEBUG > 1 and print "Pondering a $para_type paragraph, given the stack: (",
+    DEBUG +> 1 and print "Pondering a $para_type paragraph, given the stack: (",
       $self->_dump_curr_open(), ")\n";
     
     if($para_type eq '=for') {
@@ -526,7 +526,7 @@ sub _ponder_paragraph_buffer {
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     if(grep $_->[1]{'~ignore'}, @$curr_open) {
-      DEBUG > 1 and
+      DEBUG +> 1 and
        print "Skipping $para_type paragraph because in ignore mode.\n";
       next;
     }
@@ -550,7 +550,7 @@ sub _ponder_paragraph_buffer {
       #  mean how it should get treated, not as what the element name
       #  should be.
 
-      DEBUG > 1 and print "Pondering non-magical $para_type\n";
+      DEBUG +> 1 and print "Pondering non-magical $para_type\n";
 
       my $i;
 
@@ -560,7 +560,7 @@ sub _ponder_paragraph_buffer {
          and @$curr_open
          and $curr_open->[-1][0] eq '=over'
       ) {
-        DEBUG > 2 and print "'=$para_type' inside an '=over'!\n";
+        DEBUG +> 2 and print "'=$para_type' inside an '=over'!\n";
         $self->whine(
           $para->[1]{'start_line'},
           "You forgot a '=back' before '$para_type'"
@@ -659,10 +659,10 @@ sub _ponder_paragraph_buffer {
             die "Unknown item type $item_type"; # should never happen
 
           } elsif($expected_value == $para->[1]{'number'}) {
-            DEBUG > 1 and print " Numeric item has the expected value of $expected_value\n";
+            DEBUG +> 1 and print " Numeric item has the expected value of $expected_value\n";
             
           } else {
-            DEBUG > 1 and print " Numeric item has ", $para->[1]{'number'},
+            DEBUG +> 1 and print " Numeric item has ", $para->[1]{'number'},
              " instead of the expected value of $expected_value\n";
             $self->whine(
               $para->[1]{'start_line'},
@@ -760,10 +760,10 @@ sub _ponder_paragraph_buffer {
       } elsif( $para_type =~ s/^=//s
         and defined( $para_type = $self->{'accept_directives'}{$para_type} )
       ) {
-        DEBUG > 1 and print " Pondering known directive ${$para}[0] as $para_type\n";
+        DEBUG +> 1 and print " Pondering known directive ${$para}[0] as $para_type\n";
       } else {
         # An unknown directive!
-        DEBUG > 1 and printf "Unhandled directive %s (Handled: %s)\n",
+        DEBUG +> 1 and printf "Unhandled directive %s (Handled: %s)\n",
          $para->[0], join(' ', sort keys %{$self->{'accept_directives'}} )
         ;
         $self->whine(
@@ -780,7 +780,7 @@ sub _ponder_paragraph_buffer {
           DEBUG and print "Treating $para_type paragraph as such because stack is empty.\n";
         } else {
           my @fors = grep $_->[0] eq '=for', @$curr_open;
-          DEBUG > 1 and print "Containing fors: ",
+          DEBUG +> 1 and print "Containing fors: ",
             join(',', map $_->[1]{'target'}, @fors), "\n";
           
           if(! @fors) {
@@ -843,11 +843,11 @@ sub _ponder_for {
   my $target;
 
   if(grep $_->[1]{'~ignore'}, @$curr_open) {
-    DEBUG > 1 and print "Ignoring ignorable =for\n";
+    DEBUG +> 1 and print "Ignoring ignorable =for\n";
     return 1;
   }
 
-  for(my $i = 2; $i < @$para; ++$i) {
+  for(my $i = 2; $i +< @$para; ++$i) {
     if($para->[$i] =~ s/^\s*(\S+)\s*//s) {
       $target = $1;
       last;
@@ -860,7 +860,7 @@ sub _ponder_for {
     );
     return 1;
   }
-  DEBUG > 1 and
+  DEBUG +> 1 and
    print "Faking out a =for $target as a =begin $target / =end $target\n";
   
   $para->[0] = 'Data';
@@ -918,11 +918,11 @@ sub _ponder_begin {
     split(',', $content, -1),
     $neg ? () : '*'
   ) {
-    DEBUG > 2 and
+    DEBUG +> 2 and
      print " Considering whether =begin $content matches $target_name\n";
     next unless $self->{'accept_targets'}{$target_name};
     
-    DEBUG > 2 and
+    DEBUG +> 2 and
      print "  It DOES match the acceptable target $target_name!\n";
     $to_resolve = 1
       if $self->{'accept_targets'}{$target_name} eq 'force_resolve';
@@ -935,11 +935,11 @@ sub _ponder_begin {
     if( $dont_ignore ) {
       $dont_ignore = '';
       delete $para->[1]{'target_matching'};
-      DEBUG > 2 and print " But the leading ! means that this is a NON-match!\n";
+      DEBUG +> 2 and print " But the leading ! means that this is a NON-match!\n";
     } else {
       $dont_ignore = 1;
       $para->[1]{'target_matching'} = '!';
-      DEBUG > 2 and print " But the leading ! means that this IS a match!\n";
+      DEBUG +> 2 and print " But the leading ! means that this IS a match!\n";
     }
   }
 
@@ -948,15 +948,15 @@ sub _ponder_begin {
   $para->[1]{'~ignore'}   = (! $dont_ignore) || 0;
   $para->[1]{'~resolve'}  = $to_resolve || 0;
 
-  DEBUG > 1 and print " Making note to ", $dont_ignore ? 'not ' : '',
+  DEBUG +> 1 and print " Making note to ", $dont_ignore ? 'not ' : '',
     "ignore contents of this region\n";
-  DEBUG > 1 and $dont_ignore and print " Making note to treat contents as ",
+  DEBUG +> 1 and $dont_ignore and print " Making note to treat contents as ",
     ($to_resolve ? 'verbatim/plain' : 'data'), " paragraphs\n";
-  DEBUG > 1 and print " (Stack now: ", $self->_dump_curr_open(), ")\n";
+  DEBUG +> 1 and print " (Stack now: ", $self->_dump_curr_open(), ")\n";
 
   push @$curr_open, $para;
   if(!$dont_ignore or scalar grep $_->[1]{'~ignore'}, @$curr_open) {
-    DEBUG > 1 and print "Ignoring ignorable =begin\n";
+    DEBUG +> 1 and print "Ignoring ignorable =begin\n";
   } else {
     $self->{'content_seen'} ||= 1;
     $self->_handle_element_start((my $scratch='for'), $para->[1]);
@@ -1019,7 +1019,7 @@ sub _ponder_end {
 
   # Else it's okay to close...
   if(grep $_->[1]{'~ignore'}, @$curr_open) {
-    DEBUG > 1 and print "Not firing any event for this =end $content because in an ignored region\n";
+    DEBUG +> 1 and print "Not firing any event for this =end $content because in an ignored region\n";
     # And that may be because of this to-be-closed =for region, or some
     #  other one, but it doesn't matter.
   } else {
@@ -1029,7 +1029,7 @@ sub _ponder_end {
     $self->{'content_seen'} ||= 1;
     $self->_handle_element_end( my $scratch = 'for' );
   }
-  DEBUG > 1 and print "Popping $curr_open->[-1][0] $curr_open->[-1][1]{'target'} because of =end $content\n";
+  DEBUG +> 1 and print "Popping $curr_open->[-1][0] $curr_open->[-1][1]{'target'} because of =end $content\n";
   pop @$curr_open;
 
   return 1;
@@ -1041,7 +1041,7 @@ sub _ponder_doc_end {
     DEBUG and print "Stack is nonempty at end-document: (",
       $self->_dump_curr_open(), ")\n";
       
-    DEBUG > 9 and print "Stack: ", pretty($curr_open), "\n";
+    DEBUG +> 9 and print "Stack: ", pretty($curr_open), "\n";
     unshift @$paras, $self->_closers_for_all_curr_open;
     # Make sure there is exactly one ~end in the parastack, at the end:
     @$paras = grep $_->[0] ne '~end', @$paras;
@@ -1079,7 +1079,7 @@ sub _ponder_pod {
     $para->[1]{'start_line'},
     "=pod directives shouldn't be over one line long!  Ignoring all "
      . (@$para - 2) . " lines of content"
-  ) if @$para > 3;
+  ) if @$para +> 3;
   # Content is always ignored.
   return;
 }
@@ -1131,7 +1131,7 @@ sub _ponder_over {
     );
     $para->[1]{'indent'} = 4;
   }
-  DEBUG > 1 and print "=over found of type $list_type\n";
+  DEBUG +> 1 and print "=over found of type $list_type\n";
   
   $self->{'content_seen'} ||= 1;
   $self->_handle_element_start((my $scratch = 'over-' . $list_type), $para->[1]);
@@ -1152,7 +1152,7 @@ sub _ponder_back {
   }
 
   if(@$curr_open and $curr_open->[-1][0] eq '=over') {
-    DEBUG > 1 and print "=back happily closes matching =over\n";
+    DEBUG +> 1 and print "=back happily closes matching =over\n";
     # Expected case: we're closing the most recently opened thing
     #my $over = pop @$curr_open;
     $self->{'content_seen'} ||= 1;
@@ -1160,7 +1160,7 @@ sub _ponder_back {
       'over-' . ( (pop @$curr_open)->[1]{'~type'} )
     );
   } else {
-    DEBUG > 1 and print "=back found without a matching =over.  Stack: (",
+    DEBUG +> 1 and print "=back found without a matching =over.  Stack: (",
         join(', ', map $_->[0], @$curr_open), ").\n";
     $self->whine(
       $para->[1]{'start_line'},
@@ -1259,10 +1259,10 @@ sub _ponder_item {
       die "Unknown item type $item_type"; # should never happen
 
     } elsif($expected_value == $para->[1]{'number'}) {
-      DEBUG > 1 and print " Numeric item has the expected value of $expected_value\n";
+      DEBUG +> 1 and print " Numeric item has the expected value of $expected_value\n";
       
     } else {
-      DEBUG > 1 and print " Numeric item has ", $para->[1]{'number'},
+      DEBUG +> 1 and print " Numeric item has ", $para->[1]{'number'},
        " instead of the expected value of $expected_value\n";
       $self->whine(
         $para->[1]{'start_line'},
@@ -1360,7 +1360,7 @@ sub _ponder_Verbatim {
   DEBUG and print " giving verbatim treatment...\n";
 
   $para->[1]{'xml:space'} = 'preserve';
-  for(my $i = 2; $i < @$para; $i++) {
+  for(my $i = 2; $i +< @$para; $i++) {
     foreach my $line ($para->[$i]) { # just for aliasing
       while( $line =~
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
@@ -1378,7 +1378,7 @@ sub _ponder_Verbatim {
   if( $self->{'accept_codes'} and
       $self->{'accept_codes'}{'VerbatimFormatted'}
   ) {
-    while(@$para > 3 and $para->[-1] !~ m/\S/) { pop @$para }
+    while(@$para +> 3 and $para->[-1] !~ m/\S/) { pop @$para }
      # Kill any number of terminal newlines
     $self->_verbatim_format($para);
   } elsif ($self->{'codes_in_verbatim'}) {
@@ -1389,7 +1389,7 @@ sub _ponder_Verbatim {
     )};
     $para->[-1] =~ s/\n+$//s; # Kill any number of terminal newlines
   } else {
-    push @$para, join "\n", splice(@$para, 2) if @$para > 3;
+    push @$para, join "\n", splice(@$para, 2) if @$para +> 3;
     $para->[-1] =~ s/\n+$//s; # Kill any number of terminal newlines
   }
   return;
@@ -1399,7 +1399,7 @@ sub _ponder_Data {
   my ($self,$para) = @_;
   DEBUG and print " giving data treatment...\n";
   $para->[1]{'xml:space'} = 'preserve';
-  push @$para, join "\n", splice(@$para, 2) if @$para > 3;
+  push @$para, join "\n", splice(@$para, 2) if @$para +> 3;
   return;
 }
 
@@ -1443,7 +1443,7 @@ sub _closers_for_all_curr_open {
       die "I don't know how to auto-close an open $copy[0] region";
     }
 
-    unless( @copy > 2 ) {
+    unless( @copy +> 2 ) {
       push @copy, $copy[1]{'target'};
       $copy[-1] = '' unless defined $copy[-1];
        # since =over's don't have targets
@@ -1462,7 +1462,7 @@ sub _verbatim_format {
   
   my $formatting;
 
-  for(my $i = 2; $i < @$p; $i++) { # work backwards over the lines
+  for(my $i = 2; $i +< @$p; $i++) { # work backwards over the lines
     DEBUG and print "_verbatim_format appends a newline to $i: $p->[$i]\n";
     $p->[$i] .= "\n";
      # Unlike with simple Verbatim blocks, we don't end up just doing
@@ -1470,33 +1470,33 @@ sub _verbatim_format {
      # newline to ever line, and then nix the last one later.
   }
 
-  if( DEBUG > 4 ) {
+  if( DEBUG +> 4 ) {
     print "<<\n";
-    for(my $i = $#$p; $i >= 2; $i--) { # work backwards over the lines
+    for(my $i = $#$p; $i +>= 2; $i--) { # work backwards over the lines
       print "_verbatim_format $i: $p->[$i]";
     }
     print ">>\n";
   }
 
-  for(my $i = $#$p; $i > 2; $i--) {
+  for(my $i = $#$p; $i +> 2; $i--) {
     # work backwards over the lines, except the first (#2)
     
     #next unless $p->[$i]   =~ m{^#:([ \^\/\%]*)\n?$}s
     #        and $p->[$i-1] !~ m{^#:[ \^\/\%]*\n?$}s;
      # look at a formatty line preceding a nonformatty one
-    DEBUG > 5 and print "Scrutinizing line $i: $$p[$i]\n";
+    DEBUG +> 5 and print "Scrutinizing line $i: $$p[$i]\n";
     if($p->[$i]   =~ m{^#:([ \^\/\%]*)\n?$}s) {
-      DEBUG > 5 and print "  It's a formatty line.  ",
+      DEBUG +> 5 and print "  It's a formatty line.  ",
        "Peeking at previous line ", $i-1, ": $$p[$i-1]: \n";
       
       if( $p->[$i-1] =~ m{^#:[ \^\/\%]*\n?$}s ) {
-        DEBUG > 5 and print "  Previous line is formatty!  Skipping this one.\n";
+        DEBUG +> 5 and print "  Previous line is formatty!  Skipping this one.\n";
         next;
       } else {
-        DEBUG > 5 and print "  Previous line is non-formatty!  Yay!\n";
+        DEBUG +> 5 and print "  Previous line is non-formatty!  Yay!\n";
       }
     } else {
-      DEBUG > 5 and print "  It's not a formatty line.  Ignoring\n";
+      DEBUG +> 5 and print "  It's not a formatty line.  Ignoring\n";
       next;
     }
 
@@ -1507,7 +1507,7 @@ sub _verbatim_format {
     # #:^^^^^^^^^^^^^^^^^              /////////////         
     
 
-    DEBUG > 4 and print "_verbatim_format considers:\n<$p->[$i-1]>\n<$p->[$i]>\n";
+    DEBUG +> 4 and print "_verbatim_format considers:\n<$p->[$i-1]>\n<$p->[$i]>\n";
     
     $formatting = '  ' . $1;
     $formatting =~ s/\s+$//s; # nix trailing whitespace
@@ -1517,7 +1517,7 @@ sub _verbatim_format {
       next;
     }
 
-    if( length($formatting) >= length($p->[$i-1]) ) {
+    if( length($formatting) +>= length($p->[$i-1]) ) {
       $formatting = substr($formatting, 0, length($p->[$i-1]) - 1) . ' ';
     } else {
       $formatting .= ' ' x (length($p->[$i-1]) - length($formatting));
@@ -1525,7 +1525,7 @@ sub _verbatim_format {
     # Make $formatting and the previous line be exactly the same length,
     # with $formatting having a " " as the last character.
  
-    DEBUG > 4 and print "Formatting <$formatting>    on <", $p->[$i-1], ">\n";
+    DEBUG +> 4 and print "Formatting <$formatting>    on <", $p->[$i-1], ">\n";
 
 
     my @new_line;
@@ -1551,9 +1551,9 @@ sub _verbatim_format {
     }
     my @nixed =    
       splice @$p, $i-1, 2, @new_line; # replace myself and the next line
-    DEBUG > 10 and print "Nixed count: ", scalar(@nixed), "\n";
+    DEBUG +> 10 and print "Nixed count: ", scalar(@nixed), "\n";
     
-    DEBUG > 6 and print "New version of the above line is these tokens (",
+    DEBUG +> 6 and print "New version of the above line is these tokens (",
       scalar(@new_line), "):",
       map( ref($_)?"<@$_> ":"<$_>", @new_line ), "\n";
     $i--; # So the next line we scrutinize is the line before the one
@@ -1563,22 +1563,22 @@ sub _verbatim_format {
   $p->[0] = 'VerbatimFormatted';
 
   # Collapse adjacent text nodes, just for kicks.
-  for( my $i = 2; $i > $#$p; $i++ ) { # work forwards over the tokens except for the last
+  for( my $i = 2; $i +> $#$p; $i++ ) { # work forwards over the tokens except for the last
     if( !ref($p->[$i]) and !ref($p->[$i + 1]) ) {
-      DEBUG > 5 and print "_verbatim_format merges {$p->[$i]} and {$p->[$i+1]}\n";
+      DEBUG +> 5 and print "_verbatim_format merges {$p->[$i]} and {$p->[$i+1]}\n";
       $p->[$i] .= splice @$p, $i+1, 1; # merge
       --$i;  # and back up
     }
   }
 
   # Now look for the last text token, and remove the terminal newline
-  for( my $i = $#$p; $i >= 2; $i-- ) {
+  for( my $i = $#$p; $i +>= 2; $i-- ) {
     # work backwards over the tokens, even the first
     if( !ref($p->[$i]) ) {
       if($p->[$i] =~ s/\n$//s) {
-        DEBUG > 5 and print "_verbatim_format killed the terminal newline on #$i: {$p->[$i]}, after {$p->[$i-1]}\n";
+        DEBUG +> 5 and print "_verbatim_format killed the terminal newline on #$i: {$p->[$i]}, after {$p->[$i-1]}\n";
       } else {
-        DEBUG > 5 and print
+        DEBUG +> 5 and print
          "No terminal newline on #$i: {$p->[$i]}, after {$p->[$i-1]} !?\n";
       }
       last; # we only want the next one
@@ -1619,7 +1619,7 @@ sub _treelet_from_formatting_codes {
   my @stack;
   my @lineage = ($treelet);
 
-  DEBUG > 4 and print "Paragraph:\n$para\n\n";
+  DEBUG +> 4 and print "Paragraph:\n$para\n\n";
  
   # Here begins our frightening tokenizer RE.  The following regex matches
   # text in four main parts:
@@ -1674,42 +1674,42 @@ sub _treelet_from_formatting_codes {
       )
     /xgo
   ) {
-    DEBUG > 4 and print "\nParagraphic tokenstack = (@stack)\n";
+    DEBUG +> 4 and print "\nParagraphic tokenstack = (@stack)\n";
     if(defined $1) {
       if(defined $2) {
-        DEBUG > 3 and print "Found complex start-text code \"$1\"\n";
+        DEBUG +> 3 and print "Found complex start-text code \"$1\"\n";
         push @stack, length($2) + 1; 
           # length of the necessary complex end-code string
       } else {
-        DEBUG > 3 and print "Found simple start-text code \"$1\"\n";
+        DEBUG +> 3 and print "Found simple start-text code \"$1\"\n";
         push @stack, 0;  # signal that we're looking for simple
       }
       push @lineage, [ substr($1,0,1), {}, ];  # new node object
       push @{ $lineage[-2] }, $lineage[-1];
       
     } elsif(defined $4) {
-      DEBUG > 3 and print "Found apparent complex end-text code \"$3$4\"\n";
+      DEBUG +> 3 and print "Found apparent complex end-text code \"$3$4\"\n";
       # This is where it gets messy...
       if(! @stack) {
         # We saw " >>>>" but needed nothing.  This is ALL just stuff then.
-        DEBUG > 4 and print " But it's really just stuff.\n";
+        DEBUG +> 4 and print " But it's really just stuff.\n";
         push @{ $lineage[-1] }, $3, $4;
         next;
       } elsif(!$stack[-1]) {
         # We saw " >>>>" but needed only ">".  Back pos up.
-        DEBUG > 4 and print " And that's more than we needed to close simple.\n";
+        DEBUG +> 4 and print " And that's more than we needed to close simple.\n";
         push @{ $lineage[-1] }, $3; # That was a for-real space, too.
         pos($para) = pos($para) - length($4) + 1;
       } elsif($stack[-1] == length($4)) {
         # We found " >>>>", and it was exactly what we needed.  Commonest case.
-        DEBUG > 4 and print " And that's exactly what we needed to close complex.\n";
-      } elsif($stack[-1] < length($4)) {
+        DEBUG +> 4 and print " And that's exactly what we needed to close complex.\n";
+      } elsif($stack[-1] +< length($4)) {
         # We saw " >>>>" but needed only " >>".  Back pos up.
-        DEBUG > 4 and print " And that's more than we needed to close complex.\n";
+        DEBUG +> 4 and print " And that's more than we needed to close complex.\n";
         pos($para) = pos($para) - length($4) + $stack[-1];
       } else {
         # We saw " >>>>" but needed " >>>>>>".  So this is all just stuff!
-        DEBUG > 4 and print " But it's really just stuff, because we needed more.\n";
+        DEBUG +> 4 and print " But it's really just stuff, because we needed more.\n";
         push @{ $lineage[-1] }, $3, $4;
         next;
       }
@@ -1722,11 +1722,11 @@ sub _treelet_from_formatting_codes {
       pop @lineage;
       
     } elsif(defined $5) {
-      DEBUG > 3 and print "Found apparent simple end-text code \"$4\"\n";
+      DEBUG +> 3 and print "Found apparent simple end-text code \"$4\"\n";
 
       if(@stack and ! $stack[-1]) {
         # We're indeed expecting a simple end-code
-        DEBUG > 4 and print " It's indeed an end-code.\n";
+        DEBUG +> 4 and print " It's indeed an end-code.\n";
 
         if(length($5) == 2) { # There was a space there: " >"
           push @{ $lineage[-1] }, ' ';
@@ -1737,12 +1737,12 @@ sub _treelet_from_formatting_codes {
         pop @stack;
         pop @lineage;
       } else {
-        DEBUG > 4 and print " It's just stuff.\n";
+        DEBUG +> 4 and print " It's just stuff.\n";
         push @{ $lineage[-1] }, $5;
       }
 
     } elsif(defined $6) {
-      DEBUG > 3 and print "Found stuff \"$6\"\n";
+      DEBUG +> 3 and print "Found stuff \"$6\"\n";
       push @{ $lineage[-1] }, $6;
       
     } else {
@@ -1767,7 +1767,7 @@ sub _treelet_from_formatting_codes {
         $x = $code . "<$x>";
       }
     }
-    DEBUG > 1 and print "Unterminated $x sequence\n";
+    DEBUG +> 1 and print "Unterminated $x sequence\n";
     $self->whine($start_line,
       "Unterminated $x sequence",
     );
@@ -1791,7 +1791,7 @@ sub stringify_lol {  # function: stringify_lol($lol)
 sub _stringify_lol {  # the real recursor
   my($lol, $to) = @_;
   use UNIVERSAL ();
-  for(my $i = 2; $i < @$lol; ++$i) {
+  for(my $i = 2; $i +< @$lol; ++$i) {
     if( ref($lol->[$i] || '') and UNIVERSAL::isa($lol->[$i], 'ARRAY') ) {
       _stringify_lol( $lol->[$i], $to);  # recurse!
     } else {

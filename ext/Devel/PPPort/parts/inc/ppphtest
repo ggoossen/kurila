@@ -114,7 +114,7 @@ sub eq_files
       print "# couldn't open $_: $!\n";
       return 0;
     }
-    $_ = do { local $/; <F> };
+    $_ = do { local $/; ~< *F };
     close F;
     comment($_);
   }

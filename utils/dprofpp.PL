@@ -479,7 +479,7 @@ Main: {
 
 	#filter calls
 	if( $opt_f ){
-		for(my $i = 0;$i < @$idkeys - 2;){
+		for(my $i = 0;$i +< @$idkeys - 2;){
 			$key = $$idkeys[$i];
 			if($key =~ /$opt_f/){
 				splice(@$idkeys, $i, 1);
@@ -532,7 +532,7 @@ sub group{
 			$$idkeys[@$idkeys] = $other;
 		}
 
-		for(my $i = 0;$i < @$idkeys - 2;){
+		for(my $i = 0;$i +< @$idkeys - 2;){
 			$key = $$idkeys[$i];
 			if($key =~ /$opt_G/){
 				$$calls{$opt_G} += $$calls{$key};
@@ -597,7 +597,7 @@ sub exclusives_in_tree {
   $deep_times->{kids_time} = $kids_time;
 }
 
-sub kids_by_incl { $kids{$b}{incl_time} <=> $kids{$a}{excl_time} 
+sub kids_by_incl { $kids{$b}{incl_time} <+> $kids{$a}{excl_time} 
 		   or $a cmp $b }
 
 sub display_tree {
@@ -645,7 +645,7 @@ sub display {
                        "\%Time ExclSec CumulS #Calls sec/call Csec/c  Name",
                       );
 
-	  for( $x = 0; $x < @$idkeys; ++$x ){
+	  for( $x = 0; $x +< @$idkeys; ++$x ){
 	    $key = $idkeys->[$x];
 	    $ncalls = $calls->{$key};
 	    $name = $names->{$key};
@@ -932,7 +932,7 @@ sub percalc {
 	my( $calls, $times, $persecs, $idkeys ) = @_;
 	my( $x, $t, $n, $key );
 
-	for( $x = 0; $x < @$idkeys; ++$x ){
+	for( $x = 0; $x +< @$idkeys; ++$x ){
 		$key = $idkeys->[$x];
 		$n = $calls->{$key};
 		$t = $times->{$key} / $hz;
@@ -956,23 +956,23 @@ sub run_profiler {
 }
 
 
-sub by_time { $times->{$b} <=> $times->{$a} }
-sub by_ctime { $ctimes->{$b} <=> $ctimes->{$a} }
-sub by_calls { $calls->{$b} <=> $calls->{$a} }
+sub by_time { $times->{$b} <+> $times->{$a} }
+sub by_ctime { $ctimes->{$b} <+> $ctimes->{$a} }
+sub by_calls { $calls->{$b} <+> $calls->{$a} }
 sub by_alpha { $names->{$a} cmp $names->{$b} }
-sub by_avgcpu { $persecs->{$b} <=> $persecs->{$a} }
+sub by_avgcpu { $persecs->{$b} <+> $persecs->{$a} }
 # Reversed
-sub rby_time { $times->{$a} <=> $times->{$b} }
-sub rby_ctime { $ctimes->{$a} <=> $ctimes->{$b} }
-sub rby_calls { $calls->{$a} <=> $calls->{$b} }
+sub rby_time { $times->{$a} <+> $times->{$b} }
+sub rby_ctime { $ctimes->{$a} <+> $ctimes->{$b} }
+sub rby_calls { $calls->{$a} <+> $calls->{$b} }
 sub rby_alpha { $names->{$b} cmp $names->{$a} }
-sub rby_avgcpu { $persecs->{$a} <=> $persecs->{$b} }
+sub rby_avgcpu { $persecs->{$a} <+> $persecs->{$b} }
 
 BEGIN {
     $statform = ' {>>}  {>>>>} {>>>>} {>>>>} {>>>>>>} {>>>>}  {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<';
     if (-t STDOUT and defined $stty and my ($cols) = `$stty -a` =~ /\bcolumns\s+(\d+)/)
     {
-	$statform .= '<' x ($cols - length $statform) if $cols > 80;
+	$statform .= '<' x ($cols - length $statform) if $cols +> 80;
     }
     $statform .= "}";
 }

@@ -110,8 +110,8 @@ sub gzipGetHeader
     my $after = time ;
 
     ok ! defined $hdr->{Name}, "  Name is undef";
-    cmp_ok $hdr->{Time}, '>=', $before, "  Time is ok";
-    cmp_ok $hdr->{Time}, '<=', $after, "  Time is ok";
+    cmp_ok $hdr->{Time}, '+>=', $before, "  Time is ok";
+    cmp_ok $hdr->{Time}, '+<=', $after, "  Time is ok";
 
     $fh->close;
 
@@ -122,8 +122,8 @@ sub gzipGetHeader
     $after = time ;
 
     ok ! defined $hdr->{Name}, "  Name is undef";
-    cmp_ok $hdr->{Time}, '>=', $before, "  Time is ok";
-    cmp_ok $hdr->{Time}, '<=', $after, "  Time is ok";
+    cmp_ok $hdr->{Time}, '+>=', $before, "  Time is ok";
+    cmp_ok $hdr->{Time}, '+<=', $after, "  Time is ok";
 }
 
 # TODO add more error cases
