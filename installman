@@ -251,7 +251,7 @@ sub rename {
     my($from,$to) = @_;
     if (-f $to and not unlink($to)) {
 	my($i);
-	for ($i = 1; $i < 50; $i++) {
+	for ($i = 1; $i +< 50; $i++) {
 	    last if CORE::rename($to, "$to.$i");
 	}
 	warn("Cannot rename to `$to.$i': $!"), return 0 
