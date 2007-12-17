@@ -553,11 +553,11 @@ sub rename_pointy_ops {
     }
 
     # rename '<' to '+<'
-    for my $op (map { $xml->findnodes(qq'//$_') } qw|op_lt op_le op_gt op_ge |) {
+    for my $op (map { $xml->findnodes(qq'//$_') } map { ("op_i_$_", "op_$_") } qw|lt le gt ge|) {
         set_madprop($op, operator => '+' . get_madprop($op, "operator") );
     }
     # rename '<=>' to '<+>'
-    for my $op ($xml->findnodes(qq'//op_ncmp')) {
+    for my $op (map { $xml->findnodes("//$_") } qw|op_ncmp op_i_ncmp|) {
         next unless get_madprop($op, "operator") eq "&lt;=&gt;";
         set_madprop($op, operator => '&lt;+&gt;');
     }
