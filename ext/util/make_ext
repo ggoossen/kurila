@@ -126,11 +126,7 @@ nonxs)      makeargs="";
 esac
 
 if test ! -f $makefile ; then
-	if test -f ../$depth/perl ; then
-            test -f Makefile.PL && $run ../$depth/perl -I../$depth/lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru
-        else
-            test -f Makefile.PL && $run ../$depth/miniperl -I../$depth/lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru
-        fi
+        test -f Makefile.PL && $run ../$depth/miniperl -I../$depth/lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru
 fi
 if test ! -f $makefile ; then
 	echo "Warning: No Makefile!"
