@@ -44,14 +44,15 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift)"
 # available.  Dependencies handled manually below (for now).
 
 plextract = perlbug perlivp dprofpp
-plfix = h2xs h2ph perldoc pl2pm libnetcfg
+plfixlocal = h2xs h2ph perldoc pl2pm libnetcfg
+plfix = cpan config_data corelist instmodsh prove ptar ptardiff shasum splain piconv enc2xs xsubpp
 
-all: $(plextract) $(plfix)
+all: $(plextract) $(plfixlocal) $(plfix)
 
 $(plextract):
 	$(RUN) $(PERL) -I../lib $@.PL
 
-$(plfix):
+$(plfixlocal):
 	$(CPS) $@.pl $@
 	$(RUN) $(PERL) $(FIXIN) $@
 
@@ -95,8 +96,8 @@ ptardiff: ../lib/Archive/Tar/bin/$@ ../config.sh
 
 pl2pm:		pl2pm.pl ../config.sh
 
-shasum: ../lib/Digest/SHA/bin/$@ ../config.sh
-	$(CPS) ../lib/Digest/SHA/bin/$@ $@
+shasum: ../ext/Digest/SHA/bin/$@ ../config.sh
+	$(CPS) ../ext/Digest/SHA/bin/$@ $@
 	$(RUN) $(PERL) $(FIXIN) $@
 
 splain: ../lib/diagnostics.pm ../config.sh
@@ -115,8 +116,8 @@ enc2xs: ../ext/Encode/bin/$@ ../config.sh
 	$(CPS) ../ext/Encode/bin/$@ $@
 	$(RUN) $(PERL) $(FIXIN) $@
 
-xsubpp: ../ext/Encode/$@ ../config.sh
-	$(CPS) ../ext/Encode/$@ $@
+xsubpp: ../lib/ExtUtils/$@ ../config.sh
+	$(CPS) ../lib/ExtUtils/$@ $@
 	$(RUN) $(PERL) $(FIXIN) $@
 
 clean:
