@@ -30,6 +30,7 @@ sub p5convert {
 
 #t_parenthesis();
 #t_change_deref();
+t_anon_hash();
 t_pointy_op();
 die;
 t_lvalue_subs();
@@ -645,6 +646,19 @@ use integer;
 3<+>4;
 3+<4;
 3+>4;
+====
+END
+}
+
+sub t_anon_hash {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+{ foo => 'bar' };
+----
+< foo => 'bar' >;
+====
+{};
+----
+<>;
 ====
 END
 }
