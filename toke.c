@@ -4203,8 +4203,7 @@ Perl_yylex(pTHX)
 		    while (t < PL_bufend && isSPACE(*t))
 			++t;
 
-		    if (*t == '/' ||
-			((*t == 'm' || *t == 's' || *t == 'y')
+		    if (((*t == 'm' || *t == 's' || *t == 'y')
 			 && !isALNUM(t[1])) ||
 			(*t == 't' && t[1] == 'r' && !isALNUM(t[2])))
 			Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
@@ -4364,11 +4363,6 @@ Perl_yylex(pTHX)
 		else if ((*s == '-' || *s == '+')
 			 && !isSPACE(s[1]) && s[1] != '=')
 		    PL_expect = XTERM;		/* e.g. print $fh -1 */
-		else if (*s == '/' && !isSPACE(s[1]) && s[1] != '='
-			 && s[1] != '/')
-		    PL_expect = XTERM;		/* e.g. print $fh /.../
-						   XXX except DORDOR operator
-						*/
 		else if (*s == '<' && s[1] == '<' && !isSPACE(s[2])
 			 && s[2] != '=')
 		    PL_expect = XTERM;		/* print $fh <<"EOF" */
@@ -4411,7 +4405,7 @@ Perl_yylex(pTHX)
 	PL_pending_ident = '@';
 	TERM('@');
 
-     case '/':			/* may be division, defined-or, or pattern */
+     case '/':			/* may be division, defined-or */
 	if (PL_expect == XTERMORDORDOR && s[1] == '/') {
 	    s += 2;
 	    AOPERATOR(DORDOR);
@@ -4428,17 +4422,7 @@ Perl_yylex(pTHX)
 		Mop(OP_DIVIDE);
 	    }
 	 }
-	 else {
-	     /* Disable warning on "study /blah/" */
-	     if (PL_oldoldbufptr == PL_last_uni
-	      && (*PL_last_uni != 's' || s - PL_last_uni < 5
-	          || memNE(PL_last_uni, "study", 5)
-	          || isALNUM_lazy_if(PL_last_uni+5,UTF)
-	      ))
-	         check_uni();
-	     s = scan_pat(s,OP_MATCH);
-	     TERM(sublex_start());
-	 }
+	 yyerror("/pat/ must be m/pat/");
 
     case '?':			/* conditional */
 	 s++;
