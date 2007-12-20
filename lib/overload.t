@@ -46,7 +46,7 @@ sub numify { 0 + "${$_[0]}" }	# Not needed, additional overhead
 package main;
 
 $| = 1;
-use Test::More tests => 556;
+use Test::More tests => 548;
 
 
 $a = Oscalar->new( "087");

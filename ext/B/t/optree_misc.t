@@ -16,7 +16,7 @@ BEGIN {
 }
 use OptreeCheck;
 use Config;
-plan tests => 1;
+plan tests => 2;
 
 SKIP: {
 skip "no perlio in this build", 1 unless $Config::Config{useperlio};
@@ -71,7 +71,7 @@ EONT_EONT
 my $t = <<'EOT_EOT';
 # 8  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 1 -e:1) v:>,<,%,{ ->3
+# 2     <;> nextstate(main 1 -e:1) v:&,{ ->3
 # 7     <2> sassign vKS/2 ->8
 # 5        <@> index[t2] sK/2 ->6
 # -           <0> ex-pushmark s ->3
@@ -83,12 +83,12 @@ EOT_EOT
 my $nt = <<'EONT_EONT';
 # 8  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 1 -e:1) v:>,<,%,{ ->3
+# 2     <;> nextstate(main 1 -e:1) v:&,{ ->3
 # 7     <2> sassign vKS/2 ->8
 # 5        <@> index[t1] sK/2 ->6
 # -           <0> ex-pushmark s ->3
 # 3           <$> const(PV "foo") s ->4
-# 4           <$> const(GV "foo") s ->5
+# 4           <$> const(PVMG "foo") s ->5
 # -        <1> ex-rv2sv sKRM*/1 ->7
 # 6           <$> gvsv(*_) s ->7
 EONT_EONT
