@@ -15,7 +15,6 @@ extern "C" {
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "ppport.h"
 #if defined(__CYGWIN__) && defined(HAS_W32API_WINDOWS_H)
 # include <w32api/windows.h>
 # define CYGWIN_WITH_W32API
@@ -713,7 +712,7 @@ myNVtime()
 static void
 hrstatns(UV atime, UV mtime, UV ctime, UV *atime_nsec, UV *mtime_nsec, UV *ctime_nsec)
 {
-  dTHXR;
+  dTHX;
   *atime_nsec = 0;
   *mtime_nsec = 0;
   *ctime_nsec = 0;
@@ -1205,7 +1204,7 @@ PROTOTYPE: ;$
 	PUTBACK;
 	ENTER;
 	PL_laststatval = -1;
-	(void)*(PL_ppaddr[OP_STAT])(aTHXR);
+	(void)*(PL_ppaddr[OP_STAT])(aTHX);
 	SPAGAIN;
 	LEAVE;
 	if (PL_laststatval == 0) {
