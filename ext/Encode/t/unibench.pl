@@ -11,13 +11,13 @@ my @sizes = @ARGV || (1, 4, 16);
 my %utf8_seed;
 for my $i (0x00..0xff){
     my $c = chr($i);
-    $utf8_seed{BMP} .= ($c =~ /^\p{IsPrint}/o) ? $c : " ";
+    $utf8_seed{BMP} .= ($c =~ m/^\p{IsPrint}/o) ? $c : " ";
 }
 utf8::upgrade($utf8_seed{BMP});
 
 for my $i (0x00..0xff){
     my $c = chr(0x10000+$i);
-    $utf8_seed{HIGH} .= ($c =~ /^\p{IsPrint}/o) ? $c : " ";
+    $utf8_seed{HIGH} .= ($c =~ m/^\p{IsPrint}/o) ? $c : " ";
 }
 utf8::upgrade($utf8_seed{HIGH});
 

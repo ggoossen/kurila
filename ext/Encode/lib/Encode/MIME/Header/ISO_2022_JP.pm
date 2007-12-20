@@ -14,7 +14,7 @@ use constant TAIL => '?=';
 
 use Encode::CJKConstants qw(%RE);
 
-our $VERSION = do { my @r = ( q$Revision: 1.3 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 1.3 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 # I owe the below codes totally to
 #   Jcode by Dan Kogai & http://www.din.or.jp/~ohzaki/perl.htm#JP_Base64
@@ -25,7 +25,7 @@ sub encode {
 
     Encode::from_to( $str, 'utf8', 'euc-jp' );
 
-    my ($trailing_crlf) = ( $str =~ /(\n|\r|\x0d\x0a)$/o );
+    my ($trailing_crlf) = ( $str =~ m/(\n|\r|\x0d\x0a)$/o );
 
     $str = _mime_unstructured_header( $str, $self->{bpl} );
 
@@ -36,7 +36,7 @@ sub encode {
 
 sub _mime_unstructured_header {
     my ( $oldheader, $bpl ) = @_;
-    my $crlf = $oldheader =~ /\n$/;
+    my $crlf = $oldheader =~ m/\n$/;
     my ( $header, @words, @wordstmp, $i ) = ('');
 
     $oldheader =~ s/\s+$//;
@@ -44,8 +44,8 @@ sub _mime_unstructured_header {
     @wordstmp = split /\s+/, $oldheader;
 
     for ( $i = 0 ; $i +< $#wordstmp ; $i++ ) {
-        if (    $wordstmp[$i] !~ /^[\x21-\x7E]+$/
-            and $wordstmp[ $i + 1 ] !~ /^[\x21-\x7E]+$/ )
+        if (    $wordstmp[$i] !~ m/^[\x21-\x7E]+$/
+            and $wordstmp[ $i + 1 ] !~ m/^[\x21-\x7E]+$/ )
         {
             $wordstmp[ $i + 1 ] = "$wordstmp[$i] $wordstmp[$i + 1]";
         }
@@ -57,8 +57,8 @@ sub _mime_unstructured_header {
     push( @words, $wordstmp[-1] );
 
     for my $word (@words) {
-        if ( $word =~ /^[\x21-\x7E]+$/ ) {
-            $header =~ /(?:.*\n)*(.*)/;
+        if ( $word =~ m/^[\x21-\x7E]+$/ ) {
+            $header =~ m/(?:.*\n)*(.*)/;
             if ( length($1) + length($word) +> $bpl ) {
                 $header .= "\n $word";
             }
@@ -70,7 +70,7 @@ sub _mime_unstructured_header {
             $header = _add_encoded_word( $word, $header, $bpl );
         }
 
-        $header =~ /(?:.*\n)*(.*)/;
+        $header =~ m/(?:.*\n)*(.*)/;
 
         if ( length($1) == $bpl ) {
             $header .= "\n ";
@@ -95,7 +95,7 @@ sub _add_encoded_word {
 
         if (
             length($line) + 22 +
-            ( $target =~ /^(?:$RE{EUC_0212}|$RE{EUC_C})/o ) * 8 +> $bpl )
+            ( $target =~ m/^(?:$RE{EUC_0212}|$RE{EUC_C})/o ) * 8 +> $bpl )
         {
             $line =~ s/[ \t\n\r]*$/\n/;
             $result .= $line;

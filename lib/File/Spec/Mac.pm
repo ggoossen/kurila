@@ -205,15 +205,15 @@ sub catdir {
 		$relative = 0;
 		$first_arg = $self->rootdir;
 
-	} elsif ($args[0] =~ /^[^:]+:/) { # absolute path, volume name
+	} elsif ($args[0] =~ m/^[^:]+:/) { # absolute path, volume name
 		$relative = 0;
 		$first_arg = shift @args;
 		# add a trailing ':' if need be (may be it's a path like HD:dir)
-		$first_arg = "$first_arg:" unless ($first_arg =~ /:\Z(?!\n)/);
+		$first_arg = "$first_arg:" unless ($first_arg =~ m/:\Z(?!\n)/);
 
 	} else { # relative path
 		$relative = 1;
-		if ( $args[0] =~ /^::+\Z(?!\n)/ ) {
+		if ( $args[0] =~ m/^::+\Z(?!\n)/ ) {
 			# updir colon path ('::', ':::' etc.), don't shift
 			$first_arg = ':';
 		} elsif ($args[0] eq ':') {
@@ -221,7 +221,7 @@ sub catdir {
 		} else {
 			# add a trailing ':' if need be
 			$first_arg = shift @args;
-			$first_arg = "$first_arg:" unless ($first_arg =~ /:\Z(?!\n)/);
+			$first_arg = "$first_arg:" unless ($first_arg =~ m/:\Z(?!\n)/);
 		}
 	}
 
@@ -236,22 +236,22 @@ sub catdir {
 	while (@args) {
 		my $arg = shift @args;
 		unless (($arg eq '') || ($arg eq ':')) {
-			if ($arg =~ /^::+\Z(?!\n)/ ) { # updir colon path like ':::'
+			if ($arg =~ m/^::+\Z(?!\n)/ ) { # updir colon path like ':::'
 				my $updir_count = length($arg) - 1;
-				while ((@args) && ($args[0] =~ /^::+\Z(?!\n)/) ) { # while updir colon path
+				while ((@args) && ($args[0] =~ m/^::+\Z(?!\n)/) ) { # while updir colon path
 					$arg = shift @args;
 					$updir_count += (length($arg) - 1);
 				}
 				$arg = (':' x $updir_count);
 			} else {
 				$arg =~ s/^://s; # remove a leading ':' if any
-				$arg = "$arg:" unless ($arg =~ /:\Z(?!\n)/); # ensure trailing ':'
+				$arg = "$arg:" unless ($arg =~ m/:\Z(?!\n)/); # ensure trailing ':'
 			}
 			$result .= $arg;
 		}#unless
 	}
 
-	if ( ($relative) && ($result !~ /^:/) ) {
+	if ( ($relative) && ($result !~ m/^:/) ) {
 		# add a leading colon if need be
 		$result = ":$result";
 	}
@@ -409,7 +409,7 @@ E.g.
 
 sub file_name_is_absolute {
     my ($self,$file) = @_;
-    if ($file =~ /:/) {
+    if ($file =~ m/:/) {
 	return (! ($file =~ m/^:/s) );
     } elsif ( $file eq '' ) {
         return 1 ;

@@ -79,7 +79,7 @@ sub validate {
         my ($testlist, @testlist);
 
         # skip blanks/comments
-        next if $check =~ /^\s*#/ || $check =~ /^\s*$/;
+        next if $check =~ m/^\s*#/ || $check =~ m/^\s*$/;
 
         # Todo:
         # should probably check for invalid directives and die
@@ -128,7 +128,7 @@ sub validate {
             $this =~ s/-Z/-$one/;
 
             # if it's a "cd" directive...
-            if ($this =~ /^cd\b/) {
+            if ($this =~ m/^cd\b/) {
                 # add "|| die ..."
                 $this .= ' || die "cannot cd to $file\n"';
                 # expand "cd" directive with directory name
@@ -136,7 +136,7 @@ sub validate {
             }
             else {
                 # add "|| warn" as a default disposition
-                $this .= ' || warn' unless $this =~ /\|\|/; 
+                $this .= ' || warn' unless $this =~ m/\|\|/; 
 
                 # change a generic ".. || die" or ".. || warn"
                 # to call valmess instead of die/warn directly
@@ -215,7 +215,7 @@ sub valmess {
     my ($disposition, $test, $file) = @_;
     my $ferror;
 
-    if ($test =~ / ^ (!?) -(\w) \s* $ /x) {
+    if ($test =~ m/ ^ (!?) -(\w) \s* $ /x) {
         my ($neg, $ftype) = ($1, $2);
 
         $ferror = "$file $Val_Message{$ftype}";

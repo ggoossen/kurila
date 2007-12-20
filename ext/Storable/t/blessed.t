@@ -14,7 +14,7 @@ sub BEGIN {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -130,7 +130,7 @@ sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
 	my ($x, @refs) = @_;
-	my ($what, $times) = $x =~ /(.)(\d+)/;
+	my ($what, $times) = $x =~ m/(.)(\d+)/;
 	die "'$x' didn't match" unless defined $times;
 	main::ok ++$test, @refs == $times;
 	my $expect = $::immortals{$what};

@@ -6,7 +6,7 @@ BEGIN {
 	@INC = '../lib';
 	require Config; Config->import;
 	keys %Config; # Silence warning
-	if ($Config{extensions} !~ /\bList\/Util\b/) {
+	if ($Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
 	}
@@ -14,7 +14,7 @@ BEGIN {
 }
 
 use Scalar::Util ();
-use Test::More  (grep { /set_prototype/ } @Scalar::Util::EXPORT_FAIL)
+use Test::More  (grep { m/set_prototype/ } @Scalar::Util::EXPORT_FAIL)
 			? (skip_all => 'set_prototype requires XS version')
 			: (tests => 13);
 
@@ -53,7 +53,7 @@ is( prototype('f_decl'),	'\%',	'change forward declaration');
 
 eval { &set_prototype( 'f', '' ); };
 print "not " unless 
-ok($@ =~ /^set_prototype: not a reference/,	'not a reference');
+ok($@ =~ m/^set_prototype: not a reference/,	'not a reference');
 
 eval { &set_prototype( \'f', '' ); };
-ok($@ =~ /^set_prototype: not a subroutine reference/,	'not a sub reference');
+ok($@ =~ m/^set_prototype: not a subroutine reference/,	'not a sub reference');

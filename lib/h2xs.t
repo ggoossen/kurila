@@ -104,7 +104,7 @@ for (my $i = $#tests; $i +> 0; $i-=3) {
   # plus 1 to open and 1 to check for the use in lib/$name.pm and Makefile.PL
   # And 1 more for our check for "bonus" files, 2 more for ExtUtil::Manifest.
   # use the () to force list context and hence count the number of matches.
-  $total_tests += 9 + (() = $tests[$i] =~ /(Writing)/sg);
+  $total_tests += 9 + (() = $tests[$i] =~ m/(Writing)/sg);
 }
 
 plan tests => $total_tests;
@@ -138,7 +138,7 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   my (%got);
   find (sub {$got{$File::Find::name}++ unless -d $_}, $name);
 
-  foreach ($expectation =~ /Writing\s+(\S+)/gm) {
+  foreach ($expectation =~ m/Writing\s+(\S+)/gm) {
     if ($^O eq 'MacOS') {
       $_ = ':' . join(':',split(/\//,$_));
       $_ =~ s/$name:t:1.t/$name:t\/1.t/; # is this an h2xs bug?
@@ -173,7 +173,7 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
       my $match = qr/use kurila v$kurila::VERSION;/;
       my $found;
       while ( ~< *FILE) {
-        last if $found = /$match/;
+        last if $found = m/$match/;
       }
       ok ($found, "looking for /$match/ in $file");
       close FILE or die "close $file: $!";

@@ -15,10 +15,10 @@ my $Is_EBCDIC = ord('A') == 193;
 my $testno = 0;
 while ( ~< *DATA) {
     if (!$Is_EBCDIC) {
-	next if /^EBCDIC/;
+	next if m/^EBCDIC/;
     }
     else {
-	next if !/^EBCDIC/;
+	next if !m/^EBCDIC/;
 	s/^EBCDIC,\w+#//;
    }
    my($hexdigest, $message) = split;

@@ -16,7 +16,7 @@
 
 use strict;
 
-unless (@ARGV && $ARGV[0] =~ /^(?:list|extract|cleanup)$/) {
+unless (@ARGV && $ARGV[0] =~ m/^(?:list|extract|cleanup)$/) {
    die "$0: Usage: $0 [list|extract|cleanup]\n";
 }
 
@@ -27,7 +27,7 @@ my $cleanup = $action eq 'cleanup';
 
 my $fh;
 while ( ~< *DATA) {
-   if (/^-- (.+\.pl)$/) {
+   if (m/^-- (.+\.pl)$/) {
       if ($cleanup) {
          print "Deleting $1\n";
          unlink $1 or warn "$0: $1: $!\n";

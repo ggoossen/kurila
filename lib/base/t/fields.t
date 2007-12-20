@@ -50,7 +50,7 @@ foreach (Foo->new) {
 
 {
     local $SIG{__WARN__} = sub {
-        return if $_[0] =~ /^Pseudo-hashes are deprecated/ 
+        return if $_[0] =~ m/^Pseudo-hashes are deprecated/ 
     };
     my $phash;
     eval { $phash = fields::phash(name => "Joe", rank => "Captain") };

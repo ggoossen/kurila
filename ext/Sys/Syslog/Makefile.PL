@@ -42,7 +42,7 @@ if ($use_eventlog) {
         close(DLL);
     }
 }
-elsif ($^O =~ /Win32/) {
+elsif ($^O =~ m/Win32/) {
     print <<"NOTICE"
  *** You're running on a Win32 system,  but you lack the Win32::EventLog\a
  *** module, part of the libwin32 distribution. Although Sys::Syslog can 

@@ -248,7 +248,7 @@ chmod 0644, $COMPRESS_FILE;
 
         SKIP: {
             skip( "You are building perl using symlinks", 1)
-                if ($ENV{PERL_CORE} and $Config{config_args} =~/Dmksymlinks/);
+                if ($ENV{PERL_CORE} and $Config{config_args} =~m/Dmksymlinks/);
 
             is( $files[0]->is_file, 1,  
                                     "   Proper type" );

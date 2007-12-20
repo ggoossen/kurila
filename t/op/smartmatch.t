@@ -27,7 +27,7 @@ tie my %tied_hash, 'Tie::StdHash';
 %tied_hash = %hash;
 
 # Load and run the tests
-my @tests = map [chomp and split /\t+/, $_, 3], grep !/^#/ && /\S/, ~< *DATA;
+my @tests = map [chomp and split /\t+/, $_, 3], grep !m/^#/ && m/\S/, ~< *DATA;
 plan tests => 2 * @tests;
 
 for my $test (@tests) {
@@ -49,7 +49,7 @@ sub match_test {
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 
     die "$@ in '$tstr'" if $@ ne "";
-    ok( ($yn =~ /!/ xor $res), "$tstr: $res");
+    ok( ($yn =~ m/!/ xor $res), "$tstr: $res");
 }
 
 

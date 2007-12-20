@@ -161,8 +161,8 @@ sub init_quotes {
         $$self{LQUOTE} = $$self{RQUOTE} = '';
     } elsif (length ($$self{quotes}) == 1) {
         $$self{LQUOTE} = $$self{RQUOTE} = $$self{quotes};
-    } elsif ($$self{quotes} =~ /^(.)(.)$/
-             || $$self{quotes} =~ /^(..)(..)$/) {
+    } elsif ($$self{quotes} =~ m/^(.)(.)$/
+             || $$self{quotes} =~ m/^(..)(..)$/) {
         $$self{LQUOTE} = $1;
         $$self{RQUOTE} = $2;
     } else {
@@ -604,7 +604,7 @@ sub switchquotes {
     # confuses the .SH macros and the like no end.  Expand them ourselves.
     # Also separate troff from nroff if there are any fixed-width fonts in use
     # to work around problems with Solaris nroff.
-    my $c_is_quote = ($$self{LQUOTE} =~ /\"/) || ($$self{RQUOTE} =~ /\"/);
+    my $c_is_quote = ($$self{LQUOTE} =~ m/\"/) || ($$self{RQUOTE} =~ m/\"/);
     my $fixedpat = join '|', @{ $$self{FONTS} }{'100', '101', '110', '111'};
     $fixedpat =~ s/\\/\\\\/g;
     $fixedpat =~ s/\(/\\\(/g;
@@ -758,7 +758,7 @@ sub devise_title {
     my ($self) = @_;
     my $name = $self->source_filename || '';
     my $section = $$self{section} || 1;
-    $section = 3 if (!$$self{section} && $name =~ /\.pm\z/i);
+    $section = 3 if (!$$self{section} && $name =~ m/\.pm\z/i);
     $name =~ s/\.p(od|[lm])\z//i;
 
     # If the section isn't 3, then the name defaults to just the basename of
@@ -776,7 +776,7 @@ sub devise_title {
     # and strip off an initial component of "lib" or "blib/lib" since that's
     # what ExtUtils::MakeMaker creates.  splitdir requires at least File::Spec
     # 0.8.
-    if ($section !~ /^3/) {
+    if ($section !~ m/^3/) {
         require File::Basename;
         $name = uc File::Basename::basename ($name);
     } else {
@@ -786,10 +786,10 @@ sub devise_title {
         my $cut = 0;
         my $i;
         for ($i = 0; $i +< scalar @dirs; $i++) {
-            if ($dirs[$i] eq 'lib' && $i+1 +< scalar(@dirs) && $dirs[$i + 1] =~ /perl/) {
+            if ($dirs[$i] eq 'lib' && $i+1 +< scalar(@dirs) && $dirs[$i + 1] =~ m/perl/) {
                 $cut = $i + 2;
                 last;
-            } elsif ($dirs[$i] =~ /perl/) {
+            } elsif ($dirs[$i] =~ m/perl/) {
                 $cut = $i + 1;
                 $cut++ if $dirs[$i + 1] eq 'lib';
                 last;
@@ -797,9 +797,9 @@ sub devise_title {
         }
         if ($cut +> 0) {
             splice (@dirs, 0, $cut);
-            shift @dirs if ($dirs[0] =~ /^(site|vendor)(_perl)?$/);
-            shift @dirs if ($dirs[0] =~ /^[\d.]+$/);
-            shift @dirs if ($dirs[0] =~ /^(.*-$^O|$^O-.*|$^O)$/);
+            shift @dirs if ($dirs[0] =~ m/^(site|vendor)(_perl)?$/);
+            shift @dirs if ($dirs[0] =~ m/^[\d.]+$/);
+            shift @dirs if ($dirs[0] =~ m/^(.*-$^O|$^O-.*|$^O)$/);
         }
         shift @dirs if $dirs[0] eq 'lib';
         splice (@dirs, 0, 2) if ($dirs[0] eq 'blib' && $dirs[1] eq 'lib');
@@ -847,7 +847,7 @@ sub preamble {
     # If name or section contain spaces, quote them (section really never
     # should, but we may as well be cautious).
     for ($name, $section) {
-        if (/\s/) {
+        if (m/\s/) {
             s/\"/\"\"/g;
             $_ = '"' . $_ . '"';
         }
@@ -929,7 +929,7 @@ sub cmd_verbatim {
     my ($self, $attrs, $text) = @_;
 
     # Ignore an empty verbatim paragraph.
-    return unless $text =~ /\S/;
+    return unless $text =~ m/\S/;
 
     # Force exactly one newline at the end and strip unwanted trailing
     # whitespace at the end.
@@ -942,7 +942,7 @@ sub cmd_verbatim {
     my @lines = split (/\n/, $text);
     my $unbroken = 0;
     for (@lines) {
-        last if /^\s*$/;
+        last if m/^\s*$/;
         $unbroken++;
     }
     $unbroken = 10 if ($unbroken +> 12 && !$$self{MAGIC_VNOPAGEBREAK_LIMIT});
@@ -1000,7 +1000,7 @@ sub cmd_head1 {
     my ($self, $attrs, $text) = @_;
     $text =~ s/\\s-?\d//g;
     $text = $self->heading_common ($text, $$attrs{start_line});
-    my $isname = ($text eq 'NAME' || $text =~ /\(NAME\)/);
+    my $isname = ($text eq 'NAME' || $text =~ m/\(NAME\)/);
     $self->output ($self->switchquotes ('.SH', $self->mapfonts ($text)));
     $self->outindex ('Header', $text) unless $isname;
     $$self{NEEDSPACE} = 0;
@@ -1082,7 +1082,7 @@ sub over_common_start {
         ($indent || '?'), "\n";
 
     # Find the indentation level.
-    unless (defined ($indent) && $indent =~ /^[-+]?\d{1,4}\s*$/) {
+    unless (defined ($indent) && $indent =~ m/^[-+]?\d{1,4}\s*$/) {
         $indent = $$self{indent};
     }
 
@@ -1167,7 +1167,7 @@ sub item_common {
         $item = $text;
         $item =~ s/\s*\n\s*/ /g;
         $text = '';
-        $index = $item if ($item =~ /\w/);
+        $index = $item if ($item =~ m/\w/);
     }
 
     # Take care of the indentation.  If shifts and indents are equal, close

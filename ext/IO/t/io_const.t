@@ -1,6 +1,6 @@
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -10,7 +10,7 @@ use Config;
 
 BEGIN {
     if($ENV{PERL_CORE}) {
-        if ($Config{'extensions'} !~ /\bIO\b/) {
+        if ($Config{'extensions'} !~ m/\bIO\b/) {
             print "1..0 # Skip: IO extension not compiled\n";
             exit 0;
         }

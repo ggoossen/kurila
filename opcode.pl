@@ -22,7 +22,7 @@ my (@ops, %desc, %check, %ckname, %flags, %args);
 while ( ~< *DATA) {
     chop;
     next unless $_;
-    next if /^#/;
+    next if m/^#/;
     my ($key, $desc, $check, $flags, $args) = split(/\t+/, $_, 5);
     $args = '' unless defined $args;
 
@@ -330,20 +330,20 @@ my %OP_IS_FILETEST;
 for (@ops) {
     my $argsum = 0;
     my $flags = $flags{$_};
-    $argsum ^|^= 1 if $flags =~ /m/;		# needs stack mark
-    $argsum ^|^= 2 if $flags =~ /f/;		# fold constants
-    $argsum ^|^= 4 if $flags =~ /s/;		# always produces scalar
-    $argsum ^|^= 8 if $flags =~ /t/;		# needs target scalar
-    $argsum ^|^= (8^|^256) if $flags =~ /T/;	# ... which may be lexical
-    $argsum ^|^= 16 if $flags =~ /i/;		# always produces integer
-    $argsum ^|^= 32 if $flags =~ /I/;		# has corresponding int op
-    $argsum ^|^= 64 if $flags =~ /d/;		# danger, unknown side effects
-    $argsum ^|^= 128 if $flags =~ /u/;		# defaults to $_
-    $flags =~ /([\W\d_])/ or die qq[Opcode "$_" has no class indicator];
+    $argsum ^|^= 1 if $flags =~ m/m/;		# needs stack mark
+    $argsum ^|^= 2 if $flags =~ m/f/;		# fold constants
+    $argsum ^|^= 4 if $flags =~ m/s/;		# always produces scalar
+    $argsum ^|^= 8 if $flags =~ m/t/;		# needs target scalar
+    $argsum ^|^= (8^|^256) if $flags =~ m/T/;	# ... which may be lexical
+    $argsum ^|^= 16 if $flags =~ m/i/;		# always produces integer
+    $argsum ^|^= 32 if $flags =~ m/I/;		# has corresponding int op
+    $argsum ^|^= 64 if $flags =~ m/d/;		# danger, unknown side effects
+    $argsum ^|^= 128 if $flags =~ m/u/;		# defaults to $_
+    $flags =~ m/([\W\d_])/ or die qq[Opcode "$_" has no class indicator];
     $argsum ^|^= $opclass{$1} << 9;
     my $mul = 0x2000;				# 2 ^ OASHIFT
     for my $arg (split(' ',$args{$_})) {
-	if ($arg =~ /^F/) {
+	if ($arg =~ m/^F/) {
            $OP_IS_SOCKET{$_}   = 1 if $arg =~ s/s//;
            $OP_IS_FILETEST{$_} = 1 if $arg =~ s/-//;
         }
@@ -432,8 +432,8 @@ for (sort keys %ckname) {
 print PP "\n\n";
 
 for (@ops) {
-    next if /^i_(pre|post)(inc|dec)$/;
-    next if /^custom$/;
+    next if m/^i_(pre|post)(inc|dec)$/;
+    next if m/^custom$/;
     print PP "PERL_PPDEF(Perl_pp_$_)\n";
     print PPSYM "Perl_pp_$_\n";
 }

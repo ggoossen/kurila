@@ -181,11 +181,11 @@ sub three { two(@_) }
         %DB::sub = map { $_ => $_ } qw( bazbar bazboo boobar booboo boobaz );
         my @ret = DB->filesubs();
         is( scalar @ret, 2, 'DB::filesubs() should use $DB::filename with no args');
-        @ret = grep { /^baz/ } @ret;    
+        @ret = grep { m/^baz/ } @ret;    
         is( scalar @ret, 2, '... should pick up subs in proper file' );
         @ret = DB->filesubs('boo');
         is( scalar @ret, 3, '... should use argument to find subs' );
-        @ret = grep { /^boo/ } @ret;    
+        @ret = grep { m/^boo/ } @ret;    
         is( scalar @ret, 3, '... should pick up subs in proper file with argument');
 }
 

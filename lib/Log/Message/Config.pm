@@ -19,7 +19,7 @@ sub new {
     ### and/or a default configuration object
     ### and remove them from the argument hash
     my %special =   map { lc, delete $hash{$_} }
-                    grep /^config|default$/i, keys %hash;
+                    grep m/^config|default$/i, keys %hash;
 
     ### allow provided arguments to override the values from the config ###
     my $tmpl = {
@@ -75,8 +75,8 @@ sub _read_config_file {
                     );
 
     while( ~< $FH) {
-        next if     /\s*#/;
-        next unless /\S/;
+        next if     m/\s*#/;
+        next unless m/\S/;
 
         chomp; s/^\s*//; s/\s*$//;
 

@@ -5,7 +5,7 @@ use File::Copy qw(copy);
 my $name = $0;
 $name =~ s#^(.*)\.PL$#../$1.SH#;
 my %opt;
-while (@ARGV && $ARGV[0] =~ /^([\w_]+)=(.*)$/)
+while (@ARGV && $ARGV[0] =~ m/^([\w_]+)=(.*)$/)
  {
   $opt{$1}=$2;
   shift(@ARGV);
@@ -22,9 +22,9 @@ $patchlevel = qq["$patchlevel"];
 open(SH,"<$name") || die "Cannot open $name:$!";
 while ( ~< *SH)
  {
-  last if /^sed/;
+  last if m/^sed/;
  }
-($term,$file,$pat) = /^sed\s+<<(\S+)\s+>(\S+)\s+(.*)$/;
+($term,$file,$pat) = m/^sed\s+<<(\S+)\s+>(\S+)\s+(.*)$/;
 $file =~ s/^\$(\w+)$/$opt{$1}/g;
 
 my $str = "sub munge\n{\n";
@@ -46,24 +46,24 @@ open(H,">$file.new") || die "Cannot open $file.new:$!";
 binmode H;		# no CRs (which cause a spurious rebuild)
 while ( ~< *SH)
  {
-  last if /^$term$/o;
+  last if m/^$term$/o;
   s/\$([\w_]+)/Config($1)/eg;
   s/`([^\`]*)`/BackTick($1)/eg;
   munge();
   s/\\\$/\$/g;
   s#/[ *\*]*\*/#/**/#;
-  if (/^\s*#define\s+(SITELIB|VENDORLIB)_EXP/)
+  if (m/^\s*#define\s+(SITELIB|VENDORLIB)_EXP/)
    {
      $_ = "#define ". $1 . "_EXP (nw_get_". lc($1) . "($patchlevel))\t/**/\n";
    }
   # Added for NetWare and removed PRIVLIB from the above, the same thing might have
   # to be done for other as well
-  elsif (/^\s*#define\s+(PRIVLIB)_EXP/)
+  elsif (m/^\s*#define\s+(PRIVLIB)_EXP/)
    {
      $_ = "#define ". $1 . "_EXP (fnNwGetEnvironmentStr(\"PRIVLIB\", PRIVLIB))\t/**/\n";
    }
   # incpush() handles archlibs, so disable them
-  elsif (/^\s*#define\s+(ARCHLIB|SITEARCH|VENDORARCH)_EXP/)
+  elsif (m/^\s*#define\s+(ARCHLIB|SITEARCH|VENDORARCH)_EXP/)
    {
      $_ = "/*#define ". $1 . "_EXP \"\"\t/**/\n";
    }
@@ -104,7 +104,7 @@ sub Config
 sub BackTick
 {
  my $cmd = shift;
- if ($cmd =~ /^echo\s+(.*?)\s*\|\s+sed\s+'(.*)'\s*$/)
+ if ($cmd =~ m/^echo\s+(.*?)\s*\|\s+sed\s+'(.*)'\s*$/)
   {
    local ($data,$pat) = ($1,$2);
    $data =~ s/\s+/ /g;

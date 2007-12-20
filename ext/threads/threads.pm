@@ -42,22 +42,22 @@ sub import
 
     # Handle args
     while (my $sym = shift) {
-        if ($sym =~ /^(?:stack|exit)/i) {
+        if ($sym =~ m/^(?:stack|exit)/i) {
             if (defined(my $arg = shift)) {
-                if ($sym =~ /^stack/i) {
+                if ($sym =~ m/^stack/i) {
                     threads->set_stack_size($arg);
                 } else {
-                    $threads::thread_exit_only = $arg =~ /^thread/i;
+                    $threads::thread_exit_only = $arg =~ m/^thread/i;
                 }
             } else {
                 require Carp;
                 Carp::croak("threads: Missing argument for option: $sym");
             }
 
-        } elsif ($sym =~ /^str/i) {
+        } elsif ($sym =~ m/^str/i) {
             overload->import ('""' => \&tid);
 
-        } elsif ($sym =~ /^(?::all|yield)$/) {
+        } elsif ($sym =~ m/^(?::all|yield)$/) {
             push(@EXPORT, qw(yield));
 
         } else {

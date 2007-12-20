@@ -133,11 +133,11 @@ while( my($type, $vars) = each %Install_Vars) {
 
             SKIP: {
                 skip uc($installvar).' set to another INSTALL variable', 1
-                  if $mm->{uc $installvar} =~ /^\$\(INSTALL.*\)$/;
+                  if $mm->{uc $installvar} =~ m/^\$\(INSTALL.*\)$/;
 
                 # support for man page skipping
                 $prefix = 'none' if $type eq 'PERL' && 
-                                    $var =~ /man/ && 
+                                    $var =~ m/man/ && 
                                     !$Config{$installvar};
                 like( $mm->{uc $installvar}, qr/^\Q$prefix\E/, 
                       "$prefix + $var" );

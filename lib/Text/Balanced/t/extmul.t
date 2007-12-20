@@ -265,7 +265,7 @@ expect [ $text ], [ substr($stdtext2,0,6). substr($stdtext2,12) ];
 my $stdtext3 = "a,b,c";
 
 $_ = $stdtext3;
-expect	[ extract_multiple(undef, [ sub { /\G[a-z]/gc && $& } ]) ],
+expect	[ extract_multiple(undef, [ sub { m/\G[a-z]/gc && $& } ]) ],
 	[ divide($stdtext3 => 1,2,3,4,5) ];
 
 expect [ pos ], [ 5 ];
@@ -274,7 +274,7 @@ expect [ $_ ], [ $stdtext3 ];
 # TESTS 71-73
 
 $_ = $stdtext3;
-expect	[ scalar extract_multiple(undef, [ sub { /\G[a-z]/gc && $& } ]) ],
+expect	[ scalar extract_multiple(undef, [ sub { m/\G[a-z]/gc && $& } ]) ],
 	[ divide($stdtext3 => 1) ];
 
 expect [ pos ], [ 0 ];

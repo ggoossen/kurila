@@ -22,7 +22,7 @@ my $USE_PPPORT_H = ($ENV{PERL_CORE}) ? '' : '-DUSE_PPPORT_H';
 # ExtUtils::Install.
 
 # Don't ask if MM_USE_DEFAULT is set -- enables perl core building on cygwin
-if ($^O =~ /cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
+if ($^O =~ m/cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
         and not ($ENV{PERL_MM_USE_DEFAULT} or $ENV{PERL_CORE}))
 {
     print <<EOM ;
@@ -43,7 +43,7 @@ EOM
     print "Do you want to continue? [Y/N]: " ;
     my $answer = ~< STDIN ;
 
-    if ($answer =~ /^yes|y/i)
+    if ($answer =~ m/^yes|y/i)
     {
 	print "continuing...\n" 
     }
@@ -148,13 +148,13 @@ require ExtUtils::Constant;
     open F, "<lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
     while (~< *F)
     {
-        last if /^\s*\@EXPORT\s+=\s+qw\(/ ;
+        last if m/^\s*\@EXPORT\s+=\s+qw\(/ ;
     }
 
     while (~< *F)
     {
-        last if /^\s*\)/ ;
-        /(\S+)/ ;
+        last if m/^\s*\)/ ;
+        m/(\S+)/ ;
         delete $names{$1} if defined $1 ;
     }
     close F ;
@@ -192,7 +192,7 @@ sub ParseCONFIG
     open(F, "<$CONFIG") or die "Cannot open file $CONFIG: $!\n" ;
     while (~< *F) {
 	s/^\s*|\s*$//g ;
-	next if /^\s*$/ or /^\s*#/ ;
+	next if m/^\s*$/ or m/^\s*#/ ;
 	s/\s*#\s*$// ;
 
 	($k, $v) = split(/\s+=\s+/, $_, 2) ;
@@ -224,11 +224,11 @@ sub ParseCONFIG
     }
 
     my $y = $ENV{'OLD_ZLIB'} || $Info{'OLD_ZLIB'} ;
-    $OLD_ZLIB = '-DOLD_ZLIB' if $y and $y =~ /^yes|on|true|1$/i;
+    $OLD_ZLIB = '-DOLD_ZLIB' if $y and $y =~ m/^yes|on|true|1$/i;
 
     my $x = $ENV{'BUILD_ZLIB'} || $Info{'BUILD_ZLIB'} ;
 
-    if ($x and $x =~ /^yes|on|true|1$/i ) {
+    if ($x and $x =~ m/^yes|on|true|1$/i ) {
 
         $BUILD_ZLIB = 1 ;
 
@@ -256,7 +256,7 @@ sub ParseCONFIG
 
 	die "GZIP_OS_CODE not 'AUTO_DETECT' or a number between 0 and 255\n"
 	   unless uc $GZIP_OS_CODE eq 'AUTO_DETECT'
-                    || ( $GZIP_OS_CODE =~ /^(\d+)$/ && $1 +>= 0 && $1 +<= 255) ;
+                    || ( $GZIP_OS_CODE =~ m/^(\d+)$/ && $1 +>= 0 && $1 +<= 255) ;
 
     if (uc $GZIP_OS_CODE eq 'AUTO_DETECT')
     {

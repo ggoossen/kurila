@@ -66,7 +66,7 @@ sub new {
   ${*$obj}{'net_smtp_host'}       = $host;
 
   (${*$obj}{'net_smtp_banner'}) = $obj->message;
-  (${*$obj}{'net_smtp_domain'}) = $obj->message =~ /\A\s*(\S+)/;
+  (${*$obj}{'net_smtp_domain'}) = $obj->message =~ m/\A\s*(\S+)/;
 
   unless ($obj->hello($arg{Hello} || "")) {
     $obj->close();
@@ -175,7 +175,7 @@ sub hello {
     my $ln;
     foreach $ln (@msg) {
       $h->{uc $1} = $2
-        if $ln =~ /(\w+)\b[= \t]*([^\n]*)/;
+        if $ln =~ m/(\w+)\b[= \t]*([^\n]*)/;
     }
   }
   elsif ($me->status == CMD_ERROR) {
@@ -185,7 +185,7 @@ sub hello {
 
   return undef unless $ok;
 
-  $msg[0] =~ /\A\s*(\S+)/;
+  $msg[0] =~ m/\A\s*(\S+)/;
   return ($1 || " ");
 }
 
@@ -207,10 +207,10 @@ sub _addr {
   $addr = "" unless defined $addr;
 
   if (${*$self}{'net_smtp_exact_addr'}) {
-    return $1 if $addr =~ /^\s*(<.*>)\s*$/s;
+    return $1 if $addr =~ m/^\s*(<.*>)\s*$/s;
   }
   else {
-    return $1 if $addr =~ /(<[^>]*>)/;
+    return $1 if $addr =~ m/(<[^>]*>)/;
     $addr =~ s/^\s+|\s+$//sg;
   }
 

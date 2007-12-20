@@ -22,11 +22,11 @@ my $ByteOrder = 'unknown';
 my $maybe_not_avail = '(?:hto[bl]e|[bl]etoh)';
 if ($no_endianness) {
   push @valid_errors, qr/^Invalid type '[<>]'/;
-} elsif ($Config{byteorder} =~ /^1234(?:5678)?$/) {
+} elsif ($Config{byteorder} =~ m/^1234(?:5678)?$/) {
   $ByteOrder = 'little';
   $maybe_not_avail = '(?:htobe|betoh)';
 }
-elsif ($Config{byteorder} =~ /^(?:8765)?4321$/) {
+elsif ($Config{byteorder} =~ m/^(?:8765)?4321$/) {
   $ByteOrder = 'big';
   $maybe_not_avail = '(?:htole|letoh)';
 }
@@ -232,13 +232,13 @@ sub list_eq ($$) {
     SKIP: {
 	# Avoid void context warnings.
 	my $a = eval {pack "$base$mod"};
-	skip "pack can't $base", 1 if $@ =~ /^Invalid type '\w'/;
+	skip "pack can't $base", 1 if $@ =~ m/^Invalid type '\w'/;
 	# Which error you get when 2 would be possible seems to be emergent
 	# behaviour of pack's format parser.
 
-	my $fails_shriek = $mod =~ /!/ && index ($can_shriek, $base) == -1;
-	my $fails_endian = $mod =~ /[<>]/ && index ($can_endian, $base) == -1;
-	my $shriek_first = $mod =~ /^!/;
+	my $fails_shriek = $mod =~ m/!/ && index ($can_shriek, $base) == -1;
+	my $fails_endian = $mod =~ m/[<>]/ && index ($can_endian, $base) == -1;
+	my $shriek_first = $mod =~ m/^!/;
 
 	if ($no_endianness and ($mod eq '<!' or $mod eq '>!')) {
 	  # The ! isn't seem as part of $base. Instead it's seen as a modifier
@@ -300,7 +300,7 @@ sub list_eq ($$) {
 	   ||
 	   ($^O eq 'ultrix')
 	   ||
-	   ($^O =~ /^svr4/ && -f "/etc/issue" && -f "/etc/.relid") # NCR MP-RAS
+	   ($^O =~ m/^svr4/ && -f "/etc/issue" && -f "/etc/.relid") # NCR MP-RAS
 	   );
 
     my $inf = eval '2**1000000';
@@ -401,11 +401,11 @@ my @lengths = (
 
 while (my ($base, $expect) = splice @lengths, 0, 2) {
   my @formats = ($base);
-  $base =~ /^[nv]/i or push @formats, "$base>", "$base<";
+  $base =~ m/^[nv]/i or push @formats, "$base>", "$base<";
   for my $format (@formats) {
   SKIP: {
       skip $no_endianness, 1 if $no_endianness && $format =~ m/[<>]/;
-      skip $no_signedness, 1 if $no_signedness && $format =~ /[nNvV]!/;
+      skip $no_signedness, 1 if $no_signedness && $format =~ m/[nNvV]!/;
       my $len = length(pack($format, 0));
       if ($expect +> 0) {
 	is($expect, $len, "format '$format'");
@@ -425,7 +425,7 @@ my @templates = qw(c C W i I s S l L n N v V f d q Q);
 
 foreach my $base (@templates) {
     my @tmpl = ($base);
-    $base =~ /^[cwnv]/i or push @tmpl, "$base>", "$base<";
+    $base =~ m/^[cwnv]/i or push @tmpl, "$base>", "$base<";
     foreach my $t (@tmpl) {
         SKIP: {
             my @t = eval { unpack("$t*", pack("$t*", 12, 34)) };
@@ -529,7 +529,7 @@ is(length(pack("i!", 0)), length(pack("i", 0)));
 sub numbers {
   my $base = shift;
   my @formats = ($base);
-  $base =~ /^[silqjfdp]/i and push @formats, "$base>", "$base<";
+  $base =~ m/^[silqjfdp]/i and push @formats, "$base>", "$base<";
   for my $format (@formats) {
     numbers_with_total ($format, undef, @_);
   }
@@ -1322,10 +1322,10 @@ SKIP: {
      push @codes, 'd';	# Keep the count the same
    }
 
-   push @codes, map { /^[silqjfdp]/i ? ("$_<", "$_>") : () } @codes;
+   push @codes, map { m/^[silqjfdp]/i ? ("$_<", "$_>") : () } @codes;
 
    my %val;
-   @val{@codes} = map { / [Xx]  (?{ undef })
+   @val{@codes} = map { m/ [Xx]  (?{ undef })
 			| [AZa] (?{ 'something' })
 			| C     (?{ 214 })
 			| W     (?{ 188 })
@@ -1344,13 +1344,13 @@ SKIP: {
      @list = () unless defined $list[0];
      for my $count ('', '3', '[11]') {
        my $c = 1;
-       $c = $1 if $count =~ /(\d+)/;
+       $c = $1 if $count =~ m/(\d+)/;
        my @list1 = @list;
-       @list1 = (@list1) x $c unless $type =~ /[XxAaZBbHhP]/;
+       @list1 = (@list1) x $c unless $type =~ m/[XxAaZBbHhP]/;
        for my $groupend ('', ')2', ')[8]') {
 	   my $groupbegin = ($groupend ? '(' : '');
 	   $c = 1;
-	   $c = $1 if $groupend =~ /(\d+)/;
+	   $c = $1 if $groupend =~ m/(\d+)/;
 	   my @list2 = (@list1) x $c;
 
            SKIP: {
@@ -1434,7 +1434,7 @@ numbers ('F', -(2**34), -1, 0, 1, 2**34);
 SKIP: {
     my $t = eval { unpack("D*", pack("D", 12.34)) };
 
-    skip "Long doubles not in use", 166 if $@ =~ /Invalid type/;
+    skip "Long doubles not in use", 166 if $@ =~ m/Invalid type/;
 
     is(length(pack("D", 0)), $Config{longdblsize});
     numbers ('D', -(2**34), -1, 0, 1, 2**34);
@@ -1448,7 +1448,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
   SKIP: {
     my $packed = eval {pack "${template}4", 1, 4, 9, 16};
     if ($@) {
-      die unless $@ =~ /Invalid type '$template'/;
+      die unless $@ =~ m/Invalid type '$template'/;
       skip ("$template not supported on this perl",
             $cant_checksum{$template} ? 4 : 8);
     }

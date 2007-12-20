@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
+    if ($Config{'extensions'} !~ m/\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
         print "1..0\n";
         exit 0;
     }
@@ -17,13 +17,13 @@ eval <<'EOP';
 	$a = fileno STDIN;
 EOP
 
-print $@ =~ /trapped/ ? "ok 1\n" : "not ok 1\n# $@\n";
+print $@ =~ m/trapped/ ? "ok 1\n" : "not ok 1\n# $@\n";
 
 eval <<'EOP';
 	use ops ':default';	# equiv to "perl -M(as above) -Mops=:default"
 	eval 1;
 EOP
 
-print $@ =~ /trapped/ ? "ok 2\n" : "not ok 2\n# $@\n";
+print $@ =~ m/trapped/ ? "ok 2\n" : "not ok 2\n# $@\n";
 
 1;

@@ -68,13 +68,13 @@ sub stringify {
 	
 	if ($tick eq 'auto') {
 	    if (ord('A') == 193) {
-		if (/[\000-\011]/ or /[\013-\024\31-\037\177]/) {
+		if (m/[\000-\011]/ or m/[\013-\024\31-\037\177]/) {
 		    $tick = '"';
 		} else {
 		    $tick = "'";
 		}
             }  else {
-		if (/[\000-\011\013-\037\177]/) {
+		if (m/[\000-\011\013-\037\177]/) {
 		    $tick = '"';
 		} else {
 		    $tick = "'";
@@ -100,7 +100,7 @@ sub stringify {
 	}
 	$_ = uniescape($_);
 	s/([\200-\377])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
-	($noticks || /^\d+(\.\d*)?\Z/) 
+	($noticks || m/^\d+(\.\d*)?\Z/) 
 	  ? $_ 
 	  : $tick . $_ . $tick;
 }
@@ -167,7 +167,7 @@ sub unwrap {
       ($start_part, $val) = split /=/,$val;
       $val = $start_part unless defined $val;
       ($item_type, $address) = 
-        $val =~ /([^\(]+)        # Keep stuff that's     
+        $val =~ m/([^\(]+)        # Keep stuff that's     
                                  # not an open paren
                  \(              # Skip open paren
                  (0x[0-9a-f]+)   # Save the address
@@ -314,14 +314,14 @@ sub unwrap {
 sub matchlex {
   (my $var = $_[0]) =~ s/.//;
   $var eq $_[1] or 
-    ($_[1] =~ /^([!~])(.)([\x00-\xff]*)/) and 
-      ($1 eq '!') ^^^ (eval { $var =~ /$2$3/ });
+    ($_[1] =~ m/^([!~])(.)([\x00-\xff]*)/) and 
+      ($1 eq '!') ^^^ (eval { $var =~ m/$2$3/ });
 }
 
 sub matchvar {
   $_[0] eq $_[1] or 
-    ($_[1] =~ /^([!~])(.)([\x00-\xff]*)/) and 
-      ($1 eq '!') ^^^ (eval {($_[2] . "::" . $_[0]) =~ /$2$3/});
+    ($_[1] =~ m/^([!~])(.)([\x00-\xff]*)/) and 
+      ($1 eq '!') ^^^ (eval {($_[2] . "::" . $_[0]) =~ m/$2$3/});
 }
 
 sub compactDump {
@@ -367,18 +367,18 @@ sub dumpglob {
     my ($off,$key, $val, $all, $m) = @_;
     local(*entry) = $val;
     my $fileno;
-    if (($key !~ /^_</ or $dumpDBFiles) and defined $entry) {
+    if (($key !~ m/^_</ or $dumpDBFiles) and defined $entry) {
       print( (' ' x $off) . "\$", &unctrl($key), " = " );
       DumpElem $entry, 3+$off, $m;
     }
-    if (($key !~ /^_</ or $dumpDBFiles) and @entry) {
+    if (($key !~ m/^_</ or $dumpDBFiles) and @entry) {
       print( (' ' x $off) . "\@$key = (\n" );
       unwrap(\@entry,3+$off,$m) ;
       print( (' ' x $off) .  ")\n" );
     }
     if ($key ne "main::" && $key ne "DB::" && %entry
-	&& ($dumpPackages or $key !~ /::$/)
-	&& ($key !~ /^_</ or $dumpDBFiles)
+	&& ($dumpPackages or $key !~ m/::$/)
+	&& ($key !~ m/^_</ or $dumpDBFiles)
 	&& !($package eq "dumpvar" and $key eq "stab")) {
       print( (' ' x $off) . "\%$key = (\n" );
       unwrap(\%entry,3+$off,$m) ;
@@ -437,7 +437,7 @@ sub dumpsub {
     my ($off,$sub) = @_;
     my $ini = $sub;
     my $s;
-    $sub = $1 if $sub =~ /^\{\*(.*)\}$/;
+    $sub = $1 if $sub =~ m/^\{\*(.*)\}$/;
     my $subref = defined $1 ? \&$sub : \&$ini;
     my $place = $DB::sub{$sub} || (($s = $subs{"$subref"}) && $DB::sub{$s})
       || (($s = CvGV_name_or_bust($subref)) && $DB::sub{$s})
@@ -461,9 +461,9 @@ sub findsubs {
 sub main::dumpvar {
     my ($package,$m,@vars) = @_;
     local(%address,$key,$val,$^W);
-    $package .= "::" unless $package =~ /::$/;
+    $package .= "::" unless $package =~ m/::$/;
     *stab = *{Symbol::fetch_glob("main::")};
-    while ($package =~ /(\w+?::)/g){
+    while ($package =~ m/(\w+?::)/g){
       *stab = $ {stab}{$1};
     }
     local $TotalStrings = 0;
@@ -530,9 +530,9 @@ sub globUsage {			# glob ref, name
 
 sub packageUsage {
   my ($package,@vars) = @_;
-  $package .= "::" unless $package =~ /::$/;
+  $package .= "::" unless $package =~ m/::$/;
   local *stab = *{Symbol::fetch_glob("main::")};
-  while ($package =~ /(\w+?::)/g){
+  while ($package =~ m/(\w+?::)/g){
     *stab = $ {stab}{$1};
   }
   local $TotalStrings = 0;

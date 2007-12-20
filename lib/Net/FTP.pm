@@ -198,7 +198,7 @@ sub mdtm {
   # remainder, otherwise we subtract 1900 from the whole year.
 
   $ftp->_MDTM($file)
-    && $ftp->message =~ /((\d\d)(\d\d\d?))(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/
+    && $ftp->message =~ m/((\d\d)(\d\d\d?))(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/
     ? timegm($8, $7, $6, $5, $4 - 1, $2 eq '19' ? $3 : ($1 - 1900))
     : undef;
 }
@@ -210,7 +210,7 @@ sub size {
   my $io;
   if ($ftp->supported("SIZE")) {
     return $ftp->_SIZE($file)
-      ? ($ftp->message =~ /(\d+)\s*(bytes?\s*)?$/)[0]
+      ? ($ftp->message =~ m/(\d+)\s*(bytes?\s*)?$/)[0]
       : undef;
   }
   elsif ($ftp->supported("STAT")) {
@@ -220,14 +220,14 @@ sub size {
     my $line;
     foreach $line (@msg) {
       return (split(/\s+/, $line))[4]
-        if $line =~ /^[-rwxSsTt]{10}/;
+        if $line =~ m/^[-rwxSsTt]{10}/;
     }
   }
   else {
     my @files = $ftp->dir($file);
     if (@files) {
       return (split(/\s+/, $1))[4]
-        if $files[0] =~ /^([-rwxSsTt]{10}.*)$/;
+        if $files[0] =~ m/^([-rwxSsTt]{10}.*)$/;
     }
   }
   undef;
@@ -304,7 +304,7 @@ sub login {
 
   # Some dumb firewalls don't prefix the connection messages
   $ok = $ftp->response()
-    if ($ok == CMD_OK && $ftp->code == 220 && $user =~ /\@/);
+    if ($ok == CMD_OK && $ftp->code == 220 && $user =~ m/\@/);
 
   if ($ok == CMD_MORE) {
     unless (defined $pass) {
@@ -316,7 +316,7 @@ sub login {
         if ($rc);
 
       $pass = '-anonymous@'
-        if (!defined $pass && (!defined($ruser) || $ruser =~ /^anonymous/o));
+        if (!defined $pass && (!defined($ruser) || $ruser =~ m/^anonymous/o));
     }
 
     $ok = $ftp->_PASS($pass || "");
@@ -446,7 +446,7 @@ sub get {
     unless (defined $local);
 
   croak("Bad remote filename '$remote'\n")
-    if $remote =~ /[\r\n]/s;
+    if $remote =~ m/[\r\n]/s;
 
   ${*$ftp}{'net_ftp_rest'} = $where if defined $where;
   my $rest = ${*$ftp}{'net_ftp_rest'};
@@ -532,7 +532,7 @@ sub cwd {
 
   my ($ftp, $dir) = @_;
 
-  $dir = "/" unless defined($dir) && $dir =~ /\S/;
+  $dir = "/" unless defined($dir) && $dir =~ m/\S/;
 
   $dir eq ".."
     ? $ftp->_CDUP()
@@ -577,7 +577,7 @@ sub rmdir {
 
   # Try to delete the contents
   # Get a list of all the files in the directory
-  my @filelist = grep { !/^\.{1,2}$/ } $ftp->ls($dir);
+  my @filelist = grep { !m/^\.{1,2}$/ } $ftp->ls($dir);
 
   return undef
     unless @filelist;    # failed, it is probably not a directory
@@ -707,7 +707,7 @@ sub _store_cmd {
     $ftp->_ALLO($size) if $size;
   }
   croak("Bad remote filename '$remote'\n")
-    if $remote =~ /[\r\n]/s;
+    if $remote =~ m/[\r\n]/s;
 
   if ($localfd) {
     $loc = $local;
@@ -732,7 +732,7 @@ sub _store_cmd {
   $sock = $ftp->_data_cmd($cmd, $remote)
     or return undef;
 
-  $remote = ($ftp->message =~ /FILE:\s*(.*)/)[0]
+  $remote = ($ftp->message =~ m/FILE:\s*(.*)/)[0]
     if 'STOU' eq uc $cmd;
 
   my $blksize = ${*$ftp}{'net_ftp_blksize'};
@@ -830,7 +830,7 @@ sub pasv {
 
   delete ${*$ftp}{'net_ftp_intern_port'};
 
-  $ftp->_PASV && $ftp->message =~ /(\d+(,\d+)+)/
+  $ftp->_PASV && $ftp->message =~ m/(\d+(,\d+)+)/
     ? ${*$ftp}{'net_ftp_pasv'} = $1
     : undef;
 }
@@ -855,14 +855,14 @@ sub supported {
     unless $ftp->_HELP($cmd);
 
   my $text = $ftp->message;
-  if ($text =~ /following\s+commands/i) {
+  if ($text =~ m/following\s+commands/i) {
     $text =~ s/^.*\n//;
-    while ($text =~ /(\*?)(\w+)(\*?)/sg) {
+    while ($text =~ m/(\*?)(\w+)(\*?)/sg) {
       $hash->{"\U$2"} = !length("$1$3");
     }
   }
   else {
-    $hash->{$cmd} = $text !~ /unimplemented/i;
+    $hash->{$cmd} = $text !~ m/unimplemented/i;
   }
 
   $hash->{$cmd} ||= 0;
@@ -900,7 +900,7 @@ sub _extract_path {
   # didn't implement it).  It will fail on a server which uses a quote in
   # the message which isn't a part of or surrounding the path.
   $ftp->ok
-    && $ftp->message =~ /(?:^|\s)\"(.*)\"(?:$|\s)/
+    && $ftp->message =~ m/(?:^|\s)\"(.*)\"(?:$|\s)/
     && ($path = $1) =~ s/\"\"/\"/g;
 
   $path;
@@ -995,7 +995,7 @@ sub _data_cmd {
 
   for $arg (@_) {
     croak("Bad argument '$arg'\n")
-      if $arg =~ /[\r\n]/s;
+      if $arg =~ m/[\r\n]/s;
   }
 
   if ( ${*$ftp}{'net_ftp_passive'}
@@ -1014,7 +1014,7 @@ sub _data_cmd {
       $ok   = CMD_INFO == $ftp->response();
       if ($ok) {
         $data->reading
-          if $data && $cmd =~ /RETR|LIST|NLST/;
+          if $data && $cmd =~ m/RETR|LIST|NLST/;
         return $data;
       }
       $data->_close
@@ -1047,7 +1047,7 @@ sub _data_cmd {
     my $data = $ftp->_dataconn();
 
     $data->reading
-      if $data && $cmd =~ /RETR|LIST|NLST/;
+      if $data && $cmd =~ m/RETR|LIST|NLST/;
 
     return $data;
   }
@@ -1063,7 +1063,7 @@ sub _data_cmd {
 ##
 
 
-sub debug_text { $_[2] =~ /^(pass|resp|acct)/i ? "$1 ....\n" : $_[2]; }
+sub debug_text { $_[2] =~ m/^(pass|resp|acct)/i ? "$1 ....\n" : $_[2]; }
 
 
 sub command {
@@ -1151,10 +1151,10 @@ sub pasv_wait {
     unless $ftp->ok() && $non_pasv->ok();
 
   return $1
-    if $ftp->message =~ /unique file name:\s*(\S*)\s*\)/;
+    if $ftp->message =~ m/unique file name:\s*(\S*)\s*\)/;
 
   return $1
-    if $non_pasv->message =~ /unique file name:\s*(\S*)\s*\)/;
+    if $non_pasv->message =~ m/unique file name:\s*(\S*)\s*\)/;
 
   return 1;
 }
@@ -1174,13 +1174,13 @@ sub feature {
     #  SIZE
     # 211 End
 
-    @feat = map { /^\s+(.*\S)/ } $ftp->message
+    @feat = map { m/^\s+(.*\S)/ } $ftp->message
       if $ftp->_FEAT;
 
     \@feat;
   };
 
-  return grep { /^\Q$feat\E\b/i } @$feature;
+  return grep { m/^\Q$feat\E\b/i } @$feature;
 }
 
 

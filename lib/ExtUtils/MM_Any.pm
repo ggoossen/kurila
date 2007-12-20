@@ -1249,7 +1249,7 @@ sub init_INSTALL_from_PREFIX {
         foreach my $var (keys %lib_layouts) {
             my $Installvar = uc "install$var";
 
-            if( $var =~ /arch/ ) {
+            if( $var =~ m/arch/ ) {
                 $self->{$Installvar} ||= 
                   $self->catdir($self->{LIB}, $Config{archname});
             }
@@ -1703,7 +1703,7 @@ installation.
 sub libscan {
     my($self,$path) = @_;
     my($dirs,$file) = ($self->splitpath($path))[1,2];
-    return '' if grep /^(?:RCS|CVS|SCCS|\.svn|_darcs)$/, 
+    return '' if grep m/^(?:RCS|CVS|SCCS|\.svn|_darcs)$/, 
                      $self->splitdir($dirs), $file;
 
     return $path;

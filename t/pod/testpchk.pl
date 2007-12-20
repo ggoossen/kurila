@@ -27,7 +27,7 @@ $MYPKG = eval { (caller)[0] };
 
 sub stripname( $ ) {
    local $_ = shift;
-   return /(\w[.\w]*)\s*$/ ? $1 : $_;
+   return m/(\w[.\w]*)\s*$/ ? $1 : $_;
 }
 
 sub msgcmp( $ $ ) {

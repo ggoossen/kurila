@@ -51,7 +51,7 @@ my $globbed_match ;
 # Grandfather $NAME import
 sub import {
     my $this = shift;
-    my @list = grep { ! /^-no_match_vars$/ } @_ ;
+    my @list = grep { ! m/^-no_match_vars$/ } @_ ;
     local $Exporter::ExportLevel = 1;
     if ( @_ == @list ) {
         *EXPORT = \@COMPLETE_EXPORT ;

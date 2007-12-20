@@ -58,7 +58,7 @@ is(A->d, "D::d");
     eval 'sub B::d {"B::d1"}';	# Import now.
     is(A->d, "B::d1");	# Update hash table;
     undef &B::d;
-    is((eval { A->d }, ($@ =~ /Undefined subroutine/)), 1);
+    is((eval { A->d }, ($@ =~ m/Undefined subroutine/)), 1);
 }
 
 is(A->d, "D::d");		# Back to previous state
@@ -129,22 +129,22 @@ is(eval { A->x } || "nope", "nope");
 
 # test error messages if method loading fails
 is(do { eval 'my $e = bless {}, "E::A"; E::A->foo()';
-	  $@ =~ /^\QCan't locate object method "foo" via package "E::A" at/ ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "foo" via package "E::A" at/ ? 1 : $@}, 1);
 is(do { eval 'my $e = bless {}, "E::B"; $e->foo()';  
-	  $@ =~ /^\QCan't locate object method "foo" via package "E::B" at/ ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "foo" via package "E::B" at/ ? 1 : $@}, 1);
 is(do { eval 'E::C->foo()';
-	  $@ =~ /^\QCan't locate object method "foo" via package "E::C" (perhaps / ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "foo" via package "E::C" (perhaps / ? 1 : $@}, 1);
 
 is(do { eval 'UNIVERSAL->E::D::foo()';
-	  $@ =~ /^\QCan't locate object method "foo" via package "E::D" (perhaps / ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "foo" via package "E::D" (perhaps / ? 1 : $@}, 1);
 is(do { eval 'my $e = bless {}, "UNIVERSAL"; $e->E::E::foo()';
-	  $@ =~ /^\QCan't locate object method "foo" via package "E::E" (perhaps / ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ? 1 : $@}, 1);
 
 my $e = bless {}, "E::F";  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
-	  $@ =~ /^\QCan't locate object method "foo" via package "E::F" at/ ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "foo" via package "E::F" at/ ? 1 : $@}, 1);
 is(do { eval '$e = bless {}, "UNIVERSAL"; $e->E::F::foo()';
-	  $@ =~ /^\QCan't locate object method "foo" via package "E::F" at/ ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "foo" via package "E::F" at/ ? 1 : $@}, 1);
 
 # TODO: we need some tests for the SUPER:: pseudoclass
 
@@ -165,7 +165,7 @@ is( eval 'Foo->boogie(); 1'         ? "yes":"no", "no" );
 is( $::{"Foo::"} || "none", "none");  # still missing?
 
 is(do { eval 'Foo->boogie()';
-	  $@ =~ /^\QCan't locate object method "boogie" via package "Foo" (perhaps / ? 1 : $@}, 1);
+	  $@ =~ m/^\QCan't locate object method "boogie" via package "Foo" (perhaps / ? 1 : $@}, 1);
 
 eval 'sub Foo::boogie { "yes, sir!" }';
 is( $::{"Foo::"} ? "ok" : "none", "ok");  # should exist now

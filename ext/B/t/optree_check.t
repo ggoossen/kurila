@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ /\bB\b/) ){
+    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -93,7 +93,7 @@ if (1) {
 		      expect	=> '',
 		      expect_nt	=> '');
     };
-    like($@, /no '\w+' golden-sample found/, "empty expectations prevented");
+    like($@, m/no '\w+' golden-sample found/, "empty expectations prevented");
     
     $@='';
     eval {
@@ -104,7 +104,7 @@ if (1) {
 		      expect_nt	=> "\n",
 		      expect	=> "\n");
     };
-    like($@, /no '\w+' golden-sample found/,
+    like($@, m/no '\w+' golden-sample found/,
 	 "just whitespace expectations prevented");
 }
     

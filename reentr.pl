@@ -174,7 +174,7 @@ my %seenm; # all the types
 my %seenu; # the length of the argument list of this function
 
 while ( ~< *DATA) { # Read in the protypes.
-    next if /^\s+$/;
+    next if m/^\s+$/;
     chomp;
     my ($func, $hdr, $type, @p) = split(/\s*\|\s*/, $_, -1);
     my $u;
@@ -191,8 +191,8 @@ while ( ~< *DATA) { # Read in the protypes.
 
     # Set any special mapping variables (like X=x_t)
     if (@p) {
-	while ($p[-1] =~ /=/) {
-	    my ($k, $v) = ($p[-1] =~ /^([A-Za-z])\s*=\s*(.*)/);
+	while ($p[-1] =~ m/=/) {
+	    my ($k, $v) = ($p[-1] =~ m/^([A-Za-z])\s*=\s*(.*)/);
 	    $m{$k} = $v;
 	    pop @p;
 	}
@@ -280,7 +280,7 @@ EOF
 EOF
     }
     for my $p (@p) {
-        my ($r, $a) = ($p =~ /^(.)_(.+)/);
+        my ($r, $a) = ($p =~ m/^(.)_(.+)/);
 	my $v = join(", ", map { $m{$_} } split '', $a);
 	if ($opts{U}) {
 	    print <<EOF ;
@@ -385,7 +385,7 @@ EOF
 	my $FUNC = uc $func;
 	my $HAS = "${FUNC}_R_HAS_$n";
 	push @H, $HAS;
-	my @h = grep { /$p/ } @{$seena{$func}};
+	my @h = grep { m/$p/ } @{$seena{$func}};
 	unless (defined $GENFUNC) {
 	    $GENFUNC = $FUNC;
 	    $GENFUNC =~ s/^GET//;
@@ -472,7 +472,7 @@ for my $func (@seenf) {
     my $endif = "#endif /* HAS_${FUNC}_R */\n";
     if (exists $seena{$func}) {
 	my @p = @{$seena{$func}};
-	if ($func =~ /^(asctime|ctime|getlogin|setlocale|strerror|ttyname)$/) {
+	if ($func =~ m/^(asctime|ctime|getlogin|setlocale|strerror|ttyname)$/) {
 	    pushssif $ifdef;
 	    push @struct, <<EOF;
 	char*	_${func}_buffer;
@@ -484,7 +484,7 @@ EOF
 	    pushinitfree $func;
 	    pushssif $endif;
 	}
-        elsif ($func =~ /^(crypt)$/) {
+        elsif ($func =~ m/^(crypt)$/) {
 	    pushssif $ifdef;
 	    push @struct, <<EOF;
 #if CRYPT_R_PROTO == REENTRANT_PROTO_B_CCD
@@ -505,7 +505,7 @@ EOF
 EOF
 	    pushssif $endif;
 	}
-        elsif ($func =~ /^(drand48|gmtime|localtime|random|srandom)$/) {
+        elsif ($func =~ m/^(drand48|gmtime|localtime|random|srandom)$/) {
 	    pushssif $ifdef;
 	    push @struct, <<EOF;
 	$seent{$func} _${func}_struct;
@@ -529,7 +529,7 @@ EOF
 	    }
 	    pushssif $endif;
 	}
-        elsif ($func =~ /^(getgrnam|getpwnam|getspnam)$/) {
+        elsif ($func =~ m/^(getgrnam|getpwnam|getspnam)$/) {
 	    pushssif $ifdef;
 	    # 'genfunc' can be read either as 'generic' or 'genre',
 	    # it represents a group of functions.
@@ -580,13 +580,13 @@ EOF
 	    pushinitfree $genfunc;
 	    pushssif $endif;
 	}
-        elsif ($func =~ /^(gethostbyname|getnetbyname|getservbyname|getprotobyname)$/) {
+        elsif ($func =~ m/^(gethostbyname|getnetbyname|getservbyname|getprotobyname)$/) {
 	    pushssif $ifdef;
 	    my $genfunc = $func;
 	    $genfunc =~ s/byname/ent/;
 	    $genfunc =~ s/^get//;
 	    my $GENFUNC = uc $genfunc;
-	    my $D = ifprotomatch($FUNC, grep {/D/} @p);
+	    my $D = ifprotomatch($FUNC, grep {m/D/} @p);
 	    my $d = $seend{$func};
 	    $d =~ s/\*$//; # snip: we need need the base type.
 	    push @struct, <<EOF;
@@ -623,9 +623,9 @@ EOF
 EOF
 	    pushssif $endif;
 	}
-        elsif ($func =~ /^(readdir|readdir64)$/) {
+        elsif ($func =~ m/^(readdir|readdir64)$/) {
 	    pushssif $ifdef;
-	    my $R = ifprotomatch($FUNC, grep {/R/} @p);
+	    my $R = ifprotomatch($FUNC, grep {m/R/} @p);
 	    push @struct, <<EOF;
 	$seent{$func}*	_${func}_struct;
 	size_t	_${func}_size;
@@ -663,7 +663,7 @@ EOF
 	    my $test = $r eq 'I' ? ' == 0' : '';
 	    my $true  = 1;
 	    my $genfunc = $func;
-	    if ($genfunc =~ /^(?:get|set|end)(pw|gr|host|net|proto|serv|sp)/) {
+	    if ($genfunc =~ m/^(?:get|set|end)(pw|gr|host|net|proto|serv|sp)/) {
 		$genfunc = "${1}ent";
 	    } elsif ($genfunc eq 'srand48') {
 		$genfunc = "drand48";
@@ -671,19 +671,19 @@ EOF
 	    my $b = $a;
 	    my $w = '';
 	    substr($b, 0, $seenu{$func}, '');
-	    if ($func =~ /^random$/) {
+	    if ($func =~ m/^random$/) {
 		$true = "PL_reentrant_buffer->_random_retval";
-	    } elsif ($b =~ /R/) {
+	    } elsif ($b =~ m/R/) {
 		$true = "PL_reentrant_buffer->_${genfunc}_ptr";
-	    } elsif ($b =~ /T/ && $func eq 'drand48') {
+	    } elsif ($b =~ m/T/ && $func eq 'drand48') {
 		$true = "PL_reentrant_buffer->_${genfunc}_double";
-	    } elsif ($b =~ /S/) {
-		if ($func =~ /^readdir/) {
+	    } elsif ($b =~ m/S/) {
+		if ($func =~ m/^readdir/) {
 		    $true = "PL_reentrant_buffer->_${genfunc}_struct";
 		} else {
 		    $true = "&PL_reentrant_buffer->_${genfunc}_struct";
 		}
-	    } elsif ($b =~ /B/) {
+	    } elsif ($b =~ m/B/) {
 		$true = "PL_reentrant_buffer->_${genfunc}_buffer";
 	    }
 	    if (length $b) {
@@ -695,21 +695,21 @@ EOF
 				 "&PL_reentrant_buffer->_${genfunc}_errno" :
 			     $_ eq 'B' ?
 				 "PL_reentrant_buffer->_${genfunc}_buffer" :
-			     $_ =~ /^[WI]$/ ?
+			     $_ =~ m/^[WI]$/ ?
 				 "PL_reentrant_buffer->_${genfunc}_size" :
 			     $_ eq 'H' ?
 				 "&PL_reentrant_buffer->_${genfunc}_fptr" :
 			     $_ eq 'D' ?
 				 "&PL_reentrant_buffer->_${genfunc}_data" :
 			     $_ eq 'S' ?
-				 ($func =~ /^readdir\d*$/ ?
+				 ($func =~ m/^readdir\d*$/ ?
 				  "PL_reentrant_buffer->_${genfunc}_struct" :
-				  $func =~ /^crypt$/ ?
+				  $func =~ m/^crypt$/ ?
 				  "PL_reentrant_buffer->_${genfunc}_struct_buffer" :
 				  "&PL_reentrant_buffer->_${genfunc}_struct") :
 			     $_ eq 'T' && $func eq 'drand48' ?
 				 "&PL_reentrant_buffer->_${genfunc}_double" :
-			     $_ =~ /^[ilt]$/ && $func eq 'random' ?
+			     $_ =~ m/^[ilt]$/ && $func eq 'random' ?
 				 "&PL_reentrant_buffer->_random_retval" :
 				 $_
 			 } split '', $b;
@@ -723,7 +723,7 @@ EOF
 
             # Must make OpenBSD happy
             my $memzero = '';
-            if($p =~ /D$/ &&
+            if($p =~ m/D$/ &&
                 ($genfunc eq 'protoent' || $genfunc eq 'servent')) {
                 $memzero = 'REENTR_MEMZERO(&PL_reentrant_buffer->_' . $genfunc . '_data, sizeof(PL_reentrant_buffer->_' . $genfunc . '_data)),';
             }
@@ -735,7 +735,7 @@ EOF
 #       define $func($v) $call
 EOF
 	    } else {
-		if ($func =~ /^get/) {
+		if ($func =~ m/^get/) {
 		    my $rv = $v ? ", $v" : "";
 		    if ($r eq 'I') {
 			push @wrap, <<EOF;

@@ -62,7 +62,7 @@ open(IN, $tmpfile) or die $!;
 my @lines = ~< *IN;
 close IN;
 
-ok($lines[1] =~ /Hello!/);
+ok($lines[1] =~ m/Hello!/);
 
 
 

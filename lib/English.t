@@ -22,7 +22,7 @@ sub foo {
 }
 foo(1);
 
-"abc" =~ /b/;
+"abc" =~ m/b/;
 
 ok( !$PREMATCH, '$PREMATCH undefined' );
 ok( !$MATCH, '$MATCH undefined' );
@@ -89,7 +89,7 @@ ok( $SYSTEM_FD_MAX +>= 2, '$SYSTEM_FD_MAX should be at least 2' );
 
 is( $INPLACE_EDIT, '.inplace', '$INPLACE_EDIT' );
 
-'aabbcc' =~ /(.{2}).+(.{2})(?{ 9 })/;
+'aabbcc' =~ m/(.{2}).+(.{2})(?{ 9 })/;
 is( $LAST_PAREN_MATCH, 'cc', '$LAST_PARENT_MATCH' );
 is( $LAST_REGEXP_CODE_RESULT, 9, '$LAST_REGEXP_CODE_RESULT' );
 
@@ -127,7 +127,7 @@ package B;
 
 use English;
 
-"abc" =~ /b/;
+"abc" =~ m/b/;
 
 main::is( $PREMATCH, 'a', '$PREMATCH defined' );
 main::is( $MATCH, 'b', '$MATCH defined' );
@@ -143,7 +143,7 @@ package C;
 
 use English qw( -no_match_vars ) ;
 
-"abc" =~ /b/;
+"abc" =~ m/b/;
 
 main::ok( !$PREMATCH, '$PREMATCH disabled' );
 main::ok( !$MATCH, '$MATCH disabled' );

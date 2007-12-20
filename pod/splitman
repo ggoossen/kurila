@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 
 while ( ~< *ARGV) {
-    if ($seqno = 1 .. /^\.TH/) {
-	unless ($seqno =~ /e/i) {
+    if ($seqno = 1 .. m/^\.TH/) {
+	unless ($seqno =~ m/e/i) {
 	    $header .= $_;
 	} 
 	next;
     } 
 
-    if ( /^\.Ip\s*"(.*)"\s*\d+$/) {
+    if ( m/^\.Ip\s*"(.*)"\s*\d+$/) {
 	$desking = 0;
 	$desc = $1;
 	if (name($desc) ne $myname) {
@@ -42,5 +42,5 @@ EOMORE
 } 
 
 sub name {
-    ($_[0] =~ /(\w+)/)[0];
+    ($_[0] =~ m/(\w+)/)[0];
 } 

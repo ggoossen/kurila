@@ -23,7 +23,7 @@ if ($^O eq 'VMS') {
 }
 
 # No %Config.
-my $Is_Ultrix_VAX = $^O eq 'ultrix' && `uname -m` =~ /^VAX$/;
+my $Is_Ultrix_VAX = $^O eq 'ultrix' && `uname -m` =~ m/^VAX$/;
 
 while ( ~< *DATA) {
     s/^\s*>//; s/<\s*$//;
@@ -53,9 +53,9 @@ while ( ~< *DATA) {
 print '1..', scalar @tests, "\n";
 
 $SIG{__WARN__} = sub {
-    if ($_[0] =~ /^Invalid conversion/) {
+    if ($_[0] =~ m/^Invalid conversion/) {
 	$w = ' INVALID';
-    } elsif ($_[0] =~ /^Use of uninitialized value/) {
+    } elsif ($_[0] =~ m/^Use of uninitialized value/) {
 	$w = ' UNINIT';
     } else {
 	warn @_;
@@ -71,15 +71,15 @@ for ($i = 1; @tests; $i++) {
     my $y = $x;
     if ($y =~ s/([Ee][-+])0(\d)/$1$2/) {
         # if result is left-adjusted, append extra space
-        if ($template =~ /%\+?\-/ and $result =~ / $/) {
+        if ($template =~ m/%\+?\-/ and $result =~ m/ $/) {
 	    $y =~ s/<$/ </;
 	}
         # if result is zero-filled, add extra zero
-	elsif ($template =~ /%\+?0/ and $result =~ /^0/) {
+	elsif ($template =~ m/%\+?0/ and $result =~ m/^0/) {
 	    $y =~ s/^>0/>00/;
 	}
         # if result is right-adjusted, prepend extra space
-	elsif ($result =~ /^ /) {
+	elsif ($result =~ m/^ /) {
 	    $y =~ s/^>/> /;
 	}
     }
@@ -89,10 +89,10 @@ for ($i = 1; @tests; $i++) {
 	my $os  = $1;
 	my $osv = exists $Config{osvers} ? $Config{osvers} : "0";
 	# >comment skip: all<
-	if ($os =~ /\ball\b/i) {
+	if ($os =~ m/\ball\b/i) {
 	    $skip = 1;
 	# >comment skip: VMS hpux:10.20<
-	} elsif ($os =~ /\b$^O(?::(\S+))?\b/i) {
+	} elsif ($os =~ m/\b$^O(?::(\S+))?\b/i) {
 	    my $vsn = defined $1 ? $1 : "0";
 	    # Only compare on the the first pair of digits, as numeric
 	    # compares don't like 2.6.10-3mdksmp or 2.6.8-24.10-default
@@ -112,7 +112,7 @@ for ($i = 1; @tests; $i++) {
     {				# three-digit exponent
 		print("ok $i # >$result< $x three-digit exponent accepted\n");
     }
-	elsif ($result =~ /[-+]\d{3}$/ &&
+	elsif ($result =~ m/[-+]\d{3}$/ &&
 		   # Suppress tests with modulo of exponent >= 100 on platforms
 		   # which can't handle such magnitudes (or where we can't tell).
 		   ((!eval {require POSIX}) || # Costly: only do this if we must!

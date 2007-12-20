@@ -137,7 +137,7 @@ sub import {
 # Values for $order. See GNU getopt.c for details.
 ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2);
 # Version major/minor numbers.
-($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
+($major_version, $minor_version) = $VERSION =~ m/^(\d+)\.(\d+)/;
 
 ConfigDefaults();
 
@@ -336,7 +336,7 @@ sub GetOptionsFromArray($@) {
     # See if the first element of the optionlist contains option
     # starter characters.
     # Be careful not to interpret '<>' as option starters.
-    if ( @optionlist && $optionlist[0] =~ /^\W+$/
+    if ( @optionlist && $optionlist[0] =~ m/^\W+$/
 	 && !($optionlist[0] eq '<>'
 	      && @optionlist +> 0
 	      && ref($optionlist[1])) ) {
@@ -358,7 +358,7 @@ sub GetOptionsFromArray($@) {
 	}
 
 	# Strip leading prefix so people can specify "--foo=i" if they like.
-	$opt = $+ if $opt =~ /^$prefix+(.*)$/s;
+	$opt = $+ if $opt =~ m/^$prefix+(.*)$/s;
 
 	if ( $opt eq '<>' ) {
 	    if ( (defined $userlinkage)
@@ -604,8 +604,8 @@ sub GetOptionsFromArray($@) {
 			};
 			print STDERR ("=> die($eval_error)\n")
 			  if $debug && $eval_error ne '';
-			if ( $eval_error =~ /^!/ ) {
-			    if ( $eval_error =~ /^!FINISH\b/ ) {
+			if ( $eval_error =~ m/^!/ ) {
+			    if ( $eval_error =~ m/^!FINISH\b/ ) {
 				$goon = 0;
 			    }
 			}
@@ -671,8 +671,8 @@ sub GetOptionsFromArray($@) {
 		    if ( @$argv ) {
 			if ( ValidValue($ctl, $argv->[0], 1, $argend, $prefix) ) {
 			    $arg = shift(@$argv);
-			    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ /^[iIo]$/;
-			    ($key,$arg) = $arg =~ /^([^=]+)=(.*)/
+			    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
+			    ($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
 			      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 			    next;
 			}
@@ -688,8 +688,8 @@ sub GetOptionsFromArray($@) {
 		# Any more args?
 		if ( @$argv && ValidValue($ctl, $argv->[0], 0, $argend, $prefix) ) {
 		    $arg = shift(@$argv);
-		    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ /^[iIo]$/;
-		    ($key,$arg) = $arg =~ /^([^=]+)=(.*)/
+		    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
+		    ($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
 		      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 		    next;
 		}
@@ -711,8 +711,8 @@ sub GetOptionsFromArray($@) {
 		};
 		print STDERR ("=> die($eval_error)\n")
 		  if $debug && $eval_error ne '';
-		if ( $eval_error =~ /^!/ ) {
-		    if ( $eval_error =~ /^!FINISH\b/ ) {
+		if ( $eval_error =~ m/^!/ ) {
+		    if ( $eval_error =~ m/^!FINISH\b/ ) {
 			$goon = 0;
 		    }
 		}
@@ -819,7 +819,7 @@ sub ParseOptionSpec ($$) {
 	# Fields are hard-wired here.
 	$entry = [$spec,$orig,undef,CTL_DEST_SCALAR,0,0];
     }
-    elsif ( $spec =~ /^:(-?\d+|\+)([@%])?$/ ) {
+    elsif ( $spec =~ m/^:(-?\d+|\+)([@%])?$/ ) {
 	my $def = $1;
 	my $dest = $2;
 	my $type = $def eq '+' ? 'I' : 'i';
@@ -832,7 +832,7 @@ sub ParseOptionSpec ($$) {
     }
     else {
 	my ($mand, $type, $dest) =
-	  $spec =~ /^([=:])([ionfs])([@%])?(\{(\d+)?(,)?(\d+)?\})?$/;
+	  $spec =~ m/^([=:])([ionfs])([@%])?(\{(\d+)?(,)?(\d+)?\})?$/;
 	return (undef, "Cannot repeat while bundling: \"$opt\"\n")
 	  if $bundling && defined($4);
 	my ($mi, $cm, $ma) = ($5, $6, $7);
@@ -899,7 +899,7 @@ sub FindOption ($$$$$) {
 
     print STDERR ("=> find \"$opt\"\n") if $debug;
 
-    return (0) unless $opt =~ /^$prefix(.*)$/s;
+    return (0) unless $opt =~ m/^$prefix(.*)$/s;
     return (0) if $opt eq "-" && !defined $opctl->{''};
 
     $opt = $+;
@@ -912,9 +912,9 @@ sub FindOption ($$$$$) {
 
     # If it is a long option, it may include the value.
     # With getopt_compat, only if not bundling.
-    if ( ($starter=~/^$longprefix$/
+    if ( ($starter=~m/^$longprefix$/
           || ($getopt_compat && ($bundling == 0 || $bundling == 2)))
-	  && $opt =~ /^([^=]+)=(.*)$/s ) {
+	  && $opt =~ m/^([^=]+)=(.*)$/s ) {
 	$opt = $1;
 	$optarg = $2;
 	print STDERR ("=> option \"", $opt,
@@ -958,7 +958,7 @@ sub FindOption ($$$$$) {
 	# Turn option name into pattern.
 	my $pat = quotemeta ($opt);
 	# Look up in option names.
-	my @hits = grep (/^$pat/, @names);
+	my @hits = grep (m/^$pat/, @names);
 	print STDERR ("=> ", scalar(@hits), " hits (@hits) with \"$pat\" ",
 		      "out of ", scalar(@names), "\n") if $debug;
 
@@ -1088,7 +1088,7 @@ sub FindOption ($$$$$) {
     # Get key if this is a "name=value" pair for a hash option.
     my $key;
     if ($ctl->[CTL_DEST] == CTL_DEST_HASH && defined $arg) {
-	($key, $arg) = ($arg =~ /^([^=]*)=(.*)$/s) ? ($1, $2)
+	($key, $arg) = ($arg =~ m/^([^=]*)=(.*)$/s) ? ($1, $2)
 	  : ($arg, defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] :
 	     ($mand ? undef : ($type eq 's' ? "" : 1)));
 	if (! defined $arg) {
@@ -1119,7 +1119,7 @@ sub FindOption ($$$$$) {
 
 	# Check for option or option list terminator.
 	if ($arg eq $argend ||
-	    $arg =~ /^$prefix.+/) {
+	    $arg =~ m/^$prefix.+/) {
 	    # Push back.
 	    unshift (@$argv, $arg);
 	    # Supply empty value.
@@ -1134,15 +1134,15 @@ sub FindOption ($$$$$) {
 	my $o_valid = $type eq 'o' ? PAT_XINT : PAT_INT;
 
 	if ( $bundling && defined $rest
-	     && $rest =~ /^($key_valid)($o_valid)(.*)$/si ) {
+	     && $rest =~ m/^($key_valid)($o_valid)(.*)$/si ) {
 	    ($key, $arg, $rest) = ($1, $2, $+);
 	    chop($key) if $key;
-	    $arg = ($type eq 'o' && $arg =~ /^0/) ? oct($arg) : 0+$arg;
+	    $arg = ($type eq 'o' && $arg =~ m/^0/) ? oct($arg) : 0+$arg;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
-	elsif ( $arg =~ /^$o_valid$/si ) {
+	elsif ( $arg =~ m/^$o_valid$/si ) {
 	    $arg =~ tr/_//d;
-	    $arg = ($type eq 'o' && $arg =~ /^0/) ? oct($arg) : 0+$arg;
+	    $arg = ($type eq 'o' && $arg =~ m/^0/) ? oct($arg) : 0+$arg;
 	}
 	else {
 	    if ( defined $optarg || $mand ) {
@@ -1181,13 +1181,13 @@ sub FindOption ($$$$$) {
 	# [-]NN[.NN][eNN]
 	my $o_valid = PAT_FLOAT;
 	if ( $bundling && defined $rest &&
-	     $rest =~ /^($key_valid)($o_valid)(.*)$/s ) {
+	     $rest =~ m/^($key_valid)($o_valid)(.*)$/s ) {
 	    $arg =~ tr/_//d;
 	    ($key, $arg, $rest) = ($1, $2, $+);
 	    chop($key) if $key;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
-	elsif ( $arg =~ /^$o_valid$/ ) {
+	elsif ( $arg =~ m/^$o_valid$/ ) {
 	    $arg =~ tr/_//d;
 	}
 	else {
@@ -1222,7 +1222,7 @@ sub ValidValue ($$$$$) {
     my ($ctl, $arg, $mand, $argend, $prefix) = @_;
 
     if ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
-	return 0 unless $arg =~ /[^=]+=(.*)/;
+	return 0 unless $arg =~ m/[^=]+=(.*)/;
 	$arg = $1;
     }
 
@@ -1235,7 +1235,7 @@ sub ValidValue ($$$$$) {
 	return (1) if $arg eq "-";
 
 	# Check for option or option list terminator.
-	return 0 if $arg eq $argend || $arg =~ /^$prefix.+/;
+	return 0 if $arg eq $argend || $arg =~ m/^$prefix.+/;
 	return 1;
     }
 
@@ -1244,7 +1244,7 @@ sub ValidValue ($$$$$) {
 	    || $type eq 'o' ) { # dec/oct/hex/bin value
 
 	my $o_valid = $type eq 'o' ? PAT_XINT : PAT_INT;
-	return $arg =~ /^$o_valid$/si;
+	return $arg =~ m/^$o_valid$/si;
     }
 
     elsif ( $type eq 'f' ) { # real number, int is also ok
@@ -1252,7 +1252,7 @@ sub ValidValue ($$$$$) {
 	# and at least one digit following the point and 'e'.
 	# [-]NN[.NN][eNN]
 	my $o_valid = PAT_FLOAT;
-	return $arg =~ /^$o_valid$/;
+	return $arg =~ m/^$o_valid$/;
     }
     die("ValidValue: Cannot happen\n");
 }
@@ -1278,7 +1278,7 @@ sub Configure (@) {
     foreach $opt ( @options ) {
 	my $try = lc ($opt);
 	my $action = 1;
-	if ( $try =~ /^no_?(.*)$/s ) {
+	if ( $try =~ m/^no_?(.*)$/s ) {
 	    $action = 0;
 	    $try = $+;
 	}
@@ -1309,10 +1309,10 @@ sub Configure (@) {
 	elsif ( $try eq 'gnu_compat' ) {
 	    $gnu_compat = $action;
 	}
-	elsif ( $try =~ /^(auto_?)?version$/ ) {
+	elsif ( $try =~ m/^(auto_?)?version$/ ) {
 	    $auto_version = $action;
 	}
-	elsif ( $try =~ /^(auto_?)?help$/ ) {
+	elsif ( $try =~ m/^(auto_?)?help$/ ) {
 	    $auto_help = $action;
 	}
 	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
@@ -1336,26 +1336,26 @@ sub Configure (@) {
 	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
 	    $passthrough = $action;
 	}
-	elsif ( $try =~ /^prefix=(.+)$/ && $action ) {
+	elsif ( $try =~ m/^prefix=(.+)$/ && $action ) {
 	    $genprefix = $1;
 	    # Turn into regexp. Needs to be parenthesized!
 	    $genprefix = "(" . quotemeta($genprefix) . ")";
-	    eval { '' =~ /$genprefix/; };
+	    eval { '' =~ m/$genprefix/; };
 	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
 	}
-	elsif ( $try =~ /^prefix_pattern=(.+)$/ && $action ) {
+	elsif ( $try =~ m/^prefix_pattern=(.+)$/ && $action ) {
 	    $genprefix = $1;
 	    # Parenthesize if needed.
 	    $genprefix = "(" . $genprefix . ")"
-	      unless $genprefix =~ /^\(.*\)$/;
+	      unless $genprefix =~ m/^\(.*\)$/;
 	    eval { '' =~ m"$genprefix"; };
 	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
 	}
-	elsif ( $try =~ /^long_prefix_pattern=(.+)$/ && $action ) {
+	elsif ( $try =~ m/^long_prefix_pattern=(.+)$/ && $action ) {
 	    $longprefix = $1;
 	    # Parenthesize if needed.
 	    $longprefix = "(" . $longprefix . ")"
-	      unless $longprefix =~ /^\(.*\)$/;
+	      unless $longprefix =~ m/^\(.*\)$/;
 	    eval { '' =~ m"$longprefix"; };
 	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $@;
 	}
@@ -1447,7 +1447,7 @@ sub setup_pa_args($@) {
 	$pa->{-message} = $pa->{-msg};
 	delete($pa->{-msg});
     }
-    elsif ( $pa =~ /^-?\d+$/ ) {
+    elsif ( $pa =~ m/^-?\d+$/ ) {
 	$pa = { -exitval => $pa };
     }
     else {

@@ -57,11 +57,11 @@ cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag(@mpl_out);
 
 my $makefile = makefile_name();
-ok( grep(/^Writing $makefile for Big::Dummy/, 
+ok( grep(m/^Writing $makefile for Big::Dummy/, 
          @mpl_out) == 1,
                                            'Makefile.PL output looks right');
 
-ok( grep(/^Current package is: main$/,
+ok( grep(m/^Current package is: main$/,
          @mpl_out) == 1,
                                            'Makefile.PL run in package main');
 
@@ -276,7 +276,7 @@ ok( !-f $meta_yml,   'META.yml generation suppressed by NO_META' );
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
 
-ok( grep(/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
+ok( grep(m/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
                                 'init_dirscan skipped distdir') || 
   diag(@mpl_out);
 

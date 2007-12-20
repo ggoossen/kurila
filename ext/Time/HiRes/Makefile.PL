@@ -19,7 +19,7 @@ my $SYSCALL_H;
 use vars qw($self); # Used in 'sourcing' the hints.
 
 my $ld_exeext = ($^O eq 'cygwin' ||
-                 $^O eq 'os2' && $Config{ldflags} =~ /-Zexe\b/) ? '.exe' : '';
+                 $^O eq 'os2' && $Config{ldflags} =~ m/-Zexe\b/) ? '.exe' : '';
 
 unless($ENV{PERL_CORE}) {
     $ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
@@ -29,7 +29,7 @@ unless($ENV{PERL_CORE}) {
 
 sub my_dirsep {
     $^O eq 'VMS' ? '.' :
-	$^O =~ /mswin32|netware|djgpp/i ? '\\' :
+	$^O =~ m/mswin32|netware|djgpp/i ? '\\' :
 	    $^O eq 'MacOS' ? ':'
 		: '/';
 }
@@ -358,7 +358,7 @@ EOM
 sub DEFINE {
     my ($def, $val) = @_;
     my $define = defined $val ? "$def=$val" : $def ;
-    unless ($DEFINE =~ /(?:^| )-D\Q$define\E(?: |$)/) {
+    unless ($DEFINE =~ m/(?:^| )-D\Q$define\E(?: |$)/) {
 	$DEFINE .= " -D$define";
     }
 }
@@ -514,7 +514,7 @@ EOD
 	    $has_nanosleep++;
 	    $DEFINE .= ' -DTIME_HIRES_NANOSLEEP';
 	}
-    } elsif ($^O =~ /^(mpeix)$/) {
+    } elsif ($^O =~ m/^(mpeix)$/) {
 	# MPE/iX falsely finds nanosleep from its libc equivalent.
 	print "skipping because in $^O... ";
     } else {
@@ -548,7 +548,7 @@ EOD
     }
 
     if ($has_clock_gettime) {
-        if ($DEFINE =~ /-DTIME_HIRES_CLOCK_GETTIME_SYSCALL/) {
+        if ($DEFINE =~ m/-DTIME_HIRES_CLOCK_GETTIME_SYSCALL/) {
 	    print "found (via syscall).\n";
 	} else {
 	    print "found.\n";
@@ -570,7 +570,7 @@ EOD
     }
 
     if ($has_clock_getres) {
-        if ($DEFINE =~ /-DTIME_HIRES_CLOCK_GETRES_SYSCALL/) {
+        if ($DEFINE =~ m/-DTIME_HIRES_CLOCK_GETRES_SYSCALL/) {
 	    print "found (via syscall).\n";
 	} else {
 	    print "found.\n";
@@ -711,7 +711,7 @@ EOM
 	print "NOT found.\n";
     }
 
-   if ($DEFINE =~ /-DTIME_HIRES_STAT=\d+/) {
+   if ($DEFINE =~ m/-DTIME_HIRES_STAT=\d+/) {
     print "You seem to have stat() subsecond timestamps.\n";
     print "(Your struct stat has them, but the filesystems must help.)\n";
    } else {
@@ -791,11 +791,11 @@ sub doConstants {
 		     d_nanosleep d_clock_gettime d_clock_getres
 		     d_clock d_clock_nanosleep d_hires_stat)) {
 	    my $macro = $_;
-	    if ($macro =~ /^(d_nanosleep|d_clock_gettime|d_clock_getres|d_clock|d_clock_nanosleep)$/) {
+	    if ($macro =~ m/^(d_nanosleep|d_clock_gettime|d_clock_getres|d_clock|d_clock_nanosleep)$/) {
 		$macro =~ s/^d_(.+)/TIME_HIRES_\U$1/;
-	    } elsif ($macro =~ /^(d_hires_stat)$/) {
+	    } elsif ($macro =~ m/^(d_hires_stat)$/) {
 		my $d_hires_stat = 0;
-		$d_hires_stat = $1 if ($DEFINE =~ /-DTIME_HIRES_STAT=(\d+)/);
+		$d_hires_stat = $1 if ($DEFINE =~ m/-DTIME_HIRES_STAT=(\d+)/);
 		push @names, {name => $_, macro => "TIME_HIRES_STAT", value => $d_hires_stat,
 			      default => ["IV", "0"]};
 		next;
@@ -827,7 +827,7 @@ sub doConstants {
 sub main {
     print "Configuring Time::HiRes...\n";
 
-    if ($^O =~ /Win32/i) {
+    if ($^O =~ m/Win32/i) {
       DEFINE('SELECT_IS_BROKEN');
       $LIBS = [];
       print "System is $^O, skipping full configure...\n";
@@ -841,9 +841,9 @@ sub main {
 	print  <<EOM;
 Now you may issue '$make'.  Do not forget also '$make test'.
 EOM
-       if ((exists $ENV{LC_ALL}   && $ENV{LC_ALL}   =~ /utf-?8/i) ||
-           (exists $ENV{LC_CTYPE} && $ENV{LC_CTYPE} =~ /utf-?8/i) ||
-           (exists $ENV{LANG}     && $ENV{LANG}     =~ /utf-?8/i)) {
+       if ((exists $ENV{LC_ALL}   && $ENV{LC_ALL}   =~ m/utf-?8/i) ||
+           (exists $ENV{LC_CTYPE} && $ENV{LC_CTYPE} =~ m/utf-?8/i) ||
+           (exists $ENV{LANG}     && $ENV{LANG}     =~ m/utf-?8/i)) {
             print  <<EOM;
 NOTE: if you get an error like this (the Makefile line number may vary):
 Makefile:91: *** missing separator

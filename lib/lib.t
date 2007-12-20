@@ -54,14 +54,14 @@ BEGIN {
     if ($^O eq 'MacOS') {
 	for ($Lib_Dir, $Arch_Dir) {
 	    tr|/|:|;
-	    $_ .= ":" unless /:$/;
-	    $_ = ":$_" unless /^:/; # we know this path is relative
+	    $_ .= ":" unless m/:$/;
+	    $_ = ":$_" unless m/^:/; # we know this path is relative
 	}
     }
     is( $INC[1], $Lib_Dir,          'lib adding at end of @INC' );
     print "# \@INC == @INC\n";
     is( $INC[0], $Arch_Dir,        '    auto/ dir in front of that' );
-    is( grep(/^\Q$Lib_Dir\E$/, @INC), 1,   '    no duplicates' );
+    is( grep(m/^\Q$Lib_Dir\E$/, @INC), 1,   '    no duplicates' );
 
     # Yes, %INC uses Unixy filepaths.
     # Not on Mac OS, it doesn't ... it never has, at least.
@@ -85,6 +85,6 @@ unlike( do { eval 'use lib $Config{installsitelib};'; $@ || '' },
 	qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {
-    is( grep(/stuff/, @INC), 0, 'no lib' );
+    is( grep(m/stuff/, @INC), 0, 'no lib' );
     ok( !do 'Yup.pm',           '   do() effected' );
 }

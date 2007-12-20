@@ -6,7 +6,7 @@
 my $file = "tf$$.txt";
 $: = Tie::File::_default_recsep();
 
-if ($^O =~ /vms/i) {
+if ($^O =~ m/vms/i) {
   print "1..0\n";
   exit;
 }
@@ -79,7 +79,7 @@ undef $o;
 untie @a;
 
 # (39) Does it correctly detect a non-seekable handle?
-{  if ($^O =~ /^(MSWin32|dos|beos)$/) {
+{  if ($^O =~ m/^(MSWin32|dos|beos)$/) {
      print "ok $N # skipped ($^O has broken pipe semantics)\n";
      last;
    }
@@ -95,7 +95,7 @@ untie @a;
    close R;
    $o = eval {tie @a, 'Tie::File', \*W};
    if ($@) {
-     if ($@ =~ /filehandle does not appear to be seekable/) {
+     if ($@ =~ m/filehandle does not appear to be seekable/) {
        print "ok $N\n";
      } else {
        chomp $@;

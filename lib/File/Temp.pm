@@ -2145,7 +2145,7 @@ The value is only relevant when C<safe_level> is set to MEDIUM or higher.
     if (@_) {
       my $newuid = shift;
       croak "top_system_uid: UIDs should be numeric"
-        unless $newuid =~ /^\d+$/s;
+        unless $newuid =~ m/^\d+$/s;
       $TopSystemUID = $newuid;
     }
     return $TopSystemUID;

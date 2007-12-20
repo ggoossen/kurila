@@ -32,14 +32,14 @@ for my $do_study qw( 0 1 ) {
 
     # When it was studied (or first_fetched), $x was "first", but is now "next", so
     # should not match /f/.
-    ok( $x !~ /f/,              qq{"next" doesn't match /f/} );
+    ok( $x !~ m/f/,              qq{"next" doesn't match /f/} );
     is( index( $x, 'f' ), -1,   qq{"next" doesn't contain "f"} );
 
     # Subsequent references to $x are "next", so should match /n/
-    ok( $x =~ /n/,              qq{"next" matches /n/} );
+    ok( $x =~ m/n/,              qq{"next" matches /n/} );
     is( index( $x, 'n' ), 0,    qq{"next" contains "n" at pos 0} );
 
     # The letter "t" is in both, but in different positions
-    ok( $x =~ /t/,              qq{"next" matches /t/} );
+    ok( $x =~ m/t/,              qq{"next" matches /t/} );
     is( index( $x, 't' ), 3,    qq{"next" contains "t" at pos 3} );
 }

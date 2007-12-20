@@ -15,7 +15,7 @@ use File::Spec::Functions;
 
 # Okay, this is the list.
 
-my @Core_Modules = grep /\S/, ~< *DATA;
+my @Core_Modules = grep m/\S/, ~< *DATA;
 chomp @Core_Modules;
 
 if (eval { require Socket }) {
@@ -61,7 +61,7 @@ sub compile_module {
 
     my $out = scalar `$^X $lib $compmod $module`;
     print "# $out";
-    return $out =~ /^ok/;
+    return $out =~ m/^ok/;
 }
 
 # These modules have no tests of their own.

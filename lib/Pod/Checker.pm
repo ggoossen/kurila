@@ -686,7 +686,7 @@ sub node {
         # add node, order important!
         push(@{$self->{_nodes}}, $text);
         # keep also a uniqueness counter
-        $self->{_unique_nodes}->{$text}++ if($text !~ /^\s*$/s);
+        $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
     @{$self->{_nodes}};
@@ -711,7 +711,7 @@ sub idx {
         # add node, order important!
         push(@{$self->{_index}}, $text);
         # keep also a uniqueness counter
-        $self->{_unique_nodes}->{$text}++ if($text !~ /^\s*$/s);
+        $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
     @{$self->{_index}};
@@ -762,7 +762,7 @@ sub end_pod {
     my %nodes;
     foreach($self->node()) {
         $nodes{$_} = 1;
-        if(/^(\S+)\s+\S/) {
+        if(m/^(\S+)\s+\S/) {
             # we have more than one word. Use the first as a node, too.
             # This is used heavily in perlfunc.pod
             $nodes{$1} ||= 2; # derived node
@@ -826,7 +826,7 @@ sub command {
             # check for argument
             $arg = $self->interpolate_and_check($paragraph, $line,$file);
             my $indent = 4; # default
-            if($arg && $arg =~ /^\s*(\d+)\s*$/) {
+            if($arg && $arg =~ m/^\s*(\d+)\s*$/) {
                 $indent = $1;
             }
             # start a new list
@@ -857,15 +857,15 @@ sub command {
             }
             # check for argument
             $arg = $self->interpolate_and_check($paragraph, $line, $file);
-            if($arg && $arg =~ /(\S+)/) {
+            if($arg && $arg =~ m/(\S+)/) {
                 $arg =~ s/[\s\n]+$//;
                 my $type;
-                if($arg =~ /^[*]\s*(\S*.*)/) {
+                if($arg =~ m/^[*]\s*(\S*.*)/) {
                   $type = 'bullet';
                   $self->{_list_item_contents} = $1 ? 1 : 0;
                   $arg = $1;
                 }
-                elsif($arg =~ /^\d+\.?\s*(\S*)/) {
+                elsif($arg =~ m/^\d+\.?\s*(\S*)/) {
                   $type = 'number';
                   $self->{_list_item_contents} = $1 ? 1 : 0;
                   $arg = $1;
@@ -906,7 +906,7 @@ sub command {
             else {
                 # check for spurious characters
                 $arg = $self->interpolate_and_check($paragraph, $line,$file);
-                if($arg && $arg =~ /\S/) {
+                if($arg && $arg =~ m/\S/) {
                     $self->poderror({ -line => $line, -file => $file,
                          -severity => 'ERROR', 
                          -msg => "Spurious character(s) after =back" });
@@ -922,7 +922,7 @@ sub command {
                 }
             }
         }
-        elsif($cmd =~ /^head(\d+)/) {
+        elsif($cmd =~ m/^head(\d+)/) {
             my $hnum = $1;
             $self->{"_have_head_$hnum"}++; # count head types
             if($hnum +> 1 && !$self->{"_have_head_".($hnum -1)}) {
@@ -978,7 +978,7 @@ sub command {
             else {
                 # check for argument
                 $arg = $self->interpolate_and_check($paragraph, $line,$file);
-                unless($arg && $arg =~ /(\S+)/) {
+                unless($arg && $arg =~ m/(\S+)/) {
                     $self->poderror({ -line => $line, -file => $file,
                          -severity => 'ERROR', 
                          -msg => "No argument for =begin"});
@@ -1008,17 +1008,17 @@ sub command {
             }
         }
         elsif($cmd eq 'for') {
-            unless($paragraph =~ /\s*(\S+)\s*/) {
+            unless($paragraph =~ m/\s*(\S+)\s*/) {
                 $self->poderror({ -line => $line, -file => $file,
                      -severity => 'ERROR', 
                      -msg => "=for without formatter specification" });
             }
             $arg = ''; # do not expand paragraph below
         }
-        elsif($cmd =~ /^(pod|cut)$/) {
+        elsif($cmd =~ m/^(pod|cut)$/) {
             # check for argument
             $arg = $self->interpolate_and_check($paragraph, $line,$file);
-            if($arg && $arg =~ /(\S+)/) {
+            if($arg && $arg =~ m/(\S+)/) {
                 $self->poderror({ -line => $line, -file => $file,
                       -severity => 'ERROR', 
                       -msg => "Spurious text after =$cmd"});
@@ -1100,7 +1100,7 @@ sub _check_ptree {
             $text .= $self->_check_ptree($contents, $line, $file, "$nestlist$cmd");
             next;
         }
-        if($nestlist =~ /$cmd/) {
+        if($nestlist =~ m/$cmd/) {
             $self->poderror({ -line => $line, -file => $file,
                  -severity => 'WARNING', 
                  -msg => "nested commands $cmd<...$cmd<...>...>"});
@@ -1109,7 +1109,7 @@ sub _check_ptree {
         }
         if($cmd eq 'E') {
             # preserve entities
-            if(@$contents +> 1 || ref $$contents[0] || $$contents[0] !~ /^\w+$/) {
+            if(@$contents +> 1 || ref $$contents[0] || $$contents[0] !~ m/^\w+$/) {
                 $self->poderror({ -line => $line, -file => $file,
                     -severity => 'ERROR', 
                     -msg => "garbled entity " . $_->raw_text()});
@@ -1117,15 +1117,15 @@ sub _check_ptree {
             }
             my $ent = $$contents[0];
             my $val;
-            if($ent =~ /^0x[0-9a-f]+$/i) {
+            if($ent =~ m/^0x[0-9a-f]+$/i) {
                 # hexadec entity
                 $val = hex($ent);
             }
-            elsif($ent =~ /^0\d+$/) {
+            elsif($ent =~ m/^0\d+$/) {
                 # octal
                 $val = oct($ent);
             }
-            elsif($ent =~ /^\d+$/) {
+            elsif($ent =~ m/^\d+$/) {
                 # numeric entity
                 $val = $ent;
             }
@@ -1173,7 +1173,7 @@ sub _check_ptree {
             # remember link
             $self->hyperlink([$line,$link]);
         }
-        elsif($cmd =~ /[BCFIS]/) {
+        elsif($cmd =~ m/[BCFIS]/) {
             # add the guts
             $text .= $self->_check_ptree($contents, $line, $file, "$nestlist$cmd");
         }
@@ -1186,7 +1186,7 @@ sub _check_ptree {
         }
         elsif($cmd eq 'X') {
             my $idx = $self->_check_ptree($contents, $line, $file, "$nestlist$cmd");
-            if($idx =~ /^\s*$/s) {
+            if($idx =~ m/^\s*$/s) {
                 $self->poderror({ -line => $line, -file => $file,
                     -severity => 'ERROR', 
                     -msg => "Empty X<>"});
@@ -1230,7 +1230,7 @@ sub textblock {
     unless($self->{_have_begin}) {
         my $block = $self->interpolate_and_check($paragraph, $line,$file);
         if($self->{_current_head1} eq 'NAME') {
-            if($block =~ /^\s*(\S+?)\s*[,-]/) {
+            if($block =~ m/^\s*(\S+?)\s*[,-]/) {
                 # this is the canonical name
                 $self->{-name} = $1 unless(defined $self->{-name});
             }

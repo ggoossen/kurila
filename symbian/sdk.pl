@@ -36,7 +36,7 @@ if ($ENV{PATH} =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
     $SDK_NAME    = 'UIQ';
     $SDK_VARIANT = 'UIQ';
     $SDK_VERSION = $ENV{UIQSDK} = "$1.$2";
-    if ($SDK_VERSION =~ /^2\./) {
+    if ($SDK_VERSION =~ m/^2\./) {
 	$SYMBIAN_VERSION = '7.0s';
     } else {
 	die "$0: Unknown UIQ version '$SDK_VERSION'\n";
@@ -48,7 +48,7 @@ if ($ENV{PATH} =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
 if (open(GCC, "gcc -v 2>&1 |")) {
    while ( ~< *GCC) {
      # print;
-     if (/Reading specs from (.+?)\\Epoc32\\/i) {
+     if (m/Reading specs from (.+?)\\Epoc32\\/i) {
        $SYMBIAN_ROOT = $1;
        # The S60SDK tells the Series 60 SDK version.
        if ($ENV{S60SDK}) {

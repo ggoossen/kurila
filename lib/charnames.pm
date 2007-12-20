@@ -119,16 +119,16 @@ sub charnames
     ## end of the name as we find it.
 
     ## If :full, look for the name exactly
-    if ($^H{charnames_full} and $txt =~ /\t\t\Q$name\E$/m) {
+    if ($^H{charnames_full} and $txt =~ m/\t\t\Q$name\E$/m) {
       @off = ($-[0], $+[0]);
     }
 
     ## If we didn't get above, and :short allowed, look for the short name.
     ## The short name is like "greek:Sigma"
     unless (@off) {
-      if ($^H{charnames_short} and $name =~ /^(.+?):(.+)/s) {
+      if ($^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my ($script, $cname) = ($1, $2);
-	my $case = $cname =~ /[[:upper:]]/ ? "CAPITAL" : "SMALL";
+	my $case = $cname =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
 	if ($txt =~ m/\t\t\U$script\E (?:$case )?LETTER \U\Q$cname\E$/m) {
 	  @off = ($-[0], $+[0]);
 	}
@@ -138,7 +138,7 @@ sub charnames
     ## If we still don't have it, check for the name among the loaded
     ## scripts.
     if (not @off) {
-      my $case = $name =~ /[[:upper:]]/ ? "CAPITAL" : "SMALL";
+      my $case = $name =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
       for my $script (@{$^H{charnames_scripts}}) {
 	if ($txt =~ m/\t\t$script (?:$case )?LETTER \U\Q$name\E$/m) {
 	  @off = ($-[0], $+[0]);
@@ -262,9 +262,9 @@ sub viacode
   # this comes actually from Unicode::UCD, where it is the named
   # function _getcode (), but it avoids the overhead of loading it
   my $hex;
-  if ($arg =~ /^[1-9]\d*$/) {
+  if ($arg =~ m/^[1-9]\d*$/) {
     $hex = sprintf "%04X", $arg;
-  } elsif ($arg =~ /^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/) {
+  } elsif ($arg =~ m/^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/) {
     $hex = $1;
   } else {
     carp("unexpected arg \"$arg\" to charnames::viacode()");
@@ -297,7 +297,7 @@ sub vianame
 
   my $arg = shift;
 
-  return chr CORE::hex $1 if $arg =~ /^U\+([0-9a-fA-F]+)$/;
+  return chr CORE::hex $1 if $arg =~ m/^U\+([0-9a-fA-F]+)$/;
 
   return $vianame{$arg} if exists $vianame{$arg};
 

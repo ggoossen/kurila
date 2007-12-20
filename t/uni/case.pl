@@ -55,7 +55,7 @@ sub casetest {
     my %none;
     for my $i (map { ord } split //,
 	       "\e !\"#\$%&'()+,-./0123456789:;<=>?\@[\\]^_{|}~\b") {
-	next if pack("U0U", $i) =~ /\w/;
+	next if pack("U0U", $i) =~ m/\w/;
 	$none{$i}++ unless $seen{$i};
     }
     print "# ", scalar keys %none, " noncase mappings\n";
@@ -121,7 +121,7 @@ sub casetest {
 		#
 		# 0130 -> 0069 0307 (00D1 0307)
 		#
-		if ($h =~ /^(0130|0149|01F0|1E96|1E97|1E98|1E99|1E9A)$/) {
+		if ($h =~ m/^(0130|0149|01F0|1E96|1E97|1E98|1E99|1E9A)$/) {
 		    $e =~ s/004E/002B/; # N
 		    $e =~ s/004A/00A2/; # J
 		    $e =~ s/0048/00E7/; # H

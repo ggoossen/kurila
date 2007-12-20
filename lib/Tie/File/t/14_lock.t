@@ -10,7 +10,7 @@
 
 BEGIN {
   eval { flock STDOUT, 0 };
-  if ($@ && $@ =~ /unimplemented/) {
+  if ($@ && $@ =~ m/unimplemented/) {
     print "1..0\n";
     exit;
   }

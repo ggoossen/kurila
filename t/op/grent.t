@@ -5,7 +5,7 @@ BEGIN {
 }
 
 eval {my @n = getgrgid 0};
-if ($@ =~ /(The \w+ function is unimplemented)/) {
+if ($@ =~ m/(The \w+ function is unimplemented)/) {
     skip_all "getgrgid unimplemented";
 }
 
@@ -29,10 +29,10 @@ if (not defined $where) {	# Try NIS.
 
             # Check to make sure we're really using NIS.
             if( open(NSSW, "/etc/nsswitch.conf" ) ) {
-                my($group) = grep /^\s*group:/, ~< *NSSW;
+                my($group) = grep m/^\s*group:/, ~< *NSSW;
 
                 # If there's no group line, assume it default to compat.
-                if( !$group || $group !~ /(nis|compat)/ ) {
+                if( !$group || $group !~ m/(nis|compat)/ ) {
                     print "# Doesn't look like you're using NIS in ".
                           "/etc/nsswitch.conf\n";
                     last;

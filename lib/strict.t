@@ -20,11 +20,11 @@ my @prgs = () ;
 
 foreach (sort glob($^O eq 'MacOS' ? ":lib:strict:*" : "lib/strict/*")) {
 
-    next if -d || /(~|\.orig|,v)$/;
+    next if -d || m/(~|\.orig|,v)$/;
 
     open F, "<$_" or die "Cannot open $_: $!\n" ;
     while ( ~< *F) {
-	last if /^__END__/ ;
+	last if m/^__END__/ ;
     }
 
     {
@@ -46,7 +46,7 @@ for (@prgs){
         $switch = $&;
     }
     my($prog,$expected) = split(/\nEXPECT\n/, $_);
-    if ( $prog =~ /--FILE--/) {
+    if ( $prog =~ m/--FILE--/) {
         my(@files) = split(/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error test $i didn't split into pairs, got " . 
@@ -87,7 +87,7 @@ for (@prgs){
     if ( $results =~ s/^SKIPPED\n//) {
 	print "$results\n" ;
     }
-    elsif (($prefix and $results !~ /^\Q$expected/) or
+    elsif (($prefix and $results !~ m/^\Q$expected/) or
 	   (!$prefix and $results ne $expected)){
         print STDERR "PROG: $switch\n$prog\n";
         print STDERR "EXPECTED:\n$expected\n";
@@ -100,17 +100,17 @@ for (@prgs){
 }
 
 eval qq(use strict 'garbage');
-print +($@ =~ /^Unknown 'strict' tag\(s\) 'garbage'/)
+print +($@ =~ m/^Unknown 'strict' tag\(s\) 'garbage'/)
 	? "ok ".++$i."\n" : "not ok ".++$i."\t# $@";
 
 eval qq(no strict 'garbage');
-print +($@ =~ /^Unknown 'strict' tag\(s\) 'garbage'/)
+print +($@ =~ m/^Unknown 'strict' tag\(s\) 'garbage'/)
 	? "ok ".++$i."\n" : "not ok ".++$i."\t# $@";
 
 eval qq(use strict qw(foo bar));
-print +($@ =~ /^Unknown 'strict' tag\(s\) 'foo bar'/)
+print +($@ =~ m/^Unknown 'strict' tag\(s\) 'foo bar'/)
 	? "ok ".++$i."\n" : "not ok ".++$i."\t# $@";
 
 eval qq(no strict qw(foo bar));
-print +($@ =~ /^Unknown 'strict' tag\(s\) 'foo bar'/)
+print +($@ =~ m/^Unknown 'strict' tag\(s\) 'foo bar'/)
 	? "ok ".++$i."\n" : "not ok ".++$i."\t# $@";

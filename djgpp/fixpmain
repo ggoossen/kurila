@@ -11,7 +11,7 @@ undef $/;
 $perlmain= ~< *PERLM;
 $makefile= ~< *MAKEFILE;
 
-($_) = $makefile =~ /\bNAME\b.*=>\W*([\w\:]+)/; # extract module name
+($_) = $makefile =~ m/\bNAME\b.*=>\W*([\w\:]+)/; # extract module name
 $badname=join ("__",map {lc substr ($_,0,8)} split /:+/); # dosify
 $perlmain =~ s/^.*boot_$badname.*$//gm if $badname; # delete bad lines
 

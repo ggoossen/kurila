@@ -23,7 +23,7 @@ use ExtUtils::MakeMaker::Config;
 use File::Spec;
 use ExtUtils::MM;
 
-my $Is_Dosish = $^O =~ /^(dos|MSWin32)$/;
+my $Is_Dosish = $^O =~ m/^(dos|MSWin32)$/;
 
 my $mm = bless {}, 'MM';
 

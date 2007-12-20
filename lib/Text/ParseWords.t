@@ -109,7 +109,7 @@ $result = join('|', parse_line("\x{1234}", 0, $string));
 is($result, "field1|field2\x{1234}still field2|field3");
 
 # missing quote after matching regex used to hang after change #22997
-"1234" =~ /(1)(2)(3)(4)/;
+"1234" =~ m/(1)(2)(3)(4)/;
 $string = qq{"missing quote};
 $result = join('|', shellwords($string));
 is($result, "");

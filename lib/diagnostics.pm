@@ -251,7 +251,7 @@ CONFIG: {
 		if (open(POD_DIAG, $file)) {
 		    while ( ~< *POD_DIAG) {
 			next unless
-			    /^__END__\s*# wish diag dbase were more accessible/;
+			    m/^__END__\s*# wish diag dbase were more accessible/;
 			print STDERR "podfile is $file\n" if $DEBUG;
 			last INCPATH;
 		    }
@@ -337,11 +337,11 @@ my %msg;
 	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/$+/gs;
 	    s/[LIF]<(.*?)>/$1/gs;
 	} 
-	unless (/^=/) {
+	unless (m/^=/) {
 	    if (defined $header) { 
 		if ( $header eq 'DESCRIPTION' && 
-		    (   /Optional warnings are enabled/ 
-		     || /Some of these messages are generic./
+		    (   m/Optional warnings are enabled/ 
+		     || m/Some of these messages are generic./
 		    ) )
 		{
 		    next;
@@ -367,8 +367,8 @@ my %msg;
 	if( $for_item ) { $header = $for_item; undef $for_item } 
 	else {
 	    $header = $1;
-	    while( $header =~ /[;,]\z/ ) {
-		~< *POD_DIAG =~ /^\s*(.*?)\s*\z/;
+	    while( $header =~ m/[;,]\z/ ) {
+		~< *POD_DIAG =~ m/^\s*(.*?)\s*\z/;
 		$header .= ' '.$1;
 	    }
 	}
@@ -449,27 +449,27 @@ sub import {
 
     for (@_) {
 
-	/^-d(ebug)?$/ 	   	&& do {
+	m/^-d(ebug)?$/ 	   	&& do {
 				    $DEBUG++;
 				    next;
 				   };
 
-	/^-v(erbose)?$/ 	&& do {
+	m/^-v(erbose)?$/ 	&& do {
 				    $VERBOSE++;
 				    next;
 				   };
 
-	/^-p(retty)?$/ 		&& do {
+	m/^-p(retty)?$/ 		&& do {
 				    print STDERR "$0: I'm afraid it's too late for prettiness.\n";
 				    $PRETTY++;
 				    next;
 			       };
 	# matches trace and traceonly for legacy doc mixup reasons
-	/^-t(race(only)?)?$/	&& do {
+	m/^-t(race(only)?)?$/	&& do {
 				    $TRACEONLY++;
 				    next;
 			       };
-	/^-w(arntrace)?$/ 	&& do {
+	m/^-w(arntrace)?$/ 	&& do {
 				    $WARNTRACE++;
 				    next;
 			       };
@@ -564,7 +564,7 @@ sub splainthis {
     return unless @secs;
     $_ = $secs[0];
     for my $i ( 1..$#secs ){
-        if( $secs[$i] =~ /.+? (?:line|chunk) \d+/ ){
+        if( $secs[$i] =~ m/.+? (?:line|chunk) \d+/ ){
             $real = 1;
             last;
         } else {

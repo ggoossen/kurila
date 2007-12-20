@@ -511,7 +511,7 @@ sub _ipc_run {
     if( ref $cmd ) {
         my $aref = [];
         for my $item (@$cmd) {
-            if( $item =~ /([<>|&])/ ) {
+            if( $item =~ m/([<>|&])/ ) {
                 push @command, $aref, $item;
                 $aref = [];
                 $special_chars .= $1;
@@ -521,7 +521,7 @@ sub _ipc_run {
         }
         push @command, $aref;
     } else {
-        @command = map { if( /([<>|&])/ ) {
+        @command = map { if( m/([<>|&])/ ) {
                             $special_chars .= $1; $_;
                          } else {
                             [ split / +/ ]

@@ -86,7 +86,7 @@ sub _init {
     my($self) = shift;
 
     $self->{_is_vms}   = ( $^O eq 'VMS' );
-    $self->{_is_win32} = ( $^O =~ /^(MS)?Win32$/ );
+    $self->{_is_win32} = ( $^O =~ m/^(MS)?Win32$/ );
     $self->{_is_macos} = ( $^O eq 'MacOS' );
 }
 
@@ -199,7 +199,7 @@ sub _analyze_line {
             $results->set_details( $point->number, $details );
         }
     } # test point
-    elsif ( $line =~ /^not\s+$/ ) {
+    elsif ( $line =~ m/^not\s+$/ ) {
         $linetype = 'other';
         # Sometimes the "not " and "ok" will be on separate lines on VMS.
         # We catch this and remember we saw it.
@@ -330,7 +330,7 @@ sub _command_line {
     my $command =  $self->_command();
     my $switches = $self->_switches($file);
 
-    $file = qq["$file"] if ($file =~ /\s/) && ($file !~ /^".*"$/);
+    $file = qq["$file"] if ($file =~ m/\s/) && ($file !~ m/^".*"$/);
     my $line = "$command $switches $file";
 
     return $line;
@@ -356,7 +356,7 @@ sub _command {
 
     return $ENV{HARNESS_PERL}   if defined $ENV{HARNESS_PERL};
     #return qq["$^X"]            if $self->{_is_win32} && ($^X =~ /[^\w\.\/\\]/);
-    return qq["$^X"]            if $^X =~ /\s/ and $^X !~ /^["']/;
+    return qq["$^X"]            if $^X =~ m/\s/ and $^X !~ m/^["']/;
     return $^X;
 }
 
@@ -378,7 +378,7 @@ sub _switches {
     my $shebang = ~< *TEST;
     close(TEST) or print "can't close $file. $!\n";
 
-    my $taint = ( $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/ );
+    my $taint = ( $shebang =~ m/^#!.*\bperl.*\s-\w*([Tt]+)/ );
     push( @derived_switches, "-$1" ) if $taint;
 
     # When taint mode is on, PERL5LIB is ignored.  So we need to put
@@ -393,7 +393,7 @@ sub _switches {
     # we're VMS, since VMS requires all parms quoted.  Also, don't quote
     # it if it's already quoted.
     for ( @derived_switches ) {
-	$_ = qq["$_"] if ((/\s/ || $self->{_is_vms}) && !/^".*"$/ );
+	$_ = qq["$_"] if ((m/\s/ || $self->{_is_vms}) && !m/^".*"$/ );
     }
     return join( " ", @existing_switches, @derived_switches );
 }
@@ -454,7 +454,7 @@ sub _filtered_INC {
     if( $self->{_is_vms} ) {
 	# VMS has a 255-byte limit on the length of %ENV entries, so
 	# toss the ones that involve perl_root, the install location
-        @inc = grep !/perl_root/i, @inc;
+        @inc = grep !m/perl_root/i, @inc;
 
     }
     elsif ( $self->{_is_win32} ) {
@@ -520,7 +520,7 @@ C<$comment> (sans #).
 sub _is_diagnostic {
     my($self, $line, $comment) = @_;
 
-    if( $line =~ /^\s*\#(.*)/ ) {
+    if( $line =~ m/^\s*\#(.*)/ ) {
         $$comment = $1;
         return $YES;
     }
@@ -550,17 +550,17 @@ REGEX
 sub _is_header {
     my($self, $line) = @_;
 
-    if( my($max, $extra) = $line =~ /^1\.\.(\d+)(.*)/ ) {
+    if( my($max, $extra) = $line =~ m/^1\.\.(\d+)(.*)/ ) {
         $self->{max}  = $max;
         assert( $self->{max} +>= 0,  'Max # of tests looks right' );
 
         if( defined $extra ) {
-            my($todo, $skip, $reason) = $extra =~ /$Extra_Header_Re/xo;
+            my($todo, $skip, $reason) = $extra =~ m/$Extra_Header_Re/xo;
 
             $self->{todo} = { map { $_ => 1 } split /\s+/, $todo } if $todo;
 
             if( $self->{max} == 0 ) {
-                $reason = '' unless defined $skip and $skip =~ /^Skip/i;
+                $reason = '' unless defined $skip and $skip =~ m/^Skip/i;
             }
 
             $self->{skip_all} = $reason;
@@ -585,7 +585,7 @@ Checks if the line is a "Bail out!".  Places the reason for bailing
 sub _is_bail_out {
     my($self, $line, $reason) = @_;
 
-    if( $line =~ /^Bail out!\s*(.*)/i ) {
+    if( $line =~ m/^Bail out!\s*(.*)/i ) {
         $$reason = $1 if $1;
         return $YES;
     }

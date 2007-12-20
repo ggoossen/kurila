@@ -65,7 +65,7 @@ print (!(exists $lnk{bar})   ? "" : "not ", "ok 28\n");
     %lnk = ();
     undef $bar;
     GetOptions (\%lnk, "bar" => \$bar, "Foo=s");
-    print (($errors=~/Unknown option:/) ? "" : "not ", "ok 29\n");
+    print (($errors=~m/Unknown option:/) ? "" : "not ", "ok 29\n");
     $errors="";
     %lnk = ();
     undef $bar;

@@ -130,7 +130,7 @@ sub uncolor {
         my $escape = $_;
         $escape =~ s/^\e\[//;
         $escape =~ s/m$//;
-        unless ($escape =~ /^((?:\d+;)*\d*)$/) {
+        unless ($escape =~ m/^((?:\d+;)*\d*)$/) {
             require Carp;
             Carp::croak ("Bad escape sequence $_");
         }

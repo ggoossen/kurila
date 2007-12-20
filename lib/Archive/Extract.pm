@@ -202,13 +202,13 @@ Returns a C<Archive::Extract> object on success, or false on failure.
         ### figure out the type, if it wasn't already specified ###
         unless ( $parsed->{type} ) {
             $parsed->{type} =
-                $ar =~ /.+?\.(?:tar\.gz|tgz)$/i     ? TGZ   :
-                $ar =~ /.+?\.gz$/i                  ? GZ    :
-                $ar =~ /.+?\.tar$/i                 ? TAR   :
-                $ar =~ /.+?\.(zip|jar|par)$/i       ? ZIP   :
-                $ar =~ /.+?\.(?:tbz2?|tar\.bz2?)$/i ? TBZ   :
-                $ar =~ /.+?\.bz2$/i                 ? BZ2   :
-                $ar =~ /.+?\.Z$/                    ? Z     :
+                $ar =~ m/.+?\.(?:tar\.gz|tgz)$/i     ? TGZ   :
+                $ar =~ m/.+?\.gz$/i                  ? GZ    :
+                $ar =~ m/.+?\.tar$/i                 ? TAR   :
+                $ar =~ m/.+?\.(zip|jar|par)$/i       ? ZIP   :
+                $ar =~ m/.+?\.(?:tbz2?|tar\.bz2?)$/i ? TBZ   :
+                $ar =~ m/.+?\.bz2$/i                 ? BZ2   :
+                $ar =~ m/.+?\.Z$/                    ? Z     :
                 '';
 
         }
@@ -487,7 +487,7 @@ sub have_old_bunzip2 {
     ### no output
     return unless $buffer;
     
-    my ($version) = $buffer =~ /version \s+ (\d+)/ix;
+    my ($version) = $buffer =~ m/version \s+ (\d+)/ix;
 
     return 1 if $version +< 1;
     return;
@@ -1051,7 +1051,7 @@ sub _bunzip2_bin {
     
     ### guard against broken bunzip2. See ->have_old_bunzip2()
     ### for details
-    if( $self->have_old_bunzip2 and $self->archive !~ /\.bz2$/i ) {
+    if( $self->have_old_bunzip2 and $self->archive !~ m/\.bz2$/i ) {
         return $self->_error(loc("Your bunzip2 version is too old and ".
                                  "can only extract files ending in '%1'",
                                  '.bz2'));

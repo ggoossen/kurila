@@ -4,7 +4,7 @@
 package Encode;
 use strict;
 use warnings;
-our $VERSION = sprintf "%d.%02d", q$Revision: 2.23 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d", q$Revision: 2.23 $ =~ m/(\d+)/g;
 sub DEBUG () { 0 }
 use XSLoader ();
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -68,7 +68,7 @@ sub encodings {
         }
     }
     return sort { lc $a cmp lc $b }
-      grep      { !/^(?:Internal|Unicode|Guess)$/o } keys %enc;
+      grep      { !m/^(?:Internal|Unicode|Guess)$/o } keys %enc;
 }
 
 sub perlio_ok {

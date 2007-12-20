@@ -178,9 +178,9 @@ sub ldopts {
        @argv = @ARGV;
        #hmm
        while($_ = shift @argv) {
-	   /^-std$/  && do { $std = 1; next; };
-	   /^--$/    && do { @link_args = @argv; last; };
-	   /^-I(.*)/ && do { $path = $1 || shift @argv; next; };
+	   m/^-std$/  && do { $std = 1; next; };
+	   m/^--$/    && do { @link_args = @argv; last; };
+	   m/^-I(.*)/ && do { $path = $1 || shift @argv; next; };
 	   push(@mods, $_); 
        }
     }
@@ -229,8 +229,8 @@ sub ldopts {
     elsif ($^O eq 'os390' && $Config{usedl}) {
 	# Nothing for OS/390 (z/OS) dynamic.
     } else {
-	$libperl = (grep(/^-l\w*perl\w*$/, @link_args))[0]
-	    || ($Config{libperl} =~ /^lib(\w+)(\Q$lib_ext\E|\.\Q$Config{dlext}\E)$/
+	$libperl = (grep(m/^-l\w*perl\w*$/, @link_args))[0]
+	    || ($Config{libperl} =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$Config{dlext}\E)$/
 		? "-l$1" : '')
 		|| "-lperl";
     }

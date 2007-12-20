@@ -23,7 +23,7 @@ BEGIN {
       $ENV{PATH} = $ENV{PATH};
       $ENV{TERM} = $ENV{TERM} ne ''? $ENV{TERM} : 'dummy';
   }
-  if ($Config{'extensions'} =~ /\bIPC\/SysV\b/
+  if ($Config{'extensions'} =~ m/\bIPC\/SysV\b/
       && ($Config{d_shm} || $Config{d_msg})) {
       eval { require IPC::SysV };
       unless ($@) {
@@ -50,7 +50,7 @@ my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 if ($Is_VMS) {
     my (%old, $x);
     for $x ('DCL$PATH', @MoreEnv) {
-	($old{$x}) = $ENV{$x} =~ /^(.*)$/ if exists $ENV{$x};
+	($old{$x}) = $ENV{$x} =~ m/^(.*)$/ if exists $ENV{$x};
     }
     eval <<EndOfCleanup;
 	END {
@@ -129,7 +129,7 @@ my $TEST = catfile(curdir(), 'TEST');
 {
     $ENV{'DCL$PATH'} = '' if $Is_VMS;
 
-    if ($Is_MSWin32 && $Config{ccname} =~ /bcc32/ && ! -f 'cc3250mt.dll') {
+    if ($Is_MSWin32 && $Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
 	foreach my $dir (split /$Config{path_sep}/, $ENV{PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
@@ -159,7 +159,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	while (my $v = $vars[0]) {
 	    local $ENV{$v} = $TAINT;
 	    last if eval { `$echo 1` };
-	    last unless $@ =~ /^Insecure \$ENV{$v}/;
+	    last unless $@ =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
 	test !@vars, "@vars";
@@ -170,7 +170,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	test eval { `$echo 1` } eq "1\n";
 	$ENV{TERM} = 'e=mc2' . $TAINT;
 	test !eval { `$echo 1` };
-	test $@ =~ /^Insecure \$ENV{TERM}/, $@;
+	test $@ =~ m/^Insecure \$ENV{TERM}/, $@;
     }
 
     my $tmp;
@@ -189,7 +189,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
 	local $ENV{PATH} = $tmp;
 	test !eval { `$echo 1` };
-	test $@ =~ /^Insecure directory in \$ENV{PATH}/, $@;
+	test $@ =~ m/^Insecure directory in \$ENV{PATH}/, $@;
     }
 
     SKIP: {
@@ -197,14 +197,14 @@ my $TEST = catfile(curdir(), 'TEST');
 
 	$ENV{'DCL$PATH'} = $TAINT;
 	test  eval { `$echo 1` } eq '';
-	test $@ =~ /^Insecure \$ENV{DCL\$PATH}/, $@;
+	test $@ =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
 	SKIP: {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
 	    $ENV{'DCL$PATH'} = $tmp;
 	    test eval { `$echo 1` } eq '';
-	    test $@ =~ /^Insecure directory in \$ENV{DCL\$PATH}/, $@;
+	    test $@ =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
 	}
 	$ENV{'DCL$PATH'} = '';
     }
@@ -231,33 +231,33 @@ my $TEST = catfile(curdir(), 'TEST');
     test all_tainted @list[1,3,5,7,9];
     test not any_tainted @list[0,2,4,6,8];
 
-    ($foo) = $foo =~ /(.+)/;
+    ($foo) = $foo =~ m/(.+)/;
     test not tainted $foo;
 
-    $foo = $1 if ('bar' . $TAINT) =~ /(.+)/;
+    $foo = $1 if ('bar' . $TAINT) =~ m/(.+)/;
     test not tainted $foo;
     test $foo eq 'bar';
 
     {
       use re 'taint';
 
-      ($foo) = ('bar' . $TAINT) =~ /(.+)/;
+      ($foo) = ('bar' . $TAINT) =~ m/(.+)/;
       test tainted $foo;
       test $foo eq 'bar';
 
-      $foo = $1 if ('bar' . $TAINT) =~ /(.+)/;
+      $foo = $1 if ('bar' . $TAINT) =~ m/(.+)/;
       test tainted $foo;
       test $foo eq 'bar';
     }
 
-    $foo = $1 if 'bar' =~ /(.+)$TAINT/;
+    $foo = $1 if 'bar' =~ m/(.+)$TAINT/;
     test tainted $foo;
     test $foo eq 'bar';
 
     my $pi = 4 * atan2(1,1) + $TAINT0;
     test tainted $pi;
 
-    ($pi) = $pi =~ /(\d+\.\d+)/;
+    ($pi) = $pi =~ m/(\d+\.\d+)/;
     test not tainted $pi;
     test sprintf("%.5f", $pi) eq '3.14159';
 }
@@ -297,10 +297,10 @@ SKIP: {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
     my @globs = eval { glob("*") };
-    test @globs == 0 && $@ =~ /^Insecure dependency/;
+    test @globs == 0 && $@ =~ m/^Insecure dependency/;
 
     @globs = eval { glob '*' };
-    test @globs == 0 && $@ =~ /^Insecure dependency/;
+    test @globs == 0 && $@ =~ m/^Insecure dependency/;
 }
 
 # Output of commands should be tainted
@@ -319,13 +319,13 @@ SKIP: {
     my $foo = "abcdefghi" . $TAINT;
     test tainted $foo;
 
-    $foo =~ /def/;
+    $foo =~ m/def/;
     test not any_tainted $`, $&, $';
 
-    $foo =~ /(...)(...)(...)/;
+    $foo =~ m/(...)(...)(...)/;
     test not any_tainted $1, $2, $3, $+;
 
-    my @bar = $foo =~ /(...)(...)(...)/;
+    my @bar = $foo =~ m/(...)(...)(...)/;
     test not any_tainted @bar;
 
     test tainted $foo;	# $foo should still be tainted!
@@ -335,60 +335,60 @@ SKIP: {
 # Operations which affect files can't use tainted data.
 {
     test !eval { chmod 0, $TAINT }, 'chmod';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     # There is no feature test in $Config{} for truncate,
     #   so we allow for the possibility that it's missing.
     test !eval { truncate 'NoSuChFiLe', $TAINT0 }, 'truncate';
-    test $@ =~ /^(?:Insecure dependency|truncate not implemented)/, $@;
+    test $@ =~ m/^(?:Insecure dependency|truncate not implemented)/, $@;
 
     test !eval { rename '', $TAINT }, 'rename';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     test !eval { unlink $TAINT }, 'unlink';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     test !eval { utime $TAINT }, 'utime';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     SKIP: {
         skip "chown() is not available", 2 unless $Config{d_chown};
 
 	test !eval { chown -1, -1, $TAINT }, 'chown';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 
     SKIP: {
         skip "link() is not available", 2 unless $Config{d_link};
 
 	test !eval { link $TAINT, '' }, 'link';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 
     SKIP: {
         skip "symlink() is not available", 2 unless $Config{d_symlink};
 
 	test !eval { symlink $TAINT, '' }, 'symlink';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 }
 
 # Operations which affect directories can't use tainted data.
 {
     test !eval { mkdir "foo".$TAINT, 0755.$TAINT0 }, 'mkdir';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     test !eval { rmdir $TAINT }, 'rmdir';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     test !eval { chdir "foo".$TAINT }, 'chdir';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     SKIP: {
         skip "chroot() is not available", 2 unless $Config{d_chroot};
 
 	test !eval { chroot $TAINT }, 'chroot';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 }
 
@@ -396,7 +396,7 @@ SKIP: {
 {
     my $foo = "imaginary library" . $TAINT;
     test !eval { require $foo }, 'require';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     my $filename = "./taintB$$";	# NB: $filename isn't tainted!
     END { unlink $filename if defined $filename }
@@ -415,7 +415,7 @@ SKIP: {
 	($^O eq 'mint' && $! == 33);
 
     test !eval { open FOO, "> $foo" }, 'open for write';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 }
 
 # Commands to the system can't use tainted data
@@ -426,23 +426,23 @@ SKIP: {
         skip "open('|') is not available", 4 if $^O eq 'amigaos';
 
 	test !eval { open FOO, "| x$foo" }, 'popen to';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 
 	test !eval { open FOO, "x$foo |" }, 'popen from';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 
     test !eval { exec $TAINT }, 'exec';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     test !eval { system $TAINT }, 'system';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     $foo = "*";
     taint_these $foo;
 
     test !eval { `$echo 1$foo` }, 'backticks';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     SKIP: {
         # wildcard expansion doesn't invoke shell on VMS, so is safe
@@ -456,20 +456,20 @@ SKIP: {
 # Operations which affect processes can't use tainted data.
 {
     test !eval { kill 0, $TAINT }, 'kill';
-    test $@ =~ /^Insecure dependency/, $@;
+    test $@ =~ m/^Insecure dependency/, $@;
 
     SKIP: {
         skip "setpgrp() is not available", 2 unless $Config{d_setpgrp};
 
 	test !eval { setpgrp 0, $TAINT0 }, 'setpgrp';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 
     SKIP: {
         skip "setpriority() is not available", 2 unless $Config{d_setprior};
 
 	test !eval { setpriority 0, $TAINT0, $TAINT0 }, 'setpriority';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 }
 
@@ -479,7 +479,7 @@ SKIP: {
         skip "syscall() is not available", 2 unless $Config{d_syscall};
 
 	test !eval { syscall $TAINT }, 'syscall';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
     }
 
     {
@@ -491,13 +491,13 @@ SKIP: {
 	test open(FOO, "> $temp"), "Couldn't open $temp for write: $!";
 
 	test !eval { ioctl FOO, $TAINT0, $foo }, 'ioctl';
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 
         SKIP: {
             skip "fcntl() is not available", 2 unless $Config{d_fcntl};
 
 	    test !eval { fcntl FOO, $TAINT0, $foo }, 'fcntl';
-	    test $@ =~ /^Insecure dependency/, $@;
+	    test $@ =~ m/^Insecure dependency/, $@;
 	}
 
 	close FOO;
@@ -771,58 +771,58 @@ SKIP: {
 	my $evil = "foo" . $TAINT;
 
 	eval { sysopen(my $ro, $evil, &O_RDONLY) };
-	test $@ !~ /^Insecure dependency/, $@;
+	test $@ !~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $wo, $evil, &O_WRONLY) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $rw, $evil, &O_RDWR) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $ap, $evil, &O_APPEND) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $cr, $evil, &O_CREAT) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $tr, $evil, &O_TRUNC) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $ro, "foo", &O_RDONLY ^|^ $TAINT0) };
-	test $@ !~ /^Insecure dependency/, $@;
+	test $@ !~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $wo, "foo", &O_WRONLY ^|^ $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 
 	eval { sysopen(my $rw, "foo", &O_RDWR ^|^ $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 
 	eval { sysopen(my $ap, "foo", &O_APPEND ^|^ $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $cr, "foo", &O_CREAT ^|^ $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 
 	eval { sysopen(my $tr, "foo", &O_TRUNC ^|^ $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 
 	eval { sysopen(my $ro, "foo", &O_RDONLY, $TAINT0) };
-	test $@ !~ /^Insecure dependency/, $@;
+	test $@ !~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $wo, "foo", &O_WRONLY, $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $rw, "foo", &O_RDWR, $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $ap, "foo", &O_APPEND, $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	eval { sysopen(my $cr, "foo", &O_CREAT, $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 
 	eval { sysopen(my $tr, "foo", &O_TRUNC, $TAINT0) };
-	test $@ =~ /^Insecure dependency/, $@;
+	test $@ =~ m/^Insecure dependency/, $@;
 	
 	unlink("foo"); # not unlink($evil), because that would fail...
     }
@@ -884,7 +884,7 @@ SKIP: {
     while (my ($k, $v) = each %ENV) {
 	if (!tainted($v) &&
 	    # These we have explicitly untainted or set earlier.
-	    $k !~ /^(BASH_ENV|CDPATH|ENV|IFS|PATH|PERL_CORE|TEMP|TERM|TMP)$/) {
+	    $k !~ m/^(BASH_ENV|CDPATH|ENV|IFS|PATH|PERL_CORE|TEMP|TERM|TMP)$/) {
 	    push @untainted, "# '$k' = '$v'\n";
 	}
     }
@@ -896,7 +896,7 @@ ok( ${^TAINT} == 1, '$^TAINT is on' );
 
 eval { ${^TAINT} = 0 };
 ok( ${^TAINT},  '$^TAINT is not assignable' );
-ok( $@ =~ /^Modification of a read-only value attempted/,
+ok( $@ =~ m/^Modification of a read-only value attempted/,
                                 'Assigning to ${^TAINT} fails' );
 
 {
@@ -918,7 +918,7 @@ SKIP: {
     # bug 20010221.005
     local $ENV{PATH} .= $TAINT;
     eval { system { "echo" } "/arg0", "arg1" };
-    test $@ =~ /^Insecure \$ENV/;
+    test $@ =~ m/^Insecure \$ENV/;
 }
 
 TODO: {
@@ -971,7 +971,7 @@ TODO: {
 {
     # [ID 20020704.001] taint propagation failure
     use re 'taint';
-    $TAINT =~ /(.*)/;
+    $TAINT =~ m/(.*)/;
     test tainted(my $foo = $1);
 }
 
@@ -980,41 +980,41 @@ TODO: {
     our %nonmagicalenv = ( PATH => "util" );
     local *ENV = \%nonmagicalenv;
     eval { system("lskdfj"); };
-    test $@ =~ /^%ENV is aliased to another variable while running with -T switch/;
+    test $@ =~ m/^%ENV is aliased to another variable while running with -T switch/;
     local *ENV = *nonmagicalenv;
     eval { system("lskdfj"); };
-    test $@ =~ /^%ENV is aliased to %nonmagicalenv while running with -T switch/;
+    test $@ =~ m/^%ENV is aliased to %nonmagicalenv while running with -T switch/;
 }
 {
     # [perl #24248]
-    $TAINT =~ /(.*)/;
+    $TAINT =~ m/(.*)/;
     test !tainted($1);
     my $notaint = $1;
     test !tainted($notaint);
 
     my $l;
-    $notaint =~ /($notaint)/;
+    $notaint =~ m/($notaint)/;
     $l = $1;
     test !tainted($1);
     test !tainted($l);
-    $notaint =~ /($TAINT)/;
+    $notaint =~ m/($TAINT)/;
     $l = $1;
     test tainted($1);
     test tainted($l);
 
-    $TAINT =~ /($notaint)/;
+    $TAINT =~ m/($notaint)/;
     $l = $1;
     test !tainted($1);
     test !tainted($l);
-    $TAINT =~ /($TAINT)/;
+    $TAINT =~ m/($TAINT)/;
     $l = $1;
     test tainted($1);
     test tainted($l);
 
     my $r;
-    ($r = $TAINT) =~ /($notaint)/;
+    ($r = $TAINT) =~ m/($notaint)/;
     test !tainted($1);
-    ($r = $TAINT) =~ /($TAINT)/;
+    ($r = $TAINT) =~ m/($TAINT)/;
     test tainted($1);
 
     #  [perl #24674]
@@ -1025,7 +1025,7 @@ TODO: {
     if (!$^X) { } elsif ($^O eq 'bar') { }
     test !tainted($^O);
     eval '$^O = $^X';
-    test $@ =~ /Insecure dependency in/;
+    test $@ =~ m/Insecure dependency in/;
 }
 
 EFFECTIVELY_CONSTANTS: {
@@ -1074,13 +1074,13 @@ TERNARY_CONDITIONALS: {
     my $valid_chars = 'a-z';
     if ( $foo eq '' ) {
     }
-    elsif ( $foo =~ /([$valid_chars]+)/o ) {
+    elsif ( $foo =~ m/([$valid_chars]+)/o ) {
         test not tainted $1;
     }
 
     if ( $foo eq '' ) {
     }
-    elsif ( my @bar = $foo =~ /([$valid_chars]+)/o ) {
+    elsif ( my @bar = $foo =~ m/([$valid_chars]+)/o ) {
         test not any_tainted @bar;
     }
 }
@@ -1157,13 +1157,13 @@ SKIP:
 	    }
 	    close $pipe;
 	};
-	test $@ !~ /Insecure \$ENV/, 'fork triggers %ENV check';
+	test $@ !~ m/Insecure \$ENV/, 'fork triggers %ENV check';
 	test $@ eq '',               'pipe/fork/open/close failed';
 	eval {
 	    open my $pipe, "|$Invoke_Perl -e 1";
 	    close $pipe;
 	};
-	test $@ =~ /Insecure \$ENV/, 'popen neglects %ENV check';
+	test $@ =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
     }
 }
 
@@ -1214,7 +1214,7 @@ SKIP:
         my $line = 'A1' . $TAINT . chr $ord;
         chop $line;
         is($line, 'A1');
-        $line =~ /(A\S*)/;
+        $line =~ m/(A\S*)/;
         ok(!tainted($1), "\\S match with chr $ord");
     }
 }
@@ -1248,7 +1248,7 @@ END
 
     alarm(10);
 
-    if ($DATA =~ /^line2.*line4/m) {
+    if ($DATA =~ m/^line2.*line4/m) {
 	fail("Should not be a match")
     } else {
 	pass("Match on tainted multiline data should fail promptly");

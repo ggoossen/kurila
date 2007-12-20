@@ -409,7 +409,7 @@ sub fastcwd_ {
     if ($^O eq 'apollo') { $path = "/".$path; }
     # At this point $path may be tainted (if tainting) and chdir would fail.
     # Untaint it then check that we landed where we started.
-    $path =~ /^(.*)\z/s		# untaint
+    $path =~ m/^(.*)\z/s		# untaint
 	&& CORE::chdir($1) or return undef;
     ($cdev, $cino) = stat('.');
     die "Unstable directory path, current directory changed unexpectedly"
@@ -579,8 +579,8 @@ sub fast_abs_path {
 
     # Detaint else we'll explode in taint mode.  This is safe because
     # we're not doing anything dangerous with it.
-    ($path) = $path =~ /(.*)/;
-    ($cwd)  = $cwd  =~ /(.*)/;
+    ($path) = $path =~ m/(.*)/;
+    ($cwd)  = $cwd  =~ m/(.*)/;
 
     unless (-e $path) {
  	_croak("$path: No such file or directory");

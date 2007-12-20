@@ -131,7 +131,7 @@ sub try {
   my $err = $@;
   undef $o; untie @lines; alarm(0);
   if ($err) {
-    if ($err =~ /^Alarm clock/) {
+    if ($err =~ m/^Alarm clock/) {
       print "# Timeout\n";
       print "not ok $N\n"; $N++;
       return;

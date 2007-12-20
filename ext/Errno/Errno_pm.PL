@@ -44,7 +44,7 @@ sub process_file {
     my($file) = @_;
 
     # for win32 perl under cygwin, we need to get a windows pathname
-    if ($^O eq 'MSWin32' && $Config{cc} =~ /\B-mno-cygwin\b/ &&
+    if ($^O eq 'MSWin32' && $Config{cc} =~ m/\B-mno-cygwin\b/ &&
         defined($file) && !-f $file) {
         chomp($file = `cygpath -w "$file"`);
     }
@@ -80,15 +80,15 @@ sub process_file {
     if ($^O eq 'MacOS') {
 	while( ~< *FH) {
 	    $err{$1} = $2
-		if /^\s*#\s*define\s+(E\w+)\s+(\d+)/;
+		if m/^\s*#\s*define\s+(E\w+)\s+(\d+)/;
 	}
     } else {
 	while( ~< *FH) {
 	    $err{$1} = 1
-		if /^\s*#\s*define\s+(E\w+)\s+/;
+		if m/^\s*#\s*define\s+(E\w+)\s+/;
             if ($IsMSWin32) {
 	        $wsa{$1} = 1
-	    	    if /^\s*#\s*define\s+WSA(E\w+)\s+/;
+	    	    if m/^\s*#\s*define\s+WSA(E\w+)\s+/;
             }
 	}
     }
@@ -137,12 +137,12 @@ sub get_files {
     } elsif ($Config{archname} eq 'arm-riscos') {
 	# Watch out for cross compiling for RISC OS
 	my $dep = `echo "#include <errno.h>" | gcc -E -M -`;
-	if ($dep =~ /(\S+errno\.h)/) {
+	if ($dep =~ m/(\S+errno\.h)/) {
 	     $file{$1} = 1;
 	}
     } elsif ($^O eq 'linux' &&
 	      $Config{gccversion} ne '' && 
-	      $Config{gccversion} !~ /intel/i
+	      $Config{gccversion} !~ m/intel/i
 	      # might be using, say, Intel's icc
 	     ) {
 	# Some Linuxes have weird errno.hs which generate
@@ -193,7 +193,7 @@ sub get_files {
 	}
 
 	my $pat;
-	if (($IsMSWin32 || $^O eq 'NetWare') and $Config{cc} =~ /^bcc/i) {
+	if (($IsMSWin32 || $^O eq 'NetWare') and $Config{cc} =~ m/^bcc/i) {
 	    $pat = '^/\*\s+(.+)\s+\d+\s*:\s+\*/';
 	}
 	else {
@@ -201,14 +201,14 @@ sub get_files {
 	}
 	while( ~< *CPPO) {
 	    if ($^O eq 'os2' or $IsMSWin32 or $^O eq 'NetWare') {
-		if (/$pat/o) {
+		if (m/$pat/o) {
 		   my $f = $1;
 		   $f =~ s,\\\\,/,g;
 		   $file{$f} = 1;
 		}
 	    }
 	    else {
-		$file{$1} = 1 if /$pat/o;
+		$file{$1} = 1 if m/$pat/o;
 	    }
 	}
 	close(CPPO);
@@ -275,7 +275,7 @@ sub write_errno_pm {
 
 	while( ~< *CPPO) {
 	    my($name,$expr);
-	    next unless ($name, $expr) = /"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
+	    next unless ($name, $expr) = m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
 	    next if $name eq $expr;
 	    $expr =~ s/\(?\([a-z_]\w*\)([^\)]*)\)?/$1/i; # ((type)0xcafebabe) at alia
 	    $expr =~ s/((?:0x)?[0-9a-fA-F]+)[LU]+\b/$1/g; # 2147483647L et alia
@@ -315,7 +315,7 @@ EOF
             unlink("errno.c");
             if (open(C, "./errno|")) {
 		while ( ~< *C) {
-		    if (/^(\w+) (-?\d+)$/) { $err{$1} = $2 }
+		    if (m/^(\w+) (-?\d+)$/) { $err{$1} = $2 }
 		}
 		close(C);
 	    } else {

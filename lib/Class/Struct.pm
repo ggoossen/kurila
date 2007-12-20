@@ -138,7 +138,7 @@ sub struct {
             ++$cnt;
             $cmt = " # $name";
         }
-        if( $type =~ /^\*(.)/ ){
+        if( $type =~ m/^\*(.)/ ){
             $refs{$name}++;
             $type = $1;
         }
@@ -158,7 +158,7 @@ sub struct {
         elsif ( $type eq '$') {
             $out .= "    \$r->$elem = $init undef;$cmt\n";
         }
-        elsif( $type =~ /^\w+(?:::\w+)*$/ ){
+        elsif( $type =~ m/^\w+(?:::\w+)*$/ ){
             $out .= "    if (defined(\$init{'$name'})) {\n";
            $out .= "       if (ref \$init{'$name'} eq 'HASH')\n";
             $out .= "            { \$r->$elem = $type->new(\%{\$init{'$name'}}) } $cmt\n";

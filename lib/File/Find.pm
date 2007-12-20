@@ -453,7 +453,7 @@ sub contract_name_Mac {
     my ($cdir,$fn) = @_;
     my $abs_name;
 
-    if ($fn =~ /^(:+)(.*)$/) { # valid pathname starting with a ':'
+    if ($fn =~ m/^(:+)(.*)$/) { # valid pathname starting with a ':'
 
 	my $colon_count = length ($1);
 	if ($colon_count == 1) {
@@ -464,7 +464,7 @@ sub contract_name_Mac {
 	    # need to move up the tree, but
 	    # only if it's not a volume name
 	    for (my $i=1; $i+<$colon_count; $i++) {
-		unless ($cdir =~ /^[^:]+:$/) { # volume name
+		unless ($cdir =~ m/^[^:]+:$/) { # volume name
 		    $cdir =~ s/[^:]+:$//;
 		}
 		else {
@@ -481,7 +481,7 @@ sub contract_name_Mac {
 	# $fn may be a valid path to a directory or file or (dangling)
 	# symlink, without a leading ':'
 	if ( (-e $fn) || (-l $fn) ) {
-	    if ($fn =~ /^[^:]+:/) { # a volume name like DataHD:*
+	    if ($fn =~ m/^[^:]+:/) { # a volume name like DataHD:*
 		return $fn; # $fn is already an absolute path
 	    }
 	    else {
@@ -505,7 +505,7 @@ sub PathCombine($$) {
 	$AbsName = $Name;
 
 	# (simple) check for recursion
-	if ( ( $Base =~ /^$AbsName/) && (-d $AbsName) ) { # recursion
+	if ( ( $Base =~ m/^$AbsName/) && (-d $AbsName) ) { # recursion
 	    return undef;
 	}
     }
@@ -648,7 +648,7 @@ sub _find_opt {
 
 	if ($Is_MacOS) {
 	    $top_item = ":$top_item"
-		if ( (-d _) && ( $top_item !~ /:/ ) );
+		if ( (-d _) && ( $top_item !~ m/:/ ) );
 	} elsif ($^O eq 'MSWin32') {
 	    $top_item =~ s|/\z|| unless $top_item =~ m|\w:/$|;
 	}
@@ -661,7 +661,7 @@ sub _find_opt {
 	if ($follow) {
 
 	    if ($Is_MacOS) {
-		$cwd = "$cwd:" unless ($cwd =~ /:$/); # for safety
+		$cwd = "$cwd:" unless ($cwd =~ m/:$/); # for safety
 
 		if ($top_item eq $File::Find::current_dir) {
 		    $abs_dir = $cwd;
@@ -792,7 +792,7 @@ sub _find_dir($$$) {
     my $no_nlink;
 
     if ($Is_MacOS) {
-	$dir_pref= ($p_dir =~ /:$/) ? $p_dir : "$p_dir:"; # preface
+	$dir_pref= ($p_dir =~ m/:$/) ? $p_dir : "$p_dir:"; # preface
     } elsif ($^O eq 'MSWin32') {
 	$dir_pref = ($p_dir =~ m|\w:/$| ? $p_dir : "$p_dir/" );
     } elsif ($^O eq 'VMS') {
@@ -825,7 +825,7 @@ sub _find_dir($$$) {
 		}
 	    }
 	}
-	unless (chdir ($Is_VMS && $udir !~ /[\/\[<]+/ ? "./$udir" : $udir)) {
+	unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ? "./$udir" : $udir)) {
 	    warnings::warnif "Can't cd to $udir: $!\n";
 	    return;
 	}
@@ -867,7 +867,7 @@ sub _find_dir($$$) {
 		    }
 		}
 	    }
-	    unless (chdir ($Is_VMS && $udir !~ /[\/\[<]+/ ? "./$udir" : $udir)) {
+	    unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ? "./$udir" : $udir)) {
 		if ($Is_MacOS) {
 		    warnings::warnif "Can't cd to ($p_dir) $udir: $!\n";
 		}
@@ -881,7 +881,7 @@ sub _find_dir($$$) {
 	}
 
 	if ($Is_MacOS) {
-	    $dir_name = "$dir_name:" unless ($dir_name =~ /:$/);
+	    $dir_name = "$dir_name:" unless ($dir_name =~ m/:$/);
 	}
 
 	$dir= $dir_name; # $File::Find::dir
@@ -1012,7 +1012,7 @@ sub _find_dir($$$) {
 		if ($Is_MacOS) {
 		    if ($dir_rel eq ':') { # must be the top dir, where we started
 			$name =~ s|:$||; # $File::Find::name
-			$p_dir = "$p_dir:" unless ($p_dir =~ /:$/);
+			$p_dir = "$p_dir:" unless ($p_dir =~ m/:$/);
 		    }
 		    $dir = $p_dir; # $File::Find::dir
 		    $_ = ($no_chdir ? $name : $dir_rel); # $_
@@ -1061,8 +1061,8 @@ sub _find_dir_symlnk($$$) {
     my $ok = 1;
 
     if ($Is_MacOS) {
-	$dir_pref = ($p_dir =~ /:$/) ? "$p_dir" : "$p_dir:";
-	$loc_pref = ($dir_loc =~ /:$/) ? "$dir_loc" : "$dir_loc:";
+	$dir_pref = ($p_dir =~ m/:$/) ? "$p_dir" : "$p_dir:";
+	$loc_pref = ($dir_loc =~ m/:$/) ? "$dir_loc" : "$dir_loc:";
     } else {
 	$dir_pref = ( $p_dir   eq '/' ? '/' : "$p_dir/" );
 	$loc_pref = ( $dir_loc eq '/' ? '/' : "$dir_loc/" );
@@ -1142,7 +1142,7 @@ sub _find_dir_symlnk($$$) {
 	}
 
 	if ($Is_MacOS) {
-	    $dir_name = "$dir_name:" unless ($dir_name =~ /:$/);
+	    $dir_name = "$dir_name:" unless ($dir_name =~ m/:$/);
 	}
 
 	$dir = $dir_name; # $File::Find::dir
@@ -1212,7 +1212,7 @@ sub _find_dir_symlnk($$$) {
 		# where $dir_rel eq ':'
 		$dir_name = "$p_dir$dir_rel";
 		$dir_pref = "$dir_name:";
-		$loc_pref = ($dir_loc =~ /:$/) ? $dir_loc : "$dir_loc:";
+		$loc_pref = ($dir_loc =~ m/:$/) ? $dir_loc : "$dir_loc:";
 	    }
 	    else {
 		$dir_name = ($p_dir eq '/' ? "/$dir_rel" : "$p_dir/$dir_rel");
@@ -1231,7 +1231,7 @@ sub _find_dir_symlnk($$$) {
 		if ($Is_MacOS) {
 		    if ($dir_rel eq ':') { # must be the top dir, where we started
 			$name =~ s|:$||; # $File::Find::name
-			$p_dir = "$p_dir:" unless ($p_dir =~ /:$/);
+			$p_dir = "$p_dir:" unless ($p_dir =~ m/:$/);
 		    }
 		    $dir = $p_dir; # $File::Find::dir
 		     $_ = ($no_chdir ? $name : $dir_rel); # $_

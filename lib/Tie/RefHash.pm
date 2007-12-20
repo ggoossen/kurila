@@ -113,7 +113,7 @@ BEGIN {
     require overload;
 
     *refaddr = sub {
-      if ( overload::StrVal($_[0]) =~ /\( 0x ([a-zA-Z0-9]+) \)$/x) {
+      if ( overload::StrVal($_[0]) =~ m/\( 0x ([a-zA-Z0-9]+) \)$/x) {
           return $1;
       } else {
         die "couldn't parse StrVal: " . overload::StrVal($_[0]);

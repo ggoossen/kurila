@@ -57,7 +57,7 @@ sub expand_os_specific {
 	      }
 	  }
 	/ges;
-	if (/<<(=|\$\^O-)/) {die "bad <<\$^O-eq/ne-osname>> expression.".
+	if (m/<<(=|\$\^O-)/) {die "bad <<\$^O-eq/ne-osname>> expression.".
 	    " Unclosed brackets?";
 	}
     }

@@ -181,7 +181,7 @@ is(eval { MRO_N->testfunc() }, 123);
     );
     foreach my $code (@recurse_codes) {
         eval $code;
-        ok($@ =~ /Recursive inheritance detected/);
+        ok($@ =~ m/Recursive inheritance detected/);
     }
 }
 

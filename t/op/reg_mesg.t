@@ -110,7 +110,7 @@ my $total = (@death + @warning)/2;
 # utf8 is a noop on EBCDIC platforms, it is not fatal
 my $Is_EBCDIC = (ord('A') == 193);
 if ($Is_EBCDIC) {
-    my @utf8_death = grep(/utf8/, @death); 
+    my @utf8_death = grep(m/utf8/, @death); 
     $total = $total - @utf8_death;
 }
 
@@ -123,7 +123,7 @@ while (@death)
     my $regex = shift @death;
     my $result = shift @death;
     # skip the utf8 test on EBCDIC since they do not die
-    next if ($Is_EBCDIC && $regex =~ /utf8/);
+    next if ($Is_EBCDIC && $regex =~ m/utf8/);
     $count++;
 
     $_ = "x";
@@ -136,7 +136,7 @@ while (@death)
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     $result .= " at ";
-    if ($@ !~ /^\Q$result/) {
+    if ($@ !~ m/^\Q$result/) {
 	print "# For $regex, expected:\n#  $result\n# Got:\n#  $@\n#\nnot ";
     }
     print "ok $count - $regex\n";
@@ -170,7 +170,7 @@ while (@warning)
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     $result .= " at ";
-    if ($warning !~ /^\Q$result/)
+    if ($warning !~ m/^\Q$result/)
     {
 	print <<"EOM";
 # For $regex, expected:

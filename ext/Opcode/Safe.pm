@@ -94,7 +94,7 @@ sub new {
 
     if (defined($root)) {
 	croak "Can't use \"$root\" as root name"
-	    if $root =~ /^main\b/ or $root !~ /^\w[:\w]*$/;
+	    if $root =~ m/^main\b/ or $root !~ m/^\w[:\w]*$/;
 	$obj->{Root}  = $root;
 	$obj->{Erase} = 0;
     }

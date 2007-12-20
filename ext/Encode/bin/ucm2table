@@ -12,11 +12,11 @@ my $Hex = '[0-9A-Fa-f]';
 while( ~< *ARGV){
     chomp;
     my ($uni, $enc, $fb) = 
-        /^<U($Hex+)>\s+(\S+)\s+\|(\d)/o or next;
+        m/^<U($Hex+)>\s+(\S+)\s+\|(\d)/o or next;
     $fb eq '0' or next;
     my @byte = ();
     my $ord = 0;
-    while($enc =~ /\G\\x($Hex+)/iog){
+    while($enc =~ m/\G\\x($Hex+)/iog){
         my $byte = hex($1);
         push @byte, $byte;
         $ord <<= 8; $ord += $byte;
@@ -39,6 +39,6 @@ for (my $x = $start; $x +<= 0xffff; $x += 32) {
     $line .= !$char ? " " : 
         ($num +< 0x7f ) ? " $char" : $char ;
     }
-    $line =~ /^\s+$/o and next;
+    $line =~ m/^\s+$/o and next;
     printf "0x%04x: $line\n", $x;
 }

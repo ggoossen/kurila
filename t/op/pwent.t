@@ -4,7 +4,7 @@ our (%Config, $where);
 
 BEGIN {
     eval {my @n = getpwuid 0; setpwent()};
-    if ($@ && $@ =~ /(The \w+ function is unimplemented)/) {
+    if ($@ && $@ =~ m/(The \w+ function is unimplemented)/) {
 	print "1..0 # Skip: $1\n";
 	exit 0;
     }
@@ -94,7 +94,7 @@ while ( ~< *PW) {
     } else {
        ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s;
     }
-    next if /^\+/; # ignore NIS includes
+    next if m/^\+/; # ignore NIS includes
     if (@s) {
 	push @{ $seen{$name_s} }, $.;
     } else {

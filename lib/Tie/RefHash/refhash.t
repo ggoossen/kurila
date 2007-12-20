@@ -85,7 +85,7 @@ $h = eval { tie %h, 'Tie::RefHash' };
 warn $@ if $@;
 test(not $@);
 test(ref($h) eq 'Tie::RefHash');
-test(defined(tied(%h)) and tied(%h) =~ /^Tie::RefHash/);
+test(defined(tied(%h)) and tied(%h) =~ m/^Tie::RefHash/);
 $h{$ref} = 'cholet';
 test($h{$ref} eq 'cholet');
 test(exists $h{$ref});
@@ -119,13 +119,13 @@ $h = eval { tie %h, 'Tie::RefHash::Nestable' };
 warn $@ if $@;
 test(not $@);
 test(ref($h) eq 'Tie::RefHash::Nestable');
-test(defined(tied(%h)) and tied(%h) =~ /^Tie::RefHash::Nestable/);
+test(defined(tied(%h)) and tied(%h) =~ m/^Tie::RefHash::Nestable/);
 $h{$ref}->{$ref1} = 'bungo';
 test($h{$ref}->{$ref1} eq 'bungo');
 
 # Test that the nested hash is also tied (for current implementation)
 test(defined(tied(%{$h{$ref}}))
-     and tied(%{$h{$ref}}) =~ /^Tie::RefHash::Nestable=/ );
+     and tied(%{$h{$ref}}) =~ m/^Tie::RefHash::Nestable=/ );
 
 test((keys %h) == 1);
 test((keys %h)[0] eq $ref);
@@ -206,7 +206,7 @@ sub runtests {
         warn $@ if $@;
         test(not $@);
         test(ref($h) eq $class);
-        test(defined(tied(%h)) and tied(%h) =~ /^\Q$class\E/);
+        test(defined(tied(%h)) and tied(%h) =~ m/^\Q$class\E/);
     }
 
     foreach (@$tests) {

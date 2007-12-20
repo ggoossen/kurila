@@ -10,14 +10,14 @@ $level = 0;
 $cur = '';
 while ( ~< *ARGV) {
 
-    next unless /^=(?!cut)/ .. /^=cut/;
+    next unless m/^=(?!cut)/ .. m/^=cut/;
 
-    ++$level if /^=over/;
-    --$level if /^=back/;
+    ++$level if m/^=over/;
+    --$level if m/^=back/;
 
     # Ignore items that are nested within other items, e.g. don't split on the
     # items nested within the pack() and sprintf() items in perlfunc.pod.
-    if (/=item (\S+)/ and $level == 1) {
+    if (m/=item (\S+)/ and $level == 1) {
 	my $item = $1;
 	s/=item //; 
 	$next{$cur} = $item;
@@ -42,8 +42,8 @@ for $f ( keys %syn ) {
     my $body = join "", @{$pod{$func}};
 
     # deal with unbalanced =over and =back cause by the split
-    my $has_over = $body =~ /^=over/;
-    my $has_back = $body =~ /^=back/;
+    my $has_over = $body =~ m/^=over/;
+    my $has_back = $body =~ m/^=back/;
     $body =~ s/^=over\s*//m if $has_over and !$has_back;
     $body =~ s/^=back\s*//m if $has_back and !$has_over;
     open (POD, "> $name.pod") || die "can't open $name.pod: $!";

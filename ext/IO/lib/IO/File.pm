@@ -143,7 +143,7 @@ $VERSION = "1.14";
 eval {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = grep /^O_/, @Fcntl::EXPORT;
+    my @O = grep m/^O_/, @Fcntl::EXPORT;
     Fcntl->import(@O);  # first we import what we want to export
     push(@EXPORT, @O);
 };
@@ -174,10 +174,10 @@ sub open {
     my ($fh, $file) = @_;
     if (@_ +> 2) {
 	my ($mode, $perms) = @_[2, 3];
-	if ($mode =~ /^\d+$/) {
+	if ($mode =~ m/^\d+$/) {
 	    defined $perms or $perms = 0666;
 	    return sysopen($fh, $file, $mode, $perms);
-	} elsif ($mode =~ /:/) {
+	} elsif ($mode =~ m/:/) {
 	    return open($fh, $mode, $file) if @_ == 3;
 	    croak 'usage: $fh->open(FILENAME, IOLAYERS)';
 	} else {

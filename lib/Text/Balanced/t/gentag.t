@@ -40,8 +40,8 @@ while (defined($str = ~< *DATA))
 		eval{local$^W;*f = eval $str || die};
 		next;
 	}
-	elsif ($str =~ /\A# TH[EI]SE? SHOULD FAIL/) { $neg = 1; next; }
-	elsif (!$str || $str =~ /\A#/) { $neg = 0; next }
+	elsif ($str =~ m/\A# TH[EI]SE? SHOULD FAIL/) { $neg = 1; next; }
+	elsif (!$str || $str =~ m/\A#/) { $neg = 0; next }
 	$str =~ s/\\n/\n/g;
 	debug "\tUsing: $cmd\n";
 	debug "\t   on: [$str]\n";

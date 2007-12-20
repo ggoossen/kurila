@@ -9,7 +9,7 @@ BEGIN {
         @INC = '../lib';
         our %Config;
         require Config; Config->import;
-        if ($Config{'extensions'} !~ /\bData\/Dumper\b/) {
+        if ($Config{'extensions'} !~ m/\bData\/Dumper\b/) {
             print "1..0 # Skip: Data::Dumper was not built\n";
             exit 0;
         }
@@ -36,7 +36,7 @@ sub TEST {
   my $t = eval $string;
   ++$TNUM;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
-      if ($WANT =~ /deadbeef/);
+      if ($WANT =~ m/deadbeef/);
   if ($Is_ebcdic) {
       # these data need massaging with non ascii character sets
       # because of hashing order differences
@@ -64,7 +64,7 @@ sub TEST {
   $t = eval $string;
   ++$TNUM;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
-      if ($WANT =~ /deadbeef/);
+      if ($WANT =~ m/deadbeef/);
   if ($Is_ebcdic) {
       # here too there are hashing order differences
       $WANT = join("\n",sort(split(/\n/,$WANT)));

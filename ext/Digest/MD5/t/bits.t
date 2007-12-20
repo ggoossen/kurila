@@ -13,14 +13,14 @@ if ($Digest::base::VERSION) {
     eval {
 	$md5->add_bits("0111");
     };
-    ok($@ =~ /must be multiple of 8/);
+    ok($@ =~ m/must be multiple of 8/);
 }
 else {
     print "# No Digest::base\n";
     eval {
 	$md5->add_bits("foo");
     };
-    ok($@ =~ /^Can\'t locate Digest\/base\.pm in \@INC/);
+    ok($@ =~ m/^Can\'t locate Digest\/base\.pm in \@INC/);
     ok(1);  # dummy
 }
 

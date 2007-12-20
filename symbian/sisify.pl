@@ -85,9 +85,9 @@ unless (exists $Variant{$Variant}) {
 }
 
 for my $i (@ARGV) {
-  if ($i =~ /\.pl$/i) {
+  if ($i =~ m/\.pl$/i) {
     push @SisPl, $i;
-  } elsif ($i =~ /\.pm$/i) {
+  } elsif ($i =~ m/\.pm$/i) {
     push @SisPm, $i;
   } elsif (-f $i) {
     push @SisOther, $i;
@@ -111,7 +111,7 @@ die_with_usage("With the lib option set, specify only directories")
   if defined $Library && ((@SisPl || @SisPm || @SisOther) || @SisDir == 0);
 
 die_with_usage("Lib must define the Perl 5 version as 5.x.y")
-  if defined $Library && $Library !~ /^5.\d+\.\d+$/;
+  if defined $Library && $Library !~ m/^5.\d+\.\d+$/;
 
 die_with_usage("With the lib option unset, specify at least one .pl file")
   if (! defined $Library && @SisPl == 0);
@@ -120,7 +120,7 @@ if (!defined $AppName) {
   if (defined $Library) {
     $AppName = $SisDir[0];
     $AppName =~ tr!/!-!;
-  } elsif (@SisPl +> 0 && $SisPl[0] =~ /^(.+)\.pl$/i) {
+  } elsif (@SisPl +> 0 && $SisPl[0] =~ m/^(.+)\.pl$/i) {
     $AppName = basename($1);
   }
 }
@@ -133,7 +133,7 @@ print "[app name '$AppName']\n" if $Debug;
 unless (defined $SisUid) {
   $SisUid = $SisUidDefault;
   printf "[default app uid '0x%08x']\n", $SisUid;
-} elsif ($SisUid =~ /^(?:0x)?([0-9a-f]{8})$/i) {
+} elsif ($SisUid =~ m/^(?:0x)?([0-9a-f]{8})$/i) {
   $SisUid = hex($1);
 } else {
   die_with_usage("Bad uid '$SisUid'");
@@ -141,12 +141,12 @@ unless (defined $SisUid) {
 $SisUid = sprintf "0x%08x", $SisUid;
 
 die_with_usage("Bad uid '$SisUid'")
-  if $SisUid !~ /^0x[0-9a-f]{8}$/i;
+  if $SisUid !~ m/^0x[0-9a-f]{8}$/i;
 
 unless (defined $SisVersion) {
   $SisVersion = $SisVersionDefault;
   print "[default app version '$SisVersionDefault']\n";
-} elsif ($SisVersion !~ /^\d+\.\d+\.\d+$/) {
+} elsif ($SisVersion !~ m/^\d+\.\d+\.\d+$/) {
   die_with_usage("Bad version '$SisVersion'")
 }
 
@@ -191,7 +191,7 @@ if (@SisPl) {
     my $fn = "default.pl.new";
     if (open(my $fo, ">$fn")) {
       while ( ~< $fi) {
-	last unless /^\#/;
+	last unless m/^\#/;
 	print $fo $_;
       }
       print $fo "use lib qw(\\system\\apps\\$AppName \\system\\apps\\$AppName\\lib);\n";
@@ -258,7 +258,7 @@ unless ($Library) {
     close($fh);
     # 0x10000079 0x100039ce 0x0acebabe 0xc82b1900
     $line =~ s/\r?\n$//;
-    if ($line =~ /^$uids (0x[0-9a-f]{8})$/i) {
+    if ($line =~ m/^$uids (0x[0-9a-f]{8})$/i) {
       $uidcrc = hex($1);
     } else {
       die "$0: uidcrc returned '$line'\n";

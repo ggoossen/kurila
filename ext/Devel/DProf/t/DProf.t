@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
     require './test.pl';      # for which_perl() etc
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bDevel\/DProf\b/){
+    if ($Config{'extensions'} !~ m/\bDevel\/DProf\b/){
       print "1..0 # Skip: Devel::DProf was not built\n";
       exit 0;
     }
@@ -77,7 +77,7 @@ print "1..20\n";
 while( @tests ){
 	$test = shift @tests;
 	$test =~ s/\.$// if $^O eq 'VMS';
-	if( $test =~ /_t$/i ){
+	if( $test =~ m/_t$/i ){
 		print "# $test" . '.' x (20 - length $test);
 		profile $test;
 	}

@@ -16,13 +16,13 @@ my @expected = qw(Module::Pluggable::Object);
 ok(@plugins = sort $foo->plugins);
 
 
-ok(grep {/Module::Pluggable::Object/} @plugins, "Contains Module::Pluggable::Object");
+ok(grep {m/Module::Pluggable::Object/} @plugins, "Contains Module::Pluggable::Object");
 
 @plugins = ();
 
 ok(@plugins = sort MyTest->plugins);
 
-ok(grep {/Module::Pluggable::Object/} @plugins, "Contains Module::Pluggable::Object under class method");
+ok(grep {m/Module::Pluggable::Object/} @plugins, "Contains Module::Pluggable::Object under class method");
 
 
 

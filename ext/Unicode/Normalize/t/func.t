@@ -220,7 +220,7 @@ ok(answer(checkNFKC(hexU("0041 0327 030A"))), "MAYBE"); # A+cedilla+ring
 ok(answer(checkNFKC(hexU("0041 030A 0327"))), "NO");    # A+ring+cedilla
 ok(answer(check("NFKC", hexU("20 C1 212B 300"))), "NO");
 
-"012ABC" =~ /(\d+)(\w+)/;
+"012ABC" =~ m/(\d+)(\w+)/;
 ok("012" eq NFC $1 && "ABC" eq NFC $2);
 
 ok(normalize('C', $1), "012");

@@ -83,7 +83,7 @@ sub is_decent {
 
   return 0 unless
     $tag =~ 
-    /^(?:  # First subtag
+    m/^(?:  # First subtag
          [xi] | [a-z]{2,3}
       )
       (?:  # Subtags thereafter

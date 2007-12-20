@@ -13,7 +13,7 @@ sub BEGIN {
     if ($ENV{PERL_CORE}) {
 	require Config; Config->import;
 	%Config=%Config if 0; # cease -w
-	if ($Config{'extensions'} !~ /\bStorable\b/) {
+	if ($Config{'extensions'} !~ m/\bStorable\b/) {
 	    print "1..0 # Skip: Storable was not built\n";
 	    exit 0;
 	}
@@ -32,7 +32,7 @@ print "1..2\n";
 
 for my $test (1,2) {
   eval {thaw "\xFF\xFF"};
-  if ($@ =~ /Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
+  if ($@ =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
     {
       print "ok $test\n";
     } else {

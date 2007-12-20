@@ -70,8 +70,8 @@ sub recursive_dump {
 	# Then extract the bless, ref and address parts of that string.
 
 	my $what = "$object";		# Stringify
-	my ($bless, $ref, $addr) = $what =~ /^(\w+)=(\w+)\((0x.*)\)$/;
-	($ref, $addr) = $what =~ /^(\w+)\((0x.*)\)$/ unless $bless;
+	my ($bless, $ref, $addr) = $what =~ m/^(\w+)=(\w+)\((0x.*)\)$/;
+	($ref, $addr) = $what =~ m/^(\w+)\((0x.*)\)$/ unless $bless;
 
 	# Special case for references to references. When stringified,
 	# they appear as being scalars. However, ref() correctly pinpoints

@@ -78,7 +78,7 @@ $self->{BASEEXT}.def: Makefile.PL
 	open IMP, '>tmpimp.imp' or die "Can't open tmpimp.imp";
 	my ($name, $exp);
 	while (($name, $exp)= each %{$self->{IMPORTS}}) {
-	    my ($lib, $id) = ($exp =~ /(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
+	    my ($lib, $id) = ($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
 	    print IMP "$name $lib $id ?\n";
 	}
 	close IMP or die "Can't close tmpimp.imp";

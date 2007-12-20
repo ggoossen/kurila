@@ -216,7 +216,7 @@ sub pod_find
                 else {
                     $dirs_visited{$item} = 1;
                 }
-                if($opts{-perl} && /^(\d+\.[\d_]+)\z/s && eval "$1" != $^V) {
+                if($opts{-perl} && m/^(\d+\.[\d_]+)\z/s && eval "$1" != $^V) {
                     $File::Find::prune = 1;
                     warn "Perl $^V version mismatch on $_, skipping.\n"
                         if($opts{-verbose});
@@ -250,7 +250,7 @@ sub _check_and_extract_name {
 
     # check extension or executable flag
     # this involves testing the .bat extension on Win32!
-    unless(-f $file && -T $file && ($file =~ /\.(pod|pm|plx?)\z/i || -x $file )) {
+    unless(-f $file && -T $file && ($file =~ m/\.(pod|pm|plx?)\z/i || -x $file )) {
       return undef;
     }
 
@@ -307,7 +307,7 @@ sub _simplify {
     # strip Perl's own extensions
     $_[0] =~ s/\.(pod|pm|plx?)\z//i;
     # strip meaningless extensions on Win32 and OS/2
-    $_[0] =~ s/\.(bat|exe|cmd)\z//i if($^O =~ /mswin|os2/i);
+    $_[0] =~ s/\.(bat|exe|cmd)\z//i if($^O =~ m/mswin|os2/i);
     # strip meaningless extensions on VMS
     $_[0] =~ s/\.(com)\z//i if($^O eq 'VMS');
 }
@@ -458,7 +458,7 @@ sub pod_where {
     # have a case-tolerant file system, but File::Spec
     # does not recognize 'darwin' yet. And cygwin also has "pods",
     # but is not case tolerant. Oh well...
-    if((File::Spec->case_tolerant || $^O =~ /macos|darwin|cygwin/i)
+    if((File::Spec->case_tolerant || $^O =~ m/macos|darwin|cygwin/i)
      && -d File::Spec->catdir($dir,'pods')) {
       $dir = File::Spec->catdir($dir,'pods');
       redo Dir;
@@ -493,7 +493,7 @@ sub contains_pod {
   local $/ = undef;
   my $pod = ~< *POD;
   close(POD) || die "Error closing $file: $!\n";
-  unless($pod =~ /^=(head\d|pod|over|item)\b/m) {
+  unless($pod =~ m/^=(head\d|pod|over|item)\b/m) {
     warn "No POD in $file, skipping.\n"
       if($verbose);
     return 0;

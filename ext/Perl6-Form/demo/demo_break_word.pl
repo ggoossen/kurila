@@ -1,8 +1,8 @@
 sub break_word {
 	my ($str_ref, $length, $ws) = @_;
 	for ($$str_ref) {
-		return ("",0) unless /\G(\S{1,$length})\s*/gc;
-		return ("$1", substr($_, pos) =~ /\S/);
+		return ("",0) unless m/\G(\S{1,$length})\s*/gc;
+		return ("$1", substr($_, pos) =~ m/\S/);
 	}
 }
 

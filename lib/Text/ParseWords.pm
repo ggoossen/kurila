@@ -140,7 +140,7 @@ sub old_shellwords {
 	    if (s/\A"(([^"\\]|\\.)*)"//s) {
 		($snippet = $1) =~ s#\\(.)#$1#sg;
 	    }
-	    elsif (/\A"/) {
+	    elsif (m/\A"/) {
 		require Carp;
 		Carp::carp("Unmatched double quote: $_");
 		return();
@@ -148,7 +148,7 @@ sub old_shellwords {
 	    elsif (s/\A'(([^'\\]|\\.)*)'//s) {
 		($snippet = $1) =~ s#\\(.)#$1#sg;
 	    }
-	    elsif (/\A'/) {
+	    elsif (m/\A'/) {
 		require Carp;
 		Carp::carp("Unmatched single quote: $_");
 		return();

@@ -20,7 +20,7 @@ sub BEGIN {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -63,8 +63,8 @@ my %tests;
 {
   local $/ = "\n\nend\n";
   while ( ~< *DATA) {
-    next unless /\S/s;
-    unless (/begin ([0-7]{3}) ([^\n]*)\n(.*)$/s) {
+    next unless m/\S/s;
+    unless (m/begin ([0-7]{3}) ([^\n]*)\n(.*)$/s) {
       s/\n.*//s;
       warn "Dodgy data in section starting '$_'";
       next;

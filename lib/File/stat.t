@@ -13,7 +13,7 @@ our @stat;
 BEGIN {
     our $hasst;
     eval { my @n = stat "TEST" };
-    $hasst = 1 unless $@ && $@ =~ /unimplemented/;
+    $hasst = 1 unless $@ && $@ =~ m/unimplemented/;
     unless ($hasst) { plan skip_all => "no stat"; exit 0 }
     use Config;
     $hasst = 0 unless $Config{'i_sysstat'} eq 'define';

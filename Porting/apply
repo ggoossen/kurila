@@ -6,7 +6,7 @@ $ENV{'P4CLIENT'} ||= 'ni-s';
 open(FILE,$file) || die "Cannot open $file:$!";
 while ( ~< *FILE)
  {
-  if (/^(From|Subject|Date|Message-ID):(.*)$/i)
+  if (m/^(From|Subject|Date|Message-ID):(.*)$/i)
    {
     $meta{lc($1)} = $2;
    }
@@ -17,7 +17,7 @@ my $code = $?;
 warn "$code from patch\n";
 foreach (@results)
  {
-  if (/[Pp]atching\s+file\s*(\S+)/)
+  if (m/[Pp]atching\s+file\s*(\S+)/)
    {
     push(@edit,$1);
    }

@@ -97,12 +97,12 @@ SWTEST
     # Because of the stderr redirection, we can't tell reliably the order
     # in which the output is given
     ok(
-	$r =~ /$filename syntax OK/
-	&& $r =~ /\bblock 1\b/
-	&& $r =~ /\bblock 2\b/
-	&& $r !~ /\bblock 3\b/
-	&& $r !~ /\bblock 4\b/
-	&& $r !~ /\bblock 5\b/,
+	$r =~ m/$filename syntax OK/
+	&& $r =~ m/\bblock 1\b/
+	&& $r =~ m/\bblock 2\b/
+	&& $r !~ m/\bblock 3\b/
+	&& $r !~ m/\bblock 4\b/
+	&& $r !~ m/\bblock 5\b/,
 	'-c'
     );
     push @tmpfiles, $filename;
@@ -227,7 +227,7 @@ SWTESTPM
     like( $r, qr/^(?!.*(not found|UNKNOWN))./, 'perl -V:re got a result' );
 
     # make sure each line we got matches the re
-    ok( !( grep !/^i\D+size=/, split /^/, $r ), '-V:re correct' );
+    ok( !( grep !m/^i\D+size=/, split /^/, $r ), '-V:re correct' );
 }
 
 # Tests for -v

@@ -60,7 +60,7 @@ $x = asin(2);
 is(ref $x, 'Math::Complex');
 
 # avoid using Math::Complex here
-$x =~ /^([^-]+)(-[^i]+)i$/;
+$x =~ m/^([^-]+)(-[^i]+)i$/;
 ($y, $z) = ($1, $2);
 ok(near($y,  1.5707963267949));
 ok(near($z, -1.31695789692482));

@@ -236,7 +236,7 @@ unless ($have_gettimeofday) {
 
 my $has_ualarm = $Config{d_ualarm};
 
-$has_ualarm ||= $xdefine =~ /-DHAS_UALARM/;
+$has_ualarm ||= $xdefine =~ m/-DHAS_UALARM/;
 
 unless (   defined &Time::HiRes::gettimeofday
 	&& defined &Time::HiRes::ualarm
@@ -443,20 +443,20 @@ else {
 }
 
 eval { sleep(-1) };
-print $@ =~ /::sleep\(-1\): negative time not invented yet/ ?
+print $@ =~ m/::sleep\(-1\): negative time not invented yet/ ?
     "ok 24\n" : "not ok 24\n";
 
 eval { usleep(-2) };
-print $@ =~ /::usleep\(-2\): negative time not invented yet/ ?
+print $@ =~ m/::usleep\(-2\): negative time not invented yet/ ?
     "ok 25\n" : "not ok 25\n";
 
 if ($have_ualarm) {
     eval { alarm(-3) };
-    print $@ =~ /::alarm\(-3, 0\): negative time not invented yet/ ?
+    print $@ =~ m/::alarm\(-3, 0\): negative time not invented yet/ ?
 	"ok 26\n" : "not ok 26\n";
 
     eval { ualarm(-4) };
-    print $@ =~ /::ualarm\(-4, 0\): negative time not invented yet/ ?
+    print $@ =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ?
     "ok 27\n" : "not ok 27\n";
 } else {
     skip 26;
@@ -465,7 +465,7 @@ if ($have_ualarm) {
 
 if ($have_nanosleep) {
     eval { nanosleep(-5) };
-    print $@ =~ /::nanosleep\(-5\): negative time not invented yet/ ?
+    print $@ =~ m/::nanosleep\(-5\): negative time not invented yet/ ?
 	"ok 28\n" : "not ok 28\n";
 } else {
     skip 28;
@@ -653,7 +653,7 @@ if ($have_ualarm) {
     skip 34..37;
 }
 
-if ($^O =~ /^(cygwin|MSWin)/) {
+if ($^O =~ m/^(cygwin|MSWin)/) {
     print "# $^O: timestamps may not be good enough\n";
     skip 38;
 } elsif (&Time::HiRes::d_hires_stat) {

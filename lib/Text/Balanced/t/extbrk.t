@@ -35,8 +35,8 @@ while (defined($str = ~< *DATA))
 {
 	chomp $str;
 	if ($str =~ s/\A# USING://) { $neg = 0; $cmd = $str; next; }
-	elsif ($str =~ /\A# TH[EI]SE? SHOULD FAIL/) { $neg = 1; next; }
-	elsif (!$str || $str =~ /\A#/) { $neg = 0; next }
+	elsif ($str =~ m/\A# TH[EI]SE? SHOULD FAIL/) { $neg = 1; next; }
+	elsif (!$str || $str =~ m/\A#/) { $neg = 0; next }
 	$str =~ s/\\n/\n/g;
 	debug "\tUsing: $cmd\n";
 	debug "\t   on: [$str]\n";

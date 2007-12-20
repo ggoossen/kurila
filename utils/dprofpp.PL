@@ -21,7 +21,7 @@ my $dprof_pm = File::Spec->catfile(File::Spec->updir, 'ext', 'Devel', 'DProf', '
 my $VERSION = 0;
 open( PM, "<$dprof_pm" ) || die "Can't open $dprof_pm: $!";
 while( ~< *PM){
-	if( /^\$Devel::DProf::VERSION\s*=\s*'([\d._]+)'/ ){
+	if( m/^\$Devel::DProf::VERSION\s*=\s*'([\d._]+)'/ ){
 		$VERSION = $1;
 		last;
 	}

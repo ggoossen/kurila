@@ -27,14 +27,14 @@ my $EXE = '';
 if (open(CONFIG, "config.sh")) {
     local $/;
     my $CONFIG = ~< *CONFIG;
-    $SO  = $1 if $CONFIG =~ /^so='(\w+)'/m;
-    $EXE = $1 if $CONFIG =~ /^_exe='\.(\w+)'/m;
+    $SO  = $1 if $CONFIG =~ m/^so='(\w+)'/m;
+    $EXE = $1 if $CONFIG =~ m/^_exe='\.(\w+)'/m;
     close(CONFIG);
 }
 
 push @EXES, "perl$EXE";
 
-find(sub {push @EXES, $File::Find::name if /\.$SO$/}, '.' );
+find(sub {push @EXES, $File::Find::name if m/\.$SO$/}, '.' );
 
 push @EXES, @ARGV;
 
@@ -53,7 +53,7 @@ find(sub {
 	    or die "Can't open $File::Find::name: $!";
 	my $line;
 	while (defined ($line = ~< *F)) {
-	    if ($line =~ /\b(\w+_r)\b/) {
+	    if ($line =~ m/\b(\w+_r)\b/) {
 		#warn "$1 => $File::Find::name\n";
 		$rfuncs{$1}->{$File::Find::name}++;
 	    }
@@ -114,7 +114,7 @@ for my $exe (@EXES) {
         $sym =~ s/^\s+//;
         $sym =~ s/^([0-9A-Fa-f]+\s+)?[Uu]\s+//;
         $sym =~ s/\s+[Uu]\s+-$//;
-        next if $sym =~ /\s/;
+        next if $sym =~ m/\s/;
         $sym =~ s/\@.*\z//;	# remove @@GLIBC_2.0 etc
         # warn "#### $sym\n";
         if (exists $rfuncs{"${sym}_r"} && ! $syms{"$sym:$exe"}++) {

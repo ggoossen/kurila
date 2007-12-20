@@ -57,7 +57,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 {
     my ($warn, $bad) = (0,0);
     local $SIG{__WARN__} = sub {
-	if ($_[0] =~ /uninitialized/) {
+	if ($_[0] =~ m/uninitialized/) {
 	    $warn++
 	}
 	else {
@@ -76,7 +76,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
     foreach my $ord (0 .. 255) {
 	my $bad = 0;
 	local $SIG{__WARN__} = sub {
-	    if ($_[0] !~ /^Invalid conversion in sprintf/) {
+	    if ($_[0] !~ m/^Invalid conversion in sprintf/) {
 		warn $_[0];
 		$bad++;
 	    }
@@ -88,19 +88,19 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 
 sub mysprintf_int_flags {
     my ($fmt, $num) = @_;
-    die "wrong format $fmt" if $fmt !~ /^%([-+ 0]+)([1-9][0-9]*)d\z/;
+    die "wrong format $fmt" if $fmt !~ m/^%([-+ 0]+)([1-9][0-9]*)d\z/;
     my $flag  = $1;
     my $width = $2;
     my $sign  = $num +< 0 ? '-' :
-		$flag =~ /\+/ ? '+' :
-		$flag =~ /\ / ? ' ' :
+		$flag =~ m/\+/ ? '+' :
+		$flag =~ m/\ / ? ' ' :
 		'';
     my $abs   = abs($num);
     my $padlen = $width - length($sign.$abs);
     return
-	$flag =~ /0/ && $flag !~ /-/ # do zero padding
+	$flag =~ m/0/ && $flag !~ m/-/ # do zero padding
 	    ? $sign . '0' x $padlen . $abs
-	    : $flag =~ /-/ # left or right
+	    : $flag =~ m/-/ # left or right
 		? $sign . $abs . ' ' x $padlen
 		: ' ' x $padlen . $sign . $abs;
 }

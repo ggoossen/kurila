@@ -65,9 +65,9 @@ sub _unix_os2_ext {
 	    }
 	    my($rtype) = $ptype;
 	    if (($ptype eq '-R') or ($ptype eq '-Wl,-R')) {
-		if ($Config{'lddlflags'} =~ /-Wl,-R/) {
+		if ($Config{'lddlflags'} =~ m/-Wl,-R/) {
 		    $rtype = '-Wl,-R';
-		} elsif ($Config{'lddlflags'} =~ /-R/) {
+		} elsif ($Config{'lddlflags'} =~ m/-R/) {
 		    $rtype = '-R';
 		}
 	    }
@@ -127,7 +127,7 @@ sub _unix_os2_ext {
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
 		 && (($Config{'dlsrc'} ne "dl_dld.xs") || ($thislib eq "m"))){
 	    } elsif (-f ($fullname="$thispth/lib${thislib}_s$Config_libext")
-                 && (! $Config{'archname'} =~ /RM\d\d\d-svr4/)
+                 && (! $Config{'archname'} =~ m/RM\d\d\d-svr4/)
 		 && ($thislib .= "_s") ){ # we must explicitly use _s version
 	    } elsif (-f ($fullname="$thispth/lib$thislib$Config_libext")){
 	    } elsif (-f ($fullname="$thispth/$thislib$Config_libext")){
@@ -135,7 +135,7 @@ sub _unix_os2_ext {
 	    } elsif (-f ($fullname="$thispth/Slib$thislib$Config_libext")){
 	    } elsif ($^O eq 'dgux'
 		 && -l ($fullname="$thispth/lib$thislib$Config_libext")
-		 && readlink($fullname) =~ /^elink:/s) {
+		 && readlink($fullname) =~ m/^elink:/s) {
 		 # Some of DG's libraries look like misconnected symbolic
 		 # links, but development tools can follow them.  (They
 		 # look like this:
@@ -156,8 +156,8 @@ sub _unix_os2_ext {
 	    # Now update library lists
 
 	    # what do we know about this library...
-	    my $is_dyna = ($fullname !~ /\Q$Config_libext\E\z/);
-	    my $in_perl = ($libs =~ /\B-l\Q${thislib}\E\b/s);
+	    my $is_dyna = ($fullname !~ m/\Q$Config_libext\E\z/);
+	    my $in_perl = ($libs =~ m/\B-l\Q${thislib}\E\b/s);
 
             # include the path to the lib once in the dynamic linker path
             # but only if it is a dynamic lib and not in Perl itself
@@ -177,8 +177,8 @@ sub _unix_os2_ext {
 	    }
 
 	    # We might be able to load this archive file dynamically
-	    if ( ($Config{'dlsrc'} =~ /dl_next/ && $Config{'osvers'} lt '4_0')
-	    ||   ($Config{'dlsrc'} =~ /dl_dld/) )
+	    if ( ($Config{'dlsrc'} =~ m/dl_next/ && $Config{'osvers'} lt '4_0')
+	    ||   ($Config{'dlsrc'} =~ m/dl_dld/) )
 	    {
 		# We push -l$thislib instead of $fullname because
 		# it avoids hardwiring a fixed path into the .bs file.
@@ -226,16 +226,16 @@ sub _win32_ext {
     return ("", "", "", "", ($give_libs ? [] : ())) unless $potential_libs;
 
     my $cc		= $Config{cc};
-    my $VC		= $cc =~ /^cl/i;
-    my $BC		= $cc =~ /^bcc/i;
-    my $GC		= $cc =~ /^gcc/i;
+    my $VC		= $cc =~ m/^cl/i;
+    my $BC		= $cc =~ m/^bcc/i;
+    my $GC		= $cc =~ m/^gcc/i;
     my $so		= $Config{'so'};
     my $libs		= $Config{'perllibs'};
     my $libpth		= $Config{'libpth'};
     my $libext		= $Config{'lib_ext'} || ".lib";
     my(@libs, %libs_seen);
 
-    if ($libs and $potential_libs !~ /:nodefault/i) { 
+    if ($libs and $potential_libs !~ m/:nodefault/i) { 
 	# If Config.pm defines a set of default libs, we always
 	# tack them on to the user-supplied list, unless the user
 	# specified :nodefault
@@ -272,11 +272,11 @@ sub _win32_ext {
 	$thislib = $_;
 
         # see if entry is a flag
-	if (/^:\w+$/) {
+	if (m/^:\w+$/) {
 	    $search	= 0 if lc eq ':nosearch';
 	    $search	= 1 if lc eq ':search';
 	    warn "Ignoring unknown flag '$thislib'\n"
-		if $verbose and !/^:(no)?(search|default)$/i;
+		if $verbose and !m/^:(no)?(search|default)$/i;
 	    next;
 	}
 
@@ -305,10 +305,10 @@ sub _win32_ext {
 	}
 
 	# handle possible library arguments
-	if (s/^-l// and $GC and !/^lib/i) {
+	if (s/^-l// and $GC and !m/^lib/i) {
 	    $_ = "lib$_";
 	}
-	$_ .= $libext if !/\Q$libext\E$/i;
+	$_ .= $libext if !m/\Q$libext\E$/i;
 
 	my $secondpass = 0;
     LOOKAGAIN:
@@ -336,11 +336,11 @@ sub _win32_ext {
 	}
 
 	# do another pass with (or without) leading 'lib' if they used -l
-	if (!$found_lib and $thislib =~ /^-l/ and !$secondpass++) {
+	if (!$found_lib and $thislib =~ m/^-l/ and !$secondpass++) {
 	    if ($GC) {
 		goto LOOKAGAIN if s/^lib//i;
 	    }
-	    elsif (!/^lib/i) {
+	    elsif (!m/^lib/i) {
 		$_ = "lib$_";
 		goto LOOKAGAIN;
 	    }
@@ -356,8 +356,8 @@ sub _win32_ext {
     return ('','','','', ($give_libs ? \@libs : ())) unless $found;
 
     # make sure paths with spaces are properly quoted
-    @extralibs = map { (/\s/ && !/^".*"$/) ? qq["$_"] : $_ } @extralibs;
-    @libs = map { (/\s/ && !/^".*"$/) ? qq["$_"] : $_ } @libs;
+    @extralibs = map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @extralibs;
+    @libs = map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @libs;
     $lib = join(' ',@extralibs);
 
     # normalize back to backward slashes (to help braindead tools)
@@ -377,8 +377,8 @@ sub _vms_ext {
   my(@crtls,$crtlstr);
   @crtls = ( ($Config{'ldflags'} =~ m-/Debug-i ? $Config{'dbgprefix'} : '')
               . 'PerlShr/Share' );
-  push(@crtls, grep { not /\(/ } split /\s+/, $Config{'perllibs'});
-  push(@crtls, grep { not /\(/ } split /\s+/, $Config{'libc'});
+  push(@crtls, grep { not m/\(/ } split /\s+/, $Config{'perllibs'});
+  push(@crtls, grep { not m/\(/ } split /\s+/, $Config{'libc'});
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -387,7 +387,7 @@ sub _vms_ext {
   if ($self->{PERL_SRC}) {
     my($lib,$locspec,$type);
     foreach $lib (@crtls) { 
-      if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ /perl/i) {
+      if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= $Config{'exe_ext'}; }
         elsif (lc $type eq '/library') { $locspec .= $Config{'lib_ext'}; }
         else                           { $locspec .= $Config{'obj_ext'}; }
@@ -421,10 +421,10 @@ sub _vms_ext {
 
   # First, sort out directories and library names in the input
   foreach $lib (split ' ',$potential_libs) {
-    push(@dirs,$1),   next if $lib =~ /^-L(.*)/;
-    push(@dirs,$lib), next if $lib =~ /[:>\]]$/;
+    push(@dirs,$1),   next if $lib =~ m/^-L(.*)/;
+    push(@dirs,$lib), next if $lib =~ m/[:>\]]$/;
     push(@dirs,$lib), next if -d $lib;
-    push(@libs,$1),   next if $lib =~ /^-l(.*)/;
+    push(@libs,$1),   next if $lib =~ m/^-l(.*)/;
     push(@libs,$lib);
   }
   push(@dirs,split(' ',$Config{'libpth'}));
@@ -462,9 +462,9 @@ sub _vms_ext {
     # check for common variants.  We try these first to grab libraries before
     # a like-named executable image (e.g. -lperl resolves to perlshr.exe
     # before perl.exe).
-    if ($lib !~ /\.[^:>\]]*$/) {
+    if ($lib !~ m/\.[^:>\]]*$/) {
       push(@variants,"${lib}shr","${lib}rtl","${lib}lib");
-      push(@variants,"lib$lib") if $lib !~ /[:>\]]/;
+      push(@variants,"lib$lib") if $lib !~ m/[:>\]]/;
     }
     push(@variants,$lib);
     warn "Looking for $lib\n" if $verbose;
@@ -479,9 +479,9 @@ sub _vms_ext {
         $fullname = VMS::Filespec::rmsexpand($name);
         if (defined $fullname and -f $fullname) {
           # It's got its own suffix, so we'll have to figure out the type
-          if    ($fullname =~ /(?:$so|exe)$/i)      { $type = 'SHR'; }
-          elsif ($fullname =~ /(?:$lib_ext|olb)$/i) { $type = 'OLB'; }
-          elsif ($fullname =~ /(?:$obj_ext|obj)$/i) {
+          if    ($fullname =~ m/(?:$so|exe)$/i)      { $type = 'SHR'; }
+          elsif ($fullname =~ m/(?:$lib_ext|olb)$/i) { $type = 'OLB'; }
+          elsif ($fullname =~ m/(?:$obj_ext|obj)$/i) {
             warn "Note (probably harmless): "
                 ."Plain object file $fullname found in library list\n";
             $type = 'OBJ';
@@ -495,14 +495,14 @@ sub _vms_ext {
         elsif (-f ($fullname = VMS::Filespec::rmsexpand($name,$so))      or
                -f ($fullname = VMS::Filespec::rmsexpand($name,'.exe')))     {
           $type = 'SHR';
-          $name = $fullname unless $fullname =~ /exe;?\d*$/i;
+          $name = $fullname unless $fullname =~ m/exe;?\d*$/i;
         }
         elsif (not length($ctype) and  # If we've got a lib already, 
                                        # don't bother
                ( -f ($fullname = VMS::Filespec::rmsexpand($name,$lib_ext)) or
                  -f ($fullname = VMS::Filespec::rmsexpand($name,'.olb'))))  {
           $type = 'OLB';
-          $name = $fullname unless $fullname =~ /olb;?\d*$/i;
+          $name = $fullname unless $fullname =~ m/olb;?\d*$/i;
         }
         elsif (not length($ctype) and  # If we've got a lib already, 
                                        # don't bother
@@ -511,7 +511,7 @@ sub _vms_ext {
           warn "Note (probably harmless): "
 		       ."Plain object file $fullname found in library list\n";
           $type = 'OBJ';
-          $name = $fullname unless $fullname =~ /obj;?\d*$/i;
+          $name = $fullname unless $fullname =~ m/obj;?\d*$/i;
         }
         if (defined $type) {
           $ctype = $type; $cand = $name;

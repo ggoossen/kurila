@@ -66,7 +66,7 @@ sub libPath_find {
   push @path, split /;/, OS2::extLibpath(1)	if $flags ^&^ 0x4;	# END
   s,(?![/\\])$,/,  for @path;
   s,\\,/,g	   for @path;
-  $name .= ".dll" unless $name =~ /\.[^\\\/]*$/;
+  $name .= ".dll" unless $name =~ m/\.[^\\\/]*$/;
   $_ .= $name for @path;
   return grep -f $_, @path if $flags ^&^ 0x8;
   -f $_ and return $_ for @path;
@@ -78,7 +78,7 @@ use Carp;
 @ISA = 'OS2::DLL';
 
 sub AUTOLOAD {
-    $AUTOLOAD =~ /^OS2::DLL::dll::.+::(.+)$/
+    $AUTOLOAD =~ m/^OS2::DLL::dll::.+::(.+)$/
       or confess("Undefined subroutine &$AUTOLOAD called");
     return undef if $1 eq "DESTROY";
     die "AUTOLOAD loop" if $1 eq "AUTOLOAD";
@@ -94,7 +94,7 @@ sub wrapper_REXX {
 	my $prefix = exists($self->{Prefix}) ? $self->{Prefix} : "";
 	my $queue  = $self->{Queue};
 	my $name = shift;
-	$prefix = '' if $name =~ /^#\d+/;	# loading by ordinal
+	$prefix = '' if $name =~ m/^#\d+/;	# loading by ordinal
 	my $addr = (DynaLoader::dl_find_symbol($handle, uc $prefix.$name)
 		    || DynaLoader::dl_find_symbol($handle, $prefix.$name));
 	return sub {

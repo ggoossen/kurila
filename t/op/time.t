@@ -34,7 +34,7 @@ our $localyday = $yday;
 
 ok($sec != $xsec && $mday && $year,             'localtime() list context');
 
-ok(localtime() =~ /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
+ok(localtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
                     (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ ]
                     ([ \d]\d)\ (\d\d):(\d\d):(\d\d)\ (\d{4})$
                   /x,
@@ -70,7 +70,7 @@ ok( grep({ $day_diff == $_ } (0, 1, -1, 364, 365, -364, -365)),
 
 
 # This could be stricter.
-ok(gmtime() =~ /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
+ok(gmtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
                  (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ ]
                  ([ \d]\d)\ (\d\d):(\d\d):(\d\d)\ (\d{4})$
                /x,

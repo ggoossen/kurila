@@ -92,14 +92,14 @@ sub walk_table (&@) {
     seek IN, 0, 0;		# so we may restart
     while ( ~< *IN) {
 	chomp;
-	next if /^:/;
+	next if m/^:/;
 	while (s|\\$||) {
 	    $_ .= ~< *IN;
 	    chomp;
 	}
 	s/\s+$//;
 	my @args;
-	if (/^\s*(#|$)/) {
+	if (m/^\s*(#|$)/) {
 	    @args = $_;
 	}
 	else {
@@ -122,7 +122,7 @@ sub munge_c_files () {
     }
     walk_table {
 	if (@_ +> 1) {
-	    $functions->{$_[2]} = \@_ if $_[@_-1] =~ /\.\.\./;
+	    $functions->{$_[2]} = \@_ if $_[@_-1] =~ m/\.\.\./;
 	}
     } '/dev/null', '', '';
     local $^I = '.bak';
@@ -157,27 +157,27 @@ sub write_protos {
     else {
 	my ($flags,$retval,$func,@args) = @_;
 	my @nonnull;
-	my $has_context = ( $flags !~ /n/ );
-	my $never_returns = ( $flags =~ /r/ );
-	my $commented_out = ( $flags =~ /m/ );
-	my $is_malloc = ( $flags =~ /a/ );
-	my $can_ignore = ( $flags !~ /R/ ) && !$is_malloc;
+	my $has_context = ( $flags !~ m/n/ );
+	my $never_returns = ( $flags =~ m/r/ );
+	my $commented_out = ( $flags =~ m/m/ );
+	my $is_malloc = ( $flags =~ m/a/ );
+	my $can_ignore = ( $flags !~ m/R/ ) && !$is_malloc;
 
 	my $splint_flags = "";
 	if ( $SPLINT && !$commented_out ) {
 	    $splint_flags .= '/*@noreturn@*/ ' if $never_returns;
-	    if ($can_ignore && ($retval ne 'void') && ($retval !~ /\*/)) {
+	    if ($can_ignore && ($retval ne 'void') && ($retval !~ m/\*/)) {
 		$retval .= " /*\@alt void\@*/";
 	    }
 	}
 
-	if ($flags =~ /s/) {
+	if ($flags =~ m/s/) {
 	    $retval = "STATIC $splint_flags$retval";
 	    $func = "S_$func";
 	}
 	else {
 	    $retval = "PERL_CALLCONV $splint_flags$retval";
-	    if ($flags =~ /[bp]/) {
+	    if ($flags =~ m/[bp]/) {
 		$func = "Perl_$func";
 	    }
 	}
@@ -189,7 +189,7 @@ sub write_protos {
 	    my $n;
 	    for my $arg ( @args ) {
 		++$n;
-		if ( $arg =~ /\*/ && $arg !~ /\b(NN|NULLOK)\b/ ) {
+		if ( $arg =~ m/\*/ && $arg !~ m/\b(NN|NULLOK)\b/ ) {
 		    warn "$func: $arg needs NN or NULLOK\n";
 		    our $unflagged_pointers;
 		    ++$unflagged_pointers;
@@ -204,7 +204,7 @@ sub write_protos {
 		my $temp_arg = $arg;
 		$temp_arg =~ s/\*//g;
 		$temp_arg =~ s/\s*\bstruct\b\s*/ /g;
-		if ( ($temp_arg ne "...") && ($temp_arg !~ /\w+\s+\w+/) ) {
+		if ( ($temp_arg ne "...") && ($temp_arg !~ m/\w+\s+\w+/) ) {
 		    warn "$func: $arg doesn't have a name\n";
 		}
 		if ( $SPLINT && $nullok && !$commented_out ) {
@@ -218,7 +218,7 @@ sub write_protos {
 	}
 	$ret .= ")";
 	my @attrs;
-	if ( $flags =~ /r/ ) {
+	if ( $flags =~ m/r/ ) {
 	    push @attrs, "__attribute__noreturn__";
 	}
 	if ( $is_malloc ) {
@@ -227,10 +227,10 @@ sub write_protos {
 	if ( !$can_ignore ) {
 	    push @attrs, "__attribute__warn_unused_result__";
 	}
-	if ( $flags =~ /P/ ) {
+	if ( $flags =~ m/P/ ) {
 	    push @attrs, "__attribute__pure__";
 	}
-	if( $flags =~ /f/ ) {
+	if( $flags =~ m/f/ ) {
 	    my $prefix	= $has_context ? 'pTHX_' : '';
 	    my $args	= scalar @args;
  	    my $pat	= $args - 1;
@@ -265,9 +265,9 @@ sub write_protos {
 	  # If a function is defined twice, for example before and after an
 	  # #else, only process the flags on the first instance for global.sym
 	  return $ret if $seen{$func}++;
-	  if ($flags =~ /[AX]/ && $flags !~ /[xm]/
-	      || $flags =~ /b/) { # public API, so export
-	      $func = "Perl_$func" if $flags =~ /[pbX]/;
+	  if ($flags =~ m/[AX]/ && $flags !~ m/[xm]/
+	      || $flags =~ m/b/) { # public API, so export
+	      $func = "Perl_$func" if $flags =~ m/[pbX]/;
 	      $ret = "$func\n";
 	  }
       }
@@ -309,7 +309,7 @@ sub readsyms (\%$) {
 	or die "embed.pl: Can't open $file: $!\n";
     while ( ~< *FILE) {
 	s/[ \t]*#.*//;		# Delete comments.
-	if (/^\s*(\S+)\s*$/) {
+	if (m/^\s*(\S+)\s*$/) {
 	    my $sym = $1;
 	    warn "duplicate symbol $sym while processing $file line $.\n"
 		if exists $$syms{$sym};
@@ -329,7 +329,7 @@ sub readvars(\%$$@) {
 	or die "embed.pl: Can't open $file: $!\n";
     while ( ~< *FILE) {
 	s/[ \t]*#.*//;		# Delete comments.
-	if (/PERLVARA?I?S?C?\($pre(\w+)/) {
+	if (m/PERLVARA?I?S?C?\($pre(\w+)/) {
 	    my $sym = $1;
 	    $sym = $pre . $sym if $keep_pre;
 	    warn "duplicate symbol $sym while processing $file line $.\n"
@@ -410,20 +410,20 @@ walk_table {
     my $new_ifdef_state = '';
     if (@_ == 1) {
 	my $arg = shift;
-	$ret .= "$arg\n" if $arg =~ /^#\s*(if|ifn?def|else|endif)\b/;
+	$ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/;
     }
     else {
 	my ($flags,$retval,$func,@args) = @_;
-	unless ($flags =~ /[om]/) {
-	    if ($flags =~ /s/) {
+	unless ($flags =~ m/[om]/) {
+	    if ($flags =~ m/s/) {
 		$ret .= hide($func,"S_$func");
 	    }
-	    elsif ($flags =~ /p/) {
+	    elsif ($flags =~ m/p/) {
 		$ret .= hide($func,"Perl_$func");
 	    }
 	}
-	if ($ret ne '' && $flags !~ /A/) {
-	    if ($flags =~ /E/) {
+	if ($ret ne '' && $flags !~ m/A/) {
+	    if ($flags =~ m/E/) {
 		$new_ifdef_state
 		    = "#if defined(PERL_CORE) || defined(PERL_EXT)\n";
 	    }
@@ -468,20 +468,20 @@ walk_table {
     my $new_ifdef_state = '';
     if (@_ == 1) {
 	my $arg = shift;
-	$ret .= "$arg\n" if $arg =~ /^#\s*(if|ifn?def|else|endif)\b/;
+	$ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/;
     }
     else {
 	my ($flags,$retval,$func,@args) = @_;
-	unless ($flags =~ /[om]/) {
+	unless ($flags =~ m/[om]/) {
 	    my $args = scalar @args;
-	    if ($args and $args[$args-1] =~ /\.\.\./) {
+	    if ($args and $args[$args-1] =~ m/\.\.\./) {
 	        # we're out of luck for varargs functions under CPP
 	    }
-	    elsif ($flags =~ /n/) {
-		if ($flags =~ /s/) {
+	    elsif ($flags =~ m/n/) {
+		if ($flags =~ m/s/) {
 		    $ret .= hide($func,"S_$func");
 		}
-		elsif ($flags =~ /p/) {
+		elsif ($flags =~ m/p/) {
 		    $ret .= hide($func,"Perl_$func");
 		}
 	    }
@@ -490,18 +490,18 @@ walk_table {
 		$ret = "#define $func($alist)";
 		my $t = int(length($ret) / 8);
 		$ret .=  "\t" x ($t +< 4 ? 4 - $t : 1);
-		if ($flags =~ /s/) {
+		if ($flags =~ m/s/) {
 		    $ret .= "S_$func(aTHX";
 		}
-		elsif ($flags =~ /p/) {
+		elsif ($flags =~ m/p/) {
 		    $ret .= "Perl_$func(aTHX";
 		}
 		$ret .= "_ " if $alist;
 		$ret .= $alist . ")\n";
 	    }
 	}
-	unless ($flags =~ /A/) {
-	    if ($flags =~ /E/) {
+	unless ($flags =~ m/A/) {
+	    if ($flags =~ m/E/) {
 		$new_ifdef_state
 		    = "#if defined(PERL_CORE) || defined(PERL_EXT)\n";
 	    }
@@ -529,10 +529,10 @@ if ($ifdef_state) {
 
 for $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
-    if ($sym =~ /^ck_/) {
+    if ($sym =~ m/^ck_/) {
 	print EM hide("$sym(a)", "Perl_$sym(aTHX_ a)");
     }
-    elsif ($sym =~ /^pp_/) {
+    elsif ($sym =~ m/^pp_/) {
 	print EM hide("$sym()", "Perl_$sym(aTHX)");
     }
     else {

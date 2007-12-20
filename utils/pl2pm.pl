@@ -52,7 +52,7 @@ while ( ~< *ARGV) {
 
     s/\bstd(in|out|err)\b/\U$&/g;
     s/(sub\s+)(\w+)(\s*\{[ \t]*\n)\s*package\s+$oldpack\s*;[ \t]*\n+/${1}main'$2$3/ig;
-    if (/sub\s+\w+'/) {
+    if (m/sub\s+\w+'/) {
 	@export = m/sub\s+\w+'(\w+)/g;
 	s/(sub\s+)main'(\w+)/$1$2/g;
     }
@@ -70,7 +70,7 @@ while ( ~< *ARGV) {
     s/(package\s*)($oldpack)\s*;[ \t]*\n+//ig;
     s/([\$\@%&*])'(\w+)/&xlate($1,"",$2,$newpack,$oldpack,\%export)/eg;
     s/([\$\@%&*]?)(\w+)'(\w+)/&xlate($1,$2,$3,$newpack,$oldpack,\%export)/eg;
-    if (!/\$\[\s*\)?\s*=\s*[^0\s]/) {
+    if (!m/\$\[\s*\)?\s*=\s*[^0\s]/) {
 	s/^\s*(local\s*\()?\s*\$\[\s*\)?\s*=\s*0\s*;[ \t]*\n//g;
 	s/\$\[\s*\+\s*//g;
 	s/\s*\+\s*\$\[//g;
@@ -112,7 +112,7 @@ sub xlate {
     my ($prefix, $pack, $ident,$newpack,$oldpack,$export) = @_;
 
     my $xlated ;
-    if ($prefix eq '' && $ident =~ /^(t|s|m|d|ing|ll|ed|ve|re)$/) {
+    if ($prefix eq '' && $ident =~ m/^(t|s|m|d|ing|ll|ed|ve|re)$/) {
 	$xlated = "${pack}'$ident";
     }
     elsif ($pack eq '' || $pack eq 'main') {

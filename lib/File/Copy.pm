@@ -57,7 +57,7 @@ sub _catname {
 
     if ($^O eq 'MacOS') {
 	# a partial dir name that's valid only in the cwd (e.g. 'tmp')
-	$to = ':' . $to if $to !~ /:/;
+	$to = ':' . $to if $to !~ m/:/;
     }
 
     return File::Spec->catfile($to, basename($from));
@@ -133,7 +133,7 @@ sub copy {
     if ($from_a_handle) {
        $from_h = $from;
     } else {
-	$from = _protect($from) if $from =~ /^\s/s;
+	$from = _protect($from) if $from =~ m/^\s/s;
        $from_h = \do { local *FH };
        open($from_h, "< $from\0") or goto fail_open1;
        binmode $from_h or die "($!,$^E)";
@@ -144,7 +144,7 @@ sub copy {
     if ($to_a_handle) {
        $to_h = $to;
     } else {
-	$to = _protect($to) if $to =~ /^\s/s;
+	$to = _protect($to) if $to =~ m/^\s/s;
        $to_h = \do { local *FH };
        open($to_h,"> $to\0") or goto fail_open2;
        binmode $to_h or die "($!,$^E)";
@@ -279,7 +279,7 @@ unless (defined &syscopy) {
 
 	    return 0 unless -e $from;
 
-	    if ($to =~ /(.*:)([^:]+):?$/) {
+	    if ($to =~ m/(.*:)([^:]+):?$/) {
 		($dir, $toname) = ($1, $2);
 	    } else {
 		($dir, $toname) = (":", $to);

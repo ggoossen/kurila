@@ -394,7 +394,7 @@ sub parse {
         $alttext = '';
     }
 
-    if($page =~ /[(]\w*[)]$/) {
+    if($page =~ m/[(]\w*[)]$/) {
         $self->warning("(section) in '$page' deprecated");
     }
     if(!$quoted && $node =~ m:[|/]: && $type ne 'hyperlink') {

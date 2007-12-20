@@ -21,7 +21,7 @@ sub import {
     local $_;
     $^H{sort} //= 0;
     while ($_ = shift(@_)) {
-	if (/^_q(?:uick)?sort$/) {
+	if (m/^_q(?:uick)?sort$/) {
 	    $^H{sort} ^&^= ^~^$sort::sort_bits;
 	    $^H{sort} ^|^=  $sort::quicksort_bit;
 	} elsif ($_ eq '_mergesort') {
@@ -47,7 +47,7 @@ sub unimport {
     local $_;
     no warnings 'uninitialized';	# bitops would warn
     while ($_ = shift(@_)) {
-	if (/^_q(?:uick)?sort$/) {
+	if (m/^_q(?:uick)?sort$/) {
 	    $^H{sort} ^&^= ^~^$sort::sort_bits;
 	} elsif ($_ eq '_mergesort') {
 	    $^H{sort} ^&^= ^~^$sort::sort_bits;

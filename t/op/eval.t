@@ -16,10 +16,10 @@ print $foo;
 
 print eval '
 $foo =;';		# this tests for a call through yyerror()
-if ($@ =~ /line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
+if ($@ =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
 
 print eval '$foo = /';	# this tests for a call through fatal()
-if ($@ =~ /Search/) {print "ok 6\n";} else {print "not ok 6\n";}
+if ($@ =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
 
 print eval '"ok 7\n";';
 
@@ -148,7 +148,7 @@ sub recurse {
   }
 }
 {
-  local $SIG{__WARN__} = sub { die "not ok $x\n" if $_[0] =~ /^Deep recurs/ };
+  local $SIG{__WARN__} = sub { die "not ok $x\n" if $_[0] =~ m/^Deep recurs/ };
   recurse($x-5);
 }
 $x++;
@@ -458,7 +458,7 @@ print "ok $test - eval and last\n"; $test++;
 {
     no warnings;
     eval "/ /a;";
-    print "not " unless $@ =~ /^syntax error/;
+    print "not " unless $@ =~ m/^syntax error/;
     print "ok $test # eval syntax error, no warnings \n"; $test++;
 }
 

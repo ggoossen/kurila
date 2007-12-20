@@ -33,7 +33,7 @@ sub wrap
 	local($Text::Tabs::tabstop) = $tabstop;
 	my $r = "";
 	my $tail = pop(@t);
-	my $t = expand(join("", (map { /\s+\z/ ? ( $_ ) : ($_, ' ') } @t), $tail));
+	my $t = expand(join("", (map { m/\s+\z/ ? ( $_ ) : ($_, ' ') } @t), $tail));
 	my $lead = $ip;
 	my $ll = $columns - length(expand($ip)) - 1;
 	$ll = 0 if $ll +< 0;
@@ -44,18 +44,18 @@ sub wrap
 	use re 'taint';
 
 	pos($t) = 0;
-	while ($t !~ /\G(?:$break)*\Z/gc) {
-		if ($t =~ /\G([^\n]{0,$ll})($break|\n+|\z)/xmgc) {
+	while ($t !~ m/\G(?:$break)*\Z/gc) {
+		if ($t =~ m/\G([^\n]{0,$ll})($break|\n+|\z)/xmgc) {
 			$r .= $unexpand 
 				? unexpand($nl . $lead . $1)
 				: $nl . $lead . $1;
 			$remainder = $2;
-		} elsif ($huge eq 'wrap' && $t =~ /\G([^\n]{$ll})/gc) {
+		} elsif ($huge eq 'wrap' && $t =~ m/\G([^\n]{$ll})/gc) {
 			$r .= $unexpand 
 				? unexpand($nl . $lead . $1)
 				: $nl . $lead . $1;
 			$remainder = defined($separator2) ? $separator2 : $separator;
-		} elsif ($huge eq 'overflow' && $t =~ /\G([^\n]*?)($break|\n+|\z)/xmgc) {
+		} elsif ($huge eq 'overflow' && $t =~ m/\G([^\n]*?)($break|\n+|\z)/xmgc) {
 			$r .= $unexpand 
 				? unexpand($nl . $lead . $1)
 				: $nl . $lead . $1;

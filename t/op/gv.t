@@ -114,7 +114,7 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 	$warn .= $_[0];
     };
     my $val = *x{FILEHANDLE};
-    print {*x{IO}} ($warn =~ /is deprecated/
+    print {*x{IO}} ($warn =~ m/is deprecated/
 		    ? "ok $test\n" : "not ok $test\n");
     curr_test(++$test);
 }
@@ -154,7 +154,7 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
     ok(defined *{$a});
 
     $a = Symbol::fetch_glob("1");
-    "o" =~ /(o)/;
+    "o" =~ m/(o)/;
     ok(${$a});
     ok(defined *{$a});
     $a = Symbol::fetch_glob("2");
@@ -164,7 +164,7 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
     ok(!defined ${*{$a}});
     ok(defined *{$a});
     $a = Symbol::fetch_glob("11");
-    "o" =~ /(((((((((((o)))))))))))/;
+    "o" =~ m/(((((((((((o)))))))))))/;
     ok(${*{$a}});
     ok(defined *{$a});
 }

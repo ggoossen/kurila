@@ -48,7 +48,7 @@ my %Common;
 while ($how_many_common--) {
     $_ = ~< *DATA;
     chomp;
-    /^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
+    m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
     $Common{$1} = $1;
 }
 
@@ -67,9 +67,9 @@ sub opts {
     # user specified options
     my %given_opts = (
         # --opt=smth
-        (map {/^--([\-_\w]+)=(.*)$/} @ARGV),
+        (map {m/^--([\-_\w]+)=(.*)$/} @ARGV),
         # --opt --no-opt --noopt
-        (map {/^no-?(.*)$/i?($1=>0):($_=>1)} map {/^--([\-_\w]+)$/} @ARGV),
+        (map {m/^no-?(.*)$/i?($1=>0):($_=>1)} map {m/^--([\-_\w]+)$/} @ARGV),
     );
 
     my %opts = (%Allowed_Opts, %given_opts);
@@ -78,7 +78,7 @@ sub opts {
         warn "option '$opt' is not recognized";
 	usage;
     }
-    @ARGV = grep {!/^--/} @ARGV;
+    @ARGV = grep {!m/^--/} @ARGV;
 
     return %opts;
 }
@@ -219,7 +219,7 @@ my %seen_quotes;
     else { 
         ($name,$val) = ($1,$3); 
     }
-    $in_v = $val !~ /$quote\n/;
+    $in_v = $val !~ m/$quote\n/;
     next if $in_v;
 
     s,/,::,g if $Extensions{$name};
@@ -452,8 +452,8 @@ $heavy_txt .= join('', @non_v) . "\n";
 # copy config summary format from the myconfig.SH script
 $heavy_txt .= "our \$summary = <<'!END!';\n";
 open(MYCONFIG,"<myconfig.SH") || die "open myconfig.SH failed: $!";
-1 while defined($_ = ~< *MYCONFIG) && !/^Summary of/;
-do { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || /^\s*$/;
+1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/;
+do { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
 close(MYCONFIG);
 
 $heavy_txt .= "\n!END!\n" . <<'EOT';
@@ -524,7 +524,7 @@ foreach my $prefix (qw(libs libswanted)) {
 	my %lflibswanted;
 	@lflibswanted{@lflibswanted} = ();
 	if ($prefix eq 'libs') {
-	    my @libs = grep { /^-l(.+)/ &&
+	    my @libs = grep { m/^-l(.+)/ &&
                             not exists $lflibswanted{$1} }
 		                    split(' ', fetch_string ({}, 'libs'));
 	    $value = join(' ', @libs);
@@ -656,7 +656,7 @@ ENDOFSET
     my $dll;
     if (open my $fh, '<', $f) {
 	while ( ~< $fh) {
-	    $dll = $1, last if /^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
+	    $dll = $1, last if m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
 	}
     }
     $config_txt .= <<ENDOFSET if $dll;
@@ -673,7 +673,7 @@ ENDOFSET
 foreach my $key (keys %Common) {
     my $value = fetch_string ({}, $key);
     # Is it safe on the LHS of => ?
-    my $qkey = $key =~ /^[A-Za-z_][A-Za-z0-9_]*$/ ? $key : "'$key'";
+    my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ? $key : "'$key'";
     if (defined $value) {
 	# Quote things for a '' string
 	$value =~ s!\\!\\\\!g;
@@ -859,7 +859,7 @@ EOF
      $text = 1;
     }
   }
-  elsif (!$text || !/\A\t/) {
+  elsif (!$text || !m/\A\t/) {
     warn "Expected a Configure variable header",
       ($text ? " or another paragraph of description" : () );
   }

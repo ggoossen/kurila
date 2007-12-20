@@ -30,7 +30,7 @@ open PATCH_LEVEL, "<" . catfile(updir, "patchlevel.h")
 my $patchlevel_date = (stat *PATCH_LEVEL)[9];
 
 while ( ~< *PATCH_LEVEL) {
-    last if $_ =~ /^\s*static\s+(?:const\s+)?char.*?local_patches\[\]\s*=\s*{\s*$/;
+    last if $_ =~ m/^\s*static\s+(?:const\s+)?char.*?local_patches\[\]\s*=\s*{\s*$/;
 }
 
 if (! defined($_)) {
@@ -39,7 +39,7 @@ if (! defined($_)) {
 
 my @patches;
 while ( ~< *PATCH_LEVEL) {
-    last if /^\s*}/;
+    last if m/^\s*}/;
     chomp;
     s/^\s+,?\s*"?//;
     s/"?\s*,?$//;
@@ -47,7 +47,7 @@ while ( ~< *PATCH_LEVEL) {
     push @patches, $_ unless $_ eq 'NULL';
 }
 my $patch_desc = "'" . join("',\n    '", @patches) . "'";
-my $patch_tags = join "", map /(\S+)/ ? "+$1 " : (), @patches;
+my $patch_tags = join "", map m/(\S+)/ ? "+$1 " : (), @patches;
 
 close(PATCH_LEVEL) or die "Error closing patchlevel.h: $!";
 

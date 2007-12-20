@@ -79,7 +79,7 @@ sub post_initialize
     push (@files,$table.$ext);
     }
     $self->{SOURCE} .= " $table.c"
-    if $^O eq 'MacOS' && $self->{SOURCE} !~ /\b$table\.c\b/;
+    if $^O eq 'MacOS' && $self->{SOURCE} !~ m/\b$table\.c\b/;
 }
 $self->{'clean'}{'FILES'} .= join(' ',@files);
 return '';

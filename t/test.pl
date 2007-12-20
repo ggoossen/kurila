@@ -58,7 +58,7 @@ END {
 # messages
 sub _diag {
     return unless @_;
-    my @mess = map { /^#/ ? "$_\n" : "# $_\n" }
+    my @mess = map { m/^#/ ? "$_\n" : "# $_\n" }
                map { split /\n/ } @_;
     my $fh = $TODO ? *STDOUT : *STDERR;
     print $fh @mess;
@@ -151,7 +151,7 @@ sub display {
                     $y .= $backslash_escape{$c};
                 } else {
                     my $z = chr $c; # Maybe we can get away with a literal...
-                    $z = sprintf "\\%03o", $c if $z =~ /[[:^print:]]/;
+                    $z = sprintf "\\%03o", $c if $z =~ m/[[:^print:]]/;
                     $y .= $z;
                 }
             }
@@ -277,8 +277,8 @@ sub unlike ($$@) { like_yn (1,@_) }; # 1 for un-
 sub like_yn ($$$@) {
     my ($flip, $got, $expected, $name, @mess) = @_;
     my $pass;
-    $pass = $got =~ /$expected/ if !$flip;
-    $pass = $got !~ /$expected/ if $flip;
+    $pass = $got =~ m/$expected/ if !$flip;
+    $pass = $got !~ m/$expected/ if $flip;
     unless ($pass) {
 	unshift(@mess, "#      got '$got'\n",
 		$flip
@@ -411,7 +411,7 @@ sub _quote_args {
     foreach (@$args) {
 	# In VMS protect with doublequotes because otherwise
 	# DCL will lowercase -- unless already doublequoted.
-       $_ = q(").$_.q(") if $is_vms && !/^\"/ && length($_) +> 0;
+       $_ = q(").$_.q(") if $is_vms && !m/^\"/ && length($_) +> 0;
 	$$runperl .= ' ' . $_;
     }
 }
@@ -532,14 +532,14 @@ sub runperl {
 	my @keys = grep {exists $ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
 	local @ENV{@keys} = ();
 	# Untaint, plus take out . and empty string:
-	local $ENV{'DCL$PATH'} = $1 if $is_vms && ($ENV{'DCL$PATH'} =~ /(.*)/s);
-	$ENV{PATH} =~ /(.*)/s;
+	local $ENV{'DCL$PATH'} = $1 if $is_vms && ($ENV{'DCL$PATH'} =~ m/(.*)/s);
+	$ENV{PATH} =~ m/(.*)/s;
 	local $ENV{PATH} =
 	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
 		($is_mswin or $is_vms or !(stat && (stat '_')[2]^&^0022)) }
 		    split quotemeta ($sep), $1;
 
-	$runperl =~ /(.*)/s;
+	$runperl =~ m/(.*)/s;
 	$runperl = $1;
 
 	$result = `$runperl`;
@@ -581,7 +581,7 @@ sub which_perl {
 	# We could do File::Spec->abs2rel() but that does getcwd()s,
 	# which is a bit heavyweight to do here.
 
-	if ($Perl =~ /^perl\Q$exe\E$/i) {
+	if ($Perl =~ m/^perl\Q$exe\E$/i) {
 	    my $perl = "perl$exe";
 	    eval "require File::Spec";
 	    if ($@) {
@@ -595,7 +595,7 @@ sub which_perl {
 	# Build up the name of the executable file from the name of
 	# the command.
 
-	if ($Perl !~ /\Q$exe\E$/i) {
+	if ($Perl !~ m/\Q$exe\E$/i) {
 	    $Perl .= $exe;
 	}
 
@@ -679,7 +679,7 @@ sub _fresh_perl {
     # Use the first line of the program as a name if none was given
     unless( $name ) {
         my $first_line;
-        ($first_line, $name) = $prog =~ /^((.{1,50}).*)/;
+        ($first_line, $name) = $prog =~ m/^((.{1,50}).*)/;
         $name .= '...' if length $first_line +> length $name;
     }
 
@@ -711,7 +711,7 @@ sub fresh_perl_like {
     local $Level = 2;
     _fresh_perl($prog,
 		sub { @_ ?
-			  $_[0] =~ (ref $expected ? $expected : /$expected/) :
+			  $_[0] =~ (ref $expected ? $expected : m/$expected/) :
 		          $expected },
 		$runperl_args, $name);
 }
@@ -755,7 +755,7 @@ sub isa_ok ($$;$) {
         local($@, $!);  # eval sometimes resets $!
         my $rslt = eval { $object->isa($class) };
         if( $@ ) {
-            if( $@ =~ /^Can't call method "isa" on unblessed reference/ ) {
+            if( $@ =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 if( !UNIVERSAL::isa($object, $class) ) {
                     my $ref = ref $object;
                     $diag = "$obj_name isn't a '$class' it's a '$ref'";

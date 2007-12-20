@@ -56,7 +56,7 @@ sub post_initialize
     my @files = ("$name.xs");
     $self->{'C'} = ["$name.c"];
     $self->{SOURCE} .= " $name.c"
-        if $^O eq 'MacOS' && $self->{SOURCE} !~ /\b$name\.c\b/;
+        if $^O eq 'MacOS' && $self->{SOURCE} !~ m/\b$name\.c\b/;
     $self->{'H'} = [$self->catfile($self->updir,'Encode', 'encode.h')];
     my %xs;
     foreach my $table (keys %tables) {
@@ -67,7 +67,7 @@ sub post_initialize
         push (@files,$table.$ext);
     }
     $self->{SOURCE} .= " $table.c"
-        if $^O eq 'MacOS' && $self->{SOURCE} !~ /\b$table\.c\b/;
+        if $^O eq 'MacOS' && $self->{SOURCE} !~ m/\b$table\.c\b/;
     }
     $self->{'XS'} = { "$name.xs" => "$name.c" };
     $self->{'clean'}{'FILES'} .= join(' ',@files);

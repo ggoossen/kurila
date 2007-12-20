@@ -56,7 +56,7 @@ my $PERL = $ENV{PERL}
 eval '$ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
-if ($Is_MSWin32)  { ok `set FOO` =~ /^(?:FOO=)?hi there$/; }
+if ($Is_MSWin32)  { ok `set FOO` =~ m/^(?:FOO=)?hi there$/; }
 elsif ($Is_MacOS) { ok "1 # skipped", 1; }
 elsif ($Is_VMS)   { ok `write sys\$output f\$trnlnm("FOO")` eq "hi there\n"; }
 else              { ok `echo \$FOO` eq "hi there\n"; }
@@ -139,7 +139,7 @@ ok join(':',@val1) eq join(':',@val2);
 ok @val1 +> 1;
 
 # regex vars
-'foobarbaz' =~ /b(a)r/;
+'foobarbaz' =~ m/b(a)r/;
 ok $` eq 'foo', $`;
 ok $& eq 'bar', $&;
 ok $' eq 'baz', $';
@@ -180,7 +180,7 @@ ok $@ eq "foo\n", $@;
 
 ok $$ +> 0, $$;
 eval { $$++ };
-ok $@ =~ /^Modification of a read-only value attempted/;
+ok $@ =~ m/^Modification of a read-only value attempted/;
 
 our ($wd, $script);
 
@@ -307,9 +307,9 @@ else {
 	$0 = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
-       ok ($Is_MSWin32 ? (`set __NoNeSuCh` =~ /^(?:__NoNeSuCh=)?foo$/)
+       ok ($Is_MSWin32 ? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
 			    : (`echo \$__NoNeSuCh` eq "foo\n") );
-	if ($^O =~ /^(linux|freebsd)$/ &&
+	if ($^O =~ m/^(linux|freebsd)$/ &&
 	    open CMDLINE, "/proc/$$/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
 	    my $me = (split /\0/, $line)[0];
@@ -335,7 +335,7 @@ else {
 	       # be stored in the proc struct and then used by ps(1),
 	       # no matter what characters we use to pad the argv[].
 	       # (And if we use \0:s, they are shown as spaces.)  Sigh.
-               || $ps =~ /^x\s*$/
+               || $ps =~ m/^x\s*$/
 	       # FreeBSD cannot get rid of both the leading "perl :"
 	       # and the trailing " (perl)": some FreeBSD versions
 	       # can get rid of the first one.
@@ -412,7 +412,7 @@ ok ${^TAINT} == 0;
 # 5.6.1 had a bug: @+ and @- were not properly interpolated
 # into double-quoted strings
 # 20020414 mjd-perl-patch+@plover.com
-"I like pie" =~ /(I) (like) (pie)/;
+"I like pie" =~ m/(I) (like) (pie)/;
 ok "@-" eq  "0 0 2 7";
 ok "@+" eq "10 1 6 10";
 
@@ -438,7 +438,7 @@ ok "@+" eq "10 1 6 10";
 {
     my $x;
     sub f {
-	"abc" =~ /(.)./;
+	"abc" =~ m/(.)./;
 	$x = "@+";
 	return @+;
     };

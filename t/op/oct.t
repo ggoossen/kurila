@@ -25,10 +25,10 @@ sub test ($$$) {
     print "ok $test # $act $string\n";
   } else {
     my ($valstr, $resstr);
-    if ($act eq 'hex' or $string =~ /x/) {
+    if ($act eq 'hex' or $string =~ m/x/) {
       $valstr = sprintf "0x%X", $value;
       $resstr = sprintf "0x%X", $result;
-    } elsif ($string =~ /b/) {
+    } elsif ($string =~ m/b/) {
       $valstr = sprintf "0b%b", $value;
       $resstr = sprintf "0b%b", $result;
     } else {

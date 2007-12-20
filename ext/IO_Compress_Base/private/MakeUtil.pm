@@ -33,9 +33,9 @@ sub MY::libscan
     my $path = shift;
 
     return undef
-        if $path =~ /(~|\.bak|_bak)$/ ||
-           $path =~ /\..*\.sw(o|p)$/  ||
-           $path =~ /\B\.svn\b/;
+        if $path =~ m/(~|\.bak|_bak)$/ ||
+           $path =~ m/\..*\.sw(o|p)$/  ||
+           $path =~ m/\B\.svn\b/;
 
     return $path;
 }
@@ -80,20 +80,20 @@ sub getPerlFiles
         while ( ~< *M)
         {
             chomp ;
-            next if /^\s*#/ || /^\s*$/ ;
+            next if m/^\s*#/ || m/^\s*$/ ;
 
             s/^\s+//;
             s/\s+$//;
 
-            /^(\S+)\s*(.*)$/;
+            m/^(\S+)\s*(.*)$/;
 
             my ($file, $rest) = ($1, $2);
 
-            if ($file =~ /\.(pm|pl|t)$/ and $file !~ /MakeUtil.pm/)
+            if ($file =~ m/\.(pm|pl|t)$/ and $file !~ m/MakeUtil.pm/)
             {
                 push @files, "$prefix$file";
             }
-            elsif ($rest =~ /perl/i)
+            elsif ($rest =~ m/perl/i)
             {
                 push @files, "$prefix$file";
             }
@@ -127,11 +127,11 @@ sub UpDowngrade
 
     my $caller = (caller(1))[3] || '';
 
-    if ($caller =~ /downgrade/)
+    if ($caller =~ m/downgrade/)
     {
         $downgrade = 1;
     }
-    elsif ($caller =~ /upgrade/)
+    elsif ($caller =~ m/upgrade/)
     {
         $upgrade = 1;
     }
@@ -163,12 +163,12 @@ sub UpDowngrade
 
     if ($downgrade || $do_downgrade) {
         $our_sub = sub {
-	    if ( /^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
+	    if ( m/^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
                 my $indent = $1;
                 my $vars = join ' ', split /\s*,\s*/, $2;
                 $_ = "${indent}use vars qw($vars);\n";
             }
-	    elsif ( /^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)
+	    elsif ( m/^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)
             {
                 $_ = "$1# $2\n";
             }
@@ -176,12 +176,12 @@ sub UpDowngrade
     }
     elsif ($upgrade) {
         $our_sub = sub {
-	    if ( /^(\s*)use\s+vars\s+qw\((.*?)\)/ ) {
+	    if ( m/^(\s*)use\s+vars\s+qw\((.*?)\)/ ) {
                 my $indent = $1;
                 my $vars = join ', ', split ' ', $2;
                 $_ = "${indent}our ($vars);\n";
             }
-	    elsif ( /^(\s*)#\s*((use|no)\s+(bytes|utf8)\s*;.*)$/)
+	    elsif ( m/^(\s*)#\s*((use|no)\s+(bytes|utf8)\s*;.*)$/)
             {
                 $_ = "$1$2\n";
             }
@@ -221,7 +221,7 @@ sub doUpDown
  
     while ( ~< *ARGV)
     {
-        print, last if /^__(END|DATA)__/ ;
+        print, last if m/^__(END|DATA)__/ ;
 
         &{ $our_sub }() if $our_sub ;
         &{ $warn_sub }() if $warn_sub ;
@@ -256,7 +256,7 @@ sub doUpDownViaCopy
             or die "Cannot open $file: $!\n" ;
         while ( ~< *F)
         {
-            if (/^__(END|DATA)__/)
+            if (m/^__(END|DATA)__/)
             {
                 push @keep, $_;
                 last ;

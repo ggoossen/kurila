@@ -30,7 +30,7 @@ my $keynum = 0;
 while ( ~< *DATA) {
     chop;
     next unless $_;
-    next if /^#/;
+    next if m/^#/;
     my ($keyword) = split;
     print &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
 }

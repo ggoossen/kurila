@@ -28,7 +28,7 @@ Getopt::Long::Configure("no_ignore_case");
 GetOptions(\%OPT, "b=s", "p=s", "d=s", "D=s", "h", "v", "V") or die Usage;
 print Usage and exit if $OPT{h};
 print "$VERSION\n" and exit if $OPT{V};
-die Usage unless @ARGV == 1 && $ARGV[0] =~ /^\d+$/;
+die Usage unless @ARGV == 1 && $ARGV[0] =~ m/^\d+$/;
 my $CHANGE = shift;
 
 for my $p4opt (qw(p)) {
@@ -71,11 +71,11 @@ for my $a (@action) {
   $prevchange = $CHANGE-1;
   # can't assume previous rev == $number-1 due to obliterated revisions
   $prevfile = "$depotfile\@$prevchange";
-  if ($number == 1 or $action =~ /^(add|branch)$/) {
+  if ($number == 1 or $action =~ m/^(add|branch)$/) {
     $d1 = $^O eq 'MacOS' ? File::Spec->devnull : "/dev/null";
     $t1 = $d1;
     ++$doadd;
-  } elsif ($action =~ /^(edit|integrate)$/) {
+  } elsif ($action =~ m/^(edit|integrate)$/) {
     $d1 = File::Spec->catfile($path, "$basename-$prevchange");
     $t1 = File::Spec->catfile($tempdir, $d1);
     warn "==> $d1 <==\n" if $OPT{v};
@@ -86,7 +86,7 @@ for my $a (@action) {
       next;
     }
     chmod 0644, $t1;
-    if ($status =~ /\#(\d+) \s - \s \w+ \s change \s (\d+) \s /x) {
+    if ($status =~ m/\#(\d+) \s - \s \w+ \s change \s (\d+) \s /x) {
       ($prev,$prevchange) = ($1,$2);
       $prevfile = "$depotfile#$prev";
       my $oldd1 = $d1;
@@ -115,7 +115,7 @@ for my $a (@action) {
   $type = $1;
   if ($doadd or File::Compare::compare($t1, $t2)) {
     print "\n==== $file ($type) ====\n";
-    unless ($type =~ /text/) {
+    unless ($type =~ m/text/) {
       next;
     }
     unless ($^O eq 'MacOS') {
@@ -141,7 +141,7 @@ print "End of Patch.\n";
 my($tz_offset);
 sub correctmtime ($$$) {
   my($depotfile,$nr,$localfile) = @_;
-  my %fstat = map { /^\.\.\. (\w+) (.*)$/ } `p4 @P4opt fstat -s "$depotfile"`;
+  my %fstat = map { m/^\.\.\. (\w+) (.*)$/ } `p4 @P4opt fstat -s "$depotfile"`;
   return unless exists($fstat{headRev}) and $fstat{headRev} == $nr;
 
   if ($^O eq 'MacOS') {  # fix epoch ... still off by three hours (EDT->PDT)

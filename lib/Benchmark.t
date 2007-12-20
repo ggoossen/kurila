@@ -282,7 +282,7 @@ sub check_graph_consistency {
         # Fast is expressed as iters per second.
         $fastrate = 1/$fastrate if $fastrate;
     }
-    if ($ratetext =~ /rate/i) {
+    if ($ratetext =~ m/rate/i) {
         $all_passed
           ^&^= ok ($slow_is_rate, "slow should be expressed as a rate");
         $all_passed
@@ -443,7 +443,7 @@ sub check_graph {
     is ($bar, 0, "Bar code was not run");
 
     $got = $out->read();
-    ok ($got !~ /\.\.\./s, 'check that there is no title');
+    ok ($got !~ m/\.\.\./s, 'check that there is no title');
     like ($got, $graph_dissassembly, "Should find the output graph somewhere");
     check_graph_vs_output ($chart, $got);
 }

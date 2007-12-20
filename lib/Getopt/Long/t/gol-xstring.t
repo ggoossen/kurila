@@ -38,7 +38,7 @@ undef $opt_bar;
   local $SIG{__WARN__} = sub { $msg .= "@_" };
   my $ret = GetOptionsFromString($args, "foo", "Foo=s");
   print ($ret ? "not " : "ok 9\n");
-  print ($msg =~ /^GetOptionsFromString: Excess data / ? "" : "$msg\nnot ", "ok 10\n");
+  print ($msg =~ m/^GetOptionsFromString: Excess data / ? "" : "$msg\nnot ", "ok 10\n");
 }
 print ("@ARGV" eq "foo bar" ? "" : "not ", "ok 11\n");
 

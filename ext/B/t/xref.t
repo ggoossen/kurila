@@ -8,7 +8,7 @@ BEGIN {
 	unshift @INC, 't';
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ /\bB\b/) ){
+    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -40,14 +40,14 @@ our %xreftable = ();
 open XREF, $file or die "# Can't open $file: $!\n";
 while ( ~< *XREF) {
     chomp;
-    if (/^File (.*)/) {
+    if (m/^File (.*)/) {
 	$curfile = $1;
-    } elsif (/^  Subroutine (.*)/) {
+    } elsif (m/^  Subroutine (.*)/) {
 	$cursub = $1;
-    } elsif (/^    Package (.*)/) {
+    } elsif (m/^    Package (.*)/) {
 	$curpack = $1;
-    } elsif ($curpack eq '?' && /^      (".*")  +(.*)/
-	    or /^      (\S+)\s+(.*)/) {
+    } elsif ($curpack eq '?' && m/^      (".*")  +(.*)/
+	    or m/^      (\S+)\s+(.*)/) {
 	$xreftable{$curfile}{$cursub}{$curpack}{$1} = $2;
     }
 }

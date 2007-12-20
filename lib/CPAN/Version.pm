@@ -17,22 +17,22 @@ sub vcmp {
     }
     CPAN->debug("l[$l] r[$r]") if $CPAN::DEBUG;
     for ($l,$r) {
-        next unless tr/.// +> 1 || /^v/;
+        next unless tr/.// +> 1 || m/^v/;
         s/^v?/v/;
         1 while s/\.0+(\d)/.$1/; # remove leading zeroes per group
     }
     CPAN->debug("l[$l] r[$r]") if $CPAN::DEBUG;
-    if ($l=~/^v/ <+> $r=~/^v/) {
+    if ($l=~m/^v/ <+> $r=~m/^v/) {
         for ($l,$r) {
-            next if /^v/;
+            next if m/^v/;
             $_ = $self->float2vv($_);
         }
     }
     CPAN->debug("l[$l] r[$r]") if $CPAN::DEBUG;
     my $lvstring = "v0";
     my $rvstring = "v0";
-    if ($l =~ /^v/
-     && $r =~ /^v/) {
+    if ($l =~ m/^v/
+     && $r =~ m/^v/) {
         $lvstring = $self->vstring($l);
         $rvstring = $self->vstring($r);
         CPAN->debug(sprintf "lv[%vd] rv[%vd]", $lvstring, $rvstring) if $CPAN::DEBUG;
@@ -70,7 +70,7 @@ sub float2vv {
     my($self,$n) = @_;
     my($rev) = int($n);
     $rev ||= 0;
-    my($mantissa) = $n =~ /\.(\d{1,12})/; # limit to 12 digits to limit
+    my($mantissa) = $n =~ m/\.(\d{1,12})/; # limit to 12 digits to limit
                                           # architecture influence
     $mantissa ||= 0;
     $mantissa .= "0" while length($mantissa)%3;
@@ -87,7 +87,7 @@ sub float2vv {
 
 sub readable {
     my($self,$n) = @_;
-    $n =~ /^([\w\-\+\.]+)/;
+    $n =~ m/^([\w\-\+\.]+)/;
 
     return $1 if defined $1 && length($1)+>0;
     # if the first user reaches version v43, he will be treated as "+".

@@ -80,7 +80,7 @@ if ($< == $> and !$CONFIGURE) {
 my ($k, $v);
 while (($k, $v) = each %NetConfig) {
   $NetConfig{$k} = [$v]
-    if ($k =~ /_hosts$/ and $k ne "test_hosts" and defined($v) and !ref($v));
+    if ($k =~ m/_hosts$/ and $k ne "test_hosts" and defined($v) and !ref($v));
 }
 
 # Take a hostname and determine if it is inside the firewall

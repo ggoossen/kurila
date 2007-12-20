@@ -46,7 +46,7 @@ is($x + $y + $f + $g, 71,   'tr cancels IOK and NOK');
 
 # perlbug [ID 20000511.005]
 $_ = 'fred';
-/([a-z]{2})/;
+m/([a-z]{2})/;
 $1 =~ tr/A-Z//;
 s/^(\s*)f/$1F/;
 is($_, 'Fred',  'harmless if explicitly not updating');
@@ -54,7 +54,7 @@ is($_, 'Fred',  'harmless if explicitly not updating');
 
 # A variant of the above, added in 5.7.2
 $_ = 'fred';
-/([a-z]{2})/;
+m/([a-z]{2})/;
 eval '$1 =~ tr/A-Z/A-Z/;';
 s/^(\s*)f/$1F/;
 is($_, 'Fred',  'harmless if implicitly not updating');
@@ -144,11 +144,11 @@ eval "tr/m-d/ /";
 like($@, qr/^Invalid range "m-d" in transliteration operator/,
               'reversed range check');
 
-'abcdef' =~ /(bcd)/;
+'abcdef' =~ m/(bcd)/;
 is(eval '$1 =~ tr/abcd//', 3,  'explicit read-only count');
 is($@, '',                      '    no error');
 
-'abcdef' =~ /(bcd)/;
+'abcdef' =~ m/(bcd)/;
 is(eval '$1 =~ tr/abcd/abcd/', 3,  'implicit read-only count');
 is($@, '',                      '    no error');
 

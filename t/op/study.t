@@ -47,57 +47,57 @@ print "1..26\n";
 my $x = "abc\ndef\n";
 study($x);
 
-ok($x =~ /^abc/);
-ok($x !~ /^def/);
+ok($x =~ m/^abc/);
+ok($x !~ m/^def/);
 
 # used to be a test for $*
-ok($x =~ /^def/m);
+ok($x =~ m/^def/m);
 
 $_ = '123';
 study;
-ok(/^([0-9][0-9]*)/);
+ok(m/^([0-9][0-9]*)/);
 
-nok($x =~ /^xxx/);
-nok($x !~ /^abc/);
+nok($x =~ m/^xxx/);
+nok($x !~ m/^abc/);
 
-ok($x =~ /def/);
-nok($x !~ /def/);
+ok($x =~ m/def/);
+nok($x !~ m/def/);
 
 study($x);
-ok($x !~ /.def/);
-nok($x =~ /.def/);
+ok($x !~ m/.def/);
+nok($x =~ m/.def/);
 
-ok($x =~ /\ndef/);
-nok($x !~ /\ndef/);
+ok($x =~ m/\ndef/);
+nok($x !~ m/\ndef/);
 
 $_ = 'aaabbbccc';
 study;
-ok(/(a*b*)(c*)/ && $1 eq 'aaabbb' && $2 eq 'ccc');
-ok(/(a+b+c+)/ && $1 eq 'aaabbbccc');
+ok(m/(a*b*)(c*)/ && $1 eq 'aaabbb' && $2 eq 'ccc');
+ok(m/(a+b+c+)/ && $1 eq 'aaabbbccc');
 
-nok(/a+b?c+/);
+nok(m/a+b?c+/);
 
 $_ = 'aaabccc';
 study;
-ok(/a+b?c+/);
-ok(/a*b+c*/);
+ok(m/a+b?c+/);
+ok(m/a*b+c*/);
 
 $_ = 'aaaccc';
 study;
-ok(/a*b?c*/);
-nok(/a*b+c*/);
+ok(m/a*b?c*/);
+nok(m/a*b+c*/);
 
 $_ = 'abcdef';
 study;
-ok(/bcd|xyz/);
-ok(/xyz|bcd/);
+ok(m/bcd|xyz/);
+ok(m/xyz|bcd/);
 
 ok(m|bc/*d|);
 
-ok(/^$_$/);
+ok(m/^$_$/);
 
 # used to be a test for $*
-ok("ab\ncd\n" =~ /^cd/m);
+ok("ab\ncd\n" =~ m/^cd/m);
 
 if ($^O eq 'os390' or $^O eq 'posix-bc' or $^O eq 'MacOS') {
     # Even with the alarm() OS/390 and BS2000 can't manage these tests
@@ -109,7 +109,7 @@ if ($^O eq 'os390' or $^O eq 'posix-bc' or $^O eq 'MacOS') {
 
     $_ = 'FGF';
     study;
-    alarm_ok { /G.F$/ };
-    alarm_ok { /[F]F$/ };
+    alarm_ok { m/G.F$/ };
+    alarm_ok { m/[F]F$/ };
 }
 

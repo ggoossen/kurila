@@ -7,7 +7,7 @@
 
 BEGIN {
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
@@ -113,7 +113,7 @@ use File::Basename;
 
 my $dir =  dirname(__FILE__);
 opendir my $dh, $dir or die "$dir:$!";
-my @file = sort grep {/\.utf$/o} readdir $dh;
+my @file = sort grep {m/\.utf$/o} readdir $dh;
 closedir $dh;
 for my $file (@file){
     my $path = File::Spec->catfile($dir, $file);

@@ -19,8 +19,8 @@ my %opts = (
     'zip' => 0,     # perform zip
     'clean-exts' => 0,
   #options itself
-    (map {/^--([\-_\w]+)=(.*)$/} @ARGV),                            # --opt=smth
-    (map {/^no-?(.*)$/i?($1=>0):($_=>1)} map {/^--([\-_\w]+)$/} @ARGV),  # --opt --no-opt --noopt
+    (map {m/^--([\-_\w]+)=(.*)$/} @ARGV),                            # --opt=smth
+    (map {m/^no-?(.*)$/i?($1=>0):($_=>1)} map {m/^--([\-_\w]+)$/} @ARGV),  # --opt --no-opt --noopt
   );
 
 # TODO
@@ -36,7 +36,7 @@ if ($opts{'clean-exts'}) {
   unlink '../config.sh'; # delete cache config file, which remembers our previous config
   chdir '../ext';
   find({no_chdir=>1,wanted => sub{
-        unlink if /((?:\.obj|\/makefile|\/errno\.pm))$/i;
+        unlink if m/((?:\.obj|\/makefile|\/errno\.pm))$/i;
       }
     },'.');
   exit;
@@ -59,7 +59,7 @@ sub copy($$);
 
 # lib
 chdir '../lib';
-find({no_chdir=>1,wanted=>sub{push @lfiles, $_ if /\.p[lm]$/}},'.');
+find({no_chdir=>1,wanted=>sub{push @lfiles, $_ if m/\.p[lm]$/}},'.');
 chdir $cwd;
 # exclusions
 @lfiles = grep {!exists $libexclusions{$_}} @lfiles;
@@ -70,7 +70,7 @@ if ($opts{'verbose'} +>=1) {
   print STDERR "Copying perl lib files...\n";
 }
 for (@lfiles) {
-  /^(.*)\/[^\/]+$/;
+  m/^(.*)\/[^\/]+$/;
   mkpath "$opts{distdir}/lib/$1";
   copy "../lib/$_", "$opts{distdir}/lib/$_";
 }
@@ -78,7 +78,7 @@ for (@lfiles) {
 #ext
 my @efiles;
 chdir '../ext';
-find({no_chdir=>1,wanted=>sub{push @efiles, $_ if /\.pm$/}},'.');
+find({no_chdir=>1,wanted=>sub{push @efiles, $_ if m/\.pm$/}},'.');
 chdir $cwd;
 # exclusions
 #...
@@ -94,7 +94,7 @@ for (@efiles) {
     copy "../ext/$_", "$opts{distdir}/lib/$1";
   }
   else {
-    /^(.*)\/([^\/]+)\/([^\/]+)$/;
+    m/^(.*)\/([^\/]+)\/([^\/]+)$/;
     copy "../ext/$_", "$opts{distdir}/lib/$1/$3";
   }
 }
@@ -122,13 +122,13 @@ my %aexcl = (socket=>'Socket_1');
 # will be found by Dynaloader
 my @afiles;
 chdir "../xlib/$opts{'cross-name'}/auto";
-find({no_chdir=>1,wanted=>sub{push @afiles, $_ if /\.(dll|bs)$/}},'.');
+find({no_chdir=>1,wanted=>sub{push @afiles, $_ if m/\.(dll|bs)$/}},'.');
 chdir $cwd;
 if ($opts{'verbose'} +>=1) {
   print STDERR "Copying binaries for perl core extensions...\n";
 }
 for (@afiles) {
-  if (/^(.*)\/(\w+)\.dll$/i && exists $aexcl{lc($2)}) {
+  if (m/^(.*)\/(\w+)\.dll$/i && exists $aexcl{lc($2)}) {
     copy "../xlib/$opts{'cross-name'}/auto/$_", "$opts{distdir}/lib/auto/$1/$aexcl{lc($2)}.dll";
   }
   else {
@@ -146,13 +146,13 @@ sub copy($$) {
     # actually following regexp is suspicious to not work everywhere.
     # but we've checked on our set of modules, and it's fit for our purposes
     $ffrom =~ s/^=\w+.*?^=cut(?:\n|\Z)//msg;
-    unless ($ffrom=~/\bAutoLoader\b/) {
+    unless ($ffrom=~m/\bAutoLoader\b/) {
       # this logic actually strip less than could be stripped, but we're
       # not risky. Just strip only of no mention of AutoLoader
       $ffrom =~ s/^__END__.*\Z//msg;
     }
   }
-  mkpath $1 if $fnto=~/^(.*)\/([^\/]+)$/;
+  mkpath $1 if $fnto=~m/^(.*)\/([^\/]+)$/;
   open my $fhout, ">$fnto";
   binmode $fhout;
   print $fhout $ffrom;

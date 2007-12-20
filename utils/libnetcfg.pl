@@ -173,7 +173,7 @@ sub get_hostname
  while(1)
   {
    my $ans = Prompt($prompt,$def);
-   $host = ($ans =~ /(\S*)/)[0];
+   $host = ($ans =~ m/(\S*)/)[0];
    last
 	if(!length($host) || valid_host($host));
 
@@ -206,7 +206,7 @@ sub get_bool ($$)
 
  my $val = Prompt($prompt,$def ? "yes" : "no");
 
- $val =~ /^y/i ? 1 : 0;
+ $val =~ m/^y/i ? 1 : 0;
 }
 
 ##
@@ -315,7 +315,7 @@ elsif (eval { require Net::Config })
   %oldcfg = %Net::Config::NetConfig;
  }
 
-map { $cfg{lc $_} = $cfg{$_}; delete $cfg{$_} if /[A-Z]/ } keys %cfg;
+map { $cfg{lc $_} = $cfg{$_}; delete $cfg{$_} if m/[A-Z]/ } keys %cfg;
 
 #---------------------------------------------------------------------------
 
@@ -642,7 +642,7 @@ $def = $oldcfg{'inet_domain'} || $ENV{LOCALDOMAIN};
 
 $ans = Prompt("\nWhat is your local internet domain name :",$def);
 
-$cfg{'inet_domain'} = ($ans =~ /(\S+)/)[0];
+$cfg{'inet_domain'} = ($ans =~ m/(\S+)/)[0];
 
 #---------------------------------------------------------------------------
 
@@ -704,7 +704,7 @@ foreach $key (keys %cfg) {
     }
     else {
 	$val =~ s/'/\'/sog;
-	$val = "'" . $val . "'" if $val =~ /\D/;
+	$val = "'" . $val . "'" if $val =~ m/\D/;
     }
     print $fh "\t'",$key,"' => ",$val,",\n";
 }

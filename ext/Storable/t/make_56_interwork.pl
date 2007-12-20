@@ -6,7 +6,7 @@ use Storable qw(freeze thaw);
 
 # Lilliput decreed that eggs should be eaten small end first.
 # Belfuscu welcomed the rebels who wanted to eat big end first.
-my $kingdom = $Config{byteorder} =~ /23/ ? "Lillput" : "Belfuscu";
+my $kingdom = $Config{byteorder} =~ m/23/ ? "Lillput" : "Belfuscu";
 
 my $frozen = freeze
   ["This file was written with $Storable::VERSION on perl $^V",

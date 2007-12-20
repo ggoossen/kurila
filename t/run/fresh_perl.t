@@ -43,7 +43,7 @@ foreach my $prog (@prgs) {
     $prog .= "\n";
     $expected = '' unless defined $expected;
 
-    if ($prog =~ /^\# SKIP: (.+)/m) {
+    if ($prog =~ m/^\# SKIP: (.+)/m) {
 	if (eval $1) {
 	    ok(1, "Skip: $1");
 	    next;

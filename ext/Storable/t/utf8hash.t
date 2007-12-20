@@ -14,7 +14,7 @@ sub BEGIN {
     }
     require Config; Config->import();
     if ($ENV{PERL_CORE}){
-	if($Config{'extensions'} !~ /\bStorable\b/) {
+	if($Config{'extensions'} !~ m/\bStorable\b/) {
 	    print "1..0 # Skip: Storable was not built\n";
 	    exit 0;
 	}
@@ -142,8 +142,8 @@ for my $package ('', 'Hash_Test') {
     bless \%hash, $package;
   }
   for (keys %hash) {
-    my $l = 0 + /^\w+$/;
-    my $r = 0 + $hash{$_} =~ /^\w+$/;
+    my $l = 0 + m/^\w+$/;
+    my $r = 0 + $hash{$_} =~ m/^\w+$/;
     cmp_ok ($l, '==', $r);
   }
 
@@ -153,8 +153,8 @@ for my $package ('', 'Hash_Test') {
   class_test ($copy, $package);
 
   for (keys %$copy) {
-    my $l = 0 + /^\w+$/;
-    my $r = 0 + $copy->{$_} =~ /^\w+$/;
+    my $l = 0 + m/^\w+$/;
+    my $r = 0 + $copy->{$_} =~ m/^\w+$/;
     cmp_ok ($l, '==', $r, sprintf "key length %d", length $_);
   }
 

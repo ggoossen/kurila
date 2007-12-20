@@ -33,7 +33,7 @@ if (exists $opt{dir}) {
 }
 else {
   # Check if we're in 't'
-  $opt{dir} = cwd =~ /\/t$/ ? '..' : '.';
+  $opt{dir} = cwd =~ m/\/t$/ ? '..' : '.';
 
   # Check if we're in the right directory
   -d "$opt{dir}/$_" or die "$0: must be run from the perl source directory"
@@ -106,7 +106,7 @@ sub summary {
     for my $s (keys %{$leak->{$l}}) {
       my $ns = join '<', map {
                  my($func, $file, $line) = split /:/;
-                 /:/ ? $opt{lines}
+                 m/:/ ? $opt{lines}
                        ? "$func ($file:$line)" : "$func ($file)"
                      : $_
                } split /</, $s;
@@ -187,7 +187,7 @@ sub filter {
   debug(2, "$File::Find::name\n");
 
   # Only process '*.t.valgrind' files
-  /(.*)\.t\.valgrind$/ or return;
+  m/(.*)\.t\.valgrind$/ or return;
 
   # Strip all unnecessary stuff from the test name
   my $test = $1;
@@ -226,7 +226,7 @@ sub filter {
       my $inperl = 0;      # Are we inside the perl source? (And how deep?)
       my @stack;           # Call stack
 
-      while ($l[$j++] =~ /^\s+(?:at|by) $hexaddr:\s+(\w+)\s+\((?:([^:]+):(\d+)|[^)]+)\)/o) {
+      while ($l[$j++] =~ m/^\s+(?:at|by) $hexaddr:\s+(\w+)\s+\((?:([^:]+):(\d+)|[^)]+)\)/o) {
         my($func, $file, $lineno) = ($1, $2, $3);
 
         # If the stack frame is inside perl => increment $inperl
@@ -250,7 +250,7 @@ sub filter {
 
       # Simply find the topmost frame in the call stack within
       # the perl source code
-      while ($l[$j++] =~ /^\s+(?:at|by) $hexaddr:\s+(?:(\w+)\s+\(([^:]+):(\d+)\))?/o) {
+      while ($l[$j++] =~ m/^\s+(?:at|by) $hexaddr:\s+(?:(\w+)\s+\(([^:]+):(\d+)\))?/o) {
         if (defined $1) {
           $error{$line}{"$1:$2:$3"}{$test}++;
           last;

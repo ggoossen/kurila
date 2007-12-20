@@ -73,7 +73,7 @@ sub newlex { # drop-in for showlex
     printf $walkHandle "0: %s\n", $names[0]->terse unless $nosp1;
     for (my $i = 1; $i +< $count; $i++) {
 	printf $walkHandle "$i: %s = %s\n", $names[$i]->terse, $vals[$i]->terse
-	    unless $nosp1 and $names[$i]->terse =~ /SPECIAL/;
+	    unless $nosp1 and $names[$i]->terse =~ m/SPECIAL/;
     }
 }
 
@@ -90,8 +90,8 @@ sub showlex_main {
 }
 
 sub compile {
-    my @options = grep(/^-/, @_);
-    my @args = grep(!/^-/, @_);
+    my @options = grep(m/^-/, @_);
+    my @args = grep(!m/^-/, @_);
     for my $o (@options) {
 	$newlex = 1 if $o eq "-newlex";
 	$nosp1  = 1 if $o eq "-nosp";
@@ -107,7 +107,7 @@ sub compile {
 		print $walkHandle "B::Showlex::compile($objname)\n";
 		$objref = $objname;
 	    } else {
-		$objname = "main::$objname" unless $objname =~ /::/;
+		$objname = "main::$objname" unless $objname =~ m/::/;
 		print $walkHandle "$objname:\n";
 		no strict 'refs';
 		die "err: unknown function ($objname)\n"

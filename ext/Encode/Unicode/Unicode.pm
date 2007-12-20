@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = do { my @r = ( q$Revision: 2.5 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.5 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 use XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -24,7 +24,7 @@ for my $name (
   )
 {
     my ( $size, $endian, $ucs2, $mask );
-    $name =~ /^(\w+)-(\d+)(\w*)$/o;
+    $name =~ m/^(\w+)-(\d+)(\w*)$/o;
     if ( $ucs2 = ( $1 eq 'UCS' ) ) {
         $size = 2;
     }

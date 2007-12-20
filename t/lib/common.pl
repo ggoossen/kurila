@@ -36,15 +36,15 @@ else
 my $files = 0;
 foreach my $file (@w_files) {
 
-    next if $file =~ /(~|\.orig|,v)$/;
-    next if $file =~ /perlio$/ && !('PerlIO::Layer'->find( 'perlio'));
+    next if $file =~ m/(~|\.orig|,v)$/;
+    next if $file =~ m/perlio$/ && !('PerlIO::Layer'->find( 'perlio'));
     next if -d $file;
 
     open F, "<$file" or die "Cannot open $file: $!\n" ;
     my $line = 0;
     while ( ~< *F) {
         $line++;
-	last if /^__END__/ ;
+	last if m/^__END__/ ;
     }
 
     {
@@ -60,7 +60,7 @@ undef $/;
 plan tests => (scalar(@prgs)-$files);
 
 for (@prgs){
-    unless (/\n/)
+    unless (m/\n/)
      {
       print "# From $_\n";
       next;
@@ -84,7 +84,7 @@ for (@prgs){
 	}
 	$todo_reason = $temp;
     }
-    if ( $prog =~ /--FILE--/) {
+    if ( $prog =~ m/--FILE--/) {
         my(@files) = split(/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error: test $_ didn't split into pairs, got " .
@@ -175,10 +175,10 @@ for (@prgs){
         $ok = randomMatch($results, $expected);
     }
     elsif ($option_regex) {
-	$ok = $results =~ /^$expected/;
+	$ok = $results =~ m/^$expected/;
     }
     elsif ($prefix) {
-	$ok = $results =~ /^\Q$expected/;
+	$ok = $results =~ m/^\Q$expected/;
     }
     else {
 	$ok = $results eq $expected;

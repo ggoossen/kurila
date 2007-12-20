@@ -4,7 +4,7 @@ BEGIN {
         unshift @INC, '../lib';
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }

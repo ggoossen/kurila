@@ -8,8 +8,8 @@ my %dirs;
 sub mk {
   my $r = shift;
   return if exists $dirs{$r};
-  if ($r=~/\//) {
-    $r=~/^(.*)\/[^\/]*?$/;
+  if ($r=~m/\//) {
+    $r=~m/^(.*)\/[^\/]*?$/;
     mk($1);
   }
   print STDERR "..\\miniperl.exe -MCross comp.pl --do cemkdir [p]\\lib\\$r\n";
@@ -17,8 +17,8 @@ sub mk {
   $dirs{$r}++;
 }
 for (@files) {
-  if (/\//) {
-    /^(.*)\/[^\/]*?$/;
+  if (m/\//) {
+    m/^(.*)\/[^\/]*?$/;
     mk($1);
   }
   # currently no stripping POD

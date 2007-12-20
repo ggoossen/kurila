@@ -10,7 +10,7 @@ use Test::More;
 BEGIN {
     our %Config;
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bSocket\b/ && 
+    if ($Config{'extensions'} !~ m/\bSocket\b/ && 
         !(($^O eq 'VMS') && $Config{d_socket})) 
     {
 	plan skip_all => "Test uses Socket, Socket not built";
@@ -59,9 +59,9 @@ SKIP: {
     print "# name = " . $h->name . ", aliases = " . join (",", @{$h->aliases}) . "\n";
 
     my $in_alias;
-    unless ($h->name =~ /^localhost(?:\..+)?$/i) {
+    unless ($h->name =~ m/^localhost(?:\..+)?$/i) {
         foreach (@{$h->aliases}) {
-            if (/^localhost(?:\..+)?$/i) {
+            if (m/^localhost(?:\..+)?$/i) {
                 $in_alias = 1;
                 last;
             }
@@ -74,7 +74,7 @@ SKIP: {
     if ($in_alias) {
         # If we found it in the aliases before, expect to find it there again.
         foreach (@{$h->aliases}) {
-            if (/^localhost(?:\..+)?$/i) {
+            if (m/^localhost(?:\..+)?$/i) {
                 # This time, clear the flag if we see "localhost"
                 undef $in_alias;
                 last;

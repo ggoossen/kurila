@@ -19,7 +19,7 @@ open (OUT,">${dir}perlmain.c")
 
 while ( ~< *IN) {
   print OUT;
-  last if /Do not delete this line--writemain depends on it/;
+  last if m/Do not delete this line--writemain depends on it/;
 }
 $ok = !eof(IN);
 close IN;

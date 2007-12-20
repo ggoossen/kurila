@@ -21,14 +21,14 @@ $dot = DirHandle->new($^O eq 'MacOS' ? ':' : '.');
 ok(defined($dot));
 
 @a = sort glob("*");
-do { $first = $dot->read } while defined($first) && $first =~ /^\./;
+do { $first = $dot->read } while defined($first) && $first =~ m/^\./;
 ok(+(grep { $_ eq $first } @a));
 
-@b = sort($first, (grep {/^[^.]/} $dot->read));
+@b = sort($first, (grep {m/^[^.]/} $dot->read));
 ok(+(join("\0", @a) eq join("\0", @b)));
 
 $dot->rewind;
-@c = sort grep {/^[^.]/} $dot->read;
+@c = sort grep {m/^[^.]/} $dot->read;
 cmp_ok(+(join("\0", @b), 'eq', join("\0", @c)));
 
 $dot->close;

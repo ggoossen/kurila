@@ -25,9 +25,9 @@ print "1..67\n";
 
 my $UV_max = ^~^0;
 die "UV_max eq '$UV_max', doesn't end in 5; your UV isn't 4n bits long :-(."
-  unless $UV_max =~ /5$/;
+  unless $UV_max =~ m/5$/;
 my $UV_max_less3 = $UV_max - 3;
-my $maths_preserves_UVs = $UV_max_less3 =~ /^\d+2$/;   # 5 - 3 is 2.
+my $maths_preserves_UVs = $UV_max_less3 =~ m/^\d+2$/;   # 5 - 3 is 2.
 if ($maths_preserves_UVs) {
   print "# This perl's maths preserves all bits of a UV.\n";
 } else {

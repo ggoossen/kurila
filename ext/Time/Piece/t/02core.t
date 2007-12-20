@@ -1,6 +1,6 @@
 use Test::More tests => 93;
 
-my $is_win32 = ($^O =~ /Win32/);
+my $is_win32 = ($^O =~ m/Win32/);
 my $is_qnx = ($^O eq 'qnx');
 BEGIN { use_ok('Time::Piece'); }
 ok(1);

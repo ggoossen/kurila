@@ -198,7 +198,7 @@ sub _readGzipHeader($)
         $keep .= $origname . GZIP_NULL_BYTE ;
 
         return $self->HeaderError("Non ISO 8859-1 Character found in Name")
-            if *$self->{Strict} && $origname =~ /$GZIP_FNAME_INVALID_CHAR_RE/o ;
+            if *$self->{Strict} && $origname =~ m/$GZIP_FNAME_INVALID_CHAR_RE/o ;
     }
 
     my $comment ;
@@ -213,7 +213,7 @@ sub _readGzipHeader($)
         $keep .= $comment . GZIP_NULL_BYTE ;
 
         return $self->HeaderError("Non ISO 8859-1 Character found in Comment")
-            if *$self->{Strict} && $comment =~ /$GZIP_FCOMMENT_INVALID_CHAR_RE/o ;
+            if *$self->{Strict} && $comment =~ m/$GZIP_FCOMMENT_INVALID_CHAR_RE/o ;
     }
 
     if ($flag ^&^ GZIP_FLG_FHCRC) {

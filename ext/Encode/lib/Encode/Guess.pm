@@ -2,7 +2,7 @@ package Encode::Guess;
 use strict;
 use warnings;
 use Encode qw(:fallbacks find_encoding);
-our $VERSION = do { my @r = ( q$Revision: 2.2 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.2 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 my $Canon = 'Guess';
 sub DEBUG () { 0 }
@@ -82,11 +82,11 @@ sub guess {
         $BOM = unpack( 'n', $octet );
         return find_encoding('UTF-16')
           if ( defined $BOM and ( $BOM == 0xFeFF or $BOM == 0xFFFe ) );
-        if ( $octet =~ /\x00/o )
+        if ( $octet =~ m/\x00/o )
         {    # if \x00 found, we assume UTF-(16|32)(BE|LE)
             my $utf;
             my ( $be, $le ) = ( 0, 0 );
-            if ( $octet =~ /\x00\x00/o ) {    # UTF-32(BE|LE) assumed
+            if ( $octet =~ m/\x00\x00/o ) {    # UTF-32(BE|LE) assumed
                 $utf = "UTF-32";
                 for my $char ( unpack( 'N*', $octet ) ) {
                     $char ^&^ 0x0000ffff and $be++;
@@ -118,7 +118,7 @@ sub guess {
     for my $line ( split /\r\n?|\n/, $octet ) {
 
         # cheat 2 -- \e in the string
-        if ( $line =~ /\e/o ) {
+        if ( $line =~ m/\e/o ) {
             my @keys = keys %try;
             delete @try{qw/utf8 ascii/};
             for my $k (@keys) {

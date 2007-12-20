@@ -32,7 +32,7 @@ sub Mksymlists {
             my($packprefix,$sym,$bootseen);
             ($packprefix = $package) =~ s/\W/_/g;
             foreach $sym (@{$spec{DL_FUNCS}->{$package}}) {
-                if ($sym =~ /^boot_/) {
+                if ($sym =~ m/^boot_/) {
                     push(@{$spec{FUNCLIST}},$sym);
                     $bootseen++;
                 }
@@ -74,7 +74,7 @@ sub _write_aix {
 sub _write_os2 {
     my($data) = @_;
     require Config;
-    my $threaded = ($Config::Config{archname} =~ /-thread/ ? " threaded" : "");
+    my $threaded = ($Config::Config{archname} =~ m/-thread/ ? " threaded" : "");
 
     if (not $data->{DLBASE}) {
         ($data->{DLBASE} = $data->{NAME}) =~ s/.*:://;
@@ -126,7 +126,7 @@ sub _write_win32 {
     open(DEF,">$data->{FILE}.def")
         or croak("Can't create $data->{FILE}.def: $!\n");
     # put library name in quotes (it could be a keyword, like 'Alias')
-    if ($Config::Config{'cc'} !~ /^gcc/i) {
+    if ($Config::Config{'cc'} !~ m/^gcc/i) {
       print DEF "LIBRARY \"$data->{DLBASE}\"\n";
     }
     print DEF "EXPORTS\n  ";
@@ -136,7 +136,7 @@ sub _write_win32 {
     # NOTE: DynaLoader itself only uses the names without underscores,
     # so this is only to cover the case when the extension DLL may be
     # linked to directly from C. GSAR 97-07-10
-    if ($Config::Config{'cc'} =~ /^bcc/i) {
+    if ($Config::Config{'cc'} =~ m/^bcc/i) {
 	for (@{$data->{DL_VARS}}, @{$data->{FUNCLIST}}) {
 	    push @syms, "_$_", "$_ = _$_";
 	}
@@ -164,7 +164,7 @@ sub _write_vms {
     require Config; # a reminder for once we do $^O
     require ExtUtils::XSSymSet;
 
-    my($isvax) = $Config::Config{'archname'} =~ /VAX/i;
+    my($isvax) = $Config::Config{'archname'} =~ m/VAX/i;
     my($set) = ExtUtils::XSSymSet->new();
     my($sym);
 

@@ -1,6 +1,6 @@
 # $Id: encoding.pm,v 2.6 2007/04/22 14:56:12 dankogai Exp $
 package encoding;
-our $VERSION = do { my @r = ( q$Revision: 2.6 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.6 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 use Encode;
 use strict;
@@ -43,18 +43,18 @@ sub _get_locale_encoding {
     no warnings 'uninitialized';
 
     if ( not $locale_encoding && in_locale() ) {
-        if ( $ENV{LC_ALL} =~ /^([^.]+)\.([^.]+)$/ ) {
+        if ( $ENV{LC_ALL} =~ m/^([^.]+)\.([^.]+)$/ ) {
             ( $country_language, $locale_encoding ) = ( $1, $2 );
         }
-        elsif ( $ENV{LANG} =~ /^([^.]+)\.([^.]+)$/ ) {
+        elsif ( $ENV{LANG} =~ m/^([^.]+)\.([^.]+)$/ ) {
             ( $country_language, $locale_encoding ) = ( $1, $2 );
         }
 
         # LANGUAGE affects only LC_MESSAGES only on glibc
     }
     elsif ( not $locale_encoding ) {
-        if (   $ENV{LC_ALL} =~ /\butf-?8\b/i
-            || $ENV{LANG} =~ /\butf-?8\b/i )
+        if (   $ENV{LC_ALL} =~ m/\butf-?8\b/i
+            || $ENV{LANG} =~ m/\butf-?8\b/i )
         {
             $locale_encoding = 'utf8';
         }
@@ -70,16 +70,16 @@ sub _get_locale_encoding {
         && lc($locale_encoding) eq 'euc'
         && defined $country_language )
     {
-        if ( $country_language =~ /^ja_JP|japan(?:ese)?$/i ) {
+        if ( $country_language =~ m/^ja_JP|japan(?:ese)?$/i ) {
             $locale_encoding = 'euc-jp';
         }
-        elsif ( $country_language =~ /^ko_KR|korean?$/i ) {
+        elsif ( $country_language =~ m/^ko_KR|korean?$/i ) {
             $locale_encoding = 'euc-kr';
         }
-        elsif ( $country_language =~ /^zh_CN|chin(?:a|ese)$/i ) {
+        elsif ( $country_language =~ m/^zh_CN|chin(?:a|ese)$/i ) {
             $locale_encoding = 'euc-cn';
         }
-        elsif ( $country_language =~ /^zh_TW|taiwan(?:ese)?$/i ) {
+        elsif ( $country_language =~ m/^zh_TW|taiwan(?:ese)?$/i ) {
             $locale_encoding = 'euc-tw';
         }
         else {

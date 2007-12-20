@@ -35,7 +35,7 @@ ok( ($a =~ s/a/y/g) == 0 && $a eq 'xbxcxdx' );
 ok( ($a =~ s/b/y/g) == 1 && $a eq 'xyxcxdx' );
 
 $_ = 'ABACADA';
-ok( /a/i && s///gi && $_ eq 'BCD' );
+ok( m/a/i && s///gi && $_ eq 'BCD' );
 
 $_ = '\\' x 4;
 ok( length($_) == 4 );
@@ -353,7 +353,7 @@ $snum = s/\ba/./g;
 ok( $_ eq '.aaa' && $snum == 1 );
 
 eval q% s/a/"b"}/e %;
-ok( $@ =~ /Bad evalled substitution/ );
+ok( $@ =~ m/Bad evalled substitution/ );
 eval q% ($_ = "x") =~ s/(.)/"$1 "/e %;
 ok( $_ eq "x " and !length $@ );
 $x = $x = 'interp';
@@ -528,13 +528,13 @@ is(s/(??{1})/2/eg, 4, '#20684 s/// with (??{..}) inside');
 
 # [perl #20682] @- not visible in replacement
 $_ = "123";
-/(2)/;	# seed @- with something else
+m/(2)/;	# seed @- with something else
 s/(1)(2)(3)/$#- (@-)/;
 is($_, "3 (0 0 1 2)", '#20682 @- not visible in replacement');
 
 # [perl #20682] $^N not visible in replacement
 $_ = "abc";
-/(a)/; s/(b)|(c)/-$^N/g;
+m/(a)/; s/(b)|(c)/-$^N/g;
 is($_,'a-b-c','#20682 $^N not visible in replacement');
 
 # [perl #22351] perl bug with 'e' substitution modifier
@@ -559,7 +559,7 @@ is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
     $_ = "xy";
     no warnings 'uninitialized';
     no strict 'refs';
-    /(((((((((x)))))))))(z)/;	# clear $10
+    m/(((((((((x)))))))))(z)/;	# clear $10
     s/(((((((((x)))))))))(y)/${*{Symbol::fetch_glob(10)}}/;
     is($_,"y","RT#6006: \$_ eq '$_'");
     $_ = "xr";

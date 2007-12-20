@@ -101,8 +101,8 @@ sub debug_text {
   my $inout = shift;
   my $text  = shift;
 
-  if ( (ref($nntp) and $nntp->code == 350 and $text =~ /^(\S+)/)
-    || ($text =~ /^(authinfo\s+pass)/io))
+  if ( (ref($nntp) and $nntp->code == 350 and $text =~ m/^(\S+)/)
+    || ($text =~ m/^(authinfo\s+pass)/io))
   {
     $text = "$1 ....\n";
   }
@@ -204,7 +204,7 @@ sub nntpstat {
   @_ == 1 || @_ == 2 or croak 'usage: $nntp->nntpstat( [ MSGID ] )';
   my $nntp = shift;
 
-  $nntp->_STAT(@_) && $nntp->message =~ /(<[^>]+>)/o
+  $nntp->_STAT(@_) && $nntp->message =~ m/(<[^>]+>)/o
     ? $1
     : undef;
 }
@@ -222,13 +222,13 @@ sub group {
 
   return wantarray ? () : undef
     unless $nntp->_GROUP($newgrp || $grp || "")
-    && $nntp->message =~ /(\d+)\s+(\d+)\s+(\d+)\s+(\S+)/;
+    && $nntp->message =~ m/(\d+)\s+(\d+)\s+(\d+)\s+(\S+)/;
 
   my ($count, $first, $last, $group) = ($1, $2, $3, $4);
 
   # group may be replied as '(current group)'
   $group = ${*$nntp}{'net_nntp_group'}
-    if $group =~ /\(/;
+    if $group =~ m/\(/;
 
   ${*$nntp}{'net_nntp_group'} = $group;
 
@@ -263,7 +263,7 @@ sub last {
   @_ == 1 or croak 'usage: $nntp->last()';
   my $nntp = shift;
 
-  $nntp->_LAST && $nntp->message =~ /(<[^>]+>)/o
+  $nntp->_LAST && $nntp->message =~ m/(<[^>]+>)/o
     ? $1
     : undef;
 }
@@ -319,7 +319,7 @@ sub next {
   @_ == 1 or croak 'usage: $nntp->next()';
   my $nntp = shift;
 
-  $nntp->_NEXT && $nntp->message =~ /(<[^>]+>)/o
+  $nntp->_NEXT && $nntp->message =~ m/(<[^>]+>)/o
     ? $1
     : undef;
 }
@@ -402,7 +402,7 @@ sub distribution_patterns {
 
   $nntp->_LIST('DISTRIB.PATS')
     && ($arr = $nntp->read_until_dot)
-    ? [grep { /^\d/ && (chomp, $_ = [split /:/]) } @$arr]
+    ? [grep { m/^\d/ && (chomp, $_ = [split /:/]) } @$arr]
     : undef;
 }
 
@@ -535,7 +535,7 @@ sub date {
   my $nntp = shift;
 
   $nntp->_DATE
-    && $nntp->message =~ /(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/
+    && $nntp->message =~ m/(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/
     ? timegm($6, $5, $4, $3, $2 - 1, $1 - 1900)
     : undef;
 }

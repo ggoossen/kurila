@@ -3,7 +3,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = do { my @r = ( q$Revision: 2.5 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.5 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 use Encode qw(find_encoding encode_utf8 decode_utf8);
 use MIME::Base64;
 use Carp;
@@ -115,8 +115,8 @@ sub encode($$;$) {
     for my $line ( split /\r|\n|\r\n/o, $str ) {
         my ( @word, @subline );
         for my $word ( split /($re_especials)/o, $line ) {
-            if (   $word =~ /[^\x00-\x7f]/o
-                or $word =~ /^$re_encoded_word$/o )
+            if (   $word =~ m/[^\x00-\x7f]/o
+                or $word =~ m/^$re_encoded_word$/o )
             {
                 push @word, $obj->_encode($word);
             }

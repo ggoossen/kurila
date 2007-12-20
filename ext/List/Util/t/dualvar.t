@@ -6,7 +6,7 @@ BEGIN {
 	@INC = '../lib';
 	require Config; Config->import;
 	keys %Config; # Silence warning
-	if ($Config{extensions} !~ /\bList\/Util\b/) {
+	if ($Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
 	}
@@ -14,7 +14,7 @@ BEGIN {
 }
 
 use Scalar::Util ();
-use Test::More  (grep { /dualvar/ } @Scalar::Util::EXPORT_FAIL)
+use Test::More  (grep { m/dualvar/ } @Scalar::Util::EXPORT_FAIL)
 			? (skip_all => 'dualvar requires XS version')
 			: (tests => 11);
 

@@ -65,17 +65,17 @@ sub list_packages {
             $pack =~ s/::$//;
 
             my @packs;
-            my @stuff = grep !/^(main|)::$/, keys %{Symbol::stash($pack)};
-            for my $cand (grep /::$/, @stuff)
+            my @stuff = grep !m/^(main|)::$/, keys %{Symbol::stash($pack)};
+            for my $cand (grep m/::$/, @stuff)
             {
                 $cand =~ s!::$!!;
                 my @children = list_packages("$pack\::$cand");
     
-                push @packs, "$pack\::$cand" unless $cand =~ /^::/ ||
+                push @packs, "$pack\::$cand" unless $cand =~ m/^::/ ||
                     !__PACKAGE__->_loaded("$pack\::$cand"); # or @children;
                 push @packs, @children;
             }
-            return grep {$_ !~ /::::ISA::CACHE/} @packs;
+            return grep {$_ !~ m/::::ISA::CACHE/} @packs;
 }
 
 ### XXX this is an inlining of the Class-Inspector->loaded()

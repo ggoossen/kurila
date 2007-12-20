@@ -104,7 +104,7 @@ sub bulk_process {
 
         $lines++;
 
-        next unless $file =~ /\.packed/;
+        next unless $file =~ m/\.packed/;
 
         $count++;
 

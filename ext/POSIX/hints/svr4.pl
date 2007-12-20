@@ -11,7 +11,7 @@
 #  (See hints/svr4.sh for more details.)
 #	A. Dougherty  Tue Oct 30 10:20:07 EST 2001
 #
-if ($Config{'archname'} =~ /[34]4[0-9][0-9]-svr4/) {
+if ($Config{'archname'} =~ m/[34]4[0-9][0-9]-svr4/) {
     $self->{LIBS} = ['-lm -posix -lcposix -lmw'];
 }
 # A better NCR MP-RAS test, thanks to W. Geoffrey Rommel, is to
@@ -20,6 +20,6 @@ elsif( -e '/etc/issue' && -e '/etc/.relid') {
     $self->{LIBS} = ['-lm -posix -lcposix -lmw'];
 }
 # Not sure what OS this one is.
-elsif ($Config{archname} =~ /RM\d\d\d-svr4/) {
+elsif ($Config{archname} =~ m/RM\d\d\d-svr4/) {
     $self->{LIBS} = ['-lm -lc -lposix -lcposix'];
 }

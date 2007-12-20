@@ -78,7 +78,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     };
 
     if ( !$@ && @warnings == 1
-             && $warnings[0] =~ /lib is not a plain file/
+             && $warnings[0] =~ m/lib is not a plain file/
              && defined($num_warnings)
              && $num_warnings == 1 )
     {
@@ -109,9 +109,9 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     };
 
     if ( !$@ && @warnings == 3
-             && $warnings[0] =~ /lib is not a plain file/
-             && $warnings[1] =~ /README is not a directory/
-             && $warnings[2] =~ /my warning: lib/
+             && $warnings[0] =~ m/lib is not a plain file/
+             && $warnings[1] =~ m/README is not a directory/
+             && $warnings[2] =~ m/my warning: lib/
              && defined($num_warnings)
              && $num_warnings == 3 )
     {
@@ -146,8 +146,8 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     };
 
     if ( !$@ && @warnings == 2
-             && $warnings[0] =~ /Spec is not a plain file/
-             && $warnings[1] =~ /INSTALL is not a directory/
+             && $warnings[0] =~ m/Spec is not a plain file/
+             && $warnings[1] =~ m/INSTALL is not a directory/
              && defined($num_warnings)
              && $num_warnings == 2 )
     {
@@ -171,7 +171,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( $@ && $@ =~ /lib is not a plain file/
+    if ( $@ && $@ =~ m/lib is not a plain file/
             && not defined $num_warnings )
     {
         ok(1);
@@ -194,7 +194,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( $@ && $@ =~ /yadda lib yadda/
+    if ( $@ && $@ =~ m/yadda lib yadda/
             && not defined $num_warnings )
     {
         ok(1);
@@ -232,7 +232,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( $@ =~ /syntax error/) {
+    if ( $@ =~ m/syntax error/) {
 	# We got a syntax error for a malformed file query
         ok(1);
     } else {

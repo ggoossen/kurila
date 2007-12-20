@@ -359,7 +359,7 @@ sub _get_install_skip {
             my @patterns;
             while ( ~< $fh) {
                 chomp;
-                next if /^\s*(?:#|$)/;
+                next if m/^\s*(?:#|$)/;
                 print "\tSkip pattern: $_\n" if $verbose+>3;
                 push @patterns, $_;
             }
@@ -609,7 +609,7 @@ sub install { #XXX OS-SPECIFIC
             my $sourcefile = File::Spec->catfile($sourcedir, $origfile);
 
             for my $pat (@$skip) {
-                if ( $sourcefile=~/$pat/ ) {
+                if ( $sourcefile=~m/$pat/ ) {
                     print "Skipping $targetfile (filtered)\n"
                         if $verbose+>1;
                     return;
@@ -995,7 +995,7 @@ sub pm_to_blib {
         #    -- RAM, 03/01/2001
 
         my $need_filtering = defined $pm_filter && length $pm_filter &&
-                             $from =~ /\.pm$/;
+                             $from =~ m/\.pm$/;
 
         if (!$need_filtering && 0 == compare($from,$to)) {
             print "Skip $to (unchanged)\n";
@@ -1070,7 +1070,7 @@ sub _invokant {
 
     my $builder;
     my $top = pop @stack;
-    if ($top =~ /^Build/i || exists($INC{'Module/Build.pm'})) {
+    if ($top =~ m/^Build/i || exists($INC{'Module/Build.pm'})) {
         $builder = 'Module::Build';
     } else {
         $builder = 'ExtUtils::MakeMaker';

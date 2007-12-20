@@ -13,7 +13,7 @@ BEGIN {
 	unshift @INC, 't';
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ /\bB\b/) ){
+    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -44,7 +44,7 @@ while ( ~< *DATA) {
     s/#\s*(.*)$//mg;
     my ($num, $testname) = $1 =~ m/(\d+)\s*(.*)/;
     my ($input, $expected);
-    if (/(.*)\n>>>>\n(.*)/s) {
+    if (m/(.*)\n>>>>\n(.*)/s) {
 	($input, $expected) = ($1, $2);
     }
     else {

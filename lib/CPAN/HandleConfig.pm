@@ -138,7 +138,7 @@ sub edit {
         # one day I used randomize_urllist for a boolean, so we must
         # list them explicitly --ak
         if (0) {
-        } elsif ($o =~ /^(wait_list|urllist|dontload_list)$/) {
+        } elsif ($o =~ m/^(wait_list|urllist|dontload_list)$/) {
 
             #
             # ARRAYS
@@ -182,7 +182,7 @@ sub edit {
                     $CPAN::META->{dontload_hash} = {};
                 }
             }
-        } elsif ($o =~ /_hash$/) {
+        } elsif ($o =~ m/_hash$/) {
 
             #
             # HASHES
@@ -289,7 +289,7 @@ Please specify a filename where to save the configuration or try
     }
 
     my $msg;
-    $msg = <<EOF unless $configpm =~ /MyConfig/;
+    $msg = <<EOF unless $configpm =~ m/MyConfig/;
 
 # This is CPAN.pm's systemwide configuration file. This file provides
 # defaults for users, and the values can be changed in a per-user
@@ -425,8 +425,8 @@ else: quote it with the correct quote type for the box we're on
 
         if ($quote ne ' '
             and defined($command )
-            and $command =~ /\s/
-            and $command !~ /[$quote]/) {
+            and $command =~ m/\s/
+            and $command !~ m/[$quote]/) {
             return qq<$use_quote$command$use_quote>
         }
         return $command;
@@ -629,7 +629,7 @@ sub cpl {
     if (
         defined($words[2])
         and
-        $words[2] =~ /list$/
+        $words[2] =~ m/list$/
         and
         (
         @words == 3
@@ -637,7 +637,7 @@ sub cpl {
         @words == 4 && length($word)
         )
        ) {
-        return grep /^\Q$word\E/, qw(splice shift unshift pop push);
+        return grep m/^\Q$word\E/, qw(splice shift unshift pop push);
     } elsif (defined($words[2])
              and
              $words[2] eq "init"
@@ -647,7 +647,7 @@ sub cpl {
              ||
              @words +>= 4 && length($word)
             )) {
-        return sort grep /^\Q$word\E/, keys %keys;
+        return sort grep m/^\Q$word\E/, keys %keys;
     } elsif (@words +>= 4) {
         return ();
     }
@@ -656,7 +656,7 @@ sub cpl {
         keys %can,
             keys %$CPAN::Config,
                 keys %keys;
-    return grep /^\Q$word\E/, @o_conf;
+    return grep m/^\Q$word\E/, @o_conf;
 }
 
 sub prefs_lookup {

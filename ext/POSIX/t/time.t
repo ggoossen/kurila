@@ -23,7 +23,7 @@ SKIP: {
     my @tzname = tzname();
     like($tzname[0], qr/(GMT|UTC)/i, "tzset() to GMT/UTC");
     SKIP: {
-        skip "Mac OS X/Darwin doesn't handle this", 1 if $^O =~ /darwin/i;
+        skip "Mac OS X/Darwin doesn't handle this", 1 if $^O =~ m/darwin/i;
         like($tzname[1], qr/(GMT|UTC)/i, "The whole year?");
     }
 }

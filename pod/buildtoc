@@ -82,10 +82,10 @@ open MASTER, $masterpodfile or die "$0: Can't open $masterpodfile: $!";
 my ($delta_source, $delta_target);
 
 foreach ( ~< *MASTER) {
-  next if /^\#/;
+  next if m/^\#/;
 
   # At least one upper case letter somewhere in the first group
-  if (/^(\S+)\s(.*)/ && $1 =~ tr/h//) {
+  if (m/^(\S+)\s(.*)/ && $1 =~ tr/h//) {
     # it's a heading
     my $flags = $1;
     $flags =~ tr/h//d;
@@ -95,7 +95,7 @@ foreach ( ~< *MASTER) {
     die "$0: Unknown flag found in heading line: $_" if length $flags;
     push @Master, [\%flags, $2];
 
-  } elsif (/^(\S*)\s+(\S+)\s+(.*)/) {
+  } elsif (m/^(\S*)\s+(\S+)\s+(.*)/) {
     # it's a section
     my ($flags, $filename, $desc) = ($1, $2, $3);
 
@@ -125,7 +125,7 @@ foreach ( ~< *MASTER) {
     }
     die "$0: Unknown flag found in section line: $_" if length $flags;
     push @Master, [\%flags, $filename, $desc];
-  } elsif (/^$/) {
+  } elsif (m/^$/) {
     push @Master, undef;
   } else {
     die "$0: Malformed line: $_" if $1 =~ tr/A-Z//;
@@ -185,10 +185,10 @@ close MASTER;
   my $in_perlpod;
   open(PERLPOD, "perl.pod") || die "$0: opening perl.pod failed: $!\n";
   while ( ~< *PERLPOD) {
-    $in_perlpod ||= /^For ease of access/;
-    $in_perlpod &&= ! /^\(If you're intending /;
+    $in_perlpod ||= m/^For ease of access/;
+    $in_perlpod &&= ! m/^\(If you're intending /;
     if ($in_perlpod) {
-      if (/^\s+((?:perl|kurila)\S*)\s+\w/) {
+      if (m/^\s+((?:perl|kurila)\S*)\s+\w/) {
 	push @perlpods, "$1.pod";
       }
     }
@@ -226,7 +226,7 @@ close MASTER;
   find \&getpods => qw(../lib ../ext);
 
   sub getpods {
-    if (/\.p(od|m)$/) {
+    if (m/\.p(od|m)$/) {
       my $file = $File::Find::name;
       return if $file eq '../lib/Pod/Functions.pm'; # Used only by pod itself
       return if $file =~ m!(?:^|/)t/!;
@@ -237,7 +237,7 @@ close MASTER;
       return if $file =~ m!XS/(?:APItest|Typemap)!;
       my $pod = $file;
       return if $pod =~ s/pm$/pod/ && -e $pod;
-      die "$0: tut $File::Find::name" if $file =~ /TUT/;
+      die "$0: tut $File::Find::name" if $file =~ m/TUT/;
       unless (open (F, "< $_\0")) {
 	warn "$0: bogus <$file>: $!";
 	system "ls", "-l", $file;
@@ -245,7 +245,7 @@ close MASTER;
       else {
 	my $line;
 	while ($line = ~< *F) {
-	  if ($line =~ /^=head1\s+NAME\b/) {
+	  if ($line =~ m/^=head1\s+NAME\b/) {
 	    push @modpods, $file;
 	    #warn "GOOD $file\n";
 	    return;
@@ -262,7 +262,7 @@ close MASTER;
   for (@modpods) {
     #($name) = /(\w+)\.p(m|od)$/;
     my $name = path2modname($_);
-    if ($name =~ /^[a-z]/) {
+    if ($name =~ m/^[a-z]/) {
       $Pragmata{$name} = $_;
     } else {
       if ($done{$name}++) {
@@ -383,7 +383,7 @@ sub podset {
 	    unhead1();
 	    output "\n \n\n=head2 ";
 	    $_ = ~< *ARGV;
-	    if ( /^\s*$pod\b/ ) {
+	    if ( m/^\s*$pod\b/ ) {
 		s/$pod\.pm/$pod/;       # '.pm' in NAME !?
 		output $_;
 	    } else {
@@ -410,8 +410,8 @@ sub podset {
 	    s/^\s*\*\s*//;
 	    s/\n/ /g;
 	    s/\s+$//;
-	    next if /^[\d.]+$/;
-	    next if $pod eq 'perlmodlib' && /^ftp:/;
+	    next if m/^[\d.]+$/;
+	    next if $pod eq 'perlmodlib' && m/^ftp:/;
 	    ##print "=over 4\n\n" unless $initem;
 	    output ", " if $initem;
 	    $initem = 1;
@@ -469,7 +469,7 @@ sub output ($) {
 		$NEWLINE++;
 	    }
 	}
-	elsif (/\S/ && length) {
+	elsif (m/\S/ && length) {
 	    $LINE .= $_;
 	    $NEWLINE = 0;
 	}
@@ -600,7 +600,7 @@ sub do_manifest {
 sub do_nmake {
   my $name = shift;
   my $makefile = join '', @_;
-  die "$0: $name contains NUL bytes" if $makefile =~ /\0/;
+  die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
   $makefile =~ s/^\tcopy \.\.\\README.*\n/\0/gm;
   my $sections = () = $makefile =~ m/\0+/g;
   die "$0: $name contains no README copies" if $sections +< 1;
@@ -647,7 +647,7 @@ sub do_podmak {
 sub do_vms {
   my $name = shift;
   my $makefile = join '', @_;
-  die "$0: $name contains NUL bytes" if $makefile =~ /\0/;
+  die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
   $makefile =~ s/\npod\d* =[^\n]*/\0/gs;
   my $sections = () = $makefile =~ m/\0+/g;
   die "$0: $name contains no pod assignments" if $sections +< 1;
@@ -655,7 +655,7 @@ sub do_vms {
     if $sections +> 1;
   $makefile =~ s/\0+/join "\n", '', &generate_descrip_mms_1/se;
 
-  die "$0: $name contains NUL bytes" if $makefile =~ /\0/;
+  die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
 
 # Looking for rules like this
 # [.lib.pods]perl.pod : [.pod]perl.pod
@@ -677,7 +677,7 @@ sub do_vms {
 sub do_unix {
   my $name = shift;
   my $makefile_SH = join '', @_;
-  die "$0: $name contains NUL bytes" if $makefile_SH =~ /\0/;
+  die "$0: $name contains NUL bytes" if $makefile_SH =~ m/\0/;
 
   $makefile_SH =~ s/\n\s+-\@test -f \S+ && cd pod && \$\(LNS\) \S+ \S+ && cd \.\. && echo "\S+" >> extra.pods \# See buildtoc\n/\0/gm;
 

@@ -367,7 +367,7 @@ sub init_formatter_class_list {
   $self->opt_o_with('text');
   $self->opt_o_with('man') unless IS_MSWin32 || IS_Dos
        || !($ENV{TERM} && (
-              ($ENV{TERM} || '') !~ /dumb|emacs|none|unknown/i
+              ($ENV{TERM} || '') !~ m/dumb|emacs|none|unknown/i
            ));
 
   return;
@@ -740,7 +740,7 @@ sub grand_search_init {
         }
         else {
             # no match, try recursive search
-            @searchdirs = grep(!/^\.\z/s,@INC);
+            @searchdirs = grep(!m/^\.\z/s,@INC);
             @files= $self->searchfor(1,$_,@searchdirs) if $self->opt_r;
             if (@files) {
                 $self->aside( "Loosely found as @files\n" );
@@ -753,7 +753,7 @@ sub grand_search_init {
                     for my $dir (@{ $self->{'found'} }) {
                         opendir(DIR, $dir) or die "opendir $dir: $!";
                         while (my $file = readdir(DIR)) {
-                            next if ($file =~ /^\./s);
+                            next if ($file =~ m/^\./s);
                             $file =~ s/\.(pm|pod)\z//;  # XXX: badfs
                             print STDERR "\tperldoc $_\::$file\n";
                         }
@@ -865,7 +865,7 @@ sub search_perlfunc {
         or die("Can't open $perlfunc: $!");
 
     # Functions like -r, -e, etc. are listed under `-X'.
-    my $search_re = ($self->opt_f =~ /^-[rwxoRWXOeszfdlpSbctugkTBMAC]$/)
+    my $search_re = ($self->opt_f =~ m/^-[rwxoRWXOeszfdlpSbctugkTBMAC]$/)
                         ? '(?:I<)?-X' : quotemeta($self->opt_f) ;
 
     DEBUG +> 2 and
@@ -880,7 +880,7 @@ sub search_perlfunc {
     # Skip introduction
     local $_;
     while ( ~< *PFUNC) {
-        last if /^=head2 $re/;
+        last if m/^=head2 $re/;
     }
 
     # Look for our function
@@ -890,18 +890,18 @@ sub search_perlfunc {
         if ( m/^=item\s+$search_re\b/ )  {
             $found = 1;
         }
-        elsif (/^=item/) {
+        elsif (m/^=item/) {
             last if $found +> 1 and not $inlist;
         }
         next unless $found;
-        if (/^=over/) {
+        if (m/^=over/) {
             ++$inlist;
         }
-        elsif (/^=back/) {
+        elsif (m/^=back/) {
             --$inlist;
         }
         push @$pod, $_;
-        ++$found if /^\w/;        # found descriptive text
+        ++$found if m/^\w/;        # found descriptive text
     }
     if (!@$pod) {
         die sprintf
@@ -933,7 +933,7 @@ EOD
 
     local $_;
     foreach my $file (@$found_things) {
-        die "invalid file spec: $!" if $file =~ /[<>|]/;
+        die "invalid file spec: $!" if $file =~ m/[<>|]/;
         open(INFAQ, "<", $file)  # XXX 5.6ism
          or die "Can't read-open $file: $!\nAborting";
         while ( ~< *INFAQ) {
@@ -941,7 +941,7 @@ EOD
                 $found = 1;
                 push @$pod, "=head1 Found in $file\n\n" unless $found_in{$file}++;
             }
-            elsif (/^=head[12]/) {
+            elsif (m/^=head[12]/) {
                 $found = 0;
             }
             next unless $found;
@@ -1409,7 +1409,7 @@ sub check_file {
 
 sub containspod {
     my($self, $file, $readit) = @_;
-    return 1 if !$readit && $file =~ /\.pod\z/i;
+    return 1 if !$readit && $file =~ m/\.pod\z/i;
 
 
     #  Under cygwin the /usr/bin/perl is legal executable, but
@@ -1434,7 +1434,7 @@ sub containspod {
     local($_);
     open(TEST,"<", $file) 	or die "Can't open $file: $!";   # XXX 5.6ism
     while ( ~< *TEST) {
-	if (/^=head/) {
+	if (m/^=head/) {
 	    close(TEST) 	or die "Can't close $file: $!";
 	    return 1;
 	}
@@ -1607,8 +1607,8 @@ sub searchfor {
 	if ($recurse) {
 	    opendir(D,$dir)	or die "Can't opendir $dir: $!";
 	    my @newdirs = map catfile($dir, $_), grep {
-		not /^\.\.?\z/s and
-		not /^auto\z/s  and   # save time! don't search auto dirs
+		not m/^\.\.?\z/s and
+		not m/^auto\z/s  and   # save time! don't search auto dirs
 		-d  catfile($dir, $_)
 	    } readdir D;
 	    closedir(D)		or die "Can't closedir $dir: $!";

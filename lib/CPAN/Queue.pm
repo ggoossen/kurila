@@ -117,7 +117,7 @@ sub jumpqueue {
         # treat it as commandline
         $what[0]{reqtype} = "c";
     }
-    my $inherit_reqtype = $what[0]{reqtype} =~ /^(c|r)$/ ? "r" : "b";
+    my $inherit_reqtype = $what[0]{reqtype} =~ m/^(c|r)$/ ? "r" : "b";
   WHAT: for my $what_tuple (@what) {
         my($what,$reqtype) = @$what_tuple{qw(qmod reqtype)};
         if ($reqtype eq "r"

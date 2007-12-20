@@ -242,7 +242,7 @@ if ($can_fork) {
     # with each module chaining the next one down to 0. If it works, then we
     # can safely nest subprocesses
     push @INC, sub {
-	return unless $_[1] =~ /^BBBLPLAST(\d+)\.pm/;
+	return unless $_[1] =~ m/^BBBLPLAST(\d+)\.pm/;
 	my $pid = open my $fh, "-|";
 	if ($pid) {
 	    # Parent
@@ -270,7 +270,7 @@ if ($can_fork) {
     is ("@::bbblplast", "0 1 2 3 4 5", "All ran");
 
     foreach (keys %INC) {
-	delete $INC{$_} if /^BBBLPLAST/;
+	delete $INC{$_} if m/^BBBLPLAST/;
     }
 
     @::bbblplast = ();

@@ -84,7 +84,7 @@ sub is_static
 sub find_ext
 {
     opendir my $dh, '.';
-    my @items = grep { !/^\.\.?$/ } readdir $dh;
+    my @items = grep { !m/^\.\.?$/ } readdir $dh;
     closedir $dh;
     for my $xxx (@items) {
         if ($xxx ne "DynaLoader") {

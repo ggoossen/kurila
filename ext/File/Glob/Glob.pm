@@ -62,7 +62,7 @@ sub import {
     require Exporter;
     my $i = 1;
     while ($i +< @_) {
-	if ($_[$i] =~ /^:(case|nocase|globally)$/) {
+	if ($_[$i] =~ m/^:(case|nocase|globally)$/) {
 	    splice(@_, $i, 1);
 	    $DEFAULT_FLAGS ^&^= ^~^GLOB_NOCASE() if $1 eq 'case';
 	    $DEFAULT_FLAGS ^|^= GLOB_NOCASE() if $1 eq 'nocase';
@@ -94,7 +94,7 @@ sub GLOB_CSH () {
 }
 
 $DEFAULT_FLAGS = GLOB_CSH();
-if ($^O =~ /^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
+if ($^O =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
     $DEFAULT_FLAGS ^|^= GLOB_NOCASE();
 }
 
@@ -129,7 +129,7 @@ sub csh_glob {
     $pat =~ s/^\s+//;	# Protect against empty elements in
     $pat =~ s/\s+$//;	# things like < *.c> and <*.c >.
 			# These alone shouldn't trigger ParseWords.
-    if ($pat =~ /\s/) {
+    if ($pat =~ m/\s/) {
         # XXX this is needed for compatibility with the csh
 	# implementation in Perl.  Need to support a flag
 	# to disable this behavior.

@@ -75,7 +75,7 @@ sub import {
                 eval "require $base";
                 # Only ignore "Can't locate" errors from our eval require.
                 # Other fatal errors (syntax etc) must be reported.
-                die if $@ && $@ !~ /^Can't locate .*? at \(eval /;
+                die if $@ && $@ !~ m/^Can't locate .*? at \(eval /;
                 unless (%{*{Symbol::fetch_glob("$base\::")}}) {
                     require Carp;
                     local $" = " ";

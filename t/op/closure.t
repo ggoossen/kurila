@@ -488,7 +488,7 @@ END
 	  }
 	  print $output;
 	  print STDERR $errors;
-	  if ($debugging && ($errors || $? || ($output =~ /not ok/))) {
+	  if ($debugging && ($errors || $? || ($output =~ m/not ok/))) {
 	    my $lnum = 0;
 	    for $line (split '\n', $code) {
 	      printf "%3d:  %s\n", ++$lnum, $line;

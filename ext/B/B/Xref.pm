@@ -148,7 +148,7 @@ sub load_pad {
     for ($ix = 1; $ix +< @namelist; $ix++) {
 	my $namesv = $namelist[$ix];
 	next if class($namesv) eq "SPECIAL";
-	my ($type, $name) = $namesv->PV =~ /^(.)([^\0]*)(\0.*)?$/;
+	my ($type, $name) = $namesv->PV =~ m/^(.)([^\0]*)(\0.*)?$/;
 	$pad[$ix] = ["(lexical)", $type || '?', $name || '?'];
     }
     if ($Config{useithreads}) {
@@ -172,7 +172,7 @@ sub xref {
 	warn sprintf("top = [%s, %s, %s]\n", @$top) if $debug_top;
 	warn peekop($op), "\n" if $debug_op;
 	my $opname = $op->name;
-	if ($opname =~ /^(or|and|mapwhile|grepwhile|range|cond_expr)$/) {
+	if ($opname =~ m/^(or|and|mapwhile|grepwhile|range|cond_expr)$/) {
 	    xref($op->other);
 	} elsif ($opname eq "match" || $opname eq "subst") {
 	    xref($op->pmreplstart);
@@ -370,7 +370,7 @@ sub compile {
     my ($option, $opt, $arg);
   OPTION:
     while ($option = shift @options) {
-	if ($option =~ /^-(.)(.*)/) {
+	if ($option =~ m/^-(.)(.*)/) {
 	    $opt = $1;
 	    $arg = $2;
 	} else {
@@ -405,7 +405,7 @@ sub compile {
 	    my $objname;
 	    xref_definitions();
 	    foreach $objname (@options) {
-		$objname = "main::$objname" unless $objname =~ /::/;
+		$objname = "main::$objname" unless $objname =~ m/::/;
 		eval "xref_object(\\&$objname)";
 		die "xref_object(\\&$objname) failed: $@" if $@;
 	    }

@@ -11,7 +11,7 @@ use Fatal qw(open close :void opendir sin);
 
 my $i = 1;
 eval { open *FOO, '<lkjqweriuapofukndajsdlfjnvcvn' };
-print "not " unless $@ =~ /^Can't open/;
+print "not " unless $@ =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
 
 my $foo = 'FOO';
@@ -28,9 +28,9 @@ for ("*$foo", "\\*$foo") {
 }
 
 eval { opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
-print "not " unless $@ =~ /^Can't open/;
+print "not " unless $@ =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
 
 eval { my $a = opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
-print "not " if $@ =~ /^Can't open/;
+print "not " if $@ =~ m/^Can't open/;
 print "ok $i\n"; ++$i;

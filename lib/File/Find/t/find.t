@@ -296,7 +296,7 @@ sub file_path {
 
 sub file_path_name {
     my $path = file_path(@_);
-    $path = ":$path" if (($^O eq 'MacOS') && ($path !~ /:/));
+    $path = ":$path" if (($^O eq 'MacOS') && ($path !~ m/:/));
     return $path;
 }
 

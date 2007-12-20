@@ -24,7 +24,7 @@ use Getopt::Long;
 my %MANIFEST;
 if (open(MANIFEST, "MANIFEST")) {
     while ( ~< *MANIFEST) {
-	if (/^(\S+)\t+(.+)$/) {
+	if (m/^(\S+)\t+(.+)$/) {
 	    $MANIFEST{$1}++;
 	}
     }
@@ -132,10 +132,10 @@ sub show_results {
 
     if ($Maintainer) {
 	for my $m (sort keys %Maintainers) {
-	    if ($m =~ /$Maintainer/io || $Maintainers{$m} =~ /$Maintainer/io) {
+	    if ($m =~ m/$Maintainer/io || $Maintainers{$m} =~ m/$Maintainer/io) {
 		my @modules = get_maintainer_modules($m);
 		if ($Module) {
-		    @modules = grep { /$Module/io } @modules;
+		    @modules = grep { m/$Module/io } @modules;
 		}
 		if ($Files) {
 		    my @files;
@@ -154,7 +154,7 @@ sub show_results {
 	}
     } elsif ($Module) {
 	for my $m (sort { lc $a cmp lc $b } keys %Modules) {
-	    if ($m =~ /$Module/io) {
+	    if ($m =~ m/$Module/io) {
 		if ($Files) {
 		    my @files = get_module_files($m);
 		    printf "%-15s @files\n", $m;
@@ -274,7 +274,7 @@ sub missing_maintainers {
     maintainers_files();
     my @dir;
     for (@path) { if( -d ) { push @dir, $_ } else { warn_maintainer() } }
-    find sub { warn_maintainer($File::Find::name) if /$check/; }, @dir
+    find sub { warn_maintainer($File::Find::name) if m/$check/; }, @dir
 	if @dir;
 }
 

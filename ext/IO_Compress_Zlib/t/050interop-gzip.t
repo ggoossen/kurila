@@ -86,8 +86,8 @@ sub writeWithGzip
 BEGIN {
 
     # Check external gzip is available
-    my $name = $^O =~ /mswin/i ? 'gzip.exe' : 'gzip';
-    my $split = $^O =~ /mswin/i ? ";" : ":";
+    my $name = $^O =~ m/mswin/i ? 'gzip.exe' : 'gzip';
+    my $split = $^O =~ m/mswin/i ? ";" : ":";
 
     for my $dir (reverse split $split, $ENV{PATH})    
     {

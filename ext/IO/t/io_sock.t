@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -15,13 +15,13 @@ BEGIN {
     my $can_fork = $Config{d_fork} ||
 		    (($^O eq 'MSWin32' || $^O eq 'NetWare') and
 		     $Config{useithreads} and 
-		     $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/
+		     $Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
 		    );
     my $reason;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bSocket\b/) {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bSocket\b/) {
 	$reason = 'Socket extension unavailable';
     }
-    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
+    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
 	$reason = 'IO extension unavailable';
     }
     elsif (!$can_fork) {
@@ -114,8 +114,8 @@ if($pid = fork()) {
     while (1) {
        last SERVER_LOOP unless $sock = $listen->accept;
        while ( ~< $sock) {
-           last SERVER_LOOP if /^quit/;
-           last if /^done/;
+           last SERVER_LOOP if m/^quit/;
+           last if m/^done/;
            print;
        }
        $sock = undef;
@@ -294,7 +294,7 @@ if( $server_pid) {
 	if ($has_perlio) {
 	    $sock->print("ping \x{100}\n");
 	    chomp(my $pong = scalar ~< $sock);
-	    print $pong =~ /^pong (.+)$/ && $1 eq "\x{100}" ?
+	    print $pong =~ m/^pong (.+)$/ && $1 eq "\x{100}" ?
 		"ok 20\n" : "not ok 20\n";
 
 	    $sock->print("ord \x{100}\n");
@@ -355,21 +355,21 @@ if( $server_pid) {
 	# a race condition with our client, just die if we fail.
 	if ($has_perlio) { binmode($sock, ":utf8") or die }
 	while ( ~< $sock) {
-	    last SERVER_LOOP if /^quit/;
-	    last if /^done/;
-	    if (/^ping (.+)/) {
+	    last SERVER_LOOP if m/^quit/;
+	    last if m/^done/;
+	    if (m/^ping (.+)/) {
 		print $sock "pong $1\n";
 		next;
 	    }
-	    if (/^ord (.+)/) {
+	    if (m/^ord (.+)/) {
 		print $sock ord($1), "\n";
 		next;
 	    }
-	    if (/^chr (.+)/) {
+	    if (m/^chr (.+)/) {
 		print $sock chr(hex($1)), "\n";
 		next;
 	    }
-	    if (/^send/) {
+	    if (m/^send/) {
 		print $sock @data;
 		last;
 	    }

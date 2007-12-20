@@ -48,8 +48,8 @@ while ( ~< *ARGV) {
     } elsif ($type eq 'Subsection') {
 	print ".br\n", $page, "\t\t", $desc;
     } elsif ($type eq 'Item') {
-	next if $desc =~ /\\bu/;
-	next unless $name =~ /POSIX|func/i;
+	next if $desc =~ m/\\bu/;
+	next unless $name =~ m/POSIX|func/i;
 	print ".br\n", $page, "\t\t\t", $desc;
     }
 } 

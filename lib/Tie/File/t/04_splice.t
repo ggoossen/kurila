@@ -159,7 +159,7 @@ check_contents("I$:like$:pie$:pie pie pie$:");
 
 # (97) Splicing with too large a negative number should be fatal
   eval { splice(@a, -7, 0) };
-  print $@ =~ /^Modification of non-creatable array value attempted, subscript -7/
+  print $@ =~ m/^Modification of non-creatable array value attempted, subscript -7/
       ? "ok $N\n" : "not ok $N \# \$\@ was '$@'\n";
 $N++;
        

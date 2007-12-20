@@ -77,7 +77,7 @@ sub _sock_info {
   $port = $1
 	if(defined $addr && $addr =~ s,:([\w\(\)/]+)$,,);
 
-  if(defined $proto  && $proto =~ /\D/) {
+  if(defined $proto  && $proto =~ m/\D/) {
     my $num = _get_proto_number($proto);
     unless (defined $num) {
       $@ = "Bad protocol '$proto'";
@@ -114,7 +114,7 @@ sub _error {
     {
       local($!);
       my $title = ref($sock).": ";
-      $@ = join("", $_[0] =~ /^$title/ ? "" : $title, @_);
+      $@ = join("", $_[0] =~ m/^$title/ ? "" : $title, @_);
       $sock->close()
 	if(defined fileno($sock));
     }
@@ -125,7 +125,7 @@ sub _error {
 sub _get_addr {
     my($sock,$addr_str, $multi) = @_;
     my @addr;
-    if ($multi && $addr_str !~ /^\d+(?:\.\d+){3}$/) {
+    if ($multi && $addr_str !~ m/^\d+(?:\.\d+){3}$/) {
 	(undef, undef, undef, undef, @addr) = gethostbyname($addr_str);
     } else {
 	my $h = inet_aton($addr_str);

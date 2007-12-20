@@ -517,7 +517,7 @@ sub init {
     use Config;
     # extra args after 'o conf init'
     my $matcher = $args{args} && @{$args{args}} ? $args{args}[0] : '';
-    if ($matcher =~ /^\/(.*)\/$/) {
+    if ($matcher =~ m/^\/(.*)\/$/) {
         # case /regex/ => take the first, ignore the rest
         $matcher = $1;
         shift @{$args{args}};
@@ -576,12 +576,12 @@ sub init {
     } else {
         my $_conf = prompt("Would you like me to configure as much as possible ".
                            "automatically?", "yes");
-        $manual_conf = ($_conf and $_conf =~ /^y/i) ? "no" : "yes";
+        $manual_conf = ($_conf and $_conf =~ m/^y/i) ? "no" : "yes";
     }
     CPAN->debug("manual_conf[$manual_conf]") if $CPAN::DEBUG;
     my $fastread;
     {
-        if ($manual_conf =~ /^y/i) {
+        if ($manual_conf =~ m/^y/i) {
             $fastread = 0;
         } else {
             $fastread = 1;
@@ -626,10 +626,10 @@ sub init {
                        cpan_home
                        keep_source_where
                        prefs_dir
-                      } =~ /$matcher/) {
+                      } =~ m/$matcher/) {
         $CPAN::Frontend->myprint($prompts{config_intro});
 
-        if (!$matcher or 'cpan_home' =~ /$matcher/) {
+        if (!$matcher or 'cpan_home' =~ m/$matcher/) {
             my $cpan_home = $CPAN::Config->{cpan_home}
                 || File::Spec->catdir($ENV{HOME}, ".cpan");
 
@@ -655,7 +655,7 @@ Shall we use it as the general CPAN build and cache directory?
                 if (File::Spec->file_name_is_absolute($ans)) {
                     my @cpan_home = split /[\/\\]/, $ans;
                   DIR: for my $dir (@cpan_home) {
-                        if ($dir =~ /^~/ and (!$last_ans or $ans ne $last_ans)) {
+                        if ($dir =~ m/^~/ and (!$last_ans or $ans ne $last_ans)) {
                             $CPAN::Frontend
                                 ->mywarn("Warning: a tilde in the path will be ".
                                          "taken as a literal tilde. Please ".
@@ -693,25 +693,25 @@ Shall we use it as the general CPAN build and cache directory?
             $CPAN::Config->{cpan_home} = $ans;
         }
 
-        if (!$matcher or 'keep_source_where' =~ /$matcher/) {
+        if (!$matcher or 'keep_source_where' =~ m/$matcher/) {
             my_dflt_prompt("keep_source_where",
                            File::Spec->catdir($CPAN::Config->{cpan_home},"sources"),
                            $matcher,
                           );
         }
 
-        if (!$matcher or 'build_dir' =~ /$matcher/) {
+        if (!$matcher or 'build_dir' =~ m/$matcher/) {
             my_dflt_prompt("build_dir",
                            File::Spec->catdir($CPAN::Config->{cpan_home},"build"),
                            $matcher
                           );
         }
 
-        if (!$matcher or 'build_dir_reuse' =~ /$matcher/) {
+        if (!$matcher or 'build_dir_reuse' =~ m/$matcher/) {
             my_yn_prompt(build_dir_reuse => 1, $matcher);
         }
 
-        if (!$matcher or 'prefs_dir' =~ /$matcher/) {
+        if (!$matcher or 'prefs_dir' =~ m/$matcher/) {
             my_dflt_prompt("prefs_dir",
                            File::Spec->catdir($CPAN::Config->{cpan_home},"prefs"),
                            $matcher
@@ -729,16 +729,16 @@ Shall we use it as the general CPAN build and cache directory?
     #= Cache size, Index expire
     #
 
-    if (!$matcher or 'build_cache' =~ /$matcher/) {
+    if (!$matcher or 'build_cache' =~ m/$matcher/) {
         # large enough to build large dists like Tk
         my_dflt_prompt(build_cache => 100, $matcher);
     }
 
-    if (!$matcher or 'index_expire' =~ /$matcher/) {
+    if (!$matcher or 'index_expire' =~ m/$matcher/) {
         my_dflt_prompt(index_expire => 1, $matcher);
     }
 
-    if (!$matcher or 'scan_cache' =~ /$matcher/) {
+    if (!$matcher or 'scan_cache' =~ m/$matcher/) {
         my_prompt_loop(scan_cache => 'atstart', $matcher, 'atstart|never');
     }
 
@@ -753,12 +753,12 @@ Shall we use it as the general CPAN build and cache directory?
     #= Do we follow PREREQ_PM?
     #
 
-    if (!$matcher or 'prerequisites_policy' =~ /$matcher/) {
+    if (!$matcher or 'prerequisites_policy' =~ m/$matcher/) {
         my_prompt_loop(prerequisites_policy => 'ask', $matcher,
                        'follow|ask|ignore');
     }
 
-    if (!$matcher or 'build_requires_install_policy' =~ /$matcher/) {
+    if (!$matcher or 'build_requires_install_policy' =~ m/$matcher/) {
         my_prompt_loop(build_requires_install_policy => 'ask/yes', $matcher,
                        'yes|no|ask/yes|ask/no');
     }
@@ -766,14 +766,14 @@ Shall we use it as the general CPAN build and cache directory?
     #
     #= Module::Signature
     #
-    if (!$matcher or 'check_sigs' =~ /$matcher/) {
+    if (!$matcher or 'check_sigs' =~ m/$matcher/) {
         my_yn_prompt(check_sigs => 0, $matcher);
     }
 
     #
     #= CPAN::Reporter
     #
-    if (!$matcher or 'test_report' =~ /$matcher/) {
+    if (!$matcher or 'test_report' =~ m/$matcher/) {
         my_yn_prompt(test_report => 0, $matcher);
         if (
             $CPAN::Config->{test_report} &&
@@ -789,7 +789,7 @@ Shall we use it as the general CPAN build and cache directory?
     #
     #= YAML vs. YAML::Syck
     #
-    if (!$matcher or "yaml_module" =~ /$matcher/) {
+    if (!$matcher or "yaml_module" =~ m/$matcher/) {
         my_dflt_prompt(yaml_module => "YAML", $matcher);
         unless ($CPAN::META->has_inst($CPAN::Config->{yaml_module})) {
             $CPAN::Frontend->mywarn
@@ -801,7 +801,7 @@ Shall we use it as the general CPAN build and cache directory?
     #
     #= YAML code deserialisation
     #
-    if (!$matcher or "yaml_load_code" =~ /$matcher/) {
+    if (!$matcher or "yaml_load_code" =~ m/$matcher/) {
         my_yn_prompt(yaml_load_code => 0, $matcher);
     }
 
@@ -820,7 +820,7 @@ Shall we use it as the general CPAN build and cache directory?
                             patch applypatch
                             /;
     my(@path) = split /$Config{'path_sep'}/, $ENV{'PATH'};
-    if (!$matcher or "@external_progs" =~ /$matcher/) {
+    if (!$matcher or "@external_progs" =~ m/$matcher/) {
         $CPAN::Frontend->myprint($prompts{external_progs});
 
         my $old_warn = $^W;
@@ -828,7 +828,7 @@ Shall we use it as the general CPAN build and cache directory?
         local $^W = $old_warn;
         my $progname;
         for $progname (@external_progs) {
-            next if $matcher && $progname !~ /$matcher/;
+            next if $matcher && $progname !~ m/$matcher/;
             if ($^O eq 'MacOS') {
                 $CPAN::Config->{$progname} = 'not_here';
                 next;
@@ -849,7 +849,7 @@ Shall we use it as the general CPAN build and cache directory?
 
                 # warn "Warning: configured $path does not exist\n" unless -e $path;
                 # $path = "";
-            } elsif ($path =~ /^\s+$/) {
+            } elsif ($path =~ m/^\s+$/) {
                 # preserve disabled programs
             } else {
                 $path = '';
@@ -890,7 +890,7 @@ substitute. You can then revisit this dialog with
         }
     }
 
-    if (!$matcher or 'pager' =~ /$matcher/) {
+    if (!$matcher or 'pager' =~ m/$matcher/) {
         my $path = $CPAN::Config->{'pager'} ||
             $ENV{PAGER} || find_exe("less",\@path) ||
                 find_exe("more",\@path) || ($^O eq 'MacOS' ? $ENV{EDITOR} : 0 )
@@ -898,7 +898,7 @@ substitute. You can then revisit this dialog with
         my_dflt_prompt(pager => $path, $matcher);
     }
 
-    if (!$matcher or 'shell' =~ /$matcher/) {
+    if (!$matcher or 'shell' =~ m/$matcher/) {
         my $path = $CPAN::Config->{'shell'};
         if ($path && File::Spec->file_name_is_absolute($path)) {
             $CPAN::Frontend->mywarn("Warning: configured $path does not exist\n")
@@ -919,12 +919,12 @@ substitute. You can then revisit this dialog with
     # verbosity
     #
 
-    if (!$matcher or 'tar_verbosity' =~ /$matcher/) {
+    if (!$matcher or 'tar_verbosity' =~ m/$matcher/) {
         my_prompt_loop(tar_verbosity => 'v', $matcher,
                        'none|v|vv');
     }
 
-    if (!$matcher or 'load_module_verbosity' =~ /$matcher/) {
+    if (!$matcher or 'load_module_verbosity' =~ m/$matcher/) {
         my_prompt_loop(load_module_verbosity => 'v', $matcher,
                        'none|v');
     }
@@ -935,11 +935,11 @@ substitute. You can then revisit this dialog with
     #= Installer, arguments to make etc.
     #
 
-    if (!$matcher or 'prefer_installer' =~ /$matcher/) {
+    if (!$matcher or 'prefer_installer' =~ m/$matcher/) {
         my_prompt_loop(prefer_installer => 'MB', $matcher, 'MB|EUMM|RAND');
     }
 
-    if (!$matcher or 'makepl_arg make_arg' =~ /$matcher/) {
+    if (!$matcher or 'makepl_arg make_arg' =~ m/$matcher/) {
         my_dflt_prompt(makepl_arg => "", $matcher);
         my_dflt_prompt(make_arg => "", $matcher);
     }
@@ -978,7 +978,7 @@ substitute. You can then revisit this dialog with
 
     my @proxy_vars = qw/ftp_proxy http_proxy no_proxy/;
     my @proxy_user_vars = qw/proxy_user proxy_pass/;
-    if (!$matcher or "@proxy_vars @proxy_user_vars" =~ /$matcher/) {
+    if (!$matcher or "@proxy_vars @proxy_user_vars" =~ m/$matcher/) {
         $CPAN::Frontend->myprint($prompts{proxy_intro});
 
         for (@proxy_vars) {
@@ -1020,7 +1020,7 @@ substitute. You can then revisit this dialog with
     #= how cwd works
     #
 
-    if (!$matcher or 'getcwd' =~ /$matcher/) {
+    if (!$matcher or 'getcwd' =~ m/$matcher/) {
         my_prompt_loop(getcwd => 'cwd', $matcher,
                        'cwd|getcwd|fastcwd|backtickcwd');
     }
@@ -1077,7 +1077,7 @@ substitute. You can then revisit this dialog with
     #== term_is_latin
     #
 
-    if (!$matcher or 'term_is_latin' =~ /$matcher/) {
+    if (!$matcher or 'term_is_latin' =~ m/$matcher/) {
         my_yn_prompt(term_is_latin => 1, $matcher);
     }
 
@@ -1085,7 +1085,7 @@ substitute. You can then revisit this dialog with
     #== save history in file 'histfile'
     #
 
-    if (!$matcher or 'histfile histsize' =~ /$matcher/) {
+    if (!$matcher or 'histfile histsize' =~ m/$matcher/) {
         $CPAN::Frontend->myprint($prompts{histfile_intro});
         defined($default = $CPAN::Config->{histfile}) or
             $default = File::Spec->catfile($CPAN::Config->{cpan_home},"histfile");
@@ -1106,8 +1106,8 @@ substitute. You can then revisit this dialog with
     #== verbosity at the end of the r command
     #
     if (!$matcher
-        or 'show_unparsable_versions' =~ /$matcher/
-        or 'show_zero_versions' =~ /$matcher/
+        or 'show_unparsable_versions' =~ m/$matcher/
+        or 'show_zero_versions' =~ m/$matcher/
        ) {
         $CPAN::Frontend->myprint($prompts{show_unparsable_or_zero_versions_intro});
         my_yn_prompt(show_unparsable_versions => 0, $matcher);
@@ -1150,7 +1150,7 @@ sub my_dflt_prompt {
     my $default = $CPAN::Config->{$item} || $dflt;
 
     $DB::single = 1;
-    if (!$m || $item =~ /$m/) {
+    if (!$m || $item =~ m/$m/) {
         if (my $intro = $prompts{$item . "_intro"}) {
             $CPAN::Frontend->myprint($intro);
         }
@@ -1168,13 +1168,13 @@ sub my_yn_prompt {
     defined($default = $CPAN::Config->{$item}) or $default = $dflt;
 
     # $DB::single = 1;
-    if (!$m || $item =~ /$m/) {
+    if (!$m || $item =~ m/$m/) {
         if (my $intro = $prompts{$item . "_intro"}) {
             $CPAN::Frontend->myprint($intro);
         }
         $CPAN::Frontend->myprint(" <$item>\n");
         my $ans = prompt($prompts{$item}, $default ? 'yes' : 'no');
-        $CPAN::Config->{$item} = ($ans =~ /^[y1]/i ? 1 : 0);
+        $CPAN::Config->{$item} = ($ans =~ m/^[y1]/i ? 1 : 0);
         print "\n";
     } else {
         $CPAN::Config->{$item} = $default;
@@ -1187,11 +1187,11 @@ sub my_prompt_loop {
     my $ans;
 
     $DB::single = 1;
-    if (!$m || $item =~ /$m/) {
+    if (!$m || $item =~ m/$m/) {
         $CPAN::Frontend->myprint($prompts{$item . "_intro"});
         $CPAN::Frontend->myprint(" <$item>\n");
         do { $ans = prompt($prompts{$item}, $default);
-        } until $ans =~ /$ok/;
+        } until $ans =~ m/$ok/;
         $CPAN::Config->{$item} = $ans;
         print "\n";
     } else {
@@ -1221,7 +1221,7 @@ please answer 'n' to the following question.
 
 Shall I use the local database in $mby?};
         my $ans = prompt($prompt,"y");
-        $overwrite_local = 1 unless $ans =~ /^y/i;
+        $overwrite_local = 1 unless $ans =~ m/^y/i;
     }
     while ($mby) {
         if ($overwrite_local) {
@@ -1289,9 +1289,9 @@ sub picklist {
         }
         my $i = scalar @$items;
         unrangify(\@nums);
-        if (grep (/\D/ || $_ +< 1 || $_ +> $i, @nums)) {
+        if (grep (m/\D/ || $_ +< 1 || $_ +> $i, @nums)) {
             $CPAN::Frontend->mywarn("invalid items entered, try again\n");
-            if ("@nums" =~ /\D/) {
+            if ("@nums" =~ m/\D/) {
                 $CPAN::Frontend->mywarn("(we are expecting only numbers between 1 and $i)\n");
             }
             next SELECTION;
@@ -1314,7 +1314,7 @@ sub unrangify ($) {
     my @nums2 = ();
     while (@{$nums||[]}) {
         my $n = shift @$nums;
-        if ($n =~ /^(\d+)-(\d+)$/) {
+        if ($n =~ m/^(\d+)-(\d+)$/) {
             my @range = $1 .. $2;
             # warn "range[@range]";
             push @nums2, @range;
@@ -1350,14 +1350,14 @@ sub read_mirrored_by {
     $fh->open($local) or die "Couldn't open $local: $!";
     local $/ = "\012";
     while ( ~< $fh) {
-        ($host) = /^([\w\.\-]+)/ unless defined $host;
+        ($host) = m/^([\w\.\-]+)/ unless defined $host;
         next unless defined $host;
-        next unless /\s+dst_(dst|location)/;
-        /location\s+=\s+\"([^\"]+)/ and @location = (split /\s*,\s*/, $1) and
+        next unless m/\s+dst_(dst|location)/;
+        m/location\s+=\s+\"([^\"]+)/ and @location = (split /\s*,\s*/, $1) and
             ($continent, $country) = @location[-1,-2];
         $continent =~ s/\s\(.*//;
         $continent =~ s/\W+$//; # if Jarkko doesn't know latitude/longitude
-        /dst_dst\s+=\s+\"([^\"]+)/  and $dst = $1;
+        m/dst_dst\s+=\s+\"([^\"]+)/  and $dst = $1;
         next unless $host && $dst && $continent && $country;
         $all{$continent}{$country}{$dst} = CPAN::Mirrored::By->new($continent,$country,$dst);
         undef $host;
@@ -1405,7 +1405,7 @@ sub read_mirrored_by {
         %seen = map (($_ => 1), @previous_urls);
         # hmmm, should take list of defaults from CPAN::Config->{'urllist'}...
         foreach $country (@countries) {
-            next if $country =~ /edit previous picks/;
+            next if $country =~ m/edit previous picks/;
             (my $bare_country = $country) =~ s/ \(.*\)//;
             my @u = sort keys %{$all{$cont{$bare_country}}{$bare_country}};
             @u = grep (! $seen{$_}, @u);
@@ -1444,8 +1444,8 @@ Please enter your CPAN site:};
 
         if ($ans) {
             $ans =~ s|/?\z|/|; # has to end with one slash
-            $ans = "file:$ans" unless $ans =~ /:/; # without a scheme is a file:
-            if ($ans =~ /^\w+:\/./) {
+            $ans = "file:$ans" unless $ans =~ m/:/; # without a scheme is a file:
+            if ($ans =~ m/^\w+:\/./) {
                 push @urls, $ans unless $seen{$ans}++;
             } else {
                 $CPAN::Frontend->
@@ -1613,17 +1613,17 @@ local $/ = "";
 my @podpara;
 my $in_over;
 while ( ~< *FH) {
-    next if not $in_over = /^=over/;
+    next if not $in_over = m/^=over/;
     chomp;
     push @podpara, $_;
-    last if /^=back/;
+    last if m/^=back/;
 }
 pop @podpara;
 while (@podpara) {
     warn "Alert: cannot parse my own manpage for init dialog" unless $podpara[0] =~ s/^=item\s+//;
     my $name = shift @podpara;
     my @para;
-    while (@podpara && $podpara[0] !~ /^=item/) {
+    while (@podpara && $podpara[0] !~ m/^=item/) {
         push @para, shift @podpara;
     }
     $prompts{$name} = pop @para;

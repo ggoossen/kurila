@@ -424,7 +424,7 @@ sub allow {
     ### it's a regexp ###
     if( ref $_[1] eq 'Regexp' ) {
         local $^W;  # silence warnings if $val is undef #
-        return if $_[0] !~ /$_[1]/;
+        return if $_[0] !~ m/$_[1]/;
 
     ### it's a sub ###
     } elsif ( ref $_[1] eq 'CODE' ) {

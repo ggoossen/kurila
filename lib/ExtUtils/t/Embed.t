@@ -21,7 +21,7 @@ print "1..9\n";
 my $cc = $Config{'cc'};
 my $cl  = ($^O eq 'MSWin32' && $cc eq 'cl');
 my $borl  = ($^O eq 'MSWin32' && $cc eq 'bcc32');
-my $skip_exe = $^O eq 'os2' && $Config{ldflags} =~ /(?<!\S)-Zexe\b/;
+my $skip_exe = $^O eq 'os2' && $Config{ldflags} =~ m/(?<!\S)-Zexe\b/;
 my $exe = 'embed_test';
 $exe .= $Config{'exe_ext'} unless $skip_exe;	# Linker will auto-append it
 my $obj = 'embed_test' . $Config{'obj_ext'};
@@ -88,14 +88,14 @@ if ($^O eq 'VMS') {
    } else { # Not MSWin32 or OS/390 (z/OS) dynamic.
     push(@cmd,"-L$lib",'-lperl');
     local $SIG{__WARN__} = sub {
-	warn $_[0] unless $_[0] =~ /No library found for .*perl/
+	warn $_[0] unless $_[0] =~ m/No library found for .*perl/
     };
     push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!
-	if $^O eq 'os2' and $Config{ldflags} =~ /(?<!\S)-Zomf\b/;
+	if $^O eq 'os2' and $Config{ldflags} =~ m/(?<!\S)-Zomf\b/;
     push(@cmd,ldopts());
    }
    if ($borl) {
-     @cmd = ($cmd[0],(grep{/^-[LI]/}@cmd[1..$#cmd]),(grep{!/^-[LI]/}@cmd[1..$#cmd]));
+     @cmd = ($cmd[0],(grep{m/^-[LI]/}@cmd[1..$#cmd]),(grep{!m/^-[LI]/}@cmd[1..$#cmd]));
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
@@ -110,7 +110,7 @@ if ($^O eq 'VMS') {
      $v_e_r_s =~ tr/./_/;
      system("cp ../cygperl$v_e_r_s.dll ./");    # for test 1
    }
-   elsif ($Config{'libperl'} !~ /\Alibperl\./) {
+   elsif ($Config{'libperl'} !~ m/\Alibperl\./) {
      # Everyone needs libperl copied if it's not found by '-lperl'.
      $testlib = $Config{'libperl'};
      my $srclib = $testlib;
@@ -147,7 +147,7 @@ print "# embed_test = $embed_test\n";
 $status = system($embed_test);
 print (($status? 'not ':'')."ok 9 # system returned $status\n");
 unlink($exe,"embed_test.c",$obj);
-unlink("$exe.manifest") if $cl and $Config{'ccversion'} =~ /^(\d+)/ and $1 +>= 14;
+unlink("$exe.manifest") if $cl and $Config{'ccversion'} =~ m/^(\d+)/ and $1 +>= 14;
 unlink("$exe$Config{exe_ext}") if $skip_exe;
 unlink("embed_test.map","embed_test.lis") if $^O eq 'VMS';
 unlink(glob("./*.dll")) if $^O eq 'cygwin';

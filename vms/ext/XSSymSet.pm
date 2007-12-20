@@ -35,7 +35,7 @@ sub trimsym {
     $trimmed =~ s/(.)\1+/$1/g;
     if (length $trimmed +> $maxlen) {
       my $squeezed = $trimmed;
-      my($xs,$prefix,$func) = $trimmed =~ /^(XS_)?(.*)_([^_]*)$/;
+      my($xs,$prefix,$func) = $trimmed =~ m/^(XS_)?(.*)_([^_]*)$/;
       $xs ||= '';
       my $frac = 3; # replaces broken length-based calculations but w/same result
       my $pat = '([^_])';
@@ -122,7 +122,7 @@ sub get_orig {
 
 
 sub all_orig { (keys %{$_[0]->{'__N+Map'}}); }
-sub all_trimmed { (grep { /^\w+$/ } keys %{$_[0]}); }
+sub all_trimmed { (grep { m/^\w+$/ } keys %{$_[0]}); }
 
 __END__
 

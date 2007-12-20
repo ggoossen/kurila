@@ -47,8 +47,8 @@ $a = 'a';
 if ($a eq 'a') { print "ok 21\n";} else { print "not ok 21\n";}
 if ($a ne 'a') { print "not ok 22\n";} else { print "ok 22\n";}
 
-if ($a =~ /a/) { print "ok 23\n";} else { print "not ok 23\n";}
-if ($a !~ /a/) { print "not ok 24\n";} else { print "ok 24\n";}
+if ($a =~ m/a/) { print "ok 23\n";} else { print "not ok 23\n";}
+if ($a !~ m/a/) { print "not ok 24\n";} else { print "ok 24\n";}
 # test interaction of logicals and other operations
 
 $a = 'a';
@@ -67,18 +67,18 @@ if ($a eq 'a' or $x) { print "ok 31\n";} else { print "not ok 31\n";}
 if ($a ne 'a' or $x) { print "not ok 32\n";} else { print "ok 32\n";}
 
 $x = 1;
-if ($a =~ /a/ && $x) { print "ok 33\n";} else { print "not ok 33\n";}
-if ($a !~ /a/ && $x) { print "not ok 34\n";} else { print "ok 34\n";}
+if ($a =~ m/a/ && $x) { print "ok 33\n";} else { print "not ok 33\n";}
+if ($a !~ m/a/ && $x) { print "not ok 34\n";} else { print "ok 34\n";}
 $x = '';
-if ($a =~ /a/ && $x) { print "not ok 35\n";} else { print "ok 35\n";}
-if ($a !~ /a/ && $x) { print "not ok 36\n";} else { print "ok 36\n";}
+if ($a =~ m/a/ && $x) { print "not ok 35\n";} else { print "ok 35\n";}
+if ($a !~ m/a/ && $x) { print "not ok 36\n";} else { print "ok 36\n";}
 
 $x = 1;
-if ($a =~ /a/ || $x) { print "ok 37\n";} else { print "not ok 37\n";}
-if ($a !~ /a/ || $x) { print "ok 38\n";} else { print "not ok 38\n";}
+if ($a =~ m/a/ || $x) { print "ok 37\n";} else { print "not ok 37\n";}
+if ($a !~ m/a/ || $x) { print "ok 38\n";} else { print "not ok 38\n";}
 $x = '';
-if ($a =~ /a/ || $x) { print "ok 39\n";} else { print "not ok 39\n";}
-if ($a !~ /a/ || $x) { print "not ok 40\n";} else { print "ok 40\n";}
+if ($a =~ m/a/ || $x) { print "ok 39\n";} else { print "not ok 39\n";}
+if ($a !~ m/a/ || $x) { print "not ok 40\n";} else { print "ok 40\n";}
 
 $x = 1;
 if ($a eq 'a' xor $x) { print "not ok 41\n";} else { print "ok 41\n";}

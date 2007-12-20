@@ -9,7 +9,7 @@
 
 my $file = "tf$$.txt";
 
-unless ($^O =~ /^(MSWin32|dos)$/) {
+unless ($^O =~ m/^(MSWin32|dos)$/) {
   print "1..0\n";
   exit;
 }

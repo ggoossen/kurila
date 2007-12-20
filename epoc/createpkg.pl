@@ -11,7 +11,7 @@ sub filefound {
 
   my $f = $File::Find::name;
     
-  return if ( $f =~ /CVS|Unicode|unicore|CPAN|ExtUtils|IPC|User|DB.pm|\.a$|\.ld$|\.exists$|\.pod$|\.t$/i);
+  return if ( $f =~ m/CVS|Unicode|unicore|CPAN|ExtUtils|IPC|User|DB.pm|\.a$|\.ld$|\.exists$|\.pod$|\.t$/i);
   my $back = $f;
 
   my $psiback = $back;

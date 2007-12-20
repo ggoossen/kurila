@@ -94,7 +94,7 @@ sub _succeed
 sub gen_delimited_pat($;$)  # ($delimiters;$escapes)
 {
 	my ($dels, $escs) = @_;
-	return "" unless $dels =~ /\S/;
+	return "" unless $dels =~ m/\S/;
 	$escs = '\\' unless $escs;
 	$escs .= substr($escs,-1) x (length($dels)-length($escs));
 	my @pat = ();
@@ -339,7 +339,7 @@ sub _match_tagged	# ($$$$$$$)
 		$rdelspec = eval "qq{$rdel}" || do {
 			my $del;
 			for (qw,~ ! ^ & * ) _ + - = } ] : " ; ' > . ? / | ',)
-				{ next if $rdel =~ /\Q$_/; $del = $_; last }
+				{ next if $rdel =~ m/\Q$_/; $del = $_; last }
 			unless ($del) {
 				use Carp;
 				croak "Can't interpolate right delimiter $rdel"
@@ -786,7 +786,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 	}
 	pos($$textref) = $ld1pos;	# HAVE TO DO THIS BECAUSE LOOKAHEAD BROKEN
 	my ($ldel1, $rdel1) = ("\Q$1","\Q$1");
-	if ($ldel1 =~ /[[(<{]/)
+	if ($ldel1 =~ m/[[(<{]/)
 	{
 		$rdel1 =~ tr/[({</])}>/;
 		defined(_match_bracketed($textref,"",$ldel1,"","",$rdel1))
@@ -796,18 +796,18 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 	}
 	else
 	{
-		$$textref =~ /\G$ldel1(?:)[^\\$ldel1]*(\\.[^\\$ldel1]*)*$ldel1/gcs
+		$$textref =~ m/\G$ldel1(?:)[^\\$ldel1]*(\\.[^\\$ldel1]*)*$ldel1/gcs
 		|| do { pos $$textref = $startpos; return };
         $ld2pos = $rd1pos = pos($$textref)-1;
 	}
 
-	my $second_arg = $op =~ /s|tr|y/ ? 1 : 0;
+	my $second_arg = $op =~ m/s|tr|y/ ? 1 : 0;
 	if ($second_arg)
 	{
 		my ($ldel2, $rdel2);
-		if ($ldel1 =~ /[[(<{]/)
+		if ($ldel1 =~ m/[[(<{]/)
 		{
-			unless ($$textref =~ /\G\s*(\S)/gc)	# SHOULD USE LOOKAHEAD
+			unless ($$textref =~ m/\G\s*(\S)/gc)	# SHOULD USE LOOKAHEAD
 			{
 				_failmsg "Missing second block for quotelike $op",
 					 pos $$textref;
@@ -823,7 +823,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 		}
 		$str2pos = $ld2pos+1;
 
-		if ($ldel2 =~ /[[(<{]/)
+		if ($ldel2 =~ m/[[(<{]/)
 		{
 			pos($$textref)--;	# OVERCOME BROKEN LOOKAHEAD 
 			defined(_match_bracketed($textref,"",$ldel2,"","",$rdel2))
@@ -831,7 +831,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 		}
 		else
 		{
-			$$textref =~ /[^\\$ldel2]*(\\.[^\\$ldel2]*)*$ldel2/gcs
+			$$textref =~ m/[^\\$ldel2]*(\\.[^\\$ldel2]*)*$ldel2/gcs
 			|| do { pos $$textref = $startpos; return };
 		}
 		$rd2pos = pos($$textref)-1;
@@ -950,7 +950,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 					next FIELD;
 				}
 			}
-			if ($$textref =~ /\G(.)/gcs)
+			if ($$textref =~ m/\G(.)/gcs)
 			{
 				$unkpos = pos($$textref)-1
 					unless $igunk || defined $unkpos;

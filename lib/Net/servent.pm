@@ -38,7 +38,7 @@ sub getservbyport ($;$) { populate(CORE::getservbyport(shift,shift||'tcp')) }
 
 sub getserv ($;$) {
     no strict 'refs';
-    return &{'getservby' . ($_[0]=~/^\d+$/ ? 'port' : 'name')}(@_);
+    return &{'getservby' . ($_[0]=~m/^\d+$/ ? 'port' : 'name')}(@_);
 }
 
 1;

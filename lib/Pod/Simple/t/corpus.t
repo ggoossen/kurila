@@ -5,7 +5,7 @@ BEGIN {
     }
 
     use Config;
-    if ($Config::Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config::Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
@@ -121,7 +121,7 @@ foreach my $f (@testfiles) {
   
   die "Null outstring?" unless $outstring;
   
-  next if $f =~ /nonesuch/;
+  next if $f =~ m/nonesuch/;
 
   # foo.xml.out is not a portable filename. foo.xml_out may be a bit more portable
 

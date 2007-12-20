@@ -202,7 +202,7 @@ different calling convention than Unix or Windows.
 sub make_macro {
     my($make, $target) = (shift, shift);
 
-    my $is_mms = $make =~ /^MM(K|S)/i;
+    my $is_mms = $make =~ m/^MM(K|S)/i;
 
     my $cmd = $make;
     my $macros = '';

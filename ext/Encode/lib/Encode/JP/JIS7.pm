@@ -1,7 +1,7 @@
 package Encode::JP::JIS7;
 use strict;
 use warnings;
-our $VERSION = do { my @r = ( q$Revision: 2.3 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.3 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 use Encode qw(:fallbacks);
 
@@ -71,7 +71,7 @@ sub cat_decode {    # ($obj, $dst, $src, $pos, $trm, $chk)
     use bytes;
     my $opos = pos($$rsrc);
     pos($$rsrc) = $pos;
-    while ( $$rsrc =~ /$re_scan_jis_g/gc ) {
+    while ( $$rsrc =~ m/$re_scan_jis_g/gc ) {
         my ( $esc, $esc_0212, $esc_asc, $esc_kana, $chunk ) =
           ( $1, $2, $3, $4, $5 );
 

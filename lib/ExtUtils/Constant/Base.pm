@@ -310,7 +310,7 @@ sub assign {
     $clause = $indent . "{\n";
     $indent .= "  ";
     $clause .= "$indent$pre";
-    $clause .= ";" unless $pre =~ /;$/;
+    $clause .= ";" unless $pre =~ m/;$/;
     $clause .= "\n";
   }
   confess "undef \$type" unless defined $type;
@@ -322,7 +322,7 @@ sub assign {
   chomp $post;
   if (length $post) {
     $clause .= "$post";
-    $clause .= ";" unless $post =~ /;$/;
+    $clause .= ";" unless $post =~ m/;$/;
     $clause .= "\n";
   }
   my $return = $self->return_statement_for_type($type);

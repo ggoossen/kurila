@@ -46,7 +46,7 @@ sub plugins {
 
 
         # check to see if we're running under test
-        my @SEARCHDIR = exists $INC{"blib.pm"} && $filename =~ m!(^|/)blib/! ? grep {/blib/} @INC : @INC;
+        my @SEARCHDIR = exists $INC{"blib.pm"} && $filename =~ m!(^|/)blib/! ? grep {m/blib/} @INC : @INC;
 
         # add any search_dir params
         unshift @SEARCHDIR, @{$self->{'search_dirs'}} if defined $self->{'search_dirs'};
@@ -147,7 +147,7 @@ sub search_paths {
         # foreach one we've found 
         foreach my $file (@files) {
             # untaint the file; accept .pm only
-            next unless ($file) = ($file =~ /(.*$file_regex)$/); 
+            next unless ($file) = ($file =~ m/(.*$file_regex)$/); 
             # parse the file to get the name
             my ($name, $directory, $suffix) = fileparse($file, $file_regex);
 
@@ -163,9 +163,9 @@ sub search_paths {
                 my $in_pod = 0;
                 while ( my $line = ~< *PKGFILE ) {
                     $in_pod = 1 if $line =~ m/^=\w/;
-                    $in_pod = 0 if $line =~ /^=cut/;
-                    next if ($in_pod || $line =~ /^=cut/);  # skip pod text
-                    next if $line =~ /^\s*#/;               # and comments
+                    $in_pod = 0 if $line =~ m/^=cut/;
+                    next if ($in_pod || $line =~ m/^=cut/);  # skip pod text
+                    next if $line =~ m/^\s*#/;               # and comments
                     if ( $line =~ m/^\s*package\s+(.*::)?($name)\s*;/i ) {
                         @pkg_dirs = split /::/, $1;
                         $name = $2;
@@ -176,10 +176,10 @@ sub search_paths {
             }
 
             # then create the class name in a cross platform way
-            $directory =~ s/^[a-z]://i if($^O =~ /MSWin32|dos/);       # remove volume
+            $directory =~ s/^[a-z]://i if($^O =~ m/MSWin32|dos/);       # remove volume
             my @dirs = ();
             if ($directory) {
-                ($directory) = ($directory =~ /(.*)/);
+                ($directory) = ($directory =~ m/(.*)/);
                 @dirs = grep(length($_), splitdir($directory)) 
                     unless $directory eq curdir();
                 for my $d (reverse @dirs) {
@@ -232,7 +232,7 @@ sub find_files {
         File::Find::find( { no_chdir => 1, 
                            wanted => sub { 
                              # Inlined from File::Find::Rule C< name => '*.pm' >
-                             return unless $File::Find::name =~ /$file_regex/;
+                             return unless $File::Find::name =~ m/$file_regex/;
                              (my $path = $File::Find::name) =~ s#^\\./##;
                              push @files, $path;
                            }

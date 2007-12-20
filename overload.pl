@@ -14,9 +14,9 @@ use strict;
 
 my (@enums, @names);
 while ( ~< *DATA) {
-  next if /^#/;
-  next if /^$/;
-  my ($enum, $name) = /^(\S+)\s+(\S+)/ or die "Can't parse $_";
+  next if m/^#/;
+  next if m/^$/;
+  my ($enum, $name) = m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
   push @enums, $enum;
   push @names, $name;
 }
