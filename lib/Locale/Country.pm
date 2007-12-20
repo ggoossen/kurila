@@ -272,7 +272,7 @@ sub _code2codeset
     {
         next unless m/\S/;
         chop;
-        ($alpha2, $alpha3, $numeric, @countries) = split(/:/, $_);
+        ($alpha2, $alpha3, $numeric, @countries) = split(m/:/, $_);
 
         $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = $countries[0];
 	foreach $country (@countries)

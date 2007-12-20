@@ -137,7 +137,7 @@ sub search_paths {
     # and each directory in our search path
     foreach my $searchpath (@{$self->{'search_path'}}) {
         # create the search directory in a cross platform goodness way
-        my $sp = catdir($dir, (split /::/, $searchpath));
+        my $sp = catdir($dir, (split m/::/, $searchpath));
 
         # if it doesn't exist or it's not a dir then skip it
         next unless ( -e $sp && -d _ ); # Use the cached stat the second time
@@ -167,7 +167,7 @@ sub search_paths {
                     next if ($in_pod || $line =~ m/^=cut/);  # skip pod text
                     next if $line =~ m/^\s*#/;               # and comments
                     if ( $line =~ m/^\s*package\s+(.*::)?($name)\s*;/i ) {
-                        @pkg_dirs = split /::/, $1;
+                        @pkg_dirs = split m/::/, $1;
                         $name = $2;
                         last;
                     }

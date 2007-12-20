@@ -115,7 +115,7 @@ pass();
 # Bug #21875
 # { q.* => ... } should be interpreted as hash, not block
 
-foreach my $line (split /\n/, <<'EOF')
+foreach my $line (split m/\n/, <<'EOF')
 1 { foo => 'bar' }
 1 { qoo => 'bar' }
 1 { q   => 'bar' }
@@ -126,7 +126,7 @@ foreach my $line (split /\n/, <<'EOF')
 1 { q=bar= => 'bar' }
 EOF
 {
-    my ($expect, $eval) = split / /, $line, 2;
+    my ($expect, $eval) = split m/ /, $line, 2;
     my $result = eval $eval;
     ok($@ eq  '', "eval $eval");
     is(ref $result, $expect ? 'HASH' : '', $eval);

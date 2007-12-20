@@ -171,7 +171,7 @@ usage("") unless @ARGV;
 
 # Overcome shell's p1,..,p8 limitation.  
 # See vms/descrip_mms.template -> descrip.mms for invokation.
-if ( $^O eq 'VMS' ) { @ARGV = split(/\s+/,$ARGV[0]); }
+if ( $^O eq 'VMS' ) { @ARGV = split(m/\s+/,$ARGV[0]); }
 
 use vars qw( %Options );
 

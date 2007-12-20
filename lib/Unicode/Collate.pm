@@ -353,7 +353,7 @@ sub parseEntry
     return if defined $self->{undefName} && $name =~ m/$self->{undefName}/;
 
     # gets element
-    my($e, $k) = split /;/, $line;
+    my($e, $k) = split m/;/, $line;
     croak "Wrong Entry: <charList> must be separated by ';' from <collElement>"
 	if ! $k;
 
@@ -658,7 +658,7 @@ sub getSortKey
 	foreach my $jcps (@$rEnt) {
 	    # weird things like VL, TL-contraction are not considered!
 	    my $curHST = '';
-	    foreach my $u (split /;/, $jcps) {
+	    foreach my $u (split m/;/, $jcps) {
 		$curHST .= getHST($u);
 	    }
 	    if ($preHST && !$curHST || # hangul before non-hangul

@@ -21,7 +21,7 @@ sub expand {
 	my $pad;
 	for ( @_ ) {
 		my $s = '';
-		for (split(/^/m, $_, -1)) {
+		for (split(m/^/m, $_, -1)) {
 			my $offs = 0;
 			s{\t}{
 				$pad = $tabstop - (pos() + $offs) % $tabstop;
@@ -49,7 +49,7 @@ sub unexpand
 		@lines = split("\n", $x, -1);
 		for $line (@lines) {
 			$line = expand($line);
-			@e = split(/(.{$tabstop})/,$line,-1);
+			@e = split(m/(.{$tabstop})/,$line,-1);
 			$lastbit = pop(@e);
 			$lastbit = '' 
 				unless defined $lastbit;

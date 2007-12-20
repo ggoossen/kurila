@@ -83,7 +83,7 @@ sub FIRSTKEY {
   my $keys = OS2::Prf::Get($self->[0]->[0], undef, undef);
   return undef unless defined $keys;
   chop($keys);
-  $self->[1] = [split /\0/, $keys];
+  $self->[1] = [split m/\0/, $keys];
   # print "firstkey1 $self, `$self->[3]->[0], $self->[3]->[1]'\n" if $debug;
   $self->[2] = 0;
   return $self->[1]->[0];
@@ -173,7 +173,7 @@ sub FIRSTKEY {
   my $keys = OS2::Prf::Get($self->[0]->[0], $self->[3], undef);
   return undef unless defined $keys;
   chop($keys);
-  $self->[1] = [split /\0/, $keys];
+  $self->[1] = [split m/\0/, $keys];
   # print "firstkey1 $self, `$self->[3]->[0], $self->[3]->[1]'\n" if $debug;
   $self->[2] = 0;
   return $self->[1]->[0];

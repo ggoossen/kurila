@@ -1834,7 +1834,7 @@ sub local_bundles {
     foreach $incdir ($CPAN::Config->{'cpan_home'},@INC) {
         my @bbase = "Bundle";
         while (my $bbase = shift @bbase) {
-            $bdir = File::Spec->catdir($incdir,split /::/, $bbase);
+            $bdir = File::Spec->catdir($incdir,split m/::/, $bbase);
             CPAN->debug("bdir[$bdir]\@bbase[@bbase]") if $CPAN::DEBUG;
             if ($dh = DirHandle->new($bdir)) { # may fail
                 my($entry);
@@ -2152,7 +2152,7 @@ sub _reload_this {
     CPAN->debug("pwd[$pwd]") if $CPAN::DEBUG;
     my($file);
     for my $inc (@INC) {
-        $file = File::Spec->catfile($inc,split /\//, $f);
+        $file = File::Spec->catfile($inc,split m/\//, $f);
         last if -f $file;
         $file = "";
     }
@@ -2212,7 +2212,7 @@ sub mkmyconfig {
     require CPAN::FirstTime;
     my $home = CPAN::HandleConfig::home;
     $cpanpm = $INC{'CPAN/MyConfig.pm'} ||
-        File::Spec->catfile(split /\//, "$home/.cpan/CPAN/MyConfig.pm");
+        File::Spec->catfile(split m/\//, "$home/.cpan/CPAN/MyConfig.pm");
     File::Path::mkpath(File::Basename::dirname($cpanpm)) unless -e $cpanpm;
     CPAN::HandleConfig::require_myconfig_or_config;
     $CPAN::Config ||= {};
@@ -3052,7 +3052,7 @@ sub colorable_makemaker_prompt {
 #-> sub CPAN::Shell::unrecoverable_error ;
 sub unrecoverable_error {
     my($self,$what) = @_;
-    my @lines = split /\n/, $what;
+    my @lines = split m/\n/, $what;
     my $longest = 0;
     for my $l (@lines) {
         $longest = length $l if length $l +> $longest;
@@ -4386,7 +4386,7 @@ config variable with
              @dialog,
              "lcd $aslocal_dir",
              "cd /",
-             map("cd $_", split /\//, $dir), # RFC 1738
+             map("cd $_", split m/\//, $dir), # RFC 1738
              "bin",
              "get $getfile $targetfile",
              "quit"
@@ -4950,7 +4950,7 @@ sub rd_authindex {
     tie *FH, 'CPAN::Tarzip', $index_target;
     local($/) = "\n";
     local($_);
-    push @lines, split /\012/ while ~< *FH;
+    push @lines, split m/\012/ while ~< *FH;
     my $i = 0;
     my $painted = 0;
     foreach (@lines) {
@@ -4994,7 +4994,7 @@ sub rd_modpacks {
     while (my $bytes = $fh->READ(\$chunk,8192)) {
         $slurp.=$chunk;
     }
-    my @lines = split /\012/, $slurp;
+    my @lines = split m/\012/, $slurp;
     CPAN->debug(sprintf "end[%d]", time) if $CPAN::DEBUG;
     undef $fh;
     # read header
@@ -5206,7 +5206,7 @@ sub rd_modlist {
     while (my $bytes = $fh->READ(\$chunk,8192)) {
         $slurp.=$chunk;
     }
-    my @eval2 = split /\012/, $slurp;
+    my @eval2 = split m/\012/, $slurp;
 
     while (@eval2) {
         my $shift = shift(@eval2);
@@ -5829,7 +5829,7 @@ sub fast_yaml {
                             $CPAN::Config->{keep_source_where},
                             "authors",
                             "id",
-                            split(/\//,$norm)
+                            split(m/\//,$norm)
                            );
     $self->debug("Doing localize") if $CPAN::DEBUG;
     unless ($local_file =
@@ -5943,7 +5943,7 @@ sub containsmods {
 sub upload_date {
     my $self = shift;
     return $self->{UPLOAD_DATE} if exists $self->{UPLOAD_DATE};
-    my(@local_wanted) = split(/\//,$self->id);
+    my(@local_wanted) = split(m/\//,$self->id);
     my $filename = pop @local_wanted;
     push @local_wanted, "CHECKSUMS";
     my $author = CPAN::Shell->expand("Author",$self->cpan_userid);
@@ -6074,7 +6074,7 @@ sub get_file_onto_local_disk {
                             $CPAN::Config->{keep_source_where},
                             "authors",
                             "id",
-                            split(/\//,$self->id)
+                            split(m/\//,$self->id)
                            );
 
     $self->debug("Doing localize") if $CPAN::DEBUG;
@@ -6408,7 +6408,7 @@ sub try_download {
                             $CPAN::Config->{keep_source_where},
                             "authors",
                             "id",
-                            split(/\//,$norm),
+                            split(m/\//,$norm),
                            );
     $self->debug("Doing localize") if $CPAN::DEBUG;
     return CPAN::FTP->localize("authors/id/$norm",
@@ -6611,7 +6611,7 @@ We\'ll try to build it with that Makefile then.
                 s{>.*}{};
             }
             chomp $prereq;
-            $prereq = join " ", split /\s+/, $prereq;
+            $prereq = join " ", split m/\s+/, $prereq;
             my($PREREQ_PM) = join("\n", map {
                 s{.*<}{};       # strip X<...>
                 s{>.*}{};
@@ -6620,7 +6620,7 @@ We\'ll try to build it with that Makefile then.
                     s/[^\w:]$//; # period?
                     " "x28 . "'$_' => 0,";
                 }
-            } split /\s*,\s*/, $prereq);
+            } split m/\s*,\s*/, $prereq);
 
             $script = "
               EXE_FILES => ['$name'],
@@ -6819,7 +6819,7 @@ sub cvs_import {
 
     my $userid = $self->cpan_userid;
 
-    my $cvs_dir = (split /\//, $dir)[-1];
+    my $cvs_dir = (split m/\//, $dir)[-1];
     $cvs_dir =~ s/-\d+[^-]+(?!\n)\Z//;
     my $cvs_root =
       $CPAN::Config->{cvsroot} || $ENV{CVSROOT};
@@ -6858,7 +6858,7 @@ sub readme {
                             $CPAN::Config->{keep_source_where},
                             "authors",
                             "id",
-                            split(/\//,"$sans.readme"),
+                            split(m/\//,"$sans.readme"),
                            );
     $self->debug("Doing localize") if $CPAN::DEBUG;
     $local_file = CPAN::FTP->localize("authors/id/$sans.readme",
@@ -6897,7 +6897,7 @@ sub verifyCHECKSUM {
         $CPAN::Frontend->myprint(join "", map {"  $_\n"} @e) and return if @e;
     }
     my($lc_want,$lc_file,@local,$basename);
-    @local = split(/\//,$self->id);
+    @local = split(m/\//,$self->id);
     pop @local;
     push @local, "CHECKSUMS";
     $lc_want =
@@ -8104,7 +8104,7 @@ sub unsat_prereq {
         # or if the installed version is too old. We cannot omit this
         # check, because if 'force' is in effect, nobody else will check.
         if (defined $available_file) {
-            my(@all_requirements) = split /\s*,\s*/, $need_version;
+            my(@all_requirements) = split m/\s*,\s*/, $need_version;
             local($^W) = 0;
             my $ok = 0;
           RQ: for my $rq (@all_requirements) {
@@ -9361,7 +9361,7 @@ sub contains {
         $self->debug("after get id[$dist->{ID}]") if $CPAN::DEBUG;
         my($todir) = $CPAN::Config->{'cpan_home'};
         my(@me,$from,$to,$me);
-        @me = split /::/, $self->id;
+        @me = split m/::/, $self->id;
         $me[-1] .= ".pm";
         $me = File::Spec->catfile(@me);
         $from = $self->find_bundle_file($dist->{build_dir},join('/',@me));
@@ -9435,7 +9435,7 @@ sub find_bundle_file {
         # retry if she managed to have no Bundle directory
         $bundle_unixpath = $file if $file =~ m|\Q$bundle_filename\E$|;
     }
-    return File::Spec->catfile($where, split /\//, $bundle_unixpath)
+    return File::Spec->catfile($where, split m/\//, $bundle_unixpath)
         if $bundle_unixpath;
     Carp::croak("Couldn't find a Bundle file in $where");
 }
@@ -9450,7 +9450,7 @@ sub inst_file {
     my($self) = @_;
     my($inst_file);
     my(@me);
-    @me = split /::/, $self->id;
+    @me = split m/::/, $self->id;
     $me[-1] .= ".pm";
     my($incdir,$bestv);
     foreach $incdir ($CPAN::Config->{'cpan_home'},@INC) {
@@ -10089,7 +10089,7 @@ sub available_file {
     my $sep = $Config::Config{path_sep};
     my $perllib = $ENV{PERL5LIB};
     $perllib = $ENV{PERLLIB} unless defined $perllib;
-    my @perllib = split(/$sep/,$perllib) if defined $perllib;
+    my @perllib = split(m/$sep/,$perllib) if defined $perllib;
     $self->_file_in_path([@perllib,@INC]);
 }
 
@@ -10097,7 +10097,7 @@ sub available_file {
 sub _file_in_path {
     my($self,$path) = @_;
     my($dir,@packpath);
-    @packpath = split /::/, $self->{ID};
+    @packpath = split m/::/, $self->{ID};
     $packpath[-1] .= ".pm";
     if (@packpath == 1 && $packpath[0] eq "readline.pm") {
         unshift @packpath, "Term", "ReadLine"; # historical reasons
@@ -10115,7 +10115,7 @@ sub _file_in_path {
 sub xs_file {
     my($self) = @_;
     my($dir,@packpath);
-    @packpath = split /::/, $self->{ID};
+    @packpath = split m/::/, $self->{ID};
     push @packpath, $packpath[-1];
     $packpath[-1] .= "." . $Config::Config{'dlext'};
     foreach $dir (@INC) {

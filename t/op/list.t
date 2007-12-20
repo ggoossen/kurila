@@ -15,7 +15,7 @@ cmp_ok($_, 'eq', '1:2:3:4', 'join list');
 ($a,$b,$c,$d) = (1,2,3,4);
 cmp_ok("$a;$b;$c;$d", 'eq', '1;2;3;4', 'list assign');
 
-($c,$b,$a) = split(/ /,"111 222 333");
+($c,$b,$a) = split(m/ /,"111 222 333");
 cmp_ok("$a;$b;$c",'eq','333;222;111','list split on space');
 
 ($a,$b,$c) = ($c,$b,$a);

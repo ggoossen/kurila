@@ -329,7 +329,7 @@ sub maniread {
             my($base,$dir) = File::Basename::fileparse($file);
             # Resolve illegal file specifications in the same way as tar
             $dir =~ tr/./_/;
-            my(@pieces) = split(/\./,$base);
+            my(@pieces) = split(m/\./,$base);
             if (@pieces +> 2) { $base = shift(@pieces) . '.' . join('_',@pieces); }
             my $okfile = "$dir$base";
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;

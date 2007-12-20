@@ -23,7 +23,7 @@ while ( ~< *DATA) {
     chop;
     next unless $_;
     next if m/^#/;
-    my ($key, $desc, $check, $flags, $args) = split(/\t+/, $_, 5);
+    my ($key, $desc, $check, $flags, $args) = split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
     warn qq[Description "$desc" duplicates $seen{$desc}\n] if $seen{$desc};

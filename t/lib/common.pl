@@ -71,7 +71,7 @@ for (@prgs){
     if (s/^\s*-\w+//){
         $switch = $&;
     }
-    my($prog,$expected) = split(/\nEXPECT(?:\n|$)/, $_, 2);
+    my($prog,$expected) = split(m/\nEXPECT(?:\n|$)/, $_, 2);
 
     my ($todo, $todo_reason);
     $todo = $prog =~ s/^#\s*TODO\s*(.*)\n//m and $todo_reason = $1;
@@ -85,7 +85,7 @@ for (@prgs){
 	$todo_reason = $temp;
     }
     if ( $prog =~ m/--FILE--/) {
-        my(@files) = split(/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
+        my(@files) = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error: test $_ didn't split into pairs, got " .
 		scalar(@files) . "[" . join("%%%%", @files) ."]\n"

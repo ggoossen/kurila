@@ -278,7 +278,7 @@ sub getline {
 
       substr($buf, 0, 0, $partial);    ## prepend from last sysread
 
-      my @buf = split(/\015?\012/, $buf, -1);    ## break into lines
+      my @buf = split(m/\015?\012/, $buf, -1);    ## break into lines
 
       $partial = pop @buf;
 
@@ -391,7 +391,7 @@ sub datasend {
   return 1 unless length $line;
 
   if ($cmd->debug) {
-    foreach my $b (split(/\n/, $line)) {
+    foreach my $b (split(m/\n/, $line)) {
       $cmd->debug_print(1, "$b\n");
     }
   }
@@ -456,7 +456,7 @@ sub rawdatasend {
 
   if ($cmd->debug) {
     my $b = "$cmd>>> ";
-    print STDERR $b, join("\n$b", split(/\n/, $line)), "\n";
+    print STDERR $b, join("\n$b", split(m/\n/, $line)), "\n";
   }
 
   my $len    = length($line);

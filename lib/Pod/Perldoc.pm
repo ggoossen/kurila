@@ -49,7 +49,7 @@ $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
 
 #..........................................................................
 { my $pager = $Config{'pager'};
-  push @Pagers, $pager if -x (split /\s+/, $pager)[0] or IS_VMS;
+  push @Pagers, $pager if -x (split m/\s+/, $pager)[0] or IS_VMS;
 }
 $Bindir  = $Config{'scriptdirexp'};
 $Pod2man = "pod2man" . ( $Config{'versiononly'} ? $Config{'version'} : '' );

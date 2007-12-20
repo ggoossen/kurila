@@ -1737,7 +1737,7 @@ and if we can.
             # If we have a console, check to see if there are separate ins and
             # outs to open. (They are assumed identical if not.)
 
-            my ( $i, $o ) = split /,/, $console;
+            my ( $i, $o ) = split m/,/, $console;
             $o = $i unless defined $o;
 
             # read/write on in, or just read, or read on STDIN.
@@ -1923,7 +1923,7 @@ sub DB {
 
     # if we have something here, see if we should break.
     if ( $dbline{$line}
-        && ( ( $stop, $action ) = split( /\0/, $dbline{$line} ) ) )
+        && ( ( $stop, $action ) = split( m/\0/, $dbline{$line} ) ) )
     {
 
         # Stop if the stop criterion says to just stop.
@@ -2286,7 +2286,7 @@ it up.
           PIPE: {
                 $cmd =~ s/^\s+//s;    # trim annoying leading whitespace
                 $cmd =~ s/\s+$//s;    # trim annoying trailing whitespace
-                ($i) = split( /\s+/, $cmd );
+                ($i) = split( m/\s+/, $cmd );
 
 =head3 COMMAND ALIASES
 
@@ -4766,7 +4766,7 @@ sub cmd_i {
     }
     else {
       ISA:
-        foreach my $isa ( split( /\s+/, $line ) ) {
+        foreach my $isa ( split( m/\s+/, $line ) ) {
             $evalarg = $isa;
             ($isa) = &eval;
             no strict 'refs';
@@ -4850,7 +4850,7 @@ sub cmd_l {
 
         # Get name:start-stop from find_sub, and break this up at
         # colons.
-        @pieces = split( /:/, find_sub($subname) || $sub{$subname} );
+        @pieces = split( m/:/, find_sub($subname) || $sub{$subname} );
 
         # Pull off start-stop.
         $subrange = pop @pieces;
@@ -4947,7 +4947,7 @@ sub cmd_l {
 
                 # Check for breakpoints and actions.
                 my ( $stop, $action );
-                ( $stop, $action ) = split( /\0/, $dbline{$i} )
+                ( $stop, $action ) = split( m/\0/, $dbline{$i} )
                   if $dbline{$i};
 
                 # ==> if this is the current line in execution,
@@ -5036,7 +5036,7 @@ sub cmd_L {
                     print $OUT " $i:\t", $dbline[$i];
 
                     # Pull out the condition and the action.
-                    ( $stop, $action ) = split( /\0/, $dbline{$i} );
+                    ( $stop, $action ) = split( m/\0/, $dbline{$i} );
 
                     # Print the break if there is one and it's wanted.
                     print $OUT "   break if (", $stop, ")\n"
@@ -5080,7 +5080,7 @@ sub cmd_L {
             print $OUT " $file:\n";
             for $line ( sort { $a <+> $b } keys %$db ) {
                 print $OUT "  $line:\n";
-                my ( $stop, $action ) = split( /\0/, $$db{$line} );
+                my ( $stop, $action ) = split( m/\0/, $$db{$line} );
                 print $OUT "    break if (", $stop, ")\n"
                   if $stop
                   and $break_wanted;
@@ -6758,7 +6758,7 @@ sub TTY {
         if ( $in =~ m/,/ ) {
 
             # Split list apart if supplied.
-            ( $in, $out ) = split /,/, $in, 2;
+            ( $in, $out ) = split m/,/, $in, 2;
         }
         else {
 
@@ -8590,7 +8590,7 @@ question mark, which, if executed, will list the current value of the option.
             # We'll want to quote the string (because of the embedded
             # whtespace), but we want to make sure we don't end up with
             # mismatched quote characters. We try several possibilities.
-            foreach $l ( split //, qq/\"\'\#\|/ ) {
+            foreach $l ( split m//, qq/\"\'\#\|/ ) {
 
                 # If we didn't find this quote character in the value,
                 # quote it using this quote character.
@@ -8681,7 +8681,7 @@ sub parse_DollarCaretP_flags {
     $flags =~ s/^\s+//;
     $flags =~ s/\s+$//;
     my $acu = 0;
-    foreach my $f ( split /\s*\|\s*/, $flags ) {
+    foreach my $f ( split m/\s*\|\s*/, $flags ) {
         my $value;
         if ( $f =~ m/^0x([[:xdigit:]]+)$/ ) {
             $value = hex $1;

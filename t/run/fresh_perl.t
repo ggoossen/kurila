@@ -39,7 +39,7 @@ foreach my $prog (@prgs) {
 	$switch = $1;
     }
 
-    my($prog,$expected) = split(/\nEXPECT\n/, $raw_prog);
+    my($prog,$expected) = split(m/\nEXPECT\n/, $raw_prog);
     $prog .= "\n";
     $expected = '' unless defined $expected;
 

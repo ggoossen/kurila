@@ -51,7 +51,7 @@ while ( ~< *DATA) {
 	elsif (s/^\|//) {
 		$test_set = 1;	# Requests we loop over the set...
 	}
-	my @args = split(/:/);
+	my @args = split(m/:/);
 	if ($test_set == 1) {
 		my $i;
 		for ($i = 0; $i +< @set; $i++) {
@@ -522,7 +522,7 @@ sub set {
 	my ($set, $setref, $valref) = @_;
 	@{$setref} = ();
 	@{$valref} = ();
-	my @set = split(/;\s*/, $set);
+	my @set = split(m/;\s*/, $set);
 	my @res;
 	my $i;
 	for ($i = 0; $i +< @set; $i++) {

@@ -31,7 +31,7 @@ sub have_cc
     if ($@) {
         eval { require Config; };   # Everyone else
     }
-    my @chunks = split(/ /, $Config::Config{cc});
+    my @chunks = split(m/ /, $Config::Config{cc});
     # $Config{cc} may contain args; try to find out the program part
     while (@chunks) {
         if (check_cc("@chunks")) {

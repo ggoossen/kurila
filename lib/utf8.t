@@ -59,7 +59,7 @@ plan tests => 36;
 	{ use bytes; $length_bytes = length($s) }
 	my @regex_chars = $s =~ m/(.)/g;
 	my $regex_chars = @regex_chars;
-	my @split_chars = split //, $s;
+	my @split_chars = split m//, $s;
 	my $split_chars = @split_chars;
 	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
 	   "1/1/1/3");
@@ -79,7 +79,7 @@ plan tests => 36;
 	{ use bytes; $length_bytes = length($s) }
 	my @regex_chars = $s =~ m/(.)/g;
 	my $regex_chars = @regex_chars;
-	my @split_chars = split //, $s;
+	my @split_chars = split m//, $s;
 	my $split_chars = @split_chars;
 	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
 	   "2/2/2/6");

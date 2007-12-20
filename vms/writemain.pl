@@ -42,7 +42,7 @@ if (@ARGV) {
   $names = join(' ',@ARGV);
   $names =~ tr/"//d;  # Plan9 doesn't remove "" on command line
   # Allow for multiple names in one quoted group
-  @exts = split(/\s+/,$names);
+  @exts = split(m/\s+/,$names);
 }
 
 if (@exts) {

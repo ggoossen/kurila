@@ -2897,9 +2897,9 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
 {
     my $i;
-    ok('-1-3-5-' eq join('', split /((??{$i++}))/, '-1-3-5-'),
+    ok('-1-3-5-' eq join('', split m/((??{$i++}))/, '-1-3-5-'),
 	"[perl #21411] (??{ .. }) corrupts split's stack");
-    split /(?{'WOW'})/, 'abc';
+    split m/(?{'WOW'})/, 'abc';
     ok('a|b|c' eq join ('|', @_),
        "[perl #21411] (?{ .. }) version of the above");
 }
@@ -3972,7 +3972,7 @@ sub kt
          [qw|[[:^word:]] #@! abc|],
         ) {
         my $m = shift @$_;
-        my ($s, $f) = map { [split / */] } @$_;
+        my ($s, $f) = map { [split m/ */] } @$_;
         ok(m/$m/, " $m basic match") for @$s;
         ok(not m/$m/) for @$f;
         ok(m/^$m$/) for @$s;

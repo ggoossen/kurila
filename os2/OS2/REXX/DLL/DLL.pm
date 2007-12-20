@@ -5,7 +5,7 @@ our $VERSION = '1.03';
 use Carp;
 use XSLoader;
 
-@libs = split(/;/, $ENV{'PERL5REXX'} || $ENV{'PERLREXX'} || $ENV{'LIBPATH'} || $ENV{'PATH'});
+@libs = split(m/;/, $ENV{'PERL5REXX'} || $ENV{'PERLREXX'} || $ENV{'LIBPATH'} || $ENV{'PATH'});
 %dlls = ();
 
 # Preloaded methods go here.  Autoload methods go after __END__, and are
@@ -61,9 +61,9 @@ sub load {
 sub libPath_find {
   my ($name, $flags, @path) = (shift, shift);
   $flags = 0x7 unless defined $flags;
-  push @path, split /;/, OS2::extLibpath	if $flags ^&^ 0x1;	# BEGIN
-  push @path, split /;/, OS2::libPath		if $flags ^&^ 0x2;
-  push @path, split /;/, OS2::extLibpath(1)	if $flags ^&^ 0x4;	# END
+  push @path, split m/;/, OS2::extLibpath	if $flags ^&^ 0x1;	# BEGIN
+  push @path, split m/;/, OS2::libPath		if $flags ^&^ 0x2;
+  push @path, split m/;/, OS2::extLibpath(1)	if $flags ^&^ 0x4;	# END
   s,(?![/\\])$,/,  for @path;
   s,\\,/,g	   for @path;
   $name .= ".dll" unless $name =~ m/\.[^\\\/]*$/;

@@ -493,11 +493,11 @@ EOF
 	  $in_out{$name} = $out_type if $out_type;
 	}
       } else {
-	@args = split(/\s*,\s*/, $orig_args);
+	@args = split(m/\s*,\s*/, $orig_args);
 	Warn("Warning: cannot parse argument list '$orig_args', fallback to split");
       }
     } else {
-      @args = split(/\s*,\s*/, $orig_args);
+      @args = split(m/\s*,\s*/, $orig_args);
       for (@args) {
 	if ($process_inout and s/^(IN|IN_OUTLIST|OUTLIST|IN_OUT|OUT)\s+//) {
 	  my $out_type = $1;
@@ -1232,7 +1232,7 @@ sub INTERFACE_handler() {
 
   TrimWhitespace($in);
 
-  foreach (split /[\s,]+/, $in) {
+  foreach (split m/[\s,]+/, $in) {
     my $name = $_;
     $name =~ s/^$Prefix//;
     $Interfaces{$name} = $_;

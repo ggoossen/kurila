@@ -48,7 +48,7 @@ xuuuuuu
 the end
 EOM
 
-my @hello1 = grep(s/$/\n/, split(/\n/, $hello1)) ;
+my @hello1 = grep(s/$/\n/, split(m/\n/, $hello1)) ;
 
 my $hello2 = <<EOM;
 
@@ -61,7 +61,7 @@ xuuuuuu
 really the end
 EOM
 
-my @hello2 = grep(s/$/\n/, split(/\n/, $hello2)) ;
+my @hello2 = grep(s/$/\n/, split(m/\n/, $hello2)) ;
 
 my $file1 = "hello1.gz" ;
 my $file2 = "hello2.gz" ;

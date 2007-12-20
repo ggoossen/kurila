@@ -7,7 +7,7 @@ sub mungepath {
     $p =~ s/^[ ;]+//;
     $p =~ s/[ ;]+$//;
     $p =~ s/'/"/g;
-    my @p = map { $_ = "\"$_\"" if m/\s/ and !m/^".*"$/; $_ } split /;/, $p;
+    my @p = map { $_ = "\"$_\"" if m/\s/ and !m/^".*"$/; $_ } split m/;/, $p;
     return join(' ', @p);
 }
 
@@ -22,7 +22,7 @@ sub loadopts {
 	open OPTF, $optfile or die "Can't open $optfile: $!\n";
 	my @opts;
 	chomp(my $line = ~< *OPTF);
-	my @vars = split(/\t+~\t+/, $line);
+	my @vars = split(m/\t+~\t+/, $line);
 	for (@vars) {
 	    push(@opts, $_) unless (m/^\s*$/);
 	}

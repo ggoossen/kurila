@@ -27,7 +27,7 @@ my $test = 1;
 # We use the \x notation instead of raw binary bytes for \x00-\x1f\x7f-\xff
 # because e.g. many patch programs have issues with binary data.
 
-my @MK = split(/\n/, <<__EOMK__);
+my @MK = split(m/\n/, <<__EOMK__);
 1	Correct UTF-8
 1.1.1 y "\xce\xba\xe1\xbd\xb9\xcf\x83\xce\xbc\xce\xb5"	-		11	ce:ba:e1:bd:b9:cf:83:ce:bc:ce:b5	5
 2	Boundary conditions
@@ -155,7 +155,7 @@ __EOMK__
 	    $id = $1;
 	    my ($okay, $bytes, $Unicode, $byteslen, $hex, $charslen, $experr) =
 		($2, $3, $4, $5, $6, $7, $8);
-	    my @hex = split(/:/, $hex);
+	    my @hex = split(m/:/, $hex);
 	    unless (@hex == $byteslen) {
 		my $nhex = @hex;
 		moan "amount of hex ($nhex) not equal to byteslen ($byteslen)\n";

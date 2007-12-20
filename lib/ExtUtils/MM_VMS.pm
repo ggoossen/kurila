@@ -400,7 +400,7 @@ sub init_main {
 
     $self->{DEFINE} ||= '';
     if ($self->{DEFINE} ne '') {
-        my(@terms) = split(/\s+/,$self->{DEFINE});
+        my(@terms) = split(m/\s+/,$self->{DEFINE});
         my(@defs,@udefs);
         foreach my $def (@terms) {
             next unless $def;
@@ -498,12 +498,12 @@ CODE
     if ($self->{OBJECT} =~ m/\s/) {
         $self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
         $self->{OBJECT} = $self->wraplist(
-            map $self->fixpath($_,0), split /,?\s+/, $self->{OBJECT}
+            map $self->fixpath($_,0), split m/,?\s+/, $self->{OBJECT}
         );
     }
 
     $self->{LDFROM} = $self->wraplist(
-        map $self->fixpath($_,0), split /,?\s+/, $self->{LDFROM}
+        map $self->fixpath($_,0), split m/,?\s+/, $self->{LDFROM}
     );
 }
 
@@ -722,7 +722,7 @@ sub cflags {
 
     # Likewise with $self->{INC} and /Include
     if ($self->{'INC'}) {
-	my(@includes) = split(/\s+/,$self->{INC});
+	my(@includes) = split(m/\s+/,$self->{INC});
 	foreach (@includes) {
 	    s/^-I//;
 	    $incstr .= ','.$self->fixpath($_,1);
@@ -1750,7 +1750,7 @@ sub echo {
 
     my @cmds = ("\$(NOECHO) $opencmd MMECHOFILE $file ");
     push @cmds, map { '$(NOECHO) Write MMECHOFILE '.$self->quote_literal($_) } 
-                split /\n/, $text;
+                split m/\n/, $text;
     push @cmds, '$(NOECHO) Close MMECHOFILE';
     return @cmds;
 }
@@ -1831,7 +1831,7 @@ sub eliminate_macros {
     $self = {} unless ref $self;
 
     if ($path =~ m/\s/) {
-      return join ' ', map { $self->eliminate_macros($_) } split /\s+/, $path;
+      return join ' ', map { $self->eliminate_macros($_) } split m/\s+/, $path;
     }
 
     my($npath) = unixify($path);
@@ -1895,7 +1895,7 @@ sub fixpath {
     if ($path =~ m/[ \t]/) {
       return join ' ',
              map { $self->fixpath($_,$force_path) }
-	     split /[ \t]+/, $path;
+	     split m/[ \t]+/, $path;
     }
 
     if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) { 

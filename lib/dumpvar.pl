@@ -164,7 +164,7 @@ sub unwrap {
       # Match type and address.                      
       # Unblessed references will look like TYPE(0x...)
       # Blessed references will look like Class=TYPE(0x...)
-      ($start_part, $val) = split /=/,$val;
+      ($start_part, $val) = split m/=/,$val;
       $val = $start_part unless defined $val;
       ($item_type, $address) = 
         $val =~ m/([^\(]+)        # Keep stuff that's     

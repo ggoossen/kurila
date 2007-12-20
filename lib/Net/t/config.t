@@ -34,7 +34,7 @@ sub set_fail {
 
 sub inet_aton {
 	return if $fail;
-	my $num = unpack('N', pack('C*', split(/\./, $_[0])));
+	my $num = unpack('N', pack('C*', split(m/\./, $_[0])));
 	$names{$num} = $_[0];
 	return $num;
 }

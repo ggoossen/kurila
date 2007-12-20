@@ -46,7 +46,7 @@ my %ops = map { $_ => qr/$_ $hex$op/ }
 
 # split up the output lines into individual ops (terse is, well, terse!)
 # use an array here so $_ is modifiable
-my @lines = split(/\n+/, $out->read);
+my @lines = split(m/\n+/, $out->read);
 foreach (@lines) {
 	next unless m/\S/;
 	s/^\s+//;

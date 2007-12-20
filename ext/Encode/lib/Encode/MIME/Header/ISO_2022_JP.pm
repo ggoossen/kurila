@@ -41,7 +41,7 @@ sub _mime_unstructured_header {
 
     $oldheader =~ s/\s+$//;
 
-    @wordstmp = split /\s+/, $oldheader;
+    @wordstmp = split m/\s+/, $oldheader;
 
     for ( $i = 0 ; $i +< $#wordstmp ; $i++ ) {
         if (    $wordstmp[$i] !~ m/^[\x21-\x7E]+$/

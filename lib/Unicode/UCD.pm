@@ -232,7 +232,7 @@ sub charinfo {
 		     decimal digit numeric
 		     mirrored unicode10 comment
 		     upper lower title
-		    )} = split(/;/, $line, -1);
+		    )} = split(m/;/, $line, -1);
 	    $hexk =~ s/^0+//;
 	    $hexk =  sprintf("%04X", hex($hexk));
 	    if ($prop{code} eq $hexk) {

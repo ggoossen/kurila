@@ -54,7 +54,7 @@ my @out = (
 	# do the first one using multi-argument data feed
 
 my $testnum = 1;
-my @args = split(//, shift @data);
+my @args = split(m//, shift @data);
 print "not " unless hmac_sha256_hex(@args, shift @keys) eq shift @out;
 print "ok ", $testnum++, "\n";
 

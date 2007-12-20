@@ -63,7 +63,7 @@ my $load = sub {
 };
 
 {
-  my @package = split /::/, __PACKAGE__;
+  my @package = split m/::/, __PACKAGE__;
   
   if (grep {-e File::Spec->catfile($_, @package, 'Platform', $^O) . '.pm'} @INC) {
     $load->(__PACKAGE__ . "::Platform::$^O");

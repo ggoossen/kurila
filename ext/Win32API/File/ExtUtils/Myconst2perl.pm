@@ -84,7 +84,7 @@ sub ParseAttribs
 	  if  @err;
     }
     $norebuild= $hvAttr->{NO_REBUILD}   if  exists $hvAttr->{NO_REBUILD};
-    my $module= ( split /::/, $pkg )[-1];
+    my $module= ( split m/::/, $pkg )[-1];
     $base= "c".$module;
     $base= $hvAttr->{BASEFILENAME}   if  exists $hvAttr->{BASEFILENAME};
     my $ext=  ! $cplusplus  ?  ($Config{_c}||".c")
@@ -200,7 +200,7 @@ sub Myconst2perl
 	C_FILE_CODES => \%ccode,
 	SUBROUTINE => \$routine,
     } );
-    my $module= ( split /::/, $pkg )[-1];
+    my $module= ( split m/::/, $pkg )[-1];
 
     warn "Writing $outfile...\n";
     open( STDOUT, ">$outfile" )  or  die "Can't create $outfile: $!\n";

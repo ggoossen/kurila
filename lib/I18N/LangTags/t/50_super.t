@@ -7,7 +7,7 @@ print "#\n# Testing normal (tight) insertion of super-ordinate language tags...\
 
 use I18N::LangTags qw(implicate_supers);
 
-my @in = grep m/\S/, split /[\n\r]/, q{
+my @in = grep m/\S/, split m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en

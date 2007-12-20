@@ -115,7 +115,7 @@ sub guess {
         DEBUG and warn "Added: ", $e->name;
     }
     my $nline = 1;
-    for my $line ( split /\r\n?|\n/, $octet ) {
+    for my $line ( split m/\r\n?|\n/, $octet ) {
 
         # cheat 2 -- \e in the string
         if ( $line =~ m/\e/o ) {

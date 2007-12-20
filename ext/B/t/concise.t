@@ -205,7 +205,7 @@ SKIP: {
 
 	sub defd_empty {};
 	($res,$err) = render('-basic', \&defd_empty);
-	is(scalar split(/\n/, $res), 3,
+	is(scalar split(m/\n/, $res), 3,
 	   "'sub defd_empty {}' seen as 3 liner");
 
 	is(1, $res =~ m/leavesub/ && $res =~ m/(next|db)state/,

@@ -1,6 +1,6 @@
 #!./perl
 
-our @tests = split(/\n/, <<EOF);
+our @tests = split(m/\n/, <<EOF);
 0 3,			0 1 2,		3 4 5 6 7
 0 0 a b c,		,		a b c 0 1 2 3 4 5 6 7
 8 0 a b c,		,		0 1 2 3 4 5 6 7 a b c
@@ -33,7 +33,7 @@ if (join(':',@x) eq '1:2:3:1:2:3:4') {print "ok 2\n";} else {print "not ok 2\n";
 
 our $test = 5;
 foreach my $line (@tests) {
-    my ($list,$get,$leave) = split(/,\t*/,$line);
+    my ($list,$get,$leave) = split(m/,\t*/,$line);
     my ($pos, $len, @list) = split(' ',$list);
     my @get = split(' ',$get);
     my @leave = split(' ',$leave);

@@ -62,7 +62,7 @@ sub vlt {
 sub vstring {
     my($self,$n) = @_;
     $n =~ s/^v// or die "CPAN::Version::vstring() called with invalid arg [$n]";
-    pack "U*", split /\./, $n;
+    pack "U*", split m/\./, $n;
 }
 
 # vv => visible vstring

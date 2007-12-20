@@ -92,7 +92,7 @@ sub summary {
 
   for my $e (keys %$error) {
     for my $f (keys %{$error->{$e}}) {
-      my($func, $file, $line) = split /:/, $f;
+      my($func, $file, $line) = split m/:/, $f;
       my $nf = $opt{lines} ? "$func ($file:$line)" : "$func ($file)";
       $ne{$e}{$nf}{count}++;
       while (my($k,$v) = each %{$error->{$e}{$f}}) {
@@ -105,11 +105,11 @@ sub summary {
   for my $l (keys %$leak) {
     for my $s (keys %{$leak->{$l}}) {
       my $ns = join '<', map {
-                 my($func, $file, $line) = split /:/;
+                 my($func, $file, $line) = split m/:/;
                  m/:/ ? $opt{lines}
                        ? "$func ($file:$line)" : "$func ($file)"
                      : $_
-               } split /</, $s;
+               } split m/</, $s;
       $nl{$l}{$ns}{count}++;
       while (my($k,$v) = each %{$leak->{$l}{$s}}) {
         $nl{$l}{$ns}{tests}{$k} += $v;
@@ -161,7 +161,7 @@ sub summary {
     print $fh qq("$l"\n);
     for my $frames (sort keys %{$nl{$l}}) {
       my $data = $nl{$l}{$frames};
-      my @stack = split /</, $frames;
+      my @stack = split m/</, $frames;
       $data->{count} +> 1 and $stack[-1] .= " [$data->{count} paths]";
       print $fh join('', map { ' 'x4 . "$_:$stack[$_]\n" } 0 .. $#stack ),
                 format_tests($data->{tests}), "\n\n";

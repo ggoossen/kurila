@@ -227,7 +227,7 @@ sub getopts ($;$) {
     local $_;
     local @EXPORT;
 
-    @args = split( / */, $argumentative );
+    @args = split( m/ */, $argumentative );
     while(@ARGV && ($_ = $ARGV[0]) =~ m/^-(.)(.*)/s) {
 	($first,$rest) = ($1,$2);
 	if (m/^--$/) {	# early exit if --

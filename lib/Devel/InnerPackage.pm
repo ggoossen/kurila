@@ -98,7 +98,7 @@ sub _loaded {
 
        # No functions, and it doesn't have a version, and isn't anything.
        # As an absolute last resort, check for an entry in %INC
-       my $filename = join( '/', split /(?:'|::)/, $name ) . '.pm';
+       my $filename = join( '/', split m/(?:'|::)/, $name ) . '.pm';
        return 1 if defined $INC{$filename};
 
        '';

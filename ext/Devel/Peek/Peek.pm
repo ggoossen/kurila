@@ -58,10 +58,10 @@ sub debug_flags (;$) {
   my $num = $arg;
   if (defined $arg and $arg =~ m/\D/) {
     die "unknown flags in debug_flags()" if $arg =~ m/[^-$D_flags]/;
-    my ($on,$off) = split /-/, "$arg-";
+    my ($on,$off) = split m/-/, "$arg-";
     $num = $^D;
-    $num ^|^=  (1<<index($D_flags, $_)) for split //, $on;
-    $num ^&^= ^~^(1<<index($D_flags, $_)) for split //, $off;
+    $num ^|^=  (1<<index($D_flags, $_)) for split m//, $on;
+    $num ^&^= ^~^(1<<index($D_flags, $_)) for split m//, $off;
   }
   $^D = $num if defined $arg;
   $out

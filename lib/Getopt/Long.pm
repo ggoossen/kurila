@@ -805,7 +805,7 @@ sub ParseOptionSpec ($$) {
 
     my @names;
     if ( defined $names ) {
-	@names =  split (/\|/, $names);
+	@names =  split (m/\|/, $names);
 	$orig = $names[0];
     }
     else {
@@ -881,7 +881,7 @@ sub ParseOptionSpec ($$) {
     }
 
     if ( $dups && $^W ) {
-	foreach ( split(/\n+/, $dups) ) {
+	foreach ( split(m/\n+/, $dups) ) {
 	    warn($_."\n");
 	}
     }

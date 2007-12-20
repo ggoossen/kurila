@@ -59,7 +59,7 @@ END {
 sub _diag {
     return unless @_;
     my @mess = map { m/^#/ ? "$_\n" : "# $_\n" }
-               map { split /\n/ } @_;
+               map { split m/\n/ } @_;
     my $fh = $TODO ? *STDOUT : *STDERR;
     print $fh @mess;
 
@@ -134,7 +134,7 @@ sub _qq {
 
 # keys are the codes \n etc map to, values are 2 char strings such as \n
 my %backslash_escape;
-foreach my $x (split //, 'nrtfa\\\'"') {
+foreach my $x (split m//, 'nrtfa\\\'"') {
     $backslash_escape{ord eval "\"\\$x\""} = "\\$x";
 }
 # A way to display scalars containing control characters and Unicode.
