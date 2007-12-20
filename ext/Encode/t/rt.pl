@@ -11,7 +11,7 @@ BEGIN {
         $ucmdir = "../ext/Encode/ucm";
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
@@ -29,7 +29,7 @@ BEGIN {
     opendir my $dh, $ucmdir or die "$ucmdir:$!";
     @ucm = 
         map {File::Spec->catfile($ucmdir, $_) } 
-        sort grep {/\.ucm$/o} readdir($dh);
+        sort grep {m/\.ucm$/o} readdir($dh);
     closedir $dh;
     }else{
     Test::More->import("no_plan");
@@ -55,12 +55,12 @@ sub rttest{
     open my $rfh, "<$ucm" or die "$ucm:$!";
     # <U0000> \x00 |0 # <control>
     while( ~< $rfh){
-    s/#.*//o; /^$/ and next;
+    s/#.*//o; m/^$/ and next;
     unless ($name){
-        /^<code_set_name>\s+"([^\"]+)"/io or next;
+        m/^<code_set_name>\s+"([^\"]+)"/io or next;
         $name = $1 and next;
     }else{
-        /^<U([0-9a-f]+)>\s+(\S+)\s+\|(\d)/io or next;
+        m/^<U([0-9a-f]+)>\s+(\S+)\s+\|(\d)/io or next;
         $nchar++;
         $3 == 0 or next;
         $nrt++;

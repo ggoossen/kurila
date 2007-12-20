@@ -50,7 +50,7 @@ for my $target (@target) {
 
     my $srctarget = "$UREL\\$target.$suffix";
 
-    if ( $target =~ /^(miniperl|perl|perl${VERSION}(?:dll)?)$/ ) {
+    if ( $target =~ m/^(miniperl|perl|perl${VERSION}(?:dll)?)$/ ) {
         $copy{$srctarget} = "$dst\\$target.$suffix";
         print "\t$target.$suffix\n";
     }
@@ -75,7 +75,7 @@ for my $target (@target) {
         open( my $cfg, "symbian/install.cfg" )
           or die "$!: symbian/install.cfg: $!\n";
         while ( ~< $cfg) {
-            next unless /^lib\s+(.+)/;
+            next unless m/^lib\s+(.+)/;
             chomp;
             my $f = $1;
 	    unless (-f "lib/$f") {

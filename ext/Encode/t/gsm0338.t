@@ -4,7 +4,7 @@ BEGIN {
         unshift @INC, '../lib';
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
@@ -46,7 +46,7 @@ my %unesc_seq = reverse %esc_seq;
 
 
 sub eu{
-    $_[0] =~ /[\x00-\x1f]/ ? 
+    $_[0] =~ m/[\x00-\x1f]/ ? 
 	sprintf("\\x{%04X}", ord($_[0])) : encode_utf8($_[0]);
  
 }

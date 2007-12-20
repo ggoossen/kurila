@@ -10,7 +10,7 @@ use warnings;
 use Getopt::Std;
 use Config;
 my @orig_ARGV = @ARGV;
-our $VERSION  = do { my @r = (q$Revision: 2.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 2.5 $ =~ m/\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 # These may get re-ordered.
 # RAW is a do_now as inserted by &enter
@@ -155,7 +155,7 @@ my $hname = $cname;
 
 my ($doC,$doEnc,$doUcm,$doPet);
 
-if ($cname =~ /\.(c|xs)$/i) # VMS may have upcased filenames with DECC$ARGV_PARSE_STYLE defined
+if ($cname =~ m/\.(c|xs)$/i) # VMS may have upcased filenames with DECC$ARGV_PARSE_STYLE defined
  {
   $doC = 1;
   $dname =~ s/(\.[^\.]*)?$/.exh/;
@@ -177,7 +177,7 @@ if ($cname =~ /\.(c|xs)$/i) # VMS may have upcased filenames with DECC$ARGV_PARS
 END
   }
 
-  if ($cname =~ /(\w+)\.xs$/)
+  if ($cname =~ m/(\w+)\.xs$/)
    {
     print C "#include <EXTERN.h>\n";
     print C "#include <perl.h>\n";
@@ -187,15 +187,15 @@ END
   print C "#include \"encode.h\"\n\n";
 
  }
-elsif ($cname =~ /\.enc$/)
+elsif ($cname =~ m/\.enc$/)
  {
   $doEnc = 1;
  }
-elsif ($cname =~ /\.ucm$/)
+elsif ($cname =~ m/\.ucm$/)
  {
   $doUcm = 1;
  }
-elsif ($cname =~ /\.pet$/)
+elsif ($cname =~ m/\.pet$/)
  {
   $doPet = 1;
  }
@@ -211,10 +211,10 @@ my $strings = 0;
 
 sub cmp_name
 {
- if ($a =~ /^.*-(\d+)/)
+ if ($a =~ m/^.*-(\d+)/)
   {
    my $an = $1;
-   if ($b =~ /^.*-(\d+)/)
+   if ($b =~ m/^.*-(\d+)/)
     {
      my $r = $an <+> $1;
      return $r if $r;
@@ -226,7 +226,7 @@ sub cmp_name
 
 foreach my $enc (sort cmp_name @encfiles)
  {
-  my ($name,$sfx) = $enc =~ /^.*?([\w-]+)\.(enc|ucm)$/;
+  my ($name,$sfx) = $enc =~ m/^.*?([\w-]+)\.(enc|ucm)$/;
   $name = $opt{'n'} if exists $opt{'n'};
   if (open(E,$enc))
    {
@@ -275,7 +275,7 @@ if ($doC)
     my ($e2u,$u2e,$rep,$min_el,$max_el) = @{$encoding{$enc}};
     #my @info = ($e2u->{Cname},$u2e->{Cname},$rsym,length($rep),$min_el,$max_el);
     my $replen = 0; 
-    $replen++ while($rep =~ /\G\\x[0-9A-Fa-f]/g);
+    $replen++ while($rep =~ m/\G\\x[0-9A-Fa-f]/g);
     my $sym = "${enc}_encoding";
     $sym =~ s/\W+/_/g;
     my @info = ($e2u->{Cname},$u2e->{Cname},"${sym}_rep_character",$replen,
@@ -299,7 +299,7 @@ if ($doC)
     print D " Encode_XSEncoding(aTHX_ &$sym);\n";
    }
 
-  if ($cname =~ /(\w+)\.xs$/)
+  if ($cname =~ m/(\w+)\.xs$/)
    {
     my $mod = $1;
     print C <<'END';
@@ -375,8 +375,8 @@ sub compile_ucm
  while ( ~< $fh)
   {
    s/#.*$//;
-   last if /^\s*CHARMAP\s*$/i;
-   if (/^\s*<(\w+)>\s+"?([^"]*)"?\s*$/i) # " # Grrr
+   last if m/^\s*CHARMAP\s*$/i;
+   if (m/^\s*<(\w+)>\s+"?([^"]*)"?\s*$/i) # " # Grrr
     {
      $attr{$1} = $2;
     }
@@ -408,8 +408,8 @@ sub compile_ucm
  while ( ~< $fh)
   {
    s/#.*$//;
-   last if /^\s*END\s+CHARMAP\s*$/i;
-   next if /^\s*$/;
+   last if m/^\s*END\s+CHARMAP\s*$/i;
+   next if m/^\s*$/;
    my (@uni, @byte) = ();
    my ($uni, $byte, $fb) = m/^(\S+)\s+(\S+)\s+(\S+)\s+/o
        or die "Bad line: $_";
@@ -442,8 +442,8 @@ sub compile_ucm
      # 1 - fallback for unicode -> enc
      # 2 - skip sub-char mapping
      # 3 - fallback enc -> unicode
-     enter($u2e,$uch,$ech,$u2e,$fb+0) if ($fb =~ /[01]/);
-     enter($e2u,$ech,$uch,$e2u,$fb+0) if ($fb =~ /[03]/);
+     enter($u2e,$uch,$ech,$u2e,$fb+0) if ($fb =~ m/[01]/);
+     enter($e2u,$ech,$uch,$e2u,$fb+0) if ($fb =~ m/[03]/);
     }
    else
     {
@@ -468,7 +468,7 @@ sub compile_enc
  my $type;
  while ($type = ~< $fh)
   {
-   last if $type !~ /^\s*#/;
+   last if $type !~ m/^\s*#/;
   }
  chomp($type);
  return if $type eq 'E';
@@ -759,7 +759,7 @@ sub outbigstring
   my $definition = "\n$var const U8 $name\[$strings] = { " .
     join(',',unpack "C*",$string_acc);
   # We have a single long line. Split it at convenient commas.
-  print $fh $1, "\n" while $definition =~ /\G(.{74,77},)/gcs;
+  print $fh $1, "\n" while $definition =~ m/\G(.{74,77},)/gcs;
   print $fh substr ($definition, pos $definition), " };\n";
 }
 
@@ -826,7 +826,7 @@ sub char_names
  my $s = do "unicore/Name.pl";
  die "char_names: unicore/Name.pl: $!\n" unless defined $s;
  pos($s) = 0;
- while ($s =~ /\G([0-9a-f]+)\t([0-9a-f]*)\t(.*?)\s*\n/igc)
+ while ($s =~ m/\G([0-9a-f]+)\t([0-9a-f]*)\t(.*?)\s*\n/igc)
   {
    my $name = $3;
    my $s = hex($1);
@@ -929,7 +929,7 @@ sub find_e2x{
              $atime,$mtime,$ctime,$blksize,$blocks)
              = lstat($_) or return;
          -f _ or return;
-         if (/^.*\.e2x$/o){
+         if (m/^.*\.e2x$/o){
              no warnings 'once';
              $e2x_dir{$File::Find::dir} ||= $mtime;
          }
@@ -984,8 +984,8 @@ sub make_configlocal_pm {
     use File::Find ();
     my $wanted = sub{
 	-f $_ or return;
-	$File::Find::name =~ /\A\./        and return;
-	$File::Find::name =~ /\.pm\z/      or  return;
+	$File::Find::name =~ m/\A\./        and return;
+	$File::Find::name =~ m/\.pm\z/      or  return;
 	$File::Find::name =~ m/\bEncode\b/ or  return;
 	my $mod = $File::Find::name;
 	$mod =~ s/.*\bEncode\b/Encode/o;
@@ -1042,7 +1042,7 @@ sub _print_expand{
     open my $out, ">$dst" or die "$!";
     my $asis = 0;
     while ( ~< $in){ 
-    if (/^#### END_OF_HEADER/){
+    if (m/^#### END_OF_HEADER/){
         $asis = 1; next;
     }	  
     s/(\$_[A-Z][A-Za-z0-9]+)_/$1/gee unless $asis;

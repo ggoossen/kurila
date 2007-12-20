@@ -44,7 +44,7 @@ sub toebcdic {
   unless (exists ${*$cmd}{'net_cmd_asciipeer'}) {
     my $string    = $_[0];
     my $ebcdicstr = $tr->toebcdic($string);
-    ${*$cmd}{'net_cmd_asciipeer'} = $string !~ /^\d+/ && $ebcdicstr =~ /^\d+/;
+    ${*$cmd}{'net_cmd_asciipeer'} = $string !~ m/^\d+/ && $ebcdicstr =~ m/^\d+/;
   }
 
   ${*$cmd}{'net_cmd_asciipeer'}
@@ -202,7 +202,7 @@ sub command {
     my $str = join(
       " ",
       map {
-        /\n/
+        m/\n/
           ? do { my $n = $_; $n =~ tr/\n/ /; $n }
           : $_;
         } @_
@@ -362,7 +362,7 @@ sub read_until_dot {
     $cmd->debug_print(0, $str)
       if ($cmd->debug ^&^ 4);
 
-    last if ($str =~ /^\.\r?\n/o);
+    last if ($str =~ m/^\.\r?\n/o);
 
     $str =~ s/^\.\././o;
 
@@ -404,7 +404,7 @@ sub datasend {
     $first_ch = "\012" if $line =~ s/^\012//;
   }
   elsif ($last_ch eq "\012") {
-    $first_ch = "." if $line =~ /^\./;
+    $first_ch = "." if $line =~ m/^\./;
   }
 
   $line =~ s/\015?\012(\.?)/\015\012$1$1/sg;
@@ -560,7 +560,7 @@ sub READLINE {
   # indicate that we have not yet reached the eof
   return unless exists ${*$cmd}{'net_cmd_readbuf'};
   my $line = $cmd->getline;
-  return if $line =~ /^\.\r?\n/;
+  return if $line =~ m/^\.\r?\n/;
   $line;
 }
 

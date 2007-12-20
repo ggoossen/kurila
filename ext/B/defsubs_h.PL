@@ -5,7 +5,7 @@
 use strict;
 use File::Spec;
 my (undef, $headerpath) = @ARGV;
-my ($out) = __FILE__ =~ /(^.*)\.PL/i;
+my ($out) = __FILE__ =~ m/(^.*)\.PL/i;
 $out =~ s/_h$/.h/;
 unlink $out if -l $out;
 open(OUT,">$out") || die "Cannot open $out:$!";
@@ -65,7 +65,7 @@ foreach my $tuple (['op.h'],['cop.h'],['regexp.h','RXf_'])
   open(OPH,"$path") || die "Cannot open $path:$!";
   while ( ~< *OPH)
    {  
-    doconst($1) if (/#define\s+($pfx\w+)\s+([\(\)\|\dx]+)\s*(?:$|\/\*)/);
+    doconst($1) if (m/#define\s+($pfx\w+)\s+([\(\)\|\dx]+)\s*(?:$|\/\*)/);
    }  
   close(OPH);
  }

@@ -32,13 +32,13 @@ while ( ~< *ARGV) {
   }
   ##Figure out how many records in this line and
   ##extract the tag name and the line that it is found on
-  next if /struct/;
-  if (/\x01/) {
-    ($tag,$line_no) = /\x7F(\w+)\x01(\d+)/;
+  next if m/struct/;
+  if (m/\x01/) {
+    ($tag,$line_no) = m/\x7F(\w+)\x01(\d+)/;
   }
   else {
     tr/(//d;
-    ($tag,$line_no) = /(\w+)\s*\x7F(\d+),/;
+    ($tag,$line_no) = m/(\w+)\s*\x7F(\d+),/;
   }
   next unless $tag;
   ##Take only the first entry per tag

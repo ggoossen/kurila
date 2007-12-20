@@ -17,11 +17,11 @@ sub new {
     if (0) {
         # nonono, we get e.g. 01mailrc.txt uncompressed if only wget is available
         $CPAN::Frontend->mydie("file[$file] doesn't match /\\.(bz2|gz|zip|tgz)\$/")
-            unless $file =~ /\.(bz2|gz|zip|tgz)$/i;
+            unless $file =~ m/\.(bz2|gz|zip|tgz)$/i;
     }
     my $me = { FILE => $file };
     if (0) {
-    } elsif ($file =~ /\.bz2$/i) {
+    } elsif ($file =~ m/\.bz2$/i) {
         unless ($me->{UNGZIPPRG} = $CPAN::Config->{bzip2}) {
             my $bzip2;
             if ($CPAN::META->has_inst("File::Which")) {

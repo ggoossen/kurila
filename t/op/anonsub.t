@@ -59,7 +59,7 @@ sub test_invalid_decl {
     my ($code,$todo) = @_;
     $todo //= '';
     eval $code;
-    if ($@ =~ /^Illegal declaration of anonymous subroutine at/) {
+    if ($@ =~ m/^Illegal declaration of anonymous subroutine at/) {
 	print "ok ", ++$i, " - '$code' is illegal$todo\n";
     } else {
 	print "not ok ", ++$i, " - '$code' is illegal$todo\n# GOT: $@";

@@ -179,7 +179,7 @@ directory. (Does not strip symlinks, only '.', '..', and equivalents.)
 
 sub no_upwards {
     my $self = shift;
-    return grep(!/^\.{1,2}\z/s, @_);
+    return grep(!m/^\.{1,2}\z/s, @_);
 }
 
 =item case_tolerant

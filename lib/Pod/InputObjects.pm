@@ -456,7 +456,7 @@ sub new {
     my $class = ref($this) || $this;
 
     ## See if first argument has no keyword
-    if (((@_ +<= 2) or (@_ % 2)) and $_[0] !~ /^-\w/) {
+    if (((@_ +<= 2) or (@_ % 2)) and $_[0] !~ m/^-\w/) {
        ## Yup - need an implicit '-name' before first parameter
        unshift @_, '-name';
     }
@@ -482,7 +482,7 @@ sub new {
 
     ## Initialize contents if they havent been already
     my $ptree = $self->{'-ptree'} || Pod::ParseTree->new();
-    if ( ref $ptree =~ /^(ARRAY)?$/ ) {
+    if ( ref $ptree =~ m/^(ARRAY)?$/ ) {
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
         $ptree = Pod::ParseTree->new($1 ? [$ptree] : $ptree);

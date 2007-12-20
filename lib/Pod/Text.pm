@@ -103,8 +103,8 @@ sub new {
         $$self{LQUOTE} = $$self{RQUOTE} = '';
     } elsif (length ($$self{opt_quotes}) == 1) {
         $$self{LQUOTE} = $$self{RQUOTE} = $$self{opt_quotes};
-    } elsif ($$self{opt_quotes} =~ /^(.)(.)$/
-             || $$self{opt_quotes} =~ /^(..)(..)$/) {
+    } elsif ($$self{opt_quotes} =~ m/^(.)(.)$/
+             || $$self{opt_quotes} =~ m/^(..)(..)$/) {
         $$self{LQUOTE} = $1;
         $$self{RQUOTE} = $2;
     } else {
@@ -301,7 +301,7 @@ sub item {
 
     # If the tag doesn't fit, or if we have no associated text, print out the
     # tag separately.  Otherwise, put the tag in the margin of the paragraph.
-    if (!$text || $text =~ /^\s+$/ || !$fits) {
+    if (!$text || $text =~ m/^\s+$/ || !$fits) {
         my $realindent = $$self{MARGIN};
         $$self{MARGIN} = $indent;
         my $output = $self->reformat ($tag);
@@ -312,11 +312,11 @@ sub item {
         # this can result from =over/=item/=back without any intermixed
         # paragraphs.  Insert some whitespace to keep the =item from merging
         # into the next paragraph.
-        $output .= "\n" if $text && $text =~ /^\s*$/;
+        $output .= "\n" if $text && $text =~ m/^\s*$/;
 
         $self->output ($output);
         $$self{MARGIN} = $realindent;
-        $self->output ($self->reformat ($text)) if ($text && $text =~ /\S/);
+        $self->output ($self->reformat ($text)) if ($text && $text =~ m/\S/);
     } else {
         my $space = ' ' x $indent;
         $space =~ s/^$margin /$margin:/ if $$self{opt_alt};
@@ -346,7 +346,7 @@ sub cmd_para {
 sub cmd_verbatim {
     my ($self, $attrs, $text) = @_;
     $self->item if defined $$self{ITEM};
-    return if $text =~ /^\s*$/;
+    return if $text =~ m/^\s*$/;
     $text =~ s/^(\n*)(\s*\S+)/$1 . (' ' x $$self{MARGIN}) . $2/gme;
     $text =~ s/\s*$/\n\n/;
     $self->output ($text);
@@ -422,7 +422,7 @@ sub over_common_start {
 
     # Find the indentation level.
     my $indent = $$attrs{indent};
-    unless (defined ($indent) && $indent =~ /^\s*[-+]?\d{1,4}\s*$/) {
+    unless (defined ($indent) && $indent =~ m/^\s*[-+]?\d{1,4}\s*$/) {
         $indent = $$self{opt_indent};
     }
 
@@ -550,10 +550,10 @@ sub pod2text {
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
-    while ($_[0] =~ /^-/) {
+    while ($_[0] =~ m/^-/) {
         my $flag = shift;
         if    ($flag eq '-a')       { push (@args, alt => 1)    }
-        elsif ($flag =~ /^-(\d+)$/) { push (@args, width => $1) }
+        elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
         else {
             unshift (@_, $flag);
             last;

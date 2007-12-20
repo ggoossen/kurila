@@ -152,37 +152,37 @@ is(join(":", map "[$_]", @foo), '[]');
 }
 {
     local $1;
-    "2" =~ /(.+)/;
+    "2" =~ m/(.+)/;
     @foo=(); push @foo, $_ for undef..$1;
     is(join(":", @foo), '0:1:2');
 }
 {
     local $1;
-    "-2" =~ /(.+)/;
+    "-2" =~ m/(.+)/;
     @foo=(); push @foo, $_ for $1..undef;
     is(join(":", @foo), '-2:-1:0');
 }
 {
     local $1;
-    "B" =~ /(.+)/;
+    "B" =~ m/(.+)/;
     @foo=(); push @foo, $_ for undef..$1;
     is(join(":", map "[$_]", @foo), '[]');
 }
 {
     local $1;
-    "B" =~ /(.+)/;
+    "B" =~ m/(.+)/;
     @foo=(); push @foo, $_ for ""..$1;
     is(join(":", map "[$_]", @foo), '[]');
 }
 {
     local $1;
-    "B" =~ /(.+)/;
+    "B" =~ m/(.+)/;
     @foo=(); push @foo, $_ for $1..undef;
     is(join(":", map "[$_]", @foo), '');
 }
 {
     local $1;
-    "B" =~ /(.+)/;
+    "B" =~ m/(.+)/;
     @foo=(); push @foo, $_ for $1.."";
     is(join(":", map "[$_]", @foo), '');
 }

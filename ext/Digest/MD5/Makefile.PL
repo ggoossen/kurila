@@ -11,7 +11,7 @@ my @extra;
 
 if ($^O eq 'VMS') {
     if (defined($Config{ccname})) {
-        if (grep(/VMS_VAX/, @INC) && ($Config{ccname} eq 'DEC')) {
+        if (grep(m/VMS_VAX/, @INC) && ($Config{ccname} eq 'DEC')) {
             # VAX compiler optimizer even as late as v6.4 gets stuck
             push(@extra, OPTIMIZE => "/Optimize=(NODISJOINT)");
         }

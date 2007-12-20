@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, '../lib'; 
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bFile\/Glob\b/i) {
+    if ($Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
         print "1..0\n";
         exit 0;
     }
@@ -25,7 +25,7 @@ print "ok 1\n";
 # all filenames should be tainted
 @a = File::Glob::bsd_glob("*");
 eval { $a = join("",@a), kill 0; 1 };
-unless ($@ =~ /Insecure dependency/) {
+unless ($@ =~ m/Insecure dependency/) {
     print "not ";
 }
 print "ok 2\n";

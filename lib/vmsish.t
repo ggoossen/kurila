@@ -68,11 +68,11 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
 
   $msg = do_a_perl('-e "use vmsish qw(hushed); exit 1"');
   $msg =~ s/\n/\\n/g; # keep output on one line
-  ok(($msg !~ /ABORT/),"POSIX ERR exit, vmsish hushed, DCL error message check");
+  ok(($msg !~ m/ABORT/),"POSIX ERR exit, vmsish hushed, DCL error message check");
 
   $msg = do_a_perl('-e "use vmsish qw(exit hushed); exit 44"');
     $msg =~ s/\n/\\n/g; # keep output on one line
-  ok(($msg !~ /ABORT/),"vmsish ERR exit, vmsish hushed, DCL error message check");
+  ok(($msg !~ m/ABORT/),"vmsish ERR exit, vmsish hushed, DCL error message check");
 
   $msg = do_a_perl('-e "use vmsish qw(exit hushed); no vmsish qw(hushed); exit 44"');
   $msg =~ s/\n/\\n/g; # keep output on one line
@@ -80,15 +80,15 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
 
   $msg = do_a_perl('-e "use vmsish qw(hushed); die(qw(blah));"');
   $msg =~ s/\n/\\n/g; # keep output on one line
-  ok(($msg !~ /ABORT/),"die, vmsish hushed, DCL error message check");
+  ok(($msg !~ m/ABORT/),"die, vmsish hushed, DCL error message check");
 
   $msg = do_a_perl('-e "use vmsish qw(hushed); use Carp; croak(qw(blah));"');
   $msg =~ s/\n/\\n/g; # keep output on one line
-  ok(($msg !~ /ABORT/),"croak, vmsish hushed, DCL error message check");
+  ok(($msg !~ m/ABORT/),"croak, vmsish hushed, DCL error message check");
 
   $msg = do_a_perl('-e "use vmsish qw(exit); vmsish::hushed(1); exit 44;"');
   $msg =~ s/\n/\\n/g; # keep output on one line
-  ok(($msg !~ /ABORT/),"vmsish ERR exit, vmsish hushed at runtime, DCL error message check");
+  ok(($msg !~ m/ABORT/),"vmsish ERR exit, vmsish hushed at runtime, DCL error message check");
 
   local *TEST;
   open(TEST,'>vmsish_test.pl') || die('not ok ?? : unable to open "vmsish_test.pl" for writing');  
@@ -98,7 +98,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
   close TEST;
   $msg = do_a_perl('vmsish_test.pl');
   $msg =~ s/\n/\\n/g; # keep output on one line
-  ok(($msg !~ /ABORT/),"compile ERR exit, vmsish hushed, DCL error message check");
+  ok(($msg !~ m/ABORT/),"compile ERR exit, vmsish hushed, DCL error message check");
   unlink 'vmsish_test.pl';
 }
 

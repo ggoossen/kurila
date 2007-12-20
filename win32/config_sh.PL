@@ -7,7 +7,7 @@ sub mungepath {
     $p =~ s/^[ ;]+//;
     $p =~ s/[ ;]+$//;
     $p =~ s/'/"/g;
-    my @p = map { $_ = "\"$_\"" if /\s/ and !/^".*"$/; $_ } split /;/, $p;
+    my @p = map { $_ = "\"$_\"" if m/\s/ and !m/^".*"$/; $_ } split /;/, $p;
     return join(' ', @p);
 }
 
@@ -15,7 +15,7 @@ sub mungepath {
 # or an option file
 #    -- added by BKS, 10-17-1999 to fix command-line overflow problems
 sub loadopts {
-    if ($ARGV[0] =~ /--cfgsh-option-file/) {
+    if ($ARGV[0] =~ m/--cfgsh-option-file/) {
 	shift @ARGV;
 	my $optfile = shift @ARGV;
 	local (*F);
@@ -24,7 +24,7 @@ sub loadopts {
 	chomp(my $line = ~< *OPTF);
 	my @vars = split(/\t+~\t+/, $line);
 	for (@vars) {
-	    push(@opts, $_) unless (/^\s*$/);
+	    push(@opts, $_) unless (m/^\s*$/);
 	}
 	close OPTF;
 	return \@opts;
@@ -37,7 +37,7 @@ sub loadopts {
 my %opt;
 
 my $optref = loadopts();
-while (@{$optref} && $optref->[0] =~ /^([\w_]+)=(.*)$/) {
+while (@{$optref} && $optref->[0] =~ m/^([\w_]+)=(.*)$/) {
     $opt{$1}=$2;
     shift(@{$optref});
 }
@@ -57,7 +57,7 @@ my $pl_h = '../patchlevel.h';
 if (-e $pl_h) {
     open PL, "<$pl_h" or die "Can't open $pl_h: $!";
     while ( ~< *PL) {
-	if (/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
+	if (m/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
 	    $opt{$1} = $2;
 	}
     }
@@ -81,7 +81,7 @@ $opt{'version_patchlevel_string'} = "version $opt{PERL_VERSION} subversion $opt{
 $opt{'version_patchlevel_string'} .= " patchlevel $opt{PERL_PATCHLEVEL}" if exists $opt{PERL_PATCHLEVEL};
 
 my $ver = `ver 2>nul`;
-if ($ver =~ /Version (\d+\.\d+)/) {
+if ($ver =~ m/Version (\d+\.\d+)/) {
     $opt{'osvers'} = $1;
 }
 else {
@@ -92,11 +92,11 @@ if (exists $opt{cc}) {
     # cl and bcc32 version detection borrowed from Test::Smoke's configsmoke.pl
     if ($opt{cc} eq 'cl') {
         my $output = `cl --version 2>&1`;
-        $opt{ccversion} = $output =~ /^.*Version\s+([\d.]+)/ ? $1 : '?';
+        $opt{ccversion} = $output =~ m/^.*Version\s+([\d.]+)/ ? $1 : '?';
     }
     elsif ($opt{cc} eq 'bcc32') {
         my $output = `bcc32 --version 2>&1`;
-        $opt{ccversion} = $output =~ /([\d.]+)/ ? $1 : '?';
+        $opt{ccversion} = $output =~ m/([\d.]+)/ ? $1 : '?';
     }
     elsif ($opt{cc} eq 'gcc') {
         chomp($opt{gccversion} = `gcc -dumpversion`);
@@ -122,18 +122,18 @@ if ($opt{uselargefiles} ne 'define') {
     $opt{lseektype} = 'off_t';
 }
 
-if ($opt{useithreads} eq 'define' && $opt{ccflags} =~ /-DPERL_IMPLICIT_SYS\b/) {
+if ($opt{useithreads} eq 'define' && $opt{ccflags} =~ m/-DPERL_IMPLICIT_SYS\b/) {
     $opt{d_pseudofork} = 'define';
 }
 
 while ( ~< *ARGV) {
     s/~([\w_]+)~/$opt{$1}/g;
-    if (/^([\w_]+)=(.*)$/) {
+    if (m/^([\w_]+)=(.*)$/) {
 	my($k,$v) = ($1,$2);
 	# this depends on cf_time being empty in the template (or we'll
 	# get a loop)
 	if ($k eq 'cf_time') {
-	    $_ = "$k='" . localtime(time) . "'\n" if $v =~ /^\s*'\s*'/;
+	    $_ = "$k='" . localtime(time) . "'\n" if $v =~ m/^\s*'\s*'/;
 	}
 	elsif (exists $opt{$k}) {
 	    $_ = "$k='$opt{$k}'\n";

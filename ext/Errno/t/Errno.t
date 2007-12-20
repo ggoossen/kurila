@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	chdir 't' if -d 't';
 	if ($^O eq 'MacOS') { 
 	    @INC = qw(: ::lib ::macos:lib); 

@@ -352,7 +352,7 @@ sub _import {
 	    if (@_) {
 		$gzip_read_open = shift;
 		croak "$import: ':gzip_read_open' '$gzip_read_open' is illegal"
-		    unless $gzip_read_open =~ /^.+%s.+\|\s*$/;
+		    unless $gzip_read_open =~ m/^.+%s.+\|\s*$/;
 	    } else {
 		croak "$import: ':gzip_read_open' requires an argument";
 	    }
@@ -362,7 +362,7 @@ sub _import {
 	    if (@_) {
 		$gzip_write_open = shift;
 		croak "$import: ':gzip_write_open' '$gzip_read_open' is illegal"
-		    unless $gzip_write_open =~ /^\s*\|.+%s.*$/;
+		    unless $gzip_write_open =~ m/^\s*\|.+%s.*$/;
 	    } else {
 		croak "$import: ':gzip_write_open' requires an argument";
 	    }
@@ -566,7 +566,7 @@ sub gzopen_external {
     my ($filename, $mode) = @_;
     require IO::Handle;
     my $fh = IO::Handle->new();
-    if ($mode =~ /r/) {
+    if ($mode =~ m/r/) {
 	# Because someone will try to read ungzipped files
 	# with this we peek and verify the signature.  Yes,
 	# this means that we open the file twice (if it is
@@ -593,9 +593,9 @@ sub gzopen_external {
 	} else {
 	    return undef;
 	}
-    } elsif ($mode =~ /w/) {
+    } elsif ($mode =~ m/w/) {
 	my $level = '';
-	$level = "-$1" if $mode =~ /([1-9])/;
+	$level = "-$1" if $mode =~ m/([1-9])/;
 	# To maximize portability we would need to open
 	# two filehandles here, one for "| gzip $level"
 	# and another for "> $filename", and then when

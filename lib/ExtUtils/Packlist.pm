@@ -124,7 +124,7 @@ while (defined($line = ~< $fh))
    {
    chomp $line;
    my ($key, $data) = $line;
-   if ($key =~ /^(.*?)( \w+=.*)$/)
+   if ($key =~ m/^(.*?)( \w+=.*)$/)
       {
       $key = $1;
       $data = { map { split('=', $_) } split(' ', $2)};

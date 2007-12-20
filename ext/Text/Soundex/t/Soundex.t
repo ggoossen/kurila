@@ -29,13 +29,13 @@ print "1..13\n";
 while ( ~< *DATA)
 {
   chop;
-  next if /^\s*;?#/;
-  next if /^\s*$/;
+  next if m/^\s*;?#/;
+  next if m/^\s*$/;
 
   ++$test;
   $bad = 0;
 
-  if (/^eval\s+/)
+  if (m/^eval\s+/)
   {
     ($try = $_) =~ s/^eval\s+//;
 
@@ -47,7 +47,7 @@ while ( ~< *DATA)
       print "# eval '$try' returned $@";
     }
   }
-  elsif (/^\(/)
+  elsif (m/^\(/)
   {
     ($in, $out) = split (':');
 

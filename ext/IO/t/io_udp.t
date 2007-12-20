@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -12,10 +12,10 @@ use Config;
 BEGIN {
     my $reason;
 
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bSocket\b/) {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bSocket\b/) {
       $reason = 'Socket was not built';
     }
-    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
+    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
       $reason = 'IO was not built';
     }
     elsif ($^O eq 'apollo') {

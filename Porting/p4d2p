@@ -53,19 +53,19 @@ if ($cur) {
 	$fnum++;
     }
     # emit the diff header when we hit last line
-    elsif ($cur =~ /E0$/) {
+    elsif ($cur =~ m/E0$/) {
 	my $f = $file;
 
 	# special hack for perl so we can always use "patch -p1"
 	$f =~ s<^.*?(perl.*?/)><$1>;
 
 	# unified diff
-	if ($match =~ /^\@/) {
+	if ($match =~ m/^\@/) {
 	    warn "emitting udiff header\n" if $v;
 	    $_ = "Index: $f\n--- $f.~1~\t$time\n+++ $f\t$time\n$_";
 	}
 	# context diff
-	elsif ($match =~ /^\*/) {
+	elsif ($match =~ m/^\*/) {
 	    warn "emitting cdiff header\n" if $v;
 	    $_ = "Index: $f\n*** $f.~1~\t$time\n--- $f\t$time\n$_";
 	}

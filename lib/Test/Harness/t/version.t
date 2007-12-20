@@ -19,5 +19,5 @@ BEGIN {
 }
 
 my $ver = $ENV{HARNESS_VERSION} or die "HARNESS_VERSION not set";
-ok( $ver =~ /^2.\d\d(_\d\d)?$/, "Version is proper format" );
+ok( $ver =~ m/^2.\d\d(_\d\d)?$/, "Version is proper format" );
 is( $ver, $Test::Harness::VERSION );

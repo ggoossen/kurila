@@ -24,11 +24,11 @@ BEGIN {
 
                    );
     %EXPORT_TAGS = (
-        FIELDS => [ grep(/^\$pw_/, @EXPORT_OK), @EXPORT ],
+        FIELDS => [ grep(m/^\$pw_/, @EXPORT_OK), @EXPORT ],
         ALL    => [ @EXPORT, @EXPORT_OK ],
     );
 }
-use vars grep /^\$pw_/, @EXPORT_OK;
+use vars grep m/^\$pw_/, @EXPORT_OK;
 
 #
 # XXX: these mean somebody hacked this module's source
@@ -78,7 +78,7 @@ sub _feature_init {
                      }
                  )
     {
-        my $short = $feep =~ /^pw(.*)/
+        my $short = $feep =~ m/^pw(.*)/
                   ? $1
                   : do {
                         # not cluck, as we know we called ourselves,
@@ -92,8 +92,8 @@ sub _feature_init {
         $Groks{$short} = defined $Config{ "d_" . $feep };
     }
     # assume that any that are left are always there
-    for my $feep (grep /^\$pw_/s, @EXPORT_OK) {
-        $feep =~ /^\$pw_(.*)/;
+    for my $feep (grep m/^\$pw_/s, @EXPORT_OK) {
+        $feep =~ m/^\$pw_(.*)/;
         $Groks{$1} = 1 unless defined $Groks{$1};
     }
 }
@@ -171,7 +171,7 @@ sub _populate (@) {
 sub getpwent ( ) { _populate(CORE::getpwent()) }
 sub getpwnam ($) { _populate(CORE::getpwnam(shift)) }
 sub getpwuid ($) { _populate(CORE::getpwuid(shift)) }
-sub getpw    ($) { ($_[0] =~ /^\d+\z/s) ? &getpwuid : &getpwnam }
+sub getpw    ($) { ($_[0] =~ m/^\d+\z/s) ? &getpwuid : &getpwnam }
 
 _feature_init();
 

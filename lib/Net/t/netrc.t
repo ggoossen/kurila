@@ -47,7 +47,7 @@ ok( exists $INC{'Net/Netrc.pm'}, 'should be able to use Net::Netrc' );
 
 SKIP: {
 	skip('incompatible stat() handling for OS', 4), next SKIP 
-		if ($^O =~ /os2|win32|macos|cygwin/i);
+		if ($^O =~ m/os2|win32|macos|cygwin/i);
 	
 	my $warn;
 	local $SIG{__WARN__} = sub {
@@ -58,7 +58,7 @@ SKIP: {
 	$stat[2] = 077;
 	ok( !defined(Net::Netrc::_readrc()),
 		'_readrc() should not read world-writable file' );
-	ok( scalar($warn =~ /^Bad permissions:/),
+	ok( scalar($warn =~ m/^Bad permissions:/),
 		'... and should warn about it' );
 
 	# the owner field should still not match
@@ -67,7 +67,7 @@ SKIP: {
         if ($<) { 
           ok( !defined(Net::Netrc::_readrc()), 
               '_readrc() should not read file owned by someone else' ); 
-          ok( scalar($warn =~ /^Not owner:/),
+          ok( scalar($warn =~ m/^Not owner:/),
 		'... and should warn about it' ); 
         } else { 
           skip("testing as root",2);

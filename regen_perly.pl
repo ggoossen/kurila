@@ -43,7 +43,7 @@ if (@ARGV +>= 2 and $ARGV[0] eq '-b') {
 
 my $y_file = shift || 'perly.y';
 
-usage unless @ARGV==0 && $y_file =~ /\.y$/;
+usage unless @ARGV==0 && $y_file =~ m/\.y$/;
 
 (my $h_file    = $y_file) =~ s/\.y$/.h/;
 (my $act_file  = $y_file) =~ s/\.y$/.act/;
@@ -66,7 +66,7 @@ die "$0: must be run on an ASCII system\n" unless ord 'A' == 65;
 # the test below to allow that version too. DAPM Feb 04.
 
 my $version = `$bison -V`;
-unless ($version =~ /\b(1\.875[a-z]?|2\.[013])\b/) { die <<EOF; }
+unless ($version =~ m/\b(1\.875[a-z]?|2\.[013])\b/) { die <<EOF; }
 
 You have the wrong version of bison in your path; currently 1.875
 2.0, 2.1 or 2.3 is required.  Try installing
@@ -114,11 +114,11 @@ open H_FILE, ">$h_file" or die "Can't open $h_file: $!\n";
 my $endcore_done = 0;
 while ( ~< *TMPH_FILE) {
     print H_FILE "#ifdef PERL_CORE\n" if $. == 1;
-    if (!$endcore_done and /YYSTYPE_IS_DECLARED/) {
+    if (!$endcore_done and m/YYSTYPE_IS_DECLARED/) {
 	print H_FILE "#endif /* PERL_CORE */\n";
 	$endcore_done = 1;
     }
-    next if /^#line \d+ ".*"/;
+    next if m/^#line \d+ ".*"/;
     print H_FILE $_;
 }
 close TMPH_FILE;
@@ -221,11 +221,11 @@ sub make_type_tab {
     my $default_token;
     open my $fh, '<', $y_file or die "Can't open $y_file: $!\n";
     while ( ~< $fh) {
-	if (/(\$\d+)\s*=/) {
+	if (m/(\$\d+)\s*=/) {
 	    warn "$y_file:$.: dangerous assignment to $1: $_";
 	}
 
-	if (/__DEFAULT__/) {
+	if (m/__DEFAULT__/) {
 	    m{(\w+) \s* ; \s* /\* \s* __DEFAULT__}x
 		or die "$y_file: can't parse __DEFAULT__ line: $_";
 	    die "$y_file: duplicate __DEFAULT__ line: $_"
@@ -234,7 +234,7 @@ sub make_type_tab {
 	    next;
 	}
 
-	next unless /^%(token|type)/;
+	next unless m/^%(token|type)/;
 	s/^%(token|type)\s+<(\w+)>\s+//
 	    or die "$y_file: unparseable token/type line: $_";
 	$tokens{$_} = $2 for (split ' ', $_);
@@ -243,7 +243,7 @@ sub make_type_tab {
     die "$y_file: no __DEFAULT__ token defined\n" unless $default_token;
     $types{$default_token} = 1;
 
-    $tablines =~ /^\Qstatic const char *const yytname[] =\E\n
+    $tablines =~ m/^\Qstatic const char *const yytname[] =\E\n
 	    {\n
 	    (.*?)
 	    ^};

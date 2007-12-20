@@ -38,7 +38,7 @@ sub Mkbootstrap {
 	shift @INC;
     }
 
-    if ($Config{'dlsrc'} =~ /^dl_dld/){
+    if ($Config{'dlsrc'} =~ m/^dl_dld/){
 	package DynaLoader;
 	push(@dl_resolve_using, dl_findfile('-lc'));
     }

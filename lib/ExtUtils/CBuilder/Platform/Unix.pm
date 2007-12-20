@@ -26,7 +26,7 @@ sub link {
   
   local $cf->{ld} = $cf->{ld};
   if (ref $cf->{ld}) {
-    unshift @{$cf->{ld}}, 'env' if $cf->{ld}[0] =~ /^\s*\w+=/;
+    unshift @{$cf->{ld}}, 'env' if $cf->{ld}[0] =~ m/^\s*\w+=/;
   } else {
     $cf->{ld} =~ s/^(\s*\w+=)/env $1/;
   }

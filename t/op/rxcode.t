@@ -74,11 +74,11 @@ cmp_ok( scalar(@var), '==', 0, '..still nothing pushed (package)' );
 
 {
     local $^R = undef;
-    ok( 'ac' =~ /^a(?{30})(?:b(?{31})|c(?{32}))?/, 'ac =~ a(?:b|c)?' );
+    ok( 'ac' =~ m/^a(?{30})(?:b(?{31})|c(?{32}))?/, 'ac =~ a(?:b|c)?' );
     ok( $^R == 32, '$^R == 32' );
 }
 {
     local $^R = undef;
-    ok( 'abbb' =~ /^a(?{36})(?:b(?{37})|c(?{38}))+/, 'abbbb =~ a(?:b|c)+' );
+    ok( 'abbb' =~ m/^a(?{36})(?:b(?{37})|c(?{38}))+/, 'abbbb =~ a(?:b|c)+' );
     ok( $^R == 37, '$^R == 37' ) or print "# \$^R=$^R\n";
 }

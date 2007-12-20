@@ -7,7 +7,7 @@ our $VERSION = '1.05'
 my $locale_encoding;
 
 sub _get_encname {
-    return ($1, Encode::resolve_alias($1)) if $_[0] =~ /^:?encoding\((.+)\)$/;
+    return ($1, Encode::resolve_alias($1)) if $_[0] =~ m/^:?encoding\((.+)\)$/;
     return;
 }
 
@@ -32,11 +32,11 @@ sub _drop_oldenc {
     # If we find a match, we pop the old stack (once, since
     # the utf8 is just a flag on the encoding layer)
     my ($h, @new) = @_;
-    return unless @new +>= 1 && $new[-1] =~ /^:encoding\(.+\)$/;
+    return unless @new +>= 1 && $new[-1] =~ m/^:encoding\(.+\)$/;
     my @old = PerlIO::get_layers($h);
     return unless @old +>= 3 &&
 	          $old[-1] eq 'utf8' &&
-                  $old[-2] =~ /^encoding\(.+\)$/;
+                  $old[-2] =~ m/^encoding\(.+\)$/;
     require Encode;
     my ($loname, $lcname) = _get_encname($old[-2]);
     unless (defined $lcname) { # Should we trust get_layers()?
@@ -59,7 +59,7 @@ sub import {
     while (@args) {
 	my $type = shift(@args);
 	my $dscp;
-	if ($type =~ /^:?(utf8|locale|encoding\(.+\))$/) {
+	if ($type =~ m/^:?(utf8|locale|encoding\(.+\))$/) {
 	    $type = 'IO';
 	    $dscp = ":$1";
 	} elsif ($type eq ':std') {
@@ -78,7 +78,7 @@ sub import {
 		    unless defined $locale_encoding;
 		(warnings::warnif("layer", "Cannot figure out an encoding to use"), last)
 		    unless defined $locale_encoding;
-		if ($locale_encoding =~ /^utf-?8$/i) {
+		if ($locale_encoding =~ m/^utf-?8$/i) {
 		    $layer = "utf8";
 		} else {
 		    $layer = "encoding($locale_encoding)";
@@ -93,7 +93,7 @@ sub import {
 		}
 	    }
 	    push(@val,":$layer");
-	    if ($layer =~ /^(crlf|raw)$/) {
+	    if ($layer =~ m/^(crlf|raw)$/) {
 		$^H{"open_$type"} = $layer;
 	    }
 	}
@@ -117,17 +117,17 @@ sub import {
     ${^OPEN} = join("\0", $in, $out);
     if ($std) {
 	if ($in) {
-	    if ($in =~ /:utf8\b/) {
+	    if ($in =~ m/:utf8\b/) {
 		    binmode(STDIN,  ":utf8");
-		} elsif ($in =~ /(\w+\(.+\))/) {
+		} elsif ($in =~ m/(\w+\(.+\))/) {
 		    binmode(STDIN,  ":$1");
 		}
 	}
 	if ($out) {
-	    if ($out =~ /:utf8\b/) {
+	    if ($out =~ m/:utf8\b/) {
 		binmode(STDOUT,  ":utf8");
 		binmode(STDERR,  ":utf8");
-	    } elsif ($out =~ /(\w+\(.+\))/) {
+	    } elsif ($out =~ m/(\w+\(.+\))/) {
 		binmode(STDOUT,  ":$1");
 		binmode(STDERR,  ":$1");
 	    }

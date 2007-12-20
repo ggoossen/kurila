@@ -140,9 +140,9 @@ you will need also the compexcl(), casefold(), and casespec() functions.
 sub _getcode {
     my $arg = shift;
 
-    if ($arg =~ /^[1-9]\d*$/) {
+    if ($arg =~ m/^[1-9]\d*$/) {
 	return $arg;
-    } elsif ($arg =~ /^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/) {
+    } elsif ($arg =~ m/^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/) {
 	return hex($1);
     }
 
@@ -221,7 +221,7 @@ sub charinfo {
     openunicode(\$UNICODEFH, "UnicodeData.txt");
     if (defined $UNICODEFH) {
 	use Search::Dict v1.02;
-	if (look($UNICODEFH, "$hexk;", { xfrm => sub { $_[0] =~ /^([^;]+);(.+)/; sprintf "%06X;$2", hex($1) } } ) +>= 0) {
+	if (look($UNICODEFH, "$hexk;", { xfrm => sub { $_[0] =~ m/^([^;]+);(.+)/; sprintf "%06X;$2", hex($1) } } ) +>= 0) {
 	    my $line = ~< $UNICODEFH;
 	    return unless defined $line;
 	    chomp $line;
@@ -312,7 +312,7 @@ sub _charblocks {
 	if (openunicode(\$BLOCKSFH, "Blocks.txt")) {
 	    local $_;
 	    while ( ~< $BLOCKSFH) {
-		if (/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/) {
+		if (m/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/) {
 		    my ($lo, $hi) = (hex($1), hex($2));
 		    my $subrange = [ $lo, $hi, $3 ];
 		    push @BLOCKS, $subrange;
@@ -374,7 +374,7 @@ sub _charscripts {
 	if (openunicode(\$SCRIPTSFH, "Scripts.txt")) {
 	    local $_;
 	    while ( ~< $SCRIPTSFH) {
-		if (/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
+		if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
 		    my ($lo, $hi) = (hex($1), $2 ? hex($2) : hex($1));
 		    my $script = lc($3);
 		    $script =~ s/\b(\w)/uc($1)/ge;
@@ -622,7 +622,7 @@ sub _compexcl {
 	if (openunicode(\$COMPEXCLFH, "CompositionExclusions.txt")) {
 	    local $_;
 	    while ( ~< $COMPEXCLFH) {
-		if (/^([0-9A-F]+)\s+\#\s+/) {
+		if (m/^([0-9A-F]+)\s+\#\s+/) {
 		    my $code = hex($1);
 		    $COMPEXCL{$code} = undef;
 		}
@@ -693,7 +693,7 @@ sub _casefold {
 	if (openunicode(\$CASEFOLDFH, "CaseFolding.txt")) {
 	    local $_;
 	    while ( ~< $CASEFOLDFH) {
-		if (/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
+		if (m/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
 		    my $code = hex($1);
 		    $CASEFOLD{$code} = { code    => $1,
 					 status  => $2,
@@ -774,7 +774,7 @@ sub _casespec {
 	if (openunicode(\$CASESPECFH, "SpecialCasing.txt")) {
 	    local $_;
 	    while ( ~< $CASESPECFH) {
-		if (/^([0-9A-F]+); ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; (\w+(?: \w+)*)?/) {
+		if (m/^([0-9A-F]+); ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; (\w+(?: \w+)*)?/) {
 		    my ($hexcode, $lower, $title, $upper, $condition) =
 			($1, $2, $3, $4, $5);
 		    my $code = hex($hexcode);
@@ -790,7 +790,7 @@ sub _casespec {
 							   condition)};
 			    if (defined $oldcondition) {
 				my ($oldlocale) =
-				($oldcondition =~ /^([a-z][a-z](?:_\S+)?)/);
+				($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
 				delete $CASESPEC{$code};
 				$CASESPEC{$code}->{$oldlocale} =
 				{ code      => $hexcode,
@@ -801,7 +801,7 @@ sub _casespec {
 			    }
 			}
 			my ($locale) =
-			    ($condition =~ /^([a-z][a-z](?:_\S+)?)/);
+			    ($condition =~ m/^([a-z][a-z](?:_\S+)?)/);
 			$CASESPEC{$code}->{$locale} =
 			{ code      => $hexcode,
 			  lower     => $lower,
@@ -862,7 +862,7 @@ sub _namedseq {
 	if (openunicode(\$NAMEDSEQFH, "NamedSequences.txt")) {
 	    local $_;
 	    while ( ~< $NAMEDSEQFH) {
-		if (/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
+		if (m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
 		    my ($n, $s) = ($1, $2);
 		    my @s = map { chr(hex($_)) } split(' ', $s);
 		    $NAMEDSEQ{$n} = join("", @s);
@@ -908,7 +908,7 @@ sub UnicodeVersion {
 	chomp($UNICODEVERSION = ~< $VERSIONFH);
 	close($VERSIONFH);
 	croak __PACKAGE__, "::VERSION: strange version '$UNICODEVERSION'"
-	    unless $UNICODEVERSION =~ /^\d+(?:\.\d+)+$/;
+	    unless $UNICODEVERSION =~ m/^\d+(?:\.\d+)+$/;
     }
     return $UNICODEVERSION;
 }

@@ -537,7 +537,7 @@ EOM
         substr($buffer, 0, 1, 'x') ;
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
-        ok $GunzipError =~ /Header Error: Bad Magic/;
+        ok $GunzipError =~ m/Header Error: Bad Magic/;
     }
 
     {
@@ -546,7 +546,7 @@ EOM
         substr($buffer, 1, 1, "\xFF") ;
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
-        ok $GunzipError =~ /Header Error: Bad Magic/;
+        ok $GunzipError =~ m/Header Error: Bad Magic/;
         #print "$GunzipError\n";
     }
 

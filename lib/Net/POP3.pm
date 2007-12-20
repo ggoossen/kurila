@@ -78,7 +78,7 @@ sub host {
 ##
 
 
-sub debug_text { $_[2] =~ /^(pass|rpop)/i ? "$1 ....\n" : $_[2]; }
+sub debug_text { $_[2] =~ m/^(pass|rpop)/i ? "$1 ....\n" : $_[2]; }
 
 
 sub login {
@@ -112,7 +112,7 @@ sub apop {
   }
 
   return undef
-    unless ($banner = (${*$me}{'net_pop3_banner'} =~ /(<.*>)/)[0]);
+    unless ($banner = (${*$me}{'net_pop3_banner'} =~ m/(<.*>)/)[0]);
 
   if (@_ +<= 2) {
     ($user, $pass) = $me->_lookup_credentials($user);
@@ -166,7 +166,7 @@ sub last {
   @_ == 1 or croak 'usage: $obj->last()';
 
   return undef
-    unless $_[0]->_LAST && $_[0]->message =~ /(\d+)/;
+    unless $_[0]->_LAST && $_[0]->message =~ m/(\d+)/;
 
   return $1;
 }
@@ -188,7 +188,7 @@ sub popstat {
   my $me = shift;
 
   return ()
-    unless $me->_STAT && $me->message =~ /(\d+)\D+(\d+)/;
+    unless $me->_STAT && $me->message =~ m/(\d+)\D+(\d+)/;
 
   ($1 || 0, $2 || 0);
 }
@@ -202,14 +202,14 @@ sub list {
     unless $me->_LIST(@_);
 
   if (@_) {
-    $me->message =~ /\d+\D+(\d+)/;
+    $me->message =~ m/\d+\D+(\d+)/;
     return $1 || undef;
   }
 
   my $info = $me->read_until_dot
     or return undef;
 
-  my %hash = map { (/(\d+)\D+(\d+)/) } @$info;
+  my %hash = map { (m/(\d+)\D+(\d+)/) } @$info;
 
   return \%hash;
 }
@@ -251,7 +251,7 @@ sub uidl {
   $me->_UIDL(@_)
     or return undef;
   if (@_) {
-    $uidl = ($me->message =~ /\d+\s+([\041-\176]+)/)[0];
+    $uidl = ($me->message =~ m/\d+\s+([\041-\176]+)/)[0];
   }
   else {
     my $ref = $me->read_until_dot
@@ -259,7 +259,7 @@ sub uidl {
     my $ln;
     $uidl = {};
     foreach $ln (@$ref) {
-      my ($msg, $uid) = $ln =~ /^\s*(\d+)\s+([\041-\176]+)/;
+      my ($msg, $uid) = $ln =~ m/^\s*(\d+)\s+([\041-\176]+)/;
       $uidl->{$msg} = $uid;
     }
   }
@@ -271,7 +271,7 @@ sub ping {
   @_ == 2 or croak 'usage: $pop3->ping( USER )';
   my $me = shift;
 
-  return () unless $me->_PING(@_) && $me->message =~ /(\d+)\D+(\d+)/;
+  return () unless $me->_PING(@_) && $me->message =~ m/(\d+)\D+(\d+)/;
 
   ($1 || 0, $2 || 0);
 }
@@ -301,7 +301,7 @@ sub _lookup_credentials {
 sub _get_mailbox_count {
   my ($me) = @_;
   my $ret = ${*$me}{'net_pop3_count'} =
-    ($me->message =~ /(\d+)\s+message/io) ? $1 : ($me->popstat)[0];
+    ($me->message =~ m/(\d+)\s+message/io) ? $1 : ($me->popstat)[0];
 
   $ret ? $ret : "0E0";
 }
@@ -381,12 +381,12 @@ sub capa {
   my ($capa, %capabilities);
 
   # Fake a capability here
-  $capabilities{APOP} = '' if ($this->banner() =~ /<.*>/);
+  $capabilities{APOP} = '' if ($this->banner() =~ m/<.*>/);
 
   if ($this->_CAPA()) {
     $capabilities{CAPA} = 1;
     $capa = $this->read_until_dot();
-    %capabilities = (%capabilities, map {/^\s*(\S+)\s*(.*)/} @$capa);
+    %capabilities = (%capabilities, map {m/^\s*(\S+)\s*(.*)/} @$capa);
   }
   else {
 

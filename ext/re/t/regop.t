@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config;
-    if (($Config::Config{'extensions'} !~ /\bre\b/) ){
+    if (($Config::Config{'extensions'} !~ m/\bre\b/) ){
 	print "1..0 # Skip -- Perl configured without re module\n";
 	exit 0;
     }
@@ -13,16 +13,16 @@ BEGIN {
 use strict;
 BEGIN { require "./test.pl"; }
 our $NUM_SECTS;
-chomp(my @strs= grep { !/^\s*\#/ } ~< *DATA);
+chomp(my @strs= grep { !m/^\s*\#/ } ~< *DATA);
 my $out = runperl(progfile => "../ext/re/t/regop.pl", stderr => 1 );
 # VMS currently embeds linefeeds in the output.
 $out =~ s/\cJ//g if $^O = 'VMS';
-my @tests = grep { /\S/ } split /(?=Compiling REx)/, $out;
+my @tests = grep { m/\S/ } split /(?=Compiling REx)/, $out;
 # on debug builds we get an EXECUTING... message in there at the top
 shift @tests
-    if $tests[0] =~ /EXECUTING.../;
+    if $tests[0] =~ m/EXECUTING.../;
 
-plan( @tests + 2 + ( @strs - grep { !$_ or /^---/ } @strs ));
+plan( @tests + 2 + ( @strs - grep { !$_ or m/^---/ } @strs ));
 
 is( scalar @tests, $NUM_SECTS,
     "Expecting output for $NUM_SECTS patterns" );
@@ -31,17 +31,17 @@ ok( defined $out, 'regop.pl returned something defined' );
 $out ||= "";
 my $test= 1;
 foreach my $testout ( @tests ) {
-    my ( $pattern )= $testout=~/Compiling REx "([^"]+)"/;
+    my ( $pattern )= $testout=~m/Compiling REx "([^"]+)"/;
     ok( $pattern, "Pattern for test " . ($test++) );
     my $diaged;
     while (@strs) {
         local $_= shift @strs;
         last if !$_
-             or /^---/;
-        next if /^\s*#/;
+             or m/^---/;
+        next if m/^\s*#/;
         s/^\s+//;
         s/\s+$//;
-        ok( $testout=~/\Q$_\E/, "$_: /$pattern/" )
+        ok( $testout=~m/\Q$_\E/, "$_: /$pattern/" )
             or do {
                 !$diaged++ and diag("$_: /$pattern/\n$testout");
             };

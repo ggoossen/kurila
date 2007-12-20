@@ -8,7 +8,7 @@ $VERSION = 3.04;   ## Current version of this package
 BEGIN { *DEBUG = sub () {0} unless defined &DEBUG; }   # set DEBUG level
 use Carp ();
 
-$SLEEPY = 1 if !defined $SLEEPY and $^O =~ /mswin|mac/i;
+$SLEEPY = 1 if !defined $SLEEPY and $^O =~ m/mswin|mac/i;
   # flag to occasionally sleep for $SLEEPY - 1 seconds.
 
 $MAX_VERSION_WITHIN ||= 60;
@@ -440,7 +440,7 @@ sub _simplify_base {   # Internal method only
   $_[1] =~ s/\.(pod|pm|plx?)\z//i;
 
   # strip meaningless extensions on Win32 and OS/2
-  $_[1] =~ s/\.(bat|exe|cmd)\z//i if $^O =~ /mswin|os2/i;
+  $_[1] =~ s/\.(bat|exe|cmd)\z//i if $^O =~ m/mswin|os2/i;
 
   # strip meaningless extensions on VMS
   $_[1] =~ s/\.(com)\z//i if $^O eq 'VMS';

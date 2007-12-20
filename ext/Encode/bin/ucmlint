@@ -4,7 +4,7 @@
 #
 
 use strict;
-our  $VERSION = do { my @r = (q$Revision: 2.1 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our  $VERSION = do { my @r = (q$Revision: 2.1 $ =~ m/\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 use Getopt::Std;
 our %Opt;
@@ -55,7 +55,7 @@ for $ARGV (@ARGV){
     $. = 0;
     while( ~< *UCM){
     chomp;
-    s/\s*#.*$//o; /^$/ and next;
+    s/\s*#.*$//o; m/^$/ and next;
     if ($_ eq "CHARMAP"){ 
         $in_charmap = 1;
         for my $must (qw/code_set_name mb_cur_min mb_cur_max/){
@@ -68,7 +68,7 @@ for $ARGV (@ARGV){
         next;
     }
     unless ($in_charmap){
-        my($hkey, $hvalue) = /^<(\S+)>\s+[\"\']?([^\"\']+)/o or next;
+        my($hkey, $hvalue) = m/^<(\S+)>\s+[\"\']?([^\"\']+)/o or next;
         $Opt{D} and warn "$hkey => $hvalue";
         if ($hkey eq "code_set_name"){ # name check
         exists $Hdr{code_set_name} 
@@ -81,11 +81,11 @@ for $ARGV (@ARGV){
         $Hdr{$hkey} = $hvalue;
     }else{
         my $name = $Hdr{code_set_name};
-        my($unistr, $encstr, $fb) = /^(\S+)\s+(\S+)\s(\S+)/o or next;
+        my($unistr, $encstr, $fb) = m/^(\S+)\s+(\S+)\s(\S+)/o or next;
         $Opt{v} and nit $_, 2;
         my $uni = uniparse($unistr);
         my $enc = encparse($encstr);
-        $fb =~ /^\|([0123])$/ or nit "malformed fallback: $fb";
+        $fb =~ m/^\|([0123])$/ or nit "malformed fallback: $fb";
         $fb = $1; 
         $Opt{f} and $fb = 0;
         unless ($fb == 1){ # check uni -> enc
@@ -153,9 +153,9 @@ sub checkRT{
 sub uniparse{
     my $str = shift;
     my @u;
-    push @u, $1 while($str =~ /\G<U(.*?)>/ig);
+    push @u, $1 while($str =~ m/\G<U(.*?)>/ig);
     for my $u (@u){
-    $u =~ /^([0-9A-Za-z]+)$/o
+    $u =~ m/^([0-9A-Za-z]+)$/o
         or nit "malformed Unicode character: $u";
     }
     return join(',', @u);
@@ -166,7 +166,7 @@ sub encparse{
     my @e;
     for my $e (split /\\x/io, $str){
     $e or next; # first \x
-    $e =~ /^([0-9A-Za-z]{1,2})$/io
+    $e =~ m/^([0-9A-Za-z]{1,2})$/io
         or nit "Hex $e in $str is bogus";
     push @e, $1;
     }

@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -10,7 +10,7 @@ BEGIN {
 use strict;
 use bytes;
 require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
-plan(tests => ($^O =~ /MSWin32/ ? 9 : 6));
+plan(tests => ($^O =~ m/MSWin32/ ? 9 : 6));
 
 my $Class       = 'IO::File';
 my $All_Chars   = join '', "\r\n", map( chr, 1..255 ), "zzz\n\r";
@@ -32,7 +32,7 @@ can_ok( $Class,                 "binmode" );
 
 ### now read in the file, once without binmode, once with.
 ### without binmode should fail at least on win32...
-if( $^O =~ /MSWin32/ ) {
+if( $^O =~ m/MSWin32/ ) {
     my $fh = $Class->new;
 
     isa_ok( $fh,                $Class );

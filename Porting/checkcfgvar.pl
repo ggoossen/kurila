@@ -51,9 +51,9 @@ sub read_file {
 sub config_h_SH_reader {
     my $cfg = shift;
     return sub {
-	while (/[^\\]\$([a-z]\w+)/g) {
+	while (m/[^\\]\$([a-z]\w+)/g) {
 	    my $v = $1;
-	    next if $v =~ /^(CONFIG_H|CONFIG_SH)$/;
+	    next if $v =~ m/^(CONFIG_H|CONFIG_SH)$/;
 	    $cfg->{$v}++;
 	}
     }
@@ -66,7 +66,7 @@ my %MANIFEST;
 
 read_file("MANIFEST",
 	  sub {
-	      $MANIFEST{$1}++ if /^(.+?)\t/;
+	      $MANIFEST{$1}++ if m/^(.+?)\t/;
 	  });
 
 my @MASTER_CFG = sort keys %MASTER_CFG;
@@ -86,22 +86,22 @@ for my $cfg (@CFG) {
     my %cfg;
     read_file($cfg,
 	      sub {
-		  return if /^\#/ || /^\s*$/;
+		  return if m/^\#/ || m/^\s*$/;
 		  if ($cfg eq 'configure.com') {
 		      s/(\s*!.*|\s*)$//; # remove trailing comments or whitespace
-		      return if ! /^\$\s+WC "(\w+)='(.*)'"$/;
+		      return if ! m/^\$\s+WC "(\w+)='(.*)'"$/;
 		  }
 		  # foo='bar'
 		  # foo=bar
 		  # $foo='bar' # VOS 5.8.x specialty
 		  # $foo=bar   # VOS 5.8.x specialty
-		  if (/^\$?(\w+)='(.*)'$/) {
+		  if (m/^\$?(\w+)='(.*)'$/) {
 		      $cfg{$1}++;
 		  }
-		  elsif (/^\$?(\w+)=(.*)$/) {
+		  elsif (m/^\$?(\w+)=(.*)$/) {
 		      $cfg{$1}++;
 		  }
-		  elsif (/^\$\s+WC "(\w+)='(.*)'"$/) {
+		  elsif (m/^\$\s+WC "(\w+)='(.*)'"$/) {
 		      $cfg{$1}++;
 		  } else {
 		      warn "$cfg:$.:$_";

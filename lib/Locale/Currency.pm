@@ -14,7 +14,7 @@ require Exporter;
 #	Public Global Variables
 #-----------------------------------------------------------------------
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION      = sprintf("%d.%02d", q$Revision: 2.7 $ =~ /(\d+)\.(\d+)/);
+$VERSION      = sprintf("%d.%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
 @ISA          = qw(Exporter);
 @EXPORT       = qw(&code2currency &currency2code
                    &all_currency_codes &all_currency_names );
@@ -111,7 +111,7 @@ sub all_currency_names
 
     while ( ~< *DATA)
     {
-        next unless /\S/;
+        next unless m/\S/;
         chop;
         ($code, $currency) = split(/:/, $_, 2);
         $CODES{$code} = $currency;

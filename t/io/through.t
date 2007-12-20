@@ -60,7 +60,7 @@ sub testread ($$$$$$$) {
   }
   close $fh or die "close: $!";
   # The only contamination allowed is with sysread/prints
-  $buf =~ s/\r\n/\n/g if $how_r eq 'sysread' and $how_w =~ /print/;
+  $buf =~ s/\r\n/\n/g if $how_r eq 'sysread' and $how_w =~ m/print/;
   is(length $buf, length $str, "length with wrc=$write_c, rdc=$read_c, $how_w, $how_r, $why");
   is($buf, $str, "content with wrc=$write_c, rdc=$read_c, $how_w, $how_r, $why");
 }

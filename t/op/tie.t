@@ -22,7 +22,7 @@ for (@prgs){
     my($prog,$expected) = split(/\nEXPECT\n/, $_, 2);
     print("not ok $i # bad test format\n"), next
         unless defined $expected;
-    my ($testname) = $prog =~ /^# (.*)\n/m;
+    my ($testname) = $prog =~ m/^# (.*)\n/m;
     $testname ||= '';
     $TODO = $testname =~ s/^TODO //;
     $expected =~ s/\n+$//;

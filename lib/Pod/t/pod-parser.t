@@ -38,7 +38,7 @@ open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
 $parser->parse_from_file ({ -cutting => 0 }, 'tmp.pod', \*OUT);
 close OUT;
 open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
-while ( ~< *OUT) { last if /^\.nh/ }
+while ( ~< *OUT) { last if m/^\.nh/ }
 my $output;
 {
     local $/;

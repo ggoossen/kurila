@@ -2,7 +2,7 @@
 
 BEGIN {
     use Config;
-    if ($Config{extensions} !~ /\bEncode\b/) {
+    if ($Config{extensions} !~ m/\bEncode\b/) {
 	print "1..0 # Skip: no Encode\n";
 	exit 0;
     }
@@ -21,7 +21,7 @@ BEGIN {
 # bug #41442
 use PerlIO::encoding;
 use open ':locale';
-if ($warn !~ /Cannot find encoding/) {
+if ($warn !~ m/Cannot find encoding/) {
     if (-e '/dev/null') { open STDERR, '>', '/dev/null' }
     warn "# \x{201e}\n"; # &bdquo;
 }

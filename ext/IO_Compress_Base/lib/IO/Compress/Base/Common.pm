@@ -115,7 +115,7 @@ sub isaFilename($)
 
 sub isaFileGlobString
 {
-    return defined $_[0] && $_[0] =~ /^<.*>$/;
+    return defined $_[0] && $_[0] =~ m/^<.*>$/;
 }
 
 sub cleanFileGlobString
@@ -189,7 +189,7 @@ sub whatIs ($;$)
 
 sub oneTarget
 {
-    return $_[0] =~ /^(code|handle|buffer|filename)$/;
+    return $_[0] =~ m/^(code|handle|buffer|filename)$/;
 }
 
 sub Validator::new
@@ -690,7 +690,7 @@ sub IO::Compress::Base::Parameters::_checkType
         return $self->setError("Parameter '$key' must be an unsigned int, got 'undef'")
             if $validate && ! defined $value ;
         return $self->setError("Parameter '$key' must be an unsigned int, got '$value'")
-            if $validate && $value !~ /^\d+$/;
+            if $validate && $value !~ m/^\d+$/;
 
         $$output = defined $value ? $value : 0 ;    
         return 1;
@@ -700,7 +700,7 @@ sub IO::Compress::Base::Parameters::_checkType
         return $self->setError("Parameter '$key' must be a signed int, got 'undef'")
             if $validate && ! defined $value ;
         return $self->setError("Parameter '$key' must be a signed int, got '$value'")
-            if $validate && $value !~ /^-?\d+$/;
+            if $validate && $value !~ m/^-?\d+$/;
 
         $$output = defined $value ? $value : 0 ;    
         return 1 ;
@@ -708,7 +708,7 @@ sub IO::Compress::Base::Parameters::_checkType
     elsif ($type ^&^ Parse_boolean)
     {
         return $self->setError("Parameter '$key' must be an int, got '$value'")
-            if $validate && defined $value && $value !~ /^\d*$/;
+            if $validate && defined $value && $value !~ m/^\d*$/;
         $$output =  defined $value ? $value != 0 : 0 ;    
         return 1;
     }

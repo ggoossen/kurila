@@ -13,7 +13,7 @@ BEGIN {
 }
 use Config;
 BEGIN {
-    if ($Config{'extensions'} !~ /\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
+    if ($Config{'extensions'} !~ m/\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
         print "1..0\n"; exit 0;
     }
 }
@@ -28,17 +28,17 @@ my %code;
 
 while ( ~< *DATA) {
     chomp;
-    die "Can't match $_" unless /^([a-z_0-9]+)\t+(.*)/;
+    die "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/;
     $code{$1} = $2;
 }
 
 open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $!";
 while ( ~< $fh) {
-    last if /^__END__/;
+    last if m/^__END__/;
 }
 while ( ~< $fh) {
     chomp;
-    next if !$_ or /^#/;
+    next if !$_ or m/^#/;
     my ($op, $opname) = split /\t+/;
     push @op, [$op, $opname, $code{$op}];
 }
@@ -48,7 +48,7 @@ plan(tests => scalar @op);
 
 sub testop {
     my ($op, $opname, $code) = @_;
-    pass("$op : skipped") and return if $code =~ /^SKIP/;
+    pass("$op : skipped") and return if $code =~ m/^SKIP/;
     my $c = Safe->new();
     $c->deny_only($op);
     $c->reval($code);

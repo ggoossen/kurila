@@ -51,7 +51,7 @@ sub import {
 	}
 
 	# Normal constant name
-	if ($name =~ /^_?[^\W_0-9]\w*$str_end/ and !$forbidden{$name}) {
+	if ($name =~ m/^_?[^\W_0-9]\w*$str_end/ and !$forbidden{$name}) {
 	    # Everything is okay
 
 	# Name forced into main, but we're not in main. Fatal.
@@ -60,12 +60,12 @@ sub import {
 	    Carp::croak("Constant name '$name' is forced into main::");
 
 	# Starts with double underscore. Fatal.
-	} elsif ($name =~ /^__/) {
+	} elsif ($name =~ m/^__/) {
 	    require Carp;
 	    Carp::croak("Constant name '$name' begins with '__'");
 
 	# Maybe the name is tolerable
-	} elsif ($name =~ /^[A-Za-z_]\w*$str_end/) {
+	} elsif ($name =~ m/^[A-Za-z_]\w*$str_end/) {
 	    # Then we'll warn only if you've asked for warnings
 	    if (warnings::enabled()) {
 		if ($keywords{$name}) {
@@ -78,7 +78,7 @@ sub import {
 
 	# Looks like a boolean
 	# use constant FRED == fred;
-	} elsif ($name =~ /^[01]?$str_end/) {
+	} elsif ($name =~ m/^[01]?$str_end/) {
             require Carp;
 	    if (@_) {
 		Carp::croak("Constant name '$name' is invalid");

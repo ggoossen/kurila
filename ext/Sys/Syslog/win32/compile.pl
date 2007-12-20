@@ -12,7 +12,7 @@ open(my $msgfh, '<', "$name.mc") or die "fatal: Can't read file '$name.mc': $!\n
 my $top = ~< $msgfh;
 close($msgfh);
 
-my ($version) = $top =~ /Sys::Syslog Message File (\d+\.\d+\.\d+)/
+my ($version) = $top =~ m/Sys::Syslog Message File (\d+\.\d+\.\d+)/
         or die "error: File '$name.mc' doesn't have a version number\n";
 
 # compile the message text files
@@ -48,7 +48,7 @@ my %vals;
 my $max = 0;
 
 while ( ~< $header) {
-    if (/^#define\s+(\w+)\s+(\d+)$/ || /^#define\s+(\w+)\s+\(\(DWORD\)(\d+)L\)/) {
+    if (m/^#define\s+(\w+)\s+(\d+)$/ || m/^#define\s+(\w+)\s+\(\(DWORD\)(\d+)L\)/) {
         $vals{$1} = $2;
         if (substr($1, 0, 1) eq 'C') {
             $max = $2 if $max +< $2;
@@ -62,7 +62,7 @@ my ($hash, $f2c, %fac);
 
 for my $name (sort { substr($a,0,1) cmp substr($b,0,1) || $vals{$a} <+> $vals{$b} } keys %vals) {
     $hash .= "    $name => $vals{$name},\n" ;
-    if ($name =~ /^CAT_(\w+)$/) {
+    if ($name =~ m/^CAT_(\w+)$/) {
         $fac{$1} = $vals{$name};
     }
 }

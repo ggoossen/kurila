@@ -3,11 +3,11 @@ BEGIN {
     chdir 't';
     @INC = '../lib';
     require Config;
-    if (($Config::Config{'extensions'} !~ /\bB\b/) ){
+    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
-    if ($Config::Config{'extensions'} !~ /\bPOSIX\b/) {
+    if ($Config::Config{'extensions'} !~ m/\bPOSIX\b/) {
         print "1..0 # Skip -- Perl configured without POSIX\n";
         exit 0;
     }

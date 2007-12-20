@@ -101,13 +101,13 @@ my %cat_title = (
 sub get_meta_info {
     my $ls = shift;
     local($_) = shift;
-    if (/^From:\s+(.*\S)/i) {;
+    if (m/^From:\s+(.*\S)/i) {;
 	my $from = $1;	# temporary measure for Chip Salzenberg
 	$from =~ s/chip\@(atlantic\.net|perlsupport\.com)/chip\@pobox.com/;
 	$from =~ s/\(Tim Bunce\) \(Tim Bunce\)/(Tim Bunce)/;
 	$ls->{From}{$from} = 1
     }
-    if (/^Subject:\s+(?:Re: )?(.*\S)/i) {
+    if (m/^Subject:\s+(?:Re: )?(.*\S)/i) {
 	my $title = $1;
 	$title =~ s/\[(PATCH|PERL)[\w\. ]*\]:?//g;
 	$title =~ s/\b(PATCH|PERL)[\w\.]*://g;
@@ -116,9 +116,9 @@ sub get_meta_info {
 	$title =~ s/^\s*(.*?)\s*$/$1/g;
 	$ls->{Title}{$title} = 1;
     }
-    $ls->{'Msg-ID'}{$1}=1 if /^Message-Id:\s+(.*\S)/i;
-    $ls->{Date}{$1}=1     if /^Date:\s+(.*\S)/i;
-    $ls->{$1}{$2}=1       if $::opt_M && /^([-\w]+):\s+(.*\S)/;
+    $ls->{'Msg-ID'}{$1}=1 if m/^Message-Id:\s+(.*\S)/i;
+    $ls->{Date}{$1}=1     if m/^Date:\s+(.*\S)/i;
+    $ls->{$1}{$2}=1       if $::opt_M && m/^([-\w]+):\s+(.*\S)/;
 }
 
 
@@ -170,19 +170,19 @@ foreach my $argv (@ARGV) {
     $ls = $ls{$in} ||= { is_in => 1, in => $in };
     my $type;
     while ( ~< *F) {
-	unless (/^([-+*]{3}) / || /^(Index):/) {
+	unless (m/^([-+*]{3}) / || m/^(Index):/) {
 	    # not an interesting patch line
 	    # but possibly meta-information or prologue
 	    if ($prologue) {
-		$added{$1}   = 1    if /^touch\s+(\S+)/;
-		$removed{$1} = 1    if /^rm\s+(?:-f)?\s*(\S+)/;
-		$prologue = 0       if /^exit\b/;
+		$added{$1}   = 1    if m/^touch\s+(\S+)/;
+		$removed{$1} = 1    if m/^rm\s+(?:-f)?\s*(\S+)/;
+		$prologue = 0       if m/^exit\b/;
 	    }
 	    get_meta_info($ls, $_) if $::opt_m;
 	    next;
 	}
 	$type = $1;
-	next if /^--- [0-9,]+ ----$/ || /^\*\*\* [0-9,]+ \*\*\*\*$/;
+	next if m/^--- [0-9,]+ ----$/ || m/^\*\*\* [0-9,]+ \*\*\*\*$/;
 	$prologue = 0;
 
 	print "Last: $prevline","This: ${_}Got:  $type\n\n" if $::opt_d;
@@ -191,7 +191,7 @@ foreach my $argv (@ARGV) {
 	# Patch copes with this, so must we. It's also handy for
 	# documenting manual changes by simply adding Index: lines
 	# to the file which describes the problem being fixed.
-	if (/^Index:\s+(.*)/) {
+	if (m/^Index:\s+(.*)/) {
 	    my $f;
 	    foreach $f (split(/ /, $1)) { add_patched_file($ls, $f) }
 	    next;
@@ -200,9 +200,9 @@ foreach my $argv (@ARGV) {
 	if (	($type eq '---' and $prevtype eq '***')	# Style 1
 	    or	($type eq '+++' and $prevtype eq '---')	# Style 2
 	) {
-	    if (/^[-+*]{3} (\S+)\s*(.*?\d\d:\d\d:\d\d)?/) {	# double check
+	    if (m/^[-+*]{3} (\S+)\s*(.*?\d\d:\d\d:\d\d)?/) {	# double check
 		if ($1 eq "/dev/null") {
-		    $prevline =~ /^[-+*]{3} (\S+)\s*/;
+		    $prevline =~ m/^[-+*]{3} (\S+)\s*/;
 		    add_deleted_file($ls, $1);
 		}
 		else {
@@ -449,7 +449,7 @@ sub list_files_by_patch {
 	    elsif ($meta eq 'Msg-ID') {
 		my %from; # limit long threads to one msg-id per site
 		@list = map {
-		    $from{(/@(.*?)>/ ? $1 : $_)}++ ? () : ($_);
+		    $from{(m/@(.*?)>/ ? $1 : $_)}++ ? () : ($_);
 		} @list;
 	    }
 	    push @meta, my_wrap("","          ", join(", ",@list)."\n");
@@ -522,7 +522,7 @@ sub categorize_files {
 	++$refine;
 	my @c = sort { $c{$b} <+> $c{$a} || $a cmp $b } keys %c;
 	my @v = map  { $c{$_} } @c;
-	if (@v +> 1 and $refine +<= 1 and "@v" =~ /^(\d) \1/
+	if (@v +> 1 and $refine +<= 1 and "@v" =~ m/^(\d) \1/
 		and $c[0] =~ m/^(DOC|TESTS|OTHER)/) { # rare
 	    print "Tie, promoting $c[1] over $c[0]\n" if $::opt_d;
 	    ++$c{$c[1]};

@@ -779,7 +779,7 @@ sub parse_text {
     while ( @tokens ) {
         $_ = shift @tokens;
         ## Look for the beginning of a sequence
-        if ( /^([A-Z])(<(?:<+\s)?)$/ ) {
+        if ( m/^([A-Z])(<(?:<+\s)?)$/ ) {
             ## Push a new sequence onto the stack of those "in-progress"
             my $ldelim_orig;
             ($cmd, $ldelim_orig) = ($1, $2);
@@ -797,8 +797,8 @@ sub parse_text {
         elsif ( @seq_stack +> 1 ) {
             ## Make sure we match the right kind of closing delimiter
             my ($seq_end, $post_seq) = ("", "");
-            if ( ($ldelim eq '<'   and  /\A(.*?)(>)/s)
-                 or  /\A(.*?)(\s+$rdelim)/s )
+            if ( ($ldelim eq '<'   and  m/\A(.*?)(>)/s)
+                 or  m/\A(.*?)(\s+$rdelim)/s )
             {
                 ## Found end-of-sequence, capture the interior and the
                 ## closing the delimiter, and put the rest back on the
@@ -918,7 +918,7 @@ sub parse_paragraph {
     my $wantNonPods = $myOpts{'-want_nonPODs'};
 
     ## Update cutting status
-    $myData{_CUTTING} = 0 if $text =~ /^={1,2}\S/;
+    $myData{_CUTTING} = 0 if $text =~ m/^={1,2}\S/;
 
     ## Perform any desired preprocessing if we wanted it this early
     $wantNonPods  and  $text = $self->preprocess_paragraph($text, $line_num);
@@ -953,7 +953,7 @@ sub parse_paragraph {
     ## Look for one of the three types of paragraphs
     my ($pfx, $cmd, $arg, $sep) = ('', '', '', '');
     my $pod_para = undef;
-    if ($text =~ /^(={1,2})(?=\S)/) {
+    if ($text =~ m/^(={1,2})(?=\S)/) {
         ## Looks like a command paragraph. Capture the command prefix used
         ## ("=" or "=="), as well as the command-name, its paragraph text,
         ## and whatever sequence of characters was used to separate them
@@ -986,7 +986,7 @@ sub parse_paragraph {
         ## A command paragraph
         $self->command($cmd, $text, $line_num, $pod_para);
     }
-    elsif ($text =~ /^\s+/) {
+    elsif ($text =~ m/^\s+/) {
         ## Indented text - must be a verbatim paragraph
         $self->verbatim($text, $line_num, $pod_para);
     }
@@ -1052,14 +1052,14 @@ sub parse_from_filehandle {
 
     ## Use <$fh> instead of $fh->getline where possible (for speed)
     $_ = ref $in_fh;
-    my $tied_fh = (/^(?:GLOB|FileHandle|IO::\w+)$/  or  tied $in_fh);
+    my $tied_fh = (m/^(?:GLOB|FileHandle|IO::\w+)$/  or  tied $in_fh);
 
     ## Read paragraphs line-by-line
     while (defined ($textline = $tied_fh ? ~< $in_fh : $in_fh->getline)) {
         $textline = $self->preprocess_line($textline, ++$nlines);
         next  unless ((defined $textline)  &&  (length $textline));
 
-        if ((! length $paragraph) && ($textline =~ /^==/)) {
+        if ((! length $paragraph) && ($textline =~ m/^==/)) {
             ## '==' denotes a one-line command paragraph
             $paragraph = $textline;
             $plines    = 1;
@@ -1072,7 +1072,7 @@ sub parse_from_filehandle {
 
         ## See if this line is blank and ends the current paragraph.
         ## If it isnt, then keep iterating until it is.
-        next unless (($textline =~ /^([^\S\r\n]*)[\r\n]*$/)
+        next unless (($textline =~ m/^([^\S\r\n]*)[\r\n]*$/)
                                      && (length $paragraph));
 
         ## Issue a warning about any non-empty blank lines
@@ -1155,7 +1155,7 @@ sub parse_from_file {
 
     ## Is $infile a filename or a (possibly implied) filehandle
     if (defined $infile && ref $infile) {
-        if (ref($infile) =~ /^(SCALAR|ARRAY|HASH|CODE|REF)$/) {
+        if (ref($infile) =~ m/^(SCALAR|ARRAY|HASH|CODE|REF)$/) {
             croak "Input from $1 reference not supported!\n";
         }
         ## Must be a filehandle-ref (or else assume its a ref to an object
@@ -1164,7 +1164,7 @@ sub parse_from_file {
         $in_fh = $infile;
     }
     elsif (!defined($infile) || !length($infile) || ($infile eq '-')
-        || ($infile =~ /^<&(?:STDIN|0)$/i))
+        || ($infile =~ m/^<&(?:STDIN|0)$/i))
     {
         ## Not a filename, just a string implying STDIN
         $infile ||= '-';
@@ -1188,7 +1188,7 @@ sub parse_from_file {
     ## Is $outfile a filename, a (possibly implied) filehandle, maybe a ref?
     if (ref $outfile) {
         ## we need to check for ref() first, as other checks involve reading
-        if (ref($outfile) =~ /^(ARRAY|HASH|CODE)$/) {
+        if (ref($outfile) =~ m/^(ARRAY|HASH|CODE)$/) {
             croak "Output to $1 reference not supported!\n";
         }
         elsif (ref($outfile) eq 'SCALAR') {
@@ -1207,7 +1207,7 @@ sub parse_from_file {
         }
     }
     elsif (!defined($outfile) || !length($outfile) || ($outfile eq '-')
-        || ($outfile =~ /^>&?(?:STDOUT|1)$/i))
+        || ($outfile =~ m/^>&?(?:STDOUT|1)$/i))
     {
         if (defined $myData{_TOP_STREAM}) {
             $out_fh = $myData{_OUTPUT};
@@ -1219,7 +1219,7 @@ sub parse_from_file {
             $out_fh  = \*STDOUT;
         }
     }
-    elsif ($outfile =~ /^>&(STDERR|2)$/i) {
+    elsif ($outfile =~ m/^>&(STDERR|2)$/i) {
         ## Not a filename, just a string implying STDERR
         $myData{_OUTFILE} = "<standard error>";
         $out_fh  = \*STDERR;

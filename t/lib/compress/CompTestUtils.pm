@@ -613,7 +613,7 @@ sub getMultiValues
 {
     my $class = shift ;
 
-    return (0,0) if $class =~ /lzf/i;
+    return (0,0) if $class =~ m/lzf/i;
     return (1,0);
 }
 

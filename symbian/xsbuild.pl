@@ -171,7 +171,7 @@ sub run_PL {
 
 sub read_old_multi {
     my ( $conf, $k ) = @_;
-    push @{ $conf->{$k} }, split( ' ', $1 ) if /^$k\s(.+)$/;
+    push @{ $conf->{$k} }, split( ' ', $1 ) if m/^$k\s(.+)$/;
 }
 
 sub uniquefy_filenames {
@@ -192,9 +192,9 @@ sub read_mmp {
         print "\tReading $mmp...\n";
         while ( ~< *MMP) {
             chomp;
-            $conf->{TARGET}     = $1 if /^TARGET\s+(.+)$/;
-            $conf->{TARGETPATH} = $1 if /^TARGETPATH\s+(.+)$/;
-            $conf->{EXTVERSION} = $1 if /^EXTVERSION\s+(.+)$/;
+            $conf->{TARGET}     = $1 if m/^TARGET\s+(.+)$/;
+            $conf->{TARGETPATH} = $1 if m/^TARGETPATH\s+(.+)$/;
+            $conf->{EXTVERSION} = $1 if m/^EXTVERSION\s+(.+)$/;
             read_old_multi( $conf, "SOURCE" );
             read_old_multi( $conf, "SOURCEPATH" );
             read_old_multi( $conf, "USERINCLUDE" );
@@ -307,7 +307,7 @@ sub write_makefile {
     my $armdef1 = "$SYMBIAN_ROOT\\Epoc32\\Build$CWD\\$base\\$ARM\\$base.def";
     my $armdef2 = "..\\BMARM\\${base}u.def";
 
-    my $wrap = $SYMBIAN_ROOT && defined $SDK_VARIANT eq 'S60' && $SDK_VERSION eq '1.2' && $SYMBIAN_ROOT !~ /_CW$/;
+    my $wrap = $SYMBIAN_ROOT && defined $SDK_VARIANT eq 'S60' && $SDK_VERSION eq '1.2' && $SYMBIAN_ROOT !~ m/_CW$/;
     my $ABLD = $wrap ? 'perl b.pl' : 'abld';
 
     open( MAKEFILE, ">Makefile" ) or die "$0: Makefile: $!\n";
@@ -494,7 +494,7 @@ sub xsconfig {
         my @found;
         find( sub { push @found, $File::Find::name if -f $_ }, 'lib' );
         for my $found (@found) {
-	    next if $found =~ /\.bak$/i; # Zlib
+	    next if $found =~ m/\.bak$/i; # Zlib
             my ($short) = ( $found =~ m/^lib.(.+)/ );
             $short =~ s!/!\\!g;
             $found =~ s!/!\\!g;
@@ -525,14 +525,14 @@ sub xsconfig {
     }
     if ( exists $EXTCFG{$ext} ) {
         for my $cfg ( @{ $EXTCFG{$ext} } ) {
-            if ( $cfg =~ /^([-+])?(.+\.(c|cpp|h))$/ ) {
+            if ( $cfg =~ m/^([-+])?(.+\.(c|cpp|h))$/ ) {
                 my $o = defined $1 ? $1 : '+';
                 my $f = $2;
                 $f =~ s:/:\\:g;
                 for my $f ( glob($f) ) {
                     if ( $o eq '+' ) {
                         warn "$0: no source file $dir\\$f\n" unless -f $f;
-                        $src{$f}++ unless $cfg =~ /\.h$/;
+                        $src{$f}++ unless $cfg =~ m/\.h$/;
                         if ( $f =~ m:^(.+)\\[^\\]+$: ) {
                             $incdir{$1}++;
                         }
@@ -542,7 +542,7 @@ sub xsconfig {
                     }
                 }
             }
-            if ( $cfg =~ /^([-+])?(.+\.(pm|pl|inc))$/ ) {
+            if ( $cfg =~ m/^([-+])?(.+\.(pm|pl|inc))$/ ) {
                 my $o = defined $1 ? $1 : '+';
                 my $f = $2;
                 $f =~ s:/:\\:g;
@@ -660,7 +660,7 @@ __EOF__
                     if ( update_dir($d) ) {
                         my @subsrc;
                         while ( ~< *SUBMF) {
-                            next if 1 .. /postamble/;
+                            next if 1 .. m/postamble/;
                             if (m!^(\w+_t)\.c : !) {
                                 system_echo(
                                     "perl ..\\bin\\enc2xs -Q -o $1.c -f $1.fnm")
@@ -731,7 +731,7 @@ sub update_cwd {
 for my $ext (@ARGV) {
 
     $ext =~ s!::!\\!g;
-    my $extdash = $ext =~ /ext\\/ ? $ext : "ext\\$ext"; $extdash =~ s!\\!-!g;
+    my $extdash = $ext =~ m/ext\\/ ? $ext : "ext\\$ext"; $extdash =~ s!\\!-!g;
     $ext =~ s!/!\\!g;
 
     my $cfg;
@@ -741,7 +741,7 @@ for my $ext (@ARGV) {
     my $dir;
 
     unless ( -e $ext ) {
-        if ( $ext =~ /\.xs$/ && !-f $ext ) {
+        if ( $ext =~ m/\.xs$/ && !-f $ext ) {
             if ( -f "ext\\$ext" ) {
                 $ext = "ext\\$ext";
                 $dir = dirname($ext);
@@ -756,7 +756,7 @@ for my $ext (@ARGV) {
         $dir = "." unless defined $dir;
     }
     else {
-        if ( $ext =~ /\.xs$/ && -f $ext ) {
+        if ( $ext =~ m/\.xs$/ && -f $ext ) {
             $ext = dirname($ext);
             $dir = $ext;
         }
@@ -783,7 +783,7 @@ for my $ext (@ARGV) {
         my $extdir = $dir;
         $extdir =~ s:^ext\\::;
         while ( ~< $cfg) {
-            next unless /^ext\s+(.+)/;
+            next unless m/^ext\s+(.+)/;
             chomp;
             my $ext = $1;
             my @ext = split( ' ', $ext );
@@ -888,8 +888,8 @@ __EOF__
 	    die "$0: failed to find .def for $base\n";
 	}
         while ( ~< $def) {
-            next while 1 .. /^EXPORTS/;
-            if (/^\s*(\w+) \@ (\d+) /) {
+            next while 1 .. m/^EXPORTS/;
+            if (m/^\s*(\w+) \@ (\d+) /) {
                 $symbol{$1} = $2;
             }
         }
@@ -942,7 +942,7 @@ __EOF__
             }
 	    if ( $ext eq "ext\\Compress\\Raw\\Zlib" ) {
 		my @bak;
-		find( sub { push @bak, $File::Find::name if /\.bak$/ }, "." );
+		find( sub { push @bak, $File::Find::name if m/\.bak$/ }, "." );
 		unlink(@bak) if @bak;
 		my @src;
 		find( sub { push @src, $_ if -f $_ }, "zlib-src" );

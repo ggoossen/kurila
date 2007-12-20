@@ -33,7 +33,7 @@ sub populate (@) {
 sub getgrent ( ) { populate(CORE::getgrent()) } 
 sub getgrnam ($) { populate(CORE::getgrnam(shift)) } 
 sub getgrgid ($) { populate(CORE::getgrgid(shift)) } 
-sub getgr    ($) { ($_[0] =~ /^\d+/) ? &getgrgid : &getgrnam } 
+sub getgr    ($) { ($_[0] =~ m/^\d+/) ? &getgrgid : &getgrnam } 
 
 1;
 __END__

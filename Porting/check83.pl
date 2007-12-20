@@ -24,10 +24,10 @@ sub eight_dot_three {
     my $file = $base . ( defined $ext ? ".$ext" : "" );
     $base = substr($base, 0, 8);
     $ext  = substr($ext,  0, 3) if defined $ext;
-    if (defined $dir && $dir =~ /\./)  {
+    if (defined $dir && $dir =~ m/\./)  {
 	print "directory name contains '.': $dir\n";
     }
-    if ($file =~ /[^A-Za-z0-9\._-]/) {
+    if ($file =~ m/[^A-Za-z0-9\._-]/) {
 	print "filename contains non-portable characters: $_[0]\n";
     }
     if (length $file +> $maxl) {

@@ -28,7 +28,7 @@ sub make_tables {
     my $chrmap = shift;
     foreach (@_) {
         my ($letter, $shriek, $unpredictable, $nocsum, $size, $condition) =
-            /^([A-Za-z])(!?)\t(\S*)\t(\S*)\t([^\t\n]+)(?:\t+(.*))?$/ or
+            m/^([A-Za-z])(!?)\t(\S*)\t(\S*)\t([^\t\n]+)(?:\t+(.*))?$/ or
             die "Can't parse '$_'";
 
         $size = "sizeof($size)" unless $size =~ s/^=//;
@@ -60,7 +60,7 @@ sub make_tables {
 
 my @lines = grep {
     s/#.*//;
-    /\S/;
+    m/\S/;
 } ~< *DATA;
 
 my %asciimap  = map {chr $_, chr $_} 0..255;

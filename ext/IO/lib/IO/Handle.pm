@@ -330,7 +330,7 @@ sub DESTROY {}
 
 sub _open_mode_string {
     my ($mode) = @_;
-    $mode =~ /^\+?(<|>>?)$/
+    $mode =~ m/^\+?(<|>>?)$/
       or $mode =~ s/^r(\+?)$/$1</
       or $mode =~ s/^w(\+?)$/$1>/
       or $mode =~ s/^a(\+?)$/$1>>/
@@ -572,7 +572,7 @@ sub ioctl {
 sub constant {
     no strict 'refs';
     my $name = shift;
-    (($name =~ /^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::fetch_glob($name)}})
+    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::fetch_glob($name)}})
 	? &{*{Symbol::fetch_glob($name)}}() : undef;
 }
 

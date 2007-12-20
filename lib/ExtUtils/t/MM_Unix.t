@@ -14,7 +14,7 @@ chdir 't';
 BEGIN { 
     use Test::More; 
 
-    if( $^O =~ /^VMS|os2|MacOS|MSWin32|cygwin|beos|netware$/i ) {
+    if( $^O =~ m/^VMS|os2|MacOS|MSWin32|cygwin|beos|netware$/i ) {
         plan skip_all => 'Non-Unix platform';
     }
     else {

@@ -70,7 +70,7 @@ sub close {
   $data->_close;
 
   $ftp->response() == CMD_OK
-    && $ftp->message =~ /unique file name:\s*(\S*)\s*\)/
+    && $ftp->message =~ m/unique file name:\s*(\S*)\s*\)/
     && (${*$ftp}{'net_ftp_unique'} = $1);
 
   $ftp->status == CMD_OK;

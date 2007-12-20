@@ -1,7 +1,7 @@
 #!./perl -T
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -10,7 +10,7 @@ BEGIN {
 use Config;
 
 BEGIN {
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/ && $^O ne 'VMS') {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
 	print "1..0\n";
 	exit 0;
     }
@@ -27,7 +27,7 @@ $x->close;
 $x = IO::File->new( "< ./__taint__$$" || die("Cannot open ./__taint__$$\n"));
 chop($unsafe = ~< $x);
 eval { kill 0 * $unsafe };
-print "not " if ((($^O ne 'MSWin32') && ($^O ne 'NetWare')) and ($@ !~ /^Insecure/o));
+print "not " if ((($^O ne 'MSWin32') && ($^O ne 'NetWare')) and ($@ !~ m/^Insecure/o));
 print "ok 1\n";
 $x->close;
 
@@ -39,7 +39,7 @@ print "not " if ($?);
 print "ok 2\n"; # Calling the method worked
 chop($unsafe = ~< $x);
 eval { kill 0 * $unsafe };
-print "not " if ($@ =~ /^Insecure/o);
+print "not " if ($@ =~ m/^Insecure/o);
 print "ok 3\n"; # No Insecure message from using the data
 $x->close;
 

@@ -6,7 +6,7 @@ BEGIN {
     unshift @INC, '../lib';
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config{'extensions'} !~ m/\bEncode\b/) {
     print "1..0 # Skip: Encode was not built\n";
         exit 0;
     }
@@ -153,7 +153,7 @@ print "# alias undef test\n";
 Encode::Alias->undef_aliases;
 foreach my $a (keys %a2c){	
     my $e = Encode::find_encoding($a);
-    ok(!defined($e) || $e->name =~ /-raw$/o,"Undef $a")
+    ok(!defined($e) || $e->name =~ m/-raw$/o,"Undef $a")
     or warn "alias was $a";
 }
 

@@ -181,7 +181,7 @@ sub w { cluck @_ }
         my $txt = "Carp::cluck($test_num)";
         local $Carp::MaxEvalLen = $_;
         local $SIG{__WARN__} = sub {
-	    "@_"=~/'(.+?)(?:\n|')/s;
+	    "@_"=~m/'(.+?)(?:\n|')/s;
             is length($1), length($_?substr($txt,0,$_):substr($txt,0)), 'MaxEvalLen';
 	};
         eval "$txt"; $test_num++;
@@ -194,7 +194,7 @@ sub w { cluck @_ }
         my $arg = 'testtest';
         local $Carp::MaxArgLen = $_;
         local $SIG{__WARN__} = sub {
-	    "@_"=~/'(.+?)'/;
+	    "@_"=~m/'(.+?)'/;
 	    is length($1), length($_?substr($arg,0,$_):substr($arg,0)), 'MaxArgLen';
 	};
 

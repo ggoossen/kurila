@@ -326,7 +326,7 @@ $foo1 = 'f\'o\\o';
   $out = 'foo';
   $out1 = 'f\'o\\o';
   $out2 = "a\a$foo,\,";
-  /b\b$foo.\./;
+  m/b\b$foo.\./;
 }
 
 is($out, 'foo');
@@ -346,7 +346,7 @@ is($qr, 9);
   $out = 'foo';
   $out1 = 'f\'o\\o';
   $out2 = "a\a$foo,\,";
-  $res = /b\b$foo.\./;
+  $res = m/b\b$foo.\./;
   $a = <<EOF;
 oups
 EOF
@@ -629,7 +629,7 @@ is($b, "_<oups1
   my $seven = two_face->new("vii", 7);
   is((sprintf "seven=$seven, seven=%d, eight=%d", $seven, $seven+1),
 	'seven=vii, seven=7, eight=8');
-  is(scalar ($seven =~ /i/), '1');
+  is(scalar ($seven =~ m/i/), '1');
 }
 
 {
@@ -949,7 +949,7 @@ unless ($aaa) {
                fallback => 1;
   my $x = bless([]);
   # For some reason beyond me these have to be oks rather than likes.
-  main::ok("$x" =~ /Recurse=ARRAY/);
+  main::ok("$x" =~ m/Recurse=ARRAY/);
   main::ok($x);
   main::ok($x+0 =~ qr/Recurse=ARRAY/);
 }

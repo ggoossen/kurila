@@ -7,7 +7,7 @@ use warnings;
 no warnings 'redefine';
 use base qw(Encode::Encoding);
 __PACKAGE__->Define('UTF-7');
-our $VERSION = do { my @r = ( q$Revision: 2.4 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.4 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 use MIME::Base64;
 use Encode;
 
@@ -34,10 +34,10 @@ sub encode($$;$) {
     pos($str) = 0;
     my $bytes = '';
     while ( pos($str) +< $len ) {
-        if ( $str =~ /\G($re_asis+)/ogc ) {
+        if ( $str =~ m/\G($re_asis+)/ogc ) {
             $bytes .= $1;
         }
-        elsif ( $str =~ /\G($re_encoded+)/ogsc ) {
+        elsif ( $str =~ m/\G($re_encoded+)/ogsc ) {
             if ( $1 eq "+" ) {
                 $bytes .= "+-";
             }
@@ -62,19 +62,19 @@ sub decode($$;$) {
     my $str = "";
     no warnings 'uninitialized';
     while ( pos($bytes) +< $len ) {
-        if ( $bytes =~ /\G([^+]+)/ogc ) {
+        if ( $bytes =~ m/\G([^+]+)/ogc ) {
             $str .= $1;
         }
-        elsif ( $bytes =~ /\G\+-/ogc ) {
+        elsif ( $bytes =~ m/\G\+-/ogc ) {
             $str .= "+";
         }
-        elsif ( $bytes =~ /\G\+([A-Za-z0-9+\/]+)-?/ogsc ) {
+        elsif ( $bytes =~ m/\G\+([A-Za-z0-9+\/]+)-?/ogsc ) {
             my $base64 = $1;
             my $pad    = length($base64) % 4;
             $base64 .= "=" x ( 4 - $pad ) if $pad;
             $str .= $e_utf16->decode( decode_base64($base64) );
         }
-        elsif ( $bytes =~ /\G\+/ogc ) {
+        elsif ( $bytes =~ m/\G\+/ogc ) {
             $^W and warn "Bad UTF7 data escape";
             $str .= "+";
         }

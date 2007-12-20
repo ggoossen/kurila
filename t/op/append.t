@@ -42,7 +42,7 @@ if ($_ eq 'abcdef') {print "ok 3\n";} else {print "not ok 3\n";}
 
     my $t1 = $a; $t1 .= $ab;
 
-    print $t1 =~ /b/ ? "ok 6\n" : "not ok 6\t# $t1\n";
+    print $t1 =~ m/b/ ? "ok 6\n" : "not ok 6\t# $t1\n";
     
     my $t2 = $a; $t2 .= $uab;
     
@@ -50,7 +50,7 @@ if ($_ eq 'abcdef') {print "ok 3\n";} else {print "not ok 3\n";}
     
     my $t3 = $ua; $t3 .= $ab;
     
-    print $t3 =~ /$ub/ ? "ok 8\n" : "not ok 8\t# $t3\n";
+    print $t3 =~ m/$ub/ ? "ok 8\n" : "not ok 8\t# $t3\n";
     
     my $t4 = $ua; $t4 .= $uab;
     
@@ -58,7 +58,7 @@ if ($_ eq 'abcdef') {print "ok 3\n";} else {print "not ok 3\n";}
     
     my $t5 = $a; $t5 = $ab . $t5;
     
-    print $t5 =~ /$ub/ ? "ok 10\n" : "not ok 10\t# $t5\n";
+    print $t5 =~ m/$ub/ ? "ok 10\n" : "not ok 10\t# $t5\n";
     
     my $t6 = $a; $t6 = $uab . $t6;
     
@@ -66,7 +66,7 @@ if ($_ eq 'abcdef') {print "ok 3\n";} else {print "not ok 3\n";}
     
     my $t7 = $ua; $t7 = $ab . $t7;
     
-    print $t7 =~ /$ub/ ? "ok 12\n" : "not ok 12\t# $t7\n";
+    print $t7 =~ m/$ub/ ? "ok 12\n" : "not ok 12\t# $t7\n";
     
     my $t8 = $ua; $t8 = $uab . $t8;
     

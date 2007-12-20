@@ -10,7 +10,7 @@ BEGIN {
     require Config; Config->import;
     $can_fork = $Config{'d_fork'} || $Config{'d_pseudofork'};
 
-    if ($^O eq "hpux" or $Config{'extensions'} !~ /\bSocket\b/ &&
+    if ($^O eq "hpux" or $Config{'extensions'} !~ m/\bSocket\b/ &&
         !(($^O eq 'VMS') && $Config{d_socket})) {
 	print "1..0\n";
 	exit 0;
@@ -62,12 +62,12 @@ if( !$Config{d_alarm} ) {
 } else {
   # This should fail but not die if there is real socketpair
   eval {socketpair LEFT, 'RIGHT', -1, -1, -1};
-  if ($@ =~ /^Unsupported socket function "socketpair" called/ ||
-      $! =~ /^The operation requested is not supported./) { # Stratus VOS
+  if ($@ =~ m/^Unsupported socket function "socketpair" called/ ||
+      $! =~ m/^The operation requested is not supported./) { # Stratus VOS
     plan skip_all => 'No socketpair (real or emulated)';
   } else {
     eval {AF_UNIX};
-    if ($@ =~ /^Your vendor has not defined Socket macro AF_UNIX/) {
+    if ($@ =~ m/^Your vendor has not defined Socket macro AF_UNIX/) {
       plan skip_all => 'No AF_UNIX';
     } else {
       plan tests => 45;
@@ -114,7 +114,7 @@ ok (shutdown(LEFT, SHUT_WR), "shutdown left for writing");
 # This will hang forever if eof is buggy, and alarm doesn't interrupt system
 # Calls. Hence the child process minder.
 SKIP: {
-  skip "SCO Unixware / OSR have a bug with shutdown",2 if $^O =~ /^(?:svr|sco)/;
+  skip "SCO Unixware / OSR have a bug with shutdown",2 if $^O =~ m/^(?:svr|sco)/;
   local $SIG{ALRM} = sub { warn "EOF on right took over 3 seconds" };
   local $TODO = "Known problems with unix sockets on $^O"
       if $^O eq 'hpux'   || $^O eq 'super-ux';
@@ -169,7 +169,7 @@ ok (close RIGHT, "close right");
 # guarantee that the stack won't drop a UDP packet, even if it is for localhost.
 
 SKIP: {
-  skip "No usable SOCK_DGRAM for socketpair", 24 if ($^O =~ /^(MSWin32|os2)\z/);
+  skip "No usable SOCK_DGRAM for socketpair", 24 if ($^O =~ m/^(MSWin32|os2)\z/);
   local $TODO = "socketpair not supported on $^O" if $^O eq 'nto';
 
 ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_DGRAM, PF_UNSPEC),

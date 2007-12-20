@@ -83,9 +83,9 @@ my $test;
 TEST:
 foreach (@tests) {
     $test++;
-    if (!/\S/ || /^\s*#/) {
+    if (!m/\S/ || m/^\s*#/) {
         print "ok $test # (Blank line or comment)\n";
-        if (/\S/) { print $_ };
+        if (m/\S/) { print $_ };
         next;
     }
     chomp;
@@ -97,12 +97,12 @@ foreach (@tests) {
     }
     $reason = '' unless defined $reason;
     my $input = join(':',$pat,$subject,$result,$repl,$expect);
-    $pat = "'$pat'" unless $pat =~ /^[:'\/]/;
+    $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
     $pat =~ s/(\$\{\w+\})/$1/eeg;
     $pat =~ s/\\n/\n/g;
     $subject = eval qq(use utf8; "$subject"); die $@ if $@;
     $expect  = eval qq(use utf8; "$expect"); die $@ if $@;
-    $expect = $repl = '-' if $skip_amp and $input =~ /\$[&\`\']/;
+    $expect = $repl = '-' if $skip_amp and $input =~ m/\$[&\`\']/;
     my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
     $result =~ s/B//i unless $skip;

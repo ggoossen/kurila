@@ -29,7 +29,7 @@ ok(1);
 # Do this until we read an =pod
 my @reference;
 while (my $line = ~< *DATA) {
-  last if $line =~ /^=pod/;
+  last if $line =~ m/^=pod/;
   push(@reference,$line);
 }
 
@@ -70,7 +70,7 @@ my @output = ~< *INFH;
 ok(@output, @reference);
 
 for my $i (0..$#reference) {
-  next if $reference[$i] =~ /^%%/; # skip timestamp comments
+  next if $reference[$i] =~ m/^%%/; # skip timestamp comments
   ok($output[$i], $reference[$i]);
 }
 

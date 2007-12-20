@@ -88,7 +88,7 @@ sub ParseAttribs
     $base= "c".$module;
     $base= $hvAttr->{BASEFILENAME}   if  exists $hvAttr->{BASEFILENAME};
     my $ext=  ! $cplusplus  ?  ($Config{_c}||".c")
-      :  $cplusplus =~ /^[.]/  ?  $cplusplus  :  _cc();
+      :  $cplusplus =~ m/^[.]/  ?  $cplusplus  :  _cc();
     if(  $writeperl  ) {
 	$outfile= $base . "_pc" . $ext;
 	$object= $base . "_pc" . ($Config{_o}||$Config{obj_ext});
@@ -321,10 +321,10 @@ sub Myconst2perl
 	    print " */\n";
 	}
     }
-    if(  ! ref($ifdef)  &&  $ifdef =~ /[^\s\w]/  ) {
+    if(  ! ref($ifdef)  &&  $ifdef =~ m/[^\s\w]/  ) {
 	my $sub= $ifdef;
 	$sub= 'sub { local($_)= @_; ' . $sub . ' }'
-	  unless  $sub =~ /^\s*sub\b/;
+	  unless  $sub =~ m/^\s*sub\b/;
 	$ifdef= eval $sub;
 	die "$@:  $sub\n"   if  $@;
 	if(  "CODE" ne ref($ifdef)  ) {
@@ -337,7 +337,7 @@ sub Myconst2perl
 	    $if= "";
 	} elsif(  "1" eq $if  ) {
 	    $if= "#ifdef $const\n";
-	} elsif(  $if !~ /^#/  ) {
+	} elsif(  $if !~ m/^#/  ) {
 	    $if= "#ifdef $if\n";
 	} else {
 	    $if= "$if\n";

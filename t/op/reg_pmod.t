@@ -31,9 +31,9 @@ foreach my $test (@tests) {
     #
     # Cannot use if/else due to the scope invalidating ${^MATCH} and friends.
     #
-    my $ok = ok $p eq '/p'   ? /$pat/p
-              : $p eq '(?p)' ? /(?p)$pat/
-              :                /$pat/
+    my $ok = ok $p eq '/p'   ? m/$pat/p
+              : $p eq '(?p)' ? m/(?p)$pat/
+              :                m/$pat/
               => $test_name;
     SKIP: {
         skip "/$pat/$p failed to match", 3

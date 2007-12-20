@@ -169,7 +169,7 @@ ok ! UNIVERSAL::isa("\xff\xff\xff\0", 'HASH');
 
 {
     # test isa() and can() on magic variables
-    "Human" =~ /(.*)/;
+    "Human" =~ m/(.*)/;
     ok $1->isa("Human");
     ok $1->can("eat");
     package HumanTie;

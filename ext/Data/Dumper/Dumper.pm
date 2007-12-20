@@ -121,13 +121,13 @@ sub Seen {
     while (($k, $v) = each %$g) {
       if (defined $v and ref $v) {
 	$id = format_refaddr($v);
-	if ($k =~ /^[*](.*)$/) {
+	if ($k =~ m/^[*](.*)$/) {
 	  $k = (ref $v eq 'ARRAY') ? ( "\\\@" . $1 ) :
 	       (ref $v eq 'HASH')  ? ( "\\\%" . $1 ) :
 	       (ref $v eq 'CODE')  ? ( "\\\&" . $1 ) :
 				     (   "\$" . $1 ) ;
 	}
-	elsif ($k !~ /^\$/) {
+	elsif ($k !~ m/^\$/) {
 	  $k = "\$" . $k;
 	}
 	$s->{seen}{$id} = [$k, $v];
@@ -199,7 +199,7 @@ sub Dumpperl {
     @post = ();
     $name = $s->{names}[$i++];
     if (defined $name) {
-      if ($name =~ /^[*](.*)$/) {
+      if ($name =~ m/^[*](.*)$/) {
 	if (defined $val) {
 	  $name = (ref $val eq 'ARRAY') ? ( "\@" . $1 ) :
 		  (ref $val eq 'HASH')  ? ( "\%" . $1 ) :
@@ -210,7 +210,7 @@ sub Dumpperl {
 	  $name = "\$" . $1;
 	}
       }
-      elsif ($name !~ /^\$/) {
+      elsif ($name !~ m/^\$/) {
 	$name = "\$" . $name;
       }
     }
@@ -291,9 +291,9 @@ sub _dump {
 	  }
 	  else {
 	    $out = $s->{seen}{$id}[0];
-	    if ($name =~ /^([\@\%])/) {
+	    if ($name =~ m/^([\@\%])/) {
 	      my $start = $1;
-	      if ($out =~ /^\\$start/) {
+	      if ($out =~ m/^\\$start/) {
 		$out = substr($out, 1);
 	      }
 	      else {
@@ -306,9 +306,9 @@ sub _dump {
       }
       else {
         # store our name
-        $s->{seen}{$id} = [ (($name =~ /^[@%]/)     ? ('\\' . $name ) :
+        $s->{seen}{$id} = [ (($name =~ m/^[@%]/)     ? ('\\' . $name ) :
 			     ($realtype eq 'CODE' and
-			      $name =~ /^[*](.*)$/) ? ('\\&' . $1 )   :
+			      $name =~ m/^[*](.*)$/) ? ('\\&' . $1 )   :
 			     $name          ),
 			    $val ];
       }
@@ -355,13 +355,13 @@ sub _dump {
     elsif ($realtype eq 'ARRAY') {
       my($v, $pad, $mname);
       my($i) = 0;
-      $out .= ($name =~ /^\@/) ? '(' : '[';
+      $out .= ($name =~ m/^\@/) ? '(' : '[';
       $pad = $s->{sep} . $s->{pad} . $s->{apad};
-      ($name =~ /^\@(.*)$/) ? ($mname = "\$" . $1) : 
+      ($name =~ m/^\@(.*)$/) ? ($mname = "\$" . $1) : 
 	# omit -> if $foo->[0]->{bar}, but not ${$foo->[0]}->{bar}
-	($name =~ /^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
+	($name =~ m/^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
 	  ($mname = $name . '->');
-      $mname .= '->' if $mname =~ /^\*.+\{[A-Z]+\}$/;
+      $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
       for $v (@$val) {
 	$sname = $mname . '[' . $i . ']';
 	$out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
@@ -369,19 +369,19 @@ sub _dump {
 	$out .= "," if $i++ +< $#$val;
       }
       $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
-      $out .= ($name =~ /^\@/) ? ')' : ']';
+      $out .= ($name =~ m/^\@/) ? ')' : ']';
     }
     elsif ($realtype eq 'HASH') {
       my($k, $v, $pad, $lpad, $mname, $pair);
-      $out .= ($name =~ /^\%/) ? '(' : '{';
+      $out .= ($name =~ m/^\%/) ? '(' : '{';
       $pad = $s->{sep} . $s->{pad} . $s->{apad};
       $lpad = $s->{apad};
       $pair = $s->{pair};
-      ($name =~ /^\%(.*)$/) ? ($mname = "\$" . $1) :
+      ($name =~ m/^\%(.*)$/) ? ($mname = "\$" . $1) :
 	# omit -> if $foo->[0]->{bar}, but not ${$foo->[0]}->{bar}
-	($name =~ /^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
+	($name =~ m/^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
 	  ($mname = $name . '->');
-      $mname .= '->' if $mname =~ /^\*.+\{[A-Z]+\}$/;
+      $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
       my ($sortkeys, $keys, $key) = ("$s->{sortkeys}");
       if ($sortkeys) {
 	if (ref($s->{sortkeys}) eq 'CODE') {
@@ -400,7 +400,7 @@ sub _dump {
 	     () ) 
       {
 	my $nk = $s->_dump($k, "");
-	$nk = $1 if !$s->{quotekeys} and $nk =~ /^[\"\']([A-Za-z_]\w*)[\"\']$/;
+	$nk = $1 if !$s->{quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
 	$sname = $mname . '{' . $nk . '}';
 	$out .= $pad . $ipad . $nk . $pair;
 
@@ -413,7 +413,7 @@ sub _dump {
 	chop $out;
 	$out .= $pad . ($s->{xpad} x ($s->{level} - 1));
       }
-      $out .= ($name =~ /^\%/) ? ')' : '}';
+      $out .= ($name =~ m/^\%/) ? ')' : '}';
     }
     elsif ($realtype eq 'CODE') {
       if ($s->{deparse}) {
@@ -457,9 +457,9 @@ sub _dump {
 	$s->{seen}{$id} = ["\\$name", $ref];
       }
     }
-    if (ref($ref) eq 'GLOB' or "$ref" =~ /=GLOB\([^()]+\)$/) {  # glob
+    if (ref($ref) eq 'GLOB' or "$ref" =~ m/=GLOB\([^()]+\)$/) {  # glob
       my $name = Symbol::glob_name($val);
-      if ($name =~ /^[A-Za-z_][\w:]*$/) {
+      if ($name =~ m/^[A-Za-z_][\w:]*$/) {
 	$name =~ s/^main::/::/;
 	$sname = $name;
       }
@@ -487,7 +487,7 @@ sub _dump {
     elsif (!defined($val)) {
       $out .= "undef";
     }
-    elsif ($val =~ /^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
+    elsif ($val =~ m/^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
       $out .= $val;
     }
     else {				 # string
@@ -650,7 +650,7 @@ sub qquote {
   my $bytes; { use bytes; $bytes = length }
   s/([^\x[00]-\x[7f]])/'\x'.sprintf("[%02x]",ord($1))/ge if $bytes +> length;
   return qq("$_") unless 
-    /[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
+    m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
   my $high = shift || "";
   s/([\a\b\t\n\f\r\e])/$esc{$1}/g;

@@ -24,11 +24,11 @@ like( $@, "/^Undefined subroutine/", "trying a non-existing macro");
 if(@names) {
     for my $name (@names) {
         SKIP: {
-            $name =~ /^(\w+)$/ or skip "invalid name '$name'", 2;
+            $name =~ m/^(\w+)$/ or skip "invalid name '$name'", 2;
             $name = $1;
             my $v = eval "${callpack}::$name()";
 
-            if(defined $v and $v =~ /^\d+$/) {
+            if(defined $v and $v =~ m/^\d+$/) {
                 is( $@, '', "calling the constant $name as a function" );
                 like( $v, '/^\d+$/', "checking that $name is a number ($v)" );
 

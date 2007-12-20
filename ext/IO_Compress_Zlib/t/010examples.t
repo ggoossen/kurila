@@ -117,7 +117,7 @@ check "$Perl ${examples}/gzcat <$file1 ", $hello1;
 
 title "gzgrep";
 check "$Perl  ${examples}/gzgrep the $file1 $file2",
-        join('', grep(/the/, @hello1, @hello2));
+        join('', grep(m/the/, @hello1, @hello2));
 
 for ($file1, $file2, $stderr) { 1 while unlink $_ } ;
 

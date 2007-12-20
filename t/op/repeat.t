@@ -141,7 +141,7 @@ is(77, scalar ((1,7)x2),    'stack truncation');
     local $TODO = "x operator not copying elements in 'for' list? [ID 20010809.028]";
     my $x = 'abcd';
     my $y = '';
-    for (($x =~ /./g) x 2) {
+    for (($x =~ m/./g) x 2) {
 	$y .= chop;
     }
     is($y, 'abcdabcd');

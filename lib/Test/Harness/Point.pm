@@ -42,7 +42,7 @@ sub from_test_line  {
     my $line = shift or return;
 
     # We pulverize the line down into pieces in three parts.
-    my ($not, $number, $extra) = ($line =~ /^(not )?ok\b(?:\s+(\d+))?\s*(.*)/) or return;
+    my ($not, $number, $extra) = ($line =~ m/^(not )?ok\b(?:\s+(\d+))?\s*(.*)/) or return;
 
     my $point = $class->new;
     $point->set_number( $number );
@@ -103,7 +103,7 @@ sub set_directive   {
     $directive =~ s/\s+$//;
     $self->{directive} = $directive;
 
-    my ($type,$reason) = ($directive =~ /^\s*(\S+)(?:\s+(.*))?$/);
+    my ($type,$reason) = ($directive =~ m/^\s*(\S+)(?:\s+(.*))?$/);
     $self->set_directive_type( $type );
     $reason = "" unless defined $reason;
     $self->{directive_reason} = $reason;

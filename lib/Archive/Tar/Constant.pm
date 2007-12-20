@@ -38,7 +38,7 @@ use constant TAR_END        => "\0" x BLOCK;
 
 use constant READ_ONLY      => sub { shift() ? 'rb' : 'r' };
 use constant WRITE_ONLY     => sub { $_[0] ? 'wb' . shift : 'w' };
-use constant MODE_READ      => sub { $_[0] =~ /^r/ ? 1 : 0 };
+use constant MODE_READ      => sub { $_[0] =~ m/^r/ ? 1 : 0 };
 
 # Pointless assignment to make -w shut up
 my $getpwuid; $getpwuid = 'unknown' unless eval { my $f = getpwuid (0); };
@@ -71,7 +71,7 @@ use constant ZLIB           => do { !$ENV{'PERL5_AT_NO_ZLIB'} and
 use constant GZIP_MAGIC_NUM => qr/^(?:\037\213|\037\235)/;
 
 use constant CAN_CHOWN      => do { ($> == 0 and $^O ne "MacOS" and $^O ne "MSWin32") };
-use constant CAN_READLINK   => ($^O ne 'MSWin32' and $^O !~ /RISC(?:[ _])?OS/i and $^O ne 'VMS');
+use constant CAN_READLINK   => ($^O ne 'MSWin32' and $^O !~ m/RISC(?:[ _])?OS/i and $^O ne 'VMS');
 use constant ON_UNIX        => ($^O ne 'MSWin32' and $^O ne 'MacOS' and $^O ne 'VMS');
 use constant ON_VMS         => $^O eq 'VMS'; 
 

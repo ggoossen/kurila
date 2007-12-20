@@ -128,7 +128,7 @@ BEGIN {++$ntests}
     print "ok ",++$test,"\n";
     BEGIN {++$ntests}
     (print "not "), $failed=1 
-	if $w !~ /^pragma "attrs" is deprecated, use "sub NAME : ATTRS" instead at/;
+	if $w !~ m/^pragma "attrs" is deprecated, use "sub NAME : ATTRS" instead at/;
     print "ok ",++$test,"\n";
     BEGIN {++$ntests}
 }

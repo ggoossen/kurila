@@ -19,8 +19,8 @@ my $Test = Test::Builder->new;
 {
            my $r = $Test->maybe_regex(qr/^FOO$/i);
            ok(defined $r, 'qr// detected');
-           ok(('foo' =~ /$r/), 'qr// good match');
-           ok(('bar' !~ /$r/), 'qr// bad match');
+           ok(('foo' =~ m/$r/), 'qr// good match');
+           ok(('bar' !~ m/$r/), 'qr// bad match');
 }
 
 {

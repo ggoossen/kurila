@@ -212,18 +212,18 @@ sub _new_from_chunk {
     my $i = -1;
     my %entry = map {
         $tmpl->[++$i] => $tmpl->[++$i] ? oct $_ : $_
-    } map { /^([^\0]*)/ } unpack( UNPACK, $chunk );
+    } map { m/^([^\0]*)/ } unpack( UNPACK, $chunk );
 
     my $obj = bless { %entry, %args }, $class;
 
 	### magic is a filetype string.. it should have something like 'ustar' or
 	### something similar... if the chunk is garbage, skip it
-	return unless $obj->magic !~ /\W/;
+	return unless $obj->magic !~ m/\W/;
 
     ### store the original chunk ###
     $obj->raw( $chunk );
 
-    $obj->type(FILE) if ( (!length $obj->type) or ($obj->type =~ /\W/) );
+    $obj->type(FILE) if ( (!length $obj->type) or ($obj->type =~ m/\W/) );
     $obj->type(DIR)  if ( ($obj->is_file) && ($obj->name =~ m|/$|) );
 
 

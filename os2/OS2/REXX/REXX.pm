@@ -53,7 +53,7 @@ sub dropall
   &OS2::REXX::_drop(@_);	# Try to drop them all.
   my $name;
   for (@_) {
-    if (/\.$/) {
+    if (m/\.$/) {
       OS2::REXX::_fetch('DUMMY'); # reset REXX's first/next iterator
       while (($name) = OS2::REXX::_next($_)) {
 	OS2::REXX::_drop($_ . $name);

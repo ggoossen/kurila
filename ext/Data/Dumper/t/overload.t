@@ -21,6 +21,6 @@ $_ = Dumper($f);
 s/^/#/mg;
 print $_;
 
-print "not " unless /bar/ && /Foo/;
+print "not " unless m/bar/ && m/Foo/;
 print "ok 1\n";
 

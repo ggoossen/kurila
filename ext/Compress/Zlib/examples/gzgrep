@@ -17,7 +17,7 @@ foreach $file (@ARGV) {
          or die "Cannot open $file: $gzerrno\n" ;
 
     while ($gz->gzreadline($_) +> 0) {
-        print if /$pattern/ ;
+        print if m/$pattern/ ;
     }
 
     die "Error reading from $file: $gzerrno\n" 

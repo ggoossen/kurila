@@ -30,7 +30,7 @@ for (@MANIFEST) {
      {
 	 local $/="";
 	 while ( ~< *MOD) {
-	     next unless /^=head1 NAME/;
+	     next unless m/^=head1 NAME/;
 	     $foundit++;
 	     last;
 	 }
@@ -62,7 +62,7 @@ for (@MANIFEST) {
      $thing = ucfirst($thing);
      $title = "=item $perlname\n\n$thing\n\n";
 
-     if ($filename =~ /[A-Z]/) {
+     if ($filename =~ m/[A-Z]/) {
           push @mod, $title;
      } else {
           push @pragma, $title;

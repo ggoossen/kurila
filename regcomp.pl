@@ -14,9 +14,9 @@ my (@name,@rest,@type,@code,@args,@longj);
 my ($desc,$lastregop);
 while ( ~< *DESC) {
     s/#.*$//;
-    next if /^\s*$/;
+    next if m/^\s*$/;
     s/\s*\z//;
-    if (/^-+\s*$/) {
+    if (m/^-+\s*$/) {
         $lastregop= $ind;
         next;
     }
@@ -38,7 +38,7 @@ while ( ~< *DESC) {
                 my @suffix;
                 if (!$special) {
                    @suffix=("");
-                } elsif ($special=~/\d/) {
+                } elsif ($special=~m/\d/) {
                     @suffix=(1..$special);
                 } elsif ($special eq 'FAIL') {
                     @suffix=("","_fail");
@@ -200,7 +200,7 @@ open my $fh,"<","regexp.h" or die "Can't read regexp.h: $!";
 my %rxfv;
 my $val;
 while ( ~< $fh) {
-    if (/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i) {
+    if (m/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i) {
         $rxfv{$1}= eval $2;
         $val^|^=$rxfv{$1};
     }

@@ -39,7 +39,7 @@ sub _hostname {
     }
     if (defined($host) && index($host, '.') +> 0) {
       $fqdn = $host;
-      ($host, $domain) = $fqdn =~ /^([^\.]+)\.(.*)$/;
+      ($host, $domain) = $fqdn =~ m/^([^\.]+)\.(.*)$/;
     }
     return $host;
   }
@@ -51,7 +51,7 @@ sub _hostname {
     $host = $ENV{'MULTINET_HOST_NAME'} if defined($ENV{'MULTINET_HOST_NAME'});
     if (index($host, '.') +> 0) {
       $fqdn = $host;
-      ($host, $domain) = $fqdn =~ /^([^\.]+)\.(.*)$/;
+      ($host, $domain) = $fqdn =~ m/^([^\.]+)\.(.*)$/;
     }
     return $host;
   }
@@ -130,7 +130,7 @@ sub _hostdomain {
   if (open(RES, "/etc/resolv.conf")) {
     while ( ~< *RES) {
       $domain = $1
-        if (/\A\s*(?:domain|search)\s+(\S+)/);
+        if (m/\A\s*(?:domain|search)\s+(\S+)/);
     }
     close(RES);
 
@@ -145,7 +145,7 @@ sub _hostdomain {
 
   @hosts = ($host, "localhost");
 
-  unless (defined($host) && $host =~ /\./) {
+  unless (defined($host) && $host =~ m/\./) {
     my $dom = undef;
     eval {
       my $tmp = "\0" x 256;    ## preload scalar
@@ -169,7 +169,7 @@ sub _hostdomain {
     }
 
     chop($dom = `domainname 2>/dev/null`)
-      unless (defined $dom || $^O =~ /^(?:cygwin|MSWin32)/);
+      unless (defined $dom || $^O =~ m/^(?:cygwin|MSWin32)/);
 
     if (defined $dom) {
       my @h = ();
@@ -232,11 +232,11 @@ sub domainname {
   return $fqdn = $host . "." . $domain
     if (defined $host
     and defined $domain
-    and $host !~ /\./
-    and $domain =~ /\./);
+    and $host !~ m/\./
+    and $domain =~ m/\./);
 
   # For hosts that have no name, just an IP address
-  return $fqdn = $host if defined $host and $host =~ /^\d+(\.\d+){3}$/;
+  return $fqdn = $host if defined $host and $host =~ m/^\d+(\.\d+){3}$/;
 
   my @host   = defined $host   ? split(/\./, $host)   : ('localhost');
   my @domain = defined $domain ? split(/\./, $domain) : ();

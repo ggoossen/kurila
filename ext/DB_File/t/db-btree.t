@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
         chdir 't' if -d 't';
         @INC = '../lib' if -d '../lib';
     }
@@ -13,7 +13,7 @@ use Config;
  
 BEGIN {
     if(-d "lib" && -f "TEST") {
-        if ($Config{'extensions'} !~ /\bDB_File\b/ ) {
+        if ($Config{'extensions'} !~ m/\bDB_File\b/ ) {
             print "1..0 # Skip: DB_File was not built\n";
             exit 0;
         }
@@ -169,9 +169,9 @@ ok(14, $dbh->{maxkeypage} == 1234 );
 
 # Check that an invalid entry is caught both for store & fetch
 eval '$dbh->{fred} = 1234' ;
-ok(15, $@ =~ /^DB_File::BTREEINFO::STORE - Unknown element 'fred' at/ ) ;
+ok(15, $@ =~ m/^DB_File::BTREEINFO::STORE - Unknown element 'fred' at/ ) ;
 eval 'my $q = $dbh->{fred}' ;
-ok(16, $@ =~ /^DB_File::BTREEINFO::FETCH - Unknown element 'fred' at/ ) ;
+ok(16, $@ =~ m/^DB_File::BTREEINFO::FETCH - Unknown element 'fred' at/ ) ;
 
 # Now check the interface to BTREE
 
@@ -623,7 +623,7 @@ unlink $Dfile1 ;
     my $filename = "xyz" ;
     my @x ;
     eval { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ; } ;
-    ok(90, $@ =~ /^DB_File can only tie an associative array to a DB_BTREE database/) ;
+    ok(90, $@ =~ m/^DB_File can only tie an associative array to a DB_BTREE database/) ;
     unlink $filename ;
 }
 
@@ -904,7 +904,7 @@ EOM
    $db->filter_store_key (sub { $_ = $h{$_} }) ;
 
    eval '$h{1} = 1234' ;
-   ok(146, $@ =~ /^recursion detected in filter_store_key at/ );
+   ok(146, $@ =~ m/^recursion detected in filter_store_key at/ );
    
    undef $db ;
    untie %h;
@@ -1354,7 +1354,7 @@ EOM
     my $db ;
     ok(156, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
-    $db->filter_store_key (sub { $bad_key = 1 if /^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
+    $db->filter_store_key (sub { $bad_key = 1 if m/^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
 
     $h{'Alpha_ABC'} = 2 ;
     $h{'Alpha_DEF'} = 5 ;
@@ -1384,10 +1384,10 @@ EOM
     my $dbh = DB_File::BTREEINFO->new() ;
 
     eval { $dbh->{compare} = 2 };
-    ok(162, $@ =~ /^Key 'compare' not associated with a code reference at/);
+    ok(162, $@ =~ m/^Key 'compare' not associated with a code reference at/);
 
     eval { $dbh->{prefix} = 2 };
-    ok(163, $@ =~ /^Key 'prefix' not associated with a code reference at/);
+    ok(163, $@ =~ m/^Key 'prefix' not associated with a code reference at/);
 
 }
 

@@ -16,7 +16,7 @@ push(@defines, '-DNO_SHA_384_512')  if $opts{'x'};
 	# This seems to speed things up a bit.  However,
 	# DON'T do this if thread-safe option is in force.
 	
-if ($Config{archname} =~ /^i[3456]86/) {
+if ($Config{archname} =~ m/^i[3456]86/) {
 	push(@defines, '-DSHA_STO_CLASS=static') unless $opts{'t'};
 }
 

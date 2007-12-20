@@ -331,7 +331,7 @@ sub clean_data($){
 	${$dataref}[$i] =~ s/\s+\Z//;
 
         # have a look for all-space lines
-      if( ${$dataref}[$i] =~ /^\s+$/m and $dataref->[$i] !~ /^\s/ ){
+      if( ${$dataref}[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
 	    my @chunks = split( /^\s+$/m, ${$dataref}[$i] );
 	    splice( @$dataref, $i, 1, @chunks );
 	}
@@ -392,15 +392,15 @@ sub pod2html {
 
     # be eol agnostic
     for (@poddata) {
-	if (/\r/) {
-	    if (/\r\n/) {
+	if (m/\r/) {
+	    if (m/\r\n/) {
 		@poddata = map { s/\r\n/\n/g;
-				 /\n\n/ ?
+				 m/\n\n/ ?
 				     map { "$_\n\n" } split /\n\n/ :
 				     $_ } @poddata;
 	    } else {
 		@poddata = map { s/\r/\n/g;
-				 /\n\n/ ?
+				 m/\n\n/ ?
 				     map { "$_\n\n" } split /\n\n/ :
 				     $_ } @poddata;
 	    }
@@ -425,20 +425,20 @@ sub pod2html {
     if ($Title eq '') {
 	TITLE_SEARCH: {
  	    for (my $i = 0; $i +< @poddata; $i++) {
-		if ($poddata[$i] =~ /^=head1\s*NAME\b/m) {
+		if ($poddata[$i] =~ m/^=head1\s*NAME\b/m) {
  		    for my $para ( @poddata[$i, $i+1] ) {
 			last TITLE_SEARCH
-			    if ($Title) = $para =~ /(\S+\s+-+.*\S)/s;
+			    if ($Title) = $para =~ m/(\S+\s+-+.*\S)/s;
 		    }
 		}
 
 	    }
 	}
     }
-    if (!$Title and $Podfile =~ /\.pod\z/) {
+    if (!$Title and $Podfile =~ m/\.pod\z/) {
 	# probably a split pod so take first =head[12] as title
  	for (my $i = 0; $i +< @poddata; $i++) {
-	    last if ($Title) = $poddata[$i] =~ /^=head[12]\s*(.*)/;
+	    last if ($Title) = $poddata[$i] =~ m/^=head[12]\s*(.*)/;
 	}
 	warn "adopted '$Title' as title for $Podfile\n"
 	    if $Verbose and $Title;
@@ -447,7 +447,7 @@ sub pod2html {
 	$Title =~ s/\s*\(.*\)//;
     } else {
 	warn "$0: no title for $Podfile.\n" unless $Quiet;
-	$Podfile =~ /^(.*)(\.[^.\/]+)?\z/s;
+	$Podfile =~ m/^(.*)(\.[^.\/]+)?\z/s;
 	$Title = ($Podfile eq "-" ? 'No Title' : $1);
 	warn "using $Title" if $Verbose;
     }
@@ -524,35 +524,35 @@ END_OF_INDEX
     foreach my $i (0..$#poddata){
 	$_ = $poddata[$i];
 	$Paragraph = $i+1;
-	if (/^(=.*)/s) {	# is it a pod directive?
+	if (m/^(=.*)/s) {	# is it a pod directive?
 	    $Ignore = 0;
 	    $after_item = 0;
 	    $need_dd = 0;
 	    $_ = $1;
-	    if (/^=begin\s+(\S+)\s*(.*)/si) {# =begin
+	    if (m/^=begin\s+(\S+)\s*(.*)/si) {# =begin
 		process_begin($1, $2);
-	    } elsif (/^=end\s+(\S+)\s*(.*)/si) {# =end
+	    } elsif (m/^=end\s+(\S+)\s*(.*)/si) {# =end
 		process_end($1, $2);
-	    } elsif (/^=cut/) {			# =cut
+	    } elsif (m/^=cut/) {			# =cut
 		process_cut();
-	    } elsif (/^=pod/) {			# =pod
+	    } elsif (m/^=pod/) {			# =pod
 		process_pod();
 	    } else {
 		next if @Begin_Stack && $Begin_Stack[-1] ne 'html';
 
-		if (/^=(head[1-6])\s+(.*\S)/s) {	# =head[1-6] heading
+		if (m/^=(head[1-6])\s+(.*\S)/s) {	# =head[1-6] heading
 		    process_head( $1, $2, $Doindex && $index );
-		} elsif (/^=item\s*(.*\S)?/sm) {	# =item text
+		} elsif (m/^=item\s*(.*\S)?/sm) {	# =item text
 		    $need_dd = process_item( $1 );
 		    $after_item = 1;
-		} elsif (/^=over\s*(.*)/) {		# =over N
+		} elsif (m/^=over\s*(.*)/) {		# =over N
 		    process_over();
-		} elsif (/^=back/) {		# =back
+		} elsif (m/^=back/) {		# =back
 		    process_back($need_dd);
-		} elsif (/^=for\s+(\S+)\s*(.*)/si) {# =for
+		} elsif (m/^=for\s+(\S+)\s*(.*)/si) {# =for
 		    process_for($1,$2);
 		} else {
-		    /^=(\S*)\s*/;
+		    m/^=(\S*)\s*/;
 		    warn "$0: $Podfile: unknown pod directive '$1' in "
 		       . "paragraph $Paragraph.  ignoring.\n" unless $Quiet;
 		}
@@ -565,7 +565,7 @@ END_OF_INDEX
 	    print HTML and next if @Begin_Stack && $Begin_Stack[-1] eq 'html';
 	    print HTML "<dd>\n" if $need_dd;
 	    my $text = $_;
-	    if( $text =~ /\A\s+/ ){
+	    if( $text =~ m/\A\s+/ ){
 		process_pre( \$text );
 	        print HTML "<pre>\n$text</pre>\n";
 
@@ -574,12 +574,12 @@ END_OF_INDEX
 
 		# experimental: check for a paragraph where all lines
 		# have some ...\t...\t...\n pattern
-		if( $text =~ /\t/ ){
+		if( $text =~ m/\t/ ){
 		    my @lines = split( "\n", $text );
 		    if( @lines +> 1 ){
 			my $all = 2;
 			foreach my $line ( @lines ){
-			    if( $line =~ /\S/ && $line !~ /\t/ ){
+			    if( $line =~ m/\S/ && $line !~ m/\t/ ){
 				$all--;
 				last if $all == 0;
 			    }
@@ -804,7 +804,7 @@ sub load_cache {
 
     warn "loading item cache\n" if $Verbose;
     while ( ~< *CACHE) {
-	/(.*?) (.*)$/;
+	m/(.*?) (.*)$/;
 	$Items{$1} = $2;
     }
     close(CACHE);
@@ -833,7 +833,7 @@ sub load_cache {
 
     warn "loading directory cache\n" if $Verbose;
     while ( ~< *CACHE) {
-	/(.*?) (.*)$/;
+	m/(.*?) (.*)$/;
 	$Pages{$1} = $2;
     }
 
@@ -874,12 +874,12 @@ sub scan_podpath {
 	# if there is a directory then use the .pod and .pm files within it.
 	# NOTE: Only finds the first so-named directory in the tree.
 #	if ($Pages{$libpod} =~ /([^:]*[^(\.pod|\.pm)]):/) {
-	if ($Pages{$libpod} =~ /([^:]*(?<!\.pod)(?<!\.pm)):/) {
+	if ($Pages{$libpod} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/) {
 	    #  find all the .pod and .pm files within the directory
 	    $dirname = $1;
 	    opendir(DIR, $dirname) ||
 		die "$0: error opening directory $dirname: $!\n";
-	    @files = grep(/(\.pod|\.pm)\z/ && ! -d $_, readdir(DIR));
+	    @files = grep(m/(\.pod|\.pm)\z/ && ! -d $_, readdir(DIR));
 	    closedir(DIR);
 
 	    # scan each .pod and .pm file for =item directives
@@ -899,8 +899,8 @@ sub scan_podpath {
 ###		$pod =~ /^(.*)(\.pod|\.pm)$/;
 ###		$Items{$1} = "$dirname/$1.html" if $1;
 ###	    }
-	} elsif ($Pages{$libpod} =~ /([^:]*\.pod):/ ||
-		 $Pages{$libpod} =~ /([^:]*\.pm):/) {
+	} elsif ($Pages{$libpod} =~ m/([^:]*\.pod):/ ||
+		 $Pages{$libpod} =~ m/([^:]*\.pm):/) {
 	    # scan the .pod or .pm file for =item directives
 	    $pod = $1;
 	    open(POD, "<$pod") ||
@@ -962,21 +962,21 @@ sub scan_dir {
 	die "$0: error opening directory $dir: $!\n";
     while (defined($_ = readdir(DIR))) {
 	if (-d "$dir/$_" && $_ ne "." && $_ ne ".."
-	    && ($HiddenDirs || !/^\./)
+	    && ($HiddenDirs || !m/^\./)
 	) {         # directory
 	    $Pages{$_}  = "" unless defined $Pages{$_};
 	    $Pages{$_} .= "$dir/$_:";
 	    push(@subdirs, $_);
-	} elsif (/\.pod\z/) {	    	    	    	    # .pod
+	} elsif (m/\.pod\z/) {	    	    	    	    # .pod
 	    s/\.pod\z//;
 	    $Pages{$_}  = "" unless defined $Pages{$_};
 	    $Pages{$_} .= "$dir/$_.pod:";
 	    push(@pods, "$dir/$_.pod");
-	} elsif (/\.html\z/) { 	    	    	    	    # .html
+	} elsif (m/\.html\z/) { 	    	    	    	    # .html
 	    s/\.html\z//;
 	    $Pages{$_}  = "" unless defined $Pages{$_};
 	    $Pages{$_} .= "$dir/$_.pod:";
-	} elsif (/\.pm\z/) { 	    	    	    	    # .pm
+	} elsif (m/\.pm\z/) { 	    	    	    	    # .pm
 	    s/\.pm\z//;
 	    $Pages{$_}  = "" unless defined $Pages{$_};
 	    $Pages{$_} .= "$dir/$_.pm:";
@@ -986,7 +986,7 @@ sub scan_dir {
 	    if (open(F, "$dir/$_")) {
 		my $line;
 		while (defined($line = ~< *F)) {
-		    if ($line =~ /^=(?:pod|head1)/) {
+		    if ($line =~ m/^=(?:pod|head1)/) {
 			$Pages{$_}  = "" unless defined $Pages{$_};
 			$Pages{$_} .= "$dir/$_.pod:";
 			last;
@@ -1022,7 +1022,7 @@ sub scan_headings {
     # scan for =head directives, note their name, and build an index
     #  pointing to each of them.
     foreach my $line (@data) {
-      if ($line =~ /^=(head)([1-6])\s+(.*)/) {
+      if ($line =~ m/^=(head)([1-6])\s+(.*)/) {
         ($tag, $which_head, $otitle) = ($1,$2,$3);
 
         my $title = depod( $otitle );
@@ -1074,12 +1074,12 @@ sub scan_items {
 
 	# figure out what kind of item it is.
 	# Build string for referencing this item.
-	if ( $txt =~ /\A=item\s+\*\s*(.*)\Z/s ) { # bullet
+	if ( $txt =~ m/\A=item\s+\*\s*(.*)\Z/s ) { # bullet
 	    next unless $1;
 	    $item = $1;
-        } elsif( $txt =~ /\A=item\s+(?>\d+\.?)\s*(.*)\Z/s ) { # numbered list
+        } elsif( $txt =~ m/\A=item\s+(?>\d+\.?)\s*(.*)\Z/s ) { # numbered list
 	    $item = $1;
-	} elsif( $txt =~ /\A=item\s+(.*)\Z/s ) { # plain item
+	} elsif( $txt =~ m/\A=item\s+(.*)\Z/s ) { # plain item
 	    $item = $1;
 	} else {
 	    next;
@@ -1096,7 +1096,7 @@ sub process_head {
     my($tag, $heading, $hasindex) = @_;
 
     # figure out the level of the =head
-    $tag =~ /head([1-6])/;
+    $tag =~ m/head([1-6])/;
     my $level = $1;
 
     if( $Listlevel ){
@@ -1185,17 +1185,17 @@ sub process_item {
     my $emitted; # the tag actually emitted, used for closing
 
     # all the list variants:
-    if( $text =~ /\A\*/ ){ # bullet
+    if( $text =~ m/\A\*/ ){ # bullet
         $emitted = emit_li( 'ul' );
-        if ($text =~ /\A\*\s+(\S.*)\Z/s ) { # with additional text
+        if ($text =~ m/\A\*\s+(\S.*)\Z/s ) { # with additional text
             my $tag = $1;
             $otext =~ s/\A\*\s+//;
             emit_item_tag( $otext, $tag, 1 );
         }
 
-    } elsif( $text =~ /\A\d+/ ){ # numbered list
+    } elsif( $text =~ m/\A\d+/ ){ # numbered list
         $emitted = emit_li( 'ol' );
-        if ($text =~ /\A(?>\d+\.?)\s*(\S.*)\Z/s ) { # with additional text
+        if ($text =~ m/\A(?>\d+\.?)\s*(\S.*)\Z/s ) { # with additional text
             my $tag = $1;
             $otext =~ s/\A\d+\.?\s*//;
             emit_item_tag( $otext, $tag, 1 );
@@ -1203,7 +1203,7 @@ sub process_item {
 
     } else {			# definition list
         $emitted = emit_li( 'dl' );
-        if ($text =~ /\A(.+)\Z/s ){ # should have text
+        if ($text =~ m/\A(.+)\Z/s ){ # should have text
             emit_item_tag( $otext, $text, 1 );
         }
         $need_dd = 1;
@@ -1269,9 +1269,9 @@ sub process_pod {
 #
 sub process_for {
     my($whom, $text) = @_;
-    if ( $whom =~ /^(pod2)?html$/i) {
+    if ( $whom =~ m/^(pod2)?html$/i) {
 	print HTML $text;
-    } elsif ($whom =~ /^illustration$/i) {
+    } elsif ($whom =~ m/^illustration$/i) {
         1 while chomp $text;
 	for my $ext (qw[.png .gif .jpeg .jpg .tga .pcl .bmp]) {
 	  $text .= $ext, last if -r "$text$ext";
@@ -1289,7 +1289,7 @@ sub process_begin {
     my($whom, $text) = @_;
     $whom = lc($whom);
     push (@Begin_Stack, $whom);
-    if ( $whom =~ /^(pod2)?html$/) {
+    if ( $whom =~ m/^(pod2)?html$/) {
 	print HTML $text if $text;
     }
 }
@@ -1447,7 +1447,7 @@ sub process_puretext {
     # process each word individually
     foreach my $word (@words) {
 	# skip space runs
- 	next if $word =~ /^\s*$/;
+ 	next if $word =~ m/^\s*$/;
 	# see if we can infer a link or a function call
 	#
 	# NOTE: This is a word based search, it won't automatically
@@ -1469,7 +1469,7 @@ sub process_puretext {
 	    # has parenthesis so should have been a C<> ref
             ## try for a pagename (perlXXX(1))?
             my( $func, $args, $rest ) = ( $1, $2, $3 || '' );
-            if( $args =~ /^\d+$/ ){
+            if( $args =~ m/^\d+$/ ){
                 my $url = page_sect( $word, '' );
                 if( defined $url ){
                     $word = qq(<a href="$url" class="man">the $word manpage</a>$rest);
@@ -1488,14 +1488,14 @@ sub process_puretext {
 	    # looks like a URL
             # Don't relativize it: leave it as the author intended
 	    $word = qq(<a href="$word">$word</a>);
-	} elsif ($word =~ /[\w.-]+\@[\w-]+\.\w/) {
+	} elsif ($word =~ m/[\w.-]+\@[\w-]+\.\w/) {
 	    # looks like an e-mail address
 	    my ($w1, $w2, $w3) = ("", $word, "");
-	    ($w1, $w2, $w3) = ("(", $1, ")$2") if $word =~ /^\((.*?)\)(,?)/;
-	    ($w1, $w2, $w3) = ("&lt;", $1, "&gt;$2") if $word =~ /^<(.*?)>(,?)/;
+	    ($w1, $w2, $w3) = ("(", $1, ")$2") if $word =~ m/^\((.*?)\)(,?)/;
+	    ($w1, $w2, $w3) = ("&lt;", $1, "&gt;$2") if $word =~ m/^<(.*?)>(,?)/;
 	    $word = qq($w1<a href="mailto:$w2">$w2</a>$w3);
 	} else {
-	    $word = html_escape($word) if $word =~ /["&<>]/;
+	    $word = html_escape($word) if $word =~ m/["&<>]/;
 	}
     }
 
@@ -1562,7 +1562,7 @@ sub process_text1($$;$$){
 	### my $x = $par =~ /[BI]</ ? 'yes' : 'no' ;
         ### print STDERR "-->call emit_C($par) lev=$lev, par with BI=$x\n";
 
-	$res = emit_C( $text, $lev +> 1 || ($par =~ /[BI]</) );
+	$res = emit_C( $text, $lev +> 1 || ($par =~ m/[BI]</) );
 
     } elsif( $func eq 'E' ){
 	# E<x> - convert to character
@@ -1592,9 +1592,9 @@ sub process_text1($$;$$){
 	    return make_URL_href( $par );
 	}
         # b) C<...> is stripped and treated as C<>
-        if( $par =~ /^C<(.*)>$/ ){
+        if( $par =~ m/^C<(.*)>$/ ){
 	    my $text = depod( $1 );
- 	    return emit_C( $text, $lev +> 1 || ($par =~ /[BI]</) );
+ 	    return emit_C( $text, $lev +> 1 || ($par =~ m/[BI]</) );
 	}
 
 	# analyze the contents
@@ -1625,7 +1625,7 @@ sub process_text1($$;$$){
 	    ( $page, $ident ) = ( $1, $2 );
             ### print STDERR "--> L<$par> to page $page, section $section\n";
 
-	} elsif( $par =~ /\s/ ){  # this must be a section with missing quotes
+	} elsif( $par =~ m/\s/ ){  # this must be a section with missing quotes
 	    ( $page, $section ) = ( '', $par );
             ### print STDERR "--> L<$par> to void page, section $section\n";
 
@@ -1833,7 +1833,7 @@ sub page_sect($$) {
     $page=$page83 if (defined $Pages{$page83});
     if ($page eq "") {
         $link = "#" . anchorify( $section );
-    } elsif ( $page =~ /::/ ) {
+    } elsif ( $page =~ m/::/ ) {
 	$page =~ s,::,/,g;
 	# Search page cache for an entry keyed under the html page name,
 	# then look to see what directory that page might be in.  NOTE:
@@ -1842,7 +1842,7 @@ sub page_sect($$) {
 	my $page_name = $page ;
 	$page_name =~ s,^.*/,,s ;
 	if ( defined( $Pages{ $page_name } ) &&
-	     $Pages{ $page_name } =~ /([^:]*$page)\.(?:pod|pm):/
+	     $Pages{ $page_name } =~ m/([^:]*$page)\.(?:pod|pm):/
 	   ) {
 	    $page = $1 ;
 	}
@@ -1869,7 +1869,7 @@ sub page_sect($$) {
 	# if there is a directory by the name of the page, then assume that an
 	# appropriate section will exist in the subdirectory
 #	if ($section ne "" && $Pages{$page} =~ /([^:]*[^(\.pod|\.pm)]):/) {
-	if ($section ne "" && $Pages{$page} =~ /([^:]*(?<!\.pod)(?<!\.pm)):/) {
+	if ($section ne "" && $Pages{$page} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/) {
 	    $link = "$Htmlroot/$1/$section.html";
             ### print STDERR "...link=$link\n";
 
@@ -1882,7 +1882,7 @@ sub page_sect($$) {
 
 	    # check if there is a .pod with the page name.
 	    # for L<Foo>, Foo.(pod|pm) is preferred to A/Foo.(pod|pm)
-	    if ($Pages{$page} =~ /([^:]*)\.(?:pod|pm):/) {
+	    if ($Pages{$page} =~ m/([^:]*)\.(?:pod|pm):/) {
 		$link = "$Htmlroot/$1.html$section";
 	    } else {
 		$link = "";
@@ -1984,7 +1984,7 @@ sub coderef($$){
     # =item directive, then create a link to that page.
     if( defined $page ){
 	if( $page ){
-            if( exists $Pages{$page} and $Pages{$page} =~ /([^:.]*)\.[^:]*:/){
+            if( exists $Pages{$page} and $Pages{$page} =~ m/([^:.]*)\.[^:]*:/){
 		$page = $1 . '.html';
 	    }
 	    my $link = "$Htmlroot/$page#" . anchorify($fid);
@@ -2001,7 +2001,7 @@ sub coderef($$){
 	    $url = "#" . anchorify($fid);
 	}
 
-	confess "url has space: $url" if $url =~ /"[^"]*\s[^"]*"/;
+	confess "url has space: $url" if $url =~ m/"[^"]*\s[^"]*"/;
     }
     return( $url, $fid );
 }
@@ -2185,11 +2185,11 @@ sub fragment_id {
     $text =~ s/\s+\Z//s;
     if( $text ){
 	# a method or function?
-	return $1 if $text =~ /(\w+)\s*\(/;
-	return $1 if $text =~ /->\s*(\w+)\s*\(?/;
+	return $1 if $text =~ m/(\w+)\s*\(/;
+	return $1 if $text =~ m/->\s*(\w+)\s*\(?/;
 
 	# a variable name?
-	return $1 if $text =~ /^([\$\@%*]\S+)/;
+	return $1 if $text =~ m/^([\$\@%*]\S+)/;
 
 	# some pattern matching operator?
 	return $1 if $text =~ m|^(\w+/).*/\w*$|;

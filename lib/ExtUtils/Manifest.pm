@@ -153,7 +153,7 @@ sub manifind {
 	
         if( $Is_VMS ) {
             $name =~ s#(.*)\.$#\L$1#;
-            $name = uc($name) if $name =~ /^MANIFEST(\.SKIP)?$/i;
+            $name = uc($name) if $name =~ m/^MANIFEST(\.SKIP)?$/i;
         }
 	$found->{$name} = "";
     };
@@ -315,9 +315,9 @@ sub maniread {
     local $_;
     while ( ~< *M){
         chomp;
-        next if /^\s*#/;
+        next if m/^\s*#/;
 
-        my($file, $comment) = /^(\S+)\s*(.*)/;
+        my($file, $comment) = m/^(\S+)\s*(.*)/;
         next unless $file;
 
         if ($Is_MacOS) {
@@ -334,7 +334,7 @@ sub maniread {
             my $okfile = "$dir$base";
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
             $file = $okfile;
-            $file = lc($file) unless $file =~ /^MANIFEST(\.SKIP)?$/;
+            $file = lc($file) unless $file =~ m/^MANIFEST(\.SKIP)?$/;
         }
 
         $read->{$file} = $comment;
@@ -353,8 +353,8 @@ sub _maniskip {
     while ( ~< *M){
 	chomp;
 	s/\r//;
-	next if /^#/;
-	next if /^\s*$/;
+	next if m/^#/;
+	next if m/^\s*$/;
 	push @skip, _macify($_);
     }
     close M;
@@ -385,7 +385,7 @@ sub _check_mskip_directives {
         return;
     }
     while ( ~< *M) {
-        if (/^#!include_default\s*$/) {
+        if (m/^#!include_default\s*$/) {
 	    if (my @default = _include_mskip_file()) {
 	        push @lines, @default;
 		warn "Debug: Including default MANIFEST.SKIP\n" if $Debug;
@@ -393,7 +393,7 @@ sub _check_mskip_directives {
 	    }
 	    next;
         }
-	if (/^#!include\s+(.*)\s*$/) {
+	if (m/^#!include\s+(.*)\s*$/) {
 	    my $external_file = $1;
 	    if (my @external = _include_mskip_file($external_file)) {
 	        push @lines, @external;
@@ -556,7 +556,7 @@ my @Exceptions = qw(MANIFEST META.yml SIGNATURE);
 sub best {
     my ($srcFile, $dstFile) = @_;
 
-    my $is_exception = grep $srcFile =~ /$_/, @Exceptions;
+    my $is_exception = grep $srcFile =~ m/$_/, @Exceptions;
     if ($is_exception or !$Config{d_link} or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
@@ -645,7 +645,7 @@ sub _fix_manifest {
     my @manifest = ~< *MANIFEST;
     close MANIFEST;
 
-    unless( $manifest[-1] =~ /\n\z/ ) {
+    unless( $manifest[-1] =~ m/\n\z/ ) {
         open MANIFEST, ">>$MANIFEST" or die "Could not open $MANIFEST: $!";
         print MANIFEST "\n";
         close MANIFEST;

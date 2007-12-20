@@ -7,7 +7,7 @@ use strict;
 WriteMakefile(
     'NAME'	=> 'Win32API::File',
     'VERSION_FROM' => 'File.pm', # finds $VERSION
-    (  $Config{archname} =~ /-object\b/i  ?  ( 'CAPI' => 'TRUE' )  :  ()  ),
+    (  $Config{archname} =~ m/-object\b/i  ?  ( 'CAPI' => 'TRUE' )  :  ()  ),
     'AUTHOR'		=> 'Tye McQueen <tye@metronet.com>',
     'ABSTRACT_FROM'	=> 'File.pm',
     'postamble' => { IMPORT_LIST => [qw(/._/ !/[a-z]/ :MEDIA_TYPE)],

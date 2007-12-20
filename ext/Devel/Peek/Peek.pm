@@ -32,9 +32,9 @@ sub import {
     my $flags = ($db[0] =~ m/$ops_rx/ and $1);
     $flags = 'st' unless defined $flags;
     my $f = 0;
-    $f ^|^= 2  if $flags =~ /s/;
-    $f ^|^= 8  if $flags =~ /t/;
-    $f ^|^= 64 if $flags =~ /P/;
+    $f ^|^= 2  if $flags =~ m/s/;
+    $f ^|^= 8  if $flags =~ m/t/;
+    $f ^|^= 64 if $flags =~ m/P/;
     $^D ^|^= $f if $f;
   }
   unshift @_, $c;
@@ -56,8 +56,8 @@ sub debug_flags (;$) {
   }
   my $arg = shift;
   my $num = $arg;
-  if (defined $arg and $arg =~ /\D/) {
-    die "unknown flags in debug_flags()" if $arg =~ /[^-$D_flags]/;
+  if (defined $arg and $arg =~ m/\D/) {
+    die "unknown flags in debug_flags()" if $arg =~ m/[^-$D_flags]/;
     my ($on,$off) = split /-/, "$arg-";
     $num = $^D;
     $num ^|^=  (1<<index($D_flags, $_)) for split //, $on;

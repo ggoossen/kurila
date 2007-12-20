@@ -6,7 +6,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
+    if ($Config{'extensions'} !~ m/\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
         print "1..0\n";
         exit 0;
     }
@@ -87,7 +87,7 @@ print verify_opset($s1) && !verify_opset(42) ? "ok $t\n":"not ok $t\n"; $t++;
 
 opmask_add(opset(qw(fileno)));	# add to global op_mask
 print eval 'fileno STDOUT' ? "not ok $t\n" : "ok $t\n";	$t++; # fail
-print $@ =~ /'fileno' trapped/ ? "ok $t\n" : "not ok $t\n# $@\n"; $t++;
+print $@ =~ m/'fileno' trapped/ ? "ok $t\n" : "not ok $t\n# $@\n"; $t++;
 
 # --- check use of bit vector ops on opsets
 
@@ -109,7 +109,7 @@ print "@o1" eq "@o2" ? "ok $t\n":"not ok $t\n"; $t++;
 
 # --- finally, check some opname assertions
 
-foreach(@full_l1) { die "bad opname: $_" if /\W/ or /^\d/ }
+foreach(@full_l1) { die "bad opname: $_" if m/\W/ or m/^\d/ }
 
 print "ok $last_test\n";
 BEGIN { $last_test = 25 }

@@ -243,7 +243,7 @@ sub check_install {
                     ### versions after installing Text::NSP 1.03" where a 
                     ### VERSION mentioned in the POD was found before
                     ### the real $VERSION declaration.
-                    $in_pod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $in_pod;
+                    $in_pod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $in_pod;
                     next if $in_pod;
                     
                     ### try to find a version declaration in this string.
@@ -293,7 +293,7 @@ sub _parse_version {
     my $verbose = shift or 0;
 
     ### skip commented out lines, they won't eval to anything.
-    return if $str =~ /^\s*#/;
+    return if $str =~ m/^\s*#/;
         
     ### the following regexp & eval statement comes from the 
     ### ExtUtils::MakeMaker source (EU::MM_Unix->parse_version) 
@@ -302,7 +302,7 @@ sub _parse_version {
     ### it captures the entire expression, and eval /that/
     ### rather than $_, which is insecure.
 
-    if( $str =~ /(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/ ) {
+    if( $str =~ m/(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/ ) {
         
         print "Evaluating: $str\n" if $verbose;
         
@@ -520,7 +520,7 @@ sub requires {
     my $cmd = qq[$^X $lib -M$who -e"print(join(qq[\\n],keys(%INC)))"];
 
     return  sort
-                grep { !/^$who$/  }
+                grep { !m/^$who$/  }
                 map  { chomp; s|/|::|g; $_ }
                 grep { s|\.pm$||i; }
             `$cmd`;

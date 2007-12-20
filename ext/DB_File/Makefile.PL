@@ -69,13 +69,13 @@ my @names = qw(
     open F, "<DB_File.pm" or die "Cannot open DB_File.pm: $!\n";
     while ( ~< *F)
     {
-        last if /^\s*\@EXPORT\s+=\s+qw\(/ ;
+        last if m/^\s*\@EXPORT\s+=\s+qw\(/ ;
     }
 
     while ( ~< *F)
     {
-        last if /^\s*\)/ ;
-        /(\S+)/ ;
+        last if m/^\s*\)/ ;
+        m/(\S+)/ ;
         delete $names{$1} if defined $1 ;
     }
     close F ;

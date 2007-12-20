@@ -26,7 +26,7 @@ unless (eval { getgrgid(0); 1 }) {
     exit 0;
 }
 
-quit() if (($^O eq 'MSWin32' || $^O eq 'NetWare') or $^O =~ /lynxos/i);
+quit() if (($^O eq 'MSWin32' || $^O eq 'NetWare') or $^O =~ m/lynxos/i);
 
 # We have to find a command that prints all (effective
 # and real) group names (not ids).  The known commands are:
@@ -57,12 +57,12 @@ GROUPS: {
 	# uid=39957(gsar) gid=22(users) groups=33536,39181,22(users),0(root),1067(dev)
 	# FreeBSD since 6.2 has a fake id -a:
 	# uid=1001(tobez) gid=20(staff) groups=20(staff), 0(wheel), 68(dialer)
-	last GROUPS if $groups =~ /groups=/;
+	last GROUPS if $groups =~ m/groups=/;
     }
     if (($groups = `id -Gn 2>/dev/null`) ne '') {
 	# $groups could be of the form:
 	# users 33536 39181 root dev
-	last GROUPS if $groups !~ /^(\d|\s)+$/;
+	last GROUPS if $groups !~ m/^(\d|\s)+$/;
     }
     if (($groups = `groups 2>/dev/null`) ne '') {
 	# may not reflect all groups in some places, so do a sanity check
@@ -89,18 +89,18 @@ print "# groups = $groups\n";
 
 # Remember that group names can contain whitespace, '-', et cetera.
 # That is: do not \w, do not \S.
-if ($groups =~ /groups=(.+)( [ug]id=|$)/) {
+if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
     my $gr = $1;
     my @g0 = split /, ?/, $gr;
     my @g1;
     # prefer names over numbers
     for (@g0) {
 	# 42(zot me)
-	if (/^(\d+)(?:\(([^)]+)\))?/) {
+	if (m/^(\d+)(?:\(([^)]+)\))?/) {
 	    push @g1, ($2 || $1);
 	}
 	# zot me(42)
-	elsif (/^([^(]*)\((\d+)\)/) {
+	elsif (m/^([^(]*)\((\d+)\)/) {
 	    push @g1, ($1 || $2);
 	}
 	else {
@@ -135,7 +135,7 @@ for (split(' ', $()) {
 print "# gr = @gr\n";
 
 my %did;
-if ($^O =~ /^(?:uwin|cygwin|interix|solaris)$/) {
+if ($^O =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
 	# Or anybody else who can have spaces in group names.
 	$gr1 = join(' ', grep(!$did{$_}++, sort split(' ', join(' ', @gr))));
 } else {
@@ -143,7 +143,7 @@ if ($^O =~ /^(?:uwin|cygwin|interix|solaris)$/) {
 	$gr1 = join(' ', sort grep defined $_ && !$did{$_}++, @gr);
 }
 
-if ($Config{myuname} =~ /^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
+if ($Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
     @basegroup{$pwgid,$pwgnam} = (0,0);
 } else {
     @basegroup{$pwgid,$pwgnam} = (1,1);
@@ -155,7 +155,7 @@ if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
     print "ok 1\n";
     $ok1++;
 }
-elsif ($Config{myuname} =~ /^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
+elsif ($Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
     # Retry in default unix mode
     %basegroup = ( $pwgid => 1, $pwgnam => 1 );
     $gr2 = join(' ', grep(!$basegroup{$_}++, sort split(' ',$groups)));

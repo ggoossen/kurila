@@ -9,7 +9,7 @@ use vars qw($D $N);
 # $CPAN::DEBUG = 16384;
 
 while ( ~< *DATA) {
-  last if /^__END__$/;
+  last if m/^__END__$/;
   chomp;
   s/\s*#.*//;
   push @$D, [ split ];

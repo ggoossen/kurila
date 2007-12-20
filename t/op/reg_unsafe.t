@@ -12,7 +12,7 @@ print "1..1\n";
 # file until we can work it out.
 
 my $x; 
-($x='abc')=~/(abc)/g; 
+($x='abc')=~m/(abc)/g; 
 $x='123'; 
 
 print "not " if $1 ne 'abc';

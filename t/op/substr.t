@@ -9,11 +9,11 @@ our ($w, $FATAL_MSG, $x);
 
 $a = 'abcdefxyz';
 $SIG{__WARN__} = sub {
-     if ($_[0] =~ /^substr outside of string/) {
+     if ($_[0] =~ m/^substr outside of string/) {
           $w++;
-     } elsif ($_[0] =~ /^Attempt to use reference as lvalue in substr/) {
+     } elsif ($_[0] =~ m/^Attempt to use reference as lvalue in substr/) {
           $w += 2;
-     } elsif ($_[0] =~ /^Use of uninitialized value/) {
+     } elsif ($_[0] =~ m/^Use of uninitialized value/) {
           $w += 3;
      } else {
           warn $_[0];

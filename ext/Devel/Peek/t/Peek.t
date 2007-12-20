@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bDevel\/Peek\b/) {
+    if ($Config{'extensions'} !~ m/\bDevel\/Peek\b/) {
         print "1..0 # Skip: Devel::Peek was not built\n";
         exit 0;
     }
@@ -45,7 +45,7 @@ sub do_test {
 	    print $dump, "\n"    if $DEBUG;
 	    like( $dump, qr/\A$pattern\Z/ms );
 
-            local $TODO = $dump2 =~ /OOK/ ? "The hash iterator used in dump.c sets the OOK flag" : undef;
+            local $TODO = $dump2 =~ m/OOK/ ? "The hash iterator used in dump.c sets the OOK flag" : undef;
             is($dump2, $dump);
 
 	    close(IN);
@@ -364,7 +364,7 @@ do_test(19,
       LEN = \\d+');
 
 my $x="";
-$x=~/.??/g;
+$x=~m/.??/g;
 do_test(20,
         $x,
 'SV = PVMG\\($ADDR\\) at $ADDR

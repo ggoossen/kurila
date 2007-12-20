@@ -20,19 +20,19 @@ die "Must be in root of the perl source tree.\n"
 open PATCHLEVEL,"<patchlevel.h" or die;
 my @patchlevel_h = ~< *PATCHLEVEL;
 close PATCHLEVEL;
-my $patchlevel_h = join "", grep { /^#\s*define/ } @patchlevel_h;
+my $patchlevel_h = join "", grep { m/^#\s*define/ } @patchlevel_h;
 print $patchlevel_h;
-$revision = $1 if $patchlevel_h =~ /PERL_REVISION\s+(\d+)/;
-$patchlevel = $1 if $patchlevel_h =~ /PERL_VERSION\s+(\d+)/;
-$subversion = $1 if $patchlevel_h =~ /PERL_SUBVERSION\s+(\d+)/;
+$revision = $1 if $patchlevel_h =~ m/PERL_REVISION\s+(\d+)/;
+$patchlevel = $1 if $patchlevel_h =~ m/PERL_VERSION\s+(\d+)/;
+$subversion = $1 if $patchlevel_h =~ m/PERL_SUBVERSION\s+(\d+)/;
 die "Unable to parse patchlevel.h" unless $subversion +>= 0;
 $vers = sprintf("%d.%d.%d", $revision, $patchlevel, $subversion);
 
 # fetch list of local patches
 my (@local_patches, @lpatch_tags, $lpatch_tags);
-@local_patches = grep { /^static.*local_patches/../^};/ } @patchlevel_h;
-@local_patches = grep { !/^\s*,?NULL/  } @local_patches;
-@lpatch_tags   = map  {  /^\s*,"(\w+)/ } @local_patches;
+@local_patches = grep { m/^static.*local_patches/..m/^};/ } @patchlevel_h;
+@local_patches = grep { !m/^\s*,?NULL/  } @local_patches;
+@lpatch_tags   = map  {  m/^\s*,"(\w+)/ } @local_patches;
 $lpatch_tags   = join "-", @lpatch_tags;
 
 $perl = "perl-$vers";

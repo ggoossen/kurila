@@ -166,7 +166,7 @@ sub concise_cv_obj {
 
     $curcv = $cv;
 
-    if (ref($cv->XSUBANY) =~ /B::(\w+)/) {
+    if (ref($cv->XSUBANY) =~ m/B::(\w+)/) {
 	print $walkHandle "$name is a constant sub, optimized to a $1\n";
 	return;
     }
@@ -252,8 +252,8 @@ sub compileOpts {
     # set rendering state from options and args
     my (@options,@args);
     if (@_) {
-	@options = grep(/^-/, @_);
-	@args = grep(!/^-/, @_);
+	@options = grep(m/^-/, @_);
+	@args = grep(!m/^-/, @_);
     }
     for my $o (@options) {
 	# mode/order
@@ -275,7 +275,7 @@ sub compileOpts {
 	    $tree_style ^&^= ^~^2;
 	}
 	# sequence numbering
-	elsif ($o =~ /^-base(\d+)$/) {
+	elsif ($o =~ m/^-base(\d+)$/) {
 	    $base = $1;
 	} elsif ($o eq "-bigendian") {
 	    $big_endian = 1;
@@ -295,7 +295,7 @@ sub compileOpts {
 	} elsif ($o eq "-src") {
 	    $show_src = 1;
 	}
-	elsif ($o =~ /^-stash=(.*)/) {
+	elsif ($o =~ m/^-stash=(.*)/) {
 	    my $pkg = $1;
 	    no strict 'refs';
 	    eval "require $pkg" unless %{Symbol::stash($pkg)};
@@ -350,7 +350,7 @@ sub compile {
 			if $banner;
 		    $objref = $objname;
 		} else {
-		    $objname = "main::" . $objname unless $objname =~ /::/;
+		    $objname = "main::" . $objname unless $objname =~ m/::/;
 		    print $walkHandle "$objname:\n";
 		    no strict 'refs';
 		    unless (exists &$objname) {
@@ -489,7 +489,7 @@ sub walk_exec {
 		my $ar = [];
 		push @$targ, $ar;
 		push @todo, [$op->pmreplstart, $ar];
-	    } elsif ($name =~ /^enter(loop|iter)$/) {
+	    } elsif ($name =~ m/^enter(loop|iter)$/) {
                 $labels{${$op->nextop}} = "NEXT";
                 $labels{${$op->lastop}} = "LAST";
                 $labels{${$op->redoop}} = "REDO";
@@ -507,7 +507,7 @@ sub sequence {
     for (; $$op; $op = $op->next) {
 	last if exists $sequence_num{$$op};
 	my $name = $op->name;
-	if ($name =~ /^(null|scalar|lineseq|scope)$/) {
+	if ($name =~ m/^(null|scalar|lineseq|scope)$/) {
 	    next if $oldop and $ {$op->next};
 	} else {
 	    $sequence_num{$$op} = $seq_max++;
@@ -745,7 +745,7 @@ sub concise_op {
 	# targ holds the old type
 	$h{exname} = "ex-" . substr(ppname($h{targ}), 3);
 	$h{extarg} = "";
-    } elsif ($op->name =~ /^leave(sub(lv)?|write)?$/) {
+    } elsif ($op->name =~ m/^leave(sub(lv)?|write)?$/) {
 	# targ potentially holds a reference count
 	if ($op->private ^&^ 64) {
 	    my $refs = "ref" . ($h{targ} != 1 ? "s" : "");

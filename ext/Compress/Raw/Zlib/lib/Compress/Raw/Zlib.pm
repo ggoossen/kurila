@@ -260,7 +260,7 @@ sub Compress::Raw::Zlib::Parameters::_checkType
         return $self->setError("Parameter '$key' must be an unsigned int, got 'undef'")
             if $validate && ! defined $value ;
         return $self->setError("Parameter '$key' must be an unsigned int, got '$value'")
-            if $validate && $value !~ /^\d+$/;
+            if $validate && $value !~ m/^\d+$/;
 
         $$output = defined $value ? $value : 0 ;    
         return 1;
@@ -270,7 +270,7 @@ sub Compress::Raw::Zlib::Parameters::_checkType
         return $self->setError("Parameter '$key' must be a signed int, got 'undef'")
             if $validate && ! defined $value ;
         return $self->setError("Parameter '$key' must be a signed int, got '$value'")
-            if $validate && $value !~ /^-?\d+$/;
+            if $validate && $value !~ m/^-?\d+$/;
 
         $$output = defined $value ? $value : 0 ;    
         return 1 ;
@@ -278,7 +278,7 @@ sub Compress::Raw::Zlib::Parameters::_checkType
     elsif ($type ^&^ Parse_boolean)
     {
         return $self->setError("Parameter '$key' must be an int, got '$value'")
-            if $validate && defined $value && $value !~ /^\d*$/;
+            if $validate && defined $value && $value !~ m/^\d*$/;
         $$output =  defined $value ? $value != 0 : 0 ;    
         return 1;
     }

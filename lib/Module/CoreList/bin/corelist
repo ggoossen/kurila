@@ -113,11 +113,11 @@ if ( !@ARGV ) {
 
 while (@ARGV) {
 	my ($mod, $ver);
-	if ($ARGV[0] =~ /=/) {
+	if ($ARGV[0] =~ m/=/) {
 	    ($mod, $ver) = split /=/, shift @ARGV;
 	} else {
 	    $mod = shift @ARGV;
-	    $ver = (@ARGV && $ARGV[0] =~ /^\d/) ? shift @ARGV : "";
+	    $ver = (@ARGV && $ARGV[0] =~ m/^\d/) ? shift @ARGV : "";
 	}
 
 	if ($mod !~ m|^/(.*)/([imosx]*)$|) { # not a regex
@@ -128,7 +128,7 @@ while (@ARGV) {
 	    if ($@) {
 		# regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
 		# then we drop text after ';' to shorten message
-		my $errmsg = $@ =~ /(.*);/ ? $1 : $@;
+		my $errmsg = $@ =~ m/(.*);/ ? $1 : $@;
 		warn "\n$mod  is a bad regex: $errmsg\n";
 		next;
 	    }

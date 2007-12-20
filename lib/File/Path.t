@@ -396,7 +396,7 @@ SKIP: {
     is( scalar(@$error), 9, 'safe is better' );
     for (@$error) {
         ($file, $message) = each %$_;
-        if ($file =~  /[123]\z/) {
+        if ($file =~  m/[123]\z/) {
             is(index($message, 'cannot remove directory: '), 0, "failed to remove $file with rmdir")
                 or diag($message);
         }

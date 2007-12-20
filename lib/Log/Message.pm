@@ -493,9 +493,9 @@ sub retrieve {
     );
     
     my @list =
-            grep { $_->tag      =~ /$args->{tag}/       ? 1 : 0 }
-            grep { $_->level    =~ /$args->{level}/     ? 1 : 0 }
-            grep { $_->message  =~ /$args->{message}/   ? 1 : 0 }
+            grep { $_->tag      =~ m/$args->{tag}/       ? 1 : 0 }
+            grep { $_->level    =~ m/$args->{level}/     ? 1 : 0 }
+            grep { $_->message  =~ m/$args->{message}/   ? 1 : 0 }
             grep { defined }
                 $args->{chrono}
                     ? @{$self->{STACK}}

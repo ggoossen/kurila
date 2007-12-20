@@ -3,7 +3,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 use Encode;
-our $VERSION = do { my @r = ( q$Revision: 2.7 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.7 $ =~ m/\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 sub DEBUG () { 0 }
 
 use base qw(Exporter);

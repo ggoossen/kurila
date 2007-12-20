@@ -11,11 +11,11 @@ BEGIN {
 print "1..13\n";
 
 # PL_curpm->paren_names can be a null pointer. See that this succeeds anyway.
-'x' =~ /(.)/;
+'x' =~ m/(.)/;
 () = %+;
 pass( 'still alive' );
 
-"hlagh" =~ /
+"hlagh" =~ m/
     (?<a>.)
     (?<b>.)
     (?<a>.)

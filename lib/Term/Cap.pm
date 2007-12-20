@@ -108,8 +108,8 @@ sub termcap_path { ## private
     push(@termcap_path, $ENV{TERMCAP})
 	if ((exists $ENV{TERMCAP}) &&
 	    (($^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'dos')
-	     ? $ENV{TERMCAP} =~ /^[a-z]:[\\\/]/is
-	     : $ENV{TERMCAP} =~ /^\//s));
+	     ? $ENV{TERMCAP} =~ m/^[a-z]:[\\\/]/is
+	     : $ENV{TERMCAP} =~ m/^\//s));
     if ((exists $ENV{TERMPATH}) && ($ENV{TERMPATH})) {
 	# Add the users $TERMPATH
 	push(@termcap_path, split(/(:|\s+)/, $ENV{TERMPATH}))
@@ -239,7 +239,7 @@ sub Tgetent { ## public -- static method
               {
                 my $tmp = `infocmp -C 2>/dev/null`;
                 $tmp =~ s/^#.*\n//gm; # remove comments
-                if (( $tmp !~ m%^/%s ) && ( $tmp =~ /(^|\|)${termpat}(?:[:|])/s)) {
+                if (( $tmp !~ m%^/%s ) && ( $tmp =~ m/(^|\|)${termpat}(?:[:|])/s)) {
                    $entry = $tmp;
                 }
               };
@@ -323,19 +323,19 @@ sub Tgetent { ## public -- static method
     # Precompile $entry into the object
     $entry =~ s/^[^:]*://;
     foreach $field (split(/:[\s:\\]*/,$entry)) {
-	if (defined $field && $field =~ /^(\w\w)$/) {
+	if (defined $field && $field =~ m/^(\w\w)$/) {
 	    $self->{'_' . $field} = 1 unless defined $self->{'_' . $1};
 	    # print STDERR "DEBUG: flag $1\n";
 	}
-	elsif (defined $field && $field =~ /^(\w\w)\@/) {
+	elsif (defined $field && $field =~ m/^(\w\w)\@/) {
 	    $self->{'_' . $1} = "";
 	    # print STDERR "DEBUG: unset $1\n";
 	}
-	elsif (defined $field && $field =~ /^(\w\w)#(.*)/) {
+	elsif (defined $field && $field =~ m/^(\w\w)#(.*)/) {
 	    $self->{'_' . $1} = $2 unless defined $self->{'_' . $1};
 	    # print STDERR "DEBUG: numeric $1 = $2\n";
 	}
-	elsif (defined $field && $field =~ /^(\w\w)=(.*)/) {
+	elsif (defined $field && $field =~ m/^(\w\w)=(.*)/) {
 	    # print STDERR "DEBUG: string $1 = $2\n";
 	    next if defined $self->{'_' . ($cap = $1)};
 	    $_ = $2;
@@ -396,7 +396,7 @@ sub Tpad { ## public
     my($string, $cnt, $FH) = @_;
     my($decr, $ms);
 
-    if (defined $string && $string =~ /(^[\d.]+)(\*?)(.*)$/) {
+    if (defined $string && $string =~ m/(^[\d.]+)(\*?)(.*)$/) {
 	$ms = $1;
 	$ms *= $cnt if $2;
 	$string = $3;
@@ -524,7 +524,7 @@ sub Tgoto { ## public
     my @tmp = ($tmp,$code);
     my $cnt = $code;
 
-    while ($string =~ /^([^%]*)%(.)(.*)/) {
+    while ($string =~ m/^([^%]*)%(.)(.*)/) {
 	$result .= $1;
 	$code = $2;
 	$string = $3;

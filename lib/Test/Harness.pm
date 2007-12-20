@@ -66,7 +66,7 @@ if ( $ENV{HARNESS_STRAPS_CLASS} ) {
     die 'Set HARNESS_STRAP_CLASS, singular, not HARNESS_STRAPS_CLASS';
 }
 my $HARNESS_STRAP_CLASS  = $ENV{HARNESS_STRAP_CLASS} || 'Test::Harness::Straps';
-if ( $HARNESS_STRAP_CLASS =~ /\.pm$/ ) {
+if ( $HARNESS_STRAP_CLASS =~ m/\.pm$/ ) {
     # "Class" is actually a filename, that should return the
     # class name as its true return value.
     $HARNESS_STRAP_CLASS = require $HARNESS_STRAP_CLASS;
@@ -573,7 +573,7 @@ sub _leader_width {
     my $maxlen = 0;
     my $maxsuflen = 0;
     foreach (@_) {
-        my $suf    = /\.(\w+)$/ ? $1 : '';
+        my $suf    = m/\.(\w+)$/ ? $1 : '';
         my $len    = length;
         my $suflen = length $suf;
         $maxlen    = $len    if $len    +> $maxlen;
@@ -851,7 +851,7 @@ sub _canondetail {
     }
 
     return (join("", @result), $canon)
-        if $type=~/todo/i;
+        if $type=~m/todo/i;
     push @result, "\t$type $detail/$max tests, ";
     if ($max) {
 	push @result, sprintf("%.2f",100*(1-$detail/$max)), "% okay";

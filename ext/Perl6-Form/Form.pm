@@ -62,7 +62,7 @@ sub one_char {
 sub layout_word {
 	fatal "Value for layout option must be 'across', 'down', 'balanced', ",
 		  "or 'tabular\n(not '$_[0]')"
-			unless $_[0] =~ /^(across|down|balanced|tabular)$/;
+			unless $_[0] =~ m/^(across|down|balanced|tabular)$/;
 	return $_[0];
 }
 
@@ -143,7 +143,7 @@ sub hashify {
 	}
 	if (ref $val eq 'HASH') {
 		fatal "Invalid key for $what: '$_'" 
-			for grep { !/^(first|last|even|odd|other)$/ } keys %$val;
+			for grep { !m/^(first|last|even|odd|other)$/ } keys %$val;
 		my %hash;
 		for (keys %$val) {
 			if (!ref $val->{$_}) {
@@ -189,7 +189,7 @@ sub user_def {
 	my $type = ref $spec;
 	fatal "Value of 'field' option must be an array of pairs or a hash (not ",
 		  $type||"'$spec'", ")"
-				unless $type =~ /^(ARRAY|HASH)$/;
+				unless $type =~ m/^(ARRAY|HASH)$/;
 	if ($type eq 'ARRAY') {
 		fatal "Missing value for last user-defined field ('$spec->[-1]')"
 			if @$spec % 2;
@@ -341,14 +341,14 @@ sub jleft {
 	my $missing = $width-length($fld);
 	if ($missing+>0) { $fld = substr($fld,0,1) x $missing . $fld }
 	my ($whole, $point, $places) =
-				($fld =~ /^([]{>,.' 0]*)([.,]|\Q$incurr\E)([[}<0]*)/g);
+				($fld =~ m/^([]{>,.' 0]*)([.,]|\Q$incurr\E)([[}<0]*)/g);
 	$opts->{lfill} = '0' if $whole  =~ m/^0+/; 
 	$opts->{rfill} = '0' if $places =~ m/0+$/; 
-	my $comma = $whole =~ /([,.' ])/ ? $1 : '';
+	my $comma = $whole =~ m/([,.' ])/ ? $1 : '';
 	my $grouping;
 	if ($comma) {
-		$grouping = $whole =~ /,(?:\]{2},\]{3}|>{2},>{3})\z/ ? [3,2] # Subcont
-				  : $whole =~ /[,.' ](\]+|>+)\z/             ? [length($1)]
+		$grouping = $whole =~ m/,(?:\]{2},\]{3}|>{2},>{3})\z/ ? [3,2] # Subcont
+				  : $whole =~ m/[,.' ](\]+|>+)\z/             ? [length($1)]
 				  : 										   undef;
 	}
 	if (defined $setplaces) {
@@ -370,15 +370,15 @@ sub jleft {
 
 	return sub {
 		my ($orig, %val) = @_;
-		$_[0] = " "x$val{width} and return if $orig =~ /^\s*$/;
+		$_[0] = " "x$val{width} and return if $orig =~ m/^\s*$/;
 		$orig =~ s/,|\Q$incurr\E/./ if $point ne '.';
 		my ($pre,$post) = ($precurr,$postcurr);
-		if ($orig !~ /^\s*-/) {
+		if ($orig !~ m/^\s*-/) {
 			$pre  =~ s/^[(-]|[(-]$/ /g;
 			$post =~ s/^[)-]|[)-]$/ /g;
 		}
 		else {
-			$pre = $pre =~ /[(-]/ || $post =~ /[)-]/ ? "-$pre" : " $pre"
+			$pre = $pre =~ m/[(-]/ || $post =~ m/[)-]/ ? "-$pre" : " $pre"
 				unless $orig = -$orig;
 		}
 		my ($fail, $str);
@@ -390,7 +390,7 @@ sub jleft {
 			$_[0] = $huh;
 		}
 		else {
-			my($w,$p) = ($str =~ /^\s*(.*)\.(.*)$/g);
+			my($w,$p) = ($str =~ m/^\s*(.*)\.(.*)$/g);
 			if ($grouping) {
 				my @groups = @$grouping;
 				my $group = shift @groups;
@@ -407,9 +407,9 @@ sub jleft {
 			else {
 				$str = $w.q(.).$p;
 				$str =~ s/(\.\d+?)(0+)$/$1/
-					unless $orig =~ /\.\d{$places,}[1-9]/;
+					unless $orig =~ m/\.\d{$places,}[1-9]/;
 				$str =~ s/^/$pre/;
-				if ($val{pre} =~ /^0+$/) {
+				if ($val{pre} =~ m/^0+$/) {
 					$str =~ s{^((\D*)(\d.*))\.}
 						     {$2 . ("0"  x ($whole-length $1)) . "$3."}e;
 					$val{pre} = " ";
@@ -463,7 +463,7 @@ my $postcurrpat = qr/([[<0]) ([^]0>[<]+)     (\}$)     /x;
 sub perl6_match {
 	my ($str, $pat) = @_;
 	use re 'eval';
-	if (my @vals = $str =~ /$pat/) {
+	if (my @vals = $str =~ m/$pat/) {
 		unshift @vals, $&;
 		bless \@vals, 'Perl6::Form::Rule::Okay';
 	}
@@ -494,7 +494,7 @@ sub segment ($\@\%$\%) {
 	my $bullet  = join("|", map quotemeta, @{$opts->{bullet}}) || qr/(?!)/;
 	use re 'eval';
 	my @format;
-	while ($format =~ /\G ((?>(?:\\.|(?!$userdef|$bullet|\{).)*))
+	while ($format =~ m/\G ((?>(?:\\.|(?!$userdef|$bullet|\{).)*))
 														 (?{litval($^N)})
 						  (?: ($userdef)                 (?{fldvals($^N,$^R)})
 						    | ($bullet)                  (?{fldvals($^N,-1)})
@@ -543,7 +543,7 @@ sub segment ($\@\%$\%) {
 				$form{stretch} = !$form{isbullet} && $fld =~ s/[+]//;
 				@form{qw(verbatim break hjust)}
 					= (1, \&break_verbatim, \&jverbatim)
-						if $fld =~ /["']/ && $fld !~ /[][><]/;
+						if $fld =~ m/["']/ && $fld !~ m/[][><]/;
 						# was: if $fld =~ /["']/ && $fld !~ /[][]/;
 				$form{trackpos} = $fld =~ s/(\{):|:(\})/$+/g;
 				$form{vjust} = $fld =~ s/=//g ? \&jmiddle
@@ -639,16 +639,16 @@ sub segment ($\@\%$\%) {
 				$width -= $form{width}
 			}
 
-			$form{line} = 1 unless $form{isbullet} || $fld =~ /[][IV"]/;
+			$form{line} = 1 unless $form{isbullet} || $fld =~ m/[][IV"]/;
 
 			$form{hjust} ||= $form{width} == 1					 ? \&jsingle
-					 	   : ($fld =~ /^(?:<+|\[+)$/)			 ? \&jleft
-					 	   : ($fld =~ /^(?:>+|\]+)$/)			 ? \&jright
-			         	   : ($fld =~ /^(?:I+|\|+|>+<+|\]+\[+)$/)? \&jcentre
-			         	   : ($fld =~ /^(?:<+>+|\[+\]+)$/)		 ? \&jfull
-			         	   : ($fld =~ /^(?:V+)$/)				 ?
+					 	   : ($fld =~ m/^(?:<+|\[+)$/)			 ? \&jleft
+					 	   : ($fld =~ m/^(?:>+|\]+)$/)			 ? \&jright
+			         	   : ($fld =~ m/^(?:I+|\|+|>+<+|\]+\[+)$/)? \&jcentre
+			         	   : ($fld =~ m/^(?:<+>+|\[+\]+)$/)		 ? \&jfull
+			         	   : ($fld =~ m/^(?:V+)$/)				 ?
 													joverflow(%form, %fldopts)
-			         	   : ($fld =~ /^(?: [>,' 0]*  \.          [<0]*
+			         	   : ($fld =~ m/^(?: [>,' 0]*  \.          [<0]*
 										  | [],' 0]*  \.          [[0]*
 			         	                  | [>.' 0]*  \,          [<0]*
 										  | [].' 0]*  \,          [[0]*
@@ -687,7 +687,7 @@ sub segment ($\@\%$\%) {
 					ref eq 'ARRAY' ? do {
 							my $s = join "", map { s/\n(?!\z)/\r/g; $_ }
 											 map {!defined() ? "\n"
-												 : /\n\z/    ? $_
+												 : m/\n\z/    ? $_
 												 :             "$_\n"}  @$_;
 							$form{trackpos} ? ($argcache->{$_} ||= \$s) : \$s;
 							}
@@ -776,9 +776,9 @@ sub make_col {
 	until ($f->{done}) {
 		my $skipped = 0;
 		unless ($f->{isbullet} || $f->{width} == 1 || $f->{verbatim}) {
-			($skipped) = ($$str_ref =~ /\G(\s*)/gc);
+			($skipped) = ($$str_ref =~ m/\G(\s*)/gc);
 			if ($skipped||=0) {
-				$bulleted = ($skipped =~ /\n/);
+				$bulleted = ($skipped =~ m/\n/);
 				$skipped=~s/\r\Z//;
 				$skipped = ($skipped=~tr/\r//);
 				push @col, ("") x $skipped;
@@ -795,7 +795,7 @@ sub make_col {
 		}
 		$text .= "\r" if $eol;
 		push @col, $text;
-		if ($bullet && $text =~ /\S/) {
+		if ($bullet && $text =~ m/\S/) {
 			push @{$bullet->{bullets}}, ($bullet->{bullethole}) x $skipped;
 			push @{$bullet->{bullets}}, $bulleted ? ${$bullet->{isbullet}}
 												  : $bullet->{bullethole};
@@ -836,7 +836,7 @@ sub balance_cols {
 			}
 			return;
 		}
-		(substr($$src,pos$$src) =~ /\S/) ? $minheight : $maxheight = $medheight;
+		(substr($$src,pos$$src) =~ m/\S/) ? $minheight : $maxheight = $medheight;
 	}
 }
 
@@ -952,7 +952,7 @@ sub make_cols($$\@\%$) {
 				next if $f->{isbullet} || $f->{opts}{height}{minimal};
 				next if $f->{line} && $row+>0 || $f->{done};
 				my ($str_ref, $width) = @{$f}{qw(src width)};
-				$$str_ref =~ /\G\s+/gc unless $f->{verbatim};
+				$$str_ref =~ m/\G\s+/gc unless $f->{verbatim};
 				($parts->[$col][$row], my $more) =
 						$f->{break}->($str_ref,$width,$f->{opts}{ws});
 				$parts->[$col][$row] =~ s/$f->{opts}{ws}/ /g if $f->{opts}{ws};
@@ -966,7 +966,7 @@ sub make_cols($$\@\%$) {
 				next if $f->{isbullet} || !$f->{opts}{height}{minimal};
 				next if $f->{line} && $row+>0 || $f->{done};
 				my ($str_ref, $width) = @{$f}{qw(src width)};
-				$$str_ref =~ /\G\s+/gc unless $f->{verbatim};
+				$$str_ref =~ m/\G\s+/gc unless $f->{verbatim};
 				($parts->[$col][$row], my $more) =
 						$f->{break}->($str_ref,$width,$f->{opts}{ws});
 				$parts->[$col][$row] =~ s/$f->{opts}{ws}/ /g if $f->{opts}{ws};
@@ -1026,7 +1026,7 @@ sub make_cols($$\@\%$) {
 	}
 	for my $g (@maxgroups, @mingroups) {
 		my $text = $g->[-1]{src};
-		next if substr($$text,pos($$text)||0) =~ /\S/;
+		next if substr($$text,pos($$text)||0) =~ m/\S/;
 		for (1..@$g) {
 			next unless @{$parts->[$g->[-$_]{index}]};
 			$g->[-$_]{final} = 1;
@@ -1038,7 +1038,7 @@ sub make_cols($$\@\%$) {
 	}
 	for my $f (grep {!($_->{literal}||$_->{line})} @$formatters) {
 		next if $f->{done} || $f->{isbullet} || $f->{opts}{height}{minimal};
-		return 1 if substr(${$f->{src}},pos(${$f->{src}})||0) =~ /\S/;
+		return 1 if substr(${$f->{src}},pos(${$f->{src}})||0) =~ m/\S/;
 	}
 	return 0;
 }
@@ -1049,7 +1049,7 @@ sub make_underline {
 	my $trail = "$1"^|^"\n";
 	for my $l ($nextline, $prevline) {
 		$l = join "", map {$_->{literal} ? ${$_->{src}} : '*'x$_->{width} } @$l;
-		$l =~ s{(.)}{$1 =~ /\s/ ? "\0" : "\1"}ges;
+		$l =~ s{(.)}{$1 =~ m/\s/ ? "\0" : "\1"}ges;
 	}
 	$nextline ^|^= $prevline;
 	$nextline =~ s{\0}{ }g;
@@ -1059,7 +1059,7 @@ sub make_underline {
 }
 
 sub linecount($) {
-	return tr/\n// + (/[^\n]\z/?1:0) for @_;
+	return tr/\n// + (m/[^\n]\z/?1:0) for @_;
 }
 
 use warnings::register;
@@ -1092,7 +1092,7 @@ sub form {
 		}
 		if ($first) { 	# Change format lists if data first or last
 			if ($opts{interleave}) {
-				$formats = [$format =~ /.*(?:\n|\z)/g];
+				$formats = [$format =~ m/.*(?:\n|\z)/g];
 				$format = shift @$formats;
 			}
 			$first = 0;
@@ -1289,7 +1289,7 @@ sub break_verbatim {
 sub break_nl {
 	my ($str) = @_;
     if ($$str =~ m/\G [^\S\n\r]* ([^\n\r]*?) [^\S\r\n]* (?:\r|$)/gcxm)  {
-        return ("$1", $$str =~ /\G(?=.*\S)/sgc?1:0, 1);
+        return ("$1", $$str =~ m/\G(?=.*\S)/sgc?1:0, 1);
     }
     else {
         return ("",0,0);
@@ -1309,7 +1309,7 @@ sub break_at {
 		for ($$str) {
 			use re 'eval';
 			while ($rem +> 0 && (pos()||0) +< length()) {
-				if ($ws && /\G ($ws) $wsnzw/gcx) {
+				if ($ws && m/\G ($ws) $wsnzw/gcx) {
 					my $captured;
 					if ($#+ +> 1) { 		# may be extra captures...
 						for (2..$#+) {
@@ -1325,27 +1325,27 @@ sub break_at {
 					}
 					$last_breakable = length $res;
 				}
-				elsif ($rem+>=$hylen && /\G $lit_hy /gcx) {
+				elsif ($rem+>=$hylen && m/\G $lit_hy /gcx) {
 					$res .= $hyphen;
 					$rem -= $hylen;
 					$last_breakable = length $res;
 				}
-				elsif (/\G ((?!$lit_hy)[^\n\r]) /gcx) {
+				elsif (m/\G ((?!$lit_hy)[^\n\r]) /gcx) {
 					$res .= $1;
 					$rem--;
-					$last_breakable = length $res if $res =~ /\s$/;
+					$last_breakable = length $res if $res =~ m/\s$/;
 				}
 				else { last }
 			}
 			my $reslen = length $res;
 			$ws ||= qr/\s/;
-			unless (/\G (?=$lit_hy|($ws)$wsnzw|\z|\n|\r) /gcx) {
+			unless (m/\G (?=$lit_hy|($ws)$wsnzw|\z|\n|\r) /gcx) {
 				if ($last_breakable +<= $reslen) {
 					pos() -= $reslen-$last_breakable;
 					substr($res,$last_breakable, undef, "");
 				}
 				elsif ($reslen +> $hylen) {
-					if ($res =~ /\S\S\S{$hylen}$/) {
+					if ($res =~ m/\S\S\S{$hylen}$/) {
 						pos() -= $hylen;
 						substr($res,-$hylen, undef, $hyphen);
 					}
@@ -1355,7 +1355,7 @@ sub break_at {
 				}
 			}
 			my $rem = substr($$str, pos $$str);
-			return ($res, $rem=~/\S/?1:0, $rem =~ /^\s*(?:\z|\n|\r)/);
+			return ($res, $rem=~m/\S/?1:0, $rem =~ m/^\s*(?:\z|\n|\r)/);
 		}
 	};
 }

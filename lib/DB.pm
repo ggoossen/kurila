@@ -114,7 +114,7 @@ sub DB {
     }
   }
   if ($DB::single || $DB::trace || $DB::signal) {
-    $DB::subname = ($DB::sub =~ /\'|::/) ? $DB::sub : "${DB::package}::$DB::sub"; #';
+    $DB::subname = ($DB::sub =~ m/\'|::/) ? $DB::sub : "${DB::package}::$DB::sub"; #';
     DB->loadfile($DB::filename, $DB::lineno);
   }
   $evalarg = $action, &eval if $action;
@@ -197,7 +197,7 @@ sub done {
 
 sub _clientname {
   my $name = shift;
-  "$name" =~ /^(.+)=[A-Z]+\(.+\)$/;
+  "$name" =~ m/^(.+)=[A-Z]+\(.+\)$/;
   return $1;
 }
 
@@ -252,7 +252,7 @@ sub backtrace {
     @a = @DB::args;
     for (@a) {
       s/'/\\'/g;
-      s/([^\0]*)/'$1'/ unless /^-?[\d.]+$/;
+      s/([^\0]*)/'$1'/ unless m/^-?[\d.]+$/;
       s/([\200-\377])/sprintf("M-%c",ord($1)^&^0177)/eg;
       s/([\0-\37\177])/sprintf("^%c",ord($1)^^^64)/eg;
     }
@@ -297,7 +297,7 @@ sub subs {
     my(@ret) = ();
     while (@_) {
       my $name = shift;
-      push @ret, [$DB::sub{$name} =~ /^(.*)\:(\d+)-(\d+)$/] 
+      push @ret, [$DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/] 
 	if exists $DB::sub{$name};
     }
     return @ret;
@@ -314,7 +314,7 @@ sub filesubs {
   my $s = shift;
   my $fname = shift;
   $fname = $DB::filename unless $fname;
-  return grep { $DB::sub{$_} =~ /^$fname/ } keys %DB::sub;
+  return grep { $DB::sub{$_} =~ m/^$fname/ } keys %DB::sub;
 }
 
 ####
@@ -381,7 +381,7 @@ sub set_break {
   my $cond = shift;
   $i ||= $DB::lineno;
   $cond ||= '1';
-  $i = _find_subline($i) if ($i =~ /\D/);
+  $i = _find_subline($i) if ($i =~ m/\D/);
   $s->output("Subroutine not found.\n") unless $i;
   if ($i) {
     if ($DB::dbline[$i] == 0) {
@@ -396,7 +396,7 @@ sub set_break {
 sub set_tbreak {
   my $s = shift;
   my $i = shift;
-  $i = _find_subline($i) if ($i =~ /\D/);
+  $i = _find_subline($i) if ($i =~ m/\D/);
   $s->output("Subroutine not found.\n") unless $i;
   if ($i) {
     if ($DB::dbline[$i] == 0) {
@@ -411,9 +411,9 @@ sub set_tbreak {
 sub _find_subline {
   my $name = shift;
   $name =~ s/\'/::/;
-  $name = "${DB::package}\:\:" . $name if $name !~ /::/;
+  $name = "${DB::package}\:\:" . $name if $name !~ m/::/;
   $name = "main" . $name if substr($name,0,2) eq "::";
-  my($fname, $from, $to) = ($DB::sub{$name} =~ /^(.*):(\d+)-(\d+)$/);
+  my($fname, $from, $to) = ($DB::sub{$name} =~ m/^(.*):(\d+)-(\d+)$/);
   if ($from) {
     local *DB::dbline = "::_<$fname";
     ++$from while $DB::dbline[$from] == 0 && $from +< $to;
@@ -428,7 +428,7 @@ sub clr_breaks {
   if (@_) {
     while (@_) {
       $i = shift;
-      $i = _find_subline($i) if ($i =~ /\D/);
+      $i = _find_subline($i) if ($i =~ m/\D/);
       $s->output("Subroutine not found.\n") unless $i;
       if (defined $DB::dbline{$i}) {
         $DB::dbline{$i} =~ s/^[^\0]+//;
@@ -454,7 +454,7 @@ sub set_action {
   my $s = shift;
   my $i = shift;
   my $act = shift;
-  $i = _find_subline($i) if ($i =~ /\D/);
+  $i = _find_subline($i) if ($i =~ m/\D/);
   $s->output("Subroutine not found.\n") unless $i;
   if ($i) {
     if ($DB::dbline[$i] == 0) {
@@ -473,7 +473,7 @@ sub clr_actions {
   if (@_) {
     while (@_) {
       my $i = shift;
-      $i = _find_subline($i) if ($i =~ /\D/);
+      $i = _find_subline($i) if ($i =~ m/\D/);
       $s->output("Subroutine not found.\n") unless $i;
       if ($i && $DB::dbline[$i] != 0) {
 	$DB::dbline{$i} =~ s/\0[^\0]*//;

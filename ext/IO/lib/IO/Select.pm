@@ -58,7 +58,7 @@ sub _fileno
  my($self, $f) = @_;
  return unless defined $f;
  $f = $f->[0] if ref($f) eq 'ARRAY';
- ($f =~ /^\d+$/) ? $f : fileno($f);
+ ($f =~ m/^\d+$/) ? $f : fileno($f);
 }
 
 sub _update

@@ -21,13 +21,13 @@ $X::x = 13;
 
 use vars qw($p @q %r *s &t $X::p);
 
-my $e = !(grep /^Name "X::x" used only once: possible typo/, @warns) && 'not ';
+my $e = !(grep m/^Name "X::x" used only once: possible typo/, @warns) && 'not ';
 print "${e}ok 1\n";
-$e = !(grep /^Name "main::x" used only once: possible typo/, @warns) && 'not ';
+$e = !(grep m/^Name "main::x" used only once: possible typo/, @warns) && 'not ';
 print "${e}ok 2\n";
-$e = !(grep /^Name "main::y" used only once: possible typo/, @warns) && 'not ';
+$e = !(grep m/^Name "main::y" used only once: possible typo/, @warns) && 'not ';
 print "${e}ok 3\n";
-$e = !(grep /^Name "main::z" used only once: possible typo/, @warns) && 'not ';
+$e = !(grep m/^Name "main::z" used only once: possible typo/, @warns) && 'not ';
 print "${e}ok 4\n";
 ($e, @warns) = @warns != 4 && 'not ';
 print "${e}ok 5\n";
@@ -55,11 +55,11 @@ print "${e}ok 13\n";
 
 eval q{use vars qw(@X::y !abc); $e = ! *X::y{ARRAY} && 'not '};
 print "${e}ok 14\n";
-$e = $@ !~ /^'!abc' is not a valid variable name/ && 'not ';
+$e = $@ !~ m/^'!abc' is not a valid variable name/ && 'not ';
 print "${e}ok 15\n";
 
 eval 'use vars qw($x[3])';
-$e = $@ !~ /^Can't declare individual elements of hash or array/ && 'not ';
+$e = $@ !~ m/^Can't declare individual elements of hash or array/ && 'not ';
 print "${e}ok 16\n";
 
 { local $^W;
@@ -70,7 +70,7 @@ print "${e}ok 16\n";
 
 # NB the next test only works because vars.pm has already been loaded
 eval 'use warnings "vars"; use vars qw($!)';
-$e = ($@ || (shift(@warns)||'') !~ /^No need to declare built-in vars/)
+$e = ($@ || (shift(@warns)||'') !~ m/^No need to declare built-in vars/)
 			&& 'not ';
 print "${e}ok 18\n";
 
@@ -86,7 +86,7 @@ print "${e}ok 21\n";
 
 use strict 'vars';
 eval 'use vars qw(@y%%)';
-$e = $@ !~ /^'\@y%%' is not a valid variable name under strict vars/ && 'not ';
+$e = $@ !~ m/^'\@y%%' is not a valid variable name under strict vars/ && 'not ';
 print "${e}ok 22\n";
 $e = *{Symbol::fetch_glob('y%%')}{ARRAY} && 'not ';
 print "${e}ok 23\n";
@@ -94,12 +94,12 @@ eval '$u = 3; @v = (); %w = ()';
 my @errs = split /\n/, $@;
 $e = @errs != 3 && 'not ';
 print "${e}ok 24\n";
-$e = !(grep(/^Global symbol "\$u" requires explicit package name/, @errs))
+$e = !(grep(m/^Global symbol "\$u" requires explicit package name/, @errs))
 			&& 'not ';
 print "${e}ok 25\n";
-$e = !(grep(/^Global symbol "\@v" requires explicit package name/, @errs))
+$e = !(grep(m/^Global symbol "\@v" requires explicit package name/, @errs))
 			&& 'not ';
 print "${e}ok 26\n";
-$e = !(grep(/^Global symbol "\%w" requires explicit package name/, @errs))
+$e = !(grep(m/^Global symbol "\%w" requires explicit package name/, @errs))
 			&& 'not ';
 print "${e}ok 27\n";

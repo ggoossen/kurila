@@ -6,7 +6,7 @@ sub mungepath {
     $p =~ s/^[ ;]+//;
     $p =~ s/[ ;]+$//;
     $p =~ s/'/"/g;
-    my @p = map { $_ = "\"$_\"" if /\s/ and !/^".*"$/; $_ } split /;/, $p;
+    my @p = map { $_ = "\"$_\"" if m/\s/ and !m/^".*"$/; $_ } split /;/, $p;
     return join(' ', @p);
 }
 
@@ -14,7 +14,7 @@ sub mungepath {
 # or an option file
 #    -- added by BKS, 10-17-1999 to fix command-line overflow problems
 sub loadopts {
-    if ($ARGV[0] =~ /--cfgsh-option-file/) {
+    if ($ARGV[0] =~ m/--cfgsh-option-file/) {
 	shift @ARGV;
 	my $optfile = shift @ARGV;
 	local (*F);
@@ -23,7 +23,7 @@ sub loadopts {
 	chomp(my $line = ~< *OPTF);
 	my @vars = split(/\t+~\t+/, $line);
 	for (@vars) {
-	    push(@opts, $_) unless (/^\s*$/);
+	    push(@opts, $_) unless (m/^\s*$/);
 	}
 	close OPTF;
 	return \@opts;
@@ -35,7 +35,7 @@ sub loadopts {
 
 my %opt;
 my $optref = loadopts();
-while (@{$optref} && $optref->[0] =~ /^([\w_]+)=(.*)$/) {
+while (@{$optref} && $optref->[0] =~ m/^([\w_]+)=(.*)$/) {
     $opt{$1}=$2;
     shift(@{$optref});
 }
@@ -45,7 +45,7 @@ my $pl_h = '../patchlevel.h';
 if (-e $pl_h) {
     open PL, "<$pl_h" or die "Can't open $pl_h: $!";
     while ( ~< *PL) {
-	if (/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
+	if (m/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
 	    $opt{$1} = $2;
 	}
     }
@@ -67,12 +67,12 @@ $opt{incpath} = mungepath($opt{incpath}) if exists $opt{incpath};
 
 while ( ~< *ARGV) {
     s/~([\w_]+)~/$opt{$1}/g;
-    if (/^([\w_]+)=(.*)$/) {
+    if (m/^([\w_]+)=(.*)$/) {
 	my($k,$v) = ($1,$2);
 	# this depends on cf_time being empty in the template (or we'll
 	# get a loop)
 	if ($k eq 'cf_time') {
-	    $_ = "$k='" . localtime(time) . "'\n" if $v =~ /^\s*'\s*'/;
+	    $_ = "$k='" . localtime(time) . "'\n" if $v =~ m/^\s*'\s*'/;
 	}
 	elsif (exists $opt{$k}) {
 	    $_ = "$k='$opt{$k}'\n";

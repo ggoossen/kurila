@@ -178,8 +178,8 @@ sub canonpath {
     $path =~ s|\\\.\.\.\\|\\\.\.\\\.\.\\|g; # \...\ is 2 levels up
     $path =~ s|^\.\.\.\\|\.\.\\\.\.\\|g;    # ...\ is 2 levels up
     return $path if $path =~ m|^\.\.|;      # skip relative paths
-    return $path unless $path =~ /\.\./;    # too few .'s to cleanup
-    return $path if $path =~ /\.\.\.\./;    # too many .'s to cleanup
+    return $path unless $path =~ m/\.\./;    # too few .'s to cleanup
+    return $path if $path =~ m/\.\.\.\./;    # too many .'s to cleanup
     $path =~ s{^\\\.\.$}{\\};                      # \..    -> \
     1 while $path =~ s{^\\\.\.}{};                 # \..\xx -> \xx
 

@@ -89,7 +89,7 @@ is( $@, '', 'PL_lex_brackstack' );
     is("@{b}{", "B{", "interpolation, qq//");
     is(qr/${a}{/, '(?-uxism:A{)', "interpolation, qr//");
     my $c = "A{";
-    $c =~ /${a}{/;
+    $c =~ m/${a}{/;
     is($&, 'A{', "interpolation, m//");
     $c =~ s/${a}{/foo/;
     is($c, 'foo', "interpolation, s/...//");

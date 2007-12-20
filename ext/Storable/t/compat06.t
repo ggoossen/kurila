@@ -14,7 +14,7 @@ BEGIN {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -90,14 +90,14 @@ my $r = ROOT->make;
 my $data = '';
 if (!$is_EBCDIC) {			# ASCII machine
 	while ( ~< *DATA) {
-		next if /^#/;
+		next if m/^#/;
 	    $data .= unpack("u", $_);
 	}
 } else {
 	while ( ~< *DATA) {
-		next if /^#$/;		# skip comments
-		next if /^#\s+/;	# skip comments
-		next if /^[^#]/;	# skip uuencoding for ASCII machines
+		next if m/^#$/;		# skip comments
+		next if m/^#\s+/;	# skip comments
+		next if m/^[^#]/;	# skip uuencoding for ASCII machines
 		s/^#//;				# prepare uuencoded data for EBCDIC machines
 		$data .= unpack("u", $_);
 	}

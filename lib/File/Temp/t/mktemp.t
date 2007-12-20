@@ -107,4 +107,4 @@ print "# MKTEMP: Tempfile is $template -> $tmpfile\n";
 # Okay if template no longer has XXXXX in
 
 
-ok( ($tmpfile !~ /XXXXX$/) );
+ok( ($tmpfile !~ m/XXXXX$/) );

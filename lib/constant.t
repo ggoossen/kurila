@@ -115,7 +115,7 @@ cmp_ok length(E2BIG), '+>', 6;
 is @warnings, 0 or diag join "\n", "unexpected warning", @warnings;
 @warnings = ();		# just in case
 undef &PI;
-ok @warnings && ($warnings[0] =~ /Constant sub.* undefined/) or
+ok @warnings && ($warnings[0] =~ m/Constant sub.* undefined/) or
   diag join "\n", "unexpected warning", @warnings;
 shift @warnings;
 
@@ -136,7 +136,7 @@ print $output CCODE->($curr_test+4);
 $TB->current_test($curr_test+4);
 
 eval q{ CCODE->{foo} };
-ok scalar($@ =~ /^Constant is not a HASH/);
+ok scalar($@ =~ m/^Constant is not a HASH/);
 
 
 # Allow leading underscore
@@ -156,7 +156,7 @@ sub declared ($) {
     my $name = shift;
     $name =~ s/^::/main::/;
     my $pkg = caller;
-    my $full_name = $name =~ /::/ ? $name : "${pkg}::$name";
+    my $full_name = $name =~ m/::/ ? $name : "${pkg}::$name";
     $constant::declared{$full_name};
 }
 

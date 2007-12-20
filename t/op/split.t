@@ -51,7 +51,7 @@ is($_ , '1:2:3:4:5:6:::');
 
 # Does assignment to a list imply split to one more field than that?
 $foo = runperl( switches => ['-Dt'], stderr => 1, prog => '($a,$b)=split;' );
-ok($foo =~ /DEBUGGING/ || $foo =~ /const\n?\Q(IV(3))\E/);
+ok($foo =~ m/DEBUGGING/ || $foo =~ m/const\n?\Q(IV(3))\E/);
 
 # Can we say how many fields to split to when assigning to a list?
 ($a,$b) = split(' ','1 2 3 4 5 6', 2);
@@ -112,7 +112,7 @@ $_ = "a : b :c: d";
 is(($res = join(".",@ary)), "a.b.c.d", $res);
 
 # use of match result as pattern (!)
-is('p:q:r:s', join ':', split('abc' =~ /b/, 'p1q1r1s'));
+is('p:q:r:s', join ':', split('abc' =~ m/b/, 'p1q1r1s'));
 
 # /^/ treated as /^/m
 $_ = join ':', split /^/, "ab\ncd\nef\n";
@@ -259,7 +259,7 @@ ok(@ary == 3 &&
 	for my $a (0, 1) {
 	    $_ = 'readin,database,readout';
 	    utf8::encode $_ if $u;
-	    /(.+)/;
+	    m/(.+)/;
 	    my @d = split /[,]/,$1;
 	    is(join (':',@d), 'readin:database:readout', "[perl #18195]");
 	}

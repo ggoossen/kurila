@@ -34,7 +34,7 @@ Hash::Util->bootstrap($VERSION);
 
 sub import {
     my $class = shift;
-    if ( grep /fieldhash/, @_ ) {
+    if ( grep m/fieldhash/, @_ ) {
         require Hash::Util::FieldHash;
         Hash::Util::FieldHash->import(':all'); # for re-export
     }

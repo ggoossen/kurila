@@ -47,7 +47,7 @@ while ( ~< *DATA) {
     close IN;
     close OUT;
     open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
-    while ( ~< *OUT) { last if /^\.nh/ }
+    while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
     {
         local $/;

@@ -62,7 +62,7 @@ sub wraplist {
       # Perl bug -- seems to occasionally insert extra elements when
       # traversing array (scalar(@array) doesn't show them, but
       # foreach(@array) does) (5.00307)
-      next unless $word =~ /\w/;
+      next unless $word =~ m/\w/;
       $line .= ' ' if length($line);
       if ($hlen +> 80) { $line .= "\\\n\t"; $hlen = 0; }
       $line .= $word;
@@ -131,7 +131,7 @@ sub guess_name {
     }
     if (open(PM,"${defpm}.pm")){
         while ( ~< *PM) {
-            if (/^\s*package\s+([^;]+)/i) {
+            if (m/^\s*package\s+([^;]+)/i) {
                 $defname = $1;
                 last;
             }
@@ -180,7 +180,7 @@ sub find_perl {
                          my($bhasdir) = (length($b) - length($bb) +> 0);
                          if    ($ahasdir and not $bhasdir) { return 1; }
                          elsif ($bhasdir and not $ahasdir) { return -1; }
-                         else { $bb =~ /\d/ <+> $ba =~ /\d/
+                         else { $bb =~ m/\d/ <+> $ba =~ m/\d/
                                   or substr($ba,0,1) cmp substr($bb,0,1)
                                   or length($bb) <+> length($ba) } } @$names;
     }
@@ -204,7 +204,7 @@ sub find_perl {
 	    # We've covered relative dirs; everything else is an absolute
 	    # dir (probably an installed location).  First, we'll try potential
 	    # command names, to see whether we can avoid a long MCR expression.
-	    foreach $name (@snames) { push(@cand,$name) if $name =~ /^[\w\-\$]+$/; }
+	    foreach $name (@snames) { push(@cand,$name) if $name =~ m/^[\w\-\$]+$/; }
 	    $inabs++; # Should happen above in next $dir, but just in case . . .
 	}
 	foreach $name (@snames){
@@ -215,14 +215,14 @@ sub find_perl {
     foreach $name (@cand) {
 	print "Checking $name\n" if ($trace +>= 2);
 	# If it looks like a potential command, try it without the MCR
-        if ($name =~ /^[\w\-\$]+$/) {
+        if ($name =~ m/^[\w\-\$]+$/) {
             open(TCF,">temp_mmvms.com") || die('unable to open temp file');
             print TCF "\$ set message/nofacil/nosever/noident/notext\n";
             print TCF "\$ $name -e \"require $ver; print \"\"VER_OK\\n\"\"\"\n";
             close TCF;
             $rslt = `\@temp_mmvms.com` ;
             unlink('temp_mmvms.com');
-            if ($rslt =~ /VER_OK/) {
+            if ($rslt =~ m/VER_OK/) {
                 print "Using PERL=$name\n" if $trace;
                 return $name;
             }
@@ -236,7 +236,7 @@ sub find_perl {
         close TCF;
         $rslt = `\@temp_mmvms.com`;
         unlink('temp_mmvms.com');
-        if ($rslt =~ /VER_OK/) {
+        if ($rslt =~ m/VER_OK/) {
 	    print "Using PERL=MCR $vmsfile\n" if $trace;
 	    return "MCR $vmsfile";
 	}
@@ -410,7 +410,7 @@ sub init_main {
                 $def =~ s/='(.*)'$/=$1/;  # then remove shell-protection ''
                 $def =~ s/^'(.*)'$/$1/;   # from entire term or argument
             }
-            if ($def =~ /=/) {
+            if ($def =~ m/=/) {
                 $def =~ s/"/""/g;  # Protect existing " from DCL
                 $def = qq["$def"]; # and quote to prevent parsing of =
             }
@@ -495,7 +495,7 @@ CODE
     # it work.  However, Unix's DEV_NULL is quite wrong for VMS.
     $self->{DEV_NULL}   = '';
 
-    if ($self->{OBJECT} =~ /\s/) {
+    if ($self->{OBJECT} =~ m/\s/) {
         $self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
         $self->{OBJECT} = $self->wraplist(
             map $self->fixpath($_,0), split /,?\s+/, $self->{OBJECT}
@@ -575,7 +575,7 @@ sub constants {
     my($self) = @_;
 
     # Be kind about case for pollution
-    for (@ARGV) { $_ = uc($_) if /POLLUTE/i; }
+    for (@ARGV) { $_ = uc($_) if m/POLLUTE/i; }
 
     # Cleanup paths for directories in MMS macros.
     foreach my $macro ( qw [
@@ -586,7 +586,7 @@ sub constants {
                       ) 
     {
         next unless defined $self->{$macro};
-        next if $macro =~ /MAN/ && $self->{$macro} eq 'none';
+        next if $macro =~ m/MAN/ && $self->{$macro} eq 'none';
         $self->{$macro} = $self->fixpath($self->{$macro},1);
     }
 
@@ -674,14 +674,14 @@ sub cflags {
          " required to modify CC command for $self->{'BASEEXT'}\n"
     if ($Config{$name});
 
-    if ($quals =~ / -[DIUOg]/) {
-	while ($quals =~ / -([Og])(\d*)\b/) {
+    if ($quals =~ m/ -[DIUOg]/) {
+	while ($quals =~ m/ -([Og])(\d*)\b/) {
 	    my($type,$lvl) = ($1,$2);
 	    $quals =~ s/ -$type$lvl\b\s*//;
 	    if ($type eq 'g') { $flagoptstr = '/NoOptimize'; }
 	    else { $flagoptstr = '/Optimize' . (defined($lvl) ? "=$lvl" : ''); }
 	}
-	while ($quals =~ / -([DIU])(\S+)/) {
+	while ($quals =~ m/ -([DIU])(\S+)/) {
 	    my($type,$def) = ($1,$2);
 	    $quals =~ s/ -$type$def\s*//;
 	    $def =~ s/"/""/g;
@@ -737,7 +737,7 @@ sub cflags {
     $self->{OPTIMIZE} ||= $flagoptstr || $Config{'optimize'};
     if ($self->{OPTIMIZE} !~ m!/!) {
 	if    ($self->{OPTIMIZE} =~ m!-g!) { $self->{OPTIMIZE} = '/Debug/NoOptimize' }
-	elsif ($self->{OPTIMIZE} =~ /-O(\d*)/) {
+	elsif ($self->{OPTIMIZE} =~ m/-O(\d*)/) {
 	    $self->{OPTIMIZE} = '/Optimize' . (defined($1) ? "=$1" : '');
 	}
 	else {
@@ -948,8 +948,8 @@ $(BASEEXT).opt : Makefile.PL
 	q[, 'FUNCLIST' => ],neatvalue($funclist),qq[)"\n];
 
     push @m, '	$(PERL) -e "print ""$(INST_STATIC)/Include=';
-    if ($self->{OBJECT} =~ /\bBASEEXT\b/ or
-        $self->{OBJECT} =~ /\b$self->{BASEEXT}\b/i) { 
+    if ($self->{OBJECT} =~ m/\bBASEEXT\b/ or
+        $self->{OBJECT} =~ m/\b$self->{BASEEXT}\b/i) { 
         push @m, ($Config{d_vms_case_sensitive_symbols}
 	           ? uc($self->{BASEEXT}) :'$(BASEEXT)');
     }
@@ -1431,7 +1431,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     # references from [.intuit.dwim]dwim.obj can be found
     # in [.intuit]intuit.olb).
     for (sort { length($a) <+> length($b) } keys %olbs) {
-	next unless $olbs{$_} =~ /\Q$self->{LIB_EXT}\E$/;
+	next unless $olbs{$_} =~ m/\Q$self->{LIB_EXT}\E$/;
 	my($dir) = $self->fixpath($_,1);
 	my($extralibs) = $dir . "extralibs.ld";
 	my($extopt) = $dir . $olbs{$_};
@@ -1458,7 +1458,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	if (-f $extopt) {
 	    open OPT,$extopt or die $!;
 	    while ( ~< *OPT) {
-		next unless /(?:UNIVERSAL|VECTOR)=boot_([\w_]+)/;
+		next unless m/(?:UNIVERSAL|VECTOR)=boot_([\w_]+)/;
 		my $pkg = $1;
 		$pkg =~ s#__*#::#g;
 		push @staticpkgs,$pkg;
@@ -1483,7 +1483,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     else          { $extralist = ''; }
     # Let ExtUtils::Liblist find the necessary libs for us (but skip PerlShr)
     # that's what we're building here).
-    push @optlibs, grep { !/PerlShr/i } split ' ', +($self->ext())[2];
+    push @optlibs, grep { !m/PerlShr/i } split ' ', +($self->ext())[2];
     if ($libperl) {
 	unless (-f $libperl || -f ($libperl = $self->catfile($Config{'installarchlib'},'CORE',$libperl))) {
 	    print STDOUT "Warning: $libperl not found\n";
@@ -1615,7 +1615,7 @@ sub prefixify {
     $sprefix = VMS::Filespec::vmspath($sprefix) if $sprefix;
 
     $default = VMS::Filespec::vmsify($default) 
-      unless $default =~ /\[.*\]/;
+      unless $default =~ m/\[.*\]/;
 
     (my $var_no_install = $var) =~ s/^install//;
     my $path = $self->{uc $var} || 
@@ -1830,7 +1830,7 @@ sub eliminate_macros {
     return '' unless $path;
     $self = {} unless ref $self;
 
-    if ($path =~ /\s/) {
+    if ($path =~ m/\s/) {
       return join ' ', map { $self->eliminate_macros($_) } split /\s+/, $path;
     }
 
@@ -1892,14 +1892,14 @@ sub fixpath {
     $self = bless {} unless ref $self;
     my($fixedpath,$prefix,$name);
 
-    if ($path =~ /[ \t]/) {
+    if ($path =~ m/[ \t]/) {
       return join ' ',
              map { $self->fixpath($_,$force_path) }
 	     split /[ \t]+/, $path;
     }
 
     if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) { 
-        if ($force_path or $path =~ /(?:DIR\)|\])\Z(?!\n)/) {
+        if ($force_path or $path =~ m/(?:DIR\)|\])\Z(?!\n)/) {
             $fixedpath = vmspath($self->eliminate_macros($path));
         }
         else {
@@ -1909,7 +1909,7 @@ sub fixpath {
     elsif ((($prefix,$name) = ($path =~ m#^\$\(([^\)]+)\)(.+)#s)) && $self->{$prefix}) {
         my($vmspre) = $self->eliminate_macros("\$($prefix)");
         # is it a dir or just a name?
-        $vmspre = ($vmspre =~ m|/| or $prefix =~ /DIR\Z(?!\n)/) ? vmspath($vmspre) : '';
+        $vmspre = ($vmspre =~ m|/| or $prefix =~ m/DIR\Z(?!\n)/) ? vmspath($vmspre) : '';
         $fixedpath = ($vmspre ? $vmspre : $self->{$prefix}) . $name;
         $fixedpath = vmspath($fixedpath) if $force_path;
     }
@@ -1918,7 +1918,7 @@ sub fixpath {
         $fixedpath = vmspath($fixedpath) if $force_path;
     }
     # No hints, so we try to guess
-    if (!defined($force_path) and $fixedpath !~ /[:>(.\]]/) {
+    if (!defined($force_path) and $fixedpath !~ m/[:>(.\]]/) {
         $fixedpath = vmspath($fixedpath) if -d $fixedpath;
     }
 
@@ -1928,7 +1928,7 @@ sub fixpath {
     # prepended during trip through Unix syntax in eliminate_macros(), since
     # Unix syntax has no way to express "absolute from the top of this device's
     # directory tree".
-    if ($path =~ /^[\[>][^.\-]/) { $fixedpath =~ s/^[^\[<]+//; }
+    if ($path =~ m/^[\[>][^.\-]/) { $fixedpath =~ s/^[^\[<]+//; }
 
     return $fixedpath;
 }

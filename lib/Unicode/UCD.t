@@ -9,7 +9,7 @@ BEGIN {
     @INC = "::lib" if $^O eq 'MacOS'; # module parses @INC itself
     our %Config;
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bStorable\b/) {
+    if ($Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built; Unicode::UCD uses Storable\n";
         exit 0;
     }

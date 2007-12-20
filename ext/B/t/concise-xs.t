@@ -103,7 +103,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ /\bB\b/) ){
+    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -293,7 +293,7 @@ sub test_pkg {
     my (%stash) = map
 	( ($_ => 0)
 	  => ( grep exists &{*{Symbol::fetch_glob("$pkg\::$_")}}	# grab CODE symbols
-	       => grep !/__ANON__/		# but not anon subs
+	       => grep !m/__ANON__/		# but not anon subs
 	       => keys %{*{Symbol::fetch_glob($pkg.'::')}}		# from symbol table
 	       ));
 

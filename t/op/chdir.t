@@ -27,7 +27,7 @@ sub abs_path {
     my $d = rel2abs(curdir);
 
     $d = uc($d) if $IsVMS;
-    $d = lc($d) if $^O =~ /^uwin/;
+    $d = lc($d) if $^O =~ m/^uwin/;
     $d;
 }
 

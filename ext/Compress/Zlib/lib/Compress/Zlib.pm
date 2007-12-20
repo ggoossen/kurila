@@ -108,13 +108,13 @@ sub gzopen($$)
                   );
 
     my $writing ;
-    $writing = ! ($mode =~ /r/i) ;
-    $writing = ($mode =~ /[wa]/i) ;
+    $writing = ! ($mode =~ m/r/i) ;
+    $writing = ($mode =~ m/[wa]/i) ;
 
-    $defOpts{Level}    = $1               if $mode =~ /(\d)/;
-    $defOpts{Strategy} = Z_FILTERED()     if $mode =~ /f/i;
-    $defOpts{Strategy} = Z_HUFFMAN_ONLY() if $mode =~ /h/i;
-    $defOpts{Append}   = 1                if $mode =~ /a/i;
+    $defOpts{Level}    = $1               if $mode =~ m/(\d)/;
+    $defOpts{Strategy} = Z_FILTERED()     if $mode =~ m/f/i;
+    $defOpts{Strategy} = Z_HUFFMAN_ONLY() if $mode =~ m/h/i;
+    $defOpts{Append}   = 1                if $mode =~ m/a/i;
 
     my $infDef = $writing ? 'deflate' : 'inflate';
     my @params = () ;
@@ -123,7 +123,7 @@ sub gzopen($$)
         unless isaFilehandle $file || isaFilename $file  || 
                (ref $file && ref $file eq 'SCALAR');
 
-    return undef unless $mode =~ /[rwa]/i ;
+    return undef unless $mode =~ m/[rwa]/i ;
 
     _set_gzerr(0) ;
 

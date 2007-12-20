@@ -114,7 +114,7 @@ sub main {
 	$status = checkorder(\@sorted);
 	# Put the items back into the original order.
 	# The contents of the arrays had better be identical.
-	if ($expect_unstable && $status =~ /^Instability/) {
+	if ($expect_unstable && $status =~ m/^Instability/) {
 	    $status = '';
 	    ++$unstable_num;
 	}

@@ -7,7 +7,7 @@ no strict 'vars';
 
 sub foo {
     $a='abcd';
-    $a=~/(.)/g;
+    $a=~m/(.)/g;
     cmp_ok($1,'eq','a','context ' . curr_test());
 }
 

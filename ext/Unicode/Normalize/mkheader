@@ -96,9 +96,9 @@ sub decomposeHangul {
 	. "nor unicode/CompExcl.txt is found in @INC" unless defined $f;
 
     while ( ~< $fh) {
-	next if /^#/ or /^$/;
+	next if m/^#/ or m/^$/;
 	s/#.*//;
-	$Exclus{ hex($1) } = 1 if /([0-9A-Fa-f]+)/;
+	$Exclus{ hex($1) } = 1 if m/([0-9A-Fa-f]+)/;
     }
     close $fh;
 }
@@ -106,9 +106,9 @@ sub decomposeHangul {
 ##
 ## converts string "hhhh hhhh hhhh" to a numeric list
 ##
-sub _getHexArray { map hex, $_[0] =~ /([0-9A-Fa-f]+)/g }
+sub _getHexArray { map hex, $_[0] =~ m/([0-9A-Fa-f]+)/g }
 
-while ($Combin =~ /(.+)/g) {
+while ($Combin =~ m/(.+)/g) {
     my @tab = split /\t/, $1;
     my $ini = hex $tab[0];
     if ($tab[1] eq '') {
@@ -118,7 +118,7 @@ while ($Combin =~ /(.+)/g) {
     }
 }
 
-while ($Decomp =~ /(.+)/g) {
+while ($Decomp =~ m/(.+)/g) {
     my @tab = split /\t/, $1;
     my $compat = $tab[2] =~ s/<[^>]+>//;
     my $dec = [ _getHexArray($tab[2]) ]; # decomposition

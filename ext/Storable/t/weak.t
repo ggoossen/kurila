@@ -15,18 +15,18 @@ sub BEGIN {
     unshift @INC, 't';
   }
   require Config; Config->import;
-  if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
+  if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
     print "1..0 # Skip: Storable was not built\n";
     exit 0;
   }
-  if ($Config{extensions} !~ /\bList\/Util\b/) {
+  if ($Config{extensions} !~ m/\bList\/Util\b/) {
     print "1..0 # Skip: List::Util was not built\n";
     exit 0;
   }
 
   require Scalar::Util;
   Scalar::Util->import(qw(weaken isweak));
-  if (grep { /weaken/ } @Scalar::Util::EXPORT_FAIL) {
+  if (grep { m/weaken/ } @Scalar::Util::EXPORT_FAIL) {
     print("1..0 # Skip: No support for weaken in Scalar::Util\n");
     exit 0;
   }

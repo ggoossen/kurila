@@ -48,14 +48,14 @@ sub _parse_section {
 
     # If the whole link is enclosed in quotes, interpret it all as a section
     # even if it contains a slash.
-    return (undef, $1) if ($link =~ /^"\s*(.*?)\s*"$/);
+    return (undef, $1) if ($link =~ m/^"\s*(.*?)\s*"$/);
 
     # Split into page and section on slash, and then clean up quoting in the
     # section.  If there is no section and the name contains spaces, also
     # guess that it's an old section link.
     my ($page, $section) = split (/\s*\/\s*/, $link, 2);
     $section =~ s/^"\s*(.*?)\s*"$/$1/ if $section;
-    if ($page && $page =~ / / && !defined ($section)) {
+    if ($page && $page =~ m/ / && !defined ($section)) {
         $section = $page;
         $page = undef;
     } else {
@@ -85,16 +85,16 @@ sub _infer_text {
 sub parselink {
     my ($link) = @_;
     $link =~ s/\s+/ /g;
-    if ($link =~ /\A\w+:[^:\s]\S*\Z/) {
+    if ($link =~ m/\A\w+:[^:\s]\S*\Z/) {
         return (undef, $link, $link, undef, 'url');
     } else {
         my $text;
-        if ($link =~ /\|/) {
+        if ($link =~ m/\|/) {
             ($text, $link) = split (/\|/, $link, 2);
         }
         my ($name, $section) = _parse_section ($link);
         my $inferred = $text || _infer_text ($name, $section);
-        my $type = ($name && $name =~ /\(\S*\)/) ? 'man' : 'pod';
+        my $type = ($name && $name =~ m/\(\S*\)/) ? 'man' : 'pod';
         return ($text, $inferred, $name, $section, $type);
     }
 }

@@ -19,7 +19,7 @@ ok( $_ eq 'glabol', 's/// on global $_' );
     ok( $_ eq 'local', 'my $_ initial value' );
     s/oca/aco/;
     ok( $_ eq 'lacol', 's/// on my $_' );
-    /(..)/;
+    m/(..)/;
     ok( $1 eq 'la', '// on my $_' );
     ok( tr/c/d/ == 1, 'tr/// on my $_ counts correctly' );
     ok( $_ eq 'ladol', 'tr/// on my $_' );
@@ -44,7 +44,7 @@ ok( $_ eq 'global', 's/// on global $_ again' );
     ok( $_ eq 22, 'our $_ is seen explicitly' );
     chop;
     ok( $_ eq 2, '...default chop chops our $_' );
-    /(.)/;
+    m/(.)/;
     ok( $1 eq 2, '...default match sees our $_' );
 }
 
@@ -53,7 +53,7 @@ $_ = "global";
     my $_ = 'local';
     for my $_ ("foo") {
 	ok( $_ eq "foo", 'for my $_' );
-	/(.)/;
+	m/(.)/;
 	ok( $1 eq "f", '...m// in for my $_' );
 	ok( our $_ eq 'global', '...our $_ inside for my $_' );
     }
@@ -64,7 +64,7 @@ $_ = "global";
     my $_ = 'local';
     for ("implicit foo") { # implicit "my $_"
 	ok( $_ eq "implicit foo", 'for implicit my $_' );
-	/(.)/;
+	m/(.)/;
 	ok( $1 eq "i", '...m// in for implicity my $_' );
 	ok( our $_ eq 'global', '...our $_ inside for implicit my $_' );
     }
@@ -80,7 +80,7 @@ $_ = "global";
 {
     for our $_ ("bar") {
 	ok( $_ eq "bar", 'for our $_' );
-	/(.)/;
+	m/(.)/;
 	ok( $1 eq "b", '...m// in for our $_' );
     }
     ok( $_ eq 'global', '...our $_ restored outside for our $_' );
@@ -88,13 +88,13 @@ $_ = "global";
 
 {
     my $buf = '';
-    sub tmap1 { /(.)/; $buf .= $1 } # uses our $_
+    sub tmap1 { m/(.)/; $buf .= $1 } # uses our $_
     my $_ = 'x';
-    sub tmap2 { /(.)/; $buf .= $1 } # uses my $_
+    sub tmap2 { m/(.)/; $buf .= $1 } # uses my $_
     map {
 	tmap1();
 	tmap2();
-	ok( /^[67]\z/, 'local lexical $_ is seen in map' );
+	ok( m/^[67]\z/, 'local lexical $_ is seen in map' );
 	{ ok( our $_ eq 'global', 'our $_ still visible' ); }
 	ok( $_ == 6 || $_ == 7, 'local lexical $_ is still seen in map' );
 	{ my $_ ; ok( !defined, 'nested my $_ is undefined' ); }
@@ -120,13 +120,13 @@ $_ = "global";
 }
 {
     my $buf = '';
-    sub tgrep1 { /(.)/; $buf .= $1 }
+    sub tgrep1 { m/(.)/; $buf .= $1 }
     my $_ = 'y';
-    sub tgrep2 { /(.)/; $buf .= $1 }
+    sub tgrep2 { m/(.)/; $buf .= $1 }
     grep {
 	tgrep1();
 	tgrep2();
-	ok( /^[89]\z/, 'local lexical $_ is seen in grep' );
+	ok( m/^[89]\z/, 'local lexical $_ is seen in grep' );
 	{ ok( our $_ eq 'global', 'our $_ still visible' ); }
 	ok( $_ == 8 || $_ == 9, 'local lexical $_ is still seen in grep' );
     } 8, 9;
@@ -151,7 +151,7 @@ $_ = "global";
 {
     my $s = "toto";
     my $_ = "titi";
-    $s =~ /to(?{ ok( $_ eq 'toto', 'my $_ in code-match # TODO' ) })to/
+    $s =~ m/to(?{ ok( $_ eq 'toto', 'my $_ in code-match # TODO' ) })to/
 	or ok( 0, "\$s=$s should match!" );
     ok( our $_ eq 'global', '...our $_ restored outside code-match' );
 }
@@ -166,7 +166,7 @@ $_ = "global";
     package notmain;
     our $_ = 'notmain';
     ::ok( $::_ eq 'notmain', 'our $_ forced into main::' );
-    /(.*)/;
+    m/(.*)/;
     ::ok( $1 eq 'notmain', '...m// defaults to our $_ in main::' );
 }
 

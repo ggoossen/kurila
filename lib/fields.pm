@@ -61,7 +61,7 @@ sub import {
             }
         }
         $fields->{$f} = $next;
-        $fattr->[$next] = ($f =~ /^_/) ? PRIVATE : PUBLIC;
+        $fattr->[$next] = ($f =~ m/^_/) ? PRIVATE : PUBLIC;
         $next += 1;
     }
     if (@$fattr +> $next) {

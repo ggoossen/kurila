@@ -37,14 +37,14 @@ if ($^O eq 'unicos') { 	# For some reason root() produces very inaccurate
 
 while ( ~< *DATA) {
 	s/^\s+//;
-	next if $_ eq '' || /^\#/;
+	next if $_ eq '' || m/^\#/;
 	chomp;
 	$test_set = 0;		# Assume not a test over a set of values
-	if (/^&(.+)/) {
+	if (m/^&(.+)/) {
 		$op = $1;
 		next;
 	}
-	elsif (/^\{(.+)\}/) {
+	elsif (m/^\{(.+)\}/) {
 		set($1, \@set, \@val);
 		next;
 	}
@@ -485,10 +485,10 @@ sub test {
 	} else {
 		my ($try, $args);
 		if (@args == 2) {
-			$try = ($op =~ /^\w/) ? "\$z0->$op" : "$op \$z0";
+			$try = ($op =~ m/^\w/) ? "\$z0->$op" : "$op \$z0";
 			$args = "'$args[0]'";
 		} else {
-			$try = ($op =~ /^\w/) ? "$op(\$z0, \$z1)" : "\$z0 $op \$z1";
+			$try = ($op =~ m/^\w/) ? "$op(\$z0, \$z1)" : "\$z0 $op \$z1";
 			$args = "'$args[0]', '$args[1]'";
 		}
 		push @script, "\$res = $try; ";
@@ -535,16 +535,16 @@ sub set {
 
 sub value {
 	local ($_) = @_;
-	if (/^\s*\((.*),(.*)\)/) {
+	if (m/^\s*\((.*),(.*)\)/) {
 		return "cplx($1,$2)";
 	}
-	elsif (/^\s*([\-\+]?(?:\d+(\.\d+)?|\.\d+)(?:[e[\-\+]\d+])?)/) {
+	elsif (m/^\s*([\-\+]?(?:\d+(\.\d+)?|\.\d+)(?:[e[\-\+]\d+])?)/) {
 		return "cplx($1,0)";
 	}
-	elsif (/^\s*\[(.*),(.*)\]/) {
+	elsif (m/^\s*\[(.*),(.*)\]/) {
 		return "cplxe($1,$2)";
 	}
-	elsif (/^\s*'(.*)'/) {
+	elsif (m/^\s*'(.*)'/) {
 		my $ex = $1;
 		$ex =~ s/\bz\b/$target/g;
 		$ex =~ s/\br\b/abs($target)/g;
@@ -553,7 +553,7 @@ sub value {
 		$ex =~ s/\bb\b/Im($target)/g;
 		return $ex;
 	}
-	elsif (/^\s*"(.*)"/) {
+	elsif (m/^\s*"(.*)"/) {
 		return "\"$1\"";
 	}
 	return $_;
@@ -566,7 +566,7 @@ sub check {
 
 	if ("$got" eq "$expected"
 	    ||
-	    ($expected =~ /^-?\d/ && $got == $expected)
+	    ($expected =~ m/^-?\d/ && $got == $expected)
 	    ||
 	    (abs(Math::Complex->make($got) - Math::Complex->make($expected)) +< $eps)
 	    ||

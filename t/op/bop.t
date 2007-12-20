@@ -236,12 +236,12 @@ SKIP: {
 {
     $a = "aa";
     $a ^&^= "a";
-    ok($a =~ /a+$/, 'ASCII "a" is NUL-terminated');
+    ok($a =~ m/a+$/, 'ASCII "a" is NUL-terminated');
 
     use utf8;
     $b = "bb\x{100}";
     $b ^&^= "b";
-    ok($b =~ /b+$/, 'Unicode "b" is NUL-terminated');
+    ok($b =~ m/b+$/, 'Unicode "b" is NUL-terminated');
 }
 
 {

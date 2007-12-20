@@ -30,12 +30,12 @@ my $inrec = 0;
 while ( ~< $in)
 {
  chomp;
- if (/^[^#.\t][^#=]*?:(?:[^=]|$)/)
+ if (m/^[^#.\t][^#=]*?:(?:[^=]|$)/)
  {
     if (! $inrec)
     {
        print $out "$_\n";
-       while (/\\\s*$/)
+       while (m/\\\s*$/)
        {
           chomp($_ = ~< $in);
           print $out "$_\n";
@@ -45,7 +45,7 @@ while ( ~< $in)
        next;
     }
     else {
-       if (!/^\t/) {
+       if (!m/^\t/) {
            seek ($out, -4, 2);      # no recipe, so back up and undo grouping
                                     # should be -3, but MS has its CR/LF thing...
            $inrec = 0;
@@ -54,19 +54,19 @@ while ( ~< $in)
        next;
     }
  }
- if ((/^\s*$/ || /^[^#.\t][^#=]*?:/) && $inrec)
+ if ((m/^\s*$/ || m/^[^#.\t][^#=]*?:/) && $inrec)
  {
     print $out "]\n";
     print $out "$_\n";
     $inrec = 0;
     next;
  }
- if (/^(.*?)(&&|\|\|)(.*)$/)  # two commands separated by && or ||
+ if (m/^(.*?)(&&|\|\|)(.*)$/)  # two commands separated by && or ||
  {
     my ($one, $sep, $two) = ($1, $2, $3);
     $one =~ s/^\t(?:-(?!-))?\@?(.*?)$/\t$1/;   # no -,@ in group recipes
 LINE_CONT:
-    if ($two =~ /\\\s*$/)
+    if ($two =~ m/\\\s*$/)
     {
        chomp ($two .= "\n" . scalar ~< $in);
        goto LINE_CONT;

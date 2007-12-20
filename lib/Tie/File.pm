@@ -109,7 +109,7 @@ sub TIEARRAY {
   if (defined $opts{discipline}) {
     # This avoids a compile-time warning under 5.005
     eval 'binmode($fh, $opts{discipline})';
-    croak $@ if $@ =~ /unknown discipline/i;
+    croak $@ if $@ =~ m/unknown discipline/i;
     die if $@;
   }
   $opts{fh} = $fh;
@@ -1210,7 +1210,7 @@ sub _annotate_ad_history {
   if ($n eq 'CLEAR') {
     @H = (-2, -1);              # prime the history with fake records
     $self->_stop_autodeferring;
-  } elsif ($n =~ /^\d+$/) {
+  } elsif ($n =~ m/^\d+$/) {
     if (@H == 0) {
       @H =  ($n, $n);
     } else {                    # @H == 2
@@ -1406,7 +1406,7 @@ sub _check_integrity {
   if (@{$self->{ad_history}} == 0) {
     # That's OK, no additional tests required
   } elsif (@{$self->{ad_history}} == 2) {
-    my @non_number = grep !/^-?\d+$/, @{$self->{ad_history}};
+    my @non_number = grep !m/^-?\d+$/, @{$self->{ad_history}};
     if (@non_number) {
       my $msg;
       { local $" = ')(';
@@ -1669,7 +1669,7 @@ sub _check_integrity {          # For CACHE
   # Test HASH
   my $bytes = 0;
   for my $k (keys %{$self->[HASH]}) {
-    if ($k ne '0' && $k !~ /^[1-9][0-9]*$/) {
+    if ($k ne '0' && $k !~ m/^[1-9][0-9]*$/) {
       $good = 0;
       _ci_warn "Cache hash key <$k> is non-numeric";
     }

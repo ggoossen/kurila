@@ -53,7 +53,7 @@ use_ok( $Class );
 ################################
 
 sub _succeed {
-    return grep { /\S/ } map { s/^\s*//; $_ } split "\n", q[
+    return grep { m/\S/ } map { s/^\s*//; $_ } split "\n", q[
         $VERSION = 1;
         *VERSION = \'1.01';
         use version; $VERSION = qv('0.0.2');
@@ -78,7 +78,7 @@ sub _succeed {
 }
 
 sub _fail {
-    return grep { /\S/ } map { s/^\s*//; $_ } split "\n", q[
+    return grep { m/\S/ } map { s/^\s*//; $_ } split "\n", q[
         use vars qw($VERSION $AUTOLOAD %ERROR $ERROR $Warn $Die);
         sub version { $GD::Graph::colour::VERSION }
         my $VERS = qr{ $HWS VERSION $HWS \n }xms;

@@ -393,7 +393,7 @@ for my $switch (0,1) {
                         ### so we strip the ']' of the back of the regex
                         $out_re =~ s/\\\]// if IS_VMS; 
                         
-                        if( $ae->extract_path !~ /^$out_re/ ) {   
+                        if( $ae->extract_path !~ m/^$out_re/ ) {   
                             ok( 0, "Extractpath WRONG (".$ae->extract_path.")"); 
                             skip(  "Unsafe operation -- skip cleanup!!!" ), 1;
                         }                    

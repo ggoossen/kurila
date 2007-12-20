@@ -170,7 +170,7 @@ $VERSION = "1.815" ;
     local $SIG{__WARN__} = sub {$splice_end_array = "@_";};
     my @a =(1); splice(@a, 3);
     $splice_end_array = 
-        ($splice_end_array =~ /^splice\(\) offset past end of array at /);
+        ($splice_end_array =~ m/^splice\(\) offset past end of array at /);
 }      
 
 #typedef enum { DB_BTREE, DB_HASH, DB_RECNO } DBTYPE;
@@ -229,7 +229,7 @@ push @ISA, qw(Tie::Hash Exporter);
 eval {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = grep /^O_/, @Fcntl::EXPORT;
+    my @O = grep m/^O_/, @Fcntl::EXPORT;
     Fcntl->import(@O);  # first we import what we want to export
     push(@EXPORT, @O);
 };
@@ -245,14 +245,14 @@ else
 sub tie_hash_or_array
 {
     my (@arg) = @_ ;
-    my $tieHASH = ( (caller(1))[3] =~ /TIEHASH/ ) ;
+    my $tieHASH = ( (caller(1))[3] =~ m/TIEHASH/ ) ;
 
     use File::Spec;
     $arg[1] = File::Spec->rel2abs($arg[1]) 
         if defined $arg[1] ;
 
     $arg[4] = tied %{ $arg[4] } 
-	if @arg +>= 5 && ref $arg[4] && $arg[4] =~ /=HASH/ && tied %{ $arg[4] } ;
+	if @arg +>= 5 && ref $arg[4] && $arg[4] =~ m/=HASH/ && tied %{ $arg[4] } ;
 
     $arg[2] = O_CREAT()^|^O_RDWR() if @arg +>=3 && ! defined $arg[2];
     $arg[3] = 0666               if @arg +>=4 && ! defined $arg[3];
@@ -263,7 +263,7 @@ sub tie_hash_or_array
         $arg[2] ^|^= O_CREAT();
     }
 
-    if ($db_version +> 1 and defined $arg[4] and $arg[4] =~ /RECNO/ and 
+    if ($db_version +> 1 and defined $arg[4] and $arg[4] =~ m/RECNO/ and 
 	$arg[1] and ! -e $arg[1]) {
 	open(FH, ">$arg[1]") or return undef ;
 	close FH ;

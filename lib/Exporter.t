@@ -119,7 +119,7 @@ package Bar;
 my @imports = qw($seatbelt &Above stuff @wailing %left);
 Testing->import(@imports);
 
-::ok( (!grep { eval "!defined $_" } map({ /^\w/ ? "&$_" : $_ } @imports)),
+::ok( (!grep { eval "!defined $_" } map({ m/^\w/ ? "&$_" : $_ } @imports)),
       'import by symbols' );
 
 
@@ -127,7 +127,7 @@ package Yar;
 my @tags = qw(:This :tray);
 Testing->import(@tags);
 
-::ok( (!grep { eval "!defined $_" } map { /^\w/ ? "&$_" : $_ }
+::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
              map { @$_ } @{$Testing::EXPORT_TAGS{@tags}}),
       'import by tags' );
 
@@ -141,16 +141,16 @@ Testing->import(qw(!lifejacket));
 package Mars;
 Testing->import('/e/');
 
-::ok( (!grep { eval "!defined $_" } map { /^\w/ ? "&$_" : $_ }
-            grep { /e/ } @Testing::EXPORT, @Testing::EXPORT_OK),
+::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
+            grep { m/e/ } @Testing::EXPORT, @Testing::EXPORT_OK),
       'import by regex');
 
 
 package Venus;
 Testing->import('!/e/');
 
-::ok( (!grep { eval "defined $_" } map { /^\w/ ? "&$_" : $_ }
-            grep { /e/ } @Testing::EXPORT, @Testing::EXPORT_OK),
+::ok( (!grep { eval "defined $_" } map { m/^\w/ ? "&$_" : $_ }
+            grep { m/e/ } @Testing::EXPORT, @Testing::EXPORT_OK),
       'deny import by regex');
 ::ok( !defined &lifejacket, 'further denial' );
 
@@ -166,7 +166,7 @@ package Yet::More::Testing;
 @ISA = qw(Exporter);
 $VERSION = 0;
 eval { Yet::More::Testing->require_version(10); 1 };
-::ok($@ !~ /\(undef\)/,       'require_version(10) and $VERSION = 0');
+::ok($@ !~ m/\(undef\)/,       'require_version(10) and $VERSION = 0');
 
 
 my $warnings;

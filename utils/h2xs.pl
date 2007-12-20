@@ -453,7 +453,7 @@ See L<perlxs> and L<perlxstut> for additional details.
 use strict;
 
 
-my( $H2XS_VERSION ) = ' $Revision: 1.23 $ ' =~ /\$Revision:\s+([^\s]+)/;
+my( $H2XS_VERSION ) = ' $Revision: 1.23 $ ' =~ m/\$Revision:\s+([^\s]+)/;
 my $TEMPLATE_VERSION = '0.01';
 my @ARGS = @ARGV;
 require kurila;
@@ -642,7 +642,7 @@ my $extralibs = '';
 my @path_h;
 
 while (my $arg = shift) {
-    if ($arg =~ /^-l/i) {
+    if ($arg =~ m/^-l/i) {
         $extralibs .= "$arg ";
         next;
     }
@@ -719,7 +719,7 @@ if( @path_h ){
         $name ||= $path_h;
     $module ||= do {
       $name =~ s/\.h$//;
-      if ( $name !~ /::/ ) {
+      if ( $name !~ m/::/ ) {
 	$name =~ s#^.*/##;
 	$name = "\u$name";
       }
@@ -729,7 +729,7 @@ if( @path_h ){
     if( $path_h =~ s#::#/#g && $opt_n ){
 	warn "Nesting of headerfile ignored with -n\n";
     }
-    $path_h .= ".h" unless $path_h =~ /\.h$/;
+    $path_h .= ".h" unless $path_h =~ m/\.h$/;
     my $fullpath = $path_h;
     $path_h =~ s/,.*$// if $opt_x;
     $fullpath{$path_h} = $fullpath;
@@ -780,7 +780,7 @@ if( @path_h ){
 	    s/\?\?</{/g;                         # | ??<|  {|
 	    s/\?\?>/}/g;                         # | ??>|  }|
 	}
-	if (/^[ \t]*#[ \t]*define\s+([\$\w]+)\b(?!\()\s*(?=[^"\s])(.*)/) {
+	if (m/^[ \t]*#[ \t]*define\s+([\$\w]+)\b(?!\()\s*(?=[^"\s])(.*)/) {
 	    my $def = $1;
 	    my $rest = $2;
 	    $rest =~ s!/\*.*?(\*/|\n)|//.*!!g; # Remove comments
@@ -789,16 +789,16 @@ if( @path_h ){
 	    # Cannot do: (-1) and ((LHANDLE)3) are OK:
 	    #print("Skip non-wordy $def => $rest\n"),
 	    #  next defines if $rest =~ /[^\w\$]/;
-	    if ($rest =~ /"/) {
+	    if ($rest =~ m/"/) {
 	      print("Skip stringy $def => $rest\n") if $opt_d;
 	      next defines;
 	    }
 	    print "Matched $_ ($def)\n" if $opt_d;
 	    $seen_define{$def} = $rest;
 	    $_ = $def;
-	    next if /^_.*_h_*$/i; # special case, but for what?
+	    next if m/^_.*_h_*$/i; # special case, but for what?
 	    if (defined $opt_p) {
-	      if (!/^$opt_p(\d)/) {
+	      if (!m/^$opt_p(\d)/) {
 		++$prefix{$_} if s/^$opt_p//;
 	      }
 	      else {
@@ -806,7 +806,7 @@ if( @path_h ){
 	      }
 	    }
 	    $prefixless{$def} = $_;
-	    if (!$fmask or /$fmask/) {
+	    if (!$fmask or m/$fmask/) {
 		print "... Passes mask of -M.\n" if $opt_d and $fmask;
 		$const_names{$_}++;
 	    }
@@ -826,14 +826,14 @@ if( @path_h ){
         # Remove C and C++ comments
         $src =~ s#/\*[^*]*\*+([^/*][^*]*\*+)*/|("(\\.|[^"\\])*"|'(\\.|[^'\\])*'|.[^/"'\\]*)#$2#gs;
 
-	while ($src =~ /\benum\s*([\w_]*)\s*\{\s([^}]+)\}/gsc) {
+	while ($src =~ m/\benum\s*([\w_]*)\s*\{\s([^}]+)\}/gsc) {
 	    my ($enum_name, $enum_body) = ($1, $2);
             # skip enums matching $opt_e
-            next if $opt_e && $enum_name =~ /$opt_e/;
+            next if $opt_e && $enum_name =~ m/$opt_e/;
             my $val = 0;
             for my $item (split /,/, $enum_body) {
-                next if $item =~ /\A\s*\Z/;
-                my ($key, $declared_val) = $item =~ /(\w+)\s*(?:=\s*(.*))?/;
+                next if $item =~ m/\A\s*\Z/;
+                my ($key, $declared_val) = $item =~ m/(\w+)\s*(?:=\s*(.*))?/;
                 $val = defined($declared_val) && length($declared_val) ? $declared_val : 1 + $val;
                 $seen_define{$key} = $val;
                 $const_names{$key}++;
@@ -904,7 +904,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
       my $c;
       my $filter;
 
-      if ($fullpath{$filename} =~ /,/) {
+      if ($fullpath{$filename} =~ m/,/) {
 	$filename = $`;
 	$filter = $';
       }
@@ -957,7 +957,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
     if ($fmask) {
       my @good;
       for my $i (0..$#$fdecls_parsed) {
-	next unless $fdecls_parsed->[$i][1] =~ /$fmask/; # [1] is NAME
+	next unless $fdecls_parsed->[$i][1] =~ m/$fmask/; # [1] is NAME
 	push @good, $i;
 	print "... Function $fdecls_parsed->[$i][1] passes -M mask.\n"
 	  if $opt_d;
@@ -1312,7 +1312,7 @@ sub td_is_pointer {
   my $out = $pointer_typedefs{$type};
   return $out if defined $out;
   my $otype = $type;
-  $out = ($type =~ /\*$/);
+  $out = ($type =~ m/\*$/);
   # This converts only the guys which do not have trailing part in the typedef
   if (not $out
       and $typedef_rex and $type =~ s/($typedef_rex)/$typedefs_pre{$1}/go) {
@@ -1329,7 +1329,7 @@ sub td_is_struct {
   my $out = $struct_typedefs{$type};
   return $out if defined $out;
   my $otype = $type;
-  $out = ($type =~ /^(struct|union)\b/) && !td_is_pointer($type);
+  $out = ($type =~ m/^(struct|union)\b/) && !td_is_pointer($type);
   # This converts only the guys which do not have trailing part in the typedef
   if (not $out
       and $typedef_rex and $type =~ s/($typedef_rex)/$typedefs_pre{$1}/go) {
@@ -1505,7 +1505,7 @@ END
 
 sub print_accessors {
   my($fh, $name, $struct) = @_;
-  return unless defined $struct && $name !~ /\s|_ANON/;
+  return unless defined $struct && $name !~ m/\s|_ANON/;
   $name = normalize_type($name);
   my $ptrname = normalize_type("$name *");
   print $fh <<"EOF";
@@ -1545,7 +1545,7 @@ EOF
   my @items = @$struct;
   while (@items) {
     my $item = shift @items;
-    if ($item->[0] =~ /_ANON/) {
+    if ($item->[0] =~ m/_ANON/) {
       if (defined $item->[2]) {
 	push @items, map [
 	  @$_[0, 1], "$item->[2]_$_->[2]", "$item->[2].$_->[2]",
@@ -1578,14 +1578,14 @@ EOF
 
 sub accessor_docs {
   my($name, $struct) = @_;
-  return unless defined $struct && $name !~ /\s|_ANON/;
+  return unless defined $struct && $name !~ m/\s|_ANON/;
   $name = normalize_type($name);
   my $ptrname = $name . 'Ptr';
   my @items = @$struct;
   my @list;
   while (@items) {
     my $item = shift @items;
-    if ($item->[0] =~ /_ANON/) {
+    if ($item->[0] =~ m/_ANON/) {
       if (defined $item->[2]) {
 	push @items, map [
 	  @$_[0, 1], "$item->[2]_$_->[2]", "$item->[2].$_->[2]",
@@ -1663,15 +1663,15 @@ sub get_typemap {
       or warn ("Warning: could not open typemap file '$typemap': $!\n"), next;
     my $mode = 'Typemap';
     while ( ~< *TYPEMAP) {
-      next if /^\s*\#/;
-      if (/^INPUT\s*$/)   { $mode = 'Input'; next; }
-      elsif (/^OUTPUT\s*$/)  { $mode = 'Output'; next; }
-      elsif (/^TYPEMAP\s*$/) { $mode = 'Typemap'; next; }
+      next if m/^\s*\#/;
+      if (m/^INPUT\s*$/)   { $mode = 'Input'; next; }
+      elsif (m/^OUTPUT\s*$/)  { $mode = 'Output'; next; }
+      elsif (m/^TYPEMAP\s*$/) { $mode = 'Typemap'; next; }
       elsif ($mode eq 'Typemap') {
-	next if /^\s*($|\#)/ ;
+	next if m/^\s*($|\#)/ ;
 	my ($type, $image);
 	if ( ($type, $image) =
-	     /^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/o
+	     m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/o
 	     # This may reference undefined functions:
 	     and not ($image eq 'T_PACKED' and $typemap eq $stdtypemap)) {
 	  $typemap{normalize_type($type)} = $image;
@@ -1716,7 +1716,7 @@ sub assign_typemap_entry {
   my $type = shift;
   my $otype = $type;
   my $entry;
-  if ($tmask and $type =~ /$tmask/) {
+  if ($tmask and $type =~ m/$tmask/) {
     print "Type $type matches -o mask\n" if $opt_d;
     $entry = (td_is_struct($type) ? "T_OPAQUE_STRUCT" : "T_PTROBJ");
   }
@@ -1726,7 +1726,7 @@ sub assign_typemap_entry {
     $entry = assign_typemap_entry($type);
   }
   # XXX good do better if our UV happens to be long long
-  return "T_NV" if $type =~ /^(unsigned\s+)?long\s+(long|double)\z/;
+  return "T_NV" if $type =~ m/^(unsigned\s+)?long\s+(long|double)\z/;
   $entry ||= $typemap{$otype}
     || (td_is_struct($type) ? "T_OPAQUE_STRUCT" : "T_PTROBJ");
   $typemap{$otype} = $entry;
@@ -2057,7 +2057,7 @@ unless ($opt_C) {
   warn "Writing $ext$modpname/Changes\n";
   $" = ' ';
   open(EX, ">Changes") || die "Can't create $ext$modpname/Changes: $!\n";
-  @ARGS = map {/[\s\"\'\`\$*?^|&<>\[\]\{\}\(\)]/ ? "'$_'" : $_} @ARGS;
+  @ARGS = map {m/[\s\"\'\`\$*?^|&<>\[\]\{\}\(\)]/ ? "'$_'" : $_} @ARGS;
   print EX <<EOP;
 Revision history for Perl extension $module.
 

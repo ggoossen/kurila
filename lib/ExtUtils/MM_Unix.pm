@@ -34,7 +34,7 @@ BEGIN {
     $Is_SunOS4  = $^O eq 'sunos';
     $Is_Solaris = $^O eq 'solaris';
     $Is_SunOS   = $Is_SunOS4 || $Is_Solaris;
-    $Is_BSD     = $^O =~ /^(?:(?:free|net|open)bsd|bsdos|interix|dragonfly)$/;
+    $Is_BSD     = $^O =~ m/^(?:(?:free|net|open)bsd|bsdos|interix|dragonfly)$/;
 }
 
 BEGIN {
@@ -194,14 +194,14 @@ sub cflags {
 		DM =>  '-DDEBUGGING -DEMBED -DMULTIPLICITY',
 		);
 
-    if ($libperl =~ /libperl(\w*)\Q$self->{LIB_EXT}/){
+    if ($libperl =~ m/libperl(\w*)\Q$self->{LIB_EXT}/){
 	$uc = uc($1);
     } else {
 	$uc = ""; # avoid warning
     }
     $perltype = $map{$uc} ? $map{$uc} : "";
 
-    if ($uc =~ /^D/) {
+    if ($uc =~ m/^D/) {
 	$optdebug = "-g";
     }
 
@@ -226,7 +226,7 @@ sub cflags {
 	my($line);
 	foreach $line (@o){
 	    chomp $line;
-	    if ($line =~ /(.*?)=\s*(.*)\s*$/){
+	    if ($line =~ m/(.*?)=\s*(.*)\s*$/){
 		$cflags{$1} = $2;
 		print STDOUT "	$1 = $2\n" if $Verbose;
 	    } else {
@@ -253,7 +253,7 @@ sub cflags {
 
     my $pollute = '';
     if ($Config{usemymalloc} and not $Config{bincompat5005}
-	and not $Config{ccflags} =~ /-DPERL_POLLUTE_MALLOC\b/
+	and not $Config{ccflags} =~ m/-DPERL_POLLUTE_MALLOC\b/
 	and $self->{PERL_MALLOC_OK}) {
 	$pollute = '$(PERL_MALLOC_DEF)';
     }
@@ -929,9 +929,9 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 	# to link against the shared libperl library on shared perl
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
 	# or -R to add paths to the run-time library search path.
-        if ($Config{'lddlflags'} =~ /-Wl,-R/) {
+        if ($Config{'lddlflags'} =~ m/-Wl,-R/) {
             $libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -Wl,-R$(PERL_ARCHLIB)/CORE -lperl';
-        } elsif ($Config{'lddlflags'} =~ /-R/) {
+        } elsif ($Config{'lddlflags'} =~ m/-R/) {
             $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -R$(PERL_ARCHLIB)/CORE -lperl';
         }
     }
@@ -1043,7 +1043,7 @@ WARNING
                 open STDERR, '>&STDERR_COPY' if $stderr_duped;
             }
 
-            if ($val =~ /^VER_OK/m) {
+            if ($val =~ m/^VER_OK/m) {
                 print "Using PERL=$abs\n" if $trace;
                 return $abs;
             } elsif ($trace +>= 2) {
@@ -1067,7 +1067,7 @@ Inserts the sharpbang or equivalent magic number to a set of @files.
 sub fixin {    # stolen from the pink Camel book, more or less
     my ( $self, @files ) = @_;
 
-    my ($does_shbang) = $Config{'sharpbang'} =~ /^\s*\#\!/;
+    my ($does_shbang) = $Config{'sharpbang'} =~ m/^\s*\#\!/;
     for my $file (@files) {
         my $file_new = "$file.new";
         my $file_bak = "$file.bak";
@@ -1170,7 +1170,7 @@ sub _rename {
     my($old, $new) = @_;
 
     foreach my $file ($old, $new) {
-        if( $Is_VMS and basename($file) !~ /\./ ) {
+        if( $Is_VMS and basename($file) !~ m/\./ ) {
             # rename() in 5.8.0 on VMS will not rename a file if it
             # does not contain a dot yet it returns success.
             $file = "$file.";
@@ -1257,35 +1257,35 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     @ignore{map lc, keys %ignore} = values %ignore if $Is_VMS;
 
     foreach $name ($self->lsdir($Curdir)){
-	next if $name =~ /\#/;
+	next if $name =~ m/\#/;
 	next if $name eq $Curdir or $name eq $Updir or $ignore{$name};
 	next unless $self->libscan($name);
 	if (-d $name){
 	    next if -l $name; # We do not support symlinks at all
             next if $self->{NORECURS};
 	    $dir{$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
-	} elsif ($name =~ /\.xs\z/){
+	} elsif ($name =~ m/\.xs\z/){
 	    my($c); ($c = $name) =~ s/\.xs\z/.c/;
 	    $xs{$name} = $c;
 	    $c{$c} = 1;
-	} elsif ($name =~ /\.c(pp|xx|c)?\z/i){  # .c .C .cpp .cxx .cc
+	} elsif ($name =~ m/\.c(pp|xx|c)?\z/i){  # .c .C .cpp .cxx .cc
 	    $c{$name} = 1
 		unless $name =~ m/perlmain\.c/; # See MAP_TARGET
-	} elsif ($name =~ /\.h\z/i){
+	} elsif ($name =~ m/\.h\z/i){
 	    $h{$name} = 1;
-	} elsif ($name =~ /\.PL\z/) {
+	} elsif ($name =~ m/\.PL\z/) {
 	    ($pl_files{$name} = $name) =~ s/\.PL\z// ;
-	} elsif (($Is_VMS || $Is_Dos) && $name =~ /[._]pl$/i) {
+	} elsif (($Is_VMS || $Is_Dos) && $name =~ m/[._]pl$/i) {
 	    # case-insensitive filesystem, one dot per name, so foo.h.PL
 	    # under Unix appears as foo.h_pl under VMS or fooh.pl on Dos
 	    local($/); open(PL,$name); my $txt = ~< *PL; close PL;
-	    if ($txt =~ /Extracting \S+ \(with variable substitutions/) {
+	    if ($txt =~ m/Extracting \S+ \(with variable substitutions/) {
 		($pl_files{$name} = $name) =~ s/[._]pl\z//i ;
 	    }
 	    else { 
                 $pm{$name} = $self->catfile($self->{INST_LIBDIR},$name); 
             }
-	} elsif ($name =~ /\.(p[ml]|pod)\z/){
+	} elsif ($name =~ m/\.(p[ml]|pod)\z/){
 	    $pm{$name} = $self->catfile($self->{INST_LIBDIR},$name);
 	}
     }
@@ -1315,7 +1315,7 @@ sub init_MANPODS {
     # Set up names of manual pages to generate from pods
     foreach my $man (qw(MAN1 MAN3)) {
 	if ( $self->{"${man}PODS"}
-             or $self->{"INSTALL${man}DIR"} =~ /^(none|\s*)$/
+             or $self->{"INSTALL${man}DIR"} =~ m/^(none|\s*)$/
         ) {
             $self->{"${man}PODS"} ||= {};
         }
@@ -1334,7 +1334,7 @@ sub _has_pod {
     my($ispod)=0;
     if (open(FH,"<$file")) {
 	while ( ~< *FH) {
-	    if (/^=(?:head\d+|item|pod)\b/) {
+	    if (m/^=(?:head\d+|item|pod)\b/) {
 		$ispod=1;
 		last;
 	    }
@@ -1383,9 +1383,9 @@ sub init_MAN3PODS {
                          # we have to convert to pod
 
     foreach my $name (keys %{$self->{PM}}) {
-	if ($name =~ /\.pod\z/ ) {
+	if ($name =~ m/\.pod\z/ ) {
 	    $manifypods{$name} = $self->{PM}{$name};
-	} elsif ($name =~ /\.p[ml]\z/ ) {
+	} elsif ($name =~ m/\.p[ml]\z/ ) {
 	    if( $self->_has_pod($name) ) {
 		$manifypods{$name} = $self->{PM}{$name};
 	    }
@@ -1398,7 +1398,7 @@ sub init_MAN3PODS {
     # To force inclusion, just name it "Configure.pod", or override 
     # MAN3PODS
     foreach my $name (keys %manifypods) {
-	if ($self->{PERL_CORE} and $name =~ /(config|setup).*\.pm/is) {
+	if ($self->{PERL_CORE} and $name =~ m/(config|setup).*\.pm/is) {
 	    delete $manifypods{$name};
 	    next;
 	}
@@ -1490,9 +1490,9 @@ sub init_PM {
                 }
                 return;
             }
-            return if /\#/;
-            return if /~$/;    # emacs temp files
-            return if /,v$/;   # RCS files
+            return if m/\#/;
+            return if m/~$/;    # emacs temp files
+            return if m/,v$/;   # RCS files
 
 	    my $path   = $File::Find::name;
             my $prefix = $self->{INST_LIBDIR};
@@ -2288,7 +2288,7 @@ sub lsdir {
     $dh->open($dir || ".") or return ();
     @ls = $dh->read;
     $dh->close;
-    @ls = grep(/$regex/, @ls) if $regex;
+    @ls = grep(m/$regex/, @ls) if $regex;
     @ls;
 }
 
@@ -2347,7 +2347,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=};
 
 	foreach (@ARGV){
-		if( /\s/ ){
+		if( m/\s/ ){
 			s/=(.*)/='$1'/;
 		}
 		push @m, " \\\n\t\t$_";
@@ -2440,7 +2440,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     $extra = [] unless $extra && ref $extra eq 'ARRAY';
     for (sort keys %static) {
-	next unless /\Q$self->{LIB_EXT}\E\z/;
+	next unless m/\Q$self->{LIB_EXT}\E\z/;
 	$_ = dirname($_) . "/extralibs.ld";
 	push @$extra, $_;
     }
@@ -2623,7 +2623,7 @@ sub needs_linking {
     my($child,$caller);
     $caller = (caller(0))[3];
     confess("needs_linking called too early") if 
-      $caller =~ /^ExtUtils::MakeMaker::/;
+      $caller =~ m/^ExtUtils::MakeMaker::/;
     return $self->{NEEDS_LINKING} if defined $self->{NEEDS_LINKING};
     if ($self->has_link_code or $self->{MAKEAPERL}){
 	$self->{NEEDS_LINKING} = 1;
@@ -2671,10 +2671,10 @@ sub parse_abstract {
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
     while ( ~< *FH) {
-        $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
+        $inpod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $inpod;
         next if !$inpod;
         chop;
-        next unless /^($package\s-\s)(.*)/;
+        next unless m/^($package\s-\s)(.*)/;
         $result = $2;
         last;
     }
@@ -2706,10 +2706,10 @@ sub parse_version {
     open(FH,$parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     while ( ~< *FH) {
-	$inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
-	next if $inpod || /^\s*#/;
+	$inpod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $inpod;
+	next if $inpod || m/^\s*#/;
 	chop;
-	next unless /(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
+	next unless m/(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
 	my $eval = qq{
 	    package ExtUtils::MakeMaker::_version;
 	    no strict;
@@ -3588,7 +3588,7 @@ sub tool_xsubpp {
     if ($Is_VMS                          &&
         $Config{'ldflags'}               && 
         $Config{'ldflags'} =~ m!/Debug!i &&
-        (!exists($self->{XSOPT}) || $self->{XSOPT} !~ /linenumbers/)
+        (!exists($self->{XSOPT}) || $self->{XSOPT} !~ m/linenumbers/)
        ) 
     {
         unshift(@tmargs,'-nolinenumbers');

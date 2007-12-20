@@ -3,7 +3,7 @@
 my $perl;
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	$perl = './perl';
 	chdir 't' if -d 't';
 	@INC = '../lib';
@@ -19,10 +19,10 @@ BEGIN {
     my $can_fork = $Config{d_fork} ||
 		    (($^O eq 'MSWin32' || $^O eq 'NetWare') and
 		     $Config{useithreads} and 
-		     $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/
+		     $Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
 		    );
     my $reason;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
 	$reason = 'IO extension unavailable';
     }
     elsif (!$can_fork) {

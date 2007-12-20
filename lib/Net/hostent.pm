@@ -52,7 +52,7 @@ sub gethostbyaddr ($;$) {
 } 
 
 sub gethost($) {
-    if ($_[0] =~ /^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
+    if ($_[0] =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
 	require Socket;
 	&gethostbyaddr(Socket::inet_aton(shift));
     } else {

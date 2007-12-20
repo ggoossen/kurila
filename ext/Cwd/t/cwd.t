@@ -75,7 +75,7 @@ SKIP: {
     print "# native pwd = '$pwd_cmd'\n";
 
     local @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)};
-    my ($pwd_cmd_untainted) = $pwd_cmd =~ /^(.+)$/; # Untaint.
+    my ($pwd_cmd_untainted) = $pwd_cmd =~ m/^(.+)$/; # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`);
 
     # Win32's cd returns native C:\ style

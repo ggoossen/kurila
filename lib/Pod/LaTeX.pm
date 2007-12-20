@@ -569,7 +569,7 @@ sub Head1Level {
    my $self = shift;
    if (@_) {
      my $arg = shift;
-     if ($arg =~ /^\d$/ && $arg +<= $#LatexSections) {
+     if ($arg =~ m/^\d$/ && $arg +<= $#LatexSections) {
        $self->{Head1Level} = $arg;
      } else {
        carp "Head1Level supplied ($arg) must be integer in range 0 to ".$#LatexSections . "- Ignoring\n";
@@ -1051,7 +1051,7 @@ sub command {
   } elsif ($command eq 'begin') {
 
     # pass through if latex
-    if ($paragraph =~ /^latex/i) {
+    if ($paragraph =~ m/^latex/i) {
       # Make sure that subsequent paragraphs are not modfied before printing
       $self->{_dont_modify_any_para} = 1;
 
@@ -1077,7 +1077,7 @@ sub command {
 
     # If we have got some latex code print it out immediately
     # unmodified. Else do nothing.
-    if ($format =~ /^latex/i) {
+    if ($format =~ m/^latex/i) {
       # Make sure that next paragraph is not modfied before printing
       $self->_output( $chunk );
 
@@ -1116,7 +1116,7 @@ sub verbatim {
 
   } else {
 
-    return if $paragraph =~ /^\s+$/;
+    return if $paragraph =~ m/^\s+$/;
 
     # Clean trailing space
     $paragraph =~ s/\s+$//;
@@ -1177,7 +1177,7 @@ sub textblock {
   # Need to make sure this is called only on the first paragraph
   # following 'head1 NAME' and not on subsequent paragraphs that may be
   # present.
-  if ($self->{_CURRENT_HEAD1} =~ /^NAME/i && $self->ReplaceNAMEwithSection()) {
+  if ($self->{_CURRENT_HEAD1} =~ m/^NAME/i && $self->ReplaceNAMEwithSection()) {
 
     # Strip white space from start and end
     $paragraph =~ s/^\s+//;
@@ -1234,7 +1234,7 @@ sub interior_sequence {
   } elsif ($seq_command eq 'E') {
 
     # If it is simply a number
-    if ($seq_argument =~ /^\d+$/) {
+    if ($seq_argument =~ m/^\d+$/) {
       return chr($seq_argument);
     # Look up escape in hash table
     } elsif (exists $HTML_Escapes{$seq_argument}) {
@@ -1432,7 +1432,7 @@ sub add_item {
     my $type;
     if (substr($paragraph, 0,1) eq '*') {
       $type = 'itemize';
-    } elsif ($paragraph =~ /^\d/) {
+    } elsif ($paragraph =~ m/^\d/) {
       $type = 'enumerate';
     } else {
       $type = 'description';
@@ -1504,7 +1504,7 @@ sub head {
   # If we are replace 'head1 NAME' with a section
   # we return immediately if we get it
   return 
-    if ($self->{_CURRENT_HEAD1} =~ /^NAME/i && $self->ReplaceNAMEwithSection());
+    if ($self->{_CURRENT_HEAD1} =~ m/^NAME/i && $self->ReplaceNAMEwithSection());
 
   # Create a label
   my $label = $self->_create_label($paragraph);
@@ -1798,11 +1798,11 @@ sub _split_delimited {
   $input .= ' ';
   foreach ( split ( //, $input ) ) {
     $token .= $_;
-    if (/\{/) {
+    if (m/\{/) {
       $depth++;
-    } elsif ( /}/ ) {
+    } elsif ( m/}/ ) {
       $depth--;
-    } elsif ( / / and $depth == 0) {
+    } elsif ( m/ / and $depth == 0) {
       push @output, $token if ( $token and $token ne ' ' );
       $token = '';
     }

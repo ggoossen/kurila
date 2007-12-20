@@ -294,7 +294,7 @@ sub expected_tests {
 
     if( @_ ) {
         $self->croak("Number of tests must be a positive integer.  You gave it '$max'")
-          unless $max =~ /^\+?\d+$/ and $max +> 0;
+          unless $max =~ m/^\+?\d+$/ and $max +> 0;
 
         $self->{Expected_Tests} = $max;
         $self->{Have_Plan}      = 1;
@@ -395,7 +395,7 @@ sub ok {
     # In case $name is a string overloaded object, force it to stringify.
     $self->_unoverload_str(\$name);
 
-    $self->diag(<<ERR) if defined $name and $name =~ /^[\d\s]+$/;
+    $self->diag(<<ERR) if defined $name and $name =~ m/^[\d\s]+$/;
     You named your test '$name'.  You shouldn't use numbers for your test names.
     Very confusing.
 ERR
@@ -714,7 +714,7 @@ $code" . "\$got $type \$expect;";
     my $ok = $self->ok($test, $name);
 
     unless( $ok ) {
-        if( $type =~ /^(eq|==)$/ ) {
+        if( $type =~ m/^(eq|==)$/ ) {
             $self->_is_diag($got, $type, $expect);
         }
         else {
@@ -1203,7 +1203,7 @@ sub diag {
     $msg =~ s/^/# /gm;
 
     # Stick a newline on the end if it needs it.
-    $msg .= "\n" unless $msg =~ /\n\Z/;
+    $msg .= "\n" unless $msg =~ m/\n\Z/;
 
     local $Level = $Level + 1;
     $self->_print_diag($msg);
@@ -1240,7 +1240,7 @@ sub _print {
     $msg =~ s/\n(.)/\n# $1/sg;
 
     # Stick a newline on the end if it needs it.
-    $msg .= "\n" unless $msg =~ /\n\Z/;
+    $msg .= "\n" unless $msg =~ m/\n\Z/;
 
     print $fh $msg;
 }
@@ -1677,7 +1677,7 @@ $SIG{__DIE__} = sub {
     # 5.004!
     my $in_eval = 0;
     for( my $stack = 1;  my $sub = (CORE::caller($stack))[3];  $stack++ ) {
-        $in_eval = 1 if $sub =~ /^\(eval\)/;
+        $in_eval = 1 if $sub =~ m/^\(eval\)/;
     }
     $Test->{Test_Died} = 1 unless $in_eval;
 };

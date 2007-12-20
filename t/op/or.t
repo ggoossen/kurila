@@ -35,7 +35,7 @@ $c = $a || $b;
 is($c, $a_str);
 is($c+0, $a_num);   # force numeric context.
 
-$a =~ /./g or die "Match failed for some reason"; # Make $a magic
+$a =~ m/./g or die "Match failed for some reason"; # Make $a magic
 
 $c = $a || $b;
 

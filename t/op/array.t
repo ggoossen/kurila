@@ -49,13 +49,13 @@ $r = join(',', $#bar, @bar);
 is($r, "2,0,,2");
 
 $foo = 'now is the time';
-ok(scalar (($F1,$F2,$Etc) = ($foo =~ /^(\S+)\s+(\S+)\s*(.*)/)));
+ok(scalar (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/)));
 is($F1, 'now');
 is($F2, 'is');
 is($Etc, 'the time');
 
 $foo = 'lskjdf';
-ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ /^(\S+)\s+(\S+)\s*(.*)/))))
+ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
    or diag("$cnt $F1:$F2:$Etc");
 
 %foo = ('blurfl','dyick','foo','bar','etc.','etc.');
@@ -70,10 +70,10 @@ is($bar{'how'}, 'now');
 is($bar{'foo'}, 'bar');
 is($bar{'how'}, 'now');
 
-@foo = grep(/e/,split(' ','now is the time for all good men to come to'));
+@foo = grep(m/e/,split(' ','now is the time for all good men to come to'));
 is(join(' ',@foo), 'the time men come');
 
-@foo = grep(!/e/,split(' ','now is the time for all good men to come to'));
+@foo = grep(!m/e/,split(' ','now is the time for all good men to come to'));
 is(join(' ',@foo), 'now is for all good to to');
 
 $foo = join('',('a','b','c','d','e','f')[0..5]);

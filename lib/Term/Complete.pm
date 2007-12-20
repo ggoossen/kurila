@@ -91,7 +91,7 @@ sub Complete {
     $r      = 0;
 
     $prompt = shift;
-    if (ref $_[0] || $_[0] =~ /^\*/) {
+    if (ref $_[0] || $_[0] =~ m/^\*/) {
 	@cmp_lst = sort @{$_[0]};
     }
     else {
@@ -118,7 +118,7 @@ sub Complete {
             CASE: {
                 # (TAB) attempt completion
                 $_ eq "\t" && do {
-                    @match = grep(/^\Q$return/, @cmp_lst);
+                    @match = grep(m/^\Q$return/, @cmp_lst);
                     unless ($#match +< 0) {
                         $l = length($test = shift(@match));
                         foreach $cmp (@match) {
@@ -135,7 +135,7 @@ sub Complete {
 
                 # (^D) completion list
                 $_ eq $complete && do {
-                    print(join("\r\n", '', grep(/^\Q$return/, @cmp_lst)), "\r\n");
+                    print(join("\r\n", '', grep(m/^\Q$return/, @cmp_lst)), "\r\n");
                     redo LOOP;
                 };
 

@@ -29,7 +29,7 @@ my %skip;
 
 my @wanted;
 find(
-     sub { /\.pm$/ &&
+     sub { m/\.pm$/ &&
 	       ! exists $skip{$File::Find::name}
 	       &&
 	       do { my $file2 =

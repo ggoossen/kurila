@@ -23,7 +23,7 @@ my $Is_OS2     = $^O eq 'os2';
 my $Is_Solaris = $^O eq 'solaris';
 my $Is_VMS     = $^O eq 'VMS';
 my $Is_DGUX    = $^O eq 'dgux';
-my $Is_MPRAS   = $^O =~ /svr4/ && -f '/etc/.relid';
+my $Is_MPRAS   = $^O =~ m/svr4/ && -f '/etc/.relid';
 my $Is_Rhapsody= $^O eq 'rhapsody';
 
 my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
@@ -78,7 +78,7 @@ sleep 2;
 SKIP: {
     unlink $tmpfile_link;
     my $lnk_result = eval { link $tmpfile, $tmpfile_link };
-    skip "link() unimplemented", 6 if $@ =~ /unimplemented/;
+    skip "link() unimplemented", 6 if $@ =~ m/unimplemented/;
 
     is( $@, '',         'link() implemented' );
     ok( $lnk_result,    'linked tmp testfile' );
@@ -89,7 +89,7 @@ SKIP: {
     SKIP: {
         skip "No link count", 1 if $Config{dont_use_nlink};
         skip "Cygwin9X fakes hard links by copying", 1
-          if $Config{myuname} =~ /^cygwin_(?:9\d|me)\b/i;
+          if $Config{myuname} =~ m/^cygwin_(?:9\d|me)\b/i;
 
         is($nlink, 2,     'Link count on hard linked file' );
     }
@@ -198,7 +198,7 @@ ok(! -f $Curdir,          '!-f cwd' );
 SKIP: {
     unlink($tmpfile_link);
     my $symlink_rslt = eval { symlink $tmpfile, $tmpfile_link };
-    skip "symlink not implemented", 3 if $@ =~ /unimplemented/;
+    skip "symlink not implemented", 3 if $@ =~ m/unimplemented/;
 
     is( $@, '',     'symlink() implemented' );
     ok( $symlink_rslt,      'symlink() ok' );
@@ -368,7 +368,7 @@ ok(! -T $Perl,    '!-T');
 open(FOO,$statfile);
 SKIP: {
     eval { -T *FOO; };
-    skip "-T/B on filehandle not implemented", 15 if $@ =~ /not implemented/;
+    skip "-T/B on filehandle not implemented", 15 if $@ =~ m/not implemented/;
 
     is( $@, '',     '-T on filehandle causes no errors' );
 

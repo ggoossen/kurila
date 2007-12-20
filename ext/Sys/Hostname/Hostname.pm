@@ -45,7 +45,7 @@ sub hostname {
 
     # method 4 - does hostname happen to work?
     my($rslt) = `hostname`;
-    if ($rslt !~ /IVVERB/) { ($host) = $rslt =~ /^(\S+)/; }
+    if ($rslt !~ m/IVVERB/) { ($host) = $rslt =~ m/^(\S+)/; }
     return $host if $host;
 
     # rats!

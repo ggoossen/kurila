@@ -42,7 +42,7 @@ while ( ~< *F) { $O .= $_; }
 close F;
 unlink "fails";
 
-ok join(' ', map { m/(\d+)/; $1 } grep /^not ok/, split /\n+/, $O),
+ok join(' ', map { m/(\d+)/; $1 } grep m/^not ok/, split /\n+/, $O),
     join(' ', 1..13);
 
 my @got = split /not ok \d+\n/, $O;

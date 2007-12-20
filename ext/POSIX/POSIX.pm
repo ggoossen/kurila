@@ -981,7 +981,7 @@ sub _getsig {
     my $rtsig = $_[0];
     # Allow (SIGRT)?MIN( + n)?, a common idiom when doing these things in C.
     $rtsig = $_SIGRTMIN + ($1 || 0)
-	if $rtsig =~ /^(?:(?:SIG)?RT)?MIN(\s*\+\s*(\d+))?$/;
+	if $rtsig =~ m/^(?:(?:SIG)?RT)?MIN(\s*\+\s*(\d+))?$/;
     return $rtsig;
 }
 

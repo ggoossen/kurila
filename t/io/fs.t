@@ -49,7 +49,7 @@ my $needs_fh_reopen =
 $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 
 my $skip_mode_checks =
-    $^O eq 'cygwin' && $ENV{CYGWIN} !~ /ntsec/;
+    $^O eq 'cygwin' && $ENV{CYGWIN} !~ m/ntsec/;
 
 plan tests => 51;
 
@@ -257,7 +257,7 @@ sub check_utime_result {
 	    pass('mtime');
 	}
 	else {
-	    if ($^O =~ /\blinux\b/i) {
+	    if ($^O =~ m/\blinux\b/i) {
 		print "# Maybe stat() cannot get the correct atime, ".
 		    "as happens via NFS on linux?\n";
 		$foo = (utime 400000000,500000000 + 2*$delta,'b');
@@ -315,7 +315,7 @@ SKIP: {
     skip "Win32/Netware specific test", 2
       unless ($^O eq 'MSWin32') || ($^O eq 'NetWare');
     skip "No symbolic links found to test with", 2
-      unless  `ls -l perl 2>nul` =~ /^l.*->/;
+      unless  `ls -l perl 2>nul` =~ m/^l.*->/;
 
     system("cp TEST TEST$$");
     # we have to copy because e.g. GNU grep gets huffy if we have
@@ -415,7 +415,7 @@ SKIP: {
 # check if rename() can be used to just change case of filename
 SKIP: {
     skip "Works in Cygwin only if check_case is set to relaxed", 1
-      if ($ENV{'CYGWIN'} && ($ENV{'CYGWIN'} =~ /check_case:(?:adjust|strict)/));
+      if ($ENV{'CYGWIN'} && ($ENV{'CYGWIN'} =~ m/check_case:(?:adjust|strict)/));
 
     chdir './tmp';
     open(FH,'>x') || die "Can't create x";

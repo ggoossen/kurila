@@ -17,15 +17,15 @@ $VERSION    = "1.19";
 $VERSION   = eval $VERSION;
 
 sub export_fail {
-  if (grep { /^(weaken|isweak)$/ } @_ ) {
+  if (grep { m/^(weaken|isweak)$/ } @_ ) {
     require Carp;
     Carp::croak("Weak references are not implemented in the version of perl");
   }
-  if (grep { /^(isvstring)$/ } @_ ) {
+  if (grep { m/^(isvstring)$/ } @_ ) {
     require Carp;
     Carp::croak("Vstrings are not implemented in the version of perl");
   }
-  if (grep { /^(dualvar|set_prototype)$/ } @_ ) {
+  if (grep { m/^(dualvar|set_prototype)$/ } @_ ) {
     require Carp;
     Carp::croak("$1 is only avaliable with the XS version");
   }

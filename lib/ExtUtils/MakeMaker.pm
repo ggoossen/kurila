@@ -20,7 +20,7 @@ use vars qw($Revision);
 use strict;
 
 $VERSION = v6.36_01;
-($Revision) = q$Revision: 32261 $ =~ /Revision:\s+(\S+)/;
+($Revision) = q$Revision: 32261 $ =~ m/Revision:\s+(\S+)/;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
@@ -369,14 +369,14 @@ sub new {
         $self->{ARGS}{$k} = $self->{$k};
     }
 
-    if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
+    if ("@ARGV" =~ m/\bPREREQ_PRINT\b/) {
         require Data::Dumper;
         print Data::Dumper->Dump([$self->{PREREQ_PM}], [qw(PREREQ_PM)]);
         exit 0;
     }
 
     # PRINT_PREREQ is RedHatism.
-    if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
+    if ("@ARGV" =~ m/\bPRINT_PREREQ\b/) {
         print join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{$_} " } 
                         sort keys %{$self->{PREREQ_PM}}), "\n";
         exit 0;
@@ -431,7 +431,7 @@ sub new {
     }
 
     # This is for old Makefiles written pre 5.00, will go away
-    if ( Carp::longmess("") =~ /runsubdirpl/s ){
+    if ( Carp::longmess("") =~ m/runsubdirpl/s ){
         Carp::carp("WARNING: Please rerun 'perl Makefile.PL' to regenerate your Makefiles\n");
     }
 
@@ -459,7 +459,7 @@ sub new {
 
             $self->{$key} = $self->{PARENT}{$key};
 
-            unless ($Is_VMS && $key =~ /PERL$/) {
+            unless ($Is_VMS && $key =~ m/PERL$/) {
                 $self->{$key} = $self->catdir("..",$self->{$key})
                   unless $self->file_name_is_absolute($self->{$key});
             } else {
@@ -485,7 +485,7 @@ sub new {
                     }
             }
         }
-        my @fm = grep /^FIRST_MAKEFILE=/, @ARGV;
+        my @fm = grep m/^FIRST_MAKEFILE=/, @ARGV;
         parse_args($self,@fm) if @fm;
     } else {
         parse_args($self,split(' ', $ENV{PERL_MM_OPT} || ''),@ARGV);
@@ -815,7 +815,7 @@ sub mv_all_methods {
 
     local $SIG{__WARN__} = sub { 
         # can't use 'no warnings redefined', 5.6 only
-        warn @_ unless $_[0] =~ /^Subroutine .* redefined/ 
+        warn @_ unless $_[0] =~ m/^Subroutine .* redefined/ 
     };
     foreach my $method (@Overridable) {
 
@@ -986,7 +986,7 @@ sub selfdocument {
     if ($Verbose){
         push @m, "\n# Full list of MakeMaker attribute values:";
         foreach my $key (sort keys %$self){
-            next if $key eq 'RESULT' || $key =~ /^[A-Z][a-z]/;
+            next if $key eq 'RESULT' || $key =~ m/^[A-Z][a-z]/;
             my($v) = neatvalue($self->{$key});
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
             $v =~ tr/\n/ /s;

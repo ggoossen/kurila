@@ -11,7 +11,7 @@ BEGIN {
     }
     # skip all tests unless perl was compiled with -DDEBUGGING
     require Config;
-    if ($Config::Config{'ccflags'} !~ /-DDEBUGGING /) {
+    if ($Config::Config{'ccflags'} !~ m/-DDEBUGGING /) {
         print "1..0 # Skip -- Perl built w/o -DEBUGGING\n";
         exit 0;
     }

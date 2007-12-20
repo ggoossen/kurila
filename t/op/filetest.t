@@ -31,7 +31,7 @@ SKIP: {
     if (!$Config{d_seteuid}) {
 	skip('no seteuid');
     } 
-    elsif ($Config{config_args} =~/Dmksymlinks/) {
+    elsif ($Config{config_args} =~m/Dmksymlinks/) {
 	skip('we cannot chmod symlinks');
     }
     elsif ($bad_chmod) {

@@ -99,12 +99,12 @@ my %options = (
 # Default is now to first use the native mechanism, so Perl programs 
 # behave like other normal Unix programs, then try other mechanisms.
 my @connectMethods = qw(native tcp udp unix pipe stream console);
-if ($^O =~ /^(freebsd|linux)$/) {
+if ($^O =~ m/^(freebsd|linux)$/) {
     @connectMethods = grep { $_ ne 'udp' } @connectMethods;
 }
 
 # use EventLog on Win32
-my $is_Win32 = $^O =~ /Win32/i;
+my $is_Win32 = $^O =~ m/Win32/i;
 eval "use Sys::Syslog::Win32";
 
 if (not $@) {
@@ -299,18 +299,18 @@ sub syslog {
 
     connect_log() unless $connected;
 
-    if ($mask =~ /%m/) {
+    if ($mask =~ m/%m/) {
         # escape percent signs for sprintf()
         $error =~ s/%/%%/g if @_;
         # replace %m with $error, if preceded by an even number of percent signs
         $mask =~ s/(?<!%)((?:%%)*)%m/$1$error/g;
     }
 
-    $mask .= "\n" unless $mask =~ /\n$/;
+    $mask .= "\n" unless $mask =~ m/\n$/;
     $message = @_ ? sprintf($mask, @_) : $mask;
 
     # See CPAN-RT#24431. Opened on Apple Radar as bug #4944407 on 2007.01.21
-    chomp $message if $^O =~ /darwin/;
+    chomp $message if $^O =~ m/darwin/;
 
     if ($current_proto eq 'native') {
         $buf = $message;
@@ -432,9 +432,9 @@ sub _syslog_send_native {
 # 
 sub xlate {
     my($name) = @_;
-    return $name+0 if $name =~ /^\s*\d+\s*$/;
+    return $name+0 if $name =~ m/^\s*\d+\s*$/;
     $name = uc $name;
-    $name = "LOG_$name" unless $name =~ /^LOG_/;
+    $name = "LOG_$name" unless $name =~ m/^LOG_/;
     $name = "Sys::Syslog::$name";
     # Can't have just eval { &$name } || -1 because some LOG_XXX may be zero.
     my $value = eval { no strict 'refs'; &{*{Symbol::fetch_glob($name)}} };

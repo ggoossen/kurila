@@ -14,7 +14,7 @@ krunch.pm krunch.pmc whap.pm whap.pmc);
 
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
-my $Is_UTF8   = (${^OPEN} || "") =~ /:utf8/;
+my $Is_UTF8   = (${^OPEN} || "") =~ m/:utf8/;
 my $total_tests = 37;
 if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
@@ -61,7 +61,7 @@ $i++;
 
 # run-time failure in require
 do_require "0;\n";
-print "# $@\nnot " unless $@ =~ /did not return a true/;
+print "# $@\nnot " unless $@ =~ m/did not return a true/;
 print "ok ",$i++,"\n";
 
 print "not " if exists $INC{'bleah.pm'};
@@ -86,7 +86,7 @@ for my $expected_compile (1,0) {
 do_require "1)\n";
 # bison says 'parse error' instead of 'syntax error',
 # various yaccs may or may not capitalize 'syntax'.
-print "# $@\nnot " unless $@ =~ /(syntax|parse) error/mi;
+print "# $@\nnot " unless $@ =~ m/(syntax|parse) error/mi;
 print "ok ",$i++,"\n";
 
 # previous failure cached in %INC
@@ -96,7 +96,7 @@ write_file($flag_file, 1);
 write_file('bleah.pm', "unlink '$flag_file'; 1");
 print "# $@\nnot " if eval { require 'bleah.pm' };
 print "ok ",$i++,"\n";
-print "# $@\nnot " unless $@ =~ /Compilation failed/i;
+print "# $@\nnot " unless $@ =~ m/Compilation failed/i;
 print "ok ",$i++,"\n";
 print "not " unless -e $flag_file;
 print "ok ",$i++,"\n";
@@ -141,7 +141,7 @@ $foo = eval  {require bleah}; delete $INC{"bleah.pm"}; ++$::i;
 my $r = "threads";
 eval { require $r };
 $i++;
-if($@ =~ /Can't locate threads in \@INC/) {
+if($@ =~ m/Can't locate threads in \@INC/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";
@@ -151,7 +151,7 @@ if($@ =~ /Can't locate threads in \@INC/) {
 write_file('bleah.pm', qq(die "This is an expected error";\n));
 delete $INC{"bleah.pm"}; ++$::i;
 eval { CORE::require bleah; };
-if ($@ =~ /^This is an expected error/) {
+if ($@ =~ m/^This is an expected error/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";
@@ -176,7 +176,7 @@ EOT
     my $simple = ++$i;
     my $pmc_older = ++$i;
     my $pmc_dies = ++$i;
-    if ($ccflags =~ /(?:^|\s)-DPERL_DISABLE_PMC\b/) {
+    if ($ccflags =~ m/(?:^|\s)-DPERL_DISABLE_PMC\b/) {
 	print "# .pmc files are ignored, so test that\n";
 	write_file_not_thing('krunch.pmc', '.pmc', $pmc_older);
 	write_file('urkkk.pm', qq(print "ok $simple\n"));
@@ -205,7 +205,7 @@ EOT
     require krunch;
     eval {CORE::require whap; 1} and die;
 
-    if ($@ =~ /^This is an expected error/) {
+    if ($@ =~ m/^This is an expected error/) {
 	print "ok $pmc_dies\n";
     } else {
 	print "not ok $pmc_dies\n";

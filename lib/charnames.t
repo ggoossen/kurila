@@ -3,7 +3,7 @@
 my @WARN;
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
 	require './test.pl';
@@ -33,7 +33,7 @@ use charnames ":full";
 "Here: \N{CYRILLIC SMALL LETTER BE}!";
 1
 EOE
-      or $@ !~ /above 0xFF/;
+      or $@ !~ m/above 0xFF/;
   print "ok 2\n";
   # print "# \$res=$res \$\@='$@'\n";
 
@@ -43,7 +43,7 @@ use charnames 'cyrillic';
 "Here: \N{Be}!";
 1
 EOE
-      or $@ !~ /CYRILLIC CAPITAL LETTER BE.*above 0xFF/;
+      or $@ !~ m/CYRILLIC CAPITAL LETTER BE.*above 0xFF/;
   print "ok 3\n";
 }
 
@@ -224,7 +224,7 @@ print "ok 33\n";
     print "not " unless "\N{HORIZONTAL TABULATION}" eq "\t";
     print "ok 34\n";
 
-    print "not " unless grep { /"HORIZONTAL TABULATION" is deprecated/ } @WARN;
+    print "not " unless grep { m/"HORIZONTAL TABULATION" is deprecated/ } @WARN;
     print "ok 35\n";
 
     no warnings 'deprecated';
@@ -232,7 +232,7 @@ print "ok 33\n";
     print "not " unless "\N{VERTICAL TABULATION}" eq "\013";
     print "ok 36\n";
 
-    print "not " if grep { /"VERTICAL TABULATION" is deprecated/ } @WARN;
+    print "not " if grep { m/"VERTICAL TABULATION" is deprecated/ } @WARN;
     print "ok 37\n";
 }
 
@@ -267,7 +267,7 @@ print "ok 42\n";
 print "not " if defined charnames::viacode(0x110000);
 print "ok 45\n";
 
-print "not " if grep { /you asked for U+110000/ } @WARN;
+print "not " if grep { m/you asked for U+110000/ } @WARN;
 print "ok 46\n";
 
 
@@ -316,7 +316,7 @@ for (@prgs) {
     if ($res =~ s/^SKIPPED\n//) {
 	print "$results\n";
 	}
-    elsif (($pfx and $res !~ /^\Q$expected/) or
+    elsif (($pfx and $res !~ m/^\Q$expected/) or
 	  (!$pfx and $res !~ $rexp)) {
         print STDERR
 	    "PROG:\n$prog\n",

@@ -61,7 +61,7 @@ Filenames with * and ? will be glob expanded.
 my $wild_regex = $Is_VMS ? '*%' : '*?';
 sub expand_wildcards
 {
- @ARGV = map(/[$wild_regex]/o ? glob($_) : $_,@ARGV);
+ @ARGV = map(m/[$wild_regex]/o ? glob($_) : $_,@ARGV);
 }
 
 

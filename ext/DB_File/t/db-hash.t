@@ -6,7 +6,7 @@ use Config;
  
 BEGIN {
     if(-d "lib" && -f "TEST") {
-        if ($Config{'extensions'} !~ /\bDB_File\b/ ) {
+        if ($Config{'extensions'} !~ m/\bDB_File\b/ ) {
             print "1..0 # Skip: DB_File was not built\n";
             exit 0;
         }
@@ -124,9 +124,9 @@ ok(12, $dbh->{lorder} == 1234 );
 
 # Check that an invalid entry is caught both for store & fetch
 eval '$dbh->{fred} = 1234' ;
-ok(13, $@ =~ /^DB_File::HASHINFO::STORE - Unknown element 'fred' at/ );
+ok(13, $@ =~ m/^DB_File::HASHINFO::STORE - Unknown element 'fred' at/ );
 eval 'my $q = $dbh->{fred}' ;
-ok(14, $@ =~ /^DB_File::HASHINFO::FETCH - Unknown element 'fred' at/ );
+ok(14, $@ =~ m/^DB_File::HASHINFO::FETCH - Unknown element 'fred' at/ );
 
 
 # Now check the interface to HASH
@@ -397,7 +397,7 @@ untie %h ;
     my $filename = "xyz" ;
     my @x ;
     eval { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_HASH ; } ;
-    ok(52, $@ =~ /^DB_File can only tie an associative array to a DB_HASH database/) ;
+    ok(52, $@ =~ m/^DB_File can only tie an associative array to a DB_HASH database/) ;
     unlink $filename ;
 }
 
@@ -707,7 +707,7 @@ EOM
    $db->filter_store_key (sub { $_ = $h{$_} }) ;
 
    eval '$h{1} = 1234' ;
-   ok(116, $@ =~ /^recursion detected in filter_store_key at/ );
+   ok(116, $@ =~ m/^recursion detected in filter_store_key at/ );
    
    undef $db ;
    untie %h;
@@ -819,7 +819,7 @@ EOM
     my $db ;
     ok(120, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
-    $db->filter_store_key (sub { $bad_key = 1 if /^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
+    $db->filter_store_key (sub { $bad_key = 1 if m/^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
 
     $h{'Alpha_ABC'} = 2 ;
     $h{'Alpha_DEF'} = 5 ;
@@ -849,7 +849,7 @@ EOM
     my $dbh = DB_File::HASHINFO->new() ;
 
     eval { $dbh->{hash} = 2 };
-    ok(126, $@ =~ /^Key 'hash' not associated with a code reference at/);
+    ok(126, $@ =~ m/^Key 'hash' not associated with a code reference at/);
 
 }
 

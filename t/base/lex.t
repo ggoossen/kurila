@@ -106,14 +106,14 @@ print "${foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
 
 #print "FOO:" =~ /$foo[:]/ ? "ok 24\n" : "not ok 24\n";
 print "ok 24\n";
-print "ABC" =~ /^$ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
+print "ABC" =~ m/^$ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
 #print "FOOZ" =~ /^$foo[$A-Z]$/ ? "ok 26\n" : "not ok 26\n";
 print "ok 26\n";
 
 # MJD 19980425
 ($X, @X) = qw(a b c d); 
-print "d" =~ /^$X[-1]$/ ? "ok 27\n" : "not ok 27\n";
-print "a1" !~ /^$X[-1]$/ ? "ok 28\n" : "not ok 28\n";
+print "d" =~ m/^$X[-1]$/ ? "ok 27\n" : "not ok 27\n";
+print "a1" !~ m/^$X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 
 print (((q{{\{\(}} . q{{\)\}}}) eq '{{\(}{\)}}') ? "ok 29\n" : "not ok 29\n");
 
@@ -193,7 +193,7 @@ print $foo;
 sub T {
     my ($where, $num) = @_;
     my ($p,$f,$l) = caller;
-    print "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ /$where/;
+    print "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ m/$where/;
     print "ok $num\n";
 }
 
@@ -275,5 +275,5 @@ sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;
 
 eval "\$x =\xE2foo";
-if ($@ =~ /Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
+if ($@ =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
 $test++;

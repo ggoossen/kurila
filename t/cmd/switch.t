@@ -47,16 +47,16 @@ print do foo2(5) == 20 ? "ok 12\n" : "not ok 12\n";
 
 sub foo3 {
     $_ = shift(@_);
-    if (/^1/) {
+    if (m/^1/) {
 	return 1;
     }
-    elsif (/^2/) {
+    elsif (m/^2/) {
 	return 2;
     }
-    elsif (/^3/) {
+    elsif (m/^3/) {
 	return 3;
     }
-    elsif (/^4/) {
+    elsif (m/^4/) {
 	return 4;
     }
     else {

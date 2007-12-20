@@ -150,7 +150,7 @@ while (defined (my $file = next_file())) {
                       print OUT $t,"unless(defined(\&$name)) {\n    sub $name () {\t",$new,";}\n}\n";
 		    }
 		}
-	    } elsif (/^(include|import|include_next)\s*[<\"](.*)[>\"]/) {
+	    } elsif (m/^(include|import|include_next)\s*[<\"](.*)[>\"]/) {
                 $incl_type = $1;
                 $incl = $2;
                 if (($incl_type eq 'include_next') ||
@@ -187,11 +187,11 @@ while (defined (my $file = next_file())) {
                     $incl =~ s/\.h$/.ph/;
 		    print OUT $t,"require '$incl';\n";
                 }
-	    } elsif (/^ifdef\s+(\w+)/) {
+	    } elsif (m/^ifdef\s+(\w+)/) {
 		print OUT $t,"if(defined(&$1)) {\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
-	    } elsif (/^ifndef\s+(\w+)/) {
+	    } elsif (m/^ifndef\s+(\w+)/) {
 		print OUT $t,"unless(defined(&$1)) {\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
@@ -213,29 +213,29 @@ while (defined (my $file = next_file())) {
 		print OUT $t,"}\n elsif($new) {\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
-	    } elsif (/^else/) {
+	    } elsif (m/^else/) {
 		$tab -= 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
 		print OUT $t,"} else {\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
-	    } elsif (/^endif/) {
+	    } elsif (m/^endif/) {
 		$tab -= 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
 		print OUT $t,"}\n";
-	    } elsif(/^undef\s+(\w+)/) {
+	    } elsif(m/^undef\s+(\w+)/) {
 		print OUT $t, "undef(&$1) if defined(&$1);\n";
-	    } elsif(/^error\s+(".*")/) {
+	    } elsif(m/^error\s+(".*")/) {
 		print OUT $t, "die($1);\n";
-	    } elsif(/^error\s+(.*)/) {
+	    } elsif(m/^error\s+(.*)/) {
 		print OUT $t, "die(\"", quotemeta($1), "\");\n";
-	    } elsif(/^warning\s+(.*)/) {
+	    } elsif(m/^warning\s+(.*)/) {
 		print OUT $t, "warn(\"", quotemeta($1), "\");\n";
-	    } elsif(/^ident\s+(.*)/) {
+	    } elsif(m/^ident\s+(.*)/) {
 		print OUT $t, "# $1\n";
 	    }
-	} elsif (/^\s*(typedef\s*)?enum\s*(\s+[a-zA-Z_]\w*\s*)?/) { # { for vi
-	    until(/\{[^}]*\}.*;/ || /;/) {
+	} elsif (m/^\s*(typedef\s*)?enum\s*(\s+[a-zA-Z_]\w*\s*)?/) { # { for vi
+	    until(m/\{[^}]*\}.*;/ || m/;/) {
 		last unless defined ($next = next_line($file));
 		chomp $next;
 		# drop "#define FOO FOO" in enums
@@ -248,12 +248,12 @@ while (defined (my $file = next_file())) {
 	    s/#\s*if.*?#\s*endif//g; # drop #ifdefs
 	    s@/\*.*?\*/@@g;
 	    s/\s+/ /g;
-	    next unless /^\s?(typedef\s?)?enum\s?([a-zA-Z_]\w*)?\s?\{(.*)\}\s?([a-zA-Z_]\w*)?\s?;/;
+	    next unless m/^\s?(typedef\s?)?enum\s?([a-zA-Z_]\w*)?\s?\{(.*)\}\s?([a-zA-Z_]\w*)?\s?;/;
 	    (my $enum_subs = $3) =~ s/\s//g;
 	    my @enum_subs = split(/,/, $enum_subs);
 	    my $enum_val = -1;
 	    foreach my $enum (@enum_subs) {
-		my ($enum_name, $enum_value) = $enum =~ /^([a-zA-Z_]\w*)(=.+)?$/;
+		my ($enum_name, $enum_value) = $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
 		$enum_name or next;
 		$enum_value =~ s/^=//;
 		$enum_val = (length($enum_value) ? $enum_value : $enum_val + 1);
@@ -269,8 +269,8 @@ while (defined (my $file = next_file())) {
 			       "unless defined(\&$enum_name);\n");
 		}
 	    }
-	} elsif (/^(?:__extension__\s+)?(?:extern|static)\s+(?:__)?inline(?:__)?\s+/
-	    and !/;\s*$/ and !/{\s*}\s*$/)
+	} elsif (m/^(?:__extension__\s+)?(?:extern|static)\s+(?:__)?inline(?:__)?\s+/
+	    and !m/;\s*$/ and !m/{\s*}\s*$/)
 	{ # { for vi
 	    # This is a hack to parse the inline functions in the glibc headers.
 	    # Warning: massive kludge ahead. We suppose inline functions
@@ -278,11 +278,11 @@ while (defined (my $file = next_file())) {
 	    while (1) {
 		last unless defined ($next = next_line($file));
 		chomp $next;
-		undef $_, last if $next =~ /__THROW\s*;/
-			       or $next =~ /^(__extension__|extern|static)\b/;
+		undef $_, last if $next =~ m/__THROW\s*;/
+			       or $next =~ m/^(__extension__|extern|static)\b/;
 		$_ .= " $next";
 		print OUT "# $next\n" if $opt_D;
-		last if $next =~ /^}|^{.*}\s*$/;
+		last if $next =~ m/^}|^{.*}\s*$/;
 	    }
 	    next if not defined; # because it's only a prototype
 	    s/\b(__extension__|extern|static|(?:__)?inline(?:__)?)\b//g;
@@ -297,7 +297,7 @@ while (defined (my $file = next_file())) {
 	    my @args;
 	    if (s/^\(([^()]*)\)\s*(\w+\s*)*//) {
 		for my $arg (split /,/, $1) {
-		    if ($arg =~ /(\w+)\s*$/) {
+		    if ($arg =~ m/(\w+)\s*$/) {
 			$curargs{$1} = 1;
 			push @args, $1;
 		    }
@@ -360,7 +360,7 @@ if ($opt_e && (scalar(keys %bad_file) +> 0)) {
 exit $Exit;
 
 sub expr {
-    $new = '"(assembly code)"' and return if /\b__asm__\b/; # freak out.
+    $new = '"(assembly code)"' and return if m/\b__asm__\b/; # freak out.
     my $joined_args;
     if(keys(%curargs)) {
 	$joined_args = join('|', keys(%curargs));
@@ -420,7 +420,7 @@ sub expr {
             next;
         };
 	# Eliminate typedefs
-	/\(([\w\s]+)[\*\s]*\)\s*[\w\(]/ && do {
+	m/\(([\w\s]+)[\*\s]*\)\s*[\w\(]/ && do {
 	    my $doit = 1;
 	    foreach (split /\s+/, $1) {  # Make sure all the words are types,
 	        unless($isatype{$_} or $_ eq 'struct' or $_ eq 'union'){
@@ -437,7 +437,7 @@ sub expr {
 	    my $id = $1;
 	    $id =~ s/(\.|(->))([^\.\-]*)/->\{$3\}/g;
 	    $id =~ s/\b([^\$])($joined_args)/$1\$$2/g if length($joined_args);
-	    while($id =~ /\[\s*([^\$\&\d\]]+)\]/) {
+	    while($id =~ m/\[\s*([^\$\&\d\]]+)\]/) {
 		my($index) = $1;
 		$index =~ s/\s//g;
 		if(exists($curargs{$index})) {
@@ -455,31 +455,31 @@ sub expr {
 		s/^\s+(\w+)//;
 		$id .= ' ' . $1;
 		$isatype{$id} = 1;
-	    } elsif ($id =~ /^((un)?signed)|(long)|(short)$/) {
+	    } elsif ($id =~ m/^((un)?signed)|(long)|(short)$/) {
 		while (s/^\s+(\w+)//) { $id .= ' ' . $1; }
 		$isatype{$id} = 1;
 	    }
 	    if ($curargs{$id}) {
 		$new .= "\$$id";
-		$new .= '->' if /^[\[\{]/;
+		$new .= '->' if m/^[\[\{]/;
 	    } elsif ($id eq 'defined') {
 		$new .= 'defined';
-	    } elsif (/^\s*\(/) {
-		s/^\s*\((\w),/("$1",/ if $id =~ /^_IO[WR]*$/i;	# cheat
+	    } elsif (m/^\s*\(/) {
+		s/^\s*\((\w),/("$1",/ if $id =~ m/^_IO[WR]*$/i;	# cheat
 		$new .= " &$id";
 	    } elsif ($isatype{$id}) {
-		if ($new =~ /{\s*$/) {
+		if ($new =~ m/{\s*$/) {
 		    $new .= "'$id'";
-		} elsif ($new =~ /\(\s*$/ && /^[\s*]*\)/) {
+		} elsif ($new =~ m/\(\s*$/ && m/^[\s*]*\)/) {
 		    $new =~ s/\(\s*$//;
 		    s/^[\s*]*\)//;
 		} else {
 		    $new .= q(').$id.q(');
 		}
 	    } else {
-		if ($inif && $new !~ /defined\s*\($/) {
+		if ($inif && $new !~ m/defined\s*\($/) {
 		    $new .= '(defined(&' . $id . ') ? &' . $id . ' : undef)';
-		} elsif (/^\[/) {
+		} elsif (m/^\[/) {
 		    $new .= " \$$id";
 		} else {
 		    $new .= ' &' . $id;
@@ -517,18 +517,18 @@ sub next_line
                 $in =~ s/\?\?</{/g;                         # | ??<|  {|
                 $in =~ s/\?\?>/}/g;                         # | ??>|  }|
             }
-	    if ($in =~ /^\#ifdef __LANGUAGE_PASCAL__/) {
+	    if ($in =~ m/^\#ifdef __LANGUAGE_PASCAL__/) {
 		# Tru64 disassembler.h evilness: mixed C and Pascal.
 		while ( ~< *IN) {
-		    last if /^\#endif/;
+		    last if m/^\#endif/;
 		}
 		$in = "";
 		next READ;
 	    }
-	    if ($in =~ /^extern inline / && # Inlined assembler.
+	    if ($in =~ m/^extern inline / && # Inlined assembler.
 		$^O eq 'linux' && $file =~ m!(?:^|/)asm/[^/]+\.h$!) {
 		while ( ~< *IN) {
-		    last if /^}/;
+		    last if m/^}/;
 		}
 		$in = "";
 		next READ;
@@ -540,13 +540,13 @@ sub next_line
                 $out    .= $1;
             } elsif ($in =~ s/^(\\.)//) {                   # \...
                 $out    .= $1;
-            } elsif ($in =~ /^'/) {                         # '...
+            } elsif ($in =~ m/^'/) {                         # '...
                 if ($in =~ s/^('(\\.|[^'\\])*')//) {
                     $out    .= $1;
                 } else {
                     next READ;
                 }
-            } elsif ($in =~ /^"/) {                         # "...
+            } elsif ($in =~ m/^"/) {                         # "...
                 if ($in =~ s/^("(\\.|[^"\\])*")//) {
                     $out    .= $1;
                 } else {
@@ -582,7 +582,7 @@ sub next_line
             }
         }
 
-        last READ if $out =~ /\S/;
+        last READ if $out =~ m/\S/;
     }
 
     return $out;
@@ -683,12 +683,12 @@ sub queue_includes_from
 
     open HEADER, $file or return;
         while (defined($line = ~< *HEADER)) {
-            while (/\\$/) { # Handle continuation lines
+            while (m/\\$/) { # Handle continuation lines
                 chop $line;
                 $line .= ~< *HEADER;
             }
 
-            if ($line =~ /^#\s*include\s+<(.*?)>/) {
+            if ($line =~ m/^#\s*include\s+<(.*?)>/) {
                 push(@ARGV, $1) unless $Is_converted{$1};
             }
         }
@@ -726,7 +726,7 @@ sub build_preamble_if_necessary
         # Extract version number from first line of preamble:
         open  PREAMBLE, $preamble or die "Cannot open $preamble:  $!";
             my $line = ~< *PREAMBLE;
-            $line =~ /(\b\d+\b)/;
+            $line =~ m/(\b\d+\b)/;
         close PREAMBLE            or die "Cannot close $preamble:  $!";
 
         # Don't build preamble if a compatible preamble exists:
@@ -742,19 +742,19 @@ sub build_preamble_if_necessary
 	    if ($opt_D) {
 		print PREAMBLE "# $_=$define{$_}\n";
 	    }
-	    if ($define{$_} =~ /^\((.*)\)$/) {
+	    if ($define{$_} =~ m/^\((.*)\)$/) {
 		# parenthesized value:  d=(v)
 		$define{$_} = $1;
 	    }
-	    if ($define{$_} =~ /^([+-]?(\d+)?\.\d+([eE][+-]?\d+)?)[FL]?$/) {
+	    if ($define{$_} =~ m/^([+-]?(\d+)?\.\d+([eE][+-]?\d+)?)[FL]?$/) {
 		# float:
 		print PREAMBLE
 		    "unless (defined &$_) { sub $_() { $1 } }\n\n";
-	    } elsif ($define{$_} =~ /^([+-]?\d+)U?L{0,2}$/i) {
+	    } elsif ($define{$_} =~ m/^([+-]?\d+)U?L{0,2}$/i) {
 		# integer:
 		print PREAMBLE
 		    "unless (defined &$_) { sub $_() { $1 } }\n\n";
-	    } elsif ($define{$_} =~ /^\w+$/) {
+	    } elsif ($define{$_} =~ m/^\w+$/) {
 		print PREAMBLE
 		    "unless (defined &$_) { sub $_() { &$define{$_} } }\n\n";
 	    } else {
@@ -777,7 +777,7 @@ sub _extract_cc_defines
 	@Config{'ccsymbols', 'cppsymbols', 'cppccsymbols'};
 
     # Split compiler pre-definitions into `key=value' pairs:
-    while ($allsymbols =~ /([^\s]+)=((\\\s|[^\s])+)/g) {
+    while ($allsymbols =~ m/([^\s]+)=((\\\s|[^\s])+)/g) {
 	$define{$1} = $2;
 	if ($opt_D) {
 	    print STDERR "$_:  $1 -> $2\n";

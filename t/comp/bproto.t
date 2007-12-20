@@ -17,7 +17,7 @@ my $bar = "bar";
 
 sub test_too_many {
     eval $_[0];
-    print "not " unless $@ =~ /^Too many arguments/;
+    print "not " unless $@ =~ m/^Too many arguments/;
     printf "ok %d\n",$i++;
 }
 

@@ -6,7 +6,7 @@ BEGIN {
          unshift @INC, '../lib';
      }
      require Config; Config->import;
-     if ($Config{'extensions'} !~ /\bEncode\b/) {
+     if ($Config{'extensions'} !~ m/\bEncode\b/) {
          print "1..0 # Skip: Encode was not built\n";
              exit 0;
      }
@@ -19,7 +19,7 @@ use Encode;
 my $seed = "";
 for my $i (0x00..0xff){
      my $c = chr($i);
-     $seed .= ($c =~ /^\p{IsPrint}/o) ? $c : " ";
+     $seed .= ($c =~ m/^\p{IsPrint}/o) ? $c : " ";
 }
 
 use Test::More tests => $POWER*2;

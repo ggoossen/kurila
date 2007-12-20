@@ -7,10 +7,10 @@ my $o = $Config{'obj_ext'};
 my $exeout_flag = '-o ';
 my $core = grep { $_ eq 'PERL_CORE=1' } @ARGV;
 if ($^O eq 'MSWin32') {
-    if ($Config{'cc'} =~ /^cl/i) {
+    if ($Config{'cc'} =~ m/^cl/i) {
 	$exeout_flag = '-Fe';
     }
-    elsif ($Config{'cc'} =~ /^bcc/i) {
+    elsif ($Config{'cc'} =~ m/^bcc/i) {
 	$exeout_flag = '-e';
     }
 }

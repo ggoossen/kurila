@@ -160,7 +160,7 @@ sub plan {
     my $max=0;
     while (@_) {
 	my ($k,$v) = splice(@_, 0, 2);
-	if ($k =~ /^test(s)?$/) { $max = $v; }
+	if ($k =~ m/^test(s)?$/) { $max = $v; }
 	elsif ($k eq 'todo' or
 	       $k eq 'failok') { for (@$v) { $todo{$_}=1; }; }
 	elsif ($k eq 'onfail') {
@@ -391,11 +391,11 @@ sub ok ($;$$) {
 	} elsif (!defined $result) {
 	    $ok = 0;
 	} elsif (ref($expected) eq 'Regexp') {
-	    $ok = $result =~ /$expected/;
+	    $ok = $result =~ m/$expected/;
             $regex = $expected;
 	} elsif (($regex) = ($expected =~ m,^ / (.+) / $,sx) or
 	    (undef, $regex) = ($expected =~ m,^ m([^\w\s]) (.+) \1 $,sx)) {
-	    $ok = $result =~ /$regex/;
+	    $ok = $result =~ m/$regex/;
 	} else {
 	    $ok = $result eq $expected;
 	}

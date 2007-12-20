@@ -12,7 +12,7 @@ print +($! ? "(\$! = $!) not " : ''),"ok 3\n";
 
 print +($syms{$name} eq 'Perl_test' ? '' : 'not '),"ok 4\n";
 
-($val) = `Show Symbol $name` =~ /(\w+)"$/;
+($val) = `Show Symbol $name` =~ m/(\w+)"$/;
 print +($val eq 'Perl_test' ? '' : 'not '),"ok 5\n";
 
 while (($sym,$val) = each %syms) {

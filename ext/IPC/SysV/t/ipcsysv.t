@@ -7,7 +7,7 @@ BEGIN {
     require 'test.pl';
 }
 
-if ($Config{'extensions'} !~ /\bIPC\/SysV\b/) {
+if ($Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
     skip_all('IPC::SysV was not built');
 }
 elsif ($Config{'d_sem'} ne 'define') {

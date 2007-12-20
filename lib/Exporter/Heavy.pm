@@ -56,7 +56,7 @@ sub heavy_export {
 	require Carp;
 	local $Carp::CarpLevel = 1;	# ignore package calling us too.
 	Carp::croak("$_[0]Illegal null symbol in \@${1}::EXPORT")
-	    if $_[0] =~ /^Unable to create sub named "(.*?)::"/;
+	    if $_[0] =~ m/^Unable to create sub named "(.*?)::"/;
     };
 
     my($pkg, $callpkg, @imports) = @_;
@@ -96,7 +96,7 @@ sub heavy_export {
 		elsif ($spec =~ m:^/(.*)/$:){
 		    my $patn = $1;
 		    @allexports = keys %$export_cache unless @allexports; # only do keys once
-		    @names = grep(/$patn/, @allexports); # not anchored by default
+		    @names = grep(m/$patn/, @allexports); # not anchored by default
 		}
 		else {
 		    @names = ($spec); # is a normal symbol name
@@ -168,7 +168,7 @@ sub heavy_export {
 	    # Build cache of symbols. Optimise the lookup by adding
 	    # barewords twice... both with and without a leading &.
 	    # (Technique could be applied to $export_cache at cost of memory)
-	    my @expanded = map { /^\w/ ? ($_, '&'.$_) : $_ } @$fail;
+	    my @expanded = map { m/^\w/ ? ($_, '&'.$_) : $_ } @$fail;
 	    warn "${pkg}::EXPORT_FAIL cached: @expanded" if $Exporter::Verbose;
 	    @{$fail_cache}{@expanded} = (1) x @expanded;
 	}

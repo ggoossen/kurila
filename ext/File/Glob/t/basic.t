@@ -2,7 +2,7 @@
 
 BEGIN {
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bFile\/Glob\b/i) {
+    if ($Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
         print "1..0\n";
         exit 0;
     }
@@ -25,7 +25,7 @@ $ENV{PATH} = "/bin";
 delete @ENV{'BASH_ENV', 'CDPATH', 'ENV', 'IFS'};
 @correct = ();
 if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
-   @correct = grep { !/^\./ } sort readdir(D);
+   @correct = grep { !m/^\./ } sort readdir(D);
    closedir D;
 }
 @a = File::Glob::glob("*", 0);
@@ -111,8 +111,8 @@ print "ok 7\n";
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
-@a = grep !/(,v$|~$|\.(pm|ori?g|rej)$)/, @a;
-@a = (grep !/test.pl/, @a) if $^O eq 'VMS';
+@a = grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, @a;
+@a = (grep !m/test.pl/, @a) if $^O eq 'VMS';
 
 print "# @a\n";
 

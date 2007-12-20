@@ -180,13 +180,13 @@ foreach (keys %chop) {
 
 # chop and chomp can't be lvalues
 eval 'chop($x) = 1;';
-ok($@ =~ /Can\'t modify.*chop.*in.*assignment/);
+ok($@ =~ m/Can\'t modify.*chop.*in.*assignment/);
 eval 'chomp($x) = 1;';
-ok($@ =~ /Can\'t modify.*chom?p.*in.*assignment/);
+ok($@ =~ m/Can\'t modify.*chom?p.*in.*assignment/);
 eval 'chop($x, $y) = (1, 2);';
-ok($@ =~ /Can\'t modify.*chop.*in.*assignment/);
+ok($@ =~ m/Can\'t modify.*chop.*in.*assignment/);
 eval 'chomp($x, $y) = (1, 2);';
-ok($@ =~ /Can\'t modify.*chom?p.*in.*assignment/);
+ok($@ =~ m/Can\'t modify.*chom?p.*in.*assignment/);
 
 {
     use utf8;

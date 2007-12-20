@@ -27,7 +27,7 @@ for (@prgs){
         $switch = $&;
     }
     my($prog,$expected) = split(/\nEXPECT\n/, $_);
-    if ( $prog =~ /--FILE--/) {
+    if ( $prog =~ m/--FILE--/) {
         my(@files) = split(/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error test $i didn't split into pairs, got " . 
@@ -69,7 +69,7 @@ for (@prgs){
     if ( $results =~ s/^SKIPPED\n//) {
 	print "$results\n" ;
     }
-    elsif (($prefix and $results !~ /^\Q$expected/) or
+    elsif (($prefix and $results !~ m/^\Q$expected/) or
 	   (!$prefix and $results ne $expected)){
         print STDERR "PROG: $switch\n$prog\n";
         print STDERR "EXPECTED:\n$expected\n";

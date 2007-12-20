@@ -4,7 +4,7 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
 	require Config;
-	if (($Config::Config{'extensions'} !~ /\bre\b/) ){
+	if (($Config::Config{'extensions'} !~ m/\bre\b/) ){
         	print "1..0 # Skip -- Perl configured without re module\n";
 		exit 0;
 	}
@@ -61,7 +61,7 @@ ok( !( $^H ^&^ 0x00200000 ), '... and again' );
 my $reg=qr/(foo|bar|baz|blah)/;
 close STDERR;
 eval"use re Debug=>'ALL'";
-my $ok='foo'=~/$reg/;
+my $ok='foo'=~m/$reg/;
 eval"no re Debug=>'ALL'";
 ok( $ok, 'No segv!' );
 

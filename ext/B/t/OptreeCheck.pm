@@ -380,7 +380,7 @@ sub getCmdLine {	# import assistant
 	     turn on a flag by typing its name,
 	     select a value from list by typing name=val.\n    },
 	  mydumper(\%gOpts))
-	if grep /help/, @ARGV;
+	if grep m/help/, @ARGV;
 
     # replace values for each key !! MUST MARK UP %gOpts
     foreach my $opt (keys %gOpts) {
@@ -410,7 +410,7 @@ sub getCmdLine {	# import assistant
         else { # handle scalars
 
 	    # if 'opt' is present, true
-	    $gOpts{$opt} = (grep /^$opt/, @ARGV) ? 1 : 0;
+	    $gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
 
 	    # override with 'foo' if 'opt=foo' appears
 	    grep s/$opt=(.*)/$gOpts{$opt}=$1/e, @ARGV;
@@ -587,7 +587,7 @@ sub checkErrs {
     @goterrs{@{$tc->{goterrs}}} = (1) x scalar @{$tc->{goterrs}};
     
     foreach my $k (keys %{$tc->{errs}}) {
-	if (@got = grep /^$k$/, keys %goterrs) {
+	if (@got = grep m/^$k$/, keys %goterrs) {
 	    delete $tc->{errs}{$k};
 	    delete $goterrs{$_} foreach @got;
 	}
@@ -715,7 +715,7 @@ sub mkCheckRex {
     #$str =~ s/(\s*)\n/\n/msg;				# trailing spaces
     
     croak "no reftext found for $want: $tc->{name}"
-	unless $str =~ /\w+/; # fail unless a real test
+	unless $str =~ m/\w+/; # fail unless a real test
     
     # $str = '.*'	if 1;	# sanity test
     # $str .= 'FAIL'	if 1;	# sanity test
@@ -949,7 +949,7 @@ sub OptreeCheck::wrap {
     $code =~ s/(?:(\#.*?)\n)//gsm;
     $code =~ s/\s+/ /mgs;	       
     chomp $code;
-    return unless $code =~ /\S/;
+    return unless $code =~ m/\S/;
     my $comment = $1;
     
     my $testcode = qq{
@@ -1020,7 +1020,7 @@ sub OptreeCheck::processExamples {
 
 # OK - now for the final insult to your good taste...  
 
-if ($0 =~ /OptreeCheck\.pm/) {
+if ($0 =~ m/OptreeCheck\.pm/) {
 
     #use lib 't';
     require './t/test.pl';

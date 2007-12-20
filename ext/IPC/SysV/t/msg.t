@@ -7,7 +7,7 @@ BEGIN {
 
     my $reason;
 
-    if ($Config{'extensions'} !~ /\bIPC\/SysV\b/) {
+    if ($Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
       $reason = 'IPC::SysV was not built';
     } elsif ($Config{'d_sem'} ne 'define') {
       $reason = '$Config{d_sem} undefined';

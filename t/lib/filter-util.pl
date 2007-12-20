@@ -22,7 +22,7 @@ sub writeFile
     my($filename, @strings) = @_ ;
     open (F, ">$filename") 
 	or die "Cannot open $filename: $!\n" ;
-    binmode(F) if $filename =~ /bin$/i;
+    binmode(F) if $filename =~ m/bin$/i;
     foreach (@strings)
       { print F }
     close F or die "Could not close: $!" ;
@@ -34,7 +34,7 @@ sub ok
  
     $note = "" if ! defined $note ;
     if ($note) {
-        $note = "# $note" if $note !~ /^\s*#/ ;
+        $note = "# $note" if $note !~ m/^\s*#/ ;
         $note =~ s/^\s*/ / ;
     }
 

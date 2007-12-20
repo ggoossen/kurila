@@ -40,14 +40,14 @@ sub walk_table (&@) {
     seek IN, 0, 0;		# so we may restart
     while ( ~< *IN) {
 	chomp;
-	next if /^:/;
+	next if m/^:/;
 	while (s|\\\s*$||) {
 	    $_ .= ~< *IN;
 	    chomp;
 	}
 	s/\s+$//;
 	my @args;
-	if (/^\s*(#|$)/) {
+	if (m/^\s*(#|$)/) {
 	    @args = $_;
 	}
 	else {
@@ -74,29 +74,29 @@ sub autodoc ($$) { # parse a file and extract documentation info
     my($in, $doc, $line);
 FUNC:
     while (defined($in = ~< $fh)) {
-        if ($in=~ /^=head1 (.*)/) {
+        if ($in=~ m/^=head1 (.*)/) {
             $curheader = $1;
             next FUNC;
         }
 	$line++;
-	if ($in =~ /^=for\s+apidoc\s+(.*?)\s*\n/) {
+	if ($in =~ m/^=for\s+apidoc\s+(.*?)\s*\n/) {
 	    my $proto = $1;
-	    $proto = "||$proto" unless $proto =~ /\|/;
+	    $proto = "||$proto" unless $proto =~ m/\|/;
 	    my($flags, $ret, $name, @args) = split /\|/, $proto;
 	    my $docs = "";
 DOC:
 	    while (defined($doc = ~< $fh)) {
 		$line++;
-		last DOC if $doc =~ /^=\w+/;
+		last DOC if $doc =~ m/^=\w+/;
 		if ($doc =~ m:^\*/$:) {
 		    warn "=cut missing? $file:$line:$doc";;
 		    last DOC;
 		}
 		$docs .= $doc;
 	    }
-	    $docs = "\n$docs" if $docs and $docs !~ /^\n/;
-	    if ($flags =~ /m/) {
-		if ($flags =~ /A/) {
+	    $docs = "\n$docs" if $docs and $docs !~ m/^\n/;
+	    if ($flags =~ m/m/) {
+		if ($flags =~ m/A/) {
 		    $apidocs{$curheader}{$name} = [$flags, $docs, $ret, $file, @args];
 		}
 		else {
@@ -107,7 +107,7 @@ DOC:
 		$docfuncs{$name} = [$flags, $docs, $ret, $file, $curheader, @args];
 	    }
 	    if (defined $doc) {
-		if ($doc =~ /^=(?:for|head)/) {
+		if ($doc =~ m/^=(?:for|head)/) {
 		    $in = $doc;
 		    redo FUNC;
 		}
@@ -124,17 +124,17 @@ sub docout ($$$) { # output the docs for one function
     $name =~ s/\s*$//;
 
     $docs .= "NOTE: this function is experimental and may change or be
-removed without notice.\n\n" if $flags =~ /x/;
+removed without notice.\n\n" if $flags =~ m/x/;
     $docs .= "NOTE: the perl_ form of this function is deprecated.\n\n"
-	if $flags =~ /p/;
+	if $flags =~ m/p/;
 
     print $fh "=item $name\nX<$name>\n$docs";
 
-    if ($flags =~ /U/) { # no usage
+    if ($flags =~ m/U/) { # no usage
 	# nothing
-    } elsif ($flags =~ /s/) { # semicolon ("dTHR;")
+    } elsif ($flags =~ m/s/) { # semicolon ("dTHR;")
 	print $fh "\t\t$name;\n\n";
-    } elsif ($flags =~ /n/) { # no args
+    } elsif ($flags =~ m/n/) { # no args
 	print $fh "\t$ret\t$name\n\n";
     } else { # full usage
 	print $fh "\t$ret\t$name";
@@ -174,7 +174,7 @@ my $MANIFEST = do {
   ~< *FH;
 };
 
-for $file (($MANIFEST =~ /^(\S+\.c)\t/gm), ($MANIFEST =~ /^(\S+\.h)\t/gm)) {
+for $file (($MANIFEST =~ m/^(\S+\.c)\t/gm), ($MANIFEST =~ m/^(\S+\.h)\t/gm)) {
     open F, "< $file" or die "Cannot open $file for docs: $!\n";
     $curheader = "Functions in file $file\n";
     autodoc(\*F,$file);
@@ -189,14 +189,14 @@ binmode DOC;
 walk_table {	# load documented functions into appropriate hash
     if (@_ +> 1) {
 	my($flags, $retval, $func, @args) = @_;
-	return "" unless $flags =~ /d/;
+	return "" unless $flags =~ m/d/;
 	$func =~ s/\t//g; $flags =~ s/p//; # clean up fields from embed.pl
 	$retval =~ s/\t//;
 	my $docref = delete $docfuncs{$func};
 	$seenfuncs{$func} = 1;
 	if ($docref and @$docref) {
-	    if ($flags =~ /A/) {
-		$docref->[0].="x" if $flags =~ /M/;
+	    if ($flags =~ m/A/) {
+		$docref->[0].="x" if $flags =~ m/M/;
 		$apidocs{$docref->[4]}{$func} =
 		    [$docref->[0] . 'A', $docref->[1], $retval, $docref->[3],
 			@args];

@@ -159,7 +159,7 @@ sub verbatim {
     return if $$self{EXCLUDE};
     $self->item if defined $$self{ITEM};
     local $_ = shift;
-    return if /^\s*$/;
+    return if m/^\s*$/;
     s/^(\s*\S+)/(' ' x $$self{MARGIN}) . $1/gme;
     $self->output ($_);
 }
@@ -323,7 +323,7 @@ sub cmd_head3 {
 sub cmd_over {
     my $self = shift;
     local $_ = shift;
-    unless (/^[-+]?\d+\s+$/) { $_ = $$self{indent} }
+    unless (m/^[-+]?\d+\s+$/) { $_ = $$self{indent} }
     push (@{ $$self{INDENTS} }, $$self{MARGIN});
     $$self{MARGIN} += ($_ + 0);
 }
@@ -352,7 +352,7 @@ sub cmd_item {
 sub cmd_begin {
     my $self = shift;
     local $_ = shift;
-    my ($kind) = /^(\S+)/ or return;
+    my ($kind) = m/^(\S+)/ or return;
     if ($kind eq 'text') {
         $$self{VERBATIM} = 1;
     } else {
@@ -401,7 +401,7 @@ sub seq_l {
     s/\s+/ /g;
 
     # If we were given any explicit text, just output it.
-    if (/^([^|]+)\|/) { return $1 }
+    if (m/^([^|]+)\|/) { return $1 }
 
     # Okay, leading and trailing whitespace isn't important; get rid of it.
     s/^\s+//;
@@ -412,10 +412,10 @@ sub seq_l {
     # something looking like L<manpage(section)>.  The latter is an
     # enhancement over the original Pod::Text.
     my ($manpage, $section) = ('', $_);
-    if (/^(?:https?|ftp|news):/) {
+    if (m/^(?:https?|ftp|news):/) {
         # a URL
         return $_;
-    } elsif (/^"\s*(.*?)\s*"$/) {
+    } elsif (m/^"\s*(.*?)\s*"$/) {
         $section = '"' . $1 . '"';
     } elsif (m/^[-:.\w]+(?:\(\S+\))?$/) {
         ($manpage, $section) = ($_, '');
@@ -427,7 +427,7 @@ sub seq_l {
     # Now build the actual output text.
     if (!length $section) {
         $text = "the $manpage manpage" if length $manpage;
-    } elsif ($section =~ /^[:\w]+(?:\(\))?/) {
+    } elsif ($section =~ m/^[:\w]+(?:\(\))?/) {
         $text .= 'the ' . $section . ' entry';
         $text .= (length $manpage) ? " in the $manpage manpage"
                                    : " elsewhere in this document";
@@ -465,14 +465,14 @@ sub item {
     unless (defined $indent) { $indent = $$self{indent} }
     my $space = ' ' x $indent;
     $space =~ s/^ /:/ if $$self{alt};
-    if (!$_ || /^\s+$/ || ($$self{MARGIN} - $indent +< length ($tag) + 1)) {
+    if (!$_ || m/^\s+$/ || ($$self{MARGIN} - $indent +< length ($tag) + 1)) {
         my $margin = $$self{MARGIN};
         $$self{MARGIN} = $indent;
         my $output = $self->reformat ($tag);
         $output =~ s/\n*$/\n/;
         $self->output ($output);
         $$self{MARGIN} = $margin;
-        $self->output ($self->reformat ($_)) if /\S/;
+        $self->output ($self->reformat ($_)) if m/\S/;
     } else {
         $_ = $self->reformat ($_);
         s/^ /:/ if ($$self{alt} && $indent +> 0);
@@ -544,10 +544,10 @@ sub pod2text {
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
-    while ($_[0] =~ /^-/) {
+    while ($_[0] =~ m/^-/) {
         my $flag = shift;
         if    ($flag eq '-a')       { push (@args, alt => 1)    }
-        elsif ($flag =~ /^-(\d+)$/) { push (@args, width => $1) }
+        elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
         else {
             unshift (@_, $flag);
             last;

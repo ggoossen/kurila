@@ -120,7 +120,7 @@ sub format_arg {
       $arg = str_len_trim($arg, $MaxArgLen);
   
       # Quote it?
-      $arg = "'$arg'" unless $arg =~ /^-?[\d.]+\z/;
+      $arg = "'$arg'" unless $arg =~ m/^-?[\d.]+\z/;
   } else {
       $arg = 'undef';
   }

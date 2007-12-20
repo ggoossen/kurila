@@ -7,7 +7,7 @@ while ( ~< *DATA) {
   next unless $_;
   $pat .= "$_|";
 }
-chop $pat if $pat =~ /\|$/;
+chop $pat if $pat =~ m/\|$/;
 
 # grep
 while ( ~< *ARGV) {

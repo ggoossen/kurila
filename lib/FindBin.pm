@@ -138,7 +138,7 @@ sub init
 
    if ($^O eq 'VMS')
     {
-     ($Bin,$Script) = VMS::Filespec::rmsexpand($0) =~ /(.*[\]>\/]+)(.*)/s;
+     ($Bin,$Script) = VMS::Filespec::rmsexpand($0) =~ m/(.*[\]>\/]+)(.*)/s;
      # C<use disk:[dev]/lib> isn't going to work, so unixify first
      ($Bin = VMS::Filespec::unixify($Bin)) =~ s/\/\z//;
      ($RealBin,$RealScript) = ($Bin,$Script);

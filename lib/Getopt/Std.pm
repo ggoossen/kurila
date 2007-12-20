@@ -95,9 +95,9 @@ sub getopt (;$$) {
     local $_;
     local @EXPORT;
 
-    while (@ARGV && ($_ = $ARGV[0]) =~ /^-(.)(.*)/) {
+    while (@ARGV && ($_ = $ARGV[0]) =~ m/^-(.)(.*)/) {
 	($first,$rest) = ($1,$2);
-	if (/^--$/) {	# early exit if --
+	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
 	    last;
 	}
@@ -180,8 +180,8 @@ sub help_mess ($;$) {
     if (@_ and defined &main::HELP_MESSAGE) {
 	main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
-	my (@witharg) = ($args =~ /(\S)\s*:/g);
-	my (@rest) = ($args =~ /([^\s:])(?!\s*:)/g);
+	my (@witharg) = ($args =~ m/(\S)\s*:/g);
+	my (@rest) = ($args =~ m/([^\s:])(?!\s*:)/g);
 	my ($help, $arg) = ('', '');
 	if (@witharg) {
 	    $help .= "\n\tWith arguments: -" . join " -", @witharg;
@@ -205,7 +205,7 @@ EOH
 	if ( defined $0 and $0 ne '-e' and -f $0 and -r $0
 	     and open my $script, '<', $0 ) {
 	    while ( ~< $script) {
-		$has_pod = 1, last if /^=(pod|head1)/;
+		$has_pod = 1, last if m/^=(pod|head1)/;
 	    }
 	}
 	print $h <<EOH if $has_pod;
@@ -228,9 +228,9 @@ sub getopts ($;$) {
     local @EXPORT;
 
     @args = split( / */, $argumentative );
-    while(@ARGV && ($_ = $ARGV[0]) =~ /^-(.)(.*)/s) {
+    while(@ARGV && ($_ = $ARGV[0]) =~ m/^-(.)(.*)/s) {
 	($first,$rest) = ($1,$2);
-	if (/^--$/) {	# early exit if --
+	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
 	    last;
 	}

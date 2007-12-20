@@ -274,7 +274,7 @@ SKIP: {
 
 $_ = "o 0,o 1,";
 my $iter = 0;
-while (/(o.+?),/gc) {
+while (m/(o.+?),/gc) {
     is($1, "o $iter");
     foreach (1..1) { $iter++ }
     if ($iter +> 2) { fail("endless loop"); last; }
@@ -290,7 +290,7 @@ while (/(o.+?),/gc) {
 	"Nesting"     => sub { print '#'; for (1..3) { print }
 			       print "\n" },			1,
 	"Reading"     => sub { print },				0,
-	"Matching"    => sub { $x = /badness/ },		0,
+	"Matching"    => sub { $x = m/badness/ },		0,
 	"Concat"      => sub { $_ .= "a" },			0,
 	"Chop"        => sub { chop },				0,
 	"Filetest"    => sub { -x },				0,

@@ -25,7 +25,7 @@ $nn = $n = 2;
 sub subb {"in s"}
 
 @INPUT = ~< *DATA;
-@simple_input = grep /^\s*\w+\s*\$\w+\s*[#\n]/, @INPUT;
+@simple_input = grep m/^\s*\w+\s*\$\w+\s*[#\n]/, @INPUT;
 print "1..", (11 + @INPUT + @simple_input), "\n";
 $ord = 0;
 
@@ -112,15 +112,15 @@ print "ok $ord\n";
 
 for (@INPUT) {
   $ord++;
-  ($op, undef, $comment) = /^([^\#]+)(\#\s+(.*))?/;
+  ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
   $comment = $op unless defined $comment;
   chomp;
-  $op = "$op==$op" unless $op =~ /==/;
-  ($op, $expectop) = $op =~ /(.*)==(.*)/;
+  $op = "$op==$op" unless $op =~ m/==/;
+  ($op, $expectop) = $op =~ m/(.*)==(.*)/;
   
-  $skip = ($op =~ /^'\?\?\?'/ or $comment =~ /skip\(.*\Q$^O\E.*\)/i)
+  $skip = ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^O\E.*\)/i)
 	  ? "skip" : "# '$_'\nnot";
-  $integer = ($comment =~ /^i_/) ? "use integer" : '' ;
+  $integer = ($comment =~ m/^i_/) ? "use integer" : '' ;
   (print "#skipping $comment:\nok $ord\n"), next if $skip eq 'skip';
   
   eval <<EOE;
@@ -136,7 +136,7 @@ for (@INPUT) {
   print "ok \$ord\\n";
 EOE
   if ($@) {
-    if ($@ =~ /is unimplemented/) {
+    if ($@ =~ m/is unimplemented/) {
       print "# skipping $comment: unimplemented:\nok $ord\n";
     } else {
       warn $@;
@@ -147,10 +147,10 @@ EOE
 
 for (@simple_input) {
   $ord++;
-  ($op, undef, $comment) = /^([^\#]+)(\#\s+(.*))?/;
+  ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
   $comment = $op unless defined $comment;
   chomp;
-  ($operator, $variable) = /^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
+  ($operator, $variable) = m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
   eval <<EOE;
   local \$SIG{__WARN__} = \\&wrn;
   my \$$variable = "Ac# Ca\\nxxx";
@@ -162,9 +162,9 @@ for (@simple_input) {
   print "ok \$ord\\n";
 EOE
   if ($@) {
-    if ($@ =~ /is unimplemented/) {
+    if ($@ =~ m/is unimplemented/) {
       print "# skipping $comment: unimplemented:\nok $ord\n";
-    } elsif ($@ =~ /Can't (modify|take log of 0)/) {
+    } elsif ($@ =~ m/Can't (modify|take log of 0)/) {
       print "# skipping $comment: syntax not good for selfassign:\nok $ord\n";
     } else {
       warn $@;

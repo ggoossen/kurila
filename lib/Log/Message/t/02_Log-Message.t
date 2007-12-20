@@ -102,7 +102,7 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
         );
 
         my $t = scalar localtime;
-        $t =~ /(\w+ \w+ \d+)/;
+        $t =~ m/(\w+ \w+ \d+)/;
 
         like(   $item->when, qr/$1/, q[Item timestamp stored] );
     }

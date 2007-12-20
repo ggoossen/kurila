@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($^O ne 'VMS' and $Config{'extensions'} !~ /\bPOSIX\b/) {
+    if ($^O ne 'VMS' and $Config{'extensions'} !~ m/\bPOSIX\b/) {
 	print "1..0\n";
 	exit 0;
     }
@@ -81,7 +81,7 @@ SKIP: {
 	# So the kill() must not be done with this config in order to
 	# finish the test.
 	# For others (darwin & freebsd), let the test fail without crashing.
-	my $todo = $^O eq 'netbsd' && $Config{osvers}=~/^1\.6/;
+	my $todo = $^O eq 'netbsd' && $Config{osvers}=~m/^1\.6/;
 	my $why_todo = "# TODO $^O $Config{osvers} seems to lose blocked signals";
 	if (!$todo) { 
 	  kill 'HUP', $$; 
@@ -189,7 +189,7 @@ try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
 	if ($Is_W32 and (($Config{cc} eq 'cl' and
-	                 $Config{ccversion} =~ /^(\d+)/ and $1 +>= 14) or
+	                 $Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) or
 	                 (Win32::GetOSVersion())[1] +>= 6));
 
     try_strftime("Thu Feb 29 00:00:60 1996 060", 60,0,-24, 30,1,96);

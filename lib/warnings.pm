@@ -10,7 +10,7 @@ our $VERSION = '1.06';
 
 # Verify that we're called correctly so that warnings will work.
 # see also strict.pm.
-unless ( __FILE__ =~ /(^|[\/\\])\Q${\__PACKAGE__}\E\.pmc?$/ ) {
+unless ( __FILE__ =~ m/(^|[\/\\])\Q${\__PACKAGE__}\E\.pmc?$/ ) {
     my (undef, $f, $l) = caller;
     die("Incorrect use of pragma '${\__PACKAGE__}' at $f line $l.\n");
 }
@@ -434,7 +434,7 @@ sub __chk
 
     if ($isobj) {
         while (do { { package DB; $pkg = (caller($i++))[0] } } ) {
-            last unless @DB::args && $DB::args[0] =~ /^$category=/ ;
+            last unless @DB::args && $DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;
     }

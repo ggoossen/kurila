@@ -241,7 +241,7 @@ sub checkCollator {
 
 	$CVgetCombinClass ||= \&Unicode::Normalize::getCombinClass;
 
-	if ($self->{normalization} =~ /^(?:NF)D\z/) { # tweak for default
+	if ($self->{normalization} =~ m/^(?:NF)D\z/) { # tweak for default
 	    $self->{normCode} = \&Unicode::Normalize::NFD;
 	}
 	elsif ($self->{normalization} ne 'prenormalized') {
@@ -266,7 +266,7 @@ sub new
     $self->read_table() if defined $self->{table};
 
     if ($self->{entry}) {
-	while ($self->{entry} =~ /([^\n]+)/g) {
+	while ($self->{entry} =~ m/([^\n]+)/g) {
 	    $self->parseEntry($1);
 	}
     }
@@ -306,29 +306,29 @@ sub read_table {
     }
 
     while (my $line = ~< $fh) {
-	next if $line =~ /^\s*#/;
+	next if $line =~ m/^\s*#/;
 	unless ($line =~ s/^\s*\@//) {
 	    $self->parseEntry($line);
 	    next;
 	}
 
 	# matched ^\s*\@
-	if ($line =~ /^version\s*(\S*)/) {
+	if ($line =~ m/^version\s*(\S*)/) {
 	    $self->{versionTable} ||= $1;
 	}
-	elsif ($line =~ /^variable\s+(\S*)/) { # since UTS #10-9
+	elsif ($line =~ m/^variable\s+(\S*)/) { # since UTS #10-9
 	    $self->{variableTable} ||= $1;
 	}
-	elsif ($line =~ /^alternate\s+(\S*)/) { # till UTS #10-8
+	elsif ($line =~ m/^alternate\s+(\S*)/) { # till UTS #10-8
 	    $self->{alternateTable} ||= $1;
 	}
-	elsif ($line =~ /^backwards\s+(\S*)/) {
+	elsif ($line =~ m/^backwards\s+(\S*)/) {
 	    push @{ $self->{backwardsTable} }, $1;
 	}
-	elsif ($line =~ /^forwards\s+(\S*)/) { # parhaps no use
+	elsif ($line =~ m/^forwards\s+(\S*)/) { # parhaps no use
 	    push @{ $self->{forwardsTable} }, $1;
 	}
-	elsif ($line =~ /^rearrange\s+(.*)/) { # (\S*) is NG
+	elsif ($line =~ m/^rearrange\s+(.*)/) { # (\S*) is NG
 	    push @{ $self->{rearrangeTable} }, _getHexArray($1);
 	}
     }
@@ -345,12 +345,12 @@ sub parseEntry
     my $line = shift;
     my($name, $entry, @uv, @key);
 
-    return if $line !~ /^\s*[0-9A-Fa-f]/;
+    return if $line !~ m/^\s*[0-9A-Fa-f]/;
 
     # removes comment and gets name
     $name = $1
 	if $line =~ s/[#%]\s*(.*)//;
-    return if defined $self->{undefName} && $name =~ /$self->{undefName}/;
+    return if defined $self->{undefName} && $name =~ m/$self->{undefName}/;
 
     # gets element
     my($e, $k) = split /;/, $line;
@@ -367,21 +367,21 @@ sub parseEntry
 
 	# regarded as if it were not entried in the table
 	return
-	    if defined $self->{undefChar} && $ele =~ /$self->{undefChar}/;
+	    if defined $self->{undefChar} && $ele =~ m/$self->{undefChar}/;
 
 	# replaced as completely ignorable
 	$k = '[.0000.0000.0000.0000]'
-	    if defined $self->{ignoreChar} && $ele =~ /$self->{ignoreChar}/;
+	    if defined $self->{ignoreChar} && $ele =~ m/$self->{ignoreChar}/;
     }
 
     # replaced as completely ignorable
     $k = '[.0000.0000.0000.0000]'
-	if defined $self->{ignoreName} && $name =~ /$self->{ignoreName}/;
+	if defined $self->{ignoreName} && $name =~ m/$self->{ignoreName}/;
 
     my $is_L3_ignorable = TRUE;
 
-    foreach my $arr ($k =~ /\[([^\[\]]+)\]/g) { # SPACEs allowed
-	my $var = $arr =~ /\*/; # exactly /^\*/ but be lenient.
+    foreach my $arr ($k =~ m/\[([^\[\]]+)\]/g) { # SPACEs allowed
+	my $var = $arr =~ m/\*/; # exactly /^\*/ but be lenient.
 	my @wt = _getHexArray($arr);
 	push @key, pack(VCE_TEMPLATE, $var, @wt);
 	$is_L3_ignorable = FALSE
@@ -662,9 +662,9 @@ sub getSortKey
 		$curHST .= getHST($u);
 	    }
 	    if ($preHST && !$curHST || # hangul before non-hangul
-		$preHST =~ /L\z/ && $curHST =~ /^T/ ||
-		$preHST =~ /V\z/ && $curHST =~ /^L/ ||
-		$preHST =~ /T\z/ && $curHST =~ /^[LV]/) {
+		$preHST =~ m/L\z/ && $curHST =~ m/^T/ ||
+		$preHST =~ m/V\z/ && $curHST =~ m/^L/ ||
+		$preHST =~ m/T\z/ && $curHST =~ m/^[LV]/) {
 
 		push @buf, $self->getWtHangulTerm();
 	    }
@@ -827,7 +827,7 @@ sub getWtHangulTerm {
 ##
 ## "hhhh hhhh hhhh" to (dddd, dddd, dddd)
 ##
-sub _getHexArray { map hex, $_[0] =~ /([0-9a-fA-F]+)/g }
+sub _getHexArray { map hex, $_[0] =~ m/([0-9a-fA-F]+)/g }
 
 #
 # $code *must* be in Hangul syllable.

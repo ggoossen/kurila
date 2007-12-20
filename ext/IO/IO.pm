@@ -18,7 +18,7 @@ sub import {
     
     my @l = @_ ? @_ : qw(Handle Seekable File Pipe Socket Dir);
 
-    eval join("", map { "require IO::" . (/(\w+)/)[0] . ";\n" } @l)
+    eval join("", map { "require IO::" . (m/(\w+)/)[0] . ";\n" } @l)
 	or croak $@;
 }
 

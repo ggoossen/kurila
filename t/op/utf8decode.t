@@ -149,9 +149,9 @@ __EOMK__
     }
 
     for (@MK) {
-	if (/^(?:\d+(?:\.\d+)?)\s/ || /^#/) {
+	if (m/^(?:\d+(?:\.\d+)?)\s/ || m/^#/) {
 	    # print "# $_\n";
-	} elsif (/^(\d+\.\d+\.\d+[bu]?)\s+([yn])\s+"(.+)"\s+([0-9a-f]{1,8}|-)\s+(\d+)\s+([0-9a-f]{2}(?::[0-9a-f]{2})*)(?:\s+((?:\d+|-)(?:\s+(.+))?))?$/) {
+	} elsif (m/^(\d+\.\d+\.\d+[bu]?)\s+([yn])\s+"(.+)"\s+([0-9a-f]{1,8}|-)\s+(\d+)\s+([0-9a-f]{2}(?::[0-9a-f]{2})*)(?:\s+((?:\d+|-)(?:\s+(.+))?))?$/) {
 	    $id = $1;
 	    my ($okay, $bytes, $Unicode, $byteslen, $hex, $charslen, $experr) =
 		($2, $3, $4, $5, $6, $7, $8);
@@ -174,7 +174,7 @@ __EOMK__
 		    print "not ";
 		}
 	    } elsif ($okay eq 'n') {
-		if (not $warn || ($experr ne '' && $warn !~ /$experr/)) {
+		if (not $warn || ($experr ne '' && $warn !~ m/$experr/)) {
 		    moan "unpack('U0U*') false positive\n";
 		    print "not ";
 		}

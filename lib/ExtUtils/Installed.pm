@@ -10,7 +10,7 @@ use File::Basename;
 use File::Spec;
 
 my $Is_VMS = $^O eq 'VMS';
-my $DOSISH = ($^O =~ /^(MSWin\d\d|os2|dos|mint)$/);
+my $DOSISH = ($^O =~ m/^(MSWin\d\d|os2|dos|mint)$/);
 
 require VMS::Filespec if $Is_VMS;
 
@@ -192,7 +192,7 @@ sub _module_name {
     my $module = '';
     if (open PACKFH, $file) {
         while ( ~< *PACKFH) {
-            if (/package\s+(\S+)\s*;/) {
+            if (m/package\s+(\S+)\s*;/) {
                 my $pack = $1;
                 # Make a sanity check, that lower case $module
                 # is identical to lowercase $pack before
@@ -219,8 +219,8 @@ sub modules {
 
     # Bug/feature of sort in scalar context requires this.
     return wantarray
-        ? sort grep { not /^:private:$/ } keys %$self
-        : grep { not /^:private:$/ } keys %$self;
+        ? sort grep { not m/^:private:$/ } keys %$self
+        : grep { not m/^:private:$/ } keys %$self;
 }
 
 sub files {

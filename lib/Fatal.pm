@@ -26,7 +26,7 @@ sub import {
 sub fill_protos {
   my $proto = shift;
   my ($n, $isref, @out, @out1, $seen_semi) = -1;
-  while ($proto =~ /\S/) {
+  while ($proto =~ m/\S/) {
     $n++;
     push(@out1,[$n,@out]) if $seen_semi;
     push(@out, $1 . "{\$_[$n]}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
@@ -82,16 +82,16 @@ sub _make_fatal {
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
-    $sub = "${pkg}::$sub" unless $sub =~ /::/;
+    $sub = "${pkg}::$sub" unless $sub =~ m/::/;
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
     print "# _make_fatal: sub=$sub pkg=$pkg name=$name void=$void\n" if $Debug;
-    croak "Bad subroutine name for Fatal: $name" unless $name =~ /^\w+$/;
+    croak "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
 	$sref = \&$sub;
 	$proto = prototype $sref;
 	$call = '&$sref';
-    } elsif ($sub eq $ini && $sub !~ /^CORE::GLOBAL::/) {
+    } elsif ($sub eq $ini && $sub !~ m/^CORE::GLOBAL::/) {
 	# Stray user subroutine
 	die "$sub is not a Perl subroutine" 
     } else {			# CORE subroutine

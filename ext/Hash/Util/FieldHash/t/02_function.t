@@ -122,7 +122,7 @@ BEGIN { $n_tests += 5 }
     $f{ $key} = $val;
     is( $f{ $key}, $val, "plain key set in field");
     my ( $id) = keys %f;
-    my $refaddr = hex +($key =~ /\(0x([[:xdigit:]]+)\)$/)[ 0];
+    my $refaddr = hex +($key =~ m/\(0x([[:xdigit:]]+)\)$/)[ 0];
     is $id, $refaddr, "key is refaddr";
     bless $key;
     is( $f{ $key}, $val, "access through blessed");
@@ -315,7 +315,7 @@ BEGIN { plan tests => $n_tests }
 
 sub refaddr {
     my $ref = shift;
-    hex +($ref =~ /\(0x([[:xdigit:]]+)\)$/)[ 0];
+    hex +($ref =~ m/\(0x([[:xdigit:]]+)\)$/)[ 0];
 }
 
 use Symbol qw( gensym);

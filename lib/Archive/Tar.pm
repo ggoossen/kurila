@@ -253,7 +253,7 @@ sub _read_tar {
 
         unless( $read++ ) {
             my $gzip = GZIP_MAGIC_NUM;
-            if( $chunk =~ /$gzip/ ) {
+            if( $chunk =~ m/$gzip/ ) {
                 $self->_error( qq[Cannot read compressed format in tar-mode] );
                 return;
             }

@@ -104,7 +104,7 @@ sub is_language_tag {
   #  regexp would erroneously let pass
 
   return $tag =~ 
-    /^(?:  # First subtag
+    m/^(?:  # First subtag
          [xi] | [a-z]{2,3}
       )
       (?:  # Subtags thereafter
@@ -629,7 +629,7 @@ sub alternate_language_tags {
   } elsif($tag =~ m/^no-nyn\b(.*)/i) { push @em, "nn$1";
   }
 
-  push @em, $alt{$1} . $2 if $tag =~ /^([XIxi])(-.+)/;
+  push @em, $alt{$1} . $2 if $tag =~ m/^([XIxi])(-.+)/;
   return @em;
 }
 

@@ -651,7 +651,7 @@ EOM
 
 
     # Check inflateSync leaves good data in buffer
-    $Answer =~ /^(.)(.*)$/ ;
+    $Answer =~ m/^(.)(.*)$/ ;
     my ($initial, $rest) = ($1, $2);
 
     
@@ -767,32 +767,32 @@ EOM
     like $@, '/^Compress::Zlib::inflateInit: Expected even number of parameters, got 1/';
 
     eval { deflateInit(-Joe => 1) };
-    ok $@ =~ /^Compress::Zlib::deflateInit: unknown key value\(s\) Joe at/;
+    ok $@ =~ m/^Compress::Zlib::deflateInit: unknown key value\(s\) Joe at/;
 
     eval { inflateInit(-Joe => 1) };
-    ok $@ =~ /^Compress::Zlib::inflateInit: unknown key value\(s\) Joe at/;
+    ok $@ =~ m/^Compress::Zlib::inflateInit: unknown key value\(s\) Joe at/;
 
     eval { deflateInit(-Bufsize => 0) };
-    ok $@ =~ /^.*?: Bufsize must be >= 1, you specified 0 at/;
+    ok $@ =~ m/^.*?: Bufsize must be >= 1, you specified 0 at/;
 
     eval { inflateInit(-Bufsize => 0) };
-    ok $@ =~ /^.*?: Bufsize must be >= 1, you specified 0 at/;
+    ok $@ =~ m/^.*?: Bufsize must be >= 1, you specified 0 at/;
 
     eval { deflateInit(-Bufsize => -1) };
     #ok $@ =~ /^.*?: Bufsize must be >= 1, you specified -1 at/;
-    ok $@ =~ /^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
+    ok $@ =~ m/^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
 
     eval { inflateInit(-Bufsize => -1) };
-    ok $@ =~ /^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
+    ok $@ =~ m/^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
 
     eval { deflateInit(-Bufsize => "xxx") };
-    ok $@ =~ /^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
+    ok $@ =~ m/^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
 
     eval { inflateInit(-Bufsize => "xxx") };
-    ok $@ =~ /^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
+    ok $@ =~ m/^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
 
     eval { gzopen([], 0) ; }  ;
-    ok $@ =~ /^gzopen: file parameter is not a filehandle or filename at/
+    ok $@ =~ m/^gzopen: file parameter is not a filehandle or filename at/
 	or print "# $@\n" ;
 
 #    my $x = Symbol::gensym() ;

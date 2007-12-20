@@ -69,8 +69,8 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	    close FOO;
 	    print join(" ", "#", map { sprintf("%02x", $_) } unpack("C*", $foo)),
 	    "\n";
-	    ok($foo =~ /\x0d\x0a$/);
-	    ok($foo !~ /\x0d\x0d/);
+	    ok($foo =~ m/\x0d\x0a$/);
+	    ok($foo !~ m/\x0d\x0d/);
 	}
     }
 }
@@ -81,6 +81,6 @@ else {
 sub count_chars {
     my($text, $chars) = @_;
     my $seen = 0;
-    $seen++ while $text =~ /$chars/g;
+    $seen++ while $text =~ m/$chars/g;
     return $seen;
 }

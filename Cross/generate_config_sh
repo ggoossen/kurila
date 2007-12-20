@@ -48,15 +48,15 @@ open(FILE, "$config") || die("Unable to open $config");
 
 my $line_in;
 while ($line_in = ~< *FILE) {
-	if ($line_in =~ /^#/) {
+	if ($line_in =~ m/^#/) {
 		next;
 	}
 
-	if ($line_in !~ /./) {
+	if ($line_in !~ m/./) {
 		next;
 	}
 
-	$line_in =~ /^([^=]+)=(.*)/;
+	$line_in =~ m/^([^=]+)=(.*)/;
 	my $key = $1;
 	my $value = $2;
 	if (ref($callbacks->{$key}) eq "ARRAY") {

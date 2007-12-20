@@ -122,8 +122,8 @@ sub fileparse {
   my($dirpath, $basename);
 
   if (grep { $type eq $_ } qw(MSDOS DOS MSWin32 Epoc)) {
-    ($dirpath,$basename) = ($fullname =~ /^((?:.*[:\\\/])?)(.*)/s);
-    $dirpath .= '.\\' unless $dirpath =~ /[\\\/]\z/;
+    ($dirpath,$basename) = ($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
+    $dirpath .= '.\\' unless $dirpath =~ m/[\\\/]\z/;
   }
   elsif ($type eq "OS2") {
     ($dirpath,$basename) = ($fullname =~ m#^((?:.*[:\\/])?)(.*)#s);
@@ -131,15 +131,15 @@ sub fileparse {
     $dirpath .= '/' unless $dirpath =~ m#[\\/]\z#;
   }
   elsif ($type eq "MacOS") {
-    ($dirpath,$basename) = ($fullname =~ /^(.*:)?(.*)/s);
+    ($dirpath,$basename) = ($fullname =~ m/^(.*:)?(.*)/s);
     $dirpath = ':' unless $dirpath;
   }
   elsif ($type eq "AmigaOS") {
-    ($dirpath,$basename) = ($fullname =~ /(.*[:\/])?(.*)/s);
+    ($dirpath,$basename) = ($fullname =~ m/(.*[:\/])?(.*)/s);
     $dirpath = './' unless $dirpath;
   }
   elsif ($type eq 'VMS' ) {
-    ($dirpath,$basename) = ($fullname =~ /^(.*[:>\]])?(.*)/s);
+    ($dirpath,$basename) = ($fullname =~ m/^(.*[:>\]])?(.*)/s);
     $dirpath ||= '';  # should always be defined
   }
   else { # Default to Unix semantics.
@@ -296,11 +296,11 @@ sub dirname {
         $dirname ||= $ENV{DEFAULT};
     }
     elsif ($type eq 'MacOS') {
-	if( !length($basename) && $dirname !~ /^[^:]+:\z/) {
+	if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
             _strip_trailing_sep($dirname);
 	    ($basename,$dirname) = fileparse $dirname;
 	}
-	$dirname .= ":" unless $dirname =~ /:\z/;
+	$dirname .= ":" unless $dirname =~ m/:\z/;
     }
     elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
         _strip_trailing_sep($dirname);
@@ -310,7 +310,7 @@ sub dirname {
 	}
     }
     elsif ($type eq 'AmigaOS') {
-        if ( $dirname =~ /:\z/) { return $dirname }
+        if ( $dirname =~ m/:\z/) { return $dirname }
         chop $dirname;
         $dirname =~ s{[^:/]+\z}{} unless length($basename);
     }
@@ -380,7 +380,7 @@ sub fileparse_set_fstype {
 
         $Fileparse_fstype = 'Unix';  # default
         foreach my $type (@Types) {
-            $Fileparse_fstype = $type if $new_type =~ /^$type/i;
+            $Fileparse_fstype = $type if $new_type =~ m/^$type/i;
         }
 
         $Fileparse_igncase = 

@@ -12,10 +12,10 @@ sub import {
     my ($pack, @imports) = @_;
     my ($sym, $ch);
     foreach (@imports) {
-        if (($ch, $sym) = /^([\$\@\%\*\&])(.+)/) {
-	    if ($sym =~ /\W/) {
+        if (($ch, $sym) = m/^([\$\@\%\*\&])(.+)/) {
+	    if ($sym =~ m/\W/) {
 		# time for a more-detailed check-up
-		if ($sym =~ /^\w+[[{].*[]}]$/) {
+		if ($sym =~ m/^\w+[[{].*[]}]$/) {
 		    require Carp;
 		    Carp::croak("Can't declare individual elements of hash or array");
 		} elsif (warnings::enabled() and length($sym) == 1 and $sym !~ tr/a-zA-Z//) {
@@ -25,7 +25,7 @@ sub import {
 		    Carp::croak("'$_' is not a valid variable name under strict vars");
 		}
 	    }
-	    $sym = "${callpack}::$sym" unless $sym =~ /::/;
+	    $sym = "${callpack}::$sym" unless $sym =~ m/::/;
 	    *{Symbol::fetch_glob($sym)} =
 		(  $ch eq "\$" ? \${*{Symbol::fetch_glob($sym)}}
 		 : $ch eq "\@" ? \@{*{Symbol::fetch_glob($sym)}}

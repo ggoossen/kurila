@@ -31,7 +31,7 @@ ok(1);
 # Do this until we read an =pod
 my @reference;
 while (my $line = ~< *DATA) {
-  last if $line =~ /^=pod/;
+  last if $line =~ m/^=pod/;
   push(@reference,$line);
 }
 
@@ -61,12 +61,12 @@ my @output = ~< *INFH;
 
 ok(@output, @reference);
 for my $i (0..$#reference) {
-  next if $reference[$i] =~ /^%%/; # skip timestamp comments
+  next if $reference[$i] =~ m/^%%/; # skip timestamp comments
 
   # if we are running a new version of Pod::ParseUtils we need
   # to change the link text. This is a kluge until we drop support
   # for older versions of Pod::ParseUtils
-  if ($linkver +< 0.29 && $output[$i] =~ /manpage/) {
+  if ($linkver +< 0.29 && $output[$i] =~ m/manpage/) {
     # convert our expectations from new to old new format 
     $reference[$i] =~ s/Standard link: \\emph\{Pod::LaTeX\}/Standard link: the \\emph\{Pod::LaTeX\} manpage/;
     $reference[$i] =~ s/\\textsf\{sec\} in \\emph\{Pod::LaTeX\}/the section on \\textsf\{sec\} in the \\emph\{Pod::LaTeX\} manpage/;

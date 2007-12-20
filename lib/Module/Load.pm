@@ -71,8 +71,8 @@ sub _who { (caller(1))[0] }
 
 sub _is_file {
     local $_ = shift;
-    return  /^\./               ? 1 :
-            /[^\w:']/           ? 1 :
+    return  m/^\./               ? 1 :
+            m/[^\w:']/           ? 1 :
             undef
     #' silly bbedit..
 }

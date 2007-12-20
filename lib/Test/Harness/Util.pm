@@ -71,7 +71,7 @@ sub all_in {
                 push( @hits, all_in( { %parms, start => $currfile } ) ) if $parms{recurse};
             }
             else {
-                push( @hits, $currfile ) if $currfile =~ /\.t$/;
+                push( @hits, $currfile ) if $currfile =~ m/\.t$/;
             }
         }
     }

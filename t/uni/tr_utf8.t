@@ -11,7 +11,7 @@ BEGIN {
         @INC = '../lib';
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
@@ -72,7 +72,7 @@ is($str, $hiragana, "s/// # hiragana -> katakana");
   # [perl #40641]
   my $str = qq/Gebääääääääääääääääääääude/;
   my $reg = qr/Gebääääääääääääääääääääude/;
-  ok($str =~ /$reg/, "[perl #40641]");
+  ok($str =~ m/$reg/, "[perl #40641]");
 }
 
 __END__

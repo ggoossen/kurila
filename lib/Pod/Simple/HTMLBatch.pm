@@ -24,7 +24,7 @@ BEGIN {
   else { *DEBUG = sub () {0}; }
 }
 
-$SLEEPY = 1 if !defined $SLEEPY and $^O =~ /mswin|mac/i;
+$SLEEPY = 1 if !defined $SLEEPY and $^O =~ m/mswin|mac/i;
 # flag to occasionally sleep for $SLEEPY - 1 seconds.
 
 $HTML_RENDER_CLASS ||= "Pod::Simple::HTML";

@@ -193,7 +193,7 @@ for my $a (0,1) {
     $_ = 'abcdefgh';
     $_ .= chr 256;
     chop;
-    /(.*)/;
+    m/(.*)/;
     is(uc($1), "ABCDEFGH", "[perl #18931]");
 }
 
@@ -226,18 +226,18 @@ for ("a\x{100}", "ßyz\x{100}") { # ß to Ss (different length)
 
 for (map { $_ } "a\x{100}", "abc\x{100}", "\x{100}") {
     chop; # get ("a", "abc", "") in utf8
-    my $return =  uc($_) =~ /\G(.?)/g;
+    my $return =  uc($_) =~ m/\G(.?)/g;
     my $result = $return ? $1 : "not";
-    my $expect = (uc($_) =~ /(.?)/g)[0];
+    my $expect = (uc($_) =~ m/(.?)/g)[0];
     is($return, 1,       "[perl #38619]");
     is($result, $expect, "[perl #38619]");
 }
 
 for (map { $_ } "A\x{100}", "ABC\x{100}", "\x{100}") {
     chop; # get ("A", "ABC", "") in utf8
-    my $return =  lc($_) =~ /\G(.?)/g;
+    my $return =  lc($_) =~ m/\G(.?)/g;
     my $result = $return ? $1 : "not";
-    my $expect = (lc($_) =~ /(.?)/g)[0];
+    my $expect = (lc($_) =~ m/(.?)/g)[0];
     is($return, 1,       "[perl #38619]");
     is($result, $expect, "[perl #38619]");
 }

@@ -168,11 +168,11 @@ sub xclose {
 }
 
 sub fh_is_fd {
-    return ref \$_[0] eq "SCALAR" && $_[0] =~ /\A=?(\d+)\z/;
+    return ref \$_[0] eq "SCALAR" && $_[0] =~ m/\A=?(\d+)\z/;
 }
 
 sub xfileno {
-    return $1 if ref \$_[0] eq "SCALAR" and $_[0] =~ /\A=?(\d+)\z/;  # deal with fh just being an fd
+    return $1 if ref \$_[0] eq "SCALAR" and $_[0] =~ m/\A=?(\d+)\z/;  # deal with fh just being an fd
     return fileno $_[0];
 }
 

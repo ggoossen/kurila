@@ -270,7 +270,7 @@ sub new {
     $ret = bless [$FIN, $FOUT];
   }
   if ($ret->Features->{ornaments} 
-      and not ($ENV{PERL_RL} and $ENV{PERL_RL} =~ /\bo\w*=0/)) {
+      and not ($ENV{PERL_RL} and $ENV{PERL_RL} =~ m/\bo\w*=0/)) {
     local $Term::ReadLine::termcap_nowarn = 1;
     $ret->ornaments(1);
   }
@@ -307,9 +307,9 @@ our $VERSION = '1.03';
 
 my ($which) = exists $ENV{PERL_RL} ? split /\s+/, $ENV{PERL_RL} : undef;
 if ($which) {
-  if ($which =~ /\bgnu\b/i){
+  if ($which =~ m/\bgnu\b/i){
     eval "use Term::ReadLine::Gnu;";
-  } elsif ($which =~ /\bperl\b/i) {
+  } elsif ($which =~ m/\bperl\b/i) {
     eval "use Term::ReadLine::Perl;";
   } else {
     eval "use Term::ReadLine::$which;";

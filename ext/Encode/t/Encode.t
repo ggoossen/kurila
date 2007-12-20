@@ -8,7 +8,7 @@ BEGIN {
         exit 0;
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bEncode\b/) {
+    if ($Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
@@ -22,7 +22,7 @@ use charnames qw(greek);
 require bytes;
 use utf8;
 
-my @encodings = grep(/iso-?8859/,Encode::encodings());
+my @encodings = grep(m/iso-?8859/,Encode::encodings());
 my $n = 2;
 my @character_set = ('0'..'9', 'A'..'Z', 'a'..'z');
 my @source = qw(ascii iso8859-1 cp1250);

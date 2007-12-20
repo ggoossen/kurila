@@ -36,15 +36,15 @@ while (defined($str = ~< *DATA))
 {
 	chomp $str;
 	if ($str =~ s/\A# USING://)                 { $neg = 0; $cmd = $str; next; }
-	elsif ($str =~ /\A# TH[EI]SE? SHOULD FAIL/) { $neg = 1; next; }
-	elsif (!$str || $str =~ /\A#/)              { $neg = 0; next }
+	elsif ($str =~ m/\A# TH[EI]SE? SHOULD FAIL/) { $neg = 1; next; }
+	elsif (!$str || $str =~ m/\A#/)              { $neg = 0; next }
 	my $setup_cmd = ($str =~ s/\A\{(.*)\}//) ? $1 : '';
 	my $tests = 'sl';
 	$str =~ s/\\n/\n/g;
 	my $orig = $str;
 
 	eval $setup_cmd if $setup_cmd ne ''; 
-	if($tests =~ /l/) {
+	if($tests =~ m/l/) {
 		debug "\tUsing: $cmd\n";
 		debug "\t   on: [" . esc($setup_cmd) . "][" . esc($str) . "]\n";
 		my @res;
@@ -58,7 +58,7 @@ while (defined($str = ~< *DATA))
 	}
 
 	eval $setup_cmd if $setup_cmd ne '';
-	if($tests =~ /s/) {
+	if($tests =~ m/s/) {
 		$str = $orig;
 		debug "\tUsing: scalar $cmd\n";
 		debug "\t   on: [" . esc($str) . "]\n";

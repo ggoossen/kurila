@@ -29,7 +29,7 @@ like( $r, qr/^$b(?:\r?\n)?$/s, '-CO: no warning on UTF-8 output' );
 
 SKIP: {
     if (exists $ENV{PERL_UNICODE} &&
-	($ENV{PERL_UNICODE} eq "" || $ENV{PERL_UNICODE} =~ /[SO]/)) {
+	($ENV{PERL_UNICODE} eq "" || $ENV{PERL_UNICODE} =~ m/[SO]/)) {
 	skip(qq[cannot test with PERL_UNICODE locale "" or /[SO]/], 1);
     }
     $r = runperl( switches => [ '-CI', '-w' ],

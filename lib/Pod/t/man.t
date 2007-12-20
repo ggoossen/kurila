@@ -83,7 +83,7 @@ sub test_outtmp {
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
     open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
-    while ( ~< *OUT) { last if /^\.nh/ }
+    while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
     {
         local $/;

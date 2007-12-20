@@ -21,7 +21,7 @@ my @includes = ();
 my @switches = ();
 
 # Allow cuddling the paths with the -I
-@ARGV = map { /^(-I)(.+)/ ? ($1,$2) : $_ } @ARGV;
+@ARGV = map { m/^(-I)(.+)/ ? ($1,$2) : $_ } @ARGV;
 
 # Stick any default switches at the beginning, so they can be overridden
 # by the command line switches.
@@ -69,7 +69,7 @@ if ( $lib ) {
 }
 
 # Build up TH switches
-push( @switches, map { /\s/ && !/^".*"$/ ? qq["-I$_"] : "-I$_" } @includes );
+push( @switches, map { m/\s/ && !m/^".*"$/ ? qq["-I$_"] : "-I$_" } @includes );
 $Test::Harness::Switches = join( ' ', @switches );
 print "# \$Test::Harness::Switches: $Test::Harness::Switches\n" if $Test::Harness::debug;
 

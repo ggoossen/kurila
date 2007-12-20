@@ -12,7 +12,7 @@ sub b : lvalue { ${\shift} }
 my $out = a(b());		# Check that temporaries are allowed.
 is(ref $out, 'main'); # Not reached if error.
 
-my @out = grep /main/, a(b()); # Check that temporaries are allowed.
+my @out = grep m/main/, a(b()); # Check that temporaries are allowed.
 cmp_ok(scalar @out, '==', 1); # Not reached if error.
 
 my $in;
@@ -439,7 +439,7 @@ is($str, "Made w/ PerlScript");
 sub position : lvalue { pos }
 @p = ();
 $_ = "fee fi fo fum";
-while (/f/g) {
+while (m/f/g) {
     push @p, position;
     position() += 6;
 }

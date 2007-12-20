@@ -305,7 +305,7 @@ sub curr_headings {
     my $self = shift;
     $self->_init_headings()  unless (defined $self->{_SECTION_HEADINGS});
     my @headings = @{ $self->{_SECTION_HEADINGS} };
-    return (@_ +> 0  and  $_[0] =~ /^\d+$/) ? $headings[$_[0] - 1] : @headings;
+    return (@_ +> 0  and  $_[0] =~ m/^\d+$/) ? $headings[$_[0] - 1] : @headings;
 }
 
 ##---------------------------------------------------------------------------
@@ -467,8 +467,8 @@ sub match_section {
         for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
-            $match  ^&^= ($negated ? ($headings[$i] !~ /${regex}/)
-                                 : ($headings[$i] =~ /${regex}/));
+            $match  ^&^= ($negated ? ($headings[$i] !~ m/${regex}/)
+                                 : ($headings[$i] =~ m/${regex}/));
             last unless ($match);
         }
         return  1  if ($match);
@@ -504,7 +504,7 @@ sub is_selected {
 
     ## Keep track of current sections levels and headings
     $_ = $paragraph;
-    if (/^=((?:sub)*)(?:head(?:ing)?|sec(?:tion)?)(\d*)\s+(.*?)\s*$/)
+    if (m/^=((?:sub)*)(?:head(?:ing)?|sec(?:tion)?)(\d*)\s+(.*?)\s*$/)
     {
         ## This is a section heading command
         my ($level, $heading) = ($2, $3);
@@ -601,7 +601,7 @@ sub podselect {
             %opts = map {
                 my ($key, $val) = (lc $_, $opts{$_});
                 $key =~ s/^(?=\w)/-/;
-                $key =~ /^-se[cl]/  and  $key  = '-sections';
+                $key =~ m/^-se[cl]/  and  $key  = '-sections';
                 #! $key eq '-range'    and  $key .= 's';
                 ($key => $val);    
             } (keys %opts);
@@ -695,8 +695,8 @@ sub _compile_section_spec {
         }
         else {
             ## Add the forward and rear anchors (and put the negator back)
-            $_ = '^' . $_  unless (/^\^/);
-            $_ = $_ . '$'  unless (/\$$/);
+            $_ = '^' . $_  unless (m/^\^/);
+            $_ = $_ . '$'  unless (m/\$$/);
             $_ = '!' . $_  if ($negated);
         }
     }

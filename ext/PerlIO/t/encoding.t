@@ -84,7 +84,7 @@ if (open(FAIL, ">:encoding(NoneSuch)", $fail1)) {
 }
 if (!defined $warn) {
     print "not ok 10 # warning is undef\n";
-} elsif ($warn =~ /^Cannot find encoding "NoneSuch" at/) {
+} elsif ($warn =~ m/^Cannot find encoding "NoneSuch" at/) {
     print "ok 10\n";
 } else {
     print "not ok 10 # warning is '$warn'";
@@ -127,7 +127,7 @@ if (open(FAIL, ">:encoding(latin42)", $fail2)) {
 }
 if (!defined $warn) {
     print "not ok 13 # warning is undef\n";
-} elsif ($warn =~ /^Cannot find encoding "latin42" at.*line \d+\.$/) {
+} elsif ($warn =~ m/^Cannot find encoding "latin42" at.*line \d+\.$/) {
     print "ok 13\n";
 } else {
     print "not ok 13 # warning is: \n";

@@ -2,27 +2,27 @@ use re 'debug';
 
 $_ = 'foo bar baz bop fip fop';
 
-/foo/ and $count++;
+m/foo/ and $count++;
 
 {
     no re 'debug';
-    /bar/ and $count++;
+    m/bar/ and $count++;
     {
         use re 'debug';
-        /baz/ and $count++;
+        m/baz/ and $count++;
     }
-    /bop/ and $count++;
+    m/bop/ and $count++;
 }
 
-/fip/ and $count++;
+m/fip/ and $count++;
 
 no re 'debug';
 
-/fop/ and $count++;
+m/fop/ and $count++;
 
 use re 'debug';
 my $var='zoo|liz|zap';
-/($var)/ or $count++;
+m/($var)/ or $count++;
 
 print "Count=$count\n";
 

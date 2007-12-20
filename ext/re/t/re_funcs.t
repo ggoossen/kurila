@@ -4,7 +4,7 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
 	require Config;
-	if (($Config::Config{'extensions'} !~ /\bre\b/) ){
+	if (($Config::Config{'extensions'} !~ m/\bre\b/) ){
         	print "1..0 # Skip -- Perl configured without re module\n";
 		exit 0;
 	}
@@ -39,7 +39,7 @@ use re qw(is_regexp regexp_pattern regmust
     is($floating,undef,"Regmust anchored - ref");
 }
 
-if ('1234'=~/(?:(?<A>\d)|(?<C>!))(?<B>\d)(?<A>\d)(?<B>\d)/){
+if ('1234'=~m/(?:(?<A>\d)|(?<C>!))(?<B>\d)(?<A>\d)(?<B>\d)/){
     my @names = sort +regnames();
     is("@names","A B","regnames");
     my @names = sort +regnames(0);
@@ -51,7 +51,7 @@ if ('1234'=~/(?:(?<A>\d)|(?<C>!))(?<B>\d)(?<A>\d)(?<B>\d)/){
     is(join("", @{regname("A",1)}),"13");
     is(join("", @{regname("B",1)}),"24");    
     {
-        if ('foobar'=~/(?<foo>foo)(?<bar>bar)/) {
+        if ('foobar'=~m/(?<foo>foo)(?<bar>bar)/) {
             is(regnames_count(),2);
         } else {
             ok(0); ok(0);

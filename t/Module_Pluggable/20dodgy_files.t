@@ -35,7 +35,7 @@ use base qw(Module::Pluggable::Object);
 sub find_files { 
     my $self = shift;
     my @files = $self->SUPER::find_files(@_);
-    return grep { !/(^|\/)-/ } $self->SUPER::find_files(@_) ;
+    return grep { !m/(^|\/)-/ } $self->SUPER::find_files(@_) ;
 }
 
 package OddTest;

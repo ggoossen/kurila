@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -11,17 +11,17 @@ use Config;
 
 BEGIN {
     my $reason;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bSocket\b/) {
+    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bSocket\b/) {
 	$reason = 'Socket extension unavailable';
     }
-    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bIO\b/) {
+    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
 	$reason = 'IO extension unavailable';
     }
     elsif ($^O eq 'os2') {
 	require IO::Socket;
 
 	eval {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}
-	  or $@ !~ /not implemented/ or
+	  or $@ !~ m/not implemented/ or
 	    $reason = 'compiled without TCP/IP stack v4';
     }
     elsif ($^O =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {

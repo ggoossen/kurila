@@ -108,11 +108,11 @@ sub ckParams
                 
             return $self->saveErrorString(undef, "Null Character found in Name",
                                                 Z_DATA_ERROR)
-                if $strict && $name =~ /\x00/ ;
+                if $strict && $name =~ m/\x00/ ;
 
             return $self->saveErrorString(undef, "Non ISO 8859-1 Character found in Name",
                                                 Z_DATA_ERROR)
-                if $strict && $name =~ /$GZIP_FNAME_INVALID_CHAR_RE/o ;
+                if $strict && $name =~ m/$GZIP_FNAME_INVALID_CHAR_RE/o ;
         }
 
         if ($got->parsed('Comment') && defined $got->value('Comment')) {
@@ -120,11 +120,11 @@ sub ckParams
 
             return $self->saveErrorString(undef, "Null Character found in Comment",
                                                 Z_DATA_ERROR)
-                if $strict && $comment =~ /\x00/ ;
+                if $strict && $comment =~ m/\x00/ ;
 
             return $self->saveErrorString(undef, "Non ISO 8859-1 Character found in Comment",
                                                 Z_DATA_ERROR)
-                if $strict && $comment =~ /$GZIP_FCOMMENT_INVALID_CHAR_RE/o;
+                if $strict && $comment =~ m/$GZIP_FCOMMENT_INVALID_CHAR_RE/o;
         }
 
         if ($got->parsed('OS_Code') ) {

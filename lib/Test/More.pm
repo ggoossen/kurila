@@ -538,7 +538,7 @@ sub isa_ok ($$;$) {
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
         my($rslt, $error) = $tb->_try(sub { $object->isa($class) });
         if( $error ) {
-            if( $error =~ /^Can't call method "isa" on unblessed reference/ ) {
+            if( $error =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 # Its an unblessed reference
                 if( !UNIVERSAL::isa($object, $class) ) {
                     my $ref = ref $object;
@@ -660,7 +660,7 @@ sub use_ok ($;@) {
 
     local($@,$!,$SIG{__DIE__});   # isolate eval
 
-    if( @imports == 1 and $imports[0] =~ /^v\d+(?:\.\d+)?$/ ) {
+    if( @imports == 1 and $imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         eval <<USE;
@@ -739,7 +739,7 @@ sub _is_module_name {
     # End with an alphanumeric.
     # The rest is an alphanumeric or ::
     $module =~ s/\b::\b//g;
-    $module =~ /^[a-zA-Z]\w*$/;
+    $module =~ m/^[a-zA-Z]\w*$/;
 }
 
 =back
@@ -1004,7 +1004,7 @@ sub skip {
         $how_many = 1;
     }
 
-    if( defined $how_many and $how_many =~ /\D/ ) {
+    if( defined $how_many and $how_many =~ m/\D/ ) {
         _carp "skip() was passed a non-numeric number of tests.  Did you get the arguments backwards?";
         $how_many = 1;
     }

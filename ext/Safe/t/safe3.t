@@ -6,8 +6,8 @@ BEGIN {
 	@INC = '../lib';
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ /\bOpcode\b/
-	&& $Config{'extensions'} !~ /\bPOSIX\b/
+    if ($Config{'extensions'} !~ m/\bOpcode\b/
+	&& $Config{'extensions'} !~ m/\bPOSIX\b/
 	&& $Config{'osname'} ne 'VMS')
     {
 	print "1..0\n";

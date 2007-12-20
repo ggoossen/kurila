@@ -351,7 +351,7 @@ EOM
 close WARN ;
 
 while ( ~< *DATA) {
-    last if /^KEYWORDS$/ ;
+    last if m/^KEYWORDS$/ ;
     print PM $_ ;
 }
 

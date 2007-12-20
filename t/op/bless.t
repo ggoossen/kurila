@@ -68,7 +68,7 @@ expected($c1, "C3", "SCALAR");
 expected($d1, "D", "GLOB");
 
 # class is magic
-"E" =~ /(.)/;
+"E" =~ m/(.)/;
 expected(bless({}, $1), "E", "HASH");
 {
     local $! = 1;

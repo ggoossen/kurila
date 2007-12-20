@@ -1075,7 +1075,7 @@ sub _getline
     }
 
     # Record Mode
-    if ( ref $/ eq 'SCALAR' && ${$/} =~ /^\d+$/ && ${$/} +> 0) {
+    if ( ref $/ eq 'SCALAR' && ${$/} =~ m/^\d+$/ && ${$/} +> 0) {
         my $reclen = ${$/} ;
         my $data ;
         $self->read($data, $reclen) ;

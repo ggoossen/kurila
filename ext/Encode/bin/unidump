@@ -53,8 +53,8 @@ sub render_p{
     my ($chr, $format) = @_;
     our %S2pstr;
     $S2pstr{$chr} and return $S2pstr{$chr}; # \t\n...
-    $chr =~ /[\x20-\x7e]/ and return $chr;  # ascii, printable;
-    my $fmt = ($chr =~ /[\x00-\x1f\x7F]/)  ?
+    $chr =~ m/[\x20-\x7e]/ and return $chr;  # ascii, printable;
+    my $fmt = ($chr =~ m/[\x00-\x1f\x7F]/)  ?
     q(\x%x) : q(\x{%x});
     return sprintf $fmt, ord($chr);
 }
@@ -137,7 +137,7 @@ sub print_C{
 sub render_c{
     my ($chr, $format) = @_;
     our (%S2str, $IsFullWidth);
-    $chr =~ /[\p{IsControl}\s]/o and return $S2str{$chr} || "  ";
+    $chr =~ m/[\p{IsControl}\s]/o and return $S2str{$chr} || "  ";
     $chr =~ $IsFullWidth and return $chr; # as is
     return " " . $chr;
 }

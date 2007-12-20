@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    unless(grep /blib/, @INC) {
+    unless(grep m/blib/, @INC) {
         chdir 't' if -d 't';
         @INC = '../lib' if -d '../lib';
     }
@@ -13,7 +13,7 @@ use Config;
  
 BEGIN {
     if(-d "lib" && -f "TEST") {
-        if ($Config{'extensions'} !~ /\bDB_File\b/ ) {
+        if ($Config{'extensions'} !~ m/\bDB_File\b/ ) {
             print "1..0 # Skip: DB_File was not built\n";
             exit 0;
         }
@@ -195,9 +195,9 @@ ok(14, $dbh->{bfname} == 1234 );
 
 # Check that an invalid entry is caught both for store & fetch
 eval '$dbh->{fred} = 1234' ;
-ok(15, $@ =~ /^DB_File::RECNOINFO::STORE - Unknown element 'fred' at/ );
+ok(15, $@ =~ m/^DB_File::RECNOINFO::STORE - Unknown element 'fred' at/ );
 eval 'my $q = $dbh->{fred}' ;
-ok(16, $@ =~ /^DB_File::RECNOINFO::FETCH - Unknown element 'fred' at/ );
+ok(16, $@ =~ m/^DB_File::RECNOINFO::FETCH - Unknown element 'fred' at/ );
 
 # Now check the interface to RECNOINFO
 
@@ -405,7 +405,7 @@ unlink $Dfile;
     my $filename = "xyz" ;
     my %x ;
     eval { tie %x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ; } ;
-    ok(71, $@ =~ /^DB_File can only tie an array to a DB_RECNO database/) ;
+    ok(71, $@ =~ m/^DB_File can only tie an array to a DB_RECNO database/) ;
     unlink $filename ;
 }
 
@@ -758,7 +758,7 @@ EOM
    $db->filter_store_key (sub { $_ = $h[0] }) ;
 
    eval '$h[1] = 1234' ;
-   ok(146, $@ =~ /^recursion detected in filter_store_key at/ );
+   ok(146, $@ =~ m/^recursion detected in filter_store_key at/ );
    
    undef $db ;
    ok(147, safeUntie \@h);
@@ -1212,10 +1212,10 @@ exit unless $FA ;
     my $offset ;
     $a = '';
     splice(@a, $offset);
-    ok(182, $a =~ /^Use of uninitialized value /);
+    ok(182, $a =~ m/^Use of uninitialized value /);
     $a = '';
     splice(@tied, $offset);
-    ok(183, $a =~ /^Use of uninitialized value in splice/);
+    ok(183, $a =~ m/^Use of uninitialized value in splice/);
 
     no warnings 'uninitialized';
     $a = '';
@@ -1230,10 +1230,10 @@ exit unless $FA ;
     my $length ;
     $a = '';
     splice(@a, 0, $length);
-    ok(186, $a =~ /^Use of uninitialized value /);
+    ok(186, $a =~ m/^Use of uninitialized value /);
     $a = '';
     splice(@tied, 0, $length);
-    ok(187, $a =~ /^Use of uninitialized value in splice/);
+    ok(187, $a =~ m/^Use of uninitialized value in splice/);
 
     no warnings 'uninitialized';
     $a = '';
@@ -1247,10 +1247,10 @@ exit unless $FA ;
     use warnings;
     $a = '';
     splice(@a, 3);
-    my $splice_end_array = ($a =~ /^splice\(\) offset past end of array/);
+    my $splice_end_array = ($a =~ m/^splice\(\) offset past end of array/);
     $a = '';
     splice(@tied, 3);
-    ok(190, !$splice_end_array || $a =~ /^splice\(\) offset past end of array/);
+    ok(190, !$splice_end_array || $a =~ m/^splice\(\) offset past end of array/);
 
     no warnings 'misc';
     $a = '';

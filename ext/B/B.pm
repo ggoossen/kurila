@@ -177,7 +177,7 @@ sub walkoptree_exec {
 	$op->?$method($level);
 	$ppname = $op->name;
 	if ($ppname =~
-	    /^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
+	    m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
 	{
 	    print $prefix, uc($1), " => {\n";
 	    walkoptree_exec($op->other, $method, $level + 1);
@@ -222,7 +222,7 @@ sub walksymtable {
     $prefix = '' unless defined $prefix;
     while (($sym, $ref) = each %$symref) {
         $fullname = "*main::".$prefix.$sym;
-	if ($sym =~ /::$/) {
+	if ($sym =~ m/::$/) {
 	    $sym = $prefix . $sym;
 	    if ($sym ne "main::" && $sym ne "<none>::" && &$recurse($sym)) {
                walksymtable(\%{*{Symbol::fetch_glob($fullname)}}, $method, $recurse, $sym);

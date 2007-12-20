@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ /\bB\b/) ){
+    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -30,12 +30,12 @@ $out = runperl(switches => ["-MO=Concise"], prog => '$a', stderr => 1);
 # If either of the next two tests fail, it probably means you need to
 # fix the section labeled 'fragile kludge' in Concise.pm
 
-($op_base) = ($out =~ /^(\d+)\s*<0>\s*enter/m);
+($op_base) = ($out =~ m/^(\d+)\s*<0>\s*enter/m);
 
 is($op_base, 1, "Smallest OP sequence number");
 
 ($op_base_p1, $cop_base)
-  = ($out =~ /^(\d+)\s*<;>\s*nextstate\(main (-?\d+) /m);
+  = ($out =~ m/^(\d+)\s*<;>\s*nextstate\(main (-?\d+) /m);
 
 is($op_base_p1, 2, "Second-smallest OP sequence number");
 
@@ -208,7 +208,7 @@ SKIP: {
 	is(scalar split(/\n/, $res), 3,
 	   "'sub defd_empty {}' seen as 3 liner");
 
-	is(1, $res =~ /leavesub/ && $res =~ /(next|db)state/,
+	is(1, $res =~ m/leavesub/ && $res =~ m/(next|db)state/,
 	   "'sub defd_empty {}' seen as 2 ops: leavesub,nextstate");
 
 	($res,$err) = render('-basic', \&not_even_declared);

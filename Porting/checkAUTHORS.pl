@@ -35,7 +35,7 @@ while ( ~< *DATA) {
     chomp;
     s/\\100/\@/g;
     $_ = lc;
-    if (my ($correct, $alias) = /^\s*([^#\s]\S*)\s+(.*\S)/) {
+    if (my ($correct, $alias) = m/^\s*([^#\s]\S*)\s+(.*\S)/) {
         if ($correct eq '+') {$correct = $prev} else {$prev = $correct}
         $map {$alias} = $correct;
     }
@@ -123,12 +123,12 @@ if (@authors) {
   foreach my $filename (@authors) {
     open FH, "<$filename" or die "Can't open $filename: $!";
     while ( ~< *FH) {
-      next if /^\#/;
-      next if /^-- /;
-      if (/<([^>]+)>/) {
+      next if m/^\#/;
+      next if m/^-- /;
+      if (m/<([^>]+)>/) {
 	# Easy line.
 	$raw{$1}++;
-      } elsif (/^([-A-Za-z0-9 .\'Р-жиіј-џ]+)[\t\n]/) {
+      } elsif (m/^([-A-Za-z0-9 .\'Р-жиіј-џ]+)[\t\n]/) {
 	# Name only
 	$untraced{$1}++;
       } else {
@@ -147,7 +147,7 @@ if (@authors) {
 }
 
 while ( ~< *ARGV) {
-  next if /^-+/;
+  next if m/^-+/;
   if (m!^\[\s+(\d+)\]\s+By:\s+(\S+)\s+on!) {
     # new patch
     my @new = ($1, $2);
@@ -159,11 +159,11 @@ while ( ~< *ARGV) {
     $log = $_;
     my $prefix = " " x length $1;
     LOG: while ( ~< *ARGV) {
-      next if /^$/;
+      next if m/^$/;
       s/^\t/        /;
       if (s/^$prefix//) {
 	$log .= $_;
-      } elsif (/^\s+Branch:/) {
+      } elsif (m/^\s+Branch:/) {
 	last LOG;
       } else {
 	chomp;
@@ -224,7 +224,7 @@ sub display_ordered {
 sub process {
   my ($committer, $patch, $log) = @_;
   return unless $committer;
-  my @authors = $log =~ /From:\s+.*?([^"\@ \t\n<>]+\@[^"\@ \t\n<>]+)/gm;
+  my @authors = $log =~ m/From:\s+.*?([^"\@ \t\n<>]+\@[^"\@ \t\n<>]+)/gm;
 
   if (@authors) {
     foreach (@authors) {

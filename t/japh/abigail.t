@@ -88,7 +88,7 @@ plan tests => 130;
 
         my $sub     = $is_prime ? "ok" : "notok";
 
-        &$sub (( 1  x $num) !~ /^1?$|^(11+?)\1+$/,       $comment);
+        &$sub (( 1  x $num) !~ m/^1?$|^(11+?)\1+$/,       $comment);
         &$sub (( 0  x $num) !~ m 0^\0?$|^(\0\0+?)\1+$0,  $comment);
         &$sub (("m" x $num) !~ m m^\m?$|^(\m\m+?)\1+$mm, $comment);
     }
@@ -158,9 +158,9 @@ plan tests => 130;
     my @progs;
     my $key;
     while ( ~< *DATA) {
-        last if /^__END__$/;
+        last if m/^__END__$/;
 
-        if (/^#{7}(?:\s+(.*))?/) {
+        if (m/^#{7}(?:\s+(.*))?/) {
             push @progs => {COMMENT  => $1 || '',
                             CODE     => '',
                             SKIP_OS  => [],
@@ -169,14 +169,14 @@ plan tests => 130;
             $key = 'CODE';
             next;
         }
-        elsif (/^(COMMENT|CODE|ARGS|SWITCHES|EXPECT|SKIP|SKIP_OS)
+        elsif (m/^(COMMENT|CODE|ARGS|SWITCHES|EXPECT|SKIP|SKIP_OS)
                  (?::\s+(.*))?$/sx) {
             $key = $1;
             $progs [-1] {$key} = '' unless exists $progs [-1] {$key};
             next unless defined $2;
             $_ = $2;
         }
-        elsif (/^$/) {
+        elsif (m/^$/) {
             next;
         }
 

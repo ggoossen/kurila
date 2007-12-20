@@ -125,7 +125,7 @@ sub case_tolerant () {
       }
   }
   my $mntopts = Cygwin::mount_flags($drive);
-  if ($mntopts and ($mntopts =~ /,managed/)) {
+  if ($mntopts and ($mntopts =~ m/,managed/)) {
     return 0;
   }
   eval { require Win32API::File; } or return 1;

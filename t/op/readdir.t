@@ -12,7 +12,7 @@ for my $i (1..2000) {
 }
 
 if (opendir(OP, "op")) { print "ok 1\n"; } else { print "not ok 1\n"; }
-our @D = grep(/^[^\.].*\.t$/i, readdir(OP));
+our @D = grep(m/^[^\.].*\.t$/i, readdir(OP));
 closedir(OP);
 
 ##

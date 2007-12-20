@@ -26,7 +26,7 @@ Typically, it is invoked as:
 
 use strict;
 
-my ($ext1, $ext2) = map {quotemeta} grep {!/^--/} @ARGV;
+my ($ext1, $ext2) = map {quotemeta} grep {!m/^--/} @ARGV;
 my %opts = (
   #defaults
     'verbose' => 0,
@@ -34,16 +34,16 @@ my %opts = (
     'dummy' => 0,
     'say-subdir' => 0,
   #options itself
-    (map {/^--([\-_\w]+)=(.*)$/} @ARGV),                            # --opt=smth
-    (map {/^no-?(.*)$/i?($1=>0):($_=>1)} map {/^--([\-_\w]+)$/} @ARGV),  # --opt --no-opt --noopt
+    (map {m/^--([\-_\w]+)=(.*)$/} @ARGV),                            # --opt=smth
+    (map {m/^no-?(.*)$/i?($1=>0):($_=>1)} map {m/^--([\-_\w]+)$/} @ARGV),  # --opt --no-opt --noopt
   );
 
 my $sp = '';
 sub xx {
   opendir DIR, '.';
   my @t = readdir DIR;
-  my @f = map {/^(.*)\.$ext1$/i} @t;
-  my %f = map {lc($_)=>$_} map {/^(.*)\.$ext2$/i} @t;
+  my @f = map {m/^(.*)\.$ext1$/i} @t;
+  my %f = map {lc($_)=>$_} map {m/^(.*)\.$ext2$/i} @t;
   for (@f) {
     my $lc = lc($_);
     if (exists $f{$lc} and $f{$lc} ne $_) {
@@ -57,7 +57,7 @@ sub xx {
     }
   }
   if ($opts{recurse}) {
-    for (grep {-d&&!/^\.\.?$/} @t) {
+    for (grep {-d&&!m/^\.\.?$/} @t) {
       print STDERR "$sp\\$_\n" if $opts{'say-subdir'};
       $sp .= ' ';
       chdir $_ or die;

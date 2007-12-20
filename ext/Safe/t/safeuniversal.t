@@ -7,7 +7,7 @@ BEGIN {
     }
     require Config;
     Config->import;
-    if ($Config{'extensions'} !~ /\bOpcode\b/) {
+    if ($Config{'extensions'} !~ m/\bOpcode\b/) {
 	print "1..0\n";
 	exit 0;
     }

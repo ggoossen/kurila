@@ -74,7 +74,7 @@ ok("$dx->@" eq "aap noot");
     # ID 20001020.006
     use utf8;
 
-    "x" =~ /(.)/; # unset $2
+    "x" =~ m/(.)/; # unset $2
 
     # Without the fix this 5.7.0 would croak:
     # Modification of a read-only value attempted at ...
