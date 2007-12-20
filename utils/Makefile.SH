@@ -45,7 +45,7 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift)"
 
 plextract = perlbug perlivp dprofpp
 plfixlocal = h2xs h2ph perldoc pl2pm libnetcfg
-plfix = cpan config_data corelist instmodsh prove ptar ptardiff shasum splain piconv enc2xs xsubpp
+plfix = cpan corelist instmodsh prove ptar ptardiff shasum splain piconv enc2xs xsubpp
 
 all: $(plextract) $(plfixlocal) $(plfix)
 
@@ -58,10 +58,6 @@ $(plfixlocal):
 
 cpan: ../lib/CPAN/bin/cpan ../config.sh
 	$(CPS) ../lib/CPAN/bin/cpan $@
-	$(RUN) $(PERL) $(FIXIN) $@
-
-config_data: ../lib/Module/Build/scripts/$@ ../config.sh
-	$(CPS) ../lib/Module/Build/scripts/$@ $@
 	$(RUN) $(PERL) $(FIXIN) $@
 
 corelist: ../lib/Module/CoreList/bin/$@ ../config.sh
