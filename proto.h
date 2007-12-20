@@ -4610,7 +4610,7 @@ PERL_CALLCONV void	Perl_sys_init3(int* argc, char*** argv, char*** env)
 			__attribute__nonnull__(2)
 			__attribute__nonnull__(3);
 
-PERL_CALLCONV void	Perl_sys_term(pTHX);
+PERL_CALLCONV void	Perl_sys_term(void);
 
 
 #if defined(PERL_IN_DUMP_C)
