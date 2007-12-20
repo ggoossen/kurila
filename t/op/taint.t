@@ -146,7 +146,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
     if ($Is_MSWin32 && $Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split /$Config{path_sep}/, $ENV{PATH}) {
+	foreach my $dir (split m/$Config{path_sep}/, $ENV{PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -1236,9 +1236,9 @@ SKIP:
 
 {
     my $value = "foo bar";
-    my @values = split(/\s+/, $value, 2);
+    my @values = split(m/\s+/, $value, 2);
     ok(!tainted($values[1]), "result of split is not tainted if input was not tainted");
-    my @values = split(/\s+/, $value . $TAINT, 2);
+    my @values = split(m/\s+/, $value . $TAINT, 2);
     ok(tainted($values[1]), "result of split is tainted if input was tainted");
 }
 

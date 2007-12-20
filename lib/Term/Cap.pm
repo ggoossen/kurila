@@ -394,7 +394,7 @@ sub Tgetent
     $entry =~ s/^[^:]*://;
     foreach $field ( split( m/:[\s:\\]*/, $entry ) )
     {
-        if ( defined $field && $field =~ /^(\w\w)$/ )
+        if ( defined $field && $field =~ m/^(\w\w)$/ )
         {
             $self->{ '_' . $field } = 1 unless defined $self->{ '_' . $1 };
 

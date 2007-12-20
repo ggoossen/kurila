@@ -176,7 +176,7 @@ my %seenu; # the length of the argument list of this function
 while ( ~< *DATA) { # Read in the protypes.
     next if m/^\s+$/;
     chomp;
-    my ($func, $hdr, $type, @p) = split(/\s*\|\s*/, $_, -1);
+    my ($func, $hdr, $type, @p) = split(m/\s*\|\s*/, $_, -1);
     my $u;
     # Split off the real function name and the argument list.
     ($func, $u) = split(' ', $func);

@@ -939,7 +939,7 @@ sub cmd_verbatim {
     # we'll pass to .Vb as its parameter.  This tells *roff to keep that many
     # lines together.  We don't want to tell *roff to keep huge blocks
     # together.
-    my @lines = split (/\n/, $text);
+    my @lines = split (m/\n/, $text);
     my $unbroken = 0;
     for (@lines) {
         last if m/^\s*$/;

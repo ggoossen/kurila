@@ -134,7 +134,7 @@ sub copy {
 
                 $copy_to = VMS::Filespec::vmsify($to);
                 my ($vol, $dirs, $file) = File::Spec->splitpath($copy_to);
-                $file = $file . '.' unless ($file =~ /(?<!\^)\./);
+                $file = $file . '.' unless ($file =~ m/(?<!\^)\./);
                 $copy_to = File::Spec->catpath($vol, $dirs, $file);
 
                 # Get rid of the old versions to be like UNIX
@@ -247,7 +247,7 @@ sub move {
 
             $rename_to = VMS::Filespec::vmsify($to);
             my ($vol, $dirs, $file) = File::Spec->splitpath($rename_to);
-            $file = $file . '.' unless ($file =~ /(?<!\^)\./);
+            $file = $file . '.' unless ($file =~ m/(?<!\^)\./);
             $rename_to = File::Spec->catpath($vol, $dirs, $file);
 
             # Get rid of the old versions to be like UNIX

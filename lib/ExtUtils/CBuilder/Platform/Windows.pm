@@ -568,7 +568,7 @@ sub format_compiler_cmd {
   }
 
   # split off any -arguments included in cc
-  my @cc = split / (?=-)/, $spec{cc};
+  my @cc = split m/ (?=-)/, $spec{cc};
 
   return [ grep {defined && length} (
     @cc, '-c'               ,
@@ -617,7 +617,7 @@ sub format_linker_cmd {
   ];
 
   # split off any -arguments included in ld
-  my @ld = split / (?=-)/, $spec{ld};
+  my @ld = split m/ (?=-)/, $spec{ld};
 
   push @cmds, [ grep {defined && length} (
     @ld                       ,

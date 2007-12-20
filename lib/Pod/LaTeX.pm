@@ -1073,7 +1073,7 @@ sub command {
 
     # The first line contains the format and the rest is the
     # raw code.
-    my ($format, $chunk) = split(/\n/, $rawpara, 2);
+    my ($format, $chunk) = split(m/\n/, $rawpara, 2);
 
     # If we have got some latex code print it out immediately
     # unmodified. Else do nothing.
@@ -1184,7 +1184,7 @@ sub textblock {
     $paragraph =~ s/\s$//;
 
     # Split the string into 2 parts
-    my ($name, $purpose) = split(/\s+-\s+/, $expansion,2);
+    my ($name, $purpose) = split(m/\s+-\s+/, $expansion,2);
 
     # Now prevent this from triggering until a new head1 NAME is set
     $self->{_CURRENT_HEAD1} = '_NAME';
@@ -1796,7 +1796,7 @@ sub _split_delimited {
 
   $input =~ s/\n/ /gm;
   $input .= ' ';
-  foreach ( split ( //, $input ) ) {
+  foreach ( split ( m//, $input ) ) {
     $token .= $_;
     if (m/\{/) {
       $depth++;

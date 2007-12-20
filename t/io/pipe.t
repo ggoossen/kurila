@@ -55,8 +55,8 @@ SKIP: {
     if (open(PIPE, "-|")) {
 	$_ = join '', ~< *PIPE;
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = map ord, split //, $raw;
-	my @r1 = map ord, split //, $raw1;
+	my @r  = map ord, split m//, $raw;
+	my @r1 = map ord, split m//, $raw1;
         if ($raw1 eq $raw) {
 	    s/^not (ok \d+ -) .*/$1 '@r1' passes through '-|'\n/s;
 	} else {
@@ -80,8 +80,8 @@ SKIP: {
     else {
 	$_ = join '', ~< *STDIN;
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = map ord, split //, $raw;
-	my @r1 = map ord, split //, $raw1;
+	my @r  = map ord, split m//, $raw;
+	my @r1 = map ord, split m//, $raw1;
         if ($raw1 eq $raw) {
 	    s/^not (ok \d+ -) .*/$1 '@r1' passes through '|-'\n/s;
 	} else {

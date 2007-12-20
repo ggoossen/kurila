@@ -114,7 +114,7 @@ if ( !@ARGV ) {
 while (@ARGV) {
 	my ($mod, $ver);
 	if ($ARGV[0] =~ m/=/) {
-	    ($mod, $ver) = split /=/, shift @ARGV;
+	    ($mod, $ver) = split m/=/, shift @ARGV;
 	} else {
 	    $mod = shift @ARGV;
 	    $ver = (@ARGV && $ARGV[0] =~ m/^\d/) ? shift @ARGV : "";

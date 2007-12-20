@@ -99,7 +99,7 @@ sub get_keys {
 # can't do it perl, without doing some tricks
 sub hash {
     my $s = shift;
-    my @c = split //, $s;
+    my @c = split m//, $s;
     my $u = HASH_SEED;
     for (@c) {
         # (A % M) + (B % M) == (A + B) % M

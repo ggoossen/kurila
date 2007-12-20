@@ -12,14 +12,14 @@
 $|=1;
 
 undef $/;
-our @prgs = split /^########\n/m, ~< *DATA;
+our @prgs = split m/^########\n/m, ~< *DATA;
 
 BEGIN { require './test.pl'; }
 plan(tests => scalar @prgs);
 my $i;
 for (@prgs){
     ++$i;
-    my($prog,$expected) = split(/\nEXPECT\n/, $_, 2);
+    my($prog,$expected) = split(m/\nEXPECT\n/, $_, 2);
     print("not ok $i # bad test format\n"), next
         unless defined $expected;
     my ($testname) = $prog =~ m/^# (.*)\n/m;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w -I.
 
 use strict;
-our @tests = (split(/\nEND\n/s, <<DONE));
+our @tests = (split(m/\nEND\n/s, <<DONE));
 TEST1
 Cyberdog Information
 

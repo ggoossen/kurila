@@ -902,7 +902,7 @@ sub _file_fetch {
     }
     
     if( $vol ) {
-        $path   = File::Spec->catdir( split /\//, $path );
+        $path   = File::Spec->catdir( split m/\//, $path );
         $remote = File::Spec->catpath( $vol, $path, $self->file);
 
     } elsif( $share ) {

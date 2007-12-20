@@ -165,7 +165,7 @@ sub UpDowngrade
         $our_sub = sub {
 	    if ( m/^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
                 my $indent = $1;
-                my $vars = join ' ', split /\s*,\s*/, $2;
+                my $vars = join ' ', split m/\s*,\s*/, $2;
                 $_ = "${indent}use vars qw($vars);\n";
             }
 	    elsif ( m/^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)

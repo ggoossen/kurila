@@ -68,9 +68,9 @@ sub STORABLE_freeze {
 
 sub STORABLE_thaw {
 	my ($self, $cloning, $frozen) = @_;
-	my ($keys, $values) = split(/;/, $frozen);
-	my @keys = split(/:/, $keys);
-	my @values = split(/:/, $values);
+	my ($keys, $values) = split(m/;/, $frozen);
+	my @keys = split(m/:/, $keys);
+	my @values = split(m/:/, $values);
 	for (my $i = 0; $i +< @keys; $i++) {
 		$self->{$keys[$i]} = $values[$i];
 	}
@@ -110,7 +110,7 @@ sub STORABLE_freeze {
 
 sub STORABLE_thaw {
 	my ($self, $cloning, $frozen) = @_;
-	@$self = split(/:/, $frozen);
+	@$self = split(m/:/, $frozen);
 	$main::array_hook2++;
 }
 

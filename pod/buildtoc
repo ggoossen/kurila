@@ -461,7 +461,7 @@ my $NEWLINE = 0;	# how many newlines have we seen recently
 my $LINE;		# what remains to be printed
 
 sub output ($) {
-    for (split /(\n)/, shift) {
+    for (split m/(\n)/, shift) {
 	if ($_ eq "\n") {
 	    if ($LINE) {
 		print OUT wrap('', '', $LINE);
@@ -544,7 +544,7 @@ sub generate_descrip_mms_1 {
   local $Text::Wrap::columns = 150;
   my $count = 0;
   my @lines = map {"pod" . $count++ . " = $_"}
-    split /\n/, wrap('', '', join " ", map "[.lib.pods]$_.pod",
+    split m/\n/, wrap('', '', join " ", map "[.lib.pods]$_.pod",
 		     sort keys %Pods, keys %Readmepods);
   @lines, "pod = " . join ' ', map {"\$(pod$_)"} 0 .. $count - 1;
 }

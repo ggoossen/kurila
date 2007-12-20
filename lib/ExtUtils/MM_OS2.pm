@@ -97,7 +97,7 @@ sub static_lib {
     my $old = $self->ExtUtils::MM_Unix::static_lib();
     return $old unless $self->{IMPORTS} && %{$self->{IMPORTS}};
     
-    my @chunks = split /\n{2,}/, $old;
+    my @chunks = split m/\n{2,}/, $old;
     shift @chunks unless length $chunks[0]; # Empty lines at the start
     $chunks[0] .= <<'EOC';
 

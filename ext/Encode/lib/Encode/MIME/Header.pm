@@ -112,9 +112,9 @@ my $re_especials = qr{$re_encoded_word|$especials}xo;
 sub encode($$;$) {
     my ( $obj, $str, $chk ) = @_;
     my @line = ();
-    for my $line ( split /\r|\n|\r\n/o, $str ) {
+    for my $line ( split m/\r|\n|\r\n/o, $str ) {
         my ( @word, @subline );
-        for my $word ( split /($re_especials)/o, $line ) {
+        for my $word ( split m/($re_especials)/o, $line ) {
             if (   $word =~ m/[^\x00-\x7f]/o
                 or $word =~ m/^$re_encoded_word$/o )
             {

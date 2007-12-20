@@ -21,7 +21,7 @@ if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $Config_archname = qq('$Config{archname}');
     $Config_version  = qq('$Config{version}');
     my @Config_inc_version_list =
-	reverse split / /, $Config{inc_version_list};
+	reverse split m/ /, $Config{inc_version_list};
     $Config_inc_version_list =
 	@Config_inc_version_list ?
 	    qq(@Config_inc_version_list) : q(());

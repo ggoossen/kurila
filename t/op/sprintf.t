@@ -27,7 +27,7 @@ my $Is_Ultrix_VAX = $^O eq 'ultrix' && `uname -m` =~ m/^VAX$/;
 
 while ( ~< *DATA) {
     s/^\s*>//; s/<\s*$//;
-    ($template, $data, $result, $comment) = split(/<\s*>/, $_, 4);
+    ($template, $data, $result, $comment) = split(m/<\s*>/, $_, 4);
     if ($^O eq 'os390' || $^O eq 's390') { # non-IEEE (s390 is UTS)
         $data   =~ s/([eE])96$/${1}63/;      # smaller exponents
         $result =~ s/([eE]\+)102$/${1}69/;   #  "       "

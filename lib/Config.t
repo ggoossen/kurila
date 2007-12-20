@@ -160,7 +160,7 @@ foreach my $pain ($first, @virtual) {
 # This little bit of evil is to avoid a @ in the program, in case it confuses
 # shell 1 liners. Perl 1 rules.
 my ($path, $ver, @orig_inc)
-  = split /\n/,
+  = split m/\n/,
     runperl (nolib=>1,
 	     prog=>'print qq{$^X\n$^V\n}; print qq{$_\n} while $_ = shift INC');
 

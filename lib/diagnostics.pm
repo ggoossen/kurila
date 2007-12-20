@@ -376,7 +376,7 @@ my %msg;
 	# strip formatting directives from =item line
 	$header =~ s/[A-Z]<(.*?)>/$1/g;
 
-        my @toks = split( /(%l?[dx]|%c|%(?:\.\d+)?s)/, $header );
+        my @toks = split( m/(%l?[dx]|%c|%(?:\.\d+)?s)/, $header );
 	if (@toks +> 1) {
             my $conlen = 0;
             for my $i (0..$#toks){
@@ -560,7 +560,7 @@ sub splainthis {
     # Discard 1st " at <file> line <no>" and all text beyond
     # but be aware of messsages containing " at this-or-that"
     my $real = 0;
-    my @secs = split( / at / );
+    my @secs = split( m/ at / );
     return unless @secs;
     $_ = $secs[0];
     for my $i ( 1..$#secs ){

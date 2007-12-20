@@ -36,10 +36,10 @@ for (@prgs){
     if (s/^\s*(-\w.*)//){
 	$switch = $1;
     }
-    my($prog,$expected) = split(/\nEXPECT\n/, $_);
+    my($prog,$expected) = split(m/\nEXPECT\n/, $_);
     $expected =~ s/\n+$//;
     # results can be in any order, so sort 'em
-    my @expected = sort split /\n/, $expected;
+    my @expected = sort split m/\n/, $expected;
     open TEST, ">$tmpfile" or die "Cannot open $tmpfile: $!";
     print TEST $prog, "\n";
     close TEST or die "Cannot close $tmpfile: $!";
@@ -62,7 +62,7 @@ for (@prgs){
     $results =~ s/^(syntax|parse) error/syntax error/mig;
     $results =~ s/^\n*Process terminated by SIG\w+\n?//mg
 	if $^O eq 'os2';
-    my @results = sort split /\n/, $results;
+    my @results = sort split m/\n/, $results;
     if ( "@results" ne "@expected" ) {
 	print STDERR "PROG: $switch\n$prog\n";
 	print STDERR "EXPECTED:\n$expected\n";

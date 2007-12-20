@@ -635,7 +635,7 @@ $opt_c = $opt_f = 1 if $opt_X;
 $opt_t ||= 'IV';
 
 my %const_xsub;
-%const_xsub = map { $_,1 } split(/,+/, $opt_s) if $opt_s;
+%const_xsub = map { $_,1 } split(m/,+/, $opt_s) if $opt_s;
 
 my $extralibs = '';
 
@@ -831,7 +831,7 @@ if( @path_h ){
             # skip enums matching $opt_e
             next if $opt_e && $enum_name =~ m/$opt_e/;
             my $val = 0;
-            for my $item (split /,/, $enum_body) {
+            for my $item (split m/,/, $enum_body) {
                 next if $item =~ m/\A\s*\Z/;
                 my ($key, $declared_val) = $item =~ m/(\w+)\s*(?:=\s*(.*))?/;
                 $val = defined($declared_val) && length($declared_val) ? $declared_val : 1 + $val;
@@ -856,7 +856,7 @@ my $fallbackdirname = 'fallback';
 
 my $ext = chdir 'ext' ? 'ext/' : '';
 
-my @modparts  = split(/::/,$module);
+my @modparts  = split(m/::/,$module);
 my $modpname  = join('-', @modparts);
 my $modfname  = pop @modparts;
 my $modpmdir  = join '/', 'lib', @modparts;

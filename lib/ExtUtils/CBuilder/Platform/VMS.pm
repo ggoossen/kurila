@@ -129,8 +129,8 @@ sub _liblist_ext {
   my(@crtls,$crtlstr);
   @crtls = ( ($self->{'config'}{'ldflags'} =~ m-/Debug-i ? $self->{'config'}{'dbgprefix'} : '')
               . 'PerlShr/Share' );
-  push(@crtls, grep { not /\(/ } split /\s+/, $self->{'config'}{'perllibs'});
-  push(@crtls, grep { not /\(/ } split /\s+/, $self->{'config'}{'libc'});
+  push(@crtls, grep { not m/\(/ } split m/\s+/, $self->{'config'}{'perllibs'});
+  push(@crtls, grep { not m/\(/ } split m/\s+/, $self->{'config'}{'libc'});
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -139,7 +139,7 @@ sub _liblist_ext {
   if ($self->perl_src) {
     my($lib,$locspec,$type);
     foreach $lib (@crtls) { 
-      if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ /perl/i) {
+      if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= $self->{'config'}{'exe_ext'}; }
         elsif (lc $type eq '/library') { $locspec .= $self->{'config'}{'lib_ext'}; }
         else                           { $locspec .= $self->{'config'}{'obj_ext'}; }
@@ -173,10 +173,10 @@ sub _liblist_ext {
 
   # First, sort out directories and library names in the input
   foreach $lib (split ' ',$potential_libs) {
-    push(@dirs,$1),   next if $lib =~ /^-L(.*)/;
-    push(@dirs,$lib), next if $lib =~ /[:>\]]$/;
+    push(@dirs,$1),   next if $lib =~ m/^-L(.*)/;
+    push(@dirs,$lib), next if $lib =~ m/[:>\]]$/;
     push(@dirs,$lib), next if -d $lib;
-    push(@libs,$1),   next if $lib =~ /^-l(.*)/;
+    push(@libs,$1),   next if $lib =~ m/^-l(.*)/;
     push(@libs,$lib);
   }
   push(@dirs,split(' ',$self->{'config'}{'libpth'}));
@@ -211,9 +211,9 @@ sub _liblist_ext {
     # check for common variants.  We try these first to grab libraries before
     # a like-named executable image (e.g. -lperl resolves to perlshr.exe
     # before perl.exe).
-    if ($lib !~ /\.[^:>\]]*$/) {
+    if ($lib !~ m/\.[^:>\]]*$/) {
       push(@variants,"${lib}shr","${lib}rtl","${lib}lib");
-      push(@variants,"lib$lib") if $lib !~ /[:>\]]/;
+      push(@variants,"lib$lib") if $lib !~ m/[:>\]]/;
     }
     push(@variants,$lib);
     warn "Looking for $lib\n" if $verbose;
@@ -228,9 +228,9 @@ sub _liblist_ext {
         $fullname = VMS::Filespec::rmsexpand($name);
         if (defined $fullname and -f $fullname) {
           # It's got its own suffix, so we'll have to figure out the type
-          if    ($fullname =~ /(?:$so|exe)$/i)      { $type = 'SHR'; }
-          elsif ($fullname =~ /(?:$lib_ext|olb)$/i) { $type = 'OLB'; }
-          elsif ($fullname =~ /(?:$obj_ext|obj)$/i) {
+          if    ($fullname =~ m/(?:$so|exe)$/i)      { $type = 'SHR'; }
+          elsif ($fullname =~ m/(?:$lib_ext|olb)$/i) { $type = 'OLB'; }
+          elsif ($fullname =~ m/(?:$obj_ext|obj)$/i) {
             warn "Note (probably harmless): "
                 ."Plain object file $fullname found in library list\n";
             $type = 'OBJ';
@@ -244,14 +244,14 @@ sub _liblist_ext {
         elsif (-f ($fullname = VMS::Filespec::rmsexpand($name,$so))      or
                -f ($fullname = VMS::Filespec::rmsexpand($name,'.exe')))     {
           $type = 'SHR';
-          $name = $fullname unless $fullname =~ /exe;?\d*$/i;
+          $name = $fullname unless $fullname =~ m/exe;?\d*$/i;
         }
         elsif (not length($ctype) and  # If we've got a lib already, 
                                        # don't bother
                ( -f ($fullname = VMS::Filespec::rmsexpand($name,$lib_ext)) or
                  -f ($fullname = VMS::Filespec::rmsexpand($name,'.olb'))))  {
           $type = 'OLB';
-          $name = $fullname unless $fullname =~ /olb;?\d*$/i;
+          $name = $fullname unless $fullname =~ m/olb;?\d*$/i;
         }
         elsif (not length($ctype) and  # If we've got a lib already, 
                                        # don't bother
@@ -260,7 +260,7 @@ sub _liblist_ext {
           warn "Note (probably harmless): "
 		       ."Plain object file $fullname found in library list\n";
           $type = 'OBJ';
-          $name = $fullname unless $fullname =~ /obj;?\d*$/i;
+          $name = $fullname unless $fullname =~ m/obj;?\d*$/i;
         }
         if (defined $type) {
           $ctype = $type; $cand = $name;

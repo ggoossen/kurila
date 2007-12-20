@@ -39,7 +39,7 @@ while ( ~< $fh) {
 while ( ~< $fh) {
     chomp;
     next if !$_ or m/^#/;
-    my ($op, $opname) = split /\t+/;
+    my ($op, $opname) = split m/\t+/;
     push @op, [$op, $opname, $code{$op}];
 }
 close $fh;

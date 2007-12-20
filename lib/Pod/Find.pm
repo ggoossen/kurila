@@ -383,7 +383,7 @@ sub pod_where {
   my $pod = shift;
 
   # Split on :: and then join the name together using File::Spec
-  my @parts = split (/::/, $pod);
+  my @parts = split (m/::/, $pod);
 
   # Get full directory list
   my @search_dirs = @{ $options{'-dirs'} };

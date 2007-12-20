@@ -29,7 +29,7 @@ sub casetest {
 				   "$base.pl");
     my $simple = do $file or die $@;
     my %simple;
-    for my $i (split(/\n/, $simple)) {
+    for my $i (split(m/\n/, $simple)) {
 	my ($k, $v) = split(' ', $i);
 	$simple{$k} = $v;
     }
@@ -53,7 +53,7 @@ sub casetest {
     exit(1) if $both;
 
     my %none;
-    for my $i (map { ord } split //,
+    for my $i (map { ord } split m//,
 	       "\e !\"#\$%&'()+,-./0123456789:;<=>?\@[\\]^_{|}~\b") {
 	next if pack("U0U", $i) =~ m/\w/;
 	$none{$i}++ unless $seen{$i};

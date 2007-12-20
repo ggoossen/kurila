@@ -781,7 +781,7 @@ sub _create_fmts {
     my $failed_str = shift;
     my $failedtests = shift;
 
-    my ($type) = split /\s/,$failed_str;
+    my ($type) = split m/\s/,$failed_str;
     my $short = substr($type,0,4);
     my $total = $short eq 'Pass' ? 'TODOs' : 'Total';
     my $middle_str = " Stat Wstat $total $short  ";

@@ -128,7 +128,7 @@ sub openlog {
     $logopt   ||= '';
     $facility ||= LOG_USER();
 
-    for my $opt (split /\b/, $logopt) {
+    for my $opt (split m/\b/, $logopt) {
         $options{$opt} = 1 if exists $options{$opt}
     }
 
@@ -269,7 +269,7 @@ sub syslog {
     croak "syslog: expecting argument \$priority" unless defined $priority;
     croak "syslog: expecting argument \$format"   unless defined $mask;
 
-    @words = split(/\W+/, $priority, 2);    # Allow "level" or "level|facility".
+    @words = split(m/\W+/, $priority, 2);    # Allow "level" or "level|facility".
     undef $numpri;
     undef $numfac;
 

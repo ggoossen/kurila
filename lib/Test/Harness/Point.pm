@@ -49,7 +49,7 @@ sub from_test_line  {
     $point->set_ok( !$not );
 
     if ( $extra ) {
-        my ($description,$directive) = split( /(?:[^\\]|^)#/, $extra, 2 );
+        my ($description,$directive) = split( m/(?:[^\\]|^)#/, $extra, 2 );
         $description =~ s/^- //; # Test::More puts it in there
         $point->set_description( $description );
         if ( $directive ) {

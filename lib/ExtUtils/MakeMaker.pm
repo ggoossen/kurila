@@ -468,7 +468,7 @@ sub new {
                 # specification under VMS.  So, don't turn the command
                 # into a filespec, but do add a level to the path of
                 # the argument if not already absolute.
-                my @cmd = split /\s+/, $self->{$key};
+                my @cmd = split m/\s+/, $self->{$key};
                 $cmd[1] = $self->catfile('[-]',$cmd[1])
                   unless (@cmd +< 2) || $self->file_name_is_absolute($cmd[1]);
                 $self->{$key} = join(' ', @cmd);

@@ -94,7 +94,7 @@ sub _hostname {
       }
 
       # Apollo pre-SR10
-      || eval { $host = (split(/[:\. ]/, `/com/host`, 6))[0]; }
+      || eval { $host = (split(m/[:\. ]/, `/com/host`, 6))[0]; }
 
       || eval { $host = ""; };
   }
@@ -191,7 +191,7 @@ sub _hostdomain {
 
     # look at real name & aliases
     my $site;
-    foreach $site ($info[0], split(/ /, $info[1])) {
+    foreach $site ($info[0], split(m/ /, $info[1])) {
       if (rindex($site, ".") +> 0) {
 
         # Extract domain from FQDN
@@ -238,8 +238,8 @@ sub domainname {
   # For hosts that have no name, just an IP address
   return $fqdn = $host if defined $host and $host =~ m/^\d+(\.\d+){3}$/;
 
-  my @host   = defined $host   ? split(/\./, $host)   : ('localhost');
-  my @domain = defined $domain ? split(/\./, $domain) : ();
+  my @host   = defined $host   ? split(m/\./, $host)   : ('localhost');
+  my @domain = defined $domain ? split(m/\./, $domain) : ();
   my @fqdn   = ();
 
   # Determine from @host & @domain the FQDN

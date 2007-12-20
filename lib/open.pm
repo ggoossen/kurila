@@ -55,7 +55,7 @@ sub import {
     my ($class,@args) = @_;
     croak("open: needs explicit list of PerlIO layers") unless @args;
     my $std;
-    my ($in,$out) = split(/\0/,(${^OPEN} || "\0"), -1);
+    my ($in,$out) = split(m/\0/,(${^OPEN} || "\0"), -1);
     while (@args) {
 	my $type = shift(@args);
 	my $dscp;
@@ -69,7 +69,7 @@ sub import {
 	    $dscp = shift(@args) || '';
 	}
 	my @val;
-	foreach my $layer (split(/\s+/,$dscp)) {
+	foreach my $layer (split(m/\s+/,$dscp)) {
             $layer =~ s/^://;
 	    if ($layer eq 'locale') {
 		require Encode;

@@ -91,7 +91,7 @@ print "# groups = $groups\n";
 # That is: do not \w, do not \S.
 if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
     my $gr = $1;
-    my @g0 = split /, ?/, $gr;
+    my @g0 = split m/, ?/, $gr;
     my @g1;
     # prefer names over numbers
     for (@g0) {

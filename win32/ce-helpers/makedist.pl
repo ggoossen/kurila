@@ -162,12 +162,12 @@ sub copy($$) {
 }
 
 BEGIN {
-%libexclusions = map {$_=>1} split/\s/, <<"EOS";
+%libexclusions = map {$_=>1} splitm/\s/, <<"EOS";
 abbrev.pl bigfloat.pl bigint.pl bigrat.pl cacheout.pl complete.pl ctime.pl
 dotsh.pl exceptions.pl fastcwd.pl flush.pl ftp.pl getcwd.pl getopt.pl
 getopts.pl hostname.pl look.pl newgetopt.pl pwd.pl termcap.pl
 EOS
-%extexclusions = map {$_=>1} split/\s/, <<"EOS";
+%extexclusions = map {$_=>1} splitm/\s/, <<"EOS";
 EOS
 $dynaloader_pm=<<'EOS';
 # This module designed *only* for WinCE

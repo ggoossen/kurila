@@ -192,7 +192,7 @@ sub can_run {
 
     } else {
         for my $dir (
-            (split /\Q$Config::Config{path_sep}\E/, $ENV{PATH}),
+            (split m/\Q$Config::Config{path_sep}\E/, $ENV{PATH}),
             File::Spec->curdir
         ) {           
             my $abs = File::Spec->catfile($dir, $command);
@@ -528,9 +528,9 @@ sub _ipc_run {
         @command = map { if( m/([<>|&])/ ) {
                             $special_chars .= $1; $_;
                          } else {
-                            [ split / +/ ]
+                            [ split m/ +/ ]
                          }
-                    } split( /\s*([<>|&])\s*/, $cmd );
+                    } split( m/\s*([<>|&])\s*/, $cmd );
     }
  
     ### if there's a pipe in the command, *STDIN needs to 

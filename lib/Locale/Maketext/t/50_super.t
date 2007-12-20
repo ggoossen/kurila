@@ -6,7 +6,7 @@ use Test;
 BEGIN { plan tests => 26 };
 print "#\n# Testing tight insertion of super-ordinate language tags...\n#\n";
 
-my @in = grep m/\S/, split /[\n\r]/, q{
+my @in = grep m/\S/, split m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en

@@ -103,7 +103,7 @@ sub DB {
   }
 
   my ($stop, $action);
-  if (($stop,$action) = split(/\0/,$DB::dbline{$DB::lineno})) {
+  if (($stop,$action) = split(m/\0/,$DB::dbline{$DB::lineno})) {
     if ($stop eq '1') {
       $DB::signal ^|^= 1;
     }
@@ -369,7 +369,7 @@ sub lineevents {
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
   for ($i = 1; $i +<= $#DB::dbline; $i++) {
-    $ret{$i} = [$DB::dbline[$i], split(/\0/, $DB::dbline{$i})] 
+    $ret{$i} = [$DB::dbline[$i], split(m/\0/, $DB::dbline{$i})] 
       if defined $DB::dbline{$i};
   }
   return %ret;

@@ -134,7 +134,7 @@ sub static_ext {
     unless (scalar @Extensions) {
       my $static_ext = $Config{static_ext};
       $static_ext =~ s/^\s+//;
-      @Extensions = sort split /\s+/, $static_ext;
+      @Extensions = sort split m/\s+/, $static_ext;
 	unshift @Extensions, qw(DynaLoader);
     }
     @Extensions;
@@ -186,7 +186,7 @@ sub ldopts {
     }
     $std = 1 unless scalar @link_args;
     my $sep = $Config{path_sep} || ':';
-    @path = $path ? split(/\Q$sep/, $path) : @INC;
+    @path = $path ? split(m/\Q$sep/, $path) : @INC;
 
     push(@potential_libs, @link_args)    if scalar @link_args;
     # makemaker includes std libs on windows by default
@@ -199,7 +199,7 @@ sub ldopts {
     my($mod,@ns,$root,$sub,$extra,$archive,@archives);
     print STDERR "Searching (@path) for archives\n" if $Verbose;
     foreach $mod (@mods) {
-	@ns = split(/::|\/|\\/, $mod);
+	@ns = split(m/::|\/|\\/, $mod);
 	$sub = $ns[-1];
 	$root = File::Spec->catdir(@ns);
 	
@@ -211,7 +211,7 @@ sub ldopts {
 		local(*FH); 
 		if(open(FH, $extra)) {
 		    my($libs) = ~< *FH; chomp $libs;
-		    push @potential_libs, split /\s+/, $libs;
+		    push @potential_libs, split m/\s+/, $libs;
 		}
 		else {  
 		    warn "Couldn't open '$extra'"; 

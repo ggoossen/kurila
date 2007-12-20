@@ -797,7 +797,7 @@ sub C_constant {
     $default_type ||= $self->default_type();
     if (!ref $what) {
       # Convert line of the form IV,UV,NV to hash
-      $what = {map {$_ => 1} split /,\s*/, ($what || '')};
+      $what = {map {$_ => 1} split m/,\s*/, ($what || '')};
       # Figure out what types we're dealing with, and assign all unknowns to the
       # default type
     }

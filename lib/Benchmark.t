@@ -338,7 +338,7 @@ sub check_graph_vs_output {
                     "check the chart layout matches the formatted output");
     unless ($all_passed) {
       print STDERR "# Something went wrong there. I got this chart:\n";
-      print STDERR "# $_\n" foreach split /\n/, $got;
+      print STDERR "# $_\n" foreach split m/\n/, $got;
     }
 }
 
