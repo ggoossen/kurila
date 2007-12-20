@@ -1522,12 +1522,12 @@ S_tokeq(pTHX_ SV *sv)
  * Pattern matching will set PL_lex_op to the pattern-matching op to
  * make (we return THING if yylval.ival is OP_NULL, PMFUNC otherwise).
  *
- * OP_CONST and OP_READLINE are easy--just make the new op and return.
+ * OP_CONST is easy--just make the new op and return.
  *
  * Everything else becomes a FUNC.
  *
  * Sets PL_lex_state to LEX_INTERPPUSH unless (ival was OP_NULL or we
- * had an OP_CONST or OP_READLINE).  This just sets us up for a
+ * had an OP_CONST).  This just sets us up for a
  * call to S_sublex_push().
  */
 
@@ -1542,7 +1542,7 @@ S_sublex_start(pTHX)
 	PL_lex_op = NULL;
 	return THING;
     }
-    if (op_type == OP_CONST || op_type == OP_READLINE) {
+    if (op_type == OP_CONST) {
 	SV *sv = tokeq(PL_lex_stuff);
 
 	if (SvTYPE(sv) == SVt_PVIV) {
@@ -1555,9 +1555,6 @@ S_sublex_start(pTHX)
 	}
 	yylval.opval = (OP*)newSVOP(op_type, 0, sv);
 	PL_lex_stuff = NULL;
-	/* Allow <FH> // "foo" */
-	if (op_type == OP_READLINE)
-	    PL_expect = XTERMORDORDOR;
 	return THING;
     }
     else if (op_type == OP_BACKTICK && PL_lex_op) {
