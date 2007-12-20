@@ -772,10 +772,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	sv_setiv(sv, (IV)PL_hints);
 	break;
     case '\011':		/* ^I */ /* NOT \t in EBCDIC */
-	if (PL_inplace)
-	    sv_setpv(sv, PL_inplace);
-	else
-	    sv_setsv(sv, &PL_sv_undef);
+	sv_setpv(sv, PL_inplace); /* Will undefine sv if PL_inplace is NULL */
 	break;
     case '\017':		/* ^O & ^OPEN */
 	if (nextchar == '\0') {
@@ -1203,7 +1200,7 @@ Perl_magic_clearsig(pTHX_ SV *sv, MAGIC *mg)
 	    sigaddset(&set,i);
 	    sigprocmask(SIG_BLOCK, &set, &save);
 	    ENTER;
-	    save_sv = newSVpv((char *)(&save), sizeof(sigset_t));
+	    save_sv = newSVpvn((char *)(&save), sizeof(sigset_t));
 	    SAVEFREESV(save_sv);
 	    SAVEDESTRUCTOR_X(restore_sigmask, save_sv);
 #endif
@@ -1408,7 +1405,7 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 	sigaddset(&set,i);
 	sigprocmask(SIG_BLOCK, &set, &save);
 	ENTER;
-	save_sv = newSVpv((char *)(&save), sizeof(sigset_t));
+	save_sv = newSVpvn((char *)(&save), sizeof(sigset_t));
 	SAVEFREESV(save_sv);
 	SAVEDESTRUCTOR_X(restore_sigmask, save_sv);
 #endif
@@ -2734,7 +2731,7 @@ Perl_sighandler(int sig)
 #endif
 		   EXTEND(SP, 2);
 		   PUSHs((SV*)rv);
-		   PUSHs(newSVpv((char *)sip, sizeof(*sip)));
+		   PUSHs(newSVpvn((char *)sip, sizeof(*sip)));
 	      }
 
 	 }

@@ -70,6 +70,7 @@ EOF
 print C <<'EOF';
 
 #define AMG_id2name(id) (PL_AMG_names[id]+1)
+#define AMG_id2namelen(id) (PL_AMG_namelens[id]-1)
 
 char * const PL_AMG_names[NofAMmeth] = {
   /* Names kept in the symbol table.  fallback => "()", the rest has

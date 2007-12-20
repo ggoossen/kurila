@@ -2484,6 +2484,29 @@ Perl_sv_2nv(pTHX_ register SV *sv)
     return SvNVX(sv);
 }
 
+/*
+=for apidoc sv_2num
+
+Return an SV with the numeric value of the source SV, doing any necessary
+reference or overload conversion.  You must use the C<SvNUM(sv)> macro to
+access this function.
+
+=cut
+*/
+
+SV *
+Perl_sv_2num(pTHX_ register SV *sv)
+{
+    if (!SvROK(sv))
+	return sv;
+    if (SvAMAGIC(sv)) {
+	SV * const tmpsv = AMG_CALLun(sv,numer);
+	if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
+	    return sv_2num(tmpsv);
+    }
+    return sv_2mortal(newSVuv(PTR2UV(SvRV(sv))));
+}
+
 /* uiv_2buf(): private routine for use by sv_2pv_flags(): print an IV or
  * UV as a string towards the end of buf, and return pointers to start and
  * end of it.
@@ -8015,10 +8038,11 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		%p		include pointer address (standard)	
 		%-p	(SVf)	include an SV (previously %_)
 		%-<num>p	include an SV with precision <num>	
-		%1p	(VDf)	include a v-string (as %vd)
 		%<num>p		reserved for future extensions
 
 	Robin Barker 2005-07-14
+
+		%1p	(VDf)	removed.  RMB 2007-10-19
 */
  	    char* r = q; 
 	    bool sv = FALSE;	
@@ -8036,13 +8060,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    eptr = SvPV_const(argsv, elen);
 		    goto string;
 		}
-#if vdNUMBER
-		else if (n == vdNUMBER) {	/* VDf */
-		    vectorize = TRUE;
-		    VECTORIZE_ARGS
-		    goto format_vd;
-	  	}
-#endif
 		else if (n) {
 		    if (ckWARN_d(WARN_INTERNAL))
 			Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
