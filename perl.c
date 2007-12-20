@@ -1693,7 +1693,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #ifdef USE_SITECUSTOMIZE
     bool minus_f = FALSE;
 #endif
-    SV *linestr_sv = newSV_type(SVt_PVIV);
+    SV *linestr_sv = newSV_type(SVt_PV);
     bool add_read_e_script = FALSE;
 
     SvGROW(linestr_sv, 80);
