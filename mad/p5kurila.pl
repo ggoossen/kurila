@@ -536,6 +536,11 @@ sub lvalue_subs {
 }
 
 sub force_m {
+    my $xml = shift;
+    for my $op ($xml->findnodes(qq|//op_match|)) {
+        next unless get_madprop($op, "quote_open") eq "/";
+        set_madprop($op, quote_open => "m/");
+    }
 }
 
 sub rename_pointy_ops {
@@ -623,7 +628,7 @@ if ($from < 1.6 - 0.05) {
 }
 
 rename_pointy_ops( $twig );
-pointy_anon_hash( $twig );
+#pointy_anon_hash( $twig );
 force_m( $twig );
 
 # print
