@@ -30,9 +30,10 @@ sub p5convert {
 
 #t_parenthesis();
 #t_change_deref();
-t_anon_hash();
-t_pointy_op();
+#t_anon_hash();
+t_force_m();
 die;
+t_pointy_op();
 t_lvalue_subs();
 t_use_pkg_version();
 t_vstring();
@@ -593,6 +594,21 @@ substr($a, 2) = "bar";
 ----
 $a = "foobar";
 substr($a, 2, undef, "bar");
+====
+END
+}
+
+sub t_force_m {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+$a =~ //;
+----
+$a =~ m//;
+====
+$a =~ m//;
+$a =~ m**;
+----
+$a =~ m//;
+$a =~ m**;
 ====
 END
 }
