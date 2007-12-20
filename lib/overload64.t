@@ -34,10 +34,10 @@ is($$oo, $cnt++, 'overload called once');
 is($oo<<2, $ii<<2, '0+ overload with bit shift left');
 is($$oo, $cnt++, 'overload called once');
 
-is($oo|0xFF00, $ii|0xFF00, '0+ overload with bitwise or');
+is($oo^|^0xFF00, $ii^|^0xFF00, '0+ overload with bitwise or');
 is($$oo, $cnt++, 'overload called once');
 
-is($oo&0xFF03, $ii&0xFF03, '0+ overload with bitwise and');
+is($oo^&^0xFF03, $ii^&^0xFF03, '0+ overload with bitwise and');
 is($$oo, $cnt++, 'overload called once');
 
 ok($oo == $ii, '0+ overload with equality');

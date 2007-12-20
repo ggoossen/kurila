@@ -90,7 +90,7 @@ while ( ~< *PW) {
     my @s = split /:/, $_, -1;
     my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s);
     (my $v) = $Config{osvers} =~ /^(\d+)/;
-    if ($^O eq 'darwin' && $v < 9) {
+    if ($^O eq 'darwin' && $v +< 9) {
        ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s[0,1,2,3,7,8,9];
     } else {
        ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s;

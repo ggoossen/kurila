@@ -186,7 +186,7 @@ sub _liblist_ext {
   # path in a logical name.)
   foreach $dir (@dirs) {
     unless (-d $dir) {
-      warn "Skipping nonexistent Directory $dir\n" if $verbose > 1;
+      warn "Skipping nonexistent Directory $dir\n" if $verbose +> 1;
       $dir = '';
       next;
     }
@@ -224,7 +224,7 @@ sub _liblist_ext {
         my($type);
 
         $name = "$dir$variant";
-        warn "\tChecking $name\n" if $verbose > 2;
+        warn "\tChecking $name\n" if $verbose +> 2;
         $fullname = VMS::Filespec::rmsexpand($name);
         if (defined $fullname and -f $fullname) {
           # It's got its own suffix, so we'll have to figure out the type
@@ -272,7 +272,7 @@ sub _liblist_ext {
         if ($cand eq 'VAXCCURSE') { unshift @{$found{$ctype}}, $cand; }  
         else                      { push    @{$found{$ctype}}, $cand; }
         warn "\tFound as $cand (really $fullname), type $ctype\n" 
-          if $verbose > 1;
+          if $verbose +> 1;
 	push @flibs, $name unless $libs_seen{$fullname}++;
         next LIB;
       }
