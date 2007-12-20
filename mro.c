@@ -287,12 +287,13 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
                 SV** seq_ptr = AvARRAY(seq) + 1;
                 while(seq_items--) {
                     SV* const seqitem = *seq_ptr++;
-                    HE* const he = hv_fetch_ent(tails, seqitem, 0, 0);
-                    if(!he) {
-                        (void)hv_store_ent(tails, seqitem, newSViv(1), 0);
-                    }
-                    else {
+		    /* LVALUE fetch will create a new undefined SV if necessary
+		     */
+                    HE* const he = hv_fetch_ent(tails, seqitem, 1, 0);
+                    if(he) {
                         SV* const val = HeVAL(he);
+			/* This will increment undef to 1, which is what we
+			   want for a newly created entry.  */
                         sv_inc(val);
                     }
                 }
@@ -496,8 +497,9 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
     if(isarev) {
         hv_iterinit(isarev);
         while((iter = hv_iternext(isarev))) {
-            SV* const revkey = hv_iterkeysv(iter);
-            HV* revstash = gv_stashsv(revkey, 0);
+	    I32 len;
+            const char* const revkey = hv_iterkey(iter, &len);
+            HV* revstash = gv_stashpvn(revkey, len, 0);
             struct mro_meta* revmeta;
 
             if(!revstash) continue;
@@ -528,11 +530,22 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
         SV* const sv = *svp++;
         HV* mroisarev;
 
-        HE *he = hv_fetch_ent(PL_isarev, sv, 0, 0);
-        if(!he) {
-            he = hv_store_ent(PL_isarev, sv, (SV*)newHV(), 0);
-        }
+        HE *he = hv_fetch_ent(PL_isarev, sv, TRUE, 0);
+
+	/* That fetch should not fail.  But if it had to create a new SV for
+	   us, then we can detect it, because it will not be the correct type.
+	   Probably faster and cleaner for us to free that scalar [very little
+	   code actually executed to free it] and create a new HV than to
+	   copy&paste [SIN!] the code from newHV() to allow us to upgrade the
+	   new SV from SVt_NULL.  */
+
         mroisarev = (HV*)HeVAL(he);
+
+	if(SvTYPE(mroisarev) != SVt_PVHV) {
+	    SvREFCNT_dec(mroisarev);
+	    mroisarev = newHV();
+	    HeVAL(he) = (SV *)mroisarev;
+        }
 
 	/* This hash only ever contains PL_sv_yes. Storing it over itself is
 	   almost as cheap as calling hv_exists, so on aggregate we expect to
@@ -612,8 +625,9 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
 
         hv_iterinit(isarev);
         while((iter = hv_iternext(isarev))) {
-            SV* const revkey = hv_iterkeysv(iter);
-            HV* const revstash = gv_stashsv(revkey, 0);
+	    I32 len;
+            const char* const revkey = hv_iterkey(iter, &len);
+            HV* const revstash = gv_stashpvn(revkey, len, 0);
             struct mro_meta* mrometa;
 
             if(!revstash) continue;
