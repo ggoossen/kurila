@@ -1851,7 +1851,7 @@ Apd	|void	|mro_method_changed_in	|NN HV* stash
 p	|void   |boot_core_mro
 Apon	|void	|sys_init	|NN int* argc|NN char*** argv
 Apon	|void	|sys_init3	|NN int* argc|NN char*** argv|NN char*** env
-Apo	|void	|sys_term
+Apon	|void	|sys_term
 
 
 #if defined(PERL_IN_DUMP_C)
