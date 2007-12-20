@@ -795,29 +795,6 @@ suidperl$(EXE_EXT): $& sperl$(OBJ_EXT) perlmain$(OBJ_EXT) $(LIBPERL) $(static_ex
 
 fi
 
-# Some environment have no system(), which mkpport uses.
-# Let's try running the commands with shell.
-case "${osname}" in
-catamount)
-$spitshell >>Makefile <<!GROK!THIS!
-.PHONY: makeppport
-makeppport: miniperl\$(EXE_EXT) \$(CONFIGPM)
-	-@for f in Makefile.PL PPPort_pm.PL PPPort_xs.PL ppport_h.PL; do \
-	(cd ext/Devel/PPPort && `pwd`/run.sh ../../../miniperl -I../../../lib \$\$f); \
-	done
-
-!GROK!THIS!
-;;
-*)
-$spitshell >>Makefile <<'!NO!SUBS!'
-.PHONY: makeppport
-makeppport: miniperl$(EXE_EXT) $(CONFIGPM)
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib mkppport
-
-!NO!SUBS!
-;;
-esac
-
 $spitshell >>Makefile <<'!NO!SUBS!'
 
 sperl$(OBJ_EXT): perl.c $(h)
@@ -1014,10 +991,10 @@ manicheck:	FORCE
 $(DYNALOADER):	miniperl$(EXE_EXT) preplibrary FORCE
 	@$(LDLIBPTH) sh ext/util/make_ext $(STATIC) $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
 
-d_dummy $(dynamic_ext):	miniperl$(EXE_EXT) preplibrary makeppport $(DYNALOADER) FORCE
+d_dummy $(dynamic_ext):	miniperl$(EXE_EXT) preplibrary $(DYNALOADER) FORCE
 	@$(LDLIBPTH) sh ext/util/make_ext dynamic $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
 
-s_dummy $(static_ext):	miniperl$(EXE_EXT) preplibrary makeppport $(DYNALOADER) FORCE
+s_dummy $(static_ext):	miniperl$(EXE_EXT) preplibrary $(DYNALOADER) FORCE
 	@$(LDLIBPTH) sh ext/util/make_ext $(STATIC) $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
 
 n_dummy $(nonxs_ext):	miniperl$(EXE_EXT) preplibrary $(DYNALOADER) FORCE

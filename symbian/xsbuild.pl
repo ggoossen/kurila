@@ -568,9 +568,6 @@ sub xsconfig {
         run_PL( "Errno_pm.PL", $dir, "Errno.pm" );
         $lst{"$dir\\Errno.pm"} = "$targetroot\\Errno.pm";
     }
-    elsif ( $dir eq "ext\\Devel\\PPPort" ) {
-        run_PL( "ppport_h.PL", $dir, "ppport.h" );
-    }
     elsif ( $dir eq "ext\\DynaLoader" ) {
         run_PL( "XSLoader_pm.PL", $dir, "XSLoader.pm" );
         $lst{"ext\\DynaLoader\\XSLoader.pm"} = "$targetroot\\XSLoader.pm";
