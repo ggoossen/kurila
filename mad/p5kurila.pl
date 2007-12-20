@@ -559,6 +559,7 @@ sub rename_pointy_ops {
 
     # rename '<' to '+<'
     for my $op (map { $xml->findnodes(qq'//$_') } map { ("op_i_$_", "op_$_") } qw|lt le gt ge|) {
+        next unless get_madprop($op, "operator") =~ m/^[<>]/;
         set_madprop($op, operator => '+' . get_madprop($op, "operator") );
     }
     # rename '<=>' to '<+>'
@@ -568,6 +569,15 @@ sub rename_pointy_ops {
     }
 }
 
+sub pointy_anon_hash {
+    my $xml = shift;
+
+    for my $op ($xml->findnodes(qq|//op_anonhash|)) {
+        next unless get_madprop($op, "curly_open");
+        set_madprop($op, "curly_open" => '&lt;');
+        set_madprop($op, "curly_close" => ']');
+    }
+}
 
 my $from = 0; # floating point number with starting version of kurila.
 GetOptions("from=f" => \$from);
@@ -617,7 +627,8 @@ if ($from < 1.6 - 0.05) {
     lvalue_subs( $twig );
 }
 
-#rename_pointy_ops( $twig );
+rename_pointy_ops( $twig );
+#pointy_anon_hash( $twig );
 force_m( $twig );
 
 # print
