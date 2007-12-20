@@ -4618,6 +4618,10 @@ typedef struct exitlistentry {
 #  define  FAKE_DEFAULT_SIGNAL_HANDLERS
 #endif
 
+#define PERL_PATCHLEVEL_H_IMPLICIT
+#include "patchlevel.h"
+#undef PERL_PATCHLEVEL_H_IMPLICIT
+
 #ifdef PERL_GLOBAL_STRUCT
 struct perl_vars {
 #  include "perlvars.h"
@@ -5797,11 +5801,6 @@ extern void moncontrol(int);
 #define NO_ENV_ARRAY_IN_MAIN
 #endif
 
-/* and finally... */
-#define PERL_PATCHLEVEL_H_IMPLICIT
-#include "patchlevel.h"
-#undef PERL_PATCHLEVEL_H_IMPLICIT
-
 /* These are used by Perl_pv_escape() and Perl_pv_pretty() 
  * are here so that they are available throughout the core 
  * NOTE that even though some are for _escape and some for _pretty
@@ -5882,4 +5881,3 @@ extern void moncontrol(int);
 */
 
 #endif /* Include guard */
-
