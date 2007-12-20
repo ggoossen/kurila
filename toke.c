@@ -2257,29 +2257,6 @@ S_intuit_more(pTHX_ register char *s)
     return TRUE;
 }
 
-/*
- * S_incl_perldb
- * Return a string of Perl code to load the debugger.  If PERL5DB
- * is set, it will return the contents of that, otherwise a
- * compile-time require of perl5db.pl.
- */
-
-STATIC const char*
-S_incl_perldb(pTHX)
-{
-    dVAR;
-    if (PL_perldb) {
-	const char * const pdb = PerlEnv_getenv("PERL5DB");
-
-	if (pdb)
-	    return pdb;
-	SETERRNO(0,SS_NORMAL);
-	return "BEGIN { require 'perl5db.pl' }";
-    }
-    return "";
-}
-
-
 /* Encoded script support. filter_add() effectively inserts a
  * 'pre-processing' function into the current source input stream.
  * Note that the filter function only applies to the current source file
@@ -3069,15 +3046,29 @@ Perl_yylex(pTHX)
 	    if (PL_madskills)
 		PL_faketokens = 1;
 #endif
-	    sv_setpv(PL_linestr,incl_perldb());
-	    if (SvCUR(PL_linestr))
-		sv_catpvs(PL_linestr,";");
-	    if (PL_preambleav){
-		while(AvFILLp(PL_preambleav) >= 0) {
-		    SV *tmpsv = av_shift(PL_preambleav);
-		    sv_catsv(PL_linestr, tmpsv);
+	    if (PL_perldb) {
+		/* Generate a string of Perl code to load the debugger.
+		 * If PERL5DB is set, it will return the contents of that,
+		 * otherwise a compile-time require of perl5db.pl.  */
+
+		const char * const pdb = PerlEnv_getenv("PERL5DB");
+
+		if (pdb) {
+		    sv_setpv(PL_linestr, pdb);
+		    sv_catpvs(PL_linestr,";");
+		} else {
+		    SETERRNO(0,SS_NORMAL);
+		    sv_setpvs(PL_linestr, "BEGIN { require 'perl5db.pl' };");
+		}
+	    } else
+		sv_setpvs(PL_linestr,"");
+	    if (PL_preambleav) {
+		SV **svp = AvARRAY(PL_preambleav);
+		SV **const end = svp + AvFILLp(PL_preambleav);
+		while(svp <= end) {
+		    sv_catsv(PL_linestr, *svp);
+		    ++svp;
 		    sv_catpvs(PL_linestr, ";");
-		    sv_free(tmpsv);
 		}
 		sv_free((SV*)PL_preambleav);
 		PL_preambleav = NULL;
@@ -3143,10 +3134,10 @@ Perl_yylex(pTHX)
 		    if (PL_madskills)
 			PL_faketokens = 1;
 #endif
-		    sv_setpv(PL_linestr,
-			     (const char *)
-			     (PL_minus_p
-			      ? ";}continue{print;}" : ";}"));
+		    if (PL_minus_p)
+			sv_setpvs(PL_linestr, ";}continue{print;}");
+		    else
+			sv_setpvs(PL_linestr, ";}");
 		    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX(PL_linestr);
 		    PL_bufend = SvPVX(PL_linestr) + SvCUR(PL_linestr);
 		    PL_last_lop = PL_last_uni = NULL;
@@ -4781,7 +4772,7 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 		if (PL_madskills && !PL_thistoken) {
 		    char *start = SvPVX(PL_linestr) + PL_realtokenstart;
-		    PL_thistoken = newSVpv(start,s - start);
+		    PL_thistoken = newSVpvn(start,s - start);
 		    PL_realtokenstart = s - SvPVX(PL_linestr);
 		}
 #endif
@@ -4939,10 +4930,10 @@ Perl_yylex(pTHX)
 			while (*proto == ';')
 			    proto++;
 			if (*proto == '&' && *s == '{') {
-			    sv_setpv(PL_subname,
-				     (const char *)
-				     (PL_curstash ?
-				      "__ANON__" : "__ANON__::__ANON__"));
+			    if (PL_curstash)
+				sv_setpvs(PL_subname, "__ANON__");
+			    else
+				sv_setpvs(PL_subname, "__ANON__::__ANON__");
 			    PREBLOCK(LSTOPSUB);
 			}
 		    }
@@ -6041,9 +6032,10 @@ Perl_yylex(pTHX)
 		}
 #endif
 		if (!have_name) {
-		    sv_setpv(PL_subname,
-			     (const char *)
-			     (PL_curstash ? "__ANON__" : "__ANON__::__ANON__"));
+		    if (PL_curstash)
+			sv_setpvs(PL_subname, "__ANON__");
+		    else
+			sv_setpvs(PL_subname, "__ANON__::__ANON__");
 		    TOKEN(ANONSUB);
 		}
 #ifndef PERL_MAD
