@@ -954,7 +954,7 @@ custom of using run-time determined strings as patterns.  For example:
 
     $re = <>;
     chomp $re;
-    $string =~ /$re/;
+    $string =~ m/$re/;
 
 Before Perl knew how to execute interpolated code within a pattern,
 this operation was completely safe from a security point of view,
@@ -1360,7 +1360,7 @@ will fail outright at the current starting position.
 The following example counts all the possible matching strings in a
 pattern (without actually matching any of them).
 
-    'aaab' =~ /a+b?(?{print "$&\n"; $count++})(*FAIL)/;
+    'aaab' =~ m/a+b?(?{print "$&\n"; $count++})(*FAIL)/;
     print "Count=$count\n";
 
 which produces:
@@ -1378,7 +1378,7 @@ which produces:
 
 If we add a C<(*PRUNE)> before the count like the following
 
-    'aaab' =~ /a+b?(*PRUNE)(?{print "$&\n"; $count++})(*FAIL)/;
+    'aaab' =~ m/a+b?(*PRUNE)(?{print "$&\n"; $count++})(*FAIL)/;
     print "Count=$count\n";
 
 we prevent backtracking and find the count of the longest matching
@@ -1418,7 +1418,7 @@ executing the (*SKIP) pattern.
 Compare the following to the examples in C<(*PRUNE)>, note the string
 is twice as long:
 
-    'aaabaaab' =~ /a+b?(*SKIP)(?{print "$&\n"; $count++})(*FAIL)/;
+    'aaabaaab' =~ m/a+b?(*SKIP)(?{print "$&\n"; $count++})(*FAIL)/;
     print "Count=$count\n";
 
 outputs
@@ -1507,7 +1507,7 @@ into on failure it causes the match to fail outright. No further attempts
 to find a valid match by advancing the start pointer will occur again.
 For example,
 
-    'aaabaaab' =~ /a+b?(*COMMIT)(?{print "$&\n"; $count++})(*FAIL)/;
+    'aaabaaab' =~ m/a+b?(*COMMIT)(?{print "$&\n"; $count++})(*FAIL)/;
     print "Count=$count\n";
 
 outputs
@@ -1550,7 +1550,7 @@ If the C<(*ACCEPT)> is inside of capturing buffers then the buffers are
 marked as ended at the point at which the C<(*ACCEPT)> was encountered.
 For instance:
 
-  'AB' =~ /(A (A|B(*ACCEPT)|C) D)(E)/x;
+  'AB' =~ m/(A (A|B(*ACCEPT)|C) D)(E)/x;
 
 will match, and C<$1> will be C<AB> and C<$2> will be C<B>, C<$3> will not
 be set. If another branch in the inner parentheses were matched, such as in the
@@ -1690,11 +1690,11 @@ why that pattern matches, contrary to popular expectations:
     $x = 'ABC123';
     $y = 'ABC445';
 
-    print "1: got $1\n" if $x =~ /^(ABC)(?!123)/;
-    print "2: got $1\n" if $y =~ /^(ABC)(?!123)/;
+    print "1: got $1\n" if $x =~ m/^(ABC)(?!123)/;
+    print "2: got $1\n" if $y =~ m/^(ABC)(?!123)/;
 
-    print "3: got $1\n" if $x =~ /^(\D*)(?!123)/;
-    print "4: got $1\n" if $y =~ /^(\D*)(?!123)/;
+    print "3: got $1\n" if $x =~ m/^(\D*)(?!123)/;
+    print "4: got $1\n" if $y =~ m/^(\D*)(?!123)/;
 
 This prints
 
@@ -1729,8 +1729,8 @@ are zero-width expressions--they only look, but don't consume any
 of the string in their match.  So rewriting this way produces what
 you'd expect; that is, case 5 will fail, but case 6 succeeds:
 
-    print "5: got $1\n" if $x =~ /^(\D*)(?=\d)(?!123)/;
-    print "6: got $1\n" if $y =~ /^(\D*)(?=\d)(?!123)/;
+    print "5: got $1\n" if $x =~ m/^(\D*)(?=\d)(?!123)/;
+    print "6: got $1\n" if $y =~ m/^(\D*)(?=\d)(?!123)/;
 
     6: got ABC
 
@@ -1749,7 +1749,7 @@ ways they can use backtracking to try for a match.  For example, without
 internal optimizations done by the regular expression engine, this will
 take a painfully long time to run:
 
-    'aaaaaaaaaaaa' =~ /((a{0,5}){0,5})*[c]/
+    'aaaaaaaaaaaa' =~ m/((a{0,5}){0,5})*[c]/
 
 And if you used C<*>'s in the internal groups instead of limiting them
 to 0 through 5 matches, then it would take forever--or until you ran

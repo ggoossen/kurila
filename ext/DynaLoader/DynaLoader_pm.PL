@@ -202,7 +202,7 @@ EOT
 my $env_dl_library_path = <<'EOT';
 if ($ldlibpthname_defined &&
     exists $ENV{$ldlibpthname}) {
-    push(@dl_library_path, split(/$pthsep/, $ENV{$ldlibpthname}));
+    push(@dl_library_path, split(m/$pthsep/, $ENV{$ldlibpthname}));
 }
 
 # E.g. HP-UX supports both its native SHLIB_PATH *and* LD_LIBRARY_PATH.
@@ -210,7 +210,7 @@ if ($ldlibpthname_defined &&
 if ($ldlibpthname_defined &&
     $ldlibpthname ne 'LD_LIBRARY_PATH' &&
     exists $ENV{LD_LIBRARY_PATH}) {
-    push(@dl_library_path, split(/$pthsep/, $ENV{LD_LIBRARY_PATH}));
+    push(@dl_library_path, split(m/$pthsep/, $ENV{LD_LIBRARY_PATH}));
 }
 EOT
 
@@ -295,7 +295,7 @@ sub bootstrap {
     die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
 
     <</$^O-eq-os2>>
-    my @modparts = split(/::/,$module);
+    my @modparts = split(m/::/,$module);
     my $modfname = $modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.

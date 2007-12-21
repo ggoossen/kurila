@@ -253,7 +253,7 @@ if (fork) {
     $dir = "f$$.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print cwd() =~ /\Q$dir/i ? "ok 1 parent" : "not ok 1 parent";
+    print cwd() =~ m/\Q$dir/i ? "ok 1 parent" : "not ok 1 parent";
     chdir "..";
     rmdir $dir;
 }
@@ -262,7 +262,7 @@ else {
     $dir = "f$$.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print cwd() =~ /\Q$dir/i ? "ok 1 child" : "not ok 1 child";
+    print cwd() =~ m/\Q$dir/i ? "ok 1 child" : "not ok 1 child";
     chdir "..";
     rmdir $dir;
 }

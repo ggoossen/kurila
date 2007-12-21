@@ -191,13 +191,13 @@ sub check_outside1 { is($_, "outside", "\$_ lexically scoped") }
 {
     my ($ok1, $ok2);
     given("Hello, world!") {
-	when(/lo/)
+	when(m/lo/)
 	    { $ok1 = 'y'; continue}
-	when(/no/)
+	when(m/no/)
 	    { $ok1 = 'n'; continue}
-	when(/^(Hello,|Goodbye cruel) world[!.?]/)
+	when(m/^(Hello,|Goodbye cruel) world[!.?]/)
 	    { $ok2 = 'Y'; continue}
-	when(/^(Hello cruel|Goodbye,) world[!.?]/)
+	when(m/^(Hello cruel|Goodbye,) world[!.?]/)
 	    { $ok2 = 'n'; continue}
     }
     is($ok1, 'y', "regex 1");
@@ -453,7 +453,7 @@ sub bar {"bar"}
 {
     my $ok = 0;
     given(12) {
-        when( /(\d+)/ and ( 1 +<= $1 and $1 +<= 12 ) ) {
+        when( m/(\d+)/ and ( 1 +<= $1 and $1 +<= 12 ) ) {
             $ok = 1;
         }
     }
@@ -550,7 +550,7 @@ my $f = tie my $v, "FetchCounter";
 	when(21) {}
 	when("22") {}
 	when(23) {$ok = 1}
-	when(/24/) {$ok = 0}
+	when(m/24/) {$ok = 0}
     }
     is($ok, 1, "precheck: $test_name");
     is($f->count(), 1, $test_name);
@@ -566,7 +566,7 @@ my $f = tie my $v, "FetchCounter";
 	when(21) {}
 	when("22") {}
 	when($v) {$ok = 1}
-	when(/24/) {$ok = 0}
+	when(m/24/) {$ok = 0}
     }
     is($ok, 1, "precheck: $test_name");
     is($f->count(), 1, $test_name);
@@ -582,7 +582,7 @@ my $f = tie my $v, "FetchCounter";
 	when("21") {}
 	when("22") {}
 	when($v) {$ok = 1}
-	when(/24/) {$ok = 0}
+	when(m/24/) {$ok = 0}
     }
     is($ok, 1, "precheck: $test_name");
     is($f->count(), 1, $test_name);
@@ -712,7 +712,7 @@ my $f = tie my $v, "FetchCounter";
 
 sub contains_x {
     my $x = shift;
-    return ($x =~ /x/);
+    return ($x =~ m/x/);
 }
 {
     my ($ok1, $ok2) = (0,0);

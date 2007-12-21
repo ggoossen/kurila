@@ -268,7 +268,7 @@ values %h			# values
 keys %h				# keys
 %$href				# rv2hv
 pack "C2", $n,$n		# pack
-split /a/, "abad"		# split
+split m/a/, "abad"		# split
 join "a"; @a			# join
 push @a,3==6			# push
 unshift @aaa			# unshift

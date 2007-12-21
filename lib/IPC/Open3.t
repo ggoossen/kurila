@@ -7,7 +7,7 @@ BEGIN {
     require Config; Config->import;
     if (!$Config{'d_fork'}
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
-       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || $Config{'cc'} =~ /^bcc/i))
+       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || $Config{'cc'} =~ m/^bcc/i))
     {
 	print "1..0\n";
 	exit 0;
@@ -58,8 +58,8 @@ ok 1, $pid = open3 *WRITE, *READ, *ERROR, $perl, '-e', cmd_line(<<'EOF');
     print STDERR "hi error\n";
 EOF
 ok 2, print WRITE "hi kid\n";
-ok 3, (~< *READ) =~ /^hi kid\r?\n$/;
-ok 4, (~< *ERROR) =~ /^hi error\r?\n$/;
+ok 3, (~< *READ) =~ m/^hi kid\r?\n$/;
+ok 4, (~< *ERROR) =~ m/^hi error\r?\n$/;
 ok 5, close(*WRITE), $!;
 ok 6, close(*READ), $!;
 ok 7, close(*ERROR), $!;
@@ -138,7 +138,7 @@ waitpid $pid, 0;
 # command line in single parameter variant of open3
 # for understanding of Config{'sh'} test see exec description in camel book
 my $cmd = 'print(scalar(~< *STDIN))';
-$cmd = $Config{'sh'} =~ /sh/ ? "'$cmd'" : cmd_line($cmd);
+$cmd = $Config{'sh'} =~ m/sh/ ? "'$cmd'" : cmd_line($cmd);
 eval{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($@) {
 	print "error $@\n";

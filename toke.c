@@ -4422,7 +4422,7 @@ Perl_yylex(pTHX)
 		Mop(OP_DIVIDE);
 	    }
 	 }
-	 yyerror("/pat/ must be m/pat/");
+	 Perl_croak("/pat/ must be m/pat/"); /*  */
 
     case '?':			/* conditional */
 	 s++;

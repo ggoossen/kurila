@@ -51,17 +51,17 @@ my @tests = ();
 @ARGV = grep $_ && length( $_ ) => @ARGV;
 
 sub _populate_hash {
-    return map {$_, 1} split /\s+/, $_[0];
+    return map {$_, 1} split m/\s+/, $_[0];
 }
 
 our $re;
-if ($ARGV[0] && $ARGV[0]=~/^-re/) {
-    if ($ARGV[0]!~/=/) {
+if ($ARGV[0] && $ARGV[0]=~m/^-re/) {
+    if ($ARGV[0]!~m/=/) {
         shift;
         $re=join "|",@ARGV;
         @ARGV=();
     } else {
-        (undef,$re)=split/=/,shift;
+        (undef,$re)=split m/=/,shift;
     }
 }
 
@@ -125,7 +125,7 @@ if (@ARGV) {
 if ($^O eq 'MSWin32') {
     s,\\,/,g for @tests;
 }
-@tests=grep /$re/, @tests 
+@tests=grep m/$re/, @tests 
     if $re;
 Test::Harness::runtests @tests;
 exit(0);

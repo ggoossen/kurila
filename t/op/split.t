@@ -222,9 +222,9 @@ ok(@ary == 3 &&
 
 {
     no utf8;
-    my @a = split(m/\xFE/, "\xFF\xFE\xFD");
+    my @a = split(m/\xFE/, "\x[FF]\x[FE]\x[FD]");
 
-    ok(@a == 2 && $a[0] eq "\xFF" && $a[1] eq "\xFD");
+    ok(@a == 2 && $a[0] eq "\x[FF]" && $a[1] eq "\x[FD]");
 }
 
 {

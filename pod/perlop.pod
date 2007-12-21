@@ -1067,9 +1067,9 @@ is equivalent to
 The result may be used as a subpattern in a match:
 
     $re = qr/$pattern/;
-    $string =~ /foo${re}bar/;	# can be interpolated in other patterns
+    $string =~ m/foo${re}bar/;	# can be interpolated in other patterns
     $string =~ $re;		# or used standalone
-    $string =~ /$re/;		# or this way
+    $string =~ m/$re/;		# or this way
 
 Since Perl may compile the pattern at the moment of execution of qr()
 operator, using qr() may have speed advantages in some situations,
@@ -1177,7 +1177,7 @@ failure.
 Examples:
 
     open(TTY, '/dev/tty');
-    <TTY> =~ /^y/i && foo();	# do foo if desired
+    <TTY> =~ m/^y/i && foo();	# do foo if desired
 
     if (/Version: *([0-9.]*)/) { $version = $1; }
 
@@ -1189,7 +1189,7 @@ Examples:
 	print if /$arg/o;	# compile only once
     }
 
-    if (($F1, $F2, $Etc) = ($foo =~ /^(\S+)\s+(\S+)\s*(.*)/))
+    if (($F1, $F2, $Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))
 
 This last example splits $foo into the first two words and the
 remainder of the line, and assigns those three fields to $F1, $F2, and
@@ -1224,12 +1224,12 @@ properly supported when anchored at the very beginning of the pattern.
 Examples:
 
     # list context
-    ($one,$five,$fifteen) = (`uptime` =~ /(\d+\.\d+)/g);
+    ($one,$five,$fifteen) = (`uptime` =~ m/(\d+\.\d+)/g);
 
     # scalar context
     $/ = "";
     while (defined($paragraph = <>)) {
-	while ($paragraph =~ /[a-z]['")]*[.!?]+['")]*\s/g) {
+	while ($paragraph =~ m/[a-z]['")]*[.!?]+['")]*\s/g) {
 	    $sentences++;
 	}
     }

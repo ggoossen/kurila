@@ -464,14 +464,14 @@ SKIP: Abuses a fixed bug.
 
 #######  Split 1
                split // => '"';
-${"@_"} = "/"; split // => eval join "+" => 1 .. 7;
+${"@_"} = "/"; split m// => eval join "+" => 1 .. 7;
 *{"@_"} = sub {foreach (sort keys %_)  {print "$_ $_{$_} "}};
 %{"@_"} = %_ = (Just => another => Perl => Hacker); &{%{%_}};
 SKIP: Hashes are now randomized.
 EXPECT: $JaPH_s
 
 #######  Split 2
-$" = "/"; split // => eval join "+" => 1 .. 7;
+$" = "/"; split m// => eval join "+" => 1 .. 7;
 *{"@_"} = sub {foreach (sort keys %_) {print "$_ $_{$_} "}};
 %_ = (Just => another => Perl => Hacker); &{%_};
 SKIP: Hashes are now randomized.
@@ -589,13 +589,13 @@ $;=$";$;{Just=>another=>Perl=>Hacker=>}=$/;print%;
 ####### &func;
 $_ = "\112\165\163\1648\141\156\157\164\150\145\1628\120\145"
    . "\162\1548\110\141\143\153\145\162\0128\177"  and &japh;
-sub japh {print "@_" and return if pop; split /\d/ and &japh}
+sub japh {print "@_" and return if pop; split m/\d/ and &japh}
 
 ####### magic goto.
 sub _ {$_ = shift and y/b-yB-Y/a-yB-Y/                xor      !@ _?
        exit print                                                  :
             print and push @_ => shift and goto &{(caller (0)) [3]}}
-            split // => "KsvQtbuf fbsodpmu\ni flsI "  xor       & _
+            split m// => "KsvQtbuf fbsodpmu\ni flsI "  xor       & _
 
 ####### $: fun 1
 :$:=~s:$":Just$&another$&:;$:=~s:
@@ -660,7 +660,7 @@ BEGIN {print "Just "   }
 print $qr, "\n";
 
 ####### use lib 'coderef'
-use   lib sub {($\) = split /\./ => pop; print $"};
+use   lib sub {($\) = split m/\./ => pop; print $"};
 eval "use Just" || eval "use another" || eval "use Perl" || eval "use Hacker";
 EXPECT
  Just another Perl Hacker

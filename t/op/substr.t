@@ -293,12 +293,12 @@ is($a, 'xxxxefgh');
     no utf8;
     my $x = substr("a" . utf8::chr(0x263a) . "b",0); # \x{263a} == \xE2\x98\xBA
     $x = substr($x,1,1);
-    is($x, "\xE2");
+    is($x, "\x[E2]");
     $x = $x x 2;
     substr($x,0,1, "abcd");
-    is($x, "abcd\xE2");
+    is($x, "abcd\x[E2]");
     $x = reverse $x;
-    is($x, "\xE2dcba");
+    is($x, "\x[E2]dcba");
 }
 
 # replacement should work on magical values

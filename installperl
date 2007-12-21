@@ -663,7 +663,7 @@ sub safe_unlink {
 	print "  unlink $name\n" if $verbose;
 	next if CORE::unlink($name);
 	warn "Couldn't unlink $name: $!\n";
-	if ($! =~ /busy/i) {
+	if ($! =~ m/busy/i) {
 	    print "  mv $name $name.old\n" if $verbose;
 	    safe_rename($name, "$name.old")
 		or warn "Couldn't rename $name: $!\n";
@@ -769,7 +769,7 @@ sub installlib {
     my $name = $_;
 
     # Ignore version control directories.
-    if ($name =~ /^(?:CVS|RCS|SCCS|\.svn)\z/ and -d $name) {
+    if ($name =~ m/^(?:CVS|RCS|SCCS|\.svn)\z/ and -d $name) {
 	$File::Find::prune = 1;
 	return;
     }
@@ -783,14 +783,14 @@ sub installlib {
     # the corelist script from lib/Module/CoreList/bin and ptar* in
     # lib/Archive/Tar/bin, the config_data script in lib/Module/Build/scripts
     # (they're installed later with other utils)
-    return if $name =~ /^(?:cpan|instmodsh|prove|corelist|ptar|cpan2dist|ptardiff|config_data)\z/;
+    return if $name =~ m/^(?:cpan|instmodsh|prove|corelist|ptar|cpan2dist|ptardiff|config_data)\z/;
     # ignore the Makefiles
-    return if $name =~ /^makefile$/i;
+    return if $name =~ m/^makefile$/i;
     # ignore the test extensions
     return if $dir =~ m{\bXS/(?:APItest|Typemap)\b};
     return if $name =~ m{\b(?:APItest|Typemap)\.pm$};
     # ignore the demo files
-    return if $dir =~ /\b(?:demos?|eg)\b/;
+    return if $dir =~ m/\b(?:demos?|eg)\b/;
 
     # ignore READMEs, MANIFESTs, INSTALL docs, META.ymls and change logs.
     # Changes.e2x and README.e2x are needed by enc2xs.
@@ -806,14 +806,14 @@ sub installlib {
     # - import library files and export library files (only present on Win32
     #   anyway?) and empty bootstrap files [of dynamically linked extensions].
     return if $Config{useshrplib} eq 'true' and
-             ($name =~ /$Config{_a}$/ or $name =~ /\.exp$/ or ($name =~ /\.bs$/ and -z $name));
+             ($name =~ m/$Config{_a}$/ or $name =~ m/\.exp$/ or ($name =~ m/\.bs$/ and -z $name));
 
     $name = "$dir/$name" if $dir ne '';
 
     my $installlib = $installprivlib;
-    if ($dir =~ /^auto/ ||
-	  ($name =~ /^(.*)\.(?:pm|pod)$/ && $archpms{$1}) ||
-	  ($name =~ /^(.*)\.(?:h|lib)$/i && ($Is_W32 || $Is_NetWare)) ||
+    if ($dir =~ m/^auto/ ||
+	  ($name =~ m/^(.*)\.(?:pm|pod)$/ && $archpms{$1}) ||
+	  ($name =~ m/^(.*)\.(?:h|lib)$/i && ($Is_W32 || $Is_NetWare)) ||
 	  $name eq 'Config_heavy.pl'
        ) {
 	$installlib = $installarchlib;
@@ -846,17 +846,17 @@ sub installlib {
 		# the check !$nwinstall
 		if (!(/\.(?:nlp|nlm|bs)$/)) {
 		    copy_if_diff($_, "$installlib/$name")
-			and chmod($name =~ /\.(so|$dlext)$/o ? 0555 : 0444,
+			and chmod($name =~ m/\.(so|$dlext)$/o ? 0555 : 0444,
 				  "$installlib/$name");
 		}
 	   } else {
 		if (copy_if_diff($_, "$installlib/$name")) {
-		    if ($name =~ /\.(so|$dlext)$/o) {
-			strip("-S", "$installlib/$name") if $^O =~ /^(rhapsody|darwin)$/;
+		    if ($name =~ m/\.(so|$dlext)$/o) {
+			strip("-S", "$installlib/$name") if $^O =~ m/^(rhapsody|darwin)$/;
 			chmod(0555, "$installlib/$name");
 		    } else {
 			strip("-S", "$installlib/$name")
-			    if ($name =~ /\.a$/o and $^O =~ /^(rhapsody|darwin)$/);
+			    if ($name =~ m/\.a$/o and $^O =~ m/^(rhapsody|darwin)$/);
 			chmod(0444, "$installlib/$name");
 		    }
 		}
@@ -903,7 +903,7 @@ sub copy_if_diff {
 	}
 	copy($from, $to);
 	# Restore timestamps if it's a .a library or for OS/2.
-	if (!$nonono && ($Is_OS2 || $to =~ /\.a$/)) {
+	if (!$nonono && ($Is_OS2 || $to =~ m/\.a$/)) {
 	    my ($atime, $mtime) = (stat $from)[8,9];
 	    utime $atime, $mtime, $to;
 	}
@@ -918,7 +918,7 @@ sub strip
     return unless $dostrip;
 
     my @opts;
-    while (@args && $args[0] =~ /^(-\w+)$/) {
+    while (@args && $args[0] =~ m/^(-\w+)$/) {
 	push @opts, shift @args;
     }
 
