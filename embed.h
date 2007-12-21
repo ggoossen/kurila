@@ -1494,7 +1494,7 @@
 #define incline			S_incline
 #define intuit_more		S_intuit_more
 #define lop			S_lop
-#define missingterm		S_missingterm
+#define missingterminator	S_missingterminator
 #define no_op			S_no_op
 #define sublex_done		S_sublex_done
 #define sublex_push		S_sublex_push
@@ -1917,7 +1917,6 @@
 #define ck_glob			Perl_ck_glob
 #define ck_grep			Perl_ck_grep
 #define ck_index		Perl_ck_index
-#define ck_join			Perl_ck_join
 #define ck_lengthconst		Perl_ck_lengthconst
 #define ck_lfun			Perl_ck_lfun
 #define ck_listiob		Perl_ck_listiob
@@ -3749,7 +3748,7 @@
 #define incline(a)		S_incline(aTHX_ a)
 #define intuit_more(a)		S_intuit_more(aTHX_ a)
 #define lop(a,b,c)		S_lop(aTHX_ a,b,c)
-#define missingterm(a)		S_missingterm(aTHX_ a)
+#define missingterminator(a)	S_missingterminator(aTHX_ a)
 #define no_op(a,b)		S_no_op(aTHX_ a,b)
 #define sublex_done()		S_sublex_done(aTHX)
 #define sublex_push()		S_sublex_push(aTHX)
@@ -4176,7 +4175,6 @@
 #define ck_glob(a)		Perl_ck_glob(aTHX_ a)
 #define ck_grep(a)		Perl_ck_grep(aTHX_ a)
 #define ck_index(a)		Perl_ck_index(aTHX_ a)
-#define ck_join(a)		Perl_ck_join(aTHX_ a)
 #define ck_lengthconst(a)	Perl_ck_lengthconst(aTHX_ a)
 #define ck_lfun(a)		Perl_ck_lfun(aTHX_ a)
 #define ck_listiob(a)		Perl_ck_listiob(aTHX_ a)

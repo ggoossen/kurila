@@ -504,7 +504,7 @@ S_no_op(pTHX_ const char *what, char *s)
 }
 
 /*
- * S_missingterm
+ * S_missingterminator
  * Complain about missing quote/regexp/heredoc terminator.
  * If it's called with NULL then it cauterizes the line buffer.
  * If we're in a delimited string and the delimiter is a control
@@ -513,7 +513,7 @@ S_no_op(pTHX_ const char *what, char *s)
  */
 
 STATIC void
-S_missingterm(pTHX_ char *s)
+S_missingterminator(pTHX_ char *s)
 {
     dVAR;
     char tmpbuf[3];
@@ -4461,7 +4461,7 @@ Perl_yylex(pTHX)
 	    no_op("String",s);
 	}
 	if (!s)
-	    missingterm(NULL);
+	    missingterminator(NULL);
 	yylval.ival = OP_CONST;
 	TERM(sublex_start());
 
@@ -4472,7 +4472,7 @@ Perl_yylex(pTHX)
 	    no_op("String",s);
 	}
 	if (!s)
-	    missingterm(NULL);
+	    missingterminator(NULL);
 	yylval.ival = OP_CONST;
 	/* FIXME. I think that this can be const if char *d is replaced by
 	   more localised variables.  */
@@ -4490,7 +4490,7 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR)
 	    no_op("Backticks",s);
 	if (!s)
-	    missingterm(NULL);
+	    missingterminator(NULL);
 	readpipe_override();
 	TERM(sublex_start());
 
@@ -5597,7 +5597,7 @@ Perl_yylex(pTHX)
 	case KEY_q:
 	    s = scan_str(s,!!PL_madskills,FALSE);
 	    if (!s)
-		missingterm(NULL);
+		missingterminator(NULL);
 	    yylval.ival = OP_CONST;
 	    TERM(sublex_start());
 
@@ -5607,7 +5607,7 @@ Perl_yylex(pTHX)
 	case KEY_qw:
 	    s = scan_str(s,!!PL_madskills,FALSE);
 	    if (!s)
-		missingterm(NULL);
+		missingterminator(NULL);
 	    PL_expect = XOPERATOR;
 	    force_next(')');
 	    if (SvCUR(PL_lex_stuff)) {
@@ -5659,7 +5659,7 @@ Perl_yylex(pTHX)
 	case KEY_qq:
 	    s = scan_str(s,!!PL_madskills,FALSE);
 	    if (!s)
-		missingterm(NULL);
+		missingterminator(NULL);
 	    yylval.ival = OP_STRINGIFY;
 	    if (SvIVX(PL_lex_stuff) == '\'')
 		SvIV_set(PL_lex_stuff, 0);	/* qq'$foo' should intepolate */
@@ -5672,7 +5672,7 @@ Perl_yylex(pTHX)
 	case KEY_qx:
 	    s = scan_str(s,!!PL_madskills,FALSE);
 	    if (!s)
-		missingterm(NULL);
+		missingterminator(NULL);
 	    readpipe_override();
 	    TERM(sublex_start());
 
@@ -10406,7 +10406,7 @@ S_scan_heredoc(pTHX_ register char *s)
 	}
 	if (s >= bufend) {
 	    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
-	    missingterm(PL_tokenbuf);
+	    missingterminator(PL_tokenbuf);
 	}
 	sv_setpvn(herewas,bufptr,d-bufptr+1);
 	sv_setpvn(tmpstr,d+1,s-d);
@@ -10426,7 +10426,7 @@ S_scan_heredoc(pTHX_ register char *s)
 	}
 	if (s >= PL_bufend) {
 	    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
-	    missingterm(PL_tokenbuf);
+	    missingterminator(PL_tokenbuf);
 	}
 	sv_setpvn(tmpstr,d+1,s-d);
 #ifdef PERL_MAD
@@ -10462,7 +10462,7 @@ S_scan_heredoc(pTHX_ register char *s)
 	if (!outer ||
 	 !(PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = filter_gets(PL_linestr, PL_rsfp, 0))) {
 	    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
-	    missingterm(PL_tokenbuf);
+	    missingterminator(PL_tokenbuf);
 	}
 #ifdef PERL_MAD
 	stuffstart = s - SvPVX(PL_linestr);

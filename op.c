@@ -4209,9 +4209,11 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
 	if (PL_madskills) {
 	    /* This is all dead code when PERL_MAD is not defined.  */
 	    live = newUNOP(OP_NULL, 0, live);
+#ifdef PERL_MAD
 	    op_getmad(first, live, 'C');
 	    op_getmad(dead, live, left ? 'e' : 't');
 	    append_madprops_pv("const_cond", live, '<');
+#endif
 	} else {
 	    op_free(first);
 	    op_free(dead);

@@ -1502,7 +1502,7 @@ s	|void	|force_ident	|NN const char *s|int kind
 s	|void	|incline	|NN const char *s
 s	|int	|intuit_more	|NN char *s
 s	|I32	|lop		|I32 f|int x|NN char *s
-rs	|void	|missingterm	|NULLOK char *s
+rs	|void	|missingterminator	|NULLOK char *s
 s	|void	|no_op		|NN const char *what|NULLOK char *s
 sR	|I32	|sublex_done
 sR	|I32	|sublex_push
