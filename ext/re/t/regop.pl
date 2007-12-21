@@ -5,13 +5,13 @@ my @tests=(
   x  =>  '.[XY].',
   'ABCD' => '(?:ABCP|ABCG|ABCE|ABCB|ABCA|ABCD)',
   'D:\\dev/perl/ver/28321_/perl.exe'=>
-  '/(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\.WSF|\\.WSH|\\.pyo|\\.pyc|\\.pyw|\\.py)$/i',
+  'm/(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\.WSF|\\.WSH|\\.pyo|\\.pyc|\\.pyw|\\.py)$/i',
   'q'=>'[q]',
 );
 while (@tests) {
     my ($str,$pat)=splice @tests,0,2;
     warn "\n";
-    $pat="/$pat/" if substr($pat,0,1) ne '/';
+    $pat="m/$pat/" if substr($pat,0,2) ne 'm/';
     # string eval to get the free regex message in the right place.
     eval qq[
         warn "$str"=~$pat ? "%MATCHED%" : "%FAILED%","\n";

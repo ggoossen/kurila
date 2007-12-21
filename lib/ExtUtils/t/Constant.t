@@ -628,7 +628,7 @@ $test++;
 my $notdef = eval { NOTDEF; };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@ !~ /Undefined subroutine .*NOTDEF called/) {
+} elsif ($@ !~ m/Undefined subroutine .*NOTDEF called/) {
   print "not ok $test # \$@='$@'\n";
 } else {
   print "ok $test\n";
