@@ -94,18 +94,18 @@ sub catdir {
 	my $path = (@dirs == 1 ? $dirs[0] : $self->catdir(@dirs));
 	my ($spath,$sdir) = ($path,$dir);
 	$spath =~ s/\.dir\Z(?!\n)//; $sdir =~ s/\.dir\Z(?!\n)//; 
-	$sdir = $self->eliminate_macros($sdir) unless $sdir =~ /^[\w\-]+\Z(?!\n)/s;
+	$sdir = $self->eliminate_macros($sdir) unless $sdir =~ m/^[\w\-]+\Z(?!\n)/s;
 	$rslt = $self->fixpath($self->eliminate_macros($spath)."/$sdir",1);
 
 	# Special case for VMS absolute directory specs: these will have had device
 	# prepended during trip through Unix syntax in eliminate_macros(), since
 	# Unix syntax has no way to express "absolute from the top of this device's
 	# directory tree".
-	if ($spath =~ /^[\[<][^.\-]/s) { $rslt =~ s/^[^\[<]+//s; }
+	if ($spath =~ m/^[\[<][^.\-]/s) { $rslt =~ s/^[^\[<]+//s; }
     }
     else {
 	if    (not defined $dir or not length $dir) { $rslt = ''; }
-	elsif ($dir =~ /^\$\([^\)]+\)\Z(?!\n)/s)          { $rslt = $dir; }
+	elsif ($dir =~ m/^\$\([^\)]+\)\Z(?!\n)/s)          { $rslt = $dir; }
 	else                                        { $rslt = vmspath($dir); }
     }
     return $self->canonpath($rslt);
@@ -128,7 +128,7 @@ sub catfile {
 	my $path = (@files == 1 ? $files[0] : $self->catdir(@files));
 	my $spath = $path;
 	$spath =~ s/\.dir\Z(?!\n)//;
-	if ($spath =~ /^[^\)\]\/:>]+\)\Z(?!\n)/s && basename($file) eq $file) {
+	if ($spath =~ m/^[^\)\]\/:>]+\)\Z(?!\n)/s && basename($file) eq $file) {
 	    $rslt = "$spath$file";
 	}
 	else {
@@ -232,10 +232,10 @@ Checks for VMS directory spec as well as Unix separators.
 sub file_name_is_absolute {
     my ($self,$file) = @_;
     # If it's a logical name, expand it.
-    $file = $ENV{$file} while $file =~ /^[\w\$\-]+\Z(?!\n)/s && $ENV{$file};
+    $file = $ENV{$file} while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && $ENV{$file};
     return scalar($file =~ m!^/!s             ||
 		  $file =~ m![<\[][^.\-\]>]!  ||
-		  $file =~ /:[^<\[]/);
+		  $file =~ m/:[^<\[]/);
 }
 
 =item splitpath (override)
@@ -248,7 +248,7 @@ sub splitpath {
     my($self,$path) = @_;
     my($dev,$dir,$file) = ('','','');
 
-    vmsify($path) =~ /(.+:)?([\[<].*[\]>])?(.*)/s;
+    vmsify($path) =~ m/(.+:)?([\[<].*[\]>])?(.*)/s;
     return ($1 || '',$2 || '',$3);
 }
 
@@ -273,9 +273,9 @@ sub splitdir {
 						# [--.		==> [-.-.
 						# .--]		==> .-.-]
 						# [--]		==> [-.-]
-    $dirspec = "[$dirspec]" unless $dirspec =~ /[\[<]/; # make legal
+    $dirspec = "[$dirspec]" unless $dirspec =~ m/[\[<]/; # make legal
     $dirspec =~ s/^(\[|<)\./$1/;
-    my(@dirs) = split /(?<!\^)\./, vmspath($dirspec);
+    my(@dirs) = split m/(?<!\^)\./, vmspath($dirspec);
     $dirs[0] =~ s/^[\[<]//s;  $dirs[-1] =~ s/[\]>]\Z(?!\n)//s;
     @dirs;
 }
@@ -296,9 +296,9 @@ sub catpath {
     $dir = length $dir_file ? $self->catfile($dir_dir, $dir_file) : $dir_dir;
     
     if ($dev =~ m|^/+([^/]+)|) { $dev = "$1:"; }
-    else { $dev .= ':' unless $dev eq '' or $dev =~ /:\Z(?!\n)/; }
+    else { $dev .= ':' unless $dev eq '' or $dev =~ m/:\Z(?!\n)/; }
     if (length($dev) or length($dir)) {
-      $dir = "[$dir]" unless $dir =~ /[\[<\/]/;
+      $dir = "[$dir]" unless $dir =~ m/[\[<\/]/;
       $dir = vmspath($dir);
     }
     "$dev$dir$file";
@@ -431,8 +431,8 @@ sub eliminate_macros {
     return '' unless (defined $path) && ($path ne '');
     $self = {} unless ref $self;
 
-    if ($path =~ /\s/) {
-      return join ' ', map { $self->eliminate_macros($_) } split /\s+/, $path;
+    if ($path =~ m/\s/) {
+      return join ' ', map { $self->eliminate_macros($_) } split m/\s+/, $path;
     }
 
     my($npath) = unixify($path);
@@ -469,14 +469,14 @@ sub fixpath {
     $self = bless {} unless ref $self;
     my($fixedpath,$prefix,$name);
 
-    if ($path =~ /\s/) {
+    if ($path =~ m/\s/) {
       return join ' ',
              map { $self->fixpath($_,$force_path) }
-	     split /\s+/, $path;
+	     split m/\s+/, $path;
     }
 
     if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) { 
-        if ($force_path or $path =~ /(?:DIR\)|\])\Z(?!\n)/) {
+        if ($force_path or $path =~ m/(?:DIR\)|\])\Z(?!\n)/) {
             $fixedpath = vmspath($self->eliminate_macros($path));
         }
         else {
@@ -486,7 +486,7 @@ sub fixpath {
     elsif ((($prefix,$name) = ($path =~ m#^\$\(([^\)]+)\)(.+)#s)) && $self->{$prefix}) {
         my($vmspre) = $self->eliminate_macros("\$($prefix)");
         # is it a dir or just a name?
-        $vmspre = ($vmspre =~ m|/| or $prefix =~ /DIR\Z(?!\n)/) ? vmspath($vmspre) : '';
+        $vmspre = ($vmspre =~ m|/| or $prefix =~ m/DIR\Z(?!\n)/) ? vmspath($vmspre) : '';
         $fixedpath = ($vmspre ? $vmspre : $self->{$prefix}) . $name;
         $fixedpath = vmspath($fixedpath) if $force_path;
     }
@@ -495,7 +495,7 @@ sub fixpath {
         $fixedpath = vmspath($fixedpath) if $force_path;
     }
     # No hints, so we try to guess
-    if (!defined($force_path) and $fixedpath !~ /[:>(.\]]/) {
+    if (!defined($force_path) and $fixedpath !~ m/[:>(.\]]/) {
         $fixedpath = vmspath($fixedpath) if -d $fixedpath;
     }
 
@@ -505,7 +505,7 @@ sub fixpath {
     # prepended during trip through Unix syntax in eliminate_macros(), since
     # Unix syntax has no way to express "absolute from the top of this device's
     # directory tree".
-    if ($path =~ /^[\[>][^.\-]/) { $fixedpath =~ s/^[^\[<]+//; }
+    if ($path =~ m/^[\[>][^.\-]/) { $fixedpath =~ s/^[^\[<]+//; }
     $fixedpath;
 }
 

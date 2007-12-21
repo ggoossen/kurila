@@ -46,7 +46,7 @@ use utf8;
 my $x = "\x{263a}";
 is(quotemeta($x), "\x{263a}", "quotemeta Unicode");
 no utf8;
-is(quotemeta($x), "\\\xE2\\\x98\\\xBA", "quotemeta bytes");
+is(quotemeta($x), "\\\x[E2]\\\x[98]\\\x[BA]", "quotemeta bytes");
 
 $a = "foo|bar";
 is("a\Q\Ec$a", "acfoo|bar", '\Q\E');

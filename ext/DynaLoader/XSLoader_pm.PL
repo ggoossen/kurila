@@ -49,7 +49,7 @@ sub load {
 
     goto retry unless $module and defined &dl_load_file;
 
-    my @modparts = split(/::/,$module);
+    my @modparts = split(m/::/,$module);
     my $modfname = $modparts[-1];
 
 EOT

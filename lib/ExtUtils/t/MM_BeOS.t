@@ -14,7 +14,7 @@ chdir 't';
 use Test::More;
 
 BEGIN {
-	if ($^O =~ /beos/i) {
+	if ($^O =~ m/beos/i) {
 		plan tests => 4;
 	} else {
 		plan skip_all => 'This is not BeOS';

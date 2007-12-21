@@ -750,7 +750,7 @@ sub ambient_pragmas {
 		@names = @$val;
 	    }
 	    else {
-		@names = splitm/\s+/, $val;
+		@names = split m/\s+/, $val;
 	    }
 
 	    $warning_bits = $warnings::NONE if !defined ($warning_bits);

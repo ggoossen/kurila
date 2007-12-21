@@ -133,7 +133,7 @@ sub test_dbz {
 	eval '$op';
 	(\$bad) = (\$@ =~ /(.+)/);
 	print "# $test op = $op divbyzero? \$bad...\n";
-	print 'not ' unless (\$@ =~ /Division by zero/);
+	print 'not ' unless (\$@ =~ m/Division by zero/);
 EOT
         push(@script, qq(print "ok $test\\n";\n));
     }
@@ -146,9 +146,9 @@ sub test_loz {
 	$test++;
 	push(@script, <<EOT);
 	eval '$op';
-	(\$bad) = (\$@ =~ /(.+)/);
+	(\$bad) = (\$@ =~ m/(.+)/);
 	print "# $test op = $op logofzero? \$bad...\n";
-	print 'not ' unless (\$@ =~ /Logarithm of zero/);
+	print 'not ' unless (\$@ =~ m/Logarithm of zero/);
 EOT
         push(@script, qq(print "ok $test\\n";\n));
     }
@@ -190,9 +190,9 @@ sub test_broot {
 	$test++;
 	push(@script, <<EOT);
 	eval 'root(2, $op)';
-	(\$bad) = (\$@ =~ /(.+)/);
+	(\$bad) = (\$@ =~ m/(.+)/);
 	print "# $test op = $op badroot? \$bad...\n";
-	print 'not ' unless (\$@ =~ /root rank must be/);
+	print 'not ' unless (\$@ =~ m/root rank must be/);
 EOT
         push(@script, qq(print "ok $test\\n";\n));
     }
@@ -276,7 +276,7 @@ EOS
     $test++;
     push @script, <<EOS;
     print "# j = \$j\n";
-    print "not " unless "\$j" =~ /^-0(?:\\.5(?:0000\\d+)?|\\.49999\\d+)\\+0.86602540\\d+i\$/;
+    print "not " unless "\$j" =~ m/^-0(?:\\.5(?:0000\\d+)?|\\.49999\\d+)\\+0.86602540\\d+i\$/;
     print "ok $test\n";
 
     \$j->display_format('style' => 'polar', 'polar_pretty_print' => 0);
@@ -285,7 +285,7 @@ EOS
     $test++;
     push @script, <<EOS;
     print "# j = \$j\n";
-    print "not " unless "\$j" =~ /^\\[1,2\\.09439510\\d+\\]\$/;
+    print "not " unless "\$j" =~ m/^\\[1,2\\.09439510\\d+\\]\$/;
     print "ok $test\n";
 
     \$j->display_format('style' => 'cartesian', 'format' => '(%.5g)');

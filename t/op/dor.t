@@ -57,11 +57,11 @@ is( $@, '' );
 eval q# sub f ($):lvalue { $y } f $x /= 2; #;
 is( $@, '' );
 eval q# sub f ($) { } f $x /2; #;
-like( $@, qr/^Search pattern not terminated/ );
+is( $@, '' );
 eval q# sub { print $fh / 2 } #;
 is( $@, '' );
 eval q# sub { print $fh /2 } #;
-like( $@, qr/^Search pattern not terminated/ );
+is( $@, '' );
 
 # [perl #28123] Perl optimizes // away incorrectly
 

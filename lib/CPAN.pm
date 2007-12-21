@@ -12241,20 +12241,20 @@ from the CPAN shell.
 
 You will most probably also want to configure something like this:
 
-  o conf makepl_arg "LIB=~/myperl/lib \
-                    INSTALLMAN1DIR=~/myperl/man/man1 \
-                    INSTALLMAN3DIR=~/myperl/man/man3 \
-                    INSTALLSCRIPT=~/myperl/bin \
-                    INSTALLBIN=~/myperl/bin"
+  o conf makepl_arg "LIB=~m/myperl/lib \
+                    INSTALLMAN1DIR=~m/myperl/man/man1 \
+                    INSTALLMAN3DIR=~m/myperl/man/man3 \
+                    INSTALLSCRIPT=~m/myperl/bin \
+                    INSTALLBIN=~m/myperl/bin"
 
 and then (oh joy) the equivalent command for Module::Build. That would
 be
 
-  o conf mbuildpl_arg "--lib=~/myperl/lib \
-                    --installman1dir=~/myperl/man/man1 \
-                    --installman3dir=~/myperl/man/man3 \
-                    --installscript=~/myperl/bin \
-                    --installbin=~/myperl/bin"
+  o conf mbuildpl_arg "--lib=~m/myperl/lib \
+                    --installman1dir=~m/myperl/man/man1 \
+                    --installman3dir=~m/myperl/man/man3 \
+                    --installscript=~m/myperl/bin \
+                    --installbin=~m/myperl/bin"
 
 You can make this setting permanent like all C<o conf> settings with
 C<o conf commit> or by setting C<auto_commit> beforehand.

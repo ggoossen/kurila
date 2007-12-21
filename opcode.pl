@@ -750,7 +750,7 @@ hslice		hash slice		ck_null		m@	H L
 unpack		unpack			ck_unpack	@	S S?
 pack		pack			ck_fun		mst@	S L
 split		split			ck_split	t@	S S S
-join		join or string		ck_join		mst@	S L
+join		join or string		ck_fun		mst@	S L
 
 # List operators.
 

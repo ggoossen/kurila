@@ -28,8 +28,8 @@ eval 'use Config';          #  Defaults assumed if this fails
 #     print "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
 # 	  /fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/ &&
 # 	$& eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" ? "ok\n" : "not XXX";
-# # # "123" =~ /^.*1/; # .*23\x{100}$/, 'uft8 + multiple floating substr');
-# # # ok("123\x{100}" =~ /^.*1/); # .*23\x{100}$/, 'uft8 + multiple floating substr');
+# # # "123" =~ m/^.*1/; # .*23\x{100}$/, 'uft8 + multiple floating substr');
+# # # ok("123\x{100}" =~ m/^.*1/); # .*23\x{100}$/, 'uft8 + multiple floating substr');
 
 # #     # Before #13843 this was failing by matching falsely.
 # #     print "_:$char:_" =~ m/_:$SIGMA:_/i ? "not ok 786\n" : "ok 786\n";
@@ -37,8 +37,8 @@ eval 'use Config';          #  Defaults assumed if this fails
 # __END__
 
 # my $a = "İ";
-# #warn ":$a:" =~ /:$a:/i ? "a" : "b";
-# warn ((":İ:" =~ /:$a:/i) ? "a" : "b");
+# #warn ":$a:" =~ m/:$a:/i ? "a" : "b";
+# warn ((":İ:" =~ m/:$a:/i) ? "a" : "b");
 
 require bytes;
 use utf8;
@@ -221,7 +221,7 @@ print "abc" =~ m/^abc$|$xyz/ ? "ok 49\n" : "not ok 49\n";
 
 # perl 4.009 says "unmatched ()"
 our $result;
-eval '"abc" =~ /a(bc$)|$xyz/; $result = "$&:$1"';
+eval '"abc" =~ m/a(bc$)|$xyz/; $result = "$&:$1"';
 print $@ eq "" ? "ok 50\n" : "not ok 50\n";
 print $result eq "abc:bc" ? "ok 51\n" : "not ok 51\n";
 
@@ -283,23 +283,23 @@ our $reg_infty_p = $reg_infty + 1;
 # default value for $reg_infty from Config.pm, but have not.
 
 undef $@;
-print "not " if eval q(('aaa' =~ /(a{1,$reg_infty_m})/)[0] ne 'aaa') || $@;
+print "not " if eval q(('aaa' =~ m/(a{1,$reg_infty_m})/)[0] ne 'aaa') || $@;
 print "ok 66\n";
 
 undef $@;
-print "not " if eval q(('a' x $reg_infty_m) !~ /a{$reg_infty_m}/) || $@;
+print "not " if eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) || $@;
 print "ok 67\n";
 
 undef $@;
-print "not " if eval q(('a' x ($reg_infty_m - 1)) =~ /a{$reg_infty_m}/) || $@;
+print "not " if eval q(('a' x ($reg_infty_m - 1)) =~ m/a{$reg_infty_m}/) || $@;
 print "ok 68\n";
 
 undef $@;
-eval "'aaa' =~ /a{1,$reg_infty}/";
+eval "'aaa' =~ m/a{1,$reg_infty}/";
 print "not " if $@ !~ m%^\QQuantifier in {,} bigger than%;
 print "ok 69\n";
 
-eval "'aaa' =~ /a{1,$reg_infty_p}/";
+eval "'aaa' =~ m/a{1,$reg_infty_p}/";
 print "not "
 	if $@ !~ m%^\QQuantifier in {,} bigger than%;
 print "ok 70\n";
@@ -308,7 +308,7 @@ undef $@;
 # Poke a couple more parse failures
 
 our $context = 'x' x 256;
-eval qq("${context}y" =~ /(?<=$context)y/);
+eval qq("${context}y" =~ m/(?<=$context)y/);
 print "not " if $@ !~ m%^\QLookbehind longer than 255 not%;
 print "ok 71\n";
 
@@ -451,7 +451,7 @@ for $code ('{$blah = 45}','=xx') {
 
 $code = '{$blah = 45}';
 $blah = 12;
-eval "/(?$code)/";			
+eval "m/(?$code)/";			
 ok($blah == 45);
 
 $blah = 12;
@@ -621,12 +621,12 @@ sub make_must_warn {
 
 my $for_future = make_must_warn('reserved for future extensions');
 
-&$for_future('q(a:[b]:) =~ /[x[:foo:]]/');
+&$for_future('q(a:[b]:) =~ m/[x[:foo:]]/');
 
-#&$for_future('q(a=[b]=) =~ /[x[=foo=]]/');
+#&$for_future('q(a=[b]=) =~ m/[x[=foo=]]/');
 print "ok $test\n"; $test++; # now a fatal croak
 
-#&$for_future('q(a.[b].) =~ /[x[.foo.]]/');
+#&$for_future('q(a.[b].) =~ m/[x[.foo.]]/');
 print "ok $test\n"; $test++; # now a fatal croak
 
 # test if failure of patterns returns empty list
@@ -1443,11 +1443,11 @@ ok(1) while $test +< 576;
 
     # bugid 20010410.006
     for my $rx (
-		'/(.*?)\{(.*?)\}/csg',
-		'/(.*?)\{(.*?)\}/cg',
-		'/(.*?)\{(.*?)\}/sg',
-		'/(.*?)\{(.*?)\}/g',
-		'/(.+?)\{(.+?)\}/csg',
+		'm/(.*?)\{(.*?)\}/csg',
+		'm/(.*?)\{(.*?)\}/cg',
+		'm/(.*?)\{(.*?)\}/sg',
+		'm/(.*?)\{(.*?)\}/g',
+		'm/(.+?)\{(.+?)\}/csg',
 	       )
     {
 	my($input, $i);
@@ -1658,7 +1658,7 @@ EOT
 $_ = "foo";
 
 eval <<"EOT"; die if $@;
-  /f
+  m/f
    o\r
    o
    \$
@@ -1666,7 +1666,7 @@ eval <<"EOT"; die if $@;
 EOT
 
 eval <<"EOT"; die if $@;
-  /f
+  m/f
    o
    o
    \$\r
@@ -1761,7 +1761,7 @@ print "not " unless chr(0xfb4f) =~ m/\p{IsHebrew}/; # outside InHebrew
 print "ok 664\n";
 
 # # singleton (not in a range, this test must be ignored on EBCDIC)
-# print "not " unless chr(0xb5) =~ /\p{IsGreek}/ or ord("A") == 193;
+# print "not " unless chr(0xb5) =~ m/\p{IsGreek}/ or ord("A") == 193;
 # print "ok 665\n";
 print "ok 665 # 0xb5 moved from Greek to Common with Unicode 4.0.1\n";
 
@@ -2461,10 +2461,10 @@ print "# some Unicode properties\n";
     print "# Unicode lookbehind\n";
 
     print "not ok $_ # TODO variable length lookbehind\n" for 851 .. 854;
-    #print "A\x{100}B"        =~ /(?<=A.)B/  ? "ok 851\n" : "not ok 851\n";
-    #print "A\x{200}\x{300}B" =~ /(?<=A..)B/ ? "ok 852\n" : "not ok 852\n";
-    #print "\x{400}AB"        =~ /(?<=\x{400}.)B/ ? "ok 853\n" : "not ok 853\n";
-    #print "\x{500\x{600}}B"  =~ /(?<=\x{500}.)B/ ? "ok 854\n" : "not ok 854\n";
+    #print "A\x{100}B"        =~ m/(?<=A.)B/  ? "ok 851\n" : "not ok 851\n";
+    #print "A\x{200}\x{300}B" =~ m/(?<=A..)B/ ? "ok 852\n" : "not ok 852\n";
+    #print "\x{400}AB"        =~ m/(?<=\x{400}.)B/ ? "ok 853\n" : "not ok 853\n";
+    #print "\x{500\x{600}}B"  =~ m/(?<=\x{500}.)B/ ? "ok 854\n" : "not ok 854\n";
 }
 
 {
@@ -2585,10 +2585,10 @@ print "# some Unicode properties\n";
     print "# illegal Unicode properties\n";
     $test = 896;
 
-    print eval qq* "a" =~ /\pq / *      ? "not ok $test\n" : "ok $test\n";
+    print eval qq* "a" =~ m/\pq / *      ? "not ok $test\n" : "ok $test\n";
     $test++;
 
-    print eval qq* "a" =~ /\p{qrst} / * ? "not ok $test\n" : "ok $test\n";
+    print eval qq* "a" =~ m/\p{qrst} / * ? "not ok $test\n" : "ok $test\n";
     $test++;
 }
 
@@ -3016,7 +3016,7 @@ for (120 .. 130) {
     my $head = 'x' x $_;
     for my $tail ('\x{0061}', '\x{1234}') {
 	ok(
-	    eval qq{use utf8; "$head$tail" =~ /$head$tail/ },
+	    eval qq{use utf8; "$head$tail" =~ m/$head$tail/ },
 	    '\x{...} misparsed in regexp near 127 char EXACT limit'
 	);
     }
@@ -3290,7 +3290,7 @@ if ($ordA == 193) {
     
     ok('fooB'=~m/\N{foo}[\N{B}\N{b}]/,"Passthrough charname");
     my $handle=make_must_warn('Ignoring excess chars from');
-    $handle->('q(xxWxx) =~ /[\N{WARN}]/');
+    $handle->('q(xxWxx) =~ m/[\N{WARN}]/');
     {
         my $code;
         my $w="";
@@ -3300,7 +3300,7 @@ if ($ordA == 193) {
             use warnings;
             
             #1234
-            ok("\0" !~ /[\N{EMPTY-STR}XY]/,
+            ok("\0" !~ m/[\N{EMPTY-STR}XY]/,
                 "Zerolength charname in charclass doesnt match \0");
             1;
         }
@@ -3311,7 +3311,7 @@ EOFTEST
         
     }
     $handle= make_must_warn('Ignoring zero length');
-    $handle->('qq(\\0) =~ /[\N{EMPTY-STR}XY]/');
+    $handle->('qq(\\0) =~ m/[\N{EMPTY-STR}XY]/');
     ok('AB'=~m/(\N{EVIL})/ && $1 eq 'A',"Charname caching $1");
     ok('ABC'=~m/(\N{EVIL})/,"Charname caching $1");    
     ok('xy'=~m/x\N{EMPTY-STR}y/, 'Empty string charname produces NOTHING node');
@@ -3399,9 +3399,9 @@ SKIP:{
     for my $uni (@ary) {
 	my ($r1, $c1, $r2, $c2) = eval qq{
 	    use utf8;
-	    scalar("..foo foo.." =~ /(?'${uni}'foo) \\k'${uni}'/),
+	    scalar("..foo foo.." =~ m/(?'${uni}'foo) \\k'${uni}'/),
 		\$+{${uni}},
-	    scalar("..bar bar.." =~ /(?<${uni}>bar) \\k<${uni}>/),
+	    scalar("..bar bar.." =~ m/(?<${uni}>bar) \\k<${uni}>/),
 		\$+{${uni}};
 	};
 	ok($r1,                         "Named capture UTF (?'')");
@@ -3602,7 +3602,7 @@ ok("x\c\_y"   =~ m/x\c\_y/,    "\_ in a pattern");
 for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $targ = "a\034$c";
     my $reg  = "a\\c\\$c";
-    ok(eval("qq/$targ/ =~ /$reg/"), "\\c\\ in pattern");
+    ok(eval("qq/$targ/ =~ m/$reg/"), "\\c\\ in pattern");
 }
 
 {
@@ -3874,7 +3874,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
 {
     # From Message-ID: <877ixs6oa6.fsf@k75.linux.bogus>
     my $dow_name= "nada";
-    my $parser = "use utf8; (\$dow_name) = \$time_string =~ /(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;";
+    my $parser = "use utf8; (\$dow_name) = \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;";
     my $time_string = "D\x{e9} C\x{e9}adaoin";
     eval $parser;
     ok(!$@,"Test Eval worked");
@@ -3908,8 +3908,8 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
                 for my $quant (@quants) {
                     for my $tail (@tails) {
                         my $re = "($pat$quant\$)$tail";
-                        ok(m/$re/ && $1 eq $_,"'$_'=~/$re/");
-                        ok(m/$re/m && $1 eq $_,"'$_'=~/$re/m");
+                        ok(m/$re/ && $1 eq $_,"'$_'=~m/$re/");
+                        ok(m/$re/m && $1 eq $_,"'$_'=~m/$re/m");
                     }
                 }
             }
@@ -4097,13 +4097,13 @@ sub kt
             my $ret= $str=~m/$pat/i;
             next if $pat eq '-';
             ok($ret,
-               "\"$sstr\"=~/\\x{DF}/i # TODO multi-char folding");
+               "\"$sstr\"=~m/\\x{DF}/i # TODO multi-char folding");
         }
     }
 }
 {
     local $Message = "BBC(Bleadperl Breaks CPAN) Today: String::Multibyte";
-    my $re  = qr/(?:[\x00-\xFF]{4})/;
+    my $re  = qr/(?:[\x[00]-\x[FF]]{4})/;
     my $hyp = "\0\0\0-";
     my $esc = "\0\0\0\\";
 
@@ -4150,28 +4150,28 @@ sub kt
 
     $ok=exists($-{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
-    iseq($ok,1,'$-{x} exists after "bar"=~/(?<x>foo)|bar/');
-    iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~/(?<x>foo)|bar/');
-    iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~/(?<x>foo)|bar/');
+    iseq($ok,1,'$-{x} exists after "bar"=~m/(?<x>foo)|bar/');
+    iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~m/(?<x>foo)|bar/');
+    iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists($+{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
-    iseq($ok,0,'$+{x} not exists after "bar"=~/(?<x>foo)|bar/');
-    iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~/(?<x>foo)|bar/');
-    iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~/(?<x>foo)|bar/');
+    iseq($ok,0,'$+{x} not exists after "bar"=~m/(?<x>foo)|bar/');
+    iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~m/(?<x>foo)|bar/');
+    iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists($-{x}) ? 1 : 0
         if 'foo'=~m/(?<x>foo)|bar/;
-    iseq($ok,1,'$-{x} exists after "foo"=~/(?<x>foo)|bar/');
-    iseq(scalar(%+), 1, 'scalar %+ == 1 after "foo"=~/(?<x>foo)|bar/');
-    iseq(scalar(%-), 1, 'scalar %- == 1 after "foo"=~/(?<x>foo)|bar/');
+    iseq($ok,1,'$-{x} exists after "foo"=~m/(?<x>foo)|bar/');
+    iseq(scalar(%+), 1, 'scalar %+ == 1 after "foo"=~m/(?<x>foo)|bar/');
+    iseq(scalar(%-), 1, 'scalar %- == 1 after "foo"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists($+{x}) ? 1 : 0
         if 'foo'=~m/(?<x>foo)|bar/;
-    iseq($ok,1,'$+{x} exists after "foo"=~/(?<x>foo)|bar/');
+    iseq($ok,1,'$+{x} exists after "foo"=~m/(?<x>foo)|bar/');
 }
 {
     local $_;
@@ -4228,7 +4228,7 @@ ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/,
         "Regexp /^(??{'(.)'x 100})/ crashes older perls")
     or print "# Unexpected outcome: should pass or crash perl\n";
 
-eval '/\k/';
+eval 'm/\k/';
 ok($@=~m/\QSequence \k... not terminated in regex;\E/);
 
 {

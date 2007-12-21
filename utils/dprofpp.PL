@@ -534,7 +534,7 @@ sub group{
 
 		for(my $i = 0;$i +< @$idkeys - 2;){
 			$key = $$idkeys[$i];
-			if($key =~ /$opt_G/){
+			if($key =~ m/$opt_G/){
 				$$calls{$opt_G} += $$calls{$key};
 				$$times{$opt_G} += $$times{$key};
 				$$ctimes{$opt_G} += $$ctimes{$key};
@@ -736,7 +736,7 @@ sub parsestack {
 		chop;
 		if (/^&/) {
 		  ($dir, $id, $pack, $name) = split;
-		  if ($opt_R and ($name =~ /(?:::)?(__ANON__|END)$/)) {
+		  if ($opt_R and ($name =~ m/(?:::)?(__ANON__|END)$/)) {
 		    $name .= "($id)";
 		  }
 		  $cv_hash{$id} = "$pack\::$name";
@@ -878,8 +878,8 @@ sub exitstamp {
 	if( ! defined $x ){
 		die "Garbled profile, missing an enter time stamp";
 	}
-	if( $x->[0] ne $name and $opt_G and ($name =~ /$opt_G/)){
-	  if ($x->[0] =~ /(?:::)?AUTOLOAD$/) {
+	if( $x->[0] ne $name and $opt_G and ($name =~ m/$opt_G/)){
+	  if ($x->[0] =~ m/(?:::)?AUTOLOAD$/) {
 	    if ($opt_A) {
 	      $name = $x->[0];
 	    }
@@ -970,7 +970,7 @@ sub rby_avgcpu { $persecs->{$a} <+> $persecs->{$b} }
 
 BEGIN {
     $statform = ' {>>}  {>>>>} {>>>>} {>>>>} {>>>>>>} {>>>>}  {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<';
-    if (-t STDOUT and defined $stty and my ($cols) = `$stty -a` =~ /\bcolumns\s+(\d+)/)
+    if (-t STDOUT and defined $stty and my ($cols) = `$stty -a` =~ m/\bcolumns\s+(\d+)/)
     {
 	$statform .= '<' x ($cols - length $statform) if $cols +> 80;
     }

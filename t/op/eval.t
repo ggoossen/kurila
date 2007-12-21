@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..95\n";
+print "1..94\n";
 
 our ($foo, $fact, $ans, $i, $x, $eval);
 
@@ -18,7 +18,7 @@ print eval '
 $foo =;';		# this tests for a call through yyerror()
 if ($@ =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
 
-print eval '$foo = /';	# this tests for a call through fatal()
+print eval '$foo = m/';	# this tests for a call through fatal()
 if ($@ =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
 
 print eval '"ok 7\n";';
@@ -454,14 +454,6 @@ print "ok $test - eval and last\n"; $test++;
     print "not " unless $@ eq "";
     print "ok $test # eval undef \n"; $test++;
 }
-
-{
-    no warnings;
-    eval "/ /a;";
-    print "not " unless $@ =~ m/^syntax error/;
-    print "ok $test # eval syntax error, no warnings \n"; $test++;
-}
-
 
 # a syntax error in an eval called magically 9eg vie tie or overload)
 # resulted in an assertion failure in S_docatch, since doeval had already

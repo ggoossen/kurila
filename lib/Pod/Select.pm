@@ -688,7 +688,7 @@ sub _compile_section_spec {
         s|\001|\\\\|g;       ## restore escaped backward slashes
         s|\002|\\/|g;        ## restore escaped forward slashes
         $negated = s/^\!//;  ## check for negation
-        eval "/$_/";         ## check regex syntax
+        eval "m/$_/";         ## check regex syntax
         if ($@) {
             ++$bad_regexs;
             carp "Bad regular expression /$_/ in \"$section_spec\": $@\n";

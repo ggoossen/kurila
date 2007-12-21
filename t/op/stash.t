@@ -43,7 +43,7 @@ package main;
 {
     local $ENV{PERL_DESTRUCT_LEVEL} = 2;
     fresh_perl_is(
-		  'package A; sub a { // }; %::=""',
+		  'package A; sub a { m// }; %::=""',
 		  '',
 		  '',
 		  );

@@ -282,7 +282,7 @@ sub like_yn ($$$@) {
     unless ($pass) {
 	unshift(@mess, "#      got '$got'\n",
 		$flip
-		? "# expected !~ /$expected/\n" : "# expected /$expected/\n");
+		? "# expected !~ m/$expected/\n" : "# expected m/$expected/\n");
     }
     local $Level = $Level + 1;
     _ok($pass, _where(), $name, @mess);

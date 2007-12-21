@@ -55,7 +55,7 @@ my $foo = Foo->new(1..5);
 my $bar = Bar->new(1..5);
 
 for (@prgs) {
-    my($prog, $expected) = split(/\nEXPECT\n?/, $_);
+    my($prog, $expected) = split(m/\nEXPECT\n?/, $_);
     # TODO: dumpvar::stringify() is controlled by a pile of package
     # dumpvar variables: $printUndef, $unctrl, $quoteHighBit, $bareStringify,
     # and so forth.  We need to test with various settings of those.

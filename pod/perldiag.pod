@@ -4537,11 +4537,11 @@ See L<Win32> for more information.
 (W regexp) You have used an internal modifier such as (?-o) that has no
 meaning unless removed from the entire regexp:
 
-    if ($string =~ /(?-o)$pattern/o) { ... }
+    if ($string =~ m/(?-o)$pattern/o) { ... }
 
 must be written as
 
-    if ($string =~ /$pattern/) { ... }
+    if ($string =~ m/$pattern/) { ... }
 
 The <-- HERE shows in the regular expression about
 where the problem was discovered. See L<perlre>.
@@ -4557,11 +4557,11 @@ some point in the future, but in the meantime such code is discouraged.
 (W regexp) You have used an internal modifier such as (?o) that has no
 meaning unless applied to the entire regexp:
 
-    if ($string =~ /(?o)$pattern/) { ... }
+    if ($string =~ m/(?o)$pattern/) { ... }
 
 must be written as
 
-    if ($string =~ /$pattern/o) { ... }
+    if ($string =~ m/$pattern/o) { ... }
 
 The <-- HERE shows in the regular expression about
 where the problem was discovered. See L<perlre>.

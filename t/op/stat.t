@@ -266,7 +266,7 @@ SKIP: {
     }
 
     my $try = sub {
-	my @c1 = eval qq[\$DEV =~ /^$_[0].*/mg];
+	my @c1 = eval qq[\$DEV =~ m/^$_[0].*/mg];
 	my @c2 = eval qq[grep { $_[1] "/dev/\$_" } \@DEV];
 	my $c1 = scalar @c1;
 	my $c2 = scalar @c2;

@@ -82,7 +82,7 @@ padsv		SKIP my $x
 padav		SKIP my @x
 padhv		SKIP my %x
 padany		SKIP (not implemented)
-pushre		SKIP split /foo/
+pushre		SKIP split m/foo/
 rv2gv		*x
 rv2sv		$x
 av2arylen	$#x
@@ -99,7 +99,7 @@ rcatline	SKIP (set by optimizer) $x .= ~< *F
 regcmaybe	SKIP (internal)
 regcreset	SKIP (internal)
 regcomp		SKIP (internal)
-match		/foo/
+match		m/foo/
 qr		qr/foo/
 subst		s/foo/bar/
 substcont	SKIP (set by optimizer)
@@ -206,7 +206,7 @@ helem		$h{kEy}
 hslice		@h{kEy}
 unpack		unpack
 pack		pack
-split		split /foo/
+split		split m/foo/
 join		join $a, @b
 list		@x = (1,2)
 lslice		SKIP @x[1,2]

@@ -57,7 +57,7 @@ foreach my $prog (@prgs) {
 
 __END__
 ########
-$a = ":="; split /($a)/o, "a:=b:=c"; print "@_"
+$a = ":="; split m/($a)/o, "a:=b:=c"; print "@_"
 EXPECT
 a := b := c
 ########
@@ -348,11 +348,11 @@ sub foo { local $_ = shift; split; @_ }
 @x = foo(' x  y  z ');
 print "you die joe!\n" unless "@x" eq 'x y z';
 ########
-/(?{"{"})/	# Check it outside of eval too
+m/(?{"{"})/	# Check it outside of eval too
 EXPECT
 Sequence (?{...}) not terminated or not {}-balanced in regex; marked by <-- HERE in m/(?{ <-- HERE "{"})/ at - line 1.
 ########
-/(?{"{"}})/	# Check it outside of eval too
+m/(?{"{"}})/	# Check it outside of eval too
 EXPECT
 Unmatched right curly bracket at (re_eval 1) line 1, at end of line
 syntax error at (re_eval 1) line 1, near ""{"}"
@@ -540,7 +540,7 @@ EXPECT
 ########
 # core dump in 20000716.007
 -w
-"x" =~ /(\G?x)?/;
+"x" =~ m/(\G?x)?/;
 ########
 # Bug 20010515.004
 my @h = 1 .. 10;
@@ -556,7 +556,7 @@ OK
 ########
 # Bug 20010506.041
 use utf8;
-"abcd\x{1234}" =~ /(a)(b[c])(d+)?/i and print "ok\n";
+"abcd\x{1234}" =~ m/(a)(b[c])(d+)?/i and print "ok\n";
 EXPECT
 ok
 ########
@@ -580,7 +580,7 @@ Bar=ARRAY(0x...)
 ######## (?{...}) compilation bounces on PL_rs
 -0
 {
-  /(?{ $x })/;
+  m/(?{ $x })/;
   # {
 }
 BEGIN { print "ok\n" }
@@ -592,8 +592,8 @@ $foo = \-f "blah";
 print "ok" if ref $foo && !$$foo;
 EXPECT
 ok
-######## [ID 20011128.159] 'X' =~ /\X/ segfault in 5.6.1
-print "ok" if 'X' =~ /\X/;
+######## [ID 20011128.159] 'X' =~ m/\X/ segfault in 5.6.1
+print "ok" if 'X' =~ m/\X/;
 EXPECT
 ok
 ######## segfault in 5.6.1 within peep()
@@ -650,10 +650,10 @@ $eval = eval 'sub { eval "sub { %S }" }';
 $eval->({});
 ######## [perl #20667] unicode regex vs non-unicode regex
 $toto = 'Hello';
-$toto =~ /\w/; # this line provokes the problem!
+$toto =~ m/\w/; # this line provokes the problem!
 $name = 'A B';
 # utf8::upgrade($name) if @ARGV;
-if ($name =~ /(\p{IsUpper}) (\p{IsUpper})/u){
+if ($name =~ m/(\p{IsUpper}) (\p{IsUpper})/u){
     print "It's good! >$1< >$2<\n";
 } else {
     print "It's not good...\n";

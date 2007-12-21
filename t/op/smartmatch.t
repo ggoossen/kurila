@@ -154,4 +154,4 @@ __DATA__
 !	@nums		[0..9]
 
 	%hash		"foo"
-	%hash		/bar/
+	%hash		m/bar/

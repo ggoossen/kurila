@@ -284,7 +284,7 @@ SKIP: {
     open PROG, "> $arg" or die "Can't create $arg: $!";
     print PROG q{
 	eval { join('', @ARGV), kill 0 };
-	exit 0 if $@ =~ /^Insecure dependency/;
+	exit 0 if $@ =~ m/^Insecure dependency/;
 	print "# Oops: \$@ was [$@]\n";
 	exit 1;
     };

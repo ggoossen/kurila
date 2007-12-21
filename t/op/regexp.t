@@ -127,7 +127,7 @@ EOFCODE
                 $utf8;
                 my \$RE = qr$pat;
                 $study;
-                \$match = (\$subject =~ /(?:)\$RE(?:)/) while \$c--;
+                \$match = (\$subject =~ m/(?:)\$RE(?:)/) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }

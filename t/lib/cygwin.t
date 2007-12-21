@@ -48,8 +48,8 @@ my $binmode = $1 eq 'binmode';
 is(Cygwin::is_binmount("/"),  $binmode ? 1 : '', "check / for binmount");
 
 my $rootmnt = Cygwin::mount_flags("/");
-ok($binmode ? ($rootmnt =~ /,binmode/) : ($rootmnt =~ /,textmode/), "check / mount_flags");
-is(Cygwin::mount_flags("/cygdrive") =~ /,cygdrive/,  1, "check cygdrive mount_flags");
+ok($binmode ? ($rootmnt =~ m/,binmode/) : ($rootmnt =~ m/,textmode/), "check / mount_flags");
+is(Cygwin::mount_flags("/cygdrive") =~ m/,cygdrive/,  1, "check cygdrive mount_flags");
 
 # Cygdrive mount prefix
 my @flags = split(/,/, Cygwin::mount_flags('/cygdrive'));
