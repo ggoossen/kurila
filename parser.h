@@ -50,10 +50,12 @@ typedef struct yy_parser {
     OP		*lex_inpat;	/* in pattern $) and $| are special */
     OP		*lex_op;	/* extra info to pass back on op */
     SV		*lex_repl;	/* runtime replacement from s/// */
+    char	lex_repl_delim;	/* delimiter of the replacement string */
     U16		lex_inwhat;	/* what kind of quoting are we in */
     OPCODE	last_lop_op;	/* last list operator */
     I32		lex_starts;	/* how many interps done on level */
     SV		*lex_stuff;	/* runtime pattern from m// or s/// */
+    char	lex_delim;	/* delimiter of the sutff string */
     I32		multi_start;	/* 1st line of multi-line string */
     I32		multi_end;	/* last line of multi-line string */
     char	multi_open;	/* delimiter of said string */

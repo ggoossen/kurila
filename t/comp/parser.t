@@ -15,7 +15,7 @@ eval '%@x=0;';
 like( $@, qr/^Can't modify hash dereference in repeat \(x\)/, '%@x=0' );
 
 # Bug 20010422.005
-eval q{{s//${}/; //}};
+eval q{{s//${}/; m//}};
 like( $@, qr/syntax error/, 'syntax error, used to dump core' );
 
 # Bug 20010528.007

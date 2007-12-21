@@ -8983,6 +8983,8 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     parser->lex_repl	= sv_dup_inc(proto->lex_repl, param);
     parser->lex_starts	= proto->lex_starts;
     parser->lex_stuff	= sv_dup_inc(proto->lex_stuff, param);
+    parser->lex_delim	= proto->lex_delim;
+    parser->lex_repl_delim	= proto->lex_repl_delim;
     parser->multi_close	= proto->multi_close;
     parser->multi_open	= proto->multi_open;
     parser->multi_start	= proto->multi_start;

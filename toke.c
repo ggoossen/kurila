@@ -43,8 +43,10 @@
 #define PL_lex_inwhat		(PL_parser->lex_inwhat)
 #define PL_lex_op		(PL_parser->lex_op)
 #define PL_lex_repl		(PL_parser->lex_repl)
+#define PL_lex_repl_delim	(PL_parser->lex_repl_delim)
 #define PL_lex_starts		(PL_parser->lex_starts)
 #define PL_lex_stuff		(PL_parser->lex_stuff)
+#define PL_lex_delim		(PL_parser->lex_delim)
 #define PL_multi_start		(PL_parser->multi_start)
 #define PL_multi_open		(PL_parser->multi_open)
 #define PL_multi_close		(PL_parser->multi_close)
@@ -1473,8 +1475,6 @@ S_tokeq(pTHX_ SV *sv)
 	goto finish;
 
     s = SvPV_force(sv, len);
-    if (SvTYPE(sv) >= SVt_PVIV && SvIVX(sv) == -1)
-	goto finish;
     send = s + len;
     while (s < send && *s != '\\')
 	s++;
@@ -1544,15 +1544,6 @@ S_sublex_start(pTHX)
     }
     if (op_type == OP_CONST) {
 	SV *sv = tokeq(PL_lex_stuff);
-
-	if (SvTYPE(sv) == SVt_PVIV) {
-	    /* Overloaded constants, nothing fancy: Convert to SVt_PV: */
-	    STRLEN len;
-	    const char * const p = SvPV_const(sv, len);
-	    SV * const nsv = newSVpvn(p, len);
-	    SvREFCNT_dec(sv);
-	    sv = nsv;
-	}
 	yylval.opval = (OP*)newSVOP(op_type, 0, sv);
 	PL_lex_stuff = NULL;
 	return THING;
@@ -1667,6 +1658,8 @@ S_sublex_done(pTHX)
     /* Is there a right-hand side to take care of? (s//RHS/ or tr//RHS/) */
     if (PL_lex_repl && (PL_lex_inwhat == OP_SUBST || PL_lex_inwhat == OP_TRANS)) {
 	PL_linestr = PL_lex_repl;
+	PL_lex_delim = PL_lex_repl_delim;
+	PL_lex_repl_delim = 0;
 	PL_lex_inpat = 0;
 	PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart = SvPVX(PL_linestr);
 	PL_bufend += SvCUR(PL_linestr);
@@ -2919,6 +2912,7 @@ Perl_yylex(pTHX)
 	/* FALL THROUGH */
 
     case LEX_INTERPEND:
+	PL_lex_delim = 0;
 	if (PL_lex_dojoin) {
 	    PL_lex_dojoin = FALSE;
 	    PL_lex_state = LEX_INTERPCONCAT;
@@ -2947,7 +2941,7 @@ Perl_yylex(pTHX)
 	if (PL_bufptr == PL_bufend)
 	    return REPORT(sublex_done());
 
-	if (SvIVX(PL_linestr) == '\'') {
+	if (PL_lex_delim == '\'') {
 	    SV *sv = newSVsv(PL_linestr);
 	    if (!PL_lex_inpat)
 		sv = tokeq(sv);
@@ -4221,7 +4215,21 @@ Perl_yylex(pTHX)
 	    if (s[1] != '<' && !strchr(s,'>'))
 		check_uni();
 	    if (s[1] == '<') {
+		I32 op_type;
 		s = scan_heredoc(s);
+
+		op_type = yylval.ival;
+		if (op_type == OP_CONST) {
+		    /* like sublex_start, but without PL_lex_stuff going through tokeq */
+		    /* do not go through tokeq because it unescpaes slashes */
+		    SV *sv = PL_lex_stuff;
+		    if ( PL_hints & HINT_NEW_STRING )
+			sv = new_constant(NULL, 0, "q", sv, sv, "q", 1);
+
+		    yylval.opval = (OP*)newSVOP(op_type, 0, sv);
+		    PL_lex_stuff = NULL;
+		    TERM(THING);
+		}
 		TERM(sublex_start());
 	    }
 	    Perl_croak("No operator expected, but found '<', '<=' or '<=>' operator");
@@ -5661,8 +5669,7 @@ Perl_yylex(pTHX)
 	    if (!s)
 		missingterminator(NULL);
 	    yylval.ival = OP_STRINGIFY;
-	    if (SvIVX(PL_lex_stuff) == '\'')
-		SvIV_set(PL_lex_stuff, 0);	/* qq'$foo' should intepolate */
+	    PL_lex_delim = 0;	/* qq'$foo' should intepolate */
 	    TERM(sublex_start());
 
 	case KEY_qr:
@@ -10204,6 +10211,7 @@ S_scan_trans(pTHX_ char *start)
 	if (PL_lex_stuff) {
 	    SvREFCNT_dec(PL_lex_stuff);
 	    PL_lex_stuff = NULL;
+	    PL_lex_stuff = 0;
 	}
 	Perl_croak(aTHX_ "Transliteration replacement not terminated");
     }
@@ -10376,16 +10384,15 @@ S_scan_heredoc(pTHX_ register char *s)
 	s--;
 #endif
 
-    tmpstr = newSV_type(SVt_PVIV);
+    tmpstr = newSV_type(SVt_PV);
     SvGROW(tmpstr, 80);
     if (term == '\'') {
 	op_type = OP_CONST;
-	SvIV_set(tmpstr, -1);
     }
     else if (term == '`') {
 	op_type = OP_BACKTICK;
-	SvIV_set(tmpstr, '\\');
     }
+    PL_lex_delim = 0; /* single quote delimiter is handled specially in parse */
 
     CLINE;
     PL_multi_start = CopLINE(PL_curcop);
@@ -10537,7 +10544,6 @@ retval:
 	y///		string transliterate	y/this/that/
 	($*@)		sub prototypes		sub foo ($)
 	(stuff)		sub attr parameters	sub foo : attr(stuff)
-	<>		readline or globs	<FOO>, <>, <$fh>, or <*.c>
 	
    In most of these cases (all but <>, patterns and transliterate)
    yylex() calls scan_str().  m// makes yylex() call scan_pat() which
@@ -10554,8 +10560,8 @@ retval:
    On success, the SV with the resulting string is put into lex_stuff or,
    if that is already non-NULL, into lex_repl. The second case occurs only
    when parsing the RHS of the special constructs s/// and tr/// (y///).
-   For convenience, the terminating delimiter character is stuffed into
-   SvIVX of the SV.
+   The terminating delimiter character is stuffed into lex_delim or
+   lex_repl_delim
 */
 
 STATIC char *
@@ -10619,9 +10625,8 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
 
     /* create a new SV to hold the contents.  79 is the SV's initial length.
        What a random number. */
-    sv = newSV_type(SVt_PVIV);
+    sv = newSV_type(SVt_PV);
     SvGROW(sv, 80);
-    SvIV_set(sv, termcode);
     (void)SvPOK_only(sv);		/* validate pointer */
 
     /* move past delimiter and try to read a complete string */
@@ -10875,10 +10880,14 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
        for this op
     */
 
-    if (PL_lex_stuff)
+    if (PL_lex_stuff) {
 	PL_lex_repl = sv;
-    else
+	PL_lex_repl_delim = term;
+    }
+    else {
 	PL_lex_stuff = sv;
+	PL_lex_delim = term;
+    }
     return s;
 }
 
