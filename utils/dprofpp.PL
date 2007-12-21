@@ -481,7 +481,7 @@ Main: {
 	if( $opt_f ){
 		for(my $i = 0;$i +< @$idkeys - 2;){
 			$key = $$idkeys[$i];
-			if($key =~ /$opt_f/){
+			if($key =~ m/$opt_f/){
 				splice(@$idkeys, $i, 1);
 				$runtime -= $$times{$key};
 				next;
@@ -730,11 +730,11 @@ sub parsestack {
 	$over_per_call /= 2*$over_tests; # distribute over entry and exit
 
 	while(~<$fh){
-		next if /^#/;
-		last if /^PART/;
+		next if m/^#/;
+		last if m/^PART/;
 
 		chop;
-		if (/^&/) {
+		if (m/^&/) {
 		  ($dir, $id, $pack, $name) = split;
 		  if ($opt_R and ($name =~ m/(?:::)?(__ANON__|END)$/)) {
 		    $name .= "($id)";
@@ -914,12 +914,12 @@ sub exitstamp {
 sub header {
 	my $fh = shift;
 	chop($_ = ~<$fh);
-	if( ! /^#fOrTyTwO$/ ){
+	if( ! m/^#fOrTyTwO$/ ){
 		die "Not a perl profile";
 	}
 	while(~<$fh){
-		next if /^#/;
-		last if /^PART/;
+		next if m/^#/;
+		last if m/^PART/;
 		eval;
 	}
 	$over_tests = 1 unless $over_tests;
@@ -946,7 +946,7 @@ sub run_profiler {
 	my $script = shift;
 	my $profiler = shift;
 	my $startperl = shift;
-	my @script_parts = split /\s+/, $script;
+	my @script_parts = split m/\s+/, $script;
 
 	system $startperl, "-d:$profiler", @script_parts;
 	if( $? / 256 +> 0 ){
