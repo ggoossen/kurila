@@ -4008,7 +4008,7 @@ STATIC int	S_intuit_more(pTHX_ char *s)
 STATIC I32	S_lop(pTHX_ I32 f, int x, char *s)
 			__attribute__nonnull__(pTHX_3);
 
-STATIC void	S_missingterm(pTHX_ char *s)
+STATIC void	S_missingterminator(pTHX_ char *s)
 			__attribute__noreturn__;
 
 STATIC void	S_no_op(pTHX_ const char *what, char *s)
