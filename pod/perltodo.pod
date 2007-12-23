@@ -365,11 +365,6 @@ Make F<pod/roffitall> be updated by F<pod/buildtoc>.
 These tasks would need a little C knowledge, but don't need any specific
 background or experience with XS, or how the Perl interpreter works
 
-=head2 Exterminate PL_na!
-
-C<PL_na> festers still in the darkest corners of various typemap files.
-It needs to be exterminated, replaced by a local variable of type C<STRLEN>.
-
 =head2 Modernize the order of directories in @INC
 
 The way @INC is laid out by default, one cannot upgrade core (dual-life)
@@ -666,6 +661,20 @@ also the warning messages (see L<perllexwarn>, C<warnings.pl>).
 
 These tasks would need C knowledge, and knowledge of how the interpreter works,
 or a willingness to learn.
+
+=head2 lexicals used only once
+
+This warns:
+
+    $ perl -we '$pie = 42'
+    Name "main::pie" used only once: possible typo at -e line 1.
+
+This does not:
+
+    $ perl -we 'my $pie = 42'
+
+Logically all lexicals used only once should warn, if the user asks for
+warnings.
 
 =head2 UTF-8 revamp
 
