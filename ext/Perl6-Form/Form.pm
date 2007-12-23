@@ -77,7 +77,7 @@ sub strings_or_undef {
 	my $type = ref $val;
 	if (!defined $val) { $val = [] }
 	elsif (!$type)     { $val = [ "$val" ] }
-	fatal "Value for '$name' option must be string, array of strings, or undef (not \L$type\E)"
+	fatal "Value for '$name' option must be string, array of strings, or undef (not $type)"
 			unless ref $val eq 'ARRAY';
 	return $val;
 }

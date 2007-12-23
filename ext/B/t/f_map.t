@@ -20,7 +20,7 @@ BEGIN {
     # require q(test.pl); # now done by OptreeCheck
 }
 use OptreeCheck;
-plan tests => 9;
+plan tests => 7;
 
 
 =head1 f_map.t
@@ -229,114 +229,6 @@ EOT_EOT
 # v  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
-
-=for gentest
-
-# chunk: #%hash = map {  "\L$_", 1  } @array;  # perl guesses EXPR.  wrong
-%hash = map { +"\L$_", 1  } @array;  # perl guesses BLOCK. right
-
-=cut
-
-checkOptree(note   => q{},
-	    bcopts => q{-exec},
-	    code   => q{%hash = map { +"\L$_", 1 } @array; },
-	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 476 (eval 10):1) v
-# 2  <0> pushmark s
-# 3  <0> pushmark s
-# 4  <#> gv[*array] s
-# 5  <1> rv2av[t7] lKM/1
-# 6  <@> mapstart lK*
-# 7  <|> mapwhile(other->8)[t9] lK
-# 8      <0> pushmark s
-# 9      <#> gvsv[*_] s
-# a      <1> lc[t4] sK/1
-# b      <@> stringify[t5] sK/1
-# c      <$> const[IV 1] s
-# d      <@> list lK
-# -      <@> scope lK
-#            goto 7
-# e  <0> pushmark s
-# f  <#> gv[*hash] s
-# g  <1> rv2hv[t2] lKRM*/1
-# h  <2> aassign[t10] KS/COMMON
-# i  <1> leavesub[1 ref] K/REFC,1
-EOT_EOT
-# 1  <;> nextstate(main 560 (eval 15):1) v
-# 2  <0> pushmark s
-# 3  <0> pushmark s
-# 4  <$> gv(*array) s
-# 5  <1> rv2av[t4] lKM/1
-# 6  <@> mapstart lK*
-# 7  <|> mapwhile(other->8)[t5] lK
-# 8      <0> pushmark s
-# 9      <$> gvsv(*_) s
-# a      <1> lc[t2] sK/1
-# b      <@> stringify[t3] sK/1
-# c      <$> const(IV 1) s
-# d      <@> list lK
-# -      <@> scope lK
-#            goto 7
-# e  <0> pushmark s
-# f  <$> gv(*hash) s
-# g  <1> rv2hv[t1] lKRM*/1
-# h  <2> aassign[t6] KS/COMMON
-# i  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
-
-
-=for gentest
-
-# chunk: %hash = map { ("\L$_", 1) } @array;  # this also works
-
-=cut
-
-checkOptree(note   => q{},
-	    bcopts => q{-exec},
-	    code   => q{%hash = map { ("\L$_", 1) } @array; },
-	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 476 (eval 10):1) v
-# 2  <0> pushmark s
-# 3  <0> pushmark s
-# 4  <#> gv[*array] s
-# 5  <1> rv2av[t7] lKM/1
-# 6  <@> mapstart lK*
-# 7  <|> mapwhile(other->8)[t9] lK
-# 8      <0> pushmark s
-# 9      <#> gvsv[*_] s
-# a      <1> lc[t4] sK/1
-# b      <@> stringify[t5] sK/1
-# c      <$> const[IV 1] s
-# d      <@> list lKP
-# -      <@> scope lK
-#            goto 7
-# e  <0> pushmark s
-# f  <#> gv[*hash] s
-# g  <1> rv2hv[t2] lKRM*/1
-# h  <2> aassign[t10] KS/COMMON
-# i  <1> leavesub[1 ref] K/REFC,1
-EOT_EOT
-# 1  <;> nextstate(main 560 (eval 15):1) v
-# 2  <0> pushmark s
-# 3  <0> pushmark s
-# 4  <$> gv(*array) s
-# 5  <1> rv2av[t4] lKM/1
-# 6  <@> mapstart lK*
-# 7  <|> mapwhile(other->8)[t5] lK
-# 8      <0> pushmark s
-# 9      <$> gvsv(*_) s
-# a      <1> lc[t2] sK/1
-# b      <@> stringify[t3] sK/1
-# c      <$> const(IV 1) s
-# d      <@> list lKP
-# -      <@> scope lK
-#            goto 7
-# e  <0> pushmark s
-# f  <$> gv(*hash) s
-# g  <1> rv2hv[t1] lKRM*/1
-# h  <2> aassign[t6] KS/COMMON
-# i  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
 
 
 =for gentest

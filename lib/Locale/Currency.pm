@@ -115,7 +115,7 @@ sub all_currency_names
         chop;
         ($code, $currency) = split(m/:/, $_, 2);
         $CODES{$code} = $currency;
-        $CURRENCIES{"\L$currency"} = $code;
+        $CURRENCIES{lc "$currency"} = $code;
     }
 
     close(DATA);

@@ -168,18 +168,18 @@ sub all_script_names
         ($alpha2, $alpha3, $numeric, $script) = split(m/:/, $_, 4);
 
         $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = $script;
-        $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{"\L$script"} = $alpha2;
+        $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{lc "$script"} = $alpha2;
 
 	if ($alpha3)
 	{
             $CODES->[LOCALE_CODE_ALPHA_3]->{$alpha3} = $script;
-            $COUNTRIES->[LOCALE_CODE_ALPHA_3]->{"\L$script"} = $alpha3;
+            $COUNTRIES->[LOCALE_CODE_ALPHA_3]->{lc "$script"} = $alpha3;
 	}
 
 	if ($numeric)
 	{
             $CODES->[LOCALE_CODE_NUMERIC]->{$numeric} = $script;
-            $COUNTRIES->[LOCALE_CODE_NUMERIC]->{"\L$script"} = $numeric;
+            $COUNTRIES->[LOCALE_CODE_NUMERIC]->{lc "$script"} = $numeric;
 	}
 
     }

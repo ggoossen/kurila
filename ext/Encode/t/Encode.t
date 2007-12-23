@@ -28,7 +28,7 @@ my @character_set = ('0'..'9', 'A'..'Z', 'a'..'z');
 my @source = qw(ascii iso8859-1 cp1250);
 my @destiny = qw(cp1047 cp37 posix-bc);
 my @ebcdic_sets = qw(cp1047 cp37 posix-bc);
-plan test => 34+$n*@encodings + 2*@source*@destiny*@character_set + 2*@ebcdic_sets*256 + 2;
+plan test => 35+$n*@encodings + 2*@source*@destiny*@character_set + 2*@ebcdic_sets*256 + 2;
 my $str = join('',map(bytes::chr($_),0x20..0x7E));
 my $cpy = $str;
 ok(0x5F,from_to($cpy,'iso8859-1','Unicode'),"Length Wrong");
@@ -111,6 +111,8 @@ ok($mime,$x11,"iso8598-2 and iso-8859-2 not same");
 my $spc = find_encoding('iso 8859-2');
 ok(defined($spc),1,"Cannot find 'iso 8859-2'");
 ok($spc,$mime,"iso 8859-2 and iso-8859-2 not same");
+my $fe_unknonw = Encode::find_encoding('blorpy');
+ok($fe_unknonw, undef, "Encoding 'blorpy' is not not found");
 
 for my $i (256,128,129,256)
  {

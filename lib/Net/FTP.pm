@@ -858,7 +858,7 @@ sub supported {
   if ($text =~ m/following\s+commands/i) {
     $text =~ s/^.*\n//;
     while ($text =~ m/(\*?)(\w+)(\*?)/sg) {
-      $hash->{"\U$2"} = !length("$1$3");
+      $hash->{uc "$2"} = !length("$1$3");
     }
   }
   else {

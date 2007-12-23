@@ -2142,6 +2142,9 @@ S_scan_const(pTHX_ char *start)
 	    }
 
 	    /* string-change backslash escapes */
+/* 	    if (PL_lex_inwhat != OP_TRANS && *s && strchr("LUlu", *s)) { */
+/* 		Perl_warner(packWARN(WARN_SYNTAX), "case modifiers have een removed"); */
+/* 	    } */
 	    if (PL_lex_inwhat != OP_TRANS && *s && strchr("lLuUEQ", *s)) {
 		--s;
 		break;
@@ -4464,12 +4467,12 @@ Perl_yylex(pTHX)
 
     case '\'':
 	s = scan_str(s,!!PL_madskills,FALSE);
-	DEBUG_T( { printbuf("### Saw string before %s\n", s); } );
 	if (PL_expect == XOPERATOR) {
 	    no_op("String",s);
 	}
 	if (!s)
 	    missingterminator(NULL);
+	DEBUG_T( { printbuf("### Saw string before %s\n", s); } );
 	yylval.ival = OP_CONST;
 	TERM(sublex_start());
 

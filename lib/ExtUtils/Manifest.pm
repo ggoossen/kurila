@@ -152,7 +152,7 @@ sub manifind {
 	return if -d $_;
 	
         if( $Is_VMS ) {
-            $name =~ s#(.*)\.$#\L$1#;
+            $name =~ s#(.*)\.$# lc($1) #e;
             $name = uc($name) if $name =~ m/^MANIFEST(\.SKIP)?$/i;
         }
 	$found->{$name} = "";
