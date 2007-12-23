@@ -12,8 +12,8 @@ sub ToUpper {
 END
 }
 
-is("\Ufoo\x{101}", "foo\x{101}", "no changes on 'foo'");
-is("\Ubar\x{101}", "BAr\x{101}", "changing 'ab' on 'bar' ");
+is(uc("foo\x{101}"), "foo\x{101}", "no changes on 'foo'");
+is(uc("bar\x{101}"), "BAr\x{101}", "changing 'ab' on 'bar' ");
 
 sub ToLower {
     return <<END;
@@ -21,6 +21,6 @@ sub ToLower {
 END
 }
 
-is("\LFOO\x{100}", "FOO\x{100}", "no changes on 'FOO'");
-is("\LBAR\x{100}", "BaR\x{100}", "changing 'A' on 'BAR' ");
+is(lc("FOO\x{100}"), "FOO\x{100}", "no changes on 'FOO'");
+is(lc("BAR\x{100}"), "BaR\x{100}", "changing 'A' on 'BAR' ");
 

@@ -557,7 +557,7 @@ sub fmt_line {    # generate text-line for op.
     $text =~ s/\(\*\((.*?);(.*?)\)\*\)/$1 x ($level - 1) . $2 x ($level+>0)/egs;
 
     # convert #Var to tag=>val form: Var\t#var
-    $text =~ s/\#([A-Z][a-z]+)(\d+)?/\t\u$1\t\L#$1$2/gs;
+    $text =~ s/\#([A-Z][a-z]+)(\d+)?/"\t" . ucfist($1) . "\t" . lc("#$1$2")/ges;
 
     # spec: #varN
     $text =~ s/\#([a-zA-Z]+)(\d+)/sprintf("%-$2s", $hr->{$1})/eg;

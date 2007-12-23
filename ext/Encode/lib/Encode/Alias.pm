@@ -131,7 +131,7 @@ sub init_aliases {
     undef_aliases();
 
     # Try all-lower-case version should all else fails
-    define_alias( qr/^(.*)$/ => '"\L$1"' );
+    define_alias( qr/^(.*)$/ => '"' . lc($1) . '"' );
 
     # UTF/UCS stuff
     define_alias( qr/^UTF-?7$/i     => '"UTF-7"' );

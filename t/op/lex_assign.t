@@ -34,7 +34,7 @@ sub wrn {"@_"}
 # Check correct optimization of ucfirst etc
 $ord++;
 my $a = "AB";
-my $b = "\u\L$a";
+my $b = ucfirst(lc("$a"));
 print "not " unless $b eq 'Ab';
 print "ok $ord\n";
 

@@ -161,7 +161,7 @@ sub opt_o_with { # "o" for output format
     # Messy but smart:
     foreach my $stem (
       $rest,  # Yes, try it first with the given capitalization
-      "\L$rest", "\L\u$rest", "\U$rest" # And then try variations
+      lc("$rest"), ucfirst(lc("$rest")), uc("$rest") # And then try variations
 
     ) {
       push @classes, $prefix . $stem;
@@ -473,14 +473,6 @@ sub find_good_formatter_class {
       DEBUG +> 4 and print
        "Interesting, the formatter class $c is already loaded!\n";
       
-    } elsif(
-      (IS_VMS or IS_MSWin32 or IS_Dos or IS_OS2)
-       # the alway case-insensitive fs's
-      and $class_seen{lc("~$c")}++
-    ) {
-      DEBUG +> 4 and print
-       "We already used something quite like \"\L$c\E\", so no point using $c\n";
-      # This avoids redefining the package.
     } else {
       DEBUG +> 4 and print "Trying to eval 'require $c'...\n";
 

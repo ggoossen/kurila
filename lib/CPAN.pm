@@ -3362,7 +3362,7 @@ sub recent {
               my $distro = $eitem->findvalue("\@rdf:about");
               $distro =~ s|.*~||; # remove up to the tilde before the name
               $distro =~ s|/$||; # remove trailing slash
-              $distro =~ s|([^/]+)|\U$1\E|; # upcase the name
+              $distro =~ s|([^/]+)|uc($1)|e; # upcase the name
               my $author = uc $1 or die "distro[$distro] without author, cannot continue";
               my $desc   = $eitem->findvalue("*[local-name(.) = 'description']");
               my $i = 0;

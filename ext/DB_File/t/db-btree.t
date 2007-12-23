@@ -932,7 +932,7 @@ EOM
     sub Compare
     {
         my ($key1, $key2) = @_ ;
-        "\L$key1" cmp "\L$key2" ;
+        (lc "$key1") cmp (lc "$key2") ;
     }
 
     # specify the Perl sub that will do the comparison

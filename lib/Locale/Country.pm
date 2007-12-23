@@ -176,7 +176,7 @@ sub alias_code
     }
     $country = $CODES->[$codeset]->{$real};
     $CODES->[$codeset]->{$alias} = $country;
-    $COUNTRIES->[$codeset]->{"\L$country"} = $alias;
+    $COUNTRIES->[$codeset]->{lc "$country"} = $alias;
 
     return $alias;
 }
@@ -227,7 +227,7 @@ sub rename_country
 	}
 
 	$CODES->[$cset]->{$c} = $new_name;
-	$COUNTRIES->[$cset]->{"\L$new_name"} = $c;
+	$COUNTRIES->[$cset]->{lc "$new_name"} = $c;
     }
 
     return 1;
@@ -277,7 +277,7 @@ sub _code2codeset
         $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = $countries[0];
 	foreach $country (@countries)
 	{
-	    $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{"\L$country"} = $alpha2;
+	    $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{lc "$country"} = $alpha2;
 	}
 
 	if ($alpha3)
@@ -285,7 +285,7 @@ sub _code2codeset
             $CODES->[LOCALE_CODE_ALPHA_3]->{$alpha3} = $countries[0];
 	    foreach $country (@countries)
 	    {
-		$COUNTRIES->[LOCALE_CODE_ALPHA_3]->{"\L$country"} = $alpha3;
+		$COUNTRIES->[LOCALE_CODE_ALPHA_3]->{lc "$country"} = $alpha3;
 	    }
 	}
 
@@ -294,7 +294,7 @@ sub _code2codeset
             $CODES->[LOCALE_CODE_NUMERIC]->{$numeric} = $countries[0];
 	    foreach $country (@countries)
 	    {
-		$COUNTRIES->[LOCALE_CODE_NUMERIC]->{"\L$country"} = $numeric;
+		$COUNTRIES->[LOCALE_CODE_NUMERIC]->{lc "$country"} = $numeric;
 	    }
 	}
 

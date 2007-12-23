@@ -324,7 +324,7 @@ sub full_setup {
     }
     foreach my $item (@Get_from_Config) {
         $Recognized_Att_Keys{uc $item} = $Config{$item};
-        print "Attribute '\U$item\E' => '$Config{$item}'\n"
+        print "Attribute '".uc($item)."' => '$Config{$item}'\n"
             if ($Verbose +>= 2);
     }
 

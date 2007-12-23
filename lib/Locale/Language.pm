@@ -114,7 +114,7 @@ sub all_language_names
         chop;
         ($code, $language) = split(m/:/, $_, 2);
         $CODES{$code} = $language;
-        $LANGUAGES{"\L$language"} = $code;
+        $LANGUAGES{lc "$language"} = $code;
     }
 
     close(DATA);
