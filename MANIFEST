@@ -3040,7 +3040,7 @@ t/arch/64bitint.t			See if 64 bit integers work
 t/sv/alarm.t			See if alarm works
 t/sv/anonsub.t			See if anonymous subroutines work
 t/op/concat.t			See if . works
-t/op/args.t			See if operations on @_ work
+t/sv/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
 t/sv/array.t			See if array operations work
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
