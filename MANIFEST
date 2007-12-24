@@ -3056,7 +3056,7 @@ t/lex/chars.t			See if character escapes work
 t/op/chdir.t			See if chdir works
 t/op/chop.t			See if chop works
 t/op/chr.t			See if chr works
-t/op/closure.t			See if closures work
+t/sv/closure.t			See if closures work
 t/op/cmp.t			See if the various string and numeric compare work
 t/op/cond.t			See if conditional expressions work
 t/op/context.t			See if context propagation works
