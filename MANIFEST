@@ -3044,7 +3044,7 @@ t/sv/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
 t/sv/array.t			See if array operations work
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
-t/op/attrs.t			See if attributes on declarations work
+t/lex/attrs.t			See if attributes on declarations work
 t/op/auto.t			See if autoincrement et all work
 t/op/avhv.t			See if pseudo-hashes work
 t/op/bless.t			See if bless works
