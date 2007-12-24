@@ -3037,9 +3037,9 @@ t/mro/vulcan_dfs.t		mro tests
 Todo.micro			The Wishlist for microperl
 toke.c				The tokener
 t/arch/64bitint.t			See if 64 bit integers work
-t/op/alarm.t			See if alarm works
+t/sv/alarm.t			See if alarm works
 t/sv/anonsub.t			See if anonymous subroutines work
-t/op/append.t			See if . works
+t/op/concat.t			See if . works
 t/op/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
 t/sv/array.t			See if array operations work
@@ -3058,7 +3058,6 @@ t/op/chop.t			See if chop works
 t/op/chr.t			See if chr works
 t/op/closure.t			See if closures work
 t/op/cmp.t			See if the various string and numeric compare work
-t/op/concat.t			See if string concatenation works
 t/op/cond.t			See if conditional expressions work
 t/op/context.t			See if context propagation works
 t/op/cproto.t			Check builtin prototypes

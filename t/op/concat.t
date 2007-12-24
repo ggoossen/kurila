@@ -13,62 +13,79 @@ sub ok {
     return $ok;
 }
 
-print "1..31\n";
-
-our ($a, $b, $c, $dx) = qw(foo bar);
-
-ok("$a"     eq "foo",    "verifying assign");
-ok("$a$b"   eq "foobar", "basic concatenation");
-ok("$c$a$c" eq "foo",    "concatenate undef, fore and aft");
-
-# Array and derefence, this doesn't really belong in 'op/concat' but I
-# couldn't find a better place
-
-my @x = qw|aap noot|;
-my $dx = [@x];
-
-ok("@x" eq "aap noot");
-ok("@$dx" eq "aap noot");
-ok("$dx->@" eq "aap noot");
-
-# Okay, so that wasn't very challenging.  Let's go Unicode.
+print q(1..22
+);
 
 {
-    use utf8;
-    # bug id 20000819.004 
+  our ($a, $b, $c);
 
-    $_ = $dx = "\x{10f2}";
-    s/($dx)/$dx$1/;
-    {
-        ok($_ eq  "$dx$dx","bug id 20000819.004, back");
-    }
+  $a = 'ab' . 'c';	# compile time
+  $b = 'def';
 
-    $_ = $dx = "\x{10f2}";
-    s/($dx)/$1$dx/;
-    {
-        ok($_ eq  "$dx$dx","bug id 20000819.004, front");
-    }
+  $c = $a . $b;
+  ok($c eq 'abcdef');
 
-    $dx = "\x{10f2}";
-    $_  = "\x{10f2}\x{10f2}";
-    s/($dx)($dx)/$1$2/;
-    {
-        ok($_ eq  "$dx$dx","bug id 20000819.004, front and back");
-    }
+  $c .= 'xyz';
+  ok($c eq 'abcdefxyz');
+
+  $_ = $a;
+  $_ .= $b;
+  ok($_ eq 'abcdef');
 }
 
+# test that when right argument of concat is UTF8, and is the same
+# variable as the target, and the left argument is not UTF8, it no
+# longer frees the wrong string.
 {
-    # bug id 20000901.092
-    # test that undef left and right of utf8 results in a valid string
+    sub r2 {
+	my $string = '';
+	$string .= pack("U0a*", 'mnopqrstuvwx');
+	$string = "abcdefghijkl$string";
+    }
 
-    use utf8;
-
-    my $a;
-    $a .= "\x{1ff}";
-    ok($a eq  "\x{1ff}", "bug id 20000901.092, undef left");
-    $a .= undef;
-    ok($a eq  "\x{1ff}", "bug id 20000901.092, undef right");
+    r2() and ok(1) for qw/ 4 5 /;
 }
+
+# test that nul bytes get copied
+{
+    my ($a, $ab)   = ("a", "a\0b");
+    my ($ua, $uab) = map pack("U0a*", $_), $a, $ab;
+
+    my $ub = pack("U0a*", 'b');
+
+    my $t1 = $a; $t1 .= $ab;
+
+    ok(scalar $t1 =~ m/b/);
+    
+    my $t2 = $a; $t2 .= $uab;
+    
+    ok(scalar eval '$t2 =~ m/$ub/');
+    
+    my $t3 = $ua; $t3 .= $ab;
+    
+    ok(scalar $t3 =~ m/$ub/);
+    
+    my $t4 = $ua; $t4 .= $uab;
+    
+    ok(scalar eval '$t4 =~ m/$ub/');
+    
+    my $t5 = $a; $t5 = $ab . $t5;
+    
+    ok(scalar $t5 =~ m/$ub/);
+    
+    my $t6 = $a; $t6 = $uab . $t6;
+    
+    ok(scalar eval '$t6 =~ m/$ub/');
+    
+    my $t7 = $ua; $t7 = $ab . $t7;
+    
+    ok(scalar $t7 =~ m/$ub/);
+    
+    my $t8 = $ua; $t8 = $uab . $t8;
+    
+    ok(scalar eval '$t8 =~ m/$ub/');
+}
+
 
 {
     # ID 20001020.006
@@ -99,22 +116,15 @@ ok("$dx->@" eq "aap noot");
     ok(!$@, "bug id 20001020.006, constant right");
 }
 
-sub beq { use bytes; $_[0] eq $_[1]; }
-
 {
     # concat should not upgrade its arguments.
     use utf8;
     my($l, $r, $c);
 
     ($l, $r, $c) = ("\x{101}", "\x[fe]", "\x{101}\x[fe]");
-    ok(beq($l.$r, $c), "concat utf8 and byte");
-    ok(beq($l, "\x{101}"), "right not changed after concat u+b");
-    ok(beq($r, "\x[fe]"), "left not changed after concat u+b");
-
-    ($l, $r, $c) = ("\x[fe]", "\x{101}", "\x[fe]\x{101}");
-    ok(beq($l.$r, $c), "concat byte and utf8");
-    ok(beq($l, "\x[fe]"), "right not changed after concat b+u");
-    ok(beq($r, "\x{101}"), "left not changed after concat b+u");
+    ok($l.$r eq $c, "concat utf8 and byte");
+    ok($l eq "\x{101}", "right not changed after concat");
+    ok($r eq "\x[fe]", "left not changed after concat");
 }
 
 {
@@ -128,34 +138,4 @@ sub beq { use bytes; $_[0] eq $_[1]; }
     my ($x, $y);
     $y = ($x = '' . strfoo()) . "y";
     ok( "$x,$y" eq "x,xy", 'figures out correct target' );
-}
-
-{
-    # [perl #26905] "use bytes" doesn't apply byte semantics to concatenation
-    use utf8;
-
-    my $p = "\x{B6}"; # PILCROW SIGN (ASCII/EBCDIC), 2bytes in UTF-X
-    my $u = "\x{100}";
-    my $b = pack 'a*', "\x{100}";
-    my $pu = "\x{B6}\x{100}";
-    my $up = "\x{100}\x{B6}";
-    my $x1 = $p;
-    my $y1 = $u;
-
-    use bytes;
-    ok(beq($p.$u, $p.$b), "perl #26905, left eq bytes");
-    ok(beq($u.$p, $b.$p), "perl #26905, right eq bytes");
-    ok(beq($p.$u, $pu),  "perl #26905, left eq unicode");
-    ok(beq($u.$p, $up),  "perl #26905, right eq unicode");
-
-    $x1 .= $u;
-    my $x2 = $p . $u;
-    $y1 .= $p;
-    my $y2 = $u . $p;
-
-    no bytes;
-    ok(beq($x1, $x2), "perl #26905, left,  .= vs = . in bytes");
-    ok(beq($y1, $y2), "perl #26905, right, .= vs = . in bytes");
-    ok(($x1 eq $x2),  "perl #26905, left,  .= vs = . in chars");
-    ok(($y1 eq $y2),  "perl #26905, right, .= vs = . in chars");
 }
