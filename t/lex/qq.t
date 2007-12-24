@@ -60,6 +60,9 @@ is("\x[%0]", chr 0);
 is("\x[9]", '');
 is("\x[FF9]", "\x[FF]");
 
+is(" \{ 1 \} ", ' { 1 } ', " curly braces");
+is(qq{ \{ 1 \} }, ' { 1 } ', " curly braces inside curly braces");
+
 {
   use utf8;
   is ("\x{0065}", chr 101);
