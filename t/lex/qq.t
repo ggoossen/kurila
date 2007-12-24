@@ -1,6 +1,6 @@
 #!./perl
 
-print q(1..25
+print q(1..36
 );
 
 # This is() function is written to avoid ""
@@ -54,17 +54,79 @@ is ("\x{6FQ}z", chr (111) . 'z');
 is ("\x{0x4E}", chr 0);
 is ("\x{x4E}", chr 0);
 
-use utf8;
-is ("\x{0065}", chr 101);
-is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
-    chr 114);
-is ("\x{0_06_5}", chr 101);
-is ("\x{1234}", chr 4660);
-is ("\x{10FFFD}", chr 1114109);
+{
+  use utf8;
+  is ("\x{0065}", chr 101);
+  is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
+      chr 114);
+  is ("\x{0_06_5}", chr 101);
+  is ("\x{1234}", chr 4660);
+  is ("\x{10FFFD}", chr 1114109);
+  
+  use charnames ':full';
+  is ("\N{LATIN SMALL LETTER A}", "a");
+  is ("\N{NEL}", chr 0x85);
+  
+  is("\x[65]", chr 101);
+  is("\x[FF]", bytes::chr(0xFF));
+}
 
-use charnames ':full';
-is ("\N{LATIN SMALL LETTER A}", "a");
-is ("\N{NEL}", chr 0x85);
+# variable interpolation
+{
+  our ($a, $b, $c, $dx) = qw(foo bar);
 
-is("\x[65]", chr 101);
-is("\x[FF]", bytes::chr(0xFF));
+  is("$a", "foo",    "verifying assign");
+  is("$a$b", "foobar", "basic concatenation");
+  is("$c$a$c", "foo",    "concatenate undef, fore and aft");
+
+  # Array and derefence, this doesn't really belong in 'op/concat' but I
+  # couldn't find a better place
+
+  my @x = qw|aap noot|;
+  my $dx = [@x];
+
+  is("@x", "aap noot");
+  is("@$dx", "aap noot");
+  is("$dx->@", "aap noot");
+
+  # Okay, so that wasn't very challenging.  Let's go Unicode.
+
+  {
+    use utf8;
+    # bug id 20000819.004 
+
+    $_ = $dx = "\x{10f2}";
+    s/($dx)/$dx$1/;
+    {
+        is($_,  "$dx$dx","bug id 20000819.004, back");
+    }
+
+    $_ = $dx = "\x{10f2}";
+    s/($dx)/$1$dx/;
+    {
+        is($_,  "$dx$dx","bug id 20000819.004, front");
+    }
+
+    $dx = "\x{10f2}";
+    $_  = "\x{10f2}\x{10f2}";
+    s/($dx)($dx)/$1$2/;
+    {
+        is($_,  "$dx$dx","bug id 20000819.004, front and back");
+    }
+  }
+
+  {
+    # bug id 20000901.092
+    # test that undef left and right of utf8 results in a valid string
+
+    use utf8;
+
+    my $a;
+    $a .= "\x{1ff}";
+    is($a,  "\x{1ff}", "bug id 20000901.092, undef left");
+    $a .= undef;
+    is($a,  "\x{1ff}", "bug id 20000901.092, undef right");
+  }
+
+}
+  
