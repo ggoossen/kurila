@@ -23,7 +23,7 @@ if (length($x) == 1) {print "ok 4\n";} else {print "not ok 4\n";}
 eval 'while (0) {
     print "foo\n";
 }
-/^/ && (print "ok 5\n");
+m/^/ && (print "ok 5\n");
 ';
 
 our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N);
@@ -104,10 +104,10 @@ print "$foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 print "${foo}{$bar}" eq "FOO{BAR}" ? "ok 22\n" : "not ok 22\n";
 print "${foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
 
-#print "FOO:" =~ /$foo[:]/ ? "ok 24\n" : "not ok 24\n";
+#print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
 print "ok 24\n";
 print "ABC" =~ m/^$ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
-#print "FOOZ" =~ /^$foo[$A-Z]$/ ? "ok 26\n" : "not ok 26\n";
+#print "FOOZ" =~ m/^$foo[$A-Z]$/ ? "ok 26\n" : "not ok 26\n";
 print "ok 26\n";
 
 # MJD 19980425
@@ -274,6 +274,6 @@ print ((exists $str{'xyz::bar'} ? "" : "not ")."ok $test\n"); ++$test;
 sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;
 
-eval "\$x =\xE2foo";
+eval "\$x =\x[E2]foo";
 if ($@ =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
 $test++;

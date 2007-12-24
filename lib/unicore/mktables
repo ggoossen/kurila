@@ -83,7 +83,7 @@ if ($FileList) {
             s/^ \s+ | \s+ $//xg;
             next if m/^ \s* (?: \# .* )? $/x;
             last if m/^ =+ $/x;
-            my ( $file ) = split /\t/, $_;
+            my ( $file ) = split m/\t/, $_;
             push @$list, $file;
         }
         my %dupe;
@@ -233,7 +233,7 @@ sub CanonicalName($)
 {
     my $orig = shift;
     my $name = lc $orig;
-    $name =~ s/(?<![a-z])(\w)/\u$1/g;
+    $name =~ s/(?<![a-z])(\w)/ucfirst($1)/ge;
     $name =~ s/[-_\s]+//g;
 
     $CanonicalToOrig{$name} = $orig if not $CanonicalToOrig{$name};
@@ -271,7 +271,7 @@ sub Build_Aliases()
 	s/\s+$//;
 	next if m/^$/;
 
-	my ($abbrev, $name) = split /\s*;\s*/;
+	my ($abbrev, $name) = split m/\s*;\s*/;
         next if $abbrev eq "n/a";
 	$PropertyAlias{$abbrev} = $name;
         $PA_reverse{$name} = $abbrev;
@@ -291,7 +291,7 @@ sub Build_Aliases()
 	s/\s+$//;
 	next if m/^$/;
 
-	my ($prop, @data) = split /\s*;\s*/;
+	my ($prop, @data) = split m/\s*;\s*/;
 
 	if ($prop eq 'ccc') {
 	    $PropValueAlias{$prop}{$data[1]} = [ @data[0,2] ];
@@ -948,7 +948,7 @@ sub UnicodeData_Txt()
             $upper,     ## uppercase mapping
             $lower,     ## lowercase mapping
             $title,     ## titlecase mapping
-              ) = split(/\s*;\s*/);
+              ) = split(m/\s*;\s*/);
 
 	# Note that in Unicode 3.2 there will be names like
 	# LINE FEED (LF), which probably means that \N{} needs
@@ -1091,7 +1091,7 @@ sub UnicodeData_Txt()
         ## Need to ensure that all decomposition characters do not have
         ## a %HexCodeToComb in %AboveCombClasses.
         my $want = 1;
-        for my $deco_hexcode (split / /, $CodeToDeco{$code})
+        for my $deco_hexcode (split m/ /, $CodeToDeco{$code})
         {
             if (exists $_Above_HexCodes{$deco_hexcode}) {
                 ## one of the decmposition chars has an ABOVE combination
@@ -1230,7 +1230,7 @@ sub ArabicShaping_txt()
 	next unless m/^[0-9A-Fa-f]+;/;
 	s/\s+$//;
 
-	my ($hexcode, $name, $link, $linkgroup) = split(/\s*;\s*/);
+	my ($hexcode, $name, $link, $linkgroup) = split(m/\s*;\s*/);
         my $code = hex($hexcode);
 	$ArabLink->Append($code, $link);
 	$ArabLinkGroup->Append($code, $linkgroup);
@@ -1269,9 +1269,9 @@ sub EastAsianWidth_txt()
 	s/#.*//;
 	s/\s+$//;
 
-	my ($hexcodes, $pv) = split(/\s*;\s*/);
+	my ($hexcodes, $pv) = split(m/\s*;\s*/);
         $EAW{$pv} ||= Table->New(Is => "EastAsianWidth$pv");
-      my ($start, $end) = split(/\.\./, $hexcodes);
+      my ($start, $end) = split(m/\.\./, $hexcodes);
       if (defined $end) {
         $EAW{$pv}->AppendRange(hex($start), hex($end));
       } else {
@@ -1625,7 +1625,7 @@ sub RandomlyFuzzifyName($;$)
     my $WantError = shift;  ## if true, make an error
 
     my @parts;
-    for my $part (split /[-\s_]+/, $Name)
+    for my $part (split m/[-\s_]+/, $Name)
     {
         if (@parts) {
             if ($WantError and rand() +< 0.3) {
@@ -1987,7 +1987,7 @@ sub SpecialCasing_txt()
         s/\#.*//;
         s/\s+$//;
 
-        my ($code, $lower, $title, $upper, $condition) = split(/\s*;\s*/);
+        my ($code, $lower, $title, $upper, $condition) = split(m/\s*;\s*/);
 
         if ($condition) { # not implemented yet
             print "# SKIPPING $_\n" if $Verbose;

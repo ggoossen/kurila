@@ -402,7 +402,7 @@ sub distribution_patterns {
 
   $nntp->_LIST('DISTRIB.PATS')
     && ($arr = $nntp->read_until_dot)
-    ? [grep { m/^\d/ && (chomp, $_ = [split /:/]) } @$arr]
+    ? [grep { m/^\d/ && (chomp, $_ = [split m/:/]) } @$arr]
     : undef;
 }
 
@@ -513,7 +513,7 @@ sub xpath {
 
   my $m;
   ($m = $nntp->message) =~ s/^\d+\s+//o;
-  my @p = split /\s+/, $m;
+  my @p = split m/\s+/, $m;
 
   wantarray ? @p : $p[0];
 }
@@ -593,7 +593,7 @@ sub _grouplist {
   my $ln;
 
   foreach $ln (@$arr) {
-    my @a = split(/[\s\n]+/, $ln);
+    my @a = split(m/[\s\n]+/, $ln);
     $hash->{$a[0]} = [@a[1, 2, 3]];
   }
 
@@ -610,7 +610,7 @@ sub _fieldlist {
   my $ln;
 
   foreach $ln (@$arr) {
-    my @a = split(/[\t\n]/, $ln);
+    my @a = split(m/[\t\n]/, $ln);
     my $m = shift @a;
     $hash->{$m} = [@a];
   }

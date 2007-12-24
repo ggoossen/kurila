@@ -557,7 +557,7 @@ sub _is_header {
         if( defined $extra ) {
             my($todo, $skip, $reason) = $extra =~ m/$Extra_Header_Re/xo;
 
-            $self->{todo} = { map { $_ => 1 } split /\s+/, $todo } if $todo;
+            $self->{todo} = { map { $_ => 1 } split m/\s+/, $todo } if $todo;
 
             if( $self->{max} == 0 ) {
                 $reason = '' unless defined $skip and $skip =~ m/^Skip/i;

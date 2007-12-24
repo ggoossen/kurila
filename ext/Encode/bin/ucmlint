@@ -164,7 +164,7 @@ sub uniparse{
 sub encparse{
     my $str = shift;
     my @e;
-    for my $e (split /\\x/io, $str){
+    for my $e (split m/\\x/io, $str){
     $e or next; # first \x
     $e =~ m/^([0-9A-Za-z]{1,2})$/io
         or nit "Hex $e in $str is bogus";

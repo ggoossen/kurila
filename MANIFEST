@@ -1672,6 +1672,7 @@ lib/Net/t/smtp.t		libnet
 lib/Net/t/time.t		libnet
 lib/open.pm			Pragma to specify default I/O layers
 lib/open.t			See if the open pragma works
+lib/overload64.t		See if operator overloading works with 64-bit ints
 lib/overload.pm			Module for overloading perl operators
 lib/overload.t			See if operator overloading works
 lib/Params/Check.pm	Params::Check
@@ -3035,29 +3036,28 @@ t/mro/vulcan_c3.t		mro tests
 t/mro/vulcan_dfs.t		mro tests
 Todo.micro			The Wishlist for microperl
 toke.c				The tokener
-t/op/64bitint.t			See if 64 bit integers work
-t/op/alarm.t			See if alarm works
-t/op/anonsub.t			See if anonymous subroutines work
-t/op/append.t			See if . works
-t/op/args.t			See if operations on @_ work
+t/arch/64bitint.t			See if 64 bit integers work
+t/sv/alarm.t			See if alarm works
+t/sv/anonsub.t			See if anonymous subroutines work
+t/op/concat.t			See if . works
+t/sv/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
-t/op/array.t			See if array operations work
+t/sv/array.t			See if array operations work
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
-t/op/attrs.t			See if attributes on declarations work
+t/lex/attrs.t			See if attributes on declarations work
 t/op/auto.t			See if autoincrement et all work
 t/op/avhv.t			See if pseudo-hashes work
 t/op/bless.t			See if bless works
-t/op/blocks.t			See if BEGIN and friends work
+t/comp/blocks.t			See if BEGIN and friends work
 t/op/bop.t			See if bitops work
 t/op/caller.pl			Tests shared between caller.t and XS op.t
 t/op/caller.t			See if caller() works
-t/op/chars.t			See if character escapes work
+t/lex/chars.t			See if character escapes work
 t/op/chdir.t			See if chdir works
 t/op/chop.t			See if chop works
 t/op/chr.t			See if chr works
-t/op/closure.t			See if closures work
+t/sv/closure.t			See if closures work
 t/op/cmp.t			See if the various string and numeric compare work
-t/op/concat.t			See if string concatenation works
 t/op/cond.t			See if conditional expressions work
 t/op/context.t			See if context propagation works
 t/op/cproto.t			Check builtin prototypes
@@ -3073,7 +3073,7 @@ t/op/eval.t			See if eval operator works
 t/op/exec.t			See if exec, system and qx work
 t/op/exists_sub.t		See if exists(&sub) works
 t/op/exp.t			See if math functions work
-t/op/fh.t			See if filehandles work
+t/sv/fh.t			See if filehandles work
 t/op/filetest.t			See if file tests work
 t/op/fork.t			See if fork works
 t/op/getpid.t			See if $$ and getppid work with threads
@@ -3085,9 +3085,9 @@ t/op/goto_xs.t			See if "goto &sub" works on XSUBs
 t/op/grent.t			See if getgr*() functions work
 t/op/grep.t			See if grep() and map() work
 t/op/groups.t			See if $( works
-t/op/gv.t			See if typeglobs work
+t/sv/gv.t			See if typeglobs work
 t/op/hashassign.t		See if hash assignments work
-t/op/hash.t			See if the complexity attackers are repelled
+t/sv/hash.t			See if the complexity attackers are repelled
 t/op/hashwarn.t			See if warnings for bad hash assignments work
 t/op/inccode.t			See if coderefs work in @INC
 t/op/inccode-tie.t		See if tie to @INC works
@@ -3126,7 +3126,7 @@ t/op/pos.t			See if pos works
 t/op/pow.t			See if ** works
 t/op/push.t			See if push and pop work
 t/op/pwent.t			See if getpw*() functions work
-t/op/qq.t			See if qq works
+t/lex/qq.t			See if qq works
 t/op/qrstack.t			See if qr expands the stack properly
 t/op/qr.t			See if qr works
 t/op/quotemeta.t		See if quotemeta works

@@ -231,7 +231,7 @@ ENTRIES
 # defined before undefined
 
 my $sortABC = join '',
-    $few_entries->sort(split //, "ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
+    $few_entries->sort(split m//, "ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
 
 ok($sortABC eq "PERL ABCDFGHIJKMNOQSTUVWXYZ");
 

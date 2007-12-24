@@ -414,7 +414,7 @@ sub compile_ucm
    my ($uni, $byte, $fb) = m/^(\S+)\s+(\S+)\s+(\S+)\s+/o
        or die "Bad line: $_";
    while ($uni =~  m/\G<([U0-9a-fA-F\+]+)>/g){
-       push @uni, map { substr($_, 1) } split(/\+/, $1);
+       push @uni, map { substr($_, 1) } split(m/\+/, $1);
    }
    while ($byte =~ m/\G\\x([0-9a-fA-F]+)/g){
        push @byte, $1;
@@ -474,7 +474,7 @@ sub compile_enc
  return if $type eq 'E';
  # Do the hash lookup once, rather than once per function call. 4% speedup.
  my $type_func = $encode_types{$type};
- my ($def,$sym,$pages) = split(/\s+/,scalar( ~< $fh));
+ my ($def,$sym,$pages) = split(m/\s+/,scalar( ~< $fh));
  warn "$type encoded $name\n";
  my $rep = '';
  # Save a defined test by setting these to defined values.
@@ -891,7 +891,7 @@ sub output_ucm
  if (defined $rep)
   {
    print $fh "<subchar> ";
-   foreach my $c (split(//,$rep))
+   foreach my $c (split(m//,$rep))
     {
      printf $fh "\\x%02X",ord($c);
     }

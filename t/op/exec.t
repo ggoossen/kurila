@@ -94,9 +94,9 @@ unless( ok($rc == 255 << 8 or $rc == -1 or $rc == 256 or $rc == 512) ) {
     print "# \$rc == $rc\n";
 }
 
-unless ( ok( $! == 2  or  $! =~ /\bno\b.*\bfile/i or  
-             $! == 13 or  $! =~ /permission denied/i or
-             $! == 22 or  $! =~ /invalid argument/i  ) ) {
+unless ( ok( $! == 2  or  $! =~ m/\bno\b.*\bfile/i or  
+             $! == 13 or  $! =~ m/permission denied/i or
+             $! == 22 or  $! =~ m/invalid argument/i  ) ) {
     printf "# \$! eq %d, '%s'\n", $!, $!;
 }
 
@@ -113,7 +113,7 @@ END
 
 TODO: {
     my $tnum = curr_test();
-    if( $^O =~ /Win32/ ) {
+    if( $^O =~ m/Win32/ ) {
         print "not ok $tnum - exec failure doesn't terminate process " .
               "# TODO Win32 exec failure waits for user input\n";
         next_test();

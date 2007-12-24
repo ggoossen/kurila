@@ -775,7 +775,7 @@ sub parse_text {
     ## Iterate over all sequence starts text (NOTE: split with
     ## capturing parens keeps the delimiters)
     $_ = $text;
-    my @tokens = split /([A-Z]<(?:<+\s)?)/;
+    my @tokens = split m/([A-Z]<(?:<+\s)?)/;
     while ( @tokens ) {
         $_ = shift @tokens;
         ## Look for the beginning of a sequence
@@ -959,7 +959,7 @@ sub parse_paragraph {
         ## and whatever sequence of characters was used to separate them
         $pfx = $1;
         $_ = substr($text, length $pfx);
-        ($cmd, $sep, $text) = split /(\s+)/, $_, 2; 
+        ($cmd, $sep, $text) = split m/(\s+)/, $_, 2; 
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut') {

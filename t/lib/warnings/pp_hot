@@ -214,7 +214,7 @@ sub fred
 } 
 {
   local $SIG{__WARN__} = sub {
-    die "ok\n" if $_[0] =~ /^Deep recursion on subroutine "main::fred"/
+    die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
   };
   fred();
 }
@@ -229,7 +229,7 @@ sub fred
 } 
 {
   local $SIG{__WARN__} = sub {
-    die "ok\n" if $_[0] =~ /^Deep recursion on subroutine "main::fred"/
+    die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
   };
   fred();
 }

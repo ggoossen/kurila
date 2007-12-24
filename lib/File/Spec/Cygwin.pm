@@ -114,7 +114,7 @@ sub case_tolerant () {
   }
   my $drive = shift;
   if (! $drive) {
-      my @flags = split(/,/, Cygwin::mount_flags('/cygwin'));
+      my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'));
       my $prefix = pop(@flags);
       if (! $prefix || $prefix eq 'cygdrive') {
           $drive = '/cygdrive/c';

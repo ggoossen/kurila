@@ -48,7 +48,7 @@ sub _to_file{
     local $_    = shift;
     my $pm      = shift || '';
 
-    my @parts = split /::/;
+    my @parts = split m/::/;
 
     ### because of [perl #19213], see caveats ###
     my $file = $^O eq 'MSWin32'

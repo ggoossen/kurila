@@ -41,7 +41,7 @@ my $tmpfile = 'Op_read.tmp';
 
     use bytes;
     for ([length($value), 0, '', length($value), "$value"],
-         [4, 0, '', 4, "\xE2\x8D\xAA\xE2"],
+         [4, 0, '', 4, "\x[E28DAAE2]"],
          [9+8, 0, '', 9, $value],
          [9, 3, '', 9, "\0" x 3 . $value],
          [9+8, 3, '', 9, "\0" x 3 . $value]

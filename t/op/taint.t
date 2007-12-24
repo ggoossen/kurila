@@ -18,7 +18,11 @@ $| = 1;
 
 use vars qw($ipcsysv); # did we manage to load IPC::SysV?
 
+my ($old_env_path, $old_env_dcl_path, $old_env_term);
 BEGIN {
+   $old_env_path = $ENV{'PATH'};
+   $old_env_dcl_path = $ENV{'DCL$PATH'};
+   $old_env_term = $ENV{'TERM'};
   if ($^O eq 'VMS' && !defined($Config{d_setenv})) {
       $ENV{PATH} = $ENV{PATH};
       $ENV{TERM} = $ENV{TERM} ne ''? $ENV{TERM} : 'dummy';
@@ -52,11 +56,22 @@ if ($Is_VMS) {
     for $x ('DCL$PATH', @MoreEnv) {
 	($old{$x}) = $ENV{$x} =~ m/^(.*)$/ if exists $ENV{$x};
     }
+    # VMS note:  PATH and TERM are automatically created by the C
+    # library in VMS on reference to the their keys in %ENV.
+    # There is currently no way to determine if they did not exist
+    # before this test was run.
     eval <<EndOfCleanup;
 	END {
-	    \$ENV{PATH} = '' if $Config{d_setenv};
-	    warn "# Note: logical name 'PATH' may have been deleted\n";
+	    \$ENV{PATH} = \$old_env_path;
+	    warn "# Note: logical name 'PATH' may have been created\n";
+	    \$ENV{'TERM'} = \$old_env_term;
+	    warn "# Note: logical name 'TERM' may have been created\n";
 	    \@ENV{keys %old} = values %old;
+	    if (defined \$old_env_dcl_path) {
+		\$ENV{'DCL\$PATH'} = \$old_env_dcl_path;
+	    } else {
+		delete \$ENV{'DCL\$PATH'};
+	    }
 	}
 EndOfCleanup
 }
@@ -131,7 +146,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
     if ($Is_MSWin32 && $Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split /$Config{path_sep}/, $ENV{PATH}) {
+	foreach my $dir (split m/$Config{path_sep}/, $ENV{PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -269,7 +284,7 @@ SKIP: {
     open PROG, "> $arg" or die "Can't create $arg: $!";
     print PROG q{
 	eval { join('', @ARGV), kill 0 };
-	exit 0 if $@ =~ /^Insecure dependency/;
+	exit 0 if $@ =~ m/^Insecure dependency/;
 	print "# Oops: \$@ was [$@]\n";
 	exit 1;
     };
@@ -1221,9 +1236,9 @@ SKIP:
 
 {
     my $value = "foo bar";
-    my @values = split(/\s+/, $value, 2);
+    my @values = split(m/\s+/, $value, 2);
     ok(!tainted($values[1]), "result of split is not tainted if input was not tainted");
-    my @values = split(/\s+/, $value . $TAINT, 2);
+    my @values = split(m/\s+/, $value . $TAINT, 2);
     ok(tainted($values[1]), "result of split is tainted if input was tainted");
 }
 

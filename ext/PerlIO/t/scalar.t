@@ -74,7 +74,7 @@ close $fh;
 
 # Check that updates to the scalar from elsewhere do not
 # cause problems
-$var = "line one\nline two\line three\n";
+$var = "line one\nline two\nline three\n";
 open $fh, "<", \$var;
 while ( ~< $fh) {
     $var = "foo";

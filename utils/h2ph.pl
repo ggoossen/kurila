@@ -101,7 +101,7 @@ while (defined (my $file = next_file())) {
 		    my $proto = '() ';
 		    if ($args ne '') {
 			$proto = '';
-			foreach my $arg (split(/,\s*/,$args)) {
+			foreach my $arg (split(m/,\s*/,$args)) {
 			    $arg =~ s/^\s*([^\s].*[^\s])\s*$/$1/;
 			    $curargs{$arg} = 1;
 			}
@@ -250,7 +250,7 @@ while (defined (my $file = next_file())) {
 	    s/\s+/ /g;
 	    next unless m/^\s?(typedef\s?)?enum\s?([a-zA-Z_]\w*)?\s?\{(.*)\}\s?([a-zA-Z_]\w*)?\s?;/;
 	    (my $enum_subs = $3) =~ s/\s//g;
-	    my @enum_subs = split(/,/, $enum_subs);
+	    my @enum_subs = split(m/,/, $enum_subs);
 	    my $enum_val = -1;
 	    foreach my $enum (@enum_subs) {
 		my ($enum_name, $enum_value) = $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
@@ -296,7 +296,7 @@ while (defined (my $file = next_file())) {
 	    }
 	    my @args;
 	    if (s/^\(([^()]*)\)\s*(\w+\s*)*//) {
-		for my $arg (split /,/, $1) {
+		for my $arg (split m/,/, $1) {
 		    if ($arg =~ m/(\w+)\s*$/) {
 			$curargs{$1} = 1;
 			push @args, $1;
@@ -422,7 +422,7 @@ sub expr {
 	# Eliminate typedefs
 	m/\(([\w\s]+)[\*\s]*\)\s*[\w\(]/ && do {
 	    my $doit = 1;
-	    foreach (split /\s+/, $1) {  # Make sure all the words are types,
+	    foreach (split m/\s+/, $1) {  # Make sure all the words are types,
 	        unless($isatype{$_} or $_ eq 'struct' or $_ eq 'union'){
 		    $doit = 0;
 		    last;

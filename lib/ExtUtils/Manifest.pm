@@ -152,7 +152,7 @@ sub manifind {
 	return if -d $_;
 	
         if( $Is_VMS ) {
-            $name =~ s#(.*)\.$#\L$1#;
+            $name =~ s#(.*)\.$# lc($1) #e;
             $name = uc($name) if $name =~ m/^MANIFEST(\.SKIP)?$/i;
         }
 	$found->{$name} = "";
@@ -329,7 +329,7 @@ sub maniread {
             my($base,$dir) = File::Basename::fileparse($file);
             # Resolve illegal file specifications in the same way as tar
             $dir =~ tr/./_/;
-            my(@pieces) = split(/\./,$base);
+            my(@pieces) = split(m/\./,$base);
             if (@pieces +> 2) { $base = shift(@pieces) . '.' . join('_',@pieces); }
             my $okfile = "$dir$base";
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;

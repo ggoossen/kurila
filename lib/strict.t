@@ -45,9 +45,9 @@ for (@prgs){
     if (s/^\s*-\w+//){
         $switch = $&;
     }
-    my($prog,$expected) = split(/\nEXPECT\n/, $_);
+    my($prog,$expected) = split(m/\nEXPECT\n/, $_);
     if ( $prog =~ m/--FILE--/) {
-        my(@files) = split(/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
+        my(@files) = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error test $i didn't split into pairs, got " . 
 		scalar(@files) . "[" . join("%%%%", @files) ."]\n"

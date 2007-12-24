@@ -26,7 +26,7 @@ while ( ~< *DATA) {
 
    my $failed;
    $failed++ unless md5_hex($message) eq $hexdigest;
-   $failed++ unless Digest::MD5->new->add(split(//, $message))->digest
+   $failed++ unless Digest::MD5->new->add(split(m//, $message))->digest
                                               eq pack("H*", $hexdigest);
 
    print "not " if $failed;

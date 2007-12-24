@@ -153,7 +153,7 @@ sub get_host_list
 
    $ans =~ s/(\A\s+|\s+\Z)//g;
 
-   @hosts = split(/\s+/, $ans);
+   @hosts = split(m/\s+/, $ans);
   }
  while(@hosts && defined($def = test_hostnames(@hosts)));
 
@@ -242,7 +242,7 @@ MASK:
      next;
    }
 
-   my($remove,$bits,@ip) = ($1,$3,split(/\./, $2),0,0,0);
+   my($remove,$bits,@ip) = ($1,$3,split(m/\./, $2),0,0,0);
    if ( $ip[0] +< 1 || $bits +< 1 || $bits +> 32) {
      warn "Bad netmask '$ans'\n";
      next MASK;
@@ -440,7 +440,7 @@ $cfg{'nntp_hosts'} = get_host_list($msg,$def);
 $msg = 'Enter a list of available SMTP hosts :';
 
 $def = $oldcfg{'smtp_hosts'} ||
-	[ default_hostname(split(/:/,$ENV{SMTPHOSTS} || ""), 'mailhost') ];
+	[ default_hostname(split(m/:/,$ENV{SMTPHOSTS} || ""), 'mailhost') ];
 
 $cfg{'smtp_hosts'} = get_host_list($msg,$def);
 

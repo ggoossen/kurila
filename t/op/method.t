@@ -121,9 +121,9 @@ is(eval { A->x } || "nope", "nope");
 ## happens to export %Config.
 #  {
 #      is(do { use Config; eval 'Config->foo()';
-#  	      $@ =~ /^\QCan't locate object method "foo" via package "Config" at/ ? 1 : $@}, 1);
+#  	      $@ =~ m/^\QCan't locate object method "foo" via package "Config" at/ ? 1 : $@}, 1);
 #      is(do { use Config; eval '$d = bless {}, "Config"; $d->foo()';
-#  	      $@ =~ /^\QCan't locate object method "foo" via package "Config" at/ ? 1 : $@}, 1);
+#  	      $@ =~ m/^\QCan't locate object method "foo" via package "Config" at/ ? 1 : $@}, 1);
 #  }
 
 

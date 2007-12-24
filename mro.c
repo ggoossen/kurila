@@ -91,19 +91,19 @@ S_mro_get_linear_isa_dfs(pTHX_ HV *stash, I32 level)
     GV** gvp;
     GV* gv;
     AV* av;
-    const char* stashname;
+    const HEK* stashhek;
     struct mro_meta* meta;
 
     assert(stash);
     assert(HvAUX(stash));
 
-    stashname = HvNAME_get(stash);
-    if (!stashname)
+    stashhek = HvNAME_HEK(stash);
+    if (!stashhek)
       Perl_croak(aTHX_ "Can't linearize anonymous symbol table");
 
     if (level > 100)
         Perl_croak(aTHX_ "Recursive inheritance detected in package '%s'",
-              stashname);
+		   HEK_KEY(stashhek));
 
     meta = HvMROMETA(stash);
 
@@ -115,7 +115,7 @@ S_mro_get_linear_isa_dfs(pTHX_ HV *stash, I32 level)
     /* not in cache, make a new one */
 
     retval = (AV*)sv_2mortal((SV *)newAV());
-    av_push(retval, newSVpv(stashname, 0)); /* add ourselves at the top */
+    av_push(retval, newSVhek(stashhek)); /* add ourselves at the top */
 
     /* fetch our @ISA */
     gvp = (GV**)hv_fetchs(stash, "ISA", FALSE);
@@ -205,21 +205,19 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
     GV** gvp;
     GV* gv;
     AV* isa;
-    const char* stashname;
-    STRLEN stashname_len;
+    const HEK* stashhek;
     struct mro_meta* meta;
 
     assert(stash);
     assert(HvAUX(stash));
 
-    stashname = HvNAME_get(stash);
-    stashname_len = HvNAMELEN_get(stash);
-    if (!stashname)
+    stashhek = HvNAME_HEK(stash);
+    if (!stashhek)
       Perl_croak(aTHX_ "Can't linearize anonymous symbol table");
 
     if (level > 100)
         Perl_croak(aTHX_ "Recursive inheritance detected in package '%s'",
-              stashname);
+		   HEK_KEY(stashhek));
 
     meta = HvMROMETA(stash);
 
@@ -289,12 +287,13 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
                 SV** seq_ptr = AvARRAY(seq) + 1;
                 while(seq_items--) {
                     SV* const seqitem = *seq_ptr++;
-                    HE* const he = hv_fetch_ent(tails, seqitem, 0, 0);
-                    if(!he) {
-                        (void)hv_store_ent(tails, seqitem, newSViv(1), 0);
-                    }
-                    else {
+		    /* LVALUE fetch will create a new undefined SV if necessary
+		     */
+                    HE* const he = hv_fetch_ent(tails, seqitem, 1, 0);
+                    if(he) {
                         SV* const val = HeVAL(he);
+			/* This will increment undef to 1, which is what we
+			   want for a newly created entry.  */
                         sv_inc(val);
                     }
                 }
@@ -303,7 +302,7 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
 
         /* Initialize retval to build the return value in */
         retval = newAV();
-        av_push(retval, newSVpvn(stashname, stashname_len)); /* us first */
+        av_push(retval, newSVhek(stashhek)); /* us first */
 
         /* This loop won't terminate until we either finish building
            the MRO, or get an exception. */
@@ -382,14 +381,14 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
                 Safefree(heads);
 
                 Perl_croak(aTHX_ "Inconsistent hierarchy during C3 merge of class '%s': "
-                    "merging failed on parent '%"SVf"'", stashname, SVfARG(cand));
+                    "merging failed on parent '%"SVf"'", HEK_KEY(stashhek), SVfARG(cand));
             }
         }
     }
     else { /* @ISA was undefined or empty */
         /* build a retval containing only ourselves */
         retval = newAV();
-        av_push(retval, newSVpvn(stashname, stashname_len));
+        av_push(retval, newSVhek(stashhek));
     }
 
     /* we don't want anyone modifying the cache entry but us,
@@ -498,8 +497,9 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
     if(isarev) {
         hv_iterinit(isarev);
         while((iter = hv_iternext(isarev))) {
-            SV* const revkey = hv_iterkeysv(iter);
-            HV* revstash = gv_stashsv(revkey, 0);
+	    I32 len;
+            const char* const revkey = hv_iterkey(iter, &len);
+            HV* revstash = gv_stashpvn(revkey, len, 0);
             struct mro_meta* revmeta;
 
             if(!revstash) continue;
@@ -530,11 +530,22 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
         SV* const sv = *svp++;
         HV* mroisarev;
 
-        HE *he = hv_fetch_ent(PL_isarev, sv, 0, 0);
-        if(!he) {
-            he = hv_store_ent(PL_isarev, sv, (SV*)newHV(), 0);
-        }
+        HE *he = hv_fetch_ent(PL_isarev, sv, TRUE, 0);
+
+	/* That fetch should not fail.  But if it had to create a new SV for
+	   us, then we can detect it, because it will not be the correct type.
+	   Probably faster and cleaner for us to free that scalar [very little
+	   code actually executed to free it] and create a new HV than to
+	   copy&paste [SIN!] the code from newHV() to allow us to upgrade the
+	   new SV from SVt_NULL.  */
+
         mroisarev = (HV*)HeVAL(he);
+
+	if(SvTYPE(mroisarev) != SVt_PVHV) {
+	    SvREFCNT_dec(mroisarev);
+	    mroisarev = newHV();
+	    HeVAL(he) = (SV *)mroisarev;
+        }
 
 	/* This hash only ever contains PL_sv_yes. Storing it over itself is
 	   almost as cheap as calling hv_exists, so on aggregate we expect to
@@ -614,8 +625,9 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
 
         hv_iterinit(isarev);
         while((iter = hv_iternext(isarev))) {
-            SV* const revkey = hv_iterkeysv(iter);
-            HV* const revstash = gv_stashsv(revkey, 0);
+	    I32 len;
+            const char* const revkey = hv_iterkey(iter, &len);
+            HV* const revstash = gv_stashpvn(revkey, len, 0);
             struct mro_meta* mrometa;
 
             if(!revstash) continue;

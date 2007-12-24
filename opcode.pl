@@ -23,7 +23,7 @@ while ( ~< *DATA) {
     chop;
     next unless $_;
     next if m/^#/;
-    my ($key, $desc, $check, $flags, $args) = split(/\t+/, $_, 5);
+    my ($key, $desc, $check, $flags, $args) = split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
     warn qq[Description "$desc" duplicates $seen{$desc}\n] if $seen{$desc};
@@ -750,7 +750,7 @@ hslice		hash slice		ck_null		m@	H L
 unpack		unpack			ck_unpack	@	S S?
 pack		pack			ck_fun		mst@	S L
 split		split			ck_split	t@	S S S
-join		join or string		ck_join		mst@	S L
+join		join or string		ck_fun		mst@	S L
 
 # List operators.
 

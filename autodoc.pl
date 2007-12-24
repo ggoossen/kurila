@@ -51,7 +51,7 @@ sub walk_table (&@) {
 	    @args = $_;
 	}
 	else {
-	    @args = split /\s*\|\s*/, $_;
+	    @args = split m/\s*\|\s*/, $_;
 	}
 	s/\b(NN|NULLOK)\b\s+//g for @args;
 	print $F $function->(@args);
@@ -82,7 +82,7 @@ FUNC:
 	if ($in =~ m/^=for\s+apidoc\s+(.*?)\s*\n/) {
 	    my $proto = $1;
 	    $proto = "||$proto" unless $proto =~ m/\|/;
-	    my($flags, $ret, $name, @args) = split /\|/, $proto;
+	    my($flags, $ret, $name, @args) = split m/\|/, $proto;
 	    my $docs = "";
 DOC:
 	    while (defined($doc = ~< $fh)) {

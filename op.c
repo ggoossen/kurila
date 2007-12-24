@@ -4209,9 +4209,11 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
 	if (PL_madskills) {
 	    /* This is all dead code when PERL_MAD is not defined.  */
 	    live = newUNOP(OP_NULL, 0, live);
+#ifdef PERL_MAD
 	    op_getmad(first, live, 'C');
 	    op_getmad(dead, live, left ? 'e' : 't');
 	    append_madprops_pv("const_cond", live, '<');
+#endif
 	} else {
 	    op_free(first);
 	    op_free(dead);
@@ -6948,7 +6950,7 @@ Perl_ck_require(pTHX_ OP *o)
 	    for (; s < end; s++) {
 		if (*s == ':' && s[1] == ':') {
 		    *s = '/';
-		    Move(s+2, s+1, end - s, char);
+		    Move(s+2, s+1, end - s - 1, char);
 		    --end;
 		}
 	    }
@@ -7252,23 +7254,6 @@ Perl_ck_split(pTHX_ OP *o)
 	return too_many_arguments(o,OP_DESC(o));
 
     return o;
-}
-
-OP *
-Perl_ck_join(pTHX_ OP *o)
-{
-    const OP * const kid = cLISTOPo->op_first->op_sibling;
-    if (kid && kid->op_type == OP_MATCH) {
-	if (ckWARN(WARN_SYNTAX)) {
-            const REGEXP *re = PM_GETRE(kPMOP);
-	    const char *pmstr = re ? re->precomp : "STRING";
-	    const STRLEN len = re ? re->prelen : 6;
-	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-			"/%.*s/ should probably be written as \"%.*s\"",
-			(int)len, pmstr, (int)len, pmstr);
-	}
-    }
-    return ck_fun(o);
 }
 
 OP *

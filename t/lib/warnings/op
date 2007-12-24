@@ -21,16 +21,16 @@
 
      Applying %s to %s will act on scalar(%s)
 	my $a ; my @a = () ; my %a = () ; my $b = \@a ; my $c = \%a ;
-	@a =~ /abc/ ;
+	@a =~ m/abc/ ;
 	@a =~ s/a/b/ ;
 	@a =~ tr/a/b/ ;
-	@$b =~ /abc/ ;
+	@$b =~ m/abc/ ;
 	@$b =~ s/a/b/ ;
 	@$b =~ tr/a/b/ ;
-	%a =~ /abc/ ;
+	%a =~ m/abc/ ;
 	%a =~ s/a/b/ ;
 	%a =~ tr/a/b/ ;
-	%$c =~ /abc/ ;
+	%$c =~ m/abc/ ;
 	%$c =~ s/a/b/ ;
 	%$c =~ tr/a/b/ ;
 
@@ -79,9 +79,6 @@
      	(Maybe you should just omit the defined()?)
 	my %h ; defined %h ;
     
-     /---/ should probably be written as "---"
-        join(/---/, @foo);
-
     %s() called too early to check prototype		[Perl_peep]
         fred() ; sub fred ($$) {}
 
@@ -539,31 +536,31 @@ Useless use of a constant in void context at - line 4.
 #
 use warnings 'misc' ;
 my $a ; my @a = () ; my %a = () ; my $b = \@a ; my $c = \%a ;
-@a =~ /abc/ ;
+@a =~ m/abc/ ;
 @a =~ s/a/b/ ;
 @a =~ tr/a/b/ ;
-@$b =~ /abc/ ;
+@$b =~ m/abc/ ;
 @$b =~ s/a/b/ ;
 @$b =~ tr/a/b/ ;
-%a =~ /abc/ ;
+%a =~ m/abc/ ;
 %a =~ s/a/b/ ;
 %a =~ tr/a/b/ ;
-%$c =~ /abc/ ;
+%$c =~ m/abc/ ;
 %$c =~ s/a/b/ ;
 %$c =~ tr/a/b/ ;
 {
 no warnings 'misc' ;
 my $a ; my @a = () ; my %a = () ; my $b = \@a ; my $c = \%a ;
-@a =~ /abc/ ;
+@a =~ m/abc/ ;
 @a =~ s/a/b/ ;
 @a =~ tr/a/b/ ;
-@$b =~ /abc/ ;
+@$b =~ m/abc/ ;
 @$b =~ s/a/b/ ;
 @$b =~ tr/a/b/ ;
-%a =~ /abc/ ;
+%a =~ m/abc/ ;
 %a =~ s/a/b/ ;
 %a =~ tr/a/b/ ;
-%$c =~ /abc/ ;
+%$c =~ m/abc/ ;
 %$c =~ s/a/b/ ;
 %$c =~ tr/a/b/ ;
 }
@@ -812,12 +809,6 @@ Prototype mismatch: sub main::fred () vs ($) at - line 4.
 Prototype mismatch: sub main::freD () vs ($) at - line 11.
 Prototype mismatch: sub main::FRED () vs ($) at - line 14.
 ########
-# op.c
-use warnings 'syntax' ;
-join /---/, 'x', 'y', 'z';
-EXPECT
-/---/ should probably be written as "---" at - line 3.
-########
 # op.c [Perl_peep]
 use warnings 'prototype' ;
 fred() ; 
@@ -894,9 +885,9 @@ Useless use of unshift with no values at - line 5.
 # op.c
 # 20020401 mjd@plover.com at suggestion of jfriedl@yahoo.com
 use warnings 'regexp';
-split /blah/g, "blah";
+split m/blah/g, "blah";
 no warnings 'regexp';
-split /blah/g, "blah";
+split m/blah/g, "blah";
 EXPECT
 Use of /g modifier is meaningless in split at - line 4.
 ########

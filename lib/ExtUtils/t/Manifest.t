@@ -82,7 +82,7 @@ chmod( 0744, 'foo') if $Config{'chmod'};
 my ($res, $warn) = catch_warning( \&mkmanifest );
 # Canonize the order.
 $warn = join("", map { "$_|" } 
-                 sort { lc($a) cmp lc($b) } split /\r?\n/, $warn);
+                 sort { lc($a) cmp lc($b) } split m/\r?\n/, $warn);
 is( $warn, "Added to MANIFEST: foo|Added to MANIFEST: MANIFEST|",
     "mkmanifest() displayed its additions" );
 

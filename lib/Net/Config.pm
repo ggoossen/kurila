@@ -96,13 +96,13 @@ sub requires_firewall {
   $host = inet_ntoa($host);
 
   if (exists $NetConfig{'local_netmask'}) {
-    my $quad = unpack("N", pack("C*", split(/\./, $host)));
+    my $quad = unpack("N", pack("C*", split(m/\./, $host)));
     my $list = $NetConfig{'local_netmask'};
     $list = [$list] unless ref($list);
     foreach (@$list) {
       my ($net, $bits) = (m#^(\d+\.\d+\.\d+\.\d+)/(\d+)$#) or next;
       my $mask = ^~^0 << (32 - $bits);
-      my $addr = unpack("N", pack("C*", split(/\./, $net)));
+      my $addr = unpack("N", pack("C*", split(m/\./, $net)));
 
       return 0 if (($addr ^&^ $mask) == ($quad ^&^ $mask));
     }

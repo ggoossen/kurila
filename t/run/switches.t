@@ -227,7 +227,7 @@ SWTESTPM
     like( $r, qr/^(?!.*(not found|UNKNOWN))./, 'perl -V:re got a result' );
 
     # make sure each line we got matches the re
-    ok( !( grep !m/^i\D+size=/, split /^/, $r ), '-V:re correct' );
+    ok( !( grep !m/^i\D+size=/, split m/^/, $r ), '-V:re correct' );
 }
 
 # Tests for -v
@@ -255,7 +255,7 @@ SWTESTPM
 
 # Tests for switches which do not exist
 
-foreach my $switch (split //, "ABbGgHJjKkLNOoQqRrYyZz123456789_")
+foreach my $switch (split m//, "ABbGgHJjKkLNOoQqRrYyZz123456789_")
 {
     local $TODO = '';   # these ones should work on VMS
 

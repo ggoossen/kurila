@@ -776,12 +776,12 @@ sub reduceDiffs {
 
     my $tc	= shift;
     my $got	= $tc->{got};
-    my @got	= split(/\n/, $got);
+    my @got	= split(m/\n/, $got);
     my $want	= $tc->{wantstr};
-    my @want	= split(/\n/, $want);
+    my @want	= split(m/\n/, $want);
 
     # split rexstr into units that should eat leading lines.
-    my @rexs = map qr/$_/, split (/\n/, $tc->{rexstr});
+    my @rexs = map qr/$_/, split (m/\n/, $tc->{rexstr});
 
     foreach my $rex (@rexs) {
         my $exp = shift @want;

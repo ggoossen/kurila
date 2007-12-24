@@ -133,10 +133,12 @@ for example, turn C<-w -U> into C<-wU>.
 
 =item %s argument is not a HASH or ARRAY element
 
-(F) The argument to exists() must be a hash or array element, such as:
+(F) The argument to exists() must be a hash or array element or a
+subroutine with an ampersand, such as:
 
     $foo{$bar}
     $ref->{"susie"}[12]
+    &do_something
 
 =item %s argument is not a HASH or ARRAY element or slice
 
@@ -4535,11 +4537,11 @@ See L<Win32> for more information.
 (W regexp) You have used an internal modifier such as (?-o) that has no
 meaning unless removed from the entire regexp:
 
-    if ($string =~ /(?-o)$pattern/o) { ... }
+    if ($string =~ m/(?-o)$pattern/o) { ... }
 
 must be written as
 
-    if ($string =~ /$pattern/) { ... }
+    if ($string =~ m/$pattern/) { ... }
 
 The <-- HERE shows in the regular expression about
 where the problem was discovered. See L<perlre>.
@@ -4555,11 +4557,11 @@ some point in the future, but in the meantime such code is discouraged.
 (W regexp) You have used an internal modifier such as (?o) that has no
 meaning unless applied to the entire regexp:
 
-    if ($string =~ /(?o)$pattern/) { ... }
+    if ($string =~ m/(?o)$pattern/) { ... }
 
 must be written as
 
-    if ($string =~ /$pattern/o) { ... }
+    if ($string =~ m/$pattern/o) { ... }
 
 The <-- HERE shows in the regular expression about
 where the problem was discovered. See L<perlre>.
@@ -4916,10 +4918,9 @@ are being ignored.
 (W portable) The use of v-strings is non-portable to older, pre-5.6, Perls.
 If you want your scripts to be backward portable, use the floating
 point version number: for example, instead of C<use 5.6.1> say
-C<use 5.006_001>.  This of course won't help: the older Perls
-won't suddenly start understanding newer features, but at least
-they will show a sensible error message indicating the required
-minimum version.
+C<use 5.006_001>. This of course won't make older Perls suddenly start
+understanding newer features, but at least they will show a sensible
+error message indicating the required minimum version.
 
 This warning is suppressed if the C<use 5.x.y> is preceded by a
 C<use 5.006> (see C<use VERSION> in L<perlfunc/use>).

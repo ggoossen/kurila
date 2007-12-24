@@ -42,14 +42,14 @@ while ( ~< *F) { $O .= $_; }
 close F;
 unlink "fails";
 
-ok join(' ', map { m/(\d+)/; $1 } grep m/^not ok/, split /\n+/, $O),
+ok join(' ', map { m/(\d+)/; $1 } grep m/^not ok/, split m/\n+/, $O),
     join(' ', 1..13);
 
-my @got = split /not ok \d+\n/, $O;
+my @got = split m/not ok \d+\n/, $O;
 shift @got;
 
 $Expect =~ s/\n+$//;
-my @expect = split /\n\n/, $Expect;
+my @expect = split m/\n\n/, $Expect;
 
 
 sub commentless {

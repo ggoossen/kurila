@@ -42,7 +42,7 @@ package File::Basename;
 # not be available.
 BEGIN {
   unless (eval { require re; })
-    { eval ' sub re::import { $^H |= 0x00100000; } ' } # HINT_RE_TAINT
+    { eval ' sub re::import { $^H ^|^= 0x00100000; } ' } # HINT_RE_TAINT
   re->import('taint');
 }
 

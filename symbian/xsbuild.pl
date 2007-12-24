@@ -772,7 +772,7 @@ for my $ext (@ARGV) {
         $dir = "ext\\DynaLoader";
     }
 
-    $EXTCFG{$ext} = [ split( /,/, $cfg ) ] if defined $cfg;
+    $EXTCFG{$ext} = [ split( m/,/, $cfg ) ] if defined $cfg;
 
     die "$0: no lib\\Config.pm\n"
       if $CoreBuild && $Build && !-f "lib\\Config.pm";
@@ -808,7 +808,7 @@ for my $ext (@ARGV) {
 
     my %CONF;
 
-    my @ext   = split( /\\/, $ext );
+    my @ext   = split( m/\\/, $ext );
     my $base  = $ext[-1];
 
     if ( $Clean || $DistClean ) {

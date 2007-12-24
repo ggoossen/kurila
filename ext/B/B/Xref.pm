@@ -389,7 +389,7 @@ sub compile {
 	    $raw = 1;
 	} elsif ($opt eq "D") {
             $arg ||= shift @options;
-	    foreach $arg (split(//, $arg)) {
+	    foreach $arg (split(m//, $arg)) {
 		if ($arg eq "o") {
 		    B->debug(1);
 		} elsif ($arg eq "O") {

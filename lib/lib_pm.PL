@@ -21,7 +21,7 @@ if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $Config_archname = qq('$Config{archname}');
     $Config_version  = qq('$Config{version}');
     my @Config_inc_version_list =
-	reverse split / /, $Config{inc_version_list};
+	reverse split m/ /, $Config{inc_version_list};
     $Config_inc_version_list =
 	@Config_inc_version_list ?
 	    qq(@Config_inc_version_list) : q(());
@@ -30,7 +30,7 @@ if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $Config_archname = q($Config{archname});
     $Config_version  = q($Config{version});
     $Config_inc_version_list =
-	      q(reverse split / /, $Config{inc_version_list});
+	      q(reverse split m/ /, $Config{inc_version_list});
 }
  
 open OUT,">$file" or die "Can't create $file: $!";
@@ -152,7 +152,7 @@ sub _nativize {
 
     if ($Is_MacOS && $Mac_FS && ! -d $dir) {
 	$dir = Mac::FileSpec::Unixish::nativize($dir);
-	$dir .= ":" unless $dir =~ /:$/;
+	$dir .= ":" unless $dir =~ m/:$/;
     }
 
     return $dir;

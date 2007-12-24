@@ -19,7 +19,7 @@ BEGIN {
     # Remove insecure directories from PATH
     my @path;
     my $sep = $Config{path_sep};
-    foreach my $dir (split(/\Q$sep/,$ENV{'PATH'}))
+    foreach my $dir (split(m/\Q$sep/,$ENV{'PATH'}))
     {
 	##
 	## Match the directory taint tests in mg.c::Perl_magic_setenv()

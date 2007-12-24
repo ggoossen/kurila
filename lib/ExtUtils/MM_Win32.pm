@@ -101,7 +101,7 @@ used by default.
 sub maybe_command {
     my($self,$file) = @_;
     my @e = exists($ENV{'PATHEXT'})
-          ? split(/;/, $ENV{PATHEXT})
+          ? split(m/;/, $ENV{PATHEXT})
 	  : qw(.com .exe .bat .cmd);
     my $e = '';
     for (@e) { $e .= "\Q$_\E|" }
@@ -551,7 +551,7 @@ sub cflags {
     return '' unless $self->needs_linking();
 
     my $base = $self->SUPER::cflags($libperl);
-    foreach (split /\n/, $base) {
+    foreach (split m/\n/, $base) {
         m/^(\S*)\s*=\s*(\S*)$/ and $self->{$1} = $2;
     };
     $self->{CCFLAGS} .= " -DPERLDLL" if ($self->{LINKTYPE} eq 'static');

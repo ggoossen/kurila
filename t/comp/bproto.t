@@ -27,13 +27,13 @@ sub test_no_error {
     printf "ok %d\n",$i++;
 }
 
-test_too_many($_) for split /\n/,
+test_too_many($_) for split m/\n/,
 q[	defined(&foo, $bar);
 	undef(&foo, $bar);
 	uc($bar,$bar);
 ];
 
-test_no_error($_) for split /\n/,
+test_no_error($_) for split m/\n/,
 q[	scalar(&foo,$bar);
 	defined &foo, &foo, &foo;
 	undef &foo, $bar;

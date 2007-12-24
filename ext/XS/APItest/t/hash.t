@@ -269,7 +269,7 @@ sub main_test_inner {
 
 sub perform_test {
   my ($test_sub, $key, $keys, $message, @other) = @_;
-  my $printable = join ',', map {ord} split //, $key;
+  my $printable = join ',', map {ord} split m//, $key;
 
   my (%hash, %tiehash);
   tie %tiehash, 'Tie::StdHash';

@@ -15,7 +15,7 @@ eval '%@x=0;';
 like( $@, qr/^Can't modify hash dereference in repeat \(x\)/, '%@x=0' );
 
 # Bug 20010422.005
-eval q{{s//${}/; //}};
+eval q{{s//${}/; m//}};
 like( $@, qr/syntax error/, 'syntax error, used to dump core' );
 
 # Bug 20010528.007
@@ -115,7 +115,7 @@ pass();
 # Bug #21875
 # { q.* => ... } should be interpreted as hash, not block
 
-foreach my $line (split /\n/, <<'EOF')
+foreach my $line (split m/\n/, <<'EOF')
 1 { foo => 'bar' }
 1 { qoo => 'bar' }
 1 { q   => 'bar' }
@@ -126,7 +126,7 @@ foreach my $line (split /\n/, <<'EOF')
 1 { q=bar= => 'bar' }
 EOF
 {
-    my ($expect, $eval) = split / /, $line, 2;
+    my ($expect, $eval) = split m/ /, $line, 2;
     my $result = eval $eval;
     ok($@ eq  '', "eval $eval");
     is(ref $result, $expect ? 'HASH' : '', $eval);

@@ -5809,11 +5809,7 @@ Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
 	}
     }
     else {
-	const int type = SvTYPE(dbsv);
-	if (type < SVt_PVIV && type != SVt_IV)
-	    sv_upgrade(dbsv, SVt_PVIV);
-	(void)SvIOK_on(dbsv);
-	SvIV_set(dbsv, PTR2IV(cv));	/* Do it the quickest way  */
+	sv_setiv(dbsv, PTR2IV(cv));
     }
 }
 

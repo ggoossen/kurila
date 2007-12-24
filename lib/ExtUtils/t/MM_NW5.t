@@ -15,7 +15,7 @@ chdir 't';
 use Test::More;
 
 BEGIN {
-	if ($^O =~ /NetWare/i) {
+	if ($^O =~ m/NetWare/i) {
 		plan tests => 39;
 	} else {
 		plan skip_all => 'This is not NW5';

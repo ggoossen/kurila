@@ -225,7 +225,7 @@ print "ok ", $test++,"\n";
 print "not " unless join(':',@ary) eq '5:6:7:4';
 print "ok ", $test++,"\n";
 
-@ary = split(/:/,'1:2:3');
+@ary = split(m/:/,'1:2:3');
 print "not " unless join(':',@ary) eq '1:2:3';
 print "ok ", $test++,"\n";         
 

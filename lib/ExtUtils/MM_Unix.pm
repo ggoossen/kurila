@@ -1407,7 +1407,7 @@ sub init_MAN3PODS {
 	# everything below lib is ok
 	unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
 	    $manpagename = $self->catfile(
-	        split(/::/,$self->{PARENT_NAME}),$manpagename
+	        split(m/::/,$self->{PARENT_NAME}),$manpagename
 	    );
 	}
 	$manpagename = $self->replace_manpage_separator($manpagename);
@@ -1550,12 +1550,12 @@ sub init_main {
 ### Only UNIX:
 ###    ($self->{FULLEXT} =
 ###     $self->{NAME}) =~ s!::!/!g ; #eg. BSD/Foo/Socket
-    $self->{FULLEXT} = $self->catdir(split /::/, $self->{NAME});
+    $self->{FULLEXT} = $self->catdir(split m/::/, $self->{NAME});
 
 
     # Copied from DynaLoader:
 
-    my(@modparts) = split(/::/,$self->{NAME});
+    my(@modparts) = split(m/::/,$self->{NAME});
     my($modfname) = $modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
@@ -2959,7 +2959,7 @@ for a binary distribution.
 sub ppd {
     my($self) = @_;
 
-    my ($pack_ver) = join ",", (split (/\./, $self->{VERSION}), (0)x4)[0..3];
+    my ($pack_ver) = join ",", (split (m/\./, $self->{VERSION}), (0)x4)[0..3];
 
     my $abstract = $self->{ABSTRACT} || '';
     $abstract =~ s/\n/\\n/sg;
@@ -2981,7 +2981,7 @@ PPD_HTML
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
-        my ($dep_ver) = join ",", (split (/\./, $self->{PREREQ_PM}{$prereq}), 
+        my ($dep_ver) = join ",", (split (m/\./, $self->{PREREQ_PM}{$prereq}), 
                                   (0) x 4) [0 .. 3];
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
         <DEPENDENCY NAME="%s" VERSION="%s" />
@@ -3195,7 +3195,7 @@ sub oneliner {
     $cmd =~ s{^\n+}{};
     $cmd =~ s{\n+$}{};
 
-    my @cmds = split /\n/, $cmd;
+    my @cmds = split m/\n/, $cmd;
     $cmd = join " \n\t  -e ", map $self->quote_literal($_), @cmds;
     $cmd = $self->escape_newlines($cmd);
 

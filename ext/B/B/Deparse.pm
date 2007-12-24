@@ -396,7 +396,7 @@ sub begin_is_use {
 	    $version = $version->PV;
 	} else {
 	    # version specified as a v-string
-	    $version = 'v'.join '.', map ord, split //, $version->PV;
+	    $version = 'v'.join '.', map ord, split m//, $version->PV;
 	}
 	$constop = $constop->sibling;
 	return if $constop->name ne "method_named";
@@ -750,7 +750,7 @@ sub ambient_pragmas {
 		@names = @$val;
 	    }
 	    else {
-		@names = split/\s+/, $val;
+		@names = split m/\s+/, $val;
 	    }
 
 	    $warning_bits = $warnings::NONE if !defined ($warning_bits);
@@ -796,7 +796,7 @@ sub deparse {
 sub indent {
     my $self = shift;
     my $txt = shift;
-    my @lines = split(/\n/, $txt);
+    my @lines = split(m/\n/, $txt);
     my $leader = "";
     my $level = 0;
     my $line;
@@ -3501,7 +3501,7 @@ sub re_unback {
 
 sub balanced_delim {
     my($str) = @_;
-    my @str = split //, $str;
+    my @str = split m//, $str;
     my($ar, $open, $close, $fail, $c, $cnt, $last_bs);
     for $ar (['[',']'], ['(',')'], ['<','>'], ['{','}']) {
 	($open, $close) = @$ar;
@@ -3908,8 +3908,8 @@ sub tr_decode_utf8 {
     my $extra = $none + 1;
     my(@from, @delfrom, @to);
     my $line;
-    foreach $line (split /\n/, $swash{'LIST'}->PV) {
-	my($min, $max, $result) = split(/\t/, $line);
+    foreach $line (split m/\n/, $swash{'LIST'}->PV) {
+	my($min, $max, $result) = split(m/\t/, $line);
 	$min = hex $min;
 	if (length $max) {
 	    $max = hex $max;
@@ -4122,7 +4122,7 @@ sub pp_regcomp {
 # osmic acid -- see osmium tetroxide
 
 my %matchwords;
-map($matchwords{join "", sort split //, $_} = $_, 'cig', 'cog', 'cos', 'cogs',
+map($matchwords{join "", sort split m//, $_} = $_, 'cig', 'cog', 'cos', 'cogs',
     'cox', 'go', 'is', 'ism', 'iso', 'mig', 'mix', 'osmic', 'ox', 'sic',
     'sig', 'six', 'smog', 'so', 'soc', 'sog', 'xi');
 
@@ -4219,7 +4219,7 @@ sub pp_split {
 # bivalent grouping C=NOH [Webster's Tenth]
 
 my %substwords;
-map($substwords{join "", sort split //, $_} = $_, 'ego', 'egoism', 'em',
+map($substwords{join "", sort split m//, $_} = $_, 'ego', 'egoism', 'em',
     'es', 'ex', 'exes', 'gee', 'go', 'goes', 'ie', 'ism', 'iso', 'me',
     'meese', 'meso', 'mig', 'mix', 'os', 'ox', 'oxime', 'see', 'seem',
     'seg', 'sex', 'sig', 'six', 'smog', 'sog', 'some', 'xi');

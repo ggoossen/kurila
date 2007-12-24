@@ -524,7 +524,7 @@ sub find {
   my $verbose = $self->verbose;
 
   # Split on :: and then join the name together using File::Spec
-  my @parts = split /::/, $pod;
+  my @parts = split m/::/, $pod;
   $verbose and print "Chomping {$pod} => {@parts}\n";
 
   #@search_dirs = File::Spec->curdir unless @search_dirs;

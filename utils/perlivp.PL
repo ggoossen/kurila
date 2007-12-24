@@ -201,15 +201,15 @@ use Config;
 my $extensions_total = 0;
 my $extensions_there = 0;
 if (defined($Config{'extensions'})) {
-    my @extensions = split(/\s+/,$Config{'extensions'});
+    my @extensions = split(m/\s+/,$Config{'extensions'});
     foreach (@extensions) {
         next if ($_ eq '');
-        if ( $useithreads !~ /define/i ) {
+        if ( $useithreads !~ m/define/i ) {
             next if ($_ eq 'threads');
             next if ($_ eq 'threads/shared');
         }
 	# that's a distribution name, not a module name
-	next if /^IO_Compress_(?:Zlib|Base)$/;
+	next if m/^IO_Compress_(?:Zlib|Base)$/;
         next if $_ eq 'Devel/DProf'; 
 	# test modules
 	next if $_ eq 'XS/APItest';

@@ -481,7 +481,7 @@ Main: {
 	if( $opt_f ){
 		for(my $i = 0;$i +< @$idkeys - 2;){
 			$key = $$idkeys[$i];
-			if($key =~ /$opt_f/){
+			if($key =~ m/$opt_f/){
 				splice(@$idkeys, $i, 1);
 				$runtime -= $$times{$key};
 				next;
@@ -534,7 +534,7 @@ sub group{
 
 		for(my $i = 0;$i +< @$idkeys - 2;){
 			$key = $$idkeys[$i];
-			if($key =~ /$opt_G/){
+			if($key =~ m/$opt_G/){
 				$$calls{$opt_G} += $$calls{$key};
 				$$times{$opt_G} += $$times{$key};
 				$$ctimes{$opt_G} += $$ctimes{$key};
@@ -730,13 +730,13 @@ sub parsestack {
 	$over_per_call /= 2*$over_tests; # distribute over entry and exit
 
 	while(~<$fh){
-		next if /^#/;
-		last if /^PART/;
+		next if m/^#/;
+		last if m/^PART/;
 
 		chop;
-		if (/^&/) {
+		if (m/^&/) {
 		  ($dir, $id, $pack, $name) = split;
-		  if ($opt_R and ($name =~ /(?:::)?(__ANON__|END)$/)) {
+		  if ($opt_R and ($name =~ m/(?:::)?(__ANON__|END)$/)) {
 		    $name .= "($id)";
 		  }
 		  $cv_hash{$id} = "$pack\::$name";
@@ -878,8 +878,8 @@ sub exitstamp {
 	if( ! defined $x ){
 		die "Garbled profile, missing an enter time stamp";
 	}
-	if( $x->[0] ne $name and $opt_G and ($name =~ /$opt_G/)){
-	  if ($x->[0] =~ /(?:::)?AUTOLOAD$/) {
+	if( $x->[0] ne $name and $opt_G and ($name =~ m/$opt_G/)){
+	  if ($x->[0] =~ m/(?:::)?AUTOLOAD$/) {
 	    if ($opt_A) {
 	      $name = $x->[0];
 	    }
@@ -914,12 +914,12 @@ sub exitstamp {
 sub header {
 	my $fh = shift;
 	chop($_ = ~<$fh);
-	if( ! /^#fOrTyTwO$/ ){
+	if( ! m/^#fOrTyTwO$/ ){
 		die "Not a perl profile";
 	}
 	while(~<$fh){
-		next if /^#/;
-		last if /^PART/;
+		next if m/^#/;
+		last if m/^PART/;
 		eval;
 	}
 	$over_tests = 1 unless $over_tests;
@@ -946,7 +946,7 @@ sub run_profiler {
 	my $script = shift;
 	my $profiler = shift;
 	my $startperl = shift;
-	my @script_parts = split /\s+/, $script;
+	my @script_parts = split m/\s+/, $script;
 
 	system $startperl, "-d:$profiler", @script_parts;
 	if( $? / 256 +> 0 ){
@@ -970,7 +970,7 @@ sub rby_avgcpu { $persecs->{$a} <+> $persecs->{$b} }
 
 BEGIN {
     $statform = ' {>>}  {>>>>} {>>>>} {>>>>} {>>>>>>} {>>>>}  {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<';
-    if (-t STDOUT and defined $stty and my ($cols) = `$stty -a` =~ /\bcolumns\s+(\d+)/)
+    if (-t STDOUT and defined $stty and my ($cols) = `$stty -a` =~ m/\bcolumns\s+(\d+)/)
     {
 	$statform .= '<' x ($cols - length $statform) if $cols +> 80;
     }

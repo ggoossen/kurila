@@ -12,13 +12,13 @@ $perlmain= ~< *PERLM;
 $makefile= ~< *MAKEFILE;
 
 ($_) = $makefile =~ m/\bNAME\b.*=>\W*([\w\:]+)/; # extract module name
-$badname=join ("__",map {lc substr ($_,0,8)} split /:+/); # dosify
+$badname=join ("__",map {lc substr ($_,0,8)} split m/:+/); # dosify
 $perlmain =~ s/^.*boot_$badname.*$//gm if $badname; # delete bad lines
 
 @exts=('DynaLoader',split (" ",$Config{known_extensions}));
 for $realname (@exts)
 {
-    $dosname=join ("__",map {lc substr ($_,0,8)} split /\//,$realname);
+    $dosname=join ("__",map {lc substr ($_,0,8)} split m/\//,$realname);
     $realname =~ s!/!__!g;
     $perlmain =~ s/\bboot_$dosname\b/boot_$realname/gm;
     $dosname =~ s/__/::/;

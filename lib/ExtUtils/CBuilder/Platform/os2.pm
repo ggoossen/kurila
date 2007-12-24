@@ -30,7 +30,7 @@ sub _do_link {
       and (defined $args{module_name} and length $args{module_name})) {
 
     # DynaLoader::mod2fname() is a builtin func
-    my $lib = DynaLoader::mod2fname([split /::/, $args{module_name}]);
+    my $lib = DynaLoader::mod2fname([split m/::/, $args{module_name}]);
 
     # Now know the basename, find directory parts via lib_file, or objects
     my $objs = ( (ref $args{objects}) ? $args{objects} : [$args{objects}] );

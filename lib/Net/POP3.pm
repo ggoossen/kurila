@@ -424,11 +424,11 @@ sub auth {
   if (ref($username) and UNIVERSAL::isa($username, 'Authen::SASL')) {
     $sasl = $username;
     my $user_mech = $sasl->mechanism || '';
-    my @user_mech = split(/\s+/, $user_mech);
+    my @user_mech = split(m/\s+/, $user_mech);
     my %user_mech;
     @user_mech{@user_mech} = ();
 
-    my @server_mech = split(/\s+/, $mechanisms);
+    my @server_mech = split(m/\s+/, $mechanisms);
     my @mech = @user_mech
       ? grep { exists $user_mech{$_} } @server_mech
       : @server_mech;
@@ -460,7 +460,7 @@ sub auth {
 
   # We should probably allow the user to pass the host, but I don't
   # currently know and SASL mechanisms that are used by smtp that need it
-  my ($hostname) = split /:/, ${*$self}{'net_pop3_host'};
+  my ($hostname) = split m/:/, ${*$self}{'net_pop3_host'};
   my $client = eval { $sasl->client_new('pop', $hostname, 0) };
 
   unless ($client) {

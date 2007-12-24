@@ -361,7 +361,7 @@ eval q% ($_ = "x") =~ s/x(($x)*)/"$1"/e %;
 ok( $_ eq '' and !length $@ );
 
 $_ = "C:/";
-ok( !s/^([a-z]:)/\u$1/ );
+ok( !s/^([a-z]:)/uc($1)/e );
 
 $_ = "Charles Bronson";
 $snum = s/\B\w//g;

@@ -123,7 +123,7 @@ sub parse_from_file {
 
 sub ___Do_filter_nroff {
   my $self = shift;
-  my @data = split /\n{2,}/, shift;
+  my @data = split m/\n{2,}/, shift;
   
   shift @data while @data and $data[0] !~ m/\S/; # Go to header
   shift @data if @data and $data[0] =~ m/Contributed\s+Perl/; # Skip header

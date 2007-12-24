@@ -91,7 +91,7 @@ ok( setgrent(), 'setgrent' ) || print "# $!\n";
 while ( ~< *GR) {
     chomp;
     # LIMIT -1 so that groups with no users don't fall off
-    my @s = split /:/, $_, -1;
+    my @s = split m/:/, $_, -1;
     my ($name_s,$passwd_s,$gid_s,$members_s) = @s;
     if (@s) {
 	push @{ $seen{$name_s} }, $.;

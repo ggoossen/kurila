@@ -195,7 +195,7 @@ sub ParseCONFIG
 	next if m/^\s*$/ or m/^\s*#/ ;
 	s/\s*#\s*$// ;
 
-	($k, $v) = split(/\s+=\s+/, $_, 2) ;
+	($k, $v) = split(m/\s+=\s+/, $_, 2) ;
 	$k = uc $k ;
 	if ($ValidOption{$k}) {
 	    delete $Parsed{$k} ;

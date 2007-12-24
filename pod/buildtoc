@@ -31,6 +31,7 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst");
      podmak => File::Spec->catdir($Up, "win32", "pod.mak"),
      # plan9 =>  File::Spec->catdir($Up, "plan9", "mkfile"),
      unix => File::Spec->catdir($Up, "Makefile.SH"),
+     # TODO: add roffitall
     );
 
 {
@@ -274,7 +275,7 @@ close MASTER;
   }
 }
 
-# OK. Now a lot of ancillay function definitions follow
+# OK. Now a lot of ancillary function definitions follow
 # Main program returns at "Do stuff"
 
 sub path2modname {
@@ -383,6 +384,8 @@ sub podset {
 	    unhead1();
 	    output "\n \n\n=head2 ";
 	    $_ = ~< *ARGV;
+	    # Remove svn keyword expansions from the Perl FAQ
+	    s/ \(\$Revision: \d+ \$\)//g;
 	    if ( m/^\s*$pod\b/ ) {
 		s/$pod\.pm/$pod/;       # '.pm' in NAME !?
 		output $_;
@@ -458,7 +461,7 @@ my $NEWLINE = 0;	# how many newlines have we seen recently
 my $LINE;		# what remains to be printed
 
 sub output ($) {
-    for (split /(\n)/, shift) {
+    for (split m/(\n)/, shift) {
 	if ($_ eq "\n") {
 	    if ($LINE) {
 		print OUT wrap('', '', $LINE);
@@ -541,7 +544,7 @@ sub generate_descrip_mms_1 {
   local $Text::Wrap::columns = 150;
   my $count = 0;
   my @lines = map {"pod" . $count++ . " = $_"}
-    split /\n/, wrap('', '', join " ", map "[.lib.pods]$_.pod",
+    split m/\n/, wrap('', '', join " ", map "[.lib.pods]$_.pod",
 		     sort keys %Pods, keys %Readmepods);
   @lines, "pod = " . join ' ', map {"\$(pod$_)"} 0 .. $count - 1;
 }
@@ -628,7 +631,7 @@ sub do_perlpod {
 		   )+
 		  }
 	  {$1 . join "", &generate_perlpod}mxe) {
-    die "$0: Failed to insert ammendments in do_perlpod";
+    die "$0: Failed to insert amendments in do_perlpod";
   }
   $pod;
 }

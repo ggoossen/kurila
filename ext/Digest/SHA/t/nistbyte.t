@@ -32,7 +32,7 @@ D87A0EE74E4B9AD72E6847C87BDEEB3D07844380 ^
 F871BCE62436C1E280357416695EE2EF9B83695C ^
 END_OF_NIST_HASHES
 
-my @hashes = $nist_hashes =~ /\b[0-9A-F]{40}\b/g;
+my @hashes = $nist_hashes =~ m/\b[0-9A-F]{40}\b/g;
 
 my $nist_messages = <<END_OF_NIST_MESSAGES;
 0 1 ^
@@ -47,7 +47,7 @@ my $nist_messages = <<END_OF_NIST_MESSAGES;
 15 1 4 6 8 2 1 4 2 5 1 6 8 8 6 4 7 ^
 END_OF_NIST_MESSAGES
 
-my @lines = split(/\n/, $nist_messages);
+my @lines = split(m/\n/, $nist_messages);
 
 print "1..", scalar(@hashes), "\n";
 my $testnum = 1;
@@ -55,10 +55,10 @@ my $testnum = 1;
 my $message = "";
 my $sha = $MODULE->new(1);
 for (@lines) {
-	next unless /^[\d ^]/;
+	next unless m/^[\d ^]/;
 	$message .= $_;
-	next unless /\^\s*$/;
-	my @vals = $message =~ /\d+/g; $message = "";
+	next unless m/\^\s*$/;
+	my @vals = $message =~ m/\d+/g; $message = "";
 	my $count = shift(@vals);
 	my $bit = shift(@vals);
 	my $bitstr = "";

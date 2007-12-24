@@ -228,7 +228,7 @@ sub runtests {
         }
 
         my (@warnings, %seen);
-        foreach (split /\n/, $warning) {
+        foreach (split m/\n/, $warning) {
             push @warnings, $_ unless $seen{$_}++;
         }
         $warning = join("\n", @warnings);
@@ -271,7 +271,7 @@ END
   ;
 
     # Test storing and deleting 'foo'
-    push @r, split /\n/, <<"END"
+    push @r, split m/\n/, <<"END"
     $STD_TESTS;
     $FOO_TESTS;
     \$h{foo} = undef;
@@ -290,7 +290,7 @@ END
     my @things = ('boink', 0, 1, '', undef);
     foreach my $key (map { dumped($_) } @things) {
         foreach my $value ((map { dumped($_) } @things), '$ref') {
-            push @r, split /\n/, <<"END"
+            push @r, split m/\n/, <<"END"
             \$h{$key} = $value;
             $STD_TESTS;
             defined \$h{$key};
@@ -308,7 +308,7 @@ END
     
     # Test hash slices
     my @slicetests;
-    @slicetests = split /\n/, <<'END'
+    @slicetests = split m/\n/, <<'END'
     @h{'b'} = ();
     @h{'c'} = ('d');
     @h{'e'} = ('f', 'g');
@@ -321,11 +321,11 @@ END
     my @aaa = @slicetests;
     foreach (@slicetests) {
         push @r, $_;
-        push @r, split(/\n/, $STD_TESTS);
+        push @r, split(m/\n/, $STD_TESTS);
     }
 
     # Test CLEAR
-    push @r, '%h = ();', split(/\n/, $STD_TESTS);
+    push @r, '%h = ();', split(m/\n/, $STD_TESTS);
 
     return @r;
 }

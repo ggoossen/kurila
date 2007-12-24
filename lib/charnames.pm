@@ -129,7 +129,9 @@ sub charnames
       if ($^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my ($script, $cname) = ($1, $2);
 	my $case = $cname =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
-	if ($txt =~ m/\t\t\U$script\E (?:$case )?LETTER \U\Q$cname\E$/m) {
+        my $uc_cname = uc($cname);
+        my $uc_script = uc($script);
+	if ($txt =~ m/\t\t$uc_script (?:$case )?LETTER \Q$uc_cname\E$/m) {
 	  @off = ($-[0], $+[0]);
 	}
       }
@@ -140,7 +142,8 @@ sub charnames
     if (not @off) {
       my $case = $name =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
       for my $script (@{$^H{charnames_scripts}}) {
-	if ($txt =~ m/\t\t$script (?:$case )?LETTER \U\Q$name\E$/m) {
+        my $ucname = uc($name);
+	if ($txt =~ m/\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
 	  @off = ($-[0], $+[0]);
 	  last;
 	}

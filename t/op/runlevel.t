@@ -29,7 +29,7 @@ for (@prgs){
     if (s/^\s*(-\w+)//){
        $switch = $1;
     }
-    my($prog,$expected) = split(/\nEXPECT\n/, $_);
+    my($prog,$expected) = split(m/\nEXPECT\n/, $_);
     open TEST, ">$tmpfile";
     print TEST "$prog\n";
     close TEST or die "Could not close: $!";
@@ -115,7 +115,7 @@ sub TIEHANDLE {
 }
 sub PRINT {
 print STDERR "PRINT CALLED\n";
-(split(/./, 'x'x10000))[0];
+(split(m/./, 'x'x10000))[0];
 eval('die("test\n")');
 }
  
@@ -184,7 +184,7 @@ Can't "goto" out of a pseudo block at - line 2.
 ########
 our %seen = ();
 sub sortfn {
-  (split(/./, 'x'x10000))[0];
+  (split(m/./, 'x'x10000))[0];
   my (@y) = ( 4, 6, 5);
   @y = sort { $a <+> $b } @y;
   my $t = "sortfn ".join(', ', @y)."\n";
@@ -274,7 +274,7 @@ sub FETCH {
   return "fetch";
 }
 sub STORE {
-(split(/./, 'x'x10000))[0];
+(split(m/./, 'x'x10000))[0];
 }
 package main;
 tie our $bar, 'TEST';
@@ -395,7 +395,7 @@ EXPECT
 ########
 sub TIEHANDLE { bless {} }
 sub PRINT { 
-    (split(/./, 'x'x10000))[0];
+    (split(m/./, 'x'x10000))[0];
     eval('die("test\n")');
     warn "[TIE] $_[1]";
 }

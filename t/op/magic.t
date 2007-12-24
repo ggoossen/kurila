@@ -312,7 +312,7 @@ else {
 	if ($^O =~ m/^(linux|freebsd)$/ &&
 	    open CMDLINE, "/proc/$$/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
-	    my $me = (split /\0/, $line)[0];
+	    my $me = (split m/\0/, $line)[0];
 	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');
 	    close CMDLINE;
             # perlbug #22811

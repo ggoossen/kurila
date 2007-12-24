@@ -134,7 +134,7 @@ sub uncolor {
             require Carp;
             Carp::croak ("Bad escape sequence $_");
         }
-        push (@nums, split (/;/, $1));
+        push (@nums, split (m/;/, $1));
     }
     for (@nums) {
 	$_ += 0; # Strip leading zeroes
@@ -171,7 +171,7 @@ sub colored {
         join '',
             map { $_ ne $EACHLINE ? $attr . $_ . "\e[0m" : $_ }
                 grep { length ($_) +> 0 }
-                    split (/(\Q$EACHLINE\E)/, $string);
+                    split (m/(\Q$EACHLINE\E)/, $string);
     } else {
         color (@codes) . $string . "\e[0m";
     }

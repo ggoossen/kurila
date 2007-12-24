@@ -103,7 +103,7 @@ sub walk_table (&@) {
 	    @args = $_;
 	}
 	else {
-	    @args = split /\s*\|\s*/, $_;
+	    @args = split m/\s*\|\s*/, $_;
 	}
 	my @outs = &{$function}(@args);
 	print $F @outs; # $function->(@args) is not 5.003

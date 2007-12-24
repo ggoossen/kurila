@@ -78,7 +78,7 @@ SKIP: {
 $stat[4] = $<;
 
 # this curious mix of spaces and quotes tests a regex at line 79 (version 2.11)
-FileHandle::set_lines(split(/\n/, <<LINES));
+FileHandle::set_lines(split(m/\n/, <<LINES));
 macdef bar
 login	baz
  machine "foo"

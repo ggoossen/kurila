@@ -109,7 +109,7 @@ sub decomposeHangul {
 sub _getHexArray { map hex, $_[0] =~ m/([0-9A-Fa-f]+)/g }
 
 while ($Combin =~ m/(.+)/g) {
-    my @tab = split /\t/, $1;
+    my @tab = split m/\t/, $1;
     my $ini = hex $tab[0];
     if ($tab[1] eq '') {
 	$Combin{ $ini } = $tab[2];
@@ -119,7 +119,7 @@ while ($Combin =~ m/(.+)/g) {
 }
 
 while ($Decomp =~ m/(.+)/g) {
-    my @tab = split /\t/, $1;
+    my @tab = split m/\t/, $1;
     my $compat = $tab[2] =~ s/<[^>]+>//;
     my $dec = [ _getHexArray($tab[2]) ]; # decomposition
     my $ini = hex($tab[0]); # initial decomposable character

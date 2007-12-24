@@ -40,9 +40,9 @@ sub TEST {
   if ($Is_ebcdic) {
       # these data need massaging with non ascii character sets
       # because of hashing order differences
-      $WANT = join("\n",sort(split(/\n/,$WANT)));
+      $WANT = join("\n",sort(split(m/\n/,$WANT)));
       $WANT =~ s/\,$//mg;
-      $t    = join("\n",sort(split(/\n/,$t)));
+      $t    = join("\n",sort(split(m/\n/,$t)));
       $t    =~ s/\,$//mg;
   }
   $name = $name ? " - $name" : '';
@@ -67,9 +67,9 @@ sub TEST {
       if ($WANT =~ m/deadbeef/);
   if ($Is_ebcdic) {
       # here too there are hashing order differences
-      $WANT = join("\n",sort(split(/\n/,$WANT)));
+      $WANT = join("\n",sort(split(m/\n/,$WANT)));
       $WANT =~ s/\,$//mg;
-      $t    = join("\n",sort(split(/\n/,$t)));
+      $t    = join("\n",sort(split(m/\n/,$t)));
       $t    =~ s/\,$//mg;
   }
   print( ($t eq $WANT and not $@) ? "ok $TNUM\n"

@@ -11,7 +11,7 @@
 	/(?=a)?/
 
   %.*s matches null string many times   	[S_regpiece]
-	$a = "ABC123" ; $a =~ /(?=a)*/'
+	$a = "ABC123" ; $a =~ m/(?=a)*/'
 
   /%.127s/: Unrecognized escape \\%c passed through	[S_regatom] 
   	$x = '\m' ; /$x/
@@ -37,29 +37,29 @@ __END__
 # regcomp.c [S_regpiece]
 use warnings 'regexp' ;
 my $a = "ABC123" ; 
-$a =~ /(?=a)*/ ;
+$a =~ m/(?=a)*/ ;
 no warnings 'regexp' ;
-$a =~ /(?=a)*/ ;
+$a =~ m/(?=a)*/ ;
 EXPECT
 (?=a)* matches null string many times in regex; marked by <-- HERE in m/(?=a)* <-- HERE / at - line 4.
 ########
 # regcomp.c [S_regatom]
 $x = '\m' ;
 use warnings 'regexp' ;
-$a =~ /a$x/ ;
+$a =~ m/a$x/ ;
 no warnings 'regexp' ;
-$a =~ /a$x/ ;
+$a =~ m/a$x/ ;
 EXPECT
 Unrecognized escape \m passed through in regex; marked by <-- HERE in m/a\m <-- HERE / at - line 4.
 ########
 # regcomp.c [S_regatom]
 # The \q should warn, the \_ should NOT warn.
 use warnings 'regexp';
-"foo" =~ /\q/;
-"bar" =~ /\_/;
+"foo" =~ m/\q/;
+"bar" =~ m/\_/;
 no warnings 'regexp';
-"foo" =~ /\q/;
-"bar" =~ /\_/;
+"foo" =~ m/\q/;
+"bar" =~ m/\_/;
 EXPECT
 Unrecognized escape \q passed through in regex; marked by <-- HERE in m/\q <-- HERE / at - line 4.
 ########
@@ -67,11 +67,11 @@ Unrecognized escape \q passed through in regex; marked by <-- HERE in m/\q <-- H
 #
 use warnings 'regexp' ;
 $_ = "" ;
-/[:alpha:]/;
-/[:zog:]/;
+m/[:alpha:]/;
+m/[:zog:]/;
 no warnings 'regexp' ;
-/[:alpha:]/;
-/[:zog:]/;
+m/[:alpha:]/;
+m/[:zog:]/;
 EXPECT
 POSIX syntax [: :] belongs inside character classes in regex; marked by <-- HERE in m/[:alpha:] <-- HERE / at - line 5.
 POSIX syntax [: :] belongs inside character classes in regex; marked by <-- HERE in m/[:zog:] <-- HERE / at - line 6.
@@ -80,9 +80,9 @@ POSIX syntax [: :] belongs inside character classes in regex; marked by <-- HERE
 #
 use warnings 'regexp' ;
 $_ = "" ;
-/[.zog.]/;
+m/[.zog.]/;
 no warnings 'regexp' ;
-/[.zog.]/;
+m/[.zog.]/;
 EXPECT
 POSIX syntax [. .] belongs inside character classes in regex; marked by <-- HERE in m/[.zog.] <-- HERE / at - line 5.
 POSIX syntax [. .] is reserved for future extensions in regex; marked by <-- HERE in m/[.zog.] <-- HERE / at - line 5.
@@ -90,25 +90,25 @@ POSIX syntax [. .] is reserved for future extensions in regex; marked by <-- HER
 # regcomp.c [S_regclass]
 $_ = "";
 use warnings 'regexp' ;
-/[a-b]/;
-/[a-\d]/;
-/[\d-b]/;
-/[\s-\d]/;
-/[\d-\s]/;
-/[a-[:digit:]]/;
-/[[:digit:]-b]/;
-/[[:alpha:]-[:digit:]]/;
-/[[:digit:]-[:alpha:]]/;
+m/[a-b]/;
+m/[a-\d]/;
+m/[\d-b]/;
+m/[\s-\d]/;
+m/[\d-\s]/;
+m/[a-[:digit:]]/;
+m/[[:digit:]-b]/;
+m/[[:alpha:]-[:digit:]]/;
+m/[[:digit:]-[:alpha:]]/;
 no warnings 'regexp' ;
-/[a-b]/;
-/[a-\d]/;
-/[\d-b]/;
-/[\s-\d]/;
-/[\d-\s]/;
-/[a-[:digit:]]/;
-/[[:digit:]-b]/;
-/[[:alpha:]-[:digit:]]/;
-/[[:digit:]-[:alpha:]]/;
+m/[a-b]/;
+m/[a-\d]/;
+m/[\d-b]/;
+m/[\s-\d]/;
+m/[\d-\s]/;
+m/[a-[:digit:]]/;
+m/[[:digit:]-b]/;
+m/[[:alpha:]-[:digit:]]/;
+m/[[:digit:]-[:alpha:]]/;
 EXPECT
 False [] range "a-\d" in regex; marked by <-- HERE in m/[a-\d <-- HERE ]/ at - line 5.
 False [] range "\d-" in regex; marked by <-- HERE in m/[\d- <-- HERE b]/ at - line 6.
@@ -129,25 +129,25 @@ BEGIN {
 use utf8;
 $_ = "";
 use warnings 'regexp' ;
-/[a-b]/;
-/[a-\d]/;
-/[\d-b]/;
-/[\s-\d]/;
-/[\d-\s]/;
-/[a-[:digit:]]/;
-/[[:digit:]-b]/;
-/[[:alpha:]-[:digit:]]/;
-/[[:digit:]-[:alpha:]]/;
+m/[a-b]/;
+m/[a-\d]/;
+m/[\d-b]/;
+m/[\s-\d]/;
+m/[\d-\s]/;
+m/[a-[:digit:]]/;
+m/[[:digit:]-b]/;
+m/[[:alpha:]-[:digit:]]/;
+m/[[:digit:]-[:alpha:]]/;
 no warnings 'regexp' ;
-/[a-b]/;
-/[a-\d]/;
-/[\d-b]/;
-/[\s-\d]/;
-/[\d-\s]/;
-/[a-[:digit:]]/;
-/[[:digit:]-b]/;
-/[[:alpha:]-[:digit:]]/;
-/[[:digit:]-[:alpha:]]/;
+m/[a-b]/;
+m/[a-\d]/;
+m/[\d-b]/;
+m/[\s-\d]/;
+m/[\d-\s]/;
+m/[a-[:digit:]]/;
+m/[[:digit:]-b]/;
+m/[[:alpha:]-[:digit:]]/;
+m/[[:digit:]-[:alpha:]]/;
 EXPECT
 False [] range "a-\d" in regex; marked by <-- HERE in m/[a-\d <-- HERE ]/ at - line 12.
 False [] range "\d-" in regex; marked by <-- HERE in m/[\d- <-- HERE b]/ at - line 13.

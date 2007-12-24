@@ -52,7 +52,7 @@ if ("$static,$dynamic" eq "0,0") {
   ($static,$dynamic) = (1,1);
 }
 if ($opts{'list-static-libs'} || $opts{'create-perllibst-h'}) {
-  my @statics = split /\s+/, $Config{static_ext};
+  my @statics = split m/\s+/, $Config{static_ext};
   if ($opts{'create-perllibst-h'}) {
     open my $fh, ">perllibst.h"
         or die "Failed to write to perllibst.h:$!";
@@ -67,7 +67,7 @@ if ($opts{'list-static-libs'} || $opts{'create-perllibst-h'}) {
     my %extralibs;
     for (@statics) {
       open my $fh, "<..\\lib\\auto\\$_\\extralibs.ld" or die "can't open <..\\lib\\auto\\$_\\extralibs.ld: $!";
-      $extralibs{$_}++ for grep {m/\S/} split /\s+/, join '', ~< $fh;
+      $extralibs{$_}++ for grep {m/\S/} split m/\s+/, join '', ~< $fh;
     }
     print map {s|/|\\|g;m|([^\\]+)$|;"..\\lib\\auto\\$_\\$1$Config{_a} "} @statics;
     print map {"$_ "} sort keys %extralibs;

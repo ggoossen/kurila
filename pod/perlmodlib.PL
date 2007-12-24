@@ -49,7 +49,7 @@ for (@MANIFEST) {
      $perlname =~ s!\b(\w+)/\1\b!$1!;
      $perlname =~ s!/!::!g;
 
-     ($name, $thing) = split / --? /, $title, 2;
+     ($name, $thing) = split m/ --? /, $title, 2;
 
      unless ($name and $thing) {
 	 warn "$filename missing name\n"  unless $name;
