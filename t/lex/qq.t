@@ -54,6 +54,10 @@ is ("\x{6FQ}z", chr (111) . 'z');
 is ("\x{0x4E}", chr 0);
 is ("\x{x4E}", chr 0);
 
+is("\x[65]", chr 101);
+is("\x[FF]", bytes::chr(0xFF));
+is("\x[%02X]", chr 0);
+
 {
   use utf8;
   is ("\x{0065}", chr 101);
@@ -66,9 +70,6 @@ is ("\x{x4E}", chr 0);
   use charnames ':full';
   is ("\N{LATIN SMALL LETTER A}", "a");
   is ("\N{NEL}", chr 0x85);
-  
-  is("\x[65]", chr 101);
-  is("\x[FF]", bytes::chr(0xFF));
 }
 
 # variable interpolation
