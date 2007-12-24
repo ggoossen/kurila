@@ -3036,13 +3036,13 @@ t/mro/vulcan_c3.t		mro tests
 t/mro/vulcan_dfs.t		mro tests
 Todo.micro			The Wishlist for microperl
 toke.c				The tokener
-t/op/64bitint.t			See if 64 bit integers work
+t/arch/64bitint.t			See if 64 bit integers work
 t/op/alarm.t			See if alarm works
-t/op/anonsub.t			See if anonymous subroutines work
+t/sv/anonsub.t			See if anonymous subroutines work
 t/op/append.t			See if . works
 t/op/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
-t/op/array.t			See if array operations work
+t/sv/array.t			See if array operations work
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
 t/op/attrs.t			See if attributes on declarations work
 t/op/auto.t			See if autoincrement et all work
@@ -3052,7 +3052,7 @@ t/op/blocks.t			See if BEGIN and friends work
 t/op/bop.t			See if bitops work
 t/op/caller.pl			Tests shared between caller.t and XS op.t
 t/op/caller.t			See if caller() works
-t/op/chars.t			See if character escapes work
+t/lex/chars.t			See if character escapes work
 t/op/chdir.t			See if chdir works
 t/op/chop.t			See if chop works
 t/op/chr.t			See if chr works
@@ -3086,9 +3086,9 @@ t/op/goto_xs.t			See if "goto &sub" works on XSUBs
 t/op/grent.t			See if getgr*() functions work
 t/op/grep.t			See if grep() and map() work
 t/op/groups.t			See if $( works
-t/op/gv.t			See if typeglobs work
+t/sv/gv.t			See if typeglobs work
 t/op/hashassign.t		See if hash assignments work
-t/op/hash.t			See if the complexity attackers are repelled
+t/sv/hash.t			See if the complexity attackers are repelled
 t/op/hashwarn.t			See if warnings for bad hash assignments work
 t/op/inccode.t			See if coderefs work in @INC
 t/op/inccode-tie.t		See if tie to @INC works
