@@ -1293,7 +1293,7 @@ S_force_next(pTHX_ I32 type)
 #ifdef DEBUGGING
     if (DEBUG_T_TEST) {
         PerlIO_printf(Perl_debug_log, "### forced token:\n");
-	tokereport(THING, &NEXTVAL_NEXTTOKE);
+	tokereport(type, &NEXTVAL_NEXTTOKE);
     }
 #endif
 #ifdef PERL_MAD
@@ -2123,6 +2123,12 @@ S_scan_const(pTHX_ char *start)
 		break;		/* in regexp, $ might be tail anchor */
 	}
 
+	/* embedded code */
+	if (*s == '{' && ! PL_lex_inpat) {
+	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), "{ encountered");
+	    break;
+	}
+
 	/* End of else if chain - OP_TRANS rejoin rest */
 
 	/* backslashes */
@@ -2221,9 +2227,6 @@ S_scan_const(pTHX_ char *start)
     } else
 	SvREFCNT_dec(sv);
 
-/*     if ( has_utf8 && ! in_codepoints && ! PL_encoding ) */
-/* 	Perl_warner(aTHX_ packWARN(WARN_MISC), */
-/* 		    "utf8 found, but not 'use utf8'"); */
     return s;
 }
 
@@ -2627,13 +2630,10 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 	yyerror(Perl_form(aTHX_ "\"%s\" not allowed in expression",
 		    is_use ? "use" : "no"));
     s = SKIPSPACE1(s);
-    if (isDIGIT(*s) || (*s == 'v' && isDIGIT(s[1]))) {
+    if (isDIGIT(*s) || (*s == 'v' && isDIGIT(s[1])))
 	yyerror(Perl_form(aTHX_ "use VERSION is not valid in Perl Kurila (this is probably Perl 5 code)"));
-    }
-    else {
-	s = force_word(s,WORD,FALSE,TRUE,FALSE);
-	s = force_version(s);
-    }
+    s = force_word(s,WORD,FALSE,TRUE,FALSE);
+    s = force_version(s);
     yylval.ival = is_use;
     return s;
 }
@@ -2869,6 +2869,20 @@ Perl_yylex(pTHX)
 	    return REPORT(sublex_done());
 	DEBUG_T({ PerlIO_printf(Perl_debug_log,
               "### Interpolated variable\n"); });
+	if (*PL_bufptr == '{') {
+	    PL_lex_state = LEX_INTERPNORMAL;
+	    PL_expect = XREF;
+
+	    start_force(PL_curforce);
+	    NEXTVAL_NEXTTOKE.ival = 0;
+	    force_next(DO);
+
+	    if (PL_lex_starts++)
+		Aop(OP_CONCAT);
+
+	    return yylex();
+	}
+
 	PL_expect = XTERM;
 	PL_lex_dojoin = (*PL_bufptr == '@');
 	PL_lex_state = LEX_INTERPNORMAL;
@@ -4486,7 +4500,7 @@ Perl_yylex(pTHX)
 	/* FIXME. I think that this can be const if char *d is replaced by
 	   more localised variables.  */
 	for (d = SvPV(PL_lex_stuff.str_sv, len); len; len--, d++) {
-	    if (*d == '$' || *d == '@' || *d == '\\' || !UTF8_IS_INVARIANT(*d)) {
+	    if (*d == '{' || *d == '$' || *d == '@' || *d == '\\' || !UTF8_IS_INVARIANT(*d)) {
 		yylval.ival = OP_STRINGIFY;
 		break;
 	    }
