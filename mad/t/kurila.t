@@ -610,6 +610,9 @@ $a =~ m**;
 $a =~ m//;
 $a =~ m**;
 ====
+split //, "foo";
+----
+split m//, "foo";
 END
 }
 
@@ -677,4 +680,5 @@ sub t_anon_hash {
 <>;
 ====
 END
+
 }
