@@ -538,7 +538,7 @@ sub lvalue_subs {
 <<<<<<< HEAD:mad/p5kurila.pl
 sub force_m {
     my $xml = shift;
-    for my $op ($xml->findnodes(qq|//op_match|)) {
+    for my $op ($xml->findnodes(qq|//op_match|), $xml->findnodes(qq|//op_pushre|)) {
         next unless get_madprop($op, "quote_open") eq "/";
         set_madprop($op, quote_open => "m/");
     }
