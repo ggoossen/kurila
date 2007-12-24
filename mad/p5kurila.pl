@@ -535,6 +535,7 @@ sub lvalue_subs {
     }
 }
 
+<<<<<<< HEAD:mad/p5kurila.pl
 sub force_m {
     my $xml = shift;
     for my $op ($xml->findnodes(qq|//op_match|)) {
@@ -562,6 +563,7 @@ sub rename_pointy_ops {
         next unless get_madprop($op, "operator") =~ m/^[<>]/;
         set_madprop($op, operator => '+' . get_madprop($op, "operator") );
     }
+
     # rename '<=>' to '<+>'
     for my $op (map { $xml->findnodes("//$_") } qw|op_ncmp op_i_ncmp|) {
         next unless get_madprop($op, "operator") eq "&lt;=&gt;";
@@ -569,9 +571,33 @@ sub rename_pointy_ops {
     }
 }
 
+sub qq_block_escape {
+    my $op = shift;
+
+    for my $prop (qw|assign value|) {
+        my $v = get_madprop($op, $prop);
+        next unless $v;
+        $v =~ s/([}{])/\\$1/g;
+        set_madprop($op, $prop, $v);
+    }
+    for my $child ($op->children) {
+        next if $child->tag eq "madprops";
+        qq_block_escape($child);
+    }
+}
+
+sub qq_block {
+    # escape '{' and '}' inside a double quoted string
+    my $xml = shift;
+    for my $mad_quote ($xml->findnodes(qq|//madprops/mad_null_type_first[\@val="quote"]|)) {
+        my $op = $mad_quote->parent->parent;
+        next unless get_madprop($op, "quote_open") =~ m/^(&#34;|&lt;&lt;[^'])/;
+        qq_block_escape($op);
+    }
+}
+
 sub pointy_anon_hash {
     my $xml = shift;
-
     for my $op ($xml->findnodes(qq|//op_anonhash|)) {
         next unless get_madprop($op, "curly_open");
         set_madprop($op, "curly_open" => '&lt;');
@@ -627,9 +653,10 @@ if ($from < 1.6 - 0.05) {
     lvalue_subs( $twig );
 }
 
-rename_pointy_ops( $twig );
+#rename_pointy_ops( $twig );
 #pointy_anon_hash( $twig );
 force_m( $twig );
+qq_block( $twig );
 
 # print
 $twig->print( pretty_print => 'indented' );

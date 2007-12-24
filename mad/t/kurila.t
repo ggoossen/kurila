@@ -31,8 +31,9 @@ sub p5convert {
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
-t_force_m();
+t_string_block();
 die;
+t_force_m();
 t_pointy_op();
 t_lvalue_subs();
 t_use_pkg_version();
@@ -675,6 +676,29 @@ sub t_anon_hash {
 {};
 ----
 <>;
+====
+END
+}
+
+sub t_string_block {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+"foo { ";
+'foo { ';
+----
+"foo \{ ";
+'foo { ';
+====
+<<"FOO";
+{
+FOO
+----
+<<"FOO";
+\{
+FOO
+====
+"\$ {"
+----
+"\$ \{"
 ====
 END
 }
