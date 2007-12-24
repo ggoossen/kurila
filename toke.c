@@ -1760,16 +1760,24 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	++s;
 	if (*s == '[') {
 	    /* \x[XX] insert byte XX */
-	    char *orgd = d;
+	    char *const orgd = d;
+	    char *const e = strchr(s, ']');
 	    s++;
-	    while ( *s != ']' ) {
+	    if (!e) {
+		Perl_croak("Missing right square bracket on \\x[]");
+	    }
+	    while ( s + 2 <= e ) {
 		STRLEN len = 2;
 		I32 flags = PERL_SCAN_DISALLOW_PREFIX;
 		uv = grok_hex(s, &len, &flags, NULL);
-		s += len;
+		s += 2;
 		*d++ = (char)uv;
-		if (s >= send)
-		    Perl_croak("Missing right square bracket on \\x[]");
+	    }
+	    if (s + 1 == e) {
+		if (ckWARN(WARN_DIGIT))
+		    Perl_warner(aTHX_ packWARN(WARN_DIGIT),
+				"single hexadecimal digit '%c' ignored", *s);
+		s++;
 	    }
 	    s += 1;
 	    *l = d - orgd;

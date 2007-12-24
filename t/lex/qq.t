@@ -56,7 +56,9 @@ is ("\x{x4E}", chr 0);
 
 is("\x[65]", chr 101);
 is("\x[FF]", bytes::chr(0xFF));
-is("\x[%02X]", chr 0);
+is("\x[%0]", chr 0);
+is("\x[9]", '');
+is("\x[FF9]", "\x[FF]");
 
 {
   use utf8;
