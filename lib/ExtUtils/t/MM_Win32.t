@@ -15,7 +15,7 @@ use strict;
 use Test::More;
 
 BEGIN {
-	if ($^O =~ /MSWin32/i) {
+	if ($^O =~ m/MSWin32/i) {
 		plan tests => 41;
 	} else {
 		plan skip_all => 'This is not Win32';

@@ -46,7 +46,7 @@ sub Mksymlists {
 #    not as pseudo-builtin.
 #    require DynaLoader;
     if (defined &DynaLoader::mod2fname and not $spec{DLBASE}) {
-        $spec{DLBASE} = DynaLoader::mod2fname([ split(/::/,$spec{NAME}) ]);
+        $spec{DLBASE} = DynaLoader::mod2fname([ split(m/::/,$spec{NAME}) ]);
     }
 
     if    ($osname eq 'aix') { _write_aix(\%spec); }

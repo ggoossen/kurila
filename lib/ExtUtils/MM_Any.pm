@@ -206,7 +206,7 @@ sub echo {
     $appending ||= 0;
 
     my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) } 
-               split /\n/, $text;
+               split m/\n/, $text;
     if( $file ) {
         my $redirect = $appending ? '>>' : '>';
         $cmds[0] .= " $redirect $file";
@@ -449,7 +449,7 @@ clean :: clean_subdirs
         # Use @dirs because we don't know what's in here.
         push @dirs, ref $attribs{FILES}                ?
                         @{$attribs{FILES}}             :
-                        split /\s+/, $attribs{FILES}   ;
+                        split m/\s+/, $attribs{FILES}   ;
     }
 
     push(@files, qw[$(MAKE_APERL_FILE) 
@@ -824,7 +824,7 @@ sub realclean {
             push @dirs, @{ $attribs{FILES} };
         }
         else {
-            push @dirs, split /\s+/, $attribs{FILES};
+            push @dirs, split m/\s+/, $attribs{FILES};
         }
     }
 
@@ -1030,7 +1030,7 @@ sub init_INST {
 	}
     }
 
-    my @parentdir = split(/::/, $self->{PARENT_NAME});
+    my @parentdir = split(m/::/, $self->{PARENT_NAME});
     $self->{INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     @parentdir);
     $self->{INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', @parentdir);
     $self->{INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto', 

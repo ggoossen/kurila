@@ -43,7 +43,7 @@ UNITCHECK {print ":u1"}
 eval 'BEGIN {print ":b5"}';
 eval 'UNITCHECK {print ":u2"}';
 eval 'UNITCHECK {print ":u3"; UNITCHECK {print ":u4"}}';
-"a" =~ /(?{UNITCHECK {print ":u5"};
+"a" =~ m/(?{UNITCHECK {print ":u5"};
 	   CHECK {print ":c2"};
 	   BEGIN {print ":b6"}})/x;
 eval {BEGIN {print ":b7"}};

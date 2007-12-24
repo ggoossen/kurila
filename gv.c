@@ -213,7 +213,8 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
     dVAR;
     const U32 old_type = SvTYPE(gv);
     const bool doproto = old_type > SVt_NULL;
-    const char * const proto = (doproto && SvPOK(gv)) ? SvPVX_const(gv) : NULL;
+    char * const proto = (doproto && SvPOK(gv)) ? SvPVX(gv) : NULL;
+    const STRLEN protolen = proto ? SvCUR(gv) : 0;
     SV *const has_constant = doproto && SvROK(gv) ? SvRV(gv) : NULL;
     const U32 exported_constant = has_constant ? SvPCS_IMPORTED(gv) : 0;
 
@@ -279,8 +280,8 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	CvFILE_set_from_cop(GvCV(gv), PL_curcop);
 	CvSTASH(GvCV(gv)) = PL_curstash;
 	if (proto) {
-	    sv_setpv((SV*)GvCV(gv), proto);
-	    Safefree(proto);
+	    sv_usepvn_flags((SV*)GvCV(gv), proto, protolen,
+			    SV_HAS_TRAILING_NUL);
 	}
     }
 }
@@ -1868,7 +1869,7 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
     PUSHs(lr>0? left: right);
     PUSHs( lr > 0 ? &PL_sv_yes : ( assign ? &PL_sv_undef : &PL_sv_no ));
     if (notfound) {
-      PUSHs( sv_2mortal(newSVpv(AMG_id2name(method + assignshift),0)));
+	PUSHs( sv_2mortal(newSVpv(AMG_id2name(method + assignshift), 0)));
     }
     PUSHs((SV*)cv);
     PUTBACK;

@@ -219,14 +219,14 @@ sub size {
       unless $ftp->_STAT($file) && (@msg = $ftp->message) == 3;
     my $line;
     foreach $line (@msg) {
-      return (split(/\s+/, $line))[4]
+      return (split(m/\s+/, $line))[4]
         if $line =~ m/^[-rwxSsTt]{10}/;
     }
   }
   else {
     my @files = $ftp->dir($file);
     if (@files) {
-      return (split(/\s+/, $1))[4]
+      return (split(m/\s+/, $1))[4]
         if $files[0] =~ m/^([-rwxSsTt]{10}.*)$/;
     }
   }
@@ -804,7 +804,7 @@ sub port {
 
     my $listen = ${*$ftp}{'net_ftp_listen'};
 
-    my ($myport, @myaddr) = ($listen->sockport, split(/\./, $listen->sockhost));
+    my ($myport, @myaddr) = ($listen->sockport, split(m/\./, $listen->sockhost));
 
     $port = join(',', @myaddr, $myport >> 8, $myport ^&^ 0xff);
 
@@ -858,7 +858,7 @@ sub supported {
   if ($text =~ m/following\s+commands/i) {
     $text =~ s/^.*\n//;
     while ($text =~ m/(\*?)(\w+)(\*?)/sg) {
-      $hash->{"\U$2"} = !length("$1$3");
+      $hash->{uc "$2"} = !length("$1$3");
     }
   }
   else {
@@ -923,7 +923,7 @@ sub _dataconn {
   delete ${*$ftp}{'net_ftp_dataconn'};
 
   if (defined ${*$ftp}{'net_ftp_pasv'}) {
-    my @port = map { 0 + $_ } split(/,/, ${*$ftp}{'net_ftp_pasv'});
+    my @port = map { 0 + $_ } split(m/,/, ${*$ftp}{'net_ftp_pasv'});
 
     $data = $pkg->new(
       PeerAddr  => join(".", @port[0 .. 3]),
@@ -972,7 +972,7 @@ sub _list_cmd {
     $buf .= $databuf;
   }
 
-  my $list = [split(/\n/, $buf)];
+  my $list = [split(m/\n/, $buf)];
 
   $data->close();
 

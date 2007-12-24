@@ -204,7 +204,7 @@ Perl_sys_init3(int* argc, char*** argv, char*** env)
 }
 
 void
-Perl_sys_term(pTHX)
+Perl_sys_term()
 {
     dVAR;
     if (!PL_veto_cleanup) {
@@ -1693,7 +1693,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #ifdef USE_SITECUSTOMIZE
     bool minus_f = FALSE;
 #endif
-    SV *linestr_sv = newSV_type(SVt_PVIV);
+    SV *linestr_sv = newSV_type(SVt_PV);
     bool add_read_e_script = FALSE;
 
     SvGROW(linestr_sv, 80);
@@ -1905,7 +1905,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
 			     "@env = map { \"$_=\\\"$ENV{$_}\\\"\" } "
-			     "sort grep {/^PERL/} keys %ENV; ");
+			     "sort grep {m/^PERL/} keys %ENV; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
 			     "push @env, \"CYGWIN=\\\"$ENV{CYGWIN}\\\"\";");
@@ -3055,7 +3055,7 @@ Perl_moreswitches(pTHX_ const char *s)
 		sv_catpvn(sv, start, s-start);
 		/* Don't use NUL as q// delimiter here, this string goes in the
 		 * environment. */
-		Perl_sv_catpvf(aTHX_ sv, " split(/,/,q{%s});", ++s);
+		Perl_sv_catpvf(aTHX_ sv, " split(m/,/,q{%s});", ++s);
 	    }
 	    s = end;
 	    my_setenv("PERL5DB", SvPV_nolen_const(sv));
@@ -3185,7 +3185,7 @@ Perl_moreswitches(pTHX_ const char *s)
 			       s[-1]);
 		sv_catpvn(sv, start, s-start);
 		/* Use NUL as q''-delimiter.  */
-		sv_catpvs(sv, " split(/,/,q\0");
+		sv_catpvs(sv, " split(m/,/,q\0");
 		++s;
 		sv_catpvn(sv, s, end - s);
 		sv_catpvs(sv,  "\0)");

@@ -73,8 +73,8 @@ A metacharacter can be matched by putting a backslash before it:
 
     "2+2=4" =~ /2+2/;    # doesn't match, + is a metacharacter
     "2+2=4" =~ /2\+2/;   # matches, \+ is treated like an ordinary +
-    'C:\WIN32' =~ /C:\\WIN/;                       # matches
-    "/usr/bin/perl" =~ /\/usr\/bin\/perl/;  # matches
+    'C:\WIN32' =~ m/C:\\WIN/;                       # matches
+    "/usr/bin/perl" =~ m/\/usr\/bin\/perl/;  # matches
 
 In the last regex, the forward slash C<'/'> is also backslashed,
 because it is used to delimit the regex.
@@ -86,14 +86,14 @@ escape sequences, e.g., C<\033>, or hexadecimal escape sequences,
 e.g., C<\x1B>:
 
     "1000\t2000" =~ m(0\t2)        # matches
-    "cat"        =~ /\143\x61\x74/ # matches, but a weird way to spell cat
+    "cat"        =~ m/\143\x61\x74/ # matches, but a weird way to spell cat
 
 Regexes are treated mostly as double quoted strings, so variable
 substitution works:
 
     $foo = 'house';
-    'cathouse' =~ /cat$foo/;   # matches
-    'housecat' =~ /${foo}cat/; # matches
+    'cathouse' =~ m/cat$foo/;   # matches
+    'housecat' =~ m/${foo}cat/; # matches
 
 With all of the regexes above, if the regex matched anywhere in the
 string, it was considered a match.  To specify I<where> it should
@@ -102,11 +102,11 @@ anchor C<^> means match at the beginning of the string and the anchor
 C<$> means match at the end of the string, or before a newline at the
 end of the string.  Some examples:
 
-    "housekeeper" =~ /keeper/;         # matches
-    "housekeeper" =~ /^keeper/;        # doesn't match
-    "housekeeper" =~ /keeper$/;        # matches
-    "housekeeper\n" =~ /keeper$/;      # matches
-    "housekeeper" =~ /^housekeeper$/;  # matches
+    "housekeeper" =~ m/keeper/;         # matches
+    "housekeeper" =~ m/^keeper/;        # doesn't match
+    "housekeeper" =~ m/keeper$/;        # matches
+    "housekeeper\n" =~ m/keeper$/;      # matches
+    "housekeeper" =~ m/^housekeeper$/;  # matches
 
 =head2 Using character classes
 
@@ -117,7 +117,7 @@ characters to be possibly matched inside.  Here are some examples:
 
     /cat/;            # matches 'cat'
     /[bcr]at/;        # matches 'bat', 'cat', or 'rat'
-    "abc" =~ /[cab]/; # matches 'a'
+    "abc" =~ m/[cab]/; # matches 'a'
 
 In the last statement, even though C<'c'> is the first character in
 the class, the earliest point at which the regex can match is C<'a'>.
@@ -222,9 +222,9 @@ The S<B<word anchor> > C<\b> matches a boundary between a word
 character and a non-word character C<\w\W> or C<\W\w>:
 
     $x = "Housecat catenates house and cat";
-    $x =~ /\bcat/;  # matches cat in 'catenates'
-    $x =~ /cat\b/;  # matches cat in 'housecat'
-    $x =~ /\bcat\b/;  # matches 'cat' at end of string
+    $x =~ m/\bcat/;  # matches cat in 'catenates'
+    $x =~ m/cat\b/;  # matches cat in 'housecat'
+    $x =~ m/\bcat\b/;  # matches 'cat' at end of string
 
 In the last example, the end of the string is considered a word
 boundary.
@@ -240,14 +240,14 @@ C<dog> doesn't match, perl will then try the next alternative, C<cat>.
 If C<cat> doesn't match either, then the match fails and perl moves to
 the next position in the string.  Some examples:
 
-    "cats and dogs" =~ /cat|dog|bird/;  # matches "cat"
-    "cats and dogs" =~ /dog|cat|bird/;  # matches "cat"
+    "cats and dogs" =~ m/cat|dog|bird/;  # matches "cat"
+    "cats and dogs" =~ m/dog|cat|bird/;  # matches "cat"
 
 Even though C<dog> is the first alternative in the second regex,
 C<cat> is able to match earlier in the string.
 
-    "cats"          =~ /c|ca|cat|cats/; # matches "c"
-    "cats"          =~ /cats|cat|ca|c/; # matches "cats"
+    "cats"          =~ m/c|ca|cat|cats/; # matches "c"
+    "cats"          =~ m/cats|cat|ca|c/; # matches "cats"
 
 At a given character position, the first alternative that allows the
 regex match to succeed will be the one that matches. Here, all the
@@ -268,7 +268,7 @@ are
     /house(cat(s|)|)/;  # matches either 'housecats' or 'housecat' or
                         # 'house'.  Note groups can be nested.
 
-    "20" =~ /(19|20|)\d\d/;  # matches the null alternative '()\d\d',
+    "20" =~ m/(19|20|)\d\d/;  # matches the null alternative '()\d\d',
                              # because '20\d\d' can't match
 
 =head2 Extracting matches
@@ -279,7 +279,7 @@ matched inside goes into the special variables C<$1>, C<$2>, etc.
 They can be used just as ordinary variables:
 
     # extract hours, minutes, seconds
-    $time =~ /(\d\d):(\d\d):(\d\d)/;  # match hh:mm:ss format
+    $time =~ m/(\d\d):(\d\d):(\d\d)/;  # match hh:mm:ss format
     $hours = $1;
     $minutes = $2;
     $seconds = $3;
@@ -287,7 +287,7 @@ They can be used just as ordinary variables:
 In list context, a match C</regex/> with groupings will return the
 list of matched values C<($1,$2,...)>.  So we could rewrite it as
 
-    ($hours, $minutes, $second) = ($time =~ /(\d\d):(\d\d):(\d\d)/);
+    ($hours, $minutes, $second) = ($time =~ m/(\d\d):(\d\d):(\d\d)/);
 
 If the groupings in a regex are nested, C<$1> gets the group with the
 leftmost opening parenthesis, C<$2> the next opening parenthesis,
@@ -348,15 +348,15 @@ Here are some examples:
     /[a-z]+\s+\d*/;  # match a lowercase word, at least some space, and
                      # any number of digits
     /(\w+)\s+\1/;    # match doubled words of arbitrary length
-    $year =~ /\d{2,4}/;  # make sure year is at least 2 but not more
+    $year =~ m/\d{2,4}/;  # make sure year is at least 2 but not more
                          # than 4 digits
-    $year =~ /\d{4}|\d{2}/;    # better match; throw out 3 digit dates
+    $year =~ m/\d{4}|\d{2}/;    # better match; throw out 3 digit dates
 
 These quantifiers will try to match as much of the string as possible,
 while still allowing the regex to match.  So we have
 
     $x = 'the cat in the hat';
-    $x =~ /^(.*)(at)(.*)$/; # matches,
+    $x =~ m/^(.*)(at)(.*)$/; # matches,
                             # $1 = 'the cat in the h'
                             # $2 = 'at'
                             # $3 = ''   (0 matches)
@@ -392,7 +392,7 @@ You can get or set the position with the C<pos()> function.
 For example,
 
     $x = "cat dog house"; # 3 words
-    while ($x =~ /(\w+)/g) {
+    while ($x =~ m/(\w+)/g) {
         print "Word is $1, ends at position ", pos $x, "\n";
     }
 
@@ -409,7 +409,7 @@ C<//c>, as in C</regex/gc>.
 In list context, C<//g> returns a list of matched groupings, or if
 there are no groupings, a list of matches to the whole regex.  So
 
-    @words = ($x =~ /(\w+)/g);  # matches,
+    @words = ($x =~ m/(\w+)/g);  # matches,
                                 # $word[0] = 'cat'
                                 # $word[1] = 'dog'
                                 # $word[2] = 'house'

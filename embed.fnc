@@ -797,6 +797,7 @@ Amb	|IV	|sv_2iv		|NN SV* sv
 Apd	|IV	|sv_2iv_flags	|NN SV* sv|I32 flags
 Apd	|SV*	|sv_2mortal	|NULLOK SV* sv
 Apd	|NV	|sv_2nv		|NN SV* sv
+pMd	|SV*	|sv_2num	|NN SV* sv
 Amb	|char*	|sv_2pv		|NN SV* sv|NULLOK STRLEN* lp
 Apd	|char*	|sv_2pv_flags	|NN SV* sv|NULLOK STRLEN* lp|I32 flags
 Apd	|char*	|sv_2pvutf8	|NN SV* sv|NULLOK STRLEN* lp
@@ -1485,7 +1486,7 @@ sR	|char*	|scan_heredoc	|NN char *s
 s	|char*	|scan_ident	|NN char *s|NN const char *send|NN char *dest \
 				|STRLEN destlen|I32 ck_uni
 sR	|char*	|scan_pat	|NN char *start|I32 type
-sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims
+sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims|NN yy_str_info *str_info
 sR	|char*	|scan_subst	|NN char *start
 sR	|char*	|scan_trans	|NN char *start
 s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
@@ -1501,7 +1502,7 @@ s	|void	|force_ident	|NN const char *s|int kind
 s	|void	|incline	|NN const char *s
 s	|int	|intuit_more	|NN char *s
 s	|I32	|lop		|I32 f|int x|NN char *s
-rs	|void	|missingterm	|NULLOK char *s
+rs	|void	|missingterminator	|NULLOK char *s
 s	|void	|no_op		|NN const char *what|NULLOK char *s
 sR	|I32	|sublex_done
 sR	|I32	|sublex_push
@@ -1513,7 +1514,6 @@ so	|SV*	|new_constant	|NULLOK const char *s|STRLEN len \
 				|NULLOK SV *pv|NULLOK const char *type \
 				|STRLEN typelen
 s	|int	|ao		|int toketype
-s	|const char*|incl_perldb
 #  if defined(PERL_CR_FILTER)
 s	|I32	|cr_textfilter	|int idx|NULLOK SV *sv|int maxlen
 s	|void	|strip_return	|NN SV *sv
@@ -1851,7 +1851,7 @@ Apd	|void	|mro_method_changed_in	|NN HV* stash
 p	|void   |boot_core_mro
 Apon	|void	|sys_init	|NN int* argc|NN char*** argv
 Apon	|void	|sys_init3	|NN int* argc|NN char*** argv|NN char*** env
-Apo	|void	|sys_term
+Apon	|void	|sys_term
 
 
 #if defined(PERL_IN_DUMP_C)

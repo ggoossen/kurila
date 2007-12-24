@@ -2484,6 +2484,29 @@ Perl_sv_2nv(pTHX_ register SV *sv)
     return SvNVX(sv);
 }
 
+/*
+=for apidoc sv_2num
+
+Return an SV with the numeric value of the source SV, doing any necessary
+reference or overload conversion.  You must use the C<SvNUM(sv)> macro to
+access this function.
+
+=cut
+*/
+
+SV *
+Perl_sv_2num(pTHX_ register SV *sv)
+{
+    if (!SvROK(sv))
+	return sv;
+    if (SvAMAGIC(sv)) {
+	SV * const tmpsv = AMG_CALLun(sv,numer);
+	if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
+	    return sv_2num(tmpsv);
+    }
+    return sv_2mortal(newSVuv(PTR2UV(SvRV(sv))));
+}
+
 /* uiv_2buf(): private routine for use by sv_2pv_flags(): print an IV or
  * UV as a string towards the end of buf, and return pointers to start and
  * end of it.
@@ -8015,10 +8038,11 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		%p		include pointer address (standard)	
 		%-p	(SVf)	include an SV (previously %_)
 		%-<num>p	include an SV with precision <num>	
-		%1p	(VDf)	include a v-string (as %vd)
 		%<num>p		reserved for future extensions
 
 	Robin Barker 2005-07-14
+
+		%1p	(VDf)	removed.  RMB 2007-10-19
 */
  	    char* r = q; 
 	    bool sv = FALSE;	
@@ -8036,13 +8060,6 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    eptr = SvPV_const(argsv, elen);
 		    goto string;
 		}
-#if vdNUMBER
-		else if (n == vdNUMBER) {	/* VDf */
-		    vectorize = TRUE;
-		    VECTORIZE_ARGS
-		    goto format_vd;
-	  	}
-#endif
 		else if (n) {
 		    if (ckWARN_d(WARN_INTERNAL))
 			Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
@@ -8966,6 +8983,8 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     parser->lex_repl	= sv_dup_inc(proto->lex_repl, param);
     parser->lex_starts	= proto->lex_starts;
     parser->lex_stuff	= sv_dup_inc(proto->lex_stuff, param);
+    parser->lex_delim	= proto->lex_delim;
+    parser->lex_repl_delim	= proto->lex_repl_delim;
     parser->multi_close	= proto->multi_close;
     parser->multi_open	= proto->multi_open;
     parser->multi_start	= proto->multi_start;
@@ -9413,8 +9432,7 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 
     /* don't clone objects whose class has asked us not to */
     if (SvOBJECT(sstr) && ! (SvFLAGS(SvSTASH(sstr)) & SVphv_CLONEABLE)) {
-	SvFLAGS(dstr) &= ~SVTYPEMASK;
-	SvOBJECT_off(dstr);
+	SvFLAGS(dstr) = 0;
 	return dstr;
     }
 
@@ -11430,9 +11448,17 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 
     case OP_RV2SV:
     case OP_CUSTOM:
-    case OP_ENTERSUB:
 	match = 1; /* XS or custom code could trigger random warnings */
 	goto do_op;
+
+    case OP_ENTERSUB:
+    case OP_GOTO:
+	/* XXX tmp hack: these two may call an XS sub, and currently
+	  XS subs don't have a SUB entry on the context stack, so CV and
+	  pad determination goes wrong, and BAD things happen. So, just
+	  don't try to determine the value under those circumstances.
+	  Need a better fix at dome point. DAPM 11/2007 */
+	break;
 
     case OP_POS:
 	/* def-ness of rval pos() is independent of the def-ness of its arg */

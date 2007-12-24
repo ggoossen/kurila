@@ -2,7 +2,7 @@
 
 use strict;
 
-my @tests = (split(/\nEND\n/s, <<DONE));
+my @tests = (split(m/\nEND\n/s, <<DONE));
 TEST1
 This 
 is

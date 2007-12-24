@@ -21,6 +21,11 @@ typedef struct {
 #endif
 } yy_stack_frame;
 
+typedef struct yy_str_info {
+    SV *str_sv; /* SV holding the string */
+    char delim;  /* delimeter */
+} yy_str_info;
+
 typedef struct yy_parser {
 
     /* parser state */
@@ -49,11 +54,13 @@ typedef struct yy_parser {
     U8		expect;		/* how to interpret ambiguous tokens */
     OP		*lex_inpat;	/* in pattern $) and $| are special */
     OP		*lex_op;	/* extra info to pass back on op */
-    SV		*lex_repl;	/* runtime replacement from s/// */
     U16		lex_inwhat;	/* what kind of quoting are we in */
     OPCODE	last_lop_op;	/* last list operator */
     I32		lex_starts;	/* how many interps done on level */
-    SV		*lex_stuff;	/* runtime pattern from m// or s/// */
+
+    yy_str_info lex_stuff; 	/* runtime pattern from m// or s/// */
+    yy_str_info lex_repl; 	/* runtime pattern from m// or s/// */
+
     I32		multi_start;	/* 1st line of multi-line string */
     I32		multi_end;	/* last line of multi-line string */
     char	multi_open;	/* delimiter of said string */

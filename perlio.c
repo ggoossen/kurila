@@ -2413,21 +2413,35 @@ PerlIO_cleanup(pTHX)
     }
 }
 
-void PerlIO_teardown(pTHX) /* Call only from PERL_SYS_TERM(). */
+void PerlIO_teardown() /* Call only from PERL_SYS_TERM(). */
 {
     dVAR;
+#if 0
+/* XXX we can't rely on an interpreter being present at this late stage,
+   XXX so we can't use a function like PerlLIO_write that relies on one
+   being present (at least in win32) :-(.
+   Disable for now.
+*/
 #ifdef DEBUGGING
     {
 	/* By now all filehandles should have been closed, so any
 	 * stray (non-STD-)filehandles indicate *possible* (PerlIO)
 	 * errors. */
+#define PERLIO_TEARDOWN_MESSAGE_BUF_SIZE 64
+#define PERLIO_TEARDOWN_MESSAGE_FD 2
+	char buf[PERLIO_TEARDOWN_MESSAGE_BUF_SIZE];
 	int i;
 	for (i = 3; i < PL_perlio_fd_refcnt_size; i++) {
-	    if (PL_perlio_fd_refcnt[i])
-		PerlIO_debug("PerlIO_cleanup: fd %d refcnt=%d\n",
-			     i, PL_perlio_fd_refcnt[i]);
+	    if (PL_perlio_fd_refcnt[i]) {
+		const STRLEN len =
+		    my_snprintf(buf, sizeof(buf),
+				"PerlIO_teardown: fd %d refcnt=%d\n",
+				i, PL_perlio_fd_refcnt[i]);
+		PerlLIO_write(PERLIO_TEARDOWN_MESSAGE_FD, buf, len);
+	    }
 	}
     }
+#endif
 #endif
     /* Not bothering with PL_perlio_mutex since by now
      * all the interpreters are gone. */
@@ -3571,6 +3585,7 @@ FILE *
 PerlIO_findFILE(PerlIO *f)
 {
     PerlIOl *l = *f;
+    FILE *stdio;
     while (l) {
 	if (l->tab == &PerlIO_stdio) {
 	    PerlIOStdio *s = PerlIOSelf(&l, PerlIOStdio);
@@ -3579,7 +3594,19 @@ PerlIO_findFILE(PerlIO *f)
 	l = *PerlIONext(&l);
     }
     /* Uses fallback "mode" via PerlIO_modestr() in PerlIO_exportFILE */
-    return PerlIO_exportFILE(f, NULL);
+    /* However, we're not really exporting a FILE * to someone else (who
+       becomes responsible for closing it, or calling PerlIO_releaseFILE())
+       So we need to undo its refernce count increase on the underlying file
+       descriptor. We have to do this, because if the loop above returns you
+       the FILE *, then *it* didn't increase any reference count. So there's
+       only one way to be consistent. */
+    stdio = PerlIO_exportFILE(f, NULL);
+    if (stdio) {
+	const int fd = fileno(stdio);
+	if (fd >= 0)
+	    PerlIOUnix_refcnt_dec(fd);
+    }
+    return stdio;
 }
 
 /* Use this to reverse PerlIO_exportFILE calls. */

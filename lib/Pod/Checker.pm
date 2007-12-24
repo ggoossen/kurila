@@ -363,6 +363,7 @@ my %VALID_COMMANDS = (
     'for'    =>  1,
     'begin'  =>  1,
     'end'    =>  1,
+    'encoding' => '1',
 );
 
 my %VALID_SEQUENCES = (

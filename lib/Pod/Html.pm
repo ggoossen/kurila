@@ -332,7 +332,7 @@ sub clean_data($){
 
         # have a look for all-space lines
       if( ${$dataref}[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
-	    my @chunks = split( /^\s+$/m, ${$dataref}[$i] );
+	    my @chunks = split( m/^\s+$/m, ${$dataref}[$i] );
 	    splice( @$dataref, $i, 1, @chunks );
 	}
     }
@@ -396,12 +396,12 @@ sub pod2html {
 	    if (m/\r\n/) {
 		@poddata = map { s/\r\n/\n/g;
 				 m/\n\n/ ?
-				     map { "$_\n\n" } split /\n\n/ :
+				     map { "$_\n\n" } split m/\n\n/ :
 				     $_ } @poddata;
 	    } else {
 		@poddata = map { s/\r/\n/g;
 				 m/\n\n/ ?
-				     map { "$_\n\n" } split /\n\n/ :
+				     map { "$_\n\n" } split m/\n\n/ :
 				     $_ } @poddata;
 	    }
 	    last;
@@ -1442,7 +1442,7 @@ sub process_puretext {
     $trail = ($text =~ s/(\s+)\Z//s ? $1 : "");
 
     # split at space/non-space boundaries
-    @words = split( /(?<=\s)(?=\S)|(?<=\S)(?=\s)/, $text );
+    @words = split( m/(?<=\s)(?=\S)|(?<=\S)(?=\s)/, $text );
 
     # process each word individually
     foreach my $word (@words) {

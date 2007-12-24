@@ -1,7 +1,7 @@
 use Perl6::Form;
 
 for ( ~< *DATA) {
-	($title, $page) = split /[\t\n]+/;
+	($title, $page) = split m/[\t\n]+/;
 	push @contents, $title;
 	push @page, $page;
 }

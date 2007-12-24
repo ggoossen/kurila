@@ -193,7 +193,7 @@ foreach my $argv (@ARGV) {
 	# to the file which describes the problem being fixed.
 	if (m/^Index:\s+(.*)/) {
 	    my $f;
-	    foreach $f (split(/ /, $1)) { add_patched_file($ls, $f) }
+	    foreach $f (split(m/ /, $1)) { add_patched_file($ls, $f) }
 	    next;
 	}
 

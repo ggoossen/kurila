@@ -533,8 +533,8 @@ sub _diff_complain_external {
 sub _diff_complain_algdiff {
     my($result, $expected, $detail, $prefix) = @_;
 
-    my @got = split(/^/, $result);
-    my @exp = split(/^/, $expected);
+    my @got = split(m/^/, $result);
+    my @exp = split(m/^/, $expected);
 
     my $diff_kind;
     my @diff_lines;

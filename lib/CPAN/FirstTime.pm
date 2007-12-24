@@ -653,7 +653,7 @@ Shall we use it as the general CPAN build and cache directory?
           PROMPT: while ($ans = prompt("CPAN build and cache directory?",$default)) {
                 print "\n";
                 if (File::Spec->file_name_is_absolute($ans)) {
-                    my @cpan_home = split /[\/\\]/, $ans;
+                    my @cpan_home = split m/[\/\\]/, $ans;
                   DIR: for my $dir (@cpan_home) {
                         if ($dir =~ m/^~/ and (!$last_ans or $ans ne $last_ans)) {
                             $CPAN::Frontend
@@ -819,7 +819,7 @@ Shall we use it as the general CPAN build and cache directory?
 
                             patch applypatch
                             /;
-    my(@path) = split /$Config{'path_sep'}/, $ENV{'PATH'};
+    my(@path) = split m/$Config{'path_sep'}/, $ENV{'PATH'};
     if (!$matcher or "@external_progs" =~ m/$matcher/) {
         $CPAN::Frontend->myprint($prompts{external_progs});
 
@@ -1353,7 +1353,7 @@ sub read_mirrored_by {
         ($host) = m/^([\w\.\-]+)/ unless defined $host;
         next unless defined $host;
         next unless m/\s+dst_(dst|location)/;
-        m/location\s+=\s+\"([^\"]+)/ and @location = (split /\s*,\s*/, $1) and
+        m/location\s+=\s+\"([^\"]+)/ and @location = (split m/\s*,\s*/, $1) and
             ($continent, $country) = @location[-1,-2];
         $continent =~ s/\s\(.*//;
         $continent =~ s/\W+$//; # if Jarkko doesn't know latitude/longitude

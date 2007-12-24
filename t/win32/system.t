@@ -7,7 +7,7 @@ BEGIN {
     @INC = ('../lib', '../../lib');
     # XXX this could be further munged to enable some parts on other
     # platforms
-    unless ($^O =~ /^MSWin/) {
+    unless ($^O =~ m/^MSWin/) {
 	print "1..0 # skipped: windows specific test\n";
 	exit 0;
     }

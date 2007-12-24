@@ -111,7 +111,7 @@ sub hostname {
     || eval {
 	local $SIG{__DIE__};
         my($a,$b,$c,$d);
-	($host,$a,$b,$c,$d)=split(/[:\. ]/,`/com/host`,6);
+	($host,$a,$b,$c,$d)=split(m/[:\. ]/,`/com/host`,6);
     }
 
     # bummer

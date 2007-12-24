@@ -1286,7 +1286,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_unpack),	/* unpack */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* pack */
 	MEMBER_TO_FPTR(Perl_ck_split),	/* split */
-	MEMBER_TO_FPTR(Perl_ck_join),	/* join */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* join */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* list */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* lslice */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonlist */

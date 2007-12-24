@@ -120,7 +120,7 @@ sub new {
 
     my @dirs = ( $self->{':private:'}{Config}{archlibexp},
                  $self->{':private:'}{Config}{sitearchexp},
-                 split(/\Q$Config{path_sep}\E/, $perl5lib),
+                 split(m/\Q$Config{path_sep}\E/, $perl5lib),
                  @{$self->{':private:'}{EXTRA}},
                );   
     

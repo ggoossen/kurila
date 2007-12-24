@@ -140,7 +140,7 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
 
   foreach ($expectation =~ m/Writing\s+(\S+)/gm) {
     if ($^O eq 'MacOS') {
-      $_ = ':' . join(':',split(/\//,$_));
+      $_ = ':' . join(':',split(m/\//,$_));
       $_ =~ s/$name:t:1.t/$name:t\/1.t/; # is this an h2xs bug?
     }
     if ($^O eq 'VMS') {

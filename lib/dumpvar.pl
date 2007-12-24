@@ -164,7 +164,7 @@ sub unwrap {
       # Match type and address.                      
       # Unblessed references will look like TYPE(0x...)
       # Blessed references will look like Class=TYPE(0x...)
-      ($start_part, $val) = split /=/,$val;
+      ($start_part, $val) = split m/=/,$val;
       $val = $start_part unless defined $val;
       ($item_type, $address) = 
         $val =~ m/([^\(]+)        # Keep stuff that's     
@@ -314,13 +314,13 @@ sub unwrap {
 sub matchlex {
   (my $var = $_[0]) =~ s/.//;
   $var eq $_[1] or 
-    ($_[1] =~ m/^([!~])(.)([\x00-\xff]*)/) and 
+    ($_[1] =~ m/^([!~])(.)([\x[00]-\x[ff]]*)/) and 
       ($1 eq '!') ^^^ (eval { $var =~ m/$2$3/ });
 }
 
 sub matchvar {
   $_[0] eq $_[1] or 
-    ($_[1] =~ m/^([!~])(.)([\x00-\xff]*)/) and 
+    ($_[1] =~ m/^([!~])(.)([\x[00]-\x[ff]]*)/) and 
       ($1 eq '!') ^^^ (eval {($_[2] . "::" . $_[0]) =~ m/$2$3/});
 }
 

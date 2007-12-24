@@ -2144,6 +2144,9 @@ PERL_CALLCONV SV*	Perl_sv_2mortal(pTHX_ SV* sv);
 PERL_CALLCONV NV	Perl_sv_2nv(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
 
+PERL_CALLCONV SV*	Perl_sv_2num(pTHX_ SV* sv)
+			__attribute__nonnull__(pTHX_1);
+
 /* PERL_CALLCONV char*	Perl_sv_2pv(pTHX_ SV* sv, STRLEN* lp)
 			__attribute__nonnull__(pTHX_1); */
 
@@ -3959,7 +3962,7 @@ STATIC char*	S_scan_pat(pTHX_ char *start, I32 type)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
-STATIC char*	S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims)
+STATIC char*	S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str_info)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 
@@ -4005,7 +4008,7 @@ STATIC int	S_intuit_more(pTHX_ char *s)
 STATIC I32	S_lop(pTHX_ I32 f, int x, char *s)
 			__attribute__nonnull__(pTHX_3);
 
-STATIC void	S_missingterm(pTHX_ char *s)
+STATIC void	S_missingterminator(pTHX_ char *s)
 			__attribute__noreturn__;
 
 STATIC void	S_no_op(pTHX_ const char *what, char *s)
@@ -4034,7 +4037,6 @@ STATIC SV*	S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRL
 			__attribute__nonnull__(pTHX_5);
 
 STATIC int	S_ao(pTHX_ int toketype);
-STATIC const char*	S_incl_perldb(pTHX);
 #  if defined(PERL_CR_FILTER)
 STATIC I32	S_cr_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 STATIC void	S_strip_return(pTHX_ SV *sv)
@@ -4608,7 +4610,7 @@ PERL_CALLCONV void	Perl_sys_init3(int* argc, char*** argv, char*** env)
 			__attribute__nonnull__(2)
 			__attribute__nonnull__(3);
 
-PERL_CALLCONV void	Perl_sys_term(pTHX);
+PERL_CALLCONV void	Perl_sys_term(void);
 
 
 #if defined(PERL_IN_DUMP_C)

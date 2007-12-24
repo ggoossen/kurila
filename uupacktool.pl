@@ -26,7 +26,6 @@ sub handle_file {
 
     open my $fh, "<", $file
         or do { warn "Could not open input file $file: $!"; exit 0 };
-    binmode $fh;
     my $str = do { local $/; ~< $fh };
 
     ### unpack?
@@ -36,7 +35,7 @@ sub handle_file {
             $outfile = $file;
             $outfile =~ s/\.packed\z//;
         }
-        my ($head, $body) = split /__UU__\n/, $str;
+        my ($head, $body) = split m/__UU__\n/, $str;
         die "Can't unpack malformed data in '$file'\n"
             if !$head;
         $outstr = unpack 'u', $body;
@@ -100,7 +99,7 @@ sub bulk_process {
     my $lines = 0;
     while( my $line = ~< $fh ) {
         chomp $line;
-        my ($file) = split /\s+/, $line;
+        my ($file) = split m/\s+/, $line;
 
         $lines++;
 

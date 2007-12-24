@@ -540,6 +540,11 @@ The encoding pragma is not supported on EBCDIC platforms.
 (Porters who are willing and able to remove this limitation are
 welcome.)
 
+=item Thread safety
+
+C<use encoding ...> is not thread-safe (i.e., do not use in threaded
+applications).
+
 =back
 
 =head2 The Logic of :locale

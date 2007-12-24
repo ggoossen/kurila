@@ -263,7 +263,7 @@ sub _escape {
 sub _unescape {
     join(',', map {
         m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ? "$1_$2$3" : $_
-    } split(/,/, $_[0]));
+    } split(m/,/, $_[0]));
 }
 
 sub auto_path {

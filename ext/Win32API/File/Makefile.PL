@@ -71,7 +71,7 @@ $outfile:	@perlfiles  @cfiles  Makefile" . '
 
 	# If requested extra work to generate Perl instead of XS code:
 	if(  $bin  ) {
-	    my @path= split /::/, $module;
+	    my @path= split m/::/, $module;
 	    my $_final= $final;
 	    $_final =~ s/\W/_/g;
 

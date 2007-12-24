@@ -311,7 +311,7 @@ sub _tt_readline {
 
         ### if we're allowed to give multiple answers, split
         ### the answer on whitespace
-        my @answers = $multi ? split(/\s+/, $answer) : $answer;
+        my @answers = $multi ? split(m/\s+/, $answer) : $answer;
 
         ### the return value list
         my @rv;

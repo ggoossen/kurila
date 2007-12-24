@@ -200,7 +200,7 @@ sub textblock {
     } {
         local $_ = $1;
         s%L</([^>]+)>%$1%g;
-        my @items = split /(?:,?\s+(?:and\s+)?)/;
+        my @items = split m/(?:,?\s+(?:and\s+)?)/;
         my $string = "the ";
         my $i;
         for ($i = 0; $i +< @items; $i++) {
@@ -420,7 +420,7 @@ sub seq_l {
     } elsif (m/^[-:.\w]+(?:\(\S+\))?$/) {
         ($manpage, $section) = ($_, '');
     } elsif (m%/%) {
-        ($manpage, $section) = split (/\s*\/\s*/, $_, 2);
+        ($manpage, $section) = split (m/\s*\/\s*/, $_, 2);
     }
 
     my $text = '';

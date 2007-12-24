@@ -13,7 +13,7 @@ BEGIN {
                         $USE_IPC_RUN $USE_IPC_OPEN3 $WARN
                     ];
 
-    $VERSION        = '0.40';
+    $VERSION        = '0.40_1';
     $VERBOSE        = 0;
     $DEBUG          = 0;
     $WARN           = 1;
@@ -125,6 +125,10 @@ sub can_use_ipc_open3   {
     my $self    = shift;
     my $verbose = shift || 0;
 
+    ### ipc::open3 is not working on VMS becasue of a lack of fork.
+    ### todo, win32 also does not have fork, so need to do more research.
+    return 0 if IS_VMS;
+
     ### ipc::open3 works on every platform, but it can't capture buffers
     ### on win32 :(
     return unless can_load(
@@ -188,7 +192,7 @@ sub can_run {
 
     } else {
         for my $dir (
-            (split /\Q$Config::Config{path_sep}\E/, $ENV{PATH}),
+            (split m/\Q$Config::Config{path_sep}\E/, $ENV{PATH}),
             File::Spec->curdir
         ) {           
             my $abs = File::Spec->catfile($dir, $command);
@@ -524,9 +528,9 @@ sub _ipc_run {
         @command = map { if( m/([<>|&])/ ) {
                             $special_chars .= $1; $_;
                          } else {
-                            [ split / +/ ]
+                            [ split m/ +/ ]
                          }
-                    } split( /\s*([<>|&])\s*/, $cmd );
+                    } split( m/\s*([<>|&])\s*/, $cmd );
     }
  
     ### if there's a pipe in the command, *STDIN needs to 

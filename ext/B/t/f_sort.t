@@ -498,7 +498,7 @@ checkOptree(name   => q{Compound sort/map Expression },
 	    bcopts => q{-exec},
 	    code   => q{ @new = map { $_->[0] }
 			 sort { $b->[1] <+> $a->[1] || $a->[2] cmp $b->[2] }
-			 map { [$_, /=(\d+)/, uc($_)] } @old; },
+			 map { [$_, m/=(\d+)/, uc($_)] } @old; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 609 (eval 34):3) v:{
 # 2  <0> pushmark s

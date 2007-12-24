@@ -80,7 +80,7 @@ sub _read_config_file {
 
         chomp; s/^\s*//; s/\s*$//;
 
-        my ($param,$val) = split /\s*=\s*/;
+        my ($param,$val) = split m/\s*=\s*/;
 
         if( (lc $param) eq 'include' ) {
             load $val;

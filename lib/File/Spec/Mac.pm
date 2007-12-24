@@ -433,7 +433,7 @@ sub path {
 #  Under MPW, it has a meaning.
 #
     return unless exists $ENV{Commands};
-    return split(/,/, $ENV{Commands});
+    return split(m/,/, $ENV{Commands});
 }
 
 =item splitpath

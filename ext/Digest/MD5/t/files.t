@@ -58,7 +58,7 @@ if ($@) {
     $B64 = 0;
 }
 
-for (split /^/, $EXPECT) {
+for (split m/^/, $EXPECT) {
      my($md5hex, $file) = split ' ';
      my $base = $file;
 #     print "# $base\n";
@@ -145,7 +145,7 @@ for (split /^/, $EXPECT) {
 	 $failed++;
      }
 
-     my @data = split //, $data;
+     my @data = split m//, $data;
      if (md5(@data) ne $md5bin) {
 	 print "$file: md5(\@data) failed\n";
 	 $failed++;

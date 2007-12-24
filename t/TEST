@@ -23,7 +23,7 @@ our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
 {
     my @argv = ();
     foreach my $idx (0..$#ARGV) {
-	push( @argv, $ARGV[$idx] ), next unless $ARGV[$idx] =~ /^-(\S+)$/;
+	push( @argv, $ARGV[$idx] ), next unless $ARGV[$idx] =~ m/^-(\S+)$/;
 	$::core    = 1 if $1 eq 'core';
 	$::verbose = 1 if $1 eq 'v';
 	$::torture = 1 if $1 eq 'torture';
@@ -32,7 +32,7 @@ our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
 	$::taintwarn = 1 if $1 eq 'taintwarn';
 	$::failed = 1 if $1 eq 'failed';
 	$ENV{PERL_CORE_MINITEST} = 1 if $1 eq 'minitest';
-	if ($1 =~ /^deparse(,.+)?$/) {
+	if ($1 =~ m/^deparse(,.+)?$/) {
 	    $::deparse = 1;
 	    $::deparse_opts = $1;
 	}
@@ -77,13 +77,13 @@ sub _find_tests {
     opendir DIR, $dir or die "Trouble opening $dir: $!";
     foreach my $f (sort { $a cmp $b } readdir DIR) {
 	next if $f eq $curdir or $f eq $updir or
-	    $f =~ /^(?:CVS|RCS|SCCS|\.svn)$/;
+	    $f =~ m/^(?:CVS|RCS|SCCS|\.svn)$/;
 
 	my $fullpath = File::Spec->catfile($dir, $f);
 
 	_find_tests($fullpath) if -d $fullpath;
 	$fullpath = VMS::Filespec::unixify($fullpath) if $^O eq 'VMS';
-	push @ARGV, $fullpath if $f =~ /\.t$/;
+	push @ARGV, $fullpath if $f =~ m/\.t$/;
     }
 }
 
@@ -91,17 +91,17 @@ sub _quote_args {
     my ($args) = @_;
     my $argstring = '';
 
-    foreach (split(/\s+/,$args)) {
+    foreach (split(m/\s+/,$args)) {
        # In VMS protect with doublequotes because otherwise
        # DCL will lowercase -- unless already doublequoted.
-       $_ = q(").$_.q(") if ($^O eq 'VMS') && !/^\"/ && length($_) +> 0;
+       $_ = q(").$_.q(") if ($^O eq 'VMS') && !m/^\"/ && length($_) +> 0;
        $argstring .= ' ' . $_;
     }
     return $argstring;
 }
 
 sub _populate_hash {
-    return map {$_, 1} split /\s+/, $_[0];
+    return map {$_, 1} split m/\s+/, $_[0];
 }
 
 if ($::failed) {
@@ -125,12 +125,12 @@ unless (@ARGV) {
 	my (%extensions, %known_extensions);
 	open FH, $configsh or die "Can't open $configsh: $!";
 	while ( ~< *FH) {
-	    if (/^extensions=['"](.*)['"]$/) {
+	    if (m/^extensions=['"](.*)['"]$/) {
 		# Deliberate string interpolation to avoid triggering possible
 		# $1 resetting bugs.
 		%extensions = _populate_hash ("$1");
 	    }
-	    elsif (/^known_extensions=['"](.*)['"]$/) {
+	    elsif (m/^known_extensions=['"](.*)['"]$/) {
 		%known_extensions = _populate_hash ($1);
 	    }
 	}
@@ -256,7 +256,7 @@ EOT
     while (my $test = shift @tests) {
         my $test_start_time = $show_elapsed_time ? Time::HiRes::time() : 0;
 
-	if ($test =~ /^$/) {
+	if ($test =~ m/^$/) {
 	    next;
 	}
 	if ($type eq 'deparse') {
@@ -287,7 +287,7 @@ EOT
 	    $_ =~ tr/\0//d;
 	}
 	my $switch;
-	if (/#!.*\bperl.*\s-\w*([tT])/) {
+	if (m/#!.*\bperl.*\s-\w*([tT])/) {
 	    $switch = qq{"-$1"};
 	}
 	else {
@@ -305,7 +305,7 @@ EOT
 	    # Look for #line directives which change the filename
 	    while ( ~< *SCRIPT) {
 		$file_opts .= ",-f$3$4"
-			if /^#\s*line\s+(\d+)\s+((\w+)|"([^"]+)")/;
+			if m/^#\s*line\s+(\d+)\s+((\w+)|"([^"]+)")/;
 	    }
 	    close(SCRIPT);
 	}
@@ -351,21 +351,21 @@ EOT
 	my $max;
 	my %todo;
 	while ( ~< *RESULTS) {
-	    next if /^\s*$/; # skip blank lines
+	    next if m/^\s*$/; # skip blank lines
 	    if ($::verbose) {
 		print $_;
 	    }
-	    unless (/^\#/) {
+	    unless (m/^\#/) {
 		if ($trailing_leader) {
 		    # shouldn't be anything following a postfix 1..n
 		    $failure ||= 'FAILED--extra output after trailing 1..n';
 		}
-		if (/^1\.\.([0-9]+)( todo ([\d ]+))?/) {
+		if (m/^1\.\.([0-9]+)( todo ([\d ]+))?/) {
 		    if ($seen_leader) {
 			$failure ||= 'FAILED--seen duplicate leader';
 		    }
 		    $max = $1;
-		    %todo = map { $_ => 1 } split / /, $3 if $3;
+		    %todo = map { $_ => 1 } split m/ /, $3 if $3;
 		    $totmax += $max;
 		    $tested_files++;
 		    if ($seen_ok) {
@@ -381,7 +381,7 @@ EOT
 		    $seen_leader = 1;
 		}
 		else {
-		    if (/^(not )?ok(?: (\d+))?[^\#]*(\s*\#.*)?/) {
+		    if (m/^(not )?ok(?: (\d+))?[^\#]*(\s*\#.*)?/) {
 			unless ($seen_leader) {
 			    unless ($seen_ok) {
 				$next = 0;
@@ -397,7 +397,7 @@ EOT
 			    # SKIP is essentially the same as TODO for t/TEST
 			    # this still conforms to TAP:
 			    # http://search.cpan.org/dist/Test-Harness/lib/Test/Harness/TAP.pod
-			    $extra and $istodo = $extra =~ /#\s*(?:TODO|SKIP)\b/;
+			    $extra and $istodo = $extra =~ m/#\s*(?:TODO|SKIP)\b/;
 			    $istodo = 1 if $todo{$num};
 
 			    if( $not && !$istodo ) {
@@ -408,13 +408,13 @@ EOT
 			    $failure ||="FAILED--expected test $next, saw test $num";
 			}
 		    }
-		    elsif (/^Bail out!\s*(.*)/i) { # magic words
+		    elsif (m/^Bail out!\s*(.*)/i) { # magic words
 			die "FAILED--Further testing stopped" . ($1 ? ": $1\n" : ".\n");
 		    }
 		    else {
 			# module tests are allowed extra output,
 			# because Test::Harness allows it
-			next if $test =~ /^\W*(ext|lib)\b/;
+			next if $test =~ m/^\W*(ext|lib)\b/;
 			$failure ||= "FAILED--unexpected output at test $next";
 		    }
 		}
@@ -436,7 +436,7 @@ EOT
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
 		}
 	    }
-	    if ($ENV{VG_OPTS} =~ /cachegrind/) {
+	    if ($ENV{VG_OPTS} =~ m/cachegrind/) {
 		if (rename $valgrind_log, "$test.valgrind") {
 		    $valgrind++;
 		} else {
@@ -448,12 +448,12 @@ EOT
 		my $errors = 0;
 		for my $i (0..$#valgrind) {
 		    local $_ = $valgrind[$i];
-		    if (/^==\d+== ERROR SUMMARY: (\d+) errors? /) {
+		    if (m/^==\d+== ERROR SUMMARY: (\d+) errors? /) {
 			$errors += $1;   # there may be multiple error summaries
-		    } elsif (/^==\d+== LEAK SUMMARY:/) {
+		    } elsif (m/^==\d+== LEAK SUMMARY:/) {
 			for my $off (1 .. 4) {
 			    if ($valgrind[$i+$off] =~
-				/(?:lost|reachable):\s+\d+ bytes in (\d+) blocks/) {
+				m/(?:lost|reachable):\s+\d+ bytes in (\d+) blocks/) {
 				$leaks += $1;
 			    }
 			}
@@ -498,7 +498,7 @@ EOT
 	if (defined $failure) {
 	    print "${te}$failure\n";
 	    $::bad_files++;
-	    if ($test =~ /^base/) {
+	    if ($test =~ m/^base/) {
 		die "Failed a basic test ($test) -- cannot continue.\n";
 	    }
 	    ++$failed_tests{$test};

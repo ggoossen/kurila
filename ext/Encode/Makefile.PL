@@ -6,7 +6,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 # Just for sure :)
-my %ARGV = map { my @r = split /=/,$_; defined $r[1] or $r[1]=1; @r } @ARGV;
+my %ARGV = map { my @r = split m/=/,$_; defined $r[1] or $r[1]=1; @r } @ARGV;
 $ARGV{DEBUG} and warn "$_ => $ARGV{$_}\n" for keys  %ARGV;
 $ENV{PERL_CORE} ||= $ARGV{PERL_CORE} if $ARGV{PERL_CORE};
 

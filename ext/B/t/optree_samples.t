@@ -449,8 +449,8 @@ EONT_EONT
 
 pass("GREP: SAMPLES FROM PERLDOC -F GREP");
 
-checkOptree ( name	=> '@foo = grep(!/^\#/, @bar)',
-	      code	=> '@foo = grep(!/^\#/, @bar)',
+checkOptree ( name	=> '@foo = grep(!m/^\#/, @bar)',
+	      code	=> '@foo = grep(!m/^\#/, @bar)',
 	      bcopts	=> '-exec',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 496 (eval 20):1) v:{

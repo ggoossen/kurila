@@ -178,7 +178,7 @@ sub collate_xfrm {
   my $s = $_[0];
   my $x = '';
   
-  for (split(/(\000+)/, $s)) {
+  for (split(m/(\000+)/, $s)) {
     $x .= (m/^\000/) ? $_ : strxfrm("$_\000");
   }
 

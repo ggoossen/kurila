@@ -91,7 +91,7 @@ print "${e}ok 22\n";
 $e = *{Symbol::fetch_glob('y%%')}{ARRAY} && 'not ';
 print "${e}ok 23\n";
 eval '$u = 3; @v = (); %w = ()';
-my @errs = split /\n/, $@;
+my @errs = split m/\n/, $@;
 $e = @errs != 3 && 'not ';
 print "${e}ok 24\n";
 $e = !(grep(m/^Global symbol "\$u" requires explicit package name/, @errs))

@@ -105,7 +105,7 @@ my $max_uv_p1_as_iv;
 {use integer; $max_uv_p1_as_iv = 0 + sprintf "%s", $temp}
 my $max_uv_p1_as_uv = 0 ^|^ sprintf "%s", $temp;
 
-my @opnames = split //, "-+UINPuinp";
+my @opnames = split m//, "-+UINPuinp";
 
 # @list = map { 2->($_), 3->($_), 4->($_), 5->($_),  } @list; # Prepare input
 
@@ -115,7 +115,7 @@ my @opnames = split //, "-+UINPuinp";
 my $test = 1;
 my $nok;
 for my $num_chain (1..$max_chain) {
-  my @ops = map [split //], grep m/[4-9]/,
+  my @ops = map [split m//], grep m/[4-9]/,
     map { sprintf "%0${num_chain}d", $_ }  0 .. 10**$num_chain - 1;
 
   #@ops = ([]) unless $num_chain;

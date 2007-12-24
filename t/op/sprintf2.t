@@ -22,7 +22,7 @@ is(
 # cases of $i > 1 are against [perl #39126]
 for my $i (1, 5, 10, 20, 50, 100) {
     chop(my $utf8_format = "%-*s\x{100}");
-    my $string = "\xB4"x$i;        # latin1 ACUTE or ebcdic COPYRIGHT
+    my $string = "\x[B4]"x$i;        # latin1 ACUTE or ebcdic COPYRIGHT
     my $expect = $string."  "x$i;  # followed by 2*$i spaces
     is(sprintf($utf8_format, 3*$i, $string), $expect,
        "width calculation under utf8 upgrade, length=$i");

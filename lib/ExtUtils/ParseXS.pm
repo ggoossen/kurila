@@ -17,7 +17,7 @@ my(@XSStack);	# Stack of conditionals and INCLUDEs
 my($XSS_work_idx, $cpp_next_tmp);
 
 use vars qw($VERSION);
-$VERSION = '2.18';
+$VERSION = '2.18_02';
 
 use vars qw(%input_expr %output_expr $ProtoUsed @InitFileCode $FH $proto_re $Overload $errors $Fallback
 	    $cplusplus $hiertype $WantPrototypes $WantVersionChk $except $WantLineNumbers
@@ -192,8 +192,15 @@ sub process_file {
     close(TYPEMAP);
   }
 
-  foreach my $key (keys %input_expr) {
-    $input_expr{$key} =~ s/;*\s+\z//;
+  foreach my $value (values %input_expr) {
+    $value =~ s/;*\s+\z//;
+    # Move C pre-processor instructions to column 1 to be strictly ANSI
+    # conformant. Some pre-processors are fussy about this.
+    $value =~ s/^\s+#/#/mg;
+  }
+  foreach my $value (values %output_expr) {
+    # And again.
+    $value =~ s/^\s+#/#/mg;
   }
 
   my ($cast, $size);
@@ -486,11 +493,11 @@ EOF
 	  $in_out{$name} = $out_type if $out_type;
 	}
       } else {
-	@args = split(/\s*,\s*/, $orig_args);
+	@args = split(m/\s*,\s*/, $orig_args);
 	Warn("Warning: cannot parse argument list '$orig_args', fallback to split");
       }
     } else {
-      @args = split(/\s*,\s*/, $orig_args);
+      @args = split(m/\s*,\s*/, $orig_args);
       for (@args) {
 	if ($process_inout and s/^(IN|IN_OUTLIST|OUTLIST|IN_OUT|OUT)\s+//) {
 	  my $out_type = $1;
@@ -1225,7 +1232,7 @@ sub INTERFACE_handler() {
 
   TrimWhitespace($in);
 
-  foreach (split /[\s,]+/, $in) {
+  foreach (split m/[\s,]+/, $in) {
     my $name = $_;
     $name =~ s/^$Prefix//;
     $Interfaces{$name} = $_;

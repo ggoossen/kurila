@@ -264,7 +264,7 @@ sub _win32_ext {
     push @libpath, "$Config{installarchlib}/CORE";
 
     if ($VC and exists $ENV{LIB} and $ENV{LIB}) {
-        push @libpath, split /;/, $ENV{LIB};
+        push @libpath, split m/;/, $ENV{LIB};
     }
 
     foreach (Text::ParseWords::quotewords('\s+', 0, $potential_libs)){
@@ -377,8 +377,8 @@ sub _vms_ext {
   my(@crtls,$crtlstr);
   @crtls = ( ($Config{'ldflags'} =~ m-/Debug-i ? $Config{'dbgprefix'} : '')
               . 'PerlShr/Share' );
-  push(@crtls, grep { not m/\(/ } split /\s+/, $Config{'perllibs'});
-  push(@crtls, grep { not m/\(/ } split /\s+/, $Config{'libc'});
+  push(@crtls, grep { not m/\(/ } split m/\s+/, $Config{'perllibs'});
+  push(@crtls, grep { not m/\(/ } split m/\s+/, $Config{'libc'});
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble

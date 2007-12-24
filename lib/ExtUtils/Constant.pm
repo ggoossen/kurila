@@ -177,7 +177,7 @@ sub XS_constant {
 
   if (!ref $what) {
     # Convert line of the form IV,UV,NV to hash
-    $what = {map {$_ => 1} split /,\s*/, ($what)};
+    $what = {map {$_ => 1} split m/,\s*/, ($what)};
   }
   my $params = ExtUtils::Constant::XS->params ($what);
   my $type;

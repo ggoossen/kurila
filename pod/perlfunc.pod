@@ -640,7 +640,7 @@ call, but an C<eval>.  In such a case additional elements $evaltext and
 C<$is_require> are set: C<$is_require> is true if the frame is created by a
 C<require> or C<use> statement, $evaltext contains the text of the
 C<eval EXPR> statement.  In particular, for an C<eval BLOCK> statement,
-$filename is C<(eval)>, but $evaltext is undefined.  (Note also that
+$subroutine is C<(eval)>, but $evaltext is undefined.  (Note also that
 each C<use> statement creates a C<require> frame inside an C<eval EXPR>
 frame.)  $subroutine may also be C<(unknown)> if this particular
 subroutine happens to have been deleted from the symbol table.
@@ -2963,7 +2963,7 @@ binary string.  Leading whitespace is ignored in all three cases.)
 The following will handle decimal, binary, octal, and hex in the standard
 Perl or C notation:
 
-    $val = oct($val) if $val =~ /^0/;
+    $val = oct($val) if $val =~ m/^0/;
 
 If EXPR is omitted, uses C<$_>.   To go the other way (produce a number
 in octal), use sprintf() or printf():
@@ -5145,7 +5145,7 @@ Examples:
     # whole record case-insensitively otherwise
 
     @new = sort {
-	($b =~ /=(\d+)/)[0] <=> ($a =~ /=(\d+)/)[0]
+	($b =~ m/=(\d+)/)[0] <=> ($a =~ m/=(\d+)/)[0]
 			    ||
 	            uc($a)  cmp  uc($b)
     } @old;
@@ -6703,7 +6703,7 @@ Does the opposite of a C<shift>.  Or the opposite of a C<push>,
 depending on how you look at it.  Prepends list to the front of the
 array, and returns the new number of elements in the array.
 
-    unshift(@ARGV, '-e') unless $ARGV[0] =~ /^-/;
+    unshift(@ARGV, '-e') unless $ARGV[0] =~ m/^-/;
 
 Note the LIST is prepended whole, not one element at a time, so the
 prepended elements stay in the same order.  Use C<reverse> to do the

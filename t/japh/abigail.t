@@ -68,7 +68,7 @@ my $JaPh_s = "Just another Perl hacker ";
 my $JaPH_c = "Just another Perl Hacker,";
 my $JaPh_c = "Just another Perl hacker,";
 
-plan tests => 130;
+plan tests => 99;
      
 {   
     my $out  = sprintf "Just another Perl Hacker";
@@ -86,7 +86,7 @@ plan tests => 130;
     while (my ($num, $is_prime) = each %primeness) {
         my $comment = "$num is " . ($is_prime ? "prime." : "composite.");
 
-        my $sub     = $is_prime ? "ok" : "notok";
+        my $sub     = $is_prime ? \&ok : \&notok;
 
         &$sub (( 1  x $num) !~ m/^1?$|^(11+?)\1+$/,       $comment);
         &$sub (( 0  x $num) !~ m 0^\0?$|^(\0\0+?)\1+$0,  $comment);
@@ -219,79 +219,11 @@ plan tests => 130;
     }
 }
 
-{
-    my $progfile = "progtmp000";
-    1 while -f ++ $progfile;
-    END {unlink_all $progfile if $progfile}
-
-    my @programs = (<< '    --', << '    --');
-#!./perl
-BEGIN{$|=$SIG{__WARN__}=sub{$_=$_[0];y-_- -;print/(.)"$/;seek _,-open(_ 
-,"+<$0"),2;truncate _,tell _;close _;exec$0}}//rekcaH_lreP_rehtona_tsuJ
-    --
-#!./perl
-BEGIN{$SIG{__WARN__}=sub{$_=pop;y-_- -;print/".*(.)"/;  
-truncate$0,-1+-s$0;exec$0;}}//rekcaH_lreP_rehtona_tsuJ
-    --
-    chomp @programs;
-
-    if ($^O eq 'VMS' or $^O eq 'MSWin32') {
-        # VMS needs extensions for files to be executable,
-        # but the Japhs above rely on $0 being exactly the
-        # filename of the program.
-        skip $^O, 2 * @programs;
-        last
-    }
-
-    use Config;
-    unless (defined $Config {useperlio}) {
-        skip "Uuseperlio", 2 * @programs;
-        last
-    }
-
-    my $i = 1;
-    foreach my $program (@programs) {
-        open my $fh => "> $progfile" or die "Failed to open $progfile: $!\n";
-        print   $fh $program;
-        close   $fh or die "Failed to close $progfile: $!\n";
-
-        chmod 0755   => $progfile or die "Failed to chmod $progfile: $!\n";
-        my $command  = "./$progfile";
-           $command .= ' 2>&1' unless $^O eq 'MacOS';
-        if ( $^O eq 'qnx' ) {
-          skip "#!./perl not supported in QNX4";
-          skip "#!./perl not supported in QNX4";
-        } else {
-          my $output   = `$command`;
-
-          is ($output, $JaPH, "Self correcting code $i");
-
-                 $output   = `$command`;
-          is ($output, "",    "Self corrected code $i");
-        }
-        $i ++;
-    }
-}
-
 __END__
 #######  Funky loop 1.
 $_ = q ;4a75737420616e6f74686572205065726c204861636b65720as;;
      for (s;s;s;s;s;s;s;s;s;s;s;s)
          {s;(..)s?;qq qprint chr 0x$1 and \161 ssq;excess;}
-
-#######  Funky loop 2.
-$_ = q *4a75737420616e6f74686572205065726c204861636b65720a*;
-for ($*=******;$**=******;$**=******) {$**=*******s*..*qq}
-print chr 0x$& and q
-qq}*excess********}
-SKIP_OS: qnx
-
-#######  Funky loop 3.
-$_ = q *4a75737420616e6f74686572205065726c204861636b65720a*;
-for ($*=******;$**=******;$**=******) {$**=*******s*..*qq}
-print chr 0x$& and q
-qq}*excess********}
-SKIP_OS: qnx
 
 #######  Funky loop 4.
 $_ = q ?4a75737420616e6f74686572205065726c204861636b65720as?;??;
@@ -306,7 +238,7 @@ SKIP: Abuses a fixed bug.
 
 #######  Funky loop 6.
 $a = q 94a75737420616e6f74686572205065726c204861636b65720a9 and
-${qq$\x5F$} = q 97265646f9 and s g..g;
+$_ = q 97265646f9 and s g..g;
 qq e\x63\x68\x72\x20\x30\x78$&eggee;
 {eval if $a =~ s e..eqq qprint chr 0x$& and \x71\x20\x71\x71qeexcess}
 
@@ -337,18 +269,6 @@ sub f{sprintf$_[0],$_[1],$_[2]}print f('%c%s',74,f('%c%s',117,f('%c%s',115,f(
 sub f{sprintf'%c%s',$_[0],$_[1]}print f(74,f(117,f(115,f(116,f(32,f(97,
 f(110,f(111,f(116,f(104,f(0x65,f(114,f(32,f(80,f(101,f(114,f(0x6c,f(32,
 f(0x48,f(97,f(99,f(107,f(101,f(114,f(10,q ff)))))))))))))))))))))))))
-
-#######  Hanoi.
-%0=map{local$_=$_;reverse+chop,$_}ABC,ACB,BAC,BCA,CAB,CBA;$_=3 .AC;1while+
-s/(\d+)((.)(.))/($0=$1-1)?"$0$3$0{$2}1$2$0$0{$2}$4":"$3 => $4\n"/xeg;print
-EXPECT
-A => C
-A => B
-C => B
-A => C
-B => A
-B => C
-A => C
 
 #######  Funky -p 1
 }{$_=$.
@@ -403,7 +323,7 @@ SKIP_OS: NetWare
 
 #######  rand
 srand 123456;$-=rand$_--=>@[[$-,$_]=@[[$_,$-]for(reverse+1..(@[=split
-//=>"IGrACVGQ\x02GJCWVhP\x02PL\x02jNMP"));print+(map{$_^q^"^}@[),"\n"
+m//=>"IGrACVGQ\x02GJCWVhP\x02PL\x02jNMP"));print+(map{$_^q^"^}@[),"\n"
 SKIP: Solaris specific.
 
 #######  print and __PACKAGE__
@@ -412,40 +332,6 @@ package Just_another_Perl_Hacker; sub print {($_=$_[0])=~ s/_/ /g;
                                       print (     __PACKAGE__)} &
                                                   __PACKAGE__
                                             (                )
-
-#######  Decorations.
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-/ / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / / 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %;
-BEGIN {% % = ($ _ = " " => print "Just another Perl Hacker\n")}
-
-#######  Tie 1
-sub J::FETCH{Just   }$_.='print+"@{[map';sub J::TIESCALAR{bless\my$J,J}
-sub A::FETCH{another}$_.='{tie my($x),$';sub A::TIESCALAR{bless\my$A,A}
-sub P::FETCH{Perl   }$_.='_;$x}qw/J A P';sub P::TIESCALAR{bless\my$P,P}
-sub H::FETCH{Hacker }$_.=' H/]}\n"';eval;sub H::TIESCALAR{bless\my$H,H}
-
-#######  Tie 2
-package Z;use overload'""'=>sub{$b++?Hacker:another};
-sub TIESCALAR{bless\my$y=>Z}sub FETCH{$a++?Perl:Just}
-$,=$";my$x=tie+my$y=>Z;print$y,$x,$y,$x,"\n";#Abigail
-EXPECT: $JaPH_s
-
-#######  Tie 3
-sub A::TIESCALAR{bless\my$x=>A};package B;@q[0..3]=qw/Hacker Perl
-another Just/;use overload'""'=>sub{pop @q};sub A::FETCH{bless\my
-$y=>B}; tie my $shoe => qq 'A';print "$shoe $shoe $shoe $shoe\n";
-
-#######  Tie 4
-sub A::TIESCALAR{bless\my$x=>'A'};package B;@q=qw/Hacker Perl
-another Just/;use overload'""',sub{pop @q};sub A::FETCH{bless
-\my $y=>B};tie my$shoe=>'A';print"$shoe $shoe $shoe $shoe\n";
-
-#######  Tie 5
-tie $" => A; $, = " "; $\ = "\n"; @a = ("") x 2; print map {"@a"} 1 .. 4;
-sub A::TIESCALAR {bless \my $A => A} #  Yet Another silly JAPH by Abigail
-sub A::FETCH     {@q = qw /Just Another Perl Hacker/ unless @q; shift @q}
-SKIP: Pending a bug fix.
 
 #######  Prototype fun 1
 sub camel (^#87=i@J&&&#]u'^^s]#'#={123{#}7890t[0.9]9@+*`"'***}A&&&}n2o}00}t324i;
@@ -463,15 +349,15 @@ sub _ "Just another Perl Hacker"; print prototype \&_
 SKIP: Abuses a fixed bug.
 
 #######  Split 1
-               split // => '"';
-${"@_"} = "/"; split // => eval join "+" => 1 .. 7;
+               split m// => '"';
+${"@_"} = "/"; split m// => eval join "+" => 1 .. 7;
 *{"@_"} = sub {foreach (sort keys %_)  {print "$_ $_{$_} "}};
 %{"@_"} = %_ = (Just => another => Perl => Hacker); &{%{%_}};
 SKIP: Hashes are now randomized.
 EXPECT: $JaPH_s
 
 #######  Split 2
-$" = "/"; split // => eval join "+" => 1 .. 7;
+$" = "/"; split m// => eval join "+" => 1 .. 7;
 *{"@_"} = sub {foreach (sort keys %_) {print "$_ $_{$_} "}};
 %_ = (Just => another => Perl => Hacker); &{%_};
 SKIP: Hashes are now randomized.
@@ -533,41 +419,9 @@ print 1, 2, 3, 4, "\n";
 
 #######  Overloaded constants 5
 BEGIN {my $x = "Knuth heals rare project\n";
-       $^H {integer} = sub {my $y = shift; $_ = substr $x => $y & 0x1F, 1;
-       $y > 32 ? uc : lc}; $^H = hex join "" => 2, 1, 1, 0, 0}
+       $^H {integer} = sub {my $y = shift; $_ = substr $x => $y ^&^ 0x1F, 1;
+       $y +> 32 ? uc : lc}; $^H = hex join "" => 2, 1, 1, 0, 0}
 print 52,2,10,23,16,8,1,19,3,6,15,12,5,49,21,14,9,11,36,13,22,32,7,18,24;
-
-#######  v-strings 1
-print v74.117.115.116.32;
-print v97.110.111.116.104.101.114.32;
-print v80.101.114.108.32;
-print v72.97.99.107.101.114.10;
-
-#######  v-strings 2
-print 74.117.115.116.32;
-print 97.110.111.116.104.101.114.32;
-print 80.101.114.108.32;
-print 72.97.99.107.101.114.10;
-
-#######  v-strings 3
-print v74.117.115.116.32, v97.110.111.116.104.101.114.32,
-      v80.101.114.108.32, v72.97.99.107.101.114.10;
-
-#######  v-strings 4
-print 74.117.115.116.32, 97.110.111.116.104.101.114.32,
-      80.101.114.108.32, 72.97.99.107.101.114.10;
-
-#######  v-strings 5
-print v74.117.115.116.32.97.110.111.116.104.101.114.
-      v32.80.101.114.108.32.72.97.99.107.101.114.10;
-
-#######  v-strings 6
-print 74.117.115.116.32.97.110.111.116.104.101.114.
-      32.80.101.114.108.32.72.97.99.107.101.114.10;
-
-#######  Symbolic references.
-map{${+chr}=chr}map{$_=>$_^ord$"}$=+$]..3*$=/2;        
-print "$J$u$s$t $a$n$o$t$h$e$r $P$e$r$l $H$a$c$k$e$r\n";
 
 #######  $; fun
 $;                                   # A lone dollar?
@@ -577,60 +431,28 @@ $;                                   # The return of the lone dollar?
 =$/;                                 # More pod?
 print%;                              # No right operand for %?
 
-#######  @; fun
-@;=split//=>"Joel, Preach sartre knuth\n";$;=chr 65;%;=map{$;++=>$_}
-0,22,13,16,5,14,21,1,23,11,2,7,12,6,8,15,3,19,24,14,10,20,18,17,4,25
-;print@;[@;{A..Z}];
-EXPECT: $JaPh_c
-
 #######  %; fun
 $;=$";$;{Just=>another=>Perl=>Hacker=>}=$/;print%;
 
 ####### &func;
 $_ = "\112\165\163\1648\141\156\157\164\150\145\1628\120\145"
    . "\162\1548\110\141\143\153\145\162\0128\177"  and &japh;
-sub japh {print "@_" and return if pop; split /\d/ and &japh}
+sub japh {print "@_" and return if pop; split m/\d/ and &japh}
 
 ####### magic goto.
 sub _ {$_ = shift and y/b-yB-Y/a-yB-Y/                xor      !@ _?
        exit print                                                  :
             print and push @_ => shift and goto &{(caller (0)) [3]}}
-            split // => "KsvQtbuf fbsodpmu\ni flsI "  xor       & _
+            split m// => "KsvQtbuf fbsodpmu\ni flsI "  xor       & _
 
 ####### $: fun 1
 :$:=~s:$":Just$&another$&:;$:=~s:
 :Perl$"Hacker$&:;chop$:;print$:#:
 
-####### $: fun 2
- :;$:=~s:
--:;another Perl Hacker
- :;chop
-$:;$:=~y
- :;::d;print+Just.
-$:;
-
-####### $: fun 3
- :;$:=~s:
--:;another Perl Hacker
- :;chop
-$:;$:=~y:;::d;print+Just.$:
-
 ####### $!
 s[$,][join$,,(split$,,($!=85))[(q[0006143730380126152532042307].
 q[41342211132019313505])=~m[..]g]]e and y[yIbp][HJkP] and print;
 SKIP: Platform dependent.
-
-####### die 1
-eval {die ["Just another Perl Hacker"]}; print ${$@}[$#{@${@}}]
-
-####### die 2
-eval {die ["Just another Perl Hacker\n"]}; print ${$@}[$#{@${@}}]
-
-####### die 3
-eval {die ["Just another Perl Hacker"]}; print ${${@}}[$#{@{${@}}}]
-
-####### die 4
-eval {die ["Just another Perl Hacker\n"]}; print ${${@}}[$#{@{${@}}}]
 
 ####### die 5
 eval {die [[qq [Just another Perl Hacker]]]};; print
@@ -660,7 +482,7 @@ BEGIN {print "Just "   }
 print $qr, "\n";
 
 ####### use lib 'coderef'
-use   lib sub {($\) = split /\./ => pop; print $"};
+use   lib sub {($\) = split m/\./ => pop; print $"};
 eval "use Just" || eval "use another" || eval "use Perl" || eval "use Hacker";
 EXPECT
  Just another Perl Hacker

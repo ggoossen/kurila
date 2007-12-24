@@ -137,7 +137,7 @@ OSses native newline character when reading from or writing to text files.
 
 =head4 Example
 
- $str =~ /\t/;   # Matches if $str contains a (horizontal) tab.
+ $str =~ m/\t/;   # Matches if $str contains a (horizontal) tab.
 
 =head3 Control characters
 
@@ -151,7 +151,7 @@ Mnemonic: I<c>ontrol character.
 
 =head4 Example
 
- $str =~ /\cK/;  # Matches if $str contains a vertical tab (control-K).
+ $str =~ m/\cK/;  # Matches if $str contains a vertical tab (control-K).
 
 =head3 Named characters
 
@@ -167,10 +167,10 @@ Mnemonic: I<N>amed character.
 =head4 Example
 
  use charnames ':full';               # Loads the Unicode names.
- $str =~ /\N{THAI CHARACTER SO SO}/;  # Matches the Thai SO SO character
+ $str =~ m/\N{THAI CHARACTER SO SO}/;  # Matches the Thai SO SO character
 
  use charnames 'Cyrillic';            # Loads Cyrillic names.
- $str =~ /\N{ZHE}\N{KA}/;             # Match "ZHE" followed by "KA".
+ $str =~ m/\N{ZHE}\N{KA}/;             # Match "ZHE" followed by "KA".
 
 =head3 Octal escapes
 
@@ -187,9 +187,9 @@ as a character without special meaning by the regex engine, and will match
 =head4 Examples
 
  $str = "Perl";
- $str =~ /\120/;    # Match, "\120" is "P".
- $str =~ /\120+/;   # Match, "\120" is "P", it is repeated at least once.
- $str =~ /P\053/;   # No match, "\053" is "+" and taken literally.
+ $str =~ m/\120/;    # Match, "\120" is "P".
+ $str =~ m/\120+/;   # Match, "\120" is "P", it is repeated at least once.
+ $str =~ m/P\053/;   # No match, "\053" is "+" and taken literally.
 
 =head4 Caveat
 
@@ -241,9 +241,9 @@ Mnemonic: heI<x>adecimal.
 =head4 Examples
 
  $str = "Perl";
- $str =~ /\x50/;    # Match, "\x50" is "P".
- $str =~ /\x50+/;   # Match, "\x50" is "P", it is repeated at least once.
- $str =~ /P\x2B/;   # No match, "\x2B" is "+" and taken literally.
+ $str =~ m/\x50/;    # Match, "\x50" is "P".
+ $str =~ m/\x50+/;   # Match, "\x50" is "P", it is repeated at least once.
+ $str =~ m/P\x2B/;   # No match, "\x2B" is "+" and taken literally.
 
  /\x{2603}\x{2602}/ # Snowman with an umbrella.
                     # The Unicode character 2603 is a snowman,
@@ -278,9 +278,9 @@ Mnemonic: I<L>owercase, I<U>ppercase, I<Q>uotemeta, I<E>nd.
  $sid     = "sid";
  $greg    = "GrEg";
  $miranda = "(Miranda)";
- $str     =~ /\u$sid/;        # Matches 'Sid'
- $str     =~ /\L$greg/;       # Matches 'greg'
- $str     =~ /\Q$miranda\E/;  # Matches '(Miranda)', as if the pattern
+ $str     =~ m/\u$sid/;        # Matches 'Sid'
+ $str     =~ m/\L$greg/;       # Matches 'greg'
+ $str     =~ m/\Q$miranda\E/;  # Matches '(Miranda)', as if the pattern
                               #   had been written as /\(Miranda\)/
 
 =head2 Character classes
@@ -448,20 +448,20 @@ Mnemonic: I<b>oundary.
 
 =head4 Examples
 
-  "cat"   =~ /\Acat/;     # Match.
-  "cat"   =~ /cat\Z/;     # Match.
-  "cat\n" =~ /cat\Z/;     # Match.
-  "cat\n" =~ /cat\z/;     # No match.
+  "cat"   =~ m/\Acat/;     # Match.
+  "cat"   =~ m/cat\Z/;     # Match.
+  "cat\n" =~ m/cat\Z/;     # Match.
+  "cat\n" =~ m/cat\z/;     # No match.
 
-  "cat"   =~ /\bcat\b/;   # Matches.
-  "cats"  =~ /\bcat\b/;   # No match.
-  "cat"   =~ /\bcat\B/;   # No match.
-  "cats"  =~ /\bcat\B/;   # Match.
+  "cat"   =~ m/\bcat\b/;   # Matches.
+  "cats"  =~ m/\bcat\b/;   # No match.
+  "cat"   =~ m/\bcat\B/;   # No match.
+  "cats"  =~ m/\bcat\B/;   # Match.
 
-  while ("cat dog" =~ /(\w+)/g) {
+  while ("cat dog" =~ m/(\w+)/g) {
       print $1;           # Prints 'catdog'
   }
-  while ("cat dog" =~ /\G(\w+)/g) {
+  while ("cat dog" =~ m/\G(\w+)/g) {
       print $1;           # Prints 'cat'
   }
 
@@ -518,15 +518,15 @@ Mnemonic: eI<X>tended Unicode character.
 
 =head4 Examples
 
- "\x{256}" =~ /^\C\C$/;    # Match as chr (256) takes 2 octets in UTF-8.
+ "\x{256}" =~ m/^\C\C$/;    # Match as chr (256) takes 2 octets in UTF-8.
 
  $str =~ s/foo\Kbar/baz/g; # Change any 'bar' following a 'foo' to 'baz'.
  $str =~ s/(.)\K\1//g;     # Delete duplicated characters.
 
- "\n"   =~ /^\R$/;         # Match, \n   is a generic newline.
- "\r"   =~ /^\R$/;         # Match, \r   is a generic newline.
- "\r\n" =~ /^\R$/;         # Match, \r\n is a generic newline.
+ "\n"   =~ m/^\R$/;         # Match, \n   is a generic newline.
+ "\r"   =~ m/^\R$/;         # Match, \r   is a generic newline.
+ "\r\n" =~ m/^\R$/;         # Match, \r\n is a generic newline.
 
- "P\x{0307}" =~ /^\X$/     # \X matches a P with a dot above.
+ "P\x{0307}" =~ m/^\X$/     # \X matches a P with a dot above.
 
 =cut

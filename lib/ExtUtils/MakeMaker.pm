@@ -324,7 +324,7 @@ sub full_setup {
     }
     foreach my $item (@Get_from_Config) {
         $Recognized_Att_Keys{uc $item} = $Config{$item};
-        print "Attribute '\U$item\E' => '$Config{$item}'\n"
+        print "Attribute '".uc($item)."' => '$Config{$item}'\n"
             if ($Verbose +>= 2);
     }
 
@@ -468,7 +468,7 @@ sub new {
                 # specification under VMS.  So, don't turn the command
                 # into a filespec, but do add a level to the path of
                 # the argument if not already absolute.
-                my @cmd = split /\s+/, $self->{$key};
+                my @cmd = split m/\s+/, $self->{$key};
                 $cmd[1] = $self->catfile('[-]',$cmd[1])
                   unless (@cmd +< 2) || $self->file_name_is_absolute($cmd[1]);
                 $self->{$key} = join(' ', @cmd);
@@ -1179,7 +1179,7 @@ recommend you use that instead.
 Another way to specify many INSTALL directories with a single
 parameter is LIB.
 
-    perl Makefile.PL LIB=~/lib
+    perl Makefile.PL LIB=~m/lib
 
 This will install the module's architecture-independent files into
 ~/lib, the architecture-dependent files into ~/lib/$archname.
@@ -1427,7 +1427,7 @@ Something like C<"-DHAVE_UNISTD_H">
 
 This is the root directory into which the code will be installed.  It
 I<prepends itself to the normal prefix>.  For example, if your code
-would normally go into F</usr/local/lib/perl> you could set DESTDIR=~/tmp/
+would normally go into F</usr/local/lib/perl> you could set DESTDIR=~m/tmp/
 and installation would go into F<~/tmp/usr/local/lib/perl>.
 
 This is primarily of use for people who repackage Perl modules.

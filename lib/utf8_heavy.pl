@@ -209,7 +209,7 @@ sub SWASHNEW_real {
 
     my $ORIG = $list;
     if ($list) {
-	my @tmp = split(/^/m, $list);
+	my @tmp = split(m/^/m, $list);
 	my %seen;
 	no warnings;
 	$extras = join '', grep m/^[^0-9a-fA-F]/, @tmp;
@@ -248,7 +248,7 @@ sub SWASHNEW_real {
 	    my $name = $2;
 	    print STDERR "$1 => $2\n" if DEBUG;
 	    if ($char =~ m/[-+!&]/) {
-		my ($c,$t) = split(/::/, $name, 2);	# bogus use of ::, really
+		my ($c,$t) = split(m/::/, $name, 2);	# bogus use of ::, really
 		my $subobj;
 		if ($c eq 'utf8') {
 		    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0);

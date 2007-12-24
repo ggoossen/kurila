@@ -25,7 +25,7 @@ EXPECT
 ########
 # mg.c
 use warnings 'uninitialized';
-'foo' =~ /(foo)/;
+'foo' =~ m/(foo)/;
 length $3;
 EXPECT
 Use of uninitialized value $3 in length at - line 4.

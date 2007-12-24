@@ -22,6 +22,15 @@ programming languages offer you 1 line of immortality?
 
 =head1 Tasks that only need Perl knowledge
 
+=head2 merge common code in installperl and installman
+
+There are some common subroutines and a common C<BEGIN> block in F<installperl>
+and F<installman>. These should probably be merged. It would also be good to
+check for duplication in all the utility scripts supplied in the source
+tarball. It might be good to move them all to a subdirectory, but this would
+require careful checking to find all places that call them, and change those
+correctly.
+
 =head2 common test code for timed bail out
 
 Write portable self destruct code for tests to stop them burning CPU in
@@ -39,6 +48,13 @@ is needed to improve the cross-linking.
 
 The addition of C<Pod::Simple> and its related modules may make this task
 easier to complete.
+
+=head2 merge checkpods and podchecker
+
+F<pod/checkpods.PL> (and C<make check> in the F<pod/> subdirectory)
+implements a very basic check for pod files, but the errors it discovers
+aren't found by podchecker. Add this check to podchecker, get rid of
+checkpods and have C<make check> use podchecker.
 
 =head2 Parallel testing
 
@@ -327,6 +343,10 @@ cross-compilation/execution environments the HOST and the TARGET do
 not see the same filesystem(s), the $Config{run} may need to do some
 file/directory copying back and forth.
 
+=head2 roffitall
+
+Make F<pod/roffitall> be updated by F<pod/buildtoc>.
+
 =head1 Tasks that need a little C knowledge
 
 These tasks would need a little C knowledge, but don't need any specific
@@ -336,7 +356,17 @@ background or experience with XS, or how the Perl interpreter works
 
 The way @INC is laid out by default, one cannot upgrade core (dual-life)
 modules without overwriting files. This causes problems for binary
-package builders.
+package builders.  One possible proposal is laid out in this
+message:
+L<http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-04/msg02380.html>.
+
+=head2 -Duse32bit*
+
+Natively 64-bit systems need neither -Duse64bitint nor -Duse64bitall.
+On these systems, it might be the default compilation mode, and there
+is currently no guarantee that passing no use64bitall option to the
+Configure process will build a 32bit perl. Implementing -Duse32bit*
+options would be nice for perl 5.12.
 
 =head2 Make it clear from -v if this is the exact official release
 
@@ -419,6 +449,13 @@ been deprecated in favour of ISO C++ conformant names like _fileno. These
 warnings are also currently suppressed by adding -D_CRT_NONSTDC_NO_DEPRECATE. It
 might be nice to do as Microsoft suggest here too, although, unlike the secure
 functions issue, there is presumably little or no benefit in this case.
+
+=head2 __FUNCTION__ for MSVC-pre-7.0
+
+Jarkko notes that one can things morally equivalent to C<__FUNCTION__>
+(or C<__func__>) even in MSVC-pre-7.0, contrary to popular belief.
+See L<http://www.codeproject.com/debug/extendedtrace.asp> if you feel like
+making C<PERL_MEM_LOG> more useful on Win32.
 
 =head1 Tasks that need a knowledge of XS
 
@@ -546,6 +583,13 @@ given that all perl command line options are strict ASCII, and -C changes
 only the interpretation of non-ASCII characters, and not for the script file
 handle. To make it work needs some investigation of the ordering of function
 calls during startup, and (by implication) a bit of tweaking of that order.
+
+=head2 Propagate const outwards from Perl_moreswitches()
+
+Change 32057 changed the parameter and return value of C<Perl_moreswitches()>
+from <char *> to <const char *>. It should now be possible to propagate
+const-correctness outwards to C<S_parse_body()>, C<Perl_moreswitches()>
+and C<Perl_yylex()>.
 
 
 =head1 Tasks that need a knowledge of the interpreter
@@ -714,6 +758,12 @@ An example of a smaller "sandbox" is that this feature can be used to
 implement per-thread working directories: Win32 already does this.
 
 See also L</"Extend PerlIO and PerlIO::Scalar">.
+
+=head2 Investigate PADTMP hash pessimisation
+
+The peephole optimier converts constants used for hash key lookups to shared
+hash key scalars. Under ithreads, something is undoing this work. See
+See http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-09/msg00793.html
 
 =head1 Big projects
 

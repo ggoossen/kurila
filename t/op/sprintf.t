@@ -27,7 +27,7 @@ my $Is_Ultrix_VAX = $^O eq 'ultrix' && `uname -m` =~ m/^VAX$/;
 
 while ( ~< *DATA) {
     s/^\s*>//; s/<\s*$//;
-    ($template, $data, $result, $comment) = split(/<\s*>/, $_, 4);
+    ($template, $data, $result, $comment) = split(m/<\s*>/, $_, 4);
     if ($^O eq 'os390' || $^O eq 's390') { # non-IEEE (s390 is UTS)
         $data   =~ s/([eE])96$/${1}63/;      # smaller exponents
         $result =~ s/([eE]\+)102$/${1}69/;   #  "       "
@@ -36,7 +36,7 @@ while ( ~< *DATA) {
     }
     if ($Is_VMS_VAX || $Is_Ultrix_VAX) {
 	# VAX DEC C 5.3 at least since there is no
-	# ccflags =~ /float=ieee/ on VAX.
+	# ccflags =~ m/float=ieee/ on VAX.
 	# AXP is unaffected whether or not it's using ieee.
         $data   =~ s/([eE])96$/${1}26/;      # smaller exponents
         $result =~ s/([eE]\+)102$/${1}32/;   #  "       "
@@ -474,8 +474,8 @@ __END__
 >%#+6.4o<   >18<          >  0022<
 >%# 6.4o<   >18<          >  0022<
 >%#06.4o<   >18<          >  0022<        >0 flag with precision: no effect<
->%d< >$p=sprintf('%p',$p);$p=~/^[0-9a-f]+$/< >1< >Coarse hack: hex from %p?<
->%d< >$p=sprintf('%-8p',$p);$p=~/^[0-9a-f]+\s*$/< >1< >Coarse hack: hex from %p?<
+>%d< >$p=sprintf('%p',$p);$p=~m/^[0-9a-f]+$/< >1< >Coarse hack: hex from %p?<
+>%d< >$p=sprintf('%-8p',$p);$p=~m/^[0-9a-f]+\s*$/< >1< >Coarse hack: hex from %p?<
 >%#p<       >''<          >%#p INVALID<
 >%q<        >''<          >%q INVALID<
 >%r<        >''<          >%r INVALID<

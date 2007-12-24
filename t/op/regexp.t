@@ -90,7 +90,7 @@ foreach (@tests) {
     }
     chomp;
     s/\\n/\n/g;
-    my ($pat, $subject, $result, $repl, $expect, $reason) = split(/\t/,$_,6);
+    my ($pat, $subject, $result, $repl, $expect, $reason) = split(m/\t/,$_,6);
     if ($result =~ m/c/ and $ENV{PERL_VALGRIND}) {
         print "ok $test # TODO fix memory leak with compilation error\n";
         next;
@@ -127,7 +127,7 @@ EOFCODE
                 $utf8;
                 my \$RE = qr$pat;
                 $study;
-                \$match = (\$subject =~ /(?:)\$RE(?:)/) while \$c--;
+                \$match = (\$subject =~ m/(?:)\$RE(?:)/) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }

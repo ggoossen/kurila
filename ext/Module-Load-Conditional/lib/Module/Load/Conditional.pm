@@ -158,9 +158,9 @@ sub check_install {
         return;
     }
 
-    my $file     = File::Spec->catfile( split /::/, $args->{module} ) . '.pm';
+    my $file     = File::Spec->catfile( split m/::/, $args->{module} ) . '.pm';
     my $file_inc = File::Spec::Unix->catfile( 
-                        split /::/, $args->{module} 
+                        split m/::/, $args->{module} 
                     ) . '.pm';
 
     ### where we store the return value ###

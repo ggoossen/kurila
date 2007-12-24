@@ -305,7 +305,7 @@ package Term::ReadLine;		# So late to allow the above code be defined?
 
 our $VERSION = '1.03';
 
-my ($which) = exists $ENV{PERL_RL} ? split /\s+/, $ENV{PERL_RL} : undef;
+my ($which) = exists $ENV{PERL_RL} ? split m/\s+/, $ENV{PERL_RL} : undef;
 if ($which) {
   if ($which =~ m/\bgnu\b/i){
     eval "use Term::ReadLine::Gnu;";
@@ -357,7 +357,7 @@ sub ornaments {
   $rl_term_set = shift;
   $rl_term_set ||= ',,,';
   $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1';
-  my @ts = split /,/, $rl_term_set, 4;
+  my @ts = split m/,/, $rl_term_set, 4;
   eval { LoadTermCap };
   unless (defined $terminal) {
     warn("Cannot find termcap: $@\n") unless $Term::ReadLine::termcap_nowarn;

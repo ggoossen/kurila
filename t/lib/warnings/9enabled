@@ -1220,10 +1220,10 @@ eval {
 };
 
 # have we caught an error, and is it the one we generated?
-print "ok1\n" if $@ =~ /$warn_msg/;
+print "ok1\n" if $@ =~ m/$warn_msg/;
 
 # does it indicate the right line?
-print "ok2\n" if $@ =~ /line $warn_line/; 
+print "ok2\n" if $@ =~ m/line $warn_line/; 
 EXPECT
 ok1
 ok2

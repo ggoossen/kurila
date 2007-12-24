@@ -73,7 +73,7 @@ for my $u (sort keys %ORD){
     is($t, $ORD{$u}, sprintf "U+%04X", $u);
 }
 for my $s (sort keys %SEQ){
-    my $o = pack "C*" => map {hex} split /\s+/, $s;
+    my $o = pack "C*" => map {hex} split m/\s+/, $s;
     eval { $d->decode($o,1) };
     $DEBUG and $@ and warn $@;
     my $t = $@ ? 1 : 0;

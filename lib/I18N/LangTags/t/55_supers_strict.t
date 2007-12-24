@@ -8,7 +8,7 @@ BEGIN { plan tests => 19 };
 
 print "#\n# Testing strict (non-tight) insertion of super-ordinate language tags...\n#\n";
 
-my @in = grep m/\S/, split /[\n\r]/, q{
+my @in = grep m/\S/, split m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en
