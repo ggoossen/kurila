@@ -5,11 +5,12 @@ use Config;
 use File::Basename;
 use File::Spec;
 use Symbol;
+use strict;
 
 require Exporter;
 
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(process_file);
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(process_file);
 
 # use strict;  # One of these days...
 
@@ -204,7 +205,7 @@ sub process_file {
   }
 
   my ($cast, $size);
-  our $bal = qr[(?:(?>[^()]+)|\((??{ $bal })\))*]; # ()-balanced
+  our $bal = qr[(?:(?>[^()]+)|\((??\{ $bal \})\))*]; # ()-balanced
   $cast = qr[(?:\(\s*SV\s*\*\s*\)\s*)?]; # Optional (SV*) cast
   $size = qr[,\s* (??{ $bal }) ]x; # Third arg (to setpvn)
 
@@ -1654,7 +1655,7 @@ sub output_init {
     } else {
       eval qq/print "\\t$var $init\\n"/;
     }
-    warn $@   if  $@;
+    warn if  $@;
   } else {
     if (  $init =~ s/^\+//  &&  $num  ) {
       &generate_init($type, $num, $var, $name_printed);
@@ -1667,7 +1668,7 @@ sub output_init {
       $init =~ s/^;//;
     }
     $deferred .= eval qq/"\\n\\t$init\\n"/;
-    warn $@   if  $@;
+    warn if  $@;
   }
 }
 
@@ -1690,6 +1691,13 @@ sub death
     Warn @_ ;
     exit 1 ;
   }
+
+sub evalqq {
+    my $x = shift;
+    my $ex = eval qq/"$x"/;
+    die if $@;
+    return $x_var;
+}
 
 sub generate_init {
   local($type, $num, $var) = @_;
@@ -1734,35 +1742,36 @@ sub generate_init {
   if ($expr =~ m#/\*.*scope.*\*/#i) {  # "scope" in C comments
     $ScopeThisXSUB = 1;
   }
+  my $x_var = evalqq($var);
   if (defined($defaults{$var})) {
     $expr =~ s/(\t+)/$1    /g;
     $expr =~ s/        /\t/g;
     if ($name_printed) {
       print ";\n";
     } else {
-      eval qq/print "\\t$var;\\n"/;
-      warn $@   if  $@;
+      print "\t$x_var;\n";
     }
+    my $x_num = evalqq($num);
+    my $x_expr = evalqq($expr);
     if ($defaults{$var} eq 'NO_INIT') {
-      $deferred .= eval qq/"\\n\\tif (items >= $num) \{\\n$expr;\\n\\t\}\\n"/;
+        $deferred .= qq/\n\tif (items >= $x_num) \{\n$x_expr;\n\t\}\n/;
     } else {
-      $deferred .= eval qq/"\\n\\tif (items < $num)\\n\\t    $var = $defaults{$var};\\n\\telse \{\\n$expr;\\n\\t\}\\n"/;
+        my $x_defaults_var = evalqq($defaults{$var});
+        $deferred .= qq/\n\tif (items < $x_num)\n\t    $x_var = $x_defaults_var;\n\telse \{\n$x_expr;\n\t\}\n/;
     }
-    warn $@   if  $@;
   } elsif ($ScopeThisXSUB or $expr !~ m/^\s*\$var =/) {
     if ($name_printed) {
       print ";\n";
     } else {
-      eval qq/print "\\t$var;\\n"/;
-      warn $@   if  $@;
+      print "\t$x_var;\n";
     }
-    $deferred .= eval qq/"\\n$expr;\\n"/;
-    warn $@   if  $@;
+    my $x_expr = evalqq($expr);
+    $deferred .= "\n$x_expr;\n";
   } else {
     die "panic: do not know how to handle this branch for function pointers"
       if $name_printed;
-    eval qq/print "$expr;\\n"/;
-    warn $@   if  $@;
+    my $x_expr = evalqq($expr);
+    print "$x_expr;\n";
   }
 }
 
