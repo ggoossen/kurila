@@ -69,5 +69,5 @@ if (@exts) {
   }
 }
 
-print OUT "}\n";
+print OUT "\}\n";
 close OUT;

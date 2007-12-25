@@ -19,7 +19,7 @@ die "Couldn't make an object!?" unless ok defined $x;
 $x->inc(0);
 
 $x->callback(sub {
-  print "#  ", join("  ", map "{$_}", @_), "\n";
+  print "#  ", join("  ", map "\{$_\}", @_), "\n";
   return;
 });
 

@@ -320,9 +320,9 @@ sub _parse_version {
             no strict;
 
             local $1$2;
-            \$$2=undef; do {
+            \$$2=undef; do \{
                 $str
-            }; \$$2
+            \}; \$$2
         };
         
         print "Evaltext: $eval\n" if $verbose;

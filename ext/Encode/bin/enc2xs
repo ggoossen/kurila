@@ -288,7 +288,7 @@ if ($doC)
     $info[$i] ||= 1;
     }
     # end of null tweak -- dankogai
-    print C " {",join(',',@info,"{${sym}_enc_name,(const char *)0}"),"};\n\n";
+    print C " \{",join(',',@info,"\{${sym}_enc_name,(const char *)0\}"),"\};\n\n";
    }
 
   foreach my $enc (sort cmp_name keys %encoding)
@@ -326,9 +326,9 @@ Encode_XSEncoding(pTHX_ encode_t *enc)
 END
 
     print C "\nMODULE = Encode::$mod\tPACKAGE = Encode::$mod\n\n";
-    print C "BOOT:\n{\n";
+    print C "BOOT:\n\{\n";
     print C "#include \"$dname\"\n";
-    print C "}\n";
+    print C "\}\n";
    }
   # Close in void context is bad, m'kay
   close(D) or warn "Error closing '$dname': $!";
@@ -756,11 +756,11 @@ sub outbigstring
   $strings = length $string_acc;
   my $cpp = ($Config{d_cplusplus} || '') eq 'define';
   my $var = $cpp ? '' : 'static';
-  my $definition = "\n$var const U8 $name\[$strings] = { " .
+  my $definition = "\n$var const U8 $name\[$strings] = \{ " .
     join(',',unpack "C*",$string_acc);
   # We have a single long line. Split it at convenient commas.
   print $fh $1, "\n" while $definition =~ m/\G(.{74,77},)/gcs;
-  print $fh substr ($definition, pos $definition), " };\n";
+  print $fh substr ($definition, pos $definition), " \};\n";
 }
 
 sub findstring {
@@ -785,12 +785,12 @@ sub outtable
  my $var = $cpp ? '' : 'static';
  my $const = $cpp ? '' : 'const';
  print $fh "\n$var $const encpage_t $name\[",
-   scalar(@{$a->{'Entries'}}), "] = {\n";
+   scalar(@{$a->{'Entries'}}), "] = \{\n";
  foreach my $b (@{$a->{'Entries'}})
   {
    my ($sc,$ec,$out,$t,$end,$l,$fb) = @$b;
    # $end |= 0x80 if $fb; # what the heck was on your mind, Nick?  -- Dan
-   print  $fh "{";
+   print  $fh "\{";
    if ($l)
     {
      printf $fh findstring($bigname,$out);
@@ -800,9 +800,9 @@ sub outtable
      print  $fh "0";
     }
    print  $fh ",",$t->{Cname};
-   printf $fh ",0x%02x,0x%02x,$l,$end},\n",$sc,$ec;
+   printf $fh ",0x%02x,0x%02x,$l,$end\},\n",$sc,$ec;
   }
- print $fh "};\n";
+ print $fh "\};\n";
 }
 
 sub output_enc
@@ -1005,7 +1005,7 @@ sub make_configlocal_pm {
     $_ModLines = "";
     for my $enc ( sort keys %LocalMod ) {
         $_ModLines .=
-          qq(\$Encode::ExtModule{'$enc'} = "$LocalMod{$enc}";\n);
+          qq(\$Encode::ExtModule\{'$enc'\} = "$LocalMod{$enc}";\n);
     }
     warn $_ModLines;
     $_LocalVer = _mkversion();

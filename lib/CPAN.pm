@@ -1018,7 +1018,7 @@ Unfortunately we could not create the lock file
 due to permission problems.
 
 Please make sure that the configuration variable
-    \$CPAN::Config->{cpan_home}
+    \$CPAN::Config->\{cpan_home\}
 points to a directory where you can write a .lock file. You can set
 this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
 \@INC path;
@@ -6624,9 +6624,9 @@ We\'ll try to build it with that Makefile then.
 
             $script = "
               EXE_FILES => ['$name'],
-              PREREQ_PM => {
+              PREREQ_PM => \{
 $PREREQ_PM
-                           },
+                           \},
 ";
             if ($name) {
                 my $to_file = File::Spec->catfile($build_dir, $name);
@@ -7655,7 +7655,7 @@ sub _run_via_expect_anyorder {
                                   [ timeout => sub {
                                         $ran_into_timeout++;
                                     } ],
-                                  -re => eval"qr{.}",
+                                  -re => eval"qr\{.\}",
                                  );
         if ($match[2]) {
             $but .= $match[2];
@@ -7668,7 +7668,7 @@ sub _run_via_expect_anyorder {
             # warn "DEBUG: they are asking a question, but[$but]";
             for (my $i = 0; $i +<= $#expectacopy; $i+=2) {
                 my($next,$send) = @expectacopy[$i,$i+1];
-                my $regex = eval "qr{$next}";
+                my $regex = eval "qr\{$next\}";
                 # warn "DEBUG: will compare with regex[$regex].";
                 if ($but =~ m/$regex/) {
                     # warn "DEBUG: will send send[$send]";
@@ -7695,7 +7695,7 @@ sub _run_via_expect_deterministic {
   EXPECT: for (my $i = 0; $i +<= $#$expecta; $i+=2) {
         my($re,$send) = @$expecta[$i,$i+1];
         CPAN->debug("timeout[$timeout]re[$re]") if $CPAN::DEBUG;
-        my $regex = eval "qr{$re}";
+        my $regex = eval "qr\{$re\}";
         $expo->expect($timeout,
                       [ eof => sub {
                             my $but = $expo->clear_accum;
@@ -7836,7 +7836,7 @@ sub _find_prefs {
                     for my $sub_attribute (qw(distribution perl perlconfig module)) {
                         next unless exists $match->{$sub_attribute};
                         $saw_valid_subkeys++;
-                        my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
+                        my $qr = eval "qr\{$distropref->{match}{$sub_attribute}\}";
                         if ($sub_attribute eq "module") {
                             my $okm = 0;
                             #CPAN->debug(sprintf "distropref[%d]", scalar @distropref) if $CPAN::DEBUG;

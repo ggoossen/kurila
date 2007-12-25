@@ -51,7 +51,7 @@ sub unctrl {
 
 sub uniescape {
     join("",
-	 map { $_ +> 255 ? sprintf("\\x{%04X}", $_) : chr($_) }
+	 map { $_ +> 255 ? sprintf("\\x\{%04X\}", $_) : chr($_) }
 	     unpack("U*", $_[0]));
 }
 
@@ -297,16 +297,16 @@ sub unwrap {
       print "$sp-> ",&stringify($$v,1),"\n";
       if ($globPrint) {
 	$s += 3;
-       dumpglob($s, "{$$v}", $$v, 1, $m-1);
+       dumpglob($s, "\{$$v\}", $$v, 1, $m-1);
       } elsif (defined ($fileno = eval {fileno($v)})) {
-	print( (' ' x ($s+3)) .  "FileHandle({$$v}) => fileno($fileno)\n" );
+	print( (' ' x ($s+3)) .  "FileHandle(\{$$v\}) => fileno($fileno)\n" );
       }
     } elsif (ref \$v eq 'GLOB') {
       # Raw glob (again?)
       if ($globPrint) {
-       dumpglob($s, "{$v}", $v, 1, $m-1) if $globPrint;
+       dumpglob($s, "\{$v\}", $v, 1, $m-1) if $globPrint;
       } elsif (defined ($fileno = eval {fileno(\$v)})) {
-	print( (' ' x $s) .  "FileHandle({$v}) => fileno($fileno)\n" );
+	print( (' ' x $s) .  "FileHandle(\{$v\}) => fileno($fileno)\n" );
       }
     }
 }

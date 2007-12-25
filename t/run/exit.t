@@ -122,7 +122,7 @@ if ($^O ne 'VMS') {
 }
 
 $exit_arg = 42;
-$exit = run("END { \$? = $exit_arg }");
+$exit = run("END \{ \$? = $exit_arg \}");
 
 # On VMS, in the child process the actual exit status will be SS$_ABORT, 
 # or 44, which is what you get from any non-zero value of $? except for

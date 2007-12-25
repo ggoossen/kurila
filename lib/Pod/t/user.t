@@ -35,13 +35,13 @@ while (my $line = ~< *DATA) {
 
 my $user_preamble = <<PRE;
 
-\\documentclass{article}
+\\documentclass\{article\}
 
-\\begin{document}
+\\begin\{document\}
 PRE
 
 my $user_postamble = <<POST;
-\\end{document}
+\\end\{document\}
 
 POST
 

@@ -87,7 +87,7 @@ BEGIN {
 #   Expected: '1' (\@list=0,0)
 
 # Test 8 got: 'segmentation fault' ($0 at line 25)
-#   Expected: qr{bongo}
+#   Expected: qr\{bongo\}
 
 # Failed test 9 in $0 at line 27
 

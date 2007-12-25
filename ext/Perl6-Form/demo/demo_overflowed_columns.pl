@@ -14,10 +14,10 @@ EOBIO
 
 print form
 	"Name:				                                   ",
-	"  {[[[[[[[[[[[[}                                      ", $name,
+	"  \{[[[[[[[[[[[[\}                                      ", $name,
 	"                  Biography:                          ",
-	"Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}", $bio,
-	"  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $status,
-	"                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", 
-	"Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-	"  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $comments;
+	"Status:             \{<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\}", $bio,
+	"  \{[[[[[[[[[[[[\}    \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}", $status,
+	"                    \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}", 
+	"Comments:           \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}",
+	"  \{[[[[[[[[[[[\}     \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}", $comments;

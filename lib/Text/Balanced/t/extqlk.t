@@ -74,7 +74,7 @@ while (defined($str = ~< *DATA))
 }
 
 # fails in Text::Balanced 1.95
-$_ = qq(s{}{});
+$_ = qq(s\{\}\{\});
 my @z = extract_quotelike();
 print "not " if $z[0] eq '';
 print "ok ", $count++;

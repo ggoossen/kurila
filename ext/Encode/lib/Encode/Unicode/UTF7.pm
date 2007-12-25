@@ -18,7 +18,7 @@ use Encode;
 our $OPTIONAL_DIRECT_CHARS = 1;
 my $specials = quotemeta "\'(),-./:?";
 $OPTIONAL_DIRECT_CHARS
-  and $specials .= quotemeta "!\"#$%&*;<=>@[]^_`{|}";
+  and $specials .= quotemeta "!\"#$%&*;<=>@[]^_`\{|\}";
 
 # \s will not work because it matches U+3000 DEOGRAPHIC SPACE
 # We use qr/[\n\r\t\ ] instead

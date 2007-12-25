@@ -810,11 +810,11 @@ sub _create_fmts {
                   . "-" x $Columns
                   . "\n";
 
-    my $fmt1 =  "{" . "<" x ($max_namelen - 1) . "}"
-              . "  {>>} {>>>>} {>>>>} {>>>}  "
-              . "{" . "<" x ($list_len - 1) . "}";
-    my $fmt2 =  " " x ($Columns - $list_len - 2) . "{"
-              . "[" x ($list_len - 1) . "}";
+    my $fmt1 =  "\{" . "<" x ($max_namelen - 1) . "\}"
+              . "  \{>>\} \{>>>>\} \{>>>>\} \{>>>\}  "
+              . "\{" . "<" x ($list_len - 1) . "\}";
+    my $fmt2 =  " " x ($Columns - $list_len - 2) . "\{"
+              . "[" x ($list_len - 1) . "\}";
 
     return($fmt_top, $fmt1, $fmt2);
 }

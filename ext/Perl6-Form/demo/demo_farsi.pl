@@ -4,7 +4,7 @@ my @amounts = (0, 1, 1.2345, 1234.56, -1234.56, 1234567.89);
 
 print form
 	 "Farsi (Iranian):",
-	 "        {-IRR 0/[[[[[[[[}",
+	 "        \{-IRR 0/[[[[[[[[\}",
 			  farsi(@amounts);
 
 

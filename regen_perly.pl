@@ -258,13 +258,13 @@ sub make_type_tab {
 	or die "make_type_tab: couldn't delete trailing ',0'\n";
 
     return 
-	  "\ntypedef enum {\n\t"
+	  "\ntypedef enum \{\n\t"
 	. join(", ", map "toketype_$_", sort keys %types)
-	. "\n} toketypes;\n\n"
+	. "\n\} toketypes;\n\n"
 	. "/* type of each token/terminal */\n"
-	. "static const toketypes yy_type_tab[] =\n{\n"
+	. "static const toketypes yy_type_tab[] =\n\{\n"
 	. $fields
-	. "\n};\n";
+	. "\n\};\n";
 }
 
 

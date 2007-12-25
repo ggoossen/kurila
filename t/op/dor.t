@@ -44,7 +44,7 @@ is(pop @ARGV   // 7, 3,	'pop @array // ... works');
 # Test that various syntaxes are allowed
 
 for (qw(getc pos readline readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f)) {
-    eval "no strict; sub { $_ // 0 }";
+    eval "no strict; sub \{ $_ // 0 \}";
     is($@, '', "$_ // ... compiles");
 }
 

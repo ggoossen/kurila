@@ -79,7 +79,7 @@ sub perl_stringify {
   s/\t/\\t/g;
   s/\f/\\f/g;
   s/\a/\\a/g;
-  s/([^\0-\177])/sprintf "\\x{%X}", ord $1/ge;
+  s/([^\0-\177])/sprintf "\\x\{%X\}", ord $1/ge;
   # This will elicit a warning on 5.005_03 about [: :] being reserved unless
   # I cheat
   my $cheat = '([[:^print:]])';

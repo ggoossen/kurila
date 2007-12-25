@@ -23,7 +23,7 @@ sub filefound {
 
 open OUT,">perl.pkg";
 
-print OUT "#{\"perl$VERSION\"},(0x100051d8),0,$EPOC_VERSION,0\n";
+print OUT "#\{\"perl$VERSION\"\},(0x100051d8),0,$EPOC_VERSION,0\n";
 print OUT "\"" . cwd . "/Artistic.txt\"-\"\",FT,TC\n";
 print OUT "\"" . cwd . "/perl\"-\"!:\\emx\\bin\\perl.exe\"\n";
 

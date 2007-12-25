@@ -158,11 +158,11 @@ for my $target (@target) {
 
      my $ProductId =
          defined $S60SDK ?
-qq[;Supports Series 60 v0.9\n(0x101F6F88), 0, 0, 0, {"Series60ProductID"}\n] :
+qq[;Supports Series 60 v0.9\n(0x101F6F88), 0, 0, 0, \{"Series60ProductID"\}\n] :
          defined $S80SDK ?
-qq[;Supports Series 80 v2.0\n(0x101F8ED2), 0, 0, 0, {"Series80ProductID"}\n] :
+qq[;Supports Series 80 v2.0\n(0x101F8ED2), 0, 0, 0, \{"Series80ProductID"\}\n] :
          defined $S90SDK ?
-qq[;Supports Series 90 v1.1\n(0x101FBE05), 0, 0, 0, {"Series90ProductID"}\n] :
+qq[;Supports Series 90 v1.1\n(0x101FBE05), 0, 0, 0, \{"Series90ProductID"\}\n] :
          ";Supports Series NN";
 
     open PKG, ">$pkg" or die "$0: failed to create $pkg: $!\n";
@@ -174,7 +174,7 @@ qq[;Supports Series 90 v1.1\n(0x101FBE05), 0, 0, 0, {"Series90ProductID"}\n] :
 ;
 ; The installation name and header data
 ;
-#{"\u$target"},($uid),$MAJOR,$MINOR,$PATCH
+#\{"\u$target"\},($uid),$MAJOR,$MINOR,$PATCH
 ;
 ; Private key and certificate (unused)
 ;

@@ -119,7 +119,7 @@ sub have_compiler {
   {
     local *FH;
     open FH, "> $tmpfile" or die "Can't create $tmpfile: $!";
-    print FH "int boot_compilet() { return 1; }\n";
+    print FH "int boot_compilet() \{ return 1; \}\n";
     close FH;
   }
 

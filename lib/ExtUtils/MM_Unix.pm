@@ -1025,7 +1025,7 @@ WARNING
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace +>= 2);
 
-            my $version_check = qq{$abs -le "\$^V =~ m/^\Q$ver\E/; print qq{VER_OK}"};
+            my $version_check = qq{$abs -le "\$^V =~ m/^\Q$ver\E/; print qq\{VER_OK\}"};
             $version_check = "$Config{run} $version_check"
                 if defined $Config{run} and length $Config{run};
 
@@ -1121,7 +1121,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
                 $shb .= "\n";
             }
             $shb .= qq{
-eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
+eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
     if 0; # not running under some shell
 } unless $Is_Win32;    # this won't work on win32, so don't
         }
@@ -2713,15 +2713,15 @@ sub parse_version {
 	my $eval = qq{
 	    package ExtUtils::MakeMaker::_version;
 	    no strict;
-	    BEGIN { eval {
+	    BEGIN \{ eval \{
 	        require version;
 	        "version"->import;
-	    } }
+	    \} \}
 
 	    local $1$2;
-	    \$$2=undef; do {
+	    \$$2=undef; do \{
 		$_
-	    }; \$$2
+	    \}; \$$2
 	};
         local $^W = 0;
 	$result = eval($eval);
@@ -2905,7 +2905,7 @@ pm_to_blib : $(TO_INST_PM)
 };
 
     my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib({\@ARGV}, '$autodir', '\$(PM_FILTER)')
+pm_to_blib(\{\@ARGV\}, '$autodir', '\$(PM_FILTER)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});

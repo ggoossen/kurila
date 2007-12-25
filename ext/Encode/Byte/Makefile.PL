@@ -114,7 +114,7 @@ END
 
 static void
 Encode_XSEncoding(pTHX_ encode_t *enc)
-{
+\{
  dSP;
  HV *stash = gv_stashpv("Encode::XS", TRUE);
  SV *sv    = sv_bless(newRV_noinc(newSViv(PTR2IV(enc))),stash);
@@ -122,24 +122,24 @@ Encode_XSEncoding(pTHX_ encode_t *enc)
  PUSHMARK(sp);
  XPUSHs(sv);
  while (enc->name[i])
-  {
+  \{
    const char *name = enc->name[i++];
    XPUSHs(sv_2mortal(newSVpvn(name,strlen(name))));
-  }
+  \}
  PUTBACK;
  call_pv("Encode::define_encoding",G_DISCARD);
  SvREFCNT_dec(sv);
-}
+\}
 
 MODULE = Encode::$name	PACKAGE = Encode::$name
 PROTOTYPES: DISABLE
 BOOT:
-{
+\{
 END
     foreach my $table (keys %tables) {
     print XS qq[#include "${table}.exh"\n];
     }
-    print XS "}\n";
+    print XS "\}\n";
     close(XS);
     return "# Built $name.xs\n\n";
 }

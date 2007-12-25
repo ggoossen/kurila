@@ -1934,7 +1934,7 @@ sub DB {
         # It's a conditional stop; eval it in the user's context and
         # see if we should stop. If so, remove the one-time sigil.
         elsif ($stop) {
-            $evalarg = "\$DB::signal |= 1 if do {$stop}";
+            $evalarg = "\$DB::signal |= 1 if do \{$stop\}";
             &eval;
             $dbline{$line} =~ s/;9($|\0)/$1/;
         }
@@ -3164,10 +3164,10 @@ the bottom of the loop.
 =cut
 
                 # p - print (no args): print $_.
-                $cmd =~ s/^p$/print {\$DB::OUT} \$_/;
+                $cmd =~ s/^p$/print \{\$DB::OUT\} \$_/;
 
                 # p - print the given expression.
-                $cmd =~ s/^p\b/print {\$DB::OUT} /;
+                $cmd =~ s/^p\b/print \{\$DB::OUT\} /;
 
 =head4 C<=> - define command alias
 
@@ -3205,7 +3205,7 @@ Manipulates C<%alias> to add or list command aliases.
                         local $SIG{__WARN__};
 
                         # Is it valid Perl?
-                        unless ( eval "sub { s\a$k\a$v\a }; 1" ) {
+                        unless ( eval "sub \{ s\a$k\a$v\a \}; 1" ) {
 
                             # Nope. Bad alias. Say so and get out.
                             print $OUT "Can't alias $k to $v: $@\n";
@@ -5799,7 +5799,7 @@ sub dump_trace {
         # If the sub is '(eval)', this is a block eval, meaning we don't
         # know what the eval'ed text actually was.
         elsif ( $sub eq '(eval)' ) {
-            $sub = "eval {...}";
+            $sub = "eval \{...\}";
         }
 
         # Stick the collected information into @sub as an anonymous hash.
@@ -6549,7 +6549,7 @@ sub parse_options {
         # "Quoted" with [], <>, or {}.
         else {    #{ to "let some poor schmuck bounce on the % key in B<vi>."
             my ($end) =
-              "\\" . substr( ")]>}$sep", index( "([<{", $sep ), 1 );    #}
+              "\\" . substr( ")]>\}$sep", index( "([<\{", $sep ), 1 );    #}
             s/^(([^\\$end]|\\[\\$end])*)$end($|\s+)//
               or print( $OUT "Unclosed option value `$opt$sep$_'\n" ), last;
             ( $val = $1 ) =~ s/\\([\\$end])/$1/g;
@@ -7151,10 +7151,10 @@ B<>> ?            List Perl commands to run after each prompt.
 B<>> I<expr>        Define Perl command to run after each prompt.
 B<>>B<>> I<expr>        Add to the list of Perl commands to run after each prompt.
 B<>>B< *>        Delete the list of Perl commands to run after each prompt.
-B<{> I<db_command>    Define debugger command to run before each prompt.
-B<{> ?            List debugger commands to run before each prompt.
-B<{{> I<db_command>    Add to the list of debugger commands to run before each prompt.
-B<{ *>             Delete the list of debugger commands to run before each prompt.
+B<\{> I<db_command>    Define debugger command to run before each prompt.
+B<\{> ?            List debugger commands to run before each prompt.
+B<\{{> I<db_command>    Add to the list of debugger commands to run before each prompt.
+B<\{ *>             Delete the list of debugger commands to run before each prompt.
 B<$prc> I<number>    Redo a previous command (default previous command).
 B<$prc> I<-number>    Redo number'th-to-last command.
 B<$prc> I<pattern>    Redo last command that started with I<pattern>.
@@ -7174,7 +7174,7 @@ B<rerun> I<n>         Rerun session to numbered command.
 B<rerun> I<-n>        Rerun session to number'th-to-last command.
 B<H> I<-number>    Display last number commands (default all).
 B<H> I<*>          Delete complete history.
-B<p> I<expr>        Same as \"I<print {DB::OUT} expr>\" in current package.
+B<p> I<expr>        Same as \"I<print \{DB::OUT\} expr>\" in current package.
 B<|>I<dbcmd>        Run debugger command, piping DB::OUT to current pager.
 B<||>I<dbcmd>        Same as B<|>I<dbcmd> but DB::OUT is temporarilly select()ed as well.
 B<\=> [I<alias> I<value>]    Define a command alias, or list current aliases.
@@ -7214,7 +7214,7 @@ B<o> [I<opt>B<=>I<val>] [I<opt>=B<\">I<val>B<\">] ...
     I<CreateTTY>     bits control attempts to create a new TTY on events:
             1: on fork()    2: debugger is started inside debugger
             4: on startup
-    During startup options are initialized from \$ENV{PERLDB_OPTS}.
+    During startup options are initialized from \$ENV\{PERLDB_OPTS\}.
     You can put additional initialization options I<TTY>, I<noTTY>,
     I<ReadLine>, I<NonStop>, and I<RemotePort> there (or use
     `B<R>' after you set them).
@@ -7242,7 +7242,7 @@ I<List/search source lines:>               I<Control script execution:>
   B<M>           Show module versions        B<c> [I<ln>|I<sub>]  Continue until position
 I<Debugger controls:>                        B<L>           List break/watch/actions
   B<o> [...]     Set debugger options        B<t> [I<expr>]    Toggle trace [trace expr]
-  B<<>[B<<>]|B<{>[B<{>]|B<>>[B<>>] [I<cmd>] Do pre/post-prompt B<b> [I<ln>|I<event>|I<sub>] [I<cnd>] Set breakpoint
+  B<<>[B<<>]|B<\{>[B<\{>]|B<>>[B<>>] [I<cmd>] Do pre/post-prompt B<b> [I<ln>|I<event>|I<sub>] [I<cnd>] Set breakpoint
   B<$prc> [I<N>|I<pat>]   Redo a previous command     B<B> I<ln|*>      Delete a/all breakpoints
   B<H> [I<-num>]    Display last num commands   B<a> [I<ln>] I<cmd>  Do cmd before line
   B<=> [I<a> I<val>]   Define/list an alias        B<A> I<ln|*>      Delete a/all actions
@@ -7332,9 +7332,9 @@ B<<<> I<expr>        Add to the list of Perl commands to run before each prompt.
 B<>> ?            List Perl commands to run after each prompt.
 B<>> I<expr>        Define Perl command to run after each prompt.
 B<>>B<>> I<expr>        Add to the list of Perl commands to run after each prompt.
-B<{> I<db_command>    Define debugger command to run before each prompt.
-B<{> ?            List debugger commands to run before each prompt.
-B<{{> I<db_command>    Add to the list of debugger commands to run before each prompt.
+B<\{> I<db_command>    Define debugger command to run before each prompt.
+B<\{> ?            List debugger commands to run before each prompt.
+B<\{{> I<db_command>    Add to the list of debugger commands to run before each prompt.
 B<$prc> I<number>    Redo a previous command (default previous command).
 B<$prc> I<-number>    Redo number'th-to-last command.
 B<$prc> I<pattern>    Redo last command that started with I<pattern>.
@@ -7349,7 +7349,7 @@ B<$psh> [I<cmd>]     Run I<cmd> in subshell (forces \"\$SHELL -c 'cmd'\")."
         See 'B<O> I<shellBang>' too.
 B<source> I<file>        Execute I<file> containing debugger commands (may nest).
 B<H> I<-number>    Display last number commands (default all).
-B<p> I<expr>        Same as \"I<print {DB::OUT} expr>\" in current package.
+B<p> I<expr>        Same as \"I<print \{DB::OUT\} expr>\" in current package.
 B<|>I<dbcmd>        Run debugger command, piping DB::OUT to current pager.
 B<||>I<dbcmd>        Same as B<|>I<dbcmd> but DB::OUT is temporarilly select()ed as well.
 B<\=> [I<alias> I<value>]    Define a command alias, or list current aliases.
@@ -7390,7 +7390,7 @@ B<O> [I<opt>B<=>I<val>] [I<opt>=B<\">I<val>B<\">] ...
     I<CreateTTY>     bits control attempts to create a new TTY on events:
             1: on fork()    2: debugger is started inside debugger
             4: on startup
-    During startup options are initialized from \$ENV{PERLDB_OPTS}.
+    During startup options are initialized from \$ENV\{PERLDB_OPTS\}.
     You can put additional initialization options I<TTY>, I<noTTY>,
     I<ReadLine>, I<NonStop>, and I<RemotePort> there (or use
     `B<R>' after you set them).
@@ -7417,7 +7417,7 @@ I<List/search source lines:>               I<Control script execution:>
   B<v>           Show versions of modules    B<c> [I<ln>|I<sub>]  Continue until position
 I<Debugger controls:>                        B<L>           List break/watch/actions
   B<O> [...]     Set debugger options        B<t> [I<expr>]    Toggle trace [trace expr]
-  B<<>[B<<>]|B<{>[B<{>]|B<>>[B<>>] [I<cmd>] Do pre/post-prompt B<b> [I<ln>|I<event>|I<sub>] [I<cnd>] Set breakpoint
+  B<<>[B<<>]|B<\{>[B<\{>]|B<>>[B<>>] [I<cmd>] Do pre/post-prompt B<b> [I<ln>|I<event>|I<sub>] [I<cnd>] Set breakpoint
   B<$prc> [I<N>|I<pat>]   Redo a previous command     B<d> [I<ln>] or B<D> Delete a/all breakpoints
   B<H> [I<-num>]    Display last num commands   B<a> [I<ln>] I<cmd>  Do cmd before line
   B<=> [I<a> I<val>]   Define/list an alias        B<W> I<expr>      Add a watch expression

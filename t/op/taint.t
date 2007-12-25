@@ -61,18 +61,18 @@ if ($Is_VMS) {
     # There is currently no way to determine if they did not exist
     # before this test was run.
     eval <<EndOfCleanup;
-	END {
-	    \$ENV{PATH} = \$old_env_path;
+	END \{
+	    \$ENV\{PATH\} = \$old_env_path;
 	    warn "# Note: logical name 'PATH' may have been created\n";
-	    \$ENV{'TERM'} = \$old_env_term;
+	    \$ENV\{'TERM'\} = \$old_env_term;
 	    warn "# Note: logical name 'TERM' may have been created\n";
-	    \@ENV{keys %old} = values %old;
-	    if (defined \$old_env_dcl_path) {
-		\$ENV{'DCL\$PATH'} = \$old_env_dcl_path;
-	    } else {
-		delete \$ENV{'DCL\$PATH'};
-	    }
-	}
+	    \@ENV\{keys %old\} = values %old;
+	    if (defined \$old_env_dcl_path) \{
+		\$ENV\{'DCL\$PATH'\} = \$old_env_dcl_path;
+	    \} else \{
+		delete \$ENV\{'DCL\$PATH'\};
+	    \}
+	\}
 EndOfCleanup
 }
 
@@ -928,7 +928,7 @@ ok( $@ =~ m/^Modification of a read-only value attempted/,
 }
 
 SKIP: {
-    skip "system {} has different semantics on Win32", 1 if $Is_MSWin32;
+    skip "system \{\} has different semantics on Win32", 1 if $Is_MSWin32;
 
     # bug 20010221.005
     local $ENV{PATH} .= $TAINT;

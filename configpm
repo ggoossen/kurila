@@ -327,7 +327,7 @@ if ($s == 4 || $s == 8) {
     $byteorder_code = <<"EOT";
 
 my \$i = 0;
-foreach my \$c ($list) { \$i ^|^= ord(\$c); \$i <<= 8 }
+foreach my \$c ($list) \{ \$i ^|^= ord(\$c); \$i <<= 8 \}
 \$i ^|^= ord(1);
 our \$byteorder = join('', unpack('$format', pack('$f', \$i)));
 EOT
@@ -482,7 +482,7 @@ if ($Common{byteorder}) {
 
 if (@need_relocation) {
 $heavy_txt .= 'foreach my $what (qw(' . join (' ', @need_relocation) .
-      ")) {\n" . <<'EOT';
+      ")) \{\n" . <<'EOT';
     s/^($what=)(['"])(.*?)\2/$1 . $2 . relocate_inc($3) . $2/me;
 }
 EOT
@@ -491,8 +491,8 @@ EOT
 # ':' will always be applicable
 if ($need_relocation{otherlibdirs}) {
 $heavy_txt .= << 'EOT';
-s{^(otherlibdirs=)(['"])(.*?)\2}
- {$1 . $2 . join ':', map {relocate_inc($_)} split ':', $3 . $2}me;
+s\{^(otherlibdirs=)(['"])(.*?)\2\}
+ \{$1 . $2 . join ':', map \{relocate_inc($_)\} split ':', $3 . $2\}me;
 EOT
 }
 }
@@ -660,7 +660,7 @@ ENDOFSET
 	}
     }
     $config_txt .= <<ENDOFSET if $dll;
-\$preconfig{dll_name} = '$dll';
+\$preconfig\{dll_name\} = '$dll';
 ENDOFSET
 } else {
     $config_txt .= <<'ENDOFSET';
@@ -680,7 +680,7 @@ foreach my $key (keys %Common) {
 	$value =~ s!'!\\'!g;
 	$value = "'$value'";
 	if ($key eq 'otherlibdirs') {
-	    $value = "join (':', map {relocate_inc(\$_)} split (':', $value))";
+	    $value = "join (':', map \{relocate_inc(\$_)\} split (':', $value))";
 	} elsif ($need_relocation{$key}) {
 	    $value = "relocate_inc($value)";
 	}

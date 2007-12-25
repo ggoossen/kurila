@@ -280,9 +280,9 @@ is("b${a}c", "bxxc");
 $na = eval { ^~^$a };
 like($@, qr/no method found/);
 
-eval "package Oscalar; sub numify { return '_!_' . shift() . '_!_' } use overload '0+' => \\&numify";
+eval "package Oscalar; sub numify \{ return '_!_' . shift() . '_!_' \} use overload '0+' => \\&numify";
 is $@, '';
-eval "package Oscalar; sub rshft { return '_!_' . shift() . '_!_' } use overload '>>' => \\&rshft";
+eval "package Oscalar; sub rshft \{ return '_!_' . shift() . '_!_' \} use overload '>>' => \\&rshft";
 is $@, '';
 
 $na = eval { $aI >> 1 };       # Hash was not updated
@@ -404,14 +404,14 @@ is($b, "_<oups1
   } 
   my %subr = ( 'n' => sub {$_[0]} );
   foreach my $op (split " ", $overload::ops{with_assign}) {
-    $subr{$op} = $subr{"$op="} = eval "sub {shift() $op shift()}";
+    $subr{$op} = $subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
   my @bins = qw(binary 3way_comparison num_comparison str_comparison);
   foreach my $op (split " ", "@overload::ops{ @bins }") {
-    $subr{$op} = eval "sub {shift() $op shift()}";
+    $subr{$op} = eval "sub \{shift() $op shift()\}";
   }
   foreach my $op (split " ", "@overload::ops{qw(unary func)}") {
-    $subr{$op} = eval "sub {$op shift()}";
+    $subr{$op} = eval "sub \{$op shift()\}";
   }
   $subr{'++'} = $subr{'+'};
   $subr{'--'} = $subr{'-'};
@@ -525,14 +525,14 @@ is($b, "_<oups1
   } 
   my %subr = ( 'n' => sub {$_[0]} );
   foreach my $op (split " ", $overload::ops{with_assign}) {
-    $subr{$op} = $subr{"$op="} = eval "sub {shift() $op shift()}";
+    $subr{$op} = $subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
   my @bins = qw(binary 3way_comparison num_comparison str_comparison);
   foreach my $op (split " ", "@overload::ops{ @bins }") {
-    $subr{$op} = eval "sub {shift() $op shift()}";
+    $subr{$op} = eval "sub \{shift() $op shift()\}";
   }
   foreach my $op (split " ", "@overload::ops{qw(unary func)}") {
-    $subr{$op} = eval "sub {$op shift()}";
+    $subr{$op} = eval "sub \{$op shift()\}";
   }
   $subr{'++'} = $subr{'+'};
   $subr{'--'} = $subr{'-'};

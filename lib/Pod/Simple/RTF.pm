@@ -21,7 +21,7 @@ $WRAP = 1 unless defined $WRAP;
 sub _openclose {
  return map {;
    m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
-   ( $1,  "{\\$2\n",   "/$1",  "}" );
+   ( $1,  "\{\\$2\n",   "/$1",  "\}" );
  } @_;
 }
 
@@ -62,28 +62,28 @@ my @_to_accept;
  'Data'  => "\n",
  '/Data' => "\n",
 
- 'Verbatim'  => "\n{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n",
- '/Verbatim' => "\n\\par}\n",
- 'VerbatimFormatted'  => "\n{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n",
- '/VerbatimFormatted' => "\n\\par}\n",
- 'Para'    => "\n{\\pard\\li#rtfindent#\\sa180\n",
- '/Para'   => "\n\\par}\n",
- 'head1'   => "\n{\\pard\\li#rtfindent#\\s31\\keepn\\sb90\\sa180\\f2\\fs#head1_halfpoint_size#\\ul{\n",
- '/head1'  => "\n}\\par}\n",
- 'head2'   => "\n{\\pard\\li#rtfindent#\\s32\\keepn\\sb90\\sa180\\f2\\fs#head2_halfpoint_size#\\ul{\n",
- '/head2'  => "\n}\\par}\n",
- 'head3'   => "\n{\\pard\\li#rtfindent#\\s33\\keepn\\sb90\\sa180\\f2\\fs#head3_halfpoint_size#\\ul{\n",
- '/head3'  => "\n}\\par}\n",
- 'head4'   => "\n{\\pard\\li#rtfindent#\\s34\\keepn\\sb90\\sa180\\f2\\fs#head4_halfpoint_size#\\ul{\n",
- '/head4'  => "\n}\\par}\n",
+ 'Verbatim'  => "\n\{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n",
+ '/Verbatim' => "\n\\par\}\n",
+ 'VerbatimFormatted'  => "\n\{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n",
+ '/VerbatimFormatted' => "\n\\par\}\n",
+ 'Para'    => "\n\{\\pard\\li#rtfindent#\\sa180\n",
+ '/Para'   => "\n\\par\}\n",
+ 'head1'   => "\n\{\\pard\\li#rtfindent#\\s31\\keepn\\sb90\\sa180\\f2\\fs#head1_halfpoint_size#\\ul\{\n",
+ '/head1'  => "\n\}\\par\}\n",
+ 'head2'   => "\n\{\\pard\\li#rtfindent#\\s32\\keepn\\sb90\\sa180\\f2\\fs#head2_halfpoint_size#\\ul\{\n",
+ '/head2'  => "\n\}\\par\}\n",
+ 'head3'   => "\n\{\\pard\\li#rtfindent#\\s33\\keepn\\sb90\\sa180\\f2\\fs#head3_halfpoint_size#\\ul\{\n",
+ '/head3'  => "\n\}\\par\}\n",
+ 'head4'   => "\n\{\\pard\\li#rtfindent#\\s34\\keepn\\sb90\\sa180\\f2\\fs#head4_halfpoint_size#\\ul\{\n",
+ '/head4'  => "\n\}\\par\}\n",
    # wordpad borks on \tc\tcl1, or I'd put that in =head1 and =head2
 
- 'item-bullet'  => "\n{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
- '/item-bullet' => "\n\\par}\n",
- 'item-number'  => "\n{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
- '/item-number' => "\n\\par}\n",
- 'item-text'    => "\n{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
- '/item-text'   => "\n\\par}\n",
+ 'item-bullet'  => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
+ '/item-bullet' => "\n\\par\}\n",
+ 'item-number'  => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
+ '/item-number' => "\n\\par\}\n",
+ 'item-text'    => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
+ '/item-text'   => "\n\\par\}\n",
 
  # we don't need any styles for over-* and /over-*
 );
@@ -554,8 +554,8 @@ sub rtf_esc_codely {
   # CRAZY HACKS:
   "\n" => "\\line\n",
   "\r" => "\n",
-  "\cb" => "{\n\\cs21\\lang1024\\noproof ",  # \\cf1
-  "\cc" => "}",
+  "\cb" => "\{\n\\cs21\\lang1024\\noproof ",  # \\cf1
+  "\cc" => "\}",
 );
 1;
 

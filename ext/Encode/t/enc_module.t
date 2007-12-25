@@ -11,7 +11,7 @@ BEGIN {
     exit 0;
     }
     if (defined ${^UNICODE} and ${^UNICODE} != 0){
-    print "1..0 # Skip: \${^UNICODE} == ${^UNICODE}\n";
+    print "1..0 # Skip: \$\{^UNICODE\} == ${^UNICODE}\n";
     exit 0;
     }
     if (ord("A") == 193) {

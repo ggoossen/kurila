@@ -146,13 +146,13 @@ sub load_loc {
 	package $pkg;
 	use base 'Locale::Maketext';
         %${pkg}::Lexicon = ( '_AUTO' => 1 );
-	Locale::Maketext::Lexicon->import({
+	Locale::Maketext::Lexicon->import(\{
 	    'i-default' => [ 'Auto' ],
 	    '*'	=> [ Gettext => \$pattern ],
 	    _decode => \$decode,
 	    _encoding => \$encoding,
-	});
-	*tense = sub { \$_[1] . ((\$_[2] eq 'present') ? 'ing' : 'ed') }
+	\});
+	*tense = sub \{ \$_[1] . ((\$_[2] eq 'present') ? 'ing' : 'ed') \}
 	    unless defined &tense;
 
 	1;

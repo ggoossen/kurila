@@ -206,10 +206,10 @@ SKIP: {
 	sub defd_empty {};
 	($res,$err) = render('-basic', \&defd_empty);
 	is(scalar split(m/\n/, $res), 3,
-	   "'sub defd_empty {}' seen as 3 liner");
+	   "'sub defd_empty \{\}' seen as 3 liner");
 
 	is(1, $res =~ m/leavesub/ && $res =~ m/(next|db)state/,
-	   "'sub defd_empty {}' seen as 2 ops: leavesub,nextstate");
+	   "'sub defd_empty \{\}' seen as 2 ops: leavesub,nextstate");
 
 	($res,$err) = render('-basic', \&not_even_declared);
 	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,

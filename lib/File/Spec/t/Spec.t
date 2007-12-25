@@ -21,9 +21,9 @@ if ( $@ ) {
    # making it more usable when running on (say) Unix but working with
    # VMS paths.
    eval qq-
-      sub File::Spec::VMS::vmsify  { die "$skip_exception" }
-      sub File::Spec::VMS::unixify { die "$skip_exception" }
-      sub File::Spec::VMS::vmspath { die "$skip_exception" }
+      sub File::Spec::VMS::vmsify  \{ die "$skip_exception" \}
+      sub File::Spec::VMS::unixify \{ die "$skip_exception" \}
+      sub File::Spec::VMS::vmspath \{ die "$skip_exception" \}
    - ;
    $INC{"VMS/Filespec.pm"} = 1 ;
 }

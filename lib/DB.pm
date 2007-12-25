@@ -109,7 +109,7 @@ sub DB {
     }
     else {
       $stop = 0 unless $stop;			# avoid un_init warning
-      $evalarg = "\$DB::signal |= do { $stop; }"; &eval;
+      $evalarg = "\$DB::signal |= do \{ $stop; \}"; &eval;
       $DB::dbline{$DB::lineno} =~ s/;9($|\0)/$1/;    # clear any temp breakpt
     }
   }
@@ -265,7 +265,7 @@ sub backtrace {
     } elsif (defined $r) {
       $s = "eval '$e'";
     } elsif ($s eq '(eval)') {
-      $s = "eval {...}";
+      $s = "eval \{...\}";
     }
     $f = "file `$f'" unless $f eq '-e';
     push @ret, "$w&$s$a from $f line $l";

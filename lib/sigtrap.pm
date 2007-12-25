@@ -112,7 +112,7 @@ sub handler_traceback {
 	} elsif (defined $r) {
 	    $s = "eval '$e'";
 	} elsif ($s eq '(eval)') {
-	    $s = "eval {...}";
+	    $s = "eval \{...\}";
 	}
 	$f = "file `$f'" unless $f eq '-e';
 	$mess = "$w$s$a called from $f line $l\n";

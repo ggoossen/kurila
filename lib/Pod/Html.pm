@@ -1382,13 +1382,13 @@ sub process_pre {
 
     $rest =~ s{
 	\b			# start at word boundary
-	(			# begin $1  {
+	(			# begin $1  \{
 	    $urls :		# need resource and a colon
 	    (?!:)		# Ignore File::, among others.
 	    [$any] +?		# followed by one or more of any valid
 				#   character, but be conservative and
 				#   take only what you need to....
-	)			# end   $1  }
+	)			# end   $1  \}
 	(?=
 	    &quot; &gt;		# maybe pre-quoted '<a href="...">'
 	|			# or:

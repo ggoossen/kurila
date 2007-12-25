@@ -267,7 +267,7 @@ SKIP: {
 
     my $try = sub {
 	my @c1 = eval qq[\$DEV =~ m/^$_[0].*/mg];
-	my @c2 = eval qq[grep { $_[1] "/dev/\$_" } \@DEV];
+	my @c2 = eval qq[grep \{ $_[1] "/dev/\$_" \} \@DEV];
 	my $c1 = scalar @c1;
 	my $c2 = scalar @c2;
 	is($c1, $c2, "ls and $_[1] agreeing on /dev ($c1 $c2)");
@@ -501,8 +501,8 @@ SKIP: {
     # RT #8244: *FILE{IO} does not behave like *FILE for stat() and -X() operators
     ok(open(F, ">", $tmpfile), 'can create temp file');
     my @thwap = stat *F{IO};
-    ok(@thwap, "stat(*F{IO}) works");    
-    ok( -f *F{IO} , "single file tests work with *F{IO}");
+    ok(@thwap, "stat(*F\{IO\}) works");    
+    ok( -f *F{IO} , "single file tests work with *F\{IO\}");
     close F;
     unlink $tmpfile;
 
@@ -511,18 +511,18 @@ SKIP: {
     SKIP: {
         skip "No dirfd()", 9 unless $Config{d_dirfd} || $Config{d_dir_dd_fd};
         ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $!";
-        ok(stat(*DIR{IO}), "stat() on *DIR{IO} works");
+        ok(stat(*DIR{IO}), "stat() on *DIR\{IO\} works");
 	ok(-d _ , "The special file handle _ is set correctly"); 
-        ok(-d -r *DIR{IO} , "chained -x's on *DIR{IO}");
+        ok(-d -r *DIR{IO} , "chained -x's on *DIR\{IO\}");
 
 	# And now for the ambigious bareword case
 	ok(open(DIR, "TEST"), 'Can open "TEST" dir')
 	    || diag "Can't open 'TEST':  $!";
 	my $size = (stat(*DIR{IO}))[7];
-	ok(defined $size, "stat() on *THINGY{IO} works");
+	ok(defined $size, "stat() on *THINGY\{IO\} works");
 	is($size, -s "TEST",
-	   "size returned by stat of *THINGY{IO} is for the file");
-	ok(-f _, "ambiguous *THINGY{IO} uses file handle, not dir handle");
+	   "size returned by stat of *THINGY\{IO\} is for the file");
+	ok(-f _, "ambiguous *THINGY\{IO\} uses file handle, not dir handle");
 	ok(-f *DIR{IO});
 	closedir DIR or die $!;
 	close DIR or die $!;

@@ -245,7 +245,7 @@ DEBUG_INFO
 
 	  $code .= <<"END_MARK_ONE";
 
-BEGIN { \$SIG{__WARN__} = sub { 
+BEGIN \{ \$SIG\{__WARN__\} = sub \{ 
     my \$msg = \$_[0];
 END_MARK_ONE
 
@@ -256,17 +256,17 @@ END_MARK_TWO
 
 	  $code .= <<"END_MARK_THREE";		# Backwhack a lot!
     print "not ok: got unexpected warning \$msg\\n";
-} }
+\} \}
 
-{
+\{
     my \$test = $test;
-    sub test (&) {
-      my \$ok = &{\$_[0]};
+    sub test (&) \{
+      my \$ok = &\{\$_[0]\};
       print \$ok ? "ok \$test\n" : "not ok \$test\n";
       printf "# Failed at line %d\n", (caller)[2] unless \$ok;
       \$test++;
-    }
-}
+    \}
+\}
 
 # some of the variables which the closure will access
 no strict 'vars';
@@ -306,12 +306,12 @@ END
 	    $code .= "
       my \$foreach = 12000;
       my \@list = (10000, 10010);
-      foreach \$foreach (\@list) {
+      foreach \$foreach (\@list) \{
     " # }
 	  } elsif ($within eq 'naked') {
-	    $code .= "  { # naked block\n"	# }
+	    $code .= "  \{ # naked block\n"	# }
 	  } elsif ($within eq 'other_sub') {
-	    $code .= "  sub inner_sub {\n"	# }
+	    $code .= "  sub inner_sub \{\n"	# }
 	  } else {
 	    die "What was $within?"
 	  }
@@ -368,13 +368,13 @@ END
 	  } # End of foreach $inner_sub_test
 
 	  # Close up $within block		# {
-	  $code .= "  }\n\n";
+	  $code .= "  \}\n\n";
 
 	  # Close up $where_declared block
 	  if ($where_declared eq 'in_named') {	# {
-	    $code .= "}\n\n";
+	    $code .= "\}\n\n";
 	  } elsif ($where_declared eq 'in_anon') {	# {
-	    $code .= "};\n\n";
+	    $code .= "\};\n\n";
 	  }
 
 	  # We may need to do something with the sub we just made...
@@ -422,9 +422,9 @@ END
 
 	    # Here's the test:
 	    if ($inner_type eq 'anon') {
-	      $code .= "test { &\$anon_$test == $expected };\n"
+	      $code .= "test \{ &\$anon_$test == $expected \};\n"
 	    } else {
-	      $code .= "test { &named_$test == $expected };\n"
+	      $code .= "test \{ &named_$test == $expected \};\n"
 	    }
 	    $test++;
 	  }
@@ -647,12 +647,12 @@ f16302();
     open(T, ">$progfile") or die "$0: $!\n";
     print T << '__EOF__';
         print
-            sub {$_[0]->(@_)} -> (
-                sub {
+            sub \{$_[0]->(@_)\} -> (
+                sub \{
                     $_[1]
-                        ?  $_[0]->($_[0], $_[1] - 1) .  sub {"x"}->()
+                        ?  $_[0]->($_[0], $_[1] - 1) .  sub \{"x"\}->()
                         : "y"
-                },   
+                \},   
                 2
             )
             , "\n"

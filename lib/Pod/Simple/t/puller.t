@@ -23,8 +23,8 @@ sub pump_it_up {
   my(@t, $t);
   while($t = $p->get_token) { push @t, $t }
   print "# Count of tokens: ", scalar(@t), "\n";
-  print "#  I.e., {", join("\n#       + ",
-    map ref($_) . ": " . $_->dump, @t), "} \n";
+  print "#  I.e., \{", join("\n#       + ",
+    map ref($_) . ": " . $_->dump, @t), "\} \n";
   return @t;
 }
 

@@ -146,7 +146,7 @@ sub display {
             my $y = '';
             foreach my $c (unpack("U*", $x)) {
                 if ($c +> 255) {
-                    $y .= sprintf "\\x{%x}", $c;
+                    $y .= sprintf "\\x\{%x\}", $c;
                 } elsif ($backslash_escape{$c}) {
                     $y .= $backslash_escape{$c};
                 } else {

@@ -645,8 +645,8 @@ __EOF__
         print _INIT_C <<__EOF__;
     #include "EXTERN.h"
     #include "perl.h"
-    EXPORT_C void _init(void *handle) {
-    }
+    EXPORT_C void _init(void *handle) \{
+    \}
 __EOF__
         close(_INIT_C);
 

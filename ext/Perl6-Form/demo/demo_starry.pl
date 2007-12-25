@@ -13,7 +13,7 @@ sub starbright {
 	(my $whole = $match->[1]) =~ tr/*/>>/;
 	 my $point = $match->[2];
 	(my $fract = $match->[3]) =~ tr/*/<</;
-    return "{$whole$point$fract}";
+    return "\{$whole$point$fract\}";
 }
 
 my $starlight = qr/ [{] ([*]+) ([.,]) ([*]+) [}] /x;

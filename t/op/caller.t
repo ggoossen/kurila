@@ -16,8 +16,8 @@ print "# Tests with caller(0)\n";
 ok( (!@c), "caller(0) in main program" );
 
 eval { @c = caller(0) };
-is( $c[3], "(eval)", "subroutine name in an eval {}" );
-ok( !$c[4], "hasargs false in an eval {}" );
+is( $c[3], "(eval)", "subroutine name in an eval \{\}" );
+ok( !$c[4], "hasargs false in an eval \{\}" );
 
 eval q{ @c = (Caller(0))[3] };
 is( $c[3], "(eval)", "subroutine name in an eval ''" );
@@ -46,8 +46,8 @@ ok( $c[4], "hasargs true with callf()" );
 ok( !$c[4], "hasargs false with &callf" );
 
 eval { f() };
-is( $c[3], "(eval)", "subroutine name in an eval {}" );
-ok( !$c[4], "hasargs false in an eval {}" );
+is( $c[3], "(eval)", "subroutine name in an eval \{\}" );
+ok( !$c[4], "hasargs false in an eval \{\}" );
 
 eval q{ f() };
 is( $c[3], "(eval)", "subroutine name in an eval ''" );

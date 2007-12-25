@@ -295,11 +295,11 @@ print "not " if eval q(('a' x ($reg_infty_m - 1)) =~ m/a{$reg_infty_m}/) || $@;
 print "ok 68\n";
 
 undef $@;
-eval "'aaa' =~ m/a{1,$reg_infty}/";
+eval "'aaa' =~ m/a\{1,$reg_infty\}/";
 print "not " if $@ !~ m%^\QQuantifier in {,} bigger than%;
 print "ok 69\n";
 
-eval "'aaa' =~ m/a{1,$reg_infty_p}/";
+eval "'aaa' =~ m/a\{1,$reg_infty_p\}/";
 print "not "
 	if $@ !~ m%^\QQuantifier in {,} bigger than%;
 print "ok 70\n";
@@ -928,16 +928,16 @@ $brackets = qr{
 	         {  (?> [^{}]+ | (??{ $brackets }) )* }
 	      }x;
 
-"{{}" =~ $brackets;
+"\{{\}" =~ $brackets;
 print "ok $test\n";		# Did we survive?
 $test++;
 
-"something { long { and } hairy" =~ $brackets;
+"something \{ long \{ and \} hairy" =~ $brackets;
 print "ok $test\n";		# Did we survive?
 $test++;
 
-"something { long { and } hairy" =~ m/((??{ $brackets }))/;
-print "not " unless $1 eq "{ and }";
+"something \{ long \{ and \} hairy" =~ m/((??{ $brackets }))/;
+print "not " unless $1 eq "\{ and \}";
 print "ok $test\n";
 $test++;
 
@@ -1057,11 +1057,11 @@ print "ok $test\n";
 $test++;
 
 eval << 'EOE';
-{
+\{
  package S;
- use overload '""' => sub { 'Object S' };
- sub new { bless [] }
-}
+ use overload '""' => sub \{ 'Object S' \};
+ sub new \{ bless [] \}
+\}
 $a = 'S'->new;
 EOE
 
@@ -1129,7 +1129,7 @@ $test++;
     my $y = qr/^.$/u;
     ok("$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified.");
     eval q|no utf8; $x =~ m/\x{65e5}/|;
-    ok( $@ , "\\x{...} gives error in non-unicode regex");
+    ok( $@ , "\\x\{...\} gives error in non-unicode regex");
 }
 
 use utf8;
@@ -1453,12 +1453,12 @@ ok(1) while $test +< 576;
 	my($input, $i);
 
 	$i = 0;
-	$input = "a{b}c{d}";
+	$input = "a\{b\}c\{d\}";
         eval <<EOT;
-	while (eval \$input =~ $rx) {
+	while (eval \$input =~ $rx) \{
 	    print "# \\\$1 = '\$1' \\\$2 = '\$2'\n";
 	    ++\$i;
-	}
+	\}
 EOT
 	print "not " unless $i == 2;
 	print "ok " . $test++ . "\n";
@@ -2588,7 +2588,7 @@ print "# some Unicode properties\n";
     print eval qq* "a" =~ m/\pq / *      ? "not ok $test\n" : "ok $test\n";
     $test++;
 
-    print eval qq* "a" =~ m/\p{qrst} / * ? "not ok $test\n" : "ok $test\n";
+    print eval qq* "a" =~ m/\p\{qrst\} / * ? "not ok $test\n" : "ok $test\n";
     $test++;
 }
 
@@ -2831,7 +2831,7 @@ $x = "CD";
 $x =~ m/(AB)*CD/;
 ok(!defined $1, "[perl #7471]");
 
-$pattern = "^(b+?|a){1,2}c";
+$pattern = "^(b+?|a)\{1,2\}c";
 ok("bac"    =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 ok("bbac"   =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 ok("bbbac"  =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
@@ -2870,13 +2870,13 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
     foreach (1,2,3,4) {
 	    $p++ if m/(??{ $p })/
     }
-    ok ($p == 5, "[perl #20683] (??{ }) returns stale values");
+    ok ($p == 5, "[perl #20683] (??\{ \}) returns stale values");
     { package P; $a=1; sub TIESCALAR { bless[] } sub FETCH { $a++ } }
     tie $p, 'P';
     foreach (1,2,3,4) {
 	    m/(??{ $p })/
     }
-    ok ( $p == 5, "(??{ }) returns stale values");
+    ok ( $p == 5, "(??\{ \}) returns stale values");
 }
 
 {
@@ -2898,10 +2898,10 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 {
     my $i;
     ok('-1-3-5-' eq join('', split m/((??{$i++}))/, '-1-3-5-'),
-	"[perl #21411] (??{ .. }) corrupts split's stack");
+	"[perl #21411] (??\{ .. \}) corrupts split's stack");
     split m/(?{'WOW'})/, 'abc';
     ok('a|b|c' eq join ('|', @_),
-       "[perl #21411] (?{ .. }) version of the above");
+       "[perl #21411] (?\{ .. \}) version of the above");
 }
 
 {
@@ -2927,9 +2927,9 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 }
 
 {
-    $_ = "code:   'x' { '...' }\n"; study;
+    $_ = "code:   'x' \{ '...' \}\n"; study;
 
-    $_ = "code:   'x' { '...' }\n"; study;
+    $_ = "code:   'x' \{ '...' \}\n"; study;
     my @x; push @x, $& while m/'[^\']*'/gx;
     ok(join(":", @x) eq "'x':'...'",
        "[perl #17757] Parse::RecDescent triggers infinite loop");
@@ -3249,7 +3249,7 @@ if ($ordA == 193) {
     $str .= ($delim x 4);
     my $res;
     my $matched;
-    if ($str =~ s/^(.*?)${delim}{4}//s) {
+    if ($str =~ s/^(.*?)${delim}\{4\}//s) {
         $res = $1;
         $matched=1;
     } 
@@ -3349,7 +3349,7 @@ EOFTEST
 $brackets = qr{
 	         {  (?> [^{}]+ | (??{ $brackets }) )* }
 	      }x;
-ok("{b{c}d" !~ m/^((??{ $brackets }))/, "bracket mismatch");
+ok("\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch");
 
 SKIP:{
     our @stack=();
@@ -3400,9 +3400,9 @@ SKIP:{
 	my ($r1, $c1, $r2, $c2) = eval qq{
 	    use utf8;
 	    scalar("..foo foo.." =~ m/(?'${uni}'foo) \\k'${uni}'/),
-		\$+{${uni}},
+		\$+\{${uni}\},
 	    scalar("..bar bar.." =~ m/(?<${uni}>bar) \\k<${uni}>/),
-		\$+{${uni}};
+		\$+\{${uni}\};
 	};
 	ok($r1,                         "Named capture UTF (?'')");
 	ok(defined $c1 && $c1 eq 'foo', "Named capture UTF \%+");
@@ -3592,7 +3592,7 @@ if ($ENV{PERL_SKIP_PSYCHO_TEST}){
 
 # \, breaks {3,4}
 ok("xaaay"    !~ m/xa{3\,4}y/, "\, in a pattern");
-ok("xa{3,4}y" =~ m/xa{3\,4}y/, "\, in a pattern");
+ok("xa\{3,4\}y" =~ m/xa{3\,4}y/, "\, in a pattern");
 
 # \c\ followed by _
 ok("x\c_y"    !~ m/x\c\_y/,    "\_ in a pattern");
@@ -4092,12 +4092,12 @@ sub kt
         for my $dfi (0..$#df) {
             my $pat= $df[$dfi];
             my $str= $ss[$ssi];
-            (my $sstr=$str)=~s/\x{DF}/\\x{DF}/;
+            (my $sstr=$str)=~s/\x{DF}/\\x\{DF\}/;
 
             my $ret= $str=~m/$pat/i;
             next if $pat eq '-';
             ok($ret,
-               "\"$sstr\"=~m/\\x{DF}/i # TODO multi-char folding");
+               "\"$sstr\"=~m/\\x\{DF\}/i # TODO multi-char folding");
         }
     }
 }
@@ -4225,7 +4225,7 @@ ok(("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/, "Recursive stack cracker: #24274")
     or print "# Unexpected outcome: should pass or crash perl\n";
 
 ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/, 
-        "Regexp /^(??{'(.)'x 100})/ crashes older perls")
+        "Regexp /^(??\{'(.)'x 100\})/ crashes older perls")
     or print "# Unexpected outcome: should pass or crash perl\n";
 
 eval 'm/\k/';
@@ -4250,7 +4250,7 @@ ok($@=~m/\QSequence \k... not terminated in regex;\E/);
 {
     local ${^UTF8CACHE} = -1;
     use utf8;
-    my $s="[a]a{2}";
+    my $s="[a]a\{2\}";
     ok("aaa" =~ m/$s/, "#45337");
 }
 

@@ -434,22 +434,22 @@ use strict;
 use $package qw(@$export_names);
 
 print "1..2\n";
-if (open OUTPUT, ">$output") {
+if (open OUTPUT, ">$output") \{
   print "ok 1\n";
   select OUTPUT;
-} else {
+\} else \{
   print "not ok 1 # Failed to open '$output': \$!\n";
   exit 1;
-}
+\}
 EOT
   print FH $testfile or die $!;
   print FH <<"EOT" or die $!;
 select STDOUT;
-if (close OUTPUT) {
+if (close OUTPUT) \{
   print "ok 2\n";
-} else {
+\} else \{
   print "not ok 2 # Failed to close '$output': \$!\n";
-}
+\}
 EOT
   close FH or die "close $testpl: $!\n";
 
@@ -732,18 +732,18 @@ EOT
 
 $test_body .= <<"EOT";
 my \$rfc1149 = RFC1149;
-if (\$rfc1149 ne "$parent_rfc1149") {
+if (\$rfc1149 ne "$parent_rfc1149") \{
   print "not ok \$test # '\$rfc1149' ne '$parent_rfc1149'\n";
-} else {
+\} else \{
   print "ok \$test\n";
-}
+\}
 \$test++;
 
-if (\$rfc1149 != 1149) {
+if (\$rfc1149 != 1149) \{
   printf "not ok \$test # %d != 1149\n", \$rfc1149;
-} else {
+\} else \{
   print "ok \$test\n";
-}
+\}
 \$test++;
 
 EOT
@@ -769,28 +769,28 @@ sub explict_call_constant {
   my ($string, $expect) = @_;
   # This does assume simple strings suitable for ''
   my $test_body = <<"EOT";
-{
+\{
   my (\$error, \$got) = ${package}::constant ('$string');\n;
 EOT
 
   if (defined $expect) {
     # No error expected
     $test_body .= <<"EOT";
-  if (\$error or \$got ne "$expect") {
+  if (\$error or \$got ne "$expect") \{
     print "not ok $dummytest # error '\$error', expect '$expect', got '\$got'\n";
-  } else {
+  \} else \{
     print "ok $dummytest\n";
-    }
-  }
+    \}
+  \}
 EOT
   } else {
     # Error expected.
     $test_body .= <<"EOT";
-  if (\$error) {
+  if (\$error) \{
     print "ok $dummytest # error='\$error' (as expected)\n";
-  } else {
+  \} else \{
     print "not ok $dummytest # expected error, got no error and '\$got'\n";
-  }
+  \}
 EOT
   }
   $dummytest++;
@@ -811,11 +811,11 @@ sub simple {
     $test_header .= "#define $thisname $counter\n";
     $test_body .= <<"EOT";
 \$value = $thisname;
-if (\$value == $counter) {
+if (\$value == $counter) \{
   print "ok $dummytest\n";
-} else {
+\} else \{
   print "not ok $dummytest # $thisname gave \$value\n";
-}
+\}
 EOT
     ++$dummytest;
     # Yes, the last time round the loop appends a z to the string.

@@ -170,7 +170,7 @@ sub _parseBit
         }
         elsif ($2 eq '{' || $2 eq '}')
         {
-            return _retError "Nested {} not allowed" ;
+            return _retError "Nested \{\} not allowed" ;
         }
     }
 
@@ -229,7 +229,7 @@ sub _parseInputGlob
         }
         elsif ($2 eq '}')
         {
-            return _unmatched "}" ;
+            return _unmatched "\}" ;
         }
         elsif ($2 eq '{')
         {
@@ -239,7 +239,7 @@ sub _parseInputGlob
             my $tmp ;
             unless ( $string =~ s/(.*?)$noPreBS\}//)
             {
-                return _unmatched "{";
+                return _unmatched "\{";
             }
             #$string =~ s#(.*?)\}##;
 

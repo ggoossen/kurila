@@ -216,7 +216,7 @@ SKIP: {
         my ($cr, $filename) = @_;
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//;
         open my $fh, '<',
-             \"package $module; sub complain { warn q() }; \$::file = __FILE__;"
+             \"package $module; sub complain \{ warn q() \}; \$::file = __FILE__;"
 	    or die $!;
         $INC{$filename} = "/custom/path/to/$filename";
         return $fh;

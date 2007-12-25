@@ -47,7 +47,7 @@ sub import {
     $$variable = $value;
     print "# Starting Pod::Simple::DEBUG = non-constant $variable with val $value\n";
   } else {
-    *Pod::Simple::DEBUG = eval " sub () { $value } ";
+    *Pod::Simple::DEBUG = eval " sub () \{ $value \} ";
     print "# Starting Pod::Simple::DEBUG = $value\n";
   }
   

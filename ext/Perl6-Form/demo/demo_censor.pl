@@ -14,7 +14,7 @@ my $script = do{local$/; ~< *DATA};
 
 print form
 	 "[Ye following tranfcript hath been cenfored by Order of ye King]\n\n",
-	 "         {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+	 "         \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
 	 $censor->($script);
 
 __DATA__

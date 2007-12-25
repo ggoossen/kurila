@@ -189,7 +189,7 @@ sub longjmp {
 }
 
 sub setjmp {
-    unimpl "setjmp() is C-specific: use eval {} instead";
+    unimpl "setjmp() is C-specific: use eval \{\} instead";
 }
 
 sub siglongjmp {
@@ -197,7 +197,7 @@ sub siglongjmp {
 }
 
 sub sigsetjmp {
-    unimpl "sigsetjmp() is C-specific: use eval {} instead";
+    unimpl "sigsetjmp() is C-specific: use eval \{\} instead";
 }
 
 sub kill {
@@ -393,7 +393,7 @@ sub abs {
 }
 
 sub atexit {
-    unimpl "atexit() is C-specific: use END {} instead";
+    unimpl "atexit() is C-specific: use END \{\} instead";
 }
 
 sub atof {

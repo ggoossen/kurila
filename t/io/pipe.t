@@ -45,7 +45,7 @@ SKIP: {
         next_test();
         my $tnum = curr_test;
         next_test();
-	exec $Perl, '-le', "print q{not ok $tnum -     again}";
+	exec $Perl, '-le', "print q\{not ok $tnum -     again\}";
     }
 
     # This has to be *outside* the fork
@@ -119,7 +119,7 @@ SKIP: {
             
             my $tnum = curr_test;
             next_test;
-            exec $Perl, '-le', "print q{not ok $tnum -     with fh dup }";
+            exec $Perl, '-le', "print q\{not ok $tnum -     with fh dup \}";
         }
 
         # This has to be done *outside* the fork.

@@ -74,7 +74,7 @@ my $thawed = thaw(freeze(\%utf8hash));
 
 is($nk = nkeys($thawed),
    nkeys(\%utf8hash),
-   "scalar keys \%{\$thawed} (nkeys=$nk)");
+   "scalar keys \%\{\$thawed\} (nkeys=$nk)");
 for my $k (sort keys %$thawed){
     is($utf8hash{$k}, $thawed->{$k}, "frozen item chr($utf8hash{$k})");
 }
@@ -87,7 +87,7 @@ ok(($retrieved = retrieve($storage)), "retrieve from $storage");
 
 is($nk = nkeys($retrieved),
    nkeys(\%utf8hash),
-   "scalar keys \%{\$retrieved} (nkeys=$nk)");
+   "scalar keys \%\{\$retrieved\} (nkeys=$nk)");
 for my $k (sort keys %$retrieved){
     is($utf8hash{$k}, $retrieved->{$k}, "nstored item chr($utf8hash{$k})");
 }
@@ -98,7 +98,7 @@ ok((store \%utf8hash, $storage), "store to $storage");
 ok(($retrieved = retrieve($storage)), "retrieve from $storage");
 is($nk = nkeys($retrieved),
    nkeys(\%utf8hash),
-   "scalar keys \%{\$retrieved} (nkeys=$nk)");
+   "scalar keys \%\{\$retrieved\} (nkeys=$nk)");
 for my $k (sort keys %$retrieved){
     is($utf8hash{$k}, $retrieved->{$k}, "stored item chr($utf8hash{$k})");
 }

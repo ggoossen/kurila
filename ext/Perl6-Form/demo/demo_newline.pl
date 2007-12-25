@@ -6,7 +6,7 @@ use Perl6::Form 'drill';
 print form
   'Name              Payment (per unit)',
   {under=>"=-"},
-  "{[[[[[[[[[[[}       {]],]]].[[[}",
+  "\{[[[[[[[[[[[\}       \{]],]]].[[[\}",
   $name,               {lfill=>'* ', rfill=>'0'},
 				       $payment;
 

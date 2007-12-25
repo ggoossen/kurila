@@ -37,7 +37,7 @@ my $file = "fallback$$.txt";
 
 open($fh,$file) || die "File cannot be re-opened";
 my $line = ~< $fh;
-is($line,"\\x{20ac}0.02\n","perlqq escapes");
+is($line,"\\x\{20ac\}0.02\n","perlqq escapes");
 close($fh);
 
 $PerlIO::encoding::fallback = Encode::HTMLCREF();

@@ -304,12 +304,12 @@ sub write_errno_pm {
 	    print C <<EOF;
 #include <errno.h>
 #include <stdio.h>
-int main() {
+int main() \{
 EOF
             for (@allerrs) {
 		print C qq[printf("$_ %d\n", $_);]
 	    }
-            print C "}\n";
+            print C "\}\n";
             close C;
             system("cc -o errno errno.c");
             unlink("errno.c");
@@ -340,9 +340,9 @@ use Exporter ();
 use Config;
 use strict;
 
-"\$Config{'archname'}-\$Config{'osvers'}" eq
+"\$Config\{'archname'\}-\$Config\{'osvers'\}" eq
 "$Config{'archname'}-$Config{'osvers'}" or
-	die "Errno architecture ($Config{'archname'}-$Config{'osvers'}) does not match executable architecture (\$Config{'archname'}-\$Config{'osvers'})";
+	die "Errno architecture ($Config{'archname'}-$Config{'osvers'}) does not match executable architecture (\$Config\{'archname'\}-\$Config\{'osvers'\})";
 
 \$VERSION = "$VERSION";
 \$VERSION = eval \$VERSION;
@@ -382,7 +382,7 @@ ESQ
     print "\t",$k,"\n    )]\n);\n\n";
 
     foreach $err (@err) {
-	printf "sub %s () { %d }\n",,$err,$err{$err};
+	printf "sub %s () \{ %d \}\n",,$err,$err{$err};
     }
 
     print <<'ESQ';

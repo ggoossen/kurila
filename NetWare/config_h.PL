@@ -27,7 +27,7 @@ while ( ~< *SH)
 ($term,$file,$pat) = m/^sed\s+<<(\S+)\s+>(\S+)\s+(.*)$/;
 $file =~ s/^\$(\w+)$/$opt{$1}/g;
 
-my $str = "sub munge\n{\n";
+my $str = "sub munge\n\{\n";
 
 while ($pat =~ s/-e\s+'([^']*)'\s*//)
  {
@@ -36,7 +36,7 @@ while ($pat =~ s/-e\s+'([^']*)'\s*//)
   $e =~ s/\\(\d)/\$$1/g; 
   $str .= "$e;\n";
  }
-$str .= "}\n";
+$str .= "\}\n";
 
 eval $str;
 

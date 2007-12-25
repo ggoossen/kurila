@@ -88,7 +88,7 @@ delete @count{ grep $count{$_} +< 2, keys %count };
 my $shadowed = join "|", sort keys %count;
 ok $shadowed, "squaa::Vliff";
 
-sub thar { print "# Seen $_[0] :\n", map "#  {$_}\n", sort grep $where2name->{$_} eq $_[0],keys %$where2name; return; }
+sub thar { print "# Seen $_[0] :\n", map "#  \{$_\}\n", sort grep $where2name->{$_} eq $_[0],keys %$where2name; return; }
 
 ok $count{'squaa::Vliff'}, 3;
 thar 'squaa::Vliff';
