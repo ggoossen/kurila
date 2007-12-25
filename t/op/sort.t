@@ -588,9 +588,9 @@ ok "@input", "G H I D E F A B C", 'stable $b <=> $a in place sort';
 # (new in 5.9) without overloading
 { no warnings;
 @b = sort { $b <+> $a } @input = qw/5first 6first 5second 6second/;
-ok "@b" , "6first 6second 5first 5second", "optimized {$b <=> $a} without overloading" ;
+ok "@b" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
 @input = sort {$b <+> $a} @input;
-ok "@input" , "6first 6second 5first 5second","inline optimized {$b <=> $a} without overloading" ;
+ok "@input" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
 };
 
 # These two are actually doing string cmp on 0 1 and 2

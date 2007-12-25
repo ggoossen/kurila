@@ -34,39 +34,39 @@ if ("@foo[0..1]b" eq "1::2b") { print "ok 14\n";} else {print "not ok 14\n";}
 
 # test if C<eval "{...}"> distinguishes between blocks and hashrefs
 
-$a = "{ '\\'' , 'foo' }";
+$a = "\{ '\\'' , 'foo' \}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 15\n";} else {print "not ok 15\n";}
 
-$a = "{ '\\\\\\'abc' => 'foo' }";
+$a = "\{ '\\\\\\'abc' => 'foo' \}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 16\n";} else {print "not ok 16\n";}
 
-$a = "{'a\\\n\\'b','foo'}";
+$a = "\{'a\\\n\\'b','foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 17\n";} else {print "not ok 17\n";}
 
-$a = "{'\\\\\\'\\\\'=>'foo'}";
+$a = "\{'\\\\\\'\\\\'=>'foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 18\n";} else {print "not ok 18\n";}
 
-$a = "{q,a'b,,'foo'}";
+$a = "\{q,a'b,,'foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 19\n";} else {print "not ok 19\n";}
 
-$a = "{q[[']]=>'foo'}";
+$a = "\{q[[']]=>'foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 20\n";} else {print "not ok 20\n";}
 
 # needs disambiguation if first term is a variable
-$a = "+{ \$a , 'foo'}";
+$a = "+\{ \$a , 'foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 21\n";} else {print "not ok 21\n";}
 
-$a = "+{ \$a=>'foo'}";
+$a = "+\{ \$a=>'foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 22\n";} else {print "not ok 22\n";}
 
-$a = "{ 0x01 => 'foo'}->{0x01}";
+$a = "\{ 0x01 => 'foo'\}->\{0x01\}";
 $a = eval $a;
 if ($a eq 'foo') {print "ok 23\n";} else {print "not ok 23\n";}

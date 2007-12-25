@@ -190,7 +190,7 @@ print $@;
 {
     my $status = eval {
 	eval { die };
-	print "# eval { return } test\n";
+	print "# eval \{ return \} test\n";
 	return; # removing this changes behavior
     };
     print "not " if $@;

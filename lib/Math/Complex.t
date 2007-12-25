@@ -80,7 +80,7 @@ push(@script, <<'EOT');
     print "# $test Re(z) = ",$z->Re(), " Im(z) = ", $z->Im(), " z = $z\n";
     print 'not ' unless Re($z) == 2 and Im($z) == 3;
 EOT
-    push(@script, qq(print "ok $test\\n"}\n));
+    push(@script, qq(print "ok $test\\n"\}\n));
 
     $test++;
 push(@script, <<'EOT');
@@ -93,7 +93,7 @@ push(@script, <<'EOT');
                         (Re($z) - 3           ) +< $eps and
                         (Im($z) - 3           ) +< $eps;
 EOT
-    push(@script, qq(print "ok $test\\n"}\n));
+    push(@script, qq(print "ok $test\\n"\}\n));
 
     $test++;
 push(@script, <<'EOT');
@@ -106,7 +106,7 @@ push(@script, <<'EOT');
                         (Re($z) + 1          ) +< $eps and
                         (Im($z) + 1          ) +< $eps;
 EOT
-    push(@script, qq(print "ok $test\\n"}\n));
+    push(@script, qq(print "ok $test\\n"\}\n));
 }
 
 test_mutators();
@@ -234,8 +234,8 @@ EOS
 
     $test++;
     push @script, <<EOS;
-    print "# display_format{style} polar?\n";
-    print "not " unless \$display_format{style} eq 'polar';
+    print "# display_format\{style\} polar?\n";
+    print "not " unless \$display_format\{style\} eq 'polar';
     print "ok $test\n";
 EOS
 
@@ -259,8 +259,8 @@ EOS
 
     $test++;
     push @script, <<EOS;
-    print "# display_format{format} %.5f?\n";
-    print "not " unless \$display_format{format} eq '%.5f';
+    print "# display_format\{format\} %.5f?\n";
+    print "not " unless \$display_format\{format\} eq '%.5f';
     print "ok $test\n";
 EOS
 
@@ -406,7 +406,7 @@ EOS
     $test++;
     push @script, <<EOS;
     print ((\$z3->theta() == 0) ? "ok $test\n" : "not ok $test\n");
-}
+\}
 EOS
 }
 
@@ -497,15 +497,15 @@ sub test {
 			$test++;
 			# check the op= works
 			push @script, <<EOB;
-{
-	my \$za = cplx(ref \$z0 ? \@{\$z0->_cartesian} : (\$z0, 0));
+\{
+	my \$za = cplx(ref \$z0 ? \@\{\$z0->_cartesian\} : (\$z0, 0));
 
-	my (\$z1r, \$z1i) = ref \$z1 ? \@{\$z1->_cartesian} : (\$z1, 0);
+	my (\$z1r, \$z1i) = ref \$z1 ? \@\{\$z1->_cartesian\} : (\$z1, 0);
 
 	my \$zb = cplx(\$z1r, \$z1i);
 
 	\$za $op= \$zb;
-	my (\$zbr, \$zbi) = \@{\$zb->_cartesian};
+	my (\$zbr, \$zbi) = \@\{\$zb->_cartesian\};
 
 	check($test, '\$z0 $op= \$z1', \$za, \$z$#args, $args);
 EOB
@@ -513,7 +513,7 @@ EOB
 			# check that the rhs has not changed
 			push @script, qq(print "not " unless (\$zbr == \$z1r and \$zbi == \$z1i););
 			push @script, qq(print "ok $test\\n";\n);
-			push @script, "}\n";
+			push @script, "\}\n";
 		}
 	}
 }

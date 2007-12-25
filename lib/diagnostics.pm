@@ -313,7 +313,7 @@ our %HTML_Escapes;
 
 my %transfmt = (); 
 my $transmo = <<EOFUNC;
-sub transmo {
+sub transmo \{
     #local \$^W = 0;  # recursive warnings we do NOT need!
     study;
 EOFUNC
@@ -388,7 +388,7 @@ my %msg;
                     } elsif( $toks[$i] eq '%s' ){
                         $toks[$i] = $i == $#toks ? '.*' : '.*?';
                     } elsif( $toks[$i] =~ '%.(\d+)s' ){
-                        $toks[$i] = ".{$1}";
+                        $toks[$i] = ".\{$1\}";
                      } elsif( $toks[$i] =~ '^%l*x$' ){
                         $toks[$i] = '[\da-f]+';
                    }
@@ -399,11 +399,11 @@ my %msg;
             }  
             my $lhs = join( '', @toks );
 	    $transfmt{$header}{pat} =
-              "    s{^$lhs}\n     {\Q$header\E}s\n\t&& return 1;\n";
+              "    s\{^$lhs\}\n     \{\Q$header\E\}s\n\t&& return 1;\n";
             $transfmt{$header}{len} = $conlen;
 	} else {
             $transfmt{$header}{pat} =
-	      "    m{^\Q$header\E} && return 1;\n";
+	      "    m\{^\Q$header\E\} && return 1;\n";
             $transfmt{$header}{len} = length( $header );
 	} 
 
@@ -424,7 +424,7 @@ my %msg;
                   keys %transfmt ){
         $transmo .= $transfmt{$hdr}{pat};
     }
-    $transmo .= "    return 0;\n}\n";
+    $transmo .= "    return 0;\n\}\n";
     print STDERR $transmo if $DEBUG;
     eval $transmo;
     die $@ if $@;

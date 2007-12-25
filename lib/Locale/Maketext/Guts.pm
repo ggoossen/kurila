@@ -240,8 +240,8 @@ sub _compile {
   } elsif(@code +> 1) { # most cases, presumably!
     unshift @code, "join '',\n";
   }
-  unshift @code, "use strict; sub {\n";
-  push @code, "}\n";
+  unshift @code, "use strict; sub \{\n";
+  push @code, "\}\n";
 
   print @code if DEBUG;
   my $sub = eval(join '', @code);

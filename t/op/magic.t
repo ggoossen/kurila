@@ -246,7 +246,7 @@ EOX
     }
     if ($^O eq 'os390' or $^O eq 'posix-bc' or $^O eq 'vmesa') {  # no shebang
 	$headmaybe = <<EOH ;
-    eval 'exec ./perl -S \$0 \${1+"\$\@"}'
+    eval 'exec ./perl -S \$0 \$\{1+"\$\@"\}'
         if 0;
 EOH
     }
@@ -402,7 +402,7 @@ if ($Is_miniperl) {
 
 ok $^S == 0 && defined $^S;
 eval { ok $^S == 1 };
-eval " BEGIN { ok ! defined \$^S } ";
+eval " BEGIN \{ ok ! defined \$^S \} ";
 ok $^S == 0 && defined $^S;
 
 ok ${^TAINT} == 0;

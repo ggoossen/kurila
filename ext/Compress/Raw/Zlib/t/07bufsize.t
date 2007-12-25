@@ -47,7 +47,7 @@ for my $i (1 .. 13)
     
     my @hello = ();
     push @hello, $1 
-	while $tmp =~ s/^(.{$i})//;
+	while $tmp =~ s/^(.\{$i\})//;
     push @hello, $tmp if length $tmp ;
 
     my ($err, $x, $X, $status); 
@@ -77,7 +77,7 @@ for my $i (1 .. 13)
      
     my @Answer = ();
     $tmp = $out;
-    push @Answer, $1 while $tmp =~ s/^(.{$i})//;
+    push @Answer, $1 while $tmp =~ s/^(.\{$i\})//;
     push @Answer, $tmp if length $tmp ;
      
     my $k;

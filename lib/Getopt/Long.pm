@@ -446,17 +446,17 @@ sub GetOptionsFromArray($@) {
 	    if ( $opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY ) {
 		print STDERR ("=> link \"$orig\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$orig} = \\\@".$pkg."::opt_$ov;");
+		eval ("\$linkage\{\$orig\} = \\\@".$pkg."::opt_$ov;");
 	    }
 	    elsif ( $opctl{$name}[CTL_DEST] == CTL_DEST_HASH ) {
 		print STDERR ("=> link \"$orig\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$orig} = \\\%".$pkg."::opt_$ov;");
+		eval ("\$linkage\{\$orig\} = \\\%".$pkg."::opt_$ov;");
 	    }
 	    else {
 		print STDERR ("=> link \"$orig\" to \$$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$orig} = \\\$".$pkg."::opt_$ov;");
+		eval ("\$linkage\{\$orig\} = \\\$".$pkg."::opt_$ov;");
 	    }
 	}
     }
@@ -486,7 +486,7 @@ sub GetOptionsFromArray($@) {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
 	while ( ($k,$v) = each(%opctl) ) {
-	    print STDERR ($arrow, "\$opctl{$k} = $v ", OptCtl($v), "\n");
+	    print STDERR ($arrow, "\$opctl\{$k\} = $v ", OptCtl($v), "\n");
 	    $arrow = "   ";
 	}
     }
@@ -529,13 +529,13 @@ sub GetOptionsFromArray($@) {
 		print STDERR ("\"$ctl->[CTL_CNAME]\"\n") if $debug;
 
 		if ( defined $linkage{$opt} ) {
-		    print STDERR ("=> ref(\$L{$opt}) -> ",
+		    print STDERR ("=> ref(\$L\{$opt\}) -> ",
 				  ref($linkage{$opt}), "\n") if $debug;
 
 		    if ( ref($linkage{$opt}) eq 'SCALAR'
 			 || ref($linkage{$opt}) eq 'REF' ) {
 			if ( $ctl->[CTL_TYPE] eq '+' ) {
-			    print STDERR ("=> \$\$L{$opt} += \"$arg\"\n")
+			    print STDERR ("=> \$\$L\{$opt\} += \"$arg\"\n")
 			      if $debug;
 			    if ( defined ${$linkage{$opt}} ) {
 			        ${$linkage{$opt}} += $arg;
@@ -545,43 +545,43 @@ sub GetOptionsFromArray($@) {
 			    }
 			}
 			elsif ( $ctl->[CTL_DEST] == CTL_DEST_ARRAY ) {
-			    print STDERR ("=> ref(\$L{$opt}) auto-vivified",
+			    print STDERR ("=> ref(\$L\{$opt\}) auto-vivified",
 					  " to ARRAY\n")
 			      if $debug;
 			    my $t = $linkage{$opt};
 			    $$t = $linkage{$opt} = [];
-			    print STDERR ("=> push(\@{\$L{$opt}, \"$arg\")\n")
+			    print STDERR ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
 			      if $debug;
 			    push (@{$linkage{$opt}}, $arg);
 			}
 			elsif ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
-			    print STDERR ("=> ref(\$L{$opt}) auto-vivified",
+			    print STDERR ("=> ref(\$L\{$opt\}) auto-vivified",
 					  " to HASH\n")
 			      if $debug;
 			    my $t = $linkage{$opt};
 			    $$t = $linkage{$opt} = {};
-			    print STDERR ("=> \$\$L{$opt}->{$key} = \"$arg\"\n")
+			    print STDERR ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			      if $debug;
 			    $linkage{$opt}->{$key} = $arg;
 			}
 			else {
-			    print STDERR ("=> \$\$L{$opt} = \"$arg\"\n")
+			    print STDERR ("=> \$\$L\{$opt\} = \"$arg\"\n")
 			      if $debug;
 			    ${$linkage{$opt}} = $arg;
 		        }
 		    }
 		    elsif ( ref($linkage{$opt}) eq 'ARRAY' ) {
-			print STDERR ("=> push(\@{\$L{$opt}, \"$arg\")\n")
+			print STDERR ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
 			    if $debug;
 			push (@{$linkage{$opt}}, $arg);
 		    }
 		    elsif ( ref($linkage{$opt}) eq 'HASH' ) {
-			print STDERR ("=> \$\$L{$opt}->{$key} = \"$arg\"\n")
+			print STDERR ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			    if $debug;
 			$linkage{$opt}->{$key} = $arg;
 		    }
 		    elsif ( ref($linkage{$opt}) eq 'CODE' ) {
-			print STDERR ("=> &L{$opt}(\"$opt\"",
+			print STDERR ("=> &L\{$opt\}(\"$opt\"",
 				      $ctl->[CTL_DEST] == CTL_DEST_HASH ? ", \"$key\"" : "",
 				      ", \"$arg\")\n")
 			    if $debug;
@@ -623,31 +623,31 @@ sub GetOptionsFromArray($@) {
 		# No entry in linkage means entry in userlinkage.
 		elsif ( $ctl->[CTL_DEST] == CTL_DEST_ARRAY ) {
 		    if ( defined $userlinkage->{$opt} ) {
-			print STDERR ("=> push(\@{\$L{$opt}}, \"$arg\")\n")
+			print STDERR ("=> push(\@\{\$L\{$opt\}}, \"$arg\")\n")
 			    if $debug;
 			push (@{$userlinkage->{$opt}}, $arg);
 		    }
 		    else {
-			print STDERR ("=>\$L{$opt} = [\"$arg\"]\n")
+			print STDERR ("=>\$L\{$opt\} = [\"$arg\"]\n")
 			    if $debug;
 			$userlinkage->{$opt} = [$arg];
 		    }
 		}
 		elsif ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
 		    if ( defined $userlinkage->{$opt} ) {
-			print STDERR ("=> \$L{$opt}->{$key} = \"$arg\"\n")
+			print STDERR ("=> \$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			    if $debug;
 			$userlinkage->{$opt}->{$key} = $arg;
 		    }
 		    else {
-			print STDERR ("=>\$L{$opt} = {$key => \"$arg\"}\n")
+			print STDERR ("=>\$L\{$opt\} = \{$key => \"$arg\"\}\n")
 			    if $debug;
 			$userlinkage->{$opt} = {$key => $arg};
 		    }
 		}
 		else {
 		    if ( $ctl->[CTL_TYPE] eq '+' ) {
-			print STDERR ("=> \$L{$opt} += \"$arg\"\n")
+			print STDERR ("=> \$L\{$opt\} += \"$arg\"\n")
 			  if $debug;
 			if ( defined $userlinkage->{$opt} ) {
 			    $userlinkage->{$opt} += $arg;
@@ -657,7 +657,7 @@ sub GetOptionsFromArray($@) {
 			}
 		    }
 		    else {
-			print STDERR ("=>\$L{$opt} = \"$arg\"\n") if $debug;
+			print STDERR ("=>\$L\{$opt\} = \"$arg\"\n") if $debug;
 			$userlinkage->{$opt} = $arg;
 		    }
 		}
@@ -701,7 +701,7 @@ sub GetOptionsFromArray($@) {
 	    # Try non-options call-back.
 	    my $cb;
 	    if ( (defined ($cb = $linkage{'<>'})) ) {
-		print STDERR ("=> &L{$tryopt}(\"$tryopt\")\n")
+		print STDERR ("=> &L\{$tryopt\}(\"$tryopt\")\n")
 		  if $debug;
 		my $eval_error = do {
 		    local $@;
@@ -836,7 +836,7 @@ sub ParseOptionSpec ($$) {
 	return (undef, "Cannot repeat while bundling: \"$opt\"\n")
 	  if $bundling && defined($4);
 	my ($mi, $cm, $ma) = ($5, $6, $7);
-	return (undef, "{0} is useless in option spec: \"$opt\"\n")
+	return (undef, "\{0\} is useless in option spec: \"$opt\"\n")
 	  if defined($mi) && !$mi && !defined($ma) && !defined($cm);
 
 	$type = 'i' if $type eq 'n';

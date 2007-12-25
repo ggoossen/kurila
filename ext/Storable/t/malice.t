@@ -81,7 +81,7 @@ sub test_header {
     is ($header->{intsize}, $Config{intsize}, "int size");
     is ($header->{longsize}, $Config{longsize}, "long size");
  SKIP: {
-	skip ("No \$Config{prtsize} on this perl version ($^V)", 1)
+	skip ("No \$Config\{prtsize\} on this perl version ($^V)", 1)
 	    unless defined $Config{ptrsize};
 	is ($header->{ptrsize}, $Config{ptrsize}, "long size");
     }

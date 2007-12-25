@@ -977,12 +977,12 @@ $(BASEEXT).opt : Makefile.PL
 	foreach $lib (split ' ', $self->{LDLOADLIBS}) {
 	    $lib =~ s%\$%\\\$%g;  # Escape '$' in VMS filespecs
 	    if (length($line) + length($lib) +> 160) {
-		push @m, "\t\$(PERL) -e \"print qq{$line}\" >>\$(MMS\$TARGET)\n";
+		push @m, "\t\$(PERL) -e \"print qq\{$line\}\" >>\$(MMS\$TARGET)\n";
 		$line = $lib . '\n';
 	    }
 	    else { $line .= $lib . '\n'; }
 	}
-	push @m, "\t\$(PERL) -e \"print qq{$line}\" >>\$(MMS\$TARGET)\n" if $line;
+	push @m, "\t\$(PERL) -e \"print qq\{$line\}\" >>\$(MMS\$TARGET)\n" if $line;
     }
 
     join('',@m);
@@ -1533,7 +1533,7 @@ $(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmpdir}perlmain\$(OBJ_EXT) ${tmpdir}PerlSh
     push @m,"\n${tmpdir}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmpdir}Writemain.tmp\n";
     push @m, "# More from the 255-char line length limit\n";
     foreach (@staticpkgs) {
-	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[}" >>${tmpdir}Writemain.tmp\n];
+	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[\}" >>${tmpdir}Writemain.tmp\n];
     }
 
     push @m, sprintf <<'MAKE_FRAG', $tmpdir, $tmpdir;

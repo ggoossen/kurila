@@ -837,14 +837,14 @@ sub _format_stack {
         my $idx  = $entry->{'idx'};
         if( $type eq 'HASH' ) {
             $var .= "->" unless $did_arrow++;
-            $var .= "{$idx}";
+            $var .= "\{$idx\}";
         }
         elsif( $type eq 'ARRAY' ) {
             $var .= "->" unless $did_arrow++;
             $var .= "[$idx]";
         }
         elsif( $type eq 'REF' ) {
-            $var = "\${$var}";
+            $var = "\$\{$var\}";
         }
     }
 

@@ -305,10 +305,10 @@ $foo = { "abc\000\'\efg" => "mno\000",
 }
 
   $WANT = <<"EOT";
-#\$VAR1 = {
+#\$VAR1 = \{
 #  "abc\\x00'\efg" => "mno\\x00",
 #  'reftest' => \\\\1
-#};
+#\};
 EOT
 
   {
@@ -846,8 +846,8 @@ TEST q(Data::Dumper->new([$b],['b'])->Purity(1)->Dumpxs;)
 #$a = "\x{9c10}";
 EOT
 
-    TEST q(Data::Dumper->Dump([$a], ['a'])), "\\x{9c10}";
-  TEST q(Data::Dumper->Dumpxs([$a], ['a'])), "XS \\x{9c10}"
+    TEST q(Data::Dumper->Dump([$a], ['a'])), "\\x\{9c10\}";
+  TEST q(Data::Dumper->Dumpxs([$a], ['a'])), "XS \\x\{9c10\}"
 	if $XS;
 }
 

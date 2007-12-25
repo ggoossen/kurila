@@ -124,15 +124,15 @@ for (@INPUT) {
   (print "#skipping $comment:\nok $ord\n"), next if $skip eq 'skip';
   
   eval <<EOE;
-  local \$SIG{__WARN__} = \\&wrn;
+  local \$SIG\{__WARN__\} = \\&wrn;
   my \$a = 'fake';
   $integer;
   \$a = $op;
   \$b = $expectop;
-  if (\$a ne \$b) {
+  if (\$a ne \$b) \{
     print "# \$comment: got `\$a', expected `\$b'\n";
     print "\$skip " if \$a ne \$b or \$skip eq 'skip';
-  }
+  \}
   print "ok \$ord\\n";
 EOE
   if ($@) {
@@ -152,7 +152,7 @@ for (@simple_input) {
   chomp;
   ($operator, $variable) = m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
   eval <<EOE;
-  local \$SIG{__WARN__} = \\&wrn;
+  local \$SIG\{__WARN__\} = \\&wrn;
   my \$$variable = "Ac# Ca\\nxxx";
   \$$variable = $operator \$$variable;
   \$toself = \$$variable;

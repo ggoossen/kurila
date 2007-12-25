@@ -50,7 +50,7 @@ sub name {
   
   my $subform = '';
   my $name = '';
-  print "Input: {$tag}\n" if $Debug;
+  print "Input: \{$tag\}\n" if $Debug;
   while(length $tag) {
     last if $name = $Name{$tag};
     last if $name = $Name{$alt};
@@ -62,11 +62,11 @@ sub name {
       $alt =~ s/(-[a-z0-9]+)$//s && $Debug && print " alt -> $alt\n";
     } else {
       # we're trying to pull a subform off a primary tag. TILT!
-      print "Aborting on: {$name}{$subform}\n" if $Debug;
+      print "Aborting on: \{$name\}\{$subform\}\n" if $Debug;
       last;
     }
   }
-  print "Output: {$name}{$subform}\n" if $Debug;
+  print "Output: \{$name\}\{$subform\}\n" if $Debug;
   
   return unless $name;   # Failure
   return $name unless $subform;   # Exact match

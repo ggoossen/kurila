@@ -6,7 +6,7 @@ my @position = qw(Admin Sales Sales Admin );
 
 print form {vfill=>"<unknown>"},
 	<<EOFORM, \@name, \@position, [map "($_)", @status];
-{IIIIIIIIIIIII} {IIIIIIIIIIII}
-{IIIIIIIIIIIII}
+\{IIIIIIIIIIIII\} \{IIIIIIIIIIII\}
+\{IIIIIIIIIIIII\}
 ------------------------------
 EOFORM

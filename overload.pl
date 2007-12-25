@@ -85,7 +85,7 @@ print C "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ } @names;
 
 print C <<"EOT";
     "$last"
-};
+\};
 EOT
 
 close H or die $!;

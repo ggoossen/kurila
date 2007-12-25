@@ -212,7 +212,7 @@ sub wrap {
     my $spaces = ' ' x $$self{MARGIN};
     my $width = $$self{opt_width} - $$self{MARGIN};
     while (length +> $width) {
-        if (s/^([^\n]{0,$width})[ \t]+// || s/^([^\n]{$width})//) {
+        if (s/^([^\n]\{0,$width\})[ \t]+// || s/^([^\n]\{$width\})//) {
             $output .= $spaces . $1 . "\n";
         } else {
             last;

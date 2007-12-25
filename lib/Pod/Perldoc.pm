@@ -16,7 +16,7 @@ $VERSION = '3.14_02';
 BEGIN {  # Make a DEBUG constant very first thing...
   unless(defined &DEBUG) {
     if(($ENV{'PERLDOCDEBUG'} || '') =~ m/^(\d+)/) { # untaint
-      eval("sub DEBUG () {$1}");
+      eval("sub DEBUG () \{$1\}");
       die "WHAT? Couldn't eval-up a DEBUG constant!? $@" if $@;
     } else {
       *DEBUG = sub () {0};

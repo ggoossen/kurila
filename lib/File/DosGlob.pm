@@ -361,8 +361,8 @@ sub glob {
 	}
     }
     for ( @pat ) {
-	s/\\{/{/g;
-	s/\\}/}/g;
+	s/\\{/\{/g;
+	s/\\}/\}/g;
 	s/\\,/,/g;
     }
     #print join ("\n", @pat). "\n";

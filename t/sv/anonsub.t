@@ -72,7 +72,7 @@ test_invalid_decl('{ $x = sub }');
 test_invalid_decl('sub ($) && 1');
 test_invalid_decl('sub ($) : lvalue;',' # TODO');
 
-eval "sub #foo\n{print 1}";
+eval "sub #foo\n\{print 1\}";
 if ($@ eq '') {
     print "ok ", ++$i, "\n";
 } else {

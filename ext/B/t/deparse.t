@@ -51,7 +51,7 @@ while ( ~< *DATA) {
 	($input, $expected) = ($_, $_);
     }
 
-    my $coderef = eval "sub {$input}";
+    my $coderef = eval "sub \{$input\}";
 
     if ($@) {
 	diag("$num deparsed: $@");
@@ -71,7 +71,7 @@ use constant 'c', 'stuff';
 is((eval "sub ".$deparse->coderef2text(\&c))->(), 'stuff');
 
 my $a = 0;
-is("{\n    (-1) ** \$a;\n}", $deparse->coderef2text(sub{(-1) ** $a }));
+is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
 
 use constant cr => ['hello'];
 my $string = "sub " . $deparse->coderef2text(\&cr);

@@ -241,7 +241,7 @@ EOT
   $xs .= << "EOT";
       /* Return 1 or 2 items. First is error message, or undef if no error.
            Second, if present, is found value */
-        switch (type) {
+        switch (type) \{
         case PERL_constant_NOTFOUND:
           sv =
 	    sv_2mortal(newSVpvf("%s is not a valid $package_sprintf_safe macro", s));
@@ -283,7 +283,7 @@ EOT
 	    "Unexpected return type %d while processing $package_sprintf_safe macro %s, used",
                type, s));
           PUSHs(sv);
-        }
+        \}
 EOT
 
   return $xs;

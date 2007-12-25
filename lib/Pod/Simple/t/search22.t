@@ -90,7 +90,7 @@ delete @count{ grep $count{$_} +< 2, keys %count };
 my $shadowed = join "|", sort keys %count;
 ok $shadowed, "hinkhonk::Glunk|hinkhonk::Vliff|perlthng|squaa::Vliff";
 
-sub thar { print "# Seen $_[0] :\n", map "#  {$_}\n", sort grep $where2name->{$_} eq $_[0],keys %$where2name; return; }
+sub thar { print "# Seen $_[0] :\n", map "#  \{$_\}\n", sort grep $where2name->{$_} eq $_[0],keys %$where2name; return; }
 
 ok $count{'perlthng'}, 2;
 thar 'perlthng';

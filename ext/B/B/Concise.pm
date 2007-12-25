@@ -380,7 +380,7 @@ my $lastnext;	# remembers op-chain, used to insert gotos
 
 my %opclass = ('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
 	       'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*",
-	       'PVOP' => '"', 'LOOP' => "{", 'COP' => ";", 'PADOP' => "#");
+	       'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#");
 
 no warnings 'qw'; # "Possible attempt to put comments..."; use #7
 my @linenoise =

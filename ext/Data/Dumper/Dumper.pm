@@ -343,14 +343,14 @@ sub _dump {
 
     if ($realtype eq 'SCALAR' || $realtype eq 'REF') {
       if ($realpack) {
-	$out .= 'do{\\(my $o = ' . $s->_dump($$val, "\${$name}") . ')}';
+	$out .= 'do{\\(my $o = ' . $s->_dump($$val, "\$\{$name\}") . ')}';
       }
       else {
-	$out .= '\\' . $s->_dump($$val, "\${$name}");
+	$out .= '\\' . $s->_dump($$val, "\$\{$name\}");
       }
     }
     elsif ($realtype eq 'GLOB') {
-	$out .= '\\' . $s->_dump($$val, "*{$name}");
+	$out .= '\\' . $s->_dump($$val, "*\{$name\}");
     }
     elsif ($realtype eq 'ARRAY') {
       my($v, $pad, $mname);
@@ -449,7 +449,7 @@ sub _dump {
         if ($s->{seen}{$id}[2]) {
 	  $out = $s->{seen}{$id}[0];
 	  #warn "[<$out]\n";
-	  return "\${$out}";
+	  return "\$\{$out\}";
 	}
       }
       else {
@@ -668,7 +668,7 @@ sub qquote {
         # leave it as it is
     } else {
         use utf8;
-        s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
+        s/([^\040-\176])/sprintf "\\x\{%04x\}", ord($1)/ge;
     }
 
   return qq("$_");

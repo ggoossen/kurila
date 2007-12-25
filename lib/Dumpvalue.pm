@@ -257,15 +257,15 @@ sub unwrap {
     print "$sp-> ",$self->stringify($$v,1),"\n";
     if ($self->{globPrint}) {
       $s += 3;
-      $self->dumpglob('', $s, "{$$v}", $$v, 1);
+      $self->dumpglob('', $s, "\{$$v\}", $$v, 1);
     } elsif (defined ($fileno = fileno($v))) {
-      print( (' ' x ($s+3)) .  "FileHandle({$$v}) => fileno($fileno)\n" );
+      print( (' ' x ($s+3)) .  "FileHandle(\{$$v\}) => fileno($fileno)\n" );
     }
   } elsif (ref \$v eq 'GLOB') {
     if ($self->{globPrint}) {
-      $self->dumpglob('', $s, "{*" . Symbol::glob_name($v) . "}", $v, 1);
+      $self->dumpglob('', $s, "\{*" . Symbol::glob_name($v) . "\}", $v, 1);
     } elsif (defined ($fileno = fileno(\$v))) {
-      print( (' ' x $s) .  "FileHandle({$v}) => fileno($fileno)\n" );
+      print( (' ' x $s) .  "FileHandle(\{$v\}) => fileno($fileno)\n" );
     }
   }
 }

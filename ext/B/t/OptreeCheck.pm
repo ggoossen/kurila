@@ -528,7 +528,7 @@ sub getRendering {
 	    {
 		no strict;
 		no warnings;
-		$code = eval "$pkg sub { $code } }";
+		$code = eval "$pkg sub \{ $code \} \}";
 	    }
 	    # return errors
 	    if ($@) { chomp $@; push @errs, $@ }
@@ -932,11 +932,11 @@ sub preamble {
     return <<EO_HEADER;
 #!perl
 
-BEGIN {
+BEGIN \{
     chdir q(t);
     \@INC = qw(../lib ../ext/B/t);
     require q(./test.pl);
-}
+\}
 use OptreeCheck;
 plan tests => $testct;
 
@@ -954,9 +954,9 @@ sub OptreeCheck::wrap {
     
     my $testcode = qq{
 	
-checkOptree(note   => q{$comment},
-	    bcopts => q{-exec},
-	    code   => q{$code},
+checkOptree(note   => q\{$comment\},
+	    bcopts => q\{-exec\},
+	    code   => q\{$code\},
 	    expect => <<EOT_EOT, expect_nt => <<EONT_EONT);
 ThreadedRef
     paste your 'golden-example' here, then retest

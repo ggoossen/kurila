@@ -30,7 +30,7 @@ ok( Test::Builder->is_fh(*OUT) );
 ok( Test::Builder->is_fh(\*OUT) );
 
 SKIP: {
-    skip "*TIED_HANDLE{IO} doesn't work in this perl", 1
+    skip "*TIED_HANDLE\{IO\} doesn't work in this perl", 1
         unless defined *OUT{IO};
     ok( Test::Builder->is_fh(*OUT{IO}) );
 }

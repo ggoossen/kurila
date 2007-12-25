@@ -37,7 +37,7 @@ rc(
     \n|,
 
     qq|
-    sub afterinit {
+    sub afterinit \{
 	push(\@DB::typeahead,
 	    'b 23',
 	    'n',
@@ -45,10 +45,10 @@ rc(
 	    'n',
 	    'c', # line 23
 	    'n',
-	    "p \\\@{*{Symbol::fetch_glob('main::_<$target')}}",
+	    "p \\\@\{*\{Symbol::fetch_glob('main::_<$target')\}}",
 	    'q',
 	);
-    }\n|,
+    \}\n|,
 );
 
 {

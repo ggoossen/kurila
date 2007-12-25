@@ -40,10 +40,10 @@ BEGIN
 
     for my $delim ( qw/ ( ) [ ] / )
     {
-        $gm = File::GlobMapper->new("{${delim}abc}", '*.X');
+        $gm = File::GlobMapper->new("\{${delim}abc\}", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
-            "  catch unmatched $delim inside {}";
+            "  catch unmatched $delim inside \{\}";
     }
 
     
@@ -127,7 +127,7 @@ BEGIN
 
     touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
-    my $gm = File::GlobMapper->new("$tmpDir/abc{1,3}.tmp", "*.X");
+    my $gm = File::GlobMapper->new("$tmpDir/abc\{1,3\}.tmp", "*.X");
     #diag "Input pattern is $gm->{InputPattern}";
     ok $gm, "  created GlobMapper object" ;
 
@@ -138,7 +138,7 @@ BEGIN
           [map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmp.X)],
         ], "  got mapping";
 
-    $gm = File::GlobMapper->new("$tmpDir/abc{1,3}.tmp", "$tmpDir/X.#1.X")
+    $gm = File::GlobMapper->new("$tmpDir/abc\{1,3\}.tmp", "$tmpDir/X.#1.X")
         or diag $File::GlobMapper::Error ;
     #diag "Input pattern is $gm->{InputPattern}";
     ok $gm, "  created GlobMapper object" ;
@@ -227,7 +227,7 @@ BEGIN
 
     touch "$tmpDir/abc.tmp";
 
-    my $gm = File::GlobMapper->new("$tmpDir/{a*,*c}.tmp", '*.X');
+    my $gm = File::GlobMapper->new("$tmpDir/\{a*,*c\}.tmp", '*.X');
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;

@@ -117,12 +117,12 @@ sub check_env {
 
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
     if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS ) {
-        ok( !chdir(),         "chdir() on $^O ignores only \$ENV{$key} set" );
+        ok( !chdir(),         "chdir() on $^O ignores only \$ENV\{$key\} set" );
         is( abs_path, $Cwd,   '  abs_path() did not change' );
         pass( "  no need to test SYS\$LOGIN on $^O" ) for 1..7;
     }
     else {
-        ok( chdir(),              "chdir() w/ only \$ENV{$key} set" );
+        ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" );
         is( abs_path, $ENV{$key}, '  abs_path() agrees' );
         chdir($Cwd);
         is( abs_path, $Cwd,       '  and back again' );
@@ -133,7 +133,7 @@ sub check_env {
 
         # Check the deprecated chdir(undef) feature.
 #line 64
-        ok( chdir(undef),           "chdir(undef) w/ only \$ENV{$key} set" );
+        ok( chdir(undef),           "chdir(undef) w/ only \$ENV\{$key\} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir at $0 line 64.
@@ -145,7 +145,7 @@ WARNING
         # Ditto chdir('').
         $warning = '';
 #line 76
-        ok( chdir(''),              "chdir('') w/ only \$ENV{$key} set" );
+        ok( chdir(''),              "chdir('') w/ only \$ENV\{$key\} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 76.

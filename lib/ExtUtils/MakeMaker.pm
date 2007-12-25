@@ -721,7 +721,7 @@ sub parse_args{
     if (defined $self->{ARMAYBE}){
         my($armaybe) = $self->{ARMAYBE};
         print STDOUT "ARMAYBE => '$armaybe' should be changed to:\n",
-                        "\t'dynamic_lib' => {ARMAYBE => '$armaybe'}\n";
+                        "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
         my(%dl) = %{$self->{dynamic_lib} || {}};
         $self->{dynamic_lib} = { %dl, ARMAYBE => $armaybe};
         delete $self->{ARMAYBE};
@@ -841,7 +841,7 @@ sub mv_all_methods {
         # %MY:: being intact, we have to fill the hole with an
         # inheriting method:
 
-        eval "package MY; sub $method { shift->SUPER::$method(\@_); }";
+        eval "package MY; sub $method \{ shift->SUPER::$method(\@_); \}";
     }
 
     # We have to clean out %INC also, because the current directory is
@@ -977,7 +977,7 @@ sub neatvalue {
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"$key=>".neatvalue($val)) ;
     }
-    return "{ ".join(', ',@m)." }";
+    return "\{ ".join(', ',@m)." \}";
 }
 
 sub selfdocument {

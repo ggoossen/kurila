@@ -179,35 +179,35 @@ sub walkoptree_exec {
 	if ($ppname =~
 	    m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
 	{
-	    print $prefix, uc($1), " => {\n";
+	    print $prefix, uc($1), " => \{\n";
 	    walkoptree_exec($op->other, $method, $level + 1);
-	    print $prefix, "}\n";
+	    print $prefix, "\}\n";
 	} elsif ($ppname eq "match" || $ppname eq "subst") {
 	    my $pmreplstart = $op->pmreplstart;
 	    if ($$pmreplstart) {
-		print $prefix, "PMREPLSTART => {\n";
+		print $prefix, "PMREPLSTART => \{\n";
 		walkoptree_exec($pmreplstart, $method, $level + 1);
-		print $prefix, "}\n";
+		print $prefix, "\}\n";
 	    }
 	} elsif ($ppname eq "substcont") {
-	    print $prefix, "SUBSTCONT => {\n";
+	    print $prefix, "SUBSTCONT => \{\n";
 	    walkoptree_exec($op->other->pmreplstart, $method, $level + 1);
-	    print $prefix, "}\n";
+	    print $prefix, "\}\n";
 	    $op = $op->other;
 	} elsif ($ppname eq "enterloop") {
-	    print $prefix, "REDO => {\n";
+	    print $prefix, "REDO => \{\n";
 	    walkoptree_exec($op->redoop, $method, $level + 1);
-	    print $prefix, "}\n", $prefix, "NEXT => {\n";
+	    print $prefix, "\}\n", $prefix, "NEXT => \{\n";
 	    walkoptree_exec($op->nextop, $method, $level + 1);
-	    print $prefix, "}\n", $prefix, "LAST => {\n";
+	    print $prefix, "\}\n", $prefix, "LAST => \{\n";
 	    walkoptree_exec($op->lastop,  $method, $level + 1);
-	    print $prefix, "}\n";
+	    print $prefix, "\}\n";
 	} elsif ($ppname eq "subst") {
 	    my $replstart = $op->pmreplstart;
 	    if ($$replstart) {
-		print $prefix, "SUBST => {\n";
+		print $prefix, "SUBST => \{\n";
 		walkoptree_exec($replstart, $method, $level + 1);
-		print $prefix, "}\n";
+		print $prefix, "\}\n";
 	    }
 	}
     }

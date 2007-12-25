@@ -202,7 +202,7 @@ sub user_def {
 	my $count = @from;
 	for (my $i=0; $i+<@$spec; $i+=2, $count++) {
 		my ($pat, $fld) = @{$spec}[$i,$i+1];
-		push @from, "$pat(?{$count})";
+		push @from, "$pat(?\{$count\})";
 		push @to,   (ref $fld eq 'CODE' ? $fld : sub{$fld});
 	}
 	return {from=>\@from, to=>\@to};
@@ -395,10 +395,10 @@ sub jleft {
 				my @groups = @$grouping;
 				my $group = shift @groups;
 				if ($group) {
-					$w =~ s/(\d)(\d{$group})\z/$1$comma$2/;
+					$w =~ s/(\d)(\d\{$group\})\z/$1$comma$2/;
 					do {
 						$group = shift @groups if @groups;
-					} while $group && $w =~ s/(?<!,)(\d)(\d{$group})(?!\d)/$1$comma$2/;
+					} while $group && $w =~ s/(?<!,)(\d)(\d\{$group\})(?!\d)/$1$comma$2/;
 				}
 			}
 			if (!$val{stretch} && ($w ? length($w) : 0)+length($pre) +> $whole) {
@@ -419,7 +419,7 @@ sub jleft {
 				jleft($str, %val, width=>$width, precropped=>1);
 				jright($str, %val, precropped=>1);
 				my $postlen = length($post);
-				$str =~ s/(?:[ ]{$postlen}([ ]*)|.{$postlen}())$/$post$+/
+				$str =~ s/(?:[ ]\{$postlen\}([ ]*)|.\{$postlen\}())$/$post$+/
 					if $postlen;
 				$_[0] = $str;
 			}
@@ -508,7 +508,7 @@ sub segment ($\@\%$\%) {
 	my (@formatters,@starred,@vstarred);
 	for my $i (0..$args_req) {
 		my ($literal,$field,$userdef) = @format[3*$i..3*$i+2];
-		$literal =~ s/\\\{/{/g;
+		$literal =~ s/\\\{/\{/g;
 		push @formatters, { %std_literal,
 							width => length($literal),
 							src	  => \$literal,

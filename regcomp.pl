@@ -109,7 +109,7 @@ print OUT <<EOP;
 #ifndef DOINIT
 EXTCONST U8 PL_regkind[];
 #else
-EXTCONST U8 PL_regkind[] = {
+EXTCONST U8 PL_regkind[] = \{
 EOP
 
 $ind = 0;
@@ -121,13 +121,13 @@ while (++$ind +<= $tot) {
 }
 
 print OUT <<EOP;
-};
+\};
 #endif
 
 /* regarglen[] - How large is the argument part of the node (in regnodes) */
 
 #ifdef REG_COMP_C
-static const U8 regarglen[] = {
+static const U8 regarglen[] = \{
 EOP
 
 $ind = 0;
@@ -140,11 +140,11 @@ while (++$ind +<= $lastregop) {
 }
 
 print OUT <<EOP;
-};
+\};
 
 /* reg_off_by_arg[] - Which argument holds the offset to the next node */
 
-static const char reg_off_by_arg[] = {
+static const char reg_off_by_arg[] = \{
 EOP
 
 $ind = 0;
@@ -156,7 +156,7 @@ while (++$ind +<= $lastregop) {
 }
 
 print OUT <<EOP;
-};
+\};
 
 #endif /* REG_COMP_C */
 
@@ -165,7 +165,7 @@ print OUT <<EOP;
 #ifndef DOINIT
 EXTCONST char * PL_reg_name[];
 #else
-EXTCONST char * const PL_reg_name[] = {
+EXTCONST char * const PL_reg_name[] = \{
 EOP
 
 $ind = 0;
@@ -185,7 +185,7 @@ while (++$ind +<= $tot) {
 }
 
 print OUT <<EOP;
-};
+\};
 #endif /* DOINIT */
 
 /* PL_reg_extflags_name[] - Opcode/state names in string form, for debugging */
@@ -193,7 +193,7 @@ print OUT <<EOP;
 #ifndef DOINIT
 EXTCONST char * PL_reg_extflags_name[];
 #else
-EXTCONST char * const PL_reg_extflags_name[] = {
+EXTCONST char * const PL_reg_extflags_name[] = \{
 EOP
 
 open my $fh,"<","regexp.h" or die "Can't read regexp.h: $!";
@@ -215,7 +215,7 @@ for (0..31) {
 }  
  
 print OUT <<EOP;
-};
+\};
 #endif /* DOINIT */
 
 /* ex: set ro: */

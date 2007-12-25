@@ -56,8 +56,8 @@ sub ok {
 
 sub notok {
 	print "not ok $num\n";
-	print "\nResult\n{$results}\n";
-	print "Expected\n{$expected}\n";
+	print "\nResult\n\{$results\}\n";
+	print "Expected\n\{$expected\}\n";
 }
 
 1;

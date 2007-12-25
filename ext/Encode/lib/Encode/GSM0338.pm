@@ -220,7 +220,7 @@ sub encode($$;$) {
         $bytes .=
           exists $UNI2GSM{$u} ? $UNI2GSM{$u}
           : $chk
-          ? croak sprintf( "\\x{%04x} does not map to %s", 
+          ? croak sprintf( "\\x\{%04x\} does not map to %s", 
 			   ord($u), $obj->name )
           : $FBCHAR;
     }

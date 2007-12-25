@@ -550,7 +550,7 @@ sub sreftest (\$$) {
 #
 for my $p ( "", qw{ () ($) ($@) ($%) ($;$) (&) (&\@) (&@) (%) (\%) (\@) } ) {
   no warnings 'prototype';
-  my $eval = "sub evaled_subroutine $p { &void *; }";
+  my $eval = "sub evaled_subroutine $p \{ &void *; \}";
   eval $eval;
   print "# eval[$eval]\nnot " unless $@ && $@ =~ m/(parse|syntax) error/i;
   print "ok ", $i++, "\n";
@@ -631,7 +631,7 @@ print "ok ", $i++, "\n";
 }
 
 # make sure whitespace in prototypes works
-eval "sub good (\$\t\$\n\$) { 1; }";
+eval "sub good (\$\t\$\n\$) \{ 1; \}";
 print "not " if $@;
 print "ok ", $i++, "\n";
 

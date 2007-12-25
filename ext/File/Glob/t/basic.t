@@ -195,7 +195,7 @@ print "ok 12\n";
     my $cwd = Cwd::cwd();
     chdir $dir
 	or die "Could not chdir to $dir: $!";
-    my(@glob_files) = glob("a*{d[e]}j");
+    my(@glob_files) = glob("a*\{d[e]\}j");
     if (!(@glob_files == 1 && "@glob_files" eq "a_dej")) {
 	print "not ";
     }

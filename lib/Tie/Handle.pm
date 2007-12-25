@@ -130,7 +130,7 @@ sub new {
 
 sub TIEHANDLE {
     my $pkg = shift;
-    if (defined &{Symbol::fetch_glob("{$pkg}::new")}) {
+    if (defined &{Symbol::fetch_glob("\{$pkg\}::new")}) {
 	warnings::warnif("WARNING: calling ${pkg}->new since ${pkg}->TIEHANDLE is missing");
 	$pkg->new(@_);
     }

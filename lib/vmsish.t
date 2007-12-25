@@ -112,7 +112,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
   if (not $ENV{'SYS$TIMEZONE_DIFFERENTIAL'}) {
     $oldtz = $ENV{'SYS$TIMEZONE_DIFFERENTIAL'};
     $ENV{'SYS$TIMEZONE_DIFFERENTIAL'} = 3600;
-    eval "END { \$ENV{'SYS\$TIMEZONE_DIFFERENTIAL'} = $oldtz; }";
+    eval "END \{ \$ENV\{'SYS\$TIMEZONE_DIFFERENTIAL'\} = $oldtz; \}";
     gmtime(0); # Force reset of tz offset
   }
 

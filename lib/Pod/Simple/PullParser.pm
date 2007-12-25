@@ -142,7 +142,7 @@ sub get_token {
         print "* I've gotten ", scalar(@lines), " lines:\n";
         foreach my $l (@lines) {
           if(defined $l) {
-            print "  line {$l}\n";
+            print "  line \{$l\}\n";
           } else {
             print "  line undef\n";
           }

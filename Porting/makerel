@@ -66,7 +66,7 @@ print "\n";
 
 print "Copying files to release directory...\n";
 # ExtUtils::Manifest maniread does not preserve the order
-$cmd = "awk '{print \$1}' MANIFEST | cpio -pdm $relroot/$reldir";
+$cmd = "awk '\{print \$1\}' MANIFEST | cpio -pdm $relroot/$reldir";
 system($cmd) == 0
     or die "$cmd failed";
 print "\n";

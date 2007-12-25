@@ -759,7 +759,7 @@ sub simple_dumper {
 	    if (ref $item eq 'ARRAY') {
 		push @lines, "[\n", simple_dumper (@$item), "],\n";
 	    } elsif (ref $item eq 'HASH') {
-		push @lines, "{\n", simple_dumper (%$item), "},\n";
+		push @lines, "\{\n", simple_dumper (%$item), "\},\n";
 	    } else {
 		die "Can't cope with $item";
 	    }
@@ -1052,7 +1052,7 @@ sub UnicodeData_Txt()
 
     ## Any and All are all code points.
     my $Any = Table->New(Is    => 'Any',
-                         Desc  => sprintf("[\\x{0000}-\\x{%X}]",
+                         Desc  => sprintf("[\\x\{0000\}-\\x\{%X\}]",
                                           $LastUnicodeCodepoint),
                          Fuzzy => 0);
     $Any->RawAppendRange(0, $LastUnicodeCodepoint);
@@ -1579,16 +1579,16 @@ sub GenTests($$$$)
     my $FailCode = shift;
 
     if (defined $MatchCode) {
-        printf $FH qq/Expect(1, "\\x{%04X}", '\\p{$Prop}' );\n/, $MatchCode;
-        printf $FH qq/Expect(0, "\\x{%04X}", '\\p{^$Prop}');\n/, $MatchCode;
-        printf $FH qq/Expect(0, "\\x{%04X}", '\\P{$Prop}' );\n/, $MatchCode;
-        printf $FH qq/Expect(1, "\\x{%04X}", '\\P{^$Prop}');\n/, $MatchCode;
+        printf $FH qq/Expect(1, "\\x\{%04X\}", '\\p\{$Prop\}' );\n/, $MatchCode;
+        printf $FH qq/Expect(0, "\\x\{%04X\}", '\\p\{^$Prop\}');\n/, $MatchCode;
+        printf $FH qq/Expect(0, "\\x\{%04X\}", '\\P\{$Prop\}' );\n/, $MatchCode;
+        printf $FH qq/Expect(1, "\\x\{%04X\}", '\\P\{^$Prop\}');\n/, $MatchCode;
     }
     if (defined $FailCode) {
-        printf $FH qq/Expect(0, "\\x{%04X}", '\\p{$Prop}' );\n/, $FailCode;
-        printf $FH qq/Expect(1, "\\x{%04X}", '\\p{^$Prop}');\n/, $FailCode;
-        printf $FH qq/Expect(1, "\\x{%04X}", '\\P{$Prop}' );\n/, $FailCode;
-        printf $FH qq/Expect(0, "\\x{%04X}", '\\P{^$Prop}');\n/, $FailCode;
+        printf $FH qq/Expect(0, "\\x\{%04X\}", '\\p\{$Prop\}' );\n/, $FailCode;
+        printf $FH qq/Expect(1, "\\x\{%04X\}", '\\p\{^$Prop\}');\n/, $FailCode;
+        printf $FH qq/Expect(1, "\\x\{%04X\}", '\\P\{$Prop\}' );\n/, $FailCode;
+        printf $FH qq/Expect(0, "\\x\{%04X\}", '\\P\{^$Prop\}');\n/, $FailCode;
     }
 }
 
@@ -1598,8 +1598,8 @@ sub ExpectError($$)
     my $FH = shift;
     my $prop = shift;
 
-    print $FH qq/Error('\\p{$prop}');\n/;
-    print $FH qq/Error('\\P{$prop}');\n/;
+    print $FH qq/Error('\\p\{$prop\}');\n/;
+    print $FH qq/Error('\\P\{$prop\}');\n/;
 }
 
 ## This used only for making the test script
@@ -1835,7 +1835,7 @@ sub WriteAllMappings()
                 for my $N (@Supported)
                 {
                     my $IsFuzzy = $FuzzyNames{$Type}->{$N};
-                    my $Prop    = "\\p{$TypeToShow$Name}";
+                    my $Prop    = "\\p\{$TypeToShow$Name\}";
                     $OrigProp = $Prop if not $OrigProp; #cache for aliases
                     if ($IsFuzzy) {
                         $Comment .= "\t$Prop (and fuzzy permutations)\n";
@@ -1901,7 +1901,7 @@ sub WriteAllMappings()
         my @OUT = (
                    "##\n",
                    "## This file created by $0\n",
-                   "## List of built-in \\p{...}/\\P{...} properties.\n",
+                   "## List of built-in \\p\{...\}/\\P\{...\} properties.\n",
                    "##\n",
                    "## '*' means name may be 'fuzzy'\n",
                    "##\n\n",
@@ -2024,7 +2024,7 @@ sub SpecialCasing_txt()
         for my $prop (sort { $a->[0] <+> $b->[0] } @{$CaseInfo{$case}}) {
             my ($ix, $code, $to) = @$prop;
             my $tostr =
-              join "", map { sprintf "\\x{%s}", $_ } split ' ', $to;
+              join "", map { sprintf "\\x\{%s\}", $_ } split ' ', $to;
             push @OUT, sprintf qq["%s" => "$tostr",\n], join("", map { sprintf "\\x[%02X]", $_ } unpack("U0C*", pack("U", $ix)));
 	    # Remove any single-character mappings for
 	    # the same character since we are going for
@@ -2086,7 +2086,7 @@ sub CaseFolding_txt()
 	);
     for my $code (sort { $a <+> $b } keys %Fold) {
         my $foldstr =
-          join "", map { sprintf "\\x{%s}", $_ } split ' ', $Fold{$code};
+          join "", map { sprintf "\\x\{%s\}", $_ } split ' ', $Fold{$code};
         push @OUT, sprintf qq["%s" => "$foldstr",\n], join("", map { sprintf "\\x[%02X]", $_ } unpack("U0C*", pack("U", $code)));
     }
     push @OUT, (

@@ -777,8 +777,8 @@ if( @path_h ){
 	    s/\?\?\)/]/g;                        # | ??)|  ]|
 	    s/\?\?\-/~/g;                        # | ??-|  ~|
 	    s/\?\?\//\\/g;                       # | ??/|  \|
-	    s/\?\?</{/g;                         # | ??<|  {|
-	    s/\?\?>/}/g;                         # | ??>|  }|
+	    s/\?\?</\{/g;                         # | ??<|  {|
+	    s/\?\?>/\}/g;                         # | ??>|  }|
 	}
 	if (m/^[ \t]*#[ \t]*define\s+([\$\w]+)\b(?!\()\s*(?=[^"\s])(.*)/) {
 	    my $def = $1;
@@ -1054,7 +1054,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	@exported_names
 ) ] );
 
-our \@EXPORT_OK = ( \@{ \$EXPORT_TAGS{'all'} } );
+our \@EXPORT_OK = ( \@\{ \$EXPORT_TAGS\{'all'\} \} );
 
 our \@EXPORT = qw(
 	@const_names
@@ -1094,9 +1094,9 @@ END
 # tying the variables can happen only after bootstrap
 if (@vdecls) {
     printf PM <<END;
-{
+\{
 @{[ join "\n", map "    _tievar_$_(\$$_);", @vdecls ]}
-}
+\}
 
 END
 }
@@ -1295,10 +1295,10 @@ print XS <<"END" if $opt_g;
 
 #define MY_CXT_KEY "${module}::_guts" XS_VERSION
 
-typedef struct {
+typedef struct \{
     /* Put Global Data in here */
     int dummy;		/* you can access this elsewhere as MY_CXT.dummy */
-} my_cxt_t;
+\} my_cxt_t;
 
 START_MY_CXT
 
@@ -1382,12 +1382,12 @@ print XS "INCLUDE: $constsxsfname\n" unless $opt_c;
 print XS <<"END" if $opt_g;
 
 BOOT:
-{
+\{
     MY_CXT_INIT;
     /* If any of the fields in the my_cxt_t struct need
        to be initialised, do it here.
      */
-}
+\}
 
 END
 
@@ -1449,24 +1449,24 @@ sub print_tievar_subs {
   my($fh, $name, $type) = @_;
   print $fh <<END;
 I32
-_get_$name(IV index, SV *sv) {
+_get_$name(IV index, SV *sv) \{
     dSP;
     PUSHMARK(SP);
     XPUSHs(sv);
     PUTBACK;
     (void)call_pv("$module\::_get_$name", G_DISCARD);
     return (I32)0;
-}
+\}
 
 I32
-_set_$name(IV index, SV *sv) {
+_set_$name(IV index, SV *sv) \{
     dSP;
     PUSHMARK(SP);
     XPUSHs(sv);
     PUTBACK;
     (void)call_pv("$module\::_set_$name", G_DISCARD);
     return (I32)0;
-}
+\}
 
 END
 }
@@ -1517,14 +1517,14 @@ _to_ptr(THIS)
 	$name THIS = NO_INIT
     PROTOTYPE: \$
     CODE:
-	if (sv_derived_from(ST(0), "$name")) {
+	if (sv_derived_from(ST(0), "$name")) \{
 	    STRLEN len;
 	    char *s = SvPV((SV*)SvRV(ST(0)), len);
 	    if (len != sizeof(THIS))
 		croak("Size \%d of packed data != expected \%d",
 			len, sizeof(THIS));
 	    RETVAL = ($name *)s;
-	}
+	\}
 	else
 	    croak("THIS is not of type $name");
     OUTPUT:
@@ -1798,7 +1798,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => '$module',
     VERSION_FROM      => '$modpmname', # finds \$VERSION
-    PREREQ_PM         => {$prereq_pm}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => \{$prereq_pm\}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM  => '$modpmname', # retrieve abstract from module
     AUTHOR         => '$author <$email>',
 END
@@ -1837,21 +1837,21 @@ if (!$opt_c) {
                            NAMES =>        \@const_names,
                  );
   print PL <<"END";
-if  (eval {require ExtUtils::Constant; 1}) {
+if  (eval \{require ExtUtils::Constant; 1\}) \{
   # If you edit these definitions to change the constants used by this module,
   # you will need to use the generated $constscfname and $constsxsfname
   # files to replace their "fallback" counterparts before distributing your
   # changes.
 $generate_code
-}
-else {
+\}
+else \{
   use File::Copy;
   use File::Spec;
-  foreach my \$file ('$constscfname', '$constsxsfname') {
+  foreach my \$file ('$constscfname', '$constsxsfname') \{
     my \$fallback = File::Spec->catfile('$fallbackdirname', \$file);
     copy (\$fallback, \$file) or die "Can't copy \$fallback to \$file: \$!";
-  }
-}
+  \}
+\}
 END
 
   eval $generate_code;
@@ -1973,7 +1973,7 @@ if ( $old_test )
 
   print EX <<_END_;
 use Test;
-BEGIN { plan tests => $tests };
+BEGIN \{ plan tests => $tests \};
 use $module;
 ok(1); # If we made it this far, we're ok.
 
@@ -1988,22 +1988,22 @@ foreach my $constname (qw(
 _END_
 
      print EX wrap ("\t", "\t", $const_names);
-     print EX (")) {\n");
+     print EX (")) \{\n");
 
      print EX <<_END_;
   next if (eval "my \\\$a = \$constname; 1");
-  if (\$\@ =~ /^Your vendor has not defined $module macro \$constname/) {
+  if (\$\@ =~ /^Your vendor has not defined $module macro \$constname/) \{
     print "# pass: \$\@";
-  } else {
+  \} else \{
     print "# fail: \$\@";
     \$fail = 1;
-  }
-}
-if (\$fail) {
+  \}
+\}
+if (\$fail) \{
   print "not ok 2\\n";
-} else {
+\} else \{
   print "ok 2\\n";
-}
+\}
 
 _END_
   }
@@ -2012,7 +2012,7 @@ else
 {
   print EX <<_END_;
 use Test::More tests => $tests;
-BEGIN { use_ok('$module') };
+BEGIN \{ use_ok('$module') \};
 
 _END_
 
@@ -2025,18 +2025,18 @@ foreach my $constname (qw(
 _END_
 
      print EX wrap ("\t", "\t", $const_names);
-     print EX (")) {\n");
+     print EX (")) \{\n");
 
      print EX <<_END_;
   next if (eval "my \\\$a = \$constname; 1");
-  if (\$\@ =~ /^Your vendor has not defined $module macro \$constname/) {
+  if (\$\@ =~ /^Your vendor has not defined $module macro \$constname/) \{
     print "# pass: \$\@";
-  } else {
+  \} else \{
     print "# fail: \$\@";
     \$fail = 1;
-  }
+  \}
 
-}
+\}
 
 ok( \$fail == 0 , 'Constants' );
 _END_

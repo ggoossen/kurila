@@ -29,7 +29,7 @@ sub fill_protos {
   while ($proto =~ m/\S/) {
     $n++;
     push(@out1,[$n,@out]) if $seen_semi;
-    push(@out, $1 . "{\$_[$n]}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
+    push(@out, $1 . "\{\$_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
     push(@out, "\$_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
     push(@out, "\@_[$n..\$#_]"), last if $proto =~ s/^\s*(;\s*)?\@//;
     $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
@@ -51,13 +51,13 @@ sub write_invocation {
     while (@argvs) {
       @argv = @{shift @argvs};
       $n = shift @argv;
-      push @out, "$ {else}if (\@_ == $n) {\n";
-      $else = "\t} els";
+      push @out, "$ {else}if (\@_ == $n) \{\n";
+      $else = "\t\} els";
       push @out, 
           "\t\treturn " . one_invocation($core, $call, $name, $void, @argv) . ";\n";
     }
     push @out, <<EOC;
-	}
+	\}
 	die "$name(\@_): Do not expect to get ", scalar \@_, " arguments";
 EOC
     return join '', @out;
@@ -110,12 +110,12 @@ sub _make_fatal {
       $proto = '@';
     }
     $code = <<EOS;
-sub$real_proto {
+sub$real_proto \{
 	local(\$", \$!) = (', ', 0);
 EOS
     my @protos = fill_protos($proto);
     $code .= write_invocation($core, $call, $name, $void, @protos);
-    $code .= "}\n";
+    $code .= "\}\n";
     print $code if $Debug;
     {
       no strict 'refs'; # to avoid: Can't use string (...) as a symbol ref ...

@@ -73,8 +73,8 @@ sub wrap {
     # We have to do $shortchar and $longchar in variables because the
     # construct ${char}{0,$width} didn't do the right thing until Perl 5.8.x.
     my $char = '(?:(?:\e\[[\d;]+m)*[^\n])';
-    my $shortchar = $char . "{0,$width}";
-    my $longchar = $char . "{$width}";
+    my $shortchar = $char . "\{0,$width\}";
+    my $longchar = $char . "\{$width\}";
     while (length +> $width) {
         if (s/^($shortchar)[\ \t]+// || s/^($longchar)//) {
             $output .= $spaces . $1 . "\n";

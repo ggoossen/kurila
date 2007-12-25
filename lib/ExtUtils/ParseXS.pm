@@ -902,9 +902,9 @@ EOF
     print Q(<<"EOF");
 #XS(XS_${Packid}_nil); /* prototype to pass -Wmissing-prototypes */
 #XS(XS_${Packid}_nil)
-#{
+#\{
 #   XSRETURN_EMPTY;
-#}
+#\}
 #
 EOF
     unshift(@InitFileCode, <<"MAKE_FETCHMETHOD_WORK");
@@ -956,7 +956,7 @@ EOF
 EOF
 
   print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
-#    {
+#    \{
 #        CV * cv ;
 #
 EOF
@@ -976,7 +976,7 @@ EOF
   print @InitFileCode;
 
   print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
-#    }
+#    \}
 EOF
 
   if (@BootCode)
@@ -1579,8 +1579,8 @@ sub check_cpp {
 sub Q {
   my($text) = @_;
   $text =~ s/^#//gm;
-  $text =~ s/\[\[/{/g;
-  $text =~ s/\]\]/}/g;
+  $text =~ s/\[\[/\{/g;
+  $text =~ s/\]\]/\}/g;
   $text;
 }
 
@@ -1744,9 +1744,9 @@ sub generate_init {
       warn $@   if  $@;
     }
     if ($defaults{$var} eq 'NO_INIT') {
-      $deferred .= eval qq/"\\n\\tif (items >= $num) {\\n$expr;\\n\\t}\\n"/;
+      $deferred .= eval qq/"\\n\\tif (items >= $num) \{\\n$expr;\\n\\t\}\\n"/;
     } else {
-      $deferred .= eval qq/"\\n\\tif (items < $num)\\n\\t    $var = $defaults{$var};\\n\\telse {\\n$expr;\\n\\t}\\n"/;
+      $deferred .= eval qq/"\\n\\tif (items < $num)\\n\\t    $var = $defaults{$var};\\n\\telse \{\\n$expr;\\n\\t\}\\n"/;
     }
     warn $@   if  $@;
   } elsif ($ScopeThisXSUB or $expr !~ m/^\s*\$var =/) {

@@ -52,9 +52,9 @@ sub bits ($) {
 	my $n = rand(1);
 	if ($n +< 0.0 or $n +>= 1.0) {
 	    print <<EOM;
-# WHOA THERE!  \$Config{drand01} is set to '$Config{drand01}',
+# WHOA THERE!  \$Config\{drand01\} is set to '$Config{drand01}',
 # but that apparently produces values < 0.0 or >= 1.0.
-# Make sure \$Config{drand01} is a valid expression in the
+# Make sure \$Config\{drand01\} is a valid expression in the
 # C-language, and produces values in the range [0.0,1.0).
 #
 # I give up.

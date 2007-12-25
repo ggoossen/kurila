@@ -164,7 +164,7 @@ sub ParseAttribs
 	} elsif(  "CODE" eq ref( $params{$key} )  ) {
 	    @{$hvRequests->{$key}}=  &{$params{$key}};
 	} else {
-	    die "Impossible value in \$params{$key}";
+	    die "Impossible value in \$params\{$key\}";
 	}
     }
 }
@@ -211,10 +211,10 @@ sub Myconst2perl
 	warn "Reading Perl file, $file:  $perlcode{$file}\n";
 	open( MODULE, "<$file" )  or  die "Can't read Perl file, $file: $!\n";
 	eval qq[
-	    while(  <MODULE>  ) {
+	    while(  <MODULE>  ) \{
 		$perlcode{$file};
 		\$code .= \$_;
-	    }
+	    \}
 	    1;
 	]  or  die "$file eval: $@\n";
 	close( MODULE );
@@ -244,10 +244,10 @@ sub Myconst2perl
 	    print qq[\n/* Include $file:  $code */\n];
 	    print qq[\n#line 1 "$file"\n];
 	    eval qq[
-		while(  <XS>  ) {
+		while(  <XS>  ) \{
 		    $ccode{$file};
 		    print;
-		}
+		\}
 		1;
 	    ]  or  die "$file eval: $@\n";
 	    close( XS );
@@ -261,7 +261,7 @@ sub Myconst2perl
 	    print "void\n$routine( void )\n";
 	}
     }
-    print "{\n";
+    print "\{\n";
 
     {
 	@ExtUtils::Myconst2perl::importlist= @importlist;
@@ -269,15 +269,15 @@ sub Myconst2perl
 	my $port= $export ? "export" : "import";
 	my $arg2= $export ? "q[$importto]," : "";
 	local( $^W )= 0;
-	eval $code . "{\n"
-	  . "    {    package $importto;\n"
+	eval $code . "\{\n"
+	  . "    \{    package $importto;\n"
 	  . "        warn qq[\u${port}ing to $importto: $var\\n];\n"
 	  . "        \$pkg->$port( $arg2 $var );\n"
-	  . "    }\n"
-	  . "    {   no strict 'refs';\n"
-	  . "        $var=  sort keys %{'_constants::'};   }\n"
+	  . "    \}\n"
+	  . "    \{   no strict 'refs';\n"
+	  . "        $var=  sort keys %\{'_constants::'\};   \}\n"
 	  . "    warn 0 + $var, qq[ symbols ${port}ed.\\n];\n"
-	  . "}\n1;\n"
+	  . "\}\n1;\n"
 	  or  die "eval: $@\n";
     }
     my @syms= @ExtUtils::Myconst2perl::importlist;
@@ -355,7 +355,7 @@ sub Myconst2perl
 	  qq[    printf( "1;\\n" );\n],
 	  qq[    return( 0 );\n];
     }
-    print "}\n";
+    print "\}\n";
 }
 
 1;

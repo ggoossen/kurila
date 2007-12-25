@@ -131,7 +131,7 @@ sub memEQ_clause {
   my $len = length $name;
 
   if ($len +< 2) {
-    return $indent . "{\n"
+    return $indent . "\{\n"
 	if (defined $checked_at and $checked_at == 0) or $len == 0;
     # We didn't switch, drop through to the code for the 2 character string
     $checked_at = 1;
@@ -151,7 +151,7 @@ sub memEQ_clause {
       # Placate 5.005 with a break in the string. I can't see a good way of
       # getting it to not take [ as introducing an array lookup, even with
       # ${name_param}[$check]
-      return $indent . "if ($name_param" . "[$check] == '$char') {\n";
+      return $indent . "if ($name_param" . "[$check] == '$char') \{\n";
     }
   }
   if (($len == 2 and !defined $checked_at)
@@ -159,13 +159,13 @@ sub memEQ_clause {
     my $char1 = C_stringify (substr $name, 0, 1);
     my $char2 = C_stringify (substr $name, 1, 1);
     return $indent .
-      "if ($name_param" . "[0] == '$char1' && $name_param" . "[1] == '$char2') {\n";
+      "if ($name_param" . "[0] == '$char1' && $name_param" . "[1] == '$char2') \{\n";
   }
   if (($len == 3 and defined ($checked_at) and $checked_at == 1)) {
     my $char1 = C_stringify (substr $name, 0, 1);
     my $char2 = C_stringify (substr $name, 2, 1);
     return $indent .
-      "if ($name_param" . "[0] == '$char1' && $name_param" . "[2] == '$char2') {\n";
+      "if ($name_param" . "[0] == '$char1' && $name_param" . "[2] == '$char2') \{\n";
   }
 
   my $pointer = '^';
@@ -178,7 +178,7 @@ sub memEQ_clause {
 
   $name = C_stringify ($name);
   my $memEQ = $self->memEQ();
-  my $body = $indent . "if ($memEQ($name_param, \"$name\", $len)) {\n";
+  my $body = $indent . "if ($memEQ($name_param, \"$name\", $len)) \{\n";
   # Put a little ^ under the letter we checked at
   # Screws up for non printable and non-7 bit stuff, but that's too hard to
   # get right.
@@ -249,7 +249,7 @@ sub dump_names {
   }
   if ($declare_types) {
     $result = $indent . 'my $types = {map {($_, 1)} qw('
-      . join (" ", sort keys %$what) . ")};\n";
+      . join (" ", sort keys %$what) . ")\};\n";
   }
   local $Text::Wrap::huge = 'overflow';
   local $Text::Wrap::columns = 80;
@@ -258,7 +258,7 @@ sub dump_names {
   if (@complex) {
     foreach my $item (sort {$a->{name} cmp $b->{name}} @complex) {
       my $name = perl_stringify $item->{name};
-      my $line = ",\n$indent            {name=>\"$name\"";
+      my $line = ",\n$indent            \{name=>\"$name\"";
       $line .= ", type=>\"$item->{type}\"" if defined $item->{type};
       foreach my $thing (qw (macro value default pre post def_pre def_post)) {
         my $value = $item->{$thing};
@@ -271,7 +271,7 @@ sub dump_names {
           }
         }
       }
-      $line .= "}";
+      $line .= "\}";
       # Ensure that the enclosing C comment doesn't end
       # by turning */  into *" . "/
       $line =~ s!\*\/!\*" . "/!gs;
@@ -306,8 +306,8 @@ sub assign {
   my $close;
   if ($pre) {
     chomp $pre;
-    $close = "$indent}\n";
-    $clause = $indent . "{\n";
+    $close = "$indent\}\n";
+    $clause = $indent . "\{\n";
     $indent .= "  ";
     $clause .= "$indent$pre";
     $clause .= ";" unless $pre =~ m/;$/;
@@ -415,11 +415,11 @@ sub match_clause {
   # In this case, $yes and $no both have item hashrefs.
   if ($either) {
     $body .= $self->return_clause ({indent=>4 + length $indent}, $either);
-    $body .= $indent . "  }\n";
+    $body .= $indent . "  \}\n";
   } else {
     $body .= $self->return_clause ({indent=>2 + length $indent}, $item);
   }
-  $body .= $indent . "}\n";
+  $body .= $indent . "\}\n";
 }
 
 
@@ -513,9 +513,9 @@ sub switch_clause {
 
   my $do_front_chop = $offset == 0 && $namelen +> 2;
   if ($do_front_chop) {
-    $body .= $indent . "switch (*" . $self->name_param() . "++) {\n";
+    $body .= $indent . "switch (*" . $self->name_param() . "++) \{\n";
   } else {
-    $body .= $indent . "switch (" . $self->name_param() . "[$offset]) {\n";
+    $body .= $indent . "switch (" . $self->name_param() . "[$offset]) \{\n";
   }
   foreach my $char (sort keys %$best) {
     confess sprintf "'$char' is %d bytes long, not 1", length $char
@@ -545,7 +545,7 @@ sub switch_clause {
     }
     $body .= $indent . "  break;\n";
   }
-  $body .= $indent . "}\n";
+  $body .= $indent . "\}\n";
   return $body;
 }
 
@@ -817,7 +817,7 @@ sub C_constant {
   $body .= ", " . $self->namelen_param_definition($params)
     unless defined $namelen;
   $body .= $self->C_constant_other_params_defintion($params);
-  $body .= ") {\n";
+  $body .= ") \{\n";
 
   if (defined $namelen) {
     # We are a child subroutine. Print the simple description
@@ -833,7 +833,7 @@ sub C_constant {
 			      default_type => $default_type, what => $what,
 			      indent => $indent, breakout => $breakout},
 			     @items);
-    $body .= '  switch ('.$self->namelen_param().") {\n";
+    $body .= '  switch ('.$self->namelen_param().") \{\n";
     # Need to group names of the same length
     my @by_length;
     foreach (@items) {
@@ -883,11 +883,11 @@ sub C_constant {
       }
       $body .= "    break;\n";
     }
-    $body .= "  }\n";
+    $body .= "  \}\n";
   }
   my $notfound = $self->return_statement_for_notfound();
   $body .= "  $notfound\n" if $notfound;
-  $body .= "}\n";
+  $body .= "\}\n";
   return (@subs, $body);
 }
 

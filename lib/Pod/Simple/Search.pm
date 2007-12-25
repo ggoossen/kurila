@@ -525,7 +525,7 @@ sub find {
 
   # Split on :: and then join the name together using File::Spec
   my @parts = split m/::/, $pod;
-  $verbose and print "Chomping {$pod} => {@parts}\n";
+  $verbose and print "Chomping \{$pod\} => \{@parts\}\n";
 
   #@search_dirs = File::Spec->curdir unless @search_dirs;
   
@@ -639,11 +639,11 @@ sub _accessorize {  # A simple-minded method-maker
 sub _state_as_string {
   my $self = $_[0];
   return '' unless ref $self;
-  my @out = "{\n  # State of $self ...\n";
+  my @out = "\{\n  # State of $self ...\n";
   foreach my $k (sort keys %$self) {
     push @out, "  ", _esc($k), " => ", _esc($self->{$k}), ",\n";
   }
-  push @out, "}\n";
+  push @out, "\}\n";
   my $x = join '', @out;
   $x =~ s/^/#/mg;
   return $x;
