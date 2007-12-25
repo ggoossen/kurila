@@ -10607,6 +10607,8 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str
     char *tstart;
 #endif
 
+    keep_quoted = 1;
+
     /* skip space before the delimiter */
     if (isSPACE(*s)) {
 	s = PEEKSPACE(s);

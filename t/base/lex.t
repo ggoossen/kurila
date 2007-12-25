@@ -101,7 +101,7 @@ E1
 
 print "$foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 
-print "${foo}{$bar}" eq "FOO{BAR}" ? "ok 22\n" : "not ok 22\n";
+print "${foo}\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
 print "${foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
@@ -115,7 +115,7 @@ print "ok 26\n";
 print "d" =~ m/^$X[-1]$/ ? "ok 27\n" : "not ok 27\n";
 print "a1" !~ m/^$X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 
-print (((q{{\{\(}} . q{{\)\}}}) eq '{{\(}{\)}}') ? "ok 29\n" : "not ok 29\n");
+print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}{\)\}}') ? "ok 29\n" : "not ok 29\n");
 
 $foo = "not ok 30\n";
 $foo =~ s/^not /substr(<<EOF, 0, 0)/e;
@@ -135,7 +135,7 @@ print $foo;
   print "ok 31\n";
  
 # Does the syntax where we use the literal control character still work?
-  if (eval "\$ {\cX}" != 17 or $@) { print "not "  }
+  if (eval "\$ \{\cX\}" != 17 or $@) { print "not "  }
   print "ok 32\n";
 
   eval "\$\cQ = 24";                 # Literal control character
@@ -163,12 +163,12 @@ print $foo;
   # 
 
   eval 'my $^X;';
-  print "not " unless index ($@, 'Can\'t use global $^X in "my"') +> -1;
+  print "not " unless index ($@, q|Can't use global $^X in "my"|) +> -1;
   print "ok 37\n";
 #  print "($@)\n" if $@;
 
   eval 'my $ {^XYZ};';
-  print "not " unless index ($@, 'Can\'t use global $^XYZ in "my"') +> -1;
+  print "not " unless index ($@, q|Can't use global $^XYZ in "my"|) +> -1;
   print "ok 38\n";
 #  print "($@)\n" if $@;
 
