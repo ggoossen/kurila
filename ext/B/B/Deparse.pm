@@ -3721,9 +3721,9 @@ sub dq {
 
 	# Disambiguate "${foo}bar", "${foo}{bar}", "${foo}[1]", "$foo\::bar"
 	($last =~ m/^[A-Z\\\^\[\]_?]/ &&
-	    $first =~ s/([\$@])\^$/${1}{^}/)  # "${^}W" etc
+	    $first =~ s/([\$@])\^$/${1}\{^\}/)  # "${^}W" etc
 	    || ($last =~ m/^[:'{\[\w_]/ && #'
-		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}{$2}/);
+		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}\{$2\}/);
 
 	return $first . $last;
     } elsif ($type eq "uc") {
@@ -4028,9 +4028,9 @@ sub re_dq {
 
 	# Disambiguate "${foo}bar", "${foo}{bar}", "${foo}[1]"
 	($last =~ m/^[A-Z\\\^\[\]_?]/ &&
-	    $first =~ s/([\$@])\^$/${1}{^}/)  # "${^}W" etc
+	    $first =~ s/([\$@])\^$/${1}\{^\}/)  # "${^}W" etc
 	    || ($last =~ m/^[{\[\w_]/ &&
-		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}{$2}/);
+		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}\{$2\}/);
 
 	return $first . $last;
     } elsif ($type eq "uc") {

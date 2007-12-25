@@ -5,7 +5,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 7;
+plan tests => 8;
 
 if ($Config{ebcdic} eq 'define') {
     $_ = join "", map chr($_), 129..233;
@@ -28,6 +28,8 @@ if ($Config{ebcdic} eq 'define') {
 }
 
 is(length(quotemeta ""), 0, "quotemeta empty string");
+
+is(quotemeta('{'), '\{', 'quotemeta {');
 
 is("Pe\Q#x#\ErL", "Pe\\#x\\#rL", '\u\LpE\Q#X#\ER\EL');
 

@@ -65,10 +65,11 @@ BEGIN {
     # op_entereval should keep the pragmas it was compiled with
     eval q*
 	print "not " if $^H{foo} ne "a";
-	print "ok 13 - \$^H{foo} is 'a' at eval-\"\" time\n";
+	print "ok 13 - \$^H\{foo\} is 'a' at eval-\"\" time\n";
 	print "not " unless $^H ^&^ 0x00020000;
 	print "ok 14 - \$^H contains HINT_LOCALIZE_HH at eval\"\"-time\n";
     *;
+    die if $@;
 }
 BEGIN {
     print "not " if exists $^H{foo};

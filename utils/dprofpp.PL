@@ -636,11 +636,11 @@ sub display {
 	} else {
 
             print form(
-                       "Total Elapsed Time = {>>>>>>} Seconds",
+                       'Total Elapsed Time = {>>>>>>} Seconds',
                        (($rrun_rtime - $overhead) / $hz),
-                       "  {>>>>>>>>>} Time = {>>>>>>} Seconds",
+                       '  {>>>>>>>>>} Time = {>>>>>>} Seconds',
                        $whichtime, $runtime,
-                       "{<<<<<<<} Times",
+                       '{<<<<<<<} Times',
                        $incl_excl,
                        "\%Time ExclSec CumulS #Calls sec/call Csec/c  Name",
                       );
@@ -970,7 +970,6 @@ sub rby_avgcpu { $persecs->{$a} <+> $persecs->{$b} }
 
 BEGIN {
     $statform = ' {>>}  {>>>>} {>>>>} {>>>>} {>>>>>>} {>>>>}  {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<';
-    if (-t STDOUT and defined $stty and my ($cols) = `$stty -a` =~ m/\bcolumns\s+(\d+)/)
     {
 	$statform .= '<' x ($cols - length $statform) if $cols +> 80;
     }

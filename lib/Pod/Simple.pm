@@ -1434,7 +1434,7 @@ sub _out {
   my $mutor = shift(@_) if @_ and ref($_[0] || '') eq 'CODE';
 
   DEBUG and print "\n\n", '#' x 76,
-   "\nAbout to parse source: \{{\n$_[0]\n\}}\n\n";
+   "\nAbout to parse source: \{\{\n$_[0]\n\}\}\n\n";
   
   
   my $parser = $class->new;

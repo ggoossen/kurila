@@ -153,9 +153,9 @@ sub extract_bracketed (;$$$)
 	$ldel =~ s/"//g and $qdel .= q{"};
 	$ldel =~ s/`//g and $qdel .= q{`};
 	$ldel =~ s/q//g and $quotelike = 1;
-	$ldel =~ tr/[](){}<>\0-\377/[[(({{<</ds;
+	$ldel =~ tr/[]()\{\}<>\0-\377/[[((\{\{<</ds;
 	my $rdel = $ldel;
-	unless ($rdel =~ tr/[({</])}>/)
+	unless ($rdel =~ tr/[(\{</])\}>/)
         {
 		return _fail $wantarray, $textref,
 			     "Did not find a suitable bracket in delimiter: \"$_[1]\"",
@@ -219,7 +219,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 			        return;
 			}
 			my $expected = pop(@nesting);
-			$expected =~ tr/({[</)}]>/;
+			$expected =~ tr'({[<')}]>';
 			if ($expected ne $brackettype)
 			{
 				_failmsg qq{Mismatched closing bracket: expected "$expected" but found "$found"},
@@ -267,7 +267,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 sub _revbracket($)
 {
 	my $brack = reverse $_[0];
-	$brack =~ tr/[({</])}>/;
+	$brack =~ tr'[({<'])}>';
 	return $brack;
 }
 
@@ -500,8 +500,8 @@ sub extract_codeblock (;$$$$$)
 	my $rdel_inner = $ldel_inner;
 	my $rdel_outer = $ldel_outer;
 	my $posbug = pos;
-	for ($ldel_inner, $ldel_outer) { tr/[]()<>{}\0-\377/[[((<<{{/ds }
-	for ($rdel_inner, $rdel_outer) { tr/[]()<>{}\0-\377/]]))>>}}/ds }
+	for ($ldel_inner, $ldel_outer) { tr/[]()<>\{\}\0-\377/[[((<<\{\{/ds }
+	for ($rdel_inner, $rdel_outer) { tr/[]()<>\{\}\0-\377/]]))>>\}\}/ds }
 	for ($ldel_inner, $ldel_outer, $rdel_inner, $rdel_outer)
 	{
 		$_ = '('.join('|',map { quotemeta $_ } split('',$_)).')'
@@ -542,7 +542,7 @@ sub _match_codeblock($$$$$$$)
 		return;
 	}
 	my $closing = $1;
-	   $closing =~ tr/([<{/)]>}/;
+	   $closing =~ tr'([<{')]>}';
 	my $matched;
 	my $patvalid = 1;
 	while (pos($$textref) +< length($$textref))
@@ -788,7 +788,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 	my ($ldel1, $rdel1) = ("\Q$1","\Q$1");
 	if ($ldel1 =~ m/[[(<{]/)
 	{
-		$rdel1 =~ tr/[({</])}>/;
+		$rdel1 =~ tr'[({<'])}>';
 		defined(_match_bracketed($textref,"",$ldel1,"","",$rdel1))
 		|| do { pos $$textref = $startpos; return };
         $ld2pos = pos($$textref);
@@ -815,7 +815,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 				return;
 			}
 			$ldel2 = $rdel2 = "\Q$1";
-			$rdel2 =~ tr/[({</])}>/;
+			$rdel2 =~ tr'[({<'])}>';
 		}
 		else
 		{

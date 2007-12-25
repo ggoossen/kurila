@@ -40,7 +40,7 @@ $result = join('|', parse_line('\s+', 0, $string));
 is($result, 'aaaabbbbb|cc cc|\\"dddd eee\\"ffff|gg');
 
 # Now test single quote behavior
-$string = 'aaaa"bbbbb" cc\\ cc \\\\\\"dddd\' eee\\\\\\"ffff\' gg';
+$string = q|aaaa"bbbbb" cc\\ cc \\\\\\"dddd' eee\\\\\\"ffff' gg|;
 $result = join('|', parse_line('\s+', 0, $string));
 is($result, 'aaaabbbbb|cc cc|\\"dddd eee\\\\\\"ffff|gg');
 
@@ -86,9 +86,9 @@ is(@words, 0);
 
 # Now test perlish single quote behavior
 $Text::ParseWords::PERL_SINGLE_QUOTE = 1;
-$string = 'aaaa"bbbbb" cc\ cc \\\\\"dddd\' eee\\\\\"\\\'ffff\' gg';
+$string = q|aaaa"bbbbb" cc\ cc \\\\\"dddd' eee\\\\\"\\'ffff' gg|;
 $result = join('|', parse_line('\s+', 0, $string));
-is($result, 'aaaabbbbb|cc cc|\"dddd eee\\\\"\'ffff|gg');
+is($result, q<aaaabbbbb|cc cc|\"dddd eee\\\\"'ffff|gg>);
 
 # test whitespace in the delimiters
 @words = quotewords(' ', 1, '4 3 2 1 0');

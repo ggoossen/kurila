@@ -91,7 +91,7 @@ ERR
 
 #line 45
 isnt("foo", "foo", 'foo isnt foo?' );
-isn't("foo", "foo",'foo isn\'t foo?' );
+isn't("foo", "foo", q|foo isn't foo?| );
 isnt(undef, undef, 'undef isnt undef?');
 err_ok( <<ERR );
 #   Failed test 'foo isnt foo?'
