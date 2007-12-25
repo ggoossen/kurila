@@ -28,13 +28,13 @@ SKIP: {
     skip("bug/feature of pdksh", 2) if $^O eq 'os2';
 
     my $tnum = curr_test();
-    $exit = system qq{$Perl -le "print q{ok $tnum - interp system(EXPR)"}};
+    $exit = system qq{$Perl -le "print q\{ok $tnum - interp system(EXPR)"\}};
     next_test();
     is( $exit, 0, '  exited 0' );
 }
 
 my $tnum = curr_test();
-$exit = system qq{$Perl -le "print q{ok $tnum - split & direct system(EXPR)"}};
+$exit = system qq{$Perl -le "print q\{ok $tnum - split & direct system(EXPR)"\}};
 next_test();
 is( $exit, 0, '  exited 0' );
 
@@ -43,7 +43,7 @@ is( $exit, 0, '  exited 0' );
 my $quote = $Is_VMS || $Is_Win32 ? '"' : '';
 $tnum = curr_test();
 $exit = system $Perl, '-le', 
-               "${quote}print q{ok $tnum - system(PROG, LIST)}${quote}";
+               "${quote}print q<ok $tnum - system(PROG, LIST)>${quote}";
 next_test();
 is( $exit, 0, '  exited 0' );
 

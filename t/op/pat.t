@@ -928,7 +928,7 @@ $brackets = qr{
 	         {  (?> [^{}]+ | (??{ $brackets }) )* }
 	      }x;
 
-"\{{\}" =~ $brackets;
+"\{\{\}" =~ $brackets;
 print "ok $test\n";		# Did we survive?
 $test++;
 
@@ -1040,21 +1040,13 @@ iseq("@b","@c");
 }
 
 # see if backtracking optimization works correctly
-"\n\n" =~ m/\n  $ \n/x or print "not ";
-print "ok $test\n";
-$test++;
+ok("\n\n" =~ m/\n  $ \n/x);
 
-"\n\n" =~ m/\n* $ \n/x or print "not ";
-print "ok $test\n";
-$test++;
+ok("\n\n" =~ m/\n* $ \n/x);
 
-"\n\n" =~ m/\n+ $ \n/x or print "not ";
-print "ok $test\n";
-$test++;
+ok("\n\n" =~ m/\n+ $ \n/x);
 
-[] =~ m/^ARRAY/ or print "# [] \nnot ";
-print "ok $test\n";
-$test++;
+ok([] =~ m/^ARRAY/, "ARRAYREF");
 
 eval << 'EOE';
 \{
@@ -1065,9 +1057,7 @@ eval << 'EOE';
 $a = 'S'->new;
 EOE
 
-$a and $a =~ m/^Object\sS/ or print "# '$a' \nnot ";
-print "ok $test\n";
-$test++;
+ok($a and $a =~ m/^Object\sS/, '$a');
 
 # test result of match used as match (!)
 'a1b' =~ ('xyz' =~ m/y/) and $` eq 'a' or print "not ";
@@ -1923,7 +1913,7 @@ $test = 687;
     ok ($x =~ m/^[\x[00]xa]{3}$/, "\\xxa isn't to be treated as \\xa");
 
     $x = "\x[09]" . "_b";
-    ok ($x =~ m/^[\x[9]_b]{3}$/, "\\x9_b isn't to be treated as \\x9b");
+    ok ($x =~ m/^[\x[09]_b]{3}$/, "\\x9_b isn't to be treated as \\x9b");
 
 }
 
@@ -3249,7 +3239,7 @@ if ($ordA == 193) {
     $str .= ($delim x 4);
     my $res;
     my $matched;
-    if ($str =~ s/^(.*?)${delim}\{4\}//s) {
+    if ($str =~ s/^(.*?)${delim}{4}//s) {
         $res = $1;
         $matched=1;
     } 

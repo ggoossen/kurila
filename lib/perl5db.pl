@@ -1352,7 +1352,7 @@ else {
 
 $pidprompt = '';
 
-# Sets up $emacs as a synonym for $slave_editor.
+# Sets up $emacs as a synonym for $slave_editor
 *emacs = $slave_editor if $slave_editor;    # May be used in afterinit()...
 
 =head2 READING THE RC FILE
@@ -7153,7 +7153,7 @@ B<>>B<>> I<expr>        Add to the list of Perl commands to run after each promp
 B<>>B< *>        Delete the list of Perl commands to run after each prompt.
 B<\{> I<db_command>    Define debugger command to run before each prompt.
 B<\{> ?            List debugger commands to run before each prompt.
-B<\{{> I<db_command>    Add to the list of debugger commands to run before each prompt.
+B<\{\{> I<db_command>    Add to the list of debugger commands to run before each prompt.
 B<\{ *>             Delete the list of debugger commands to run before each prompt.
 B<$prc> I<number>    Redo a previous command (default previous command).
 B<$prc> I<-number>    Redo number'th-to-last command.
@@ -7334,7 +7334,7 @@ B<>> I<expr>        Define Perl command to run after each prompt.
 B<>>B<>> I<expr>        Add to the list of Perl commands to run after each prompt.
 B<\{> I<db_command>    Define debugger command to run before each prompt.
 B<\{> ?            List debugger commands to run before each prompt.
-B<\{{> I<db_command>    Add to the list of debugger commands to run before each prompt.
+B<\{\{> I<db_command>    Add to the list of debugger commands to run before each prompt.
 B<$prc> I<number>    Redo a previous command (default previous command).
 B<$prc> I<-number>    Redo number'th-to-last command.
 B<$prc> I<pattern>    Redo last command that started with I<pattern>.

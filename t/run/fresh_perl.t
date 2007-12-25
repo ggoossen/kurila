@@ -348,16 +348,6 @@ sub foo { local $_ = shift; split; @_ }
 @x = foo(' x  y  z ');
 print "you die joe!\n" unless "@x" eq 'x y z';
 ########
-m/(?{"{"})/	# Check it outside of eval too
-EXPECT
-Sequence (?{...}) not terminated or not {}-balanced in regex; marked by <-- HERE in m/(?{ <-- HERE "{"})/ at - line 1.
-########
-m/(?{"{"}})/	# Check it outside of eval too
-EXPECT
-Unmatched right curly bracket at (re_eval 1) line 1, at end of line
-syntax error at (re_eval 1) line 1, near ""{"}"
-Compilation failed in regexp at - line 1.
-########
 BEGIN { @ARGV = qw(a b c d e) }
 BEGIN { print "argv <@ARGV>\nbegin <",shift,">\n" }
 END { print "end <",shift,">\nargv <@ARGV>\n" }
@@ -646,7 +636,7 @@ print $x;
 EXPECT
 ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
-$eval = eval 'sub { eval "sub { %S }" }';
+$eval = eval 'sub { eval "sub \{ %S \}" }';
 $eval->({});
 ######## [perl #20667] unicode regex vs non-unicode regex
 $toto = 'Hello';

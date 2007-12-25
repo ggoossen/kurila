@@ -501,13 +501,13 @@ a(?:b|(c|e){1,2}?|d)+?(.)	ace	y	$1$2	ce
 '(ab)\d\1'i	ab4Ab	y	$1	ab
 foo\w*\d{4}baz	foobar1234baz	y	$&	foobar1234baz
 a(?{})b	cabd	y	$&	ab
-a(?{)b	-	c	-	Sequence (?{...}) not terminated or not {}-balanced
-a(?{{})b	-	c	-	Sequence (?{...}) not terminated or not {}-balanced
+a(?{)b	-	c	-	Sequence (?\{...\}) not terminated or not \{\}-balanced
+a(?{{})b	-	c	-	Sequence (?\{...\}) not terminated or not \{\}-balanced
 a(?{}})b	-	c	-	
-a(?{"{"})b	-	c	-	Sequence (?{...}) not terminated or not {}-balanced
+a(?{"{"})b	-	c	-	Sequence (?\{...\}) not terminated or not \{\}-balanced
 a(?{"\{"})b	cabd	y	$&	ab
-a(?{"{"}})b	-	c	-	Unmatched right curly bracket
-a(?{$::bl="\{"}).b	caxbd	y	$::bl	{
+#a(?{"{"}})b	-	c	-	Unmatched right curly bracket
+a(?{$::bl="\{"}).b	caxbd	y	$::bl	\{
 x(~~)*(?:(?:F)?)?	x~~	y	-	-
 ^a(?#xxx){3}c	aaac	y	$&	aaac
 '^a (?#xxx) (?#yyy) {3}c'x	aaac	y	$&	aaac
@@ -612,13 +612,13 @@ $(?<=^(a))	a	y	$1	a
 ((?>a+)b)	aaab	y	$1	aaab
 (?>(a+))b	aaab	y	$1	aaa
 ((?>[^()]+)|\([^()]*\))+	((abc(ade)ufh()()x	y	$&	abc(ade)ufh()()x
-(?<=x+)y	-	c	-	Variable length lookbehind not implemented
-a{37,17}	-	c	-	Can't do {n,m} with n > m
+(?<=x+)y	-	c	-	Variable length lookbehind notimplemented
+a{37,17}	-	c	-	Can't do \{n,m\} with n > m
 \Z	a\nb\n	y	$-[0]	3
 \z	a\nb\n	y	$-[0]	4
 $	a\nb\n	y	$-[0]	3
 \Z	b\na\n	y	$-[0]	3
-\z	b\na\n	y	$-[0]	4
+\z	b\na\n	y	$-[0]4
 $	b\na\n	y	$-[0]	3
 \Z	b\na	y	$-[0]	3
 \z	b\na	y	$-[0]	3

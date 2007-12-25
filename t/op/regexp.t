@@ -100,8 +100,8 @@ foreach (@tests) {
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
     $pat =~ s/(\$\{\w+\})/$1/eeg;
     $pat =~ s/\\n/\n/g;
-    $subject = eval qq(use utf8; "$subject"); die $@ if $@;
-    $expect  = eval qq(use utf8; "$expect"); die $@ if $@;
+    $subject = eval qq("$subject"); die "error in '$subject': $@" if $@;
+    $expect  = eval qq("$expect"); die "error in '$expect': $@" if $@;
     $expect = $repl = '-' if $skip_amp and $input =~ m/\$[&\`\']/;
     my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;

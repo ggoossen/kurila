@@ -274,10 +274,10 @@ $| = 1;
 $\ = "\n";
 my $getenv;
 if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
-    $getenv = qq[$^X -e "print \$ENV{TST}"];
+    $getenv = qq[$^X -e "print \$ENV\{TST\}"];
 }
 else {
-    $getenv = qq[$^X -e 'print \$ENV{TST}'];
+    $getenv = qq[$^X -e 'print \$ENV\{TST\}'];
 }
 $ENV{TST} = 'foo';
 if (fork) {
