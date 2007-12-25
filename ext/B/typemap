@@ -25,34 +25,34 @@ B::RHE		T_RHE_OBJ
 
 INPUT
 T_SV_OBJ
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    croak(\"$var is not a reference\")
 
 T_MG_OBJ
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    croak(\"$var is not a reference\")
 
 T_HE_OBJ
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    croak(\"$var is not a reference\")
 
 T_RHE_OBJ
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    croak(\"$var is not a reference\")
 
