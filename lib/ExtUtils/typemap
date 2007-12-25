@@ -122,65 +122,65 @@ T_PV
 T_PTR
 	$var = INT2PTR($type,SvIV($arg))
 T_PTRREF
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    Perl_croak(aTHX_ \"%s: %s is not a reference\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\")
 T_REF_IV_REF
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"${ntype}\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = *INT2PTR($type *, tmp);
-	}
+	\}
 	else
 	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\", \"$ntype\")
 T_REF_IV_PTR
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"${ntype}\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
-	}
+	\}
 	else
 	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\", \"$ntype\")
 T_PTROBJ
-	if (sv_derived_from($arg, \"${ntype}\")) {
+	if (sv_derived_from($arg, \"${ntype}\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\", \"$ntype\")
 T_PTRDESC
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"${ntype}\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    ${type}_desc = (\U${type}_DESC\E*) tmp;
 	    $var = ${type}_desc->ptr;
-	}
+	\}
 	else
 	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\", \"$ntype\")
 T_REFREF
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = *INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    Perl_croak(aTHX_ \"%s: %s is not a reference\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 			\"$var\")
 T_REFOBJ
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"${ntype}\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = *INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
@@ -198,10 +198,10 @@ T_CALLBACK
 T_ARRAY
 	U32 ix_$var = $argoff;
 	$var = $ntype(items -= $argoff);
-	while (items--) {
+	while (items--) \{
 	    DO_ARRAY_ELEM;
 	    ix_$var++;
-	}
+	\}
         /* this is the number of elements in the array */
         ix_$var -= $argoff
 T_STDIO
@@ -231,12 +231,12 @@ T_UV
 T_INT
 	sv_setiv($arg, (IV)$var);
 T_SYSRET
-	if ($var != -1) {
+	if ($var != -1) \{
 	    if ($var == 0)
 		sv_setpvn($arg, "0 but true", 10);
 	    else
 		sv_setiv($arg, (IV)$var);
-	}
+	\}
 T_ENUM
 	sv_setiv($arg, (IV)$var);
 T_BOOL
@@ -293,44 +293,44 @@ T_CALLBACK
 	sv_setpvn($arg, $var.context.value().chp(),
 		$var.context.value().size());
 T_ARRAY
-        {
+        \{
 	    U32 ix_$var;
 	    EXTEND(SP,size_$var);
-	    for (ix_$var = 0; ix_$var < size_$var; ix_$var++) {
+	    for (ix_$var = 0; ix_$var < size_$var; ix_$var++) \{
 		ST(ix_$var) = sv_newmortal();
 	DO_ARRAY_ELEM
-	    }
-        }
+	    \}
+        \}
 T_STDIO
-	{
+	\{
 	    GV *gv = newGVgen("$Package");
 	    PerlIO *fp = PerlIO_importFILE($var,0);
 	    if ( fp && do_open(gv, "+<&", 3, FALSE, 0, 0, fp) )
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;
-	}
+	\}
 T_IN
-	{
+	\{
 	    GV *gv = newGVgen("$Package");
 	    if ( do_open(gv, "<&", 2, FALSE, 0, 0, $var) )
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;
-	}
+	\}
 T_INOUT
-	{
+	\{
 	    GV *gv = newGVgen("$Package");
 	    if ( do_open(gv, "+<&", 3, FALSE, 0, 0, $var) )
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;
-	}
+	\}
 T_OUT
-	{
+	\{
 	    GV *gv = newGVgen("$Package");
 	    if ( do_open(gv, "+>&", 3, FALSE, 0, 0, $var) )
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;
-	}
+	\}
