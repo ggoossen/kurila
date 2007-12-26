@@ -10855,12 +10855,8 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str
 	SvPV_renew(sv, SvLEN(sv));
     }
 
-    /* decide whether this is the first or second quoted string we've read
-       for this op
-    */
 
-/*  PL_lex_repl might not be NULL it is abused to tell whether the replacement is an eval. */
-/*     assert(str_info->str_sv == NULL); */
+    assert(str_info->str_sv == NULL);
 /*     assert(str_info->delim == 0); */
 
     str_info->str_sv = sv;
