@@ -45,7 +45,7 @@ rc(
 	    'n',
 	    'c', # line 23
 	    'n',
-	    q!p \@\{*\{Symbol::fetch_glob('main::_<$target')\}}!,
+	    q!p \@\{*\{Symbol::fetch_glob('main::_<$target')\}\}!,
 	    'q',
 	);
     \}\n|,

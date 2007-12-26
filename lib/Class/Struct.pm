@@ -161,7 +161,7 @@ sub struct {
         elsif( $type =~ m/^\w+(?:::\w+)*$/ ){
             $out .= "    if (defined(\$init\{'$name'\})) \{\n";
            $out .= "       if (ref \$init\{'$name'\} eq 'HASH')\n";
-            $out .= "            \{ \$r->$elem = $type->new(\%\{\$init\{'$name'\}}) \} $cmt\n";
+            $out .= "            \{ \$r->$elem = $type->new(\%\{\$init\{'$name'\}\}) \} $cmt\n";
            $out .= "       elsif (UNIVERSAL::isa(\$init\{'$name'\}, '$type'))\n";
             $out .= "            \{ \$r->$elem = \$init\{'$name'\} \} $cmt\n";
             $out .= "       else \{ croak 'Initializer for $name must be hash or $type reference' \}\n";

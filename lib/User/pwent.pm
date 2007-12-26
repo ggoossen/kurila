@@ -195,7 +195,7 @@ User::pwent - by-name interface to Perl's built-in getpw*() functions
  for (($fullname, $office, $workphone, $homephone) =
         split /\s*,\s*/, $pw->gecos)
  {
-    s/&/ucfirst(lc($pw->name))/ge;
+    s/&/{ eval ucfirst(lc($pw->name)) }/g;
  }
 
  use User::pwent qw(:FIELDS);

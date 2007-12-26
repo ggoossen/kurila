@@ -623,7 +623,7 @@ sub GetOptionsFromArray($@) {
 		# No entry in linkage means entry in userlinkage.
 		elsif ( $ctl->[CTL_DEST] == CTL_DEST_ARRAY ) {
 		    if ( defined $userlinkage->{$opt} ) {
-			print STDERR ("=> push(\@\{\$L\{$opt\}}, \"$arg\")\n")
+			print STDERR ("=> push(\@\{\$L\{$opt\}\}, \"$arg\")\n")
 			    if $debug;
 			push (@{$userlinkage->{$opt}}, $arg);
 		    }
