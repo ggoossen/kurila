@@ -4,7 +4,7 @@
 	$_ = "abc" ;
 	while ($i ++ == 0)
 	{
-    	    s/ab/last/e ;
+    	    s/ab/{last}/ ;
 	}
 
     Exiting subroutine via %s		
@@ -22,7 +22,7 @@
 	last fred:
 	while ($i ++ == 0)
 	{
-    	    s/ab/last fred/e ;
+    	    s/ab/{last fred}/ ;
 	}
 
 
@@ -57,12 +57,12 @@ $_ = "abc" ;
  
 while ($i ++ == 0)
 {
-    s/ab/last/e ;
+    s/ab/{last}/ ;
 }
 no warnings 'exiting' ;
 while ($i ++ == 0)
 {
-    s/ab/last/e ;
+    s/ab/{last}/ ;
 }
 EXPECT
 Exiting substitution via last at - line 7.
@@ -105,12 +105,12 @@ $_ = "abc" ;
 fred: 
 while ($i ++ == 0)
 {
-    s/ab/last fred/e ;
+    s/ab/{last fred}/ ;
 }
 no warnings 'exiting' ;
 while ($i ++ == 0)
 {
-    s/ab/last fred/e ;
+    s/ab/{last fred}/ ;
 }
 EXPECT
 Exiting substitution via last at - line 7.

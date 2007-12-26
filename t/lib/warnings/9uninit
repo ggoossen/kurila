@@ -639,7 +639,7 @@ $foo =~ s/y/z/;
 $foo =~ s/$m1/z/;
 $foo =~ s//$g1/;
 $foo =~ s/$m1/$g1/;
-$foo =~ s/./$m1/e;
+$foo =~ s/./{$m1}/;
 EXPECT
 Use of uninitialized value $_ in pattern match (m//) at - line 5.
 Use of uninitialized value $m1 in regexp compilation at - line 6.

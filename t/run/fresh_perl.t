@@ -114,7 +114,7 @@ quotemeta ""
 ########
 for ("ABCDE") {
  &sub;
-s/./&sub($&)/eg;
+s/./{&sub($&)}/g;
 print;}
 sub sub {local($_) = @_;
 $_ x 4;}
