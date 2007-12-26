@@ -47,8 +47,8 @@ binmode H;		# no CRs (which cause a spurious rebuild)
 while ( ~< *SH)
  {
   last if m/^$term$/o;
-  s/\$([\w_]+)/Config($1)/eg;
-  s/`([^\`]*)`/BackTick($1)/eg;
+  s/\$([\w_]+)/{Config($1)}/g;
+  s/`([^\`]*)`/{BackTick($1)}/g;
   munge();
   s/\\\$/\$/g;
   s#/[ *\*]*\*/#/**/#;

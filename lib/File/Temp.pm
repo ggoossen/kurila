@@ -616,10 +616,12 @@ sub _replace_XX {
   # Don't want to always use substr when not required though.
 
   if ($ignore) {
-      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/$CHARS[ int( rand( $#CHARS ) ) ]/ge;
+      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/{$CHARS[ int( rand( $#CHARS ) ) ]
+}/g;
       substr($path, 0, - $ignore, $x);
   } else {
-    $path =~ s/X(?=X*\z)/$CHARS[ int( rand( $#CHARS ) ) ]/ge;
+    $path =~ s/X(?=X*\z)/{$CHARS[ int( rand( $#CHARS ) ) ]
+}/g;
   }
   return $path;
 }

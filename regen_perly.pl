@@ -251,9 +251,9 @@ sub make_type_tab {
 	or die "Can't extract yytname[] from table string\n";
     my $fields = $1;
     $fields =~ s{"([^"]+)"}
-		{ "toketype_" .
+		{{ "toketype_" .
 		    (defined $tokens{$1} ? $tokens{$1} : $default_token)
-		}ge;
+		}}g;
     $fields =~ s/, \s* 0 \s* $//x
 	or die "make_type_tab: couldn't delete trailing ',0'\n";
 

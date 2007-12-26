@@ -110,7 +110,7 @@ sub jis_euc {
     local ${^ENCODING};
     my $r_str = shift;
     $$r_str =~ s($re_scan_jis)
-    {
+    {{
     my ($esc_0212, $esc_asc, $esc_kana, $chunk) =
        ($1, $2, $3, $4);
     if (!$esc_asc) {
@@ -123,7 +123,7 @@ sub jis_euc {
         }
     }
     $chunk;
-    }geox;
+    }}gox;
     my ($residue) = ( $$r_str =~ s/(\e.*)$//so );
     return $residue;
 }
@@ -134,7 +134,7 @@ sub euc_jis {
     my $jis0212 = shift;
     $$r_str =~ s{
     ((?:$RE{EUC_C})+|(?:$RE{EUC_KANA})+|(?:$RE{EUC_0212})+)
-    }{
+    }{{
         my $chunk = $1;
         my $esc =
         ( $chunk =~ tr/\x8E//d ) ? $ESC{KANA} :
@@ -147,7 +147,8 @@ sub euc_jis {
         $chunk =~ tr/\xA1-\xFE/\x21-\x7E/;
         }
         $esc . $chunk . $ESC{ASC};
-    }geox;
+    
+}}gox;
     $$r_str =~ s/\Q$ESC{ASC}\E
         (\Q$ESC{KANA}\E|\Q$ESC{JIS_0212}\E|\Q$ESC{JIS_0208}\E)/$1/gox;
     $$r_str;

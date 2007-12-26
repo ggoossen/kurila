@@ -77,28 +77,28 @@ sub x1 {'x'}
 $a = $t;
 @res = ();
 pos ($a) = 1;
-$a =~ s/\Ga(?{push @res, $_, $`})/x2/ge;
+$a =~ s/\Ga(?{push @res, $_, $`})/{x2}/g;
 print "#'$a' '@res'\nnot " unless "$a @res" eq 'axxxx aaa a aaa aa';
 print "ok 10\n";
 
 $a = $t;
 @res = ();
 pos ($a) = 1;
-$a =~ s/\Ga(?{push @res, $_, $`})/x1/ge;
+$a =~ s/\Ga(?{push @res, $_, $`})/{x1}/g;
 print "#'$a' '@res'\nnot " unless "$a @res" eq 'axx aaa a aaa aa';
 print "ok 11\n";
 
 $a = $t;
 @res = ();
 pos ($a) = 1;
-$a =~ s/\Ga(?{push @res, $_, $`})/x2/e;
+$a =~ s/\Ga(?{push @res, $_, $`})/{x2}/;
 print "#'$a' '@res'\nnot " unless "$a @res" eq 'axxa aaa a';
 print "ok 12\n";
 
 $a = $t;
 @res = ();
 pos ($a) = 1;
-$a =~ s/\Ga(?{push @res, $_, $`})/x1/e;
+$a =~ s/\Ga(?{push @res, $_, $`})/{x1}/;
 print "#'$a' '@res'\nnot " unless "$a @res" eq 'axa aaa a';
 print "ok 13\n";
 

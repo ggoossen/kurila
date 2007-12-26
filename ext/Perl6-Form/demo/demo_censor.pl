@@ -4,7 +4,7 @@ sub obscure {
 	my $hidewords = join '|', map quotemeta, @_;
 	return sub {
 		my ($data) = @_;
-		$data =~ s/($hidewords)/'X' x length $1/egi;
+		$data =~ s/($hidewords)/{'X' x length $1}/gi;
 		return $data;
 	}
 }

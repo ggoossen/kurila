@@ -2955,7 +2955,7 @@ sub print_ornamented {
         # note: deprecated, need to switch to $LANG and $LC_*
         # courtesy jhi:
         $swhat
-            =~ s{([\xC0-\xDF])([\x80-\xBF])}{chr(ord($1)<<6^&^0xC0^|^ord($2)^&^0x3F)}eg; #};
+            =~ s{([\xC0-\xDF])([\x80-\xBF])}{{chr(ord($1)<<6^&^0xC0^|^ord($2)^&^0x3F)}}g; #};
     }
     if ($self->colorize_output) {
         if ( $CPAN::DEBUG && $swhat =~ m/^Debug\(/ ) {
@@ -3362,7 +3362,7 @@ sub recent {
               my $distro = $eitem->findvalue("\@rdf:about");
               $distro =~ s|.*~||; # remove up to the tilde before the name
               $distro =~ s|/$||; # remove trailing slash
-              $distro =~ s|([^/]+)|uc($1)|e; # upcase the name
+              $distro =~ s|([^/]+)|{uc($1)}|; # upcase the name
               my $author = uc $1 or die "distro[$distro] without author, cannot continue";
               my $desc   = $eitem->findvalue("*[local-name(.) = 'description']");
               my $i = 0;

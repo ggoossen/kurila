@@ -377,7 +377,7 @@ sub _charscripts {
 		if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
 		    my ($lo, $hi) = (hex($1), $2 ? hex($2) : hex($1));
 		    my $script = lc($3);
-		    $script =~ s/\b(\w)/uc($1)/ge;
+		    $script =~ s/\b(\w)/{uc($1)}/g;
 		    my $subrange = [ $lo, $hi, $script ];
 		    push @SCRIPTS, $subrange;
 		    push @{$SCRIPTS{$script}}, $subrange;

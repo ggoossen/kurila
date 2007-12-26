@@ -5760,10 +5760,10 @@ sub dump_trace {
                   unless m/^(?: -?[\d.]+ | \*[\w:]* )$/x;
 
                 # Turn high-bit characters into meta-whatever.
-                s/([\200-\377])/sprintf("M-%c",ord($1)^&^0177)/eg;
+                s/([\200-\377])/{sprintf("M-%c",ord($1)^&^0177)}/g;
 
                 # Turn control characters into ^-whatever.
-                s/([\0-\37\177])/sprintf("^%c",ord($1)^^^64)/eg;
+                s/([\0-\37\177])/{sprintf("^%c",ord($1)^^^64)}/g;
 
                 push( @a, $_ );
             } ## end else [ if (not defined $arg)
@@ -6619,7 +6619,7 @@ sub set_list {
     for $i ( 0 .. $#list ) {
         $val = $list[$i];
         $val =~ s/\\/\\\\/g;
-        $val =~ s/([\0-\37\177\200-\377])/"\\0x" . unpack('H2',$1)/eg;
+        $val =~ s/([\0-\37\177\200-\377])/{"\\0x" . unpack('H2',$1)}/g;
         $ENV{"${stem}_$i"} = $val;
     } ## end for $i (0 .. $#list)
 } ## end sub set_list
@@ -6638,7 +6638,7 @@ sub get_list {
     my $val;
     for $i ( 0 .. $n - 1 ) {
         $val = delete $ENV{"${stem}_$i"};
-        $val =~ s/\\((\\)|0x(..))/ $2 ? $2 : pack('H2', $3) /ge;
+        $val =~ s/\\((\\)|0x(..))/{ $2 ? $2 : pack('H2', $3) }/g;
         push @list, $val;
     }
     @list;
@@ -7464,7 +7464,7 @@ sub print_help {
           ( \t+ )               # original separation, discarded
           ( .* )                # this will now start (no earlier) than 
                                 # column 16
-    } {
+    } {{
         my($leadwhite, $command, $midwhite, $text) = ($1, $2, $3, $4);
         my $clean = $command;
         $clean =~ s/[BI]<([^>]*)>/$1/g;  
@@ -7475,23 +7475,24 @@ sub print_help {
       . ((" " x (16 + ($leadwhite ? 4 : 0) - length($clean))) || " ")
       . $text;
 
-    }mgex;
+    
+}}mgx;
 
     s{                          # handle bold ornaments
        B < ( [^>] + | > ) >
-    } {
+    } {{
           $Term::ReadLine::TermCap::rl_term_set[2] 
         . $1
         . $Term::ReadLine::TermCap::rl_term_set[3]
-    }gex;
+    }}gx;
 
     s{                         # handle italic ornaments
        I < ( [^>] + | > ) >
-    } {
+    } {{
           $Term::ReadLine::TermCap::rl_term_set[0] 
         . $1
         . $Term::ReadLine::TermCap::rl_term_set[1]
-    }gex;
+    }}gx;
 
     local $\ = '';
     print $OUT $_;

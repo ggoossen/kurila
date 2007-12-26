@@ -179,9 +179,9 @@ sub split_command {
 sub _expand_macros {
     my($self, $cmd) = @_;
 
-    $cmd =~ s{\$\((\w+)\)}{
+    $cmd =~ s{\$\((\w+)\)}{{
         defined $self->{$1} ? $self->{$1} : "\$($1)"
-    }e;
+    }};
     return $cmd;
 }
 

@@ -696,10 +696,10 @@ sub parse_args{
         my($name, $value) = ($1, $2);
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
             $value =~ s [^~(\w*)]
-                [$1 ?
+                [{$1 ?
                  ((getpwnam($1))[7] || "~$1") :
                  (getpwuid($>))[7]
-                 ]ex;
+                 }]x;
         }
 
         # Remember the original args passed it.  It will be useful later.

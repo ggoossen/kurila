@@ -8,7 +8,7 @@ sub break_and_censor {
 	return sub {
 		my ($str,$rem,$ws) = @_;
 		my ($nextline, $more) = $breaker->(@_);
-		$nextline =~ s/($proscribed)/'X' x length $1/egi;
+		$nextline =~ s/($proscribed)/{'X' x length $1}/gi;
 		return ($nextline, $more);
 	}
 }

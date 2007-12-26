@@ -135,7 +135,7 @@ sub doglob_Mac {
 		# if a '*' or '?' is preceded by an odd count of '\', temporary delete 
 		# it (and its preceding backslashes), i.e. don't treat '\*' and '\?' as 
 		# wildcards
-		$tmp_head =~ s/(\\*)([*?])/$2 x ((length($1) + 1) % 2)/eg;
+		$tmp_head =~ s/(\\*)([*?])/{$2 x ((length($1) + 1) % 2)}/g;
 	
 		if ($tmp_head =~ m/[*?]/) { # if there are wildcards ...	
 		@globdirs = doglob_Mac('d', $head);
@@ -156,7 +156,7 @@ sub doglob_Mac {
 	# if a '*' or '?' is preceded by an odd count of '\', temporary delete 
 	# it (and its preceding backslashes), i.e. don't treat '\*' and '\?' as 
 	# wildcards
-	$tmp_tail =~ s/(\\*)([*?])/$2 x ((length($1) + 1) % 2)/eg;
+	$tmp_tail =~ s/(\\*)([*?])/{$2 x ((length($1) + 1) % 2)}/g;
 	
 	unless ($tmp_tail =~ m/[*?]/) { # if there are wildcards ...
 	    $not_esc_head = $head = '' if $head eq ':';
@@ -178,7 +178,7 @@ sub doglob_Mac {
 	$_ =~ s:([].+^\-\${}[|]):\\$1:g;
 	# and convert DOS-style wildcards to regex,
 	# but only if they are not escaped
-	$_ =~ s/(\\*)([*?])/$1 . ('.' x ((length($1) + 1) % 2)) . $2/eg;
+	$_ =~ s/(\\*)([*?])/{$1 . ('.' x ((length($1) + 1) % 2)) . $2}/g;
 
 	#print "regex: '$_', head: '$head', unescaped head: '$not_esc_head'\n";
 	my $matchsub = eval 'sub { $_[0] =~ m|^' . $_ . '\\z|ios }';
@@ -241,7 +241,7 @@ sub _expand_volume {
 			$vol_pat =~ s:([].+^\-\${}[|]):\\$1:g;
 			# and convert DOS-style wildcards to regex,
 			# but only if they are not escaped
-			$vol_pat =~ s/(\\*)([*?])/$1 . ('.' x ((length($1) + 1) % 2)) . $2/eg;
+			$vol_pat =~ s/(\\*)([*?])/{$1 . ('.' x ((length($1) + 1) % 2)) . $2}/g;
 			#print "volume regex: '$vol_pat' \n";
 				
 			foreach my $volume (@mounted_volumes) {

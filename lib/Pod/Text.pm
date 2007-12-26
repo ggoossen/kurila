@@ -347,7 +347,7 @@ sub cmd_verbatim {
     my ($self, $attrs, $text) = @_;
     $self->item if defined $$self{ITEM};
     return if $text =~ m/^\s*$/;
-    $text =~ s/^(\n*)(\s*\S+)/$1 . (' ' x $$self{MARGIN}) . $2/gme;
+    $text =~ s/^(\n*)(\s*\S+)/{$1 . (' ' x $$self{MARGIN}) . $2}/gm;
     $text =~ s/\s*$/\n\n/;
     $self->output ($text);
     return '';

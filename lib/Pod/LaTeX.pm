@@ -1126,11 +1126,11 @@ sub verbatim {
     # slightly modified by hsmyers@sdragons.com 10/22/01
     my @l = split("\n",$paragraph);
     foreach (@l) {
-      1 while s/(^|\n)([^\t\n]*)(\t+)/
+      1 while s/(^|\n)([^\t\n]*)(\t+)/{
 	$1. $2 . (" " x 
 		  (8 * length($3)
 		   - (length($2) % 8)))
-	  /sex;
+	  }/sx;
     }
     $paragraph = join("\n",@l);
     # End of change.

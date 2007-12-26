@@ -327,7 +327,7 @@ sub _match_tagged	# ($$$$$$$)
 	if (!defined $rdel)
 	{
 		$rdelspec = substr($$textref, $-[0], $+[0] - $-[0]);
-		unless ($rdelspec =~ s/\A([[(<\{]+)($XMLNAME).*/ quotemeta "$1\/$2". _revbracket($1) /oes)
+		unless ($rdelspec =~ s/\A([[(<\{]+)($XMLNAME).*/{ quotemeta "$1\/$2". _revbracket($1) }/os)
 		{
 			_failmsg "Unable to construct closing tag to match: $rdel",
 				 pos $$textref;

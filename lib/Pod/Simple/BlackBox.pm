@@ -1366,7 +1366,7 @@ sub _ponder_Verbatim {
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
         # one setting everywhere, and 8th wins.
-        s/^([^\t]*)(\t+)/$1.(" " x ((length($2)<<3)-(length($1)^&^7)))/e
+        s/^([^\t]*)(\t+)/{$1.(" " x ((length($2)<<3)-(length($1)^&^7)))}/
       ) {}
 
       # TODO: whinge about (or otherwise treat) unindented or overlong lines
@@ -1870,7 +1870,7 @@ sub pretty { # adopted from Class::Classless
     } else {
         s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
          #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
-         <$pretty_form{$1} || '\\x['.sprintf("%.2x", ord($1)) . ']'>eg;
+         <{$pretty_form{$1} || '\\x['.sprintf("%.2x", ord($1)) . ']'}>g;
       qq{"$_"};
     }
   } @stuff;

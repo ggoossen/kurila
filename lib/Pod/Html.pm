@@ -1318,11 +1318,11 @@ sub process_pre {
     $rest = $$text;
 
     # insert spaces in place of tabs
-    $rest =~ s#(.+)#
+    $rest =~ s#(.+)#{
 	    my $line = $1;
-            1 while $line =~ s/(\t+)/' ' x ((length($1) * 8) - $-[0] % 8)/e;
+            1 while $line =~ s/(\t+)/{' ' x ((length($1) * 8) - $-[0] % 8)}/;
 	    $line;
-	#eg;
+	}#g;
 
     # convert some special chars to HTML escapes
     $rest = html_escape($rest);
@@ -1331,7 +1331,7 @@ sub process_pre {
     # the preformatted text.
     $rest =~ s{
 	         (\s*)(perl\w+)
-	      }{
+	      }{{
 		 if ( defined $Pages{$2} ){	# is a link
 		     qq($1<a href="$Htmlroot/$Pages{$2}">$2</a>);
 		 } elsif (defined $Pages{dosify($2)}) {	# is a link
@@ -1339,10 +1339,11 @@ sub process_pre {
 		 } else {
 		     "$1$2";
 		 }
-	      }xeg;
+	      
+}}xg;
      $rest =~ s{
 		 (<a\ href="?) ([^>:]*:)? ([^>:]*) \.pod: ([^>:]*:)?
-               }{
+               }{{
                   my $url ;
                   if ( $Htmlfileurl ne '' ){
 		     # Here, we take advantage of the knowledge
@@ -1358,7 +1359,8 @@ sub process_pre {
 		     $url = "$3.html" ;
 		  }
 		  "$1$url" ;
-	       }xeg;
+	       
+}}xg;
 
     # Look for embedded URLs and make them into links.  We don't
     # relativize them since they are best left as the author intended.
@@ -1809,8 +1811,8 @@ sub dosify {
     return lc($str) if $^O eq 'VMS';     # VMS just needs casing
     if ($Is83) {
         $str = lc $str;
-        $str =~ s/(\.\w+)/substr ($1,0,4)/ge;
-        $str =~ s/(\w+)/substr ($1,0,8)/ge;
+        $str =~ s/(\.\w+)/{substr ($1,0,4)}/g;
+        $str =~ s/(\w+)/{substr ($1,0,8)}/g;
     }
     return $str;
 }
@@ -2164,9 +2166,9 @@ sub fragment_id_obfuscated {  # This was the old "_2d_2d__"
     # text? Normalize by obfuscating the fragment id to make it unique
     $text =~ s/\s+/_/sg;
 
-    $text =~ s{(\W)}{
+    $text =~ s{(\W)}{{
         defined( $HC[ord($1)] ) ? $HC[ord($1)]
-        : ( $HC[ord($1)] = sprintf( "%%%02X", ord($1) ) ) }gxe;
+        : ( $HC[ord($1)] = sprintf( "%%%02X", ord($1) ) ) }}gx;
     $text = substr( $text, 0, 50 );
 
     $text;

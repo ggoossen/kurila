@@ -475,7 +475,7 @@ sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   for $_ (@them) {
     if ( $_ eq '.' ) {
       $_ = ':';
-    } elsif ( $_ =~ s|^((?:\.\./)+)|':' x (length($1)/3)|e ) {
+    } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
       $_ = ':'. $_;
     } else {
       $_ =~ s|^\./|:|;
@@ -654,7 +654,7 @@ sub _esc {
   return 'undef' unless defined $in;
   $in =~
     s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
-     <'\\x['.(unpack("H2",$1).']')>eg;
+     <{'\\x['.(unpack("H2",$1).']')}>g;
   return qq{"$in"};
 }
 

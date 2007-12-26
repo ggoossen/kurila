@@ -21,7 +21,7 @@ $x=~m/.a/g;
 is(f(pos($x)), 4);
 
 # Is pos() set inside //g? (bug id 19990615.008)
-$x = "test string?"; $x =~ s/\w/pos($x)/eg;
+$x = "test string?"; $x =~ s/\w/{pos($x)}/g;
 is($x, "0123 5678910?");
 
 $x = "123 56"; $x =~ m/ /g;

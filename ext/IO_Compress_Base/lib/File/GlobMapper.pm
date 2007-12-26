@@ -285,11 +285,11 @@ sub _parseOutputGlob
                   [^/]        # a non-slash character
                         *     # repeated 0 or more times (0 means me)
               )
-            }{
+            }{{
               $1
                   ? (getpwnam($1))[7]
                   : ( $ENV{HOME} || $ENV{LOGDIR} )
-            }ex;
+            }}x;
 
     }
 

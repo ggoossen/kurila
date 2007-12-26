@@ -1093,8 +1093,8 @@ SKIP: {
   sub compress_template {
     my $t = shift;
     for my $mod (qw( < > )) {
-      $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?)\{2,\})/
-              my $x = $1; $x =~ s!$mod!!g ? "($x)$mod" : $x /ieg;
+      $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?)\{2,\})/{
+              my $x = $1; $x =~ s!$mod!!g ? "($x)$mod" : $x }/ig;
     }
     return $t;
   }

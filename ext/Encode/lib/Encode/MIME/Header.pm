@@ -58,7 +58,7 @@ sub decode($$;$) {
         \?([QqBb])\?     # delimiter
         (.*?)            # Base64-encodede contents
         \?=              # end encoded word      
-        }{
+        }{{
         if    (uc($2) eq 'B'){
             $obj->{decode_b} or croak qq(MIME "B" unsupported);
             decode_b($1, $3);
@@ -68,7 +68,7 @@ sub decode($$;$) {
         }else{
             croak qq(MIME "$2" encoding is nonexistent!);
         }
-        }egox;
+        }}gox;
     $_[1] = '' if $chk;
     return $str;
 }
@@ -86,7 +86,7 @@ sub decode_q {
     my ( $enc, $q ) = @_;
     my $d = find_encoding($enc) or croak qq(Unknown encoding "$enc");
     $q =~ s/_/ /go;
-    $q =~ s/=([0-9A-Fa-f]{2})/pack("C", hex($1))/ego;
+    $q =~ s/=([0-9A-Fa-f]{2})/{pack("C", hex($1))}/go;
     return $d->name eq 'utf8'
       ? Encode::decode_utf8($q)
       : $d->decode( $q, Encode::FB_PERLQQ );
@@ -176,9 +176,9 @@ sub _encode_q {
     $chunk = encode_utf8($chunk);
     $chunk =~ s{
         ([^0-9A-Za-z])
-           }{
+           }{{
            join("" => map {sprintf "=%02X", $_} unpack("C*", $1))
-           }egox;
+           }}gox;
     return HEAD . 'Q?' . $chunk . TAIL;
 }
 

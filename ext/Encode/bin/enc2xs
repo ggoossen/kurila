@@ -1045,7 +1045,7 @@ sub _print_expand{
     if (m/^#### END_OF_HEADER/){
         $asis = 1; next;
     }	  
-    s/(\$_[A-Z][A-Za-z0-9]+)_/$1/gee unless $asis;
+    s/(\$_[A-Z][A-Za-z0-9]+)_/{$1}/ge unless $asis;
     print $out $_;
     }
 }

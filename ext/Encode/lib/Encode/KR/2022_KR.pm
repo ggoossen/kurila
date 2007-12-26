@@ -46,11 +46,11 @@ sub iso_euc {
      ([^\x0f]*)                        # with characters in GR
      \x0f
         }
-    {
+    {{
                         my $out= $1;
       $out =~ tr/\x21-\x7e/\xa1-\xfe/;
       $out;
-    }geox;
+    }}gox;
     my ($residue) = ( $$r_str =~ s/(\e.*)$//so );
     return $residue;
 }
@@ -63,11 +63,11 @@ sub euc_iso {
     $$r_str =~
       s{                         # move KS X 1001 characters in GR to GL
         ($RE{EUC_C}+)                     # and enclose them with SO and SI
-        }{
+        }{{
             my $str = $1;
             $str =~ tr/\xA1-\xFE/\x21-\x7E/;
             "\x0e" . $str . "\x0f";
-        }geox;
+        }}gox;
     $$r_str;
 }
 

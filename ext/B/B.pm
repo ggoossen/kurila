@@ -66,8 +66,8 @@ sub B::GV::SAFENAME {
   # The regex below corresponds to the isCONTROLVAR macro
   # from toke.c
 
-  $name =~ s/^([\cA-\cZ\c\\c[\c]\c?\c_\c^])/"^".
-	chr( utf8::unicode_to_native( 64 ^^^ ord($1) ))/e;
+  $name =~ s/^([\cA-\cZ\c\\c[\c]\c?\c_\c^])/{"^".
+	chr( utf8::unicode_to_native( 64 ^^^ ord($1) ))}/;
 
   # When we say unicode_to_native we really mean ascii_to_native,
   # which matters iff this is a non-ASCII platform (EBCDIC).
@@ -290,9 +290,9 @@ sub walksymtable {
 	    chomp;
 	    s/^(.*?)\t//;
 	    if ($1 eq $name) {
-		s{(s\\_[0-9a-f]+)} {
+		s{(s\\_[0-9a-f]+)} {{
 		    exists($sym->{$1}) ? $sym->{$1} : $default;
-		}ge;
+		}}g;
 		printf $fh $format, $_;
 	    }
 	}

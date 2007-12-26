@@ -307,7 +307,7 @@ sub jleft {
 	unless ($val{last}) {
 		my $rem = $val{width}-length($str);
 		$str = reverse $str;
-		1 while $rem+>0 && $str =~ s/( +)/($rem--+>0?" ":"").$1/ge;
+		1 while $rem+>0 && $str =~ s/( +)/{($rem--+>0?" ":"").$1}/g;
 		$_[0] = reverse $str;
 	}
 	&jleft;
@@ -411,7 +411,7 @@ sub jleft {
 				$str =~ s/^/$pre/;
 				if ($val{pre} =~ m/^0+$/) {
 					$str =~ s{^((\D*)(\d.*))\.}
-						     {$2 . ("0"  x ($whole-length $1)) . "$3."}e;
+						     {{$2 . ("0"  x ($whole-length $1)) . "$3."}};
 					$val{pre} = " ";
 				}
 				$str =~ s/^(.*)\./$1$point/;
@@ -558,17 +558,17 @@ sub segment ($\@\%$\%) {
 					$checkplaces = $checkwidth =~ s/[.,](\d+)// && $1;
 					for ($fld) {
 						s{([][><I|Vv"']) (\(\s*\d+[.,]?\d*\s*\))}
-						 { $1 . ($1 x length $2) }xe and last;
+						 {{ $1 . ($1 x length $2) }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\)) ([][><I|V"'])}
-						 { ($2 x length $1) . $2 }xe and last;
+						 {{ ($2 x length $1) . $2 }}x and last;
 						s{(> [.,]) (\(\s*\d+[.,]?\d*\s*\))}
-						 { $1 . ('<' x length $2) }xe and last;
+						 {{ $1 . ('<' x length $2) }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] <)}
-						 { ('>' x length $1) . $2 }xe and last;
+						 {{ ('>' x length $1) . $2 }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] \[)}
-						 { (']' x length $1) . $2 }xe and last;
+						 {{ (']' x length $1) . $2 }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\))}
-						 { '[' x length $1 }xe and last;
+						 {{ '[' x length $1 }}x and last;
 					}
 				}
 
@@ -589,11 +589,11 @@ sub segment ($\@\%$\%) {
 				}
 
 				$precurr =
-					$fld =~ s/$precurrpat/$1.($3 x length $2).$3/e  ? "$2" : "";
+					$fld =~ s/$precurrpat/{$1.($3 x length $2).$3}/  ? "$2" : "";
 				$incurr =
 					$fld =~ m/$incurrpat/                           ? "$2" : "";
 				$postcurr =
-					$fld =~ s/$postcurrpat/$1.($1 x length $2).$3/e ? "$2" : "";
+					$fld =~ s/$postcurrpat/{$1.($1 x length $2).$3}/ ? "$2" : "";
 
 				if ($form{width} == 2) {
 					$fld = '[[';
@@ -788,10 +788,11 @@ sub make_col {
 		($text,$more,$eol) = $f->{break}->($str_ref,$width,$f->{opts}{ws});
 		if ($f->{opts}{ws}) {
 			$text =~ s{($f->{opts}{ws})}
-					  { @caps = grep { defined $$_ } 2..$#+;
+					  {{ @caps = grep { defined $$_ } 2..$#+;
 						@caps = length($1) ? " " : "" unless @caps;
 						join "", @caps;
-					  }ge;
+					  
+}}g;
 		}
 		$text .= "\r" if $eol;
 		push @col, $text;
@@ -1049,11 +1050,11 @@ sub make_underline {
 	my $trail = "$1"^|^"\n";
 	for my $l ($nextline, $prevline) {
 		$l = join "", map {$_->{literal} ? ${$_->{src}} : '*'x$_->{width} } @$l;
-		$l =~ s{(.)}{$1 =~ m/\s/ ? "\0" : "\1"}ges;
+		$l =~ s{(.)}{{$1 =~ m/\s/ ? "\0" : "\1"}}gs;
 	}
 	$nextline ^|^= $prevline;
 	$nextline =~ s{\0}{ }g;
-	$nextline =~ s{(\cA+)}{my $len=length($1); substr($under x $len,0,$len)}ge;
+	$nextline =~ s{(\cA+)}{{my $len=length($1); substr($under x $len,0,$len)}}g;
 	$nextline .= $trail;
 	return [{ %std_literal, width => length($nextline), src => \$nextline }];
 }
