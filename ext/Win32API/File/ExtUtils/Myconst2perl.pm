@@ -239,7 +239,7 @@ sub Myconst2perl
 	    open( XS, "<$file" )  or  die "Can't read C file, $file: $!\n";
 	    my $code= $ccode{$file};
 	    $code =~ s#\\#\\\\#g;
-	    $code =~ s#([^\s -~])#"\\x".sprintf "%02X",unpack "C",$1#ge;
+	    $code =~ s#([^\s -~])#{"\\x".sprintf "%02X",unpack "C",$1}#g;
 	    $code =~ s#[*]/#*\\/#g;
 	    print qq[\n/* Include $file:  $code */\n];
 	    print qq[\n#line 1 "$file"\n];
@@ -304,7 +304,7 @@ sub Myconst2perl
 	foreach $key (  @perlfile  ) {
 	    my $code= $perlcode{$key};
 	    $code =~ s#\\#\\\\#g;
-	    $code =~ s#([^ -~])#"\\".sprintf "%03o",unpack "C",$1#ge;
+	    $code =~ s#([^ -~])#{"\\".sprintf "%03o",unpack "C",$1}#g;
 	    $code =~ s#"#\\"#g   if  $writeperl;
 	    print $head, "    $key => ", $code, $tail;
 	}
@@ -313,7 +313,7 @@ sub Myconst2perl
 	    foreach $key (  @cfile  ) {
 		my $code= $ccode{$key};
 		$code =~ s#\\#\\\\#g;
-		$code =~ s#([^ -~])#"\\".sprintf "%03o",unpack "C",$1#ge;
+		$code =~ s#([^ -~])#{"\\".sprintf "%03o",unpack "C",$1}#g;
 		$code =~ s#"#\\"#g;
 		print $head, "    $key => ", $code, $tail;
 	    }

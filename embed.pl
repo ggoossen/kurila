@@ -128,7 +128,7 @@ sub munge_c_files () {
     local $^I = '.bak';
     while ( ~< *ARGV) {
 	s{(\b(\w+)[ \t]*\([ \t]*(?!aTHX))}
-	 {
+	 {{
 	    my $repl = $1;
 	    my $f = $2;
 	    if (exists $functions->{$f}) {
@@ -136,7 +136,8 @@ sub munge_c_files () {
 		warn("$ARGV:$.:$`#$repl#$'");
 	    }
 	    $repl;
-	 }eg;
+	 
+}}g;
 	print;
 	close ARGV if eof;	# restart $.
     }

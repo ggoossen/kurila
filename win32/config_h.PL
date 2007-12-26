@@ -57,8 +57,8 @@ open(H,">$file.new") || die "Cannot open $file.new:$!";
 while ( ~< *SH)
  {
   last if m/^$term$/o;
-  s/\$([\w_]+)/Config($1)/eg;
-  s/`([^\`]*)`/BackTick($1)/eg;
+  s/\$([\w_]+)/{Config($1)}/g;
+  s/`([^\`]*)`/{BackTick($1)}/g;
   munge();
   s/\\\$/\$/g;
   s#/[ *\*]*\*/#/**/#;

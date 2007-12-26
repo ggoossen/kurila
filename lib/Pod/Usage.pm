@@ -618,7 +618,7 @@ sub _handle_element_end {
         # a colon to end all headings.
         if($self->{USAGE_OPTIONS}->{-verbose} +< 2) {
             local $_ = $$self{PENDING}[-1][1];
-            s{([A-Z])([A-Z]+)}{((length($2) +> 2) ? $1 : lc($1)) . lc($2)}ge;
+            s{([A-Z])([A-Z]+)}{{((length($2) +> 2) ? $1 : lc($1)) . lc($2)}}g;
             s/\s*$/:/  unless (m/:\s*$/);
             $_ .= "\n";
             $$self{PENDING}[-1][1] = $_;
@@ -656,7 +656,7 @@ sub preprocess_paragraph {
         ## Change the title of the SYNOPSIS section to USAGE
         s/^=head1\s+SYNOPSIS\s*$/=head1 USAGE/;
         ## Try to do some lowercasing instead of all-caps in headings
-        s{([A-Z])([A-Z]+)}{((length($2) +> 2) ? $1 : lc($1)) . lc($2)}ge;
+        s{([A-Z])([A-Z]+)}{{((length($2) +> 2) ? $1 : lc($1)) . lc($2)}}g;
         ## Use a colon to end all headings
         s/\s*$/:/  unless (m/:\s*$/);
         $_ .= "\n";

@@ -47,7 +47,7 @@ print OUTFIL "#> conversion process.  For more information, see $0\n";
 print OUTFIL "#>\n";
 
 while ( ~< *INFIL) {
-  s/$infile/$outfile/eoi;
+  s/$infile/{$outfile}/oi;
   if (m/^\#/) { 
     if (!m/^\#\:/) {print OUTFIL;}
     next;

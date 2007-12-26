@@ -706,11 +706,12 @@ sub _gen_css_wad {
 
     # Only look at three-digitty colors, for now at least.
     if( $flipmode =~ m/n/ ) {
-      $this_css =~ s/(#[0-9a-fA-F]{3})\b/_color_negate($1)/eg;
+      $this_css =~ s/(#[0-9a-fA-F]{3})\b/{_color_negate($1)}/g;
       $this_css =~ s/\bthin\b/medium/g;
     }
     $this_css =~ s<#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])\b>
-                  < join '', '#', ($1,$2,$3)[@swap] >eg   if @swap;
+                  <{ join '', '#', ($1,$2,$3)[@swap] 
+}>g   if @swap;
 
     if(   $flipmode =~ m/a/)
        { $this_css =~ s/#fff\b/#999/gi } # black -> dark grey

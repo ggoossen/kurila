@@ -394,7 +394,7 @@ sub getCmdLine {	# import assistant
 	    # uhh this WORKS. but it's inscrutable
 	    # grep s/$opt=(\w+)/grep {$_ eq $1} @ARGV and $gOpts{$opt}=$1/e, @ARGV;
 	    my $tval;  # temp
-	    if (grep s/$opt=(\w+)/$tval=$1/e, @ARGV) {
+	    if (grep s/$opt=(\w+)/{$tval=$1}/, @ARGV) {
 		# check val before accepting
 		my @allowed = @{$gOpts{$opt}};
 		if (grep { $_ eq $tval } @allowed) {
@@ -413,7 +413,7 @@ sub getCmdLine {	# import assistant
 	    $gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
 
 	    # override with 'foo' if 'opt=foo' appears
-	    grep s/$opt=(.*)/$gOpts{$opt}=$1/e, @ARGV;
+	    grep s/$opt=(.*)/{$gOpts{$opt}=$1}/, @ARGV;
 	}
      }
     print("$0 heres current state:\n", mydumper(\%gOpts))
@@ -697,9 +697,10 @@ sub mkCheckRex {
 	       [^()]*?			# which might be followed by something
 	      )?
 	      \\\)			# closing literal )
-	     !'(?:next|db)state\\([^()]*?' .
+	     !{'(?:next|db)state\\([^()]*?' .
 	      ($1 && '\\(eval \\d+\\)[^()]*')	# Match the eval if present
-	      . '\\)'!msgxe;
+	      . '\\)'
+}!msgx;
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg;
 

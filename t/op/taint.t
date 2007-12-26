@@ -653,7 +653,7 @@ SKIP: {
     $why =~ s/$z/zee/;
     test     tainted $why;
 
-    $why =~ s/e/'-'.$$/ge;
+    $why =~ s/e/{'-'.$$}/g;
     test     tainted $why;
 }
 

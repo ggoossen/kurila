@@ -1191,7 +1191,7 @@ ok("\x{abcd}" =~ m/\x{abcd}/);
 
     my @x = ("stra\x{DF}e 138","stra\x{DF}e 138");
     for (@x) {
-	s/(\d+)\s*([\w\-]+)/$1 . uc $2/e;
+	s/(\d+)\s*([\w\-]+)/{$1 . uc $2}/;
 	my($latin) = m/^(.+)(?:\s+\d)/;
 	print $latin eq "stra\x{DF}e" ? "ok $test\n" :	# 248,249
 	    "#latin[$latin]\nnot ok $test\n";
@@ -2480,10 +2480,10 @@ print "# some Unicode properties\n";
     my $i = 858;
     for my $char ("a", "\x{df}", "\x{100}"){
 	$x = "$char b $char";
-	$x =~ s{($char)}{
+	$x =~ s{($char)}{{
 	    "c" =~ m/c/;
 	    "x";
-	}ge;
+	}}g;
 	print substr($x,0,1) eq substr($x,-1,1) ?
 	    "ok $i\n" : "not ok $i # debug: $x\n";
  	$i++;
@@ -2936,8 +2936,8 @@ sub func ($) {
     ok( "a\nb" =~ m/^b/m, "$_[0] - with /m" );
 }
 func "standalone";
-$_ = "x"; s/x/func "in subst"/e;
-$_ = "x"; s/x/func "in multiline subst"/em;
+$_ = "x"; s/x/{func "in subst"}/;
+$_ = "x"; s/x/{func "in multiline subst"}/m;
 #$_ = "x"; /x(?{func "in regexp"})/;
 #$_ = "x"; /x(?{func "in multiline regexp"})/m;
 
@@ -4184,7 +4184,7 @@ sub kt
     for (@foo) {
         my @bar;
         $str .= "@bar";
-        s/a|/push @bar, 1/e;
+        s/a|/{push @bar, 1}/;
     }
     iseq(length($str),"0","Trie scope error, string should be empty");
 }

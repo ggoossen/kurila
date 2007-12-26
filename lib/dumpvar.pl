@@ -44,7 +44,7 @@ sub unctrl {
 	    # EBCDIC has no concept of "\cA" or "A" being related
 	    # to each other by a linear/boolean mapping.
 	} else {
-	    s/([\001-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
+	    s/([\001-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
 	}
 	$_;
 }
@@ -85,21 +85,21 @@ sub stringify {
 	  s/([\'\\])/\\$1/g;
 	} elsif ($unctrl eq 'unctrl') {
 	  s/([\"\\])/\\$1/g ;
-	  s/([\000-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
+	  s/([\000-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
 	  # uniescape?
-	  s/([\200-\377])/'\\0x'.sprintf('%2X',ord($1))/eg 
+	  s/([\200-\377])/{'\\0x'.sprintf('%2X',ord($1))}/g 
 	    if $quoteHighBit;
 	} elsif ($unctrl eq 'quote') {
 	  s/([\"\\\$\@])/\\$1/g if $tick eq '"';
 	  s/\033/\\e/g;
 	  if (ord('A') == 193) { # EBCDIC.
-	      s/([\000-\037\177])/'\\c'.chr(193)/eg; # Unfinished.
+	      s/([\000-\037\177])/{'\\c'.chr(193)}/g; # Unfinished.
 	  } else {
-	      s/([\000-\037\177])/'\\c'._escaped_ord($1)/eg;
+	      s/([\000-\037\177])/{'\\c'._escaped_ord($1)}/g;
 	  }
 	}
 	$_ = uniescape($_);
-	s/([\200-\377])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
+	s/([\200-\377])/{'\\'.sprintf('%3o',ord($1))}/g if $quoteHighBit;
 	($noticks || m/^\d+(\.\d*)?\Z/) 
 	  ? $_ 
 	  : $tick . $_ . $tick;

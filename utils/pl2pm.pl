@@ -68,8 +68,8 @@ while ( ~< *ARGV) {
     s/(^\s*);#/$1#/g;
     s/(#.*)require ['"]$oldpack\.pl['"]/$1use $newpack/;
     s/(package\s*)($oldpack)\s*;[ \t]*\n+//ig;
-    s/([\$\@%&*])'(\w+)/&xlate($1,"",$2,$newpack,$oldpack,\%export)/eg;
-    s/([\$\@%&*]?)(\w+)'(\w+)/&xlate($1,$2,$3,$newpack,$oldpack,\%export)/eg;
+    s/([\$\@%&*])'(\w+)/{&xlate($1,"",$2,$newpack,$oldpack,\%export)}/g;
+    s/([\$\@%&*]?)(\w+)'(\w+)/{&xlate($1,$2,$3,$newpack,$oldpack,\%export)}/g;
     if (!m/\$\[\s*\)?\s*=\s*[^0\s]/) {
 	s/^\s*(local\s*\()?\s*\$\[\s*\)?\s*=\s*0\s*;[ \t]*\n//g;
 	s/\$\[\s*\+\s*//g;

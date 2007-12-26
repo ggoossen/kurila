@@ -80,7 +80,7 @@ $template =~ s/__NAME_VER__/$name/;
 $template =~ s/__VER__/$version/;
 $max = sprintf "0x%08x", $max;
 $template =~ s/__MAX__/'$max'/g;
-$template =~ s/__TIME__/localtime()/ge;
+$template =~ s/__TIME__/{localtime()}/g;
 print $out $template;
 close $out;
 print "Updated Win32.pm and relevent message files\n";

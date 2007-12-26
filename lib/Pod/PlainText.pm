@@ -160,7 +160,7 @@ sub verbatim {
     $self->item if defined $$self{ITEM};
     local $_ = shift;
     return if m/^\s*$/;
-    s/^(\s*\S+)/(' ' x $$self{MARGIN}) . $1/gme;
+    s/^(\s*\S+)/{(' ' x $$self{MARGIN}) . $1}/gm;
     $self->output ($_);
 }
 
@@ -197,7 +197,7 @@ sub textblock {
               >
           )+
         )
-    } {
+    } {{
         local $_ = $1;
         s%L</([^>]+)>%$1%g;
         my @items = split m/(?:,?\s+(?:and\s+)?)/;
@@ -210,7 +210,8 @@ sub textblock {
         }
         $string .= " entries elsewhere in this document";
         $string;
-    }gex;
+    
+}}gx;
 
     # Now actually interpolate and output the paragraph.
     $_ = $self->interpolate ($_, $line);
@@ -264,7 +265,7 @@ sub interior_sequence {
 sub preprocess_paragraph {
     my $self = shift;
     local $_ = shift;
-    1 while s/^(.*?)(\t+)/$1 . ' ' x (length ($2) * 8 - length ($1) % 8)/me;
+    1 while s/^(.*?)(\t+)/{$1 . ' ' x (length ($2) * 8 - length ($1) % 8)}/m;
     $_;
 }
 

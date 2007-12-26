@@ -610,10 +610,10 @@ sub do_nmake {
   die "$0: $name contains discontiguous README copies" if $sections +> 1;
   # Now remove the other copies that follow
   1 while $makefile =~ s/\0\tcopy .*\n/\0/gm;
-  $makefile =~ s/\0+/join ("", &generate_nmake_1)/se;
+  $makefile =~ s/\0+/{join ("", &generate_nmake_1)}/s;
 
   $makefile =~ s{(del /f [^\n]+checkpods[^\n]+).*?(pod2html)}
-    {"$1\n" . &generate_nmake_2."\n\t    $2"}se;
+    {{"$1\n" . &generate_nmake_2."\n\t    $2"}}s;
   $makefile;
 }
 
@@ -630,7 +630,7 @@ sub do_perlpod {
 		    |\s*\n		# blank line
 		   )+
 		  }
-	  {$1 . join "", &generate_perlpod}mxe) {
+	  {{$1 . join "", &generate_perlpod}}mx) {
     die "$0: Failed to insert amendments in do_perlpod";
   }
   $pod;
@@ -642,7 +642,7 @@ sub do_podmak {
   foreach my $variable (qw(pod man html tex)) {
     die "$0: could not find $variable in $name"
       unless $body =~ s{\n\U$variable\E = (?:[^\n]*\\\n)*[^\n]*}
-	{"\n" . generate_pod_mak ($variable)}se;
+	{{"\n" . generate_pod_mak ($variable)}}s;
   }
   $body;
 }
@@ -656,7 +656,7 @@ sub do_vms {
   die "$0: $name contains no pod assignments" if $sections +< 1;
   die "$0: $name contains $sections discontigous pod assignments"
     if $sections +> 1;
-  $makefile =~ s/\0+/join "\n", '', &generate_descrip_mms_1/se;
+  $makefile =~ s/\0+/{join "\n", '', &generate_descrip_mms_1}/s;
 
   die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
 
@@ -673,7 +673,7 @@ sub do_vms {
   die "$0: $name contains no copy rules" if $sections +< 1;
   die "$0: $name contains $sections discontigous copy rules"
     if $sections +> 1;
-  $makefile =~ s/\0+/join "\n", '', &generate_descrip_mms_2/se;
+  $makefile =~ s/\0+/{join "\n", '', &generate_descrip_mms_2}/s;
   $makefile;
 }
 
@@ -693,7 +693,7 @@ sub do_unix {
   my @copy_rules = map "\t-\@test -f pod/$Copies{$_} && cd pod && \$(LNS) $Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
     keys %Copies;
 
-  $makefile_SH =~ s/\0+/join "\n", '', @copy_rules, ''/se;
+  $makefile_SH =~ s/\0+/{join "\n", '', @copy_rules, ''}/s;
   $makefile_SH;
 
 }

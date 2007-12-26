@@ -133,21 +133,22 @@ sub h2z {
             $$r_str =~ s(
                ($RE{EUC_KANA}
                 (?:\x8e[\xde\xdf])?)
-               ){
+               ){{
           my $str = $1;
           $_D2Z{$str} || $_H2Z{$str} || 
               # in case dakuten and handakuten are side-by-side!
               $_H2Z{substr($str,0,2)} . $_H2Z{substr($str,2,2)};
-          }eogx
+          
+}}ogx
         );
     }
     else {
         $n = (
             $$r_str =~ s(
                ($RE{EUC_KANA})
-               ){
+               ){{
           $_H2Z{$1};
-          }eogx
+          }}ogx
         );
     }
     $n;
@@ -158,9 +159,9 @@ sub z2h {
     my $n     = (
         $$r_str =~ s(
               ($RE{EUC_C}|$RE{EUC_0212}|$RE{EUC_KANA})
-              ){
+              ){{
          $_Z2D{$1} || $_Z2H{$1} || $1;
-         }eogx
+         }}ogx
     );
     $n;
 }

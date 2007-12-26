@@ -239,9 +239,9 @@ sub _quote {
     $str =~ s/\n/\\n/g;
     $str =~ s/\r/\\r/g;
     $str =~ s/\t/\\t/g;
-    $str =~ s/([\0-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
-    $str =~ s/([\0-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
-    $str =~ s/([^\0-\176])/sprintf('\\x{%X}',ord($1))/eg;
+    $str =~ s/([\0-\037])(?!\d)/{sprintf('\\%o',ord($1))}/g;
+    $str =~ s/([\0-\037\177-\377])/{sprintf('\\x%02X',ord($1))}/g;
+    $str =~ s/([^\0-\176])/{sprintf('\\x{%X}',ord($1))}/g;
     #if( $_[1] ) {
     #  substr( $str , 218-3 ) = "..."
     #   if length($str) >= 218 and !$ENV{PERL_TEST_NO_TRUNC};

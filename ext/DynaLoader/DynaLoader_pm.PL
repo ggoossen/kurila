@@ -33,8 +33,8 @@ sub to_string {
 sub expand_os_specific {
     my $s = shift;
     for ($s) {
-	s/<<=(.*?)>>/$1/gee;
-	s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/
+	s/<<=(.*?)>>/{$1}/ge;
+	s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/{
 	  my ($op, $os, $expr) = ($1,$2,$3);
 	  if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg in $&"};
 	  if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
@@ -56,7 +56,8 @@ sub expand_os_specific {
 	      	  ""
 	      }
 	  }
-	/ges;
+	
+}/gs;
 	if (m/<<(=|\$\^O-)/) {die "bad <<\$^O-eq/ne-osname>> expression.".
 	    " Unclosed brackets?";
 	}

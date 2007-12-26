@@ -344,9 +344,9 @@ sub format_text {
     # <Data> blocks.
     if ($convert) {
         if (ASCII) {
-            $text =~ s/(\\|[^\x{00}-\x{7F}])/$ESCAPES{ord ($1)} || "X"/eg;
+            $text =~ s/(\\|[^\x{00}-\x{7F}])/{$ESCAPES{ord ($1)} || "X"}/g;
         } else {
-            $text =~ s/(\\)/$ESCAPES{ord ($1)} || "X"/eg;
+            $text =~ s/(\\)/{$ESCAPES{ord ($1)} || "X"}/g;
         }
     }
 
@@ -428,19 +428,19 @@ sub guesswork {
         ( (?: [a-zA-Z\']+ \\-)+ )
         ( [a-zA-Z\']+ ) (?= [\)\".?!,;:]* (?:\s|\Z|\\\ ) )
         \b
-    } {
+    } {{
         my ($prefix, $hyphen, $main, $suffix) = ($1, $2, $3, $4);
         $hyphen ||= '';
         $main =~ s/\\-/-/g;
         $prefix . $hyphen . $main . $suffix;
-    }egx;
+    }}gx;
 
     # Translate "--" into a real em-dash if it's used like one.  This means
     # that it's either surrounded by whitespace, it follows a regular word, or
     # it occurs between two regular words.
     if ($$self{MAGIC_EMDASH}) {
-        s{          (\s) \\-\\- (\s)                } { $1 . '\*(--' . $2 }egx;
-        s{ (\b[a-zA-Z]+) \\-\\- (\s|\Z|[a-zA-Z]+\b) } { $1 . '\*(--' . $2 }egx;
+        s{          (\s) \\-\\- (\s)                } {{ $1 . '\*(--' . $2 }}gx;
+        s{ (\b[a-zA-Z]+) \\-\\- (\s|\Z|[a-zA-Z]+\b) } {{ $1 . '\*(--' . $2 }}gx;
     }
 
     # Make words in all-caps a little bit smaller; they look better that way.
@@ -457,9 +457,9 @@ sub guesswork {
             ( ^ | [\s\(\"\'\`\[\{<>] | \\\  )                   # (1)
             ( [A-Z] [A-Z] (?: [/A-Z+:\d_\$&] | \\- )* )         # (2)
             (?= [\s>\}\]\(\)\'\".?!,;] | \\*\(-- | \\\  | $ )   # (3)
-        } {
+        } {{
             $1 . '\s-1' . $2 . '\s0'
-        }egx;
+        }}gx;
     }
 
     # Note that from this point forward, we have to adjust for \s-1 and \s-0
@@ -474,9 +474,9 @@ sub guesswork {
         s{
             ( \b | \\s-1 )
             ( [A-Za-z_] ([:\w] | \\s-?[01])+ \(\) )
-        } {
+        } {{
             $1 . '\f(IS' . $2 . '\f(IE'
-        }egx;
+        }}gx;
     }
 
     # Change references to manual pages to put the page name in italics but
@@ -491,9 +491,9 @@ sub guesswork {
             ( \b | \\s-1 )
             ( [A-Za-z_] (?:[.:\w] | \\- | \\s-?[01])+ )
             ( \( \d [a-z]* \) )
-        } {
+        } {{
             $1 . '\f(IS' . $2 . '\f(IE\|' . $3
-        }egx;
+        }}gx;
     }
 
     # Convert simple Perl variable references to a fixed-width font.  Be
@@ -504,16 +504,16 @@ sub guesswork {
            ( ^ | \s+ )
            ( [\$\@%] [\w:]+ )
            (?! \( )
-        } {
+        } {{
             $1 . '\f(FS' . $2 . '\f(FE'
-        }egx;
+        }}gx;
     }
 
     # Fix up double quotes.  Unfortunately, we miss this transformation if the
     # quoted text contains any code with formatting codes and there's not much
     # we can effectively do about that, which makes it somewhat unclear if
     # this is really a good idea.
-    s{ \" ([^\"]+) \" } { '\*(L"' . $1 . '\*(R"' }egx;
+    s{ \" ([^\"]+) \" } {{ '\*(L"' . $1 . '\*(R"' }}gx;
 
     # Make C++ into \*(C+, which is a squinched version.
     if ($$self{MAGIC_CPP}) {
@@ -553,7 +553,7 @@ sub mapfonts {
     my $last = '\fR';
     $text =~ s<
         \\f\((.)(.)
-    > <
+    > <{
         my $sequence = '';
         my $f;
         if ($last ne '\fR') { $sequence = '\fP' }
@@ -566,7 +566,7 @@ sub mapfonts {
             $last = $f;
             $sequence;
         }
-    >gxe;
+    }>gx;
     return $text;
 }
 
@@ -581,10 +581,10 @@ sub textmapfonts {
     my %magic = (F => \$fixed, B => \$bold, I => \$italic);
     $text =~ s<
         \\f\((.)(.)
-    > <
+    > <{
         ${ $magic{$1} } += ($2 eq 'S') ? 1 : -1;
         $$self{FONTS}{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
-    >gxe;
+    }>gx;
     return $text;
 }
 

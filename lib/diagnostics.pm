@@ -331,8 +331,8 @@ my %msg;
 	    sub noop   { return $_[0] }  # spensive for a noop
 	    sub bold   { my $str =$_[0];  $str =~ s/(.)/$1\b$1/g; return $str; } 
 	    sub italic { my $str = $_[0]; $str =~ s/(.)/_\b$1/g;  return $str; } 
-	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/bold($+)/ges;
-	    s/[LIF]<(.*?)>/italic($1)/ges;
+	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/{bold($+)}/gs;
+	    s/[LIF]<(.*?)>/{italic($1)}/gs;
 	} else {
 	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/$+/gs;
 	    s/[LIF]<(.*?)>/$1/gs;
@@ -618,7 +618,7 @@ sub unescape {
             E<  
             ( [A-Za-z]+ )       
             >   
-    } { 
+    } {{ 
          do {   
              exists $HTML_Escapes{$1}
                 ? do { $HTML_Escapes{$1} }
@@ -627,7 +627,7 @@ sub unescape {
                     "E<$1>";
                 } 
          } 
-    }egx;
+    }}gx;
 }
 
 sub shorten {

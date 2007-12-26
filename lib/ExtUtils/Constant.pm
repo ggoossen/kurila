@@ -323,7 +323,7 @@ EOT
                                 );
 EOT
 
-  $result =~ s/^/' 'x$indent/gem;
+  $result =~ s/^/{' 'x$indent}/gm;
   return ExtUtils::Constant::XS->dump_names({default_type=>$args{DEFAULT_TYPE},
 					     indent=>$indent,},
 					    @{$args{NAMES}})

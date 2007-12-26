@@ -152,7 +152,7 @@ sub manifind {
 	return if -d $_;
 	
         if( $Is_VMS ) {
-            $name =~ s#(.*)\.$# lc($1) #e;
+            $name =~ s#(.*)\.$#{ lc($1) }#;
             $name = uc($name) if $name =~ m/^MANIFEST(\.SKIP)?$/i;
         }
 	$found->{$name} = "";
@@ -257,8 +257,8 @@ sub _check_files {
         warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
         if ($dosnames){
             $file = lc $file;
-            $file =~ s=(\.(\w|-)+)=substr ($1,0,4)=ge;
-            $file =~ s=((\w|-)+)=substr ($1,0,8)=ge;
+            $file =~ s=(\.(\w|-)+)={substr ($1,0,4)}=g;
+            $file =~ s=((\w|-)+)={substr ($1,0,8)}=g;
         }
         unless ( exists $found->{$file} ) {
             warn "No such file: $file\n" unless $Quiet;
@@ -322,7 +322,7 @@ sub maniread {
 
         if ($Is_MacOS) {
             $file = _macify($file);
-            $file =~ s/\\([0-3][0-7][0-7])/sprintf("%c", oct($1))/ge;
+            $file =~ s/\\([0-3][0-7][0-7])/{sprintf("%c", oct($1))}/g;
         }
         elsif ($Is_VMS) {
             require File::Basename;
@@ -594,7 +594,7 @@ sub _unmacify {
     return $file unless $Is_MacOS;
 
     $file =~ s|^:||;
-    $file =~ s|([/ \n])|sprintf("\\%03o", unpack("c", $1))|ge;
+    $file =~ s|([/ \n])|{sprintf("\\%03o", unpack("c", $1))}|g;
     $file =~ y|:|/|;
 
     $file;
