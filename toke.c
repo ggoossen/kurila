@@ -2122,7 +2122,7 @@ S_scan_const(pTHX_ char *start)
 	}
 
 	/* embedded code */
-	if (*s == '{' && ! PL_lex_inpat) {
+	if ( (*s == '{' || *s == '}') && ! PL_lex_inpat) {
 	    break;
 	}
 

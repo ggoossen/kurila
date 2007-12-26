@@ -353,11 +353,9 @@ $_ = 'aaaa';
 $snum = s/\ba/./g;
 ok( $_ eq '.aaa' && $snum == 1 );
 
-{
-    local our $TODO = 1;
-    eval q% s/a/{ "b"}}/ %;
-    like( $@, qr/Bad evalled substitution/ );
-}
+eval q% s/a/{ "b"}}/ %;
+like( $@, qr/Unmatched right curly bracket/ );
+
 eval q% ($_ = "x") =~ s/(.)/{"$1 "}/ %;
 ok( $_ eq "x " and !length $@ );
 $x = $x = 'interp';
