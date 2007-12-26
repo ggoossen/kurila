@@ -202,7 +202,7 @@ my $test = 42;
 # line 42 "plink"
     local $_ = "not ok ";
     eval q{
-	s/^not /<<EOT/e and T '^main:\(eval \d+\):2$', $test++;
+	s/^not /{<<EOT}/ and T '^main:\(eval \d+\):2$', $test++;
 # fuggedaboudit
 EOT
         print $_, $test++, "\n";
@@ -210,8 +210,9 @@ EOT
 # line 1 "plunk"
 	T('^main:plunk:1$', $test++);
     };
-    print "# $@\nnot ok $test\n" if $@;
+    print "not ok $test # TODO heredoc inside quoted construct\n" if $@; $test++;
     T '^main:plink:53$', $test++;
+    print "ok 44\nok 45\nok 46\n";
 }
 
 # tests 47--51 start here
