@@ -26,6 +26,10 @@ typedef struct yy_str_info {
     char delim;  /* delimeter */
 } yy_str_info;
 
+#define LEXf_INPAT   0x01 /* pattern */
+#define LEXf_SINGLEQ 0x02 /* single quoted, both q*...* or qr'..' */
+#define LEXf_EXT_PAT 0x04 /* in an extended pattern */
+
 typedef struct yy_parser {
 
     /* parser state */
@@ -52,7 +56,7 @@ typedef struct yy_parser {
     bool	lex_dojoin;	/* doing an array interpolation */
     U8		lex_expect;	/* expect after determined token */
     U8		expect;		/* how to interpret ambiguous tokens */
-    OP		*lex_inpat;	/* in pattern $) and $| are special */
+    U8		lex_flags;	/* flags for the lexer */
     OP		*lex_op;	/* extra info to pass back on op */
     U16		lex_inwhat;	/* what kind of quoting are we in */
     OPCODE	last_lop_op;	/* last list operator */
