@@ -510,7 +510,7 @@ is("<$_> <$s>", "<> <4>", "[perl #7806]");
 {
     local $^W = 0;
     $_="abcdef\n";
-    s!.!{}!g;
+    s!.!{''}!g;
     is($_, "\n", "[perl #19048]");
 }
 
@@ -542,7 +542,7 @@ is($_,'a-b-c','#20682 $^N not visible in replacement');
 my $name = "chris";
 {
     no warnings 'uninitialized';
-    $name =~ s/hr/{}/;
+    $name =~ s/hr/{''}/;
 }
 is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
 
