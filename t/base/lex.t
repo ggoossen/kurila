@@ -92,7 +92,6 @@ E2
 E1
 
 {
-    no strict 'subs';
     $foo = 'FOO';
     $bar = 'BAR';
     $foo{$bar} = 'BAZ';

@@ -39,7 +39,7 @@
 #define PL_lex_defer		(PL_parser->lex_defer)
 #define PL_lex_dojoin		(PL_parser->lex_dojoin)
 #define PL_lex_expect		(PL_parser->lex_expect)
-#define PL_lex_inpat		(PL_parser->lex_inpat)
+#define PL_lex_flags		(PL_parser->lex_flags)
 #define PL_lex_inwhat		(PL_parser->lex_inwhat)
 #define PL_lex_op		(PL_parser->lex_op)
 #define PL_lex_repl		(PL_parser->lex_repl)
@@ -1590,7 +1590,7 @@ S_sublex_push(pTHX)
     SAVEI32(PL_lex_casemods);
     SAVEI32(PL_lex_starts);
     SAVEI8(PL_lex_state);
-    SAVEVPTR(PL_lex_inpat);
+    SAVEI8(PL_lex_flags);
     SAVEI16(PL_lex_inwhat);
     SAVECOPLINE(PL_curcop);
     SAVEPPTR(PL_bufptr);
@@ -1624,10 +1624,12 @@ S_sublex_push(pTHX)
     CopLINE_set(PL_curcop, (line_t)PL_multi_start);
 
     PL_lex_inwhat = PL_sublex_info.sub_inwhat;
-    if (PL_lex_inwhat == OP_MATCH || PL_lex_inwhat == OP_QR || PL_lex_inwhat == OP_SUBST)
-	PL_lex_inpat = PL_sublex_info.sub_op;
-    else
-	PL_lex_inpat = NULL;
+    PL_lex_flags = 0;
+    if (PL_lex_inwhat == OP_MATCH || PL_lex_inwhat == OP_QR || PL_lex_inwhat == OP_SUBST) {
+	PL_lex_flags |= LEXf_INPAT;
+	if (((PMOP*)PL_sublex_info.sub_op)->op_pmflags & PMf_EXTENDED)
+	    PL_lex_flags |= LEXf_EXT_PAT;
+    }
 
     return '(';
 }
@@ -1658,7 +1660,7 @@ S_sublex_done(pTHX)
 	PL_linestr = PL_lex_repl.str_sv;
 	PL_lex_stuff.delim = PL_lex_repl.delim;
 	PL_lex_repl.delim = 0;
-	PL_lex_inpat = 0;
+	PL_lex_flags = 0;
 	PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart = SvPVX(PL_linestr);
 	PL_bufend += SvCUR(PL_linestr);
 	PL_last_lop = PL_last_uni = NULL;
@@ -1910,8 +1912,8 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
   Extracts a pattern, double-quoted string, or transliteration.  This
   is terrifying code.
 
-  It looks at PL_lex_inwhat and PL_lex_inpat to find out whether it's
-  processing a pattern (PL_lex_inpat is true), a transliteration
+  It looks at PL_lex_inwhat and PL_lex_flags to find out whether it's
+  processing a pattern (PL_lex_flags in_pat is true), a transliteration
   (PL_lex_inwhat == OP_TRANS is true), or a double-quoted string.
 
   Returns a pointer to the character scanned up to. If this is
@@ -1996,6 +1998,7 @@ S_scan_const(pTHX_ char *start)
     bool didrange = FALSE;		        /* did we just finish a range? */
     I32  has_utf8 = FALSE;			/* Output constant is UTF8 */
     bool in_codepoints = (IN_CODEPOINTS != 0);  /* PL_curtoken can be changed ?! */
+    bool in_pat = ((PL_lex_flags & LEXf_INPAT) != 0);
 
     while (s < send || dorange) {
         /* get transliterations out of the way (they're most literal) */
@@ -2064,7 +2067,7 @@ S_scan_const(pTHX_ char *start)
 
 	/* skip for regexp comments /(?#comment)/ and code /(?{code})/,
 	   except for the last char, which will be done separately. */
-	else if (*s == '(' && PL_lex_inpat && s[1] == '?') {
+	else if (*s == '(' && in_pat && s[1] == '?') {
 	    if (s[2] == '#') {
 		while (s+1 < send && *s != ')')
 		    *d++ = NATIVE_TO_UNI(*s++);
@@ -2093,8 +2096,7 @@ S_scan_const(pTHX_ char *start)
 	}
 
 	/* likewise skip #-initiated comments in //x patterns */
-	else if (*s == '#' && PL_lex_inpat &&
-	  ((PMOP*)PL_lex_inpat)->op_pmflags & PMf_EXTENDED) {
+	else if (*s == '#' && in_pat && (PL_lex_flags & LEXf_EXT_PAT)) {
 	    while (s+1 < send && *s != '\n')
 		*d++ = NATIVE_TO_UNI(*s++);
 	}
@@ -2107,7 +2109,7 @@ S_scan_const(pTHX_ char *start)
 		break;
 	    if (strchr(":'{$", s[1]))
 		break;
-	    if (!PL_lex_inpat && (s[1] == '+' || s[1] == '-'))
+	    if (!in_pat && (s[1] == '+' || s[1] == '-'))
 		break; /* in regexp, neither @+ nor @- are interpolated */
 	}
 
@@ -2115,14 +2117,14 @@ S_scan_const(pTHX_ char *start)
 	   variable.
         */
 	else if (*s == '$') {
-	    if (!PL_lex_inpat)	/* not a regexp, so $ must be var */
+	    if (!in_pat)	/* not a regexp, so $ must be var */
 		break;
 	    if (s + 1 < send && !strchr("()| \r\n\t", s[1]))
 		break;		/* in regexp, $ might be tail anchor */
 	}
 
 	/* embedded code */
-	if ( (*s == '{' || *s == '}') && ! PL_lex_inpat) {
+	if ( (*s == '{' || *s == '}') && ! in_pat) {
 	    break;
 	}
 
@@ -2133,7 +2135,7 @@ S_scan_const(pTHX_ char *start)
 	    s++;
 
 	    /* deprecate \1 in strings and substitution replacements */
-	    if (PL_lex_inwhat == OP_SUBST && !PL_lex_inpat &&
+	    if (PL_lex_inwhat == OP_SUBST && !in_pat &&
 		isDIGIT(*s) && *s != '0' && !isDIGIT(s[1]))
 	    {
 		if (ckWARN(WARN_SYNTAX))
@@ -2151,7 +2153,7 @@ S_scan_const(pTHX_ char *start)
 		break;
 	    }
 	    /* skip any other backslash escapes in a pattern */
-	    else if (PL_lex_inpat) {
+	    else if (in_pat) {
 		*d++ = NATIVE_TO_UNI('\\');
 		goto default_action;
 	    }
@@ -2200,16 +2202,16 @@ S_scan_const(pTHX_ char *start)
 
     /* return the substring (via yylval) only if we parsed anything */
     if (s > PL_bufptr) {
-	if ( PL_hints & ( PL_lex_inpat ? HINT_NEW_RE : HINT_NEW_STRING ) ) {
-	    const char *const key = PL_lex_inpat ? "qr" : "q";
-	    const STRLEN keylen = PL_lex_inpat ? 2 : 1;
+	if ( PL_hints & ( in_pat ? HINT_NEW_RE : HINT_NEW_STRING ) ) {
+	    const char *const key = in_pat ? "qr" : "q";
+	    const STRLEN keylen = in_pat ? 2 : 1;
 	    const char *type;
 	    STRLEN typelen;
 
 	    if (PL_lex_inwhat == OP_TRANS) {
 		type = "tr";
 		typelen = 2;
-	    } else if (PL_lex_inwhat == OP_SUBST && !PL_lex_inpat) {
+	    } else if (PL_lex_inwhat == OP_SUBST && !in_pat) {
 		type = "s";
 		typelen = 1;
 	    } else  {
@@ -2849,7 +2851,7 @@ Perl_yylex(pTHX)
 		}
 #endif
 		/* commas only at base level: /$a\Ub$c/ => ($a,uc(b.$c)) */
-		if (PL_lex_casemods == 1 && PL_lex_inpat)
+		if (PL_lex_casemods == 1 && PL_lex_flags & LEXf_INPAT)
 		    OPERATOR(',');
 		else
 		    Aop(OP_CONCAT);
@@ -2909,7 +2911,7 @@ Perl_yylex(pTHX)
 	    }
 #endif
 	    /* commas only at base level: /$a\Ub$c/ => ($a,uc(b.$c)) */
-	    if (!PL_lex_casemods && PL_lex_inpat)
+	    if (!PL_lex_casemods && (PL_lex_flags & LEXf_INPAT))
 		OPERATOR(',');
 	    else
 		Aop(OP_CONCAT);
@@ -2948,7 +2950,7 @@ Perl_yylex(pTHX)
 
 	if (PL_lex_stuff.delim == '\'') {
 	    SV *sv = newSVsv(PL_linestr);
-	    if (!PL_lex_inpat)
+	    if (! PL_lex_flags & LEXf_INPAT)
 		sv = tokeq(sv);
 	    else if ( PL_hints & HINT_NEW_RE )
 		sv = new_constant(NULL, 0, "qr", sv, sv, "q", 1);
@@ -2980,7 +2982,7 @@ Perl_yylex(pTHX)
 		}
 #endif
 		/* commas only at base level: /$a\Ub$c/ => ($a,uc(b.$c)) */
-		if (!PL_lex_casemods && PL_lex_inpat)
+		if (!PL_lex_casemods &&  PL_lex_flags & LEXf_INPAT)
 		    OPERATOR(',');
 		else
 		    Aop(OP_CONCAT);
@@ -11351,7 +11353,7 @@ Perl_yyerror(pTHX_ const char *s)
 	if (PL_lex_state == LEX_NORMAL ||
 	   (PL_lex_state == LEX_KNOWNEXT && PL_lex_defer == LEX_NORMAL))
 	    where = "at end of line";
-	else if (PL_lex_inpat)
+	else if (PL_lex_flags & LEXf_INPAT)
 	    where = "within pattern";
 	else
 	    where = "within string";

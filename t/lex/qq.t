@@ -16,10 +16,10 @@ sub is {
     foreach ($left, $right) {
       # Comment out these regexps to map non-printables to ord if the perl under
       # test is so broken that it's not helping
-      s/([^-+A-Za-z_0-9])/sprintf q{'.chr(%d).'}, ord $1/ge;
-      $_ = sprintf q('%s'), $_;
-      s/^''\.//;
-      s/\.''$//;
+#       s/([^-+A-Za-z_0-9])/sprintf q{'.chr(%d).'}, ord $1/ge;
+#       $_ = sprintf q('%s'), $_;
+#       s/^''\.//;
+#       s/\.''$//;
     }
     printf q(not ok %d - got %s expected %s
 ), $test++, $left, $right;
