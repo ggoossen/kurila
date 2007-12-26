@@ -24,7 +24,7 @@ if ($^O eq 'MacOS') {
 my @r = glob;
 print "not " if $_ ne $expected;
 print "ok 1\n";
-print "# |@r|\nnot " if @r +< 9;
+print "# |@r|\nnot " if @r +< 4;
 print "ok 2\n";
 
 # check if <*/*> works
