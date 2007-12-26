@@ -1530,13 +1530,13 @@ S_tokeq(pTHX_ SV *sv)
  */
 
 STATIC I32
-S_sublex_start(pTHX)
+S_sublex_start(pTHX_ I32 op_type, OP* op)
 {
     dVAR;
-    register const I32 op_type = yylval.ival;
+    yylval.ival = op_type;
 
     if (op_type == OP_NULL) {
-	yylval.opval = PL_lex_op;
+	yylval.opval = op;
 	PL_lex_op = NULL;
 	return THING;
     }
@@ -1561,7 +1561,7 @@ S_sublex_start(pTHX)
     PL_lex_state = LEX_INTERPPUSH;
 
     PL_expect = XTERM;
-    if (PL_lex_op) {
+    if (op) {
 	yylval.opval = PL_lex_op;
 	PL_lex_op = NULL;
 	return PMFUNC;
@@ -4237,7 +4237,7 @@ Perl_yylex(pTHX)
 		    PL_lex_stuff.str_sv = NULL;
 		    TERM(THING);
 		}
-		TERM(sublex_start());
+		TERM(sublex_start(op_type, NULL));
 	    }
 	    Perl_croak("No operator expected, but found '<', '<=' or '<=>' operator");
 	}
@@ -4477,8 +4477,7 @@ Perl_yylex(pTHX)
 	if (!s)
 	    missingterminator(NULL);
 	DEBUG_T( { printbuf("### Saw string before %s\n", s); } );
-	yylval.ival = OP_CONST;
-	TERM(sublex_start());
+	TERM(sublex_start(OP_CONST, NULL));
 
     case '"':
 	s = scan_str(s,!!PL_madskills,FALSE, &PL_lex_stuff);
@@ -4497,7 +4496,7 @@ Perl_yylex(pTHX)
 		break;
 	    }
 	}
-	TERM(sublex_start());
+	TERM(sublex_start(yylval.ival, NULL));
 
     case '`':
 	s = scan_str(s,!!PL_madskills,FALSE, &PL_lex_stuff);
@@ -4507,7 +4506,7 @@ Perl_yylex(pTHX)
 	if (!s)
 	    missingterminator(NULL);
 	readpipe_override();
-	TERM(sublex_start());
+	TERM(sublex_start(yylval.ival, PL_lex_op));
 
     case '\\':
 	s++;
@@ -5495,7 +5494,7 @@ Perl_yylex(pTHX)
 
 	case KEY_m:
 	    s = scan_pat(s,OP_MATCH);
-	    TERM(sublex_start());
+	    TERM(sublex_start(yylval.ival, PL_lex_op));
 
 	case KEY_map:
 	    LOP(OP_MAPSTART, XREF);
@@ -5614,7 +5613,7 @@ Perl_yylex(pTHX)
 	    if (!s)
 		missingterminator(NULL);
 	    yylval.ival = OP_CONST;
-	    TERM(sublex_start());
+	    TERM(sublex_start(yylval.ival, NULL));
 
 	case KEY_quotemeta:
 	    UNI(OP_QUOTEMETA);
@@ -5677,18 +5676,18 @@ Perl_yylex(pTHX)
 		missingterminator(NULL);
 	    yylval.ival = OP_STRINGIFY;
 	    PL_lex_stuff.delim = 0;	/* qq'$foo' should intepolate */
-	    TERM(sublex_start());
+	    TERM(sublex_start(yylval.ival, NULL));
 
 	case KEY_qr:
 	    s = scan_pat(s,OP_QR);
-	    TERM(sublex_start());
+	    TERM(sublex_start(yylval.ival, PL_lex_op));
 
 	case KEY_qx:
 	    s = scan_str(s,!!PL_madskills,FALSE, &PL_lex_stuff);
 	    if (!s)
 		missingterminator(NULL);
 	    readpipe_override();
-	    TERM(sublex_start());
+	    TERM(sublex_start(yylval.ival, NULL));
 
 	case KEY_return:
 	    OLDLOP(OP_RETURN);
@@ -5763,7 +5762,7 @@ Perl_yylex(pTHX)
 	case KEY_s:
 	    s = scan_subst(s);
 	    if (yylval.opval)
-		TERM(sublex_start());
+		TERM(sublex_start(yylval.ival, PL_lex_op));
 	    else
 		TOKEN(1);	/* force error */
 
@@ -6065,7 +6064,7 @@ Perl_yylex(pTHX)
 
 	case KEY_tr:
 	    s = scan_trans(s);
-	    TERM(sublex_start());
+	    TERM(sublex_start(yylval.ival, PL_lex_op));
 
 	case KEY_tell:
 	    UNI(OP_TELL);
@@ -6169,7 +6168,7 @@ Perl_yylex(pTHX)
 
 	case KEY_y:
 	    s = scan_trans(s);
-	    TERM(sublex_start());
+	    TERM(sublex_start(yylval.ival, PL_lex_op));
 	}
     }}
 }

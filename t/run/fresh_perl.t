@@ -708,7 +708,7 @@ $SIG{__WARN__} = sub { $@ = shift };
 use Encode;
 use utf8;
 my $t = "\x[E9]";
-$t =~ s/([^a])//ge;
+$t =~ s/([^a])/{''}/g;
 $@ =~ s/ at .*/ at/;
 print $@;
 print "Good" if $t eq "\x[E9]";
