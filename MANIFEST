@@ -53,7 +53,7 @@ doio.c			I/O operations
 doop.c			Support code for various operations
 dosish.h		Some defines for MS/DOSish machines
 dump.c			Debugging output
-emacs/cperl-mode.el	An alternate perl-mode
+emacs/kurila-mode.el	An alternate perl-mode
 emacs/e2ctags.pl	etags to ctags converter
 emacs/ptags		Creates smart TAGS file
 embed.fnc		Database used by embed.pl
@@ -3193,6 +3193,7 @@ t/op/utf8decode.t		See if UTF-8 decoding works
 t/op/utftaint.t			See if utf8 and taint work together
 t/op/vec.t			See if vectors work
 t/lex/ver.t			See if v-strings and the %v format flag work
+t/lex/use.t			See if use works
 t/op/wantarray.t		See if wantarray works
 t/perl.supp			Perl valgrind suppressions
 t/pod/emptycmd.t		Test empty pod directives

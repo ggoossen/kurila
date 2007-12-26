@@ -37,6 +37,7 @@ while (defined($str = ~< *DATA))
 	if ($str =~ s/\A# USING://)
 	{
 		$neg = 0;
+                $cmd = $str;
 		eval{local$^W;*f = eval $str || die};
 		next;
 	}

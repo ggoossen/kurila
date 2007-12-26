@@ -2630,7 +2630,7 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 		    is_use ? "use" : "no"));
     s = SKIPSPACE1(s);
     if (isDIGIT(*s) || (*s == 'v' && isDIGIT(s[1])))
-	yyerror(Perl_form(aTHX_ "use VERSION is not valid in Perl Kurila (this is probably Perl 5 code)"));
+	Perl_croak(aTHX_ "use VERSION is not valid in Perl Kurila (this is probably Perl 5 code)");
     s = force_word(s,WORD,FALSE,TRUE,FALSE);
     s = force_version(s);
     yylval.ival = is_use;
