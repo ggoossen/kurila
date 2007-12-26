@@ -3964,7 +3964,8 @@ STATIC char*	S_scan_pat(pTHX_ char *start, I32 type)
 
 STATIC char*	S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str_info)
 			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_4);
 
 STATIC char*	S_scan_subst(pTHX_ char *start)
 			__attribute__warn_unused_result__
@@ -4020,7 +4021,7 @@ STATIC I32	S_sublex_done(pTHX)
 STATIC I32	S_sublex_push(pTHX)
 			__attribute__warn_unused_result__;
 
-STATIC I32	S_sublex_start(pTHX)
+STATIC I32	S_sublex_start(pTHX_ I32 op_type, OP *op)
 			__attribute__warn_unused_result__;
 
 STATIC char *	S_filter_gets(pTHX_ SV *sv, PerlIO *fp, STRLEN append)

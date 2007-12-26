@@ -3752,7 +3752,7 @@
 #define no_op(a,b)		S_no_op(aTHX_ a,b)
 #define sublex_done()		S_sublex_done(aTHX)
 #define sublex_push()		S_sublex_push(aTHX)
-#define sublex_start()		S_sublex_start(aTHX)
+#define sublex_start(a,b)	S_sublex_start(aTHX_ a,b)
 #define filter_gets(a,b,c)	S_filter_gets(aTHX_ a,b,c)
 #define tokenize_use(a,b)	S_tokenize_use(aTHX_ a,b)
 #define ao(a)			S_ao(aTHX_ a)

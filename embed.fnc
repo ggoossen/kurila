@@ -1506,7 +1506,7 @@ rs	|void	|missingterminator	|NULLOK char *s
 s	|void	|no_op		|NN const char *what|NULLOK char *s
 sR	|I32	|sublex_done
 sR	|I32	|sublex_push
-sR	|I32	|sublex_start
+sR	|I32	|sublex_start   |I32 op_type|NULLOK OP *op
 sR	|char *	|filter_gets	|NN SV *sv|NN PerlIO *fp|STRLEN append
 sR	|char *	|tokenize_use	|int is_use|NN char *s
 so	|SV*	|new_constant	|NULLOK const char *s|STRLEN len \
