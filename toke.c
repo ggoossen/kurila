@@ -10098,7 +10098,6 @@ S_scan_subst(pTHX_ char *start)
     register char *s;
     register PMOP *pm;
     I32 first_start;
-    I32 es = 0;
 #ifdef PERL_MAD
     char *modstart;
 #endif
@@ -10144,11 +10143,7 @@ S_scan_subst(pTHX_ char *start)
 #endif
 
     while (*s) {
-	if (*s == EXEC_PAT_MOD) {
-	    s++;
-	    es++;
-	}
-	else if (strchr(S_PAT_MODS, *s))
+	if (strchr(S_PAT_MODS, *s))
 	    pmflag(&pm->op_pmflags,*s++);
 	else
 	    break;
@@ -10167,29 +10162,6 @@ S_scan_subst(pTHX_ char *start)
 #endif
     if ((pm->op_pmflags & PMf_CONTINUE) && ckWARN(WARN_REGEXP)) {
         Perl_warner(aTHX_ packWARN(WARN_REGEXP), "Use of /c modifier is meaningless in s///" );
-    }
-
-    if (es) {
-	SV * const repl = newSVpvs("");
-
-	PL_sublex_info.super_bufptr = s;
-	PL_sublex_info.super_bufend = PL_bufend;
-	PL_multi_end = 0;
-	pm->op_pmflags |= PMf_EVAL;
-	while (es-- > 0) {
-	    if (es)
-		sv_catpvs(repl, "eval ");
-	    else
-		sv_catpvs(repl, "do ");
-	}
-	sv_catpvs(repl, "{");
-	sv_catsv(repl, PL_lex_repl.str_sv);
-	if (strchr(SvPVX(PL_lex_repl.str_sv), '#'))
-	    sv_catpvs(repl, "\n");
-	sv_catpvs(repl, "}");
-	SvEVALED_on(repl);
-	SvREFCNT_dec(PL_lex_repl.str_sv);
-	PL_lex_repl.str_sv = repl;
     }
 
     PL_lex_op = (OP*)pm;
