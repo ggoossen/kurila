@@ -1529,7 +1529,7 @@ sub head {
   my $star = ($level +>= $self->LevelNoNum ? '*' : '');
 
   # Section
-  $self->_output("\\" .$LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}}\n");
+  $self->_output("\\" .$LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n");
 
 }
 

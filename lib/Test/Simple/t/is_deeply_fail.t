@@ -178,8 +178,8 @@ is( $err, <<ERR,                              '    right diagnostic' );
 #   Failed test 'deep scalar refs'
 #   at $0 line 173.
 #     Structures begin differing at:
-#     \$\{\$\{     \$got\}} = '42'
-#     \$\{\$\{\$expected\}} = '23'
+#     \$\{\$\{     \$got\}\} = '42'
+#     \$\{\$\{\$expected\}\} = '23'
 ERR
 
 # I don't know how to properly display this structure.
