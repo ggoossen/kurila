@@ -10072,7 +10072,7 @@ S_scan_pat(pTHX_ char *start, I32 type)
     }
 
     PL_lex_op = (OP*)pm;
-    yylval.ival = OP_MATCH;
+    yylval.ival = type;
     return s;
 }
 
@@ -10377,33 +10377,35 @@ S_scan_heredoc(pTHX_ register char *s)
     PL_multi_start = CopLINE(PL_curcop);
     PL_multi_open = PL_multi_close = '<';
     term = *PL_tokenbuf;
-    if (PL_lex_inwhat == OP_SUBST && PL_in_eval && !PL_rsfp) {
-	char * const bufptr = PL_sublex_info.super_bufptr;
-	char * const bufend = PL_sublex_info.super_bufend;
-	char * const olds = s - SvCUR(herewas);
-	s = strchr(bufptr, '\n');
-	if (!s)
-	    s = bufend;
-	d = s;
-	while (s < bufend &&
-	  (*s != term || memNE(s,PL_tokenbuf,len)) ) {
-	    if (*s++ == '\n')
-		CopLINE_inc(PL_curcop);
-	}
-	if (s >= bufend) {
-	    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
-	    missingterminator(PL_tokenbuf);
-	}
-	sv_setpvn(herewas,bufptr,d-bufptr+1);
-	sv_setpvn(tmpstr,d+1,s-d);
-	s += len - 1;
-	sv_catpvn(herewas,s,bufend-s);
-	Copy(SvPVX_const(herewas),bufptr,SvCUR(herewas) + 1,char);
+/*     if (PL_lex_inwhat == OP_SUBST && PL_in_eval && !PL_rsfp) { */
+/*      /* FIXME: heredoc inside an quoted construct.
+/* 	char * const bufptr = PL_sublex_info.super_bufptr; */
+/* 	char * const bufend = PL_sublex_info.super_bufend; */
+/* 	char * const olds = s - SvCUR(herewas); */
+/* 	s = strchr(bufptr, '\n'); */
+/* 	if (!s) */
+/* 	    s = bufend; */
+/* 	d = s; */
+/* 	while (s < bufend && */
+/* 	  (*s != term || memNE(s,PL_tokenbuf,len)) ) { */
+/* 	    if (*s++ == '\n') */
+/* 		CopLINE_inc(PL_curcop); */
+/* 	} */
+/* 	if (s >= bufend) { */
+/* 	    CopLINE_set(PL_curcop, (line_t)PL_multi_start); */
+/* 	    missingterminator(PL_tokenbuf); */
+/* 	} */
+/* 	sv_setpvn(herewas,bufptr,d-bufptr+1); */
+/* 	sv_setpvn(tmpstr,d+1,s-d); */
+/* 	s += len - 1; */
+/* 	sv_catpvn(herewas,s,bufend-s); */
+/* 	Copy(SvPVX_const(herewas),bufptr,SvCUR(herewas) + 1,char); */
 
-	s = olds;
-	goto retval;
-    }
-    else if (!outer) {
+/* 	s = olds; */
+/* 	goto retval; */
+/*     } */
+/*     else */
+    if (!outer) {
 	d = s;
 	while (s < PL_bufend &&
 	  (*s != term || memNE(s,PL_tokenbuf,len)) ) {

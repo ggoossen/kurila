@@ -178,7 +178,7 @@ like( $@, qr/Bad name after foo'/, 'Bad name after foo\'' );
 eval q{($a ? $x : ($y)) = 5};
 like( $@, qr/Assignment to both a list and a scalar/, 'Assignment to both a list and a scalar' );
 
-eval q{ s/x/#/e };
+eval q{ s/x/#/ };
 is( $@, '', 'comments in s///e' );
 
 # these five used to coredump because the op cleanup on parse error could
