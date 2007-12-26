@@ -1668,18 +1668,8 @@ S_sublex_done(pTHX)
 	PL_lex_casemods = 0;
 	*PL_lex_casestack = '\0';
 	PL_lex_starts = 0;
-	if (SvEVALED(PL_lex_repl.str_sv)) {
-	    PL_lex_state = LEX_INTERPNORMAL;
-	    PL_lex_starts++;
-	    /*	we don't clear PL_lex_repl here, so that we can check later
-		whether this is an evalled subst; that means we rely on the
-		logic to ensure sublex_done() is called again only via the
-		branch (in yylex()) that clears PL_lex_repl, else we'll loop */
-	}
-	else {
-	    PL_lex_state = LEX_INTERPCONCAT;
-	    PL_lex_repl.str_sv = NULL;
-	}
+	PL_lex_state = LEX_INTERPCONCAT;
+	PL_lex_repl.str_sv = NULL;
 	return ',';
     }
     else {
@@ -2946,13 +2936,6 @@ Perl_yylex(pTHX)
 	    }
 #endif
 	    return REPORT(')');
-	}
-	if (PL_lex_inwhat == OP_SUBST && PL_linestr == PL_lex_repl.str_sv
-	    && SvEVALED(PL_lex_repl.str_sv))
-	{
-	    if (PL_bufptr != PL_bufend)
-		Perl_croak(aTHX_ "Bad evalled substitution pattern");
-	    PL_lex_repl.str_sv = NULL;
 	}
 	/* FALLTHROUGH */
     case LEX_INTERPCONCAT:
