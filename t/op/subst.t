@@ -353,12 +353,15 @@ $_ = 'aaaa';
 $snum = s/\ba/./g;
 ok( $_ eq '.aaa' && $snum == 1 );
 
-eval q% s/a/"b"}/e %;
-ok( $@ =~ m/Bad evalled substitution/ );
-eval q% ($_ = "x") =~ s/(.)/"$1 "/e %;
+{
+    local our $TODO = 1;
+    eval q% s/a/{ "b"}}/ %;
+    like( $@, qr/Bad evalled substitution/ );
+}
+eval q% ($_ = "x") =~ s/(.)/{"$1 "}/ %;
 ok( $_ eq "x " and !length $@ );
 $x = $x = 'interp';
-eval q% ($_ = "x") =~ s/x(($x)*)/"$1"/e %;
+eval q% ($_ = "x") =~ s/x(($x)*)/{eval "$1"}/ %;
 ok( $_ eq '' and !length $@ );
 
 $_ = "C:/";

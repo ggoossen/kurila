@@ -270,7 +270,6 @@ and check for NULL.
  * for compatibility reasons with Regexp::Common which highjacked (?k:...)
  * for its own uses. So 'k' is out as well.
  */
-#define EXEC_PAT_MOD         'e'
 #define KEEPCOPY_PAT_MOD     'p'
 #define ONCE_PAT_MOD         'o'
 #define GLOBAL_PAT_MOD       'g'
@@ -283,7 +282,6 @@ and check for NULL.
 
 #define ONCE_PAT_MODS        "o"
 #define KEEPCOPY_PAT_MODS    "p"
-#define EXEC_PAT_MODS        "e"
 #define LOOP_PAT_MODS        "gc"
 
 #define STD_PAT_MODS        "msixu"
@@ -293,7 +291,7 @@ and check for NULL.
 #define EXT_PAT_MODS    ONCE_PAT_MODS   KEEPCOPY_PAT_MODS
 #define QR_PAT_MODS     STD_PAT_MODS    EXT_PAT_MODS
 #define M_PAT_MODS      QR_PAT_MODS     LOOP_PAT_MODS
-#define S_PAT_MODS      M_PAT_MODS      EXEC_PAT_MODS
+#define S_PAT_MODS      M_PAT_MODS
 
 /*
  * NOTE: if you modify any RXf flags you should run regen.pl or regcomp.pl
