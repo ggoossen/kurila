@@ -2133,7 +2133,6 @@ S_scan_const(pTHX_ char *start)
 
 	/* embedded code */
 	if (*s == '{' && ! PL_lex_inpat) {
-	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), "{ encountered");
 	    break;
 	}
 

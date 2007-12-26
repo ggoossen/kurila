@@ -98,7 +98,7 @@ foreach (@tests) {
     $reason = '' unless defined $reason;
     my $input = join(':',$pat,$subject,$result,$repl,$expect);
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
-    $pat =~ s/(\$\{\w+\})/{$1}/eg;
+    $pat =~ s/(\$\{\w+\})/{eval $1}/g;
     $pat =~ s/\\n/\n/g;
     $subject = eval qq("$subject"); die "error in '$subject': $@" if $@;
     $expect  = eval qq("$expect"); die "error in '$expect': $@" if $@;
