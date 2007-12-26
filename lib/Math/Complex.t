@@ -13,6 +13,8 @@ BEGIN {
     }
 }
 
+BEGIN { require "./test.pl" }
+
 use Math::Complex;
 
 use strict;
@@ -201,113 +203,43 @@ EOT
 test_broot(qw(-3 -2.1 0 0.99));
 
 sub test_display_format {
-    $test++;
-    push @script, <<EOS;
-    print "# package display_format cartesian?\n";
-    print "not " unless Math::Complex->display_format eq 'cartesian';
-    print "ok $test\n";
-EOS
+    is(Math::Complex->display_format, 'cartesian');
+    my $j = (root(1,3))[1];
 
-    push @script, <<EOS;
-    my \$j = (root(1,3))[1];
+    $j->display_format('polar');
+    is($j->display_format, 'polar');
 
-    \$j->display_format('polar');
-EOS
-
-    $test++;
-    push @script, <<EOS;
-    print "# j display_format polar?\n";
-    print "not " unless \$j->display_format eq 'polar';
-    print "ok $test\n";
-EOS
-
-    $test++;
-    push @script, <<EOS;
-    print "# j = \$j\n";
-    print "not " unless "\$j" eq "[1,2pi/3]";
-    print "ok $test\n";
+    is("$j", "[1,2pi/3]");
 
     my %display_format;
 
-    %display_format = \$j->display_format;
-EOS
+    %display_format = $j->display_format;
 
-    $test++;
-    push @script, <<EOS;
-    print "# display_format\{style\} polar?\n";
-    print "not " unless \$display_format\{style\} eq 'polar';
-    print "ok $test\n";
-EOS
+    is($display_format{style}, 'polar');
 
-    $test++;
-    push @script, <<EOS;
-    print "# keys %display_format == 2?\n";
-    print "not " unless keys %display_format == 2;
-    print "ok $test\n";
+    is(keys %display_format, 2);
 
-    \$j->display_format('style' => 'cartesian', 'format' => '%.5f');
-EOS
+    $j->display_format('style' => 'cartesian', 'format' => '%.5f');
 
-    $test++;
-    push @script, <<EOS;
-    print "# j = \$j\n";
-    print "not " unless "\$j" eq "-0.50000+0.86603i";
-    print "ok $test\n";
+    is("$j", "-0.50000+0.86603i");
 
-    %display_format = \$j->display_format;
-EOS
+    %display_format = $j->display_format;
+    is($display_format{format}, '%.5f');
+    is(keys %display_format, 3);
 
-    $test++;
-    push @script, <<EOS;
-    print "# display_format\{format\} %.5f?\n";
-    print "not " unless \$display_format\{format\} eq '%.5f';
-    print "ok $test\n";
-EOS
+    $j->display_format('format' => undef);
+    like("$j", qr/^-0(?:\.5(?:0000\d+)?|\.49999\d+)\+0.86602540\d+i$/);
 
-    $test++;
-    push @script, <<EOS;
-    print "# keys %display_format == 3?\n";
-    print "not " unless keys %display_format == 3;
-    print "ok $test\n";
+    $j->display_format('style' => 'polar', 'polar_pretty_print' => 0);
+    like("$j", qr/^\[1,2\.09439510\d+\]$/);
 
-    \$j->display_format('format' => undef);
-EOS
+    $j->display_format('style' => 'cartesian', 'format' => '(%.5g)');
 
-    $test++;
-    push @script, <<EOS;
-    print "# j = \$j\n";
-    print "not " unless "\$j" =~ m/^-0(?:\\.5(?:0000\\d+)?|\\.49999\\d+)\\+0.86602540\\d+i\$/;
-    print "ok $test\n";
+    is("$j", "(-0.5)+(0.86603)i");
 
-    \$j->display_format('style' => 'polar', 'polar_pretty_print' => 0);
-EOS
-
-    $test++;
-    push @script, <<EOS;
-    print "# j = \$j\n";
-    print "not " unless "\$j" =~ m/^\\[1,2\\.09439510\\d+\\]\$/;
-    print "ok $test\n";
-
-    \$j->display_format('style' => 'cartesian', 'format' => '(%.5g)');
-EOS
-
-    $test++;
-    push @script, <<EOS;
-    print "# j = \$j\n";
-    print "not " unless "\$j" eq "(-0.5)+(0.86603)i";
-    print "ok $test\n";
-EOS
-
-    $test++;
-    push @script, <<EOS;
-    print "# j display_format cartesian?\n";
-    print "not " unless \$j->display_format eq 'cartesian';
-    print "ok $test\n";
-EOS
+    is($j->display_format, 'cartesian');
 }
-
-test_display_format();
-
+         
 sub test_remake {
     $test++;
     push @script, <<EOS;
@@ -444,6 +376,10 @@ EOS
     print (abs(atan2(cplx(0, 1), cplx(1, 1)) - cplx(0.553574358897045, 0.402359478108525)) +< $eps ? "ok $test\n" : "not ok $test\n");
 EOS
 }
+
+push @script, "test_display_format();\n";
+curr_test($test+1);
+$test += 12;
 
 sub test_decplx {
 }
