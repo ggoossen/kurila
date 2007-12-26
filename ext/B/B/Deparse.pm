@@ -1134,7 +1134,11 @@ sub scopeop {
 	push @kids, $kid;
     }
     if ($cx +> 0) { # inside an expression, (a do {} while for lineseq)
-	return "do \{\n\t" . $self->lineseq($op, @kids) . "\n\b\}";
+        if ($cx == 26) { # inside double quote
+            return '{ ' . $self->lineseq($op, @kids) . ' }';
+        } else {
+            return "do \{\n\t" . $self->lineseq($op, @kids) . "\n\b\}";
+        }
     } else {
 	my $lineseq = $self->lineseq($op, @kids);
 	return (length ($lineseq) ? "$lineseq;" : "");
