@@ -2,7 +2,7 @@ package Fatal;
 
 use Carp;
 use strict;
-our($AUTOLOAD, $Debug, $VERSION);
+our($Debug, $VERSION);
 
 $VERSION = 1.05;
 

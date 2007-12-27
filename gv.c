@@ -1441,9 +1441,6 @@ Perl_Gv_AMupdate(pTHX_ HV *stash)
 	    filled = 1;
 	    if (i < DESTROY_amg)
 		have_ovl = 1;
-	} else if (gv) {		/* Autoloaded... */
-	    cv = (CV*)gv;
-	    filled = 1;
 	}
 	amt.table[i]=(CV*)SvREFCNT_inc_simple(cv);
     }
@@ -1493,16 +1490,6 @@ Perl_gv_handler(pTHX_ HV *stash, I32 id)
 	goto do_update;
     if (AMT_AMAGIC(amtp)) {
 	CV * const ret = amtp->table[id];
-	if (ret && isGV(ret)) {		/* Autoloading stab */
-	    /* Passing it through may have resulted in a warning
-	       "Inherited AUTOLOAD for a non-method deprecated", since
-	       our caller is going through a function call, not a method call.
-	       So return the CV for AUTOLOAD, setting $AUTOLOAD. */
-	    GV * const gv = gv_fetchmethod(stash, PL_AMG_names[id]);
-
-	    if (gv && GvCV(gv))
-		return GvCV(gv);
-	}
 	return ret;
     }
 
