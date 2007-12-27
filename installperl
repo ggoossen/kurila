@@ -223,7 +223,7 @@ if ($^O eq 'os390') {
     my $archlibexp = $Config{archlibexp};
     my $usedl = $Config{usedl};
     if ($usedl eq 'define') {
-	`./$^X -pibak -e 's{$pwd\/libperl.x}{$archlibexp/CORE/libperl.x}' lib/Config.pm`;
+	`./$^X -pibak -e 's<$pwd\/libperl.x><$archlibexp/CORE/libperl.x>' lib/Config.pm`;
     }
 }
 
@@ -561,7 +561,7 @@ if ( !$versiononly || ($installprivlib =~ m/\Q$ver/)) {
 	read POD, $_, 4000;
 	close POD;
 	# Some of Perl 5.003's diagnostic messages ended with periods.
-	if (/^=.*\.$/m) {
+	if (m/^=.*\.$/m) {
 	    my ($from, $to) = ("${installprivlib}/$pod/perldiag.pod",
 			       "${installprivlib}/$pod/perldiag-5.003.pod");
 	    print "  rename $from $to";
@@ -589,7 +589,7 @@ if (!$versiononly && $otherperls) {
     my ($path, @path);
     my $dirsep = ($Is_OS2 || $Is_W32 || $Is_NetWare) ? ';' : ':' ;
     ($path = $ENV{"PATH"}) =~ s:\\:/:g ;
-    @path = split(/$dirsep/, $path);
+    @path = split(m/$dirsep/, $path);
     if ($Is_VMS) {
 	my $i = 0;
 	while (exists $ENV{'DCL$PATH' . $i}) {
@@ -823,7 +823,7 @@ sub installlib {
     }
 
     if (-f $_) {
-	if (/\.(?:al|ix)$/ && !($dir =~ m[^auto/(.*)$])) {
+	if (m/\.(?:al|ix)$/ && !($dir =~ m[^auto/(.*)$])) {
 	    $installlib = $installprivlib;
 	    #We're installing *.al and *.ix files into $installprivlib,
 	    #but we have to delete old *.al and *.ix files from the 5.000
@@ -844,7 +844,7 @@ sub installlib {
 		# if copied will give problems when building new extensions.
 		# Has to be copied if we are installing on a NetWare server and hence
 		# the check !$nwinstall
-		if (!(/\.(?:nlp|nlm|bs)$/)) {
+		if (!(m/\.(?:nlp|nlm|bs)$/)) {
 		    copy_if_diff($_, "$installlib/$name")
 			and chmod($name =~ m/\.(so|$dlext)$/o ? 0555 : 0444,
 				  "$installlib/$name");
