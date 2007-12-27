@@ -2,7 +2,7 @@ package POSIX;
 use strict;
 use warnings;
 
-our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, $AUTOLOAD, %SIGRT) = ();
+our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, %SIGRT) = ();
 
 our $VERSION = "1.13";
 

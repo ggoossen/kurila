@@ -159,7 +159,7 @@ package DB_File ;
 
 use warnings;
 use strict;
-our ($VERSION, @ISA, @EXPORT, $AUTOLOAD, $DB_BTREE, $DB_HASH, $DB_RECNO);
+our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO);
 our ($db_version, $use_XSLoader, $splice_end_array, $Error);
 use Carp;
 

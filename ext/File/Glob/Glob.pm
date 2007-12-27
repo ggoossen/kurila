@@ -2,7 +2,7 @@ package File::Glob;
 
 use strict;
 our($VERSION, @ISA, @EXPORT_OK, @EXPORT_FAIL, %EXPORT_TAGS,
-    $AUTOLOAD, $DEFAULT_FLAGS);
+    $DEFAULT_FLAGS);
 
 use XSLoader ();
 

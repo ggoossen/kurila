@@ -5,7 +5,7 @@ use Devel::Tokenizer::C 0.05;
 use strict;
 use warnings;
 
-my @pos = qw(__DATA__ __END__ AUTOLOAD BEGIN CHECK DESTROY default defined
+my @pos = qw(__DATA__ __END__ BEGIN CHECK DESTROY default defined
 	    delete do END else eval elsif exists for foreach given grep
 	    goto glob INIT if last local m my map next no our pos print printf
 	    package prototype q qr qq qw qx redo return require s scalar sort

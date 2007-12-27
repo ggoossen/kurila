@@ -335,7 +335,7 @@ EOF
 #
 
 package Errno;
-our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno,\$AUTOLOAD);
+our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno);
 use Exporter ();
 use Config;
 use strict;
