@@ -762,8 +762,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	     SvRTRIM(sv);
 	     SvNOK_on(sv);	/* what a wonderful hack! */
 	 }
-	 else if (strEQ(remaining, "NCODING"))
-	     sv_setsv(sv, PL_encoding);
 	 break;
     case '\006':		/* ^F */
 	sv_setiv(sv, (IV)PL_maxsysfd);
@@ -2190,16 +2188,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 #    endif
 #  endif
 #endif
-	}
-	else if (strEQ(mg->mg_ptr+1, "NCODING")) {
-           if (PL_encoding)
-               SvREFCNT_dec(PL_encoding);
-           if (SvOK(sv) || SvGMAGICAL(sv)) {
-               PL_encoding = newSVsv(sv);
-           }
-           else {
-               PL_encoding = NULL;
-           }
 	}
 	break;
     case '\006':	/* ^F */

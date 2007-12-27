@@ -10493,10 +10493,6 @@ retval:
 	SvPV_shrink_to_cur(tmpstr);
     }
     SvREFCNT_dec(herewas);
-    if (!IN_BYTES) {
-	if (PL_encoding)
-	    sv_recode_to_utf8(tmpstr, PL_encoding);
-    }
     PL_lex_stuff.str_sv = tmpstr;
     yylval.ival = op_type;
     return s;
@@ -10623,76 +10619,6 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str
     }
 #endif
     for (;;) {
-	if (PL_encoding) {
-            bool cont = TRUE;
- 
-            while (cont) {
-                int offset = s - SvPVX_const(PL_linestr);
-                const bool found = sv_cat_decode(sv, PL_encoding, PL_linestr,
-                                           &offset, (char*)termstr, termlen);
-                const char * const ns = SvPVX_const(PL_linestr) + offset;
-                char * const svlast = SvEND(sv) - 1;
- 
-                for (; s < ns; s++) {
-                    if (*s == '\n' && !PL_rsfp)
-                        CopLINE_inc(PL_curcop);
-                }
-                if (!found)
-                    goto read_more_line;
-                else {
-                    /* handle quoted delimiters */
-                    if (SvCUR(sv) > 1 && *(svlast-1) == '\\') {
-                        const char *t;
-                        for (t = svlast-2; t >= SvPVX_const(sv) && *t == '\\';)
-                            t--;
-                        if ((svlast-1 - t) % 2) {
-                            if (!keep_quoted) {
-                                *(svlast-1) = term;
-                                *svlast = '\0';
-                                SvCUR_set(sv, SvCUR(sv) - 1);
-                            }
-                            continue;
-                        }
-                    }
-                    if (PL_multi_open == PL_multi_close) {
-                        cont = FALSE;
-                    }
-                    else {
-                        const char *t;
-                        char *w;
-                        for (t = w = SvPVX(sv)+last_off; t < svlast; w++, t++) {
-                            /* At here, all closes are "was quoted" one,
-                               so we don't check PL_multi_close. */
-                            if (*t == '\\') {
-                                if (!keep_quoted && *(t+1) == PL_multi_open)
-                                    t++;
-                                else
-                                    *w++ = *t++;
-                            }
-                            else if (*t == PL_multi_open)
-                                brackets++;
- 
-                            *w = *t;
-                        }
-                        if (w < t) {
-                            *w++ = term;
-                            *w = '\0';
-
-                            SvCUR_set(sv, w - SvPVX_const(sv));
-                        }
-                        last_off = w - SvPVX(sv);
-                        if (--brackets <= 0)
-                            cont = FALSE;
-                    }
-                }
-            }
-            if (!keep_delims) {
-                SvCUR_set(sv, SvCUR(sv) - 1);
-                *SvEND(sv) = '\0';
-            }
-	    break;
-        }
-
     	/* extend sv if need be */
 	SvGROW(sv, SvCUR(sv) + (PL_bufend - s) + 1);
 	/* set 'to' to the next character in the sv's string */
@@ -10817,38 +10743,22 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str
 
     /* at this point, we have successfully read the delimited string */
 
-    if (!PL_encoding) {
 #ifdef PERL_MAD
-	if (PL_madskills) {
-	    char * const tstart = SvPVX(PL_linestr) + stuffstart;
-	    const int len = s - tstart;
-	    if (PL_thisstuff)
-		sv_catpvn(PL_thisstuff, tstart, len);
-	    else
-		PL_thisstuff = newSVpvn(tstart, len);
-	    if (!PL_thisclose && !keep_delims)
-		PL_thisclose = newSVpvn(s,termlen);
-	}
+    if (PL_madskills) {
+	char * const tstart = SvPVX(PL_linestr) + stuffstart;
+	const int len = s - tstart;
+	if (PL_thisstuff)
+	    sv_catpvn(PL_thisstuff, tstart, len);
+	else
+	    PL_thisstuff = newSVpvn(tstart, len);
+	if (!PL_thisclose && !keep_delims)
+	    PL_thisclose = newSVpvn(s,termlen);
+    }
 #endif
 
-	if (keep_delims)
-	    sv_catpvn(sv, s, termlen);
-	s += termlen;
-    }
-#ifdef PERL_MAD
-    else {
-       if (PL_madskills) {
-           char * const tstart = SvPVX(PL_linestr) + stuffstart;
-           const int len = s - tstart - termlen;
-           if (PL_thisstuff)
-	       sv_catpvn(PL_thisstuff, tstart, len);
-           else
-               PL_thisstuff = newSVpvn(tstart, len);
-           if (!PL_thisclose && !keep_delims)
-               PL_thisclose = newSVpvn(s - termlen,termlen);
-       }
-    }
-#endif
+    if (keep_delims)
+	sv_catpvn(sv, s, termlen);
+    s += termlen;
 
     PL_multi_end = CopLINE(PL_curcop);
 

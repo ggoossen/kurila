@@ -1385,8 +1385,7 @@ PP(pp_sysread)
     /* Allocating length + offset + 1 isn't perfect in the case of reading
        bytes from a byte file handle into a UTF8 buffer, but it won't harm us
        unduly.
-       (should be 2 * length + offset + 1, or possibly something longer if
-       PL_encoding is true) */
+       (should be 2 * length + offset + 1) */
     buffer  = SvGROW(bufsv, (STRLEN)(length+offset+1));
     if (offset > 0 && (Sock_size_t)offset > bufsize) { /* Zero any newly allocated space */
     	Zero(buffer+bufsize, offset-bufsize, char);
