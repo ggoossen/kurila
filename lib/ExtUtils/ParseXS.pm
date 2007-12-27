@@ -1667,8 +1667,8 @@ sub fetch_para {
 }
 
 sub output_init {
-  my($type, $num, $var, $init, $name_printed) = @_;
-  my($arg) = "ST(" . ($num - 1) . ")";
+  local($type, $num, $var, $init, $name_printed) = @_;
+  local($arg) = "ST(" . ($num - 1) . ")";
 
   if (  $init =~ m/^=/  ) {
       my $x_init = evalqq($init);
