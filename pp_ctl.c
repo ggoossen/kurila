@@ -2761,17 +2761,10 @@ PP(pp_require)
 
     PUTBACK;
 
-    /* Store and reset encoding. */
-    encoding = PL_encoding;
-    PL_encoding = NULL;
-
     if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
 	op = DOCATCH(PL_eval_start);
     else
 	op = PL_op->op_next;
-
-    /* Restore encoding. */
-    PL_encoding = encoding;
 
     return op;
 }

@@ -126,7 +126,6 @@
 #define PL_efloatbuf		(vTHX->Iefloatbuf)
 #define PL_efloatsize		(vTHX->Iefloatsize)
 #define PL_egid			(vTHX->Iegid)
-#define PL_encoding		(vTHX->Iencoding)
 #define PL_endav		(vTHX->Iendav)
 #define PL_envgv		(vTHX->Ienvgv)
 #define PL_errgv		(vTHX->Ierrgv)
@@ -432,7 +431,6 @@
 #define PL_Iefloatbuf		PL_efloatbuf
 #define PL_Iefloatsize		PL_efloatsize
 #define PL_Iegid		PL_egid
-#define PL_Iencoding		PL_encoding
 #define PL_Iendav		PL_endav
 #define PL_Ienvgv		PL_envgv
 #define PL_Ierrgv		PL_errgv
