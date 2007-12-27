@@ -8,7 +8,7 @@ use Log::Message::Handlers;
 use Carp ();
 
 BEGIN {
-    use vars qw[$AUTOLOAD $VERSION];
+    use vars qw[$VERSION];
 
     $VERSION    =   $Log::Message::VERSION;
 }

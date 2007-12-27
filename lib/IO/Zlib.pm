@@ -289,7 +289,7 @@ it and/or modify it under the same terms as Perl itself.
 
 use strict;
 use bytes;
-use vars qw($VERSION $AUTOLOAD @ISA);
+use vars qw($VERSION @ISA);
 
 use Carp;
 use Fcntl qw(SEEK_SET);
