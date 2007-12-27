@@ -144,12 +144,6 @@ Devel::DProf::write> and C<- & Devel::DProf::write> lines.  These 3
 lines are outputted when printing of the mark above actually consumed
 measurable time.
 
-=head1 AUTOLOAD
-
-When Devel::DProf finds a call to an C<&AUTOLOAD> subroutine it looks at the
-C<$AUTOLOAD> variable to find the real name of the sub being called.  See
-L<perlsub/"Autoloading">.
-
 =head1 ENVIRONMENT
 
 C<PERL_DPROF_BUFFER> sets size of output buffer in words.  Defaults to 2**14.

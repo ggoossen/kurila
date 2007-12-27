@@ -5078,7 +5078,6 @@ Perl_yylex(pTHX)
 	    goto fake_eof;
 	}
 
-	case KEY_AUTOLOAD:
 	case KEY_DESTROY:
 	case KEY_BEGIN:
 	case KEY_UNITCHECK:
@@ -8611,20 +8610,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
     case 8: /* 26 tokens of length 8 */
       switch (name[0])
       {
-        case 'A':
-          if (name[1] == 'U' &&
-              name[2] == 'T' &&
-              name[3] == 'O' &&
-              name[4] == 'L' &&
-              name[5] == 'O' &&
-              name[6] == 'A' &&
-              name[7] == 'D')
-          {                                       /* AUTOLOAD   */
-            return KEY_AUTOLOAD;
-          }
-
-          goto unknown;
-
         case '_':
           if (name[1] == '_')
           {
@@ -10554,7 +10539,6 @@ S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str
     I32 termcode;			/* terminating char. code */
     char termstr[UTF8_MAXBYTES];		/* terminating string */
     STRLEN termlen;			/* length of terminating string */
-    int last_off = 0;			/* last position for nesting bracket */
 #ifdef PERL_MAD
     int stuffstart;
     char *tstart;

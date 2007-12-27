@@ -35,10 +35,6 @@ Perl stores its global variables.
 #include "perl.h"
 #include "overload.c"
 
-static const char S_autoload[] = "AUTOLOAD";
-static const STRLEN S_autolen = sizeof(S_autoload)-1;
-
-
 #ifdef PERL_DONT_CREATE_GVSV
 GV *
 Perl_gv_SVadd(pTHX_ GV *gv)
@@ -470,48 +466,6 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
     }
 
     return 0;
-}
-
-/*
-=for apidoc gv_fetchmeth_autoload
-
-Same as gv_fetchmeth(), but looks for autoloaded subroutines too.
-Returns a glob for the subroutine.
-
-For an autoloaded subroutine without a GV, will create a GV even
-if C<level < 0>.  For an autoloaded subroutine without a stub, GvCV()
-of the result may be zero.
-
-=cut
-*/
-
-GV *
-Perl_gv_fetchmeth_autoload(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
-{
-    GV *gv = gv_fetchmeth(stash, name, len, level);
-
-    if (!gv) {
-	CV *cv;
-	GV **gvp;
-
-	if (!stash)
-	    return NULL;	/* UNIVERSAL::AUTOLOAD could cause trouble */
-	if (len == S_autolen && strnEQ(name, S_autoload, S_autolen))
-	    return NULL;
-	if (!(gv = gv_fetchmeth(stash, S_autoload, S_autolen, FALSE)))
-	    return NULL;
-	cv = GvCV(gv);
-	if (!(CvROOT(cv) || CvXSUB(cv)))
-	    return NULL;
-	/* Have an autoload */
-	if (level < 0)	/* Cannot do without a stub */
-	    gv_fetchmeth(stash, name, len, 0);
-	gvp = (GV**)hv_fetch(stash, name, len, (level >= 0));
-	if (!gvp)
-	    return NULL;
-	return *gvp;
-    }
-    return gv;
 }
 
 /*
@@ -1476,7 +1430,7 @@ Perl_Gv_AMupdate(pTHX_ HV *stash)
 	   But if B overloads "bool", we may want to use it for
 	   numifying instead of C's "+0". */
 	if (i >= DESTROY_amg)
-	    gv = Perl_gv_fetchmeth_autoload(aTHX_ stash, cooky, l, 0);
+	    gv = Perl_gv_fetchmeth(aTHX_ stash, cooky, l, 0);
 	else				/* Autoload taken care of below */
 	    gv = Perl_gv_fetchmeth(aTHX_ stash, cooky, l, -1);
         cv = 0;

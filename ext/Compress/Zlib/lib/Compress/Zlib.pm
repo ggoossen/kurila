@@ -14,7 +14,7 @@ use IO::Uncompress::Gunzip v2.006 ;
 use strict ;
 use warnings ;
 use bytes ;
-our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
+our ($VERSION, $XS_VERSION, @ISA, @EXPORT);
 
 $VERSION = '2.007';
 $XS_VERSION = $VERSION; 

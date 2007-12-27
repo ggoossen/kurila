@@ -22,7 +22,6 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
 $VERSION = 0.83;
 use strict;
-use vars qw/$AUTOLOAD/;
 use warnings ();
 
 # Changes between 0.50 and 0.51:
@@ -468,27 +467,7 @@ sub stash_subs {
     my %stash = svref_2object($stash)->ARRAY;
     while (my ($key, $val) = each %stash) {
 	my $class = class($val);
-	if ($class eq "PV") {
-	    # Just a prototype. As an ugly but fairly effective way
-	    # to find out if it belongs here is to see if the AUTOLOAD
-	    # (if any) for the stash was defined in one of our files.
-	    my $A = $stash{"AUTOLOAD"};
-	    if (defined ($A) && class($A) eq "GV" && defined($A->CV)
-		&& class($A->CV) eq "CV") {
-		my $AF = $A->FILE;
-		next unless $AF eq $0 || exists $self->{'files'}{$AF};
-	    }
-	    push @{$self->{'protos_todo'}}, [$pack . $key, $val->PV];
-	} elsif ($class eq "IV") {
-	    # Just a name. As above.
-	    my $A = $stash{"AUTOLOAD"};
-	    if (defined ($A) && class($A) eq "GV" && defined($A->CV)
-		&& class($A->CV) eq "CV") {
-		my $AF = $A->FILE;
-		next unless $AF eq $0 || exists $self->{'files'}{$AF};
-	    }
-	    push @{$self->{'protos_todo'}}, [$pack . $key, undef];
-	} elsif ($class eq "GV") {
+        if ($class eq "GV") {
 	    if (class(my $cv = $val->CV) ne "SPECIAL") {
 		next if $self->{'subs_done'}{$$val}++;
 		next if $$val != ${$cv->GV};   # Ignore imposters

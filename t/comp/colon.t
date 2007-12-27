@@ -24,7 +24,7 @@ sub ok {
 
 $SIG{__WARN__} = sub { 1; }; # avoid some spurious warnings
 
-print "1..25\n";
+print "1..24\n";
 
 ok 1, (eval "package ABC; sub zyx \{1\}; 1;" and
 	eval "ABC::zyx" and
@@ -125,14 +125,10 @@ ok 22, (not eval "y:1" and
 	not eval "y:echo: eq y|echo|" and
 	eval "y:echo:ohce: +>= 0");
 
-ok 23, (eval "AUTOLOAD:1" and
-	not eval "AUTOLOAD:echo: eq AUTOLOAD|echo|" and
-	not eval "AUTOLOAD:echo:ohce: +>= 0");
-
-ok 24, (eval "and:1" and
+ok 23, (eval "and:1" and
 	not eval "and:echo: eq and|echo|" and
 	not eval "and:echo:ohce: +>= 0");
 
-ok 25, (eval "alarm:1" and
+ok 24, (eval "alarm:1" and
 	not eval "alarm:echo: eq alarm|echo|" and
 	not eval "alarm:echo:ohce: +>= 0");
