@@ -107,9 +107,9 @@ pod2man('lib', $opts{man3dir}, $opts{man3ext});
 my $has_man1dir = $opts{man1dir} ne '' && -d $opts{man1dir};
 open UTILS, "utils.lst" or die "Can't open 'utils.lst': $!";
 while (~< *UTILS) {
-    next if /^#/;
+    next if m/^#/;
     chomp;
-    $_ = $1 if /#.*pod\s*=\s*(\S+)/;
+    $_ = $1 if m/#.*pod\s*=\s*(\S+)/;
     my ($where, $what) = m|^(\S*)/(\S+)|;
     pod2man($where, $opts{man1dir}, $opts{man1ext}, $what);
     if ($has_man1dir) {
@@ -157,7 +157,7 @@ sub pod2man {
 	File::Find::find({no_chdir=>1,
                           wanted => sub {
                               # $_ is $File::Find::name when using no_chdir
-                              if (-f $_ and /\.p(?:m|od)$/) {
+                              if (-f $_ and m/\.p(?:m|od)$/) {
                                   my $fullname = $_;
                                   s!^\Q$poddir\E/!!;
                                   $modpods{$fullname} = $_;
@@ -181,7 +181,7 @@ sub pod2man {
 	    local $_;
 	    while (~< *T)
 	    {
-		++$has_pod and last if /^=(?:head\d+|item|pod)\b/;
+		++$has_pod and last if m/^=(?:head\d+|item|pod)\b/;
 	    }
 
 	    close T;
