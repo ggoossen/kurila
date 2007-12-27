@@ -22,7 +22,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 54;
+use Test::More tests => 55;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -360,3 +360,8 @@ $a = sub {
     return $x++;
 }
 ;
+####
+# 49 match
+{
+    $a =~ m/foo/;
+}

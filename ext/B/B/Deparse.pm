@@ -3513,7 +3513,7 @@ sub balanced_delim {
 sub single_delim {
     my($q, $default, $str) = @_;
     return "$default$str$default" if $default and index($str, $default) == -1;
-    if ($q ne 'qr') {
+    if ($q !~ m/^(?:qr|m)$/) {
 	(my $succeed, $str) = balanced_delim($str);
 	return "$q$str" if $succeed;
     }
@@ -4153,7 +4153,7 @@ sub matchop {
     }
 }
 
-sub pp_match { matchop(@_, "m", "/") }
+sub pp_match { matchop(@_, "m", "") }
 sub pp_pushre { matchop(@_, "m", "/") }
 sub pp_qr { matchop(@_, "qr", "") }
 
