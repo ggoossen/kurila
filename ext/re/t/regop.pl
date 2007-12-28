@@ -4,8 +4,8 @@ my @tests=(
   foobar =>  '[f][o][o][b][a][r]',
   x  =>  '.[XY].',
   'ABCD' => '(?:ABCP|ABCG|ABCE|ABCB|ABCA|ABCD)',
-  'D:\\dev/perl/ver/28321_/perl.exe'=>
-  'm/(\\.COM|\\.EXE|\\.BAT|\\.CMD|\\.VBS|\\.VBE|\\.JS|\\.JSE|\\.WSF|\\.WSH|\\.pyo|\\.pyc|\\.pyw|\\.py)$/i',
+  'D:\dev/perl/ver/28321_/perl.exe'=>
+  'm/(\.COM|\.EXE|\.BAT|\.CMD|\.VBS|\.VBE|\.JS|\.JSE|\.WSF|\.WSH|\.pyo|\.pyc|\.pyw|\.py)$/i',
   'q'=>'[q]',
 );
 while (@tests) {

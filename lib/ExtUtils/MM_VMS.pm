@@ -1502,9 +1502,9 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     }
     $libperldir = $self->fixpath((fileparse($libperl))[1],1);
 
-    push @m, '
-# Fill in the target you want to produce if it\'s not perl
-MAP_TARGET    = ',$self->fixpath($target,0),'
+    push @m, q|
+# Fill in the target you want to produce if it's not perl
+MAP_TARGET    = |,$self->fixpath($target,0),'
 MAP_SHRTARGET = ',$self->fixpath($shrtarget,0),"
 MAP_LINKCMD   = $linkcmd
 MAP_PERLINC   = ", $perlinc ? map('"$_" ',@{$perlinc}) : '',"

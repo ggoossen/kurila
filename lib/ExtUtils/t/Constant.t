@@ -527,7 +527,7 @@ EOT
 
   my @items = ("FIVE", {name=>"OK6", type=>"PV",},
                {name=>"OK7", type=>"PVN",
-                value=>['"not ok 7\\n\\0ok 7\\n"', 15]},
+                value=>['"not ok 7\n\0ok 7\n"', 15]},
                {name => "FARTHING", type=>"NV"},
                {name => "NOT_ZERO", type=>"UV", value=>"~(UV)0"},
                {name => "OPEN", type=>"PV", value=>'"/*"', macro=>1},

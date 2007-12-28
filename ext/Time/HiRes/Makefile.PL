@@ -29,7 +29,7 @@ unless($ENV{PERL_CORE}) {
 
 sub my_dirsep {
     $^O eq 'VMS' ? '.' :
-	$^O =~ m/mswin32|netware|djgpp/i ? '\\' :
+	$^O =~ m/mswin32|netware|djgpp/i ? '\' :
 	    $^O eq 'MacOS' ? ':'
 		: '/';
 }

@@ -62,15 +62,15 @@ sub dlsyms {
 	push(@m,"
 $self->{BASEEXT}.def: Makefile.PL
 ",
-     '	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -e \'use ExtUtils::Mksymlists; \\
-     Mksymlists("NAME" => "$(NAME)", "DLBASE" => "$(DLBASE)", ',
+     q|	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -e 'use ExtUtils::Mksymlists; \
+     Mksymlists("NAME" => "$(NAME)", "DLBASE" => "$(DLBASE)", |,
      '"VERSION" => "$(VERSION)", "DISTNAME" => "$(DISTNAME)", ',
      '"INSTALLDIRS" => "$(INSTALLDIRS)", ',
      '"DL_FUNCS" => ',neatvalue($funcs),
      ', "FUNCLIST" => ',neatvalue($funclist),
      ', "IMPORTS" => ',neatvalue($imports),
-     ', "DL_VARS" => ', neatvalue($vars), ');\'
-');
+     ', "DL_VARS" => ', neatvalue($vars), q|);'
+|);
     }
     if ($self->{IMPORTS} && %{$self->{IMPORTS}}) {
 	# Make import files (needed for static build)

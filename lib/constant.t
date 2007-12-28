@@ -72,7 +72,7 @@ is "d e f @{[ DEF ]} d e f", "d e f D E F d e f";
 
 use constant SINGLE	=> "'";
 use constant DOUBLE	=> '"';
-use constant BACK	=> '\\';
+use constant BACK	=> '\';
 my $tt = BACK . SINGLE . DOUBLE ;
 is $tt, q(\\'");
 

@@ -1829,11 +1829,11 @@ my %pretty_form = (
   "\cj" => '\cj',
   "\n" => '\n', # probably overrides one of either \cm or \cj
   '"' => '\"',
-  '\\' => '\\\\',
-  '$' => '\\$',
-  '@' => '\\@',
-  '%' => '\\%',
-  '#' => '\\#',
+  '\' => '\\',
+  '$' => '\$',
+  '@' => '\@',
+  '%' => '\%',
+  '#' => '\#',
 );
 
 sub pretty { # adopted from Class::Classless

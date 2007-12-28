@@ -409,7 +409,7 @@ sub getline {
 sub getlines {
     @_ == 1 or croak 'usage: $io->getlines()';
     wantarray or
-	croak 'Can\'t call $io->getlines in a scalar context, use $io->getline';
+	croak q|Can't call $io->getlines in a scalar context, use $io->getline|;
     my $this = shift;
     return ~< $this;
 }

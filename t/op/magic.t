@@ -468,5 +468,5 @@ else {
 # Can not do this test on VMS, EPOC, and SYMBIAN according to comments
 # in mg.c/Perl_magic_clear_all_env()
 #
-    skip('Can\'t make assignment to \%ENV on this system') for 1..3;
+    skip(q|Can't make assignment to \%ENV on this system|) for 1..3;
 }

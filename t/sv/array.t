@@ -118,7 +118,7 @@ is("@foo", "bar burbl blah");					# 39
 is("@foo", "XXX bar burbl blah YYY");				# 40
 
 @foo = @foo = qw(foo b\a\r bu\\rbl blah);
-is("@foo", 'foo b\a\r bu\\rbl blah');				# 41
+is("@foo", 'foo b\a\r bu\rbl blah');				# 41
 
 @bar = @foo = qw(foo bar);					# 42
 is("@foo", "foo bar");

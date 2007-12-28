@@ -95,7 +95,7 @@ sub gen_delimited_pat($;$)  # ($delimiters;$escapes)
 {
 	my ($dels, $escs) = @_;
 	return "" unless $dels =~ m/\S/;
-	$escs = '\\' unless $escs;
+	$escs = '\' unless $escs;
 	$escs .= substr($escs,-1) x (length($dels)-length($escs));
 	my @pat = ();
 	my $i;

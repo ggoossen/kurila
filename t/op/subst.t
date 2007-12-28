@@ -37,15 +37,15 @@ ok( ($a =~ s/b/y/g) == 1 && $a eq 'xyxcxdx' );
 $_ = 'ABACADA';
 ok( m/a/i && s///gi && $_ eq 'BCD' );
 
-$_ = '\\' x 4;
+$_ = '\' x 4;
 ok( length($_) == 4 );
 $snum = s/\\/\\\\/g;
-ok( $_ eq '\\' x 8 && $snum == 4 );
+ok( $_ eq '\' x 8 && $snum == 4 );
 
 $_ = '\/' x 4;
 ok( length($_) == 8 );
 $snum = s/\//\/\//g;
-ok( $_ eq '\\//' x 4 && $snum == 4 );
+ok( $_ eq '\//' x 4 && $snum == 4 );
 ok( length($_) == 12 );
 
 $_ = 'aaaXXXXbbb';
