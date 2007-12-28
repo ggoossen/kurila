@@ -1,6 +1,6 @@
 #!./perl
 
-print q(1..41
+print q(1..42
 );
 
 # This is() function is written to avoid ""
@@ -30,18 +30,6 @@ sub is {
     return 0;
 }
 
-{
-    use bytes;
-    local $SIG{__WARN__} = sub { };
-    is (eval '"\x53"', chr 83);
-    is (eval '"\x4EE"', chr (78) . 'E');
-    is (eval '"\x4i"', chr (4) . 'i');	# This will warn
-    is (eval '"\xh"', chr (0) . 'h');	# This will warn
-    is (eval '"\xx"', chr (0) . 'x');	# This will warn
-    is (eval '"\xx9"', chr (0) . 'x9');	# This will warn. \x9 is tab in EBCDIC too?
-    is (eval '"\x9_E"', chr (9) . '_E');	# This will warn
-}
-
 is ("\x{4E}", chr 78);
 is ("\x{6_9}", chr 105);
 is ("\x{_6_3}", chr 99);
@@ -63,14 +51,27 @@ is("\x[FF9]", "\x[FF]");
 is(" \{ 1 \} ", ' { 1 } ', " curly braces");
 is(qq{ \{ 1 \} }, ' { 1 } ', " curly braces inside curly braces");
 
+is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
+
 {
-  use utf8;
-  is ("\x{0065}", chr 101);
+    local $SIG{__WARN__} = sub { };
+    is (eval '"\x53"', chr 83);
+    is (eval '"\x4EE"', chr (78) . 'E');
+    is (eval '"\x4i"', chr (4) . 'i');	# This will warn
+    is (eval '"\xh"', chr (0) . 'h');	# This will warn
+    is (eval '"\xx"', chr (0) . 'x');	# This will warn
+    is (eval '"\xx9"', chr (0) . 'x9');	# This will warn. \x9 is tab in EBCDIC too?
+    is (eval '"\x9_E"', chr (9) . '_E');	# This will warn
+}
+
+{
+  require utf8;
+  is ("\x{0065}", utf8::chr(101));
   is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
-      chr 114);
-  is ("\x{0_06_5}", chr 101);
-  is ("\x{1234}", chr 4660);
-  is ("\x{10FFFD}", chr 1114109);
+      utf8::chr(114));
+  is ("\x{0_06_5}", utf8::chr(101));
+  is ("\x{1234}", utf8::chr(4660));
+  is ("\x{10FFFD}", utf8::chr(1114109));
   
   use charnames ':full';
   is ("\N{LATIN SMALL LETTER A}", "a");
