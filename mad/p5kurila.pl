@@ -535,7 +535,6 @@ sub lvalue_subs {
     }
 }
 
-<<<<<<< HEAD:mad/p5kurila.pl
 sub force_m {
     my $xml = shift;
     for my $op ($xml->findnodes(qq|//op_match|), $xml->findnodes(qq|//op_pushre|)) {
@@ -577,7 +576,20 @@ sub qq_block_escape {
     for my $prop (qw|assign value|) {
         my $v = get_madprop($op, $prop);
         next unless $v;
-        $v =~ s/([}{])/\\$1/g;
+        # sort of parser of '\\' and '\x{...}'
+        my @v = split m/\\\\/, $v, -1;
+        my @v_x = map { [split m'(\\[xN]{[^}]+})', $_, -1] } @v;
+        for my $vx (@v_x) {
+            my $i = 0;
+            for (@$vx) {
+                next if $i++ % 2;
+                s/(\A|[^\\])([}])/$1\\$2/g;
+                s/(\A|[^\\])([}])/$1\\$2/g;
+                s/(\A|[^\\])([{])/$1\\$2/g;
+                s/(\A|[^\\])([{])/$1\\$2/g;
+            }
+        }
+        $v = join "\\\\", map { join '', @$_ } @v_x;
         set_madprop($op, $prop, $v);
     }
     for my $child ($op->children) {
@@ -591,7 +603,15 @@ sub qq_block {
     my $xml = shift;
     for my $mad_quote ($xml->findnodes(qq|//madprops/mad_null_type_first[\@val="quote"]|)) {
         my $op = $mad_quote->parent->parent;
-        next unless get_madprop($op, "quote_open") =~ m/^(&#34;|&lt;&lt;[^'])/;
+        next unless get_madprop($op, "quote_open") =~ m/^(&#34;|&lt;&lt;[^']|qq)/;
+        qq_block_escape($op);
+    }
+
+    # '{' and '}' inside s/../../g;
+    for my $op_subst ($xml->findnodes(qq|//op_subst/|)) {
+        my $op = $op_subst->child(-1);
+        next unless $op and $op->tag ne "op_regcomp";
+        next unless get_madprop($op_subst, "subst_open") ne "'";
         qq_block_escape($op);
     }
 }
@@ -605,8 +625,10 @@ sub pointy_anon_hash {
     }
 }
 
-my $from = 0; # floating point number with starting version of kurila.
-GetOptions("from=f" => \$from);
+my $from; # floating point number with starting version of kurila.
+GetOptions("from=s" => \$from);
+$from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
+$from = { branch => $1, 'v' => $2};
 
 my $filename = shift @ARGV;
 
@@ -617,7 +639,7 @@ my $twig= XML::Twig->new( # keep_spaces => 1,
 
 $twig->parsefile( "-" );
 
-if ($from < 1.4 - 0.05) {
+if ($from->{v} < 1.4 - 0.05) {
     # replacing.
     for my $op ($twig->findnodes(q|//op_entersub|)) {
         entersub_handler($twig, $op);
@@ -635,7 +657,7 @@ if ($from < 1.4 - 0.05) {
     remove_typed_declaration($twig);
 }
 
-if ($from < 1.5 - 0.05) {
+if ($from->{v} < 1.5 - 0.05) {
     rename_bit_operators($twig);
     remove_useversion($twig);
     change_deref_method($twig);
@@ -647,7 +669,7 @@ if ($from < 1.5 - 0.05) {
 }
 #t_parenthesis($twig);
 
-if ($from < 1.6 - 0.05) {
+if ($from->{v} < 1.6 - 0.05) {
     remove_vstring( $twig );
     use_pkg_version($twig);
     lvalue_subs( $twig );
@@ -655,8 +677,10 @@ if ($from < 1.6 - 0.05) {
 
 #rename_pointy_ops( $twig );
 #pointy_anon_hash( $twig );
-force_m( $twig );
-qq_block( $twig );
+if ($from->{v} < 1.61) {
+     force_m( $twig );
+     qq_block( $twig );
+}
 
 # print
 $twig->print( pretty_print => 'indented' );
