@@ -21,14 +21,21 @@ typedef struct {
 #endif
 } yy_stack_frame;
 
-typedef struct yy_str_info {
-    SV *str_sv; /* SV holding the string */
-    char delim;  /* delimeter */
-} yy_str_info;
-
 #define LEXf_INPAT   0x01 /* pattern */
 #define LEXf_SINGLEQ 0x02 /* single quoted, both q*...* or qr'..' */
 #define LEXf_EXT_PAT 0x04 /* in an extended pattern */
+#define LEXf_ATTRS 0x08 /* in attributes */
+#define LEXf_DOUBLEQ 0x10 /* single quoted, both q*...* or qr'..' */
+#define LEXf_BACKTICK 0x20 /* single quoted, both q*...* or qr'..' */
+#define LEXf_QW 0x40 /* single quoted, both q*...* or qr'..' */
+#define LEXf_PROTOTYPE 0x80 /* single quoted, both q*...* or qr'..' */
+#define LEXf_REPL 0x100 /* single quoted, both q*...* or qr'..' */
+#define LEXf_HEREDOC 0x200 /* single quoted, both q*...* or qr'..' */
+
+typedef struct yy_str_info {
+    SV *str_sv; /* SV holding the string */
+    U16 flags;	/* flags for the lexer */
+} yy_str_info;
 
 typedef struct yy_parser {
 
@@ -56,7 +63,7 @@ typedef struct yy_parser {
     bool	lex_dojoin;	/* doing an array interpolation */
     U8		lex_expect;	/* expect after determined token */
     U8		expect;		/* how to interpret ambiguous tokens */
-    U8		lex_flags;	/* flags for the lexer */
+    U8 lex_flags;	/* flags for the lexer */
     OP		*lex_op;	/* extra info to pass back on op */
     U16		lex_inwhat;	/* what kind of quoting are we in */
     OPCODE	last_lop_op;	/* last list operator */
