@@ -172,7 +172,7 @@ EOF
 eval q{ foo::$bar };
 like( $@, qr/Bad name after foo::/, 'Bad name after foo::' );
 eval q{ foo''bar };
-like( $@, qr/Bad name after foo'/, 'Bad name after foo\'' );
+like( $@, qr/Bad name after foo'/, q|Bad name after foo'| );
 
 # test for ?: context error
 eval q{($a ? $x : ($y)) = 5};

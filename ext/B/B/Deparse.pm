@@ -3433,7 +3433,7 @@ my %unctrl = # portable to to EBCDIC
      "\cY" => '\cY',
      "\cZ" => '\cZ',
      "\c[" => '\c[',	# unused
-     "\c\\" => '\c\\',	# unused
+     "\c\\" => '\c\',	# unused
      "\c]" => '\c]',	# unused
      "\c_" => '\c_',	# unused
     );
@@ -3502,7 +3502,7 @@ sub balanced_delim {
 		    last;
 		}
 	    }
-	    $last_bs = $c eq '\\';
+	    $last_bs = $c eq '\';
 	}
 	$fail = 1 if $cnt != 0;
 	return ($open, "$open$str$close") if not $fail;
@@ -3778,31 +3778,31 @@ sub double_delim {
 # Only used by tr///, so backslashes hyphens
 sub pchr { # ASCII
     my($n) = @_;
-    if ($n == ord '\\') {
-	return '\\\\';
+    if ($n == ord '\') {
+	return '\\';
     } elsif ($n == ord "-") {
 	return "\\-";
     } elsif ($n +>= ord(' ') and $n +<= ord('~')) {
 	return chr($n);
     } elsif ($n == ord "\a") {
-	return '\\a';
+	return '\a';
     } elsif ($n == ord "\b") {
-	return '\\b';
+	return '\b';
     } elsif ($n == ord "\t") {
-	return '\\t';
+	return '\t';
     } elsif ($n == ord "\n") {
-	return '\\n';
+	return '\n';
     } elsif ($n == ord "\e") {
-	return '\\e';
+	return '\e';
     } elsif ($n == ord "\f") {
-	return '\\f';
+	return '\f';
     } elsif ($n == ord "\r") {
-	return '\\r';
+	return '\r';
     } elsif ($n +>= ord("\cA") and $n +<= ord("\cZ")) {
-	return '\\c' . chr(ord("@") + $n);
+	return '\c' . chr(ord("@") + $n);
     } else {
 #	return '\x' . sprintf("%02x", $n);
-	return '\\' . sprintf("%03o", $n);
+	return '\' . sprintf("%03o", $n);
     }
 }
 

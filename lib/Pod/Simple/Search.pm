@@ -73,7 +73,7 @@ sub survey {
     if($self->{'dir_prefix'}) {
       $start_in = File::Spec->catdir(
         $try,
-        grep length($_), split '[\\/:]+', $self->{'dir_prefix'}
+        grep length($_), split '[\/:]+', $self->{'dir_prefix'}
       );
       $modname_prefix = [grep length($_), split m{[:/\\]}, $self->{'dir_prefix'}];
       $verbose and print "Appending \"$self->{'dir_prefix'}\" to $try, ",

@@ -3301,7 +3301,7 @@ EOFTEST
         
     }
     $handle= make_must_warn('Ignoring zero length');
-    $handle->('qq(\\0) =~ m/[\N{EMPTY-STR}XY]/');
+    $handle->('qq(\0) =~ m/[\N{EMPTY-STR}XY]/');
     ok('AB'=~m/(\N{EVIL})/ && $1 eq 'A',"Charname caching $1");
     ok('ABC'=~m/(\N{EVIL})/,"Charname caching $1");    
     ok('xy'=~m/x\N{EMPTY-STR}y/, 'Empty string charname produces NOTHING node');

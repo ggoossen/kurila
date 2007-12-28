@@ -69,7 +69,7 @@ my @death =
 
  'm/(x)\2/' => 'Reference to nonexistent group in regex; marked by {#} in m/(x)\2{#}/',
 
- 'my $m = "\\\"; $m =~ $m', => 'Trailing \ in regex m/\/',
+ 'my $m = "\\"; $m =~ $m', => 'Trailing \ in regex m/\/',
 
  'm/\x{1/' => 'Missing right brace on \x{} in regex; marked by {#} in m/\x{{#}1/',
 

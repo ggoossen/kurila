@@ -85,7 +85,7 @@ sub doglob {
 	    # has a dot *and* name is shorter than 9 chars.
 	    #
 	    if (index($e,'.') == -1 and length($e) +< 9
-	        and index($pat,'\\.') != -1) {
+	        and index($pat,'\.') != -1) {
 		push(@matched, "$head$e"), next INNER if &$matchsub("$e.");
 	    }
 	}
@@ -181,7 +181,7 @@ sub doglob_Mac {
 	$_ =~ s/(\\*)([*?])/{$1 . ('.' x ((length($1) + 1) % 2)) . $2}/g;
 
 	#print "regex: '$_', head: '$head', unescaped head: '$not_esc_head'\n";
-	my $matchsub = eval 'sub { $_[0] =~ m|^' . $_ . '\\z|ios }';
+	my $matchsub = eval 'sub { $_[0] =~ m|^' . $_ . '\z|ios }';
 	warn($@), next OUTER if $@;
       INNER:
 	for my $e (@leaves) {

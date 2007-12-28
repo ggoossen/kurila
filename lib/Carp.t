@@ -246,12 +246,12 @@ sub w { cluck @_ }
     runperl(prog => 'use Carp; $@=q{Phooey}; $!=42; croak(q{Dead})', 
 	    stderr => 1);
 
-    is($?>>8, 42, 'croak() doesn\'t clobber $!');
+    is($?>>8, 42, q|croak() doesn't clobber $!|);
 
     runperl(prog => 'use Carp; $@=q{Phooey}; $!=42; confess(q{Dead})', 
 	    stderr => 1);
 
-    is($?>>8, 42, 'confess() doesn\'t clobber $!');
+    is($?>>8, 42, q|confess() doesn't clobber $!|);
 }
 
 # undef used to be incorrectly reported as the string "undef"

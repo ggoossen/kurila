@@ -134,7 +134,7 @@ sub _qq {
 
 # keys are the codes \n etc map to, values are 2 char strings such as \n
 my %backslash_escape;
-foreach my $x (split m//, 'nrtfa\\\'"') {
+foreach my $x (split m//, q|nrtfa\'"|) {
     $backslash_escape{ord eval "\"\\$x\""} = "\\$x";
 }
 # A way to display scalars containing control characters and Unicode.

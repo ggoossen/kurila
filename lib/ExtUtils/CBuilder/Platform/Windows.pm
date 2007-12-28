@@ -56,11 +56,11 @@ sub split_like_shell {
     my $ch      = substr( $_, $i  , 1 );
     my $next_ch = substr( $_, $i+1, 1 );
     
-    if ( $ch eq '\\' && $next_ch eq '"' ) {
+    if ( $ch eq '\' && $next_ch eq '"' ) {
       $arg .= '"';
       $i++;
-    } elsif ( $ch eq '\\' && $next_ch eq '\\' ) {
-      $arg .= '\\';
+    } elsif ( $ch eq '\' && $next_ch eq '\' ) {
+      $arg .= '\';
       $i++;
     } elsif ( $ch eq '"' && $next_ch eq '"' && $quote_mode ) {
       $quote_mode = !$quote_mode;

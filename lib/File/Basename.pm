@@ -123,7 +123,7 @@ sub fileparse {
 
   if (grep { $type eq $_ } qw(MSDOS DOS MSWin32 Epoc)) {
     ($dirpath,$basename) = ($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
-    $dirpath .= '.\\' unless $dirpath =~ m/[\\\/]\z/;
+    $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/;
   }
   elsif ($type eq "OS2") {
     ($dirpath,$basename) = ($fullname =~ m#^((?:.*[:\\/])?)(.*)#s);

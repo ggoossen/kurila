@@ -94,7 +94,7 @@ ok(close($utffh));
 # in-memory open
 {
     my $var;
-    ok( open(my $x,"+<",\$var), 'magic in-memory file via 3 arg open with \\$var');
+    ok( open(my $x,"+<",\$var), 'magic in-memory file via 3 arg open with \$var');
     ok( defined fileno($x),     '       fileno' );
 
     select $x;

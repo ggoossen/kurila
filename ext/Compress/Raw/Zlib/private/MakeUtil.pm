@@ -50,10 +50,10 @@ sub MY::postamble
     my $postamble = '
 
 MyTrebleCheck:
-	@echo Checking for $$^W in files: '. "@files" . '
-	@perl -ne \'						\
+	@echo Checking for $$^W in files: '. "@files" . q|
+	@perl -ne '						\
 	    exit 1 if /^\s*local\s*\(\s*\$$\^W\s*\)/;		\
-         \' ' . " @files || " . '				\
+         ' | . " @files || " . '				\
 	(echo found unexpected $$^W ; exit 1)
 	@echo All is ok.
 

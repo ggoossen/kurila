@@ -131,9 +131,9 @@ sub init_DIRFILESEP {
     my $make = $self->make;
 
     # The ^ makes sure its not interpreted as an escape in nmake
-    $self->{DIRFILESEP} = $make eq 'nmake' ? '^\\' :
-                          $make eq 'dmake' ? '\\\\'
-                                           : '\\';
+    $self->{DIRFILESEP} = $make eq 'nmake' ? '^\' :
+                          $make eq 'dmake' ? '\\'
+                                           : '\';
 }
 
 =item B<init_others>

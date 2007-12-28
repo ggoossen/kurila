@@ -306,9 +306,9 @@ sub _dump {
       }
       else {
         # store our name
-        $s->{seen}{$id} = [ (($name =~ m/^[@%]/)     ? ('\\' . $name ) :
+        $s->{seen}{$id} = [ (($name =~ m/^[@%]/)     ? ('\' . $name ) :
 			     ($realtype eq 'CODE' and
-			      $name =~ m/^[*](.*)$/) ? ('\\&' . $1 )   :
+			      $name =~ m/^[*](.*)$/) ? ('\&' . $1 )   :
 			     $name          ),
 			    $val ];
       }
@@ -343,14 +343,14 @@ sub _dump {
 
     if ($realtype eq 'SCALAR' || $realtype eq 'REF') {
       if ($realpack) {
-	$out .= 'do{\\(my $o = ' . $s->_dump($$val, "\$\{$name\}") . ')}';
+	$out .= 'do{\(my $o = ' . $s->_dump($$val, "\$\{$name\}") . ')}';
       }
       else {
-	$out .= '\\' . $s->_dump($$val, "\$\{$name\}");
+	$out .= '\' . $s->_dump($$val, "\$\{$name\}");
       }
     }
     elsif ($realtype eq 'GLOB') {
-	$out .= '\\' . $s->_dump($$val, "*\{$name\}");
+	$out .= '\' . $s->_dump($$val, "*\{$name\}");
     }
     elsif ($realtype eq 'ARRAY') {
       my($v, $pad, $mname);

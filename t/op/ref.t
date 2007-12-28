@@ -239,7 +239,7 @@ is (scalar grep(ref($_), @baa), 3);
 is (scalar (@bzz), 3);
 
 # also, it can't be an lvalue
-eval '\\($x, $y) = (1, 2);';
+eval '\($x, $y) = (1, 2);';
 like ($@, qr/Can\'t modify.*ref.*in.*assignment/);
 
 # test for proper destruction of lexical objects
