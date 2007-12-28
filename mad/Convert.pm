@@ -30,7 +30,7 @@ sub convert {
     }
 
     # sanity Perl 5 to Perl 5 works.
-    my $p5 = Nomad::xml_to_p5( input => "$file.xml" );
+    my $p5 = Nomad::xml_to_p5( input => "$file.xml", version => $options{from} );
     if ($p5 ne $input) {
         use Text::Diff;
         warn diff(\$input, \$p5);
@@ -40,11 +40,12 @@ sub convert {
     # transform XML
     if ($convert) {
         rename "$file.xml", "$file.xml.org";
-        system "cat $file.xml.org | $convert > $file.xml" and die "Failed converting";
+        (system "cat $file.xml.org | $convert > $file.xml") == 0
+          or die "Failed converting";
     }
 
     # XML back to Perl 5
-    return Nomad::xml_to_p5( input => "$file.xml" );
+    return Nomad::xml_to_p5( input => "$file.xml", version => $options{to} );
 }
 
 1;

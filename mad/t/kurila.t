@@ -15,7 +15,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 1.5;
+my $from = 'kurila-1.6';
+my $to = 'kurila-1.61';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -23,7 +24,9 @@ sub p5convert {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     local $TODO = $TODO || ($input =~ m/^[#]\s*TODO/);
-    my $output = Convert::convert($input, "/usr/bin/env perl ../mad/p5kurila.pl",
+    my $output = Convert::convert($input,
+                                  "/usr/bin/env perl ../mad/p5kurila.pl --from $from",
+                                  from => $from, to => $to,
                                   dumpcommand => "$ENV{madpath}/perl");
     is($output, $expected) or $TODO or die;
 }
@@ -31,8 +34,10 @@ sub p5convert {
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
-t_string_block();
+t_qstring();
 die;
+t_subst_eval();
+t_string_block();
 t_force_m();
 t_pointy_op();
 t_lvalue_subs();
@@ -684,7 +689,43 @@ END
 
 }
 
+sub t_subst_eval {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+s/x/1/e;
+----
+s/x/{1}/;
+====
+s/x//eg;
+----
+s/x/{}/g;
+====
+s/(x)/uc($1)/eg;
+----
+s/(x)/{uc($1)}/g;
+====
+sub foo {}
+s/(x)/foo($1)/eg;
+----
+sub foo {}
+s/(x)/{foo($1)}/g;
+====
+END
+}
+
+sub t_qstring {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+'foo\'bar'
+----
+q|foo'bar|
+====
+'foo\\bar'
+----
+'foo\bar'
+END
+}
+
 sub t_string_block {
+    my $x = "abc";
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
 "foo { ";
 'foo { ';
@@ -704,5 +745,32 @@ FOO
 ----
 "\$ \{"
 ====
+<<"FOO";
+$x {
+FOO
+----
+<<"FOO";
+$x \{
+FOO
+====
+qq{ {} };
+----
+qq{ \{\} };
+====
+"\x{FF}";
+"\\x{FF}";
+"foo\{FF}";
+----
+"\x{FF}";
+"\\x\{FF\}";
+"foo\{FF\}";
+====
+s//ab{c/g;
+s''de{f'g;
+s/${a}{4}//g;
+----
+s//ab\{c/g;
+s''de{f'g;
+s/${a}{4}//g;
 END
 }

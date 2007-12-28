@@ -24,6 +24,8 @@ sub xml_to_p5 {
     my $YAML = $options{'YAML'};
 
     $::curenc = 0;		# start in utf8.
+    $options{'version'} =~ m/(\w+)[-]([\d.]+)$/ or die "invalid version: '$options{version}'";
+    $::version = { branch => $1, 'v' => $2};
 
     local $SIG{__DIE__} = sub {
         my $e = shift;
@@ -60,6 +62,7 @@ sub xml_to_p5 {
 $::curstate = 0;
 $::prevstate = 0;
 $::curenc = 0;		# start in utf8.
+$::version = 0;
 
 $::H = "HeredocHere000";
 %::H = ();
@@ -855,33 +858,50 @@ sub innerpmop {
 	    }
 	    $really = $$really{Kids}[0];
 	}
-	if (ref $really eq 'PLXML::op_scope' and
-	    @{$$really{Kids}} == 1 and
-	    ref $$really{Kids}[0] eq 'PLXML::op_null' and
-	    not @{$$really{Kids}[0]{Kids}})
-	{
-	    $bits->{repl} = '';
-	    return;
-	}
-	if (ref $really eq 'PLXML::op_leave' and
-	    @{$$really{Kids}} == 2 and
-	    ref $$really{Kids}[1] eq 'PLXML::op_null' and
-	    not @{$$really{Kids}[1]{Kids}})
-	{
-	    $bits->{repl} = '';
-	    return;
-	}
-	if ((ref $really) =~ /^PLXML::op_(scope|leave)/) {
-	    # should be at inner do {...} here, so skip that fakery too
-	    $bits->{repl} = $really->newtype->new(Kids => [$really->PLXML::op_lineseq::lineseq(@_)]);
-	    # but retrieve the whitespace before fake '}'
-	    if ($$really{mp}{'_}'}) {
-		push(@{$bits->{repl}->{Kids}}, p5::junk->new($$really{mp}{'_}'}));
-	    }
-	}
-	else {	# something else, padsv probably
-	    $bits->{repl} = $really->ast(@_);
-	}
+        if ( $::version->{branch} eq 'kurila' and $::version->{'v'} > 1.6 ) {
+            if ((ref $really) =~ m/PLXML::op_(scope|leave)/) {
+                # remove whitespace in front of the '{'
+                if (ref $really eq 'PLXML::op_scope' and
+                    @{$$really{Kids}} == 1 and
+                    ref $$really{Kids}[0] eq 'PLXML::op_null' and
+                    not @{$$really{Kids}[0]{Kids}}) {
+                    $really->{Kids}[0]->{mp}{'_{'} = '';
+                } else {
+                    $really->{mp}{'_{'} = '';
+                }
+            }
+
+            $bits->{repl} = $really->ast(@_);
+        }
+        else {
+            if (ref $really eq 'PLXML::op_scope' and
+                @{$$really{Kids}} == 1 and
+                ref $$really{Kids}[0] eq 'PLXML::op_null' and
+                not @{$$really{Kids}[0]{Kids}})
+              {
+                  $bits->{repl} = '';
+                  return;
+              }
+            if (ref $really eq 'PLXML::op_leave' and
+                @{$$really{Kids}} == 2 and
+                ref $$really{Kids}[1] eq 'PLXML::op_null' and
+                not @{$$really{Kids}[1]{Kids}})
+              {
+                  $bits->{repl} = '';
+                  return;
+              }
+            if ((ref $really) =~ /^PLXML::op_(scope|leave)/) {
+                # should be at inner do {...} here, so skip that fakery too
+                $bits->{repl} = $really->newtype->new(Kids => [$really->PLXML::op_lineseq::lineseq(@_)]);
+                # but retrieve the whitespace before fake '}'
+                if ($$really{mp}{'_}'}) {
+                    push(@{$bits->{repl}->{Kids}}, p5::junk->new($$really{mp}{'_}'}));
+                }
+            }
+            else {	# something else, padsv probably
+                $bits->{repl} = $really->ast(@_);
+            }
+        }
     }
 }
 
@@ -1768,6 +1788,10 @@ sub ast {
     # remove the fake '\n' if /e and '#' in replacement.
     if (@mods and $mods[0] =~ m/e/ and ($self->madness('R'))[0]->uni =~ m/#/) {
         unshift @rlast, bless {}, 'chomp'; # hack to remove '\n'
+    }
+    # remove 'e' options
+    if (@mods and $::version->{branch} eq 'kurila' and $::version->{'v'} > 1.6) {
+        $mods[0]->{uni} =~ s/e//;
     }
     push @newkids, $bits->{repl}, @rlast, @mods;
 

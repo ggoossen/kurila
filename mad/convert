@@ -31,14 +31,16 @@ use Fatal qw|open close|;
     }
     my $output = eval { Convert::convert($input,
                                          "$ENV{madconvert}",
+                                         from => "$ENV{madfrom}",
+                                         to => "$ENV{madto}",
                                          dumpcommand => "$ENV{madperl}",
                                          switches => join ' ', map { "-I $_" } @lib ) };
     if ($output) {
-#         if ($input ne $output) {
-        open my $fh, '>', "$filename.p5k" or die;
-        $fh->print($output);
-        close $fh or die;
-#         }
+        if ($input ne $output) {
+            open my $fh, '>', "$filename.p5k" or die;
+            $fh->print($output);
+            close $fh or die;
+        }
     } else {
         warn "Failed converting $filename:\n\n$@\n\n";
     }
