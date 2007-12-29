@@ -219,7 +219,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 			        return;
 			}
 			my $expected = pop(@nesting);
-			$expected =~ tr'({[<')}]>';
+			$expected =~ tr/(\{[</)\}]>/;
 			if ($expected ne $brackettype)
 			{
 				_failmsg qq{Mismatched closing bracket: expected "$expected" but found "$found"},
@@ -267,7 +267,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 sub _revbracket($)
 {
 	my $brack = reverse $_[0];
-	$brack =~ tr'[({<'])}>';
+	$brack =~ tr/[(\{</])\}>/;
 	return $brack;
 }
 

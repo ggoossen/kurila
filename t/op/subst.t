@@ -25,7 +25,7 @@ ok( $_ eq '$x foo', ":$_: eq :\$x foo:" );
 
 $b = 'cd';
 ($a = 'abcdef') =~ s<(b${b}e)>'\n$1';
-ok( $1 eq 'bcde' && $a eq 'a\n$1f', ":$1: eq :bcde: ; :$a: eq :a\\n\$1f:" );
+ok( $1 eq 'bcde' && $a eq "a\nbcdef" );
 
 $a = 'abacada';
 ok( ($a =~ s/a/x/g) == 4 && $a eq 'xbxcxdx' );

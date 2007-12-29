@@ -114,7 +114,7 @@ print "ok 26\n";
 print "d" =~ m/^$X[-1]$/ ? "ok 27\n" : "not ok 27\n";
 print "a1" !~ m/^$X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 
-print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}{\)\}}') ? "ok 29\n" : "not ok 29\n");
+print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}} . q{{\)\}}') ? "ok 29\n" : "not ok 29\n");
 
 $foo = "not ok 30\n";
 $foo =~ s/^not /{substr(<<EOF, 0, 0)}/;
