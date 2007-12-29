@@ -311,7 +311,6 @@ ext/Encode/Encode/_PM.e2x	Skeleton file for enc2xs
 ext/Encode/Encode/README.e2x	Skeleton file for enc2xs
 ext/Encode/Encode/_T.e2x	Skeleton file for enc2xs
 ext/Encode/Encode.xs		Encode extension
-ext/Encode/encoding.pm		Perl Pragmatic Module
 ext/Encode/JP/JP.pm		Encode extension
 ext/Encode/JP/Makefile.PL	Encode extension
 ext/Encode/KR/KR.pm		Encode extension
@@ -344,12 +343,7 @@ ext/Encode/t/big5-eten.utf	test data
 ext/Encode/t/big5-hkscs.enc	test data
 ext/Encode/t/big5-hkscs.utf	test data
 ext/Encode/t/CJKT.t		test script
-ext/Encode/t/enc_data.t		test script for utf8 DATA
-ext/Encode/t/enc_eucjp.t	test script
-ext/Encode/t/enc_module.enc	test data for t/enc_module.t
-ext/Encode/t/enc_module.t	test script
 ext/Encode/t/Encode.t		test script
-ext/Encode/t/enc_utf8.t		test script
 ext/Encode/t/fallback.t		test script
 ext/Encode/t/from_to.t		test script
 ext/Encode/t/gb2312.enc		test data
@@ -363,13 +357,11 @@ ext/Encode/t/jisx0208.enc	test data
 ext/Encode/t/jisx0208.utf	test data
 ext/Encode/t/jisx0212.enc	test data
 ext/Encode/t/jisx0212.utf	test data
-ext/Encode/t/jperl.t		test script
 ext/Encode/t/ksc5601.enc	test data
 ext/Encode/t/ksc5601.utf	test data
 ext/Encode/t/mime_header_iso2022jp.t	test script
 ext/Encode/t/mime-header.t	test script
 ext/Encode/t/mime-name.t	test script
-ext/Encode/t/Mod_EUCJP.pm	module that t/enc_module.enc uses
 ext/Encode/t/perlio.t		test script
 ext/Encode/t/rt.pl		test script
 ext/Encode/t/unibench.pl	benchmark script
@@ -3259,13 +3251,9 @@ t/test.pl			Simple testing library
 t/uni/case.pl			See if Unicode casing works
 t/uni/class.t			See if Unicode classes work (\p)
 t/uni/fold.t			See if Unicode folding works
-t/uni/greek.t			See if Unicode in greek works
 t/uni/lower.t			See if Unicode casing works
 t/uni/sprintf.t			See if Unicode sprintf works
 t/uni/title.t			See if Unicode casing works
-t/uni/tr_7jis.t			See if Unicode tr/// in 7jis works
-t/uni/tr_eucjp.t		See if Unicode tr/// in eucjp works
-t/uni/tr_sjis.t			See if Unicode tr/// in sjis works
 t/uni/tr_utf8.t			See if Unicode tr/// in utf8 works
 t/uni/upper.t			See if Unicode casing works
 t/win32/system.t		See if system works in Win*
