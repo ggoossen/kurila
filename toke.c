@@ -1462,38 +1462,8 @@ S_force_version(pTHX_ char *s)
 STATIC SV *
 S_tokeq(pTHX_ SV *sv)
 {
-    dVAR;
-    register char *s;
-    register char *send;
-    register char *d;
-    STRLEN len = 0;
-    SV *pv = sv;
-
-    if (!SvLEN(sv))
-	goto finish;
-
-    s = SvPV_force(sv, len);
-    send = s + len;
-    while (s < send && *s != '\\')
-	s++;
-    if (s == send)
-	goto finish;
-    d = s;
-    if ( PL_hints & HINT_NEW_STRING ) {
-	pv = sv_2mortal(newSVpvn(SvPVX_const(pv), len));
-    }
-    while (s < send) {
-	if (*s == '\\') {
-	    if (s + 1 < send && (s[1] == '\\'))
-		s++;		/* all that, just for this */
-	}
-	*d++ = *s++;
-    }
-    *d = '\0';
-    SvCUR_set(sv, d - SvPVX_const(sv));
-  finish:
     if ( PL_hints & HINT_NEW_STRING )
-       return new_constant(NULL, 0, "q", sv, pv, "q", 1);
+       return new_constant(NULL, 0, "q", sv, sv, "q", 1);
     return sv;
 }
 
@@ -2949,22 +2919,13 @@ Perl_yylex(pTHX)
 	if (PL_bufptr == PL_bufend)
 	    return REPORT(sublex_done());
 
-	if (PL_lex_flags & LEXf_SINGLEQ) {
-	    SV *sv = newSVsv(PL_linestr);
-	    if (! PL_lex_flags & LEXf_INPAT)
-		sv = tokeq(sv);
-	    else if ( PL_hints & HINT_NEW_RE )
-		sv = new_constant(NULL, 0, "qr", sv, sv, "q", 1);
-	    yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv);
-	    s = PL_bufend;
-	}
-	else {
-	    s = scan_const(PL_bufptr);
-	    if (*s == '\\')
-		PL_lex_state = LEX_INTERPCASEMOD;
-	    else
-		PL_lex_state = LEX_INTERPSTART;
-	}
+	assert( ! (PL_lex_flags & LEXf_SINGLEQ) );
+
+	s = scan_const(PL_bufptr);
+	if (*s == '\\')
+	    PL_lex_state = LEX_INTERPCASEMOD;
+	else
+	    PL_lex_state = LEX_INTERPSTART;
 
 	if (s != PL_bufptr) {
 	    start_force(PL_curforce);
