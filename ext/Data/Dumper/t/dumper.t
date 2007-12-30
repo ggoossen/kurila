@@ -102,7 +102,7 @@ print "1..$TMAX\n";
 #############
 #############
 
-@c = ('c');
+@c = ("c");
 $c = \@c;
 $b = {};
 $a = [1, $b, $c];
@@ -116,16 +116,16 @@ $WANT = <<'EOT';
 #$a = [
 #       1,
 #       {
-#         'a' => $a,
-#         'b' => $a->[1],
-#         'c' => [
-#                  'c'
+#         "a" => $a,
+#         "b" => $a->[1],
+#         "c" => [
+#                  "c"
 #                ]
 #       },
-#       $a->[1]{'c'}
+#       $a->[1]{"c"}
 #     ];
 #$b = $a->[1];
-#$6 = $a->[1]{'c'};
+#$6 = $a->[1]{"c"};
 EOT
 
 TEST q(Data::Dumper->Dump([$a,$b,$c], [qw(a b), 6]));
@@ -138,17 +138,17 @@ $WANT = <<'EOT';
 #@a = (
 #       1,
 #       {
-#         'a' => [],
-#         'b' => {},
-#         'c' => [
-#                  'c'
+#         "a" => [],
+#         "b" => {},
+#         "c" => [
+#                  "c"
 #                ]
 #       },
 #       []
 #     );
-#$a[1]{'a'} = \@a;
-#$a[1]{'b'} = $a[1];
-#$a[2] = $a[1]{'c'};
+#$a[1]{"a"} = \@a;
+#$a[1]{"b"} = $a[1];
+#$a[2] = $a[1]{"c"};
 #$b = $a[1];
 EOT
 
@@ -160,20 +160,20 @@ TEST q(Data::Dumper->Dumpxs([$a, $b], [qw(*a b)])) if $XS;
 ##
 $WANT = <<'EOT';
 #%b = (
-#       'a' => [
+#       "a" => [
 #                1,
 #                {},
 #                [
-#                  'c'
+#                  "c"
 #                ]
 #              ],
-#       'b' => {},
-#       'c' => []
+#       "b" => {},
+#       "c" => []
 #     );
-#$b{'a'}[1] = \%b;
-#$b{'b'} = \%b;
-#$b{'c'} = $b{'a'}[2];
-#$a = $b{'a'};
+#$b{"a"}[1] = \%b;
+#$b{"b"} = \%b;
+#$b{"c"} = $b{"a"}[2];
+#$a = $b{"a"};
 EOT
 
 TEST q(Data::Dumper->Dump([$b, $a], [qw(*b a)])); # print as %b
@@ -185,15 +185,15 @@ $WANT = <<'EOT';
 #$a = [
 #  1,
 #  {
-#    'a' => [],
-#    'b' => {},
-#    'c' => []
+#    "a" => [],
+#    "b" => {},
+#    "c" => []
 #  },
 #  []
 #];
-#$a->[1]{'a'} = $a;
-#$a->[1]{'b'} = $a->[1];
-#$a->[1]{'c'} = \@c;
+#$a->[1]{"a"} = $a;
+#$a->[1]{"b"} = $a->[1];
+#$a->[1]{"c"} = \@c;
 #$a->[2] = \@c;
 #$b = $a->[1];
 EOT
@@ -201,13 +201,13 @@ EOT
 $Data::Dumper::Indent = 1;
 TEST q(
        $d = Data::Dumper->new([$a,$b], [qw(a b)]);
-       $d->Seen({'*c' => $c});
+       $d->Seen({"*c" => $c});
        $d->Dump;
       );
 if ($XS) {
   TEST q(
 	 $d = Data::Dumper->new([$a,$b], [qw(a b)]);
-	 $d->Seen({'*c' => $c});
+	 $d->Seen({"*c" => $c});
 	 $d->Dumpxs;
 	);
 }
@@ -225,7 +225,7 @@ $WANT = <<'EOT';
 #         b => $a->[1],
 #         c => [
 #                #0
-#                'c'
+#                "c"
 #              ]
 #       },
 #       #2
@@ -246,17 +246,17 @@ $WANT = <<'EOT';
 #$VAR1 = [
 #  1,
 #  {
-#    'a' => [],
-#    'b' => {},
-#    'c' => [
-#      'c'
+#    "a" => [],
+#    "b" => {},
+#    "c" => [
+#      "c"
 #    ]
 #  },
 #  []
 #];
-#$VAR1->[1]{'a'} = $VAR1;
-#$VAR1->[1]{'b'} = $VAR1->[1];
-#$VAR1->[2] = $VAR1->[1]{'c'};
+#$VAR1->[1]{"a"} = $VAR1;
+#$VAR1->[1]{"b"} = $VAR1->[1];
+#$VAR1->[2] = $VAR1->[1]{"c"};
 EOT
 
 TEST q(Dumper($a));
@@ -271,7 +271,7 @@ $WANT = <<'EOT';
 #    a => $VAR1,
 #    b => $VAR1->[1],
 #    c => [
-#      'c'
+#      "c"
 #    ]
 #  },
 #  $VAR1->[1]{c}
@@ -307,7 +307,7 @@ $foo = { "abc\000\'\efg" => "mno\000",
   $WANT = <<"EOT";
 #\$VAR1 = \{
 #  "abc\\x00'\efg" => "mno\\x00",
-#  'reftest' => \\\\1
+#  "reftest" => \\\\1
 #\};
 EOT
 
@@ -342,16 +342,16 @@ EOT
 #           do{my $o},
 #           #2
 #           {
-#             'a' => 1,
-#             'b' => do{my $o},
-#             'c' => [],
-#             'd' => {}
+#             "a" => 1,
+#             "b" => do{my $o},
+#             "c" => [],
+#             "d" => {}
 #           }
 #         ];
 #*::foo{ARRAY}->[1] = $foo;
-#*::foo{ARRAY}->[2]{'b'} = *::foo{SCALAR};
-#*::foo{ARRAY}->[2]{'c'} = *::foo{ARRAY};
-#*::foo{ARRAY}->[2]{'d'} = *::foo{ARRAY}->[2];
+#*::foo{ARRAY}->[2]{"b"} = *::foo{SCALAR};
+#*::foo{ARRAY}->[2]{"c"} = *::foo{ARRAY};
+#*::foo{ARRAY}->[2]{"d"} = *::foo{ARRAY}->[2];
 #*::foo = *::foo{ARRAY}->[2];
 #@bar = @{*::foo{ARRAY}};
 #%baz = %{*::foo{ARRAY}->[2]};
@@ -359,7 +359,7 @@ EOT
 
   $Data::Dumper::Purity = 1;
   $Data::Dumper::Indent = 3;
-  TEST q(Data::Dumper->Dump([\\*foo, \\@foo, \\%foo], ['*foo', '*bar', '*baz']));
+  TEST q(Data::Dumper->Dump([\\*foo, \\@foo, \\%foo], ["*foo", "*bar", '*baz']));
   TEST q(Data::Dumper->Dumpxs([\\*foo, \\@foo, \\%foo], ['*foo', '*bar', '*baz'])) if $XS;
 
 ############# 55
@@ -371,16 +371,16 @@ EOT
 #  -10,
 #  do{my $o},
 #  {
-#    'a' => 1,
-#    'b' => do{my $o},
-#    'c' => [],
-#    'd' => {}
+#    "a" => 1,
+#    "b" => do{my $o},
+#    "c" => [],
+#    "d" => {}
 #  }
 #];
 #*::foo{ARRAY}->[1] = $foo;
-#*::foo{ARRAY}->[2]{'b'} = *::foo{SCALAR};
-#*::foo{ARRAY}->[2]{'c'} = *::foo{ARRAY};
-#*::foo{ARRAY}->[2]{'d'} = *::foo{ARRAY}->[2];
+#*::foo{ARRAY}->[2]{"b"} = *::foo{SCALAR};
+#*::foo{ARRAY}->[2]{"c"} = *::foo{ARRAY};
+#*::foo{ARRAY}->[2]{"d"} = *::foo{ARRAY}->[2];
 #*::foo = *::foo{ARRAY}->[2];
 #$bar = *::foo{ARRAY};
 #$baz = *::foo{ARRAY}->[2];
@@ -401,14 +401,14 @@ EOT
 #*::foo = \5;
 #*::foo = \@bar;
 #*::foo = {
-#  'a' => 1,
-#  'b' => do{my $o},
-#  'c' => [],
-#  'd' => {}
+#  "a" => 1,
+#  "b" => do{my $o},
+#  "c" => [],
+#  "d" => {}
 #};
-#*::foo{HASH}->{'b'} = *::foo{SCALAR};
-#*::foo{HASH}->{'c'} = \@bar;
-#*::foo{HASH}->{'d'} = *::foo{HASH};
+#*::foo{HASH}->{"b"} = *::foo{SCALAR};
+#*::foo{HASH}->{"c"} = \@bar;
+#*::foo{HASH}->{"d"} = *::foo{HASH};
 #$bar[2] = *::foo{HASH};
 #%baz = %{*::foo{HASH}};
 #$foo = $bar[1];
@@ -428,14 +428,14 @@ EOT
 #*::foo = \5;
 #*::foo = $bar;
 #*::foo = {
-#  'a' => 1,
-#  'b' => do{my $o},
-#  'c' => [],
-#  'd' => {}
+#  "a" => 1,
+#  "b" => do{my $o},
+#  "c" => [],
+#  "d" => {}
 #};
-#*::foo{HASH}->{'b'} = *::foo{SCALAR};
-#*::foo{HASH}->{'c'} = $bar;
-#*::foo{HASH}->{'d'} = *::foo{HASH};
+#*::foo{HASH}->{"b"} = *::foo{SCALAR};
+#*::foo{HASH}->{"c"} = $bar;
+#*::foo{HASH}->{"d"} = *::foo{HASH};
 #$bar->[2] = *::foo{HASH};
 #$baz = *::foo{HASH};
 #$foo = $bar->[1];
@@ -505,8 +505,8 @@ EOT
 ##
   $WANT = <<'EOT';
 #%kennels = (
-#  First => \'Fido',
-#  Second => \'Wags'
+#  First => \'Fido",
+#  Second => \"Wags"
 #);
 #@dogs = (
 #  ${$kennels{First}},
@@ -544,8 +544,8 @@ EOT
 ##
   $WANT = <<'EOT';
 #%kennels = (
-#  First => \'Fido',
-#  Second => \'Wags'
+#  First => \"Fido",
+#  Second => \"Wags"
 #);
 #@dogs = (
 #  ${$kennels{First}},
@@ -565,8 +565,8 @@ EOT
 ##
   $WANT = <<'EOT';
 #@dogs = (
-#  'Fido',
-#  'Wags',
+#  "Fido",
+#  "Wags",
 #  {
 #    First => \$dogs[0],
 #    Second => \$dogs[1]
@@ -600,16 +600,16 @@ EOT
 ##
   $WANT = <<'EOT';
 #@dogs = (
-#  'Fido',
-#  'Wags',
+#  "Fido",
+#  "Wags",
 #  {
-#    First => \'Fido',
-#    Second => \'Wags'
+#    First => \"Fido",
+#    Second => \"Wags"
 #  }
 #);
 #%kennels = (
-#  First => \'Fido',
-#  Second => \'Wags'
+#  First => \"Fido",
+#  Second => \"Wags"
 #);
 EOT
 
@@ -695,7 +695,7 @@ TEST q(Data::Dumper->new([$a],['*a'])->Purity(1)->Dumpxs;)
 ############# 145
 ##
   $WANT = <<'EOT';
-#$a = \\\\\'foo';
+#$a = \\\\\"foo";
 #$b = ${${$a}};
 EOT
 
@@ -748,7 +748,7 @@ TEST q(Data::Dumper->new([$a,$b],['a','b'])->Purity(1)->Dumpxs;)
 #  [
 #    [
 #      [
-#        \\\\\'foo'
+#        \\\\\"foo"
 #      ]
 #    ]
 #  ]
@@ -777,7 +777,7 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Purity(1)->Dumpxs;)
 #  b => {
 #    c => [
 #      {
-#        e => 'ARRAY(0xdeadbeef)'
+#        e => "ARRAY(0xdeadbeef)"
 #      }
 #    ]
 #  }
@@ -794,11 +794,11 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Maxdepth(4)->Dumpxs;)
 ##
   $WANT = <<'EOT';
 #$a = {
-#  b => 'HASH(0xdeadbeef)'
+#  b => "HASH(0xdeadbeef)"
 #};
 #$b = $a->{b};
 #$c = [
-#  'HASH(0xdeadbeef)'
+#  "HASH(0xdeadbeef)"
 #];
 EOT
 
@@ -889,15 +889,15 @@ TEST q(Data::Dumper->new([$a])->Dumpxs;)
 ##
   $WANT = <<'EOT';
 #$VAR1 = {
-#  14 => 'QQQ',
-#  13 => 'PPP',
-#  12 => 'OOO',
-#  11 => 'NNN',
-#  10 => 'MMM',
-#  9 => 'LLL',
-#  8 => 'KKK',
-#  7 => 'JJJ',
-#  6 => 'III'
+#  14 => "QQQ",
+#  13 => "PPP",
+#  12 => "OOO",
+#  11 => "NNN",
+#  10 => "MMM",
+#  9 => "LLL",
+#  8 => "KKK",
+#  7 => "JJJ",
+#  6 => "III"
 #};
 EOT
 
@@ -927,15 +927,15 @@ TEST q(Data::Dumper->new([$c])->Dumpxs;)
   $WANT = <<'EOT';
 #$VAR1 = [
 #  {
-#    6 => 'III',
-#    7 => 'JJJ',
-#    8 => 'KKK',
-#    9 => 'LLL',
-#    10 => 'MMM',
-#    11 => 'NNN',
-#    12 => 'OOO',
-#    13 => 'PPP',
-#    14 => 'QQQ'
+#    6 => "III",
+#    7 => "JJJ",
+#    8 => "KKK",
+#    9 => "LLL",
+#    10 => "MMM",
+#    11 => "NNN",
+#    12 => "OOO",
+#    13 => "PPP",
+#    14 => "QQQ"
 #  },
 #  {
 #    QQQ => 14,
@@ -966,7 +966,7 @@ TEST q(Data::Dumper->new([[$c, $d]])->Dumpxs;)
   $WANT = <<'EOT';
 #$VAR1 = {
 #          foo => sub {
-#                     print 'foo';
+#                     print "foo";
 #                 }
 #        };
 EOT
@@ -1020,40 +1020,40 @@ EOT
 #$VAR4 = 3;
 #$VAR5 = 4;
 #$VAR6 = -5;
-#$VAR7 = '6.5';
-#$VAR8 = '7.5';
-#$VAR9 = '-8.5';
+#$VAR7 = "6.5";
+#$VAR8 = "7.5";
+#$VAR9 = "-8.5";
 #$VAR10 = 9;
 #$VAR11 = 10;
 #$VAR12 = -11;
 #$VAR13 = 12;
 #$VAR14 = 13;
 #$VAR15 = -14;
-#$VAR16 = '15.5';
-#$VAR17 = '16.25';
-#$VAR18 = '-17.75';
+#$VAR16 = "15.5";
+#$VAR17 = "16.25";
+#$VAR18 = "-17.75";
 EOT
 # The perl code knows that 0 and -2 stringify exactly back to the strings,
 # so it dumps them as numbers, not strings.
   $WANT_PL_S = <<'EOT';
 #$VAR1 = 0;
-#$VAR2 = '+1';
+#$VAR2 = "+1";
 #$VAR3 = -2;
-#$VAR4 = '3.0';
-#$VAR5 = '+4.0';
-#$VAR6 = '-5.0';
-#$VAR7 = '6.5';
-#$VAR8 = '+7.5';
-#$VAR9 = '-8.5';
-#$VAR10 = ' 9';
-#$VAR11 = ' +10';
-#$VAR12 = ' -11';
-#$VAR13 = ' 12.0';
-#$VAR14 = ' +13.0';
-#$VAR15 = ' -14.0';
-#$VAR16 = ' 15.5';
-#$VAR17 = ' +16.25';
-#$VAR18 = ' -17.75';
+#$VAR4 = "3.0";
+#$VAR5 = "+4.0";
+#$VAR6 = "-5.0";
+#$VAR7 = "6.5";
+#$VAR8 = "+7.5";
+#$VAR9 = "-8.5";
+#$VAR10 = " 9";
+#$VAR11 = " +10";
+#$VAR12 = " -11";
+#$VAR13 = " 12.0";
+#$VAR14 = " +13.0";
+#$VAR15 = " -14.0";
+#$VAR16 = " 15.5";
+#$VAR17 = " +16.25";
+#$VAR18 = " -17.75";
 EOT
 
 # The XS code differs.
@@ -1065,44 +1065,44 @@ EOT
 #$VAR1 = 0;
 #$VAR2 = 1;
 #$VAR3 = -2;
-#$VAR4 = '3';
-#$VAR5 = '4';
-#$VAR6 = '-5';
-#$VAR7 = '6.5';
-#$VAR8 = '7.5';
-#$VAR9 = '-8.5';
+#$VAR4 = "3";
+#$VAR5 = "4";
+#$VAR6 = "-5";
+#$VAR7 = "6.5";
+#$VAR8 = "7.5";
+#$VAR9 = "-8.5";
 #$VAR10 = 9;
 #$VAR11 = 10;
 #$VAR12 = -11;
-#$VAR13 = '12';
-#$VAR14 = '13';
-#$VAR15 = '-14';
-#$VAR16 = '15.5';
-#$VAR17 = '16.25';
-#$VAR18 = '-17.75';
+#$VAR13 = "12";
+#$VAR14 = "13";
+#$VAR15 = "-14";
+#$VAR16 = "15.5";
+#$VAR17 = "16.25";
+#$VAR18 = "-17.75";
 EOT
 
 # These are the strings as seen by the tokeniser. The XS code will output
 # these for all cases except where the scalar has been used in integer context
   $WANT_XS_S = <<'EOT';
-#$VAR1 = '0';
-#$VAR2 = '+1';
-#$VAR3 = '-2';
-#$VAR4 = '3.0';
-#$VAR5 = '+4.0';
-#$VAR6 = '-5.0';
-#$VAR7 = '6.5';
-#$VAR8 = '+7.5';
-#$VAR9 = '-8.5';
-#$VAR10 = ' 9';
-#$VAR11 = ' +10';
-#$VAR12 = ' -11';
-#$VAR13 = ' 12.0';
-#$VAR14 = ' +13.0';
-#$VAR15 = ' -14.0';
-#$VAR16 = ' 15.5';
-#$VAR17 = ' +16.25';
-#$VAR18 = ' -17.75';
+#$VAR1 = "0";
+#$VAR2 = "+1";
+#$VAR3 = "-2";
+#$VAR4 = "3.0";
+#$VAR5 = "+4.0";
+#$VAR6 = "-5.0";
+#$VAR7 = "6.5";
+#$VAR8 = "+7.5";
+#$VAR9 = "-8.5";
+#$VAR10 = " 9";
+#$VAR11 = " +10";
+#$VAR12 = " -11";
+#$VAR13 = " 12.0";
+#$VAR14 = " +13.0";
+#$VAR15 = " -14.0";
+#$VAR16 = " 15.5";
+#$VAR17 = " +16.25";
+#$VAR18 = " -17.75";
 EOT
 
 # These are the numbers as IV-ized by &
@@ -1116,18 +1116,18 @@ EOT
 #$VAR4 = 3;
 #$VAR5 = 4;
 #$VAR6 = -5;
-#$VAR7 = '6.5';
-#$VAR8 = '7.5';
-#$VAR9 = '-8.5';
+#$VAR7 = "6.5";
+#$VAR8 = "7.5";
+#$VAR9 = "-8.5";
 #$VAR10 = 9;
 #$VAR11 = 10;
 #$VAR12 = -11;
 #$VAR13 = 12;
 #$VAR14 = 13;
 #$VAR15 = -14;
-#$VAR16 = '15.5';
-#$VAR17 = '16.25';
-#$VAR18 = '-17.75';
+#$VAR16 = "15.5";
+#$VAR17 = "16.25";
+#$VAR18 = "-17.75";
 EOT
 
 # Some of these tests will be redundant.
@@ -1253,17 +1253,17 @@ EOT
 ## Perl code flips over at 10 digits.
   $WANT = <<'EOT';
 #$VAR1 = 999999999;
-#$VAR2 = '1000000000';
-#$VAR3 = '9999999999';
-#$VAR4 = '10000000000';
+#$VAR2 = "1000000000";
+#$VAR3 = "9999999999";
+#$VAR4 = "10000000000";
 #$VAR5 = -999999999;
-#$VAR6 = '-1000000000';
-#$VAR7 = '-9999999999';
-#$VAR8 = '-10000000000';
-#$VAR9 = '4294967295';
-#$VAR10 = '4294967296';
-#$VAR11 = '-2147483648';
-#$VAR12 = '-2147483649';
+#$VAR6 = "-1000000000";
+#$VAR7 = "-9999999999";
+#$VAR8 = "-10000000000";
+#$VAR9 = "4294967295";
+#$VAR10 = "4294967296";
+#$VAR11 = "-2147483648";
+#$VAR12 = "-2147483649";
 EOT
 
   TEST q(Data::Dumper->Dump(\@a)), "long integers";
@@ -1275,31 +1275,31 @@ EOT
       $WANT = <<'EOT';
 #$VAR1 = 999999999;
 #$VAR2 = 1000000000;
-#$VAR3 = '9999999999';
-#$VAR4 = '10000000000';
+#$VAR3 = "9999999999";
+#$VAR4 = "10000000000";
 #$VAR5 = -999999999;
-#$VAR6 = '-1000000000';
-#$VAR7 = '-9999999999';
-#$VAR8 = '-10000000000';
+#$VAR6 = "-1000000000";
+#$VAR7 = "-9999999999";
+#$VAR8 = "-10000000000";
 #$VAR9 = 4294967295;
-#$VAR10 = '4294967296';
-#$VAR11 = '-2147483648';
-#$VAR12 = '-2147483649';
+#$VAR10 = "4294967296";
+#$VAR11 = "-2147483648";
+#$VAR12 = "-2147483649";
 EOT
     } else {
       $WANT = <<'EOT';
 #$VAR1 = 999999999;
 #$VAR2 = 1000000000;
 #$VAR3 = 9999999999;
-#$VAR4 = '10000000000';
+#$VAR4 = "10000000000";
 #$VAR5 = -999999999;
-#$VAR6 = '-1000000000';
-#$VAR7 = '-9999999999';
-#$VAR8 = '-10000000000';
+#$VAR6 = "-1000000000";
+#$VAR7 = "-9999999999";
+#$VAR8 = "-10000000000";
 #$VAR9 = 4294967295;
 #$VAR10 = 4294967296;
-#$VAR11 = '-2147483648';
-#$VAR12 = '-2147483649';
+#$VAR11 = "-2147483648";
+#$VAR12 = "-2147483649";
 EOT
     }
     TEST q(Data::Dumper->Dumpxs(\@a)), "XS long integers";
@@ -1325,7 +1325,7 @@ EOT
   # XS used to produce "$b\"' which is 4 chars, not 3. [ie wrongly qq(\$b\\\")]
 ############# 328
   $WANT = <<'EOT';
-#$VAR1 = '$b"';
+#$VAR1 = "\$b\"";
 EOT
 
   $a = "\$b\"\x{100}";
@@ -1340,7 +1340,7 @@ EOT
   # Andreas found this one, which in turn discovered the previous two.
 ############# 334
   $WANT = <<'EOT';
-#$VAR1 = 'D\'oh!';
+#$VAR1 = "D'oh!";
 EOT
 
   $a = "D'oh!\x{100}";
@@ -1381,7 +1381,7 @@ EOT
 {
   $WANT = <<'EOT';
 #$VAR1 = {
-#  perl => 'rocks'
+#  perl => "rocks"
 #};
 EOT
   local $Data::Dumper::Quotekeys = 0;

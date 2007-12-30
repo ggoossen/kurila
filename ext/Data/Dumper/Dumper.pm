@@ -243,7 +243,7 @@ sub Dumpperl {
 # wrap string in single quotes (escaping if needed)
 sub _quote {
     my $val = shift;
-    $val =~ s/([\\\'\"\$\{\}\@])/\\$1/g;
+    $val =~ s/([\\\"\$\{\}\@])/\\$1/g;
     return  '"' . $val .  '"';
 }
 
@@ -656,11 +656,11 @@ sub qquote {
   s/([\a\b\t\n\f\r\e])/$esc{$1}/g;
 
     # no need for 3 digits in escape for these
-    s/([\0-\037])(?!\d)/{'\\'.sprintf('%o',ord($1))}/g;
-    s/([\0-\037\177])/{'\\'.sprintf('%03o',ord($1))}/g;
+    s/([\0-\037])(?!\d)/{'\'.sprintf('%o',ord($1))}/g;
+    s/([\0-\037\177])/{'\'.sprintf('%03o',ord($1))}/g;
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
     if ($high eq "iso8859") {
-      s/([\200-\240])/{'\\'.sprintf('%o',ord($1))}/g;
+      s/([\200-\240])/{'\'.sprintf('%o',ord($1))}/g;
     } elsif ($high eq "utf8") {
 #     use utf8;
 #     $str =~ s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
