@@ -75,7 +75,7 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
   
   use charnames ':full';
   is ("\N{LATIN SMALL LETTER A}", "a");
-  is ("\N{NEL}", chr 0x85);
+  is ("\N{NEL}", utf8::chr(0x85));
 }
 
 # variable interpolation

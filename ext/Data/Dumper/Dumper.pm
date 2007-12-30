@@ -243,8 +243,8 @@ sub Dumpperl {
 # wrap string in single quotes (escaping if needed)
 sub _quote {
     my $val = shift;
-    $val =~ s/([\\\'])/\\$1/g;
-    return  "'" . $val .  "'";
+    $val =~ s/([\\\'\"\$\{\}\@])/\\$1/g;
+    return  '"' . $val .  '"';
 }
 
 #

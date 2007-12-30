@@ -34,19 +34,19 @@ if ("@foo[0..1]b" eq "1::2b") { print "ok 14\n";} else {print "not ok 14\n";}
 
 # test if C<eval "{...}"> distinguishes between blocks and hashrefs
 
-$a = "\{ '\\'' , 'foo' \}";
+$a = "\{ q|'| , 'foo' \}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 15\n";} else {print "not ok 15\n";}
 
-$a = "\{ '\\\\\\'abc' => 'foo' \}";
+$a = "\{ q|\\\\\\'abc| => 'foo' \}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 16\n";} else {print "not ok 16\n";}
 
-$a = "\{'a\\\n\\'b','foo'\}";
+$a = "\{q|a\\\n\\'b|,'foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 17\n";} else {print "not ok 17\n";}
 
-$a = "\{'\\\\\\'\\\\'=>'foo'\}";
+$a = "\{q|'\\\\'\\\\|=>'foo'\}";
 $a = eval $a;
 if (ref($a) eq 'HASH') {print "ok 18\n";} else {print "not ok 18\n";}
 

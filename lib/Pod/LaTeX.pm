@@ -1647,7 +1647,7 @@ sub _replace_special_chars_late {
   $paragraph =~ s/(<|>)/\$$1\$/g;
 
   # Replace | with $|$
-  $paragraph =~ s'\|'$|$'g;
+  $paragraph =~ s/\|/{'$|$'}/g;
 
 
   return $paragraph;

@@ -1550,7 +1550,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 {
     # "Z0" (bug #34062)
     my (@x) = unpack("C*", pack("CZ0", 1, "b"));
-    is(join(',', @x), '1', 'pack Z0 doesn\'t destroy the character before');
+    is(join(',', @x), '1', q|pack Z0 doesn't destroy the character before|);
 }
 
 {

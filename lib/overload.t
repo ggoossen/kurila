@@ -318,7 +318,7 @@ is($int, 9);
 is($out, 1024);
 
 $foo = 'foo';
-$foo1 = q|f'o\o|;
+$foo1 = q|f'o\\o|;
 {
   BEGIN { $q = $qr = 7; 
 	  overload::constant 'q' => sub {$q++; push @q, shift, ($_[1] || 'none'); shift},
@@ -360,8 +360,8 @@ EOF
 }
  is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
  qq oups1
- q second part q tail here s A-Z tr a-z tr");
-is("@qr1", "b\\b qq .\\. qq try it q first part q yet another qq");
+ q second part s tail here s A-Z tr a-z tr");
+is("@qr1", "b\\b qq .\\. qq try it qq first part qq yet another qq");
 is($res, 1);
 is($a, "_<oups
 >_");

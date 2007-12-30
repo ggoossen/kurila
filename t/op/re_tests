@@ -338,7 +338,7 @@ a[-]?c	ac	y	$&	ac
 '*a'i	-	c	-	Quantifier follows nothing
 '(|*)b'i	-	c	-	Quantifier follows nothing
 '(*)b'i	-	c	-	Unknown verb
-'$b'i	B	n	-	-
+'\$b'i	B	n	-	-
 'a\'i	-	c	-	Search pattern not terminated
 'a\(b'i	A(B	y	$&-$1	A(B-
 'a\(*b'i	AB	y	$&	AB
