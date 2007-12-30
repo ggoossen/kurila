@@ -93,7 +93,8 @@ num_q(register const char *s, register STRLEN slen)
     register I32 ret = 0;
 
     while (slen > 0) {
-	if (*s == '\'' || *s == '\\')
+	if (*s == '\"' || *s == '\\' || *s == '@' ||
+            *s == '$' || *s == '{' || *s == '}')
 	    ++ret;
 	++s;
 	--slen;
@@ -112,7 +113,11 @@ esc_q(register char *d, register const char *s, register STRLEN slen)
 
     while (slen > 0) {
 	switch (*s) {
-	case '\'':
+	case '\"':
+	case '@':
+	case '$':
+	case '{':
+	case '}':
 	case '\\':
 	    *d = '\\';
 	    ++d; ++ret;
@@ -169,7 +174,7 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
             normal++;
         }
     }
-    if (grow) {
+    if (1) {
         /* We have something needing hex. 3 is ""\0 */
         sv_grow(sv, cur + 3 + grow + 2*backslashes + single_quotes
 		+ 2*qq_escapables + normal);
@@ -768,7 +773,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		SvREFCNT_dec(apad);
 		apad = blesspad;
 	    }
-	    sv_catpvn(retval, ", '", 3);
+	    sv_catpvn(retval, ", \"", 3);
 
 	    plen = strlen(realpack);
 	    pticks = num_q(realpack, plen);
@@ -787,7 +792,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	    else {
 	        sv_catpvn(retval, realpack, strlen(realpack));
 	    }
-	    sv_catpvn(retval, "' )", 3);
+	    sv_catpvn(retval, "\" )", 3);
 	    if (toaster && SvPOK(toaster) && SvCUR(toaster)) {
 		sv_catpvn(retval, "->", 2);
 		sv_catsv(retval, toaster);
@@ -865,10 +870,10 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	    if (needs_quote(c)) {
 		sv_grow(retval, SvCUR(retval)+6+2*i);
 		r = SvPVX(retval)+SvCUR(retval);
-		r[0] = '*'; r[1] = '{';	r[2] = '\'';
+		r[0] = '*'; r[1] = '{';	r[2] = '\"';
 		i += esc_q(r+3, c, i);
 		i += 3;
-		r[i++] = '\''; r[i++] = '}';
+		r[i++] = '\"'; r[i++] = '}';
 		r[i] = '\0';
 	    }
 	    else {
