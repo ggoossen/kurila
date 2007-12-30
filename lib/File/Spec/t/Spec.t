@@ -748,7 +748,6 @@ sub tryfunc {
 	return;
     }
 
-    $function =~ s#\\#\\\\#g ;
     $function =~ s/^([^\$].*->)/File::Spec::$1/;
     my $got = join ',', eval $function;
 

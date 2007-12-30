@@ -219,7 +219,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 			        return;
 			}
 			my $expected = pop(@nesting);
-			$expected =~ tr/(\{[</)\}]>/;
+			$expected =~ tr/\(\{\[\</\)\}\]\>/;
 			if ($expected ne $brackettype)
 			{
 				_failmsg qq{Mismatched closing bracket: expected "$expected" but found "$found"},
@@ -542,7 +542,7 @@ sub _match_codeblock($$$$$$$)
 		return;
 	}
 	my $closing = $1;
-	   $closing =~ tr'([<{')]>}';
+	   $closing =~ tr/([<\{/)]>\}/;
 	my $matched;
 	my $patvalid = 1;
 	while (pos($$textref) +< length($$textref))
@@ -788,7 +788,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 	my ($ldel1, $rdel1) = ("\Q$1","\Q$1");
 	if ($ldel1 =~ m/[[(<{]/)
 	{
-		$rdel1 =~ tr'[({<'])}>';
+		$rdel1 =~ tr/[(\{</])\}>/;
 		defined(_match_bracketed($textref,"",$ldel1,"","",$rdel1))
 		|| do { pos $$textref = $startpos; return };
         $ld2pos = pos($$textref);
@@ -815,7 +815,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 				return;
 			}
 			$ldel2 = $rdel2 = "\Q$1";
-			$rdel2 =~ tr'[({<'])}>';
+			$rdel2 =~ tr/[(\{</])\}>/;
 		}
 		else
 		{

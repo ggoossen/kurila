@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 2;
+plan tests => 1;
 
 my $rx = qr//;
 

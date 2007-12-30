@@ -30,7 +30,6 @@ sub import {
     my $multiple  = ref $_[0];
     my $pkg = caller;
     my $symtab;
-    my $str_end = "\\z";
 
     $symtab = \%{*{Symbol::fetch_glob($pkg . '::')}};
 
@@ -51,7 +50,7 @@ sub import {
 	}
 
 	# Normal constant name
-	if ($name =~ m/^_?[^\W_0-9]\w*$str_end/ and !$forbidden{$name}) {
+	if ($name =~ m/^_?[^\W_0-9]\w*\z/ and !$forbidden{$name}) {
 	    # Everything is okay
 
 	# Name forced into main, but we're not in main. Fatal.
@@ -65,7 +64,7 @@ sub import {
 	    Carp::croak("Constant name '$name' begins with '__'");
 
 	# Maybe the name is tolerable
-	} elsif ($name =~ m/^[A-Za-z_]\w*$str_end/) {
+	} elsif ($name =~ m/^[A-Za-z_]\w*\z/) {
 	    # Then we'll warn only if you've asked for warnings
 	    if (warnings::enabled()) {
 		if ($keywords{$name}) {
@@ -78,7 +77,7 @@ sub import {
 
 	# Looks like a boolean
 	# use constant FRED == fred;
-	} elsif ($name =~ m/^[01]?$str_end/) {
+	} elsif ($name =~ m/^[01]?\z/) {
             require Carp;
 	    if (@_) {
 		Carp::croak("Constant name '$name' is invalid");
