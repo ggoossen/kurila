@@ -1463,6 +1463,7 @@ XS(XS_dump_view)
        Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
 
     if (SvPOK(sv)) {
+	/* mostly stoken from Data::Dumper/Dumper.xs */
 	char *r, *rstart;
 	const char * const src = SvPVX_const(sv);
 	const char * const send = src + SvCUR(sv);
@@ -1543,15 +1544,11 @@ XS(XS_dump_view)
 	    *r++ = '"';
 	} else {
 	    /* Single quotes.  */
-	    sv_grow(retsv, 3 + 2*backslashes + 2*single_quotes
-		    + qq_escapables + normal);
+	    sv_grow(retsv, 3 + backslashes + single_quotes + qq_escapables + normal);
 	    rstart = r = SvPVX(retsv);
 	    *r++ = '\'';
 	    for (s = src; s < send; s ++) {
-		const char k = *s;
-		if (k == '\'' || k == '\\')
-		    *r++ = '\\';
-		*r++ = k;
+		*r++ = *s;
 	    }
 	    *r++ = '\'';
 	}
