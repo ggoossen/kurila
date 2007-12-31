@@ -2666,7 +2666,7 @@ sub parse_abstract {
     my $result;
     local *FH;
     local $/ = "\n";
-    open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+    open(FH,"<",$parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
