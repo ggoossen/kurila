@@ -131,7 +131,7 @@ sub process_file {
   }
   
   # Open the input file
-  open($FH, $args{filename}) or die "cannot open $args{filename}: $!\n";
+  open($FH, "<", $args{filename}) or die "cannot open $args{filename}: $!\n";
 
   # Open the output file if given as a string.  If they provide some
   # other kind of reference, trust them that we can print to it.
@@ -175,7 +175,7 @@ sub process_file {
     # skip directories, binary files etc.
     warn("Warning: ignoring non-text typemap file '$typemap'\n"), next
       unless -T $typemap ;
-    open(TYPEMAP, $typemap)
+    open(TYPEMAP, "<", $typemap)
       or warn ("Warning: could not open typemap file '$typemap': $!\n"), next;
     my $mode = 'Typemap';
     my $junk = "" ;

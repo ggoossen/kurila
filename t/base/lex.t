@@ -18,7 +18,7 @@ if ($x eq '-1') {print "ok 3\n";} else {print "not ok 3\n";}
 
 $x = '\\'; # ';
 
-if (length($x) == 1) {print "ok 4\n";} else {print "not ok 4\n";}
+if (length($x) == 2) {print "ok 4\n";} else {print "not ok 4\n";}
 
 eval 'while (0) {
     print "foo\n";
@@ -56,7 +56,7 @@ $foo
 EOF
 EOE
 
-print <<'EOS' . <<\EOF;
+urint <<'EOS' . <<\EOF;
 ok 12 - make sure single quotes are honored \nnot ok
 EOS
 ok 13
