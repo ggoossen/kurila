@@ -36,8 +36,6 @@ PERL_CALLCONV IV Perl_sv_2iv(pTHX_ register SV *sv);
 PERL_CALLCONV UV Perl_sv_2uv(pTHX_ register SV *sv);
 PERL_CALLCONV char * Perl_sv_2pv(pTHX_ register SV *sv, STRLEN *lp);
 PERL_CALLCONV char * Perl_sv_2pv_nolen(pTHX_ register SV *sv);
-PERL_CALLCONV char * Perl_sv_2pvbyte_nolen(pTHX_ register SV *sv);
-PERL_CALLCONV char * Perl_sv_2pvutf8_nolen(pTHX_ register SV *sv);
 PERL_CALLCONV void Perl_sv_force_normal(pTHX_ register SV *sv);
 PERL_CALLCONV void Perl_sv_setsv(pTHX_ SV *dstr, register SV *sstr);
 PERL_CALLCONV void Perl_sv_catpvn(pTHX_ SV *dsv, const char* sstr, STRLEN slen);
@@ -46,8 +44,6 @@ PERL_CALLCONV void Perl_sv_catsv(pTHX_ SV *dstr, register SV *sstr);
 PERL_CALLCONV void Perl_sv_catsv_mg(pTHX_ SV *dsv, register SV *ssv);
 PERL_CALLCONV char * Perl_sv_pv(pTHX_ SV *sv);
 PERL_CALLCONV char * Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp);
-PERL_CALLCONV char * Perl_sv_pvbyte(pTHX_ SV *sv);
-PERL_CALLCONV char * Perl_sv_pvutf8(pTHX_ SV *sv);
 PERL_CALLCONV NV Perl_huge(void);
 PERL_CALLCONV GV * Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name);
 PERL_CALLCONV HE * Perl_hv_iternext(pTHX_ HV *hv);
@@ -333,66 +329,6 @@ char *
 Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp)
 {
     return sv_pvn_force_flags(sv, lp, SV_GMAGIC);
-}
-
-/* sv_pvbyte () is now a macro using Perl_sv_2pv_flags();
- * this function provided for binary compatibility only
- */
-
-char *
-Perl_sv_pvbyte(pTHX_ SV *sv)
-{
-    return sv_pv(sv);
-}
-
-/*
-=for apidoc sv_pvbyte
-
-Use C<SvPVbyte_nolen> instead.
-
-=for apidoc sv_pvbyten
-
-A private implementation of the C<SvPVbyte> macro for compilers
-which can't cope with complex macro expressions. Always use the macro
-instead.
-
-=cut
-*/
-
-char *
-Perl_sv_pvbyten(pTHX_ SV *sv, STRLEN *lp)
-{
-    return sv_pvn(sv,lp);
-}
-
-/* sv_pvutf8 () is now a macro using Perl_sv_2pv_flags();
- * this function provided for binary compatibility only
- */
-
-char *
-Perl_sv_pvutf8(pTHX_ SV *sv)
-{
-    return sv_pv(sv);
-}
-
-/*
-=for apidoc sv_pvutf8
-
-Use the C<SvPVutf8_nolen> macro instead
-
-=for apidoc sv_pvutf8n
-
-A private implementation of the C<SvPVutf8> macro for compilers
-which can't cope with complex macro expressions. Always use the macro
-instead.
-
-=cut
-*/
-
-char *
-Perl_sv_pvutf8n(pTHX_ SV *sv, STRLEN *lp)
-{
-    return sv_pvn(sv,lp);
 }
 
 int

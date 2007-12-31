@@ -225,6 +225,7 @@ XS(XS_Tie_Hash_NamedCapture_flags);
 XS(XS_Symbol_fetch_glob);
 XS(XS_Symbol_stash);
 XS(XS_Symbol_glob_name);
+XS(XS_dump_view);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -290,6 +291,8 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXSproto("Symbol::fetch_glob", XS_Symbol_fetch_glob, file, "$");
     newXSproto("Symbol::glob_name", XS_Symbol_glob_name, file, "$");
     newXSproto("Symbol::stash", XS_Symbol_stash, file, "$");
+
+    newXS("dump::view", XS_dump_view, file);
 }
 
 
@@ -1448,6 +1451,134 @@ XS(XS_Symbol_stash)
     ST(0) = newRV_noinc(ST(0));
     XSRETURN(1);
 }
+
+XS(XS_dump_view)
+{
+    dVAR;
+    dXSARGS;
+    SV * const sv = TOPs;
+    SV * const retsv = ST(0) = sv_newmortal();
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
+
+    if (SvPOK(sv)) {
+	char *r, *rstart;
+	const char * const src = SvPVX_const(sv);
+	const char * const send = src + SvCUR(sv);
+	const char *s;
+
+	STRLEN j, cur = 0;
+	/* Could count 128-255 and 256+ in two variables, if we want to
+	   be like &qquote and make a distinction.  */
+	STRLEN grow = 0;	/* bytes needed to represent chars 128+ */
+	/* STRLEN topbit_grow = 0;	bytes needed to represent chars 128-255 */
+	STRLEN backslashes = 0;
+	STRLEN single_quotes = 0;
+	STRLEN qq_escapables = 0;	/* " $ @ will need a \ in "" strings.  */
+	STRLEN normal = 0;
+	
+	/* this will need EBCDICification */
+	for (s = src; s < send; s += UTF8SKIP(s)) {
+	    const UV k = utf8_to_uvchr((U8*)s, NULL);
+
+	    if (k == 0) {
+		/* invalid character escape: \xXX */
+		grow += 2;
+		s += 1;
+		continue;
+	    } else if (k > 127) {
+		/* 4: \x{} then count the number of hex digits.  */
+		grow += 4 + (k <= 0xFF ? 2 : k <= 0xFFF ? 3 : k <= 0xFFFF ? 4 : 8);
+	    } else if ( ! isPRINT(k) ) {
+		grow += 1;
+	    } else if (k == '\\') {
+		backslashes++;
+	    } else if (k == '\'') {
+		single_quotes++;
+	    } else if (k == '"' || k == '$' || k == '@' || k == '{' || k == '}') {
+		qq_escapables++;
+	    } else {
+		normal++;
+	    }
+	}
+	if (single_quotes || grow) {
+	    /* We have something needing hex. 3 is ""\0 */
+	    sv_grow(retsv, 3 + grow + 2*backslashes + single_quotes
+		    + 2*qq_escapables + normal);
+	    rstart = r = SvPVX(retsv);
+
+	    *r++ = '"';
+
+	    STRLEN charlen;
+	    for (s = src; s < send; s += charlen) {
+		const UV k = utf8_to_uvchr((U8*)s, &charlen);
+
+		if (k == 0) {
+		    /* invalid character */
+		    r = r + my_sprintf(r, "\\x%02"UVxf"", (U8)*s);
+		    charlen = 1;
+		    continue;
+		} else if (k > 127) {
+		    r = r + my_sprintf(r, "\\x{%"UVxf"}", k);
+		} else if ( ! isPRINT(k) ) {
+		    *r++ = '\\';
+		    switch (k) {
+		    case '\v' : *r++ = 'v';  break;
+		    case '\t' : *r++ = 't';  break;
+		    case '\r' : *r++ = 'r';  break;
+		    case '\n' : *r++ = 'n';  break;
+		    case '\f' : *r++ = 'f';  break;
+		      defualt:
+			r = r + my_sprintf(r, "x%02"UVxf"", k);
+		    }
+		} else if (k == '"' || k == '\\' || k == '$' || k == '@' || k == '{' || k == '}') {
+		    *r++ = '\\';
+		    *r++ = (char)k;
+		}
+		else {
+		    *r++ = (char)k;
+		}
+	    }
+	    *r++ = '"';
+	} else {
+	    /* Single quotes.  */
+	    sv_grow(retsv, 3 + 2*backslashes + 2*single_quotes
+		    + qq_escapables + normal);
+	    rstart = r = SvPVX(retsv);
+	    *r++ = '\'';
+	    for (s = src; s < send; s ++) {
+		const char k = *s;
+		if (k == '\'' || k == '\\')
+		    *r++ = '\\';
+		*r++ = k;
+	    }
+	    *r++ = '\'';
+	}
+	*r = '\0';
+	j = r - rstart;
+	SvCUR_set(retsv, j);
+	SvPOK_on(retsv);
+
+	XSRETURN(1);
+    }
+
+    if (SvIOK(sv) || SvUOK(sv)) {
+	sv_setsv(retsv, sv); /* let perl handle the stringification */
+	XSRETURN(1);
+    }
+
+    if (isGV(sv)) {
+	gv_efullname4(retsv, (GV*)sv, "*", TRUE);
+
+	XSRETURN(1);
+    }
+
+    Perl_croak(aTHX_ "Unknown scalar type");
+
+    XSRETURN(1);
+}
+
 
 /*
  * Local variables:
