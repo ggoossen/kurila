@@ -283,9 +283,9 @@ sub const_cccmd {
     return $self->{CONST_CCCMD} if $self->{CONST_CCCMD};
     return '' unless $self->needs_linking();
     return $self->{CONST_CCCMD} =
-	q{CCCMD = $(CC) -c $(PASTHRU_INC) $(INC) \\
-	$(CCFLAGS) $(OPTIMIZE) \\
-	$(PERLTYPE) $(MPOLLUTE) $(DEFINE_VERSION) \\
+	q{CCCMD = $(CC) -c $(PASTHRU_INC) $(INC) \
+	$(CCFLAGS) $(OPTIMIZE) \
+	$(PERLTYPE) $(MPOLLUTE) $(DEFINE_VERSION) \
 	$(XS_DEFINE_VERSION)};
 }
 
@@ -996,9 +996,9 @@ in these dirs:
     }
 
     my $stderr_duped = 0;
-    local *STDERR_COPY;
+    my $stderr_copy;
     unless ($Is_BSD) {
-        if( open(STDERR_COPY, '>&STDERR') ) {
+        if( open($stderr_copy, '>&', \*STDERR) ) {
             $stderr_duped = 1;
         }
         else {
@@ -1040,7 +1040,7 @@ WARNING
             } else {
                 close STDERR if $stderr_duped;
                 $val = `$version_check`;
-                open STDERR, '>&STDERR_COPY' if $stderr_duped;
+                open STDERR, '>&', $stderr_copy if $stderr_duped;
             }
 
             if ($val =~ m/^VER_OK/m) {
@@ -1074,7 +1074,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
 
         local (*FIXIN);
         local (*FIXOUT);
-        open( FIXIN, $file ) or croak "Can't process '$file': $!";
+        open( FIXIN, "<", $file ) or croak "Can't process '$file': $!";
         local $/ = "\n";
         chomp( my $line = ~< *FIXIN );
         next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
@@ -1131,7 +1131,7 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
             next;
         }
 
-        unless ( open( FIXOUT, ">$file_new" ) ) {
+        unless ( open( FIXOUT, ">", "$file_new" ) ) {
             warn "Can't create new $file: $!\n";
             next;
         }
@@ -2703,7 +2703,7 @@ sub parse_version {
     local *FH;
     local $/ = "\n";
     local $_;
-    open(FH,$parsefile) or die "Could not open '$parsefile': $!";
+    open(FH,"<", $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     while ( ~< *FH) {
 	$inpod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $inpod;

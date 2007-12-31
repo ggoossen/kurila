@@ -897,7 +897,7 @@ sub flush {
     print STDOUT "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
-    open(FH,">MakeMaker.tmp") or die "Unable to open MakeMaker.tmp: $!";
+    open(FH,">", "MakeMaker.tmp") or die "Unable to open MakeMaker.tmp: $!";
 
     for $chunk (@{$self->{RESULT}}) {
         print FH "$chunk\n";
