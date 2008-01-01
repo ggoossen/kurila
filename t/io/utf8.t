@@ -63,7 +63,7 @@ close(F);
     chomp($x);
     is( $x, chr(300) );
 
-    open F, "a" or die $!; # Not UTF
+    open F, "<", "a" or die $!; # Not UTF
     binmode(F, ":bytes");
     $x = ~< *F;
     chomp($x);
@@ -91,7 +91,7 @@ close(F);
 
     close F;
 
-    open F, "a" or die $!; # Not UTF
+    open F, "<", "a" or die $!; # Not UTF
     binmode(F, ":bytes");
     $x = ~< *F;
     chomp($x);

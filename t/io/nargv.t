@@ -5,7 +5,7 @@ print "1..5\n";
 my $j = 1;
 for my $i ( 1,2,5,4,3 ) {
     my $file = mkfiles($i);
-    open(FH, ">", " $file") || die "can't create $file: $!";
+    open(FH, ">", "$file") || die "can't create $file: $!";
     print FH "not ok " . $j++ . "\n";
     close(FH) || die "Can't close $file: $!";
 }

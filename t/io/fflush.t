@@ -49,7 +49,7 @@ sub file_eq {
     my $f   = shift;
     my $val = shift;
 
-    open IN, $f or die "open $f: $!";
+    open IN, "<", $f or die "open $f: $!";
     chomp(my $line = ~< *IN);
     close IN;
 
@@ -64,7 +64,7 @@ open PROG, ">", "ff-prog" or die "open ff-prog: $!";
 print PROG <<'EOF';
 my $f = shift;
 my $str = shift;
-open OUT, ">> $f" or die "open $f: $!";
+open OUT, ">>", "$f" or die "open $f: $!";
 print OUT $str;
 close OUT;
 EOF
@@ -79,7 +79,7 @@ if (!$d_fork) {
     print "ok 1 # skipped: no fork\n";
 } else {
     my $f = "ff-fork-$$";
-    open OUT, ">", " $f" or die "open $f: $!";
+    open OUT, ">", "$f" or die "open $f: $!";
     print OUT "Pe";
     my $pid = fork;
     if ($pid) {
@@ -114,7 +114,7 @@ my %subs = (
             },
             "popen"  => sub {
                 my $c = shift;
-                open PIPE, "$c|" or die "$c: $!";
+                open PIPE, "-|", "$c" or die "$c: $!";
                 close PIPE;
             },
             );
@@ -123,7 +123,7 @@ for (qw(system qx popen)) {
     my $code    = $subs{$_};
     my $f       = "ff-$_-$$";
     my $command = qq{$runperl "ff-prog" "$f" "rl"};
-    open OUT, ">", " $f" or die "open $f: $!";
+    open OUT, ">", "$f" or die "open $f: $!";
     print OUT "Pe";
     close OUT or die "close $f: $!";;
     print "# $command\n";
@@ -138,7 +138,7 @@ my $cmd = _create_runperl(
 			  prog =>
 			  sprintf('print qq[ok $_] for (%d..%d)', $t, $t+2));
 print "# cmd = '$cmd'\n";
-open my $CMD, "$cmd |" or die "Can't open pipe to '$cmd': $!";
+open my $CMD, '-|', "$cmd" or die "Can't open pipe to '$cmd': $!";
 while ( ~< $CMD) {
     system("$runperl -e 0");
     print;

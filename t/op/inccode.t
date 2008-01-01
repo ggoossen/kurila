@@ -243,7 +243,7 @@ if ($can_fork) {
     # can safely nest subprocesses
     push @INC, sub {
 	return unless $_[1] =~ m/^BBBLPLAST(\d+)\.pm/;
-	my $pid = open my $fh, "-|";
+	my $pid = open my $fh, "-|", "-";
 	if ($pid) {
 	    # Parent
 	    return $fh;

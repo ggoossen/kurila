@@ -16,7 +16,7 @@ use strict;
 # implicit interpreter context argument.
 #
 
-open IN, "embed.fnc" or die $!;
+open IN, "<", "embed.fnc" or die $!;
 
 # walk table providing an array of components in each line to
 # subroutine, printing the result
@@ -170,7 +170,7 @@ my $file;
 # development trees.
 my $MANIFEST = do {
   local ($/, *FH);
-  open FH, "MANIFEST" or die "Can't open MANIFEST: $!";
+  open FH, "<", "MANIFEST" or die "Can't open MANIFEST: $!";
   ~< *FH;
 };
 

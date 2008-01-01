@@ -15,7 +15,7 @@ BEGIN {
 sub getoutput
 {
   my ($code) = @_;
-  my $pid = open(IN, "-|");
+  my $pid = open(IN, "-|", "-");
   unless(defined $pid) {
     die "Cannot fork: $!";
   }

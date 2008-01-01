@@ -28,7 +28,7 @@ is($x, $y,  'test data is sane');
 print TRY $x;
 close TRY or die "Could not close: $!";
 
-open(TRY,'Comp.try') || (die "Can't reopen temp file.");
+open(TRY, "<",'Comp.try') || (die "Can't reopen temp file.");
 my $count = 0;
 my $z = '';
 while ( ~< *TRY) {

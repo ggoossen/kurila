@@ -170,7 +170,7 @@ close MASTER;
   # Things we copy to won't be in MANIFEST
   @sources{values %Copies} = ();
 
-  open(MANI, "../MANIFEST") || die "$0: opening ../MANIFEST failed: $!";
+  open(MANI, "<", "../MANIFEST") || die "$0: opening ../MANIFEST failed: $!";
   while ( ~< *MANI) {
     if (m!^pod/([^.]+\.pod)\s+!i) {
       push @manipods, $1;
@@ -184,7 +184,7 @@ close MASTER;
   @manireadmes{@manireadmes} = @manireadmes;
 
   my $in_perlpod;
-  open(PERLPOD, "perl.pod") || die "$0: opening perl.pod failed: $!\n";
+  open(PERLPOD, "<", "perl.pod") || die "$0: opening perl.pod failed: $!\n";
   while ( ~< *PERLPOD) {
     $in_perlpod ||= m/^For ease of access/;
     $in_perlpod &&= ! m/^\(If you're intending /;

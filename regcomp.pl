@@ -7,7 +7,7 @@ use kurila;
 use strict;
 use warnings;
 
-open DESC, 'regcomp.sym';
+open DESC, "<", 'regcomp.sym';
 
 my $ind = 0;
 my (@name,@rest,@type,@code,@args,@longj);

@@ -43,13 +43,13 @@ my $cmd4 = qq/$perl -e "print scalar ~< *ARGV;"/;
 #warn "#$cmd1\n#$cmd2\n#$cmd3\n#$cmd4\n";
 
 # start the processes
-ok( my $pid1 = open(FH1, "$cmd1 |"), 'first process started');
-ok( my $pid2 = open(FH2, "$cmd2 |"), '    second' );
+ok( my $pid1 = open(FH1, "-|", "$cmd1"), 'first process started');
+ok( my $pid2 = open(FH2, "-|", "$cmd2"), '    second' );
 {
     no warnings 'once';
-    ok( $pid3 = open(FH3, "| $cmd3"), '    third'  );
+    ok( $pid3 = open(FH3, "|-", "$cmd3"), '    third'  );
 }
-ok( $pid4 = open(FH4, "| $cmd4"), '    fourth' );
+ok( $pid4 = open(FH4, "|-", "$cmd4"), '    fourth' );
 
 print "# pids were $pid1, $pid2, $pid3, $pid4\n";
 

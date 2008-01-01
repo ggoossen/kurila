@@ -210,7 +210,7 @@ print "ok 3\n";
 fail unless -f "big";
 print "ok 4\n";
 
-open(BIG, "big") or do { warn "open failed: $!\n"; bye };
+open(BIG, "<", "big") or do { warn "open failed: $!\n"; bye };
 binmode BIG;
 
 fail unless seek(BIG, 4_500_000_000, $SEEK_SET);

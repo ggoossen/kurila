@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 60);
+plan(tests => 61);
 
 use Config;
 
@@ -23,6 +23,13 @@ $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
 my $r;
 my @tmpfiles = ();
 END { unlink @tmpfiles }
+
+$r = runperl(
+    switches	=> [],
+    stdin	=> 'foo\nbar\nbaz\n',
+    prog	=> 'print qq(<$_>) while ~< *ARGV',
+);
+is( $r, "<foo\n><bar\n><baz\n>", "no switches" );
 
 # Tests for -0
 
@@ -285,11 +292,11 @@ __EOF__
 
     runperl( switches => ['-pi.bak'], prog => 's/foo/bar/', args => ['file'] );
 
-    open(FILE, "file") or die "$0: Failed to open 'file': $!";
+    open(FILE, "<", "file") or die "$0: Failed to open 'file': $!";
     chomp(my @file = ~< *FILE);
     close FILE;
 
-    open(BAK, "file.bak") or die "$0: Failed to open 'file': $!";
+    open(BAK, "<", "file.bak") or die "$0: Failed to open 'file': $!";
     chomp(my @bak = ~< *BAK);
     close BAK;
 

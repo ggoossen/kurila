@@ -72,7 +72,7 @@ for my $target (@target) {
         print "\tErrno.pm\n";
         $copy{"ext\\Errno\\Errno.pm"} = "$lib\\Perl\\$R_V_SV\\Errno.pm";
 
-        open( my $cfg, "symbian/install.cfg" )
+        open( my $cfg, "<", "symbian/install.cfg" )
           or die "$!: symbian/install.cfg: $!\n";
         while ( ~< $cfg) {
             next unless m/^lib\s+(.+)/;

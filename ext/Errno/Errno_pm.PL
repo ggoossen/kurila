@@ -313,7 +313,7 @@ EOF
             close C;
             system("cc -o errno errno.c");
             unlink("errno.c");
-            if (open(C, "./errno|")) {
+            if (open(C, "-|", "./errno")) {
 		while ( ~< *C) {
 		    if (m/^(\w+) (-?\d+)$/) { $err{$1} = $2 }
 		}

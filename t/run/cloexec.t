@@ -80,7 +80,7 @@ make_tmp_file($tmpfile2, $tmpfile2_contents);
 my $Child_prog = <<'CHILD_PROG';
 my $fd = shift;
 print qq{childfd=$fd\n};
-open INHERIT, qq{<&=$fd} or die qq{open $fd: $!};
+open INHERIT, qq{<&=}, qq{$fd} or die qq{open $fd: $!};
 my $line = ~< *INHERIT;
 close INHERIT or die qq{close $fd: $!};
 print $line
@@ -94,11 +94,11 @@ sub test_not_inherited {
     ok( -f $tmpfile2, "tmpfile '$tmpfile2' exists" );
     my $cmd = qq{$Perl -e $quote$Child_prog$quote $expected_fd};
     # Expect 'Bad file descriptor' or similar to be written to STDERR.
-    local *SAVERR; open SAVERR, ">", "&STDERR";  # save original STDERR
+    local *SAVERR; open SAVERR, ">&", \*STDERR;  # save original STDERR
     open STDERR, ">", "$tmperr" or die "open '$tmperr': $!";
     my $out = `$cmd`;
     my $rc  = $? >> 8;
-    open STDERR, ">", "&SAVERR" or die "error: restore STDERR: $!";
+    open STDERR, ">&", \*SAVERR or die "error: restore STDERR: $!";
     close SAVERR or die "error: close SAVERR: $!";
     # XXX: it seems one cannot rely on a non-zero return code,
     # at least not on Tru64.

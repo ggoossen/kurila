@@ -48,7 +48,7 @@ while ( ~< *DATA) {
     open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
-    open (TMP, 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     my $output;
     {
         local $/;

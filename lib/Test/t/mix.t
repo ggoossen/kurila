@@ -31,7 +31,7 @@ $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
 $ntest = 1;
 
-open F, "mix";
+open F, "<", "mix";
 my $out = join '', ~< *F;
 close F;
 unlink "mix";

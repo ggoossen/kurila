@@ -64,7 +64,7 @@ while (defined (my $file = next_file())) {
     $eval_index = 1;
 
     if ($file eq '-') {
-	open(IN, "-");
+	open(IN, "<", "-");
 	open(OUT, ">", "-");
     } else {
 	($outfile = $file) =~ s/\.h$/.ph/ || next;

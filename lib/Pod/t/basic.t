@@ -88,7 +88,7 @@ for (sort keys %translators) {
     $parser->parse_from_file (source_path ('basic.pod'), \*OUT);
     close OUT;
     if ($_ eq 'Pod::Man') {
-        open (TMP, 'out.tmp') or die "Cannot open out.tmp: $!\n";
+        open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
         open (OUTPUT, ">", " out.$translators{$_}")
             or die "Cannot create out.$translators{$_}: $!\n";
         local $_;
@@ -105,7 +105,7 @@ for (sort keys %translators) {
         local $/;
         open (MASTER, source_path ("basic.$translators{$_}"))
             or die "Cannot open basic.$translators{$_}: $!\n";
-        open (OUTPUT, "out.$translators{$_}")
+        open (OUTPUT, "<", "out.$translators{$_}")
             or die "Cannot open out.$translators{$_}: $!\n";
         my $master = ~< *MASTER;
         my $output = ~< *OUTPUT;

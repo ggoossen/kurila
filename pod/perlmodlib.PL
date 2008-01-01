@@ -5,7 +5,7 @@ $ENV{LC_ALL} = 'C';
 open (OUT, ">", "perlmodlib.pod") or die $!;
 my (@pragma, @mod, @MANIFEST);
 
-open (MANIFEST, "../MANIFEST") or die $!;
+open (MANIFEST, "<", "../MANIFEST") or die $!;
 @MANIFEST = grep !m</(?:t|demo)/>, ~< *MANIFEST;
 push @MANIFEST, 'lib/Config.pod', 'lib/Errno.pm', 'lib/lib.pm',
     'lib/DynaLoader.pm', 'lib/XSLoader.pm';
@@ -16,8 +16,8 @@ for (@MANIFEST) {
      my ($origfilename) = ($filename) = m|^(\S+)|;
      $filename =~ s|^[^/]+/|| if $filename =~ s|^ext/||;
      next unless $filename =~ m!\.p(m|od)$!;
-     unless (open (MOD, "../lib/$filename")) {
-	unless (open (MOD, "../$origfilename")) {
+     unless (open (MOD, "<", "../lib/$filename")) {
+	unless (open (MOD, "<", "../$origfilename")) {
 	    warn "Couldn't open ../$origfilename: $!";
 	    next;
 	}

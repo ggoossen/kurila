@@ -36,7 +36,7 @@ $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
 $ntest = 1;
 
-open F, "fails";
+open F, "<", "fails";
 my $O;
 while ( ~< *F) { $O .= $_; }
 close F;

@@ -9,7 +9,7 @@ our ($reopen, $x, $outfile);
 chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $!";
 @INC = '../../lib';
 
-open(I, 'sysio.t') || die "sysio.t: cannot find myself: $!";
+open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $!";
 
 $reopen = ($^O eq 'VMS' ||
            $^O eq 'os2' ||
