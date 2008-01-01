@@ -282,13 +282,13 @@ ok( grep(m/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
 
 # I know we'll get ignored errors from make here, that's ok.
 # Send STDERR off to oblivion.
-open(SAVERR, ">&STDERR") or die $!;
+open(SAVERR, ">", "&STDERR") or die $!;
 open(STDERR, ">".File::Spec->devnull) or die $!;
 
 my $realclean_out = run("$make realclean");
 is( $?, 0, 'realclean' ) || diag($realclean_out);
 
-open(STDERR, ">&SAVERR") or die $!;
+open(STDERR, ">", "&SAVERR") or die $!;
 close SAVERR;
 
 

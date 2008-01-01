@@ -334,7 +334,7 @@ ok ! $fil->gzclose ;
     my $hello = "hello" ;
     my $len = length $hello ;
 
-    open F, ">$name" ;
+    open F, ">", "$name" ;
 
     my $fil;
     ok $fil = gzopen(*F, "wb") ;
@@ -343,7 +343,7 @@ ok ! $fil->gzclose ;
 
     ok ! $fil->gzclose ;
 
-    open F, "<$name" ;
+    open F, "<", "$name" ;
     ok $fil = gzopen(*F, "rb") ;
 
     my $uncmomp;
@@ -371,9 +371,9 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
     my $hello = "hello" ;
     my $len = length $hello ;
 
-    ok open(SAVEOUT, ">&STDOUT"), "  save STDOUT";
+    ok open(SAVEOUT, ">", "&STDOUT"), "  save STDOUT";
     my $dummy = fileno SAVEOUT;
-    ok open(STDOUT, ">$name"), "  redirect STDOUT" ;
+    ok open(STDOUT, ">", "$name"), "  redirect STDOUT" ;
     
     my $status = 0 ;
 
@@ -383,12 +383,12 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
               ($fil->gzwrite($hello) == $len) &&
               ($fil->gzclose == 0) ;
 
-    open(STDOUT, ">&SAVEOUT");
+    open(STDOUT, ">", "&SAVEOUT");
 
     ok $status, "  wrote to stdout";
 
-       open(SAVEIN, "<&STDIN");
-    ok open(STDIN, "<$name"), "  redirect STDIN";
+       open(SAVEIN, "<", "&STDIN");
+    ok open(STDIN, "<", "$name"), "  redirect STDIN";
     $dummy = fileno SAVEIN;
 
     ok $fil = gzopen($stdin, "rb") ;
@@ -401,7 +401,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
     ok ! $fil->gzclose ;
     ok   $fil->gzeof() ;
 
-       open(STDIN, "<&SAVEIN");
+       open(STDIN, "<", "&SAVEIN");
 
     is $uncomp, $hello ;
 

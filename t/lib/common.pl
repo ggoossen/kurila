@@ -40,7 +40,7 @@ foreach my $file (@w_files) {
     next if $file =~ m/perlio$/ && !('PerlIO::Layer'->find( 'perlio'));
     next if -d $file;
 
-    open F, "<$file" or die "Cannot open $file: $!\n" ;
+    open F, "<", "$file" or die "Cannot open $file: $!\n" ;
     my $line = 0;
     while ( ~< *F) {
         $line++;
@@ -98,7 +98,7 @@ for (@prgs){
                 mkpath($1);
                 push(@temp_path, $1);
     	    }
-	    open F, ">$filename" or die "Cannot open $filename: $!\n" ;
+	    open F, ">", "$filename" or die "Cannot open $filename: $!\n" ;
 	    print F $code ;
 	    close F or die "Cannot close $filename: $!\n";
 	}
@@ -112,7 +112,7 @@ for (@prgs){
 	$prog =~ s|"\."|":"|g;
     }
 
-    open TEST, ">$tmpfile" or die "Cannot open >$tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open >$tmpfile: $!";
     print TEST q{
         BEGIN {
             open(STDERR, ">&STDOUT")

@@ -764,7 +764,7 @@ if( @path_h ){
       # Scan the header file (we should deal with nested header files)
       # Record the names of simple #define constants into const_names
             # Function prototypes are processed below.
-      open(CH, "<$rel_path_h") || die "Can't open $rel_path_h: $!\n";
+      open(CH, "<", "$rel_path_h") || die "Can't open $rel_path_h: $!\n";
     defines:
       while ( ~< *CH) {
 	if ($pre_sub_tri_graphs) {
@@ -1003,7 +1003,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
 my @const_names = sort keys %const_names;
 
 -d $modpmdir || mkpath([$modpmdir], 0, 0775);
-open(PM, ">$modpmname") || die "Can't create $ext$modpname/$modpmname: $!\n";
+open(PM, ">", "$modpmname") || die "Can't create $ext$modpname/$modpmname: $!\n";
 
 $" = "\n\t";
 warn "Writing $ext$modpname/$modpmname\n";
@@ -1752,7 +1752,7 @@ close XS;
 if (%types_seen) {
   my $type;
   warn "Writing $ext$modpname/typemap\n";
-  open TM, ">typemap" or die "Cannot open typemap file for write: $!";
+  open TM, ">", "typemap" or die "Cannot open typemap file for write: $!";
 
   for $type (sort keys %types_seen) {
     my $entry = assign_typemap_entry $type;
@@ -1786,7 +1786,7 @@ EOP
 } # if( ! $opt_X )
 
 warn "Writing $ext$modpname/Makefile.PL\n";
-open(PL, ">Makefile.PL") || die "Can't create $ext$modpname/Makefile.PL: $!\n";
+open(PL, ">", "Makefile.PL") || die "Can't create $ext$modpname/Makefile.PL: $!\n";
 
 my $prereq_pm = '';
 
@@ -1895,7 +1895,7 @@ close(PL) || die "Can't close $ext$modpname/Makefile.PL: $!\n";
 # Create a simple README since this is a CPAN requirement
 # and it doesnt hurt to have one
 warn "Writing $ext$modpname/README\n";
-open(RM, ">README") || die "Can't create $ext$modpname/README:$!\n";
+open(RM, ">", "README") || die "Can't create $ext$modpname/README:$!\n";
 my $thisyear = (gmtime)[5] + 1900;
 my $rmhead = "$modpname version $TEMPLATE_VERSION";
 my $rmheadeq = "=" x length($rmhead);
@@ -1953,7 +1953,7 @@ unless (-d "$testdir") {
 warn "Writing $ext$modpname/$testfile\n";
 my $tests = @const_names ? 2 : 1;
 
-open EX, ">$testfile" or die "Can't create $ext$modpname/$testfile: $!\n";
+open EX, ">", "$testfile" or die "Can't create $ext$modpname/$testfile: $!\n";
 
 print EX <<_END_;
 # Before `make install' is performed this script should be runnable with
@@ -2056,7 +2056,7 @@ close(EX) || die "Can't close $ext$modpname/$testfile: $!\n";
 unless ($opt_C) {
   warn "Writing $ext$modpname/Changes\n";
   $" = ' ';
-  open(EX, ">Changes") || die "Can't create $ext$modpname/Changes: $!\n";
+  open(EX, ">", "Changes") || die "Can't create $ext$modpname/Changes: $!\n";
   @ARGS = map {m/[\s\"\'\`\$*?^|&<>\[\]\{\}\(\)]/ ? "'$_'" : $_} @ARGS;
   print EX <<EOP;
 Revision history for Perl extension $module.
@@ -2070,7 +2070,7 @@ EOP
 }
 
 warn "Writing $ext$modpname/MANIFEST\n";
-open(MANI,'>MANIFEST') or die "Can't create MANIFEST: $!";
+open(MANI, ">",'MANIFEST') or die "Can't create MANIFEST: $!";
 my @files = grep { -f } (glob("*"), glob("t/*"), glob("$fallbackdirname/*"), glob("$modpmdir/*"));
 if (!@files) {
   eval {opendir(D,'.');};

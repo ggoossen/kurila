@@ -26,7 +26,7 @@ sub get_temp_fh {
     my $f = "DummyModule0000";
     1 while -e ++$f;
     push @tempfiles, $f;
-    open my $fh, ">$f" or die "Can't create $f: $!";
+    open my $fh, ">", "$f" or die "Can't create $f: $!";
     print $fh "package ".substr($_[0],0,-3).";\n1;\n";
     print $fh $_[1] if @_ +> 1;
     close $fh or die "Couldn't close: $!";

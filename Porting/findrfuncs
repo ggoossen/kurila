@@ -49,7 +49,7 @@ my @syms;
 find(sub {
 	return unless -f $File::Find::name;
 	local *F;
-	open F, "<$File::Find::name"
+	open F, "<", "$File::Find::name"
 	    or die "Can't open $File::Find::name: $!";
 	my $line;
 	while (defined ($line = ~< *F)) {

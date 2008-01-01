@@ -65,7 +65,7 @@ $foo = FOO->make;
 print "not " unless $foo->store('store');
 print "ok 6\n";
 
-print "not " unless open(OUT, '>>store');
+print "not " unless open(OUT, ">>", 'store');
 print "ok 7\n";
 binmode OUT;
 

@@ -222,7 +222,7 @@ SKIP: {
     # setlogsock() with "stream" and a local file
     SKIP: {
         my $logfile = "test.log";
-        open(LOG, ">$logfile") or skip "can't create file '$logfile': $!", 2;
+        open(LOG, ">", "$logfile") or skip "can't create file '$logfile': $!", 2;
         close(LOG);
         $r = eval { setlogsock("stream", $logfile ) } || '';
         is( $@, '', "setlogsock() called, with 'stream' and '$logfile' (file exists)" );

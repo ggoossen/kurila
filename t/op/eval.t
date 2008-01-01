@@ -35,7 +35,7 @@ $fact = 'local($foo)=$foo; $foo +<= 1 ? 1 : $foo-- * (eval $fact);';
 $ans = eval $fact;
 if ($ans == 120) {print "ok 9\n";} else {print "not ok 9 $ans\n";}
 
-open(try,'>Op.eval');
+open(try, ">",'Op.eval');
 print try 'print "ok 10\n"; unlink "Op.eval";',"\n";
 close try;
 

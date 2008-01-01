@@ -189,7 +189,7 @@ chdir($tempdir) or die "$0: chdir('$tempdir')\n";
 if (@SisPl) {
   if (open(my $fi, "default.pl")) {
     my $fn = "default.pl.new";
-    if (open(my $fo, ">$fn")) {
+    if (open(my $fo, ">", "$fn")) {
       while ( ~< $fi) {
 	last unless m/^\#/;
 	print $fo $_;
@@ -310,7 +310,7 @@ if ($ShowPkg) {
   }
 } else {
   my $fn = "$AppName.pkg";
-  if (open(my $fh, ">$fn")) {
+  if (open(my $fh, ">", "$fn")) {
     for my $l (@pkg) {
       print $fh "$l\r\n"; # Note CRLF!
     }

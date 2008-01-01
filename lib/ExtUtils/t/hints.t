@@ -23,7 +23,7 @@ mkdir('hints', 0777);
 (my $os = $^O) =~ s/\./_/g;
 my $hint_file = File::Spec->catfile('hints', "$os.pl");
 
-open(HINT, ">$hint_file") || die "Can't write dummy hints file $hint_file: $!";
+open(HINT, ">", "$hint_file") || die "Can't write dummy hints file $hint_file: $!";
 print HINT <<'CLOO';
 $self->{CCFLAGS} = 'basset hounds got long ears';
 CLOO
@@ -38,7 +38,7 @@ $mm->check_hints;
 is( $mm->{CCFLAGS}, 'basset hounds got long ears' );
 is( $out->read, "Processing hints file $hint_file\n" );
 
-open(HINT, ">$hint_file") || die "Can't write dummy hints file $hint_file: $!";
+open(HINT, ">", "$hint_file") || die "Can't write dummy hints file $hint_file: $!";
 print HINT <<'CLOO';
 die "Argh!\n";
 CLOO

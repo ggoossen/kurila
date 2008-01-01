@@ -28,7 +28,7 @@ $patchlevel =~ s|~VERSION~|$Config{version}|g;
 $patchlevel ||= $Config{version};
 $patchlevel = qq["$patchlevel"];
 
-open(SH,"<$name") || die "Cannot open $name:$!";
+open(SH, "<","$name") || die "Cannot open $name:$!";
 while ( ~< *SH)
  {
   last if m/^\s*sed/;

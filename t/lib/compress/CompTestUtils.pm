@@ -85,7 +85,7 @@ sub readFile
     }
     else
     {
-        open (F, "<$f") 
+        open (F, "<", "$f") 
             or croak "Cannot open $f: $!\n" ;
         binmode F;
         @strings = ~< *F ;	
@@ -105,7 +105,7 @@ sub writeFile
 {
     my($filename, @strings) = @_ ;
     1 while unlink $filename ;
-    open (F, ">$filename") 
+    open (F, ">", "$filename") 
         or croak "Cannot open $filename: $!\n" ;
     binmode F;
     foreach (@strings) {

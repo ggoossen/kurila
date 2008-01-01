@@ -131,7 +131,7 @@ sub test ($;$) {
 # We need an external program to call.
 my $ECHO = ($Is_MSWin32 ? ".\\echo$$" : $Is_MacOS ? ":echo$$" : ($Is_NetWare ? "echo$$" : "./echo$$"));
 END { unlink $ECHO }
-open PROG, "> $ECHO" or die "Can't create $ECHO: $!";
+open PROG, ">", " $ECHO" or die "Can't create $ECHO: $!";
 print PROG 'print "@ARGV\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
@@ -281,7 +281,7 @@ my $TEST = catfile(curdir(), 'TEST');
 # always get some, so we'll run another process with some.
 SKIP: {
     my $arg = catfile(curdir(), "arg$$");
-    open PROG, "> $arg" or die "Can't create $arg: $!";
+    open PROG, ">", " $arg" or die "Can't create $arg: $!";
     print PROG q{
 	eval { join('', @ARGV), kill 0 };
 	exit 0 if $@ =~ m/^Insecure dependency/;
@@ -429,7 +429,7 @@ SKIP: {
 	($Is_Dos && $! == 22) ||
 	($^O eq 'mint' && $! == 33);
 
-    test !eval { open FOO, "> $foo" }, 'open for write';
+    test !eval { open FOO, ">", " $foo" }, 'open for write';
     test $@ =~ m/^Insecure dependency/, $@;
 }
 
@@ -503,7 +503,7 @@ SKIP: {
 	local *FOO;
 	my $temp = "./taintC$$";
 	END { unlink $temp }
-	test open(FOO, "> $temp"), "Couldn't open $temp for write: $!";
+	test open(FOO, ">", " $temp"), "Couldn't open $temp for write: $!";
 
 	test !eval { ioctl FOO, $TAINT0, $foo }, 'ioctl';
 	test $@ =~ m/^Insecure dependency/, $@;

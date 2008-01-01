@@ -84,7 +84,7 @@ sub try_compile_and_link {
     my $obj_ext = $Config{obj_ext} || ".o";
     unlink("$tmp.c", "$tmp$obj_ext");
 
-    if (open(TMPC, ">$tmp.c")) {
+    if (open(TMPC, ">", "$tmp.c")) {
 	print TMPC $c;
 	close(TMPC);
 
@@ -735,7 +735,7 @@ EOM
 
     if ($DEFINE) {
         $DEFINE =~ s/^\s+//;
-        if (open(XDEFINE, ">xdefine")) {
+        if (open(XDEFINE, ">", "xdefine")) {
 	    print XDEFINE $DEFINE, "\n";
 	    close(XDEFINE);
         }

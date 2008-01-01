@@ -136,7 +136,7 @@ sub process_file {
   # Open the output file if given as a string.  If they provide some
   # other kind of reference, trust them that we can print to it.
   if (not ref $args{output}) {
-    open my($fh), "> $args{output}" or die "Can't create $args{output}: $!";
+    open my($fh), ">", "$args{output}" or die "Can't create $args{output}: $!";
     $args{outfile} = $args{output};
     $args{output} = $fh;
   }
@@ -1489,7 +1489,7 @@ sub INCLUDE_handler ()
     $FH = Symbol::gensym();
 
     # open the new file
-    open ($FH, "$_") or death("Cannot open '$_': $!") ;
+    open ($FH, "<", "$_") or death("Cannot open '$_': $!") ;
 
     print Q(<<"EOF");
 #

@@ -21,7 +21,7 @@ sub filefound {
   print OUT "\"$back\"-\"!:$psiback\"\n"  if ( -f $f );
 }
 
-open OUT,">perl.pkg";
+open OUT, ">","perl.pkg";
 
 print OUT "#\{\"perl$VERSION\"\},(0x100051d8),0,$EPOC_VERSION,0\n";
 print OUT "\"" . cwd . "/Artistic.txt\"-\"\",FT,TC\n";
@@ -29,8 +29,8 @@ print OUT "\"" . cwd . "/perl\"-\"!:\\emx\\bin\\perl.exe\"\n";
 
 find(\&filefound, cwd.'/lib');
 
-open IN,  "<Artistic";
-open OUT, ">Artistic.txt";
+open IN, "<",  "Artistic";
+open OUT, ">", "Artistic.txt";
 while (my $line = ~< *IN) {
   chomp $line;
   print OUT "$line\r\n";

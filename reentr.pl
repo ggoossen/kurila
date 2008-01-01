@@ -41,7 +41,7 @@ my %map = (
 
 
 safer_unlink 'reentr.h';
-die "reentr.h: $!" unless open(H, ">reentr.h");
+die "reentr.h: $!" unless open(H, ">", "reentr.h");
 binmode H;
 select H;
 print <<EOF;
@@ -793,7 +793,7 @@ close(H);
 # Prepare to write the reentr.c.
 
 safer_unlink 'reentr.c';
-die "reentr.c: $!" unless open(C, ">reentr.c");
+die "reentr.c: $!" unless open(C, ">", "reentr.c");
 binmode C;
 select C;
 print <<EOF;

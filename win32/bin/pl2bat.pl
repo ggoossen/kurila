@@ -110,7 +110,7 @@ sub process {
     close( FILE );
     $file =~ s/$OPT{'s'}$//oi;
     $file .= '.bat' unless $file =~ m/\.bat$/i or $file =~ m/^-$/;
-    open( FILE, ">$file" ) or die "Can't open $file: $!";
+    open( FILE, ">", "$file" ) or die "Can't open $file: $!";
     print FILE $myhead;
     print FILE $start, ( $OPT{'w'} ? " -w" : "" ),
 	       "\n#line ", ($headlines+1), "\n" unless $linedone;

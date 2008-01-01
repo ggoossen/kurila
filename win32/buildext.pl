@@ -54,7 +54,7 @@ if ("$static,$dynamic" eq "0,0") {
 if ($opts{'list-static-libs'} || $opts{'create-perllibst-h'}) {
   my @statics = split m/\s+/, $Config{static_ext};
   if ($opts{'create-perllibst-h'}) {
-    open my $fh, ">perllibst.h"
+    open my $fh, ">", "perllibst.h"
         or die "Failed to write to perllibst.h:$!";
     my @statics1 = map {local $_=$_;s/\//__/g;$_} @statics;
     my @statics2 = map {local $_=$_;s/\//::/g;$_} @statics;

@@ -100,7 +100,7 @@ sub write_file
 
 	local(*F);
 
-	open(F, ">$f") || die "open >$f: $!";
+	open(F, ">", "$f") || die "open >$f: $!";
 	(print F @data) || die "write $f: $!";
 	close(F) || die "close $f: $!";
 	return 1;

@@ -3,7 +3,7 @@ use strict;
 
 require 'regen_lib.pl';
 safer_unlink ("keywords.h");
-open(KW, ">keywords.h") || die "Can't create keywords.h: $!\n";
+open(KW, ">", "keywords.h") || die "Can't create keywords.h: $!\n";
 binmode KW;
 select KW;
 

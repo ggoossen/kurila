@@ -32,7 +32,7 @@ sub walk_table (&@) {
     }
     else {
 	safer_unlink $filename;
-	open F, ">$filename" or die "Can't open $filename: $!";
+	open F, ">", "$filename" or die "Can't open $filename: $!";
 	binmode F;
 	$F = \*F;
     }
@@ -175,14 +175,14 @@ my $MANIFEST = do {
 };
 
 for $file (($MANIFEST =~ m/^(\S+\.c)\t/gm), ($MANIFEST =~ m/^(\S+\.h)\t/gm)) {
-    open F, "< $file" or die "Cannot open $file for docs: $!\n";
+    open F, "<", " $file" or die "Cannot open $file for docs: $!\n";
     $curheader = "Functions in file $file\n";
     autodoc(\*F,$file);
     close F or die "Error closing $file: $!\n";
 }
 
 safer_unlink "pod/perlapi.pod";
-open (DOC, ">pod/perlapi.pod") or
+open (DOC, ">", "pod/perlapi.pod") or
 	die "Can't create pod/perlapi.pod: $!\n";
 binmode DOC;
 
@@ -282,7 +282,7 @@ readonly_footer(\*DOC);
 close(DOC) or die "Error closing pod/perlapi.pod: $!";
 
 safer_unlink "pod/perlintern.pod";
-open(GUTS, ">pod/perlintern.pod") or
+open(GUTS, ">", "pod/perlintern.pod") or
 		die "Unable to create pod/perlintern.pod: $!\n";
 binmode GUTS;
 readonly_header(\*GUTS);

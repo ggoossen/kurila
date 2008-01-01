@@ -2,7 +2,7 @@
 
 $ENV{LC_ALL} = 'C';
 
-open (OUT, ">perlmodlib.pod") or die $!;
+open (OUT, ">", "perlmodlib.pod") or die $!;
 my (@pragma, @mod, @MANIFEST);
 
 open (MANIFEST, "../MANIFEST") or die $!;

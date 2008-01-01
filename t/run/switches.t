@@ -80,7 +80,7 @@ my $filename = 'swctest.tmp';
 SKIP: {
     local $TODO = '';   # this one works on VMS
 
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 BEGIN { print "block 1\n"; }
 CHECK { print "block 2\n"; }
@@ -127,7 +127,7 @@ is( $r, '21-', '-s switch parsing' );
 
 $filename = 'swstest.tmp';
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -s
 BEGIN { print $x,$y; exit }
@@ -144,7 +144,7 @@ SWTEST
 # Bug ID 20011106.084
 $filename = 'swsntest.tmp';
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -sn
 BEGIN { print $x; exit }
@@ -162,7 +162,7 @@ SWTEST
 
 $filename = 'swtest.pm';
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!",4 );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!",4 );
     print $f <<'SWTESTPM';
 package swtest;
 sub import { print map "<$_>", @_ }
@@ -273,7 +273,7 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoQqRrYyZz123456789_")
 
     sub do_i_unlink { 1 while unlink("file", "file.bak") }
 
-    open(FILE, ">file") or die "$0: Failed to create 'file': $!";
+    open(FILE, ">", "file") or die "$0: Failed to create 'file': $!";
     print FILE <<__EOF__;
 foo yada dada
 bada foo bing

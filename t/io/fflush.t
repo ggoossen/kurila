@@ -60,7 +60,7 @@ sub file_eq {
 
 # This script will be used as the command to execute from
 # child processes
-open PROG, "> ff-prog" or die "open ff-prog: $!";
+open PROG, ">", "ff-prog" or die "open ff-prog: $!";
 print PROG <<'EOF';
 my $f = shift;
 my $str = shift;
@@ -79,7 +79,7 @@ if (!$d_fork) {
     print "ok 1 # skipped: no fork\n";
 } else {
     my $f = "ff-fork-$$";
-    open OUT, "> $f" or die "open $f: $!";
+    open OUT, ">", " $f" or die "open $f: $!";
     print OUT "Pe";
     my $pid = fork;
     if ($pid) {
@@ -123,7 +123,7 @@ for (qw(system qx popen)) {
     my $code    = $subs{$_};
     my $f       = "ff-$_-$$";
     my $command = qq{$runperl "ff-prog" "$f" "rl"};
-    open OUT, "> $f" or die "open $f: $!";
+    open OUT, ">", " $f" or die "open $f: $!";
     print OUT "Pe";
     close OUT or die "close $f: $!";;
     print "# $command\n";

@@ -35,7 +35,7 @@ my $tmpfile = 'Op_read.tmp';
     use utf8;
     my $value = "\x{236a}" x 3; # e2.8d.aa x 3
 
-    open FH, ">$tmpfile" or die "Can't open $tmpfile: $!";
+    open FH, ">", "$tmpfile" or die "Can't open $tmpfile: $!";
     print FH $value;
     close FH;
 

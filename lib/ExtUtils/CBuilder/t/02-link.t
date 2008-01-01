@@ -36,7 +36,7 @@ ok $b;
 my $source_file = File::Spec->catfile('t', 'compilet.c');
 {
   local *FH;
-  open FH, "> $source_file" or die "Can't create $source_file: $!";
+  open FH, ">", "$source_file" or die "Can't create $source_file: $!";
   print FH "int main(void) \{ return 11; \}\n";
   close FH;
 }

@@ -123,7 +123,7 @@ unless (@ARGV) {
     my %skip;
     if (-f $configsh) {
 	my (%extensions, %known_extensions);
-	open FH, $configsh or die "Can't open $configsh: $!";
+	open FH, "<", $configsh or die "Can't open $configsh: $!";
 	while ( ~< *FH) {
 	    if (m/^extensions=['"](.*)['"]$/) {
 		# Deliberate string interpolation to avoid triggering possible
@@ -147,7 +147,7 @@ unless (@ARGV) {
 	}
     }
     my $mani = File::Spec->catfile($updir, "MANIFEST");
-    if (open(MANI, $mani)) {
+    if (open(MANI, "<", $mani)) {
 	my $ext_pat = $^O eq 'MSWin32' ? '(?:win32/)?ext' : 'ext';
 	while ( ~< *MANI) { # similar code in t/harness
 	    if (m!^($ext_pat/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!) {
@@ -171,7 +171,6 @@ unless (@ARGV) {
 	warn "$0: cannot open $mani: $!\n";
     }
     unless ($::core) {
-	_find_tests('Module_Pluggable');
 	_find_tests('pod');
 	_find_tests('japh') if $::torture;
     }
@@ -190,8 +189,8 @@ elsif ($::with_utf16) {
 		my $f = $e ? "v" : "n";
 		push @UARGV, $u;
 		unlink($u);
-		if (open(A, $a)) {
-		    if (open(U, ">$u")) {
+		if (open(A, "<", $a)) {
+		    if (open(U, ">", "$u")) {
 			print U pack("$f", 0xFEFF) if $b;
 			while ( ~< *A) {
 			    print U pack("$f*", unpack("C*", $_));
@@ -317,8 +316,8 @@ EOT
 		"./perl $testswitch $switch -I../lib -MO=-qq,Deparse,-sv1.,".
 		"-l$::deparse_opts$file_opts ".
 		"$test +> $test.dp ".
-		"&& ./perl $testswitch $switch -I../lib $test.dp |";
-	    open(RESULTS, $deparse_cmd)
+		"&& ./perl $testswitch $switch -I../lib $test.dp";
+	    open(RESULTS, "-|", $deparse_cmd)
 		or print "can't deparse '$deparse_cmd': $!.\n";
 	}
 	elsif ($type eq 'perl') {
@@ -429,7 +428,7 @@ EOT
 	if ($ENV{PERL_VALGRIND}) {
 	    my @valgrind;
 	    if (-e $valgrind_log) {
-		if (open(V, $valgrind_log)) {
+		if (open(V, "<", $valgrind_log)) {
 		    @valgrind = ~< *V;
 		    close V;
 		} else {

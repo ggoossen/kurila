@@ -38,13 +38,13 @@ my $parser = Pod::Text::Termcap->new or die "Cannot create parser\n";
 my $n = 2;
 while ( ~< *DATA) {
     next until $_ eq "###\n";
-    open (TMP, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
+    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
         print TMP $_;
     }
     close TMP;
-    open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
+    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
     open (TMP, 'out.tmp') or die "Cannot open out.tmp: $!\n";

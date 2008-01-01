@@ -342,7 +342,7 @@ EOM
     ok length $dest ;
 
     # write it to disk
-    ok open(FH, ">$name") ;
+    ok open(FH, ">", "$name") ;
     binmode(FH);
     print FH $dest ;
     close FH ;
@@ -370,7 +370,7 @@ EOM
     ok length $dest ;
 
     # write it to disk
-    ok open(FH, ">$name") ;
+    ok open(FH, ">", "$name") ;
     binmode(FH);
     print FH $dest ;
     close FH ;
@@ -1153,7 +1153,7 @@ sub trickle
     is trickle($name), $data1 . $data2, "got expected data from trickle";
 
     title "Trailing Data";
-    open F, ">>$name";
+    open F, ">>", "$name";
     print F $trailing;
     close F;
 

@@ -435,14 +435,14 @@ END
 	    $| = 1; print ""; $| = 0; # flush output before forking
 	    pipe READ, 'WRITE' or die "Can't make pipe: $!";
 	    pipe READ2, 'WRITE2' or die "Can't make second pipe: $!";
-	    die "Can't fork: $!" unless defined($pid = open PERL, "|-");
+	    die "Can't fork: $!" unless defined($pid = open PERL, "|-", '');
 	    unless ($pid) {
 	      # Child process here. We're going to send errors back
 	      # through the extra pipe.
 	      close READ;
 	      close READ2;
-	      open STDOUT, ">&WRITE"  or die "Can't redirect STDOUT: $!";
-	      open STDERR, ">&WRITE2" or die "Can't redirect STDERR: $!";
+	      open STDOUT, ">", "&WRITE"  or die "Can't redirect STDOUT: $!";
+	      open STDERR, ">", "&WRITE2" or die "Can't redirect STDERR: $!";
 	      exec which_perl(), '-w', '-MTestInit', '-'
 		or die "Can't exec perl: $!";
 	    } else {
@@ -462,7 +462,7 @@ END
 	    my $cmdfile = "tcmd$$";  $cmdfile++ while -e $cmdfile;
 	    my $errfile = "terr$$";  $errfile++ while -e $errfile;
 	    my @tmpfiles = ($cmdfile, $errfile);
-	    open CMD, ">$cmdfile"; print CMD $code; close CMD;
+	    open CMD, ">", "$cmdfile"; print CMD $code; close CMD;
 	    my $cmd = which_perl();
 	    $cmd .= " -w $cmdfile 2>$errfile";
 	    if ($^O eq 'VMS' or $^O eq 'MSWin32' or $^O eq 'NetWare') {
@@ -644,7 +644,7 @@ f16302();
    # and its children
 
     my $progfile = "b23265.pl";
-    open(T, ">$progfile") or die "$0: $!\n";
+    open(T, ">", "$progfile") or die "$0: $!\n";
     print T << '__EOF__';
         print
             sub {$_[0]->(@_)} -> (

@@ -117,7 +117,7 @@ if (defined($packfile)) { $self->{packfile} = $packfile; }
 else { $packfile = $self->{packfile}; }
 Carp::croak("No packlist filename specified") if (! defined($packfile));
 my $fh = mkfh();
-open($fh, "<$packfile") || Carp::croak("Can't open file $packfile: $!");
+open($fh, "<", "$packfile") || Carp::croak("Can't open file $packfile: $!");
 $self->{data} = {};
 my ($line);
 while (defined($line = ~< $fh))
@@ -152,7 +152,7 @@ if (defined($packfile)) { $self->{packfile} = $packfile; }
 else { $packfile = $self->{packfile}; }
 Carp::croak("No packlist filename specified") if (! defined($packfile));
 my $fh = mkfh();
-open($fh, ">$packfile") || Carp::croak("Can't open file $packfile: $!");
+open($fh, ">", "$packfile") || Carp::croak("Can't open file $packfile: $!");
 foreach my $key (sort(keys(%{$self->{data}})))
    {
        my $data = $self->{data}->{$key};

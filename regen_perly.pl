@@ -91,13 +91,13 @@ my ($actlines, $tablines) = extract($clines);
 $tablines .= make_type_tab($y_file, $tablines);
 
 chmod 0644, $act_file;
-open ACTFILE, ">$act_file" or die "can't open $act_file: $!\n";
+open ACTFILE, ">", "$act_file" or die "can't open $act_file: $!\n";
 print ACTFILE $actlines;
 close ACTFILE;
 chmod 0444, $act_file;
 
 chmod 0644, $tab_file;
-open TABFILE, ">$tab_file" or die "can't open $tab_file: $!\n";
+open TABFILE, ">", "$tab_file" or die "can't open $tab_file: $!\n";
 print TABFILE $tablines;
 close TABFILE;
 chmod 0444, $tab_file;
@@ -110,7 +110,7 @@ unlink $tmpc_file;
 
 open TMPH_FILE, $tmph_file or die "Can't open $tmph_file: $!\n";
 chmod 0644, $h_file;
-open H_FILE, ">$h_file" or die "Can't open $h_file: $!\n";
+open H_FILE, ">", "$h_file" or die "Can't open $h_file: $!\n";
 my $endcore_done = 0;
 while ( ~< *TMPH_FILE) {
     print H_FILE "#ifdef PERL_CORE\n" if $. == 1;

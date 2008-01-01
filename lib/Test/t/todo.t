@@ -6,7 +6,7 @@ use Test qw(:DEFAULT $TESTOUT $TESTERR $ntest);
 ### seeing the todo tests, otherwise you get people sending in bug reports
 ### about Test.pm having "UNEXPECTEDLY SUCCEEDED" tests.
 
-open F, ">todo";
+open F, ">", "todo";
 $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 my $tests = 5; 

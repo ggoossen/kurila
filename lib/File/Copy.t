@@ -41,7 +41,7 @@ for my $cross_partition_test (0..1) {
   }
 
   # First we create a file
-  open(F, ">file-$$") or die;
+  open(F, ">", "file-$$") or die;
   binmode F; # for DOSISH platforms, because test 3 copies to stdout
   printf F "ok\n";
   close F;
@@ -152,7 +152,7 @@ for my $cross_partition_test (0..1) {
   SKIP: {
     skip "Testing symlinks", 3 unless $Config{d_symlink};
 
-    open(F, ">file-$$") or die $!;
+    open(F, ">", "file-$$") or die $!;
     print F "dummy content\n";
     close F;
     symlink("file-$$", "symlink-$$") or die $!;
@@ -173,7 +173,7 @@ for my $cross_partition_test (0..1) {
     skip "Testing hard links", 3 
          if !$Config{d_link} or $^O eq 'MSWin32' or $^O eq 'cygwin';
 
-    open(F, ">file-$$") or die $!;
+    open(F, ">", "file-$$") or die $!;
     print F "dummy content\n";
     close F;
     link("file-$$", "hardlink-$$") or die $!;

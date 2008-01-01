@@ -57,7 +57,7 @@ sub ok
         my $class = shift ;
         my $filename = shift ;
 	my $fh = gensym ;
-	open ($fh, ">$filename") || die "Cannot open $filename: $!" ;
+	open ($fh, ">", "$filename") || die "Cannot open $filename: $!" ;
 	my $real_stdout = select($fh) ;
 	return bless [$fh, $real_stdout ] ;
 
@@ -417,7 +417,7 @@ unlink $Dfile;
    use warnings ;
    use strict ;
 
-   open(FILE, ">SubDB.pm") or die "Cannot open SubDB.pm: $!\n" ;
+   open(FILE, ">", "SubDB.pm") or die "Cannot open SubDB.pm: $!\n" ;
    print FILE <<'EOM' ;
 
    package SubDB ;

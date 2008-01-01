@@ -64,7 +64,7 @@ sub run
             my $lex = LexFile->new( my $out_file) ;
 
             # create empty file
-            open F, ">$out_file" ; print F "x"; close F;
+            open F, ">", "$out_file" ; print F "x"; close F;
             ok   -e $out_file, "  file exists" ;
             ok  !-z $out_file, "  and is not empty" ;
             

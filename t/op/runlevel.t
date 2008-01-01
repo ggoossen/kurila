@@ -30,7 +30,7 @@ for (@prgs){
        $switch = $1;
     }
     my($prog,$expected) = split(m/\nEXPECT\n/, $_);
-    open TEST, ">$tmpfile";
+    open TEST, ">", "$tmpfile";
     print TEST "$prog\n";
     close TEST or die "Could not close: $!";
     my $results = $Is_VMS ?

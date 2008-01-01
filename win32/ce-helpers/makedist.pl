@@ -138,7 +138,7 @@ for (@afiles) {
 
 sub copy($$) {
   my ($fnfrom, $fnto) = @_;
-  open my $fh, "<$fnfrom" or die "can not open $fnfrom: $!";
+  open my $fh, "<", "$fnfrom" or die "can not open $fnfrom: $!";
   binmode $fh;
   local $/;
   my $ffrom = ~< $fh;
@@ -153,7 +153,7 @@ sub copy($$) {
     }
   }
   mkpath $1 if $fnto=~m/^(.*)\/([^\/]+)$/;
-  open my $fhout, ">$fnto";
+  open my $fhout, ">", "$fnto";
   binmode $fhout;
   print $fhout $ffrom;
   if ($opts{'verbose'} +>=2) {

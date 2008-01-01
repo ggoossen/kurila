@@ -96,7 +96,7 @@ sub run
             use Config;
 
             my $lex = LexFile->new( my $out_file) ;
-            open OUT, ">$out_file" ;
+            open OUT, ">", "$out_file" ;
             eval { $a = $Func->(\*OUT, \*OUT) ;} ;
             like $@, mkErr("^$TopType: input and output handle are identical"),
                 '  Input and Output handle are the same';
@@ -473,16 +473,16 @@ sub run
                     my $lex = LexFile->new(my $in_file, my $out_file) ;
                     writeFile($in_file, $buffer);
 
-                       open(SAVEIN, "<&STDIN");
+                       open(SAVEIN, "<", "&STDIN");
                     my $dummy = fileno SAVEIN ;
-                    ok open(STDIN, "<$in_file"), "  redirect STDIN";
+                    ok open(STDIN, "<", "$in_file"), "  redirect STDIN";
 
                     my $out = $already;
 
                     ok &$Func('-', \$out, Append => $append), '  Compressed ok' 
                         or diag $$Error ;
 
-                       open(STDIN, "<&SAVEIN");
+                       open(STDIN, "<", "&SAVEIN");
 
                     my $got = anyUncompress(\$out, $already);
                     $got = undef if ! defined $buffer && $got eq '' ;
@@ -1186,9 +1186,9 @@ sub run
                 my $lex = LexFile->new(my $in_file) ;
                 writeFile($in_file, $comp);
 
-                   open(SAVEIN, "<&STDIN");
+                   open(SAVEIN, "<", "&STDIN");
                 my $dummy = fileno SAVEIN ;
-                ok open(STDIN, "<$in_file"), "  redirect STDIN";
+                ok open(STDIN, "<", "$in_file"), "  redirect STDIN";
 
                 my $output ;
                 $output = $incumbent if $append ;
@@ -1196,7 +1196,7 @@ sub run
                 ok &$Func('-', \$output, Append => $append, @opts), '  Uncompressed ok' 
                     or diag $$Error ;
 
-                   open(STDIN, "<&SAVEIN");
+                   open(STDIN, "<", "&SAVEIN");
 
                 is $keep_comp, $comp, "  Input buffer not changed" ;
                 is $output, $expected, "  Uncompressed matches original";
@@ -1243,9 +1243,9 @@ sub run
             my $len_appended = length $appended;
             writeFile($in_file, $comp . $appended ) ;
 
-               open(SAVEIN, "<&STDIN");
+               open(SAVEIN, "<", "&STDIN");
             my $dummy = fileno SAVEIN ;
-            ok open(STDIN, "<$in_file"), "  redirect STDIN";
+            ok open(STDIN, "<", "$in_file"), "  redirect STDIN";
 
             my $output ;
 
@@ -1258,7 +1258,7 @@ sub run
             is $output, $expected, "  Uncompressed matches original";
             is $buff, $appended, "  Appended data ok";
 
-              open(STDIN, "<&SAVEIN");
+              open(STDIN, "<", "&SAVEIN");
         }
     }
 

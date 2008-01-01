@@ -4,7 +4,7 @@ use vars qw($Expect);
 use Test qw($TESTOUT $TESTERR $ntest ok skip plan); 
 plan tests => 14;
 
-open F, ">fails";
+open F, ">", "fails";
 $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 

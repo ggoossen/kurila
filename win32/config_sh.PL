@@ -55,7 +55,7 @@ $opt{'known_extensions'} = join(' ',FindExt::known_extensions()) || ' ';
 my $pl_h = '../patchlevel.h';
 
 if (-e $pl_h) {
-    open PL, "<$pl_h" or die "Can't open $pl_h: $!";
+    open PL, "<", "$pl_h" or die "Can't open $pl_h: $!";
     while ( ~< *PL) {
 	if (m/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
 	    $opt{$1} = $2;
