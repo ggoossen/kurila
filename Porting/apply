@@ -27,7 +27,7 @@ my @have = `p4 have @edit`;
 if ($code == 0)
  {
   System("p4 edit @edit");
-  open(PIPE,"|p4 change -i") || die "Cannot open pipe to p4:$!";
+  open(PIPE, "|-","p4 change -i") || die "Cannot open pipe to p4:$!";
   print PIPE "Change: new\n";
   print PIPE "Description:\n";
   foreach my $key (qw(Subject From Date Message-Id))

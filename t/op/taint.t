@@ -131,7 +131,7 @@ sub test ($;$) {
 # We need an external program to call.
 my $ECHO = ($Is_MSWin32 ? ".\\echo$$" : $Is_MacOS ? ":echo$$" : ($Is_NetWare ? "echo$$" : "./echo$$"));
 END { unlink $ECHO }
-open PROG, ">", " $ECHO" or die "Can't create $ECHO: $!";
+open PROG, ">", "$ECHO" or die "Can't create $ECHO: $!";
 print PROG 'print "@ARGV\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
@@ -440,7 +440,7 @@ SKIP: {
     SKIP: {
         skip "open('|') is not available", 4 if $^O eq 'amigaos';
 
-	test !eval { open FOO, "| x$foo" }, 'popen to';
+	test !eval { open FOO, "|-", "x$foo" }, 'popen to';
 	test $@ =~ m/^Insecure dependency/, $@;
 
 	test !eval { open FOO, "x$foo |" }, 'popen from';
@@ -1163,7 +1163,7 @@ SKIP:
 	$ENV{'PATH'} = $TAINT;
 	local $SIG{'PIPE'} = 'IGNORE';
 	eval {
-	    my $pid = open my $pipe, '|-';
+	    my $pid = open my $pipe, "|-", '-';
 	    if (!defined $pid) {
 		die "open failed: $!";
 	    }
@@ -1214,7 +1214,7 @@ SKIP:
     like ($@, qr/^Insecure dependency in eval/);
 
     # Rather nice code to get a tainted undef by from Rick Delaney
-    open FH, "test.pl" or die $!;
+    open FH, "<", "test.pl" or die $!;
     seek FH, 0, 2 or die $!;
     $tainted = ~< *FH;
 

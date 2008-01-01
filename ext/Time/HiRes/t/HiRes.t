@@ -98,7 +98,7 @@ if ($have_fork) {
 
 my $xdefine = ''; 
 
-if (open(XDEFINE, "xdefine")) {
+if (open(XDEFINE, "<", "xdefine")) {
     chomp($xdefine = ~< *XDEFINE);
     close(XDEFINE);
 }

@@ -56,8 +56,8 @@ BEGIN {
 }
 
 if (!defined $file) {
-    open(TESTS,'op/re_tests') || open(TESTS,'t/op/re_tests')
-	|| open(TESTS,':op:re_tests') || die "Can't open re_tests";
+    open(TESTS, "<",'op/re_tests') || open(TESTS, "<",'t/op/re_tests')
+	|| open(TESTS, "<",':op:re_tests') || die "Can't open re_tests";
 }
 
 my @tests = ~< *TESTS;

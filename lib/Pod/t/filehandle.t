@@ -46,7 +46,7 @@ while ( ~< *DATA) {
     $man->parse_from_filehandle (\*IN, \*OUT);
     close IN;
     close OUT;
-    open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
     {
@@ -71,7 +71,7 @@ while ( ~< *DATA) {
     $text->parse_from_filehandle (\*IN, \*OUT);
     close IN;
     close OUT;
-    open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     {
         local $/;
         $output = ~< *OUT;

@@ -18,7 +18,7 @@ print "ok 1\n";
 }
 
 # Get data written to file
-open(FOO, "foo-$$") || die;
+open(FOO, "<", "foo-$$") || die;
 chomp($foo = ~< *FOO);
 close FOO;
 unlink "foo-$$";

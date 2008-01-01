@@ -40,7 +40,7 @@ sub add_file {
 }
 
 sub read_manifest {
-    open( M, 'MANIFEST' ) or return;
+    open( M, "<", 'MANIFEST' ) or return;
     chomp( my @files = ~< *M );
     close M;
     return @files;

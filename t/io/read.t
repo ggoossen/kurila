@@ -12,7 +12,7 @@ die $@ if $@ and !$ENV{PERL_CORE_MINITEST};
 
 plan tests => 2;
 
-open(A,"+>a");
+open(A, "+>","a");
 print A "_";
 seek(A,0,0);
 

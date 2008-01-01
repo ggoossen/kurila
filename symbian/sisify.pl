@@ -187,7 +187,7 @@ $OWD =~ s!/!\\!g;
 chdir($tempdir) or die "$0: chdir('$tempdir')\n";
 
 if (@SisPl) {
-  if (open(my $fi, "default.pl")) {
+  if (open(my $fi, "<", "default.pl")) {
     my $fn = "default.pl.new";
     if (open(my $fo, ">", "$fn")) {
       while ( ~< $fi) {

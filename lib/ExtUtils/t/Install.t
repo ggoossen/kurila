@@ -75,7 +75,7 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' );
 ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
-open(PACKLIST, 'install-test/packlist' );
+open(PACKLIST, "<", 'install-test/packlist' );
 my %packlist = map { chomp;  ($_ => 1) } ~< *PACKLIST;
 close PACKLIST;
 

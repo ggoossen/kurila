@@ -179,7 +179,7 @@ END { unlink $file; }
     ok( -s $file, 'writing to filehandle $_ works' );
 }
 {
-    open my $_, $file or die "Can't open $file: $!";
+    open my $_, "<", $file or die "Can't open $file: $!";
     my $x = ~< $_;
     ok( $x eq "hello\n", 'reading from <$_> works' );
     close $_;

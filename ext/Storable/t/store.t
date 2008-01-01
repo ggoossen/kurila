@@ -79,7 +79,7 @@ print "ok 10\n";
 print "not " unless close(OUT);
 print "ok 11\n";
 
-print "not " unless open(OUT, 'store');
+print "not " unless open(OUT, "<", 'store');
 binmode OUT;
 
 $r = fd_retrieve('::OUT');

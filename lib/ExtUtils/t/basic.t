@@ -88,7 +88,7 @@ END { unlink 'MANIFEST'; }
 
 my $ppd_out = run("$make ppd");
 is( $?, 0,                      '  exited normally' ) || diag $ppd_out;
-ok( open(PPD, 'Big-Dummy.ppd'), '  .ppd file generated' );
+ok( open(PPD, "<", 'Big-Dummy.ppd'), '  .ppd file generated' );
 my $ppd_html;
 { local $/; $ppd_html = ~< *PPD }
 close PPD;

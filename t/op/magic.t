@@ -63,7 +63,7 @@ else              { ok `echo \$FOO` eq "hi there\n"; }
 
 unlink 'ajslkdfpqjsjfk';
 $! = 0;
-open(FOO,'ajslkdfpqjsjfk');
+open(FOO, "<",'ajslkdfpqjsjfk');
 ok $!, $!;
 close FOO; # just mention it, squelch used-only-once
 
@@ -76,7 +76,7 @@ else {
   # We use a pipe rather than system() because the VMS command buffer
   # would overflow with a command that long.
 
-    open( CMDPIPE, "| $PERL");
+    open( CMDPIPE, "|-", "$PERL");
 
     print CMDPIPE <<'END';
 
@@ -99,7 +99,7 @@ END
 
     close CMDPIPE;
 
-    open( CMDPIPE, "| $PERL");
+    open( CMDPIPE, "|-", "$PERL");
     print CMDPIPE <<'END';
 
     { package X;
@@ -394,7 +394,7 @@ if ($Is_miniperl) {
     undef %{Symbol::stash("Errno")};
     delete $INC{"Errno.pm"};
 
-    open(FOO, "nonesuch"); # Generate ENOENT
+    open(FOO, "<", "nonesuch"); # Generate ENOENT
     no strict 'refs';
     my %errs = %{*{Symbol::fetch_glob("!")}}; # Cause Errno.pm to be loaded at run-time
     ok ${*{Symbol::fetch_glob("!")}}{ENOENT};

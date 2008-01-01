@@ -31,7 +31,7 @@ SKIP: {
 	Mkbootstrap('mkboot');
 	ok( -s 'mkboot.bso', 'Mkbootstrap should backup the .bs file' );
 	local *IN;
-	if (open(IN, 'mkboot.bso')) {
+	if (open(IN, "<", 'mkboot.bso')) {
 		chomp ($file_is_ready = ~< *IN);
 		close IN;
 	}
@@ -98,7 +98,7 @@ SKIP: {
 	like( $read, qr/containing: my/, 'should print verbose status on request' );
 
 	# now be tricky, and set the status for the next skip block
-	$file_is_ready = open(IN, 'dasboot.bs');
+	$file_is_ready = open(IN, "<", 'dasboot.bs');
 	ok( $file_is_ready, 'should have written a new .bs file' );
 }
 
@@ -132,7 +132,7 @@ SKIP: {
 	eval{ Mkbootstrap('dasboot', '-Larry') };
 	is( $@, '', 'should be able to open a file again');
 
-	$file_is_ready = open(IN, 'dasboot.bs');
+	$file_is_ready = open(IN, "<", 'dasboot.bs');
 }
 
 SKIP: {

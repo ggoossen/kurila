@@ -587,7 +587,7 @@ sub xsconfig {
         my @MM = qw(VERSION XS_VERSION);
         if ( -f "Makefile" ) {
             print "\tReading MakeMaker Makefile...\n";
-            if ( open( MAKEFILE, "Makefile" ) ) {
+            if ( open( MAKEFILE, "<", "Makefile" ) ) {
                 while ( ~< *MAKEFILE) {
                     for my $m (@MM) {
                         if (m!^$m = (.+)!) {
@@ -778,7 +778,7 @@ for my $ext (@ARGV) {
       if $CoreBuild && $Build && !-f "lib\\Config.pm";
 
     if ($CoreBuild) {
-        open( my $cfg, "symbian/install.cfg" )
+        open( my $cfg, "<", "symbian/install.cfg" )
           or die "$0: symbian/install.cfg: $!\n";
         my $extdir = $dir;
         $extdir =~ s:^ext\\::;

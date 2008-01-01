@@ -3579,7 +3579,7 @@ sub _ftp_statistics {
     my $locktype = $fh ? LOCK_EX : LOCK_SH;
     $fh ||= FileHandle->new;
     my $file = File::Spec->catfile($CPAN::Config->{cpan_home},"FTPstats.yml");
-    open $fh, "+>>$file" or $CPAN::Frontend->mydie("Could not open '$file': $!");
+    open $fh, "<", "+>>$file" or $CPAN::Frontend->mydie("Could not open '$file': $!");
     my $sleep = 1;
     my $waitstart;
     while (!CPAN::_flock($fh, $locktype^|^LOCK_NB)) {
@@ -6486,7 +6486,7 @@ sub try_download {
                 $readfh = CPAN::Tarzip->TIEHANDLE($patch); # open again
                 my $writefh = FileHandle->new;
                 $CPAN::Frontend->myprint("  $pcommand\n");
-                unless (open $writefh, "|$pcommand") {
+                unless (open $writefh, "|-", "$pcommand") {
                     my $fail = "Could not fork '$pcommand'";
                     $CPAN::Frontend->mywarn("$fail; cannot continue\n");
                     $self->{unwrapped} = CPAN::Distrostatus->new("NO -- $fail");
