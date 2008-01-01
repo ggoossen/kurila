@@ -247,7 +247,7 @@ sub _store {
 	logcroak "wrong argument number" unless @_ == 2;	# No @foo in arglist
 	local *FILE;
 	if ($use_locking) {
-		open(FILE, ">>$file") || logcroak "can't write into $file: $!";
+		open(FILE, ">>", "$file") || logcroak "can't write into $file: $!";
 		unless (&CAN_FLOCK) {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
 			return undef;
@@ -257,7 +257,7 @@ sub _store {
 		truncate *FILE, 0;
 		# Unlocking will happen when FILE is closed
 	} else {
-		open(FILE, ">$file") || logcroak "can't create $file: $!";
+		open(FILE, ">", "$file") || logcroak "can't create $file: $!";
 	}
 	binmode FILE;				# Archaic systems...
 	my $da = $@;				# Don't mess if called from exception handler

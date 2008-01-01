@@ -148,7 +148,7 @@ is $testimport->[1], "joe", "testimport is still 'joe'";
 {
     # Regression test for patch 14937: 
     #   Check that a .pm file with no package or VERSION doesn't core.
-    open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
+    open F, ">", "xxx.pm" or die "Cannot open xxx.pm: $!\n";
     print F "1;\n";
     close F;
     eval "use lib '.'; use xxx v3;";

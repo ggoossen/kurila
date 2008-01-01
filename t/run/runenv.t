@@ -50,9 +50,9 @@ sub runperl {
     wait;
     return (0, "Failure in child.\n") if ($?>>8) == $FAILURE_CODE;
 
-    open F, "< $STDOUT" or return (0, "Couldn't read $STDOUT file");
+    open F, "<", " $STDOUT" or return (0, "Couldn't read $STDOUT file");
     { local $/; $actual_stdout = ~< *F }
-    open F, "< $STDERR" or return (0, "Couldn't read $STDERR file");
+    open F, "<", " $STDERR" or return (0, "Couldn't read $STDERR file");
     { local $/; $actual_stderr = ~< *F }
 
     if ($actual_stdout ne $stdout) {
@@ -66,8 +66,8 @@ sub runperl {
     for my $k (keys %$env) {
       $ENV{$k} = $env->{$k};
     }
-    open STDOUT, "> $STDOUT" or exit $FAILURE_CODE;
-    open STDERR, "> $STDERR" or it_didnt_work();
+    open STDOUT, ">", " $STDOUT" or exit $FAILURE_CODE;
+    open STDERR, ">", " $STDERR" or it_didnt_work();
     { exec $PERL, @$args }
     it_didnt_work();
   }

@@ -287,7 +287,7 @@ SKIP: {
     
     
     {
-	open F, ">aaa.pm" or die "Cannot open aaa.pm: $!\n";
+	open F, ">", "aaa.pm" or die "Cannot open aaa.pm: $!\n";
 	print F "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
 	close F;
 
@@ -320,7 +320,7 @@ SKIP: {
     }
 
     { # dummy up some variously broken modules for testing
-	open F, ">xxx.pm" or die "Cannot open xxx.pm: $!\n";
+	open F, ">", "xxx.pm" or die "Cannot open xxx.pm: $!\n";
 	print F "1;\n";
 	close F;
 
@@ -335,7 +335,7 @@ SKIP: {
     }
     
     { # dummy up some variously broken modules for testing
-	open F, ">yyy.pm" or die "Cannot open yyy.pm: $!\n";
+	open F, ">", "yyy.pm" or die "Cannot open yyy.pm: $!\n";
 	print F "package yyy;\n#look ma no VERSION\n1;\n";
 	close F;
 	eval "use lib '.'; use yyy v3;";
@@ -348,7 +348,7 @@ SKIP: {
     }
 
     { # dummy up some variously broken modules for testing
-	open F, ">zzz.pm" or die "Cannot open zzz.pm: $!\n";
+	open F, ">", "zzz.pm" or die "Cannot open zzz.pm: $!\n";
 	print F "package zzz;\n\@VERSION = ();\n1;\n";
 	close F;
 	eval "use lib '.'; use zzz v3;";
@@ -417,7 +417,7 @@ SKIP: 	{
 
 SKIP: {
 	# dummy up a legal module for testing RT#19017
-	open F, ">www.pm" or die "Cannot open www.pm: $!\n";
+	open F, ">", "www.pm" or die "Cannot open www.pm: $!\n";
 	print F <<"EOF";
 package www;
 use version; \$VERSION = qv('0.0.4');
@@ -447,7 +447,7 @@ EOF
 	unlink 'www.pm';
     }
 
-    open F, ">vvv.pm" or die "Cannot open vvv.pm: $!\n";
+    open F, ">", "vvv.pm" or die "Cannot open vvv.pm: $!\n";
     print F <<"EOF";
 package vvv;
 use base qw(version);
@@ -463,7 +463,7 @@ EOF
     unlink 'vvv.pm';
 
 SKIP: {
-	open F, ">uuu.pm" or die "Cannot open uuu.pm: $!\n";
+	open F, ">", "uuu.pm" or die "Cannot open uuu.pm: $!\n";
 	print F <<"EOF";
 package uuu;
 \$VERSION = 1.0;

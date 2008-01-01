@@ -113,7 +113,7 @@ sub Addfile {
 	my $text = -T $file;
 
 	local *FH;
-	open(FH, "<$file") or _bail("Open failed");
+	open(FH, "<", "$file") or _bail("Open failed");
 	binmode(FH) if $binary || $portable;
 
 	unless ($portable && $text) {

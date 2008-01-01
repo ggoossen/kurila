@@ -19,7 +19,7 @@ BEGIN { use_ok( 'ExtUtils::Mkbootstrap' ) }
 # Mkbootstrap makes a backup copy of "$_[0].bs" if it exists and is non-zero
 my $file_is_ready;
 local *OUT;
-if (open(OUT, '>mkboot.bs')) {
+if (open(OUT, ">", 'mkboot.bs')) {
 	$file_is_ready = 1;
 	print OUT 'meaningless text';
 	close OUT;
@@ -57,7 +57,7 @@ like( $out->read, qr/bsloadlibs=foo/, 'should still report libraries' );
 
 
 # if ${_[0]}_BS exists, require it
-$file_is_ready = open(OUT, '>boot_BS');
+$file_is_ready = open(OUT, ">", 'boot_BS');
 
 SKIP: {
 	skip("cannot open boot_BS for writing: $!", 1) unless $file_is_ready;
@@ -71,7 +71,7 @@ SKIP: {
 
 
 # if there are any arguments, open a file named baseext.bs
-$file_is_ready = open(OUT, '>dasboot.bs');
+$file_is_ready = open(OUT, ">", 'dasboot.bs');
 
 SKIP: {
 	skip("cannot make dasboot.bs: $!", 5) unless $file_is_ready;
@@ -117,7 +117,7 @@ SKIP: {
 
 
 # overwrite this file (may whack portability, but the name's too good to waste)
-$file_is_ready = open(OUT, '>dasboot.bs');
+$file_is_ready = open(OUT, ">", 'dasboot.bs');
 
 SKIP: {
 	skip("cannot make dasboot.bs again: $!", 1) unless $file_is_ready;

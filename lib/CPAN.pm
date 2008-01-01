@@ -442,7 +442,7 @@ sub _yaml_dumpfile {
             eval { $code->($local_file,@what); };
         } elsif ($code = UNIVERSAL::can($yaml_module, "Dump")) {
             local *FH;
-            open FH, ">$local_file" or die "Could not open '$local_file': $!";
+            open FH, ">", "$local_file" or die "Could not open '$local_file': $!";
             print FH $code->(@what);
         }
         if ($@) {
@@ -1353,7 +1353,7 @@ sub cleanup {
 sub readhist {
     my($self,$term,$histfile) = @_;
     my($fh) = FileHandle->new;
-    open $fh, "<$histfile" or last;
+    open $fh, "<", "$histfile" or last;
     local $/ = "\n";
     while ( ~< $fh) {
         chomp;
@@ -1382,7 +1382,7 @@ sub savehist {
     my @h = $CPAN::term->GetHistory;
     splice @h, 0, @h-$histsize if @h+>$histsize;
     my($fh) = FileHandle->new;
-    open $fh, ">$histfile" or $CPAN::Frontend->mydie("Couldn't open >$histfile: $!");
+    open $fh, ">", "$histfile" or $CPAN::Frontend->mydie("Couldn't open >$histfile: $!");
     local $\ = local $, = "\n";
     print $fh @h;
     close $fh;
@@ -7796,7 +7796,7 @@ sub _find_prefs {
                 } elsif ($thisexte eq "dd") {
                     package CPAN::Eval;
                     no strict;
-                    open FH, "<$abs" or $CPAN::Frontend->mydie("Could not open '$abs': $!");
+                    open FH, "<", "$abs" or $CPAN::Frontend->mydie("Could not open '$abs': $!");
                     local $/;
                     my $eval = ~< *FH;
                     close FH;
@@ -9016,7 +9016,7 @@ Could not fork '$html_converter $saved_file': $!});
             } else {
                 $filename = "cpan_htmlconvert_$$.txt";
                 $fh = FileHandle->new();
-                open $fh, ">$filename" or die;
+                open $fh, ">", "$filename" or die;
             }
             while ( ~< *README) {
                 $fh->print($_);

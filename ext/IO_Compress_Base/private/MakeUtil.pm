@@ -75,7 +75,7 @@ sub getPerlFiles
         $prefix = $1
             if $manifest =~ m#^(.*/)#;
 
-        open M, "<$manifest"
+        open M, "<", "$manifest"
             or die "Cannot open '$manifest': $!\n";
         while ( ~< *M)
         {
@@ -252,7 +252,7 @@ sub doUpDownViaCopy
     my @keep = ();
 
     {
-        open F, "<$file"
+        open F, "<", "$file"
             or die "Cannot open $file: $!\n" ;
         while ( ~< *F)
         {
@@ -276,7 +276,7 @@ sub doUpDownViaCopy
     }
 
     {
-        open F, ">$file"
+        open F, ">", "$file"
             or die "Cannot open $file: $!\n";
         print F @keep ;
         close F;

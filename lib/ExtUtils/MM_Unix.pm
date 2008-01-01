@@ -1332,7 +1332,7 @@ sub _has_pod {
 
     local *FH;
     my($ispod)=0;
-    if (open(FH,"<$file")) {
+    if (open(FH, "<","$file")) {
 	while ( ~< *FH) {
 	    if (m/^=(?:head\d+|item|pod)\b/) {
 		$ispod=1;

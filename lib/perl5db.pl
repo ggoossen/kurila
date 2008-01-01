@@ -1741,26 +1741,26 @@ and if we can.
             $o = $i unless defined $o;
 
             # read/write on in, or just read, or read on STDIN.
-            open( IN,      "+<$i" )
-              || open( IN, "<$i" )
-              || open( IN, "<&STDIN" );
+            open( IN,      "+<", "$i" )
+              || open( IN, "<", "$i" )
+              || open( IN, "<", "&STDIN" );
 
             # read/write/create/clobber out, or write/create/clobber out,
             # or merge with STDERR, or merge with STDOUT.
-                 open( OUT, "+>$o" )
-              || open( OUT, ">$o" )
-              || open( OUT, ">&STDERR" )
-              || open( OUT, ">&STDOUT" );    # so we don't dongle stdout
+                 open( OUT, "+>", "$o" )
+              || open( OUT, ">", "$o" )
+              || open( OUT, ">", "&STDERR" )
+              || open( OUT, ">", "&STDOUT" );    # so we don't dongle stdout
 
         } ## end if ($console)
         elsif ( not defined $console ) {
 
             # No console. Open STDIN.
-            open( IN, "<&STDIN" );
+            open( IN, "<", "&STDIN" );
 
             # merge with STDERR, or with STDOUT.
-            open( OUT,      ">&STDERR" )
-              || open( OUT, ">&STDOUT" );    # so we don't dongle stdout
+            open( OUT, ">",      "&STDERR" )
+              || open( OUT, ">", "&STDOUT" );    # so we don't dongle stdout
             $console = 'STDIN/OUT';
         } ## end elsif (not defined $console)
 
@@ -3256,7 +3256,7 @@ pick it up.
 
                 # source - read commands from a file (or pipe!) and execute.
                 $cmd =~ m/^source\s+(.*\S)/ && do {
-                    if ( open my $fh, $1 ) {
+                    if ( open my $fh, "<", $1 ) {
 
                         # Opened OK; stick it in the list of file handles.
                         push @cmdfhs, $fh;
@@ -3281,7 +3281,7 @@ Note that all C<^(save|source)>'s are commented out with a view to minimise recu
                 # save source - write commands to a file for later use
                 $cmd =~ m/^save\s*(.*)$/ && do {
                     my $file = $1 || '.perl5dbrc';    # default?
-                    if ( open my $fh, "> $file" ) {
+                    if ( open my $fh, ">", " $file" ) {
 
                        # chomp to remove extraneous newlines from source'd files
                         chomp( my @truelist =
@@ -3324,7 +3324,7 @@ Return to any given position in the B<true>-history list
 
                     if (defined $max_fd) {
                         foreach ($^F+1 .. $max_fd-1) {
-                            next unless open FD_TO_CLOSE, "<&=$_";
+                            next unless open FD_TO_CLOSE, "<", "&=$_";
                             close(FD_TO_CLOSE);
                         }
                     }
@@ -3355,37 +3355,37 @@ reading another.
                     if ( $pager =~ m/^\|/ ) {
 
                         # Default pager is into a pipe. Redirect I/O.
-                        open( SAVEOUT, ">&STDOUT" )
+                        open( SAVEOUT, ">", "&STDOUT" )
                           || &warn("Can't save STDOUT");
-                        open( STDOUT, ">&OUT" )
+                        open( STDOUT, ">", "&OUT" )
                           || &warn("Can't redirect STDOUT");
                     } ## end if ($pager =~ /^\|/)
                     else {
 
                         # Not into a pipe. STDOUT is safe.
-                        open( SAVEOUT, ">&OUT" ) || &warn("Can't save DB::OUT");
+                        open( SAVEOUT, ">", "&OUT" ) || &warn("Can't save DB::OUT");
                     }
 
                     # Fix up environment to record we have less if so.
                     fix_less();
 
-                    unless ( $piped = open( OUT, $pager ) ) {
+                    unless ( $piped = open( OUT, "<", $pager ) ) {
 
                         # Couldn't open pipe to pager.
                         &warn("Can't pipe output to `$pager'");
                         if ( $pager =~ m/^\|/ ) {
 
                             # Redirect I/O back again.
-                            open( OUT, ">&STDOUT" )    # XXX: lost message
+                            open( OUT, ">", "&STDOUT" )    # XXX: lost message
                               || &warn("Can't restore DB::OUT");
-                            open( STDOUT, ">&SAVEOUT" )
+                            open( STDOUT, ">", "&SAVEOUT" )
                               || &warn("Can't restore STDOUT");
                             close(SAVEOUT);
                         } ## end if ($pager =~ /^\|/)
                         else {
 
                             # Redirect I/O. STDOUT already safe.
-                            open( OUT, ">&STDOUT" )    # XXX: lost message
+                            open( OUT, ">", "&STDOUT" )    # XXX: lost message
                               || &warn("Can't restore DB::OUT");
                         }
                         next CMD;
@@ -3492,8 +3492,8 @@ our standard filehandles for input and output.
 
                     # Reopen filehandle for our output (if we can) and
                     # restore STDOUT (if we can).
-                    open( OUT, ">&STDOUT" ) || &warn("Can't restore DB::OUT");
-                    open( STDOUT, ">&SAVEOUT" )
+                    open( OUT, ">", "&STDOUT" ) || &warn("Can't restore DB::OUT");
+                    open( STDOUT, ">", "&SAVEOUT" )
                       || &warn("Can't restore STDOUT");
 
                     # Turn off pipe exception handler if necessary.
@@ -3505,7 +3505,7 @@ our standard filehandles for input and output.
                 else {
 
                     # Non-piped "pager". Just restore STDOUT.
-                    open( OUT, ">&SAVEOUT" ) || &warn("Can't restore DB::OUT");
+                    open( OUT, ">", "&SAVEOUT" ) || &warn("Can't restore DB::OUT");
                 }
 
                 # Close filehandle pager was using, restore the normal one
@@ -5900,15 +5900,15 @@ sub system {
 
     # We save, change, then restore STDIN and STDOUT to avoid fork() since
     # some non-Unix systems can do system() but have problems with fork().
-    open( SAVEIN,  "<&STDIN" )  || &warn("Can't save STDIN");
-    open( SAVEOUT, ">&STDOUT" ) || &warn("Can't save STDOUT");
-    open( STDIN,   "<&IN" )     || &warn("Can't redirect STDIN");
-    open( STDOUT,  ">&OUT" )    || &warn("Can't redirect STDOUT");
+    open( SAVEIN, "<",  "&STDIN" )  || &warn("Can't save STDIN");
+    open( SAVEOUT, ">", "&STDOUT" ) || &warn("Can't save STDOUT");
+    open( STDIN, "<",   "&IN" )     || &warn("Can't redirect STDIN");
+    open( STDOUT, ">",  "&OUT" )    || &warn("Can't redirect STDOUT");
 
     # XXX: using csh or tcsh destroys sigint retvals!
     system(@_);
-    open( STDIN,  "<&SAVEIN" )  || &warn("Can't restore STDIN");
-    open( STDOUT, ">&SAVEOUT" ) || &warn("Can't restore STDOUT");
+    open( STDIN, "<",  "&SAVEIN" )  || &warn("Can't restore STDIN");
+    open( STDOUT, ">", "&SAVEOUT" ) || &warn("Can't restore STDOUT");
     close(SAVEIN);
     close(SAVEOUT);
 
@@ -5961,8 +5961,8 @@ sub setterm {
         if ($tty) {
             my ( $i, $o ) = split $tty, m/,/;
             $o = $i unless defined $o;
-            open( IN,  "<$i" ) or die "Cannot open TTY `$i' for read: $!";
-            open( OUT, ">$o" ) or die "Cannot open TTY `$o' for write: $!";
+            open( IN, "<",  "$i" ) or die "Cannot open TTY `$i' for read: $!";
+            open( OUT, ">", "$o" ) or die "Cannot open TTY `$o' for write: $!";
             $IN  = \*IN;
             $OUT = \*OUT;
             my $sel = select($OUT);
@@ -6768,7 +6768,7 @@ sub TTY {
 
         # Open file onto the debugger's filehandles, if you can.
         open IN,  $in     or die "cannot open `$in' for read: $!";
-        open OUT, ">$out" or die "cannot open `$out' for write: $!";
+        open OUT, ">", "$out" or die "cannot open `$out' for write: $!";
 
         # Swap to the new filehandles.
         reset_IN_OUT( \*IN, \*OUT );
@@ -6982,13 +6982,13 @@ sub LineInfo {
 
     #  If this is a valid "thing to be opened for output", tack a
     # '>' onto the front.
-    my $stream = ( $lineinfo =~ m/^(\+?\>|\|)/ ) ? $lineinfo : ">$lineinfo";
+    my ($mode, $stream) = ( $lineinfo =~ m/^(\+?\<|\|)(.*)/ ) ? ($1, $2) : (">", "$lineinfo");
 
     # If this is a pipe, the stream points to a slave editor.
     $slave_editor = ( $stream =~ m/^\|/ );
 
     # Open it up and unbuffer it.
-    open( LINEINFO, "$stream" ) || &warn("Cannot open `$stream' for write");
+    open( LINEINFO, $mode, "$stream" ) || &warn("Cannot open `$stream' for write");
     $LINEINFO = \*LINEINFO;
     my $save = select($LINEINFO);
     $| = 1;

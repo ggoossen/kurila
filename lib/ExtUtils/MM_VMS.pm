@@ -216,7 +216,7 @@ sub find_perl {
 	print "Checking $name\n" if ($trace +>= 2);
 	# If it looks like a potential command, try it without the MCR
         if ($name =~ m/^[\w\-\$]+$/) {
-            open(TCF,">temp_mmvms.com") || die('unable to open temp file');
+            open(TCF, ">","temp_mmvms.com") || die('unable to open temp file');
             print TCF "\$ set message/nofacil/nosever/noident/notext\n";
             print TCF "\$ $name -e \"require $ver; print \"\"VER_OK\\n\"\"\"\n";
             close TCF;
@@ -230,7 +230,7 @@ sub find_perl {
 	next unless $vmsfile = $self->maybe_command($name);
 	$vmsfile =~ s/;[\d\-]*$//;  # Clip off version number; we can use a newer version as well
 	print "Executing $vmsfile\n" if ($trace +>= 2);
-        open(TCF,">temp_mmvms.com") || die('unable to open temp file');
+        open(TCF, ">","temp_mmvms.com") || die('unable to open temp file');
         print TCF "\$ set message/nofacil/nosever/noident/notext\n";
         print TCF "\$ mcr $vmsfile -e \"require $ver; print \"\"VER_OK\\n\"\"\" \n";
         close TCF;

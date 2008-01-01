@@ -144,7 +144,7 @@ plan tests => 99;
     1 while -f ++ $datafile;
     END {unlink_all $datafile if $datafile}
 
-    open  MY_DATA, "> $datafile" or die "Failed to open $datafile: $!";
+    open  MY_DATA, ">", " $datafile" or die "Failed to open $datafile: $!";
     print MY_DATA  << "    --";
         One
         Two

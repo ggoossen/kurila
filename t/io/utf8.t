@@ -204,12 +204,12 @@ is($failed, undef);
     for my $u (@a) {
 	for my $v (@a) {
 	    # print "# @$u - @$v\n";
-	    open F, ">a";
+	    open F, ">", "a";
 	    binmode(F, ":" . $u->[1]);
 	    print F chr($u->[0]);
 	    close F;
 
-	    open F, "<a";
+	    open F, "<", "a";
 	    binmode(F, ":" . $u->[1]);
 
 	    my $s = chr($v->[0]);
@@ -225,7 +225,7 @@ is($failed, undef);
 
 {
     # [perl #23428] Somethings rotten in unicode semantics
-    open F, ">a";
+    open F, ">", "a";
     binmode F, ":utf8";
     syswrite(F, $a = chr(0x100));
     close F;
@@ -241,7 +241,7 @@ is($failed, undef);
     use warnings 'utf8';
     undef $@;
     local $SIG{__WARN__} = sub { $@ = shift };
-    open F, ">a";
+    open F, ">", "a";
     binmode F;
     my ($chrE4, $chrF6) = ("\x[E4]", "\x[F6]");
     print F "foo", $chrE4, "\n";

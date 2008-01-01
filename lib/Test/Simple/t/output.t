@@ -51,7 +51,7 @@ close IN;
 
 ok($line eq 'hi!');
 
-open(FOO, ">>$tmpfile") or die $!;
+open(FOO, ">", ">$tmpfile") or die $!;
 $out = $Test->output(\*FOO);
 $old = select *$out;
 print "Hello!\n";

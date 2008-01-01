@@ -49,7 +49,7 @@ print "ok 8\n";
 # filehandle and same file
 {
   my $fh;
-  open ($fh, "<README") or print "not ";
+  open ($fh, "<", "README") or print "not ";
   binmode($fh);
   print "not " unless compare($fh,"README") == 0;
   print "ok 9\n";
@@ -59,7 +59,7 @@ print "ok 8\n";
 # filehandle and different (but existing) file.
 {
   my $fh;
-  open ($fh, "<README") or print "not ";
+  open ($fh, "<", "README") or print "not ";
   binmode($fh);
   print "not " unless compare_text($fh,"TEST") == 1;
   print "ok 10\n";

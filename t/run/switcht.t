@@ -31,7 +31,7 @@ like( $warning, qr/^Insecure .* $Tmsg/, '    taint warn' );
 # Get ourselves a tainted variable.
 $file = $0;
 $file =~ s/.*/some.tmp/;
-ok( open(FILE, ">$file"),   'open >' ) or DIE $!;
+ok( open(FILE, ">", "$file"),   'open >' ) or DIE $!;
 print FILE "Stuff\n";
 close FILE;
 like( $warning, qr/^Insecure dependency in open $Tmsg/, 'open > taint warn' );

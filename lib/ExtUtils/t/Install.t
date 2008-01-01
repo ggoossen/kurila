@@ -99,7 +99,7 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm', '  UNINST=1 preserved same' );
 
 
 chmod 0644, 'blib/lib/Big/Dummy.pm' or die $!;
-open(DUMMY, ">>blib/lib/Big/Dummy.pm") or die $!;
+open(DUMMY, ">>", "blib/lib/Big/Dummy.pm") or die $!;
 print DUMMY "Extra stuff\n";
 close DUMMY;
 

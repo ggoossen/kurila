@@ -41,10 +41,10 @@ my $tmpfile_link = $tmpfile.'2';
 
 chmod 0666, $tmpfile;
 1 while unlink $tmpfile;
-open(FOO, ">$tmpfile") || DIE("Can't open temp test file: $!");
+open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 close FOO;
 
-open(FOO, ">$tmpfile") || DIE("Can't open temp test file: $!");
+open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 
 my($nlink, $mtime, $ctime) = (stat(*FOO))[$NLINK, $MTIME, $CTIME];
 
@@ -126,7 +126,7 @@ DIAG
 }
 
 # truncate and touch $tmpfile.
-open(F, ">$tmpfile") || DIE("Can't open temp test file: $!");
+open(F, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 ok(-z \*F,     '-z on empty filehandle');
 ok(! -s \*F,   '   and -s');
 close F;
@@ -134,11 +134,11 @@ close F;
 ok(-z $tmpfile,     '-z on empty file');
 ok(! -s $tmpfile,   '   and -s');
 
-open(F, ">$tmpfile") || DIE("Can't open temp test file: $!");
+open(F, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 print F "hi\n";
 close F;
 
-open(F, "<$tmpfile") || DIE("Can't open temp test file: $!");
+open(F, "<", "$tmpfile") || DIE("Can't open temp test file: $!");
 ok(!-z *F,     '-z on empty filehandle');
 ok( -s *F,   '   and -s');
 close F;
@@ -455,7 +455,7 @@ print "# Zzz...\n";
 sleep(3);
 my $f = 'tstamp.tmp';
 unlink $f;
-ok (open(S, "> $f"), 'can create tmp file');
+ok (open(S, ">", " $f"), 'can create tmp file');
 close S or die;
 my @a = stat $f;
 print "# time=$^T, stat=(@a)\n";

@@ -62,7 +62,7 @@ my %Data =
 die "Usage: dbinfo file\n" unless @ARGV == 1 ;
 
 print "testing file $ARGV[0]...\n\n" ;
-open (F, "<$ARGV[0]") or die "Cannot open file $ARGV[0]: $!\n" ;
+open (F, "<", "$ARGV[0]") or die "Cannot open file $ARGV[0]: $!\n" ;
 
 my $buff ;
 read F, $buff, 30 ;

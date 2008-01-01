@@ -19,13 +19,13 @@ cmp_ok($warns,'==',0,'no warns at start');
 
 no strict 'subs';
 
-open(FILE,">$saved_filename");
+open(FILE, ">","$saved_filename");
 ok(defined('FILE'),'created work file');
 print FILE "1\n";
 print FILE "0";
 close(FILE);
 
-open(FILE,"<$saved_filename");
+open(FILE, "<","$saved_filename");
 ok(defined('FILE'),'opened work file');
 my $seen = 0;
 my $dummy;

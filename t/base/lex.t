@@ -56,7 +56,7 @@ $foo
 EOF
 EOE
 
-urint <<'EOS' . <<\EOF;
+print <<'EOS' . <<\EOF;
 ok 12 - make sure single quotes are honored \nnot ok
 EOS
 ok 13

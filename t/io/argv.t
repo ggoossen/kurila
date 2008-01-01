@@ -13,7 +13,7 @@ use File::Spec;
 
 my $devnull = 'File::Spec'->devnull;
 
-open(TRY, '>Io_argv1.tmp') || (die "Can't open temp file: $!");
+open(TRY, ">", 'Io_argv1.tmp') || (die "Can't open temp file: $!");
 print TRY "a line\n";
 close TRY or die "Could not close: $!";
 
@@ -56,9 +56,9 @@ while ( ~< *ARGV) {
 is($y, "1a line\n2a line\n3a line\n", '~< *ARGV from @ARGV');
 
 
-open(TRY, '>Io_argv1.tmp') or die "Can't open temp file: $!";
+open(TRY, ">", 'Io_argv1.tmp') or die "Can't open temp file: $!";
 close TRY or die "Could not close: $!";
-open(TRY, '>Io_argv2.tmp') or die "Can't open temp file: $!";
+open(TRY, ">", 'Io_argv2.tmp') or die "Can't open temp file: $!";
 close TRY or die "Could not close: $!";
 @ARGV = ('Io_argv1.tmp', 'Io_argv2.tmp');
 $^I = '_bak';   # not .bak which confuses VMS
@@ -70,9 +70,9 @@ while ( ~< *ARGV) {
     print;
     next_test();
 }
-open(TRY, '<Io_argv1.tmp') or die "Can't open temp file: $!";
+open(TRY, "<", 'Io_argv1.tmp') or die "Can't open temp file: $!";
 print while ~< *TRY;
-open(TRY, '<Io_argv2.tmp') or die "Can't open temp file: $!";
+open(TRY, "<", 'Io_argv2.tmp') or die "Can't open temp file: $!";
 print while ~< *TRY;
 close TRY or die "Could not close: $!";
 undef $^I;

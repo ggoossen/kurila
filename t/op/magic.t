@@ -251,7 +251,7 @@ EOX
 EOH
     }
     my $s1 = "\$^X is $perl, \$0 is $script\n";
-    ok open(SCRIPT, ">$script"), $!;
+    ok open(SCRIPT, ">", "$script"), $!;
     ok print(SCRIPT $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), $!;
 #!$wd/perl
 EOB

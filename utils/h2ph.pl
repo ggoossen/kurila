@@ -65,7 +65,7 @@ while (defined (my $file = next_file())) {
 
     if ($file eq '-') {
 	open(IN, "-");
-	open(OUT, ">-");
+	open(OUT, ">", "-");
     } else {
 	($outfile = $file) =~ s/\.h$/.ph/ || next;
 	print "$file -> $outfile\n" unless $opt_Q;
@@ -735,7 +735,7 @@ sub build_preamble_if_necessary
 
     my (%define) = _extract_cc_defines();
 
-    open  PREAMBLE, ">$preamble" or die "Cannot open $preamble:  $!";
+    open  PREAMBLE, ">", "$preamble" or die "Cannot open $preamble:  $!";
 	print PREAMBLE "# This file was created by h2ph version $VERSION\n";
 
 	foreach (sort keys %define) {

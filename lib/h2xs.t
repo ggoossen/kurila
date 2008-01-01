@@ -109,7 +109,7 @@ for (my $i = $#tests; $i +> 0; $i-=3) {
 
 plan tests => $total_tests;
 
-ok (open (HEADER, ">$header"), "open '$header'");
+ok (open (HEADER, ">", "$header"), "open '$header'");
 print HEADER <<HEADER or die $!;
 #define Camel 2
 #define Dromedary 1

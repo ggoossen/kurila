@@ -2,7 +2,7 @@
 
 print "1..22\n";
 
-open (tmp,'>Cmd_while.tmp') || die "Can't create Cmd_while.tmp.";
+open (tmp, ">",'Cmd_while.tmp') || die "Can't create Cmd_while.tmp.";
 print tmp "tvi925\n";
 print tmp "tvi920\n";
 print tmp "vt100\n";

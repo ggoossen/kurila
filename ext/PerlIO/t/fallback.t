@@ -54,7 +54,7 @@ close($fh);
 
 {
     no utf8;
-    open($fh,">$file") || die "File cannot be re-opened";
+    open($fh, ">","$file") || die "File cannot be re-opened";
     binmode($fh);
     print $fh "\xA30.02\n";
     close($fh);

@@ -254,7 +254,7 @@ sub new {
     # a SetConsoleMode() if we end up using Term::ReadKey
     open FIN, (  $^O eq 'MSWin32' && $console eq 'CONIN$' ) ? "+<$console" :
                                                               "<$console";
-    open FOUT,">$consoleOUT";
+    open FOUT, ">","$consoleOUT";
 
     #OUT->autoflush(1);		# Conflicts with debugger?
     my $sel = select(FOUT);

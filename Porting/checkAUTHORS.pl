@@ -121,7 +121,7 @@ $map {$_} = '!' for
 if (@authors) {
   my %raw;
   foreach my $filename (@authors) {
-    open FH, "<$filename" or die "Can't open $filename: $!";
+    open FH, "<", "$filename" or die "Can't open $filename: $!";
     while ( ~< *FH) {
       next if m/^\#/;
       next if m/^-- /;

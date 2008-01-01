@@ -97,7 +97,7 @@ sub setup {
 
         my $dir = dirname($file);
         mkpath $dir;
-        open(FILE, ">$file") || die "Can't create $file: $!";
+        open(FILE, ">", "$file") || die "Can't create $file: $!";
         print FILE $text;
         close FILE;
     }

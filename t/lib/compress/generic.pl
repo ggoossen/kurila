@@ -294,7 +294,7 @@ EOM
 
     {
       title "$CompressClass: Input from typeglob filehandle";  
-      ok open FH, ">$name" ;
+      ok open FH, ">", "$name" ;
 
       my $x = $CompressClass-> new( *FH)  ;
       ok $x, "  create $CompressClass"  ;
@@ -313,7 +313,7 @@ EOM
     {
       title "$UncompressClass: Input from typeglob filehandle, append output";  
       my $x ;
-      ok open FH, "<$name" ;
+      ok open FH, "<", "$name" ;
       ok $x = $UncompressClass-> new( *FH, -Append => 1, Transparent => 0)
         or diag $$UnError ;
       is $x->fileno(), fileno FH, "  fileno ok" ;
@@ -339,15 +339,15 @@ EOM
     {
       title "Outout to stdout via '-'" ;
 
-      open(SAVEOUT, ">&STDOUT");
+      open(SAVEOUT, ">", "&STDOUT");
       my $dummy = fileno SAVEOUT;
-      open STDOUT, ">$name" ;
+      open STDOUT, ">", "$name" ;
 
       my $x = $CompressClass->new( '-')  ;
       $x->write($hello);
       $x->close;
 
-      open(STDOUT, ">&SAVEOUT");
+      open(STDOUT, ">", "&SAVEOUT");
 
       ok 1, "  wrote to stdout" ;
     }
@@ -361,8 +361,8 @@ EOM
       my $uncomp ;
       my $stdinFileno = fileno(STDIN);
       # open below doesn't return 1 sometines on XP
-         open(SAVEIN, "<&STDIN");
-      ok open(STDIN, "<$name"), "  redirect STDIN";
+         open(SAVEIN, "<", "&STDIN");
+      ok open(STDIN, "<", "$name"), "  redirect STDIN";
       my $dummy = fileno SAVEIN;
       $x = $UncompressClass->new( '-', Append => 1, Transparent => 0)
             or diag $$UnError ;
@@ -372,7 +372,7 @@ EOM
       1 while $x->read($uncomp) +> 0 ;
 
       ok $x->close, "  close" ;
-         open(STDIN, "<&SAVEIN");
+         open(STDIN, "<", "&SAVEIN");
       is $uncomp, $hello, "  expected output" ;
     }
 }

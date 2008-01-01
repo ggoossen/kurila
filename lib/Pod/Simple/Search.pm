@@ -250,7 +250,7 @@ sub _path2modname {
   # filenames, so try to extract them from the "=head1 NAME" tag in the
   # file instead.
   if ($^O eq 'VMS' && ($name eq lc($name) || $name eq uc($name))) {
-      open PODFILE, "<$file" or die "_path2modname: Can't open $file: $!";
+      open PODFILE, "<", "$file" or die "_path2modname: Can't open $file: $!";
       my $in_pod = 0;
       my $in_name = 0;
       my $line;
@@ -589,7 +589,7 @@ sub contains_pod {
 
   # check for one line of POD
   $verbose +> 1 and print " Scanning $file for pod...\n";
-  unless( open(MAYBEPOD,"<$file") ) {
+  unless( open(MAYBEPOD, "<","$file") ) {
     print "Error: $file is unreadable: $!\n";
     return undef;
   }

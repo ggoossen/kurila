@@ -110,7 +110,7 @@ package foo;
 
 package main;
 $i = 28;
-open(FOO,">Cmd_subval.tmp");
+open(FOO, ">","Cmd_subval.tmp");
 print FOO "blah blah\n";
 close FOO or die "Can't close Cmd_subval.tmp: $!";
 

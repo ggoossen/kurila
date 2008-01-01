@@ -25,7 +25,7 @@ my $fail2 = "fb$$";
 my $russki = "koi8r$$";
 my $threebyte = "3byte$$";
 
-if (open(GRK, ">$grk")) {
+if (open(GRK, ">", "$grk")) {
     binmode(GRK, ":bytes");
     # alpha beta gamma in ISO 8859-7
     print GRK "\xe1\xe2\xe3";
@@ -43,7 +43,7 @@ if (open(GRK, ">$grk")) {
     close($i);
 }
 
-if (open(UTF, "<$utf")) {
+if (open(UTF, "<", "$utf")) {
     binmode(UTF, ":bytes");
     if (ord('A') == 193) { # EBCDIC
 	# alpha beta gamma in UTF-EBCDIC Unicode (0x3b1 0x3b2 0x3b3)
@@ -68,7 +68,7 @@ if (open(UTF, "<$utf")) {
     close($i);
 }
 
-if (open(GRK, "<$grk")) {
+if (open(GRK, "<", "$grk")) {
     binmode(GRK, ":bytes");
     print "not " unless ~< *GRK eq "\xe1\xe2\xe3";
     print "ok 8\n";
@@ -90,7 +90,7 @@ if (!defined $warn) {
     print "not ok 10 # warning is '$warn'";
 }
 
-if (open(RUSSKI, ">$russki")) {
+if (open(RUSSKI, ">", "$russki")) {
     print RUSSKI "\x3c\x3f\x78";
     close RUSSKI or die "Could not close: $!";
     open(RUSSKI, "$russki");

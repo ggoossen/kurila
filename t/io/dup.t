@@ -13,11 +13,11 @@ my $test = 1;
 print "1..29\n";
 print "ok 1\n";
 
-open(DUPOUT,">&STDOUT");
-open(DUPERR,">&STDERR");
+open(DUPOUT, ">","&STDOUT");
+open(DUPERR, ">","&STDERR");
 
-open(STDOUT,">Io.dup")  || die "Can't open stdout";
-open(STDERR,">&STDOUT") || die "Can't open stderr";
+open(STDOUT, ">","Io.dup")  || die "Can't open stdout";
+open(STDERR, ">","&STDOUT") || die "Can't open stderr";
 
 select(STDERR); $| = 1;
 select(STDOUT); $| = 1;
@@ -53,8 +53,8 @@ else {
 close(STDOUT) or die "Could not close: $!";
 close(STDERR) or die "Could not close: $!";
 
-open(STDOUT,">&DUPOUT") or die "Could not open: $!";
-open(STDERR,">&DUPERR") or die "Could not open: $!";
+open(STDOUT, ">","&DUPOUT") or die "Could not open: $!";
+open(STDERR, ">","&DUPERR") or die "Could not open: $!";
 
 if (($^O eq 'MSWin32') || ($^O eq 'NetWare') || ($^O eq 'VMS')) { print `type Io.dup` }
 elsif ($^O eq 'MacOS') { system 'catenate Io.dup' }
@@ -80,13 +80,13 @@ if ($Config{useperlio}) {
     print F "ok 12\n";
     close(F);
 } else {
-    open(F, ">&DUPOUT") or die "Cannot dup stdout back: $!";
+    open(F, ">", "&DUPOUT") or die "Cannot dup stdout back: $!";
     print F "ok 12\n";
     close(F);
 }
 
 # To get STDOUT back.
-open(F, ">&DUPOUT") or die "Cannot dup stdout back: $!";
+open(F, ">", "&DUPOUT") or die "Cannot dup stdout back: $!";
 
 curr_test(13);
 
@@ -97,26 +97,26 @@ SKIP: {
     isnt(fileno(F), fileno(STDOUT));
     close F;
 
-    ok(open(F, "<&=STDIN")) or _diag $!;
+    ok(open(F, "<", "&=STDIN")) or _diag $!;
     is(fileno(F), fileno(STDIN));
     close F;
 
-    ok(open(F, ">&=STDOUT"));
+    ok(open(F, ">", "&=STDOUT"));
     is(fileno(F), fileno(STDOUT));
     close F;
 
-    ok(open(F, ">&=STDERR"));
+    ok(open(F, ">", "&=STDERR"));
     is(fileno(F), fileno(STDERR));
     close F;
 
-    open(G, ">dup$$") or die;
+    open(G, ">", "dup$$") or die;
     my $g = fileno(G);
 
-    ok(open(F, ">&=$g"));
+    ok(open(F, ">", "&=$g"));
     is(fileno(F), $g);
     close F;
 
-    ok(open(F, ">&=G"));
+    ok(open(F, ">", "&=G"));
     is(fileno(F), $g);
 
     print G "ggg\n";
@@ -125,7 +125,7 @@ SKIP: {
     close G; # flush first
     close F; # flush second
 
-    open(G, "<dup$$") or die;
+    open(G, "<", "dup$$") or die;
     {
 	my $line;
 	$line = ~< *G; chomp $line; is($line, "ggg");
@@ -134,7 +134,7 @@ SKIP: {
     close G;
 
     open UTFOUT, '>:utf8', "dup$$" or die $!;
-    open UTFDUP, '>&UTFOUT' or die $!;
+    open UTFDUP, ">", '&UTFOUT' or die $!;
     # some old greek saying.
     my $message = "\x{03A0}\x{0391}\x{039D}\x{03A4}\x{0391} \x{03A1}\x{0395}\x{0399}\n";
     print UTFOUT $message;

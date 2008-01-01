@@ -108,7 +108,7 @@ my $written = "tell_write.txt";
 END { 1 while unlink($written) }
 
 close($TST);
-open($tst,">$written")  || die "Cannot open $written:$!";
+open($tst, ">","$written")  || die "Cannot open $written:$!";
 binmode $tst if $Is_Dosish;
 
 if (tell($tst) == 0) { print "ok 24\n"; } else { print "not ok 24\n"; }
@@ -148,10 +148,10 @@ if (tell($tst) == 15 ||
 
 close($tst);
 
-open($tst,">$written")  || die "Cannot open $written:$!";
+open($tst, ">","$written")  || die "Cannot open $written:$!";
 print $tst "foobar";
 close $tst;
-open($tst,">>$written")  || die "Cannot open $written:$!";
+open($tst, ">",">$written")  || die "Cannot open $written:$!";
 
 # This test makes a questionable assumption that the file pointer will
 # be at eof after opening a file but before seeking, reading, or writing.

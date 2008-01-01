@@ -412,12 +412,12 @@ sub WriteConstants {
 
   my $c_fh = $ARGS{C_FH};
   if (!$c_fh) {
-      open $c_fh, ">$ARGS{C_FILE}" or die "Can't open $ARGS{C_FILE}: $!";
+      open $c_fh, ">", "$ARGS{C_FILE}" or die "Can't open $ARGS{C_FILE}: $!";
   }
 
   my $xs_fh = $ARGS{XS_FH};
   if (!$xs_fh) {
-      open $xs_fh, ">$ARGS{XS_FILE}" or die "Can't open $ARGS{XS_FILE}: $!";
+      open $xs_fh, ">", "$ARGS{XS_FILE}" or die "Can't open $ARGS{XS_FILE}: $!";
   }
 
   # As this subroutine is intended to make code that isn't edited, there's no

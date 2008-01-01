@@ -114,7 +114,7 @@ SKIP: {
             printf WRITER "not ok %d - pipe & fork\n", curr_test;
             next_test;
 
-            open(STDOUT,">&WRITER") || die "Can't dup WRITER to STDOUT";
+            open(STDOUT, ">","&WRITER") || die "Can't dup WRITER to STDOUT";
             close WRITER;
             
             my $tnum = curr_test;

@@ -78,7 +78,7 @@ if ($Verbose) {
 
 chdir $FindBin::Bin or die "$0: Can't chdir $FindBin::Bin: $!";
 
-open MASTER, $masterpodfile or die "$0: Can't open $masterpodfile: $!";
+open MASTER, "<", $masterpodfile or die "$0: Can't open $masterpodfile: $!";
 
 my ($delta_source, $delta_target);
 
@@ -290,7 +290,7 @@ sub path2modname {
 sub output ($);
 
 sub output_kurilatoc {
-  open(OUT, ">kurilatoc.pod") || die "$0: creating kurilatoc.pod failed: $!";
+  open(OUT, ">", "kurilatoc.pod") || die "$0: creating kurilatoc.pod failed: $!";
 
   local $/ = '';
 
@@ -725,7 +725,7 @@ while (my ($target, $name) = each %Targets) {
     next;
   }
   rename $name, "$name.old" or die "$0: Can't rename $name to $name.old: $!";
-  open THING, ">$name" or die "$0: Can't open $name for writing: $!";
+  open THING, ">", "$name" or die "$0: Can't open $name for writing: $!";
   print THING $new or die "$0: print to $name failed: $!";
   close THING or die die "$0: close $name failed: $!";
 }

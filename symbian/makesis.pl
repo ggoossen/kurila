@@ -165,7 +165,7 @@ qq[;Supports Series 80 v2.0\n(0x101F8ED2), 0, 0, 0, \{"Series80ProductID"\}\n] :
 qq[;Supports Series 90 v1.1\n(0x101FBE05), 0, 0, 0, \{"Series90ProductID"\}\n] :
          ";Supports Series NN";
 
-    open PKG, ">$pkg" or die "$0: failed to create $pkg: $!\n";
+    open PKG, ">", "$pkg" or die "$0: failed to create $pkg: $!\n";
     print PKG <<__EOF__;
 ; \u$target installation script
 ;

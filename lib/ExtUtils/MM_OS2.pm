@@ -75,7 +75,7 @@ $self->{BASEEXT}.def: Makefile.PL
     if ($self->{IMPORTS} && %{$self->{IMPORTS}}) {
 	# Make import files (needed for static build)
 	-d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp";
-	open IMP, '>tmpimp.imp' or die "Can't open tmpimp.imp";
+	open IMP, ">", 'tmpimp.imp' or die "Can't open tmpimp.imp";
 	my ($name, $exp);
 	while (($name, $exp)= each %{$self->{IMPORTS}}) {
 	    my ($lib, $id) = ($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";

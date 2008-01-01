@@ -22,7 +22,7 @@ foreach (sort glob($^O eq 'MacOS' ? ":lib:strict:*" : "lib/strict/*")) {
 
     next if -d || m/(~|\.orig|,v)$/;
 
-    open F, "<$_" or die "Cannot open $_: $!\n" ;
+    open F, "<", "$_" or die "Cannot open $_: $!\n" ;
     while ( ~< *F) {
 	last if m/^__END__/ ;
     }
@@ -57,7 +57,7 @@ for (@prgs){
 	    my $code = shift @files ;
 	    $code =~ s|\./abc|:abc|g if $^O eq 'MacOS';
     	    push @temps, $filename ;
-	    open F, ">$filename" or die "Cannot open $filename: $!\n" ;
+	    open F, ">", "$filename" or die "Cannot open $filename: $!\n" ;
 	    print F $code ;
 	    close F or die "Could not close: $!" ;
 	}
@@ -65,7 +65,7 @@ for (@prgs){
 	$prog = shift @files ;
 	$prog =~ s|\./abc|:abc|g if $^O eq 'MacOS';
     }
-    open TEST, ">$tmpfile" or die "Could not open: $!";
+    open TEST, ">", "$tmpfile" or die "Could not open: $!";
     print TEST $prog,"\n";
     close TEST or die "Could not close: $!";
     my $results = $Is_MSWin32 ?

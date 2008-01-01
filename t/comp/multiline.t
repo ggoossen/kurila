@@ -8,7 +8,7 @@ BEGIN {
 
 plan(tests => 6);
 
-open(TRY,'>Comp.try') || (die "Can't open temp file.");
+open(TRY, ">",'Comp.try') || (die "Can't open temp file.");
 
 my $x = 'now is the time
 for all good men

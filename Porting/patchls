@@ -162,7 +162,7 @@ foreach my $argv (@ARGV) {
     }
     if ($in eq "-") {
       *F = \*STDIN;
-    } elsif (not open F, "<$in") {
+    } elsif (not open F, "<", "$in") {
 	warn "Unable to open $in: $!\n";
 	next;
     }

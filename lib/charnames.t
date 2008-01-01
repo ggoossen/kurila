@@ -289,12 +289,12 @@ for (@prgs) {
     my ($code, $exp) = ((split m/\nEXPECT\n/), '$');
     my ($prog, $fil) = ((split m/\nFILE\n/, $code), "");
     $prog = "use utf8; " . $prog;
-    open my $tmp, "> $tmpfile" or die "Could not open $tmpfile: $!";
+    open my $tmp, ">", " $tmpfile" or die "Could not open $tmpfile: $!";
     print $tmp $prog, "\n";
     close $tmp or die "Could not close $tmpfile: $!";
     if ($fil) {
 	$fil .= "\n";
-	open my $ali, "> $alifile" or die "Could not open $alifile: $!";
+	open my $ali, ">", " $alifile" or die "Could not open $alifile: $!";
 	print $ali $fil;
 	close $ali or die "Could not close $alifile: $!";
 	}
