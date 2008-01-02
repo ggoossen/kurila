@@ -310,7 +310,7 @@ else {
        ok ($Is_MSWin32 ? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
 			    : (`echo \$__NoNeSuCh` eq "foo\n") );
 	if ($^O =~ m/^(linux|freebsd)$/ &&
-	    open CMDLINE, "/proc/$$/cmdline") {
+	    open CMDLINE, '<', "/proc/$$/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
 	    my $me = (split m/\0/, $line)[0];
 	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');

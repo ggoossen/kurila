@@ -51,7 +51,7 @@ BEGIN {
     # Do this open before any chdir
     $file = shift;
     if (defined $file) {
-	open TESTS, $file or die "Can't open $file";
+	open TESTS, "<", $file or die "Can't open $file";
     }
 }
 

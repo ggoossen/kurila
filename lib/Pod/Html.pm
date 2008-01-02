@@ -362,7 +362,7 @@ sub pod2html {
     local *POD;
     unless (@ARGV && $ARGV[0]) {
 	$Podfile  = "-" unless $Podfile;	# stdin
-	open(POD, "<$Podfile")
+	open(POD, "<", "$Podfile")
 		|| die "$0: cannot open $Podfile file for input: $!\n";
     } else {
 	$Podfile = $ARGV[0];  # XXX: might be more filenames
@@ -418,7 +418,7 @@ sub pod2html {
     }
 
     # open the output file
-    open(HTML, ">$Htmlfile")
+    open(HTML, ">", "$Htmlfile")
 	    || die "$0: cannot open $Htmlfile file for output: $!\n";
 
     # put a title in the HTML file if one wasn't specified
@@ -782,7 +782,7 @@ sub load_cache {
 
     $tests = 0;
 
-    open(CACHE, "<$itemcache") ||
+    open(CACHE, "<", "$itemcache") ||
 	die "$0: error opening $itemcache for reading: $!\n";
     $/ = "\n";
 
@@ -810,7 +810,7 @@ sub load_cache {
     close(CACHE);
 
     warn "scanning for directory cache\n" if $Verbose;
-    open(CACHE, "<$dircache") ||
+    open(CACHE, "<", "$dircache") ||
 	die "$0: error opening $dircache for reading: $!\n";
     $/ = "\n";
     $tests = 0;
@@ -884,7 +884,7 @@ sub scan_podpath {
 
 	    # scan each .pod and .pm file for =item directives
 	    foreach $pod (@files) {
-		open(POD, "<$dirname/$pod") ||
+		open(POD, "<", "$dirname/$pod") ||
 		    die "$0: error opening $dirname/$pod for input: $!\n";
 		@poddata = ~< *POD;
 		close(POD);
@@ -903,7 +903,7 @@ sub scan_podpath {
 		 $Pages{$libpod} =~ m/([^:]*\.pm):/) {
 	    # scan the .pod or .pm file for =item directives
 	    $pod = $1;
-	    open(POD, "<$pod") ||
+	    open(POD, "<", "$pod") ||
 		die "$0: error opening $pod for input: $!\n";
 	    @poddata = ~< *POD;
 	    close(POD);
@@ -921,7 +921,7 @@ sub scan_podpath {
 
     # cache the item list for later use
     warn "caching items for later use\n" if $Verbose;
-    open(CACHE, ">$Itemcache") ||
+    open(CACHE, ">", "$Itemcache") ||
 	die "$0: error open $Itemcache for writing: $!\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
@@ -933,7 +933,7 @@ sub scan_podpath {
 
     # cache the directory list for later use
     warn "caching directories for later use\n" if $Verbose;
-    open(CACHE, ">$Dircache") ||
+    open(CACHE, ">", "$Dircache") ||
 	die "$0: error open $Dircache for writing: $!\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
@@ -983,7 +983,7 @@ sub scan_dir {
 	    push(@pods, "$dir/$_.pm");
 	} elsif (-T "$dir/$_") {			    # script(?)
 	    local *F;
-	    if (open(F, "$dir/$_")) {
+	    if (open(F, "<", "$dir/$_")) {
 		my $line;
 		while (defined($line = ~< *F)) {
 		    if ($line =~ m/^=(?:pod|head1)/) {

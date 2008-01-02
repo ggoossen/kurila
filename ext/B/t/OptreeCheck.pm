@@ -1008,7 +1008,7 @@ sub OptreeCheck::processExamples {
     # turned into optreeCheck tests,
 
     foreach my $file (@files) {
-	open (my $fh, $file) or die "cant open $file: $!\n";
+	open (my $fh, "<", $file) or die "cant open $file: $!\n";
 	$/ = "";
 	my @chunks = ~< $fh;
 	print preamble (scalar @chunks);

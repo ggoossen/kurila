@@ -87,15 +87,15 @@ sub stringify {
 	  s/([\"\\])/\\$1/g ;
 	  s/([\000-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
 	  # uniescape?
-	  s/([\200-\377])/{'\\0x'.sprintf('%2X',ord($1))}/g 
+	  s/([\200-\377])/{'\0x'.sprintf('%2X',ord($1))}/g 
 	    if $quoteHighBit;
 	} elsif ($unctrl eq 'quote') {
 	  s/([\"\\\$\@])/\\$1/g if $tick eq '"';
 	  s/\033/\\e/g;
 	  if (ord('A') == 193) { # EBCDIC.
-	      s/([\000-\037\177])/{'\\c'.chr(193)}/g; # Unfinished.
+	      s/([\000-\037\177])/{'\c'.chr(193)}/g; # Unfinished.
 	  } else {
-	      s/([\000-\037\177])/{'\\c'._escaped_ord($1)}/g;
+	      s/([\000-\037\177])/{'\c'._escaped_ord($1)}/g;
 	  }
 	}
 	$_ = uniescape($_);

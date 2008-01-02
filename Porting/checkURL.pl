@@ -16,7 +16,7 @@ my %dummy;
 @dummy{@dummy} = ();
 
 foreach my $file (glob("*/*.pod */*/*.pod */*/*/*.pod README README.* INSTALL")) {
-    open my $fh => $file or die "Failed to open $file: $!\n";
+    open my $fh , "<", $file or die "Failed to open $file: $!\n";
     while ( ~< $fh) {
         if (m{(?:http|ftp)://(?:(?!\w<)[-\w~?@=.])+} && !exists $dummy{$&}) {
             my $url = $&;

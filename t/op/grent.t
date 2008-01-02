@@ -60,7 +60,7 @@ if (not defined $where) {	# Try NetInfo.
 
 if (not defined $where) {	# Try local.
     my $GR = "/etc/group";
-    if (-f $GR && open(GR, $GR) && defined( ~< *GR)) {
+    if (-f $GR && open(GR, "<", $GR) && defined( ~< *GR)) {
         undef $reason;
         $where = "local $GR";
     }

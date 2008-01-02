@@ -83,7 +83,7 @@ sub openunicode {
 	for my $d (@INC) {
 	    use File::Spec;
 	    $f = File::Spec->catfile($d, "unicore", @path);
-	    last if open($$rfh, $f);
+	    last if open($$rfh, "<", $f);
 	    undef $f;
 	}
 	croak __PACKAGE__, ": failed to find ",

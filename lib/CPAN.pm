@@ -411,7 +411,7 @@ sub _yaml_loadfile {
             return \@yaml;
         } elsif ($code = UNIVERSAL::can($yaml_module, "Load")) {
             local *FH;
-            open FH, $local_file or die "Could not open '$local_file': $!";
+            open FH, "<", $local_file or die "Could not open '$local_file': $!";
             local $/;
             my $ystream = ~< *FH;
             my @yaml;
@@ -2652,7 +2652,7 @@ sub status {
     my($self) = @_;
     require Devel::Size;
     my $ps = FileHandle->new;
-    open $ps, "/proc/$$/status";
+    open $ps, "<", "/proc/$$/status";
     my $vm = 0;
     while ( ~< $ps) {
         next unless m/VmSize:\s+(\d+)/;
@@ -2955,7 +2955,7 @@ sub print_ornamented {
         # note: deprecated, need to switch to $LANG and $LC_*
         # courtesy jhi:
         $swhat
-            =~ s{([\xC0-\xDF])([\x80-\xBF])}{{chr(ord($1)<<6^&^0xC0^|^ord($2)^&^0x3F)}}g; #};
+            =~ s{([\x[C0]-\x[DF]])([\x[80]-\x[BF]])}{{chr(ord($1)<<6^&^0xC0^|^ord($2)^&^0x3F)}}g; #};
     }
     if ($self->colorize_output) {
         if ( $CPAN::DEBUG && $swhat =~ m/^Debug\(/ ) {
@@ -4261,7 +4261,7 @@ Trying with "$funkyftp$src_switch" to get
                 # lynx returns 0 when it fails somewhere
                 if (-s $asl_ungz) {
                     my $content = do { local *FH;
-                                       open FH, $asl_ungz or die;
+                                       open FH, "<", $asl_ungz or die;
                                        local $/;
                                        ~< *FH };
                     if ($content =~ m/^<.*(<title>[45]|Error [45])/si) {
@@ -5641,7 +5641,7 @@ sub dir_listing {
     # hazard.  (Without GPG installed they are not that much better,
     # though.)
     $fh = FileHandle->new;
-    if (open($fh, $lc_want)) {
+    if (open($fh, "<", $lc_want)) {
         my $line = ~< $fh; close $fh;
         unlink($lc_want) unless $line =~ m/PGP/;
     }
@@ -5682,7 +5682,7 @@ sub dir_listing {
     # adapted from CPAN::Distribution::CHECKSUM_check_file ;
     $fh = FileHandle->new;
     my($cksum);
-    if (open $fh, $lc_file) {
+    if (open $fh, "<", $lc_file) {
         local($/);
         my $eval = ~< $fh;
         $eval =~ s/\015?\012/\n/g;
@@ -6442,7 +6442,7 @@ sub try_download {
             unless ($stdpatchargs) {
                 my $system = "$patchbin --version |";
                 local *FH;
-                open FH, $system or die "Could not fork '$system': $!";
+                open FH, "<", $system or die "Could not fork '$system': $!";
                 local $/ = "\n";
                 my $pversion;
               PARSEVERSION: while ( ~< *FH) {
@@ -6981,7 +6981,7 @@ sub CHECKSUM_check_file {
     $file = $self->{localfile};
     $basename = File::Basename::basename($file);
     my $fh = FileHandle->new;
-    if (open $fh, $chk_file) {
+    if (open $fh, "<", $chk_file) {
         local($/);
         my $eval = ~< $fh;
         $eval =~ s/\015?\012/\n/g;
@@ -7011,7 +7011,7 @@ for further processing, but got garbage instead.
         $self->debug("Found checksum for $basename:" .
                      "$cksum->{$basename}{sha256}\n") if $CPAN::DEBUG;
 
-        open($fh, $file);
+        open($fh, "<", $file);
         binmode $fh;
         my $eq = $self->eq_CHECKSUM($fh,$cksum->{$basename}{sha256});
         $fh->close;
@@ -8355,7 +8355,7 @@ sub prereq_pm {
             if (-f $build_prereqs) {
                 CPAN->debug("Getting prerequisites from '$build_prereqs'") if $CPAN::DEBUG;
                 my $content = do { local *FH;
-                                   open FH, $build_prereqs
+                                   open FH, "<", $build_prereqs
                                        or $CPAN::Frontend->mydie("Could not open ".
                                                                  "'$build_prereqs': $!");
                                    local $/;
@@ -8942,7 +8942,7 @@ sub _check_binary {
         return File::Which::which($binary);
     } else {
         local *README;
-        $pid = open README, "which $binary|"
+        $pid = open README, "<", "which $binary|"
             or $CPAN::Frontend->mywarn(qq{Could not fork 'which $binary': $!\n});
         return unless $pid;
         while ( ~< *README) {
@@ -9033,7 +9033,7 @@ saved output to %s\n},
                                             )) if $CPAN::DEBUG;
             close $fh;
             local *FH;
-            open FH, $tmpin
+            open FH, "<", $tmpin
                 or $CPAN::Frontend->mydie(qq{Could not open "$tmpin": $!});
             my $fh_pager = FileHandle->new;
             local($SIG{PIPE}) = "IGNORE";
@@ -9374,7 +9374,7 @@ sub contains {
     my @result;
     my $fh = FileHandle->new;
     local $/ = "\n";
-    open($fh,$inst_file) or die "Could not open '$inst_file': $!";
+    open($fh, "<",$inst_file) or die "Could not open '$inst_file': $!";
     my $in_cont = 0;
     $self->debug("inst_file[$inst_file]") if $CPAN::DEBUG;
     while ( ~< $fh) {

@@ -89,7 +89,7 @@ for (sort keys %translators) {
     close OUT;
     if ($_ eq 'Pod::Man') {
         open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
-        open (OUTPUT, ">", " out.$translators{$_}")
+        open (OUTPUT, ">", "out.$translators{$_}")
             or die "Cannot create out.$translators{$_}: $!\n";
         local $_;
         while ( ~< *TMP) { last if m/^\.nh/ }
@@ -103,7 +103,7 @@ for (sort keys %translators) {
     }
     {
         local $/;
-        open (MASTER, source_path ("basic.$translators{$_}"))
+        open (MASTER, "<", source_path ("basic.$translators{$_}"))
             or die "Cannot open basic.$translators{$_}: $!\n";
         open (OUTPUT, "<", "out.$translators{$_}")
             or die "Cannot open out.$translators{$_}: $!\n";

@@ -123,7 +123,8 @@ sub gzopen($$)
         unless isaFilehandle $file || isaFilename $file  || 
                (ref $file && ref $file eq 'SCALAR');
 
-    return undef unless $mode =~ m/[rwa]/i ;
+    croak "gzopen: invalid mode"
+      unless $mode =~ m/[rwa]/i ;
 
     _set_gzerr(0) ;
 
@@ -142,7 +143,7 @@ sub gzopen($$)
             or $Compress::Zlib::gzerrno = $IO::Uncompress::Gunzip::GunzipError;
     }
 
-    return undef
+    croak "gzopen: Valid creating unzip thing"
         if ! defined $gz ;
 
     bless [$gz, $infDef], 'Compress::Zlib::gzFile';

@@ -239,7 +239,7 @@ close MASTER;
       my $pod = $file;
       return if $pod =~ s/pm$/pod/ && -e $pod;
       die "$0: tut $File::Find::name" if $file =~ m/TUT/;
-      unless (open (F, "< $_\0")) {
+      unless (open (F, "<", "$_\0")) {
 	warn "$0: bogus <$file>: $!";
 	system "ls", "-l", $file;
       }
@@ -711,7 +711,7 @@ while (my ($target, $name) = each %Targets) {
     next;
   }
   print "Now processing $name\n" if $Verbose;
-  open THING, $name or die "Can't open $name: $!";
+  open THING, "<", $name or die "Can't open $name: $!";
   my @orig = ~< *THING;
   my $orig = join '', @orig;
   close THING;

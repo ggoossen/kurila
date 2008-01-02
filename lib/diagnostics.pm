@@ -239,7 +239,7 @@ CONFIG: {
 	$PRETTY = $opt_p;
     }
 
-    if (open(POD_DIAG, $PODFILE)) {
+    if (open(POD_DIAG, "<", $PODFILE)) {
 	warn "Happy happy podfile from real $PODFILE\n" if $DEBUG;
 	last CONFIG;
     } 
@@ -248,7 +248,7 @@ CONFIG: {
 	INCPATH: {
 	    for my $file ( (map { "$_/$WHOAMI.pm" } @INC), $0) {
 		warn "Checking $file\n" if $DEBUG;
-		if (open(POD_DIAG, $file)) {
+		if (open(POD_DIAG, "<", $file)) {
 		    while ( ~< *POD_DIAG) {
 			next unless
 			    m/^__END__\s*# wish diag dbase were more accessible/;

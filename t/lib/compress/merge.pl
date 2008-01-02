@@ -83,9 +83,9 @@ sub run
                 if ($to_file)
                   { $dest = $out_file }
                 else
-                  { $dest = 'IO::File'->new( "<$out_file")  }
+                  { $dest = 'IO::File'->new( "$out_file", "<")  }
 
-                my $gz = $CompressClass->new($dest, Merge => 1) ;
+                my $gz = eval { $CompressClass->new($dest, Merge => 1) };
                 
                 ok ! $gz, "  Did not create $CompressClass object";
 
@@ -128,15 +128,16 @@ sub run
 
                 if ($to_file eq 'handle')
                 {
-                    $buffer = 'IO::File'->new( "+<$out_file") 
+                    $buffer = 'IO::File'->new( "$out_file", "+<")
                         or die "# Cannot open $out_file: $!";
                 }
                 else
                   { $buffer = $out_file }
             }
 
-            ok ! $CompressClass->new($buffer, Merge => 1), "  constructor fails";
+            ok ! eval { $CompressClass->new($buffer, Merge => 1) }, "  constructor fails";
             {
+                local $TODO = 1;
                 like $$Error, '/Cannot create InflateScan object: (Header Error|unexpected end of file)/', "  got Bad Magic" ;
             }
 
@@ -167,7 +168,7 @@ sub run
 
                 if ($to_file eq 'handle')
                 {
-                    $buffer = 'IO::File'->new( "+<$out_file") 
+                    $buffer = 'IO::File'->new( "$out_file", "+<") 
                         or die "# Cannot open $out_file: $!";
                 }
                 else
@@ -256,9 +257,11 @@ sub run
                 my $dest = $buffer ;    
                 if ($to_file eq 'handle')
                 {
-                    $dest = 'IO::File'->new( "+<$buffer") ;
+                    $dest = 'IO::File'->new( "$buffer", "+<") ;
                 }
 
+                warn $dest;
+                warn "-- {dump::view($dest)}";
                 my $gz1 = $CompressClass->new($dest, Merge => 1, AutoClose => 1)
                     or die "## Error is  $$Error\n";
 

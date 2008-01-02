@@ -434,7 +434,7 @@ use strict;
 use $package qw(@$export_names);
 
 print "1..2\n";
-if (open OUTPUT, ">$output") \{
+if (open OUTPUT, ">", "$output") \{
   print "ok 1\n";
   select OUTPUT;
 \} else \{

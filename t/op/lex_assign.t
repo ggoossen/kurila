@@ -15,7 +15,7 @@ $runme = $^X;
 %h = (1..6);
 $aref = \@a;
 $href = \%h;
-open OP, qq{$runme -le "print 'aaa Ok ok' for 1..100"|};
+open OP, '-|', qq{$runme -le "print 'aaa Ok ok' for 1..100"};
 $chopit = 'aaaaaa';
 @chopar = (113 .. 119);
 $posstr = '123456';
@@ -280,7 +280,7 @@ subb()				# entersub
 caller				# caller
 warn "ignore this\n"		# warn
 'faked'				# die
-open BLAH, "<non-existent"	# open
+open BLAH, "<", "non-existent"	# open
 fileno STDERR			# fileno
 umask 0				# umask
 select STDOUT			# sselect

@@ -174,7 +174,7 @@ sub digest_file
     $method ||= "digest";
     #print "$file $method\n";
 
-    open(FILE, $file) or die "Can't open $file: $!";
+    open(FILE, "<", $file) or die "Can't open $file: $!";
     my $digest = Digest::MD5->new->addfile(*FILE)->?$method();
     close(FILE);
 
@@ -185,7 +185,7 @@ sub cat_file
 {
     my($file) = @_;
     local $/;  # slurp
-    open(FILE, $file) or die "Can't open $file: $!";
+    open(FILE, "<", $file) or die "Can't open $file: $!";
 
     # For PerlIO in case of UTF-8 locales.
     eval 'binmode(FILE, ":bytes")';

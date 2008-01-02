@@ -319,7 +319,7 @@ if (defined $fh) {
   ok( $Config{useperlio} ? T_STDIO_close( $fh ) : close( $fh ) );
 
   # open from perl, and check contents
-  open($fh, "<", " $testfile");
+  open($fh, "<", "$testfile");
   ok($fh);
   my $line = ~< $fh;
   ok($line,$lines[0]);

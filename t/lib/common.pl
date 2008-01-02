@@ -59,10 +59,12 @@ undef $/;
 
 plan tests => (scalar(@prgs)-$files);
 
+my $file;
 for (@prgs){
     unless (m/\n/)
      {
       print "# From $_\n";
+      $file = $_;
       next;
      }
     my $switch = "";
@@ -115,7 +117,7 @@ for (@prgs){
     open TEST, ">", "$tmpfile" or die "Cannot open >$tmpfile: $!";
     print TEST q{
         BEGIN {
-            open(STDERR, ">&STDOUT")
+            open(STDERR, ">&", "STDOUT")
               or die "Can't dup STDOUT->STDERR: $!;";
         }
     };
@@ -184,7 +186,7 @@ for (@prgs){
 	$ok = $results eq $expected;
     }
  
-    print_err_line( $switch, $prog, $expected, $results, $todo ) unless $ok;
+    print_err_line( $switch, $prog, $expected, $results, $todo, $file ) unless $ok;
 
     our $TODO = $todo ? $todo_reason : 0;
     ok($ok);
@@ -209,7 +211,8 @@ sub randomMatch
 
 sub print_err_line {
     my($switch, $prog, $expected, $results, $todo) = @_;
-    my $err_line = "PROG: $switch\n$prog\n" .
+    my $err_line = "FILE: $file\n" .
+                   "PROG: $switch\n$prog\n" .
 		   "EXPECTED:\n$expected\n" .
 		   "GOT:\n$results\n";
     if ($todo) {

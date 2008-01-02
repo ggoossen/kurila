@@ -77,7 +77,7 @@ for my $cross_partition_test (0..1) {
   unlink "copy-$$" or die "unlink: $!";
 
   require IO::File;
-  my $fh = IO::File->new(">copy-$$") or die "Cannot open copy-$$:$!";
+  my $fh = IO::File->new("copy-$$", ">") or die "Cannot open copy-$$:$!";
   binmode $fh or die;
   copy("file-$$",$fh);
   $fh->close or die "close: $!";
@@ -86,7 +86,7 @@ for my $cross_partition_test (0..1) {
   unlink "copy-$$" or die "unlink: $!";
 
   require FileHandle;
-  my $fh = FileHandle->new(">copy-$$") or die "Cannot open copy-$$:$!";
+  my $fh = FileHandle->new("copy-$$", ">") or die "Cannot open copy-$$:$!";
   binmode $fh or die;
   copy("file-$$",$fh);
   $fh->close;

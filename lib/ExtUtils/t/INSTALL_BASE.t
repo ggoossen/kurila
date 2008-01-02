@@ -72,7 +72,7 @@ foreach my $file (@installed_files) {
 # nmake outputs its damned logo
 # Send STDERR off to oblivion.
 open(SAVERR, ">", "&STDERR") or die $!;
-open(STDERR, ">".File::Spec->devnull) or die $!;
+open(STDERR, ">", "".File::Spec->devnull) or die $!;
 
 my $realclean_out = run("$make realclean");
 is( $?, 0, 'realclean' ) || diag($realclean_out);

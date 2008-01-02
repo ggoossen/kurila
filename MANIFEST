@@ -700,7 +700,6 @@ ext/Storable/t/threads.t	Does Storable work with threads?
 ext/Storable/t/tied_hook.t	See if Storable works
 ext/Storable/t/tied_items.t	See if Storable works
 ext/Storable/t/tied.t		See if Storable works
-ext/Storable/t/utf8hash.t	Perl6-Form
 ext/Storable/t/utf8.t		See if Storable works
 ext/Storable/t/weak.t		Can Storable store weakrefs
 ext/Sys/Hostname/Hostname.pm	Sys::Hostname extension Perl module

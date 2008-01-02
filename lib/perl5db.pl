@@ -6767,7 +6767,7 @@ sub TTY {
         }
 
         # Open file onto the debugger's filehandles, if you can.
-        open IN,  $in     or die "cannot open `$in' for read: $!";
+        open IN, "<",  $in     or die "cannot open `$in' for read: $!";
         open OUT, ">", "$out" or die "cannot open `$out' for write: $!";
 
         # Swap to the new filehandles.

@@ -101,7 +101,7 @@ for (@efiles) {
 my ($dynaloader_pm);
 if ($opts{adaptation}) {
   # let's copy our Dynaloader.pm (make this optional?)
-  open my $fhdyna, ">$opts{distdir}/lib/Dynaloader.pm";
+  open my $fhdyna, ">", "$opts{distdir}/lib/Dynaloader.pm";
   print $fhdyna $dynaloader_pm;
   close $fhdyna;
 }

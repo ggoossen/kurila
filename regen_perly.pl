@@ -79,7 +79,7 @@ EOF
 # creates $tmpc_file and $tmph_file
 my_system("$bison -d -o $tmpc_file $y_file");
 
-open CTMPFILE, $tmpc_file or die "Can't open $tmpc_file: $!\n";
+open CTMPFILE, "<", $tmpc_file or die "Can't open $tmpc_file: $!\n";
 my $clines;
 { local $/; $clines = ~< *CTMPFILE; }
 die "failed to read $tmpc_file: length mismatch\n"
@@ -108,7 +108,7 @@ unlink $tmpc_file;
 # C<#line 30 "perly.y"> confuses the Win32 resource compiler and the
 # C<#line 188 "perlytmp.h"> gets picked up by make depend, so remove them.
 
-open TMPH_FILE, $tmph_file or die "Can't open $tmph_file: $!\n";
+open TMPH_FILE, "<", $tmph_file or die "Can't open $tmph_file: $!\n";
 chmod 0644, $h_file;
 open H_FILE, ">", "$h_file" or die "Can't open $h_file: $!\n";
 my $endcore_done = 0;

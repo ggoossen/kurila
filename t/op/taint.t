@@ -281,7 +281,7 @@ my $TEST = catfile(curdir(), 'TEST');
 # always get some, so we'll run another process with some.
 SKIP: {
     my $arg = catfile(curdir(), "arg$$");
-    open PROG, ">", " $arg" or die "Can't create $arg: $!";
+    open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
 	eval { join('', @ARGV), kill 0 };
 	exit 0 if $@ =~ m/^Insecure dependency/;
@@ -296,7 +296,7 @@ SKIP: {
 
 # Reading from a file should be tainted
 {
-    test open(FILE, $TEST), "Couldn't open '$TEST': $!";
+    test open(FILE, "<", $TEST), "Couldn't open '$TEST': $!";
 
     my $block;
     sysread(FILE, $block, 100);
@@ -418,7 +418,7 @@ SKIP: {
     $foo = $filename . $TAINT;
     unlink $filename;	# in any case
 
-    test !eval { open FOO, $foo }, 'open for read';
+    test !eval { open FOO, "<", $foo }, 'open for read';
     test $@ eq '', $@;		# NB: This should be allowed
 
     # Try first new style but allow also old style.
@@ -429,7 +429,7 @@ SKIP: {
 	($Is_Dos && $! == 22) ||
 	($^O eq 'mint' && $! == 33);
 
-    test !eval { open FOO, ">", " $foo" }, 'open for write';
+    test !eval { open FOO, ">", "$foo" }, 'open for write';
     test $@ =~ m/^Insecure dependency/, $@;
 }
 
@@ -443,7 +443,7 @@ SKIP: {
 	test !eval { open FOO, "|-", "x$foo" }, 'popen to';
 	test $@ =~ m/^Insecure dependency/, $@;
 
-	test !eval { open FOO, "x$foo |" }, 'popen from';
+	test !eval { open FOO, "-|", "x$foo" }, 'popen from';
 	test $@ =~ m/^Insecure dependency/, $@;
     }
 
@@ -503,7 +503,7 @@ SKIP: {
 	local *FOO;
 	my $temp = "./taintC$$";
 	END { unlink $temp }
-	test open(FOO, ">", " $temp"), "Couldn't open $temp for write: $!";
+	test open(FOO, ">", "$temp"), "Couldn't open $temp for write: $!";
 
 	test !eval { ioctl FOO, $TAINT0, $foo }, 'ioctl';
 	test $@ =~ m/^Insecure dependency/, $@;
@@ -732,7 +732,7 @@ SKIP: {
 {
     # bug id 20001004.006
 
-    open IN, $TEST or warn "$0: cannot read $TEST: $!" ;
+    open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
     local $/;
     my $a = ~< *IN;
     my $b = ~< *IN;
@@ -745,7 +745,7 @@ SKIP: {
 {
     # bug id 20001004.007
 
-    open IN, $TEST or warn "$0: cannot read $TEST: $!" ;
+    open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
     my $a = ~< *IN;
 
     my $c = { a => 42,
@@ -1139,7 +1139,7 @@ TERNARY_CONDITIONALS: {
     while($a[0]=~ m/(.)/g ) {
 	last if $i++ +> 10000;
     }
-    cmp_ok $i, '<', 10000, "infinite m//g";
+    cmp_ok $i, '+<', 10000, "infinite m//g";
 }
 
 SKIP:
@@ -1173,9 +1173,9 @@ SKIP:
 	    close $pipe;
 	};
 	test $@ !~ m/Insecure \$ENV/, 'fork triggers %ENV check';
-	test $@ eq '',               'pipe/fork/open/close failed';
+	is $@, '',               'pipe/fork/open/close failed';
 	eval {
-	    open my $pipe, "|$Invoke_Perl -e 1";
+	    open my $pipe, "|-", "$Invoke_Perl -e 1";
 	    close $pipe;
 	};
 	test $@ =~ m/Insecure \$ENV/, 'popen neglects %ENV check';

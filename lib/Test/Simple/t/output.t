@@ -13,7 +13,7 @@ chdir 't';
 
 
 # Can't use Test.pm, that's a 5.005 thing.
-print "1..4\n";
+print "1..5\n";
 
 my $test_num = 1;
 # Utility testing functions.
@@ -45,23 +45,24 @@ print $out "hi!\n";
 close *$out;
 
 undef $out;
-open(IN, $tmpfile) or die $!;
+open(IN, "<", $tmpfile) or die $!;
 chomp(my $line = ~< *IN);
 close IN;
 
 ok($line eq 'hi!');
 
-open(FOO, ">", ">$tmpfile") or die $!;
+open(FOO, ">>", "$tmpfile") or die $!;
 $out = $Test->output(\*FOO);
 $old = select *$out;
 print "Hello!\n";
 close *$out;
 undef $out;
 select $old;
-open(IN, $tmpfile) or die $!;
+open(IN, "<", $tmpfile) or die $!;
 my @lines = ~< *IN;
 close IN;
 
+ok($lines[0] =~ m/hi!/);
 ok($lines[1] =~ m/Hello!/);
 
 

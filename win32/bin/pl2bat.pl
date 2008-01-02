@@ -83,7 +83,7 @@ sub process {
     my $line;
     my $start= $Config{startperl};
     $start= "#!perl"   unless  $start =~ m/^#!.*perl/;
-    open( FILE, $file ) or die "$0: Can't open $file: $!";
+    open( FILE, "<", $file ) or die "$0: Can't open $file: $!";
     @file = ~< *FILE;
     foreach $line ( @file ) {
 	$linenum++;

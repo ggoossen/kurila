@@ -602,17 +602,15 @@ sub _system_run {
             ### MUST use the 2-arg version of open for dup'ing for 
             ### 5.6.x compatibilty. 5.8.x can use 3-arg open
             ### see perldoc5.6.2 -f open for details            
-            open $glob, $redir . fileno($fh) or (
+            open $glob, $redir, fileno($fh) or (
                         Carp::carp(loc("Could not dup '$name': %1", $!)),
                         return
                     );        
                 
             ### we should re-open this filehandle right now, not
             ### just dup it
-            ### Use 2-arg version of open, as 5.5.x doesn't support
-            ### 3-arg version =/
             if( $redir eq '>&' ) {
-                open( $fh, '>' . File::Spec->devnull ) or (
+                open( $fh, ">", '' . File::Spec->devnull ) or (
                     Carp::carp(loc("Could not reopen '$name': %1", $!)),
                     return
                 );
@@ -633,10 +631,7 @@ sub _system_run {
             my($redir, $fh, $glob) = @{$Map{$name}} or (
                 Carp::carp(loc("No such FD: '%1'", $name)), next );
 
-            ### MUST use the 2-arg version of open for dup'ing for 
-            ### 5.6.x compatibilty. 5.8.x can use 3-arg open
-            ### see perldoc5.6.2 -f open for details
-            open( $fh, $redir . fileno($glob) ) or (
+            open( $fh, $redir, fileno($glob) ) or (
                     Carp::carp(loc("Could not restore '$name': %1", $!)),
                     return
                 ); 

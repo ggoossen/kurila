@@ -57,7 +57,7 @@ sub docat_del
 { 
     my $file = shift;
     local $/ = undef;
-    open(CAT,$file) || die "Cannot open $file: $!";
+    open(CAT, "<",$file) || die "Cannot open $file: $!";
     my $result = ~< *CAT;
     close(CAT);
     $result = normalise($result) ;

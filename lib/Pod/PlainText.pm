@@ -564,7 +564,7 @@ sub pod2text {
     # open will handle the <&STDIN case automagically.
     if (defined $_[1]) {
         local *IN;
-        unless (open (IN, $_[0])) {
+        unless (open (IN, "<", $_[0])) {
             croak ("Can't open $_[0] for reading: $!\n");
             return;
         }

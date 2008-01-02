@@ -654,7 +654,7 @@ sub WriteEmptyMakefile {
     if ( -f $new ) {
         _rename($new, $old) or warn "rename $new => $old: $!"
     }
-    open MF, '>'.$new or die "open $new for write: $!";
+    open MF, ">", ''.$new or die "open $new for write: $!";
     print MF <<'EOP';
 all:
 

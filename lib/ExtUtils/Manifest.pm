@@ -349,7 +349,7 @@ sub _maniskip {
     my $mfile = "$MANIFEST.SKIP";
     _check_mskip_directives($mfile) if -f $mfile;
     local(*M, $_);
-    open M, $mfile or open M, "<", $DEFAULT_MSKIP or return sub {0};
+    open M, "<", $mfile or open M, "<", $DEFAULT_MSKIP or return sub {0};
     while ( ~< *M){
 	chomp;
 	s/\r//;
@@ -380,7 +380,7 @@ sub _check_mskip_directives {
     local (*M, $_);
     my @lines = ();
     my $flag = 0;
-    unless (open M, $mfile) {
+    unless (open M, "<", $mfile) {
         warn "Problem opening $mfile: $!";
         return;
     }
@@ -428,7 +428,7 @@ sub _include_mskip_file {
         return;
     }
     local (*M, $_);
-    unless (open M, $mskip) {
+    unless (open M, "<", $mskip) {
         warn "Problem opening $mskip: $!";
         return;
     }
@@ -495,8 +495,8 @@ sub cp_if_diff {
     -f $from or carp "$0: $from not found";
     my($diff) = 0;
     local(*F,*T);
-    open(F,"< $from\0") or die "Can't read $from: $!\n";
-    if (open(T,"< $to\0")) {
+    open(F, "<","$from\0") or die "Can't read $from: $!\n";
+    if (open(T, "<","$to\0")) {
         local $_;
 	while ( ~< *F) { $diff++,last if $_ ne ~< *T; }
 	$diff++ unless eof(T);

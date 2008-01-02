@@ -98,7 +98,7 @@ for my $target (@target) {
             my $ext = $1;
             $ext =~ s!-!::!g;
             print "\t$ext\n";
-            if ( open( my $pkg, $lst ) ) {
+            if ( open( my $pkg, "<", $lst ) ) {
                 while ( ~< $pkg) {
                     if (m!^"(.+)"-"(.+)"$!) {
                         my ( $src, $dst ) = ( $1, $2 );

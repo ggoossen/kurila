@@ -1278,7 +1278,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	} elsif (($Is_VMS || $Is_Dos) && $name =~ m/[._]pl$/i) {
 	    # case-insensitive filesystem, one dot per name, so foo.h.PL
 	    # under Unix appears as foo.h_pl under VMS or fooh.pl on Dos
-	    local($/); open(PL,$name); my $txt = ~< *PL; close PL;
+	    local($/); open(PL, "<",$name); my $txt = ~< *PL; close PL;
 	    if ($txt =~ m/Extracting \S+ \(with variable substitutions/) {
 		($pl_files{$name} = $name) =~ s/[._]pl\z//i ;
 	    }

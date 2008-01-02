@@ -374,7 +374,7 @@ sub run {
     if($file =~ m/\.pod$/i) {
       # Don't bother looking for $VERSION in .pod files
       DEBUG and print "Not looking for \$VERSION in .pod $file\n";
-    } elsif( !open(INPOD, $file) ) {
+    } elsif( !open(INPOD, "<", $file) ) {
       DEBUG and print "Couldn't open $file: $!\n";
       close(INPOD);
     } else {

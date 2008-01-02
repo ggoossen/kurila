@@ -193,7 +193,7 @@ SKIP: {
     ok( $files{'.packlist'},    '  packlist created'   );
     ok( $files{'perllocal.pod'},'  perllocal.pod created' );
 
-    ok( open(PERLLOCAL, $files{'perllocal.pod'} ) ) || 
+    ok( open(PERLLOCAL, "<", $files{'perllocal.pod'} ) ) || 
         diag("Can't open $files{'perllocal.pod'}: $!");
     { local $/;
       unlike( ~< *PERLLOCAL, qr/other/, 'DESTDIR should not appear in perllocal');
@@ -249,7 +249,7 @@ ok( !-f 'META.yml',  'META.yml not written to source dir' );
 ok( -f $meta_yml,    'META.yml written to dist dir' );
 ok( !-e "META_new.yml", 'temp META.yml file not left around' );
 
-ok open META, $meta_yml or diag $!;
+ok open META, "<", $meta_yml or diag $!;
 my @meta = ~< *META;
 like $meta[-1], '/\n$/', "META.yml ends with a newline";
 ok close META;
@@ -283,7 +283,7 @@ ok( grep(m/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
 # I know we'll get ignored errors from make here, that's ok.
 # Send STDERR off to oblivion.
 open(SAVERR, ">", "&STDERR") or die $!;
-open(STDERR, ">".File::Spec->devnull) or die $!;
+open(STDERR, ">", "".File::Spec->devnull) or die $!;
 
 my $realclean_out = run("$make realclean");
 is( $?, 0, 'realclean' ) || diag($realclean_out);

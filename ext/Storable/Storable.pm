@@ -120,7 +120,7 @@ EOM
 sub file_magic {
     my $file = shift;
     my $fh = FileHandle->new();
-    open($fh, "<". $file) || die "Can't open '$file': $!";
+    open($fh, "<", "". $file) || die "Can't open '$file': $!";
     binmode($fh);
     defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $!";
     close($fh);
@@ -367,7 +367,7 @@ sub lock_retrieve {
 sub _retrieve {
 	my ($file, $use_locking) = @_;
 	local *FILE;
-	open(FILE, $file) || logcroak "can't open $file: $!";
+	open(FILE, "<", $file) || logcroak "can't open $file: $!";
 	binmode FILE;							# Archaic systems...
 	my $self;
 	my $da = $@;							# Could be from exception handler

@@ -94,7 +94,7 @@ print "ok 15\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">", ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' if (-s $outfile);
 print "ok 16\n";
@@ -111,7 +111,7 @@ print "ok 18\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">", ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' if (-s $outfile);
 print "ok 19\n";
@@ -132,7 +132,7 @@ print "ok 21\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">", ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 2);
 print "ok 22\n";
@@ -147,7 +147,7 @@ print "ok 24\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">", ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 4);
 print "ok 25\n";
@@ -162,7 +162,7 @@ print "ok 27\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">", ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 7);
 print "ok 28\n";
@@ -177,7 +177,7 @@ print "ok 30\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">", ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 10);
 print "ok 31\n";
