@@ -297,7 +297,7 @@ sub read_table {
     my($f, $fh);
     foreach my $d (@INC) {
 	$f = File::Spec->catfile($d, @Path, $self->{table});
-	last if open($fh, $f);
+	last if open($fh, "<", $f);
 	$f = undef;
     }
     if (!defined $f) {

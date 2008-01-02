@@ -65,7 +65,7 @@ while (defined (my $file = next_file())) {
 
     if ($file eq '-') {
 	open(IN, "<", "-");
-	open(OUT, ">", "-");
+	open(OUT, ">-");
     } else {
 	($outfile = $file) =~ s/\.h$/.ph/ || next;
 	print "$file -> $outfile\n" unless $opt_Q;
@@ -81,8 +81,8 @@ while (defined (my $file = next_file())) {
 	    }
 	}
 
-	open(IN,"$file") || (($Exit = 1),(warn "Can't open $file: $!\n"),next);
-	open(OUT,">$Dest_dir/$outfile") || die "Can't create $outfile: $!\n";
+	open(IN,"<","$file") || (($Exit = 1),(warn "Can't open $file: $!\n"),next);
+	open(OUT,">","$Dest_dir/$outfile") || die "Can't create $outfile: $!\n";
     }
 
     print OUT
@@ -681,7 +681,7 @@ sub queue_includes_from
 
     return if ($file eq "-");
 
-    open HEADER, $file or return;
+    open HEADER, "<", $file or return;
         while (defined($line = ~< *HEADER)) {
             while (m/\\$/) { # Handle continuation lines
                 chop $line;
@@ -724,7 +724,7 @@ sub build_preamble_if_necessary
     # Can we skip building the preamble file?
     if (-r $preamble) {
         # Extract version number from first line of preamble:
-        open  PREAMBLE, $preamble or die "Cannot open $preamble:  $!";
+        open  PREAMBLE, "<", $preamble or die "Cannot open $preamble:  $!";
             my $line = ~< *PREAMBLE;
             $line =~ m/(\b\d+\b)/;
         close PREAMBLE            or die "Cannot close $preamble:  $!";

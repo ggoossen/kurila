@@ -199,7 +199,7 @@ while ( ~< *DATA) { # Read in the protypes.
     }
 
     # If given the -U option open up the metaconfig unit for this function.
-    if ($opts{U} && open(U, ">d_${func}_r.U"))  {
+    if ($opts{U} && open(U, ">", "d_${func}_r.U"))  {
     	binmode U;
 	select U;
     }

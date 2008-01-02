@@ -269,7 +269,7 @@ sub write_mmp {
     for my $u (qw(SOURCE SOURCEPATH SYSTEMINCLUDE USERINCLUDE LIBRARY MACRO)) {
         $CONF{$u} = uniquefy_filenames( $CONF{$u} );
     }
-    open( BASE_MMP, ">$base.mmp" ) or die "$0: $base.mmp: $!\n";
+    open( BASE_MMP, ">", "$base.mmp" ) or die "$0: $base.mmp: $!\n";
 
     print BASE_MMP <<__EOF__;
 TARGET		$CONF{TARGET}
@@ -656,7 +656,7 @@ __EOF__
             for my $submf ( glob("*/Makefile") ) {
                 my $d = dirname($submf);
                 print "Configuring Encode::$d...\n";
-                if ( open( SUBMF, $submf ) ) {
+                if ( open( SUBMF, "<", $submf ) ) {
                     if ( update_dir($d) ) {
                         my @subsrc;
                         while ( ~< *SUBMF) {
@@ -876,7 +876,7 @@ __EOF__
         for my $f ("$SYMBIAN_ROOT\\Epoc32\\Build$CWD\\$base\\WINS\\perl$VERSION-$extdash.def",
 		   "..\\BMARM\\perl$VERSION-${extdash}u.def") {
 	    print "\t($f - ";
-	    if ( open( $def, $f ) ) {
+	    if ( open( $def, "<", $f ) ) {
 		print "OK)\n";
 	        $basef = $f;
 		last;

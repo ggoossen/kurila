@@ -892,7 +892,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
     Devel::PPPort::WriteFile('ppport.h')
         || die "Can't create $ext$modpname/ppport.h: $!\n";
   }
-  open(XS, ">$modfname.xs") || die "Can't create $ext$modpname/$modfname.xs: $!\n";
+  open(XS, ">", "$modfname.xs") || die "Can't create $ext$modpname/$modfname.xs: $!\n";
   if ($opt_x) {
     warn "Scanning typemaps...\n";
     get_typemap();
@@ -1659,7 +1659,7 @@ sub get_typemap {
     warn " Scanning $typemap\n";
     warn("Warning: ignoring non-text typemap file '$typemap'\n"), next
       unless -T $typemap ;
-    open(TYPEMAP, $typemap)
+    open(TYPEMAP, "<", $typemap)
       or warn ("Warning: could not open typemap file '$typemap': $!\n"), next;
     my $mode = 'Typemap';
     while ( ~< *TYPEMAP) {

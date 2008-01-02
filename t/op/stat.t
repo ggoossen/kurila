@@ -328,7 +328,7 @@ SKIP: {
         skip "Test uses unixisms", 2 if $Is_MSWin32 || $Is_NetWare;
         skip "No TTY to test -t with", 2 unless -e $TTY;
 
-        open(TTY, $TTY) ||
+        open(TTY, "<", $TTY) ||
           warn "Can't open $TTY--run t/TEST outside of make.\n";
         ok(-t *TTY,  '-t');
         ok(-c *TTY,  'tty is -c');
@@ -347,7 +347,7 @@ SKIP: {
     skip "No null device to test with", 1 unless -e $Null;
     skip "We know Win32 thinks '$Null' is a TTY", 1 if $Is_MSWin32;
 
-    open(NULL, $Null) or DIE("Can't open $Null: $!");
+    open(NULL, "<", $Null) or DIE("Can't open $Null: $!");
     ok(! -t *NULL,   'null device is not a TTY');
     close(NULL);
 }
@@ -365,7 +365,7 @@ ok(-B $Perl,      '-B');
 
 ok(! -T $Perl,    '!-T');
 
-open(FOO,$statfile);
+open(FOO, "<",$statfile);
 SKIP: {
     eval { -T *FOO; };
     skip "-T/B on filehandle not implemented", 15 if $@ =~ m/not implemented/;
@@ -381,7 +381,7 @@ SKIP: {
     ok(! -B *FOO,    '   still -B');
     close(FOO);
 
-    open(FOO,$statfile);
+    open(FOO, "<",$statfile);
     $_ = ~< *FOO;
     like($_, qr/perl/,      'reopened and after readline');
     ok(-T *FOO,      '   still -T');
@@ -455,7 +455,7 @@ print "# Zzz...\n";
 sleep(3);
 my $f = 'tstamp.tmp';
 unlink $f;
-ok (open(S, ">", " $f"), 'can create tmp file');
+ok (open(S, ">", "$f"), 'can create tmp file');
 close S or die;
 my @a = stat $f;
 print "# time=$^T, stat=(@a)\n";

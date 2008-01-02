@@ -435,14 +435,14 @@ END
 	    $| = 1; print ""; $| = 0; # flush output before forking
 	    pipe READ, 'WRITE' or die "Can't make pipe: $!";
 	    pipe READ2, 'WRITE2' or die "Can't make second pipe: $!";
-	    die "Can't fork: $!" unless defined($pid = open PERL, "|-", '');
+	    die "Can't fork: $!" unless defined($pid = open PERL, "|-", '-');
 	    unless ($pid) {
 	      # Child process here. We're going to send errors back
 	      # through the extra pipe.
 	      close READ;
 	      close READ2;
-	      open STDOUT, ">", "&WRITE"  or die "Can't redirect STDOUT: $!";
-	      open STDERR, ">", "&WRITE2" or die "Can't redirect STDERR: $!";
+	      open STDOUT, ">&", \*WRITE  or die "Can't redirect STDOUT: $!";
+	      open STDERR, ">&", \*WRITE2 or die "Can't redirect STDERR: $!";
 	      exec which_perl(), '-w', '-MTestInit', '-'
 		or die "Can't exec perl: $!";
 	    } else {
@@ -469,21 +469,21 @@ END
 	      # Use pipe instead of system so we don't inherit STD* from
 	      # this process, and then foul our pipe back to parent by
 	      # redirecting output in the child.
-	      open PERL,"$cmd |" or die "Can't open pipe: $!\n";
+	      open PERL, "-", "$cmd" or die "Can't open pipe: $!\n";
 	      { local $/; $output = join '', ~< *PERL }
 	      close PERL;
 	    } else {
 	      my $outfile = "tout$$";  $outfile++ while -e $outfile;
 	      push @tmpfiles, $outfile;
 	      system "$cmd >$outfile";
-	      { local $/; open IN, $outfile; $output = ~< *IN; close IN }
+	      { local $/; open IN, "<", $outfile; $output = ~< *IN; close IN }
 	    }
 	    if ($?) {
 	      printf "not ok: exited with error code %04X\n", $?;
 	      $debugging or do { 1 while unlink @tmpfiles };
 	      exit;
 	    }
-	    { local $/; open IN, $errfile; $errors = ~< *IN; close IN }
+	    { local $/; open IN, "<", $errfile; $errors = ~< *IN; close IN }
 	    1 while unlink @tmpfiles;
 	  }
 	  print $output;

@@ -355,7 +355,7 @@ sub _get_install_skip {
     if ($skip && !ref $skip) {
         print "Reading skip patterns from '$skip'.\n"
             if $verbose;
-        if (open my $fh,$skip ) {
+        if (open my $fh, "<",$skip ) {
             my @patterns;
             while ( ~< $fh) {
                 chomp;
@@ -950,7 +950,7 @@ sub run_filter {
     my ($cmd, $src, $dest) = @_;
     local(*CMD, *SRC);
     open(CMD, "|$cmd >$dest") || die "Cannot fork: $!";
-    open(SRC, $src)           || die "Cannot open $src: $!";
+    open(SRC, "<", $src)           || die "Cannot open $src: $!";
     my $buf;
     my $sz = 1024;
     while (my $len = sysread(SRC, $buf, $sz)) {

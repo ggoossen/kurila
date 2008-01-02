@@ -1608,7 +1608,7 @@ if (scalar(keys %prompts) != scalar(@prompts)/2) {
 
 local *FH;
 my $pmfile = __FILE__;
-open FH, $pmfile or die "Could not open '$pmfile': $!";
+open FH, "<", $pmfile or die "Could not open '$pmfile': $!";
 local $/ = "";
 my @podpara;
 my $in_over;

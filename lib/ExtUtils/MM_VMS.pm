@@ -1440,7 +1440,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	# Get external libraries this extension will need
 	if (-f $extralibs ) {
 	    my %seenthis;
-	    open LIST,$extralibs or warn $!,next;
+	    open LIST, "<",$extralibs or warn $!,next;
 	    while ( ~< *LIST) {
 		chomp;
 		# Include a library in the link only once, unless it's mentioned
@@ -1456,7 +1456,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	}
 	# Get full name of extension for ExtUtils::Miniperl
 	if (-f $extopt) {
-	    open OPT,$extopt or die $!;
+	    open OPT, "<",$extopt or die $!;
 	    while ( ~< *OPT) {
 		next unless m/(?:UNIVERSAL|VECTOR)=boot_([\w_]+)/;
 		my $pkg = $1;

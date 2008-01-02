@@ -1174,7 +1174,7 @@ sub parse_from_file {
     else {
         ## We have a filename, open it for reading
         $myData{_INFILE} = $infile;
-        open($in_fh, "<", " $infile")  or
+        open($in_fh, "<", "$infile")  or
              croak "Can't open $infile for reading: $!\n";
         $close_input = 1;
     }
@@ -1228,7 +1228,7 @@ sub parse_from_file {
         ## We have a filename, open it for writing
         $myData{_OUTFILE} = $outfile;
         (-d $outfile) and croak "$outfile is a directory, not POD input!\n";
-        open($out_fh, ">", " $outfile")  or
+        open($out_fh, ">", "$outfile")  or
              croak "Can't open $outfile for writing: $!\n";
         $close_output = 1;
     }

@@ -12,10 +12,9 @@ $VERSION = '2.02';
 %Supported = (
   'ascii'       => 1,
   'ascii-ctrl'  => 1,
-  'iso-8859-1'  => 1,
+  'utf8'  => 1,
   'null'        => 1,
-  'latin1'      => 1,
-  'latin-1'     => 1,
+  'latin1' => 1,
   %Supported,
 );
 
@@ -38,6 +37,10 @@ sub make_transcoder {
   my($e) = $_[1];
   die "WHAT ENCODING!?!?" unless $e;
   my $x;
+  if ($e eq "latin1") {
+      return sub { return join '', map { utf8::chr($_) } unpack "C*", $_; };
+  }
+
   return sub {;
     #foreach $x (@_) {
     #  if(Pod::Simple::ASCII and !Pod::Simple::UNICODE) {

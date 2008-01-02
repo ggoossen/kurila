@@ -31,6 +31,7 @@ our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
 	$::with_utf16 = 1 if $1 eq 'utf16';
 	$::taintwarn = 1 if $1 eq 'taintwarn';
 	$::failed = 1 if $1 eq 'failed';
+	$::failed = 2 if $1 eq 'ffailed';
 	$ENV{PERL_CORE_MINITEST} = 1 if $1 eq 'minitest';
 	if ($1 =~ m/^deparse(,.+)?$/) {
 	    $::deparse = 1;
@@ -109,6 +110,9 @@ if ($::failed) {
     open my $fh, "<", "TEST_FAILED";
     push @ARGV, map { chomp; $_ } ~< $fh;
     close $fh;
+    if ($::failed +> 1) {
+        @ARGV = ($ARGV[0]);
+    }
 }
 
 unless (@ARGV) {

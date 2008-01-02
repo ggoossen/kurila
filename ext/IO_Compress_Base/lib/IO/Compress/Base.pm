@@ -181,7 +181,7 @@ sub _create
     {
         $oneShot = 0 ;
         $got = $obj->checkParams($class, undef, @_)
-            or return undef ;
+          or $obj->croakError("invalid params");
     }
 
     my $lax = ! $got->value('Strict') ;
@@ -189,7 +189,7 @@ sub _create
     my $outType = whatIsOutput($outValue);
 
     $obj->ckOutputParam($class, $outValue)
-        or return undef ;
+      or $obj->croakError("invalid output param");
 
     if ($outType eq 'buffer') {
         *$obj->{Buffer} = $outValue;
@@ -234,7 +234,7 @@ sub _create
     if (! $merge)
     {
         *$obj->{Compress} = $obj->mkComp($class, $got)
-            or return undef;
+            or $obj->croakError("Failed making Compress");
         
         *$obj->{UnCompSize} = U64->new() ;
         *$obj->{CompSize} = U64->new() ;
@@ -260,7 +260,7 @@ sub _create
                 my $mode = '>' ;
                 $mode = '>>'
                     if $appendOutput;
-                *$obj->{FH} = IO::File->new( "$mode $outValue") 
+                *$obj->{FH} = IO::File->new( "$outValue", "$mode")
                     or return $obj->saveErrorString(undef, "cannot open file '$outValue': $!", $!) ;
                 *$obj->{StdIO} = ($outValue eq '-'); 
                 setBinModeOutput(*$obj->{FH}) ;
@@ -269,12 +269,12 @@ sub _create
 
         *$obj->{Header} = $obj->mkHeader($got) ;
         $obj->output( *$obj->{Header} )
-            or return undef;
+            or $obj->croakError("Failed writing header");
     }
     else
     {
         *$obj->{Compress} = $obj->createMerge($outValue, $outType)
-            or return undef;
+            or $obj->croakError("Failed createMerge");
     }
 
     *$obj->{Closed} = 0 ;

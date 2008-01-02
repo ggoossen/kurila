@@ -14,7 +14,7 @@ else { die "$0: Can't find miniperlmain.c\n"; }
 
 open (IN,"${dir}miniperlmain.c")
   || die "$0: Can't open ${dir}miniperlmain.c: $!\n";
-open (OUT,">${dir}perlmain.c")
+open (OUT, ">","${dir}perlmain.c")
   || die "$0: Can't open ${dir}perlmain.c: $!\n";
 
 while ( ~< *IN) {

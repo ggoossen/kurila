@@ -168,7 +168,7 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
  
   foreach my $leaf (File::Spec->catfile('lib', "$name.pm"), 'Makefile.PL') {
     my $file = File::Spec->catfile($name, $leaf);
-    if (ok (open (FILE, $file), "open $file")) {
+    if (ok (open (FILE, "<", $file), "open $file")) {
         require kurila;
       my $match = qr/use kurila v$kurila::VERSION;/;
       my $found;

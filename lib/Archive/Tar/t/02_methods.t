@@ -714,7 +714,7 @@ sub check_tar_extract {
         ok( -e $path,               "   File '$path' exists" );
 
         my $fh;
-        open $fh, "$path" or warn "Error opening file '$path': $!\n";
+        open $fh, "<", "$path" or warn "Error opening file '$path': $!\n";
         binmode $fh;
 
         ok( $fh,                    "   Opening file" );

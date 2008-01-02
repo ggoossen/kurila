@@ -10,7 +10,7 @@ eval { for (\2) { $_ = ~< *FH } };
 like($@, 'Modification of a read-only value attempted', '[perl #19566]');
 
 {
-  open A, "+>", "a"; $a = 3;
+  open A,"+>", "a"; $a = 3;
   is($a .= (~< *A), 3, '#21628 - $a .= ~< *A , A eof');
   close A; $a = 4;
   is($a .= (~< *A), 4, '#21628 - $a .= ~< *A , A closed');
@@ -57,7 +57,7 @@ foreach my $l (1, 21) {
 use strict;
 use File::Spec;
 
-open F, "<", 'File::Spec'->curdir and sysread F, $_, 1;
+open F, '<', 'File::Spec'->curdir and sysread F, $_, 1;
 my $err = $! + 0;
 close F;
 

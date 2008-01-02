@@ -5,7 +5,7 @@ if (! eval { require Test::More; 1 }) {
   exit;
 }
 require Test::More;
-Test::More->import(tests => 8);
+Test::More->import(tests => 7);
 
 # use this first to $CPAN::term can be undefined
 use_ok( 'CPAN' );

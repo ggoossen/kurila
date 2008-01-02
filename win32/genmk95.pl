@@ -14,7 +14,7 @@
 
 my ($filein, $fileout) = @ARGV;
 
-open my $in, $filein or die "Error opening input file: $!\n";
+open my $in, "<", $filein or die "Error opening input file: $!\n";
 open my $out, ">", " $fileout" or die "Error opening output file: $!\n";
 
 print $out <<_EOH_;

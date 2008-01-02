@@ -286,7 +286,7 @@ sub analyze_file {
     # *sigh* this breaks under taint, but open -| is unportable.
     my $line = $self->_command_line($file);
 
-    unless ( open(FILE, "$line|" )) {
+    unless ( open(FILE, "-|", "$line" )) {
         print "can't run $file. $!\n";
         return;
     }
@@ -374,7 +374,7 @@ sub _switches {
     my @derived_switches;
 
     local *TEST;
-    open(TEST, $file) or print "can't open $file. $!\n";
+    open(TEST, "<", $file) or print "can't open $file. $!\n";
     my $shebang = ~< *TEST;
     close(TEST) or print "can't close $file. $!\n";
 

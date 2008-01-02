@@ -124,7 +124,7 @@ sub list_eq ($$) {
     is( ($x = unpack("%32B*", "Now is the time for all good blurfl")), $sum );
 
     my $foo;
-    open(BIN, "<", $Perl) || die "Can't open $Perl: $!\n";
+    open(BIN, '<', $Perl) || die "Can't open $Perl: $!\n";
     binmode BIN;
     sysread BIN, $foo, 8192;
     close BIN;

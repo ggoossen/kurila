@@ -199,7 +199,17 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
         while (tend > type && isSPACE(tend[-1]))
 	    *--tend = '\0';
 
+	IoTYPE(io) = *type;
+	if ((*type == IoTYPE_RDWR) && /* scary */
+	    (*(type+1) == IoTYPE_RDONLY || *(type+1) == IoTYPE_WRONLY) &&
+	    (tend > type+1 && tend[-1] != IoTYPE_PIPE)) {
+	    TAINT_PROPER("open");
+	    mode[1] = *type++;
+	    writing = 1;
+	} 
+
 	if (*type == IoTYPE_STD && type[1] == '\0') {
+	    /* '-' opens STDIN */
 	    if (num_svs)
 		Perl_croak(aTHX_ "open() '-' is only allowed with 3rd argument.");
 	    name = type;
@@ -213,6 +223,7 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	    IoTYPE(io) = IoTYPE_STD;
 
 	} else if (*type == IoTYPE_WRONLY && type[1] == IoTYPE_STD && (!type[2])) {
+	    /* '>-' opens STDOUT */
 	    if (num_svs > 1) {
 		Perl_croak(aTHX_ "More than one argument to '>%c' open",IoTYPE_STD);
 	    }
@@ -224,6 +235,30 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		mode[1] = 't';
 	    fp = PerlIO_stdout();
 	    IoTYPE(io) = IoTYPE_STD;
+
+        } else if (supplied_fp) {
+	    /* '+>&' with a supllied_fd */
+
+            TAINT_PROPER("open");
+            if ( ! ((*type == IoTYPE_WRONLY ||*type==IoTYPE_RDONLY) && type[1] == '&' && type[2] == '\0' ) ) {
+		Perl_croak(aTHX_ "open() with supplied_fd with incompatible type '%s'", type);
+	    }
+	    if (*type == IoTYPE_WRONLY) {
+		mode[0] = 'w';
+		writing = 1;
+	    } else {
+		mode[0] = 'r';
+	    }
+
+            if (out_raw)
+                mode[1] = 'b';
+            else if (out_crlf)
+                mode[1] = 't';
+	    dodup = PERLIO_DUP_FD;
+	    fp = supplied_fp;
+
+	} else if (*type == '\0') {
+	    /* '' opens a new filehandle */
 	} else {
 	    
 	    if ( ! num_svs ) {
@@ -243,15 +278,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	    name = SvOK(*svp) ? savesvpv (*svp) : savepvn ("", 0);
 	    SAVEFREEPV(name);
 
-	    IoTYPE(io) = *type;
-	    if ((*type == IoTYPE_RDWR) && /* scary */
-		(*(type+1) == IoTYPE_RDONLY || *(type+1) == IoTYPE_WRONLY) &&
-		(tend > type+1 && tend[-1] != IoTYPE_PIPE)) {
-		TAINT_PROPER("open");
-		mode[1] = *type++;
-		writing = 1;
-	    } 
-
 	    if (*type == IoTYPE_PIPE) {
 		if (type[1] != IoTYPE_STD) {
 		  unknown_open_mode:
@@ -261,6 +287,11 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		do {
 		    type++;
 		} while (isSPACE(*type));
+		if (*type == IoTYPE_PIPE) {
+		    if (ckWARN(WARN_PIPE))
+			Perl_warner(aTHX_ packWARN(WARN_PIPE), "Can't open bidirectional pipe");
+		    type++;
+		}
 		if (*name == '\0') {
 		    /* command is missing 19990114 */
 		    if (ckWARN(WARN_PIPE))
@@ -268,7 +299,8 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		    errno = EPIPE;
 		    goto say_false;
 		}
-		TAINT_ENV();
+		if ( ! (*name == '-' && name[1] == '\0') )
+		    TAINT_ENV();
 		TAINT_PROPER("piped open");
 		mode[0] = 'w';
 		writing = 1;

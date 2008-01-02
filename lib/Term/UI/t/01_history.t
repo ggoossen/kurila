@@ -55,7 +55,7 @@ SKIP: {
     {   ok( -e $file,           "File $file exists" );
         ok( -s $file,           "   File has size" );
     
-        open my $fh, $file or skip "Could not open $file: $!", 2;
+        open my $fh, "<", $file or skip "Could not open $file: $!", 2;
         my $cont = do { local $/; ~< $fh };
         chomp $cont;
         

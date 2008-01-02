@@ -6,7 +6,7 @@ my $targ = (@ARGV) ? join(' ',@ARGV) : 'miniperl' ;
 my $work = 1;
 while ($work)
  {
-  open(PIPE,"make $targ 2>&1 |") || die "Cannot open pipe to make:$!";
+  open(PIPE, "<","make $targ 2>&1 |") || die "Cannot open pipe to make:$!";
   my %fix;
   while ( ~< *PIPE)
    {

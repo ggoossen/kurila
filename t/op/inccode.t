@@ -30,7 +30,7 @@ sub get_temp_fh {
     print $fh "package ".substr($_[0],0,-3).";\n1;\n";
     print $fh $_[1] if @_ +> 1;
     close $fh or die "Couldn't close: $!";
-    open $fh, $f or die "Can't open $f: $!";
+    open $fh, "<", $f or die "Can't open $f: $!";
     return $fh;
 }
 

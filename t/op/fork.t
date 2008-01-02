@@ -382,8 +382,8 @@ sub pipe_to_fork ($$) {
 
 my ($parent, $child);
 
-open $parent;
-open $child;
+open $parent, "<", '';
+open $child, "<", '';
 if (pipe_to_fork($parent, $child)) {
     # parent
     print $parent "pipe_to_fork\n";

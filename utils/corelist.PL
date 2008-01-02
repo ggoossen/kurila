@@ -38,7 +38,7 @@ my $script = File::Spec->catfile(
                 File::Spec->updir, qw[lib Module CoreList bin]
             ), "corelist");
 
-if (open(IN, $script)) {
+if (open(IN, "<", $script)) {
     print OUT ~< *IN;
     close IN;
 } else {

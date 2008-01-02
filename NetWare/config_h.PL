@@ -42,7 +42,7 @@ eval $str;
 
 die "$str:$@" if $@;
 
-open(H,">$file.new") || die "Cannot open $file.new:$!";
+open(H, ">","$file.new") || die "Cannot open $file.new:$!";
 binmode H;		# no CRs (which cause a spurious rebuild)
 while ( ~< *SH)
  {

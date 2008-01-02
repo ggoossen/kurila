@@ -74,7 +74,7 @@ sub docat
 {
     my $file = shift;
     local $/ = undef;
-    open(CAT,$file) || die "Cannot open $file:$!";
+    open(CAT, "<",$file) || die "Cannot open $file:$!";
     my $result = ~< *CAT;
     close(CAT);
     normalise($result) ;
@@ -1512,7 +1512,7 @@ sub test_splice {
     undef $H;
     untie @h;
     
-    open(TEXT, $tmp) or die "cannot open $tmp: $!";
+    open(TEXT, "<", $tmp) or die "cannot open $tmp: $!";
     @h = ~< *TEXT; normalise @h; chomp @h;
     close TEXT or die "cannot close $tmp: $!";
     return('list is different when re-read from disk: '

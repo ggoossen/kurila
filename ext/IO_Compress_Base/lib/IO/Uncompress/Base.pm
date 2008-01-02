@@ -340,13 +340,13 @@ sub _create
     if (! $got)
     {
         $got = $obj->checkParams($class, undef, @_)
-            or return undef ;
+          or die $obj->croakError("$class: Failed checkParams");
     }
 
     my $inType  = whatIsInput($inValue, 1);
 
     $obj->ckInputParam($class, $inValue, 1) 
-        or return undef ;
+      or die $obj->croakError("$class: Failed ckInputParam");
 
     *$obj->{InNew} = 1;
 
@@ -428,7 +428,7 @@ sub _create
 
     my $status = $obj->mkUncomp($class, $got);
 
-    return undef
+    die $obj->croakError("$class: mkUncomp returned invalid status")
         unless defined $status;
 
     if ( !  $status) {

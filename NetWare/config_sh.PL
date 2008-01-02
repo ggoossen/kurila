@@ -18,7 +18,7 @@ sub loadopts {
 	shift @ARGV;
 	my $optfile = shift @ARGV;
 	local (*F);
-	open OPTF, $optfile or die "Can't open $optfile: $!\n";
+	open OPTF, "<", $optfile or die "Can't open $optfile: $!\n";
 	my @opts;
 	chomp(my $line = ~< *OPTF);
 	my @vars = split(m/\t+~\t+/, $line);

@@ -52,7 +52,7 @@ BEGIN {
     if (not defined $where) {      # Try NIS+
      foreach my $niscat (qw(/bin/niscat)) {
          if (-x $niscat &&
-           open(PW, "<", "$niscat passwd.org_dir 2>/dev/null |") &&
+           open(PW, "$niscat passwd.org_dir 2>/dev/null |") &&
            defined( ~< *PW)) {
            $where = "NIS+ $niscat passwd.org_dir";
            undef $reason;

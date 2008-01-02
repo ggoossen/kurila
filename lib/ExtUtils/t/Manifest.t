@@ -33,7 +33,7 @@ sub add_file {
     my ($file, $data) = @_;
     $data ||= 'foo';
     1 while unlink $file;  # or else we'll get multiple versions on VMS
-    open( T, '>'.$file) or return;
+    open( T, ">", ''.$file) or return;
     print T $data;
     ++$Files{$file};
     close T;

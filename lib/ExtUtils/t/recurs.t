@@ -105,7 +105,7 @@ ok( -e $makefile,    'Makefile written' );
 ok( -e $submakefile, 'sub Makefile written' );
 
 my $inst_script = File::Spec->catdir(File::Spec->updir, 'cgi');
-ok( open(MAKEFILE, $submakefile) ) || diag("Can't open $submakefile: $!");
+ok( open(MAKEFILE, "<", $submakefile) ) || diag("Can't open $submakefile: $!");
 { local $/;  
   like( ~< *MAKEFILE, qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
         'prepend .. not stomping WriteMakefile args' ) 

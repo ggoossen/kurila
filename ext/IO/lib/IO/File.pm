@@ -184,7 +184,7 @@ sub open {
             return open($fh, IO::Handle::_open_mode_string($mode), $file);
         }
     }
-    open($fh, $file);
+    open($fh, "<", $file);
 }
 
 ################################################

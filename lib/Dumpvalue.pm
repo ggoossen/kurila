@@ -107,14 +107,14 @@ sub stringify {
   } elsif ($self->{unctrl} eq 'unctrl') {
     s/([\"\\])/\\$1/g ;
     s/([\000-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
-    s/([\200-\377])/{'\\0x'.sprintf('%2X',ord($1))}/g
+    s/([\200-\377])/{'\0x'.sprintf('%2X',ord($1))}/g
       if $self->{quoteHighBit};
   } elsif ($self->{unctrl} eq 'quote') {
     s/([\"\\\$\@])/\\$1/g if $tick eq '"';
     s/\033/\\e/g;
-    s/([\000-\037\177])/{'\\c'.chr(ord($1)^^^64)}/g;
+    s/([\000-\037\177])/{'\c'.chr(ord($1)^^^64)}/g;
   }
-  s/([\200-\377])/{'\\'.sprintf('%3o',ord($1))}/g if $self->{quoteHighBit};
+  s/([\200-\377])/{'\'.sprintf('%3o',ord($1))}/g if $self->{quoteHighBit};
   ($noticks || m/^\d+(\.\d*)?\Z/)
     ? $_
       : $tick . $_ . $tick;

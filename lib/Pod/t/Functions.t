@@ -54,7 +54,7 @@ SKIP: {
 	my $test_out = do { local $/; ~< *DATA }; 
 	
 	skip( "Can't fork '$^X': $!", 1) 
-	    unless open my $fh, qq[$^X "-I../lib" $pod_functions |];
+	    unless open my $fh, "-|", qq[$^X "-I../lib" $pod_functions];
 	my $fake_out = do { local $/; ~< $fh };
 	skip( "Pipe error: $!", 1)
 	    unless close $fh;
