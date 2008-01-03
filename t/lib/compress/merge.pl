@@ -260,8 +260,6 @@ sub run
                     $dest = 'IO::File'->new( "$buffer", "+<") ;
                 }
 
-                warn $dest;
-                warn "-- {dump::view($dest)}";
                 my $gz1 = $CompressClass->new($dest, Merge => 1, AutoClose => 1)
                     or die "## Error is  $$Error\n";
 

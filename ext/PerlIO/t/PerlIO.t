@@ -83,9 +83,9 @@ ok(close($utffh));
     ok( tell($x) +>= 3,          '       tell' );
 
     # test magic temp file over STDOUT
-    open OLDOUT, ">", "&STDOUT" or die "cannot dup STDOUT: $!";
+    open OLDOUT, ">&", \*STDOUT or die "cannot dup STDOUT: $!";
     my $status = open(STDOUT,"+<",undef);
-    open STDOUT, ">",  "&OLDOUT" or die "cannot dup OLDOUT: $!";
+    open STDOUT, ">&",  \*OLDOUT or die "cannot dup OLDOUT: $!";
     # report after STDOUT is restored
     ok($status, '       re-open STDOUT');
     close OLDOUT;
@@ -109,21 +109,21 @@ ok(close($utffh));
         local $TODO = "broken";
 
         # test in-memory open over STDOUT
-        open OLDOUT, ">", "&STDOUT" or die "cannot dup STDOUT: $!";
+        open OLDOUT, ">&", \*STDOUT or die "cannot dup STDOUT: $!";
         #close STDOUT;
         my $status = open(STDOUT,">",\$var);
         my $error = "$!" unless $status; # remember the error
 	close STDOUT unless $status;
-        open STDOUT, ">",  "&OLDOUT" or die "cannot dup OLDOUT: $!";
+        open STDOUT, ">&",  \*OLDOUT or die "cannot dup OLDOUT: $!";
         print "# $error\n" unless $status;
         # report after STDOUT is restored
         ok($status, '       open STDOUT into in-memory var');
 
         # test in-memory open over STDERR
-        open OLDERR, ">", "&STDERR" or die "cannot dup STDERR: $!";
+        open OLDERR, ">&", \*STDERR or die "cannot dup STDERR: $!";
         #close STDERR;
         ok( open(STDERR,">",\$var), '       open STDERR into in-memory var');
-        open STDERR, ">",  "&OLDERR" or die "cannot dup OLDERR: $!";
+        open STDERR, ">&",  \*OLDERR or die "cannot dup OLDERR: $!";
     }
 }
 

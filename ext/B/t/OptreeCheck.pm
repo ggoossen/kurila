@@ -697,9 +697,9 @@ sub mkCheckRex {
 	       [^()]*?			# which might be followed by something
 	      )?
 	      \\\)			# closing literal )
-	     !{'(?:next|db)state\\([^()]*?' .
-	      ($1 && '\\(eval \\d+\\)[^()]*')	# Match the eval if present
-	      . '\\)'
+	     !{'(?:next|db)state\([^()]*?' .
+	      ($1 && '\(eval \d+\)[^()]*')	# Match the eval if present
+	      . '\)'
 }!msgx;
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg;

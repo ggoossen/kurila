@@ -49,13 +49,13 @@ $Storable::forgive_me=1;
 
 my $devnull = File::Spec->devnull;
 
-open(SAVEERR, ">", "&STDERR");
+open(SAVEERR, ">&", \*STDERR);
 open(STDERR, ">", "$devnull") or 
   ( print SAVEERR "Unable to redirect STDERR: $!\n" and exit(1) );
 
 eval {$result = store ($bad , 'store')};
 
-open(STDERR, ">", "&SAVEERR");
+open(STDERR, ">&", \*SAVEERR);
 
 print ((defined $result)?"ok $test\n":"not ok $test\n"); $test++;
 print (($@ eq '')?"ok $test\n":"not ok $test\n"); $test++;

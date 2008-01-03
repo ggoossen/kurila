@@ -37,7 +37,7 @@ sub saveErrorString
 {
     my $self   = shift ;
     my $retval = shift ;
-    ${ *$self->{Error} } = shift ;
+    ${ *$self->{Error} } = shift() . (${*$self->{Error}} ? "\nprevious: ${*$self->{Error}}" : "") ;
     ${ *$self->{ErrorNo} } = shift() + 0 if @_ ;
 
     return $retval;
@@ -274,7 +274,7 @@ sub _create
     else
     {
         *$obj->{Compress} = $obj->createMerge($outValue, $outType)
-            or $obj->croakError("Failed createMerge");
+            or return undef;
     }
 
     *$obj->{Closed} = 0 ;
@@ -473,7 +473,7 @@ sub _wr2
 
         if ( ! $isFilehandle )
         {
-            $fh = IO::File->new( "<$input")
+            $fh = IO::File->new( "$input", "<")
                 or return $self->saveErrorString(undef, "cannot open file '$input': $!", $!) ;
         }
         binmode $fh if *$self->{Got}->valueOrDefault('BinModeIn') ;
