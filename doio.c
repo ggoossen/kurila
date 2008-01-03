@@ -667,7 +667,7 @@ PerlIO *
 Perl_nextargv(pTHX_ register GV *gv)
 {
     dVAR;
-    register SV *sv;
+    SV *sv;
 #ifndef FLEXFILENAMES
     int filedev;
     int fileino;
