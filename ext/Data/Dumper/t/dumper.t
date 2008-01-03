@@ -359,8 +359,8 @@ EOT
 
   $Data::Dumper::Purity = 1;
   $Data::Dumper::Indent = 3;
-  TEST q(Data::Dumper->Dump([\\*foo, \\@foo, \\%foo], ["*foo", "*bar", '*baz']));
-  TEST q(Data::Dumper->Dumpxs([\\*foo, \\@foo, \\%foo], ['*foo', '*bar', '*baz'])) if $XS;
+  TEST q(Data::Dumper->Dump([\*foo, \@foo, \%foo], ["*foo", "*bar", '*baz']));
+  TEST q(Data::Dumper->Dumpxs([\*foo, \@foo, \%foo], ['*foo', '*bar', '*baz'])) if $XS;
 
 ############# 55
 ##
@@ -387,8 +387,8 @@ EOT
 EOT
 
   $Data::Dumper::Indent = 1;
-  TEST q(Data::Dumper->Dump([\\*foo, \\@foo, \\%foo], ['foo', 'bar', 'baz']));
-  TEST q(Data::Dumper->Dumpxs([\\*foo, \\@foo, \\%foo], ['foo', 'bar', 'baz'])) if $XS;
+  TEST q(Data::Dumper->Dump([\*foo, \@foo, \%foo], ['foo', 'bar', 'baz']));
+  TEST q(Data::Dumper->Dumpxs([\*foo, \@foo, \%foo], ['foo', 'bar', 'baz'])) if $XS;
 
 ############# 61
 ##
@@ -414,8 +414,8 @@ EOT
 #$foo = $bar[1];
 EOT
 
-  TEST q(Data::Dumper->Dump([\\@foo, \\%foo, \\*foo], ['*bar', '*baz', '*foo']));
-  TEST q(Data::Dumper->Dumpxs([\\@foo, \\%foo, \\*foo], ['*bar', '*baz', '*foo'])) if $XS;
+  TEST q(Data::Dumper->Dump([\@foo, \%foo, \*foo], ['*bar', '*baz', '*foo']));
+  TEST q(Data::Dumper->Dumpxs([\@foo, \%foo, \*foo], ['*bar', '*baz', '*foo'])) if $XS;
 
 ############# 67
 ##
@@ -441,8 +441,8 @@ EOT
 #$foo = $bar->[1];
 EOT
 
-  TEST q(Data::Dumper->Dump([\\@foo, \\%foo, \\*foo], ['bar', 'baz', 'foo']));
-  TEST q(Data::Dumper->Dumpxs([\\@foo, \\%foo, \\*foo], ['bar', 'baz', 'foo'])) if $XS;
+  TEST q(Data::Dumper->Dump([\@foo, \%foo, \*foo], ['bar', 'baz', 'foo']));
+  TEST q(Data::Dumper->Dumpxs([\@foo, \%foo, \*foo], ['bar', 'baz', 'foo'])) if $XS;
 
 ############# 73
 ##
@@ -463,8 +463,8 @@ EOT
 
   $Data::Dumper::Purity = 0;
   $Data::Dumper::Quotekeys = 0;
-  TEST q(Data::Dumper->Dump([\\*foo, \\@foo, \\%foo], ['*foo', '*bar', '*baz']));
-  TEST q(Data::Dumper->Dumpxs([\\*foo, \\@foo, \\%foo], ['*foo', '*bar', '*baz'])) if $XS;
+  TEST q(Data::Dumper->Dump([\*foo, \@foo, \%foo], ['*foo', '*bar', '*baz']));
+  TEST q(Data::Dumper->Dumpxs([\*foo, \@foo, \%foo], ['*foo', '*bar', '*baz'])) if $XS;
 
 ############# 79
 ##
@@ -483,8 +483,8 @@ EOT
 #$baz = $bar->[2];
 EOT
 
-  TEST q(Data::Dumper->Dump([\\*foo, \\@foo, \\%foo], ['foo', 'bar', 'baz']));
-  TEST q(Data::Dumper->Dumpxs([\\*foo, \\@foo, \\%foo], ['foo', 'bar', 'baz'])) if $XS;
+  TEST q(Data::Dumper->Dump([\*foo, \@foo, \%foo], ['foo', 'bar', 'baz']));
+  TEST q(Data::Dumper->Dumpxs([\*foo, \@foo, \%foo], ['foo', 'bar', 'baz'])) if $XS;
 
 }
 
@@ -505,7 +505,7 @@ EOT
 ##
   $WANT = <<'EOT';
 #%kennels = (
-#  First => \'Fido",
+#  First => \"Fido",
 #  Second => \"Wags"
 #);
 #@dogs = (
@@ -517,13 +517,13 @@ EOT
 EOT
 
   TEST q(
-	 $d = Data::Dumper->new([\\%kennel, \\@dogs, $mutts],
+	 $d = Data::Dumper->new([\%kennel, \@dogs, $mutts],
 				[qw(*kennels *dogs *mutts)] );
 	 $d->Dump;
 	);
   if ($XS) {
     TEST q(
-	   $d = Data::Dumper->new([\\%kennel, \\@dogs, $mutts],
+	   $d = Data::Dumper->new([\%kennel, \@dogs, $mutts],
 				  [qw(*kennels *dogs *mutts)] );
 	   $d->Dumpxs;
 	  );
@@ -577,13 +577,13 @@ EOT
 EOT
 
   TEST q(
-	 $d = Data::Dumper->new([\\@dogs, \\%kennel, $mutts],
+	 $d = Data::Dumper->new([\@dogs, \%kennel, $mutts],
 				[qw(*dogs *kennels *mutts)] );
 	 $d->Dump;
 	);
   if ($XS) {
     TEST q(
-	   $d = Data::Dumper->new([\\@dogs, \\%kennel, $mutts],
+	   $d = Data::Dumper->new([\@dogs, \%kennel, $mutts],
 				  [qw(*dogs *kennels *mutts)] );
 	   $d->Dumpxs;
 	  );
@@ -777,7 +777,7 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Purity(1)->Dumpxs;)
 #  b => {
 #    c => [
 #      {
-#        e => "ARRAY(0xdeadbeef)"
+#        e => 'ARRAY(0xdeadbeef)'
 #      }
 #    ]
 #  }
@@ -794,11 +794,11 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Maxdepth(4)->Dumpxs;)
 ##
   $WANT = <<'EOT';
 #$a = {
-#  b => "HASH(0xdeadbeef)"
+#  b => 'HASH(0xdeadbeef)'
 #};
 #$b = $a->{b};
 #$c = [
-#  "HASH(0xdeadbeef)"
+#  'HASH(0xdeadbeef)'
 #];
 EOT
 
@@ -904,7 +904,7 @@ EOT
 # perl code does keys and values as numbers if possible
 TEST q(Data::Dumper->new([$c])->Dump;);
 # XS code always does them as strings
-$WANT =~ s/ (\d+)/ '$1'/gs;
+$WANT =~ s/ (\d+)/ "$1"/gs;
 TEST q(Data::Dumper->new([$c])->Dumpxs;)
 	if $XS;
 }
@@ -952,7 +952,7 @@ TEST q(Data::Dumper->new([$c])->Dumpxs;)
 EOT
 
 TEST q(Data::Dumper->new([[$c, $d]])->Dump;);
-$WANT =~ s/ (\d+)/ '$1'/gs;
+$WANT =~ s/ (\d+)/ "$1"/gs;
 TEST q(Data::Dumper->new([[$c, $d]])->Dumpxs;)
 	if $XS;
 }
@@ -966,7 +966,7 @@ TEST q(Data::Dumper->new([[$c, $d]])->Dumpxs;)
   $WANT = <<'EOT';
 #$VAR1 = {
 #          foo => sub {
-#                     print "foo";
+#                     print 'foo';
 #                 }
 #        };
 EOT
@@ -1223,8 +1223,8 @@ if ($XS) {
 ############# 310
 ## Perl code was using /...$/ and hence missing the \n.
   $WANT = <<'EOT';
-my $VAR1 = '42
-';
+my $VAR1 = "42
+";
 EOT
 
   # Can't pad with # as the output has an embedded newline.
@@ -1275,31 +1275,31 @@ EOT
       $WANT = <<'EOT';
 #$VAR1 = 999999999;
 #$VAR2 = 1000000000;
-#$VAR3 = "9999999999";
-#$VAR4 = "10000000000";
+#$VAR3 = '9999999999';
+#$VAR4 = '10000000000';
 #$VAR5 = -999999999;
-#$VAR6 = "-1000000000";
-#$VAR7 = "-9999999999";
-#$VAR8 = "-10000000000";
+#$VAR6 = '-1000000000';
+#$VAR7 = '-9999999999';
+#$VAR8 = '-10000000000';
 #$VAR9 = 4294967295;
-#$VAR10 = "4294967296";
-#$VAR11 = "-2147483648";
-#$VAR12 = "-2147483649";
+#$VAR10 = '4294967296';
+#$VAR11 = '-2147483648';
+#$VAR12 = '-2147483649';
 EOT
     } else {
       $WANT = <<'EOT';
 #$VAR1 = 999999999;
 #$VAR2 = 1000000000;
 #$VAR3 = 9999999999;
-#$VAR4 = "10000000000";
+#$VAR4 = '10000000000';
 #$VAR5 = -999999999;
-#$VAR6 = "-1000000000";
-#$VAR7 = "-9999999999";
-#$VAR8 = "-10000000000";
+#$VAR6 = '-1000000000';
+#$VAR7 = '-9999999999';
+#$VAR8 = '-10000000000';
 #$VAR9 = 4294967295;
 #$VAR10 = 4294967296;
-#$VAR11 = "-2147483648";
-#$VAR12 = "-2147483649";
+#$VAR11 = '-2147483648';
+#$VAR12 = '-2147483649';
 EOT
     }
     TEST q(Data::Dumper->Dumpxs(\@a)), "XS long integers";
@@ -1370,8 +1370,8 @@ EOT
   $ping = 5;
   %ping = (chr (0xDECAF) x 4  =>\$ping);
   for $Data::Dumper::Sortkeys (0, 1) {
-      TEST q(Data::Dumper->Dump([\\*ping, \\%ping], ['*ping', '*pong']));
-      TEST q(Data::Dumper->Dumpxs([\\*ping, \\%ping], ['*ping', '*pong'])) if $XS;
+      TEST q(Data::Dumper->Dump([\*ping, \%ping], ['*ping', '*pong']));
+      TEST q(Data::Dumper->Dumpxs([\*ping, \%ping], ['*ping', '*pong'])) if $XS;
   }
 }
 
@@ -1389,8 +1389,8 @@ EOT
   chop $k;
   %foo = ($k => 'rocks');
 
-  TEST q(Data::Dumper->Dump([\\%foo])), "quotekeys == 0 for utf8 flagged ASCII";
-  TEST q(Data::Dumper->Dumpxs([\\%foo])),
+  TEST q(Data::Dumper->Dump([\%foo])), "quotekeys == 0 for utf8 flagged ASCII";
+  TEST q(Data::Dumper->Dumpxs([\%foo])),
     "XS quotekeys == 0 for utf8 flagged ASCII" if $XS;
 }
 ############# 358

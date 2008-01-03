@@ -143,7 +143,7 @@ sub gzopen($$)
             or $Compress::Zlib::gzerrno = $IO::Uncompress::Gunzip::GunzipError;
     }
 
-    croak "gzopen: Valid creating unzip thing"
+    return undef
         if ! defined $gz ;
 
     bless [$gz, $infDef], 'Compress::Zlib::gzFile';

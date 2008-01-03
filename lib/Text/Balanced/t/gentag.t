@@ -22,6 +22,7 @@ $loaded = 1;
 print "ok 1\n";
 my $count=2;
 use vars qw( $DEBUG );
+$DEBUG=1;
 sub debug { print "\t>>>",@_ if $DEBUG }
 
 ######################### End of black magic.
@@ -69,7 +70,7 @@ while (defined($str = ~< *DATA))
 
 __DATA__
 
-# USING: gen_extract_tagged('{','}');
+# USING: gen_extract_tagged('\{','\}');
 	{ a test };
 
 # USING: gen_extract_tagged(qr/<[A-Z]+>/,undef, undef, {ignore=>["<BR>"]});

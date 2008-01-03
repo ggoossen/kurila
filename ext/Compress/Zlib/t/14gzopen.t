@@ -301,7 +301,7 @@ ok ! $fil->gzclose ;
     my $hello = "hello" ;
     my $len = length $hello ;
 
-    my $f = IO::File->new( ">$name") ;
+    my $f = IO::File->new( "$name", ">") ;
     ok $f;
 
     my $fil;
@@ -311,7 +311,7 @@ ok ! $fil->gzclose ;
 
     ok ! $fil->gzclose ;
 
-    $f = IO::File->new( "<$name") ;
+    $f = IO::File->new( "$name", "<") ;
     ok $fil = gzopen($name, "rb") ;
 
     my $uncmomp;
@@ -371,7 +371,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
     my $hello = "hello" ;
     my $len = length $hello ;
 
-    ok open(SAVEOUT, ">", "&STDOUT"), "  save STDOUT";
+    ok open(SAVEOUT, ">&", \*STDOUT), "  save STDOUT";
     my $dummy = fileno SAVEOUT;
     ok open(STDOUT, ">", "$name"), "  redirect STDOUT" ;
     
@@ -383,11 +383,11 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
               ($fil->gzwrite($hello) == $len) &&
               ($fil->gzclose == 0) ;
 
-    open(STDOUT, ">", "&SAVEOUT");
+    open(STDOUT, ">&", \*SAVEOUT);
 
     ok $status, "  wrote to stdout";
 
-       open(SAVEIN, "<", "&STDIN");
+       open(SAVEIN, "<&", \*STDIN);
     ok open(STDIN, "<", "$name"), "  redirect STDIN";
     $dummy = fileno SAVEIN;
 
@@ -401,7 +401,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
     ok ! $fil->gzclose ;
     ok   $fil->gzeof() ;
 
-       open(STDIN, "<", "&SAVEIN");
+       open(STDIN, "<&", \*SAVEIN);
 
     is $uncomp, $hello ;
 
@@ -420,7 +420,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
         '  gzopen with missing mode fails' ;
 
     # unknown parameters
-    $fil = gzopen($name, "xy") ;
+    $fil = eval { gzopen($name, "xy") };
     ok ! defined $fil, '  gzopen with unknown mode fails' ;
 
     $fil = gzopen($name, "ab") ;
@@ -475,7 +475,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
 
         ok ! -w $name, "  input file not writable";
 
-        my $fil = gzopen($name, "wb") ;
+        my $fil = eval { gzopen($name, "wb") };
         ok !$fil, "  gzopen returns undef" ;
         ok $gzerrno, "  gzerrno ok" or 
             diag " gzerrno $gzerrno\n";
@@ -497,7 +497,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
 
         ok ! -r $name, "  input file not readable";
         $gzerrno = 0;
-        $fil = gzopen($name, "rb") ;
+        $fil = eval { gzopen($name, "rb") };
         ok !$fil, "  gzopen returns undef" ;
         ok $gzerrno, "  gzerrno ok";
         chmod 0777, $name ;

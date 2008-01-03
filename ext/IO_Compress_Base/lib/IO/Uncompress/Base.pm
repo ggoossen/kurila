@@ -346,7 +346,7 @@ sub _create
     my $inType  = whatIsInput($inValue, 1);
 
     $obj->ckInputParam($class, $inValue, 1) 
-      or die $obj->croakError("$class: Failed ckInputParam");
+      or return undef;
 
     *$obj->{InNew} = 1;
 
@@ -371,7 +371,7 @@ sub _create
             my $mode = '<';
             $mode = '+<' if $got->value('Scan');
             *$obj->{StdIO} = ($inValue eq '-');
-            *$obj->{FH} = IO::File->new( "$mode $inValue")
+            *$obj->{FH} = IO::File->new( "$inValue", $mode)
                 or return $obj->saveErrorString(undef, "cannot open file '$inValue': $!", $!) ;
         }
         
@@ -428,7 +428,7 @@ sub _create
 
     my $status = $obj->mkUncomp($class, $got);
 
-    die $obj->croakError("$class: mkUncomp returned invalid status")
+    return undef
         unless defined $status;
 
     if ( !  $status) {
@@ -588,7 +588,7 @@ sub _singleTarget
         my $mode = '>' ;
         $mode = '>>'
             if $x->{Got}->value('Append') ;
-        $x->{fh} = IO::File->new( "$mode $output") 
+        $x->{fh} = IO::File->new( "$output", $mode) 
             or return retErr($x, "cannot open file '$output': $!") ;
         binmode $x->{fh} if $x->{Got}->valueOrDefault('BinModeOut');
 

@@ -18,7 +18,7 @@ BEGIN { use_ok('XS::APItest') };
 my $ldok = have_long_double();
 
 # first some IO redirection
-ok open(my $oldout, ">", "&STDOUT"), "saving STDOUT";
+ok open(my $oldout, ">&", \*STDOUT), "saving STDOUT";
 ok open(STDOUT, '>', "foo.out"),"redirecting STDOUT";
 
 # Allow for it to be removed

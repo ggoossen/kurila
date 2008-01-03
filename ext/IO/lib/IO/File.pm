@@ -184,6 +184,7 @@ sub open {
             return open($fh, IO::Handle::_open_mode_string($mode), $file);
         }
     }
+    $file =~ m/^<|>>?/ and croak 'MODE may not be part of the filename';
     open($fh, "<", $file);
 }
 
