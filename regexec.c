@@ -1791,7 +1791,7 @@ Perl_regexec_flags(pTHX_ REGEXP * const prog, char *stringarg, register char *st
 	    if (regtry(&reginfo, &s))
 		goto got_it;
 	    if (do_utf8) {
-		while (UTF8_IS_CONTINUED(s) && s < strend) 
+		while (UTF8_IS_CONTINUED(*s) && s < strend) 
 		    s++;
 	    }
 	} while (s++ < strend);
