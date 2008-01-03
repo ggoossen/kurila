@@ -439,7 +439,7 @@ EOT
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
 		}
 	    }
-	    if ($ENV{VG_OPTS} =~ m/cachegrind/) {
+	    if (($ENV{VG_OPTS} || '') =~ m/cachegrind/) {
 		if (rename $valgrind_log, "$test.valgrind") {
 		    $valgrind++;
 		} else {

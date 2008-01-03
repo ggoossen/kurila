@@ -38,7 +38,7 @@ sub make_transcoder {
   die "WHAT ENCODING!?!?" unless $e;
   my $x;
   if ($e eq "latin1") {
-      return sub { return join '', map { utf8::chr($_) } unpack "C*", $_; };
+      return sub { return map { join '', map { utf8::chr($_) } unpack "C*", $_; } @_ };
   }
 
   return sub {;

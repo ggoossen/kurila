@@ -1655,12 +1655,12 @@ Perl_swash_fetch(pTHX_ SV *swash, const char *ptr, bool do_utf8)
        * In both UTF-8 and UTF-8-MOD that happens to be UTF_CONTINUATION_MARK
        */
 	needents = UTF_CONTINUATION_MARK;
-	off      = NATIVE_TO_UTF(ptr[klen]);
+	off      = (U8)NATIVE_TO_UTF(ptr[klen]);
     }
     else {
       /* If char is encoded then swatch is for the prefix */
 	needents = (1 << UTF_ACCUMULATION_SHIFT);
-	off      = NATIVE_TO_UTF(ptr[klen]) & UTF_CONTINUATION_MASK;
+	off      = (U8)NATIVE_TO_UTF(ptr[klen]) & UTF_CONTINUATION_MASK;
     }
 
     /*
