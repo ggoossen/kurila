@@ -15,7 +15,7 @@ print "1..13\n";
 # my $file tests
 
 unlink("afile.new") if -f "afile";
-print "$!\nnot " unless open($f,"+>afile") && open($f, "+<", "afile");
+print "$!\nnot " unless open($f, "+>","afile") && open($f, "+<", "afile");
 print "ok 1\n";
 print "$!\nnot " unless binmode($f);
 print "ok 2\n";

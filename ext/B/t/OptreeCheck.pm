@@ -697,9 +697,9 @@ sub mkCheckRex {
 	       [^()]*?			# which might be followed by something
 	      )?
 	      \\\)			# closing literal )
-	     !{'(?:next|db)state\\([^()]*?' .
-	      ($1 && '\\(eval \\d+\\)[^()]*')	# Match the eval if present
-	      . '\\)'
+	     !{'(?:next|db)state\([^()]*?' .
+	      ($1 && '\(eval \d+\)[^()]*')	# Match the eval if present
+	      . '\)'
 }!msgx;
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg;
@@ -1008,7 +1008,7 @@ sub OptreeCheck::processExamples {
     # turned into optreeCheck tests,
 
     foreach my $file (@files) {
-	open (my $fh, $file) or die "cant open $file: $!\n";
+	open (my $fh, "<", $file) or die "cant open $file: $!\n";
 	$/ = "";
 	my @chunks = ~< $fh;
 	print preamble (scalar @chunks);

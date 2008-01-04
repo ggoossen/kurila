@@ -340,13 +340,13 @@ sub _create
     if (! $got)
     {
         $got = $obj->checkParams($class, undef, @_)
-            or return undef ;
+          or die $obj->croakError("$class: Failed checkParams");
     }
 
     my $inType  = whatIsInput($inValue, 1);
 
     $obj->ckInputParam($class, $inValue, 1) 
-        or return undef ;
+      or return undef;
 
     *$obj->{InNew} = 1;
 
@@ -371,7 +371,7 @@ sub _create
             my $mode = '<';
             $mode = '+<' if $got->value('Scan');
             *$obj->{StdIO} = ($inValue eq '-');
-            *$obj->{FH} = IO::File->new( "$mode $inValue")
+            *$obj->{FH} = IO::File->new( "$inValue", $mode)
                 or return $obj->saveErrorString(undef, "cannot open file '$inValue': $!", $!) ;
         }
         
@@ -588,7 +588,7 @@ sub _singleTarget
         my $mode = '>' ;
         $mode = '>>'
             if $x->{Got}->value('Append') ;
-        $x->{fh} = IO::File->new( "$mode $output") 
+        $x->{fh} = IO::File->new( "$output", $mode) 
             or return retErr($x, "cannot open file '$output': $!") ;
         binmode $x->{fh} if $x->{Got}->valueOrDefault('BinModeOut');
 

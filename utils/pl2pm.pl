@@ -91,7 +91,7 @@ while ( ~< *ARGV) {
 	$export_ok = "\@EXPORT_OK = qw(@export_ok);\n";
     }
 
-    if ( open(PM, ">$newname") ) {
+    if ( open(PM, ">", "$newname") ) {
         print PM <<"END";
 package $newpack;
 use 5.006;

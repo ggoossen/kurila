@@ -81,7 +81,7 @@ my ($SEEK_SET, $SEEK_CUR, $SEEK_END) = (0, 1, 2);
 # consume less blocks than one megabyte (assuming nobody has
 # one megabyte blocks...)
 
-open(BIG, ">big1") or
+open(BIG, ">", "big1") or
     do { warn "open big1 failed: $!\n"; bye };
 binmode(BIG) or
     do { warn "binmode big1 failed: $!\n"; bye };
@@ -96,7 +96,7 @@ my @s1 = stat("big1");
 
 print "# s1 = @s1\n";
 
-open(BIG, ">big2") or
+open(BIG, ">", "big2") or
     do { warn "open big2 failed: $!\n"; bye };
 binmode(BIG) or
     do { warn "binmode big2 failed: $!\n"; bye };
@@ -134,7 +134,7 @@ print BIG "big";
 exit 0;
 EOF
 
-open(BIG, ">big") or do { warn "open failed: $!\n"; bye };
+open(BIG, ">", "big") or do { warn "open failed: $!\n"; bye };
 binmode BIG;
 if ($r or not seek(BIG, 5_000_000_000, $SEEK_SET)) {
     my $err = $r ? 'signal '.($r ^&^ 0x7f) : $!;
@@ -210,7 +210,7 @@ print "ok 3\n";
 fail unless -f "big";
 print "ok 4\n";
 
-open(BIG, "big") or do { warn "open failed: $!\n"; bye };
+open(BIG, "<", "big") or do { warn "open failed: $!\n"; bye };
 binmode BIG;
 
 fail unless seek(BIG, 4_500_000_000, $SEEK_SET);
@@ -269,7 +269,7 @@ bye(); # does the necessary cleanup
 END {
     # unlink may fail if applied directly to a large file
     # be paranoid about leaving 5 gig files lying around
-    open(BIG, ">big"); # truncate
+    open(BIG, ">", "big"); # truncate
     close(BIG);
     1 while unlink "big"; # standard portable idiom
 }

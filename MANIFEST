@@ -199,13 +199,6 @@ ext/DB_File/t/db-hash.t		See if DB_File works
 ext/DB_File/t/db-recno.t	See if DB_File works
 ext/DB_File/typemap		Berkeley DB extension interface types
 ext/DB_File/version.c		Berkeley DB extension interface version check
-ext/Devel/DProf/Changes		Perl code profiler changelog
-ext/Devel/DProf/DProf.pm	Perl code profiler
-ext/Devel/DProf/DProf.xs	Perl code profiler
-ext/Devel/DProf/Makefile.PL	Perl code profiler makefile writer
-ext/Devel/DProf/t/dprofpp.t	Perl code profiler dprofpp test
-ext/Devel/DProf/t/DProf.t	Perl code profiler
-ext/Devel/DProf/Todo		Perl code profiler todo list
 ext/Digest/MD5/Changes		Digest::MD5 extension changes
 ext/Digest/MD5/hints/dec_osf.pl	Hints for named architecture
 ext/Digest/MD5/hints/irix_6.pl	Hints for named architecture
@@ -282,194 +275,6 @@ ext/DynaLoader/README		Dynamic Loader notes and intro
 ext/DynaLoader/t/DynaLoader.t	See if DynaLoader works
 ext/DynaLoader/t/XSLoader.t	See if XSLoader works
 ext/DynaLoader/XSLoader_pm.PL	Simple XS Loader perl module
-ext/Encode/AUTHORS		List of authors
-ext/Encode/bin/enc2xs		Encode module generator
-ext/Encode/bin/piconv		iconv by perl
-ext/Encode/bin/ucm2table	Table Generator for testing
-ext/Encode/bin/ucmlint		A UCM Lint utility
-ext/Encode/bin/ucmsort		A UCM sort utility
-ext/Encode/bin/unidump		Unicode Dump like hexdump(1)
-ext/Encode/Byte/Byte.pm		Encode extension
-ext/Encode/Byte/Makefile.PL	Encode extension
-ext/Encode/Changes		Change Log
-ext/Encode/CN/CN.pm		Encode extension
-ext/Encode/CN/Makefile.PL	Encode extension
-ext/Encode/EBCDIC/EBCDIC.pm	Encode extension
-ext/Encode/EBCDIC/Makefile.PL	Encode extension
-ext/Encode/encengine.c		Encode extension
-ext/Encode/Encode/Changes.e2x	Skeleton file for enc2xs
-ext/Encode/Encode/ConfigLocal_PM.e2x	Skeleton file for enc2xs
-ext/Encode/Encode/encode.h	Encode extension header file
-ext/Encode/Encode/Makefile_PL.e2x	Skeleton file for enc2xs
-ext/Encode/Encode.pm		Mother of all Encode extensions
-ext/Encode/Encode/_PM.e2x	Skeleton file for enc2xs
-ext/Encode/Encode/README.e2x	Skeleton file for enc2xs
-ext/Encode/Encode/_T.e2x	Skeleton file for enc2xs
-ext/Encode/Encode.xs		Encode extension
-ext/Encode/JP/JP.pm		Encode extension
-ext/Encode/JP/Makefile.PL	Encode extension
-ext/Encode/KR/KR.pm		Encode extension
-ext/Encode/KR/Makefile.PL	Encode extension
-ext/Encode/lib/Encode/Alias.pm	Encode extension
-ext/Encode/lib/Encode/CJKConstants.pm	Encode extension
-ext/Encode/lib/Encode/CN/HZ.pm		Encode extension
-ext/Encode/lib/Encode/Config.pm	Encode configuration module
-ext/Encode/lib/Encode/Encoding.pm	Encode extension
-ext/Encode/lib/Encode/GSM0338.pm	Encode extension
-ext/Encode/lib/Encode/Guess.pm	Encode Extension
-ext/Encode/lib/Encode/JP/H2Z.pm	Encode extension
-ext/Encode/lib/Encode/JP/JIS7.pm	Encode extension
-ext/Encode/lib/Encode/KR/2022_KR.pm	 Encode extension
-ext/Encode/lib/Encode/MIME/Header/ISO_2022_JP.pm	Encode extension
-ext/Encode/lib/Encode/MIME/Header.pm	Encode extension
-ext/Encode/lib/Encode/MIME/Name.pm	Encode extension
-ext/Encode/lib/Encode/PerlIO.pod	Documents for Encode & PerlIO
-ext/Encode/lib/Encode/Supported.pod	Documents for supported encodings
-ext/Encode/lib/Encode/Unicode/UTF7.pm	Encode extension
-ext/Encode/Makefile.PL		Encode extension makefile writer
-ext/Encode/README		Encode extension
-ext/Encode/Symbol/Makefile.PL	Encode extension
-ext/Encode/Symbol/Symbol.pm	Encode extension
-ext/Encode/t/Aliases.t		test script
-ext/Encode/t/at-cn.t		test script
-ext/Encode/t/at-tw.t		test script
-ext/Encode/t/big5-eten.enc	test data
-ext/Encode/t/big5-eten.utf	test data
-ext/Encode/t/big5-hkscs.enc	test data
-ext/Encode/t/big5-hkscs.utf	test data
-ext/Encode/t/CJKT.t		test script
-ext/Encode/t/Encode.t		test script
-ext/Encode/t/fallback.t		test script
-ext/Encode/t/from_to.t		test script
-ext/Encode/t/gb2312.enc		test data
-ext/Encode/t/gb2312.utf		test data
-ext/Encode/t/grow.t		test script
-ext/Encode/t/gsm0338.t		test script
-ext/Encode/t/guess.t		test script
-ext/Encode/t/jisx0201.enc	test data
-ext/Encode/t/jisx0201.utf	test data
-ext/Encode/t/jisx0208.enc	test data
-ext/Encode/t/jisx0208.utf	test data
-ext/Encode/t/jisx0212.enc	test data
-ext/Encode/t/jisx0212.utf	test data
-ext/Encode/t/ksc5601.enc	test data
-ext/Encode/t/ksc5601.utf	test data
-ext/Encode/t/mime_header_iso2022jp.t	test script
-ext/Encode/t/mime-header.t	test script
-ext/Encode/t/mime-name.t	test script
-ext/Encode/t/perlio.t		test script
-ext/Encode/t/rt.pl		test script
-ext/Encode/t/unibench.pl	benchmark script
-ext/Encode/t/Unicode.t		test script
-ext/Encode/t/utf8strict.t	test script
-ext/Encode/TW/Makefile.PL	Encode extension
-ext/Encode/TW/TW.pm		Encode extension
-ext/Encode/ucm/8859-10.ucm	Unicode Character Map
-ext/Encode/ucm/8859-11.ucm	Unicode Character Map
-ext/Encode/ucm/8859-13.ucm	Unicode Character Map
-ext/Encode/ucm/8859-14.ucm	Unicode Character Map
-ext/Encode/ucm/8859-15.ucm	Unicode Character Map
-ext/Encode/ucm/8859-16.ucm	Unicode Character Map
-ext/Encode/ucm/8859-1.ucm	Unicode Character Map
-ext/Encode/ucm/8859-2.ucm	Unicode Character Map
-ext/Encode/ucm/8859-3.ucm	Unicode Character Map
-ext/Encode/ucm/8859-4.ucm	Unicode Character Map
-ext/Encode/ucm/8859-5.ucm	Unicode Character Map
-ext/Encode/ucm/8859-6.ucm	Unicode Character Map
-ext/Encode/ucm/8859-7.ucm	Unicode Character Map
-ext/Encode/ucm/8859-8.ucm	Unicode Character Map
-ext/Encode/ucm/8859-9.ucm	Unicode Character Map
-ext/Encode/ucm/adobeStdenc.ucm	Unicode Character Map
-ext/Encode/ucm/adobeSymbol.ucm	Unicode Character Map
-ext/Encode/ucm/adobeZdingbat.ucm	Unicode Character Map
-ext/Encode/ucm/ascii.ucm	Unicode Character Map
-ext/Encode/ucm/big5-eten.ucm	Unicode Character Map
-ext/Encode/ucm/big5-hkscs.ucm	Unicode Character Map
-ext/Encode/ucm/cp037.ucm	Unicode Character Map
-ext/Encode/ucm/cp1006.ucm	Unicode Character Map
-ext/Encode/ucm/cp1026.ucm	Unicode Character Map
-ext/Encode/ucm/cp1047.ucm	Unicode Character Map
-ext/Encode/ucm/cp1250.ucm	Unicode Character Map
-ext/Encode/ucm/cp1251.ucm	Unicode Character Map
-ext/Encode/ucm/cp1252.ucm	Unicode Character Map
-ext/Encode/ucm/cp1253.ucm	Unicode Character Map
-ext/Encode/ucm/cp1254.ucm	Unicode Character Map
-ext/Encode/ucm/cp1255.ucm	Unicode Character Map
-ext/Encode/ucm/cp1256.ucm	Unicode Character Map
-ext/Encode/ucm/cp1257.ucm	Unicode Character Map
-ext/Encode/ucm/cp1258.ucm	Unicode Character Map
-ext/Encode/ucm/cp424.ucm	Unicode Character Map
-ext/Encode/ucm/cp437.ucm	Unicode Character Map
-ext/Encode/ucm/cp500.ucm	Unicode Character Map
-ext/Encode/ucm/cp737.ucm	Unicode Character Map
-ext/Encode/ucm/cp775.ucm	Unicode Character Map
-ext/Encode/ucm/cp850.ucm	Unicode Character Map
-ext/Encode/ucm/cp852.ucm	Unicode Character Map
-ext/Encode/ucm/cp855.ucm	Unicode Character Map
-ext/Encode/ucm/cp856.ucm	Unicode Character Map
-ext/Encode/ucm/cp857.ucm	Unicode Character Map
-ext/Encode/ucm/cp860.ucm	Unicode Character Map
-ext/Encode/ucm/cp861.ucm	Unicode Character Map
-ext/Encode/ucm/cp862.ucm	Unicode Character Map
-ext/Encode/ucm/cp863.ucm	Unicode Character Map
-ext/Encode/ucm/cp864.ucm	Unicode Character Map
-ext/Encode/ucm/cp865.ucm	Unicode Character Map
-ext/Encode/ucm/cp866.ucm	Unicode Character Map
-ext/Encode/ucm/cp869.ucm	Unicode Character Map
-ext/Encode/ucm/cp874.ucm	Unicode Character Map
-ext/Encode/ucm/cp875.ucm	Unicode Character Map
-ext/Encode/ucm/cp932.ucm	Unicode Character Map
-ext/Encode/ucm/cp936.ucm	Unicode Character Map
-ext/Encode/ucm/cp949.ucm	Unicode Character Map
-ext/Encode/ucm/cp950.ucm	Unicode Character Map
-ext/Encode/ucm/ctrl.ucm		Unicode Character Map
-ext/Encode/ucm/dingbats.ucm	Unicode Character Map
-ext/Encode/ucm/euc-cn.ucm	Unicode Character Map
-ext/Encode/ucm/euc-jp.ucm	Unicode Character Map
-ext/Encode/ucm/euc-kr.ucm	Unicode Character Map
-ext/Encode/ucm/gb12345.ucm	Unicode Character Map
-ext/Encode/ucm/gb2312.ucm	Unicode Character Map
-ext/Encode/ucm/gsm0338.ucm	Unicode Character Map
-ext/Encode/ucm/hp-roman8.ucm	Unicode Character Map
-ext/Encode/ucm/ir-165.ucm	Unicode Character Map
-ext/Encode/ucm/jis0201.ucm	Unicode Character Map
-ext/Encode/ucm/jis0208.ucm	Unicode Character Map
-ext/Encode/ucm/jis0212.ucm	Unicode Character Map
-ext/Encode/ucm/johab.ucm	Unicode Character Map
-ext/Encode/ucm/koi8-f.ucm	Unicode Character Map
-ext/Encode/ucm/koi8-r.ucm	Unicode Character Map
-ext/Encode/ucm/koi8-u.ucm	Unicode Character Map
-ext/Encode/ucm/ksc5601.ucm	Unicode Character Map
-ext/Encode/ucm/macArabic.ucm	Unicode Character Map
-ext/Encode/ucm/macCentEuro.ucm	Unicode Character Map
-ext/Encode/ucm/macChinsimp.ucm	Unicode Character Map
-ext/Encode/ucm/macChintrad.ucm	Unicode Character Map
-ext/Encode/ucm/macCroatian.ucm	Unicode Character Map
-ext/Encode/ucm/macCyrillic.ucm	Unicode Character Map
-ext/Encode/ucm/macDingbats.ucm	Unicode Character Map
-ext/Encode/ucm/macFarsi.ucm	Unicode Character Map
-ext/Encode/ucm/macGreek.ucm	Unicode Character Map
-ext/Encode/ucm/macHebrew.ucm	Unicode Character Map
-ext/Encode/ucm/macIceland.ucm	Unicode Character Map
-ext/Encode/ucm/macJapanese.ucm	Unicode Character Map
-ext/Encode/ucm/macKorean.ucm	Unicode Character Map
-ext/Encode/ucm/macRoman.ucm	Unicode Character Map
-ext/Encode/ucm/macROMnn.ucm	Unicode Character Map
-ext/Encode/ucm/macRUMnn.ucm	Unicode Character Map
-ext/Encode/ucm/macSami.ucm	Unicode Character Map
-ext/Encode/ucm/macSymbol.ucm	Unicode Character Map
-ext/Encode/ucm/macThai.ucm	Unicode Character Map
-ext/Encode/ucm/macTurkish.ucm	Unicode Character Map
-ext/Encode/ucm/macUkraine.ucm	Unicode Character Map
-ext/Encode/ucm/nextstep.ucm	Unicode Character Map
-ext/Encode/ucm/null.ucm		Unicode Character Map
-ext/Encode/ucm/posix-bc.ucm	Unicode Character Map
-ext/Encode/ucm/shiftjis.ucm	Unicode Character Map
-ext/Encode/ucm/symbol.ucm	Unicode Character Map
-ext/Encode/ucm/viscii.ucm	Unicode Character Map
-ext/Encode/Unicode/Makefile.PL	Encode extension
-ext/Encode/Unicode/Unicode.pm	Encode extension
-ext/Encode/Unicode/Unicode.xs	Encode extension
 EXTERN.h			Included before foreign .h files
 ext/Errno/ChangeLog	Errno changes
 ext/Errno/Errno_pm.PL	Errno perl module create script
@@ -785,11 +590,6 @@ ext/Perl6-Form/Makefile.PL	Perl6-Form
 ext/Perl6-Form/MANIFEST	Perl6-Form
 ext/Perl6-Form/README	Perl6-Form
 ext/Perl6-Form/t/1.t	Perl6-Form
-ext/PerlIO/encoding/encoding.pm	PerlIO::encoding
-ext/PerlIO/encoding/encoding.xs	PerlIO::encoding
-ext/PerlIO/encoding/Makefile.PL	PerlIO::encoding makefile writer
-ext/PerlIO/encoding/MANIFEST	PerlIO::encoding list of files
-ext/PerlIO/encoding/t/nolooping.t	Tests for PerlIO::encoding
 ext/PerlIO/scalar/Makefile.PL	PerlIO layer for scalars
 ext/PerlIO/scalar/scalar.pm	PerlIO layer for scalars
 ext/PerlIO/scalar/scalar.xs	PerlIO layer for scalars
@@ -900,7 +700,6 @@ ext/Storable/t/threads.t	Does Storable work with threads?
 ext/Storable/t/tied_hook.t	See if Storable works
 ext/Storable/t/tied_items.t	See if Storable works
 ext/Storable/t/tied.t		See if Storable works
-ext/Storable/t/utf8hash.t	Perl6-Form
 ext/Storable/t/utf8.t		See if Storable works
 ext/Storable/t/weak.t		Can Storable store weakrefs
 ext/Sys/Hostname/Hostname.pm	Sys::Hostname extension Perl module
@@ -1295,7 +1094,6 @@ lib/CPAN/Version.pm		Simple math with different flavors of version strings
 lib/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
 lib/DB.pm			Debugger API (draft)
 lib/DB.t			See if DB works
-lib/Devel/InnerPackage.pm	Find inner packages
 lib/diagnostics.pm		Print verbose diagnostics
 lib/diagnostics.t		See if diagnostics.pm works
 lib/Digest/base.pm		Digest extensions
@@ -1610,8 +1408,6 @@ lib/Module/Load/t/to_load/LoadMe.pl	Module::Load tests
 lib/Module/Load/t/to_load/Must/Be/Loaded.pm	Module::Load tests
 lib/Module/Load/t/to_load/TestModule.pm	Module::Load tests
 lib/Module/Load/t/to_load/ToBeLoaded	Module::Load tests
-lib/Module/Pluggable/Object.pm	Module::Pluggable
-lib/Module/Pluggable.pm	Module::Pluggable
 lib/mro.pm			mro extension
 lib/Net/Changes			libnet
 lib/Net/Cmd.pm			libnet
@@ -2773,23 +2569,6 @@ t/lib/contains_pod.xr		Pod-Parser test file
 t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
 t/lib/Dev/Null.pm		Module for testing Test::Harness
-t/lib/dprof/test1_t		Perl code profiler tests
-t/lib/dprof/test1_v		Perl code profiler tests
-t/lib/dprof/test2_t		Perl code profiler tests
-t/lib/dprof/test2_v		Perl code profiler tests
-t/lib/dprof/test3_t		Perl code profiler tests
-t/lib/dprof/test3_v		Perl code profiler tests
-t/lib/dprof/test4_t		Perl code profiler tests
-t/lib/dprof/test4_v		Perl code profiler tests
-t/lib/dprof/test5_t		Perl code profiler tests
-t/lib/dprof/test5_v		Perl code profiler tests
-t/lib/dprof/test6_t		Perl code profiler tests
-t/lib/dprof/test6_v		Perl code profiler tests
-t/lib/dprof/test7_t		Perl code profiler tests
-t/lib/dprof/test7_v		Perl code profiler tests
-t/lib/dprof/test8_t		Perl code profiler tests
-t/lib/dprof/test8_v		Perl code profiler tests
-t/lib/dprof/V.pm		Perl code profiler tests
 t/lib/Dummy.pm			Module for testing base.pm
 t/lib/feature/implicit		Tests for implicit loading of feature.pm
 t/lib/feature/nonesuch		Tests for enabling/disabling nonexistent feature
@@ -2901,56 +2680,6 @@ t/lib/warnings/toke		Tests for toke.c for warnings.t
 t/lib/warnings/universal	Tests for universal.c for warnings.t
 t/lib/warnings/utf8		Tests for utf8.c for warnings.t
 t/lib/warnings/util		Tests for util.c for warnings.t
-t/Module_Pluggable/01use.t	Module::Pluggable tests
-t/Module_Pluggable/02alsoworks.t	Module::Pluggable tests
-t/Module_Pluggable/02works.t	Module::Pluggable tests
-t/Module_Pluggable/02works_taint.t	Module::Pluggable tests
-t/Module_Pluggable/03diffname.t	Module::Pluggable tests
-t/Module_Pluggable/04acmedir_single.t	Module::Pluggable tests
-t/Module_Pluggable/04acmedir.t	Module::Pluggable tests
-t/Module_Pluggable/04acmepath_single.t	Module::Pluggable tests
-t/Module_Pluggable/04acmepath.t	Module::Pluggable tests
-t/Module_Pluggable/05postpath.t	Module::Pluggable tests
-t/Module_Pluggable/06multipath.t	Module::Pluggable tests
-t/Module_Pluggable/07instantiate.t	Module::Pluggable tests
-t/Module_Pluggable/08nothing.t	Module::Pluggable tests
-t/Module_Pluggable/09require.t	Module::Pluggable tests
-t/Module_Pluggable/10innerpack_inner.t	Module::Pluggable tests
-t/Module_Pluggable/10innerpack_noinner.t	Module::Pluggable tests
-t/Module_Pluggable/10innerpack_override.t	Module::Pluggable tests
-t/Module_Pluggable/10innerpack.t	Module::Pluggable tests
-t/Module_Pluggable/11usetwice.t	Module::Pluggable tests
-t/Module_Pluggable/12onlyarray.t	Module::Pluggable tests
-t/Module_Pluggable/12onlyregex.t	Module::Pluggable tests
-t/Module_Pluggable/12only.t	Module::Pluggable tests
-t/Module_Pluggable/13exceptarray.t	Module::Pluggable tests
-t/Module_Pluggable/13exceptregex.t	Module::Pluggable tests
-t/Module_Pluggable/13except.t	Module::Pluggable tests
-t/Module_Pluggable/14package.t	Module::Pluggable tests
-t/Module_Pluggable/15topicsafe.t	Module::Pluggable tests
-t/Module_Pluggable/16different_extension.t	Module::Pluggable tests
-t/Module_Pluggable/17devel_inner_package.t	Module::Pluggable tests
-t/Module_Pluggable/18skipped_package.t	Module::Pluggable tests
-t/Module_Pluggable/19can_ok_clobber.t	Module::Pluggable tests
-t/Module_Pluggable/20dodgy_files.t	Module::Pluggable tests
-t/Module_Pluggable/acme/Acme/MyTest/Plugin/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/Acme/MyTest/Plugin/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/ExtTest/Plugin/Bar.plugin	Module::Pluggable tests
-t/Module_Pluggable/lib/ExtTest/Plugin/Foo.plugin	Module::Pluggable tests
-t/Module_Pluggable/lib/ExtTest/Plugin/Quux/Foo.plugin	Module::Pluggable tests
-t/Module_Pluggable/lib/InnerTest/Plugin/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyOtherTest/Plugin/Bar.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyOtherTest/Plugin/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyOtherTest/Plugin/Quux/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyOtherTest/Plugin/Quux.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyTest/Extend/Plugin/Bar.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyTest/Plugin/Bar.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyTest/Plugin/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/MyTest/Plugin/Quux/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/No/Middle.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/OddTest/Plugin/-Dodgy.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/OddTest/Plugin/Foo.pm	Module::Pluggable tests
-t/Module_Pluggable/lib/TA/C/A/I.pm	Module::Pluggable tests
 t/mro/basic_01_c3.t		mro tests
 t/mro/basic_01_dfs.t		mro tests
 t/mro/basic_02_c3.t		mro tests
@@ -3223,7 +2952,6 @@ utf8.h				Unicode header
 utfebcdic.h			Unicode on EBCDIC (UTF-EBCDIC, tr16) header
 util.c				Utility routines
 util.h				Dummy header
-utils/dprofpp.PL		Perl code profile post-processor
 utils/h2ph.pl			A thing to turn C .h files into perl .ph files
 utils/h2xs.pl			Program to make .xs files from C header files
 utils/instmodsh.PL		Give information about installed extensions

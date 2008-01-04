@@ -22,9 +22,9 @@ while ( ~< *DATA) {
 }
 
 safer_unlink ('overload.h', 'overload.c');
-die "overload.h: $!" unless open(C, ">overload.c");
+die "overload.h: $!" unless open(C, ">", "overload.c");
 binmode C;
-die "overload.h: $!" unless open(H, ">overload.h");
+die "overload.h: $!" unless open(H, ">", "overload.h");
 binmode H;
 
 sub print_header {

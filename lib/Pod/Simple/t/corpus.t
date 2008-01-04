@@ -127,7 +127,7 @@ foreach my $f (@testfiles) {
 
   my $outfilename = ($HACK +> 1) ? $wouldxml{$f} : "$wouldxml{$f}_out";
   if($HACK) {
-    open OUT, ">$outfilename" or die "Can't write-open $outfilename: $!\n";
+    open OUT, ">", "$outfilename" or die "Can't write-open $outfilename: $!\n";
     binmode(OUT);
     print OUT $outstring;
     close(OUT);
@@ -138,7 +138,7 @@ foreach my $f (@testfiles) {
     next;
   }
   
-  open(IN, "<$xml") or die "Can't read-open $xml: $!";
+  open(IN, "<", "$xml") or die "Can't read-open $xml: $!";
   #binmode(IN);
   local $/;
   my $xmlsource = ~< *IN;

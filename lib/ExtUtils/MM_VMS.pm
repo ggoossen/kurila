@@ -216,7 +216,7 @@ sub find_perl {
 	print "Checking $name\n" if ($trace +>= 2);
 	# If it looks like a potential command, try it without the MCR
         if ($name =~ m/^[\w\-\$]+$/) {
-            open(TCF,">temp_mmvms.com") || die('unable to open temp file');
+            open(TCF, ">","temp_mmvms.com") || die('unable to open temp file');
             print TCF "\$ set message/nofacil/nosever/noident/notext\n";
             print TCF "\$ $name -e \"require $ver; print \"\"VER_OK\\n\"\"\"\n";
             close TCF;
@@ -230,7 +230,7 @@ sub find_perl {
 	next unless $vmsfile = $self->maybe_command($name);
 	$vmsfile =~ s/;[\d\-]*$//;  # Clip off version number; we can use a newer version as well
 	print "Executing $vmsfile\n" if ($trace +>= 2);
-        open(TCF,">temp_mmvms.com") || die('unable to open temp file');
+        open(TCF, ">","temp_mmvms.com") || die('unable to open temp file');
         print TCF "\$ set message/nofacil/nosever/noident/notext\n";
         print TCF "\$ mcr $vmsfile -e \"require $ver; print \"\"VER_OK\\n\"\"\" \n";
         close TCF;
@@ -1440,7 +1440,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	# Get external libraries this extension will need
 	if (-f $extralibs ) {
 	    my %seenthis;
-	    open LIST,$extralibs or warn $!,next;
+	    open LIST, "<",$extralibs or warn $!,next;
 	    while ( ~< *LIST) {
 		chomp;
 		# Include a library in the link only once, unless it's mentioned
@@ -1456,7 +1456,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	}
 	# Get full name of extension for ExtUtils::Miniperl
 	if (-f $extopt) {
-	    open OPT,$extopt or die $!;
+	    open OPT, "<",$extopt or die $!;
 	    while ( ~< *OPT) {
 		next unless m/(?:UNIVERSAL|VECTOR)=boot_([\w_]+)/;
 		my $pkg = $1;

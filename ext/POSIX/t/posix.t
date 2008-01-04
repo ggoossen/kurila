@@ -49,8 +49,8 @@ SKIP: {
     @fds = POSIX::pipe();
     ok( $fds[0] +> $testfd,      'POSIX::pipe' );
 
-    CORE::open($reader = \*READER, "<&=".$fds[0]);
-    CORE::open($writer = \*WRITER, ">&=".$fds[1]);
+    CORE::open($reader = \*READER, "<&=", $fds[0]);
+    CORE::open($writer = \*WRITER, ">&=", $fds[1]);
     print $writer "ok 6\n";
     close $writer;
     print ~< $reader;

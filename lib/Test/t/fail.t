@@ -4,7 +4,7 @@ use vars qw($Expect);
 use Test qw($TESTOUT $TESTERR $ntest ok skip plan); 
 plan tests => 14;
 
-open F, ">fails";
+open F, ">", "fails";
 $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 
@@ -36,7 +36,7 @@ $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
 $ntest = 1;
 
-open F, "fails";
+open F, "<", "fails";
 my $O;
 while ( ~< *F) { $O .= $_; }
 close F;

@@ -57,13 +57,13 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     # not accumulate).
     for my $utf8 ('', ':utf8') {
 	for my $binmode (1..2) {
-	    open(FOO, ">$file");
+	    open(FOO, ">", "$file");
 	    # require PerlIO; print PerlIO::get_layers(FOO), "\n";
 	    binmode(FOO, "$utf8:crlf") for 1..$binmode;
 	    # require PerlIO; print PerlIO::get_layers(FOO), "\n";
 	    print FOO "Hello\n";
 	    close FOO;
-	    open(FOO, "<$file");
+	    open(FOO, "<", "$file");
 	    binmode(FOO);
 	    my $foo = scalar ~< *FOO;
 	    close FOO;

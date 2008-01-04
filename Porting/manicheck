@@ -34,7 +34,7 @@ use vars qw($x $m $l $h);
 
 help() if $h;
 
-open(MANIFEST, "MANIFEST") or die "MANIFEST: $!";
+open(MANIFEST, "<", "MANIFEST") or die "MANIFEST: $!";
 
 my %mani;
 my %mand = qw(. 1);

@@ -8,9 +8,9 @@ BEGIN {
 
 my $opcode_new = 'opcode.h-new';
 my $opname_new = 'opnames.h-new';
-open(OC, ">$opcode_new") || die "Can't create $opcode_new: $!\n";
+open(OC, ">", "$opcode_new") || die "Can't create $opcode_new: $!\n";
 binmode OC;
-open(ON, ">$opname_new") || die "Can't create $opname_new: $!\n";
+open(ON, ">", "$opname_new") || die "Can't create $opname_new: $!\n";
 binmode ON;
 select OC;
 
@@ -398,9 +398,9 @@ safer_rename $opname_new, 'opnames.h';
 my $pp_proto_new = 'pp_proto.h-new';
 my $pp_sym_new  = 'pp.sym-new';
 
-open PP, ">$pp_proto_new" or die "Error creating $pp_proto_new: $!";
+open PP, ">", "$pp_proto_new" or die "Error creating $pp_proto_new: $!";
 binmode PP;
-open PPSYM, ">$pp_sym_new" or die "Error creating $pp_sym_new: $!";
+open PPSYM, ">", "$pp_sym_new" or die "Error creating $pp_sym_new: $!";
 binmode PPSYM;
 
 print PP <<"END";

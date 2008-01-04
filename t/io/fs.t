@@ -83,9 +83,9 @@ SKIP: {
     is((umask(0)^&^0777), 022, 'umask'),
 }
 
-open(FH,'>x') || die "Can't create x";
+open(FH, ">",'x') || die "Can't create x";
 close(FH);
-open(FH,'>a') || die "Can't create a";
+open(FH, ">",'a') || die "Can't create a";
 close(FH);
 
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
@@ -329,7 +329,7 @@ SKIP: {
 }
 
 unlink "Iofs.tmp";
-open IOFSCOM, ">Iofs.tmp" or die "Could not write IOfs.tmp: $!";
+open IOFSCOM, ">", "Iofs.tmp" or die "Could not write IOfs.tmp: $!";
 print IOFSCOM 'helloworld';
 close(IOFSCOM);
 
@@ -350,12 +350,12 @@ SKIP: {
 
 #these steps are necessary to check if file is really truncated
 #On Win95, FH is updated, but file properties aren't
-    open(FH, ">Iofs.tmp") or die "Can't create Iofs.tmp";
+    open(FH, ">", "Iofs.tmp") or die "Can't create Iofs.tmp";
     print FH "x\n" x 200;
     close FH;
 
 # Check truncating an open file.
-    open(FH, ">>Iofs.tmp") or die "Can't open Iofs.tmp for appending";
+    open(FH, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
     binmode FH;
     select FH;
@@ -369,7 +369,7 @@ SKIP: {
     }
 
     if ($needs_fh_reopen) {
-	close (FH); open (FH, ">>Iofs.tmp") or die "Can't reopen Iofs.tmp";
+	close (FH); open (FH, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
     }
 
     SKIP: {
@@ -382,14 +382,14 @@ SKIP: {
 	ok(truncate(*FH, 0), "fh resize to zero");
 
 	if ($needs_fh_reopen) {
-	    close (FH); open (FH, ">>Iofs.tmp") or die "Can't reopen Iofs.tmp";
+	    close (FH); open (FH, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
 	}
 
 	ok(-z "Iofs.tmp", "fh resize to zero working (filename check)");
 
 	close FH;
 
-	open(FH, ">>Iofs.tmp") or die "Can't open Iofs.tmp for appending";
+	open(FH, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
 	binmode FH;
 	select FH;
@@ -403,7 +403,7 @@ SKIP: {
 	}
 
 	if ($needs_fh_reopen) {
-	    close (FH); open (FH, ">>Iofs.tmp") or die "Can't reopen Iofs.tmp";
+	    close (FH); open (FH, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
 	}
 
 	is(-s "Iofs.tmp", 100, "fh resize by IO slot working");
@@ -418,7 +418,7 @@ SKIP: {
       if ($ENV{'CYGWIN'} && ($ENV{'CYGWIN'} =~ m/check_case:(?:adjust|strict)/));
 
     chdir './tmp';
-    open(FH,'>x') || die "Can't create x";
+    open(FH, ">",'x') || die "Can't create x";
     close(FH);
     rename('x', 'X');
 

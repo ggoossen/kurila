@@ -1565,6 +1565,11 @@ XS(XS_dump_view)
 	XSRETURN(1);
     }
 
+    if (SvROK(sv)) {
+	sv_setpv(retsv, "REF");
+	XSRETURN(1);
+    }
+
     if (isGV(sv)) {
 	gv_efullname4(retsv, (GV*)sv, "*", TRUE);
 

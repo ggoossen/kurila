@@ -61,7 +61,7 @@ is( $stat->blocks, $stat[12], "number of blocks in position 12" );
 
 SKIP: {
 	local *STAT;
-	skip("Could not open file: $!", 2) unless open(STAT, 'TEST');
+	skip("Could not open file: $!", 2) unless open(STAT, "<", 'TEST');
 	ok( File::stat::stat('STAT'), '... should be able to find filehandle' );
 
 	package foo;

@@ -183,7 +183,7 @@ sub WriteIfChanged($\@)
     $file = File::Spec->catfile(@$file) if ref $file;
 
     my $TextToWrite = join '', @$lines;
-    if (open IN, $file) {
+    if (open IN, "<", $file) {
         local($/) = undef;
         my $PreviousText = ~< *IN;
         close IN;
@@ -193,7 +193,7 @@ sub WriteIfChanged($\@)
         }
     }
     force_unlink ($file);
-    if (not open OUT, ">$file") {
+    if (not open OUT, ">", "$file") {
         die "$0: can't open $file for output: $!\n";
     }
     print "$file written.\n" if $Verbose;
@@ -264,7 +264,7 @@ sub Build_Aliases()
     %utf8::PVA_reverse = ();
     %utf8::PVA_abbr_map = ();
 
-    open PA, "< PropertyAliases.txt"
+    open PA, "<", "PropertyAliases.txt"
 	or confess "Can't open PropertyAliases.txt: $!";
     while ( ~< *PA) {
 	s/#.*//;
@@ -284,7 +284,7 @@ sub Build_Aliases()
     }
     close PA;
 
-    open PVA, "< PropValueAliases.txt"
+    open PVA, "<", "PropValueAliases.txt"
 	or confess "Can't open PropValueAliases.txt: $!";
     while ( ~< *PVA) {
 	s/#.*//;
@@ -911,7 +911,7 @@ sub UnicodeData_Txt()
     }
 
     ## open ane read file.....
-    if (not open IN, "UnicodeData.txt") {
+    if (not open IN, "<", "UnicodeData.txt") {
         die "$0: UnicodeData.txt: $!\n";
     }
 
@@ -1175,7 +1175,7 @@ sub UnicodeData_Txt()
 ##
 sub LineBreak_Txt()
 {
-    if (not open IN, "LineBreak.txt") {
+    if (not open IN, "<", "LineBreak.txt") {
         die "$0: LineBreak.txt: $!\n";
     }
 
@@ -1216,7 +1216,7 @@ sub LineBreak_Txt()
 ##
 sub ArabicShaping_txt()
 {
-    if (not open IN, "ArabicShaping.txt") {
+    if (not open IN, "<", "ArabicShaping.txt") {
         die "$0: ArabicShaping.txt: $!\n";
     }
 
@@ -1257,7 +1257,7 @@ sub ArabicShaping_txt()
 ##
 sub EastAsianWidth_txt()
 {
-    if (not open IN, "EastAsianWidth.txt") {
+    if (not open IN, "<", "EastAsianWidth.txt") {
         die "$0: EastAsianWidth.txt: $!\n";
     }
 
@@ -1294,7 +1294,7 @@ sub EastAsianWidth_txt()
 ##
 sub HangulSyllableType_txt()
 {
-    if (not open IN, "HangulSyllableType.txt") {
+    if (not open IN, "<", "HangulSyllableType.txt") {
         die "$0: HangulSyllableType.txt: $!\n";
     }
 
@@ -1325,7 +1325,7 @@ sub HangulSyllableType_txt()
 ##
 sub Jamo_txt()
 {
-    if (not open IN, "Jamo.txt") {
+    if (not open IN, "<", "Jamo.txt") {
         die "$0: Jamo.txt: $!\n";
     }
     my $Short = Table->New();
@@ -1348,7 +1348,7 @@ sub Scripts_txt()
 {
     my @ScriptInfo;
 
-    if (not open(IN, "Scripts.txt")) {
+    if (not open(IN, "<", "Scripts.txt")) {
         die "$0: Scripts.txt: $!\n";
     }
     while ( ~< *IN) {
@@ -1417,7 +1417,7 @@ sub Blocks_txt()
     my $Blocks = Table->New();
     my %Blocks;
 
-    if (not open IN, "Blocks.txt") {
+    if (not open IN, "<", "Blocks.txt") {
         die "$0: Blocks.txt: $!\n";
     }
 
@@ -1456,7 +1456,7 @@ sub PropList_txt()
 {
     my @PropInfo;
 
-    if (not open IN, "PropList.txt") {
+    if (not open IN, "<", "PropList.txt") {
         die "$0: PropList.txt: $!\n";
     }
 
@@ -1663,7 +1663,7 @@ sub MakePropTestScript()
 {
     ## this written directly -- it's huge.
     force_unlink ("TestProp.pl");
-    if (not open OUT, ">TestProp.pl") {
+    if (not open OUT, ">", "TestProp.pl") {
         die "$0: TestProp.pl: $!\n";
     }
     print OUT ~< *DATA;
@@ -1979,7 +1979,7 @@ sub SpecialCasing_txt()
 
     my %CaseInfo;
 
-    if (not open IN, "SpecialCasing.txt") {
+    if (not open IN, "<", "SpecialCasing.txt") {
         die "$0: SpecialCasing.txt: $!\n";
     }
     while ( ~< *IN) {
@@ -2048,7 +2048,7 @@ sub SpecialCasing_txt()
 #
 sub CaseFolding_txt()
 {
-    if (not open IN, "CaseFolding.txt") {
+    if (not open IN, "<", "CaseFolding.txt") {
 	die "$0: CaseFolding.txt: $!\n";
     }
 

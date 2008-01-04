@@ -98,7 +98,7 @@ if ($have_fork) {
 
 my $xdefine = ''; 
 
-if (open(XDEFINE, "xdefine")) {
+if (open(XDEFINE, "<", "xdefine")) {
     chomp($xdefine = ~< *XDEFINE);
     close(XDEFINE);
 }
@@ -662,13 +662,13 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
     my @mtime;
     for (1..5) {
 	Time::HiRes::sleep(rand(0.1) + 0.1);
-	open(X, ">$$");
+	open(X, ">", "$$");
 	print X $$;
 	close(X);
 	@stat = Time::HiRes::stat($$);
 	push @mtime, $stat[9];
 	Time::HiRes::sleep(rand(0.1) + 0.1);
-	open(X, "<$$");
+	open(X, "<", "$$");
 	~< *X;
 	close(X);
 	@stat = Time::HiRes::stat($$);

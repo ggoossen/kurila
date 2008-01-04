@@ -36,7 +36,7 @@ is $more_tb, Test::Builder->new,  '       does not interfere with ->new';
 
 pass("Changing output() of new TB doesn't interfere with singleton");
 
-ok open FILE, "some_file";
+ok open FILE, "<", "some_file";
 is join("", ~< *FILE), <<OUT;
 1..1
 ok 1

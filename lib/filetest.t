@@ -64,7 +64,7 @@ SKIP: {
 
     eval {
 	if (!-e $tstfile) {
-	    open(T, ">$tstfile") or die "Can't create $tstfile: $!";
+	    open(T, ">", "$tstfile") or die "Can't create $tstfile: $!";
 	    close T;
 	}
 	system($chflags, "uchg", $tstfile);
