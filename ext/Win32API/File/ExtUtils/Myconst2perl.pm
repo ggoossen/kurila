@@ -203,13 +203,13 @@ sub Myconst2perl
     my $module= ( split m/::/, $pkg )[-1];
 
     warn "Writing $outfile...\n";
-    open( STDOUT, ">$outfile" )  or  die "Can't create $outfile: $!\n";
+    open( STDOUT, ">", "$outfile" )  or  die "Can't create $outfile: $!\n";
 
     my $code= "";
     my $file;
     foreach $file (  @perlfile  ) {
 	warn "Reading Perl file, $file:  $perlcode{$file}\n";
-	open( MODULE, "<$file" )  or  die "Can't read Perl file, $file: $!\n";
+	open( MODULE, "<", "$file" )  or  die "Can't read Perl file, $file: $!\n";
 	eval qq[
 	    while(  <MODULE>  ) \{
 		$perlcode{$file};
@@ -236,7 +236,7 @@ sub Myconst2perl
 	}
 	foreach $file (  @cfile  ) {
 	    warn "Reading C file, $file:  $ccode{$file}\n";
-	    open( XS, "<$file" )  or  die "Can't read C file, $file: $!\n";
+	    open( XS, "<", "$file" )  or  die "Can't read C file, $file: $!\n";
 	    my $code= $ccode{$file};
 	    $code =~ s#\\#\\\\#g;
 	    $code =~ s#([^\s -~])#{"\\x".sprintf "%02X",unpack "C",$1}#g;

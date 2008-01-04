@@ -190,7 +190,7 @@ sub _module_name {
     my($file, $orig_module) = @_;
 
     my $module = '';
-    if (open PACKFH, $file) {
+    if (open PACKFH, "<", $file) {
         while ( ~< *PACKFH) {
             if (m/package\s+(\S+)\s*;/) {
                 my $pack = $1;

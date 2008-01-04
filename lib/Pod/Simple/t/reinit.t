@@ -50,7 +50,7 @@ foreach my $file (
     $parser->output_string(\$outstring);
     $parser->parse_file(source_path($file));
 
-    open(IN, $precooked) or die "Can't read-open $precooked: $!";
+    open(IN, "<", $precooked) or die "Can't read-open $precooked: $!";
     {
       local $/;
       $compstring = ~< *IN;

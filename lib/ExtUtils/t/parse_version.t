@@ -41,7 +41,7 @@ if( eval 'require version; "version"->import' ) {
 plan tests => 2 * keys %versions;
 
 while( my($code, $expect) = each %versions ) {
-    open(FILE, ">VERSION.tmp") || die $!;
+    open(FILE, ">", "VERSION.tmp") || die $!;
     print FILE "$code\n";
     close FILE;
 

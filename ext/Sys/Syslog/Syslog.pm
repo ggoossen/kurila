@@ -390,7 +390,7 @@ sub _syslog_send_console {
 	    }
 	}
     } else {
-        if (open(CONS, ">/dev/console")) {
+        if (open(CONS, ">", "/dev/console")) {
 	    my $ret = print CONS $buf . "\r";  # XXX: should this be \x0A ?
 	    exit $ret if defined $pid;
 	    close CONS;
@@ -602,7 +602,7 @@ sub connect_pipe {
         return 0;
     }
 
-    if (not open(SYSLOG, ">$syslog_path")) {
+    if (not open(SYSLOG, ">", "$syslog_path")) {
         push @$errs, "can't write to $syslog_path: $!";
         return 0;
     }

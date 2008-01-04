@@ -17,7 +17,7 @@ END { unlink @tmpfiles }
 
 my $filename = 'swdtest.tmp';
 SKIP: {
-	open my $f, ">$filename"
+	open my $f, ">", "$filename"
 	    or skip( "Can't write temp file $filename: $!" );
 	print $f <<'__SWDTEST__';
 package Bar;

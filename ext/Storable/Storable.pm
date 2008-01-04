@@ -120,7 +120,7 @@ EOM
 sub file_magic {
     my $file = shift;
     my $fh = FileHandle->new();
-    open($fh, "<". $file) || die "Can't open '$file': $!";
+    open($fh, "<", "". $file) || die "Can't open '$file': $!";
     binmode($fh);
     defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $!";
     close($fh);
@@ -247,7 +247,7 @@ sub _store {
 	logcroak "wrong argument number" unless @_ == 2;	# No @foo in arglist
 	local *FILE;
 	if ($use_locking) {
-		open(FILE, ">>$file") || logcroak "can't write into $file: $!";
+		open(FILE, ">>", "$file") || logcroak "can't write into $file: $!";
 		unless (&CAN_FLOCK) {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
 			return undef;
@@ -257,7 +257,7 @@ sub _store {
 		truncate *FILE, 0;
 		# Unlocking will happen when FILE is closed
 	} else {
-		open(FILE, ">$file") || logcroak "can't create $file: $!";
+		open(FILE, ">", "$file") || logcroak "can't create $file: $!";
 	}
 	binmode FILE;				# Archaic systems...
 	my $da = $@;				# Don't mess if called from exception handler
@@ -367,7 +367,7 @@ sub lock_retrieve {
 sub _retrieve {
 	my ($file, $use_locking) = @_;
 	local *FILE;
-	open(FILE, $file) || logcroak "can't open $file: $!";
+	open(FILE, "<", $file) || logcroak "can't open $file: $!";
 	binmode FILE;							# Archaic systems...
 	my $self;
 	my $da = $@;							# Could be from exception handler

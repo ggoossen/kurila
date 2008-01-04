@@ -199,7 +199,7 @@ sub _read_program {
   my($file) = shift;
   return unless defined $file and length $file
     and -e $file and -f _ and -r _;
-  open(SOURCEFILE, "<$file") || return;
+  open(SOURCEFILE, "<", "$file") || return;
   $Program_Lines{$file} = [ ~< *SOURCEFILE];
   close(SOURCEFILE);
 

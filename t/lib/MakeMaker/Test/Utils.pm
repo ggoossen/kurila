@@ -229,7 +229,7 @@ touched.
 =cut
 
 sub calibrate_mtime {
-    open(FILE, ">calibrate_mtime.tmp") || die $!;
+    open(FILE, ">", "calibrate_mtime.tmp") || die $!;
     print FILE "foo";
     close FILE;
     my($mtime) = (stat('calibrate_mtime.tmp'))[9];
@@ -278,7 +278,7 @@ sub setup_mm_test_root {
         # imposed by RMS.  We get around this with a rooted logical, but we
         # can't create logical names with attributes in Perl, so we do it
         # in a DCL subprocess and put it in the job table so the parent sees it.
-        open( MMTMP, '>mmtesttmp.com' ) || 
+        open( MMTMP, ">", 'mmtesttmp.com' ) || 
           die "Error creating command file; $!";
         print MMTMP <<'COMMAND';
 $ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"

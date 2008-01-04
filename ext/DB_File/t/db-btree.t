@@ -76,7 +76,7 @@ sub lexical
         my $class = shift ;
         my $filename = shift ;
 	my $fh = gensym ;
-	open ($fh, ">$filename") || die "Cannot open $filename: $!" ;
+	open ($fh, ">", "$filename") || die "Cannot open $filename: $!" ;
 	my $real_stdout = select($fh) ;
 	return bless [$fh, $real_stdout ] ;
 
@@ -93,7 +93,7 @@ sub docat
 { 
     my $file = shift;
     local $/ = undef ;
-    open(CAT,$file) || die "Cannot open $file: $!";
+    open(CAT, "<",$file) || die "Cannot open $file: $!";
     my $result = ~< *CAT;
     close(CAT);
     $result = normalise($result) ;
@@ -635,7 +635,7 @@ unlink $Dfile1 ;
    use warnings ;
    use strict ;
 
-   open(FILE, ">SubDB.pm") or die "Cannot open SubDB.pm: $!\n" ;
+   open(FILE, ">", "SubDB.pm") or die "Cannot open SubDB.pm: $!\n" ;
    print FILE <<'EOM' ;
 
    package SubDB ;

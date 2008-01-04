@@ -3,7 +3,7 @@ print "1..5\n";
 
 my $file = "F-Pathological.pl";
 
-open F, ">$file" or die "Open $file: $!";
+open F, ">", "$file" or die "Open $file: $!";
 
 my $prog = <<'EOT';
 #!./perl -anF[~#QQ\\xq']

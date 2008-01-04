@@ -371,7 +371,7 @@ sub Tgetent
             $state = 1;    # ok, maybe do a new file next time
         }
 
-        open( TERMCAP, "< $TERMCAP\0" ) || croak "open $TERMCAP: $!";
+        open( TERMCAP, "<", "$TERMCAP\0" ) || croak "open $TERMCAP: $!";
         eval $search;
         die $@ if $@;
         close TERMCAP;

@@ -300,7 +300,7 @@ EOF
     $msg ||= "\n";
     my($fh) = FileHandle->new;
     rename $configpm, "$configpm~" if -f $configpm;
-    open $fh, ">$configpm" or
+    open $fh, ">", "$configpm" or
         $CPAN::Frontend->mydie("Couldn't open >$configpm: $!");
     $fh->print(qq[$msg\$CPAN::Config = \{\n]);
     foreach (sort keys %$CPAN::Config) {

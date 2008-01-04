@@ -26,11 +26,11 @@ sub get_temp_fh {
     my $f = "DummyModule0000";
     1 while -e ++$f;
     push @tempfiles, $f;
-    open my $fh, ">$f" or die "Can't create $f: $!";
+    open my $fh, ">", "$f" or die "Can't create $f: $!";
     print $fh "package ".substr($_[0],0,-3).";\n1;\n";
     print $fh $_[1] if @_ +> 1;
     close $fh or die "Couldn't close: $!";
-    open $fh, $f or die "Can't open $f: $!";
+    open $fh, "<", $f or die "Can't open $f: $!";
     return $fh;
 }
 
@@ -243,7 +243,7 @@ if ($can_fork) {
     # can safely nest subprocesses
     push @INC, sub {
 	return unless $_[1] =~ m/^BBBLPLAST(\d+)\.pm/;
-	my $pid = open my $fh, "-|";
+	my $pid = open my $fh, "-|", "-";
 	if ($pid) {
 	    # Parent
 	    return $fh;

@@ -28,7 +28,7 @@ if (not defined $where) {	# Try NIS.
             print "# `ypcat group` worked\n";
 
             # Check to make sure we're really using NIS.
-            if( open(NSSW, "/etc/nsswitch.conf" ) ) {
+            if( open(NSSW, "<", "/etc/nsswitch.conf" ) ) {
                 my($group) = grep m/^\s*group:/, ~< *NSSW;
 
                 # If there's no group line, assume it default to compat.
@@ -60,7 +60,7 @@ if (not defined $where) {	# Try NetInfo.
 
 if (not defined $where) {	# Try local.
     my $GR = "/etc/group";
-    if (-f $GR && open(GR, $GR) && defined( ~< *GR)) {
+    if (-f $GR && open(GR, "<", $GR) && defined( ~< *GR)) {
         undef $reason;
         $where = "local $GR";
     }

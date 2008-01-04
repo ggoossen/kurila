@@ -199,289 +199,285 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
         while (tend > type && isSPACE(tend[-1]))
 	    *--tend = '\0';
 
-	if (num_svs) {
+	IoTYPE(io) = *type;
+	if ((*type == IoTYPE_RDWR) && /* scary */
+	    (*(type+1) == IoTYPE_RDONLY || *(type+1) == IoTYPE_WRONLY) &&
+	    (tend > type+1 && tend[-1] != IoTYPE_PIPE)) {
+	    TAINT_PROPER("open");
+	    mode[1] = *type++;
+	    writing = 1;
+	} 
+
+	if (*type == IoTYPE_STD && type[1] == '\0') {
+	    /* '-' opens STDIN */
+	    if (num_svs)
+		Perl_croak(aTHX_ "open() '-' is only allowed with 3rd argument.");
+	    name = type;
+	    mode[0] = 'r';
+	    if (in_raw)
+		mode[1] = 'b';
+	    else if (in_crlf)
+		mode[1] = 't';
+
+	    fp = PerlIO_stdin();
+	    IoTYPE(io) = IoTYPE_STD;
+
+	} else if (*type == IoTYPE_WRONLY && type[1] == IoTYPE_STD && (!type[2])) {
+	    /* '>-' opens STDOUT */
+	    if (num_svs > 1) {
+		Perl_croak(aTHX_ "More than one argument to '>%c' open",IoTYPE_STD);
+	    }
+	    mode[0] = 'w';
+	    writing = 1;
+	    if (in_raw)
+		mode[1] = 'b';
+	    else if (in_crlf)
+		mode[1] = 't';
+	    fp = PerlIO_stdout();
+	    IoTYPE(io) = IoTYPE_STD;
+
+        } else if (supplied_fp) {
+	    /* '+>&' with a supllied_fd */
+
+            TAINT_PROPER("open");
+            if ( ! ((*type == IoTYPE_WRONLY ||*type==IoTYPE_RDONLY) && type[1] == '&' && type[2] == '\0' ) ) {
+		Perl_croak(aTHX_ "open() with supplied_fd with incompatible type '%s'", type);
+	    }
+	    if (*type == IoTYPE_WRONLY) {
+		mode[0] = 'w';
+		writing = 1;
+	    } else {
+		mode[0] = 'r';
+	    }
+
+            if (out_raw)
+                mode[1] = 'b';
+            else if (out_crlf)
+                mode[1] = 't';
+	    dodup = PERLIO_DUP_FD;
+	    fp = supplied_fp;
+
+	} else if (*type == '\0') {
+	    /* '' opens a new filehandle */
+	} else {
+	    
+	    if ( ! num_svs ) {
+		Perl_croak(aTHX_ "open() with old-style 2-arg version '%.*s'", tend-type, type);
+	    }
+
 	    /* New style explicit name, type is just mode and layer info */
 #ifdef USE_STDIO
 	    if (SvROK(*svp) && !strchr(oname,'&')) {
 		if (ckWARN(WARN_IO))
 		    Perl_warner(aTHX_ packWARN(WARN_IO),
-			    "Can't open a reference");
+				"Can't open a reference");
 		SETERRNO(EINVAL, LIB_INVARG);
 		goto say_false;
 	    }
 #endif /* USE_STDIO */
 	    name = SvOK(*svp) ? savesvpv (*svp) : savepvn ("", 0);
 	    SAVEFREEPV(name);
-	}
-	else {
-	    name = type;
-	    len  = tend-type;
-	}
-	IoTYPE(io) = *type;
-	if ((*type == IoTYPE_RDWR) && /* scary */
-           (*(type+1) == IoTYPE_RDONLY || *(type+1) == IoTYPE_WRONLY) &&
-	    ((!num_svs || (tend > type+1 && tend[-1] != IoTYPE_PIPE)))) {
-	    TAINT_PROPER("open");
-	    mode[1] = *type++;
-	    writing = 1;
-	}
 
-	if (*type == IoTYPE_PIPE) {
-	    if (num_svs) {
+	    if (*type == IoTYPE_PIPE) {
 		if (type[1] != IoTYPE_STD) {
-	          unknown_open_mode:
+		  unknown_open_mode:
 		    Perl_croak(aTHX_ "Unknown open() mode '%.*s'", (int)olen, oname);
 		}
 		type++;
-	    }
-	    do {
-		type++;
-	    } while (isSPACE(*type));
-	    if (!num_svs) {
-		name = type;
-		len = tend-type;
-	    }
-	    if (*name == '\0') {
-		/* command is missing 19990114 */
-		if (ckWARN(WARN_PIPE))
-		    Perl_warner(aTHX_ packWARN(WARN_PIPE), "Missing command in piped open");
-		errno = EPIPE;
-		goto say_false;
-	    }
-	    if (!(*name == '-' && name[1] == '\0') || num_svs)
-		TAINT_ENV();
-	    TAINT_PROPER("piped open");
-	    if (!num_svs && name[len-1] == '|') {
-		name[--len] = '\0' ;
-		if (ckWARN(WARN_PIPE))
-		    Perl_warner(aTHX_ packWARN(WARN_PIPE), "Can't open bidirectional pipe");
-	    }
-	    mode[0] = 'w';
-	    writing = 1;
-            if (out_raw)
-		mode[1] = 'b';
-            else if (out_crlf)
-		mode[1] = 't';
-	    if (num_svs > 1) {
-		fp = PerlProc_popen_list(mode, num_svs, svp);
-	    }
-	    else {
-		fp = PerlProc_popen(name,mode);
-	    }
-	    if (num_svs) {
-		if (*type) {
-		    if (PerlIO_apply_layers(aTHX_ fp, mode, type) != 0) {
-			goto say_false;
-		    }
-		}
-	    }
-	} /* IoTYPE_PIPE */
-	else if (*type == IoTYPE_WRONLY) {
-	    TAINT_PROPER("open");
-	    type++;
-	    if (*type == IoTYPE_WRONLY) {
-		/* Two IoTYPE_WRONLYs in a row make for an IoTYPE_APPEND. */
-		mode[0] = IoTYPE(io) = IoTYPE_APPEND;
-		type++;
-	    }
-	    else {
-		mode[0] = 'w';
-	    }
-	    writing = 1;
-
-            if (out_raw)
-		mode[1] = 'b';
-            else if (out_crlf)
-		mode[1] = 't';
-	    if (*type == '&') {
-	      duplicity:
-		dodup = PERLIO_DUP_FD;
-		type++;
-		if (*type == '=') {
-		    dodup = 0;
+		do {
+		    type++;
+		} while (isSPACE(*type));
+		if (*type == IoTYPE_PIPE) {
+		    if (ckWARN(WARN_PIPE))
+			Perl_warner(aTHX_ packWARN(WARN_PIPE), "Can't open bidirectional pipe");
 		    type++;
 		}
-		if (!num_svs && !*type && supplied_fp) {
-		    /* "<+&" etc. is used by typemaps */
-		    fp = supplied_fp;
+		if (*name == '\0') {
+		    /* command is missing 19990114 */
+		    if (ckWARN(WARN_PIPE))
+			Perl_warner(aTHX_ packWARN(WARN_PIPE), "Missing command in piped open");
+		    errno = EPIPE;
+		    goto say_false;
+		}
+		if ( ! (*name == '-' && name[1] == '\0') )
+		    TAINT_ENV();
+		TAINT_PROPER("piped open");
+		mode[0] = 'w';
+		writing = 1;
+		if (out_raw)
+		    mode[1] = 'b';
+		else if (out_crlf)
+		    mode[1] = 't';
+		if (num_svs > 1) {
+		    fp = PerlProc_popen_list(mode, num_svs, svp);
 		}
 		else {
-		    PerlIO *that_fp = NULL;
-		    if (num_svs > 1) {
-			Perl_croak(aTHX_ "More than one argument to '%c&' open",IoTYPE(io));
+		    fp = PerlProc_popen(name,mode);
+		}
+		if (*type) {
+		    if (PerlIO_apply_layers(aTHX_ fp, mode, type) != 0) {
+			goto say_false;
 		    }
-		    while (isSPACE(*type))
+		}
+	    } /* IoTYPE_PIPE */
+	    else if (*type == IoTYPE_WRONLY) {
+		TAINT_PROPER("open");
+		type++;
+		if (*type == IoTYPE_WRONLY) {
+		    /* Two IoTYPE_WRONLYs in a row make for an IoTYPE_APPEND. */
+		    mode[0] = IoTYPE(io) = IoTYPE_APPEND;
+		    type++;
+		}
+		else {
+		    mode[0] = 'w';
+		}
+		writing = 1;
+
+		if (out_raw)
+		    mode[1] = 'b';
+		else if (out_crlf)
+		    mode[1] = 't';
+		if (*type == '&') {
+		  duplicity:
+		    dodup = PERLIO_DUP_FD;
+		    type++;
+		    if (*type == '=') {
+			dodup = 0;
 			type++;
-		    if (num_svs && (SvIOK(*svp) || (SvPOK(*svp) && looks_like_number(*svp)))) {
-			fd = SvUV(*svp);
-			num_svs = 0;
 		    }
-		    else if (isDIGIT(*type)) {
-			fd = atoi(type);
-		    }
-		    else {
-			const IO* thatio;
-			if (num_svs) {
-			    thatio = sv_2io(*svp);
+
+		    {
+			PerlIO *that_fp = NULL;
+			if (num_svs > 1) {
+			    Perl_croak(aTHX_ "More than one argument to '%c&' open",IoTYPE(io));
+			}
+			while (isSPACE(*type))
+			    type++;
+			if (SvIOK(*svp) || (SvPOK(*svp) && looks_like_number(*svp))) {
+			    fd = SvUV(*svp);
+			    num_svs = 0;
+			}
+			else if (isDIGIT(*type)) {
+			    fd = atoi(type);
 			}
 			else {
-			    GV * const thatgv = gv_fetchpvn_flags(type, tend - type,
-						       0, SVt_PVIO);
-			    thatio = GvIO(thatgv);
-			}
-			if (!thatio) {
+			    const IO* thatio;
+			    thatio = sv_2io(*svp);
+			    if (!thatio) {
 #ifdef EINVAL
-			    SETERRNO(EINVAL,SS_IVCHAN);
+				SETERRNO(EINVAL,SS_IVCHAN);
 #endif
-			    goto say_false;
-			}
-			if ((that_fp = IoIFP(thatio))) {
-			    /* Flush stdio buffer before dup. --mjd
-			     * Unfortunately SEEK_CURing 0 seems to
-			     * be optimized away on most platforms;
-			     * only Solaris and Linux seem to flush
-			     * on that. --jhi */
+				goto say_false;
+			    }
+			    if ((that_fp = IoIFP(thatio))) {
+				/* Flush stdio buffer before dup. --mjd
+				 * Unfortunately SEEK_CURing 0 seems to
+				 * be optimized away on most platforms;
+				 * only Solaris and Linux seem to flush
+				 * on that. --jhi */
 #ifdef USE_SFIO
-			    /* sfio fails to clear error on next
-			       sfwrite, contrary to documentation.
-			       -- Nicholas Clark */
-			    if (PerlIO_seek(that_fp, 0, SEEK_CUR) == -1)
-				PerlIO_clearerr(that_fp);
+				/* sfio fails to clear error on next
+				   sfwrite, contrary to documentation.
+				   -- Nicholas Clark */
+				if (PerlIO_seek(that_fp, 0, SEEK_CUR) == -1)
+				    PerlIO_clearerr(that_fp);
 #endif
-			    /* On the other hand, do all platforms
-			     * take gracefully to flushing a read-only
-			     * filehandle?  Perhaps we should do
-			     * fsetpos(src)+fgetpos(dst)?  --nik */
-			    PerlIO_flush(that_fp);
-			    fd = PerlIO_fileno(that_fp);
-			    /* When dup()ing STDIN, STDOUT or STDERR
-			     * explicitly set appropriate access mode */
-			    if (that_fp == PerlIO_stdout()
-				|| that_fp == PerlIO_stderr())
-			        IoTYPE(io) = IoTYPE_WRONLY;
-			    else if (that_fp == PerlIO_stdin())
-                                IoTYPE(io) = IoTYPE_RDONLY;
-			    /* When dup()ing a socket, say result is
-			     * one as well */
-			    else if (IoTYPE(thatio) == IoTYPE_SOCKET)
-				IoTYPE(io) = IoTYPE_SOCKET;
+				/* On the other hand, do all platforms
+				 * take gracefully to flushing a read-only
+				 * filehandle?  Perhaps we should do
+				 * fsetpos(src)+fgetpos(dst)?  --nik */
+				PerlIO_flush(that_fp);
+				fd = PerlIO_fileno(that_fp);
+				/* When dup()ing STDIN, STDOUT or STDERR
+				 * explicitly set appropriate access mode */
+				if (that_fp == PerlIO_stdout()
+				    || that_fp == PerlIO_stderr())
+				    IoTYPE(io) = IoTYPE_WRONLY;
+				else if (that_fp == PerlIO_stdin())
+				    IoTYPE(io) = IoTYPE_RDONLY;
+				/* When dup()ing a socket, say result is
+				 * one as well */
+				else if (IoTYPE(thatio) == IoTYPE_SOCKET)
+				    IoTYPE(io) = IoTYPE_SOCKET;
+			    }
+			    else
+				fd = -1;
 			}
-			else
-			    fd = -1;
-		    }
-		    if (!num_svs)
-			type = NULL;
-		    if (that_fp) {
-			fp = PerlIO_fdupopen(aTHX_ that_fp, NULL, dodup);
-		    }
-		    else {
-			if (dodup)
-			    fd = PerlLIO_dup(fd);
-			else
-			    was_fdopen = TRUE;
-			if (!(fp = PerlIO_openn(aTHX_ type,mode,fd,0,0,NULL,num_svs,svp))) {
-			    if (dodup && fd >= 0)
-				PerlLIO_close(fd);
+			if (!num_svs)
+			    type = NULL;
+			if (that_fp) {
+			    fp = PerlIO_fdupopen(aTHX_ that_fp, NULL, dodup);
+			}
+			else {
+			    if (dodup)
+				fd = PerlLIO_dup(fd);
+			    else
+				was_fdopen = TRUE;
+			    if (!(fp = PerlIO_openn(aTHX_ type,mode,fd,0,0,NULL,num_svs,svp))) {
+				if (dodup && fd >= 0)
+				    PerlLIO_close(fd);
+			    }
 			}
 		    }
-		}
-	    } /* & */
-	    else {
-		while (isSPACE(*type))
+		} /* & */
+		else {
+		    fp = PerlIO_openn(aTHX_ type,mode,-1,0,0,NULL,num_svs,svp);
+		} /* !& */
+		if (!fp && type && *type && *type != ':' && !isIDFIRST(*type))
+		    goto unknown_open_mode;
+	    } /* IoTYPE_WRONLY */
+	    else if (*type == IoTYPE_RDONLY) {
+		do {
 		    type++;
+		} while (isSPACE(*type));
+		mode[0] = 'r';
+		if (in_raw)
+		    mode[1] = 'b';
+		else if (in_crlf)
+		    mode[1] = 't';
+		if (*type == '&') {
+		    goto duplicity;
+		}
 		if (*type == IoTYPE_STD && (!type[1] || isSPACE(type[1]) || type[1] == ':')) {
 		    type++;
-		    fp = PerlIO_stdout();
+		    fp = PerlIO_stdin();
 		    IoTYPE(io) = IoTYPE_STD;
 		    if (num_svs > 1) {
-			Perl_croak(aTHX_ "More than one argument to '>%c' open",IoTYPE_STD);
+			Perl_croak(aTHX_ "More than one argument to '<%c' open",IoTYPE_STD);
 		    }
 		}
-		else  {
-		    if (!num_svs) {
-			namesv = sv_2mortal(newSVpvn(type,tend - type));
-			num_svs = 1;
-			svp = &namesv;
-		        type = NULL;
-		    }
+		else {
 		    fp = PerlIO_openn(aTHX_ type,mode,-1,0,0,NULL,num_svs,svp);
 		}
-	    } /* !& */
-	    if (!fp && type && *type && *type != ':' && !isIDFIRST(*type))
-	       goto unknown_open_mode;
-	} /* IoTYPE_WRONLY */
-	else if (*type == IoTYPE_RDONLY) {
-	    do {
-		type++;
-	    } while (isSPACE(*type));
-	    mode[0] = 'r';
-            if (in_raw)
-		mode[1] = 'b';
-            else if (in_crlf)
-		mode[1] = 't';
-	    if (*type == '&') {
-		goto duplicity;
-	    }
-	    if (*type == IoTYPE_STD && (!type[1] || isSPACE(type[1]) || type[1] == ':')) {
-		type++;
-		fp = PerlIO_stdin();
-		IoTYPE(io) = IoTYPE_STD;
-		if (num_svs > 1) {
-		    Perl_croak(aTHX_ "More than one argument to '<%c' open",IoTYPE_STD);
-		}
-	    }
-	    else {
-		if (!num_svs) {
-		    namesv = sv_2mortal(newSVpvn(type,tend - type));
-		    num_svs = 1;
-		    svp = &namesv;
-		    type = NULL;
-		}
-		fp = PerlIO_openn(aTHX_ type,mode,-1,0,0,NULL,num_svs,svp);
-	    }
-	    if (!fp && type && *type && *type != ':' && !isIDFIRST(*type))
-	       goto unknown_open_mode;
-	} /* IoTYPE_RDONLY */
-	else if ((num_svs && /* '-|...' or '...|' */
-		  type[0] == IoTYPE_STD && type[1] == IoTYPE_PIPE) ||
-	         (!num_svs && tend > type+1 && tend[-1] == IoTYPE_PIPE)) {
-	    if (num_svs) {
+		if (!fp && type && *type && *type != ':' && !isIDFIRST(*type))
+		    goto unknown_open_mode;
+	    } /* IoTYPE_RDONLY */
+	    else if ((/* '-|...' or '...|' */
+			 type[0] == IoTYPE_STD && type[1] == IoTYPE_PIPE)) {
 		type += 2;   /* skip over '-|' */
-	    }
-	    else {
-		*--tend = '\0';
-		while (tend > type && isSPACE(tend[-1]))
-		    *--tend = '\0';
-		for (; isSPACE(*type); type++)
-		    ;
-		name = type;
-	        len  = tend-type;
-	    }
-	    if (*name == '\0') {
-		/* command is missing 19990114 */
-		if (ckWARN(WARN_PIPE))
-		    Perl_warner(aTHX_ packWARN(WARN_PIPE), "Missing command in piped open");
-		errno = EPIPE;
-		goto say_false;
-	    }
-	    if (!(*name == '-' && name[1] == '\0') || num_svs)
+		if (*name == '\0') {
+		    /* command is missing 19990114 */
+		    if (ckWARN(WARN_PIPE))
+			Perl_warner(aTHX_ packWARN(WARN_PIPE), "Missing command in piped open");
+		    errno = EPIPE;
+		    goto say_false;
+		}
 		TAINT_ENV();
-	    TAINT_PROPER("piped open");
-	    mode[0] = 'r';
+		TAINT_PROPER("piped open");
+		mode[0] = 'r';
 
-            if (in_raw)
-		mode[1] = 'b';
-            else if (in_crlf)
-		mode[1] = 't';
+		if (in_raw)
+		    mode[1] = 'b';
+		else if (in_crlf)
+		    mode[1] = 't';
 
-	    if (num_svs > 1) {
-		fp = PerlProc_popen_list(mode,num_svs,svp);
-	    }
-	    else {
-		fp = PerlProc_popen(name,mode);
-	    }
-	    IoTYPE(io) = IoTYPE_PIPE;
-	    if (num_svs) {
+		if (num_svs > 1) {
+		    fp = PerlProc_popen_list(mode,num_svs,svp);
+		}
+		else {
+		    fp = PerlProc_popen(name,mode);
+		}
+		IoTYPE(io) = IoTYPE_PIPE;
 		while (isSPACE(*type))
 		    type++;
 		if (*type) {
@@ -490,33 +486,8 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		    }
 		}
 	    }
-	}
-	else { /* layer(Args) */
-	    if (num_svs)
+	    else { /* layer(Args) */
 		goto unknown_open_mode;
-	    name = type;
-	    IoTYPE(io) = IoTYPE_RDONLY;
-	    for (; isSPACE(*name); name++)
-		;
-	    mode[0] = 'r';
-
-            if (in_raw)
-		mode[1] = 'b';
-            else if (in_crlf)
-		mode[1] = 't';
-
-	    if (*name == '-' && name[1] == '\0') {
-		fp = PerlIO_stdin();
-		IoTYPE(io) = IoTYPE_STD;
-	    }
-	    else {
-		if (!num_svs) {
-		    namesv = sv_2mortal(newSVpvn(type,tend - type));
-		    num_svs = 1;
-		    svp = &namesv;
-		    type = NULL;
-		}
-		fp = PerlIO_openn(aTHX_ type,mode,-1,0,0,NULL,num_svs,svp);
 	    }
 	}
     }
@@ -696,7 +667,7 @@ PerlIO *
 Perl_nextargv(pTHX_ register GV *gv)
 {
     dVAR;
-    register SV *sv;
+    SV *sv;
 #ifndef FLEXFILENAMES
     int filedev;
     int fileino;
@@ -735,8 +706,18 @@ Perl_nextargv(pTHX_ register GV *gv)
 	sv_setsv(GvSVn(gv),sv);
 	SvSETMAGIC(GvSV(gv));
 	PL_oldname = SvPVx(GvSV(gv), oldlen);
-	if (do_open(gv,PL_oldname,oldlen,PL_inplace!=0,O_RDONLY,0,NULL)) {
-	    if (PL_inplace) {
+	if ( ! PL_inplace) {
+	    if (oldlen == 1 && *PL_oldname == '-') {
+		if (do_openn(gv,"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
+		    return IoIFP(GvIOp(gv));
+		}
+	    } else {
+		if (do_openn(gv,"<", 1, FALSE, O_RDONLY,0,NULL,&sv,1)) {
+		    return IoIFP(GvIOp(gv));
+		}
+	    }
+	} else {
+	    if (do_openn(gv,PL_oldname,oldlen,TRUE,O_RDONLY,0,NULL,NULL,0)) {
 		TAINT_PROPER("inplace open");
 		if (oldlen == 1 && *PL_oldname == '-') {
 		    setdefout(gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL,
@@ -805,8 +786,8 @@ Perl_nextargv(pTHX_ register GV *gv)
 		    do_close(gv,FALSE);
 		    (void)PerlLIO_unlink(SvPVX_const(sv));
 		    (void)PerlLIO_rename(PL_oldname,SvPVX_const(sv));
-		    do_open(gv,(char*)SvPVX_const(sv),SvCUR(sv),PL_inplace!=0,
-			    O_RDONLY,0,NULL);
+		    do_openn(gv,"<", 1,PL_inplace!=0,
+			     O_RDONLY,0,NULL, &sv, 1);
 #endif /* DOSISH */
 #else
 		    (void)UNLINK(SvPVX_const(sv));
@@ -876,22 +857,22 @@ Perl_nextargv(pTHX_ register GV *gv)
 #endif
 #endif
 		}
+		return IoIFP(GvIOp(gv));
 	    }
-	    return IoIFP(GvIOp(gv));
-	}
-	else {
-	    if (ckWARN_d(WARN_INPLACE)) {
-		const int eno = errno;
-		if (PerlLIO_stat(PL_oldname, &PL_statbuf) >= 0
-		    && !S_ISREG(PL_statbuf.st_mode))	
-		{
-		    Perl_warner(aTHX_ packWARN(WARN_INPLACE),
-				"Can't do inplace edit: %s is not a regular file",
-				PL_oldname);
+	    else {
+		if (ckWARN_d(WARN_INPLACE)) {
+		    const int eno = errno;
+		    if (PerlLIO_stat(PL_oldname, &PL_statbuf) >= 0
+			&& !S_ISREG(PL_statbuf.st_mode))	
+			{
+			    Perl_warner(aTHX_ packWARN(WARN_INPLACE),
+					"Can't do inplace edit: %s is not a regular file",
+					PL_oldname);
 		}
-		else
-		    Perl_warner(aTHX_ packWARN(WARN_INPLACE), "Can't open %s: %s",
-				PL_oldname, Strerror(eno));
+		    else
+			Perl_warner(aTHX_ packWARN(WARN_INPLACE), "Can't open %s: %s",
+				    PL_oldname, Strerror(eno));
+		}
 	    }
 	}
     }
@@ -2288,13 +2269,12 @@ Perl_vms_start_glob
 #ifdef MACOS_TRADITIONAL
     sv_setpv(tmpcmd, "glob ");
     sv_catsv(tmpcmd, tmpglob);
-    sv_catpv(tmpcmd, " |");
 #else
 #ifdef DOSISH
 #ifdef OS2
     sv_setpv(tmpcmd, "for a in ");
     sv_catsv(tmpcmd, tmpglob);
-    sv_catpv(tmpcmd, "; do echo \"$a\\0\\c\"; done |");
+    sv_catpv(tmpcmd, "; do echo \"$a\\0\\c\"; done");
 #else
 #ifdef DJGPP
     sv_setpv(tmpcmd, "/dev/dosglob/"); /* File System Extension */
@@ -2302,7 +2282,6 @@ Perl_vms_start_glob
 #else
     sv_setpv(tmpcmd, "perlglob ");
     sv_catsv(tmpcmd, tmpglob);
-    sv_catpv(tmpcmd, " |");
 #endif /* !DJGPP */
 #endif /* !OS2 */
 #else /* !DOSISH */
@@ -2310,20 +2289,20 @@ Perl_vms_start_glob
     sv_setpvn(tmpcmd, PL_cshname, PL_cshlen);
     sv_catpv(tmpcmd, " -cf 'set nonomatch; glob ");
     sv_catsv(tmpcmd, tmpglob);
-    sv_catpv(tmpcmd, "' 2>/dev/null |");
+    sv_catpv(tmpcmd, "' 2>/dev/null");
 #else
     sv_setpv(tmpcmd, "echo ");
     sv_catsv(tmpcmd, tmpglob);
 #if 'z' - 'a' == 25
-    sv_catpv(tmpcmd, "|tr -s ' \t\f\r' '\\012\\012\\012\\012'|");
+    sv_catpv(tmpcmd, " |tr -s ' \t\f\r' '\\012\\012\\012\\012'");
 #else
-    sv_catpv(tmpcmd, "|tr -s ' \t\f\r' '\\n\\n\\n\\n'|");
+    sv_catpv(tmpcmd, " |tr -s ' \t\f\r' '\\n\\n\\n\\n'");
 #endif
 #endif /* !CSH */
 #endif /* !DOSISH */
 #endif /* MACOS_TRADITIONAL */
-    (void)do_open(PL_last_in_gv, (char*)SvPVX_const(tmpcmd), SvCUR(tmpcmd),
-		  FALSE, O_RDONLY, 0, NULL);
+    (void)do_openn(PL_last_in_gv, "-|", 2,
+		   FALSE, O_RDONLY, 0, NULL, &tmpcmd, 1);
     fp = IoIFP(io);
 #endif /* !VMS */
     LEAVE;

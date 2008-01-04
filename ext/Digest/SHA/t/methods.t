@@ -52,7 +52,7 @@ $rsp = shift(@out);
 
 	# test addfile with bareword filehandle
 
-open(FILE, "<$tempfile");
+open(FILE, "<", "$tempfile");
 binmode(FILE);
 print "not " unless
 	$sha->clone->addfile(*FILE)->hexdigest eq $rsp;

@@ -1717,20 +1717,6 @@ STATIC char *
 S_glob_2pv(pTHX_ GV * const gv, STRLEN * const len)
 {
     Perl_croak(aTHX "Tried to use glob as string");
-    const U32 wasfake = SvFLAGS(gv) & SVf_FAKE;
-    SV *const buffer = sv_newmortal();
-
-    /* FAKE globs can get coerced, so need to turn this off temporarily if it
-       is on.  */
-    SvFAKE_off(gv);
-    gv_efullname4(buffer, gv, "*", TRUE);
-    SvFLAGS(gv) |= wasfake;
-
-    assert(SvPOK(buffer));
-    if (len) {
-	*len = SvCUR(buffer);
-    }
-    return SvPVX(buffer);
 }
 
 /* Actually, ISO C leaves conversion of UV to IV undefined, but

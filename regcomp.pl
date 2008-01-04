@@ -7,7 +7,7 @@ use kurila;
 use strict;
 use warnings;
 
-open DESC, 'regcomp.sym';
+open DESC, "<", 'regcomp.sym';
 
 my $ind = 0;
 my (@name,@rest,@type,@code,@args,@longj);
@@ -69,7 +69,7 @@ my $tmp_h = 'tmp_reg.h';
 
 unlink $tmp_h if -f $tmp_h;
 
-open OUT, ">$tmp_h";
+open OUT, ">", "$tmp_h";
 #*OUT=\*STDOUT;
 binmode OUT;
 

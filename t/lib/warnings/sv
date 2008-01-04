@@ -284,7 +284,7 @@ Subroutine main::fred redefined at - line 5.
 ########
 # sv.c
 use warnings 'printf' ;
-open F, ">".($^O eq 'VMS'? 'NL:' : '/dev/null') ;
+open F, ">", ($^O eq 'VMS'? 'NL:' : '/dev/null') ;
 printf F "%z\n" ;
 my $a = sprintf "%z" ;
 printf F "%" ;

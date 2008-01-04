@@ -96,7 +96,7 @@ BEGIN {
     cmp_ok( abs($new_stamp - $stamp), '+<=', 1, 'eqtime' );
 
     # eqtime use to clear the contents of the file being equalized!
-    open(FILE, ">>$Testfile") || die $!;
+    open(FILE, ">>", "$Testfile") || die $!;
     print FILE "Foo";
     close FILE;
 
@@ -263,12 +263,12 @@ BEGIN {
 
 {
     { local @ARGV = 'd2utest'; mkpath; }
-    open(FILE, '>d2utest/foo');
+    open(FILE, ">", 'd2utest/foo');
     binmode(FILE);
     print FILE "stuff\015\012and thing\015\012";
     close FILE;
 
-    open(FILE, '>d2utest/bar');
+    open(FILE, ">", 'd2utest/bar');
     binmode(FILE);
     my $bin = "\c@\c@\c@\c@\c@\c@\cA\c@\c@\c@\015\012".
               "\@\c@\cA\c@\c@\c@8__LIN\015\012";
@@ -278,11 +278,11 @@ BEGIN {
     local @ARGV = 'd2utest';
     ExtUtils::Command::dos2unix();
 
-    open(FILE, 'd2utest/foo');
+    open(FILE, "<", 'd2utest/foo');
     is( join('', ~< *FILE), "stuff\012and thing\012", 'dos2unix' );
     close FILE;
 
-    open(FILE, 'd2utest/bar');
+    open(FILE, "<", 'd2utest/bar');
     binmode(FILE);
     ok( -B 'd2utest/bar' );
     is( join('', ~< *FILE), $bin, 'dos2unix preserves binaries');

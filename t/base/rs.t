@@ -10,12 +10,12 @@ $teststring = "1\n12\n123\n1234\n1234\n12345\n\n123456\n1234567\n";
 # Create our test datafile
 1 while unlink 'foo';                # in case junk left around
 rmdir 'foo';
-open TESTFILE, ">./foo" or die "error $! $^E opening";
+open TESTFILE, ">", "./foo" or die "error $! $^E opening";
 binmode TESTFILE;
 print TESTFILE $teststring;
 close TESTFILE or die "error $! $^E closing";
 
-open TESTFILE, "<./foo";
+open TESTFILE, "<", "./foo";
 binmode TESTFILE;
 
 # Check the default $/
@@ -59,11 +59,11 @@ if ($bar eq "123456\n1234567\n") {print "ok 6\n";} else {print "not ok 6\n";}
 # the size of \n.
 close TESTFILE;
 unlink "./foo";
-open TESTFILE, ">./foo";
+open TESTFILE, ">", "./foo";
 print TESTFILE "1234567890123456789012345678901234567890";
 binmode TESTFILE;
 close TESTFILE;
-open TESTFILE, "<./foo";
+open TESTFILE, "<", "./foo";
 binmode TESTFILE;
 
 # Test straight number
@@ -99,10 +99,10 @@ close TESTFILE;
 if ($^O eq 'VMS') {
   # Create a temp file. We jump through these hoops 'cause CREATE really
   # doesn't like our methods for some reason.
-  open FDLFILE, "> ./foo.fdl";
+  open FDLFILE, ">", "./foo.fdl";
   print FDLFILE "RECORD\n FORMAT VARIABLE\n";
   close FDLFILE;
-  open CREATEFILE, "> ./foo.com";
+  open CREATEFILE, ">", "./foo.com";
   print CREATEFILE '$ DEFINE/USER SYS$INPUT NL:', "\n";
   print CREATEFILE '$ DEFINE/USER SYS$OUTPUT NL:', "\n";
   print CREATEFILE '$ OPEN YOW []FOO.BAR/WRITE', "\n";
@@ -110,11 +110,11 @@ if ($^O eq 'VMS') {
   print CREATEFILE "\$EXIT\n";
   close CREATEFILE;
   $throwaway = `\@\[\]foo`, "\n";
-  open(TEMPFILE, ">./foo.bar") or print "# open failed $! $^E\n";
+  open(TEMPFILE, ">", "./foo.bar") or print "# open failed $! $^E\n";
   print TEMPFILE "foo\nfoobar\nbaz\n";
   close TEMPFILE;
 
-  open TESTFILE, "<./foo.bar";
+  open TESTFILE, "<", "./foo.bar";
   $/ = \10;
   $bar = ~< *TESTFILE;
   if ($bar eq "foo\n") {print "ok 12\n";} else {print "not ok 12\n";}
@@ -140,7 +140,7 @@ $/ = "\n";
 
 # see if open/readline/close work on our and my variables
 {
-    if (open our $T, "./foo") {
+    if (open our $T, "<", "./foo") {
         my $line = ~< $T;
 	print "# $line\n";
 	length($line) == 40 or print "not ";
@@ -153,7 +153,7 @@ $/ = "\n";
 }
 
 {
-    if (open my $T, "./foo") {
+    if (open my $T, "<", "./foo") {
         my $line = ~< $T;
 	print "# $line\n";
 	length($line) == 40 or print "not ";

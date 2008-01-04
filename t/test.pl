@@ -634,7 +634,7 @@ sub _fresh_perl {
     $runperl_args->{progfile} = $tmpfile;
     $runperl_args->{stderr} = 1;
 
-    open TEST, ">$tmpfile" or die "Cannot open $tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
 
     # VMS adjustments
     if( $^O eq 'VMS' ) {

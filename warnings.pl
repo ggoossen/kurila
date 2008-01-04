@@ -234,9 +234,9 @@ if (@ARGV && $ARGV[0] eq "tree")
 
 unlink "warnings.h";
 unlink "lib/warnings.pm";
-open(WARN, ">warnings.h") || die "Can't create warnings.h: $!\n";
+open(WARN, ">", "warnings.h") || die "Can't create warnings.h: $!\n";
 binmode WARN;
-open(PM, ">lib/warnings.pm") || die "Can't create lib/warnings.pm: $!\n";
+open(PM, ">", "lib/warnings.pm") || die "Can't create lib/warnings.pm: $!\n";
 binmode PM;
 
 print WARN <<'EOM' ;

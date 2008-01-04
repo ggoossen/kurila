@@ -75,7 +75,7 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' );
 ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
-open(PACKLIST, 'install-test/packlist' );
+open(PACKLIST, "<", 'install-test/packlist' );
 my %packlist = map { chomp;  ($_ => 1) } ~< *PACKLIST;
 close PACKLIST;
 
@@ -99,7 +99,7 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm', '  UNINST=1 preserved same' );
 
 
 chmod 0644, 'blib/lib/Big/Dummy.pm' or die $!;
-open(DUMMY, ">>blib/lib/Big/Dummy.pm") or die $!;
+open(DUMMY, ">>", "blib/lib/Big/Dummy.pm") or die $!;
 print DUMMY "Extra stuff\n";
 close DUMMY;
 

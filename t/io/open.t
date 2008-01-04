@@ -14,7 +14,7 @@ my $Is_MacOS = $^O eq 'MacOS';
 
 our ($f);
 
-plan tests => 108;
+plan tests => 102;
 
 my $Perl = which_perl();
 
@@ -22,7 +22,7 @@ my $Perl = which_perl();
     unlink("afile") if -f "afile";
 
     $! = 0;  # the -f above will set $! if 'afile' doesn't exist.
-    ok( open(my $f,"+>afile"),  'open(my $f, "+>...")' );
+    ok( open(my $f, "+>","afile"),  'open(my $f, "+>...")' );
 
     binmode $f;
     ok( -f "afile",             '       its a file');
@@ -119,7 +119,7 @@ like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
 {
     unlink("afile") if -f "afile";
 
-    ok( open(local $f,"+>afile"),       'open local $f, "+>", ...' );
+    ok( open(local $f, "+>","afile"),       'open local $f, "+>", ...' );
     binmode $f;
 
     ok( -f "afile",                     '       -f' );
@@ -212,12 +212,6 @@ like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
 {
     local *F;
     for (1..2) {
-	ok( open(F, qq{$Perl -le "print 'ok'"|}), 'open to pipe' );
-	is(scalar ~< *F, "ok\n",  '       readline');
-	ok( close F,            '       close' );
-    }
-
-    for (1..2) {
 	ok( open(F, "-|", qq{$Perl -le "print 'ok'"}), 'open -|');
 	is( scalar ~< *F, "ok\n", '       readline');
 	ok( close F,            '       close' );
@@ -266,21 +260,21 @@ SKIP: {
 	return $line;
     }
 
-    open($fh0[0], "TEST");
+    open($fh0[0], "<", "TEST");
     gimme($fh0[0]);
     like($@, qr/<\$fh0\[...\]> line 1\./, "autoviv fh package aelem");
 
-    open($fh1{k}, "TEST");
+    open($fh1{k}, "<", "TEST");
     gimme($fh1{k});
     like($@, qr/<\$fh1{...}> line 1\./, "autoviv fh package helem");
 
     my @fh2;
-    open($fh2[0], "TEST");
+    open($fh2[0], "<", "TEST");
     gimme($fh2[0]);
     like($@, qr/<\$fh2\[...\]> line 1\./, "autoviv fh lexical aelem");
 
     my %fh3;
-    open($fh3{k}, "TEST");
+    open($fh3{k}, "<", "TEST");
     gimme($fh3{k});
     like($@, qr/<\$fh3{...}> line 1\./, "autoviv fh lexical helem");
 }
@@ -314,12 +308,12 @@ fresh_perl_like('open m', qr/^Search pattern not terminated at/,
 	{ stderr => 1 }, 'open m test');
 
 fresh_perl_is(
-    'sub f { open(my $fh, "xxx"); $fh = "f"; } f; f;print "ok"',
+    'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print "ok"',
     'ok', { stderr => 1 },
     '#29102: Crash on assignment to lexical filehandle');
 
 # [perl #31767] Using $1 as a filehandle via open $1, "file" doesn't raise
 # an exception
 
-eval { open $99, "foo" };
+eval { open $99, "<", "foo" };
 like($@, qr/Modification of a read-only value attempted/, "readonly fh");

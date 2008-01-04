@@ -214,7 +214,7 @@ sub build_and_run {
 
   @makeout = `$maketest`;
 
-  if (open OUTPUT, "<$output") {
+  if (open OUTPUT, "<", "$output") {
     local $/; # Slurp it - faster.
     print ~< *OUTPUT;
     close OUTPUT or print "# Close $output failed: $!\n";
@@ -303,7 +303,7 @@ sub Makefile_PL {
   # We really need a Makefile.PL because make test for a no dynamic linking perl
   # will run Makefile.PL again as part of the "make perl" target.
   my $makefilePL = "Makefile.PL";
-  open FH, ">$makefilePL" or die "open >$makefilePL: $!\n";
+  open FH, ">", "$makefilePL" or die "open >$makefilePL: $!\n";
   print FH <<"EOT";
 #!$perl -w
 use ExtUtils::MakeMaker;
@@ -325,7 +325,7 @@ sub MANIFEST {
   # We really need a MANIFEST because make distclean checks it.
   my $manifest = "MANIFEST";
   push @files, $manifest;
-  open FH, ">$manifest" or die "open >$manifest: $!\n";
+  open FH, ">", "$manifest" or die "open >$manifest: $!\n";
   print FH "$_\n" foreach @files;
   close FH or die "close $manifest: $!\n";
   return @files;
@@ -369,14 +369,14 @@ sub write_and_run_extension {
   ################ Header
   my $header_name = "test.h";
   push @files, $header_name;
-  open FH, ">$header_name" or die "open >$header_name: $!\n";
+  open FH, ">", "$header_name" or die "open >$header_name: $!\n";
   print FH $header or die $!;
   close FH or die "close $header_name: $!\n";
 
   ################ XS
   my $xs_name = "$package.xs";
   push @files, $xs_name;
-  open FH, ">$xs_name" or die "open >$xs_name: $!\n";
+  open FH, ">", "$xs_name" or die "open >$xs_name: $!\n";
 
   print FH <<"EOT";
 #include "EXTERN.h"
@@ -396,7 +396,7 @@ EOT
   ################ PM
   my $pm = "$package.pm";
   push @files, $pm;
-  open FH, ">$pm" or die "open >$pm: $!\n";
+  open FH, ">", "$pm" or die "open >$pm: $!\n";
   print FH "package $package;\n";
 
   print FH <<'EOT';
@@ -427,14 +427,14 @@ EOT
   ################ test.pl
   my $testpl = "test.pl";
   push @files, $testpl;
-  open FH, ">$testpl" or die "open >$testpl: $!\n";
+  open FH, ">", "$testpl" or die "open >$testpl: $!\n";
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
 use strict;
 use $package qw(@$export_names);
 
 print "1..2\n";
-if (open OUTPUT, ">$output") \{
+if (open OUTPUT, ">", "$output") \{
   print "ok 1\n";
   select OUTPUT;
 \} else \{

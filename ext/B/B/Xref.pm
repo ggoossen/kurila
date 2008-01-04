@@ -382,7 +382,7 @@ sub compile {
 	    last OPTION;
 	} elsif ($opt eq "o") {
 	    $arg ||= shift @options;
-	    open(STDOUT, ">$arg") or return "$arg: $!\n";
+	    open(STDOUT, ">", "$arg") or return "$arg: $!\n";
 	} elsif ($opt eq "d") {
 	    $nodefs = 1;
 	} elsif ($opt eq "r") {

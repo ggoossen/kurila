@@ -6,7 +6,6 @@ BEGIN {
 }
 
 use strict;
-use encoding 'latin1';
 use charnames ':full';
 use Test;
 BEGIN { plan tests => 104 };
@@ -178,9 +177,9 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 Когда читала (NAME)\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ (NAME)\n\nц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
-ok $p->get_title(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_title(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 my $t;
 
 ok( $t = $p->get_token);
@@ -195,9 +194,9 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│\n\nц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
-ok $p->get_title(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_title(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 my $t;
 
 ok( $t = $p->get_token);
@@ -212,10 +211,10 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│\n\nц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title() || '', '';
-ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_description(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 my $t;
 
 ok( $t = $p->get_token);
@@ -229,9 +228,9 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│\n\nц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
-ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_description(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 ok $p->get_title() || '', '';
 my $t;
 
@@ -247,9 +246,9 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│\n\nц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
-ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_description(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 ok $p->get_title(), "Thingy";
 my $t;
 
@@ -265,10 +264,10 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│\n\nц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title(), "Thingy";
-ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_description(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 my $t;
 
 ok( $t = $p->get_token);
@@ -283,10 +282,10 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 print "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
-$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) Вдали перед\n\nThingy\n\n=head1 (DESCRIPTION) Когда читала\n\nКогда читала ты мучительные строки -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
+$p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) ц╥ц└ц│ц▄ц┌ц┴ ц░ц┘ц▓ц┘ц┌ц└\n\nThingy\n\n=head1 (DESCRIPTION) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│\n\nц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
 
 ok $p->get_title(), "Thingy";
-ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_description(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 my $t;
 
 ok( $t = $p->get_token);
@@ -303,13 +302,13 @@ print "# Testing another set, at line ", __LINE__, "\n";
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}
 
-=head1 (NAME) Вдали перед
+=head1 (NAME) ц╥ц└ц│ц▄ц┌ц┴ ц░ц┘ц▓ц┘ц┌ц└
 
 Thingy
 
-=head1 (DESCRIPTION) Когда читала
+=head1 (DESCRIPTION) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│
 
-Когда читала ты мучительные строки -- Fet's I<"When you were> reading
+ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading
 
 =pod
 
@@ -320,7 +319,7 @@ Grunk
 
 ok $p->get_title(), "Thingy";
 ok $p->get_version() || '', '';
-ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_description(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 my $t;
 
 ok( $t = $p->get_token);
@@ -337,13 +336,13 @@ print "# Testing another set, at line ", __LINE__, "\n";
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}
 
-=head1 (NAME) Вдали перед
+=head1 (NAME) ц╥ц└ц│ц▄ц┌ц┴ ц░ц┘ц▓ц┘ц┌ц└
 
 Thingy
 
-=head1 (DESCRIPTION) Когда читала
+=head1 (DESCRIPTION) ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│
 
-Когда читала ты мучительные строки -- Fet's I<"When you were> reading
+ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's I<"When you were> reading
 
 =head1 VERSION
 
@@ -367,7 +366,7 @@ $v =~ s/^ +//m;
 $v =~ s/^\s+//s;
 $v =~ s/\s+$//s;
 ok $v, "Stuff: Thing\nWhatever: Um.";
-ok $p->get_description(), q{Когда читала ты мучительные строки -- Fet's "When you were reading};
+ok $p->get_description(), q{ц╚ц▐ц┤ц└ц┌ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц┌ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┌ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading};
 ok $p->get_author() || '', 'Jojoj Aarzarz';
 
 

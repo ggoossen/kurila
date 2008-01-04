@@ -3,7 +3,7 @@ my $file = pop(@ARGV);
 my %meta;
 $ENV{'P4PORT'} ||= 'bactrian:1667';
 $ENV{'P4CLIENT'} ||= 'ni-s';
-open(FILE,$file) || die "Cannot open $file:$!";
+open(FILE, "<",$file) || die "Cannot open $file:$!";
 while ( ~< *FILE)
  {
   if (m/^(From|Subject|Date|Message-ID):(.*)$/i)
@@ -27,7 +27,7 @@ my @have = `p4 have @edit`;
 if ($code == 0)
  {
   System("p4 edit @edit");
-  open(PIPE,"|p4 change -i") || die "Cannot open pipe to p4:$!";
+  open(PIPE, "|-","p4 change -i") || die "Cannot open pipe to p4:$!";
   print PIPE "Change: new\n";
   print PIPE "Description:\n";
   foreach my $key (qw(Subject From Date Message-Id))

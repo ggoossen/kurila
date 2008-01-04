@@ -485,7 +485,7 @@ sub contains_pod {
   $verbose = shift if @_;
 
   # check for one line of POD
-  unless(open(POD,"<$file")) {
+  unless(open(POD, "<","$file")) {
     warn "Error: $file is unreadable: $!\n";
     return undef;
   }

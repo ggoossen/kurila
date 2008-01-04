@@ -273,7 +273,7 @@ print "ok\n" if ("\0" lt "\x[FF]");
 EXPECT
 ok
 ########
-open(H,$^O eq 'MacOS' ? ':run:fresh_perl.t' : 'run/fresh_perl.t'); # must be in the 't' directory
+open(H,"<",$^O eq 'MacOS' ? ':run:fresh_perl.t' : 'run/fresh_perl.t'); # must be in the 't' directory
 stat(H);
 print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT
@@ -364,7 +364,7 @@ argv <e>
 -l
 # fdopen from a system descriptor to a system descriptor used to close
 # the former.
-open STDERR, '>&=STDOUT' or die $!;
+open STDERR, '>&=', 'STDOUT' or die $!;
 select STDOUT; $| = 1; print fileno STDOUT or die $!;
 select STDERR; $| = 1; print fileno STDERR or die $!;
 EXPECT
@@ -491,7 +491,7 @@ Modification of a read-only value attempted at - line 2.
 ########
 print qw(ab a\b a\\b);
 EXPECT
-aba\ba\b
+aba\ba\\b
 ########
 # lexicals declared after the myeval() definition should not be visible
 # within it

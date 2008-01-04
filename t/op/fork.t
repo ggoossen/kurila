@@ -40,7 +40,7 @@ for (@prgs){
     $expected =~ s/\n+$//;
     # results can be in any order, so sort 'em
     my @expected = sort split m/\n/, $expected;
-    open TEST, ">$tmpfile" or die "Cannot open $tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
     print TEST $prog, "\n";
     close TEST or die "Cannot close $tmpfile: $!";
     my $results;
@@ -382,8 +382,8 @@ sub pipe_to_fork ($$) {
 
 my ($parent, $child);
 
-open $parent;
-open $child;
+open $parent, "<", '';
+open $child, "<", '';
 if (pipe_to_fork($parent, $child)) {
     # parent
     print $parent "pipe_to_fork\n";

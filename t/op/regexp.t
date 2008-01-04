@@ -51,13 +51,13 @@ BEGIN {
     # Do this open before any chdir
     $file = shift;
     if (defined $file) {
-	open TESTS, $file or die "Can't open $file";
+	open TESTS, "<", $file or die "Can't open $file";
     }
 }
 
 if (!defined $file) {
-    open(TESTS,'op/re_tests') || open(TESTS,'t/op/re_tests')
-	|| open(TESTS,':op:re_tests') || die "Can't open re_tests";
+    open(TESTS, "<",'op/re_tests') || open(TESTS, "<",'t/op/re_tests')
+	|| open(TESTS, "<",':op:re_tests') || die "Can't open re_tests";
 }
 
 my @tests = ~< *TESTS;

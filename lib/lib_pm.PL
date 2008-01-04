@@ -33,7 +33,7 @@ if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
 	      q(reverse split m/ /, $Config{inc_version_list});
 }
  
-open OUT,">$file" or die "Can't create $file: $!";
+open OUT,">", "$file" or die "Can't create $file: $!";
  
 print "Extracting $file (with variable substitutions)\n";
  

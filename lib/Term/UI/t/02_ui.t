@@ -18,7 +18,7 @@ $^W = 1;
 if( $ENV{PERL_CORE} ) {
     *STDOUT_SAVE = *STDOUT_SAVE = *STDOUT;
     close *STDOUT;
-    open *STDOUT, ">termui.$$" or diag("Could not open tempfile");
+    open *STDOUT, ">", "termui.$$" or diag("Could not open tempfile");
 }
 END { close *STDOUT && unlink "termui.$$" if $ENV{PERL_CORE} }
 

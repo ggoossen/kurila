@@ -335,7 +335,7 @@ EOM
     exit ;
 }
 my $file = "./xcv" ;
-open(F, ">$file") ; 
+open(F, ">", "$file") ; 
 my $a = sysread(F, $a,10) ;
 no warnings 'io' ;
 my $a = sysread(F, $a,10) ;
@@ -363,9 +363,9 @@ binmode() on unopened filehandle at - line 4.
 ########
 # pp_sys.c [pp_lstat]
 use warnings 'io';
-open FH, "harness" or die "# $!";
+open FH, "<", "harness" or die "# $!";
 lstat FH;
-open my $fh, $0 or die "# $!";
+open my $fh, "<", $0 or die "# $!";
 lstat $fh;
 no warnings 'io';
 lstat FH;
@@ -383,8 +383,8 @@ close STDIN;
 getc STDIN;
 # Create an empty file
 $file = 'getcwarn.tmp';
-open FH1, ">$file" or die "# $!"; close FH1;
-open FH2, $file    or die "# $!";
+open FH1, ">", "$file" or die "# $!"; close FH1;
+open FH2, "<", $file    or die "# $!";
 getc FH2; # Should not warn at EOF
 close FH2;
 getc FH2; # Warns, now
@@ -418,9 +418,9 @@ EOM
     }
 }
 opendir FOO, '.'; closedir FOO;
-open BAR, '.'; close BAR;
+open BAR, "<", '.'; close BAR;
 opendir $dh, '.'; closedir $dh;
-open $fh, '.'; close $fh;
+open $fh, "<", '.'; close $fh;
 chdir FOO;
 chdir BAR;
 chdir $dh;
@@ -440,19 +440,19 @@ chdir() on closed filehandle $fh at - line 23.
 use warnings;
 opendir FOO, ".";
 opendir my $foo, ".";
-open FOO, "TEST";
-open $foo, "TEST";
+open FOO, "<", "TEST";
+open $foo, "<", "TEST";
 no warnings qw(io deprecated);
-open FOO, "TEST";
-open $foo, "TEST";
+open FOO, "<", "TEST";
+open $foo, "<", "TEST";
 EXPECT
 Opening dirhandle FOO also as a file at - line 5.
 Opening dirhandle $foo also as a file at - line 6.
 ########
 # pp_sys.c [pp_open_dir]
 use warnings;
-open FOO, "TEST";
-open my $foo, "TEST";
+open FOO, "<", "TEST";
+open my $foo, "<", "TEST";
 opendir FOO, ".";
 opendir $foo, ".";
 no warnings qw(io deprecated);

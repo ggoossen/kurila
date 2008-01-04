@@ -15,7 +15,7 @@ $Is_Dosish = ($^O eq 'MSWin32' or $^O eq 'NetWare' or $^O eq 'dos' or
               $^O eq 'os2' or $^O eq 'mint' or $^O eq 'cygwin' or
               $^O =~ m/^uwin/);
 
-open($TST, 'harness') || (die "Can't open harness");
+open($TST, "<", 'harness') || (die "Can't open harness");
 binmode $TST if $Is_Dosish;
 if (eof(TST)) { print "not ok 1\n"; } else { print "ok 1\n"; }
 
@@ -55,7 +55,7 @@ unless (eof) { print "not ok 13\n"; } else { print "ok 13\n"; }
 if ($. == 0) { print "not ok 14\n"; } else { print "ok 14\n"; }
 
 $curline = $.;
-open(OTHER, 'harness') || (die "Can't open harness: $!");
+open(OTHER, "<", 'harness') || (die "Can't open harness: $!");
 binmode OTHER if (($^O eq 'MSWin32') || ($^O eq 'NetWare'));
 
 {
@@ -108,7 +108,7 @@ my $written = "tell_write.txt";
 END { 1 while unlink($written) }
 
 close($TST);
-open($tst,">$written")  || die "Cannot open $written:$!";
+open($tst, ">","$written")  || die "Cannot open $written:$!";
 binmode $tst if $Is_Dosish;
 
 if (tell($tst) == 0) { print "ok 24\n"; } else { print "not ok 24\n"; }
@@ -123,7 +123,7 @@ if (tell($tst) == 10) { print "ok 26\n"; } else { print "not ok 26\n"; }
 
 close($tst);
 
-open($tst,"+>>$written")  || die "Cannot open $written:$!";
+open($tst, "+>>", "$written")  || die "Cannot open $written:$!";
 binmode $tst if $Is_Dosish;
 
 if (0) 
@@ -148,10 +148,10 @@ if (tell($tst) == 15 ||
 
 close($tst);
 
-open($tst,">$written")  || die "Cannot open $written:$!";
+open($tst, ">","$written")  || die "Cannot open $written:$!";
 print $tst "foobar";
 close $tst;
-open($tst,">>$written")  || die "Cannot open $written:$!";
+open($tst, ">>","$written")  || die "Cannot open $written:$!";
 
 # This test makes a questionable assumption that the file pointer will
 # be at eof after opening a file but before seeking, reading, or writing.

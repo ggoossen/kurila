@@ -8,7 +8,7 @@ my (undef, $headerpath) = @ARGV;
 my ($out) = __FILE__ =~ m/(^.*)\.PL/i;
 $out =~ s/_h$/.h/;
 unlink $out if -l $out;
-open(OUT,">$out") || die "Cannot open $out:$!";
+open(OUT,">","$out") || die "Cannot open $out:$!";
 print "Extracting $out...\n";
 print OUT <<"END";
 /*
@@ -62,7 +62,7 @@ foreach my $tuple (['op.h'],['cop.h'],['regexp.h','RXf_'])
   my $file = $tuple->[0];
   my $pfx = $tuple->[1] || '';
   my $path = File::Spec->catfile($headerpath, $file);
-  open(OPH,"$path") || die "Cannot open $path:$!";
+  open(OPH,"<","$path") || die "Cannot open $path:$!";
   while ( ~< *OPH)
    {  
     doconst($1) if (m/#define\s+($pfx\w+)\s+([\(\)\|\dx]+)\s*(?:$|\/\*)/);

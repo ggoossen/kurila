@@ -154,14 +154,14 @@ Not yet supported.
 
 If the external F<gzip> is used, the following C<open>s are used:
 
-    open(FH, "gzip -dc $filename |")  # for read opens
-    open(FH, " | gzip > $filename")   # for write opens
+    open(FH, "-|", "gzip -dc $filename")  # for read opens
+    open(FH, "|-", "gzip > $filename")   # for write opens
 
 You can modify the 'commands' for example to hardwire
 an absolute path by e.g.
 
-    use IO::Zlib ':gzip_read_open'  => '/some/where/gunzip -c %s |';
-    use IO::Zlib ':gzip_write_open' => '| /some/where/gzip.exe > %s';
+    use IO::Zlib ':gzip_read_open'  => '/some/where/gunzip -c %s';
+    use IO::Zlib ':gzip_write_open' => '/some/where/gzip.exe > %s';
 
 The C<%s> is expanded to be the filename (C<sprintf> is used, so be
 careful to escape any other C<%> signs).  The 'commands' are checked
@@ -310,8 +310,8 @@ use Symbol;
 use Tie::Handle;
 
 # These might use some $^O logic.
-my $gzip_read_open   = "gzip -dc %s |";
-my $gzip_write_open  = "| gzip > %s";
+my $gzip_read_open   = "gzip -dc %s";
+my $gzip_write_open  = "gzip > %s";
 
 my $gzip_external;
 my $gzip_used;
@@ -352,7 +352,7 @@ sub _import {
 	    if (@_) {
 		$gzip_read_open = shift;
 		croak "$import: ':gzip_read_open' '$gzip_read_open' is illegal"
-		    unless $gzip_read_open =~ m/^.+%s.+\|\s*$/;
+		    unless $gzip_read_open =~ m/^.+%s.+$/;
 	    } else {
 		croak "$import: ':gzip_read_open' requires an argument";
 	    }
@@ -362,7 +362,7 @@ sub _import {
 	    if (@_) {
 		$gzip_write_open = shift;
 		croak "$import: ':gzip_write_open' '$gzip_read_open' is illegal"
-		    unless $gzip_write_open =~ m/^\s*\|.+%s.*$/;
+		    unless $gzip_write_open =~ m/^.+%s.*$/;
 	    } else {
 		croak "$import: ':gzip_write_open' requires an argument";
 	    }
@@ -574,13 +574,13 @@ sub gzopen_external {
 	# Plenty of race conditions exist in this code, but
 	# the alternative would be to capture the stderr of
 	# gzip and parse it, which would be a portability nightmare.
-	if (-e $filename && open($fh, $filename)) {
+	if (-e $filename && open($fh, "<", $filename)) {
 	    binmode $fh;
 	    my $sig;
 	    my $rdb = read($fh, $sig, 2);
 	    if ($rdb == 2 && $sig eq "\x[1F8B]") {
 		my $ropen = sprintf $gzip_read_open, $filename;
-		if (open($fh, $ropen)) {
+		if (open($fh, "-|", $ropen)) {
 		    binmode $fh;
 		    return $fh;
 		} else {
@@ -603,7 +603,7 @@ sub gzopen_external {
 	# We are using IO::Handle objects for now, however,
 	# and they can only contain one stream at a time.
 	my $wopen = sprintf $gzip_write_open, $filename;
-	if (open($fh, $wopen)) {
+	if (open($fh, "|-", $wopen)) {
 	    $fh->autoflush(1);
 	    binmode $fh;
 	    return $fh;

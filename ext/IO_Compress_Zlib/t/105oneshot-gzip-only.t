@@ -102,7 +102,7 @@ sub gzipGetHeader
     is $hdr->{Time}, 4321, "  Time is 4321";
 
     title "Filehandle doesn't have default Name or Time" ;
-    my $fh = IO::File->new( "< $file1")
+    my $fh = IO::File->new( "$file1", "<")
         or diag "Cannot open '$file1': $!\n" ;
     sleep 3 ; 
     my $before = time ;

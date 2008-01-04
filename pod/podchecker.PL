@@ -22,7 +22,7 @@ $file =~ s/\.pl$//
         if ($^O eq 'VMS' or $^O eq 'os2' or $^O eq 'dos');  # "case-forgiving"
 $file .= '.com' if $^O eq 'VMS';
 
-open OUT,">$file" or die "Can't create $file: $!";
+open OUT,">", "$file" or die "Can't create $file: $!";
 
 print "Extracting $file (with variable substitutions)\n";
 

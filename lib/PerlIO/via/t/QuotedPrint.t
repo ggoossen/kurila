@@ -60,7 +60,7 @@ ok( close( $out ),			'closing encoding handle' );
 
 {
 local $/ = undef;
-ok( open( my $test,$file ),		'opening without layer' );
+ok( open( my $test, "<",$file ),		'opening without layer' );
 is( $encoded,readline( $test ),		'check encoded content' );
 ok( close( $test ),			'close test handle' );
 }

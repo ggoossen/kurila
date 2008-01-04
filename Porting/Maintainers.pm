@@ -22,7 +22,7 @@ use File::Find;
 use Getopt::Long;
 
 my %MANIFEST;
-if (open(MANIFEST, "MANIFEST")) {
+if (open(MANIFEST, "<", "MANIFEST")) {
     while ( ~< *MANIFEST) {
 	if (m/^(\S+)\t+(.+)$/) {
 	    $MANIFEST{$1}++;

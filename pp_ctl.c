@@ -281,8 +281,6 @@ PP(pp_substcont)
 			     NULL, 0);
 	}
 	i = m - orig;
-	if (DO_UTF8(sv))
-	    sv_pos_b2u(sv, &i);
 	mg->mg_len = i;
     }
     if (old != rx)
