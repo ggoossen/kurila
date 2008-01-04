@@ -485,7 +485,7 @@ sub process_para {
       }
     }
     
-    next PARAGRAPH unless @line;
+    return unless @line;
     
     if ($XSS_work_idx && !$XSStack[$XSS_work_idx]{varname}) {
       # We are inside an #if, but have not yet #defined its xsubpp variable.
