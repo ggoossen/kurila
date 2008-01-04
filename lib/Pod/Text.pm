@@ -570,7 +570,7 @@ sub pod2text {
     if (defined $_[1]) {
         my @fhs = @_;
         local *IN;
-        unless (open (IN, $fhs[0])) {
+        unless (open (IN, "<", $fhs[0])) {
             croak ("Can't open $fhs[0] for reading: $!\n");
             return;
         }
