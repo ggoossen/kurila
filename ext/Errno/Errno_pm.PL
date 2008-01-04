@@ -453,7 +453,7 @@ non-zero value only if C<$!> is set to that value. For example:
 
     use Errno;
 
-    unless (open(FH, "/fangorn/spouse")) {
+    unless (open(FH, "<", "/fangorn/spouse")) {
         if ($!{ENOENT}) {
             warn "Get a wife!\n";
         } else {
