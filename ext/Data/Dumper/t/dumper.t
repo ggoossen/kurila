@@ -16,25 +16,33 @@ BEGIN {
     }
 }
 
+use Test::More;
+
 # Since Perl 5.8.1 because otherwise hash ordering is really random.
 local $Data::Dumper::Sortkeys = 1;
 
 use Data::Dumper;
 use Config;
 use utf8;
+use strict;
 my $Is_ebcdic = defined($Config{'ebcdic'}) && $Config{'ebcdic'} eq 'define';
 
 $Data::Dumper::Pad = "#";
 my $TMAX;
 my $XS;
-my $TNUM = 0;
 my $WANT = '';
 
+our (@a, @c, $c, $d, $foo, %foo, @foo, @dogs, %kennel, $mutts, $e, $f, $i,
+    @numbers, @strings, $WANT_PL_N, $WANT_PL_S, $WANT_XS_N, $WANT_XS_S,
+    $WANT_XS_I, @numbers_s, @numbers_i, @numbers_ni, @numbers_nis, @numbers_ns,
+    @strings_s, @strings_i, @strings_is, @strings_n, @strings_ns, @strings_ni,
+    @strings_nis, @numbers_is, @numbers_n, $ping, %ping);
+
+
 sub TEST {
-  my $string = shift;
-  my $name = shift;
+  my ($string, $name) = @_;
+  no strict;
   my $t = eval $string;
-  ++$TNUM;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
       if ($WANT =~ m/deadbeef/);
   if ($Is_ebcdic) {
@@ -45,24 +53,20 @@ sub TEST {
       $t    = join("\n",sort(split(m/\n/,$t)));
       $t    =~ s/\,$//mg;
   }
-  $name = $name ? " - $name" : '';
-  print( ($t eq $WANT and not $@) ? "ok $TNUM$name\n"
-	: "not ok $TNUM$name\n--Input--\n$string\nExpected--\n$WANT\n--Got--\n$@$t\n");
 
-  ++$TNUM;
-  if ($Is_ebcdic) { # EBCDIC.
-      if ($TNUM == 311 || $TNUM == 314) {
-	  eval $string;
-      } else {
-	  eval $t;
-      }
-  } else {
-      eval "$t";
+  ok(($t eq $WANT and not $@), $name);
+  if ($@) {
+      diag("error: $@");
   }
-  print $@ ? "not ok $TNUM\n# \$@ says: $@\n" : "ok $TNUM\n";
+  if ($t ne $WANT) {
+      diag("--Expected--\n$WANT\n--Got--\n$@$t\n");
+  }
+
+  eval "$t";
+  ok(!$@);
+  diag $@ if $@;
 
   $t = eval $string;
-  ++$TNUM;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
       if ($WANT =~ m/deadbeef/);
   if ($Is_ebcdic) {
@@ -72,15 +76,20 @@ sub TEST {
       $t    = join("\n",sort(split(m/\n/,$t)));
       $t    =~ s/\,$//mg;
   }
-  print( ($t eq $WANT and not $@) ? "ok $TNUM\n"
-	: "not ok $TNUM\n--Expected--\n$WANT\n--Got--\n$@$t\n");
+  ok($t eq $WANT and not $@);
+  if ($@) {
+      diag("error: $@");
+  }
+  if ($t ne $WANT) {
+      diag("--Expected--\n$WANT\n--Got--\n$@$t\n");
+  }
 }
 
 sub SKIP_TEST {
-  my $reason = shift;
-  ++$TNUM; print "ok $TNUM # skip $reason\n";
-  ++$TNUM; print "ok $TNUM # skip $reason\n";
-  ++$TNUM; print "ok $TNUM # skip $reason\n";
+    my $reason = shift;
+  SKIP: {
+        skip $reason, 3;
+    }
 }
 
 # Force Data::Dumper::Dump to use perl. We test Dumpxs explicitly by calling
@@ -89,14 +98,17 @@ sub SKIP_TEST {
 $Data::Dumper::Useperl = 1;
 if (defined &Data::Dumper::Dumpxs) {
   print "### XS extension loaded, will run XS tests\n";
-  $TMAX = 363; $XS = 1;
+  $TMAX = 365; $XS = 1;
 }
 else {
   print "### XS extensions not loaded, will NOT run XS tests\n";
-  $TMAX = 183; $XS = 0;
+  $TMAX = 185; $XS = 0;
 }
 
-print "1..$TMAX\n";
+plan tests => $TMAX;
+
+is Data::Dumper->Dump(['{'], [qw(a)]), '#$a = "\{";' . "\n";
+is Data::Dumper->Dumpxs(['{'], [qw(a)]), '#$a = "\{";' . "\n" if $XS;
 
 #XXXif (0) {
 #############
@@ -971,11 +983,7 @@ TEST q(Data::Dumper->new([[$c, $d]])->Dumpxs;)
 #        };
 EOT
 
-  if(" $Config{'extensions'} " !~ m[ B ]) {
-    SKIP_TEST "Perl configured without B module";
-  } else {
     TEST q(Data::Dumper->new([{ foo => sub { print "foo"; } }])->Dump);
-  }
 }
 
 ############# 214

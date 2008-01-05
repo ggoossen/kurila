@@ -168,7 +168,7 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
             backslashes++;
         } else if (k == '\'') {
             single_quotes++;
-        } else if (k == '"' || k == '$' || k == '@') {
+        } else if (k == '"' || k == '$' || k == '@' || k == '{' || k == '}') {
             qq_escapables++;
         } else {
             normal++;
@@ -191,7 +191,7 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
                 r = r + my_sprintf(r, "\\x%02"UVxf"", (U8)*s);
                 charlen = 1;
                 continue;
-            } else if (k == '"' || k == '\\' || k == '$' || k == '@') {
+            } else if (k == '"' || k == '\\' || k == '$' || k == '@' || k == '{' || k == '}') {
                 *r++ = '\\';
                 *r++ = (char)k;
             }
