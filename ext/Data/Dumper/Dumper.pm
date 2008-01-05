@@ -646,7 +646,7 @@ my %esc = (
 # put a string value in double quotes
 sub qquote {
   local($_) = shift;
-  s/([\\\"\@\$])/\\$1/g;
+  s/([\\\"\@\$\{\}])/\\$1/g;
   my $bytes; { use bytes; $bytes = length }
   s/([^\x[00]-\x[7f]])/{'\x'.sprintf("[%02x]",ord($1))}/g if $bytes +> length;
   return qq("$_") unless 
