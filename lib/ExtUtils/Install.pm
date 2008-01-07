@@ -949,7 +949,7 @@ Filter $src using $cmd into $dest.
 sub run_filter {
     my ($cmd, $src, $dest) = @_;
     local(*CMD, *SRC);
-    open(CMD, "|$cmd >$dest") || die "Cannot fork: $!";
+    open(CMD, '-|', "$cmd >$dest") || die "Cannot fork: $!";
     open(SRC, "<", $src)           || die "Cannot open $src: $!";
     my $buf;
     my $sz = 1024;
