@@ -1400,7 +1400,7 @@ ok(1) while $test +< 576;
     $_ = "abc\x{100}\x{200}\x{300}\x{380}\x{400}defg";
 
     if (m/(.\x{300})./) {
-	print "ok 576\n";
+	ok(1);
 
 	print "not " unless $` eq "abc\x{100}" && length($`) == 4;
 	print "ok 577\n";
@@ -1414,7 +1414,7 @@ ok(1) while $test +< 576;
 	print "not " unless $1 eq "\x{200}\x{300}" && length($1) == 2;
 	print "ok 580\n";
     } else {
-	for (576..580) { print "not ok $_\n" }
+	for (576..580) { ok(0); }
     }
 }
 
