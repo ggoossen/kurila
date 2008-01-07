@@ -1580,6 +1580,11 @@ XS(XS_dump_view)
 	sv_setpv(retsv, "REF");
 	XSRETURN(1);
     }
+    
+    if (SvTYPE(sv) == SVt_NULL) {
+	sv_setpv(retsv, "undef");
+	XSRETURN(1);
+    }
 
     if (isGV(sv)) {
 	gv_efullname4(retsv, (GV*)sv, "*", TRUE);
