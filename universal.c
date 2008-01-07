@@ -1462,7 +1462,15 @@ XS(XS_dump_view)
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
 
-    if (SvPOK(sv)) {
+    if (SvGMAGICAL(sv))
+	mg_get(sv);
+
+    if ( ! SvOK(sv) ) {
+	sv_setpv(retsv, "undef");
+	XSRETURN(1);
+    }
+
+    if (SvPOKp(sv)) {
 	/* mostly stoken from Data::Dumper/Dumper.xs */
 	char *r, *rstart;
 	const char * const src = SvPVX_const(sv);
@@ -1571,7 +1579,7 @@ XS(XS_dump_view)
 	XSRETURN(1);
     }
 
-    if (SvIOK(sv) || SvUOK(sv)) {
+    if (SvIOKp(sv) || SvNOKp(sv)) {
 	sv_setsv(retsv, sv); /* let perl handle the stringification */
 	XSRETURN(1);
     }
@@ -1581,11 +1589,6 @@ XS(XS_dump_view)
 	XSRETURN(1);
     }
     
-    if (SvTYPE(sv) == SVt_NULL) {
-	sv_setpv(retsv, "undef");
-	XSRETURN(1);
-    }
-
     if (isGV(sv)) {
 	gv_efullname4(retsv, (GV*)sv, "*", TRUE);
 

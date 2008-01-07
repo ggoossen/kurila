@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl" }
 
-plan tests => 9;
+plan tests => 10;
 
 is dump::view('foo'), q|'foo'|;
 is dump::view("'foo"), q|"'foo"|;
@@ -12,6 +12,7 @@ is dump::view("\x[FF]"), q|"\x[ff]"|, "string with broken UTF-8";
 
 is dump::view(*foo), '*main::foo';
 is dump::view(15), '15';
+is dump::view(15.55), '15.55';
 is dump::view(undef), q|undef|, "undef";
 {
     local $TODO = "make this dump something useful";
