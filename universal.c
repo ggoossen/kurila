@@ -1530,8 +1530,8 @@ XS(XS_dump_view)
 		    case '\r' : *r++ = 'r';  break;
 		    case '\n' : *r++ = 'n';  break;
 		    case '\f' : *r++ = 'f';  break;
-		      defualt:
-			r = r + my_sprintf(r, "x%02"UVxf"", k);
+		    default:
+			r = r + my_sprintf(r, "x%02"UVxf"", k); 
 		    }
 		} else if (k == '"' || k == '\\' || k == '$' || k == '@' || k == '{' || k == '}') {
 		    *r++ = '\\';
