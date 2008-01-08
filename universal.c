@@ -1462,7 +1462,15 @@ XS(XS_dump_view)
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
 
-    if (SvPOK(sv)) {
+    if (SvGMAGICAL(sv))
+	mg_get(sv);
+
+    if ( ! SvOK(sv) ) {
+	sv_setpv(retsv, "undef");
+	XSRETURN(1);
+    }
+
+    if (SvPOKp(sv)) {
 	/* mostly stoken from Data::Dumper/Dumper.xs */
 	char *r, *rstart;
 	const char * const src = SvPVX_const(sv);
@@ -1480,19 +1488,30 @@ XS(XS_dump_view)
 	STRLEN normal = 0;
 	
 	/* this will need EBCDICification */
-	for (s = src; s < send; s += UTF8SKIP(s)) {
-	    const UV k = utf8_to_uvchr((U8*)s, NULL);
+	STRLEN charlen = 0;
+	for (s = src; s < send; s += charlen) {
+	    const UV k = utf8_to_uvchr((U8*)s, &charlen);
 
-	    if (k == 0) {
-		/* invalid character escape: \xXX */
-		grow += 2;
+	    if (k == 0 || s + charlen > send ) {
+		/* invalid character escape: \x[XX] */
+		grow += 6;
 		s += 1;
 		continue;
 	    } else if (k > 127) {
 		/* 4: \x{} then count the number of hex digits.  */
 		grow += 4 + (k <= 0xFF ? 2 : k <= 0xFFF ? 3 : k <= 0xFFFF ? 4 : 8);
 	    } else if ( ! isPRINT(k) ) {
-		grow += 1;
+		switch (*s) {
+		case '\v' : 
+		case '\t' : 
+		case '\r' :
+		case '\n' :
+		case '\f' :
+		    grow += 2;
+		    break;
+		default:
+		    grow += 6;
+		}
 	    } else if (k == '\\') {
 		backslashes++;
 	    } else if (k == '\'') {
@@ -1515,23 +1534,23 @@ XS(XS_dump_view)
 	    for (s = src; s < send; s += charlen) {
 		const UV k = utf8_to_uvchr((U8*)s, &charlen);
 
-		if (k == 0) {
+		if (k == 0 || s + charlen > send ) {
 		    /* invalid character */
-		    r = r + my_sprintf(r, "\\x%02"UVxf"", (U8)*s);
+		    r = r + my_sprintf(r, "\\x[%02x]", (U8)*s);
 		    charlen = 1;
 		    continue;
 		} else if (k > 127) {
 		    r = r + my_sprintf(r, "\\x{%"UVxf"}", k);
 		} else if ( ! isPRINT(k) ) {
 		    *r++ = '\\';
-		    switch (k) {
-		    case '\v' : *r++ = 'v';  break;
-		    case '\t' : *r++ = 't';  break;
-		    case '\r' : *r++ = 'r';  break;
-		    case '\n' : *r++ = 'n';  break;
-		    case '\f' : *r++ = 'f';  break;
-		    default:
-			r = r + my_sprintf(r, "x%02"UVxf"", k); 
+		    switch (*s) {
+		    case '\v': *r++ = 'v';  break;
+		    case '\t': *r++ = 't';  break;
+		    case '\r': *r++ = 'r';  break;
+		    case '\n': *r++ = 'n';  break;
+		    case '\f': *r++ = 'f';  break;
+		    default: 
+			r = r + my_sprintf(r, "x{%02"UVxf"}", k);
 		    }
 		} else if (k == '"' || k == '\\' || k == '$' || k == '@' || k == '{' || k == '}') {
 		    *r++ = '\\';
@@ -1560,7 +1579,7 @@ XS(XS_dump_view)
 	XSRETURN(1);
     }
 
-    if (SvIOK(sv) || SvUOK(sv)) {
+    if (SvIOKp(sv) || SvNOKp(sv)) {
 	sv_setsv(retsv, sv); /* let perl handle the stringification */
 	XSRETURN(1);
     }
@@ -1569,7 +1588,7 @@ XS(XS_dump_view)
 	sv_setpv(retsv, "REF");
 	XSRETURN(1);
     }
-
+    
     if (isGV(sv)) {
 	gv_efullname4(retsv, (GV*)sv, "*", TRUE);
 
