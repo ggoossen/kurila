@@ -259,6 +259,7 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 
 	} else if (*type == '\0') {
 	    /* '' opens a new filehandle */
+	    fp = NULL;
 	} else {
 	    
 	    if ( ! num_svs ) {
