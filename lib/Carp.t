@@ -190,12 +190,15 @@ sub w { cluck @_ }
 
 # $Carp::MaxArgLen
 {
-    for(0,4) {
+    for(0,6) {
         my $arg = 'testtest';
         local $Carp::MaxArgLen = $_;
         local $SIG{__WARN__} = sub {
-	    "@_"=~m/'(.+?)'/;
-	    is length($1), length($_?substr($arg,0,$_):substr($arg,0)), 'MaxArgLen';
+            if ($_) {
+                ok "@_"=~m/\Qmain::w('te...)\E/, "MaxArgLen $_";
+            } else {
+                ok "@_"=~m/\Qmain::w('testtest')\E/, "MaxArgLen $_";
+            }
 	};
 
         package Z;

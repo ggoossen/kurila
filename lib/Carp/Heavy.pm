@@ -108,27 +108,10 @@ sub caller_info {
 # Transform an argument to a function into a string.
 sub format_arg {
   my $arg = shift;
-  if (ref($arg)) {
-      $arg = defined($overload::VERSION) ? overload::StrVal($arg) : "$arg";
-  }
-  if (defined($arg)) {
-      if (ref \$arg eq "GLOB") {
-          $arg = '*' . Symbol::glob_name($arg);
-      } else {
-          $arg =~ s/'/\\'/g;
-      }
-      $arg = str_len_trim($arg, $MaxArgLen);
   
-      # Quote it?
-      $arg = "'$arg'" unless $arg =~ m/^-?[\d.]+\z/;
-  } else {
-      $arg = 'undef';
-  }
+  $arg = dump::view($arg);
+  $arg = str_len_trim($arg, $MaxArgLen);
 
-  # The following handling of "control chars" is direct from
-  # the original code - it is broken on Unicode though.
-  # Suggestions?
-  $arg =~ s/([[:cntrl:]]|[[:^ascii:]])/{sprintf("\\x\{%x\}",ord($1))}/g;
   return $arg;
 }
 
