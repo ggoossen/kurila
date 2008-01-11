@@ -184,7 +184,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
     }
     else {
 	/* Regular (non-sys) open */
-	char *name;
 	STRLEN olen = len;
 	char *tend;
 	int dodup = 0;
@@ -212,7 +211,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	    /* '-' opens STDIN */
 	    if (num_svs)
 		Perl_croak(aTHX_ "open() '-' is only allowed with 3rd argument.");
-	    name = type;
 	    mode[0] = 'r';
 	    if (in_raw)
 		mode[1] = 'b';
@@ -276,10 +274,10 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		goto say_false;
 	    }
 #endif /* USE_STDIO */
-	    name = SvOK(*svp) ? savesvpv (*svp) : savepvn ("", 0);
-	    SAVEFREEPV(name);
-
 	    if (*type == IoTYPE_PIPE) {
+		char *name = SvOK(*svp) ? savesvpv (*svp) : savepvn ("", 0);
+		SAVEFREEPV(name);
+
 		if (type[1] != IoTYPE_STD) {
 		  unknown_open_mode:
 		    Perl_croak(aTHX_ "Unknown open() mode '%.*s'", (int)olen, oname);
@@ -352,14 +350,9 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 			if (num_svs > 1) {
 			    Perl_croak(aTHX_ "More than one argument to '%c&' open",IoTYPE(io));
 			}
-			while (isSPACE(*type))
-			    type++;
 			if (SvIOK(*svp) || (SvPOK(*svp) && looks_like_number(*svp))) {
 			    fd = SvUV(*svp);
 			    num_svs = 0;
-			}
-			else if (isDIGIT(*type)) {
-			    fd = atoi(type);
 			}
 			else {
 			    const IO* thatio;
@@ -455,6 +448,9 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	    } /* IoTYPE_RDONLY */
 	    else if ((/* '-|...' or '...|' */
 			 type[0] == IoTYPE_STD && type[1] == IoTYPE_PIPE)) {
+		char *name = SvOK(*svp) ? savesvpv (*svp) : savepvn ("", 0);
+		SAVEFREEPV(name);
+
 		type += 2;   /* skip over '-|' */
 		if (*name == '\0') {
 		    /* command is missing 19990114 */
@@ -476,6 +472,8 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		    fp = PerlProc_popen_list(mode,num_svs,svp);
 		}
 		else {
+		    char *name = SvOK(*svp) ? savesvpv (*svp) : savepvn ("", 0);
+		    SAVEFREEPV(name);
 		    fp = PerlProc_popen(name,mode);
 		}
 		IoTYPE(io) = IoTYPE_PIPE;
