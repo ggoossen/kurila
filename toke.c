@@ -9987,10 +9987,12 @@ S_scan_pat(pTHX_ char *start, I32 type)
 {
     dVAR;
     PMOP *pm;
-    PL_lex_stuff.flags = LEXf_INPAT;
-    char *s = scan_str(start,TRUE,FALSE, &PL_lex_stuff);
+    char *s;
     const char * const valid_flags =
 	(const char *)((type == OP_QR) ? QR_PAT_MODS : M_PAT_MODS);
+
+    PL_lex_stuff.flags = LEXf_INPAT;
+    s = scan_str(start,TRUE,FALSE, &PL_lex_stuff);
 #ifdef PERL_MAD
     char *modstart;
 #endif
@@ -10336,34 +10338,6 @@ S_scan_heredoc(pTHX_ register char *s)
     PL_multi_start = CopLINE(PL_curcop);
     PL_multi_open = PL_multi_close = '<';
     term = *PL_tokenbuf;
-/*     if (PL_lex_inwhat == OP_SUBST && PL_in_eval && !PL_rsfp) { */
-/*      /* FIXME: heredoc inside an quoted construct.
-/* 	char * const bufptr = PL_sublex_info.super_bufptr; */
-/* 	char * const bufend = PL_sublex_info.super_bufend; */
-/* 	char * const olds = s - SvCUR(herewas); */
-/* 	s = strchr(bufptr, '\n'); */
-/* 	if (!s) */
-/* 	    s = bufend; */
-/* 	d = s; */
-/* 	while (s < bufend && */
-/* 	  (*s != term || memNE(s,PL_tokenbuf,len)) ) { */
-/* 	    if (*s++ == '\n') */
-/* 		CopLINE_inc(PL_curcop); */
-/* 	} */
-/* 	if (s >= bufend) { */
-/* 	    CopLINE_set(PL_curcop, (line_t)PL_multi_start); */
-/* 	    missingterminator(PL_tokenbuf); */
-/* 	} */
-/* 	sv_setpvn(herewas,bufptr,d-bufptr+1); */
-/* 	sv_setpvn(tmpstr,d+1,s-d); */
-/* 	s += len - 1; */
-/* 	sv_catpvn(herewas,s,bufend-s); */
-/* 	Copy(SvPVX_const(herewas),bufptr,SvCUR(herewas) + 1,char); */
-
-/* 	s = olds; */
-/* 	goto retval; */
-/*     } */
-/*     else */
     if (!outer) {
 	d = s;
 	while (s < PL_bufend &&
@@ -10447,7 +10421,6 @@ S_scan_heredoc(pTHX_ register char *s)
 	}
     }
     s++;
-retval:
     PL_multi_end = CopLINE(PL_curcop);
     if (SvCUR(tmpstr) + 5 < SvLEN(tmpstr)) {
 	SvPV_shrink_to_cur(tmpstr);
@@ -10642,7 +10615,6 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 	    to[-1] = '\n';
 #endif
 	
-     read_more_line:
 	/* if we're out of file, or a read fails, bail and reset the current
 	   line marker so we can report where the unterminated string began
 	*/
