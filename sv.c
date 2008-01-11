@@ -1695,22 +1695,6 @@ STATIC bool
 S_glob_2number(pTHX_ GV * const gv)
 {
     Perl_croak(aTHX "Tried to use glob as number");
-    const U32 wasfake = SvFLAGS(gv) & SVf_FAKE;
-    SV *const buffer = sv_newmortal();
-
-    /* FAKE globs can get coerced, so need to turn this off temporarily if it
-       is on.  */
-    SvFAKE_off(gv);
-    gv_efullname4(buffer, gv, "*", TRUE);
-    SvFLAGS(gv) |= wasfake;
-
-    /* We know that all GVs stringify to something that is not-a-number,
-	so no need to test that.  */
-    if (ckWARN(WARN_NUMERIC))
-	not_a_number(buffer);
-    /* We just want something true to return, so that S_sv_2iuv_common
-	can tail call us and return true.  */
-    return TRUE;
 }
 
 STATIC char *
