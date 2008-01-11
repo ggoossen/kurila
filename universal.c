@@ -133,7 +133,6 @@ The SV can be a Perl object or the name of a Perl class.
 bool
 Perl_sv_does(pTHX_ SV *sv, const char *name)
 {
-    const char *classname;
     bool does_it;
     SV *methodname;
 
@@ -148,13 +147,14 @@ Perl_sv_does(pTHX_ SV *sv, const char *name)
 	return FALSE;
 
     if (sv_isobject(sv)) {
-	classname = sv_reftype(SvRV(sv),TRUE);
-    } else {
-	classname = SvPV_nolen(sv);
+	const char *classname = sv_reftype(SvRV(sv),TRUE);
+	if (strEQ(name,classname))
+	    return TRUE;
+    } else if (SvPOKp(sv)) {
+	const char *classname = SvPV_nolen(sv);
+	if (strEQ(name,classname))
+	    return TRUE;
     }
-
-    if (strEQ(name,classname))
-	return TRUE;
 
     PUSHMARK(SP);
     XPUSHs(sv);
@@ -1585,7 +1585,115 @@ XS(XS_dump_view)
     }
 
     if (SvROK(sv)) {
-	sv_setpv(retsv, "REF");
+/* 	sv_setpv(retsv, "REF"); */
+
+/*             if (SvAMAGIC(sv)) { */
+/* 		SV *const tmpstr = AMG_CALLun(sv,string); */
+/* 		if (tmpstr && (!SvROK(tmpstr) || (SvRV(tmpstr) != SvRV(sv)))) { */
+/* 		    /\* Unwrap this:  *\/ */
+/* 		    /\* char *pv = lp ? SvPV(tmpstr, *lp) : SvPV_nolen(tmpstr); */
+/* 		     *\/ */
+
+/* 		    char *pv; */
+/* 		    if ((SvFLAGS(tmpstr) & (SVf_POK)) == SVf_POK) { */
+/* 			if (flags & SV_CONST_RETURN) { */
+/* 			    pv = (char *) SvPVX_const(tmpstr); */
+/* 			} else { */
+/* 			    pv = (flags & SV_MUTABLE_RETURN) */
+/* 				? SvPVX_mutable(tmpstr) : SvPVX(tmpstr); */
+/* 			} */
+/* 			if (lp) */
+/* 			    *lp = SvCUR(tmpstr); */
+/* 		    } else { */
+/* 			pv = sv_2pv_flags(tmpstr, lp, flags); */
+/* 		    } */
+/* 		    return pv; */
+/* 		} */
+/* 	    } */
+/* 	    { */
+		STRLEN len;
+		char *retval;
+		char *buffer;
+/* 		MAGIC *mg; */
+		const SV *const referent = (SV*)SvRV(sv);
+
+		if (!referent) {
+		    sv_setpv(retsv, "NULLREF");
+/* 		} else if (SvTYPE(referent) == SVt_PVMG */
+/* 			   && ((SvFLAGS(referent) & */
+/* 				(SVs_OBJECT|SVf_OK|SVs_GMG|SVs_SMG|SVs_RMG)) */
+/* 			       == (SVs_OBJECT|SVs_SMG)) */
+/* 			   && (mg = mg_find(referent, PERL_MAGIC_qr))) */
+/*                 { */
+/*                     char *str = NULL; */
+/*                     I32 haseval = 0; */
+/*                     U32 flags = 0; */
+/*                     (str) = CALLREG_AS_STR(mg,lp,&flags,&haseval); */
+/*                     PL_reginterp_cnt += haseval; */
+/* 		    return str; */
+		} else {
+		    const char *const typestr = sv_reftype(referent, 0);
+		    const STRLEN typelen = strlen(typestr);
+		    UV addr = PTR2UV(referent);
+		    const char *stashname = NULL;
+		    STRLEN stashnamelen = 0; /* hush, gcc */
+		    const char *buffer_end;
+		    UV i;
+
+		    if (SvOBJECT(referent)) {
+			const HEK *const name = HvNAME_HEK(SvSTASH(referent));
+
+			if (name) {
+			    stashname = HEK_KEY(name);
+			    stashnamelen = HEK_LEN(name);
+			} else {
+			    stashname = "__ANON__";
+			    stashnamelen = 8;
+			}
+			len = stashnamelen + 1 /* = */ + typelen + 3 /* (0x */
+			    + 2 * sizeof(UV) + 2 /* )\0 */;
+		    } else {
+			len = typelen + 3 /* (0x */
+			    + 2 * sizeof(UV) + 2 /* )\0 */;
+		    }
+
+		    sv_grow(retsv, len);
+		    buffer = SvPVX(retsv);
+		    buffer_end = retval = buffer + len;
+
+		    /* Working backwards  */
+		    *--retval = '\0';
+		    *--retval = ')';
+		    for (i=0; i < 2*sizeof(UV); i++) {
+			*--retval = PL_hexdigit[addr & 15];
+			addr >>= 4;
+		    }
+		    *--retval = 'x';
+		    *--retval = '0';
+		    *--retval = '(';
+
+		    retval -= typelen;
+		    memcpy(retval, typestr, typelen);
+
+		    if (stashname) {
+			*--retval = '=';
+			retval -= stashnamelen;
+			memcpy(retval, stashname, stashnamelen);
+		    }
+		    /* retval may not neccesarily have reached the start of the
+		       buffer here.  */
+		    assert (retval == buffer);
+
+		    len = buffer_end - retval - 1; /* -1 for that \0  */
+
+		    SvCUR_set(retsv, len);
+		    SvPOK_on(retsv);
+		}
+/* 		if (lp) */
+/* 		    *lp = len; */
+/* 		SAVEFREEPV(buffer); */
+/* 		return retval; */
+/* 	    } */
 	XSRETURN(1);
     }
     

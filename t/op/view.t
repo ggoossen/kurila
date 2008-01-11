@@ -14,9 +14,5 @@ is dump::view(*foo), '*main::foo';
 is dump::view(15), '15';
 is dump::view(15.55), '15.55';
 is dump::view(undef), q|undef|, "undef";
-{
-    local $TODO = "make this dump something useful";
-    my $x;
-    is dump::view(\$x), "refence";
-}
+like dump::view(\"foobar"), qr/SCALAR[(]0x\w*[)]/;
 
