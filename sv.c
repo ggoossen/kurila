@@ -1601,59 +1601,8 @@ S_not_a_number(pTHX_ SV *sv)
      char tmpbuf[64];
      const char *pv;
 
-     if (DO_UTF8(sv)) {
-          dsv = sv_2mortal(newSVpvs(""));
-          pv = sv_uni_display(dsv, sv, 10, 0);
-     } else {
-	  char *d = tmpbuf;
-	  const char * const limit = tmpbuf + sizeof(tmpbuf) - 8;
-	  /* each *s can expand to 4 chars + "...\0",
-	     i.e. need room for 8 chars */
-	
-	  const char *s = SvPVX_const(sv);
-	  const char * const end = s + SvCUR(sv);
-	  for ( ; s < end && d < limit; s++ ) {
-	       int ch = *s & 0xFF;
-	       if (ch & 128 && !isPRINT_LC(ch)) {
-		    *d++ = 'M';
-		    *d++ = '-';
-		    ch &= 127;
-	       }
-	       if (ch == '\n') {
-		    *d++ = '\\';
-		    *d++ = 'n';
-	       }
-	       else if (ch == '\r') {
-		    *d++ = '\\';
-		    *d++ = 'r';
-	       }
-	       else if (ch == '\f') {
-		    *d++ = '\\';
-		    *d++ = 'f';
-	       }
-	       else if (ch == '\\') {
-		    *d++ = '\\';
-		    *d++ = '\\';
-	       }
-	       else if (ch == '\0') {
-		    *d++ = '\\';
-		    *d++ = '0';
-	       }
-	       else if (isPRINT_LC(ch))
-		    *d++ = ch;
-	       else {
-		    *d++ = '^';
-		    *d++ = toCTRL(ch);
-	       }
-	  }
-	  if (s < end) {
-	       *d++ = '.';
-	       *d++ = '.';
-	       *d++ = '.';
-	  }
-	  *d = '\0';
-	  pv = tmpbuf;
-    }
+     dsv = sv_2mortal(newSVpvs(""));
+     pv = sv_uni_display(dsv, sv, 10, 0);
 
     if (PL_op)
 	Perl_warner(aTHX_ packWARN(WARN_NUMERIC),
@@ -3466,15 +3415,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV *sstr, I32 flags)
     }
     else {
 	if (isGV_with_GP(sstr)) {
-	    /* This stringification rule for globs is spread in 3 places.
-	       This feels bad. FIXME.  */
-	    const U32 wasfake = sflags & SVf_FAKE;
-
-	    /* FAKE globs can get coerced, so need to turn this off
-	       temporarily if it is on.  */
-	    SvFAKE_off(sstr);
 	    gv_efullname4(dstr, (GV *)sstr, "*", TRUE);
-	    SvFLAGS(sstr) |= wasfake;
 	}
 	else
 	    (void)SvOK_off(dstr);
