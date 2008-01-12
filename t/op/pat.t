@@ -1046,7 +1046,8 @@ ok("\n\n" =~ m/\n* $ \n/x);
 
 ok("\n\n" =~ m/\n+ $ \n/x);
 
-ok([] =~ m/^ARRAY/, "ARRAYREF");
+eval { [] =~ m/^ARRAY/ };
+ok($@ =~ qr/Tried to stringify a reference/, " # TODO ");
 
 eval << 'EOE';
 \{

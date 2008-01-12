@@ -242,7 +242,7 @@ is($j[0], 1);
     my $output = runperl(prog => <<'EOPROG');
 package M;
 $| = 1;
-sub DESTROY {eval {die qq{Farewell $_[0]}}; print $@}
+sub DESTROY {eval {die qq{Farewell {dump::view($_[0])}}}; print $@}
 package main;
 
 bless \$A::B, q{M};

@@ -21,7 +21,6 @@ WriteMakefile(
     XSPROTOARG	=> '-noprototypes',	# XXX remove later?
     VERSION_FROM => 'POSIX.pm',
     realclean	=> {FILES=> 'const-c.inc const-xs.inc'},
-    PROXYSUBS => 1,
 );
 
 my @names =
