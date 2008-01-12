@@ -156,7 +156,7 @@ ok ! UNIVERSAL::can($b, "can");
 
 ok ! $a->can("export_tags");	# a method in Exporter
 
-ok ! UNIVERSAL::isa("\xff\xff\xff\0", 'HASH');
+ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
 
 {
     package Pickup;

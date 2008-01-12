@@ -119,12 +119,7 @@ sub ok ($@) {
 
 sub _q {
     my $x = shift;
-    return "GLOB('" . Symbol::glob_name($x) . ")" if ref \$x eq "GLOB";
-    return 'undef' unless defined $x;
-    my $q = $x;
-    $q =~ s/\\/\\\\/g;
-    $q =~ s/'/\\'/g;
-    return "'$q'";
+    return dump::view($x);
 }
 
 sub _qq {
@@ -171,12 +166,9 @@ sub is ($$@) {
         # undef only matches undef
         $pass = !defined $got && !defined $expected;
     }
-    elsif (ref \$got eq "GLOB") {
-        "GLOB('" . Symbol::glob_name($got) . ')';
-        $got = "GLOB('" . Symbol::glob_name($got) . ')';
-        $pass = 0;
-    } else {
-        $pass = $got eq $expected;
+    else {
+        local $@;
+        $pass = eval { $got eq $expected };
     }
 
     unless ($pass) {
@@ -776,6 +768,16 @@ WHOA
     }
 
     _ok( !$diag, _where(), $name );
+}
+
+sub dies_like(&$;$) {
+    my ($e, $qr, $name);
+    if (eval { $qr->(); 1; }) {
+        diag "didn't die";
+        return ok(0, $name);
+    }
+    my $err = $@;
+    return like_yn(1, $err, $qr );
 }
 
 1;

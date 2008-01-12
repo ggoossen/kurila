@@ -549,24 +549,6 @@ use utf8;
 "abcd\x{1234}" =~ m/(a)(b[c])(d+)?/i and print "ok\n";
 EXPECT
 ok
-########
-my $foo = Bar->new();
-my @dst;
-END {
-    ($_ = "@dst") =~ s/\(0x.+?\)/(0x...)/;
-    print $_, "\n";
-}
-package Bar;
-sub new {
-    my $self = bless [], 'Bar';
-    eval '$self';
-    return $self;
-}
-sub DESTROY { 
-    push @dst, "$_[0]";
-}
-EXPECT
-Bar=ARRAY(0x...)
 ######## (?{...}) compilation bounces on PL_rs
 -0
 {

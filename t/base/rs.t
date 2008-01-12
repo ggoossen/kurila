@@ -89,7 +89,7 @@ $bar = ~< *TESTFILE;
 if ($bar eq "78") {print "ok 10\n";} else {print "not ok 10\n";}
 
 # Naughty straight number - should get the rest of the file
-$/ = \0;
+$/ = undef;
 $bar = ~< *TESTFILE;
 if ($bar eq "90123456789012345678901234567890") {print "ok 11\n";} else {print "not ok 11\n";}
 

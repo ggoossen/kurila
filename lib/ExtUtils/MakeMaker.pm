@@ -558,12 +558,12 @@ END
 # This Makefile is for the $self->{NAME} extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# $VERSION (Revision: $Revision) from the contents of
+# {dump::view($VERSION)} (Revision: $Revision) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
 #
-#   MakeMaker ARGV: $argv
+#   MakeMaker ARGV: {dump::view($argv)}
 #
 #   MakeMaker Parameters:
 END

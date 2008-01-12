@@ -629,32 +629,29 @@ sub normalise_items
     my @new_items;
     foreach my $orig (@_) {
 	my ($name, $item);
-      if (ref $orig) {
-        # Make a copy which is a normalised version of the ref passed in.
-        $name = $orig->{name};
-        my ($type, $macro, $value) = @$orig{qw (type macro value)};
-        $type ||= $default_type;
-        $what->{$type} = 1;
-        $item = {name=>$name, type=>$type};
-
-        undef $macro if defined $macro and $macro eq $name;
-        $item->{macro} = $macro if defined $macro;
-        undef $value if defined $value and $value eq $name;
-        $item->{value} = $value if defined $value;
-        foreach my $key (qw(default pre post def_pre def_post weight
-			    not_constant)) {
-          my $value = $orig->{$key};
-          $item->{$key} = $value if defined $value;
-          # warn "$key $value";
+        if (ref $orig) {
+            # Make a copy which is a normalised version of the ref passed in.
+            $name = $orig->{name};
+            my ($type, $macro, $value) = @$orig{qw (type macro value)};
+            $type ||= $default_type;
+            $what->{$type} = 1;
+            $item = {name=>$name, type=>$type};
+            $item->{macro} = $macro if defined $macro and $macro ne $name;
+            $item->{value} = $value if defined $value and $value ne $name;
+            foreach my $key (qw(default pre post def_pre def_post weight
+                                not_constant)) {
+                my $value = $orig->{$key};
+                $item->{$key} = $value if defined $value;
+                # warn "$key $value";
+            }
+        } else {
+            $name = $orig;
+            $item = {name=>$name, type=>$default_type};
+            $what->{$default_type} = 1;
         }
-      } else {
-        $name = $orig;
-        $item = {name=>$name, type=>$default_type};
-        $what->{$default_type} = 1;
-      }
-      warn +(ref ($self) || $self)
-	. "doesn't know how to handle values of type $_ used in macro $name"
-	  unless $self->valid_type ($item->{type});
+        warn +(ref ($self) || $self)
+          . "doesn't know how to handle values of type $_ used in macro $name"
+            unless $self->valid_type ($item->{type});
 
         $item->{name} = $name;
         $items->{$name} = $item;

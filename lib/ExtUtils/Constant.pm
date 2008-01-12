@@ -430,25 +430,7 @@ sub WriteConstants {
       $ARGS{XS_FH} = $xs_fh;
       ExtUtils::Constant::ProxySubs->WriteConstants(%ARGS);
   } else {
-      my $types = {};
-
-      print $c_fh constant_types(); # macro defs
-      print $c_fh "\n";
-
-      # indent is still undef. Until anyone implements indent style rules with
-      # it.
-      foreach (ExtUtils::Constant::XS->C_constant({package => $ARGS{NAME},
-						   subname => $ARGS{C_SUBNAME},
-						   default_type =>
-						       $ARGS{DEFAULT_TYPE},
-						       types => $types,
-						       breakout =>
-						       $ARGS{BREAKOUT_AT}},
-						  @{$ARGS{NAMES}})) {
-	  print $c_fh $_, "\n"; # C constant subs
-      }
-      print $xs_fh XS_constant ($ARGS{NAME}, $types, $ARGS{XS_SUBNAME},
-				$ARGS{C_SUBNAME});
+      die "Ony ProxySubs are supported";
   }
 
   close $c_fh or warn "Error closing $ARGS{C_FILE}: $!" unless $ARGS{C_FH};
