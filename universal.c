@@ -1495,14 +1495,13 @@ XS(XS_dump_view)
 	    if (k == 0 || s + charlen > send ) {
 		/* invalid character escape: \x[XX] */
 		grow += 6;
-		s += 1;
+		charlen = 1;
 		continue;
 	    } else if (k > 127) {
 		/* 4: \x{} then count the number of hex digits.  */
 		grow += 4 + (k <= 0xFF ? 2 : k <= 0xFFF ? 3 : k <= 0xFFFF ? 4 : 8);
 	    } else if ( ! isPRINT(k) ) {
 		switch (*s) {
-		case '\v' : 
 		case '\t' : 
 		case '\r' :
 		case '\n' :
@@ -1544,7 +1543,6 @@ XS(XS_dump_view)
 		} else if ( ! isPRINT(k) ) {
 		    *r++ = '\\';
 		    switch (*s) {
-		    case '\v': *r++ = 'v';  break;
 		    case '\t': *r++ = 't';  break;
 		    case '\r': *r++ = 'r';  break;
 		    case '\n': *r++ = 'n';  break;
