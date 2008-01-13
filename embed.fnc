@@ -1538,9 +1538,9 @@ s	|char*	|stdize_locale	|NN char* locs
 s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 s	|SV*	|mess_alloc
 s	|const char *|vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args \
-				|NULLOK STRLEN *msglen|NULLOK I32* utf8
+				|NULLOK STRLEN *msglen
 s	|bool	|vdie_common	|NULLOK const char *message|STRLEN msglen\
-				|I32 utf8|bool warn
+				|bool warn
 sr	|char *	|write_no_mem
 #endif
 

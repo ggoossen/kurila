@@ -2221,9 +2221,7 @@
 #define pp_setpgrp		Perl_pp_setpgrp
 #define pp_setpriority		Perl_pp_setpriority
 #define pp_setstate		Perl_pp_setstate
-#define pp_sge			Perl_pp_sge
 #define pp_sgrent		Perl_pp_sgrent
-#define pp_sgt			Perl_pp_sgt
 #define pp_shift		Perl_pp_shift
 #define pp_shmctl		Perl_pp_shmctl
 #define pp_shmget		Perl_pp_shmget
@@ -2232,9 +2230,7 @@
 #define pp_shostent		Perl_pp_shostent
 #define pp_shutdown		Perl_pp_shutdown
 #define pp_sin			Perl_pp_sin
-#define pp_sle			Perl_pp_sle
 #define pp_sleep		Perl_pp_sleep
-#define pp_slt			Perl_pp_slt
 #define pp_smartmatch		Perl_pp_smartmatch
 #define pp_sne			Perl_pp_sne
 #define pp_snetent		Perl_pp_snetent
@@ -3786,8 +3782,8 @@
 #ifdef PERL_CORE
 #define closest_cop(a,b)	S_closest_cop(aTHX_ a,b)
 #define mess_alloc()		S_mess_alloc(aTHX)
-#define vdie_croak_common(a,b,c,d)	S_vdie_croak_common(aTHX_ a,b,c,d)
-#define vdie_common(a,b,c,d)	S_vdie_common(aTHX_ a,b,c,d)
+#define vdie_croak_common(a,b,c)	S_vdie_croak_common(aTHX_ a,b,c)
+#define vdie_common(a,b,c)	S_vdie_common(aTHX_ a,b,c)
 #define write_no_mem()		S_write_no_mem(aTHX)
 #endif
 #endif
@@ -4479,9 +4475,7 @@
 #define pp_setpgrp()		Perl_pp_setpgrp(aTHX)
 #define pp_setpriority()	Perl_pp_setpriority(aTHX)
 #define pp_setstate()		Perl_pp_setstate(aTHX)
-#define pp_sge()		Perl_pp_sge(aTHX)
 #define pp_sgrent()		Perl_pp_sgrent(aTHX)
-#define pp_sgt()		Perl_pp_sgt(aTHX)
 #define pp_shift()		Perl_pp_shift(aTHX)
 #define pp_shmctl()		Perl_pp_shmctl(aTHX)
 #define pp_shmget()		Perl_pp_shmget(aTHX)
@@ -4490,9 +4484,7 @@
 #define pp_shostent()		Perl_pp_shostent(aTHX)
 #define pp_shutdown()		Perl_pp_shutdown(aTHX)
 #define pp_sin()		Perl_pp_sin(aTHX)
-#define pp_sle()		Perl_pp_sle(aTHX)
 #define pp_sleep()		Perl_pp_sleep(aTHX)
-#define pp_slt()		Perl_pp_slt(aTHX)
 #define pp_smartmatch()		Perl_pp_smartmatch(aTHX)
 #define pp_sne()		Perl_pp_sne(aTHX)
 #define pp_snetent()		Perl_pp_snetent(aTHX)
