@@ -226,6 +226,7 @@ XS(XS_Symbol_fetch_glob);
 XS(XS_Symbol_stash);
 XS(XS_Symbol_glob_name);
 XS(XS_dump_view);
+XS(XS_error_new);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -293,6 +294,8 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXSproto("Symbol::stash", XS_Symbol_stash, file, "$");
 
     newXS("dump::view", XS_dump_view, file);
+    
+    newXS("error::new", XS_error_new, file);
 }
 
 
@@ -493,6 +496,43 @@ XS(XS_version_new)
 	}
 
 	rv = new_version(vs);
+	if ( strcmp(classname,"version") != 0 ) /* inherited new() */
+	    sv_bless(rv, gv_stashpv(classname, GV_ADD));
+
+	PUSHs(sv_2mortal(rv));
+	PUTBACK;
+	return;
+    }
+}
+
+XS(XS_error_new)
+{
+    dVAR;
+    dXSARGS;
+    PERL_UNUSED_ARG(cv);
+    if (items > 3)
+	Perl_croak(aTHX_ "Usage: version::new(class, version)");
+    SP -= items;
+    {
+        SV *vs = ST(1);
+	SV *rv;
+	const char * const classname =
+	    sv_isobject(ST(0)) /* get the class if called as an object method */
+		? HvNAME(SvSTASH(SvRV(ST(0))))
+		: (char *)SvPV_nolen(ST(0));
+
+	if ( items == 1 || vs == &PL_sv_undef ) { /* no param or explicit undef */
+	    /* create empty object */
+	    vs = sv_newmortal();
+	    sv_setpvn(vs,"",0);
+	}
+
+	rv = newSV(0);
+	SV * const hv = newSVrv(rv, "version"); 
+	(void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
+
+	(void)hv_stores((HV *)hv, "message", vs);
+
 	if ( strcmp(classname,"version") != 0 ) /* inherited new() */
 	    sv_bless(rv, gv_stashpv(classname, GV_ADD));
 
