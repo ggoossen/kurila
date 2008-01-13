@@ -1387,7 +1387,7 @@ Perl_vcroak(pTHX_ const char* pat, va_list *args)
 	JMPENV_JUMP(3);
     }
     else if (!message)
-	message = SvPVx_const(ERRSV, msglen);
+	message = SvPVx_const(ERRSV, &msglen);
 
     write_to_stderr(message, msglen);
     my_failure_exit();

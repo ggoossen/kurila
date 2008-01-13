@@ -704,7 +704,7 @@ Perl_nextargv(pTHX_ register GV *gv)
 	SAVEFREESV(sv);
 	sv_setsv(GvSVn(gv),sv);
 	SvSETMAGIC(GvSV(gv));
-	PL_oldname = SvPVx(GvSV(gv), oldlen);
+	PL_oldname = SvPVx(GvSV(gv), &oldlen);
 	if ( ! PL_inplace) {
 	    if (oldlen == 1 && *PL_oldname == '-') {
 		if (do_openn(gv,"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {

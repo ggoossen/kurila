@@ -2609,7 +2609,6 @@ PP(pp_entersub)
 
   retry:
     if (!CvROOT(cv) && !CvXSUB(cv)) {
-	GV* autogv;
 	SV* sub_name;
 
 	/* anonymous or undef'd function leaves us no recourse */
