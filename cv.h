@@ -149,7 +149,7 @@ Returns the stash of the CV.
 #define CVf_ISXSUB	0x0800	/* CV is an XSUB, not pure perl.  */
 
 /* This symbol for optimised communication between toke.c and op.c: */
-#define CVf_BUILTIN_ATTRS	(CVf_METHOD|CVf_LOCKED|CVf_LVALUE)
+#define CVf_BUILTIN_ATTRS	(CVf_METHOD|CVf_LOCKED)
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)
@@ -178,10 +178,6 @@ Returns the stash of the CV.
 #define CvLOCKED(cv)		(CvFLAGS(cv) & CVf_LOCKED)
 #define CvLOCKED_on(cv)		(CvFLAGS(cv) |= CVf_LOCKED)
 #define CvLOCKED_off(cv)	(CvFLAGS(cv) &= ~CVf_LOCKED)
-
-#define CvLVALUE(cv)		(CvFLAGS(cv) & CVf_LVALUE)
-#define CvLVALUE_on(cv)		(CvFLAGS(cv) |= CVf_LVALUE)
-#define CvLVALUE_off(cv)	(CvFLAGS(cv) &= ~CVf_LVALUE)
 
 #define CvEVAL(cv)		(CvUNIQUE(cv) && !SvFAKE(cv))
 #define CvEVAL_on(cv)		(CvUNIQUE_on(cv),SvFAKE_off(cv))

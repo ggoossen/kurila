@@ -491,13 +491,6 @@ and C<PUSHu>.
   } } STMT_END
 
 /*
-=for apidoc mU||LVRET
-True if this op will be the return value of an lvalue subroutine
-
-=cut */
-#define LVRET ((PL_op->op_private & OPpMAYBE_LVSUB) && is_lvalue_sub())
-
-/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4

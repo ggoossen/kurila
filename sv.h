@@ -1479,14 +1479,6 @@ Like C<sv_catsv> but doesn't process magic.
 =cut
 */
 
-/* Let us hope that bitmaps for UV and IV are the same */
-#define SvIV(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
-#define SvUV(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
-#define SvNV(sv) (SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv))
-
-#define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv_flags(sv, 0))
-#define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv_flags(sv, 0))
-
 /* ----*/
 
 #define SvPV(sv, lp) SvPV_flags(sv, lp, SV_GMAGIC)
@@ -1560,7 +1552,6 @@ Like C<sv_catsv> but doesn't process magic.
 #define SV_IMMEDIATE_UNREF	1
 #define SV_GMAGIC		2
 #define SV_COW_DROP_PV		4
-#define SV_UTF8_NO_ENCODING	8
 #define SV_NOSTEAL		16
 #define SV_CONST_RETURN		32
 #define SV_MUTABLE_RETURN	64
