@@ -4656,13 +4656,12 @@ Perl_yylex(pTHX)
 
 		/* Get the rest if it looks like a package qualifier */
 
-		if (*s == '\'' || (*s == ':' && s[1] == ':')) {
+		if (*s == ':' && s[1] == ':') {
 		    STRLEN morelen;
 		    s = scan_word(s, PL_tokenbuf + len, sizeof PL_tokenbuf - len,
 				  TRUE, &morelen);
 		    if (!morelen)
-			Perl_croak(aTHX_ "Bad name after %s%s", PL_tokenbuf,
-				*s == '\'' ? "'" : "::");
+			Perl_croak(aTHX_ "Bad name after %s::", PL_tokenbuf);
 		    len += morelen;
 		    pkgname = 1;
 		}
@@ -5853,7 +5852,7 @@ Perl_yylex(pTHX)
 		s = skipspace(s);
 #endif
 
-		if (isIDFIRST_lazy_if(s,UTF) || *s == '\'' ||
+		if (isIDFIRST_lazy_if(s,UTF) ||
 		    (*s == ':' && s[1] == ':'))
 		{
 #ifdef PERL_MAD
@@ -9728,11 +9727,6 @@ S_scan_word(pTHX_ register char *s, char *dest, STRLEN destlen, int allow_packag
 	    Perl_croak(aTHX_ ident_too_long);
 	if (isALNUM(*s))	/* UTF handled below */
 	    *d++ = *s++;
-	else if (allow_package && (*s == '\'') && isIDFIRST_lazy_if(s+1,UTF)) {
-	    *d++ = ':';
-	    *d++ = ':';
-	    s++;
-	}
 	else if (allow_package && (s[0] == ':') && (s[1] == ':') && (s[2] != '$')) {
 	    *d++ = *s++;
 	    *d++ = *s++;
@@ -9781,11 +9775,6 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 		Perl_croak(aTHX_ ident_too_long);
 	    if (isALNUM(*s))	/* UTF handled below */
 		*d++ = *s++;
-	    else if (*s == '\'' && isIDFIRST_lazy_if(s+1,UTF)) {
-		*d++ = ':';
-		*d++ = ':';
-		s++;
-	    }
 	    else if (*s == ':' && s[1] == ':') {
 		*d++ = *s++;
 		*d++ = *s++;

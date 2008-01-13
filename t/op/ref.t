@@ -160,7 +160,7 @@ is (join('', sort values %$anonhash2), 'BARXYZ');
 
 package MYHASH;
 
-$object = bless $main'anonhash2;
+$object = bless $main::anonhash2;
 main::is (ref $object, 'MYHASH');
 main::is ($object->{ABC}, 'XYZ');
 
@@ -184,7 +184,7 @@ sub mymethod {
 $string = "bad";
 $object = "foo";
 $string = "good";
-$main'anonhash2 = "foo";
+$main::anonhash2 = "foo";
 $string = "";
 
 DESTROY {
@@ -201,7 +201,7 @@ package OBJ;
 
 our @ISA = ('BASEOBJ');
 
-$main'object = bless {FOO => 'foo', BAR => 'bar'};
+$main::object = bless {FOO => 'foo', BAR => 'bar'};
 
 package main;
 
@@ -214,7 +214,7 @@ is ($object->doit("BAR"), 'bar');
 eval q{$foo = doit $object "FOO";};
 main::isnt (@$, 'foo');
 
-sub BASEOBJ'doit {
+sub BASEOBJ::doit {
     local $ref = shift;
     die "Not an OBJ" unless ref $ref eq 'OBJ';
     $ref->{shift()};
