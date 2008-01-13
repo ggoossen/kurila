@@ -1034,7 +1034,7 @@ Perl_do_kv(pTHX)
     const I32 dovalues = dokv || (PL_op->op_type == OP_VALUES);
 
     if (!hv) {
-	if (PL_op->op_flags & OPf_MOD || LVRET) {	/* lvalue */
+	if (PL_op->op_flags & OPf_MOD) {	/* lvalue */
 	    SV * const sv = sv_newmortal();
 	    sv_upgrade(sv, SVt_PVLV);
 	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);
@@ -1053,7 +1053,7 @@ Perl_do_kv(pTHX)
     if (gimme == G_SCALAR) {
 	IV i;
 
-	if (PL_op->op_flags & OPf_MOD || LVRET) {	/* lvalue */
+	if (PL_op->op_flags & OPf_MOD) {	/* lvalue */
 	    SV * const sv = sv_newmortal();
 	    sv_upgrade(sv, SVt_PVLV);
 	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);

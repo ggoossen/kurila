@@ -1,4 +1,13 @@
 
+/* Let us hope that bitmaps for UV and IV are the same */
+static __inline__ IV SvIV(SV *sv) { return SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv); }
+static __inline__ UV SvUV(SV *sv) { return SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv); }
+static __inline__ NV SvNV(SV *sv) { return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv); }
+
+#define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv_flags(sv, 0))
+#define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv_flags(sv, 0))
+
+
 static __inline__ IV SvIVx(SV *sv) { return SvIV(sv); }
 static __inline__ UV SvUVx(SV *sv) { return SvUV(sv); }
 static __inline__ NV SvNVx(SV *sv) { return SvNV(sv); }

@@ -1312,8 +1312,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 		cv = GvCV(kGVOP_gv);
 		if (!cv)
 		    goto restore_2cv;
-		if (CvLVALUE(cv))
-		    break;
 	    }
 	}
 	/* FALL THROUGH */
@@ -5305,26 +5303,19 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     if (!block)
 	goto done;
 
-    if (CvLVALUE(cv)) {
-	CvROOT(cv) = newUNOP(OP_LEAVESUBLV, 0,
-			     mod(scalarseq(block), OP_LEAVESUBLV));
-	block->op_attached = 1;
-    }
-    else {
-	/* This makes sub {}; work as expected.  */
-	if (block->op_type == OP_STUB) {
-	    OP* const newblock = newSTATEOP(0, NULL, 0);
+    /* This makes sub {}; work as expected.  */
+    if (block->op_type == OP_STUB) {
+	OP* const newblock = newSTATEOP(0, NULL, 0);
 #ifdef PERL_MAD
-	    op_getmad(block,newblock,'B');
+	op_getmad(block,newblock,'B');
 #else
-	    op_free(block);
+	op_free(block);
 #endif
-	    block = newblock;
-	}
-	else
-	    block->op_attached = 1;
-	CvROOT(cv) = newUNOP(OP_LEAVESUB, 0, scalarseq(block));
+	block = newblock;
     }
+    else
+	block->op_attached = 1;
+    CvROOT(cv) = newUNOP(OP_LEAVESUB, 0, scalarseq(block));
     CvROOT(cv)->op_private |= OPpREFCOUNTED;
     OpREFCNT_set(CvROOT(cv), 1);
     CvSTART(cv) = LINKLIST(CvROOT(cv));
@@ -6992,11 +6983,6 @@ OP *
 Perl_ck_return(pTHX_ OP *o)
 {
     dVAR;
-    if (CvLVALUE(PL_compcv)) {
-        OP *kid;
-	for (kid = cLISTOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
-	    mod(kid, OP_LEAVESUBLV);
-    }
     return o;
 }
 

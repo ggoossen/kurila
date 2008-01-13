@@ -5,7 +5,7 @@
 package main;
 require './test.pl';
 
-plan( tests => 31 );
+plan( tests => 30 );
 
 my($x);
 
@@ -53,8 +53,6 @@ for (qw(getc pos readline readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f)) {
 our ($y, $fh);
 
 eval q# sub f ($) { } f $x / 2; #;
-is( $@, '' );
-eval q# sub f ($):lvalue { $y } f $x /= 2; #;
 is( $@, '' );
 eval q# sub f ($) { } f $x /2; #;
 is( $@, '' );
