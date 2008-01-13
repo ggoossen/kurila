@@ -20,11 +20,11 @@ our (@a, @b);
     map scalar(sort(+())), ('')x68;
 }
 
-sub Backwards { $a lt $b ? 1 : $a gt $b ? -1 : 0 }
-sub Backwards_stacked($$) { my($a,$b) = @_; $a lt $b ? 1 : $a gt $b ? -1 : 0 }
-sub Backwards_other { $a lt $b ? 1 : $a gt $b ? -1 : 0 }
+sub Backwards { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
+sub Backwards_stacked($$) { my($x,$y) = @_; ($x cmp $y) +< 0 ? 1 : ($x cmp $y) +> 0 ? -1 : 0 }
+sub Backwards_other { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
 
-my $upperfirst = 'A' lt 'a';
+my $upperfirst = 'A' cmp 'a' +< 0;
 
 # Beware: in future this may become hairier because of possible
 # collation complications: qw(A a B b) can be sorted at least as

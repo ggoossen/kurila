@@ -117,10 +117,6 @@ EXTCONST char* const PL_op_name[] = {
 	"i_ne",
 	"ncmp",
 	"i_ncmp",
-	"slt",
-	"sgt",
-	"sle",
-	"sge",
 	"seq",
 	"sne",
 	"scmp",
@@ -481,10 +477,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"integer ne (!=)",
 	"numeric comparison (<+>)",
 	"integer comparison (<+>)",
-	"string lt",
-	"string gt",
-	"string le",
-	"string ge",
 	"string eq",
 	"string ne",
 	"string comparison (cmp)",
@@ -857,10 +849,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_i_ne),
 	MEMBER_TO_FPTR(Perl_pp_ncmp),
 	MEMBER_TO_FPTR(Perl_pp_i_ncmp),
-	MEMBER_TO_FPTR(Perl_pp_sle),	/* Perl_pp_slt */
-	MEMBER_TO_FPTR(Perl_pp_sle),	/* Perl_pp_sgt */
-	MEMBER_TO_FPTR(Perl_pp_sle),
-	MEMBER_TO_FPTR(Perl_pp_sle),	/* Perl_pp_sge */
 	MEMBER_TO_FPTR(Perl_pp_seq),
 	MEMBER_TO_FPTR(Perl_pp_sne),
 	MEMBER_TO_FPTR(Perl_pp_scmp),
@@ -1230,10 +1218,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_ne */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* ncmp */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_ncmp */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* slt */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* sgt */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* sle */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* sge */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* seq */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* sne */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* scmp */
@@ -1597,10 +1581,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00022416,	/* i_ne */
 	0x0002243e,	/* ncmp */
 	0x0002241e,	/* i_ncmp */
-	0x00022416,	/* slt */
-	0x00022416,	/* sgt */
-	0x00022416,	/* sle */
-	0x00022416,	/* sge */
 	0x00022416,	/* seq */
 	0x00022416,	/* sne */
 	0x0002241e,	/* scmp */

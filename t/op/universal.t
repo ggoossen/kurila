@@ -120,11 +120,7 @@ is $@, '';
 my $subs = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} } keys %UNIVERSAL::;
 ## The test for import here is *not* because we want to ensure that UNIVERSAL
 ## can always import; it is an historical accident that UNIVERSAL can import.
-if ('a' lt 'A') {
-    is $subs, "can import isa DOES VERSION";
-} else {
-    is $subs, "DOES VERSION can import isa";
-}
+is $subs, "DOES VERSION can import isa";
 
 ok $a->isa("UNIVERSAL");
 
@@ -143,11 +139,7 @@ ok $a->isa("UNIVERSAL");
 
 my $sub2 = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} } keys %UNIVERSAL::;
 # XXX import being here is really a bug
-if ('a' lt 'A') {
-    is $sub2, "can import isa DOES VERSION";
-} else {
-    is $sub2, "DOES VERSION can import isa";
-}
+is $sub2, "DOES VERSION can import isa";
 
 eval 'sub UNIVERSAL::sleep {}';
 ok $a->can("sleep");

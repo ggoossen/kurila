@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 108;
+use Test::More tests => 103;
 
 # The behaviour of the feature pragma should be tested by lib/switch.t
 # using the tests in t/lib/switch/*. This file tests the behaviour of
@@ -318,79 +318,6 @@ sub check_outside1 { is($_, "outside", "\$_ lexically scoped") }
 	when ($_ +>= 20) { $ok = "twenty" }
 	when ($_ +>= 10) { $ok = "ten" }
 	default         { $ok = "default" }
-    }
-    is($ok, "twenty", $test);
-}
-
-
-{
-    my $test = "explicit string comparison (lt)";
-    my $twenty_five = "25";
-    my $ok;
-    given($twenty_five) {
-	when ($_ lt "10") { $ok = "ten" }
-	when ($_ lt "20") { $ok = "twenty" }
-	when ($_ lt "30") { $ok = "thirty" }
-	when ($_ lt "40") { $ok = "forty" }
-	default           { $ok = "default" }
-    }
-    is($ok, "thirty", $test);
-}
-
-{
-    my $test = "explicit string comparison (le)";
-    my $twenty_five = "25";
-    my $ok;
-    given($twenty_five) {
-	when ($_ le "10") { $ok = "ten" }
-	when ($_ le "20") { $ok = "twenty" }
-	when ($_ le "30") { $ok = "thirty" }
-	when ($_ le "40") { $ok = "forty" }
-	default           { $ok = "default" }
-    }
-    is($ok, "thirty", $test);
-}
-
-{
-    my $test = "explicit string comparison (gt)";
-    my $twenty_five = 25;
-    my $ok;
-    given($twenty_five) {
-	when ($_ ge "40") { $ok = "forty" }
-	when ($_ ge "30") { $ok = "thirty" }
-	when ($_ ge "20") { $ok = "twenty" }
-	when ($_ ge "10") { $ok = "ten" }
-	default           { $ok = "default" }
-    }
-    is($ok, "twenty", $test);
-}
-
-{
-    my $test = "explicit string comparison (ge)";
-    my $twenty_five = 25;
-    my $ok;
-    given($twenty_five) {
-	when ($_ ge "40") { $ok = "forty" }
-	when ($_ ge "30") { $ok = "thirty" }
-	when ($_ ge "20") { $ok = "twenty" }
-	when ($_ ge "10") { $ok = "ten" }
-	default           { $ok = "default" }
-    }
-    is($ok, "twenty", $test);
-}
-
-# Make sure it still works with a lexical $_:
-{
-    my $_;
-    my $test = "explicit comparison with lexical \$_";
-    my $twenty_five = 25;
-    my $ok;
-    given($twenty_five) {
-	when ($_ ge "40") { $ok = "forty" }
-	when ($_ ge "30") { $ok = "thirty" }
-	when ($_ ge "20") { $ok = "twenty" }
-	when ($_ ge "10") { $ok = "ten" }
-	default           { $ok = "default" }
     }
     is($ok, "twenty", $test);
 }

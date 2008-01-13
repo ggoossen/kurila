@@ -1602,7 +1602,7 @@ S_not_a_number(pTHX_ SV *sv)
      const char *pv;
 
      dsv = sv_2mortal(newSVpvs(""));
-     pv = sv_uni_display(dsv, sv, 10, 0);
+     pv = sv_uni_display(dsv, sv, 10, UNI_DISPLAY_QQ);
 
     if (PL_op)
 	Perl_warner(aTHX_ packWARN(WARN_NUMERIC),

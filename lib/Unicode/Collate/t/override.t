@@ -10,7 +10,7 @@ BEGIN {
     }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 76 };
 
 use strict;
@@ -32,11 +32,11 @@ my $all_undef_8 = Unicode::Collate->new(
 # All in the Unicode code point order.
 # No hangul decomposition.
 
-ok($all_undef_8->lt("\x{3402}", "\x{4E00}"));
-ok($all_undef_8->lt("\x{4DFF}", "\x{4E00}"));
-ok($all_undef_8->lt("\x{4E00}", "\x{AC00}"));
-ok($all_undef_8->gt("\x{AC00}", "\x{1100}\x{1161}"));
-ok($all_undef_8->gt("\x{AC00}", "\x{ABFF}"));
+is($all_undef_8->cmp("\x{3402}", "\x{4E00}"), -1);
+is($all_undef_8->cmp("\x{4DFF}", "\x{4E00}"), -1);
+is($all_undef_8->cmp("\x{4E00}", "\x{AC00}"), -1);
+is($all_undef_8->cmp("\x{AC00}", "\x{1100}\x{1161}"), 1);
+is($all_undef_8->cmp("\x{AC00}", "\x{ABFF}"), 1);
 
 
 ##### 7..11
@@ -52,11 +52,11 @@ my $all_undef_9 = Unicode::Collate->new(
 # CJK Ideo. < CJK ext A/B < Others.
 # No hangul decomposition.
 
-ok($all_undef_9->lt("\x{4E00}", "\x{3402}"));
-ok($all_undef_9->lt("\x{3402}", "\x{20000}"));
-ok($all_undef_9->lt("\x{20000}", "\x{AC00}"));
-ok($all_undef_9->gt("\x{AC00}", "\x{1100}\x{1161}"));
-ok($all_undef_9->gt("\x{AC00}", "\x{ABFF}")); # U+ABFF: not assigned
+is($all_undef_9->cmp("\x{4E00}", "\x{3402}"), -1);
+is($all_undef_9->cmp("\x{3402}", "\x{20000}"), -1);
+is($all_undef_9->cmp("\x{20000}", "\x{AC00}"), -1);
+is($all_undef_9->cmp("\x{AC00}", "\x{1100}\x{1161}"), 1);
+is($all_undef_9->cmp("\x{AC00}", "\x{ABFF}"), 1); # U+ABFF: not assigned
 
 ##### 12..16
 
@@ -72,10 +72,10 @@ ENTRIES
 # All Hangul Syllables except U+AE00 are ignored.
 
 ok($ignoreHangul->eq("\x{AC00}", ""));
-ok($ignoreHangul->lt("\x{AC00}", "\0"));
-ok($ignoreHangul->lt("\x{AC00}", "\x{AE00}"));
-ok($ignoreHangul->lt("\x{AC00}", "\x{1100}\x{1161}")); # Jamo are not ignored.
-ok($ignoreHangul->lt("Pe\x{AE00}rl", "Perl")); # 'r' is unassigned.
+is($ignoreHangul->cmp("\x{AC00}", "\0"), -1);
+is($ignoreHangul->cmp("\x{AC00}", "\x{AE00}"), -1);
+is($ignoreHangul->cmp("\x{AC00}", "\x{1100}\x{1161}"), -1); # Jamo are not ignored.
+is($ignoreHangul->cmp("Pe\x{AE00}rl", "Perl"), -1); # 'r' is unassigned.
 
 
 my $ignoreCJK = Unicode::Collate->new(
@@ -91,10 +91,10 @@ ENTRIES
 
 ##### 17..21
 ok($ignoreCJK->eq("\x{4E00}", ""));
-ok($ignoreCJK->lt("\x{4E00}", "\0"));
+is($ignoreCJK->cmp("\x{4E00}", "\0"), -1);
 ok($ignoreCJK->eq("Pe\x{4E00}rl", "Perl")); # U+4E00 is a CJK.
-ok($ignoreCJK->gt("\x{4DFF}", "\x{4E00}")); # U+4DFF is not CJK.
-ok($ignoreCJK->lt("Pe\x{5B57}rl", "Perl")); # 'r' is unassigned.
+is($ignoreCJK->cmp("\x{4DFF}", "\x{4E00}"), 1); # U+4DFF is not CJK.
+is($ignoreCJK->cmp("Pe\x{5B57}rl", "Perl"), -1); # 'r' is unassigned.
 
 ##### 22..29
 ok($ignoreCJK->eq("\x{3400}", ""));
@@ -102,7 +102,7 @@ ok($ignoreCJK->eq("\x{4DB5}", ""));
 ok($ignoreCJK->eq("\x{9FA5}", ""));
 ok($ignoreCJK->eq("\x{9FA6}", "")); # UI since Unicode 4.1.0
 ok($ignoreCJK->eq("\x{9FBB}", "")); # UI since Unicode 4.1.0
-ok($ignoreCJK->gt("\x{9FBC}", "Perl"));
+is($ignoreCJK->cmp("\x{9FBC}", "Perl"), 1);
 ok($ignoreCJK->eq("\x{20000}", ""));
 ok($ignoreCJK->eq("\x{2A6D6}", ""));
 
@@ -111,9 +111,9 @@ $ignoreCJK->change(UCA_Version => 9);
 ok($ignoreCJK->eq("\x{3400}", ""));
 ok($ignoreCJK->eq("\x{4DB5}", ""));
 ok($ignoreCJK->eq("\x{9FA5}", ""));
-ok($ignoreCJK->gt("\x{9FA6}", "Perl"));
-ok($ignoreCJK->gt("\x{9FBB}", "Perl"));
-ok($ignoreCJK->gt("\x{9FBC}", "Perl"));
+is($ignoreCJK->cmp("\x{9FA6}", "Perl"), 1);
+is($ignoreCJK->cmp("\x{9FBB}", "Perl"), 1);
+is($ignoreCJK->cmp("\x{9FBC}", "Perl"), 1);
 ok($ignoreCJK->eq("\x{20000}", ""));
 ok($ignoreCJK->eq("\x{2A6D6}", ""));
 
@@ -122,9 +122,9 @@ $ignoreCJK->change(UCA_Version => 8);
 ok($ignoreCJK->eq("\x{3400}", ""));
 ok($ignoreCJK->eq("\x{4DB5}", ""));
 ok($ignoreCJK->eq("\x{9FA5}", ""));
-ok($ignoreCJK->gt("\x{9FA6}", "Perl"));
-ok($ignoreCJK->gt("\x{9FBB}", "Perl"));
-ok($ignoreCJK->gt("\x{9FBC}", "Perl"));
+is($ignoreCJK->cmp("\x{9FA6}", "Perl"), 1);
+is($ignoreCJK->cmp("\x{9FBB}", "Perl"), 1);
+is($ignoreCJK->cmp("\x{9FBC}", "Perl"), 1);
 ok($ignoreCJK->eq("\x{20000}", ""));
 ok($ignoreCJK->eq("\x{2A6D6}", ""));
 
@@ -135,7 +135,7 @@ ok($ignoreCJK->eq("\x{4DB5}", ""));
 ok($ignoreCJK->eq("\x{9FA5}", ""));
 ok($ignoreCJK->eq("\x{9FA6}", "")); # UI since Unicode 4.1.0
 ok($ignoreCJK->eq("\x{9FBB}", "")); # UI since Unicode 4.1.0
-ok($ignoreCJK->gt("\x{9FBC}", "Perl"));
+is($ignoreCJK->cmp("\x{9FBC}", "Perl"), 1);
 ok($ignoreCJK->eq("\x{20000}", ""));
 ok($ignoreCJK->eq("\x{2A6D6}", ""));
 
@@ -154,34 +154,34 @@ ENTRIES
   },
 );
 
-ok($overCJK->lt("a", "A")); # diff. at level 3.
-ok($overCJK->lt( "\x{4E03}",  "\x{4E00}")); # diff. at level 2.
-ok($overCJK->lt("A\x{4E03}", "A\x{4E00}"));
-ok($overCJK->lt("A\x{4E03}", "a\x{4E00}"));
-ok($overCJK->lt("a\x{4E03}", "A\x{4E00}"));
+is($overCJK->cmp("a", "A"), -1); # diff. at level 3.
+is($overCJK->cmp( "\x{4E03}",  "\x{4E00}"), -1); # diff. at level 2.
+is($overCJK->cmp("A\x{4E03}", "A\x{4E00}"), -1);
+is($overCJK->cmp("A\x{4E03}", "a\x{4E00}"), -1);
+is($overCJK->cmp("a\x{4E03}", "A\x{4E00}"), -1);
 
-ok($overCJK->gt("a\x{3400}", "A\x{4DB5}"));
-ok($overCJK->gt("a\x{4DB5}", "A\x{9FA5}"));
-ok($overCJK->gt("a\x{9FA5}", "A\x{9FA6}"));
-ok($overCJK->gt("a\x{9FA6}", "A\x{9FBB}"));
-ok($overCJK->lt("a\x{9FBB}", "A\x{9FBC}"));
-ok($overCJK->lt("a\x{9FBC}", "A\x{9FBF}"));
+is($overCJK->cmp("a\x{3400}", "A\x{4DB5}"), 1);
+is($overCJK->cmp("a\x{4DB5}", "A\x{9FA5}"), 1);
+is($overCJK->cmp("a\x{9FA5}", "A\x{9FA6}"), 1);
+is($overCJK->cmp("a\x{9FA6}", "A\x{9FBB}"), 1);
+is($overCJK->cmp("a\x{9FBB}", "A\x{9FBC}"), -1);
+is($overCJK->cmp("a\x{9FBC}", "A\x{9FBF}"), -1);
 
 $overCJK->change(UCA_Version => 9);
 
-ok($overCJK->gt("a\x{3400}", "A\x{4DB5}"));
-ok($overCJK->gt("a\x{4DB5}", "A\x{9FA5}"));
-ok($overCJK->lt("a\x{9FA5}", "A\x{9FA6}"));
-ok($overCJK->lt("a\x{9FA6}", "A\x{9FBB}"));
-ok($overCJK->lt("a\x{9FBB}", "A\x{9FBC}"));
-ok($overCJK->lt("a\x{9FBC}", "A\x{9FBF}"));
+is($overCJK->cmp("a\x{3400}", "A\x{4DB5}"), 1);
+is($overCJK->cmp("a\x{4DB5}", "A\x{9FA5}"), 1);
+is($overCJK->cmp("a\x{9FA5}", "A\x{9FA6}"), -1);
+is($overCJK->cmp("a\x{9FA6}", "A\x{9FBB}"), -1);
+is($overCJK->cmp("a\x{9FBB}", "A\x{9FBC}"), -1);
+is($overCJK->cmp("a\x{9FBC}", "A\x{9FBF}"), -1);
 
 $overCJK->change(UCA_Version => 14);
 
-ok($overCJK->gt("a\x{3400}", "A\x{4DB5}"));
-ok($overCJK->gt("a\x{4DB5}", "A\x{9FA5}"));
-ok($overCJK->gt("a\x{9FA5}", "A\x{9FA6}"));
-ok($overCJK->gt("a\x{9FA6}", "A\x{9FBB}"));
-ok($overCJK->lt("a\x{9FBB}", "A\x{9FBC}"));
-ok($overCJK->lt("a\x{9FBC}", "A\x{9FBF}"));
+is($overCJK->cmp("a\x{3400}", "A\x{4DB5}"), 1);
+is($overCJK->cmp("a\x{4DB5}", "A\x{9FA5}"), 1);
+is($overCJK->cmp("a\x{9FA5}", "A\x{9FA6}"), 1);
+is($overCJK->cmp("a\x{9FA6}", "A\x{9FBB}"), 1);
+is($overCJK->cmp("a\x{9FBB}", "A\x{9FBC}"), -1);
+is($overCJK->cmp("a\x{9FBC}", "A\x{9FBF}"), -1);
 

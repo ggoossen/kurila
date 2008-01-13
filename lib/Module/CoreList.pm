@@ -105,7 +105,7 @@ sub first_release_raw {
 
     my @perls = $version
         ? grep { exists $version{$_}{ $module } &&
-                        $version{$_}{ $module } ge $version } keys %version
+                        $version{$_}{ $module } +>= $version } keys %version
         : grep { exists $version{$_}{ $module }             } keys %version;
 
     return @perls;

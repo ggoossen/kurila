@@ -32,7 +32,7 @@ like( $@, qr/Too many decimal points/ );
 # See if the things Camel-III says are true: 29..33
 
 # Chapter 28, pp671
-ok(v5.6.0 lt v5.7.0, "v5.6.0 lt v5.7.0");
+is(v5.6.0 cmp v5.7.0, -1, "v5.6.0 cmp v5.7.0");
 
 # part of 20000323.059
 is(v200, +v200,         "v200 eq +v200"         );

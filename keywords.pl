@@ -113,7 +113,6 @@ flock
 for
 foreach
 fork
-ge
 getc
 getgrent
 getgrgid
@@ -145,7 +144,6 @@ glob
 gmtime
 goto
 grep
-gt
 hex
 if
 index
@@ -157,7 +155,6 @@ kill
 last
 lc
 lcfirst
-le
 length
 link
 listen
@@ -166,7 +163,6 @@ localtime
 lock
 log
 lstat
-lt
 m
 map
 mkdir

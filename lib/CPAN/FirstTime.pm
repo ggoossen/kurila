@@ -838,7 +838,7 @@ Shall we use it as the general CPAN build and cache directory?
             unless ($matcher) {
                 # we really don't need ncftp if we have ncftpget, but
                 # if they chose this dialog via matcher, they shall have it
-                next if $progname eq "ncftp" && $CPAN::Config->{ncftpget} gt " ";
+                next if $progname eq "ncftp" && ($CPAN::Config->{ncftpget} cmp " ") +> 0;
             }
             my $path = $CPAN::Config->{$progname}
                 || $Config::Config{$progname}

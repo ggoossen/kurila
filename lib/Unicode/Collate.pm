@@ -739,10 +739,6 @@ sub getSortKey
 sub cmp { $_[0]->getSortKey($_[1]) cmp $_[0]->getSortKey($_[2]) }
 sub eq  { $_[0]->getSortKey($_[1]) eq  $_[0]->getSortKey($_[2]) }
 sub ne  { $_[0]->getSortKey($_[1]) ne  $_[0]->getSortKey($_[2]) }
-sub lt  { $_[0]->getSortKey($_[1]) lt  $_[0]->getSortKey($_[2]) }
-sub le  { $_[0]->getSortKey($_[1]) le  $_[0]->getSortKey($_[2]) }
-sub gt  { $_[0]->getSortKey($_[1]) gt  $_[0]->getSortKey($_[2]) }
-sub ge  { $_[0]->getSortKey($_[1]) ge  $_[0]->getSortKey($_[2]) }
 
 ##
 ## list[strings] sorted = sort(list[strings] arg)

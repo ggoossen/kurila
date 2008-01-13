@@ -11,7 +11,7 @@ BEGIN {
     }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 17 };
 
 use strict;
@@ -51,27 +51,27 @@ ok(1);
 
 no warnings 'utf8';
 
-ok("\x{206F}!" lt "\x{D800}!");
-ok(pack('U*', 0x206F, 0x21) lt pack('U*', 0xD800, 0x21));
+is("\x{206F}!" cmp "\x{D800}!", -1);
+is(pack('U*', 0x206F, 0x21) cmp pack('U*', 0xD800, 0x21), -1);
 
-ok("\x{D800}!" lt "\x{DFFF}!");
-ok(pack('U*', 0xD800, 0x21) lt pack('U*', 0xDFFF, 0x21));
+is("\x{D800}!" cmp "\x{DFFF}!", -1);
+is(pack('U*', 0xD800, 0x21) cmp pack('U*', 0xDFFF, 0x21), -1);
 
-ok("\x{DFFF}!" lt "\x{FDD0}!");
-ok(pack('U*', 0xDFFF, 0x21) lt pack('U*', 0xFDD0, 0x21) );
+is("\x{DFFF}!" cmp "\x{FDD0}!", -1);
+is(pack('U*', 0xDFFF, 0x21) cmp pack('U*', 0xFDD0, 0x21), -1 );
 
-ok("\x{FDD0}!" lt "\x{FFFB}!");
-ok(pack('U*', 0xFDD0, 0x21) lt pack('U*', 0xFFFB, 0x21));
+is("\x{FDD0}!" cmp "\x{FFFB}!", -1);
+is(pack('U*', 0xFDD0, 0x21) cmp pack('U*', 0xFFFB, 0x21), -1);
 
-ok("\x{FFFB}!" lt "\x{FFFE}!");
-ok(pack('U*', 0xFFFB, 0x21) lt pack('U*', 0xFFFE, 0x21));
+is("\x{FFFB}!" cmp "\x{FFFE}!", -1);
+is(pack('U*', 0xFFFB, 0x21) cmp pack('U*', 0xFFFE, 0x21), -1);
 
-ok("\x{FFFE}!" lt "\x{FFFF}!");
-ok(pack('U*', 0xFFFE, 0x21) lt pack('U*', 0xFFFF, 0x21));
+is("\x{FFFE}!" cmp "\x{FFFF}!", -1);
+is(pack('U*', 0xFFFE, 0x21) cmp pack('U*', 0xFFFF, 0x21), -1);
 
-ok("\x{FFFF}!" lt "\x{1D165}!");
-ok(pack('U*', 0xFFFF, 0x21) lt pack('U*', 0x1D165, 0x21));
+is("\x{FFFF}!" cmp "\x{1D165}!", -1);
+is(pack('U*', 0xFFFF, 0x21) cmp pack('U*', 0x1D165, 0x21), -1);
 
-ok("\000!" lt "\x{FFFF}!");
-ok(pack('U*', 0, 0x21) lt pack('U*', 0xFFFF, 0x21));
+is("\000!" cmp "\x{FFFF}!", -1);
+is(pack('U*', 0, 0x21) cmp pack('U*', 0xFFFF, 0x21), -1);
 

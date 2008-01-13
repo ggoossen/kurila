@@ -1256,22 +1256,17 @@ SKIP: {
 	    print "ok $test\n"; $test++;
 	}
 	print "# IsASCII\n";
-	if (ord("A") == 193) {
-	    print "ok $test # Skip: in EBCDIC\n"; $test++;
-	    print "ok $test # Skip: in EBCDIC\n"; $test++;
-	} else {
-	    if ($code le '00007f') {
-		print "not " unless $char =~ m/\p{IsASCII}/;
-		print "ok $test\n"; $test++;
-		print "not " if     $char =~ m/\P{IsASCII}/;
-		print "ok $test\n"; $test++;
-	    } else {
-		print "not " if     $char =~ m/\p{IsASCII}/;
-		print "ok $test\n"; $test++;
-		print "not " unless $char =~ m/\P{IsASCII}/;
-		print "ok $test\n"; $test++;
-	    }
-	}
+        if (($code cmp '00007f') +<= 0) {
+            print "not " unless $char =~ m/\p{IsASCII}/;
+            print "ok $test\n"; $test++;
+            print "not " if     $char =~ m/\P{IsASCII}/;
+            print "ok $test\n"; $test++;
+        } else {
+            print "not " if     $char =~ m/\p{IsASCII}/;
+            print "ok $test\n"; $test++;
+            print "not " unless $char =~ m/\P{IsASCII}/;
+            print "ok $test\n"; $test++;
+        }
 	print "# IsCntrl\n";
 	if ($class =~ m/^C/) {
 	    print "not " unless $char =~ m/\p{IsCntrl}/;
