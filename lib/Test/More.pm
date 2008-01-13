@@ -334,8 +334,6 @@ sub isnt ($$;$) {
     $tb->isnt_eq(@_);
 }
 
-*isn't = \&isnt;
-
 
 =item B<like>
 

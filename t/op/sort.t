@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 143 );
+plan( tests => 142 );
 
 our (@a, @b);
 
@@ -24,7 +24,7 @@ sub Backwards { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
 sub Backwards_stacked($$) { my($x,$y) = @_; ($x cmp $y) +< 0 ? 1 : ($x cmp $y) +> 0 ? -1 : 0 }
 sub Backwards_other { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
 
-my $upperfirst = 'A' cmp 'a' +< 0;
+my $upperfirst = ('A' cmp 'a') +< 0;
 
 # Beware: in future this may become hairier because of possible
 # collation complications: qw(A a B b) can be sorted at least as
@@ -149,11 +149,6 @@ ok(($@ eq "" && "@b" eq "1 4 5 9"),'redefinition should not take effect during t
 }
 eval { @b = sort twoface 4,1 };
 cmp_ok(substr($@,0,4), 'eq', 'good', 'twoface eval');
-
-eval <<'CODE';
-    my @result = sort main'Backwards 'one', 'two';
-CODE
-cmp_ok($@,'eq','',q(old skool package));
 
 eval <<'CODE';
     # "sort 'one', 'two'" should not try to parse "'one" as a sort sub
