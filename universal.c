@@ -1477,7 +1477,7 @@ XS(XS_dump_view)
 	const char * const send = src + SvCUR(sv);
 	const char *s;
 
-	STRLEN j, cur = 0;
+	STRLEN j = 0;
 	/* Could count 128-255 and 256+ in two variables, if we want to
 	   be like &qquote and make a distinction.  */
 	STRLEN grow = 0;	/* bytes needed to represent chars 128+ */
@@ -1523,15 +1523,15 @@ XS(XS_dump_view)
 	}
 	if (single_quotes || grow) {
 	    /* We have something needing hex. 3 is ""\0 */
+	    STRLEN charlen;
 	    sv_grow(retsv, 3 + grow + 2*backslashes + single_quotes
 		    + 2*qq_escapables + normal);
 	    rstart = r = SvPVX(retsv);
 
 	    *r++ = '"';
 
-	    STRLEN charlen;
 	    for (s = src; s < send; s += charlen) {
-		const UV k = utf8_to_uvchr((U8*)s, &charlen);
+		const UV k = utf8_to_uvchr(s, &charlen);
 
 		if (k == 0 || s + charlen > send ) {
 		    /* invalid character */

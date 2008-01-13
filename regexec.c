@@ -2619,6 +2619,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		while ( state && uc <= PL_regeol ) {
                     U32 base = trie->states[ state ].trans.base;
                     U16 charid;
+		    U8 uvc = 0;
                     /* We use charid to hold the wordnum as we don't use it
                        for charid until after we have done the wordnum logic. 
                        We define an alias just so that the wordnum logic reads
@@ -2667,7 +2668,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			            (UV)state, (UV)ST.accepted );
 		    });
 
-                    U8 uvc = 0;
 		    if ( base ) {
                                                       
 			uvc = (U8)*uc;

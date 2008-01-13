@@ -1637,7 +1637,7 @@ PP(pp_send)
 	const int flags = SvIVx(*++MARK);
 	if (SP > MARK) {
 	    STRLEN mlen;
-	    char * const sockbuf = SvPVx(*++MARK, mlen);
+	    char * const sockbuf = SvPVx(*++MARK, &mlen);
 	    retval = PerlSock_sendto(PerlIO_fileno(IoIFP(io)), buffer, blen,
 				     flags, (struct sockaddr *)sockbuf, mlen);
 	}

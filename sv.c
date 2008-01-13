@@ -1598,7 +1598,6 @@ S_not_a_number(pTHX_ SV *sv)
 {
      dVAR;
      SV *dsv;
-     char tmpbuf[64];
      const char *pv;
 
      dsv = sv_2mortal(newSVpvs(""));

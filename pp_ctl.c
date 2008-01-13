@@ -907,7 +907,7 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 	    POPBLOCK(cx,PL_curpm);
 	    if (CxTYPE(cx) != CXt_EVAL) {
 		if (!message)
-		    message = SvPVx_const(ERRSV, msglen);
+		    message = SvPVx_const(ERRSV, &msglen);
 		PerlIO_write(Perl_error_log, (const char *)"panic: die ", 11);
 		PerlIO_write(Perl_error_log, message, msglen);
 		my_exit(1);
@@ -939,7 +939,7 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 	}
     }
     if (!message)
-	message = SvPVx_const(ERRSV, msglen);
+	message = SvPVx_const(ERRSV, &msglen);
 
     write_to_stderr(message, msglen);
     my_failure_exit();
@@ -1682,7 +1682,6 @@ PP(pp_goto)
 	    I32 oldsave;
 	    bool reified = 0;
 
-	retry:
 	    if (!CvROOT(cv) && !CvXSUB(cv)) {
 		const GV * const gv = CvGV(cv);
 		if (gv) {
@@ -2433,7 +2432,6 @@ PP(pp_require)
     SV *filter_state = NULL;
     SV *filter_sub = NULL;
     SV *hook_sv = NULL;
-    SV *encoding;
     OP *op;
 
     sv = POPs;
