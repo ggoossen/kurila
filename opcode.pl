@@ -671,10 +671,6 @@ i_ne		integer ne (!=)		ck_null		ifs2	S S
 ncmp		numeric comparison (<+>)	ck_null		Iifst2	S S
 i_ncmp		integer comparison (<+>)	ck_null		ifst2	S S
 
-slt		string lt		ck_null		ifs2	S S
-sgt		string gt		ck_null		ifs2	S S
-sle		string le		ck_null		ifs2	S S
-sge		string ge		ck_null		ifs2	S S
 seq		string eq		ck_null		ifs2	S S
 sne		string ne		ck_null		ifs2	S S
 scmp		string comparison (cmp)	ck_null		ifst2	S S

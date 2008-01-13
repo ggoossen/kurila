@@ -1,16 +1,5 @@
-BEGIN {
-    unless ("A" eq pack('U', 0x41)) {
-	print "1..0 # Unicode::Collate " .
-	    "cannot stringify a Unicode code point\n";
-	exit 0;
-    }
-    if ($ENV{PERL_CORE}) {
-	chdir('t') if -d 't';
-	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
-    }
-}
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 40 };
 
 use strict;
@@ -54,8 +43,8 @@ my $kjeNoN = Unicode::Collate->new(
     entry => $kjeEntry,
 );
 
-ok($kjeNoN->lt("\x{043A}", "\x{043A}\x{0301}"));
-ok($kjeNoN->gt("\x{045C}", "\x{043A}\x{0334}\x{0301}"));
+is($kjeNoN->cmp("\x{043A}", "\x{043A}\x{0301}"), -1);
+is($kjeNoN->cmp("\x{045C}", "\x{043A}\x{0334}\x{0301}"), 1);
 ok($kjeNoN->eq("\x{043A}", "\x{043A}\x{0334}\x{0301}"));
 ok($kjeNoN->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
 
@@ -72,9 +61,9 @@ if (!$@) {
 	table => undef,
 	entry => $kjeEntry,
     );
-ok($kjeNFD->lt("\x{043A}", "\x{043A}\x{0301}"));
+is($kjeNFD->cmp("\x{043A}", "\x{043A}\x{0301}"), -1);
 ok($kjeNFD->eq("\x{045C}", "\x{043A}\x{0334}\x{0301}"));
-ok($kjeNFD->lt("\x{043A}", "\x{043A}\x{0334}\x{0301}"));
+is($kjeNFD->cmp("\x{043A}", "\x{043A}\x{0334}\x{0301}"), -1);
 ok($kjeNFD->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
 
     my $aaNFD = Unicode::Collate->new(
@@ -83,14 +72,14 @@ ok($kjeNFD->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
 	entry => $aaEntry,
     );
 
-ok($aaNFD->lt("Z", "A\x{30A}\x{304}"));
+is($aaNFD->cmp("Z", "A\x{30A}\x{304}"), -1);
 ok($aaNFD->eq("A", "A\x{304}\x{30A}"));
 ok($aaNFD->eq(pack('U', 0xE5), "A\x{30A}\x{304}"));
 ok($aaNFD->eq("A\x{304}", "A\x{304}\x{30A}"));
-ok($aaNFD->lt("Z", "A\x{327}\x{30A}"));
-ok($aaNFD->lt("Z", "A\x{30A}\x{327}"));
-ok($aaNFD->lt("Z", "A\x{31A}\x{30A}"));
-ok($aaNFD->lt("Z", "A\x{30A}\x{31A}"));
+is($aaNFD->cmp("Z", "A\x{327}\x{30A}"), -1);
+is($aaNFD->cmp("Z", "A\x{30A}\x{327}"), -1);
+is($aaNFD->cmp("Z", "A\x{31A}\x{30A}"), -1);
+is($aaNFD->cmp("Z", "A\x{30A}\x{31A}"), -1);
 
     my $aaPre = Unicode::Collate->new(
 	level => 1,
@@ -99,28 +88,28 @@ ok($aaNFD->lt("Z", "A\x{30A}\x{31A}"));
 	entry => $aaEntry,
     );
 
-ok($aaPre->lt("Z", "A\x{30A}\x{304}"));
+is($aaPre->cmp("Z", "A\x{30A}\x{304}"), -1);
 ok($aaPre->eq("A", "A\x{304}\x{30A}"));
 ok($aaPre->eq(pack('U', 0xE5), "A\x{30A}\x{304}"));
 ok($aaPre->eq("A\x{304}", "A\x{304}\x{30A}"));
-ok($aaPre->lt("Z", "A\x{327}\x{30A}"));
-ok($aaPre->lt("Z", "A\x{30A}\x{327}"));
-ok($aaPre->lt("Z", "A\x{31A}\x{30A}"));
-ok($aaPre->lt("Z", "A\x{30A}\x{31A}"));
+is($aaPre->cmp("Z", "A\x{327}\x{30A}"), -1);
+is($aaPre->cmp("Z", "A\x{30A}\x{327}"), -1);
+is($aaPre->cmp("Z", "A\x{31A}\x{30A}"), -1);
+is($aaPre->cmp("Z", "A\x{30A}\x{31A}"), -1);
 }
 else {
   ok(1) for 1..20;
 }
 
 # again: loading Unicode::Normalize should not affect $kjeNoN.
-ok($kjeNoN->lt("\x{043A}", "\x{043A}\x{0301}"));
-ok($kjeNoN->gt("\x{045C}", "\x{043A}\x{0334}\x{0301}"));
+is($kjeNoN->cmp("\x{043A}", "\x{043A}\x{0301}"), -1);
+is($kjeNoN->cmp("\x{045C}", "\x{043A}\x{0334}\x{0301}"), 1);
 ok($kjeNoN->eq("\x{043A}", "\x{043A}\x{0334}\x{0301}"));
 ok($kjeNoN->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
 
-ok($sortkeys{'KAac'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}"));
-ok($sortkeys{'KAta'}, $kjeNoN->viewSortKey("\x{043A}\x{0334}\x{0301}"));
-ok($sortkeys{'KAat'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}\x{0334}"));
+is($sortkeys{'KAac'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}"));
+is($sortkeys{'KAta'}, $kjeNoN->viewSortKey("\x{043A}\x{0334}\x{0301}"));
+is($sortkeys{'KAat'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}\x{0334}"));
 
 my $aaNoN = Unicode::Collate->new(
     level => 1,
@@ -129,12 +118,12 @@ my $aaNoN = Unicode::Collate->new(
     normalization => undef,
 );
 
-ok($aaNoN->lt("Z", "A\x{30A}\x{304}"));
+is($aaNoN->cmp("Z", "A\x{30A}\x{304}"), -1);
 ok($aaNoN->eq("A", "A\x{304}\x{30A}"));
 ok($aaNoN->eq(pack('U', 0xE5), "A\x{30A}\x{304}"));
 ok($aaNoN->eq("A\x{304}", "A\x{304}\x{30A}"));
 ok($aaNoN->eq("A", "A\x{327}\x{30A}"));
-ok($aaNoN->lt("Z", "A\x{30A}\x{327}"));
+is($aaNoN->cmp("Z", "A\x{30A}\x{327}"), -1);
 ok($aaNoN->eq("A", "A\x{31A}\x{30A}"));
-ok($aaNoN->lt("Z", "A\x{30A}\x{31A}"));
+is($aaNoN->cmp("Z", "A\x{30A}\x{31A}"), -1);
 

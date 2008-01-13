@@ -50,7 +50,7 @@ $i = 0;		# stop -w complaints
 
 while (($key,$value) = each(%h)) {
     if ($key eq $keys[$i] && $value eq $values[$i]
-        && (('a' lt 'A' && $key lt $value) || $key gt $value)) {
+        && (($key cmp $value) +> 0)) {
 	$key =~ y/a-z/A-Z/;
 	$i++ if $key eq $value;
     }

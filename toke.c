@@ -4319,10 +4319,6 @@ Perl_yylex(pTHX)
 			case -KEY_x:
 			case -KEY_eq:
 			case -KEY_ne:
-			case -KEY_gt:
-			case -KEY_lt:
-			case -KEY_ge:
-			case -KEY_le:
 			case -KEY_cmp:
 			    break;
 			default:
@@ -5290,12 +5286,6 @@ Perl_yylex(pTHX)
 	case KEY_flock:
 	    LOP(OP_FLOCK,XTERM);
 
-	case KEY_gt:
-	    Rop(OP_SGT);
-
-	case KEY_ge:
-	    Rop(OP_SGE);
-
 	case KEY_grep:
 	    LOP(OP_GREPSTART, XREF);
 
@@ -5432,12 +5422,6 @@ Perl_yylex(pTHX)
 
 	case KEY_length:
 	    UNI(OP_LENGTH);
-
-	case KEY_lt:
-	    Rop(OP_SLT);
-
-	case KEY_le:
-	    Rop(OP_SLE);
 
 	case KEY_localtime:
 	    UNI(OP_LOCALTIME);
@@ -6360,21 +6344,7 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
           goto unknown;
 
         case 'g':
-          switch (name[1])
-          {
-            case 'e':
-              {                                   /* ge         */
-                return -KEY_ge;
-              }
-
-            case 't':
-              {                                   /* gt         */
-                return -KEY_gt;
-              }
-
-            default:
-              goto unknown;
-          }
+	    goto unknown;
 
         case 'i':
           if (name[1] == 'f')
@@ -6390,16 +6360,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
             case 'c':
               {                                   /* lc         */
                 return -KEY_lc;
-              }
-
-            case 'e':
-              {                                   /* le         */
-                return -KEY_le;
-              }
-
-            case 't':
-              {                                   /* lt         */
-                return -KEY_lt;
               }
 
             default:

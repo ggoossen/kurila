@@ -814,21 +814,6 @@ PP(pp_lcfirst)
     return pp_ucfirst();
 }
 
-PP(pp_slt)
-{
-    return pp_sle();
-}
-
-PP(pp_sgt)
-{
-    return pp_sle();
-}
-
-PP(pp_sge)
-{
-    return pp_sle();
-}
-
 PP(pp_rindex)
 {
     return pp_index();

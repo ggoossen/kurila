@@ -177,7 +177,7 @@ sub _unix_os2_ext {
 	    }
 
 	    # We might be able to load this archive file dynamically
-	    if ( ($Config{'dlsrc'} =~ m/dl_next/ && $Config{'osvers'} lt '4_0')
+	    if ( ($Config{'dlsrc'} =~ m/dl_next/ && ($Config{'osvers'} cmp '4_0') +<= 0)
 	    ||   ($Config{'dlsrc'} =~ m/dl_dld/) )
 	    {
 		# We push -l$thislib instead of $fullname because

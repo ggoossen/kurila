@@ -4722,8 +4722,7 @@ S_looks_like_bool(pTHX_ const OP *o)
 	case OP_I_EQ:	case OP_I_NE:	case OP_I_LT:
 	case OP_I_GT:	case OP_I_LE:	case OP_I_GE:
 
-	case OP_SEQ:	case OP_SNE:	case OP_SLT:
-	case OP_SGT:	case OP_SLE:	case OP_SGE:
+	case OP_SEQ:	case OP_SNE:
 	
 	case OP_SMARTMATCH:
 	

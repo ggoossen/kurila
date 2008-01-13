@@ -2200,42 +2200,6 @@ PP(pp_ncmp)
     }
 }
 
-PP(pp_sle)
-{
-    dVAR; dSP;
-
-    int amg_type = sle_amg;
-    int multiplier = 1;
-    int rhs = 1;
-
-    switch (PL_op->op_type) {
-    case OP_SLT:
-	amg_type = slt_amg;
-	/* cmp < 0 */
-	rhs = 0;
-	break;
-    case OP_SGT:
-	amg_type = sgt_amg;
-	/* cmp > 0 */
-	multiplier = -1;
-	rhs = 0;
-	break;
-    case OP_SGE:
-	amg_type = sge_amg;
-	/* cmp >= 0 */
-	multiplier = -1;
-	break;
-    }
-
-    tryAMAGICbinSET_var(amg_type,0);
-    {
-      dPOPTOPssrl;
-      const int cmp = sv_cmp(left, right);
-      SETs(boolSV(cmp * multiplier < rhs));
-      RETURN;
-    }
-}
-
 PP(pp_seq)
 {
     dVAR; dSP; tryAMAGICbinSET(seq,0);

@@ -269,7 +269,7 @@ my $x = 1 + $a ;
 no warnings 'numeric' ;
 my $z = 1 + $a ;
 EXPECT
-Argument "d\0f" isn't numeric in addition (+) at - line 4.
+Argument "d\x{0}f" isn't numeric in addition (+) at - line 4.
 ########
 # sv.c
 use warnings 'redefine' ;

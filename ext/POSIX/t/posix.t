@@ -92,7 +92,7 @@ SKIP: {
 	sleep 1;
 
 	$todo = 1 if ($^O eq 'freebsd')
-		  || ($^O eq 'darwin' && $Config{osvers} lt '6.6');
+		  || ($^O eq 'darwin' && $Config{osvers} +<= v6.6);
 	printf "%s 11 - masked SIGINT received %s\n",
 	    $sigint_called ? "ok" : "not ok",
 	    $todo ? $why_todo : '';

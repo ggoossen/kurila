@@ -40,6 +40,6 @@ print "ok 5\n";
 print "not " if $a eq $b;
 print "ok 6\n";
 
-print "not " if $a lt $b == $a gt $b;
+print "not " if ($a cmp $b) == ($b cmp $a);
 print "ok 7\n";
 

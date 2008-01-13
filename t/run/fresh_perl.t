@@ -269,7 +269,7 @@ print "ok\n" if (1E2<<1 == 200 and 3E4<<3 == 240000);
 EXPECT
 ok
 ########
-print "ok\n" if ("\0" lt "\x[FF]");
+print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
 ########

@@ -33,7 +33,7 @@ our (@FOO, $expect);
 	$uv_big, $uv_bigi, $iv0, $iv1, $ivm1, $iv_min, $iv_max, $iv_big,
 	$iv_small, \$array[0], \$array[0], \$array[1], \$^X);
 
-$expect = 7 * ($#FOO+2) * ($#FOO+1);
+$expect = 5 * ($#FOO+2) * ($#FOO+1);
 print "1..$expect\n";
 
 sub nok ($$$$$$$$) {
@@ -141,16 +141,6 @@ for my $i (0..$#FOO) {
 	# String comparisons
 	$ok++;
 	$cmp = $i9 cmp $j9;
-	if ($cmp == -1 && $i10 lt $j10 ||
-	    $cmp == 0  && !($i10 lt $j10) ||
-	    $cmp == 1  && !($i10 lt $j10))
-	{
-	    print "ok $ok\n";
-	}
-	else {
-	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'lt');
-	}
-	$ok++;
 	if ($cmp == -1 && !($i11 eq $j11) ||
 	    $cmp == 0  && ($i11 eq $j11) ||
 	    $cmp == 1  && !($i11 eq $j11))
@@ -161,26 +151,6 @@ for my $i (0..$#FOO) {
 	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'eq');
 	}
 	$ok++;
-	if ($cmp == -1 && !($i12 gt $j12) ||
-	    $cmp == 0  && !($i12 gt $j12) ||
-	    $cmp == 1  && ($i12 gt $j12))
-	{
-	    print "ok $ok\n";
-	}
-	else {
-	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'gt');
-	}
-	$ok++;
-	if ($cmp == -1 && $i13 le $j13 ||
-	    $cmp == 0  && ($i13 le $j13) ||
-	    $cmp == 1  && !($i13 le $j13))
-	{
-	    print "ok $ok\n";
-	}
-	else {
-	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'le');
-	}
-	$ok++;
 	if ($cmp == -1 && ($i14 ne $j14) ||
 	    $cmp == 0  && !($i14 ne $j14) ||
 	    $cmp == 1  && ($i14 ne $j14))
@@ -189,16 +159,6 @@ for my $i (0..$#FOO) {
 	}
 	else {
 	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'ne');
-	}
-	$ok++;
-	if ($cmp == -1 && !($i15 ge $j15) ||
-	    $cmp == 0  && ($i15 ge $j15) ||
-	    $cmp == 1  && ($i15 ge $j15))
-	{
-	    print "ok $ok\n";
-	}
-	else {
-	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'ge');
 	}
 	$ok++;
         $pmc =  $j17 cmp $i17; # cmp it in reverse

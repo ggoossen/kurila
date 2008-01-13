@@ -10,7 +10,7 @@ BEGIN {
     }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 58 };
 
 use strict;
@@ -74,32 +74,32 @@ ok(ref $hangul, "Unicode::Collate");
 #########################
 
 # LVX vs LVV: /GAA/ vs /GA/.latinA
-ok($Collator->gt("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"));
-ok($hangul  ->gt("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"));
+is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1);
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1);
 
 # LVX vs LVV: /GAA/ vs /GA/.hiraganaA
-ok($Collator->lt("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"));
-ok($hangul  ->gt("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), -1);
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), 1);
 
 # LVX vs LVV: /GAA/ vs /GA/.hanja
-ok($Collator->lt("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"));
-ok($hangul  ->gt("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), -1);
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), 1);
 
 # LVL vs LVT: /GA/./G/ vs /GAG/
-ok($Collator->lt("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"));
-ok($hangul  ->lt("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1);
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1);
 
 # LVT vs LVX: /GAG/ vs /GA/.latinA
-ok($Collator->gt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"));
-ok($hangul  ->gt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"));
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1);
+is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1);
 
 # LVT vs LVX: /GAG/ vs /GA/.hiraganaA
-ok($Collator->lt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"));
-ok($hangul  ->gt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), -1);
+is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), 1);
 
 # LVT vs LVX: /GAG/ vs /GA/.hanja
-ok($Collator->lt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"));
-ok($hangul  ->gt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), -1);
+is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), 1);
 
 # LV vs Syl(LV): /GA/ vs /[GA]/
 ok($Collator->eq("\x{1100}\x{1161}", "\x{AC00}"));
@@ -149,22 +149,22 @@ ENTRIES
 
 # LV vs Circled Syl(LV): /GA/ vs /(GA)/
 ok($Collator->eq("\x{1100}\x{1161}", "\x{326E}"));
-ok($hangul  ->gt("\x{1100}\x{1161}", "\x{326E}"));
+is($hangul  ->cmp("\x{1100}\x{1161}", "\x{326E}"), 1);
 ok($hangcirc->eq("\x{1100}\x{1161}", "\x{326E}"));
 
 # LV vs Circled Syl(LV): followed by latin A
 ok($Collator->eq("\x{1100}\x{1161}A", "\x{326E}A"));
-ok($hangul  ->lt("\x{1100}\x{1161}A", "\x{326E}A"));
+is($hangul  ->cmp("\x{1100}\x{1161}A", "\x{326E}A"), -1);
 ok($hangcirc->eq("\x{1100}\x{1161}A", "\x{326E}A"));
 
 # LV vs Circled Syl(LV): followed by hiragana A
 ok($Collator->eq("\x{1100}\x{1161}\x{3042}", "\x{326E}\x{3042}"));
-ok($hangul  ->lt("\x{1100}\x{1161}\x{3042}", "\x{326E}\x{3042}"));
+is($hangul  ->cmp("\x{1100}\x{1161}\x{3042}", "\x{326E}\x{3042}"), -1);
 ok($hangcirc->eq("\x{1100}\x{1161}\x{3042}", "\x{326E}\x{3042}"));
 
 # LVT vs LVX: /GAG/ vs /GA/.hanja
 ok($Collator->eq("\x{1100}\x{1161}\x{4E00}", "\x{326E}\x{4E00}"));
-ok($hangul  ->lt("\x{1100}\x{1161}\x{4E00}", "\x{326E}\x{4E00}"));
+is($hangul  ->cmp("\x{1100}\x{1161}\x{4E00}", "\x{326E}\x{4E00}"), -1);
 ok($hangcirc->eq("\x{1100}\x{1161}\x{4E00}", "\x{326E}\x{4E00}"));
 
 #########################
@@ -208,15 +208,15 @@ ok($hangcont->eq("\x{1103}\x{1161}\x{11A8}", "\x{B2E5}"));
 
 $Collator->change(hangul_terminator => 16);
 
-ok($Collator->gt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"));
-ok($Collator->gt("\x{1100}\x{1161}", "\x{326E}"));
-ok($Collator->lt("\x{1100}\x{1161}A", "\x{326E}A"));
-ok($Collator->lt("\x{1100}\x{1161}\x{3042}", "\x{326E}\x{3042}"));
-ok($Collator->lt("\x{1100}\x{1161}\x{4E00}", "\x{326E}\x{4E00}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), 1);
+is($Collator->cmp("\x{1100}\x{1161}", "\x{326E}"), 1);
+is($Collator->cmp("\x{1100}\x{1161}A", "\x{326E}A"), -1);
+is($Collator->cmp("\x{1100}\x{1161}\x{3042}", "\x{326E}\x{3042}"), -1);
+is($Collator->cmp("\x{1100}\x{1161}\x{4E00}", "\x{326E}\x{4E00}"), -1);
 
 $Collator->change(hangul_terminator => 0);
 
-ok($Collator->lt("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), -1);
 ok($Collator->eq("\x{1100}\x{1161}", "\x{326E}"));
 ok($Collator->eq("\x{1100}\x{1161}A", "\x{326E}A"));
 ok($Collator->eq("\x{1100}\x{1161}\x{3042}", "\x{326E}\x{3042}"));
