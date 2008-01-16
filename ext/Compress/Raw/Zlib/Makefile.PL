@@ -94,9 +94,7 @@ WriteMakefile(
     ),
 
     INSTALLDIRS => ('perl'),
-
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
-        ('LICENSE'  => 'perl')         : ()),    
+    LICENSE  => 'perl',
 
 ) ;
 
