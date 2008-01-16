@@ -3421,6 +3421,10 @@ STATIC char *	S_sv_exp_grow(pTHX_ SV *sv, STRLEN needed)
 
 #endif
 
+PERL_CALLCONV I32	Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT* cxstk, I32 startingblock)
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(pTHX_1);
+
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 STATIC OP*	S_docatch(pTHX_ OP *o)
 			__attribute__warn_unused_result__;
@@ -3444,10 +3448,6 @@ STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 
 STATIC I32	S_dopoptoloop(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
-
-STATIC I32	S_dopoptosub_at(pTHX_ const PERL_CONTEXT* cxstk, I32 startingblock)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
 
 STATIC I32	S_dopoptowhen(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;

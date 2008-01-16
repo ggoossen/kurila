@@ -686,8 +686,8 @@ Perl_block_gimme(pTHX)
     }
 }
 
-STATIC I32
-S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
+I32
+Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 {
     dVAR;
     I32 i;
