@@ -505,43 +505,6 @@ XS(XS_version_new)
     }
 }
 
-XS(XS_error_new)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items > 3)
-	Perl_croak(aTHX_ "Usage: version::new(class, version)");
-    SP -= items;
-    {
-        SV *vs = ST(1);
-	SV *rv;
-	const char * const classname =
-	    sv_isobject(ST(0)) /* get the class if called as an object method */
-		? HvNAME(SvSTASH(SvRV(ST(0))))
-		: (char *)SvPV_nolen(ST(0));
-
-	if ( items == 1 || vs == &PL_sv_undef ) { /* no param or explicit undef */
-	    /* create empty object */
-	    vs = sv_newmortal();
-	    sv_setpvn(vs,"",0);
-	}
-
-	rv = newSV(0);
-	SV * const hv = newSVrv(rv, "version"); 
-	(void)sv_upgrade(hv, SVt_PVHV); /* needs to be an HV type */
-
-	(void)hv_stores((HV *)hv, "message", vs);
-
-	if ( strcmp(classname,"version") != 0 ) /* inherited new() */
-	    sv_bless(rv, gv_stashpv(classname, GV_ADD));
-
-	PUSHs(sv_2mortal(rv));
-	PUTBACK;
-	return;
-    }
-}
-
 XS(XS_version_stringify)
 {
      dVAR;
@@ -731,6 +694,136 @@ XS(XS_version_qv)
         upg_version(rv, TRUE);
         PUSHs(rv);
 
+	PUTBACK;
+	return;
+    }
+}
+
+STATIC
+AV* S_context_info(const PERL_CONTEXT *cx) {
+    AV* av = newAV();
+    const char *stashname;
+    
+    stashname = CopSTASHPV(cx->blk_oldcop);
+
+    if (!stashname)
+	av_push(av, &PL_sv_undef);
+    else
+	av_push(av, newSVpv(stashname, 0));
+    av_push(av, newSVpv(OutCopFILE(cx->blk_oldcop), 0));
+    av_push(av, newSViv((I32)CopLINE(cx->blk_oldcop)));
+    if (CxTYPE(cx) == CXt_SUB) {
+	GV * const cvgv = CvGV(cx->blk_sub.cv);
+	/* So is ccstack[dbcxix]. */
+	if (isGV(cvgv)) {
+	    SV * const sv = newSV(0);
+	    gv_efullname4(sv, cvgv, NULL, TRUE);
+	    av_push(av, sv);
+	}
+	else {
+	    av_push(av, newSVpvs("(unknown)"));
+	}
+    }
+    else {
+	av_push(av, newSVpvs("(eval)"));
+    }
+    
+    if (CxTYPE(cx) == CXt_EVAL) {
+	/* eval STRING */
+	if (cx->blk_eval.old_op_type == OP_ENTEREVAL) {
+	    av_push(av, cx->blk_eval.cur_text);
+	}
+	/* require */
+	else if (cx->blk_eval.old_namesv) {
+	    av_push(av, newSVsv(cx->blk_eval.old_namesv));
+	}
+	/* eval BLOCK (try blocks have old_namesv == 0) */
+	else {
+	    av_push(av, &PL_sv_undef);
+	}
+    }
+    else {
+	av_push(av, &PL_sv_undef);
+    }
+    
+    return av;
+}
+
+STATIC AV* S_error_backtrace()
+{
+    register I32 cxix = dopoptosub_at(cxstack, cxstack_ix);
+    register const PERL_CONTEXT *ccstack = cxstack;
+    const PERL_SI *top_si = PL_curstackinfo;
+
+    AV* trace;
+
+    trace = newAV();
+
+    for(;;) {
+	/* we may be in a higher stacklevel, so dig down deeper */
+ 	while (cxix < 0 && top_si->si_type != PERLSI_MAIN) {
+	    top_si = top_si->si_prev;
+	    ccstack = top_si->si_cxstack;
+	    cxix = dopoptosub_at(ccstack, top_si->si_cxix);
+	}
+	if (cxix < 0)
+	    break;
+	
+	/* caller() should not report the automatic calls to &DB::sub */
+	if (PL_DBsub && GvCV(PL_DBsub) && cxix >= 0 &&
+	    ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub)) {
+	    cxix = dopoptosub_at(ccstack, cxix - 1);
+	    continue;
+	}
+
+	/* make stack entry */
+	av_push(trace, newRV_inc( (SV*) S_context_info(&ccstack[cxix]) ));
+
+	cxix = dopoptosub_at(ccstack, cxix - 1);
+    }
+
+    return trace;
+}
+
+
+
+XS(XS_error_new)
+{
+    dVAR;
+    dXSARGS;
+    PERL_UNUSED_ARG(cv);
+    if (items > 3)
+	Perl_croak(aTHX_ "Usage: version::new(class, version)");
+    SP -= items;
+    {
+        SV *vs = ST(1);
+	SV *rv;
+	HV *hv;
+
+	const char * const classname =
+	    sv_isobject(ST(0)) /* get the class if called as an object method */
+		? HvNAME(SvSTASH(SvRV(ST(0))))
+		: (char *)SvPV_nolen(ST(0));
+
+	if ( items == 1 || vs == &PL_sv_undef ) { /* no param or explicit undef */
+	    /* create empty object */
+	    vs = sv_newmortal();
+	    sv_setpvn(vs,"",0);
+	}
+
+	rv = newSV(0);
+	hv = (HV*)newSVrv(rv, "error"); 
+	(void)sv_upgrade((SV*)hv, SVt_PVHV); /* needs to be an HV type */
+
+	(void)hv_stores(hv, "message", SvREFCNT_inc(vs));
+
+	if ( strcmp(classname,"error") != 0 ) /* inherited new() */
+	    sv_bless(rv, gv_stashpv(classname, GV_ADD));
+
+	(void)hv_stores(hv, "stack", newRV_inc( (SV*) S_error_backtrace() ));
+
+	/* backtrace */
+	PUSHs(sv_2mortal(rv));
 	PUTBACK;
 	return;
     }

@@ -1114,6 +1114,7 @@ lib/English.t			See if English works
 lib/Env.pm			Map environment into ordinary variables
 lib/Env/t/array.t		See if Env works for arrays
 lib/Env/t/env.t			See if Env works
+lib/error.t                     See if error works
 lib/Exporter/Heavy.pm		Complicated routines for Exporter
 lib/Exporter.pm			Exporter base class
 lib/Exporter.t			See if Exporter works
