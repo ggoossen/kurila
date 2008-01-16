@@ -22,10 +22,8 @@ WriteMakefile(
 	XSPROTOARG	=> '-noprototypes',
 	DEFINE		=> $OS2 || "",
 	INC		=> ($^O eq "MacOS" ? "-i ::::db:include" : ""),
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30')
-            ?  ('LICENSE'  => 'perl')
-            : ()
-    ),
+        LICENSE  => 'perl',
+
               ABSTRACT_FROM => 'DB_File.pm',
               AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
