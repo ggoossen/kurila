@@ -123,7 +123,7 @@ Pops a long off the stack.
 #define RETURNX(x)	return (x, PUTBACK, NORMAL)
 
 #define POPs		(*sp--)
-#define POPp		(SvPVx(POPs, PL_na))		/* deprecated */
+#define POPp		(SvPVx(POPs, &PL_na))		/* deprecated */
 #define POPpx		(SvPVx_nolen(POPs))
 #define POPpconstx	(SvPVx_nolen_const(POPs))
 #define POPn		(SvNVx(POPs))
