@@ -1710,7 +1710,7 @@ typedef UVTYPE UV;
  */
 #if (IVSIZE == PTRSIZE) && (UVSIZE == PTRSIZE)
 #  define PTRV			UV
-#  define INT2PTR(any,d)	(any)(d)
+#  define INT2PTR(any,d)	((any)(d))
 #else
 #  if PTRSIZE == LONGSIZE
 #    define PTRV		unsigned long
@@ -1721,7 +1721,7 @@ typedef UVTYPE UV;
 #endif
 
 #ifndef INT2PTR
-#  define INT2PTR(any,d)	(any)(PTRV)(d)
+#  define INT2PTR(any,d)	((any)(PTRV)(d))
 #endif
 
 #ifndef PTR2ul
