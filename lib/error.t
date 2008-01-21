@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan( tests => 20 );
+plan( tests => 22 );
 
 # simple error object.
 {
@@ -90,7 +90,16 @@ MSG
 
 # Writing the standard message
 {
-    fresh_perl_is("die 'foobar'", <<MSG );
-foobar at ../lib/error.t line 93
+    fresh_perl_is("die 'foobar'",
+                  'foobar at - line 1');
+}
+
+# Compilation error
+{
+    fresh_perl_is('BEGIN { die "foobar" }', <<MSG );
+foobar at - line 1
+BEGIN failed--compilation aborted
+    main::BEGIN called at - line 1
+    (eval) called at - line 1
 MSG
 }

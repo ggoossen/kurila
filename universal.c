@@ -931,6 +931,11 @@ XS(XS_error_message)
 	    }
 	    sv_catpv(res, "\n");
 
+	    sv = hv_fetchs(err, "notes", 0);
+	    if (sv) {
+		sv_catsv(res, *sv);
+	    }
+
 	    sv = hv_fetchs(err, "stack", 0);
 	    if (sv && SvROK(*sv)) {
 		AV *av = (AV*)SvRV(*sv);
