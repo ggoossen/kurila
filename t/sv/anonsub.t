@@ -4,6 +4,9 @@
 # fresh_perl_is, and fresh_perl_is uses a closure -- a special
 # case of what this program tests for.
 
+use strict;
+BEGIN { require "./test.pl" }
+
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MSWin32 = $^O eq 'MSWin32';
 my $Is_MacOS = $^O eq 'MacOS';
@@ -16,7 +19,7 @@ $|=1;
 
 undef $/;
 my @prgs = split "\n########\n", ~< *DATA;
-print "1..", 6 + scalar @prgs, "\n";
+plan(6 + scalar @prgs);
 
 my $tmpfile = "asubtmp000";
 1 while -f ++$tmpfile;
@@ -48,22 +51,15 @@ for (@prgs){
     $expected =~ s/\n+$//;
     if ($results ne $expected) {
        print STDERR "PROG: $switch\n$prog\n";
-       print STDERR "EXPECTED:\n$expected\n";
-       print STDERR "GOT:\n$results\n";
-       print "not ";
     }
-    print "ok ", ++$i, "\n";
+    is($results, $expected);
 }
 
 sub test_invalid_decl {
     my ($code,$todo) = @_;
     $todo //= '';
-    eval $code;
-    if ($@ =~ m/^Illegal declaration of anonymous subroutine at/) {
-	print "ok ", ++$i, " - '$code' is illegal$todo\n";
-    } else {
-	print "not ok ", ++$i, " - '$code' is illegal$todo\n# GOT: $@";
-    }
+    eval_dies_like( $code,
+                    qr/^Illegal declaration of anonymous subroutine at/);
 }
 
 test_invalid_decl('sub;');
@@ -73,11 +69,7 @@ test_invalid_decl('sub ($) && 1');
 test_invalid_decl('sub ($) : lvalue;',' # TODO');
 
 eval "sub #foo\n\{print 1\}";
-if ($@ eq '') {
-    print "ok ", ++$i, "\n";
-} else {
-    print "not ok ", ++$i, "\n# GOT: $@";
-}
+is $@, '', "No error"
 
 __END__
 sub X {

@@ -449,22 +449,27 @@ PP(pp_die)
     const char *tmps;
     SV *tmpsv;
 
+    /* TODO: protection against recursion */
+
     if (SP - MARK >= 1) {
 	call_pv("error::create", G_SCALAR);
-	sv_setsv(ERRSV, TOPs);
+	tmpsv = TOPs;
 	SP = MARK + 1;
 
-	DIE(aTHX_ NULL);
+	die_where(tmpsv);
+	/* NOTREACHED */
     }
     else {
 	SV * const error = ERRSV;
 	if (sv_isobject(error)) {
-	    DIE(aTHX_ NULL);
+	    die_where(error);
+	    /* NOTREACHED */
 	}
     }
     tmpsv = sv_2mortal(newSVpvs("Died"));
-
-    DIE(aTHX_ "%"SVf, SVfARG(tmpsv));
+    die_where(tmpsv);
+    /* NOTREACHED */
+    return NULL;
 }
 
 /* I/O. */

@@ -51,7 +51,7 @@ sub method {
 
 sub try {
     eval { method('foo', 'bar'); };
-    print "# $@" if $@;
+    print "# $@->{description}" if $@;
 }
 
 for (1..5) { try() }

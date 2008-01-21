@@ -264,8 +264,8 @@ is ($got, '');
 
 {
     my @a;
-    eval '$a[-1] = 0';
-    like($@, qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0");
+    eval_dies_like( '$a[-1] = 0', 
+                    qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0");
 }
 
 sub test_arylen {

@@ -838,10 +838,18 @@ Perl_qerror(pTHX_ SV *err)
 	++PL_parser->error_count;
 }
 
-OP *
-Perl_die_where(pTHX_ const char *message, STRLEN msglen)
+/* This function will never return */
+void
+Perl_die_where(pTHX_ SV *msv)
 {
     dVAR;
+    const char* message;
+    STRLEN msglen;
+
+    if (ERRSV != msv) {
+	SvREFCNT_dec(ERRSV);
+	ERRSV = SvREFCNT_inc(msv);
+    }
 
     if (PL_in_eval) {
 	I32 cxix;
@@ -886,8 +894,9 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 		SV * const nsv = cx->blk_eval.old_namesv;
                 (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                                &PL_sv_undef, 0);
-		DIE(aTHX_ "%sCompilation failed in require",
-		    *message ? message : "Unknown error\n");
+/* 		DIE(aTHX_ "%sCompilation failed in require", */
+/* 		    *message ? message : "Unknown error\n"); */
+		die_where(ERRSV);
 	    }
 	    assert(CxTYPE(cx) == CXt_EVAL);
 
@@ -896,13 +905,13 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 	}
     }
 
-    if ( ! message && sv_isobject(ERRSV)) {
+    if ( sv_isobject(msv)) {
 	dSP;
 	SV* tmpsv;
 
 	ENTER;
 	PUSHMARK(SP);
-	PUSHs(ERRSV);
+	PUSHs(msv);
 	PUTBACK;
 
 	call_method("message", G_SCALAR);
@@ -911,12 +920,15 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 	message = SvPV_const(tmpsv, msglen);
 
 	LEAVE;
+    } else {
+	message = SvPV_const(msv, msglen);
     }
+    
 
     write_to_stderr(message, msglen);
     my_failure_exit();
     /* NOTREACHED */
-    return 0;
+    return;
 }
 
 PP(pp_xor)
@@ -1423,7 +1435,7 @@ PP(pp_return)
 
     LEAVESUB(sv);
     if (clear_errsv)
-	sv_setpvn(ERRSV,"",0);
+	sv_setsv(ERRSV, &PL_sv_undef);
     return retop;
 }
 

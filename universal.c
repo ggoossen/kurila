@@ -868,6 +868,7 @@ XS(XS_error_create)
 
 	    const COP *cop = S_closest_cop(PL_curcop, PL_curcop->op_sibling);
 	    SV *sv = sv_newmortal();
+	    sv_setpvn(sv,"",0);
 	    if (!cop)
 		cop = PL_curcop;
 
@@ -911,6 +912,7 @@ XS(XS_error_message)
     {
 	HV *err;
 	SV *res = sv_newmortal();
+	sv_setpvn(res, "", 0);
 	
 	if (sv_derived_from(ST(0), "error")) {
 	    err = (HV*)SvRV(ST(0));
