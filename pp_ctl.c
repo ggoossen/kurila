@@ -847,35 +847,6 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 	I32 cxix;
 	I32 gimme;
 
-	if (message) {
-	    if (PL_in_eval & EVAL_KEEPERR) {
-                static const char prefix[] = "\t(in cleanup) ";
-		SV * const err = ERRSV;
-		const char *e = NULL;
-		if (!SvPOK(err))
-		    sv_setpvn(err,"",0);
-		else if (SvCUR(err) >= sizeof(prefix)+msglen-1) {
-		    STRLEN len;
-		    e = SvPV_const(err, len);
-		    e += len - msglen;
-		    if (*e != *message || strNE(e,message))
-			e = NULL;
-		}
-		if (!e) {
-		    SvGROW(err, SvCUR(err)+sizeof(prefix)+msglen);
-		    sv_catpvn(err, prefix, sizeof(prefix)-1);
-		    sv_catpvn(err, message, msglen);
-		    if (ckWARN(WARN_MISC)) {
-			const STRLEN start = SvCUR(err)-msglen-sizeof(prefix)+1;
-			Perl_warner(aTHX_ packWARN(WARN_MISC), SvPVX_const(err)+start);
-		    }
-		}
-	    }
-	    else {
-		sv_setpvn(ERRSV, message, msglen);
-	    }
-	}
-
 	while ((cxix = dopoptoeval(cxstack_ix)) < 0
 	       && PL_curstackinfo->si_prev)
 	{
@@ -893,8 +864,6 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 
 	    POPBLOCK(cx,PL_curpm);
 	    if (CxTYPE(cx) != CXt_EVAL) {
-		if (!message)
-		    message = SvPVx_const(ERRSV, &msglen);
 		PerlIO_write(Perl_error_log, (const char *)"panic: die ", 11);
 		PerlIO_write(Perl_error_log, message, msglen);
 		my_exit(1);
@@ -914,19 +883,35 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 	    PL_curcop = cx->blk_oldcop;
 
 	    if (optype == OP_REQUIRE) {
-                const char* const msg = SvPVx_nolen_const(ERRSV);
 		SV * const nsv = cx->blk_eval.old_namesv;
                 (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                                &PL_sv_undef, 0);
 		DIE(aTHX_ "%sCompilation failed in require",
-		    *msg ? msg : "Unknown error\n");
+		    *message ? message : "Unknown error\n");
 	    }
 	    assert(CxTYPE(cx) == CXt_EVAL);
-	    return cx->blk_eval.retop;
+
+	    PL_restartop = cx->blk_eval.retop;
+	    JMPENV_JUMP(3);
 	}
     }
-    if (!message)
-	message = SvPVx_const(ERRSV, &msglen);
+
+    if ( ! message && sv_isobject(ERRSV)) {
+	dSP;
+	SV* tmpsv;
+
+	ENTER;
+	PUSHMARK(SP);
+	PUSHs(ERRSV);
+	PUTBACK;
+
+	call_method("message", G_SCALAR);
+	SPAGAIN;
+	tmpsv = POPs;
+	message = SvPV_const(tmpsv, msglen);
+
+	LEAVE;
+    }
 
     write_to_stderr(message, msglen);
     my_failure_exit();

@@ -226,7 +226,9 @@ XS(XS_Symbol_fetch_glob);
 XS(XS_Symbol_stash);
 XS(XS_Symbol_glob_name);
 XS(XS_dump_view);
-XS(XS_error_new);
+XS(XS_error_create);
+XS(XS_error_message);
+XS(XS_error__die_hook);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -295,7 +297,11 @@ Perl_boot_core_UNIVERSAL(pTHX)
 
     newXS("dump::view", XS_dump_view, file);
     
-    newXS("error::new", XS_error_new, file);
+    newXS("error::create", XS_error_create, file);
+    newXS("error::message", XS_error_message, file);
+/*     newXS("error::_die_hook", XS_error__die_hook, file); */
+
+/*     PL_diehook = (SV*)gv_fetchmethod(NULL, "error::_die_hook"); */
 }
 
 
@@ -785,9 +791,41 @@ STATIC AV* S_error_backtrace()
     return trace;
 }
 
+STATIC const COP*
+S_closest_cop(pTHX_ const COP *cop, const OP *o)
+{
+    dVAR;
+    /* Look for PL_op starting from o.  cop is the last COP we've seen. */
+
+    if (!o || o == PL_op)
+	return cop;
+
+    if (o->op_flags & OPf_KIDS) {
+	const OP *kid;
+	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling) {
+	    const COP *new_cop;
+
+	    /* If the OP_NEXTSTATE has been optimised away we can still use it
+	     * the get the file and line number. */
+
+	    if (kid->op_type == OP_NULL && kid->op_targ == OP_NEXTSTATE)
+		cop = (const COP *)kid;
+
+	    /* Keep searching, and return when we've found something. */
+
+	    new_cop = S_closest_cop(cop, kid);
+	    if (new_cop)
+		return new_cop;
+	}
+    }
+
+    /* Nothing found. */
+
+    return NULL;
+}
 
 
-XS(XS_error_new)
+XS(XS_error_create)
 {
     dVAR;
     dXSARGS;
@@ -796,16 +834,16 @@ XS(XS_error_new)
 	Perl_croak(aTHX_ "Usage: version::new(class, version)");
     SP -= items;
     {
-        SV *vs = ST(1);
+        SV *vs = ST(0);
 	SV *rv;
 	HV *hv;
 
-	const char * const classname =
-	    sv_isobject(ST(0)) /* get the class if called as an object method */
-		? HvNAME(SvSTASH(SvRV(ST(0))))
-		: (char *)SvPV_nolen(ST(0));
+	const char * const classname = "error";
+/* 	    sv_isobject(ST(0)) /\* get the class if called as an object method *\/ */
+/* 		? HvNAME(SvSTASH(SvRV(ST(0)))) */
+/* 		: (char *)SvPV_nolen(ST(0)); */
 
-	if ( items == 1 || vs == &PL_sv_undef ) { /* no param or explicit undef */
+	if ( items == 0 || vs == &PL_sv_undef ) { /* no param or explicit undef */
 	    /* create empty object */
 	    vs = sv_newmortal();
 	    sv_setpvn(vs,"",0);
@@ -815,17 +853,116 @@ XS(XS_error_new)
 	hv = (HV*)newSVrv(rv, "error"); 
 	(void)sv_upgrade((SV*)hv, SVt_PVHV); /* needs to be an HV type */
 
-	(void)hv_stores(hv, "message", SvREFCNT_inc(vs));
+	(void)hv_stores(hv, "description", SvREFCNT_inc(vs));
 
 	if ( strcmp(classname,"error") != 0 ) /* inherited new() */
 	    sv_bless(rv, gv_stashpv(classname, GV_ADD));
 
+	{
+	    /*
+	     * Try and find the file and line for PL_op.  This will usually be
+	     * PL_curcop, but it might be a cop that has been optimised away.  We
+	     * can try to find such a cop by searching through the optree starting
+	     * from the sibling of PL_curcop.
+	     */
+
+	    const COP *cop = S_closest_cop(PL_curcop, PL_curcop->op_sibling);
+	    SV *sv = sv_newmortal();
+	    if (!cop)
+		cop = PL_curcop;
+
+	    if (CopLINE(cop))
+		Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf,
+			       OutCopFILE(cop), (IV)CopLINE(cop));
+	    /* Seems that GvIO() can be untrustworthy during global destruction. */
+	    if (GvIO(PL_last_in_gv) && (SvTYPE(GvIOp(PL_last_in_gv)) == SVt_PVIO)
+		&& IoLINES(GvIOp(PL_last_in_gv)))
+		{
+		    const bool line_mode = (RsSIMPLE(PL_rs) &&
+					    SvCUR(PL_rs) == 1 && *SvPVX_const(PL_rs) == '\n');
+		    Perl_sv_catpvf(aTHX_ sv, ", <%s> %s %"IVdf,
+				   PL_last_in_gv == PL_argvgv ? "" : GvNAME(PL_last_in_gv),
+				   line_mode ? "line" : "chunk",
+				   (IV)IoLINES(GvIOp(PL_last_in_gv)));
+		}
+	    if (PL_dirty)
+		sv_catpvs(sv, " during global destruction");
+
+	    (void)hv_stores(hv, "location", SvREFCNT_inc(sv));
+	}
+	    
 	(void)hv_stores(hv, "stack", newRV_inc( (SV*) S_error_backtrace() ));
 
 	/* backtrace */
 	PUSHs(sv_2mortal(rv));
 	PUTBACK;
 	return;
+    }
+}
+
+XS(XS_error_message)
+{
+    dVAR;
+    dXSARGS;
+    PERL_UNUSED_ARG(cv);
+    if (items < 1)
+	Perl_croak(aTHX_ "Usage: error::message()");
+    SP -= items;
+    {
+	HV *err;
+	SV *res = sv_newmortal();
+	
+	if (sv_derived_from(ST(0), "error")) {
+	    err = (HV*)SvRV(ST(0));
+	}
+	else
+	    Perl_croak(aTHX_ "not an error object");
+
+	{
+	    SV **sv;
+	    sv = hv_fetchs(err, "description", 0);
+	    if (sv) {
+		sv_catsv(res, *sv);
+	    }
+
+	    sv = hv_fetchs(err, "location", 0);
+	    if (sv) {
+		sv_catsv(res, *sv);
+	    }
+	    sv_catpv(res, "\n");
+
+	    sv = hv_fetchs(err, "stack", 0);
+	    if (sv && SvROK(*sv)) {
+		AV *av = (AV*)SvRV(*sv);
+		SV** svp = AvARRAY(av);
+		int avlen = av_len(av);
+		int i=0;
+		for (i=0; i<=avlen;i++) {
+		    if (svp[i] && SvROK(svp[i])) {
+			AV* item = (AV*)SvRV(svp[i]);
+
+			SV **v = av_fetch(item, 3, 0);
+			sv_catpv(res, "    ");
+			if (v)
+			    sv_catsv(res, *v);
+
+			sv_catpv(res, " called at ");
+			v = av_fetch(item, 1, 0);
+			if (v)
+			    sv_catsv(res, *v);
+
+			sv_catpv(res, " line ");
+			v = av_fetch(item, 2, 0);
+			if (v)
+			    sv_catsv(res, *v);
+			sv_catpv(res, "\n");
+		    }
+		}
+	    }
+	}
+
+	PUSHs(res);
+	XSRETURN(1);
     }
 }
 

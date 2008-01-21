@@ -448,60 +448,21 @@ PP(pp_die)
     dVAR; dSP; dMARK;
     const char *tmps;
     SV *tmpsv;
-    STRLEN len;
-    bool multiarg = 0;
-#ifdef VMS
-    VMSISH_HUSHED  = VMSISH_HUSHED || (PL_op->op_private & OPpHUSH_VMSISH);
-#endif
-    if (SP - MARK != 1) {
-	dTARGET;
-	do_join(TARG, &PL_sv_no, MARK, SP);
-	tmpsv = TARG;
-	tmps = SvPV_const(tmpsv, len);
-	multiarg = 1;
+
+    if (SP - MARK >= 1) {
+	call_pv("error::create", G_SCALAR);
+	sv_setsv(ERRSV, TOPs);
 	SP = MARK + 1;
+
+	DIE(aTHX_ NULL);
     }
     else {
-	tmpsv = TOPs;
-        tmps = SvROK(tmpsv) ? (const char *)NULL : SvPV_const(tmpsv, len);
-    }
-    if (!tmps || !len) {
 	SV * const error = ERRSV;
-	SvUPGRADE(error, SVt_PV);
-	if (multiarg ? SvROK(error) : SvROK(tmpsv)) {
-	    if (!multiarg)
-		SvSetSV(error,tmpsv);
-	    else if (sv_isobject(error)) {
-		HV * const stash = SvSTASH(SvRV(error));
-		GV * const gv = gv_fetchmethod(stash, "PROPAGATE");
-		if (gv) {
-		    SV * const file = sv_2mortal(newSVpv(CopFILE(PL_curcop),0));
-		    SV * const line = sv_2mortal(newSVuv(CopLINE(PL_curcop)));
-		    EXTEND(SP, 3);
-		    PUSHMARK(SP);
-		    PUSHs(error);
-		    PUSHs(file);
- 		    PUSHs(line);
-		    PUTBACK;
-		    call_sv((SV*)GvCV(gv),
-			    G_SCALAR|G_EVAL|G_KEEPERR);
-		    sv_setsv(error,*PL_stack_sp--);
-		}
-	    }
+	if (sv_isobject(error)) {
 	    DIE(aTHX_ NULL);
 	}
-	else {
-	    if (SvPOK(error) && SvCUR(error))
-		sv_catpvs(error, "\t...propagated");
-	    tmpsv = error;
-	    if (SvOK(tmpsv))
-		tmps = SvPV_const(tmpsv, len);
-	    else
-		tmps = NULL;
-	}
     }
-    if (!tmps || !len)
-	tmpsv = sv_2mortal(newSVpvs("Died"));
+    tmpsv = sv_2mortal(newSVpvs("Died"));
 
     DIE(aTHX_ "%"SVf, SVfARG(tmpsv));
 }
