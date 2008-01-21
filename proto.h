@@ -395,8 +395,10 @@ PERL_CALLCONV void	Perl_deprecate_old(pTHX_ const char* s)
 PERL_CALLCONV OP*	Perl_die(pTHX_ const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
-PERL_CALLCONV OP*	Perl_vdie(pTHX_ const char* pat, va_list* args);
-PERL_CALLCONV OP*	Perl_die_where(pTHX_ const char* message, STRLEN msglen);
+PERL_CALLCONV void	Perl_vdie(pTHX_ const char* pat, va_list* args);
+PERL_CALLCONV void	Perl_die_where(pTHX_ SV *msv)
+			__attribute__nonnull__(pTHX_1);
+
 PERL_CALLCONV void	Perl_dounwind(pTHX_ I32 cxix);
 /* PERL_CALLCONV bool	Perl_do_aexec(pTHX_ SV* really, SV** mark, SV** sp)
 			__attribute__nonnull__(pTHX_2)
@@ -4074,8 +4076,10 @@ STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
 			__attribute__nonnull__(pTHX_1);
 
 STATIC SV*	S_mess_alloc(pTHX);
-STATIC const char *	S_vdie_croak_common(pTHX_ const char *pat, va_list *args, STRLEN *msglen);
-STATIC bool	S_vdie_common(pTHX_ const char *message, STRLEN msglen, bool warn);
+STATIC SV*	S_vdie_croak_common(pTHX_ const char *pat, va_list *args);
+STATIC bool	S_vdie_common(pTHX_ SV *msg, bool warn)
+			__attribute__nonnull__(pTHX_1);
+
 STATIC char *	S_write_no_mem(pTHX)
 			__attribute__noreturn__;
 

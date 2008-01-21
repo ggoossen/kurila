@@ -1657,7 +1657,7 @@ S_hfreeentries(pTHX_ HV *hv)
 	}
 
 	if (--attempts == 0) {
-	    Perl_die(aTHX_ "panic: hfreeentries failed to free hash - something is repeatedly re-creating entries");
+	    Perl_croak(aTHX_ "panic: hfreeentries failed to free hash - something is repeatedly re-creating entries");
 	}
     }
 	
@@ -2345,7 +2345,7 @@ Perl_hv_placeholders_p(pTHX_ HV *hv)
 	mg = sv_magicext((SV*)hv, 0, PERL_MAGIC_rhash, 0, 0, 0);
 
 	if (!mg) {
-	    Perl_die(aTHX_ "panic: hv_placeholders_p");
+	    Perl_croak(aTHX_ "panic: hv_placeholders_p");
 	}
     }
     return &(mg->mg_len);
@@ -2371,7 +2371,7 @@ Perl_hv_placeholders_set(pTHX_ HV *hv, I32 ph)
 	mg->mg_len = ph;
     } else if (ph) {
 	if (!sv_magicext((SV*)hv, 0, PERL_MAGIC_rhash, 0, 0, ph))
-	    Perl_die(aTHX_ "panic: hv_placeholders_set");
+	    Perl_croak(aTHX_ "panic: hv_placeholders_set");
     }
     /* else we don't need to add magic to record 0 placeholders.  */
 }

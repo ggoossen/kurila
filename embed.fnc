@@ -183,8 +183,8 @@ pM	|void	|delete_eval_scope
 p	|void	|deprecate	|NN const char* s
 p	|void	|deprecate_old	|NN const char* s
 Afp	|OP*	|die		|NULLOK const char* pat|...
-p	|OP*	|vdie		|NULLOK const char* pat|NULLOK va_list* args
-p	|OP*	|die_where	|NULLOK const char* message|STRLEN msglen
+p	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
+p	|void	|die_where	|NN SV *msv
 Ap	|void	|dounwind	|I32 cxix
 pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV** mark|NN SV** sp
 p	|bool	|do_aexec5	|NULLOK SV* really|NN SV** mark|NN SV** sp|int fd|int do_report
@@ -1537,9 +1537,8 @@ s	|char*	|stdize_locale	|NN char* locs
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 s	|SV*	|mess_alloc
-s	|const char *|vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args \
-				|NULLOK STRLEN *msglen
-s	|bool	|vdie_common	|NULLOK const char *message|STRLEN msglen\
+s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
+s	|bool	|vdie_common	|NN SV *msg \
 				|bool warn
 sr	|char *	|write_no_mem
 #endif
