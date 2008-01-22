@@ -905,27 +905,6 @@ Perl_die_where(pTHX_ SV *msv)
 	}
     }
 
-    if ( sv_isobject(msv)) {
-	dSP;
-	SV* tmpsv;
-
-	ENTER;
-	PUSHMARK(SP);
-	PUSHs(msv);
-	PUTBACK;
-
-	call_method("message", G_SCALAR);
-	SPAGAIN;
-	tmpsv = POPs;
-	message = SvPV_const(tmpsv, msglen);
-
-	LEAVE;
-    } else {
-	message = SvPV_const(msv, msglen);
-    }
-    
-
-    write_to_stderr(message, msglen);
     my_failure_exit();
     /* NOTREACHED */
     return;
@@ -2806,6 +2785,11 @@ PP(pp_entereval)
     PL_hints = PL_op->op_targ;
     if (saved_hh)
 	GvHV(PL_hintgv) = saved_hh;
+
+    SAVESPTR(PL_diehook);
+    SvREFCNT_dec(PL_diehook);
+    PL_diehook = NULL;
+
     SAVECOMPILEWARNINGS();
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
     if (PL_compiling.cop_hints_hash) {

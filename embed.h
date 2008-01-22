@@ -1537,7 +1537,7 @@
 #define closest_cop		S_closest_cop
 #define mess_alloc		S_mess_alloc
 #define vdie_croak_common	S_vdie_croak_common
-#define vdie_common		S_vdie_common
+#define vdie_common		Perl_vdie_common
 #define write_no_mem		S_write_no_mem
 #endif
 #endif
@@ -3787,7 +3787,7 @@
 #define closest_cop(a,b)	S_closest_cop(aTHX_ a,b)
 #define mess_alloc()		S_mess_alloc(aTHX)
 #define vdie_croak_common(a,b)	S_vdie_croak_common(aTHX_ a,b)
-#define vdie_common(a,b)	S_vdie_common(aTHX_ a,b)
+#define vdie_common(a,b)	Perl_vdie_common(aTHX_ a,b)
 #define write_no_mem()		S_write_no_mem(aTHX)
 #endif
 #endif

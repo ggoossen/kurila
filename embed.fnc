@@ -1538,7 +1538,7 @@ s	|char*	|stdize_locale	|NN char* locs
 s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 s	|SV*	|mess_alloc
 s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
-s	|bool	|vdie_common	|NN SV *msg \
+p	|bool	|vdie_common	|NN SV *msg \
 				|bool warn
 sr	|char *	|write_no_mem
 #endif

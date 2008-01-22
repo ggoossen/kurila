@@ -1178,8 +1178,8 @@ Perl_write_to_stderr(pTHX_ const char* message, int msglen)
 
 /* Common code used by vdie, vwarn and vwarner  */
 
-STATIC bool
-S_vdie_common(pTHX_ SV *msv, bool warn)
+bool
+Perl_vdie_common(pTHX_ SV *msv, bool warn)
 {
     dVAR;
     HV *stash;
@@ -1189,7 +1189,9 @@ S_vdie_common(pTHX_ SV *msv, bool warn)
     /* sv_2cv might call Perl_croak() or Perl_warner() */
     SV * const oldhook = *hook;
 
-    assert(oldhook);
+    if ( ! oldhook ) {
+	return FALSE;
+    }
 
     ENTER;
     SAVESPTR(*hook);
@@ -1247,9 +1249,7 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
     DEBUG_S(PerlIO_printf(Perl_debug_log,
 			  "%p: die/croak\ndiehook = %p\n",
 			  (void*)thr, (void*)PL_diehook));
-    if (PL_diehook) {
-	S_vdie_common(aTHX_ ERRSV, FALSE);
-    }
+    vdie_common(ERRSV, FALSE);
     return ERRSV;
 }
 
@@ -1340,8 +1340,6 @@ void
 Perl_vwarn(pTHX_ const char* pat, va_list *args)
 {
     dVAR;
-    STRLEN msglen;
-    const char * message;
     SV* msv;
     SV* esv;
 
@@ -1366,28 +1364,8 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	LEAVE;
     }
 
-    if (PL_warnhook) {
-	if (vdie_common(msv, TRUE))
-	    return;
-    }
-
-    {
-	dSP;
-	SV* tmpsv;
-
-	ENTER;
-	PUSHMARK(SP);
-	PUSHs(esv);
-	PUTBACK;
-
-	call_method("message", G_SCALAR);
-	SPAGAIN;
-	tmpsv = POPs;
-	message = SvPV_const(tmpsv, msglen);
-
-	LEAVE;
-    }
-    write_to_stderr(message, msglen);
+    if (PL_warnhook)
+	vdie_common(esv, TRUE);
 }
 
 #if defined(PERL_IMPLICIT_CONTEXT)
@@ -1452,7 +1430,7 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 
 	if (PL_diehook) {
 	    assert(message);
-	    S_vdie_common(aTHX_ msv, FALSE);
+	    Perl_vdie_common(aTHX_ msv, FALSE);
 	}
 	die_where(msv);
 	/* NOTREACHED */

@@ -342,6 +342,8 @@ foo;
 EXPECT
 In foo1
 Subroutine foo redefined at (eval 1) line 1
+    (eval) called at - line 4
+    main::foo called at - line 7
 Exiting foo1
 In foo2
 ########
@@ -433,7 +435,7 @@ destroyed
 BEGIN {
   $| = 1;
   $SIG{__WARN__} = sub {
-    eval { print $_[0] };
+    eval { print $_[0]->{description} };
     die "bar\n";
   };
   warn "foo\n";
