@@ -447,7 +447,7 @@ PP(pp_die)
 {
     dVAR; dSP; dMARK;
     const char *tmps;
-    SV *tmpsv;
+    SV *tmpsv = NULL;
 
     /* TODO: protection against recursion */
 
@@ -455,20 +455,21 @@ PP(pp_die)
 	call_pv("error::create", G_SCALAR);
 	tmpsv = TOPs;
 	SP = MARK + 1;
-
-	die_where(tmpsv);
-	/* NOTREACHED */
     }
     else {
 	SV * const error = ERRSV;
 	if (sv_isobject(error)) {
-	    die_where(error);
-	    /* NOTREACHED */
+	    tmpsv = error;
 	}
     }
-    tmpsv = sv_2mortal(newSVpvs("Died"));
+    if ( ! tmpsv )
+	tmpsv = sv_2mortal(newSVpvs("Died"));
+
+    Perl_vdie_common(tmpsv, FALSE);
+
     die_where(tmpsv);
     /* NOTREACHED */
+
     return NULL;
 }
 

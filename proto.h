@@ -4077,7 +4077,7 @@ STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
 
 STATIC SV*	S_mess_alloc(pTHX);
 STATIC SV*	S_vdie_croak_common(pTHX_ const char *pat, va_list *args);
-STATIC bool	S_vdie_common(pTHX_ SV *msg, bool warn)
+PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msg, bool warn)
 			__attribute__nonnull__(pTHX_1);
 
 STATIC char *	S_write_no_mem(pTHX)

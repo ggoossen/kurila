@@ -184,7 +184,7 @@ Returns the stash of the CV.
 #define CvEVAL_off(cv)		CvUNIQUE_off(cv)
 
 /* BEGIN|CHECK|INIT|UNITCHECK|END */
-#define CvSPECIAL(cv)		(CvUNIQUE(cv) && SvFAKE(cv))
+static __inline__ U32 CvSPECIAL(CV *cv) { return CvUNIQUE(cv) && SvFAKE(cv); }
 #define CvSPECIAL_on(cv)	(CvUNIQUE_on(cv),SvFAKE_on(cv))
 #define CvSPECIAL_off(cv)	(CvUNIQUE_off(cv),SvFAKE_off(cv))
 

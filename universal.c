@@ -228,7 +228,7 @@ XS(XS_Symbol_glob_name);
 XS(XS_dump_view);
 XS(XS_error_create);
 XS(XS_error_message);
-XS(XS_error__die_hook);
+XS(XS_error_write_to_stderr);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -299,9 +299,10 @@ Perl_boot_core_UNIVERSAL(pTHX)
     
     newXS("error::create", XS_error_create, file);
     newXS("error::message", XS_error_message, file);
-/*     newXS("error::_die_hook", XS_error__die_hook, file); */
+    newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
-/*     PL_diehook = (SV*)gv_fetchmethod(NULL, "error::_die_hook"); */
+    PL_diehook = (SV*)gv_fetchmethod(NULL, "error::write_to_stderr");
+    PL_warnhook = (SV*)gv_fetchmethod(NULL, "error::write_to_stderr");
 }
 
 
@@ -776,11 +777,16 @@ STATIC AV* S_error_backtrace()
 	    break;
 	
 	/* caller() should not report the automatic calls to &DB::sub */
-	if (PL_DBsub && GvCV(PL_DBsub) && cxix >= 0 &&
+	if (PL_DBsub && GvCV(PL_DBsub) && 
 	    ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub)) {
 	    cxix = dopoptosub_at(ccstack, cxix - 1);
 	    continue;
 	}
+
+	/* stop on BEGIN/CHECK/.../END blocks */
+	if ((CxTYPE(&ccstack[cxix]) == CXt_SUB) &&
+	    (CvSPECIAL(ccstack[cxix].blk_sub.cv)))
+	    break;
 
 	/* make stack entry */
 	av_push(trace, newRV_inc( (SV*) S_context_info(&ccstack[cxix]) ));
@@ -971,6 +977,30 @@ XS(XS_error_message)
 	PUSHs(res);
 	XSRETURN(1);
     }
+}
+
+XS(XS_error_write_to_stderr) {
+    dXSARGS;
+    STRLEN msglen;
+    const char * message;
+    SV* tmpsv;
+
+    if (items != 1)
+	Perl_croak(aTHX_ "Usage: $error->write_to_stderr()");
+
+    ENTER;
+    PUSHMARK(SP);
+    PUSHs(ST(0));
+    PUTBACK;
+
+    call_method("message", G_SCALAR);
+    SPAGAIN;
+    tmpsv = POPs;
+    message = SvPV_const(tmpsv, msglen);
+
+    LEAVE;
+
+    write_to_stderr(message, msglen);
 }
 
 XS(XS_utf8_valid)
