@@ -133,19 +133,20 @@ __EOMK__
 {
     my $id;
 
-    local $SIG{__WARN__} = sub {
-	print "# $id: @_";
-	$@ = "@_";
-    };
+    my $x_warn;
+#     local $SIG{__WARN__} = sub {
+# 	print "# $id: " . $_[0]->{description} . "\n";
+# 	$x_warn = $_[0]->{description};
+#     };
 
     sub moan {
 	print "$id: @_";
     }
 
     sub warn_unpack_U {
-	$@ = '';
+	$x_warn = '';
 	my @null = unpack('U0U*', $_[0]);
-	return $@;
+	return $x_warn;
     }
 
     for (@MK) {

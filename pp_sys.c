@@ -452,9 +452,11 @@ PP(pp_die)
     /* TODO: protection against recursion */
 
     if (SP - MARK >= 1) {
+	ENTER;
+	PUSHMARK(MARK);
 	call_pv("error::create", G_SCALAR);
-	tmpsv = TOPs;
-	SP = MARK + 1;
+	tmpsv = POPs;
+	LEAVE;
     }
     else {
 	SV * const error = ERRSV;
