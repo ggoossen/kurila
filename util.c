@@ -1197,7 +1197,6 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     SAVESPTR(*hook);
     *hook = NULL;
     cv = sv_2cv(oldhook, &stash, &gv, 0);
-    POPSTACK;
     LEAVE;
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
 	dSP;
@@ -1233,6 +1232,7 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 
 	if (PL_errors && SvCUR(PL_errors)) {
 	    sv_catsv(PL_errors, msv);
+	    sv_catpvn(PL_errors, "\n", 1);
 	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);
 	}
@@ -1374,8 +1374,8 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	LEAVE;
     }
 
-/*     if (PL_warnhook) */
-/* 	vdie_common(msv, TRUE); */
+    if (PL_warnhook)
+	vdie_common(msv, TRUE);
 }
 
 #if defined(PERL_IMPLICIT_CONTEXT)

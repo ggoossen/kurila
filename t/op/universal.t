@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 111;
+plan tests => 110;
 
 $a = {};
 bless $a, "Bob";
@@ -111,8 +111,8 @@ ok ! $a->can("export_tags");	# a method in Exporter
 
 cmp_ok eval { $a->VERSION }, '==', 2.718;
 
-ok ! (eval { $a->VERSION(2.719) });
-like $@, qr/^Alice version 2.719 required--this is only version 2.718 at /;
+dies_like( sub { $a->VERSION(2.719) }, 
+           qr/^Alice version 2.719 required--this is only version 2.718 at / );
 
 ok (eval { $a->VERSION(2.718) });
 is $@, '';
@@ -215,6 +215,6 @@ eval { isa({}, 'HASH') };
 ::is($@, '', "*isa correctly found");
 
 package main;
-eval { UNIVERSAL::DOES([], "foo") };
-like( $@, qr/Can't call method "DOES" on unblessed reference/,
-    'DOES call error message says DOES, not isa' );
+::dies_like( sub { UNIVERSAL::DOES([], "foo") },
+             qr/Can't call method "DOES" on unblessed reference/,
+             'DOES call error message says DOES, not isa' );
