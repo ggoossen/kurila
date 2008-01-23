@@ -98,8 +98,6 @@ MSG
 {
     fresh_perl_is('BEGIN { die "foobar" }', <<MSG );
 foobar at - line 1
-BEGIN failed--compilation aborted
-    main::BEGIN called at - line 1
-    (eval) called at - line 1
+BEGIN failed--compilation aborted at - line 1
 MSG
 }

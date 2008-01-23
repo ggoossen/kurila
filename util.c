@@ -1224,33 +1224,42 @@ STATIC SV*
 S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 {
     dVAR;
+    assert(pat);
+    SV * msv = vmess(pat, args);
 
     if (pat) {
 	dSP;
-	SV * const msv = vmess(pat, args);
-	ENTER;
-	PUSHMARK(SP);
+	GV *gv;
 
 	if (PL_errors && SvCUR(PL_errors)) {
 	    sv_catsv(PL_errors, msv);
-	    PUSHs(sv_mortalcopy(PL_errors));
+	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);
 	}
-	else
-	    PUSHs(msv);
 
-	PUTBACK;
-	call_pv("error::create", G_SCALAR);
-	sv_setsv(ERRSV, TOPs);
-	SP--;
+	ENTER;
+	gv = gv_fetchmethod(NULL, "error::create");
 	LEAVE;
+
+	if (gv) {
+	    ENTER;
+	    PUSHMARK(SP);
+
+	    XPUSHs(msv);
+
+	    PUTBACK;
+	    call_sv((SV*)GvCV(gv), G_SCALAR);
+	    msv = TOPs;
+	    SP--;
+	    LEAVE;
+	}
     }
 
     DEBUG_S(PerlIO_printf(Perl_debug_log,
 			  "%p: die/croak\ndiehook = %p\n",
 			  (void*)thr, (void*)PL_diehook));
-    vdie_common(ERRSV, FALSE);
-    return ERRSV;
+    vdie_common(msv, FALSE);
+    return msv;
 }
 
 void

@@ -301,8 +301,8 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("error::message", XS_error_message, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
-    PL_diehook = (SV*)gv_fetchmethod(NULL, "error::write_to_stderr");
-    PL_warnhook = (SV*)gv_fetchmethod(NULL, "error::write_to_stderr");
+    PL_diehook = SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
+    PL_warnhook = SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
 }
 
 

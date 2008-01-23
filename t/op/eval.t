@@ -16,10 +16,10 @@ print $foo;
 
 print eval '
 $foo =;';		# this tests for a call through yyerror()
-if ($@ =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
+if ($@->{location} =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
 
 print eval '$foo = m/';	# this tests for a call through fatal()
-if ($@ =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
+if ($@->{description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
 
 print eval '"ok 7\n";';
 

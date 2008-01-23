@@ -1,6 +1,6 @@
 #!./perl
 
-require "./test.pl";
+BEGIN { require "./test.pl"; }
 plan( tests => 25 );
 
 is(vec($foo,0,1), 0);
@@ -35,18 +35,11 @@ ok("$foo $bar $baz" eq "1 2 3");
 
 # error cases
 
-$x = eval { vec $foo, 0, 3 };
-like($@, qr/^Illegal number of bits in vec/);
-$@ = undef;
-$x = eval { vec $foo, 0, 0 };
-like($@, qr/^Illegal number of bits in vec/);
-$@ = undef;
-$x = eval { vec $foo, 0, -13 };
-like($@, qr/^Illegal number of bits in vec/);
-$@ = undef;
-$x = eval { vec($foo, -1, 4) = 2 };
-like($@, qr/^Negative offset to vec in lvalue context/);
-$@ = undef;
+dies_like( sub { vec $foo, 0, 3 }, qr/^Illegal number of bits in vec/);
+dies_like( sub { vec $foo, 0, 0 }, qr/^Illegal number of bits in vec/);
+dies_like( sub { vec $foo, 0, -13 }, qr/^Illegal number of bits in vec/);
+dies_like( sub { vec($foo, -1, 4) = 2 }, qr/^Negative offset to vec in lvalue context/);
+
 ok(! vec('abcd', 7, 8));
 
 # vec is independent of 'use utf8'
