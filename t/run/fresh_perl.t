@@ -183,23 +183,17 @@ DESTROY
 BEGIN { die "phooey" }
 EXPECT
 phooey at - line 1
-BEGIN failed--compilation aborted
-    main::BEGIN called at - line 1
-    (eval) called at - line 1
+BEGIN failed--compilation aborted at - line 1
 ########
 BEGIN { 1/$zero }
 EXPECT
 Illegal division by zero at - line 1
-BEGIN failed--compilation aborted
-    main::BEGIN called at - line 1
-    (eval) called at - line 1
+BEGIN failed--compilation aborted at - line 1
 ########
 BEGIN { undef = 0 }
 EXPECT
 Modification of a read-only value attempted at - line 1
-BEGIN failed--compilation aborted
-    main::BEGIN called at - line 1
-    (eval) called at - line 1
+BEGIN failed--compilation aborted at - line 1
 ########
 {
     package foo;
@@ -436,13 +430,14 @@ BEGIN {
   $| = 1;
   $SIG{__WARN__} = sub {
     eval { print $_[0]->{description} };
-    die "bar\n";
+    die "bar";
   };
   warn "foo\n";
 }
 EXPECT
 foo
-bar
+bar at - line 5
+    main::__ANON__ called at - line 7
 BEGIN failed--compilation aborted at - line 8
 ########
 re();
@@ -495,7 +490,8 @@ sub M { $_[0] = 2; }
 eval "C";
 M(C);
 EXPECT
-Modification of a read-only value attempted at - line 2.
+Modification of a read-only value attempted at - line 2
+    main::M called at - line 4
 ########
 print qw(ab a\b a\\b);
 EXPECT
@@ -529,7 +525,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-(?-uxism:x)
+(?-uxism:x) at - line 3
 ########
 # David Dyck
 # coredump in 5.7.1
