@@ -1197,6 +1197,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     SAVESPTR(*hook);
     *hook = NULL;
     cv = sv_2cv(oldhook, &stash, &gv, 0);
+    POPSTACK;
     LEAVE;
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
 	dSP;
@@ -1224,7 +1225,6 @@ STATIC SV*
 S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 {
     dVAR;
-    assert(pat);
     SV * msv = vmess(pat, args);
 
     if (pat) {
@@ -1243,6 +1243,7 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 
 	if (gv) {
 	    ENTER;
+	    PUSHSTACKi(PERLSI_DIEHOOK);
 	    PUSHMARK(SP);
 
 	    XPUSHs(msv);
@@ -1250,7 +1251,7 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	    PUTBACK;
 	    call_sv((SV*)GvCV(gv), G_SCALAR);
 	    msv = TOPs;
-	    SP--;
+	    POPSTACK;
 	    LEAVE;
 	}
     }
@@ -1348,33 +1349,33 @@ Perl_croak(pTHX_ const char *pat, ...)
 void
 Perl_vwarn(pTHX_ const char* pat, va_list *args)
 {
-    dVAR;
     SV* msv;
-    SV* esv;
 
     {
 	dSP;
-	SV * const msv = vmess(pat, args);
-	ENTER;
-	PUSHMARK(SP);
+	msv = vmess(pat, args);
 
 	if (PL_errors && SvCUR(PL_errors)) {
 	    sv_catsv(PL_errors, msv);
-	    PUSHs(sv_mortalcopy(PL_errors));
+	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);
 	}
-	else
-	    PUSHs(msv);
 
+	ENTER;
+	PUSHSTACKi(PERLSI_WARNHOOK);
+	PUSHMARK(SP);
+	XPUSHs(msv);
 	PUTBACK;
 	call_pv("error::create", G_SCALAR);
-	esv = TOPs;
-	SP--;
+	SPAGAIN;
+	msv = POPs;
+	PUTBACK;
+	POPSTACK;
 	LEAVE;
     }
 
-    if (PL_warnhook)
-	vdie_common(esv, TRUE);
+/*     if (PL_warnhook) */
+/* 	vdie_common(msv, TRUE); */
 }
 
 #if defined(PERL_IMPLICIT_CONTEXT)

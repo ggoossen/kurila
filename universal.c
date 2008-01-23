@@ -898,12 +898,11 @@ XS(XS_error_create)
 	    (void)hv_stores(hv, "location", SvREFCNT_inc(sv));
 	}
 	    
+	/* backtrace */
 	(void)hv_stores(hv, "stack", newRV_inc( (SV*) S_error_backtrace() ));
 
-	/* backtrace */
-	PUSHs(sv_2mortal(rv));
-	PUTBACK;
-	return;
+	XPUSHs(sv_2mortal(rv));
+	XSRETURN(1);
     }
 }
 
