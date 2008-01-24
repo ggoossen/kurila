@@ -43,9 +43,9 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift)"
 # Files to be built with variable substitution after miniperl is
 # available.  Dependencies handled manually below (for now).
 
-plextract = perlbug perlivp dprofpp
+plextract = perlbug perlivp
 plfixlocal = h2xs h2ph perldoc pl2pm libnetcfg
-plfix = cpan corelist instmodsh prove ptar ptardiff shasum splain piconv enc2xs xsubpp
+plfix = cpan corelist instmodsh prove ptar ptardiff shasum splain xsubpp
 
 all: $(plextract) $(plfixlocal) $(plfix)
 
@@ -100,17 +100,7 @@ splain: ../lib/diagnostics.pm ../config.sh
 	$(CPS) ../lib/diagnostics.pm $@
 	$(RUN) $(PERL) $(FIXIN) $@
 
-dprofpp:	dprofpp.PL ../config.sh
-
 libnetcfg:	libnetcfg.pl ../config.sh
-
-piconv: ../ext/Encode/bin/$@ ../config.sh
-	$(CPS) ../ext/Encode/bin/$@ $@
-	$(RUN) $(PERL) $(FIXIN) $@
-
-enc2xs: ../ext/Encode/bin/$@ ../config.sh
-	$(CPS) ../ext/Encode/bin/$@ $@
-	$(RUN) $(PERL) $(FIXIN) $@
 
 xsubpp: ../lib/ExtUtils/$@ ../config.sh
 	$(CPS) ../lib/ExtUtils/$@ $@

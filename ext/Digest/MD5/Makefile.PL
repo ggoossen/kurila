@@ -54,7 +54,7 @@ sub free_u32_alignment
     }
     
     print "Testing alignment requirements for U32... ";
-    open(ALIGN_TEST, ">u32align.c") or die "$!";
+    open(ALIGN_TEST, ">", "u32align.c") or die "$!";
     print ALIGN_TEST <<'EOT'; close(ALIGN_TEST);
 /*--------------------------------------------------------------*/
 /*  This program allocates a buffer of U8 (char) and then tries */

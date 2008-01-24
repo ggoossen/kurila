@@ -140,16 +140,13 @@ chdir "pteerslo";
 
 @f_names = qw(Ax.pl Bx.pl Cx.pl aY.pl bY.pl cY.pl);
 @f_alpha = qw(Ax.pl aY.pl Bx.pl bY.pl Cx.pl cY.pl);
-if ('a' lt 'A') { # EBCDIC char sets sort lower case before UPPER
-    @f_names = sort(@f_names);
-}
 if ($^O eq 'VMS') { # VMS is happily caseignorant
     @f_alpha = qw(ax.pl ay.pl bx.pl by.pl cx.pl cy.pl);
     @f_names = @f_alpha;
 }
 
 for (@f_names) {
-    open T, "> $_";
+    open T, ">", "$_";
     close T;
 }
 
@@ -195,7 +192,7 @@ print "ok 12\n";
     my $cwd = Cwd::cwd();
     chdir $dir
 	or die "Could not chdir to $dir: $!";
-    my(@glob_files) = glob("a*{d[e]}j");
+    my(@glob_files) = glob("a*\{d[e]\}j");
     if (!(@glob_files == 1 && "@glob_files" eq "a_dej")) {
 	print "not ";
     }

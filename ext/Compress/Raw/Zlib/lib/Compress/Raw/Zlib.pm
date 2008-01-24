@@ -9,7 +9,7 @@ use Carp ;
 use strict ;
 use warnings ;
 use bytes ;
-our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
+our ($VERSION, $XS_VERSION, @ISA, @EXPORT);
 
 BEGIN {
     $VERSION = '2.006';

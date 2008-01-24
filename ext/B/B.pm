@@ -66,8 +66,8 @@ sub B::GV::SAFENAME {
   # The regex below corresponds to the isCONTROLVAR macro
   # from toke.c
 
-  $name =~ s/^([\cA-\cZ\c\\c[\c]\c?\c_\c^])/"^".
-	chr( utf8::unicode_to_native( 64 ^^^ ord($1) ))/e;
+  $name =~ s/^([\cA-\cZ\c\\c[\c]\c?\c_\c^])/{"^".
+	chr( utf8::unicode_to_native( 64 ^^^ ord($1) ))}/;
 
   # When we say unicode_to_native we really mean ascii_to_native,
   # which matters iff this is a non-ASCII platform (EBCDIC).
@@ -179,35 +179,35 @@ sub walkoptree_exec {
 	if ($ppname =~
 	    m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
 	{
-	    print $prefix, uc($1), " => {\n";
+	    print $prefix, uc($1), " => \{\n";
 	    walkoptree_exec($op->other, $method, $level + 1);
-	    print $prefix, "}\n";
+	    print $prefix, "\}\n";
 	} elsif ($ppname eq "match" || $ppname eq "subst") {
 	    my $pmreplstart = $op->pmreplstart;
 	    if ($$pmreplstart) {
-		print $prefix, "PMREPLSTART => {\n";
+		print $prefix, "PMREPLSTART => \{\n";
 		walkoptree_exec($pmreplstart, $method, $level + 1);
-		print $prefix, "}\n";
+		print $prefix, "\}\n";
 	    }
 	} elsif ($ppname eq "substcont") {
-	    print $prefix, "SUBSTCONT => {\n";
+	    print $prefix, "SUBSTCONT => \{\n";
 	    walkoptree_exec($op->other->pmreplstart, $method, $level + 1);
-	    print $prefix, "}\n";
+	    print $prefix, "\}\n";
 	    $op = $op->other;
 	} elsif ($ppname eq "enterloop") {
-	    print $prefix, "REDO => {\n";
+	    print $prefix, "REDO => \{\n";
 	    walkoptree_exec($op->redoop, $method, $level + 1);
-	    print $prefix, "}\n", $prefix, "NEXT => {\n";
+	    print $prefix, "\}\n", $prefix, "NEXT => \{\n";
 	    walkoptree_exec($op->nextop, $method, $level + 1);
-	    print $prefix, "}\n", $prefix, "LAST => {\n";
+	    print $prefix, "\}\n", $prefix, "LAST => \{\n";
 	    walkoptree_exec($op->lastop,  $method, $level + 1);
-	    print $prefix, "}\n";
+	    print $prefix, "\}\n";
 	} elsif ($ppname eq "subst") {
 	    my $replstart = $op->pmreplstart;
 	    if ($$replstart) {
-		print $prefix, "SUBST => {\n";
+		print $prefix, "SUBST => \{\n";
 		walkoptree_exec($replstart, $method, $level + 1);
-		print $prefix, "}\n";
+		print $prefix, "\}\n";
 	    }
 	}
     }
@@ -290,9 +290,9 @@ sub walksymtable {
 	    chomp;
 	    s/^(.*?)\t//;
 	    if ($1 eq $name) {
-		s{(s\\_[0-9a-f]+)} {
+		s{(s\\_[0-9a-f]+)} {{
 		    exists($sym->{$1}) ? $sym->{$1} : $default;
-		}ge;
+		}}g;
 		printf $fh $format, $_;
 	    }
 	}

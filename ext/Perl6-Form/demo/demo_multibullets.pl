@@ -16,7 +16,7 @@ use Perl6::Form;
 for my $category (keys %categories) {
 	print form
 		 {bullet=>'*'},
-		 "** * {<<<<<<<<<<<<<<<<<<<<<<<<<<<<} **", $category,
+		 "** * \{<<<<<<<<<<<<<<<<<<<<<<<<<<<<\} **", $category,
 		 {bullet=>'-'},
-		 "     - {[[[[[[[[[[[[[[[[[[[[[[[[[[} - ", $categories{$category};
+		 "     - \{[[[[[[[[[[[[[[[[[[[[[[[[[[\} - ", $categories{$category};
 }

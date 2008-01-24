@@ -83,11 +83,7 @@ WriteMakefile(
         'threads.pm'    => '$(INST_LIBDIR)/threads.pm',
     },
     'INSTALLDIRS'       => 'perl',
-
-    ((ExtUtils::MakeMaker->VERSION() lt '6.25') ?
-        ('PL_FILES' => { })            : ()),
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
-        ('LICENSE'  => 'perl')         : ()),
+    'LICENSE'  => 'perl',
 
     @conditional_params
 );

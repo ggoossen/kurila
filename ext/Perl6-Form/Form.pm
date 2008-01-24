@@ -202,7 +202,7 @@ sub user_def {
 	my $count = @from;
 	for (my $i=0; $i+<@$spec; $i+=2, $count++) {
 		my ($pat, $fld) = @{$spec}[$i,$i+1];
-		push @from, "$pat(?{$count})";
+		push @from, "$pat(?\{$count\})";
 		push @to,   (ref $fld eq 'CODE' ? $fld : sub{$fld});
 	}
 	return {from=>\@from, to=>\@to};
@@ -307,7 +307,7 @@ sub jleft {
 	unless ($val{last}) {
 		my $rem = $val{width}-length($str);
 		$str = reverse $str;
-		1 while $rem+>0 && $str =~ s/( +)/($rem--+>0?" ":"").$1/ge;
+		1 while $rem+>0 && $str =~ s/( +)/{($rem--+>0?" ":"").$1}/g;
 		$_[0] = reverse $str;
 	}
 	&jleft;
@@ -395,10 +395,10 @@ sub jleft {
 				my @groups = @$grouping;
 				my $group = shift @groups;
 				if ($group) {
-					$w =~ s/(\d)(\d{$group})\z/$1$comma$2/;
+					$w =~ s/(\d)(\d\{$group\})\z/$1$comma$2/;
 					do {
 						$group = shift @groups if @groups;
-					} while $group && $w =~ s/(?<!,)(\d)(\d{$group})(?!\d)/$1$comma$2/;
+					} while $group && $w =~ s/(?<!,)(\d)(\d\{$group\})(?!\d)/$1$comma$2/;
 				}
 			}
 			if (!$val{stretch} && ($w ? length($w) : 0)+length($pre) +> $whole) {
@@ -411,7 +411,7 @@ sub jleft {
 				$str =~ s/^/$pre/;
 				if ($val{pre} =~ m/^0+$/) {
 					$str =~ s{^((\D*)(\d.*))\.}
-						     {$2 . ("0"  x ($whole-length $1)) . "$3."}e;
+						     {{$2 . ("0"  x ($whole-length $1)) . "$3."}};
 					$val{pre} = " ";
 				}
 				$str =~ s/^(.*)\./$1$point/;
@@ -419,7 +419,7 @@ sub jleft {
 				jleft($str, %val, width=>$width, precropped=>1);
 				jright($str, %val, precropped=>1);
 				my $postlen = length($post);
-				$str =~ s/(?:[ ]{$postlen}([ ]*)|.{$postlen}())$/$post$+/
+				$str =~ s/(?:[ ]\{$postlen\}([ ]*)|.\{$postlen\}())$/$post$+/
 					if $postlen;
 				$_[0] = $str;
 			}
@@ -508,7 +508,7 @@ sub segment ($\@\%$\%) {
 	my (@formatters,@starred,@vstarred);
 	for my $i (0..$args_req) {
 		my ($literal,$field,$userdef) = @format[3*$i..3*$i+2];
-		$literal =~ s/\\\{/{/g;
+		$literal =~ s/\\\{/\{/g;
 		push @formatters, { %std_literal,
 							width => length($literal),
 							src	  => \$literal,
@@ -558,17 +558,17 @@ sub segment ($\@\%$\%) {
 					$checkplaces = $checkwidth =~ s/[.,](\d+)// && $1;
 					for ($fld) {
 						s{([][><I|Vv"']) (\(\s*\d+[.,]?\d*\s*\))}
-						 { $1 . ($1 x length $2) }xe and last;
+						 {{ $1 . ($1 x length $2) }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\)) ([][><I|V"'])}
-						 { ($2 x length $1) . $2 }xe and last;
+						 {{ ($2 x length $1) . $2 }}x and last;
 						s{(> [.,]) (\(\s*\d+[.,]?\d*\s*\))}
-						 { $1 . ('<' x length $2) }xe and last;
+						 {{ $1 . ('<' x length $2) }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] <)}
-						 { ('>' x length $1) . $2 }xe and last;
+						 {{ ('>' x length $1) . $2 }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] \[)}
-						 { (']' x length $1) . $2 }xe and last;
+						 {{ (']' x length $1) . $2 }}x and last;
 						s{(\(\s*\d+[.,]?\d*\s*\))}
-						 { '[' x length $1 }xe and last;
+						 {{ '[' x length $1 }}x and last;
 					}
 				}
 
@@ -589,11 +589,11 @@ sub segment ($\@\%$\%) {
 				}
 
 				$precurr =
-					$fld =~ s/$precurrpat/$1.($3 x length $2).$3/e  ? "$2" : "";
+					$fld =~ s/$precurrpat/{$1.($3 x length $2).$3}/  ? "$2" : "";
 				$incurr =
 					$fld =~ m/$incurrpat/                           ? "$2" : "";
 				$postcurr =
-					$fld =~ s/$postcurrpat/$1.($1 x length $2).$3/e ? "$2" : "";
+					$fld =~ s/$postcurrpat/{$1.($1 x length $2).$3}/ ? "$2" : "";
 
 				if ($form{width} == 2) {
 					$fld = '[[';
@@ -788,10 +788,11 @@ sub make_col {
 		($text,$more,$eol) = $f->{break}->($str_ref,$width,$f->{opts}{ws});
 		if ($f->{opts}{ws}) {
 			$text =~ s{($f->{opts}{ws})}
-					  { @caps = grep { defined $$_ } 2..$#+;
+					  {{ @caps = grep { defined $$_ } 2..$#+;
 						@caps = length($1) ? " " : "" unless @caps;
 						join "", @caps;
-					  }ge;
+					  
+}}g;
 		}
 		$text .= "\r" if $eol;
 		push @col, $text;
@@ -1049,11 +1050,11 @@ sub make_underline {
 	my $trail = "$1"^|^"\n";
 	for my $l ($nextline, $prevline) {
 		$l = join "", map {$_->{literal} ? ${$_->{src}} : '*'x$_->{width} } @$l;
-		$l =~ s{(.)}{$1 =~ m/\s/ ? "\0" : "\1"}ges;
+		$l =~ s{(.)}{{$1 =~ m/\s/ ? "\0" : "\1"}}gs;
 	}
 	$nextline ^|^= $prevline;
 	$nextline =~ s{\0}{ }g;
-	$nextline =~ s{(\cA+)}{my $len=length($1); substr($under x $len,0,$len)}ge;
+	$nextline =~ s{(\cA+)}{{my $len=length($1); substr($under x $len,0,$len)}}g;
 	$nextline .= $trail;
 	return [{ %std_literal, width => length($nextline), src => \$nextline }];
 }

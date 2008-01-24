@@ -54,15 +54,15 @@ SKIP: { # Test exit status from pod2usage()
     my $args = join ", ", (
         "-verbose => 0", 
         "-exit    => $exit",
-        "-output  => q{$dev_null}",
-        "-input   => q{$0}",
+        "-output  => q\{$dev_null\}",
+        "-input   => q\{$0\}",
     );
     my $cq = (($^O eq 'MSWin32'
                || $^O eq 'NetWare'
                || $^O eq 'VMS') ? '"'
               : "");
     my @params = ( "${cq}-I../lib$cq",  "${cq}-MPod::Usage$cq", '-e' );
-    my $prg = qq[${cq}pod2usage({ $args })$cq];
+    my $prg = qq[${cq}pod2usage(\{ $args \})$cq];
     my @cmd = ( $^X, @params, $prg );
 
     print "# cmd = @cmd\n";

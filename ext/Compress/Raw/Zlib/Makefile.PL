@@ -94,9 +94,7 @@ WriteMakefile(
     ),
 
     INSTALLDIRS => ('perl'),
-
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
-        ('LICENSE'  => 'perl')         : ()),    
+    LICENSE  => 'perl',
 
 ) ;
 
@@ -145,7 +143,7 @@ require ExtUtils::Constant;
 {
     # Check the constants above all appear in @EXPORT in Zlib.pm
     my %names = map { $_, 1} @names, 'ZLIB_VERSION';
-    open F, "<lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
+    open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
     while (~< *F)
     {
         last if m/^\s*\@EXPORT\s+=\s+qw\(/ ;
@@ -189,7 +187,7 @@ sub ParseCONFIG
 
     print "Parsing $CONFIG...\n" ;
 
-    open(F, "<$CONFIG") or die "Cannot open file $CONFIG: $!\n" ;
+    open(F, "<", "$CONFIG") or die "Cannot open file $CONFIG: $!\n" ;
     while (~< *F) {
 	s/^\s*|\s*$//g ;
 	next if m/^\s*$/ or m/^\s*#/ ;

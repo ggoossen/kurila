@@ -16,7 +16,7 @@ sub digest_file_ctx {
     my $file = shift;
     croak("No digest algorithm specified") unless @_;
     local *F;
-    open(F, $file) || croak("Can't open '$file': $!");
+    open(F, "<", $file) || croak("Can't open '$file': $!");
     binmode(F);
     my $ctx = Digest->new(@_);
     $ctx->addfile(*F);

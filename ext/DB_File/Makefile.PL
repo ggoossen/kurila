@@ -22,10 +22,8 @@ WriteMakefile(
 	XSPROTOARG	=> '-noprototypes',
 	DEFINE		=> $OS2 || "",
 	INC		=> ($^O eq "MacOS" ? "-i ::::db:include" : ""),
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30')
-            ?  ('LICENSE'  => 'perl')
-            : ()
-    ),
+        LICENSE  => 'perl',
+
               ABSTRACT_FROM => 'DB_File.pm',
               AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
@@ -66,7 +64,7 @@ my @names = qw(
 
     # Check the constants above all appear in @EXPORT in DB_File.pm
     my %names = map { $_, 1} @names;
-    open F, "<DB_File.pm" or die "Cannot open DB_File.pm: $!\n";
+    open F, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $!\n";
     while ( ~< *F)
     {
         last if m/^\s*\@EXPORT\s+=\s+qw\(/ ;

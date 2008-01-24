@@ -396,7 +396,7 @@ sub parse_file {
   } else {
     {
       local *PODSOURCE;
-      open(PODSOURCE, "<$source") || Carp::croak("Can't open $source: $!");
+      open(PODSOURCE, "<", "$source") || Carp::croak("Can't open $source: $!");
       $self->{'source_filename'} = $source;
       $source = *PODSOURCE{IO};
     }
@@ -450,7 +450,7 @@ sub parse_from_file {
     require Symbol;
     my $out_fh = Symbol::gensym();
     DEBUG and print "Write-opening to $to\n";
-    open($out_fh, ">$to")  or  Carp::croak "Can't write-open $to: $!";
+    open($out_fh, ">", "$to")  or  Carp::croak "Can't write-open $to: $!";
     binmode($out_fh)
      if $self->can('write_with_binmode') and $self->write_with_binmode;
     $self->output_fh($out_fh);
@@ -1434,7 +1434,7 @@ sub _out {
   my $mutor = shift(@_) if @_ and ref($_[0] || '') eq 'CODE';
 
   DEBUG and print "\n\n", '#' x 76,
-   "\nAbout to parse source: {{\n$_[0]\n}}\n\n";
+   "\nAbout to parse source: \{\{\n$_[0]\n\}\}\n\n";
   
   
   my $parser = $class->new;

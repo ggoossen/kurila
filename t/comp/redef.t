@@ -75,7 +75,7 @@ ok 17, $warn =~ s/Subroutine sub9 redefined[^\n]+\n//s;
 
 BEGIN {
     local $^W = 0;
-    eval qq(sub sub10 () {1} sub sub10 {1});
+    eval qq(sub sub10 () \{1\} sub sub10 \{1\});
 }
 
 ok 18, $warn =~ s/$NEWPROTO \Qsub main::sub10 () vs none\E[^\n]+\n//s;

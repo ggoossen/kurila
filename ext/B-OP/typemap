@@ -34,26 +34,26 @@ PADOFFSET	T_UV
 
 INPUT
 T_OP_OBJ
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    croak(\"$var is not a reference\")
 
 T_SV_OBJ
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    croak(\"$var is not a reference\")
 
 T_MG_OBJ
-	if (SvROK($arg)) {
+	if (SvROK($arg)) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
-	}
+	\}
 	else
 	    croak(\"$var is not a reference\")
 

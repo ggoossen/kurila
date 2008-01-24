@@ -73,7 +73,7 @@ is ("@b", $b);
     my $bad = 0;
     local $SIG{'__WARN__'} = sub { $bad = 1 };
     my $x = 'a-e';
-    $x =~ s/(\w)-(\w)/join ':', $1 .. $2/e;
+    $x =~ s/(\w)-(\w)/{join ':', $1 .. $2}/;
     is ($x, 'a:b:c:d:e');
 }
 

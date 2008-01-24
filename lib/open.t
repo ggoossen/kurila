@@ -66,15 +66,16 @@ SKIP: {
     eval <<EOE;
     use open ':utf8';
     use utf8;
-    open(O, ">utf8");
+    open(O, ">", "utf8");
     print O chr(0x100);
     close O;
-    open(I, "<utf8");
+    open(I, "<", "utf8");
     is(ord(~<*I), 0x100, ":utf8 single wide character round-trip");
     close I;
 EOE
+    die if $@;
 
-    open F, ">a";
+    open F, ">", "a";
     @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
     unshift @a, chr(0); # ... and a null byte in front just for fun
     print F @a;
@@ -209,10 +210,10 @@ like( $@, qr/too ambiguous/, 'should die with ambiguous locale encoding' );
 $ENV{LC_ALL} = $ENV{LANG} = 'ru_RU.KOI8-R';
 # the :locale will probe the locale environment variables like LANG
 use open OUT => ':locale';
-open(O, ">koi8");
+open(O, ">", "koi8");
 print O chr(0x430); # Unicode CYRILLIC SMALL LETTER A = KOI8-R 0xc1
 close O;
-open(I, "<koi8");
+open(I, "<", "koi8");
 printf "%#x\n", ord(~<*I), "\n"; # this should print 0xc1
 close I;
 %%%

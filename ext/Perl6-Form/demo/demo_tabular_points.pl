@@ -17,7 +17,7 @@ print form
 	 {layout=>'down', bullet=>'.'},
 	 "Index  Character     Appears in",
 	 {under=>"_"},
-	 "{]]}.  {[[[[[[[[[[}  {[[[[[[[[[[}",
+	 "\{]]\}.  \{[[[[[[[[[[\}  \{[[[[[[[[[[\}",
       [1..@name], \@name,       \@play;
 
 print "\n\n=================\n\n";
@@ -26,5 +26,5 @@ print form
 	 {layout=>'tabular', bullet=>'.'},
 	 "Index  Character     Appears in",
 	 {under=>"_"},
-	 "{]]}.  {[[[[[[[[[[}  {[[[[[[[[[[}",
+	 "\{]]\}.  \{[[[[[[[[[[\}  \{[[[[[[[[[[\}",
       [1..@name], \@name,       \@play;

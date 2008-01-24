@@ -743,7 +743,7 @@ sub _gunzip_bin {
         unless $self->bin_gzip;
 
 
-    my $fh = FileHandle->new('>'. $self->_gunzip_to) or
+    my $fh = FileHandle->new($self->_gunzip_to, '>') or
         return $self->_error(loc("Could not open '%1' for writing: %2",
                             $self->_gunzip_to, $! ));
 
@@ -787,7 +787,7 @@ sub _gunzip_cz {
                 return $self->_error(loc("Unable to open '%1': %2",
                             $self->archive, $Compress::Zlib::gzerrno));
 
-    my $fh = FileHandle->new('>'. $self->_gunzip_to) or
+    my $fh = FileHandle->new($self->_gunzip_to, ">") or
         return $self->_error(loc("Could not open '%1' for writing: %2",
                             $self->_gunzip_to, $! ));
 
@@ -832,7 +832,7 @@ sub _uncompress_bin {
         unless $self->bin_uncompress;
 
 
-    my $fh = FileHandle->new('>'. $self->_gunzip_to) or
+    my $fh = FileHandle->new($self->_gunzip_to, '>') or
         return $self->_error(loc("Could not open '%1' for writing: %2",
                             $self->_gunzip_to, $! ));
 
@@ -1045,7 +1045,7 @@ sub _bunzip2_bin {
         unless $self->bin_bunzip2;
 
 
-    my $fh = FileHandle->new('>'. $self->_gunzip_to) or
+    my $fh = FileHandle->new($self->_gunzip_to, '>') or
         return $self->_error(loc("Could not open '%1' for writing: %2",
                             $self->_gunzip_to, $! ));
     

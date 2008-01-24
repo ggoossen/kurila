@@ -43,7 +43,7 @@ close $fh;
 
 $fh = FileHandle->new();
 
-print "not " unless ($fh->open("< TEST") && ~< $fh eq $buffer);
+print "not " unless ($fh->open("TEST", "<") && ~< $fh eq $buffer);
 print "ok 5\n";
 
 $fh->seek(0,0);

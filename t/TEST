@@ -31,6 +31,7 @@ our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
 	$::with_utf16 = 1 if $1 eq 'utf16';
 	$::taintwarn = 1 if $1 eq 'taintwarn';
 	$::failed = 1 if $1 eq 'failed';
+	$::failed = 2 if $1 eq 'ffailed';
 	$ENV{PERL_CORE_MINITEST} = 1 if $1 eq 'minitest';
 	if ($1 =~ m/^deparse(,.+)?$/) {
 	    $::deparse = 1;
@@ -109,10 +110,13 @@ if ($::failed) {
     open my $fh, "<", "TEST_FAILED";
     push @ARGV, map { chomp; $_ } ~< $fh;
     close $fh;
+    if ($::failed +> 1) {
+        @ARGV = ($ARGV[0]);
+    }
 }
 
 unless (@ARGV) {
-    foreach my $dir (qw(base comp cmd run io op uni mro)) {
+    foreach my $dir (qw(base comp cmd run io lex sv op uni mro)) {
 	_find_tests($dir);
     }
     _find_tests("lib") unless $::core;
@@ -123,7 +127,7 @@ unless (@ARGV) {
     my %skip;
     if (-f $configsh) {
 	my (%extensions, %known_extensions);
-	open FH, $configsh or die "Can't open $configsh: $!";
+	open FH, "<", $configsh or die "Can't open $configsh: $!";
 	while ( ~< *FH) {
 	    if (m/^extensions=['"](.*)['"]$/) {
 		# Deliberate string interpolation to avoid triggering possible
@@ -147,7 +151,7 @@ unless (@ARGV) {
 	}
     }
     my $mani = File::Spec->catfile($updir, "MANIFEST");
-    if (open(MANI, $mani)) {
+    if (open(MANI, "<", $mani)) {
 	my $ext_pat = $^O eq 'MSWin32' ? '(?:win32/)?ext' : 'ext';
 	while ( ~< *MANI) { # similar code in t/harness
 	    if (m!^($ext_pat/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!) {
@@ -171,7 +175,6 @@ unless (@ARGV) {
 	warn "$0: cannot open $mani: $!\n";
     }
     unless ($::core) {
-	_find_tests('Module_Pluggable');
 	_find_tests('pod');
 	_find_tests('japh') if $::torture;
     }
@@ -190,8 +193,8 @@ elsif ($::with_utf16) {
 		my $f = $e ? "v" : "n";
 		push @UARGV, $u;
 		unlink($u);
-		if (open(A, $a)) {
-		    if (open(U, ">$u")) {
+		if (open(A, "<", $a)) {
+		    if (open(U, ">", "$u")) {
 			print U pack("$f", 0xFEFF) if $b;
 			while ( ~< *A) {
 			    print U pack("$f*", unpack("C*", $_));
@@ -317,8 +320,8 @@ EOT
 		"./perl $testswitch $switch -I../lib -MO=-qq,Deparse,-sv1.,".
 		"-l$::deparse_opts$file_opts ".
 		"$test +> $test.dp ".
-		"&& ./perl $testswitch $switch -I../lib $test.dp |";
-	    open(RESULTS, $deparse_cmd)
+		"&& ./perl $testswitch $switch -I../lib $test.dp";
+	    open(RESULTS, "-|", $deparse_cmd)
 		or print "can't deparse '$deparse_cmd': $!.\n";
 	}
 	elsif ($type eq 'perl') {
@@ -334,8 +337,8 @@ EOT
 		$redir = "3>$valgrind_log";
 	    }
 	    my $run = "$perl" . _quote_args("$testswitch $switch $utf8")
-			      . " $test $redir|";
-	    open(RESULTS,$run) or print "can't run '$run': $!.\n";
+			      . " $test $redir";
+	    open(RESULTS,"-|",$run) or print "can't run '$run': $!.\n";
 	}
 	# Our environment may force us to use UTF-8, but we can't be sure that
 	# anything we're reading from will be generating (well formed) UTF-8
@@ -429,14 +432,14 @@ EOT
 	if ($ENV{PERL_VALGRIND}) {
 	    my @valgrind;
 	    if (-e $valgrind_log) {
-		if (open(V, $valgrind_log)) {
+		if (open(V, "<", $valgrind_log)) {
 		    @valgrind = ~< *V;
 		    close V;
 		} else {
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
 		}
 	    }
-	    if ($ENV{VG_OPTS} =~ m/cachegrind/) {
+	    if (($ENV{VG_OPTS} || '') =~ m/cachegrind/) {
 		if (rename $valgrind_log, "$test.valgrind") {
 		    $valgrind++;
 		} else {
@@ -535,40 +538,40 @@ EOT
     else {
 	my $pct = $tested_files ? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) : "0.00";
 	my $s = $::bad_files == 1 ? "" : "s";
-	warn "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
+	print STDERR "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
 	for my $test ( sort grep { $failed_tests{$_} } keys %failed_tests ) {
 	    print "\t$test\n";
 	}
-	warn <<'SHRDLU_1';
+	print STDERR <<'SHRDLU_1';
 ### Since not all tests were successful, you may want to run some of
 ### them individually and examine any diagnostic messages they produce.
 ### See the INSTALL document's section on "make test".
 SHRDLU_1
-	warn <<'SHRDLU_2' if $good_files / $total_files +> 0.8;
+	print STDERR <<'SHRDLU_2' if $good_files / $total_files +> 0.8;
 ### You have a good chance to get more information by running
 ###   ./perl harness
 ### in the 't' directory since most (>=80%) of the tests succeeded.
 SHRDLU_2
 	if (eval {require Config; Config->import; 1}) {
 	    if ($::Config{usedl} && (my $p = $::Config{ldlibpthname})) {
-		warn <<SHRDLU_3;
+		print STDERR <<SHRDLU_3;
 ### You may have to set your dynamic library search path,
 ### $p, to point to the build directory:
 SHRDLU_3
 		if (exists $ENV{$p} && $ENV{$p} ne '') {
-		    warn <<SHRDLU_4a;
+		    print STDERR <<SHRDLU_4a;
 ###   setenv $p `pwd`:\$$p; cd t; ./perl harness
 ###   $p=`pwd`:\$$p; export $p; cd t; ./perl harness
 ###   export $p=`pwd`:\$$p; cd t; ./perl harness
 SHRDLU_4a
 		} else {
-		    warn <<SHRDLU_4b;
+		    print STDERR <<SHRDLU_4b;
 ###   setenv $p `pwd`; cd t; ./perl harness
 ###   $p=`pwd`; export $p; cd t; ./perl harness
 ###   export $p=`pwd`; cd t; ./perl harness
 SHRDLU_4b
 		}
-		warn <<SHRDLU_5;
+		print STDERR <<SHRDLU_5;
 ### for csh-style shells, like tcsh; or for traditional/modern
 ### Bourne-style shells, like bash, ksh, and zsh, respectively.
 SHRDLU_5

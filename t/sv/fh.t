@@ -22,7 +22,7 @@ ok(!defined *{$a});
 
 {
     no strict 'refs';
-    ok(open(Symbol::fetch_glob($a), ">&STDOUT"));
+    ok(open(Symbol::fetch_glob($a), ">&", \*STDOUT));
     ok(defined *{$a});
 }
 

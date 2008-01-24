@@ -43,7 +43,7 @@ BEGIN {
 
     if (not defined $where) {	# Try local.
 	my $PW = "/etc/passwd";
-	if (-f $PW && open(PW, $PW) && defined( ~< *PW)) {
+	if (-f $PW && open(PW, "<", $PW) && defined( ~< *PW)) {
 	    $where = $PW;
 	    undef $reason;
 	}

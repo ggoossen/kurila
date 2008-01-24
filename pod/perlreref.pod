@@ -13,13 +13,13 @@ as the L</"SEE ALSO"> section in this document.
 C<=~> determines to which variable the regex is applied.
 In its absence, $_ is used.
 
-    $var =~ /foo/;
+    $var =~ m/foo/;
 
 C<!~> determines to which variable the regex is applied,
 and negates the result of the match; it returns
 false if the match succeeds, and true if it fails.
 
-    $var !~ /foo/;
+    $var !~ m/foo/;
 
 C<m/pattern/msixpogc> searches a string for a pattern match,
 applying the given options.
@@ -36,24 +36,16 @@ applying the given options.
 
 If 'pattern' is an empty string, the last I<successfully> matched
 regex is used. Delimiters other than '/' may be used for both this
-operator and the following ones. The leading C<m> can be omitted
-if the delimiter is '/'.
+operator and the following ones.
 
 C<qr/pattern/msixpo> lets you store a regex in a variable,
 or pass one around. Modifiers as for C<m//>, and are stored
 within the regex.
 
-C<s/pattern/replacement/msixpogce> substitutes matches of
-'pattern' with 'replacement'. Modifiers as for C<m//>,
-with one addition:
-
-    e  Evaluate 'replacement' as an expression
-
-'e' may be specified multiple times. 'replacement' is interpreted
-as a double quoted string unless a single-quote (C<'>) is the delimiter.
-
-C<?pattern?> is like C<m/pattern/> but matches only once. No alternate
-delimiters can be used.  Must be reset with reset().
+C<s/pattern/replacement/msixpogc> substitutes matches of
+'pattern' with 'replacement'. Modifiers as for C<m//>.
+'replacement' is interpreted
+as a double quoted string.
 
 =head2 SYNTAX
 

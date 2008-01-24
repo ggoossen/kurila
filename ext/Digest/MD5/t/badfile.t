@@ -11,7 +11,7 @@ eval {
 print "not " unless $@ =~ m/^Bad filehandle: FOO at/;
 print "ok 1\n";
 
-open(BAR, "no-existing-file.$$");
+open(BAR, "<", "no-existing-file.$$");
 eval {
     $md5->addfile(*BAR);
 };

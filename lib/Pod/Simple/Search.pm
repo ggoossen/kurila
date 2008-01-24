@@ -73,7 +73,7 @@ sub survey {
     if($self->{'dir_prefix'}) {
       $start_in = File::Spec->catdir(
         $try,
-        grep length($_), split '[\\/:]+', $self->{'dir_prefix'}
+        grep length($_), split '[\/:]+', $self->{'dir_prefix'}
       );
       $modname_prefix = [grep length($_), split m{[:/\\]}, $self->{'dir_prefix'}];
       $verbose and print "Appending \"$self->{'dir_prefix'}\" to $try, ",
@@ -250,7 +250,7 @@ sub _path2modname {
   # filenames, so try to extract them from the "=head1 NAME" tag in the
   # file instead.
   if ($^O eq 'VMS' && ($name eq lc($name) || $name eq uc($name))) {
-      open PODFILE, "<$file" or die "_path2modname: Can't open $file: $!";
+      open PODFILE, "<", "$file" or die "_path2modname: Can't open $file: $!";
       my $in_pod = 0;
       my $in_name = 0;
       my $line;
@@ -374,7 +374,7 @@ sub run {
     if($file =~ m/\.pod$/i) {
       # Don't bother looking for $VERSION in .pod files
       DEBUG and print "Not looking for \$VERSION in .pod $file\n";
-    } elsif( !open(INPOD, $file) ) {
+    } elsif( !open(INPOD, "<", $file) ) {
       DEBUG and print "Couldn't open $file: $!\n";
       close(INPOD);
     } else {
@@ -475,7 +475,7 @@ sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   for $_ (@them) {
     if ( $_ eq '.' ) {
       $_ = ':';
-    } elsif ( $_ =~ s|^((?:\.\./)+)|':' x (length($1)/3)|e ) {
+    } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
       $_ = ':'. $_;
     } else {
       $_ =~ s|^\./|:|;
@@ -525,7 +525,7 @@ sub find {
 
   # Split on :: and then join the name together using File::Spec
   my @parts = split m/::/, $pod;
-  $verbose and print "Chomping {$pod} => {@parts}\n";
+  $verbose and print "Chomping \{$pod\} => \{@parts\}\n";
 
   #@search_dirs = File::Spec->curdir unless @search_dirs;
   
@@ -589,7 +589,7 @@ sub contains_pod {
 
   # check for one line of POD
   $verbose +> 1 and print " Scanning $file for pod...\n";
-  unless( open(MAYBEPOD,"<$file") ) {
+  unless( open(MAYBEPOD, "<","$file") ) {
     print "Error: $file is unreadable: $!\n";
     return undef;
   }
@@ -639,11 +639,11 @@ sub _accessorize {  # A simple-minded method-maker
 sub _state_as_string {
   my $self = $_[0];
   return '' unless ref $self;
-  my @out = "{\n  # State of $self ...\n";
+  my @out = "\{\n  # State of $self ...\n";
   foreach my $k (sort keys %$self) {
     push @out, "  ", _esc($k), " => ", _esc($self->{$k}), ",\n";
   }
-  push @out, "}\n";
+  push @out, "\}\n";
   my $x = join '', @out;
   $x =~ s/^/#/mg;
   return $x;
@@ -654,7 +654,7 @@ sub _esc {
   return 'undef' unless defined $in;
   $in =~
     s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
-     <'\\x['.(unpack("H2",$1).']')>eg;
+     <{'\\x['.(unpack("H2",$1).']')}>g;
   return qq{"$in"};
 }
 

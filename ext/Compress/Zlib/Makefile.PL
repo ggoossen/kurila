@@ -34,13 +34,11 @@ WriteMakefile(
 	      )
     ),
        
-     ABSTRACT_FROM => 'lib/Compress/Zlib.pm',
-     AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
+    ABSTRACT_FROM => 'lib/Compress/Zlib.pm',
+    AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
     INSTALLDIRS => 'perl',
-
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
-        ('LICENSE'  => 'perl')         : ()),    
+    LICENSE  => 'perl',
 
 ) ;
 

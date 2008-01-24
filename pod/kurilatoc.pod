@@ -923,7 +923,7 @@ Interaction, perlfaq9 - Networking
 
 =back
 
-=head2 perlfaq1 - General Questions About Perl ($Revision: 9681 $)
+=head2 perlfaq1 - General Questions About Perl
 
 =over 4
 
@@ -975,7 +975,7 @@ http://www.perl.org/advocacy/whyperl.html
 
 =back
 
-=head2 perlfaq2 - Obtaining and Learning about Perl ($Revision: 9462 $)
+=head2 perlfaq2 - Obtaining and Learning about Perl
 
 =over 4
 
@@ -1030,7 +1030,7 @@ References, Tutorials, Task-Oriented, Special Topics
 
 =back
 
-=head2 perlfaq3 - Programming Tools ($Revision: 8539 $)
+=head2 perlfaq3 - Programming Tools
 
 =over 4
 
@@ -1115,7 +1115,7 @@ program; what am I doing wrong?
 
 =back
 
-=head2 perlfaq4 - Data Manipulation ($Revision: 9681 $)
+=head2 perlfaq4 - Data Manipulation
 
 =over 4
 
@@ -1334,7 +1334,7 @@ array of hashes or arrays?
 
 =back
 
-=head2 perlfaq5 - Files and Formats ($Revision: 9576 $)
+=head2 perlfaq5 - Files and Formats
 
 =over 4
 
@@ -1468,7 +1468,7 @@ X<file, selecting a random line>
 
 =back
 
-=head2 perlfaq6 - Regular Expressions ($Revision: 8539 $)
+=head2 perlfaq6 - Regular Expressions
 
 =over 4
 
@@ -1565,7 +1565,7 @@ X<\E, regex>, X<qr//>
 
 =back
 
-=head2 perlfaq7 - General Perl Language Issues ($Revision: 9620 $)
+=head2 perlfaq7 - General Perl Language Issues
 
 =over 4
 
@@ -1648,7 +1648,7 @@ methods?
 
 =back
 
-=head2 perlfaq8 - System Interaction ($Revision: 9681 $)
+=head2 perlfaq8 - System Interaction
 
 =over 4
 
@@ -1782,7 +1782,7 @@ perl -Idir command line flag, the use lib pragma:
 
 =back
 
-=head2 perlfaq9 - Networking ($Revision: 8539 $)
+=head2 perlfaq9 - Networking
 
 =over 4
 
@@ -2000,11 +2000,11 @@ X<relational operator> X<operator, relational>
 X<equality> X<equal> X<equals> X<operator, equality>
 
 =item Bitwise And
-X<operator, bitwise, and> X<bitwise and> X<&>
+X<operator, bitwise, and> X<bitwise and> X<^&^>
 
 =item Bitwise Or and Exclusive Or
-X<operator, bitwise, or> X<bitwise or> X<|> X<operator, bitwise, xor>
-X<bitwise xor> X<^>
+X<operator, bitwise, or> X<bitwise or> X<^|^> X<operator, bitwise, xor>
+X<bitwise xor> X<^^^>
 
 =item C-style Logical And
 X<&&> X<logical and> X<operator, logical, and>
@@ -2016,15 +2016,15 @@ X<||> X<operator, logical, or>
 X<//> X<operator, logical, defined-or>
 
 =item Range Operators
-X<operator, range> X<range> X<..> X<...>
+X<operator, range> X<range> X<..>
 
 =item Conditional Operator
 X<operator, conditional> X<operator, ternary> X<ternary> X<?:>
 
 =item Assignment Operators
-X<assignment> X<operator, assignment> X<=> X<**=> X<+=> X<*=> X<&=>
-X<<< <<= >>> X<&&=> X<-=> X</=> X<|=> X<<< >>= >>> X<||=> X<//=> X<.=>
-X<%=> X<^=> X<x=>
+X<assignment> X<operator, assignment> X<=> X<**=> X<+=> X<*=> X<^&^=>
+X<<< <<= >>> X<&&=> X<-=> X</=> X<^|^=> X<<< >>= >>> X<||=> X<//=> X<.=>
+X<%=> X<^^^=> X<x=>
 
 =item Comma Operator
 X<comma> X<operator, comma> X<,>
@@ -2060,9 +2060,9 @@ X<operator, regexp>
 qr/STRING/msixpo X<qr> X</i> X</m> X</o> X</s> X</x> X</p>,
 m/PATTERN/msixpogc X<m> X<operator, match> X<regexp, options> X<regexp>
 X<regex, options> X<regex> X</m> X</s> X</i> X</x> X</p> X</o> X</g> X</c>,
-/PATTERN/msixpogc, s/PATTERN/REPLACEMENT/msixpogce X<substitute>
-X<substitution> X<replace> X<regexp, replace> X<regexp, substitute> X</m>
-X</s> X</i> X</x> X</p> X</o> X</g> X</c> X</e>
+s/PATTERN/REPLACEMENT/msixpogc X<substitute> X<substitution> X<replace>
+X<regexp, replace> X<regexp, substitute> X</m> X</s> X</i> X</x> X</p>
+X</o> X</g> X</c>
 
 =item Quote-Like Operators
 X<operator, quote-like>
@@ -2077,16 +2077,15 @@ X<here-document> X<<< << >>>, Double Quotes, Single Quotes, Backticks
 =item Gory details of parsing quoted constructs
 X<quote, gory details>
 
-Finding the end, Interpolation X<interpolation>, C<<<'EOF'>,  C<m''>, the
-pattern of C<s'''>, C<''>, C<q//>, C<tr'''>, C<y'''>, the replacement of
-C<s'''>, C<tr///>, C<y///>, C<"">, C<``>, C<qq//>, C<qx//>, C<< <file*glob>
->>, C<<<"EOF">, the replacement of C<s///>, C<RE> in C<?RE?>, C</RE/>,
-C<m/RE/>, C<s/RE/foo/>,, parsing regular expressions X<regexp, parse>,
-Optimization of regular expressions X<regexp, optimization>
+Finding the end, Interpolation X<interpolation>, C<<<'EOF'>, C<''>, C<q//>,
+C<tr///>, C<y///>, C<"">, C<``>, C<qq//>, C<qx//>, C<<<"EOF">, the
+replacement of C<s///>, C<RE> in C<?RE?>, C</RE/>, C<m/RE/>, C<s/RE/foo/>,,
+parsing regular expressions X<regexp, parse>, Optimization of regular
+expressions X<regexp, optimization>
 
 =item I/O Operators
 X<operator, i/o> X<operator, io> X<io> X<while> X<filehandle>
-X<< <> >> X<@ARGV>
+X<< ~< >> X<@ARGV>
 
 =item Constant Folding
 X<constant folding> X<folding>
@@ -2274,7 +2273,7 @@ ID,MSG,FLAGS X<msgsnd>, my EXPR X<my>, my TYPE EXPR, my EXPR : ATTRS, my
 TYPE EXPR : ATTRS, next LABEL X<next> X<continue>, next, no Module VERSION
 LIST X<no>, no Module VERSION, no Module LIST, no Module, no VERSION, oct
 EXPR X<oct> X<octal> X<hex> X<hexadecimal> X<binary> X<bin>, oct, open
-FILEHANDLE,EXPR X<open> X<pipe> X<file, open> X<fopen>, open
+FILEHANDLE,MODE X<open> X<pipe> X<file, open> X<fopen>, open
 FILEHANDLE,MODE,EXPR, open FILEHANDLE,MODE,EXPR,LIST, open
 FILEHANDLE,MODE,REFERENCE, open FILEHANDLE, opendir DIRHANDLE,EXPR
 X<opendir>, ord EXPR X<ord> X<encoding>, ord, our EXPR X<our> X<global>,
@@ -2964,7 +2963,7 @@ C<(?(condition)yes-pattern|no-pattern)>
 
 =item PCRE/Python Support
 
-C<< (?P<NAME>pattern) >>, C<< (?P=NAME) >>, C<< (?P>NAME) >>
+C<< (?PE<lt>NAMEE<gt>pattern) >>, C<< (?P=NAME) >>, C<< (?P>NAME) >>
 
 =item BUGS
 
@@ -4654,9 +4653,8 @@ L<config_data|config_data>, L<libnetcfg|libnetcfg>, L<perlivp>
 
 =item Development
 
-L<perlbug|perlbug>, L<h2ph|h2ph>,
-L<h2xs|h2xs>, L<enc2xs>, L<xsubpp>, L<dprofpp|dprofpp>, L<prove>,
-L<corelist>
+L<perlbug|perlbug>, L<h2ph|h2ph>, L<h2xs|h2xs>, L<enc2xs>, L<xsubpp>,
+L<dprofpp|dprofpp>, L<prove>, L<corelist>
 
 =item General tools
 
@@ -5728,14 +5726,14 @@ pv_display X<pv_display>, pv_escape X<pv_escape>, pv_pretty X<pv_pretty>
 
 =item Functions in file mathoms.c
 
-gv_fetchmethod X<gv_fetchmethod>, pack_cat X<pack_cat>, sv_2pv_nolen
-X<sv_2pv_nolen>, sv_catpvn_mg X<sv_catpvn_mg>, sv_catsv_mg X<sv_catsv_mg>,
-sv_force_normal X<sv_force_normal>, sv_iv X<sv_iv>, sv_nolocking
-X<sv_nolocking>, sv_nounlocking X<sv_nounlocking>, sv_nv X<sv_nv>, sv_pv
-X<sv_pv>, sv_pvbyte X<sv_pvbyte>, sv_pvbyten X<sv_pvbyten>, sv_pvn
-X<sv_pvn>, sv_pvutf8 X<sv_pvutf8>, sv_pvutf8n X<sv_pvutf8n>, sv_taint
-X<sv_taint>, sv_unref X<sv_unref>, sv_usepvn X<sv_usepvn>, sv_usepvn_mg
-X<sv_usepvn_mg>, sv_uv X<sv_uv>, unpack_str X<unpack_str>
+pack_cat X<pack_cat>, sv_2pv_nolen X<sv_2pv_nolen>, sv_catpvn_mg
+X<sv_catpvn_mg>, sv_catsv_mg X<sv_catsv_mg>, sv_force_normal
+X<sv_force_normal>, sv_iv X<sv_iv>, sv_nolocking X<sv_nolocking>,
+sv_nounlocking X<sv_nounlocking>, sv_nv X<sv_nv>, sv_pv X<sv_pv>, sv_pvbyte
+X<sv_pvbyte>, sv_pvbyten X<sv_pvbyten>, sv_pvn X<sv_pvn>, sv_pvutf8
+X<sv_pvutf8>, sv_pvutf8n X<sv_pvutf8n>, sv_taint X<sv_taint>, sv_unref
+X<sv_unref>, sv_usepvn X<sv_usepvn>, sv_usepvn_mg X<sv_usepvn_mg>, sv_uv
+X<sv_uv>, unpack_str X<unpack_str>
 
 =item Functions in file pp_ctl.c
 
@@ -5748,8 +5746,7 @@ packlist X<packlist>, unpackstring X<unpackstring>
 =item GV Functions
 
 GvSV X<GvSV>, gv_const_sv X<gv_const_sv>, gv_fetchmeth X<gv_fetchmeth>,
-gv_fetchmethod_autoload X<gv_fetchmethod_autoload>, gv_fetchmeth_autoload
-X<gv_fetchmeth_autoload>, gv_stashpv X<gv_stashpv>, gv_stashpvn
+gv_fetchmethod X<gv_fetchmethod>, gv_stashpv X<gv_stashpv>, gv_stashpvn
 X<gv_stashpvn>, gv_stashpvs X<gv_stashpvs>, gv_stashsv X<gv_stashsv>
 
 =item Handy Values
@@ -6046,6 +6043,10 @@ djSP X<djSP>, LVRET X<LVRET>
 
 sv_add_arena X<sv_add_arena>, sv_clean_all X<sv_clean_all>, sv_clean_objs
 X<sv_clean_objs>, sv_free_arenas X<sv_free_arenas>
+
+=item SV-Body Allocation
+
+sv_2num X<sv_2num>
 
 =item Unicode Support
 
@@ -6382,9 +6383,13 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 
 =over 4
 
+=item merge common code in installperl and installman
+
 =item common test code for timed bail out
 
 =item POD -E<gt> HTML conversion in the core still sucks
+
+=item merge checkpods and podchecker
 
 =item Parallel testing
 
@@ -6428,6 +6433,8 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 
 =item Cross-compile support
 
+=item roffitall
+
 =back
 
 =item Tasks that need a little C knowledge
@@ -6435,6 +6442,8 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =over 4
 
 =item Modernize the order of directories in @INC
+
+=item -Duse32bit*
 
 =item Make it clear from -v if this is the exact official release
 
@@ -6445,6 +6454,8 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =item Improve win32/wince.c
 
 =item Use secure CRT functions when building with VC8 on Win32
+
+=item __FUNCTION__ for MSVC-pre-7.0
 
 =back
 
@@ -6475,6 +6486,8 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =item Extend PerlIO and PerlIO::Scalar
 
 =item -C on the #! line
+
+=item Propagate const outwards from Perl_moreswitches()
 
 =back
 
@@ -6522,6 +6535,8 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 
 =item Virtualize operating system access
 
+=item Investigate PADTMP hash pessimisation
+
 =back
 
 =item Big projects
@@ -6564,6 +6579,54 @@ B<-V>
 =item ENVIRONMENT
 
 =item AUTHOR
+
+=back
+
+=head2 kurila17delta - what is new for Perl Kurila 1.7
+
+=over 4
+
+=item DESCRIPTION
+
+=item Highlights In Perl Kurila 1.7
+
+=item Core Enhancements
+
+=over 4
+
+=item Block interpolation using C<{...}> inside double quoted strings
+
+=item Numeric comparison operators renamed.
+
+=item Interpolation independent of the delimiter
+
+=item No-escaping within single quotes
+
+=item Substitute modifier s///e is removed
+
+=item Obligatory C<m> in front of matches.
+
+=item Renamed readline C<< <> >> operator to C<< ~< >>
+
+=item open must have a separate mode and filename
+
+=item Removal of C<$]>
+
+=back
+
+=item KNOWN BUGS
+
+=over 4
+
+=item Documentation
+
+=item Limited platform support
+
+=back
+
+=item SEE ALSO
+
+=item HISTORY
 
 =back
 
@@ -6862,59 +6925,11 @@ locale, the locale pramga has been removed
 
 =back
 
-=head2 perl5100delta, perldelta - what is new for perl 5.10.0
+=head2 perldelta - what is new for perl 5.10.0
 
 =over 4
 
 =item DESCRIPTION
-
-=item Incompatible Changes
-
-=over 4
-
-=item Packing and UTF-8 strings
-
-=item Byte/character count feature in unpack()
-
-=item The C<$*> and C<$#> variables have been removed
-
-=item substr() lvalues are no longer fixed-length
-
-=item Parsing of C<-f _>
-
-=item C<:unique>
-
-=item Scoping of the C<sort> pragma
-
-=item Scoping of C<bignum>, C<bigint>, C<bigrat>
-
-=item Effect of pragmas in eval
-
-=item chdir FOO
-
-=item Handling of .pmc files
-
-=item @- and @+ in patterns
-
-=item $AUTOLOAD can now be tainted
-
-=item Tainting and printf
-
-=item undef and signal handlers
-
-=item strictures and array/hash dereferencing in defined()
-
-=item C<(?p{})> has been removed
-
-=item Pseudo-hashes have been removed
-
-=item Removal of the bytecode compiler and of perlcc
-
-=item Removal of the JPL
-
-=item Recursive inheritance detected earlier
-
-=back
 
 =item Core Enhancements
 
@@ -6946,15 +6961,13 @@ and horizontal whitespace, and linebreak
 
 =item readpipe() is now overridable
 
-=item default argument for readline()
+=item Default argument for readline()
 
 =item state() variables
 
 =item Stacked filetest operators
 
 =item UNIVERSAL::DOES()
-
-=item C<CLONE_SKIP()>
 
 =item Formats
 
@@ -6974,7 +6987,8 @@ and horizontal whitespace, and linebreak
 
 =item New internal variables
 
-C<${^RE_DEBUG_FLAGS}>, C<${^CHILD_ERROR_NATIVE}>
+C<${^RE_DEBUG_FLAGS}>, C<${^CHILD_ERROR_NATIVE}>, C<${^RE_TRIE_MAXBUF}>,
+C<${^WIN32_SLOPPY_STAT}>
 
 =item Miscellaneous
 
@@ -6984,18 +6998,444 @@ C<${^RE_DEBUG_FLAGS}>, C<${^CHILD_ERROR_NATIVE}>
 
 =back
 
+=item Incompatible Changes
+
+=over 4
+
+=item Packing and UTF-8 strings
+
+=item Byte/character count feature in unpack()
+
+=item The C<$*> and C<$#> variables have been removed
+
+=item substr() lvalues are no longer fixed-length
+
+=item Parsing of C<-f _>
+
+=item C<:unique>
+
+=item Effect of pragmas in eval
+
+=item chdir FOO
+
+=item Handling of .pmc files
+
+=item @- and @+ in patterns
+
+=item $AUTOLOAD can now be tainted
+
+=item Tainting and printf
+
+=item undef and signal handlers
+
+=item strictures and dereferencing in defined()
+
+=item C<(?p{})> has been removed
+
+=item Pseudo-hashes have been removed
+
+=item Removal of the bytecode compiler and of perlcc
+
+=item Removal of the JPL
+
+=item Recursive inheritance detected earlier
+
+=back
+
 =item Modules and Pragmata
-=head1 Utility Changes
-=head1 New Documentation
-=head1 Performance Enhancements
-=head1 Installation and Configuration Improvements
-=head1 Selected Bug Fixes
-=head1 New or Changed Diagnostics
-=head1 Changed Internals
-=head1 New Tests
-=head1 Known Problems
-=head1 Platform Specific Problems
-=head1 Reporting Bugs
+
+=over 4
+
+=item Pragmata Changes
+
+C<feature>, C<mro>, Scoping of the C<sort> pragma, Scoping of C<bignum>,
+C<bigint>, C<bigrat>, C<base>, C<strict> and C<warnings>, C<version>,
+C<warnings>, C<less>
+
+=item New modules
+
+=item Selected Changes to Core Modules
+
+C<Attribute::Handlers>, C<B::Lint>, C<B>, C<Thread>
+
+=back
+
+=item Utility Changes
+
+perl -d, ptar, ptardiff, shasum, corelist, h2ph and h2xs, perlivp,
+find2perl, config_data, cpanp, cpan2dist, pod2html
+
+=item New Documentation
+
+=item Performance Enhancements
+
+=over 4
+
+=item In-place sorting
+
+=item Lexical array access
+
+=item XS-assisted SWASHGET
+
+=item Constant subroutines
+
+=item C<PERL_DONT_CREATE_GVSV>
+
+=item Weak references are cheaper
+
+=item sort() enhancements
+
+=item Memory optimisations
+
+=item UTF-8 cache optimisation
+
+=item Sloppy stat on Windows
+
+=item Regular expressions optimisations
+
+Engine de-recursivised, Single char char-classes treated as literals, Trie
+optimisation of literal string alternations, Aho-Corasick start-point
+optimisation
+
+=back
+
+=item Installation and Configuration Improvements
+
+=over 4
+
+=item Configuration improvements
+
+C<-Dusesitecustomize>, Relocatable installations, strlcat() and strlcpy(),
+C<d_pseudofork> and C<d_printf_format_null>, Configure help
+
+=item Compilation improvements
+
+Parallel build, Borland's compilers support, Static build on Windows,
+pport.h files, C++ compatibility, Building XS extensions on Windows,
+Support for Microsoft 64-bit compiler, Visual C++, Win32 builds
+
+=item Installation improvements
+
+Module auxiliary files
+
+=item New Or Improved Platforms
+
+=back
+
+=item Selected Bug Fixes
+
+strictures in regexp-eval blocks, Calling CORE::require(), Subscripts of
+slices, C<no warnings 'category'> works correctly with -w, threads
+improvements, chr() and negative values, PERL5SHELL and tainting, Using
+*FILE{IO}, Overloading and reblessing, Overloading and UTF-8, eval memory
+leaks fixed, Random device on Windows, PERLIO_DEBUG, PerlIO::scalar and
+read-only scalars, study() and UTF-8, Critical signals, @INC-hook fix,
+C<-t> switch fix, Duping UTF-8 filehandles, Localisation of hash elements
+
+=item New or Changed Diagnostics
+
+Use of uninitialized value, Deprecated use of my() in false conditional,
+!=~ should be !~, Newline in left-justified string, Too late for "-T"
+option, "%s" variable %s masks earlier declaration,
+readdir()/closedir()/etc. attempted on invalid dirhandle, Opening
+dirhandle/filehandle %s also as a file/directory, Use of -P is deprecated,
+v-string in use/require is non-portable, perl -V
+
+=item Changed Internals
+
+=over 4
+
+=item Reordering of SVt_* constants
+
+=item Elimination of SVt_PVBM
+
+=item New type SVt_BIND
+
+=item Removal of CPP symbols
+
+=item Less space is used by ops
+
+=item New parser
+
+=item Use of C<const>
+
+=item Mathoms
+
+=item C<AvFLAGS> has been removed
+
+=item C<av_*> changes
+
+=item $^H and %^H
+
+=item B:: modules inheritance changed
+
+=item Anonymous hash and array constructors
+
+=back
+
+=item Known Problems
+
+=item Platform Specific Problems
+
+=item Reporting Bugs
+
+=item SEE ALSO
+
+=back
+
+=head2 perl5100delta, perldelta - what is new for perl 5.10.0
+
+=over 4
+
+=item DESCRIPTION
+
+=item Core Enhancements
+
+=over 4
+
+=item The C<feature> pragma
+
+=item New B<-E> command-line switch
+
+=item Defined-or operator
+
+=item Switch and Smart Match operator
+
+=item Regular expressions
+
+Recursive Patterns, Named Capture Buffers, Possessive Quantifiers,
+Backtracking control verbs, Relative backreferences, C<\K> escape, Vertical
+and horizontal whitespace, and linebreak
+
+=item C<say()>
+
+=item Lexical C<$_>
+
+=item The C<_> prototype
+
+=item UNITCHECK blocks
+
+=item New Pragma, C<mro>
+
+=item readpipe() is now overridable
+
+=item Default argument for readline()
+
+=item state() variables
+
+=item Stacked filetest operators
+
+=item UNIVERSAL::DOES()
+
+=item Formats
+
+=item Byte-order modifiers for pack() and unpack()
+
+=item C<no VERSION>
+
+=item C<chdir>, C<chmod> and C<chown> on filehandles
+
+=item OS groups
+
+=item Recursive sort subs
+
+=item Exceptions in constant folding
+
+=item Source filters in @INC
+
+=item New internal variables
+
+C<${^RE_DEBUG_FLAGS}>, C<${^CHILD_ERROR_NATIVE}>, C<${^RE_TRIE_MAXBUF}>,
+C<${^WIN32_SLOPPY_STAT}>
+
+=item Miscellaneous
+
+=item UCD 5.0.0
+
+=item MAD
+
+=back
+
+=item Incompatible Changes
+
+=over 4
+
+=item Packing and UTF-8 strings
+
+=item Byte/character count feature in unpack()
+
+=item The C<$*> and C<$#> variables have been removed
+
+=item substr() lvalues are no longer fixed-length
+
+=item Parsing of C<-f _>
+
+=item C<:unique>
+
+=item Effect of pragmas in eval
+
+=item chdir FOO
+
+=item Handling of .pmc files
+
+=item @- and @+ in patterns
+
+=item $AUTOLOAD can now be tainted
+
+=item Tainting and printf
+
+=item undef and signal handlers
+
+=item strictures and dereferencing in defined()
+
+=item C<(?p{})> has been removed
+
+=item Pseudo-hashes have been removed
+
+=item Removal of the bytecode compiler and of perlcc
+
+=item Removal of the JPL
+
+=item Recursive inheritance detected earlier
+
+=back
+
+=item Modules and Pragmata
+
+=over 4
+
+=item Pragmata Changes
+
+C<feature>, C<mro>, Scoping of the C<sort> pragma, Scoping of C<bignum>,
+C<bigint>, C<bigrat>, C<base>, C<strict> and C<warnings>, C<version>,
+C<warnings>, C<less>
+
+=item New modules
+
+=item Selected Changes to Core Modules
+
+C<Attribute::Handlers>, C<B::Lint>, C<B>, C<Thread>
+
+=back
+
+=item Utility Changes
+
+perl -d, ptar, ptardiff, shasum, corelist, h2ph and h2xs, perlivp,
+find2perl, config_data, cpanp, cpan2dist, pod2html
+
+=item New Documentation
+
+=item Performance Enhancements
+
+=over 4
+
+=item In-place sorting
+
+=item Lexical array access
+
+=item XS-assisted SWASHGET
+
+=item Constant subroutines
+
+=item C<PERL_DONT_CREATE_GVSV>
+
+=item Weak references are cheaper
+
+=item sort() enhancements
+
+=item Memory optimisations
+
+=item UTF-8 cache optimisation
+
+=item Sloppy stat on Windows
+
+=item Regular expressions optimisations
+
+Engine de-recursivised, Single char char-classes treated as literals, Trie
+optimisation of literal string alternations, Aho-Corasick start-point
+optimisation
+
+=back
+
+=item Installation and Configuration Improvements
+
+=over 4
+
+=item Configuration improvements
+
+C<-Dusesitecustomize>, Relocatable installations, strlcat() and strlcpy(),
+C<d_pseudofork> and C<d_printf_format_null>, Configure help
+
+=item Compilation improvements
+
+Parallel build, Borland's compilers support, Static build on Windows,
+pport.h files, C++ compatibility, Building XS extensions on Windows,
+Support for Microsoft 64-bit compiler, Visual C++, Win32 builds
+
+=item Installation improvements
+
+Module auxiliary files
+
+=item New Or Improved Platforms
+
+=back
+
+=item Selected Bug Fixes
+
+strictures in regexp-eval blocks, Calling CORE::require(), Subscripts of
+slices, C<no warnings 'category'> works correctly with -w, threads
+improvements, chr() and negative values, PERL5SHELL and tainting, Using
+*FILE{IO}, Overloading and reblessing, Overloading and UTF-8, eval memory
+leaks fixed, Random device on Windows, PERLIO_DEBUG, PerlIO::scalar and
+read-only scalars, study() and UTF-8, Critical signals, @INC-hook fix,
+C<-t> switch fix, Duping UTF-8 filehandles, Localisation of hash elements
+
+=item New or Changed Diagnostics
+
+Use of uninitialized value, Deprecated use of my() in false conditional,
+!=~ should be !~, Newline in left-justified string, Too late for "-T"
+option, "%s" variable %s masks earlier declaration,
+readdir()/closedir()/etc. attempted on invalid dirhandle, Opening
+dirhandle/filehandle %s also as a file/directory, Use of -P is deprecated,
+v-string in use/require is non-portable, perl -V
+
+=item Changed Internals
+
+=over 4
+
+=item Reordering of SVt_* constants
+
+=item Elimination of SVt_PVBM
+
+=item New type SVt_BIND
+
+=item Removal of CPP symbols
+
+=item Less space is used by ops
+
+=item New parser
+
+=item Use of C<const>
+
+=item Mathoms
+
+=item C<AvFLAGS> has been removed
+
+=item C<av_*> changes
+
+=item $^H and %^H
+
+=item B:: modules inheritance changed
+
+=item Anonymous hash and array constructors
+
+=back
+
+=item Known Problems
+
+=item Platform Specific Problems
+
+=item Reporting Bugs
 
 =item SEE ALSO
 
@@ -10056,6 +10496,1558 @@ a), b), c), d), a), b), c), d)
 
 =back
 
+=head2 perlaix, README.aix - Perl version 5 on IBM Unix (AIX) systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl 5 on AIX
+
+=item OS level
+
+=item Building Dynamic Extensions on AIX
+
+=item The IBM ANSI C Compiler
+
+=item The usenm option
+
+=item Using GNU's gcc for building perl
+
+=item Using Large Files with Perl
+
+=item Threaded Perl
+
+=item 64-bit Perl
+
+=item AIX 4.2 and extensions using C++ with statics
+
+=back
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlamiga - Perl under Amiga OS
+
+=over 4
+
+=item NOTE
+
+=item SYNOPSIS
+
+=back
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Prerequisites for Compiling Perl on AmigaOS
+
+B<Unix emulation for AmigaOS: ixemul.library>, B<Version of Amiga OS>
+
+=item Starting Perl programs under AmigaOS
+
+=item Shortcomings of Perl under AmigaOS
+
+=back
+
+=item INSTALLATION
+
+=item Accessing documentation
+
+=over 4
+
+=item Manpages for Perl on AmigaOS
+
+=item Perl HTML Documentation on AmigaOS
+
+=item Perl GNU Info Files on AmigaOS
+
+=item Perl LaTeX Documentation on AmigaOS
+
+=back
+
+=item BUILDING PERL ON AMIGAOS
+
+=over 4
+
+=item Build Prerequisites for Perl on AmigaOS
+
+=item Getting the Perl Source for AmigaOS
+
+=item Making Perl on AmigaOS
+
+=item Testing Perl on AmigaOS
+
+=item Installing the built Perl on AmigaOS
+
+=back
+
+=item PERL 5.8.0 BROKEN IN AMIGAOS
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=back
+
+=head2 perlapollo, README.apollo - Perl version 5 on Apollo DomainOS
+
+=over 4
+
+=item DESCRIPTION
+
+=item AUTHOR
+
+=back
+
+=head2 perlbeos, README.beos - Perl version 5.8+ on BeOS
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILD AND INSTALL
+
+=over 4
+
+=item Requirements
+
+=item Configure
+
+=item Build
+
+=item Install
+
+=back
+
+=item KNOWN PROBLEMS
+
+=item CONTACT
+
+=back
+
+=head2 perlbs2000, README.BS2000 - building and installing Perl for BS2000.
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item gzip on BS2000
+
+=item bison on BS2000
+
+=item Unpacking Perl Distribution on BS2000
+
+=item Compiling Perl on BS2000
+
+=item Testing Perl on BS2000
+
+=item Installing Perl on BS2000
+
+=item Using Perl in the Posix-Shell of BS2000
+
+=item Using Perl in "native" BS2000
+
+=item Floating point anomalies on BS2000
+
+=item Using PerlIO and different encodings on ASCII and EBCDIC partitions
+
+=back
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=over 4
+
+=item Mailing list
+
+=back
+
+=item HISTORY
+
+=back
+
+=head2 perlce - Perl for WinCE
+
+=over 4
+
+=item Building Perl for WinCE
+
+=over 4
+
+=item DESCRIPTION
+
+=item General explanations on cross-compiling WinCE
+
+=item BUILD
+
+Microsoft Embedded Visual Tools, Microsoft Visual C++, Rainer Keuchel's
+celib-sources, Rainer Keuchel's console-sources, go to C<./win32>
+subdirectory, edit file C<./win32/ce-helpers/compile.bat>, run	 
+compile.bat, run    compile.bat dist
+
+=back
+
+=item Using Perl on WinCE
+
+=over 4
+
+=item DESCRIPTION
+
+=item LIMITATIONS
+
+=item ENVIRONMENT
+
+PERL5LIB, PATH, TMP, UNIXROOTPATH, ROWS/COLS, HOME, CONSOLEFONTSIZE
+
+=item REGISTRY
+
+=item XS
+
+=item BUGS
+
+=item INSTALLATION
+
+=back
+
+=item ACKNOWLEDGEMENTS
+
+=item History of WinCE port
+
+=item AUTHORS
+
+Rainer Keuchel <coyxc@rainer-keuchel.de>, Vadim Konovalov
+
+=back
+
+=head2 perlcygwin, README.cygwin - Perl for Cygwin
+
+=over 4
+
+=item SYNOPSIS
+
+=item PREREQUISITES FOR COMPILING PERL ON CYGWIN
+
+=over 4
+
+=item Cygwin = GNU+Cygnus+Windows (Don't leave UNIX without it)
+
+=item Cygwin Configuration
+
+C<PATH>, I<nroff>, Permissions
+
+=back
+
+=item CONFIGURE PERL ON CYGWIN
+
+=over 4
+
+=item Stripping Perl Binaries on Cygwin
+
+=item Optional Libraries for Perl on Cygwin
+
+C<-lcrypt>, C<-lgdbm_compat> (C<use GDBM_File>), C<-ldb> (C<use DB_File>),
+C<cygserver> (C<use IPC::SysV>), C<-lutil>
+
+=item Configure-time Options for Perl on Cygwin
+
+C<-Uusedl>, C<-Uusemymalloc>, C<-Uuseperlio>, C<-Dusemultiplicity>,
+C<-Duse64bitint>, C<-Duselongdouble>, C<-Dusethreads>, C<-Duselargefiles>,
+C<-Dmksymlinks>
+
+=item Suspicious Warnings on Cygwin
+
+Win9x and C<d_eofnblk>, Compiler/Preprocessor defines
+
+=back
+
+=item MAKE ON CYGWIN
+
+=item TEST ON CYGWIN
+
+=over 4
+
+=item File Permissions on Cygwin
+
+=item NDBM_File and ODBM_File do not work on FAT filesystems
+
+=item C<fork()> failures in io_* tests
+
+=back
+
+=item Specific features of the Cygwin port
+
+=over 4
+
+=item Script Portability on Cygwin
+
+Pathnames, Text/Binary, PerlIO, F<.exe>, Cygwin vs. Windows process ids,
+Cygwin vs. Windows errors, C<chown()>, Miscellaneous
+
+=item Prebuilt methods:
+
+C<Cwd::cwd>, C<Cygwin::pid_to_winpid>, C<Cygwin::winpid_to_pid>,
+C<Cygwin::win_to_posix_path>, C<Cygwin::posix_to_win_path>,
+C<Cygwin::mount_table()>, C<Cygwin::mount_flags>, C<Cygwin::is_binmount>
+
+=back
+
+=item INSTALL PERL ON CYGWIN
+
+=item MANIFEST ON CYGWIN
+
+Documentation, Build, Configure, Make, Install, Tests, Compiled Perl
+Source, Compiled Module Source, Perl Modules/Scripts, Perl Module Tests
+
+=item BUGS ON CYGWIN
+
+=item AUTHORS
+
+=item HISTORY
+
+=back
+
+=head2 perldgux - Perl under DG/UX.
+
+=over 4
+
+=item SYNOPSIS
+
+=back
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILDING PERL ON DG/UX
+
+=over 4
+
+=item Non-threaded Perl on DG/UX
+
+=item Threaded Perl on DG/UX
+
+=item Testing Perl on DG/UX
+
+=item Installing the built perl on DG/UX
+
+=back
+
+=item AUTHOR
+
+=item SEE ALSO
+
+=back
+
+=head2 perldos - Perl under DOS, W31, W95.
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Prerequisites for Compiling Perl on DOS
+
+DJGPP, Pthreads
+
+=item Shortcomings of Perl under DOS
+
+=item Building Perl on DOS
+
+=item Testing Perl on DOS
+
+=item Installation of Perl on DOS
+
+=back
+
+=item BUILDING AND INSTALLING MODULES ON DOS
+
+=over 4
+
+=item Building Prerequisites for Perl on DOS
+
+=item Unpacking CPAN Modules on DOS
+
+=item Building Non-XS Modules on DOS
+
+=item Building XS Modules on DOS
+
+=back
+
+=item AUTHOR
+
+=item SEE ALSO
+
+=back
+
+=head2 perlepoc, README.epoc - Perl for EPOC
+
+=over 4
+
+=item SYNOPSIS
+
+=item INTRODUCTION
+
+=item INSTALLING PERL ON EPOC
+
+=item STARTING PERL ON EPOC
+
+=over 4
+
+=item Editors on Epoc
+
+=item Features of Perl on Epoc
+
+=item Restrictions of Perl on Epoc
+
+=item Compiling Perl 5 on the EPOC cross compiling environment
+
+=back
+
+=item SUPPORT STATUS OF PERL ON EPOC
+
+=item AUTHOR
+
+=item LAST UPDATE
+
+=back
+
+=head2 perlfreebsd, README.freebsd - Perl version 5 on FreeBSD systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item FreeBSD core dumps from readdir_r with ithreads
+
+=item $^X doesn't always contain a full path in FreeBSD
+
+=item Perl will no longer be part of "base FreeBSD"
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlhpux, README.hpux - Perl version 5 on Hewlett-Packard Unix
+(HP-UX) systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Using perl as shipped with HP-UX
+
+=item Using perl from HP's porting centre
+
+=item Compiling Perl 5 on HP-UX
+
+=item PA-RISC
+
+=item Portability Between PA-RISC Versions
+
+=item PA-RISC 1.0
+
+=item PA-RISC 1.1
+
+=item PA-RISC 2.0
+
+=item Itanium Processor Family (IPF) and HP-UX
+
+=item Itanium, Itanium 2 & Madison 6
+
+=item Building Dynamic Extensions on HP-UX
+
+=item The HP ANSI C Compiler
+
+=item The GNU C Compiler
+
+=item Using Large Files with Perl on HP-UX
+
+=item Threaded Perl on HP-UX
+
+=item 64-bit Perl on HP-UX
+
+=item Oracle on HP-UX
+
+=item GDBM and Threads on HP-UX
+
+=item NFS filesystems and utime(2) on HP-UX
+
+=item perl -P and // and HP-UX
+
+=item HP-UX Kernel Parameters (maxdsiz) for Compiling Perl
+
+=back
+
+=item nss_delete core dump from op/pwent or op/grent
+
+=item Miscellaneous
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlhurd, README.hurd - Perl version 5 on Hurd
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Known Problems with Perl on Hurd 
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlirix, README.irix - Perl version 5 on Irix systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Building 32-bit Perl in Irix
+
+=item Building 64-bit Perl in Irix
+
+=item About Compiler Versions of Irix
+
+=item Linker Problems in Irix
+
+=item Malloc in Irix
+
+=item Building with threads in Irix
+
+=item Irix 5.3
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perllinux, README.linux - Perl version 5 on Linux systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Experimental Support for Sun Studio Compilers for Linux OS
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlmachten, README.machten - Perl version 5 on Power MachTen
+systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Perl version 5.8.x and greater not supported
+
+=item Compiling Perl 5.6.x on MachTen
+
+=item Failures during C<make test> on MachTen
+
+op/lexassign.t, pragma/warnings.t
+
+=item Building external modules on MachTen
+
+=back
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlmacos, README.macos - Perl under Mac OS (Classic)
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlmacosx, README.macosx - Perl under Mac OS X
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Installation Prefix
+
+=item SDK support
+
+=item Universal Binary support
+
+=item 64-bit PPC support
+
+=item libperl and Prebinding
+
+=item Updating Apple's Perl
+
+=item Known problems
+
+=item MacPerl
+
+=item Carbon
+
+=item Cocoa
+
+=back
+
+=item Starting From Scratch
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlmint, README.mint - Perl version 5 on Atari MiNT
+
+=over 4
+
+=item DESCRIPTION
+
+=item Known problems with Perl on MiNT
+
+=item AUTHOR
+
+=back
+
+=head2 perlmpeix, README.mpeix - Perl/iX for HP e3000 MPE
+
+=over 4
+
+=item SYNOPSIS
+
+=item NOTE
+
+=item Binary distribution from HP
+
+=item What's New in Perl for MPE/iX
+
+=item Welcome to Perl/iX
+
+=item System Requirements for Perl/iX
+
+=item How to Obtain Perl/iX
+
+=item Perl/iX Distribution Contents Highlights
+
+README, INSTALL, LIBSHP3K, PERL, .cpan/, lib/, man/,
+public_html/feedback.cgi, src/perl-5.6.0-mpe
+
+=item How to Compile Perl/iX
+
+ 4,  6
+
+=item Getting Started with Perl/iX
+
+=item MPE/iX Implementation Considerations
+
+=item Known Perl/iX Bugs Under Investigation
+
+=item Perl/iX To-Do List
+
+=item Perl/iX Change History
+
+=item AUTHOR
+
+=back
+
+=head2 perlnetware - Perl for NetWare
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILD
+
+=over 4
+
+=item Tools & SDK
+
+=item Setup
+
+SetNWBld.bat, Buildtype.bat
+
+=item Make
+
+=item Interpreter
+
+=item Extensions
+
+=back
+
+=item INSTALL
+
+=item BUILD NEW EXTENSIONS
+
+=item ACKNOWLEDGEMENTS
+
+=item AUTHORS
+
+=item DATE
+
+=back
+
+=head2 perlopenbsd, README.openbsd - Perl version 5 on OpenBSD systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item OpenBSD core dumps from getprotobyname_r and getservbyname_r with
+ithreads
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlos2 - Perl under OS/2, DOS, Win0.3*, Win0.95 and WinNT.
+
+=over 4
+
+=item SYNOPSIS
+
+=back
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Target
+
+=item Other OSes
+
+=item Prerequisites
+
+EMX, RSX, HPFS, pdksh
+
+=item Starting Perl programs under OS/2 (and DOS and...)
+
+=item Starting OS/2 (and DOS) programs under Perl
+
+=back
+
+=item Frequently asked questions
+
+=over 4
+
+=item "It does not work"
+
+=item I cannot run external programs
+
+=item I cannot embed perl into my program, or use F<perl.dll> from my
+program. 
+
+Is your program EMX-compiled with C<-Zmt -Zcrtdll>?, Did you use
+L<ExtUtils::Embed>?
+
+=item C<``> and pipe-C<open> do not work under DOS.
+
+=item Cannot start C<find.exe "pattern" file>
+
+=back
+
+=item INSTALLATION
+
+=over 4
+
+=item Automatic binary installation
+
+C<PERL_BADLANG>, C<PERL_BADFREE>, F<Config.pm>
+
+=item Manual binary installation
+
+Perl VIO and PM executables (dynamically linked), Perl_ VIO executable
+(statically linked), Executables for Perl utilities, Main Perl library,
+Additional Perl modules, Tools to compile Perl modules, Manpages for Perl
+and utilities, Manpages for Perl modules, Source for Perl documentation,
+Perl manual in F<.INF> format, Pdksh
+
+=item B<Warning>
+
+=back
+
+=item Accessing documentation
+
+=over 4
+
+=item OS/2 F<.INF> file
+
+=item Plain text
+
+=item Manpages
+
+=item HTML
+
+=item GNU C<info> files
+
+=item F<PDF> files
+
+=item C<LaTeX> docs
+
+=back
+
+=item BUILD
+
+=over 4
+
+=item The short story
+
+=item Prerequisites
+
+=item Getting perl source
+
+=item Application of the patches
+
+=item Hand-editing
+
+=item Making
+
+=item Testing
+
+A lot of C<bad free>, Process terminated by SIGTERM/SIGINT, F<op/fs.t>,
+F<op/stat.t>
+
+=item Installing the built perl
+
+=item C<a.out>-style build
+
+=back
+
+=item Building a binary distribution
+
+=item Building custom F<.EXE> files
+
+=over 4
+
+=item Making executables with a custom collection of statically loaded
+extensions
+
+=item Making executables with a custom search-paths
+
+=back
+
+=item Build FAQ
+
+=over 4
+
+=item Some C</> became C<\> in pdksh.
+
+=item C<'errno'> - unresolved external
+
+=item Problems with tr or sed
+
+=item Some problem (forget which ;-)
+
+=item Library ... not found
+
+=item Segfault in make
+
+=item op/sprintf test failure
+
+=back
+
+=item Specific (mis)features of OS/2 port
+
+=over 4
+
+=item C<setpriority>, C<getpriority>
+
+=item C<system()>
+
+=item C<extproc> on the first line
+
+=item Additional modules:
+
+=item Prebuilt methods:
+
+C<File::Copy::syscopy>, C<DynaLoader::mod2fname>,  C<Cwd::current_drive()>,
+ C<Cwd::sys_chdir(name)>,  C<Cwd::change_drive(name)>, 
+C<Cwd::sys_is_absolute(name)>,	C<Cwd::sys_is_rooted(name)>, 
+C<Cwd::sys_is_relative(name)>,	C<Cwd::sys_cwd(name)>, 
+C<Cwd::sys_abspath(name, dir)>,  C<Cwd::extLibpath([type])>, 
+C<Cwd::extLibpath_set( path [, type ] )>,
+C<OS2::Error(do_harderror,do_exception)>, C<OS2::Errors2Drive(drive)>,
+OS2::SysInfo(), OS2::BootDrive(), C<OS2::MorphPM(serve)>,
+C<OS2::UnMorphPM(serve)>, C<OS2::Serve_Messages(force)>,
+C<OS2::Process_Messages(force [, cnt])>, C<OS2::_control87(new,mask)>,
+OS2::get_control87(), C<OS2::set_control87_em(new=MCW_EM,mask=MCW_EM)>,
+C<OS2::DLLname([how [, \&xsub]])>
+
+=item Prebuilt variables:
+
+$OS2::emx_rev, $OS2::emx_env, $OS2::os_ver, $OS2::is_aout, $OS2::can_fork,
+$OS2::nsyserror
+
+=item Misfeatures
+
+=item Modifications
+
+C<popen>, C<tmpnam>, C<tmpfile>, C<ctermid>, C<stat>, C<mkdir>, C<rmdir>,
+C<flock>
+
+=item Identifying DLLs
+
+=item Centralized management of resources
+
+C<HAB>, C<HMQ>, Treating errors reported by OS/2 API,
+C<CheckOSError(expr)>, C<CheckWinError(expr)>, C<SaveWinError(expr)>,
+C<SaveCroakWinError(expr,die,name1,name2)>, C<WinError_2_Perl_rc>,
+C<FillWinError>, C<FillOSError(rc)>, Loading DLLs and ordinals in DLLs
+
+=back
+
+=item Perl flavors
+
+=over 4
+
+=item F<perl.exe>
+
+=item F<perl_.exe>
+
+=item F<perl__.exe>
+
+=item F<perl___.exe>
+
+=item Why strange names?
+
+=item Why dynamic linking?
+
+=item Why chimera build?
+
+=back
+
+=item ENVIRONMENT
+
+=over 4
+
+=item C<PERLLIB_PREFIX>
+
+=item C<PERL_BADLANG>
+
+=item C<PERL_BADFREE>
+
+=item C<PERL_SH_DIR>
+
+=item C<USE_PERL_FLOCK>
+
+=item C<TMP> or C<TEMP>
+
+=back
+
+=item Evolution
+
+=over 4
+
+=item Text-mode filehandles
+
+=item Priorities
+
+=item DLL name mangling: pre 5.6.2
+
+=item DLL name mangling: 5.6.2 and beyond
+
+Global DLLs, specific DLLs, C<BEGINLIBPATH> and C<ENDLIBPATH>, F<.> from
+C<LIBPATH>
+
+=item DLL forwarder generation
+
+=item Threading
+
+=item Calls to external programs
+
+=item Memory allocation
+
+=item Threads
+
+C<COND_WAIT>, F<os2.c>
+
+=back
+
+=item BUGS
+
+=back
+
+=over 4
+
+=item AUTHOR
+
+=item SEE ALSO
+
+=back
+
+=head2 perlos390, README.os390 - building and installing Perl for OS/390
+and z/OS
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Tools
+
+=item Unpacking Perl distribution on OS/390
+
+=item Setup and utilities for Perl on OS/390
+
+=item Configure Perl on OS/390
+
+=item Build, Test, Install Perl on OS/390
+
+=item Build Anomalies with Perl on OS/390
+
+=item Testing Anomalies with Perl on OS/390
+
+=item Installation Anomalies with Perl on OS/390
+
+=item Usage Hints for Perl on OS/390
+
+=item Floating Point Anomalies with Perl on OS/390
+
+=item Modules and Extensions for Perl on OS/390
+
+=back
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=over 4
+
+=item Mailing list for Perl on OS/390
+
+=back
+
+=item HISTORY
+
+=back
+
+=head2 perlos400, README.os400 - Perl version 5 on OS/400
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl for OS/400 PASE
+
+=item Installing Perl in OS/400 PASE
+
+=item Using Perl in OS/400 PASE
+
+=item Known Problems
+
+=item Perl on ILE
+
+=back
+
+=item AUTHORS
+
+=back
+
+=head2 perlplan9 - Plan 9-specific documentation for Perl
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Invoking Perl
+
+=item What's in Plan 9 Perl
+
+=item What's not in Plan 9 Perl
+
+=item Perl5 Functions not currently supported in Plan 9 Perl
+
+=item Signals in Plan 9 Perl
+
+=back
+
+=item COMPILING AND INSTALLING PERL ON PLAN 9
+
+=over 4
+
+=item Installing Perl Documentation on Plan 9
+
+=back
+
+=item BUGS
+
+=item Revision date
+
+=item AUTHOR
+
+=back
+
+=head2 perlqnx, README.qnx - Perl version 5 on QNX
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Required Software for Compiling Perl on QNX4
+
+/bin/sh, ar, nm, cpp, make
+
+=item Outstanding Issues with Perl on QNX4
+
+=item QNX auxiliary files
+
+qnx/ar, qnx/cpp
+
+=item Outstanding issues with perl under QNX6
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlriscos, README.riscos - Perl version 5 for RISC OS
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILD
+
+=item AUTHOR
+
+=back
+
+=head2 perlsolaris, README.solaris - Perl version 5 on Solaris systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Solaris Version Numbers.
+
+=back
+
+=item RESOURCES
+
+Solaris FAQ, Precompiled Binaries, Solaris Documentation
+
+=item SETTING UP
+
+=over 4
+
+=item File Extraction Problems on Solaris.
+
+=item Compiler and Related Tools on Solaris.
+
+=item Environment for Compiling perl on Solaris
+
+=back
+
+=item RUN CONFIGURE.
+
+=over 4
+
+=item 64-bit perl on Solaris.
+
+=item Threads in perl on Solaris.
+
+=item Malloc Issues with perl on Solaris.
+
+=back
+
+=item MAKE PROBLEMS.
+
+Dynamic Loading Problems With GNU as and GNU ld, ld.so.1: ./perl: fatal:
+relocation error:, dlopen: stub interception failed, #error "No
+DATAMODEL_NATIVE specified", sh: ar: not found
+
+=item MAKE TEST
+
+=over 4
+
+=item op/stat.t test 4 in Solaris
+
+=item nss_delete core dump from op/pwent or op/grent
+
+=back
+
+=item PREBUILT BINARIES OF PERL FOR SOLARIS.
+
+=item RUNTIME ISSUES FOR PERL ON SOLARIS.
+
+=over 4
+
+=item Limits on Numbers of Open Files on Solaris.
+
+=back
+
+=item SOLARIS-SPECIFIC MODULES.
+
+=item SOLARIS-SPECIFIC PROBLEMS WITH MODULES.
+
+=over 4
+
+=item Proc::ProcessTable on Solaris
+
+=item BSD::Resource on Solaris
+
+=item Net::SSLeay on Solaris
+
+=back
+
+=item SunOS 4.x
+
+=item AUTHOR
+
+=back
+
+=head2 perlsymbian, README.symbian - Perl version 5 on Symbian OS
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl on Symbian
+
+=item Compilation problems
+
+=item PerlApp
+
+=item sisify.pl
+
+=item Using Perl in Symbian
+
+=back
+
+=item TO DO
+
+=item WARNING
+
+=item NOTE
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item LICENSE
+
+=item HISTORY
+
+=back
+
+=head2 perltru64, README.tru64 - Perl version 5 on Tru64 (formerly known as
+Digital UNIX formerly known as DEC OSF/1) systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl 5 on Tru64
+
+=item Using Large Files with Perl on Tru64
+
+=item Threaded Perl on Tru64
+
+=item Long Doubles on Tru64
+
+=item DB_File tests failing on Tru64
+
+=item 64-bit Perl on Tru64
+
+=item Warnings about floating-point overflow when compiling Perl on Tru64
+
+=back
+
+=item Testing Perl on Tru64
+
+=item ext/ODBM_File/odbm Test Failing With Static Builds
+
+=item Perl Fails Because Of Unresolved Symbol sockatmark
+
+=item AUTHOR
+
+=back
+
+=head2 perluts - Perl under UTS
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item BUILDING PERL ON UTS
+
+=item Installing the built perl on UTS
+
+=item AUTHOR
+
+=back
+
+=head2 perlvmesa, README.vmesa - building and installing Perl for VM/ESA.
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Unpacking Perl Distribution on VM/ESA
+
+=item Setup Perl and utilities on VM/ESA
+
+=item Configure Perl on VM/ESA
+
+=item Testing Anomalies of Perl on VM/ESA
+
+=item Usage Hints for Perl on VM/ESA
+
+=back
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=over 4
+
+=item Mailing list for Perl on VM/ESA
+
+=back
+
+=back
+
+=head2 perlvms - VMS-specific documentation for Perl
+
+=over 4
+
+=item DESCRIPTION
+
+=item Installation
+
+=item Organization of Perl Images
+
+=over 4
+
+=item Core Images
+
+=item Perl Extensions
+
+=item Installing static extensions
+
+=item Installing dynamic extensions
+
+=back
+
+=item File specifications
+
+=over 4
+
+=item Syntax
+
+=item Wildcard expansion
+
+=item Pipes
+
+=back
+
+=item PERL5LIB and PERLLIB
+
+=item The Perl Forked Debugger
+
+=item PERL_VMS_EXCEPTION_DEBUG
+
+=item Command line
+
+=over 4
+
+=item I/O redirection and backgrounding
+
+=item Command line switches
+
+-i, -S, -u
+
+=back
+
+=item Perl functions
+
+File tests, backticks, binmode FILEHANDLE, crypt PLAINTEXT, USER, die,
+dump, exec LIST, fork, getpwent, getpwnam, getpwuid, gmtime, kill, qx//,
+select (system call), stat EXPR, system LIST, time, times, unlink LIST,
+utime LIST, waitpid PID,FLAGS
+
+=item Perl variables
+
+%ENV, CRTL_ENV, CLISYM_[LOCAL], Any other string, $!, $^E, $?, $|
+
+=item Standard modules with VMS-specific differences
+
+=over 4
+
+=item SDBM_File
+
+=back
+
+=item Revision date
+
+=item AUTHOR
+
+=back
+
+=head2 perlvos, README.vos - Perl for Stratus VOS
+
+=over 4
+
+=item SYNOPSIS
+
+=item BUILDING PERL FOR VOS
+
+=item INSTALLING PERL IN VOS
+
+=item USING PERL IN VOS
+
+=over 4
+
+=item Restrictions of Perl on VOS
+
+=item Handling of underflow and overflow
+
+=back
+
+=item TEST STATUS
+
+=item SUPPORT STATUS
+
+=item AUTHOR
+
+=item LAST UPDATE
+
+=back
+
+=head2 perlwin32 - Perl under Windows
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Setting Up Perl on Win32
+
+Make, Command Shell, Borland C++, Microsoft Visual C++, Microsoft Visual
+C++ 2008 Express Edition Beta 2, Microsoft Visual C++ 2005 Express Edition,
+Microsoft Visual C++ Toolkit 2003, Microsoft Platform SDK 64-bit Compiler,
+MinGW release 3 with gcc, MinGW release 1 with gcc
+
+=item Building
+
+=item Testing Perl on Win32
+
+=item Installation of Perl on Win32
+
+=item Usage Hints for Perl on Win32
+
+Environment Variables, File Globbing, Using perl from the command line,
+Building Extensions, Command-line Wildcard Expansion, Win32 Specific
+Extensions, Notes on 64-bit Windows
+
+=item Running Perl Scripts
+
+=item Miscellaneous Things
+
+=back
+
+=item BUGS AND CAVEATS
+
+=item ACKNOWLEDGEMENTS
+
+=item AUTHORS
+
+Gary Ng E<lt>71564.1743@CompuServe.COME<gt>, Gurusamy Sarathy
+E<lt>gsar@activestate.comE<gt>, Nick Ing-Simmons
+E<lt>nick@ing-simmons.netE<gt>, Jan Dubois E<lt>jand@activestate.comE<gt>,
+Steve Hay E<lt>steve.hay@uk.radan.comE<gt>
+
+=item SEE ALSO
+
+=item HISTORY
+
+=back
+
 =head1 PRAGMA DOCUMENTATION
 
 =head2 attrs - set/get attributes of a subroutine (deprecated)
@@ -10454,77 +12446,6 @@ global environment, parsing arguments and declaring lexical variables
 =item BUGS
 
 =item AUTHOR
-
-=back
-
-=head2 encoding - allows you to write your script in non-ascii or non-utf8
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=over 4
-
-=item Literal Conversions
-
-=item Implicit upgrading for byte strings
-
-=item Side effects
-
-=item Side effects
-
-=item Side effects
-
-=back
-
-=item FEATURES THAT REQUIRE 5.8.1
-
-"NON-EUC" doublebyte encodings, tr//, DATA pseudo-filehandle
-
-=item USAGE
-
-use encoding [I<ENCNAME>] ;, use encoding I<ENCNAME> [ STDIN =E<gt>
-I<ENCNAME_IN> ...] ;, use encoding I<ENCNAME> Filter=E<gt>1;, no encoding;
-
-=item The Filter Option
-
-=over 4
-
-=item Filter-related changes at Encode version 1.87
-
-=back
-
-=item CAVEATS
-
-=over 4
-
-=item NOT SCOPED
-
-=item DO NOT MIX MULTIPLE ENCODINGS
-
-=item tr/// with ranges
-
-Legend of characters above
-
-=back
-
-=item EXAMPLE - Greekperl
-
-=item KNOWN PROBLEMS
-
-literals in regex that are longer than 127 bytes, EBCDIC
-
-=over 4
-
-=item The Logic of :locale
-
-=back
-
-=item HISTORY
-
-=item SEE ALSO
 
 =back
 
@@ -11413,6 +13334,8 @@ FILE, HARDLINK, SYMLINK, CHARDEV, BLOCKDEV, DIR, FIFO, SOCKET
 
 =item $Archive::Tar::error
 
+=item $Archive::Tar::INSECURE_EXTRACT_MODE
+
 =item $Archive::Tar::HAS_PERLIO
 
 =item $Archive::Tar::HAS_IO_STRING
@@ -11878,37 +13801,6 @@ strict, $[, bytes, utf8, integer, re, warnings, hint_bits, warning_bits,
 =item coderef2text
 
 =back
-
-=item BUGS
-
-=item AUTHOR
-
-=back
-
-=head2 B::Lint - Perl lint
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item OPTIONS AND LINT CHECKS
-
-B<magic-diamond>, B<context>, B<implicit-read> and B<implicit-write>,
-B<bare-subs>, B<dollar-underscore>, B<private-names>, B<undefined-subs>,
-B<regexp-variables>, B<all>, B<none>
-
-=item NON LINT-CHECK OPTIONS
-
-B<-u Package>
-
-=item EXTENDING LINT
-
-=item TODO
-
-while(<FH>) stomps $_, strict oo, unchecked system calls, more tests,
-validate against older perls
 
 =item BUGS
 
@@ -13556,155 +15448,6 @@ Dumper
 
 =back
 
-=head2 Devel::DProf - a Perl code profiler
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item PROFILE FORMAT
-
-=item AUTOLOAD
-
-=item ENVIRONMENT
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Devel::InnerPackage - find all the inner packages of a package
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item list_packages <package name>
-
-=back
-
-=back
-
-=over 4
-
-=item AUTHOR
-
-=item COPYING
-
-=item BUGS
-
-=back
-
-=head2 Devel::PPPort - Perl/Pollution/Portability
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Why use ppport.h?
-
-=item How to use ppport.h
-
-=item Running ppport.h
-
-=back
-
-=item FUNCTIONS
-
-=over 4
-
-=item WriteFile
-
-=back
-
-=item COMPATIBILITY
-
-=over 4
-
-=item Provided Perl compatibility API
-
-=item Perl API not supported by ppport.h
-
-perl 5.9.5, perl 5.9.4, perl 5.9.3, perl 5.9.2, perl 5.9.1, perl 5.9.0,
-perl 5.8.3, perl 5.8.1, perl 5.8.0, perl 5.7.3, perl 5.7.2, perl 5.7.1,
-perl 5.6.1, perl 5.6.0, perl 5.005_03, perl 5.005, perl 5.004_05, perl
-5.004
-
-=back
-
-=item BUGS
-
-=item AUTHORS
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Devel::Peek - A data debugging tool for the XS programmer
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Runtime debugging
-
-=item Memory footprint debugging
-
-=back
-
-=item EXAMPLES
-
-=over 4
-
-=item A simple scalar string
-
-=item A simple scalar number
-
-=item A simple scalar with an extra reference
-
-=item A reference to a simple scalar
-
-=item A reference to an array
-
-=item A reference to a hash
-
-=item Dumping a large array or hash
-
-=item A reference to an SV which holds a C pointer
-
-=item A reference to a subroutine
-
-=back
-
-=item EXPORTS
-
-=item BUGS
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
 =head2 Digest - Modules that calculate message digests
 
 =over 4
@@ -13930,811 +15673,6 @@ C<XSLoader::load('Your::Module', $Your::Module::VERSION)>
 
 =back
 
-=head2 Encode - character encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=over 4
-
-=item Table of Contents
-
-=back
-
-=item DESCRIPTION
-
-=over 4
-
-=item TERMINOLOGY
-
-=back
-
-=item PERL ENCODING API
-
-$octets  = encode(ENCODING, $string [, CHECK]), $string = decode(ENCODING,
-$octets [, CHECK]), [$obj =] find_encoding(ENCODING), [$length =]
-from_to($octets, FROM_ENC, TO_ENC [, CHECK]), $octets =
-encode_utf8($string);, $string = decode_utf8($octets [, CHECK]);
-
-=over 4
-
-=item Listing available encodings
-
-=item Defining Aliases
-
-=item Finding IANA Character Set Registry names
-
-=back
-
-=item Encoding via PerlIO
-
-=item Handling Malformed Data
-
-B<NOTE:> Not all encoding support this feature, I<CHECK> =
-Encode::FB_DEFAULT ( == 0), I<CHECK> = Encode::FB_CROAK ( == 1), I<CHECK> =
-Encode::FB_QUIET, I<CHECK> = Encode::FB_WARN, perlqq mode (I<CHECK> =
-Encode::FB_PERLQQ), HTML charref mode (I<CHECK> = Encode::FB_HTMLCREF), XML
-charref mode (I<CHECK> = Encode::FB_XMLCREF), The bitmask,
-Encode::LEAVE_SRC
-
-=item Defining Encodings
-
-=item The UTF8 flag
-
-Goal #1:, Goal #2:, Goal #3:, Goal #4:
-
-=over 4
-
-=item Messing with Perl's Internals
-
-is_utf8(STRING [, CHECK])
-
-=back
-
-=item UTF-8 vs. utf8 vs. UTF8
-
-=item SEE ALSO
-
-=item MAINTAINER
-
-=item COPYRIGHT
-
-=back
-
-=head2 Encode::Alias - alias definitions to encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-As a simple string, As a qr// compiled regular expression, e.g.:, As a code
-reference, e.g.:
-
-=over 4
-
-=item Alias overloading
-
-=back
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::Byte - Single Byte Encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::CJKConstants -- Internally used by Encode::??::ISO_2022_*
-
-=head2 Encode::CN - China-based Chinese Encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item NOTES
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::CN::HZ -- internally used by Encode::CN
-
-=head2 Encode::Config -- internally used by Encode
-
-=head2 Encode::EBCDIC - EBCDIC Encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::Encoding - Encode Implementation Base Class
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Methods you should implement
-
--E<gt>encode($string [,$check]), -E<gt>decode($octets [,$check]),
--E<gt>cat_decode($destination, $octets, $offset, $terminator [,$check])
-
-=item Other methods defined in Encode::Encodings
-
--E<gt>name, -E<gt>mime_name, -E<gt>renew, -E<gt>renewed, -E<gt>perlio_ok(),
--E<gt>needs_lines()
-
-=item Example: Encode::ROT13
-
-=back
-
-=item Why the heck Encode API is different?
-
-=over 4
-
-=item Compiled Encodings
-
-=back
-
-=item SEE ALSO
-
-Scheme 1, Scheme 2, Other Schemes
-
-=back
-
-=head2 Encode::GSM0338 -- ESTI GSM 03.38 Encoding
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item NOTES
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::Guess -- Guesses encoding from data
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-Encode::Guess->set_suspects, Encode::Guess->add_suspects,
-Encode::decode("Guess" ...), Encode::Guess->guess($data),
-guess_encoding($data, [, I<list of suspects>])
-
-=item CAVEATS
-
-=item TO DO
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::JP - Japanese Encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-=item Note on ISO-2022-JP(-1)?
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::JP::H2Z -- internally used by Encode::JP::2022_JP*
-
-=head2 Encode::JP::JIS7 -- internally used by Encode::JP
-
-=head2 Encode::KR - Korean Encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::KR::2022_KR -- internally used by Encode::KR
-
-=head2 Encode::MIME::Header -- MIME 'B' and 'Q' header encoding
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::MIME::Name, Encode::MIME::NAME -- internally used by Encode
-
-=over 4
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::PerlIO -- a detailed document on Encode and PerlIO
-
-=over 4
-
-=item Overview
-
-=item How does it work?
-
-=item Line Buffering
-
-=over 4
-
-=item How can I tell whether my encoding fully supports PerlIO ?
-
-=back
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::Supported -- Encodings supported by Encode
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item Encoding Names
-
-=back
-
-=item Supported Encodings
-
-=over 4
-
-=item Built-in Encodings
-
-=item Encode::Unicode -- other Unicode encodings
-
-=item Encode::Byte -- Extended ASCII
-
-ISO-8859 and corresponding vendor mappings, KOI8 - De Facto Standard for
-the Cyrillic world
-
-=item gsm0338 - Hentai Latin 1
-
-gsm0338 support before 2.19
-
-=item CJK: Chinese, Japanese, Korean (Multibyte)
-
-Encode::CN -- Continental China, Encode::JP -- Japan, Encode::KR -- Korea,
-Encode::TW -- Taiwan, Encode::HanExtra -- More Chinese via CPAN,
-Encode::JIS2K -- JIS X 0213 encodings via CPAN
-
-=item Miscellaneous encodings
-
-Encode::EBCDIC, Encode::Symbols, Encode::MIME::Header, Encode::Guess
-
-=back
-
-=item Unsupported encodings
-
-  ISO-2022-JP-2 [RFC1554], ISO-2022-CN [RFC1922], Various HP-UX encodings,
-Cyrillic encoding ISO-IR-111, ISO-8859-8-1 [Hebrew], ISIRI 3342, Iran
-System, ISIRI 2900 [Farsi], Thai encoding TCVN, Vietnamese encodings VPS,
-Various Mac encodings, (Mac) Indic encodings
-
-=item Encoding vs. Charset -- terminology
-
-=item Encoding Classification (by Anton Tagunov and Dan Kogai)
-
-=over 4
-
-=item Microsoft-related naming mess
-
-KS_C_5601-1987, GB2312, Big5, Shift_JIS
-
-=back
-
-=item Glossary
-
-character repertoire, coded character set (CCS), character encoding scheme
-(CES), charset (in MIME context), EUC, ISO-2022, UCS, UCS-2, Unicode, UTF,
-UTF-16
-
-=item See Also
-
-=item References
-
-ECMA, ECMA-035 (eq C<ISO-2022>), IANA, Assigned Charset Names by IANA, ISO,
-RFC, UC, Unicode Glossary
-
-=over 4
-
-=item Other Notable Sites
-
-czyborra.com, CJK.inf, Jungshik Shin's Hangul FAQ, debian.org:
-"Introduction to i18n"
-
-=item Offline sources
-
-C<CJKV Information Processing> by Ken Lunde
-
-=back
-
-=back
-
-=head2 Encode::Symbol - Symbol Encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::TW - Taiwan-based Chinese Encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item NOTES
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::Unicode -- Various Unicode Transformation Formats
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-L<http://www.unicode.org/glossary/> says:, Quick Reference
-
-=item Size, Endianness, and BOM
-
-=over 4
-
-=item by size
-
-=item by endianness
-
-BOM as integer when fetched in network byte order
-
-=back
-
-=item Surrogate Pairs
-
-=item Error Checking
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::Unicode::UTF7 -- UTF-7 encoding
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item In Practice
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::lib::Encode::Alias, Encode::Alias - alias definitions to
-encodings
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-As a simple string, As a qr// compiled regular expression, e.g.:, As a code
-reference, e.g.:
-
-=over 4
-
-=item Alias overloading
-
-=back
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::lib::Encode::CJKConstants, Encode::CJKConstants.pm --
-Internally used by Encode::??::ISO_2022_*
-
-=head2 Encode::lib::Encode::CN::HZ, Encode::CN::HZ -- internally used by
-Encode::CN
-
-=head2 Encode::lib::Encode::Config, Encode::Config -- internally used by
-Encode
-
-=head2 Encode::lib::Encode::Encoding, Encode::Encoding - Encode
-Implementation Base Class
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Methods you should implement
-
--E<gt>encode($string [,$check]), -E<gt>decode($octets [,$check]),
--E<gt>cat_decode($destination, $octets, $offset, $terminator [,$check])
-
-=item Other methods defined in Encode::Encodings
-
--E<gt>name, -E<gt>mime_name, -E<gt>renew, -E<gt>renewed, -E<gt>perlio_ok(),
--E<gt>needs_lines()
-
-=item Example: Encode::ROT13
-
-=back
-
-=item Why the heck Encode API is different?
-
-=over 4
-
-=item Compiled Encodings
-
-=back
-
-=item SEE ALSO
-
-Scheme 1, Scheme 2, Other Schemes
-
-=back
-
-=head2 Encode::lib::Encode::GSM0338, Encode::GSM0338 -- ESTI GSM 03.38
-Encoding
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item NOTES
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::lib::Encode::Guess, Encode::Guess -- Guesses encoding from
-data
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-Encode::Guess->set_suspects, Encode::Guess->add_suspects,
-Encode::decode("Guess" ...), Encode::Guess->guess($data),
-guess_encoding($data, [, I<list of suspects>])
-
-=item CAVEATS
-
-=item TO DO
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::lib::Encode::JP::H2Z, Encode::JP::H2Z -- internally used by
-Encode::JP::2022_JP*
-
-=head2 Encode::lib::Encode::JP::JIS7, Encode::JP::JIS7 -- internally used
-by Encode::JP
-
-=head2 Encode::lib::Encode::KR::2022_KR, Encode::KR::2022_KR -- internally
-used by Encode::KR
-
-=head2 Encode::lib::Encode::MIME::Header, Encode::MIME::Header -- MIME 'B'
-and 'Q' header encoding
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::lib::Encode::MIME::Name, Encode::MIME::NAME -- internally
-used by Encode
-
-=over 4
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::lib::Encode::PerlIO, Encode::PerlIO -- a detailed document
-on Encode and PerlIO
-
-=over 4
-
-=item Overview
-
-=item How does it work?
-
-=item Line Buffering
-
-=over 4
-
-=item How can I tell whether my encoding fully supports PerlIO ?
-
-=back
-
-=item SEE ALSO
-
-=back
-
-=head2 Encode::lib::Encode::Supported, Encode::Supported -- Encodings
-supported by Encode
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item Encoding Names
-
-=back
-
-=item Supported Encodings
-
-=over 4
-
-=item Built-in Encodings
-
-=item Encode::Unicode -- other Unicode encodings
-
-=item Encode::Byte -- Extended ASCII
-
-ISO-8859 and corresponding vendor mappings, KOI8 - De Facto Standard for
-the Cyrillic world
-
-=item gsm0338 - Hentai Latin 1
-
-gsm0338 support before 2.19
-
-=item CJK: Chinese, Japanese, Korean (Multibyte)
-
-Encode::CN -- Continental China, Encode::JP -- Japan, Encode::KR -- Korea,
-Encode::TW -- Taiwan, Encode::HanExtra -- More Chinese via CPAN,
-Encode::JIS2K -- JIS X 0213 encodings via CPAN
-
-=item Miscellaneous encodings
-
-Encode::EBCDIC, Encode::Symbols, Encode::MIME::Header, Encode::Guess
-
-=back
-
-=item Unsupported encodings
-
-  ISO-2022-JP-2 [RFC1554], ISO-2022-CN [RFC1922], Various HP-UX encodings,
-Cyrillic encoding ISO-IR-111, ISO-8859-8-1 [Hebrew], ISIRI 3342, Iran
-System, ISIRI 2900 [Farsi], Thai encoding TCVN, Vietnamese encodings VPS,
-Various Mac encodings, (Mac) Indic encodings
-
-=item Encoding vs. Charset -- terminology
-
-=item Encoding Classification (by Anton Tagunov and Dan Kogai)
-
-=over 4
-
-=item Microsoft-related naming mess
-
-KS_C_5601-1987, GB2312, Big5, Shift_JIS
-
-=back
-
-=item Glossary
-
-character repertoire, coded character set (CCS), character encoding scheme
-(CES), charset (in MIME context), EUC, ISO-2022, UCS, UCS-2, Unicode, UTF,
-UTF-16
-
-=item See Also
-
-=item References
-
-ECMA, ECMA-035 (eq C<ISO-2022>), IANA, Assigned Charset Names by IANA, ISO,
-RFC, UC, Unicode Glossary
-
-=over 4
-
-=item Other Notable Sites
-
-czyborra.com, CJK.inf, Jungshik Shin's Hangul FAQ, debian.org:
-"Introduction to i18n"
-
-=item Offline sources
-
-C<CJKV Information Processing> by Ken Lunde
-
-=back
-
-=back
-
-=head2 Encode::lib::Encode::Unicode::UTF7, Encode::Unicode::UTF7 -- UTF-7
-encoding
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=item In Practice
-
-=item SEE ALSO
-
-=back
-
-=head2 Encodencoding, encoding - allows you to write your script in
-non-ascii or non-utf8
-
-=over 4
-
-=item SYNOPSIS
-
-=item ABSTRACT
-
-=over 4
-
-=item Literal Conversions
-
-=item Implicit upgrading for byte strings
-
-=item Side effects
-
-=item Side effects
-
-=item Side effects
-
-=back
-
-=item FEATURES THAT REQUIRE 5.8.1
-
-"NON-EUC" doublebyte encodings, tr//, DATA pseudo-filehandle
-
-=item USAGE
-
-use encoding [I<ENCNAME>] ;, use encoding I<ENCNAME> [ STDIN =E<gt>
-I<ENCNAME_IN> ...] ;, use encoding I<ENCNAME> Filter=E<gt>1;, no encoding;
-
-=item The Filter Option
-
-=over 4
-
-=item Filter-related changes at Encode version 1.87
-
-=back
-
-=item CAVEATS
-
-=over 4
-
-=item NOT SCOPED
-
-=item DO NOT MIX MULTIPLE ENCODINGS
-
-=item tr/// with ranges
-
-Legend of characters above
-
-=back
-
-=item EXAMPLE - Greekperl
-
-=item KNOWN PROBLEMS
-
-literals in regex that are longer than 127 bytes, EBCDIC
-
-=over 4
-
-=item The Logic of :locale
-
-=back
-
-=item HISTORY
-
-=item SEE ALSO
-
-=back
-
 =head2 English - use nice English (or awk) names for ugly punctuation
 variables
 
@@ -14816,8 +15754,6 @@ C<use ModuleName;>, C<use ModuleName ();>, C<use ModuleName qw(...);>
 =item Tag Handling Utility Functions
 
 =item Generating combined tags
-
-=item C<AUTOLOAD>ed Constants
 
 =back
 
@@ -16381,7 +17317,8 @@ rmscopy($from,$to[,$date_flag]) X<rmscopy>
 
 =item ACCESSORS
 
-$ff->uri, $ff->scheme, $ff->host, $ff->path, $ff->file
+$ff->uri, $ff->scheme, $ff->host, $ff->vol, $ff->share, $ff->path,
+$ff->file
 
 =back
 
@@ -21602,570 +22539,6 @@ modules, verbose, nocache
 
 =back
 
-=head2 Module::Build - Build and install Perl modules
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item GUIDE TO DOCUMENTATION
-
-General Usage (L<Module::Build>), Authoring Reference
-(L<Module::Build::Authoring>), API Reference (L<Module::Build::API>),
-Cookbook (L<Module::Build::Cookbook>)
-
-=item ACTIONS
-
-build, clean, code, config_data, diff, dist, distcheck, distclean, distdir,
-distmeta, distsign, disttest, docs, fakeinstall, help, html, install,
-manifest, manpages, pardist, ppd, ppmdist, prereq_report, pure_install,
-realclean, retest, skipcheck, test, testall, testcover, testdb, testpod,
-testpodcoverage, versioninstall
-
-=item OPTIONS
-
-=over 4
-
-=item Command Line Options
-
-quiet, use_rcfile, verbose, allow_mb_mismatch
-
-=item Default Options File (F<.modulebuildrc>)
-
-=back
-
-=item INSTALL PATHS
-
-lib, arch, script, bin, bindoc, libdoc, binhtml, libhtml, installdirs,
-install_path, install_base, destdir, prefix
-
-=item MOTIVATIONS
-
-+, +
-
-=item TO DO
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::API - API Reference for Module Authors
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item CONSTRUCTORS
-
-current(), new(), add_to_cleanup, auto_features, autosplit, build_class,
-build_requires, create_packlist, c_source, conflicts, create_makefile_pl,
-create_readme, dist_abstract, dist_author, dist_name, dist_version,
-dist_version_from, dynamic_config, extra_compiler_flags,
-extra_linker_flags, get_options, type, store, default, include_dirs,
-install_path, installdirs, license, apache, artistic, bsd, gpl, lgpl, mit,
-mozilla, open_source, perl, restrictive, unrestricted, meta_add,
-meta_merge, module_name, PL_files, pm_files, pod_files, recommends,
-recursive_test_files, requires, script_files, sign, test_files, xs_files,
-new_from_context(%args), resume(), subclass()
-
-=item METHODS
-
-add_build_element($type), add_to_cleanup(@files), args(),
-autosplit_file($from, $to), base_dir(), build_requires(),
-check_installed_status($module, $version), check_installed_version($module,
-$version), compare_versions($v1, $op, $v2), config($key), config($key,
-$value), config() [deprecated], config_data($name), config_data($name =>
-$value), conflicts(), contains_pod($file), copy_if_modified(%parameters),
-create_build_script(), current_action(), depends_on(@actions),
-dir_contains($first_dir, $second_dir), dispatch($action, %args),
-dist_dir(), dist_name(), dist_version(), do_system($cmd, @args),
-feature($name), feature($name => $value), have_c_compiler(),
-install_base_relpaths(), install_base_relpaths($type),
-install_base_relpaths($type => $path), install_destination($type),
-install_path(), install_path($type), install_path($type => $path),
-install_types(), invoked_action(), notes(), notes($key), notes($key =>
-$value), orig_dir(), os_type(), is_vmsish(), is_windowsish(), is_unixish(),
-prefix_relpaths(), prefix_relpaths($installdirs),
-prefix_relpaths($installdirs, $type), prefix_relpaths($installdirs, $type
-=> $path), prepare_metadata(), prereq_failures(), prereq_report(),
-prompt($message, $default), recommends(), requires(), rscan_dir($dir,
-$pattern), runtime_params(), runtime_params($key), script_files(),
-up_to_date($source_file, $derived_file), up_to_date(\@source_files,
-\@derived_files), y_n($message, $default)
-
-=item Autogenerated Accessors
-
-PL_files(), allow_mb_mismatch(), autosplit(), base_dir(), bindoc_dirs(),
-blib(), build_bat(), build_class(), build_elements(), build_requires(),
-build_script(), c_source(), config_dir(), conflicts(),
-create_makefile_pl(), create_packlist(), create_readme(), debugger(),
-destdir(), get_options(), html_css(), include_dirs(), install_base(),
-install_sets(), installdirs(), libdoc_dirs(), license(), magic_number(),
-mb_version(), meta_add(), meta_merge(), metafile(), module_name(),
-orig_dir(), original_prefix(), perl(), pm_files(), pod_files(), pollute(),
-prefix(), prereq_action_types(), quiet(), recommends(), recurse_into(),
-recursive_test_files(), requires(), scripts(), use_rcfile(), verbose(),
-xs_files()
-
-=back
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Authoring - Authoring Module::Build modules
-
-=over 4
-
-=item DESCRIPTION
-
-=item STRUCTURE
-
-=item SUBCLASSING
-
-=item PREREQUISITES
-
-=over 4
-
-=item Format of prerequisites
-
-=back
-
-=item SAVING CONFIGURATION INFORMATION
-
-=item STARTING MODULE DEVELOPMENT
-
-=item AUTOMATION
-
-=item MIGRATION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Base - Default methods for Module::Build
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Compat - Compatibility with ExtUtils::MakeMaker
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-create_makefile_pl($style, $build), small, passthrough, traditional,
-run_build_pl(args => \@ARGV), args, script, write_makefile(), makefile
-
-=item SCENARIOS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::ConfigData - Configuration for Module::Build
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-config($name), feature($name), set_config($name, $value),
-set_feature($name, $value), config_names(), feature_names(),
-auto_feature_names(), write()
-
-=item AUTHOR
-
-=back
-
-=head2 Module::Build::Cookbook - Examples of Module::Build Usage
-
-=over 4
-
-=item DESCRIPTION
-
-=item BASIC RECIPES
-
-=over 4
-
-=item The basic installation recipe for modules that use Module::Build
-
-=item Making a CPAN.pm-compatible distribution
-
-=item Installing modules using the programmatic interface
-
-=item Installing to a temporary directory
-
-=item Installing to a non-standard directory
-
-=item Installing in the same location as ExtUtils::MakeMaker
-
-=item Running a single test file
-
-=back
-
-=item ADVANCED RECIPES
-
-=over 4
-
-=item Changing the order of the build process
-
-=item Adding new file types to the build process
-
-=item Adding new elements to the install process
-
-=back
-
-=item EXAMPLES ON CPAN
-
-=over 4
-
-=item SVN-Notify-Mirror
-
-1. Using C<auto_features>, I check to see whether two optional modules are
-available - SVN::Notify::Config and Net::SSH;, 2. If the S::N::Config
-module is loaded, I automatically generate testfiles for it during Build
-(using the C<PL_files> property), 3. If the C<ssh_feature> is available, I
-ask if the user wishes to perform the ssh tests (since it requires a little
-preliminary setup);, 4. Only if the user has C<ssh_feature> and answers yes
-to the testing, do I generate a test file
-
-=item Modifying an action
-
-=back
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::ModuleInfo, ModuleInfo - Gather package and POD
-information from a perl module files
-
-=over 4
-
-=item DESCRIPTION
-
-new_from_file($filename, collect_pod => 1), new_from_module($module,
-collect_pod => 1, inc => \@dirs), name(), version($package), filename(),
-packages_inside(), pod_inside(), contains_pod(), pod($section),
-find_module_by_name($module, \@dirs), find_module_dir_by_name($module,
-\@dirs)
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Notes, $notes_name - Configuration for $module_name
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-config(\$name), feature(\$name), set_config(\$name, \$value),
-set_feature(\$name, \$value), config_names(), feature_names(),
-auto_feature_names(), write()
-
-=item AUTHOR
-
-=back
-
-=head2 Module::Build::PPMMaker - Perl Package Manager file creation
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::Amiga - Builder class for Amiga platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::Default - Stub class for unknown platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::EBCDIC - Builder class for EBCDIC platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::MPEiX - Builder class for MPEiX platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::MacOS - Builder class for MacOS platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item Overriden Methods
-
-new(), make_executable(), dispatch(), ACTION_realclean()
-
-=back
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::RiscOS - Builder class for RiscOS platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::Unix - Builder class for Unix platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::VMS - Builder class for VMS platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item Overridden Methods
-
-_set_defaults
-
-=back
-
-=back
-
-cull_args
-
-manpage_separator
-
-prefixify
-
-_quote_args
-
-have_forkpipe
-
-_backticks
-
-do_system
-
-_infer_xs_spec
-
-rscan_dir
-
-dist_dir
-
-man3page_name
-
-expand_test_dir
-
-_detildefy
-
-find_perl_interpreter
-
-=over 4
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::VOS - Builder class for VOS platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::Windows - Builder class for Windows
-platforms
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::aix - Builder class for AIX platform
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::cygwin - Builder class for Cygwin platform
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::darwin - Builder class for Mac OS X
-platform
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::Platform::os2 - Builder class for OS/2 platform
-
-=over 4
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Build::YAML - Provides just enough YAML support so that
-Module::Build works even if YAML.pm is not installed
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
 =head2 Module::CoreList - what modules shipped with versions of perl
 
 =over 4
@@ -22304,86 +22677,6 @@ modules, verbose, nocache
 =item AUTHOR
 
 =item COPYRIGHT
-
-=back
-
-=head2 Module::Pluggable - automatically give your module the ability to
-have plugins
-
-=over 4
-
-=item SYNOPSIS
-
-=item EXAMPLE
-
-=item DESCRIPTION
-
-=item ADVANCED USAGE
-
-=item INNER PACKAGES
-
-=item OPTIONS
-
-=over 4
-
-=item sub_name
-
-=item search_path
-
-=item search_dirs 
-
-=item instantiate
-
-=item require
-
-=item inner
-
-=item only
-
-=item except
-
-=item package
-
-=item file_regex
-
-=back
-
-=item METHODs
-
-=over 4
-
-=item search_path
-
-=back
-
-=item FUTURE PLANS
-
-=item AUTHOR
-
-=item COPYING
-
-=item BUGS
-
-=item SEE ALSO
-
-=back
-
-=head2 Module::Pluggable::Object - automatically give your module the
-ability to have plugins
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item AUTHOR
-
-=item COPYING
-
-=item BUGS
-
-=item SEE ALSO
 
 =back
 
@@ -23449,18 +23742,6 @@ name space
 =back
 
 =item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 PerlIO::encoding - encoding layer
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
 
 =item SEE ALSO
 

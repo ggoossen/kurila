@@ -280,9 +280,9 @@ is("b${a}c", "bxxc");
 $na = eval { ^~^$a };
 like($@, qr/no method found/);
 
-eval "package Oscalar; sub numify { return '_!_' . shift() . '_!_' } use overload '0+' => \\&numify";
+eval "package Oscalar; sub numify \{ return '_!_' . shift() . '_!_' \} use overload '0+' => \\&numify";
 is $@, '';
-eval "package Oscalar; sub rshft { return '_!_' . shift() . '_!_' } use overload '>>' => \\&rshft";
+eval "package Oscalar; sub rshft \{ return '_!_' . shift() . '_!_' \} use overload '>>' => \\&rshft";
 is $@, '';
 
 $na = eval { $aI >> 1 };       # Hash was not updated
@@ -318,20 +318,20 @@ is($int, 9);
 is($out, 1024);
 
 $foo = 'foo';
-$foo1 = 'f\'o\\o';
+$foo1 = q|f'o\\o|;
 {
   BEGIN { $q = $qr = 7; 
 	  overload::constant 'q' => sub {$q++; push @q, shift, ($_[1] || 'none'); shift},
 			     'qr' => sub {$qr++; push @qr, shift, ($_[1] || 'none'); shift}; }
   $out = 'foo';
-  $out1 = 'f\'o\\o';
+  $out1 = q|f'o\\o|;
   $out2 = "a\a$foo,\,";
   m/b\b$foo.\./;
 }
 
 is($out, 'foo');
 is($out, $foo);
-is($out1, 'f\'o\\o');
+is($out1, q|f'o\\o|);
 is($out1, $foo1);
 is($out2, "a\afoo,\,");
 is("@q", "foo q f'o\\\\o q a\\a qq ,\\, qq");
@@ -344,7 +344,7 @@ is($qr, 9);
   BEGIN { overload::constant 'q' => sub {push @q1, shift, ($_[1] || 'none'); "_<" . (shift) . ">_"},
 			     'qr' => sub {push @qr1, shift, ($_[1] || 'none'); "!<" . (shift) . ">!"}; }
   $out = 'foo';
-  $out1 = 'f\'o\\o';
+  $out1 = q|f'o\\o|;
   $out2 = "a\a$foo,\,";
   $res = m/b\b$foo.\./;
   $a = <<EOF;
@@ -358,14 +358,10 @@ EOF
   s/yet another/tail here/;
   tr/A-Z/a-z/;
 }
-
-is($out, '_<foo>_');
-is($out1, '_<f\'o\\o>_');
-is($out2, "_<a\a>_foo_<,\,>_");
-is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
+ is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
  qq oups1
- q second part q tail here s A-Z tr a-z tr");
-is("@qr1", "b\\b qq .\\. qq try it q first part q yet another qq");
+ q second part s tail here s A-Z tr a-z tr");
+is("@qr1", "b\\b qq .\\. qq try it qq first part qq yet another qq");
 is($res, 1);
 is($a, "_<oups
 >_");
@@ -404,14 +400,14 @@ is($b, "_<oups1
   } 
   my %subr = ( 'n' => sub {$_[0]} );
   foreach my $op (split " ", $overload::ops{with_assign}) {
-    $subr{$op} = $subr{"$op="} = eval "sub {shift() $op shift()}";
+    $subr{$op} = $subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
   my @bins = qw(binary 3way_comparison num_comparison str_comparison);
   foreach my $op (split " ", "@overload::ops{ @bins }") {
-    $subr{$op} = eval "sub {shift() $op shift()}";
+    $subr{$op} = eval "sub \{shift() $op shift()\}";
   }
   foreach my $op (split " ", "@overload::ops{qw(unary func)}") {
-    $subr{$op} = eval "sub {$op shift()}";
+    $subr{$op} = eval "sub \{$op shift()\}";
   }
   $subr{'++'} = $subr{'+'};
   $subr{'--'} = $subr{'-'};
@@ -525,14 +521,14 @@ is($b, "_<oups1
   } 
   my %subr = ( 'n' => sub {$_[0]} );
   foreach my $op (split " ", $overload::ops{with_assign}) {
-    $subr{$op} = $subr{"$op="} = eval "sub {shift() $op shift()}";
+    $subr{$op} = $subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
   my @bins = qw(binary 3way_comparison num_comparison str_comparison);
   foreach my $op (split " ", "@overload::ops{ @bins }") {
-    $subr{$op} = eval "sub {shift() $op shift()}";
+    $subr{$op} = eval "sub \{shift() $op shift()\}";
   }
   foreach my $op (split " ", "@overload::ops{qw(unary func)}") {
-    $subr{$op} = eval "sub {$op shift()}";
+    $subr{$op} = eval "sub \{$op shift()\}";
   }
   $subr{'++'} = $subr{'+'};
   $subr{'--'} = $subr{'-'};

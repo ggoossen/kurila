@@ -71,13 +71,14 @@ sub testpipe ($$$$$$) {
   my $fh;
   if ($how_w eq 'print') {	# AUTOFLUSH???
     # Should be shell-neutral:
-    open $fh, '-|', qq[$Perl -we "$set_out;print for grep length, split m/(.{1,$write_c})/s, qq($quoted)"] or die "open: $!";
+    open $fh, '-|', qq[$Perl -we "$set_out;print for grep length, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $!";
   } elsif ($how_w eq 'print/flush') {
     # shell-neutral and miniperl-enabled autoflush? qq(\x24\x7c) eq '$|'
-    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24\\x7c = 1) or die;print for grep length, split m/(.{1,$write_c})/s, qq($quoted)"] or die "open: $!";
+    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24\\x7c = 1) or die;print for grep length, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $!";
   } elsif ($how_w eq 'syswrite') {
     ### How to protect \$_
-    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(sub w {syswrite STDOUT, \\x24_} 1) or die; w() for grep length, split m/(.{1,$write_c})/s, qq($quoted)"] or die "open: $!";
+    my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \} split m/(.\{1,$write_c\})/s, qq($quoted)"];
+    open $fh, '-|', $cmd or die "open '$cmd': $!";
   } else {
     die "Unrecognized write: '$how_w'";
   }

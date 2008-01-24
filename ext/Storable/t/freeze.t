@@ -97,8 +97,8 @@ $VAR1 = [
 	'method',
 	1,
 	'prepare',
-	'SELECT table_name, table_owner, num_rows FROM iitables
-                  where table_owner != \'$ingres\' and table_owner != \'DBA\''
+	q|SELECT table_name, table_owner, num_rows FROM iitables
+                  where table_owner != '$ingres' and table_owner != 'DBA'|
 ];
 
 $x = nfreeze($VAR1);

@@ -683,7 +683,7 @@ my $fh = IO::File->new($libnet_cfg_out, "w") or
 
 print "Writing $libnet_cfg_out\n";
 
-print $fh "{\n";
+print $fh "\{\n";
 
 my $key;
 foreach $key (keys %cfg) {
@@ -709,7 +709,7 @@ foreach $key (keys %cfg) {
     print $fh "\t'",$key,"' => ",$val,",\n";
 }
 
-print $fh "}\n";
+print $fh "\}\n";
 
 $fh->close;
 

@@ -146,13 +146,13 @@ sub load_loc {
 	package $pkg;
 	use base 'Locale::Maketext';
         %${pkg}::Lexicon = ( '_AUTO' => 1 );
-	Locale::Maketext::Lexicon->import({
+	Locale::Maketext::Lexicon->import(\{
 	    'i-default' => [ 'Auto' ],
 	    '*'	=> [ Gettext => \$pattern ],
 	    _decode => \$decode,
 	    _encoding => \$encoding,
-	});
-	*tense = sub { \$_[1] . ((\$_[2] eq 'present') ? 'ing' : 'ed') }
+	\});
+	*tense = sub \{ \$_[1] . ((\$_[2] eq 'present') ? 'ing' : 'ed') \}
 	    unless defined &tense;
 
 	1;
@@ -178,11 +178,11 @@ sub load_loc {
                     |
                         ([1-9]\d*|\*)           # 4 - variable
                     )
-            }{
+            }{{
                 $1 ? $1
                    : $2 ? "\[$2,"._unescape($3)."]"
                         : "[_$4]"
-            }egx;
+            }}gx;
 	    return $lh->maketext($str, @_);
 	};
     }
@@ -205,7 +205,7 @@ sub default_loc {
             $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
                      {$1%$2}g;
             $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
-                     {"$1%$2(" . _escape($3) . ')'}eg;
+                     {{"$1%$2(" . _escape($3) . ')'}}g;
 	    _default_gettext($str, @_);
 	};
     }
@@ -241,7 +241,7 @@ sub _default_gettext {
 		[^)]*		#     and other ignorable params
 	    \)			#   closing function call
 	)			# closing either one of
-    }{
+    }{{
 	my $digit = $2 || shift;
 	$digit . (
 	    $1 ? (
@@ -250,7 +250,7 @@ sub _default_gettext {
 		''
 	    ) : ''
 	);
-    }egx;
+    }}gx;
     return $str;
 };
 

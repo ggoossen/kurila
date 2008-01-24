@@ -8,9 +8,9 @@ BEGIN {
 
 my $opcode_new = 'opcode.h-new';
 my $opname_new = 'opnames.h-new';
-open(OC, ">$opcode_new") || die "Can't create $opcode_new: $!\n";
+open(OC, ">", "$opcode_new") || die "Can't create $opcode_new: $!\n";
 binmode OC;
-open(ON, ">$opname_new") || die "Can't create $opname_new: $!\n";
+open(ON, ">", "$opname_new") || die "Can't create $opname_new: $!\n";
 binmode ON;
 select OC;
 
@@ -141,7 +141,7 @@ print ON <<"END";
  *  will be lost!
  */
 
-typedef enum opcode {
+typedef enum opcode \{
 END
 
 my $i = 0;
@@ -149,7 +149,7 @@ for (@ops) {
     print ON "\t", &tab(3,"OP_\U$_,"), "/* ", $i++, " */\n";
 }
 print ON "\t", &tab(3,"OP_max"), "\n";
-print ON "} opcode;\n";
+print ON "\} opcode;\n";
 print ON "\n#define MAXO ", scalar @ops, "\n";
 print ON "#define OP_phoney_INPUT_ONLY -1\n";
 print ON "#define OP_phoney_OUTPUT_ONLY -2\n\n";
@@ -167,7 +167,7 @@ START_EXTERN_C
 #ifndef DOINIT
 EXTCONST char* const PL_op_name[];
 #else
-EXTCONST char* const PL_op_name[] = {
+EXTCONST char* const PL_op_name[] = \{
 END
 
 for (@ops) {
@@ -176,7 +176,7 @@ for (@ops) {
 
 print <<END;
 \tNULL,\n
-};
+\};
 #endif
 
 END
@@ -185,7 +185,7 @@ print <<END;
 #ifndef DOINIT
 EXTCONST char* const PL_op_desc[];
 #else
-EXTCONST char* const PL_op_desc[] = {
+EXTCONST char* const PL_op_desc[] = \{
 END
 
 for (@ops) {
@@ -198,7 +198,7 @@ for (@ops) {
 }
 
 print <<END;
-};
+\};
 #endif
 
 END_EXTERN_C
@@ -235,7 +235,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 #endif /* PERL_GLOBAL_STRUCT */
 #if (defined(DOINIT) && !defined(PERL_GLOBAL_STRUCT)) || defined(PERL_GLOBAL_STRUCT_INIT)
 #  define PERL_PPADDR_INITED
-= {
+= \{
 END
 
 for (@ops) {
@@ -248,7 +248,7 @@ for (@ops) {
 }
 
 print <<END;
-}
+\}
 #endif
 #ifdef PERL_PPADDR_INITED
 ;
@@ -270,7 +270,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 #endif
 #if (defined(DOINIT) && !defined(PERL_GLOBAL_STRUCT)) || defined(PERL_GLOBAL_STRUCT_INIT)
 #  define PERL_CHECK_INITED
-= {
+= \{
 END
 
 for (@ops) {
@@ -278,7 +278,7 @@ for (@ops) {
 }
 
 print <<END;
-}
+\}
 #endif
 #ifdef PERL_CHECK_INITED
 ;
@@ -294,7 +294,7 @@ print <<END;
 #ifndef DOINIT
 EXTCONST U32 PL_opargs[];
 #else
-EXTCONST U32 PL_opargs[] = {
+EXTCONST U32 PL_opargs[] = \{
 END
 
 my %argnum = (
@@ -360,7 +360,7 @@ for (@ops) {
 }
 
 print <<END;
-};
+\};
 #endif
 
 #endif /* !PERL_GLOBAL_STRUCT_INIT */
@@ -398,9 +398,9 @@ safer_rename $opname_new, 'opnames.h';
 my $pp_proto_new = 'pp_proto.h-new';
 my $pp_sym_new  = 'pp.sym-new';
 
-open PP, ">$pp_proto_new" or die "Error creating $pp_proto_new: $!";
+open PP, ">", "$pp_proto_new" or die "Error creating $pp_proto_new: $!";
 binmode PP;
-open PPSYM, ">$pp_sym_new" or die "Error creating $pp_sym_new: $!";
+open PPSYM, ">", "$pp_sym_new" or die "Error creating $pp_sym_new: $!";
 binmode PPSYM;
 
 print PP <<"END";
@@ -671,10 +671,6 @@ i_ne		integer ne (!=)		ck_null		ifs2	S S
 ncmp		numeric comparison (<+>)	ck_null		Iifst2	S S
 i_ncmp		integer comparison (<+>)	ck_null		ifst2	S S
 
-slt		string lt		ck_null		ifs2	S S
-sgt		string gt		ck_null		ifs2	S S
-sle		string le		ck_null		ifs2	S S
-sge		string ge		ck_null		ifs2	S S
 seq		string eq		ck_null		ifs2	S S
 sne		string ne		ck_null		ifs2	S S
 scmp		string comparison (cmp)	ck_null		ifst2	S S

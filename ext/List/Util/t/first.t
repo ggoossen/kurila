@@ -29,7 +29,7 @@ is($v, undef, 'none match');
 $v = first { 0 };
 is($v, undef, 'no args');
 
-$v = first { $_->[1] le "e" and "e" le $_->[2] }
+$v = first { ($_->[1] cmp "e") +<= 0 and ("e" cmp $_->[2]) +<= 0 }
 		[qw(a b c)], [qw(d e f)], [qw(g h i)];
 is_deeply($v, [qw(d e f)], 'reference args');
 

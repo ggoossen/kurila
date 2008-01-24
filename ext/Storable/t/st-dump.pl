@@ -27,7 +27,7 @@ sub num_equal {
           } elsif ($left !~ tr/0-9//c) {
             print "# Got $left\n";
           } else {
-            $left =~ s/([^-a-zA-Z0-9_+])/sprintf "\\%03o", ord $1/ge;
+            $left =~ s/([^-a-zA-Z0-9_+])/{sprintf "\\%03o", ord $1}/g;
             print "# Got \"$left\"\n";
           }
         }
@@ -46,7 +46,7 @@ use Carp;
 );
 
 # Given an object, dump its transitive data closure
-sub main'dump {
+sub main::dump {
 	my ($object) = @_;
 	croak "Not a reference!" unless ref($object);
 	local %dumped;

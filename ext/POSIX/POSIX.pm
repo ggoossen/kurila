@@ -2,7 +2,7 @@ package POSIX;
 use strict;
 use warnings;
 
-our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, $AUTOLOAD, %SIGRT) = ();
+our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, %SIGRT) = ();
 
 our $VERSION = "1.13";
 
@@ -189,7 +189,7 @@ sub longjmp {
 }
 
 sub setjmp {
-    unimpl "setjmp() is C-specific: use eval {} instead";
+    unimpl "setjmp() is C-specific: use eval \{\} instead";
 }
 
 sub siglongjmp {
@@ -197,7 +197,7 @@ sub siglongjmp {
 }
 
 sub sigsetjmp {
-    unimpl "sigsetjmp() is C-specific: use eval {} instead";
+    unimpl "sigsetjmp() is C-specific: use eval \{\} instead";
 }
 
 sub kill {
@@ -393,7 +393,7 @@ sub abs {
 }
 
 sub atexit {
-    unimpl "atexit() is C-specific: use END {} instead";
+    unimpl "atexit() is C-specific: use END \{\} instead";
 }
 
 sub atof {
@@ -558,7 +558,7 @@ sub chmod {
 sub fstat {
     usage "fstat(fd)" if @_ != 1;
     local *TMP;
-    CORE::open(TMP, "<&$_[0]");		# Gross.
+    CORE::open(TMP, "<&", $_[0]);		# Gross.
     my @l = CORE::stat(*TMP);
     CORE::close(TMP);
     @l;

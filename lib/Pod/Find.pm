@@ -142,7 +142,7 @@ sub pod_find
             for (@new_INC) {
                 if ( $_ eq '.' ) {
                     $_ = ':';
-                } elsif ( $_ =~ s|^((?:\.\./)+)|':' x (length($1)/3)|e ) {
+                } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
                     $_ = ':'. $_;
                 } else {
                     $_ =~ s|^\./|:|;
@@ -399,7 +399,7 @@ sub pod_where {
         for (@new_INC) {
             if ( $_ eq '.' ) {
                 $_ = ':';
-            } elsif ( $_ =~ s|^((?:\.\./)+)|':' x (length($1)/3)|e ) {
+            } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
                 $_ = ':'. $_;
             } else {
                 $_ =~ s|^\./|:|;
@@ -485,7 +485,7 @@ sub contains_pod {
   $verbose = shift if @_;
 
   # check for one line of POD
-  unless(open(POD,"<$file")) {
+  unless(open(POD, "<","$file")) {
     warn "Error: $file is unreadable: $!\n";
     return undef;
   }

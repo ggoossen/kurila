@@ -209,12 +209,14 @@ Scalar value @a{3} better written as $a{3} at - line 4.
 # toke.c
 use warnings 'syntax' ;
 $_ = "ab" ; 
-s/(ab)/\1/e;
+s/(ab)/{\1}/;
 no warnings 'syntax' ;
 $_ = "ab" ; 
-s/(ab)/\1/e;
+s/(ab)/{\1}/e;
 EXPECT
 Can't use \1 to mean $1 in expression at - line 4.
+syntax error at - line 7, near "s/(ab)/{\1}/e"
+Execution of - aborted due to compilation errors.
 ########
 # toke.c
 use warnings 'reserved' ;
@@ -596,7 +598,7 @@ EXPECT
 Precedence problem: open FOO should be open(FOO) at - line 2.
 ########
 # toke.c (and [perl #16184])
-open FOO => "<&0"; close FOO;
+open FOO => "<&", "0"; close FOO;
 EXPECT
 ########
 # toke.c

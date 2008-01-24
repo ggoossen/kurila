@@ -11,12 +11,7 @@ $DOWARN = 1; # enable run-time warnings now
 use Config;
 
 require "./test.pl";
-plan( tests => 15 );
-
-use utf8;
-
-eval 'use v5.5.640';
-like( $@, qr/use VERSION is not valid in Perl Kurila/, "use v5.5.640;");
+plan( tests => 12 );
 
 # printing characters should work
 is(ref v111.107.32, 'version','ASCII printing characters');
@@ -30,14 +25,6 @@ is('ok',$x,'poetry optimization');
 $x = v77.78.79;
 is($x, 'v77.78.79','poetry optimization with dots');
 
-#
-# now do the same without the "v"
-eval 'use 5.8';
-like( $@, qr/use VERSION is not valid in Perl Kurila/, "use 5.8");
-
-eval 'use 5.5.640';
-like( $@, qr/Too many decimal points/, "use 5.5.640" );
-
 # hash keys too
 eval "111.107.32";
 like( $@, qr/Too many decimal points/ );
@@ -45,7 +32,7 @@ like( $@, qr/Too many decimal points/ );
 # See if the things Camel-III says are true: 29..33
 
 # Chapter 28, pp671
-ok(v5.6.0 lt v5.7.0, "v5.6.0 lt v5.7.0");
+is(v5.6.0 cmp v5.7.0, -1, "v5.6.0 cmp v5.7.0");
 
 # part of 20000323.059
 is(v200, +v200,         "v200 eq +v200"         );

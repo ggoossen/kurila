@@ -25,7 +25,7 @@ mkdir('Odd-Version', 0777);
 END { chdir File::Spec->updir;  rmtree 'Odd-Version' }
 chdir 'Odd-Version';
 
-open(MPL, ">Version") || die $!;
+open(MPL, ">", "Version") || die $!;
 print MPL "\$VERSION = 0\n";
 close MPL;
 END { unlink 'Version' }

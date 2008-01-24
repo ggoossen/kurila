@@ -79,7 +79,7 @@ sub _succeed {
 
 sub _fail {
     return grep { m/\S/ } map { s/^\s*//; $_ } split "\n", q[
-        use vars qw($VERSION $AUTOLOAD %ERROR $ERROR $Warn $Die);
+        use vars qw($VERSION %ERROR $ERROR $Warn $Die);
         sub version { $GD::Graph::colour::VERSION }
         my $VERS = qr{ $HWS VERSION $HWS \n }xms;
         diag( "Testing $main_module \$${main_module}::VERSION" );

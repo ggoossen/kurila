@@ -22,7 +22,6 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
 $VERSION = 0.83;
 use strict;
-use vars qw/$AUTOLOAD/;
 use warnings ();
 
 # Changes between 0.50 and 0.51:
@@ -468,27 +467,7 @@ sub stash_subs {
     my %stash = svref_2object($stash)->ARRAY;
     while (my ($key, $val) = each %stash) {
 	my $class = class($val);
-	if ($class eq "PV") {
-	    # Just a prototype. As an ugly but fairly effective way
-	    # to find out if it belongs here is to see if the AUTOLOAD
-	    # (if any) for the stash was defined in one of our files.
-	    my $A = $stash{"AUTOLOAD"};
-	    if (defined ($A) && class($A) eq "GV" && defined($A->CV)
-		&& class($A->CV) eq "CV") {
-		my $AF = $A->FILE;
-		next unless $AF eq $0 || exists $self->{'files'}{$AF};
-	    }
-	    push @{$self->{'protos_todo'}}, [$pack . $key, $val->PV];
-	} elsif ($class eq "IV") {
-	    # Just a name. As above.
-	    my $A = $stash{"AUTOLOAD"};
-	    if (defined ($A) && class($A) eq "GV" && defined($A->CV)
-		&& class($A->CV) eq "CV") {
-		my $AF = $A->FILE;
-		next unless $AF eq $0 || exists $self->{'files'}{$AF};
-	    }
-	    push @{$self->{'protos_todo'}}, [$pack . $key, undef];
-	} elsif ($class eq "GV") {
+        if ($class eq "GV") {
 	    if (class(my $cv = $val->CV) ne "SPECIAL") {
 		next if $self->{'subs_done'}{$$val}++;
 		next if $$val != ${$cv->GV};   # Ignore imposters
@@ -614,15 +593,15 @@ sub compile {
 	my $self = B::Deparse->new(@args);
 	# First deparse command-line args
 	if (defined $^I) { # deparse -i
-	    print q(BEGIN { $^I = ).perlstring($^I).qq(; }\n);
+	    print q(BEGIN { $^I = ).perlstring($^I).qq(; \}\n);
 	}
 	if ($^W) { # deparse -w
-	    print qq(BEGIN { \$^W = $^W; }\n);
+	    print qq(BEGIN \{ \$^W = $^W; \}\n);
 	}
 	if ($/ ne "\n" or defined $O::savebackslash) { # deparse -l and -0
 	    my $fs = perlstring($/) || 'undef';
 	    my $bs = perlstring($O::savebackslash) || 'undef';
-	    print qq(BEGIN { \$/ = $fs; \$\\ = $bs; }\n);
+	    print qq(BEGIN \{ \$/ = $fs; \$\\ = $bs; \}\n);
 	}
 	my @BEGINs  = B::begin_av->isa("B::AV") ? B::begin_av->ARRAY : ();
 	my @UNITCHECKs = B::unitcheck_av->isa("B::AV")
@@ -865,12 +844,12 @@ Carp::confess("SPECIAL in deparse_sub") if $cv->isa("B::SPECIAL");
 	my $sv = $cv->const_sv;
 	if ($$sv) {
 	    # uh-oh. inlinable sub... format it differently
-	    return $proto . "{ " . $self->const($sv, 0) . " }\n";
+	    return $proto . "\{ " . $self->const($sv, 0) . " \}\n";
 	} else { # XSUB? (or just a declaration)
 	    return "$proto;\n";
 	}
     }
-    return $proto ."{\n\t$body\n\b}" ."\n";
+    return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
 
 sub deparse_format {
@@ -1134,7 +1113,11 @@ sub scopeop {
 	push @kids, $kid;
     }
     if ($cx +> 0) { # inside an expression, (a do {} while for lineseq)
-	return "do {\n\t" . $self->lineseq($op, @kids) . "\n\b}";
+        if ($cx == 26) { # inside double quote
+            return '{ ' . $self->lineseq($op, @kids) . ' }';
+        } else {
+            return "do \{\n\t" . $self->lineseq($op, @kids) . "\n\b\}";
+        }
     } else {
 	my $lineseq = $self->lineseq($op, @kids);
 	return (length ($lineseq) ? "$lineseq;" : "");
@@ -1211,7 +1194,7 @@ Carp::confess() unless ref($gv) eq "B::GV";
 	$stash = $stash . "::";
     }
     if ($name =~ m/^(\^..|{)/) {
-        $name = "{$name}";       # ${^WARNING_BITS}, etc and ${
+        $name = "\{$name\}";       # ${^WARNING_BITS}, etc and ${
     }
     return $stash . $name;
 }
@@ -1402,7 +1385,7 @@ sub declare_warnings {
     elsif (($to ^&^ WARN_MASK) eq ("\0"x length($to) ^&^ WARN_MASK)) {
 	return "no warnings;\n";
     }
-    return "BEGIN {\${^WARNING_BITS} = ".perlstring($to)."}\n";
+    return "BEGIN \{\$\{^WARNING_BITS\} = ".perlstring($to)."\}\n";
 }
 
 sub declare_hints {
@@ -1433,17 +1416,17 @@ sub declare_hinthash {
     for my $key (keys %$to) {
 	next if $ignored_hints{$key};
 	if (!defined $from->{$key} or $from->{$key} ne $to->{$key}) {
-	    push @decls, qq(\$^H{'$key'} = q($to->{$key}););
+	    push @decls, qq(\$^H\{'$key'\} = q($to->{$key}););
 	}
     }
     for my $key (keys %$from) {
 	next if $ignored_hints{$key};
 	if (!exists $to->{$key}) {
-	    push @decls, qq(delete \$^H{'$key'};);
+	    push @decls, qq(delete \$^H\{'$key'\};);
 	}
     }
     @decls or return '';
-    return join("\n" . (" " x $indent), "BEGIN {", @decls) . "\n}\n";
+    return join("\n" . (" " x $indent), "BEGIN \{", @decls) . "\n\}\n";
 }
 
 sub hint_pragmas {
@@ -1679,9 +1662,9 @@ sub givwhen {
 	$block = $self->deparse($cond->sibling, 0);
     }
 
-    return "$head {\n".
+    return "$head \{\n".
 	"\t$block\n".
-	"\b}\cK";
+	"\b\}\cK";
 }
 
 sub pp_leavegiven { givwhen(@_, "given"); }
@@ -1771,16 +1754,16 @@ sub anon_hash_or_list {
     my($op, $cx) = @_;
 
     my($pre, $post) = @{{"anonlist" => ["[","]"],
-			 "anonhash" => ["{","}"]}->{$op->name}};
+			 "anonhash" => ["\{","\}"]}->{$op->name}};
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
     for (; !null($op); $op = $op->sibling) {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
     }
-    if ($pre eq "{" and $cx +< 1) {
+    if ($pre eq "\{" and $cx +< 1) {
 	# Disambiguate that it's not a block
-	$pre = "+{";
+	$pre = "+\{";
     }
     return $pre . join(", ", @exprs) . $post;
 }
@@ -2169,7 +2152,7 @@ sub logop {
     { # if ($a) {$b}
 	$left = $self->deparse($left, 1);
 	$right = $self->deparse($right, 0);
-	return "$blockname ($left) {\n\t$right\n\b}\cK";
+	return "$blockname ($left) \{\n\t$right\n\b\}\cK";
     } elsif ($cx +< 1 and $blockname and not $self->{'parens'}
 	     and $self->{'expand'} +< 7) { # $b if $a
 	$right = $self->deparse($right, 1);
@@ -2375,8 +2358,8 @@ sub indirop {
 	$indir = $kid;
 	$indir = $indir->first; # skip rv2gv
 	if (is_scope($indir)) {
-	    $indir = "{" . $self->deparse($indir, 0) . "}";
-	    $indir = "{;}" if $indir eq "{}";
+	    $indir = "\{" . $self->deparse($indir, 0) . "\}";
+	    $indir = "\{;\}" if $indir eq "\{\}";
 	} elsif ($indir->name eq "const" && $indir->private ^&^ OPpCONST_BARE) {
 	    $indir = $self->const_sv($indir)->PV;
 	} else {
@@ -2435,7 +2418,7 @@ sub mapop {
     $kid = $kid->first->sibling; # skip a pushmark
     my $code = $kid->first; # skip a null
     if (is_scope $code) {
-	$code = "{" . $self->deparse($code, 0) . "} ";
+	$code = "\{" . $self->deparse($code, 0) . "\} ";
     } else {
 	$code = $self->deparse($code, 24) . ", ";
     }
@@ -2549,7 +2532,7 @@ sub pp_cond_expr {
 
     $cond = $self->deparse($cond, 1);
     $true = $self->deparse($true, 0);
-    my $head = "if ($cond) {\n\t$true\n\b}";
+    my $head = "if ($cond) \{\n\t$true\n\b\}";
     my @elsifs;
     while (!null($false) and is_ifelse_cont($false)) {
 	my $newop = $false->first;
@@ -2558,11 +2541,11 @@ sub pp_cond_expr {
 	$false = $newtrue->sibling; # last in chain is OP_AND => no else
 	$newcond = $self->deparse($newcond, 1);
 	$newtrue = $self->deparse($newtrue, 0);
-	push @elsifs, "elsif ($newcond) {\n\t$newtrue\n\b}";
+	push @elsifs, "elsif ($newcond) \{\n\t$newtrue\n\b\}";
     }
     if (!null($false)) {
-	$false = $cuddle . "else {\n\t" .
-	  $self->deparse($false, 0) . "\n\b}\cK";
+	$false = $cuddle . "else \{\n\t" .
+	  $self->deparse($false, 0) . "\n\b\}\cK";
     } else {
 	$false = "\cK";
     }
@@ -2632,7 +2615,7 @@ sub loop_common {
 	$head = "$name ($cond) ";
 	$body = $kid->first->sibling;
     } elsif ($kid->name eq "stub") { # bare and empty
-	return "{;}"; # {} could be a hashref
+	return "\{;\}"; # {} could be a hashref
     }
     # If there isn't a continue block, then the next pointer for the loop
     # will point to the unstack, which is kid's last child, except
@@ -2661,8 +2644,8 @@ sub loop_common {
 	    $head = "for ($init; $cond; " . $self->deparse($cont, 1) .") ";
 	    $cont = "\cK";
 	} else {
-	    $cont = $cuddle . "continue {\n\t" .
-	      $self->deparse($cont, 0) . "\n\b}\cK";
+	    $cont = $cuddle . "continue \{\n\t" .
+	      $self->deparse($cont, 0) . "\n\b\}\cK";
 	}
     } else {
 	return "" if !defined $body;
@@ -2674,7 +2657,7 @@ sub loop_common {
     }
     $body =~ s/;?$/;\n/;
 
-    return $head . "{\n\t" . $body . "\b}" . $cont;
+    return $head . "\{\n\t" . $body . "\b\}" . $cont;
 }
 
 sub pp_leaveloop { shift->loop_common(@_, "") }
@@ -2688,13 +2671,13 @@ sub for_loop {
 
 sub pp_leavetry {
     my $self = shift;
-    return "eval {\n\t" . $self->pp_leave(@_) . "\n\b}";
+    return "eval \{\n\t" . $self->pp_leave(@_) . "\n\b\}";
 }
 
-BEGIN { eval "sub OP_CONST () {" . opnumber("const") . "}" }
-BEGIN { eval "sub OP_STRINGIFY () {" . opnumber("stringify") . "}" }
-BEGIN { eval "sub OP_RV2SV () {" . opnumber("rv2sv") . "}" }
-BEGIN { eval "sub OP_LIST () {" . opnumber("list") . "}" }
+BEGIN { eval "sub OP_CONST () \{" . opnumber("const") . "\}" }
+BEGIN { eval "sub OP_STRINGIFY () \{" . opnumber("stringify") . "\}" }
+BEGIN { eval "sub OP_RV2SV () \{" . opnumber("rv2sv") . "\}" }
+BEGIN { eval "sub OP_LIST () \{" . opnumber("list") . "\}" }
 
 sub pp_null {
     my $self = shift;
@@ -2725,7 +2708,7 @@ sub pp_null {
 				   . $self->deparse($op->first->sibling, 20),
 				   $cx, 20);
     } elsif ($op->flags ^&^ OPf_SPECIAL && $cx +< 1 && !$op->targ) {
-	return "do {\n\t". $self->deparse($op->first, $cx) ."\n\b};";
+	return "do \{\n\t". $self->deparse($op->first, $cx) ."\n\b\};";
     } elsif (!null($op->first->sibling) and
 	     $op->first->sibling->name eq "null" and
 	     class($op->first->sibling) eq "UNOP" and
@@ -2842,11 +2825,11 @@ sub rv2x {
 	    # It's not clear if this should somehow be unified with
 	    # the code in dq and re_dq that also adds lexer
 	    # disambiguation braces.
-	    $str = '$' . "{$1}"; #'
+	    $str = '$' . "\{$1\}"; #'
 	}
 	return $type . $str;
     } else {
-	return $type . "{" . $self->deparse($kid, 0) . "}";
+	return $type . "\{" . $self->deparse($kid, 0) . "\}";
     }
 }
 
@@ -2936,7 +2919,7 @@ sub elem_or_slice_array_name
     if ($array->name eq $padname) {
 	return $self->padany($array);
     } elsif (is_scope($array)) { # ${expr}[0]
-	return "{" . $self->deparse($array, 0) . "}";
+	return "\{" . $self->deparse($array, 0) . "\}";
     } elsif ($array->name eq "gv") {
 	$array = $self->gv_name($self->gv_or_padgv($array));
 	if ($array !~ m/::/) {
@@ -3012,7 +2995,7 @@ sub elem {
 }
 
 sub pp_aelem { maybe_local(@_, elem(@_, "[", "]", "padav")) }
-sub pp_helem { maybe_local(@_, elem(@_, "{", "}", "padhv")) }
+sub pp_helem { maybe_local(@_, elem(@_, "\{", "\}", "padhv")) }
 
 sub pp_gelem {
     my $self = shift;
@@ -3023,7 +3006,7 @@ sub pp_gelem {
     my $scope = is_scope($glob);
     $glob = $self->deparse($glob, 0);
     $part = $self->deparse($part, 1);
-    return "*" . ($scope ? "{$glob}" : $glob) . "{$part}";
+    return "*" . ($scope ? "\{$glob\}" : $glob) . "\{$part\}";
 }
 
 sub slice {
@@ -3055,7 +3038,7 @@ sub slice {
 }
 
 sub pp_aslice { maybe_local(@_, slice(@_, "[", "]", "rv2av", "padav")) }
-sub pp_hslice { maybe_local(@_, slice(@_, "{", "}", "rv2hv", "padhv")) }
+sub pp_hslice { maybe_local(@_, slice(@_, "\{", "\}", "rv2hv", "padhv")) }
 
 sub pp_lslice {
     my $self = shift;
@@ -3250,7 +3233,7 @@ sub pp_entersub {
     my $proto = undef;
     if (is_scope($kid)) {
 	$amper = "&";
-	$kid = "{" . $self->deparse($kid, 0) . "}";
+	$kid = "\{" . $self->deparse($kid, 0) . "\}";
     } elsif ($kid->first->name eq "gv") {
 	my $gv = $self->gv_or_padgv($kid->first);
 	if (class($gv->CV) ne "SPECIAL") {
@@ -3386,7 +3369,7 @@ sub re_uninterp {
           | \\[uUlLQE]
           )
 
-	/defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"/xeg;
+	/{defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"}/xg;
 
     return $str;
 }
@@ -3406,7 +3389,7 @@ sub re_uninterp_extended {
           )
 
           (                       # $3
-            ( \(\?\??\{$bal\}\)   # $4  (skip over (?{}) and (??{}) blocks)
+            ( \(\?\??\{$bal\}\)   # $4  (skip over (?\{\}) and (??\{\}) blocks)
             | \#[^\n]*            #     (skip over comments)
             )
           | [\$\@]
@@ -3414,7 +3397,7 @@ sub re_uninterp_extended {
           | \\[uUlLQE]
           )
 
-	/defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"/xeg;
+	/{defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"}/xg;
 
     return $str;
 }
@@ -3450,7 +3433,7 @@ my %unctrl = # portable to to EBCDIC
      "\cY" => '\cY',
      "\cZ" => '\cZ',
      "\c[" => '\c[',	# unused
-     "\c\\" => '\c\\',	# unused
+     "\c\\" => '\c\',	# unused
      "\c]" => '\c]',	# unused
      "\c_" => '\c_',	# unused
     );
@@ -3458,7 +3441,7 @@ my %unctrl = # portable to to EBCDIC
 # character escapes, but not delimiters that might need to be escaped
 sub escape_str { # ASCII, UTF8
     my($str) = @_;
-    $str =~ s/(.)/ord($1) +> 255 ? sprintf("\\x{%x}", ord($1)) : $1/eg;
+    $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{%x\}", ord($1)) : $1}/g;
     $str =~ s/\a/\\a/g;
 #    $str =~ s/\cH/\\b/g; # \b means something different in a regex
     $str =~ s/\t/\\t/g;
@@ -3466,8 +3449,8 @@ sub escape_str { # ASCII, UTF8
     $str =~ s/\e/\\e/g;
     $str =~ s/\f/\\f/g;
     $str =~ s/\r/\\r/g;
-    $str =~ s/([\cA-\cZ])/$unctrl{$1}/ge;
-    $str =~ s/([[:^print:]])/sprintf("\\%03o", ord($1))/ge;
+    $str =~ s/([\cA-\cZ])/{$unctrl{$1}}/g;
+    $str =~ s/([[:^print:]])/{sprintf("\\%03o", ord($1))}/g;
     return $str;
 }
 
@@ -3475,9 +3458,9 @@ sub escape_str { # ASCII, UTF8
 # Leave whitespace unmangled.
 sub escape_extended_re {
     my($str) = @_;
-    $str =~ s/(.)/ord($1) +> 255 ? sprintf("\\x{%x}", ord($1)) : $1/eg;
-    $str =~ s/([[:^print:]])/
-	($1 =~ y! \t\n!!) ? $1 : sprintf("\\%03o", ord($1))/ge;
+    $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{%x\}", ord($1)) : $1}/g;
+    $str =~ s/([[:^print:]])/{
+	($1 =~ y! \t\n!!) ? $1 : sprintf("\\%03o", ord($1))}/g;
     $str =~ s/\n/\n\f/g;
     return $str;
 }
@@ -3519,7 +3502,7 @@ sub balanced_delim {
 		    last;
 		}
 	    }
-	    $last_bs = $c eq '\\';
+	    $last_bs = $c eq '\';
 	}
 	$fail = 1 if $cnt != 0;
 	return ($open, "$open$str$close") if not $fail;
@@ -3530,7 +3513,7 @@ sub balanced_delim {
 sub single_delim {
     my($q, $default, $str) = @_;
     return "$default$str$default" if $default and index($str, $default) == -1;
-    if ($q ne 'qr') {
+    if ($q !~ m/^(?:qr|m)$/) {
 	(my $succeed, $str) = balanced_delim($str);
 	return "$q$str" if $succeed;
     }
@@ -3650,7 +3633,7 @@ sub const {
 	    for my $k (sort keys %hash) {
 		push @elts, "$k => " . $self->const($hash{$k}, 6);
 	    }
-	    return "{" . join(", ", @elts) . "}";
+	    return "\{" . join(", ", @elts) . "\}";
 	} elsif (class($ref) eq "CV") {
 	    return "sub " . $self->deparse_sub($ref);
 	}
@@ -3721,9 +3704,9 @@ sub dq {
 
 	# Disambiguate "${foo}bar", "${foo}{bar}", "${foo}[1]", "$foo\::bar"
 	($last =~ m/^[A-Z\\\^\[\]_?]/ &&
-	    $first =~ s/([\$@])\^$/${1}{^}/)  # "${^}W" etc
+	    $first =~ s/([\$@])\^$/${1}\{^\}/)  # "${^}W" etc
 	    || ($last =~ m/^[:'{\[\w_]/ && #'
-		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}{$2}/);
+		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}\{$2\}/);
 
 	return $first . $last;
     } elsif ($type eq "uc") {
@@ -3795,31 +3778,31 @@ sub double_delim {
 # Only used by tr///, so backslashes hyphens
 sub pchr { # ASCII
     my($n) = @_;
-    if ($n == ord '\\') {
-	return '\\\\';
+    if ($n == ord '\') {
+	return '\\';
     } elsif ($n == ord "-") {
 	return "\\-";
     } elsif ($n +>= ord(' ') and $n +<= ord('~')) {
 	return chr($n);
     } elsif ($n == ord "\a") {
-	return '\\a';
+	return '\a';
     } elsif ($n == ord "\b") {
-	return '\\b';
+	return '\b';
     } elsif ($n == ord "\t") {
-	return '\\t';
+	return '\t';
     } elsif ($n == ord "\n") {
-	return '\\n';
+	return '\n';
     } elsif ($n == ord "\e") {
-	return '\\e';
+	return '\e';
     } elsif ($n == ord "\f") {
-	return '\\f';
+	return '\f';
     } elsif ($n == ord "\r") {
-	return '\\r';
+	return '\r';
     } elsif ($n +>= ord("\cA") and $n +<= ord("\cZ")) {
-	return '\\c' . chr(ord("@") + $n);
+	return '\c' . chr(ord("@") + $n);
     } else {
 #	return '\x' . sprintf("%02x", $n);
-	return '\\' . sprintf("%03o", $n);
+	return '\' . sprintf("%03o", $n);
     }
 }
 
@@ -4028,9 +4011,9 @@ sub re_dq {
 
 	# Disambiguate "${foo}bar", "${foo}{bar}", "${foo}[1]"
 	($last =~ m/^[A-Z\\\^\[\]_?]/ &&
-	    $first =~ s/([\$@])\^$/${1}{^}/)  # "${^}W" etc
+	    $first =~ s/([\$@])\^$/${1}\{^\}/)  # "${^}W" etc
 	    || ($last =~ m/^[{\[\w_]/ &&
-		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}{$2}/);
+		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}\{$2\}/);
 
 	return $first . $last;
     } elsif ($type eq "uc") {
@@ -4170,7 +4153,7 @@ sub matchop {
     }
 }
 
-sub pp_match { matchop(@_, "m", "/") }
+sub pp_match { matchop(@_, "m", "") }
 sub pp_pushre { matchop(@_, "m", "/") }
 sub pp_qr { matchop(@_, "qr", "") }
 

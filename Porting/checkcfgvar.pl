@@ -38,7 +38,7 @@ my @CFG = (
 
 sub read_file {
     my ($fn, $sub) = @_;
-    if (open(my $fh, $fn)) {
+    if (open(my $fh, "<", $fn)) {
 	local $_;
 	while ( ~< $fh) {
 	    &$sub;

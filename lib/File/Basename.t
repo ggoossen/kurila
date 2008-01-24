@@ -56,16 +56,16 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 {
     is(fileparse_set_fstype('DOS'), 'VMS', 'set fstype to DOS');
 
-    my($base,$path,$type) = fileparse('C:\\virgil\\aeneid\\draft.book7',
+    my($base,$path,$type) = fileparse('C:\virgil\aeneid\draft.book7',
                                       '\.book\d+');
     is($base, 'draft');
-    is($path, 'C:\\virgil\\aeneid\\');
+    is($path, 'C:\virgil\aeneid\');
     is($type, '.book7');
 
-    is(basename('A:virumque\\cano.trojae'),  'cano.trojae');
-    is(dirname('A:\\virumque\\cano.trojae'), 'A:\\virumque');
-    is(dirname('A:\\'), 'A:\\');
-    is(dirname('arma\\'), '.');
+    is(basename('A:virumque\cano.trojae'),  'cano.trojae');
+    is(dirname('A:\virumque\cano.trojae'), 'A:\virumque');
+    is(dirname('A:\'), 'A:\');
+    is(dirname('arma\'), '.');
 
     # Yes "/" is a legal path separator under DOS
     is(basename("lib/File/Basename.pm"), "Basename.pm");
@@ -110,7 +110,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
     # perl5.003_18 gives C:/perl/.\
     is((fileparse 'C:/perl/lib')[1], 'C:/perl/');
     # perl5.003_18 gives C:\perl\
-    is(dirname('C:\\perl\\lib\\'), 'C:\\perl');
+    is(dirname('C:\perl\lib\'), 'C:\perl');
 
     fileparse_set_fstype 'UNIX';
     # perl5.003_18 gives '.'
@@ -125,8 +125,8 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
     is(basename('/usr/lib//'), 'lib');
 
     fileparse_set_fstype 'MSWin32';
-    is(basename('a\\'), 'a');
-    is(basename('\\usr\\lib\\\\'), 'lib');
+    is(basename('a\'), 'a');
+    is(basename('\usr\lib\\'), 'lib');
 }
 
 
@@ -137,8 +137,8 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
     is(basename('/'), '/');
 
     fileparse_set_fstype('DOS');
-    is(dirname('\\'), '\\');
-    is(basename('\\'), '\\');
+    is(dirname('\'), '\');
+    is(basename('\'), '\');
 }
 
 

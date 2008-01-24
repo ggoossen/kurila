@@ -30,33 +30,36 @@ sub to_string {
 # The $^O tests test both for $^O and for $Config{osname}.
 # The latter is better for some for cross-compilation setups.
 #
+sub _expansion {
+    my ($op, $os, $expr) = @_;
+    if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg in $&"};
+    if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
+        my ($if,$el) = ($1,$2);
+        if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
+            return $if
+        }
+        else {
+            return $el
+        }
+    }
+    else {
+        # #if;#endif
+        if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
+            return $expr
+        }
+        else {
+            return ""
+        }
+    }
+}
+
 sub expand_os_specific {
     my $s = shift;
     for ($s) {
-	s/<<=(.*?)>>/$1/gee;
-	s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/
-	  my ($op, $os, $expr) = ($1,$2,$3);
-	  if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg in $&"};
-	  if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
-	      # #if;#else;#endif
-	      my ($if,$el) = ($1,$2);
-	      if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
-		  $if
-	      }
-	      else {
-		  $el
-	      }
-	  }
-	  else {
-	      # #if;#endif
-	      if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
-		  $expr
-	      }
-	      else {
-	      	  ""
-	      }
-	  }
-	/ges;
+	s/<<=(.*?)>>/{eval $1}/g;
+	s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/{
+           _expansion($1,$2,$3);
+        }/gs;
 	if (m/<<(=|\$\^O-)/) {die "bad <<\$^O-eq/ne-osname>> expression.".
 	    " Unclosed brackets?";
 	}
@@ -65,7 +68,7 @@ sub expand_os_specific {
 }
 
 unlink "DynaLoader.pm" if -f "DynaLoader.pm";
-open OUT, ">DynaLoader.pm" or die $!;
+open OUT, ">", "DynaLoader.pm" or die $!;
 print OUT <<'EOT';
 
 # Generated from DynaLoader_pm.PL

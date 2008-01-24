@@ -111,8 +111,8 @@ sub wrap {
     # construct ${char}{0,$width} didn't do the right thing until Perl 5.8.x.
     my $codes = "(?:\Q$$self{BOLD}\E|\Q$$self{UNDL}\E|\Q$$self{NORM}\E)";
     my $char = "(?:$codes*[^\\n])";
-    my $shortchar = $char . "{0,$width}";
-    my $longchar = $char . "{$width}";
+    my $shortchar = $char . "\{0,$width\}";
+    my $longchar = $char . "\{$width\}";
     while (length +> $width) {
         if (s/^($shortchar)[\ \t]+// || s/^($longchar)//) {
             $output .= $spaces . $1 . "\n";

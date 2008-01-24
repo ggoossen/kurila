@@ -128,10 +128,6 @@ Perl_pp_ne
 Perl_pp_i_ne
 Perl_pp_ncmp
 Perl_pp_i_ncmp
-Perl_pp_slt
-Perl_pp_sgt
-Perl_pp_sle
-Perl_pp_sge
 Perl_pp_seq
 Perl_pp_sne
 Perl_pp_scmp

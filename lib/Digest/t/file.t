@@ -31,7 +31,7 @@ use Digest::file qw(digest_file digest_file_hex digest_file_base64);
 
 my $file = "test-$$";
 die if -f $file;
-open(F, ">$file") || die "Can't create '$file': $!";
+open(F, ">", "$file") || die "Can't create '$file': $!";
 binmode(F);
 print F "foo\0\n";
 close(F) || die "Can't write '$file': $!";

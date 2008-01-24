@@ -10,4 +10,4 @@ use Tie::Array;
 tie @foo,'Tie::StdArray';
 tie @ary,'Tie::StdArray';
 tie @bar,'Tie::StdArray';
-require "op/array.t"
+require "sv/array.t"

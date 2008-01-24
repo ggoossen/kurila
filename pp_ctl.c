@@ -281,8 +281,6 @@ PP(pp_substcont)
 			     NULL, 0);
 	}
 	i = m - orig;
-	if (DO_UTF8(sv))
-	    sv_pos_b2u(sv, &i);
 	mg->mg_len = i;
     }
     if (old != rx)
@@ -689,20 +687,7 @@ Perl_block_gimme(pTHX)
 }
 
 I32
-Perl_is_lvalue_sub(pTHX)
-{
-    dVAR;
-    const I32 cxix = dopoptosub(cxstack_ix);
-    assert(cxix >= 0);  /* We should only be called from inside subs */
-
-    if (cxstack[cxix].blk_sub.lval && CvLVALUE(cxstack[cxix].blk_sub.cv))
-	return cxstack[cxix].blk_sub.lval;
-    else
-	return 0;
-}
-
-STATIC I32
-S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
+Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 {
     dVAR;
     I32 i;
@@ -853,43 +838,22 @@ Perl_qerror(pTHX_ SV *err)
 	++PL_parser->error_count;
 }
 
-OP *
-Perl_die_where(pTHX_ const char *message, STRLEN msglen)
+/* This function will never return */
+void
+Perl_die_where(pTHX_ SV *msv)
 {
     dVAR;
+    const char* message;
+    STRLEN msglen;
+
+    if (ERRSV != msv) {
+	SvREFCNT_dec(ERRSV);
+	ERRSV = SvREFCNT_inc(msv);
+    }
 
     if (PL_in_eval) {
 	I32 cxix;
 	I32 gimme;
-
-	if (message) {
-	    if (PL_in_eval & EVAL_KEEPERR) {
-                static const char prefix[] = "\t(in cleanup) ";
-		SV * const err = ERRSV;
-		const char *e = NULL;
-		if (!SvPOK(err))
-		    sv_setpvn(err,"",0);
-		else if (SvCUR(err) >= sizeof(prefix)+msglen-1) {
-		    STRLEN len;
-		    e = SvPV_const(err, len);
-		    e += len - msglen;
-		    if (*e != *message || strNE(e,message))
-			e = NULL;
-		}
-		if (!e) {
-		    SvGROW(err, SvCUR(err)+sizeof(prefix)+msglen);
-		    sv_catpvn(err, prefix, sizeof(prefix)-1);
-		    sv_catpvn(err, message, msglen);
-		    if (ckWARN(WARN_MISC)) {
-			const STRLEN start = SvCUR(err)-msglen-sizeof(prefix)+1;
-			Perl_warner(aTHX_ packWARN(WARN_MISC), SvPVX_const(err)+start);
-		    }
-		}
-	    }
-	    else {
-		sv_setpvn(ERRSV, message, msglen);
-	    }
-	}
 
 	while ((cxix = dopoptoeval(cxstack_ix)) < 0
 	       && PL_curstackinfo->si_prev)
@@ -908,8 +872,6 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 
 	    POPBLOCK(cx,PL_curpm);
 	    if (CxTYPE(cx) != CXt_EVAL) {
-		if (!message)
-		    message = SvPVx_const(ERRSV, msglen);
 		PerlIO_write(Perl_error_log, (const char *)"panic: die ", 11);
 		PerlIO_write(Perl_error_log, message, msglen);
 		my_exit(1);
@@ -929,24 +891,23 @@ Perl_die_where(pTHX_ const char *message, STRLEN msglen)
 	    PL_curcop = cx->blk_oldcop;
 
 	    if (optype == OP_REQUIRE) {
-                const char* const msg = SvPVx_nolen_const(ERRSV);
 		SV * const nsv = cx->blk_eval.old_namesv;
                 (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                                &PL_sv_undef, 0);
-		DIE(aTHX_ "%sCompilation failed in require",
-		    *msg ? msg : "Unknown error\n");
+/* 		DIE(aTHX_ "%sCompilation failed in require", */
+/* 		    *message ? message : "Unknown error\n"); */
+		die_where(ERRSV);
 	    }
 	    assert(CxTYPE(cx) == CXt_EVAL);
-	    return cx->blk_eval.retop;
+
+	    PL_restartop = cx->blk_eval.retop;
+	    JMPENV_JUMP(3);
 	}
     }
-    if (!message)
-	message = SvPVx_const(ERRSV, msglen);
 
-    write_to_stderr(message, msglen);
     my_failure_exit();
     /* NOTREACHED */
-    return 0;
+    return;
 }
 
 PP(pp_xor)
@@ -1453,7 +1414,7 @@ PP(pp_return)
 
     LEAVESUB(sv);
     if (clear_errsv)
-	sv_setpvn(ERRSV,"",0);
+	sv_setsv(ERRSV, &PL_sv_undef);
     return retop;
 }
 
@@ -1684,7 +1645,6 @@ PP(pp_goto)
 	    I32 oldsave;
 	    bool reified = 0;
 
-	retry:
 	    if (!CvROOT(cv) && !CvXSUB(cv)) {
 		const GV * const gv = CvGV(cv);
 		if (gv) {
@@ -2435,7 +2395,6 @@ PP(pp_require)
     SV *filter_state = NULL;
     SV *filter_sub = NULL;
     SV *hook_sv = NULL;
-    SV *encoding;
     OP *op;
 
     sv = POPs;
@@ -2761,17 +2720,10 @@ PP(pp_require)
 
     PUTBACK;
 
-    /* Store and reset encoding. */
-    encoding = PL_encoding;
-    PL_encoding = NULL;
-
     if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
 	op = DOCATCH(PL_eval_start);
     else
 	op = PL_op->op_next;
-
-    /* Restore encoding. */
-    PL_encoding = encoding;
 
     return op;
 }
@@ -2833,6 +2785,10 @@ PP(pp_entereval)
     PL_hints = PL_op->op_targ;
     if (saved_hh)
 	GvHV(PL_hintgv) = saved_hh;
+
+    SAVESPTR(PL_diehook);
+    PL_diehook = NULL;
+
     SAVECOMPILEWARNINGS();
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
     if (PL_compiling.cop_hints_hash) {
@@ -2986,6 +2942,10 @@ PP(pp_entertry)
 {
     dVAR;
     PERL_CONTEXT * const cx = create_eval_scope(0);
+
+    SAVESPTR(PL_diehook);
+    PL_diehook = NULL;
+
     cx->blk_eval.retop = cLOGOP->op_other->op_next;
     return DOCATCH(PL_op->op_next);
 }

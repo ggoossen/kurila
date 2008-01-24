@@ -25,7 +25,7 @@ ok( $_ eq '$x foo', ":$_: eq :\$x foo:" );
 
 $b = 'cd';
 ($a = 'abcdef') =~ s<(b${b}e)>'\n$1';
-ok( $1 eq 'bcde' && $a eq 'a\n$1f', ":$1: eq :bcde: ; :$a: eq :a\\n\$1f:" );
+ok( $1 eq 'bcde' && $a eq "a\nbcdef" );
 
 $a = 'abacada';
 ok( ($a =~ s/a/x/g) == 4 && $a eq 'xbxcxdx' );
@@ -37,15 +37,15 @@ ok( ($a =~ s/b/y/g) == 1 && $a eq 'xyxcxdx' );
 $_ = 'ABACADA';
 ok( m/a/i && s///gi && $_ eq 'BCD' );
 
-$_ = '\\' x 4;
+$_ = '\' x 4;
 ok( length($_) == 4 );
 $snum = s/\\/\\\\/g;
-ok( $_ eq '\\' x 8 && $snum == 4 );
+ok( $_ eq '\' x 8 && $snum == 4 );
 
 $_ = '\/' x 4;
 ok( length($_) == 8 );
 $snum = s/\//\/\//g;
-ok( $_ eq '\\//' x 4 && $snum == 4 );
+ok( $_ eq '\//' x 4 && $snum == 4 );
 ok( length($_) == 12 );
 
 $_ = 'aaaXXXXbbb';
@@ -155,11 +155,11 @@ $x ne $x || s/bb/x/;
 ok( $_ eq 'aaaXXXXxb' );
 
 $_ = 'abc123xyz';
-s/(\d+)/$1*2/e;              # yields 'abc246xyz'
+s/(\d+)/{$1*2}/;              # yields 'abc246xyz'
 ok( $_ eq 'abc246xyz' );
-s/(\d+)/sprintf("%5d",$1)/e; # yields 'abc  246xyz'
+s/(\d+)/{sprintf("%5d",$1)}/; # yields 'abc  246xyz'
 ok( $_ eq 'abc  246xyz' );
-s/(\w)/$1 x 2/eg;            # yields 'aabbcc  224466xxyyzz'
+s/(\w)/{$1 x 2}/g;            # yields 'aabbcc  224466xxyyzz'
 ok( $_ eq 'aabbcc  224466xxyyzz' );
 
 $_ = "aaaaa";
@@ -224,7 +224,7 @@ sub var {
 }
 sub exp_vars { 
     my($str,$level) = @_;
-    $str =~ s/\$\((\w+)\)/var($1, $level+1)/ge; # can recurse
+    $str =~ s/\$\((\w+)\)/{var($1, $level+1)}/g; # can recurse
     #warn "exp_vars $level = '$str'\n";
     $str;
 }
@@ -235,7 +235,8 @@ ok( exp_vars('$(DIR)',0)             eq '$(UNDEFINEDNAME)/xxx' );
 ok( exp_vars('foo $(DIR)/yyy bar',0) eq 'foo $(UNDEFINEDNAME)/xxx/yyy bar' );
 
 $_ = "abcd";
-s/(..)/$x = $1, m#.#/eg;
+s/(..)/{$x = $1, m#.#
+}/g;
 ok( $x eq "cd", 'a match nested in the RHS of a substitution' );
 
 # Subst and lookbehind
@@ -352,16 +353,17 @@ $_ = 'aaaa';
 $snum = s/\ba/./g;
 ok( $_ eq '.aaa' && $snum == 1 );
 
-eval q% s/a/"b"}/e %;
-ok( $@ =~ m/Bad evalled substitution/ );
-eval q% ($_ = "x") =~ s/(.)/"$1 "/e %;
+eval q% s/a/{ "b"}}/ %;
+like( $@, qr/Unmatched right curly bracket/ );
+
+eval q% ($_ = "x") =~ s/(.)/{"$1 "}/ %;
 ok( $_ eq "x " and !length $@ );
 $x = $x = 'interp';
-eval q% ($_ = "x") =~ s/x(($x)*)/"$1"/e %;
+eval q% ($_ = "x") =~ s/x(($x)*)/{eval "$1"}/ %;
 ok( $_ eq '' and !length $@ );
 
 $_ = "C:/";
-ok( !s/^([a-z]:)/uc($1)/e );
+ok( !s/^([a-z]:)/{uc($1)}/ );
 
 $_ = "Charles Bronson";
 $snum = s/\B\w//g;
@@ -420,7 +422,7 @@ SKIP: {
     is(length($a), 2, "SADAHIRO utf8 s///");
 
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/"\x{FF}"/e;
+    $a =~ s/\x{101}/{"\x{FF}"}/;
     like($a, qr/\x{FF}/);
     is(length($a), 2);
 
@@ -430,7 +432,7 @@ SKIP: {
     is(length($a), 4);
 
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/"\x{FF}\x{FF}\x{FF}"/e;
+    $a =~ s/\x{101}/{"\x{FF}\x{FF}\x{FF}"}/;
     like($a, qr/\x{FF}\x{FF}\x{FF}/);
     is(length($a), 4);
 
@@ -440,7 +442,7 @@ SKIP: {
     is(length($a), 2);
 
     $a = "\x{FF}\x{101}";
-    $a =~ s/\x{FF}/"\x{100}"/e;
+    $a =~ s/\x{FF}/{"\x{100}"}/;
     like($a, qr/\x{100}/);
     is(length($a), 2);
 
@@ -450,7 +452,7 @@ SKIP: {
     is(length($a), 1);
 
     $a = "\x{FF}";
-    $a =~ s/\x{FF}/"\x{100}"/e;
+    $a =~ s/\x{FF}/{"\x{100}"}/;
     like($a, qr/\x{100}/);
     is(length($a), 1);
 }
@@ -509,7 +511,7 @@ is("<$_> <$s>", "<> <4>", "[perl #7806]");
 {
     local $^W = 0;
     $_="abcdef\n";
-    s!.!!eg;
+    s!.!{''}!g;
     is($_, "\n", "[perl #19048]");
 }
 
@@ -524,7 +526,7 @@ is("<$_> <$s>", "<> <4>", "[perl #7806]");
 
 # [perl #20684] returned a zero count
 $_ = "1111";
-is(s/(??{1})/2/eg, 4, '#20684 s/// with (??{..}) inside');
+is(s/(??{1})/{2}/g, 4, '#20684 s/// with (??{..}) inside');
 
 # [perl #20682] @- not visible in replacement
 $_ = "123";
@@ -541,7 +543,7 @@ is($_,'a-b-c','#20682 $^N not visible in replacement');
 my $name = "chris";
 {
     no warnings 'uninitialized';
-    $name =~ s/hr//e;
+    $name =~ s/hr/{''}/;
 }
 is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
 

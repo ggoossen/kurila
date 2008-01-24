@@ -130,6 +130,7 @@ if test ! -f $makefile ; then
 fi
 if test ! -f $makefile ; then
 	echo "Warning: No Makefile!"
+        echo "failed: $run ../$depth/miniperl -I../$depth/lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru"
 fi
 
 case "$target" in

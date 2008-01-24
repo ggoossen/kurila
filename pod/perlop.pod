@@ -34,19 +34,19 @@ values only, not array values.
     left	->
     nonassoc	++ --
     right	**
-    right	! ~ \ and unary + and -
+    right	! ^~^ \ and unary + and -
     left	=~ !~
     left	* / % x
     left	+ - .
     left	<< >>
     nonassoc	named unary operators
-    nonassoc	< > <= >= lt gt le ge
-    nonassoc	== != <=> eq ne cmp ~~
-    left	&
-    left	| ^
+    nonassoc	+< +> +<= +>= lt gt le ge
+    nonassoc	== != <+> eq ne cmp ~~
+    left	^&^
+    left	^|^ ^^^
     left	&&
     left	|| //
-    nonassoc	..  ...
+    nonassoc	..
     right	?:
     right	= += -= *= etc.
     left	, =>
@@ -99,18 +99,18 @@ Be careful with parentheses:
 
 Also note that
 
-    print ($foo & 255) + 1, "\n";
+    print ($foo ^&^ 255) + 1, "\n";
 
 probably doesn't do what you expect at first glance.  The parentheses
 enclose the argument list for C<print> which is evaluated (printing
-the result of C<$foo & 255>).  Then one is added to the return value
+the result of C<$foo ^&^ 255>).  Then one is added to the return value
 of C<print> (usually 1).  The result is something like this:
 
     1 + 1, "\n";    # Obviously not what you meant.
 
 To do what you meant properly, you must write:
 
-    print(($foo & 255) + 1, "\n");
+    print(($foo ^&^ 255) + 1, "\n");
 
 See L<Named Unary Operators> for more discussion of this.
 
@@ -206,13 +206,13 @@ string cannot be cleanly converted to a numeric, Perl will give the warning
 B<Argument "the string" isn't numeric in negation (-) at ...>.
 X<-> X<negation, arithmetic>
 
-Unary "~" performs bitwise negation, i.e., 1's complement.  For
-example, C<0666 & ~027> is 0640.  (See also L<Integer Arithmetic> and
+Unary "^~^" performs bitwise negation, i.e., 1's complement.  For
+example, C<0666 ^&^ ^~^027> is 0640.  (See also L<Integer Arithmetic> and
 L<Bitwise String Operators>.)  Note that the width of the result is
-platform-dependent: ~0 is 32 bits wide on a 32-bit platform, but 64
+platform-dependent: ^~^0 is 32 bits wide on a 32-bit platform, but 64
 bits wide on a 64-bit platform, so if you are expecting a certain bit
 width, remember to use the & operator to mask off the excess bits.
-X<~> X<negation, binary>
+X<^~^> X<negation, binary>
 
 Unary "+" has no effect whatsoever, even on strings.  It is useful
 syntactically for separating a function name from a parenthesized expression
@@ -243,7 +243,7 @@ If the right argument is an expression rather than a search pattern,
 substitution, or transliteration, it is interpreted as a search pattern at run
 time. Note that this means that its contents will be interpolated twice, so
 
-  '\\' =~ q'\\';
+  '\' =~ q'\';
 
 is not ok, as the regex engine will end up trying to compile the
 pattern C<\>, which it will consider a syntax error.
@@ -377,21 +377,21 @@ See also L<"Terms and List Operators (Leftward)">.
 =head2 Relational Operators
 X<relational operator> X<operator, relational>
 
-Binary "<" returns true if the left argument is numerically less than
+Binary "+<" returns true if the left argument is numerically less than
 the right argument.
-X<< < >>
+X<< +< >>
 
-Binary ">" returns true if the left argument is numerically greater
+Binary "+>" returns true if the left argument is numerically greater
 than the right argument.
-X<< > >>
+X<< +> >>
 
-Binary "<=" returns true if the left argument is numerically less than
+Binary "+<=" returns true if the left argument is numerically less than
 or equal to the right argument.
-X<< <= >>
+X<< +<= >>
 
-Binary ">=" returns true if the left argument is numerically greater
+Binary "+>=" returns true if the left argument is numerically greater
 than or equal to the right argument.
-X<< >= >>
+X<< +>= >>
 
 Binary "lt" returns true if the left argument is stringwise less than
 the right argument.
@@ -420,14 +420,14 @@ Binary "!=" returns true if the left argument is numerically not equal
 to the right argument.
 X<!=>
 
-Binary "<=>" returns -1, 0, or 1 depending on whether the left
+Binary "<+>" returns -1, 0, or 1 depending on whether the left
 argument is numerically less than, equal to, or greater than the right
 argument.  If your platform supports NaNs (not-a-numbers) as numeric
-values, using them with "<=>" returns undef.  NaN is not "<", "==", ">",
-"<=" or ">=" anything (even NaN), so those 5 return false. NaN != NaN
+values, using them with "<+>" returns undef.  NaN is not "+<", "==", "+>",
+"+<=" or "+>=" anything (even NaN), so those 5 return false. NaN != NaN
 returns true, as does NaN != anything else. If your platform doesn't
 support NaNs then NaN is just a string with numeric value 0.
-X<< <=> >> X<spaceship>
+X<< <+> >> X<spaceship>
 
     perl -le '$a = "NaN"; print "No NaN support here" if $a == $a'
     perl -le '$a = "NaN"; print "NaN support here" if $a != $a'
@@ -455,30 +455,30 @@ X<~~>
 by the current locale if C<use locale> is in effect.  See L<perllocale>.
 
 =head2 Bitwise And
-X<operator, bitwise, and> X<bitwise and> X<&>
+X<operator, bitwise, and> X<bitwise and> X<^&^>
 
-Binary "&" returns its operands ANDed together bit by bit.
+Binary "^&^" returns its operands ANDed together bit by bit.
 (See also L<Integer Arithmetic> and L<Bitwise String Operators>.)
 
-Note that "&" has lower priority than relational operators, so for example
+Note that "^&^" has lower priority than relational operators, so for example
 the brackets are essential in a test like
 
-	print "Even\n" if ($x & 1) == 0;
+	print "Even\n" if ($x ^&^ 1) == 0;
 
 =head2 Bitwise Or and Exclusive Or
-X<operator, bitwise, or> X<bitwise or> X<|> X<operator, bitwise, xor>
-X<bitwise xor> X<^>
+X<operator, bitwise, or> X<bitwise or> X<^|^> X<operator, bitwise, xor>
+X<bitwise xor> X<^^^>
 
-Binary "|" returns its operands ORed together bit by bit.
+Binary "^|^" returns its operands ORed together bit by bit.
 (See also L<Integer Arithmetic> and L<Bitwise String Operators>.)
 
-Binary "^" returns its operands XORed together bit by bit.
+Binary "^^^" returns its operands XORed together bit by bit.
 (See also L<Integer Arithmetic> and L<Bitwise String Operators>.)
 
-Note that "|" and "^" have lower priority than relational operators, so
+Note that "^|^" and "^^^" have lower priority than relational operators, so
 for example the brackets are essential in a test like
 
-	print "false\n" if (8 | 2) != 10;
+	print "false\n" if (8 ^|^ 2) != 10;
 
 =head2 C-style Logical And
 X<&&> X<logical and> X<operator, logical, and>
@@ -539,11 +539,10 @@ With the C-style operators that would have been written like this:
 Using "or" for assignment is unlikely to do what you want; see below.
 
 =head2 Range Operators
-X<operator, range> X<range> X<..> X<...>
+X<operator, range> X<range> X<..>
 
-Binary ".." is the range operator, which is really two different
-operators depending on the context.  In list context, it returns a
-list of values counting (up by ones) from the left value to the right
+Binary ".." is the range operator, which can only be used in list context.
+It returns a list of values counting (up by ones) from the left value to the right
 value.  If the left value is greater than the right value then it
 returns the empty list.  The range operator is useful for writing
 C<foreach (1..10)> loops and for doing slice operations on arrays. In
@@ -559,95 +558,13 @@ like this:
 The range operator also works on strings, using the magical auto-increment,
 see below.
 
-In scalar context, ".." returns a boolean value.  The operator is
-bistable, like a flip-flop, and emulates the line-range (comma) operator
-of B<sed>, B<awk>, and various editors.  Each ".." operator maintains its
-own boolean state.  It is false as long as its left operand is false.
-Once the left operand is true, the range operator stays true until the
-right operand is true, I<AFTER> which the range operator becomes false
-again.  It doesn't become false till the next time the range operator is
-evaluated.  It can test the right operand and become false on the same
-evaluation it became true (as in B<awk>), but it still returns true once.
-If you don't want it to test the right operand till the next
-evaluation, as in B<sed>, just use three dots ("...") instead of
-two.  In all other regards, "..." behaves just like ".." does.
-
-The right operand is not evaluated while the operator is in the
-"false" state, and the left operand is not evaluated while the
-operator is in the "true" state.  The precedence is a little lower
-than || and &&.  The value returned is either the empty string for
-false, or a sequence number (beginning with 1) for true.  The
-sequence number is reset for each range encountered.  The final
-sequence number in a range has the string "E0" appended to it, which
-doesn't affect its numeric value, but gives you something to search
-for if you want to exclude the endpoint.  You can exclude the
-beginning point by waiting for the sequence number to be greater
-than 1.
-
-If either operand of scalar ".." is a constant expression,
-that operand is considered true if it is equal (C<==>) to the current
-input line number (the C<$.> variable).
-
-To be pedantic, the comparison is actually C<int(EXPR) == int(EXPR)>,
-but that is only an issue if you use a floating point expression; when
-implicitly using C<$.> as described in the previous paragraph, the
-comparison is C<int(EXPR) == int($.)> which is only an issue when C<$.>
-is set to a floating point value and you are not reading from a file.
-Furthermore, C<"span" .. "spat"> or C<2.18 .. 3.14> will not do what
-you want in scalar context because each of the operands are evaluated
-using their integer representation.
-
-Examples:
-
-As a scalar operator:
-
-    if (101 .. 200) { print; } # print 2nd hundred lines, short for
-                               #   if ($. == 101 .. $. == 200) ...
-
-    next LINE if (1 .. /^$/);  # skip header lines, short for
-                               #   ... if ($. == 1 .. /^$/);
-                               # (typically in a loop labeled LINE)
-
-    s/^/> / if (/^$/ .. eof());  # quote body
-
-    # parse mail messages
-    while (<>) {
-        $in_header =   1  .. /^$/;
-        $in_body   = /^$/ .. eof;
-        if ($in_header) {
-            # ...
-        } else { # in body
-            # ...
-        }
-    } continue {
-        close ARGV if eof;             # reset $. each file
-    }
-
-Here's a simple example to illustrate the difference between
-the two range operators:
-
-    @lines = ("   - Foo",
-              "01 - Bar",
-              "1  - Baz",
-              "   - Quux");
-
-    foreach (@lines) {
-        if (/0/ .. /1/) {
-            print "$_\n";
-        }
-    }
-
-This program will print only the line containing "Bar". If
-the range operator is changed to C<...>, it will also print the
-"Baz" line.
-
-And now some examples as a list operator:
+Some examples of the range operator:
 
     for (101 .. 200) { print; }	# print $_ 100 times
     @foo = @foo[0 .. $#foo];	# an expensive no-op
     @foo = @foo[$#foo-4 .. $#foo];	# slice last 5 items
 
-The range operator (in list context) makes use of the magical
+The range operator makes use of the magical
 auto-increment algorithm if the operands are strings.  You
 can say
 
@@ -655,7 +572,7 @@ can say
 
 to get all normal letters of the English alphabet, or
 
-    $hexdigit = (0 .. 9, 'a' .. 'f')[$num & 15];
+    $hexdigit = (0 .. 9, 'a' .. 'f')[$num ^&^ 15];
 
 to get a hexadecimal digit, or
 
@@ -725,9 +642,9 @@ That should probably be written more simply as:
     $a += ($a % 2) ? 10 : 2;
 
 =head2 Assignment Operators
-X<assignment> X<operator, assignment> X<=> X<**=> X<+=> X<*=> X<&=>
-X<<< <<= >>> X<&&=> X<-=> X</=> X<|=> X<<< >>= >>> X<||=> X<//=> X<.=>
-X<%=> X<^=> X<x=>
+X<assignment> X<operator, assignment> X<=> X<**=> X<+=> X<*=> X<^&^=>
+X<<< <<= >>> X<&&=> X<-=> X</=> X<^|^=> X<<< >>= >>> X<||=> X<//=> X<.=>
+X<%=> X<^^^=> X<x=>
 
 "=" is the ordinary assignment operator.
 
@@ -743,9 +660,9 @@ although without duplicating any side effects that dereferencing the lvalue
 might trigger, such as from tie().  Other assignment operators work similarly.
 The following are recognized:
 
-    **=    +=    *=    &=    <<=    &&=
-           -=    /=    |=    >>=    ||=
-           .=    %=    ^=           //=
+    **=    +=    *=    ^&^=    <<=    &&=
+           -=    /=    ^|^=    >>=    ||=
+           .=    %=    ^^^=           //=
                  x=
 
 Although these are grouped by family, they all have the precedence
@@ -818,7 +735,7 @@ The only operators with lower precedence are the logical operators
 "and", "or", and "not", which may be used to evaluate calls to list
 operators without the need for extra parentheses:
 
-    open HANDLE, "filename"
+    open HANDLE, "<", "filename"
 	or die "Can't open: $!\n";
 
 See also discussion of list operators in L<Terms and List Operators (Leftward)>.
@@ -957,6 +874,7 @@ X<\t> X<\n> X<\r> X<\f> X<\b> X<\a> X<\e> X<\x> X<\0> X<\c> X<\N>
     \e		escape          (ESC)
     \033	octal char	(example: ESC)
     \x1b	hex char	(example: ESC)
+    \x[FF]	byte
     \x{263a}	wide hex char	(example: SMILEY)
     \c[		control char    (example: ESC)
     \N{name}	named Unicode character
@@ -1007,7 +925,7 @@ X<newline> X<line terminator> X<eol> X<end of line>
 X<\n> X<\r> X<\r\n>
 
 For constructs that do interpolate, variables beginning with "C<$>"
-or "C<@>" are interpolated.  Subscripted variables such as C<$a[3]> or
+or "C<@>" or blocks beggining with "C<{>" are interpolated.  Subscripted variables such as C<$a[3]> or
 C<< $href->{key}[0] >> are also interpolated, as are array and hash slices.
 But method calls such as C<< $obj->meth >> are not.
 
@@ -1081,7 +999,7 @@ notably if the result of qr() is used standalone:
 	grep {
 	    my $success = 0;
 	    foreach my $pat (@compiled) {
-		$success = 1, last if /$pat/;
+		$success = 1, last if m/$pat/;
 	    }
 	    $success;
 	} @_;
@@ -1089,7 +1007,7 @@ notably if the result of qr() is used standalone:
 
 Precompilation of the pattern into an internal representation at
 the moment of qr() avoids a need to recompile the pattern every
-time a match C</$pat/> is attempted.  (Perl has many other internal
+time a match C<m/$pat/> is attempted.  (Perl has many other internal
 optimizations, but none would be triggered in the above example if
 we did not use qr() operator.)
 
@@ -1116,8 +1034,6 @@ X<m> X<operator, match>
 X<regexp, options> X<regexp> X<regex, options> X<regex>
 X</m> X</s> X</i> X</x> X</p> X</o> X</g> X</c>
 
-=item /PATTERN/msixpogc
-
 Searches a string for a pattern match, and in scalar context returns
 true if it succeeds, false if it fails.  If no string is specified
 via the C<=~> or C<!~> operator, the $_ string is searched.  (The
@@ -1132,12 +1048,6 @@ process modifiers are available:
 
     g	Match globally, i.e., find all occurrences.
     c	Do not reset search position on a failed match when /g is in effect.
-
-If "/" is the delimiter then the initial C<m> is optional.  With the C<m>
-you can use any pair of non-alphanumeric, non-whitespace characters
-as delimiters.  This is particularly useful for matching path names
-that contain "/", to avoid LTS (leaning toothpick syndrome). 
-If "'" is the delimiter, no interpolation is performed on the PATTERN.
 
 PATTERN may contain variables, which will be interpolated (and the
 pattern recompiled) every time the pattern search is evaluated, except
@@ -1156,15 +1066,6 @@ case, only the C<g> and C<c> flags on the empty pattern is honoured -
 the other flags are taken from the original pattern. If no match has
 previously succeeded, this will (silently) act instead as a genuine
 empty pattern (which will always match).
-
-Note that it's possible to confuse Perl into thinking C<//> (the empty
-regex) is really C<//> (the defined-or operator).  Perl is usually pretty
-good about this, but some pathological cases might trigger this, such as
-C<$a///> (is that C<($a) / (//)> or C<$a // />?) and C<print $fh //>
-(C<print $fh(//> or C<print($fh //>?).  In all of these examples, Perl
-will assume you meant defined-or.  If you meant the empty regex, just
-use parentheses or spaces to disambiguate, or even prefix the empty
-regex with an C<m> (so C<//> becomes C<m//>).
 
 If the C</g> option is not used, C<m//> in list context returns a
 list consisting of the subexpressions matched by the parentheses in the
@@ -1185,8 +1086,8 @@ Examples:
 
     # poor man's grep
     $arg = shift;
-    while (<>) {
-	print if /$arg/o;	# compile only once
+    while (~< *ARGV) {
+	print if m/$arg/o;	# compile only once
     }
 
     if (($F1, $F2, $Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))
@@ -1228,7 +1129,7 @@ Examples:
 
     # scalar context
     $/ = "";
-    while (defined($paragraph = <>)) {
+    while (defined($paragraph = ~< *ARGV)) {
 	while ($paragraph =~ m/[a-z]['")]*[.!?]+['")]*\s/g) {
 	    $sentences++;
 	}
@@ -1237,15 +1138,15 @@ Examples:
 
     # using m//gc with \G
     $_ = "ppooqppqq";
-    while ($i++ < 2) {
+    while ($i++ +< 2) {
         print "1: '";
-        print $1 while /(o)/gc; print "', pos=", pos, "\n";
+        print $1 while m/(o)/gc; print "', pos=", pos, "\n";
         print "2: '";
-        print $1 if /\G(q)/gc;  print "', pos=", pos, "\n";
+        print $1 if m/\G(q)/gc;  print "', pos=", pos, "\n";
         print "3: '";
-        print $1 while /(p)/gc; print "', pos=", pos, "\n";
+        print $1 while m/(p)/gc; print "', pos=", pos, "\n";
     }
-    print "Final: '$1', pos=",pos,"\n" if /\G(.)/;
+    print "Final: '$1', pos=",pos,"\n" if m/\G(.)/;
 
 The last example should print:
 
@@ -1263,7 +1164,7 @@ did not update C<pos> -- C<pos> is only updated on a C</g> match. If the
 final match did indeed match C<p>, it's a good bet that you're running an
 older (pre-5.6.0) Perl.
 
-A useful idiom for C<lex>-like scanners is C</\G.../gc>.  You can
+A useful idiom for C<lex>-like scanners is C<m/\G.../gc>.  You can
 combine several regexps like this to process a string part-by-part,
 doing different actions depending on which regexp matched.  Each
 regexp tries to match where the previous one leaves off.
@@ -1273,13 +1174,13 @@ regexp tries to match where the previous one leaves off.
  EOL
  LOOP:
     {
-      print(" digits"),		redo LOOP if /\G\d+\b[,.;]?\s*/gc;
-      print(" lowercase"),	redo LOOP if /\G[a-z]+\b[,.;]?\s*/gc;
-      print(" UPPERCASE"),	redo LOOP if /\G[A-Z]+\b[,.;]?\s*/gc;
-      print(" Capitalized"),	redo LOOP if /\G[A-Z][a-z]+\b[,.;]?\s*/gc;
-      print(" MiXeD"),		redo LOOP if /\G[A-Za-z]+\b[,.;]?\s*/gc;
-      print(" alphanumeric"),	redo LOOP if /\G[A-Za-z0-9]+\b[,.;]?\s*/gc;
-      print(" line-noise"),	redo LOOP if /\G[^A-Za-z0-9]+/gc;
+      print(" digits"),		redo LOOP if m/\G\d+\b[,.;]?\s*/gc;
+      print(" lowercase"),	redo LOOP if m/\G[a-z]+\b[,.;]?\s*/gc;
+      print(" UPPERCASE"),	redo LOOP if m/\G[A-Z]+\b[,.;]?\s*/gc;
+      print(" Capitalized"),	redo LOOP if m/\G[A-Z][a-z]+\b[,.;]?\s*/gc;
+      print(" MiXeD"),		redo LOOP if m/\G[A-Za-z]+\b[,.;]?\s*/gc;
+      print(" alphanumeric"),	redo LOOP if m/\G[A-Za-z0-9]+\b[,.;]?\s*/gc;
+      print(" line-noise"),	redo LOOP if m/\G[^A-Za-z0-9]+/gc;
       print ". That's all!\n";
     }
 
@@ -1290,9 +1191,9 @@ Here is the output (split into several lines):
  lowercase lowercase line-noise lowercase lowercase line-noise
  MiXeD line-noise. That's all!
 
-=item s/PATTERN/REPLACEMENT/msixpogce
+=item s/PATTERN/REPLACEMENT/msixpogc
 X<substitute> X<substitution> X<replace> X<regexp, replace>
-X<regexp, substitute> X</m> X</s> X</i> X</x> X</p> X</o> X</g> X</c> X</e>
+X<regexp, substitute> X</m> X</s> X</i> X</x> X</p> X</o> X</g> X</c>
 
 Searches a string for a pattern, and if found, replaces that pattern
 with the replacement text and returns the number of substitutions
@@ -1314,24 +1215,13 @@ expression is used instead.  See L<perlre> for further explanation on these.
 See L<perllocale> for discussion of additional considerations that apply
 when C<use locale> is in effect.
 
-Options are as with m// with the addition of the following replacement
-specific options:
-
-    e	Evaluate the right side as an expression.
-    ee  Evaluate the right side as a string then eval the result
+Options are as with m//.
 
 Any non-alphanumeric, non-whitespace delimiter may replace the
-slashes.  If single quotes are used, no interpretation is done on the
-replacement string (the C</e> modifier overrides this, however).  Unlike
-Perl 4, Perl 5 treats backticks as normal delimiters; the replacement
-text is not evaluated as a command.  If the
+slashes.  If the
 PATTERN is delimited by bracketing quotes, the REPLACEMENT has its own
 pair of quotes, which may or may not be bracketing quotes, e.g.,
-C<s(foo)(bar)> or C<< s<foo>/bar/ >>.  A C</e> will cause the
-replacement portion to be treated as a full-fledged Perl expression
-and evaluated right then and there.  It is, however, syntax checked at
-compile-time. A second C<e> modifier will cause the replacement portion
-to be C<eval>ed before being run as a Perl expression.
+C<s(foo)(bar)> or C<< s<foo>/bar/ >>.
 
 Examples:
 
@@ -1345,26 +1235,17 @@ Examples:
 
     $count = ($paragraph =~ s/Mister\b/Mr./g);  # get change-count
 
-    $_ = 'abc123xyz';
-    s/\d+/$&*2/e;		# yields 'abc246xyz'
-    s/\d+/sprintf("%5d",$&)/e;	# yields 'abc  246xyz'
-    s/\w/$& x 2/eg;		# yields 'aabbcc  224466xxyyzz'
-
-    s/%(.)/$percent{$1}/g;	# change percent escapes; no /e
-    s/%(.)/$percent{$1} || $&/ge;	# expr now, so /e
-    s/^=(\w+)/pod($1)/ge;	# use function call
-
     # expand variables in $_, but dynamics only, using
     # symbolic dereferencing
     s/\$(\w+)/${$1}/g;
 
     # Add one to the value of any numbers in the string
-    s/(\d+)/1 + $1/eg;
+    s/(\d+)/{1 + $1}/g;
 
     # This will expand any embedded scalar variable
     # (including lexicals) in $_ : First $1 is interpolated
     # to the variable name, and then evaluated
-    s/(\$\w+)/$1/eeg;
+    s/(\$\w+)/{ eval $1 }/g;
 
     # Delete (most) C comments.
     $program =~ s {
@@ -1393,7 +1274,7 @@ to occur that you might want.  Here are two common cases:
     1 while s/(\d)(\d\d\d)(?!\d)/$1,$2/g;
 
     # expand tabs to 8-column spacing
-    1 while s/\t+/' ' x (length($&)*8 - length($`)%8)/e;
+    1 while s/\t+/{ ' ' x (length($&)*8 - length($`)%8) }/;
 
 =back
 
@@ -1471,7 +1352,7 @@ The STDIN filehandle used by the command is inherited from Perl's STDIN.
 For example:
 
     open BLAM, "blam" || die "Can't open: $!";
-    open STDIN, "<&BLAM";
+    open STDIN, "<&", \*BLAM;
     print `sort`;
 
 will print the sorted contents of the file "blam".
@@ -1737,22 +1618,6 @@ you'll need to remove leading whitespace from each line manually:
        down from the door where it began.
     FINIS
 
-If you use a here-doc within a delimited construct, such as in C<s///eg>,
-the quoted material must come on the lines following the final delimiter.
-So instead of
-
-    s/this/<<E . 'that'
-    the other
-    E
-     . 'more '/eg;
-
-you have to write
-
-    s/this/<<E . 'that'
-     . 'more '/eg;
-    the other
-    E
-
 If the terminating identifier is on the last line of the program, you
 must be sure there is a newline after it; otherwise, Perl will give the
 warning B<Can't find string terminator "END" anywhere before EOF...>.
@@ -1833,8 +1698,6 @@ for closing C<]> paired with the opening C<[>, combinations of C<\\>, C<\]>,
 and C<\[> are all skipped, and nested C<[> and C<]> are skipped as well.
 However, when backslashes are used as the delimiters (like C<qq\\> and
 C<tr\\\>), nothing is skipped.
-During the search for the end, backslashes that escape delimiters
-are removed (exactly speaking, they are not copied to the safe location).
 
 For constructs with three-part delimiters (C<s///>, C<y///>, and
 C<tr///>), the search is repeated once more.
@@ -1884,18 +1747,10 @@ No interpolation is performed.
 Note that the combination C<\\> is left intact, since escaped delimiters
 are not available for here-docs.
 
-=item  C<m''>, the pattern of C<s'''>
+=item C<''>, C<q//>
 
-No interpolation is performed at this stage.
-Any backslashed sequences including C<\\> are treated at the stage
-to L</"parsing regular expressions">.
-
-=item C<''>, C<q//>, C<tr'''>, C<y'''>, the replacement of C<s'''>
-
-The only interpolation is removal of C<\> from pairs of C<\\>.
-Therefore C<-> in C<tr'''> and C<y'''> is treated literally
-as a hyphen and no character range is available.
-C<\1> in the replacement of C<s'''> does not work as C<$1>.
+No interpolation is performed. 
+Note that the combination C<\\> is left intact, as is C<\'>.
 
 =item C<tr///>, C<y///>
 
@@ -1906,7 +1761,7 @@ characters such as C<\\> and C<\-> are converted to appropriate literals.
 The character C<-> is treated specially and therefore C<\-> is treated
 as a literal C<->.
 
-=item C<"">, C<``>, C<qq//>, C<qx//>, C<< <file*glob> >>, C<<<"EOF">
+=item C<"">, C<``>, C<qq//>, C<qx//>, C<<<"EOF">
 
 C<\Q>, C<\U>, C<\u>, C<\L>, C<\l> (possibly paired with C<\E>) are
 converted to corresponding Perl constructs.  Thus, C<"$foo\Qbaz$bar">
@@ -1986,14 +1841,7 @@ performed whatsoever.  This is the first step at which the presence
 of the C<//x> modifier is relevant.
 
 Interpolation in patterns has several quirks: C<$|>, C<$(>, C<$)>, C<@+>
-and C<@-> are not interpolated, and constructs C<$var[SOMETHING]> are
-voted (by several different estimators) to be either an array element
-or C<$var> followed by an RE alternative.  This is where the notation
-C<${arr[$bar]}> comes handy: C</${arr[0-9]}/> is interpreted as
-array element C<-9>, not as a regular expression from the variable
-C<$arr> followed by a digit, which would be the interpretation of
-C</$arr[0-9]/>.  Since voting among different estimators may occur,
-the result is not predictable.
+and C<@-> are not interpolated.
 
 The lack of processing of C<\\> creates specific restrictions on
 the post-processed text.  If the delimiter is C</>, one cannot get
@@ -2065,14 +1913,14 @@ semantics, details of this step are not documented and are subject
 to change without notice.  This step is performed over the finite
 automaton that was generated during the previous pass.
 
-It is at this stage that C<split()> silently optimizes C</^/> to
-mean C</^/m>.
+It is at this stage that C<split()> silently optimizes C<m/^/> to
+mean C<m/^/m>.
 
 =back
 
 =head2 I/O Operators
 X<operator, i/o> X<operator, io> X<io> X<while> X<filehandle>
-X<< <> >> X<@ARGV>
+X<< ~< >> X<@ARGV>
 
 There are several I/O operators you should know about.
 
@@ -2113,17 +1961,17 @@ to happen.
 
 The following lines are equivalent:
 
-    while (defined($_ = <STDIN>)) { print; }
-    while ($_ = <STDIN>) { print; }
-    while (<STDIN>) { print; }
-    for (;<STDIN>;) { print; }
-    print while defined($_ = <STDIN>);
-    print while ($_ = <STDIN>);
-    print while <STDIN>;
+    while (defined($_ = ~< *STDIN)) { print; }
+    while ($_ = ~< *STDIN>) { print; }
+    while (~< *STDIN) { print; }
+    for (;~< *STDIN;) { print; }
+    print while defined($_ = ~< *STDIN);
+    print while ($_ = ~< *STDIN);
+    print while ~< *STDIN;
 
 This also behaves similarly, but avoids $_ :
 
-    while (my $line = <STDIN>) { print $line }
+    while (my $line = ~< *STDIN) { print $line }
 
 In these loop constructs, the assigned value (whether assignment
 is automatic or explicit) is then tested to see whether it is
@@ -2132,10 +1980,10 @@ value that would be treated as false by Perl, for example a "" or
 a "0" with no trailing newline.  If you really mean for such values
 to terminate the loop, they should be tested for explicitly:
 
-    while (($_ = <STDIN>) ne '0') { ... }
-    while (<STDIN>) { last unless $_; ... }
+    while (($_ = ~< *STDIN) ne '0') { ... }
+    while (~< *STDIN) { last unless $_; ... }
 
-In other boolean contexts, C<< <I<filehandle>> >> without an
+In other boolean contexts, C<< ~< *I<filehandle> >> without an
 explicit C<defined> test or comparison elicit a warning if the
 C<use warnings> pragma or the B<-w>
 command-line switch (the C<$^W> variable) is in effect.
@@ -2148,23 +1996,23 @@ the open() function, amongst others.  See L<perlopentut> and
 L<perlfunc/open> for details on this.
 X<stdin> X<stdout> X<sterr>
 
-If a <FILEHANDLE> is used in a context that is looking for
+If a ~< *FILEHANDLE is used in a context that is looking for
 a list, a list comprising all input lines is returned, one line per
 list element.  It's easy to grow to a rather large data space this
 way, so use with care.
 
-<FILEHANDLE> may also be spelled C<readline(*FILEHANDLE)>.
+~< *FILEHANDLE may also be spelled C<readline(*FILEHANDLE)>.
 See L<perlfunc/readline>.
 
-The null filehandle <> is special: it can be used to emulate the
-behavior of B<sed> and B<awk>.  Input from <> comes either from
+The ARGV filehandle is special: it can be used to emulate the
+behavior of B<sed> and B<awk>.  Input from ~< *ARGV comes either from
 standard input, or from each file listed on the command line.  Here's
-how it works: the first time <> is evaluated, the @ARGV array is
+how it works: the first time ~< *ARGV is evaluated, the @ARGV array is
 checked, and if it is empty, C<$ARGV[0]> is set to "-", which when opened
 gives you standard input.  The @ARGV array is then processed as a list
 of filenames.  The loop
 
-    while (<>) {
+    while (~< *ARGV) {
 	...			# code for each line
     }
 
@@ -2173,7 +2021,7 @@ is equivalent to the following Perl-like pseudo code:
     unshift(@ARGV, '-') unless @ARGV;
     while ($ARGV = shift) {
 	open(ARGV, $ARGV);
-	while (<ARGV>) {
+	while (~< *ARGV) {
 	    ...		# code for each line
 	}
     }
@@ -2181,11 +2029,8 @@ is equivalent to the following Perl-like pseudo code:
 except that it isn't so cumbersome to say, and will actually work.
 It really does shift the @ARGV array and put the current filename
 into the $ARGV variable.  It also uses filehandle I<ARGV>
-internally--<> is just a synonym for <ARGV>, which
-is magical.  (The pseudo code above doesn't work because it treats
-<ARGV> as non-magical.)
 
-You can modify @ARGV before the first <> as long as the array ends up
+You can modify @ARGV before the first ~< *ARGV as long as the array ends up
 containing the list of filenames you really want.  Line numbers (C<$.>)
 continue as though the input were one big happy file.  See the example
 in L<perlfunc/eof> for how to reset line numbers on each file.
@@ -2198,44 +2043,26 @@ This sets @ARGV to all plain text files if no @ARGV was given:
 You can even set them to pipe commands.  For example, this automatically
 filters compressed arguments through B<gzip>:
 
-    @ARGV = map { /\.(gz|Z)$/ ? "gzip -dc < $_ |" : $_ } @ARGV;
+    @ARGV = map { m/\.(gz|Z)$/ ? "gzip -dc < $_ |" : $_ } @ARGV;
 
 If you want to pass switches into your script, you can use one of the
 Getopts modules or put a loop on the front like this:
 
-    while ($_ = $ARGV[0], /^-/) {
+    while ($_ = $ARGV[0], m/^-/) {
 	shift;
-        last if /^--$/;
-	if (/^-D(.*)/) { $debug = $1 }
-	if (/^-v/)     { $verbose++  }
+        last if m/^--$/;
+	if (m/^-D(.*)/) { $debug = $1 }
+	if (m/^-v/)     { $verbose++  }
 	# ...		# other switches
     }
 
-    while (<>) {
+    while (~< *ARGV) {
 	# ...		# code for each line
     }
 
 The <> symbol will return C<undef> for end-of-file only once.
 If you call it again after this, it will assume you are processing another
 @ARGV list, and if you haven't set @ARGV, will read input from STDIN.
-
-If what the angle brackets contain is a simple scalar variable (e.g.,
-<$foo>), then that variable contains the name of the
-filehandle to input from, or its typeglob, or a reference to the
-same.  For example:
-
-    $fh = \*STDIN;
-    $line = <$fh>;
-
-If what's within the angle brackets is neither a filehandle nor a simple
-scalar variable containing a filehandle name, typeglob, or typeglob
-reference, Perl 5 interpreted as a filename pattern to be globbed, Perl
-Kurila gives an error. This distinction is determined on syntactic
-grounds alone.  That means C<< <$x> >> is always a readline() from
-an indirect handle, but C<< <$hash{key}> >> gives an error.
-That's because $x is a simple scalar variable, but C<$hash{key}> is
-not--it's a hash element.  Even C<< <$x > >> (note the extra space)
-gives an error. Use the C<glob> function to match filename patters.
 
 =head2 Constant Folding
 X<constant folding> X<folding>
@@ -2273,7 +2100,7 @@ context, so you can for example safely do
 X<operator, bitwise, string>
 
 Bitstrings of any size may be manipulated by the bitwise operators
-(C<~ | & ^>).
+(C<^~^ ^|^ ^&^ ^^^>).
 
 If the operands to a binary bitwise op are strings of different
 sizes, B<|> and B<^> ops act as though the shorter operand had
@@ -2283,23 +2110,23 @@ The granularity for such extension or truncation is one or more
 bytes.
 
     # ASCII-based examples
-    print "j p \n" ^ " a h";        	# prints "JAPH\n"
-    print "JA" | "  ph\n";          	# prints "japh\n"
-    print "japh\nJunk" & '_____';   	# prints "JAPH\n";
-    print 'p N$' ^ " E<H\n";		# prints "Perl\n";
+    print "j p \n" ^^^ " a h";        	# prints "JAPH\n"
+    print "JA" ^|^ "  ph\n";          	# prints "japh\n"
+    print "japh\nJunk" ^&^ '_____';   	# prints "JAPH\n";
+    print 'p N$' ^^^ " E<H\n";		# prints "Perl\n";
 
 If you are intending to manipulate bitstrings, be certain that
 you're supplying bitstrings: If an operand is a number, that will imply
 a B<numeric> bitwise operation.  You may explicitly show which type of
 operation you intend by using C<""> or C<0+>, as in the examples below.
 
-    $foo =  150  |  105;	# yields 255  (0x96 | 0x69 is 0xFF)
-    $foo = '150' |  105;	# yields 255
-    $foo =  150  | '105';	# yields 255
-    $foo = '150' | '105';	# yields string '155' (under ASCII)
+    $foo =  150  ^|^  105;	# yields 255  (0x96 | 0x69 is 0xFF)
+    $foo = '150' ^|^  105;	# yields 255
+    $foo =  150  ^|^ '105';	# yields 255
+    $foo = '150' ^|^ '105';	# yields string '155' (under ASCII)
 
-    $baz = 0+$foo & 0+$bar;	# both ops explicitly numeric
-    $biz = "$foo" ^ "$bar";	# both ops explicitly stringy
+    $baz = 0+$foo ^&^ 0+$bar;	# both ops explicitly numeric
+    $biz = "$foo" ^^^ "$bar";	# both ops explicitly stringy
 
 See L<perlfunc/vec> for information on how to manipulate individual bits
 in a bit vector.
@@ -2324,13 +2151,13 @@ operations if it is so inclined.  For example, even under C<use
 integer>, if you take the C<sqrt(2)>, you'll still get C<1.4142135623731>
 or so.
 
-Used on numbers, the bitwise operators ("&", "|", "^", "~", "<<",
+Used on numbers, the bitwise operators ("^&^", "^|^", "^^^", "^~^", "<<",
 and ">>") always produce integral results.  (But see also
 L<Bitwise String Operators>.)  However, C<use integer> still has meaning for
 them.  By default, their results are interpreted as unsigned integers, but
 if C<use integer> is in effect, their results are interpreted
-as signed integers.  For example, C<~0> usually evaluates to a large
-integral value.  However, C<use integer; ~0> is C<-1> on two's-complement
+as signed integers.  For example, C<^~^0> usually evaluates to a large
+integral value.  However, C<use integer; ^~^0> is C<-1> on two's-complement
 machines.
 
 =head2 Floating-point Arithmetic

@@ -183,8 +183,8 @@ pM	|void	|delete_eval_scope
 p	|void	|deprecate	|NN const char* s
 p	|void	|deprecate_old	|NN const char* s
 Afp	|OP*	|die		|NULLOK const char* pat|...
-p	|OP*	|vdie		|NULLOK const char* pat|NULLOK va_list* args
-p	|OP*	|die_where	|NULLOK const char* message|STRLEN msglen
+p	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
+p	|void	|die_where	|NN SV *msv
 Ap	|void	|dounwind	|I32 cxix
 pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV** mark|NN SV** sp
 p	|bool	|do_aexec5	|NULLOK SV* really|NN SV** mark|NN SV** sp|int fd|int do_report
@@ -1278,6 +1278,7 @@ sR	|const char *|get_num	|NN const char *ppat|NN I32 *lenptr
 sR	|char *	|sv_exp_grow	|NN SV *sv|STRLEN needed
 #endif
 
+pR	|I32	|dopoptosub_at	|NN const PERL_CONTEXT* cxstk|I32 startingblock
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 sR	|OP*	|docatch	|NULLOK OP *o
 sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|NN OP **opstack|NN OP **oplimit
@@ -1285,7 +1286,6 @@ sR	|I32	|dopoptoeval	|I32 startingblock
 sR	|I32	|dopoptogiven	|I32 startingblock
 sR	|I32	|dopoptolabel	|NN const char *label
 sR	|I32	|dopoptoloop	|I32 startingblock
-sR	|I32	|dopoptosub_at	|NN const PERL_CONTEXT* cxstk|I32 startingblock
 sR	|I32	|dopoptowhen	|I32 startingblock
 s	|void	|save_lines	|NULLOK AV *array|NN SV *sv
 s	|bool	|doeval		|int gimme|NULLOK OP** startop|NULLOK CV* outside|U32 seq
@@ -1506,7 +1506,7 @@ rs	|void	|missingterminator	|NULLOK char *s
 s	|void	|no_op		|NN const char *what|NULLOK char *s
 sR	|I32	|sublex_done
 sR	|I32	|sublex_push
-sR	|I32	|sublex_start
+sR	|I32	|sublex_start   |I32 op_type|NULLOK OP *op
 sR	|char *	|filter_gets	|NN SV *sv|NN PerlIO *fp|STRLEN append
 sR	|char *	|tokenize_use	|int is_use|NN char *s
 so	|SV*	|new_constant	|NULLOK const char *s|STRLEN len \
@@ -1537,10 +1537,9 @@ s	|char*	|stdize_locale	|NN char* locs
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 s	|SV*	|mess_alloc
-s	|const char *|vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args \
-				|NULLOK STRLEN *msglen|NULLOK I32* utf8
-s	|bool	|vdie_common	|NULLOK const char *message|STRLEN msglen\
-				|I32 utf8|bool warn
+s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
+p	|bool	|vdie_common	|NN SV *msg \
+				|bool warn
 sr	|char *	|write_no_mem
 #endif
 

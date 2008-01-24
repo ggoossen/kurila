@@ -8,10 +8,10 @@ for ( ~< *DATA) {
 
 print form
 	 {page=>{width=>51},hfill=>'=-'},
-	 "{||||{*}|||||}\n\n",
+	 "\{||||\{*\}|||||\}\n\n",
 	 "[ Table of Contents ]",
 	 {hfill=>' .'},
-	 "   {[[[[[{*}[[[[[}{]]]}   ",
+	 "   \{[[[[[\{*\}[[[[[\}\{]]]\}   ",
 	     \@contents,    \@page;
 
 __DATA__

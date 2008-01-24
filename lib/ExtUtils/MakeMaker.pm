@@ -558,12 +558,12 @@ END
 # This Makefile is for the $self->{NAME} extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# $VERSION (Revision: $Revision) from the contents of
+# {dump::view($VERSION)} (Revision: $Revision) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
 #
-#   MakeMaker ARGV: $argv
+#   MakeMaker ARGV: {dump::view($argv)}
 #
 #   MakeMaker Parameters:
 END
@@ -654,7 +654,7 @@ sub WriteEmptyMakefile {
     if ( -f $new ) {
         _rename($new, $old) or warn "rename $new => $old: $!"
     }
-    open MF, '>'.$new or die "open $new for write: $!";
+    open MF, ">", ''.$new or die "open $new for write: $!";
     print MF <<'EOP';
 all:
 
@@ -696,10 +696,10 @@ sub parse_args{
         my($name, $value) = ($1, $2);
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
             $value =~ s [^~(\w*)]
-                [$1 ?
+                [{$1 ?
                  ((getpwnam($1))[7] || "~$1") :
                  (getpwuid($>))[7]
-                 ]ex;
+                 }]x;
         }
 
         # Remember the original args passed it.  It will be useful later.
@@ -721,7 +721,7 @@ sub parse_args{
     if (defined $self->{ARMAYBE}){
         my($armaybe) = $self->{ARMAYBE};
         print STDOUT "ARMAYBE => '$armaybe' should be changed to:\n",
-                        "\t'dynamic_lib' => {ARMAYBE => '$armaybe'}\n";
+                        "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
         my(%dl) = %{$self->{dynamic_lib} || {}};
         $self->{dynamic_lib} = { %dl, ARMAYBE => $armaybe};
         delete $self->{ARMAYBE};
@@ -841,7 +841,7 @@ sub mv_all_methods {
         # %MY:: being intact, we have to fill the hole with an
         # inheriting method:
 
-        eval "package MY; sub $method { shift->SUPER::$method(\@_); }";
+        eval "package MY; sub $method \{ shift->SUPER::$method(\@_); \}";
     }
 
     # We have to clean out %INC also, because the current directory is
@@ -897,7 +897,7 @@ sub flush {
     print STDOUT "Writing $finalname for $self->{NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
-    open(FH,">MakeMaker.tmp") or die "Unable to open MakeMaker.tmp: $!";
+    open(FH,">", "MakeMaker.tmp") or die "Unable to open MakeMaker.tmp: $!";
 
     for $chunk (@{$self->{RESULT}}) {
         print FH "$chunk\n";
@@ -977,7 +977,7 @@ sub neatvalue {
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"$key=>".neatvalue($val)) ;
     }
-    return "{ ".join(', ',@m)." }";
+    return "\{ ".join(', ',@m)." \}";
 }
 
 sub selfdocument {

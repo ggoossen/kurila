@@ -111,7 +111,7 @@ sub struct {
     my $got_class = 0;
     my $out = '';
 
-    $out = "{\n  package $class;\n  use Carp;\n  sub new {\n";
+    $out = "\{\n  package $class;\n  use Carp;\n  sub new \{\n";
     $out .= "    my (\$class, \%init) = \@_;\n";
     $out .= "    \$class = __PACKAGE__ unless \@_;\n";
 
@@ -120,7 +120,7 @@ sub struct {
     my( $cmt, $name, $type, $elem );
 
     if( $base_type eq 'HASH' ){
-        $out .= "    my(\$r) = {};\n";
+        $out .= "    my(\$r) = \{\};\n";
         $cmt = '';
     }
     elsif( $base_type eq 'ARRAY' ){
@@ -131,7 +131,7 @@ sub struct {
         $type = $decls[$idx+1];
         push( @methods, $name );
         if( $base_type eq 'HASH' ){
-            $elem = "{'${class}::$name'}";
+            $elem = "\{'${class}::$name'\}";
         }
         elsif( $base_type eq 'ARRAY' ){
             $elem = "[$cnt]";
@@ -142,30 +142,30 @@ sub struct {
             $refs{$name}++;
             $type = $1;
         }
-        my $init = "defined(\$init{'$name'}) ? \$init{'$name'} :";
+        my $init = "defined(\$init\{'$name'\}) ? \$init\{'$name'\} :";
         if( $type eq '@' ){
             $out .= "    croak 'Initializer for $name must be array reference'\n"; 
-            $out .= "        if defined(\$init{'$name'}) && ref(\$init{'$name'}) ne 'ARRAY';\n";
+            $out .= "        if defined(\$init\{'$name'\}) && ref(\$init\{'$name'\}) ne 'ARRAY';\n";
             $out .= "    \$r->$elem = $init [];$cmt\n"; 
             $arrays{$name}++;
         }
         elsif( $type eq '%' ){
             $out .= "    croak 'Initializer for $name must be hash reference'\n";
-            $out .= "        if defined(\$init{'$name'}) && ref(\$init{'$name'}) ne 'HASH';\n";
-            $out .= "    \$r->$elem = $init {};$cmt\n";
+            $out .= "        if defined(\$init\{'$name'\}) && ref(\$init\{'$name'\}) ne 'HASH';\n";
+            $out .= "    \$r->$elem = $init \{\};$cmt\n";
             $hashes{$name}++;
         }
         elsif ( $type eq '$') {
             $out .= "    \$r->$elem = $init undef;$cmt\n";
         }
         elsif( $type =~ m/^\w+(?:::\w+)*$/ ){
-            $out .= "    if (defined(\$init{'$name'})) {\n";
-           $out .= "       if (ref \$init{'$name'} eq 'HASH')\n";
-            $out .= "            { \$r->$elem = $type->new(\%{\$init{'$name'}}) } $cmt\n";
-           $out .= "       elsif (UNIVERSAL::isa(\$init{'$name'}, '$type'))\n";
-            $out .= "            { \$r->$elem = \$init{'$name'} } $cmt\n";
-            $out .= "       else { croak 'Initializer for $name must be hash or $type reference' }\n";
-            $out .= "    }\n";
+            $out .= "    if (defined(\$init\{'$name'\})) \{\n";
+           $out .= "       if (ref \$init\{'$name'\} eq 'HASH')\n";
+            $out .= "            \{ \$r->$elem = $type->new(\%\{\$init\{'$name'\}\}) \} $cmt\n";
+           $out .= "       elsif (UNIVERSAL::isa(\$init\{'$name'\}, '$type'))\n";
+            $out .= "            \{ \$r->$elem = \$init\{'$name'\} \} $cmt\n";
+            $out .= "       else \{ croak 'Initializer for $name must be hash or $type reference' \}\n";
+            $out .= "    \}\n";
             $classes{$name} = $type;
             $got_class = 1;
         }
@@ -174,7 +174,7 @@ sub struct {
         }
         $idx += 2;
     }
-    $out .= "    bless \$r, \$class;\n  }\n";
+    $out .= "    bless \$r, \$class;\n  \}\n";
 
     # Create accessor methods.
 
@@ -191,35 +191,35 @@ sub struct {
                 $pst = ")";
                 $cmt = " # returns ref";
             }
-            $out .= "  sub $name {$cmt\n    my \$r = shift;\n";
+            $out .= "  sub $name \{$cmt\n    my \$r = shift;\n";
             if( $base_type eq 'ARRAY' ){
                 $elem = "[$cnt]";
                 ++$cnt;
             }
             elsif( $base_type eq 'HASH' ){
-                $elem = "{'${class}::$name'}";
+                $elem = "\{'${class}::$name'\}";
             }
             if( defined $arrays{$name} ){
                 $out .= "    my \$i;\n";
                 $out .= "    \@_ ? (\$i = shift) : return \$r->$elem;\n"; 
-                $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) { \$r->$elem = \$i; return \$r }\n";
+                $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
                 $sel = "->[\$i]";
             }
             elsif( defined $hashes{$name} ){
                 $out .= "    my \$i;\n";
                 $out .= "    \@_ ? (\$i = shift) : return \$r->$elem;\n";
-                $out .= "    if (ref(\$i) eq 'HASH' && !\@_) { \$r->$elem = \$i; return \$r }\n";
-                $sel = "->{\$i}";
+                $out .= "    if (ref(\$i) eq 'HASH' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
+                $sel = "->\{\$i\}";
             }
             elsif( defined $classes{$name} ){
                 $out .= "    croak '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '$classes{$name}');\n";
             }
             $out .= "    croak 'Too many args to $name' if \@_ +> 1;\n";
             $out .= "    \@_ ? ($pre\$r->$elem$sel = shift$pst) : $pre\$r->$elem$sel$pst;\n";
-            $out .= "  }\n";
+            $out .= "  \}\n";
         }
     }
-    $out .= "}\n1;\n";
+    $out .= "\}\n1;\n";
 
     print $out if $print;
     my $result = eval $out;

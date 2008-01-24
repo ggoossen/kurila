@@ -40,7 +40,7 @@ my $max = keys %tests;
 print "1..$max\n";
 
 # Dump any error messages from the dying processes off to a temp file.
-open(STDERR, ">die_exit.err") or die "Can't open temp error file:  $!";
+open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $!";
 
 foreach my $test (1 .. $max) {
     my($bang, $query, $code) = @{$tests{$test}};

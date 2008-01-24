@@ -22,9 +22,9 @@ while ( ~< *DATA) {
 }
 
 safer_unlink ('overload.h', 'overload.c');
-die "overload.h: $!" unless open(C, ">overload.c");
+die "overload.h: $!" unless open(C, ">", "overload.c");
 binmode C;
-die "overload.h: $!" unless open(H, ">overload.h");
+die "overload.h: $!" unless open(H, ">", "overload.h");
 binmode H;
 
 sub print_header {
@@ -85,7 +85,7 @@ print C "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ } @names;
 
 print C <<"EOT";
     "$last"
-};
+\};
 EOT
 
 close H or die $!;

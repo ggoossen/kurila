@@ -16,10 +16,10 @@ my $min = {height=>'minimal'};
 
 print form
 	"Name:             Biography:                            ",
-	"  {[[[[[[[[[[[[}    {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}", $name,$min,$bio,
-	"                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", 
-	"Status:             {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-	"  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $status,
-	"                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", 
-	"Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-	"  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $comments;
+	"  \{[[[[[[[[[[[[\}    \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}", $name,$min,$bio,
+	"                    \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}", 
+	"Status:             \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}",
+	"  \{[[[[[[[[[[[[\}    \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}", $status,
+	"                    \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}", 
+	"Comments:           \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}",
+	"  \{[[[[[[[[[[[\}     \{VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV\}", $comments;

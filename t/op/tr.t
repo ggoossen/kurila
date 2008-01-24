@@ -328,7 +328,7 @@ is( $@, '',         'implicit count outside hash bounds' );
 is( scalar keys %foo, 0,   "    doesn't extend the hash");
 
 $x = \"foo";
-is( $x =~ tr/A/A/, 2, 'non-modifying tr/// on a scalar ref' );
+dies_like( sub { $x =~ tr/A/A/ }, qr/stringify a reference/, 'non-modifying tr/// on a scalar ref' );
 is( ref $x, 'SCALAR', "    doesn't stringify its argument" );
 
 # rt.perl.org 36622.  Perl didn't like a y/// at end of file.  No trailing

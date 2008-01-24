@@ -134,11 +134,11 @@ sub boottime_iterator {
     my $athx = $self->C_constant_prefix_param();
 
     return sprintf <<"EOBOOT", &$generator(&$extractor($iterator));
-        while ($iterator->name) {
+        while ($iterator->name) \{
 	    $subname($athx $hash, $iterator->name,
 				$iterator->namelen, %s);
 	    ++$iterator;
-	}
+	\}
 EOBOOT
 }
 
@@ -199,9 +199,9 @@ sub WriteConstants {
 
     print $c_fh $self->header(), <<"EOADD";
 static void
-${c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) {
+${c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
 	newCONSTSUB(hash, name, value);
-}
+\}
 
 EOADD
 
@@ -209,15 +209,15 @@ EOADD
 
 static int
 Im_sorry_Dave(pTHX_ SV *sv, MAGIC *mg)
-{
+\{
     PERL_UNUSED_ARG(mg);
     Perl_croak(aTHX_
 	       "Your vendor has not defined $package_sprintf_safe macro %"SVf
 	       " used", sv);
     NORETURN_FUNCTION_END;
-}
+\}
 
-static MGVTBL not_defined_vtbl = {
+static MGVTBL not_defined_vtbl = \{
  Im_sorry_Dave, /* get - I'm afraid I can't do that */
  Im_sorry_Dave, /* set */
  0, /* len */
@@ -225,7 +225,7 @@ static MGVTBL not_defined_vtbl = {
  0, /* free */
  0, /* copy */
  0, /* dup */
-};
+\};
 
 EXPLODE
 
@@ -246,7 +246,7 @@ EXPLODE
    each package's hash into one hash in our namespace.  */
 
 static HV *
-get_missing_hash(pTHX) {
+get_missing_hash(pTHX) \{
     HV *const parent
 	= get_hv("ExtUtils::Constant::ProxySubs::Missing", GVf_MULTI);
     /* We could make a hash of hashes directly, but this would confuse anything
@@ -267,7 +267,7 @@ get_missing_hash(pTHX) {
     SvRV_set(*ref, (SV *)new_hv);
     SvROK_on(*ref);
     return new_hv;
-}
+\}
 
 #endif
 
@@ -277,7 +277,7 @@ MISSING
 
     print $xs_fh <<"EOBOOT";
 BOOT:
-  {
+  \{
 #ifdef dTHX
     dTHX;
 #endif
@@ -306,7 +306,7 @@ EOBOOT
 	print $xs_fh <<"EOBOOT";
 
     static const struct $struct_type $array_name\[] =
-      {
+      \{
 EOBOOT
 
 
@@ -325,14 +325,14 @@ EOBOOT
 		    "        /* This is the default value: */\n" if $type;
 		print $xs_fh "#else\n";
 	    }
-	    print $xs_fh "        { ", join (', ', "\"$name\"", $namelen,
-					     &$type_to_value($value)), " },\n",
+	    print $xs_fh "        \{ ", join (', ', "\"$name\"", $namelen,
+					     &$type_to_value($value)), " \},\n",
 						 $self->macro_to_endif($macro);
 	}
 
 
     # Terminate the list with a NULL
-	print $xs_fh "        { NULL, 0", (", 0" x $number_of_args), " } };\n";
+	print $xs_fh "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
 
 	$iterator{$type} = "value_for_" . ($type ? lc $type : 'notfound');
 
@@ -357,7 +357,7 @@ EOBOOT
     }
 
     print $xs_fh <<"EOBOOT";
-	while (value_for_notfound->name) {
+	while (value_for_notfound->name) \{
 EOBOOT
 
     print $xs_fh $explosives ? <<"EXPLODE" : << "DONT";
@@ -365,11 +365,11 @@ EOBOOT
 	    
 	    sv_magicext(tripwire, 0, PERL_MAGIC_ext, &not_defined_vtbl, 0, 0);
 	    SvPV_set(tripwire, (char *)value_for_notfound->name);
-	    if(value_for_notfound->namelen >= 0) {
+	    if(value_for_notfound->namelen >= 0) \{
 		SvCUR_set(tripwire, value_for_notfound->namelen);
-	    } else {
+	    \} else \{
 		SvCUR_set(tripwire, -value_for_notfound->namelen);
-	    }
+	    \}
 	    SvPOKp_on(tripwire);
 	    SvREADONLY_on(tripwire);
 	    assert(SvLEN(tripwire) == 0);
@@ -381,17 +381,17 @@ EXPLODE
 	    /* Need to add prototypes, else parsing will vary by platform.  */
 	    SV **sv = hv_fetch(symbol_table, value_for_notfound->name,
 			       value_for_notfound->namelen, TRUE);
-	    if (!sv) {
+	    if (!sv) \{
 		Perl_croak($athx
 			   "Couldn't add key '%s' to %%$package_sprintf_safe\::",
 			   value_for_notfound->name);
-	    }
-	    if (!SvOK(*sv) && SvTYPE(*sv) != SVt_PVGV) {
+	    \}
+	    if (!SvOK(*sv) && SvTYPE(*sv) != SVt_PVGV) \{
 		/* Nothing was here before, so mark a prototype of ""  */
 		sv_setpvn(*sv, "", 0);
-	    } else if (SvPOK(*sv) && SvCUR(*sv) == 0) {
+	    \} else if (SvPOK(*sv) && SvCUR(*sv) == 0) \{
 		/* There is already a prototype of "" - do nothing  */
-	    } else {
+	    \} else \{
 		/* Someone has been here before us - have to make a real
 		   typeglob.  */
 		/* It turns out to be incredibly hard to deal with all the
@@ -404,7 +404,7 @@ EXPLODE
 		CvCONST_off(cv);
 		CvXSUB(cv) = NULL;
 		CvXSUBANY(cv).any_ptr = NULL;
-	    }
+	    \}
 #ifndef SYMBIAN
 	    if (!hv_store(${c_subname}_missing, value_for_notfound->name,
 			  value_for_notfound->namelen, &PL_sv_yes, 0))
@@ -416,7 +416,7 @@ DONT
     print $xs_fh <<"EOBOOT";
 
 	    ++value_for_notfound;
-	}
+	\}
 EOBOOT
 
     foreach my $item (@$trouble) {
@@ -436,7 +436,7 @@ EOBOOT
 	die "Can't find generator code for type $type"
 	    unless defined $generator;
 
-	print $xs_fh "        {\n";
+	print $xs_fh "        \{\n";
 	# We need to use a temporary value because some really troublesome
 	# items use C pre processor directives in their values, and in turn
 	# these don't fit nicely in the macro-ised generator functions
@@ -458,7 +458,7 @@ EOBOOT
 				    $namelen, %s);
 EOBOOT
 	print $xs_fh "        $item->{post}\n" if $item->{post};
-	print $xs_fh "        }\n";
+	print $xs_fh "        \}\n";
 
         print $xs_fh $self->macro_to_endif($macro);
     }
@@ -467,7 +467,7 @@ EOBOOT
     /* As we've been creating subroutines, we better invalidate any cached
        methods  */
     ++PL_sub_generation;
-  }
+  \}
 EOBOOT
 
     print $xs_fh $explosives ? <<"EXPLODE" : <<"DONT";
@@ -494,13 +494,13 @@ $xs_subname(sv)
 	sv = newSVpvf("%"SVf" is not a valid $package_sprintf_safe macro", sv);
 #else
 	HV *${c_subname}_missing = get_missing_hash(aTHX);
-	if (hv_exists(${c_subname}_missing, s, (I32)len)) {
+	if (hv_exists(${c_subname}_missing, s, (I32)len)) \{
 	    sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro %" SVf
 			  ", used", sv);
-	} else {
+	\} else \{
 	    sv = newSVpvf("%"SVf" is not a valid $package_sprintf_safe macro",
 			  sv);
-	}
+	\}
 #endif
 	PUSHs(sv_2mortal(sv));
 DONT

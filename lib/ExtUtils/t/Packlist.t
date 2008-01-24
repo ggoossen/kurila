@@ -114,7 +114,7 @@ SKIP: {
 	is( $@, '', 'write() should normally succeed' );
 	is( $pl->{packfile}, 'eplist', 'write() should set packfile name' );
 
-	$file_is_ready = open(IN, 'eplist');
+	$file_is_ready = open(IN, "<", 'eplist');
 }
 
 

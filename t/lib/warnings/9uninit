@@ -639,7 +639,7 @@ $foo =~ s/y/z/;
 $foo =~ s/$m1/z/;
 $foo =~ s//$g1/;
 $foo =~ s/$m1/$g1/;
-$foo =~ s/./$m1/e;
+$foo =~ s/./{$m1}/;
 EXPECT
 Use of uninitialized value $_ in pattern match (m//) at - line 5.
 Use of uninitialized value $m1 in regexp compilation at - line 6.
@@ -752,29 +752,17 @@ our ($g1);
 
 $v = "$m1";
 
-$v = $m1 lt $g1;
-$v = $m1 le $g1;
-$v = $m1 gt $g1;
-$v = $m1 ge $g1;
 $v = $m1 eq $g1;
 $v = $m1 ne $g1;
 $v = $m1 cmp $g1;
 EXPECT
 Use of uninitialized value $m1 in string at - line 5.
-Use of uninitialized value $m1 in string lt at - line 7.
-Use of uninitialized value $g1 in string lt at - line 7.
-Use of uninitialized value $m1 in string le at - line 8.
-Use of uninitialized value $g1 in string le at - line 8.
-Use of uninitialized value $m1 in string gt at - line 9.
-Use of uninitialized value $g1 in string gt at - line 9.
-Use of uninitialized value $m1 in string ge at - line 10.
-Use of uninitialized value $g1 in string ge at - line 10.
-Use of uninitialized value $m1 in string eq at - line 11.
-Use of uninitialized value $g1 in string eq at - line 11.
-Use of uninitialized value $m1 in string ne at - line 12.
-Use of uninitialized value $g1 in string ne at - line 12.
-Use of uninitialized value $m1 in string comparison (cmp) at - line 13.
-Use of uninitialized value $g1 in string comparison (cmp) at - line 13.
+Use of uninitialized value $m1 in string eq at - line 7.
+Use of uninitialized value $g1 in string eq at - line 7.
+Use of uninitialized value $m1 in string ne at - line 8.
+Use of uninitialized value $g1 in string ne at - line 8.
+Use of uninitialized value $m1 in string comparison (cmp) at - line 9.
+Use of uninitialized value $g1 in string comparison (cmp) at - line 9.
 ########
 use warnings 'uninitialized';
 my ($m1, $v);

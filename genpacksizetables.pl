@@ -38,7 +38,7 @@ sub make_tables {
                       $unpredictable, $nocsum, $size, $condition);
     }
 
-    my $text = "STATIC const packprops_t packprops[512] = {\n";
+    my $text = "STATIC const packprops_t packprops[512] = \{\n";
     foreach my $arrayname (qw(normal shrieking)) {
         my $array = $arrays{$arrayname} ||
             die "No defined entries in $arrayname";
@@ -54,7 +54,7 @@ sub make_tables {
     $text =~ s/((?:\b0, ){15}0,) /$1\n    /g;
     # Clean up final ,
     $text =~ s/,$//;
-    $text .= "};";
+    $text .= "\};";
     return $text;
 }
 

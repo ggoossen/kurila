@@ -99,8 +99,8 @@ sub handler_traceback {
 	    s/([\'\\])/\\$1/g;
 	    s/([^\0]*)/'$1'/
 	      unless m/^(?: -?[\d.]+ | \*[\w:]* )$/x;
-	    s/([\200-\377])/sprintf("M-%c",ord($1)^&^0177)/eg;
-	    s/([\0-\37\177])/sprintf("^%c",ord($1)^^^64)/eg;
+	    s/([\200-\377])/{sprintf("M-%c",ord($1)^&^0177)}/g;
+	    s/([\0-\37\177])/{sprintf("^%c",ord($1)^^^64)}/g;
 	    push(@a, $_);
 	}
 	$w = $w ? '@ = ' : '$ = ';
@@ -112,7 +112,7 @@ sub handler_traceback {
 	} elsif (defined $r) {
 	    $s = "eval '$e'";
 	} elsif ($s eq '(eval)') {
-	    $s = "eval {...}";
+	    $s = "eval \{...\}";
 	}
 	$f = "file `$f'" unless $f eq '-e';
 	$mess = "$w$s$a called from $f line $l\n";

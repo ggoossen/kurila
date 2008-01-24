@@ -79,7 +79,7 @@ sub _validate {
                     $path =~ s/\.pm$//;
                     $path = File::Spec->catfile($path, "$schema_name.dd");
                     local *FH;
-                    open FH, $path or die "Could not open '$path': $!";
+                    open FH, "<", $path or die "Could not open '$path': $!";
                     local $/;
                     ~< *FH;
                 };
@@ -114,7 +114,7 @@ sub yaml {
         $path =~ s/\.pm$//;
         $path = File::Spec->catfile($path, "$schema_name.yml");
         local *FH;
-        open FH, $path or die "Could not open '$path': $!";
+        open FH, "<", $path or die "Could not open '$path': $!";
         local $/;
         ~< *FH;
     };

@@ -49,8 +49,8 @@ SKIP: {
     @fds = POSIX::pipe();
     ok( $fds[0] +> $testfd,      'POSIX::pipe' );
 
-    CORE::open($reader = \*READER, "<&=".$fds[0]);
-    CORE::open($writer = \*WRITER, ">&=".$fds[1]);
+    CORE::open($reader = \*READER, "<&=", $fds[0]);
+    CORE::open($writer = \*WRITER, ">&=", $fds[1]);
     print $writer "ok 6\n";
     close $writer;
     print ~< $reader;
@@ -92,7 +92,7 @@ SKIP: {
 	sleep 1;
 
 	$todo = 1 if ($^O eq 'freebsd')
-		  || ($^O eq 'darwin' && $Config{osvers} lt '6.6');
+		  || ($^O eq 'darwin' && $Config{osvers} +<= v6.6);
 	printf "%s 11 - masked SIGINT received %s\n",
 	    $sigint_called ? "ok" : "not ok",
 	    $todo ? $why_todo : '';

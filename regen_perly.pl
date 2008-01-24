@@ -79,7 +79,7 @@ EOF
 # creates $tmpc_file and $tmph_file
 my_system("$bison -d -o $tmpc_file $y_file");
 
-open CTMPFILE, $tmpc_file or die "Can't open $tmpc_file: $!\n";
+open CTMPFILE, "<", $tmpc_file or die "Can't open $tmpc_file: $!\n";
 my $clines;
 { local $/; $clines = ~< *CTMPFILE; }
 die "failed to read $tmpc_file: length mismatch\n"
@@ -91,13 +91,13 @@ my ($actlines, $tablines) = extract($clines);
 $tablines .= make_type_tab($y_file, $tablines);
 
 chmod 0644, $act_file;
-open ACTFILE, ">$act_file" or die "can't open $act_file: $!\n";
+open ACTFILE, ">", "$act_file" or die "can't open $act_file: $!\n";
 print ACTFILE $actlines;
 close ACTFILE;
 chmod 0444, $act_file;
 
 chmod 0644, $tab_file;
-open TABFILE, ">$tab_file" or die "can't open $tab_file: $!\n";
+open TABFILE, ">", "$tab_file" or die "can't open $tab_file: $!\n";
 print TABFILE $tablines;
 close TABFILE;
 chmod 0444, $tab_file;
@@ -108,9 +108,9 @@ unlink $tmpc_file;
 # C<#line 30 "perly.y"> confuses the Win32 resource compiler and the
 # C<#line 188 "perlytmp.h"> gets picked up by make depend, so remove them.
 
-open TMPH_FILE, $tmph_file or die "Can't open $tmph_file: $!\n";
+open TMPH_FILE, "<", $tmph_file or die "Can't open $tmph_file: $!\n";
 chmod 0644, $h_file;
-open H_FILE, ">$h_file" or die "Can't open $h_file: $!\n";
+open H_FILE, ">", "$h_file" or die "Can't open $h_file: $!\n";
 my $endcore_done = 0;
 while ( ~< *TMPH_FILE) {
     print H_FILE "#ifdef PERL_CORE\n" if $. == 1;
@@ -251,20 +251,20 @@ sub make_type_tab {
 	or die "Can't extract yytname[] from table string\n";
     my $fields = $1;
     $fields =~ s{"([^"]+)"}
-		{ "toketype_" .
+		{{ "toketype_" .
 		    (defined $tokens{$1} ? $tokens{$1} : $default_token)
-		}ge;
+		}}g;
     $fields =~ s/, \s* 0 \s* $//x
 	or die "make_type_tab: couldn't delete trailing ',0'\n";
 
     return 
-	  "\ntypedef enum {\n\t"
+	  "\ntypedef enum \{\n\t"
 	. join(", ", map "toketype_$_", sort keys %types)
-	. "\n} toketypes;\n\n"
+	. "\n\} toketypes;\n\n"
 	. "/* type of each token/terminal */\n"
-	. "static const toketypes yy_type_tab[] =\n{\n"
+	. "static const toketypes yy_type_tab[] =\n\{\n"
 	. $fields
-	. "\n};\n";
+	. "\n\};\n";
 }
 
 

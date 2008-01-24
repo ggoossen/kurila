@@ -1710,7 +1710,7 @@ typedef UVTYPE UV;
  */
 #if (IVSIZE == PTRSIZE) && (UVSIZE == PTRSIZE)
 #  define PTRV			UV
-#  define INT2PTR(any,d)	(any)(d)
+#  define INT2PTR(any,d)	((any)(d))
 #else
 #  if PTRSIZE == LONGSIZE
 #    define PTRV		unsigned long
@@ -1721,7 +1721,7 @@ typedef UVTYPE UV;
 #endif
 
 #ifndef INT2PTR
-#  define INT2PTR(any,d)	(any)(PTRV)(d)
+#  define INT2PTR(any,d)	((any)(PTRV)(d))
 #endif
 
 #ifndef PTR2ul
@@ -4742,6 +4742,8 @@ END_EXTERN_C
 #undef PERLVARIC
 
 START_EXTERN_C
+
+#include "svx.h"
 
 /* PERL_GLOBAL_STRUCT_PRIVATE wants to keep global data like the
  * magic vtables const, but this is incompatible with SWIG which

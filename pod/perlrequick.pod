@@ -16,10 +16,10 @@ The simplest regex is simply a word, or more generally, a string of
 characters.  A regex consisting of a word matches any string that
 contains that word:
 
-    "Hello World" =~ /World/;  # matches
+    "Hello World" =~ m/World/;  # matches
 
-In this statement, C<World> is a regex and the C<//> enclosing
-C</World/> tells perl to search a string for a match.  The operator
+In this statement, C<World> is a regex and the C<m//> enclosing
+C<m/World/> tells perl to search a string for a match.  The operator
 C<=~> associates the string with the regex match and produces a true
 value if the regex matched, or false if the regex did not match.  In
 our case, C<World> matches the second word in C<"Hello World">, so the
@@ -27,24 +27,24 @@ expression is true.  This idea has several variations.
 
 Expressions like this are useful in conditionals:
 
-    print "It matches\n" if "Hello World" =~ /World/;
+    print "It matches\n" if "Hello World" =~ m/World/;
 
 The sense of the match can be reversed by using C<!~> operator:
 
-    print "It doesn't match\n" if "Hello World" !~ /World/;
+    print "It doesn't match\n" if "Hello World" !~ m/World/;
 
 The literal string in the regex can be replaced by a variable:
 
     $greeting = "World";
-    print "It matches\n" if "Hello World" =~ /$greeting/;
+    print "It matches\n" if "Hello World" =~ m/$greeting/;
 
 If you're matching against C<$_>, the C<$_ =~> part can be omitted:
 
     $_ = "Hello World";
-    print "It matches\n" if /World/;
+    print "It matches\n" if m/World/;
 
-Finally, the C<//> default delimiters for a match can be changed to
-arbitrary delimiters by putting an C<'m'> out front:
+Finally, the C<m//> default delimiters for a match can be changed to
+arbitrary delimiters:
 
     "Hello World" =~ m!World!;   # matches, delimited by '!'
     "Hello World" =~ m{World};   # matches, note the matching '{}'
@@ -54,14 +54,14 @@ arbitrary delimiters by putting an C<'m'> out front:
 Regexes must match a part of the string I<exactly> in order for the
 statement to be true:
 
-    "Hello World" =~ /world/;  # doesn't match, case sensitive
-    "Hello World" =~ /o W/;    # matches, ' ' is an ordinary char
-    "Hello World" =~ /World /; # doesn't match, no ' ' at end
+    "Hello World" =~ m/world/;  # doesn't match, case sensitive
+    "Hello World" =~ m/o W/;    # matches, ' ' is an ordinary char
+    "Hello World" =~ m/World /; # doesn't match, no ' ' at end
 
 perl will always match at the earliest possible point in the string:
 
-    "Hello World" =~ /o/;       # matches 'o' in 'Hello'
-    "That hat is red" =~ /hat/; # matches 'hat' in 'That'
+    "Hello World" =~ m/o/;       # matches 'o' in 'Hello'
+    "That hat is red" =~ m/hat/; # matches 'hat' in 'That'
 
 Not all characters can be used 'as is' in a match.  Some characters,
 called B<metacharacters>, are reserved for use in regex notation.
@@ -71,8 +71,8 @@ The metacharacters are
 
 A metacharacter can be matched by putting a backslash before it:
 
-    "2+2=4" =~ /2+2/;    # doesn't match, + is a metacharacter
-    "2+2=4" =~ /2\+2/;   # matches, \+ is treated like an ordinary +
+    "2+2=4" =~ m/2+2/;    # doesn't match, + is a metacharacter
+    "2+2=4" =~ m/2\+2/;   # matches, \+ is treated like an ordinary +
     'C:\WIN32' =~ m/C:\\WIN/;                       # matches
     "/usr/bin/perl" =~ m/\/usr\/bin\/perl/;  # matches
 
@@ -115,16 +115,16 @@ just a single character, to match at a particular point in a regex.
 Character classes are denoted by brackets C<[...]>, with the set of
 characters to be possibly matched inside.  Here are some examples:
 
-    /cat/;            # matches 'cat'
-    /[bcr]at/;        # matches 'bat', 'cat', or 'rat'
+    m/cat/;            # matches 'cat'
+    m/[bcr]at/;        # matches 'bat', 'cat', or 'rat'
     "abc" =~ m/[cab]/; # matches 'a'
 
 In the last statement, even though C<'c'> is the first character in
 the class, the earliest point at which the regex can match is C<'a'>.
 
-    /[yY][eE][sS]/; # match 'yes' in a case-insensitive way
+    m/[yY][eE][sS]/; # match 'yes' in a case-insensitive way
                     # 'yes', 'Yes', 'YES', etc.
-    /yes/i;         # also match 'yes' in a case-insensitive way
+    m/yes/i;         # also match 'yes' in a case-insensitive way
 
 The last example shows a match with an C<'i'> B<modifier>, which makes
 the match case-insensitive.
@@ -135,18 +135,18 @@ different than those outside a character class.  The special
 characters for a character class are C<-]\^$> and are matched using an
 escape:
 
-   /[\]c]def/; # matches ']def' or 'cdef'
+   m/[\]c]def/; # matches ']def' or 'cdef'
    $x = 'bcr';
-   /[$x]at/;   # matches 'bat, 'cat', or 'rat'
-   /[\$x]at/;  # matches '$at' or 'xat'
-   /[\\$x]at/; # matches '\at', 'bat, 'cat', or 'rat'
+   m/[$x]at/;   # matches 'bat, 'cat', or 'rat'
+   m/[\$x]at/;  # matches '$at' or 'xat'
+   m/[\\$x]at/; # matches '\at', 'bat, 'cat', or 'rat'
 
 The special character C<'-'> acts as a range operator within character
 classes, so that the unwieldy C<[0123456789]> and C<[abc...xyz]>
 become the svelte C<[0-9]> and C<[a-z]>:
 
-    /item[0-9]/;  # matches 'item0' or ... or 'item9'
-    /[0-9a-fA-F]/;  # matches a hexadecimal digit
+    m/item[0-9]/;  # matches 'item0' or ... or 'item9'
+    m/[0-9a-fA-F]/;  # matches a hexadecimal digit
 
 If C<'-'> is the first or last character in a character class, it is
 treated as an ordinary character.
@@ -156,10 +156,10 @@ denotes a B<negated character class>, which matches any character but
 those in the brackets.  Both C<[...]> and C<[^...]> must match a
 character, or the match fails.  Then
 
-    /[^a]at/;  # doesn't match 'aat' or 'at', but matches
+    m/[^a]at/;  # doesn't match 'aat' or 'at', but matches
                # all other 'bat', 'cat, '0at', '%at', etc.
-    /[^0-9]/;  # matches a non-numeric character
-    /[a^]at/;  # matches 'aat' or '^at'; here '^' is ordinary
+    m/[^0-9]/;  # matches a non-numeric character
+    m/[a^]at/;  # matches 'aat' or '^at'; here '^' is ordinary
 
 Perl has several abbreviations for common character classes:
 
@@ -210,13 +210,13 @@ The period '.' matches any character but "\n"
 The C<\d\s\w\D\S\W> abbreviations can be used both inside and outside
 of character classes.  Here are some in use:
 
-    /\d\d:\d\d:\d\d/; # matches a hh:mm:ss time format
-    /[\d\s]/;         # matches any digit or whitespace character
-    /\w\W\w/;         # matches a word char, followed by a
+    m/\d\d:\d\d:\d\d/; # matches a hh:mm:ss time format
+    m/[\d\s]/;         # matches any digit or whitespace character
+    m/\w\W\w/;         # matches a word char, followed by a
                       # non-word char, followed by a word char
-    /..rt/;           # matches any two chars, followed by 'rt'
-    /end\./;          # matches 'end.'
-    /end[.]/;         # same thing, matches 'end.'
+    m/..rt/;           # matches any two chars, followed by 'rt'
+    m/end\./;          # matches 'end.'
+    m/end[.]/;         # same thing, matches 'end.'
 
 The S<B<word anchor> > C<\b> matches a boundary between a word
 character and a non-word character C<\w\W> or C<\W\w>:
@@ -261,11 +261,11 @@ them in parentheses.  The regex C<house(cat|keeper)> means match
 C<house> followed by either C<cat> or C<keeper>.  Some more examples
 are
 
-    /(a|b)b/;    # matches 'ab' or 'bb'
-    /(^a|b)c/;   # matches 'ac' at start of string or 'bc' anywhere
+    m/(a|b)b/;    # matches 'ab' or 'bb'
+    m/(^a|b)c/;   # matches 'ac' at start of string or 'bc' anywhere
 
-    /house(cat|)/;  # matches either 'housecat' or 'house'
-    /house(cat(s|)|)/;  # matches either 'housecats' or 'housecat' or
+    m/house(cat|)/;  # matches either 'housecat' or 'house'
+    m/house(cat(s|)|)/;  # matches either 'housecats' or 'housecat' or
                         # 'house'.  Note groups can be nested.
 
     "20" =~ m/(19|20|)\d\d/;  # matches the null alternative '()\d\d',
@@ -284,7 +284,7 @@ They can be used just as ordinary variables:
     $minutes = $2;
     $seconds = $3;
 
-In list context, a match C</regex/> with groupings will return the
+In list context, a match C<m/regex/> with groupings will return the
 list of matched values C<($1,$2,...)>.  So we could rewrite it as
 
     ($hours, $minutes, $second) = ($time =~ m/(\d\d):(\d\d):(\d\d)/);
@@ -294,14 +294,14 @@ leftmost opening parenthesis, C<$2> the next opening parenthesis,
 etc.  For example, here is a complex regex and the matching variables
 indicated below it:
 
-    /(ab(cd|ef)((gi)|j))/;
+    m/(ab(cd|ef)((gi)|j))/;
      1  2      34
 
 Associated with the matching variables C<$1>, C<$2>, ... are
 the B<backreferences> C<\1>, C<\2>, ...  Backreferences are
 matching variables that can be used I<inside> a regex:
 
-    /(\w\w\w)\s\1/; # find sequences like 'the the' in string
+    m/(\w\w\w)\s\1/; # find sequences like 'the the' in string
 
 C<$1>, C<$2>, ... should only be used outside of a regex, and C<\1>,
 C<\2>, ... only inside a regex.
@@ -345,9 +345,9 @@ C<a{n}> = match exactly C<n> times
 
 Here are some examples:
 
-    /[a-z]+\s+\d*/;  # match a lowercase word, at least some space, and
+    m/[a-z]+\s+\d*/;  # match a lowercase word, at least some space, and
                      # any number of digits
-    /(\w+)\s+\1/;    # match doubled words of arbitrary length
+    m/(\w+)\s+\1/;    # match doubled words of arbitrary length
     $year =~ m/\d{2,4}/;  # make sure year is at least 2 but not more
                          # than 4 digits
     $year =~ m/\d{4}|\d{2}/;    # better match; throw out 3 digit dates
@@ -372,17 +372,12 @@ operators.  In the code
 
     $pattern = 'Seuss';
     while (<>) {
-        print if /$pattern/;
+        print if m/$pattern/;
     }
 
 perl has to re-evaluate C<$pattern> each time through the loop.  If
-C<$pattern> won't be changing, use the C<//o> modifier, to only
-perform variable substitutions once.  If you don't want any
-substitutions at all, use the special delimiter C<m''>:
-
-    @pattern = ('Seuss');
-    m/@pattern/; # matches 'Seuss'
-    m'@pattern'; # matches the literal string '@pattern'
+C<$pattern> won't be changing, use the C<m//o> modifier, to only
+perform variable substitutions once. 
 
 The global modifier C<//g> allows the matching operator to match
 within a string as many times as possible.  In scalar context,
@@ -440,43 +435,40 @@ of the regex in the string:
     $x = "I batted 4 for 4";
     $x =~ s/4/four/g;  # $x contains "I batted four for four"
 
-The evaluation modifier C<s///e> wraps an C<eval{...}> around the
-replacement string and the evaluated result is substituted for the
-matched substring.  Some examples:
+In the replacement expression C<{...}> can be used to evaluate code.
+Some examples:
 
     # reverse all the words in a string
     $x = "the cat in the hat";
-    $x =~ s/(\w+)/reverse $1/ge;   # $x contains "eht tac ni eht tah"
+    $x =~ s/(\w+)/{ reverse $1 }/g;   # $x contains "eht tac ni eht tah"
 
     # convert percentage to decimal
     $x = "A 39% hit rate";
-    $x =~ s!(\d+)%!$1/100!e;       # $x contains "A 0.39 hit rate"
+    $x =~ s!(\d+)%!{ $1/100 }!;       # $x contains "A 0.39 hit rate"
 
 The last example shows that C<s///> can use other delimiters, such as
-C<s!!!> and C<s{}{}>, and even C<s{}//>.  If single quotes are used
-C<s'''>, then the regex and replacement are treated as single quoted
-strings.
+C<s!!!> and C<s{}{}>, and even C<s{}//>..
 
 =head2 The split operator
 
-C<split /regex/, string> splits C<string> into a list of substrings
+C<split m/regex/, string> splits C<string> into a list of substrings
 and returns that list.  The regex determines the character sequence
 that C<string> is split with respect to.  For example, to split a
 string into words, use
 
     $x = "Calvin and Hobbes";
-    @word = split /\s+/, $x;  # $word[0] = 'Calvin'
+    @word = split m/\s+/, $x;  # $word[0] = 'Calvin'
                               # $word[1] = 'and'
                               # $word[2] = 'Hobbes'
 
 To extract a comma-delimited list of numbers, use
 
     $x = "1.618,2.718,   3.142";
-    @const = split /,\s*/, $x;  # $const[0] = '1.618'
+    @const = split m/,\s*/, $x;  # $const[0] = '1.618'
                                 # $const[1] = '2.718'
                                 # $const[2] = '3.142'
 
-If the empty regex C<//> is used, the string is split into individual
+If the empty regex C<m//> is used, the string is split into individual
 characters.  If the regex has groupings, then the list produced contains
 the matched substrings from the groupings as well:
 

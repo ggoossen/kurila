@@ -159,7 +159,7 @@ package DB_File ;
 
 use warnings;
 use strict;
-our ($VERSION, @ISA, @EXPORT, $AUTOLOAD, $DB_BTREE, $DB_HASH, $DB_RECNO);
+our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO);
 our ($db_version, $use_XSLoader, $splice_end_array, $Error);
 use Carp;
 
@@ -265,7 +265,7 @@ sub tie_hash_or_array
 
     if ($db_version +> 1 and defined $arg[4] and $arg[4] =~ m/RECNO/ and 
 	$arg[1] and ! -e $arg[1]) {
-	open(FH, ">$arg[1]") or return undef ;
+	open(FH, ">", "$arg[1]") or return undef ;
 	close FH ;
 	chmod $arg[3] ? $arg[3] : 0666 , $arg[1] ;
     }

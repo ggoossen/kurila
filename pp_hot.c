@@ -784,8 +784,6 @@ PP(pp_rv2av)
 {
     dVAR; dSP; dTOPss;
     const I32 gimme = GIMME_V;
-    static const char return_array_to_lvalue_scalar[] = "Can't return array to lvalue scalar context";
-    static const char return_hash_to_lvalue_scalar[] = "Can't return hash to lvalue scalar context";
     static const char an_array[] = "an ARRAY";
     static const char a_hash[] = "a HASH";
     const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
@@ -802,13 +800,6 @@ PP(pp_rv2av)
 	    SETs(sv);
 	    RETURN;
 	}
-	else if (LVRET) {
-	    if (gimme != G_ARRAY)
-		Perl_croak(aTHX_ is_pp_rv2av ? return_array_to_lvalue_scalar
-			   : return_hash_to_lvalue_scalar);
-	    SETs(sv);
-	    RETURN;
-	}
 	else if (PL_op->op_flags & OPf_MOD
 		&& PL_op->op_private & OPpLVAL_INTRO)
 	    Perl_croak(aTHX_ PL_no_localize_ref);
@@ -816,14 +807,6 @@ PP(pp_rv2av)
     else {
 	if (SvTYPE(sv) == type) {
 	    if (PL_op->op_flags & OPf_REF) {
-		SETs(sv);
-		RETURN;
-	    }
-	    else if (LVRET) {
-		if (gimme != G_ARRAY)
-		    Perl_croak(aTHX_
-			       is_pp_rv2av ? return_array_to_lvalue_scalar
-			       : return_hash_to_lvalue_scalar);
 		SETs(sv);
 		RETURN;
 	    }
@@ -848,14 +831,6 @@ PP(pp_rv2av)
 	    if (PL_op->op_private & OPpLVAL_INTRO)
 		sv = is_pp_rv2av ? (SV*)save_ary(gv) : (SV*)save_hash(gv);
 	    if (PL_op->op_flags & OPf_REF) {
-		SETs(sv);
-		RETURN;
-	    }
-	    else if (LVRET) {
-		if (gimme != G_ARRAY)
-		    Perl_croak(aTHX_
-			       is_pp_rv2av ? return_array_to_lvalue_scalar
-			       : return_hash_to_lvalue_scalar);
 		SETs(sv);
 		RETURN;
 	    }
@@ -1490,7 +1465,7 @@ Perl_do_readline(pTHX)
 		    IoLINES(io) = 0;
 		    if (av_len(GvAVn(PL_last_in_gv)) < 0) {
 			IoFLAGS(io) &= ~IOf_START;
-			do_open(PL_last_in_gv,"-",1,FALSE,O_RDONLY,0,NULL);
+			do_openn(PL_last_in_gv,"-",1,FALSE,O_RDONLY,0,NULL,NULL,0);
 			sv_setpvn(GvSVn(PL_last_in_gv), "-", 1);
 			SvSETMAGIC(GvSV(PL_last_in_gv));
 			fp = IoIFP(io);
@@ -1690,7 +1665,7 @@ PP(pp_helem)
     SV **svp;
     SV * const keysv = POPs;
     HV * const hv = (HV*)POPs;
-    const U32 lval = PL_op->op_flags & OPf_MOD || LVRET;
+    const U32 lval = PL_op->op_flags & OPf_MOD;
     const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
     SV *sv;
     const U32 hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
@@ -2399,92 +2374,19 @@ PP(pp_leavesublv)
 	if (gimme == G_SCALAR)
 	    goto temporise;
 	if (gimme == G_ARRAY) {
-	    if (!CvLVALUE(cx->blk_sub.cv))
-		goto temporise_array;
-	    EXTEND_MORTAL(SP - newsp);
-	    for (mark = newsp + 1; mark <= SP; mark++) {
-		if (SvTEMP(*mark))
-		    NOOP;
-		else if (SvFLAGS(*mark) & (SVs_PADTMP | SVf_READONLY))
-		    *mark = sv_mortalcopy(*mark);
-		else {
-		    /* Can be a localized value subject to deletion. */
-		    PL_tmps_stack[++PL_tmps_ix] = *mark;
-		    SvREFCNT_inc_void(*mark);
-		}
-	    }
+	    goto temporise_array;
 	}
     }
     else if (cx->blk_sub.lval) {     /* Leave it as it is if we can. */
 	/* Here we go for robustness, not for speed, so we change all
 	 * the refcounts so the caller gets a live guy. Cannot set
 	 * TEMP, so sv_2mortal is out of question. */
-	if (!CvLVALUE(cx->blk_sub.cv)) {
-	    LEAVE;
-	    cxstack_ix--;
-	    POPSUB(cx,sv);
-	    PL_curpm = newpm;
-	    LEAVESUB(sv);
-	    DIE(aTHX_ "Can't modify non-lvalue subroutine call");
-	}
-	if (gimme == G_SCALAR) {
-	    MARK = newsp + 1;
-	    EXTEND_MORTAL(1);
-	    if (MARK == SP) {
-		/* Temporaries are bad unless they happen to be elements
-		 * of a tied hash or array or it is an lvalue */
-		if (SvFLAGS(TOPs) & (SVs_TEMP | SVs_PADTMP | SVf_READONLY) &&
-		    !(SvRMAGICAL(TOPs) && mg_find(TOPs, PERL_MAGIC_tiedelem)) &&
-		    !(SvTYPE(TOPs) == SVt_PVLV)) {
-		    LEAVE;
-		    cxstack_ix--;
-		    POPSUB(cx,sv);
-		    PL_curpm = newpm;
-		    LEAVESUB(sv);
-		    DIE(aTHX_ "Can't return %s from lvalue subroutine",
-			SvREADONLY(TOPs) ? (TOPs == &PL_sv_undef) ? "undef"
-			: "a readonly value" : "a temporary");
-		}
-		else {                  /* Can be a localized value
-					 * subject to deletion. */
-		    PL_tmps_stack[++PL_tmps_ix] = *mark;
-		    SvREFCNT_inc_void(*mark);
-		}
-	    }
-	    else {			/* Should not happen? */
-		LEAVE;
-		cxstack_ix--;
-		POPSUB(cx,sv);
-		PL_curpm = newpm;
-		LEAVESUB(sv);
-		DIE(aTHX_ "%s returned from lvalue subroutine in scalar context",
-		    (MARK > SP ? "Empty array" : "Array"));
-	    }
-	    SP = MARK;
-	}
-	else if (gimme == G_ARRAY) {
-	    EXTEND_MORTAL(SP - newsp);
-	    for (mark = newsp + 1; mark <= SP; mark++) {
-		if (*mark != &PL_sv_undef
-		    && (SvFLAGS(*mark) & (SVs_TEMP | SVs_PADTMP | SVf_READONLY))
-		    && !(SvTYPE(*mark) == SVt_PVLV)) {
-		    /* Might be flattened array after $#array =  */
-		    PUTBACK;
-		    LEAVE;
-		    cxstack_ix--;
-		    POPSUB(cx,sv);
-		    PL_curpm = newpm;
-		    LEAVESUB(sv);
-		    DIE(aTHX_ "Can't return a %s from lvalue subroutine",
-			SvREADONLY(TOPs) ? "readonly value" : "temporary");
-		}
-		else {
-		    /* Can be a localized value subject to deletion. */
-		    PL_tmps_stack[++PL_tmps_ix] = *mark;
-		    SvREFCNT_inc_void(*mark);
-		}
-	    }
-	}
+	LEAVE;
+	cxstack_ix--;
+	POPSUB(cx,sv);
+	PL_curpm = newpm;
+	LEAVESUB(sv);
+	DIE(aTHX_ "Can't modify non-lvalue subroutine call");
     }
     else {
 	if (gimme == G_SCALAR) {
@@ -2609,7 +2511,6 @@ PP(pp_entersub)
 
   retry:
     if (!CvROOT(cv) && !CvXSUB(cv)) {
-	GV* autogv;
 	SV* sub_name;
 
 	/* anonymous or undef'd function leaves us no recourse */
@@ -2777,7 +2678,7 @@ PP(pp_aelem)
     SV* const elemsv = POPs;
     IV elem = SvIV(elemsv);
     AV* const av = (AV*)POPs;
-    const U32 lval = PL_op->op_flags & OPf_MOD || LVRET;
+    const U32 lval = PL_op->op_flags & OPf_MOD;
     const U32 defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
     SV *sv;
 

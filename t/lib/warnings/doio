@@ -60,37 +60,29 @@
 __END__
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
-open(F, '|'."$^X -e 1|");
+open(F, '|-|', "$^X -e 1");
 close(F);
 no warnings 'io' ;
-open(G, '|'."$^X -e 1|");
+open(G, '|-|', "$^X -e 1");
 close(G);
 EXPECT
 Can't open bidirectional pipe at - line 3.
 ########
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
-open(F, "|      ");
+open(F, "|-", "");
 no warnings 'io' ;
-open(G, "|      ");
+open(G, "|-", "");
 EXPECT
 Missing command in piped open at - line 3.
 ########
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
-open(F, "      |");
+open(F, "-|", "");
 no warnings 'io' ;
-open(G, "      |");
+open(G, "-|", "");
 EXPECT
 Missing command in piped open at - line 3.
-########
-# doio.c [Perl_do_open9]
-use warnings 'io' ;
-open(F, "<true\ncd");
-no warnings 'io' ;
-open(G, "<true\ncd");
-EXPECT
-Unsuccessful open on filename containing newline at - line 3.
 ########
 # doio.c [Perl_do_close] <<TODO
 use warnings 'unopened' ;
@@ -160,7 +152,7 @@ Unsuccessful stat on filename containing newline at - line 4.
 use warnings 'io';
 -l STDIN;
 -l $fh;
-open $fh, $0 or die "# $!";
+open $fh, "<", $0 or die "# $!";
 -l $fh;
 no warnings 'io';
 -l STDIN;
@@ -289,9 +281,9 @@ EOM
 }
 use warnings 'io' ;
 close STDOUT;
-open FH1, "harness"; close FH1;
+open FH1, "<", "harness"; close FH1;
 no warnings 'io' ;
-open FH2, "harness"; close FH2;
+open FH2, "<", "harness"; close FH2;
 EXPECT
 Filehandle STDOUT reopened as FH1 only for input at - line 14.
 ########
@@ -308,9 +300,9 @@ EOM
 }
 use warnings 'io' ;
 close STDIN;
-open my $fh1, ">doiowarn.tmp"; close $fh1;
+open my $fh1, ">", "doiowarn.tmp"; close $fh1;
 no warnings 'io' ;
-open my $fh2, ">doiowarn.tmp"; close $fh2;
+open my $fh2, ">", "doiowarn.tmp"; close $fh2;
 unlink "doiowarn.tmp";
 EXPECT
 Filehandle STDIN reopened as $fh1 only for output at - line 14.

@@ -123,7 +123,7 @@ Pops a long off the stack.
 #define RETURNX(x)	return (x, PUTBACK, NORMAL)
 
 #define POPs		(*sp--)
-#define POPp		(SvPVx(POPs, PL_na))		/* deprecated */
+#define POPp		(SvPVx(POPs, &PL_na))		/* deprecated */
 #define POPpx		(SvPVx_nolen(POPs))
 #define POPpconstx	(SvPVx_nolen_const(POPs))
 #define POPn		(SvNVx(POPs))
@@ -489,13 +489,6 @@ and C<PUSHu>.
     SvRV_set(rv, AMG_CALLun(rv,copy));	\
     SvREFCNT_dec(tmpRef);                   \
   } } STMT_END
-
-/*
-=for apidoc mU||LVRET
-True if this op will be the return value of an lvalue subroutine
-
-=cut */
-#define LVRET ((PL_op->op_private & OPpMAYBE_LVSUB) && is_lvalue_sub())
 
 /*
  * Local variables:

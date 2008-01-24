@@ -245,7 +245,7 @@ DEBUG_INFO
 
 	  $code .= <<"END_MARK_ONE";
 
-BEGIN { \$SIG{__WARN__} = sub { 
+BEGIN \{ \$SIG\{__WARN__\} = sub \{ 
     my \$msg = \$_[0];
 END_MARK_ONE
 
@@ -256,17 +256,17 @@ END_MARK_TWO
 
 	  $code .= <<"END_MARK_THREE";		# Backwhack a lot!
     print "not ok: got unexpected warning \$msg\\n";
-} }
+\} \}
 
-{
+\{
     my \$test = $test;
-    sub test (&) {
-      my \$ok = &{\$_[0]};
+    sub test (&) \{
+      my \$ok = &\{\$_[0]\};
       print \$ok ? "ok \$test\n" : "not ok \$test\n";
       printf "# Failed at line %d\n", (caller)[2] unless \$ok;
       \$test++;
-    }
-}
+    \}
+\}
 
 # some of the variables which the closure will access
 no strict 'vars';
@@ -306,12 +306,12 @@ END
 	    $code .= "
       my \$foreach = 12000;
       my \@list = (10000, 10010);
-      foreach \$foreach (\@list) {
+      foreach \$foreach (\@list) \{
     " # }
 	  } elsif ($within eq 'naked') {
-	    $code .= "  { # naked block\n"	# }
+	    $code .= "  \{ # naked block\n"	# }
 	  } elsif ($within eq 'other_sub') {
-	    $code .= "  sub inner_sub {\n"	# }
+	    $code .= "  sub inner_sub \{\n"	# }
 	  } else {
 	    die "What was $within?"
 	  }
@@ -368,13 +368,13 @@ END
 	  } # End of foreach $inner_sub_test
 
 	  # Close up $within block		# {
-	  $code .= "  }\n\n";
+	  $code .= "  \}\n\n";
 
 	  # Close up $where_declared block
 	  if ($where_declared eq 'in_named') {	# {
-	    $code .= "}\n\n";
+	    $code .= "\}\n\n";
 	  } elsif ($where_declared eq 'in_anon') {	# {
-	    $code .= "};\n\n";
+	    $code .= "\};\n\n";
 	  }
 
 	  # We may need to do something with the sub we just made...
@@ -422,9 +422,9 @@ END
 
 	    # Here's the test:
 	    if ($inner_type eq 'anon') {
-	      $code .= "test { &\$anon_$test == $expected };\n"
+	      $code .= "test \{ &\$anon_$test == $expected \};\n"
 	    } else {
-	      $code .= "test { &named_$test == $expected };\n"
+	      $code .= "test \{ &named_$test == $expected \};\n"
 	    }
 	    $test++;
 	  }
@@ -435,14 +435,14 @@ END
 	    $| = 1; print ""; $| = 0; # flush output before forking
 	    pipe READ, 'WRITE' or die "Can't make pipe: $!";
 	    pipe READ2, 'WRITE2' or die "Can't make second pipe: $!";
-	    die "Can't fork: $!" unless defined($pid = open PERL, "|-");
+	    die "Can't fork: $!" unless defined($pid = open PERL, "|-", '-');
 	    unless ($pid) {
 	      # Child process here. We're going to send errors back
 	      # through the extra pipe.
 	      close READ;
 	      close READ2;
-	      open STDOUT, ">&WRITE"  or die "Can't redirect STDOUT: $!";
-	      open STDERR, ">&WRITE2" or die "Can't redirect STDERR: $!";
+	      open STDOUT, ">&", \*WRITE  or die "Can't redirect STDOUT: $!";
+	      open STDERR, ">&", \*WRITE2 or die "Can't redirect STDERR: $!";
 	      exec which_perl(), '-w', '-MTestInit', '-'
 		or die "Can't exec perl: $!";
 	    } else {
@@ -462,28 +462,28 @@ END
 	    my $cmdfile = "tcmd$$";  $cmdfile++ while -e $cmdfile;
 	    my $errfile = "terr$$";  $errfile++ while -e $errfile;
 	    my @tmpfiles = ($cmdfile, $errfile);
-	    open CMD, ">$cmdfile"; print CMD $code; close CMD;
+	    open CMD, ">", "$cmdfile"; print CMD $code; close CMD;
 	    my $cmd = which_perl();
 	    $cmd .= " -w $cmdfile 2>$errfile";
 	    if ($^O eq 'VMS' or $^O eq 'MSWin32' or $^O eq 'NetWare') {
 	      # Use pipe instead of system so we don't inherit STD* from
 	      # this process, and then foul our pipe back to parent by
 	      # redirecting output in the child.
-	      open PERL,"$cmd |" or die "Can't open pipe: $!\n";
+	      open PERL, "-", "$cmd" or die "Can't open pipe: $!\n";
 	      { local $/; $output = join '', ~< *PERL }
 	      close PERL;
 	    } else {
 	      my $outfile = "tout$$";  $outfile++ while -e $outfile;
 	      push @tmpfiles, $outfile;
 	      system "$cmd >$outfile";
-	      { local $/; open IN, $outfile; $output = ~< *IN; close IN }
+	      { local $/; open IN, "<", $outfile; $output = ~< *IN; close IN }
 	    }
 	    if ($?) {
 	      printf "not ok: exited with error code %04X\n", $?;
 	      $debugging or do { 1 while unlink @tmpfiles };
 	      exit;
 	    }
-	    { local $/; open IN, $errfile; $errors = ~< *IN; close IN }
+	    { local $/; open IN, "<", $errfile; $errors = ~< *IN; close IN }
 	    1 while unlink @tmpfiles;
 	  }
 	  print $output;
@@ -551,7 +551,7 @@ test {1};
 # can lead to stack corruption
 {
     my $x = "foooobar";
-    $x =~ s/o//eg;
+    $x =~ s/o/{''}/g;
     test { $x eq 'fbar' }
 }
 
@@ -644,7 +644,7 @@ f16302();
    # and its children
 
     my $progfile = "b23265.pl";
-    open(T, ">$progfile") or die "$0: $!\n";
+    open(T, ">", "$progfile") or die "$0: $!\n";
     print T << '__EOF__';
         print
             sub {$_[0]->(@_)} -> (

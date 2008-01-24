@@ -22,7 +22,7 @@ $VERSION = '0.000_02';
 
 
 our ($noPreBS, $metachars, $matchMetaRE, %mapping, %wildCount);
-$noPreBS = '(?<!\\\)' ; # no preceeding backslash
+$noPreBS = '(?<!\\)' ; # no preceeding backslash
 $metachars = '.*?[](){}';
 $matchMetaRE = '[' . quotemeta($metachars) . ']';
 
@@ -170,7 +170,7 @@ sub _parseBit
         }
         elsif ($2 eq '{' || $2 eq '}')
         {
-            return _retError "Nested {} not allowed" ;
+            return _retError "Nested \{\} not allowed" ;
         }
     }
 
@@ -229,7 +229,7 @@ sub _parseInputGlob
         }
         elsif ($2 eq '}')
         {
-            return _unmatched "}" ;
+            return _unmatched "\}" ;
         }
         elsif ($2 eq '{')
         {
@@ -239,7 +239,7 @@ sub _parseInputGlob
             my $tmp ;
             unless ( $string =~ s/(.*?)$noPreBS\}//)
             {
-                return _unmatched "{";
+                return _unmatched "\{";
             }
             #$string =~ s#(.*?)\}##;
 
@@ -285,11 +285,11 @@ sub _parseOutputGlob
                   [^/]        # a non-slash character
                         *     # repeated 0 or more times (0 means me)
               )
-            }{
+            }{{
               $1
                   ? (getpwnam($1))[7]
                   : ( $ENV{HOME} || $ENV{LOGDIR} )
-            }ex;
+            }}x;
 
     }
 
@@ -300,12 +300,12 @@ sub _parseOutputGlob
             if $1 +> $maxwild ;
     }
 
-    my $noPreBS = '(?<!\\\)' ; # no preceeding backslash
+    my $noPreBS = '(?<!\\)' ; # no preceeding backslash
     #warn "noPreBS = '$noPreBS'\n";
 
     #$string =~ s/${noPreBS}\$(\d)/\${$1}/g;
-    $string =~ s/${noPreBS}#(\d)/\${$1}/g;
-    $string =~ s#${noPreBS}\*#\${inFile}#g;
+    $string =~ s/${noPreBS}#(\d)/\$\{$1\}/g;
+    $string =~ s#${noPreBS}\*#\$\{inFile\}#g;
     $string = '"' . $string . '"';
 
     #print "OUTPUT '$self->{OutputGlob}' => '$string'\n";

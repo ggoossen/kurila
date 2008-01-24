@@ -199,8 +199,8 @@ SKIP: {
     {
 	use open(IN => ":crlf", OUT => ":encoding(cp1252)");
 
-	open F, "<afile";
-	open G, ">afile";
+	open F, "<", "afile";
+	open G, ">", "afile";
 
 	check([ PerlIO::get_layers('F', input  => 1) ],
 	      [ qw(stdio crlf) ],

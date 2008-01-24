@@ -30,7 +30,7 @@ for (@prgs){
        $switch = $1;
     }
     my($prog,$expected) = split(m/\nEXPECT\n/, $_);
-    open TEST, ">$tmpfile";
+    open TEST, ">", "$tmpfile";
     print TEST "$prog\n";
     close TEST or die "Could not close: $!";
     my $results = $Is_VMS ?
@@ -121,7 +121,7 @@ eval('die("test\n")');
  
 package main;
  
-open FH, ">&STDOUT";
+open FH, ">&", \*STDOUT;
 tie *FH, 'TEST';
 print FH "OK\n";
 print STDERR "DONE\n";
@@ -399,7 +399,7 @@ sub PRINT {
     eval('die("test\n")');
     warn "[TIE] $_[1]";
 }
-open OLDERR, '>&STDERR';
+open OLDERR, '>&', \*STDERR;
 tie *STDERR, '';
 
 use warnings FATAL => qw(uninitialized);

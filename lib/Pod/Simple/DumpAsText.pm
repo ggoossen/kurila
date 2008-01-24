@@ -73,7 +73,7 @@ sub _handle_element_end {
 sub _perly_escape {
   foreach my $x (@_) {
     # Escape things very cautiously:
-    $x =~ s/([^-\n\t \&\<\>\'!\#\%\(\)\*\+,\.\/\:\;=\?\~\[\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/sprintf'\x{%X}',ord($1)/eg;
+    $x =~ s/([^-\n\t \&\<\>\'!\#\%\(\)\*\+,\.\/\:\;=\?\~\[\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/{sprintf'\x{%X}',ord($1)}/g;
   }
   return;
 }

@@ -137,7 +137,7 @@ my %EXTCFG;
 sub write_bld_inf {
     my ($base) = @_;
     print "\tbld.inf\n";
-    open( BLD_INF, ">bld.inf" ) or die "$0: bld.inf: $!\n";
+    open( BLD_INF, ">", "bld.inf" ) or die "$0: bld.inf: $!\n";
     print BLD_INF <<__EOF__;
 PRJ_MMPFILES
 $base.mmp
@@ -188,7 +188,7 @@ sub uniquefy_filenames {
 
 sub read_mmp {
     my ( $conf, $mmp ) = @_;
-    if ( -r $mmp && open( MMP, "<$mmp" ) ) {
+    if ( -r $mmp && open( MMP, "<", "$mmp" ) ) {
         print "\tReading $mmp...\n";
         while ( ~< *MMP) {
             chomp;
@@ -269,7 +269,7 @@ sub write_mmp {
     for my $u (qw(SOURCE SOURCEPATH SYSTEMINCLUDE USERINCLUDE LIBRARY MACRO)) {
         $CONF{$u} = uniquefy_filenames( $CONF{$u} );
     }
-    open( BASE_MMP, ">$base.mmp" ) or die "$0: $base.mmp: $!\n";
+    open( BASE_MMP, ">", "$base.mmp" ) or die "$0: $base.mmp: $!\n";
 
     print BASE_MMP <<__EOF__;
 TARGET		$CONF{TARGET}
@@ -310,7 +310,7 @@ sub write_makefile {
     my $wrap = $SYMBIAN_ROOT && defined $SDK_VARIANT eq 'S60' && $SDK_VERSION eq '1.2' && $SYMBIAN_ROOT !~ m/_CW$/;
     my $ABLD = $wrap ? 'perl b.pl' : 'abld';
 
-    open( MAKEFILE, ">Makefile" ) or die "$0: Makefile: $!\n";
+    open( MAKEFILE, ">", "Makefile" ) or die "$0: Makefile: $!\n";
     print MAKEFILE <<__EOF__;
 WIN = $WIN
 ARM = $ARM
@@ -382,7 +382,7 @@ distclean:	defrost realclean
 __EOF__
     close(MAKEFILE);
     if ($wrap) {
-	if(open(B,">b.pl")) {
+	if(open(B, ">","b.pl")) {
 	    print B <<'__EOF__';
 # abld.pl wrapper.
 
@@ -420,7 +420,7 @@ sub patch_config {
     return unless $CoreBuild;
     my $V = sprintf "%vd", $^V;
     # create reverse patch script
-    if (open(RSCRIPT, ">$config_restore_script")) {
+    if (open(RSCRIPT, ">", "$config_restore_script")) {
         print RSCRIPT <<__EOF__;
 #!perl -pi.bak
 s:\\Q$V:$R_V_SV:
@@ -587,7 +587,7 @@ sub xsconfig {
         my @MM = qw(VERSION XS_VERSION);
         if ( -f "Makefile" ) {
             print "\tReading MakeMaker Makefile...\n";
-            if ( open( MAKEFILE, "Makefile" ) ) {
+            if ( open( MAKEFILE, "<", "Makefile" ) ) {
                 while ( ~< *MAKEFILE) {
                     for my $m (@MM) {
                         if (m!^$m = (.+)!) {
@@ -614,7 +614,7 @@ sub xsconfig {
         }
         (&restore_config and die "$0: VERSION or XS_VERSION undefined\n")
           unless defined $MM{VERSION} && defined $MM{XS_VERSION};
-        if ( open( BASE_C, ">$basec" ) ) {
+        if ( open( BASE_C, ">", "$basec" ) ) {
             print BASE_C <<__EOF__;
 #ifndef VERSION
 #define VERSION "$MM{VERSION}"
@@ -640,13 +640,13 @@ __EOF__
         }
 
         print "\t_init.c\n";
-        open( _INIT_C, ">_init.c" )
+        open( _INIT_C, ">", "_init.c" )
             or &restore_config and die "$!: _init.c: $!\n";
         print _INIT_C <<__EOF__;
     #include "EXTERN.h"
     #include "perl.h"
-    EXPORT_C void _init(void *handle) {
-    }
+    EXPORT_C void _init(void *handle) \{
+    \}
 __EOF__
         close(_INIT_C);
 
@@ -656,7 +656,7 @@ __EOF__
             for my $submf ( glob("*/Makefile") ) {
                 my $d = dirname($submf);
                 print "Configuring Encode::$d...\n";
-                if ( open( SUBMF, $submf ) ) {
+                if ( open( SUBMF, "<", $submf ) ) {
                     if ( update_dir($d) ) {
                         my @subsrc;
                         while ( ~< *SUBMF) {
@@ -712,7 +712,7 @@ __EOF__
     print "\t$lstname.lst\n";
     my $lstout =
       $CoreBuild ? "$BUILDROOT/symbian/$lstname.lst" : "$BUILDROOT/$lstname.lst";
-    if ( open( my $lst, ">$lstout" ) ) {
+    if ( open( my $lst, ">", "$lstout" ) ) {
         for my $f (@lst) { print $lst qq["$f"-"!:$lst{$f}"\n] }
         close($lst);
     }
@@ -778,7 +778,7 @@ for my $ext (@ARGV) {
       if $CoreBuild && $Build && !-f "lib\\Config.pm";
 
     if ($CoreBuild) {
-        open( my $cfg, "symbian/install.cfg" )
+        open( my $cfg, "<", "symbian/install.cfg" )
           or die "$0: symbian/install.cfg: $!\n";
         my $extdir = $dir;
         $extdir =~ s:^ext\\::;
@@ -855,7 +855,7 @@ for my $ext (@ARGV) {
         system_echo("make @TARGET") == 0 or die "$0: make #2 failed\n";
         unlink("$base.mmp.bak");
 
-        open( _INIT_C, ">_init.c" ) or die "$0: _init.c: $!\n";
+        open( _INIT_C, ">", "_init.c" ) or die "$0: _init.c: $!\n";
         print _INIT_C <<'__EOF__';
 #include "EXTERN.h"
 #include "perl.h"
@@ -876,7 +876,7 @@ __EOF__
         for my $f ("$SYMBIAN_ROOT\\Epoc32\\Build$CWD\\$base\\WINS\\perl$VERSION-$extdash.def",
 		   "..\\BMARM\\perl$VERSION-${extdash}u.def") {
 	    print "\t($f - ";
-	    if ( open( $def, $f ) ) {
+	    if ( open( $def, "<", $f ) ) {
 		print "OK)\n";
 	        $basef = $f;
 		last;

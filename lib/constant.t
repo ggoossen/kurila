@@ -16,7 +16,7 @@ END { print STDERR @warnings }
 
 
 use strict;
-use Test::More tests => 97;
+use Test::More tests => 96;
 my $TB = Test::More->builder;
 
 BEGIN { use_ok('constant'); }
@@ -72,12 +72,12 @@ is "d e f @{[ DEF ]} d e f", "d e f D E F d e f";
 
 use constant SINGLE	=> "'";
 use constant DOUBLE	=> '"';
-use constant BACK	=> '\\';
+use constant BACK	=> '\';
 my $tt = BACK . SINGLE . DOUBLE ;
-is $tt, q(\\'");
+is $tt, q(\'");
 
-use constant MESS	=> q('"'\\"'"\\);
-is MESS, q('"'\\"'"\\);
+use constant MESS	=> q('"'\"'"\);
+is MESS, q('"'\"'"\);
 is length(MESS), 8;
 
 use constant TRAILING	=> '12 cats';
@@ -208,7 +208,6 @@ my @Expected_Warnings =
    qr/^Constant name 'UNITCHECK' is a Perl keyword at/,
    qr/^Constant name 'END' is a Perl keyword at/,
    qr/^Constant name 'DESTROY' is a Perl keyword at/,
-   qr/^Constant name 'AUTOLOAD' is a Perl keyword at/,
    qr/^Constant name 'STDIN' is forced into package main:: a/,
    qr/^Constant name 'STDOUT' is forced into package main:: at/,
    qr/^Constant name 'STDERR' is forced into package main:: at/,
@@ -220,20 +219,14 @@ my @Expected_Warnings =
 );
 
 # when run under "make test"
-if (@warnings == 16) {
+if (0+@warnings == 0+@Expected_Warnings) {
     push @warnings, "";
     push @Expected_Warnings, qr/^$/;
 }
 # when run directly: perl -wT -Ilib t/constant.t
-elsif (@warnings == 17) {
+elsif (@warnings == @Expected_Warnings + 1) {
     splice @Expected_Warnings, 1, 0, 
         qr/^Prototype mismatch: sub main::BEGIN \(\) vs none at/;
-}
-# when run directly under 5.6.2: perl -wT -Ilib t/constant.t
-elsif (@warnings == 15) {
-    splice @Expected_Warnings, 1, 1;
-    push @warnings, "", "";
-    push @Expected_Warnings, qr/^$/, qr/^$/;
 }
 else {
     my $rule = " -" x 20;
@@ -242,7 +235,7 @@ else {
     diag $rule, $/;
 }
 
-is @warnings, 17;
+is @warnings, 0+@Expected_Warnings;
 
 for my $idx (0..$#warnings) {
     like $warnings[$idx], $Expected_Warnings[$idx];

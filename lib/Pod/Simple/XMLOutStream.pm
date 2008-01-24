@@ -75,7 +75,8 @@ sub _handle_element_end {
 sub _xml_escape {
   foreach my $x (@_) {
     # Escape things very cautiously:
-    $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/'&#'.(ord($1)).';'/eg;
+    $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/{'&#'.(ord($1)).';'
+}/g;
     # Yes, stipulate the list without a range, so that this can work right on
     #  all charsets that this module happens to run under.
     # Altho, hmm, what about that ord?  Presumably that won't work right

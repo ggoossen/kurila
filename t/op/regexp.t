@@ -51,13 +51,13 @@ BEGIN {
     # Do this open before any chdir
     $file = shift;
     if (defined $file) {
-	open TESTS, $file or die "Can't open $file";
+	open TESTS, "<", $file or die "Can't open $file";
     }
 }
 
 if (!defined $file) {
-    open(TESTS,'op/re_tests') || open(TESTS,'t/op/re_tests')
-	|| open(TESTS,':op:re_tests') || die "Can't open re_tests";
+    open(TESTS, "<",'op/re_tests') || open(TESTS, "<",'t/op/re_tests')
+	|| open(TESTS, "<",':op:re_tests') || die "Can't open re_tests";
 }
 
 my @tests = ~< *TESTS;
@@ -98,10 +98,10 @@ foreach (@tests) {
     $reason = '' unless defined $reason;
     my $input = join(':',$pat,$subject,$result,$repl,$expect);
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
-    $pat =~ s/(\$\{\w+\})/$1/eeg;
+    $pat =~ s/(\$\{\w+\})/{eval $1}/g;
     $pat =~ s/\\n/\n/g;
-    $subject = eval qq(use utf8; "$subject"); die $@ if $@;
-    $expect  = eval qq(use utf8; "$expect"); die $@ if $@;
+    $subject = eval qq("$subject"); die "error in '$subject': $@" if $@;
+    $expect  = eval qq("$expect"); die "error in '$expect': $@" if $@;
     $expect = $repl = '-' if $skip_amp and $input =~ m/\$[&\`\']/;
     my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;

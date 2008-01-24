@@ -10,7 +10,7 @@ BEGIN {
     }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 41 };
 
 use strict;
@@ -35,22 +35,22 @@ ENTRIES
 
 ##### 2..3
 
-ok(
+is(
   join(':', $trad->sort( qw/ acha aca ada acia acka / ) ),
   join(':',              qw/ aca acia acka acha ada / ),
 );
 
-ok(
+is(
   join(':', $trad->sort( qw/ ACHA ACA ADA ACIA ACKA / ) ),
   join(':',              qw/ ACA ACIA ACKA ACHA ADA / ),
 );
 
 ##### 4..7
 
-ok($trad->gt("ocho", "oc\cAho")); # UCA v14
-ok($trad->gt("ocho", "oc\0\cA\0\cBho"));  # UCA v14
+is($trad->cmp("ocho", "oc\cAho"), 1); # UCA v14
+is($trad->cmp("ocho", "oc\0\cA\0\cBho"), 1);  # UCA v14
 ok($trad->eq("-", ""));
-ok($trad->gt("ocho", "oc-ho"));
+is($trad->cmp("ocho", "oc-ho"), 1);
 
 ##### 8..11
 
@@ -59,16 +59,16 @@ $trad->change(UCA_Version => 9);
 ok($trad->eq("ocho", "oc\cAho")); # UCA v9
 ok($trad->eq("ocho", "oc\0\cA\0\cBho")); # UCA v9
 ok($trad->eq("-", ""));
-ok($trad->gt("ocho", "oc-ho"));
+is($trad->cmp("ocho", "oc-ho"), 1);
 
 ##### 12..15
 
 $trad->change(UCA_Version => 8);
 
-ok($trad->gt("ocho", "oc\cAho"));
-ok($trad->gt("ocho", "oc\0\cA\0\cBho"));
+is($trad->cmp("ocho", "oc\cAho"), 1);
+is($trad->cmp("ocho", "oc\0\cA\0\cBho"), 1);
 ok($trad->eq("-", ""));
-ok($trad->gt("ocho", "oc-ho"));
+is($trad->cmp("ocho", "oc-ho"), 1);
 
 
 ##### 16..19
@@ -113,14 +113,14 @@ my $L3ignorable = Unicode::Collate->new(
 ENTRIES
 );
 
-ok($L3ignorable->lt("\cA", "!"));
-ok($L3ignorable->lt("\x{591}", "!"));
+is($L3ignorable->cmp("\cA", "!"), -1);
+is($L3ignorable->cmp("\x{591}", "!"), -1);
 ok($L3ignorable->eq("\cA", "\x{591}"));
 ok($L3ignorable->eq("\x{09C7}\x{09BE}A", "\x{09C7}\cA\x{09BE}A"));
 ok($L3ignorable->eq("\x{09C7}\x{09BE}A", "\x{09C7}\x{0591}\x{09BE}A"));
 ok($L3ignorable->eq("\x{09C7}\x{09BE}A", "\x{09C7}\x{1D165}\x{09BE}A"));
 ok($L3ignorable->eq("\x{09C7}\x{09BE}A", "\x{09CB}A"));
-ok($L3ignorable->lt("\x{1D1BB}", "\x{1D1BC}"));
+is($L3ignorable->cmp("\x{1D1BB}", "\x{1D1BC}"), -1);
 ok($L3ignorable->eq("\x{1D1BB}", "\x{1D1B9}"));
 ok($L3ignorable->eq("\x{1D1BC}", "\x{1D1BA}"));
 ok($L3ignorable->eq("\x{1D1BB}", "\x{1D1B9}\x{1D165}"));
@@ -143,12 +143,12 @@ ENTRIES
 # 0063  ; [.0A3D.0020.0002.0063] # LATIN SMALL LETTER C
 # 0064  ; [.0A49.0020.0002.0064] # LATIN SMALL LETTER D
 
-ok($c->gt("ocho", "oc\x00\x00ho"));
-ok($c->gt("ocho", "oc\cAho"));
-ok($c->gt("ocho", "oc\x{034F}ho"));
-ok($c->gt("ocio", "oc\x{034F}ho"));
-ok($c->lt("ocgo", "oc\x{034F}ho"));
-ok($c->lt("oceo", "oc\x{034F}ho"));
+is($c->cmp("ocho", "oc\x00\x00ho"), 1);
+is($c->cmp("ocho", "oc\cAho"), 1);
+is($c->cmp("ocho", "oc\x{034F}ho"), 1);
+is($c->cmp("ocio", "oc\x{034F}ho"), 1);
+is($c->cmp("ocgo", "oc\x{034F}ho"), -1);
+is($c->cmp("oceo", "oc\x{034F}ho"), -1);
 
 ok($c->viewSortKey("ocho"),         "[0B4B 0A3F 0B4B | | |]");
 ok($c->viewSortKey("oc\x00\x00ho"), "[0B4B 0A3D 0AB9 0B4B | | |]");

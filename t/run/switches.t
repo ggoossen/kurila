@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 60);
+plan(tests => 61);
 
 use Config;
 
@@ -23,6 +23,13 @@ $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
 my $r;
 my @tmpfiles = ();
 END { unlink @tmpfiles }
+
+$r = runperl(
+    switches	=> [],
+    stdin	=> 'foo\nbar\nbaz\n',
+    prog	=> 'print qq(<$_>) while ~< *ARGV',
+);
+is( $r, "<foo\n><bar\n><baz\n>", "no switches" );
 
 # Tests for -0
 
@@ -80,7 +87,7 @@ my $filename = 'swctest.tmp';
 SKIP: {
     local $TODO = '';   # this one works on VMS
 
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 BEGIN { print "block 1\n"; }
 CHECK { print "block 2\n"; }
@@ -127,7 +134,7 @@ is( $r, '21-', '-s switch parsing' );
 
 $filename = 'swstest.tmp';
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -s
 BEGIN { print $x,$y; exit }
@@ -144,7 +151,7 @@ SWTEST
 # Bug ID 20011106.084
 $filename = 'swsntest.tmp';
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -sn
 BEGIN { print $x; exit }
@@ -162,7 +169,7 @@ SWTEST
 
 $filename = 'swtest.pm';
 SKIP: {
-    open my $f, ">$filename" or skip( "Can't write temp file $filename: $!",4 );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!",4 );
     print $f <<'SWTESTPM';
 package swtest;
 sub import { print map "<$_>", @_ }
@@ -273,7 +280,7 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoQqRrYyZz123456789_")
 
     sub do_i_unlink { 1 while unlink("file", "file.bak") }
 
-    open(FILE, ">file") or die "$0: Failed to create 'file': $!";
+    open(FILE, ">", "file") or die "$0: Failed to create 'file': $!";
     print FILE <<__EOF__;
 foo yada dada
 bada foo bing
@@ -285,11 +292,11 @@ __EOF__
 
     runperl( switches => ['-pi.bak'], prog => 's/foo/bar/', args => ['file'] );
 
-    open(FILE, "file") or die "$0: Failed to open 'file': $!";
+    open(FILE, "<", "file") or die "$0: Failed to open 'file': $!";
     chomp(my @file = ~< *FILE);
     close FILE;
 
-    open(BAK, "file.bak") or die "$0: Failed to open 'file': $!";
+    open(BAK, "<", "file.bak") or die "$0: Failed to open 'file': $!";
     chomp(my @bak = ~< *BAK);
     close BAK;
 

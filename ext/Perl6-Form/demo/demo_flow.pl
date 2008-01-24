@@ -10,9 +10,9 @@ print form
 	{page=>{width=>72, length=>5, footer=>"====================\n"},
       layout=>'across',
 	},
-   	 "{:[{*}]}   {:[{*}]}   {:[{*}]}",
+   	 "\{:[\{*\}]\}   \{:[\{*\}]\}   \{:[\{*\}]\}",
 	  $text,     $text,     $text,
-	 "{II{*}II}",
+	 "\{II\{*\}II\}",
 	 "The End\nis nigh\nunto\nthis line\nright here"
 	 ;
                
@@ -21,9 +21,9 @@ pos $text = 0;
 print "\nBalanced (default):\n";
 print form
 	{page=>{width=>72, length=>5, footer=>"====================\n"}},
-   	 "{:[{*}]}   {:[{*}]}   {:[{*}]}",
+   	 "\{:[\{*\}]\}   \{:[\{*\}]\}   \{:[\{*\}]\}",
 	  $text,      $text,      $text,
-	 "{II{*}II}",
+	 "\{II\{*\}II\}",
 	 "The End\nis nigh\nunto\nthis line\nright here"
 	 ;
 
@@ -34,8 +34,8 @@ print form
 	{page=>{width=>72, length=>5, footer=>"====================\n"},
       layout=>'down',
 	 },
-   	 "{:[{*}]}   {:[{*}]}   {:[{*}]}",
+   	 "\{:[\{*\}]\}   \{:[\{*\}]\}   \{:[\{*\}]\}",
 	  $text,      $text,      $text,
-	 "{II{*}II}",
+	 "\{II\{*\}II\}",
 	 "The End\nis nigh\nunto\nthis line\nright here"
 	 ;

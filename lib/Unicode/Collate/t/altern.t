@@ -1,17 +1,5 @@
 
-BEGIN {
-    unless ("A" eq pack('U', 0x41)) {
-	print "1..0 # Unicode::Collate " .
-	    "cannot stringify a Unicode code point\n";
-	exit 0;
-    }
-    if ($ENV{PERL_CORE}) {
-	chdir('t') if -d 't';
-	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
-    }
-}
-
-use Test;
+use Test::More;
 BEGIN { plan tests => 37 };
 
 use strict;
@@ -35,39 +23,39 @@ my $Collator = Unicode::Collate->new(
 
 my %origAlt = $Collator->change(alternate => 'Blanked');
 
-ok($Collator->lt("death", "de luge"));
-ok($Collator->lt("de luge", "de-luge"));
-ok($Collator->lt("de-luge", "deluge"));
-ok($Collator->lt("deluge", "de\x{2010}luge"));
-ok($Collator->lt("deluge", "de Luge"));
+is($Collator->cmp("death", "de luge"), -1);
+is($Collator->cmp("de luge", "de-luge"), -1);
+is($Collator->cmp("de-luge", "deluge"), -1);
+is($Collator->cmp("deluge", "de\x{2010}luge"), -1);
+is($Collator->cmp("deluge", "de Luge"), -1);
 
 $Collator->change(alternate => 'Non-ignorable');
 
-ok($Collator->lt("de luge", "de Luge"));
-ok($Collator->lt("de Luge", "de-luge"));
-ok($Collator->lt("de-Luge", "de\x{2010}luge"));
-ok($Collator->lt("de-luge", "death"));
-ok($Collator->lt("death", "deluge"));
+is($Collator->cmp("de luge", "de Luge"), -1);
+is($Collator->cmp("de Luge", "de-luge"), -1);
+is($Collator->cmp("de-Luge", "de\x{2010}luge"), -1);
+is($Collator->cmp("de-luge", "death"), -1);
+is($Collator->cmp("death", "deluge"), -1);
 
 $Collator->change(alternate => 'Shifted');
 
-ok($Collator->lt("death", "de luge"));
-ok($Collator->lt("de luge", "de-luge"));
-ok($Collator->lt("de-luge", "deluge"));
-ok($Collator->lt("deluge", "de Luge"));
-ok($Collator->lt("de Luge", "deLuge"));
+is($Collator->cmp("death", "de luge"), -1);
+is($Collator->cmp("de luge", "de-luge"), -1);
+is($Collator->cmp("de-luge", "deluge"), -1);
+is($Collator->cmp("deluge", "de Luge"), -1);
+is($Collator->cmp("de Luge", "deLuge"), -1);
 
 $Collator->change(alternate => 'Shift-Trimmed');
 
-ok($Collator->lt("death", "deluge"));
-ok($Collator->lt("deluge", "de luge"));
-ok($Collator->lt("de luge", "de-luge"));
-ok($Collator->lt("de-luge", "deLuge"));
-ok($Collator->lt("deLuge", "de Luge"));
+is($Collator->cmp("death", "deluge"), -1);
+is($Collator->cmp("deluge", "de luge"), -1);
+is($Collator->cmp("de luge", "de-luge"), -1);
+is($Collator->cmp("de-luge", "deLuge"), -1);
+is($Collator->cmp("deLuge", "de Luge"), -1);
 
 $Collator->change(%origAlt);
 
-ok($Collator->{alternate}, 'shifted');
+is($Collator->{alternate}, 'shifted');
 
 ##############
 
@@ -93,13 +81,13 @@ ok($Collator->eq("\cA", "?"));
 
 $Collator->change(alternate => 'Non-ignorable', level => 4);
 
-ok($Collator->lt("?\x{300}", "?!"));
-ok($Collator->gt("?\x{300}A$acute", "?$A_acute"));
-ok($Collator->gt("?\x{300}", "?"));
-ok($Collator->gt("?\x{344}", "?"));
+is($Collator->cmp("?\x{300}", "?!"), -1);
+is($Collator->cmp("?\x{300}A$acute", "?$A_acute"), 1);
+is($Collator->cmp("?\x{300}", "?"), 1);
+is($Collator->cmp("?\x{344}", "?"), 1);
 
 $Collator->change(level => 3);
-ok($Collator->lt("\cA", "?"));
+is($Collator->cmp("\cA", "?"), -1);
 
 $Collator->change(alternate => 'Shifted', level => 4);
 

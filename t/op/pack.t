@@ -124,7 +124,7 @@ sub list_eq ($$) {
     is( ($x = unpack("%32B*", "Now is the time for all good blurfl")), $sum );
 
     my $foo;
-    open(BIN, $Perl) || die "Can't open $Perl: $!\n";
+    open(BIN, '<', $Perl) || die "Can't open $Perl: $!\n";
     binmode BIN;
     sysread BIN, $foo, 8192;
     close BIN;
@@ -1093,8 +1093,8 @@ SKIP: {
   sub compress_template {
     my $t = shift;
     for my $mod (qw( < > )) {
-      $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?){2,})/
-              my $x = $1; $x =~ s!$mod!!g ? "($x)$mod" : $x /ieg;
+      $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?)\{2,\})/{
+              my $x = $1; $x =~ s!$mod!!g ? "($x)$mod" : $x }/ig;
     }
     return $t;
   }
@@ -1550,7 +1550,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 {
     # "Z0" (bug #34062)
     my (@x) = unpack("C*", pack("CZ0", 1, "b"));
-    is(join(',', @x), '1', 'pack Z0 doesn\'t destroy the character before');
+    is(join(',', @x), '1', q|pack Z0 doesn't destroy the character before|);
 }
 
 {

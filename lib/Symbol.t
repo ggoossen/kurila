@@ -60,7 +60,7 @@ use Symbol qw(qualify qualify_to_ref);  # must import into this package too
     'qualify() with a reserved identifier and a package' );
 ::ok( qualify("_foo") eq "foo::_foo",
     'qualify() with an identifier starting with a _' );
-::ok( qualify("^FOO") eq "main::\cFOO",
+::is( qualify("^FOO"), "main::\cFOO",
     'qualify() with an identifier starting with a ^' );
 
 # Test qualify_to_ref()

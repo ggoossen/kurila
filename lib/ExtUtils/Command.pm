@@ -155,7 +155,7 @@ sub touch {
     my $t    = time;
     expand_wildcards();
     foreach my $file (@ARGV) {
-        open(FILE,">>$file") || die "Cannot write $file:$!";
+        open(FILE, ">>","$file") || die "Cannot write $file:$!";
         close(FILE);
         utime($t,$t,$file);
     }
@@ -306,8 +306,8 @@ sub dos2unix {
 
 	my $orig = $_;
 	my $temp = '.dos2unix_tmp';
-	open ORIG, $_ or do { warn "dos2unix can't open $_: $!"; return };
-	open TEMP, ">$temp" or 
+	open ORIG, "<", $_ or do { warn "dos2unix can't open $_: $!"; return };
+	open TEMP, ">", "$temp" or 
 	    do { warn "dos2unix can't create .dos2unix_tmp: $!"; return };
         while (my $line = ~< *ORIG) { 
             $line =~ s/\015\012/\012/g;

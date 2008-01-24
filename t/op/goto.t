@@ -203,7 +203,7 @@ is($ok, 1, 'goto in for(;;) with continuation');
 
 # bug #22299 - goto in require doesn't find label
 
-open my $f, ">goto01.pm" or die;
+open my $f, ">", "goto01.pm" or die;
 print $f <<'EOT';
 package goto01;
 goto YYY;

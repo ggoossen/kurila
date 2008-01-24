@@ -447,63 +447,32 @@ PP(pp_die)
 {
     dVAR; dSP; dMARK;
     const char *tmps;
-    SV *tmpsv;
-    STRLEN len;
-    bool multiarg = 0;
-#ifdef VMS
-    VMSISH_HUSHED  = VMSISH_HUSHED || (PL_op->op_private & OPpHUSH_VMSISH);
-#endif
-    if (SP - MARK != 1) {
-	dTARGET;
-	do_join(TARG, &PL_sv_no, MARK, SP);
-	tmpsv = TARG;
-	tmps = SvPV_const(tmpsv, len);
-	multiarg = 1;
-	SP = MARK + 1;
+    SV *tmpsv = NULL;
+
+    /* TODO: protection against recursion */
+
+    if (SP - MARK >= 1) {
+	ENTER;
+	PUSHMARK(MARK);
+	call_pv("error::create", G_SCALAR);
+	tmpsv = POPs;
+	LEAVE;
     }
     else {
-	tmpsv = TOPs;
-        tmps = SvROK(tmpsv) ? (const char *)NULL : SvPV_const(tmpsv, len);
-    }
-    if (!tmps || !len) {
 	SV * const error = ERRSV;
-	SvUPGRADE(error, SVt_PV);
-	if (multiarg ? SvROK(error) : SvROK(tmpsv)) {
-	    if (!multiarg)
-		SvSetSV(error,tmpsv);
-	    else if (sv_isobject(error)) {
-		HV * const stash = SvSTASH(SvRV(error));
-		GV * const gv = gv_fetchmethod(stash, "PROPAGATE");
-		if (gv) {
-		    SV * const file = sv_2mortal(newSVpv(CopFILE(PL_curcop),0));
-		    SV * const line = sv_2mortal(newSVuv(CopLINE(PL_curcop)));
-		    EXTEND(SP, 3);
-		    PUSHMARK(SP);
-		    PUSHs(error);
-		    PUSHs(file);
- 		    PUSHs(line);
-		    PUTBACK;
-		    call_sv((SV*)GvCV(gv),
-			    G_SCALAR|G_EVAL|G_KEEPERR);
-		    sv_setsv(error,*PL_stack_sp--);
-		}
-	    }
-	    DIE(aTHX_ NULL);
-	}
-	else {
-	    if (SvPOK(error) && SvCUR(error))
-		sv_catpvs(error, "\t...propagated");
+	if (sv_isobject(error)) {
 	    tmpsv = error;
-	    if (SvOK(tmpsv))
-		tmps = SvPV_const(tmpsv, len);
-	    else
-		tmps = NULL;
 	}
     }
-    if (!tmps || !len)
+    if ( ! tmpsv )
 	tmpsv = sv_2mortal(newSVpvs("Died"));
 
-    DIE(aTHX_ "%"SVf, SVfARG(tmpsv));
+    Perl_vdie_common(tmpsv, FALSE);
+
+    die_where(tmpsv);
+    /* NOTREACHED */
+
+    return NULL;
 }
 
 /* I/O. */
@@ -1385,8 +1354,7 @@ PP(pp_sysread)
     /* Allocating length + offset + 1 isn't perfect in the case of reading
        bytes from a byte file handle into a UTF8 buffer, but it won't harm us
        unduly.
-       (should be 2 * length + offset + 1, or possibly something longer if
-       PL_encoding is true) */
+       (should be 2 * length + offset + 1) */
     buffer  = SvGROW(bufsv, (STRLEN)(length+offset+1));
     if (offset > 0 && (Sock_size_t)offset > bufsize) { /* Zero any newly allocated space */
     	Zero(buffer+bufsize, offset-bufsize, char);
@@ -1638,7 +1606,7 @@ PP(pp_send)
 	const int flags = SvIVx(*++MARK);
 	if (SP > MARK) {
 	    STRLEN mlen;
-	    char * const sockbuf = SvPVx(*++MARK, mlen);
+	    char * const sockbuf = SvPVx(*++MARK, &mlen);
 	    retval = PerlSock_sendto(PerlIO_fileno(IoIFP(io)), buffer, blen,
 				     flags, (struct sockaddr *)sockbuf, mlen);
 	}

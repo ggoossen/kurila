@@ -239,7 +239,7 @@ CONFIG: {
 	$PRETTY = $opt_p;
     }
 
-    if (open(POD_DIAG, $PODFILE)) {
+    if (open(POD_DIAG, "<", $PODFILE)) {
 	warn "Happy happy podfile from real $PODFILE\n" if $DEBUG;
 	last CONFIG;
     } 
@@ -248,7 +248,7 @@ CONFIG: {
 	INCPATH: {
 	    for my $file ( (map { "$_/$WHOAMI.pm" } @INC), $0) {
 		warn "Checking $file\n" if $DEBUG;
-		if (open(POD_DIAG, $file)) {
+		if (open(POD_DIAG, "<", $file)) {
 		    while ( ~< *POD_DIAG) {
 			next unless
 			    m/^__END__\s*# wish diag dbase were more accessible/;
@@ -313,7 +313,7 @@ our %HTML_Escapes;
 
 my %transfmt = (); 
 my $transmo = <<EOFUNC;
-sub transmo {
+sub transmo \{
     #local \$^W = 0;  # recursive warnings we do NOT need!
     study;
 EOFUNC
@@ -331,8 +331,8 @@ my %msg;
 	    sub noop   { return $_[0] }  # spensive for a noop
 	    sub bold   { my $str =$_[0];  $str =~ s/(.)/$1\b$1/g; return $str; } 
 	    sub italic { my $str = $_[0]; $str =~ s/(.)/_\b$1/g;  return $str; } 
-	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/bold($+)/ges;
-	    s/[LIF]<(.*?)>/italic($1)/ges;
+	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/{bold($+)}/gs;
+	    s/[LIF]<(.*?)>/{italic($1)}/gs;
 	} else {
 	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/$+/gs;
 	    s/[LIF]<(.*?)>/$1/gs;
@@ -388,7 +388,7 @@ my %msg;
                     } elsif( $toks[$i] eq '%s' ){
                         $toks[$i] = $i == $#toks ? '.*' : '.*?';
                     } elsif( $toks[$i] =~ '%.(\d+)s' ){
-                        $toks[$i] = ".{$1}";
+                        $toks[$i] = ".\{$1\}";
                      } elsif( $toks[$i] =~ '^%l*x$' ){
                         $toks[$i] = '[\da-f]+';
                    }
@@ -399,11 +399,11 @@ my %msg;
             }  
             my $lhs = join( '', @toks );
 	    $transfmt{$header}{pat} =
-              "    s{^$lhs}\n     {\Q$header\E}s\n\t&& return 1;\n";
+              "    s\{^$lhs\}\n     \{\Q$header\E\}s\n\t&& return 1;\n";
             $transfmt{$header}{len} = $conlen;
 	} else {
             $transfmt{$header}{pat} =
-	      "    m{^\Q$header\E} && return 1;\n";
+	      "    m\{^\Q$header\E\} && return 1;\n";
             $transfmt{$header}{len} = length( $header );
 	} 
 
@@ -424,7 +424,7 @@ my %msg;
                   keys %transfmt ){
         $transmo .= $transfmt{$hdr}{pat};
     }
-    $transmo .= "    return 0;\n}\n";
+    $transmo .= "    return 0;\n\}\n";
     print STDERR $transmo if $DEBUG;
     eval $transmo;
     die $@ if $@;
@@ -618,7 +618,7 @@ sub unescape {
             E<  
             ( [A-Za-z]+ )       
             >   
-    } { 
+    } {{ 
          do {   
              exists $HTML_Escapes{$1}
                 ? do { $HTML_Escapes{$1} }
@@ -627,7 +627,7 @@ sub unescape {
                     "E<$1>";
                 } 
          } 
-    }egx;
+    }}gx;
 }
 
 sub shorten {

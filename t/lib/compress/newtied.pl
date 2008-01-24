@@ -326,7 +326,7 @@ EOM
 
             {
               my $fh ;
-              ok $fh = 'IO::File'->new( ">$name") ;
+              ok $fh = 'IO::File'->new( "$name", ">") ;
               my $x ;
               ok $x = $CompressClass-> new( $fh)  ;
 
@@ -340,7 +340,7 @@ EOM
             my $uncomp;
             {
               my $x ;
-              ok my $fh1 = 'IO::File'->new( "<$name") ;
+              ok my $fh1 = 'IO::File'->new( "$name", "<") ;
               ok $x = $UncompressClass-> new( $fh1, -Append => 1)  ;
               ok $x->fileno() == fileno $fh1 ;
               ok $x->fileno() == fileno $x ;

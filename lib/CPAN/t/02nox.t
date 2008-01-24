@@ -5,7 +5,7 @@ if (! eval { require Test::More; 1 }) {
   exit;
 }
 require Test::More;
-Test::More->import(tests => 8);
+Test::More->import(tests => 7);
 
 # use this first to $CPAN::term can be undefined
 use_ok( 'CPAN' );
@@ -28,7 +28,6 @@ for $mod (qw( Digest::MD5 LWP Compress::Zlib )) {
 
 # and these will be set to those in CPAN
 is( scalar @CPAN::Nox::EXPORT, scalar @CPAN::EXPORT, 'should export just what CPAN does' );
-is( \&CPAN::Nox::AUTOLOAD, \&CPAN::AUTOLOAD, 'AUTOLOAD should be aliased' );
 
 # Local Variables:
 # mode: cperl

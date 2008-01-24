@@ -109,8 +109,8 @@ while (@ARGV) {
     $archname = 1 if $ARGV[0] eq '-A';
     $nwinstall = 1 if $ARGV[0] eq '-netware';
     $nopods = 1 if $ARGV[0] eq '-p';
-    $destdir = $1 if $ARGV[0] =~ /^-?-destdir=(.*)$/;
-    if ($ARGV[0] eq '-?' or $ARGV[0] =~ /^-?-h/) {
+    $destdir = $1 if $ARGV[0] =~ m/^-?-destdir=(.*)$/;
+    if ($ARGV[0] eq '-?' or $ARGV[0] =~ m/^-?-h/) {
 	print <<"EOT";
 Usage $0: [switches]
   -n	    Don't actually run any commands; just print them.
@@ -136,13 +136,13 @@ EOT
 
 $versiononly = 1 if $Config{versiononly} && !defined $versiononly;
 my (@scripts, @tolink);
-open SCRIPTS, "utils.lst" or die "Can't open utils.lst: $!";
+open SCRIPTS, "<", "utils.lst" or die "Can't open utils.lst: $!";
 while (~< *SCRIPTS) {
-    next if /^#/;
+    next if m/^#/;
     s/\s*#\s*pod\s*=.*//; # install script regardless of pod location
-    next if /a2p/; # a2p is binary, to be installed separately
+    next if m/a2p/; # a2p is binary, to be installed separately
     chomp;
-    if (/(\S*)\s*#\s*link\s*=\s*(\S*)/) {
+    if (m/(\S*)\s*#\s*link\s*=\s*(\S*)/) {
 	push @scripts, $1;
 	push @tolink, [$1, $2];
     } else {
@@ -223,7 +223,7 @@ if ($^O eq 'os390') {
     my $archlibexp = $Config{archlibexp};
     my $usedl = $Config{usedl};
     if ($usedl eq 'define') {
-	`./$^X -pibak -e 's{$pwd\/libperl.x}{$archlibexp/CORE/libperl.x}' lib/Config.pm`;
+	`./$^X -pibak -e 's<$pwd\/libperl.x><$archlibexp/CORE/libperl.x>' lib/Config.pm`;
     }
 }
 
@@ -409,8 +409,8 @@ foreach my $file (@corefiles) {
     # HP-UX (at least) needs to maintain execute permissions
     # on dynamically-loadable libraries. So we do it for all.
     if (copy_if_diff($file,"$installarchlib/CORE/$file")) {
-	if ($file =~ /\.(\Q$so\E|\Q$dlext\E)$/) {
-	    strip("-S", "$installarchlib/CORE/$file") if $^O =~ /^(rhapsody|darwin)$/;
+	if ($file =~ m/\.(\Q$so\E|\Q$dlext\E)$/) {
+	    strip("-S", "$installarchlib/CORE/$file") if $^O =~ m/^(rhapsody|darwin)$/;
 	    chmod(0555, "$installarchlib/CORE/$file");
 	} else {
 	    chmod(0444, "$installarchlib/CORE/$file");
@@ -557,11 +557,11 @@ if ( !$versiononly || ($installprivlib =~ m/\Q$ver/)) {
     mkpath("${installprivlib}/$pod", $verbose, 0777);
 
     # If Perl 5.003's perldiag.pod is there, rename it.
-    if (open POD, "${installprivlib}/$pod/perldiag.pod") {
+    if (open POD, "<", "${installprivlib}/$pod/perldiag.pod") {
 	read POD, $_, 4000;
 	close POD;
 	# Some of Perl 5.003's diagnostic messages ended with periods.
-	if (/^=.*\.$/m) {
+	if (m/^=.*\.$/m) {
 	    my ($from, $to) = ("${installprivlib}/$pod/perldiag.pod",
 			       "${installprivlib}/$pod/perldiag-5.003.pod");
 	    print "  rename $from $to";
@@ -589,7 +589,7 @@ if (!$versiononly && $otherperls) {
     my ($path, @path);
     my $dirsep = ($Is_OS2 || $Is_W32 || $Is_NetWare) ? ';' : ':' ;
     ($path = $ENV{"PATH"}) =~ s:\\:/:g ;
-    @path = split(/$dirsep/, $path);
+    @path = split(m/$dirsep/, $path);
     if ($Is_VMS) {
 	my $i = 0;
 	while (exists $ENV{'DCL$PATH' . $i}) {
@@ -823,7 +823,7 @@ sub installlib {
     }
 
     if (-f $_) {
-	if (/\.(?:al|ix)$/ && !($dir =~ m[^auto/(.*)$])) {
+	if (m/\.(?:al|ix)$/ && !($dir =~ m[^auto/(.*)$])) {
 	    $installlib = $installprivlib;
 	    #We're installing *.al and *.ix files into $installprivlib,
 	    #but we have to delete old *.al and *.ix files from the 5.000
@@ -844,7 +844,7 @@ sub installlib {
 		# if copied will give problems when building new extensions.
 		# Has to be copied if we are installing on a NetWare server and hence
 		# the check !$nwinstall
-		if (!(/\.(?:nlp|nlm|bs)$/)) {
+		if (!(m/\.(?:nlp|nlm|bs)$/)) {
 		    copy_if_diff($_, "$installlib/$name")
 			and chmod($name =~ m/\.(so|$dlext)$/o ? 0555 : 0444,
 				  "$installlib/$name");

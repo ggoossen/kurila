@@ -87,9 +87,9 @@ sub decomposeHangul {
     my($f, $fh);
     foreach my $d (@INC) {
 	$f = File::Spec->catfile($d, "unicore", "CompositionExclusions.txt");
-	last if open($fh, $f);
+	last if open($fh, "<", $f);
 	$f = File::Spec->catfile($d, "unicode", "CompExcl.txt");
-	last if open($fh, $f);
+	last if open($fh, "<", $f);
 	$f = undef;
     }
     croak "$PACKAGE: neither unicore/CompositionExclusions.txt "
@@ -260,7 +260,7 @@ my @boolfunc = (
 );
 
 my $file = "unfexc.h";
-open FH, ">$file" or croak "$PACKAGE: $file can't be made";
+open FH, ">", "$file" or croak "$PACKAGE: $file can't be made";
 binmode FH; select FH;
 
     print << 'EOF';
@@ -274,7 +274,7 @@ foreach my $tbl (@boolfunc) {
     my @temp = sort {$a <+> $b} keys %{$tbl->{hash}};
     my $type = $tbl->{type};
     my $name = $tbl->{name};
-    print "$type is$name (UV uv)\n{\nreturn\n\t";
+    print "$type is$name (UV uv)\n\{\nreturn\n\t";
 
     while (@temp) {
 	my $cur = shift @temp;
@@ -290,7 +290,7 @@ foreach my $tbl (@boolfunc) {
 	    print "\n\t|| " if @temp;
 	}
     }
-    print "\n\t? TRUE : FALSE;\n}\n\n";
+    print "\n\t? TRUE : FALSE;\n\}\n\n";
 }
 
 close FH;
@@ -298,14 +298,14 @@ close FH;
 ####################################
 
 my $compinit =
-    "typedef struct { UV nextchar; UV composite; } $structname;\n\n";
+    "typedef struct \{ UV nextchar; UV composite; \} $structname;\n\n";
 
 foreach my $i (sort keys %CompList) {
-    $compinit .= "$structname $i [] = {\n";
+    $compinit .= "$structname $i [] = \{\n";
     $compinit .= join ",\n",
-	map sprintf("\t{ %d, %d }", $_, $CompList{$i}{$_}),
+	map sprintf("\t\{ %d, %d \}", $_, $CompList{$i}{$_}),
 	    sort {$a <+> $b } keys %{ $CompList{$i} };
-    $compinit .= ",\n{0,0}\n};\n\n"; # with sentinel
+    $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 
 my @tripletable = (
@@ -348,7 +348,7 @@ foreach my $tbl (@tripletable) {
     my $null = $tbl->{null};
     my $init = $tbl->{init};
 
-    open FH, ">$file" or croak "$PACKAGE: $file can't be made";
+    open FH, ">", "$file" or croak "$PACKAGE: $file can't be made";
     binmode FH; select FH;
     my %val;
 
@@ -372,7 +372,7 @@ EOF
 	next if ! $val{ $p };
 	for (my $r = 0; $r +< 256; $r++) {
 	    next if ! $val{ $p }{ $r };
-	    printf "static $type ${head}_%02x_%02x [256] = {\n", $p, $r;
+	    printf "static $type ${head}_%02x_%02x [256] = \{\n", $p, $r;
 	    for (my $c = 0; $c +< 256; $c++) {
 		print "\t", defined $val{$p}{$r}{$c}
 		    ? "($type)".$val{$p}{$r}{$c}
@@ -380,12 +380,12 @@ EOF
 		print ','  if $c != 255;
 		print "\n" if $c % 8 == 7;
 	    }
-	    print "};\n\n";
+	    print "\};\n\n";
 	}
     }
     foreach my $p (sort { $a <+> $b } keys %val) {
 	next if ! $val{ $p };
-	printf "static $type* ${head}_%02x [256] = {\n", $p;
+	printf "static $type* ${head}_%02x [256] = \{\n", $p;
 	for (my $r = 0; $r +< 256; $r++) {
 	    print $val{ $p }{ $r }
 		? sprintf("${head}_%02x_%02x", $p, $r)
@@ -393,15 +393,15 @@ EOF
 	    print ','  if $r != 255;
 	    print "\n" if $val{ $p }{ $r } || ($r+1) % 8 == 0;
 	}
-	print "};\n\n";
+	print "\};\n\n";
     }
-    print "static $type** $head [] = {\n";
+    print "static $type** $head [] = \{\n";
     for (my $p = 0; $p +<= 0x10; $p++) {
 	print $val{ $p } ? sprintf("${head}_%02x", $p) : "NULL";
 	print ','  if $p != 0x10;
 	print "\n";
     }
-    print "};\n\n";
+    print "\};\n\n";
     close FH;
 }
 

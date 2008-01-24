@@ -49,7 +49,7 @@ while ( ~< *ARGV) {
 }
 
 foreach $filename (keys %files) {
-  open FILE, $filename or die "Couldn't open $filename: $!\n";
+  open FILE, "<", $filename or die "Couldn't open $filename: $!\n";
   @lines = ~< *FILE;
   close FILE;
   chomp @lines;

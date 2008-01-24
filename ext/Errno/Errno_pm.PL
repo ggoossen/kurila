@@ -13,7 +13,7 @@ my $IsSymbian = exists $ENV{SDK} && -d "$ENV{SDK}\\epoc32";
 my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
 
 unlink "Errno.pm" if -f "Errno.pm";
-open OUT, ">Errno.pm" or die "Cannot open Errno.pm: $!";
+open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $!";
 select OUT;
 my $file;
 my @files = get_files();
@@ -21,7 +21,7 @@ if ($Config{gccversion} ne '' && $^O eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
     # file" if the header files are processed individually, so include them
     # all in .c file and process that instead.
-    open INCS, '>includes.c' or
+    open INCS, ">", 'includes.c' or
 	die "Cannot open includes.c";
     foreach $file (@files) {
 	next if $file eq 'errno.c';
@@ -54,7 +54,7 @@ sub process_file {
 
     local *FH;
     if (($^O eq 'VMS') && ($Config{vms_cc_type} ne 'gnuc')) {
-	unless(open(FH," LIBRARY/EXTRACT=ERRNO/OUTPUT=SYS\$OUTPUT $file |")) {
+	unless(open(FH, "-|", "LIBRARY/EXTRACT=ERRNO/OUTPUT=SYS\$OUTPUT $file")) {
             warn "Cannot open '$file'";
             return;
 	}     
@@ -64,12 +64,12 @@ sub process_file {
 	     && $^O ne 'openstep' && $^O ne 'next' && $^O ne 'darwin'
 	     ) { 
 	# With the -dM option, gcc outputs every #define it finds
-	unless(open(FH,"$Config{cc} -E -dM $Config{cppflags} $file |")) {
+	unless(open(FH,"-|","$Config{cc} -E -dM $Config{cppflags} $file")) {
             warn "Cannot open '$file'";
             return;
 	}     
     } else {
-	unless(open(FH,"< $file")) {
+	unless(open(FH, "<"," $file")) {
 	    # This file could be a temporary file created by cppstdin
 	    # so only warn under -w, and return
             warn "Cannot open '$file'" if $^W;
@@ -167,7 +167,7 @@ sub get_files {
         $SDK =~ s!\\!/!g;
 	$file{"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
     } else {
-	open(CPPI,"> errno.c") or
+	open(CPPI, ">","errno.c") or
 	    die "Cannot open errno.c";
 
 	if ($^O eq 'NetWare') {
@@ -184,11 +184,11 @@ sub get_files {
 
 	# invoke CPP and read the output
 	if ($IsMSWin32 || $^O eq 'NetWare') {
-	    open(CPPO,"$Config{cpprun} $Config{cppflags} errno.c |") or
+	    open(CPPO,"-|","$Config{cpprun} $Config{cppflags} errno.c") or
 		die "Cannot run '$Config{cpprun} $Config{cppflags} errno.c'";
 	} else {
 	    my $cpp = default_cpp();
-	    open(CPPO,"$cpp < errno.c |") or
+	    open(CPPO,"-|", "$cpp < errno.c") or
 		die "Cannot exec $cpp";
 	}
 
@@ -225,7 +225,7 @@ sub write_errno_pm {
 
     # create the CPP input
 
-    open(CPPI,"> errno.c") or
+    open(CPPI, ">","errno.c") or
 	die "Cannot open errno.c";
 
     if ($^O eq 'NetWare') {
@@ -256,18 +256,18 @@ sub write_errno_pm {
 	if ($^O eq 'VMS') {
 	    my $cpp = "$Config{cppstdin} $Config{cppflags} $Config{cppminus}";
 	    $cpp =~ s/sys\$input//i;
-	    open(CPPO,"$cpp  errno.c |") or
+	    open(CPPO,"-|", "$cpp  errno.c") or
 		die "Cannot exec $Config{cppstdin}";
 	} elsif ($IsMSWin32 || $^O eq 'NetWare') {
-	    open(CPPO,"$Config{cpprun} $Config{cppflags} errno.c |") or
+	    open(CPPO,"-|", "$Config{cpprun} $Config{cppflags} errno.c") or
 		die "Cannot run '$Config{cpprun} $Config{cppflags} errno.c'";
 	} elsif ($IsSymbian) {
             my $cpp = "gcc -E -I$ENV{SDK}\\epoc32\\include\\libc -";
-	    open(CPPO,"$cpp < errno.c |")
+	    open(CPPO,"-|", "$cpp < errno.c")
 		or die "Cannot exec $cpp";
         } else {
 	    my $cpp = default_cpp();
-	    open(CPPO,"$cpp < errno.c |")
+	    open(CPPO,"-|", "$cpp < errno.c")
 		or die "Cannot exec $cpp";
 	}
 
@@ -299,21 +299,21 @@ sub write_errno_pm {
     # values, since we can get all of them here, anyway.
 
     if ($^O eq 'beos') {
-	if (open(C, ">errno.c")) {
+	if (open(C, ">", "errno.c")) {
 	    my @allerrs = keys %err;
 	    print C <<EOF;
 #include <errno.h>
 #include <stdio.h>
-int main() {
+int main() \{
 EOF
             for (@allerrs) {
 		print C qq[printf("$_ %d\n", $_);]
 	    }
-            print C "}\n";
+            print C "\}\n";
             close C;
             system("cc -o errno errno.c");
             unlink("errno.c");
-            if (open(C, "./errno|")) {
+            if (open(C, "-|", "./errno")) {
 		while ( ~< *C) {
 		    if (m/^(\w+) (-?\d+)$/) { $err{$1} = $2 }
 		}
@@ -335,14 +335,14 @@ EOF
 #
 
 package Errno;
-our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno,\$AUTOLOAD);
+our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno);
 use Exporter ();
 use Config;
 use strict;
 
-"\$Config{'archname'}-\$Config{'osvers'}" eq
+"\$Config\{'archname'\}-\$Config\{'osvers'\}" eq
 "$Config{'archname'}-$Config{'osvers'}" or
-	die "Errno architecture ($Config{'archname'}-$Config{'osvers'}) does not match executable architecture (\$Config{'archname'}-\$Config{'osvers'})";
+	die "Errno architecture ($Config{'archname'}-$Config{'osvers'}) does not match executable architecture (\$Config\{'archname'\}-\$Config\{'osvers'\})";
 
 \$VERSION = "$VERSION";
 \$VERSION = eval \$VERSION;
@@ -382,7 +382,7 @@ ESQ
     print "\t",$k,"\n    )]\n);\n\n";
 
     foreach $err (@err) {
-	printf "sub %s () { %d }\n",,$err,$err{$err};
+	printf "sub %s () \{ %d \}\n",,$err,$err{$err};
     }
 
     print <<'ESQ';
@@ -453,7 +453,7 @@ non-zero value only if C<$!> is set to that value. For example:
 
     use Errno;
 
-    unless (open(FH, "/fangorn/spouse")) {
+    unless (open(FH, "<", "/fangorn/spouse")) {
         if ($!{ENOENT}) {
             warn "Get a wife!\n";
         } else {

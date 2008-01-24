@@ -53,9 +53,9 @@ my @death =
 
  'm/((x)/' => 'Unmatched ( in regex; marked by {#} in m/({#}(x)/',
 
- "m/x{$inf_p1}/" => "Quantifier in {,} bigger than $inf_m1 in regex; marked by {#} in m/x{{#}$inf_p1}/",
+ "m/x\{$inf_p1\}/" => "Quantifier in \{,\} bigger than $inf_m1 in regex; marked by \{#\} in m/x\{\{#\}$inf_p1\}/",
 
- 'm/x{3,1}/' => 'Can\'t do {n,m} with n > m in regex; marked by {#} in m/x{3,1}{#}/',
+ 'm/x{3,1}/' => q|Can't do {n,m} with n > m in regex; marked by {#} in m/x{3,1}{#}/|,
 
  'm/x**/' => 'Nested quantifiers in regex; marked by {#} in m/x**{#}/',
 
@@ -69,7 +69,7 @@ my @death =
 
  'm/(x)\2/' => 'Reference to nonexistent group in regex; marked by {#} in m/(x)\2{#}/',
 
- 'my $m = "\\\"; $m =~ $m', => 'Trailing \ in regex m/\/',
+ 'my $m = "\\"; $m =~ $m', => 'Trailing \ in regex m/\/',
 
  'm/\x{1/' => 'Missing right brace on \x{} in regex; marked by {#} in m/\x{{#}1/',
 

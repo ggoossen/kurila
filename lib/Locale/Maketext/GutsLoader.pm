@@ -27,7 +27,7 @@ if($@) {
   die "No readable file $Locale::Maketext::GutsLoader::GUTSPATH\nAborting"
    unless -e $path and -f _ and -r _;
 
-  open(IN, $path) or die "Can't read-open $path\nAborting";
+  open(IN, "<", $path) or die "Can't read-open $path\nAborting";
   
   my $source;
   { local $/;  $source = ~< *IN; }
