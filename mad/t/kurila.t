@@ -34,8 +34,9 @@ sub p5convert {
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
-t_qstring();
+t_open_args3();
 die;
+t_qstring();
 t_subst_eval();
 t_string_block();
 t_force_m();
@@ -708,6 +709,59 @@ s/(x)/foo($1)/eg;
 ----
 sub foo {}
 s/(x)/{foo($1)}/g;
+====
+END
+}
+
+sub t_open_args3 {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+open($fh,$filename);
+----
+open($fh, "<",$filename);
+====
+open $fh, ">$filename";
+----
+open $fh, ">", "$filename";
+====
+open $fh, ">> $filename";
+----
+open $fh, ">>", "$filename";
+====
+open $fh, ">filename";
+----
+open $fh, ">", "filename";
+====
+open FH, 'filename';
+----
+open FH, "<", 'filename';
+====
+open FH, 'echo "bar" |';
+----
+open FH, "-|", 'echo "bar"';
+====
+open FH, "$filename";
+----
+open FH, "<", "$filename";
+====
+open FH, ">&STDERR";
+----
+open FH, ">&", "STDERR";
+====
+my $TEST;
+open IN, $TEST or warn "$0: cannot read $TEST: $!" ;
+----
+my $TEST;
+open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
+====
+open(POD, "<$$.pod") or die "$$.pod: $!";
+----
+open(POD, "<", "$$.pod") or die "$$.pod: $!";
+====
+open $fh, "-";
+open $fh, ">-";
+----
+open $fh, "-";
+open $fh, ">-";
 ====
 END
 }

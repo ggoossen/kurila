@@ -598,6 +598,61 @@ sub qq_block_escape {
     }
 }
 
+sub open_3args {
+    my $xml = shift;
+    for my $op_open ($xml->findnodes(qq|//op_open|)) {
+        next unless $op_open->children == 2+2;
+        my $arg = $op_open->child(3);
+        my $argo = $arg->child(1);
+        if (($argo->att('was') || '') eq "rv2sv" or
+            $argo->tag eq "op_padsv" or
+            ($argo->tag eq "op_stringify" and 
+             $argo->children == 3 and
+             ($argo->child(-1)->att('was') || '') eq "rv2sv")) {
+            # horrible way to insert "<"
+            set_madprop($arg, "comma", ', &quot;&lt;&quot;,');
+            next;
+        }
+        my $c = $arg->child(1);
+        if ($c and ($c->att('was') || '') eq "stringify") {
+            $c = $c->child(2)->child(1);
+        }
+        if ($c and $c->tag eq "op_concat") {
+            $c = $c->child(1);
+        }
+        next unless $c and $c->tag eq "op_const";
+        my $prop = get_madprop($c, "value") ? "value" : "assign";
+        my $v = get_madprop($c, $prop);
+        next if $v eq "-" or $v eq "&gt;-";
+        my $mode = '&lt;';
+        if ($v =~ s/^ ( [+-]? (?: &lt; | &gt;(?:&gt;)? | \| ) (?:&amp;)? ) \s* //x) {
+            $mode = $1;
+            $mode eq "|" and $mode = "|-";
+        } elsif ($v =~ s/\s* ( [|] ) $//x) {
+            $mode = '-|';
+        }
+        set_madprop($arg, "comma", ", &quot;$mode&quot;,");
+        set_madprop($c, $prop => $v);
+    }
+}
+
+sub qstring {
+    my $xml = shift;
+    for my $mad_quote ($xml->findnodes(qq|//madprops/mad_null_type_first[\@val="quote"]|)) {
+        my $op = $mad_quote->parent->parent;
+        next unless get_madprop($op, "quote_open") eq "'";
+        my $v = get_madprop($op, 'assign');
+        next unless $v =~ m/\\/;
+        $v =~ s/\\([\\\'])/$1/g;
+        set_madprop($op, 'assign' => $v);
+        if ($v =~ m/\'/) {
+            my ($delim) = grep { $v !~ m/\Q$_/ } qw{| " ! : / \ + =};
+            set_madprop($op, "quote_open" => "q$delim");
+            set_madprop($op, "quote_close" => "$delim");
+        }
+    }
+}
+
 sub qq_block {
     # escape '{' and '}' inside a double quoted string
     my $xml = shift;
@@ -681,6 +736,11 @@ if ($from->{v} < 1.61) {
      force_m( $twig );
      qq_block( $twig );
 }
+if ($from->{v} < 1.62) {
+    qstring( $twig );
+}
+
+open_3args($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
