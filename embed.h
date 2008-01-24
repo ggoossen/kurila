@@ -1272,6 +1272,9 @@
 #define sv_exp_grow		S_sv_exp_grow
 #endif
 #endif
+#ifdef PERL_CORE
+#define dopoptosub_at		Perl_dopoptosub_at
+#endif
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define docatch			S_docatch
@@ -1280,7 +1283,6 @@
 #define dopoptogiven		S_dopoptogiven
 #define dopoptolabel		S_dopoptolabel
 #define dopoptoloop		S_dopoptoloop
-#define dopoptosub_at		S_dopoptosub_at
 #define dopoptowhen		S_dopoptowhen
 #define save_lines		S_save_lines
 #define doeval			S_doeval
@@ -1535,7 +1537,7 @@
 #define closest_cop		S_closest_cop
 #define mess_alloc		S_mess_alloc
 #define vdie_croak_common	S_vdie_croak_common
-#define vdie_common		S_vdie_common
+#define vdie_common		Perl_vdie_common
 #define write_no_mem		S_write_no_mem
 #endif
 #endif
@@ -2221,9 +2223,7 @@
 #define pp_setpgrp		Perl_pp_setpgrp
 #define pp_setpriority		Perl_pp_setpriority
 #define pp_setstate		Perl_pp_setstate
-#define pp_sge			Perl_pp_sge
 #define pp_sgrent		Perl_pp_sgrent
-#define pp_sgt			Perl_pp_sgt
 #define pp_shift		Perl_pp_shift
 #define pp_shmctl		Perl_pp_shmctl
 #define pp_shmget		Perl_pp_shmget
@@ -2232,9 +2232,7 @@
 #define pp_shostent		Perl_pp_shostent
 #define pp_shutdown		Perl_pp_shutdown
 #define pp_sin			Perl_pp_sin
-#define pp_sle			Perl_pp_sle
 #define pp_sleep		Perl_pp_sleep
-#define pp_slt			Perl_pp_slt
 #define pp_smartmatch		Perl_pp_smartmatch
 #define pp_sne			Perl_pp_sne
 #define pp_snetent		Perl_pp_snetent
@@ -2404,7 +2402,7 @@
 #endif
 #ifdef PERL_CORE
 #define vdie(a,b)		Perl_vdie(aTHX_ a,b)
-#define die_where(a,b)		Perl_die_where(aTHX_ a,b)
+#define die_where(a)		Perl_die_where(aTHX_ a)
 #endif
 #define dounwind(a)		Perl_dounwind(aTHX_ a)
 #ifdef PERL_CORE
@@ -3523,6 +3521,9 @@
 #define sv_exp_grow(a,b)	S_sv_exp_grow(aTHX_ a,b)
 #endif
 #endif
+#ifdef PERL_CORE
+#define dopoptosub_at(a,b)	Perl_dopoptosub_at(aTHX_ a,b)
+#endif
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define docatch(a)		S_docatch(aTHX_ a)
@@ -3531,7 +3532,6 @@
 #define dopoptogiven(a)		S_dopoptogiven(aTHX_ a)
 #define dopoptolabel(a)		S_dopoptolabel(aTHX_ a)
 #define dopoptoloop(a)		S_dopoptoloop(aTHX_ a)
-#define dopoptosub_at(a,b)	S_dopoptosub_at(aTHX_ a,b)
 #define dopoptowhen(a)		S_dopoptowhen(aTHX_ a)
 #define save_lines(a,b)		S_save_lines(aTHX_ a,b)
 #define doeval(a,b,c,d)		S_doeval(aTHX_ a,b,c,d)
@@ -3752,7 +3752,7 @@
 #define no_op(a,b)		S_no_op(aTHX_ a,b)
 #define sublex_done()		S_sublex_done(aTHX)
 #define sublex_push()		S_sublex_push(aTHX)
-#define sublex_start()		S_sublex_start(aTHX)
+#define sublex_start(a,b)	S_sublex_start(aTHX_ a,b)
 #define filter_gets(a,b,c)	S_filter_gets(aTHX_ a,b,c)
 #define tokenize_use(a,b)	S_tokenize_use(aTHX_ a,b)
 #define ao(a)			S_ao(aTHX_ a)
@@ -3786,8 +3786,8 @@
 #ifdef PERL_CORE
 #define closest_cop(a,b)	S_closest_cop(aTHX_ a,b)
 #define mess_alloc()		S_mess_alloc(aTHX)
-#define vdie_croak_common(a,b,c,d)	S_vdie_croak_common(aTHX_ a,b,c,d)
-#define vdie_common(a,b,c,d)	S_vdie_common(aTHX_ a,b,c,d)
+#define vdie_croak_common(a,b)	S_vdie_croak_common(aTHX_ a,b)
+#define vdie_common(a,b)	Perl_vdie_common(aTHX_ a,b)
 #define write_no_mem()		S_write_no_mem(aTHX)
 #endif
 #endif
@@ -4479,9 +4479,7 @@
 #define pp_setpgrp()		Perl_pp_setpgrp(aTHX)
 #define pp_setpriority()	Perl_pp_setpriority(aTHX)
 #define pp_setstate()		Perl_pp_setstate(aTHX)
-#define pp_sge()		Perl_pp_sge(aTHX)
 #define pp_sgrent()		Perl_pp_sgrent(aTHX)
-#define pp_sgt()		Perl_pp_sgt(aTHX)
 #define pp_shift()		Perl_pp_shift(aTHX)
 #define pp_shmctl()		Perl_pp_shmctl(aTHX)
 #define pp_shmget()		Perl_pp_shmget(aTHX)
@@ -4490,9 +4488,7 @@
 #define pp_shostent()		Perl_pp_shostent(aTHX)
 #define pp_shutdown()		Perl_pp_shutdown(aTHX)
 #define pp_sin()		Perl_pp_sin(aTHX)
-#define pp_sle()		Perl_pp_sle(aTHX)
 #define pp_sleep()		Perl_pp_sleep(aTHX)
-#define pp_slt()		Perl_pp_slt(aTHX)
 #define pp_smartmatch()		Perl_pp_smartmatch(aTHX)
 #define pp_sne()		Perl_pp_sne(aTHX)
 #define pp_snetent()		Perl_pp_snetent(aTHX)

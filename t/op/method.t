@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-print "1..57\n";
+print "1..56\n";
 
 @A::ISA = 'B';
 @B::ISA = 'C';
@@ -172,19 +172,6 @@ is( $::{"Foo::"} ? "ok" : "none", "ok");  # should exist now
 is( Foo->boogie(), "yes, sir!");
 
 # TODO: universal.t should test NoSuchPackage->isa()/can()
-
-# This is actually testing parsing of indirect objects and undefined subs
-#   print foo("bar") where foo does not exist is not an indirect object.
-#   print foo "bar"  where foo does not exist is an indirect object.
-
-# Bug ID 20010902.002
-is(
-    eval q[
-	our $x = 'x';
-	sub Foo::x : lvalue { $x }
-	Foo->?$x = 'ok';
-    ] || $@, 'ok'
-);
 
 # [ID 20020305.025] PACKAGE::SUPER doesn't work anymore
 

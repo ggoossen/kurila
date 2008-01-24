@@ -11,7 +11,7 @@ BEGIN {
     }
 }
 
-use Test;
+use Test::More;
 use strict;
 use warnings;
 
@@ -54,21 +54,21 @@ ENTRIES
 );
 
 # 2..12
-ok($illeg->lt("", "\x00"));
-ok($illeg->lt("", "\x01"));
+is($illeg->cmp("", "\x00"), -1);
+is($illeg->cmp("", "\x01"), -1);
 ok($illeg->eq("", "\x{FFFE}"));
 ok($illeg->eq("", "\x{FFFF}"));
 ok($illeg->eq("", "\x{D800}"));
 ok($illeg->eq("", "\x{DFFF}"));
 ok($illeg->eq("", "\x{FDD0}"));
 ok($illeg->eq("", "\x{FDEF}"));
-ok($illeg->lt("", "\x02"));
+is($illeg->cmp("", "\x02"), -1);
 ok($illeg->eq("", "\x{10FFFF}"));
 ok($illeg->eq("", "\x{110000}"));
 
 # 13..22
-ok($illeg->lt("\x00", "\x01"));
-ok($illeg->lt("\x01", "\x02"));
+is($illeg->cmp("\x00", "\x01"), -1);
+is($illeg->cmp("\x01", "\x02"), -1);
 ok($illeg->ne("\0", "\x{D800}"));
 ok($illeg->ne("\0", "\x{DFFF}"));
 ok($illeg->ne("\0", "\x{FDD0}"));
@@ -80,9 +80,9 @@ ok($illeg->ne("\0", "\x{110000}"));
 
 # 23..26
 ok($illeg->eq("A",   "A\x{FFFF}"));
-ok($illeg->gt("A\0", "A\x{FFFF}"));
-ok($illeg->lt("A",  "A\0"));
-ok($illeg->lt("AA", "A\0"));
+is($illeg->cmp("A\0", "A\x{FFFF}"), 1);
+is($illeg->cmp("A",  "A\0"), -1);
+is($illeg->cmp("AA", "A\0"), -1);
 
 ##################
 

@@ -14,7 +14,7 @@ use IO::Uncompress::Gunzip v2.006 ;
 use strict ;
 use warnings ;
 use bytes ;
-our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
+our ($VERSION, $XS_VERSION, @ISA, @EXPORT);
 
 $VERSION = '2.007';
 $XS_VERSION = $VERSION; 
@@ -123,7 +123,8 @@ sub gzopen($$)
         unless isaFilehandle $file || isaFilename $file  || 
                (ref $file && ref $file eq 'SCALAR');
 
-    return undef unless $mode =~ m/[rwa]/i ;
+    croak "gzopen: invalid mode"
+      unless $mode =~ m/[rwa]/i ;
 
     _set_gzerr(0) ;
 

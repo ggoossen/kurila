@@ -5,11 +5,12 @@ use Config;
 use File::Basename;
 use File::Spec;
 use Symbol;
+use strict;
 
 require Exporter;
 
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(process_file);
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(process_file);
 
 # use strict;  # One of these days...
 
@@ -32,6 +33,37 @@ use vars qw(%input_expr %output_expr $ProtoUsed @InitFileCode $FH $proto_re $Ove
             @line_no $ret_type $func_header $orig_args
 	   ); # Add these just to get compilation to happen.
 
+our ($func_args, $PPCODE, $CODE, $EXPLICIT_RETURN, $ALIAS, $INTERFACE, $Full_func_name,
+     $cond, $min_args, $pname, $condnum, $thisdone, $retvaldone, $deferred, $gotRETVAL,
+     $RETVAL_code, %outargs, $DoSetMagic, %XsubAliases, $name, $value, @Attributes,
+     $XsubAliases, %Interfaces, $Packid, $proto, $Module_cname, $Interfaces,
+     $name_printed, $var_num, $orig_alias, $Packprefix, %XsubAliasValues, $Module,
+     $type, $num, $var, $init, $arg, $argoff, $ntype, $tk, $subtype,
+     $func_name, $expr, $do_setmagic, $do_push, $subexpr);
+
+# Constants:
+
+our $END = "!End!\n\n";		# "impossible" keyword (multiple newline)
+our $Is_VMS = $^O eq 'VMS';
+
+# constant regex.
+our ($C_group_rex, $C_arg);
+# Group in C (no support for comments or literals)
+$C_group_rex = qr/ [({\[]
+		       (?: (?> [^()\[\]{}]+ ) | (??{ $C_group_rex }) )*
+		       [)}\]] /x ;
+# Chunk in C without comma at toplevel (no comments):
+$C_arg = qr/ (?: (?> [^()\[\]{},"']+ )
+	     |   (??{ $C_group_rex })
+	     |   " (?: (?> [^\\"]+ )
+		   |   \\.
+		   )* "		# String literal
+			    |   ' (?: (?> [^\\']+ ) | \\. )* ' # Char literal
+	     )* /xs;
+
+
+
+our $SymSet;
 
 sub process_file {
   
@@ -60,9 +92,7 @@ sub process_file {
 
   # Global Constants
   
-  my ($Is_VMS, $SymSet);
-  if ($^O eq 'VMS') {
-    $Is_VMS = 1;
+  if ($Is_VMS) {
     # Establish set of global symbols with max length 28, since xsubpp
     # will later add the 'XS_' prefix.
     require ExtUtils::XSSymSet;
@@ -101,12 +131,12 @@ sub process_file {
   }
   
   # Open the input file
-  open($FH, $args{filename}) or die "cannot open $args{filename}: $!\n";
+  open($FH, "<", $args{filename}) or die "cannot open $args{filename}: $!\n";
 
   # Open the output file if given as a string.  If they provide some
   # other kind of reference, trust them that we can print to it.
   if (not ref $args{output}) {
-    open my($fh), "> $args{output}" or die "Can't create $args{output}: $!";
+    open my($fh), ">", "$args{output}" or die "Can't create $args{output}: $!";
     $args{outfile} = $args{output};
     $args{output} = $fh;
   }
@@ -145,7 +175,7 @@ sub process_file {
     # skip directories, binary files etc.
     warn("Warning: ignoring non-text typemap file '$typemap'\n"), next
       unless -T $typemap ;
-    open(TYPEMAP, $typemap)
+    open(TYPEMAP, "<", $typemap)
       or warn ("Warning: could not open typemap file '$typemap': $!\n"), next;
     my $mode = 'Typemap';
     my $junk = "" ;
@@ -204,7 +234,8 @@ sub process_file {
   }
 
   my ($cast, $size);
-  our $bal = qr[(?:(?>[^()]+)|\((??{ $bal })\))*]; # ()-balanced
+  our $bal;
+  $bal = qr[(?:(?>[^()]+)|\((??{ $bal })\))*]; # ()-balanced
   $cast = qr[(?:\(\s*SV\s*\*\s*\)\s*)?]; # Optional (SV*) cast
   $size = qr[,\s* (??{ $bal }) ]x; # Third arg (to setpvn)
 
@@ -222,8 +253,6 @@ sub process_file {
     $targetable{$key} = [$t, $with_size, $arg, $sarg] if $t;
   }
 
-  my $END = "!End!\n\n";		# "impossible" keyword (multiple newline)
-
   # Match an XS keyword
   $BLOCK_re= '\s*(' . join('|', qw(
 				   REQUIRE BOOT CASE PREINIT INPUT INIT CODE PPCODE OUTPUT
@@ -231,20 +260,6 @@ sub process_file {
 				   SCOPE INTERFACE INTERFACE_MACRO C_ARGS POSTCALL OVERLOAD FALLBACK
 				  )) . "|$END)\\s*:";
 
-  
-  our ($C_group_rex, $C_arg);
-  # Group in C (no support for comments or literals)
-  $C_group_rex = qr/ [({\[]
-		       (?: (?> [^()\[\]{}]+ ) | (??{ $C_group_rex }) )*
-		       [)}\]] /x ;
-  # Chunk in C without comma at toplevel (no comments):
-  $C_arg = qr/ (?: (?> [^()\[\]{},"']+ )
-	     |   (??{ $C_group_rex })
-	     |   " (?: (?> [^\\"]+ )
-		   |   \\.
-		   )* "		# String literal
-			    |   ' (?: (?> [^\\']+ ) | \\. )* ' # Char literal
-	     )* /xs;
   
   # Identify the version of xsubpp used
   print <<EOM ;
@@ -263,6 +278,7 @@ EOM
     if $WantLineNumbers;
 
   firstmodule:
+  local $_;
   while ( ~< $FH) {
     if (m/^=/) {
       my $podstartline = $.;
@@ -318,6 +334,124 @@ EOF
 
  PARAGRAPH:
   while (fetch_para()) {
+      process_para(%args);
+  }
+
+  if ($Overload) # make it findable with fetchmethod
+  {
+    print Q(<<"EOF");
+#XS(XS_${Packid}_nil); /* prototype to pass -Wmissing-prototypes */
+#XS(XS_${Packid}_nil)
+#\{
+#   XSRETURN_EMPTY;
+#\}
+#
+EOF
+    unshift(@InitFileCode, <<"MAKE_FETCHMETHOD_WORK");
+    /* Making a sub named "${Package}::()" allows the package */
+    /* to be findable via fetchmethod(), and causes */
+    /* overload::Overloaded("${Package}") to return true. */
+    newXS("${Package}::()", XS_${Packid}_nil, file$proto);
+MAKE_FETCHMETHOD_WORK
+  }
+
+  # print initialization routine
+
+  print Q(<<"EOF");
+##ifdef __cplusplus
+#extern "C"
+##endif
+EOF
+
+  print Q(<<"EOF");
+#XS(boot_$Module_cname); /* prototype to pass -Wmissing-prototypes */
+#XS(boot_$Module_cname)
+EOF
+
+  print Q(<<"EOF");
+#[[
+##ifdef dVAR
+#    dVAR; dXSARGS;
+##else
+#    dXSARGS;
+##endif
+EOF
+
+  #-Wall: if there is no $Full_func_name there are no xsubs in this .xs
+  #so `file' is unused
+  print Q(<<"EOF") if $Full_func_name;
+#    char* file = __FILE__;
+EOF
+
+  print Q("#\n");
+
+  print Q(<<"EOF");
+#    PERL_UNUSED_VAR(cv); /* -W */
+#    PERL_UNUSED_VAR(items); /* -W */
+EOF
+    
+  print Q(<<"EOF") if $WantVersionChk ;
+#    XS_VERSION_BOOTCHECK ;
+#
+EOF
+
+  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+#    \{
+#        CV * cv ;
+#
+EOF
+
+  print Q(<<"EOF") if ($Overload);
+#    /* register the overloading (type 'A') magic */
+#    PL_amagic_generation++;
+#    /* The magic for overload gets a GV* via gv_fetchmeth as */
+#    /* mentioned above, and looks in the SV* slot of it for */
+#    /* the "fallback" status. */
+#    sv_setsv(
+#        get_sv( "${Package}::()", TRUE ),
+#        $Fallback
+#    );
+EOF
+
+  print @InitFileCode;
+
+  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+#    \}
+EOF
+
+  if (@BootCode)
+  {
+    print "\n    /* Initialisation Section */\n\n" ;
+    @line = @BootCode;
+    print_section();
+    print "\n    /* End of Initialisation Section */\n\n" ;
+  }
+
+    print <<'EOF';
+    if (PL_unitcheckav)
+         call_list(PL_scopestack_ix, PL_unitcheckav);
+EOF
+
+  print Q(<<"EOF");
+#    XSRETURN_YES;
+#]]
+#
+EOF
+
+  warn("Please specify prototyping behavior for $filename (see perlxs manual)\n")
+    unless $ProtoUsed ;
+
+  chdir($orig_cwd);
+  select($orig_fh);
+  untie *PSEUDO_STDOUT if tied *PSEUDO_STDOUT;
+  close $FH;
+
+  return 1;
+}
+
+sub process_para {
+    my %args = @_;
+
     # Print initial preprocessor statements and blank lines
     while (@line && $line[0] !~ m/^[^\#]/) {
       my $line = shift(@line);
@@ -351,7 +485,7 @@ EOF
       }
     }
     
-    next PARAGRAPH unless @line;
+    return unless @line;
     
     if ($XSS_work_idx && !$XSStack[$XSS_work_idx]{varname}) {
       # We are inside an #if, but have not yet #defined its xsubpp variable.
@@ -431,7 +565,7 @@ EOF
     ($class, $func_name, $orig_args) =  ($1, $2, $3) ;
     $class = "$4 $class" if $4;
     ($pname = $func_name) =~ s/^($Prefix)?/$Packprefix/;
-    ($clean_func_name = $func_name) =~ s/^$Prefix//;
+    (my $clean_func_name = $func_name) =~ s/^$Prefix//;
     $Full_func_name = "${Packid}_$clean_func_name";
     if ($Is_VMS) {
       $Full_func_name = $SymSet->addsym($Full_func_name);
@@ -503,21 +637,22 @@ EOF
 	  my $out_type = $1;
 	  next if $out_type eq 'IN';
 	  $only_C_inlist{$_} = 1 if $out_type eq "OUTLIST";
+          my $name = ''; # FIXME $name is wronly scoped.
 	  push @outlist, $name if $out_type =~ m/OUTLIST$/;
 	  $in_out{$_} = $out_type;
 	}
       }
     }
+    my $extra_args = 0;
+    my @args_num = ();
+    my $num_args = 0;
+    my $report_args = '';
     if (defined($class)) {
       my $arg0 = ((defined($static) or $func_name eq 'new')
 		  ? "CLASS" : "THIS");
       unshift(@args, $arg0);
       ($report_args = "$arg0, $report_args") =~ s/^\w+, $/$arg0/;
     }
-    my $extra_args = 0;
-    @args_num = ();
-    $num_args = 0;
-    my $report_args = '';
     foreach my $i (0 .. $#args) {
       if ($args[$i] =~ s/\.\.\.//) {
 	$ellipsis = 1;
@@ -541,7 +676,7 @@ EOF
       }
       $proto_arg[$i+1] = '$' ;
     }
-    $min_args = $num_args - $extra_args;
+    my $min_args = $num_args - $extra_args;
     $report_args =~ s/"/\\"/g;
     $report_args =~ s/^,\s+//;
     my @func_args = @args;
@@ -895,118 +1030,6 @@ EOF
       push(@InitFileCode,
 	   "        ${newXS}(\"$pname\", XS_$Full_func_name, file$proto);\n");
     }
-  }
-
-  if ($Overload) # make it findable with fetchmethod
-  {
-    print Q(<<"EOF");
-#XS(XS_${Packid}_nil); /* prototype to pass -Wmissing-prototypes */
-#XS(XS_${Packid}_nil)
-#{
-#   XSRETURN_EMPTY;
-#}
-#
-EOF
-    unshift(@InitFileCode, <<"MAKE_FETCHMETHOD_WORK");
-    /* Making a sub named "${Package}::()" allows the package */
-    /* to be findable via fetchmethod(), and causes */
-    /* overload::Overloaded("${Package}") to return true. */
-    newXS("${Package}::()", XS_${Packid}_nil, file$proto);
-MAKE_FETCHMETHOD_WORK
-  }
-
-  # print initialization routine
-
-  print Q(<<"EOF");
-##ifdef __cplusplus
-#extern "C"
-##endif
-EOF
-
-  print Q(<<"EOF");
-#XS(boot_$Module_cname); /* prototype to pass -Wmissing-prototypes */
-#XS(boot_$Module_cname)
-EOF
-
-  print Q(<<"EOF");
-#[[
-##ifdef dVAR
-#    dVAR; dXSARGS;
-##else
-#    dXSARGS;
-##endif
-EOF
-
-  #-Wall: if there is no $Full_func_name there are no xsubs in this .xs
-  #so `file' is unused
-  print Q(<<"EOF") if $Full_func_name;
-#    char* file = __FILE__;
-EOF
-
-  print Q("#\n");
-
-  print Q(<<"EOF");
-#    PERL_UNUSED_VAR(cv); /* -W */
-#    PERL_UNUSED_VAR(items); /* -W */
-EOF
-    
-  print Q(<<"EOF") if $WantVersionChk ;
-#    XS_VERSION_BOOTCHECK ;
-#
-EOF
-
-  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
-#    {
-#        CV * cv ;
-#
-EOF
-
-  print Q(<<"EOF") if ($Overload);
-#    /* register the overloading (type 'A') magic */
-#    PL_amagic_generation++;
-#    /* The magic for overload gets a GV* via gv_fetchmeth as */
-#    /* mentioned above, and looks in the SV* slot of it for */
-#    /* the "fallback" status. */
-#    sv_setsv(
-#        get_sv( "${Package}::()", TRUE ),
-#        $Fallback
-#    );
-EOF
-
-  print @InitFileCode;
-
-  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
-#    }
-EOF
-
-  if (@BootCode)
-  {
-    print "\n    /* Initialisation Section */\n\n" ;
-    @line = @BootCode;
-    print_section();
-    print "\n    /* End of Initialisation Section */\n\n" ;
-  }
-
-    print <<'EOF';
-    if (PL_unitcheckav)
-         call_list(PL_scopestack_ix, PL_unitcheckav);
-EOF
-
-  print Q(<<"EOF");
-#    XSRETURN_YES;
-#]]
-#
-EOF
-
-  warn("Please specify prototyping behavior for $filename (see perlxs manual)\n")
-    unless $ProtoUsed ;
-
-  chdir($orig_cwd);
-  select($orig_fh);
-  untie *PSEUDO_STDOUT if tied *PSEUDO_STDOUT;
-  close $FH;
-
-  return 1;
 }
 
 sub errors { $errors }
@@ -1034,8 +1057,7 @@ sub TrimWhitespace
   $_[0] =~ s/^\s+|\s+$//go ;
 }
 
-sub TidyType
-  {
+sub TidyType {
     local ($_) = @_ ;
 
     # rationalise any '*' by joining them into bunches and removing whitespace
@@ -1467,7 +1489,7 @@ sub INCLUDE_handler ()
     $FH = Symbol::gensym();
 
     # open the new file
-    open ($FH, "$_") or death("Cannot open '$_': $!") ;
+    open ($FH, "<", "$_") or death("Cannot open '$_': $!") ;
 
     print Q(<<"EOF");
 #
@@ -1579,8 +1601,8 @@ sub check_cpp {
 sub Q {
   my($text) = @_;
   $text =~ s/^#//gm;
-  $text =~ s/\[\[/{/g;
-  $text =~ s/\]\]/}/g;
+  $text =~ s/\[\[/\{/g;
+  $text =~ s/\]\]/\}/g;
   $text;
 }
 
@@ -1649,25 +1671,26 @@ sub output_init {
   local($arg) = "ST(" . ($num - 1) . ")";
 
   if (  $init =~ m/^=/  ) {
-    if ($name_printed) {
-      eval qq/print " $init\\n"/;
-    } else {
-      eval qq/print "\\t$var $init\\n"/;
-    }
-    warn $@   if  $@;
+      my $x_init = evalqq($init);
+      if ($name_printed) {
+          print " $x_init\n";
+      } else {
+          my $x_var = evalqq($var);
+          print "\t$x_var $x_init\n";
+      }
   } else {
     if (  $init =~ s/^\+//  &&  $num  ) {
-      &generate_init($type, $num, $var, $name_printed);
+        &generate_init($type, $num, $var, $name_printed);
     } elsif ($name_printed) {
-      print ";\n";
-      $init =~ s/^;//;
+        print ";\n";
+        $init =~ s/^;//;
     } else {
-      eval qq/print "\\t$var;\\n"/;
-      warn $@   if  $@;
-      $init =~ s/^;//;
+        my $x_var = evalqq($var);
+        print "\t$x_var;\n";
+        $init =~ s/^;//;
     }
-    $deferred .= eval qq/"\\n\\t$init\\n"/;
-    warn $@   if  $@;
+    my $x_init = evalqq($init);
+    $deferred .= "\n\t$x_init\n";
   }
 }
 
@@ -1688,8 +1711,15 @@ sub blurt
 sub death
   {
     Warn @_ ;
-    exit 1 ;
+    die @_;
   }
+
+sub evalqq {
+    my $x = shift;
+    my $ex = eval qq/"$x"/;
+    die "error in '$x': $@" if $@;
+    return $ex;
+}
 
 sub generate_init {
   local($type, $num, $var) = @_;
@@ -1734,35 +1764,36 @@ sub generate_init {
   if ($expr =~ m#/\*.*scope.*\*/#i) {  # "scope" in C comments
     $ScopeThisXSUB = 1;
   }
+  my $x_var = evalqq($var);
   if (defined($defaults{$var})) {
     $expr =~ s/(\t+)/$1    /g;
     $expr =~ s/        /\t/g;
     if ($name_printed) {
       print ";\n";
     } else {
-      eval qq/print "\\t$var;\\n"/;
-      warn $@   if  $@;
+      print "\t$x_var;\n";
     }
+    my $x_num = evalqq($num);
+    my $x_expr = evalqq($expr);
     if ($defaults{$var} eq 'NO_INIT') {
-      $deferred .= eval qq/"\\n\\tif (items >= $num) {\\n$expr;\\n\\t}\\n"/;
+        $deferred .= qq/\n\tif (items >= $x_num) \{\n$x_expr;\n\t\}\n/;
     } else {
-      $deferred .= eval qq/"\\n\\tif (items < $num)\\n\\t    $var = $defaults{$var};\\n\\telse {\\n$expr;\\n\\t}\\n"/;
+        my $x_defaults_var = evalqq($defaults{$var});
+        $deferred .= qq/\n\tif (items < $x_num)\n\t    $x_var = $x_defaults_var;\n\telse \{\n$x_expr;\n\t\}\n/;
     }
-    warn $@   if  $@;
   } elsif ($ScopeThisXSUB or $expr !~ m/^\s*\$var =/) {
     if ($name_printed) {
       print ";\n";
     } else {
-      eval qq/print "\\t$var;\\n"/;
-      warn $@   if  $@;
+      print "\t$x_var;\n";
     }
-    $deferred .= eval qq/"\\n$expr;\\n"/;
-    warn $@   if  $@;
+    my $x_expr = evalqq($expr);
+    $deferred .= "\n$x_expr;\n";
   } else {
     die "panic: do not know how to handle this branch for function pointers"
       if $name_printed;
-    eval qq/print "$expr;\\n"/;
-    warn $@   if  $@;
+    my $x_expr = evalqq($expr);
+    print "$x_expr;\n";
   }
 }
 
@@ -1860,7 +1891,7 @@ sub map_type {
 package
   ExtUtils::ParseXS::CountLines;
 use strict;
-use vars qw($SECTION_END_MARKER);
+our ($SECTION_END_MARKER);
 
 sub TIEHANDLE {
   my ($class, $cfile, $fh) = @_;

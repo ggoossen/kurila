@@ -1787,21 +1787,15 @@ Perl_regexec_flags(pTHX_ REGEXP * const prog, char *stringarg, register char *st
 	    dontbother = minlen - 1;
 	strend -= dontbother; 		   /* this one's always in bytes! */
 	/* We don't know much -- general case. */
-	if (do_utf8) {
-	    for (;;) {
-		if (regtry(&reginfo, &s))
-		    goto got_it;
-		if (s >= strend)
-		    break;
-		s += UTF8SKIP(s);
-	    };
-	}
-	else {
-	    do {
-		if (regtry(&reginfo, &s))
-		    goto got_it;
-	    } while (s++ < strend);
-	}
+	do {
+	    if (regtry(&reginfo, &s))
+		goto got_it;
+	    s++;
+	    if (do_utf8) {
+		while (UTF8_IS_CONTINUATION(*s) && s <= strend) 
+		    s++;
+	    }
+	} while (s <= strend);
     }
 
     /* Failure. */
@@ -1876,6 +1870,7 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
 
     DEBUG_EXECUTE_r(
 			PerlIO_printf(Perl_debug_log, "regtry") );
+    assert(*startpos <= PL_regeol);
 
     if ((prog->extflags & RXf_EVAL_SEEN) && !PL_reg_eval_set) {
 	MAGIC *mg;
@@ -1989,6 +1984,7 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
     }
 #endif
     REGCP_SET(lastcp);
+    assert(PL_reginput <= PL_regeol);
     if (regmatch(reginfo, progi->program + 1)) {
 	PL_regoffs[0].end = PL_reginput - PL_bostr;
 	return 1;
@@ -2449,6 +2445,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	st = PL_regmatch_state = S_push_slab(aTHX);
 
     /* Note that nextchr is a byte even in UTF */
+    assert(locinput <= PL_regeol);
     nextchr = UCHARAT(locinput);
     scan = prog;
     while (scan != NULL) {
@@ -2622,6 +2619,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		while ( state && uc <= PL_regeol ) {
                     U32 base = trie->states[ state ].trans.base;
                     U16 charid;
+		    U8 uvc = 0;
                     /* We use charid to hold the wordnum as we don't use it
                        for charid until after we have done the wordnum logic. 
                        We define an alias just so that the wordnum logic reads
@@ -2670,7 +2668,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			            (UV)state, (UV)ST.accepted );
 		    });
 
-                    U8 uvc = 0;
 		    if ( base ) {
                                                       
 			uvc = (U8)*uc;

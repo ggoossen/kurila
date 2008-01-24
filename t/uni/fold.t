@@ -13,7 +13,7 @@ my $CF = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
 
 use constant EBCDIC => ord 'A' == 193;
 
-if (open(CF, $CF)) {
+if (open(CF, "<", $CF)) {
     my @CF;
 
     while ( ~< *CF) {

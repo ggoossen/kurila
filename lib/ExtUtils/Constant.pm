@@ -241,7 +241,7 @@ EOT
   $xs .= << "EOT";
       /* Return 1 or 2 items. First is error message, or undef if no error.
            Second, if present, is found value */
-        switch (type) {
+        switch (type) \{
         case PERL_constant_NOTFOUND:
           sv =
 	    sv_2mortal(newSVpvf("%s is not a valid $package_sprintf_safe macro", s));
@@ -283,7 +283,7 @@ EOT
 	    "Unexpected return type %d while processing $package_sprintf_safe macro %s, used",
                type, s));
           PUSHs(sv);
-        }
+        \}
 EOT
 
   return $xs;
@@ -323,7 +323,7 @@ EOT
                                 );
 EOT
 
-  $result =~ s/^/' 'x$indent/gem;
+  $result =~ s/^/{' 'x$indent}/gm;
   return ExtUtils::Constant::XS->dump_names({default_type=>$args{DEFAULT_TYPE},
 					     indent=>$indent,},
 					    @{$args{NAMES}})
@@ -412,12 +412,12 @@ sub WriteConstants {
 
   my $c_fh = $ARGS{C_FH};
   if (!$c_fh) {
-      open $c_fh, ">$ARGS{C_FILE}" or die "Can't open $ARGS{C_FILE}: $!";
+      open $c_fh, ">", "$ARGS{C_FILE}" or die "Can't open $ARGS{C_FILE}: $!";
   }
 
   my $xs_fh = $ARGS{XS_FH};
   if (!$xs_fh) {
-      open $xs_fh, ">$ARGS{XS_FILE}" or die "Can't open $ARGS{XS_FILE}: $!";
+      open $xs_fh, ">", "$ARGS{XS_FILE}" or die "Can't open $ARGS{XS_FILE}: $!";
   }
 
   # As this subroutine is intended to make code that isn't edited, there's no
@@ -430,25 +430,7 @@ sub WriteConstants {
       $ARGS{XS_FH} = $xs_fh;
       ExtUtils::Constant::ProxySubs->WriteConstants(%ARGS);
   } else {
-      my $types = {};
-
-      print $c_fh constant_types(); # macro defs
-      print $c_fh "\n";
-
-      # indent is still undef. Until anyone implements indent style rules with
-      # it.
-      foreach (ExtUtils::Constant::XS->C_constant({package => $ARGS{NAME},
-						   subname => $ARGS{C_SUBNAME},
-						   default_type =>
-						       $ARGS{DEFAULT_TYPE},
-						       types => $types,
-						       breakout =>
-						       $ARGS{BREAKOUT_AT}},
-						  @{$ARGS{NAMES}})) {
-	  print $c_fh $_, "\n"; # C constant subs
-      }
-      print $xs_fh XS_constant ($ARGS{NAME}, $types, $ARGS{XS_SUBNAME},
-				$ARGS{C_SUBNAME});
+      die "Ony ProxySubs are supported";
   }
 
   close $c_fh or warn "Error closing $ARGS{C_FILE}: $!" unless $ARGS{C_FH};

@@ -24,7 +24,7 @@ sub parse_file {
 
     my $result;
 
-    open(FH,$parsefile) or warn "Could not open '$parsefile': $!";
+    open(FH, "<",$parsefile) or warn "Could not open '$parsefile': $!";
 
     my $inpod = 0;
     while ( ~< *FH) {
@@ -36,9 +36,9 @@ sub parse_file {
 	    package ExtUtils::MakeMaker::_version;
 	    no strict;
 	    local $1$2;
-	    \$$2=undef; do {
+	    \$$2=undef; do \{
 		$_
-	    }; \$$2
+	    \}; \$$2
 	};
 	no warnings;
 	$result = eval($eval);

@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 143 );
+plan( tests => 142 );
 
 our (@a, @b);
 
@@ -20,11 +20,11 @@ our (@a, @b);
     map scalar(sort(+())), ('')x68;
 }
 
-sub Backwards { $a lt $b ? 1 : $a gt $b ? -1 : 0 }
-sub Backwards_stacked($$) { my($a,$b) = @_; $a lt $b ? 1 : $a gt $b ? -1 : 0 }
-sub Backwards_other { $a lt $b ? 1 : $a gt $b ? -1 : 0 }
+sub Backwards { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
+sub Backwards_stacked($$) { my($x,$y) = @_; ($x cmp $y) +< 0 ? 1 : ($x cmp $y) +> 0 ? -1 : 0 }
+sub Backwards_other { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
 
-my $upperfirst = 'A' lt 'a';
+my $upperfirst = ('A' cmp 'a') +< 0;
 
 # Beware: in future this may become hairier because of possible
 # collation complications: qw(A a B b) can be sorted at least as
@@ -149,11 +149,6 @@ ok(($@ eq "" && "@b" eq "1 4 5 9"),'redefinition should not take effect during t
 }
 eval { @b = sort twoface 4,1 };
 cmp_ok(substr($@,0,4), 'eq', 'good', 'twoface eval');
-
-eval <<'CODE';
-    my @result = sort main'Backwards 'one', 'two';
-CODE
-cmp_ok($@,'eq','',q(old skool package));
 
 eval <<'CODE';
     # "sort 'one', 'two'" should not try to parse "'one" as a sort sub
@@ -588,9 +583,9 @@ ok "@input", "G H I D E F A B C", 'stable $b <=> $a in place sort';
 # (new in 5.9) without overloading
 { no warnings;
 @b = sort { $b <+> $a } @input = qw/5first 6first 5second 6second/;
-ok "@b" , "6first 6second 5first 5second", "optimized {$b <=> $a} without overloading" ;
+ok "@b" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
 @input = sort {$b <+> $a} @input;
-ok "@input" , "6first 6second 5first 5second","inline optimized {$b <=> $a} without overloading" ;
+ok "@input" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
 };
 
 # These two are actually doing string cmp on 0 1 and 2

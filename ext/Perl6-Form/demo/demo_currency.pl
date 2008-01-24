@@ -21,7 +21,7 @@ print form
 print "\n\n";
 
 print form
-	"{\x{20AC}]]]].[[-}",
+	"\{\x{20AC}]]]].[[-\}",
 	\@amounts;
 
 print "\n\n";
@@ -34,13 +34,13 @@ print "\n\n";
 
 
 print form {rfill=>0},
-	"{]],]],]]].[\x{20A8}}",
+	"\{]],]],]]].[\x{20A8}\}",
 	\@amounts;
 
 print "\n\n";
 
 print form
-	"{].]]],[DM}",
+	"\{].]]],[DM\}",
 	\@amounts;
 
 print "\n\n";
@@ -59,7 +59,7 @@ print form {rfill=>0},
 print "\n\n";
 
 print form
-	"{]']]],[CHF}",
+	"\{]']]],[CHF\}",
 	\@amounts;
 
 print "\n\n";

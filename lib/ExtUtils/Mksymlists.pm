@@ -63,7 +63,7 @@ sub _write_aix {
 
     rename "$data->{FILE}.exp", "$data->{FILE}.exp_old";
 
-    open(EXP,">$data->{FILE}.exp")
+    open(EXP, ">","$data->{FILE}.exp")
         or croak("Can't create $data->{FILE}.exp: $!\n");
     print EXP join("\n",@{$data->{DL_VARS}}, "\n") if @{$data->{DL_VARS}};
     print EXP join("\n",@{$data->{FUNCLIST}}, "\n") if @{$data->{FUNCLIST}};
@@ -94,7 +94,7 @@ sub _write_os2 {
     $comment = substr($comment, 0, 200) . "...)" if length $comment +> 203;
     rename "$data->{FILE}.def", "$data->{FILE}_def.old";
 
-    open(DEF,">$data->{FILE}.def")
+    open(DEF, ">","$data->{FILE}.def")
         or croak("Can't create $data->{FILE}.def: $!\n");
     print DEF "LIBRARY '$data->{DLBASE}' INITINSTANCE TERMINSTANCE\n";
     print DEF "DESCRIPTION '\@#$distname:$data->{VERSION}#\@ $comment'\n";
@@ -123,7 +123,7 @@ sub _write_win32 {
     }
     rename "$data->{FILE}.def", "$data->{FILE}_def.old";
 
-    open(DEF,">$data->{FILE}.def")
+    open(DEF, ">","$data->{FILE}.def")
         or croak("Can't create $data->{FILE}.def: $!\n");
     # put library name in quotes (it could be a keyword, like 'Alias')
     if ($Config::Config{'cc'} !~ m/^gcc/i) {
@@ -170,7 +170,7 @@ sub _write_vms {
 
     rename "$data->{FILE}.opt", "$data->{FILE}.opt_old";
 
-    open(OPT,">$data->{FILE}.opt")
+    open(OPT, ">","$data->{FILE}.opt")
         or croak("Can't create $data->{FILE}.opt: $!\n");
 
     # Options file declaring universal symbols

@@ -395,8 +395,10 @@ PERL_CALLCONV void	Perl_deprecate_old(pTHX_ const char* s)
 PERL_CALLCONV OP*	Perl_die(pTHX_ const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
-PERL_CALLCONV OP*	Perl_vdie(pTHX_ const char* pat, va_list* args);
-PERL_CALLCONV OP*	Perl_die_where(pTHX_ const char* message, STRLEN msglen);
+PERL_CALLCONV void	Perl_vdie(pTHX_ const char* pat, va_list* args);
+PERL_CALLCONV void	Perl_die_where(pTHX_ SV *msv)
+			__attribute__nonnull__(pTHX_1);
+
 PERL_CALLCONV void	Perl_dounwind(pTHX_ I32 cxix);
 /* PERL_CALLCONV bool	Perl_do_aexec(pTHX_ SV* really, SV** mark, SV** sp)
 			__attribute__nonnull__(pTHX_2)
@@ -3421,6 +3423,10 @@ STATIC char *	S_sv_exp_grow(pTHX_ SV *sv, STRLEN needed)
 
 #endif
 
+PERL_CALLCONV I32	Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT* cxstk, I32 startingblock)
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(pTHX_1);
+
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 STATIC OP*	S_docatch(pTHX_ OP *o)
 			__attribute__warn_unused_result__;
@@ -3444,10 +3450,6 @@ STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 
 STATIC I32	S_dopoptoloop(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
-
-STATIC I32	S_dopoptosub_at(pTHX_ const PERL_CONTEXT* cxstk, I32 startingblock)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
 
 STATIC I32	S_dopoptowhen(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
@@ -3964,7 +3966,8 @@ STATIC char*	S_scan_pat(pTHX_ char *start, I32 type)
 
 STATIC char*	S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, yy_str_info *str_info)
 			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_4);
 
 STATIC char*	S_scan_subst(pTHX_ char *start)
 			__attribute__warn_unused_result__
@@ -4020,7 +4023,7 @@ STATIC I32	S_sublex_done(pTHX)
 STATIC I32	S_sublex_push(pTHX)
 			__attribute__warn_unused_result__;
 
-STATIC I32	S_sublex_start(pTHX)
+STATIC I32	S_sublex_start(pTHX_ I32 op_type, OP *op)
 			__attribute__warn_unused_result__;
 
 STATIC char *	S_filter_gets(pTHX_ SV *sv, PerlIO *fp, STRLEN append)
@@ -4073,8 +4076,10 @@ STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
 			__attribute__nonnull__(pTHX_1);
 
 STATIC SV*	S_mess_alloc(pTHX);
-STATIC const char *	S_vdie_croak_common(pTHX_ const char *pat, va_list *args, STRLEN *msglen, I32* utf8);
-STATIC bool	S_vdie_common(pTHX_ const char *message, STRLEN msglen, I32 utf8, bool warn);
+STATIC SV*	S_vdie_croak_common(pTHX_ const char *pat, va_list *args);
+PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msg, bool warn)
+			__attribute__nonnull__(pTHX_1);
+
 STATIC char *	S_write_no_mem(pTHX)
 			__attribute__noreturn__;
 

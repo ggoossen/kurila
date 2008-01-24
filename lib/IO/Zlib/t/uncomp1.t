@@ -27,7 +27,7 @@ EOM
 
 $name = "IO-Zlib-test";
 
-if (open(FH, ">$name")) {
+if (open(FH, ">", "$name")) {
     binmode FH;
     print FH $hello;
     close FH;

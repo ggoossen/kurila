@@ -44,14 +44,14 @@ sub unctrl {
 	    # EBCDIC has no concept of "\cA" or "A" being related
 	    # to each other by a linear/boolean mapping.
 	} else {
-	    s/([\001-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
+	    s/([\001-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
 	}
 	$_;
 }
 
 sub uniescape {
     join("",
-	 map { $_ +> 255 ? sprintf("\\x{%04X}", $_) : chr($_) }
+	 map { $_ +> 255 ? sprintf("\\x\{%04X\}", $_) : chr($_) }
 	     unpack("U*", $_[0]));
 }
 
@@ -85,21 +85,21 @@ sub stringify {
 	  s/([\'\\])/\\$1/g;
 	} elsif ($unctrl eq 'unctrl') {
 	  s/([\"\\])/\\$1/g ;
-	  s/([\000-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
+	  s/([\000-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
 	  # uniescape?
-	  s/([\200-\377])/'\\0x'.sprintf('%2X',ord($1))/eg 
+	  s/([\200-\377])/{'\0x'.sprintf('%2X',ord($1))}/g 
 	    if $quoteHighBit;
 	} elsif ($unctrl eq 'quote') {
 	  s/([\"\\\$\@])/\\$1/g if $tick eq '"';
 	  s/\033/\\e/g;
 	  if (ord('A') == 193) { # EBCDIC.
-	      s/([\000-\037\177])/'\\c'.chr(193)/eg; # Unfinished.
+	      s/([\000-\037\177])/{'\c'.chr(193)}/g; # Unfinished.
 	  } else {
-	      s/([\000-\037\177])/'\\c'._escaped_ord($1)/eg;
+	      s/([\000-\037\177])/{'\c'._escaped_ord($1)}/g;
 	  }
 	}
 	$_ = uniescape($_);
-	s/([\200-\377])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
+	s/([\200-\377])/{'\\'.sprintf('%3o',ord($1))}/g if $quoteHighBit;
 	($noticks || m/^\d+(\.\d*)?\Z/) 
 	  ? $_ 
 	  : $tick . $_ . $tick;
@@ -297,16 +297,16 @@ sub unwrap {
       print "$sp-> ",&stringify($$v,1),"\n";
       if ($globPrint) {
 	$s += 3;
-       dumpglob($s, "{$$v}", $$v, 1, $m-1);
+       dumpglob($s, "\{$$v\}", $$v, 1, $m-1);
       } elsif (defined ($fileno = eval {fileno($v)})) {
-	print( (' ' x ($s+3)) .  "FileHandle({$$v}) => fileno($fileno)\n" );
+	print( (' ' x ($s+3)) .  "FileHandle(\{$$v\}) => fileno($fileno)\n" );
       }
     } elsif (ref \$v eq 'GLOB') {
       # Raw glob (again?)
       if ($globPrint) {
-       dumpglob($s, "{$v}", $v, 1, $m-1) if $globPrint;
+       dumpglob($s, "\{$v\}", $v, 1, $m-1) if $globPrint;
       } elsif (defined ($fileno = eval {fileno(\$v)})) {
-	print( (' ' x $s) .  "FileHandle({$v}) => fileno($fileno)\n" );
+	print( (' ' x $s) .  "FileHandle(\{$v\}) => fileno($fileno)\n" );
       }
     }
 }

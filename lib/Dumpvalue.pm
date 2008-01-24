@@ -77,7 +77,7 @@ sub unctrl {
   local($_) = @_;
 
   return \$_ if ref \$_ eq "GLOB";
-  s/([\001-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
+  s/([\001-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
   $_;
 }
 
@@ -106,15 +106,15 @@ sub stringify {
     s/([\'\\])/\\$1/g;
   } elsif ($self->{unctrl} eq 'unctrl') {
     s/([\"\\])/\\$1/g ;
-    s/([\000-\037\177])/'^'.pack('c',ord($1)^^^64)/eg;
-    s/([\200-\377])/'\\0x'.sprintf('%2X',ord($1))/eg
+    s/([\000-\037\177])/{'^'.pack('c',ord($1)^^^64)}/g;
+    s/([\200-\377])/{'\0x'.sprintf('%2X',ord($1))}/g
       if $self->{quoteHighBit};
   } elsif ($self->{unctrl} eq 'quote') {
     s/([\"\\\$\@])/\\$1/g if $tick eq '"';
     s/\033/\\e/g;
-    s/([\000-\037\177])/'\\c'.chr(ord($1)^^^64)/eg;
+    s/([\000-\037\177])/{'\c'.chr(ord($1)^^^64)}/g;
   }
-  s/([\200-\377])/'\\'.sprintf('%3o',ord($1))/eg if $self->{quoteHighBit};
+  s/([\200-\377])/{'\'.sprintf('%3o',ord($1))}/g if $self->{quoteHighBit};
   ($noticks || m/^\d+(\.\d*)?\Z/)
     ? $_
       : $tick . $_ . $tick;
@@ -257,15 +257,15 @@ sub unwrap {
     print "$sp-> ",$self->stringify($$v,1),"\n";
     if ($self->{globPrint}) {
       $s += 3;
-      $self->dumpglob('', $s, "{$$v}", $$v, 1);
+      $self->dumpglob('', $s, "\{$$v\}", $$v, 1);
     } elsif (defined ($fileno = fileno($v))) {
-      print( (' ' x ($s+3)) .  "FileHandle({$$v}) => fileno($fileno)\n" );
+      print( (' ' x ($s+3)) .  "FileHandle(\{$$v\}) => fileno($fileno)\n" );
     }
   } elsif (ref \$v eq 'GLOB') {
     if ($self->{globPrint}) {
-      $self->dumpglob('', $s, "{*" . Symbol::glob_name($v) . "}", $v, 1);
+      $self->dumpglob('', $s, "\{*" . Symbol::glob_name($v) . "\}", $v, 1);
     } elsif (defined ($fileno = fileno(\$v))) {
-      print( (' ' x $s) .  "FileHandle({$v}) => fileno($fileno)\n" );
+      print( (' ' x $s) .  "FileHandle(\{$v\}) => fileno($fileno)\n" );
     }
   }
 }

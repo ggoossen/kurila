@@ -151,16 +151,16 @@ is(uc("\x{1C6}") , "\x{1C4}",      "U+01C6 uc is U+01C4, too");
 $a = "\x{3c3}foo.bar"; # \x{3c3} == GREEK SMALL LETTER SIGMA.
 $b = "\x{3a3}FOO.BAR"; # \x{3a3} == GREEK CAPITAL LETTER SIGMA.
 
-($c = $b) =~ s/(\w+)/lc($1)/ge;
+($c = $b) =~ s/(\w+)/{lc($1)}/g;
 is($c , $a, "Using s///e to change case.");
 
-($c = $a) =~ s/(\w+)/uc($1)/ge;
+($c = $a) =~ s/(\w+)/{uc($1)}/g;
 is($c , $b, "Using s///e to change case.");
 
-($c = $b) =~ s/(\w+)/lcfirst($1)/ge;
+($c = $b) =~ s/(\w+)/{lcfirst($1)}/g;
 is($c , "\x{3c3}FOO.bAR", "Using s///e to change case.");
 
-($c = $a) =~ s/(\w+)/ucfirst($1)/ge;
+($c = $a) =~ s/(\w+)/{ucfirst($1)}/g;
 is($c , "\x{3a3}foo.Bar", "Using s///e to change case.");
 
 # #18931: perl5.8.0 bug in \U..\E processing
@@ -178,7 +178,7 @@ for my $a (0,1) {
         local $TODO = "fix lc";
 	$a = "\x{a}"."\x{101}";
 	chop $a;
-	$a =~ s/^(\s*)(\w*)/"$1".ucfirst($2)/e;
+	$a =~ s/^(\s*)(\w*)/{"$1".ucfirst($2)}/;
 	is($a, "\x{a}", "[perl #18857]");
     } 
 }

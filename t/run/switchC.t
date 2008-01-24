@@ -45,14 +45,11 @@ $r = runperl( switches => [ '-CE', '-w' ],
 like( $r, qr/^$b(?:\r?\n)?$/s, '-CE: UTF-8 stderr' );
 
 $r = runperl( switches => [ '-Co', '-w' ],
-	      prog     => 'use utf8; open(F, q(>out)) or die $!; print F chr(256); close F',
-              stderr   => 1 );
-like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' );
-
+	      prog     => 'use utf8; open(F, q(>), q(out)) or die $!; print F chr(256); close F', stderr   => 1 ); like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' ); 
 push @tmpfiles, "out";
 
 $r = runperl( switches => [ '-Ci', '-w' ],
-	      prog     => 'use utf8; open(F, q(<out)); print ord(~< *F); close F',
+	      prog     => 'use utf8; open(F, q(<), q(out)); print ord(~< *F); close F',
               stderr   => 1 );
 like( $r, qr/^256(?:\r?\n)?$/s, '-Ci: auto-UTF-8 open for input' );
 

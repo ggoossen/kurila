@@ -131,9 +131,9 @@ sub init_DIRFILESEP {
     my $make = $self->make;
 
     # The ^ makes sure its not interpreted as an escape in nmake
-    $self->{DIRFILESEP} = $make eq 'nmake' ? '^\\' :
-                          $make eq 'dmake' ? '\\\\'
-                                           : '\\';
+    $self->{DIRFILESEP} = $make eq 'nmake' ? '^\' :
+                          $make eq 'dmake' ? '\\'
+                                           : '\';
 }
 
 =item B<init_others>
@@ -459,8 +459,8 @@ sub quote_literal {
     # quotes.  It also translates }} into }.  The escaping below is not
     # 100% correct.
     if( $self->make eq 'dmake' ) {
-        $text =~ s/{/{{/g;
-        $text =~ s/}}/}}}/g;
+        $text =~ s/{/\{\{/g;
+        $text =~ s/}}/\}\}\}/g;
     }
 
     return qq{"$text"};

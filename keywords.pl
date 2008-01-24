@@ -3,7 +3,7 @@ use strict;
 
 require 'regen_lib.pl';
 safer_unlink ("keywords.h");
-open(KW, ">keywords.h") || die "Can't create keywords.h: $!\n";
+open(KW, ">", "keywords.h") || die "Can't create keywords.h: $!\n";
 binmode KW;
 select KW;
 
@@ -54,7 +54,6 @@ __LINE__
 __PACKAGE__
 __DATA__
 __END__
-AUTOLOAD
 BEGIN
 UNITCHECK
 CORE
@@ -114,7 +113,6 @@ flock
 for
 foreach
 fork
-ge
 getc
 getgrent
 getgrgid
@@ -146,7 +144,6 @@ glob
 gmtime
 goto
 grep
-gt
 hex
 if
 index
@@ -158,7 +155,6 @@ kill
 last
 lc
 lcfirst
-le
 length
 link
 listen
@@ -167,7 +163,6 @@ localtime
 lock
 log
 lstat
-lt
 m
 map
 mkdir

@@ -109,7 +109,7 @@ sub DB {
     }
     else {
       $stop = 0 unless $stop;			# avoid un_init warning
-      $evalarg = "\$DB::signal |= do { $stop; }"; &eval;
+      $evalarg = "\$DB::signal |= do \{ $stop; \}"; &eval;
       $DB::dbline{$DB::lineno} =~ s/;9($|\0)/$1/;    # clear any temp breakpt
     }
   }
@@ -253,8 +253,8 @@ sub backtrace {
     for (@a) {
       s/'/\\'/g;
       s/([^\0]*)/'$1'/ unless m/^-?[\d.]+$/;
-      s/([\200-\377])/sprintf("M-%c",ord($1)^&^0177)/eg;
-      s/([\0-\37\177])/sprintf("^%c",ord($1)^^^64)/eg;
+      s/([\200-\377])/{sprintf("M-%c",ord($1)^&^0177)}/g;
+      s/([\0-\37\177])/{sprintf("^%c",ord($1)^^^64)}/g;
     }
     $w = $w ? '@ = ' : '$ = ';
     $a = $h ? '(' . join(', ', @a) . ')' : '';
@@ -265,7 +265,7 @@ sub backtrace {
     } elsif (defined $r) {
       $s = "eval '$e'";
     } elsif ($s eq '(eval)') {
-      $s = "eval {...}";
+      $s = "eval \{...\}";
     }
     $f = "file `$f'" unless $f eq '-e';
     push @ret, "$w&$s$a from $f line $l";

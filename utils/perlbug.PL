@@ -20,11 +20,11 @@ chdir dirname($0);
 $file = basename($0, '.PL');
 $file .= '.com' if $^O eq 'VMS';
 
-open OUT, ">$file" or die "Can't create $file: $!";
+open OUT, ">", "$file" or die "Can't create $file: $!";
 
 # extract patchlevel.h information
 
-open PATCH_LEVEL, "<" . catfile(updir, "patchlevel.h")
+open PATCH_LEVEL, "<", catfile(updir, "patchlevel.h")
     or die "Can't open patchlevel.h: $!";
 
 my $patchlevel_date = (stat *PATCH_LEVEL)[9];
@@ -65,7 +65,7 @@ my $extract_version = sprintf("%vd", $^V);
 
 print OUT <<"!GROK!THIS!";
 $Config{startperl}
-    eval 'exec $Config{perlpath} -S \$0 \${1+"\$@"}'
+    eval 'exec $Config{perlpath} -S \$0 \$\{1+"\$@"\}'
 	if \$running_under_some_shell;
 
 my \$config_tag1 = '$extract_version - $Config{cf_time}';

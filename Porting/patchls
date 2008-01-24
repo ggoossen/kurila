@@ -162,7 +162,7 @@ foreach my $argv (@ARGV) {
     }
     if ($in eq "-") {
       *F = \*STDIN;
-    } elsif (not open F, "<$in") {
+    } elsif (not open F, "<", "$in") {
 	warn "Unable to open $in: $!\n";
 	next;
     }
@@ -229,12 +229,12 @@ foreach my $argv (@ARGV) {
 	    get_meta_info($ls, $_) while ( ~< *CHIP);
 	    $is_chip = 1;
 	}
-	if (open CHIP,"<$dir/from") {
+	if (open CHIP, "<","$dir/from") {
 	    chop($chip = ~< *CHIP);
 	    $ls->{From} = { $chip => 1 };
 	    $is_chip = 1;
 	}
-	if (open CHIP,"<$dir/tag") {
+	if (open CHIP, "<","$dir/tag") {
 	    chop($chip = ~< *CHIP);
 	    $ls->{Title} = { $chip => 1 };
 	    $is_chip = 1;

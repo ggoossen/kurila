@@ -29,7 +29,7 @@ unless($ENV{PERL_CORE}) {
 
 sub my_dirsep {
     $^O eq 'VMS' ? '.' :
-	$^O =~ m/mswin32|netware|djgpp/i ? '\\' :
+	$^O =~ m/mswin32|netware|djgpp/i ? '\' :
 	    $^O eq 'MacOS' ? ':'
 		: '/';
 }
@@ -84,7 +84,7 @@ sub try_compile_and_link {
     my $obj_ext = $Config{obj_ext} || ".o";
     unlink("$tmp.c", "$tmp$obj_ext");
 
-    if (open(TMPC, ">$tmp.c")) {
+    if (open(TMPC, ">", "$tmp.c")) {
 	print TMPC $c;
 	close(TMPC);
 
@@ -199,14 +199,14 @@ sub has_gettimeofday {
     return 1 if try_compile_and_link(<<EOM);
 $TIME_HEADERS
 static int foo()
-{
+\{
     struct timeval tv;
     gettimeofday(&tv, 0);
-}
+\}
 int main(int argc, char** argv)
-{
+\{
     foo();
-}
+\}
 EOM
     return 0;
 }
@@ -233,9 +233,9 @@ sub has_x {
 #endif
 
 int main(int argc, char** argv)
-{
+\{
 	$x;
-}
+\}
 EOM
     return 0;
 }
@@ -252,7 +252,7 @@ sub has_nanosleep {
 
 /* int nanosleep(const struct timespec *rqtp, struct timespec *rmtp); */
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) \{
     struct timespec ts1, ts2;
     int ret;
     ts1.tv_sec  = 0;
@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
     errno = 0;
     ret = nanosleep(&ts1, &ts2); /* E.g. in AIX nanosleep() fails and sets errno to ENOSYS. */
     ret == 0 ? exit(0) : exit(errno ? errno : -1);
-}
+\}
 EOM
 }
 
@@ -276,9 +276,9 @@ sub has_include {
 
 #include <$inc>
 int main(int argc, char** argv)
-{
+\{
 	return 0;
-}
+\}
 EOM
     return 0;
 }
@@ -293,13 +293,13 @@ sub has_clock_xxx_syscall {
 #include "XSUB.h"
 #include <$SYSCALL_H>
 int main(int argc, char** argv)
-{
+\{
     struct timespec ts;
     /* Many Linuxes get ENOSYS even though the syscall exists. */
     /* All implementations are supposed to support CLOCK_REALTIME. */
     int ret = syscall(SYS_clock_$x, CLOCK_REALTIME, &ts);
     ret == 0 ? exit(0) : exit(errno ? errno : -1);
-}
+\}
 EOM
 }
 
@@ -311,12 +311,12 @@ sub has_clock_xxx {
 #include "perl.h"
 #include "XSUB.h"
 int main(int argc, char** argv)
-{
+\{
     struct timespec ts;
     int ret = clock_$xxx(CLOCK_REALTIME, &ts); /* Many Linuxes get ENOSYS. */
     /* All implementations are supposed to support CLOCK_REALTIME. */
     ret == 0 ? exit(0) : exit(errno ? errno : -1);
-}
+\}
 EOM
 }
 
@@ -327,11 +327,11 @@ sub has_clock {
 #include "perl.h"
 #include "XSUB.h"
 int main(int argc, char** argv)
-{
+\{
     clock_t tictoc;
     clock_t ret = clock();
     ret == (clock_t)-1 ? exit(errno ? errno : -1) : exit(0);
-}
+\}
 EOM
 }
 
@@ -343,7 +343,7 @@ sub has_clock_nanosleep {
 #include "XSUB.h"
 #include <time.h>
 int main(int argc, char** argv)
-{
+\{
     int ret;
     struct timespec ts1;
     struct timespec ts2;
@@ -351,7 +351,7 @@ int main(int argc, char** argv)
     ts1.tv_nsec = 750000000;;
     ret = clock_nanosleep(CLOCK_MONOTONIC, 0, &ts1, &ts2);
     ret == 0 ? exit(0) : exit(errno ? errno : -1);
-}
+\}
 EOM
 }
 
@@ -509,7 +509,7 @@ EOD
 	}
     }
     elsif (exists $Config{d_nanosleep}) {
-	print "believing \$Config{d_nanosleep}... ";
+	print "believing \$Config\{d_nanosleep\}... ";
 	if ($Config{d_nanosleep}) {
 	    $has_nanosleep++;
 	    $DEFINE .= ' -DTIME_HIRES_NANOSLEEP';
@@ -616,10 +616,10 @@ EOD
     if (try_compile_and_link(<<EOM)) {
 $TIME_HEADERS
 #include <sys/stat.h>
-int main(int argc, char** argv) {
+int main(int argc, char** argv) \{
     struct stat st;
     st.st_atimespec.tv_nsec = 0;
-}
+\}
 EOM
       $has_stat_st_xtimespec++;
       DEFINE('TIME_HIRES_STAT', 1);
@@ -636,10 +636,10 @@ EOM
     if (try_compile_and_link(<<EOM)) {
 $TIME_HEADERS
 #include <sys/stat.h>
-int main(int argc, char** argv) {
+int main(int argc, char** argv) \{
     struct stat st;
     st.st_atimensec = 0;
-}
+\}
 EOM
       $has_stat_st_xtimensec++;
       DEFINE('TIME_HIRES_STAT', 2);
@@ -656,10 +656,10 @@ EOM
     if (try_compile_and_link(<<EOM)) {
 $TIME_HEADERS
 #include <sys/stat.h>
-int main(int argc, char** argv) {
+int main(int argc, char** argv) \{
     struct stat st;
     st.st_atime_n = 0;
-}
+\}
 EOM
       $has_stat_st_xtime_n++;
       DEFINE('TIME_HIRES_STAT', 3);
@@ -676,10 +676,10 @@ EOM
     if (try_compile_and_link(<<EOM)) {
 $TIME_HEADERS
 #include <sys/stat.h>
-int main(int argc, char** argv) {
+int main(int argc, char** argv) \{
     struct stat st;
     st.st_atim.tv_nsec = 0;
-}
+\}
 EOM
       $has_stat_st_xtim++;
       DEFINE('TIME_HIRES_STAT', 4);
@@ -696,10 +696,10 @@ EOM
     if (try_compile_and_link(<<EOM)) {
 $TIME_HEADERS
 #include <sys/stat.h>
-int main(int argc, char** argv) {
+int main(int argc, char** argv) \{
     struct stat st;
     st.st_uatime = 0;
-}
+\}
 EOM
       $has_stat_st_uxtime++;
       DEFINE('TIME_HIRES_STAT', 5);
@@ -735,7 +735,7 @@ EOM
 
     if ($DEFINE) {
         $DEFINE =~ s/^\s+//;
-        if (open(XDEFINE, ">xdefine")) {
+        if (open(XDEFINE, ">", "xdefine")) {
 	    print XDEFINE $DEFINE, "\n";
 	    close(XDEFINE);
         }

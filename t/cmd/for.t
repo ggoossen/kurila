@@ -464,7 +464,7 @@ is ($r, '1CBA', 'Reverse for array and value via map with var');
 
 TODO: {
     $test++;
-    local $TODO = "RT #1085: what should be output of perl -we 'print do { foreach (1, 2) { 1; } }'";
+    local $TODO = "RT #1085: what should be output of perl -we 'print do \{ foreach (1, 2) \{ 1; \} \}'";
     if (do {17; foreach (1, 2) { 1; } } != 17) {
         print "not ";
     }

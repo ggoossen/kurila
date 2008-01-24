@@ -282,9 +282,9 @@ BEGIN { $n_tests += 4 }
 {
     # prototypes in place?
     my %proto_tab = (
-        fieldhash   => '\\%',
+        fieldhash   => '\%',
         fieldhashes => '',
-        idhash      => '\\%',
+        idhash      => '\%',
         idhashes    => '',
         id          => '$',
         id_2obj     => '$',

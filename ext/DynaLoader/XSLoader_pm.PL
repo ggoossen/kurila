@@ -9,7 +9,7 @@ sub to_string {
 }
 
 1 while unlink "XSLoader.pm";
-open OUT, ">XSLoader.pm" or die $!;
+open OUT, ">", "XSLoader.pm" or die $!;
 print OUT <<'EOT';
 # Generated from XSLoader.pm.PL (resolved %Config::Config value)
 

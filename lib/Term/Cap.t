@@ -37,7 +37,7 @@ local (*TCOUT, *OUT);
 my $out = tie *OUT, 'TieOut';
 my $writable = 1;
 
-if (open(TCOUT, ">tcout")) {
+if (open(TCOUT, ">", "tcout")) {
 	print TCOUT ~< *DATA;
 	close TCOUT;
 } else {

@@ -54,7 +54,7 @@ sub casetest {
 
     my %none;
     for my $i (map { ord } split m//,
-	       "\e !\"#\$%&'()+,-./0123456789:;<=>?\@[\\]^_{|}~\b") {
+	       "\e !\"#\$%&'()+,-./0123456789:;<=>?\@[\\]^_\{|\}~\b") {
 	next if pack("U0U", $i) =~ m/\w/;
 	$none{$i}++ unless $seen{$i};
     }

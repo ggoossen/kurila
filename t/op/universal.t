@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 111;
+plan tests => 110;
 
 $a = {};
 bless $a, "Bob";
@@ -111,8 +111,8 @@ ok ! $a->can("export_tags");	# a method in Exporter
 
 cmp_ok eval { $a->VERSION }, '==', 2.718;
 
-ok ! (eval { $a->VERSION(2.719) });
-like $@, qr/^Alice version 2.719 required--this is only version 2.718 at /;
+dies_like( sub { $a->VERSION(2.719) }, 
+           qr/^Alice version 2.719 required--this is only version 2.718 at / );
 
 ok (eval { $a->VERSION(2.718) });
 is $@, '';
@@ -120,11 +120,7 @@ is $@, '';
 my $subs = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} } keys %UNIVERSAL::;
 ## The test for import here is *not* because we want to ensure that UNIVERSAL
 ## can always import; it is an historical accident that UNIVERSAL can import.
-if ('a' lt 'A') {
-    is $subs, "can import isa DOES VERSION";
-} else {
-    is $subs, "DOES VERSION can import isa";
-}
+is $subs, "DOES VERSION can import isa";
 
 ok $a->isa("UNIVERSAL");
 
@@ -143,11 +139,7 @@ ok $a->isa("UNIVERSAL");
 
 my $sub2 = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} } keys %UNIVERSAL::;
 # XXX import being here is really a bug
-if ('a' lt 'A') {
-    is $sub2, "can import isa DOES VERSION";
-} else {
-    is $sub2, "DOES VERSION can import isa";
-}
+is $sub2, "DOES VERSION can import isa";
 
 eval 'sub UNIVERSAL::sleep {}';
 ok $a->can("sleep");
@@ -156,7 +148,7 @@ ok ! UNIVERSAL::can($b, "can");
 
 ok ! $a->can("export_tags");	# a method in Exporter
 
-ok ! UNIVERSAL::isa("\xff\xff\xff\0", 'HASH');
+ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
 
 {
     package Pickup;
@@ -223,6 +215,6 @@ eval { isa({}, 'HASH') };
 ::is($@, '', "*isa correctly found");
 
 package main;
-eval { UNIVERSAL::DOES([], "foo") };
-like( $@, qr/Can't call method "DOES" on unblessed reference/,
-    'DOES call error message says DOES, not isa' );
+::dies_like( sub { UNIVERSAL::DOES([], "foo") },
+             qr/Can't call method "DOES" on unblessed reference/,
+             'DOES call error message says DOES, not isa' );

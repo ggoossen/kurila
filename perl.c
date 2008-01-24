@@ -5000,7 +5000,6 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
     SV *atsv;
     volatile const line_t oldline = PL_curcop ? CopLINE(PL_curcop) : 0;
     CV *cv;
-    STRLEN len;
     int ret;
     dJMPENV;
 
@@ -5036,23 +5035,22 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		PL_madskills &= ~16384;
 #endif
 	    atsv = ERRSV;
-	    (void)SvPV_const(atsv, len);
-	    if (len) {
+	    if (SvTRUE(atsv)) {
 		PL_curcop = &PL_compiling;
 		CopLINE_set(PL_curcop, oldline);
-		if (paramList == PL_beginav)
-		    sv_catpvs(atsv, "BEGIN failed--compilation aborted");
-		else
-		    Perl_sv_catpvf(aTHX_ atsv,
-				   "%s failed--call queue aborted",
-				   paramList == PL_checkav ? "CHECK"
-				   : paramList == PL_initav ? "INIT"
-				   : paramList == PL_unitcheckav ? "UNITCHECK"
-				   : "END");
 		while (PL_scopestack_ix > oldscope)
 		    LEAVE;
 		JMPENV_POP;
-		Perl_croak(aTHX_ "%"SVf"", SVfARG(atsv));
+
+		if (paramList == PL_beginav)
+		    Perl_croak(aTHX_ "BEGIN failed--compilation aborted");
+		else
+		    Perl_croak(aTHX_ "%s failed--call queue aborted",
+			paramList == PL_checkav ? "CHECK"
+			: paramList == PL_initav ? "INIT"
+			: paramList == PL_unitcheckav ? "UNITCHECK"
+			: "END");
+		/* NOTREACHED */
 	    }
 	    break;
 	case 1:

@@ -300,7 +300,7 @@ EOF
     $msg ||= "\n";
     my($fh) = FileHandle->new;
     rename $configpm, "$configpm~" if -f $configpm;
-    open $fh, ">$configpm" or
+    open $fh, ">", "$configpm" or
         $CPAN::Frontend->mydie("Couldn't open >$configpm: $!");
     $fh->print(qq[$msg\$CPAN::Config = \{\n]);
     foreach (sort keys %$CPAN::Config) {
@@ -316,7 +316,7 @@ EOF
         );
     }
 
-    $fh->print("};\n1;\n__END__\n");
+    $fh->print("\};\n1;\n__END__\n");
     close $fh;
 
     #$mode = 0444 | ( $mode & 0111 ? 0111 : 0 );
@@ -354,7 +354,7 @@ sub neatvalue {
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"q[$key]=>".$self->neatvalue($val)) ;
     }
-    return "{ ".join(', ',@m)." }";
+    return "\{ ".join(', ',@m)." \}";
 }
 
 sub defaults {
@@ -369,7 +369,7 @@ sub defaults {
     my $done;
     for my $config (qw(CPAN/MyConfig.pm CPAN/Config.pm)) {
         if ($INC{$config}) {
-            CPAN->debug("INC{'$config'}[$INC{$config}]") if $CPAN::DEBUG;
+            CPAN->debug("INC\{'$config'\}[$INC{$config}]") if $CPAN::DEBUG;
             CPAN::Shell->_reload_this($config,{reloforce => 1});
             $CPAN::Frontend->myprint("'$INC{$config}' reread\n");
             last;

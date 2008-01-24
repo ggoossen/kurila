@@ -179,9 +179,9 @@ sub split_command {
 sub _expand_macros {
     my($self, $cmd) = @_;
 
-    $cmd =~ s{\$\((\w+)\)}{
+    $cmd =~ s{\$\((\w+)\)}{{
         defined $self->{$1} ? $self->{$1} : "\$($1)"
-    }e;
+    }};
     return $cmd;
 }
 
@@ -421,12 +421,12 @@ sub clean {
 
     my($self, %attribs) = @_;
     my @m;
-    push(@m, '
-# Delete temporary files but do not touch installed files. We don\'t delete
+    push(@m, q|
+# Delete temporary files but do not touch installed files. We don't delete
 # the Makefile here so a later make realclean still has a makefile to use.
 
 clean :: clean_subdirs
-');
+|);
 
     my @files = values %{$self->{XS}}; # .c files from *.xs files
     my @dirs  = qw(blib);

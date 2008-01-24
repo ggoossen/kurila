@@ -36,8 +36,8 @@ sub msgcmp( $ $ ) {
    for ($line1, $line2) {
       ## remove filenames from error messages to avoid any
       ## filepath naming differences between OS platforms
-      s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/"$1 ".lc($2)/e;
-      s/.*\W(\w+\.[tT]) (has \d+ pod syntax error)/lc($1)." $2"/e;
+      s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/{"$1 ".lc($2)}/;
+      s/.*\W(\w+\.[tT]) (has \d+ pod syntax error)/{lc($1)." $2"}/;
    }
    return ($line1 ne $line2);
 }

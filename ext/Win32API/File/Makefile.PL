@@ -57,8 +57,8 @@ sub MY::postamble
 	# How to create F<$outfile> via ExtUtils::Myconst2perl::Myconst2perl:
 	push @m, "
 $outfile:	@perlfiles  @cfiles  Makefile" . '
-	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MExtUtils::Myconst2perl \\
-	  -e "my %attribs;" \\
+	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MExtUtils::Myconst2perl \
+	  -e "my %attribs;" \
 	  ';
 	$m[-1] =~ s/^/##/gm   if  $noreb;
 	my( $key, $value );
@@ -78,8 +78,8 @@ $outfile:	@perlfiles  @cfiles  Makefile" . '
 	    # How to compile F<$outfile> and then run it to produce F<$final>:
 	    push @m, "
 $bin:	$outfile" . '
-	$(CC) $(INC) $(CCFLAGS) $(OPTIMIZE) $(PERLTYPE) $(LARGE) \\
-	  $(SPLIT) $(DEFINE_VERSION) $(XS_DEFINE_VERSION) -I$(PERL_INC) \\
+	$(CC) $(INC) $(CCFLAGS) $(OPTIMIZE) $(PERLTYPE) $(LARGE) \
+	  $(SPLIT) $(DEFINE_VERSION) $(XS_DEFINE_VERSION) -I$(PERL_INC) \
 	  $(DEFINE)' . $outfile . " "
 	  .  $self->catfile(qw[ $(PERL_INC) $(LIBPERL_A) ]) . " -o $bin
 
@@ -97,8 +97,8 @@ $final: $bin
 pm_to_blib: ${_final}_to_blib
 
 ${_final}_to_blib: $final
-	" . '@$(PERL) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)" \\
-	"-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MExtUtils::Install \\
+	" . '@$(PERL) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)" \
+	"-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MExtUtils::Install \
         -e "pm_to_blib({ ',neatvalue($final),',',
 	neatvalue($self->catfile('$(INST_ARCHLIB)',@path,$final)), ' },',
 	neatvalue($self->catfile(qw[$(INST_LIB) auto])), ')"

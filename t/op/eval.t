@@ -16,10 +16,10 @@ print $foo;
 
 print eval '
 $foo =;';		# this tests for a call through yyerror()
-if ($@ =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
+if ($@->{location} =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
 
 print eval '$foo = m/';	# this tests for a call through fatal()
-if ($@ =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
+if ($@->{description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
 
 print eval '"ok 7\n";';
 
@@ -35,7 +35,7 @@ $fact = 'local($foo)=$foo; $foo +<= 1 ? 1 : $foo-- * (eval $fact);';
 $ans = eval $fact;
 if ($ans == 120) {print "ok 9\n";} else {print "not ok 9 $ans\n";}
 
-open(try,'>Op.eval');
+open(try, ">",'Op.eval');
 print try 'print "ok 10\n"; unlink "Op.eval";',"\n";
 close try;
 
@@ -190,7 +190,7 @@ print $@;
 {
     my $status = eval {
 	eval { die };
-	print "# eval { return } test\n";
+	print "# eval \{ return \} test\n";
 	return; # removing this changes behavior
     };
     print "not " if $@;

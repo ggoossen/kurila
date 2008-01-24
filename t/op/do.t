@@ -59,21 +59,21 @@ do blather(@x,"noofie",@y);
 
 unshift @INC, '.';
 
-if (open(DO, ">$$.16")) {
+if (open(DO, ">", "$$.16")) {
     print DO "ok(1, 'do in scalar context') if defined wantarray && not wantarray\n";
     close DO or die "Could not close: $!";
 }
 
 my $a = do "$$.16"; die $@ if $@;
 
-if (open(DO, ">$$.17")) {
+if (open(DO, ">", "$$.17")) {
     print DO "ok(1, 'do in list context') if defined wantarray &&     wantarray\n";
     close DO or die "Could not close: $!";
 }
 
 my @a = do "$$.17"; die $@ if $@;
 
-if (open(DO, ">$$.18")) {
+if (open(DO, ">", "$$.18")) {
     print DO "ok(1, 'do in void context') if not defined wantarray\n";
     close DO or die "Could not close: $!";
 }

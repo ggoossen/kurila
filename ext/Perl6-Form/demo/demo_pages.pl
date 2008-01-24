@@ -5,13 +5,13 @@ my @text = ~< *DATA;
 my %page = (
 	header => { first => qq{Hamlet's soliloquy begins...\n\n},
 	            odd   => qq{Hamlet's soliloquy continues...\n\n},
-   				even  => sub { form "{>>{70}>>}\n\n",
+   				even  => sub { form "\{>>\{70\}>>\}\n\n",
 							        "Hamlet's soliloquy continues..."
 						 },
 	            last  => qq{Hamlet's soliloquy concludes...\n\n},
 			  },
-	footer => { other => sub{form "\n{>{70}>}", "../".($_[0]{page}{number}+1)},
-			    last  => sub{form "\n{||{70}||}", "END OF TEXT"},
+	footer => { other => sub{form "\n\{>\{70\}>\}", "../".($_[0]{page}{number}+1)},
+			    last  => sub{form "\n\{||\{70\}||\}", "END OF TEXT"},
 			  },
 	length => 15,
 	width  => 72,

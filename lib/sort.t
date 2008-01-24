@@ -63,7 +63,7 @@ sub checkorder {
 
     for ($i = 0; $i +< $#$aref; ++$i) {
 	# Equality shouldn't happen, but catch it in the contents check
-	next if ($aref->[$i] le $aref->[$i+1]);
+	next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq
 		     substr($aref->[$i+1], 0, $RootWidth)) ?
 		     "Instability" : "Disorder";

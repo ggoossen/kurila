@@ -63,7 +63,7 @@ sub import {
 	};
 
 	if (defined $proto) {
-	    *$closure_import_func = eval "sub ($proto) { goto &\$load_sub }"
+	    *$closure_import_func = eval "sub ($proto) \{ goto &\$load_sub \}"
 	        || die;
 	} else {
 	    *$closure_import_func = $load_sub;

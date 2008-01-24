@@ -50,10 +50,10 @@ sub MY::postamble
     my $postamble = '
 
 MyTrebleCheck:
-	@echo Checking for $$^W in files: '. "@files" . '
-	@perl -ne \'						\
+	@echo Checking for $$^W in files: '. "@files" . q|
+	@perl -ne '						\
 	    exit 1 if /^\s*local\s*\(\s*\$$\^W\s*\)/;		\
-         \' ' . " @files || " . '				\
+         ' | . " @files || " . '				\
 	(echo found unexpected $$^W ; exit 1)
 	@echo All is ok.
 
@@ -75,7 +75,7 @@ sub getPerlFiles
         $prefix = $1
             if $manifest =~ m#^(.*/)#;
 
-        open M, "<$manifest"
+        open M, "<", "$manifest"
             or die "Cannot open '$manifest': $!\n";
         while ( ~< *M)
         {
@@ -252,7 +252,7 @@ sub doUpDownViaCopy
     my @keep = ();
 
     {
-        open F, "<$file"
+        open F, "<", "$file"
             or die "Cannot open $file: $!\n" ;
         while ( ~< *F)
         {
@@ -276,7 +276,7 @@ sub doUpDownViaCopy
     }
 
     {
-        open F, ">$file"
+        open F, ">", "$file"
             or die "Cannot open $file: $!\n";
         print F @keep ;
         close F;

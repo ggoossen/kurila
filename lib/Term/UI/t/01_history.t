@@ -36,7 +36,7 @@ my $Verbose = 0;            # print to STDOUT?
 SKIP: {   
     my $file = "$$.tmp";
     
-    {   open my $fh, ">$file" or skip "Could not open $file: $!", 6;
+    {   open my $fh, ">", "$file" or skip "Could not open $file: $!", 6;
     
         ### declare twice for 'used only once' warning
         local $Term::UI::History::HISTORY_FH = $fh;
@@ -55,7 +55,7 @@ SKIP: {
     {   ok( -e $file,           "File $file exists" );
         ok( -s $file,           "   File has size" );
     
-        open my $fh, $file or skip "Could not open $file: $!", 2;
+        open my $fh, "<", $file or skip "Could not open $file: $!", 2;
         my $cont = do { local $/; ~< $fh };
         chomp $cont;
         

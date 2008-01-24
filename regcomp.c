@@ -6844,7 +6844,7 @@ tryagain:
 			/* FALL THROUGH */
 		    default:
 			if (!SIZE_ONLY&& isALPHA(*p) && ckWARN(WARN_REGEXP))
-			    vWARN2(p + 1, "Unrecognized escape \\%c passed through", UCHARAT(p));
+			    vWARN2(p + 1, "Unrecognized escape \\%c passed through", *p);
 			goto normal_default;
 		    }
 		    break;

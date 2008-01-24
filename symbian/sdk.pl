@@ -45,7 +45,7 @@ if ($ENV{PATH} =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
     $ENV{WIN} = $WIN; 
 }
 
-if (open(GCC, "gcc -v 2>&1 |")) {
+if (open(GCC, "-|", "gcc -v 2>&1")) {
    while ( ~< *GCC) {
      # print;
      if (m/Reading specs from (.+?)\\Epoc32\\/i) {

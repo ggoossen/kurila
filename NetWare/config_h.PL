@@ -19,7 +19,7 @@ $patchlevel =~ s|~VERSION~|$Config{version}|g;
 $patchlevel ||= $Config{version};
 $patchlevel = qq["$patchlevel"];
 
-open(SH,"<$name") || die "Cannot open $name:$!";
+open(SH, "<","$name") || die "Cannot open $name:$!";
 while ( ~< *SH)
  {
   last if m/^sed/;
@@ -27,7 +27,7 @@ while ( ~< *SH)
 ($term,$file,$pat) = m/^sed\s+<<(\S+)\s+>(\S+)\s+(.*)$/;
 $file =~ s/^\$(\w+)$/$opt{$1}/g;
 
-my $str = "sub munge\n{\n";
+my $str = "sub munge\n\{\n";
 
 while ($pat =~ s/-e\s+'([^']*)'\s*//)
  {
@@ -36,19 +36,19 @@ while ($pat =~ s/-e\s+'([^']*)'\s*//)
   $e =~ s/\\(\d)/\$$1/g; 
   $str .= "$e;\n";
  }
-$str .= "}\n";
+$str .= "\}\n";
 
 eval $str;
 
 die "$str:$@" if $@;
 
-open(H,">$file.new") || die "Cannot open $file.new:$!";
+open(H, ">","$file.new") || die "Cannot open $file.new:$!";
 binmode H;		# no CRs (which cause a spurious rebuild)
 while ( ~< *SH)
  {
   last if m/^$term$/o;
-  s/\$([\w_]+)/Config($1)/eg;
-  s/`([^\`]*)`/BackTick($1)/eg;
+  s/\$([\w_]+)/{Config($1)}/g;
+  s/`([^\`]*)`/{BackTick($1)}/g;
   munge();
   s/\\\$/\$/g;
   s#/[ *\*]*\*/#/**/#;

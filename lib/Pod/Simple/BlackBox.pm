@@ -1366,7 +1366,7 @@ sub _ponder_Verbatim {
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
         # one setting everywhere, and 8th wins.
-        s/^([^\t]*)(\t+)/$1.(" " x ((length($2)<<3)-(length($1)^&^7)))/e
+        s/^([^\t]*)(\t+)/{$1.(" " x ((length($2)<<3)-(length($1)^&^7)))}/
       ) {}
 
       # TODO: whinge about (or otherwise treat) unindented or overlong lines
@@ -1565,7 +1565,7 @@ sub _verbatim_format {
   # Collapse adjacent text nodes, just for kicks.
   for( my $i = 2; $i +> $#$p; $i++ ) { # work forwards over the tokens except for the last
     if( !ref($p->[$i]) and !ref($p->[$i + 1]) ) {
-      DEBUG +> 5 and print "_verbatim_format merges {$p->[$i]} and {$p->[$i+1]}\n";
+      DEBUG +> 5 and print "_verbatim_format merges \{$p->[$i]\} and \{$p->[$i+1]\}\n";
       $p->[$i] .= splice @$p, $i+1, 1; # merge
       --$i;  # and back up
     }
@@ -1576,10 +1576,10 @@ sub _verbatim_format {
     # work backwards over the tokens, even the first
     if( !ref($p->[$i]) ) {
       if($p->[$i] =~ s/\n$//s) {
-        DEBUG +> 5 and print "_verbatim_format killed the terminal newline on #$i: {$p->[$i]}, after {$p->[$i-1]}\n";
+        DEBUG +> 5 and print "_verbatim_format killed the terminal newline on #$i: \{$p->[$i]\}, after \{$p->[$i-1]\}\n";
       } else {
         DEBUG +> 5 and print
-         "No terminal newline on #$i: {$p->[$i]}, after {$p->[$i-1]} !?\n";
+         "No terminal newline on #$i: \{$p->[$i]\}, after \{$p->[$i-1]\} !?\n";
       }
       last; # we only want the next one
     }
@@ -1829,11 +1829,11 @@ my %pretty_form = (
   "\cj" => '\cj',
   "\n" => '\n', # probably overrides one of either \cm or \cj
   '"' => '\"',
-  '\\' => '\\\\',
-  '$' => '\\$',
-  '@' => '\\@',
-  '%' => '\\%',
-  '#' => '\\#',
+  '\' => '\\',
+  '$' => '\$',
+  '@' => '\@',
+  '%' => '\%',
+  '#' => '\#',
 );
 
 sub pretty { # adopted from Class::Classless
@@ -1855,9 +1855,9 @@ sub pretty { # adopted from Class::Classless
       $x;
     } elsif(ref($_) eq 'HASH') {
       my $hr = $_;
-      $x = "{" . join(", ",
+      $x = "\{" . join(", ",
         map(pretty($_) . '=>' . pretty($hr->{$_}),
-            sort keys %$hr ) ) . "}" ;
+            sort keys %$hr ) ) . "\}" ;
       $x;
     } elsif(!length($_)) { q{''} # empty string
     } elsif(
@@ -1870,7 +1870,7 @@ sub pretty { # adopted from Class::Classless
     } else {
         s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
          #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
-         <$pretty_form{$1} || '\\x['.sprintf("%.2x", ord($1)) . ']'>eg;
+         <{$pretty_form{$1} || '\\x['.sprintf("%.2x", ord($1)) . ']'}>g;
       qq{"$_"};
     }
   } @stuff;

@@ -8,7 +8,7 @@ $y = "     the second field is here";
 print form {out=>\*STDERR, single=>"=", ws=>qr/[^\S\n]+/,
 	  # layout=>'across'
 	 },
-      "= hi [{:[[[[:}] there [{:>>}] you {:III:}{]][[} -> {]]].[[}",
+      "= hi [\{:[[[[:\}] there [\{:>>\}] you \{:III:\}\{]][[\} -> \{]]].[[\}",
       'demo',
 			 $x,              {bfill=>'*  '}, 
 							  $y,        {bfill=>'+'},

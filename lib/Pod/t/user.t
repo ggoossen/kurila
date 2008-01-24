@@ -35,13 +35,13 @@ while (my $line = ~< *DATA) {
 
 my $user_preamble = <<PRE;
 
-\\documentclass{article}
+\\documentclass\{article\}
 
-\\begin{document}
+\\begin\{document\}
 PRE
 
 my $user_postamble = <<POST;
-\\end{document}
+\\end\{document\}
 
 POST
 
@@ -55,7 +55,7 @@ my $parser = Pod::LaTeX->new(%params);
 ok($parser);
 
 # Create an output file
-open(OUTFH, "> test.tex" ) or die "Unable to open test tex file: $!\n";
+open(OUTFH, ">", "test.tex" ) or die "Unable to open test tex file: $!\n";
 
 # Read from the DATA filehandle and write to a new output file
 # Really want to write this to a scalar
@@ -64,7 +64,7 @@ $parser->parse_from_filehandle(\*DATA,\*OUTFH);
 close(OUTFH) or die "Error closing OUTFH test.tex: $!\n";
 
 # Now read in OUTFH and compare
-open(INFH, "< test.tex") or die "Unable to read test tex file: $!\n";
+open(INFH, "<", "test.tex") or die "Unable to read test tex file: $!\n";
 my @output = ~< *INFH;
 
 ok(@output, @reference);

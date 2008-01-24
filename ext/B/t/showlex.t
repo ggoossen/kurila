@@ -56,7 +56,7 @@ my ($out, $newlex);	# output, option-flag
 sub padrep {
     my ($varname,$newlex) = @_;
     return ($newlex)
-	? 'PVNV \(0x[0-9a-fA-F]+\) "\\'.$varname.'" = '
+	? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
 	: "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
 }
 

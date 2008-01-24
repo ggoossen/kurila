@@ -125,7 +125,7 @@ print $@ =~ m/foo bar/ ? "ok 29\n" : "not ok 29\n";
 my $t = 30;
 $! = 0;
 my $nosuch = '/non/existant/file.name';
-open(NOSUCH, $nosuch);
+open(NOSUCH, "<", $nosuch);
 if ($@) {
     my $errno  = $!;
     die "Eek! Attempting to open $nosuch failed, but \$! is still 0" unless $!;

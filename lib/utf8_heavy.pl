@@ -194,7 +194,7 @@ sub SWASHNEW_real {
 	    ##
 	    my $found = $Cache{$class, $file};
 	    if ($found and ref($found) eq $class) {
-		print STDERR "Returning cached '$file' for \\p{$type}\n" if DEBUG;
+		print STDERR "Returning cached '$file' for \\p\{$type\}\n" if DEBUG;
 		return $found;
 	    }
 

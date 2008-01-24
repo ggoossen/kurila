@@ -108,8 +108,13 @@ encoded character.
 #define UTF8_IS_INVARIANT(c)		UNI_IS_INVARIANT(NATIVE_TO_UTF(c))
 #define NATIVE_IS_INVARIANT(c)		UNI_IS_INVARIANT(NATIVE_TO_ASCII(c))
 #define UTF8_IS_START(c)		(((U8)c) >= 0xc0 && (((U8)c) <= 0xfd))
-#define UTF8_IS_CONTINUATION(c)		(((U8)c) >= 0x80 && (((U8)c) <= 0xbf))
-#define UTF8_IS_CONTINUED(c) 		(((U8)c) &  0x80)
+static __inline__ bool UTF8_IS_CONTINUATION(const char c) {
+    return (((U8)c) >= 0x80) && (((U8)c) <= 0xbf);
+}
+
+static __inline__ bool UTF8_IS_CONTINUED(const char c) {
+    return (U8)c & 0x80;
+}
 #define UTF8_IS_DOWNGRADEABLE_START(c)	(((U8)c & 0xfc) == 0xc0)
 
 #define UTF_START_MARK(len) ((len >  7) ? 0xFF : (0xFE << (7-len)))

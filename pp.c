@@ -67,11 +67,6 @@ PP(pp_padav)
     if (PL_op->op_flags & OPf_REF) {
 	PUSHs(TARG);
 	RETURN;
-    } else if (LVRET) {
-	if (GIMME == G_SCALAR)
-	    Perl_croak(aTHX_ "Can't return array to lvalue scalar context");
-	PUSHs(TARG);
-	RETURN;
     }
     gimme = GIMME_V;
     if (gimme == G_ARRAY) {
@@ -109,11 +104,6 @@ PP(pp_padhv)
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
     if (PL_op->op_flags & OPf_REF)
 	RETURN;
-    else if (LVRET) {
-	if (GIMME == G_SCALAR)
-	    Perl_croak(aTHX_ "Can't return hash to lvalue scalar context");
-	RETURN;
-    }
     gimme = GIMME_V;
     if (gimme == G_ARRAY) {
 	RETURNOP(do_kv());
@@ -286,7 +276,7 @@ PP(pp_pos)
 {
     dVAR; dSP; dTARGET; dPOPss;
 
-    if (PL_op->op_flags & OPf_MOD || LVRET) {
+    if (PL_op->op_flags & OPf_MOD) {
 	TARG = sv_newmortal();
 	sv_upgrade(TARG, SVt_PVLV);
 	sv_magic(TARG, NULL, PERL_MAGIC_pos, NULL, 0);
@@ -329,8 +319,7 @@ PP(pp_rv2cv)
 	if (CvCLONE(cv))
 	    cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
 	if ((PL_op->op_private & OPpLVAL_INTRO)) {
-	    if (!CvLVALUE(cv))
-		DIE(aTHX_ "Can't modify non-lvalue subroutine call");
+	    DIE(aTHX_ "Can't modify non-lvalue subroutine call");
 	}
     }
     else if ((flags == (GV_ADD|GV_NOEXPAND)) && gv && SvROK(gv)) {
@@ -2200,42 +2189,6 @@ PP(pp_ncmp)
     }
 }
 
-PP(pp_sle)
-{
-    dVAR; dSP;
-
-    int amg_type = sle_amg;
-    int multiplier = 1;
-    int rhs = 1;
-
-    switch (PL_op->op_type) {
-    case OP_SLT:
-	amg_type = slt_amg;
-	/* cmp < 0 */
-	rhs = 0;
-	break;
-    case OP_SGT:
-	amg_type = sgt_amg;
-	/* cmp > 0 */
-	multiplier = -1;
-	rhs = 0;
-	break;
-    case OP_SGE:
-	amg_type = sge_amg;
-	/* cmp >= 0 */
-	multiplier = -1;
-	break;
-    }
-
-    tryAMAGICbinSET_var(amg_type,0);
-    {
-      dPOPTOPssrl;
-      const int cmp = sv_cmp(left, right);
-      SETs(boolSV(cmp * multiplier < rhs));
-      RETURN;
-    }
-}
-
 PP(pp_seq)
 {
     dVAR; dSP; tryAMAGICbinSET(seq,0);
@@ -3019,7 +2972,7 @@ PP(pp_vec)
     register const IV size   = POPi;
     register const IV offset = POPi;
     register SV * const src = POPs;
-    const I32 lvalue = PL_op->op_flags & OPf_MOD || LVRET;
+    const I32 lvalue = PL_op->op_flags & OPf_MOD;
 
     SvTAINTED_off(TARG);		/* decontaminate */
     if (lvalue) {			/* it's an lvalue! */
@@ -3561,7 +3514,7 @@ PP(pp_aslice)
 {
     dVAR; dSP; dMARK; dORIGMARK;
     register AV* const av = (AV*)POPs;
-    register const I32 lval = (PL_op->op_flags & OPf_MOD || LVRET);
+    register const I32 lval = (PL_op->op_flags & OPf_MOD);
 
     if (SvTYPE(av) == SVt_PVAV) {
 	if (lval && PL_op->op_private & OPpLVAL_INTRO) {
@@ -3730,7 +3683,7 @@ PP(pp_hslice)
 {
     dVAR; dSP; dMARK; dORIGMARK;
     register HV * const hv = (HV*)POPs;
-    register const I32 lval = (PL_op->op_flags & OPf_MOD || LVRET);
+    register const I32 lval = (PL_op->op_flags & OPf_MOD);
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
     bool other_magic = FALSE;
 

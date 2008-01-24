@@ -9,7 +9,7 @@ our ($reopen, $x, $outfile);
 chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $!";
 @INC = '../../lib';
 
-open(I, 'sysio.t') || die "sysio.t: cannot find myself: $!";
+open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $!";
 
 $reopen = ($^O eq 'VMS' ||
            $^O eq 'os2' ||
@@ -66,7 +66,7 @@ print "ok 10\n";
 
 $outfile = 'sysio.out';
 
-open(O, ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+open(O, ">", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 
 select(O); $|=1; select(STDOUT);
 
@@ -94,7 +94,7 @@ print "ok 15\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' if (-s $outfile);
 print "ok 16\n";
@@ -111,7 +111,7 @@ print "ok 18\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' if (-s $outfile);
 print "ok 19\n";
@@ -132,7 +132,7 @@ print "ok 21\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 2);
 print "ok 22\n";
@@ -147,7 +147,7 @@ print "ok 24\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 4);
 print "ok 25\n";
@@ -162,7 +162,7 @@ print "ok 27\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 7);
 print "ok 28\n";
@@ -177,14 +177,14 @@ print "ok 30\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 }
 print 'not ' unless (-s $outfile == 10);
 print "ok 31\n";
 
 close(O);
 
-open(I, $outfile) || die "sysio.t: cannot read $outfile: $!";
+open(I, "<", $outfile) || die "sysio.t: cannot read $outfile: $!";
 
 $b = 'xyz';
 
@@ -219,7 +219,7 @@ close(I);
 unlink $outfile;
 
 # Check that utf8 IO doesn't upgrade the scalar
-open(I, ">$outfile") || die "sysio.t: cannot write $outfile: $!";
+open(I, ">", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 # Will skip harmlessly on stdioperl
 eval {binmode STDOUT, ":utf8"};
 die $@ if $@ and $@ !~ m/^IO layers \(like ':utf8'\) unavailable/;

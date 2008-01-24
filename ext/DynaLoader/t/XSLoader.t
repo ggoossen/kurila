@@ -40,7 +40,7 @@ can_ok( 'XSLoader' => 'bootstrap_inherit' );
 
 # Check error messages
 eval { XSLoader::load() };
-like( $@, '/^XSLoader::load\(\'Your::Module\', \$Your::Module::VERSION\)/',
+like( $@, q|/^XSLoader::load\('Your::Module', \$Your::Module::VERSION\)/|,
         "calling XSLoader::load() with no argument" );
 
 eval q{ package Thwack; XSLoader::load('Thwack'); };

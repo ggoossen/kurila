@@ -33,14 +33,14 @@ sub add_file {
     my ($file, $data) = @_;
     $data ||= 'foo';
     1 while unlink $file;  # or else we'll get multiple versions on VMS
-    open( T, '>'.$file) or return;
+    open( T, ">", ''.$file) or return;
     print T $data;
     ++$Files{$file};
     close T;
 }
 
 sub read_manifest {
-    open( M, 'MANIFEST' ) or return;
+    open( M, "<", 'MANIFEST' ) or return;
     chomp( my @files = ~< *M );
     close M;
     return @files;

@@ -4,7 +4,7 @@ use vars qw($Expect);
 use Test qw($TESTOUT $TESTERR $ntest ok skip plan); 
 plan tests => 14;
 
-open F, ">fails";
+open F, ">", "fails";
 $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 
@@ -36,7 +36,7 @@ $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
 $ntest = 1;
 
-open F, "fails";
+open F, "<", "fails";
 my $O;
 while ( ~< *F) { $O .= $_; }
 close F;
@@ -87,7 +87,7 @@ BEGIN {
 #   Expected: '1' (\@list=0,0)
 
 # Test 8 got: 'segmentation fault' ($0 at line 25)
-#   Expected: qr{bongo}
+#   Expected: qr\{bongo\}
 
 # Failed test 9 in $0 at line 27
 

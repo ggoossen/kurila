@@ -24,59 +24,59 @@ sub ok {
 
 $SIG{__WARN__} = sub { 1; }; # avoid some spurious warnings
 
-print "1..25\n";
+print "1..24\n";
 
-ok 1, (eval "package ABC; sub zyx {1}; 1;" and
+ok 1, (eval "package ABC; sub zyx \{1\}; 1;" and
 	eval "ABC::zyx" and
 	not eval "ABC:: eq ABC||" and
 	not eval "ABC::: +>= 0");
 
-ok 2, (eval "package LABEL; sub zyx {1}; 1;" and
+ok 2, (eval "package LABEL; sub zyx \{1\}; 1;" and
 	eval "LABEL::zyx" and
 	not eval "LABEL:: eq LABEL||" and
 	not eval "LABEL::: +>= 0");
 
-ok 3, (eval "package XYZZY; sub zyx {1}; 1;" and
+ok 3, (eval "package XYZZY; sub zyx \{1\}; 1;" and
 	eval "XYZZY::zyx" and
 	not eval "XYZZY:: eq XYZZY||" and
 	not eval "XYZZY::: +>= 0");
 
-ok 4, (eval "package m; sub zyx {1}; 1;" and
+ok 4, (eval "package m; sub zyx \{1\}; 1;" and
 	not eval "m::zyx" and
 	eval "m:: eq m||" and
 	not eval "m::: +>= 0");
 
-ok 5, (eval "package q; sub zyx {1}; 1;" and
+ok 5, (eval "package q; sub zyx \{1\}; 1;" and
 	not eval "q::zyx" and
 	eval "q:: eq q||" and
 	not eval "q::: +>= 0");
 
-ok 6, (eval "package qq; sub zyx {1}; 1;" and
+ok 6, (eval "package qq; sub zyx \{1\}; 1;" and
 	not eval "qq::zyx" and
 	eval "qq:: eq qq||" and
 	not eval "qq::: +>= 0");
 
-ok 7, (eval "package qw; sub zyx {1}; 1;" and
+ok 7, (eval "package qw; sub zyx \{1\}; 1;" and
 	not eval "qw::zyx" and
 	eval "qw:: eq qw||" and
 	not eval "qw::: +>= 0");
 
-ok 8, (eval "package qx; sub zyx {1}; 1;" and
+ok 8, (eval "package qx; sub zyx \{1\}; 1;" and
 	not eval "qx::zyx" and
 	eval "qx:: eq qx||" and
 	not eval "qx::: +>= 0");
 
-ok 9, (eval "package s; sub zyx {1}; 1;" and
+ok 9, (eval "package s; sub zyx \{1\}; 1;" and
 	not eval "s::zyx" and
 	not eval "s:: eq s||" and
 	eval "s::: +>= 0");
 
-ok 10, (eval "package tr; sub zyx {1}; 1;" and
+ok 10, (eval "package tr; sub zyx \{1\}; 1;" and
 	not eval "tr::zyx" and
 	not eval "tr:: eq tr||" and
 	eval "tr::: +>= 0");
 
-ok 11, (eval "package y; sub zyx {1}; 1;" and
+ok 11, (eval "package y; sub zyx \{1\}; 1;" and
 	not eval "y::zyx" and
 	not eval "y:: eq y||" and
 	eval "y::: +>= 0");
@@ -125,14 +125,10 @@ ok 22, (not eval "y:1" and
 	not eval "y:echo: eq y|echo|" and
 	eval "y:echo:ohce: +>= 0");
 
-ok 23, (eval "AUTOLOAD:1" and
-	not eval "AUTOLOAD:echo: eq AUTOLOAD|echo|" and
-	not eval "AUTOLOAD:echo:ohce: +>= 0");
-
-ok 24, (eval "and:1" and
+ok 23, (eval "and:1" and
 	not eval "and:echo: eq and|echo|" and
 	not eval "and:echo:ohce: +>= 0");
 
-ok 25, (eval "alarm:1" and
+ok 24, (eval "alarm:1" and
 	not eval "alarm:echo: eq alarm|echo|" and
 	not eval "alarm:echo:ohce: +>= 0");

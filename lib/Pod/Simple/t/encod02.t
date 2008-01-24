@@ -6,7 +6,6 @@ BEGIN {
 }
 
 use strict;
-use encoding 'latin1';
 use Test;
 BEGIN { plan tests => 4 };
 
@@ -25,7 +24,7 @@ my @output_lines = split m/[\cm\cj]+/, Pod::Simple::XMLOutStream->_out( q{
 
 =head1 NAME
 
-Когда читала ты мучительные строки -- Fet's "When you were reading"
+ц╚ц▐ц┤ц└ц│ ц·ц┴ц■ц│ц▄ц│ ц■ц≥ ц█ц∙ц·ц┴ц■ц┘ц▄ц≤ц▌ц≥ц┘ ц⌠ц■ц▓ц▐ц▀ц┴ -- Fet's "When you were reading"
 
 =cut
 

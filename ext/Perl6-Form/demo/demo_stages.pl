@@ -10,7 +10,7 @@ $disclaimer = "WARNING:\nThis list is roles constitutes a personal opinion "
 print "The best Shakespearean roles are:\n\n";
 
 print form
-	 "   * {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}   |{:<<<<<<<>>>>>>>:}|",
+	 "   * \{<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\}   |\{:<<<<<<<>>>>>>>:\}|",
            $character[$_],                $disclaimer
 				for 0..$#character;
 
@@ -20,7 +20,7 @@ unshift @character, "Either of the 'two foolish officers': Dogberry and Verges";
 print "\n\nThe best Shakespearean roles are:\n\n";
 
 print form
-	 "   * {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}   |{[[[[[[[[]]]]]]]]}|",
+	 "   * \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}   |\{[[[[[[[[]]]]]]]]\}|",
 		   \@character,                            $disclaimer;
 
 pos $disclaimer = 0;
@@ -28,5 +28,5 @@ print "\n\nThe best Shakespearean roles are:\n\n";
 
 print form
 	 {bullet=>'*'},
-     "   * {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}   |{[[[[[[[[]]]]]]]]}|",
+     "   * \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}   |\{[[[[[[[[]]]]]]]]\}|",
 		   \@character,                            $disclaimer;

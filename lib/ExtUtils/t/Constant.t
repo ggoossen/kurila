@@ -214,7 +214,7 @@ sub build_and_run {
 
   @makeout = `$maketest`;
 
-  if (open OUTPUT, "<$output") {
+  if (open OUTPUT, "<", "$output") {
     local $/; # Slurp it - faster.
     print ~< *OUTPUT;
     close OUTPUT or print "# Close $output failed: $!\n";
@@ -303,7 +303,7 @@ sub Makefile_PL {
   # We really need a Makefile.PL because make test for a no dynamic linking perl
   # will run Makefile.PL again as part of the "make perl" target.
   my $makefilePL = "Makefile.PL";
-  open FH, ">$makefilePL" or die "open >$makefilePL: $!\n";
+  open FH, ">", "$makefilePL" or die "open >$makefilePL: $!\n";
   print FH <<"EOT";
 #!$perl -w
 use ExtUtils::MakeMaker;
@@ -325,7 +325,7 @@ sub MANIFEST {
   # We really need a MANIFEST because make distclean checks it.
   my $manifest = "MANIFEST";
   push @files, $manifest;
-  open FH, ">$manifest" or die "open >$manifest: $!\n";
+  open FH, ">", "$manifest" or die "open >$manifest: $!\n";
   print FH "$_\n" foreach @files;
   close FH or die "close $manifest: $!\n";
   return @files;
@@ -369,14 +369,14 @@ sub write_and_run_extension {
   ################ Header
   my $header_name = "test.h";
   push @files, $header_name;
-  open FH, ">$header_name" or die "open >$header_name: $!\n";
+  open FH, ">", "$header_name" or die "open >$header_name: $!\n";
   print FH $header or die $!;
   close FH or die "close $header_name: $!\n";
 
   ################ XS
   my $xs_name = "$package.xs";
   push @files, $xs_name;
-  open FH, ">$xs_name" or die "open >$xs_name: $!\n";
+  open FH, ">", "$xs_name" or die "open >$xs_name: $!\n";
 
   print FH <<"EOT";
 #include "EXTERN.h"
@@ -396,7 +396,7 @@ EOT
   ################ PM
   my $pm = "$package.pm";
   push @files, $pm;
-  open FH, ">$pm" or die "open >$pm: $!\n";
+  open FH, ">", "$pm" or die "open >$pm: $!\n";
   print FH "package $package;\n";
 
   print FH <<'EOT';
@@ -427,29 +427,29 @@ EOT
   ################ test.pl
   my $testpl = "test.pl";
   push @files, $testpl;
-  open FH, ">$testpl" or die "open >$testpl: $!\n";
+  open FH, ">", "$testpl" or die "open >$testpl: $!\n";
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
 use strict;
 use $package qw(@$export_names);
 
 print "1..2\n";
-if (open OUTPUT, ">$output") {
+if (open OUTPUT, ">", "$output") \{
   print "ok 1\n";
   select OUTPUT;
-} else {
+\} else \{
   print "not ok 1 # Failed to open '$output': \$!\n";
   exit 1;
-}
+\}
 EOT
   print FH $testfile or die $!;
   print FH <<"EOT" or die $!;
 select STDOUT;
-if (close OUTPUT) {
+if (close OUTPUT) \{
   print "ok 2\n";
-} else {
+\} else \{
   print "not ok 2 # Failed to close '$output': \$!\n";
-}
+\}
 EOT
   close FH or die "close $testpl: $!\n";
 
@@ -527,7 +527,7 @@ EOT
 
   my @items = ("FIVE", {name=>"OK6", type=>"PV",},
                {name=>"OK7", type=>"PVN",
-                value=>['"not ok 7\\n\\0ok 7\\n"', 15]},
+                value=>['"not ok 7\n\0ok 7\n"', 15]},
                {name => "FARTHING", type=>"NV"},
                {name => "NOT_ZERO", type=>"UV", value=>"~(UV)0"},
                {name => "OPEN", type=>"PV", value=>'"/*"', macro=>1},
@@ -732,18 +732,18 @@ EOT
 
 $test_body .= <<"EOT";
 my \$rfc1149 = RFC1149;
-if (\$rfc1149 ne "$parent_rfc1149") {
+if (\$rfc1149 ne "$parent_rfc1149") \{
   print "not ok \$test # '\$rfc1149' ne '$parent_rfc1149'\n";
-} else {
+\} else \{
   print "ok \$test\n";
-}
+\}
 \$test++;
 
-if (\$rfc1149 != 1149) {
+if (\$rfc1149 != 1149) \{
   printf "not ok \$test # %d != 1149\n", \$rfc1149;
-} else {
+\} else \{
   print "ok \$test\n";
-}
+\}
 \$test++;
 
 EOT
@@ -769,28 +769,28 @@ sub explict_call_constant {
   my ($string, $expect) = @_;
   # This does assume simple strings suitable for ''
   my $test_body = <<"EOT";
-{
+\{
   my (\$error, \$got) = ${package}::constant ('$string');\n;
 EOT
 
   if (defined $expect) {
     # No error expected
     $test_body .= <<"EOT";
-  if (\$error or \$got ne "$expect") {
+  if (\$error or \$got ne "$expect") \{
     print "not ok $dummytest # error '\$error', expect '$expect', got '\$got'\n";
-  } else {
+  \} else \{
     print "ok $dummytest\n";
-    }
-  }
+    \}
+  \}
 EOT
   } else {
     # Error expected.
     $test_body .= <<"EOT";
-  if (\$error) {
+  if (\$error) \{
     print "ok $dummytest # error='\$error' (as expected)\n";
-  } else {
+  \} else \{
     print "not ok $dummytest # expected error, got no error and '\$got'\n";
-  }
+  \}
 EOT
   }
   $dummytest++;
@@ -811,11 +811,11 @@ sub simple {
     $test_header .= "#define $thisname $counter\n";
     $test_body .= <<"EOT";
 \$value = $thisname;
-if (\$value == $counter) {
+if (\$value == $counter) \{
   print "ok $dummytest\n";
-} else {
+\} else \{
   print "not ok $dummytest # $thisname gave \$value\n";
-}
+\}
 EOT
     ++$dummytest;
     # Yes, the last time round the loop appends a z to the string.

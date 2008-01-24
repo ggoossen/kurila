@@ -357,8 +357,6 @@ perform the upgrade if necessary.  See C<svtype>.
 /* This is only set true on a PVGV when it's playing "PVBM", but is tested for
    on any regular scalar (anything <= PVLV) */
 #define SVpbm_VALID	0x40000000
-/* ??? */
-#define SVrepl_EVAL	0x40000000  /* Replacement part of s///e */
 
 /* IV, PVIV, PVNV, PVMG, PVGV and (I assume) PVLV  */
 /* Presumably IVs aren't stored in pads */
@@ -983,10 +981,6 @@ the scalar's value cannot change unless written to.
 #define SvCOMPILED_on(sv)	(SvFLAGS(sv) |= SVpfm_COMPILED)
 #define SvCOMPILED_off(sv)	(SvFLAGS(sv) &= ~SVpfm_COMPILED)
 
-#define SvEVALED(sv)		(SvFLAGS(sv) & SVrepl_EVAL)
-#define SvEVALED_on(sv)		(SvFLAGS(sv) |= SVrepl_EVAL)
-#define SvEVALED_off(sv)	(SvFLAGS(sv) &= ~SVrepl_EVAL)
-
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define SvVALID(sv)		({ SV *const thwacke = (SV *) (sv);	\
 				   if (SvFLAGS(thwacke) & SVpbm_VALID)	\
@@ -1375,6 +1369,28 @@ Taints an SV if tainting is enabled.
 	}				\
     } STMT_END
 
+
+/* all these 'functions' are now just macros */
+
+#define sv_pv(sv) SvPV_nolen(sv)
+
+#define sv_pvn_force_nomg(sv, lp) sv_pvn_force_flags(sv, lp, 0)
+#define sv_catpvn_nomg(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
+#define sv_setsv(dsv, ssv) \
+	sv_setsv_flags(dsv, ssv, SV_GMAGIC|SV_DO_COW_SVSETSV)
+#define sv_setsv_nomg(dsv, ssv) sv_setsv_flags(dsv, ssv, SV_DO_COW_SVSETSV)
+#define sv_catsv(dsv, ssv) sv_catsv_flags(dsv, ssv, SV_GMAGIC)
+#define sv_catsv_nomg(dsv, ssv) sv_catsv_flags(dsv, ssv, 0)
+#define sv_catsv_mg(dsv, ssv) sv_catsv_flags(dsv, ssv, SV_GMAGIC|SV_SMAGIC)
+#define sv_catpvn(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, SV_GMAGIC)
+#define sv_catpvn_mg(sv, sstr, slen) \
+	sv_catpvn_flags(sv, sstr, slen, SV_GMAGIC|SV_SMAGIC);
+#define sv_2pv(sv, lp) sv_2pv_flags(sv, lp, SV_GMAGIC)
+#define sv_2pv_nolen(sv) sv_2pv(sv, 0)
+#define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
+#define sv_pvn_force(sv, lp) sv_pvn_force_flags(sv, lp, SV_GMAGIC)
+#define sv_2iv(sv) sv_2iv_flags(sv, SV_GMAGIC)
+#define sv_2uv(sv) sv_2uv_flags(sv, SV_GMAGIC)
 /*
 =for apidoc Am|char*|SvPV_force|SV* sv|STRLEN len
 Like C<SvPV> but will force the SV into containing just a string
@@ -1463,14 +1479,6 @@ Like C<sv_catsv> but doesn't process magic.
 =cut
 */
 
-/* Let us hope that bitmaps for UV and IV are the same */
-#define SvIV(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
-#define SvUV(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
-#define SvNV(sv) (SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv))
-
-#define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv_flags(sv, 0))
-#define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv_flags(sv, 0))
-
 /* ----*/
 
 #define SvPV(sv, lp) SvPV_flags(sv, lp, SV_GMAGIC)
@@ -1532,63 +1540,6 @@ Like C<sv_catsv> but doesn't process magic.
 
 #define SvPVx_force(sv, lp) sv_pvn_force(sv, &lp)
 
-#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-
-#  define SvIVx(sv) ({SV *_sv = (SV*)(sv); SvIV(_sv); })
-#  define SvUVx(sv) ({SV *_sv = (SV*)(sv); SvUV(_sv); })
-#  define SvNVx(sv) ({SV *_sv = (SV*)(sv); SvNV(_sv); })
-#  define SvPVx(sv, lp) ({SV *_sv = (sv); SvPV(_sv, lp); })
-#  define SvPVx_const(sv, lp) ({SV *_sv = (sv); SvPV_const(_sv, lp); })
-#  define SvPVx_nolen(sv) ({SV *_sv = (sv); SvPV_nolen(_sv); })
-#  define SvPVx_nolen_const(sv) ({SV *_sv = (sv); SvPV_nolen_const(_sv); })
-#  define SvTRUE(sv) (						\
-    !sv								\
-    ? 0								\
-    :    SvPOK(sv)						\
-	?   (({XPV *nxpv = (XPV*)SvANY(sv);			\
-	     nxpv &&						\
-	     (nxpv->xpv_cur > 1 ||				\
-	      (nxpv->xpv_cur && *(sv)->sv_u.svu_pv != '0')); })	\
-	     ? 1						\
-	     : 0)						\
-	:							\
-	    SvIOK(sv)						\
-	    ? SvIVX(sv) != 0					\
-	    :   SvNOK(sv)					\
-		? SvNVX(sv) != 0.0				\
-		: sv_2bool(sv) )
-#  define SvTRUEx(sv) ({SV *_sv = (sv); SvTRUE(_sv); })
-
-#else /* __GNUC__ */
-
-/* These inlined macros use globals, which will require a thread
- * declaration in user code, so we avoid them under threads */
-
-#  define SvIVx(sv) ((PL_Sv = (sv)), SvIV(PL_Sv))
-#  define SvUVx(sv) ((PL_Sv = (sv)), SvUV(PL_Sv))
-#  define SvNVx(sv) ((PL_Sv = (sv)), SvNV(PL_Sv))
-#  define SvPVx(sv, lp) ((PL_Sv = (sv)), SvPV(PL_Sv, lp))
-#  define SvPVx_const(sv, lp) ((PL_Sv = (sv)), SvPV_const(PL_Sv, lp))
-#  define SvPVx_nolen(sv) ((PL_Sv = (sv)), SvPV_nolen(PL_Sv))
-#  define SvPVx_nolen_const(sv) ((PL_Sv = (sv)), SvPV_nolen_const(PL_Sv))
-#  define SvTRUE(sv) (						\
-    !sv								\
-    ? 0								\
-    :    SvPOK(sv)						\
-	?   ((PL_Xpv = (XPV*)SvANY(PL_Sv = (sv))) &&		\
-	     (PL_Xpv->xpv_cur > 1 ||				\
-	      (PL_Xpv->xpv_cur && *PL_Sv->sv_u.svu_pv != '0'))	\
-	     ? 1						\
-	     : 0)						\
-	:							\
-	    SvIOK(sv)						\
-	    ? SvIVX(sv) != 0					\
-	    :   SvNOK(sv)					\
-		? SvNVX(sv) != 0.0				\
-		: sv_2bool(sv) )
-#  define SvTRUEx(sv) ((PL_Sv = (sv)), SvTRUE(PL_Sv))
-#endif /* __GNU__ */
-
 #define SvIsCOW(sv)		((SvFLAGS(sv) & (SVf_FAKE | SVf_READONLY)) == \
 				    (SVf_FAKE | SVf_READONLY))
 #define SvIsCOW_shared_hash(sv)	(SvIsCOW(sv) && SvLEN(sv) == 0)
@@ -1601,7 +1552,6 @@ Like C<sv_catsv> but doesn't process magic.
 #define SV_IMMEDIATE_UNREF	1
 #define SV_GMAGIC		2
 #define SV_COW_DROP_PV		4
-#define SV_UTF8_NO_ENCODING	8
 #define SV_NOSTEAL		16
 #define SV_CONST_RETURN		32
 #define SV_MUTABLE_RETURN	64
@@ -1655,28 +1605,6 @@ Like C<sv_catsv> but doesn't process magic.
 #define SV_CHECK_THINKFIRST(sv) if (SvTHINKFIRST(sv)) \
 				    sv_force_normal_flags(sv, 0)
 
-
-/* all these 'functions' are now just macros */
-
-#define sv_pv(sv) SvPV_nolen(sv)
-
-#define sv_pvn_force_nomg(sv, lp) sv_pvn_force_flags(sv, lp, 0)
-#define sv_catpvn_nomg(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
-#define sv_setsv(dsv, ssv) \
-	sv_setsv_flags(dsv, ssv, SV_GMAGIC|SV_DO_COW_SVSETSV)
-#define sv_setsv_nomg(dsv, ssv) sv_setsv_flags(dsv, ssv, SV_DO_COW_SVSETSV)
-#define sv_catsv(dsv, ssv) sv_catsv_flags(dsv, ssv, SV_GMAGIC)
-#define sv_catsv_nomg(dsv, ssv) sv_catsv_flags(dsv, ssv, 0)
-#define sv_catsv_mg(dsv, ssv) sv_catsv_flags(dsv, ssv, SV_GMAGIC|SV_SMAGIC)
-#define sv_catpvn(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, SV_GMAGIC)
-#define sv_catpvn_mg(sv, sstr, slen) \
-	sv_catpvn_flags(sv, sstr, slen, SV_GMAGIC|SV_SMAGIC);
-#define sv_2pv(sv, lp) sv_2pv_flags(sv, lp, SV_GMAGIC)
-#define sv_2pv_nolen(sv) sv_2pv(sv, 0)
-#define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
-#define sv_pvn_force(sv, lp) sv_pvn_force_flags(sv, lp, SV_GMAGIC)
-#define sv_2iv(sv) sv_2iv_flags(sv, SV_GMAGIC)
-#define sv_2uv(sv) sv_2uv_flags(sv, SV_GMAGIC)
 
 /*
 =for apidoc Am|SV*|newRV_inc|SV* sv

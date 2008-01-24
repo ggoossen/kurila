@@ -243,8 +243,8 @@ sub Dumpperl {
 # wrap string in single quotes (escaping if needed)
 sub _quote {
     my $val = shift;
-    $val =~ s/([\\\'])/\\$1/g;
-    return  "'" . $val .  "'";
+    $val =~ s/([\\\"\$\{\}\@])/\\$1/g;
+    return  '"' . $val .  '"';
 }
 
 #
@@ -306,9 +306,9 @@ sub _dump {
       }
       else {
         # store our name
-        $s->{seen}{$id} = [ (($name =~ m/^[@%]/)     ? ('\\' . $name ) :
+        $s->{seen}{$id} = [ (($name =~ m/^[@%]/)     ? ('\' . $name ) :
 			     ($realtype eq 'CODE' and
-			      $name =~ m/^[*](.*)$/) ? ('\\&' . $1 )   :
+			      $name =~ m/^[*](.*)$/) ? ('\&' . $1 )   :
 			     $name          ),
 			    $val ];
       }
@@ -343,14 +343,14 @@ sub _dump {
 
     if ($realtype eq 'SCALAR' || $realtype eq 'REF') {
       if ($realpack) {
-	$out .= 'do{\\(my $o = ' . $s->_dump($$val, "\${$name}") . ')}';
+	$out .= 'do{\(my $o = ' . $s->_dump($$val, "\$\{$name\}") . ')}';
       }
       else {
-	$out .= '\\' . $s->_dump($$val, "\${$name}");
+	$out .= '\' . $s->_dump($$val, "\$\{$name\}");
       }
     }
     elsif ($realtype eq 'GLOB') {
-	$out .= '\\' . $s->_dump($$val, "*{$name}");
+	$out .= '\' . $s->_dump($$val, "*\{$name\}");
     }
     elsif ($realtype eq 'ARRAY') {
       my($v, $pad, $mname);
@@ -420,7 +420,7 @@ sub _dump {
 	require B::Deparse;
 	my $sub =  'sub ' . (B::Deparse->new)->coderef2text($val);
 	$pad    =  $s->{sep} . $s->{pad} . $s->{apad} . $s->{xpad} x ($s->{level} - 1);
-	$sub    =~ s/\n/$pad/gse;
+	$sub    =~ s/\n/{$pad}/gs;
 	$out   .=  $sub;
       } else {
         $out .= 'sub { "DUMMY" }';
@@ -449,7 +449,7 @@ sub _dump {
         if ($s->{seen}{$id}[2]) {
 	  $out = $s->{seen}{$id}[0];
 	  #warn "[<$out]\n";
-	  return "\${$out}";
+	  return "\$\{$out\}";
 	}
       }
       else {
@@ -646,9 +646,9 @@ my %esc = (
 # put a string value in double quotes
 sub qquote {
   local($_) = shift;
-  s/([\\\"\@\$])/\\$1/g;
+  s/([\\\"\@\$\{\}])/\\$1/g;
   my $bytes; { use bytes; $bytes = length }
-  s/([^\x[00]-\x[7f]])/'\x'.sprintf("[%02x]",ord($1))/ge if $bytes +> length;
+  s/([^\x[00]-\x[7f]])/{'\x'.sprintf("[%02x]",ord($1))}/g if $bytes +> length;
   return qq("$_") unless 
     m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
@@ -656,11 +656,11 @@ sub qquote {
   s/([\a\b\t\n\f\r\e])/$esc{$1}/g;
 
     # no need for 3 digits in escape for these
-    s/([\0-\037])(?!\d)/'\\'.sprintf('%o',ord($1))/eg;
-    s/([\0-\037\177])/'\\'.sprintf('%03o',ord($1))/eg;
+    s/([\0-\037])(?!\d)/{'\'.sprintf('%o',ord($1))}/g;
+    s/([\0-\037\177])/{'\'.sprintf('%03o',ord($1))}/g;
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
     if ($high eq "iso8859") {
-      s/([\200-\240])/'\\'.sprintf('%o',ord($1))/eg;
+      s/([\200-\240])/{'\'.sprintf('%o',ord($1))}/g;
     } elsif ($high eq "utf8") {
 #     use utf8;
 #     $str =~ s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
@@ -668,7 +668,7 @@ sub qquote {
         # leave it as it is
     } else {
         use utf8;
-        s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
+        s/([^\040-\176])/{sprintf "\\x\{%04x\}", ord($1)}/g;
     }
 
   return qq("$_");

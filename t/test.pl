@@ -119,12 +119,7 @@ sub ok ($@) {
 
 sub _q {
     my $x = shift;
-    return "GLOB('" . Symbol::glob_name($x) . ")" if ref \$x eq "GLOB";
-    return 'undef' unless defined $x;
-    my $q = $x;
-    $q =~ s/\\/\\\\/g;
-    $q =~ s/'/\\'/g;
-    return "'$q'";
+    return dump::view($x);
 }
 
 sub _qq {
@@ -134,7 +129,7 @@ sub _qq {
 
 # keys are the codes \n etc map to, values are 2 char strings such as \n
 my %backslash_escape;
-foreach my $x (split m//, 'nrtfa\\\'"') {
+foreach my $x (split m//, q|nrtfa\'"|) {
     $backslash_escape{ord eval "\"\\$x\""} = "\\$x";
 }
 # A way to display scalars containing control characters and Unicode.
@@ -146,7 +141,7 @@ sub display {
             my $y = '';
             foreach my $c (unpack("U*", $x)) {
                 if ($c +> 255) {
-                    $y .= sprintf "\\x{%x}", $c;
+                    $y .= sprintf "\\x\{%x\}", $c;
                 } elsif ($backslash_escape{$c}) {
                     $y .= $backslash_escape{$c};
                 } else {
@@ -171,12 +166,9 @@ sub is ($$@) {
         # undef only matches undef
         $pass = !defined $got && !defined $expected;
     }
-    elsif (ref \$got eq "GLOB") {
-        "GLOB('" . Symbol::glob_name($got) . ')';
-        $got = "GLOB('" . Symbol::glob_name($got) . ')';
-        $pass = 0;
-    } else {
-        $pass = $got eq $expected;
+    else {
+        local $@;
+        $pass = eval { $got eq $expected };
     }
 
     unless ($pass) {
@@ -634,7 +626,7 @@ sub _fresh_perl {
     $runperl_args->{progfile} = $tmpfile;
     $runperl_args->{stderr} = 1;
 
-    open TEST, ">$tmpfile" or die "Cannot open $tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
 
     # VMS adjustments
     if( $^O eq 'VMS' ) {
@@ -695,6 +687,7 @@ sub _fresh_perl {
 sub fresh_perl_is {
     my($prog, $expected, $runperl_args, $name) = @_;
     local $Level = 2;
+    $expected =~ s/\n+$//; # is also removed from program output
     _fresh_perl($prog,
 		sub { @_ ? $_[0] eq $expected : $expected },
 		$runperl_args, $name);
@@ -776,6 +769,28 @@ WHOA
     }
 
     _ok( !$diag, _where(), $name );
+}
+
+sub dies_like(&$;$) {
+    my ($e, $qr, $name) = @_;
+    if (eval { $e->(); 1; }) {
+        diag "didn't die";
+        return ok(0, $name);
+    }
+    my $err = $@;
+    return like_yn(1, $err, $qr );
+}
+
+sub eval_dies_like($$;$) {
+    my ($e, $qr, $name) = @_;
+    eval "$e";
+    my $err = $@;
+    if (not $err) {
+        local $Level = 2;
+        diag "didn't die";
+        return ok(0, $name);
+    }
+    return like_yn(1, $err, $qr );
 }
 
 1;

@@ -123,7 +123,7 @@ is ($auto, $default, 'timestr ($diff, "auto") matches timestr ($diff)');
     if ($auto eq $noc) {
         pass ('"auto" is "noc"');
     } else {
-        is ($auto, $all, '"auto" isn\'t "noc", so should be eq to "all"');
+        is ($auto, $all, q|"auto" isn't "noc", so should be eq to "all"|);
     }
 
     like (timestr ($diff, 'all', 'E'), 

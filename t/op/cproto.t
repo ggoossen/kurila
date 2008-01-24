@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 232;
+plan tests => 228;
 
 while ( ~< *DATA) {
     chomp;
@@ -74,7 +74,6 @@ foreach undef
 fork ()
 format unknown
 formline unknown
-ge ($$)
 getc (;*)
 getgrent ()
 getgrgid ($)
@@ -106,7 +105,6 @@ glob undef
 gmtime (;$)
 goto undef
 grep undef
-gt ($$)
 hex (_)
 if undef
 index ($$;$)
@@ -118,7 +116,6 @@ kill (@)
 last undef
 lc (_)
 lcfirst (_)
-le ($$)
 length (_)
 link ($$)
 listen (*$)
@@ -127,7 +124,6 @@ localtime (;$)
 lock (\$)
 log (_)
 lstat (*)
-lt ($$)
 m undef
 map undef
 mkdir (_;$)

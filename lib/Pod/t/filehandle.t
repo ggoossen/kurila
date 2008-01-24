@@ -35,18 +35,18 @@ my $text = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
 while ( ~< *DATA) {
     next until $_ eq "###\n";
-    open (TMP, '> tmp.pod') or die "Cannot create tmp.pod: $!\n";
+    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
         print TMP $_;
     }
     close TMP;
-    open (IN, '< tmp.pod') or die "Cannot open tmp.pod: $!\n";
-    open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
+    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $!\n";
+    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
     $man->parse_from_filehandle (\*IN, \*OUT);
     close IN;
     close OUT;
-    open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
     {
@@ -66,12 +66,12 @@ while ( ~< *DATA) {
         print "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
-    open (IN, '< tmp.pod') or die "Cannot open tmp.pod: $!\n";
-    open (OUT, '> out.tmp') or die "Cannot create out.tmp: $!\n";
+    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $!\n";
+    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
     $text->parse_from_filehandle (\*IN, \*OUT);
     close IN;
     close OUT;
-    open (OUT, 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     {
         local $/;
         $output = ~< *OUT;

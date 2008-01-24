@@ -362,7 +362,7 @@ sub pod2html {
     local *POD;
     unless (@ARGV && $ARGV[0]) {
 	$Podfile  = "-" unless $Podfile;	# stdin
-	open(POD, "<$Podfile")
+	open(POD, "<", "$Podfile")
 		|| die "$0: cannot open $Podfile file for input: $!\n";
     } else {
 	$Podfile = $ARGV[0];  # XXX: might be more filenames
@@ -418,7 +418,7 @@ sub pod2html {
     }
 
     # open the output file
-    open(HTML, ">$Htmlfile")
+    open(HTML, ">", "$Htmlfile")
 	    || die "$0: cannot open $Htmlfile file for output: $!\n";
 
     # put a title in the HTML file if one wasn't specified
@@ -782,7 +782,7 @@ sub load_cache {
 
     $tests = 0;
 
-    open(CACHE, "<$itemcache") ||
+    open(CACHE, "<", "$itemcache") ||
 	die "$0: error opening $itemcache for reading: $!\n";
     $/ = "\n";
 
@@ -810,7 +810,7 @@ sub load_cache {
     close(CACHE);
 
     warn "scanning for directory cache\n" if $Verbose;
-    open(CACHE, "<$dircache") ||
+    open(CACHE, "<", "$dircache") ||
 	die "$0: error opening $dircache for reading: $!\n";
     $/ = "\n";
     $tests = 0;
@@ -884,7 +884,7 @@ sub scan_podpath {
 
 	    # scan each .pod and .pm file for =item directives
 	    foreach $pod (@files) {
-		open(POD, "<$dirname/$pod") ||
+		open(POD, "<", "$dirname/$pod") ||
 		    die "$0: error opening $dirname/$pod for input: $!\n";
 		@poddata = ~< *POD;
 		close(POD);
@@ -903,7 +903,7 @@ sub scan_podpath {
 		 $Pages{$libpod} =~ m/([^:]*\.pm):/) {
 	    # scan the .pod or .pm file for =item directives
 	    $pod = $1;
-	    open(POD, "<$pod") ||
+	    open(POD, "<", "$pod") ||
 		die "$0: error opening $pod for input: $!\n";
 	    @poddata = ~< *POD;
 	    close(POD);
@@ -921,7 +921,7 @@ sub scan_podpath {
 
     # cache the item list for later use
     warn "caching items for later use\n" if $Verbose;
-    open(CACHE, ">$Itemcache") ||
+    open(CACHE, ">", "$Itemcache") ||
 	die "$0: error open $Itemcache for writing: $!\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
@@ -933,7 +933,7 @@ sub scan_podpath {
 
     # cache the directory list for later use
     warn "caching directories for later use\n" if $Verbose;
-    open(CACHE, ">$Dircache") ||
+    open(CACHE, ">", "$Dircache") ||
 	die "$0: error open $Dircache for writing: $!\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
@@ -983,7 +983,7 @@ sub scan_dir {
 	    push(@pods, "$dir/$_.pm");
 	} elsif (-T "$dir/$_") {			    # script(?)
 	    local *F;
-	    if (open(F, "$dir/$_")) {
+	    if (open(F, "<", "$dir/$_")) {
 		my $line;
 		while (defined($line = ~< *F)) {
 		    if ($line =~ m/^=(?:pod|head1)/) {
@@ -1318,11 +1318,11 @@ sub process_pre {
     $rest = $$text;
 
     # insert spaces in place of tabs
-    $rest =~ s#(.+)#
+    $rest =~ s#(.+)#{
 	    my $line = $1;
-            1 while $line =~ s/(\t+)/' ' x ((length($1) * 8) - $-[0] % 8)/e;
+            1 while $line =~ s/(\t+)/{' ' x ((length($1) * 8) - $-[0] % 8)}/;
 	    $line;
-	#eg;
+	}#g;
 
     # convert some special chars to HTML escapes
     $rest = html_escape($rest);
@@ -1331,7 +1331,7 @@ sub process_pre {
     # the preformatted text.
     $rest =~ s{
 	         (\s*)(perl\w+)
-	      }{
+	      }{{
 		 if ( defined $Pages{$2} ){	# is a link
 		     qq($1<a href="$Htmlroot/$Pages{$2}">$2</a>);
 		 } elsif (defined $Pages{dosify($2)}) {	# is a link
@@ -1339,10 +1339,11 @@ sub process_pre {
 		 } else {
 		     "$1$2";
 		 }
-	      }xeg;
+	      
+}}xg;
      $rest =~ s{
 		 (<a\ href="?) ([^>:]*:)? ([^>:]*) \.pod: ([^>:]*:)?
-               }{
+               }{{
                   my $url ;
                   if ( $Htmlfileurl ne '' ){
 		     # Here, we take advantage of the knowledge
@@ -1358,7 +1359,8 @@ sub process_pre {
 		     $url = "$3.html" ;
 		  }
 		  "$1$url" ;
-	       }xeg;
+	       
+}}xg;
 
     # Look for embedded URLs and make them into links.  We don't
     # relativize them since they are best left as the author intended.
@@ -1382,13 +1384,13 @@ sub process_pre {
 
     $rest =~ s{
 	\b			# start at word boundary
-	(			# begin $1  {
+	(			# begin $1  \{
 	    $urls :		# need resource and a colon
 	    (?!:)		# Ignore File::, among others.
 	    [$any] +?		# followed by one or more of any valid
 				#   character, but be conservative and
 				#   take only what you need to....
-	)			# end   $1  }
+	)			# end   $1  \}
 	(?=
 	    &quot; &gt;		# maybe pre-quoted '<a href="...">'
 	|			# or:
@@ -1809,8 +1811,8 @@ sub dosify {
     return lc($str) if $^O eq 'VMS';     # VMS just needs casing
     if ($Is83) {
         $str = lc $str;
-        $str =~ s/(\.\w+)/substr ($1,0,4)/ge;
-        $str =~ s/(\w+)/substr ($1,0,8)/ge;
+        $str =~ s/(\.\w+)/{substr ($1,0,4)}/g;
+        $str =~ s/(\w+)/{substr ($1,0,8)}/g;
     }
     return $str;
 }
@@ -2164,9 +2166,9 @@ sub fragment_id_obfuscated {  # This was the old "_2d_2d__"
     # text? Normalize by obfuscating the fragment id to make it unique
     $text =~ s/\s+/_/sg;
 
-    $text =~ s{(\W)}{
+    $text =~ s{(\W)}{{
         defined( $HC[ord($1)] ) ? $HC[ord($1)]
-        : ( $HC[ord($1)] = sprintf( "%%%02X", ord($1) ) ) }gxe;
+        : ( $HC[ord($1)] = sprintf( "%%%02X", ord($1) ) ) }}gx;
     $text = substr( $text, 0, 50 );
 
     $text;

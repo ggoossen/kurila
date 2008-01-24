@@ -89,11 +89,11 @@ rmtree 'auto/FakeMod';
 ok( mkpath('auto/FakeMod') );
 END { rmtree 'auto' }
 
-ok(open(PACKLIST, '>auto/FakeMod/.packlist'));
+ok(open(PACKLIST, ">", 'auto/FakeMod/.packlist'));
 print PACKLIST 'list';
 close PACKLIST;
 
-ok(open(FAKEMOD, '>auto/FakeMod/FakeMod.pm'));
+ok(open(FAKEMOD, ">", 'auto/FakeMod/FakeMod.pm'));
 
 print FAKEMOD <<'FAKE';
 package FakeMod;

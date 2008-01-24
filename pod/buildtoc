@@ -78,7 +78,7 @@ if ($Verbose) {
 
 chdir $FindBin::Bin or die "$0: Can't chdir $FindBin::Bin: $!";
 
-open MASTER, $masterpodfile or die "$0: Can't open $masterpodfile: $!";
+open MASTER, "<", $masterpodfile or die "$0: Can't open $masterpodfile: $!";
 
 my ($delta_source, $delta_target);
 
@@ -170,7 +170,7 @@ close MASTER;
   # Things we copy to won't be in MANIFEST
   @sources{values %Copies} = ();
 
-  open(MANI, "../MANIFEST") || die "$0: opening ../MANIFEST failed: $!";
+  open(MANI, "<", "../MANIFEST") || die "$0: opening ../MANIFEST failed: $!";
   while ( ~< *MANI) {
     if (m!^pod/([^.]+\.pod)\s+!i) {
       push @manipods, $1;
@@ -184,7 +184,7 @@ close MASTER;
   @manireadmes{@manireadmes} = @manireadmes;
 
   my $in_perlpod;
-  open(PERLPOD, "perl.pod") || die "$0: opening perl.pod failed: $!\n";
+  open(PERLPOD, "<", "perl.pod") || die "$0: opening perl.pod failed: $!\n";
   while ( ~< *PERLPOD) {
     $in_perlpod ||= m/^For ease of access/;
     $in_perlpod &&= ! m/^\(If you're intending /;
@@ -239,7 +239,7 @@ close MASTER;
       my $pod = $file;
       return if $pod =~ s/pm$/pod/ && -e $pod;
       die "$0: tut $File::Find::name" if $file =~ m/TUT/;
-      unless (open (F, "< $_\0")) {
+      unless (open (F, "<", "$_\0")) {
 	warn "$0: bogus <$file>: $!";
 	system "ls", "-l", $file;
       }
@@ -290,7 +290,7 @@ sub path2modname {
 sub output ($);
 
 sub output_kurilatoc {
-  open(OUT, ">kurilatoc.pod") || die "$0: creating kurilatoc.pod failed: $!";
+  open(OUT, ">", "kurilatoc.pod") || die "$0: creating kurilatoc.pod failed: $!";
 
   local $/ = '';
 
@@ -610,10 +610,10 @@ sub do_nmake {
   die "$0: $name contains discontiguous README copies" if $sections +> 1;
   # Now remove the other copies that follow
   1 while $makefile =~ s/\0\tcopy .*\n/\0/gm;
-  $makefile =~ s/\0+/join ("", &generate_nmake_1)/se;
+  $makefile =~ s/\0+/{join ("", &generate_nmake_1)}/s;
 
   $makefile =~ s{(del /f [^\n]+checkpods[^\n]+).*?(pod2html)}
-    {"$1\n" . &generate_nmake_2."\n\t    $2"}se;
+    {{"$1\n" . &generate_nmake_2."\n\t    $2"}}s;
   $makefile;
 }
 
@@ -630,7 +630,7 @@ sub do_perlpod {
 		    |\s*\n		# blank line
 		   )+
 		  }
-	  {$1 . join "", &generate_perlpod}mxe) {
+	  {{$1 . join "", &generate_perlpod}}mx) {
     die "$0: Failed to insert amendments in do_perlpod";
   }
   $pod;
@@ -642,7 +642,7 @@ sub do_podmak {
   foreach my $variable (qw(pod man html tex)) {
     die "$0: could not find $variable in $name"
       unless $body =~ s{\n\U$variable\E = (?:[^\n]*\\\n)*[^\n]*}
-	{"\n" . generate_pod_mak ($variable)}se;
+	{{"\n" . generate_pod_mak ($variable)}}s;
   }
   $body;
 }
@@ -656,7 +656,7 @@ sub do_vms {
   die "$0: $name contains no pod assignments" if $sections +< 1;
   die "$0: $name contains $sections discontigous pod assignments"
     if $sections +> 1;
-  $makefile =~ s/\0+/join "\n", '', &generate_descrip_mms_1/se;
+  $makefile =~ s/\0+/{join "\n", '', &generate_descrip_mms_1}/s;
 
   die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
 
@@ -673,7 +673,7 @@ sub do_vms {
   die "$0: $name contains no copy rules" if $sections +< 1;
   die "$0: $name contains $sections discontigous copy rules"
     if $sections +> 1;
-  $makefile =~ s/\0+/join "\n", '', &generate_descrip_mms_2/se;
+  $makefile =~ s/\0+/{join "\n", '', &generate_descrip_mms_2}/s;
   $makefile;
 }
 
@@ -693,7 +693,7 @@ sub do_unix {
   my @copy_rules = map "\t-\@test -f pod/$Copies{$_} && cd pod && \$(LNS) $Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
     keys %Copies;
 
-  $makefile_SH =~ s/\0+/join "\n", '', @copy_rules, ''/se;
+  $makefile_SH =~ s/\0+/{join "\n", '', @copy_rules, ''}/s;
   $makefile_SH;
 
 }
@@ -711,7 +711,7 @@ while (my ($target, $name) = each %Targets) {
     next;
   }
   print "Now processing $name\n" if $Verbose;
-  open THING, $name or die "Can't open $name: $!";
+  open THING, "<", $name or die "Can't open $name: $!";
   my @orig = ~< *THING;
   my $orig = join '', @orig;
   close THING;
@@ -725,7 +725,7 @@ while (my ($target, $name) = each %Targets) {
     next;
   }
   rename $name, "$name.old" or die "$0: Can't rename $name to $name.old: $!";
-  open THING, ">$name" or die "$0: Can't open $name for writing: $!";
+  open THING, ">", "$name" or die "$0: Can't open $name for writing: $!";
   print THING $new or die "$0: print to $name failed: $!";
   close THING or die die "$0: close $name failed: $!";
 }

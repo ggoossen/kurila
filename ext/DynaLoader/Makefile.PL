@@ -18,18 +18,18 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-	'
+	q|
 DynaLoader.xs: $(DLSRC)
 	$(RM_F) $@
 	$(CP) $? $@
 
 # Perform very simple tests just to check for major gaffs.
-# We can\'t do much more for platforms we are not executing on.
+# We can't do much more for platforms we are not executing on.
 test-xs:
 	for i in dl_*xs; \
 	    do $(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) $(XSUBPPARGS) $$i > /dev/null; \
 	done
-';
+|;
 }
 
 sub MY::static {

@@ -216,7 +216,7 @@ sub find_perl {
 	print "Checking $name\n" if ($trace +>= 2);
 	# If it looks like a potential command, try it without the MCR
         if ($name =~ m/^[\w\-\$]+$/) {
-            open(TCF,">temp_mmvms.com") || die('unable to open temp file');
+            open(TCF, ">","temp_mmvms.com") || die('unable to open temp file');
             print TCF "\$ set message/nofacil/nosever/noident/notext\n";
             print TCF "\$ $name -e \"require $ver; print \"\"VER_OK\\n\"\"\"\n";
             close TCF;
@@ -230,7 +230,7 @@ sub find_perl {
 	next unless $vmsfile = $self->maybe_command($name);
 	$vmsfile =~ s/;[\d\-]*$//;  # Clip off version number; we can use a newer version as well
 	print "Executing $vmsfile\n" if ($trace +>= 2);
-        open(TCF,">temp_mmvms.com") || die('unable to open temp file');
+        open(TCF, ">","temp_mmvms.com") || die('unable to open temp file');
         print TCF "\$ set message/nofacil/nosever/noident/notext\n";
         print TCF "\$ mcr $vmsfile -e \"require $ver; print \"\"VER_OK\\n\"\"\" \n";
         close TCF;
@@ -977,12 +977,12 @@ $(BASEEXT).opt : Makefile.PL
 	foreach $lib (split ' ', $self->{LDLOADLIBS}) {
 	    $lib =~ s%\$%\\\$%g;  # Escape '$' in VMS filespecs
 	    if (length($line) + length($lib) +> 160) {
-		push @m, "\t\$(PERL) -e \"print qq{$line}\" >>\$(MMS\$TARGET)\n";
+		push @m, "\t\$(PERL) -e \"print qq\{$line\}\" >>\$(MMS\$TARGET)\n";
 		$line = $lib . '\n';
 	    }
 	    else { $line .= $lib . '\n'; }
 	}
-	push @m, "\t\$(PERL) -e \"print qq{$line}\" >>\$(MMS\$TARGET)\n" if $line;
+	push @m, "\t\$(PERL) -e \"print qq\{$line\}\" >>\$(MMS\$TARGET)\n" if $line;
     }
 
     join('',@m);
@@ -1440,7 +1440,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	# Get external libraries this extension will need
 	if (-f $extralibs ) {
 	    my %seenthis;
-	    open LIST,$extralibs or warn $!,next;
+	    open LIST, "<",$extralibs or warn $!,next;
 	    while ( ~< *LIST) {
 		chomp;
 		# Include a library in the link only once, unless it's mentioned
@@ -1456,7 +1456,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	}
 	# Get full name of extension for ExtUtils::Miniperl
 	if (-f $extopt) {
-	    open OPT,$extopt or die $!;
+	    open OPT, "<",$extopt or die $!;
 	    while ( ~< *OPT) {
 		next unless m/(?:UNIVERSAL|VECTOR)=boot_([\w_]+)/;
 		my $pkg = $1;
@@ -1502,9 +1502,9 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     }
     $libperldir = $self->fixpath((fileparse($libperl))[1],1);
 
-    push @m, '
-# Fill in the target you want to produce if it\'s not perl
-MAP_TARGET    = ',$self->fixpath($target,0),'
+    push @m, q|
+# Fill in the target you want to produce if it's not perl
+MAP_TARGET    = |,$self->fixpath($target,0),'
 MAP_SHRTARGET = ',$self->fixpath($shrtarget,0),"
 MAP_LINKCMD   = $linkcmd
 MAP_PERLINC   = ", $perlinc ? map('"$_" ',@{$perlinc}) : '',"
@@ -1533,7 +1533,7 @@ $(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmpdir}perlmain\$(OBJ_EXT) ${tmpdir}PerlSh
     push @m,"\n${tmpdir}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmpdir}Writemain.tmp\n";
     push @m, "# More from the 255-char line length limit\n";
     foreach (@staticpkgs) {
-	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[}" >>${tmpdir}Writemain.tmp\n];
+	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[\}" >>${tmpdir}Writemain.tmp\n];
     }
 
     push @m, sprintf <<'MAKE_FRAG', $tmpdir, $tmpdir;

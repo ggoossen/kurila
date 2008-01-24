@@ -29,20 +29,20 @@ is($words[2], 'zoo');
 is(join(";", @words), qq(4; ;3; ;2; ;1; ;0));
 
 # Big ol' nasty test (thanks, Joerk!)
-our $string = 'aaaa"bbbbb" cc\\ cc \\\\\\"dddd" eee\\\\\\"ffff" "gg"';
+our $string = 'aaaa"bbbbb" cc\ cc \\\"dddd" eee\\\"ffff" "gg"';
 
 # First with $keep == 1
 our $result = join('|', parse_line('\s+', 1, $string));
-is($result, 'aaaa"bbbbb"|cc\\ cc|\\\\\\"dddd" eee\\\\\\"ffff"|"gg"');
+is($result, 'aaaa"bbbbb"|cc\ cc|\\\"dddd" eee\\\"ffff"|"gg"');
 
 # Now, $keep == 0
 $result = join('|', parse_line('\s+', 0, $string));
-is($result, 'aaaabbbbb|cc cc|\\"dddd eee\\"ffff|gg');
+is($result, 'aaaabbbbb|cc cc|\"dddd eee\"ffff|gg');
 
 # Now test single quote behavior
-$string = 'aaaa"bbbbb" cc\\ cc \\\\\\"dddd\' eee\\\\\\"ffff\' gg';
+$string = q|aaaa"bbbbb" cc\ cc \\\\\\\"dddd' eee\\\\\\"ffff' gg|;
 $result = join('|', parse_line('\s+', 0, $string));
-is($result, 'aaaabbbbb|cc cc|\\"dddd eee\\\\\\"ffff|gg');
+is($result, 'aaaabbbbb|cc cc|\\\"dddd eee\\\\\\"ffff|gg');
 
 # Make sure @nested_quotewords does the right thing
 our @lists = nested_quotewords('\s+', 0, 'a b c', '1 2 3', 'x y z');
@@ -86,9 +86,9 @@ is(@words, 0);
 
 # Now test perlish single quote behavior
 $Text::ParseWords::PERL_SINGLE_QUOTE = 1;
-$string = 'aaaa"bbbbb" cc\ cc \\\\\"dddd\' eee\\\\\"\\\'ffff\' gg';
+$string = q|aaaa"bbbbb" cc\ cc \\\\\"dddd' eee\\\\\"ffff' gg|;
 $result = join('|', parse_line('\s+', 0, $string));
-is($result, 'aaaabbbbb|cc cc|\"dddd eee\\\\"\'ffff|gg');
+is($result, q<aaaabbbbb|cc cc|\\"dddd eee\\\\\"ffff|gg>);
 
 # test whitespace in the delimiters
 @words = quotewords(' ', 1, '4 3 2 1 0');

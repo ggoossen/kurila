@@ -32,7 +32,7 @@ sub convert_n_test {
 	}
 
 	# result
-	open my $in, $outfile or die "cannot open $outfile: $!";
+	open my $in, "<", $outfile or die "cannot open $outfile: $!";
 	$result = ~< $in;
 	close $in;
     }

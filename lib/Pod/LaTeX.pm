@@ -919,15 +919,15 @@ __TEX_COMMENT__
 
       # Roll our own
       $preamble = << "__TEX_HEADER__";
-\\documentclass{article}
-\\usepackage[T1]{fontenc}
-\\usepackage{textcomp}
+\\documentclass\{article\}
+\\usepackage[T1]\{fontenc\}
+\\usepackage\{textcomp\}
 
 $comment
 
 $makeindex
 
-\\begin{document}
+\\begin\{document\}
 
 $tableofcontents
 
@@ -971,7 +971,7 @@ sub end_pod {
 
       $makeindex = '%% '. $makeindex  unless $self->MakeIndex;
 
-      $end = "$makeindex\n\n\\end{document}\n";
+      $end = "$makeindex\n\n\\end\{document\}\n";
     }
   }
 
@@ -1126,11 +1126,11 @@ sub verbatim {
     # slightly modified by hsmyers@sdragons.com 10/22/01
     my @l = split("\n",$paragraph);
     foreach (@l) {
-      1 while s/(^|\n)([^\t\n]*)(\t+)/
+      1 while s/(^|\n)([^\t\n]*)(\t+)/{
 	$1. $2 . (" " x 
 		  (8 * length($3)
 		   - (length($2) % 8)))
-	  /sex;
+	  }/sx;
     }
     $paragraph = join("\n",@l);
     # End of change.
@@ -1226,10 +1226,10 @@ sub interior_sequence {
   my ($seq_command, $seq_argument, $pod_seq) = @_;
 
   if ($seq_command eq 'B') {
-    return "\\textbf{$seq_argument}";
+    return "\\textbf\{$seq_argument\}";
 
   } elsif ($seq_command eq 'I') {
-    return "\\textit{$seq_argument}";
+    return "\\textit\{$seq_argument\}";
 
   } elsif ($seq_command eq 'E') {
 
@@ -1252,10 +1252,10 @@ sub interior_sequence {
     return '{}';
 
   } elsif ($seq_command eq 'C') {
-    return "\\texttt{$seq_argument}";
+    return "\\texttt\{$seq_argument\}";
 
   } elsif ($seq_command eq 'F') {
-    return "\\emph{$seq_argument}";
+    return "\\emph\{$seq_argument\}";
 
   } elsif ($seq_command eq 'S') {
     # non breakable spaces
@@ -1284,7 +1284,7 @@ sub interior_sequence {
       # Convert to a label
       $node = $self->_create_label($node);
 
-      return "\\S\\ref{$node}";
+      return "\\S\\ref\{$node\}";
 
     } else {
       # Use default markup for external references
@@ -1304,12 +1304,12 @@ sub interior_sequence {
     my $link = $seq_argument;
     $link =~ s|::|/|g;
 
-    my $ref = "\\emph{$seq_argument}";
+    my $ref = "\\emph\{$seq_argument\}";
     return $ref;
 
   } elsif ($seq_command eq 'Q') {
     # Special markup for Pod::Hyperlink
-    return "\\textsf{$seq_argument}";
+    return "\\textsf\{$seq_argument\}";
 
   } elsif ($seq_command eq 'X') {
     # Index entries
@@ -1318,7 +1318,7 @@ sub interior_sequence {
     # I will let '!' go through for now
     # not sure how sub categories are handled in X<>
     my $index = $self->_create_index($seq_argument);
-    return "\\index{$index}\n";
+    return "\\index\{$index\}\n";
 
   } else {
     carp "Unknown sequence $seq_command<$seq_argument>";
@@ -1384,7 +1384,7 @@ sub end_list {
   # Dont write anything if the list type is not set
   # iomplying that a list was created but no entries were
   # placed in it (eg because of a =begin/=end combination)
-  $self->_output("\\end{$type}\n")
+  $self->_output("\\end\{$type\}\n")
     if (defined $type && length($type) +> 0);
   
   # Clear list
@@ -1439,7 +1439,7 @@ sub add_item {
     }
     $self->lists->[-1]->type($type);
 
-    $self->_output("\\begin{$type}\n");
+    $self->_output("\\begin\{$type\}\n");
 
   }
 
@@ -1453,14 +1453,14 @@ sub add_item {
     my ($hunk1, $hunk2) = $self->_split_delimited( $paragraph, $maxlen );
 
     # Print the first hunk
-    $self->_output("\n\\item[{$hunk1}] ");
+    $self->_output("\n\\item[\{$hunk1\}] ");
 
     # and the second hunk if it is defined
     if ($hunk2) {
-      $self->_output("\\textbf{$hunk2}");
+      $self->_output("\\textbf\{$hunk2\}");
     } else {
       # Not there so make sure we have a new line
-      $self->_output("\\mbox{}");
+      $self->_output("\\mbox\{\}");
     }
 
   } else {
@@ -1529,7 +1529,7 @@ sub head {
   my $star = ($level +>= $self->LevelNoNum ? '*' : '');
 
   # Section
-  $self->_output("\\" .$LatexSections[$level] .$star ."{$paragraph\\label{".$label ."}\\index{".$index."}}\n");
+  $self->_output("\\" .$LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n");
 
 }
 
@@ -1647,7 +1647,7 @@ sub _replace_special_chars_late {
   $paragraph =~ s/(<|>)/\$$1\$/g;
 
   # Replace | with $|$
-  $paragraph =~ s'\|'$|$'g;
+  $paragraph =~ s/\|/{'$|$'}/g;
 
 
   return $paragraph;

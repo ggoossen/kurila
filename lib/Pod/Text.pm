@@ -27,7 +27,7 @@ package Pod::Text;
 
 use strict;
 use utf8;
-use vars qw(@ISA @EXPORT %ESCAPES $VERSION);
+use vars qw(@ISA @EXPORT $VERSION);
 
 use Carp qw(carp croak);
 use Exporter ();
@@ -347,7 +347,7 @@ sub cmd_verbatim {
     my ($self, $attrs, $text) = @_;
     $self->item if defined $$self{ITEM};
     return if $text =~ m/^\s*$/;
-    $text =~ s/^(\n*)(\s*\S+)/$1 . (' ' x $$self{MARGIN}) . $2/gme;
+    $text =~ s/^(\n*)(\s*\S+)/{$1 . (' ' x $$self{MARGIN}) . $2}/gm;
     $text =~ s/\s*$/\n\n/;
     $self->output ($text);
     return '';
@@ -570,7 +570,7 @@ sub pod2text {
     if (defined $_[1]) {
         my @fhs = @_;
         local *IN;
-        unless (open (IN, $fhs[0])) {
+        unless (open (IN, "<", $fhs[0])) {
             croak ("Can't open $fhs[0] for reading: $!\n");
             return;
         }

@@ -70,7 +70,7 @@ EXPECT
 ########
 $foo=undef; $foo->go;
 EXPECT
-Can't call method "go" on an undefined value at - line 1.
+Can't call method "go" on an undefined value at - line 1
 ########
 BEGIN
         {
@@ -81,7 +81,7 @@ $array[128]=1
 ########
 $x=0x0eabcd; print $x->ref;
 EXPECT
-Can't call method "ref" without a package or object reference at - line 1.
+Can't call method "ref" without a package or object reference at - line 1
 ########
 chop ($str .= ~< *DATA);
 ########
@@ -114,12 +114,12 @@ quotemeta ""
 ########
 for ("ABCDE") {
  &sub;
-s/./&sub($&)/eg;
+s/./{&sub($&)}/g;
 print;}
 sub sub {local($_) = @_;
 $_ x 4;}
 EXPECT
-Modification of a read-only value attempted at - line 3.
+Modification of a read-only value attempted at - line 3
 ########
 package FOO;sub new {bless {FOO => 'BAR'}};
 package main;
@@ -180,20 +180,20 @@ TIEARRAY FAKEARRAY fred
 TIEARRAY FAKEARRAY fred
 DESTROY 
 ########
-BEGIN { die "phooey\n" }
+BEGIN { die "phooey" }
 EXPECT
-phooey
-BEGIN failed--compilation aborted at - line 1.
+phooey at - line 1
+BEGIN failed--compilation aborted at - line 1
 ########
 BEGIN { 1/$zero }
 EXPECT
-Illegal division by zero at - line 1.
-BEGIN failed--compilation aborted at - line 1.
+Illegal division by zero at - line 1
+BEGIN failed--compilation aborted at - line 1
 ########
 BEGIN { undef = 0 }
 EXPECT
-Modification of a read-only value attempted at - line 1.
-BEGIN failed--compilation aborted at - line 1.
+Modification of a read-only value attempted at - line 1
+BEGIN failed--compilation aborted at - line 1
 ########
 {
     package foo;
@@ -269,11 +269,11 @@ print "ok\n" if (1E2<<1 == 200 and 3E4<<3 == 240000);
 EXPECT
 ok
 ########
-print "ok\n" if ("\0" lt "\x[FF]");
+print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
 ########
-open(H,$^O eq 'MacOS' ? ':run:fresh_perl.t' : 'run/fresh_perl.t'); # must be in the 't' directory
+open(H,"<",$^O eq 'MacOS' ? ':run:fresh_perl.t' : 'run/fresh_perl.t'); # must be in the 't' directory
 stat(H);
 print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT
@@ -296,7 +296,7 @@ no strict 'refs';
 { local $main::{ren} = *stimpy; print ${'ren'}, ' ' }
 print +(defined(${'ren'}) ? 'oops' : 'joy'), "\n";
 EXPECT
-Can't use string ("ren") as a SCALAR ref while "strict refs" in use at - line 3.
+Can't use string ("ren") as a SCALAR ref while "strict refs" in use at - line 3
 ########
 package p;
 sub func { print 'really ' unless wantarray; 'p' }
@@ -335,7 +335,9 @@ foo;
 foo;
 EXPECT
 In foo1
-Subroutine foo redefined at (eval 1) line 1.
+Subroutine foo redefined at (eval 1) line 1
+    (eval) called at - line 4
+    main::foo called at - line 7
 Exiting foo1
 In foo2
 ########
@@ -347,16 +349,6 @@ print "eat flaming death\n" unless ($s == 7);
 sub foo { local $_ = shift; split; @_ }
 @x = foo(' x  y  z ');
 print "you die joe!\n" unless "@x" eq 'x y z';
-########
-m/(?{"{"})/	# Check it outside of eval too
-EXPECT
-Sequence (?{...}) not terminated or not {}-balanced in regex; marked by <-- HERE in m/(?{ <-- HERE "{"})/ at - line 1.
-########
-m/(?{"{"}})/	# Check it outside of eval too
-EXPECT
-Unmatched right curly bracket at (re_eval 1) line 1, at end of line
-syntax error at (re_eval 1) line 1, near ""{"}"
-Compilation failed in regexp at - line 1.
 ########
 BEGIN { @ARGV = qw(a b c d e) }
 BEGIN { print "argv <@ARGV>\nbegin <",shift,">\n" }
@@ -374,7 +366,7 @@ argv <e>
 -l
 # fdopen from a system descriptor to a system descriptor used to close
 # the former.
-open STDERR, '>&=STDOUT' or die $!;
+open STDERR, '>&=', 'STDOUT' or die $!;
 select STDOUT; $| = 1; print fileno STDOUT or die $!;
 select STDERR; $| = 1; print fileno STDERR or die $!;
 EXPECT
@@ -384,7 +376,7 @@ EXPECT
 -w
 sub testme { my $a = "test"; { local $a = "new test"; print $a }}
 EXPECT
-Can't localize lexical variable $a at - line 1.
+Can't localize lexical variable $a at - line 1
 ########
 package X;
 sub ascalar { my $r; bless \$r }
@@ -437,15 +429,16 @@ destroyed
 BEGIN {
   $| = 1;
   $SIG{__WARN__} = sub {
-    eval { print $_[0] };
-    die "bar\n";
+    eval { print $_[0]->{description} };
+    die "bar";
   };
   warn "foo\n";
 }
 EXPECT
 foo
-bar
-BEGIN failed--compilation aborted at - line 8.
+bar at - line 5
+    main::__ANON__ called at - line 7
+BEGIN failed--compilation aborted at - line 8
 ########
 re();
 sub re {
@@ -474,7 +467,7 @@ else {
   if ($x == 0) { print "" } else { print $x }
 }
 EXPECT
-Use of uninitialized value $x in numeric eq (==) at - line 3.
+Use of uninitialized value $x in numeric eq (==) at - line 3
 ########
 $x = sub {};
 foo();
@@ -497,11 +490,12 @@ sub M { $_[0] = 2; }
 eval "C";
 M(C);
 EXPECT
-Modification of a read-only value attempted at - line 2.
+Modification of a read-only value attempted at - line 2
+    main::M called at - line 4
 ########
 print qw(ab a\b a\\b);
 EXPECT
-aba\ba\b
+aba\ba\\b
 ########
 # lexicals declared after the myeval() definition should not be visible
 # within it
@@ -531,7 +525,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-(?-uxism:x)
+(?-uxism:x) at - line 3
 ########
 # David Dyck
 # coredump in 5.7.1
@@ -559,24 +553,6 @@ use utf8;
 "abcd\x{1234}" =~ m/(a)(b[c])(d+)?/i and print "ok\n";
 EXPECT
 ok
-########
-my $foo = Bar->new();
-my @dst;
-END {
-    ($_ = "@dst") =~ s/\(0x.+?\)/(0x...)/;
-    print $_, "\n";
-}
-package Bar;
-sub new {
-    my $self = bless [], 'Bar';
-    eval '$self';
-    return $self;
-}
-sub DESTROY { 
-    push @dst, "$_[0]";
-}
-EXPECT
-Bar=ARRAY(0x...)
 ######## (?{...}) compilation bounces on PL_rs
 -0
 {
@@ -646,7 +622,7 @@ print $x;
 EXPECT
 ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
-$eval = eval 'sub { eval "sub { %S }" }';
+$eval = eval 'sub { eval "sub \{ %S \}" }';
 $eval->({});
 ######## [perl #20667] unicode regex vs non-unicode regex
 $toto = 'Hello';
@@ -718,7 +694,7 @@ $SIG{__WARN__} = sub { $@ = shift };
 use Encode;
 use utf8;
 my $t = "\x[E9]";
-$t =~ s/([^a])//ge;
+$t =~ s/([^a])/{''}/g;
 $@ =~ s/ at .*/ at/;
 print $@;
 print "Good" if $t eq "\x[E9]";

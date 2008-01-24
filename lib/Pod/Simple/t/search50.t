@@ -26,7 +26,7 @@ use Pod::Simple;
 
 my $found = 0;
 $x->callback(sub {
-  print "#  ", join("  ", map "{$_}", @_), "\n";
+  print "#  ", join("  ", map "\{$_\}", @_), "\n";
   ++$found;
   return;
 });
@@ -55,7 +55,7 @@ if( $strictpath ) {
   print "# Comparing \"$x[0]\" to \"$x[1]\"\n";
   for(@x) { s{[/\\]}{/}g; }
   print "#        => \"$x[0]\" to \"$x[1]\"\n";
-  ok $x[0], $x[1], " find('strict') should match survey's name2where{strict}";
+  ok $x[0], $x[1], " find('strict') should match survey's name2where\{strict\}";
 } else {
   ok 0;  # no 'thatpath/strict.pm' means can't test find()
 }

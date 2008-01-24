@@ -36,8 +36,8 @@ my $testlines = {
         number => 1,
         ok => 0
     },
-    'not ok 11 - this is \\# all the name # skip this is not' => {
-        description => 'this is \\# all the name',
+    'not ok 11 - this is \# all the name # skip this is not' => {
+        description => 'this is \# all the name',
         number => 11,
         ok => 0,
         reason => 'this is not',
@@ -81,8 +81,8 @@ my $testlines = {
         number => 2938,
         ok => 1
     },
-    'ok 42 - _is_header() is a header \'1..192 todo 4 2 13 192 \\# Skip skip skip because' => {
-        description => '_is_header() is a header \'1..192 todo 4 2 13 192 \\# Skip skip skip because',
+    q|ok 42 - _is_header() is a header '1..192 todo 4 2 13 192 \# Skip skip skip because| => {
+        description => q|_is_header() is a header '1..192 todo 4 2 13 192 \# Skip skip skip because|,
         number => 42,
         ok => 1
     }

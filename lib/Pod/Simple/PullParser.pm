@@ -142,7 +142,7 @@ sub get_token {
         print "* I've gotten ", scalar(@lines), " lines:\n";
         foreach my $l (@lines) {
           if(defined $l) {
-            print "  line {$l}\n";
+            print "  line \{$l\}\n";
           } else {
             print "  line undef\n";
           }
@@ -256,7 +256,7 @@ sub set_source {
     DEBUG and print "$self 's source is filename $_[0]\n";
     {
       local *PODSOURCE;
-      open(PODSOURCE, "<$_[0]") || Carp::croak "Can't open $_[0]: $!";
+      open(PODSOURCE, "<", "$_[0]") || Carp::croak "Can't open $_[0]: $!";
       $handle = *PODSOURCE{IO};
     }
     $self->{'source_filename'} = $_[0];

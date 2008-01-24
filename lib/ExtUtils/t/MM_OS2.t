@@ -61,7 +61,7 @@ like( $res, qr/"IMPORTS" => .+imports/, '... and allow parameter options too' );
 my $can_write;
 {
 	local *OUT;
-	$can_write = open(OUT, '>tmp_imp');
+	$can_write = open(OUT, ">", 'tmp_imp');
 }
 
 SKIP: {

@@ -274,13 +274,13 @@ END
     push @r, split m/\n/, <<"END"
     $STD_TESTS;
     $FOO_TESTS;
-    \$h{foo} = undef;
+    \$h\{foo\} = undef;
     $STD_TESTS;
     $FOO_TESTS;
-    \$h{foo} = 'hello';
+    \$h\{foo\} = 'hello';
     $STD_TESTS;
     $FOO_TESTS;
-    delete  \$h{foo};
+    delete  \$h\{foo\};
     $STD_TESTS;
     $FOO_TESTS;
 END
@@ -291,16 +291,16 @@ END
     foreach my $key (map { dumped($_) } @things) {
         foreach my $value ((map { dumped($_) } @things), '$ref') {
             push @r, split m/\n/, <<"END"
-            \$h{$key} = $value;
+            \$h\{$key\} = $value;
             $STD_TESTS;
-            defined \$h{$key};
-            exists \$h{$key};
-            \$h{$key};
-            delete \$h{$key};
+            defined \$h\{$key\};
+            exists \$h\{$key\};
+            \$h\{$key\};
+            delete \$h\{$key\};
             $STD_TESTS;
-            defined \$h{$key};
-            exists \$h{$key};
-            \$h{$key};
+            defined \$h\{$key\};
+            exists \$h\{$key\};
+            \$h\{$key\};
 END
   ;
         }

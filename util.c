@@ -1119,39 +1119,6 @@ Perl_mess(pTHX_ const char *pat, ...)
     return retval;
 }
 
-STATIC const COP*
-S_closest_cop(pTHX_ const COP *cop, const OP *o)
-{
-    dVAR;
-    /* Look for PL_op starting from o.  cop is the last COP we've seen. */
-
-    if (!o || o == PL_op)
-	return cop;
-
-    if (o->op_flags & OPf_KIDS) {
-	const OP *kid;
-	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling) {
-	    const COP *new_cop;
-
-	    /* If the OP_NEXTSTATE has been optimised away we can still use it
-	     * the get the file and line number. */
-
-	    if (kid->op_type == OP_NULL && kid->op_targ == OP_NEXTSTATE)
-		cop = (const COP *)kid;
-
-	    /* Keep searching, and return when we've found something. */
-
-	    new_cop = closest_cop(cop, kid);
-	    if (new_cop)
-		return new_cop;
-	}
-    }
-
-    /* Nothing found. */
-
-    return NULL;
-}
-
 SV *
 Perl_vmess(pTHX_ const char *pat, va_list *args)
 {
@@ -1159,36 +1126,6 @@ Perl_vmess(pTHX_ const char *pat, va_list *args)
     SV * const sv = mess_alloc();
 
     sv_vsetpvfn(sv, pat, strlen(pat), args, NULL, 0, NULL);
-    if (!SvCUR(sv) || *(SvEND(sv) - 1) != '\n') {
-	/*
-	 * Try and find the file and line for PL_op.  This will usually be
-	 * PL_curcop, but it might be a cop that has been optimised away.  We
-	 * can try to find such a cop by searching through the optree starting
-	 * from the sibling of PL_curcop.
-	 */
-
-	const COP *cop = closest_cop(PL_curcop, PL_curcop->op_sibling);
-	if (!cop)
-	    cop = PL_curcop;
-
-	if (CopLINE(cop))
-	    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf,
-	    OutCopFILE(cop), (IV)CopLINE(cop));
-	/* Seems that GvIO() can be untrustworthy during global destruction. */
-	if (GvIO(PL_last_in_gv) && (SvTYPE(GvIOp(PL_last_in_gv)) == SVt_PVIO)
-		&& IoLINES(GvIOp(PL_last_in_gv)))
-	{
-	    const bool line_mode = (RsSIMPLE(PL_rs) &&
-			      SvCUR(PL_rs) == 1 && *SvPVX_const(PL_rs) == '\n');
-	    Perl_sv_catpvf(aTHX_ sv, ", <%s> %s %"IVdf,
-			   PL_last_in_gv == PL_argvgv ? "" : GvNAME(PL_last_in_gv),
-			   line_mode ? "line" : "chunk",
-			   (IV)IoLINES(GvIOp(PL_last_in_gv)));
-	}
-	if (PL_dirty)
-	    sv_catpvs(sv, " during global destruction");
-	sv_catpvs(sv, ".\n");
-    }
     return sv;
 }
 
@@ -1239,10 +1176,10 @@ Perl_write_to_stderr(pTHX_ const char* message, int msglen)
     }
 }
 
-/* Common code used by vcroak, vdie, vwarn and vwarner  */
+/* Common code used by vdie, vwarn and vwarner  */
 
-STATIC bool
-S_vdie_common(pTHX_ const char *message, STRLEN msglen, I32 utf8, bool warn)
+bool
+Perl_vdie_common(pTHX_ SV *msv, bool warn)
 {
     dVAR;
     HV *stash;
@@ -1252,7 +1189,9 @@ S_vdie_common(pTHX_ const char *message, STRLEN msglen, I32 utf8, bool warn)
     /* sv_2cv might call Perl_croak() or Perl_warner() */
     SV * const oldhook = *hook;
 
-    assert(oldhook);
+    if ( ! oldhook ) {
+	return FALSE;
+    }
 
     ENTER;
     SAVESPTR(*hook);
@@ -1261,7 +1200,6 @@ S_vdie_common(pTHX_ const char *message, STRLEN msglen, I32 utf8, bool warn)
     LEAVE;
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
 	dSP;
-	SV *msg;
 
 	ENTER;
 	save_re_context();
@@ -1269,19 +1207,10 @@ S_vdie_common(pTHX_ const char *message, STRLEN msglen, I32 utf8, bool warn)
 	    SAVESPTR(*hook);
 	    *hook = NULL;
 	}
-	if (warn || message) {
-	    msg = newSVpvn(message, msglen);
-	    SvFLAGS(msg) |= utf8;
-	    SvREADONLY_on(msg);
-	    SAVEFREESV(msg);
-	}
-	else {
-	    msg = ERRSV;
-	}
 
 	PUSHSTACKi(warn ? PERLSI_WARNHOOK : PERLSI_DIEHOOK);
 	PUSHMARK(SP);
-	XPUSHs(msg);
+	XPUSHs(msv);
 	PUTBACK;
 	call_sv((SV*)cv, G_DISCARD);
 	POPSTACK;
@@ -1291,61 +1220,75 @@ S_vdie_common(pTHX_ const char *message, STRLEN msglen, I32 utf8, bool warn)
     return FALSE;
 }
 
-STATIC const char *
-S_vdie_croak_common(pTHX_ const char* pat, va_list* args, STRLEN* msglen,
-		    I32* utf8)
+STATIC SV*
+S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 {
     dVAR;
-    const char *message;
+    SV * msv = vmess(pat, args);
 
     if (pat) {
-	SV * const msv = vmess(pat, args);
+	dSP;
+	GV *gv;
+
 	if (PL_errors && SvCUR(PL_errors)) {
 	    sv_catsv(PL_errors, msv);
-	    message = SvPV_const(PL_errors, *msglen);
+	    sv_catpvn(PL_errors, "\n", 1);
+	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);
 	}
-	else
-	    message = SvPV_const(msv,*msglen);
-    }
-    else {
-	message = NULL;
+
+	ENTER;
+	gv = gv_fetchmethod(NULL, "error::create");
+	LEAVE;
+
+	if (gv) {
+	    ENTER;
+	    PUSHSTACKi(PERLSI_DIEHOOK);
+	    PUSHMARK(SP);
+
+	    XPUSHs(msv);
+
+	    PUTBACK;
+	    call_sv((SV*)GvCV(gv), G_SCALAR);
+	    msv = TOPs;
+	    POPSTACK;
+	    LEAVE;
+	}
     }
 
     DEBUG_S(PerlIO_printf(Perl_debug_log,
-			  "%p: die/croak: message = %s\ndiehook = %p\n",
-			  (void*)thr, message, (void*)PL_diehook));
-    if (PL_diehook) {
-	S_vdie_common(aTHX_ message, *msglen, *utf8, FALSE);
-    }
-    return message;
+			  "%p: die/croak\ndiehook = %p\n",
+			  (void*)thr, (void*)PL_diehook));
+    vdie_common(msv, FALSE);
+    return msv;
 }
 
-OP *
+void
 Perl_vdie(pTHX_ const char* pat, va_list *args)
 {
     dVAR;
-    const char *message;
-    const int was_in_eval = PL_in_eval;
-    STRLEN msglen;
-    I32 utf8 = 0;
+    SV* msv;
 
     DEBUG_S(PerlIO_printf(Perl_debug_log,
 			  "%p: die: curstack = %p, mainstack = %p\n",
 			  (void*)thr, (void*)PL_curstack, (void*)PL_mainstack));
 
-    message = vdie_croak_common(pat, args, &msglen, &utf8);
-
-    PL_restartop = die_where(message, msglen);
-    SvFLAGS(ERRSV) |= utf8;
-    DEBUG_S(PerlIO_printf(Perl_debug_log,
-	  "%p: die: restartop = %p, was_in_eval = %d, top_env = %p\n",
-	  (void*)thr, (void*)PL_restartop, was_in_eval, (void*)PL_top_env));
-    if ((!PL_restartop && was_in_eval) || PL_top_env->je_prev)
-	JMPENV_JUMP(3);
-    return PL_restartop;
+    msv = vdie_croak_common(pat, args);
+    die_where(msv);
+    /* NOTREACHED */
+    return NULL;
 }
 
+OP *
+Perl_die(pTHX_ const char* pat, ...)
+{
+    va_list args;
+    va_start(args, pat);
+    vdie(pat, &args);
+    /* NOTREACHED */
+    va_end(args);
+    return NULL;
+}
 #if defined(PERL_IMPLICIT_CONTEXT)
 OP *
 Perl_die_nocontext(const char* pat, ...)
@@ -1360,39 +1303,6 @@ Perl_die_nocontext(const char* pat, ...)
 }
 #endif /* PERL_IMPLICIT_CONTEXT */
 
-OP *
-Perl_die(pTHX_ const char* pat, ...)
-{
-    OP *o;
-    va_list args;
-    va_start(args, pat);
-    o = vdie(pat, &args);
-    va_end(args);
-    return o;
-}
-
-void
-Perl_vcroak(pTHX_ const char* pat, va_list *args)
-{
-    dVAR;
-    const char *message;
-    STRLEN msglen;
-    I32 utf8 = 0;
-
-    message = S_vdie_croak_common(aTHX_ pat, args, &msglen, &utf8);
-
-    if (PL_in_eval) {
-	PL_restartop = die_where(message, msglen);
-	SvFLAGS(ERRSV) |= utf8;
-	JMPENV_JUMP(3);
-    }
-    else if (!message)
-	message = SvPVx_const(ERRSV, msglen);
-
-    write_to_stderr(message, msglen);
-    my_failure_exit();
-}
-
 #if defined(PERL_IMPLICIT_CONTEXT)
 void
 Perl_croak_nocontext(const char *pat, ...)
@@ -1400,7 +1310,7 @@ Perl_croak_nocontext(const char *pat, ...)
     dTHX;
     va_list args;
     va_start(args, pat);
-    vcroak(pat, &args);
+    vdie(pat, &args);
     /* NOTREACHED */
     va_end(args);
 }
@@ -1431,7 +1341,7 @@ Perl_croak(pTHX_ const char *pat, ...)
 {
     va_list args;
     va_start(args, pat);
-    vcroak(pat, &args);
+    vdie(pat, &args);
     /* NOTREACHED */
     va_end(args);
 }
@@ -1439,18 +1349,33 @@ Perl_croak(pTHX_ const char *pat, ...)
 void
 Perl_vwarn(pTHX_ const char* pat, va_list *args)
 {
-    dVAR;
-    STRLEN msglen;
-    SV * const msv = vmess(pat, args);
-    const I32 utf8 = 1;
-    const char * const message = SvPV_const(msv, msglen);
+    SV* msv;
 
-    if (PL_warnhook) {
-	if (vdie_common(message, msglen, utf8, TRUE))
-	    return;
+    {
+	dSP;
+	msv = vmess(pat, args);
+
+	if (PL_errors && SvCUR(PL_errors)) {
+	    sv_catsv(PL_errors, msv);
+	    msv = sv_mortalcopy(PL_errors);
+	    SvCUR_set(PL_errors, 0);
+	}
+
+	ENTER;
+	PUSHSTACKi(PERLSI_WARNHOOK);
+	PUSHMARK(SP);
+	XPUSHs(msv);
+	PUTBACK;
+	call_pv("error::create", G_SCALAR);
+	SPAGAIN;
+	msv = POPs;
+	PUTBACK;
+	POPSTACK;
+	LEAVE;
     }
 
-    write_to_stderr(message, msglen);
+    if (PL_warnhook)
+	vdie_common(msv, TRUE);
 }
 
 #if defined(PERL_IMPLICIT_CONTEXT)
@@ -1512,18 +1437,13 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 	SV * const msv = vmess(pat, args);
 	STRLEN msglen;
 	const char * const message = SvPV_const(msv, msglen);
-	const I32 utf8 = 1;
 
 	if (PL_diehook) {
 	    assert(message);
-	    S_vdie_common(aTHX_ message, msglen, utf8, FALSE);
+	    Perl_vdie_common(aTHX_ msv, FALSE);
 	}
-	if (PL_in_eval) {
-	    PL_restartop = die_where(message, msglen);
-	    JMPENV_JUMP(3);
-	}
-	write_to_stderr(message, msglen);
-	my_failure_exit();
+	die_where(msv);
+	/* NOTREACHED */
     }
     else {
 	Perl_vwarn(aTHX_ pat, args);

@@ -89,8 +89,8 @@ is( $err, <<ERR,                        '   right diagnostic' );
 #   Failed test 'hashes with different values'
 #   at $0 line 88.
 #     Structures begin differing at:
-#          \$got->{this} = '42'
-#     \$expected->{this} = '43'
+#          \$got->\{this\} = '42'
+#     \$expected->\{this\} = '43'
 ERR
 
 #line 99
@@ -101,8 +101,8 @@ is( $err, <<ERR,                        '    right diagnostic' );
 #   Failed test 'hashes with different keys'
 #   at $0 line 99.
 #     Structures begin differing at:
-#          \$got->{this} = Does not exist
-#     \$expected->{this} = '42'
+#          \$got->\{this\} = Does not exist
+#     \$expected->\{this\} = '42'
 ERR
 
 #line 110
@@ -135,8 +135,8 @@ is( $err, <<ERR,                            '    right diagnostic' );
 #   Failed test 'hashes of undefs'
 #   at $0 line 131.
 #     Structures begin differing at:
-#          \$got->{foo} = undef
-#     \$expected->{foo} = Does not exist
+#          \$got->\{foo\} = undef
+#     \$expected->\{foo\} = Does not exist
 ERR
 
 #line 141
@@ -146,8 +146,8 @@ is( $err, <<ERR,                        '    right diagnostic' );
 #   Failed test 'scalar refs'
 #   at $0 line 141.
 #     Structures begin differing at:
-#     \${     \$got} = '42'
-#     \${\$expected} = '23'
+#     \$\{     \$got\} = '42'
+#     \$\{\$expected\} = '23'
 ERR
 
 #line 151
@@ -178,8 +178,8 @@ is( $err, <<ERR,                              '    right diagnostic' );
 #   Failed test 'deep scalar refs'
 #   at $0 line 173.
 #     Structures begin differing at:
-#     \${\${     \$got}} = '42'
-#     \${\${\$expected}} = '23'
+#     \$\{\$\{     \$got\}\} = '42'
+#     \$\{\$\{\$expected\}\} = '23'
 ERR
 
 # I don't know how to properly display this structure.
@@ -205,8 +205,8 @@ is( $err, <<ERR,                            '    right diagnostic' );
 #   Failed test 'deep structures'
 #   at $0 line 198.
 #     Structures begin differing at:
-#          \$got->{that}{foo} = Does not exist
-#     \$expected->{that}{foo} = '42'
+#          \$got->\{that\}\{foo\} = Does not exist
+#     \$expected->\{that\}\{foo\} = '42'
 ERR
 
 

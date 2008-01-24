@@ -39,22 +39,22 @@ eval { local $SIG{__DIE__}; require Net::LocalCfg };
 $^O eq 'MacOS' and eval <<TRY_INTERNET_CONFIG;
 use Mac::InternetConfig;
 
-{
+\{
 my %nc = (
-    nntp_hosts      => [ \$InternetConfig{ kICNNTPHost() } ],
-    pop3_hosts      => [ \$InternetConfig{ kICMailAccount() } =~ /\@(.*)/ ],
-    smtp_hosts      => [ \$InternetConfig{ kICSMTPHost() } ],
-    ftp_testhost    => \$InternetConfig{ kICFTPHost() } ? \$InternetConfig{ kICFTPHost()} : undef,
-    ph_hosts        => [ \$InternetConfig{ kICPhHost() }   ],
-    ftp_ext_passive => \$InternetConfig{"646F676F\x[A5]UsePassiveMode"} || 0,
-    ftp_int_passive => \$InternetConfig{"646F676F\x[A5]UsePassiveMode"} || 0,
+    nntp_hosts      => [ \$InternetConfig\{ kICNNTPHost() \} ],
+    pop3_hosts      => [ \$InternetConfig\{ kICMailAccount() \} =~ /\@(.*)/ ],
+    smtp_hosts      => [ \$InternetConfig\{ kICSMTPHost() \} ],
+    ftp_testhost    => \$InternetConfig\{ kICFTPHost() \} ? \$InternetConfig\{ kICFTPHost()\} : undef,
+    ph_hosts        => [ \$InternetConfig\{ kICPhHost() \}   ],
+    ftp_ext_passive => \$InternetConfig\{"646F676F\x[A5]UsePassiveMode"\} || 0,
+    ftp_int_passive => \$InternetConfig\{"646F676F\x[A5]UsePassiveMode"\} || 0,
     socks_hosts     => 
-    	\$InternetConfig{ kICUseSocks() }    ? [ \$InternetConfig{ kICSocksHost() }    ] : [],
+    	\$InternetConfig\{ kICUseSocks() \}    ? [ \$InternetConfig\{ kICSocksHost() \}    ] : [],
     ftp_firewall    => 
-    	\$InternetConfig{ kICUseFTPProxy() } ? [ \$InternetConfig{ kICFTPProxyHost() } ] : [],
+    	\$InternetConfig\{ kICUseFTPProxy() \} ? [ \$InternetConfig\{ kICFTPProxyHost() \} ] : [],
 );
-\@NetConfig{keys %nc} = values %nc;
-}
+\@NetConfig\{keys %nc\} = values %nc;
+\}
 TRY_INTERNET_CONFIG
 
 my $file = __FILE__;

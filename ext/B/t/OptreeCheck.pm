@@ -394,7 +394,7 @@ sub getCmdLine {	# import assistant
 	    # uhh this WORKS. but it's inscrutable
 	    # grep s/$opt=(\w+)/grep {$_ eq $1} @ARGV and $gOpts{$opt}=$1/e, @ARGV;
 	    my $tval;  # temp
-	    if (grep s/$opt=(\w+)/$tval=$1/e, @ARGV) {
+	    if (grep s/$opt=(\w+)/{$tval=$1}/, @ARGV) {
 		# check val before accepting
 		my @allowed = @{$gOpts{$opt}};
 		if (grep { $_ eq $tval } @allowed) {
@@ -413,7 +413,7 @@ sub getCmdLine {	# import assistant
 	    $gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
 
 	    # override with 'foo' if 'opt=foo' appears
-	    grep s/$opt=(.*)/$gOpts{$opt}=$1/e, @ARGV;
+	    grep s/$opt=(.*)/{$gOpts{$opt}=$1}/, @ARGV;
 	}
      }
     print("$0 heres current state:\n", mydumper(\%gOpts))
@@ -528,7 +528,7 @@ sub getRendering {
 	    {
 		no strict;
 		no warnings;
-		$code = eval "$pkg sub { $code } }";
+		$code = eval "$pkg sub \{ $code \} \}";
 	    }
 	    # return errors
 	    if ($@) { chomp $@; push @errs, $@ }
@@ -697,9 +697,10 @@ sub mkCheckRex {
 	       [^()]*?			# which might be followed by something
 	      )?
 	      \\\)			# closing literal )
-	     !'(?:next|db)state\\([^()]*?' .
-	      ($1 && '\\(eval \\d+\\)[^()]*')	# Match the eval if present
-	      . '\\)'!msgxe;
+	     !{'(?:next|db)state\([^()]*?' .
+	      ($1 && '\(eval \d+\)[^()]*')	# Match the eval if present
+	      . '\)'
+}!msgx;
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg;
 
@@ -932,11 +933,11 @@ sub preamble {
     return <<EO_HEADER;
 #!perl
 
-BEGIN {
+BEGIN \{
     chdir q(t);
     \@INC = qw(../lib ../ext/B/t);
     require q(./test.pl);
-}
+\}
 use OptreeCheck;
 plan tests => $testct;
 
@@ -954,9 +955,9 @@ sub OptreeCheck::wrap {
     
     my $testcode = qq{
 	
-checkOptree(note   => q{$comment},
-	    bcopts => q{-exec},
-	    code   => q{$code},
+checkOptree(note   => q\{$comment\},
+	    bcopts => q\{-exec\},
+	    code   => q\{$code\},
 	    expect => <<EOT_EOT, expect_nt => <<EONT_EONT);
 ThreadedRef
     paste your 'golden-example' here, then retest
@@ -1007,7 +1008,7 @@ sub OptreeCheck::processExamples {
     # turned into optreeCheck tests,
 
     foreach my $file (@files) {
-	open (my $fh, $file) or die "cant open $file: $!\n";
+	open (my $fh, "<", $file) or die "cant open $file: $!\n";
 	$/ = "";
 	my @chunks = ~< $fh;
 	print preamble (scalar @chunks);

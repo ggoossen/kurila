@@ -23,8 +23,8 @@ sub pump_it_up {
   my(@t, $t);
   while($t = $p->get_token) { push @t, $t }
   print "# Count of tokens: ", scalar(@t), "\n";
-  print "#  I.e., {", join("\n#       + ",
-    map ref($_) . ": " . $_->dump, @t), "} \n";
+  print "#  I.e., \{", join("\n#       + ",
+    map ref($_) . ": " . $_->dump, @t), "\} \n";
   return @t;
 }
 
@@ -220,7 +220,7 @@ END { unlink "temp.pod" }
 print "# Testing pullparsing from a file\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(OUT, ">temp.pod") || die "Can't write-open temp.pod: $!";
+open(OUT, ">", "temp.pod") || die "Can't write-open temp.pod: $!";
 print OUT
  map "$_\n",
   '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut'
@@ -258,7 +258,7 @@ ok $t[4]->tagname, 'Document';
 print "# Testing pullparsing from a glob\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(IN, "<temp.pod") || die "Can't read-open temp.pod: $!";
+open(IN, "<", "temp.pod") || die "Can't read-open temp.pod: $!";
 $p->set_source(*IN);
 
 my( @t, $t );
@@ -289,7 +289,7 @@ close(IN);
 print "# Testing pullparsing from a globref\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(IN, "<temp.pod") || die "Can't read-open temp.pod: $!";
+open(IN, "<", "temp.pod") || die "Can't read-open temp.pod: $!";
 $p->set_source(\*IN);
 
 my( @t, $t );
@@ -320,7 +320,7 @@ close(IN);
 print "# Testing pullparsing from a filehandle\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(IN, "<temp.pod") || die "Can't read-open temp.pod: $!";
+open(IN, "<", "temp.pod") || die "Can't read-open temp.pod: $!";
 $p->set_source(*IN{IO});
 
 my( @t, $t );

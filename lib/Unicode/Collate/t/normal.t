@@ -18,7 +18,7 @@ BEGIN {
 	exit;
     }
 }
-use Test;
+use Test::More;
 BEGIN { plan tests => 100 };
 
 use strict;
@@ -80,99 +80,99 @@ our $nfkd = Unicode::Collate->new(
   entry => $entry,
 );
 
-ok($noN->lt("\x{212B}", "A"));
-ok($noN->lt("\x{212B}", $Aring));
-ok($noN->lt("A\x{30A}", $Aring));
-ok($noN->lt("A",       "\x{FF21}"));
-ok($noN->lt("Z",       "\x{FF21}"));
-ok($noN->lt("Z",        $Aring));
-ok($noN->lt("\x{212B}", $aring));
-ok($noN->lt("A\x{30A}", $aring));
-ok($noN->lt("Z",        $aring));
-ok($noN->lt("a\x{30A}", "Z"));
+is($noN->cmp("\x{212B}", "A"), -1);
+is($noN->cmp("\x{212B}", $Aring), -1);
+is($noN->cmp("A\x{30A}", $Aring), -1);
+is($noN->cmp("A",       "\x{FF21}"), -1);
+is($noN->cmp("Z",       "\x{FF21}"), -1);
+is($noN->cmp("Z",        $Aring), -1);
+is($noN->cmp("\x{212B}", $aring), -1);
+is($noN->cmp("A\x{30A}", $aring), -1);
+is($noN->cmp("Z",        $aring), -1);
+is($noN->cmp("a\x{30A}", "Z"), -1);
 
 ok($nfd->eq("\x{212B}", "A"));
 ok($nfd->eq("\x{212B}", $Aring));
 ok($nfd->eq("A\x{30A}", $Aring));
-ok($nfd->lt("A",       "\x{FF21}"));
-ok($nfd->lt("Z",       "\x{FF21}"));
-ok($nfd->gt("Z",        $Aring));
+is($nfd->cmp("A",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",        $Aring), 1);
 ok($nfd->eq("\x{212B}", $aring));
 ok($nfd->eq("A\x{30A}", $aring));
-ok($nfd->gt("Z",        $aring));
-ok($nfd->lt("a\x{30A}", "Z"));
+is($nfd->cmp("Z",        $aring), 1);
+is($nfd->cmp("a\x{30A}", "Z"), -1);
 
-ok($nfc->gt("\x{212B}", "A"));
+is($nfc->cmp("\x{212B}", "A"), 1);
 ok($nfc->eq("\x{212B}", $Aring));
 ok($nfc->eq("A\x{30A}", $Aring));
-ok($nfc->lt("A",       "\x{FF21}"));
-ok($nfc->lt("Z",       "\x{FF21}"));
-ok($nfc->lt("Z",        $Aring));
+is($nfc->cmp("A",       "\x{FF21}"), -1);
+is($nfc->cmp("Z",       "\x{FF21}"), -1);
+is($nfc->cmp("Z",        $Aring), -1);
 ok($nfc->eq("\x{212B}", $aring));
 ok($nfc->eq("A\x{30A}", $aring));
-ok($nfc->lt("Z",        $aring));
-ok($nfc->gt("a\x{30A}", "Z"));
+is($nfc->cmp("Z",        $aring), -1);
+is($nfc->cmp("a\x{30A}", "Z"), 1);
 
 ok($nfkd->eq("\x{212B}", "A"));
 ok($nfkd->eq("\x{212B}", $Aring));
 ok($nfkd->eq("A\x{30A}", $Aring));
 ok($nfkd->eq("A",       "\x{FF21}"));
-ok($nfkd->gt("Z",       "\x{FF21}"));
-ok($nfkd->gt("Z",        $Aring));
+is($nfkd->cmp("Z",       "\x{FF21}"), 1);
+is($nfkd->cmp("Z",        $Aring), 1);
 ok($nfkd->eq("\x{212B}", $aring));
 ok($nfkd->eq("A\x{30A}", $aring));
-ok($nfkd->gt("Z",        $aring));
-ok($nfkd->lt("a\x{30A}", "Z"));
+is($nfkd->cmp("Z",        $aring), 1);
+is($nfkd->cmp("a\x{30A}", "Z"), -1);
 
-ok($nfkc->gt("\x{212B}", "A"));
+is($nfkc->cmp("\x{212B}", "A"), 1);
 ok($nfkc->eq("\x{212B}", $Aring));
 ok($nfkc->eq("A\x{30A}", $Aring));
 ok($nfkc->eq("A",       "\x{FF21}"));
-ok($nfkc->gt("Z",       "\x{FF21}"));
-ok($nfkc->lt("Z",        $Aring));
+is($nfkc->cmp("Z",       "\x{FF21}"), 1);
+is($nfkc->cmp("Z",        $Aring), -1);
 ok($nfkc->eq("\x{212B}", $aring));
 ok($nfkc->eq("A\x{30A}", $aring));
-ok($nfkc->lt("Z",        $aring));
-ok($nfkc->gt("a\x{30A}", "Z"));
+is($nfkc->cmp("Z",        $aring), -1);
+is($nfkc->cmp("a\x{30A}", "Z"), 1);
 
 $nfd->change(normalization => undef);
 
-ok($nfd->lt("\x{212B}", "A"));
-ok($nfd->lt("\x{212B}", $Aring));
-ok($nfd->lt("A\x{30A}", $Aring));
-ok($nfd->lt("A",       "\x{FF21}"));
-ok($nfd->lt("Z",       "\x{FF21}"));
-ok($nfd->lt("Z",        $Aring));
-ok($nfd->lt("\x{212B}", $aring));
-ok($nfd->lt("A\x{30A}", $aring));
-ok($nfd->lt("Z",        $aring));
-ok($nfd->lt("a\x{30A}", "Z"));
+is($nfd->cmp("\x{212B}", "A"), -1);
+is($nfd->cmp("\x{212B}", $Aring), -1);
+is($nfd->cmp("A\x{30A}", $Aring), -1);
+is($nfd->cmp("A",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",        $Aring), -1);
+is($nfd->cmp("\x{212B}", $aring), -1);
+is($nfd->cmp("A\x{30A}", $aring), -1);
+is($nfd->cmp("Z",        $aring), -1);
+is($nfd->cmp("a\x{30A}", "Z"), -1);
 
 $nfd->change(normalization => 'C');
 
-ok($nfd->gt("\x{212B}", "A"));
+is($nfd->cmp("\x{212B}", "A"), 1);
 ok($nfd->eq("\x{212B}", $Aring));
 ok($nfd->eq("A\x{30A}", $Aring));
-ok($nfd->lt("A",       "\x{FF21}"));
-ok($nfd->lt("Z",       "\x{FF21}"));
-ok($nfd->lt("Z",        $Aring));
+is($nfd->cmp("A",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",        $Aring), -1);
 ok($nfd->eq("\x{212B}", $aring));
 ok($nfd->eq("A\x{30A}", $aring));
-ok($nfd->lt("Z",        $aring));
-ok($nfd->gt("a\x{30A}", "Z"));
+is($nfd->cmp("Z",        $aring), -1);
+is($nfd->cmp("a\x{30A}", "Z"), 1);
 
 $nfd->change(normalization => 'D');
 
 ok($nfd->eq("\x{212B}", "A"));
 ok($nfd->eq("\x{212B}", $Aring));
 ok($nfd->eq("A\x{30A}", $Aring));
-ok($nfd->lt("A",       "\x{FF21}"));
-ok($nfd->lt("Z",       "\x{FF21}"));
-ok($nfd->gt("Z",        $Aring));
+is($nfd->cmp("A",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",       "\x{FF21}"), -1);
+is($nfd->cmp("Z",        $Aring), 1);
 ok($nfd->eq("\x{212B}", $aring));
 ok($nfd->eq("A\x{30A}", $aring));
-ok($nfd->gt("Z",        $aring));
-ok($nfd->lt("a\x{30A}", "Z"));
+is($nfd->cmp("Z",        $aring), 1);
+is($nfd->cmp("a\x{30A}", "Z"), -1);
 
 $nfd->change(normalization => 'KD');
 
@@ -180,23 +180,23 @@ ok($nfd->eq("\x{212B}", "A"));
 ok($nfd->eq("\x{212B}", $Aring));
 ok($nfd->eq("A\x{30A}", $Aring));
 ok($nfd->eq("A",       "\x{FF21}"));
-ok($nfd->gt("Z",       "\x{FF21}"));
-ok($nfd->gt("Z",        $Aring));
+is($nfd->cmp("Z",       "\x{FF21}"), 1);
+is($nfd->cmp("Z",        $Aring), 1);
 ok($nfd->eq("\x{212B}", $aring));
 ok($nfd->eq("A\x{30A}", $aring));
-ok($nfd->gt("Z",        $aring));
-ok($nfd->lt("a\x{30A}", "Z"));
+is($nfd->cmp("Z",        $aring), 1);
+is($nfd->cmp("a\x{30A}", "Z"), -1);
 
 $nfd->change(normalization => 'KC');
 
-ok($nfd->gt("\x{212B}", "A"));
+is($nfd->cmp("\x{212B}", "A"), 1);
 ok($nfd->eq("\x{212B}", $Aring));
 ok($nfd->eq("A\x{30A}", $Aring));
 ok($nfd->eq("A",       "\x{FF21}"));
-ok($nfd->gt("Z",       "\x{FF21}"));
-ok($nfd->lt("Z",        $Aring));
+is($nfd->cmp("Z",       "\x{FF21}"), 1);
+is($nfd->cmp("Z",        $Aring), -1);
 ok($nfd->eq("\x{212B}", $aring));
 ok($nfd->eq("A\x{30A}", $aring));
-ok($nfd->lt("Z",        $aring));
-ok($nfd->gt("a\x{30A}", "Z"));
+is($nfd->cmp("Z",        $aring), -1);
+is($nfd->cmp("a\x{30A}", "Z"), 1);
 

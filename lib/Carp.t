@@ -190,12 +190,15 @@ sub w { cluck @_ }
 
 # $Carp::MaxArgLen
 {
-    for(0,4) {
+    for(0,6) {
         my $arg = 'testtest';
         local $Carp::MaxArgLen = $_;
         local $SIG{__WARN__} = sub {
-	    "@_"=~m/'(.+?)'/;
-	    is length($1), length($_?substr($arg,0,$_):substr($arg,0)), 'MaxArgLen';
+            if ($_) {
+                ok "@_"=~m/\Qmain::w('te...)\E/, "MaxArgLen $_";
+            } else {
+                ok "@_"=~m/\Qmain::w('testtest')\E/, "MaxArgLen $_";
+            }
 	};
 
         package Z;
@@ -246,12 +249,12 @@ sub w { cluck @_ }
     runperl(prog => 'use Carp; $@=q{Phooey}; $!=42; croak(q{Dead})', 
 	    stderr => 1);
 
-    is($?>>8, 42, 'croak() doesn\'t clobber $!');
+    is($?>>8, 42, q|croak() doesn't clobber $!|);
 
     runperl(prog => 'use Carp; $@=q{Phooey}; $!=42; confess(q{Dead})', 
 	    stderr => 1);
 
-    is($?>>8, 42, 'confess() doesn\'t clobber $!');
+    is($?>>8, 42, q|confess() doesn't clobber $!|);
 }
 
 # undef used to be incorrectly reported as the string "undef"

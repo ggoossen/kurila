@@ -87,10 +87,6 @@ Declare constants
 
 Produce verbose warning diagnostics
 
-=item encoding
-
-Allows you to write your script in non-ascii or non-utf8
-
 =item feature
 
 Enable new syntactic features
@@ -317,18 +313,6 @@ Perl5 access to Berkeley DB version 1.x
 
 Stringified perl data structures, suitable for both printing and C<eval>
 
-=item Devel::DProf
-
-A Perl code profiler
-
-=item Devel::InnerPackage
-
-Find all the inner packages of a package
-
-=item Devel::Peek
-
-A data debugging tool for the XS programmer
-
 =item Digest
 
 Modules that calculate message digests
@@ -356,102 +340,6 @@ Provides screen dump of Perl data.
 =item DynaLoader
 
 Dynamically load C libraries into Perl code
-
-=item Encode
-
-Character encodings
-
-=item Encode::Alias
-
-Alias definitions to encodings
-
-=item Encode::Byte
-
-Single Byte Encodings
-
-=item Encode::CJKConstants
-
-Internally used by Encode::??::ISO_2022_*
-
-=item Encode::CN
-
-China-based Chinese Encodings
-
-=item Encode::CN::HZ
-
-Internally used by Encode::CN
-
-=item Encode::Config
-
-Internally used by Encode
-
-=item Encode::EBCDIC
-
-EBCDIC Encodings
-
-=item Encode::Encoding
-
-Encode Implementation Base Class
-
-=item Encode::GSM0338
-
-ESTI GSM 03.38 Encoding
-
-=item Encode::Guess
-
-Guesses encoding from data
-
-=item Encode::JP
-
-Japanese Encodings
-
-=item Encode::JP::H2Z
-
-Internally used by Encode::JP::2022_JP*
-
-=item Encode::JP::JIS7
-
-Internally used by Encode::JP
-
-=item Encode::KR
-
-Korean Encodings
-
-=item Encode::KR::2022_KR
-
-Internally used by Encode::KR
-
-=item Encode::MIME::Header
-
-MIME 'B' and 'Q' header encoding
-
-=item Encode::MIME::Name
-
-Internally used by Encode
-
-=item Encode::PerlIO
-
-A detailed document on Encode and PerlIO
-
-=item Encode::Supported
-
-Encodings supported by Encode
-
-=item Encode::Symbol
-
-Symbol Encodings
-
-=item Encode::TW
-
-Taiwan-based Chinese Encodings
-
-=item Encode::Unicode
-
-Various Unicode Transformation Formats
-
-=item Encode::Unicode::UTF7
-
-UTF-7 encoding
 
 =item English
 
@@ -957,106 +845,6 @@ Complex numbers and associated mathematical functions
 
 Trigonometric functions
 
-=item Module::Build
-
-Build and install Perl modules
-
-=item Module::Build::API
-
-API Reference for Module Authors
-
-=item Module::Build::Authoring
-
-Authoring Module::Build modules
-
-=item Module::Build::Base
-
-Default methods for Module::Build
-
-=item Module::Build::Compat
-
-Compatibility with ExtUtils::MakeMaker
-
-=item Module::Build::ConfigData
-
-Configuration for Module::Build
-
-=item Module::Build::Cookbook
-
-Examples of Module::Build Usage
-
-=item Module::Build::ModuleInfo
-
-Gather package and POD information from a perl module files
-
-=item Module::Build::Notes
-
-Configuration for $module_name
-
-=item Module::Build::PPMMaker
-
-Perl Package Manager file creation
-
-=item Module::Build::Platform::Amiga
-
-Builder class for Amiga platforms
-
-=item Module::Build::Platform::Default
-
-Stub class for unknown platforms
-
-=item Module::Build::Platform::EBCDIC
-
-Builder class for EBCDIC platforms
-
-=item Module::Build::Platform::MPEiX
-
-Builder class for MPEiX platforms
-
-=item Module::Build::Platform::MacOS
-
-Builder class for MacOS platforms
-
-=item Module::Build::Platform::RiscOS
-
-Builder class for RiscOS platforms
-
-=item Module::Build::Platform::Unix
-
-Builder class for Unix platforms
-
-=item Module::Build::Platform::VMS
-
-Builder class for VMS platforms
-
-=item Module::Build::Platform::VOS
-
-Builder class for VOS platforms
-
-=item Module::Build::Platform::Windows
-
-Builder class for Windows platforms
-
-=item Module::Build::Platform::aix
-
-Builder class for AIX platform
-
-=item Module::Build::Platform::cygwin
-
-Builder class for Cygwin platform
-
-=item Module::Build::Platform::darwin
-
-Builder class for Mac OS X platform
-
-=item Module::Build::Platform::os2
-
-Builder class for OS/2 platform
-
-=item Module::Build::YAML
-
-Provides just enough YAML support so that Module::Build works even if YAML.pm is not installed
-
 =item Module::CoreList
 
 What modules shipped with versions of perl
@@ -1072,14 +860,6 @@ Looking up module information / loading at runtime
 =item Module::Loaded
 
 Mark modules as loaded or unloaded
-
-=item Module::Pluggable
-
-Automatically give your module the ability to have plugins
-
-=item Module::Pluggable::Object
-
-Automatically give your module the ability to have plugins
 
 =item Net::Cmd
 
@@ -1160,10 +940,6 @@ Implements the Perl 6 'form' built-in
 =item PerlIO
 
 On demand loader for PerlIO layers and root of PerlIO::* name space
-
-=item PerlIO::encoding
-
-Encoding layer
 
 =item PerlIO::scalar
 
@@ -1528,10 +1304,6 @@ Thread-safe semaphores
 =item Tie::Array
 
 Base class for tied arrays
-
-=item Tie::File
-
-Access the lines of a disk file via a Perl array
 
 =item Tie::Handle
 

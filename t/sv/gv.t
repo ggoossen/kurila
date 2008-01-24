@@ -24,7 +24,7 @@ is(ref(\$foo), 'GLOB');
 is(Symbol::glob_name($foo), 'main::bar');
 is(ref(\$foo), 'GLOB');
 eval { my $x = "$foo" };
-like($@, qr/Tried to use glob as string/);
+like($@->{description}, qr/Tried to use glob as string/);
 
 # returning glob values
 sub foo {
@@ -76,15 +76,15 @@ is (scalar %foo, 0);
     foreach ($copy, *SKREEE) {
 	$msg = '';
 	eval { $victim = sprintf "%d", $_ };
-        like($@, qr/Tried to use glob as number/);
+        like($@->{description}, qr/Tried to use glob as number/);
 
 	eval { $victim = sprintf "%u", $_ };
-        like($@, qr/Tried to use glob as number/);
+        like($@->{description}, qr/Tried to use glob as number/);
 	eval { $victim = sprintf "%e", $_ };
-        like($@, qr/Tried to use glob as number/);
+        like($@->{description}, qr/Tried to use glob as number/);
 
 	eval { $victim = sprintf "%s", $_ };
-        like($@, qr/Tried to use glob as string/);
+        like($@->{description}, qr/Tried to use glob as string/);
     }
 }
 
@@ -242,7 +242,7 @@ is($j[0], 1);
     my $output = runperl(prog => <<'EOPROG');
 package M;
 $| = 1;
-sub DESTROY {eval {die qq{Farewell $_[0]}}; print $@}
+sub DESTROY {eval {die qq{Farewell {dump::view($_[0])}}}; print $@->{description}}
 package main;
 
 bless \$A::B, q{M};
@@ -419,13 +419,13 @@ is (ref \$::{plunk}, 'GLOB', "Symbol table has full typeglob");
 	}
     }
     eval {slosh->rip;};
-    like ($@, qr/^Can't locate object method "rip"/, "Even with SUPER");
+    like ($@->{description}, qr/^Can't locate object method "rip"/, "Even with SUPER");
 
     is(slosh->isa('swoosh'), '');
 
     $CORE::GLOBAL::{"lock"}=[];
     eval "no warnings; lock";
-    like($@, qr/^Not enough arguments for lock/,
+    like($@->{description}, qr/^Not enough arguments for lock/,
        "Can't trip up general keyword overloading");
 
     $CORE::GLOBAL::{"readline"}=[];

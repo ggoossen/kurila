@@ -37,14 +37,14 @@ for (@prgs){
 	    my $filename = shift @files ;
 	    my $code = shift @files ;
     	    push @temps, $filename ;
-	    open F, ">$filename" or die "Cannot open $filename: $!\n" ;
+	    open F, ">", "$filename" or die "Cannot open $filename: $!\n" ;
 	    print F $code ;
 	    close F ;
 	}
 	shift @files ;
 	$prog = shift @files ;
     }
-    open TEST, ">$tmpfile";
+    open TEST, ">", "$tmpfile";
     print TEST $prog,"\n";
     close TEST;
     my $results = $Is_VMS ?

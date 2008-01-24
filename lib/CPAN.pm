@@ -411,7 +411,7 @@ sub _yaml_loadfile {
             return \@yaml;
         } elsif ($code = UNIVERSAL::can($yaml_module, "Load")) {
             local *FH;
-            open FH, $local_file or die "Could not open '$local_file': $!";
+            open FH, "<", $local_file or die "Could not open '$local_file': $!";
             local $/;
             my $ystream = ~< *FH;
             my @yaml;
@@ -442,7 +442,7 @@ sub _yaml_dumpfile {
             eval { $code->($local_file,@what); };
         } elsif ($code = UNIVERSAL::can($yaml_module, "Dump")) {
             local *FH;
-            open FH, ">$local_file" or die "Could not open '$local_file': $!";
+            open FH, ">", "$local_file" or die "Could not open '$local_file': $!";
             print FH $code->(@what);
         }
         if ($@) {
@@ -1018,7 +1018,7 @@ Unfortunately we could not create the lock file
 due to permission problems.
 
 Please make sure that the configuration variable
-    \$CPAN::Config->{cpan_home}
+    \$CPAN::Config->\{cpan_home\}
 points to a directory where you can write a .lock file. You can set
 this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
 \@INC path;
@@ -1353,7 +1353,7 @@ sub cleanup {
 sub readhist {
     my($self,$term,$histfile) = @_;
     my($fh) = FileHandle->new;
-    open $fh, "<$histfile" or last;
+    open $fh, "<", "$histfile" or last;
     local $/ = "\n";
     while ( ~< $fh) {
         chomp;
@@ -1382,7 +1382,7 @@ sub savehist {
     my @h = $CPAN::term->GetHistory;
     splice @h, 0, @h-$histsize if @h+>$histsize;
     my($fh) = FileHandle->new;
-    open $fh, ">$histfile" or $CPAN::Frontend->mydie("Couldn't open >$histfile: $!");
+    open $fh, ">", "$histfile" or $CPAN::Frontend->mydie("Couldn't open >$histfile: $!");
     local $\ = local $, = "\n";
     print $fh @h;
     close $fh;
@@ -2652,7 +2652,7 @@ sub status {
     my($self) = @_;
     require Devel::Size;
     my $ps = FileHandle->new;
-    open $ps, "/proc/$$/status";
+    open $ps, "<", "/proc/$$/status";
     my $vm = 0;
     while ( ~< $ps) {
         next unless m/VmSize:\s+(\d+)/;
@@ -2955,7 +2955,7 @@ sub print_ornamented {
         # note: deprecated, need to switch to $LANG and $LC_*
         # courtesy jhi:
         $swhat
-            =~ s{([\xC0-\xDF])([\x80-\xBF])}{chr(ord($1)<<6^&^0xC0^|^ord($2)^&^0x3F)}eg; #};
+            =~ s{([\x[C0]-\x[DF]])([\x[80]-\x[BF]])}{{chr(ord($1)<<6^&^0xC0^|^ord($2)^&^0x3F)}}g; #};
     }
     if ($self->colorize_output) {
         if ( $CPAN::DEBUG && $swhat =~ m/^Debug\(/ ) {
@@ -3362,7 +3362,7 @@ sub recent {
               my $distro = $eitem->findvalue("\@rdf:about");
               $distro =~ s|.*~||; # remove up to the tilde before the name
               $distro =~ s|/$||; # remove trailing slash
-              $distro =~ s|([^/]+)|uc($1)|e; # upcase the name
+              $distro =~ s|([^/]+)|{uc($1)}|; # upcase the name
               my $author = uc $1 or die "distro[$distro] without author, cannot continue";
               my $desc   = $eitem->findvalue("*[local-name(.) = 'description']");
               my $i = 0;
@@ -3579,7 +3579,7 @@ sub _ftp_statistics {
     my $locktype = $fh ? LOCK_EX : LOCK_SH;
     $fh ||= FileHandle->new;
     my $file = File::Spec->catfile($CPAN::Config->{cpan_home},"FTPstats.yml");
-    open $fh, "+>>$file" or $CPAN::Frontend->mydie("Could not open '$file': $!");
+    open $fh, "<", "+>>$file" or $CPAN::Frontend->mydie("Could not open '$file': $!");
     my $sleep = 1;
     my $waitstart;
     while (!CPAN::_flock($fh, $locktype^|^LOCK_NB)) {
@@ -4261,7 +4261,7 @@ Trying with "$funkyftp$src_switch" to get
                 # lynx returns 0 when it fails somewhere
                 if (-s $asl_ungz) {
                     my $content = do { local *FH;
-                                       open FH, $asl_ungz or die;
+                                       open FH, "<", $asl_ungz or die;
                                        local $/;
                                        ~< *FH };
                     if ($content =~ m/^<.*(<title>[45]|Error [45])/si) {
@@ -5641,7 +5641,7 @@ sub dir_listing {
     # hazard.  (Without GPG installed they are not that much better,
     # though.)
     $fh = FileHandle->new;
-    if (open($fh, $lc_want)) {
+    if (open($fh, "<", $lc_want)) {
         my $line = ~< $fh; close $fh;
         unlink($lc_want) unless $line =~ m/PGP/;
     }
@@ -5682,7 +5682,7 @@ sub dir_listing {
     # adapted from CPAN::Distribution::CHECKSUM_check_file ;
     $fh = FileHandle->new;
     my($cksum);
-    if (open $fh, $lc_file) {
+    if (open $fh, "<", $lc_file) {
         local($/);
         my $eval = ~< $fh;
         $eval =~ s/\015?\012/\n/g;
@@ -6442,7 +6442,7 @@ sub try_download {
             unless ($stdpatchargs) {
                 my $system = "$patchbin --version |";
                 local *FH;
-                open FH, $system or die "Could not fork '$system': $!";
+                open FH, "<", $system or die "Could not fork '$system': $!";
                 local $/ = "\n";
                 my $pversion;
               PARSEVERSION: while ( ~< *FH) {
@@ -6486,7 +6486,7 @@ sub try_download {
                 $readfh = CPAN::Tarzip->TIEHANDLE($patch); # open again
                 my $writefh = FileHandle->new;
                 $CPAN::Frontend->myprint("  $pcommand\n");
-                unless (open $writefh, "|$pcommand") {
+                unless (open $writefh, "|-", "$pcommand") {
                     my $fail = "Could not fork '$pcommand'";
                     $CPAN::Frontend->mywarn("$fail; cannot continue\n");
                     $self->{unwrapped} = CPAN::Distrostatus->new("NO -- $fail");
@@ -6624,9 +6624,9 @@ We\'ll try to build it with that Makefile then.
 
             $script = "
               EXE_FILES => ['$name'],
-              PREREQ_PM => {
+              PREREQ_PM => \{
 $PREREQ_PM
-                           },
+                           \},
 ";
             if ($name) {
                 my $to_file = File::Spec->catfile($build_dir, $name);
@@ -6981,7 +6981,7 @@ sub CHECKSUM_check_file {
     $file = $self->{localfile};
     $basename = File::Basename::basename($file);
     my $fh = FileHandle->new;
-    if (open $fh, $chk_file) {
+    if (open $fh, "<", $chk_file) {
         local($/);
         my $eval = ~< $fh;
         $eval =~ s/\015?\012/\n/g;
@@ -7011,7 +7011,7 @@ for further processing, but got garbage instead.
         $self->debug("Found checksum for $basename:" .
                      "$cksum->{$basename}{sha256}\n") if $CPAN::DEBUG;
 
-        open($fh, $file);
+        open($fh, "<", $file);
         binmode $fh;
         my $eq = $self->eq_CHECKSUM($fh,$cksum->{$basename}{sha256});
         $fh->close;
@@ -7655,7 +7655,7 @@ sub _run_via_expect_anyorder {
                                   [ timeout => sub {
                                         $ran_into_timeout++;
                                     } ],
-                                  -re => eval"qr{.}",
+                                  -re => eval"qr\{.\}",
                                  );
         if ($match[2]) {
             $but .= $match[2];
@@ -7668,7 +7668,7 @@ sub _run_via_expect_anyorder {
             # warn "DEBUG: they are asking a question, but[$but]";
             for (my $i = 0; $i +<= $#expectacopy; $i+=2) {
                 my($next,$send) = @expectacopy[$i,$i+1];
-                my $regex = eval "qr{$next}";
+                my $regex = eval "qr\{$next\}";
                 # warn "DEBUG: will compare with regex[$regex].";
                 if ($but =~ m/$regex/) {
                     # warn "DEBUG: will send send[$send]";
@@ -7695,7 +7695,7 @@ sub _run_via_expect_deterministic {
   EXPECT: for (my $i = 0; $i +<= $#$expecta; $i+=2) {
         my($re,$send) = @$expecta[$i,$i+1];
         CPAN->debug("timeout[$timeout]re[$re]") if $CPAN::DEBUG;
-        my $regex = eval "qr{$re}";
+        my $regex = eval "qr\{$re\}";
         $expo->expect($timeout,
                       [ eof => sub {
                             my $but = $expo->clear_accum;
@@ -7796,7 +7796,7 @@ sub _find_prefs {
                 } elsif ($thisexte eq "dd") {
                     package CPAN::Eval;
                     no strict;
-                    open FH, "<$abs" or $CPAN::Frontend->mydie("Could not open '$abs': $!");
+                    open FH, "<", "$abs" or $CPAN::Frontend->mydie("Could not open '$abs': $!");
                     local $/;
                     my $eval = ~< *FH;
                     close FH;
@@ -7836,7 +7836,7 @@ sub _find_prefs {
                     for my $sub_attribute (qw(distribution perl perlconfig module)) {
                         next unless exists $match->{$sub_attribute};
                         $saw_valid_subkeys++;
-                        my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
+                        my $qr = eval "qr\{$distropref->{match}{$sub_attribute}\}";
                         if ($sub_attribute eq "module") {
                             my $okm = 0;
                             #CPAN->debug(sprintf "distropref[%d]", scalar @distropref) if $CPAN::DEBUG;
@@ -8355,7 +8355,7 @@ sub prereq_pm {
             if (-f $build_prereqs) {
                 CPAN->debug("Getting prerequisites from '$build_prereqs'") if $CPAN::DEBUG;
                 my $content = do { local *FH;
-                                   open FH, $build_prereqs
+                                   open FH, "<", $build_prereqs
                                        or $CPAN::Frontend->mydie("Could not open ".
                                                                  "'$build_prereqs': $!");
                                    local $/;
@@ -8942,7 +8942,7 @@ sub _check_binary {
         return File::Which::which($binary);
     } else {
         local *README;
-        $pid = open README, "which $binary|"
+        $pid = open README, "<", "which $binary|"
             or $CPAN::Frontend->mywarn(qq{Could not fork 'which $binary': $!\n});
         return unless $pid;
         while ( ~< *README) {
@@ -9016,7 +9016,7 @@ Could not fork '$html_converter $saved_file': $!});
             } else {
                 $filename = "cpan_htmlconvert_$$.txt";
                 $fh = FileHandle->new();
-                open $fh, ">$filename" or die;
+                open $fh, ">", "$filename" or die;
             }
             while ( ~< *README) {
                 $fh->print($_);
@@ -9033,7 +9033,7 @@ saved output to %s\n},
                                             )) if $CPAN::DEBUG;
             close $fh;
             local *FH;
-            open FH, $tmpin
+            open FH, "<", $tmpin
                 or $CPAN::Frontend->mydie(qq{Could not open "$tmpin": $!});
             my $fh_pager = FileHandle->new;
             local($SIG{PIPE}) = "IGNORE";
@@ -9374,7 +9374,7 @@ sub contains {
     my @result;
     my $fh = FileHandle->new;
     local $/ = "\n";
-    open($fh,$inst_file) or die "Could not open '$inst_file': $!";
+    open($fh, "<",$inst_file) or die "Could not open '$inst_file': $!";
     my $in_cont = 0;
     $self->debug("inst_file[$inst_file]") if $CPAN::DEBUG;
     while ( ~< $fh) {

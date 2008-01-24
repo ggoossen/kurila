@@ -22,7 +22,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 54;
+use Test::More tests => 55;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -51,7 +51,7 @@ while ( ~< *DATA) {
 	($input, $expected) = ($_, $_);
     }
 
-    my $coderef = eval "sub {$input}";
+    my $coderef = eval "sub \{$input\}";
 
     if ($@) {
 	diag("$num deparsed: $@");
@@ -71,7 +71,7 @@ use constant 'c', 'stuff';
 is((eval "sub ".$deparse->coderef2text(\&c))->(), 'stuff');
 
 my $a = 0;
-is("{\n    (-1) ** \$a;\n}", $deparse->coderef2text(sub{(-1) ** $a }));
+is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
 
 use constant cr => ['hello'];
 my $string = "sub " . $deparse->coderef2text(\&cr);
@@ -215,7 +215,7 @@ my $foo = "Ab\x{100}\200\x{200}\377Cd\000Ef\x{1000}\cA\x{2000}\cZ";
 my $foo = "Ab\304\200\200\310\200\377Cd\000Ef\341\200\200\cA\342\200\200\cZ";
 ####
 # 15
-s/x/'y';/e;
+s/x/{ 'y' }/;
 ####
 # 16 - various lypes of loop
 { my $x; }
@@ -360,3 +360,8 @@ $a = sub {
     return $x++;
 }
 ;
+####
+# 49 match
+{
+    $a =~ m/foo/;
+}

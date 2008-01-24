@@ -33,7 +33,7 @@ require Exporter;
 $head= <<'EOF!HEAD';
 END
 
-open MINI, "miniperlmain.c";
+open MINI, "<", "miniperlmain.c";
 while ( ~< *MINI) {
     last if m/Do not delete this line--writemain depends on it/;
     print;

@@ -38,8 +38,8 @@ $macros{"DECC"} = 1 if $macros{"__AXP__"};
 # [lazy - saves having to check for empty array - just test [0]==1]
 @conditions = (1);
 
-open(INFIL,$infile) || die "Can't open $infile: $!\n"; 
-open(OUTFIL,">$outfile") || die "Can't open $outfile: $!\n"; 
+open(INFIL, "<",$infile) || die "Can't open $infile: $!\n"; 
+open(OUTFIL, ">","$outfile") || die "Can't open $outfile: $!\n"; 
 
 print OUTFIL "#> This file produced from $infile by $0\n";
 print OUTFIL "#> Lines beginning with \"#>\" were commented out during the\n";
@@ -47,7 +47,7 @@ print OUTFIL "#> conversion process.  For more information, see $0\n";
 print OUTFIL "#>\n";
 
 while ( ~< *INFIL) {
-  s/$infile/$outfile/eoi;
+  s/$infile/{$outfile}/oi;
   if (m/^\#/) { 
     if (!m/^\#\:/) {print OUTFIL;}
     next;

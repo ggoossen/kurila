@@ -28,7 +28,7 @@ sub do_require {
 
 sub write_file {
     my $f = shift;
-    open(REQ,">$f") or die "Can't write '$f': $!";
+    open(REQ, ">","$f") or die "Can't write '$f': $!";
     binmode REQ;
     use bytes;
     print REQ @_;
@@ -39,7 +39,7 @@ eval 'require 5.005';
 print "not " unless $@;
 print "ok ",$i++,"\n";
 
-print "not " unless v5.5.1 gt v5.5;
+print "not " unless (v5.5.1 cmp v5.5) +> 0;
 print "ok ",$i++,"\n";
 
 {

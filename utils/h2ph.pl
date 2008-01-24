@@ -64,7 +64,7 @@ while (defined (my $file = next_file())) {
     $eval_index = 1;
 
     if ($file eq '-') {
-	open(IN, "-");
+	open(IN, "<", "-");
 	open(OUT, ">-");
     } else {
 	($outfile = $file) =~ s/\.h$/.ph/ || next;
@@ -81,8 +81,8 @@ while (defined (my $file = next_file())) {
 	    }
 	}
 
-	open(IN,"$file") || (($Exit = 1),(warn "Can't open $file: $!\n"),next);
-	open(OUT,">$Dest_dir/$outfile") || die "Can't create $outfile: $!\n";
+	open(IN,"<","$file") || (($Exit = 1),(warn "Can't open $file: $!\n"),next);
+	open(OUT,">","$Dest_dir/$outfile") || die "Can't create $outfile: $!\n";
     }
 
     print OUT
@@ -118,14 +118,14 @@ while (defined (my $file = next_file())) {
 			$new =~ s/(['\\])/\\$1/g;   #']);
 			if ($opt_h) {
 			    print OUT $t,
-                            "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    ${args}eval q($new);\n$t}' unless defined(\&$name);\n";
+                            "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    ${args}eval q($new);\n$t\}' unless defined(\&$name);\n";
                             $eval_index++;
 			} else {
 			    print OUT $t,
-                            "eval 'sub $name $proto\{\n$t    ${args}eval q($new);\n$t}' unless defined(\&$name);\n";
+                            "eval 'sub $name $proto\{\n$t    ${args}eval q($new);\n$t\}' unless defined(\&$name);\n";
 			}
 		    } else {
-                      print OUT "unless(defined(\&$name)) {\n    sub $name $proto\{\n\t${args}eval q($new);\n    }\n}\n";
+                      print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t${args}eval q($new);\n    \}\n\}\n";
 		    }
 		    %curargs = ();
 		} else {
@@ -138,16 +138,16 @@ while (defined (my $file = next_file())) {
 			$new =~ s/(['\\])/\\$1/g;        #']);
 
 			if ($opt_h) {
-			    print OUT $t,"eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name () {",$new,";}' unless defined(\&$name);\n";
+			    print OUT $t,"eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name () \{",$new,";\}' unless defined(\&$name);\n";
 			    $eval_index++;
 			} else {
-			    print OUT $t,"eval 'sub $name () {",$new,";}' unless defined(\&$name);\n";
+			    print OUT $t,"eval 'sub $name () \{",$new,";\}' unless defined(\&$name);\n";
 			}
 		    } else {
 		    	# Shunt around such directives as `#define FOO FOO':
 		    	next if " \&$name" eq $new;
 
-                      print OUT $t,"unless(defined(\&$name)) {\n    sub $name () {\t",$new,";}\n}\n";
+                      print OUT $t,"unless(defined(\&$name)) \{\n    sub $name () \{\t",$new,";\}\n\}\n";
 		    }
 		}
 	    } elsif (m/^(include|import|include_next)\s*[<\"](.*)[>\"]/) {
@@ -157,30 +157,30 @@ while (defined (my $file = next_file())) {
                     ($opt_e && exists($bad_file{$incl}))) {
                     $incl =~ s/\.h$/.ph/;
 		print OUT ($t,
-			   "eval {\n");
+			   "eval \{\n");
                 $tab += 4;
                 $t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
                     print OUT ($t, "my(\@REM);\n");
                     if ($incl_type eq 'include_next') {
 		print OUT ($t,
-			   "my(\%INCD) = map { \$INC{\$_} => 1 } ",
-			           "(grep { \$_ eq \"$incl\" } ",
+			   "my(\%INCD) = map \{ \$INC\{\$_\} => 1 \} ",
+			           "(grep \{ \$_ eq \"$incl\" \} ",
                                    "keys(\%INC));\n");
 		print OUT ($t,
-			           "\@REM = map { \"\$_/$incl\" } ",
-			   "(grep { not exists(\$INCD{\"\$_/$incl\"})",
-			           " and -f \"\$_/$incl\" } \@INC);\n");
+			           "\@REM = map \{ \"\$_/$incl\" \} ",
+			   "(grep \{ not exists(\$INCD\{\"\$_/$incl\"\})",
+			           " and -f \"\$_/$incl\" \} \@INC);\n");
                     } else {
                         print OUT ($t,
-                                   "\@REM = map { \"\$_/$incl\" } ",
-                                   "(grep {-r \"\$_/$incl\" } \@INC);\n");
+                                   "\@REM = map \{ \"\$_/$incl\" \} ",
+                                   "(grep \{-r \"\$_/$incl\" \} \@INC);\n");
                     }
 		print OUT ($t,
 			   "require \"\$REM[0]\" if \@REM;\n");
                 $tab -= 4;
                 $t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
                 print OUT ($t,
-			   "};\n");
+			   "\};\n");
 		print OUT ($t,
 			   "warn(\$\@) if \$\@;\n");
                 } else {
@@ -188,11 +188,11 @@ while (defined (my $file = next_file())) {
 		    print OUT $t,"require '$incl';\n";
                 }
 	    } elsif (m/^ifdef\s+(\w+)/) {
-		print OUT $t,"if(defined(&$1)) {\n";
+		print OUT $t,"if(defined(&$1)) \{\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
 	    } elsif (m/^ifndef\s+(\w+)/) {
-		print OUT $t,"unless(defined(&$1)) {\n";
+		print OUT $t,"unless(defined(&$1)) \{\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
 	    } elsif (s/^if\s+//) {
@@ -200,7 +200,7 @@ while (defined (my $file = next_file())) {
 		$inif = 1;
 		expr();
 		$inif = 0;
-		print OUT $t,"if($new) {\n";
+		print OUT $t,"if($new) \{\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
 	    } elsif (s/^elif\s+//) {
@@ -210,19 +210,19 @@ while (defined (my $file = next_file())) {
 		$inif = 0;
 		$tab -= 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
-		print OUT $t,"}\n elsif($new) {\n";
+		print OUT $t,"\}\n elsif($new) \{\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
 	    } elsif (m/^else/) {
 		$tab -= 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
-		print OUT $t,"} else {\n";
+		print OUT $t,"\} else \{\n";
 		$tab += 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
 	    } elsif (m/^endif/) {
 		$tab -= 4;
 		$t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
-		print OUT $t,"}\n";
+		print OUT $t,"\}\n";
 	    } elsif(m/^undef\s+(\w+)/) {
 		print OUT $t, "undef(&$1) if defined(&$1);\n";
 	    } elsif(m/^error\s+(".*")/) {
@@ -323,7 +323,7 @@ while (defined (my $file = next_file())) {
 		  (?:long\s+)?
 		  (?:$typelist)\s+
 		  (\w+)
-		  (?{ push @local_variables, $1 })
+		  (?\{ push @local_variables, $1 \})
 		  ']
 		 [my \$$1]gx;
 		$new =~ s['
@@ -332,7 +332,7 @@ while (defined (my $file = next_file())) {
 		  (?:long\s+)?
 		  (?:$typelist)\s+
 		  ' \s+ &(\w+) \s* ;
-		  (?{ push @local_variables, $1 })
+		  (?\{ push @local_variables, $1 \})
 		  ]
 		 [my \$$1;]gx;
 	     }
@@ -405,7 +405,7 @@ sub expr {
             $new .= '$sizeof';
             my $lvl = 1;  # already saw one open paren
             # tack { on the front, and skip it in the loop
-            $_ = "{" . "$_";
+            $_ = "\{" . "$_";
             my $index = 1;
             # find balanced closing paren
             while ($index +<= length($_) && $lvl +> 0) {
@@ -414,7 +414,7 @@ sub expr {
                 $index++;
             }
             # tack } on the end, replacing )
-            substr($_, $index - 1, 1, "}");
+            substr($_, $index - 1, 1, "\}");
             # remove pesky * operators within the sizeof argument
             substr($_, 0, $index - 1, (my $x = substr($_, 0, $index -1)) =~ s/\*//g);
             next;
@@ -514,8 +514,8 @@ sub next_line
                 $in =~ s/\?\?\)/]/g;                        # | ??)|  ]|
                 $in =~ s/\?\?\-/~/g;                        # | ??-|  ~|
                 $in =~ s/\?\?\//\\/g;                       # | ??/|  \|
-                $in =~ s/\?\?</{/g;                         # | ??<|  {|
-                $in =~ s/\?\?>/}/g;                         # | ??>|  }|
+                $in =~ s/\?\?</\{/g;                         # | ??<|  {|
+                $in =~ s/\?\?>/\}/g;                         # | ??>|  }|
             }
 	    if ($in =~ m/^\#ifdef __LANGUAGE_PASCAL__/) {
 		# Tru64 disassembler.h evilness: mixed C and Pascal.
@@ -681,7 +681,7 @@ sub queue_includes_from
 
     return if ($file eq "-");
 
-    open HEADER, $file or return;
+    open HEADER, "<", $file or return;
         while (defined($line = ~< *HEADER)) {
             while (m/\\$/) { # Handle continuation lines
                 chop $line;
@@ -724,7 +724,7 @@ sub build_preamble_if_necessary
     # Can we skip building the preamble file?
     if (-r $preamble) {
         # Extract version number from first line of preamble:
-        open  PREAMBLE, $preamble or die "Cannot open $preamble:  $!";
+        open  PREAMBLE, "<", $preamble or die "Cannot open $preamble:  $!";
             my $line = ~< *PREAMBLE;
             $line =~ m/(\b\d+\b)/;
         close PREAMBLE            or die "Cannot close $preamble:  $!";
@@ -735,7 +735,7 @@ sub build_preamble_if_necessary
 
     my (%define) = _extract_cc_defines();
 
-    open  PREAMBLE, ">$preamble" or die "Cannot open $preamble:  $!";
+    open  PREAMBLE, ">", "$preamble" or die "Cannot open $preamble:  $!";
 	print PREAMBLE "# This file was created by h2ph version $VERSION\n";
 
 	foreach (sort keys %define) {
@@ -749,18 +749,18 @@ sub build_preamble_if_necessary
 	    if ($define{$_} =~ m/^([+-]?(\d+)?\.\d+([eE][+-]?\d+)?)[FL]?$/) {
 		# float:
 		print PREAMBLE
-		    "unless (defined &$_) { sub $_() { $1 } }\n\n";
+		    "unless (defined &$_) \{ sub $_() \{ $1 \} \}\n\n";
 	    } elsif ($define{$_} =~ m/^([+-]?\d+)U?L{0,2}$/i) {
 		# integer:
 		print PREAMBLE
-		    "unless (defined &$_) { sub $_() { $1 } }\n\n";
+		    "unless (defined &$_) \{ sub $_() \{ $1 \} \}\n\n";
 	    } elsif ($define{$_} =~ m/^\w+$/) {
 		print PREAMBLE
-		    "unless (defined &$_) { sub $_() { &$define{$_} } }\n\n";
+		    "unless (defined &$_) \{ sub $_() \{ &$define{$_} \} \}\n\n";
 	    } else {
 		print PREAMBLE
-		    "unless (defined &$_) { sub $_() { \"",
-		    quotemeta($define{$_}), "\" } }\n\n";
+		    "unless (defined &$_) \{ sub $_() \{ \"",
+		    quotemeta($define{$_}), "\" \} \}\n\n";
 	    }
 	}
     close PREAMBLE               or die "Cannot close $preamble:  $!";
