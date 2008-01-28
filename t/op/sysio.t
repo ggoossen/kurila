@@ -22,7 +22,7 @@ $x = 'abc';
 
 # should not be able to do negative lengths
 eval { sysread(I, $x, -1) };
-print 'not ' unless ($@ =~ m/^Negative length /);
+print 'not ' unless ($@->{description} =~ m/^Negative length /);
 print "ok 1\n";
 
 # $x should be intact
@@ -72,7 +72,7 @@ select(O); $|=1; select(STDOUT);
 
 # cannot write negative lengths
 eval { syswrite(O, $x, -1) };
-print 'not ' unless ($@ =~ m/^Negative length /);
+print 'not ' unless ($@->{description} =~ m/^Negative length /);
 print "ok 11\n";
 
 # $x still intact
@@ -85,7 +85,7 @@ print "ok 13\n";
 
 # should not be able to write from after the buffer
 eval { syswrite(O, $x, 1, 3) };
-print 'not ' unless ($@ =~ m/^Offset outside string /);
+print 'not ' unless ($@->{description} =~ m/^Offset outside string /);
 print "ok 14\n";
 
 # $x still intact
@@ -102,7 +102,7 @@ print "ok 16\n";
 # should not be able to write from before the buffer
 
 eval { syswrite(O, $x, 1, -4) };
-print 'not ' unless ($@ =~ m/^Offset outside string /);
+print 'not ' unless ($@->{description} =~ m/^Offset outside string /);
 print "ok 17\n";
 
 # $x still intact
@@ -222,7 +222,7 @@ unlink $outfile;
 open(I, ">", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 # Will skip harmlessly on stdioperl
 eval {binmode STDOUT, ":utf8"};
-die $@ if $@ and $@ !~ m/^IO layers \(like ':utf8'\) unavailable/;
+die $@ if $@ and $@->{description} !~ m/^IO layers \(like ':utf8'\) unavailable/;
 
 $a = "\xFF";
 

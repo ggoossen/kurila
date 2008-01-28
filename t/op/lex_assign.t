@@ -136,7 +136,7 @@ for (@INPUT) {
   print "ok \$ord\\n";
 EOE
   if ($@) {
-    if ($@ =~ m/is unimplemented/) {
+    if ($@->{description} =~ m/is unimplemented/) {
       print "# skipping $comment: unimplemented:\nok $ord\n";
     } else {
       warn $@;
@@ -162,9 +162,9 @@ for (@simple_input) {
   print "ok \$ord\\n";
 EOE
   if ($@) {
-    if ($@ =~ m/is unimplemented/) {
+    if ($@->{description} =~ m/is unimplemented/) {
       print "# skipping $comment: unimplemented:\nok $ord\n";
-    } elsif ($@ =~ m/Can't (modify|take log of 0)/) {
+    } elsif ($@->{description} =~ m/Can't (modify|take log of 0)/) {
       print "# skipping $comment: syntax not good for selfassign:\nok $ord\n";
     } else {
       warn $@;

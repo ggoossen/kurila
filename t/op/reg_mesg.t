@@ -136,7 +136,7 @@ while (@death)
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     $result .= " at ";
-    if ($@ !~ m/^\Q$result/) {
+    if ($@->{description} !~ m/^\Q$result/) {
 	print "# For $regex, expected:\n#  $result\n# Got:\n#  $@\n#\nnot ";
     }
     print "ok $count - $regex\n";

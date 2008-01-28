@@ -46,7 +46,7 @@ is( $r, join($dirsep, "Foo", "Bar.pm") );
     local(*CORE::GLOBAL::require);
     $r = '';
     eval "require NoNeXiSt;";
-    ok( ! ( $r or $@ !~ m/^Can't locate NoNeXiSt/i ) );
+    ok( ! ( $r or $@->{description} !~ m/^Can't locate NoNeXiSt/i ) );
 }
 
 #
