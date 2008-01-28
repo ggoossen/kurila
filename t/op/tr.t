@@ -110,8 +110,8 @@ is($x, "\x{100}B\x{100}");
 }
 
 $_ = "abcdefghijklmnopqrstuvwxyz";
-eval 'tr/a-z-9/ /';
-like($@, qr/^Ambiguous range in transliteration operator/,  'tr/a-z-9//');
+eval_dies_like( 'tr/a-z-9/ /',
+                qr/^Ambiguous range in transliteration operator/,  'tr/a-z-9//');
 
 # 19-21: Make sure leading and trailing hyphens still work
 $_ = "car-rot9";
@@ -140,9 +140,9 @@ is($_, '...d.f...j.l...p');
 
 
 # 20000705 MJD
-eval "tr/m-d/ /";
-like($@, qr/^Invalid range "m-d" in transliteration operator/,
-              'reversed range check');
+eval_dies_like( "tr/m-d/ /",
+                qr/^Invalid range "m-d" in transliteration operator/,
+                'reversed range check');
 
 'abcdef' =~ m/(bcd)/;
 is(eval '$1 =~ tr/abcd//', 3,  'explicit read-only count');
@@ -154,9 +154,9 @@ is($@, '',                      '    no error');
 
 is(eval '"123" =~ tr/12//', 2,     'LHS of non-updating tr');
 
-eval '"123" =~ tr/1/2/';
-like($@, qr|^Can't modify constant item in transliteration \(tr///\)|,
-         'LHS bad on updating tr');
+eval_dies_like( '"123" =~ tr/1/2/',
+                qr|^Can't modify constant item in transliteration \(tr///\)|,
+                'LHS bad on updating tr');
 
 
 # v300 (0x12c) is UTF-8-encoded as 196 172 (0xc4 0xac)
@@ -328,7 +328,7 @@ is( $@, '',         'implicit count outside hash bounds' );
 is( scalar keys %foo, 0,   "    doesn't extend the hash");
 
 $x = \"foo";
-dies_like( sub { $x =~ tr/A/A/ }, qr/stringify a reference/, 'non-modifying tr/// on a scalar ref' );
+ok $x =~ tr/A/A/;
 is( ref $x, 'SCALAR', "    doesn't stringify its argument" );
 
 # rt.perl.org 36622.  Perl didn't like a y/// at end of file.  No trailing

@@ -59,8 +59,6 @@ sub import {
       foreach (@_);
   }
   return export $pkg, $callpkg, ($args ? @_ : ()) if $heavy;
-  local $SIG{__WARN__} = 
-	sub {require Carp; &Carp::carp};
   # shortcut for the common case of no type character
   *{Symbol::fetch_glob("$callpkg\::$_")} = \&{*{Symbol::fetch_glob("$pkg\::$_")}} foreach @_;
 }

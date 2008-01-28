@@ -774,11 +774,12 @@ WHOA
 sub dies_like(&$;$) {
     my ($e, $qr, $name) = @_;
     if (eval { $e->(); 1; }) {
+        local $Level = 2;
         diag "didn't die";
         return ok(0, $name);
     }
-    my $err = $@;
-    return like_yn(1, $err, $qr );
+    my $err = $@->{description};
+    return like_yn(0, $err, $qr );
 }
 
 sub eval_dies_like($$;$) {
@@ -790,7 +791,7 @@ sub eval_dies_like($$;$) {
         diag "didn't die";
         return ok(0, $name);
     }
-    return like_yn(1, $err, $qr );
+    return like_yn(0, $err->{description}, $qr );
 }
 
 1;

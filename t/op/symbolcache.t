@@ -27,9 +27,9 @@ sub replaced { 'meth' }
 sub removed2 { 24 }
 sub bound2 { removed2() }
 undef $main::{removed2};
-eval { bound2() };
-like( $@, qr/Undefined subroutine &main::removed2 called/,
-    'function not bound' );
+dies_like( sub { bound2() },
+           qr/Undefined subroutine &main::removed2 called/,
+           'function not bound' );
 ok( !main->can('removed2'), 'function not available as method' );
 
 # replacement

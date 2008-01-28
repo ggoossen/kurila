@@ -12,7 +12,7 @@ use Config;
 use File::Spec::Functions;
 
 BEGIN { require './test.pl'; }
-plan tests => 267;
+plan tests => 232;
 
 $| = 1;
 
@@ -174,7 +174,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	while (my $v = $vars[0]) {
 	    local $ENV{$v} = $TAINT;
 	    last if eval { `$echo 1` };
-	    last unless $@ =~ m/^Insecure \$ENV{$v}/;
+	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
 	test !@vars, "@vars";
@@ -185,7 +185,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	test eval { `$echo 1` } eq "1\n";
 	$ENV{TERM} = 'e=mc2' . $TAINT;
 	test !eval { `$echo 1` };
-	test $@ =~ m/^Insecure \$ENV{TERM}/, $@;
+	like( $@->{description}, qr/^Insecure \$ENV{TERM}/ );
     }
 
     my $tmp;
@@ -284,7 +284,7 @@ SKIP: {
     open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
 	eval { join('', @ARGV), kill 0 };
-	exit 0 if $@ =~ m/^Insecure dependency/;
+	exit 0 if $@->{description} =~ m/^Insecure dependency/;
 	print "# Oops: \$@ was [$@]\n";
 	exit 1;
     };
@@ -349,69 +349,68 @@ SKIP: {
 
 # Operations which affect files can't use tainted data.
 {
-    test !eval { chmod 0, $TAINT }, 'chmod';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { chmod 0, $TAINT }, qr/^Insecure dependency/);
 
     # There is no feature test in $Config{} for truncate,
     #   so we allow for the possibility that it's missing.
-    test !eval { truncate 'NoSuChFiLe', $TAINT0 }, 'truncate';
-    test $@ =~ m/^(?:Insecure dependency|truncate not implemented)/, $@;
+    dies_like( sub { truncate 'NoSuChFiLe', $TAINT0 }, 
+               qr/^(?:Insecure dependency|truncate not implemented)/);
 
-    test !eval { rename '', $TAINT }, 'rename';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { rename '', $TAINT },
+               qr/^Insecure dependency/);
 
-    test !eval { unlink $TAINT }, 'unlink';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { unlink $TAINT },
+               qr/^Insecure dependency/);
 
-    test !eval { utime $TAINT }, 'utime';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { utime $TAINT },
+               qr/^Insecure dependency/);
 
     SKIP: {
         skip "chown() is not available", 2 unless $Config{d_chown};
 
-	test !eval { chown -1, -1, $TAINT }, 'chown';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { chown -1, -1, $TAINT },
+                   qr/^Insecure dependency/);
     }
 
     SKIP: {
         skip "link() is not available", 2 unless $Config{d_link};
 
-	test !eval { link $TAINT, '' }, 'link';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { link $TAINT, '' },
+                   qr/^Insecure dependency/);
     }
 
     SKIP: {
         skip "symlink() is not available", 2 unless $Config{d_symlink};
 
-	test !eval { symlink $TAINT, '' }, 'symlink';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { symlink $TAINT, '' },
+                   qr/^Insecure dependency/);
     }
 }
 
 # Operations which affect directories can't use tainted data.
 {
-    test !eval { mkdir "foo".$TAINT, 0755.$TAINT0 }, 'mkdir';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { mkdir "foo".$TAINT, 0755.$TAINT0 },
+               qr/^Insecure dependency/);
 
-    test !eval { rmdir $TAINT }, 'rmdir';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { rmdir $TAINT },
+               qr/^Insecure dependency/);
 
-    test !eval { chdir "foo".$TAINT }, 'chdir';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { chdir "foo".$TAINT },
+               qr/^Insecure dependency/);
 
     SKIP: {
         skip "chroot() is not available", 2 unless $Config{d_chroot};
 
-	test !eval { chroot $TAINT }, 'chroot';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { chroot $TAINT },
+                   qr/^Insecure dependency/);
     }
 }
 
 # Some operations using files can't use tainted data.
 {
     my $foo = "imaginary library" . $TAINT;
-    test !eval { require $foo }, 'require';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { require $foo },
+               qr/^Insecure dependency/);
 
     my $filename = "./taintB$$";	# NB: $filename isn't tainted!
     END { unlink $filename if defined $filename }
@@ -429,8 +428,8 @@ SKIP: {
 	($Is_Dos && $! == 22) ||
 	($^O eq 'mint' && $! == 33);
 
-    test !eval { open FOO, ">", "$foo" }, 'open for write';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { open FOO, ">", "$foo" },
+               qr/^Insecure dependency/);
 }
 
 # Commands to the system can't use tainted data
@@ -440,24 +439,24 @@ SKIP: {
     SKIP: {
         skip "open('|') is not available", 4 if $^O eq 'amigaos';
 
-	test !eval { open FOO, "|-", "x$foo" }, 'popen to';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { open FOO, "|-", "x$foo" },
+                   qr/^Insecure dependency/);
 
-	test !eval { open FOO, "-|", "x$foo" }, 'popen from';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { open FOO, "-|", "x$foo" },
+                   qr/^Insecure dependency/);
     }
 
-    test !eval { exec $TAINT }, 'exec';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { exec $TAINT },
+               qr/^Insecure dependency/);
 
-    test !eval { system $TAINT }, 'system';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { system $TAINT },
+               qr/^Insecure dependency/);
 
     $foo = "*";
     taint_these $foo;
 
-    test !eval { `$echo 1$foo` }, 'backticks';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { `$echo 1$foo` },
+               qr/^Insecure dependency/);
 
     SKIP: {
         # wildcard expansion doesn't invoke shell on VMS, so is safe
@@ -470,21 +469,21 @@ SKIP: {
 
 # Operations which affect processes can't use tainted data.
 {
-    test !eval { kill 0, $TAINT }, 'kill';
-    test $@ =~ m/^Insecure dependency/, $@;
+    dies_like( sub { kill 0, $TAINT },
+               qr/^Insecure dependency/);
 
     SKIP: {
         skip "setpgrp() is not available", 2 unless $Config{d_setpgrp};
 
-	test !eval { setpgrp 0, $TAINT0 }, 'setpgrp';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { setpgrp 0, $TAINT0 },
+                   qr/^Insecure dependency/);
     }
 
     SKIP: {
         skip "setpriority() is not available", 2 unless $Config{d_setprior};
 
-	test !eval { setpriority 0, $TAINT0, $TAINT0 }, 'setpriority';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { setpriority 0, $TAINT0, $TAINT0 },
+                   qr/^Insecure dependency/);
     }
 }
 
@@ -493,8 +492,8 @@ SKIP: {
     SKIP: {
         skip "syscall() is not available", 2 unless $Config{d_syscall};
 
-	test !eval { syscall $TAINT }, 'syscall';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { syscall $TAINT },
+                   qr/^Insecure dependency/);
     }
 
     {
@@ -505,14 +504,14 @@ SKIP: {
 	END { unlink $temp }
 	test open(FOO, ">", "$temp"), "Couldn't open $temp for write: $!";
 
-	test !eval { ioctl FOO, $TAINT0, $foo }, 'ioctl';
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { ioctl FOO, $TAINT0, $foo },
+                   qr/^Insecure dependency/);
 
         SKIP: {
             skip "fcntl() is not available", 2 unless $Config{d_fcntl};
 
-	    test !eval { fcntl FOO, $TAINT0, $foo }, 'fcntl';
-	    test $@ =~ m/^Insecure dependency/, $@;
+	    dies_like( sub { fcntl FOO, $TAINT0, $foo },
+                       qr/^Insecure dependency/);
 	}
 
 	close FOO;
@@ -911,8 +910,8 @@ ok( ${^TAINT} == 1, '$^TAINT is on' );
 
 eval { ${^TAINT} = 0 };
 ok( ${^TAINT},  '$^TAINT is not assignable' );
-ok( $@ =~ m/^Modification of a read-only value attempted/,
-                                'Assigning to ${^TAINT} fails' );
+ok( $@->{description} =~ m/^Modification of a read-only value attempted/,
+    'Assigning to ${^TAINT} fails' );
 
 {
     # bug 20011111.105
@@ -932,8 +931,8 @@ SKIP: {
 
     # bug 20010221.005
     local $ENV{PATH} .= $TAINT;
-    eval { system { "echo" } "/arg0", "arg1" };
-    test $@ =~ m/^Insecure \$ENV/;
+    dies_like(sub { system { "echo" } "/arg0", "arg1" },
+              qr/^Insecure \$ENV/);
 }
 
 TODO: {
@@ -942,27 +941,22 @@ TODO: {
 
     # bug 20020208.005 plus some single arg exec/system extras
     my $err = qr/^Insecure dependency/ ;
-    test !eval { exec $TAINT, $TAINT }, 'exec';
-    test $@ =~ $err, $@;
-    test !eval { exec $TAINT $TAINT }, 'exec';
-    test $@ =~ $err, $@;
-    test !eval { exec $TAINT $TAINT, $TAINT }, 'exec';
-    test $@ =~ $err, $@;
-    test !eval { exec $TAINT 'notaint' }, 'exec';
-    test $@ =~ $err, $@;
-    test !eval { exec {'notaint'} $TAINT }, 'exec';
-    test $@ =~ $err, $@;
+    dies_like( sub { exec $TAINT, $TAINT },
+               $err );
+    dies_like( sub { exec $TAINT, $TAINT },
+               $err );
+    dies_like( sub { exec $TAINT, $TAINT, $TAINT },
+               $err );
+    dies_like( sub { exec $TAINT 'notaint' },
+               $err );
+    dies_like( sub { exec {'notaint'} $TAINT },
+               $err );
 
-    test !eval { system $TAINT, $TAINT }, 'system';
-    test $@ =~ $err, $@;
-    test !eval { system $TAINT $TAINT }, 'system';
-    test $@ =~ $err, $@;
-    test !eval { system $TAINT $TAINT, $TAINT }, 'system';
-    test $@ =~ $err, $@;
-    test !eval { system $TAINT 'notaint' }, 'system';
-    test $@ =~ $err, $@;
-    test !eval { system {'notaint'} $TAINT }, 'system';
-    test $@ =~ $err, $@;
+    dies_like( sub { system $TAINT, $TAINT }, $err );
+    dies_like( sub { system $TAINT $TAINT }, $err, 'system');
+    dies_like( sub { system $TAINT $TAINT, $TAINT }, $err, 'system');
+    dies_like( sub { system $TAINT 'notaint' }, $err, 'system');
+    dies_like( sub { system {'notaint'} $TAINT }, $err, 'system');
 
     eval { 
         no warnings;
@@ -994,11 +988,11 @@ TODO: {
     # [perl #24291] this used to dump core
     our %nonmagicalenv = ( PATH => "util" );
     local *ENV = \%nonmagicalenv;
-    eval { system("lskdfj"); };
-    test $@ =~ m/^%ENV is aliased to another variable while running with -T switch/;
+    dies_like(sub { system("lskdfj") },
+              qr/^%ENV is aliased to another variable while running with -T switch/);
     local *ENV = *nonmagicalenv;
-    eval { system("lskdfj"); };
-    test $@ =~ m/^%ENV is aliased to %nonmagicalenv while running with -T switch/;
+    dies_like( sub { system("lskdfj"); },
+               qr/^%ENV is aliased to %nonmagicalenv while running with -T switch/);
 }
 {
     # [perl #24248]
@@ -1039,8 +1033,8 @@ TODO: {
     test !tainted($^O);
     if (!$^X) { } elsif ($^O eq 'bar') { }
     test !tainted($^O);
-    eval '$^O = $^X';
-    test $@ =~ m/Insecure dependency in/;
+    eval_dies_like( '$^O = $^X',
+                    qr/Insecure dependency in/ );
 }
 
 EFFECTIVELY_CONSTANTS: {
@@ -1178,18 +1172,18 @@ SKIP:
 	    open my $pipe, "|-", "$Invoke_Perl -e 1";
 	    close $pipe;
 	};
-	test $@ =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
+	test $@->{description} =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
     }
 }
 
 {
     # tests for tainted format in s?printf
-    eval { printf($TAINT . "# %s\n", "foo") };
-    like($@, qr/^Insecure dependency in printf/, q/printf doesn't like tainted formats/);
+    dies_like( sub { printf($TAINT . "# %s\n", "foo") },
+               qr/^Insecure dependency in printf/, q/printf doesn't like tainted formats/);
     eval { printf("# %s\n", $TAINT . "foo") };
     ok(!$@, q/printf accepts other tainted args/);
-    eval { sprintf($TAINT . "# %s\n", "foo") };
-    like($@, qr/^Insecure dependency in sprintf/, q/sprintf doesn't like tainted formats/);
+    dies_like( sub { sprintf($TAINT . "# %s\n", "foo") },
+               qr/^Insecure dependency in sprintf/, q/sprintf doesn't like tainted formats/);
     eval { sprintf("# %s\n", $TAINT . "foo") };
     ok(!$@, q/sprintf accepts other tainted args/);
 }
@@ -1211,7 +1205,7 @@ SKIP:
     my $tainted = '1' . $TAINT;
     eval '$val = eval $tainted;';
     is ($val, 0, "eval doesn't like tainted strings");
-    like ($@, qr/^Insecure dependency in eval/);
+    like ($@->{description}, qr/^Insecure dependency in eval/);
 
     # Rather nice code to get a tainted undef by from Rick Delaney
     open FH, "<", "test.pl" or die $!;
@@ -1219,7 +1213,7 @@ SKIP:
     $tainted = ~< *FH;
 
     eval 'eval $tainted';
-    like ($@, qr/^Insecure dependency in eval/);
+    like ($@->{description}, qr/^Insecure dependency in eval/);
 }
 
 {
