@@ -56,10 +56,10 @@ undef &foo;
 print defined(&foo) ? "not ok 21\n" : "ok 21\n";
 
 eval { undef $1 };
-print $@ =~ m/^Modification of a read/ ? "ok 22\n" : "not ok 22\n";
+print $@->{description} =~ m/^Modification of a read/ ? "ok 22\n" : "not ok 22\n";
 
 eval { $1 = undef };
-print $@ =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n";
+print $@->{description} =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n";
 
 {
     require Tie::Hash;
@@ -80,7 +80,7 @@ print $@ =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n";
 {
     # [perl #17753] segfault when undef'ing unquoted string constant
     eval 'undef tcp';
-    print $@ =~ m/^Can't modify constant item/ ? "ok 28\n" : "not ok 28\n";
+    print $@->{description} =~ m/^Can't modify constant item/ ? "ok 28\n" : "not ok 28\n";
 }
 
 # bugid 3096

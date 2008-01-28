@@ -5,7 +5,7 @@ BEGIN {
 }
 
 eval {my @n = getgrgid 0};
-if ($@ =~ m/(The \w+ function is unimplemented)/) {
+if ($@->{description} =~ m/(The \w+ function is unimplemented)/) {
     skip_all "getgrgid unimplemented";
 }
 

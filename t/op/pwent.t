@@ -4,7 +4,7 @@ our (%Config, $where);
 
 BEGIN {
     eval {my @n = getpwuid 0; setpwent()};
-    if ($@ && $@ =~ m/(The \w+ function is unimplemented)/) {
+    if ($@ && $@->{description} =~ m/(The \w+ function is unimplemented)/) {
 	print "1..0 # Skip: $1\n";
 	exit 0;
     }
