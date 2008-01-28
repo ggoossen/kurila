@@ -29,16 +29,10 @@ sub longmess  { goto &longmess_jmp }
 sub shortmess { goto &shortmess_jmp }
 # these two are replaced when Carp::Heavy is loaded
 sub longmess_jmp  {
-    local($@, $!);
-    eval { require Carp::Heavy };
-    return $@ if $@;
-    goto &longmess_real;
+    return @_;
 }
 sub shortmess_jmp  {
-    local($@, $!);
-    eval { require Carp::Heavy };
-    return $@ if $@;
-    goto &shortmess_real;
+    return @_;
 }
 
 sub croak   { die  shortmess @_ }

@@ -2218,16 +2218,16 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	if (PL_minus_c)
 	    Perl_croak(aTHX_ "%s had compilation errors.\n", MacPerl_MPWFileName(PL_origfilename));
 	else {
-	    Perl_croak(aTHX_ "Execution of %s aborted due to compilation errors.\n",
+	    Perl_croak(aTHX_ "Execution of %s aborted due to compilation errors.",
 		       MacPerl_MPWFileName(PL_origfilename));
 	}
     }
 #else
     if (yyparse() || PL_parser->error_count) {
 	if (PL_minus_c)
-	    Perl_croak(aTHX_ "%s had compilation errors.\n", PL_origfilename);
+	    Perl_croak(aTHX_ "%s had compilation errors.", PL_origfilename);
 	else {
-	    Perl_croak(aTHX_ "Execution of %s aborted due to compilation errors.\n",
+	    Perl_croak(aTHX_ "Execution of %s aborted due to compilation errors.",
 		       PL_origfilename);
 	}
     }

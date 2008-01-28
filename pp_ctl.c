@@ -2271,9 +2271,23 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 		       (*msg ? msg : "Unknown error\n"));
 	}
 	else {
-	    if (!*msg) {
-	        sv_setpvs(ERRSV, "Compilation error");
-	    }
+	    SV *msv;
+
+	    ENTER;
+	    PUSHSTACKi(PERLSI_DIEHOOK);
+
+	    PUSHMARK(SP);
+	    XPUSHs(ERRSV);
+	    PUTBACK;
+	    call_pv("error::create", G_SCALAR);
+	    SPAGAIN;
+	    msv = SvREFCNT_inc(POPs);
+	    SvREFCNT_dec(ERRSV);
+	    ERRSV = msv;
+	    PUTBACK;
+
+	    POPSTACK;
+	    LEAVE;
 	}
 	PERL_UNUSED_VAR(newsp);
 	PUSHs(&PL_sv_undef);

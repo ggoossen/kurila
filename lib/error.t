@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan( tests => 22 );
+plan( tests => 25 );
 
 # simple error object.
 {
@@ -99,5 +99,16 @@ MSG
     fresh_perl_is('BEGIN { die "foobar" }', <<MSG );
 foobar at - line 1
 BEGIN failed--compilation aborted at - line 1
+MSG
+}
+
+# yyerror
+{
+    eval 'undef foo';
+    is defined $@, 1, '$@ is set';
+    is ref $@, 'error', '$@ is error object';
+    is $@->message, <<MSG ;
+Can't modify constant item in undef operator at (eval 9) line 2, at EOF
+Bareword \"foo\" not allowed while "strict subs" in use at ../lib/error.t line 107
 MSG
 }

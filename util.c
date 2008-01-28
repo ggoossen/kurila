@@ -1231,8 +1231,8 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	GV *gv;
 
 	if (PL_errors && SvCUR(PL_errors)) {
-	    sv_catsv(PL_errors, msv);
 	    sv_catpvn(PL_errors, "\n", 1);
+	    sv_catsv(PL_errors, msv);
 	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);
 	}
