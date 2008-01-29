@@ -15,8 +15,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.6';
-my $to = 'kurila-1.61';
+my $from = 'kurila-1.7';
+my $to = 'kurila-1.71';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -34,8 +34,9 @@ sub p5convert {
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
-t_open_args3();
+t_error_str();
 die;
+t_open_args3();
 t_qstring();
 t_subst_eval();
 t_string_block();
@@ -762,6 +763,15 @@ open $fh, ">-";
 ----
 open $fh, "-";
 open $fh, ">-";
+====
+END
+}
+
+sub t_error_str {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+$@ =~ m/foo/;
+----
+$@->{description} =~ m/foo/;
 ====
 END
 }
