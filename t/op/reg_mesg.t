@@ -136,7 +136,7 @@ while (@death)
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     $result .= " at ";
-    if ($@->{description} !~ m/^\Q$result/) {
+    if ($@->message !~ m/^\Q$result/) {
 	print "# For $regex, expected:\n#  $result\n# Got:\n#  $@\n#\nnot ";
     }
     print "ok $count - $regex\n";
@@ -170,7 +170,7 @@ while (@warning)
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     $result .= " at ";
-    if ($warning !~ m/^\Q$result/)
+    if ($warning->message !~ m/^\Q$result/)
     {
 	print <<"EOM";
 # For $regex, expected:

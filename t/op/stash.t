@@ -7,9 +7,9 @@ plan( tests => 12 );
 # Used to segfault (bug #15479)
 fresh_perl_is(
     '%:: = ""',
-    'Odd number of elements in hash assignment at - line 1.',
+    'recursive die',
     { switches => [ '-w' ] },
-    'delete $::{STDERR} and print a warning',
+    'delete error::message and print a warning',
 );
 
 # Used to segfault

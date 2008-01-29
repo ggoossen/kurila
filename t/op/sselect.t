@@ -19,9 +19,9 @@ is ($@, "");
 eval {select $blank, $blank, "", 0};
 is ($@, "");
 
-eval {select "a", $blank, $blank, 0};
-like ($@, qr/^Modification of a read-only value attempted/);
-eval {select $blank, "a", $blank, 0};
-like ($@, qr/^Modification of a read-only value attempted/);
-eval {select $blank, $blank, "a", 0};
-like ($@, qr/^Modification of a read-only value attempted/);
+dies_like( sub {select "a", $blank, $blank, 0},
+           qr/^Modification of a read-only value attempted/);
+dies_like( sub {select $blank, "a", $blank, 0},
+           qr/^Modification of a read-only value attempted/);
+dies_like( sub {select $blank, $blank, "a", 0},
+           qr/^Modification of a read-only value attempted/);

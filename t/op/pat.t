@@ -296,12 +296,12 @@ print "ok 68\n";
 
 undef $@;
 eval "'aaa' =~ m/a\{1,$reg_infty\}/";
-print "not " if $@ !~ m%^\QQuantifier in {,} bigger than%;
+print "not " if $@->{description} !~ m%^\QQuantifier in {,} bigger than%;
 print "ok 69\n";
 
 eval "'aaa' =~ m/a\{1,$reg_infty_p\}/";
 print "not "
-	if $@ !~ m%^\QQuantifier in {,} bigger than%;
+	if $@->{description} !~ m%^\QQuantifier in {,} bigger than%;
 print "ok 70\n";
 undef $@;
 
@@ -309,7 +309,7 @@ undef $@;
 
 our $context = 'x' x 256;
 eval qq("${context}y" =~ m/(?<=$context)y/);
-print "not " if $@ !~ m%^\QLookbehind longer than 255 not%;
+print "not " if $@->{description} !~ m%^\QLookbehind longer than 255 not%;
 print "ok 71\n";
 
 # removed test
@@ -433,7 +433,7 @@ $test++;
 my $code = '{$blah = 45}';
 my $blah = 12;
 eval { m/(?$code)/ };
-print "not " unless $@ and $@ =~ m/not allowed at runtime/ and $blah == 12;
+print "not " unless $@ and $@->{description} =~ m/not allowed at runtime/ and $blah == 12;
 print "ok $test\n";
 $test++;
 
@@ -443,7 +443,7 @@ for $code ('{$blah = 45}','=xx') {
   if ($code eq '=xx') {
     print "#'$@','$res','$blah'\nnot " unless not $@ and $res;
   } else {
-    print "#'$@','$res','$blah'\nnot " unless $@ and $@ =~ m/not allowed at runtime/ and $blah == 12;
+    print "#'$@','$res','$blah'\nnot " unless $@ and $@->{description} =~ m/not allowed at runtime/ and $blah == 12;
   }
   print "ok $test\n";
   $test++;
@@ -569,7 +569,7 @@ our $lex_a;
   no re "eval";
   my $match = eval { m/$a$c$a/ };
   print "not "
-    unless $b eq '14' and $@ =~ m/Eval-group not allowed/ and not $match;
+    unless $b eq '14' and $@->{description} =~ m/Eval-group not allowed/ and not $match;
   print "ok $test\n";
   $test++;
 }
@@ -727,24 +727,24 @@ $test++;
 
 eval { $+[0] = 13; };
 print "not "
-   if $@ !~ m/^Modification of a read-only value attempted/;
+   if $@->{description} !~ m/^Modification of a read-only value attempted/;
 print "ok $test\n";
 $test++;
 
 eval { $-[0] = 13; };
 print "not "
-   if $@ !~ m/^Modification of a read-only value attempted/;
+   if $@->{description} !~ m/^Modification of a read-only value attempted/;
 print "ok $test\n";
 $test++;
 
 eval { @+ = (7, 6, 5); };
 print "not "
-   if $@ !~ m/^Modification of a read-only value attempted/;
+   if $@->{description} !~ m/^Modification of a read-only value attempted/;
 print "ok $test\n";
 $test++;
 
 eval { @- = qw(foo bar); };
-ok( $@ =~ m/^Modification of a read-only value attempted/ );
+ok( $@->{description} =~ m/^Modification of a read-only value attempted/ );
 
 m/.(a)(ba*)?/;
 print "#$#-..$#+\nnot " if $#+ != 2 or $#- != 1;
@@ -1120,7 +1120,7 @@ $test++;
     my $y = qr/^.$/u;
     ok("$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified.");
     eval q|no utf8; $x =~ m/\x{65e5}/|;
-    ok( $@ , "\\x\{...\} gives error in non-unicode regex");
+    ok( $@->{description} , "\\x\{...\} gives error in non-unicode regex");
 }
 
 use utf8;
@@ -1565,7 +1565,7 @@ EOT
     # from japhy
     my $w;
     use warnings;    
-    local $SIG{__WARN__} = sub { $w .= shift };
+    local $SIG{__WARN__} = sub { $w .= shift->{description} . "\n" };
 
     $w = "";
     eval 'qr/(?c)/';
@@ -3280,7 +3280,7 @@ if ($ordA == 193) {
     {
         my $code;
         my $w="";
-        local $SIG{__WARN__} = sub { $w.=shift };
+        local $SIG{__WARN__} = sub { $w.=shift->message };
         eval($code=<<'EOFTEST') or die "$@\n$code\n";
         {
             use warnings;
@@ -4215,7 +4215,7 @@ ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/,
     or print "# Unexpected outcome: should pass or crash perl\n";
 
 eval 'm/\k/';
-ok($@=~m/\QSequence \k... not terminated in regex;\E/);
+ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
 
 {
     use bytes;

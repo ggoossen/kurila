@@ -1192,6 +1192,10 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     if ( ! oldhook ) {
 	return FALSE;
     }
+    if ( *hook == PERL_DIEHOOK_FATAL ) {
+	write_to_stderr("recursive die\n", 13);
+	return FALSE;
+    }
 
     ENTER;
     SAVESPTR(*hook);
@@ -1203,10 +1207,10 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 
 	ENTER;
 	save_re_context();
-	if (warn) {
-	    SAVESPTR(*hook);
-	    *hook = NULL;
-	}
+/* 	if (warn) { */
+	SAVESPTR(*hook);
+	*hook = PERL_DIEHOOK_FATAL;
+/* 	} */
 
 	PUSHSTACKi(warn ? PERLSI_WARNHOOK : PERLSI_DIEHOOK);
 	PUSHMARK(SP);
@@ -1237,11 +1241,7 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	    SvCUR_set(PL_errors, 0);
 	}
 
-	ENTER;
-	gv = gv_fetchmethod(NULL, "error::create");
-	LEAVE;
-
-	if (gv) {
+	if (PL_errorcreatehook) { 
 	    ENTER;
 	    PUSHSTACKi(PERLSI_DIEHOOK);
 	    PUSHMARK(SP);
@@ -1249,7 +1249,7 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	    XPUSHs(msv);
 
 	    PUTBACK;
-	    call_sv((SV*)GvCV(gv), G_SCALAR);
+	    call_sv(PL_errorcreatehook, G_SCALAR);
 	    msv = TOPs;
 	    POPSTACK;
 	    LEAVE;
@@ -1366,7 +1366,7 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	PUSHMARK(SP);
 	XPUSHs(msv);
 	PUTBACK;
-	call_pv("error::create", G_SCALAR);
+	call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
 	msv = POPs;
 	PUTBACK;

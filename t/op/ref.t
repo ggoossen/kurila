@@ -3,7 +3,7 @@
 require './test.pl';
 use strict qw(refs subs);
 
-plan(125);
+plan(124);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -240,7 +240,7 @@ is (scalar (@bzz), 3);
 
 # also, it can't be an lvalue
 eval '\($x, $y) = (1, 2);';
-like ($@, qr/Can\'t modify.*ref.*in.*assignment/);
+like ($@->{description}, qr/Can\'t modify.*ref.*in.*assignment/);
 
 # test for proper destruction of lexical objects
 $test = curr_test();
@@ -298,7 +298,7 @@ curr_test($test + 2);
 	    print "# infinite recursion, bailing\nnot ok $test\n";
 	    exit 1;
         }
-	like ($m, qr/^Modification of a read-only/);
+	like ($m->{description}, qr/^Modification of a read-only/);
     };
     package C;
     sub new { bless {}, shift }
@@ -356,10 +356,6 @@ curr_test($test+4);
 is (runperl (switches=>['-l'],
 	     prog=> 'print 1; print qq-*$\*-;print 1;'),
     "1\n*\n*\n1\n");
-
-runperl(prog => 'sub UNIVERSAL::DESTROY { warn } bless \$a, "A"', stderr => 1);
-is ($?, 0, 'warn called inside UNIVERSAL::DESTROY');
-
 
 # bug #22719
 
@@ -475,7 +471,7 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
 {
     local $@;
     eval { ()[0]{foo} };
-    like ( "$@", "Can't use an undefined value as a HASH reference",
+    like ( "$@->{description}", "Can't use an undefined value as a HASH reference",
            "deref of undef from list slice fails" );
 }
 
@@ -484,13 +480,13 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
     my $ref;
     foreach $ref (*STDOUT{IO}) {
 	eval q/ $$ref /;
-	like($@, qr/Not a SCALAR reference/, "Scalar dereference");
+	like($@->{description}, qr/Not a SCALAR reference/, "Scalar dereference");
 	eval q/ @$ref /;
-	like($@, qr/Not an ARRAY reference/, "Array dereference");
+	like($@->{description}, qr/Not an ARRAY reference/, "Array dereference");
 	eval q/ %$ref /;
-	like($@, qr/Not a HASH reference/, "Hash dereference");
+	like($@->{description}, qr/Not a HASH reference/, "Hash dereference");
 	eval q/ &$ref /;
-	like($@, qr/Not a CODE reference/, "Code dereference");
+	like($@->{description}, qr/Not a CODE reference/, "Code dereference");
     }
 
     $ref = *STDOUT{IO};

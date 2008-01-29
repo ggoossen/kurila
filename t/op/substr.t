@@ -9,14 +9,14 @@ our ($w, $FATAL_MSG, $x);
 
 $a = 'abcdefxyz';
 $SIG{__WARN__} = sub {
-     if ($_[0] =~ m/^substr outside of string/) {
+     if ($_[0]->{description} =~ m/^substr outside of string/) {
           $w++;
-     } elsif ($_[0] =~ m/^Attempt to use reference as lvalue in substr/) {
+     } elsif ($_[0]->{description} =~ m/^Attempt to use reference as lvalue in substr/) {
           $w += 2;
-     } elsif ($_[0] =~ m/^Use of uninitialized value/) {
+     } elsif ($_[0]->{description} =~ m/^Use of uninitialized value/) {
           $w += 3;
      } else {
-          warn $_[0];
+          warn $_[0]->{description};
      }
 };
 
@@ -31,8 +31,8 @@ is(substr($a,3,3), 'def');   # P Q R S
 is(substr($a,6,999), 'xyz'); # P Q S R
 $b = substr($a,999,999) ; # warn # P R Q S
 is ($w--, 1);
-eval{substr($a,999,999, "") ; };# P R Q S
-like ($@, $FATAL_MSG);
+dies_like( sub {substr($a,999,999, "") ; },# P R Q S
+           $FATAL_MSG);
 is(substr($a,0,-6), 'abc');  # P=Q R S
 is(substr($a,-3,1), 'x');    # P Q R S
 
@@ -57,8 +57,8 @@ is(substr($a,6), 'xyz' );        # P Q R=S
 is(substr($a,-3), 'xyz' );       # P Q R=S
 $b = substr($a,999,999) ; # warning   # P R=S Q
 is($w--, 1);
-eval{substr($a,999,999, "") ; } ;    # P R=S Q
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a,999,999, "") ; } ,    # P R=S Q
+          $FATAL_MSG);
 is(substr($a,0), 'abcdefxyz');  # P=Q R=S
 is(substr($a,9), '');           # P Q=R=S
 is(substr($a,-11), 'abcdefxyz'); # Q P R=S
@@ -68,12 +68,12 @@ $a = '54321';
 
 $b = substr($a,-7, 1) ; # warn  # Q R P S
 is($w--, 1);
-eval{substr($a,-7, 1, "") ; }; # Q R P S
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a,-7, 1, "") ; }, # Q R P S
+          $FATAL_MSG);
 $b = substr($a,-7,-6) ; # warn  # Q R P S
 is($w--, 1);
-eval{substr($a,-7,-6, "") ; }; # Q R P S
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a,-7,-6, "") ; }, # Q R P S
+          $FATAL_MSG);
 is(substr($a,-5,-7), '');  # R P=Q S
 is(substr($a, 2,-7), '');  # R P Q S
 is(substr($a,-3,-7), '');  # R P Q S
@@ -86,20 +86,20 @@ is(substr($a, 5,-5), '');  # P=R Q S
 is(substr($a, 5,-3), '');  # P R Q=S
 $b = substr($a, 7,-7) ; # warn  # R P S Q
 is($w--, 1);
-eval{substr($a, 7,-7, "") ; }; # R P S Q
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a, 7,-7, "") ; }, # R P S Q
+          $FATAL_MSG);
 $b = substr($a, 7,-5) ; # warn  # P=R S Q
 is($w--, 1);
-eval{substr($a, 7,-5, "") ; }; # P=R S Q
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a, 7,-5, "") ; }, # P=R S Q
+          $FATAL_MSG);
 $b = substr($a, 7,-3) ; # warn  # P Q S Q
 is($w--, 1);
-eval{substr($a, 7,-3, "") ; }; # P Q S Q
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a, 7,-3, "") ; }, # P Q S Q
+          $FATAL_MSG);
 $b = substr($a, 7, 0) ; # warn  # P S Q=R
 is($w--, 1);
-eval{substr($a, 7, 0, "") ; }; # P S Q=R
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a, 7, 0, "") ; }, # P S Q=R
+          $FATAL_MSG);
 
 is(substr($a,-7,2), '');   # Q P=R S
 is(substr($a,-7,4), '54'); # Q P R S
@@ -141,43 +141,43 @@ is(substr($a,0), '');      # P=Q=R=S
 is(substr($a,0,-1), '');   # R P=Q=S
 $b = substr($a,-2, 0) ; # warn  # Q=R P=S
 is($w--, 1);
-eval{substr($a,-2, 0, "") ; }; # Q=R P=S
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a,-2, 0, "") ; }, # Q=R P=S
+           $FATAL_MSG);
 
 $b = substr($a,-2, 1) ; # warn  # Q R P=S
 is($w--, 1);
-eval{substr($a,-2, 1, "") ; }; # Q R P=S
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a,-2, 1, "") ; }, # Q R P=S
+           $FATAL_MSG);
 
 $b = substr($a,-2,-1) ; # warn  # Q R P=S
 is($w--, 1);
-eval{substr($a,-2,-1, "") ; }; # Q R P=S
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a,-2,-1, "") ; }, # Q R P=S
+           $FATAL_MSG);
 
 $b = substr($a,-2,-2) ; # warn  # Q=R P=S
 is($w--, 1);
-eval{substr($a,-2,-2, "") ; }; # Q=R P=S
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a,-2,-2, "") ; }, # Q=R P=S
+           $FATAL_MSG);
 
 $b = substr($a, 1,-2) ; # warn  # R P=S Q
 is($w--, 1);
-eval{substr($a, 1,-2, "") ; }; # R P=S Q
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a, 1,-2, "") ; }, # R P=S Q
+           $FATAL_MSG);
 
 $b = substr($a, 1, 1) ; # warn  # P=S Q R
 is($w--, 1);
-eval{substr($a, 1, 1, "") ; }; # P=S Q R
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a, 1, 1, "") ; }, # P=S Q R
+           $FATAL_MSG);
 
 $b = substr($a, 1, 0) ;# warn   # P=S Q=R
 is($w--, 1);
-eval{substr($a, 1, 0, "") ; }; # P=S Q=R
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a, 1, 0, "") ; }, # P=S Q=R
+           $FATAL_MSG);
 
 $b = substr($a,1) ; # warning   # P=R=S Q
 is($w--, 1);
-eval{substr($a,1, undef, "") ; };     # P=R=S Q
-like($@, $FATAL_MSG);
+dies_like( sub {substr($a,1, undef, "") ; },     # P=R=S Q
+           $FATAL_MSG);
 
 my $a = 'zxcvbnm';
 substr($a,2,0, '');
@@ -251,18 +251,18 @@ $w = 0;
 
 is(substr($a, 3, 9999999, ""), "xy");
 is($a, "abc");
-eval{substr($a, -99, 0, "") };
-like($@, $FATAL_MSG);
-eval{substr($a, 99, 3, "") };
-like($@, $FATAL_MSG);
+dies_like(sub {substr($a, -99, 0, "") },
+          $FATAL_MSG);
+dies_like(sub {substr($a, 99, 3, "") },
+          $FATAL_MSG);
 
 substr($a, 0, length($a), "foo");
 is ($a, "foo");
 is ($w, 0);
 
 # using 4 arg substr as lvalue is a compile time error
-eval 'substr($a,0,0,"") = "abc"';
-like ($@, qr/Can't modify substr/);
+eval_dies_like( 'substr($a,0,0,"") = "abc"',
+                qr/Can't modify substr/);
 is ($a, "foo");
 
 $a = "abcdefgh";

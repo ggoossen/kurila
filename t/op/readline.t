@@ -6,8 +6,8 @@ BEGIN {
 
 plan tests => 18;
 
-eval { for (\2) { $_ = ~< *FH } };
-like($@, 'Modification of a read-only value attempted', '[perl #19566]');
+dies_like(sub { for (\2) { $_ = ~< *FH } },
+          qr/^Modification of a read-only value attempted$/, '[perl #19566]');
 
 {
   open A,"+>", "a"; $a = 3;

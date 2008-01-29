@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }   
 
-plan tests => 1292;
+plan tests => 1286;
 
 use utf8;
 
@@ -40,24 +40,24 @@ for my $i (1, 3, 5, 10) {
 # Used to mangle PL_sv_undef
 fresh_perl_is(
     'print sprintf "xxx%n\n"; print undef',
-    'Modification of a read-only value attempted at - line 1.',
+    'Modification of a read-only value attempted at - line 1',
     { switches => [ '-w' ] },
     q(%n should not be able to modify read-only constants),
 );
 
 # check overflows
 for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
-    is(eval {sprintf "%${_}d", 0}, undef, "no sprintf result expected %${_}d");
-    like($@, qr/^Integer overflow in format string for sprintf /, "overflow in sprintf");
-    is(eval {printf "%${_}d\n", 0}, undef, "no printf result expected %${_}d");
-    like($@, qr/^Integer overflow in format string for prtf /, "overflow in printf");
+    dies_like( sub {sprintf "%${_}d", 0},
+               qr/^Integer overflow in format string for sprintf/, "overflow in sprintf");
+    dies_like( sub {printf "%${_}d\n", 0},
+               qr/^Integer overflow in format string for prtf/, "overflow in printf");
 }
 
 # check %NNN$ for range bounds
 {
     my ($warn, $bad) = (0,0);
     local $SIG{__WARN__} = sub {
-	if ($_[0] =~ m/uninitialized/) {
+	if ($_[0]->{description} =~ m/uninitialized/) {
 	    $warn++
 	}
 	else {
@@ -76,7 +76,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
     foreach my $ord (0 .. 255) {
 	my $bad = 0;
 	local $SIG{__WARN__} = sub {
-	    if ($_[0] !~ m/^Invalid conversion in sprintf/) {
+	    if ($_[0]->{description} !~ m/^Invalid conversion in sprintf/) {
 		warn $_[0];
 		$bad++;
 	    }

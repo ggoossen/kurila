@@ -294,6 +294,8 @@ END_EXTERN_C
 #define PL_envgv		(*Perl_Ienvgv_ptr(aTHX))
 #undef  PL_errgv
 #define PL_errgv		(*Perl_Ierrgv_ptr(aTHX))
+#undef  PL_errorcreatehook
+#define PL_errorcreatehook	(*Perl_Ierrorcreatehook_ptr(aTHX))
 #undef  PL_errors
 #define PL_errors		(*Perl_Ierrors_ptr(aTHX))
 #undef  PL_euid

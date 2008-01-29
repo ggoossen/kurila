@@ -203,6 +203,7 @@ PERLVAR(Ienvgv,		GV *)
 PERLVAR(Iincgv,		GV *)
 PERLVAR(Ihintgv,	GV *)
 PERLVAR(Iorigfilename,	char *)
+PERLVAR(Ierrorcreatehook,	SV *)
 PERLVAR(Idiehook,	SV *)
 PERLVAR(Iwarnhook,	SV *)
 
