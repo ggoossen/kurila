@@ -636,6 +636,18 @@ sub open_3args {
     }
 }
 
+sub error_str {
+    my $xml = shift;
+
+    for my $op (map { $xml->findnodes($_) } qw|//op_rv2sv //op_null[@was="rv2sv"]|) {
+        next unless (get_madprop($op, "variable") || '') eq '$@';
+        next unless $op->parent->tag eq "op_match";
+
+        # horrible way to insert description
+        set_madprop($op, "variable", '$@->{description}');
+    }
+}
+
 sub qstring {
     my $xml = shift;
     for my $mad_quote ($xml->findnodes(qq|//madprops/mad_null_type_first[\@val="quote"]|)) {
@@ -732,15 +744,14 @@ if ($from->{v} < 1.6 - 0.05) {
 
 #rename_pointy_ops( $twig );
 #pointy_anon_hash( $twig );
-if ($from->{v} < 1.61) {
+if ($from->{v} < 1.7 - 0.05) {
      force_m( $twig );
      qq_block( $twig );
-}
-if ($from->{v} < 1.62) {
-    qstring( $twig );
+     qstring( $twig );
+     open_3args($twig);
 }
 
-open_3args($twig);
+error_str($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
