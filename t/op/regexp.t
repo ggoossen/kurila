@@ -149,9 +149,9 @@ EOFCODE
 	    no warnings qw(uninitialized regexp);
 	    eval $code;
 	}
-	chomp( my $err = $@ );
+	my $err = $@;
 	if ($result eq 'c') {
-	    if ($err !~ m!^\Q$expect!) { print "not ok $test (compile) $input => `$err'\n"; next TEST }
+	    if ($err->{description} !~ m!^\Q$expect!) { print "not ok $test (compile) $input => `$err'\n"; next TEST }
 	    last;  # no need to study a syntax error
 	}
 	elsif ( $skip ) {

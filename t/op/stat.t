@@ -420,12 +420,12 @@ my @r = \stat($Curdir);
 is(scalar @r, 13,   'stat returns full 13 elements');
 
 stat $0;
-eval { lstat _ };
-like( $@, qr/^The stat preceding lstat\(\) wasn't an lstat/,
-    'lstat _ croaks after stat' );
-eval { -l _ };
-like( $@, qr/^The stat preceding -l _ wasn't an lstat/,
-    '-l _ croaks after stat' );
+dies_like( sub { lstat _ },
+           qr/^The stat preceding lstat\(\) wasn't an lstat/,
+           'lstat _ croaks after stat' );
+dies_like( sub { -l _ },
+           qr/^The stat preceding -l _ wasn't an lstat/,
+           '-l _ croaks after stat' );
 
 lstat $0;
 eval { lstat _ };
@@ -442,12 +442,12 @@ SKIP: {
     symlink $0, $linkname or die "# Can't symlink $0: $!";
     lstat $linkname;
     -T _;
-    eval { lstat _ };
-    like( $@, qr/^The stat preceding lstat\(\) wasn't an lstat/,
-	'lstat croaks after -T _' );
-    eval { -l _ };
-    like( $@, qr/^The stat preceding -l _ wasn't an lstat/,
-	'-l _ croaks after -T _' );
+    dies_like(sub { lstat _ },
+              qr/^The stat preceding lstat\(\) wasn't an lstat/,
+              'lstat croaks after -T _' );
+    dies_like(sub { -l _ },
+              qr/^The stat preceding -l _ wasn't an lstat/,
+              '-l _ croaks after -T _' );
     unlink $linkname or print "# unlink $linkname failed: $!\n";
 }
 

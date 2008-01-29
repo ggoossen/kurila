@@ -808,6 +808,8 @@ perl_destruct(pTHXx)
     }
 
     /* unhook hooks which will soon be, or use, destroyed data */
+    SvREFCNT_dec(PL_errorcreatehook);
+    PL_errorcreatehook = NULL;
     SvREFCNT_dec(PL_warnhook);
     PL_warnhook = NULL;
     SvREFCNT_dec(PL_diehook);

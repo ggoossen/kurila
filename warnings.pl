@@ -268,6 +268,8 @@ print WARN <<'EOM' ;
 
 /* if PL_warnhook is set to this value, then warnings die */
 #define PERL_WARNHOOK_FATAL	(&PL_sv_placeholder)
+/* if PL_diehook is set to this value, then a fatal warning is printed */
+#define PERL_DIEHOOK_FATAL	(&PL_sv_placeholder)
 EOM
 
 my $offset = 0 ;

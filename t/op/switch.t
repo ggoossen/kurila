@@ -14,10 +14,10 @@ use feature 'switch';
 no warnings "numeric";
 
 eval { continue };
-like($@, qr/^Can't "continue" outside/, "continue outside");
+like($@->{description}, qr/^Can't "continue" outside/, "continue outside");
 
 eval { break };
-like($@, qr/^Can't "break" outside/, "break outside");
+like($@->{description}, qr/^Can't "break" outside/, "break outside");
 
 # Scoping rules
 
@@ -537,7 +537,7 @@ my $f = tie my $v, "FetchCounter";
 	when ("two") {
 	    is($first, 0, "Loop: second");
 	    eval {break};
-	    like($@, qr/^Can't "break" in a loop topicalizer/,
+	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
 	when (1) {
@@ -554,7 +554,7 @@ my $f = tie my $v, "FetchCounter";
 	when ("two") {
 	    is($first, 0, "Explicit \$_: second");
 	    eval {break};
-	    like($@, qr/^Can't "break" in a loop topicalizer/,
+	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
 	when (1) {
@@ -572,7 +572,7 @@ my $f = tie my $v, "FetchCounter";
 	when ("two") {
 	    is($first, 0, "Implicitly lexical loop: second");
 	    eval {break};
-	    like($@, qr/^Can't "break" in a loop topicalizer/,
+	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
 	when (1) {
@@ -590,7 +590,7 @@ my $f = tie my $v, "FetchCounter";
 	when ("two") {
 	    is($first, 0, "Implicitly lexical, explicit \$_: second");
 	    eval {break};
-	    like($@, qr/^Can't "break" in a loop topicalizer/,
+	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
 	when (1) {
@@ -607,7 +607,7 @@ my $f = tie my $v, "FetchCounter";
 	when ("two") {
 	    is($first, 0, "Lexical loop: second");
 	    eval {break};
-	    like($@, qr/^Can't "break" in a loop topicalizer/,
+	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
 	when (1) {

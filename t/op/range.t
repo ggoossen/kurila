@@ -188,4 +188,4 @@ is(join(":", map "[$_]", @foo), '[]');
 }
 
 eval 'scalar(1..3)';
-like($@, qr/range operator \.\. can only be used in list context/);
+like($@->{description}, qr/range operator \.\. can only be used in list context/);

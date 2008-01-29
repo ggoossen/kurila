@@ -63,7 +63,7 @@ our @a = (1, 2, 3);
   @a = sort { last ; } @a;
 }
 EXPECT
-Can't "last" outside a loop block at - line 3.
+Can't "last" outside a loop block at - line 3
 ########
 package TEST;
  
@@ -74,7 +74,7 @@ sub TIESCALAR {
 sub FETCH {
   eval 'die("test")';
   print "still in fetch\n";
-  return ">$@<";
+  return ">" . $@->message() . "<";
 }
 package main;
  
@@ -82,7 +82,9 @@ tie my $bar, 'TEST';
 print "- $bar\n";
 EXPECT
 still in fetch
-- >test at (eval 1) line 1.
+- >test at (eval 1) line 1
+    (eval) called at - line 8
+    TEST::FETCH called at - line 15
 <
 ########
 package TEST;
@@ -180,7 +182,8 @@ exit;
 bar:
 print "bar reached\n";
 EXPECT
-Can't "goto" out of a pseudo block at - line 2.
+Can't "goto" out of a pseudo block at - line 2
+    main::foo called at - line 6
 ########
 our %seen = ();
 sub sortfn {
@@ -210,7 +213,7 @@ foo:
   @a = sort { last foo; } @a;
 }
 EXPECT
-Label not found for "last foo" at - line 2.
+Label not found for "last foo" at - line 2
 ########
 package TEST;
  
@@ -233,7 +236,8 @@ tie our $bar, 'TEST';
 }
 print "OK\n";
 EXPECT
-Can't "next" outside a loop block at - line 8.
+Can't "next" outside a loop block at - line 8
+    TEST::FETCH called at - line 18
 ########
 package TEST;
  
@@ -254,7 +258,8 @@ exit;
 bbb:
 print "bbb\n";
 EXPECT
-Can't find label bbb at - line 8.
+Can't find label bbb at - line 8
+    TEST::FETCH called at - line 15
 ########
 sub foo {
   $a <+> $b unless eval('$a == 0 ? die("foo\n") : ($a <+> $b)');
@@ -291,7 +296,8 @@ package main;
 tie my $bar, 'TEST';
 }
 EXPECT
-Can't "next" outside a loop block at - line 4.
+Can't "next" outside a loop block at - line 4
+    TEST::TIESCALAR called at - line 9
 ########
 our @a = (1, 2, 3);
 foo:
@@ -313,18 +319,9 @@ eval { die };
 &{sub { eval 'die' }}();
 sub foo { eval { die } } foo();
 {package rmb; sub{ eval{die} } ->() };	# check __ANON__ knows package	
+print "Nothing\n";
 EXPECT
-In DIE
-main|-|8|(eval)
-In DIE
-main|-|9|(eval)
-main|-|9|main::__ANON__
-In DIE
-main|-|10|(eval)
-main|-|10|main::foo
-In DIE
-rmb|-|11|(eval)
-rmb|-|11|rmb::__ANON__
+Nothing
 ########
 package TEST;
  
@@ -351,9 +348,9 @@ sub TIEHASH { bless {}, 'TH' }
 sub STORE { eval { print "@_[1,2]\n" }; die "bar\n" }
 tie our %h, 'TH';
 eval { $h{A} = 1; print "never\n"; };
-print $@;
+print $@->{description};
 eval { $h{B} = 2; };
-print $@;
+print $@->{description};
 EXPECT
 A 1
 bar
@@ -382,16 +379,16 @@ tie *STDERR, '';
 { map ++$_, 1 }
 
 EXPECT
-Can't "next" outside a loop block at - line 2.
+recursive die
 ########
 sub TIEHANDLE { bless {} }
 sub PRINT { print "[TIE] $_[1]" }
 
 tie *STDERR, '';
-die "DIE\n";
+die "DIE";
 
 EXPECT
-[TIE] DIE
+[TIE] DIE at - line 5
 ########
 sub TIEHANDLE { bless {} }
 sub PRINT { 
@@ -406,4 +403,5 @@ use warnings FATAL => qw(uninitialized);
 print undef;
 
 EXPECT
-[TIE] Use of uninitialized value in print at - line 11.
+[TIE] recursive die at - line 5
+    main::PRINT called at - line 11

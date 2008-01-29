@@ -2455,9 +2455,9 @@ PP(pp_entersub)
 	    cv = sv_2cv(sv, &stash, &gv, 0);
 	}
 	if (!cv) {
-	    ENTER;
-	    SAVETMPS;
-	    goto try_autoload;
+	    SV* sub_name;
+	    gv_efullname4(sub_name, sv, NULL, TRUE);
+	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
 	}
 	break;
     default:
@@ -2509,7 +2509,6 @@ PP(pp_entersub)
     ENTER;
     SAVETMPS;
 
-  retry:
     if (!CvROOT(cv) && !CvXSUB(cv)) {
 	SV* sub_name;
 
@@ -2517,21 +2516,10 @@ PP(pp_entersub)
 	if (CvANON(cv) || !(gv = CvGV(cv)))
 	    DIE(aTHX_ "Undefined subroutine called");
 
-	/* autoloaded stub? */
-	if (cv != GvCV(gv)) {
-	    cv = GvCV(gv);
-	}
-	/* should call AUTOLOAD now? */
-	else {
-try_autoload:
-	    /* sorry */
-	    sub_name = sv_newmortal();
-	    gv_efullname4(sub_name, gv, NULL, TRUE);
-	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
-	}
-	if (!cv)
-	    DIE(aTHX_ "Not a CODE reference");
-	goto retry;
+	/* sorry */
+	sub_name = sv_newmortal();
+	gv_efullname4(sub_name, gv, NULL, TRUE);
+	DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
     }
 
     gimme = GIMME_V;
