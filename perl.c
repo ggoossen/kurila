@@ -5044,14 +5044,16 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		    LEAVE;
 		JMPENV_POP;
 
-		if (paramList == PL_beginav)
-		    Perl_croak(aTHX_ "BEGIN failed--compilation aborted");
-		else
-		    Perl_croak(aTHX_ "%s failed--call queue aborted",
-			paramList == PL_checkav ? "CHECK"
-			: paramList == PL_initav ? "INIT"
-			: paramList == PL_unitcheckav ? "UNITCHECK"
-			: "END");
+		Perl_vdie_common(atsv, FALSE);
+		die_where(atsv);
+/* 		if (paramList == PL_beginav) */
+/* 		    Perl_croak(aTHX_ "BEGIN failed--compilation aborted"); */
+/* 		else */
+/* 		    Perl_croak(aTHX_ "%s failed--call queue aborted", */
+/* 			paramList == PL_checkav ? "CHECK" */
+/* 			: paramList == PL_initav ? "INIT" */
+/* 			: paramList == PL_unitcheckav ? "UNITCHECK" */
+/* 			: "END"); */
 		/* NOTREACHED */
 	    }
 	    break;

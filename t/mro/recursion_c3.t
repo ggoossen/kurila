@@ -82,10 +82,10 @@ foreach my $loopy (@loopies) {
     };
 
     if(my $err = $@) {
-        if($err =~ m/ALRMTimeout/) {
+        if($err->{description} =~ m/ALRMTimeout/) {
             ok(0, "Loop terminated by SIGALRM");
         }
-        elsif($err =~ m/Recursive inheritance detected/) {
+        elsif($err->{description} =~ m/Recursive inheritance detected/) {
             ok(1, "Graceful exception thrown");
         }
         else {

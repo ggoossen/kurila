@@ -32,7 +32,7 @@ This tests the use of an eval{} block to wrap a next::method call.
       };
 
       if ($@) {
-        return $@;
+        return $@->{description};
       }
     }
 }

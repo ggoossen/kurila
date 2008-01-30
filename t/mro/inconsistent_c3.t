@@ -41,4 +41,4 @@ except TypeError:
 }
 
 eval { @Z::ISA = ('XY', 'YX') };
-like($@, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');
+like($@->{description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');

@@ -16,7 +16,7 @@ print $foo;
 
 print eval '
 $foo =;';		# this tests for a call through yyerror()
-if ($@->{location} =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
+if ($@->message =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
 
 print eval '$foo = m/';	# this tests for a call through fatal()
 if ($@->{description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
@@ -52,7 +52,7 @@ eval {
     print "ok 14\n";
     die "ok 16\n";
     1;
-} || print "ok 15\n$@";
+} || print "ok 15\n$@->{description}";
 
 # check whether eval EXPR determines value of EXPR correctly
 
@@ -174,11 +174,6 @@ sub terminal { eval 'no strict; print $r' }
 }
 $x++;
 
-# Have we cured panic which occurred with require/eval in die handler ?
-$SIG{__DIE__} = sub { eval {1}; die shift }; 
-eval { die "ok ".$x++,"\n" }; 
-print $@;
-
 # does scalar eval"" pop stack correctly?
 {
     my $c = eval "(1,2)x10";
@@ -209,6 +204,8 @@ print $@;
     print "ok $x\n";
     $x++;
 }
+
+print "ok 40\n";
 
 # Check that eval catches bad goto calls
 #   (BUG ID 20010305.003)
@@ -443,7 +440,7 @@ $got = runperl (
     'no strict; sub A::TIEARRAY { L: { eval { last L } } } tie @a, A; warn qq(ok\n)',
 stderr => 1);
 
-print "not " unless $got eq "ok\n";
+print "not " unless $got =~ qr/^ok\n/;
 print "ok $test - eval and last\n"; $test++;
 
 # eval undef should be the same as eval "" barring any warnings

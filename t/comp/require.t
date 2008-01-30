@@ -61,7 +61,7 @@ $i++;
 
 # run-time failure in require
 do_require "0;\n";
-print "# $@\nnot " unless $@ =~ m/did not return a true/;
+print "# $@\nnot " unless $@->message =~ m/did not return a true/;
 print "ok ",$i++,"\n";
 
 print "not " if exists $INC{'bleah.pm'};
@@ -86,7 +86,7 @@ for my $expected_compile (1,0) {
 do_require "1)\n";
 # bison says 'parse error' instead of 'syntax error',
 # various yaccs may or may not capitalize 'syntax'.
-print "# $@\nnot " unless $@ =~ m/(syntax|parse) error/mi;
+print "# $@\nnot " unless $@->message =~ m/(syntax|parse) error/mi;
 print "ok ",$i++,"\n";
 
 # previous failure cached in %INC
@@ -96,7 +96,7 @@ write_file($flag_file, 1);
 write_file('bleah.pm', "unlink '$flag_file'; 1");
 print "# $@\nnot " if eval { require 'bleah.pm' };
 print "ok ",$i++,"\n";
-print "# $@\nnot " unless $@ =~ m/Compilation failed/i;
+print "# $@\nnot " unless $@->message =~ m/Compilation failed/i;
 print "ok ",$i++,"\n";
 print "not " unless -e $flag_file;
 print "ok ",$i++,"\n";
@@ -141,7 +141,7 @@ $foo = eval  {require bleah}; delete $INC{"bleah.pm"}; ++$::i;
 my $r = "threads";
 eval { require $r };
 $i++;
-if($@ =~ m/Can't locate threads in \@INC/) {
+if($@->message =~ m/Can't locate threads in \@INC/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";
@@ -151,7 +151,7 @@ if($@ =~ m/Can't locate threads in \@INC/) {
 write_file('bleah.pm', qq(die "This is an expected error";\n));
 delete $INC{"bleah.pm"}; ++$::i;
 eval { CORE::require bleah; };
-if ($@ =~ m/^This is an expected error/) {
+if ($@->message =~ m/^This is an expected error/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";
@@ -205,7 +205,7 @@ EOT
     require krunch;
     eval {CORE::require whap; 1} and die;
 
-    if ($@ =~ m/^This is an expected error/) {
+    if ($@->message =~ m/^This is an expected error/) {
 	print "ok $pmc_dies\n";
     } else {
 	print "not ok $pmc_dies\n";

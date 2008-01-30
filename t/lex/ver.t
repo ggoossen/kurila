@@ -27,7 +27,7 @@ is($x, 'v77.78.79','poetry optimization with dots');
 
 # hash keys too
 eval "111.107.32";
-like( $@, qr/Too many decimal points/ );
+like( $@->{description}, qr/Too many decimal points/ );
 
 # See if the things Camel-III says are true: 29..33
 
@@ -50,6 +50,6 @@ ok( exists $h{v65}, "v-stringness is not engaged for vX" );
 %h = (v65.66 => 42);
 ok( exists $h{'v65.66'}, "v-stringness is engaged for vX.Y" );
 eval ' %h = (65.66.67 => 42); ';
-like($@, qr/Too many decimal points/);
+like($@->{description}, qr/Too many decimal points/);
 
 
