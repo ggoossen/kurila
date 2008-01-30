@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 my $warn = "";
-$SIG{q(__WARN__)} = sub { print $warn; $warn .= join("",@_) };
+$SIG{q(__WARN__)} = sub { print $warn; $warn .= $_[0]->{description} . "\n" };
 
 sub uninitialized { $warn =~ s/Use of uninitialized value[^\n]+\n//s; }
 sub tiex { tie $_[0], 'main' }

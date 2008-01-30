@@ -63,13 +63,13 @@ sub isnt ($$;$) {
 }
 
 eval "use 5.000";	# implicit semicolon
-like ($@, qr/use VERSION is not valid in Perl Kurila/);
+like ($@->message, qr/use VERSION is not valid in Perl Kurila/);
 
 eval "use 5.000;";
-like ($@, qr/use VERSION is not valid in Perl Kurila/);
+like ($@->message, qr/use VERSION is not valid in Perl Kurila/);
 
 eval "use 6.000;";
-like ($@, qr/use VERSION is not valid in Perl Kurila/);
+like ($@->message, qr/use VERSION is not valid in Perl Kurila/);
 
 # fake package 'testuse'
 our $testimport;
@@ -95,7 +95,7 @@ eval "use testuse v1.0";
 is ($@, '');
 
 eval "use testuse v1.01";
-like ($@, qr/testuse version v1.1.0 required--this is only version v1.0.0/);
+like ($@->message, qr/testuse version v1.1.0 required--this is only version v1.0.0/);
 
 eval "use testuse v0.9 qw(fred)";
 is ($@, '');
@@ -115,7 +115,7 @@ is $testimport->[1], "joe", "testimport is still 'joe'";
     is ($@, '');
 
     eval "use testuse v100.105";
-    like ($@, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);
+    like ($@->message, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);
 
     eval "use testuse v33.55";
     is ($@, '');
@@ -125,20 +125,20 @@ is $testimport->[1], "joe", "testimport is still 'joe'";
     like ($@, '');
 
     eval "use testuse v100.105";
-    like ($@, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);
+    like ($@->message, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);
 
     eval "use testuse v33.55";
     is ($@, '');
 
     eval "use testuse v100.105";
-    like ($@, qr/testuse version v100.105.0 required--this is only version v35.360.0/);
+    like ($@->message, qr/testuse version v100.105.0 required--this is only version v35.360.0/);
 
     local $testuse::VERSION = v35.36;
     eval "use testuse v33.55";
     is ($@, '');
 
     eval "use testuse v100.105";
-    like ($@, qr/testuse version v100.105.0 required--this is only version v35\.36\.0/);
+    like ($@->message, qr/testuse version v100.105.0 required--this is only version v35\.36\.0/);
 
     eval "use testuse v33.55";
     is ($@, '');
@@ -152,6 +152,6 @@ is $testimport->[1], "joe", "testimport is still 'joe'";
     print F "1;\n";
     close F;
     eval "use lib '.'; use xxx v3;";
-    like ($@, qr/^xxx defines neither package nor VERSION--version check failed at/);
+    like ($@->message, qr/^xxx defines neither package nor VERSION--version check failed at/);
     unlink 'xxx.pm';
 }

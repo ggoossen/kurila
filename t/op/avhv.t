@@ -21,7 +21,7 @@ plan(tests => 40);
 # Helper function to check the typical error message.
 sub not_hash {
     my($err) = shift;
-    like( $err, qr/^Not a HASH reference / ) ||
+    like( $err->{description}, qr/^Not a HASH reference/ ) ||
       printf STDERR "# at %s line %d.\n", (caller)[1,2];
 }
 

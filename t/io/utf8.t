@@ -155,7 +155,7 @@ SKIP: {
 	my @warnings;
 	open F, "<:utf8", "a" or die $!;
 	$x = ~< *F; chomp $x;
-	local $SIG{__WARN__} = sub { push @warnings, $_[0]; };
+	local $SIG{__WARN__} = sub { push @warnings, $_[0]->message; };
 	eval { sprintf "%vd\n", $x };
 	is (scalar @warnings, 1);
 	like ($warnings[0], qr/Malformed UTF-8 character \(unexpected continuation byte 0x82, with no preceding start byte/);
@@ -251,11 +251,11 @@ is($failed, undef);
     undef $@;
     my $line = ~< *F;
     my ($chrE4, $chrF6) = ("E4", "F6");
-    like( $@, qr/utf8 "\\x$chrE4" does not map to Unicode .+ <F> line 1/,
+    like( $@->message, qr/utf8 "\\x$chrE4" does not map to Unicode .+ <F> line 1/,
 	  "<:utf8 readline must warn about bad utf8");
     undef $@;
     $line .= ~< *F;
-    like( $@, qr/utf8 "\\x$chrF6" does not map to Unicode .+ <F> line 2/,
+    like( $@->message, qr/utf8 "\\x$chrF6" does not map to Unicode .+ <F> line 2/,
 	  "<:utf8 rcatline must warn about bad utf8");
     close F;
 }

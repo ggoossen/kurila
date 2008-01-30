@@ -408,7 +408,7 @@ print "# CORE::open => ($p)\nnot " if ($p = prototype('CORE::open')) ne '*;$@';
 print "ok ", $i++, "\n";
 
 print "# CORE:Foo => ($p), \$@ => `$@'\nnot " 
-    if defined ($p = eval { prototype('CORE::Foo') or 1 }) or $@ !~ m/^Can't find an opnumber/;
+    if defined ($p = eval { prototype('CORE::Foo') or 1 }) or $@->message !~ m/^Can't find an opnumber/;
 print "ok ", $i++, "\n";
 
 # correctly note too-short parameter lists that don't end with '$',
@@ -416,12 +416,12 @@ print "ok ", $i++, "\n";
 
 sub foo1 ($\@);
 eval q{ foo1 "s" };
-print "not " unless $@ =~ m/^Not enough/;
+print "not " unless $@->message =~ m/^Not enough/;
 print "ok ", $i++, "\n";
 
 sub foo2 ($\%);
 eval q{ foo2 "s" };
-print "not " unless $@ =~ m/^Not enough/;
+print "not " unless $@->message =~ m/^Not enough/;
 print "ok ", $i++, "\n";
 
 sub X::foo3;
@@ -552,7 +552,7 @@ for my $p ( "", qw{ () ($) ($@) ($%) ($;$) (&) (&\@) (&@) (%) (\%) (\@) } ) {
   no warnings 'prototype';
   my $eval = "sub evaled_subroutine $p \{ &void *; \}";
   eval $eval;
-  print "# eval[$eval]\nnot " unless $@ && $@ =~ m/(parse|syntax) error/i;
+  print "# eval[$eval]\nnot " unless $@ && $@->message =~ m/(parse|syntax) error/i;
   print "ok ", $i++, "\n";
 }
 
@@ -586,24 +586,24 @@ print "ok ", $i++, "\n";
 
     eval q/sub multi1 (\[%@]) { 1 } multi1 $myvar;/;
     print "not "
-	unless $@ =~ m/Type of arg 1 to main::multi1 must be one of \[%\@\] /;
+	unless $@->message =~ m/Type of arg 1 to main::multi1 must be one of \[%\@\] /;
     print "ok ", $i++, "\n";
     eval q/sub multi2 (\[$*&]) { 1 } multi2 @myarray;/;
     print "not "
-	unless $@ =~ m/Type of arg 1 to main::multi2 must be one of \[\$\*&\] /;
+	unless $@->message =~ m/Type of arg 1 to main::multi2 must be one of \[\$\*&\] /;
     print "ok ", $i++, "\n";
     eval q/sub multi3 (\[$@]) { 1 } multi3 %myhash;/;
     print "not "
-	unless $@ =~ m/Type of arg 1 to main::multi3 must be one of \[\$\@\] /;
+	unless $@->message =~ m/Type of arg 1 to main::multi3 must be one of \[\$\@\] /;
     print "ok ", $i++, "\n";
     eval q/sub multi4 ($\[%]) { 1 } multi4 1, &mysub;/;
     print "not "
-	unless $@ =~ m/Type of arg 2 to main::multi4 must be one of \[%\] /;
+	unless $@->message =~ m/Type of arg 2 to main::multi4 must be one of \[%\] /;
     print "ok ", $i++, "\n";
     eval q/sub multi5 (\[$@]$) { 1 } multi5 *myglob;/;
     print "not "
-	unless $@ =~ m/Type of arg 1 to main::multi5 must be one of \[\$\@\] /
-	    && $@ =~ m/Not enough arguments/;
+	unless $@->message =~ m/Type of arg 1 to main::multi5 must be one of \[\$\@\] /
+	    && $@->message =~ m/Not enough arguments/;
     print "ok ", $i++, "\n";
 }
 
@@ -611,7 +611,7 @@ print "ok ", $i++, "\n";
 {
   use warnings 'syntax';
   my $warn = "";
-  local $SIG{__WARN__} = sub { $warn .= join("",@_) };
+  local $SIG{__WARN__} = sub { $warn .= $_[0]->{description} . "\n" };
   
   eval 'sub badproto (@bar) { 1; }';
   print "not " unless $warn =~ m/Illegal character in prototype for main::badproto : \@bar/;
@@ -637,5 +637,5 @@ print "ok ", $i++, "\n";
 
 # Ought to fail, doesn't in 5.8.1.
 eval 'sub bug (\[%@]) {  } my $array = [0 .. 1]; bug %$array;';
-print "not " unless $@ =~ m/Not a HASH reference/;
+print "not " unless $@->message =~ m/Not a HASH reference/;
 print "ok ", $i++, "\n";

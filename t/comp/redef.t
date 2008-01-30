@@ -5,7 +5,7 @@
 our $warn;
 BEGIN {
     $warn = "";
-    $SIG{__WARN__} = sub { $warn .= join("",@_) }
+    $SIG{__WARN__} = sub { $warn .= $_[0]->message }
 }
 
 sub ok ($$) { 
@@ -80,6 +80,8 @@ BEGIN {
 
 ok 18, $warn =~ s/$NEWPROTO \Qsub main::sub10 () vs none\E[^\n]+\n//s;
 ok 19, $warn =~ s/Constant subroutine sub10 redefined[^\n]+\n//s;
+
+$warn =~ s/\s+\(eval\) called at .* line .*\n//g;
 
 ok 20, $warn eq '';
 

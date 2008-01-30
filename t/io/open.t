@@ -35,7 +35,7 @@ my $Perl = which_perl();
     ok( -f $f,                  '       still a file' );
 
     eval  { die "Message" };
-    like( $@, qr/<\$f> line 1/, '       die message correct' );
+    like( $@->message, qr/<\$f> line 1/, '       die message correct' );
     
     ok( close($f),              '       close()' );
     ok( unlink("afile"),        '       unlink()' );
@@ -112,7 +112,7 @@ EOC
 
 
 ok( !eval { open my $f, '<&', 'afile'; 1; },    '<& on a non-filehandle' );
-like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
+like( $@->message, qr/Bad filehandle:\s+afile/,          '       right error' );
 
 
 # local $file tests
@@ -132,7 +132,7 @@ like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
     ok( -f $f,                          '       still a file' );
 
     eval  { die "Message" };
-    like( $@, qr/<\$f> line 1/,         '       proper die message' );
+    like( $@->message, qr/<\$f> line 1/,         '       proper die message' );
     ok( close($f),                      '       close' );
 
     unlink("afile");
@@ -207,7 +207,7 @@ EOC
 
 
 ok( !eval { open local $f, '<&', 'afile'; 1 },  'local <& on non-filehandle');
-like( $@, qr/Bad filehandle:\s+afile/,          '       right error' );
+like( $@->message, qr/Bad filehandle:\s+afile/,          '       right error' );
 
 {
     local *F;
@@ -247,7 +247,7 @@ SKIP: {
 
 {
     ok( !eval { open F, "BAR", "QUUX" },       'Unknown open() mode' );
-    like( $@, qr/\QUnknown open() mode 'BAR'/, '       right error' );
+    like( $@->message, qr/\QUnknown open() mode 'BAR'/, '       right error' );
 }
 
 {
@@ -262,33 +262,33 @@ SKIP: {
 
     open($fh0[0], "<", "TEST");
     gimme($fh0[0]);
-    like($@, qr/<\$fh0\[...\]> line 1\./, "autoviv fh package aelem");
+    like($@->message, qr/<\$fh0\[...\]> line 1/, "autoviv fh package aelem");
 
     open($fh1{k}, "<", "TEST");
     gimme($fh1{k});
-    like($@, qr/<\$fh1{...}> line 1\./, "autoviv fh package helem");
+    like($@->message, qr/<\$fh1{...}> line 1/, "autoviv fh package helem");
 
     my @fh2;
     open($fh2[0], "<", "TEST");
     gimme($fh2[0]);
-    like($@, qr/<\$fh2\[...\]> line 1\./, "autoviv fh lexical aelem");
+    like($@->message, qr/<\$fh2\[...\]> line 1/, "autoviv fh lexical aelem");
 
     my %fh3;
     open($fh3{k}, "<", "TEST");
     gimme($fh3{k});
-    like($@, qr/<\$fh3{...}> line 1\./, "autoviv fh lexical helem");
+    like($@->message, qr/<\$fh3{...}> line 1/, "autoviv fh lexical helem");
 }
     
 SKIP: {
     skip("These tests use perlio", 5) unless $Config{useperlio};
     my $w;
     use warnings 'layer';
-    local $SIG{__WARN__} = sub { $w = shift };
+    local $SIG{__WARN__} = sub { $w = shift->message };
 
     eval { open(F, ">>>", "afile") };
     like($w, qr/Invalid separator character '>' in PerlIO layer spec/,
 	 "bad open (>>>) warning");
-    like($@, qr/Unknown open\(\) mode '>>>'/,
+    like($@->message, qr/Unknown open\(\) mode '>>>'/,
 	 "bad open (>>>) failure");
 
     eval { open(F, ">:u", "afile" ) };
@@ -298,7 +298,7 @@ SKIP: {
     like($w, qr/Unknown PerlIO layer "u"/,
 	 'bad layer "<:u" warning');
     eval { open(F, ":c", "afile" ) };
-    like($@, qr/Unknown open\(\) mode ':c'/,
+    like($@->message, qr/Unknown open\(\) mode ':c'/,
 	 'bad layer ":c" failure');
 }
 
@@ -316,4 +316,4 @@ fresh_perl_is(
 # an exception
 
 eval { open $99, "<", "foo" };
-like($@, qr/Modification of a read-only value attempted/, "readonly fh");
+like($@->message, qr/Modification of a read-only value attempted/, "readonly fh");

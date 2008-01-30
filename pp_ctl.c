@@ -2273,13 +2273,14 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	else {
 	    SV *msv;
 
+	    dSP;
 	    ENTER;
 	    PUSHSTACKi(PERLSI_DIEHOOK);
 
 	    PUSHMARK(SP);
 	    XPUSHs(ERRSV);
 	    PUTBACK;
-	    call_pv("error::create", G_SCALAR);
+	    call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
 	    msv = SvREFCNT_inc(POPs);
 	    SvREFCNT_dec(ERRSV);

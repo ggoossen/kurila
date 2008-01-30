@@ -128,7 +128,7 @@ sub check_env {
         is( abs_path, $Cwd,       '  and back again' );
 
         my $warning = '';
-        local $SIG{__WARN__} = sub { $warning .= join '', @_ };
+        local $SIG{__WARN__} = sub { $warning .= $_[0]->{description} . "\n" };
 
 
         # Check the deprecated chdir(undef) feature.
@@ -136,8 +136,8 @@ sub check_env {
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV\{$key\} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
-Use of uninitialized value in chdir at $0 line 64.
-Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 64.
+Use of uninitialized value in chdir
+Use of chdir('') or chdir(undef) as chdir() is deprecated
 WARNING
 
         chdir($Cwd);
@@ -148,7 +148,7 @@ WARNING
         ok( chdir(''),              "chdir('') w/ only \$ENV\{$key\} set" );
         is( abs_path, $ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got deprecation warning' );
-Use of chdir('') or chdir(undef) as chdir() is deprecated at $0 line 76.
+Use of chdir('') or chdir(undef) as chdir() is deprecated
 WARNING
 
         chdir($Cwd);
