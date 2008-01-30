@@ -107,7 +107,7 @@ sub goto_croak { goto &mycroak }
     my $e;
     for (1..4) {
 	eval { goto_croak("boo$_\n") };
-	$e .= $@;
+	$e .= $@->{description};
     }
     print $e eq "boo1\nboo2\nboo3\nboo4\n" ? "ok 11\n" : "not ok 11\n";
 }

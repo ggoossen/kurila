@@ -4077,13 +4077,14 @@ STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
 
 STATIC SV*	S_mess_alloc(pTHX);
 STATIC SV*	S_vdie_croak_common(pTHX_ const char *pat, va_list *args);
-PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msg, bool warn)
-			__attribute__nonnull__(pTHX_1);
-
 STATIC char *	S_write_no_mem(pTHX)
 			__attribute__noreturn__;
 
 #endif
+
+PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msg, bool warn)
+			__attribute__nonnull__(pTHX_1);
+
 
 #if defined(PERL_IN_NUMERIC_C) || defined(PERL_DECL_PROT)
 STATIC NV	S_mulexp10(NV value, I32 exponent);

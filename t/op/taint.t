@@ -784,59 +784,56 @@ SKIP: {
 
 	my $evil = "foo" . $TAINT;
 
-	eval { sysopen(my $ro, $evil, &O_RDONLY) };
-	test $@ !~ m/^Insecure dependency/, $@;
+	dies_not( sub { sysopen(my $ro, $evil, &O_RDONLY) } );
 	
-	eval { sysopen(my $wo, $evil, &O_WRONLY) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $wo, $evil, &O_WRONLY) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $rw, $evil, &O_RDWR) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $rw, $evil, &O_RDWR) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $ap, $evil, &O_APPEND) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $ap, $evil, &O_APPEND) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $cr, $evil, &O_CREAT) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $cr, $evil, &O_CREAT) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $tr, $evil, &O_TRUNC) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $tr, $evil, &O_TRUNC) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $ro, "foo", &O_RDONLY ^|^ $TAINT0) };
-	test $@ !~ m/^Insecure dependency/, $@;
+        dies_not( sub { sysopen(my $ro, "foo", &O_RDONLY ^|^ $TAINT0) } );
 	
-	eval { sysopen(my $wo, "foo", &O_WRONLY ^|^ $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $wo, "foo", &O_WRONLY ^|^ $TAINT0) },
+                   qr/^Insecure dependency/);
 
-	eval { sysopen(my $rw, "foo", &O_RDWR ^|^ $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $rw, "foo", &O_RDWR ^|^ $TAINT0) },
+                   qr/^Insecure dependency/);
 
-	eval { sysopen(my $ap, "foo", &O_APPEND ^|^ $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $ap, "foo", &O_APPEND ^|^ $TAINT0) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $cr, "foo", &O_CREAT ^|^ $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $cr, "foo", &O_CREAT ^|^ $TAINT0) },
+                   qr/^Insecure dependency/);
 
-	eval { sysopen(my $tr, "foo", &O_TRUNC ^|^ $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $tr, "foo", &O_TRUNC ^|^ $TAINT0) },
+                   qr/^Insecure dependency/);
 
-	eval { sysopen(my $ro, "foo", &O_RDONLY, $TAINT0) };
-	test $@ !~ m/^Insecure dependency/, $@;
+	dies_not( sub { sysopen(my $ro, "foo", &O_RDONLY, $TAINT0) } );
 	
-	eval { sysopen(my $wo, "foo", &O_WRONLY, $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $wo, "foo", &O_WRONLY, $TAINT0) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $rw, "foo", &O_RDWR, $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $rw, "foo", &O_RDWR, $TAINT0) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $ap, "foo", &O_APPEND, $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $ap, "foo", &O_APPEND, $TAINT0) },
+                   qr/^Insecure dependency/);
 	
-	eval { sysopen(my $cr, "foo", &O_CREAT, $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $cr, "foo", &O_CREAT, $TAINT0) },
+                   qr/^Insecure dependency/);
 
-	eval { sysopen(my $tr, "foo", &O_TRUNC, $TAINT0) };
-	test $@ =~ m/^Insecure dependency/, $@;
+	dies_like( sub { sysopen(my $tr, "foo", &O_TRUNC, $TAINT0) },
+                   qr/^Insecure dependency/);
 	
 	unlink("foo"); # not unlink($evil), because that would fail...
     }

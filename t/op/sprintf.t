@@ -53,12 +53,12 @@ while ( ~< *DATA) {
 print '1..', scalar @tests, "\n";
 
 $SIG{__WARN__} = sub {
-    if ($_[0] =~ m/^Invalid conversion/) {
+    if ($_[0]->{description} =~ m/^Invalid conversion/) {
 	$w = ' INVALID';
-    } elsif ($_[0] =~ m/^Use of uninitialized value/) {
+    } elsif ($_[0]->{description}=~ m/^Use of uninitialized value/) {
 	$w = ' UNINIT';
     } else {
-	warn @_;
+	warn $_[0]->{description};
     }
 };
 

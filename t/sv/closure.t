@@ -246,7 +246,7 @@ DEBUG_INFO
 	  $code .= <<"END_MARK_ONE";
 
 BEGIN \{ \$SIG\{__WARN__\} = sub \{ 
-    my \$msg = \$_[0];
+    my \$msg = \$_[0]->message;
 END_MARK_ONE
 
 	  $code .=  <<"END_MARK_TWO" if $nc_attempt;

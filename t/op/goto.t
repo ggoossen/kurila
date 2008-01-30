@@ -273,7 +273,7 @@ $::LINE = __LINE__ + 1;
 {
     my $wherever = 'NOWHERE';
     eval { goto $wherever };
-    like($@, qr/Can't find label NOWHERE/, 'goto NOWHERE sets $@');
+    like($@->{description}, qr/Can't find label NOWHERE/, 'goto NOWHERE sets $@');
 }
 
 # see if a modified @_ propagates
@@ -306,7 +306,7 @@ moretests:
 	goto L4 if $z == 10;
 	last;
     };
-    like($@, qr/Can't "goto" into the middle of a foreach loop/,
+    like($@->{description}, qr/Can't "goto" into the middle of a foreach loop/,
 	    'catch goto middle of foreach');
 
     $z = 0;
@@ -422,9 +422,9 @@ a32039();
 
 sub null { 1 };
 eval 'goto &null';
-like($@, qr/Can't goto subroutine from an eval-string/, 'eval string');
+like($@->{description}, qr/Can't goto subroutine from an eval-string/, 'eval string');
 eval { goto &null };
-like($@, qr/Can't goto subroutine from an eval-block/, 'eval block');
+like($@->{description}, qr/Can't goto subroutine from an eval-block/, 'eval block');
 
 # [perl #36521] goto &foo in warn handler could defeat recursion avoider
 
@@ -433,7 +433,7 @@ like($@, qr/Can't goto subroutine from an eval-block/, 'eval block');
 		stderr => 1,
 		prog => 'my $d; my $w = sub { return if $d++; warn q(bar)}; local $SIG{__WARN__} = sub { goto &$w; }; warn q(foo);'
     );
-    like($r, qr/bar/, "goto &foo in warn");
+    like($r, qr/recursive die/, "goto &foo in warn");
 }
 
 TODO: {

@@ -1538,10 +1538,10 @@ s	|char*	|stdize_locale	|NN char* locs
 s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 s	|SV*	|mess_alloc
 s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
-p	|bool	|vdie_common	|NN SV *msg \
-				|bool warn
 sr	|char *	|write_no_mem
 #endif
+
+p	|bool	|vdie_common	|NN SV *msg|bool warn
 
 #if defined(PERL_IN_NUMERIC_C) || defined(PERL_DECL_PROT)
 sn	|NV|mulexp10	|NV value|I32 exponent

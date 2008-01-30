@@ -11,7 +11,7 @@ plan tests => 11;
 my $Perl = which_perl();
 
 my $warning;
-local $SIG{__WARN__} = sub { $warning = join "\n", @_; };
+local $SIG{__WARN__} = sub { $warning = $_[0]->message; };
 my $Tmsg = 'while running with -t switch';
 
 is( ${^TAINT}, -1, '${^TAINT} == -1' );

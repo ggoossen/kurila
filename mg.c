@@ -2747,7 +2747,8 @@ Perl_sighandler(int sig)
         (void)rsignal(sig, PL_csighandlerp);
 #endif
 #endif /* !PERL_MICRO */
-        Perl_croak(aTHX_ NULL);
+        Perl_vdie_common(pTHX_ ERRSV, FALSE);
+	die_where(ERRSV);
     }
 cleanup:
     if (flags & 1)

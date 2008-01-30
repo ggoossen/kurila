@@ -327,35 +327,39 @@ if (fork) {
     die "parent died";
 }
 else {
-    die "child died";
+    sleep 1; die "child died";
 }
 EXPECT
-parent died at - line 2.
-child died at - line 5.
+parent died at - line 2
+child died at - line 5
 ########
 if ($pid = fork) {
     eval { die "parent died" };
-    print $@;
+    print $@->message;
 }
 else {
-    eval { die "child died" };
-    print $@;
+    sleep 1; eval { die "child died" };
+    print $@->message;
 }
 EXPECT
-parent died at - line 2.
-child died at - line 6.
+parent died at - line 2
+    (eval) called at - line 6
+child died at - line 6
+    (eval) called at - line 2
 ########
 if (eval q{$pid = fork}) {
     eval q{ die "parent died" };
-    print $@;
+    print $@->message;
 }
 else {
-    eval q{ die "child died" };
-    print $@;
+    sleep 1; eval q{ die "child died" };
+    print $@->message;
 }
 EXPECT
-parent died at (eval 2) line 1.
-child died at (eval 2) line 1.
+parent died at (eval 2) line 1
+    (eval) called at - line 2
+child died at (eval 2) line 1
+    (eval) called at - line 6
 ########
 BEGIN {
     $| = 1;
@@ -465,7 +469,9 @@ EXPECT
 1
 ########
 # [perl #39145] Perl_dounwind() crashing with Win32's fork() emulation
-sub { @_ = 3; fork ? die "1\n" : die "1\n" }->(2);
+sub { @_ = 3; fork ? die "1" : die "1" }->(2);
 EXPECT
-1
-1
+1 at - line 2
+    main::__ANON__ called at - line 2
+1 at - line 2
+    main::__ANON__ called at - line 2

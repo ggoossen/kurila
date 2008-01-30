@@ -112,7 +112,7 @@ ok ! $a->can("export_tags");	# a method in Exporter
 cmp_ok eval { $a->VERSION }, '==', 2.718;
 
 dies_like( sub { $a->VERSION(2.719) }, 
-           qr/^Alice version 2.719 required--this is only version 2.718 at / );
+           qr/^Alice version 2.719 required--this is only version 2.718/ );
 
 ok (eval { $a->VERSION(2.718) });
 is $@, '';
