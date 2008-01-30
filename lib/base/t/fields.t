@@ -54,7 +54,7 @@ foreach (Foo->new) {
     };
     my $phash;
     eval { $phash = fields::phash(name => "Joe", rank => "Captain") };
-    like $@, qr/^Pseudo-hashes have been removed from Perl/;
+    like $@->{description}, qr/^Pseudo-hashes have been removed from Perl/;
 }
 
 

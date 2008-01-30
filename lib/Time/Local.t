@@ -123,7 +123,7 @@ for (@bad_time) {
 
     eval { timegm($sec,$min,$hour,$mday,$mon,$year) };
 
-    like($@, qr/.*out of range.*/, 'invalid time caused an error');
+    like($@->{description}, qr/.*out of range.*/, 'invalid time caused an error');
 }
 
 {
@@ -164,11 +164,11 @@ SKIP:
         unless $neg_epoch_ok;
 
     eval { timegm(0,0,0,29,1,1900) };
-    like($@, qr/Day '29' out of range 1\.\.28/,
+    like($@->{description}, qr/Day '29' out of range 1\.\.28/,
          'does not accept leap day in 1900');
 
     eval { timegm(0,0,0,29,1,200) };
-    like($@, qr/Day '29' out of range 1\.\.28/,
+    like($@->{description}, qr/Day '29' out of range 1\.\.28/,
          'does not accept leap day in 2100 (year passed as 200)');
 
     eval { timegm(0,0,0,29,1,0) };

@@ -36,10 +36,10 @@ eval { exists $!{[]} };
 ok(! $@);
 
 eval {$!{$err} = "qunckkk" };
-like($@, qr/^ERRNO hash is read only!/);
+like($@->{description}, qr/^ERRNO hash is read only!/);
 
 eval {delete $!{$err}};
-like($@, qr/^ERRNO hash is read only!/);
+like($@->{description}, qr/^ERRNO hash is read only!/);
 
 # The following tests are in trouble if some OS picks errno values
 # through Acme::MetaSyntactic::batman

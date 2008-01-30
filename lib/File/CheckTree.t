@@ -171,7 +171,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( $@ && $@ =~ m/lib is not a plain file/
+    if ( $@ && $@->{description} =~ m/lib is not a plain file/
             && not defined $num_warnings )
     {
         ok(1);
@@ -194,7 +194,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( $@ && $@ =~ m/yadda lib yadda/
+    if ( $@ && $@->{description} =~ m/yadda lib yadda/
             && not defined $num_warnings )
     {
         ok(1);
@@ -232,7 +232,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( $@ =~ m/syntax error/) {
+    if ( $@->{description} =~ m/syntax error/) {
 	# We got a syntax error for a malformed file query
         ok(1);
     } else {

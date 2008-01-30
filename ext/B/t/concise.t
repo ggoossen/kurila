@@ -103,7 +103,7 @@ SKIP: {
 my @stylespec;
 $@='';
 eval { add_style ('junk_B' => @stylespec) };
-like ($@, 'expecting 3 style-format args',
+like ($@->{description}, 'expecting 3 style-format args',
     "add_style rejects insufficient args");
 
 @stylespec = (0,0,0); # right length, invalid values
@@ -113,7 +113,7 @@ is ($@, '', "add_style accepts: stylename => 3-arg-array");
 
 $@='';
 eval { add_style (junk => @stylespec) };
-like ($@, qr/style 'junk' already exists, choose a new name/,
+like ($@->{description}, qr/style 'junk' already exists, choose a new name/,
     "add_style correctly disallows re-adding same style-name" );
 
 # test new arg-checks on set_style
@@ -124,7 +124,7 @@ is ($@, '', "set_style accepts 3 style-format args");
 @stylespec = (); # bad style
 
 eval { set_style (@stylespec) };
-like ($@, qr/expecting 3 style-format args/,
+like ($@->{description}, qr/expecting 3 style-format args/,
       "set_style rejects bad style-format args");
 
 #### for content with doc'd options
@@ -183,7 +183,7 @@ SKIP: {
 	    my $typ = ref $ref;
 	    walk_output(\my $out);
 	    eval { B::Concise::compile('-basic', $ref)->() };
-	    like ($@, qr/^err: not a coderef: $typ/,
+	    like ($@->{description}, qr/^err: not a coderef: $typ/,
 		  "compile detects $typ-ref where expecting subref");
 	    is($out,'', "no output when errd"); # announcement prints
 	}

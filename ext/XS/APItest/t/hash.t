@@ -57,12 +57,12 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
     };
     my $prefix = "Cannot modify shared string table in hv_";
     my $what = $prefix . 'fetch';
-    like ($@, qr/^$what/,$what);
+    like ($@->{description}, qr/^$what/,$what);
     eval {
 	XS::APItest::Hash::store($strtab, 'Boom!',  1)
     };
     $what = $prefix . 'store';
-    like ($@, qr/^$what/, $what);
+    like ($@->{description}, qr/^$what/, $what);
     if (0) {
 	A::B->method();
     }
@@ -71,7 +71,7 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
 	delete $strtab->{DESTROY};
     };
     $what = $prefix . 'delete';
-    like ($@, qr/^$what/, $what);
+    like ($@->{description}, qr/^$what/, $what);
     # I can't work out how to get to the code that flips the wasutf8 flag on
     # the hash key without some ikcy XS
 }

@@ -33,7 +33,7 @@ ok( eval "use if ($v_plus +> \$x), strict => 'refs'; 12" eq 12,
     '"use if" with a true condition, fake pragma');
 
 ok( (not defined eval "use if ($v_plus +> \$x), strict => 'bla'; 12"
-     and $@ =~ m/while "strict refs" in use/),
+     and $@->{description} =~ m/while "strict refs" in use/),
     '"use if" with a true condition and a pragma');
 
 # Old version had problems with the module name `open', which is a keyword too

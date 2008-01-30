@@ -27,7 +27,7 @@ my $Strict  = 'strict';
     my $rv = eval "require $Mod; 1";
     ok( !$rv,                   "$Mod require failed" );
     ok( $@,                     "   require died" );
-    like( $@, qr/locate/,       "       with expected error" );
+    like( $@->{description}, qr/locate/,       "       with expected error" );
 }
 
 ### check for an already loaded module

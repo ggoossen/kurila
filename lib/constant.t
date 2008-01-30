@@ -136,7 +136,7 @@ print $output CCODE->($curr_test+4);
 $TB->current_test($curr_test+4);
 
 eval q{ CCODE->{foo} };
-ok scalar($@ =~ m/^Constant is not a HASH/);
+ok scalar($@->{description} =~ m/^Constant is not a HASH/);
 
 
 # Allow leading underscore
@@ -147,7 +147,7 @@ is _PRIVATE, 47;
 eval q{
     use constant __DISALLOWED => "Oops";
 };
-like $@, qr/begins with '__'/;
+like $@->{description}, qr/begins with '__'/;
 
 # Check on declared() and %declared. This sub should be EXACTLY the
 # same as the one quoted in the docs!

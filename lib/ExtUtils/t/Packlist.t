@@ -77,7 +77,7 @@ can_ok( 'ExtUtils::Packlist', 'DESTROY' );
 
 # write is a little more complicated
 eval { ExtUtils::Packlist::write({}) };
-like( $@, qr/No packlist filename/, 'write() should croak without packfile' );
+like( $@->{description}, qr/No packlist filename/, 'write() should croak without packfile' );
 
 eval { ExtUtils::Packlist::write({}, 'eplist') };
 my $file_is_ready = $@ ? 0 : 1;
@@ -95,7 +95,7 @@ SKIP: {
 	    skip("cannot write readonly files", 1) if -w 'eplist';
 
 	    eval { ExtUtils::Packlist::write({}, 'eplist') };
-	    like( $@, qr/Can't open file/, 'write() should croak on open failure' );
+	    like( $@->{description}, qr/Can't open file/, 'write() should croak on open failure' );
 	}
 
 	#'now set it back (tick here fixes vim syntax highlighting ;)
@@ -119,11 +119,11 @@ SKIP: {
 
 
 eval { ExtUtils::Packlist::read({}) };
-like( $@, qr/^No packlist filename/, 'read() should croak without packfile' );
+like( $@->{description}, qr/^No packlist filename/, 'read() should croak without packfile' );
 
 
 eval { ExtUtils::Packlist::read({}, 'abadfilename') };
-like( $@, qr/^Can't open file/, 'read() should croak with bad packfile name' );
+like( $@->{description}, qr/^Can't open file/, 'read() should croak with bad packfile name' );
 #'open packfile for reading
 
 

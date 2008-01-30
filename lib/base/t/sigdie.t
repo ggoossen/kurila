@@ -22,7 +22,7 @@ use base;
       'base'->import(qw(Huh::Boo));
     };
 
-    ::like($@, qr/^Base class package "Huh::Boo" is empty/, 
+    ::like($@->{description}, qr/^Base class package "Huh::Boo" is empty/, 
          'Base class empty error message');
 }
 

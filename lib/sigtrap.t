@@ -17,14 +17,14 @@ local %SIG;
 
 # use a version of sigtrap.pm somewhat too high
 eval{ sigtrap->import(99999) };
-like( $@, qr/version 99999 required,/, 'import excessive version number' );
+like( $@->{description}, qr/version 99999 required,/, 'import excessive version number' );
 
 # use an invalid signal name
 eval{ sigtrap->import('abadsignal') };
-like( $@, qr/^Unrecognized argument abadsignal/, 'send bad signame to import' );
+like( $@->{description}, qr/^Unrecognized argument abadsignal/, 'send bad signame to import' );
 
 eval{ sigtrap->import('handler') };
-like( $@, qr/^No argument specified/, 'send handler without subref' );
+like( $@->{description}, qr/^No argument specified/, 'send handler without subref' );
 
 sigtrap->import('AFAKE');
 is( $SIG{AFAKE}, \&sigtrap::handler_traceback, 'install normal handler' );
@@ -65,7 +65,7 @@ like( $out->read, qr/^Installing handler/, 'does it talk with $Verbose set?' );
 
 # handler_die croaks with first argument
 eval { sigtrap::handler_die('FAKE') };
-like( $@, qr/^Caught a SIGFAKE/, 'does handler_die() croak?' );
+like( $@->{description}, qr/^Caught a SIGFAKE/, 'does handler_die() croak?' );
  
 package TieOut;
 

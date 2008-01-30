@@ -55,11 +55,11 @@ print "${e}ok 13\n";
 
 eval q{use vars qw(@X::y !abc); $e = ! *X::y{ARRAY} && 'not '};
 print "${e}ok 14\n";
-$e = $@ !~ m/^'!abc' is not a valid variable name/ && 'not ';
+$e = $@->{description} !~ m/^'!abc' is not a valid variable name/ && 'not ';
 print "${e}ok 15\n";
 
 eval 'use vars qw($x[3])';
-$e = $@ !~ m/^Can't declare individual elements of hash or array/ && 'not ';
+$e = $@->{description} !~ m/^Can't declare individual elements of hash or array/ && 'not ';
 print "${e}ok 16\n";
 
 { local $^W;
@@ -86,7 +86,7 @@ print "${e}ok 21\n";
 
 use strict 'vars';
 eval 'use vars qw(@y%%)';
-$e = $@ !~ m/^'\@y%%' is not a valid variable name under strict vars/ && 'not ';
+$e = $@->{description} !~ m/^'\@y%%' is not a valid variable name under strict vars/ && 'not ';
 print "${e}ok 22\n";
 $e = *{Symbol::fetch_glob('y%%')}{ARRAY} && 'not ';
 print "${e}ok 23\n";

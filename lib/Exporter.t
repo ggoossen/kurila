@@ -166,7 +166,7 @@ package Yet::More::Testing;
 @ISA = qw(Exporter);
 $VERSION = 0;
 eval { Yet::More::Testing->require_version(10); 1 };
-::ok($@ !~ m/\(undef\)/,       'require_version(10) and $VERSION = 0');
+::ok($@->{description} !~ m/\(undef\)/,       'require_version(10) and $VERSION = 0');
 
 
 my $warnings;

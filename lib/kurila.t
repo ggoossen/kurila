@@ -8,4 +8,4 @@ eval "use kurila 1.4";
 ok ! $@, "'use kurila 1.4'";
 
 eval "use kurila 1.99";
-like $@, qr/only version/;
+like $@->{description}, qr/only version/;

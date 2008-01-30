@@ -35,15 +35,15 @@ print "not " unless (values %a)[0] == 234;
 print "ok 4\n";
 
 eval { $a{abcd} = 123 };
-print "not " unless $@ =~ m/Key "abcd" is not 3 characters long/;
+print "not " unless $@->{description} =~ m/Key "abcd" is not 3 characters long/;
 print "ok 5\n";
 
 eval { $a{abc} = 1234 };
-print "not " unless $@ =~ m/Value "1234" is not 3 characters long/;
+print "not " unless $@->{description} =~ m/Value "1234" is not 3 characters long/;
 print "ok 6\n";
 
 eval { $a = $a{abcd}; $a++  };
-print "not " unless $@ =~ m/Key "abcd" is not 3 characters long/;
+print "not " unless $@->{description} =~ m/Key "abcd" is not 3 characters long/;
 print "ok 7\n";
 
 @a{qw(abc cde)} = qw(123 345); 
@@ -52,7 +52,7 @@ print "not " unless $a{cde} == 345;
 print "ok 8\n";
 
 eval { $a{def} = 456 };
-print "not " unless $@ =~ m/Table is full \(3 elements\)/;
+print "not " unless $@->{description} =~ m/Table is full \(3 elements\)/;
 print "ok 9\n";
 
 %a = ();

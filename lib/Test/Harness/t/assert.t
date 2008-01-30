@@ -20,9 +20,9 @@ BEGIN { use_ok( 'Test::Harness::Assert' ); }
 ok( defined &assert,                'assert() exported' );
 
 ok( !eval { assert( 0 ); 1 },       'assert( FALSE ) causes death' );
-like( $@, '/Assert failed/',        '  with the right message' );
+like( $@->{description}, '/Assert failed/',        '  with the right message' );
 
 ok( eval { assert( 1 );  1 },       'assert( TRUE ) does nothing' );
 
 ok( !eval { assert( 0, 'some name' ); 1 },  'assert( FALSE, NAME )' );
-like( $@, '/some name/',                    '  has the name' );
+like( $@->{description}, '/some name/',                    '  has the name' );

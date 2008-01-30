@@ -24,7 +24,7 @@ use_ok( 'Tie::Scalar' );
 # these are "abstract virtual" parent methods
 for my $method qw( TIESCALAR FETCH STORE ) {
 	eval { Tie::Scalar->?$method() };
-	like( $@, qr/doesn't define a $method/, "croaks on inherited $method()" );
+	like( $@->{description}, qr/doesn't define a $method/, "croaks on inherited $method()" );
 }
 
 # the default value is undef

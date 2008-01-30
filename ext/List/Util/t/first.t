@@ -62,7 +62,7 @@ is($v, 12, 'return from loop');
 # Can we undefine a first sub while it's running?
 sub self_immolate {undef &self_immolate; 1}
 eval { $v = first \&self_immolate, 1,2; };
-like($@, qr/^Can't undef active subroutine/, "undef active sub");
+like($@->{description}, qr/^Can't undef active subroutine/, "undef active sub");
 
 # Redefining an active sub should not fail, but whether the
 # redefinition takes effect immediately depends on whether we're
@@ -106,10 +106,10 @@ if (!$::PERL_ONLY) { SKIP: {
 
     # Can we goto a label from the 'first' sub?
     eval {()=first{goto foo} 1,2; foo: 1};
-    like($@, qr/^Can't "goto" out of a pseudo block/, "goto label");
+    like($@->{description}, qr/^Can't "goto" out of a pseudo block/, "goto label");
 
     # Can we goto a subroutine?
     eval {()=first{goto sub{}} 1,2;};
-    like($@, qr/^Can't goto subroutine from a sort sub/, "goto sub");
+    like($@->{description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 } }

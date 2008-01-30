@@ -23,7 +23,7 @@ use TieOut;
 can_ok __PACKAGE__, 'WriteEmptyMakefile';
 
 eval { WriteEmptyMakefile("something"); };
-like $@, qr/Need an even number of args/;
+like $@->{description}, qr/Need an even number of args/;
 
 
 {

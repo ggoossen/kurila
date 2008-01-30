@@ -202,7 +202,7 @@ SKIP: {
 {
     use utf8;
     eval {utf8::encode("£")};
-    like($@, qr//, "utf8::encode is a NO-OP");
+    like($@->{description}, qr//, "utf8::encode is a NO-OP");
 }
 
 {

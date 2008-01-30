@@ -45,40 +45,40 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     title "Error Cases" ;
 
     eval { Compress::Raw::Zlib::Deflate->new(-Level) };
-    like $@,  mkErr("^Compress::Raw::Zlib::Deflate::new: Expected even number of parameters, got 1") ;
+    like $@->{description},  mkErr("^Compress::Raw::Zlib::Deflate::new: Expected even number of parameters, got 1") ;
 
     eval { Compress::Raw::Zlib::Inflate->new(-Level) };
-    like $@, mkErr("^Compress::Raw::Zlib::Inflate::new: Expected even number of parameters, got 1");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Inflate::new: Expected even number of parameters, got 1");
 
     eval { Compress::Raw::Zlib::Deflate->new(-Joe => 1) };
-    like $@, mkErr('^Compress::Raw::Zlib::Deflate::new: unknown key value\(s\) Joe');
+    like $@->{description}, mkErr('^Compress::Raw::Zlib::Deflate::new: unknown key value\(s\) Joe');
 
     eval { Compress::Raw::Zlib::Inflate->new(-Joe => 1) };
-    like $@, mkErr('^Compress::Raw::Zlib::Inflate::new: unknown key value\(s\) Joe');
+    like $@->{description}, mkErr('^Compress::Raw::Zlib::Inflate::new: unknown key value\(s\) Joe');
 
     eval { Compress::Raw::Zlib::Deflate->new(-Bufsize => 0) };
-    like $@, mkErr("^Compress::Raw::Zlib::Deflate::new: Bufsize must be >= 1, you specified 0");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Deflate::new: Bufsize must be >= 1, you specified 0");
 
     eval { Compress::Raw::Zlib::Inflate->new(-Bufsize => 0) };
-    like $@, mkErr("^Compress::Raw::Zlib::Inflate::new: Bufsize must be >= 1, you specified 0");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Inflate::new: Bufsize must be >= 1, you specified 0");
 
     eval { Compress::Raw::Zlib::Deflate->new(-Bufsize => -1) };
-    like $@, mkErr("^Compress::Raw::Zlib::Deflate::new: Parameter 'Bufsize' must be an unsigned int, got '-1'");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Deflate::new: Parameter 'Bufsize' must be an unsigned int, got '-1'");
 
     eval { Compress::Raw::Zlib::Inflate->new(-Bufsize => -1) };
-    like $@, mkErr("^Compress::Raw::Zlib::Inflate::new: Parameter 'Bufsize' must be an unsigned int, got '-1'");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Inflate::new: Parameter 'Bufsize' must be an unsigned int, got '-1'");
 
     eval { Compress::Raw::Zlib::Deflate->new(-Bufsize => "xxx") };
-    like $@, mkErr("^Compress::Raw::Zlib::Deflate::new: Parameter 'Bufsize' must be an unsigned int, got 'xxx'");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Deflate::new: Parameter 'Bufsize' must be an unsigned int, got 'xxx'");
 
     eval { Compress::Raw::Zlib::Inflate->new(-Bufsize => "xxx") };
-    like $@, mkErr("^Compress::Raw::Zlib::Inflate::new: Parameter 'Bufsize' must be an unsigned int, got 'xxx'");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Inflate::new: Parameter 'Bufsize' must be an unsigned int, got 'xxx'");
 
     eval { Compress::Raw::Zlib::Inflate->new(-Bufsize => 1, 2) };
-    like $@, mkErr("^Compress::Raw::Zlib::Inflate::new: Expected even number of parameters, got 3");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Inflate::new: Expected even number of parameters, got 3");
 
     eval { Compress::Raw::Zlib::Deflate->new(-Bufsize => 1, 2) };
-    like $@, mkErr("^Compress::Raw::Zlib::Deflate::new: Expected even number of parameters, got 3");
+    like $@->{description}, mkErr("^Compress::Raw::Zlib::Deflate::new: Expected even number of parameters, got 3");
 
 }
 
@@ -517,13 +517,13 @@ for my $consume ( 0 .. 1)
     
     # error cases
     eval { $x->deflateParams() };
-    like $@, mkErr('^Compress::Raw::Zlib::deflateParams needs Level and\/or Strategy');
+    like $@->{description}, mkErr('^Compress::Raw::Zlib::deflateParams needs Level and\/or Strategy');
 
     eval { $x->deflateParams(-Bufsize => 0) };
-    like $@, mkErr('^Compress::Raw::Zlib::Inflate::deflateParams: Bufsize must be >= 1, you specified 0');
+    like $@->{description}, mkErr('^Compress::Raw::Zlib::Inflate::deflateParams: Bufsize must be >= 1, you specified 0');
 
     eval { $x->deflateParams(-Joe => 3) };
-    like $@, mkErr('^Compress::Raw::Zlib::deflateStream::deflateParams: unknown key value\(s\) Joe');
+    like $@->{description}, mkErr('^Compress::Raw::Zlib::deflateStream::deflateParams: unknown key value\(s\) Joe');
 
     is $x->get_Level(),    Z_DEFAULT_COMPRESSION;
     is $x->get_Strategy(), Z_DEFAULT_STRATEGY;
@@ -583,7 +583,7 @@ for my $consume ( 0 .. 1)
      
     my $Z; 
     eval { $k->inflate("abc", $Z) ; };
-    like $@, mkErr("Modification of a read-only value attempted");
+    like $@->{description}, mkErr("Modification of a read-only value attempted");
 
 }
 

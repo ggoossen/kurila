@@ -44,10 +44,10 @@ sub run
         title "Misc error cases";
 
         eval { 'Compress::Raw::Zlib::InflateScan'->new( Bufsize => 0)} ;
-        like $@, mkErr("^Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified 0"), "  catch bufsize == 0";
+        like $@->{description}, mkErr("^Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified 0"), "  catch bufsize == 0";
 
         eval { Compress::Raw::Zlib::inflateScanStream::createDeflateStream(undef, Bufsize => 0) } ;
-        like $@, mkErr("^Compress::Raw::Zlib::InflateScan::createDeflateStream: Bufsize must be >= 1, you specified 0"), "  catch bufsize == 0";
+        like $@->{description}, mkErr("^Compress::Raw::Zlib::InflateScan::createDeflateStream: Bufsize must be >= 1, you specified 0"), "  catch bufsize == 0";
 
     }
 

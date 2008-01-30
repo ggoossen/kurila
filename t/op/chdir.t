@@ -57,7 +57,7 @@ SKIP: {
     }
     else {
        eval { chdir($dh); };
-       like($@, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+       like($@->{description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
        chdir ".." or die $!;
     }
 
@@ -72,7 +72,7 @@ SKIP: {
     }
     else {
        eval { chdir(*DH); };
-       like($@, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+       like($@->{description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
        chdir ".." or die $!;
     }
     ok(-d "op", "verify that we are back");
@@ -90,7 +90,7 @@ SKIP: {
     }
     else {
 	eval { chdir(*H); };
-	like($@, qr/^The dirfd function is unimplemented at/,
+	like($@->{description}, qr/^The dirfd function is unimplemented at/,
 	     "dirfd is unimplemented");
 	SKIP: {
 	    skip("dirfd is unimplemented");
@@ -106,7 +106,7 @@ SKIP: {
     skip("has fchdir", 1) if $has_fchdir;
     opendir(my $dh, "op");
     eval { chdir($dh); };
-    like($@, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
+    like($@->{description}, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
 }
 
 # The environment variables chdir() pays attention to.

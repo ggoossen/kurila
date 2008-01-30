@@ -748,7 +748,7 @@ sub isa_ok ($$;$) {
         local($@, $!);  # eval sometimes resets $!
         my $rslt = eval { $object->isa($class) };
         if( $@ ) {
-            if( $@ =~ m/^Can't call method "isa" on unblessed reference/ ) {
+            if( $@->{description} =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 if( !UNIVERSAL::isa($object, $class) ) {
                     my $ref = ref $object;
                     $diag = "$obj_name isn't a '$class' it's a '$ref'";

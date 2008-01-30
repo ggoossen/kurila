@@ -36,31 +36,31 @@ EOM
 sub My::testParseParameters()
 {
     eval { ParseParameters(1, {}, 1) ; };
-    like $@, mkErr(': Expected even number of parameters, got 1'), 
+    like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
     eval { ParseParameters(1, {}, undef) ; };
-    like $@, mkErr(': Expected even number of parameters, got 1'), 
+    like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
     eval { ParseParameters(1, {}, []) ; };
-    like $@, mkErr(': Expected even number of parameters, got 1'), 
+    like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
     eval { ParseParameters(1, {'Fred' => [1, 1, Parse_boolean, 0]}, Fred => 'joe') ; };
-    like $@, mkErr("Parameter 'Fred' must be an int, got 'joe'"), 
+    like $@->{description}, mkErr("Parameter 'Fred' must be an int, got 'joe'"), 
             "wanted unsigned, got undef";
 
     eval { ParseParameters(1, {'Fred' => [1, 1, Parse_unsigned, 0]}, Fred => undef) ; };
-    like $@, mkErr("Parameter 'Fred' must be an unsigned int, got 'undef'"), 
+    like $@->{description}, mkErr("Parameter 'Fred' must be an unsigned int, got 'undef'"), 
             "wanted unsigned, got undef";
 
     eval { ParseParameters(1, {'Fred' => [1, 1, Parse_signed, 0]}, Fred => undef) ; };
-    like $@, mkErr("Parameter 'Fred' must be a signed int, got 'undef'"), 
+    like $@->{description}, mkErr("Parameter 'Fred' must be a signed int, got 'undef'"), 
             "wanted signed, got undef";
 
     eval { ParseParameters(1, {'Fred' => [1, 1, Parse_signed, 0]}, Fred => 'abc') ; };
-    like $@, mkErr("Parameter 'Fred' must be a signed int, got 'abc'"), 
+    like $@->{description}, mkErr("Parameter 'Fred' must be a signed int, got 'abc'"), 
             "wanted signed, got 'abc'";
 
 
@@ -72,18 +72,18 @@ sub My::testParseParameters()
             if $Config{useithreads};
 
         eval { ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, 0]}, Fred => 'abc') ; };
-        like $@, mkErr("Parameter 'Fred' not writable"), 
+        like $@->{description}, mkErr("Parameter 'Fred' not writable"), 
                 "wanted writable, got readonly";
     }
 
     my @xx;
     eval { ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, 0]}, Fred => \@xx) ; };
-    like $@, mkErr("Parameter 'Fred' not a scalar reference"), 
+    like $@->{description}, mkErr("Parameter 'Fred' not a scalar reference"), 
             "wanted scalar reference";
 
     local *ABC;
     eval { ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, 0]}, Fred => *ABC) ; };
-    like $@, mkErr("Parameter 'Fred' not a scalar"), 
+    like $@->{description}, mkErr("Parameter 'Fred' not a scalar"), 
             "wanted scalar";
 
     #eval { ParseParameters(1, {'Fred' => [1, 1, Parse_any|Parse_multiple, 0]}, Fred => 1, Fred => 2) ; };

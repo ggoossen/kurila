@@ -139,7 +139,7 @@ print ((inet_ntoa("\x{a}\x{14}\x{1e}\x{28}") eq "10.20.30.40") ? "ok 11\n" : "no
 }
 				     
 eval { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") };
-print (($@ =~ m/^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/) ? "ok 14\n" : "not ok 14\n");
+print (($@->{description} =~ m/^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/) ? "ok 14\n" : "not ok 14\n");
 
 if (sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))) == AF_INET) {
     print "ok 15\n";
@@ -148,7 +148,7 @@ if (sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))) == AF_INET
 }
 
 eval { sockaddr_family("") };
-print (($@ =~ m/^Bad arg length for Socket::sockaddr_family, length is 0, should be at least \d+/) ? "ok 16\n" : "not ok 16\n");
+print (($@->{description} =~ m/^Bad arg length for Socket::sockaddr_family, length is 0, should be at least \d+/) ? "ok 16\n" : "not ok 16\n");
 
 if ($^O eq 'linux') {
     # see if we can handle abstract sockets

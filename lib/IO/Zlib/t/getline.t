@@ -51,7 +51,7 @@ ok(12, $file->close());
 ok(13, $file = IO::Zlib->new($name, "rb"));
 ok(14, !$file->eof());
 eval '$file->getlines';
-ok(15, $@ =~ m/^IO::Zlib::getlines: must be called in list context /);
+ok(15, $@->{description} =~ m/^IO::Zlib::getlines: must be called in list context /);
 ok(16, @lines = $file->getlines());
 ok(17, @lines == @text);
 ok(18, $lines[0] eq $text[0]);

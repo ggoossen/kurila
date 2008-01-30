@@ -28,7 +28,7 @@ foreach my $code ("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
                  )
 {
     eval $code;
-    like $@, qr/^Usage: /, "'$code' is a usage error";
+    like $@->{description}, qr/^Usage: /, "'$code' is a usage error";
 }
 
 

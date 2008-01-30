@@ -24,7 +24,7 @@ is( B::Terse::indent(), '', 'indent with no argument' );
 
 # this should fail without a reference
 eval { B::Terse::terse('scalar') };
-like( $@, qr/not a reference/, 'terse() fed bad parameters' );
+like( $@->{description}, qr/not a reference/, 'terse() fed bad parameters' );
 
 # now point it at a sub and see what happens
 sub foo {}

@@ -19,13 +19,13 @@ use TieIn;
 eval q{
     prompt();
 };
-like( $@, qr/^Not enough arguments for ExtUtils::MakeMaker::prompt/,
+like( $@->{description}, qr/^Not enough arguments for ExtUtils::MakeMaker::prompt/,
                                             'no args' );
 
 eval {
     prompt(undef);
 };
-like( $@, qr/^prompt function called without an argument/, 
+like( $@->{description}, qr/^prompt function called without an argument/, 
                                             'undef message' );
 
 my $stdout = tie *STDOUT, 'TieOut' or die;

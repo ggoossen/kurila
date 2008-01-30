@@ -45,16 +45,16 @@ diag "tests with bad subclass" unless $ENV{PERL_CORE};
 $testobj = version::Bad->new(1.002_003);
 isa_ok( $testobj, "version::Bad" );
 eval { my $string = $testobj->numify };
-like($@, qr/Invalid version object/,
+like($@->{description}, qr/Invalid version object/,
     "Bad subclass numify");
 eval { my $string = $testobj->normal };
-like($@, qr/Invalid version object/,
+like($@->{description}, qr/Invalid version object/,
     "Bad subclass normal");
 eval { my $string = $testobj->stringify };
-like($@, qr/Invalid version object/,
+like($@->{description}, qr/Invalid version object/,
     "Bad subclass stringify");
 eval { my $test = $testobj +> 1.0 };
-like($@, qr/Invalid version object/,
+like($@->{description}, qr/Invalid version object/,
     "Bad subclass vcmp");
 
 # dummy up a redundant call to satify David Wheeler
@@ -96,15 +96,15 @@ sub BaseTests {
     # test illegal formats
     diag "test illegal formats" if $Verbose;
     eval {my $version = $CLASS->new("1.2_3_4")};
-    like($@, qr/multiple underscores/,
+    like($@->{description}, qr/multiple underscores/,
 	"Invalid version format (multiple underscores)");
     
     eval {my $version = $CLASS->new("1.2_3.4")};
-    like($@, qr/underscores before decimal/,
+    like($@->{description}, qr/underscores before decimal/,
 	"Invalid version format (underscores before decimal)");
     
     eval {my $version = $CLASS->new("1_2")};
-    like($@, qr/alpha without decimal/,
+    like($@->{description}, qr/alpha without decimal/,
 	"Invalid version format (alpha without decimal)");
     
     # for this first test, just upgrade the warn() to die()
@@ -115,7 +115,7 @@ sub BaseTests {
     my $warnregex = "Version string '.+' contains invalid data; ".
 	    "ignoring: '.+'";
 
-    like($@, qr/$warnregex/,
+    like($@->{description}, qr/$warnregex/,
 	"Version string contains invalid data; ignoring");
 
     # from here on out capture the warning and test independently
@@ -307,7 +307,7 @@ SKIP: {
 	# this should fail even with old UNIVERSAL::VERSION
 	$version = v0.590;
 	eval "use lib '.'; use aaa $version";
-	like($@, qr/aaa version $version/,
+	like($@->{description}, qr/aaa version $version/,
 		'Replacement eval works with incremented version');
 	
 	$version =~ s/0+$//; #convert to string and remove trailing 0's
@@ -325,7 +325,7 @@ SKIP: {
 	close F;
 
 	eval "use lib '.'; use xxx v3;";
-        like($@, qr/xxx defines neither package nor VERSION/,
+        like($@->{description}, qr/xxx defines neither package nor VERSION/,
              'Replacement handles modules without package or VERSION'); 
 	eval "use lib '.'; use xxx; \$version = xxx->VERSION";
 	unlike ($@, qr/$error_regex/,
@@ -339,7 +339,7 @@ SKIP: {
 	print F "package yyy;\n#look ma no VERSION\n1;\n";
 	close F;
 	eval "use lib '.'; use yyy v3;";
-	like ($@, qr/$error_regex/,
+	like ($@->{description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use yyy; print yyy->VERSION";
 	unlike ($@, qr/$error_regex/,
@@ -352,7 +352,7 @@ SKIP: {
 	print F "package zzz;\n\@VERSION = ();\n1;\n";
 	close F;
 	eval "use lib '.'; use zzz v3;";
-	like ($@, qr/$error_regex/,
+	like ($@->{description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use zzz; print zzz->VERSION";
 	unlike ($@, qr/$error_regex/,
@@ -426,18 +426,18 @@ EOF
 	close F;
 
 	eval "use lib '.'; use www v0.000008;";
-	like ($@, qr/^www version v0.8.0 required/,
+	like ($@->{description}, qr/^www version v0.8.0 required/,
 	    "Make sure very small versions don't freak"); 
 	eval "use lib '.'; use www v1;";
-	like ($@, qr/^www version v1.0.0 required/,
+	like ($@->{description}, qr/^www version v1.0.0 required/,
 	    "Comparing vs. version with no decimal"); 
 	eval "use lib '.'; use www v1.;";
-	like ($@, qr/^www version v1.0.0 required/,
+	like ($@->{description}, qr/^www version v1.0.0 required/,
 	    "Comparing vs. version with decimal only"); 
 
 	eval "use lib '.'; use www v0.0.8;";
 	my $regex = "^www version v0.0.8 required";
-	like ($@, qr/$regex/, "Make sure very small versions don't freak"); 
+	like ($@->{description}, qr/$regex/, "Make sure very small versions don't freak"); 
 
 	$regex =~ s/8/4/; # set for second test
 	eval "use lib '.'; use www v0.0.4;";
@@ -471,10 +471,10 @@ package uuu;
 EOF
 	close F;
 	eval "use lib '.'; use uuu v1.001;";
-	like ($@, qr/^uuu version v1.1.0 required/,
+	like ($@->{description}, qr/^uuu version v1.1.0 required/,
 	    "User typed numeric so we error with numeric"); 
 	eval "use lib '.'; use uuu v1.1.0;";
-	like ($@, qr/^uuu version v1.1.0 required/,
+	like ($@->{description}, qr/^uuu version v1.1.0 required/,
 	    "User typed extended so we error with extended"); 
 	unlink 'uuu.pm';
     }
