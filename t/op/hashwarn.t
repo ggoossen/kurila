@@ -9,7 +9,7 @@ use warnings;
 use vars qw{ @warnings };
 
 BEGIN {
-    $SIG{'__WARN__'} = sub { push @warnings, @_ };
+    $SIG{'__WARN__'} = sub { push @warnings, $_[0]->message };
     $| = 1;
 }
 
@@ -57,12 +57,12 @@ my $fail_not_hr   = 'Not a HASH reference at ';
         %$avhv = (x=>13,'y');
     };
     cmp_ok(scalar(@warnings),'==',0,'pseudo-hash 1 count');
-    cmp_ok(substr($@,0,length($fail_not_hr)),'eq',$fail_not_hr,'pseudo-hash 1 msg');
+    cmp_ok(substr($@->message,0,length($fail_not_hr)),'eq',$fail_not_hr,'pseudo-hash 1 msg');
 
     @warnings = ();
     eval {
         %$avhv = 'x';
     };
     cmp_ok(scalar(@warnings),'==',0,'pseudo-hash 2 count');
-    cmp_ok(substr($@,0,length($fail_not_hr)),'eq',$fail_not_hr,'pseudo-hash 2 msg');
+    cmp_ok(substr($@->message,0,length($fail_not_hr)),'eq',$fail_not_hr,'pseudo-hash 2 msg');
 }

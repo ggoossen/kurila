@@ -1189,7 +1189,14 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     /* sv_2cv might call Perl_croak() or Perl_warner() */
     SV * const oldhook = *hook;
 
-    if ( ! oldhook ) {
+    if ( *hook == NULL ) {
+	const char *msg;
+	STRLEN msglen;
+	msg = SvPV_const(msv, msglen);
+	write_to_stderr(msg, msglen);
+	return FALSE;
+    }
+    if ( *hook == PERL_DIEHOOK_IGNORE ) {
 	return FALSE;
     }
     if ( *hook == PERL_DIEHOOK_FATAL ) {
@@ -1228,11 +1235,12 @@ STATIC SV*
 S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 {
     dVAR;
-    SV * msv = vmess(pat, args);
+    SV * msv;
+    assert(pat);
+    msv = vmess(pat, args);
 
     if (pat) {
 	dSP;
-	GV *gv;
 
 	if (PL_errors && SvCUR(PL_errors)) {
 	    sv_catpvn(PL_errors, "\n", 1);
@@ -1276,7 +1284,7 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
     msv = vdie_croak_common(pat, args);
     die_where(msv);
     /* NOTREACHED */
-    return NULL;
+    return;
 }
 
 OP *
@@ -1438,10 +1446,7 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 	STRLEN msglen;
 	const char * const message = SvPV_const(msv, msglen);
 
-	if (PL_diehook) {
-	    assert(message);
-	    Perl_vdie_common(aTHX_ msv, FALSE);
-	}
+	Perl_vdie_common(aTHX_ msv, FALSE);
 	die_where(msv);
 	/* NOTREACHED */
     }

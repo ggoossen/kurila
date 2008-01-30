@@ -72,13 +72,13 @@ is($y, "c 20");
 
 
 eval 'local($$e)';
-like($@, qr/Can't localize through a reference/);
+like($@->{description}, qr/Can't localize through a reference/);
 
 eval '$e = []; local(@$e)';
-like($@, qr/Can't localize through a reference/);
+like($@->{description}, qr/Can't localize through a reference/);
 
 eval '$e = {}; local(%$e)';
-like($@, qr/Can't localize through a reference/);
+like($@->{description}, qr/Can't localize through a reference/);
 
 # Array and hash elements
 
@@ -218,7 +218,7 @@ is($a[0].$a[1], "Xb");
 # now try the same for %SIG
 
 eval { $SIG{TERM} = 'foo' };
-like $@, qr/signal handler should be glob or .../;
+like $@->{description}, qr/signal handler should be glob or .../;
 $SIG{INT} = \&foo;
 $SIG{__WARN__} = $SIG{INT};
 {
@@ -320,14 +320,14 @@ while (m/(o.+?),/gc) {
 # local() and readonly magic variables
 
 eval { local $1 = 1 };
-like($@, qr/Modification of a read-only value attempted/);
+like($@->{description}, qr/Modification of a read-only value attempted/);
 
 eval { for ($1) { local $_ = 1 } };
-like($@, qr/Modification of a read-only value attempted/);
+like($@->{description}, qr/Modification of a read-only value attempted/);
 
 # make sure $1 is still read-only
 eval { for ($1) { local $_ = 1 } };
-like($@, qr/Modification of a read-only value attempted/);
+like($@->{description}, qr/Modification of a read-only value attempted/);
 
 # The s/// adds 'g' magic to $_, but it should remain non-readonly
 eval { for("a") { for $x (1,2) { local $_="b"; s/(.*)/+$1/ } } };

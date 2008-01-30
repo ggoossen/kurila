@@ -93,7 +93,7 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " $_[0]" }; }
 # by the indirect object notation
 {
     local $SIG{__WARN__} = sub {
-	::like( $_[0], qr/^ok overriden at/ );
+	::like( $_[0]->message, qr/^ok overriden at/ );
     };
     BEGIN { *OverridenWarn::warn = sub { CORE::warn "@_ overriden"; }; }
     package OverridenWarn;

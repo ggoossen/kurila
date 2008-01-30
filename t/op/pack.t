@@ -1184,13 +1184,13 @@ SKIP: {
     @a = unpack '(SL)*SL',   pack 'SLSLSLSL', 67..90;
     is("@a", "@b");
     eval { @a = unpack '(*SL)',   '' };
-    like($@, qr/\(\)-group starts with a count/);
+    like($@->{description}, qr/\(\)-group starts with a count/);
     eval { @a = unpack '(3SL)',   '' };
-    like($@, qr/\(\)-group starts with a count/);
+    like($@->{description}, qr/\(\)-group starts with a count/);
     eval { @a = unpack '([3]SL)',   '' };
-    like($@, qr/\(\)-group starts with a count/);
+    like($@->{description}, qr/\(\)-group starts with a count/);
     eval { @a = pack '(*SL)' };
-    like($@, qr/\(\)-group starts with a count/);
+    like($@->{description}, qr/\(\)-group starts with a count/);
     @a = unpack '(SL)3 SL',   pack '(SL)4', 67..74;
     is("@a", "@b");
     @a = unpack '(SL)3 SL',   pack '(SL)[4]', 67..74;
@@ -1221,7 +1221,7 @@ SKIP: {
   # \0002 \0001 a \0003 AAA \0001 b \0003 BBB
   #     2     4 5     7  10    1213
   eval { @pup = unpack( 'S/(S/A* S/A*)', substr( $env, 0, 13 ) ) };
-  like( $@, qr{length/code after end of string} );
+  like( $@->{description}, qr{length/code after end of string} );
 
   # postfix repeat count
   $env = pack( '(S/A* S/A*)' . @Env/2, @Env );
@@ -1230,30 +1230,30 @@ SKIP: {
   # \0001 a \0003 AAA \0001  b \0003 BBB
   #     2 3c    5   8    10 11    13  16
   eval { @pup = unpack( '(S/A* S/A*)' . @Env/2, substr( $env, 0, 11 ) ) };
-  like( $@, qr{length/code after end of string} );
+  like( $@->{description}, qr{length/code after end of string} );
 
   # catch stack overflow/segfault
   eval { $_ = pack( ('(' x 105) . 'A' . (')' x 105) ); };
-  like( $@, qr{Too deeply nested \(\)-groups} );
+  like( $@->{description}, qr{Too deeply nested \(\)-groups} );
 }
 
 { # syntax checks (W.Laun)
   use warnings qw(NONFATAL all);;
   my @warning;
   local $SIG{__WARN__} = sub {
-      push( @warning, $_[0] );
+      push( @warning, $_[0]->{description} );
   };
   eval { my $s = pack( 'Ax![4c]A', 1..5 ); };
-  like( $@, qr{Malformed integer in \[\]} );
+  like( $@->{description}, qr{Malformed integer in \[\]} );
 
   eval { my $buf = pack( '(c/*a*)', 'AAA', 'BB' ); };
-  like( $@, qr{'/' does not take a repeat count} );
+  like( $@->{description}, qr{'/' does not take a repeat count} );
 
   eval { my @inf = unpack( 'c/1a', "\x[03]AAA\x[02]BB" ); };
-  like( $@, qr{'/' does not take a repeat count} );
+  like( $@->{description}, qr{'/' does not take a repeat count} );
 
   eval { my @inf = unpack( 'c/*a', "\x[03]AAA\x[02]BB" ); };
-  like( $@, qr{'/' does not take a repeat count} );
+  like( $@->{description}, qr{'/' does not take a repeat count} );
 
   # white space where possible
   my @Env = ( a => 'AAA', b => 'BBB' );
@@ -1264,7 +1264,7 @@ SKIP: {
   # white space in 4 wrong places
   for my $temp (  'A ![4]', 'A [4]', 'A *', 'A 4' ){
       eval { my $s = pack( $temp, 'B' ); };
-      like( $@, qr{Invalid type } );
+      like( $@->{description}, qr{Invalid type } );
   }
 
   # warning for commas
@@ -1279,7 +1279,7 @@ SKIP: {
 
   # forbidden code in []
   eval { my $x = pack( 'A[@4]', 'XXXX' ); };
-  like( $@, qr{Within \[\]-length '\@' not allowed} );
+  like( $@->{description}, qr{Within \[\]-length '\@' not allowed} );
 
   # @ repeat default 1
   my $s = pack( 'AA@A', 'A', 'B', 'C' );
@@ -1289,7 +1289,7 @@ SKIP: {
 
   # no unpack code after /
   eval { my @a = unpack( "C/", "\3" ); };
-  like( $@, qr{Code missing after '/'} );
+  like( $@->{description}, qr{Code missing after '/'} );
 
  SKIP: {
     skip $no_endianness, 6 if $no_endianness;
@@ -1434,7 +1434,7 @@ numbers ('F', -(2**34), -1, 0, 1, 2**34);
 SKIP: {
     my $t = eval { unpack("D*", pack("D", 12.34)) };
 
-    skip "Long doubles not in use", 166 if $@ =~ m/Invalid type/;
+    skip "Long doubles not in use", 166 if $@->{description} =~ m/Invalid type/;
 
     is(length(pack("D", 0)), $Config{longdblsize});
     numbers ('D', -(2**34), -1, 0, 1, 2**34);
@@ -1448,7 +1448,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
   SKIP: {
     my $packed = eval {pack "${template}4", 1, 4, 9, 16};
     if ($@) {
-      die unless $@ =~ m/Invalid type '$template'/;
+      die unless $@->{description} =~ m/Invalid type '$template'/;
       skip ("$template not supported on this perl",
             $cant_checksum{$template} ? 4 : 8);
     }
@@ -1505,7 +1505,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     use warnings qw(NONFATAL all);;
     my $warning;
     local $SIG{__WARN__} = sub {
-        $warning = $_[0];
+        $warning = $_[0]->message;
     };
     my $out = pack("u99", "foo" x 99);
     like($warning, qr/Field too wide in 'u' format in pack at /,
@@ -1837,7 +1837,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     # Testing pack . and .!
     is(pack("(a)5 .", 1..5, 3), "123", ". relative to string start, shorten");
     eval { () = pack("(a)5 .", 1..5, -3) };
-    like($@, qr{'\.' outside of string in pack}, "Proper error message");
+    like($@->{description}, qr{'\.' outside of string in pack}, "Proper error message");
     is(pack("(a)5 .", 1..5, 8), "12345\0\0\0",
        ". relative to string start, extend");
     is(pack("(a)5 .", 1..5, 5), "12345", ". relative to string start, keep");

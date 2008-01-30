@@ -57,9 +57,9 @@ for (@prgs){
 
 sub test_invalid_decl {
     my ($code,$todo) = @_;
-    $todo //= '';
+    local our $TODO = $todo;
     eval_dies_like( $code,
-                    qr/^Illegal declaration of anonymous subroutine at/);
+                    qr/^Illegal declaration of anonymous subroutine/);
 }
 
 test_invalid_decl('sub;');

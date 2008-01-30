@@ -13,7 +13,7 @@ sub compare {
 
     for my $i (0..$#_) {
 	next if $_[$i] eq $expect[$i];
-	return ::fail();
+	return ::fail( " '$_[$i]' eq '$expect[$i]' " );
     }
 
     ::pass();
@@ -201,7 +201,7 @@ is($r, 1);
 	local *BAZ;
 	tie *BAZ, 'Blah';
     }
-    ok(!tied *BAZ);
+    ok(!tied *BAZ, "tied *BAZ");
 
     package Blah;
 
@@ -219,8 +219,7 @@ is($r, 1);
     local *Implement::PRINT = sub { @received = @_ };
 
     $r = warn("some", "text", "\n");
-    @expect = (PRINT => $ob,"sometext\n");
-
+    @expect = (PRINT => $ob,"sometext\n at op/tiehandle.t line 221\n");
     compare(PRINT => @received);
 
     use warnings;
@@ -235,7 +234,7 @@ is($r, 1);
     tie *TEST, 'CHOMP';
     my $data;
     chomp($data = ~< *TEST);
-    is($data, 'foobar');
+    is($data, 'foobar', '[ID 20020713.001]');
 
     package CHOMP;
     sub TIEHANDLE { bless {}, $_[0] }

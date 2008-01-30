@@ -2801,7 +2801,7 @@ PP(pp_entereval)
 	GvHV(PL_hintgv) = saved_hh;
 
     SAVESPTR(PL_diehook);
-    PL_diehook = NULL;
+    PL_diehook = SvREFCNT_inc(PERL_DIEHOOK_IGNORE);
 
     SAVECOMPILEWARNINGS();
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
@@ -2958,7 +2958,7 @@ PP(pp_entertry)
     PERL_CONTEXT * const cx = create_eval_scope(0);
 
     SAVESPTR(PL_diehook);
-    PL_diehook = NULL;
+    PL_diehook = SvREFCNT_inc(PERL_DIEHOOK_IGNORE);
 
     cx->blk_eval.retop = cLOGOP->op_other->op_next;
     return DOCATCH(PL_op->op_next);

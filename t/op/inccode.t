@@ -231,7 +231,7 @@ SKIP: {
         my $warning;
         local $SIG{__WARN__} = sub { $warning = shift };
         Publius::Vergilius::Maro::complain();
-        like( $warning, qr{something's wrong at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
+        like( $warning->message, qr{something's wrong at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
     }
 }
 pop @INC;

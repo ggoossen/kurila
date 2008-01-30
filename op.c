@@ -2283,7 +2283,7 @@ Perl_fold_constants(pTHX_ register OP *o)
     create_eval_scope(G_FAKINGEVAL);
 
     PL_warnhook = PERL_WARNHOOK_FATAL;
-    PL_diehook  = NULL;
+    PL_diehook  = PERL_DIEHOOK_IGNORE;
     JMPENV_PUSH(ret);
 
     switch (ret) {

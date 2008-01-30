@@ -14,7 +14,7 @@ BEGIN {
     }
 }
 
-use Test;
+BEGIN { require './test.pl'; }
 
 plan tests => 17;
 
@@ -56,9 +56,9 @@ sub runperl {
     { local $/; $actual_stderr = ~< *F }
 
     if ($actual_stdout ne $stdout) {
-      return (0, "Stdout mismatch: expected [$stdout], saw [$actual_stdout]");
+      return (0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]");
     } elsif ($actual_stderr ne $stderr) {
-      return (0, "Stderr mismatch: expected [$stderr], saw [$actual_stderr]");
+      return (0, "Stderr mismatch: expected:\n[$stderr]\nsaw:\n[$actual_stderr]");
     } else {
       return 1;                 # success
     }
@@ -81,7 +81,6 @@ sub it_didnt_work {
 
 sub try {
   my ($success, $reason) = runperl(@_);
-  $reason =~ s/\n/\\n/g if defined $reason;
   ok( !!$success, 1, $reason );
 }
 
@@ -97,26 +96,30 @@ sub try {
 
 try({PERL5OPT => '-w'}, ['-e', 'print $::x'],
     "", 
-    qq{Name "main::x" used only once: possible typo at -e line 1.\nUse of uninitialized value \$x in print at -e line 1.\n});
+    qq{Name "main::x" used only once: possible typo at -e line 1
+Use of uninitialized value \$x in print at -e line 1
+});
 
 try({PERL5OPT => '-Mstrict'}, ['-e', 'print $::x'],
     "", "");
 
 try({PERL5OPT => '-Mstrict'}, ['-e', 'print $x'],
     "", 
-    qq{Global symbol "\$x" requires explicit package name at -e line 1.\nExecution of -e aborted due to compilation errors.\n});
+    qq{Global symbol "\$x" requires explicit package name
+Execution of -e aborted due to compilation errors. at -e line 1\n});
 
 # Fails in 5.6.0
 try({PERL5OPT => '-Mstrict -w'}, ['-e', 'print $x'],
     "", 
-    qq{Global symbol "\$x" requires explicit package name at -e line 1.\nExecution of -e aborted due to compilation errors.\n});
+    qq{Global symbol "\$x" requires explicit package name
+Execution of -e aborted due to compilation errors. at -e line 1\n});
 
 # Fails in 5.6.0
 try({PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
     "", 
     <<ERROR
-Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$x in print at -e line 1.
+Name "main::x" used only once: possible typo at -e line 1
+Use of uninitialized value \$x in print at -e line 1
 ERROR
     );
 
@@ -124,8 +127,8 @@ ERROR
 try({PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
     "", 
     <<ERROR
-Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$x in print at -e line 1.
+Name "main::x" used only once: possible typo at -e line 1
+Use of uninitialized value \$x in print at -e line 1
 ERROR
     );
 

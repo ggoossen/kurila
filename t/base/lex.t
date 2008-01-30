@@ -162,12 +162,12 @@ print $foo;
   # 
 
   eval 'my $^X;';
-  print "not " unless index ($@, q|Can't use global $^X in "my"|) +> -1;
+  print "not " unless index ($@->{description}, q|Can't use global $^X in "my"|) +> -1;
   print "ok 37\n";
 #  print "($@)\n" if $@;
 
   eval 'my $ {^XYZ};';
-  print "not " unless index ($@, q|Can't use global $^XYZ in "my"|) +> -1;
+  print "not " unless index ($@->{description}, q|Can't use global $^XYZ in "my"|) +> -1;
   print "ok 38\n";
 #  print "($@)\n" if $@;
 
@@ -275,5 +275,5 @@ sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;
 
 eval "\$x =\x[E2]foo";
-if ($@ =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
+if ($@->{description} =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
 $test++;

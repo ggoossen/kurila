@@ -268,7 +268,7 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoQqRrYyZz123456789_")
 
     like( runperl( switches => ["-$switch"], stderr => 1,
 		   prog => 'die "oops"' ),
-	  qr/\QUnrecognized switch: -$switch  (-h will show valid options)./,
+	  qr/\QUnrecognized switch: -$switch  (-h will show valid options)/,
           "-$switch correctly unknown" );
 
 }

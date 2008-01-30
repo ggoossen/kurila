@@ -771,6 +771,16 @@ WHOA
     _ok( !$diag, _where(), $name );
 }
 
+sub dies_not(&;$) {
+    my ($e, $qr, $name) = @_;
+    local $Level = 2;
+    if (eval { $e->(); 1; }) {
+        return ok(1, $name);
+    }
+    diag $@->message;
+    return ok(0, $name);
+}
+
 sub dies_like(&$;$) {
     my ($e, $qr, $name) = @_;
     if (eval { $e->(); 1; }) {

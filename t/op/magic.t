@@ -176,11 +176,11 @@ else {
 }
 
 eval { die "foo\n" };
-ok $@ eq "foo\n", $@;
+ok $@->{description} eq "foo\n", $@;
 
 ok $$ +> 0, $$;
 eval { $$++ };
-ok $@ =~ m/^Modification of a read-only value attempted/;
+ok $@->{description} =~ m/^Modification of a read-only value attempted/;
 
 our ($wd, $script);
 
