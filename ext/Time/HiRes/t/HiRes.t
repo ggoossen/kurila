@@ -443,20 +443,20 @@ else {
 }
 
 eval { sleep(-1) };
-print $@ =~ m/::sleep\(-1\): negative time not invented yet/ ?
+print $@->{description} =~ m/::sleep\(-1\): negative time not invented yet/ ?
     "ok 24\n" : "not ok 24\n";
 
 eval { usleep(-2) };
-print $@ =~ m/::usleep\(-2\): negative time not invented yet/ ?
+print $@->{description} =~ m/::usleep\(-2\): negative time not invented yet/ ?
     "ok 25\n" : "not ok 25\n";
 
 if ($have_ualarm) {
     eval { alarm(-3) };
-    print $@ =~ m/::alarm\(-3, 0\): negative time not invented yet/ ?
+    print $@->{description} =~ m/::alarm\(-3, 0\): negative time not invented yet/ ?
 	"ok 26\n" : "not ok 26\n";
 
     eval { ualarm(-4) };
-    print $@ =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ?
+    print $@->{description} =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ?
     "ok 27\n" : "not ok 27\n";
 } else {
     skip 26;
@@ -465,7 +465,7 @@ if ($have_ualarm) {
 
 if ($have_nanosleep) {
     eval { nanosleep(-5) };
-    print $@ =~ m/::nanosleep\(-5\): negative time not invented yet/ ?
+    print $@->{description} =~ m/::nanosleep\(-5\): negative time not invented yet/ ?
 	"ok 28\n" : "not ok 28\n";
 } else {
     skip 28;

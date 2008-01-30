@@ -44,7 +44,7 @@ BEGIN {
 use Test::More tests => 7;
 
 eval 'use blib;';
-ok( $@ =~ m/Cannot find blib/, 'Fails if blib directory not found' );
+ok( $@->{description} =~ m/Cannot find blib/, 'Fails if blib directory not found' );
 
 _mkdirs( @blib_dirs );
 

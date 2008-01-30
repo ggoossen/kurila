@@ -198,14 +198,14 @@ SKIP: {
     skip "has fchmod", 1 if ($Config{d_fchmod} || "") eq "define";
     open(my $fh, "<", "a");
     eval { chmod(0777, $fh); };
-    like($@, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
+    like($@->{description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
 }
 
 SKIP: {
     skip "has fchown", 1 if ($Config{d_fchown} || "") eq "define";
     open(my $fh, "<", "a");
     eval { chown(0, 0, $fh); };
-    like($@, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
+    like($@->{description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
 }
 
 is(rename('a','b'), 1, "rename a b");
@@ -295,7 +295,7 @@ SKIP: {
     skip "has futimes", 1 if ($Config{d_futimes} || "") eq "define";
     open(my $fh, "<", "b") || die;
     eval { utime(undef, undef, $fh); };
-    like($@, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
+    like($@->{description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
 }
 
 is(unlink('b'), 1, "unlink b");

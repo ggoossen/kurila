@@ -21,7 +21,7 @@ sub title
 
 sub like_eval
 {
-    like $@, @_ ;
+    like $@->{description}, @_ ;
 }
 
 {

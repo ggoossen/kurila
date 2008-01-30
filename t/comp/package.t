@@ -58,7 +58,7 @@ eval { $a = *xyz::new{PACKAGE}; };
 print $a eq "__ANON__" ? "ok 9\n" : "not ok 9 # '$a'\n";
 
 eval { $Q->param; };
-print $@ =~ m/^Can't use anonymous symbol table for method lookup/ ?
+print $@->{description} =~ m/^Can't use anonymous symbol table for method lookup/ ?
   "ok 10\n" : "not ok 10 # '$@'\n";
 
 print "$Q" =~ m/^__ANON__=/ ? "ok 11\n" : "not ok 11 # '$Q'\n";

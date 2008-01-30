@@ -87,7 +87,7 @@ is( $out->read(), 'pc', 'Tputs() should write to filehandle when passed' );
 eval { $t->Trequire( 'pc' ) };
 is( $@, '', 'Trequire() should finds existing cap' );
 eval { $t->Trequire( 'nonsense' ) };
-like( $@, qr/support: \(nonsense\)/, 
+like( $@->{description}, qr/support: \(nonsense\)/, 
 	'Trequire() should croak with unsupported cap' );
 
 my $warn;
@@ -99,7 +99,7 @@ local $SIG{__WARN__} = sub {
 undef $ENV{TERM};
 my $vals = {};
 eval { local $^W = 1; $t = Term::Cap->Tgetent($vals) };
-like( $@, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
+like( $@->{description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
 like( $warn, qr/OSPEED was not set/, 'Tgetent() should set default OSPEED' );
 
 is( $vals->{PADDING}, 10000/9600, 'Default OSPEED implies default PADDING' );
@@ -134,14 +134,14 @@ SKIP: {
 	$vals->{TERM} = 'quux';
 	$ENV{TERMPATH} = 'tcout';
 	eval { $t = Term::Cap->Tgetent($vals) };
-	like( $@, qr/failed termcap/, 'Tgetent() should die with bad termcap' );
+	like( $@->{description}, qr/failed termcap/, 'Tgetent() should die with bad termcap' );
 
 	# it shouldn't try to read one file more than 32(!) times
 	# see __END__ for a really awful termcap example
 	$ENV{TERMPATH} = join(' ', ('tcout') x 33);
 	$vals->{TERM} = 'bar';
 	eval { $t = Term::Cap->Tgetent($vals) };
-	like( $@, qr/failed termcap loop/, 'Tgetent() should catch deep recursion');
+	like( $@->{description}, qr/failed termcap loop/, 'Tgetent() should catch deep recursion');
 
 	# now let it read a fake termcap file, and see if it sets properties 
 	$ENV{TERMPATH} = 'tcout';

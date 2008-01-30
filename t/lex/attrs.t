@@ -63,7 +63,7 @@ like $@->message, qr/^Invalid SCALAR attribute: ["']?plugh\(}\)["']? at/;
 eval 'my $x : switch(10,foo(7,3))  :  expensive;';
 like $@->message, qr/^Invalid SCALAR attributes: ["']?switch\(10,foo\(7,3\)\) : expensive["']? at/;
 eval q/my $x : Ugly('\(") :Bad;/;
-like $@, qr/^Invalid SCALAR attributes: ["']?Ugly\('\\\("\) : Bad["']? at/;
+like $@->{description}, qr/^Invalid SCALAR attributes: ["']?Ugly\('\\\("\) : Bad["']? at/;
 eval 'my $x : _5x5;';
 like $@->message, qr/^Invalid SCALAR attribute: ["']?_5x5["']? at/;
 eval 'my $x : locked method;';
@@ -82,7 +82,7 @@ eval 'my A $x : plugh;';
 like $@->message, qr/^Expected variable after declarator at/;
 
 eval 'my A $x : plugh plover;';
-like $@, qr/^Expected variable after declarator at/;
+like $@->{description}, qr/^Expected variable after declarator at/;
 
 no warnings 'reserved';
 eval 'my A $x : plugh;';

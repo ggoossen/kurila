@@ -77,7 +77,7 @@ print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 eval 'sub e1 ($) : plugh ;';
-unless ($@ && $@ =~ m/^Invalid CODE attribute: ["']?plugh["']? at/) {
+unless ($@ && $@->{description} =~ m/^Invalid CODE attribute: ["']?plugh["']? at/) {
     my $x = $@;
     $x =~ s/\n.*\z//s;
     print "# $x\n";
@@ -88,7 +88,7 @@ print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 eval 'sub e2 ($) : plugh(0,0) xyzzy ;';
-unless ($@ && $@ =~ m/^Invalid CODE attributes: ["']?plugh\(0,0\)["']? /) {
+unless ($@ && $@->{description} =~ m/^Invalid CODE attributes: ["']?plugh\(0,0\)["']? /) {
     my $x = $@;
     $x =~ s/\n.*\z//s;
     print "# $x\n";
@@ -99,7 +99,7 @@ print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 eval 'sub e3 ($) : plugh(0,0 xyzzy ;';
-unless ($@ && $@ =~ m/Unterminated attribute parameter in attribute list at/) {
+unless ($@ && $@->{description} =~ m/Unterminated attribute parameter in attribute list at/) {
     my $x = $@;
     $x =~ s/\n.*\z//s;
     print "# $x\n";
@@ -110,7 +110,7 @@ print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 eval 'sub e4 ($) : plugh + xyzzy ;';
-unless ($@ && $@ =~ m/Invalid separator character '[+]' in attribute list at/) {
+unless ($@ && $@->{description} =~ m/Invalid separator character '[+]' in attribute list at/) {
     my $x = $@;
     $x =~ s/\n.*\z//s;
     print "# $x\n";

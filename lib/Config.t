@@ -96,19 +96,19 @@ like($out2, qr/^d_bork='UNKNOWN';/, "config_var d_bork is UNKNOWN");
 
 undef $@;
 eval { $Config{d_bork} = 'borkbork' };
-like($@, qr/Config is read-only/, "no STORE");
+like($@->{description}, qr/Config is read-only/, "no STORE");
 
 ok(!exists $Config{d_bork}, "still no d_bork");
 
 undef $@;
 eval { delete $Config{d_fork} };
-like($@, qr/Config is read-only/, "no DELETE");
+like($@->{description}, qr/Config is read-only/, "no DELETE");
 
 ok( exists $Config{d_fork}, "still d_fork");
 
 undef $@;
 eval { %Config = () };
-like($@, qr/Config is read-only/, "no CLEAR");
+like($@->{description}, qr/Config is read-only/, "no CLEAR");
 
 ok( exists $Config{d_fork}, "still d_fork");
 

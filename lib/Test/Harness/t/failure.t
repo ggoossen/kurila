@@ -41,6 +41,6 @@ FAILING: {
     prepare_for_death();
     eval { runtests( File::Spec->catfile( $SAMPLE_TESTS, "too_many" ) ) };
     ok( $@, "$@" );
-    ok( $@ =~ m[Failed 1/1], "too_many dies" );
+    ok( $@->{description} =~ m[Failed 1/1], "too_many dies" );
     is( $died, 1, "Death happened" );
 }

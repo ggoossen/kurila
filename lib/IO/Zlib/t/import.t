@@ -17,4 +17,4 @@ sub ok
 # The :gzip tags are tested in external.t.
 
 eval "use IO::Zlib qw(foo bar)";
-ok(1, $@ =~ m/^IO::Zlib::import: 'foo bar' is illegal /);
+ok(1, $@->{description} =~ m/^IO::Zlib::import: 'foo bar' is illegal /);

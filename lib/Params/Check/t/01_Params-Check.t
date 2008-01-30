@@ -257,7 +257,7 @@ use constant TRUE   => sub { 1 };
     eval { check( $tmpl, { foo => 1 } ) };      
 
     ok( $@,             "Call dies with fatal toggled" );
-    like( $@,           qr/invalid type/,
+    like( $@->{description},           qr/invalid type/,
                             "   error stored ok" );
 }
 

@@ -45,7 +45,7 @@ ok(1,
 
 eval "use IO::Zlib qw(:gzip_external)";
 ok(2,
-   $@ =~ m/^IO::Zlib::import: ':gzip_external' requires an argument /);
+   $@->{description} =~ m/^IO::Zlib::import: ':gzip_external' requires an argument /);
 
 eval "use IO::Zlib";
 ok(3, !$@);
@@ -74,7 +74,7 @@ ok(9,
 ok(10,
    ($hasCompressZlib && \&IO::Zlib::gzopen == \&Compress::Zlib::gzopen) ||
    (!$hasCompressZlib &&
-    $@ =~ m/^IO::Zlib::import: no Compress::Zlib and no external gzip /));
+    $@->{description} =~ m/^IO::Zlib::import: no Compress::Zlib and no external gzip /));
 
 eval "use IO::Zlib qw(:gzip_external 1)";
 
@@ -88,7 +88,7 @@ ok(13,
    \&IO::Zlib::gzopen == \&IO::Zlib::gzopen_external);
 
 eval 'IO::Zlib->new("foo", "xyz")';
-ok(14, $@ =~ m/^IO::Zlib::gzopen_external: mode 'xyz' is illegal /);
+ok(14, $@->{description} =~ m/^IO::Zlib::gzopen_external: mode 'xyz' is illegal /);
 
 # The following is a copy of the basic.t, shifted up by 14 tests,
 # the difference being that now we should be using the external gzip.
@@ -133,7 +133,7 @@ ok(30,
 eval "use IO::Zlib ':gzip_read_open' => 'bad'";
 
 ok(31,
-   $@ =~ m/^IO::Zlib::import: ':gzip_read_open' 'bad' is illegal /);
+   $@->{description} =~ m/^IO::Zlib::import: ':gzip_read_open' 'bad' is illegal /);
 
 my $new_write = '| gzip.exe %s';
 
@@ -145,5 +145,5 @@ ok(32,
 eval "use IO::Zlib ':gzip_write_open' => 'bad'";
 
 ok(33,
-   $@ =~ m/^IO::Zlib::import: ':gzip_write_open' 'bad' is illegal /);
+   $@->{description} =~ m/^IO::Zlib::import: ':gzip_write_open' 'bad' is illegal /);
 

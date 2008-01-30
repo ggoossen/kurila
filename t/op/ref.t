@@ -469,7 +469,7 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
 
 # deref on empty list shouldn't autovivify
 {
-    local $@;
+    local $@->{description};
     eval { ()[0]{foo} };
     like ( "$@->{description}", "Can't use an undefined value as a HASH reference",
            "deref of undef from list slice fails" );

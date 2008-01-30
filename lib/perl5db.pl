@@ -2435,7 +2435,7 @@ Uses C<dumpvar.pl> to dump out the current values for selected variables.
                         # The die doesn't need to include the $@, because
                         # it will automatically get propagated for us.
                         if ($@) {
-                            die unless $@ =~ m/dumpvar print failed/;
+                            die unless $@->{description} =~ m/dumpvar print failed/;
                         }
                     } ## end if (defined &main::dumpvar)
                     else {
@@ -2604,7 +2604,7 @@ above the current one and then displays then using C<dumpvar.pl>.
                     # See if we've got the necessary support.
                     eval { require PadWalker; PadWalker->VERSION(0.08) }
                       or &warn(
-                        $@ =~ m/locate/
+                        $@->{description} =~ m/locate/
                         ? "PadWalker module not found - please install\n"
                         : $@
                       )
@@ -4760,7 +4760,7 @@ sub cmd_i {
     my $line = shift;
     eval { require Class::ISA };
     if ($@) {
-        &warn( $@ =~ m/locate/
+        &warn( $@->{description} =~ m/locate/
             ? "Class::ISA module not found - please install\n"
             : $@ );
     }

@@ -11,7 +11,7 @@ BEGIN {
 	exit 0;
     }
     eval 'use Encode';
-    if ($@ =~ m/dynamic loading not available/) {
+    if ($@->{description} =~ m/dynamic loading not available/) {
         print "1..0 # miniperl cannot load Encode\n";
 	exit 0;
     }

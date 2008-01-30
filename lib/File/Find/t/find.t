@@ -700,7 +700,7 @@ if ( $symlink_exists ) {
     undef $@;
     eval {File::Find::find( {wanted => \&simple_wanted, follow => 1,
                              no_chdir => 1}, topdir('fa') ); };
-    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]faa_sl is a recursive symbolic link|i );  
+    Check( $@->{description} =~ m|for_find[:/]fa[:/]faa[:/]faa_sl is a recursive symbolic link|i );  
     unlink file_path('fa', 'faa', 'faa_sl'); 
 
 
@@ -717,7 +717,7 @@ if ( $symlink_exists ) {
                                   follow_skip => 0, no_chdir => 1},
                                   topdir('fa') );};
 
-    Check( $@ =~ m|for_find[:/]fa[:/]fa_ord encountered a second time|i );
+    Check( $@->{description} =~ m|for_find[:/]fa[:/]fa_ord encountered a second time|i );
 
 
     # no_chdir is in effect, hence we use file_path_name to specify
@@ -766,7 +766,7 @@ if ( $symlink_exists ) {
                             follow_skip => 0, no_chdir => 1},
                             topdir('fa') );};
 
-    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );
+    Check( $@->{description} =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );
 
   
     undef $@;
@@ -775,7 +775,7 @@ if ( $symlink_exists ) {
                             follow_skip => 1, no_chdir => 1},
                             topdir('fa') );};
 
-    Check( $@ =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );  
+    Check( $@->{description} =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );  
 
     # no_chdir is in effect, hence we use file_path_name to specify
     # the expected paths for %Expect_File

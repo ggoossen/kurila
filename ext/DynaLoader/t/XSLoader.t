@@ -40,11 +40,11 @@ can_ok( 'XSLoader' => 'bootstrap_inherit' );
 
 # Check error messages
 eval { XSLoader::load() };
-like( $@, q|/^XSLoader::load\('Your::Module', \$Your::Module::VERSION\)/|,
+like( $@->{description}, q|/^XSLoader::load\('Your::Module', \$Your::Module::VERSION\)/|,
         "calling XSLoader::load() with no argument" );
 
 eval q{ package Thwack; XSLoader::load('Thwack'); };
-like( $@, q{/^Can't locate loadable object for module Thwack in @INC/},
+like( $@->{description}, q{/^Can't locate loadable object for module Thwack in @INC/},
         "calling XSLoader::load() under a package with no XS part" );
 
 # Now try to load well known XS modules
@@ -56,7 +56,7 @@ for my $module (sort keys %modules) {
         skip "$module not available", 3 if $extensions !~ m/\b$module\b/;
 
         eval qq{ package $module; XSLoader::load('$module', "qunckkk"); };
-        like( $@, "/^$module object version \\S+ does not match bootstrap parameter (?:qunckkk|0)/",  
+        like( $@->{description}, "/^$module object version \\S+ does not match bootstrap parameter (?:qunckkk|0)/",  
                 "calling XSLoader::load() with a XS module and an incorrect version" );
 
         eval qq{ package $module; XSLoader::load('$module'); };

@@ -40,16 +40,16 @@ is( $@, $error, 'filetest dies without subpragma on unimport' );
 
 # there'll be a compilation aborted failure here, with the eval string
 eval "no filetest 'fake pragma'";
-like( $@, qr/^$error/, 'filetest dies with bad subpragma on unuse' );
+like( $@->{description}, qr/^$error/, 'filetest dies with bad subpragma on unuse' );
 
 eval "use filetest 'bad subpragma'";
-like( $@, qr/^$error/, 'filetest dies with bad subpragma on use' );
+like( $@->{description}, qr/^$error/, 'filetest dies with bad subpragma on use' );
 
 eval "use filetest";
-like( $@, qr/^$error/, 'filetest dies with missing subpragma on use' );
+like( $@->{description}, qr/^$error/, 'filetest dies with missing subpragma on use' );
 
 eval "no filetest";
-like( $@, qr/^$error/, 'filetest dies with missing subpragma on unuse' );
+like( $@->{description}, qr/^$error/, 'filetest dies with missing subpragma on unuse' );
 
 SKIP: {
     # A real test for filetest.

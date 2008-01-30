@@ -752,7 +752,7 @@ sub tryfunc {
     my $got = join ',', eval $function;
 
     if ( $@ ) {
-      if ( $@ =~ m/^\Q$skip_exception/ ) {
+      if ( $@->{description} =~ m/^\Q$skip_exception/ ) {
 	skip "skip $function: $skip_exception", 1;
       }
       else {

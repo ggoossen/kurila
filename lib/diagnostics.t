@@ -20,4 +20,4 @@ eval {
     'base'->import(qw(I::do::not::exist));
 };
 
-like( $@, qr/^Base class package "I::do::not::exist" is empty/);
+like( $@->{description}, qr/^Base class package "I::do::not::exist" is empty/);

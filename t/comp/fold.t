@@ -51,6 +51,6 @@ is ($@, "");
 	$c = 0;
 	$x = 1/0;
     };
-    like ($@, qr/division/, "eval caught division");
+    like ($@->{description}, qr/division/, "eval caught division");
     is($c, 2, "missing die hook");
 }
