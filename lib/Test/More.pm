@@ -3,7 +3,6 @@ package Test::More;
 
 use strict;
 
-
 # Can't use Carp because it might cause use_ok() to accidentally succeed
 # even though the module being used forgot to use Carp.  Yes, this
 # actually happened.
@@ -656,7 +655,7 @@ sub use_ok ($;@) {
 
     my($pack,$filename,$line) = caller;
 
-    local($@,$!,$SIG{__DIE__});   # isolate eval
+    local($@,$!);   # isolate eval
 
     if( @imports == 1 and $imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
         # probably a version check.  Perl needs to see the bare number
@@ -708,8 +707,7 @@ sub require_ok ($) {
     # Module names must be barewords, files not.
     $module = qq['$module'] unless _is_module_name($module);
 
-    local($!, $@, $SIG{__DIE__}); # isolate eval
-    local $SIG{__DIE__};
+    local($!, $@); # isolate eval
     eval <<REQUIRE;
 package $pack;
 require $module;

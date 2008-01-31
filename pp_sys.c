@@ -446,7 +446,6 @@ PP(pp_warn)
 PP(pp_die)
 {
     dVAR; dSP; dMARK;
-    const char *tmps;
     SV *tmpsv = NULL;
 
     /* TODO: protection against recursion */
@@ -454,7 +453,7 @@ PP(pp_die)
     if (SP - MARK >= 1) {
 	ENTER;
 	PUSHMARK(MARK);
-	call_pv("error::create", G_SCALAR);
+	call_sv(PL_errorcreatehook, G_SCALAR);
 	tmpsv = POPs;
 	LEAVE;
     }
@@ -464,8 +463,17 @@ PP(pp_die)
 	    tmpsv = error;
 	}
     }
-    if ( ! tmpsv )
-	tmpsv = sv_2mortal(newSVpvs("Died"));
+    if ( ! tmpsv ) {
+	ENTER;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSVpvs("Died")));
+	PUTBACK;
+	call_sv(PL_errorcreatehook, G_SCALAR);
+	SPAGAIN;
+	tmpsv = POPs;
+	PUTBACK;
+	LEAVE;
+    }
 
     Perl_vdie_common(tmpsv, FALSE);
 

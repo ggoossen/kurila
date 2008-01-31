@@ -1047,7 +1047,7 @@ ok("\n\n" =~ m/\n* $ \n/x);
 ok("\n\n" =~ m/\n+ $ \n/x);
 
 eval { [] =~ m/^ARRAY/ };
-ok($@->{description} =~ qr/Tried to stringify a reference/, " # TODO ");
+ok($@ && $@->{description} =~ qr/Tried to stringify a reference/, " # TODO ");
 
 eval << 'EOE';
 \{

@@ -56,7 +56,7 @@ is("$a-$b", "newa-oldb");
     ok ! $@, "compsub in run-time eval";
 }
 eval "nothing";
-like $@, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
+like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
 
 
 ## calling a function

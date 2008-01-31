@@ -18,7 +18,7 @@ ok( require filetest, 'required pragma successfully' );
 
 # and here's one culprit, right here
 eval { filetest->import('bad subpragma') };
-is( $@, $error, 'filetest dies with bad subpragma on import' );
+is( $@->{description}, $error, 'filetest dies with bad subpragma on import' );
 
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set without pragma in place' );
 
@@ -36,7 +36,7 @@ filetest->unimport('access');
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set with pragma unimported' );
 
 eval { filetest->unimport() };
-is( $@, $error, 'filetest dies without subpragma on unimport' );
+is( $@->{description}, $error, 'filetest dies without subpragma on unimport' );
 
 # there'll be a compilation aborted failure here, with the eval string
 eval "no filetest 'fake pragma'";

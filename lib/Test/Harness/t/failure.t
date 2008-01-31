@@ -29,17 +29,21 @@ my $SAMPLE_TESTS = $ENV{PERL_CORE}
 	: File::Spec->catdir($Curdir, 't',   'sample-tests');
 
 PASSING: {
-    local $SIG{__DIE__} = \&signal_death;
     prepare_for_death();
-    eval { runtests( File::Spec->catfile( $SAMPLE_TESTS, "simple" ) ) };
+    eval {
+        local $SIG{__DIE__} = \&signal_death;
+        runtests( File::Spec->catfile( $SAMPLE_TESTS, "simple" ) );
+    };
     ok( !$@, "simple lives" );
     is( $died, 0, "Death never happened" );
 }
 
 FAILING: {
-    local $SIG{__DIE__} = \&signal_death;
     prepare_for_death();
-    eval { runtests( File::Spec->catfile( $SAMPLE_TESTS, "too_many" ) ) };
+    eval {
+        local $SIG{__DIE__} = \&signal_death;
+        runtests( File::Spec->catfile( $SAMPLE_TESTS, "too_many" ) );
+    };
     ok( $@, "$@" );
     ok( $@->{description} =~ m[Failed 1/1], "too_many dies" );
     is( $died, 1, "Death happened" );

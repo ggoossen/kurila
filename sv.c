@@ -10359,6 +10359,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_origfilename	= SAVEPV(proto_perl->Iorigfilename);
     PL_diehook		= sv_dup_inc(proto_perl->Idiehook, param);
     PL_warnhook		= sv_dup_inc(proto_perl->Iwarnhook, param);
+    PL_errorcreatehook		= sv_dup_inc(proto_perl->Ierrorcreatehook, param);
 
     /* switches */
     PL_minus_c		= proto_perl->Iminus_c;

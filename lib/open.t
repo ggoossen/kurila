@@ -25,7 +25,7 @@ like( $@->{description}, qr/needs explicit list of PerlIO layers/,
 # prevent it from loading I18N::Langinfo, so we can test encoding failures
 my $warn;
 local $SIG{__WARN__} = sub {
-	$warn .= shift;
+	$warn .= shift->{description};
 };
 
 # and it shouldn't be able to find this layer

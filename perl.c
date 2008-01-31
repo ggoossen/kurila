@@ -5031,7 +5031,12 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 	    if (PL_madskills)
 		PL_madskills |= 16384;
 #endif
-	    CALL_LIST_BODY(cv);
+	    {
+		SV *old_diehook = PL_diehook;
+		PL_diehook = PERL_DIEHOOK_IGNORE;
+		CALL_LIST_BODY(cv);
+		PL_diehook = old_diehook;
+	    }
 #ifdef PERL_MAD
 	    if (PL_madskills)
 		PL_madskills &= ~16384;
@@ -5044,16 +5049,27 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		    LEAVE;
 		JMPENV_POP;
 
+		/* report compilation errors */
+		if (SvROK(atsv) && SvTYPE(SvRV(atsv)) == SVt_PVHV) {
+		    SV** desc = hv_fetchs( (HV*)SvRV(atsv), "description", FALSE );
+		    if (desc) {
+			if (paramList == PL_beginav)
+			    sv_catpv( *desc,
+				      "\nBEGIN failed--compilation aborted" );
+			else
+			    sv_catpvf( *desc, "\n%s failed--call queue aborted",
+				       paramList == PL_checkav ? "CHECK"
+				       : paramList == PL_initav ? "INIT"
+				       : paramList == PL_unitcheckav ? "UNITCHECK"
+				       : "END");
+		    }
+		}
+
 		Perl_vdie_common(atsv, FALSE);
 		die_where(atsv);
-/* 		if (paramList == PL_beginav) */
-/* 		    Perl_croak(aTHX_ "BEGIN failed--compilation aborted"); */
-/* 		else */
-/* 		    Perl_croak(aTHX_ "%s failed--call queue aborted", */
-/* 			paramList == PL_checkav ? "CHECK" */
-/* 			: paramList == PL_initav ? "INIT" */
-/* 			: paramList == PL_unitcheckav ? "UNITCHECK" */
-/* 			: "END"); */
+
+		/* really die */
+		    Perl_croak(aTHX_ "BEGIN failed--compilation aborted");
 		/* NOTREACHED */
 	    }
 	    break;
