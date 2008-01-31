@@ -42,8 +42,8 @@ is ($@, "");
 {
     my $c = 0;
     local $SIG{__WARN__} = sub { $c++   };
-    local $SIG{__DIE__}  = sub { $c+= 2 };
     eval q{
+        local $SIG{__DIE__}  = sub { $c+= 2 };
 	is($c, 0, "premature warn/die: $c");
 	my $x = "a"+5;
 	is($c, 1, "missing warn hook");

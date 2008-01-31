@@ -12,7 +12,7 @@ print "1..27\n";
 
 # catch "used once" warnings
 my @warns;
-BEGIN { $SIG{__WARN__} = sub { push @warns, @_ }; $^W = 1 };
+BEGIN { $SIG{__WARN__} = sub { push @warns, $_[0]->{description} }; $^W = 1 };
 
 %x = ();
 $y = 3;
@@ -91,8 +91,8 @@ print "${e}ok 22\n";
 $e = *{Symbol::fetch_glob('y%%')}{ARRAY} && 'not ';
 print "${e}ok 23\n";
 eval '$u = 3; @v = (); %w = ()';
-my @errs = split m/\n/, $@;
-$e = @errs != 3 && 'not ';
+my @errs = split m/\n/, $@->message;
+$e = @errs != 4 && 'not ';
 print "${e}ok 24\n";
 $e = !(grep(m/^Global symbol "\$u" requires explicit package name/, @errs))
 			&& 'not ';

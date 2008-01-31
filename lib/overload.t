@@ -278,7 +278,7 @@ is("b${a}c", "bxxc");
 # Negative overloading:
 
 $na = eval { ^~^$a };
-like($@, qr/no method found/);
+like($@->{description}, qr/no method found/);
 
 eval "package Oscalar; sub numify \{ return '_!_' . shift() . '_!_' \} use overload '0+' => \\&numify";
 is $@, '';
@@ -286,7 +286,7 @@ eval "package Oscalar; sub rshft \{ return '_!_' . shift() . '_!_' \} use overlo
 is $@, '';
 
 $na = eval { $aI >> 1 };       # Hash was not updated
-like($@, qr/no method found/);
+like($@->{description}, qr/no method found/);
 
 bless \$x, 'OscalarI';
 
@@ -878,7 +878,7 @@ unless ($aaa) {
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "integer" ; ' ;
-    like($a, qr/^Odd number of arguments for overload::constant at/);
+    like($a->{description}, qr/^Odd number of arguments for overload::constant at/);
 }
 
 {
@@ -889,7 +889,7 @@ unless ($aaa) {
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "fred" => sub {} ; ' ;
-    like($a, qr/^`fred' is not an overloadable type at/);
+    like($a->{description}, qr/^`fred' is not an overloadable type at/);
 }
 
 {
@@ -900,7 +900,7 @@ unless ($aaa) {
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "integer" => 1; ' ;
-    like($a, qr/^`1' is not a code reference at/);
+    like($a->{description}, qr/^`1' is not a code reference at/);
 }
 
 {
@@ -1016,7 +1016,7 @@ my $a = Foo->new;
 $a->xet('b', 42);
 is ($a->xet('b'), 42);
 ok (!defined eval { $a->{b} });
-like ($@, qr/zap/);
+like ($@->{description}, qr/zap/);
 
 {
    package t229;
@@ -1278,7 +1278,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     ($warning, $method) = ("", "");
     ok($t eq 'whatever', 'eq falls back to cmp (nomethod not called)');
     is($method, 'cmp');
-    like($warning, qr/isn't numeric/, 'cmp should return number');
+    like($warning->{description}, qr/isn't numeric/, 'cmp should return number');
 
 }
 

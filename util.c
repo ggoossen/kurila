@@ -1364,6 +1364,7 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	msv = vmess(pat, args);
 
 	if (PL_errors && SvCUR(PL_errors)) {
+	    sv_catpvn(PL_errors, "\n", 1);
 	    sv_catsv(PL_errors, msv);
 	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);

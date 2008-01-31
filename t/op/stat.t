@@ -78,7 +78,7 @@ sleep 2;
 SKIP: {
     unlink $tmpfile_link;
     my $lnk_result = eval { link $tmpfile, $tmpfile_link };
-    skip "link() unimplemented", 6 if $@->{description} =~ m/unimplemented/;
+    skip "link() unimplemented", 6 if $@ and $@->{description} =~ m/unimplemented/;
 
     is( $@, '',         'link() implemented' );
     ok( $lnk_result,    'linked tmp testfile' );
@@ -198,7 +198,7 @@ ok(! -f $Curdir,          '!-f cwd' );
 SKIP: {
     unlink($tmpfile_link);
     my $symlink_rslt = eval { symlink $tmpfile, $tmpfile_link };
-    skip "symlink not implemented", 3 if $@->{description} =~ m/unimplemented/;
+    skip "symlink not implemented", 3 if $@ and $@->{description} =~ m/unimplemented/;
 
     is( $@, '',     'symlink() implemented' );
     ok( $symlink_rslt,      'symlink() ok' );
@@ -368,7 +368,7 @@ ok(! -T $Perl,    '!-T');
 open(FOO, "<",$statfile);
 SKIP: {
     eval { -T *FOO; };
-    skip "-T/B on filehandle not implemented", 15 if $@->{description} =~ m/not implemented/;
+    skip "-T/B on filehandle not implemented", 15 if $@ and $@->{description} =~ m/not implemented/;
 
     is( $@, '',     '-T on filehandle causes no errors' );
 
