@@ -8,15 +8,14 @@ my $fred ;
 $b = "fred" ;
 $a = $$b ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use at - line 3.
-Execution of - aborted due to compilation errors.
+Bareword "Fred" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 6.
 ########
 
 use strict qw(subs refs) ;
 $fred ;
 EXPECT
-Global symbol "$fred" requires explicit package name at - line 3.
-Execution of - aborted due to compilation errors.
+
 ########
 
 use strict ;
@@ -51,24 +50,23 @@ EXPECT
 use strict ;
 $fred ;
 EXPECT
-Global symbol "$fred" requires explicit package name at - line 4.
-Execution of - aborted due to compilation errors.
+Global symbol "$fred" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 4.
 ########
 
 # strict vars - error
 use strict 'vars' ;
 <$fred> ;
 EXPECT
-Global symbol "$fred" requires explicit package name at - line 4.
-Execution of - aborted due to compilation errors.
+No operator expected, but found '<', '<=' or '<=>' operator at - line 4.
 ########
 
 # strict vars - error
 use strict 'vars' ;
 local $fred ;
 EXPECT
-Global symbol "$fred" requires explicit package name at - line 4.
-Execution of - aborted due to compilation errors.
+Global symbol "$fred" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 4.
 ########
 
 # Check compile time scope of strict vars pragma
@@ -80,8 +78,8 @@ use strict 'vars' ;
 $joe = 1 ;
 EXPECT
 Variable "$joe" is not imported at - line 8.
-Global symbol "$joe" requires explicit package name at - line 8.
-Execution of - aborted due to compilation errors.
+Global symbol "$joe" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 8.
 ########
 
 # Check compile time scope of strict vars pragma
@@ -92,8 +90,8 @@ no strict;
 }
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 6.
-Execution of - aborted due to compilation errors.
+Global symbol "$joe" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 8.
 ########
 
 --FILE-- abc
@@ -103,8 +101,7 @@ $joe = 1 ;
 use strict 'vars' ;
 require "./abc";
 EXPECT
-Global symbol "$joe" requires explicit package name at ./abc line 1.
-Compilation failed in require at - line 2.
+
 ########
 
 --FILE-- abc
@@ -128,7 +125,8 @@ $joe = 1 ;
 require "./abc";
 EXPECT
 Variable "$joe" is not imported at ./abc line 2.
-Global symbol "$joe" requires explicit package name at ./abc line 2.
+    (eval) called at - line 3.
+Global symbol "$joe" requires explicit package name
 Compilation failed in require at - line 3.
 ########
 
@@ -142,9 +140,10 @@ $joe = 1 ;
 use abc;
 EXPECT
 Variable "$joe" is not imported at abc.pm line 2.
-Global symbol "$joe" requires explicit package name at abc.pm line 2.
+    (eval) called at - line 3.
+Global symbol "$joe" requires explicit package name
 Compilation failed in require at - line 3.
-BEGIN failed--compilation aborted at - line 3.
+BEGIN failed--compilation aborted
 ########
 
 --FILE-- abc.pm
@@ -159,24 +158,25 @@ $p = 0b12;
 --FILE-- 
 use abc;
 EXPECT
-Global symbol "$f" requires explicit package name at abc.pm line 3.
-Global symbol "$k" requires explicit package name at abc.pm line 3.
-Global symbol "$g" requires explicit package name at abc.pm line 4.
-Global symbol "$l" requires explicit package name at abc.pm line 4.
-Global symbol "$c" requires explicit package name at abc.pm line 5.
-Global symbol "$h" requires explicit package name at abc.pm line 5.
-Global symbol "$m" requires explicit package name at abc.pm line 5.
-Global symbol "$d" requires explicit package name at abc.pm line 6.
-Global symbol "$i" requires explicit package name at abc.pm line 6.
-Global symbol "$n" requires explicit package name at abc.pm line 6.
-Global symbol "$e" requires explicit package name at abc.pm line 7.
-Global symbol "$j" requires explicit package name at abc.pm line 7.
-Global symbol "$o" requires explicit package name at abc.pm line 7.
-Global symbol "$p" requires explicit package name at abc.pm line 8.
+Global symbol "$f" requires explicit package name
+Global symbol "$k" requires explicit package name
+Global symbol "$g" requires explicit package name
+Global symbol "$l" requires explicit package name
+Global symbol "$c" requires explicit package name
+Global symbol "$h" requires explicit package name
+Global symbol "$m" requires explicit package name
+Global symbol "$d" requires explicit package name
+Global symbol "$i" requires explicit package name
+Global symbol "$n" requires explicit package name
+Global symbol "$e" requires explicit package name
+Global symbol "$j" requires explicit package name
+Global symbol "$o" requires explicit package name
+Global symbol "$p" requires explicit package name
 Illegal binary digit '2' at abc.pm line 8, at end of line
 abc.pm has too many errors.
-Compilation failed in require at - line 1.
-BEGIN failed--compilation aborted at - line 1.
+ at abc.pm line 8.
+    (eval) called at - line 1.
+BEGIN failed--compilation aborted
 ########
 
 # Check scope of pragma with eval
@@ -199,8 +199,8 @@ eval {
 print STDERR $@;
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 6.
-Execution of - aborted due to compilation errors.
+Global symbol "$joe" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 9.
 ########
 
 # Check scope of pragma with eval
@@ -211,9 +211,9 @@ eval {
 print STDERR $@;
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 5.
-Global symbol "$joe" requires explicit package name at - line 8.
-Execution of - aborted due to compilation errors.
+Global symbol "$joe" requires explicit package name
+Global symbol "$joe" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 8.
 ########
 
 # Check scope of pragma with eval
@@ -226,8 +226,8 @@ print STDERR $@;
 $joe = 1 ;
 EXPECT
 Variable "$joe" is not imported at - line 9.
-Global symbol "$joe" requires explicit package name at - line 9.
-Execution of - aborted due to compilation errors.
+Global symbol "$joe" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 9.
 ########
 
 # Check scope of pragma with eval
@@ -247,7 +247,7 @@ eval q[
     $joe = 1 ;
 ]; print STDERR $@;
 EXPECT
-Global symbol "$joe" requires explicit package name at (eval 1) line 3.
+error=HASH(0x7af158)
 ########
 
 # Check scope of pragma with eval
@@ -256,7 +256,7 @@ eval '
     $joe = 1 ;
 '; print STDERR $@ ;
 EXPECT
-Global symbol "$joe" requires explicit package name at (eval 1) line 2.
+error=HASH(0x7af158)
 ########
 
 # Check scope of pragma with eval
@@ -267,8 +267,8 @@ eval '
 '; print STDERR $@;
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name at - line 8.
-Execution of - aborted due to compilation errors.
+Global symbol "$joe" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 8.
 ########
 
 # Check if multiple evals produce same errors
@@ -280,10 +280,8 @@ $ret = eval q{ print $x; };
 print $@;
 print "ok 2\n" unless defined $ret;
 EXPECT
-Global symbol "$x" requires explicit package name at (eval 1) line 1.
-ok 1
-Global symbol "$x" requires explicit package name at (eval 2) line 1.
-ok 2
+error=HASH(0x7af158)ok 1
+error=HASH(0x7c1a90)ok 2
 ########
 
 # strict vars with outer our - no error
@@ -339,8 +337,8 @@ sub foo {
 $fred ;
 EXPECT
 Variable "$fred" is not imported at - line 8.
-Global symbol "$fred" requires explicit package name at - line 8.
-Execution of - aborted due to compilation errors.
+Global symbol "$fred" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 8.
 ########
 
 # nested our with local - no error
@@ -404,6 +402,7 @@ our $foo;
 EXPECT
 "our" variable $foo redeclared at - line 9.
 	(Did you mean "local" instead of "our"?)
+ at - line 9.
 "our" variable $foo redeclared at - line 10.
 ########
 
@@ -418,7 +417,7 @@ open $FH, "abc" or die "Can't open 'abc': $!";
 print <$FH>;
 close $FH;
 EXPECT
-ok
+No operator expected, but found '<', '<=' or '<=>' operator at - line 6.
 ########
 
 # Make sure the strict vars failure still occurs
@@ -428,21 +427,21 @@ use strict 'vars';
 no warnings;
 "@i_like_crackers";
 EXPECT
-Global symbol "@i_like_crackers" requires explicit package name at - line 7.
-Execution of - aborted due to compilation errors.
+Global symbol "@i_like_crackers" requires explicit package name
+Execution of - aborted due to compilation errors. at - line 7.
 ########
 
 # [perl #21914] New bug > 5.8.0. Used to dump core.
 use strict 'vars';
 @k = <$k>;
 EXPECT
-Global symbol "@k" requires explicit package name at - line 4.
-Global symbol "$k" requires explicit package name at - line 4.
-Execution of - aborted due to compilation errors.
+Global symbol "@k" requires explicit package name
+No operator expected, but found '<', '<=' or '<=>' operator at - line 4.
 ########
 # [perl #26910] hints not propagated into (?{...})
 use strict 'vars';
 qr/(?{$foo++})/;
 EXPECT
-Global symbol "$foo" requires explicit package name at (re_eval 1) line 1.
+Global symbol "$foo" requires explicit package name
 Compilation failed in regexp at - line 3.
+########
