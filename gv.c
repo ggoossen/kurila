@@ -867,7 +867,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
     if (!stash) {
 	if (add) {
 	    SV * const err = Perl_mess(aTHX_
-		 "Global symbol \"%s%s\" requires explicit package name",
+		 "Global symbol \"%s%s\" requires explicit package name\n",
 		 (sv_type == SVt_PV ? "$"
 		  : sv_type == SVt_PVAV ? "@"
 		  : sv_type == SVt_PVHV ? "%"

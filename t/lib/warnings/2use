@@ -8,8 +8,9 @@ __END__
 #  check illegal category is caught
 use warnings 'this-should-never-be-a-warning-category' ;
 EXPECT
-Unknown warnings category 'this-should-never-be-a-warning-category' at - line 3
-BEGIN failed--compilation aborted at - line 3.
+Unknown warnings category 'this-should-never-be-a-warning-category' at ../lib/warnings.pm line 361.
+    warnings::import called at - line 3.
+BEGIN failed--compilation aborted
 ########
 
 # Check compile time scope of pragma
@@ -65,6 +66,7 @@ no warnings ;
 &$a ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 6.
+    main::__ANON__ called at - line 8.
 ########
 
 use warnings 'syntax' ;
@@ -77,9 +79,9 @@ no warnings 'reserved' ;
 foo.bar;
 EXPECT
 Useless use of concatenation (.) or string in void context at - line 3.
-Bareword "foo" not allowed while "strict subs" in use at - line 3.
-Bareword "bar" not allowed while "strict subs" in use at - line 3.
-Execution of - aborted due to compilation errors.
+Bareword "foo" not allowed while "strict subs" in use
+Bareword "bar" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 3.
 ########
 
 --FILE-- abc
@@ -112,6 +114,7 @@ require "./abc";
 my $a ; chop $a ;
 EXPECT
 Reversed += operator at ./abc line 2.
+    (eval) called at - line 2.
 Use of uninitialized value $a in scalar chop at - line 3.
 ########
 
@@ -125,6 +128,7 @@ use abc;
 my $a ; chop $a ;
 EXPECT
 Reversed += operator at abc.pm line 2.
+    (eval) called at - line 2.
 Use of uninitialized value $a in scalar chop at - line 3.
 ########
 
@@ -153,6 +157,7 @@ use warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 8.
+    (eval) called at - line 6.
 ########
 
 # Check scope of pragma with eval
@@ -166,6 +171,7 @@ no warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 7.
+    (eval) called at - line 6.
 Use of uninitialized value $b in scalar chop at - line 9.
 ########
 
@@ -263,6 +269,7 @@ use warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 3.
+    (eval) called at - line 6.
 ########
 
 # Check scope of pragma with eval
@@ -276,6 +283,7 @@ no warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 2.
+    (eval) called at - line 6.
 Use of uninitialized value $b in scalar chop at - line 9.
 ########
 
@@ -318,6 +326,7 @@ use warnings;
 }
 EXPECT
 Reversed += operator at (eval 1) line 3.
+    (eval) called at - line 6.
 ########
 
 # Check scope of pragma with eval
@@ -332,6 +341,7 @@ no warnings;
 EXPECT
 Reversed += operator at - line 9.
 Reversed += operator at (eval 1) line 2.
+    (eval) called at - line 6.
 ########
 
 # Check scope of pragma with eval

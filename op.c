@@ -341,7 +341,7 @@ S_no_bareword_allowed(pTHX_ const OP *o)
     if (PL_madskills)
 	return;		/* various ok barewords are hidden in extra OP_NULL */
     qerror(Perl_mess(aTHX_
-		     "Bareword \"%"SVf"\" not allowed while \"strict subs\" in use",
+		     "Bareword \"%"SVf"\" not allowed while \"strict subs\" in use\n",
 		     SVfARG(cSVOPo_sv)));
 }
 
