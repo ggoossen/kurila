@@ -6,3 +6,4 @@ use feature ":5.10";
 1 ~~ 1 and print "Hello", "world\n";
 EXPECT
 Helloworld
+########

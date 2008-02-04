@@ -6,35 +6,35 @@ __END__
 use warnings;
 print STDOUT given;
 EXPECT
-Bareword "given" not allowed while "strict subs" in use at - line 3.
-Execution of - aborted due to compilation errors.
+Bareword "given" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 3.
 ########
 # No switch; when should be a bareword.
 use warnings;
 print STDOUT when;
 EXPECT
-Bareword "when" not allowed while "strict subs" in use at - line 3.
-Execution of - aborted due to compilation errors.
+Bareword "when" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 3.
 ########
 # No switch; default should be a bareword.
 use warnings;
 print STDOUT default;
 EXPECT
-Bareword "default" not allowed while "strict subs" in use at - line 3.
-Execution of - aborted due to compilation errors.
+Bareword "default" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 3.
 ########
 # No switch; break should be a bareword.
 use warnings;
 print STDOUT break;
 EXPECT
-Bareword "break" not allowed while "strict subs" in use at - line 3.
-Execution of - aborted due to compilation errors.
+Bareword "break" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 3.
 ########
 # No switch; but continue is still a keyword
 print STDOUT continue;
 EXPECT
 syntax error at - line 2, near "STDOUT continue"
-Execution of - aborted due to compilation errors.
+Execution of - aborted due to compilation errors. at - line 2.
 ########
 # Use switch; so given is a keyword
 use feature 'switch';
@@ -73,8 +73,8 @@ use warnings;
 }
 print STDOUT given;
 EXPECT
-Bareword "given" not allowed while "strict subs" in use at - line 6.
-Execution of - aborted due to compilation errors.
+Bareword "given" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 6.
 ########
 # switch out of scope; when should be a bareword.
 use warnings;
@@ -83,8 +83,8 @@ use warnings;
 }
 print STDOUT when;
 EXPECT
-Bareword "when" not allowed while "strict subs" in use at - line 6.
-Execution of - aborted due to compilation errors.
+Bareword "when" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 6.
 ########
 # switch out of scope; default should be a bareword.
 use warnings;
@@ -93,8 +93,8 @@ use warnings;
 }
 print STDOUT default;
 EXPECT
-Bareword "default" not allowed while "strict subs" in use at - line 6.
-Execution of - aborted due to compilation errors.
+Bareword "default" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 6.
 ########
 # switch out of scope; break should be a bareword.
 use warnings;
@@ -103,8 +103,8 @@ use warnings;
 }
 print STDOUT break;
 EXPECT
-Bareword "break" not allowed while "strict subs" in use at - line 6.
-Execution of - aborted due to compilation errors.
+Bareword "break" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 6.
 ########
 # switch out of scope; continue should not work
 { use feature 'switch';
@@ -113,7 +113,7 @@ Execution of - aborted due to compilation errors.
 print STDOUT continue;
 EXPECT
 syntax error at - line 5, near "STDOUT continue"
-Execution of - aborted due to compilation errors.
+Execution of - aborted due to compilation errors. at - line 5.
 ########
 # C<no feature 'switch'> should work
 use warnings;
@@ -122,8 +122,8 @@ given (1) { when(1) {print "Okay here\n";} }
 no feature 'switch';
 print STDOUT when;
 EXPECT
-Bareword "when" not allowed while "strict subs" in use at - line 6.
-Execution of - aborted due to compilation errors.
+Bareword "when" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 6.
 ########
 # C<no feature> should work too
 use warnings;
@@ -132,8 +132,8 @@ given (1) { when(1) {print "Okay here\n";} }
 no feature;
 print STDOUT when;
 EXPECT
-Bareword "when" not allowed while "strict subs" in use at - line 6.
-Execution of - aborted due to compilation errors.
+Bareword "when" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 6.
 ########
 # Without the feature, no 'Unambiguous use of' warning:
 use warnings;
@@ -151,3 +151,4 @@ EXPECT
 Ambiguous use of ${break} resolved to $break at - line 5.
 Ambiguous use of ${break[...]} resolved to $break[...] at - line 5.
 breakbreak
+########
