@@ -56,3 +56,4 @@ close F;
 END { 1 while unlink "bb" } # KEEP THIS WITH THE LAST TEST.
 EXPECT
 Unknown PerlIO layer "xyz" at - line 5.
+########

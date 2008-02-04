@@ -68,6 +68,7 @@ use abc;
 my $a ; chop $a ;
 EXPECT
 Reversed += operator at abc.pm line 4.
+    (eval) called at - line 2.
 Use of uninitialized value $a in scalar chop at - line 3.
 ########
 -W
@@ -83,6 +84,7 @@ require "./abc";
 my $a ; chop $a ;
 EXPECT
 Reversed += operator at ./abc line 4.
+    (eval) called at - line 2.
 Use of uninitialized value $a in scalar chop at - line 3.
 ########
 -W
@@ -98,6 +100,7 @@ use abc;
 my $a ; chop $a ;
 EXPECT
 Reversed += operator at abc.pm line 4.
+    (eval) called at - line 2.
 Use of uninitialized value $a in scalar chop at - line 3.
 ########
 -W
@@ -112,6 +115,7 @@ require "./abc";
 my $a ; chop $a ;
 EXPECT
 Reversed += operator at ./abc line 3.
+    (eval) called at - line 2.
 Use of uninitialized value $a in scalar chop at - line 3.
 ########
 -W
@@ -125,6 +129,7 @@ Use of uninitialized value $a in scalar chop at - line 3.
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 2.
+    (eval) called at - line 5.
 Use of uninitialized value $b in scalar chop at - line 8.
 ########
 -W
@@ -140,6 +145,7 @@ use warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 3.
+    (eval) called at - line 6.
 Use of uninitialized value $b in scalar chop at - line 10.
 ########
 -W
@@ -154,6 +160,7 @@ no warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 2.
+    (eval) called at - line 6.
 Use of uninitialized value $b in scalar chop at - line 9.
 ########
 -W
@@ -169,6 +176,7 @@ no warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 3.
+    (eval) called at - line 6.
 Use of uninitialized value $b in scalar chop at - line 10.
 ########
 -W
@@ -186,6 +194,7 @@ use warnings;
 EXPECT
 Reversed += operator at - line 11.
 Reversed += operator at (eval 1) line 3.
+    (eval) called at - line 7.
 ########
 -W
 # Check scope of pragma with eval
@@ -201,6 +210,7 @@ no warnings;
 EXPECT
 Reversed += operator at - line 10.
 Reversed += operator at (eval 1) line 2.
+    (eval) called at - line 7.
 ########
 -W
 # Check scope of pragma with eval
@@ -217,3 +227,5 @@ no warnings;
 EXPECT
 Reversed += operator at - line 11.
 Reversed += operator at (eval 1) line 3.
+    (eval) called at - line 7.
+########

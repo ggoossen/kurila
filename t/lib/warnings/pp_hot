@@ -107,6 +107,7 @@ EXPECT
 print() on closed filehandle STDIN at - line 4.
 print() on closed filehandle STDIN at - line 6.
 	(Are you trying to call print() on dirhandle STDIN?)
+ at - line 6.
 ########
 # pp_hot.c [pp_print]
 # [ID 20020425.012] from Dave Steiner <steiner@bakerst.rutgers.edu>
@@ -181,6 +182,7 @@ EXPECT
 readline() on closed filehandle STDIN at - line 3.
 readline() on closed filehandle STDIN at - line 4.
 	(Are you trying to call readline() on dirhandle STDIN?)
+ at - line 4.
 ########
 # pp_hot.c [Perl_do_readline]
 use warnings 'io' ;
@@ -219,7 +221,7 @@ sub fred
   fred();
 }
 EXPECT
-ok
+
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
@@ -246,6 +248,106 @@ $b = sub
 &$b ;
 EXPECT
 Deep recursion on anonymous subroutine at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 5.
+    main::__ANON__ called at - line 8.
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
@@ -256,6 +358,7 @@ $b = sub
 
 &$b ;
 EXPECT
+
 ########
 # pp_hot.c [pp_concat]
 use warnings 'uninitialized';
@@ -303,3 +406,5 @@ print $x[$b];
 EXPECT
 OPTION regex
 Use of reference ".*" as array index at - line 7.
+
+########

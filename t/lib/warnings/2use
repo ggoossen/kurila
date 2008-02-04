@@ -371,3 +371,4 @@ $a =+ 1 ;
 EXPECT
 Reversed += operator at - line 6.
 Use of uninitialized value $c in scalar chop at - line 9.
+########

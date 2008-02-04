@@ -76,6 +76,7 @@ sub joe { last }
 { joe() }
 EXPECT
 Exiting subroutine via last at - line 3.
+    main::fred called at - line 4.
 ########
 # pp_ctl.c
 {
@@ -88,6 +89,7 @@ print STDERR $@ ;
 print STDERR $@ ;
 EXPECT
 Exiting eval via last at (eval 1) line 1.
+    (eval) called at - line 3.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
@@ -124,6 +126,7 @@ sub Fred { last Joe }
 Joe: { Fred() }
 EXPECT
 Exiting subroutine via last at - line 3.
+    main::fred called at - line 4.
 ########
 # pp_ctl.c
 joe:
@@ -134,6 +137,7 @@ Joe:
 print STDERR $@ ;
 EXPECT
 Exiting eval via last at (eval 1) line 1.
+    (eval) called at - line 2.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
@@ -175,8 +179,66 @@ DESTROY { die "@{$_[0]} foo bar" }
 { bless ['A'], 'Foo' for 1..10 }
 { bless ['B'], 'Foo' for 1..10 }
 EXPECT
-	(in cleanup) A foo bar at - line 4.
-	(in cleanup) B foo bar at - line 4.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
 ########
 # pp_ctl.c
 no warnings 'misc' ;
@@ -185,12 +247,73 @@ DESTROY { die "@{$_[0]} foo bar" }
 { bless ['A'], 'Foo' for 1..10 }
 { bless ['B'], 'Foo' for 1..10 }
 EXPECT
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+A foo bar at - line 4.
+    Foo::DESTROY called at - line 5.
+    (eval) called at - line 5.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
+B foo bar at - line 4.
+    Foo::DESTROY called at - line 6.
+    (eval) called at - line 6.
 ########
 # pp_ctl.c
 use warnings;
 eval 'print $foo';
 EXPECT
 Use of uninitialized value $foo in print at (eval 1) line 1.
+    (eval) called at - line 3.
 ########
 # pp_ctl.c
 use warnings;
@@ -199,3 +322,5 @@ use warnings;
     eval 'print $foo';
 }
 EXPECT
+
+########

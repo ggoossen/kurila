@@ -161,8 +161,8 @@ Reversed *= operator at - line 5.
 Reversed %= operator at - line 6.
 Reversed &= operator at - line 7.
 Reversed .= operator at - line 8.
-Reversed ^= operator at - line 9.
 syntax error at - line 8, near "=."
+Reversed ^= operator at - line 9.
 Expected ^,&,| or ~ after a ^, but found ' ' at - line 9.
 ########
 # toke.c
@@ -216,7 +216,7 @@ s/(ab)/{\1}/e;
 EXPECT
 Can't use \1 to mean $1 in expression at - line 4.
 syntax error at - line 7, near "s/(ab)/{\1}/e"
-Execution of - aborted due to compilation errors.
+Execution of - aborted due to compilation errors. at - line 7.
 ########
 # toke.c
 use warnings 'reserved' ;
@@ -227,9 +227,9 @@ $a = { def
 no warnings 'reserved' ;
 $a = abc;
 EXPECT
-Bareword "abc" not allowed while "strict subs" in use at - line 3.
-Bareword "abc" not allowed while "strict subs" in use at - line 8.
-Execution of - aborted due to compilation errors.
+Bareword "abc" not allowed while "strict subs" in use
+Bareword "abc" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 8.
 ########
 # toke.c
 use warnings 'qw' ;
@@ -544,6 +544,7 @@ warn "yelp";
 EOE
 EXPECT
 yelp at foo line 30.
+    (eval) called at - line 3.
 ########
 # toke.c
 my $a = rand + 4 ;
@@ -569,6 +570,7 @@ Warning: Use of "rand" without parentheses is ambiguous at - line 10.
 use warnings "ambiguous";
 print for keys %+; # should not warn
 EXPECT
+
 ########
 # toke.c
 sub fred {};
@@ -600,6 +602,7 @@ Precedence problem: open FOO should be open(FOO) at - line 2.
 # toke.c (and [perl #16184])
 open FOO => "<&", "0"; close FOO;
 EXPECT
+
 ########
 # toke.c
 $^W = 0 ;
@@ -633,11 +636,11 @@ Operator or semicolon missing before *foo at - line 8.
 Ambiguous use of * resolved as operator * at - line 8.
 Operator or semicolon missing before *foo at - line 10.
 Ambiguous use of * resolved as operator * at - line 10.
-Bareword "foo" not allowed while "strict subs" in use at - line 3.
-Bareword "foo" not allowed while "strict subs" in use at - line 6.
-Bareword "foo" not allowed while "strict subs" in use at - line 8.
-Bareword "foo" not allowed while "strict subs" in use at - line 10.
-Execution of - aborted due to compilation errors.
+Bareword "foo" not allowed while "strict subs" in use
+Bareword "foo" not allowed while "strict subs" in use
+Bareword "foo" not allowed while "strict subs" in use
+Bareword "foo" not allowed while "strict subs" in use
+Execution of - aborted due to compilation errors. at - line 10.
 ########
 # toke.c
 use warnings 'misc' ;
@@ -792,6 +795,7 @@ no warnings "syntax";
 eval q/if ($a) { } elseif ($b) { }/;
 EXPECT
 elseif should be elsif at (eval 1) line 1.
+    (eval) called at - line 3.
 ########
 # toke.c
 # mandatory warning
@@ -800,7 +804,11 @@ no warnings "syntax";
 eval q/5 6/;
 EXPECT
 Number found where operator expected at (eval 1) line 1, near "5 6"
+ at (eval 1) line 1.
+    (eval) called at - line 3.
 	(Missing operator before  6?)
+ at (eval 1) line 1.
+    (eval) called at - line 3.
 ########
 # toke.c
 use warnings "syntax";
@@ -829,3 +837,4 @@ use warnings 'deprecated';
 our $bar :unique;
 EXPECT
 Use of :unique is deprecated at - line 4.
+########

@@ -8,12 +8,14 @@ $a = $b = 1 ;
 $a =+ 1 ;
 close STDIN ; print STDIN "abc" ;
 EXPECT
+
 ########
 -X
 # nolint: check runtime $^W is zapped
 $^W = 1 ;
 close STDIN ; print STDIN "abc" ;
 EXPECT
+
 ########
 -X
 # nolint: check runtime $^W is zapped
@@ -22,6 +24,7 @@ EXPECT
   close STDIN ; print STDIN "abc" ;
 }
 EXPECT
+
 ########
 -X
 # nolint: check "no warnings" is zapped
@@ -30,6 +33,7 @@ $a = $b = 1 ;
 $a =+ 1 ;
 close STDIN ; print STDIN "abc" ;
 EXPECT
+
 ########
 -X
 # nolint: check "no warnings" is zapped
@@ -38,6 +42,7 @@ EXPECT
   close STDIN ; print STDIN "abc" ;
 }
 EXPECT
+
 ########
 -Xw
 # nolint: check combination of -w and -X
@@ -46,6 +51,7 @@ EXPECT
   close STDIN ; print STDIN "abc" ;
 }
 EXPECT
+
 ########
 -X
 --FILE-- abc.pm
@@ -58,6 +64,7 @@ use warnings 'uninitialized' ;
 use abc;
 my $a ; chop $a ;
 EXPECT
+
 ########
 -X
 --FILE-- abc
@@ -70,6 +77,7 @@ use warnings 'uninitialized' ;
 require "./abc";
 my $a ; chop $a ;
 EXPECT
+
 ########
 -X
 --FILE-- abc.pm
@@ -82,6 +90,7 @@ $^W = 1 ;
 use abc;
 my $a ; chop $a ;
 EXPECT
+
 ########
 -X
 --FILE-- abc
@@ -94,6 +103,7 @@ $^W = 1 ;
 require "./abc";
 my $a ; chop $a ;
 EXPECT
+
 ########
 -X
 # Check scope of pragma with eval
@@ -202,3 +212,4 @@ no warnings;
 }
 EXPECT
 
+########

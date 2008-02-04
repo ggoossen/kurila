@@ -12,6 +12,8 @@ use strict;
 use warnings;
 our $pragma_name;
 
+our $got_files;
+
 $| = 1;
 
 my $Is_MacOS = $^O eq 'MacOS';
@@ -36,16 +38,19 @@ else
 my $files = 0;
 foreach my $file (@w_files) {
 
-    next if $file =~ m/(~|\.orig|,v)$/;
+    next if $file =~ m/(~|\.orig|\.got|,v)$/;
     next if $file =~ m/perlio$/ && !('PerlIO::Layer'->find( 'perlio'));
     next if -d $file;
 
     open F, "<", "$file" or die "Cannot open $file: $!\n" ;
     my $line = 0;
+    open my $got_file, ">", "$file.got" or die if $got_files;
     while ( ~< *F) {
+        print $got_file $_ if $got_files;
         $line++;
 	last if m/^__END__/ ;
     }
+    close $got_file if $got_files;
 
     {
         local $/ = undef;
@@ -59,14 +64,21 @@ undef $/;
 
 plan tests => (scalar(@prgs)-$files);
 
+my $out_file;
 my $file;
 for (@prgs){
     unless (m/\n/)
      {
       print "# From $_\n";
       $file = $_;
+
+      if ($got_files) {
+          close $out_file if $out_file;
+          open $out_file, ">>", "$file.got" or die;
+      }
       next;
      }
+    my $src = $_;
     my $switch = "";
     my @temps = () ;
     my @temp_path = () ;
@@ -184,7 +196,10 @@ for (@prgs){
     }
     else {
 	$ok = $results eq $expected;
+
+        $src =~ s/\nEXPECT(?:\n|$)(.|\n)*/\nEXPECT\n$results/;
     }
+    print $out_file $src, "\n########\n" if $got_files;
  
     print_err_line( $switch, $prog, $expected, $results, $todo, $file ) unless $ok;
 

@@ -331,3 +331,4 @@ no warnings 'numeric' ;
 $a = "\x{100}\x{200}"; $a = -$a;
 EXPECT
 Argument "\x{100}\x{200}" isn't numeric in negation (-) at - line 4.
+########

@@ -341,6 +341,7 @@ our $tmp6; $v = $tmp6--; # (doesn't warn)
 my  $tmp7; $v = --$tmp7; # (doesn't warn)
 our $tmp8; $v = --$tmp8; # (doesn't warn)
 EXPECT
+
 ########
 use warnings 'uninitialized';
 
@@ -457,9 +458,12 @@ Use of uninitialized value $m1 in integer subtraction (-) at - line 7.
 Use of uninitialized value $g1 in integer multiplication (*) at - line 8.
 Use of uninitialized value $m1 in integer multiplication (*) at - line 8.
 Use of uninitialized value $g1 in integer division (/) at - line 9.
+    (eval) called at - line 9.
 Use of uninitialized value $m2 in integer division (/) at - line 10.
 Use of uninitialized value $g1 in integer modulus (%) at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $m1 in integer modulus (%) at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $m2 in integer modulus (%) at - line 12.
 Use of uninitialized value $g1 in integer lt (+<) at - line 13.
 Use of uninitialized value $m1 in integer lt (+<) at - line 13.
@@ -521,7 +525,9 @@ Use of uninitialized value $g1 in sort at - line 7.
 Use of uninitialized value $m1 in sort at - line 7.
 Use of uninitialized value $g1 in sort at - line 7.
 Use of uninitialized value $a in subtraction (-) at - line 8.
+    main::sortf called at - line 9.
 Use of uninitialized value $b in subtraction (-) at - line 8.
+    main::sortf called at - line 9.
 Use of uninitialized value $m1 in sort at - line 9.
 Use of uninitialized value $g1 in sort at - line 9.
 Use of uninitialized value $m1 in sort at - line 9.
@@ -551,10 +557,14 @@ $v = $m1 +  $g1;
 $v = $m1 -  $g1;
 EXPECT
 Use of uninitialized value $g1 in division (/) at - line 5.
+    (eval) called at - line 5.
 Use of uninitialized value $m1 in division (/) at - line 5.
+    (eval) called at - line 5.
 Use of uninitialized value $m2 in division (/) at - line 6.
 Use of uninitialized value $g1 in modulus (%) at - line 7.
+    (eval) called at - line 7.
 Use of uninitialized value $m1 in modulus (%) at - line 7.
+    (eval) called at - line 7.
 Use of uninitialized value $m2 in modulus (%) at - line 8.
 Use of uninitialized value $g1 in numeric eq (==) at - line 9.
 Use of uninitialized value $m1 in numeric eq (==) at - line 9.
@@ -789,6 +799,7 @@ Use of uninitialized value $m1 in rand at - line 8.
 Use of uninitialized value $m1 in srand at - line 9.
 Use of uninitialized value $m1 in exp at - line 10.
 Use of uninitialized value $m1 in log at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $m1 in sqrt at - line 12.
 Use of uninitialized value $m1 in hex at - line 13.
 Use of uninitialized value $m1 in oct at - line 14.
@@ -822,11 +833,17 @@ Use of uninitialized value $g1 in substr at - line 7.
 Use of uninitialized value $m1 in substr at - line 7.
 Use of uninitialized value $m1 in substr at - line 7.
 Use of uninitialized value $m2 in vec at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $g1 in vec at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $m1 in vec at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $m2 in vec at - line 12.
+    (eval) called at - line 12.
 Use of uninitialized value $g1 in vec at - line 12.
+    (eval) called at - line 12.
 Use of uninitialized value $m1 in vec at - line 12.
+    (eval) called at - line 12.
 Use of uninitialized value $m1 in index at - line 14.
 Use of uninitialized value $m2 in index at - line 14.
 Use of uninitialized value $g1 in index at - line 15.
@@ -980,22 +997,27 @@ warn $m1,$g1,"foo";
 eval { die $m1, $g1 };
 EXPECT
 Use of uninitialized value $m1 in subroutine dereference at - line 5.
+    (eval) called at - line 5.
 Use of uninitialized value $m1 in subroutine dereference at - line 5.
+    (eval) called at - line 5.
 Use of uninitialized value $g1 in subroutine dereference at - line 6.
+    (eval) called at - line 6.
 Use of uninitialized value $g1 in subroutine dereference at - line 6.
+    (eval) called at - line 6.
 Use of uninitialized value $m1 in splice at - line 9.
 Use of uninitialized value $g1 in splice at - line 9.
 Use of uninitialized value $m1 in splice at - line 10.
 Use of uninitialized value $g1 in splice at - line 10.
 Use of uninitialized value in addition (+) at - line 10.
 Use of uninitialized value $m1 in method lookup at - line 13.
+    (eval) called at - line 13.
 Use of uninitialized value in subroutine entry at - line 15.
+    (eval) called at - line 15.
 Use of uninitialized value in subroutine entry at - line 16.
+    (eval) called at - line 16.
 Use of uninitialized value $m1 in warn at - line 18.
 Use of uninitialized value $g1 in warn at - line 18.
 foo at - line 18.
-Use of uninitialized value $m1 in die at - line 20.
-Use of uninitialized value $g1 in die at - line 20.
 ########
 use warnings 'uninitialized';
 my ($m1);
@@ -1031,7 +1053,9 @@ our ($g1);
 eval { my $x; tie $x, $m1 };
 EXPECT
 Use of uninitialized value $m1 in tie at - line 5.
+    (eval) called at - line 5.
 Use of uninitialized value $m1 in tie at - line 5.
+    (eval) called at - line 5.
 ########
 use warnings 'uninitialized';
 my ($m1);
@@ -1075,11 +1099,17 @@ eval { my $x; socket $x, $m1, $g1, $m2 };
 eval { my ($x,$y); socketpair $x, $y, $m1, $g1, $m2 };
 EXPECT
 Use of uninitialized value $m2 in socket at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $g1 in socket at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $m1 in socket at - line 11.
+    (eval) called at - line 11.
 Use of uninitialized value $m2 in socketpair at - line 12.
+    (eval) called at - line 12.
 Use of uninitialized value $g1 in socketpair at - line 12.
+    (eval) called at - line 12.
 Use of uninitialized value $m1 in socketpair at - line 12.
+    (eval) called at - line 12.
 ########
 use Config; 
 BEGIN { 
@@ -1194,3 +1224,4 @@ my ($m1);
 exit $m1;
 EXPECT
 Use of uninitialized value $m1 in exit at - line 4.
+########

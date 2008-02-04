@@ -226,6 +226,7 @@ use warnings;
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 3.
+    (eval) called at - line 7.
 ########
 
 # Check scope of pragma with eval
@@ -239,6 +240,7 @@ BEGIN {  $^W = 0 }
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 2.
+    (eval) called at - line 6.
 Use of uninitialized value $b in scalar chop at - line 9.
 ########
 
@@ -267,3 +269,4 @@ BEGIN {  $^W = 1 }
 }
 EXPECT
 
+########
