@@ -1440,10 +1440,7 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 {
     dVAR;
     if (PL_warnhook == PERL_WARNHOOK_FATAL || ckDEAD(err)) {
-	SV * const msv = vmess(pat, args);
-
-	Perl_vdie_common(aTHX_ msv, FALSE);
-	die_where(msv);
+	vdie(pat, args);
 	/* NOTREACHED */
     }
     else {

@@ -4,8 +4,8 @@ TODO
 
 __END__
 # 8signal
-BEGIN { $| = 1; $SIG{__WARN__} = sub { print "WARN -- @_" } }
-BEGIN { $SIG{__DIE__}  = sub { print "DIE -- @_" } }
+BEGIN { $| = 1; $SIG{__WARN__} = sub { print "WARN -- {$_[0]->message}" } }
+BEGIN { $SIG{__DIE__}  = sub { print "DIE -- {$_[0]->message}" } }
 $a =+ 1 ;
 use warnings qw(syntax) ;
 $a =+ 1 ;
@@ -14,5 +14,5 @@ $a =+ 1 ;
 print "The End.\n" ;
 EXPECT
 WARN -- Reversed += operator at - line 6.
-DIE -- Reversed += operator at - line 8.
 Reversed += operator at - line 8.
+########

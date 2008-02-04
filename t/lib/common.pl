@@ -12,7 +12,7 @@ use strict;
 use warnings;
 our $pragma_name;
 
-our $got_files;
+our $got_files = 0; # set to 1 to generate output files.
 
 $| = 1;
 
