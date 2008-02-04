@@ -1657,7 +1657,7 @@ doesn't actually exit, that's your job.
 =cut
 
 sub _my_exit {
-    $? = $_[0];
+    $? ||= $_[0];
 
     return 1;
 }
