@@ -52,12 +52,6 @@ sub heavy_export {
 	    warn $text;
 	}
     };
-    local $SIG{__DIE__} = sub {
-	require Carp;
-	local $Carp::CarpLevel = 1;	# ignore package calling us too.
-	Carp::croak("$_[0]Illegal null symbol in \@${1}::EXPORT")
-	    if $_[0] =~ m/^Unable to create sub named "(.*?)::"/;
-    };
 
     my($pkg, $callpkg, @imports) = @_;
     my($type, $sym, $cache_is_current, $oops);

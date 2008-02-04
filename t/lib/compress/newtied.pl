@@ -293,10 +293,10 @@ EOT
 
             ok ! $a->error() ;
             eval { seek($a, -1, 10) ; };
-            like $@, mkErr("seek: unknown value, 10, for whence parameter");
+            like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
             eval { seek($a, -1, SEEK_END) ; };
-            like $@, mkErr("cannot seek backwards");
+            like $@->{description}, mkErr("cannot seek backwards");
 
             print $a "fred";
             close $a ;
@@ -305,13 +305,13 @@ EOT
             my $u = $UncompressClass-> new((\$b))  ;
 
             eval { seek($u, -1, 10) ; };
-            like $@, mkErr("seek: unknown value, 10, for whence parameter");
+            like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
             eval { seek($u, -1, SEEK_END) ; };
-            like $@, mkErr("seek: SEEK_END not allowed");
+            like $@->{description}, mkErr("seek: SEEK_END not allowed");
 
             eval { seek($u, -1, SEEK_CUR) ; };
-            like $@, mkErr("cannot seek backwards");
+            like $@->{description}, mkErr("cannot seek backwards");
         }
 
         {

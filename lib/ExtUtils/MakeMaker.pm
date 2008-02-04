@@ -3,7 +3,6 @@ package ExtUtils::MakeMaker;
 
 require Exporter;
 use ExtUtils::MakeMaker::Config;
-use Carp ();
 use File::Path;
 
 use vars qw(
@@ -47,7 +46,7 @@ require ExtUtils::MY;  # XXX pre-5.8 versions of ExtUtils::Embed expect
 
 
 sub WriteMakefile {
-    Carp::croak "WriteMakefile: Need even number of args" if @_ % 2;
+    die "WriteMakefile: Need even number of args" if @_ % 2;
 
     require ExtUtils::MY;
     my %att = @_;
@@ -142,7 +141,7 @@ sub _format_att {
 
 sub prompt ($;$) {
     my($mess, $def) = @_;
-    Carp::confess("prompt function called without an argument") 
+    die("prompt function called without an argument") 
         unless defined $mess;
 
     my $isa_tty = -t *STDIN && (-t *STDOUT || !(-f *STDOUT || -c *STDOUT)) ;
@@ -190,7 +189,7 @@ sub eval_in_subdirs {
 
 sub eval_in_x {
     my($self,$dir) = @_;
-    chdir $dir or Carp::carp("Couldn't change to directory $dir: $!");
+    chdir $dir or warn("Couldn't change to directory $dir: $!");
 
     {
         package main;
@@ -202,7 +201,7 @@ sub eval_in_x {
 #         } else {
 #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
 #         }
-        die "ERROR from evaluation of $dir/Makefile.PL: $@";
+        die "ERROR from evaluation of $dir/Makefile.PL: {$@->message}";
     }
 }
 
@@ -426,13 +425,8 @@ sub new {
             %configure_att = %{&{$self->{CONFIGURE}}};
             $self = { %$self, %configure_att };
         } else {
-            Carp::croak "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
+            die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
         }
-    }
-
-    # This is for old Makefiles written pre 5.00, will go away
-    if ( Carp::longmess("") =~ m/runsubdirpl/s ){
-        Carp::carp("WARNING: Please rerun 'perl Makefile.PL' to regenerate your Makefiles\n");
     }
 
     my $newclass = ++$PACKNAME;
@@ -641,7 +635,7 @@ END
 }
 
 sub WriteEmptyMakefile {
-    Carp::croak "WriteEmptyMakefile: Need an even number of args" if @_ % 2;
+    die "WriteEmptyMakefile: Need an even number of args" if @_ % 2;
 
     my %att = @_;
     my $self = MM->new(\%att);

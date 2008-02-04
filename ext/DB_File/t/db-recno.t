@@ -141,7 +141,6 @@ sub normalise
 BEGIN 
 { 
     { 
-        local $SIG{__DIE__} ; 
         eval { require Data::Dumper ; Data::Dumper->import() } ; 
     }
  
@@ -758,7 +757,7 @@ EOM
    $db->filter_store_key (sub { $_ = $h[0] }) ;
 
    eval '$h[1] = 1234' ;
-   ok(146, $@->{description} =~ m/^recursion detected in filter_store_key at/ );
+   ok(146, $@->{description} =~ m/^recursion detected in filter_store_key/ );
    
    undef $db ;
    ok(147, safeUntie \@h);
@@ -1199,7 +1198,7 @@ exit unless $FA ;
 
     my $a = '';
     my @a = (1);
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local $SIG{__WARN__} = sub {$a = $_[0]->{description}} ;
 
     unlink $Dfile;
     my @tied ;
@@ -1404,14 +1403,14 @@ sub test_splice {
     # 
     my ($s_r, $s_error, @s_warnings);
 
-    my $gather_warning = sub { push @s_warnings, $_[0] };
+    my $gather_warning = sub { push @s_warnings, $_[0]->{description} };
     if ($context eq 'list') {
 	my @r;
 	eval {
 	    local $SIG{__WARN__} = $gather_warning;
 	    @r = splice @array, $offset, $length, @list;
 	};
-	$s_error = $@;
+	$s_error = $@ && $@->{description};
 	$s_r = \@r;
     }
     elsif ($context eq 'scalar') {
@@ -1420,7 +1419,7 @@ sub test_splice {
 	    local $SIG{__WARN__} = $gather_warning;
 	    $r = splice @array, $offset, $length, @list;
 	};
-	$s_error = $@;
+	$s_error = $@ && $@->{description};
 	$s_r = [ $r ];
     }
     elsif ($context eq 'void') {
@@ -1428,7 +1427,7 @@ sub test_splice {
 	    local $SIG{__WARN__} = $gather_warning;
 	    splice @array, $offset, $length, @list;
 	};
-	$s_error = $@;
+	$s_error = $@ && $@->{description};
 	$s_r = [];
     }
     else {
@@ -1444,14 +1443,14 @@ sub test_splice {
 
     # Now do the same for DB_File's version of splice
     my ($ms_r, $ms_error, @ms_warnings);
-    $gather_warning = sub { push @ms_warnings, $_[0] };
+    $gather_warning = sub { push @ms_warnings, $_[0]->{description} };
     if ($context eq 'list') {
 	my @r;
 	eval {
 	    local $SIG{__WARN__} = $gather_warning;
 	    @r = splice @h, $offset, $length, @list;
 	};
-	$ms_error = $@;
+	$ms_error = $@ && $@->{description};
 	$ms_r = \@r;
     }
     elsif ($context eq 'scalar') {
@@ -1460,7 +1459,7 @@ sub test_splice {
 	    local $SIG{__WARN__} = $gather_warning;
 	    $r = splice @h, $offset, $length, @list;
 	};
-	$ms_error = $@;
+	$ms_error = $@ && $@->{description};
 	$ms_r = [ $r ];
     }
     elsif ($context eq 'void') {
@@ -1468,7 +1467,7 @@ sub test_splice {
 	    local $SIG{__WARN__} = $gather_warning;
 	    splice @h, $offset, $length, @list;
 	};
-	$ms_error = $@;
+	$ms_error = $@ && $@->{description};
 	$ms_r = [];
     }
     else {
@@ -1488,6 +1487,8 @@ sub test_splice {
       if list_diff(\@array, \@h);
 
     if ((scalar @s_warnings) != (scalar @ms_warnings)) {
+        print STDERR "s_warnings: ", @s_warnings, "ABC\n";
+        print STDERR "ms_warnings: ", @ms_warnings, "DEF\n";
 	return 'different number of warnings';
     }
 

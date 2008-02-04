@@ -1,7 +1,6 @@
 package Hash::Util;
 
 use strict;
-use Carp;
 use warnings;
 use warnings::register;
 use Scalar::Util qw(reftype);
@@ -143,7 +142,7 @@ sub lock_ref_keys {
         my %keys = map { ($_ => 1) } @keys;
         my %original_keys = map { ($_ => 1) } keys %$hash;
         foreach my $k (keys %original_keys) {
-            croak "Hash has key '$k' which is not in the new key set"
+            die "Hash has key '$k' which is not in the new key set"
               unless $keys{$k};
         }
 
@@ -228,7 +227,7 @@ sub lock_ref_value {
     # I'm doubtful about this warning, as it seems not to be true.
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
-    carp "Cannot usefully lock values in an unlocked hash"
+    warn "Cannot usefully lock values in an unlocked hash"
       if !Internals::SvREADONLY(%$hash) && warnings::enabled;
     Internals::SvREADONLY $hash->{$key}, 1;
     return $hash

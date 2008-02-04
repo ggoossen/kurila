@@ -185,7 +185,6 @@ good working examples.
 
 =cut
 
-use Carp;
 use warnings::register;
 
 sub new {
@@ -202,13 +201,13 @@ sub TIEHASH {
 	$pkg->new(@_);
     }
     else {
-	croak "$pkg doesn't define a TIEHASH method";
+	die "$pkg doesn't define a TIEHASH method";
     }
 }
 
 sub EXISTS {
     my $pkg = ref $_[0];
-    croak "$pkg doesn't define an EXISTS method";
+    die "$pkg doesn't define an EXISTS method";
 }
 
 sub CLEAR {

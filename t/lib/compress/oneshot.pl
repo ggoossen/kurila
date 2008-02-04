@@ -44,22 +44,22 @@ sub run
         my $x ;
 
         eval { $a = $Func->(\$a => \$x, Fred => 1) ;} ;
-        like $@, mkErr("^$TopType: unknown key value\\(s\\) Fred"), '  Illegal Parameters';
+        like $@->{description}, qr/^$TopType: unknown key value\(s\) Fred/, '  Illegal Parameters';
 
         eval { $a = $Func->() ;} ;
-        like $@, mkErr("^$TopType: expected at least 1 parameters"), '  No Parameters';
+        like $@->{description}, qr/^$TopType: expected at least 1 parameters/, '  No Parameters';
 
         eval { $a = $Func->(\$x, \1) ;} ;
         like $$Error, "/^$TopType: output buffer is read-only/", '  Output is read-only' ;
 
         my $in ;
         eval { $a = $Func->($in, \$x) ;} ;
-        like $@, mkErr("^$TopType: input filename is undef or null string"), 
+        like $@->{description}, mkErr("^$TopType: input filename is undef or null string"), 
             '  Input filename undef' ;
 
         $in = '';    
         eval { $a = $Func->($in, \$x) ;} ;
-        like $@, mkErr("^$TopType: input filename is undef or null string"), 
+        like $@->{description}, mkErr("^$TopType: input filename is undef or null string"), 
             '  Input filename empty' ;
 
         {
@@ -67,7 +67,7 @@ sub run
             writeFile($in, "abc");
             my $out = $in ;
             eval { $a = $Func->($in, $out) ;} ;
-            like $@, mkErr("^$TopType: input and output filename are identical"),
+            like $@->{description}, mkErr("^$TopType: input and output filename are identical"),
                 '  Input and Output filename are the same';
         }
 
@@ -88,7 +88,7 @@ sub run
         }
 
         eval { $a = $Func->(\$in, \$in) ;} ;
-        like $@, mkErr("^$TopType: input and output buffer are identical"),
+        like $@->{description}, mkErr("^$TopType: input and output buffer are identical"),
             '  Input and Output buffer are the same';
             
         SKIP:
@@ -98,7 +98,7 @@ sub run
             my $lex = LexFile->new( my $out_file) ;
             open OUT, ">", "$out_file" ;
             eval { $a = $Func->(\*OUT, \*OUT) ;} ;
-            like $@, mkErr("^$TopType: input and output handle are identical"),
+            like $@->{description}, mkErr("^$TopType: input and output handle are identical"),
                 '  Input and Output handle are the same';
                 
             close OUT;
@@ -112,22 +112,22 @@ sub run
             # Buffer not a scalar reference
             #eval { $a = $Func->(\$x, \%x) ;} ;
             eval { $a = $Func->(\$x, $object) ;} ;
-            like $@, mkErr("^$TopType: illegal output parameter"),
+            like $@->{description}, mkErr("^$TopType: illegal output parameter"),
                 '  Bad Output Param';
                 
             # Buffer not a scalar reference
             eval { $a = $Func->(\$x, \%x) ;} ;
-            like $@, mkErr("^$TopType: illegal output parameter"),
+            like $@->{description}, mkErr("^$TopType: illegal output parameter"),
                 '  Bad Output Param';
                 
 
             eval { $a = $Func->(\%x, \$x) ;} ;
-            like $@, mkErr("^$TopType: illegal input parameter"),
+            like $@->{description}, mkErr("^$TopType: illegal input parameter"),
                 '  Bad Input Param';
 
             #eval { $a = $Func->(\%x, \$x) ;} ;
             eval { $a = $Func->($object, \$x) ;} ;
-            like $@, mkErr("^$TopType: illegal input parameter"),
+            like $@->{description}, mkErr("^$TopType: illegal input parameter"),
                 '  Bad Input Param';
         }
 
@@ -176,12 +176,12 @@ sub run
 
                 
                 eval { $a = $Func->(\$in, \$out, TrailingData => \"abc") ;} ;
-                like $@, mkErr("^$TopType: Parameter 'TrailingData' not writable"),
+                like $@->{description}, mkErr("^$TopType: Parameter 'TrailingData' not writable"),
                     '  TrailingData output not writable';
             }
 
             eval { $a = $Func->(\$in, \$out, TrailingData => \@x) ;} ;
-            like $@, mkErr("^$TopType: Parameter 'TrailingData' not a scalar reference"),
+            like $@->{description}, mkErr("^$TopType: Parameter 'TrailingData' not a scalar reference"),
                 '  TrailingData output not scaral reference';
         }
     }
@@ -1539,7 +1539,7 @@ sub run
             eval "\$copy = $send";
             my $Answer ;
             eval { &$Func($copy, \$Answer) } ;
-            like $@, mkErr("^$TopFuncName: input filename is undef or null string"), 
+            like $@->{description}, mkErr("^$TopFuncName: input filename is undef or null string"), 
                 "  got error message";
 
         }

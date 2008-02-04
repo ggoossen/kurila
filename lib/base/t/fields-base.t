@@ -5,7 +5,7 @@ my $W;
 BEGIN {
     $W = 0;
     $SIG{__WARN__} = sub {
-        if ($_[0] =~ m/^Hides field '.*?' in base class/) {
+        if ($_[0]->{description} =~ m/^Hides field '.*?' in base class/) {
             $W++;
         }
         else {
@@ -58,7 +58,7 @@ use base qw(M B2);
 # Test that multiple inheritance fails.
 package D6;
 eval { 'base'->import(qw(B2 M B3)); };
-::like($@, qr/can't multiply inherit fields/i, 
+::like($@->{description}, qr/can't multiply inherit fields/i, 
     'No multiple field inheritance');
 
 package Foo::Bar;
@@ -176,7 +176,7 @@ eval {
     require base;
     'base'->import(qw(E1 E2));
 };
-::like( $@, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
+::like( $@->{description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
 
 
 # Test that a package with no fields can inherit from a package with

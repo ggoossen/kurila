@@ -24,7 +24,6 @@ sub import {
     Exporter::import($this,@list);
 }
 
-sub croak { require Carp;  goto &Carp::croak }
 # declare usage to assist AutoLoad
 sub usage;
 
@@ -55,24 +54,24 @@ package POSIX;
 
 sub usage {
     my ($mess) = @_;
-    croak "Usage: POSIX::$mess";
+    die "Usage: POSIX::$mess";
 }
 
 sub redef {
     my ($mess) = @_;
-    croak "Use method $mess instead";
+    die "Use method $mess instead";
 }
 
 sub unimpl {
     my ($mess) = @_;
     $mess =~ s/xxx//;
-    croak "Unimplemented: POSIX::$mess";
+    die "Unimplemented: POSIX::$mess";
 }
 
 sub assert {
     usage "assert(expr)" if @_ != 1;
     if (!$_[0]) {
-	croak "Assertion failed";
+	die "Assertion failed";
     }
 }
 

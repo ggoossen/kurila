@@ -416,7 +416,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
 
     # missing parameters
     eval ' $fil = gzopen()  ' ;
-    like $@, mkEvalErr('Not enough arguments for Compress::Zlib::gzopen'),
+    like $@->{description}, mkEvalErr('Not enough arguments for Compress::Zlib::gzopen'),
         '  gzopen with missing mode fails' ;
 
     # unknown parameters
@@ -560,10 +560,10 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
     ok ! $a->gzerror() 
         or print "# gzerrno is $Compress::Zlib::gzerrno \n" ;
     eval { $a->gzseek(-1, 10) ; };
-    like $@, mkErr("gzseek: unknown value, 10, for whence parameter");
+    like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
     eval { $a->gzseek(-1, SEEK_END) ; };
-    like $@, mkErr("gzseek: cannot seek backwards");
+    like $@->{description}, mkErr("seek: cannot seek backwards");
 
     $a->gzwrite("fred");
     $a->gzclose ;
@@ -572,13 +572,13 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
     my $u = gzopen($name, "r");
 
     eval { $u->gzseek(-1, 10) ; };
-    like $@, mkErr("gzseek: unknown value, 10, for whence parameter");
+    like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
     eval { $u->gzseek(-1, SEEK_END) ; };
-    like $@, mkErr("gzseek: SEEK_END not allowed");
+    like $@->{description}, mkErr("seek: SEEK_END not allowed");
 
     eval { $u->gzseek(-1, SEEK_CUR) ; };
-    like $@, mkErr("gzseek: cannot seek backwards");
+    like $@->{description}, mkErr("seek: cannot seek backwards");
 }
 
 {

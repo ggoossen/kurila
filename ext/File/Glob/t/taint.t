@@ -25,7 +25,7 @@ print "ok 1\n";
 # all filenames should be tainted
 @a = File::Glob::bsd_glob("*");
 eval { $a = join("",@a), kill 0; 1 };
-unless ($@ =~ m/Insecure dependency/) {
+unless ($@->{description} =~ m/Insecure dependency/) {
     print "not ";
 }
 print "ok 2\n";

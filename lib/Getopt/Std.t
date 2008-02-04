@@ -50,7 +50,7 @@ $SIG{__WARN__} = sub { $warning = $_[0] };
 @ARGV = qw(-h help);
 
 ok( !getopts("xf:y"),		'getopts fails for an illegal option' );
-ok( $warning eq "Unknown option: h\n", 'user warned' );
+ok( $warning->{description} eq "Unknown option: h\n", 'user warned' );
 
 # Then try the Getopt::Long module
 

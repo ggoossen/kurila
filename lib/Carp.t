@@ -13,7 +13,7 @@ plan tests => 37;
 ok 1;
 
 { local $SIG{__WARN__} = sub {
-    like $_[0], qr/ok (\d+)\n at.+\b(?i:carp\.t) line \d+$/, 'ok 2\n' };
+    like $_[0]->message, qr/ok (\d+)\n at.+\b(?i:carp\.t) line \d+/, 'ok 2\n' };
 
   carp  "ok 2\n";
 

@@ -206,5 +206,5 @@ SKIP: {
 }
 
 eval { sigaction(-999, "foo"); };
-like($@, qr/Negative signals/,
+like($@->{description}, qr/Negative signals/,
     "Prevent negative signals instead of core dumping");

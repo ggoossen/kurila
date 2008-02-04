@@ -9,20 +9,6 @@
 # Tests freezing/thawing structures containing Singleton objects,
 # which should see both structs pointing to the same object.
 
-sub BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-    }
-    require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-}
-
 use Test::More tests => 11;
 use Storable ();
 

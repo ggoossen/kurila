@@ -4,7 +4,6 @@ use strict;
 use vars qw($VERSION @ISA);
 $VERSION = '0.15';
 
-use Carp;
 use File::Spec;
 BEGIN { @ISA = qw(File::Spec); }
 
@@ -992,7 +991,7 @@ sub init_ABSTRACT {
 
     if ($self->{ABSTRACT_FROM}){
         $self->{ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
-            carp "WARNING: Setting ABSTRACT via file ".
+            warn "WARNING: Setting ABSTRACT via file ".
                  "'$self->{ABSTRACT_FROM}' failed\n";
     }
 }

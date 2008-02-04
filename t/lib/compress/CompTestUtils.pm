@@ -566,8 +566,7 @@ sub mkErr
 
     $file = quotemeta($file);
 
-    return "/$string\\s+at $file line $line/";
-    return "/$string\\s+at /" ;
+    return "/$string/";
 }
 
 sub mkEvalErr

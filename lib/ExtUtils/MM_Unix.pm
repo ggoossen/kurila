@@ -3,7 +3,6 @@ package ExtUtils::MM_Unix;
 
 use strict;
 
-use Carp;
 use ExtUtils::MakeMaker::Config;
 use File::Basename qw(basename dirname);
 use DirHandle;
@@ -1074,7 +1073,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
 
         local (*FIXIN);
         local (*FIXOUT);
-        open( FIXIN, "<", $file ) or croak "Can't process '$file': $!";
+        open( FIXIN, "<", $file ) or die "Can't process '$file': $!";
         local $/ = "\n";
         chomp( my $line = ~< *FIXIN );
         next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
@@ -1580,7 +1579,6 @@ sub init_main {
 
     # *Real* information: where did we get these two from? ...
     my $inc_config_dir = dirname($INC{'Config.pm'});
-    my $inc_carp_dir   = dirname($INC{'Carp.pm'});
 
     unless ($self->{PERL_SRC}){
         foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting

@@ -99,7 +99,7 @@ sub test_truncated {
     my $clone = &$sub($short);
     is (defined ($clone), '', "truncated $what to $i should fail");
     if ($i +< $magic_len) {
-      like ($@, "/^Magic number checking on storable $what failed/",
+      like ($@ && $@->{description}, "/^Magic number checking on storable $what failed/",
           "Should croak with magic number warning");
     } else {
       is ($@, "", "Should not set \$\@");
@@ -112,7 +112,7 @@ sub test_corrupt {
 
   my $clone = &$sub($data);
   is (defined ($clone), '', "$name $what should fail");
-  like ($@, $what, $name);
+  like ($@->{description}, $what, $name);
 }
 
 sub test_things {

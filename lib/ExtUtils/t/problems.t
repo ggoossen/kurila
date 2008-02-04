@@ -35,7 +35,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
     my $stdout = tie *STDOUT, 'TieOut' or die;
 
     my $warning = '';
-    local $SIG{__WARN__} = sub { $warning = join '', @_ };
+    local $SIG{__WARN__} = sub { $warning = $_[0]->{description} };
     eval { $MM->eval_in_subdirs; };
 
     is( $stdout->read, qq{\@INC has .\n}, 'cwd in @INC' );

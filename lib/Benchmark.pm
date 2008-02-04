@@ -429,7 +429,6 @@ sub _doeval { no strict;  eval shift }
 # put any lexicals at file scope AFTER here
 #
 
-use Carp;
 use Exporter;
 
 our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
@@ -629,8 +628,8 @@ sub runloop {
     my($n, $c) = @_;
 
     $n+=0; # force numeric now, so garbage won't creep into the eval
-    croak "negative loopcount $n" if $n+<0;
-    confess usage unless defined $c;
+    die "negative loopcount $n" if $n+<0;
+    die usage unless defined $c;
     my($t0, $t1, $td); # before, after, difference
 
     # find package of caller so we can execute code there
@@ -649,7 +648,7 @@ sub runloop {
 	$subcode = "sub \{ for (1 .. $n) \{ local \$_; package $pack; $c;\} \}";
         $subref  = _doeval($subcode);
     }
-    croak "runloop unable to compile '$c': $@\ncode: $subcode\n" if $@;
+    die "runloop unable to compile '$c': $@\ncode: $subcode\n" if $@;
     print STDERR "runloop $n '$subcode'\n" if $Debug;
 
     # Wait for the user timer to tick.  This makes the error range more like 
@@ -817,7 +816,7 @@ sub timethis{
                      (!ref $code or ref $code eq 'CODE');
 
     if ( $n +> 0 ) {
-	croak "non-integer loopcount $n, stopped" if int($n)+<$n;
+	die "non-integer loopcount $n, stopped" if int($n)+<$n;
 	$t = timeit($n, $code);
 	$title = "timethis $n" unless defined $title;
     } else {
@@ -857,7 +856,7 @@ sub timethese{
     $style = "" unless defined $style;
     print "Benchmark: " unless $style eq 'none';
     if ( $n +> 0 ) {
-	croak "non-integer loopcount $n, stopped" if int($n)+<$n;
+	die "non-integer loopcount $n, stopped" if int($n)+<$n;
 	print "timing $n iterations of" unless $style eq 'none';
     } else {
 	print "running" unless $style eq 'none';

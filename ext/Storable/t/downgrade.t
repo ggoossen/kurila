@@ -100,7 +100,7 @@ sub thaw_fail {
   my ($name, $expected) = @_;
   my $thing = eval {thaw $tests{$name}};
   is ($thing, undef, "Thawed $name failed as expected?");
-  like ($@, $expected, "Error as predicted?");
+  like ($@->{description}, $expected, "Error as predicted?");
 }
 
 sub test_locked_hash {
@@ -108,11 +108,11 @@ sub test_locked_hash {
   my @keys = keys %$hash;
   my ($key, $value) = each %$hash;
   eval {$hash->{$key} = reverse $value};
-  like( $@, "/^Modification of a read-only value attempted/",
+  like( $@->{description}, "/^Modification of a read-only value attempted/",
         'trying to change a locked key' );
   is ($hash->{$key}, $value, "hash should not change?");
   eval {$hash->{use} = 'perl'};
-  like( $@, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+  like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
   ok (eq_array([keys %$hash], \@keys), "Still the same keys?");
 }
@@ -126,7 +126,7 @@ sub test_restricted_hash {
         'trying to change a restricted key' );
   is ($hash->{$key}, reverse ($value), "hash should change");
   eval {$hash->{use} = 'perl'};
-  like( $@, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+  like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
   ok (eq_array([keys %$hash], \@keys), "Still the same keys?");
 }

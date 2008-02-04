@@ -5051,13 +5051,13 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 
 		/* report compilation errors */
 		if (SvROK(atsv) && SvTYPE(SvRV(atsv)) == SVt_PVHV) {
-		    SV** desc = hv_fetchs( (HV*)SvRV(atsv), "description", FALSE );
+		    SV** desc = hv_fetchs( (HV*)SvRV(atsv), "notes", TRUE );
 		    if (desc) {
 			if (paramList == PL_beginav)
 			    sv_catpv( *desc,
-				      "\nBEGIN failed--compilation aborted" );
+				      "BEGIN failed--compilation aborted" );
 			else
-			    sv_catpvf( *desc, "\n%s failed--call queue aborted",
+			    sv_catpvf( *desc, "%s failed--call queue aborted",
 				       paramList == PL_checkav ? "CHECK"
 				       : paramList == PL_initav ? "INIT"
 				       : paramList == PL_unitcheckav ? "UNITCHECK"

@@ -1,10 +1,6 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
     require Config; Config->import;
     if ($Config{'extensions'} !~ m/\bOpcode\b/
 	&& $Config{'extensions'} !~ m/\bPOSIX\b/
@@ -30,7 +26,7 @@ $safe->reval( qq{\$_[1] = qq/\0/ x } . $masksize );
 
 # Check that it didn't work
 $safe->reval( q{$x + $y} );
-like( $@, qr/^'?addition \(\+\)'? trapped by operation mask/,
+like( $@->{description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
 	    'opmask still in place with reval' );
 
 my $safe2 = Safe->new();
@@ -43,6 +39,6 @@ EOF
 close $fh;
 $safe2->rdo('nasty.pl');
 $safe2->reval( q{$x + $y} );
-like( $@, qr/^'?addition \(\+\)'? trapped by operation mask/,
+like( $@->{description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
 	    'opmask still in place with rdo' );
 END { unlink 'nasty.pl' }

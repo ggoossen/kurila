@@ -53,16 +53,16 @@ sub run
 
         # Buffer not writable
         eval qq[\$a = $CompressClass->new(\\1) ;] ;
-        like $@, mkEvalErr("^$CompressClass: output buffer is read-only") ;
+        like $@->{description}, mkEvalErr("^$CompressClass: output buffer is read-only") ;
             
         my($out, $gz);
         $out = "" ;
         eval { $a = $CompressClass->new( $out ) };
-        like $@, mkEvalErr("^$CompressClass: output filename is undef or null string");
+        like $@->{description}, mkEvalErr("^$CompressClass: output filename is undef or null string");
             
         $out = undef ;
         eval { $a = $CompressClass->new($out) };
-        like $@, mkEvalErr("^$CompressClass: output filename is undef or null string");
+        like $@->{description}, mkEvalErr("^$CompressClass: output filename is undef or null string");
             
         my $x ;
         $gz = $CompressClass-> new((\$x)); 
@@ -70,18 +70,18 @@ sub run
         foreach my $name (qw(read readline getc))
         {
             eval " \$gz->$name() " ;
-            like $@, mkEvalErr("^$name Not Available: File opened only for output");
+            like $@->{description}, mkEvalErr("^$name Not Available: File opened only for output");
         }
 
         eval ' $gz->write({})' ;
-like $@, mkEvalErr("^${CompressClass}::write: not a scalar reference");
+like $@->{description}, mkEvalErr("^${CompressClass}::write: not a scalar reference");
 #like $@, mkEvalErr("^${CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref");
 
 eval ' $gz->syswrite("abc", 1, 5)' ;
-like $@, mkEvalErr("^${CompressClass}::write: offset outside string");
+like $@->{description}, mkEvalErr("^${CompressClass}::write: offset outside string");
 
 eval ' $gz->syswrite("abc", 1, -4)' ;
-like $@, mkEvalErr("^${CompressClass}::write: offset outside string");
+like $@->{description}, mkEvalErr("^${CompressClass}::write: offset outside string");
 }
 
 
@@ -90,10 +90,10 @@ title "Testing $UncompressClass Errors";
 
 my $out = "" ;
 eval qq[\$a = $UncompressClass->new(\$out) ;] ;
-like $@, mkEvalErr("^$UncompressClass: input filename is undef or null string");
+like $@->{description}, mkEvalErr("^$UncompressClass: input filename is undef or null string");
 $out = undef ;
 eval qq[\$a = $UncompressClass->new(\$out) ;] ;
-like $@, mkEvalErr("^$UncompressClass: input filename is undef or null string");
+like $@->{description}, mkEvalErr("^$UncompressClass: input filename is undef or null string");
 
 my $lex = LexFile->new( my $name) ;
 
@@ -113,7 +113,7 @@ my $gz = $UncompressClass-> new((\$gc));
 foreach my $name (qw(print printf write))
 {
     eval " \$gz->$name() " ;
-    like $@, mkEvalErr("^$name Not Available: File opened only for intput");
+    like $@->{description}, mkEvalErr("^$name Not Available: File opened only for intput");
 }
 
 }
@@ -126,11 +126,11 @@ title "Testing $CompressClass and $UncompressClass";
 
     # Buffer not a scalar reference
     eval qq[\$a = $CompressClass->new(\\\@x) ;] ;
-    like $@, mkEvalErr("^$CompressClass: output parameter not a filename, filehandle or scalar ref");
+    like $@->{description}, mkEvalErr("^$CompressClass: output parameter not a filename, filehandle or scalar ref");
 
     # Buffer not a scalar reference
     eval qq[\$a = $UncompressClass->new(\\\@x) ;] ;
-    like $@, mkEvalErr("^$UncompressClass: input parameter not a filename, filehandle, array ref or scalar ref");
+    like $@->{description}, mkEvalErr("^$UncompressClass: input parameter not a filename, filehandle, array ref or scalar ref");
 }
 
 foreach my $Type ( $CompressClass, $UncompressClass)
@@ -141,15 +141,15 @@ foreach my $Type ( $CompressClass, $UncompressClass)
 
     # Odd number of parameters
     eval qq[\$a = $Type->new("abc", -Output) ] ;
-    like $@, mkEvalErr("^$Type: Expected even number of parameters, got 1");
+    like $@->{description}, mkEvalErr("^$Type: Expected even number of parameters, got 1");
 
     # Unknown parameter
     eval qq[\$a = $Type->new("anc", -Fred => 123) ;] ;
-    like $@, mkEvalErr("^$Type: unknown key value\\(s\\) Fred");
+    like $@->{description}, mkEvalErr("^$Type: unknown key value\\(s\\) Fred");
 
     # no in or out param
     eval qq[\$a = $Type->new() ;] ;
-    like $@, mkEvalErr("^$Type: Missing (Input|Output) parameter");
+    like $@->{description}, mkEvalErr("^$Type: Missing (Input|Output) parameter");
 
 }    
 
@@ -776,7 +776,7 @@ EOT
 
 
         eval { $io->read(1) } ;
-        like $@, mkErr("buffer parameter is read-only");
+        like $@->{description}, mkErr("buffer parameter is read-only");
 
         is $io->read($buf, 0), 0, "Requested 0 bytes" ;
 
@@ -1100,10 +1100,10 @@ foreach my $file (0, 1)
 
     ok ! $a->error() ;
     eval { $a->seek(-1, 10) ; };
-    like $@, mkErr("^${CompressClass}::seek: unknown value, 10, for whence parameter");
+    like $@->{description}, mkErr("^${CompressClass}::seek: unknown value, 10, for whence parameter");
 
     eval { $a->seek(-1, SEEK_END) ; };
-    like $@, mkErr("^${CompressClass}::seek: cannot seek backwards");
+    like $@->{description}, mkErr("^${CompressClass}::seek: cannot seek backwards");
 
     $a->write("fred");
     $a->close ;
@@ -1112,13 +1112,13 @@ foreach my $file (0, 1)
     my $u = $UncompressClass-> new((\$b))  ;
 
     eval { $u->seek(-1, 10) ; };
-    like $@, mkErr("^${UncompressClass}::seek: unknown value, 10, for whence parameter");
+    like $@->{description}, mkErr("^${UncompressClass}::seek: unknown value, 10, for whence parameter");
 
     eval { $u->seek(-1, SEEK_END) ; };
-    like $@, mkErr("^${UncompressClass}::seek: SEEK_END not allowed");
+    like $@->{description}, mkErr("^${UncompressClass}::seek: SEEK_END not allowed");
 
     eval { $u->seek(-1, SEEK_CUR) ; };
-    like $@, mkErr("^${UncompressClass}::seek: cannot seek backwards");
+    like $@->{description}, mkErr("^${UncompressClass}::seek: cannot seek backwards");
 }
 
 foreach my $fb (qw(filename buffer filehandle))
@@ -1389,7 +1389,7 @@ foreach my $file (0, 1)
         ok $x, "  Created $CompressClass object";
         eval { $x->write($copy) } ;
         #like $@, "/^$get/", "  error - $get";
-        like $@, "/not a scalar reference /", "  error - not a scalar reference";
+        like $@->{description}, "/not a scalar reference /", "  error - not a scalar reference";
     }
 
 #        @data = (

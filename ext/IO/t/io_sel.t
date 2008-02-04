@@ -119,7 +119,7 @@ print "ok 21\n";
 # check warnings
 $SIG{__WARN__} = sub { 
     ++ $w 
-      if $_[0] =~ m/^Call to deprecated method 'has_error', use 'has_exception'/ ;
+      if $_[0]->{description} =~ m/^Call to deprecated method 'has_error', use 'has_exception'/ ;
     } ;
 $w = 0 ;
 {

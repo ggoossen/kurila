@@ -39,7 +39,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     ok( my $stdout = tie *STDOUT, 'TieOut' );
     my $warnings = '';
     local $SIG{__WARN__} = sub {
-        $warnings .= join '', @_;
+        $warnings .= $_[0]->{description};
     };
 
     my $mm;

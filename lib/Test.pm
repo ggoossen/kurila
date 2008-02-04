@@ -4,7 +4,6 @@ package Test;
 
 use strict;
 
-use Carp;
 use vars (qw($VERSION @ISA @EXPORT @EXPORT_OK $ntest $TestLevel), #public-ish
           qw($TESTOUT $TESTERR %Program_Lines $told_about_diff
              $ONFAIL %todo %history $planned @FAILDETAIL) #private-ish
@@ -147,8 +146,8 @@ in a C<BEGIN {...}> block, like so:
 =cut
 
 sub plan {
-    croak "Test::plan(%args): odd number of arguments" if @_ ^&^ 1;
-    croak "Test::plan(): should not be called more than once" if $planned;
+    die "Test::plan(%args): odd number of arguments" if @_ ^&^ 1;
+    die "Test::plan(): should not be called more than once" if $planned;
 
     local($\, $,);   # guard against -l and other things that screw with
                      # print
@@ -164,10 +163,10 @@ sub plan {
 	elsif ($k eq 'todo' or
 	       $k eq 'failok') { for (@$v) { $todo{$_}=1; }; }
 	elsif ($k eq 'onfail') {
-	    ref $v eq 'CODE' or croak "Test::plan(onfail => $v): must be CODE";
+	    ref $v eq 'CODE' or die "Test::plan(onfail => $v): must be CODE";
 	    $ONFAIL = $v;
 	}
-	else { carp "Test::plan(): skipping unrecognized directive '$k'" }
+	else { warn "Test::plan(): skipping unrecognized directive '$k'" }
     }
     my @todo = sort { $a <+> $b } keys %todo;
     if (@todo) {
@@ -365,7 +364,7 @@ problems.  See L</BUGS and CAVEATS>.
 #
 
 sub ok ($;$$) {
-    croak "ok: plan before you test!" if !$planned;
+    die "ok: plan before you test!" if !$planned;
 
     local($\,$,);   # guard against -l and other things that screw with
                     # print

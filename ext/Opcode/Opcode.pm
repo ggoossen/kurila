@@ -536,7 +536,7 @@ This tag holds opcodes related to loading modules and getting information
 about calling environment and args.
 
     require dofile 
-    caller
+    caller compsub
 
 =item :still_to_be_decided
 

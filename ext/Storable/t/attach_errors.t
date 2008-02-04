@@ -12,20 +12,6 @@
 # This file tests several known-error cases relating to STORABLE_attach, in
 # which Storable should (correctly) throw errors.
 
-sub BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-    }
-    require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-}
-
 use Test::More tests => 35;
 use Storable ();
 
@@ -77,7 +63,7 @@ use Storable ();
 	};
 	ok( $@, 'Storable dies correctly when STORABLE_freeze returns a referece' );
 	# Check for a unique substring of the error message
-	ok( $@ =~ m/cannot return references/, 'Storable dies with the expected error' );
+	ok( $@->{description} =~ m/cannot return references/, 'Storable dies with the expected error' );
 
 	package My::BadFreeze;
 
@@ -159,7 +145,7 @@ use Storable ();
 	};
 	ok( $@, 'My::BadThaw object dies when thawing as expected' );
 	# Check for a snippet from the error message
-	ok( $@ =~ m/unexpected references/, 'Dies with the expected error message' );
+	ok( $@->{description} =~ m/unexpected references/, 'Dies with the expected error message' );
 
 	package My::BadThaw;
 
@@ -249,7 +235,7 @@ use Storable ();
 			$thawed = Storable::thaw( $frozen );
 		};
 		ok( $@, 'BadAttach dies on thaw' );
-		ok( $@ =~ m/STORABLE_attach did not return a My::BadAttach object/,
+		ok( $@->{description} =~ m/STORABLE_attach did not return a My::BadAttach object/,
 			'BadAttach dies on thaw with the expected error message' );
 		is( $thawed, undef, 'Double checking $thawed was not set' );
 	}

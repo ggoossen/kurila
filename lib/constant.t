@@ -208,7 +208,7 @@ my @Expected_Warnings =
    qr/^Constant name 'UNITCHECK' is a Perl keyword/,
    qr/^Constant name 'END' is a Perl keyword/,
    qr/^Constant name 'DESTROY' is a Perl keyword/,
-   qr/^Constant name 'STDIN' is forced into package main:: a/,
+   qr/^Constant name 'STDIN' is forced into package main::/,
    qr/^Constant name 'STDOUT' is forced into package main::/,
    qr/^Constant name 'STDERR' is forced into package main::/,
    qr/^Constant name 'ARGV' is forced into package main::/,

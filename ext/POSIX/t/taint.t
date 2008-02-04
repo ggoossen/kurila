@@ -1,8 +1,6 @@
 #!./perl -Tw
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require Config; Config->import;
     if ($^O ne 'VMS' and $Config{'extensions'} !~ m/\bPOSIX\b/) {
 	print "1..0\n";
@@ -31,10 +29,10 @@ my $TAINT = substr($^X, 0, 0);
 my $file = 'TEST';
 
 eval { mkfifo($TAINT. $file, 0) };
-like($@, qr/^Insecure dependency/,              'mkfifo with tainted data');
+like($@->{description}, qr/^Insecure dependency/,              'mkfifo with tainted data');
 
 eval { $testfd = open($TAINT. $file, O_WRONLY, 0) };
-like($@, qr/^Insecure dependency/,              'open with tainted data');
+like($@->{description}, qr/^Insecure dependency/,              'open with tainted data');
 
 eval { $testfd = open($file, O_RDONLY, 0) };
 is($@, "",                                  'open with untainted data');

@@ -76,9 +76,8 @@ sub import {
                 # Other fatal errors (syntax etc) must be reported.
                 die if $@ && $@->{description} !~ m/^Can't locate .*?/;
                 unless (%{*{Symbol::fetch_glob("$base\::")}}) {
-                    require Carp;
                     local $" = " ";
-                    Carp::croak(<<ERROR);
+                    die(<<ERROR);
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
     or make that module available in \@INC (\@INC contains: @INC).
@@ -93,8 +92,7 @@ ERROR
         if ( has_fields($base) || has_attr($base) ) {
             # No multiple fields inheritance *suck*
             if ($fields_base) {
-                require Carp;
-                Carp::croak("Can't multiply inherit fields");
+                die("Can't multiply inherit fields");
             } else {
                 $fields_base = $base;
             }
@@ -136,8 +134,7 @@ END
     while (my($k,$v) = each %$bfields) {
         my $fno;
         if ($fno = $dfields->{$k} and $fno != $v) {
-            require Carp;
-            Carp::croak ("Inherited fields can't override existing fields");
+            die("Inherited fields can't override existing fields");
         }
 
         if( $battr->[$v] ^&^ PRIVATE ) {

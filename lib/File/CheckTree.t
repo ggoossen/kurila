@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Test;
+use Test::More;
 
 BEGIN { plan tests => 8 }
 
@@ -39,7 +39,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     $path_to_README = File::Spec->rel2abs('README');
 
     my @warnings;
-    local $SIG{__WARN__} = sub { push @warnings, "@_" };
+    local $SIG{__WARN__} = sub { push @warnings, $_[0]->{description} };
 
     eval {
         $num_warnings = validate qq{
@@ -68,7 +68,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 {
     my ($num_warnings, @warnings);
 
-    local $SIG{__WARN__} = sub { push @warnings, "@_" };
+    local $SIG{__WARN__} = sub { push @warnings, $_[0]->{description} };
 
     eval {
         $num_warnings = validate qq{
@@ -97,7 +97,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 {
     my ($num_warnings, @warnings);
 
-    local $SIG{__WARN__} = sub { push @warnings, "@_" };
+    local $SIG{__WARN__} = sub { push @warnings, $_[0]->{description} };
 
     eval {
         $num_warnings = validate q{
@@ -130,7 +130,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     $path_to_libFile = File::Spec->rel2abs(File::Spec->catdir('lib','File'));
     $path_to_dist    = File::Spec->rel2abs(File::Spec->curdir);
 
-    local $SIG{__WARN__} = sub { push @warnings, "@_" };
+    local $SIG{__WARN__} = sub { push @warnings, $_[0]->{description} };
 
     eval {
         $num_warnings = validate qq{
@@ -177,7 +177,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         ok(1);
     }
     else {
-        ok(0);
+        ok(0, "$@");
     }
 }
 

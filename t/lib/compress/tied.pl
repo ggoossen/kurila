@@ -64,13 +64,13 @@ sub run
         my $buff ;
 
         eval { getc($gz) } ;
-        like $@, mkErr("^getc Not Available: File opened only for output");
+        like $@->{description}, mkErr("^getc Not Available: File opened only for output");
 
         eval { read($gz, $buff, 1) } ;
-        like $@, mkErr("^read Not Available: File opened only for output");
+        like $@->{description}, mkErr("^read Not Available: File opened only for output");
 
         eval { ~< $gz  } ;
-        like $@, mkErr("^readline Not Available: File opened only for output");
+        like $@->{description}, mkErr("^readline Not Available: File opened only for output");
 
     }
 
@@ -90,10 +90,10 @@ sub run
         my $buff ;
 
         eval { print $gz "abc" } ;
-        like $@, mkErr("^print Not Available: File opened only for intput");
+        like $@->{description}, mkErr("^print Not Available: File opened only for intput");
 
         eval { printf $gz "fmt", "abc" } ;
-        like $@, mkErr("^printf Not Available: File opened only for intput");
+        like $@->{description}, mkErr("^printf Not Available: File opened only for intput");
 
         #eval { write($gz, $buff, 1) } ;
         #like $@, mkErr("^write Not Available: File opened only for intput");
@@ -260,7 +260,7 @@ EOT
             
 
                 eval { read($io, $buf, -1) } ;
-                like $@, mkErr("length parameter is negative");
+                like $@->{description}, mkErr("length parameter is negative");
 
                 is read($io, $buf, 0), 0, "Requested 0 bytes" ;
 

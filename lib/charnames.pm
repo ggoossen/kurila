@@ -44,16 +44,6 @@ my %alias3 = (
 	    );
 my $txt;
 
-sub croak
-{
-  require Carp; goto &Carp::croak;
-} # croak
-
-sub carp
-{
-  require Carp; goto &Carp::carp;
-} # carp
-
 sub alias (@)
 {
   @_ or return %alias3;
@@ -71,13 +61,13 @@ sub alias_file ($)
     $file = "unicore/${arg}_alias.pl";
   }
   else {
-    croak "Charnames alias files can only have identifier characters";
+    die "Charnames alias files can only have identifier characters";
   }
   if (my @alias = do $file) {
     @alias == 1 && !defined $alias[0] and
-      croak "$file cannot be used as alias file for charnames";
+      die "$file cannot be used as alias file for charnames";
     @alias % 2 and
-      croak "$file did not return a (valid) list of alias pairs";
+      die "$file did not return a (valid) list of alias pairs";
     alias (@alias);
     return (1);
   }
@@ -152,7 +142,7 @@ sub charnames
 
     ## If we don't have it by now, give up.
     unless (@off) {
-      carp "Unknown charname '$name'";
+      warn "Unknown charname '$name'";
       return "\x{FFFD}";
     }
 
@@ -183,7 +173,7 @@ sub charnames
     if (not defined $fname) {
       $fname = substr $txt, $off[0] + 2, $off[1] - $off[0] - 2;
     }
-    croak "Character 0x$hex with name '$fname' is above 0xFF";
+    die "Character 0x$hex with name '$fname' is above 0xFF";
   }
 
   no warnings 'utf8'; # allow even illegal characters
@@ -195,7 +185,7 @@ sub import
   shift; ## ignore class name
 
   if (not @_) {
-    carp("`use charnames' needs explicit imports list");
+    warn("`use charnames' needs explicit imports list");
   }
   $^H{charnames} = \&charnames ;
 
@@ -206,17 +196,17 @@ sub import
   while (my $arg = shift) {
     if ($arg eq ":alias") {
       @_ or
-	croak ":alias needs an argument in charnames";
+	die ":alias needs an argument in charnames";
       my $alias = shift;
       if (ref $alias) {
 	ref $alias eq "HASH" or
-	  croak "Only HASH reference supported as argument to :alias";
+	  die "Only HASH reference supported as argument to :alias";
 	alias ($alias);
 	next;
       }
       if ($alias =~ m{:(\w+)$}) {
 	$1 eq "full" || $1 eq "short" and
-	  croak ":alias cannot use existing pragma :$1 (reversed order?)";
+	  die ":alias cannot use existing pragma :$1 (reversed order?)";
 	alias_file ($1) and $promote = 1;
 	next;
       }
@@ -256,7 +246,7 @@ my %viacode;
 sub viacode
 {
   if (@_ != 1) {
-    carp "charnames::viacode() expects one argument";
+    warn "charnames::viacode() expects one argument";
     return;
   }
 
@@ -270,13 +260,13 @@ sub viacode
   } elsif ($arg =~ m/^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/) {
     $hex = $1;
   } else {
-    carp("unexpected arg \"$arg\" to charnames::viacode()");
+    warn("unexpected arg \"$arg\" to charnames::viacode()");
     return;
   }
 
   # checking the length first is slightly faster
   if (length($hex) +> 5 && hex($hex) +> 0x10FFFF) {
-    carp "Unicode characters only allocated up to U+10FFFF (you asked for U+$hex)";
+    warn "Unicode characters only allocated up to U+10FFFF (you asked for U+$hex)";
     return;
   }
 
@@ -294,7 +284,7 @@ my %vianame;
 sub vianame
 {
   if (@_ != 1) {
-    carp "charnames::vianame() expects one name argument";
+    warn "charnames::vianame() expects one name argument";
     return ()
   }
 

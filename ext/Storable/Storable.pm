@@ -33,7 +33,6 @@ $VERSION = '2.16';
 #
 
 {
-    local $SIG{__DIE__};
     eval "use Log::Agent";
 }
 
@@ -266,7 +265,7 @@ sub _store {
 	eval { $ret = &$xsptr(*FILE, $self) };
 	close(FILE) or $ret = undef;
 	unlink($file) or warn "Can't unlink $file: $!\n" if $@ || !defined $ret;
-	logcroak $@ if $@ =~ s/\.?\n$/,/;
+	logcroak $@ if $@;
 	$@ = $da;
 	return $ret ? $ret : undef;
 }
@@ -304,7 +303,7 @@ sub _store_fd {
 	my $ret;
 	# Call C routine nstore or pstore, depending on network order
 	eval { $ret = &$xsptr($file, $self) };
-	logcroak $@ if $@ =~ s/\.?\n$/,/;
+	logcroak $@ if $@;
 	local $\; $file->print('');	# Autoflush the file if wanted
 	$@ = $da;
 	return $ret ? $ret : undef;
@@ -339,7 +338,7 @@ sub _freeze {
 	my $ret;
 	# Call C routine mstore or net_mstore, depending on network order
 	eval { $ret = &$xsptr($self) };
-	logcroak $@ if $@ =~ s/\.?\n$/,/;
+	logcroak $@ if $@;
 	$@ = $da;
 	return $ret ? $ret : undef;
 }
@@ -381,7 +380,7 @@ sub _retrieve {
 	}
 	eval { $self = pretrieve(*FILE) };		# Call C routine
 	close(FILE);
-	logcroak $@ if $@ =~ s/\.?\n$/,/;
+	logcroak $@ if $@;
 	$@ = $da;
 	return $self;
 }
@@ -398,7 +397,7 @@ sub fd_retrieve {
 	my $self;
 	my $da = $@;							# Could be from exception handler
 	eval { $self = pretrieve($file) };		# Call C routine
-	logcroak $@ if $@ =~ s/\.?\n$/,/;
+	logcroak $@ if $@;
 	$@ = $da;
 	return $self;
 }
@@ -415,7 +414,7 @@ sub thaw {
 	my $self;
 	my $da = $@;							# Could be from exception handler
 	eval { $self = mretrieve($frozen) };	# Call C routine
-	logcroak $@ if $@ =~ s/\.?\n$/,/;
+	logcroak $@ if $@;
 	$@ = $da;
 	return $self;
 }

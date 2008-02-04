@@ -62,7 +62,7 @@ push @EXPORT_FAIL, qw(weaken isweak dualvar isvstring set_prototype);
 sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }
 
 sub blessed ($) {
-  local($@, $SIG{__DIE__}, $SIG{__WARN__});
+  local($@, $SIG{__WARN__});
   length(ref($_[0]))
     ? eval { $_[0]->a_sub_not_likely_to_be_here }
     : undef
@@ -83,7 +83,7 @@ sub refaddr($) {
 }
 
 sub reftype ($) {
-  local($@, $SIG{__DIE__}, $SIG{__WARN__});
+  local($@, $SIG{__WARN__});
   my $r = shift;
   my $t;
 
@@ -113,7 +113,7 @@ sub reftype ($) {
 }
 
 sub tainted {
-  local($@, $SIG{__DIE__}, $SIG{__WARN__});
+  local($@, $SIG{__WARN__});
   local $^W = 0;
   eval { kill 0 * $_[0] };
   $@ =~ /^Insecure/;
@@ -122,7 +122,7 @@ sub tainted {
 sub readonly {
   return 0 if tied($_[0]) || (ref(\($_[0])) ne "SCALAR");
 
-  local($@, $SIG{__DIE__}, $SIG{__WARN__});
+  local($@, $SIG{__WARN__});
   my $tmp = $_[0];
 
   !eval { $_[0] = $tmp; 1 };

@@ -32,5 +32,5 @@ print "not " unless $@->{description} =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
 
 eval { my $a = opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
-print "not " if $@->{description} =~ m/^Can't open/;
+print "not " if $@ && $@->{description} =~ m/^Can't open/;
 print "ok $i\n"; ++$i;

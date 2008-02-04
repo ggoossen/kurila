@@ -28,6 +28,8 @@ BEGIN {
     use_ok('XS::APItest')
 };
 
+local our $TODO = 1;
+
 #########################
 
 sub f {
@@ -96,19 +98,19 @@ for my $test (
 	ok(eq_array( [ call_pv('d', $flags^|^G_EVAL^|^$keep, @$args) ], 
 		    $flags ^&^ (G_ARRAY^|^G_DISCARD) ? [0] : [ undef, 1 ]),
 		    "$desc G_EVAL call_pv('d')");
-	is($@, $exp_err, "$desc G_EVAL call_pv('d') - \$@");
+	is($@->{description}, $exp_err, "$desc G_EVAL call_pv('d') - \$@");
 
 	$@ = "before\n";
 	ok(eq_array( [ eval_sv('d()', $flags^|^$keep) ],
 		    $flags ^&^ (G_ARRAY^|^G_DISCARD) ? [0] : [ undef, 1 ]),
 		    "$desc eval_sv('d()')");
-	is($@, $exp_err, "$desc eval_sv('d()') - \$@");
+	is($@->{description}, $exp_err, "$desc eval_sv('d()') - \$@");
 
 	$@ = "before\n";
 	ok(eq_array( [ call_method('d', $flags^|^G_EVAL^|^$keep, $obj, @$args) ],
 		    $flags ^&^ (G_ARRAY^|^G_DISCARD) ? [0] : [ undef, 1 ]),
 		    "$desc G_EVAL call_method('d')");
-	is($@, $exp_err, "$desc G_EVAL call_method('d') - \$@");
+	is($@->{description}, $exp_err, "$desc G_EVAL call_method('d') - \$@");
     }
 
     ok(eq_array( [ sub { call_pv('f', $flags^|^G_NOARGS, "bad") }->(@$args) ],
@@ -120,7 +122,7 @@ for my $test (
     # XXX call_method(G_NOARGS) isn't tested: I'm assuming
     # it's not a sensible combination. DAPM.
 
-    ok(eq_array( [ eval { call_pv('d', $flags, @$args) }, $@ ],
+    ok(eq_array( [ eval { call_pv('d', $flags, @$args) }, $@->{description} ],
 	[ "its_dead_jim\n" ]), "$description eval \{ call_pv('d') \}");
 
     ok(eq_array( [ eval { eval_sv('d', $flags), $@ }, $@ ],
@@ -128,7 +130,7 @@ for my $test (
 		"its_dead_jim\n", '' ]),
 	"$description eval \{ eval_sv('d') \}");
 
-    ok(eq_array( [ eval { call_method('d', $flags, $obj, @$args) }, $@ ],
+    ok(eq_array( [ eval { call_method('d', $flags, $obj, @$args) }, $@->{description} ],
 	[ "its_dead_jim\n" ]), "$description eval \{ call_method('d') \}");
 
 };
@@ -136,9 +138,9 @@ for my $test (
 is(eval_pv('f()', 0), 'y', "eval_pv('f()', 0)");
 is(eval_pv('f(qw(a b c))', 0), 'y', "eval_pv('f(qw(a b c))', 0)");
 is(eval_pv('d()', 0), undef, "eval_pv('d()', 0)");
-is($@, "its_dead_jim\n", "eval_pv('d()', 0) - \$@");
+is($@->{description}, "its_dead_jim\n", "eval_pv('d()', 0) - \$@");
 is(eval { eval_pv('d()', 1) } , undef, "eval \{ eval_pv('d()', 1) \}");
-is($@, "its_dead_jim\n", "eval \{ eval_pv('d()', 1) \} - \$@");
+is($@->{description}, "its_dead_jim\n", "eval \{ eval_pv('d()', 1) \} - \$@");
 
 # DAPM 9-Aug-04. A taint test in eval_sv() could die after setting up
 # a new jump level but before pushing an eval context, leading to

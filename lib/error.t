@@ -10,7 +10,7 @@ plan( tests => 25 );
     ok $err, "error object created";
     is ref $err, "error";
     is $err->{description}, "my message";
-    is $err->message, "my message at ../lib/error.t line $line1\n", "message function";
+    is $err->message, "my message at ../lib/error.t line $line1.\n", "message function";
 }
 
 # a bit more complex one, with stack trace.
@@ -23,9 +23,9 @@ plan( tests => 25 );
     is((join '**', @{$err->{stack}[0]}), "main**../lib/error.t**$line2**main::new_error**");
     is((join '**', @{$err->{stack}[1]}), "main**../lib/error.t**$line3**main::new_error2**");
     is $err->message, <<MSG ;
-my message at ../lib/error.t line $line1
-    main::new_error called at ../lib/error.t line $line2
-    main::new_error2 called at ../lib/error.t line $line3
+my message at ../lib/error.t line $line1.
+    main::new_error called at ../lib/error.t line $line2.
+    main::new_error2 called at ../lib/error.t line $line3.
 MSG
 }
 
@@ -39,8 +39,8 @@ MSG
     is ref $@, "error", '$@ is an error object';
     is $@->{description}, "foobar";
     is $@->message, <<MSG;
-foobar at ../lib/error.t line $line2
-    (eval) called at ../lib/error.t line $line1
+foobar at ../lib/error.t line $line2.
+    (eval) called at ../lib/error.t line $line1.
 MSG
 }
 
@@ -55,9 +55,9 @@ MSG
     is defined $err, 1, '$@ is set';
     is ref $err, "error", '$@ is error object';
     is $err->message, <<MSG;
-my die at ../lib/error.t line $line1
-    (eval) called at ../lib/error.t line $line1
-    (eval) called at ../lib/error.t line $line2
+my die at ../lib/error.t line $line1.
+    (eval) called at ../lib/error.t line $line1.
+    (eval) called at ../lib/error.t line $line2.
 MSG
 }
 
@@ -70,9 +70,9 @@ MSG
     };
     is ref $@, "error", '$@ is an error object';
     is $@->message, <<MSG;
-reuse die at ../lib/error.t line $line1
-    (eval) called at ../lib/error.t line $line1
-    (eval) called at ../lib/error.t line $line2
+reuse die at ../lib/error.t line $line1.
+    (eval) called at ../lib/error.t line $line1.
+    (eval) called at ../lib/error.t line $line2.
 MSG
 }
 
@@ -83,22 +83,22 @@ MSG
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is an error object';
     is $@->message, <<MSG;
-Can't use string ("xx") as a SCALAR ref while "strict refs" in use at ../lib/error.t line $line1
-    (eval) called at ../lib/error.t line $line1
+Can't use string ("xx") as a SCALAR ref while "strict refs" in use at ../lib/error.t line $line1.
+    (eval) called at ../lib/error.t line $line1.
 MSG
 }
 
 # Writing the standard message
 {
     fresh_perl_is("die 'foobar'",
-                  'foobar at - line 1');
+                  'foobar at - line 1.');
 }
 
 # Compilation error
 {
     fresh_perl_is('BEGIN { die "foobar" }', <<MSG );
-foobar at - line 1
-BEGIN failed--compilation aborted at - line 1
+foobar at - line 1.
+BEGIN failed--compilation aborted
 MSG
 }
 
@@ -109,6 +109,6 @@ MSG
     is ref $@, 'error', '$@ is error object';
     is $@->message, <<MSG ;
 Can't modify constant item in undef operator at (eval 9) line 2, at EOF
-Bareword \"foo\" not allowed while "strict subs" in use at ../lib/error.t line 107
+Bareword \"foo\" not allowed while "strict subs" in use at ../lib/error.t line 107.
 MSG
 }

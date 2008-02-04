@@ -2,7 +2,6 @@ package Params::Check;
 
 use strict;
 
-use Carp                        qw[carp croak];
 use Locale::Maketext::Simple    Style => 'gettext';
 
 use Data::Dumper;
@@ -357,7 +356,7 @@ sub check {
 
     ### croak with the collected errors if there were errors and 
     ### we have the fatal flag toggled.
-    croak(__PACKAGE__->last_error) if ($wrong || $warned) && $WARNINGS_FATAL;
+    die(__PACKAGE__->last_error) if ($wrong || $warned) && $WARNINGS_FATAL;
 
     ### done with our loop... if $wrong is set, somethign went wrong
     ### and the user is already informed, just return...
@@ -560,9 +559,7 @@ It is exported upon request.
         $offset  ||= 0;
         my $level   = 1 + $offset;
 
-        local $Carp::CarpLevel = $level;
-
-        carp $err if $verbose;
+        warn $err if $verbose;
 
         $_ERROR_STRING .= $err . "\n";
     }

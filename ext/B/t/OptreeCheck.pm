@@ -293,7 +293,7 @@ use B::Concise qw(walk_output);
 
 BEGIN {
     $SIG{__WARN__} = sub {
-	my $err = shift;
+	my $err = shift->{description};
 	$err =~ m/Subroutine re::(un)?install redefined/ and return;
     };
 }
@@ -531,7 +531,7 @@ sub getRendering {
 		$code = eval "$pkg sub \{ $code \} \}";
 	    }
 	    # return errors
-	    if ($@) { chomp $@; push @errs, $@ }
+	    if ($@) { chomp $@; push @errs, $@->{description} }
 	}
 	# set walk-output b4 compiling, which writes 'announce' line
 	walk_output(\$rendering);
@@ -543,7 +543,7 @@ sub getRendering {
 	$opwalker->();
 
 	# kludge error into rendering if its empty.
-	$rendering = $@ if $@ and ! $rendering;
+	$rendering = $@->message if $@ and ! $rendering;
     }
     else {
 	die "bad testcase; no prog, code or Dx parameter\n";

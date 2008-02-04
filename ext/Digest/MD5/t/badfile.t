@@ -8,12 +8,12 @@ eval {
    use vars qw(*FOO);
    $md5->addfile(*FOO);
 };
-print "not " unless $@->{description} =~ m/^Bad filehandle: FOO at/;
+print "not " unless $@->{description} =~ m/^Bad filehandle: FOO/;
 print "ok 1\n";
 
 open(BAR, "<", "no-existing-file.$$");
 eval {
     $md5->addfile(*BAR);
 };
-print "not " unless $@->{description} =~ m/^No filehandle passed at/;
+print "not " unless $@->{description} =~ m/^No filehandle passed/;
 print "ok 2\n";

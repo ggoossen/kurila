@@ -5,7 +5,7 @@ use Test::More tests => 1;
 
 my $warnings = '';
 {
-    local $SIG{__WARN__} = sub { $warnings .= join '', @_ };
+    local $SIG{__WARN__} = sub { $warnings .= $_[0]->{description} };
     kill 0, $^X;
 }
 like( $warnings, '/^Insecure dependency/',   '-t honored' );

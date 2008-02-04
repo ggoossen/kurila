@@ -233,7 +233,6 @@ unless ($^O eq 'MacOS') {
     $OPENFLAGS ^|^= $bit if eval {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
-      local $SIG{__DIE__} = sub {};
       local $SIG{__WARN__} = sub {};
       $bit = &$func();
       1;
@@ -256,7 +255,6 @@ unless ($^O eq 'MacOS') {
     $OPENTEMPFLAGS ^|^= $bit if eval {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
-      local $SIG{__DIE__} = sub {};
       local $SIG{__WARN__} = sub {};
       $bit = &$func();
       1;

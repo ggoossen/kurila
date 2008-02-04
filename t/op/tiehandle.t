@@ -219,7 +219,7 @@ is($r, 1);
     local *Implement::PRINT = sub { @received = @_ };
 
     $r = warn("some", "text", "\n");
-    @expect = (PRINT => $ob,"sometext\n at op/tiehandle.t line 221\n");
+    @expect = (PRINT => $ob,"sometext\n at op/tiehandle.t line 221.\n");
     compare(PRINT => @received);
 
     use warnings;

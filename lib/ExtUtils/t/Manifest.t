@@ -48,7 +48,7 @@ sub read_manifest {
 
 sub catch_warning {
     my $warn = '';
-    local $SIG{__WARN__} = sub { $warn .= $_[0] };
+    local $SIG{__WARN__} = sub { $warn .= $_[0]->{description} };
     return join('', $_[0]->() ), $warn;
 }
 

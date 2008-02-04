@@ -532,7 +532,7 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
                     );
     while( my($name, $code) = each %cmpthese ) {
         eval $code;
-        is( $@, $usage{cmpthese}, "cmpthese usage: $name" );
+        is( $@->{description}, $usage{cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = ('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
@@ -542,19 +542,19 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
 
     while( my($name, $code) = each %timethese ) {
         eval $code;
-        is( $@, $usage{timethese}, "timethese usage: $name" );
+        is( $@->{description}, $usage{timethese}, "timethese usage: $name" );
     }
 
 
     while( my($func, $usage) = each %usage ) {
         next if grep $func eq $_, @takes_no_args;
         eval "$func()";
-        is( $@, $usage, "$func usage: no args" );
+        is( $@->{description}, $usage, "$func usage: no args" );
     }
 
     foreach my $func (@takes_no_args) {
         eval "$func(42)";
-        is( $@, $usage{$func}, "$func usage: with args" );
+        is( $@->{description}, $usage{$func}, "$func usage: with args" );
     }
 }
 

@@ -7,6 +7,7 @@
 package IO::Zlib;
 
 $VERSION = "1.07";
+
 =head1 NAME
 
 IO::Zlib - IO:: style interface to L<Compress::Zlib>

@@ -16,15 +16,15 @@ sub foo { $tb->croak("foo") }
 sub bar { $tb->carp("bar")  }
 
 eval { foo() };
-is $@, sprintf "foo at %s line %s.\n", $0, __LINE__ - 1;
+is $@->{description}, sprintf "foo at %s line %s.\n", $0, __LINE__ - 1;
 
 eval { $tb->croak("this") };
-is $@, sprintf "this at %s line %s.\n", $0, __LINE__ - 1;
+is $@->{description}, sprintf "this at %s line %s.\n", $0, __LINE__ - 1;
 
 {
     my $warning = '';
     local $SIG{__WARN__} = sub {
-        $warning .= join '', @_;
+        $warning .= $_[0]->{description};
     };
 
     bar();

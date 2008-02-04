@@ -40,7 +40,7 @@ is( $FOO, 'Eymascalar', 'leaves scalar alone' );
 {
     local $^W=1;		# 5.005 compat.
     my $warn;
-    local $SIG{__WARN__} = sub { $warn .= "@_" };
+    local $SIG{__WARN__} = sub { $warn .= $_[0]->{description} };
     readline *FOO;
     like( $warn, qr/unopened filehandle/, 'warns like an unopened filehandle' );
 }

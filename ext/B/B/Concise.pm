@@ -152,7 +152,7 @@ sub concise_stashref {
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	eval { concise_cv_obj($order, $codeobj, $k) };
-	warn "err $@ on $codeobj" if $@;
+	warn "err {$@->message} on $codeobj" if $@;
     }
 }
 

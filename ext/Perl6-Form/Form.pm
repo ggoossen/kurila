@@ -4,7 +4,6 @@ our $VERSION = '0.04';
 
 use Scalar::Util qw( readonly );
 use List::Util   qw( max min first );
-use Carp;
 use charnames ':full';
 
 use Exporter;
@@ -15,10 +14,6 @@ our @EXPORT=qw|form|;
 our @EXPORT_OK=qw|drill break_at|;
 
 my %caller_opts;
-
-sub fatal {
-	croak @_, "\nin call to &form";
-}
 
 sub defined_or_space {
 	return " " if !defined $_[0] || length $_[0] == 0; 
@@ -37,7 +32,7 @@ sub pattern {
 sub code {
 	my ($newval, $name ) = @_;
 	my $type = ref($newval) || "'$newval'";
-	fatal "Value for '$name' option must be code reference (not $type)"
+	die "Value for '$name' option must be code reference (not $type)"
 			unless $type eq 'CODE';
 	return $newval;
 }
@@ -51,7 +46,7 @@ sub one_char {
 	my ($newval, undef, $opts ) = @_;
 	$newval = [ $newval ] unless ref $newval eq 'ARRAY';
 	for (@$newval) {
-		fatal "Value for 'single' option must be single character (not '$_')"
+		die "Value for 'single' option must be single character (not '$_')"
 			if length() != 1;
 		$opts->{field} =
 			user_def([qr/\Q$_\E/, $std_one{$_}||'{[{1}[}'], 'single', $opts);
@@ -60,14 +55,14 @@ sub one_char {
 }
 
 sub layout_word {
-	fatal "Value for layout option must be 'across', 'down', 'balanced', ",
+	die "Value for layout option must be 'across', 'down', 'balanced', ",
 		  "or 'tabular\n(not '$_[0]')"
 			unless $_[0] =~ m/^(across|down|balanced|tabular)$/;
 	return $_[0];
 }
 
 sub pos_integer {
-	fatal "Value for '$_[1]' option must be positive integer (not $_[0])"
+	die "Value for '$_[1]' option must be positive integer (not $_[0])"
 			unless int($_[0]) eq $_[0] && $_[0] +> 0;
 	return $_[0];
 }
@@ -77,7 +72,7 @@ sub strings_or_undef {
 	my $type = ref $val;
 	if (!defined $val) { $val = [] }
 	elsif (!$type)     { $val = [ "$val" ] }
-	fatal "Value for '$name' option must be string, array of strings, or undef (not $type)"
+	die "Value for '$name' option must be string, array of strings, or undef (not $type)"
 			unless ref $val eq 'ARRAY';
 	return $val;
 }
@@ -94,7 +89,7 @@ sub height_vals {
 	elsif ($type eq 'HASH')  { $vals->{min}||=0;
 							   defined $vals->{max} or $vals->{max}=$unlimited;
 							 }
-	fatal "Values for height option must be positive integers (not $_[0])"
+	die "Values for height option must be positive integers (not $_[0])"
 				unless ref $vals eq 'HASH'
 					&& !grep {int($vals->{$_}) ne $vals->{$_}} qw(min max);
 	return $vals;
@@ -142,7 +137,7 @@ sub hashify {
 		return { other => $val };
 	}
 	if (ref $val eq 'HASH') {
-		fatal "Invalid key for $what: '$_'" 
+		die "Invalid key for $what: '$_'" 
 			for grep { !m/^(first|last|even|odd|other)$/ } keys %$val;
 		my %hash;
 		for (keys %$val) {
@@ -150,7 +145,7 @@ sub hashify {
 				$hash{$_} = $default_val->($val->{$_})
 			}
 			elsif (ref $val->{$_} ne 'CODE') {
-				fatal "Value for $what '$_' must be string or subroutine";
+				die "Value for $what '$_' must be string or subroutine";
 			}
 			else {
 				$hash{$_} = $val->{$_};
@@ -158,17 +153,17 @@ sub hashify {
 		}
 		return \%hash;
 	}
-	fatal "Value for $what must be string, subroutine, or hash";
+	die "Value for $what must be string, subroutine, or hash";
 }
 
 sub page_hash {
 	my ($h, undef, $opts) = @_;
-	fatal "Value for 'page' option must be hash reference (not $_)"
+	die "Value for 'page' option must be hash reference (not $_)"
 		for grep $_ ne 'HASH', ref $h;
 	$h = { %{$opts->{page}}, %$h };
-	fatal "Unknown page sub-option ('$_')"
+	die "Unknown page sub-option ('$_')"
 		for grep {!exists $def_page{$_}} keys %$h;
-	fatal "Page $_ must be greater than zero"
+	die "Page $_ must be greater than zero"
 		for grep $h->{$_} +<= 0, qw(length width);
 	$h->{body} =
 		hashify("body preprocessor", $h->{body}, \&std_body, \&form_body);
@@ -179,7 +174,7 @@ sub page_hash {
 }
 
 sub filehandle {
-	fatal "Value for 'out' option must be filehandle (not '$_')"
+	die "Value for 'out' option must be filehandle (not '$_')"
 			for grep {$_ ne 'GLOB' } ref $_[0];
 	return $_[0];
 }
@@ -187,11 +182,11 @@ sub filehandle {
 sub user_def {
 	my ($spec, $name, $opts) = @_;
 	my $type = ref $spec;
-	fatal "Value of 'field' option must be an array of pairs or a hash (not ",
+	die "Value of 'field' option must be an array of pairs or a hash (not ",
 		  $type||"'$spec'", ")"
 				unless $type =~ m/^(ARRAY|HASH)$/;
 	if ($type eq 'ARRAY') {
-		fatal "Missing value for last user-defined field ('$spec->[-1]')"
+		die "Missing value for last user-defined field ('$spec->[-1]')"
 			if @$spec % 2;
 	}
 	else {
@@ -256,8 +251,7 @@ sub update(\%\%;$) {
 		push @bad, "Unknown option: $opt=>'$new->{$opt}" and next unless $std;
 		$old->{$opt} = $std->{set}->($new->{$opt}, $opt, $old);
 	}
-	if (@bad && $croak) { croak join "\n", @bad }
-	elsif (@bad)        { fatal join "\n", @bad }
+	if (@bad) { die join "\n", @bad }
 }
 
 
@@ -358,7 +352,7 @@ sub jleft {
 	else {
 		$_ = length for $whole, $places;
 	}
-	fatal "Inconsistent number of decimal places in numeric field.\n",
+	die "Inconsistent number of decimal places in numeric field.\n",
 		  "Specified as $checkplaces but found $places"
 				if $checkplaces && $places != $checkplaces;
 	my $huh = ('?'x$whole).$point.('?'x$places);
@@ -553,7 +547,7 @@ sub segment ($\@\%$\%) {
 
 				$DB::single=1;
                 ($checkwidth, $extras) = $fld =~ m/\(\s*(\d+[.,]?\d*)\s*\)/g;
-				fatal "Too many width specifications in $field" if $extras;
+				die "Too many width specifications in $field" if $extras;
 				if ($checkwidth) {
 					$checkplaces = $checkwidth =~ s/[.,](\d+)// && $1;
 					for ($fld) {
@@ -574,14 +568,14 @@ sub segment ($\@\%$\%) {
 
                 ($setwidth, $extras) = $fld =~ m/\{\s*(\d+[.,]?\d*|\*)\s*\}/g
 								   and $fld =~ s/\{\s*(\d+[.,]?\d*|\*)\s*\}//;
-				fatal "Too many width specifications in $field"
+				die "Too many width specifications in $field"
 					if $extras || $setwidth && $checkwidth;
 				if ($setwidth && $setwidth =~ s/[.,](\d+)//) {
 					$setplaces = $1 || 0;
 				}
 
 				for ([$checkwidth, $checkplaces], [$setwidth, $setplaces]) {
-					fatal "Can't fit $_->[1] decimal place",($_->[1]!=1?'s':''),
+					die "Can't fit $_->[1] decimal place",($_->[1]!=1?'s':''),
 						  " in a $_->[0]-character field" 
 							  if defined($_->[0]) && defined($_->[1])
 							  && $_->[0] ne '*'
@@ -660,12 +654,12 @@ sub segment ($\@\%$\%) {
 										   $form{width},\%fldopts,
 										   $setplaces, $checkplaces)
 																		}
-					 	   : fatal "Field $fldcnt is of unknown type: $field"
+					 	   : die "Field $fldcnt is of unknown type: $field"
 					 	   ;
 
 			$form{break}=\&break_nl if $form{stretch};
 
-			fatal "Inconsistent width for field $fldcnt.\n",
+			die "Inconsistent width for field $fldcnt.\n",
 				  "Specified as '$field' but actual width is $form{width}"
 				if defined $checkwidth && $form{width} != $checkwidth;
 
@@ -678,7 +672,7 @@ sub segment ($\@\%$\%) {
 
 			splice @$args, $i, 0, "" if $form{overflow}; # AFTER ANY OPTIONS
 
-			fatal "Missing data value for field ", $i, " ($field)"
+			die "Missing data value for field ", $i, " ($field)"
 				unless defined $args->[$i];
 
 			for ($args->[$i]) {
@@ -892,7 +886,7 @@ sub resolve_overflows {
 				$overflowed = 1;
 			}
 		}
-		croak "Useless overflow field (no field above it)"
+		die "Useless overflow field (no field above it)"
 			unless $overflowed;
 	}
 }
@@ -1066,7 +1060,7 @@ sub linecount($) {
 use warnings::register;
 
 sub form {
-	croak "Useless call to &form in void context" unless defined wantarray;
+	die "Useless call to &form in void context" unless defined wantarray;
 	
 	# Handle formatting calls...
 	my ($package, $file, $line) = caller;
@@ -1110,7 +1104,7 @@ sub form {
 		push @{$section[-1]{formatters}}, $currformat;
 		push @allformats, $currformat;
 	}
-	croak scalar(@_), " too many data values after last format" if @_;
+	die scalar(@_), " too many data values after last format" if @_;
 	delineate_overflows(@allformats);
 
 	my $text = "";
@@ -1235,7 +1229,7 @@ sub section {
     my @section;
     for my $row ( @$structure ) {
 		local $,=",";
-        my $type = ref $row or croak "Too many indices (starting with [@index])";
+        my $type = ref $row or die "Too many indices (starting with [@index])";
         if ($type eq 'HASH') {
 			@index = keys %$row unless @index;
             push @{$section[$_]}, $row->{$index[$_]} for 0..$#index;
@@ -1246,7 +1240,7 @@ sub section {
         }
         else {
 			my $what = ref $structure;
-            croak "Can't drill ", ($what ? lc $what : $structure) , " of $type";
+            die "Can't drill ", ($what ? lc $what : $structure) , " of $type";
         }
     }
     return @section;

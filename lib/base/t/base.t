@@ -59,7 +59,7 @@ like( $@->{description}, qr/^Base class package "reallyReAlLyNotexists" is empty
     my $warning;
     local $SIG{__WARN__} = sub { $warning = shift };
     eval q{package HomoGenous; use base 'HomoGenous';};
-    like($warning, qr/^Class 'HomoGenous' tried to inherit from itself/,
+    like($warning->{description}, qr/^Class 'HomoGenous' tried to inherit from itself/,
                                           '  self-inheriting');
 }
 

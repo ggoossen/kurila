@@ -1243,7 +1243,6 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	dSP;
 
 	if (PL_errors && SvCUR(PL_errors)) {
-	    sv_catpvn(PL_errors, "\n", 1);
 	    sv_catsv(PL_errors, msv);
 	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);
@@ -1364,7 +1363,6 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	msv = vmess(pat, args);
 
 	if (PL_errors && SvCUR(PL_errors)) {
-	    sv_catpvn(PL_errors, "\n", 1);
 	    sv_catsv(PL_errors, msv);
 	    msv = sv_mortalcopy(PL_errors);
 	    SvCUR_set(PL_errors, 0);
@@ -1383,8 +1381,7 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	LEAVE;
     }
 
-    if (PL_warnhook)
-	vdie_common(msv, TRUE);
+    vdie_common(msv, TRUE);
 }
 
 #if defined(PERL_IMPLICIT_CONTEXT)
@@ -1444,8 +1441,6 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
     dVAR;
     if (PL_warnhook == PERL_WARNHOOK_FATAL || ckDEAD(err)) {
 	SV * const msv = vmess(pat, args);
-	STRLEN msglen;
-	const char * const message = SvPV_const(msv, msglen);
 
 	Perl_vdie_common(aTHX_ msv, FALSE);
 	die_where(msv);

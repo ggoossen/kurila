@@ -78,7 +78,7 @@ my($OS) = keys %Is;
 
 my $class = "ExtUtils::MM_$OS";
 eval "require $class" unless $INC{"ExtUtils/MM_$OS.pm"};
-die $@ if $@;
+die if $@;
 unshift @ISA, $class;
 
 
