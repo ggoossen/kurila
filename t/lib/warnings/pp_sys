@@ -128,6 +128,7 @@ EXPECT
 printf() on closed filehandle STDIN at - line 4.
 printf() on closed filehandle STDIN at - line 6.
 	(Are you trying to call printf() on dirhandle STDIN?)
+ at - line 6.
 ########
 # pp_sys.c [pp_prtf]
 use warnings 'io' ;
@@ -160,6 +161,7 @@ EXPECT
 syswrite() on closed filehandle STDIN at - line 4.
 syswrite() on closed filehandle STDIN at - line 6.
 	(Are you trying to call syswrite() on dirhandle STDIN?)
+ at - line 6.
 ########
 # pp_sys.c [pp_flock]
 use Config; 
@@ -191,6 +193,7 @@ EXPECT
 flock() on closed filehandle STDIN at - line 16.
 flock() on closed filehandle STDIN at - line 18.
 	(Are you trying to call flock() on dirhandle STDIN?)
+ at - line 18.
 flock() on unopened filehandle FOO at - line 19.
 Can't use an undefined value as a symbol reference at - line 20.
 ########
@@ -272,24 +275,34 @@ getsockname() on closed socket STDIN at - line 30.
 getpeername() on closed socket STDIN at - line 31.
 send() on closed socket STDIN at - line 33.
 	(Are you trying to call send() on dirhandle STDIN?)
+ at - line 33.
 bind() on closed socket STDIN at - line 34.
 	(Are you trying to call bind() on dirhandle STDIN?)
+ at - line 34.
 connect() on closed socket STDIN at - line 35.
 	(Are you trying to call connect() on dirhandle STDIN?)
+ at - line 35.
 listen() on closed socket STDIN at - line 36.
 	(Are you trying to call listen() on dirhandle STDIN?)
+ at - line 36.
 accept() on closed socket STDIN at - line 37.
 	(Are you trying to call accept() on dirhandle STDIN?)
+ at - line 37.
 shutdown() on closed socket STDIN at - line 38.
 	(Are you trying to call shutdown() on dirhandle STDIN?)
+ at - line 38.
 setsockopt() on closed socket STDIN at - line 39.
 	(Are you trying to call setsockopt() on dirhandle STDIN?)
+ at - line 39.
 getsockopt() on closed socket STDIN at - line 40.
 	(Are you trying to call getsockopt() on dirhandle STDIN?)
+ at - line 40.
 getsockname() on closed socket STDIN at - line 41.
 	(Are you trying to call getsockname() on dirhandle STDIN?)
+ at - line 41.
 getpeername() on closed socket STDIN at - line 42.
 	(Are you trying to call getpeername() on dirhandle STDIN?)
+ at - line 42.
 ########
 # pp_sys.c [pp_stat]
 use warnings 'newline' ;
@@ -461,3 +474,4 @@ opendir $foo, ".";
 EXPECT
 Opening filehandle FOO also as a directory at - line 5.
 Opening filehandle $foo also as a directory at - line 6.
+########

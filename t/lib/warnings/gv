@@ -28,4 +28,7 @@ eval ' $a = $#; ';
 eval ' $a = $*; ';
 EXPECT
 $# is no longer supported at (eval 1) line 1.
+    (eval) called at - line 3.
 $* is no longer supported at (eval 2) line 1.
+    (eval) called at - line 4.
+########

@@ -211,6 +211,7 @@ EOM
 use warnings 'exec' ;
 exec $^X, "-e0" ;
 EXPECT
+
 ########
 # doio.c [Perl_nextargv]
 $^W = 0 ;
@@ -238,7 +239,6 @@ rmdir $filename ;
 EXPECT
 Can't do inplace edit: ./temp.dir is not a regular file at - line 9.
 Can't do inplace edit: ./temp.dir is not a regular file at - line 21.
-
 ########
 # doio.c [Perl_do_eof]
 use warnings 'io' ;
@@ -306,3 +306,4 @@ open my $fh2, ">", "doiowarn.tmp"; close $fh2;
 unlink "doiowarn.tmp";
 EXPECT
 Filehandle STDIN reopened as $fh1 only for output at - line 14.
+########

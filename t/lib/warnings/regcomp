@@ -198,3 +198,4 @@ Useless (?-c) - don't use /gc modifier in regex; marked by <-- HERE in m/(?o-c <
 Useless (?o) - use /o modifier in regex; marked by <-- HERE in m/(?o <-- HERE gc)/ at - line 12.
 Useless (?g) - use /g modifier in regex; marked by <-- HERE in m/(?og <-- HERE c)/ at - line 12.
 Useless (?c) - use /gc modifier in regex; marked by <-- HERE in m/(?ogc <-- HERE )/ at - line 12.
+########

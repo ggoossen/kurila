@@ -52,6 +52,7 @@ use utf8 ;
 $_ = "\x[80]  \x[ff]" ;
 reverse ;
 EXPECT
+
 ########
 # pp_pack.c
 use warnings 'pack' ;
@@ -93,3 +94,4 @@ Character in 'c' format wrapped in pack at - line 3.
 -128
 127
 -128
+########

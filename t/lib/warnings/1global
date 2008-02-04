@@ -192,3 +192,4 @@ sub fred { my $b ; chop $b ;}
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 2.
     main::fred called at - line 4.
+########

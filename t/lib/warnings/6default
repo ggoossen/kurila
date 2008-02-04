@@ -11,6 +11,7 @@ Integer overflow in octal number at - line 3.
 no warnings ;
 my $a = oct "7777777777777777777777777777777777778" ;
 EXPECT
+
 ########
 # all warnings should be displayed 
 use warnings ;
@@ -78,8 +79,11 @@ use warnings;
 }
 EXPECT
 Integer overflow in hexadecimal number at (eval 1) line 3.
+    (eval) called at - line 6.
 Illegal hexadecimal digit 'g' ignored at (eval 1) line 3.
+    (eval) called at - line 6.
 Hexadecimal number > 0xffffffff non-portable at (eval 1) line 3.
+    (eval) called at - line 6.
 ########
 
 # Check scope of pragma with eval
@@ -92,8 +96,11 @@ no warnings;
 }
 EXPECT
 Integer overflow in hexadecimal number at (eval 1) line 2.
+    (eval) called at - line 6.
 Illegal hexadecimal digit 'g' ignored at (eval 1) line 2.
+    (eval) called at - line 6.
 Hexadecimal number > 0xffffffff non-portable at (eval 1) line 2.
+    (eval) called at - line 6.
 ########
 
 # Check scope of pragma with eval
@@ -119,3 +126,4 @@ no warnings;
 }
 EXPECT
 
+########

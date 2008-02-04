@@ -174,6 +174,8 @@ sub {
 f();
 EXPECT
 Variable "$x" is not available at (eval 1) line 2.
+    (eval) called at - line 5.
+    main::f called at - line 7.
 ########
 # pad.c
 use warnings 'closure' ;
@@ -196,6 +198,8 @@ sub f {
 f()->();
 EXPECT
 Variable "$x" is not available at (eval 1) line 2.
+    (eval) called at - line 6.
+    main::__ANON__ called at - line 8.
 ########
 use warnings 'closure' ;
 {
@@ -206,6 +210,8 @@ use warnings 'closure' ;
 f2();
 EXPECT
 Variable "$x" is not available at (eval 1) line 2.
+    (eval) called at - line 5.
+    main::f2 called at - line 7.
 ########
 use warnings 'closure' ;
 for my $x (1,2,3) {
@@ -215,6 +221,8 @@ for my $x (1,2,3) {
 f();
 EXPECT
 Variable "$x" is not available at (eval 4) line 2.
+    (eval) called at - line 3.
+    main::f called at - line 6.
 ########
 # pad.c
 no warnings 'closure' ;
@@ -233,6 +241,7 @@ my $x;
     my $x;
 }
 EXPECT
+
 ########
 # pad.c
 use warnings 'misc' ;
@@ -269,6 +278,7 @@ our $y;
 EXPECT
 "our" variable $x redeclared at - line 4.
 	(Did you mean "local" instead of "our"?)
+ at - line 4.
 "our" variable $x redeclared at - line 6.
 ########
 use warnings 'misc' ;
@@ -282,6 +292,7 @@ our $y;
     my $y;
 }
 EXPECT
+
 ########
 use warnings 'misc' ;
 my $x;
@@ -294,6 +305,7 @@ my $y;
     our $y;
 }
 EXPECT
+
 ########
 use warnings 'misc' ;
 my $x;
@@ -306,9 +318,12 @@ my $y;
     my $y;
 }
 EXPECT
+
 ########
 # an our var being introduced should suppress errors about global syms
 use strict;
 use warnings;
 our $x unless $x;
 EXPECT
+
+########

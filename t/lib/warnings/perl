@@ -55,6 +55,7 @@ Name "main::x" used only once: possible typo at - line 4.
 use warnings 'once' ;
 $x = 3 ;
 EXPECT
+
 ########
 
 # perl.c
@@ -71,3 +72,4 @@ BEGIN { $^W = 1 }
 $y = 3 ;
 EXPECT
 Name "main::y" used only once: possible typo at - line 6.
+########
