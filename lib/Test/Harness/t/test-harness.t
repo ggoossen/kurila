@@ -508,7 +508,7 @@ SKIP: {
     my $failed;
     my $warning = '';
     eval {
-        local $SIG{__WARN__} = sub { $warning .= join '', @_; };
+        local $SIG{__WARN__} = sub { $warning .= $_[0]->{description} . "\n"; };
         ($totals, $failed) = Test::Harness::execute_tests(tests => [$test_path], out => \*NULL);
     };
 
@@ -517,7 +517,7 @@ SKIP: {
 
     SKIP: {
         skip "special tests for bailout", 1 unless $test eq 'bailout';
-        like( $@, '/Further testing stopped: GERONI/i' );
+        like( $@->{description}, '/Further testing stopped: GERONI/i' );
     }
 
     SKIP: {
@@ -544,13 +544,17 @@ SKIP: {
     if ( $test eq "bignum" ) {
         $expected_warnings = <<WARN;
 Enormous test number seen [test 136211425]
+
 Can't detailize, too big.
+
 WARN
     }
     elsif ( $test eq 'bignum_many' ) {
         $expected_warnings = <<WARN;
 Enormous test number seen [test 100001]
+
 Can't detailize, too big.
+
 WARN
     }
     my $desc = $expected_warnings ? 'Got proper warnings' : 'No warnings';

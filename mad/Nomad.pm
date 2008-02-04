@@ -27,12 +27,6 @@ sub xml_to_p5 {
     $options{'version'} =~ m/(\w+)[-]([\d.]+)$/ or die "invalid version: '$options{version}'";
     $::version = { branch => $1, 'v' => $2};
 
-    local $SIG{__DIE__} = sub {
-        my $e = shift;
-        $e =~ s/\n$/\n    [NODE $filename line $::prevstate->{line}]/ if $::prevstate;
-        confess $e;
-    };
-
     # parse file
     use XML::Parser;
     my $p1 = XML::Parser->new(Style => 'Objects', Pkg => 'PLXML');

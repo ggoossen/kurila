@@ -878,7 +878,7 @@ unless ($aaa) {
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "integer" ; ' ;
-    like($a->{description}, qr/^Odd number of arguments for overload::constant at/);
+    like($a->{description}, qr/^Odd number of arguments for overload::constant/);
 }
 
 {
@@ -889,7 +889,7 @@ unless ($aaa) {
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "fred" => sub {} ; ' ;
-    like($a->{description}, qr/^`fred' is not an overloadable type at/);
+    like($a->{description}, qr/^`fred' is not an overloadable type/);
 }
 
 {
@@ -900,7 +900,7 @@ unless ($aaa) {
     is($a, "");
     use warnings 'overload' ;
     $x = eval ' overload::constant "integer" => 1; ' ;
-    like($a->{description}, qr/^`1' is not a code reference at/);
+    like($a->{description}, qr/^`1' is not a code reference/);
 }
 
 {

@@ -680,7 +680,7 @@ USE
                 {BEGIN failed--compilation aborted at $filename line $line.}m;
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
-    Error:  $@
+    Error:  {$@->message}
 DIAGNOSTIC
 
     }
@@ -719,7 +719,7 @@ REQUIRE
         chomp $@;
         $tb->diag(<<DIAGNOSTIC);
     Tried to require '$module'.
-    Error:  $@
+    Error:  {$@->message}
 DIAGNOSTIC
 
     }

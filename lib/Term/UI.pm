@@ -1,6 +1,5 @@
 package Term::UI;
 
-use Carp;
 use Params::Check qw[check allow];
 use Term::ReadLine;
 use Locale::Maketext::Simple Style => 'gettext';
@@ -275,7 +274,7 @@ sub _tt_readline {
     if ($AUTOREPLY) {
         
         ### you used autoreply, but didnt provide a default!
-        carp loc(   
+        warn loc(   
             q[You have '%1' set to true, but did not provide a default!],
             '$AUTOREPLY' 
         ) if( !defined $default && $VERBOSE);

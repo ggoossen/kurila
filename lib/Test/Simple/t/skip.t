@@ -54,7 +54,7 @@ SKIP: {
 
 {
     my $warning;
-    local $SIG{__WARN__} = sub { $warning = join "", @_ };
+    local $SIG{__WARN__} = sub { $warning = $_[0]->message };
     SKIP: {
         # perl gets the line number a little wrong on the first
         # statement inside a block.
@@ -63,8 +63,7 @@ SKIP: {
         skip $Why;
         fail("So very failed");
     }
-    is( $warning, "skip() needs to know \$how_many tests are in the ".
-                  "block at $0 line 56\n",
+    like( $warning, qr/skip\(\) needs to know \$how_many tests are in the block at $0 line 56/,
         'skip without $how_many warning' );
 }
 
@@ -86,7 +85,7 @@ SKIP: {
 
 {
     my $warning = '';
-    local $SIG{__WARN__} = sub { $warning .= join "", @_ };
+    local $SIG{__WARN__} = sub { $warning .= $_[0]->message };
 
     SKIP: {
         skip 1, "This is backwards" if 1;

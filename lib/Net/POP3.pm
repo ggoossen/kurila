@@ -100,10 +100,10 @@ sub apop {
   my $banner;
   my $md;
 
-  if (eval { local $SIG{__DIE__}; require Digest::MD5 }) {
+  if (eval { require Digest::MD5 }) {
     $md = Digest::MD5->new();
   }
-  elsif (eval { local $SIG{__DIE__}; require MD5 }) {
+  elsif (eval { require MD5 }) {
     $md = MD5->new();
   }
   else {
@@ -282,7 +282,7 @@ sub _lookup_credentials {
 
   require Net::Netrc;
 
-       $user ||= eval { local $SIG{__DIE__}; (getpwuid($>))[0] }
+       $user ||= eval { (getpwuid($>))[0] }
     || $ENV{NAME}
     || $ENV{USER}
     || $ENV{LOGNAME};

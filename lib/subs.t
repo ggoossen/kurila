@@ -88,9 +88,12 @@ Fred 1,2 ;
 sub Fred {}
 EXPECT
 Number found where operator expected at - line 3, near "Fred 1"
+  at - line 3.
 	(Do you need to predeclare Fred?)
+  at - line 3.
 syntax error at - line 3, near "Fred 1"
-Execution of - aborted due to compilation errors.
+
+Execution of - aborted due to compilation errors. at - line 4.
 ########
 
 # Error - not predeclaring a sub in time

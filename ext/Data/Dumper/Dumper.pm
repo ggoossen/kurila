@@ -16,8 +16,6 @@ $VERSION = '2.121_14'
 require Exporter;
 require overload;
 
-use Carp;
-
 BEGIN {
     @ISA = qw(Exporter);
     @EXPORT = qw(Dumper);
@@ -62,7 +60,7 @@ $Deparse    = 0         unless defined $Deparse;
 sub new {
   my($c, $v, $n) = @_;
 
-  croak "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
+  die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
     unless (defined($v) && (ref($v) eq 'ARRAY'));
   $n = [] unless (defined($n) && (ref($v) eq 'ARRAY'));
 
@@ -133,7 +131,7 @@ sub Seen {
 	$s->{seen}{$id} = [$k, $v];
       }
       else {
-	carp "Only refs supported, ignoring non-ref item \$$k";
+	warn "Only refs supported, ignoring non-ref item \$$k";
       }
     }
     return $s;
@@ -387,7 +385,7 @@ sub _dump {
 	if (ref($s->{sortkeys}) eq 'CODE') {
 	  $keys = $s->{sortkeys}($val);
 	  unless (ref($keys) eq 'ARRAY') {
-	    carp "Sortkeys subroutine did not return ARRAYREF";
+	    warn "Sortkeys subroutine did not return ARRAYREF";
 	    $keys = [];
 	  }
 	}
@@ -424,11 +422,11 @@ sub _dump {
 	$out   .=  $sub;
       } else {
         $out .= 'sub { "DUMMY" }';
-        carp "Encountered CODE ref, using dummy placeholder" if $s->{purity};
+        warn "Encountered CODE ref, using dummy placeholder" if $s->{purity};
       }
     }
     else {
-      croak "Can\'t handle $realtype type.";
+      die "Can\'t handle $realtype type.";
     }
     
     if ($realpack) { # we have a blessed ref

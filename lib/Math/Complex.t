@@ -133,9 +133,9 @@ sub test_dbz {
 	$test++;
 	push(@script, <<EOT);
 	eval '$op';
-	(\$bad) = (\$@ =~ m/(.+)/);
-	print "# $test op = $op divbyzero? \$bad...\n";
-	print 'not ' unless (\$@ =~ m/Division by zero/);
+	(\$bad) = (\$@->\{description\} =~ m/(.+)/);
+	print "# $test op = $op divbyzero? \$bad... \$\@->\{description\}\n";
+	print 'not ' unless (\$\@->\{description\} =~ m/Division by zero/);
 EOT
         push(@script, qq(print "ok $test\\n";\n));
     }
@@ -148,9 +148,9 @@ sub test_loz {
 	$test++;
 	push(@script, <<EOT);
 	eval '$op';
-	(\$bad) = (\$@ =~ m/(.+)/);
+	(\$bad) = (\$\@->\{description\} =~ m/(.+)/);
 	print "# $test op = $op logofzero? \$bad...\n";
-	print 'not ' unless (\$@ =~ m/Logarithm of zero/);
+	print 'not ' unless (\$\@->\{description\} =~ m/Logarithm of zero/);
 EOT
         push(@script, qq(print "ok $test\\n";\n));
     }
@@ -192,9 +192,9 @@ sub test_broot {
 	$test++;
 	push(@script, <<EOT);
 	eval 'root(2, $op)';
-	(\$bad) = (\$@ =~ m/(.+)/);
+	(\$bad) = (\$\@->\{description\} =~ m/(.+)/);
 	print "# $test op = $op badroot? \$bad...\n";
-	print 'not ' unless (\$@ =~ m/root rank must be/);
+	print 'not ' unless (\$\@->\{description\} =~ m/root rank must be/);
 EOT
         push(@script, qq(print "ok $test\\n";\n));
     }

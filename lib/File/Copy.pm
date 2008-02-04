@@ -270,7 +270,6 @@ sub move {
     {
         local $@;
         eval {
-            local $SIG{__DIE__};
             copy($from,$to) or die;
             my($atime, $mtime) = (stat($from))[8,9];
             utime($atime, $mtime, $to);

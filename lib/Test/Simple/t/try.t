@@ -17,8 +17,6 @@ use Test::More 'no_plan';
 require Test::Builder;
 my $tb = Test::Builder->new;
 
-local $SIG{__DIE__} = sub { fail("DIE handler called: @_") };
-
 # These should not change;
 local $@ = 42;
 local $! = 23;

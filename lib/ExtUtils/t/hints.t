@@ -45,10 +45,7 @@ CLOO
 close HINT;
 
 $mm->check_hints;
-is( $out->read, <<OUT, 'hint files produce errors' );
-Processing hints file $hint_file
-Argh!
-OUT
+like( $out->read, qr/Processing hints file $hint_file\nArgh!/, 'hint files produce errors' );
 
 END {
     use File::Path;

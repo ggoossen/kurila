@@ -63,7 +63,7 @@ local $SIG{__WARN__} = sub {
 
 # Tie::Scalar::TIEHANDLE should find and call TieTest::new and complain
 is( tie( my $foo, 'TieTest'), 'Fooled you.', 'delegated to new()' );
-like( $warn, qr/WARNING: calling TieTest->new/, 'caught warning fine' );
+like( $warn->{description}, qr/WARNING: calling TieTest->new/, 'caught warning fine' );
 
 package DestroyAction;
 

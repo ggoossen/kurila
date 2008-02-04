@@ -330,8 +330,8 @@ else {
     sleep 1; die "child died";
 }
 EXPECT
-parent died at - line 2
-child died at - line 5
+parent died at - line 2.
+child died at - line 5.
 ########
 if ($pid = fork) {
     eval { die "parent died" };
@@ -342,10 +342,10 @@ else {
     print $@->message;
 }
 EXPECT
-parent died at - line 2
-    (eval) called at - line 6
-child died at - line 6
-    (eval) called at - line 2
+parent died at - line 2.
+    (eval) called at - line 6.
+child died at - line 6.
+    (eval) called at - line 2.
 ########
 if (eval q{$pid = fork}) {
     eval q{ die "parent died" };
@@ -356,10 +356,10 @@ else {
     print $@->message;
 }
 EXPECT
-parent died at (eval 2) line 1
-    (eval) called at - line 2
-child died at (eval 2) line 1
-    (eval) called at - line 6
+parent died at (eval 2) line 1.
+    (eval) called at - line 2.
+child died at (eval 2) line 1.
+    (eval) called at - line 6.
 ########
 BEGIN {
     $| = 1;
@@ -471,7 +471,7 @@ EXPECT
 # [perl #39145] Perl_dounwind() crashing with Win32's fork() emulation
 sub { @_ = 3; fork ? die "1" : die "1" }->(2);
 EXPECT
-1 at - line 2
-    main::__ANON__ called at - line 2
-1 at - line 2
-    main::__ANON__ called at - line 2
+1 at - line 2.
+    main::__ANON__ called at - line 2.
+1 at - line 2.
+    main::__ANON__ called at - line 2.

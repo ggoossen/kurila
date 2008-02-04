@@ -42,7 +42,7 @@ $cpt = Safe->new( "Root");
 $cpt->permit(qw(:base_io));
 
 $cpt->reval(q{ system("echo not ok 1"); });
-if ($@ =~ m/^'?system'? trapped by operation mask/) {
+if ($@ && $@->{description} =~ m/^'?system'? trapped by operation mask/) {
     print "ok 1\n";
 } else {
     print "#$@" if $@;
@@ -118,7 +118,7 @@ print $t_array[2] == 4 ? "ok 27\n" : "not ok 27\n";
 
 my $t_scalar2 = $cpt->reval('die "foo bar"; 1');
 print defined $t_scalar2 ? "not ok 28\n" : "ok 28\n";
-print $@ =~ m/foo bar/ ? "ok 29\n" : "not ok 29\n";
+print $@ && $@->{description} =~ m/foo bar/ ? "ok 29\n" : "not ok 29\n";
 
 # --- rdo
   

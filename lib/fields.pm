@@ -53,11 +53,10 @@ sub import {
         # Allow the module to be reloaded so long as field positions
         # have not changed.
         if ($fno and $fno != $next) {
-            require Carp;
             if ($fno +< $fattr->[0]) {
                 warnings::warnif("Hides field '$f' in base class") ;
             } else {
-                Carp::croak("Field name '$f' already in use");
+                die("Field name '$f' already in use");
             }
         }
         $fields->{$f} = $next;

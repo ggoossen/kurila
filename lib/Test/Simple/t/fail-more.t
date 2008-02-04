@@ -45,12 +45,8 @@ sub main::err_ok ($) {
 package main;
 
 require Test::More;
-my $Total = 30;
+my $Total = 29;
 Test::More->import(tests => $Total);
-
-# This should all work in the presence of a __DIE__ handler.
-local $SIG{__DIE__} = sub { $TB->ok(0, "DIE handler called: ".join "", @_); };
-
 
 my $tb = Test::More->builder;
 $tb->use_numbers(0);
@@ -91,7 +87,6 @@ ERR
 
 #line 45
 isnt("foo", "foo", 'foo isnt foo?' );
-isn't("foo", "foo", q|foo isn't foo?| );
 isnt(undef, undef, 'undef isnt undef?');
 err_ok( <<ERR );
 #   Failed test 'foo isnt foo?'
@@ -99,13 +94,8 @@ err_ok( <<ERR );
 #     'foo'
 #         ne
 #     'foo'
-#   Failed test 'foo isn\'t foo?'
-#   at $0 line 46.
-#     'foo'
-#         ne
-#     'foo'
 #   Failed test 'undef isnt undef?'
-#   at $0 line 47.
+#   at $0 line 46.
 #     undef
 #         ne
 #     undef
@@ -222,7 +212,7 @@ ERR
 
 {
     my $warnings;
-    local $SIG{__WARN__} = sub { $warnings .= join '', @_ };
+    local $SIG{__WARN__} = sub { $warnings .= $_[0]->message };
 
 # line 211
     cmp_ok( 42,    '==', "foo", '       == with strings' );
@@ -233,7 +223,7 @@ ERR
 #     expected: foo
 ERR
     My::Test::like $warnings,
-     qq[/^Argument "foo" isn't numeric in .* at $Filename line 211\\\.\n\$/];
+     qq[/^Argument "foo" isn't numeric in .* at $Filename line 211\\\.\n/];
 
 }
 
@@ -291,7 +281,6 @@ not ok - undef is empty string?
 not ok - undef is 0?
 not ok - empty string is 0?
 not ok - foo isnt foo?
-not ok - foo isn't foo?
 not ok - undef isnt undef?
 not ok - is foo like that
 not ok - is foo unlike foo

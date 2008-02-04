@@ -70,7 +70,7 @@ EXPECT
 ########
 $foo=undef; $foo->go;
 EXPECT
-Can't call method "go" on an undefined value at - line 1
+Can't call method "go" on an undefined value at - line 1.
 ########
 BEGIN
         {
@@ -81,7 +81,7 @@ $array[128]=1
 ########
 $x=0x0eabcd; print $x->ref;
 EXPECT
-Can't call method "ref" without a package or object reference at - line 1
+Can't call method "ref" without a package or object reference at - line 1.
 ########
 chop ($str .= ~< *DATA);
 ########
@@ -119,7 +119,7 @@ print;}
 sub sub {local($_) = @_;
 $_ x 4;}
 EXPECT
-Modification of a read-only value attempted at - line 3
+Modification of a read-only value attempted at - line 3.
 ########
 package FOO;sub new {bless {FOO => 'BAR'}};
 package main;
@@ -182,18 +182,18 @@ DESTROY
 ########
 BEGIN { die "phooey" }
 EXPECT
-phooey at - line 1
-BEGIN failed--compilation aborted at - line 1
+phooey at - line 1.
+BEGIN failed--compilation aborted
 ########
 BEGIN { 1/$zero }
 EXPECT
-Illegal division by zero at - line 1
-BEGIN failed--compilation aborted at - line 1
+Illegal division by zero at - line 1.
+BEGIN failed--compilation aborted
 ########
 BEGIN { undef = 0 }
 EXPECT
-Modification of a read-only value attempted at - line 1
-BEGIN failed--compilation aborted at - line 1
+Modification of a read-only value attempted at - line 1.
+BEGIN failed--compilation aborted
 ########
 {
     package foo;
@@ -296,7 +296,7 @@ no strict 'refs';
 { local $main::{ren} = *stimpy; print ${'ren'}, ' ' }
 print +(defined(${'ren'}) ? 'oops' : 'joy'), "\n";
 EXPECT
-Can't use string ("ren") as a SCALAR ref while "strict refs" in use at - line 3
+Can't use string ("ren") as a SCALAR ref while "strict refs" in use at - line 3.
 ########
 package p;
 sub func { print 'really ' unless wantarray; 'p' }
@@ -335,9 +335,9 @@ foo;
 foo;
 EXPECT
 In foo1
-Subroutine foo redefined at (eval 1) line 1
-    (eval) called at - line 4
-    main::foo called at - line 7
+Subroutine foo redefined at (eval 1) line 1.
+    (eval) called at - line 4.
+    main::foo called at - line 7.
 Exiting foo1
 In foo2
 ########
@@ -376,7 +376,7 @@ EXPECT
 -w
 sub testme { my $a = "test"; { local $a = "new test"; print $a }}
 EXPECT
-Can't localize lexical variable $a at - line 1
+Can't localize lexical variable $a at - line 1.
 ########
 package X;
 sub ascalar { my $r; bless \$r }
@@ -436,9 +436,9 @@ BEGIN {
 }
 EXPECT
 foo
-bar at - line 5
-    main::__ANON__ called at - line 7
-BEGIN failed--compilation aborted at - line 8
+bar at - line 5.
+    main::__ANON__ called at - line 7.
+BEGIN failed--compilation aborted
 ########
 re();
 sub re {
@@ -467,7 +467,7 @@ else {
   if ($x == 0) { print "" } else { print $x }
 }
 EXPECT
-Use of uninitialized value $x in numeric eq (==) at - line 3
+Use of uninitialized value $x in numeric eq (==) at - line 3.
 ########
 $x = sub {};
 foo();
@@ -490,8 +490,8 @@ sub M { $_[0] = 2; }
 eval "C";
 M(C);
 EXPECT
-Modification of a read-only value attempted at - line 2
-    main::M called at - line 4
+Modification of a read-only value attempted at - line 2.
+    main::M called at - line 4.
 ########
 print qw(ab a\b a\\b);
 EXPECT
@@ -525,7 +525,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-(?-uxism:x) at - line 3
+(?-uxism:x) at - line 3.
 ########
 # David Dyck
 # coredump in 5.7.1

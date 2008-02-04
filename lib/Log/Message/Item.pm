@@ -4,9 +4,6 @@ use strict;
 use Params::Check qw[check];
 use Log::Message::Handlers;
 
-### for the messages to store ###
-use Carp ();
-
 BEGIN {
     use vars qw[$VERSION];
 
@@ -36,7 +33,7 @@ sub new {
     return bless $args, $class;
 }
 
-sub _clean { map { s/\s*//; chomp; $_ } shift; }
+sub _clean { my $x = shift; map { s/\s*//; chomp; $_ } $x; }
 
 sub remove {
     my $item = shift;

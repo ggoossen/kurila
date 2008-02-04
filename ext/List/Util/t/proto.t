@@ -53,7 +53,7 @@ is( prototype('f_decl'),	'\%',	'change forward declaration');
 
 eval { &set_prototype( 'f', '' ); };
 print "not " unless 
-ok($@ =~ m/^set_prototype: not a reference/,	'not a reference');
+ok($@->{description} =~ m/^set_prototype: not a reference/,	'not a reference');
 
 eval { &set_prototype( \'f', '' ); };
-ok($@ =~ m/^set_prototype: not a subroutine reference/,	'not a sub reference');
+ok($@->{description} =~ m/^set_prototype: not a subroutine reference/,	'not a sub reference');

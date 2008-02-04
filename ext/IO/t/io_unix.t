@@ -21,7 +21,7 @@ BEGIN {
 	require IO::Socket;
 
 	eval {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}
-	  or $@ !~ m/not implemented/ or
+	  or $@->{description} !~ m/not implemented/ or
 	    $reason = 'compiled without TCP/IP stack v4';
     }
     elsif ($^O =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {

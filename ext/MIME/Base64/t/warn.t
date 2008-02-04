@@ -26,7 +26,7 @@ print "1..1\n";
 use warnings;
 
 my @warn;
-$SIG{__WARN__} = sub { push(@warn, @_) };
+$SIG{__WARN__} = sub { push(@warn, $_[0]->{description} . "\n") };
 
 warn;
 my $a;
@@ -57,12 +57,12 @@ for (@warn) {
 }
 
 print "not " unless join("", @warn) eq <<"EOT"; print "ok 1\n";
-Warning: something's wrong at $0 line 31.
-Premature end of base64 data at $0 line 33.
-Premature padding of base64 data at $0 line 34.
-Warning: something's wrong at $0 line 35.
-Premature end of base64 data at $0 line 38.
-Premature padding of base64 data at $0 line 42.
-Warning: something's wrong at $0 line 44.
-Warning: something's wrong at $0 line 53.
+Warning: something's wrong
+Premature end of base64 data
+Premature padding of base64 data
+Warning: something's wrong
+Premature end of base64 data
+Premature padding of base64 data
+Warning: something's wrong
+Warning: something's wrong
 EOT

@@ -1078,7 +1078,6 @@ this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
 #       Larry
 
     # global backstop to cleanup if we should really die
-    $SIG{__DIE__} = \&cleanup;
     $self->debug("Signal handler set.") if $CPAN::DEBUG;
 }
 
@@ -1326,7 +1325,6 @@ sub new {
 #-> sub CPAN::cleanup ;
 sub cleanup {
   # warn "cleanup called with arg[@_] End[$CPAN::End] Signal[$Signal]";
-  local $SIG{__DIE__} = '';
   my($message) = @_;
   my $i = 0;
   my $ineval = 0;

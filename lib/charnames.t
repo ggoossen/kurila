@@ -8,7 +8,7 @@ BEGIN {
 	@INC = '../lib';
 	require './test.pl';
     }
-    $SIG{__WARN__} = sub { push @WARN, @_ };
+    $SIG{__WARN__} = sub { push @WARN, $_[0]->{description} };
 }
 
 require File::Spec;

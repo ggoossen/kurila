@@ -850,6 +850,12 @@ XS(XS_error_create)
 /* 		? HvNAME(SvSTASH(SvRV(ST(0)))) */
 /* 		: (char *)SvPV_nolen(ST(0)); */
 
+	if (sv_isobject(vs)) {
+	    XPUSHs(vs);
+	    XSRETURN(1);
+	    return;
+	}
+
 	if ( items == 0 || vs == &PL_sv_undef ) { /* no param or explicit undef */
 	    /* create empty object */
 	    vs = sv_newmortal();
@@ -939,11 +945,6 @@ XS(XS_error_message)
 	    }
 	    sv_catpv(res, "\n");
 
-	    sv = hv_fetchs(err, "notes", 0);
-	    if (sv) {
-		sv_catsv(res, *sv);
-	    }
-
 	    sv = hv_fetchs(err, "stack", 0);
 	    if (sv && SvROK(*sv)) {
 		AV *av = (AV*)SvRV(*sv);
@@ -971,6 +972,11 @@ XS(XS_error_message)
 			sv_catpv(res, ".\n");
 		    }
 		}
+	    }
+
+	    sv = hv_fetchs(err, "notes", 0);
+	    if (sv) {
+		sv_catsv(res, *sv);
 	    }
 	}
 

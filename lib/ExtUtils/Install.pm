@@ -5,7 +5,6 @@ use vars qw(@ISA @EXPORT $VERSION $MUST_REBOOT %Config);
 $VERSION = '1.44';
 $VERSION = eval $VERSION;
 
-use Carp ();
 use Config qw(%Config);
 use Cwd qw(cwd);
 use Exporter;
@@ -115,7 +114,7 @@ sub _warnonce(@) {
 sub _choke(@) {
     my $first=shift;
     my $msg=_estr "ERROR: $first",@_;
-    Carp::croak($msg);
+    die($msg);
 }
 
 

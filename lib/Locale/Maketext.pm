@@ -135,7 +135,6 @@ sub failure_handler_auto {
 
   # Dumbly copied from sub maketext:
   {
-    local $SIG{'__DIE__'};
     eval { $value = &$value($handle, @_) };
   }
   # If we make it here, there was an exception thrown in the
@@ -225,7 +224,6 @@ sub maketext {
   return $value unless ref($value) eq 'CODE';
   
   {
-    local $SIG{'__DIE__'};
     eval { $value = &$value($handle, @_) };
   }
   # If we make it here, there was an exception thrown in the
@@ -394,7 +392,6 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
 
   print " About to use $module ...\n" if DEBUG;
   {
-    local $SIG{'__DIE__'};
     eval "require $module"; # used to be "use $module", but no point in that.
   }
   if($@) {

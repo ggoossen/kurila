@@ -38,7 +38,7 @@ my @default = map { "IO/$_.pm" } qw( Handle Seekable File Pipe Socket Dir );
 delete @INC{ @default };
 
 my $warn = '' ;
-local $SIG{__WARN__} = sub { $warn = "@_" } ;
+local $SIG{__WARN__} = sub { $warn = $_[0]->{description} } ;
 
 {
     no warnings ;
@@ -57,7 +57,7 @@ local $SIG{__WARN__} = sub { $warn = "@_" } ;
 {
     local $^W = 1;
     IO->import();
-    like( $warn, qr/^Parameterless "use IO" deprecated at/, 
+    like( $warn, qr/^Parameterless "use IO" deprecated/, 
               "... import default, should warn");
     $warn = '' ;
 }
@@ -65,7 +65,7 @@ local $SIG{__WARN__} = sub { $warn = "@_" } ;
 {
     use warnings 'deprecated' ;
     IO->import(); 
-    like( $warn, qr/^Parameterless "use IO" deprecated at/, 
+    like( $warn, qr/^Parameterless "use IO" deprecated/, 
               "... import default, should warn");
     $warn = '' ;
 }
@@ -73,7 +73,7 @@ local $SIG{__WARN__} = sub { $warn = "@_" } ;
 {
     use warnings ;
     IO->import();
-    like( $warn, qr/^Parameterless "use IO" deprecated at/, 
+    like( $warn, qr/^Parameterless "use IO" deprecated/,
               "... import default, should warn");
     $warn = '' ;
 }

@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require Config; Config->import;
     if ($Config{'extensions'} !~ m/\bSocket\b/ && 
         !(($^O eq 'VMS') && $Config{d_socket})) {
@@ -114,7 +112,7 @@ else {
 
 # warnings
 $SIG{__WARN__} = sub {
-    ++ $w if $_[0] =~ m/^6-ARG sockaddr_in call is deprecated/ ;
+    ++ $w if $_[0]->{description} =~ m/^6-ARG sockaddr_in call is deprecated/ ;
 } ;
 $w = 0 ;
 sockaddr_in(1,2,3,4,5,6) ;

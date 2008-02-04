@@ -1717,7 +1717,7 @@ sub death
 sub evalqq {
     my $x = shift;
     my $ex = eval qq/"$x"/;
-    die "error in '$x': $@" if $@;
+    die "error in '$x': {$@->message}" if $@;
     return $ex;
 }
 

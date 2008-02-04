@@ -64,7 +64,7 @@ is Compress::Zlib::zlib_version, ZLIB_VERSION,
     
     # Error cases
     eval { $x->gzsetparams() };
-    like $@, mkErr('^Usage: Compress::Zlib::gzFile::gzsetparams\(file, level, strategy\)');
+    like $@->{description}, mkErr('^Usage: Compress::Zlib::gzFile::gzsetparams\(file, level, strategy\)');
 
     # Change both Level & Strategy
     $status = $x->gzsetparams(Z_BEST_SPEED, Z_HUFFMAN_ONLY) ;

@@ -229,18 +229,18 @@ POSIX->import ('kill');
 my $result = eval "kill 0";
 is ($result, undef, "we should now have POSIX::kill");
 # Check usage.
-like ($@, qr/^Usage: POSIX::kill\(pid, sig\)/, "check its usage message");
+like ($@->{description}, qr/^Usage: POSIX::kill\(pid, sig\)/, "check its usage message");
 
 # Check unimplemented.
 $result = eval {POSIX::offsetof};
 is ($result, undef, "offsetof should fail");
-like ($@, qr/^Unimplemented: POSIX::offsetof\(\) is C-specific/,
+like ($@->{description}, qr/^Unimplemented: POSIX::offsetof\(\) is C-specific/,
       "check its unimplemented message");
 
 # Check reimplemented.
 $result = eval {POSIX::fgets};
 is ($result, undef, "fgets should fail");
-like ($@, qr/^Use method IO::Handle::gets\(\) instead/,
+like ($@->{description}, qr/^Use method IO::Handle::gets\(\) instead/,
       "check its redef message");
 
 # Simplistic tests for the isXXX() functions (bug #16799)

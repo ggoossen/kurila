@@ -401,8 +401,7 @@ sub FETCH {
 }
 
 sub STORE {
-    require Carp;
-    Carp::confess("ERRNO hash is read only!");
+    die("ERRNO hash is read only!");
 }
 
 *CLEAR = \&STORE;

@@ -830,11 +830,9 @@ Perl_qerror(pTHX_ SV *err)
     dVAR;
     if (PL_in_eval) {
 	sv_catsv(ERRSV, err);
-	sv_catpvn(ERRSV, "\n", 1);
     }
     else if (PL_errors) {
 	sv_catsv(PL_errors, err);
-	sv_catpvn(PL_errors, "\n", 1);
     }
     else
 	Perl_warn(aTHX_ "%"SVf, SVfARG(err));

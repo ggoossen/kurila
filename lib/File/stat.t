@@ -86,6 +86,6 @@ SKIP: {
 
 local $!;
 $stat = stat '/notafile';
-isn't( $!, '', 'should populate $!, given invalid file' );
+isnt( $!, '', 'should populate $!, given invalid file' );
 
 # Testing pretty much anything else is unportable.

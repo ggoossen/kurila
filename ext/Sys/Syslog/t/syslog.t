@@ -94,7 +94,7 @@ SKIP: {
     SKIP: {
         # openlog()
         $r = eval { openlog('perl', 'ndelay', 'local0') } || 0;
-        skip "can't connect to syslog", 6 if $@->{description} =~ m/^no connection to syslog available/;
+        skip "can't connect to syslog", 6 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "openlog() called with facility 'local0'" );
         ok( $r, "openlog() should return true" );
 
@@ -133,13 +133,13 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
 
         # openlog() without option NDELAY
         $r = eval { openlog('perl', '', 'local0') } || 0;
-        skip "can't connect to syslog", 16 if $@->{description} =~ m/^no connection to syslog available/;
+        skip "can't connect to syslog", 16 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' and without option 'ndelay'" );
         ok( $r, "[$sock_type] openlog() should return true: '$r'" );
 
         # openlog() with the option NDELAY
         $r = eval { openlog('perl', 'ndelay', 'local0') } || 0;
-        skip "can't connect to syslog", 14 if $@->{description} =~ m/^no connection to syslog available/;
+        skip "can't connect to syslog", 14 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' with option 'ndelay'" );
         ok( $r, "[$sock_type] openlog() should return true: '$r'" );
 

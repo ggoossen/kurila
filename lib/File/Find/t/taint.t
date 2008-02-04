@@ -309,7 +309,7 @@ eval {File::Find::find( {wanted => \&simple_wanted, untaint => 1,
                          untaint_skip => 1, untaint_pattern =>
                          qr|^(NO_MATCH)$|}, topdir('fa') );};
 
-print "# $@" if $@;
+print "# $@->{description}\n" if $@;
 #$^D = 8;
 like( $@->{description}, qr|insecure cwd|, 'Bad untaint pattern causes death in cwd (good)' );
 

@@ -2,11 +2,7 @@
 # Tests that all ops can be trapped by a Safe compartment
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-    else {
+    if (not $ENV{PERL_CORE}) {
 	# this won't work outside of the core, so exit
         print "1..0\n"; exit 0;
     }
@@ -52,7 +48,7 @@ sub testop {
     my $c = Safe->new();
     $c->deny_only($op);
     $c->reval($code);
-    like($@, qr/'\Q$opname\E' trapped by operation mask/, $op);
+    like($@->{description}, qr/'\Q$opname\E' trapped by operation mask/, $op);
 }
 
 foreach (@op) {
@@ -235,7 +231,6 @@ orassign	$x ||= $y
 method		Foo->?$x()
 entersub	f()
 leavesub	sub f{} f()
-leavesublv	sub f:lvalue{return $x} f()
 caller		caller
 warn		warn
 die		die

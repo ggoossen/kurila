@@ -72,7 +72,7 @@ BEGIN {
     is scalar keys %hash, 0, "key collected from registered hash";
     is scalar keys %$ob_reg, 0, "object registry empty again";
     eval { register( 1234) };
-    like $@, qr/^Attempt to register/, "registering non-ref is fatal";
+    like $@->{description}, qr/^Attempt to register/, "registering non-ref is fatal";
     
 }
 

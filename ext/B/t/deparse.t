@@ -53,7 +53,7 @@ while ( ~< *DATA) {
 
     my $coderef = eval "sub \{$input\}";
 
-    if ($@->{description}) {
+    if ($@ and $@->{description}) {
 	diag("$num deparsed: $@");
 	ok(0, $testname);
     }

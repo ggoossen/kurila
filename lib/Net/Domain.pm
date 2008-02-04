@@ -56,7 +56,6 @@ sub _hostname {
     return $host;
   }
   else {
-    local $SIG{'__DIE__'};
 
     # syscall is preferred since it avoids tainting problems
     eval {
@@ -113,8 +112,6 @@ sub _hostdomain {
   # we already know it
   return $domain
     if (defined $domain);
-
-  local $SIG{'__DIE__'};
 
   return $domain = $NetConfig{'inet_domain'}
     if defined $NetConfig{'inet_domain'};

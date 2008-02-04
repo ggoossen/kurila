@@ -39,7 +39,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     ok( my $stdout = tie *STDOUT, 'TieOut' );
     my $warnings = '';
     local $SIG{__WARN__} = sub {
-        $warnings .= join '', @_;
+        $warnings .= $_[0]->{description};
     };
 
     WriteMakefile(
@@ -98,7 +98,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     };
     
     is $warnings, '';
-    is $@, <<'END', "PREREQ_FATAL";
+    is $@->{description}, <<'END', "PREREQ_FATAL";
 MakeMaker FATAL: prerequisites not found.
     I::Do::Not::Exist not installed
     Nor::Do::I not installed

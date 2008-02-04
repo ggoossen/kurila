@@ -32,7 +32,7 @@ sub hostname {
   if ($^O eq 'VMS') {
 
     # method 2 - no sockets ==> return DECnet node name
-    eval { local $SIG{__DIE__}; $host = (gethostbyname('me'))[0] };
+    eval { $host = (gethostbyname('me'))[0] };
     if ($@) { return $host = $ENV{'SYS$NODE'}; }
 
     # method 3 - has someone else done the job already?  It's common for the
@@ -70,7 +70,6 @@ sub hostname {
     # method 2 - syscall is preferred since it avoids tainting problems
     # XXX: is it such a good idea to return hostname untainted?
     eval {
-	local $SIG{__DIE__};
 	require "syscall.ph";
 	$host = "\0" x 65; ## preload scalar
 	syscall(&SYS_gethostname, $host, 65) == 0;
@@ -79,7 +78,6 @@ sub hostname {
     # method 2a - syscall using systeminfo instead of gethostname
     #           -- needed on systems like Solaris
     || eval {
-	local $SIG{__DIE__};
 	require "sys/syscall.ph";
 	require "sys/systeminfo.ph";
 	$host = "\0" x 65; ## preload scalar
@@ -88,7 +86,6 @@ sub hostname {
 
     # method 3 - trusty old hostname command
     || eval {
-	local $SIG{__DIE__};
 	local $SIG{CHLD};
 	$host = `(hostname) 2>/dev/null`; # bsdish
     }
@@ -96,20 +93,17 @@ sub hostname {
     # method 4 - use POSIX::uname(), which strictly can't be expected to be
     # correct
     || eval {
-	local $SIG{__DIE__};
 	require POSIX;
 	$host = (POSIX::uname())[1];
     }
 
     # method 5 - sysV uname command (may truncate)
     || eval {
-	local $SIG{__DIE__};
 	$host = `uname -n 2>/dev/null`; ## sysVish
     }
 
     # method 6 - Apollo pre-SR10
     || eval {
-	local $SIG{__DIE__};
         my($a,$b,$c,$d);
 	($host,$a,$b,$c,$d)=split(m/[:\. ]/,`/com/host`,6);
     }

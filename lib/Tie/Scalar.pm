@@ -79,7 +79,6 @@ process IDs with priority.
 
 =cut
 
-use Carp;
 use warnings::register;
 
 sub new {
@@ -96,18 +95,18 @@ sub TIESCALAR {
 	$pkg->new(@_);
     }
     else {
-	croak "$pkg doesn't define a TIESCALAR method";
+	die "$pkg doesn't define a TIESCALAR method";
     }
 }
 
 sub FETCH {
     my $pkg = ref $_[0];
-    croak "$pkg doesn't define a FETCH method";
+    die "$pkg doesn't define a FETCH method";
 }
 
 sub STORE {
     my $pkg = ref $_[0];
-    croak "$pkg doesn't define a STORE method";
+    die "$pkg doesn't define a STORE method";
 }
 
 #

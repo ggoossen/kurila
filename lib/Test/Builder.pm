@@ -1005,7 +1005,7 @@ sub _try {
     local $@;               # don't set $@ in the test
     my $return = eval { $code->() };
     
-    return wantarray ? ($return, $@) : $return;
+    return wantarray ? ($return, $@ && $@->{description}) : $return;
 }
 
 =end private

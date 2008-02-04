@@ -6,24 +6,11 @@
 #  in the README file that comes with the distribution.
 #
 
-sub BEGIN {
-    if ($ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
-    } else {
-	unshift @INC, 't';
-    }
-    require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-    require 'st-dump.pl';
-}
-
 use Storable qw(store retrieve store_fd nstore_fd fd_retrieve);
 
-print "1..20\n";
+use Test::More;
+
+plan tests => 19;
 
 $a = 'toto';
 $b = \$a;
@@ -33,21 +20,12 @@ $c->{attribute} = 'attrval';
 @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a);
 
-print "not " unless defined store(\@a, 'store');
-print "ok 1\n";
-
-$dumped = &dump(\@a);
-print "ok 2\n";
+ok(defined store(\@a, 'store'));
 
 $root = retrieve('store');
-print "not " unless defined $root;
-print "ok 3\n";
+ok(defined $root);
 
-$got = &dump($root);
-print "ok 4\n";
-
-print "not " unless $got eq $dumped; 
-print "ok 5\n";
+is_deeply($root, \@a);
 
 1 while unlink 'store';
 
@@ -62,53 +40,38 @@ sub make {
 package main;
 
 $foo = FOO->make;
-print "not " unless $foo->store('store');
-print "ok 6\n";
+ok($foo->store('store'));
 
-print "not " unless open(OUT, ">>", 'store');
-print "ok 7\n";
+ok(open(OUT, ">>", 'store'));
 binmode OUT;
 
-print "not " unless defined store_fd(\@a, '::OUT');
-print "ok 8\n";
-print "not " unless defined nstore_fd($foo, '::OUT');
-print "ok 9\n";
-print "not " unless defined nstore_fd(\%a, '::OUT');
-print "ok 10\n";
+ok(defined store_fd(\@a, '::OUT'));
+ok(defined nstore_fd($foo, '::OUT'));
+ok(defined nstore_fd(\%a, '::OUT'));
 
-print "not " unless close(OUT);
-print "ok 11\n";
+ok(close(OUT));
 
-print "not " unless open(OUT, "<", 'store');
+ok(open(OUT, "<", 'store'));
 binmode OUT;
 
 $r = fd_retrieve('::OUT');
-print "not " unless defined $r;
-print "ok 12\n";
-print "not " unless &dump($foo) eq &dump($r);
-print "ok 13\n";
+ok(defined $r);
+is_deeply($foo, $r);
 
 $r = fd_retrieve('::OUT');
-print "not " unless defined $r;
-print "ok 14\n";
-print "not " unless &dump(\@a) eq &dump($r);
-print "ok 15\n";
+ok(defined $r);
+is_deeply(\@a, $r);
 
 $r = fd_retrieve('main::OUT');
-print "not " unless defined $r;
-print "ok 16\n";
-print "not " unless &dump($foo) eq &dump($r);
-print "ok 17\n";
+ok(defined $r);
+is_deeply($foo, $r);
 
 $r = fd_retrieve('::OUT');
-print "not " unless defined $r;
-print "ok 18\n";
-print "not " unless &dump(\%a) eq &dump($r);
-print "ok 19\n";
+ok(defined $r);
+is_deeply(\%a, $r);
 
-eval { $r = fd_retrieve('::OUT'); };
-print "not " unless $@;
-print "ok 20\n";
+eval { $r = fd_retrieve(*OUT); };
+ok(not $@);
 
 close OUT or die "Could not close: $!";
 END { 1 while unlink 'store' }

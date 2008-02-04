@@ -63,7 +63,7 @@ our @a = (1, 2, 3);
   @a = sort { last ; } @a;
 }
 EXPECT
-Can't "last" outside a loop block at - line 3
+Can't "last" outside a loop block at - line 3.
 ########
 package TEST;
  
@@ -82,9 +82,9 @@ tie my $bar, 'TEST';
 print "- $bar\n";
 EXPECT
 still in fetch
-- >test at (eval 1) line 1
-    (eval) called at - line 8
-    TEST::FETCH called at - line 15
+- >test at (eval 1) line 1.
+    (eval) called at - line 8.
+    TEST::FETCH called at - line 15.
 <
 ########
 package TEST;
@@ -182,8 +182,8 @@ exit;
 bar:
 print "bar reached\n";
 EXPECT
-Can't "goto" out of a pseudo block at - line 2
-    main::foo called at - line 6
+Can't "goto" out of a pseudo block at - line 2.
+    main::foo called at - line 6.
 ########
 our %seen = ();
 sub sortfn {
@@ -213,7 +213,7 @@ foo:
   @a = sort { last foo; } @a;
 }
 EXPECT
-Label not found for "last foo" at - line 2
+Label not found for "last foo" at - line 2.
 ########
 package TEST;
  
@@ -236,8 +236,8 @@ tie our $bar, 'TEST';
 }
 print "OK\n";
 EXPECT
-Can't "next" outside a loop block at - line 8
-    TEST::FETCH called at - line 18
+Can't "next" outside a loop block at - line 8.
+    TEST::FETCH called at - line 18.
 ########
 package TEST;
  
@@ -258,8 +258,8 @@ exit;
 bbb:
 print "bbb\n";
 EXPECT
-Can't find label bbb at - line 8
-    TEST::FETCH called at - line 15
+Can't find label bbb at - line 8.
+    TEST::FETCH called at - line 15.
 ########
 sub foo {
   $a <+> $b unless eval('$a == 0 ? die("foo\n") : ($a <+> $b)');
@@ -296,8 +296,8 @@ package main;
 tie my $bar, 'TEST';
 }
 EXPECT
-Can't "next" outside a loop block at - line 4
-    TEST::TIESCALAR called at - line 9
+Can't "next" outside a loop block at - line 4.
+    TEST::TIESCALAR called at - line 9.
 ########
 our @a = (1, 2, 3);
 foo:
@@ -388,7 +388,7 @@ tie *STDERR, '';
 die "DIE";
 
 EXPECT
-[TIE] DIE at - line 5
+[TIE] DIE at - line 5.
 ########
 sub TIEHANDLE { bless {} }
 sub PRINT { 
@@ -403,5 +403,5 @@ use warnings FATAL => qw(uninitialized);
 print undef;
 
 EXPECT
-[TIE] recursive die at - line 5
-    main::PRINT called at - line 11
+[TIE] recursive die at - line 5.
+    main::PRINT called at - line 11.

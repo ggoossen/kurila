@@ -29,7 +29,7 @@ is( $ENV{PERL_RE_COLORS}, "su\tn\tny", '... or use $ENV{PERL_RE_COLORS}' );
 # get on
 my $warn;
 local $SIG{__WARN__} = sub {
-	$warn = shift;
+	$warn = $_[0]->{description};
 };
 #eval { re::bits(1) };
 #like( $warn, qr/Useless use/, 'bits() should warn with no args' );

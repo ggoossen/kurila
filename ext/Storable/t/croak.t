@@ -32,7 +32,7 @@ print "1..2\n";
 
 for my $test (1,2) {
   eval {thaw "\xFF\xFF"};
-  if ($@ =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
+  if ($@->{description} =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
     {
       print "ok $test\n";
     } else {
