@@ -82,7 +82,7 @@ eval 'my A $x : plugh;';
 like $@->message, qr/^Expected variable after declarator at/;
 
 eval 'my A $x : plugh plover;';
-like $@->{description}, qr/^Expected variable after declarator at/;
+like $@->{description}, qr/^Expected variable after declarator/;
 
 no warnings 'reserved';
 eval 'my A $x : plugh;';

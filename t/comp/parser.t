@@ -241,10 +241,10 @@ eval q[ sub foo3 { my $x; $x=1 } ] for 1..10;
 is($@, "", 'BEGIN 5' );
 
 eval q[ BEGIN { die } ] for 1..10;
-like($@->{description}, qr/BEGIN failed--compilation aborted/, 'BEGIN 6' );
+like($@->message, qr/BEGIN failed--compilation aborted/, 'BEGIN 6' );
 
 eval q[ BEGIN {\&foo4; die } ] for 1..10;
-like($@->{description}, qr/BEGIN failed--compilation aborted/, 'BEGIN 7' );
+like($@->message, qr/BEGIN failed--compilation aborted/, 'BEGIN 7' );
 
 # Add new tests HERE:
 

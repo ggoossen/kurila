@@ -69,6 +69,7 @@ my $b ; chop $b ;
 require "./abcd";
 EXPECT
 Use of uninitialized value $b in scalar chop at ./abcd line 1.
+    (eval) called at - line 1.
 ########
 
 --FILE-- abcd
@@ -79,6 +80,7 @@ my $b ; chop $b ;
 require "./abcd";
 EXPECT
 Use of uninitialized value $b in scalar chop at ./abcd line 1.
+    (eval) called at - line 2.
 ########
 
 --FILE-- abcd
@@ -89,6 +91,7 @@ $^W =1 ;
 require "./abcd";
 EXPECT
 Use of uninitialized value $b in scalar chop at ./abcd line 1.
+    (eval) called at - line 2.
 ########
 
 --FILE-- abcd
@@ -118,6 +121,7 @@ eval 'my $b ; chop $b ;' ;
 print $@ ;
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 1.
+    (eval) called at - line 3.
 ########
 
 eval '$^W = 1;' ;
@@ -187,3 +191,4 @@ sub fred { my $b ; chop $b ;}
 }
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 2.
+    main::fred called at - line 4.

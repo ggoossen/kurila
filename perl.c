@@ -5053,6 +5053,8 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		if (SvROK(atsv) && SvTYPE(SvRV(atsv)) == SVt_PVHV) {
 		    SV** desc = hv_fetchs( (HV*)SvRV(atsv), "notes", TRUE );
 		    if (desc) {
+			if ( ! SvPOK(*desc) )
+			    sv_setpvn(*desc, "", 0);
 			if (paramList == PL_beginav)
 			    sv_catpv( *desc,
 				      "BEGIN failed--compilation aborted" );
