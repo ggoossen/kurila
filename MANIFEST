@@ -129,7 +129,6 @@ ext/Compress/Raw/Zlib/README		Compress::Raw::Zlib
 ext/Compress/Raw/Zlib/t/01version.t	Compress::Raw::Zlib
 ext/Compress/Raw/Zlib/t/02zlib.t	Compress::Raw::Zlib
 ext/Compress/Raw/Zlib/t/07bufsize.t	Compress::Raw::Zlib
-ext/Compress/Raw/Zlib/t/18lvalue.t	Compress::Raw::Zlib
 ext/Compress/Raw/Zlib/typemap		Compress::Raw::Zlib
 ext/Compress/Raw/Zlib/zlib-src/adler32.c	Compress::Raw::Zlib
 ext/Compress/Raw/Zlib/zlib-src/compress.c	Compress::Raw::Zlib
