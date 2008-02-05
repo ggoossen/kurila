@@ -58,13 +58,6 @@
 #  define AT_LEAST_ZLIB_1_2_3
 #endif
 
-#ifdef USE_PPPORT_H
-#  define NEED_sv_2pvbyte
-#  define NEED_sv_2pv_nolen
-#  include "ppport.h"
-#endif
-
-
 typedef int                     DualType ;
 typedef int                     int_undef ;
 

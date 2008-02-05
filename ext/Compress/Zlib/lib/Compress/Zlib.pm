@@ -215,14 +215,7 @@ sub Compress::Zlib::gzFile::gzseek
 
     my $gz = $self->[0] ;
     my $status ;
-    eval { $status = $gz->seek($offset, $whence) ; };
-    if ($@)
-    {
-        my $error = $@;
-        $error =~ s/^.*: /gzseek: /;
-        $error =~ s/ at .* line \d+\s*$//;
-        croak $error;
-    }
+    $status = $gz->seek($offset, $whence) ;
     _save_gzerr($gz);
     return $status ;
 }
