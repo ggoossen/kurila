@@ -1602,7 +1602,6 @@ S_hfreeentries(pTHX_ HV *hv)
 	    iter->xhv_eiter = NULL;	/* HvEITER(hv) = NULL */
 
             if((meta = iter->xhv_mro_meta)) {
-                if(meta->mro_linear_dfs) SvREFCNT_dec(meta->mro_linear_dfs);
                 if(meta->mro_linear_c3)  SvREFCNT_dec(meta->mro_linear_c3);
                 if(meta->mro_nextmethod) SvREFCNT_dec(meta->mro_nextmethod);
                 Safefree(meta);

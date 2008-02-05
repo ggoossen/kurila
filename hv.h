@@ -41,18 +41,11 @@ struct shared_he {
    Use the funcs in mro.c
 */
 
-typedef enum {
-    MRO_C3,  /* 0 */
-    MRO_DFS  /* 1 */
-} mro_alg;
-
 struct mro_meta {
-    AV      *mro_linear_dfs; /* cached dfs @ISA linearization */
     AV      *mro_linear_c3;  /* cached c3 @ISA linearization */
     HV      *mro_nextmethod; /* next::method caching */
     U32     cache_gen;       /* Bumping this invalidates our method cache */
     U32     pkg_gen;         /* Bumps when local methods/@ISA change */
-    mro_alg mro_which;       /* which mro alg is in use? */
 };
 
 /* Subject to change.
