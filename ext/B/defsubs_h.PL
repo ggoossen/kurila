@@ -22,7 +22,6 @@ foreach my $const (qw(
 		      CVf_CLONED
 		      CVf_CONST
 		      CVf_LOCKED
-		      CVf_LVALUE
 		      CVf_METHOD
 		      CVf_NODEBUG
 		      CVf_UNIQUE

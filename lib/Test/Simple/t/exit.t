@@ -20,6 +20,8 @@ if( $^O eq 'MacOS' ) {
     exit 0;
 }
 
+our $TODO;
+
 my $test_num = 1;
 # Utility testing functions.
 sub ok ($;$) {
@@ -27,6 +29,7 @@ sub ok ($;$) {
     my $ok = '';
     $ok .= "not " unless $test;
     $ok .= "ok $test_num";
+    $ok .= " # TODO " if defined $TODO;
     $ok .= " - $name" if defined $name;
     $ok .= "\n";
     print $ok;
@@ -49,7 +52,7 @@ my %Tests = (
              'extras.plx'               => [2,      4],
              'too_few.plx'              => [255,    4],
              'too_few_fail.plx'         => [2,      4],
-             'death.plx'                => [255,    4],
+             'death.plx'                => [9,    4],
              'last_minute_death.plx'    => [255,    4],
              'pre_plan_death.plx'       => ['not zero',    'not zero'],
              'death_in_eval.plx'        => [0,      0],
@@ -84,6 +87,7 @@ while( my($test_name, $exit_codes) = each %Tests ) {
     my $wait_stat = system(qq{$Perl -"I../blib/lib" -"I../lib" -"I../t/lib" $file});
     my $actual_exit = exitstatus($wait_stat);
 
+    local $My::Test::TODO = 1 if $test_name =~ m/last_minute_death/;
     if( $exit_code eq 'not zero' ) {
         My::Test::ok( $actual_exit != 0,
                       "$test_name exited with $actual_exit ".

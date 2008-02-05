@@ -135,7 +135,6 @@ Returns the stash of the CV.
 
 #define CVf_METHOD	0x0001	/* CV is explicitly marked as a method */
 #define CVf_LOCKED	0x0002	/* CV locks itself or first arg on entry */
-#define CVf_LVALUE	0x0004  /* CV return value can be used as lvalue */
 
 #define CVf_WEAKOUTSIDE	0x0010  /* CvOUTSIDE isn't ref counted */
 #define CVf_CLONE	0x0020	/* anon CV uses external lexicals */

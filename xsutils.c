@@ -73,17 +73,6 @@ modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
 	    switch ((int)len) {
 	    case 6:
 		switch (name[3]) {
-#ifdef CVf_LVALUE
-		case 'l':
-		    if (memEQ(name, "lvalue", 6)) {
-			if (negated)
-			    CvFLAGS((CV*)sv) &= ~CVf_LVALUE;
-			else
-			    CvFLAGS((CV*)sv) |= CVf_LVALUE;
-			continue;
-		    }
-		    break;
-#endif
 		case 'k':
 		    if (memEQ(name, "locked", 6)) {
 			if (negated)
@@ -211,10 +200,6 @@ usage:
 	cvflags = CvFLAGS((CV*)sv);
 	if (cvflags & CVf_LOCKED)
 	    XPUSHs(sv_2mortal(newSVpvs("locked")));
-#ifdef CVf_LVALUE
-	if (cvflags & CVf_LVALUE)
-	    XPUSHs(sv_2mortal(newSVpvs("lvalue")));
-#endif
 	if (cvflags & CVf_METHOD)
 	    XPUSHs(sv_2mortal(newSVpvs("method")));
         if (GvUNIQUE(CvGV((CV*)sv)))
