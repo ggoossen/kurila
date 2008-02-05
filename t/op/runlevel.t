@@ -403,5 +403,6 @@ use warnings FATAL => qw(uninitialized);
 print undef;
 
 EXPECT
-[TIE] recursive die at - line 5.
+[TIE] Use of uninitialized value in print at - line 11.
+ at - line 5.
     main::PRINT called at - line 11.
