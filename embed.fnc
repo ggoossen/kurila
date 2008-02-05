@@ -1843,7 +1843,6 @@ p	|struct mro_meta*	|mro_meta_dup	|NN struct mro_meta* smeta|NN CLONE_PARAMS* pa
 Apd	|AV*	|mro_get_linear_isa|NN HV* stash
 #if defined(PERL_IN_MRO_C) || defined(PERL_DECL_PROT)
 sd	|AV*	|mro_get_linear_isa_c3|NN HV* stash|I32 level
-sd	|AV*	|mro_get_linear_isa_dfs|NN HV* stash|I32 level
 #endif
 pd	|void   |mro_isa_changed_in|NN HV* stash
 Apd	|void	|mro_method_changed_in	|NN HV* stash

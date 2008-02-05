@@ -4596,9 +4596,6 @@ PERL_CALLCONV AV*	Perl_mro_get_linear_isa(pTHX_ HV* stash)
 STATIC AV*	S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
 			__attribute__nonnull__(pTHX_1);
 
-STATIC AV*	S_mro_get_linear_isa_dfs(pTHX_ HV* stash, I32 level)
-			__attribute__nonnull__(pTHX_1);
-
 #endif
 PERL_CALLCONV void	Perl_mro_isa_changed_in(pTHX_ HV* stash)
 			__attribute__nonnull__(pTHX_1);
