@@ -34,6 +34,7 @@ foreach my $testout ( @tests ) {
     my ( $pattern )= $testout=~m/Compiling REx "([^"]+)"/;
     ok( $pattern, "Pattern for test " . ($test++) );
     my $diaged;
+
     while (@strs) {
         local $_= shift @strs;
         last if !$_
@@ -43,7 +44,7 @@ foreach my $testout ( @tests ) {
         s/\s+$//;
         ok( $testout=~m/\Q$_\E/, "$_: /$pattern/" )
             or do {
-                !$diaged++ and diag("$_: /$pattern/\n$testout");
+                !$diaged++ and diag("$_: /$pattern/\n'$testout'");
             };
     }
 }

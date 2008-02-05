@@ -70,8 +70,8 @@ $r = fd_retrieve('::OUT');
 ok(defined $r);
 is_deeply(\%a, $r);
 
-eval { $r = fd_retrieve(*OUT); };
-ok(not $@);
+eval { $r = fd_retrieve('::OUT'); };
+ok($@);
 
 close OUT or die "Could not close: $!";
 END { 1 while unlink 'store' }

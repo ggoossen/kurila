@@ -10,11 +10,11 @@ my @tests=(
 );
 while (@tests) {
     my ($str,$pat)=splice @tests,0,2;
-    warn "\n";
+    print STDERR "\n";
     $pat="m/$pat/" if substr($pat,0,2) ne 'm/';
     # string eval to get the free regex message in the right place.
     eval qq[
-        warn "$str"=~$pat ? "%MATCHED%" : "%FAILED%","\n";
+        print STDERR "$str"=~$pat ? "%MATCHED%" : "%FAILED%","\n";
     ];
     die $@ if $@;
 }
