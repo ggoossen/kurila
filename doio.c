@@ -60,7 +60,7 @@
 
 bool
 Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
-	      int rawmode, int rawperm, PerlIO *supplied_fp, SV **svp,
+	      int rawmode, int rawperm, PerlIO *supplied_fp, SV * const *svp,
 	      I32 num_svs)
 {
     dVAR;
@@ -1327,7 +1327,7 @@ S_exec_failed(pTHX_ const char *cmd, int fd, int do_report)
 }
 
 bool
-Perl_do_aexec5(pTHX_ SV *really, register SV **mark, register SV **sp,
+Perl_do_aexec5(pTHX_ SV *really, register SV * const *mark, register SV * const *sp,
 	       int fd, int do_report)
 {
     dVAR;

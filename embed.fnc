@@ -186,8 +186,8 @@ Afp	|OP*	|die		|NULLOK const char* pat|...
 p	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
 p	|void	|die_where	|NN SV *msv
 Ap	|void	|dounwind	|I32 cxix
-pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV** mark|NN SV** sp
-p	|bool	|do_aexec5	|NULLOK SV* really|NN SV** mark|NN SV** sp|int fd|int do_report
+pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp
+p	|bool	|do_aexec5	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp|int fd|int do_report
 Ap	|int	|do_binmode	|NN PerlIO *fp|int iotype|int mode
 p	|void	|do_chop	|NN SV* asv|NN SV* sv
 Ap	|bool	|do_close	|NULLOK GV* gv|bool not_implicit
@@ -228,7 +228,7 @@ Ap	|bool	|do_open9	|NN GV *gv|NN const char *name|I32 len|int as_raw \
 				|NN SV *svs|I32 num
 Ap	|bool	|do_openn	|NN GV *gv|NN const char *name|I32 len|int as_raw \
 				|int rawmode|int rawperm|NULLOK PerlIO *supplied_fp \
-				|NULLOK SV **svp|I32 num
+				|NULLOK SV * const *svp|I32 num
 p	|bool	|do_print	|NULLOK SV* sv|NN PerlIO* fp
 pR	|OP*	|do_readline
 p	|I32	|do_chomp	|NN SV* sv
@@ -509,7 +509,7 @@ Anp	|void*	|my_memset	|NN char* loc|I32 ch|I32 len
 #endif
 Ap	|I32	|my_pclose	|NULLOK PerlIO* ptr
 Ap	|PerlIO*|my_popen	|NN const char* cmd|NN const char* mode
-Ap	|PerlIO*|my_popen_list	|NN char* mode|int n|NN SV ** args
+Ap	|PerlIO*|my_popen_list	|NN char* mode|int n|NN SV * const * args
 Ap	|void	|my_setenv	|NULLOK const char* nam|NULLOK const char* val
 Ap	|I32	|my_stat
 Ap	|char *	|my_strftime	|NN const char *fmt|int sec|int min|int hour|int mday|int mon|int year|int wday|int yday|int isdst
@@ -789,10 +789,6 @@ p	|void	|sub_crush_depth|NN CV* cv
 Apd	|bool	|sv_2bool	|NN SV* sv
 Apd	|CV*	|sv_2cv		|NULLOK SV* sv|NN HV** st|NN GV** gvp|I32 lref
 Apd	|IO*	|sv_2io		|NN SV* sv
-#ifdef PERL_IN_SV_C
-s	|bool	|glob_2number	|NN GV* const gv
-s	|char*	|glob_2pv	|NN GV* const gv|NULLOK STRLEN * const len
-#endif
 Amb	|IV	|sv_2iv		|NN SV* sv
 Apd	|IV	|sv_2iv_flags	|NN SV* sv|I32 flags
 Apd	|SV*	|sv_2mortal	|NULLOK SV* sv
@@ -1526,6 +1522,7 @@ s	|void	|printbuf	|NN const char* fmt|NN const char* s
 
 #if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 s	|bool|isa_lookup	|NULLOK HV *stash|NN const char * const name|NULLOK const HV * const name_stash
+s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 #endif
 
 #if defined(PERL_IN_LOCALE_C) || defined(PERL_DECL_PROT)
@@ -1535,7 +1532,6 @@ s	|char*	|stdize_locale	|NN char* locs
 #endif
 
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
-s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 s	|SV*	|mess_alloc
 s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
 sr	|char *	|write_no_mem
