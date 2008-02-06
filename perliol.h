@@ -24,7 +24,7 @@ struct _PerlIO_funcs {
 		     PerlIO_list_t *layers, IV n,
 		     const char *mode,
 		     int fd, int imode, int perm,
-		     PerlIO *old, int narg, SV **args);
+		     PerlIO *old, int narg, SV *const*args);
     IV (*Binmode)(pTHX_ PerlIO *f);
     SV *(*Getarg) (pTHX_ PerlIO *f, CLONE_PARAMS *param, int flags);
     IV (*Fileno) (pTHX_ PerlIO *f);
@@ -155,7 +155,7 @@ PERL_EXPORT_C SV * PerlIO_tab_sv(pTHX_ PerlIO_funcs *tab);
 PERL_EXPORT_C void PerlIO_default_buffer(pTHX_ PerlIO_list_t *av);
 PERL_EXPORT_C void PerlIO_stdstreams(pTHX);
 PERL_EXPORT_C int PerlIO__close(pTHX_ PerlIO *f);
-PERL_EXPORT_C PerlIO_list_t * PerlIO_resolve_layers(pTHX_ const char *layers, const char *mode, int narg, SV **args);
+PERL_EXPORT_C PerlIO_list_t * PerlIO_resolve_layers(pTHX_ const char *layers, const char *mode, int narg, SV * const *args);
 PERL_EXPORT_C PerlIO_funcs * PerlIO_default_layer(pTHX_ I32 n);
 PERL_EXPORT_C PerlIO_list_t * PerlIO_default_layers(pTHX);
 PERL_EXPORT_C PerlIO * PerlIO_reopen(const char *path, const char *mode, PerlIO *f);
@@ -200,7 +200,7 @@ PERL_EXPORT_C IV        PerlIOBuf_flush(pTHX_ PerlIO *f);
 PERL_EXPORT_C STDCHAR * PerlIOBuf_get_base(pTHX_ PerlIO *f);
 PERL_EXPORT_C SSize_t   PerlIOBuf_get_cnt(pTHX_ PerlIO *f);
 PERL_EXPORT_C STDCHAR * PerlIOBuf_get_ptr(pTHX_ PerlIO *f);
-PERL_EXPORT_C PerlIO *  PerlIOBuf_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *old, int narg, SV **args);
+PERL_EXPORT_C PerlIO *  PerlIOBuf_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *old, int narg, SV *const*args);
 PERL_EXPORT_C IV        PerlIOBuf_popped(pTHX_ PerlIO *f);
 PERL_EXPORT_C IV        PerlIOBuf_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab);
 PERL_EXPORT_C SSize_t   PerlIOBuf_read(pTHX_ PerlIO *f, void *vbuf, Size_t count);
@@ -244,7 +244,7 @@ PERL_EXPORT_C void      PerlIOPending_set_ptrcnt(pTHX_ PerlIO *f, STDCHAR * ptr,
 PERL_EXPORT_C IV        PerlIOPop_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab);
 
 /* Raw */
-PERL_EXPORT_C PerlIO *  PerlIORaw_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *old, int narg, SV **args);
+PERL_EXPORT_C PerlIO *  PerlIORaw_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *old, int narg, SV *const*args);
 PERL_EXPORT_C IV        PerlIORaw_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab);
 
 /* Stdio */
@@ -258,7 +258,7 @@ PERL_EXPORT_C IV        PerlIOStdio_fill(pTHX_ PerlIO *f);
 PERL_EXPORT_C IV        PerlIOStdio_flush(pTHX_ PerlIO *f);
 PERL_EXPORT_C STDCHAR * PerlIOStdio_get_base(pTHX_ PerlIO *f);
 PERL_EXPORT_C char *    PerlIOStdio_mode(const char *mode, char *tmode);
-PERL_EXPORT_C PerlIO *  PerlIOStdio_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *f, int narg, SV **args);
+PERL_EXPORT_C PerlIO *  PerlIOStdio_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *f, int narg, SV *const*args);
 PERL_EXPORT_C IV        PerlIOStdio_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab);
 PERL_EXPORT_C SSize_t   PerlIOStdio_read(pTHX_ PerlIO *f, void *vbuf, Size_t count);
 PERL_EXPORT_C IV        PerlIOStdio_seek(pTHX_ PerlIO *f, Off_t offset, int whence);
@@ -272,7 +272,7 @@ PERL_EXPORT_C IV        PerlIOUnix_close(pTHX_ PerlIO *f);
 PERL_EXPORT_C PerlIO *  PerlIOUnix_dup(pTHX_ PerlIO *f, PerlIO *o, CLONE_PARAMS *param, int flags);
 PERL_EXPORT_C IV        PerlIOUnix_fileno(pTHX_ PerlIO *f);
 PERL_EXPORT_C int       PerlIOUnix_oflags(const char *mode);
-PERL_EXPORT_C PerlIO *  PerlIOUnix_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *f, int narg, SV **args);
+PERL_EXPORT_C PerlIO *  PerlIOUnix_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, IV n, const char *mode, int fd, int imode, int perm, PerlIO *f, int narg, SV *const*args);
 PERL_EXPORT_C IV        PerlIOUnix_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab);
 PERL_EXPORT_C SSize_t   PerlIOUnix_read(pTHX_ PerlIO *f, void *vbuf, Size_t count);
 PERL_EXPORT_C int       PerlIOUnix_refcnt_dec(int fd);

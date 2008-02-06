@@ -2130,7 +2130,7 @@ Perl_my_swabn(void *ptr, int n)
 }
 
 PerlIO *
-Perl_my_popen_list(pTHX_ char *mode, int n, SV **args)
+Perl_my_popen_list(pTHX_ char *mode, int n, SV * const *args)
 {
 #if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(OS2) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL) && !defined(NETWARE) && !defined(__LIBCATAMOUNT__)
     dVAR;

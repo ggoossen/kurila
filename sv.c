@@ -1639,18 +1639,6 @@ Perl_looks_like_number(pTHX_ SV *sv)
     return grok_number(sbegin, len, NULL);
 }
 
-STATIC bool
-S_glob_2number(pTHX_ GV * const gv)
-{
-    Perl_croak(aTHX "Tried to use glob as number");
-}
-
-STATIC char *
-S_glob_2pv(pTHX_ GV * const gv, STRLEN * const len)
-{
-    Perl_croak(aTHX "Tried to use glob as string");
-}
-
 /* Actually, ISO C leaves conversion of UV to IV undefined, but
    until proven guilty, assume that things are not that bad... */
 
@@ -2020,7 +2008,7 @@ S_sv_2iuv_common(pTHX_ SV *sv) {
     }
     else  {
 	if (isGV_with_GP(sv))
-	    return glob_2number((GV *)sv);
+	    Perl_croak(aTHX "Tried to use glob as number");
 
 	if (!(SvFLAGS(sv) & SVs_PADTMP)) {
 	    if (!PL_localizing && ckWARN(WARN_UNINITIALIZED))
@@ -2376,8 +2364,7 @@ Perl_sv_2nv(pTHX_ register SV *sv)
     }
     else  {
 	if (isGV_with_GP(sv)) {
-	    glob_2number((GV *)sv);
-	    return 0.0;
+	    Perl_croak(aTHX "Tried to use glob as number");
 	}
 
 	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))
@@ -2692,7 +2679,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
     }
     else {
 	if (isGV_with_GP(sv))
-	    return glob_2pv((GV *)sv, lp);
+	    Perl_croak(aTHX "Tried to use glob as string");
 
 	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))
 	    report_uninit(sv);
@@ -8207,8 +8194,8 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		goto unknown;
 	    uv = (args) ? va_arg(*args, int) : SvIV(argsv);
 	    if ((!UNI_IS_INVARIANT(uv) && IN_CODEPOINTS)) {
-		eptr = (char*)utf8buf;
-		elen = uvchr_to_utf8(eptr, uv) - utf8buf;
+		eptr = utf8buf;
+		elen = uvchr_to_utf8(utf8buf, uv) - utf8buf;
 		is_utf8 = TRUE;
 	    }
 	    else {

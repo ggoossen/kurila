@@ -3047,8 +3047,8 @@ PP(pp_index)
     else if (offset > (I32)biglen)
 	offset = biglen;
     if (!(little_p = is_index
-	  ? fbm_instr(big_p + offset,
-		      big_p + biglen, little, 0)
+	  ? fbm_instr((char*)big_p + offset,
+		      (char*)big_p + biglen, little, 0)
 	  : rninstr(big_p,  big_p  + offset,
 		    little_p, little_p + llen)))
 	retval = -1;
@@ -4360,7 +4360,7 @@ PP(pp_split)
 	}
 	else {
 	    while (s < strend && --limit &&
-	      (m = fbm_instr(s, strend,
+	      (m = fbm_instr((char*)s, (char*)strend,
 			     csv, multiline ? FBMrf_MULTILINE : 0)) )
 	    {
 		dstr = newSVpvn(s, m-s);

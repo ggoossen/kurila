@@ -400,11 +400,11 @@ PERL_CALLCONV void	Perl_die_where(pTHX_ SV *msv)
 			__attribute__nonnull__(pTHX_1);
 
 PERL_CALLCONV void	Perl_dounwind(pTHX_ I32 cxix);
-/* PERL_CALLCONV bool	Perl_do_aexec(pTHX_ SV* really, SV** mark, SV** sp)
+/* PERL_CALLCONV bool	Perl_do_aexec(pTHX_ SV* really, SV* const * mark, SV* const * sp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3); */
 
-PERL_CALLCONV bool	Perl_do_aexec5(pTHX_ SV* really, SV** mark, SV** sp, int fd, int do_report)
+PERL_CALLCONV bool	Perl_do_aexec5(pTHX_ SV* really, SV* const * mark, SV* const * sp, int fd, int do_report)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 
@@ -496,7 +496,7 @@ PERL_CALLCONV bool	Perl_do_open9(pTHX_ GV *gv, const char *name, I32 len, int as
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_8);
 
-PERL_CALLCONV bool	Perl_do_openn(pTHX_ GV *gv, const char *name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO *supplied_fp, SV **svp, I32 num)
+PERL_CALLCONV bool	Perl_do_openn(pTHX_ GV *gv, const char *name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO *supplied_fp, SV * const *svp, I32 num)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
@@ -1363,7 +1363,7 @@ PERL_CALLCONV PerlIO*	Perl_my_popen(pTHX_ const char* cmd, const char* mode)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 
-PERL_CALLCONV PerlIO*	Perl_my_popen_list(pTHX_ char* mode, int n, SV ** args)
+PERL_CALLCONV PerlIO*	Perl_my_popen_list(pTHX_ char* mode, int n, SV * const * args)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_3);
 
@@ -2128,14 +2128,6 @@ PERL_CALLCONV CV*	Perl_sv_2cv(pTHX_ SV* sv, HV** st, GV** gvp, I32 lref)
 PERL_CALLCONV IO*	Perl_sv_2io(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
 
-#ifdef PERL_IN_SV_C
-STATIC bool	S_glob_2number(pTHX_ GV* const gv)
-			__attribute__nonnull__(pTHX_1);
-
-STATIC char*	S_glob_2pv(pTHX_ GV* const gv, STRLEN * const len)
-			__attribute__nonnull__(pTHX_1);
-
-#endif
 /* PERL_CALLCONV IV	Perl_sv_2iv(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1); */
 
@@ -4061,6 +4053,9 @@ STATIC void	S_printbuf(pTHX_ const char* fmt, const char* s)
 STATIC bool	S_isa_lookup(pTHX_ HV *stash, const char * const name, const HV * const name_stash)
 			__attribute__nonnull__(pTHX_2);
 
+STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
+			__attribute__nonnull__(pTHX_1);
+
 #endif
 
 #if defined(PERL_IN_LOCALE_C) || defined(PERL_DECL_PROT)
@@ -4072,9 +4067,6 @@ STATIC char*	S_stdize_locale(pTHX_ char* locs)
 #endif
 
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
-STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
-			__attribute__nonnull__(pTHX_1);
-
 STATIC SV*	S_mess_alloc(pTHX);
 STATIC SV*	S_vdie_croak_common(pTHX_ const char *pat, va_list *args);
 STATIC char *	S_write_no_mem(pTHX)

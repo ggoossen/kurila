@@ -2456,7 +2456,7 @@ PP(pp_entersub)
 	}
 	if (!cv) {
 	    SV* sub_name = sv_newmortal();
-	    gv_efullname4(sub_name, sv, NULL, TRUE);
+	    gv_efullname4(sub_name, (GV*)sv, NULL, TRUE);
 	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
 	}
 	break;

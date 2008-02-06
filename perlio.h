@@ -230,7 +230,7 @@ PERL_EXPORT_C PerlIO *PerlIO_open(const char *, const char *);
 #ifndef PerlIO_openn
 PERL_EXPORT_C PerlIO *PerlIO_openn(pTHX_ const char *layers, const char *mode,
 				   int fd, int imode, int perm, PerlIO *old,
-				   int narg, SV **arg);
+				   int narg, SV * const *arg);
 #endif
 #ifndef PerlIO_eof
 PERL_EXPORT_C int PerlIO_eof(PerlIO *);
