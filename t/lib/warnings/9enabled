@@ -335,13 +335,19 @@ use warnings ;
 eval { 
     warnings::warn() 
   } ;
-print $@ ;
+print $@->message;
 eval { 
   warnings::warn("fred", "joe") 
   } ;
-print $@ ;
+print $@->message;
 EXPECT
-error=HASH(0x7af500)error=HASH(0x7cb280)
+Usage: warnings::warn([category,] 'message') at ../lib/warnings.pm line 456.
+    warnings::warn called at - line 5.
+    (eval) called at - line 4.
+Unknown warnings category 'fred' at ../lib/warnings.pm line 413.
+    warnings::__chk called at ../lib/warnings.pm line 460.
+    warnings::warn called at - line 9.
+    (eval) called at - line 8.
 ########
 
 # check warnings::warnif
@@ -349,13 +355,19 @@ use warnings ;
 eval { 
   warnings::warnif() 
 } ;
-print $@ ;
+print $@->message;
 eval { 
   warnings::warnif("fred", "joe") 
 } ;
-print $@ ;
+print $@->message;
 EXPECT
-error=HASH(0x7af500)error=HASH(0x7cb280)
+Usage: warnings::warnif([category,] 'message') at ../lib/warnings.pm line 469.
+    warnings::warnif called at - line 5.
+    (eval) called at - line 4.
+Unknown warnings category 'fred' at ../lib/warnings.pm line 413.
+    warnings::__chk called at ../lib/warnings.pm line 473.
+    warnings::warnif called at - line 9.
+    (eval) called at - line 8.
 ########
 
 --FILE-- abc.pm
@@ -419,9 +431,13 @@ use abc;
 eval { 
   abc::check() ; 
 } ;
-print "[[$@]]\n";
+print "[[{$@->message}]]\n";
 EXPECT
-[[error=HASH(0x7af500)]]
+[[hello at ../lib/warnings.pm line 461.
+    warnings::warn called at abc.pm line 3.
+    abc::check called at - line 4.
+    (eval) called at - line 3.
+]]
 ########
 -W
 --FILE-- abc.pm
@@ -712,9 +728,13 @@ use warnings qw( FATAL abc ) ;
 eval { 
   abc::check() ; 
   } ;
-print "[[$@]]\n";
+print "[[{$@->message}]]\n";
 EXPECT
-[[error=HASH(0x7af500)]]
+[[hello at ../lib/warnings.pm line 461.
+    warnings::warn called at abc.pm line 3.
+    abc::check called at - line 4.
+    (eval) called at - line 3.
+]]
 ########
 -W
 --FILE-- abc.pm

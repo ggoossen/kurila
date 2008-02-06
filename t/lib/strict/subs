@@ -287,18 +287,20 @@ no strict ;
 eval q[ 
     use strict 'subs' ;
     Fred ;
-]; print STDERR $@;
+]; print STDERR $@->message;
 EXPECT
-error=HASH(0x7af158)
+Bareword "Fred" not allowed while "strict subs" in use
+ at - line 4.
 ########
 
 # Check scope of pragma with eval
 use strict 'subs' ;
 eval '
     Fred ;
-'; print STDERR $@ ;
+'; print STDERR $@->message ;
 EXPECT
-error=HASH(0x7af158)
+Bareword "Fred" not allowed while "strict subs" in use
+ at - line 4.
 ########
 
 # Check scope of pragma with eval
@@ -362,9 +364,10 @@ Bareword "bad" not allowed while "strict subs" in use
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 eval q{ use strict; no strict refs; };
-print $@;
+print $@->message;
 EXPECT
-error=HASH(0x7c1b38)
+Bareword "refs" not allowed while "strict subs" in use
+ at - line 1.
 ########
 # [perl #25147] 
 use strict;

@@ -114,20 +114,20 @@ is ref($thunk), "Z";
 is "@attrs", "locked method Z";
 
 # Test attributes on predeclared subroutines:
-eval 'package A; sub PS : lvalue';
+eval 'package A; sub PS : locked';
 @attrs = eval 'attributes::get \&A::PS';
-is "@attrs", "lvalue";
+is "@attrs", "locked";
 
 # Test ability to modify existing sub's (or XSUB's) attributes.
-eval 'package A; sub X { $_[0] } sub X : lvalue';
+eval 'package A; sub X { $_[0] } sub X : locked';
 @attrs = eval 'attributes::get \&A::X';
-is "@attrs", "lvalue";
+is "@attrs", "locked";
 
 # Above not with just 'pure' built-in attributes.
 sub Z::MODIFY_CODE_ATTRIBUTES { (); }
-eval 'package Z; sub L { $_[0] } sub L : Z lvalue';
+eval 'package Z; sub L { $_[0] } sub L : Z locked';
 @attrs = eval 'attributes::get \&Z::L';
-is "@attrs", "lvalue Z";
+is "@attrs", "locked Z";
 
 # Begin testing attributes that tie
 
@@ -159,7 +159,7 @@ eval 'my $$foo : bar = 1';
 like $@->message, qr/Can't declare scalar dereference in "my"/;
 
 
-my @code = qw(lvalue locked method);
+my @code = qw(locked method);
 my @other = qw(shared unique);
 my %valid;
 $valid{CODE} = {map {$_ => 1} @code};

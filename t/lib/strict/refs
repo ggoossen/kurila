@@ -220,10 +220,12 @@ no strict ;
 eval {
     my $a = ${"Fred"} ;
 };
-print STDERR $@ ;
+print STDERR $@->message ;
 my $a = ${"Fred"} ;
 EXPECT
-error=HASH(0x7c1a78)Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 8.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 5.
+    (eval) called at - line 4.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 8.
 ########
 
 # Check scope of pragma with eval
@@ -232,10 +234,12 @@ eval {
     use strict 'refs' ;
     my $a = ${"Fred"} ;
 };
-print STDERR $@ ;
+print STDERR $@->message ;
 my $a = ${"Fred"} ;
 EXPECT
-error=HASH(0x7c1a78)Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 9.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 6.
+    (eval) called at - line 4.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 9.
 ########
 
 # Check scope of pragma with eval
@@ -243,9 +247,10 @@ use strict 'refs' ;
 eval {
     my $a = ${"Fred"} ;
 };
-print STDERR $@ ;
+print STDERR $@->message ;
 EXPECT
-error=HASH(0x7c1a78)
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 5.
+    (eval) called at - line 4.
 ########
 
 # Check scope of pragma with eval
@@ -254,20 +259,24 @@ eval {
     no strict ;
     my $a = ${"Fred"} ;
 };
-print STDERR $@ ;
+print STDERR $@->message ;
 my $a = ${"Fred"} ;
 EXPECT
-error=HASH(0x7c1a78)Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 9.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 6.
+    (eval) called at - line 4.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 9.
 ########
 
 # Check scope of pragma with eval
 no strict ;
 eval '
     my $a = ${"Fred"} ;
-'; print STDERR $@ ;
+'; print STDERR $@->message ;
 my $a = ${"Fred"} ;
 EXPECT
-error=HASH(0x7cb9b8)Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 7.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at (eval 1) line 2.
+    (eval) called at - line 4.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 7.
 ########
 
 # Check scope of pragma with eval
@@ -275,18 +284,20 @@ no strict ;
 eval q[ 
     use strict 'refs' ;
     my $a = ${"Fred"} ;
-]; print STDERR $@;
+]; print STDERR $@->message;
 EXPECT
-error=HASH(0x7cb9b8)
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at (eval 1) line 3.
+    (eval) called at - line 4.
 ########
 
 # Check scope of pragma with eval
 use strict 'refs' ;
 eval '
     my $a = ${"Fred"} ;
-'; print STDERR $@ ;
+'; print STDERR $@->message ;
 EXPECT
-error=HASH(0x7cb948)
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at (eval 1) line 2.
+    (eval) called at - line 4.
 ########
 
 # Check scope of pragma with eval
@@ -294,10 +305,12 @@ use strict 'refs' ;
 eval '
     no strict ;
     my $a = ${"Fred"} ;
-'; print STDERR $@;
+'; print STDERR $@->message;
 my $a = ${"Fred"} ;
 EXPECT
-error=HASH(0x7cb9f8)Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 8.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at (eval 1) line 3.
+    (eval) called at - line 4.
+Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 8.
 ########
 # [perl #26910] hints not propagated into (?{...})
 use strict 'refs';

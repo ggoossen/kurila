@@ -3151,27 +3151,6 @@ if (!$ENV{PERL_SKIP_PSYCHO_TEST}){
 	or print "# $@\n";
 }
 
-{
-    package lv;
-    $var = "abc";
-    sub variable : lvalue { $var }
-
-    package main;
-    my $o = bless [], "lv";
-    my $f = "";
-    eval { for (1..2) { $f .= $1 if $o->variable =~ m/(.)/g } };
-    ok($f eq "ab", "pos retained between calls # TODO") or print "# $@\n";
-}
-
-{
-    $var = "abc";
-    sub variable : lvalue { $var }
-
-    my $f = "";
-    eval { for (1..2) { $f .= $1 if variable() =~ m/(.)/g } };
-    ok($f eq "ab", "pos retained between calls # TODO") or print "# $@\n";
-}
-
 # [perl #37836] Simple Regex causes SEGV when run on specific data
 if ($ordA == 193) {
     print "ok $test # Skip: in EBCDIC\n"; $test++;
@@ -4244,6 +4223,6 @@ ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1782;
+    $::TestCount = 1780;
     print "1..$::TestCount\n";
 }
