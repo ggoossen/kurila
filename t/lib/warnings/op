@@ -963,8 +963,6 @@ Possible precedence problem on bitwise ^&^ operator at - line 10.
 use warnings 'syntax';
 
 local(undef);		# OP_UNDEF		ignore
-sub lval : lvalue {};
-local(lval());		# OP_ENTERSUB
 local($x **= 1);	# OP_POW
 local($x *=  1);	# OP_MULTIPLY
 local($x /=  1);	# OP_DIVIDE
@@ -1010,8 +1008,32 @@ local($a{$b});		# OP_HELEM		ok
 
 no warnings 'syntax';
 EXPECT
-Can't modify non-lvalue subroutine call in local at - line 10, near ");"
-BEGIN not safe after errors--compilation aborted at - line 25.
+Useless localization of exponentiation (**) at - line 9.
+Useless localization of multiplication (*) at - line 10.
+Useless localization of division (/) at - line 11.
+Useless localization of modulus (%) at - line 12.
+Useless localization of repeat (x) at - line 13.
+Useless localization of addition (+) at - line 14.
+Useless localization of subtraction (-) at - line 15.
+Useless localization of concatenation (.) or string at - line 16.
+Useless localization of left bitshift (<<) at - line 17.
+Useless localization of right bitshift (>>) at - line 18.
+Useless localization of bitwise and (^&^) at - line 19.
+Useless localization of bitwise xor (^^^) at - line 20.
+Useless localization of bitwise or (^|^) at - line 21.
+Useless localization of integer multiplication (*) at - line 24.
+Useless localization of integer division (/) at - line 25.
+Useless localization of integer modulus (%) at - line 26.
+Useless localization of integer addition (+) at - line 27.
+Useless localization of integer subtraction (-) at - line 28.
+Useless localization of list assignment at - line 37.
+Useless localization of array length at - line 39.
+Useless localization of scalar assignment at - line 40.
+Useless localization of logical and assignment (&&=) at - line 41.
+Useless localization of logical or assignment (||=) at - line 42.
+Useless localization of defined or assignment (//=) at - line 43.
+Useless localization of match position at - line 47.
+Useless localization of vec at - line 48.
 ########
 # op.c
 use warnings 'deprecated';

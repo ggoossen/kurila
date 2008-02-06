@@ -245,18 +245,20 @@ no strict ;
 eval q[ 
     use strict 'vars' ;
     $joe = 1 ;
-]; print STDERR $@;
+]; print STDERR $@->message;
 EXPECT
-error=HASH(0x7af158)
+Global symbol "$joe" requires explicit package name
+ at - line 4.
 ########
 
 # Check scope of pragma with eval
 use strict 'vars' ;
 eval '
     $joe = 1 ;
-'; print STDERR $@ ;
+'; print STDERR $@->message ;
 EXPECT
-error=HASH(0x7af158)
+Global symbol "$joe" requires explicit package name
+ at - line 4.
 ########
 
 # Check scope of pragma with eval
@@ -264,7 +266,7 @@ use strict 'vars' ;
 eval '
     no strict ;
     $joe = 1 ;
-'; print STDERR $@;
+'; print STDERR $@->message;
 $joe = 1 ;
 EXPECT
 Global symbol "$joe" requires explicit package name
@@ -274,14 +276,18 @@ Execution of - aborted due to compilation errors. at - line 8.
 # Check if multiple evals produce same errors
 use strict 'vars';
 my $ret = eval q{ print $x; };
-print $@;
+print $@->message;
 print "ok 1\n" unless defined $ret;
 $ret = eval q{ print $x; };
-print $@;
+print $@->message;
 print "ok 2\n" unless defined $ret;
 EXPECT
-error=HASH(0x7af158)ok 1
-error=HASH(0x7c1a90)ok 2
+Global symbol "$x" requires explicit package name
+ at - line 4.
+ok 1
+Global symbol "$x" requires explicit package name
+ at - line 7.
+ok 2
 ########
 
 # strict vars with outer our - no error
