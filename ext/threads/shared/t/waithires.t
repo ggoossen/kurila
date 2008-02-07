@@ -69,7 +69,7 @@ sub forko (&$$); # To prevent deadlock from underlying pthread_* bugs (as in
                  # stock RH9 glibc/NPTL) or from our own errors, we run tests
                  # in separately forked and alarmed processes.
 
-*forko = ($^O =~ /^dos|os2|mswin32|netware|vms$/i)
+*forko = ($^O =~ m/^dos|os2|mswin32|netware|vms$/i)
 ? sub (&$$) { my $code = shift; goto &$code; }
 : sub (&$$) {
   my ($code, $expected, $patience) = @_;
@@ -78,7 +78,7 @@ sub forko (&$$); # To prevent deadlock from underlying pthread_* bugs (as in
 
   my $bump = $expected;
 
-  unless (defined($pid = open(CHLD, "-|"))) {
+  unless (defined($pid = open(CHLD, "-|", '-'))) {
     die "fork: $!\n";
   }
   if (! $pid) {   # Child -- run the test
@@ -87,8 +87,8 @@ sub forko (&$$); # To prevent deadlock from underlying pthread_* bugs (as in
     exit;
   }
 
-  while (<CHLD>) {
-    $expected--, $test_num=$1 if /^(?:not )?ok (\d+)/;
+  while (~< *CHLD) {
+    $expected--, $test_num=$1 if m/^(?:not )?ok (\d+)/;
     #print "#forko: ($expected, $1) $_";
     print;
   }
@@ -121,7 +121,7 @@ SYNC_SHARED: {
 
   sub signaller {
     ok(2,1,"$test: child before lock");
-    $test =~ /twain/ ? lock($lock) : lock($cond);
+    $test =~ m/twain/ ? lock($lock) : lock($cond);
     ok(3,1,"$test: child obtained lock");
     if ($test =~ 'twain') {
       no warnings 'threads';   # lock var != cond var, so disable warnings
@@ -146,15 +146,15 @@ SYNC_SHARED: {
       my $to = shift;
 
       # which lock to obtain?
-      $test =~ /twain/ ? lock($lock) : lock($cond);
+      $test =~ m/twain/ ? lock($lock) : lock($cond);
       ok(1,1, "$test: obtained initial lock");
 
       my $thr = threads->create(\&signaller);
       my $ok = 0;
       for ($test) {
-        $ok=cond_timedwait($cond, time() + $to), last        if    /simple/;
-        $ok=cond_timedwait($cond, time() + $to, $cond), last if    /repeat/;
-        $ok=cond_timedwait($cond, time() + $to, $lock), last if    /twain/;
+        $ok=cond_timedwait($cond, time() + $to), last        if    m/simple/;
+        $ok=cond_timedwait($cond, time() + $to, $cond), last if    m/repeat/;
+        $ok=cond_timedwait($cond, time() + $to, $lock), last if    m/twain/;
         die "$test: unknown test\n";
       }
       $thr->join;
@@ -182,27 +182,27 @@ SYNC_SHARED: {
   # cond_timedwait timeout (relative timeout)
   sub ctw_fail {
     my $to = shift;
-    if ($^O eq "hpux" && $Config{osvers} <= 10.20) {
+    if ($^O eq "hpux" && $Config{osvers} +<= 10.20) {
       # The lock obtaining would pass, but the wait will not.
       ok(1,1, "$test: obtained initial lock");
       ok(2,0, "# SKIP see perl583delta");
     } else {
-      $test =~ /twain/ ? lock($lock) : lock($cond);
+      $test =~ m/twain/ ? lock($lock) : lock($cond);
       ok(1,1, "$test: obtained initial lock");
       my $ok;
       my $delta = time();
       for ($test) {
-        $ok=cond_timedwait($cond, time() + $to), last        if    /simple/;
-        $ok=cond_timedwait($cond, time() + $to, $cond), last if    /repeat/;
-        $ok=cond_timedwait($cond, time() + $to, $lock), last if    /twain/;
+        $ok=cond_timedwait($cond, time() + $to), last        if    m/simple/;
+        $ok=cond_timedwait($cond, time() + $to, $cond), last if    m/repeat/;
+        $ok=cond_timedwait($cond, time() + $to, $lock), last if    m/twain/;
         die "$test: unknown test\n";
       }
       $delta = time() - $delta;
       ok(2, ! defined($ok), "$test: timeout");
 
-      if (($to > 0) && ($^O ne 'os2')) {
+      if (($to +> 0) && ($^O ne 'os2')) {
         # Timing tests can be problematic
-        if (($delta < (0.9 * $to)) || ($delta > (1.0 + $to))) {
+        if (($delta +< (0.9 * $to)) || ($delta +> (1.0 + $to))) {
           print(STDERR "# Timeout: specified=$to  actual=$delta secs.\n");
         }
       }
@@ -228,7 +228,7 @@ SYNCH_REFS: {
 
   sub signaller2 {
     ok(2,1,"$test: child before lock");
-    $test =~ /twain/ ? lock($lock) : lock($cond);
+    $test =~ m/twain/ ? lock($lock) : lock($cond);
     ok(3,1,"$test: child obtained lock");
     if ($test =~ 'twain') {
       no warnings 'threads';   # lock var != cond var, so disable warnings
@@ -253,15 +253,15 @@ SYNCH_REFS: {
       my $to = shift;
 
       # which lock to obtain?
-      $test =~ /twain/ ? lock($lock) : lock($cond);
+      $test =~ m/twain/ ? lock($lock) : lock($cond);
       ok(1,1, "$test: obtained initial lock");
 
       my $thr = threads->create(\&signaller2);
       my $ok = 0;
       for ($test) {
-        $ok=cond_timedwait($cond, time() + $to), last        if    /simple/;
-        $ok=cond_timedwait($cond, time() + $to, $cond), last if    /repeat/;
-        $ok=cond_timedwait($cond, time() + $to, $lock), last if    /twain/;
+        $ok=cond_timedwait($cond, time() + $to), last        if    m/simple/;
+        $ok=cond_timedwait($cond, time() + $to, $cond), last if    m/repeat/;
+        $ok=cond_timedwait($cond, time() + $to, $lock), last if    m/twain/;
         die "$test: unknown test\n";
       }
       $thr->join;
@@ -289,27 +289,27 @@ SYNCH_REFS: {
   sub ctw_fail2 {
     my $to = shift;
 
-    if ($^O eq "hpux" && $Config{osvers} <= 10.20) {
+    if ($^O eq "hpux" && $Config{osvers} +<= 10.20) {
       # The lock obtaining would pass, but the wait will not.
       ok(1,1, "$test: obtained initial lock");
       ok(2,0, "# SKIP see perl583delta");
     } else {
-      $test =~ /twain/ ? lock($lock) : lock($cond);
+      $test =~ m/twain/ ? lock($lock) : lock($cond);
       ok(1,1, "$test: obtained initial lock");
       my $ok;
       my $delta = time();
       for ($test) {
-        $ok=cond_timedwait($cond, time() + $to), last        if    /simple/;
-        $ok=cond_timedwait($cond, time() + $to, $cond), last if    /repeat/;
-        $ok=cond_timedwait($cond, time() + $to, $lock), last if    /twain/;
+        $ok=cond_timedwait($cond, time() + $to), last        if    m/simple/;
+        $ok=cond_timedwait($cond, time() + $to, $cond), last if    m/repeat/;
+        $ok=cond_timedwait($cond, time() + $to, $lock), last if    m/twain/;
         die "$test: unknown test\n";
       }
       $delta = time() - $delta;
       ok(2, ! $ok, "$test: timeout");
 
-      if (($to > 0) && ($^O ne 'os2')) {
+      if (($to +> 0) && ($^O ne 'os2')) {
         # Timing tests can be problematic
-        if (($delta < (0.9 * $to)) || ($delta > (1.0 + $to))) {
+        if (($delta +< (0.9 * $to)) || ($delta +> (1.0 + $to))) {
           print(STDERR "# Timeout: specified=$to  actual=$delta secs.\n");
         }
       }

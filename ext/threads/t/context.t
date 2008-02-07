@@ -76,28 +76,28 @@ sub foo
     }
 }
 
-my ($thr) = threads->create('foo', 'array');
+my ($thr) = threads->create(\&foo, 'array');
 my ($res) = $thr->join();
 ok($res eq 'array', 'Implicit array context');
 
-$thr = threads->create('foo', 'scalar');
+$thr = threads->create(\&foo, 'scalar');
 $res = $thr->join();
 ok($res eq 'scalar', 'Implicit scalar context');
 
-threads->create('foo', 'void');
+threads->create(\&foo, 'void');
 ($thr) = threads->list();
 $res = $thr->join();
 ok(! defined($res), 'Implicit void context');
 
-$thr = threads->create({'context' => 'array'}, 'foo', 'array');
+$thr = threads->create({'context' => 'array'}, \&foo, 'array');
 ($res) = $thr->join();
 ok($res eq 'array', 'Explicit array context');
 
-($thr) = threads->create({'scalar' => 'scalar'}, 'foo', 'scalar');
+($thr) = threads->create({'scalar' => 'scalar'}, \&foo, 'scalar');
 $res = $thr->join();
 ok($res eq 'scalar', 'Explicit scalar context');
 
-$thr = threads->create({'void' => 1}, 'foo', 'void');
+$thr = threads->create({'void' => 1}, \&foo, 'void');
 $res = $thr->join();
 ok(! defined($res), 'Explicit void context');
 
@@ -119,38 +119,38 @@ sub bar
     }
 }
 
-($thr) = threads->create('bar', 'list');
+($thr) = threads->create(\&bar, 'list');
 my $ctx = $thr->wantarray();
 ok($ctx, 'Implicit array context');
 ($res) = $thr->join();
 ok($res eq 'list', 'Implicit array context');
 
-$thr = threads->create('bar', 'scalar');
+$thr = threads->create(\&bar, 'scalar');
 $ctx = $thr->wantarray();
 ok(defined($ctx) && !$ctx, 'Implicit scalar context');
 $res = $thr->join();
 ok($res eq 'scalar', 'Implicit scalar context');
 
-threads->create('bar', 'void');
+threads->create(\&bar, 'void');
 ($thr) = threads->list();
 $ctx = $thr->wantarray();
 ok(! defined($ctx), 'Implicit void context');
 $res = $thr->join();
 ok(! defined($res), 'Implicit void context');
 
-$thr = threads->create({'context' => 'list'}, 'bar', 'list');
+$thr = threads->create({'context' => 'list'}, \&bar, 'list');
 $ctx = $thr->wantarray();
 ok($ctx, 'Explicit array context');
 ($res) = $thr->join();
 ok($res eq 'list', 'Explicit array context');
 
-($thr) = threads->create({'scalar' => 'scalar'}, 'bar', 'scalar');
+($thr) = threads->create({'scalar' => 'scalar'}, \&bar, 'scalar');
 $ctx = $thr->wantarray();
 ok(defined($ctx) && !$ctx, 'Explicit scalar context');
 $res = $thr->join();
 ok($res eq 'scalar', 'Explicit scalar context');
 
-$thr = threads->create({'void' => 1}, 'bar', 'void');
+$thr = threads->create({'void' => 1}, \&bar, 'void');
 $ctx = $thr->wantarray();
 ok(! defined($ctx), 'Explicit void context');
 $res = $thr->join();

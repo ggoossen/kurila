@@ -44,11 +44,11 @@ my $foo;
 my $bar = "foo";
 share($foo);
 eval { $foo = \$bar; };
-ok(2,my $temp1 = $@ =~/^Invalid\b.*shared scalar/, "Wrong error message");
+ok(2,my $temp1 = $@->{description} =~ m/^Invalid\b.*shared scalar/, "Wrong error message");
 
 share($bar);
 $foo = \$bar;
-ok(3, $temp1 = $foo =~/SCALAR/, "Check that is a ref");
+ok(3, $temp1 = $foo =~ m/SCALAR/, "Check that is a ref");
 ok(4, $$foo eq "foo", "Check that it points to the correct value");
 $bar = "yeah";
 ok(5, $$foo eq "yeah", "Check that assignment works");

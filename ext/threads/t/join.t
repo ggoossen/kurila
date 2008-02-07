@@ -82,7 +82,7 @@ sub skip {
 }
 {
     my $retval = threads->create( sub {
-        open(my $fh, "+>threadtest") || die $!;
+        open(my $fh, "+>", "threadtest") || die $!;
         print $fh "test\n";
         return $fh;
     })->join();
@@ -126,14 +126,14 @@ if ($^O eq 'linux') {
                  })->join;
     #print "# mainthread: \$0 = $0\n";
     #print "# pid = $$\n";
-    if (open PS, "ps -f |") { # Note: must work in (all) systems.
+    if (open PS, "-|", "ps -f") { # Note: must work in (all) systems.
         my ($sawpid, $sawexe);
-        while (<PS>) {
+        while (~< *PS) {
             chomp;
             #print "# [$_]\n";
-            if (/^\s*\S+\s+$$\s/) {
+            if (m/^\s*\S+\s+$$\s/) {
                 $sawpid++;
-                if (/\sfoobar\s*$/) { # Linux 2.2 leaves extra trailing spaces.
+                if (m/\sfoobar\s*$/) { # Linux 2.2 leaves extra trailing spaces.
                     $sawexe++;
                 }
                 last;
@@ -157,9 +157,9 @@ if ($^O eq 'linux') {
     $t->join();
     threads->create(sub {})->join();
     eval { $t->join(); };
-    ok(($@ =~ /Thread already joined/), "Double join works");
+    ok(($@->{description} =~ m/Thread already joined/), "Double join works");
     eval { $t->detach(); };
-    ok(($@ =~ /Cannot detach a joined thread/), "Detach joined thread");
+    ok(($@->{description} =~ m/Cannot detach a joined thread/), "Detach joined thread");
 }
 
 {
@@ -167,9 +167,9 @@ if ($^O eq 'linux') {
     $t->detach();
     threads->create(sub {})->join();
     eval { $t->detach(); };
-    ok(($@ =~ /Thread already detached/), "Double detach works");
+    ok(($@->{description} =~ m/Thread already detached/), "Double detach works");
     eval { $t->join(); };
-    ok(($@ =~ /Cannot join a detached thread/), "Join detached thread");
+    ok(($@->{description} =~ m/Cannot join a detached thread/), "Join detached thread");
 }
 
 {
@@ -194,7 +194,7 @@ if ($^O eq 'linux') {
     threads->yield();
     sleep 1;
     eval { $t->join; };
-    ok(($@ =~ /^Thread already joined at/)?1:0, "Join pending join");
+    ok(($@->{description} =~ m/^Thread already joined/)?1:0, "Join pending join");
 
     { lock($go); $go = 1; cond_signal($go); }
     $joiner->join;
@@ -204,7 +204,7 @@ if ($^O eq 'linux') {
     my $go : shared = 0;
     my $t = threads->create( sub {
         eval { threads->self->join; };
-        ok(($@ =~ /^Cannot join self/), "Join self");
+        ok(($@->{description} =~ m/^Cannot join self/), "Join self");
         lock($go); $go = 1; cond_signal($go);
     });
 
@@ -222,7 +222,7 @@ if ($^O eq 'linux') {
     threads->yield();
     sleep 1;
     eval { $t->detach };
-    ok(($@ =~ /^Cannot detach a joined thread at/)?1:0, "Detach pending join");
+    ok(($@->{description} =~ m/^Cannot detach a joined thread/)?1:0, "Detach pending join");
 
     { lock($go); $go = 1; cond_signal($go); }
     $joiner->join;

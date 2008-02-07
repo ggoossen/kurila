@@ -477,7 +477,7 @@ S_ithread_run(void * arg)
                 JMPENV_PUSH(jmp_rc);
                 if (jmp_rc == 0) {
                     /* Warn that thread died */
-                    Perl_warn(aTHX_ "Thread %" UVuf " terminated abnormally: %" SVf, thread->tid, ERRSV);
+/*                     Perl_warn(aTHX_ "Thread %" UVuf " terminated abnormally: %" SVf, thread->tid, ERRSV); */
                 } else if (jmp_rc == 2) {
                     /* Warn handler exited */
                     exit_app = 1;

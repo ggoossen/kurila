@@ -50,7 +50,7 @@ threads->create(
                 sub {
                     ok(4, $test eq "foo","Test magic share fetch after thread");
                     $test = "baz";
-                    ok(5,threads::shared::_refcnt($test) > $c, "Check that threadcount is correct");
+                    ok(5,threads::shared::_refcnt($test) +> $c, "Check that threadcount is correct");
                     })->join();
 ok(6,$test eq "baz","Test that value has changed in another thread");
 ok(7,threads::shared::_refcnt($test) == $c,"Check thrcnt is down properly");

@@ -82,7 +82,7 @@ use threads::shared;
         my $rc = $threads[$_]->join();
         if (! $rc) {
             $failures++;
-        } elsif ($rc =~ /^timed out/) {
+        } elsif ($rc =~ m/^timed out/) {
             $timeouts++;
         } elsif ($rc eq 'okay') {
             $okay++;

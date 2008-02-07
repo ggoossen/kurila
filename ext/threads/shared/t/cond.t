@@ -210,7 +210,7 @@ $Base++;
         my $th;
         {
             lock($counter);
-            if ($n > 0) {
+            if ($n +> 0) {
                 $counter++;
                 $th = threads->create(\&broad, $n-1);
                 cond_wait($counter);
@@ -241,7 +241,7 @@ $Base++;
         my $th;
         {
             lock($r);
-            if ($n > 0) {
+            if ($n +> 0) {
                 $$r++;
                 $th = threads->create(\&broad2, $n-1);
                 cond_wait($r);

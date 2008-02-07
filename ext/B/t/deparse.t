@@ -54,7 +54,7 @@ while ( ~< *DATA) {
     my $coderef = eval "sub \{$input\}";
 
     if ($@ and $@->{description}) {
-	diag("$num deparsed: $@");
+	diag("$num deparsed: {$@->message}");
 	ok(0, $testname);
     }
     else {
@@ -161,12 +161,7 @@ $test /= 2 if ++$test;
 -((1, 2) x 2);
 ####
 # 6
-{
-    my $test = sub : lvalue {
-	my $x;
-    }
-    ;
-}
+1;
 ####
 # 7
 {

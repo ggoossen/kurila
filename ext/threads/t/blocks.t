@@ -74,39 +74,31 @@ BEGIN {
     $SIG{'__WARN__'} = sub { ok(0, "BEGIN: $_[0]"); };
 
     $TOTAL++;
-    threads->create('foo')->join();
-    $TOTAL++;
     threads->create(\&foo)->join();
     $TOTAL++;
     threads->create(sub { lock($COUNT); $COUNT++; })->join();
 
     $TOTAL++;
-    threads->create('foo')->detach();
-    $TOTAL++;
     threads->create(\&foo)->detach();
     $TOTAL++;
     threads->create(sub { lock($COUNT); $COUNT++; })->detach();
 
-    $bthr = threads->create('baz');
+    $bthr = threads->create(\&baz);
 }
 
 my $mthr;
 MAIN: {
     $TOTAL++;
-    threads->create('foo')->join();
-    $TOTAL++;
     threads->create(\&foo)->join();
     $TOTAL++;
     threads->create(sub { lock($COUNT); $COUNT++; })->join();
 
     $TOTAL++;
-    threads->create('foo')->detach();
-    $TOTAL++;
     threads->create(\&foo)->detach();
     $TOTAL++;
     threads->create(sub { lock($COUNT); $COUNT++; })->detach();
 
-    $mthr = threads->create('baz');
+    $mthr = threads->create(\&baz);
 }
 
 ok($mthr, 'Main thread');
@@ -120,7 +112,7 @@ ok($bthr->join() == 42, 'BEGIN join');
     threads->yield();
     sleep(1);
     lock($COUNT);
-    redo if ($COUNT < $TOTAL);
+    redo if ($COUNT +< $TOTAL);
 }
 
 # EOF

@@ -36,7 +36,7 @@ BEGIN {
 
 our $warnmsg;
 BEGIN {
-    $SIG{__WARN__} = sub { $warnmsg = shift; };
+    $SIG{__WARN__} = sub { $warnmsg = shift->{description}; };
 }
 
 use threads::shared;
@@ -45,7 +45,7 @@ ok(1, 1, 'Loaded');
 
 ### Start of Testing ###
 
-ok(2, ($warnmsg =~ /Warning, threads::shared has already been loaded/)?1:0,
+ok(2, ($warnmsg =~ m/Warning, threads::shared has already been loaded/)?1:0,
     "threads has warned us");
 
 my $test = "bar";

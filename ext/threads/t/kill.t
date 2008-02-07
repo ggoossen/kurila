@@ -47,9 +47,10 @@ BEGIN {
 my $q = Thread::Queue->new();
 my $TEST = 1;
 
-sub ok
+sub ok($$)
 {
-    $q->enqueue(@_);
+    my ($xok, $xname) = @_;
+    $q->enqueue($xok, $xname);
 
     while ($q->pending()) {
         my $ok   = $q->dequeue();
@@ -73,7 +74,7 @@ ok(1, 'Loaded');
 
 # Set up to capture warning when thread terminates
 my @errs :shared;
-$SIG{__WARN__} = sub { push(@errs, $_[0]->{description}); };
+$SIG{__DIE__} = sub { push(@errs, $_[0]->{description}); };
 
 sub thr_func {
     my $q = shift;
@@ -149,7 +150,7 @@ my $sema = Thread::Semaphore->new();
 ok($sema, 'Semaphore created');
 
 # Create a thread and send it the semaphore
-$thr = threads->create('thr_func2', $q, $sema);
+$thr = threads->create(\&thr_func2, $q, $sema);
 ok($thr && $thr->tid() == 3, 'Created thread');
 threads->yield();
 sleep(1);

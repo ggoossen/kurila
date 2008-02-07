@@ -28,7 +28,7 @@ foreach my $func (qw(share cond_wait cond_signal cond_broadcast)) {
     ok( my $func_ref = __PACKAGE__->can($func) ? 1 : 0 );
 
     eval qq{$func()};
-    ok( $@, qr/^Not enough arguments / );
+    ok( $@->{description}, qr/^Not enough arguments / );
 
     my %hash = (foo => 42, bar => 23);
     eval qq{$func(\%hash)};
