@@ -927,7 +927,7 @@ do_aspawn(void *vreally, void **vmark, void **vsp)
 
     if (SvNIOKp(*(mark+1)) && !SvPOKp(*(mark+1))) {
 	++mark;
-	flag = SvIVx(*mark);
+	flag = SvIV(*mark);
     }
 
     while (++mark <= sp) {

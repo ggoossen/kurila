@@ -53,9 +53,6 @@ Perl_mro_meta_dup(pTHX_ struct mro_meta* smeta, CLONE_PARAMS* param)
     Newx(newmeta, 1, struct mro_meta);
     Copy(smeta, newmeta, 1, struct mro_meta);
 
-    if (newmeta->mro_linear_dfs)
-	newmeta->mro_linear_dfs
-	    = (AV*) SvREFCNT_inc(sv_dup((SV*)newmeta->mro_linear_dfs, param));
     if (newmeta->mro_linear_c3)
 	newmeta->mro_linear_c3
 	    = (AV*) SvREFCNT_inc(sv_dup((SV*)newmeta->mro_linear_c3, param));

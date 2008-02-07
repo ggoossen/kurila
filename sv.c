@@ -2008,7 +2008,7 @@ S_sv_2iuv_common(pTHX_ SV *sv) {
     }
     else  {
 	if (isGV_with_GP(sv))
-	    Perl_croak(aTHX "Tried to use glob as number");
+	    Perl_croak(aTHX_ "Tried to use glob as number");
 
 	if (!(SvFLAGS(sv) & SVs_PADTMP)) {
 	    if (!PL_localizing && ckWARN(WARN_UNINITIALIZED))
@@ -2028,7 +2028,7 @@ S_sv_2iuv_common(pTHX_ SV *sv) {
 
 Return the integer value of an SV, doing any necessary string
 conversion.  If flags includes SV_GMAGIC, does an mg_get() first.
-Normally used via the C<SvIV(sv)> and C<SvIVx(sv)> macros.
+Normally used via the C<SvIV(sv)> function.
 
 =cut
 */
@@ -2364,7 +2364,7 @@ Perl_sv_2nv(pTHX_ register SV *sv)
     }
     else  {
 	if (isGV_with_GP(sv)) {
-	    Perl_croak(aTHX "Tried to use glob as number");
+	    Perl_croak(aTHX_ "Tried to use glob as number");
 	}
 
 	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))
@@ -2679,7 +2679,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
     }
     else {
 	if (isGV_with_GP(sv))
-	    Perl_croak(aTHX "Tried to use glob as string");
+	    Perl_croak(aTHX_ "Tried to use glob as string");
 
 	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))
 	    report_uninit(sv);
@@ -8082,7 +8082,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		i = va_arg(*args, int);
 	    else
 		i = (ewix ? ewix <= svmax : svix < svmax) ?
-		    SvIVx(svargs[ewix ? ewix-1 : svix++]) : 0;
+		    SvIV(svargs[ewix ? ewix-1 : svix++]) : 0;
 	    left |= (i < 0);
 	    width = (i < 0) ? -i : i;
 	}
@@ -8103,7 +8103,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *sv, const char *pat, STRLEN patlen, va_list *args, SV
 		    i = va_arg(*args, int);
 		else
 		    i = (ewix ? ewix <= svmax : svix < svmax)
-			? SvIVx(svargs[ewix ? ewix-1 : svix++]) : 0;
+			? SvIV(svargs[ewix ? ewix-1 : svix++]) : 0;
 		precis = i;
 		has_precis = !(i < 0);
 	    }
@@ -8874,14 +8874,14 @@ Perl_parser_dup(pTHX_ const yy_parser *proto, CLONE_PARAMS* param)
     parser->lex_defer	= proto->lex_defer;
     parser->lex_dojoin	= proto->lex_dojoin;
     parser->lex_expect	= proto->lex_expect;
-    parser->lex_inpat	= proto->lex_inpat;
+    parser->lex_flags	= proto->lex_flags;
     parser->lex_inwhat	= proto->lex_inwhat;
     parser->lex_op	= proto->lex_op;
-    parser->lex_repl	= sv_dup_inc(proto->lex_repl, param);
+    parser->lex_repl.str_sv= sv_dup_inc(proto->lex_repl.str_sv, param);
+    parser->lex_repl.flags= proto->lex_repl.flags;
     parser->lex_starts	= proto->lex_starts;
-    parser->lex_stuff	= sv_dup_inc(proto->lex_stuff, param);
-    parser->lex_delim	= proto->lex_delim;
-    parser->lex_repl_delim	= proto->lex_repl_delim;
+    parser->lex_stuff.str_sv	= sv_dup_inc(proto->lex_stuff.str_sv, param);
+    parser->lex_stuff.flags= proto->lex_stuff.flags;
     parser->multi_close	= proto->multi_close;
     parser->multi_open	= proto->multi_open;
     parser->multi_start	= proto->multi_start;
@@ -9014,7 +9014,11 @@ Perl_gp_dup(pTHX_ GP *gp, CLONE_PARAMS* param)
     ret->gp_cv		= cv_dup_inc(gp->gp_cv, param);
     ret->gp_cvgen	= gp->gp_cvgen;
     ret->gp_line	= gp->gp_line;
-    ret->gp_file_hek	= hek_dup(gp->gp_file_hek, param);
+    if (gp->gp_file_hek)
+	ret->gp_file_hek	= hek_dup(gp->gp_file_hek, param);
+    else
+	ret->gp_file_hek = NULL;
+
     return ret;
 }
 
@@ -9460,13 +9464,7 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		    /* I have no idea why fake dirp (rsfps)
 		       should be treated differently but otherwise
 		       we end up with leaks -- sky*/
-		    IoTOP_GV(dstr)      = gv_dup_inc(IoTOP_GV(dstr), param);
-		    IoFMT_GV(dstr)      = gv_dup_inc(IoFMT_GV(dstr), param);
-		    IoBOTTOM_GV(dstr)   = gv_dup_inc(IoBOTTOM_GV(dstr), param);
 		} else {
-		    IoTOP_GV(dstr)      = gv_dup(IoTOP_GV(dstr), param);
-		    IoFMT_GV(dstr)      = gv_dup(IoFMT_GV(dstr), param);
-		    IoBOTTOM_GV(dstr)   = gv_dup(IoBOTTOM_GV(dstr), param);
 		    if (IoDIRP(dstr)) {
 			IoDIRP(dstr)	= dirp_dup(IoDIRP(dstr));
 		    } else {
@@ -9474,9 +9472,6 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 			/* IoDIRP(dstr) is already a copy of IoDIRP(sstr)  */
 		    }
 		}
-		IoTOP_NAME(dstr)	= SAVEPV(IoTOP_NAME(dstr));
-		IoFMT_NAME(dstr)	= SAVEPV(IoFMT_NAME(dstr));
-		IoBOTTOM_NAME(dstr)	= SAVEPV(IoBOTTOM_NAME(dstr));
 		break;
 	    case SVt_PVAV:
 		if (AvARRAY((AV*)sstr)) {
@@ -9888,7 +9883,6 @@ Perl_ss_dup(pTHX_ PerlInterpreter *proto_perl, CLONE_PARAMS* param)
 		case OP_LEAVEEVAL:
 		case OP_LEAVE:
 		case OP_SCOPE:
-		case OP_LEAVEWRITE:
 		    TOPPTR(nss,ix) = ptr;
 		    o = (OP*)ptr;
 		    OP_REFCNT_LOCK;
@@ -9957,7 +9951,7 @@ Perl_ss_dup(pTHX_ PerlInterpreter *proto_perl, CLONE_PARAMS* param)
 	    ptr = POPPTR(ss,ix);
 	    if (ptr) {
 		HINTS_REFCNT_LOCK;
-		((struct refcounted_he *)ptr)->refcounted_he_refcnt++;
+		SvREFCNT_inc(ptr);
 		HINTS_REFCNT_UNLOCK;
 	    }
 	    TOPPTR(nss,ix) = ptr;
@@ -10316,7 +10310,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_compiling.cop_warnings);
     if (PL_compiling.cop_hints_hash) {
 	HINTS_REFCNT_LOCK;
-	PL_compiling.cop_hints_hash->refcounted_he_refcnt++;
+/* 	PL_compiling.cop_hints_hash = sv_dup_inc(PL_compiling.cop_hints_hash, param); */
 	HINTS_REFCNT_UNLOCK;
     }
     PL_curcop		= (COP*)any_dup(proto_perl->Icurcop, proto_perl);
@@ -10346,7 +10340,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_origfilename	= SAVEPV(proto_perl->Iorigfilename);
     PL_diehook		= sv_dup_inc(proto_perl->Idiehook, param);
     PL_warnhook		= sv_dup_inc(proto_perl->Iwarnhook, param);
-    PL_errorcreatehook		= sv_dup_inc(proto_perl->Ierrorcreatehook, param);
+    PL_errorcreatehook	= sv_dup_inc(proto_perl->Ierrorcreatehook, param);
 
     /* switches */
     PL_minus_c		= proto_perl->Iminus_c;

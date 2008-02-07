@@ -61,7 +61,7 @@ print "ok";
 EOI
 
 #PR30333 - sort() crash with threads
-sub mycmp { length($b) <=> length($a) }
+sub mycmp { length($b) <+> length($a) }
 
 sub do_sort_one_thread {
    my $kid = shift;

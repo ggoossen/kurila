@@ -1364,7 +1364,7 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
 	    curmad('g', newSVpvs( "forced" ));
 	NEXTVAL_NEXTTOKE.opval
 	    = (OP*)newSVOP(OP_CONST,0,
-			   newSVpvn(aTHX_ PL_tokenbuf, len));
+			   newSVpvn(PL_tokenbuf, len));
 	NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
 	force_next(token);
     }
@@ -1728,7 +1728,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    char *const e = strchr(s, ']');
 	    s++;
 	    if (!e) {
-		Perl_croak("Missing right square bracket on \\x[]");
+		Perl_croak(aTHX_ "Missing right square bracket on \\x[]");
 	    }
 	    while ( s + 2 <= e ) {
 		STRLEN len = 2;
@@ -1756,7 +1756,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 
 	    ++s;
 	    if (!e) {
-		Perl_croak("Missing right brace on \\x{}");
+		Perl_croak(aTHX_ "Missing right brace on \\x{}");
 	    }
 	    len = e - s;
 	    uv = grok_hex(s, &len, &flags, NULL);
@@ -1806,7 +1806,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    const char *str;
 	    
 	    if (!e || (e >= send)) {
-		Perl_croak("Missing right brace on \\N{}");
+		Perl_croak(aTHX_ "Missing right brace on \\N{}");
 	    }
 	    if (e > s + 2 && s[1] == 'U' && s[2] == '+') {
 		/* \N{U+...} */
@@ -1826,7 +1826,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 				res, NULL, s - 2, e - s + 3 );
 	    str = SvPV_const(res,len);
 	    if (len > (STRLEN)(e - s + 4)) { /* I _guess_ 4 is \N{} --jhi */
-		Perl_croak("panic: \\N{...} replacement too long");
+		Perl_croak(aTHX_ "panic: \\N{...} replacement too long");
 	    }
 	    Copy(str, d, len, char);
 	    *l = len;
@@ -1834,7 +1834,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    s = e + 1;
 	}
 	else
-	    Perl_croak("Missing braces on \\N{}");
+	    Perl_croak(aTHX_ "Missing braces on \\N{}");
 	return s;
 
 	/* \c is a control character */
@@ -1846,7 +1846,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 	    *l = 1;
 	}
 	else {
-	    Perl_croak("Missing control char name in \\c");
+	    Perl_croak(aTHX_ "Missing control char name in \\c");
 	}
 	return s;
 
@@ -2288,7 +2288,7 @@ Perl_filter_del(pTHX_ filter_t funcp)
         return;
     }
     /* we need to search for the correct entry and clear it	*/
-    Perl_croak("filter_del can only delete in reverse order (currently)");
+    Perl_croak(aTHX_ "filter_del can only delete in reverse order (currently)");
 }
 
 
@@ -4198,7 +4198,7 @@ Perl_yylex(pTHX)
 		}
 		TERM(sublex_start(op_type, NULL));
 	    }
-	    Perl_croak("No operator expected, but found '<', '<=' or '<=>' operator");
+	    Perl_croak(aTHX_ "No operator expected, but found '<', '<=' or '<=>' operator");
 	}
 	s++;
 	{
@@ -4210,14 +4210,14 @@ Perl_yylex(pTHX)
 		s++;
 		Eop(OP_NCMP);
 	    }
-	    Perl_croak("'<' is reserved for hashes");
+	    Perl_croak(aTHX_ "'<' is reserved for hashes");
 	}
     case '>':
 	s++;
 	if (*s++ == '>')
 	    SHop(OP_RIGHT_SHIFT);
 	
-	Perl_croak("'>' is reserved for hashes");
+	Perl_croak(aTHX_ "'>' is reserved for hashes");
 
     case '$':
 	CLINE;
@@ -4576,7 +4576,7 @@ Perl_yylex(pTHX)
 	    CLINE;
 	    yylval.opval
 		= (OP*)newSVOP(OP_CONST, 0,
-			       newSVpvn(aTHX_ PL_tokenbuf, len));
+			       newSVpvn(PL_tokenbuf, len));
 	    yylval.opval->op_private = OPpCONST_BARE;
 	    TERM(WORD);
 	}

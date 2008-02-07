@@ -3872,7 +3872,7 @@ PP(pp_splice)
 	if (offset < 0)
 	    DIE(aTHX_ PL_no_aelem, i);
 	if (++MARK < SP) {
-	    length = SvIVx(*MARK++);
+	    length = SvIV(*MARK++);
 	    if (length < 0) {
 		length += AvFILLp(ary) - offset + 1;
 		if (length < 0)

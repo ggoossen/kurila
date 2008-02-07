@@ -475,7 +475,7 @@ PP(pp_die)
 	LEAVE;
     }
 
-    Perl_vdie_common(tmpsv, FALSE);
+    Perl_vdie_common(aTHX_ tmpsv, FALSE);
 
     die_where(tmpsv);
     /* NOTREACHED */
@@ -1281,10 +1281,10 @@ PP(pp_sysread)
     bufsv = *++MARK;
     if (! SvOK(bufsv))
 	sv_setpvn(bufsv, "", 0);
-    length = SvIVx(*++MARK);
+    length = SvIV(*++MARK);
     SETERRNO(0,0);
     if (MARK < SP)
-	offset = SvIVx(*++MARK);
+	offset = SvIV(*++MARK);
     else
 	offset = 0;
     io = GvIO(gv);
@@ -1543,9 +1543,9 @@ PP(pp_send)
 	    length = blen_chars;
 	} else {
 #if Size_t_size > IVSIZE
-	    length = (Size_t)SvNVx(*++MARK);
+	    length = (Size_t)SvNV(*++MARK);
 #else
-	    length = (Size_t)SvIVx(*++MARK);
+	    length = (Size_t)SvIV(*++MARK);
 #endif
 	    if ((SSize_t)length < 0) {
 		Safefree(tmpbuf);
@@ -1554,7 +1554,7 @@ PP(pp_send)
 	}
 
 	if (MARK < SP) {
-	    offset = SvIVx(*++MARK);
+	    offset = SvIV(*++MARK);
 	    if (offset < 0) {
 		if (-offset > (IV)blen_chars) {
 		    Safefree(tmpbuf);
@@ -1611,7 +1611,7 @@ PP(pp_send)
     }
 #ifdef HAS_SOCKET
     else {
-	const int flags = SvIVx(*++MARK);
+	const int flags = SvIV(*++MARK);
 	if (SP > MARK) {
 	    STRLEN mlen;
 	    char * const sockbuf = SvPVx(*++MARK, &mlen);
@@ -1737,9 +1737,9 @@ PP(pp_sysseek)
     dVAR; dSP;
     const int whence = POPi;
 #if LSEEKSIZE > IVSIZE
-    const Off_t offset = (Off_t)SvNVx(POPs);
+    const Off_t offset = (Off_t)SvNV(POPs);
 #else
-    const Off_t offset = (Off_t)SvIVx(POPs);
+    const Off_t offset = (Off_t)SvIV(POPs);
 #endif
 
     GV * const gv = PL_last_in_gv = (GV*)POPs;
@@ -3911,7 +3911,7 @@ PP(pp_getpgrp)
 #ifdef HAS_GETPGRP
     dVAR; dSP; dTARGET;
     Pid_t pgrp;
-    const Pid_t pid = (MAXARG < 1) ? 0 : SvIVx(POPs);
+    const Pid_t pid = (MAXARG < 1) ? 0 : SvIV(POPs);
 
 #ifdef BSD_GETPGRP
     pgrp = (I32)BSD_GETPGRP(pid);
@@ -4096,7 +4096,7 @@ PP(pp_gmtime)
 #ifdef BIG_TIME
 	when = (Time_t)SvNVx(POPs);
 #else
-	when = (Time_t)SvIVx(POPs);
+	when = (Time_t)SvIV(POPs);
 #endif
 
     if (PL_op->op_type == OP_LOCALTIME)

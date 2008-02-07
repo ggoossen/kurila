@@ -7319,7 +7319,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 		SV* buf = newSV(RExC_end - RExC_parse + 1);
 		SvPOK_on(buf);
 		d = SvPV_mutable(buf, len);
-		RExC_parse = (char*)parse_escape(aTHX_ RExC_parse-1, d, &len, RExC_end);
+		RExC_parse = (char*)parse_escape(RExC_parse-1, d, &len, RExC_end);
 
 		/* extract character from escape sequence, there should be exactly one character */
 		if (UTF) {

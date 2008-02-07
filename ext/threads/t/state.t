@@ -111,7 +111,7 @@ sub thread_go
 }
 
 
-my $thr = threads->create('do_thread');
+my $thr = threads->create(\&do_thread);
 wait_until_ready();
 ok($thr->is_running(),    'thread running');
 ok(threads->list(threads::running) == 1,  'thread running list');
@@ -136,7 +136,7 @@ ok(! $thr->is_joinable(), 'thread not joinable');
 ok(threads->list(threads::joinable) == 0, 'thread joinable list');
 ok(threads->list(threads::all) == 0, 'thread list');
 
-$thr = threads->create('do_thread');
+$thr = threads->create(\&do_thread);
 $thr->detach();
 ok($thr->is_running(),    'thread running');
 ok(threads->list(threads::running) == 0,  'thread running list');

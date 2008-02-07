@@ -1944,7 +1944,7 @@ PP(pp_exit)
     if (MAXARG < 1)
 	anum = 0;
     else {
-	anum = SvIVx(POPs);
+	anum = SvIV(POPs);
 #ifdef VMS
         if (anum == 1 && (PL_op->op_private & OPpEXIT_VMSISH))
 	    anum = 0;

@@ -1489,7 +1489,7 @@ os2_aspawn_4(pTHX_ SV *really, register SV **args, I32 cnt, int execing)
 	a = PL_Argv;
 
 	if (cnt > 1 && SvNIOKp(*argp) && !SvPOKp(*argp)) {
-	    flag = SvIVx(*argp);
+	    flag = SvIV(*argp);
 	    flag_set = 1;
 	} else
 	    --argp;

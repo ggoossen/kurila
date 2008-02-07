@@ -215,7 +215,7 @@ PP(pp_sassign)
 PP(pp_cond_expr)
 {
     dVAR; dSP;
-    if (SvTRUEx(POPs))
+    if (SvTRUE(POPs))
 	RETURNOP(cLOGOP->op_other);
     else
 	RETURNOP(cLOGOP->op_next);
@@ -2235,7 +2235,7 @@ PP(pp_grepwhile)
 {
     dVAR; dSP;
 
-    if (SvTRUEx(POPs))
+    if (SvTRUE(POPs))
 	PL_stack_base[PL_markstack_ptr[-1]++] = PL_stack_base[*PL_markstack_ptr];
     ++*PL_markstack_ptr;
     LEAVE;					/* exit inner scope */

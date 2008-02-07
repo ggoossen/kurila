@@ -1160,7 +1160,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    break;
 	case ']':
 	{
-	    Perl_croak(aTHX "$] is obsolete. Use $^V or $kurila::VERSION");
+	    Perl_croak(aTHX_ "$] is obsolete. Use $^V or $kurila::VERSION");
 	}
 	break;
 	case '\026':	/* $^V */

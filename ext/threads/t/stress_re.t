@@ -46,13 +46,13 @@ my $cnt = 30;
 sub stress_re {
     my $s = "abcd" x (1000 + $_[0]);
     my $t = '';
-    while ($s =~ /(.)/g) { $t .= $1 }
+    while ($s =~ m/(.)/g) { $t .= $1 }
     return ($s eq $t) ? 'ok' : 'not';
 }
 
 my @threads;
 for (1..$cnt) {
-    my $thr = threads->create('stress_re', $_);
+    my $thr = threads->create(\&stress_re, $_);
     ok($thr, "Thread created - iter $_");
     push(@threads, $thr);
 }

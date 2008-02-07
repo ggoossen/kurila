@@ -2860,8 +2860,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 
 	    char *s = STRING(scan);
 	    ln = STR_LEN(scan);
-	    DEBUG_EXECUTE_r(
-		PerlIO_printf(Perl_debug_log, "EXACT %x %x %x\n", UCHARAT(s), nextchr, 'A'));
 	    /* Inline the first character, for speed. */
 	    if (UCHARAT(s) != nextchr)
 		sayNO;
@@ -2878,7 +2876,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 
 	    if (!reginclass(rex, scan, locinput, &inclasslen))
 		goto anyof_fail;
-	    DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "foobar %d\n", inclasslen));
 	    if (locinput >= PL_regeol)
 		sayNO;
 	    locinput += inclasslen ? inclasslen : UTF8SKIP(locinput);
@@ -4847,13 +4844,13 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
     }
 
     DEBUG_EXECUTE_r({
-    PerlIO_printf(Perl_debug_log, "reg in class %d %d %p\n", match, (flags & ANYOF_INVERT), n);
+    PerlIO_printf(Perl_debug_log, "reg in class %d %d\n", match, (flags & ANYOF_INVERT));
     });
     return (flags & ANYOF_INVERT) ? !match : match;
 }
 
 STATIC char*
-S_reghop3(char *s, I32 off, const char* lim)
+S_reghop3(char *s, I32 off, char* lim)
 {
     return s + off;
     if (off >= 0) {
@@ -4865,7 +4862,7 @@ S_reghop3(char *s, I32 off, const char* lim)
 }
 
 STATIC char*
-S_reghop3x(char *s, I32 off, const char* lim)
+S_reghop3x(char *s, I32 off, char* lim)
 {
     if (off >= 0) {
 	return s + off > lim ? lim : s + off;
@@ -4876,7 +4873,7 @@ S_reghop3x(char *s, I32 off, const char* lim)
 }
 
 STATIC char *
-S_reghop3c(char *s, I32 off, const char* lim)
+S_reghop3c(char *s, I32 off, char* lim)
 {
     dVAR;
     if (off >= 0) {

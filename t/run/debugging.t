@@ -46,8 +46,9 @@ my $refdump = <<'EO_DX_OUT';
         }
         {
 5           TYPE = const  ===> 6
+            TARG = 1@THR
             FLAGS = (SCALAR)
-            SV = PV("foo"\0) [UTF8 "foo"]
+            SV = PV("foo"\0) [UTF8 "foo"]@NO_THR
         }
     }
 }
@@ -55,6 +56,8 @@ EO_DX_OUT
 
 # escape the regex chars in the reference dump
 $refdump =~ s/([{}()\\\[\]])/\\$1/gms;
+$refdump =~ s/(.*)\@THR\n/{ $Config::Config{useithreads} ? $1 . "\n" : '' }/g;
+$refdump =~ s/(.*)\@NO_THR\n/{ $Config::Config{useithreads} ? '' : $1 }/g;
 
 my $qr = qr/$refdump/;
 # diag($qr);

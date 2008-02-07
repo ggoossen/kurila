@@ -631,7 +631,7 @@ Perl_do_aspawn(pTHX_ SV *really, SV **mark, SV **sp)
 
     if (SvNIOKp(*(mark+1)) && !SvPOKp(*(mark+1))) {
 	++mark;
-	flag = SvIVx(*mark);
+	flag = SvIV(*mark);
     }
 
     while (++mark <= sp) {
