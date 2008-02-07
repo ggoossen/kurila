@@ -10225,7 +10225,7 @@ int flags = 0;
      */
     if (SvNIOKp(*((SV**)mark+1)) && !SvPOKp(*((SV**)mark+1))) {
 	++mark;
-	flags = SvIVx(*(SV**)mark);
+	flags = SvIV(*(SV**)mark);
     }
 
     if (flags && flags == 1)     /* the Win32 P_NOWAIT value */

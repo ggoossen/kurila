@@ -6739,10 +6739,10 @@ Perl_ck_compsub(pTHX_ OP *o)
     newop = INT2PTR(OP*, SvIV(SvRV(sv)));
 
     if (!newop)
-	Perl_die(aTHX "No opcode returned by the compsub");
+	Perl_die(aTHX_ "No opcode returned by the compsub");
 
     if (args_b && SvREFCNT(args_b) != 1)
-	Perl_die(aTHX "reference to B::OP argument kept");
+	Perl_die(aTHX_ "reference to B::OP argument kept");
     SvREFCNT_dec(args_b);
 
     LEAVE;

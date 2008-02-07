@@ -708,7 +708,7 @@ XS(XS_version_qv)
 }
 
 STATIC
-AV* S_context_info(const PERL_CONTEXT *cx) {
+AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     AV* av = newAV();
     const char *stashname;
     
@@ -757,7 +757,7 @@ AV* S_context_info(const PERL_CONTEXT *cx) {
     return av;
 }
 
-STATIC AV* S_error_backtrace()
+STATIC AV* S_error_backtrace(pTHX)
 {
     register I32 cxix = dopoptosub_at(cxstack, cxstack_ix);
     register const PERL_CONTEXT *ccstack = cxstack;
@@ -790,7 +790,7 @@ STATIC AV* S_error_backtrace()
 	    break;
 
 	/* make stack entry */
-	av_push(trace, newRV_inc( (SV*) S_context_info(&ccstack[cxix]) ));
+	av_push(trace, newRV_inc( (SV*) S_context_info(aTHX_ &ccstack[cxix]) ));
 
 	cxix = dopoptosub_at(ccstack, cxix - 1);
     }
@@ -820,7 +820,7 @@ S_closest_cop(pTHX_ const COP *cop, const OP *o)
 
 	    /* Keep searching, and return when we've found something. */
 
-	    new_cop = S_closest_cop(cop, kid);
+	    new_cop = S_closest_cop(aTHX_ cop, kid);
 	    if (new_cop)
 		return new_cop;
 	}
@@ -879,7 +879,7 @@ XS(XS_error_create)
 	     * from the sibling of PL_curcop.
 	     */
 
-	    const COP *cop = S_closest_cop(PL_curcop, PL_curcop->op_sibling);
+	    const COP *cop = S_closest_cop(aTHX_ PL_curcop, PL_curcop->op_sibling);
 	    SV *sv = sv_newmortal();
 	    sv_setpvn(sv,"",0);
 	    if (!cop)
@@ -906,7 +906,7 @@ XS(XS_error_create)
 	}
 	    
 	/* backtrace */
-	(void)hv_stores(hv, "stack", newRV_inc( (SV*) S_error_backtrace() ));
+	(void)hv_stores(hv, "stack", newRV_inc( (SV*) S_error_backtrace(aTHX) ));
 
 	XPUSHs(sv_2mortal(rv));
 	XSRETURN(1);
@@ -1326,13 +1326,13 @@ XS(XS_Internals_set_hint_hash)
 {
     dVAR;
     dXSARGS;
-    const HV* hv;
+    const SV* hv;
     if (!SvROK(ST(0)))
 	Perl_croak(aTHX_ "Internals::set_hint_hash $hashref");
-    hv = (HV *) SvRV(ST(0));
+    hv = SvRV(ST(0));
     if (items == 1 && SvTYPE(hv) == SVt_PVHV) {
 	SvREFCNT_dec(PL_compiling.cop_hints_hash);
-	PL_compiling.cop_hints_hash = SvREFCNT_inc(hv);
+	PL_compiling.cop_hints_hash = (HV*)SvREFCNT_inc(hv);
     }
 }
 
@@ -1803,7 +1803,7 @@ XS(XS_dump_view)
 	/* this will need EBCDICification */
 	STRLEN charlen = 0;
 	for (s = src; s < send; s += charlen) {
-	    const UV k = utf8_to_uvchr((U8*)s, &charlen);
+	    const UV k = utf8_to_uvchr(s, &charlen);
 
 	    if (k == 0 || s + charlen > send ) {
 		/* invalid character escape: \x[XX] */

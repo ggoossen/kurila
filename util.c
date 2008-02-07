@@ -1296,17 +1296,17 @@ Perl_die(pTHX_ const char* pat, ...)
     va_end(args);
     return NULL;
 }
+
 #if defined(PERL_IMPLICIT_CONTEXT)
-OP *
+void
 Perl_die_nocontext(const char* pat, ...)
 {
     dTHX;
-    OP *o;
     va_list args;
     va_start(args, pat);
-    o = vdie(pat, &args);
+    vdie(pat, &args);
+    /* NOTREACHED */
     va_end(args);
-    return o;
 }
 #endif /* PERL_IMPLICIT_CONTEXT */
 

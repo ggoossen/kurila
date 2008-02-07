@@ -247,7 +247,7 @@ PERL_CALLCONV void	Perl_croak_nocontext(const char* pat, ...)
 			__attribute__format__(__printf__,1,2)
 			__attribute__nonnull__(1);
 
-PERL_CALLCONV OP*	Perl_die_nocontext(const char* pat, ...)
+PERL_CALLCONV void	Perl_die_nocontext(const char* pat, ...)
 			__attribute__format__(__printf__,1,2)
 			__attribute__nonnull__(1);
 
@@ -3744,17 +3744,17 @@ STATIC CHECKPOINT	S_regcppush(pTHX_ I32 parenfloor);
 STATIC char*	S_regcppop(pTHX_ const regexp *rex)
 			__attribute__nonnull__(pTHX_1);
 
-STATIC char*	S_reghop3(char *pos, I32 off, const char *lim)
+STATIC char*	S_reghop3(char *pos, I32 off, char *lim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3);
 
-STATIC char*	S_reghop3c(char *pos, I32 off, const char *lim)
+STATIC char*	S_reghop3c(char *pos, I32 off, char *lim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3);
 
-STATIC char*	S_reghop3x(char *pos, I32 off, const char *lim)
+STATIC char*	S_reghop3x(char *pos, I32 off, char *lim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3);

@@ -102,16 +102,16 @@ threads->create(sub {
         lock($test);
         my $TODO = ":unique needs to be re-implemented in a non-broken way";
         eval { $unique_scalar = 1 };
-        print $@ =~ /read-only/
+        print $@ && $@->{description} =~ m/read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_scalar\n";
         $test++;
         eval { $unique_array[0] = 1 };
-        print $@ =~ /read-only/
+        print $& && $@->{description} =~ m/read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_array\n";
         $test++;
         if ($^O ne 'MSWin32') {
             eval { $unique_hash{abc} = 1 };
-            print $@ =~ /disallowed/
+            print $@ && $@->{description} =~ m/disallowed/
               ? '' : 'not ', "ok $test # TODO $TODO - unique_hash\n";
         } else {
             print("ok $test # Skip $TODO - unique_hash\n");
@@ -125,7 +125,7 @@ for my $decl ('my $x : unique', 'sub foo : unique') {
     {
         lock($test);
         eval $decl;
-        print $@ =~ /^The 'unique' attribute may only be applied to 'our' variables/
+        print $@->{description} =~ m/^The 'unique' attribute may only be applied to 'our' variables/
           ? '' : 'not ', "ok $test - $decl\n";
         $test++;
     }

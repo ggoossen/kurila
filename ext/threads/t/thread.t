@@ -106,7 +106,7 @@ sub threaded {
     my ($string, $string_end) = @_;
 
   # Do the match, saving the output in appropriate variables
-    $string =~ /(.*)(is)(.*)/;
+    $string =~ m/(.*)(is)(.*)/;
   # Yield control, allowing the other thread to fill in the match variables
     threads->yield();
   # Examine the match variable contents; on broken perls this fails
@@ -126,11 +126,11 @@ sub threaded {
     my $longe  = " short.";
     my $foo = "This is bar bar bar.";
     my $fooe = " bar bar bar.";
-    my $thr3 = new threads \&threaded, $short, $shorte;
-    my $thr4 = new threads \&threaded, $long, $longe;
-    my $thr5 = new threads \&testsprintf, 19;
-    my $thr6 = new threads \&testsprintf, 20;
-    my $thr7 = new threads \&threaded, $foo, $fooe;
+    my $thr3 = threads->new( \&threaded, $short, $shorte );
+    my $thr4 = threads->new( \&threaded, $long, $longe );
+    my $thr5 = threads->new( \&testsprintf, 19 );
+    my $thr6 = threads->new( \&testsprintf, 20 );
+    my $thr7 = threads->new( \&threaded, $foo, $fooe );
 
     ok($thr1->join());
     ok($thr2->join());
@@ -166,12 +166,12 @@ package main;
     rand(10);
     threads->create( sub { $rand{int(rand(10000000000))}++ } ) foreach 1..25;
     $_->join foreach threads->list;
-    ok((keys %rand >= 23), "Check that rand() is randomized in new threads");
+    ok((keys %rand +>= 23), "Check that rand() is randomized in new threads");
 }
 
 # bugid #24165
 
-run_perl(prog => 'use threads 1.67;' .
+run_perl(prog => 'use threads v1.67;' .
                  'sub a{threads->create(shift)} $t = a sub{};' .
                  '$t->tid; $t->join; $t->tid',
          nolib => ($ENV{PERL_CORE}) ? 0 : 1,
@@ -269,10 +269,10 @@ SKIP: {
         sub f {
             my $depth = shift;
             my $cloned = ""; # XXX due to recursion, doesn't get initialized
-            $cloned .= "$_" =~ /ARRAY/ ? '1' : '0' for @objs;
+            $cloned .= "$_" =~ m/ARRAY/ ? '1' : '0' for @objs;
             is($cloned, ($depth ? '00010001111' : '11111111111'),
                 "objs clone skip at depth $depth");
-            threads->create( \&f, $depth+1)->join if $depth < 2;
+            threads->create( \&f, $depth+1)->join if $depth +< 2;
             @objs = ();
         }
         f(0);

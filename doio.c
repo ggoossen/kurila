@@ -1589,8 +1589,8 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 	APPLY_TAINT_PROPER();
 	if (sp - mark > 2) {
             register I32 val2;
-	    val = SvIVx(*++mark);
-	    val2 = SvIVx(*++mark);
+	    val = SvIV(*++mark);
+	    val2 = SvIV(*++mark);
 	    APPLY_TAINT_PROPER();
 	    tot = sp - mark;
 	    while (++mark <= sp) {
@@ -1909,9 +1909,9 @@ I32
 Perl_do_ipcget(pTHX_ I32 optype, SV **mark, SV **sp)
 {
     dVAR;
-    const key_t key = (key_t)SvNVx(*++mark);
-    const I32 n = (optype == OP_MSGGET) ? 0 : SvIVx(*++mark);
-    const I32 flags = SvIVx(*++mark);
+    const key_t key = (key_t)SvNV(*++mark);
+    const I32 n = (optype == OP_MSGGET) ? 0 : SvIV(*++mark);
+    const I32 flags = SvIV(*++mark);
 
     PERL_UNUSED_ARG(sp);
 
@@ -1944,11 +1944,11 @@ Perl_do_ipcctl(pTHX_ I32 optype, SV **mark, SV **sp)
     dVAR;
     char *a;
     I32 ret = -1;
-    const I32 id  = SvIVx(*++mark);
+    const I32 id  = SvIV(*++mark);
 #ifdef Semctl
-    const I32 n   = (optype == OP_SEMCTL) ? SvIVx(*++mark) : 0;
+    const I32 n   = (optype == OP_SEMCTL) ? SvIV(*++mark) : 0;
 #endif
-    const I32 cmd = SvIVx(*++mark);
+    const I32 cmd = SvIV(*++mark);
     SV * const astr = *++mark;
     STRLEN infosize = 0;
     I32 getinfo = (cmd == IPC_STAT);
@@ -2069,9 +2069,9 @@ Perl_do_msgsnd(pTHX_ SV **mark, SV **sp)
     dVAR;
 #ifdef HAS_MSG
     STRLEN len;
-    const I32 id = SvIVx(*++mark);
+    const I32 id = SvIV(*++mark);
     SV * const mstr = *++mark;
-    const I32 flags = SvIVx(*++mark);
+    const I32 flags = SvIV(*++mark);
     const char * const mbuf = SvPV_const(mstr, len);
     const I32 msize = len - sizeof(long);
 
@@ -2094,16 +2094,16 @@ Perl_do_msgrcv(pTHX_ SV **mark, SV **sp)
     char *mbuf;
     long mtype;
     I32 msize, flags, ret;
-    const I32 id = SvIVx(*++mark);
+    const I32 id = SvIV(*++mark);
     SV * const mstr = *++mark;
     PERL_UNUSED_ARG(sp);
 
     /* suppress warning when reading into undef var --jhi */
     if (! SvOK(mstr))
 	sv_setpvn(mstr, "", 0);
-    msize = SvIVx(*++mark);
-    mtype = (long)SvIVx(*++mark);
-    flags = SvIVx(*++mark);
+    msize = SvIV(*++mark);
+    mtype = (long)SvIV(*++mark);
+    flags = SvIV(*++mark);
     SvPV_force_nolen(mstr);
     mbuf = SvGROW(mstr, sizeof(long)+msize+1);
 
@@ -2129,7 +2129,7 @@ Perl_do_semop(pTHX_ SV **mark, SV **sp)
 #ifdef HAS_SEM
     dVAR;
     STRLEN opsize;
-    const I32 id = SvIVx(*++mark);
+    const I32 id = SvIV(*++mark);
     SV * const opstr = *++mark;
     const char * const opbuf = SvPV_const(opstr, opsize);
     PERL_UNUSED_ARG(sp);
@@ -2182,10 +2182,10 @@ Perl_do_shmio(pTHX_ I32 optype, SV **mark, SV **sp)
     dVAR;
     char *shm;
     struct shmid_ds shmds;
-    const I32 id = SvIVx(*++mark);
+    const I32 id = SvIV(*++mark);
     SV * const mstr = *++mark;
-    const I32 mpos = SvIVx(*++mark);
-    const I32 msize = SvIVx(*++mark);
+    const I32 mpos = SvIV(*++mark);
+    const I32 msize = SvIV(*++mark);
     PERL_UNUSED_ARG(sp);
 
     SETERRNO(0,0);

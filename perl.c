@@ -2807,7 +2807,7 @@ Perl_eval_pv(pTHX_ const char *p, I32 croak_on_error)
     PUTBACK;
 
     if (croak_on_error && SvTRUE(ERRSV)) {
-	Perl_croak(aTHX_ SvPVx_nolen_const(ERRSV));
+	Perl_croak(aTHX_ SvPV_nolen_const(ERRSV));
     }
 
     return sv;
@@ -5059,15 +5059,15 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 			    sv_catpv( *desc,
 				      "BEGIN failed--compilation aborted" );
 			else
-			    sv_catpvf( *desc, "%s failed--call queue aborted",
-				       paramList == PL_checkav ? "CHECK"
-				       : paramList == PL_initav ? "INIT"
-				       : paramList == PL_unitcheckav ? "UNITCHECK"
-				       : "END");
+			    Perl_sv_catpvf(aTHX_ *desc, "%s failed--call queue aborted",
+					   paramList == PL_checkav ? "CHECK"
+					   : paramList == PL_initav ? "INIT"
+					   : paramList == PL_unitcheckav ? "UNITCHECK"
+					   : "END");
 		    }
 		}
 
-		Perl_vdie_common(atsv, FALSE);
+		Perl_vdie_common(aTHX_ atsv, FALSE);
 		die_where(atsv);
 
 		/* really die */

@@ -126,14 +126,14 @@ Pops a long off the stack.
 #define POPp		(SvPVx(POPs, &PL_na))		/* deprecated */
 #define POPpx		(SvPVx_nolen(POPs))
 #define POPpconstx	(SvPVx_nolen_const(POPs))
-#define POPn		(SvNVx(POPs))
-#define POPi		((IV)SvIVx(POPs))
-#define POPu		((UV)SvUVx(POPs))
-#define POPl		((long)SvIVx(POPs))
-#define POPul		((unsigned long)SvIVx(POPs))
+#define POPn		(SvNV(POPs))
+#define POPi		((IV)SvIV(POPs))
+#define POPu		((UV)SvUV(POPs))
+#define POPl		((long)SvIV(POPs))
+#define POPul		((unsigned long)SvIV(POPs))
 #ifdef HAS_QUAD
-#define POPq		((Quad_t)SvIVx(POPs))
-#define POPuq		((Uquad_t)SvUVx(POPs))
+#define POPq		((Quad_t)SvIV(POPs))
+#define POPuq		((Uquad_t)SvUV(POPs))
 #endif
 
 #define TOPs		(*sp)
