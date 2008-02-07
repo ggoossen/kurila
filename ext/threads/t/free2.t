@@ -82,9 +82,9 @@ sub th_start
         lock(%READY);
 
         # Create next thread
-        if ($tid < 17) {
+        if ($tid +< 17) {
             my $next = 'th' . ($tid+1);
-            my $th = threads->create($next, $q);
+            my $th = threads->create(\&{*{Symbol::fetch_glob($next)}}, $q);
         } else {
             # Last thread signals first
             th_signal($q, 1);
@@ -319,10 +319,10 @@ sub th15
 TEST_STARTS_HERE:
 {
     $COUNT = 0;
-    threads->create('th1', $q);
+    threads->create(\&th1, $q);
     {
         lock($COUNT);
-        while ($COUNT < 17) {
+        while ($COUNT +< 17) {
             cond_wait($COUNT);
             ok();   # Prints out any intermediate results
         }

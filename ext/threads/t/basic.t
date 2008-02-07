@@ -49,7 +49,7 @@ ok(2, 1 == $threads::threads, "Check that threads::threads is true");
 sub test1 {
     ok(3,'bar' eq $_[0], "Test that argument passing works");
 }
-threads->create('test1', 'bar')->join();
+threads->create(\&test1, 'bar')->join();
 
 sub test2 {
     ok(4,'bar' eq $_[0]->[0]->{'foo'}, "Test that passing arguments as references work");
@@ -66,7 +66,7 @@ sub test4 {
     ok(6, 1, "Detach test");
 }
 {
-    my $thread1 = threads->create('test4');
+    my $thread1 = threads->create(\&test4);
     $thread1->detach();
     while ($thread1->is_running()) {
         threads->yield();
@@ -77,7 +77,7 @@ ok(7, 1, "Detach test");
 
 
 sub test5 {
-    threads->create('test6')->join();
+    threads->create(\&test6)->join();
     ok(9, 1, "Nested thread test");
 }
 
@@ -85,7 +85,7 @@ sub test6 {
     ok(8, 1, "Nested thread test");
 }
 
-threads->create('test5')->join();
+threads->create(\&test5)->join();
 
 
 sub test7 {
@@ -93,14 +93,14 @@ sub test7 {
     ok(10, $self->tid == 7, "Wanted 7, got ".$self->tid);
     ok(11, threads->tid() == 7, "Wanted 7, got ".threads->tid());
 }
-threads->create('test7')->join;
+threads->create(\&test7)->join;
 
 sub test8 {
     my $self = threads->self();
     ok(12, $self->tid == 8, "Wanted 8, got ".$self->tid);
     ok(13, threads->tid() == 8, "Wanted 8, got ".threads->tid());
 }
-threads->create('test8')->join;
+threads->create(\&test8)->join;
 
 
 ok(14, 0 == threads->self->tid(), "Check so that tid for threads work for main thread");

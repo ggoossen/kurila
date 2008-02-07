@@ -33,14 +33,14 @@ my $result = $thr->join();
 ok(! defined($result), 'thread died');
 
 # Check error
-like($thr->error(), q/Can't locate object method/, 'thread error');
+like($thr->error()->{description}, q/Can't locate object method/, 'thread error');
 
 
 # Create a thread that 'die's with an object
 $thr = threads->create(sub {
                     threads->yield();
                     sleep(1);
-                    die(bless({ error => 'bogus' }, 'Err::Class'));
+                    die "bogus";
                 });
 
 my $err = $thr->error();
@@ -52,11 +52,11 @@ ok(! defined($result), 'thread died');
 
 # Check that error object is retrieved
 $err = $thr->error();
-isa_ok($err, 'Err::Class', 'error object');
-is($err->{error}, 'bogus', 'error field');
+isa_ok($err, 'error', 'error object');
+is($err->{description}, 'bogus', 'error field');
 
 # Check that another thread can reference the error object
-my $thrx = threads->create(sub { die(bless($thr->error(), 'Foo')); });
+my $thrx = threads->create(sub { die $thr->error(); });
 
 # Check that thread returns 'undef'
 $result = $thrx->join();
@@ -64,7 +64,7 @@ ok(! defined($result), 'thread died');
 
 # Check that the rethrown error object is retrieved
 $err = $thrx->error();
-isa_ok($err, 'Foo', 'error object');
-is($err->{error}, 'bogus', 'error field');
+isa_ok($err, 'error', 'error object');
+is($err->{description}, 'bogus', 'error field');
 
 # EOF

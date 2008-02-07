@@ -76,9 +76,9 @@ sub threading_1 {
         $STARTED++;
         $id = $STARTED;
     }
-    if ($STARTED < 5) {
+    if ($STARTED +< 5) {
         sleep(1);
-        threads->create('threading_1', $q)->detach();
+        threads->create(\&threading_1, $q)->detach();
     }
 
     if ($id == 1) {
@@ -102,13 +102,13 @@ sub threading_1 {
 {
     $STARTED = 0;
     $COUNT = 0;
-    threads->create('threading_1', $q)->detach();
+    threads->create(\&threading_1, $q)->detach();
     {
         my $cnt = 0;
-        while ($cnt < 5) {
+        while ($cnt +< 5) {
             {
                 lock($COUNT);
-                cond_wait($COUNT) if ($COUNT < 5);
+                cond_wait($COUNT) if ($COUNT +< 5);
                 $cnt = $COUNT;
             }
             threads->create(sub {
@@ -131,8 +131,8 @@ sub threading_2 {
         lock($STARTED);
         $STARTED++;
     }
-    if ($STARTED < 5) {
-        threads->create('threading_2', $q)->detach();
+    if ($STARTED +< 5) {
+        threads->create(\&threading_2, $q)->detach();
     }
     threads->yield();
 
@@ -146,13 +146,13 @@ sub threading_2 {
 {
     $STARTED = 0;
     $COUNT = 0;
-    threads->create('threading_2', $q)->detach();
+    threads->create(\&threading_2, $q)->detach();
     threads->create(sub {
         threads->create(sub { })->join();
     })->join();
     {
         lock($COUNT);
-        while ($COUNT < 5) {
+        while ($COUNT +< 5) {
             cond_wait($COUNT);
         }
     }
@@ -200,10 +200,10 @@ sub threading_3 {
 {
     $COUNT = 0;
     threads->create(sub {
-        threads->create('threading_3', $q)->detach();
+        threads->create(\&threading_3, $q)->detach();
         {
             lock($COUNT);
-            while ($COUNT < 2) {
+            while ($COUNT +< 2) {
                 cond_wait($COUNT);
             }
         }
