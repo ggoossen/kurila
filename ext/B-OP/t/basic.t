@@ -1,5 +1,13 @@
 #!/usr/bin/perl -w
 
+use Config;
+BEGIN {
+    if ($Config{'usethreads'}) {
+        print "1..0 # Skip: B-OP replacements don't work with threads\n";
+        exit 0;
+    }
+}
+
 use Test::More tests => 10;
 
 use B qw(svref_2object);
