@@ -15,7 +15,7 @@ use strict;
 use threads;
 use Thread::Queue;
 
-my $q = new Thread::Queue;
+my $q = Thread::Queue->new();
 $|++;
 print "1..26\n";
 
@@ -49,11 +49,11 @@ sub reader {
 my $nthreads = 5;
 my @threads;
 
-for (my $i = 0; $i < $nthreads; $i++) {
+for (my $i = 0; $i +< $nthreads; $i++) {
     push @threads, threads->create(\&reader, $i);
 }
 
-for (my $i = 1; $i <= 20; $i++) {
+for (my $i = 1; $i +<= 20; $i++) {
     my $el = int(rand(100));
     select(undef, undef, undef, rand(1));
 #    print "writer: enqueuing value $el\n";

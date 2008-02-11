@@ -145,15 +145,16 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
     STRLEN single_quotes = 0;
     STRLEN qq_escapables = 0;	/* " $ @ will need a \ in "" strings.  */
     STRLEN normal = 0;
+    STRLEN charlen = 0;
 
     /* this will need EBCDICification */
-    for (s = src; s < send; s += UTF8SKIP(s)) {
-        const UV k = utf8_to_uvchr((U8*)s, NULL);
+    for (s = src; s < send; s += charlen) {
+        const UV k = utf8_to_uvchr(s, &charlen);
        
-        if (k == 0) {
+        if (k == 0 || s + charlen > send ) {
             /* invalid character escape: \xXX */
-            grow += 2;
-            s += 1;
+            grow += 6;
+            charlen = 1;
             continue;
         } else if (k > 127) {
             /* 4: \x{} then count the number of hex digits.  */
@@ -186,17 +187,16 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
         for (s = src; s < send; s += charlen) {
             const UV k = utf8_to_uvchr((U8*)s, &charlen);
 
-            if (k == 0) {
+            if (k == 0 || s + charlen > send ) {
                 /* invalid character */
-                r = r + my_sprintf(r, "\\x%02"UVxf"", (U8)*s);
+                r = r + my_sprintf(r, "\\x[%02x]", (U8)*s);
                 charlen = 1;
                 continue;
             } else if (k == '"' || k == '\\' || k == '$' || k == '@' || k == '{' || k == '}') {
                 *r++ = '\\';
                 *r++ = (char)k;
             }
-            else
-	      if (k < 0x80)
+            else if (k < 0x80)
                 *r++ = (char)k;
             else {
                 r = r + my_sprintf(r, "\\x{%"UVxf"}", k);
