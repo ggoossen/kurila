@@ -1302,10 +1302,12 @@ perl_destruct(pTHXx)
     PL_hints = 0;		/* Reset hints. Should hints be per-interpreter ? */
     PL_debug = 0;
 
+#ifdef PERL_IMPLICIT_CONTEXT
 #ifndef PERL_GLOBAL_STRUCT_PRIVATE
     Safefree(PL_my_cxt_list);
     PL_my_cxt_list = NULL;
     PL_my_cxt_size = 0;
+#endif
 #endif
 
     DEBUG_P(debprofdump());
