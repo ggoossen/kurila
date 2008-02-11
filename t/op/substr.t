@@ -601,8 +601,10 @@ is($x, "\xFFb\x{100}\x{200}");
 substr($x = "\x{100}\x{200}", 2, 0, "\xFFb");
 is($x, "\x{100}\x{200}\xFFb");
 
+}
+
 # [perl #20933]
-{ 
+{
     my $s = "ab";
     my @r; 
     $r[$_] = \ substr $s, $_, 1 for (0, 1);
@@ -664,7 +666,6 @@ is($x, "\x{100}\x{200}\xFFb");
     pos($text) = $pos;
     my $a = substr($text, $pos, $pos);
     is(substr($text,$pos,1), $pos);
-
 }
 
 # [perl #23765]
