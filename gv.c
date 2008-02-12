@@ -992,6 +992,10 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (strEQ(name2, "HILD_ERROR_NATIVE"))
 		    goto magicalize;
 		break;
+	    case '\004':        /* $^DIE_HOOK */
+		if (strEQ(name2, "IE_HOOK"))
+		    goto magicalize;
+		break;
 	    case '\005':	/* $^ENCODING */
 		if (strEQ(name2, "NCODING"))
 		    goto magicalize;
@@ -1018,7 +1022,9 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (strEQ(name2, "TF8CACHE"))
 		    goto magicalize;
 		break;
-	    case '\027':	/* $^WARNING_BITS */
+	    case '\027':	/* $^WARNING_BITS, $^WARN_HOOK */
+		if (strEQ(name2, "ARNHOOK"))
+		    goto magicalize;
 		if (strEQ(name2, "ARNING_BITS"))
 		    goto magicalize;
 		break;

@@ -704,7 +704,11 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	break;
 
     case '\004':		/* ^D */
-	sv_setiv(sv, (IV)(PL_debug & DEBUG_MASK));
+	if (nextchar == '\0') {
+	    sv_setiv(sv, (IV)(PL_debug & DEBUG_MASK));
+	} else if (strEQ(remaining, "IE_HOOK")) { /* $^DIE_HOOK */
+	    sv_setsv(sv, PL_diehook);
+	}
 	break;
     case '\005':  /* ^E */
 	 if (nextchar == '\0') {
@@ -853,6 +857,8 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 			  *PL_compiling.cop_warnings);
 	    }
 	    SvPOK_only(sv);
+	} else if (strEQ(remaining, "ARN_HOOK")) { /* $^WARN_HOOK */
+	    sv_setsv(sv, PL_warnhook);
 	}
 	break;
     case '\015': /* $^MATCH */
@@ -2166,13 +2172,18 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         break;
 
     case '\004':        /* ^D */
+	if (*remaining == '\0') {
 #ifdef DEBUGGING
-        s = SvPV_nolen_const(sv);
-        PL_debug = get_debug_opts(&s, 0) | DEBUG_TOP_FLAG;
-        DEBUG_x(dump_all());
+	    s = SvPV_nolen_const(sv);
+	    PL_debug = get_debug_opts(&s, 0) | DEBUG_TOP_FLAG;
+	    DEBUG_x(dump_all());
 #else
-        PL_debug = (SvIV(sv)) | DEBUG_TOP_FLAG;
+	    PL_debug = (SvIV(sv)) | DEBUG_TOP_FLAG;
 #endif
+	}
+	else if (strEQ(remaining, "IE_HOOK")) {
+	    sv_setsv(PL_diehook, sv);
+	}
         break;
     case '\005':  /* ^E */
         if (*(mg->mg_ptr+1) == '\0') {
@@ -2318,6 +2329,9 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 }
             }
         }
+	else if (strEQ(remaining, "ARN_HOOK")) {
+	    sv_setsv(PL_warnhook, sv);
+	}
         break;
     case '.':
         if (PL_localizing) {
