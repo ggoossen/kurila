@@ -41,7 +41,7 @@ is ($@, "");
 
 {
     my $c = 0;
-    local $SIG{__WARN__} = sub { $c++   };
+    local ${^WARN_HOOK} = sub { $c++   };
     eval q{
         local $SIG{__DIE__}  = sub { $c+= 2 };
 	is($c, 0, "premature warn/die: $c");

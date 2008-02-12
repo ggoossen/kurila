@@ -17,7 +17,7 @@ sub BEGIN {
         }
     } else {
         if (!eval "require Hash::Util") {
-            if ($@ =~ m/Can\'t locate Hash\/Util\.pm in \@INC/s) {
+            if ($@->{description} =~ m/Can\'t locate Hash\/Util\.pm in \@INC/s) {
                 print "1..0 # Skip: No Hash::Util:\n";
                 exit 0;
             } else {

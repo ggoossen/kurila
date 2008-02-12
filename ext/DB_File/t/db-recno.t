@@ -93,7 +93,7 @@ sub safeUntie
 {
     my $hashref = shift ;
     my $no_inner = 1;
-    local $SIG{__WARN__} = sub {-- $no_inner } ;
+    local ${^WARN_HOOK} = sub {-- $no_inner } ;
     untie @$hashref;
     return $no_inner;
 }
@@ -943,7 +943,7 @@ EOM
     unlink $Dfile;
     my @h ;
     my $a = "";
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
     
     tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_RECNO 
 	or die "Can't open file: $!\n" ;
@@ -960,7 +960,7 @@ EOM
     use strict ;
     use DB_File ;
     my $a = "";
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
 
     unlink $Dfile;
     my @h ;
@@ -1080,7 +1080,7 @@ EOM
     ok(169, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO) );
 
     my $warned = '';
-    local $SIG{__WARN__} = sub {$warned = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$warned = $_[0]} ;
 
     # db-put with substr of key
     my %remember = () ;
@@ -1198,7 +1198,7 @@ exit unless $FA ;
 
     my $a = '';
     my @a = (1);
-    local $SIG{__WARN__} = sub {$a = $_[0]->{description}} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]->{description}} ;
 
     unlink $Dfile;
     my @tied ;
@@ -1407,7 +1407,7 @@ sub test_splice {
     if ($context eq 'list') {
 	my @r;
 	eval {
-	    local $SIG{__WARN__} = $gather_warning;
+	    local ${^WARN_HOOK} = $gather_warning;
 	    @r = splice @array, $offset, $length, @list;
 	};
 	$s_error = $@ && $@->{description};
@@ -1416,7 +1416,7 @@ sub test_splice {
     elsif ($context eq 'scalar') {
 	my $r;
 	eval {
-	    local $SIG{__WARN__} = $gather_warning;
+	    local ${^WARN_HOOK} = $gather_warning;
 	    $r = splice @array, $offset, $length, @list;
 	};
 	$s_error = $@ && $@->{description};
@@ -1424,7 +1424,7 @@ sub test_splice {
     }
     elsif ($context eq 'void') {
 	eval {
-	    local $SIG{__WARN__} = $gather_warning;
+	    local ${^WARN_HOOK} = $gather_warning;
 	    splice @array, $offset, $length, @list;
 	};
 	$s_error = $@ && $@->{description};
@@ -1447,7 +1447,7 @@ sub test_splice {
     if ($context eq 'list') {
 	my @r;
 	eval {
-	    local $SIG{__WARN__} = $gather_warning;
+	    local ${^WARN_HOOK} = $gather_warning;
 	    @r = splice @h, $offset, $length, @list;
 	};
 	$ms_error = $@ && $@->{description};
@@ -1456,7 +1456,7 @@ sub test_splice {
     elsif ($context eq 'scalar') {
 	my $r;
 	eval {
-	    local $SIG{__WARN__} = $gather_warning;
+	    local ${^WARN_HOOK} = $gather_warning;
 	    $r = splice @h, $offset, $length, @list;
 	};
 	$ms_error = $@ && $@->{description};
@@ -1464,7 +1464,7 @@ sub test_splice {
     }
     elsif ($context eq 'void') {
 	eval {
-	    local $SIG{__WARN__} = $gather_warning;
+	    local ${^WARN_HOOK} = $gather_warning;
 	    splice @h, $offset, $length, @list;
 	};
 	$ms_error = $@ && $@->{description};

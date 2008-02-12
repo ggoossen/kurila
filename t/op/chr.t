@@ -34,7 +34,7 @@ is(chr(ord("A")), "A");
     # ASCII characters
     is chr(0x65), "\x[65]";
     my $warn;
-    $SIG{__WARN__} = sub { $warn = shift->message };
+    ${^WARN_HOOK} = sub { $warn = shift->message };
     is chr(0x80), "\x[80]";
     like $warn, qr"chr\(\) ambiguous with highbit without use bytes or use utf8", "highbit warning";
 }

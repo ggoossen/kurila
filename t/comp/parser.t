@@ -134,7 +134,7 @@ EOF
 
 # Bug #24212
 {
-    local $SIG{__WARN__} = sub { }; # silence mandatory warning
+    local ${^WARN_HOOK} = sub { }; # silence mandatory warning
     eval q{ my $x = -F 1; };
     like( $@->{description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
     is(

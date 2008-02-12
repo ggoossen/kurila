@@ -167,7 +167,7 @@ use Carp;
 $VERSION = "1.815" ;
 
 {
-    local $SIG{__WARN__} = sub {$splice_end_array = $_[0]->{description};};
+    local ${^WARN_HOOK} = sub {$splice_end_array = $_[0]->{description};};
     my @a =(1); splice(@a, 3);
     $splice_end_array = 
         ($splice_end_array =~ m/^splice\(\) offset past end of array/);

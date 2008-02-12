@@ -121,7 +121,7 @@ sub safeUntie
 {
     my $hashref = shift ;
     my $no_inner = 1;
-    local $SIG{__WARN__} = sub {-- $no_inner } ;
+    local ${^WARN_HOOK} = sub {-- $no_inner } ;
     untie %$hashref;
     return $no_inner;
 }
@@ -1307,7 +1307,7 @@ EOM
     unlink $Dfile;
     my %h ;
     my $a = "";
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
     
     tie %h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE
 	or die "Can't open file: $!\n" ;
@@ -1327,7 +1327,7 @@ EOM
     unlink $Dfile;
     my %h ;
     my $a = "";
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
     
     tie %h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE
 	or die "Can't open file: $!\n" ;
@@ -1561,7 +1561,7 @@ ok(165,1);
     ok(188, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ));
 
     my $warned = '';
-    local $SIG{__WARN__} = sub {$warned = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$warned = $_[0]} ;
 
     # db-put with substr of key
     my %remember = () ;

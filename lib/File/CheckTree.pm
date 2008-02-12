@@ -148,8 +148,8 @@ sub validate {
             {
                 # count warnings, either from valmess or '-r || warn "my msg"'
                 # also, call any pre-existing signal handler for __WARN__
-                my $orig_sigwarn = $SIG{__WARN__};
-                local $SIG{__WARN__} = sub {
+                my $orig_sigwarn = ${^WARN_HOOK};
+                local ${^WARN_HOOK} = sub {
                     ++$Warnings;
                     if ( $orig_sigwarn ) {
                         $orig_sigwarn->(@_);

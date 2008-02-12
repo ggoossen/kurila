@@ -57,7 +57,7 @@ is( $flag, 1, 'and DESTROY() works' );
 # we want some noise, and some way to capture it
 use warnings;
 my $warn;
-local $SIG{__WARN__} = sub {
+local ${^WARN_HOOK} = sub {
 	$warn = $_[0];
 };
 

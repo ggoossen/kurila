@@ -55,6 +55,6 @@ print (($r eq $s)?"ok $test\n":"not ok $test\n"); $test++;
 # warnings safe with zero arguments
 my $notok;
 $^W = 1;
-$SIG{__WARN__} = sub { $notok++ };
+${^WARN_HOOK} = sub { $notok++ };
 abbrev();
 print ($notok ? "not ok $test\n" : "ok $test\n"); $test++;

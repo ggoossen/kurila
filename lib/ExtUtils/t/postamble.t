@@ -36,7 +36,7 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
 
 {
     my $warnings = '';
-    local $SIG{__WARN__} = sub {
+    local ${^WARN_HOOK} = sub {
         $warnings = join '', @_;
     };
 

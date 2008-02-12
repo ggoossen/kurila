@@ -247,7 +247,7 @@ ok(@ary == 3 &&
 {
     # [perl #17064]
     my $warn;
-    local $SIG{__WARN__} = sub { $warn = join '', @_; chomp $warn };
+    local ${^WARN_HOOK} = sub { $warn = join '', @_; chomp $warn };
     my $char = "\x{10f1ff}";
     my @a = split m/\r?\n/, "$char\n";
     ok(@a == 1 && $a[0] eq $char && !defined($warn));

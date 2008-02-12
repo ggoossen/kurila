@@ -52,7 +52,7 @@ while ( ~< *DATA) {
 
 print '1..', scalar @tests, "\n";
 
-$SIG{__WARN__} = sub {
+${^WARN_HOOK} = sub {
     if ($_[0]->{description} =~ m/^Invalid conversion/) {
 	$w = ' INVALID';
     } elsif ($_[0]->{description}=~ m/^Use of uninitialized value/) {

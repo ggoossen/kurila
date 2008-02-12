@@ -109,7 +109,7 @@ sub TIEARRAY {
   if (defined $opts{discipline}) {
     # This avoids a compile-time warning under 5.005
     eval 'binmode($fh, $opts{discipline})';
-    croak $@ if $@ =~ m/unknown discipline/i;
+    croak $@ if $@->{description} =~ m/unknown discipline/i;
     die if $@;
   }
   $opts{fh} = $fh;

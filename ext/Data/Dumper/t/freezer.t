@@ -44,7 +44,7 @@ like($dumped_foo, qr/frozed/,
 # test for warning when an object doesn't have a freeze()
 {
     my $warned = 0;
-    local $SIG{__WARN__} = sub { $warned++ };
+    local ${^WARN_HOOK} = sub { $warned++ };
     my $bar = Test2->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 0, "A missing freeze() shouldn't warn.");
@@ -55,7 +55,7 @@ like($dumped_foo, qr/frozed/,
 {
     local $Data::Dumper::Useperl = 1;
     my $warned = 0;
-    local $SIG{__WARN__} = sub { $warned++ };
+    local ${^WARN_HOOK} = sub { $warned++ };
     my $bar = Test2->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 0, "A missing freeze() shouldn't warn with useperl");
@@ -64,7 +64,7 @@ like($dumped_foo, qr/frozed/,
 # a freeze() which die()s should still trigger the warning
 {
     my $warned = 0;
-    local $SIG{__WARN__} = sub { $warned++; };
+    local ${^WARN_HOOK} = sub { $warned++; };
     my $bar = Test3->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 1, "A freeze() which die()s should warn.");
@@ -74,7 +74,7 @@ like($dumped_foo, qr/frozed/,
 {
     local $Data::Dumper::Useperl = 1;
     my $warned = 0;
-    local $SIG{__WARN__} = sub { $warned++; };
+    local ${^WARN_HOOK} = sub { $warned++; };
     my $bar = Test3->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 1, "A freeze() which die()s should warn with useperl.");

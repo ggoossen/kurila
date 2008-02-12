@@ -25,7 +25,7 @@ plan tests => $tests;
 SKIP: {
 skip "no perlio in this build", $tests unless $Config::Config{useperlio};
 
-$SIG{__WARN__} = sub {
+${^WARN_HOOK} = sub {
     my $err = shift;
     $err =~ m/Subroutine re::(un)?install redefined/ and return;
 };

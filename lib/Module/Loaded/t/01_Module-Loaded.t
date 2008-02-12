@@ -37,7 +37,7 @@ my $Strict  = 'strict';
                                 "   $Strict unloaded" );
 
     ### redefining subs, quell warnings
-    {   local $SIG{__WARN__} = sub {};
+    {   local ${^WARN_HOOK} = sub {};
         my $rv = eval "require $Strict; 1";
         ok( $rv,                "$Strict loaded again" );
     }

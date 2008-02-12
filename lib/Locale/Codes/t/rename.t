@@ -5,7 +5,7 @@
 
 use Locale::Country;
 
-local $SIG{__WARN__} = sub { };		# muffle warnings from carp
+local ${^WARN_HOOK} = sub { };		# muffle warnings from carp
 
 Locale::Country::rename_country('gb' => 'Great Britain');
 

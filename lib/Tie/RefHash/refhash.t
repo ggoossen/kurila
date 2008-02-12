@@ -211,7 +211,7 @@ sub runtests {
 
     foreach (@$tests) {
         my ($result, $warning, $exception);
-        local $SIG{__WARN__} = sub { $warning .= $_[0]->{description} . "\n" };
+        local ${^WARN_HOOK} = sub { $warning .= $_[0]->{description} . "\n" };
         $result = scalar(eval $_);
         if ($@)
          {

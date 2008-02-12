@@ -18,7 +18,7 @@ ok(1); # If we made it this far, we're loaded.
 
 chdir 't' or die "Can't chdir to t/, $!";
 
-use Carp; $SIG{__WARN__} = \&Carp::cluck;
+use Carp; ${^WARN_HOOK} = \&Carp::cluck;
 
 #########################
 

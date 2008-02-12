@@ -6,7 +6,7 @@ BEGIN { plan tests => 1 }
 
 use Pod::Parser;
 use Carp;
-$SIG{__DIE__} = \&Carp::confess;
+${^DIE_HOOK} = \&Carp::confess;
 
 eval {require IO::String;};
 skip($@ ? 'no IO::String' : '', sub {

@@ -10,7 +10,7 @@ my $warn_msg;
 use Carp::Heavy (); # make sure Carp::Heavy is already loaded, because @INC is relative
 
 BEGIN {
-    $SIG{'__WARN__'} = sub { $warn_msg = $_[0]; warn "# $_[0]"; }
+    ${^WARN_HOOK}'__WARN__' = sub { $warn_msg = $_[0]; warn "# $_[0]"; }
 }
 
 if ( $symlink_exists ) { print "1..199\n"; }

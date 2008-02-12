@@ -17,7 +17,7 @@ use TieOut;
 BEGIN { $^W = 1; }
 
 my $warnings = '';
-local $SIG{__WARN__} = sub { $warnings .= $_[0]->message };
+local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
 
 my $TB = Test::Builder->new;
 sub no_warnings {

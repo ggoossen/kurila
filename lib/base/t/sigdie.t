@@ -15,7 +15,7 @@ use base;
 {
     package Test::SIGDIE;
 
-    local $SIG{__DIE__} = sub { 
+    local ${^DIE_HOOK} = sub { 
         ::fail('sigdie not caught, this test should not run') 
     };
     eval {
@@ -30,7 +30,7 @@ use base;
 {
     use lib 't/lib';
     
-    local $SIG{__DIE__};
+    local ${^DIE_HOOK};
     base->import(qw(HasSigDie));
-    ok $SIG{__DIE__}, 'base.pm does not mask SIGDIE';
+    ok ${^DIE_HOOK}, 'base.pm does not mask SIGDIE';
 }

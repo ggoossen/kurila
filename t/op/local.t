@@ -220,20 +220,20 @@ is($a[0].$a[1], "Xb");
 eval { $SIG{TERM} = 'foo' };
 like $@->{description}, qr/signal handler should be glob or .../;
 $SIG{INT} = \&foo;
-$SIG{__WARN__} = $SIG{INT};
+${^WARN_HOOK} = $SIG{INT};
 {
     local($SIG{TERM}) = $SIG{TERM};
     local($SIG{INT}) = $SIG{INT};
-    local($SIG{__WARN__}) = $SIG{__WARN__};
+    local(${^WARN_HOOK}) = ${^WARN_HOOK};
     is($SIG{TERM}, undef);
     is($SIG{INT}, \&foo);
-    is($SIG{__WARN__}, \&foo);
+    is(${^WARN_HOOK}, \&foo);
     local($SIG{INT});
     delete $SIG{__WARN__};
 }
 is($SIG{TERM}, undef);
 is($SIG{INT}, \&foo);
-is($SIG{__WARN__}, \&foo);
+is(${^WARN_HOOK}, \&foo);
 {
     my $d = join("\n", map { "$_=>$SIG{$_}" } sort keys %SIG);
     local %SIG = %SIG;

@@ -43,7 +43,7 @@ sub new {
 package main;
 
 my $warnings = '';
-local $SIG{__WARN__} = sub { $warnings = join '', @_ };
+local ${^WARN_HOOK} = sub { $warnings = join '', @_ };
 
 # overloaded object as name
 my $obj = Overloaded->new('foo');

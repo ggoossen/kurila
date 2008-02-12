@@ -111,7 +111,7 @@ else {
 }
 
 # warnings
-$SIG{__WARN__} = sub {
+${^WARN_HOOK} = sub {
     ++ $w if $_[0]->{description} =~ m/^6-ARG sockaddr_in call is deprecated/ ;
 } ;
 $w = 0 ;

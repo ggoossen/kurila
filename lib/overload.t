@@ -873,7 +873,7 @@ unless ($aaa) {
 {
     # check the Odd number of arguments for overload::constant warning
     my $a = "" ;
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
     $x = eval ' overload::constant "integer" ; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -884,7 +884,7 @@ unless ($aaa) {
 {
     # check the `$_[0]' is not an overloadable type warning
     my $a = "" ;
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
     $x = eval ' overload::constant "fred" => sub {} ; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -895,7 +895,7 @@ unless ($aaa) {
 {
     # check the `$_[1]' is not a code reference warning
     my $a = "" ;
-    local $SIG{__WARN__} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
     $x = eval ' overload::constant "integer" => 1; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -1026,7 +1026,7 @@ like ($@->{description}, qr/zap/);
 
    my $warn;
    {  
-     local $SIG{__WARN__} = sub { $warn++ };
+     local ${^WARN_HOOK} = sub { $warn++ };
       my $x = t229->new;
       my $y = $x;
       eval { $y++ };
@@ -1248,7 +1248,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
 
     package main;
     local $^W = 1;
-    local $SIG{__WARN__} = sub { $warning = $_[0] };
+    local ${^WARN_HOOK} = sub { $warning = $_[0] };
 
     my $f = bless [], 'nomethod_false';
     ($warning, $method) = ("", "");

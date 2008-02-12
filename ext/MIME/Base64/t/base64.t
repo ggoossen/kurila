@@ -345,7 +345,7 @@ sub decodeTest
 {
     print "# decode test\n";
 
-    local $SIG{__WARN__} = sub { print $_[0] };  # avoid warnings on stderr
+    local ${^WARN_HOOK} = sub { print $_[0] };  # avoid warnings on stderr
 
     my @decode_tests = (
 	['YWE='   => ASCII('aa')],

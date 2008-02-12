@@ -18,7 +18,7 @@ our @tests = (
 plan tests => 4 * @tests + 2;
 my $W = "";
 
-$SIG{__WARN__} = sub { $W.=join("",@_); };
+${^WARN_HOOK} = sub { $W.=join("",@_); };
 sub _u($$) { "$_[0] is ".(defined $_[1] ? "'$_[1]'" : "undef") }
 
 $_ = '123-456-789';

@@ -1071,7 +1071,7 @@ $test++;
 
 our $w = 0;
 {
-    local $SIG{__WARN__} = sub { $w = 1 };
+    local ${^WARN_HOOK} = sub { $w = 1 };
     local $^W = 1;
 	$w = 1 if ("1\n" x 102) =~ m/^\s*\n/m;
 }
@@ -1565,7 +1565,7 @@ EOT
     # from japhy
     my $w;
     use warnings;    
-    local $SIG{__WARN__} = sub { $w .= shift->{description} . "\n" };
+    local ${^WARN_HOOK} = sub { $w .= shift->{description} . "\n" };
 
     $w = "";
     eval 'qr/(?c)/';
@@ -3259,7 +3259,7 @@ if ($ordA == 193) {
     {
         my $code;
         my $w="";
-        local $SIG{__WARN__} = sub { $w.=shift->message };
+        local ${^WARN_HOOK} = sub { $w.=shift->message };
         eval($code=<<'EOFTEST') or die "$@\n$code\n";
         {
             use warnings;
@@ -4006,7 +4006,7 @@ sub kt
     use warnings;
     local $Message = "ASCII pattern that really is utf8";
     my @w;
-    local $SIG{__WARN__}=sub{push @w,"@_"};
+    local ${^WARN_HOOK}=sub{push @w,"@_"};
     my $c=qq(\x{DF}); 
     ok($c=~m/${c}|\x{100}/);
     ok(@w==0);

@@ -368,7 +368,7 @@ sub foo { my $a = "a"; return $a . $a++ . $a++ }
   use warnings qw(NONFATAL all);;
   my $warning;
   {
-      local $SIG{__WARN__} = sub {
+      local ${^WARN_HOOK} = sub {
           $warning = $_[0]->message;
       };
       my $junk = pack("p", &foo);
@@ -951,7 +951,7 @@ SKIP: {
 	use warnings qw(NONFATAL all);;
 
         my $bad = pack("U0C", 255);
-        local $SIG{__WARN__} = sub { $@ = $_[0]; };
+        local ${^WARN_HOOK} = sub { $@ = $_[0]; };
         my @null = unpack('U0U', $bad);
         like($@->{description}, qr/^Malformed UTF-8 character /);
     }
@@ -1240,7 +1240,7 @@ SKIP: {
 { # syntax checks (W.Laun)
   use warnings qw(NONFATAL all);;
   my @warning;
-  local $SIG{__WARN__} = sub {
+  local ${^WARN_HOOK} = sub {
       push( @warning, $_[0]->{description} );
   };
   eval { my $s = pack( 'Ax![4c]A', 1..5 ); };
@@ -1412,7 +1412,7 @@ is(scalar unpack('A /A /A Z20', '3004bcde'), 'bcde');
 
   use warnings qw(NONFATAL all);;
   my $warning;
-  local $SIG{__WARN__} = sub {
+  local ${^WARN_HOOK} = sub {
       $warning = $_[0];
   };
   @b = unpack "x[C] x[$t] X[$t] X[C] $t", "$p\0";
@@ -1504,7 +1504,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 {
     use warnings qw(NONFATAL all);;
     my $warning;
-    local $SIG{__WARN__} = sub {
+    local ${^WARN_HOOK} = sub {
         $warning = $_[0]->message;
     };
     my $out = pack("u99", "foo" x 99);

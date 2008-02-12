@@ -10,7 +10,7 @@ BEGIN {
 
 plan 'no_plan';
 
-$SIG{__WARN__} = sub { die @_ };
+${^WARN_HOOK} = sub { die @_ };
 
 our ($anon1, $anon2, $anon3);
 

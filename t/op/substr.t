@@ -8,7 +8,7 @@ use strict;
 our ($w, $FATAL_MSG, $x);
 
 $a = 'abcdefxyz';
-$SIG{__WARN__} = sub {
+${^WARN_HOOK} = sub {
      if ($_[0]->{description} =~ m/^substr outside of string/) {
           $w++;
      } elsif ($_[0]->{description} =~ m/^Attempt to use reference as lvalue in substr/) {

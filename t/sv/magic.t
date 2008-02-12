@@ -1,18 +1,8 @@
 #!./perl
 
-# Test default value '$SIG{__DIE__}'
-# Internals::peek(\(my $x = $SIG{__DIE__}));
-# #$SIG{__DIE__} = 'DEFAULT';
-#local $SIG{__DIE__} = $SIG{__DIE__};
-#${^TAINT} = 1;
-#${^DIEHOOK} = 2;
-Internals::peek(\${^DIE_HOOK});
-# ($SIG{__DIE__} eq \&error::write_to_stderr);
-
-__END__
 BEGIN {
     $| = 1;
-    $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
+    ${^WARN_HOOK} = sub { die "Dying on warning: ", @_ };
 }
 
 use warnings;
@@ -360,7 +350,7 @@ else {
 {
     my $ok = 1;
     my $warn = '';
-    local $SIG{'__WARN__'} = sub { $ok = 0; $warn = join '', @_; };
+    local ${^WARN_HOOK}'__WARN__' = sub { $ok = 0; $warn = join '', @_; };
     $! = undef;
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
 }

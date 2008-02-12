@@ -49,7 +49,7 @@ foreach (Foo->new) {
 }
 
 {
-    local $SIG{__WARN__} = sub {
+    local ${^WARN_HOOK} = sub {
         return if $_[0] =~ m/^Pseudo-hashes are deprecated/ 
     };
     my $phash;
