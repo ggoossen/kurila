@@ -40,19 +40,6 @@ sub _rebuild_cache {
 
 sub heavy_export {
 
-    # First make import warnings look like they're coming from the "use".
-    local $SIG{__WARN__} = sub {
-	my $text = shift;
-	if ($text =~ s/ at \S*Exporter\S*.pm line \d+.*\n//) {
-	    require Carp;
-	    local $Carp::CarpLevel = 1;	# ignore package calling us too.
-	    Carp::carp($text);
-	}
-	else {
-	    warn $text;
-	}
-    };
-
     my($pkg, $callpkg, @imports) = @_;
     my($type, $sym, $cache_is_current, $oops);
     my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("${pkg}::EXPORT")}},
