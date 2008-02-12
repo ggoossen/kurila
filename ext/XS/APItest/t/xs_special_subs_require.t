@@ -89,7 +89,7 @@ is($XS::APItest::END_called_PP, undef, "END not yet called");
 
 {
     my @trap;
-    local $SIG{__WARN__} = sub { push @trap, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @trap, $_[0]->{description} };
     require XS::APItest;
 
     @trap = sort @trap;

@@ -13,7 +13,7 @@ print "not " unless $@->{description} eq $err;
 print "ok 1\n";
 
 eval {
-    local $SIG{__DIE__} = sub { print "ok ", $_[0]->{description}, "\n" } ;
+    local ${^DIE_HOOK} = sub { print "ok ", $_[0]->{description}, "\n" } ;
 
     die 2;
 

@@ -212,7 +212,7 @@ ERR
 
 {
     my $warnings;
-    local $SIG{__WARN__} = sub { $warnings .= $_[0]->message };
+    local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
 
 # line 211
     cmp_ok( 42,    '==', "foo", '       == with strings' );

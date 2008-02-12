@@ -24,7 +24,7 @@ ok( defined &ExtUtils::Liblist::ext,
 
 {
     my @warn;
-    local $SIG{__WARN__} = sub {push @warn, [$_[0]->{description}]};
+    local ${^WARN_HOOK} = sub {push @warn, [$_[0]->{description}]};
 
     my $ll = bless {}, 'ExtUtils::Liblist';
     my @out = $ll->ext('-ln0tt43r3_perl');

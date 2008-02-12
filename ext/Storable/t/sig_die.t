@@ -34,8 +34,8 @@ BEGIN {
 BEGIN { plan tests => 1 }
 
 my @warns;
-$SIG{__WARN__} = sub { push @warns, shift };
-$SIG{__DIE__}  = sub { require Carp; warn Carp::longmess(); warn "Evil die!" };
+${^WARN_HOOK} = sub { push @warns, shift };
+${^DIE_HOOK}  = sub { require Carp; warn Carp::longmess(); warn "Evil die!" };
 
 require Storable;
 

@@ -2,7 +2,7 @@
 
 BEGIN {
     $| = 1;
-    $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
+    ${^WARN_HOOK} = sub { die "Dying on warning: ", @_ };
 }
 
 use warnings;
@@ -350,7 +350,7 @@ else {
 {
     my $ok = 1;
     my $warn = '';
-    local $SIG{'__WARN__'} = sub { $ok = 0; $warn = join '', @_; };
+    local ${^WARN_HOOK} = sub { $ok = 0; $warn = join '', @_; };
     $! = undef;
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
 }

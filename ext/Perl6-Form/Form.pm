@@ -377,7 +377,7 @@ sub jleft {
 		}
 		my ($fail, $str);
 		{
-			local $SIG{__WARN__} = sub { $fail = 1 };
+			local ${^WARN_HOOK} = sub { $fail = 1 };
 			$str = sprintf('%*.*f',$val{width},$places,$orig);
 		}
 		if ($fail) {

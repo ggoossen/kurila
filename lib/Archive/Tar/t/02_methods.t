@@ -142,7 +142,7 @@ chmod 0644, $COMPRESS_FILE;
         local $Archive::Tar::WARN  = 1;
 
         my $warnings = '';
-        local $SIG{__WARN__} = sub { $warnings .= "@_" };
+        local ${^WARN_HOOK} = sub { $warnings .= "@_" };
         
         my $rv = $tar->contains_file( $$ );
         ok( !$rv,                   "Does not contain file '$$'" );

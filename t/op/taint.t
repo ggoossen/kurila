@@ -204,7 +204,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
 	local $ENV{PATH} = $tmp;
 	test !eval { `$echo 1` };
-	test $@ =~ m/^Insecure directory in \$ENV{PATH}/, $@;
+	test $@->{description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
     }
 
     SKIP: {
@@ -212,14 +212,14 @@ my $TEST = catfile(curdir(), 'TEST');
 
 	$ENV{'DCL$PATH'} = $TAINT;
 	test  eval { `$echo 1` } eq '';
-	test $@ =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
+	test $@->{description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
 	SKIP: {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
 	    $ENV{'DCL$PATH'} = $tmp;
 	    test eval { `$echo 1` } eq '';
-	    test $@ =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
+	    test $@->{description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
 	}
 	$ENV{'DCL$PATH'} = '';
     }
@@ -312,10 +312,10 @@ SKIP: {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
     my @globs = eval { glob("*") };
-    test @globs == 0 && $@ =~ m/^Insecure dependency/;
+    test @globs == 0 && $@->{description} =~ m/^Insecure dependency/;
 
     @globs = eval { glob '*' };
-    test @globs == 0 && $@ =~ m/^Insecure dependency/;
+    test @globs == 0 && $@->{description} =~ m/^Insecure dependency/;
 }
 
 # Output of commands should be tainted
@@ -845,7 +845,7 @@ SKIP: {
     use warnings;
 
     my $saw_warning = 0;
-    local $SIG{__WARN__} = sub { $saw_warning = 1 };
+    local ${^WARN_HOOK} = sub { $saw_warning = 1 };
 
     sub fmi {
 	my $divnum = shift()/1;
@@ -1163,7 +1163,7 @@ SKIP:
 	    }
 	    close $pipe;
 	};
-	test $@ !~ m/Insecure \$ENV/, 'fork triggers %ENV check';
+	test $@->{description} !~ m/Insecure \$ENV/, 'fork triggers %ENV check';
 	is $@, '',               'pipe/fork/open/close failed';
 	eval {
 	    open my $pipe, "|-", "$Invoke_Perl -e 1";

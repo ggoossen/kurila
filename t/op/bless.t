@@ -96,7 +96,7 @@ expected(bless({}, $1), "E", "HASH");
 # no class, or empty string (with a warning), or undef (with two)
 expected(bless([]), 'main', "ARRAY");
 {
-    local $SIG{__WARN__} = sub { push @w, join '', @_ };
+    local ${^WARN_HOOK} = sub { push @w, join '', @_ };
     use warnings;
 
     my $m = bless [];

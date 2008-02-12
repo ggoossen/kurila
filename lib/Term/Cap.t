@@ -91,7 +91,7 @@ like( $@->{description}, qr/support: \(nonsense\)/,
 	'Trequire() should croak with unsupported cap' );
 
 my $warn;
-local $SIG{__WARN__} = sub {
+local ${^WARN_HOOK} = sub {
 	$warn = $_[0];
 };
 

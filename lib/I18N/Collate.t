@@ -23,7 +23,7 @@ print "ok 2\n";
 
 {
     use warnings;
-    local $SIG{__WARN__} = sub { $@ = $_[0] };
+    local ${^WARN_HOOK} = sub { $@ = $_[0] };
     $b = I18N::Collate->new("foo");
     print "not " unless $@->{description} =~ m/\bHAS BEEN DEPRECATED\b/;
     print "ok 3\n";

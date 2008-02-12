@@ -144,7 +144,7 @@ while (@death)
 
 
 our $warning;
-$SIG{__WARN__} = sub { $warning = shift };
+${^WARN_HOOK} = sub { $warning = shift };
 
 while (@warning)
 {

@@ -508,7 +508,7 @@ SKIP: {
     my $failed;
     my $warning = '';
     eval {
-        local $SIG{__WARN__} = sub { $warning .= $_[0]->{description} . "\n"; };
+        local ${^WARN_HOOK} = sub { $warning .= $_[0]->{description} . "\n"; };
         ($totals, $failed) = Test::Harness::execute_tests(tests => [$test_path], out => \*NULL);
     };
 

@@ -273,7 +273,7 @@ sub test_arylen {
     local $^W = 1;
     is ($$ref, undef, "\$# on freed array is undef");
     my @warn;
-    local $SIG{__WARN__} = sub {push @warn, $_[0]->message};
+    local ${^WARN_HOOK} = sub {push @warn, $_[0]->message};
     $$ref = 1000;
     is (scalar @warn, 1);
     like ($warn[0], qr/^Attempt to set length of freed array/);

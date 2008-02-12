@@ -35,7 +35,7 @@ use_ok( $Class );
 
 
                     local *STDERR;
-                    local $SIG{__WARN__} = sub { };
+                    local ${^WARN_HOOK} = sub { };
                     
                     my $ref = $Class->can( $name );
 

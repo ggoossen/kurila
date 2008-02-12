@@ -46,7 +46,7 @@ is( $opt{i}, 'j',		q/option -i is 'j'/ );
 ok( !defined $opt_i,		'$opt_i still undefined' );
 
 # Try illegal options, but avoid printing of the error message
-$SIG{__WARN__} = sub { $warning = $_[0] };
+${^WARN_HOOK} = sub { $warning = $_[0] };
 @ARGV = qw(-h help);
 
 ok( !getopts("xf:y"),		'getopts fails for an illegal option' );

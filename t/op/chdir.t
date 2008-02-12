@@ -128,7 +128,7 @@ sub check_env {
         is( abs_path, $Cwd,       '  and back again' );
 
         my $warning = '';
-        local $SIG{__WARN__} = sub { $warning .= $_[0]->{description} . "\n" };
+        local ${^WARN_HOOK} = sub { $warning .= $_[0]->{description} . "\n" };
 
 
         # Check the deprecated chdir(undef) feature.

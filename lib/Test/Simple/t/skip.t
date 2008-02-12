@@ -54,7 +54,7 @@ SKIP: {
 
 {
     my $warning;
-    local $SIG{__WARN__} = sub { $warning = $_[0]->message };
+    local ${^WARN_HOOK} = sub { $warning = $_[0]->message };
     SKIP: {
         # perl gets the line number a little wrong on the first
         # statement inside a block.
@@ -85,7 +85,7 @@ SKIP: {
 
 {
     my $warning = '';
-    local $SIG{__WARN__} = sub { $warning .= $_[0]->message };
+    local ${^WARN_HOOK} = sub { $warning .= $_[0]->message };
 
     SKIP: {
         skip 1, "This is backwards" if 1;

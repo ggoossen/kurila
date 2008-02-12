@@ -28,7 +28,7 @@ is( $ENV{PERL_RE_COLORS}, "su\tn\tny", '... or use $ENV{PERL_RE_COLORS}' );
 # bits
 # get on
 my $warn;
-local $SIG{__WARN__} = sub {
+local ${^WARN_HOOK} = sub {
 	$warn = $_[0]->{description};
 };
 #eval { re::bits(1) };

@@ -9,7 +9,7 @@ use warnings;
 use vars qw{ @warnings };
 
 BEGIN {
-    $SIG{'__WARN__'} = sub { push @warnings, $_[0]->message };
+    ${^WARN_HOOK}'__WARN__' = sub { push @warnings, $_[0]->message };
     $| = 1;
 }
 

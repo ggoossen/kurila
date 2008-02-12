@@ -22,7 +22,7 @@ sub ok {
     print "ok $test\n";
 }
 
-$SIG{__WARN__} = sub { 1; }; # avoid some spurious warnings
+${^WARN_HOOK} = sub { 1; }; # avoid some spurious warnings
 
 print "1..24\n";
 

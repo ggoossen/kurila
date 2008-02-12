@@ -73,7 +73,7 @@ my $tmpl = {
     };
     
     my $warnings = '';
-    local $SIG{__WARN__} = sub { $warnings .= $_[0]->message };
+    local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
     
     my $res = $term->get_reply( %$args );
 
@@ -92,7 +92,7 @@ my $tmpl = {
     };
     
     my $warnings = '';
-    local $SIG{__WARN__} = sub { $warnings .= "@_" };
+    local ${^WARN_HOOK} = sub { $warnings .= "@_" };
     
     my $res = $term->get_reply( %$args );
 

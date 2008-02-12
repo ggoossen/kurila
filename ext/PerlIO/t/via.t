@@ -39,7 +39,7 @@ is($a, $b, 'compare original data with filtered version');
 
 {
     my $warnings = '';
-    local $SIG{__WARN__} = sub { $warnings = $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { $warnings = $_[0]->{description} };
 
     use warnings 'layer';
 

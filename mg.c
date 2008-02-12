@@ -1180,19 +1180,7 @@ Perl_magic_clearsig(pTHX_ SV *sv, MAGIC *mg)
     dVAR;
     register const char * const s = MgPV_nolen_const(mg);
     PERL_UNUSED_ARG(sv);
-    if (*s == '_') {
-	SV** svp = NULL;
-	if (strEQ(s,"__DIE__"))
-            svp = &PL_diehook;
-        else if (strEQ(s,"__WARN__") && PL_warnhook != PERL_WARNHOOK_FATAL)
-            svp = &PL_warnhook;
-        if (svp && *svp) {
-            SV *const to_dec = *svp;
-            *svp = NULL;
-            SvREFCNT_dec(to_dec);
-        }
-    }
-    else {
+    {
         /* Are we clearing a signal entry? */
         const I32 i = whichsig(s);
         if (i > 0) {
@@ -1382,21 +1370,7 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
     }
 
     s = MgPV_const(mg,len);
-    if (*s == '_') {
-        if (strEQ(s,"__DIE__"))
-            svp = &PL_diehook;
-        else if (strEQ(s,"__WARN__"))
-            svp = &PL_warnhook;
-        else
-            Perl_croak(aTHX_ "No such hook: %s", s);
-        i = 0;
-        if (*svp) {
-            if (*svp != PERL_WARNHOOK_FATAL)
-                to_dec = *svp;
-            *svp = NULL;
-        }
-    }
-    else {
+    {
         i = whichsig(s);        /* ...no, a brick */
         if (i <= 0) {
             if (ckWARN(WARN_SIGNAL))
@@ -1453,9 +1427,6 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
             (void)rsignal(i, (Sighandler_t) SIG_IGN);
 #endif
         }
-	else {
-	    *svp = PERL_DIEHOOK_IGNORE;
-	}
     }
     else {
         if (i) {
@@ -1465,10 +1436,6 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 #else
             (void)rsignal(i, (Sighandler_t) SIG_DFL);
 #endif
-	}
-	else {
-	    /* FIXME default handler should not be IGNORE */
-	    *svp = PERL_DIEHOOK_IGNORE;
 	}
     }
 #ifdef HAS_SIGPROCMASK

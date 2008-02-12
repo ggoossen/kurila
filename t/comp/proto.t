@@ -611,7 +611,7 @@ print "ok ", $i++, "\n";
 {
   use warnings 'syntax';
   my $warn = "";
-  local $SIG{__WARN__} = sub { $warn .= $_[0]->{description} . "\n" };
+  local ${^WARN_HOOK} = sub { $warn .= $_[0]->{description} . "\n" };
   
   eval 'sub badproto (@bar) { 1; }';
   print "not " unless $warn =~ m/Illegal character in prototype for main::badproto : \@bar/;

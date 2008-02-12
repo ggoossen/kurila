@@ -87,7 +87,7 @@ if ($^O eq 'VMS') {
     # Nothing for OS/390 (z/OS) dynamic.
    } else { # Not MSWin32 or OS/390 (z/OS) dynamic.
     push(@cmd,"-L$lib",'-lperl');
-    local $SIG{__WARN__} = sub {
+    local ${^WARN_HOOK} = sub {
 	warn $_[0] unless $_[0] =~ m/No library found for .*perl/
     };
     push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!

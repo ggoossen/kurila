@@ -40,7 +40,7 @@ my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0);
 
 {
 	my $bad;
-	local($SIG{__WARN__})=sub { $bad=1; };
+	local(${^WARN_HOOK})=sub { $bad=1; };
 	sigaction(SIGHUP, $newaction, $oldaction);
 	ok(!$bad, "no warnings");
 }
@@ -130,7 +130,7 @@ SKIP: {
 }
 
 {
-    local $SIG{__WARN__} = sub { }; # Just suffer silently.
+    local ${^WARN_HOOK} = sub { }; # Just suffer silently.
 
     my $hup20;
     my $hup21;

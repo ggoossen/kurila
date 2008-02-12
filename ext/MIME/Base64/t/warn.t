@@ -26,7 +26,7 @@ print "1..1\n";
 use warnings;
 
 my @warn;
-$SIG{__WARN__} = sub { push(@warn, $_[0]->{description} . "\n") };
+${^WARN_HOOK} = sub { push(@warn, $_[0]->{description} . "\n") };
 
 warn;
 my $a;

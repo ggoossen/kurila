@@ -92,7 +92,7 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " $_[0]" }; }
 # Verify that the parsing of overriden keywords isn't messed up
 # by the indirect object notation
 {
-    local $SIG{__WARN__} = sub {
+    local ${^WARN_HOOK} = sub {
 	::like( $_[0]->message, qr/^ok overriden at/ );
     };
     BEGIN { *OverridenWarn::warn = sub { CORE::warn "@_ overriden"; }; }

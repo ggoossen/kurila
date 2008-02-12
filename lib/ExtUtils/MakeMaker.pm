@@ -807,7 +807,7 @@ sub mv_all_methods {
     # still trying to reduce the list to some reasonable minimum --
     # because I want to make it easier for the user. A.K.
 
-    local $SIG{__WARN__} = sub { 
+    local ${^WARN_HOOK} = sub { 
         # can't use 'no warnings redefined', 5.6 only
         warn @_ unless $_[0] =~ m/^Subroutine .* redefined/ 
     };

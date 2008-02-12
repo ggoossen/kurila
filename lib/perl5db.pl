@@ -1390,8 +1390,8 @@ sub safe_do {
     my $file = shift;
 
     # Just exactly what part of the word "CORE::" don't you understand?
-    local $SIG{__WARN__};
-    local $SIG{__DIE__};
+    local ${^WARN_HOOK};
+    local ${^DIE_HOOK};
 
     unless ( is_safe_file($file) ) {
         CORE::warn <<EO_GRIPE;
@@ -2302,8 +2302,8 @@ completely replacing it.
 
                     # Squelch signal handling; we want to keep control here
                     # if something goes loco during the alias eval.
-                    local $SIG{__DIE__};
-                    local $SIG{__WARN__};
+                    local ${^DIE_HOOK};
+                    local ${^WARN_HOOK};
 
                     # This is a command, so we eval it in the DEBUGGER's
                     # scope! Otherwise, we can't see the special debugger
@@ -2868,8 +2868,8 @@ mess us up.
                     if ( $inpat ne "" ) {
 
                         # Turn of warn and die procesing for a bit.
-                        local $SIG{__DIE__};
-                        local $SIG{__WARN__};
+                        local ${^DIE_HOOK};
+                        local ${^WARN_HOOK};
 
                         # Create the pattern.
                         eval '$inpat =~ m' . "\a$inpat\a";
@@ -2943,8 +2943,8 @@ Same as for C</>, except the loop runs backwards.
                     if ( $inpat ne "" ) {
 
                         # Turn off die & warn handlers.
-                        local $SIG{__DIE__};
-                        local $SIG{__WARN__};
+                        local ${^DIE_HOOK};
+                        local ${^WARN_HOOK};
                         eval '$inpat =~ m' . "\a$inpat\a";
 
                         if ( $@ ne "" ) {
@@ -3201,8 +3201,8 @@ Manipulates C<%alias> to add or list command aliases.
                         $alias{$k} = "s\a$k\a$v\a";
 
                         # Turn off standard warn and die behavior.
-                        local $SIG{__DIE__};
-                        local $SIG{__WARN__};
+                        local ${^DIE_HOOK};
+                        local ${^WARN_HOOK};
 
                         # Is it valid Perl?
                         unless ( eval "sub \{ s\a$k\a$v\a \}; 1" ) {
@@ -7562,7 +7562,7 @@ sub diesignal {
     if ( defined &Carp::longmess ) {
 
         # Don't recursively enter the warn handler, since we're carping.
-        local $SIG{__WARN__} = '';
+        local ${^WARN_HOOK} = '';
 
         # Skip two levels before reporting traceback: we're skipping
         # mydie and confess.
@@ -7599,8 +7599,8 @@ sub dbwarn {
 
     # Turn off warn and die handling to prevent recursive entries to this
     # routine.
-    local $SIG{__WARN__} = '';
-    local $SIG{__DIE__}  = '';
+    local ${^WARN_HOOK} = '';
+    local ${^DIE_HOOK}  = '';
 
     # Load Carp if we can. If $^S is false (current thing being compiled isn't
     # done yet), we may not be able to do a require.
@@ -7649,13 +7649,13 @@ displaying the exception via its C<dbwarn()> routine.
 sub dbdie {
     local $frame         = 0;
     local $doret         = -2;
-    local $SIG{__DIE__}  = '';
-    local $SIG{__WARN__} = '';
+    local ${^DIE_HOOK}  = '';
+    local ${^WARN_HOOK} = '';
     my $i      = 0;
     my $ineval = 0;
     my $sub;
     if ( $dieLevel +> 2 ) {
-        local $SIG{__WARN__} = \&dbwarn;
+        local ${^WARN_HOOK} = \&dbwarn;
         &warn(@_);    # Yell no matter what
         return;
     }
@@ -7701,13 +7701,13 @@ being debugged in place.
 
 sub warnLevel {
     if (@_) {
-        $prevwarn = $SIG{__WARN__} unless $warnLevel;
+        $prevwarn = ${^WARN_HOOK} unless $warnLevel;
         $warnLevel = shift;
         if ($warnLevel) {
-            $SIG{__WARN__} = \&DB::dbwarn;
+            ${^WARN_HOOK} = \&DB::dbwarn;
         }
         elsif ($prevwarn) {
-            $SIG{__WARN__} = $prevwarn;
+            ${^WARN_HOOK} = $prevwarn;
         }
     } ## end if (@_)
     $warnLevel;
@@ -7724,12 +7724,12 @@ zero lets you use your own C<die()> handler.
 sub dieLevel {
     local $\ = '';
     if (@_) {
-        $prevdie = $SIG{__DIE__} unless $dieLevel;
+        $prevdie = ${^DIE_HOOK} unless $dieLevel;
         $dieLevel = shift;
         if ($dieLevel) {
 
             # Always set it to dbdie() for non-zero values.
-            $SIG{__DIE__} = \&DB::dbdie;    # if $dieLevel < 2;
+            ${^DIE_HOOK} = \&DB::dbdie;    # if $dieLevel < 2;
 
             # No longer exists, so don't try  to use it.
             #$SIG{__DIE__} = \&DB::diehard if $dieLevel >= 2;
@@ -7747,7 +7747,7 @@ sub dieLevel {
 
         # Put the old one back if there was one.
         elsif ($prevdie) {
-            $SIG{__DIE__} = $prevdie;
+            ${^DIE_HOOK} = $prevdie;
             print $OUT "Default die handler restored.\n";
         }
     } ## end if (@_)

@@ -610,7 +610,7 @@ if( $opt_v ){
     my $beta_version = $temp_version =~ s/(\d)_(\d\d)/$1$2/;
     my $notnum;
     {
-        local $SIG{__WARN__} = sub { $notnum = 1 };
+        local ${^WARN_HOOK} = sub { $notnum = 1 };
         use warnings 'numeric';
         $temp_version = 0+$temp_version;
     }

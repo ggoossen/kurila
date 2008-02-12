@@ -111,7 +111,7 @@ close(F);
     my $w;
     {
 	use warnings 'utf8';
-	local $SIG{__WARN__} = sub { $w = $_[0] };
+	local ${^WARN_HOOK} = sub { $w = $_[0] };
 	print F $a;
         ok( (!$@));
 	ok( ! $w, , "No 'Wide character in print' warning" );
@@ -155,7 +155,7 @@ SKIP: {
 	my @warnings;
 	open F, "<:utf8", "a" or die $!;
 	$x = ~< *F; chomp $x;
-	local $SIG{__WARN__} = sub { push @warnings, $_[0]->message; };
+	local ${^WARN_HOOK} = sub { push @warnings, $_[0]->message; };
 	eval { sprintf "%vd\n", $x };
 	is (scalar @warnings, 1);
 	like ($warnings[0], qr/Malformed UTF-8 character \(unexpected continuation byte 0x82, with no preceding start byte/);
@@ -240,7 +240,7 @@ is($failed, undef);
     # if it finds bad UTF-8 (:encoding(utf8) works this way)
     use warnings 'utf8';
     undef $@;
-    local $SIG{__WARN__} = sub { $@ = shift };
+    local ${^WARN_HOOK} = sub { $@ = shift };
     open F, ">", "a";
     binmode F;
     my ($chrE4, $chrF6) = ("\x[E4]", "\x[F6]");

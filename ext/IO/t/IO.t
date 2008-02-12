@@ -38,7 +38,7 @@ my @default = map { "IO/$_.pm" } qw( Handle Seekable File Pipe Socket Dir );
 delete @INC{ @default };
 
 my $warn = '' ;
-local $SIG{__WARN__} = sub { $warn = $_[0]->{description} } ;
+local ${^WARN_HOOK} = sub { $warn = $_[0]->{description} } ;
 
 {
     no warnings ;

@@ -122,7 +122,7 @@ is $testimport->[1], "joe", "testimport is still 'joe'";
 
     local $testuse::VERSION = '35.36';
     eval "use testuse v33.55";
-    like ($@, '');
+    like ($@->{description}, '');
 
     eval "use testuse v100.105";
     like ($@->message, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);

@@ -122,7 +122,7 @@ BEGIN {++$ntests}
 
 {
     my $w = "" ;
-    local $SIG{__WARN__} = sub {$w = shift->message} ;
+    local ${^WARN_HOOK} = sub {$w = shift->message} ;
     eval 'sub w1 ($) { use warnings "deprecated"; use attrs "locked"; $_[0]++ }';
     (print "not "), $failed=1 if $@;
     print "ok ",++$test,"\n";

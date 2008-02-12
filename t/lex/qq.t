@@ -54,7 +54,7 @@ is(qq{ \{ 1 \} }, ' { 1 } ', " curly braces inside curly braces");
 is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
 
 {
-    local $SIG{__WARN__} = sub { };
+    local ${^WARN_HOOK} = sub { };
     is (eval '"\x53"', chr 83);
     is (eval '"\x4EE"', chr (78) . 'E');
     is (eval '"\x4i"', chr (4) . 'i');	# This will warn

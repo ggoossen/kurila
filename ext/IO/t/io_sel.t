@@ -117,7 +117,7 @@ print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 21\n";
 
 # check warnings
-$SIG{__WARN__} = sub { 
+${^WARN_HOOK} = sub { 
     ++ $w 
       if $_[0]->{description} =~ m/^Call to deprecated method 'has_error', use 'has_exception'/ ;
     } ;

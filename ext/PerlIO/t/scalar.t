@@ -106,7 +106,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local $SIG{__WARN__} = sub { $warn++ };
+    local ${^WARN_HOOK} = sub { $warn++ };
     open my $fh, '>', \my $scalar;
     print $fh "foo";
     close $fh;

@@ -56,7 +56,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 # check %NNN$ for range bounds
 {
     my ($warn, $bad) = (0,0);
-    local $SIG{__WARN__} = sub {
+    local ${^WARN_HOOK} = sub {
 	if ($_[0]->{description} =~ m/uninitialized/) {
 	    $warn++
 	}
@@ -75,7 +75,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 {
     foreach my $ord (0 .. 255) {
 	my $bad = 0;
-	local $SIG{__WARN__} = sub {
+	local ${^WARN_HOOK} = sub {
 	    if ($_[0]->{description} !~ m/^Invalid conversion in sprintf/) {
 		warn $_[0];
 		$bad++;

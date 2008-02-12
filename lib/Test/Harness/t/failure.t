@@ -31,7 +31,7 @@ my $SAMPLE_TESTS = $ENV{PERL_CORE}
 PASSING: {
     prepare_for_death();
     eval {
-        local $SIG{__DIE__} = \&signal_death;
+        local ${^DIE_HOOK} = \&signal_death;
         runtests( File::Spec->catfile( $SAMPLE_TESTS, "simple" ) );
     };
     ok( !$@, "simple lives" );
@@ -41,7 +41,7 @@ PASSING: {
 FAILING: {
     prepare_for_death();
     eval {
-        local $SIG{__DIE__} = \&signal_death;
+        local ${^DIE_HOOK} = \&signal_death;
         runtests( File::Spec->catfile( $SAMPLE_TESTS, "too_many" ) );
     };
     ok( $@, "$@" );

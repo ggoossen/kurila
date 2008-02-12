@@ -50,7 +50,7 @@ _mkdirs( @blib_dirs );
 
 {
     my $warnings = '';
-    local $SIG{__WARN__} = sub { $warnings = join '', @_ };
+    local ${^WARN_HOOK} = sub { $warnings = join '', @_ };
     use_ok('blib');
     is( $warnings, '',  'use blib is nice and quiet' );
 }

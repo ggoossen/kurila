@@ -251,7 +251,7 @@ SKIP: {
 }
 
 {
-    local $SIG{__WARN__} = sub { $@ = shift };
+    local ${^WARN_HOOK} = sub { $@ = shift };
 
     sub gimme {
         my $tmphandle = shift;
@@ -283,7 +283,7 @@ SKIP: {
     skip("These tests use perlio", 5) unless $Config{useperlio};
     my $w;
     use warnings 'layer';
-    local $SIG{__WARN__} = sub { $w = shift->message };
+    local ${^WARN_HOOK} = sub { $w = shift->message };
 
     eval { open(F, ">>>", "afile") };
     like($w, qr/Invalid separator character '>' in PerlIO layer spec/,
