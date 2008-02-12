@@ -1,5 +1,15 @@
 #!./perl
 
+# Test default value '$SIG{__DIE__}'
+# Internals::peek(\(my $x = $SIG{__DIE__}));
+# #$SIG{__DIE__} = 'DEFAULT';
+#local $SIG{__DIE__} = $SIG{__DIE__};
+#${^TAINT} = 1;
+#${^DIEHOOK} = 2;
+Internals::peek(\${^DIE_HOOK});
+# ($SIG{__DIE__} eq \&error::write_to_stderr);
+
+__END__
 BEGIN {
     $| = 1;
     $SIG{__WARN__} = sub { die "Dying on warning: ", @_ };
