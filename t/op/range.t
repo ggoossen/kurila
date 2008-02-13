@@ -71,7 +71,7 @@ is ("@b", $b);
 # check magic
 {
     my $bad = 0;
-    local ${^WARN_HOOK}'__WARN__' = sub { $bad = 1 };
+    local ${^WARN_HOOK} = sub { $bad = 1 };
     my $x = 'a-e';
     $x =~ s/(\w)-(\w)/{join ':', $1 .. $2}/;
     is ($x, 'a:b:c:d:e');

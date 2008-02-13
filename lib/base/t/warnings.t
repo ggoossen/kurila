@@ -6,7 +6,7 @@ use Test::More tests => 1;
 
 my $warnings;
 BEGIN {
-    $SIG{__WARN__} = sub { $warnings = $_[0]->{description} };
+    ${^WARN_HOOK} = sub { $warnings = $_[0]->{description} };
 }
 
 {

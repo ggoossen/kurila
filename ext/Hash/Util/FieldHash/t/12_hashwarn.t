@@ -18,7 +18,7 @@ use Hash::Util::FieldHash qw( :all);
 use vars qw{ @warnings };
 
 BEGIN {
-    ${^WARN_HOOK}'__WARN__' = sub { push @warnings, $_[0]->{description} };
+    ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} };
     $| = 1;
 }
 

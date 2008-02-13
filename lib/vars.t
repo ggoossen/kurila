@@ -12,7 +12,7 @@ print "1..27\n";
 
 # catch "used once" warnings
 my @warns;
-BEGIN { $SIG{__WARN__} = sub { push @warns, $_[0]->{description} }; $^W = 1 };
+BEGIN { ${^WARN_HOOK} = sub { push @warns, $_[0]->{description} }; $^W = 1 };
 
 %x = ();
 $y = 3;

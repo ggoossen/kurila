@@ -4,7 +4,7 @@ my $W;
 
 BEGIN {
     $W = 0;
-    $SIG{__WARN__} = sub {
+    ${^WARN_HOOK} = sub {
         if ($_[0]->{description} =~ m/^Hides field '.*?' in base class/) {
             $W++;
         }

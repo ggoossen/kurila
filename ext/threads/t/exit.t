@@ -38,11 +38,11 @@ ok(1, 'Loaded');
 
 ### Start of Testing ###
 
-$SIG{'__WARN__'} = sub {
+${^WARN_HOOK} = sub {
     my $msg = shift;
     ok(0, "WARN in main: $msg");
 };
-$SIG{'__DIE__'} = sub {
+${^DIE_HOOK} = sub {
     my $msg = shift;
     ok(0, "DIE in main: $msg");
 };
@@ -152,7 +152,7 @@ like($out, '1 finished and unjoined', "set_thread_exit_only(0)");
 
 run_perl(prog => 'use threads v1.67;' .
                  'threads->create(sub {' .
-                 '   $SIG{__DIE__} = sub { exit(99); };' .
+                 '   ${^DIE_HOOK} = sub { exit(99); };' .
                  '   die();' .
                  '})->join();' .
                  'exit(86);',
@@ -164,8 +164,8 @@ run_perl(prog => 'use threads v1.67;' .
 }
 
 $thr = threads->create(sub {
-    $SIG{__WARN__} = sub { threads->exit(); };
-    local $SIG{__DIE__} = 'DEFAULT';
+    ${^WARN_HOOK} = sub { threads->exit(); };
+    local ${^DIE_HOOK} = sub { };
     die('Died');
 });
 ok($thr, 'Created: threads->exit() in thread warn handler');

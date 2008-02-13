@@ -74,7 +74,7 @@ ok(1, 'Loaded');
 
 # Set up to capture warning when thread terminates
 my @errs :shared;
-$SIG{__DIE__} = sub { push(@errs, $_[0]->{description}); };
+${^DIE_HOOK} = sub { push(@errs, $_[0]->{description}); };
 
 sub thr_func {
     my $q = shift;

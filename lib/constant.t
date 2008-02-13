@@ -10,7 +10,7 @@ BEGIN {
 use warnings;
 use vars qw{ @warnings $fagwoosh $putt $kloong};
 BEGIN {				# ...and save 'em for later
-    ${^WARN_HOOK}'__WARN__' = sub { push @warnings, $_[0]->{description} }
+    ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} }
 }
 END { print STDERR @warnings }
 
@@ -271,7 +271,7 @@ sub slotch ();
 
 {
     my @warnings;
-    local ${^WARN_HOOK}'__WARN__' = sub { push @warnings, @_ };
+    local ${^WARN_HOOK} = sub { push @warnings, @_ };
     eval 'use constant slotch => 3; 1' or die $@;
 
     is ("@warnings", "", "No warnings if a prototype exists");
@@ -285,7 +285,7 @@ sub zit;
 
 {
     my @warnings;
-    local ${^WARN_HOOK}'__WARN__' = sub { push @warnings, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} };
     eval 'use constant zit => 4; 1' or die $@;
 
     # empty prototypes are reported differently in different versions
@@ -306,7 +306,7 @@ $kloong = 'schlozhauer';
 
 {
     my @warnings;
-    local ${^WARN_HOOK}'__WARN__' = sub { push @warnings, @_ };
+    local ${^WARN_HOOK} = sub { push @warnings, @_ };
     eval 'use constant fagwoosh => 5; 1' or die $@;
 
     is ("@warnings", "", "No warnings if the typeglob exists already");

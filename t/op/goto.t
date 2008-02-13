@@ -431,7 +431,7 @@ like($@->{description}, qr/Can't goto subroutine from an eval-block/, 'eval bloc
 {
     my $r = runperl(
 		stderr => 1,
-		prog => 'my $d; my $w = sub { return if $d++; warn q(bar)}; local $SIG{__WARN__} = sub { goto &$w; }; warn q(foo);'
+		prog => 'my $d; my $w = sub { return if $d++; warn q(bar)}; local ${^WARN_HOOK} = sub { goto &$w; }; warn q(foo);'
     );
     like($r, qr/recursive die/, "goto &foo in warn");
 }

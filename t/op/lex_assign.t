@@ -124,7 +124,7 @@ for (@INPUT) {
   (print "#skipping $comment:\nok $ord\n"), next if $skip eq 'skip';
   
   eval <<EOE;
-  local \$SIG\{__WARN__\} = \\&wrn;
+  local \$\{^WARN_HOOK\} = \\&wrn;
   my \$a = 'fake';
   $integer;
   \$a = $op;
@@ -152,7 +152,7 @@ for (@simple_input) {
   chomp;
   ($operator, $variable) = m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
   eval <<EOE;
-  local \$SIG\{__WARN__\} = \\&wrn;
+  local \$\{^WARN_HOOK\} = \\&wrn;
   my \$$variable = "Ac# Ca\\nxxx";
   \$$variable = $operator \$$variable;
   \$toself = \$$variable;

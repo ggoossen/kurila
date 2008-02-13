@@ -292,7 +292,7 @@ curr_test($test + 2);
 {
     my $test = curr_test();
     my $i = 0;
-    local ${^DIE_HOOK}'__DIE__' = sub {
+    local ${^DIE_HOOK} = sub {
 	my $m = shift;
 	if ($i++ +> 4) {
 	    print "# infinite recursion, bailing\nnot ok $test\n";
