@@ -602,13 +602,13 @@ ok($c == 3, "# TODO lexical scope?");
 
 sub must_warn_pat {
     my $warn_pat = shift;
-    return sub { print "not  # warning: $_[0]" unless $_[0] =~ m/$warn_pat/ }
+    return sub { print "not  # warning: $_[0]->{description}" unless $_[0]->{description} =~ m/$warn_pat/ }
 }
 
 sub must_warn {
     my ($warn_pat, $code) = @_;
     local %SIG;
-    eval 'BEGIN { use warnings; $SIG{__WARN__} = $warn_pat };' . $code;
+    eval 'BEGIN { use warnings; ${^WARN_HOOK} = $warn_pat };' . $code;
     print "ok $test\n";
     $test++;
 }
@@ -4067,6 +4067,7 @@ sub kt
     }
 }
 {
+    use bytes;
     local $Message = "BBC(Bleadperl Breaks CPAN) Today: String::Multibyte";
     my $re  = qr/(?:[\x[00]-\x[FF]]{4})/;
     my $hyp = "\0\0\0-";

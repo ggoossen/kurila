@@ -229,7 +229,7 @@ ${^WARN_HOOK} = $SIG{INT};
     is($SIG{INT}, \&foo);
     is(${^WARN_HOOK}, \&foo);
     local($SIG{INT});
-    delete $SIG{__WARN__};
+    ${^WARN_HOOK} = undef;
 }
 is($SIG{TERM}, undef);
 is($SIG{INT}, \&foo);

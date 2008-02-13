@@ -265,7 +265,7 @@ $Base++;
 # test warnings;
 {
     my $warncount = 0;
-    local $SIG{__WARN__} = sub { $warncount++ };
+    local ${^WARN_HOOK} = sub { $warncount++ };
 
     my $lock : shared;
 

@@ -215,7 +215,7 @@ sub fred
     fred() if $a++ +< 200
 } 
 {
-  local $SIG{__WARN__} = sub {
+  local ${^WARN_HOOK} = sub {
     die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
   };
   fred();
@@ -230,7 +230,7 @@ sub fred
     fred() if $a++ +< 200
 } 
 {
-  local $SIG{__WARN__} = sub {
+  local ${^WARN_HOOK} = sub {
     die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
   };
   fred();

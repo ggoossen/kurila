@@ -36,7 +36,7 @@ BEGIN {
 
 our $warnmsg;
 BEGIN {
-    $SIG{__WARN__} = sub { $warnmsg = shift->{description}; };
+    ${^WARN_HOOK} = sub { $warnmsg = shift->{description}; };
 }
 
 use threads::shared;

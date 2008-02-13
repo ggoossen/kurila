@@ -1023,7 +1023,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    goto magicalize;
 		break;
 	    case '\027':	/* $^WARNING_BITS, $^WARN_HOOK */
-		if (strEQ(name2, "ARNHOOK"))
+		if (strEQ(name2, "ARN_HOOK"))
 		    goto magicalize;
 		if (strEQ(name2, "ARNING_BITS"))
 		    goto magicalize;
@@ -1929,6 +1929,10 @@ Perl_is_gv_magical(pTHX_ const char *name, STRLEN len, U32 flags)
 	    /* Using ${^...} variables is likely to be sufficiently rare that
 	       it seems sensible to avoid the space hit of also checking the
 	       length.  */
+	case '\004':    /* ${^DIE_HOOK} */
+	    if (strEQ(name1, "IE_HOOK"))
+		goto yes;
+	    break;
 	case '\017':   /* ${^OPEN} */
 	    if (strEQ(name1, "PEN"))
 		goto yes;
@@ -1945,6 +1949,8 @@ Perl_is_gv_magical(pTHX_ const char *name, STRLEN len, U32 flags)
 	    break;
 	case '\027':   /* ${^WARNING_BITS} */
 	    if (strEQ(name1, "ARNING_BITS"))
+		goto yes;
+	    if (strEQ(name1, "ARN_HOOK"))
 		goto yes;
 	    break;
 	case '1':

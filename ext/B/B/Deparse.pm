@@ -614,7 +614,7 @@ sub compile {
 	    $self->todo($block, 0);
 	}
 	$self->stash_subs();
-	local(${^DIE_HOOK}"__DIE__") =
+	local(${^DIE_HOOK}) =
 	  sub {
 	      if ($self->{'curcop'}) {
 		  my $cop = $self->{'curcop'};

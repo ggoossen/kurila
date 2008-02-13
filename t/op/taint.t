@@ -1163,7 +1163,7 @@ SKIP:
 	    }
 	    close $pipe;
 	};
-	test $@->{description} !~ m/Insecure \$ENV/, 'fork triggers %ENV check';
+	test( ($@ && $@->{description}) !~ m/Insecure \$ENV/, 'fork triggers %ENV check');
 	is $@, '',               'pipe/fork/open/close failed';
 	eval {
 	    open my $pipe, "|-", "$Invoke_Perl -e 1";

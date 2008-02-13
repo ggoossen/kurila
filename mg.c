@@ -707,7 +707,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	if (nextchar == '\0') {
 	    sv_setiv(sv, (IV)(PL_debug & DEBUG_MASK));
 	} else if (strEQ(remaining, "IE_HOOK")) { /* $^DIE_HOOK */
-	    sv_setsv(sv, PL_diehook);
+	    break;
 	}
 	break;
     case '\005':  /* ^E */
@@ -858,7 +858,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	    }
 	    SvPOK_only(sv);
 	} else if (strEQ(remaining, "ARN_HOOK")) { /* $^WARN_HOOK */
-	    sv_setsv(sv, PL_warnhook);
+	    break;
 	}
 	break;
     case '\015': /* $^MATCH */
@@ -2149,7 +2149,8 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 #endif
 	}
 	else if (strEQ(remaining, "IE_HOOK")) {
-	    sv_setsv(PL_diehook, sv);
+	    SvREFCNT_dec(PL_diehook);
+	    PL_diehook = newSVsv(sv);
 	}
         break;
     case '\005':  /* ^E */
@@ -2296,8 +2297,9 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 }
             }
         }
-	else if (strEQ(remaining, "ARN_HOOK")) {
-	    sv_setsv(PL_warnhook, sv);
+	else if (strEQ(remaining, "ARN_HOOK")) { /* $^WARN_HOOK */
+	    SvREFCNT_dec(PL_warnhook);
+	    PL_warnhook = newSVsv(sv);
 	}
         break;
     case '.':

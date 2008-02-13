@@ -3,7 +3,7 @@
 # Testing of v-string syntax
 
 BEGIN {
-    ${^WARN_HOOK}'__WARN__' = sub { warn $_[0] if $DOWARN };
+    ${^WARN_HOOK} = sub { warn $_[0] if $DOWARN };
 }
 
 $DOWARN = 1; # enable run-time warnings now

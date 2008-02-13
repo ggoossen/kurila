@@ -4,8 +4,8 @@ TODO
 
 __END__
 # 8signal
-BEGIN { $| = 1; $SIG{__WARN__} = sub { print "WARN -- {$_[0]->message}" } }
-BEGIN { $SIG{__DIE__}  = sub { print "DIE -- {$_[0]->message}" } }
+BEGIN { $| = 1; ${^WARN_HOOK} = sub { print "WARN -- {$_[0]->message}" } }
+BEGIN { ${^DIE_HOOK}  = sub { print "DIE -- {$_[0]->message}" } }
 $a =+ 1 ;
 use warnings qw(syntax) ;
 $a =+ 1 ;
