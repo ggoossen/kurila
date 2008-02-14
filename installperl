@@ -199,8 +199,7 @@ find(sub {
 my $ver = $Config{version};
 $^V =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^V";
 my ($release, $patchlevel) = ($1, $2);
-warn "Patchlevel of perl ($patchlevel)",
-    "and patchlevel of config.sh ($Config{'KURILA_VERSION'}) don't match\n"
+warn "Patchlevel of perl ($patchlevel) and patchlevel of config.sh ($Config{'KURILA_VERSION'}) don't match\n"
 	if $patchlevel != $Config{'KURILA_VERSION'};
 
 # Fetch some frequently-used items from %Config
