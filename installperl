@@ -268,8 +268,7 @@ else {
 -x 'suidperl' . $exe_ext|| die "suidperl isn't executable!\n" if $d_dosuid;
 
 -f 't/rantests'		|| $Is_W32
-			|| warn "WARNING: You've never run 'make test' or",
-				" some tests failed! (Installing anyway.)\n";
+			|| warn "WARNING: You've never run 'make test' or some tests failed! (Installing anyway.)\n";
 } #if (!$Is_NetWare)
 
 # This will be used to store the packlist
@@ -613,7 +612,7 @@ if (!$versiononly && $otherperls) {
 	warn "\nWarning: $perl appears in your path in the following " .
 	    "locations beyond where\nwe just installed it:\n";
 	for (@otherperls) {
-	    warn "    ", $_, "\n";
+	    warn "    $_\n";
 	}
 	warn "\n";
     }
@@ -703,7 +702,7 @@ sub link {
 	$packlist->{$xto} = { from => $xfrom, type => 'link' };
     };
     if ($@) {
-	warn "Replacing link() with File::Copy::copy(): $@";
+	warn "Replacing link() with File::Copy::copy(): {$@->message}";
 	print $verbose ? "  cp $from $xto\n" : "  $xto\n" unless $silent;
 	print "  creating new version of $xto\n"
 		 if $Is_VMS and -e $to and !$silent;
