@@ -991,10 +991,6 @@ eval { $x->?$m1() };
 
 eval { &$m1() };
 eval { &$g1() };
-
-warn $m1,$g1,"foo";
-
-eval { die $m1, $g1 };
 EXPECT
 Use of uninitialized value $m1 in subroutine dereference at - line 5.
     (eval) called at - line 5.
@@ -1015,9 +1011,6 @@ Use of uninitialized value in subroutine entry at - line 15.
     (eval) called at - line 15.
 Use of uninitialized value in subroutine entry at - line 16.
     (eval) called at - line 16.
-Use of uninitialized value $m1 in warn at - line 18.
-Use of uninitialized value $g1 in warn at - line 18.
-foo at - line 18.
 ########
 use warnings 'uninitialized';
 my ($m1);

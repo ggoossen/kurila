@@ -182,7 +182,7 @@ sub _analyze_line {
 
         if ( ($point->number +> 100_000) && ($point->number +> ($self->{max}||100_000)) ) {
             if ( !$self->{too_many_tests}++ ) {
-                warn "Enormous test number seen [test ", $point->number, "]\n";
+                warn "Enormous test number seen [test " . $point->number . "]\n";
                 warn "Can't detailize, too big.\n";
             }
         }

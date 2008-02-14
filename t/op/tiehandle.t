@@ -218,7 +218,7 @@ is($r, 1);
     no warnings 'redefine';
     local *Implement::PRINT = sub { @received = @_ };
 
-    $r = warn("some", "text", "\n");
+    $r = warn("sometext\n");
     @expect = (PRINT => $ob,"sometext\n at op/tiehandle.t line 221.\n");
     compare(PRINT => @received);
 

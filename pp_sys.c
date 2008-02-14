@@ -423,11 +423,13 @@ PP(pp_warn)
 	LEAVE;
     }
     else {
+	EXTEND(SP, 1);
 	SV * const error = ERRSV;
 	if (sv_isobject(error)) {
 	    tmpsv = error;
 	}
     }
+    SP = MARK + 1;
     if ( ! tmpsv ) {
 	ENTER;
 	PUSHMARK(SP);
