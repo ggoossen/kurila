@@ -409,37 +409,39 @@ PP(pp_rcatline)
 
 PP(pp_warn)
 {
+
     dVAR; dSP; dMARK;
-    SV *tmpsv;
-    const char *tmps;
-    STRLEN len;
-    if (SP - MARK > 1) {
-	dTARGET;
-	do_join(TARG, &PL_sv_no, MARK, SP);
-	tmpsv = TARG;
-	SP = MARK + 1;
-    }
-    else if (SP == MARK) {
-	tmpsv = &PL_sv_no;
-	EXTEND(SP, 1);
-	SP = MARK + 1;
+    SV *tmpsv = NULL;
+
+    /* TODO: protection against recursion */
+
+    if (SP - MARK >= 1) {
+	ENTER;
+	PUSHMARK(MARK);
+	call_sv(PL_errorcreatehook, G_SCALAR);
+	tmpsv = POPs;
+	LEAVE;
     }
     else {
-	tmpsv = TOPs;
+	SV * const error = ERRSV;
+	if (sv_isobject(error)) {
+	    tmpsv = error;
+	}
     }
-    tmps = SvPV_const(tmpsv, len);
-    if ((!tmps || !len) && PL_errgv) {
-  	SV * const error = ERRSV;
-	SvUPGRADE(error, SVt_PV);
-	if (SvPOK(error) && SvCUR(error))
-	    sv_catpvs(error, "\t...caught");
-	tmpsv = error;
-	tmps = SvPV_const(tmpsv, len);
+    if ( ! tmpsv ) {
+	ENTER;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSVpvs("Warning: something's wrong")));
+	PUTBACK;
+	call_sv(PL_errorcreatehook, G_SCALAR);
+	SPAGAIN;
+	tmpsv = POPs;
+	PUTBACK;
+	LEAVE;
     }
-    if (!tmps || !len)
-	tmpsv = sv_2mortal(newSVpvs("Warning: something's wrong"));
 
-    Perl_warn(aTHX_ "%"SVf, SVfARG(tmpsv));
+    Perl_vdie_common(aTHX_ tmpsv, TRUE);
+
     RETSETYES;
 }
 
