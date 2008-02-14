@@ -46,7 +46,7 @@ $ENV{SHELL} = 'sh' if $^O eq 'os2';
 my $ver = $Config{version};     # Not used presently.
 $^V =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^V";
 my ($release, $patchlevel) = ($1, $2);
-warn "Patchlevel of perl ($patchlevel)",
+warn "Patchlevel of perl ($patchlevel)" .
     "and patchlevel of config.sh ($Config{'KURILA_VERSION'}) don't match\n"
 	if $patchlevel != $Config{'KURILA_VERSION'};
 
@@ -91,7 +91,7 @@ $opts{verbose} ||= $opts{V} || $opts{notify};
 -d  "$opts{destdir}$Config{'installprivlib'}"
 	|| warn "Perl library directory $Config{'installprivlib'} not found.
 		Have you run make install?.  (Installing anyway.)\n";
--x "t/perl$Config{exe_ext}"		|| warn "WARNING: You've never run 'make test'!!!",
+-x "t/perl$Config{exe_ext}"		|| warn "WARNING: You've never run 'make test'!!!" .
 	"  (Installing anyway.)\n";
 
 $packlist = ExtUtils::Packlist->new("$opts{destdir}$Config{installarchlib}/.packlist");
