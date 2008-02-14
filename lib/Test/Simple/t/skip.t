@@ -63,7 +63,7 @@ SKIP: {
         skip $Why;
         fail("So very failed");
     }
-    like( $warning, qr/skip\(\) needs to know \$how_many tests are in the block at $0 line 56/,
+    like( $warning, qr/skip\(\) needs to know \$how_many tests are in the block .* at $0 line 56/ms,
         'skip without $how_many warning' );
 }
 

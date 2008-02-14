@@ -216,7 +216,7 @@ SKIP: {
         my ($cr, $filename) = @_;
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//;
         open my $fh, '<',
-             \"package $module; sub complain \{ warn q() \}; \$::file = __FILE__;"
+             \"package $module; sub complain \{ warn q(barf) \}; \$::file = __FILE__;"
 	    or die $!;
         $INC{$filename} = "/custom/path/to/$filename";
         return $fh;
@@ -231,7 +231,7 @@ SKIP: {
         my $warning;
         local ${^WARN_HOOK} = sub { $warning = shift };
         Publius::Vergilius::Maro::complain();
-        like( $warning->message, qr{something's wrong at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
+        like( $warning->message, qr{barf at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
     }
 }
 pop @INC;

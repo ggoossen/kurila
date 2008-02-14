@@ -364,7 +364,7 @@ sub execute_tests {
         }
         my $test_start_time = $Timer ? time : 0;
         my $results = $Strap->analyze_file($tfile) or
-          do { warn $Strap->{error}, "\n";  next };
+          do { warn $Strap->{error};  next };
         my $elapsed;
         if ( $Timer ) {
             $elapsed = time - $test_start_time;

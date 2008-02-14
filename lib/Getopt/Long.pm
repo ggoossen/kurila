@@ -1012,7 +1012,7 @@ sub FindOption ($$$$$) {
 	    $opt = substr($opt,0,1);
             unshift (@$argv, $starter.$rest) if defined $rest;
 	}
-	warn ("Unknown option: ", $opt, "\n");
+	warn ("Unknown option: " . $opt . "\n");
 	$error++;
 	return (1, undef);
     }
