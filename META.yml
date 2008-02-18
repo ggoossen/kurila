@@ -88,6 +88,7 @@ no_index:
     - lib/Pod/Simple
     - lib/Term/ANSIColor
     - lib/Term/UI
+    - lib/Test/Builder
     - lib/Test/Harness
     - lib/Test/Simple
     - lib/Test/t
@@ -107,7 +108,7 @@ no_index:
     - ext/DynaLoader/t/XSLoader.t
     - ext/DynaLoader/XSLoader_pm.PL
     - ext/Filter/t/call.t
-    - ext/Filter/Util/Call
+    - ext/Opcode/Safe.pm
     - ext/threads/threads.pm
     - ext/threads/threads.xs
     - lib/Archive/Extract.pm
