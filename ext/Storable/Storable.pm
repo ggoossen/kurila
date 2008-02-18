@@ -26,7 +26,7 @@ our @EXPORT_OK = qw(
 use FileHandle;
 use vars qw($canonical $forgive_me $VERSION);
 
-$VERSION = '2.16';
+$VERSION = '2.18';
 
 #
 # Use of Log::Agent is optional
