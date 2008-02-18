@@ -227,7 +227,7 @@ overriding the lexical declaration with C<our $_>. (Rafael Garcia-Suarez)
 
 A new prototype character has been added. C<_> is equivalent to C<$> but
 defaults to C<$_> if the corresponding argument isn't supplied. (both C<$>
-and <_> denote a scalar). Due to the optional nature of the argument, you
+and C<_> denote a scalar). Due to the optional nature of the argument, you
 can only use it at the end of a prototype, or before a semicolon.
 
 This has a small incompatible consequence: the prototype() function has
@@ -910,6 +910,10 @@ Inc.
 The L<perlreguts> manpage, courtesy of Yves Orton, describes internals of the
 Perl regular expression engine.
 
+The L<perlreapi> manpage describes the interface to the perl interpreter
+used to write pluggable regular expression engines (by Ævar Arnfjörð
+Bjarmason).
+
 The L<perlunitut> manpage is an tutorial for programming with Unicode and
 string encodings in Perl, courtesy of Juerd Waalboer.
 
@@ -1470,8 +1474,6 @@ inherits from C<B::SV> (it used to inherit from C<B::IV>).
 The anonymous hash and array constructors now take 1 op in the optree
 instead of 3, now that pp_anonhash and pp_anonlist return a reference to
 an hash/array when the op is flagged with OPf_SPECIAL (Nicholas Clark).
-
-=for p5p XXX have we some docs on how to create regexp engine plugins, since that's now possible ? (perlreguts)
 
 =head1 Known Problems
 
