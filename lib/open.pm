@@ -1,8 +1,7 @@
 package open;
 use warnings;
 
-our $VERSION = '1.05'
-;
+our $VERSION = '1.06';
 
 my $locale_encoding;
 

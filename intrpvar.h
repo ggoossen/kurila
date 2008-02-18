@@ -629,8 +629,6 @@ PERLVARI(Ippid,		IV,		0)
 
 PERLVARI(Ihash_seed, UV, 0)		/* Hash initializer */
 
-PERLVAR(IDBassertion,   SV *)
-
 PERLVARI(Irehash_seed, UV, 0)		/* 582 hash initializer */
 
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
