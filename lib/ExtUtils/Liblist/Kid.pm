@@ -9,7 +9,7 @@ package ExtUtils::Liblist::Kid;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = 1.33;
+$VERSION = 6.37_02;
 
 use Config;
 use Cwd 'cwd';
