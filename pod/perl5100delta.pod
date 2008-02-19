@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 perldelta - what is new for perl 5.10.0
@@ -414,7 +416,9 @@ such as newline and backspace are output in C<\x> notation, rather than
 octal.
 
 The B<-C> option can no longer be used on the C<#!> line. It wasn't
-working there anyway.
+working there anyway, since the standard streams are already set up
+at this point in the execution of the perl interpreter. You can use
+binmode() instead to get the desired behaviour.
 
 =head2 UCD 5.0.0
 
