@@ -546,7 +546,6 @@
 #define newSUB			Perl_newSUB
 #define newXS_flags		Perl_newXS_flags
 #define newXS			Perl_newXS
-#define newAV			Perl_newAV
 #define newAVREF		Perl_newAVREF
 #define newBINOP		Perl_newBINOP
 #define newCVREF		Perl_newCVREF
@@ -554,7 +553,6 @@
 #define newGVgen		Perl_newGVgen
 #define newGVREF		Perl_newGVREF
 #define newHVREF		Perl_newHVREF
-#define newHV			Perl_newHV
 #define newHVhv			Perl_newHVhv
 #define newIO			Perl_newIO
 #define newLISTOP		Perl_newLISTOP
@@ -2799,7 +2797,6 @@
 #define newSUB(a,b,c,d)		Perl_newSUB(aTHX_ a,b,c,d)
 #define newXS_flags(a,b,c,d,e)	Perl_newXS_flags(aTHX_ a,b,c,d,e)
 #define newXS(a,b,c)		Perl_newXS(aTHX_ a,b,c)
-#define newAV()			Perl_newAV(aTHX)
 #define newAVREF(a)		Perl_newAVREF(aTHX_ a)
 #define newBINOP(a,b,c,d)	Perl_newBINOP(aTHX_ a,b,c,d)
 #define newCVREF(a,b)		Perl_newCVREF(aTHX_ a,b)
@@ -2807,7 +2804,6 @@
 #define newGVgen(a)		Perl_newGVgen(aTHX_ a)
 #define newGVREF(a,b)		Perl_newGVREF(aTHX_ a,b)
 #define newHVREF(a)		Perl_newHVREF(aTHX_ a)
-#define newHV()			Perl_newHV(aTHX)
 #define newHVhv(a)		Perl_newHVhv(aTHX_ a)
 #define newIO()			Perl_newIO(aTHX)
 #define newLISTOP(a,b,c,d)	Perl_newLISTOP(aTHX_ a,b,c,d)
