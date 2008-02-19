@@ -6,7 +6,7 @@
 
 package IO::Zlib;
 
-$VERSION = "1.07";
+$VERSION = "1.08";
 
 =head1 NAME
 
@@ -259,10 +259,6 @@ We must know how much to read.
 =item IO::Zlib::WRITE: too long LENGTH
 
 The LENGTH must be less than or equal to the buffer size.
-
-=item IO::Zlib::WRITE: OFFSET is not supported
-
-Offsets of gzipped streams are not supported.
 
 =back
 

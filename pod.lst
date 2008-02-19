@@ -138,7 +138,8 @@ h Miscellaneous
   kurila02delta         Perl Kurila changes in version 0.2
   perlhist		Perl history records
 d perldelta		Perl changes since previous version
-D perl5100delta		Perl changes in version 5.10.0
+D perl5110delta		Perl changes in version 5.11.0
+  perl5100delta		Perl changes in version 5.10.0
   perl595delta		Perl changes in version 5.9.5
   perl594delta		Perl changes in version 5.9.4
   perl593delta		Perl changes in version 5.9.3

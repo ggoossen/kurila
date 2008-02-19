@@ -154,6 +154,7 @@ For ease of access, the Perl manual has been split up into several sections.
     kurila02delta       What is new for Perl Kurila 0.2
     kurila01delta       What is new for Perl Kurila 0.1
     perldelta		Perl changes since previous version
+    perl5100delta	Perl changes in version 5.10.0
     perl595delta	Perl changes in version 5.9.5
     perl594delta	Perl changes in version 5.9.4
     perl593delta	Perl changes in version 5.9.3

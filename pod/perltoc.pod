@@ -6509,6 +6509,10 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 
 =over 4
 
+=item UTF-8 revamp
+
+=item Properly Unicode safe tokeniser and pads.
+
 =item state variable initialization in list context
 
 =item Implement $value ~~ 0 .. $range
@@ -6542,8 +6546,6 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =item Self ties
 
 =item Optimize away @_
-
-=item Properly Unicode safe tokeniser and pads.
 
 =item The yada yada yada operators
 
@@ -6626,7 +6628,7 @@ B<-V>
 
 =back
 
-=head2 perldelta - what is new for perl 5.10.0
+=head2 perldelta, perl5100delta - what is new for perl 5.10.0
 
 =over 4
 
@@ -6875,6 +6877,12 @@ v-string in use/require is non-portable, perl -V
 =back
 
 =item Known Problems
+
+=over 4
+
+=item UTF-8 problems
+
+=back
 
 =item Platform Specific Problems
 
@@ -6884,7 +6892,47 @@ v-string in use/require is non-portable, perl -V
 
 =back
 
-=head2 perl5100delta, perldelta - what is new for perl 5.10.0
+=head2 perl5110delta, perldelta - what is new for perl v5.11.0
+
+=over 4
+
+=item DESCRIPTION
+
+=item Incompatible Changes
+
+=item Core Enhancements
+
+=item Modules and Pragmata
+
+=item Utility Changes
+
+=item Documentation
+
+=item Performance Enhancements
+
+=item Installation and Configuration Improvements
+
+=item Selected Bug Fixes
+
+=item New or Changed Diagnostics
+
+=item Changed Internals
+
+=item Known Problems
+
+=over 4
+
+=item Platform Specific Problems
+
+=back
+
+=item Reporting Bugs
+
+=item SEE ALSO
+
+=back
+
+=head2 perl5100delta - what is new for perl 5.10.0
 
 =over 4
 
@@ -7133,6 +7181,12 @@ v-string in use/require is non-portable, perl -V
 =back
 
 =item Known Problems
+
+=over 4
+
+=item UTF-8 problems
+
+=back
 
 =item Platform Specific Problems
 
