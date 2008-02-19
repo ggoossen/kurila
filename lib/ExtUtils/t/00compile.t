@@ -34,7 +34,7 @@ foreach my $file (@modules) {
     # 5.8.0 has a bug about require alone in an eval.  Thus the extra
     # statement.
     eval { require($file); 1 };
-    is( $@, '', "require $file" );
+    is( $@ && $@->message, '', "require $file" );
 
     SKIP: {
         skip "Test::Pod not installed", 1 unless $Has_Test_Pod;
