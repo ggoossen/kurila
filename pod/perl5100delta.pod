@@ -543,6 +543,14 @@ Previously, F<.pmc> files were loaded only if more recent than the
 matching F<.pm> file. Starting with 5.9.4, they'll be always loaded if
 they exist.
 
+=head2 $^V is now a C<version> object instead of a v-string
+
+$^V can still be used with the C<%vd> format in printf, but any
+character-level operations will now access the string representation
+of the C<version> object and not the ordinals of a v-string.
+Expressions like C<< substr($^V, 0, 2) >> or C<< split //, $^V >>
+no longer work and must be rewritten.
+
 =head2 @- and @+ in patterns
 
 The special arrays C<@-> and C<@+> are no longer interpolated in regular
@@ -1274,7 +1282,7 @@ D. Hedden)
 
 chr() on a negative value now gives C<\x{FFFD}>, the Unicode replacement
 character, unless when the C<bytes> pragma is in effect, where the low
-eight bytes of the value are used.
+eight bits of the value are used.
 
 =item PERL5SHELL and tainting
 
@@ -1530,7 +1538,7 @@ inherits from C<B::SV> (it used to inherit from C<B::IV>).
 
 The anonymous hash and array constructors now take 1 op in the optree
 instead of 3, now that pp_anonhash and pp_anonlist return a reference to
-an hash/array when the op is flagged with OPf_SPECIAL (Nicholas Clark).
+an hash/array when the op is flagged with OPf_SPECIAL. (Nicholas Clark)
 
 =head1 Known Problems
 
