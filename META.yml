@@ -1,7 +1,14 @@
+<<<<<<< HEAD:META.yml
 name: kurila
 version: 1.7_0
 abstract: a geneticly modified perl
 author: ~
+=======
+name: perl
+version: 5.011000
+abstract: Practical Extraction and Report Language
+author: perl5-porters@perl.org
+>>>>>>> 7c373853fad0b2d07c3f74ee400cf5d9a0675e97:META.yml
 license: perl
 distribution_type: core
 no_index:
