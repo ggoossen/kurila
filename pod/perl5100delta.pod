@@ -21,7 +21,7 @@ pragma, like C<strict> or C<warnings>.
 
 Currently the following new features are available: C<switch> (adds a
 switch statement), C<say> (adds a C<say> built-in function), and C<state>
-(adds an C<state> keyword for declaring "static" variables). Those
+(adds a C<state> keyword for declaring "static" variables). Those
 features are described in their own sections of this document.
 
 The C<feature> pragma is also implicitly loaded when you require a minimal
@@ -191,7 +191,7 @@ which is much more efficient. (Yves Orton)
 
 =item Vertical and horizontal whitespace, and linebreak
 
-Regular expressions now recognize the C<\v> and C<\h> escapes, that match
+Regular expressions now recognize the C<\v> and C<\h> escapes that match
 vertical and horizontal whitespace, respectively. C<\V> and C<\H>
 logically match their complements.
 
@@ -259,6 +259,29 @@ Note that, due to changes in the implementation of class hierarchy search,
 code that used to undef the C<*ISA> glob will most probably break. Anyway,
 undef'ing C<*ISA> had the side-effect of removing the magic on the @ISA
 array and should not have been done in the first place.
+
+=head2 readdir() may return a "short filename" on Windows
+
+The readdir() function may return a "short filename" when the long
+filename contains characters outside the ANSI codepage.  Similarly
+Cwd::cwd() may return a short directory name, and glob() may return short
+names as well.  On the NTFS file system these short names can always be
+represented in the ANSI codepage.  This will not be true for all other file
+system drivers; e.g. the FAT filesystem stores short filenames in the OEM
+codepage, so some files on FAT volumes remain unaccessible through the
+ANSI APIs.
+
+Similarly, $^X, @INC, and $ENV{PATH} are preprocessed at startup to make
+sure all paths are valid in the ANSI codepage (if possible).
+
+The Win32::GetLongPathName() function now returns the UTF-8 encoded
+correct long file name instead of using replacement characters to force
+the name into the ANSI codepage.  The new Win32::GetANSIPathName()
+function can be used to turn a long pathname into a short one only if the
+long one cannot be represented in the ANSI codepage.
+
+Many other functions in the C<Win32> module have been improved to accept
+UTF-8 encoded arguments.  Please see L<Win32> for details.
 
 =head2 readpipe() is now overridable
 
@@ -786,6 +809,16 @@ for F<.tar> (plain, gziped or bzipped) or F<.zip> files.
 C<CPANPLUS> provides an API and a command-line tool to access the CPAN
 mirrors.
 
+=item *
+
+C<Pod::Escapes> provides utilities that are useful in decoding Pod
+EE<lt>...E<gt> sequences.
+
+=item *
+
+C<Pod::Simple> is now the backend for several of the Pod-related modules
+included with Perl.
+
 =back
 
 =head2 Selected Changes to Core Modules
@@ -833,7 +866,7 @@ C<i> command.
 
 =item ptar
 
-C<ptar> is a pure perl implementation of C<tar>, that comes with
+C<ptar> is a pure perl implementation of C<tar> that comes with
 C<Archive::Tar>.
 
 =item ptardiff
@@ -894,7 +927,7 @@ direct use).
 
 =item cpan2dist
 
-C<cpan2dist> is a new utility, that comes with CPANPLUS. It's a tool to
+C<cpan2dist> is a new utility that comes with CPANPLUS. It's a tool to
 create distributions (or packages) from CPAN modules.
 
 =item pod2html
@@ -1036,8 +1069,7 @@ this optimization. (Yves Orton)
 B<Note:> Much code exists that works around perl's historic poor
 performance on alternations. Often the tricks used to do so will disable
 the new optimisations. Hopefully the utility modules used for this purpose
-will be educated about these new optimisations by the time 5.10 is
-released.
+will be educated about these new optimisations.
 
 =item Aho-Corasick start-point optimisation
 
@@ -1303,7 +1335,7 @@ properly carry that layer on the duped filehandle. (Rafael)
 
 =item Localisation of hash elements
 
-Localizing an hash element whose key was given as a variable didn't work
+Localizing a hash element whose key was given as a variable didn't work
 correctly if the variable was changed while the local() was in effect (as
 in C<local $h{$x}; ++$x>). (Bo Lindbergh)
 
@@ -1388,9 +1420,15 @@ details.
 
 =head1 Changed Internals
 
-In general, the source code of perl has been refactored, tied up, and
-optimized in many places. Also, memory management and allocation has been
-improved in a couple of points.
+In general, the source code of perl has been refactored, tidied up,
+and optimized in many places. Also, memory management and allocation
+has been improved in several points.
+
+When compiling the perl core with gcc, as many gcc warning flags are
+turned on as is possible on the platform.  (This quest for cleanliness
+doesn't extend to XS code because we cannot guarantee the tidiness of
+code we didn't write.)  Similar strictness flags have been added or
+tightened for various other C compilers.
 
 =head2 Reordering of SVt_* constants
 
