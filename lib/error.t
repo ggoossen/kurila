@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan( tests => 25 );
+plan( tests => 26 );
 
 # simple error object.
 {
@@ -111,5 +111,15 @@ MSG
 Can't modify constant item in undef operator at (eval 9) line 2, at EOF
 Bareword \"foo\" not allowed while "strict subs" in use
  at ../lib/error.t line 107.
+MSG
+}
+
+# Compilation error with '#line X'
+{
+    local $TODO = "multiple compilation errors, line numbers.";
+    fresh_perl_is("use strict;\n\$x = 1;\n\$y = 1;\n", <<MSG );
+Global symbol "$x" requires explicit package name at - line 2.
+Global symbol "$y" requires explicit package name at - line 3.
+Execution of - aborted due to compilation errors. at - line 3.
 MSG
 }
