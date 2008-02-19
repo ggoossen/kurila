@@ -140,7 +140,6 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
     my $state = "not";
     *{$a} = sub { $state = "ok" };
     ok(defined &{$a});
-    local our $TODO = 1;
     ok(defined &{Symbol::fetch_glob('SYM000')});
     &{*{$a}};
     is ($state, 'ok');
@@ -445,6 +444,7 @@ is (ref \$::{plunk}, 'GLOB', "Symbol table has full typeglob");
              "Assigment works when glob created midway (bug 45607)"); 1'
 	or die $@;
 }
+
 __END__
 Perl
 Rules
