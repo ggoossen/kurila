@@ -2509,6 +2509,7 @@ PP(pp_entersub)
     ENTER;
     SAVETMPS;
 
+  retry:
     if (!CvROOT(cv) && !CvXSUB(cv)) {
 	SV* sub_name;
 
