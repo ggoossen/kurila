@@ -25,4 +25,4 @@ BEGIN {
 }
 
 plan tests => 1;
-like $result, '/^You tried to run a test without a plan/';
+like $result->{description}, '/^You tried to run a test without a plan/';

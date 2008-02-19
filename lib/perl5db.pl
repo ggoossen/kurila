@@ -6201,7 +6201,7 @@ sub macosx_get_fork_TTY
 
     return unless $version=$ENV{TERM_PROGRAM_VERSION};
     foreach my $entry (@script_versions) {
-	if ($version>=$entry->[0]) {
+	if ($version +>= $entry->[0]) {
 	    $script=$entry->[1];
 	    last;
 	}
