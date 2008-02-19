@@ -3,6 +3,7 @@ package ExtUtils::Mkbootstrap;
 use strict;
 
 use vars qw($VERSION @ISA @EXPORT);
+$VERSION = '6.37_03';
 
 our ($Verbose, $osname, $dlsrc, $bscode, @dl_resolve_using);
 
