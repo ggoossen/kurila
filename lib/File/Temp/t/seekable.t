@@ -23,7 +23,7 @@ isa_ok( $tmp, 'IO::Seekable' );
 # make sure the seek method is available...
 # Note that we need a reasonably modern IO::Seekable
 SKIP: {
-  skip "IO::Seekable is too old", 1 if IO::Seekable->VERSION <= 1.06;
+  skip "IO::Seekable is too old", 1 if IO::Seekable->VERSION +<= v1.06;
   ok( File::Temp->can('seek'), 'tmp can seek' );
 }
 

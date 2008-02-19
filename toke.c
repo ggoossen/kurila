@@ -4042,7 +4042,7 @@ Perl_yylex(pTHX)
     case '}':
 	s++;
 	if (PL_lex_brackets <= 0)
-	    yyerror("Unmatched right curly bracket");
+	    Perl_croak(aTHX_ "Unmatched right curly bracket");
 	else
 	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets];
 	if (PL_lex_state == LEX_INTERPNORMAL) {
@@ -10096,7 +10096,6 @@ S_scan_trans(pTHX_ char *start)
 	if (PL_lex_stuff.str_sv) {
 	    SvREFCNT_dec(PL_lex_stuff.str_sv);
 	    PL_lex_stuff.str_sv = NULL;
-	    PL_lex_stuff.str_sv = 0;
 	}
 	Perl_croak(aTHX_ "Transliteration replacement not terminated");
     }

@@ -503,7 +503,7 @@ sub _gettemp {
 	my $flags = ( ($options{"unlink_on_close"} && !$KEEP_ALL) ?
 		      $OPENTEMPFLAGS :
 		      $OPENFLAGS );
-	$flags |= $LOCKFLAG if (defined $LOCKFLAG && $options{use_exlock});
+	$flags ^|^= $LOCKFLAG if (defined $LOCKFLAG && $options{use_exlock});
 	$open_success = sysopen($fh, $path, $flags, 0600);
       }
       if ( $open_success ) {
@@ -2367,7 +2367,7 @@ package File::Temp::Dir;
 
 use File::Path qw/ rmtree /;
 use strict;
-use overload '""' => "STRINGIFY", fallback => 1;
+use overload '""' => \&STRINGIFY, fallback => 1;
 
 # private class specifically to support tempdir objects
 # created by File::Temp->newdir
