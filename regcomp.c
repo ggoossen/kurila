@@ -2544,7 +2544,15 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                                     last = cur;
                                 }
                             } else {
-                                if ( last ) {
+/* 
+    Currently we assume that the trie can handle unicode and ascii
+    matches fold cased matches. If this proves true then the following
+    define will prevent tries in this situation. 
+    
+    #define TRIE_TYPE_IS_SAFE (UTF || optype==EXACT)
+*/
+#define TRIE_TYPE_IS_SAFE 1
+                                if ( last && TRIE_TYPE_IS_SAFE ) {
                                     make_trie( pRExC_state, 
                                             startbranch, first, cur, tail, count, 
                                             optype, depth+1 );
@@ -2572,7 +2580,8 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                               "", SvPV_nolen_const( mysv ),REG_NODE_NUM(cur));
 
                         });
-                        if ( last ) {
+                        
+                        if ( last && TRIE_TYPE_IS_SAFE ) {
                             made= make_trie( pRExC_state, startbranch, first, scan, tail, count, optype, depth+1 );
 #ifdef TRIE_STUDY_OPT	
                             if ( ((made == MADE_EXACT_TRIE && 
@@ -6441,7 +6450,7 @@ tryagain:
 	   required, as the default for this switch is to jump to the
 	   literal text handling code.
 	*/
-	switch (*++RExC_parse) {
+	switch ((U8)*++RExC_parse) {
 	/* Special Escapes */
 	case 'A':
 	    RExC_seen_zerolen++;
@@ -6745,7 +6754,7 @@ tryagain:
 		       an unescaped equivalent literal.
 		    */
 
-		    switch (*++p) {
+		    switch ((U8)*++p) {
 		    /* These are all the special escapes. */
 		    case 'A':             /* Start assertion */
 		    case 'b': case 'B':   /* Word-boundary assertion*/

@@ -48,7 +48,7 @@ sub match_test {
     my $res;
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 
-    die "$@ in '$tstr'" if $@ ne "";
+    die "{$@->message} in '$tstr'" if $@ ne "";
     ok( ($yn =~ m/!/ xor $res), "$tstr: $res");
 }
 
@@ -165,12 +165,10 @@ __DATA__
 	%hash		[qw(bar)]
 !	%hash		[qw(a b c)]
 	%hash		%hash
-	%hash		{%hash}
 	%hash		%tied_hash
 	%tied_hash	%tied_hash
 	%hash		{ foo => 5, bar => 10 }
 !	%hash		{ foo => 5, bar => 10, quux => 15 }
-
 	@nums		{  1, '',  2, '' }
 	@nums		{  1, '', 12, '' }
 !	@nums		{ 11, '', 12, '' }
