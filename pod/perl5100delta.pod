@@ -444,8 +444,6 @@ group.)
 
 =head2 Packing and UTF-8 strings
 
-=for XXX update this
-
 The semantics of pack() and unpack() regarding UTF-8-encoded data has been
 changed. Processing is now by default character per character instead of
 byte per byte on the underlying encoding. Notably, code that used things
@@ -617,6 +615,14 @@ use of the recursive inheritance while resolving a method or doing a
 C<$foo-E<gt>isa($bar)> lookup.
 
 =head1 Modules and Pragmata
+
+=head2 Upgrading individual core modules
+
+Even more core modules are now also available separately through the
+CPAN.  If you wish to update one of these modules, you don't need to
+wait for a new perl release.  From within the cpan shell, running the
+'r' command will report on modules with upgrades available.  See
+C<perldoc CPAN> for more information.
 
 =head2 Pragmata Changes
 
@@ -1532,6 +1538,11 @@ F<t/op/mydef.t>.)
 Stacked filetest operators won't work when the C<filetest> pragma is in
 effect, because they rely on the stat() buffer C<_> being populated, and
 filetest bypasses stat().
+
+When compiled with g++ and thread support on Linux, it's reported that the
+C<$!> stops working correctly. This is related to the fact that the glibc
+provides two strerror_r(3) implementation, and perl selects the wrong
+one.
 
 =head1 Platform Specific Problems
 

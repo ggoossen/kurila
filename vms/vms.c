@@ -11,6 +11,17 @@
  *    Please see Changes*.* or the Perl Repository Browser for revision history.
  */
 
+/*
+ *               Yet small as was their hunted band
+ *               still fell and fearless was each hand,
+ *               and strong deeds they wrought yet oft,
+ *               and loved the woods, whose ways more soft
+ *               them seemed than thralls of that black throne
+ *               to live and languish in halls of stone.
+ *
+ *                           The Lay of Leithian, 135-40
+ */
+ 
 #include <acedef.h>
 #include <acldef.h>
 #include <armdef.h>
@@ -9591,16 +9602,13 @@ Perl_readdir(pTHX_ DIR *dd)
     }
     dd->count++;
     /* Force the buffer to end with a NUL, and downcase name to match C convention. */
+    buff[res.dsc$w_length] = '\0';
+    p = buff + res.dsc$w_length;
+    while (--p >= buff) if (!isspace(*p)) break;  
+    *p = '\0';
     if (!decc_efs_case_preserve) {
-      buff[VMS_MAXRSS - 1] = '\0';
       for (p = buff; *p; p++) *p = _tolower(*p);
     }
-    else {
-      /* we don't want to force to lowercase, just null terminate */
-      buff[res.dsc$w_length] = '\0';
-    }
-    while (--p >= buff) if (!isspace(*p)) break;  /* Do we really need this? */
-    *p = '\0';
 
     /* Skip any directory component and just copy the name. */
     sts = vms_split_path
@@ -12910,14 +12918,14 @@ mp_do_vms_realpath(pTHX_ const char *filespec, char * rslt_spec,
 		   int *utf8_fl);
 
 void
-vms_realpath_fromperl(pTHX_ CV *cv)
+unixrealpath_fromperl(pTHX_ CV *cv)
 {
     dXSARGS;
     char *fspec, *rslt_spec, *rslt;
     STRLEN n_a;
 
     if (!items || items != 1)
-	Perl_croak(aTHX_ "Usage: VMS::Filespec::vms_realpath(spec)");
+	Perl_croak(aTHX_ "Usage: VMS::Filespec::unixrealpath(spec)");
 
     fspec = SvPV(ST(0),n_a);
     if (!fspec || !*fspec) XSRETURN_UNDEF;
@@ -12938,14 +12946,14 @@ mp_do_vms_realname(pTHX_ const char *filespec, char * rslt_spec,
 		   int *utf8_fl);
 
 void
-vms_realname_fromperl(pTHX_ CV *cv)
+vmsrealpath_fromperl(pTHX_ CV *cv)
 {
     dXSARGS;
     char *fspec, *rslt_spec, *rslt;
     STRLEN n_a;
 
     if (!items || items != 1)
-	Perl_croak(aTHX_ "Usage: VMS::Filespec::vms_realname(spec)");
+	Perl_croak(aTHX_ "Usage: VMS::Filespec::vmsrealpath(spec)");
 
     fspec = SvPV(ST(0),n_a);
     if (!fspec || !*fspec) XSRETURN_UNDEF;
@@ -12981,7 +12989,7 @@ int my_symlink(const char *path1, const char *path2) {
 int do_vms_case_tolerant(void);
 
 void
-vms_case_tolerant_fromperl(pTHX_ CV *cv)
+case_tolerant_process_fromperl(pTHX_ CV *cv)
 {
   dXSARGS;
   ST(0) = boolSV(do_vms_case_tolerant());
@@ -13038,10 +13046,10 @@ init_os_extras(void)
   newXSproto("DynaLoader::mod2fname", mod2fname, file, "$");
   newXS("File::Copy::rmscopy",rmscopy_fromperl,file);
   newXSproto("vmsish::hushed",hushexit_fromperl,file,";$");
-  newXSproto("VMS::Filespec::vms_realpath",vms_realpath_fromperl,file,"$;$");
-  newXSproto("VMS::Filespec::vms_realname",vms_realname_fromperl,file,"$;$");
-  newXSproto("VMS::Filepec::vms_case_tolerant",
-             vms_case_tolerant_fromperl, file, "$");
+  newXSproto("VMS::Filespec::unixrealpath",unixrealpath_fromperl,file,"$;$");
+  newXSproto("VMS::Filespec::vmsrealpath",vmsrealpath_fromperl,file,"$;$");
+  newXSproto("VMS::Filespec::case_tolerant_process",
+      case_tolerant_process_fromperl,file,"");
 
   store_pipelocs(aTHX);         /* will redo any earlier attempts */
 
@@ -13130,8 +13138,8 @@ mp_do_vms_realpath(pTHX_ const char *filespec, char *outbuf,
 
         Newx(vms_spec, VMS_MAXRSS + 1, char);
 
-	 sts = vms_fid_to_name(vms_spec, VMS_MAXRSS + 1, filespec);
-	 if (sts == 0) {
+	sts = vms_fid_to_name(vms_spec, VMS_MAXRSS + 1, filespec);
+	if (sts == 0) {
 
 
 	    /* Now need to trim the version off */
@@ -13151,17 +13159,28 @@ mp_do_vms_realpath(pTHX_ const char *filespec, char *outbuf,
 		   &vs_len);
 
 
-	     if (sts == 0) {
-	        int file_len;
+		if (sts == 0) {
+	            int haslower = 0;
+	            const char *cp;
 
-		/* Trim off the version */
-		file_len = v_len + r_len + d_len + n_len + e_len;
-		vms_spec[file_len] = 0;
+	            /* Trim off the version */
+	            int file_len = v_len + r_len + d_len + n_len + e_len;
+	            vms_spec[file_len] = 0;
 
-		/* The result is expected to be in UNIX format */
-		rslt = do_tounixspec(vms_spec, outbuf, 0, utf8_fl);
-	     }
-	 }
+	            /* The result is expected to be in UNIX format */
+		    rslt = do_tounixspec(vms_spec, outbuf, 0, utf8_fl);
+
+                    /* Downcase if input had any lower case letters and 
+	             * case preservation is not in effect. 
+	             */
+	            if (!decc_efs_case_preserve) {
+	                for (cp = filespec; *cp; cp++)
+	                    if (islower(*cp)) { haslower = 1; break; }
+
+	                if (haslower) __mystrtolower(rslt);
+	            }
+	        }
+	}
 
         Safefree(vms_spec);
     }
@@ -13203,11 +13222,22 @@ mp_do_vms_realname(pTHX_ const char *filespec, char *outbuf,
 
 
 	if (sts == 0) {
-	    int file_len;
+	    int haslower = 0;
+	    const char *cp;
 
-	/* Trim off the version */
-	file_len = v_len + r_len + d_len + n_len + e_len;
-	outbuf[file_len] = 0;
+	    /* Trim off the version */
+	    int file_len = v_len + r_len + d_len + n_len + e_len;
+	    outbuf[file_len] = 0;
+
+	    /* Downcase if input had any lower case letters and 
+	     * case preservation is not in effect. 
+	     */
+	    if (!decc_efs_case_preserve) {
+	        for (cp = filespec; *cp; cp++)
+	            if (islower(*cp)) { haslower = 1; break; }
+
+	        if (haslower) __mystrtolower(outbuf);
+	    }
 	}
     }
     return outbuf;
