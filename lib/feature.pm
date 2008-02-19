@@ -1,6 +1,6 @@
 package feature;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 # (feature name) => (internal name, used in %^H)
 my %feature = (
@@ -8,13 +8,17 @@ my %feature = (
     state  => "feature_state",
 );
 
+# NB. the latest bundle must be loaded by the -E switch (see toke.c)
+
 my %feature_bundle = (
     "5.10.0" => [qw(switch state)],
+    "5.11.0" => [qw(switch state)],
 );
 
 # latest version here
-$feature_bundle{"5.10"} = $feature_bundle{"5.10.0"};
+$feature_bundle{"5.11"} = $feature_bundle{"5.11.0"};
 
+$feature_bundle{"5.10"} = $feature_bundle{"5.10.0"};
 $feature_bundle{"5.9.5"} = $feature_bundle{"5.10.0"};
 
 # TODO:
