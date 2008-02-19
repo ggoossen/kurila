@@ -967,7 +967,11 @@ Perl_re_intuit_start(pTHX_ REGEXP * const prog, SV *sv, char *strpos,
     return NULL;
 }
 
-
+#define DECL_TRIE_TYPE(scan) \
+    const enum { trie_plain, trie_utf8, trie_utf8_fold, trie_latin_utf8_fold } \
+		    trie_type = (scan->flags != EXACT) \
+		              ? (do_utf8 ? trie_utf8_fold : (UTF ? trie_latin_utf8_fold : trie_plain)) \
+                              : (do_utf8 ? trie_utf8 : trie_plain)
 
 #define REXEC_FBC_UTF8_SCAN(CoDe)                     \
 STMT_START {                                          \
