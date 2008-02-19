@@ -2082,6 +2082,8 @@ Perl_do_msgsnd(pTHX_ SV **mark, SV **sp)
     SETERRNO(0,0);
     return msgsnd(id, (struct msgbuf *)mbuf, msize, flags);
 #else
+    PERL_UNUSED_ARG(sp);
+    PERL_UNUSED_ARG(mark);
     Perl_croak(aTHX_ "msgsnd not implemented");
 #endif
 }
@@ -2119,6 +2121,8 @@ Perl_do_msgrcv(pTHX_ SV **mark, SV **sp)
     }
     return ret;
 #else
+    PERL_UNUSED_ARG(sp);
+    PERL_UNUSED_ARG(mark);
     Perl_croak(aTHX_ "msgrcv not implemented");
 #endif
 }
