@@ -2516,6 +2516,14 @@ PP(pp_entersub)
 	if (CvANON(cv) || !(gv = CvGV(cv)))
 	    DIE(aTHX_ "Undefined subroutine called");
 
+	/* glob assignment */
+	if (cv != GvCV(gv)) {
+	    cv = GvCV(gv);
+	    if (!cv)
+		DIE(aTHX_ "Not a CODE reference");
+	    goto retry;
+	}
+
 	/* sorry */
 	sub_name = sv_newmortal();
 	gv_efullname4(sub_name, gv, NULL, TRUE);
