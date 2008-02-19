@@ -1119,11 +1119,6 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
     if (old_type == new_type)
 	return;
 
-    if (old_type > new_type)
-	Perl_croak(aTHX_ "sv_upgrade from type %d down to type %d",
-		(int)old_type, (int)new_type);
-
-
     old_body = SvANY(sv);
 
     /* Copying structures onto other structures that have been neatly zeroed
@@ -1200,6 +1195,11 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
 	    Perl_croak(aTHX_ "Can't upgrade %s (%" UVuf ") to %" UVuf,
 		       sv_reftype(sv, 0), (UV) old_type, (UV) new_type);
     }
+
+    if (old_type > new_type)
+	Perl_croak(aTHX_ "sv_upgrade from type %d down to type %d",
+		(int)old_type, (int)new_type);
+
     new_type_details = bodies_by_type + new_type;
 
     SvFLAGS(sv) &= ~SVTYPEMASK;
@@ -1245,7 +1245,7 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
 	    AvMAX(sv)	= -1;
 	    AvFILLp(sv)	= -1;
 	    AvREAL_only(sv);
-	    if (old_type >= SVt_RV) {
+	    if (old_type_details->body_size) {
 		AvALLOC(sv) = 0;
 	    } else {
 		/* It will have been zeroed when the new body was allocated.
@@ -1259,7 +1259,7 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
 	    HvSHAREKEYS_on(sv);         /* key-sharing on by default */
 #endif
 	    HvMAX(sv) = 7; /* (start with 8 buckets) */
-	    if (old_type >= SVt_RV) {
+	    if (old_type_details->body_size) {
 		HvFILL(sv) = 0;
 	    } else {
 		/* It will have been zeroed when the new body was allocated.
@@ -1474,10 +1474,8 @@ Perl_sv_setiv(pTHX_ register SV *sv, IV i)
     SV_CHECK_THINKFIRST_COW_DROP(sv);
     switch (SvTYPE(sv)) {
     case SVt_NULL:
-	sv_upgrade(sv, SVt_IV);
-	break;
     case SVt_NV:
-	sv_upgrade(sv, SVt_PVNV);
+	sv_upgrade(sv, SVt_IV);
 	break;
     case SVt_RV:
     case SVt_PV:
@@ -10759,7 +10757,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 
     PL_Sv		= NULL;
     PL_Xpv		= (XPV*)NULL;
-    PL_na		= proto_perl->Ina;
+    my_perl->Ina	= proto_perl->Ina;
 
     PL_statbuf		= proto_perl->Istatbuf;
     PL_statcache	= proto_perl->Istatcache;
