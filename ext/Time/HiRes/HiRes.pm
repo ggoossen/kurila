@@ -23,9 +23,8 @@ require DynaLoader;
 		 stat
 		);
 	
-$VERSION = '1.9710';
-$XS_VERSION = $VERSION;
-$VERSION = eval $VERSION;
+$VERSION = v1.9711;
+($XS_VERSION = $VERSION) =~ s/^v//;
 
 sub import {
     my $this = shift;
