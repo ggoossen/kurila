@@ -9,7 +9,7 @@ require ExtUtils::Constant::XS;
 use ExtUtils::Constant::Utils qw(C_stringify);
 use ExtUtils::Constant::XS qw(%XS_TypeSet);
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 @ISA = 'ExtUtils::Constant::XS';
 
 %type_to_struct =
@@ -397,7 +397,8 @@ EXPLODE
 		/* It turns out to be incredibly hard to deal with all the
 		   corner cases of sub foo (); and reporting errors correctly,
 		   so lets cheat a bit.  Start with a constant subroutine  */
-		CV *cv = newCONSTSUB(symbol_table, value_for_notfound->name,
+		CV *cv = newCONSTSUB(symbol_table,
+				     value_for_notfound->name,
 				     &PL_sv_yes);
 		/* and then turn it into a non constant declaration only.  */
 		SvREFCNT_dec(CvXSUBANY(cv).any_ptr);
