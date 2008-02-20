@@ -1266,7 +1266,8 @@ play_it_again:
 	     && !SvROK(TARG))	/* Cannot trust since INTUIT cannot guess ^ */
 	    goto yup;
     }
-    if (CALLREGEXEC(rx, (char*)s, (char *)strend, (char*)truebase, minmatch, TARG, gpos, r_flags))
+    if (CALLREGEXEC(rx, (char*)s, (char *)strend, (char*)truebase,
+                    minmatch, TARG, NUM2PTR(void*, gpos), r_flags))
     {
 	PL_curpm = pm;
 	goto gotcha;
