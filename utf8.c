@@ -537,7 +537,7 @@ malformed:
     }
 
     if (dowarn) {
-	SV* const sv = sv_2mortal(newSVpvs("Malformed UTF-8 character "));
+	SV* const sv = newSVpvs_flags("Malformed UTF-8 character ", SVs_TEMP);
 
 	switch (warning) {
 	case 0: /* Intentionally empty. */ break;
@@ -1580,8 +1580,8 @@ Perl_swash_init(pTHX_ const char* pkg, const char* name, SV *listsv, I32 minbits
     SPAGAIN;
     PUSHMARK(SP);
     EXTEND(SP,5);
-    PUSHs(sv_2mortal(newSVpvn(pkg, pkg_len)));
-    PUSHs(sv_2mortal(newSVpvn(name, name_len)));
+    PUSHs(newSVpvn_flags(pkg, pkg_len, SVs_TEMP));
+    PUSHs(newSVpvn_flags(name, name_len, SVs_TEMP));
     PUSHs(listsv);
     PUSHs(sv_2mortal(newSViv(minbits)));
     PUSHs(sv_2mortal(newSViv(none)));

@@ -347,7 +347,7 @@ PP(pp_prototype)
 			|| code == -KEY_exec || code == -KEY_system)
 		    goto set;
 		if (code == -KEY_mkdir) {
-		    ret = sv_2mortal(newSVpvs("_;$"));
+		    ret = newSVpvs_flags("_;$", SVs_TEMP);
 		    goto set;
 		}
 		if (code == -KEY_readpipe) {
@@ -383,7 +383,7 @@ PP(pp_prototype)
 		if (defgv && str[n - 1] == '$')
 		    str[n - 1] = '_';
 		str[n++] = '\0';
-		ret = sv_2mortal(newSVpvn(str, n - 1));
+		ret = newSVpvn_flags(str, n - 1, SVs_TEMP);
 	    }
 	    else if (code)		/* Non-Overridable */
 		goto set;
@@ -395,7 +395,7 @@ PP(pp_prototype)
     }
     cv = sv_2cv(TOPs, &stash, &gv, 0);
     if (cv && SvPOK(cv))
-	ret = sv_2mortal(newSVpvn(SvPVX_const(cv), SvCUR(cv)));
+	ret = newSVpvn_flags(SvPVX_const(cv), SvCUR(cv), SVs_TEMP);
   set:
     SETs(ret);
     RETURN;
@@ -3012,7 +3012,7 @@ PP(pp_index)
 	   Otherwise I need to avoid calls to sv_pos_u2b(), which (dangerously)
 	   will trigger magic and overloading again, as will fbm_instr()
 	*/
-	big = sv_2mortal(newSVpvn(big_p, biglen));
+	big = newSVpvn_flags(big_p, biglen, SVs_TEMP);
 	big_p = SvPVX(big);
     }
     if (SvGAMAGIC(little) || (is_index && !SvOK(little))) {
@@ -3024,7 +3024,7 @@ PP(pp_index)
 	   This is all getting to messy. The API isn't quite clean enough,
 	   because data access has side effects.
 	*/
-	little = sv_2mortal(newSVpvn(little_p, llen));
+	little = newSVpvn_flags(little_p, llen, SVs_TEMP);
 	little_p = SvPVX(little);
     }
 

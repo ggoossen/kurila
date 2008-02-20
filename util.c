@@ -1025,7 +1025,7 @@ S_mess_alloc(pTHX)
     XPVMG *any;
 
     if (!PL_dirty)
-	return sv_2mortal(newSVpvs(""));
+	return newSVpvs_flags("", SVs_TEMP);
 
     if (PL_mess_sv)
 	return PL_mess_sv;
@@ -1153,7 +1153,7 @@ Perl_write_to_stderr(pTHX_ const char* message, int msglen)
 	PUSHMARK(SP);
 	EXTEND(SP,2);
 	PUSHs(SvTIED_obj((SV*)io, mg));
-	PUSHs(sv_2mortal(newSVpvn(message, msglen)));
+	PUSHs(newSVpvn_flags(message, msglen, SVs_TEMP));
 	PUTBACK;
 	call_method("PRINT", G_SCALAR);
 

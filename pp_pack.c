@@ -1829,7 +1829,7 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
 		SHIFT_VAR(s, strend, aptr, datumtype);
 		DO_BO_UNPACK_PC(aptr);
 		/* newSVpvn generates undef if aptr is NULL */
-		PUSHs(sv_2mortal(newSVpvn(aptr, len)));
+		PUSHs(newSVpvn_flags(aptr, len, SVs_TEMP));
 	    }
 	    break;
 #ifdef HAS_QUAD
@@ -2230,7 +2230,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 			       by copying it to a temporary.  */
 			    STRLEN len;
 			    const char *const pv = SvPV_const(*beglist, len);
-			    SV *const temp = sv_2mortal(newSVpvn(pv, len));
+			    SV *const temp = newSVpvn_flags(pv, len, SVs_TEMP);
 			    *beglist = temp;
 			}
 			count = sv_len(*beglist);
