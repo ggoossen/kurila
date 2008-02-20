@@ -2307,7 +2307,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
     case SVt_BIND:
 	sv_catpv(t, " BIND=\"");
 	break;
-    case SVt_ORANGE:
+    case SVt_REGEXP:
 	sv_catpv(t, " ORANGE=\"");
 	break;
     case SVt_PVIO:
@@ -2349,8 +2349,9 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     Perl_xmldump_indent(aTHX_ level, file, "<pmop \n");
     level++;
     if (PM_GETRE(pm)) {
-	const regexp *const r = PM_GETRE(pm);
-	SV * const tmpsv = newSVpvn(RX_PRECOMP(r),r->prelen);
+	REGEXP *const r = PM_GETRE(pm);
+	/* FIXME ORANGE - REGEXP can be 8 bit, so this is sometimes buggy:  */
+	SV * const tmpsv = newSVpvn(RX_PRECOMP(r),RX_PRELEN(r));
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"%s\"\n",
 	     SvPVX(tmpsv));
 	SvREFCNT_dec(tmpsv);
@@ -2359,7 +2360,7 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     }
     else
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"\" when=\"RUN\"\n");
-    if (pm->op_pmflags || (PM_GETRE(pm) && PM_GETRE(pm)->check_substr)) {
+    if (pm->op_pmflags || (PM_GETRE(pm) && RX_CHECK_SUBSTR(PM_GETRE(pm)))) {
 	SV * const tmpsv = pm_description(pm);
 	Perl_xmldump_indent(aTHX_ level, file, "pmflags=\"%s\"\n", SvCUR(tmpsv) ? SvPVX(tmpsv) + 1 : "");
 	SvREFCNT_dec(tmpsv);
@@ -2529,8 +2530,8 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	S_xmldump_attr(aTHX_ level, file, "padix=\"%" IVdf "\"", (IV)cPADOPo->op_padix);
 #else
 	if (cSVOPo->op_sv) {
-	    SV * const tmpsv1 = newSV(0);
-	    SV * const tmpsv2 = newSVpvn("",0);
+	    SV * const tmpsv1 = newSVpvn_utf8(NULL, 0, TRUE);
+	    SV * const tmpsv2 = newSVpvn_utf8("", 0, TRUE);
 	    char *s;
 	    STRLEN len;
 	    ENTER;
@@ -2619,11 +2620,11 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	SV * const tmpsv = newSVpvn("", 0);
 	const MADPROP* mp = o->op_madprop;
 
-        if (!contents) {
-            contents = 1;
-            PerlIO_printf(file, ">\n");
-        }
-        Perl_xmldump_indent(aTHX_ level, file, "<madprops>\n");
+	if (!contents) {
+	    contents = 1;
+	    PerlIO_printf(file, ">\n");
+	}
+	Perl_xmldump_indent(aTHX_ level, file, "<madprops>\n");
 	level++;
 	while (mp) {
 	    char tmp = mp->mad_key;
