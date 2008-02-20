@@ -4520,9 +4520,7 @@ Perl_reg_named_buff_nextkey(pTHX_ REGEXP * const r, const U32 flags)
                 }
             }
             if (parno || flags & RXapif_ALL) {
-                STRLEN len;
-                char *pv = HePV(temphe, len);
-                return newSVpvn(pv,len);
+		return newSVhek(HeKEY_hek(temphe));
             }
         }
     }
@@ -4578,9 +4576,7 @@ Perl_reg_named_buff_all(pTHX_ REGEXP * const r, const U32 flags)
                 }
             }
             if (parno || flags & RXapif_ALL) {
-                STRLEN len;
-                char *pv = HePV(temphe, len);
-                av_push(av, newSVpvn(pv,len));
+                av_push(av, newSVhek(HeKEY_hek(temphe)));
             }
         }
     }
