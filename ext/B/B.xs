@@ -687,7 +687,7 @@ MODULE = B	PACKAGE = B::REGEXP
 
 IV
 REGEX(sv)
-	B::PVMG	sv
+	B::REGEXP	sv
     CODE:
 	RETVAL = PTR2IV(((struct xregexp *)SvANY(sv))->xrx_regexp);
     OUTPUT:
@@ -695,7 +695,7 @@ REGEX(sv)
 
 SV*
 precomp(sv)
-	B::PVMG	sv
+	B::REGEXP	sv
 	REGEXP* rx = NO_INIT
     CODE:
 	rx = ((struct xregexp *)SvANY(sv))->xrx_regexp;

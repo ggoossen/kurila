@@ -107,7 +107,7 @@ PPCODE:
 
             const char *fptr = INT_PAT_MODS;
             char ch;
-            U16 match_flags = (U16)((re->extflags & PMf_COMPILETIME)
+            U16 match_flags = (U16)((RX_EXTFLAGS(re) & PMf_COMPILETIME)
 				    >> RXf_PMf_STD_PMMOD_SHIFT);
 
             while((ch = *fptr++)) {
@@ -166,11 +166,11 @@ PPCODE:
     {
         SV *an = &PL_sv_no;
         SV *fl = &PL_sv_no;
-        if (re->anchored_substr) {
-            an = newSVsv(re->anchored_substr);
+        if (RX_ANCHORED_SUBSTR(re)) {
+            an = newSVsv(RX_ANCHORED_SUBSTR(re));
         }
-        if (re->float_substr) {
-            fl = newSVsv(re->float_substr);
+        if (RX_FLOAT_SUBSTR(re)) {
+            fl = newSVsv(RX_FLOAT_SUBSTR(re));
         }
         XPUSHs(an);
         XPUSHs(fl);
