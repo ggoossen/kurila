@@ -3807,7 +3807,8 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
         bool has_p     = ((r->extflags & RXf_PMf_KEEPCOPY) == RXf_PMf_KEEPCOPY);
 	bool has_minus = ((r->extflags & RXf_PMf_STD_PMMOD) != RXf_PMf_STD_PMMOD);
 	bool has_runon = ((RExC_seen & REG_SEEN_RUN_ON_COMMENT)==REG_SEEN_RUN_ON_COMMENT);
-	U16 reganch = (U16)((r->extflags & RXf_PMf_STD_PMMOD) >> 12);
+	U16 reganch = (U16)((r->extflags & RXf_PMf_STD_PMMOD)
+			    >> RXf_PMf_STD_PMMOD_SHIFT);
 	const char *fptr = STD_PAT_MODS;        /*"msix"*/
 	char *p;
         RX_WRAPLEN(r) = plen + has_minus + has_p + has_runon
