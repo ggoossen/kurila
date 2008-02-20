@@ -16,10 +16,8 @@ BEGIN {
 
 use strict;
 use warnings;
-my $uc;
-BEGIN {
-    $uc = $] > 5.009;
-}
+our $uc;
+BEGIN { $uc = 1; }
 use Test::More tests => $uc ? 100 : 80;
 
 # Doing this longhand cut&paste makes it clear

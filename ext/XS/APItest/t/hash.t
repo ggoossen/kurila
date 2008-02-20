@@ -43,7 +43,7 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
   my %h = (a=>'cheat');
   tie %h, 'Tie::StdHash';
   # is bug 36327 fixed?
-  my $result = ($] > 5.009) ? undef : 1;
+  my $result = undef;
 
   is (XS::APItest::Hash::store(\%h, chr 258,  1), $result);
     
@@ -51,7 +51,7 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
       "hv_store does insert a key with the raw utf8 on a tied hash");
 }
 
-if ($] > 5.009) {
+{
     my $strtab = strtab();
     is (ref $strtab, 'HASH', "The shared string table quacks like a hash");
     my $wibble = "\0";
@@ -356,13 +356,8 @@ sub test_store {
   if (defined $class) {
     tie %$h1, ref $class;
     tie %$h2, ref $class;
-    if ($] > 5.009) {
-      # bug 36327 is fixed
-      $HV_STORE_IS_CRAZY = undef;
-    } else {
-      # HV store_ent returns 1 if there was already underlying hash storage
-      $HV_STORE_IS_CRAZY = undef unless @$defaults;
-    }
+    # bug 36327 is fixed
+    $HV_STORE_IS_CRAZY = undef;
   }
   is (XS::APItest::Hash::store_ent($h1, $key, 1), $HV_STORE_IS_CRAZY,
       "hv_store_ent$message $printable");

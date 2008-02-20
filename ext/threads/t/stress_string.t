@@ -50,7 +50,7 @@ sub test9 {
 
 my @threads;
 for (1..$cnt) {
-    my $thr = threads->create('test9', $_);
+    my $thr = threads->create(\&test9, $_);
     ok($thr, "Thread created - iter $_");
     push(@threads, $thr);
 }

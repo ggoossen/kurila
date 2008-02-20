@@ -50,14 +50,6 @@
 #endif
 #endif
 
-#ifndef SvRV_set
-#define SvRV_set(sv, val) \
-    STMT_START { \
-        assert(SvTYPE(sv) >=  SVt_RV); \
-        (((XRV*)SvANY(sv))->xrv_rv = (val)); \
-    } STMT_END
-#endif
-
 #ifndef PERL_UNUSED_DECL
 #  ifdef HASATTRIBUTE
 #    if (defined(__GNUC__) && defined(__cplusplus)) || defined(__INTEL_COMPILER)
@@ -3254,7 +3246,9 @@ static int sv_type(pTHX_ SV *sv)
 {
 	switch (SvTYPE(sv)) {
 	case SVt_NULL:
+#if PERL_VERSION <= 10
 	case SVt_IV:
+#endif
 	case SVt_NV:
 		/*
 		 * No need to check for ROK, that can't be set here since there
@@ -3262,7 +3256,11 @@ static int sv_type(pTHX_ SV *sv)
 		 */
 		return svis_SCALAR;
 	case SVt_PV:
+#if PERL_VERSION <= 10
 	case SVt_RV:
+#else
+	case SVt_IV:
+#endif
 	case SVt_PVIV:
 	case SVt_PVNV:
 		/*
@@ -4317,9 +4315,9 @@ static SV *retrieve_ref(pTHX_ stcxt_t *cxt, const char *cname)
 
 	if (cname) {
 		/* No need to do anything, as rv will already be PVMG.  */
-		assert (SvTYPE(rv) >= SVt_RV);
+		assert (SvTYPE(rv) == SVt_IV || SvTYPE(rv) >= SVt_PV);
 	} else {
-		sv_upgrade(rv, SVt_RV);
+		sv_upgrade(rv, SVt_IV);
 	}
 
 	SvRV_set(rv, sv);				/* $rv = \$sv */
@@ -4381,7 +4379,7 @@ static SV *retrieve_overloaded(pTHX_ stcxt_t *cxt, const char *cname)
 	 * WARNING: breaks RV encapsulation.
 	 */
 
-	sv_upgrade(rv, SVt_RV);
+	sv_upgrade(rv, SVt_IV);
 	SvRV_set(rv, sv);				/* $rv = \$sv */
 	SvROK_on(rv);
 

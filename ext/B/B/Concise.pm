@@ -28,7 +28,7 @@ our %EXPORT_TAGS =
 # use #6
 use B qw(class ppname main_start main_root main_cv cstring svref_2object
 	 SVf_IOK SVf_NOK SVf_POK SVf_IVisUV SVf_FAKE OPf_KIDS OPf_SPECIAL
-	 CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI);
+	 CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK);
 
 my %style =
   ("terse" =>
@@ -693,10 +693,10 @@ sub concise_sv {
 	$hr->{svval} = "*$stash" . $gv->SAFENAME;
 	return "*$stash" . $gv->SAFENAME;
     } else {
-	while (class($sv) eq "RV") {
-	    $hr->{svval} .= "\\";
-	    $sv = $sv->RV;
-	}
+        while (class($sv) eq "IV" && ($sv->FLAGS ^&^ SVf_ROK)) {
+            $hr->{svval} .= "\\";
+            $sv = $sv->RV;
+        }
 	if (class($sv) eq "SPECIAL") {
 	    $hr->{svval} .= ["Null", "sv_undef", "sv_yes", "sv_no"]->[$$sv];
 	} elsif ($preferpv && $sv->FLAGS ^&^ SVf_POK) {

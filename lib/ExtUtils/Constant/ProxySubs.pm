@@ -263,7 +263,7 @@ get_missing_hash(pTHX) \{
 	return (HV*) SvRV(*ref);
 
     new_hv = newHV();
-    SvUPGRADE(*ref, SVt_RV);
+    SvUPGRADE(*ref, SVt_IV);
     SvRV_set(*ref, (SV *)new_hv);
     SvROK_on(*ref);
     return new_hv;

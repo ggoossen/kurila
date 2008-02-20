@@ -22,7 +22,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 55;
+use Test::More tests => 56;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -75,8 +75,9 @@ is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
 
 use constant cr => ['hello'];
 my $string = "sub " . $deparse->coderef2text(\&cr);
-my $val = (eval $string)->();
-ok( ref($val) eq 'ARRAY' && $val->[0] eq 'hello');
+my $val = (eval $string)->() or diag $string;
+is(ref($val), 'ARRAY');
+is($val->[0], 'hello');
 
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
