@@ -450,12 +450,6 @@ struct xpvmg {
     _XPVMG_HEAD;
 };
 
-struct xregexp {
-    _XPV_HEAD;
-    _XPVMG_HEAD;
-    REGEXP *	xrx_regexp;	/* Our regular expression */
-};
-
 struct xpvlv {
     _XPV_HEAD;
     _XPVMG_HEAD;

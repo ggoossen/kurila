@@ -916,9 +916,9 @@ static const struct body_details bodies_by_type[] = {
     { sizeof(XPVMG), copy_length(XPVMG, xmg_stash), 0, SVt_PVMG, FALSE, HADNV,
       HASARENA, FIT_ARENA(0, sizeof(XPVMG)) },
 
-    /* 32 */
-    { sizeof(struct xregexp), copy_length(struct xregexp, xrx_regexp), 0,
-      SVt_REGEXP, FALSE, HADNV, HASARENA, FIT_ARENA(0, sizeof(struct xregexp))
+    /* something big */
+    { sizeof(struct regexp), sizeof(struct regexp), 0,
+      SVt_REGEXP, FALSE, HADNV, HASARENA, FIT_ARENA(0, sizeof(struct regexp))
     },
 
     /* 48 */
@@ -2597,8 +2597,9 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
                     I32 haseval = 0;
                     U32 flags = 0;
 		    struct magic temp;
-		    temp.mg_obj
-			= (SV*)((struct xregexp *)SvANY(referent))->xrx_regexp;
+		    /* FIXME - get rid of this cast away of const, or work out
+		       how to do it better.  */
+		    temp.mg_obj = (SV *)referent;
 		    assert(temp.mg_obj);
                     (str) = CALLREG_AS_STR(&temp,lp,&flags,&haseval);
                     PL_reginterp_cnt += haseval;
@@ -4071,7 +4072,6 @@ Perl_sv_magicext(pTHX_ SV* sv, SV* obj, int how, const MGVTBL *vtable,
     */
     if (!obj || obj == sv ||
 	how == PERL_MAGIC_arylen ||
-	how == PERL_MAGIC_qr ||
 	how == PERL_MAGIC_symtab ||
 	(SvTYPE(obj) == SVt_PVGV &&
 	    (GvSV(obj) == sv || GvHV(obj) == (HV*)sv || GvAV(obj) == (AV*)sv ||
@@ -4814,7 +4814,8 @@ Perl_sv_clear(pTHX_ register SV *sv)
 	IoDIRP(sv) = (DIR*)NULL;
 	goto freescalar;
     case SVt_REGEXP:
-	ReREFCNT_dec(((struct xregexp *)SvANY(sv))->xrx_regexp);
+	/* FIXME for plugins */
+	pregfree2(sv);
 	goto freescalar;
     case SVt_PVCV:
 	cv_undef((CV*)sv);
@@ -9105,10 +9106,13 @@ Perl_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS* param)
 	nmg->mg_private	= mg->mg_private;
 	nmg->mg_type	= mg->mg_type;
 	nmg->mg_flags	= mg->mg_flags;
+	/* FIXME for plugins
 	if (mg->mg_type == PERL_MAGIC_qr) {
 	    nmg->mg_obj	= (SV*)CALLREGDUPE((REGEXP*)mg->mg_obj, param);
 	}
-	else if(mg->mg_type == PERL_MAGIC_backref) {
+	else
+	*/
+	if(mg->mg_type == PERL_MAGIC_backref) {
 	    /* The backref AV has its reference count deliberately bumped by
 	       1.  */
 	    nmg->mg_obj = SvREFCNT_inc(av_dup_inc((AV*) mg->mg_obj, param));
@@ -9487,9 +9491,8 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 	    case SVt_PVMG:
 		break;
 	    case SVt_REGEXP:
-		((struct xregexp *)SvANY(dstr))->xrx_regexp
-		    = CALLREGDUPE(((struct xregexp *)SvANY(dstr))->xrx_regexp,
-				  param);
+		/* FIXME for plugins */
+		re_dup_guts(sstr, dstr, param);
 		break;
 	    case SVt_PVLV:
 		/* XXX LvTARGOFF sometimes holds PMOP* when DEBUGGING */
@@ -10457,12 +10460,17 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 	av_push(PL_regex_padav, sv_dup_inc_NN(regexen[0],param));
 	for(i = 1; i <= len; i++) {
 	    const SV * const regex = regexen[i];
+	    /* FIXME for plugins
+			newSViv(PTR2IV(CALLREGDUPE(
+				INT2PTR(REGEXP *, SvIVX(regex)), param))))
+	    */
+	    /* And while we're at it, can we FIXME on the whole hiding 
+	       pointer inside an IV hack? */
 	    SV * const sv =
 		SvREPADTMP(regex)
 		    ? sv_dup_inc(regex, param)
 		    : SvREFCNT_inc(
-			newSViv(PTR2IV(CALLREGDUPE(
-				INT2PTR(REGEXP *, SvIVX(regex)), param))))
+			newSViv(PTR2IV(sv_dup_inc(INT2PTR(REGEXP *, SvIVX(regex)), param))))
 		;
 	    if (SvFLAGS(regex) & SVf_BREAK)
 		SvFLAGS(sv) |= SVf_BREAK; /* unrefcnted PL_curpm */
