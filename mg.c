@@ -1537,7 +1537,7 @@ S_magic_methcall(pTHX_ SV *sv, const MAGIC *mg, const char *meth, I32 flags, int
     if (n > 1) {
         if (mg->mg_ptr) {
             if (mg->mg_len >= 0)
-                PUSHs(sv_2mortal(newSVpvn(mg->mg_ptr, mg->mg_len)));
+                PUSHs(newSVpvn_flags(mg->mg_ptr, mg->mg_len, SVs_TEMP));
             else if (mg->mg_len == HEf_SVKEY)
                 PUSHs((SV*)mg->mg_ptr);
         }
@@ -2163,9 +2163,9 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
             HV* old_cop_hints_hash;
 
 
-            PL_compiling.cop_hints |= HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
-            PL_hints
-                |= HINT_LOCALIZE_HH | HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
+	    PL_compiling.cop_hints |= HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
+	    PL_hints
+		|= HINT_LOCALIZE_HH | HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
 
             /* Opening for input is more common than opening for output, so
                ensure that hints for input are sooner on linked list.  */
@@ -2174,13 +2174,13 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
             PL_compiling.cop_hints_hash = newHVhv(PL_compiling.cop_hints_hash);
             SvREFCNT_dec(old_cop_hints_hash);
 
-            tmp = out ? newSVpvn(out + 1, start + len - out - 1) : newSVpvs("");
+            tmp = out ? newSVpvn_flags(out + 1, start + len - out - 1, SVs_TEMP) : newSVpvs_flags("", SVs_TEMP);
             (void)hv_store_ent(PL_compiling.cop_hints_hash, 
-                               sv_2mortal(newSVpvs("open>")), tmp, 0);
+                               newSVpvs_flags("open>", SVs_TEMP), tmp, 0);
 
-            tmp = newSVpvn(start, out ? (STRLEN)(out - start) : len);
+            tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, SVs_TEMP);
             (void)hv_store_ent(PL_compiling.cop_hints_hash,
-                               sv_2mortal(newSVpvs("open<")), tmp, 0);
+                               newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
         }
         break;
     case '\020':        /* ^P */

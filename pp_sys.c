@@ -388,7 +388,7 @@ PP(pp_glob)
     PL_last_in_gv = (GV*)*PL_stack_sp--;
 
     SAVESPTR(PL_rs);		/* This is not permanent, either. */
-    PL_rs = sv_2mortal(newSVpvs("\000"));
+    PL_rs = newSVpvs_flags("\000", SVs_TEMP);
 #ifndef DOSISH
 #ifndef CSH
     *SvPVX(PL_rs) = '\n';
@@ -470,7 +470,7 @@ PP(pp_die)
     if ( ! tmpsv ) {
 	ENTER;
 	PUSHMARK(SP);
-	XPUSHs(sv_2mortal(newSVpvs("Died")));
+	XPUSHs(newSVpvs_flags("Died", SVs_TEMP));
 	PUTBACK;
 	call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
@@ -2553,7 +2553,7 @@ PP(pp_stat)
 #ifdef USE_STAT_RDEV
 	PUSHs(sv_2mortal(newSViv(PL_statcache.st_rdev)));
 #else
-	PUSHs(sv_2mortal(newSVpvs("")));
+	PUSHs(newSVpvs_flags("", SVs_TEMP));
 #endif
 #if Off_t_size > IVSIZE
 	PUSHs(sv_2mortal(newSVnv((NV)PL_statcache.st_size)));
@@ -2573,8 +2573,8 @@ PP(pp_stat)
 	PUSHs(sv_2mortal(newSVuv(PL_statcache.st_blksize)));
 	PUSHs(sv_2mortal(newSVuv(PL_statcache.st_blocks)));
 #else
-	PUSHs(sv_2mortal(newSVpvs("")));
-	PUSHs(sv_2mortal(newSVpvs("")));
+	PUSHs(newSVpvs_flags("", SVs_TEMP));
+	PUSHs(newSVpvs_flags("", SVs_TEMP));
 #endif
     }
     RETURN;
@@ -4258,7 +4258,7 @@ S_space_join_names_mortal(pTHX_ char *const *array)
     SV *target;
 
     if (array && *array) {
-	target = sv_2mortal(newSVpvs(""));
+	target = newSVpvs_flags("", SVs_TEMP);
 	while (1) {
 	    sv_catpv(target, *array);
 	    if (!*++array)
@@ -4348,7 +4348,7 @@ PP(pp_ghostent)
 	PUSHs(sv_2mortal(newSViv((IV)len)));
 #ifdef h_addr
 	for (elem = hent->h_addr_list; elem && *elem; elem++) {
-	    XPUSHs(sv_2mortal(newSVpvn(*elem, len)));
+	    XPUSHs(newSVpvn_flags(*elem, len, SVs_TEMP));
 	}
 #else
 	if (hent->h_addr)

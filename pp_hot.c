@@ -245,7 +245,7 @@ PP(pp_concat)
     if (TARG == right && right != left) {
 	/* mg_get(right) may happen here ... */
 	rpv = SvPV_const(right, rlen);
-	right = sv_2mortal(newSVpvn(rpv, rlen));
+	right = newSVpvn_flags(rpv, rlen, SVs_TEMP);
 	rpv = SvPV_const(right, rlen);	/* no point setting UTF-8 here */
 	rcopied = TRUE;
     }

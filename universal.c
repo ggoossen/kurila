@@ -161,7 +161,7 @@ Perl_sv_does(pTHX_ SV *sv, const char *name)
     XPUSHs(sv_2mortal(newSVpv(name, 0)));
     PUTBACK;
 
-    methodname = sv_2mortal(newSVpvs("isa"));
+    methodname = newSVpvs_flags("isa", SVs_TEMP);
     /* ugly hack: use the SvSCREAM flag so S_method_common
      * can figure out we're calling DOES() and not isa(),
      * and report eventual errors correctly. --rgs */
@@ -1214,7 +1214,6 @@ XS(XS_PerlIO_get_layers)
 	}
 
 	if (gv && (io = GvIO(gv))) {
-	     dTARGET;
 	     AV* const av = PerlIO_get_layers(aTHX_ input ?
 					IoIFP(io) : IoOFP(io));
 	     I32 i;
@@ -1232,25 +1231,25 @@ XS(XS_PerlIO_get_layers)
 
 		  if (details) {
 		       XPUSHs(namok
-			      ? newSVpvn(SvPVX_const(*namsvp), SvCUR(*namsvp))
+			      ? sv_2mortal(newSVpvn(SvPVX_const(*namsvp), SvCUR(*namsvp)))
 			      : &PL_sv_undef);
 		       XPUSHs(argok
-			      ? newSVpvn(SvPVX_const(*argsvp), SvCUR(*argsvp))
+			      ? sv_2mortal(newSVpvn(SvPVX_const(*argsvp), SvCUR(*argsvp)))
 			      : &PL_sv_undef);
 		       if (flgok)
-			    XPUSHi(SvIVX(*flgsvp));
+			    mXPUSHi(SvIVX(*flgsvp));
 		       else
 			    XPUSHs(&PL_sv_undef);
 		       nitem += 3;
 		  }
 		  else {
 		       if (namok && argok)
-			    XPUSHs(Perl_newSVpvf(aTHX_ "%"SVf"(%"SVf")",
+			    XPUSHs(sv_2mortal(Perl_newSVpvf(aTHX_ "%"SVf"(%"SVf")",
 						 SVfARG(*namsvp),
-						 SVfARG(*argsvp)));
+						 SVfARG(*argsvp))));
 		       else if (namok)
-			    XPUSHs(Perl_newSVpvf(aTHX_ "%"SVf,
-						 SVfARG(*namsvp)));
+			    XPUSHs(sv_2mortal(Perl_newSVpvf(aTHX_ "%"SVf,
+						 SVfARG(*namsvp))));
 		       else
 			    XPUSHs(&PL_sv_undef);
 		       nitem++;
@@ -1258,7 +1257,7 @@ XS(XS_PerlIO_get_layers)
 			    const IV flags = SvIVX(*flgsvp);
 
 			    if (flags & PERLIO_F_UTF8) {
-				 XPUSHs(newSVpvs("utf8"));
+				 XPUSHs(newSVpvs_flags("utf8", SVs_TEMP));
 				 nitem++;
 			    }
 		       }

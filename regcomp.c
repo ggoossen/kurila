@@ -4759,8 +4759,9 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags) {
     }
 
     if ( flags ) {
-        SV* sv_name = sv_2mortal(Perl_newSVpvn(aTHX_ name_start,
-            (int)(RExC_parse - name_start)));
+        SV* sv_name
+	    = newSVpvn_flags(name_start, (int)(RExC_parse - name_start),
+			     SVs_TEMP);
         if ( flags == REG_RSN_RETURN_NAME)
             return sv_name;
         else if (flags==REG_RSN_RETURN_DATA) {

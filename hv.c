@@ -342,7 +342,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		SV* obj = mg->mg_obj;
 
 		if (!keysv) {
-		    keysv = sv_2mortal(newSVpvn(key, klen));
+		    keysv = newSVpvn_flags(key, klen, SVs_TEMP);
 		}
 		
 		mg->mg_obj = keysv;         /* pass key */
@@ -867,7 +867,7 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 #ifdef ENV_IS_CASELESS
 		else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
 		    /* XXX This code isn't UTF8 clean.  */
-		    keysv = sv_2mortal(newSVpvn(key,klen));
+		    keysv = newSVpvn_flags(key, klen, SVs_TEMP);
 		    if (k_flags & HVhek_FREEKEY) {
 			Safefree(key);
 		    }
