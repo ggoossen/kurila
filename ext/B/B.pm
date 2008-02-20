@@ -38,7 +38,7 @@ use strict;
 @B::PVIV::ISA = qw(B::PV B::IV);
 @B::PVNV::ISA = qw(B::PVIV B::NV);
 @B::PVMG::ISA = 'B::PVNV';
-@B::ORANGE::ISA = 'B::PVMG' if $] >= 5.011;
+@B::REGEXP::ISA = 'B::PVMG' if $] >= 5.011;
 # Change in the inheritance hierarchy post 5.9.0
 @B::PVLV::ISA = 'B::GV';
 @B::BM::ISA = 'B::PVMG';

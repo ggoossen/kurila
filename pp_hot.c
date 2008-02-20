@@ -1142,11 +1142,11 @@ PP(pp_qr)
     REGEXP * rx = PM_GETRE(pm);
     SV * const pkg = CALLREG_PACKAGE(rx);
     SV * const rv = sv_newmortal();
-    SV * const sv = newSVrv(rv, SvPV_nolen(pkg));
+    SV * const sv = newSVrv(rv, pkg ? SvPV_nolen(pkg) : NULL);
     if (rx->extflags & RXf_TAINTED)
         SvTAINTED_on(rv);
-    sv_upgrade(sv, SVt_ORANGE);
-    sv_magic(sv,(SV*)ReREFCNT_inc(rx), PERL_MAGIC_qr,0,0);
+    sv_upgrade(sv, SVt_REGEXP);
+    ((struct xregexp *)SvANY(sv))->xrx_regexp = ReREFCNT_inc(rx);
     XPUSHs(rv);
     RETURN;
 }
@@ -1200,7 +1200,7 @@ PP(pp_match)
 
 
     /* empty pattern special-cased to use last successful pattern if possible */
-    if (!rx->prelen && PL_curpm) {
+    if (!RX_PRELEN(rx) && PL_curpm) {
 	pm = PL_curpm;
 	rx = PM_GETRE(pm);
     }
@@ -1949,6 +1949,8 @@ PP(pp_subst)
     STRLEN len;
     int force_on_match = 0;
     const I32 oldsave = PL_savestack_ix;
+    STRLEN slen;
+    I32 matched;
 #ifdef PERL_OLD_COPY_ON_WRITE
     bool is_cow;
 #endif
@@ -2001,7 +2003,7 @@ PP(pp_subst)
 				   position, once with zero-length,
 				   second time with non-zero. */
 
-    if (!rx->prelen && PL_curpm) {
+    if (!RX_PRELEN(rx) && PL_curpm) {
 	pm = PL_curpm;
 	rx = PM_GETRE(pm);
     }
@@ -2031,7 +2033,8 @@ PP(pp_subst)
 
     /* only replace once? */
     once = !(rpm->op_pmflags & PMf_GLOBAL);
-
+    matched = CALLREGEXEC(rx, s, strend, orig, 0, TARG, NULL,
+			 r_flags | REXEC_CHECKED);
     /* known replacement string? */
     if (dstr) {
 	c = SvPV_const(dstr, clen);
@@ -2047,8 +2050,7 @@ PP(pp_subst)
 #endif
 	&& (I32)clen <= rx->minlenret && (once || !(r_flags & REXEC_COPY_STR))
 	&& !(rx->extflags & RXf_LOOKBEHIND_SEEN)) {
-	if (!CALLREGEXEC(rx, s, strend, orig, 0, TARG, NULL,
-			 r_flags | REXEC_CHECKED))
+	if (!matched)
 	{
 	    SPAGAIN;
 	    PUSHs(&PL_sv_no);
@@ -2150,8 +2152,7 @@ PP(pp_subst)
 	RETURN;
     }
 
-    if (CALLREGEXEC(rx, s, strend, orig, 0, TARG, NULL,
-		    r_flags | REXEC_CHECKED))
+    if (matched)
     {
 	if (force_on_match) {
 	    force_on_match = 0;

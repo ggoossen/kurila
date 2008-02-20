@@ -198,11 +198,17 @@ EOP
 
 open my $fh,"<","regexp.h" or die "Can't read regexp.h: $!";
 my %rxfv;
-my $val;
-while ( ~< $fh) {
+my $val = 0;
+my %reverse;
+while (~< $fh) {
     if (m/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i) {
-        $rxfv{$1}= eval $2;
-        $val^|^=$rxfv{$1};
+	my $newval = eval $2;
+	if($val ^&^ $newval) {
+	    die sprintf "Both $1 and $reverse{$newval} use %08X", $newval;
+	}
+        $val^|^=$newval;
+        $rxfv{$1}= $newval;
+	$reverse{$newval} = $1;
     }
 }    
 my %vrxf=reverse %rxfv;

@@ -116,7 +116,7 @@ PPCODE:
                 match_flags >>= 1;
             }
 
-            pattern = sv_2mortal(newSVpvn(re->precomp,re->prelen));
+            pattern = sv_2mortal(newSVpvn(RX_PRECOMP(re),RX_PRELEN(re)));
 
             /* return the pattern and the modifiers */
             XPUSHs(pattern);
@@ -125,7 +125,7 @@ PPCODE:
         } else {
             /* Scalar, so use the string that Perl would return */
             /* return the pattern in (?msix:..) format */
-            pattern = sv_2mortal(newSVpvn(re->wrapped,re->wraplen));
+            pattern = sv_2mortal(newSVpvn(RX_WRAPPED(re),RX_WRAPLEN(re)));
             XPUSHs(pattern);
             XSRETURN(1);
         }

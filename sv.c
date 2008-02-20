@@ -916,9 +916,10 @@ static const struct body_details bodies_by_type[] = {
     { sizeof(XPVMG), copy_length(XPVMG, xmg_stash), 0, SVt_PVMG, FALSE, HADNV,
       HASARENA, FIT_ARENA(0, sizeof(XPVMG)) },
 
-    /* 28 */
-    { sizeof(XPVMG), copy_length(XPVMG, xmg_stash), 0, SVt_ORANGE, FALSE, HADNV,
-      HASARENA, FIT_ARENA(0, sizeof(XPVMG)) },
+    /* 32 */
+    { sizeof(struct xregexp), copy_length(struct xregexp, xrx_regexp), 0,
+      SVt_REGEXP, FALSE, HADNV, HASARENA, FIT_ARENA(0, sizeof(struct xregexp))
+    },
 
     /* 48 */
     { sizeof(XPVGV), sizeof(XPVGV), 0, SVt_PVGV, TRUE, HADNV,
@@ -1301,7 +1302,7 @@ Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
     case SVt_PVGV:
     case SVt_PVCV:
     case SVt_PVLV:
-    case SVt_ORANGE:
+    case SVt_REGEXP:
     case SVt_PVMG:
     case SVt_PVNV:
     case SVt_PV:
@@ -2576,22 +2577,20 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
 		STRLEN len;
 		char *retval;
 		char *buffer;
-		MAGIC *mg;
 		const SV *const referent = (SV*)SvRV(sv);
 
 		if (!referent) {
 		    len = 7;
 		    retval = buffer = savepvn("NULLREF", len);
-		} else if (SvTYPE(referent) == SVt_ORANGE
-			   && ((SvFLAGS(referent) &
-				(SVs_OBJECT|SVf_OK|SVs_GMG|SVs_SMG|SVs_RMG))
-			       == (SVs_OBJECT|SVs_SMG))
-			   && (mg = mg_find(referent, PERL_MAGIC_qr)))
-                {
+		} else if (SvTYPE(referent) == SVt_REGEXP) {
                     char *str = NULL;
                     I32 haseval = 0;
                     U32 flags = 0;
-                    (str) = CALLREG_AS_STR(mg,lp,&flags,&haseval);
+		    struct magic temp;
+		    temp.mg_obj
+			= (SV*)((struct xregexp *)SvANY(referent))->xrx_regexp;
+		    assert(temp.mg_obj);
+                    (str) = CALLREG_AS_STR(&temp,lp,&flags,&haseval);
                     PL_reginterp_cnt += haseval;
 		    return str;
 		} else {
@@ -3831,6 +3830,10 @@ Perl_sv_chop(pTHX_ register SV *sv, register const char *ptr)
     if (!ptr || !SvPOKp(sv))
 	return;
     delta = ptr - SvPVX_const(sv);
+    if (!delta) {
+	/* Nothing to do.  */
+	return;
+    }
     SV_CHECK_THINKFIRST(sv);
     if (SvTYPE(sv) < SVt_PVIV)
 	sv_upgrade(sv,SVt_PVIV);
@@ -4787,6 +4790,9 @@ Perl_sv_clear(pTHX_ register SV *sv)
 	if (IoDIRP(sv) && !(IoFLAGS(sv) & IOf_FAKE_DIRP))
 	    PerlDir_close(IoDIRP(sv));
 	IoDIRP(sv) = (DIR*)NULL;
+	goto freescalar;
+    case SVt_REGEXP:
+	ReREFCNT_dec(((struct xregexp *)SvANY(sv))->xrx_regexp);
 	goto freescalar;
     case SVt_PVCV:
 	cv_undef((CV*)sv);
@@ -7089,7 +7095,7 @@ Perl_sv_reftype(pTHX_ const SV *sv, int ob)
 	case SVt_PVGV:		return "GLOB";
 	case SVt_PVIO:		return "IO";
 	case SVt_BIND:		return "BIND";
-	case SVt_ORANGE:	return "ORANGE";
+	case SVt_REGEXP:	return "Regexp"; /* FIXME? to "REGEXP"  */
 	default:		return "UNKNOWN";
 	}
     }
@@ -9403,7 +9409,7 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 	    case SVt_PVAV:
 	    case SVt_PVCV:
 	    case SVt_PVLV:
-	    case SVt_ORANGE:
+	    case SVt_REGEXP:
 	    case SVt_PVMG:
 	    case SVt_PVNV:
 	    case SVt_PVIV:
@@ -9458,7 +9464,10 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		break;
 	    case SVt_PVMG:
 		break;
-	    case SVt_ORANGE:
+	    case SVt_REGEXP:
+		((struct xregexp *)SvANY(dstr))->xrx_regexp
+		    = CALLREGDUPE(((struct xregexp *)SvANY(dstr))->xrx_regexp,
+				  param);
 		break;
 	    case SVt_PVLV:
 		/* XXX LvTARGOFF sometimes holds PMOP* when DEBUGGING */
