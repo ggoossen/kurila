@@ -2352,7 +2352,8 @@ typedef struct STRUCT_SV SV;
 typedef struct av AV;
 typedef struct hv HV;
 typedef struct cv CV;
-typedef struct regexp REGEXP;
+typedef struct regexp ORANGE;	/* This is the body structure.  */
+typedef SV REGEXP;
 typedef struct gp GP;
 typedef struct gv GV;
 typedef struct io IO;
@@ -3307,8 +3308,8 @@ struct nextmadtoken {
 };
 #endif
 
-#include "regexp.h"
 #include "sv.h"
+#include "regexp.h"
 #include "util.h"
 #include "form.h"
 #include "gv.h"
@@ -5063,7 +5064,7 @@ MGVTBL_SET(
     MEMBER_TO_FPTR(Perl_magic_setregexp),
     0,
     0,
-    MEMBER_TO_FPTR(Perl_magic_freeregexp),
+    0,
     0,
     0,
     0
