@@ -48,15 +48,17 @@ our ($test, $x, %XXX, @XXX, $foo, @x, $null, @words);
 # Force scalar context on the patern match
 sub ok ($;$) {
     my($ok, $name) = @_;
+    my $todo = $TODO ? " # TODO $TODO" : '';
 
     printf "%sok %d - %s\n", ($ok ? "" : "not "), $test,
-        ($name||$Message)."\tLine ".((caller)[2]);
+        ($name||$Message)."$todo\tLine ".((caller)[2]);
 
     printf "# Failed test at line %d\n", (caller)[2] unless $ok;
 
     $test++;
     return $ok;
 }
+
 
 $x = "abc\ndef\n";
 
@@ -2796,12 +2798,15 @@ ok("A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash");
     ok($a !~ m/^\C{4}y/,     q{don't match \C{4}y});
 }
 
-$_ = 'aaaaaaaaaa';
-chop $_; $\="\n";
-ok(m/[^\s]+/, "m/[^\s]/ utf8");
-ok(m/[^\d]+/, "m/[^\d]/ utf8");
-ok(($a = $_, $_ =~ s/[^\s]+/./g), "s/[^\s]/ utf8");
-ok(($a = $_, $a =~ s/[^\d]+/./g), "s/[^\s]/ utf8");
+{
+    local $\;
+    $_ = 'aaaaaaaaaa';
+    chop $_; $\="\n";
+    ok(m/[^\s]+/, "m/[^\s]/ utf8");
+    ok(m/[^\d]+/, "m/[^\d]/ utf8");
+    ok(($a = $_, $_ =~ s/[^\s]+/./g), "s/[^\s]/ utf8");
+    ok(($a = $_, $a =~ s/[^\d]+/./g), "s/[^\s]/ utf8");
+}
 
 ok("\x{100}" =~ m/\x{100}/, "[perl #15397]");
 ok("\x{100}" =~ m/(\x{100})/, "[perl #15397]");
@@ -2856,13 +2861,13 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
     foreach (1,2,3,4) {
 	    $p++ if m/(??{ $p })/
     }
-    ok ($p == 5, "[perl #20683] (??\{ \}) returns stale values");
+    iseq ($p, 5, '[perl #20683] (??{ }) returns stale values');
     { package P; $a=1; sub TIESCALAR { bless[] } sub FETCH { $a++ } }
     tie $p, 'P';
     foreach (1,2,3,4) {
 	    m/(??{ $p })/
     }
-    ok ( $p == 5, "(??\{ \}) returns stale values");
+    iseq ( $p, 5, '(??{ }) returns stale values');
 }
 
 {
@@ -3378,13 +3383,14 @@ SKIP:{
 
 sub iseq($$;$) { 
     my ( $got, $expect, $name)=@_;
+    my $todo = $TODO ? " # TODO $TODO" : '';
     
     $_=defined($_) ? "'$_'" : "undef"
         for $got, $expect;
         
     my $ok=  $got eq $expect;
         
-    printf "%sok %d - %s\n", ($ok ? "" : "not "), $test,
+    printf "%sok %d - %s$todo\n", ($ok ? "" : "not "), $test,
         ($name||$Message)."\tLine ".((caller)[2]);
 
     printf "# Failed test at line %d\n".
@@ -3792,12 +3798,13 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     iseq($^R,'Nothing');
 }
 {
-    local $Message="RT#22395";
+    local $Message="RT 22395";
+    local $TODO = "Should be L+1 not L*(L+3)/2 (L=$l)";
     our $count;
     for my $l (10,100,1000) {
 	$count=0;
 	('a' x $l) =~ m/(.*)(?{$count++})[bc]/;
-	iseq( $count, $l + 1, "# TODO Should be L+1 not L*(L+3)/2 (L=$l)");
+	iseq( $count, $l + 1);
     }
 }
 {
@@ -4165,6 +4172,12 @@ sub kt
     iseq(length($str),"0","Trie scope error, string should be empty");
 }
 
+{
+    my $a = 3; "" =~ m/(??{ $a })/;
+    my $b = $a;
+    iseq($b, $a, "copy of scalar used for postponed subexpression");
+}
+
 # Test counter is at bottom of file. Put new tests above here.
 #-------------------------------------------------------------------
 # Keep the following tests last -- they may crash perl
@@ -4224,6 +4237,6 @@ ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1780;
+    $::TestCount = 1781;
     print "1..$::TestCount\n";
 }
