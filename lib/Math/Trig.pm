@@ -9,14 +9,14 @@ package Math::Trig;
 
 use strict;
 
-use Math::Complex v1.36;
+use Math::Complex v1.37;
 use Math::Complex qw(:trig :pi);
 
 use vars qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA = qw(Exporter);
 
-$VERSION = 1.04;
+$VERSION = 1.05;
 
 my @angcnv = qw(rad2deg rad2grad
 		deg2rad deg2grad
@@ -646,7 +646,7 @@ The midpoint between London and Tokyo being
 
     my @M = great_circle_midpoint(@L, @T);
 
-or about 89.16N 68.93E, practically at the North Pole.
+or about 68.93N 89.16E, in the frozen wastes of Siberia.
 
 =head2 CAVEAT FOR GREAT CIRCLE FORMULAS
 
