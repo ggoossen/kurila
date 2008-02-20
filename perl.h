@@ -5012,7 +5012,19 @@ MGVTBL_SET(
 MGVTBL_SET(
     PL_vtbl_bm,
     0,
-    MEMBER_TO_FPTR(Perl_magic_setbm),
+    MEMBER_TO_FPTR(Perl_magic_setregexp),
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+);
+
+MGVTBL_SET(
+    PL_vtbl_fm,
+    0,
+    MEMBER_TO_FPTR(Perl_magic_setregexp),
     0,
     0,
     0,

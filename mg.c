@@ -2000,16 +2000,6 @@ Perl_magic_setmglob(pTHX_ SV *sv, MAGIC *mg)
 }
 
 int
-Perl_magic_setbm(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_UNUSED_ARG(mg);
-    sv_unmagic(sv, PERL_MAGIC_bm);
-    SvTAIL_off(sv);
-    SvVALID_off(sv);
-    return 0;
-}
-
-int
 Perl_magic_setuvar(pTHX_ SV *sv, MAGIC *mg)
 {
     const struct ufuncs * const uf = (struct ufuncs *)mg->mg_ptr;
@@ -2022,9 +2012,14 @@ Perl_magic_setuvar(pTHX_ SV *sv, MAGIC *mg)
 int
 Perl_magic_setregexp(pTHX_ SV *sv, MAGIC *mg)
 {
-    PERL_UNUSED_ARG(mg);
-    sv_unmagic(sv, PERL_MAGIC_qr);
-    return 0;
+    const char type = mg->mg_type;
+    if (type == PERL_MAGIC_qr) {
+    } else {
+	assert(type == PERL_MAGIC_bm);
+	SvTAIL_off(sv);
+	SvVALID_off(sv);
+    }
+    return sv_unmagic(sv, type);
 }
 
 int
