@@ -4220,7 +4220,7 @@ PP(pp_split)
 	DIE(aTHX_ "panic: pp_split");
     rx = PM_GETRE(pm);
 
-    do_utf8 = (rx->extflags & RXf_PMf_UTF8) != 0;
+    do_utf8 = (RX_EXTFLAGS(rx) & RXf_PMf_UTF8) != 0;
 
 #ifdef USE_ITHREADS
     if (pm->op_pmreplrootu.op_pmtargetoff) {
@@ -4260,7 +4260,7 @@ PP(pp_split)
     }
     base = SP - PL_stack_base;
     orig = s;
-    if (rx->extflags & RXf_SKIPWHITE) {
+    if (RX_EXTFLAGS(rx) & RXf_SKIPWHITE) {
 	if (do_utf8) {
 	    while (*s == ' ' || is_utf8_space(s))
 		s += UTF8SKIP(s);
@@ -4270,13 +4270,13 @@ PP(pp_split)
 		s++;
 	}
     }
-    if (rx->extflags & PMf_MULTILINE) {
+    if (RX_EXTFLAGS(rx) & PMf_MULTILINE) {
 	multiline = 1;
     }
 
     if (!limit)
 	limit = maxiters + 2;
-    if (rx->extflags & RXf_WHITE) {
+    if (RX_EXTFLAGS(rx) & RXf_WHITE) {
 	while (--limit) {
 	    m = s;
 	    /* this one uses 'm' and is a negative test */
@@ -4317,7 +4317,7 @@ PP(pp_split)
             } 	    
 	}
     }
-    else if (rx->extflags & RXf_START_ONLY) {
+    else if (RX_EXTFLAGS(rx) & RXf_START_ONLY) {
 	while (--limit) {
 	    for (m = s; m < strend && *m != '\n'; m++)
 		;
@@ -4331,14 +4331,14 @@ PP(pp_split)
 	    s = m;
 	}
     }
-    else if ((rx->extflags & RXf_USE_INTUIT) && !rx->nparens
-	     && (rx->extflags & RXf_CHECK_ALL)
-	     && !(rx->extflags & RXf_ANCH)) {
-	const int tail = (rx->extflags & RXf_INTUIT_TAIL);
+    else if ((RX_EXTFLAGS(rx) & RXf_USE_INTUIT) && !RX_NPARENS(rx)
+	     && (RX_EXTFLAGS(rx) & RXf_CHECK_ALL)
+	     && !(RX_EXTFLAGS(rx) & RXf_ANCH)) {
+	const int tail = (RX_EXTFLAGS(rx) & RXf_INTUIT_TAIL);
 	SV * const csv = CALLREG_INTUIT_STRING(rx);
 
-	len = rx->minlenret;
-	if (len == 1 && !(IN_CODEPOINTS) && !tail) {
+	len = RX_MINLENRET(rx);
+	if (len == 1 && !(do_utf8) && !tail) {
 	    const char c = *SvPV_nolen_const(csv);
 	    while (--limit) {
 		for (m = s; m < strend && *m != c; m++)
@@ -4366,7 +4366,7 @@ PP(pp_split)
 	}
     }
     else {
-	maxiters += slen * rx->nparens;
+	maxiters += slen * RX_NPARENS(rx);
 	while (s < strend && --limit)
 	{
 	    I32 rex_return;
@@ -4377,23 +4377,23 @@ PP(pp_split)
 	    if (rex_return == 0)
 		break;
 	    TAINT_IF(RX_MATCH_TAINTED(rx));
-	    if (RX_MATCH_COPIED(rx) && rx->subbeg != orig) {
+	    if (RX_MATCH_COPIED(rx) && RX_SUBBEG(rx) != orig) {
 		m = s;
 		s = orig;
-		orig = rx->subbeg;
+		orig = RX_SUBBEG(rx);
 		s = orig + (m - s);
 		strend = s + (strend - m);
 	    }
-	    m = rx->offs[0].start + orig;
+	    m = RX_OFFS(rx)[0].start + orig;
 	    dstr = newSVpvn(s, m-s);
 	    if (make_mortal)
 		sv_2mortal(dstr);
 	    XPUSHs(dstr);
-	    if (rx->nparens) {
+	    if (RX_NPARENS(rx)) {
 		I32 i;
-		for (i = 1; i <= (I32)rx->nparens; i++) {
-		    s = rx->offs[i].start + orig;
-		    m = rx->offs[i].end + orig;
+		for (i = 1; i <= (I32)RX_NPARENS(rx); i++) {
+		    s = RX_OFFS(rx)[i].start + orig;
+		    m = RX_OFFS(rx)[i].end + orig;
 
 		    /* japhy (07/27/01) -- the (m && s) test doesn't catch
 		       parens that didn't match -- they should be set to
@@ -4408,7 +4408,7 @@ PP(pp_split)
 		    XPUSHs(dstr);
 		}
 	    }
-	    s = rx->offs[0].end + orig;
+	    s = RX_OFFS(rx)[0].end + orig;
 	}
     }
 
