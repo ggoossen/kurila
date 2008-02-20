@@ -675,7 +675,7 @@ S_get_RV(pTHX_ SV *sv, SV *ssv) {
         if (SvROK(sv)) {
             SvREFCNT_dec(SvRV(sv));
         } else {
-            assert(SvTYPE(sv) >= SVt_RV);
+            assert(SvTYPE(sv) >= SVt_IV);
             sv_setsv_nomg(sv, &PL_sv_undef);
             SvROK_on(sv);
         }
@@ -735,7 +735,7 @@ sharedsv_scalar_store(pTHX_ SV *sv, SV *ssv)
         SV *sobj = Perl_sharedsv_find(aTHX_ obj);
         if (sobj) {
             SHARED_CONTEXT;
-            (void)SvUPGRADE(ssv, SVt_RV);
+            (void)SvUPGRADE(ssv, SVt_IV);
             sv_setsv_nomg(ssv, &PL_sv_undef);
 
             SvRV_set(ssv, SvREFCNT_inc(sobj));

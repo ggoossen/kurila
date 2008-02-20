@@ -43,13 +43,15 @@ sub myyes() { 1==1 }
 sub myno () { return 1!=1 }
 sub pi () { 3.14159 };
 
+my $RV_class = 'IV';
+
 my $want = {	# expected types, how value renders in-line, todos (maybe)
     mystr	=> [ 'PVIV', '"'.mystr.'"' ],
-    myhref	=> [ 'PVIV', ''],
+    myhref	=> [ 'IV', ''],
     pi		=> [ 'NV', pi ],
-    myglob	=> [ 'PVIV', '' ],
-    mysub	=> [ 'PVIV', '' ],
-    myunsub	=> [ 'PVIV', '' ],
+    myglob	=> [ 'IV', '' ],
+    mysub	=> [ 'IV', '' ],
+    myunsub	=> [ 'IV', '' ],
     # these are not inlined, at least not per BC::Concise
     #myyes	=> [ 'RV', ],
     #myno	=> [ 'RV', ],
@@ -65,7 +67,7 @@ use constant WEEKDAYS
 
 
 $::{napier} = \2.71828;	# counter-example (doesn't get optimized).
-eval "sub napier ();";
+eval "sub napier () \{\}";
 
 
 # should be able to undefine constant::import here ???
@@ -98,6 +100,7 @@ for $func (sort keys %$want) {
 		  code    => "$func",
 		  ($want->{$func}[2]) ? ( todo => $want->{$func}[2]) : (),
 		  bc_opts => '-nobanner',
+                  todo => "FIXME",
 		  expect  => <<EOT_EOT, expect_nt => <<EONT_EONT);
 3  <1> leavesub[2 refs] K/REFC,1 ->(end)
 -     <\@> lineseq KP ->3

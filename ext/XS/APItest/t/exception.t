@@ -9,7 +9,7 @@ BEGIN {
     }
 }
 
-use Test::More tests => 12;
+use Test::More tests => 10;
 
 BEGIN { use_ok('XS::APItest') };
 
@@ -34,8 +34,4 @@ is($XS::APItest::exception_caught, 1);
 
 $rv = eval { mycroak("foobar\n"); 1 };
 is($@->{description}, "foobar\n", 'croak');
-ok(not defined $rv);
-
-$rv = eval { $@ = bless{}, "foo"; mycroak(undef); 1 };
-is(ref($@), "error", 'croak(NULL)');
 ok(not defined $rv);

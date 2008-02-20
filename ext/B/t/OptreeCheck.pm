@@ -292,7 +292,7 @@ use Carp;
 use B::Concise qw(walk_output);
 
 BEGIN {
-    $SIG{__WARN__} = sub {
+    $^{WARN_HOOK} = sub {
 	my $err = shift->{description};
 	$err =~ m/Subroutine re::(un)?install redefined/ and return;
     };

@@ -48,11 +48,12 @@ typedef enum {
 	SVt_BIND,	/* 1 */
 	SVt_IV,		/* 2 */
 	SVt_NV,		/* 3 */
-	SVt_RV,		/* 4 */
-	SVt_PV,		/* 5 */
-	SVt_PVIV,	/* 6 */
-	SVt_PVNV,	/* 7 */
-	SVt_PVMG,	/* 8 */
+	/* RV was here, before it was merged with IV.  */
+	SVt_PV,		/* 4 */
+	SVt_PVIV,	/* 5 */
+	SVt_PVNV,	/* 6 */
+	SVt_PVMG,	/* 7 */
+	SVt_ORANGE,	/* 8 */
 	/* PVBM was here, before BIND replaced it.  */
 	SVt_PVGV,	/* 9 */
 	SVt_PVLV,	/* 10 */
@@ -1132,7 +1133,7 @@ the scalar's value cannot change unless written to.
 	 }))
 #    define SvRV(sv)							\
 	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) >= SVt_RV);				\
+	    assert(SvTYPE(_svi) >= SVt_PV || SvTYPE(_svi) == SVt_IV);	\
 	    assert(SvTYPE(_svi) != SVt_PVAV);				\
 	    assert(SvTYPE(_svi) != SVt_PVHV);				\
 	    assert(SvTYPE(_svi) != SVt_PVCV);				\
@@ -1216,7 +1217,7 @@ the scalar's value cannot change unless written to.
 		assert(!isGV_with_GP(sv));		\
 		(((XPVUV*)SvANY(sv))->xuv_uv = (val)); } STMT_END
 #define SvRV_set(sv, val) \
-        STMT_START { assert(SvTYPE(sv) >=  SVt_RV); \
+        STMT_START { assert(SvTYPE(sv) >=  SVt_PV || SvTYPE(sv) ==  SVt_IV); \
 		assert(SvTYPE(sv) != SVt_PVAV);		\
 		assert(SvTYPE(sv) != SVt_PVHV);		\
 		assert(SvTYPE(sv) != SVt_PVCV);		\
@@ -1269,6 +1270,20 @@ the scalar's value cannot change unless written to.
 		     }							\
 		 } STMT_END
 
+#ifdef PERL_CORE
+/* Code that crops up in three places to take a scalar and ready it to hold
+   a reference */
+#  define prepare_SV_for_RV(sv)						\
+    STMT_START {							\
+		    if (SvTYPE(sv) < SVt_PV && SvTYPE(sv) != SVt_IV)	\
+			sv_upgrade(sv, SVt_IV);				\
+		    else if (SvPVX_const(sv)) {				\
+			SvPV_free(sv);					\
+			SvLEN_set(sv, 0);				\
+                        SvCUR_set(sv, 0);				\
+		    }							\
+		 } STMT_END
+#endif
 
 #define PERL_FBM_TABLE_OFFSET 1	/* Number of bytes between EOS and table */
 

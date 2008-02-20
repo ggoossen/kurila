@@ -134,10 +134,10 @@ __EOMK__
     my $id;
 
     my $x_warn;
-#     local $SIG{__WARN__} = sub {
-# 	print "# $id: " . $_[0]->{description} . "\n";
-# 	$x_warn = $_[0]->{description};
-#     };
+    local ${^WARN_HOOK} = sub {
+	print "# $id: " . $_[0]->{description} . "\n";
+	$x_warn = $_[0]->{description};
+    };
 
     sub moan {
 	print "$id: @_";

@@ -162,13 +162,7 @@ PP(pp_rv2gv)
 			const char * const name = CopSTASHPV(PL_curcop);
 			gv = newGVgen(name);
 		    }
-		    if (SvTYPE(sv) < SVt_RV)
-			sv_upgrade(sv, SVt_RV);
-		    else if (SvPVX_const(sv)) {
-			SvPV_free(sv);
-			SvLEN_set(sv, 0);
-                        SvCUR_set(sv, 0);
-		    }
+		    prepare_SV_for_RV(sv);
 		    SvRV_set(sv, (SV*)gv);
 		    SvROK_on(sv);
 		    SvSETMAGIC(sv);
@@ -470,7 +464,7 @@ S_refto(pTHX_ SV *sv)
 	SvREFCNT_inc_void_NN(sv);
     }
     rv = sv_newmortal();
-    sv_upgrade(rv, SVt_RV);
+    sv_upgrade(rv, SVt_IV);
     SvRV_set(rv, sv);
     SvROK_on(rv);
     return rv;
