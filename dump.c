@@ -36,7 +36,7 @@ static const char* const svtypenames[SVt_LAST] = {
     "PVIV",
     "PVNV",
     "PVMG",
-    "ORANGE",
+    "REGEXP",
     "PVGV",
     "PVLV",
     "PVAV",
@@ -55,7 +55,7 @@ static const char* const svshorttypenames[SVt_LAST] = {
     "PVIV",
     "PVNV",
     "PVMG",
-    "ORANGE",
+    "REGEXP",
     "GV",
     "PVLV",
     "AV",
@@ -525,7 +525,7 @@ Perl_do_pmop_dump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     ch = '/';
     if (PM_GETRE(pm))
 	Perl_dump_indent(aTHX_ level, file, "PMf_PRE %c%s%c%s\n",
-	     ch, PM_GETRE(pm)->precomp, ch,
+	     ch, RX_PRECOMP(PM_GETRE(pm)), ch,
 	     (pm->op_private & OPpRUNTIME) ? " (RUNTIME)" : "");
     else
 	Perl_dump_indent(aTHX_ level, file, "PMf_PRE (RUNTIME)\n");
@@ -1264,7 +1264,8 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             if (mg->mg_type == PERL_MAGIC_qr) {
 		const regexp * const re = (regexp *)mg->mg_obj;
 		SV * const dsv = sv_newmortal();
-                const char * const s =  pv_pretty(dsv, re->wrapped, re->wraplen, 
+                const char * const s
+		    = pv_pretty(dsv, RX_WRAPPED(re), RX_WRAPLEN(re), 
                     60, NULL, NULL,
                     ( PERL_PV_PRETTY_QUOTE | PERL_PV_ESCAPE_RE | PERL_PV_PRETTY_ELLIPSES |
                     (PERL_PV_ESCAPE_UNI))
@@ -1556,6 +1557,10 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	}
 	else
 	    Perl_dump_indent(aTHX_ level, file, "  PV = 0\n");
+    }
+    if (type == SVt_REGEXP) {
+	    Perl_dump_indent(aTHX_ level, file, "  REGEXP = 0x%"UVxf"\n",
+			     PTR2UV(((struct xregexp *)SvANY(sv))->xrx_regexp));
     }
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
@@ -2343,9 +2348,7 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     level++;
     if (PM_GETRE(pm)) {
 	const regexp *const r = PM_GETRE(pm);
-	SV * const tmpsv = newSV(0);
-	Perl_sv_catxmlpvn(tmpsv, r->precomp,r->prelen);
-
+	SV * const tmpsv = newSVpvn(RX_PRECOMP(r),r->prelen);
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"%s\"\n",
 	     SvPVX(tmpsv));
 	SvREFCNT_dec(tmpsv);

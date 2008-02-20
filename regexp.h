@@ -98,12 +98,11 @@ typedef struct regexp {
         
         
         /* Information about the match that isn't often used */
-	I32 prelen;		/* length of precomp */
-	const char *precomp;	/* pre-compilation regular expression */
 	/* wrapped can't be const char*, as it is returned by sv_2pv_flags */
 	char *wrapped;          /* wrapped version of the pattern */
 	I32 wraplen;		/* length of wrapped */
-	I32 seen_evals;         /* number of eval groups in the pattern - for security checks */ 
+	unsigned pre_prefix:4;	/* offset from wrapped to the start of precomp */
+	unsigned seen_evals:28;	/* number of eval groups in the pattern - for security checks */ 
         HV *paren_names;	/* Optional hash of paren names */
         
         /* Refcount of this regexp */
@@ -245,7 +244,9 @@ and check for NULL.
 #define RXf_START_ONLY		0x00000200 /* Pattern is /^/ */
 #define RXf_WHITE		0x00000400 /* Pattern is /\s+/ */
 
-/* 0x1F800 of extflags is used by (RXf_)PMf_COMPILETIME */
+/* 0x1F800 of extflags is used by (RXf_)PMf_COMPILETIME
+ * If you change these you need to change the equivalent flags in op.h, and
+ * vice versa.  */
 #define RXf_PMf_MULTILINE	0x00001000 /* /m         */
 #define RXf_PMf_SINGLELINE	0x00002000 /* /s         */
 #define RXf_PMf_FOLD    	0x00004000 /* /i         */
@@ -340,6 +341,16 @@ and check for NULL.
 #define RX_MATCH_COPIED_set(prog,t)	((t) \
 					 ? RX_MATCH_COPIED_on(prog) \
 					 : RX_MATCH_COPIED_off(prog))
+
+/* For source compatibility. We used to store these explicitly.  */
+#define RX_PRECOMP(prog)		((prog)->wrapped + (prog)->pre_prefix)
+/* FIXME? Are we hardcoding too much here and constraining plugin extension
+   writers? Specifically, the value 1 assumes that the wrapped version always
+   has exactly one character at the end, a ')'. Will that always be true?  */
+#define RX_PRELEN(prog)			((prog)->wraplen - (prog)->pre_prefix - 1)
+#define RX_WRAPPED(prog)		((prog)->wrapped)
+#define RX_WRAPLEN(prog)		((prog)->wraplen)
+
 
 #endif /* PLUGGABLE_RE_EXTENSION */
 

@@ -3802,7 +3802,6 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
     RXi_SET( r, ri );
     r->engine= RE_ENGINE_PTR;
     r->refcnt = 1;
-    r->prelen = plen;
     r->extflags = pm_flags;
     {
         bool has_p     = ((r->extflags & RXf_PMf_KEEPCOPY) == RXf_PMf_KEEPCOPY);
@@ -3811,12 +3810,12 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
 	U16 reganch = (U16)((r->extflags & RXf_PMf_STD_PMMOD) >> 12);
 	const char *fptr = STD_PAT_MODS;        /*"msix"*/
 	char *p;
-        r->wraplen = r->prelen + has_minus + has_p + has_runon
+        RX_WRAPLEN(r) = plen + has_minus + has_p + has_runon
             + (sizeof(STD_PAT_MODS) - 1)
             + (sizeof("(?:)") - 1);
 
-        Newx(r->wrapped, r->wraplen + 1, char );
-        p = r->wrapped;
+        Newx(RX_WRAPPED(r), RX_WRAPLEN(r) + 1, char );
+        p = RX_WRAPPED(r);
         *p++='('; *p++='?';
         if (has_p)
             *p++ = KEEPCOPY_PAT_MOD; /*'p'*/
@@ -3839,9 +3838,10 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
         }
 
         *p++ = ':';
-        Copy(RExC_precomp, p, r->prelen, char);
-        r->precomp = p;
-        p += r->prelen;
+        Copy(RExC_precomp, p, plen, char);
+	assert ((RX_WRAPPED(r) - p) < 16);
+	r->pre_prefix = p - RX_WRAPPED(r);
+        p += plen;
         if (has_runon)
             *p++ = '\n';
         *p++ = ')';
@@ -4301,10 +4301,23 @@ reStudy:
         r->paren_names = (HV*)SvREFCNT_inc(RExC_paren_names);
     else
         r->paren_names = NULL;
-    if (r->prelen == 3 && strnEQ("\\s+", r->precomp, 3)) /* precomp = "\\s+)" */
-	r->extflags |= RXf_WHITE;
-    else if (r->prelen == 1 && r->precomp[0] == '^')
+
+#ifdef STUPID_PATTERN_CHECKS            
+    if (RX_PRELEN(r) == 3 && memEQ("\\s+", RX_PRECOMP(r), 3))
+        r->extflags |= RXf_WHITE;
+    else if (RX_PRELEN(r) == 1 && RX_PRECOMP(r)[0] == '^')
         r->extflags |= RXf_START_ONLY;
+#else
+    {
+        regnode *first = ri->program + 1;
+        U8 fop = OP(first);
+        U8 nop = OP(NEXTOPER(first));
+        
+        if (PL_regkind[fop] == BOL && nop == END)
+            r->extflags |= RXf_START_ONLY;
+    }
+#endif
+
 #ifdef DEBUGGING
     if (RExC_paren_names) {
         ri->name_list_idx = add_data( pRExC_state, 1, "p" );
@@ -4683,7 +4696,7 @@ SV*
 Perl_reg_qr_package(pTHX_ REGEXP * const rx)
 {
 	PERL_UNUSED_ARG(rx);
-	return newSVpvs("Regexp");
+	return NULL;
 }
 
 /* Scans the name of a named buffer from the pattern.
@@ -8609,7 +8622,7 @@ Perl_pregfree(pTHX_ struct regexp *r)
         CALLREGFREE_PVT(r); /* free the private data */
         if (r->paren_names)
             SvREFCNT_dec(r->paren_names);
-        Safefree(r->wrapped);
+        Safefree(RX_WRAPPED(r));
     }        
     if (r->substrs) {
         if (r->anchored_substr)
@@ -8701,7 +8714,7 @@ Perl_regfree_internal(pTHX_ REGEXP * const r)
 	{
 	    SV *dsv= sv_newmortal();
             RE_PV_QUOTED_DECL(s, 0,
-                dsv, r->precomp, r->prelen, 60);
+                dsv, RX_PRECOMP(r), RX_PRELEN(r), 60);
             PerlIO_printf(Perl_debug_log,"%sFreeing REx:%s %s\n", 
                 PL_colors[4],PL_colors[5],s);
         }
@@ -8869,8 +8882,7 @@ Perl_re_dup(pTHX_ const regexp *r, CLONE_PARAMS *param)
 	}
     }
 
-    ret->wrapped        = SAVEPVN(ret->wrapped, ret->wraplen+1);
-    ret->precomp        = ret->wrapped + (ret->precomp - ret->wrapped);
+    RX_WRAPPED(ret)     = SAVEPVN(RX_WRAPPED(ret), RX_WRAPLEN(ret)+1);
     ret->paren_names    = hv_dup_inc(ret->paren_names, param);
 
     if (ret->pprivate)
@@ -9031,8 +9043,8 @@ Perl_reg_stringify(pTHX_ MAGIC *mg, STRLEN *lp, U32 *flags, I32 *haseval ) {
     if (flags)    
 	*flags = 1;
     if (lp)
-	*lp = re->wraplen;
-    return re->wrapped;
+	*lp = RX_WRAPLEN(re);
+    return RX_WRAPPED(re);
 }
 
 /*

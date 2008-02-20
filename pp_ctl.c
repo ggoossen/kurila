@@ -77,8 +77,7 @@ PP(pp_regcomp)
     dSP;
     register PMOP *pm = (PMOP*)cLOGOP->op_other;
     SV *tmpstr;
-    MAGIC *mg = NULL;
-    regexp * re;
+    regexp *re = NULL;
 
     /* prevent recompiling under /o and ithreads. */
 #if defined(USE_ITHREADS)
@@ -117,11 +116,11 @@ PP(pp_regcomp)
 
     if (SvROK(tmpstr)) {
 	SV * const sv = SvRV(tmpstr);
-	if(SvMAGICAL(sv))
-	    mg = mg_find(sv, PERL_MAGIC_qr);
+	if (SvTYPE(sv) == SVt_REGEXP)
+	    re = ((struct xregexp *)SvANY(sv))->xrx_regexp;
     }
-    if (mg) {
-	regexp * const re = reg_temp_copy((regexp *)mg->mg_obj);
+    if (re) {
+	re = reg_temp_copy(re);
 	ReREFCNT_dec(PM_GETRE(pm));
 	PM_SETRE(pm, re);
     }
@@ -131,8 +130,8 @@ PP(pp_regcomp)
 	re = PM_GETRE(pm);
 
 	/* Check against the last compiled regexp. */
-	if (!re || !re->precomp || re->prelen != (I32)len ||
-	    memNE(re->precomp, t, len))
+	if (!re || !RX_PRECOMP(re) || RX_PRELEN(re) != (I32)len ||
+	    memNE(RX_PRECOMP(re), t, len))
 	{
 	    const regexp_engine *eng = re ? re->engine : NULL;
             U32 pm_flags = pm->op_pmflags & PMf_COMPILETIME;
@@ -169,7 +168,7 @@ PP(pp_regcomp)
     }
 #endif
 
-    if (!PM_GETRE(pm)->prelen && PL_curpm)
+    if (!RX_PRELEN(PM_GETRE(pm)) && PL_curpm)
 	pm = PL_curpm;
 
 
@@ -3115,7 +3114,6 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
     SV *e = TOPs;	/* e is for 'expression' */
     SV *d = TOPm1s;	/* d is for 'default', as in PL_defgv */
     SV *This, *Other;	/* 'This' (and Other to match) to play with C++ */
-    MAGIC *mg;
     regexp *this_regex, *other_regex;
 
 #   define NOT_EMPTY_PROTO(cv) (!SvPOK(cv) || SvCUR(cv) == 0)
@@ -3131,24 +3129,22 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	    && NOT_EMPTY_PROTO(This) && (Other = d)))
 
 #   define SM_REGEX ( \
-	   (SvROK(d) && SvMAGICAL(This = SvRV(d))			\
-	&& (mg = mg_find(This, PERL_MAGIC_qr))				\
-	&& (this_regex = (regexp *)mg->mg_obj)				\
+	   (SvROK(d) && (SvTYPE(This = SvRV(d)) == SVt_REGEXP)		\
+	&& (this_regex = ((struct xregexp *)SvANY(This))->xrx_regexp)	\
 	&& (Other = e))							\
     ||									\
-	   (SvROK(e) && SvMAGICAL(This = SvRV(e))			\
-	&& (mg = mg_find(This, PERL_MAGIC_qr))				\
-	&& (this_regex = (regexp *)mg->mg_obj)				\
+	   (SvROK(e) && (SvTYPE(This = SvRV(e)) == SVt_REGEXP)		\
+	&& (this_regex = ((struct xregexp *)SvANY(This))->xrx_regexp)	\
 	&& (Other = d))	)
 	
 
 #   define SM_OTHER_REF(type) \
 	(SvROK(Other) && SvTYPE(SvRV(Other)) == SVt_##type)
 
-#   define SM_OTHER_REGEX (SvROK(Other) && SvMAGICAL(SvRV(Other))	\
-	&& (mg = mg_find(SvRV(Other), PERL_MAGIC_qr))			\
-	&& (other_regex = (regexp *)mg->mg_obj))
-	
+#   define SM_OTHER_REGEX (SvROK(Other)					\
+	&& (SvTYPE(SvRV(Other)) == SVt_REGEXP)				\
+	&& (other_regex = ((struct xregexp *)SvANY(SvRV(Other)))->xrx_regexp))
+
 
 #   define SM_SEEN_THIS(sv) hv_exists_ent(seen_this, \
 	sv_2mortal(newSViv(PTR2IV(sv))), 0)

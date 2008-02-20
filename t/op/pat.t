@@ -4177,7 +4177,15 @@ sub kt
     my $b = $a;
     iseq($b, $a, "copy of scalar used for postponed subexpression");
 }
-
+{
+     local $Message = "\$REGMARK in replacement -- Bug #49190";
+     my $_ = "A";
+     s/(*:B)A/$REGMARK/;
+     iseq $_, "B";
+     $_ = "CCCCBAA";
+     s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g;
+     iseq $_, "ZYX";
+}
 # Test counter is at bottom of file. Put new tests above here.
 #-------------------------------------------------------------------
 # Keep the following tests last -- they may crash perl
@@ -4237,6 +4245,6 @@ ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1781;
+    $::TestCount = 1783;
     print "1..$::TestCount\n";
 }

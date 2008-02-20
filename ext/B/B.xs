@@ -28,7 +28,7 @@ static const char* const svclassnames[] = {
     "B::PVIV",
     "B::PVNV",
     "B::PVMG",
-    "B::ORANGE",
+    "B::REGEXP",
     "B::GV",
     "B::PVLV",
     "B::AV",
@@ -217,6 +217,9 @@ typedef SV	*B__IV;
 typedef SV	*B__PV;
 typedef SV	*B__NV;
 typedef SV	*B__PVMG;
+#if PERL_VERSION >= 11
+typedef SV	*B__REGEXP;
+#endif
 typedef SV	*B__PVLV;
 typedef SV	*B__BM;
 typedef SV	*B__RV;
@@ -678,6 +681,31 @@ B::HV
 SvSTASH(sv)
 	B::PVMG	sv
 
+MODULE = B	PACKAGE = B::REGEXP
+
+#if PERL_VERSION >= 11
+
+IV
+REGEX(sv)
+	B::PVMG	sv
+    CODE:
+	RETVAL = PTR2IV(((struct xregexp *)SvANY(sv))->xrx_regexp);
+    OUTPUT:
+        RETVAL
+
+SV*
+precomp(sv)
+	B::PVMG	sv
+	REGEXP* rx = NO_INIT
+    CODE:
+	rx = ((struct xregexp *)SvANY(sv))->xrx_regexp;
+	/* FIXME - UTF-8? And the equivalent precomp methods? */
+	RETVAL = newSVpvn( RX_PRECOMP(rx), RX_PRELEN(rx) );
+    OUTPUT:
+        RETVAL
+
+#endif
+
 #define MgMOREMAGIC(mg) mg->mg_moremagic
 #define MgPRIVATE(mg) mg->mg_private
 #define MgTYPE(mg) mg->mg_type
@@ -738,7 +766,7 @@ precomp(mg)
             REGEXP* rx = (REGEXP*)mg->mg_obj;
             RETVAL = Nullsv;
             if( rx )
-                RETVAL = newSVpvn( rx->precomp, rx->prelen );
+                RETVAL = newSVpvn( RX_PRECOMP(rx), RX_PRELEN(rx) );
         }
         else {
             croak( "precomp is only meaningful on r-magic" );
