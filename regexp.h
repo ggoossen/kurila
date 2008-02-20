@@ -254,6 +254,7 @@ and check for NULL.
 #define RXf_PMf_UTF8            0x00010000 /* /u         */
 #define RXf_PMf_KEEPCOPY	0x00020000 /* /p         */
 /* these flags are transfered from the PMOP->op_pmflags member during compilation */
+#define RXf_PMf_STD_PMMOD_SHIFT	12
 #define RXf_PMf_STD_PMMOD	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_UTF8)
 #define RXf_PMf_COMPILETIME	(RXf_PMf_MULTILINE|RXf_PMf_SINGLELINE|RXf_PMf_FOLD|RXf_PMf_EXTENDED|RXf_PMf_KEEPCOPY|RXf_PMf_UTF8)
 
