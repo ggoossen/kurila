@@ -55,7 +55,8 @@ my $want = {	# expected types, how value renders in-line, todos (maybe)
     # these are not inlined, at least not per BC::Concise
     #myyes	=> [ 'RV', ],
     #myno	=> [ 'RV', ],
-    myaref	=> [ 'PVIV', '' ],
+    myrex	=> [ $RV_class, '\\\\"\\(?-xism:Foo\\)"' ],
+    myundef	=> [ 'NULL', ],
     myfl	=> [ 'PVNV', myfl ],
     myint	=> [ 'PVIV', myint ],
     myrex	=> [ 'PVNV', '' ],
