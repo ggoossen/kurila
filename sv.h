@@ -583,10 +583,12 @@ Tells an SV that it is a string and disables all other OK bits.
 Will also turn off the UTF-8 status.
 
 =for apidoc Am|U32|SvOOK|SV* sv
-Returns a U32 indicating whether the SvIVX is a valid offset value for
-the SvPVX.  This hack is used internally to speed up removal of characters
-from the beginning of a SvPV.  When SvOOK is true, then the start of the
-allocated string buffer is really (SvPVX - SvIVX).
+Returns a U32 indicating whether the pointer to the string buffer is offset.
+This hack is used internally to speed up removal of characters from the
+beginning of a SvPV.  When SvOOK is true, then the start of the
+allocated string buffer is actually C<SvOOK_offset()> bytes before SvPVX.
+This offset used to be stored in SvIVX, but is now stored within the spare
+part of the buffer.
 
 =for apidoc Am|U32|SvROK|SV* sv
 Tests if the SV is an RV.
@@ -690,7 +692,7 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 
 #define SvOKp(sv)		(SvFLAGS(sv) & (SVp_IOK|SVp_NOK|SVp_POK))
 #define SvIOKp(sv)		(SvFLAGS(sv) & SVp_IOK)
-#define SvIOKp_on(sv)		(assert_not_glob(sv) SvRELEASE_IVX(sv), \
+#define SvIOKp_on(sv)		(assert_not_glob(sv) SvRELEASE_IVX_(sv)	\
 				    SvFLAGS(sv) |= SVp_IOK)
 #define SvNOKp(sv)		(SvFLAGS(sv) & SVp_NOK)
 #define SvNOKp_on(sv)		(assert_not_glob(sv) SvFLAGS(sv) |= SVp_NOK)
@@ -699,7 +701,7 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 				 SvFLAGS(sv) |= SVp_POK)
 
 #define SvIOK(sv)		(SvFLAGS(sv) & SVf_IOK)
-#define SvIOK_on(sv)		(assert_not_glob(sv) SvRELEASE_IVX(sv), \
+#define SvIOK_on(sv)		(assert_not_glob(sv) SvRELEASE_IVX_(sv)	\
 				    SvFLAGS(sv) |= (SVf_IOK|SVp_IOK))
 #define SvIOK_off(sv)		(SvFLAGS(sv) &= ~(SVf_IOK|SVp_IOK|SVf_IVisUV))
 #define SvIOK_only(sv)		(SvOK_off(sv), \
@@ -1119,7 +1121,9 @@ the scalar's value cannot change unless written to.
 		     if (SvLEN(sv)) {					\
 			 assert(!SvROK(sv));				\
 			 if(SvOOK(sv)) {				\
-			     SvPV_set(sv, SvPVX_mutable(sv) - SvIVX(sv)); \
+			     STRLEN zok; 				\
+			     SvOOK_offset(sv, zok);			\
+			     SvPV_set(sv, SvPVX_mutable(sv) - zok);	\
 			     SvFLAGS(sv) &= ~SVf_OOK;			\
 			 }						\
 			 Safefree(SvPVX(sv));				\
@@ -1445,10 +1449,16 @@ Like C<sv_catsv> but doesn't process magic.
 
 #ifdef PERL_OLD_COPY_ON_WRITE
 #define SvRELEASE_IVX(sv)   \
-    ((SvIsCOW(sv) ? sv_force_normal_flags(sv, 0) : (void) 0), SvOOK_off(sv))
+    ((SvIsCOW(sv) ? sv_force_normal_flags(sv, 0) : (void) 0), 0)
 #  define SvIsCOW_normal(sv)	(SvIsCOW(sv) && SvLEN(sv))
+#  define SvRELEASE_IVX_(sv)	SvRELEASE_IVX(sv),
 #else
-#  define SvRELEASE_IVX(sv)   SvOOK_off(sv)
+#  define SvRELEASE_IVX(sv)   0
+/* This little game brought to you by the need to shut this warning up:
+mg.c: In function `Perl_magic_get':
+mg.c:1024: warning: left-hand operand of comma expression has no effect
+*/
+#  define SvRELEASE_IVX_(sv)  /**/
 #endif /* PERL_OLD_COPY_ON_WRITE */
 
 #define CAN_COW_MASK	(SVs_OBJECT|SVs_GMG|SVs_SMG|SVs_RMG|SVf_IOK|SVf_NOK| \
@@ -1600,6 +1610,60 @@ struct clone_params {
   PerlInterpreter *proto_perl;
 };
 
+/*
+=for apidoc Am|void|SvOOK_offset|NN SV*sv|STRLEN len
+
+Reads into I<len> the offset from SvPVX back to the true start of the
+allocated buffer, which will be non-zero if C<sv_chop> has been used to
+efficiently remove characters from start of the buffer. Implemented as a
+macro, which takes the address of I<len>, which must be of type C<STRLEN>.
+Evaluates I<sv> more than once. Sets I<len> to 0 if C<SvOOK(sv)> is false.
+
+=cut
+*/
+
+#ifdef DEBUGGING
+/* Does the bot know something I don't?
+10:28 <@Nicholas> metabatman
+10:28 <+meta> Nicholas: crash
+*/
+#  define SvOOK_offset(sv, offset) STMT_START {				\
+	assert(sizeof(offset) == sizeof(STRLEN));			\
+	if (SvOOK(sv)) {						\
+	    const U8 *crash = (U8*)SvPVX_const(sv);			\
+	    offset = *--crash;						\
+ 	    if (!offset) {						\
+		crash -= sizeof(STRLEN);				\
+		Copy(crash, (U8 *)&offset, sizeof(STRLEN), U8);		\
+	    }								\
+	    {								\
+		/* Validate the preceding buffer's sentinels to		\
+		   verify that no-one is using it.  */			\
+		const U8 *const bonk = (U8 *) SvPVX_const(sv) - offset;	\
+		while (crash > bonk) {					\
+		    --crash;						\
+		    assert (*crash == (U8)PTR2UV(crash));		\
+		}							\
+	    }								\
+	} else {							\
+	    offset = 0;							\
+	}								\
+    } STMT_END
+#else
+    /* This is the same code, but avoids using any temporary variables:  */
+#  define SvOOK_offset(sv, offset) STMT_START {				\
+	assert(sizeof(offset) == sizeof(STRLEN));			\
+	if (SvOOK(sv)) {						\
+	    offset = ((U8*)SvPVX_const(sv))[-1];			\
+	    if (!offset) {						\
+		Copy(SvPVX_const(sv) - 1 - sizeof(STRLEN),		\
+		     (U8 *)&offset, sizeof(STRLEN), U8);		\
+	    }								\
+	} else {							\
+	    offset = 0;							\
+	}								\
+    } STMT_END
+#endif
 /*
  * Local variables:
  * c-indentation-style: bsd
