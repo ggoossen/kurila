@@ -397,7 +397,7 @@ Perl_re_intuit_start(pTHX_ REGEXP * const rx, SV *sv, char *strpos,
     GET_RE_DEBUG_FLAGS_DECL;
 
     DEBUG_EXECUTE_r( 
-        debug_start_match(prog, do_utf8, strpos, strend, 
+        debug_start_match(rx, do_utf8, strpos, strend, 
             sv ? "Guessing start of match in sv for"
                : "Guessing start of match in string for");
 	      );
@@ -1465,7 +1465,7 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
     reginfo.prog = rx;	 /* Yes, sorry that this is confusing.  */
 
     DEBUG_EXECUTE_r( 
-        debug_start_match(prog, do_utf8, startpos, strend, 
+        debug_start_match(rx, do_utf8, startpos, strend, 
         "Matching");
     );
 
@@ -3204,7 +3204,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                 re->sublen = rex->sublen;
 		rei = RXi_GET(re);
                 DEBUG_EXECUTE_r(
-                    debug_start_match(re, do_utf8, locinput, PL_regeol, 
+                    debug_start_match(rex_sv, do_utf8, locinput, PL_regeol, 
                         "Matching embedded");
 		);		
 		startpoint = rei->program + 1;

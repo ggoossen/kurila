@@ -75,7 +75,7 @@ ok( B::svref_2object(\$.)->MAGIC->TYPE eq "\0", '$. has \0 magic' );
 
 my $r = qr/foo/;
 my $obj = B::svref_2object($r);
-my $regexp =  ($] < 5.011) ? $obj->MAGIC : $obj;
+my $regexp =  $obj;
 ok($regexp->precomp() eq 'foo', 'Get string from qr//');
 like($regexp->REGEX(), qr/\d+/, "REGEX() returns numeric value");
 my $iv = 1;

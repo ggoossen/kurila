@@ -18,6 +18,7 @@ use warnings;
 my $tmp = "via$$";
 
 use Test::More tests => 18;
+use bytes;
 
 my $fh;
 my $a = join("", map { chr } 0..255) x 10;

@@ -4365,6 +4365,7 @@ reStudy:
         PerlIO_printf(Perl_debug_log,"Final program:\n");
         regdump(r);
     });
+#ifdef RE_TRACK_PATTERN_OFFSETS
     DEBUG_OFFSETS_r(if (ri->u.offsets) {
         const U32 len = ri->u.offsets[0];
         U32 i;
@@ -4377,6 +4378,7 @@ reStudy:
             }
         PerlIO_printf(Perl_debug_log, "\n");
     });
+#endif
     return rx;
 }
 
@@ -8969,7 +8971,7 @@ Perl_regdupe_internal(pTHX_ REGEXP * const rx, CLONE_PARAMS *param)
     RXi_GET_DECL(r,ri);
     
     npar = r->nparens+1;
-    len = ri->u.offsets[0];
+    len = ProgLen(ri);
     
     Newxc(reti, sizeof(regexp_internal) + (len+1)*sizeof(regnode), char, regexp_internal);
     Copy(ri->program, reti->program, len+1, regnode);
@@ -9038,8 +9040,14 @@ Perl_regdupe_internal(pTHX_ REGEXP * const rx, CLONE_PARAMS *param)
 
     reti->name_list_idx = ri->name_list_idx;
 
-    Newx(reti->u.offsets, 2*len+1, U32);
-    Copy(ri->u.offsets, reti->u.offsets, 2*len+1, U32);
+#ifdef RE_TRACK_PATTERN_OFFSETS
+    if (ri->u.offsets) {
+        Newx(reti->u.offsets, 2*len+1, U32);
+        Copy(ri->u.offsets, reti->u.offsets, 2*len+1, U32);
+    }
+#else
+    SetProgLen(reti,len);
+#endif
     
     return (void*)reti;
 }

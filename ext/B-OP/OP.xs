@@ -1400,7 +1400,7 @@ PMOP_precomp(o)
 	ST(0) = sv_newmortal();
 	rx = PM_GETRE(o);
 	if (rx)
-	    sv_setpvn(ST(0), rx->precomp, rx->prelen);
+	    sv_setpvn(ST(0), RX_PRECOMP(rx), RX_PRELEN(rx));
 
 #if PERL_VERSION >= 9
 
@@ -1412,7 +1412,7 @@ PMOP_reflags(o)
 	ST(0) = sv_newmortal();
 	rx = PM_GETRE(o);
 	if (rx)
-	    sv_setuv(ST(0), rx->extflags);
+	    sv_setuv(ST(0), RX_EXTFLAGS(rx));
 
 #endif
 

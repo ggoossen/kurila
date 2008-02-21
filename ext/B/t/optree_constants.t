@@ -19,7 +19,7 @@ BEGIN {
 use OptreeCheck;	# ALSO DOES @ARGV HANDLING !!!!!!
 use Config;
 
-my $tests = 30;
+my $tests = 28;
 plan tests => $tests;
 SKIP: {
 skip "no perlio in this build", $tests unless $Config::Config{useperlio};
