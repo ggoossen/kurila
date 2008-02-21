@@ -3834,12 +3834,12 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
 			    >> RXf_PMf_STD_PMMOD_SHIFT);
 	const char *fptr = STD_PAT_MODS;        /*"msix"*/
 	char *p;
-        RXp_WRAPLEN(r) = plen + has_minus + has_p + has_runon
+	const STRLEN wraplen = plen + has_minus + has_p + has_runon
             + (sizeof(STD_PAT_MODS) - 1)
             + (sizeof("(?:)") - 1);
 
-	p = sv_grow(rx, RXp_WRAPLEN(r) + 1);
-	SvCUR_set(rx, RXp_WRAPLEN(r));
+	p = sv_grow(rx, wraplen + 1);
+	SvCUR_set(rx, wraplen);
 	SvPOK_on(rx);
         *p++='('; *p++='?';
         if (has_p)
@@ -4331,7 +4331,7 @@ reStudy:
 #ifdef STUPID_PATTERN_CHECKS            
     if (RX_PRELEN(r) == 3 && memEQ("\\s+", RX_PRECOMP(r), 3))
         r->extflags |= RXf_WHITE;
-    else if (RX_PRELEN(r) == 1 && RXp_PRECOMP(r)[0] == '^')
+    else if (RX_PRELEN(rx) == 1 && RXp_PRECOMP(rx)[0] == '^')
         r->extflags |= RXf_START_ONLY;
 #else
     {
