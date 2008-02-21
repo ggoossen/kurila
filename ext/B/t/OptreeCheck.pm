@@ -698,7 +698,7 @@ sub mkCheckRex {
 	      )?
 	      \\\)			# closing literal )
 	     !{'(?:next|db)state\([^()]*?' .
-	      ($1 && '\(eval \d+\)[^()]*')	# Match the eval if present
+	      ($1 ? '\(eval \d+\)[^()]*' : '')	# Match the eval if present
 	      . '\)'
 }!msgx;
     # widened for -terse mode

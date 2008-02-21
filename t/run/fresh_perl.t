@@ -525,7 +525,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-recursive die
+(?-uxism:x) at - line 3.
 ########
 # David Dyck
 # coredump in 5.7.1

@@ -2174,11 +2174,11 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
             PL_compiling.cop_hints_hash = newHVhv(PL_compiling.cop_hints_hash);
             SvREFCNT_dec(old_cop_hints_hash);
 
-            tmp = out ? newSVpvn_flags(out + 1, start + len - out - 1, SVs_TEMP) : newSVpvs_flags("", SVs_TEMP);
+            tmp = out ? newSVpvn_flags(out + 1, start + len - out - 1, 0) : newSVpvs_flags("", 0);
             (void)hv_store_ent(PL_compiling.cop_hints_hash, 
                                newSVpvs_flags("open>", SVs_TEMP), tmp, 0);
 
-            tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, SVs_TEMP);
+            tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, 0);
             (void)hv_store_ent(PL_compiling.cop_hints_hash,
                                newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
         }

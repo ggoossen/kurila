@@ -24,9 +24,6 @@ sub import {
     Exporter::import($this,@list);
 }
 
-# declare usage to assist AutoLoad
-sub usage;
-
 XSLoader::load 'POSIX', $VERSION;
 
 my %NON_CONSTS = (map {($_,1)}
@@ -34,7 +31,7 @@ my %NON_CONSTS = (map {($_,1)}
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
 
 for my $name (keys %NON_CONSTS) {
-    *{Symbol::fetch_glob($name)} = sub { &int_macro_int($name, $_[0]) };
+    *{Symbol::fetch_glob($name)} = sub { int_macro_int($name, $_[0]) };
 }
 
 package POSIX::SigRt;
