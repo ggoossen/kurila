@@ -1523,8 +1523,8 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	Perl_dump_indent(aTHX_ level, file, "  COP_HIGH = %"UVuf"\n",
 			 (UV) COP_SEQ_RANGE_HIGH(sv));
     } else if ((type >= SVt_PVNV && type != SVt_PVAV && type != SVt_PVHV
-		&& type != SVt_PVCV && !isGV_with_GP(sv)
-		&& !SvVALID(sv))
+		&& type != SVt_PVCV && type != SVt_REGEXP
+		&& !isGV_with_GP(sv) && !SvVALID(sv))
 	       || type == SVt_NV) {
 	/* %Vg doesn't work? --jhi */
 #ifdef USE_LONG_DOUBLE
@@ -1548,7 +1548,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	    if (SvOOK(sv)) {
 		SvOOK_offset(sv, delta);
 		Perl_dump_indent(aTHX_ level, file,"  OFFSET = %"UVuf"\n",
-				 delta);
+				 (UV) delta);
 	    } else {
 		delta = 0;
 	    }

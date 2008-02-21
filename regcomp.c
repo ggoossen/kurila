@@ -3808,7 +3808,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
     /* Allocate space and zero-initialize. Note, the two step process 
        of zeroing when in debug mode, thus anything assigned has to 
        happen after that */
-    rx = newSV_type(SVt_REGEXP);
+    rx = (REGEXP*) newSV_type(SVt_REGEXP);
     r = (struct regexp*)SvANY(rx);
     Newxc(ri, sizeof(regexp_internal) + (unsigned)RExC_size * sizeof(regnode),
 	 char, regexp_internal);
@@ -3838,7 +3838,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
             + (sizeof(STD_PAT_MODS) - 1)
             + (sizeof("(?:)") - 1);
 
-	p = sv_grow(rx, wraplen + 1);
+	p = sv_grow((SV *)rx, wraplen + 1);
 	SvCUR_set(rx, wraplen);
 	SvPOK_on(rx);
         *p++='('; *p++='?';
@@ -8703,18 +8703,18 @@ Perl_pregfree2(pTHX_ REGEXP *rx)
     
 REGEXP *
 Perl_reg_temp_copy (pTHX_ REGEXP *rx) {
-    REGEXP *ret_x = newSV_type(SVt_REGEXP);
+    REGEXP *ret_x = (REGEXP*) newSV_type(SVt_REGEXP);
     struct regexp *ret = (struct regexp *)SvANY(ret_x);
     struct regexp *const r = (struct regexp *)SvANY(rx);
     register const I32 npar = r->nparens+1;
     (void)ReREFCNT_inc(rx);
-    /* FIXME ORANGE (once we start actually using the regular SV fields.) */
     /* We can take advantage of the existing "copied buffer" mechanism in SVs
        by pointing directly at the buffer, but flagging that the allocated
        space in the copy is zero. As we've just done a struct copy, it's now
        a case of zero-ing that, rather than copying the current length.  */
     SvPV_set(ret_x, RX_WRAPPED(rx));
-    StructCopy(r, ret, regexp);
+    SvFLAGS(ret_x) |= SvFLAGS(rx) & (SVf_POK|SVp_POK);
+    StructCopy(&(r->xpv_cur), &(ret->xpv_cur), struct regexp_allocated);
     SvLEN_set(ret_x, 0);
     Newx(ret->offs, npar, regexp_paren_pair);
     Copy(r->offs, ret->offs, npar, regexp_paren_pair);

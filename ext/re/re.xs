@@ -126,7 +126,7 @@ PPCODE:
         } else {
             /* Scalar, so use the string that Perl would return */
             /* return the pattern in (?msix:..) format */
-            pattern = sv_2mortal(newSVpvn(RX_WRAPPED(re),RX_WRAPLEN(re)));
+            pattern = sv_2mortal(newSVsv((SV*)re));
             XPUSHs(pattern);
             XSRETURN(1);
         }
