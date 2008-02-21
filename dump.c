@@ -2359,8 +2359,7 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     level++;
     if (PM_GETRE(pm)) {
 	REGEXP *const r = PM_GETRE(pm);
-	/* FIXME ORANGE - REGEXP can be 8 bit, so this is sometimes buggy:  */
-	SV * const tmpsv = newSVpvn(RX_PRECOMP(r),RX_PRELEN(r));
+	SV * const tmpsv = newSVsv((SV*)r);
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"%s\"\n",
 	     SvPVX(tmpsv));
 	SvREFCNT_dec(tmpsv);
