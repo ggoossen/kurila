@@ -806,6 +806,9 @@ Perl_screaminstr(pTHX_ SV *bigstr, SV *littlestr, I32 start_shift, I32 end_shift
     big = (const unsigned char *)(SvPVX_const(bigstr));
     /* The value of pos we can stop at: */
     stop_pos = SvCUR(bigstr) - end_shift - (SvCUR(littlestr) - 1 - previous);
+    /* Always return the stop_pos if looking for last and tail (might be a false positive) */
+    if (last && SvTAIL(littlestr))
+	return big + stop_pos;
     if (previous + start_shift > stop_pos) {
 /*
   stop_pos does not include SvTAIL in the count, so this check is incorrect
