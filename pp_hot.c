@@ -43,7 +43,7 @@ PP(pp_const)
         /* This is a const op added to hold the hints hash for
            pp_entereval. The hash can be modified by the code
            being eval'ed, so we return a copy instead. */
-        XPUSHs(sv_2mortal((SV*)Perl_hv_copy_hints_hv(aTHX_ (HV*)cSVOP_sv)));
+        mXPUSHs((SV*)Perl_hv_copy_hints_hv(aTHX_ (HV*)cSVOP_sv));
     else
         /* Normal const. */
         XPUSHs(cSVOP_sv);
@@ -2145,7 +2145,7 @@ PP(pp_subst)
 	    }
 	    TAINT_IF(rxtainted & 1);
 	    SPAGAIN;
-	    PUSHs(sv_2mortal(newSViv((I32)iters)));
+	    mPUSHi((I32)iters);
 	}
 	(void)SvPOK_only(TARG);
 	TAINT_IF(rxtainted);
@@ -2222,7 +2222,7 @@ PP(pp_subst)
 
 	TAINT_IF(rxtainted & 1);
 	SPAGAIN;
-	PUSHs(sv_2mortal(newSViv((I32)iters)));
+	mPUSHi((I32)iters);
 
 	(void)SvPOK_only(TARG);
 	TAINT_IF(rxtainted);

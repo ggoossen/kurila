@@ -1535,15 +1535,15 @@ S_magic_methcall(pTHX_ SV *sv, const MAGIC *mg, const char *meth, I32 flags, int
     EXTEND(SP, n);
     PUSHs(SvTIED_obj(sv, mg));
     if (n > 1) {
-        if (mg->mg_ptr) {
-            if (mg->mg_len >= 0)
-                PUSHs(newSVpvn_flags(mg->mg_ptr, mg->mg_len, SVs_TEMP));
-            else if (mg->mg_len == HEf_SVKEY)
-                PUSHs((SV*)mg->mg_ptr);
-        }
-        else if (mg->mg_type == PERL_MAGIC_tiedelem) {
-            PUSHs(sv_2mortal(newSViv(mg->mg_len)));
-        }
+	if (mg->mg_ptr) {
+	    if (mg->mg_len >= 0)
+		mPUSHp(mg->mg_ptr, mg->mg_len);
+	    else if (mg->mg_len == HEf_SVKEY)
+		PUSHs((SV*)mg->mg_ptr);
+	}
+	else if (mg->mg_type == PERL_MAGIC_tiedelem) {
+	    mPUSHi(mg->mg_len);
+	}
     }
     if (n > 2) {
         PUSHs(val);
@@ -2660,17 +2660,17 @@ Perl_sighandler(int sig)
                    (void)hv_stores(sih, "signo", newSViv(sip->si_signo));
                    (void)hv_stores(sih, "code", newSViv(sip->si_code));
 #if 0 /* XXX TODO: Configure scan for the existence of these, but even that does not help if the SA_SIGINFO is not implemented according to the spec. */
-                   hv_stores(sih, "errno",      newSViv(sip->si_errno));
-                   hv_stores(sih, "status",     newSViv(sip->si_status));
-                   hv_stores(sih, "uid",        newSViv(sip->si_uid));
-                   hv_stores(sih, "pid",        newSViv(sip->si_pid));
-                   hv_stores(sih, "addr",       newSVuv(PTR2UV(sip->si_addr)));
-                   hv_stores(sih, "band",       newSViv(sip->si_band));
+		   hv_stores(sih, "errno",      newSViv(sip->si_errno));
+		   hv_stores(sih, "status",     newSViv(sip->si_status));
+		   hv_stores(sih, "uid",        newSViv(sip->si_uid));
+		   hv_stores(sih, "pid",        newSViv(sip->si_pid));
+		   hv_stores(sih, "addr",       newSVuv(PTR2UV(sip->si_addr)));
+		   hv_stores(sih, "band",       newSViv(sip->si_band));
 #endif
-                   EXTEND(SP, 2);
-                   PUSHs((SV*)rv);
-                   PUSHs(newSVpvn((char *)sip, sizeof(*sip)));
-              }
+		   EXTEND(SP, 2);
+		   PUSHs((SV*)rv);
+		   mPUSHp((char *)sip, sizeof(*sip));
+	      }
 
          }
     }

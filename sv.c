@@ -10171,7 +10171,7 @@ do_mark_cloneable_stash(pTHX_ SV *sv)
 	    ENTER;
 	    SAVETMPS;
 	    PUSHMARK(SP);
-	    XPUSHs(sv_2mortal(newSVhek(hvname)));
+	    mXPUSHs(newSVhek(hvname));
 	    PUTBACK;
 	    call_sv((SV*)GvCV(cloner), G_SCALAR);
 	    SPAGAIN;
@@ -10914,7 +10914,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 	    ENTER;
 	    SAVETMPS;
 	    PUSHMARK(SP);
-	    XPUSHs(sv_2mortal(newSVhek(HvNAME_HEK(stash))));
+	    mXPUSHs(newSVhek(HvNAME_HEK(stash)));
 	    PUTBACK;
 	    call_sv((SV*)GvCV(cloner), G_DISCARD);
 	    FREETMPS;
@@ -11029,8 +11029,9 @@ Perl_sv_cat_decode(pTHX_ SV *dsv, SV *encoding,
 	XPUSHs(encoding);
 	XPUSHs(dsv);
 	XPUSHs(ssv);
-	XPUSHs(offsv = sv_2mortal(newSViv(*offset)));
-	XPUSHs(newSVpvn_flags(tstr, tlen, SVs_TEMP));
+	offsv = newSViv(*offset);
+	mXPUSHs(offsv);
+	mXPUSHp(tstr, tlen);
 	PUTBACK;
 	call_method("cat_decode", G_SCALAR);
 	SPAGAIN;
