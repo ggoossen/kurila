@@ -241,7 +241,7 @@ PP(pp_substcont)
 	    SvPV_set(dstr, NULL);
 
 	    TAINT_IF(cx->sb_rxtainted & 1);
-	    PUSHs(sv_2mortal(newSViv(saviters - 1)));
+	    mPUSHi(saviters - 1);
 
 	    (void)SvPOK_only(targ);
 	    TAINT_IF(cx->sb_rxtainted);
@@ -313,8 +313,8 @@ Perl_rxres_save(pTHX_ void **rsp, REGEXP *rx)
     RX_MATCH_COPIED_off(rx);
 
 #ifdef PERL_OLD_COPY_ON_WRITE
-    *p++ = PTR2UV(rx->saved_copy);
-    rx->saved_copy = NULL;
+    *p++ = PTR2UV(RX_SAVED_COPY(rx));
+    RX_SAVED_COPY(rx) = NULL;
 #endif
 
     *p++ = RX_NPARENS(rx);
@@ -339,9 +339,9 @@ Perl_rxres_restore(pTHX_ void **rsp, REGEXP *rx)
     *p++ = 0;
 
 #ifdef PERL_OLD_COPY_ON_WRITE
-    if (rx->saved_copy)
-	SvREFCNT_dec (rx->saved_copy);
-    rx->saved_copy = INT2PTR(SV*,*p);
+    if (RX_SAVED_COPY(rx))
+	SvREFCNT_dec (RX_SAVED_COPY(rx));
+    RX_SAVED_COPY(rx) = INT2PTR(SV*,*p);
     *p++ = 0;
 #endif
 
@@ -388,7 +388,7 @@ PP(pp_grepstart)
     if (PL_stack_base + *PL_markstack_ptr == SP) {
 	(void)POPMARK;
 	if (GIMME_V == G_SCALAR)
-	    XPUSHs(sv_2mortal(newSViv(0)));
+	    mXPUSHi(0);
 	RETURNOP(PL_op->op_next->op_next);
     }
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
@@ -986,9 +986,9 @@ PP(pp_caller)
     if (!stashname)
 	PUSHs(&PL_sv_undef);
     else
-	PUSHs(sv_2mortal(newSVpv(stashname, 0)));
-    PUSHs(sv_2mortal(newSVpv(OutCopFILE(cx->blk_oldcop), 0)));
-    PUSHs(sv_2mortal(newSViv((I32)CopLINE(cx->blk_oldcop))));
+	mPUSHs(newSVpv(stashname, 0));
+    mPUSHs(newSVpv(OutCopFILE(cx->blk_oldcop), 0));
+    mPUSHi((I32)CopLINE(cx->blk_oldcop));
     if (!MAXARG)
 	RETURN;
     if (CxTYPE(cx) == CXt_SUB) {
@@ -997,23 +997,23 @@ PP(pp_caller)
 	if (isGV(cvgv)) {
 	    SV * const sv = newSV(0);
 	    gv_efullname4(sv, cvgv, NULL, TRUE);
-	    PUSHs(sv_2mortal(sv));
-	    PUSHs(sv_2mortal(newSViv((I32)cx->blk_sub.hasargs)));
+	    mPUSHs(sv);
+	    mPUSHi((I32)cx->blk_sub.hasargs);
 	}
 	else {
 	    PUSHs(newSVpvs_flags("(unknown)", SVs_TEMP));
-	    PUSHs(sv_2mortal(newSViv((I32)cx->blk_sub.hasargs)));
+	    mPUSHi((I32)cx->blk_sub.hasargs);
 	}
     }
     else {
 	PUSHs(newSVpvs_flags("(eval)", SVs_TEMP));
-	PUSHs(sv_2mortal(newSViv(0)));
+	mPUSHi(0);
     }
     gimme = (I32)cx->blk_gimme;
     if (gimme == G_VOID)
 	PUSHs(&PL_sv_undef);
     else
-	PUSHs(sv_2mortal(newSViv(gimme & G_ARRAY)));
+	mPUSHi(gimme & G_ARRAY);
     if (CxTYPE(cx) == CXt_EVAL) {
 	/* eval STRING */
 	if (cx->blk_eval.old_op_type == OP_ENTEREVAL) {
@@ -1022,7 +1022,7 @@ PP(pp_caller)
 	}
 	/* require */
 	else if (cx->blk_eval.old_namesv) {
-	    PUSHs(sv_2mortal(newSVsv(cx->blk_eval.old_namesv)));
+	    mPUSHs(newSVsv(cx->blk_eval.old_namesv));
 	    PUSHs(&PL_sv_yes);
 	}
 	/* eval BLOCK (try blocks have old_namesv == 0) */
@@ -1056,7 +1056,7 @@ PP(pp_caller)
     /* XXX only hints propagated via op_private are currently
      * visible (others are not easily accessible, since they
      * use the global PL_hints) */
-    PUSHs(sv_2mortal(newSViv(CopHINTS_get(cx->blk_oldcop))));
+    mPUSHi(CopHINTS_get(cx->blk_oldcop));
     {
 	SV * mask ;
 	STRLEN * const old_warnings = cx->blk_oldcop->cop_warnings ;
@@ -1079,7 +1079,7 @@ PP(pp_caller)
 	}
         else
             mask = newSVpvn((char *) (old_warnings + 1), old_warnings[0]);
-        PUSHs(sv_2mortal(mask));
+        mPUSHs(mask);
     }
 
     PUSHs(cx->blk_oldcop->cop_hints_hash ?
@@ -1646,10 +1646,14 @@ PP(pp_goto)
 	    I32 oldsave;
 	    bool reified = 0;
 
+	retry:
 	    if (!CvROOT(cv) && !CvXSUB(cv)) {
 		const GV * const gv = CvGV(cv);
 		if (gv) {
 		    SV *tmpstr;
+		    /* autoloaded stub? */
+		    if (cv != GvCV(gv) && (cv = GvCV(gv)))
+			goto retry;
 		    tmpstr = sv_newmortal();
 		    gv_efullname4(tmpstr, gv, NULL, TRUE);
 		    DIE(aTHX_ "Goto undefined subroutine &%"SVf"", SVfARG(tmpstr));
@@ -3662,7 +3666,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 
 	DEFSV = upstream;
 	PUSHMARK(SP);
-	PUSHs(sv_2mortal(newSViv(0)));
+	mPUSHi(0);
 	if (filter_state) {
 	    PUSHs(filter_state);
 	}
@@ -3697,56 +3701,6 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	    }
 	}
     }
-/*     if (prune_from) { */
-/* 	/\* Oh. Too long. Stuff some in our cache.  *\/ */
-/* 	STRLEN cached_len = got_p + got_len - prune_from; */
-/* 	SV *cache = NULL; /\* (SV *)IoFMT_GV(datasv); *\/ */
-
-/* 	if (!cache) { */
-/* 	    IoFMT_GV(datasv) = (GV*) (cache = newSV(got_len - umaxlen)); */
-/* 	} else if (SvOK(cache)) { */
-/* 	    /\* Cache should be empty.  *\/ */
-/* 	    assert(!SvCUR(cache)); */
-/* 	} */
-
-/* 	sv_setpvn(cache, prune_from, cached_len); */
-/* 	/\* If you ask for block mode, you may well split UTF-8 characters. */
-/* 	   "If it breaks, you get to keep both parts" */
-/* 	   (Your code is broken if you  don't put them back together again */
-/* 	   before something notices.) *\/ */
-/* 	SvCUR_set(upstream, got_len - cached_len); */
-/* 	/\* Can't yet be EOF  *\/ */
-/* 	if (status == 0) */
-/* 	    status = 1; */
-/*     } */
-
-/*     /\* If they are at EOF but buf_sv has something in it, then they may never */
-/*        have touched the SV upstream, so it may be undefined.  If we naively */
-/*        concatenate it then we get a warning about use of uninitialised value. */
-/*     *\/ */
-/*     if (upstream != buf_sv && (SvOK(upstream) || SvGMAGICAL(upstream))) { */
-/* 	sv_catsv(buf_sv, upstream); */
-/*     } */
-
-/*     if (status <= 0) { */
-/* 	IoLINES(datasv) = 0; */
-/* 	SvREFCNT_dec(IoFMT_GV(datasv)); */
-/* 	if (filter_state) { */
-/* 	    SvREFCNT_dec(filter_state); */
-/* 	    IoTOP_GV(datasv) = NULL; */
-/* 	} */
-/* 	if (filter_sub) { */
-/* 	    SvREFCNT_dec(filter_sub); */
-/* 	    IoBOTTOM_GV(datasv) = NULL; */
-/* 	} */
-/* 	filter_del(S_run_user_filter); */
-/*     } */
-/*     if (status == 0 && read_from_cache) { */
-/* 	/\* If we read some data from the cache (and by getting here it implies */
-/* 	   that we emptied the cache) then we aren't yet at EOF, and mustn't */
-/* 	   report that to our caller.  *\/ */
-/* 	return 1; */
-/*     } */
     return status;
 }
 

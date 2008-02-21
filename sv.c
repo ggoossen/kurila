@@ -1386,27 +1386,18 @@ wrapper instead.
 int
 Perl_sv_backoff(pTHX_ register SV *sv)
 {
+    STRLEN delta;
+    const char * const s = SvPVX_const(sv);
     PERL_UNUSED_CONTEXT;
     assert(SvOOK(sv));
     assert(SvTYPE(sv) != SVt_PVHV);
     assert(SvTYPE(sv) != SVt_PVAV);
-    if (SvIVX(sv)) {
-	const char * const s = SvPVX_const(sv);
-#ifdef DEBUGGING
-	/* Validate the preceding buffer's sentinels to verify that no-one is
-	   using it.  */
-	const U8 *p = (const U8*) s;
-	const U8 *const real_start = p - SvIVX(sv);
-	while (p > real_start) {
-	    --p;
-	    assert (*p == (U8)PTR2UV(p));
-	}
-#endif
-	SvLEN_set(sv, SvLEN(sv) + SvIVX(sv));
-	SvPV_set(sv, SvPVX(sv) - SvIVX(sv));
-	SvIV_set(sv, 0);
-	Move(s, SvPVX(sv), SvCUR(sv)+1, char);
-    }
+
+    SvOOK_offset(sv, delta);
+    
+    SvLEN_set(sv, SvLEN(sv) + delta);
+    SvPV_set(sv, SvPVX(sv) - delta);
+    Move(s, SvPVX(sv), SvCUR(sv)+1, char);
     SvFLAGS(sv) &= ~SVf_OOK;
     return 0;
 }
@@ -3416,7 +3407,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV *sstr, I32 flags)
 	    SvNV_set(dstr, SvNVX(sstr));
 	}
 	if (sflags & SVp_IOK) {
-	    SvOOK_off(dstr);
 	    SvIV_set(dstr, SvIVX(sstr));
 	    /* Must do this otherwise some other overloaded use of 0x80000000
 	       gets confused. I guess SVpbm_VALID */
@@ -3837,7 +3827,13 @@ refer to the same chunk of data.
 void
 Perl_sv_chop(pTHX_ register SV *sv, register const char *ptr)
 {
-    register STRLEN delta;
+    STRLEN delta;
+    STRLEN old_delta;
+    U8 *p;
+#ifdef DEBUGGING
+    const U8 *real_start;
+#endif
+
     if (!ptr || !SvPOKp(sv))
 	return;
     delta = ptr - SvPVX_const(sv);
@@ -3847,8 +3843,6 @@ Perl_sv_chop(pTHX_ register SV *sv, register const char *ptr)
     }
     assert(ptr > SvPVX_const(sv));
     SV_CHECK_THINKFIRST(sv);
-    if (SvTYPE(sv) < SVt_PVIV)
-	sv_upgrade(sv,SVt_PVIV);
 
     if (!SvOOK(sv)) {
 	if (!SvLEN(sv)) { /* make copy of shared string */
@@ -3858,27 +3852,38 @@ Perl_sv_chop(pTHX_ register SV *sv, register const char *ptr)
 	    Move(pvx,SvPVX(sv),len,char);
 	    *SvEND(sv) = '\0';
 	}
-	SvIV_set(sv, 0);
-	/* Same SvOOK_on but SvOOK_on does a SvIOK_off
-	   and we do that anyway inside the SvNIOK_off
-	*/
 	SvFLAGS(sv) |= SVf_OOK;
+	old_delta = 0;
+    } else {
+	SvOOK_offset(sv, old_delta);
     }
-    SvNIOK_off(sv);
     SvLEN_set(sv, SvLEN(sv) - delta);
     SvCUR_set(sv, SvCUR(sv) - delta);
     SvPV_set(sv, SvPVX(sv) + delta);
-    SvIV_set(sv, SvIVX(sv) + delta);
+
+    p = (U8 *)SvPVX_const(sv);
+
+    delta += old_delta;
+
 #ifdef DEBUGGING
-    {
-	/* Fill the preceding buffer with sentinals to verify that no-one is
-	   using it.  */
-	U8 *p = (U8*) SvPVX(sv);
-	const U8 *const real_start = p - SvIVX(sv);
-	while (p > real_start) {
-	    --p;
-	    *p = (U8)PTR2UV(p);
-	}
+    real_start = p - delta;
+#endif
+
+    assert(delta);
+    if (delta < 0x100) {
+	*--p = (U8) delta;
+    } else {
+	*--p = 0;
+	p -= sizeof(STRLEN);
+	Copy((U8*)&delta, p, sizeof(STRLEN), U8);
+    }
+
+#ifdef DEBUGGING
+    /* Fill the preceding buffer with sentinals to verify that no-one is
+       using it.  */
+    while (p > real_start) {
+	--p;
+	*p = (U8)PTR2UV(p);
     }
 #endif
 }
@@ -4859,13 +4864,15 @@ Perl_sv_clear(pTHX_ register SV *sv)
     case SVt_PVMG:
     case SVt_PVNV:
     case SVt_PVIV:
+    case SVt_PV:
       freescalar:
 	/* Don't bother with SvOOK_off(sv); as we're only going to free it.  */
 	if (SvOOK(sv)) {
-	    SvPV_set(sv, SvPVX_mutable(sv) - SvIVX(sv));
+	    STRLEN offset;
+	    SvOOK_offset(sv, offset);
+	    SvPV_set(sv, SvPVX_mutable(sv) - offset);
 	    /* Don't even bother with turning off the OOK flag.  */
 	}
-    case SVt_PV:
 	if (SvROK(sv)) {
 	    SV * const target = SvRV(sv);
 	    if (SvWEAKREF(sv))
