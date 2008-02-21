@@ -117,7 +117,7 @@ PP(pp_regcomp)
     if (SvROK(tmpstr)) {
 	SV * const sv = SvRV(tmpstr);
 	if (SvTYPE(sv) == SVt_REGEXP)
-	    re = sv;
+	    re = (REGEXP*) sv;
     }
     if (re) {
 	re = reg_temp_copy(re);
@@ -130,7 +130,7 @@ PP(pp_regcomp)
 	re = PM_GETRE(pm);
 
 	/* Check against the last compiled regexp. */
-	if (!re || !RX_PRECOMP(re) || RX_PRELEN(re) != (I32)len ||
+	if (!re || !RX_PRECOMP(re) || RX_PRELEN(re) != len ||
 	    memNE(RX_PRECOMP(re), t, len))
 	{
 	    const regexp_engine *eng = re ? RX_ENGINE(re) : NULL;
@@ -3134,11 +3134,11 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 
 #   define SM_REGEX ( \
 	   (SvROK(d) && (SvTYPE(This = SvRV(d)) == SVt_REGEXP)		\
-	&& (this_regex = This)						\
+	&& (this_regex = (REGEXP*) This)				\
 	&& (Other = e))							\
     ||									\
 	   (SvROK(e) && (SvTYPE(This = SvRV(e)) == SVt_REGEXP)		\
-	&& (this_regex = This)						\
+	&& (this_regex = (REGEXP*) This)				\
 	&& (Other = d))	)
 	
 
@@ -3147,7 +3147,7 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 
 #   define SM_OTHER_REGEX (SvROK(Other)					\
 	&& (SvTYPE(SvRV(Other)) == SVt_REGEXP)				\
-	&& (other_regex = SvRV(Other)))
+	&& (other_regex = (REGEXP*) SvRV(Other)))
 
 
 #   define SM_SEEN_THIS(sv) hv_exists_ent(seen_this, \

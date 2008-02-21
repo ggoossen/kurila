@@ -3062,7 +3062,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 #define ST st->u.eval
 	{
 	    SV *ret;
-	    SV *re_sv;
+	    REGEXP *re_sv;
             regexp *re;
             regexp_internal *rei;
             regnode *startpoint;
@@ -3149,13 +3149,13 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			SV *const sv = SvRV(ret);
 
 			if (SvTYPE(sv) == SVt_REGEXP) {
-			    rx = sv;
+			    rx = (REGEXP*) sv;
 			} else if (SvSMAGICAL(sv)) {
 			    mg = mg_find(sv, PERL_MAGIC_qr);
 			    assert(mg);
 			}
 		    } else if (SvTYPE(ret) == SVt_REGEXP) {
-			rx = ret;
+			rx = (REGEXP*) ret;
 		    } else if (SvSMAGICAL(ret)) {
 			if (SvGMAGICAL(ret)) {
 			    /* I don't believe that there is ever qr magic
@@ -3174,8 +3174,8 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		    }
 
 		    if (mg) {
-			rx = mg->mg_obj; /*XXX:dmq*/
-			assert(re);
+			rx = (REGEXP *) mg->mg_obj; /*XXX:dmq*/
+			assert(rx);
 		    }
 		    if (rx) {
 			rx = reg_temp_copy(rx);
@@ -3192,7 +3192,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			    /* This isn't a first class regexp. Instead, it's
 			       caching a regexp onto an existing, Perl visible
 			       scalar.  */
-			    sv_magic(ret, rx, PERL_MAGIC_qr, 0, 0);
+			    sv_magic(ret, (SV*) rx, PERL_MAGIC_qr, 0, 0);
 			}
 			PL_regsize = osize;
 		    }
@@ -3225,8 +3225,12 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		
 		PL_regoffs = re->offs; /* essentially NOOP on GOSUB */
 		
-		*PL_reglastparen = 0;
-		*PL_reglastcloseparen = 0;
+		/* see regtry, specifically PL_reglast(?:close)?paren is a pointer! (i dont know why) :dmq */
+		PL_reglastparen = &re->lastparen;
+		PL_reglastcloseparen = &re->lastcloseparen;
+		re->lastparen = 0;
+		re->lastcloseparen = 0;
+
 		PL_reginput = locinput;
 		PL_regsize = 0;
 
@@ -3269,6 +3273,10 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	    regcpblow(ST.cp);
 	    cur_eval = ST.prev_eval;
 	    cur_curlyx = ST.prev_curlyx;
+	    
+	    PL_reglastparen = &rex->lastparen;
+	    PL_reglastcloseparen = &rex->lastcloseparen;
+	    
 	    /* XXXX This is too dramatic a measure... */
 	    PL_reg_maxiter = 0;
             if ( nochange_depth )
@@ -3283,6 +3291,9 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	    SETREX(rex_sv,ST.prev_rex);
 	    rex = (struct regexp *)SvANY(rex_sv);
 	    rexi = RXi_GET(rex); 
+	    PL_reglastparen = &rex->lastparen;
+	    PL_reglastcloseparen = &rex->lastcloseparen;
+
 	    PL_reginput = locinput;
 	    REGCP_UNWIND(ST.lastcp);
 	    regcppop(rex);

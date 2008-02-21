@@ -4186,6 +4186,31 @@ sub kt
      s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g;
      iseq $_, "ZYX";
 }
+{
+    our @ctl_n=();
+    our @plus=();
+    our $nested_tags;
+    $nested_tags = qr{
+        <
+           (\w+)
+           (?{
+                   push @ctl_n,$^N;
+                   push @plus,$+;
+           })
+        >
+        (??{$nested_tags})*
+        </\s* \w+ \s*>
+    }x;
+
+    my $match= '<bla><blubb></blubb></bla>' =~ m/^$nested_tags$/;
+    ok($match,'nested construct matches');
+    iseq("@ctl_n","bla blubb",'$^N inside of (?{}) works as expected');
+    iseq("@plus","bla blubb",'$+ inside of (?{}) works as expected');
+}
+
+
+
+
 # Test counter is at bottom of file. Put new tests above here.
 #-------------------------------------------------------------------
 # Keep the following tests last -- they may crash perl
@@ -4245,6 +4270,6 @@ ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1783;
+    $::TestCount = 1786;
     print "1..$::TestCount\n";
 }

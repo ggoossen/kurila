@@ -474,7 +474,7 @@ PostInitStream(s, flags, bufsize, windowBits)
 
 static SV* 
 #ifdef CAN_PROTOTYPE
-deRef(SV * sv, char * string)
+deRef(SV * sv, const char * string)
 #else
 deRef(sv, string)
 SV * sv ;
@@ -506,7 +506,7 @@ char * string;
 
 static SV*
 #ifdef CAN_PROTOTYPE
-deRef_l(SV * sv, char * string)
+deRef_l(SV * sv, const char * string)
 #else
 deRef_l(sv, string)
 SV * sv ;

@@ -917,8 +917,10 @@ static const struct body_details bodies_by_type[] = {
       HASARENA, FIT_ARENA(0, sizeof(XPVMG)) },
 
     /* something big */
-    { sizeof(struct regexp), sizeof(struct regexp), 0,
-      SVt_REGEXP, FALSE, HADNV, HASARENA, FIT_ARENA(0, sizeof(struct regexp))
+    { sizeof(struct regexp_allocated), sizeof(struct regexp_allocated),
+      + relative_STRUCT_OFFSET(struct regexp_allocated, regexp, xpv_cur),
+      SVt_REGEXP, FALSE, NONV, HASARENA,
+      FIT_ARENA(0, sizeof(struct regexp_allocated))
     },
 
     /* 48 */
@@ -3135,6 +3137,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV *sstr, I32 flags)
 	}
 	goto undef_sstr;
 
+    case SVt_REGEXP:
     case SVt_PV:
 	if (dtype < SVt_PV)
 	    sv_upgrade(dstr, SVt_PV);
@@ -4820,7 +4823,7 @@ Perl_sv_clear(pTHX_ register SV *sv)
 	goto freescalar;
     case SVt_REGEXP:
 	/* FIXME for plugins */
-	pregfree2(sv);
+	pregfree2((REGEXP*) sv);
 	goto freescalar;
     case SVt_PVCV:
 	cv_undef((CV*)sv);
@@ -9527,7 +9530,7 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		break;
 	    case SVt_REGEXP:
 		/* FIXME for plugins */
-		re_dup_guts(sstr, dstr, param);
+		re_dup_guts((REGEXP*) sstr, (REGEXP*) dstr, param);
 		break;
 	    case SVt_PVLV:
 		/* XXX LvTARGOFF sometimes holds PMOP* when DEBUGGING */
@@ -10503,9 +10506,9 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 	       pointer inside an IV hack? */
 	    SV * const sv =
 		SvREPADTMP(regex)
-		    ? sv_dup_inc(regex, param)
+		    ? sv_dup_inc((SV*) regex, param)
 		    : SvREFCNT_inc(
-			newSViv(PTR2IV(sv_dup_inc(INT2PTR(REGEXP *, SvIVX(regex)), param))))
+			newSViv(PTR2IV(sv_dup_inc(INT2PTR(SV *, SvIVX(regex)), param))))
 		;
 	    if (SvFLAGS(regex) & SVf_BREAK)
 		SvFLAGS(sv) |= SVf_BREAK; /* unrefcnted PL_curpm */
