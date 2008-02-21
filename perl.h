@@ -3768,17 +3768,8 @@ Gid_t getegid (void);
 #  include <assert.h>
 #endif
 
-/* Keep the old croak based assert for those who want it, and as a fallback if
-   the platform is so heretically non-ANSI that it can't assert.  */
-
-#define Perl_assert(what)	PERL_DEB( 				\
-	((what) ? ((void) 0) :						\
-	    (Perl_croak_nocontext("Assertion %s failed: file \"" __FILE__ \
-			"\", line %d", STRINGIFY(what), __LINE__),	\
-	    (void) 0)))
-
 #ifndef assert
-#  define assert(what)	Perl_assert(what)
+#  error "No assert"
 #endif
 
 struct ufuncs {
