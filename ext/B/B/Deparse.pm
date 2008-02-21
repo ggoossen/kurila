@@ -20,7 +20,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
          CVf_METHOD CVf_LOCKED
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
-$VERSION = 0.83;
+$VERSION = 0.85;
 use strict;
 use warnings ();
 
@@ -1785,9 +1785,7 @@ sub pp_refgen {
     my $kid = $op->first;
     if ($kid->name eq "null") {
 	$kid = $kid->first;
-	if ($kid->name eq "anonlist" || $kid->name eq "anonhash") {
-	    return $self->anon_hash_or_list($op, $cx);
-	} elsif (!null($kid->sibling) and
+	if (!null($kid->sibling) and
 		 $kid->sibling->name eq "anoncode") {
             return $self->e_anoncode({ code => $self->padval($kid->sibling->targ) });
 	} elsif ($kid->name eq "pushmark") {
