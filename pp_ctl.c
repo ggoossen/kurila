@@ -128,6 +128,7 @@ PP(pp_regcomp)
 	STRLEN len;
 	const char *t = SvOK(tmpstr) ? SvPV_const(tmpstr, len) : "";
 	re = PM_GETRE(pm);
+	assert (re != (REGEXP*) &PL_sv_undef);
 
 	/* Check against the last compiled regexp. */
 	if (!re || !RX_PRECOMP(re) || RX_PRELEN(re) != len ||
@@ -137,7 +138,11 @@ PP(pp_regcomp)
             U32 pm_flags = pm->op_pmflags & PMf_COMPILETIME;
 	    if (re) {
 	        ReREFCNT_dec(re);
+#ifdef USE_ITHREADS
+		PM_SETRE(pm, (REGEXP*) &PL_sv_undef);
+#else
 		PM_SETRE(pm, NULL);	/* crucial if regcomp aborts */
+#endif
 	    } else if (PL_curcop->cop_hints_hash) {
 	        SV **ptr = hv_fetch(PL_curcop->cop_hints_hash, "regcomp", 7, 0);
                 if (ptr && *ptr && SvIOK(*ptr) && SvIV(*ptr))
@@ -1751,7 +1756,7 @@ PP(pp_goto)
 		if (CvDEPTH(cv) < 2)
 		    SvREFCNT_inc_simple_void_NN(cv);
 		else {
-		    if (CvDEPTH(cv) == 100 && ckWARN(WARN_RECURSION))
+		    if (CvDEPTH(cv) == PERL_SUB_DEPTH_WARN && ckWARN(WARN_RECURSION))
 			sub_crush_depth(cv);
 		    pad_push(padlist, CvDEPTH(cv));
 		}

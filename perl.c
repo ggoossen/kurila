@@ -353,8 +353,9 @@ perl_construct(pTHXx)
     sv_setpvn(PERL_DEBUG_PAD(1), "", 0);	/* ext/re needs these */
     sv_setpvn(PERL_DEBUG_PAD(2), "", 0);	/* even without DEBUGGING. */
 #ifdef USE_ITHREADS
-    /* First entry is an array of empty elements */
-    Perl_av_create_and_push(aTHX_ &PL_regex_padav,(SV*)newAV());
+    /* First entry is a list of empty elements. It needs to be initialised
+       else all hell breaks loose in S_find_uninit_var().  */
+    Perl_av_create_and_push(aTHX_ &PL_regex_padav, newSVpvs(""));
     PL_regex_pad = AvARRAY(PL_regex_padav);
 #endif
 #ifdef USE_REENTRANT_API
@@ -1813,9 +1814,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    else
 		Perl_croak(aTHX_ "No directory specified for -I");
 	    break;
-	case 'P':
-	    Perl_croak(aTHX_ "-P switch has been removed");
-	    goto reswitch;
 	case 'S':
 	    forbid_setid('S', -1);
 	    dosearch = TRUE;
@@ -1892,12 +1890,10 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 				   "\"  Built under %s\\n",OSNAME);
 #ifdef __DATE__
 #  ifdef __TIME__
-		    Perl_sv_catpvf(aTHX_ opts_prog,
-				   "  Compiled at %s %s\\n\"",__DATE__,
-				   __TIME__);
+		    sv_catpvs(opts_prog,
+			      "  Compiled at " __DATE__ " " __TIME__ "\\n\"");
 #  else
-		    Perl_sv_catpvf(aTHX_ opts_prog,"  Compiled on %s\\n\"",
-				   __DATE__);
+		    sv_catpvs(opts_prog, "  Compiled on " __DATE__ "\\n\"");
 #  endif
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
@@ -2867,7 +2863,6 @@ S_usage(pTHX_ const char *name)		/* XXX move this out into a module ? */
 "-[mM][-]module    execute \"use/no module...\" before executing program",
 "-n                assume \"while (<>) { ... }\" loop around program",
 "-p                assume loop like -n but print line also, like sed",
-"-P                run program through C preprocessor before compilation",
 "-s                enable rudimentary parsing for switches after programfile",
 "-S                look for programfile using PATH environment variable",
 "-t                enable tainting warnings",
@@ -2907,7 +2902,7 @@ Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
       "  t  Trace execution",
       "  o  Method and overloading resolution",
       "  c  String/numeric conversions",
-      "  P  Print profiling info, preprocessor command for -P, source file input state",
+      "  P  Print profiling info, source file input state",
       "  m  Memory allocation",
       "  f  Format processing",
       "  r  Regular expression parsing and execution",

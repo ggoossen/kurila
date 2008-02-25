@@ -220,7 +220,6 @@ PERLVAR(Iminus_l,	bool)
 PERLVAR(Iminus_a,	bool)
 PERLVAR(Iminus_F,	bool)
 PERLVAR(Idoswitches,	bool)
-
 PERLVAR(Iminus_E,	bool)
 
 /*
@@ -240,6 +239,7 @@ PERLVAR(Iexit_flags,	U8)		/* was exit() unexpected, etc. */
 PERLVAR(Isrand_called,	bool)
 /* Part of internal state, but makes the 16th 1 byte variable in a row.  */
 PERLVAR(Itainting,	bool)		/* doing taint checks */
+/* Space for a U8 */
 PERLVAR(Iinplace,	char *)
 PERLVAR(Ie_script,	SV *)
 
@@ -557,9 +557,13 @@ PERLVAR(Inumeric_radix_sv,	SV *)	/* The radix separator if not '.' */
 #endif
 
 #if defined(USE_ITHREADS)
-PERLVAR(Iregex_pad,     SV**)		/* All regex objects */
-PERLVAR(Iregex_padav,   AV*)		/* All regex objects */
-
+PERLVAR(Iregex_pad,     SV**)		/* Shortcut into the array of
+					   regex_padav */
+PERLVAR(Iregex_padav,   AV*)		/* All regex objects, indexed via the
+					   values in op_pmoffset of pmop.
+					   Entry 0 is an SV whose PV is a
+					   "packed" list of IVs listing
+					   the now-free slots in the array */
 #endif
 
 #ifdef USE_REENTRANT_API
