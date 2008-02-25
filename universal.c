@@ -740,7 +740,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     
     if (CxTYPE(cx) == CXt_EVAL) {
 	/* eval STRING */
-	if (cx->blk_eval.old_op_type == OP_ENTEREVAL) {
+	if (CxOLD_OP_TYPE(cx) == OP_ENTEREVAL) {
 	    av_push(av, cx->blk_eval.cur_text);
 	}
 	/* require */

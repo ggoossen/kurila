@@ -258,10 +258,9 @@ struct cop {
 
 /* subroutine context */
 struct block_sub {
-    CV *	cv;
     OP *	retop;	/* op to execute on exit from sub */
-    U8		hasargs;
-    U8		lval;		/* XXX merge lval and hasargs? */
+    /* Above here is the same for sub and eval.  */
+    CV *	cv;
     AV *	savearray;
     AV *	argarray;
     I32		olddepth;
@@ -280,7 +279,7 @@ struct block_sub {
 									\
 	cx->blk_sub.cv = cv;						\
 	cx->blk_sub.olddepth = CvDEPTH(cv);				\
-	cx->blk_sub.hasargs = hasargs;					\
+	cx->cx_type |= (hasargs) ? CXp_HASARGS : 0;			\
 	cx->blk_sub.retop = NULL;					\
 	if (!CvDEPTH(cv)) {						\
 	    SvREFCNT_inc_simple_void_NN(cv);				\
@@ -291,13 +290,13 @@ struct block_sub {
 
 #define PUSHSUB(cx)							\
 	PUSHSUB_BASE(cx)						\
-	cx->blk_sub.lval = PL_op->op_private &                          \
+	cx->blk_u16 = PL_op->op_private &				\
 	                      (OPpLVAL_INTRO|OPpENTERSUB_INARGS);
 
 /* variant for use by OP_DBSTATE, where op_private holds hint bits */
 #define PUSHSUB_DB(cx)							\
 	PUSHSUB_BASE(cx)						\
-	cx->blk_sub.lval = 0;
+	cx->blk_u16 = 0;
 
 
 #define POP_SAVEARRAY()						\
@@ -321,7 +320,7 @@ struct block_sub {
 		CopFILE((COP*)CvSTART((CV*)cx->blk_sub.cv)),		\
 		CopLINE((COP*)CvSTART((CV*)cx->blk_sub.cv)));		\
 									\
-	if (cx->blk_sub.hasargs) {					\
+	if (CxHASARGS(cx)) {						\
 	    POP_SAVEARRAY();						\
 	    /* abandon @_ if it got reified */				\
 	    if (AvREAL(cx->blk_sub.argarray)) {				\
@@ -349,20 +348,27 @@ struct block_sub {
 
 /* eval context */
 struct block_eval {
-    U8		old_in_eval;
-    U16		old_op_type;
+    OP *	retop;	/* op to execute on exit from eval */
+    /* Above here is the same for sub, format and eval.  */
     SV *	old_namesv;
     OP *	old_eval_root;
     SV *	cur_text;
     CV *	cv;
-    OP *	retop;	/* op to execute on exit from eval */
     JMPENV *	cur_top_env; /* value of PL_top_env when eval CX created */
 };
 
+/* If we ever need more than 512 op types, change the shift from 7.
+   blku_gimme is actually also only 2 bits, so could be merged with something.
+*/
+
+#define CxOLD_IN_EVAL(cx)	(((cx)->blk_u16) & 0x7F)
+#define CxOLD_OP_TYPE(cx)	(((cx)->blk_u16) >> 7)
+
 #define PUSHEVAL(cx,n,fgv)						\
     STMT_START {							\
-	cx->blk_eval.old_in_eval = PL_in_eval;				\
-	cx->blk_eval.old_op_type = PL_op->op_type;			\
+	assert(!(PL_in_eval & ~0x7F));					\
+	assert(!(PL_op->op_type & ~0x1FF));				\
+	cx->blk_u16 = (PL_in_eval & 0x7F) | ((U16)PL_op->op_type << 7);	\
 	cx->blk_eval.old_namesv = (n ? newSVpv(n,0) : NULL);		\
 	cx->blk_eval.old_eval_root = PL_eval_root;			\
 	cx->blk_eval.cur_text = PL_parser ? PL_parser->linestr : NULL;	\
@@ -373,8 +379,8 @@ struct block_eval {
 
 #define POPEVAL(cx)							\
     STMT_START {							\
-	PL_in_eval = cx->blk_eval.old_in_eval;				\
-	optype = cx->blk_eval.old_op_type;				\
+	PL_in_eval = CxOLD_IN_EVAL(cx);					\
+	optype = CxOLD_OP_TYPE(cx);					\
 	PL_eval_root = cx->blk_eval.old_eval_root;			\
 	if (cx->blk_eval.old_namesv)					\
 	    sv_2mortal(cx->blk_eval.old_namesv);			\
@@ -382,7 +388,6 @@ struct block_eval {
 
 /* loop context */
 struct block_loop {
-    char *	label;
     I32		resetsp;
     LOOP *	my_op;	/* My op, that contains redo, next and last ops.  */
     /* (except for non_ithreads we need to modify next_op in pp_ctl.c, hence
@@ -440,7 +445,9 @@ struct block_loop {
 	else								\
 	    cx->blk_loop.itersave = NULL;
 #endif
-#define CxLABEL(c)	(0 + (c)->blk_loop.label)
+#define CxLABEL(c)	(0 + (c)->blk_oldcop->cop_label)
+#define CxHASARGS(c)	(((c)->cx_type & CXp_HASARGS) == CXp_HASARGS)
+#define CxLVAL(c)	(0 + (c)->blk_u16)
 
 #ifdef USE_ITHREADS
 #  define PUSHLOOP_OP_NEXT		/* No need to do anything.  */
@@ -451,7 +458,6 @@ struct block_loop {
 #endif
 
 #define PUSHLOOP(cx, dat, s)						\
-	cx->blk_loop.label = PL_curcop->cop_label;			\
 	cx->blk_loop.resetsp = s - PL_stack_base;			\
 	cx->blk_loop.my_op = cLOOP;					\
 	PUSHLOOP_OP_NEXT;						\
@@ -487,9 +493,9 @@ struct block_givwhen {
 
 /* context common to subroutines, evals and loops */
 struct block {
-    U16		blku_type;	/* what kind of context this is */
+    U8		blku_type;	/* what kind of context this is */
     U8		blku_gimme;	/* is this block running in list context? */
-    U8		blku_spare;	/* Padding to match with struct subst */
+    U16		blku_u16;	/* used by block_sub and block_eval (so far) */
     I32		blku_oldsp;	/* stack pointer to copy stuff down to */
     COP *	blku_oldcop;	/* old curcop pointer */
     I32		blku_oldmarksp;	/* mark stack index */
@@ -509,6 +515,7 @@ struct block {
 #define blk_oldscopesp	cx_u.cx_blk.blku_oldscopesp
 #define blk_oldpm	cx_u.cx_blk.blku_oldpm
 #define blk_gimme	cx_u.cx_blk.blku_gimme
+#define blk_u16		cx_u.cx_blk.blku_u16
 #define blk_sub		cx_u.cx_blk.blk_u.blku_sub
 #define blk_eval	cx_u.cx_blk.blk_u.blku_eval
 #define blk_loop	cx_u.cx_blk.blk_u.blku_loop
@@ -548,9 +555,9 @@ struct block {
 
 /* substitution context */
 struct subst {
-    U16		sbu_type;	/* what kind of context this is */
-    U8		sbu_once;	/* Actually both booleans, but U8 to matches */
-    U8		sbu_rxtainted;	/* struct block */
+    U8		sbu_type;	/* what kind of context this is */
+    U8		sbu_once;	/* Actually both booleans, but U8/U16 */
+    U16		sbu_rxtainted;	/* matches struct block */
     I32		sbu_iters;
     I32		sbu_maxiters;
     I32		sbu_rflags;
@@ -610,7 +617,7 @@ struct context {
 };
 #define cx_type cx_u.cx_subst.sbu_type
 
-#define CXTYPEMASK	0xff
+#define CXTYPEMASK	0xf
 #define CXt_NULL	0
 #define CXt_SUB		1
 #define CXt_EVAL	2
@@ -620,19 +627,25 @@ struct context {
 #define CXt_GIVEN	6
 #define CXt_WHEN	7
 
-/* private flags for CXt_SUB and CXt_NULL */
-#define CXp_MULTICALL	0x00000400	/* part of a multicall (so don't
+/* private flags for CXt_SUB and CXt_NULL
+   However, this is checked in many places which do not check the type, so
+   this bit needs to be kept clear for most everything else. For reasons I
+   haven't investigated, it can coexist with CXp_FOR_DEF */
+#define CXp_MULTICALL	0x0000040	/* part of a multicall (so don't
 					   tear down context on exit). */ 
 
+/* private flags for CXt_SUB and CXt_FORMAT */
+#define CXp_HASARGS	0x00000020
+
 /* private flags for CXt_EVAL */
-#define CXp_REAL	0x00000100	/* truly eval'', not a lookalike */
-#define CXp_TRYBLOCK	0x00000200	/* eval{}, not eval'' or similar */
+#define CXp_REAL	0x00000010	/* truly eval'', not a lookalike */
+#define CXp_TRYBLOCK	0x00000020	/* eval{}, not eval'' or similar */
 
 /* private flags for CXt_LOOP */
-#define CXp_FOREACH	0x00000200	/* a foreach loop */
-#define CXp_FOR_DEF	0x00000400	/* foreach using $_ */
+#define CXp_FOREACH	0x00000020	/* a foreach loop */
+#define CXp_FOR_DEF	0x00000040	/* foreach using $_ */
 #ifdef USE_ITHREADS
-#  define CXp_PADVAR	0x00000100	/* itervar lives on pad, iterdata
+#  define CXp_PADVAR	0x00000010	/* itervar lives on pad, iterdata
 					   has pad offset; if not set,
 					   iterdata holds GV* */
 #  define CxPADLOOP(c)	(((c)->cx_type & (CXt_LOOP|CXp_PADVAR))		\
@@ -686,19 +699,20 @@ L<perlcall>.
 =cut
 */
 
-#define G_SCALAR	0
-#define G_ARRAY		1
-#define G_VOID		128	/* skip this bit when adding flags below */
+#define G_SCALAR	2
+#define G_ARRAY		3
+#define G_VOID		1
+#define G_WANT		3
 
 /* extra flags for Perl_call_* routines */
-#define G_DISCARD	2	/* Call FREETMPS.
+#define G_DISCARD	4	/* Call FREETMPS.
 				   Don't change this without consulting the
 				   hash actions codes defined in hv.h */
-#define G_EVAL		4	/* Assume eval {} around subroutine call. */
-#define G_NOARGS	8	/* Don't construct a @_ array. */
-#define G_KEEPERR      16	/* Append errors to $@, don't overwrite it */
-#define G_NODEBUG      32	/* Disable debugging at toplevel.  */
-#define G_METHOD       64       /* Calling method. */
+#define G_EVAL		8	/* Assume eval {} around subroutine call. */
+#define G_NOARGS       16	/* Don't construct a @_ array. */
+#define G_KEEPERR      32	/* Append errors to $@, don't overwrite it */
+#define G_NODEBUG      64	/* Disable debugging at toplevel.  */
+#define G_METHOD      128       /* Calling method. */
 #define G_FAKINGEVAL  256	/* Faking an eval context for call_sv or
 				   fold_constants. */
 
