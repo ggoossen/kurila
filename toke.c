@@ -1087,7 +1087,7 @@ S_skipspace(pTHX_ register char *s)
 	    PL_bufend = SvPVX(PL_linestr) + SvCUR(PL_linestr);
 	    PL_last_lop = PL_last_uni = NULL;
 
-	    /* Close the filehandle.  Could be from -P preprocessor,
+	    /* Close the filehandle.  Could be from
 	     * STDIN, or a regular file.  If we were reading code from
 	     * STDIN (because the commandline held no -e or filename)
 	     * then we don't close it, we reset it so the code can

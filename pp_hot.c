@@ -1143,15 +1143,6 @@ PP(pp_qr)
     SV * const pkg = rx ? CALLREG_PACKAGE(rx) : NULL;
     SV * const rv = sv_newmortal();
 
-    if (!rx) {
-	/* FIXME ORANGE.
-	   This can go if/when regexps are stored directly in PL_regex_pad
-	   rather than via references. do_clean_objs finds and frees them
-	   when they are stored as references.  */
-	XPUSHs(rv);
-	RETURN;
-    }
-
     SvUPGRADE(rv, SVt_IV);
     /* This RV is about to own a reference to the regexp. (In addition to the
        reference already owned by the PMOP.  */
@@ -2623,7 +2614,7 @@ PP(pp_entersub)
 	 * stuff so that __WARN__ handlers can safely dounwind()
 	 * if they want to
 	 */
-	if (CvDEPTH(cv) == 100 && ckWARN(WARN_RECURSION)
+	if (CvDEPTH(cv) == PERL_SUB_DEPTH_WARN && ckWARN(WARN_RECURSION)
 	    && !(PERLDB_SUB && cv == GvCV(PL_DBsub)))
 	    sub_crush_depth(cv);
 #if 0

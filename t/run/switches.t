@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 61);
+plan(tests => 62);
 
 use Config;
 
@@ -262,7 +262,7 @@ SWTESTPM
 
 # Tests for switches which do not exist
 
-foreach my $switch (split m//, "ABbGgHJjKkLNOoQqRrYyZz123456789_")
+foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
 {
     local $TODO = '';   # these ones should work on VMS
 

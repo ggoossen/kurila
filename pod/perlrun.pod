@@ -394,7 +394,7 @@ B<-D14> is equivalent to B<-Dtls>):
         8  t  Trace execution
        16  o  Method and overloading resolution
        32  c  String/numeric conversions
-       64  P  Print profiling info, preprocessor command for -P, source file input state
+       64  P  Print profiling info, source file input state
       128  m  Memory allocation
       256  f  Format processing
       512  r  Regular expression parsing and execution
@@ -691,11 +691,6 @@ overrides a B<-n> switch.
 
 C<BEGIN> and C<END> blocks may be used to capture control before or after
 the implicit loop, just as in B<awk>.
-
-=item B<-P>
-X<-P>
-
-Has been removed in kurila.
 
 =item B<-s>
 X<-s>
