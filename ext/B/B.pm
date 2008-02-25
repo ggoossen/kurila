@@ -7,7 +7,7 @@
 #
 package B;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 use XSLoader ();
 require Exporter;
@@ -563,17 +563,19 @@ give incomprehensible results, or worse.
 B::IV, B::NV, B::RV, B::PV, B::PVIV, B::PVNV, B::PVMG, 
 B::AV, B::HV, B::CV, B::GV, B::IO. These classes
 correspond in the obvious way to the underlying C structures of similar names.
-The inheritance hierarchy mimics the underlying C "inheritance". For the
-5.10, 5.10.1 I<etc> this is:
+The inheritance hierarchy mimics the underlying C "inheritance".
 
-                             B::SV
-                               |
-                +--------------+----------+------------+
-                |              |          |            |
-              B::PV          B::IV      B::NV        B::RV
-                   \         /          /
-                    \       /          /
-                     B::PVIV          /
+For 5.11.0 and later, B::RV is abolished, and IVs can be used to store
+references, and a new type B::REGEXP is introduced, giving this structure:
+
+                           B::SV
+                             |
+                +------------+------------+
+                |            |            |
+              B::PV        B::IV        B::NV
+                  \         /           /
+                   \       /           /
+                    B::PVIV           /
                          \           /
                           \         /
                            \       /
@@ -582,15 +584,13 @@ The inheritance hierarchy mimics the underlying C "inheritance". For the
                                |
                             B::PVMG
                                |
-                          +----+------+-----+-----+
-                          |    |      |     |     |
-                        B::AV B::GV B::HV B::CV B::IO
-                               |
-                            B::PVLV
+           +-------+-------+---+---+-------+-------+
+           |       |       |       |       |       |
+         B::AV   B::GV   B::HV   B::CV   B::IO B::REGEXP
+                   |               |
+                   |               |
+                B::PVLV          B::FM
 
-
-For 5.11.0 and later, B::RV is abolished, and IVs can be used to store
-references.
 
 Access methods correspond to the underlying C macros for field access,
 usually with the leading "class indication" prefix removed (Sv, Av,

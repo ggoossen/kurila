@@ -4,7 +4,7 @@ BEGIN { require "./test.pl"; }
 plan( tests => 25 );
 
 is(vec($foo,0,1), 0);
-is(length($foo), 0);
+is(length($foo), undef);
 vec($foo,0,1) = 1;
 is(length($foo), 1);
 is(unpack('C',$foo), 1);

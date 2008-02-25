@@ -2681,10 +2681,12 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
 	    }
 	}
 	if (SvREADONLY(sv) && !SvOK(sv)) {
-	    if (ckWARN(WARN_UNINITIALIZED))
-		report_uninit(sv);
 	    if (lp)
 		*lp = 0;
+	    if (flags & SV_UNDEF_RETURNS_NULL)
+		return NULL;
+	    if (ckWARN(WARN_UNINITIALIZED))
+		report_uninit(sv);
 	    return (char *)"";
 	}
     }
@@ -2738,10 +2740,12 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
 	if (isGV_with_GP(sv))
 	    Perl_croak(aTHX_ "Tried to use glob as string");
 
-	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))
-	    report_uninit(sv);
 	if (lp)
 	    *lp = 0;
+	if (flags & SV_UNDEF_RETURNS_NULL)
+	    return NULL;
+	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))
+	    report_uninit(sv);
 	if (SvTYPE(sv) < SVt_PV)
 	    /* Typically the caller expects that sv_any is not NULL now.  */
 	    sv_upgrade(sv, SVt_PV);
@@ -5754,7 +5758,7 @@ Perl_sv_cmp(pTHX_ register SV *sv1, register SV *sv2)
 
 Compares the strings in two SVs in a locale-aware manner. Is UTF-8 and
 'use bytes' aware, handles get magic, and will coerce its args to strings
-if necessary.  See also C<sv_cmp_locale>.  See also C<sv_cmp>.
+if necessary.  See also C<sv_cmp>.
 
 =cut
 */
@@ -6267,8 +6271,15 @@ Perl_sv_inc(pTHX_ register SV *sv)
 	return;
     }
     if (flags & SVp_NOK) {
+	const NV was = SvNVX(sv);
+	const NV now = was + 1.0;
+	if (now - was != 1.0 && ckWARN(WARN_IMPRECISION)) {
+	    Perl_warner(aTHX_ packWARN(WARN_IMPRECISION),
+			"Lost precision when incrementing %" NVff " by 1",
+			was);
+	}
 	(void)SvNOK_only(sv);
-        SvNV_set(sv, SvNVX(sv) + 1.0);
+        SvNV_set(sv, now);
 	return;
     }
 
@@ -6412,8 +6423,10 @@ Perl_sv_dec(pTHX_ register SV *sv)
 		SvUV_set(sv, SvUVX(sv) - 1);
 	    }	
 	} else {
-	    if (SvIVX(sv) == IV_MIN)
-		sv_setnv(sv, (NV)IV_MIN - 1.0);
+	    if (SvIVX(sv) == IV_MIN) {
+		sv_setnv(sv, (NV)IV_MIN);
+		goto oops_its_num;
+	    }
 	    else {
 		(void)SvIOK_only(sv);
 		SvIV_set(sv, SvIVX(sv) - 1);
@@ -6422,9 +6435,19 @@ Perl_sv_dec(pTHX_ register SV *sv)
 	return;
     }
     if (flags & SVp_NOK) {
-        SvNV_set(sv, SvNVX(sv) - 1.0);
-	(void)SvNOK_only(sv);
-	return;
+    oops_its_num:
+	{
+	    const NV was = SvNVX(sv);
+	    const NV now = was - 1.0;
+	    if (now - was != -1.0 && ckWARN(WARN_IMPRECISION)) {
+		Perl_warner(aTHX_ packWARN(WARN_IMPRECISION),
+			    "Lost precision when decrementing %" NVff " by 1",
+			    was);
+	    }
+	    (void)SvNOK_only(sv);
+	    SvNV_set(sv, now);
+	    return;
+	}
     }
     if (!(flags & SVp_POK)) {
 	if ((flags & SVTYPEMASK) < SVt_PVIV)

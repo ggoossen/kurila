@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA
 
 use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
-$VERSION = '6.42_02';
+$VERSION = '6.42_03';
 $VERSION = eval $VERSION;
 
 require ExtUtils::MM_Any;
@@ -1978,7 +1978,7 @@ sub init_PERL {
     }
 
     $self->{ABSPERL} = qq{"$self->{ABSPERL}"}
-        if $self->{ABSPERL} =~ m/\s/;
+        if ($self->{ABSPERL} =~ m/\s/) && ! $has_mcr;
 
     # Are we building the core?
     $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};
