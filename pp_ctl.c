@@ -218,7 +218,7 @@ PP(pp_substcont)
 	sv_catsv(dstr, POPs);
 
 	/* Are we done */
-	if (cx->sb_once || !CALLREGEXEC(rx, s, cx->sb_strend, orig,
+	if (CxONCE(cx) || !CALLREGEXEC(rx, s, cx->sb_strend, orig,
 				     s == m, cx->sb_targ, NULL,
 				     ((cx->sb_rflags & REXEC_COPY_STR)
 				      ? (REXEC_IGNOREPOS|REXEC_NOT_FIRST)
@@ -1251,7 +1251,6 @@ PP(pp_enteriter)
     }
     else {
 	cx->blk_loop.iterary = PL_curstack;
-	AvFILLp(PL_curstack) = SP - PL_stack_base;
 	if (PL_op->op_private & OPpITER_REVERSED) {
 	    cx->blk_loop.itermax = MARK - PL_stack_base + 1;
 	    cx->blk_loop.iterix = cx->blk_oldsp + 1;
