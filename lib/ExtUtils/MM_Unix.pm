@@ -1978,7 +1978,7 @@ sub init_PERL {
     }
 
     $self->{ABSPERL} = qq{"$self->{ABSPERL}"}
-        if $self->{ABSPERL} =~ /\s/;
+        if $self->{ABSPERL} =~ m/\s/;
 
     # Are we building the core?
     $self->{PERL_CORE} = $ENV{PERL_CORE} unless exists $self->{PERL_CORE};

@@ -175,7 +175,7 @@ curr_test(curr_test() + 2);
 
 sub safe_re {
     my $re = qr/(?{1})/;	# this is literal, so safe
-    eval { "a" =~ /$re$re/ };	# interpolating safe values, so safe
+    eval { "a" =~ m/$re$re/ };	# interpolating safe values, so safe
     ok($@ eq "", 'clone seen-evals');
 }
 threads->new(\&safe_re)->join();

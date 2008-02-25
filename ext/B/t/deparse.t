@@ -22,7 +22,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 56;
+use Test::More tests => 58;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();

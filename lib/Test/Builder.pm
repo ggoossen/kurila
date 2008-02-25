@@ -924,10 +924,7 @@ sub maybe_regex {
     my($re, $opts);
 
     # Check for qr/foo/
-    if (   $] >= 5.009004 
-              ? re::is_regexp($regex) 
-              : ref $regex eq 'Regexp'
-       ) 
+    if (re::is_regexp($regex))
     {
         $usable_regex = $regex;
     }
