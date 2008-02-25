@@ -125,16 +125,22 @@ char *getenv (char *); /* Usually in <stdlib.h> */
 
 static I32 read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen);
 
-#ifdef IAMSUID
-#ifndef DOSUID
-#define DOSUID
-#endif
-#endif /* IAMSUID */
-
-#ifdef SETUID_SCRIPTS_ARE_SECURE_NOW
 #ifdef DOSUID
-#undef DOSUID
-#endif
+#  ifdef IAMSUID
+/* Drop scriptname */
+#    define validate_suid(validarg, scriptname, fdscript, suidscript, linestr_sv, rsfp) S_validate_suid(aTHX_ validarg, fdscript, suidscript, linestr_sv, rsfp)
+#  else
+/* Drop suidscript */
+#    define validate_suid(validarg, scriptname, fdscript, suidscript, linestr_sv, rsfp) S_validate_suid(aTHX_ validarg, scriptname, fdscript, linestr_sv, rsfp)
+#  endif
+#else
+#  ifdef SETUID_SCRIPTS_ARE_SECURE_NOW
+/* Drop everything. Heck, don't even try to call it */
+#    define validate_suid(validarg, scriptname, fdscript, suidscript, linestr_sv, rsfp) NOOP
+#  else
+/* Drop almost everything */
+#    define validate_suid(validarg, scriptname, fdscript, suidscript, linestr_sv, rsfp) S_validate_suid(aTHX_ rsfp)
+#  endif
 #endif
 
 #define CALL_BODY_EVAL(myop) \
@@ -1496,12 +1502,9 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 
     PERL_UNUSED_ARG(my_perl);
 
-#ifdef SETUID_SCRIPTS_ARE_SECURE_NOW
-#ifdef IAMSUID
-#undef IAMSUID
-    Perl_croak(aTHX_ "suidperl is no longer needed since the kernel can now execute\n\
-setuid perl scripts securely.\n");
-#endif /* IAMSUID */
+#ifdef SETUID_SCRIPTS_ARE_SECURE_NOW_AND_IAMSUID
+    Perl_croak(aTHX_ "suidperl is no longer needed since the kernel can now "
+	       "execute\nsetuid perl scripts securely.\n");
 #endif
 
 #if defined(USE_HASH_SEED) || defined(USE_HASH_SEED_EXPLICIT)
@@ -1684,7 +1687,9 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     char **argv = PL_origargv;
     const char *scriptname = NULL;
     VOL bool dosearch = FALSE;
+#ifdef DOSUID
     const char *validarg = "";
+#endif
     register SV *sv;
     register char c;
     const char *cddir = NULL;
@@ -1774,7 +1779,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    if (argv[1] && !strcmp(argv[1], "Dev:Pseudo"))
 		break;
 #endif
-	    forbid_setid('e', -1);
+	    forbid_setid('e', FALSE);
 	    if (!PL_e_script) {
 		PL_e_script = newSVpvs("");
 		add_read_e_script = TRUE;
@@ -1798,7 +1803,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    goto reswitch;
 
 	case 'I':	/* -I handled both here and in moreswitches() */
-	    forbid_setid('I', -1);
+	    forbid_setid('I', FALSE);
 	    if (!*++s && (s=argv[1]) != NULL) {
 		argc--,argv++;
 	    }
@@ -1815,7 +1820,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		Perl_croak(aTHX_ "No directory specified for -I");
 	    break;
 	case 'S':
-	    forbid_setid('S', -1);
+	    forbid_setid('S', FALSE);
 	    dosearch = TRUE;
 	    s++;
 	    goto reswitch;
@@ -2037,9 +2042,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     init_perllib();
 
     {
-	int suidscript;
-	const int fdscript
-	    = open_script(scriptname, dosearch, &suidscript, &rsfp);
+	bool suidscript = FALSE;
+
+#ifdef DOSUID
+	const int fdscript =
+#endif
+	    open_script(scriptname, dosearch, &suidscript, &rsfp);
 
 	validate_suid(validarg, scriptname, fdscript, suidscript,
 		linestr_sv, rsfp);
@@ -2067,10 +2075,10 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #endif
 	    ) {
 
-	    /* This will croak if suidscript is >= 0, as -x cannot be used with
+	    /* This will croak if suidscript is true, as -x cannot be used with
 	       setuid scripts.  */
 	    forbid_setid('x', suidscript);
-	    /* Hence you can't get here if suidscript >= 0  */
+	    /* Hence you can't get here if suidscript is true */
 
 	    find_beginning(linestr_sv, rsfp);
 	    if (cddir && PerlDir_chdir( (char *)cddir ) < 0)
@@ -3023,7 +3031,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	s++;
 	return s;
     case 'd':
-	forbid_setid('d', -1);
+	forbid_setid('d', FALSE);
 	s++;
 
         /* -dt indicates to the debugger that threads will be used */
@@ -3061,7 +3069,7 @@ Perl_moreswitches(pTHX_ const char *s)
     case 'D':
     {	
 #ifdef DEBUGGING
-	forbid_setid('D', -1);
+	forbid_setid('D', FALSE);
 	s++;
 	PL_debug = get_debug_opts( (const char **)&s, 1) | DEBUG_TOP_FLAG;
 #else /* !DEBUGGING */
@@ -3097,7 +3105,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	}
 	return s;
     case 'I':	/* -I handled both here and in parse_body() */
-	forbid_setid('I', -1);
+	forbid_setid('I', FALSE);
 	++s;
 	while (*s && isSPACE(*s))
 	    ++s;
@@ -3146,10 +3154,10 @@ Perl_moreswitches(pTHX_ const char *s)
 	}
 	return s;
     case 'M':
-	forbid_setid('M', -1);	/* XXX ? */
+	forbid_setid('M', FALSE);	/* XXX ? */
 	/* FALL THROUGH */
     case 'm':
-	forbid_setid('m', -1);	/* XXX ? */
+	forbid_setid('m', FALSE);	/* XXX ? */
 	if (*++s) {
 	    const char *start;
 	    const char *end;
@@ -3197,7 +3205,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	s++;
 	return s;
     case 's':
-	forbid_setid('s', -1);
+	forbid_setid('s', FALSE);
 	PL_doswitches = TRUE;
 	s++;
 	return s;
@@ -3494,12 +3502,10 @@ S_init_main_stash(pTHX)
 
 STATIC int
 S_open_script(pTHX_ const char *scriptname, bool dosearch,
-	      int *suidscript, PerlIO **rsfpp)
+	      bool *suidscript, PerlIO **rsfpp)
 {
     int fdscript = -1;
     dVAR;
-
-    *suidscript = -1;
 
     if (PL_e_script) {
 	PL_origfilename = savepvs("-e");
@@ -3523,7 +3529,7 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch,
 		 * Is it a mistake to use a similar /dev/fd/ construct for
 		 * suidperl?
 		 */
-		*suidscript = 1;
+		*suidscript = TRUE;
 		/* PSz 20 Feb 04  
 		 * Be supersafe and do some sanity-checks.
 		 * Still, can we be sure we got the right thing?
@@ -3566,7 +3572,7 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch,
  * perl with that fd as it has always done.
  */
     }
-    if (*suidscript != 1) {
+    if (*suidscript) {
 	Perl_croak(aTHX_ "suidperl needs (suid) fd script\n");
     }
 #else /* IAMSUID */
@@ -3768,14 +3774,20 @@ S_fd_on_nosuid_fs(pTHX_ int fd)
 }
 #endif /* IAMSUID */
 
+#ifdef DOSUID
 STATIC void
-S_validate_suid(pTHX_ const char *validarg, const char *scriptname,
-		int fdscript, int suidscript, SV *linestr_sv, PerlIO *rsfp)
+S_validate_suid(pTHX_ const char *validarg,
+#  ifndef IAMSUID
+		const char *scriptname,
+#  endif
+		int fdscript,
+#  ifdef IAMSUID
+		bool suidscript,
+#  endif
+		SV *linestr_sv, PerlIO *rsfp)
 {
     dVAR;
-#ifdef IAMSUID
-    /* int which; */
-#endif /* IAMSUID */
+    const char *s, *s2;
 
     /* do we need to emulate setuid on scripts? */
 
@@ -3804,9 +3816,6 @@ S_validate_suid(pTHX_ const char *validarg, const char *scriptname,
      * Configure script will set this up for you if you want it.
      */
 
-#ifdef DOSUID
-    const char *s, *s2;
-
     if (PerlLIO_fstat(PerlIO_fileno(rsfp),&PL_statbuf) < 0)	/* normal stat is insecure */
 	Perl_croak(aTHX_ "Can't stat script \"%s\"",PL_origfilename);
     if (PL_statbuf.st_mode & (S_ISUID|S_ISGID)) {
@@ -3815,7 +3824,7 @@ S_validate_suid(pTHX_ const char *validarg, const char *scriptname,
 	const char *s_end;
 
 #  ifdef IAMSUID
-	if (fdscript < 0 || suidscript != 1)
+	if (fdscript < 0 || !suidscript)
 	    Perl_croak(aTHX_ "Need (suid) fdscript in suidperl\n");	/* We already checked this */
 	/* PSz 11 Nov 03
 	 * Since the script is opened by perl, not suidperl, some of these
@@ -4092,7 +4101,7 @@ FIX YOUR KERNEL, OR PUT A C WRAPPER AROUND THIS SCRIPT!\n");
 	    Perl_croak(aTHX_ "Effective UID cannot exec script\n");	/* they can't do this */
     }
 #  ifdef IAMSUID
-    else if (fdscript < 0 || suidscript != 1)
+    else if (fdscript < 0 || !suidscript)
 	/* PSz 13 Nov 03  Caught elsewhere, useless(?!) here */
 	Perl_croak(aTHX_ "(suid) fdscript needed in suidperl\n");
     else {
@@ -4138,13 +4147,6 @@ FIX YOUR KERNEL, OR PUT A C WRAPPER AROUND THIS SCRIPT!\n");
     /* PSz 11 Nov 03
      * Keep original arguments: suidperl already has fd script.
      */
-/*  for (which = 1; PL_origargv[which] && PL_origargv[which] != scriptname; which++) ;	*/
-/*  if (!PL_origargv[which]) {						*/
-/*	errno = EPERM;							*/
-/*	Perl_croak(aTHX_ "Permission denied\n");			*/
-/*  }									*/
-/*  PL_origargv[which] = savepv(Perl_form(aTHX_ "/dev/fd/%d/%s",	*/
-/*				  PerlIO_fileno(rsfp), PL_origargv[which]));	*/
 #  if defined(HAS_FCNTL) && defined(F_SETFD)
     fcntl(PerlIO_fileno(rsfp),F_SETFD,0);	/* ensure no close-on-exec */
 #  endif
@@ -4155,13 +4157,18 @@ FIX YOUR KERNEL, OR PUT A C WRAPPER AROUND THIS SCRIPT!\n");
     PERL_FPU_POST_EXEC
     Perl_croak(aTHX_ "Can't do setuid (suidperl cannot exec perl)\n");
 #  endif /* IAMSUID */
+}
+
 #else /* !DOSUID */
-    PERL_UNUSED_ARG(fdscript);
-    PERL_UNUSED_ARG(suidscript);
-    if (PL_euid != PL_uid || PL_egid != PL_gid) {	/* (suidperl doesn't exist, in fact) */
+
 #  ifdef SETUID_SCRIPTS_ARE_SECURE_NOW
-    PERL_UNUSED_ARG(rsfp);
+/* Don't even need this function.  */
 #  else
+STATIC void
+S_validate_suid(pTHX_ PerlIO *rsfp)
+{
+    if (PL_euid != PL_uid || PL_egid != PL_gid) {	/* (suidperl doesn't exist, in fact) */
+#  ifndef SETUID_SCRIPTS_ARE_SECURE_NOW
 	PerlLIO_fstat(PerlIO_fileno(rsfp),&PL_statbuf);	/* may be either wrapped or real suid */
 	if ((PL_euid != PL_uid && PL_euid == PL_statbuf.st_uid && PL_statbuf.st_mode & S_ISUID)
 	    ||
@@ -4173,11 +4180,9 @@ FIX YOUR KERNEL, PUT A C WRAPPER AROUND THIS SCRIPT, OR USE -u AND UNDUMP!\n");
 #  endif /* SETUID_SCRIPTS_ARE_SECURE_NOW */
 	/* not set-id, must be wrapped */
     }
-#endif /* DOSUID */
-    PERL_UNUSED_ARG(validarg);
-    PERL_UNUSED_ARG(scriptname);
-    PERL_UNUSED_ARG(linestr_sv);
 }
+#  endif /* SETUID_SCRIPTS_ARE_SECURE_NOW */
+#endif /* DOSUID */
 
 STATIC void
 S_find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
@@ -4316,7 +4321,7 @@ Perl_doing_taint(int argc, char *argv[], char *envp[])
    "program input from stdin", which is substituted in place of '\0', which
    could never be a command line flag.  */
 STATIC void
-S_forbid_setid(pTHX_ const char flag, const int suidscript)
+S_forbid_setid(pTHX_ const char flag, const bool suidscript) /* g */
 {
     dVAR;
     char string[3] = "-x";
@@ -4355,7 +4360,7 @@ S_forbid_setid(pTHX_ const char flag, const int suidscript)
      * 
      * Also see comments about root running a setuid script, elsewhere.
      */
-    if (suidscript >= 0)
+    if (suidscript)
         Perl_croak(aTHX_ "No %s allowed with (suid) fdscript", message);
 #ifdef IAMSUID
     /* PSz 11 Nov 03  Catch it in suidperl, always! */

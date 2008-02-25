@@ -413,4 +413,10 @@ setstate	SKIP
 method_named	$x->y()
 dor		$x // $y
 dorassign	$x //= $y
+once		SKIP {use feature 'state'; state $foo = 42;}
+say		SKIP {use feature 'say'; say "foo";}
+smartmatch	$x ~~ $y
+aeach		SKIP each @t
+akeys		SKIP keys @t
+avalues		SKIP values @t
 custom		SKIP (no way)

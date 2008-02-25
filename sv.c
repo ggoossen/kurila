@@ -1757,10 +1757,13 @@ Perl_looks_like_number(pTHX_ SV *sv)
 
 /* For sv_2nv these three cases are "SvNOK and don't bother casting"  */
 STATIC int
-S_sv_2iuv_non_preserve(pTHX_ register SV *sv, I32 numtype)
+S_sv_2iuv_non_preserve(pTHX_ register SV *sv
+#  ifdef DEBUGGING
+		       , I32 numtype
+#  endif
+		       )
 {
     dVAR;
-    PERL_UNUSED_ARG(numtype); /* Used only under DEBUGGING? */
     DEBUG_c(PerlIO_printf(Perl_debug_log,"sv_2iuv_non '%s', IV=0x%"UVxf" NV=%"NVgf" inttype=%"UVXf"\n", SvPVX_const(sv), SvIVX(sv), SvNVX(sv), (UV)numtype));
     if (SvNVX(sv) < (NV)IV_MIN) {
 	(void)SvIOKp_on(sv);
@@ -2038,7 +2041,11 @@ S_sv_2iuv_common(pTHX_ SV *sv) {
                          1      1       already read UV.
                        so there's no point in sv_2iuv_non_preserve() attempting
                        to use atol, strtol, strtoul etc.  */
+#  ifdef DEBUGGING
                     sv_2iuv_non_preserve (sv, numtype);
+#  else
+                    sv_2iuv_non_preserve (sv);
+#  endif
                 }
             }
 #endif /* NV_PRESERVES_UV */
