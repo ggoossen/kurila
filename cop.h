@@ -259,16 +259,15 @@ struct cop {
 /* subroutine context */
 struct block_sub {
     CV *	cv;
-    GV *	gv;
-    GV *	dfoutgv;
+    OP *	retop;	/* op to execute on exit from sub */
+    U8		hasargs;
+    U8		lval;		/* XXX merge lval and hasargs? */
     AV *	savearray;
     AV *	argarray;
     I32		olddepth;
-    U8		hasargs;
-    U8		lval;		/* XXX merge lval and hasargs? */
     PAD		*oldcomppad;
-    OP *	retop;	/* op to execute on exit from sub */
 };
+
 
 /* base for the next two macros. Don't use directly.
  * Note that the refcnt of the cv is incremented twice;  The CX one is
@@ -643,13 +642,13 @@ struct context {
 #define CxTYPE(c)	((c)->cx_type & CXTYPEMASK)
 #define CxMULTICALL(c)	(((c)->cx_type & CXp_MULTICALL)			\
 			 == CXp_MULTICALL)
-#define CxREALEVAL(c)	(((c)->cx_type & (CXt_EVAL|CXp_REAL))		\
+#define CxREALEVAL(c)	(((c)->cx_type & (CXTYPEMASK|CXp_REAL))		\
 			 == (CXt_EVAL|CXp_REAL))
-#define CxTRYBLOCK(c)	(((c)->cx_type & (CXt_EVAL|CXp_TRYBLOCK))	\
+#define CxTRYBLOCK(c)	(((c)->cx_type & (CXTYPEMASK|CXp_TRYBLOCK))	\
 			 == (CXt_EVAL|CXp_TRYBLOCK))
-#define CxFOREACH(c)	(((c)->cx_type & (CXt_LOOP|CXp_FOREACH))	\
+#define CxFOREACH(c)	(((c)->cx_type & (CXTYPEMASK|CXp_FOREACH))	\
                          == (CXt_LOOP|CXp_FOREACH))
-#define CxFOREACHDEF(c)	(((c)->cx_type & (CXt_LOOP|CXp_FOREACH|CXp_FOR_DEF))\
+#define CxFOREACHDEF(c)	(((c)->cx_type & (CXTYPEMASK|CXp_FOREACH|CXp_FOR_DEF))\
 			 == (CXt_LOOP|CXp_FOREACH|CXp_FOR_DEF))
 
 #define CXINC (cxstack_ix < cxstack_max ? ++cxstack_ix : (cxstack_ix = cxinc()))
