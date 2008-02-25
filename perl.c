@@ -300,15 +300,19 @@ perl_construct(pTHXx)
 
     sv_setpv(&PL_sv_no,PL_No);
     /* value lookup in void context - happens to have the side effect
-       of caching the numeric forms.  */
-    SvIV(&PL_sv_no);
+       of caching the numeric forms. However, as &PL_sv_no doesn't contain
+       a string that is a valid numer, we have to turn the public flags by
+       hand:  */
     SvNV(&PL_sv_no);
+    SvIV(&PL_sv_no);
+    SvIOK_on(&PL_sv_no);
+    SvNOK_on(&PL_sv_no);
     SvREADONLY_on(&PL_sv_no);
     SvREFCNT(&PL_sv_no) = (~(U32)0)/2;
 
     sv_setpv(&PL_sv_yes,PL_Yes);
-    SvIV(&PL_sv_yes);
     SvNV(&PL_sv_yes);
+    SvIV(&PL_sv_yes);
     SvREADONLY_on(&PL_sv_yes);
     SvREFCNT(&PL_sv_yes) = (~(U32)0)/2;
 
@@ -887,13 +891,8 @@ perl_destruct(pTHXx)
                  * flag is set in regexec.c:S_regtry
                  */
                 SvFLAGS(resv) &= ~SVf_BREAK;
-            }
-	    else if(SvREPADTMP(resv)) {
-	      SvREPADTMP_off(resv);
-	    }
-            else if(SvIOKp(resv)) {
-		REGEXP *re = INT2PTR(REGEXP *,SvIVX(resv));
-                ReREFCNT_dec(re);
+		/* So stop it pointing to what is now a dead reference.  */
+		SvROK_off(resv);
             }
         }
     }

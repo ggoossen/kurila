@@ -1483,10 +1483,17 @@ Perl_cv_clone(pTHX_ CV *proto)
 	    if (SvFAKE(namesv)) {   /* lexical from outside? */
 		sv = outpad[PARENT_PAD_INDEX(namesv)];
 		assert(sv);
-		/* 'my $x if $y' can leave $x stale even in an active sub */
-		if (!SvPADSTALE(sv)) {
-		    SvREFCNT_inc_simple_void_NN(sv);
+		/* formats may have an inactive parent,
+		   while my $x if $false can leave an active var marked as
+		   stale */
+		if (SvPADSTALE(sv)) {
+		    if (ckWARN(WARN_CLOSURE))
+			Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
+			    "Variable \"%s\" is not available", SvPVX_const(namesv));
+		    sv = NULL;
 		}
+		else 
+		    SvREFCNT_inc_simple_void_NN(sv);
 	    }
 	    if (!sv) {
                 const char sigil = SvPVX_const(namesv)[0];

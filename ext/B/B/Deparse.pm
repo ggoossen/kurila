@@ -20,7 +20,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
          CVf_METHOD CVf_LOCKED
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
-$VERSION = 0.85;
+$VERSION = 0.86;
 use strict;
 use warnings ();
 
@@ -1406,8 +1406,7 @@ sub declare_hints {
 my %ignored_hints = (
     'open<' => 1,
     'open>' => 1,
-    'v_string' => 1,
-    );
+);
 
 sub declare_hinthash {
     my ($from, $to, $indent) = @_;
@@ -2065,7 +2064,7 @@ sub pp_aassign { binop(@_, "=", 7, SWAP_CHILDREN ^|^ LIST_CONTEXT) }
 sub pp_smartmatch {
     my ($self, $op, $cx) = @_;
     if ($op->flags ^&^ OPf_SPECIAL) {
-	return $self->deparse($op->first, $cx);
+	return $self->deparse($op->last, $cx);
     }
     else {
 	binop(@_, "~~", 14);

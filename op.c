@@ -606,9 +606,9 @@ clear_pmop:
 #ifdef USE_ITHREADS
 	if(PL_regex_pad) {        /* We could be in destruction */
 	    ReREFCNT_dec(PM_GETRE(cPMOPo));
-            av_push((AV*) PL_regex_pad[0],(SV*) PL_regex_pad[(cPMOPo)->op_pmoffset]);
+            av_push((AV*) PL_regex_pad[0],
+		    (SV*) SvREFCNT_inc_simple_NN(PL_regex_pad[(cPMOPo)->op_pmoffset]));
             SvREADONLY_off(PL_regex_pad[(cPMOPo)->op_pmoffset]);
-	    SvREPADTMP_on(PL_regex_pad[(cPMOPo)->op_pmoffset]);
             PM_SETRE_OFFSET(cPMOPo, (cPMOPo)->op_pmoffset);
         }
 #else
@@ -3224,11 +3224,10 @@ Perl_newPMOP(pTHX_ I32 type, I32 flags)
     if (av_len((AV*) PL_regex_pad[0]) > -1) {
 	SV * const repointer = av_pop((AV*)PL_regex_pad[0]);
 	pmop->op_pmoffset = SvIV(repointer);
-	SvREPADTMP_off(repointer);
 	sv_setiv(repointer,0);
     } else {
 	SV * const repointer = newSViv(0);
-	av_push(PL_regex_padav, SvREFCNT_inc_simple_NN(repointer));
+	av_push(PL_regex_padav, repointer);
 	pmop->op_pmoffset = av_len(PL_regex_padav);
 	PL_regex_pad = AvARRAY(PL_regex_padav);
     }
@@ -3844,7 +3843,10 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
     }
 
     if (is_list_assignment(left)) {
+	static const char no_list_state[] = "Initialization of state variables"
+            " in list context currently forbidden";
 	OP *curop;
+	bool maybe_common_vars = TRUE;
 
 	PL_modcount = 0;
 	/* Grandfathering $[ assignment here.  Bletch.*/
@@ -3862,6 +3864,65 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	o = newBINOP(OP_AASSIGN, flags, list(force_list(right)), curop);
 	o->op_private = (U8)(0 | (flags >> 8));
 
+	if ((left->op_type == OP_LIST
+	     || (left->op_type == OP_NULL && left->op_targ == OP_LIST)))
+	{
+	    OP* lop = ((LISTOP*)left)->op_first;
+	    maybe_common_vars = FALSE;
+	    while (lop) {
+		if (lop->op_type == OP_PADSV ||
+		    lop->op_type == OP_PADAV ||
+		    lop->op_type == OP_PADHV ||
+		    lop->op_type == OP_PADANY) {
+		    if (!(lop->op_private & OPpLVAL_INTRO))
+			maybe_common_vars = TRUE;
+
+		    if (lop->op_private & OPpPAD_STATE) {
+			if (left->op_private & OPpLVAL_INTRO) {
+			    /* Each variable in state($a, $b, $c) = ... */
+			}
+			else {
+			    /* Each state variable in
+			       (state $a, my $b, our $c, $d, undef) = ... */
+			}
+			yyerror(no_list_state);
+		    } else {
+			/* Each my variable in
+			   (state $a, my $b, our $c, $d, undef) = ... */
+		    }
+		} else if (lop->op_type == OP_UNDEF ||
+			   lop->op_type == OP_PUSHMARK) {
+		    /* undef may be interesting in
+		       (state $a, undef, state $c) */
+		} else {
+		    /* Other ops in the list. */
+		    maybe_common_vars = TRUE;
+		}
+		lop = lop->op_sibling;
+	    }
+	}
+	else if ((left->op_private & OPpLVAL_INTRO)
+		&& (   left->op_type == OP_PADSV
+		    || left->op_type == OP_PADAV
+		    || left->op_type == OP_PADHV
+		    || left->op_type == OP_PADANY))
+	{
+	    maybe_common_vars = FALSE;
+	    if (left->op_private & OPpPAD_STATE) {
+		/* All single variable list context state assignments, hence
+		   state ($a) = ...
+		   (state $a) = ...
+		   state @a = ...
+		   state (@a) = ...
+		   (state @a) = ...
+		   state %a = ...
+		   state (%a) = ...
+		   (state %a) = ...
+		*/
+		yyerror(no_list_state);
+	    }
+	}
+
 	/* PL_generation sorcery:
 	 * an assignment like ($a,$b) = ($c,$d) is easier than
 	 * ($a,$b) = ($c,$a), since there is no need for temporary vars.
@@ -3876,7 +3937,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	 * to store these values, evil chicanery is done with SvUVX().
 	 */
 
-	{
+	if (maybe_common_vars) {
 	    OP *lastop = o;
 	    PL_generation++;
 	    for (curop = LINKLIST(o); curop != o; curop = LINKLIST(curop)) {
