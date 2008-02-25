@@ -7156,7 +7156,7 @@ Perl_sv_reftype(pTHX_ const SV *sv, int ob)
 	case SVt_PVGV:		return "GLOB";
 	case SVt_PVIO:		return "IO";
 	case SVt_BIND:		return "BIND";
-	case SVt_REGEXP:	return "Regexp"; /* FIXME? to "REGEXP"  */
+	case SVt_REGEXP:	return "REGEXP"; 
 	default:		return "UNKNOWN";
 	}
     }
