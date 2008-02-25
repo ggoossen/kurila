@@ -18,6 +18,7 @@ BEGIN {
 our %Config;
 eval 'use Config';          #  Defaults assumed if this fails
 
+run_tests() unless caller;
 
 # use utf8;
 # use charnames ':full';
@@ -59,6 +60,7 @@ sub ok ($;$) {
     return $ok;
 }
 
+sub run_tests {
 
 $x = "abc\ndef\n";
 
@@ -542,15 +544,17 @@ $b = 7;
 m/$a$a/;
 ok($b eq '9');
 
-$c="$a";
-m/$a$a/;
-ok($b eq '11');
+{
+    $c="$a";
+    m/$a$a/;
+    iseq($b, '11');
+}
 
 our $lex_a;
 {
   use re "eval";
   m/$a$c$a/;
-  ok($b eq '14');
+  iseq($b, '14');
 
   local $lex_a = 2;
   my $lex_a = 43;
@@ -569,11 +573,10 @@ our $lex_a;
 
 
   no re "eval";
-  my $match = eval { m/$a$c$a/ };
-  print "not "
-    unless $b eq '14' and $@->{description} =~ m/Eval-group not allowed/ and not $match;
-  print "ok $test\n";
-  $test++;
+  $match = eval { m/$a$c$a/ };
+  # FIXME - split this one. That would require removing a lot of hard coded
+  # test numbers.
+  ok($b eq '14' and $@->{description} =~ m/Eval-group not allowed/ and not $match);
 }
 
 {
@@ -779,9 +782,10 @@ print "not " if $str =~ m/^...\G/;
 print "ok $test\n";
 $test++;
 
-print "not " unless $str =~ m/.\G./ and $& eq 'bc';
-print "ok $test\n";
-$test++;
+{
+    local $TODO = $::running_as_thread;
+    ok($str =~ m/.\G./ and $& eq 'bc');
+}
 
 print "not " unless $str =~ m/\G../ and $& eq 'cd';
 print "ok $test\n";
@@ -865,24 +869,30 @@ $foo='aabbccddeeffgg';
 
 pos($foo)=1;
 
-$foo=~m/.\G(..)/g;
-iseq($1,'ab');
+$foo =~ m/.\G(..)/g;
+{
+    local $TODO = $::running_as_thread;
+    iseq($1,'ab');
+}
 
 pos($foo) += 1;
-$foo=~m/.\G(..)/g;
-print "not " unless($1 eq 'cc');
-print "ok $test\n";
-$test++;
+$foo =~ m/.\G(..)/g;
+{
+    local $TODO = $::running_as_thread;
+    iseq($1, 'cc');
+}
 
 pos($foo) += 1;
-$foo=~m/.\G(..)/g;
-print "not " unless($1 eq 'de');
-print "ok $test\n";
-$test++;
+$foo =~ m/.\G(..)/g;
+{
+    local $TODO = $::running_as_thread;
+    iseq($1, 'de');
+}
 
-print "not " unless $foo =~ m/\Gef/g;
-print "ok $test\n";
-$test++;
+{
+    local $TODO = $::running_as_thread;
+    ok($foo =~ m/\Gef/g);
+}
 
 undef pos $foo;
 
@@ -4268,8 +4278,13 @@ ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
 
 # Put new tests above the dotted line about a page above this comment
 iseq(0+$::test,$::TestCount,"Got the right number of tests!");
+
+} # end of sub pat_tests
+
 # Don't forget to update this!
 BEGIN {
     $::TestCount = 1786;
     print "1..$::TestCount\n";
 }
+
+"Truth";

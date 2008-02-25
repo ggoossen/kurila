@@ -61,13 +61,18 @@ my $email = qr {
     (?&address)
 }x;
 
-my $count = 0;
 
-$| = 1;
-while ( ~< *DATA) {
-    chomp;
-    next if m/^#/;
-    print m/^$email$/ ? "ok " : "not ok ", ++ $count, "\n";
+run_tests() unless caller;
+
+sub run_tests {
+    my $count = 0;
+
+    $| = 1;
+    while (~< *DATA) {
+	chomp;
+	next if m/^#/;
+	print m/^$email$/ ? "ok " : "not ok ", ++ $count, "\n";
+    }
 }
 
 #

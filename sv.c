@@ -2610,17 +2610,18 @@ Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
 		    len = 7;
 		    retval = buffer = savepvn("NULLREF", len);
 		} else if (SvTYPE(referent) == SVt_REGEXP) {
-                    char *str = NULL;
-                    I32 haseval = 0;
-                    U32 flags = 0;
-		    struct magic temp;
-		    /* FIXME - get rid of this cast away of const, or work out
-		       how to do it better.  */
-		    temp.mg_obj = (SV *)referent;
-		    assert(temp.mg_obj);
-                    (str) = CALLREG_AS_STR(&temp,lp,&flags,&haseval);
-                    PL_reginterp_cnt += haseval;
-		    return str;
+		    const REGEXP * const re = (REGEXP *)referent;
+		    I32 seen_evals = 0;
+
+		    assert(re);
+			
+		    if ((seen_evals = RX_SEEN_EVALS(re)))
+			PL_reginterp_cnt += seen_evals;
+
+		    if (lp)
+			*lp = RX_WRAPLEN(re);
+ 
+		    return RX_WRAPPED(re);
 		} else {
 		    const char *const typestr = sv_reftype(referent, 0);
 		    const STRLEN typelen = strlen(typestr);
@@ -5001,17 +5002,28 @@ Perl_sv_free(pTHX_ SV *sv)
 	    return;
 	}
 	if (ckWARN_d(WARN_INTERNAL)) {
-	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
-                        "Attempt to free unreferenced scalar: SV 0x%"UVxf
-                        pTHX__FORMAT, PTR2UV(sv) pTHX__VALUE);
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
 	    Perl_dump_sv_child(aTHX_ sv);
 #else
   #ifdef DEBUG_LEAKING_SCALARS
-	sv_dump(sv);
+	    sv_dump(sv);
   #endif
+#ifdef DEBUG_LEAKING_SCALARS_ABORT
+	    if (PL_warnhook == PERL_WARNHOOK_FATAL
+		|| ckDEAD(packWARN(WARN_INTERNAL))) {
+		/* Don't let Perl_warner cause us to escape our fate:  */
+		abort();
+	    }
+#endif
+	    /* This may not return:  */
+	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
+                        "Attempt to free unreferenced scalar: SV 0x%"UVxf
+                        pTHX__FORMAT, PTR2UV(sv) pTHX__VALUE);
 #endif
 	}
+#ifdef DEBUG_LEAKING_SCALARS_ABORT
+	abort();
+#endif
 	return;
     }
     if (--(SvREFCNT(sv)) > 0)
@@ -9410,8 +9422,14 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
     dVAR;
     SV *dstr;
 
-    if (!sstr || SvTYPE(sstr) == SVTYPEMASK)
+    if (!sstr)
 	return NULL;
+    if (SvTYPE(sstr) == SVTYPEMASK) {
+#ifdef DEBUG_LEAKING_SCALARS_ABORT
+	abort();
+#endif
+	return NULL;
+    }
     /* look for it in the table first */
     dstr = (SV*)ptr_table_fetch(PL_ptr_table, sstr);
     if (dstr)

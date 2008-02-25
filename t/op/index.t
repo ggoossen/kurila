@@ -9,6 +9,10 @@ plan( tests => 49 );
 
 require bytes;
 
+run_tests() unless caller;
+
+sub run_tests {
+
 my $foo = 'Now is the time for all good men to come to the aid of their country.';
 
 my $first = substr($foo,0,index($foo,'the'));
@@ -111,4 +115,6 @@ is(rindex("abc", "", 4), 3);
 
     local ${^UTF8CACHE} = -1;
     is(index($t, 'xyz'), 4, "0xfffffffd and utf8cache");
+}
+
 }

@@ -15,6 +15,7 @@
 # 	c	expect an error
 #	B	test exposes a known bug in Perl, should be skipped
 #	b	test exposes a known bug in Perl, should be skipped if noamp
+#	t	test exposes a bug with threading, TODO if qr_embed_thr
 #
 # Columns 4 and 5 are used only if column 3 contains C<y> or C<c>.
 #
@@ -53,7 +54,26 @@ BEGIN {
     if (defined $file) {
 	open TESTS, "<", $file or die "Can't open $file";
     }
+
+    if ($qr_embed_thr) {
+	require Config;
+	if (!$Config::Config{useithreads}) {
+	    print "1..0 # Skip: no ithreads\n";
+		exit 0;
+	}
+	if ($ENV{PERL_CORE_MINITEST}) {
+	    print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
+		exit 0;
+	}
+	require threads;
+    }
 }
+
+use strict;
+use warnings FATAL=>"all";
+use vars qw($iters $numtests $bang $ffff $nulnul $OP);
+use vars qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
+
 
 if (!defined $file) {
     open(TESTS, "<",'op/re_tests') || open(TESTS, "<",'t/op/re_tests')
@@ -79,6 +99,7 @@ $OP = $qr ? 'qr' : 'm';
 
 $| = 1;
 printf "1..%d\n# $iters iterations\n", scalar @tests;
+
 my $test;
 TEST:
 foreach (@tests) {
@@ -102,7 +123,7 @@ foreach (@tests) {
     $pat =~ s/\\n/\n/g;
     $subject = eval qq("$subject"); die "error in '$subject': $@" if $@;
     $expect  = eval qq("$expect"); die "error in '$expect': $@" if $@;
-    $expect = $repl = '-' if $skip_amp and $input =~ m/\$[&\`\']/;
+    my $todo = $qr_embed_thr && ($result =~ s/t//);
     my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
     $result =~ s/B//i unless $skip;
@@ -128,6 +149,16 @@ EOFCODE
                 my \$RE = qr$pat;
                 $study;
                 \$match = (\$subject =~ m/(?:)\$RE(?:)/) while \$c--;
+                \$got = "$repl";
+EOFCODE
+        }
+        elsif ($qr_embed_thr) {
+            $code= <<EOFCODE;
+		# Can't run the match in a subthread, but can do this and
+	 	# clone the pattern the other way.
+                my \$RE = threads->new(sub {qr$pat})->join();
+                $study;
+                \$match = (\$subject =~ /(?:)\$RE(?:)/) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }
@@ -158,10 +189,14 @@ EOFCODE
 	    print "ok $test # skipped", length($reason) ? " $reason" : '', "\n";
 	    next TEST;
 	}
+	elsif ( $todo ) {
+	    print "not ok $test # todo", length($reason) ? " - $reason" : '', "\n";
+	    next TEST;
+	}
 	elsif ($@) {
 	    print "not ok $test $input => error `$err'\n$code\n$@\n"; next TEST;
 	}
-	elsif ($result eq 'n') {
+	elsif ($result =~ /^n/) {
 	    if ($match) { print "not ok $test ($study) $input => false positive\n"; next TEST }
 	}
 	else {

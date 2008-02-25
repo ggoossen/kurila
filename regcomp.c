@@ -8946,7 +8946,6 @@ Perl_re_dup_guts(pTHX_ const REGEXP *sstr, REGEXP *dstr, CLONE_PARAMS *param)
 
     ret->mother_re      = NULL;
     ret->gofs = 0;
-    ret->seen_evals = 0;
 }
 #endif /* PERL_IN_XSUB_RE */
 
@@ -9057,47 +9056,7 @@ Perl_regdupe_internal(pTHX_ REGEXP * const rx, CLONE_PARAMS *param)
 
 #endif    /* USE_ITHREADS */
 
-/* 
-   reg_stringify() 
-   
-   converts a regexp embedded in a MAGIC struct to its stringified form, 
-   caching the converted form in the struct and returns the cached 
-   string. 
-
-   If lp is nonnull then it is used to return the length of the 
-   resulting string
-   
-   If flags is nonnull and the returned string contains UTF8 then 
-   (*flags & 1) will be true.
-   
-   If haseval is nonnull then it is used to return whether the pattern 
-   contains evals.
-   
-   Normally called via macro: 
-   
-        CALLREG_STRINGIFY(mg,&len,&utf8);
-        
-   And internally with
-   
-        CALLREG_AS_STR(mg,&lp,&flags,&haseval)        
-    
-   See sv_2pv_flags() in sv.c for an example of internal usage.
-    
- */
 #ifndef PERL_IN_XSUB_RE
-
-char *
-Perl_reg_stringify(pTHX_ MAGIC *mg, STRLEN *lp, U32 *flags, I32 *haseval ) {
-    dVAR;
-    const REGEXP * const re = (REGEXP *)mg->mg_obj;
-    if (haseval) 
-        *haseval = RX_SEEN_EVALS(re);
-    if (flags)    
-	*flags = 1;
-    if (lp)
-	*lp = RX_WRAPLEN(re);
-    return RX_WRAPPED(re);
-}
 
 /*
  - regnext - dig the "next" pointer out of a node

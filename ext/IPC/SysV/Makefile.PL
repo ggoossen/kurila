@@ -7,15 +7,14 @@ use ExtUtils::MakeMaker;
 
 sub MY::libscan
 {
- my($self,$path) = @_;
-
- return '' 
-	if($path =~ m:/(RCS|CVS|SCCS)/: ||
-	   $path =~ m:[~%]$: ||
-	   $path =~ m:\.(orig|rej)$:
-	  );
- 
- $path;
+  package MY;
+  my($self, $path) = @_;
+  return $path if $self->SUPER::libscan($path) and
+                  $path !~ m! [~%]$
+                            | \.(cache\.cm|swp|orig|rej)$
+                            | regen\.pl$
+                            !x;
+  return '';
 }
 
 WriteMakefile(

@@ -24,6 +24,12 @@ require './test.pl';
 
 plan(235);
 
+run_tests() unless caller;
+
+my $krunch = "a";
+
+sub run_tests {
+
 $FATAL_MSG = qr/^substr outside of string/;
 
 is(substr($a,0,3), 'abc');   # P=Q R S
