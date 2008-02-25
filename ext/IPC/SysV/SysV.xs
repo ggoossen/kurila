@@ -216,117 +216,21 @@ SHMLBA()
     croak("SHMLBA is not defined on this architecture");
 #endif
 
-BOOT:
-{
-    HV *stash = gv_stashpvn("IPC::SysV", 9, GV_ADD);
-    /*
-     * constant subs for IPC::SysV
-     */
-     struct { const char *n; I32 v; } IPC__SysV__const[] = {
-#ifdef GETVAL
-        {"GETVAL", GETVAL},
-#endif
-#ifdef GETPID
-        {"GETPID", GETPID},
-#endif
-#ifdef GETNCNT
-        {"GETNCNT", GETNCNT},
-#endif
-#ifdef GETZCNT
-        {"GETZCNT", GETZCNT},
-#endif
-#ifdef GETALL
-        {"GETALL", GETALL},
-#endif
-#ifdef IPC_ALLOC
-        {"IPC_ALLOC", IPC_ALLOC},
-#endif
-#ifdef IPC_CREAT
-        {"IPC_CREAT", IPC_CREAT},
-#endif
-#ifdef IPC_EXCL
-        {"IPC_EXCL", IPC_EXCL},
-#endif
-#ifdef IPC_GETACL
-        {"IPC_GETACL", IPC_GETACL},
-#endif
-#ifdef IPC_LOCKED
-        {"IPC_LOCKED", IPC_LOCKED},
-#endif
-#ifdef IPC_M
-        {"IPC_M", IPC_M},
-#endif
-#ifdef IPC_NOERROR
-        {"IPC_NOERROR", IPC_NOERROR},
-#endif
-#ifdef IPC_NOWAIT
-        {"IPC_NOWAIT", IPC_NOWAIT},
-#endif
-#ifdef IPC_PRIVATE
-        {"IPC_PRIVATE", IPC_PRIVATE},
-#endif
-#ifdef IPC_R
-        {"IPC_R", IPC_R},
-#endif
-#ifdef IPC_RMID
-        {"IPC_RMID", IPC_RMID},
-#endif
-#ifdef IPC_SET
-        {"IPC_SET", IPC_SET},
-#endif
-#ifdef IPC_SETACL
-        {"IPC_SETACL", IPC_SETACL},
-#endif
-#ifdef IPC_SETLABEL
-        {"IPC_SETLABEL", IPC_SETLABEL},
-#endif
-#ifdef IPC_STAT
-        {"IPC_STAT", IPC_STAT},
-#endif
-#ifdef IPC_W
-        {"IPC_W", IPC_W},
-#endif
-#ifdef IPC_WANTED
-        {"IPC_WANTED", IPC_WANTED},
-#endif
-#ifdef MSG_NOERROR
-        {"MSG_NOERROR", MSG_NOERROR},
-#endif
-#ifdef MSG_FWAIT
-        {"MSG_FWAIT", MSG_FWAIT},
-#endif
-#ifdef MSG_LOCKED
-        {"MSG_LOCKED", MSG_LOCKED},
-#endif
-#ifdef MSG_MWAIT
-        {"MSG_MWAIT", MSG_MWAIT},
-#endif
-#ifdef MSG_WAIT
-        {"MSG_WAIT", MSG_WAIT},
-#endif
-#ifdef MSG_R
-        {"MSG_R", MSG_R},
-#endif
-#ifdef MSG_RWAIT
-        {"MSG_RWAIT", MSG_RWAIT},
-#endif
-#ifdef MSG_STAT
-        {"MSG_STAT", MSG_STAT},
-#endif
-#ifdef MSG_W
-        {"MSG_W", MSG_W},
-#endif
-#ifdef MSG_WWAIT
-        {"MSG_WWAIT", MSG_WWAIT},
-#endif
-#ifdef SEM_A
-        {"SEM_A", SEM_A},
-#endif
-#ifdef SEM_ALLOC
-        {"SEM_ALLOC", SEM_ALLOC},
-#endif
-#ifdef SEM_DEST
-        {"SEM_DEST", SEM_DEST},
+void
+shmdt(addr)
+    SV *addr
+  CODE:
+#ifdef HAS_SHM
+    void *caddr = sv2addr(addr);
+#   ifdef __SUNPRO_CC
+    int rv = shmdt((char *)caddr);
+#   else
+    int rv = shmdt(caddr);
+#   endif
+    ST(0) = rv == -1 ? &PL_sv_undef : sv_2mortal(newSViv(rv));
+    XSRETURN(1);
+#else
+    Perl_die(aTHX_ PL_no_func, "shmdt"); return;
 #endif
 #ifdef SEM_ERR
         {"SEM_ERR", SEM_ERR},
