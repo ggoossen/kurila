@@ -879,23 +879,6 @@ perl_destruct(pTHXx)
      * REGEXPs in the parent interpreter
      * we need to manually ReREFCNT_dec for the clones
      */
-    {
-        I32 i = AvFILLp(PL_regex_padav) + 1;
-        SV * const * const ary = AvARRAY(PL_regex_padav);
-
-        while (i) {
-            SV * const resv = ary[--i];
-
-            if (SvFLAGS(resv) & SVf_BREAK) {
-                /* this is PL_reg_curpm, already freed
-                 * flag is set in regexec.c:S_regtry
-                 */
-                SvFLAGS(resv) &= ~SVf_BREAK;
-		/* So stop it pointing to what is now a dead reference.  */
-		SvROK_off(resv);
-            }
-        }
-    }
     SvREFCNT_dec(PL_regex_padav);
     PL_regex_padav = NULL;
     PL_regex_pad = NULL;
@@ -1223,7 +1206,8 @@ perl_destruct(pTHXx)
 			" flags=0x%"UVxf
 			" refcnt=%"UVuf pTHX__FORMAT "\n"
 			"\tallocated at %s:%d %s %s%s\n",
-			(void*)sv, sv->sv_flags, sv->sv_refcnt pTHX__VALUE,
+			(void*)sv, (UV)sv->sv_flags, (UV)sv->sv_refcnt
+			pTHX__VALUE,
 			sv->sv_debug_file ? sv->sv_debug_file : "(unknown)",
 			sv->sv_debug_line,
 			sv->sv_debug_inpad ? "for" : "by",
@@ -1256,6 +1240,10 @@ perl_destruct(pTHXx)
 	close(sock);
     }
 #endif
+#endif
+#ifdef DEBUG_LEAKING_SCALARS_ABORT
+    if (PL_sv_count)
+	abort();
 #endif
     PL_sv_count = 0;
 

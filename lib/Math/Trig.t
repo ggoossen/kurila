@@ -28,8 +28,8 @@ BEGIN {
 
 plan(tests => 135);
 
-use Math::Trig v1.07;
-use Math::Trig v1.07 qw(Inf);
+use Math::Trig v1.08;
+use Math::Trig v1.08 qw(Inf);
 
 my $pip2 = pi / 2;
 
@@ -347,18 +347,18 @@ ok(near(csch(-100), -7.4402e-44, 1e-3));
 ok(near(tanh(-100), -1));
 ok(near(coth(-100), -1));
 
-ok(sinh(1e4) == Inf());
-ok(sech(1e4) == 0);
-ok(cosh(1e4) == Inf());
-ok(csch(1e4) == 0);
-ok(tanh(1e4) == 1);
-ok(coth(1e4) == 1);
+cmp_ok(sinh(1e5), '==', Inf());
+cmp_ok(sech(1e5), '==', 0);
+cmp_ok(cosh(1e5), '==', Inf());
+cmp_ok(csch(1e5), '==', 0);
+cmp_ok(tanh(1e5), '==', 1);
+cmp_ok(coth(1e5), '==', 1);
 
-ok(sinh(-1e4) == -Inf());
-ok(sech(-1e4) == 0);
-ok(cosh(-1e4) == Inf());
-ok(csch(-1e4) == 0);
-ok(tanh(-1e4) == -1);
-ok(coth(-1e4) == -1);
+cmp_ok(sinh(-1e5), '==', -Inf());
+cmp_ok(sech(-1e5), '==', 0);
+cmp_ok(cosh(-1e5), '==', Inf());
+cmp_ok(csch(-1e5), '==', 0);
+cmp_ok(tanh(-1e5), '==', -1);
+cmp_ok(coth(-1e5), '==', -1);
 
 # eof
