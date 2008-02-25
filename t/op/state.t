@@ -8,7 +8,7 @@ BEGIN {
 use strict;
 use feature "state";
 
-plan tests => 44;
+plan tests => 68;
 
 ok( ! defined state $uninit, q(state vars are undef by default) );
 
@@ -195,3 +195,71 @@ is( pugnax(), 42, 'scalar state assignment return value' );
 
 
 
+foreach my $forbidden (~< *DATA) {
+    chomp $forbidden;
+    no strict 'vars';
+    eval $forbidden;
+    like $@->{description}, qr/Initialization of state variables in list context currently forbidden/, "Currently forbidden: $forbidden";
+}
+
+# [perl #49522] state variable not available
+
+{
+    my @warnings;
+    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->message };
+
+    eval q{
+	use warnings;
+
+	sub f_49522 {
+	    state $s = 88;
+	    sub g_49522 { $s }
+	    sub { $s };
+	}
+
+	sub h_49522 {
+	    state $t = 99;
+	    sub i_49522 {
+		sub { $t };
+	    }
+	}
+    };
+    is $@, '', "eval f_49522";
+    # shouldn't be any 'not available' or 'not stay shared' warnings
+    ok !@warnings, "suppress warnings part 1 [@warnings]";
+
+    @warnings = ();
+    my $f = f_49522();
+    is $f->(), 88, "state var closure 1";
+    is g_49522(), 88, "state var closure 2";
+    ok !@warnings, "suppress warnings part 2 [@warnings]";
+
+
+    @warnings = ();
+    $f = i_49522();
+    h_49522(); # initialise $t
+    is $f->(), 99, "state var closure 3";
+    ok !@warnings, "suppress warnings part 3 [@warnings]";
+
+
+}
+
+
+__DATA__
+state ($a) = 1;
+(state $a) = 1;
+state @a = 1;
+state (@a) = 1;
+(state @a) = 1;
+state %a = ();
+state (%a) = ();
+(state %a) = ();
+state ($a, $b) = ();
+state ($a, @b) = ();
+(state $a, state $b) = ();
+(state $a, $b) = ();
+(state $a, my $b) = ();
+(state $a, state @b) = ();
+(state $a, local @b) = ();
+(state $a, undef, state $b) = ();
+state ($a, undef, $b) = ();

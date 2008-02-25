@@ -460,6 +460,15 @@ all: $(FIRSTMAKEFILE) miniperl$(EXE_EXT) extra.pods $(private) $(unidatafiles) $
 	@echo " ";
 	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
 
+sperl$(OBJ_EXT): perl.c $(h)
+	$(RMS) sperl.c
+	$(LNS) perl.c sperl.c
+	$(CCCMD) -DIAMSUID sperl.c
+	$(RMS) sperl.c
+
+sperl.i: perl.c $(h)
+	$(CCCMDSRC) -DIAMSUID -E perl.c > sperl.i
+
 .PHONY: all utilities
 
 utilities:	miniperl$(EXE_EXT) $(CONFIGPM) $(plextract) lib/lib.pm FORCE
@@ -831,12 +840,6 @@ suidperl$(EXE_EXT): $& sperl$(OBJ_EXT) perlmain$(OBJ_EXT) $(LIBPERL) $(static_ex
 fi
 
 $spitshell >>Makefile <<'!NO!SUBS!'
-
-sperl$(OBJ_EXT): perl.c $(h)
-	$(RMS) sperl.c
-	$(LNS) perl.c sperl.c
-	$(CCCMD) -DIAMSUID sperl.c
-	$(RMS) sperl.c
 
 # We have to call our ./makedir because Ultrix 4.3 make can't handle the line
 #	test -d lib/auto || mkdir lib/auto
