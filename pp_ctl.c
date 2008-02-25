@@ -646,9 +646,9 @@ S_dopoptolabel(pTHX_ const char *label)
 		return -1;
 	    break;
 	case CXt_LOOP:
-	    if ( !cx->blk_loop.label || strNE(label, cx->blk_loop.label) ) {
+	    if ( !CxLABEL(cx) || strNE(label, CxLABEL(cx)) ) {
 		DEBUG_l(Perl_deb(aTHX_ "(Skipping label #%ld %s)\n",
-			(long)i, cx->blk_loop.label));
+			(long)i, CxLABEL(cx)));
 		continue;
 	    }
 	    DEBUG_l( Perl_deb(aTHX_ "(Found label #%ld %s)\n", (long)i, label));
@@ -1003,11 +1003,11 @@ PP(pp_caller)
 	    SV * const sv = newSV(0);
 	    gv_efullname4(sv, cvgv, NULL, TRUE);
 	    mPUSHs(sv);
-	    mPUSHi((I32)cx->blk_sub.hasargs);
+	    PUSHs(boolSV(CxHASARGS(cx)));
 	}
 	else {
 	    PUSHs(newSVpvs_flags("(unknown)", SVs_TEMP));
-	    mPUSHi((I32)cx->blk_sub.hasargs);
+	    PUSHs(boolSV(CxHASARGS(cx)));
 	}
     }
     else {
@@ -1018,10 +1018,10 @@ PP(pp_caller)
     if (gimme == G_VOID)
 	PUSHs(&PL_sv_undef);
     else
-	mPUSHi(gimme & G_ARRAY);
+	PUSHs(boolSV((gimme & G_WANT) == G_ARRAY));
     if (CxTYPE(cx) == CXt_EVAL) {
 	/* eval STRING */
-	if (cx->blk_eval.old_op_type == OP_ENTEREVAL) {
+	if (CxOLD_OP_TYPE(cx) == OP_ENTEREVAL) {
 	    PUSHs(cx->blk_eval.cur_text);
 	    PUSHs(&PL_sv_no);
 	}
@@ -1040,7 +1040,7 @@ PP(pp_caller)
 	PUSHs(&PL_sv_undef);
 	PUSHs(&PL_sv_undef);
     }
-    if (CxTYPE(cx) == CXt_SUB && cx->blk_sub.hasargs
+    if (CxTYPE(cx) == CXt_SUB && CxHASARGS(cx)
 	&& CopSTASH_eq(PL_curcop, PL_debstash))
     {
 	AV * const ary = cx->blk_sub.argarray;
@@ -1702,7 +1702,7 @@ PP(pp_goto)
 	    }
 	    else if (CxMULTICALL(cx))
 		DIE(aTHX_ "Can't goto subroutine from a sort sub (or similar callback)");
-	    if (CxTYPE(cx) == CXt_SUB && cx->blk_sub.hasargs) {
+	    if (CxTYPE(cx) == CXt_SUB && CxHASARGS(cx)) {
 		/* put @_ back onto stack */
 		AV* av = cx->blk_sub.argarray;
 
@@ -1761,10 +1761,9 @@ PP(pp_goto)
 	    else {
 		AV* const padlist = CvPADLIST(cv);
 		if (CxTYPE(cx) == CXt_EVAL) {
-		    PL_in_eval = cx->blk_eval.old_in_eval;
+		    PL_in_eval = CxOLD_IN_EVAL(cx);
 		    PL_eval_root = cx->blk_eval.old_eval_root;
 		    cx->cx_type = CXt_SUB;
-		    cx->blk_sub.hasargs = 0;
 		}
 		cx->blk_sub.cv = cv;
 		cx->blk_sub.olddepth = CvDEPTH(cv);
@@ -1779,7 +1778,7 @@ PP(pp_goto)
 		}
 		SAVECOMPPAD();
 		PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
-		if (cx->blk_sub.hasargs)
+		if (CxHASARGS(cx))
 		{
 		    AV* const av = (AV*)PAD_SVl(0);
 
@@ -2336,9 +2335,9 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    && cLISTOPx(cUNOPx(PL_eval_root)->op_first)->op_last->op_type
 	    == OP_REQUIRE)
 	scalar(PL_eval_root);
-    else if (gimme & G_VOID)
+    else if ((gimme & G_WANT) == G_VOID)
 	scalarvoid(PL_eval_root);
-    else if (gimme & G_ARRAY)
+    else if ((gimme & G_WANT) == G_ARRAY)
 	list(PL_eval_root);
     else
 	scalar(PL_eval_root);
