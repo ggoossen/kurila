@@ -9,14 +9,14 @@ package Math::Trig;
 
 use strict;
 
-use Math::Complex v1.37;
+use Math::Complex v1.42;
 use Math::Complex qw(:trig :pi);
 
 use vars qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA = qw(Exporter);
 
-$VERSION = 1.05;
+$VERSION = 1.07;
 
 my @angcnv = qw(rad2deg rad2grad
 		deg2rad deg2grad
@@ -43,7 +43,7 @@ my @greatcircle = qw(
 
 my @pi = qw(pi pi2 pi4 pip2 pip4);
 
-@EXPORT_OK = (@rdlcnv, @greatcircle, @pi);
+@EXPORT_OK = (@rdlcnv, @greatcircle, @pi, 'Inf');
 
 # See e.g. the following pages:
 # http://www.movable-type.co.uk/scripts/LatLong.html
@@ -672,6 +672,11 @@ Do not attempt navigation using these formulas.
 
 Jarkko Hietaniemi <F<jhi!at!iki.fi>> and 
 Raphael Manfredi <F<Raphael_Manfredi!at!pobox.com>>.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
 
 =cut
 

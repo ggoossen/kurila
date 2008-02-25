@@ -1841,7 +1841,11 @@ S_sv_2iuv_common(pTHX_ SV *sv) {
 		   we're outside the range of NV integer precision */
 #endif
 		) {
-		SvIOK_on(sv);  /* Can this go wrong with rounding? NWC */
+		if (SvNOK(sv))
+		    SvIOK_on(sv);  /* Can this go wrong with rounding? NWC */
+		else {
+		    /* scalar has trailing garbage, eg "42a" */
+		}
 		DEBUG_c(PerlIO_printf(Perl_debug_log,
 				      "0x%"UVxf" iv(%"NVgf" => %"IVdf") (precise)\n",
 				      PTR2UV(sv),
@@ -1880,6 +1884,7 @@ S_sv_2iuv_common(pTHX_ SV *sv) {
 		   came from a (by definition imprecise) NV operation, and
 		   we're outside the range of NV integer precision */
 #endif
+		&& SvNOK(sv)
 		)
 		SvIOK_on(sv);
 	    SvIsUV_on(sv);
@@ -2037,6 +2042,12 @@ S_sv_2iuv_common(pTHX_ SV *sv) {
                 }
             }
 #endif /* NV_PRESERVES_UV */
+	/* It might be more code efficient to go through the entire logic above
+	   and conditionally set with SvIOKp_on() rather than SvIOK(), but it
+	   gets complex and potentially buggy, so more programmer efficient
+	   to do it this way, by turning off the public flags:  */
+	if (!numtype)
+	    SvFLAGS(sv) &= ~(SVf_IOK|SVf_NOK);
 	}
     }
     else  {
@@ -2303,11 +2314,15 @@ Perl_sv_2nv(pTHX_ register SV *sv)
     if (SvIOKp(sv)) {
 	SvNV_set(sv, SvIsUV(sv) ? (NV)SvUVX(sv) : (NV)SvIVX(sv));
 #ifdef NV_PRESERVES_UV
-	SvNOK_on(sv);
+	if (SvIOK(sv))
+	    SvNOK_on(sv);
+	else
+	    SvNOKp_on(sv);
 #else
 	/* Only set the public NV OK flag if this NV preserves the IV  */
 	/* Check it's not 0xFFFFFFFFFFFFFFFF */
-	if (SvIsUV(sv) ? ((SvUVX(sv) != UV_MAX)&&(SvUVX(sv) == U_V(SvNVX(sv))))
+	if (SvIOK(sv) &&
+	    SvIsUV(sv) ? ((SvUVX(sv) != UV_MAX)&&(SvUVX(sv) == U_V(SvNVX(sv))))
 		       : (SvIVX(sv) == I_V(SvNVX(sv))))
 	    SvNOK_on(sv);
 	else
@@ -2326,7 +2341,10 @@ Perl_sv_2nv(pTHX_ register SV *sv)
 	    SvNV_set(sv, (numtype & IS_NUMBER_NEG) ? -(NV)value : (NV)value);
 	} else
 	    SvNV_set(sv, Atof(SvPVX_const(sv)));
-	SvNOK_on(sv);
+	if (numtype)
+	    SvNOK_on(sv);
+	else
+	    SvNOKp_on(sv);
 #else
 	SvNV_set(sv, Atof(SvPVX_const(sv)));
 	/* Only set the public NV OK flag if this NV preserves the value in
@@ -2393,6 +2411,12 @@ Perl_sv_2nv(pTHX_ register SV *sv)
                 }
             }
         }
+	/* It might be more code efficient to go through the entire logic above
+	   and conditionally set with SvNOKp_on() rather than SvNOK(), but it
+	   gets complex and potentially buggy, so more programmer efficient
+	   to do it this way, by turning off the public flags:  */
+	if (!numtype)
+	    SvFLAGS(sv) &= ~(SVf_IOK|SVf_NOK);
 #endif /* NV_PRESERVES_UV */
     }
     else  {
@@ -10490,31 +10514,11 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_regmatch_slab	= NULL;
     
     /* Clone the regex array */
-    PL_regex_padav = newAV();
-    {
-	const I32 len = av_len((AV*)proto_perl->Iregex_padav);
-	SV* const * const regexen = AvARRAY((AV*)proto_perl->Iregex_padav);
-	IV i;
-	av_push(PL_regex_padav, sv_dup_inc_NN(regexen[0],param));
-	for(i = 1; i <= len; i++) {
-	    const SV * const regex = regexen[i];
-	    /* FIXME for plugins
-			newSViv(PTR2IV(CALLREGDUPE(
-				INT2PTR(REGEXP *, SvIVX(regex)), param))))
-	    */
-	    /* And while we're at it, can we FIXME on the whole hiding 
-	       pointer inside an IV hack? */
-	    SV * const sv =
-		SvREPADTMP(regex)
-		    ? sv_dup_inc((SV*) regex, param)
-		    : SvREFCNT_inc(
-			newSViv(PTR2IV(sv_dup_inc(INT2PTR(SV *, SvIVX(regex)), param))))
-		;
-	    if (SvFLAGS(regex) & SVf_BREAK)
-		SvFLAGS(sv) |= SVf_BREAK; /* unrefcnted PL_curpm */
-	    av_push(PL_regex_padav, sv);
-	}
-    }
+    /* ORANGE FIXME for plugins, probably in the SV dup code.
+       newSViv(PTR2IV(CALLREGDUPE(
+       INT2PTR(REGEXP *, SvIVX(regex)), param))))
+    */
+    PL_regex_padav = av_dup_inc(proto_perl->Iregex_padav, param);
     PL_regex_pad = AvARRAY(PL_regex_padav);
 
     /* shortcuts to various I/O objects */

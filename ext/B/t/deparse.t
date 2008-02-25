@@ -361,3 +361,15 @@ $a = sub {
 {
     $a =~ m/foo/;
 }
+####
+my $a = {};
+my $b = \{};
+my $c = [];
+my $d = \[];
+####
+# 51 implicit smartmatch in given/when
+given ('foo') {
+    when ('bar') { continue; }
+    when ($_ ~~ 'quux') { continue; }
+    default { 0; }
+}
