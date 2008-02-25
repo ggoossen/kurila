@@ -2811,15 +2811,17 @@ PP(pp_entereval)
 
     SAVECOMPILEWARNINGS();
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
-    if (PL_compiling.cop_hints_hash) {
-	SvREFCNT_dec(PL_compiling.cop_hints_hash);
-    }
-    PL_compiling.cop_hints_hash = PL_curcop->cop_hints_hash;
-    if (PL_compiling.cop_hints_hash) {
+    if (PL_curcop->cop_hints_hash) {
 	HINTS_REFCNT_LOCK;
-	SvREFCNT_inc(PL_compiling.cop_hints_hash);
+	SvREFCNT_inc(PL_curcop->cop_hints_hash);
 	HINTS_REFCNT_UNLOCK;
     }
+    if (PL_compiling.cop_hints_hash) {
+	HINTS_REFCNT_LOCK;
+	SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	HINTS_REFCNT_UNLOCK;
+    }
+    PL_compiling.cop_hints_hash = PL_curcop->cop_hints_hash;
     /* special case: an eval '' executed within the DB package gets lexically
      * placed in the first non-DB CV rather than the current CV - this
      * allows the debugger to execute code, find lexicals etc, in the

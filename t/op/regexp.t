@@ -43,7 +43,7 @@ my $file;
 use strict;
 use warnings FATAL=>"all";
 use vars qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
-use vars qw($qr $skip_amp $qr_embed); # set by our callers
+use vars qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
 
 
 BEGIN {
@@ -156,9 +156,9 @@ EOFCODE
             $code= <<EOFCODE;
 		# Can't run the match in a subthread, but can do this and
 	 	# clone the pattern the other way.
-                my \$RE = threads->new(sub {qr$pat})->join();
+                my \$RE = threads->new(sub \{qr$pat\})->join();
                 $study;
-                \$match = (\$subject =~ /(?:)\$RE(?:)/) while \$c--;
+                \$match = (\$subject =~ m/(?:)\$RE(?:)/) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }
@@ -196,7 +196,7 @@ EOFCODE
 	elsif ($@) {
 	    print "not ok $test $input => error `$err'\n$code\n$@\n"; next TEST;
 	}
-	elsif ($result =~ /^n/) {
+	elsif ($result =~ m/^n/) {
 	    if ($match) { print "not ok $test ($study) $input => false positive\n"; next TEST }
 	}
 	else {

@@ -314,7 +314,7 @@ sub _dump {
     }
     my $no_bless = 0; 
     my $is_regex = 0;
-    if ( $realpack and ($] >= 5.009005 ? re::is_regexp($val) : $realpack eq 'Regexp') ) {
+    if ( $realpack and re::is_regexp($val) ) {
         $is_regex = 1;
         $no_bless = $realpack eq 'Regexp';
     }

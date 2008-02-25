@@ -507,3 +507,5 @@ is($x, "\x{100}\x{200}ab");
     substr($foo, -2, 2, "la");
     is(Internals::SvREFCNT(\$foo), 2);
 }
+
+}
