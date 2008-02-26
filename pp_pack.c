@@ -161,6 +161,8 @@ S_mul128(pTHX_ SV *sv, U8 m)
   char           *s = SvPV(sv, len);
   char           *t;
 
+  PERL_ARGS_ASSERT_MUL128;
+
   if (!strnEQ(s, "0000", 4)) {  /* need to grow sv */
     SV * const tmpNew = newSVpvs("0000000000");
 
@@ -726,6 +728,8 @@ S_measure_struct(pTHX_ tempsym_t* symptr)
 {
     I32 total = 0;
 
+    PERL_ARGS_ASSERT_MEASURE_STRUCT;
+
     while (next_symbol(symptr)) {
 	I32 len;
 	int size;
@@ -835,6 +839,8 @@ S_measure_struct(pTHX_ tempsym_t* symptr)
 STATIC const char *
 S_group_end(pTHX_ register const char *patptr, register const char *patend, char ender)
 {
+    PERL_ARGS_ASSERT_GROUP_END;
+
     while (patptr < patend) {
 	const char c = *patptr++;
 
@@ -865,6 +871,9 @@ STATIC const char *
 S_get_num(pTHX_ register const char *patptr, I32 *lenptr )
 {
   I32 len = *patptr++ - '0';
+
+  PERL_ARGS_ASSERT_GET_NUM;
+
   while (isDIGIT(*patptr)) {
     if (len >= 0x7FFFFFFF/10)
       Perl_croak(aTHX_ "pack/unpack repeat count overflow");
@@ -882,6 +891,8 @@ S_next_symbol(pTHX_ tempsym_t* symptr )
 {
   const char* patptr = symptr->patptr;
   const char* const patend = symptr->patend;
+
+  PERL_ARGS_ASSERT_NEXT_SYMBOL;
 
   symptr->flags &= ~FLAG_SLASH;
 
@@ -1063,6 +1074,8 @@ Perl_unpackstring(pTHX_ const char *pat, const char *patend, const char *s, cons
 {
     tempsym_t sym;
 
+    PERL_ARGS_ASSERT_UNPACKSTRING;
+
     TEMPSYM_INIT(&sym, pat, patend, flags);
 
     return unpack_rec(&sym, s, s, strend, NULL );
@@ -1075,7 +1088,6 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
     SV *sv;
     const I32 start_sp_offset = SP - PL_stack_base;
     howlen_t howlen;
-
     I32 checksum = 0;
     UV cuv = 0;
     NV cdouble = 0.0;
@@ -1084,6 +1096,9 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
     bool explicit_length;
     const bool unpack_only_one = (symptr->flags & FLAG_UNPACK_ONLY_ONE) != 0;
     bool utf8 = 0; /* (symptr->flags & FLAG_PARSE_UTF8) ? 1 : 0; */
+
+    PERL_ARGS_ASSERT_UNPACK_REC;
+
     symptr->strbeg = s - strbeg;
 
     while (next_symbol(symptr)) {
@@ -2068,6 +2083,8 @@ S_is_an_int(pTHX_ const char *s, STRLEN l)
   bool skip = 1;
   bool ignore = 0;
 
+  PERL_ARGS_ASSERT_IS_AN_INT;
+
   while (*s) {
     switch (*s) {
     case ' ':
@@ -2116,6 +2133,8 @@ S_div128(pTHX_ SV *pnum, bool *done)
     char *t = s;
     int m = 0;
 
+    PERL_ARGS_ASSERT_DIV128;
+
     *done = 1;
     while (*t) {
 	const int i = m * 10 + (*t - '0');
@@ -2145,6 +2164,8 @@ Perl_packlist(pTHX_ SV *cat, const char *pat, const char *patend, register SV **
     dVAR;
     tempsym_t sym;
 
+    PERL_ARGS_ASSERT_PACKLIST;
+
     TEMPSYM_INIT(&sym, pat, patend, FLAG_PACK);
 
     /* We're going to do changes through SvPVX(cat). Make sure it's valid.
@@ -2165,6 +2186,9 @@ S_sv_exp_grow(pTHX_ SV *sv, STRLEN needed) {
     const STRLEN cur = SvCUR(sv);
     const STRLEN len = SvLEN(sv);
     STRLEN extend;
+
+    PERL_ARGS_ASSERT_SV_EXP_GROW;
+
     if (len - cur > needed) return SvPVX(sv);
     extend = needed > len ? needed : len;
     return SvGROW(sv, len+extend+1);
@@ -2180,6 +2204,8 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
     bool found = next_symbol(symptr);
     bool utf8 = (symptr->flags & FLAG_PARSE_UTF8) ? 1 : 0;
     bool warn_utf8 = ckWARN(WARN_UTF8);
+
+    PERL_ARGS_ASSERT_PACK_REC;
 
     symptr->strbeg = SvCUR(cat);
 
