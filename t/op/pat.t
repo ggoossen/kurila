@@ -3403,6 +3403,7 @@ sub iseq($$;$) {
     printf "%sok %d - %s$todo\n", ($ok ? "" : "not "), $test,
         ($name||$Message)."\tLine ".((caller)[2]);
 
+    no warnings 'utf8';
     printf "# Failed test at line %d\n".
            "# expected: %s\n". 
            "#   result: %s\n", 
@@ -3444,6 +3445,45 @@ sub iseq($$;$) {
     iseq("@v","bar baz foo", "Got expected values");
     eval'
         print for $+{this_key_doesnt_exist};
+    ';
+    ok(!$@,'lvalue $+{...} should not throw an exception');
+}
+{
+    #
+    # Almost the same as the block above, except that the capture is nested.
+    #
+    my $s = 'foo bar baz';
+    my (@k,@v,@fetch,$res);
+    my $count = 0;
+    my @names = qw($+{A} $+{B} $+{C} $+{D});
+    if ($s =~ m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/) {
+	while (my ($k,$v) = each(%+)) {
+	    $count++;
+	}
+	@k = sort keys(%+);
+	@v = sort values(%+);
+	$res = 1;
+	push @fetch,
+	    [ "$+{A}", "$2" ],
+	    [ "$+{B}", "$3" ],
+	    [ "$+{C}", "$4" ],
+	    [ "$+{D}", $1 ],
+	;
+    }
+    foreach (0..3) {
+	if ($fetch[$_]) {
+	    iseq($fetch[$_][0],$fetch[$_][1],$names[$_]);
+	} else {
+	    ok(0, $names[$_]);
+	}
+    }
+    iseq($res,1,"$s~=m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/");
+    iseq($count,4,"Got 4 keys in %+ via each -- bug 50496");
+    iseq(0+@k, 4, 'Got 4 keys in %+ via keys -- bug 50496');
+    iseq("@k","A B C D", "Got expected keys -- bug 50496");
+    iseq("@v","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
+    eval'
+	print for $+{this_key_doesnt_exist};
     ';
     ok(!$@,'lvalue $+{...} should not throw an exception');
 }
@@ -4283,7 +4323,7 @@ iseq(0+$::test,$::TestCount,"Got the right number of tests!");
 
 # Don't forget to update this!
 BEGIN {
-    $::TestCount = 1786;
+    $::TestCount = 1796;
     print "1..$::TestCount\n";
 }
 

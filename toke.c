@@ -5917,7 +5917,7 @@ Perl_yylex(pTHX)
 		    (*s == ':' && s[1] == ':'))
 		{
 #ifdef PERL_MAD
-		    SV *nametoke;
+		    SV *nametoke = NULL;
 #endif
 
 		    PL_expect = XBLOCK;
