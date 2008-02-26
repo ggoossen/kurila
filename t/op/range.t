@@ -5,7 +5,7 @@ require './test.pl';
 
 use Config;
 
-plan (115);
+plan (116);
 
 our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 
@@ -188,7 +188,7 @@ is(join(":", map "[$_]", @foo), '[]');
 }
 
 # Test upper range limit
-my $MAX_INT = ~0>>1;
+my $MAX_INT = ^~^0>>1;
 
 foreach my $ii (-3 .. 3) {
     my ($first, $last);
@@ -248,7 +248,7 @@ foreach my $ii (-3 .. 3) {
     ok(! defined($first), 'Range ineffectual');
 }
 
-foreach my $ii (~0, ~0+1, ~0+(~0>>4)) {
+foreach my $ii (^~^0, ^~^0+1, ^~^0+(^~^0>>4)) {
     eval {
         my $lim=0;
         for ($MAX_INT-10 .. $ii) {
@@ -283,7 +283,7 @@ foreach my $ii (-3 .. 3) {
             last if ($lim++ +> 100);
         }
     };
-    if ($ii >= 0) {
+    if ($ii +>= 0) {
         ok(! $@, 'Lower bound accepted: ' . ($MIN_INT+$ii));
         is($first, $MIN_INT+$ii, 'Lower bound okay');
         is($last, $MIN_INT+10, 'Upper bound okay');
@@ -304,7 +304,7 @@ foreach my $ii (-3 .. 3) {
             last if ($lim++ +> 100);
         }
     };
-    if ($ii >= 0) {
+    if ($ii +>= 0) {
         ok(! $@, 'Upper bound accepted: ' . ($MIN_INT+$ii));
         is($first, $MIN_INT, 'Lower bound okay');
         is($last, $MIN_INT+$ii, 'Upper bound okay');
@@ -329,7 +329,7 @@ foreach my $ii (-3 .. 3) {
     ok(! defined($first), 'Range ineffectual');
 }
 
-foreach my $ii (~0, ~0+1, ~0+(~0>>4)) {
+foreach my $ii (^~^0, ^~^0+1, ^~^0+(^~^0>>4)) {
     eval {
         my $lim=0;
         for (-$ii .. $MIN_INT+10) {

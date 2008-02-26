@@ -154,19 +154,6 @@ is(eval { MRO_N->testfunc() }, 123);
 
     ok(eq_array(mro::get_linear_isa('ISACLEAR1'),[qw/ISACLEAR1/]));
     ok(eq_array(mro::get_linear_isa('ISACLEAR2'),[qw/ISACLEAR2/]));
-
-    # [perl #49564]  This is a pretty obscure way of clearing @ISA but
-    # it tests a regression that affects XS code calling av_clear too.
-    {
-        package ISACLEAR3;
-        our @ISA = qw/WW XX/;
-    }
-    ok(eq_array(mro::get_linear_isa('ISACLEAR3'),[qw/ISACLEAR3 WW XX/]));
-    {
-        package ISACLEAR3;
-        reset 'I';
-    }
-    ok(eq_array(mro::get_linear_isa('ISACLEAR3'),[qw/ISACLEAR3/]));
 }
 
 # Check that recursion bails out "cleanly" in a variety of cases

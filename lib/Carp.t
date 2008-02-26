@@ -8,7 +8,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 use Carp qw(carp cluck croak confess);
 
-plan tests => 33;
+plan tests => 35;
 
 our $TODO = "Figure out what to do with Carp";
 

@@ -98,14 +98,14 @@ sub grad2rad ($;$) { my $d = _GR * $_[0]; $_[1] ? $d : rad2rad($d) }
 #
 
 sub acos_real {
-    return 0  if $_[0] >=  1;
-    return pi if $_[0] <= -1;
+    return 0  if $_[0] +>=  1;
+    return pi if $_[0] +<= -1;
     return acos($_[0]);
 }
 
 sub asin_real {
-    return  &pip2 if $_[0] >=  1;
-    return -&pip2 if $_[0] <= -1;
+    return  &pip2 if $_[0] +>=  1;
+    return -&pip2 if $_[0] +<= -1;
     return asin($_[0]);
 }
 

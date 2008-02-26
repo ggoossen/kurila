@@ -313,24 +313,24 @@ my $BigDouble = 1e40;
 
 local $SIG{FPE} = { };  # E.g. netbsd-alpha core dumps on Inf arith
 
-ok(Inf() > $BigDouble);  # This passes in netbsd-alpha.
-ok(Inf() + $BigDouble > $BigDouble); # This coredumps.
+ok(Inf() +> $BigDouble);  # This passes in netbsd-alpha.
+ok(Inf() + $BigDouble +> $BigDouble); # This coredumps.
 ok(Inf() + $BigDouble == Inf());
-ok(Inf() - $BigDouble > $BigDouble);
+ok(Inf() - $BigDouble +> $BigDouble);
 ok(Inf() - $BigDouble == Inf());
-ok(Inf() * $BigDouble > $BigDouble);
+ok(Inf() * $BigDouble +> $BigDouble);
 ok(Inf() * $BigDouble == Inf());
-ok(Inf() / $BigDouble > $BigDouble);
+ok(Inf() / $BigDouble +> $BigDouble);
 ok(Inf() / $BigDouble == Inf());
 
-ok(-Inf() < -$BigDouble);
-ok(-Inf() + $BigDouble < $BigDouble);
+ok(-Inf() +< -$BigDouble);
+ok(-Inf() + $BigDouble +< $BigDouble);
 ok(-Inf() + $BigDouble == -Inf());
-ok(-Inf() - $BigDouble < -$BigDouble);
+ok(-Inf() - $BigDouble +< -$BigDouble);
 ok(-Inf() - $BigDouble == -Inf());
-ok(-Inf() * $BigDouble < -$BigDouble);
+ok(-Inf() * $BigDouble +< -$BigDouble);
 ok(-Inf() * $BigDouble == -Inf());
-ok(-Inf() / $BigDouble < -$BigDouble);
+ok(-Inf() / $BigDouble +< -$BigDouble);
 ok(-Inf() / $BigDouble == -Inf());
 
 print "# sinh/sech/cosh/csch/tanh/coth unto infinity\n";
@@ -367,8 +367,8 @@ print "# great_circle_distance with small angles\n";
 
 for my $e (qw(1e-2 1e-3 1e-4 1e-5)) {
     # Can't assume == 0 because of floating point fuzz,
-    # but let's hope for at least < $e.
-    cmp_ok(great_circle_distance(0, $e, 0, $e), '<', $e);
+    # but let's hope for at least +< $e.
+    cmp_ok(great_circle_distance(0, $e, 0, $e), '+<', $e);
 }
 
 print "# asin_real, acos_real\n";

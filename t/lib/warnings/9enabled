@@ -341,11 +341,11 @@ eval {
   } ;
 print $@->message;
 EXPECT
-Usage: warnings::warn([category,] 'message') at ../lib/warnings.pm line 456.
+Usage: warnings::warn([category,] 'message') at .../warnings.pm line xxx.
     warnings::warn called at - line 5.
     (eval) called at - line 4.
-Unknown warnings category 'fred' at ../lib/warnings.pm line 413.
-    warnings::__chk called at ../lib/warnings.pm line 460.
+Unknown warnings category 'fred' at .../warnings.pm line xxx.
+    warnings::__chk called at .../warnings.pm line xxx.
     warnings::warn called at - line 9.
     (eval) called at - line 8.
 ########
@@ -361,11 +361,11 @@ eval {
 } ;
 print $@->message;
 EXPECT
-Usage: warnings::warnif([category,] 'message') at ../lib/warnings.pm line 469.
+Usage: warnings::warnif([category,] 'message') at .../warnings.pm line xxx.
     warnings::warnif called at - line 5.
     (eval) called at - line 4.
-Unknown warnings category 'fred' at ../lib/warnings.pm line 413.
-    warnings::__chk called at ../lib/warnings.pm line 473.
+Unknown warnings category 'fred' at .../warnings.pm line xxx.
+    warnings::__chk called at .../warnings.pm line xxx.
     warnings::warnif called at - line 9.
     (eval) called at - line 8.
 ########
@@ -380,7 +380,7 @@ use warnings "io" ;
 use abc;
 abc::check() ;
 EXPECT
-hello at ../lib/warnings.pm line 464.
+hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3.
     abc::check called at - line 3.
 ########
@@ -395,7 +395,7 @@ use warnings "io" ;
 use abc;
 abc::check() ;
 EXPECT
-hello at ../lib/warnings.pm line 464.
+hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3.
     abc::check called at - line 3.
 ########
@@ -413,7 +413,7 @@ eval {
   } ;
 print "[[$@]]\n";
 EXPECT
-hello at ../lib/warnings.pm line 464.
+hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3.
     abc::check called at - line 4.
     (eval) called at - line 3.
@@ -433,7 +433,7 @@ eval {
 } ;
 print "[[{$@->message}]]\n";
 EXPECT
-[[hello at ../lib/warnings.pm line 461.
+[[hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3.
     abc::check called at - line 4.
     (eval) called at - line 3.
@@ -480,8 +480,8 @@ use warnings 'syntax' ;
 use abc ;
 abc::check() ;
 EXPECT
-package 'abc' not registered for warnings at ../lib/warnings.pm line 419.
-    warnings::__chk called at ../lib/warnings.pm line 446.
+package 'abc' not registered for warnings at .../warnings.pm line xxx.
+    warnings::__chk called at .../warnings.pm line xxx.
     warnings::enabled called at abc.pm line 4.
     abc::check called at - line 3.
 ########
@@ -498,8 +498,8 @@ use warnings 'syntax' ;
 use abc ;
 abc::check() ;
 EXPECT
-package 'abc' not registered for warnings at ../lib/warnings.pm line 419.
-    warnings::__chk called at ../lib/warnings.pm line 460.
+package 'abc' not registered for warnings at .../warnings.pm line xxx.
+    warnings::__chk called at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 4.
     abc::check called at - line 3.
 ########
@@ -516,8 +516,8 @@ use warnings 'syntax' ;
 use abc ;
 abc::check() ;
 EXPECT
-package 'abc' not registered for warnings at ../lib/warnings.pm line 419.
-    warnings::__chk called at ../lib/warnings.pm line 473.
+package 'abc' not registered for warnings at .../warnings.pm line xxx.
+    warnings::__chk called at .../warnings.pm line xxx.
     warnings::warnif called at abc.pm line 4.
     abc::check called at - line 3.
 ########
@@ -678,7 +678,7 @@ use abc;
 use warnings "abc" ;
 abc::check() ;
 EXPECT
-hello at ../lib/warnings.pm line 464.
+hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 4.
     abc::check called at - line 3.
 ########
@@ -692,7 +692,7 @@ sub check { warnings::warn("hello") }
 use abc;
 abc::check() ;
 EXPECT
-hello at ../lib/warnings.pm line 464.
+hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3.
     abc::check called at - line 2.
 ########
@@ -710,7 +710,7 @@ eval {
   } ;
 print "[[$@]]\n";
 EXPECT
-hello at ../lib/warnings.pm line 464.
+hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3.
     abc::check called at - line 4.
     (eval) called at - line 3.
@@ -730,7 +730,7 @@ eval {
   } ;
 print "[[{$@->message}]]\n";
 EXPECT
-[[hello at ../lib/warnings.pm line 461.
+[[hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3.
     abc::check called at - line 4.
     (eval) called at - line 3.
@@ -1039,7 +1039,7 @@ abc::in1() ;
 EXPECT
 ok2
 ok3
-my message 1 at ../lib/warnings.pm line 464.
+my message 1 at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 10.
     abc::check called at abc.pm line 16.
     abc::in2 called at abc.pm line 17.
@@ -1078,7 +1078,7 @@ abc::in1() ;
 EXPECT
 ok2
 ok3
-my message 1 at ../lib/warnings.pm line 464.
+my message 1 at .../warnings.pm line xxx.
     warnings::warn called at def.pm line 9.
     def::check called at def.pm line 15.
     def::in2 called at def.pm line 16.
@@ -1125,7 +1125,7 @@ EXPECT
 ok2
 ok3
 ok5
-my message 1 at ../lib/warnings.pm line 464.
+my message 1 at .../warnings.pm line xxx.
     warnings::warn called at def.pm line 14.
     def::check called at def.pm line 21.
     def::in2 called at def.pm line 22.
@@ -1204,17 +1204,17 @@ ok2
 ok3
 ok5
 ok6
-my message 1 at ../lib/warnings.pm line 464.
+my message 1 at .../warnings.pm line xxx.
     warnings::warn called at def.pm line 21.
     def::check called at def.pm line 35.
     def::in2 called at def.pm line 41.
     def::in1 called at - line 5.
-my message 2 at ../lib/warnings.pm line 464.
+my message 2 at .../warnings.pm line xxx.
     warnings::warn called at def.pm line 22.
     def::check called at def.pm line 35.
     def::in2 called at def.pm line 41.
     def::in1 called at - line 5.
-my message 8 at ../lib/warnings.pm line 484.
+my message 8 at .../warnings.pm line xxx.
     warnings::warnif called at def.pm line 29.
     def::check called at def.pm line 35.
     def::in2 called at def.pm line 41.
@@ -1224,12 +1224,12 @@ ok1
 ok2
 ok3
 ok5
-my message 1 at ../lib/warnings.pm line 464.
+my message 1 at .../warnings.pm line xxx.
     warnings::warn called at def.pm line 21.
     def::check called at def.pm line 35.
     def::in2 called at def.pm line 41.
     def::in1 called at - line 8.
-my message 2 at ../lib/warnings.pm line 464.
+my message 2 at .../warnings.pm line xxx.
     warnings::warn called at def.pm line 22.
     def::check called at def.pm line 35.
     def::in2 called at def.pm line 41.

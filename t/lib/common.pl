@@ -141,6 +141,7 @@ for (@prgs){
     $results =~ s/\n+$//;
     # allow expected output to be written as if $prog is on STDIN
     $results =~ s/tmp\d+/-/g;
+    $results =~ s|at \.\./lib/warnings\.pm line \d*\.|at .../warnings.pm line xxx.|g;
     if ($^O eq 'VMS') {
         # some tests will trigger VMS messages that won't be expected
         $results =~ s/\n?%[A-Z]+-[SIWEF]-[A-Z]+,.*//;

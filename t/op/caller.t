@@ -77,7 +77,7 @@ sub show_bits
 
 sub check_bits
 {
-    local $Level = $Level + 2;
+    local our $Level = $Level + 2;
     my ($got, $exp, $desc) = @_;
     if (! ok($got eq $exp, $desc)) {
         diag('     got: ' . show_bits($got));
