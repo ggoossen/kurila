@@ -2570,7 +2570,7 @@ L<perlcall>.
 */
 
 I32
-Perl_call_sv(pTHX_ SV *sv, I32 flags)
+Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
           		/* See G_* flags in cop.h */
 {
     dVAR; dSP;

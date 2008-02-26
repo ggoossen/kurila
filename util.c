@@ -425,7 +425,7 @@ Perl_ninstr(pTHX_ const char *big, const char *bigend, const char *little, const
     if (little >= lend)
         return (char*)big;
     {
-        char first = *little++;
+        const char first = *little++;
         const char *s, *x;
         bigend -= lend - little;
     OUTER:
@@ -2133,7 +2133,7 @@ Perl_my_swabn(void *ptr, int n)
 }
 
 PerlIO *
-Perl_my_popen_list(pTHX_ char *mode, int n, SV * const *args)
+Perl_my_popen_list(pTHX_ const char *mode, int n, SV * const *args)
 {
 #if (!defined(DOSISH) || defined(HAS_FORK) || defined(AMIGAOS)) && !defined(OS2) && !defined(VMS) && !defined(__OPEN_VM) && !defined(EPOC) && !defined(MACOS_TRADITIONAL) && !defined(NETWARE) && !defined(__LIBCATAMOUNT__)
     dVAR;
@@ -2517,7 +2517,7 @@ Perl_my_fork(void)
 
 #ifdef DUMP_FDS
 void
-Perl_dump_fds(pTHX_ char *s)
+Perl_dump_fds(pTHX_ const char *const s)
 {
     int fd;
     Stat_t tmpstatbuf;

@@ -140,9 +140,11 @@ sub SWASHNEW_real {
             print STDERR "canonical = $canonical\n" if DEBUG;
 
             require "unicore/Canonical.pl";
+	    { no warnings "uninitialized";
             if (my $base = ($utf8::Canonical{$canonical} || $utf8::Canonical{ lc $utf8::PropertyAlias{$canonical} })) {
                 $file = "unicore/lib/gc_sc/$base.pl";
                 last GETFILE;
+            }
             }
 
 	    ##

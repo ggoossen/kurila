@@ -3197,6 +3197,8 @@ PP(pp_ucfirst)
     if (SvOK(source)) {
 	s = SvPV_nomg_const(source, slen);
     } else {
+	if (ckWARN(WARN_UNINITIALIZED))
+	    report_uninit(source);
 	s = "";
 	slen = 0;
     }
@@ -3308,6 +3310,8 @@ PP(pp_uc)
 	if (SvOK(source)) {
 	    s = SvPV_nomg_const(source, len);
 	} else {
+	    if (ckWARN(WARN_UNINITIALIZED))
+		report_uninit(source);
 	    s = "";
 	    len = 0;
 	}
@@ -3389,6 +3393,8 @@ PP(pp_lc)
 	if (SvOK(source)) {
 	    s = SvPV_nomg_const(source, len);
 	} else {
+	    if (ckWARN(WARN_UNINITIALIZED))
+		report_uninit(source);
 	    s = "";
 	    len = 0;
 	}
