@@ -56,7 +56,7 @@ sub TEST {
 
   ok(($t eq $WANT and not $@), $name);
   if ($@) {
-      diag("error: $@");
+      diag("error: {$@->message}");
   }
   if ($t ne $WANT) {
       diag("--Expected--\n$WANT\n--Got--\n$@$t\n");
