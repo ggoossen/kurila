@@ -457,7 +457,15 @@ struct block_loop {
 #  define CX_LOOP_NEXTOP_GET(cx)	((cx)->blk_loop.next_op + 0)
 #endif
 
-#define PUSHLOOP(cx, dat, s)						\
+#define PUSHLOOP_PLAIN(cx, s)						\
+	cx->blk_loop.resetsp = s - PL_stack_base;			\
+	cx->blk_loop.my_op = cLOOP;					\
+	PUSHLOOP_OP_NEXT;						\
+	cx->blk_loop.iterlval = NULL;					\
+	cx->blk_loop.iterary = NULL;					\
+	CX_ITERDATA_SET(cx,NULL);
+
+#define PUSHLOOP_FOR(cx, dat, s)					\
 	cx->blk_loop.resetsp = s - PL_stack_base;			\
 	cx->blk_loop.my_op = cLOOP;					\
 	PUSHLOOP_OP_NEXT;						\
@@ -478,7 +486,7 @@ struct block_loop {
 		SvREFCNT_dec(cx->blk_loop.itersave);			\
 	    }								\
 	}								\
-	if (cx->blk_loop.iterary && cx->blk_loop.iterary != PL_curstack)\
+	if ((CxTYPE(cx) != CXt_LOOP_STACK) && cx->blk_loop.iterary)	\
 	    SvREFCNT_dec(cx->blk_loop.iterary);
 
 /* given/when context */
@@ -621,11 +629,15 @@ struct context {
 #define CXt_NULL	0
 #define CXt_SUB		1
 #define CXt_EVAL	2
-#define CXt_LOOP	3
+#define CXt_WHEN	3
 #define CXt_SUBST	4
 #define CXt_BLOCK	5
 #define CXt_GIVEN	6
-#define CXt_WHEN	7
+#define CXt_LOOP_PLAIN	8 /* hard-coded 8 is used in CxTYPE_is_LOOP */
+#define CXt_LOOP_FOR	9
+/* Foreach on a temporary list on the stack */
+#define CXt_LOOP_STACK	10
+#define CXt_LOOP_RES2	11
 
 /* private flags for CXt_SUB and CXt_NULL
    However, this is checked in many places which do not check the type, so
@@ -634,7 +646,7 @@ struct context {
 #define CXp_MULTICALL	0x10	/* part of a multicall (so don't
 				   tear down context on exit). */ 
 
-/* private flags for CXt_SUB and CXt_FORMAT */
+/* private flags for CXt_SUB */
 #define CXp_HASARGS	0x20
 
 /* private flags for CXt_EVAL */
@@ -643,27 +655,25 @@ struct context {
 
 /* private flags for CXt_LOOP */
 #define CXp_FOR_DEF	0x10	/* foreach using $_ */
-#define CXp_FOREACH	0x20	/* a foreach loop */
 #ifdef USE_ITHREADS
-#  define CXp_PADVAR	0x40	/* itervar lives on pad, iterdata has pad
+#  define CXp_PADVAR	0x20	/* itervar lives on pad, iterdata has pad
 				   offset; if not set, iterdata holds GV* */
-#  define CxPADLOOP(c)	(((c)->cx_type & (CXt_LOOP|CXp_PADVAR))		\
-			 == (CXt_LOOP|CXp_PADVAR))
+#  define CxPADLOOP(c)	(CxTYPE_is_LOOP(c) && ((c)->cx_type & (CXp_PADVAR)))
 #endif
 /* private flags for CXt_SUBST */
 #define CXp_ONCE	0x10	/* What was sbu_once in struct subst */
 
 #define CxTYPE(c)	((c)->cx_type & CXTYPEMASK)
+#define CxTYPE_is_LOOP(c)	(((c)->cx_type & 0xC) == 0x8)
 #define CxMULTICALL(c)	(((c)->cx_type & CXp_MULTICALL)			\
 			 == CXp_MULTICALL)
 #define CxREALEVAL(c)	(((c)->cx_type & (CXTYPEMASK|CXp_REAL))		\
 			 == (CXt_EVAL|CXp_REAL))
 #define CxTRYBLOCK(c)	(((c)->cx_type & (CXTYPEMASK|CXp_TRYBLOCK))	\
 			 == (CXt_EVAL|CXp_TRYBLOCK))
-#define CxFOREACH(c)	(((c)->cx_type & (CXTYPEMASK|CXp_FOREACH))	\
-                         == (CXt_LOOP|CXp_FOREACH))
-#define CxFOREACHDEF(c)	(((c)->cx_type & (CXTYPEMASK|CXp_FOREACH|CXp_FOR_DEF))\
-			 == (CXt_LOOP|CXp_FOREACH|CXp_FOR_DEF))
+#define CxFOREACH(c)	(CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN)
+#define CxFOREACHDEF(c)	((CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN) \
+			 && ((c)->cx_type & CXp_FOR_DEF))
 
 #define CXINC (cxstack_ix < cxstack_max ? ++cxstack_ix : (cxstack_ix = cxinc()))
 
