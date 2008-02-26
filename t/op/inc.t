@@ -204,15 +204,15 @@ sub check_some_code {
     my ($start, $warn, $action, $description) = @_;
     my $warn_line = ($warn ? 'use' : 'no') . " warnings 'imprecision';";
     my @warnings;
-    local $SIG{__WARN__} = sub {push @warnings, "@_"};
+    local ${^WARN_HOOK} = sub {push @warnings, $_[0]->message};
 
     print "# checking $action under $warn_line\n";
     my $code = <<"EOC";
 $warn_line
 my \$i = \$start;
-for(0 .. 3) {
+for(0 .. 3) \{
     my \$a = $action;
-}
+\}
 1;
 EOC
     eval $code or die "# $@\n$code";
@@ -222,7 +222,7 @@ EOC
 	    print STDERR "# $_" foreach @warnings;
 	}
 	foreach (@warnings) {
-	    unless (ok (/Lost precision when incrementing \d+/, $_)) {
+	    unless (ok (m/Lost precision when incrementing \d+/, $_)) {
 		print STDERR "# $_"
 	    }
 	}

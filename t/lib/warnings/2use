@@ -8,7 +8,7 @@ __END__
 #  check illegal category is caught
 use warnings 'this-should-never-be-a-warning-category' ;
 EXPECT
-Unknown warnings category 'this-should-never-be-a-warning-category' at ../lib/warnings.pm line 361.
+Unknown warnings category 'this-should-never-be-a-warning-category' at .../warnings.pm line xxx.
     warnings::import called at - line 3.
 BEGIN failed--compilation aborted
 ########
