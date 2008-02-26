@@ -937,6 +937,8 @@ information is no longer stored directly in the hash.
 
 =back
 
+<<<<<<< HEAD:ext/B/B.pm
+=======
 =head1 AUTHOR
 
 Malcolm Beattie, C<mbeattie@sable.ox.ac.uk>

@@ -68,6 +68,10 @@ sub run_tests {
     my $count = 0;
 
     $| = 1;
+    # rewinding DATA is necessary with PERLIO=stdio when this
+    # test is run from another thread
+    seek *DATA, 0, 0;
+    while (~< *DATA) { last if m/^__DATA__/ }
     while (~< *DATA) {
 	chomp;
 	next if m/^#/;
