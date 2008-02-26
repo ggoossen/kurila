@@ -15,356 +15,356 @@
  */
 
 typedef enum opcode {
-	OP_NULL,	/* 0 */
-	OP_STUB,	/* 1 */
-	OP_SCALAR,	/* 2 */
-	OP_PUSHMARK,	/* 3 */
-	OP_WANTARRAY,	/* 4 */
-	OP_CONST,	/* 5 */
-	OP_GVSV,	/* 6 */
-	OP_GV,		/* 7 */
-	OP_GELEM,	/* 8 */
-	OP_PADSV,	/* 9 */
-	OP_PADAV,	/* 10 */
-	OP_PADHV,	/* 11 */
-	OP_PADANY,	/* 12 */
-	OP_PUSHRE,	/* 13 */
-	OP_RV2GV,	/* 14 */
-	OP_RV2SV,	/* 15 */
-	OP_AV2ARYLEN,	/* 16 */
-	OP_RV2CV,	/* 17 */
-	OP_ANONCODE,	/* 18 */
-	OP_PROTOTYPE,	/* 19 */
-	OP_REFGEN,	/* 20 */
-	OP_SREFGEN,	/* 21 */
-	OP_REF,		/* 22 */
-	OP_BLESS,	/* 23 */
-	OP_BACKTICK,	/* 24 */
-	OP_GLOB,	/* 25 */
-	OP_READLINE,	/* 26 */
-	OP_RCATLINE,	/* 27 */
-	OP_REGCMAYBE,	/* 28 */
-	OP_REGCRESET,	/* 29 */
-	OP_REGCOMP,	/* 30 */
-	OP_MATCH,	/* 31 */
-	OP_QR,		/* 32 */
-	OP_SUBST,	/* 33 */
-	OP_SUBSTCONT,	/* 34 */
-	OP_TRANS,	/* 35 */
-	OP_SASSIGN,	/* 36 */
-	OP_AASSIGN,	/* 37 */
-	OP_CHOP,	/* 38 */
-	OP_SCHOP,	/* 39 */
-	OP_CHOMP,	/* 40 */
-	OP_SCHOMP,	/* 41 */
-	OP_DEFINED,	/* 42 */
-	OP_UNDEF,	/* 43 */
-	OP_STUDY,	/* 44 */
-	OP_POS,		/* 45 */
-	OP_PREINC,	/* 46 */
-	OP_I_PREINC,	/* 47 */
-	OP_PREDEC,	/* 48 */
-	OP_I_PREDEC,	/* 49 */
-	OP_POSTINC,	/* 50 */
-	OP_I_POSTINC,	/* 51 */
-	OP_POSTDEC,	/* 52 */
-	OP_I_POSTDEC,	/* 53 */
-	OP_POW,		/* 54 */
-	OP_MULTIPLY,	/* 55 */
-	OP_I_MULTIPLY,	/* 56 */
-	OP_DIVIDE,	/* 57 */
-	OP_I_DIVIDE,	/* 58 */
-	OP_MODULO,	/* 59 */
-	OP_I_MODULO,	/* 60 */
-	OP_REPEAT,	/* 61 */
-	OP_ADD,		/* 62 */
-	OP_I_ADD,	/* 63 */
-	OP_SUBTRACT,	/* 64 */
-	OP_I_SUBTRACT,	/* 65 */
-	OP_CONCAT,	/* 66 */
-	OP_STRINGIFY,	/* 67 */
-	OP_LEFT_SHIFT,	/* 68 */
-	OP_RIGHT_SHIFT,	/* 69 */
-	OP_LT,		/* 70 */
-	OP_I_LT,	/* 71 */
-	OP_GT,		/* 72 */
-	OP_I_GT,	/* 73 */
-	OP_LE,		/* 74 */
-	OP_I_LE,	/* 75 */
-	OP_GE,		/* 76 */
-	OP_I_GE,	/* 77 */
-	OP_EQ,		/* 78 */
-	OP_I_EQ,	/* 79 */
-	OP_NE,		/* 80 */
-	OP_I_NE,	/* 81 */
-	OP_NCMP,	/* 82 */
-	OP_I_NCMP,	/* 83 */
-	OP_SEQ,		/* 84 */
-	OP_SNE,		/* 85 */
-	OP_SCMP,	/* 86 */
-	OP_BIT_AND,	/* 87 */
-	OP_BIT_XOR,	/* 88 */
-	OP_BIT_OR,	/* 89 */
-	OP_NEGATE,	/* 90 */
-	OP_I_NEGATE,	/* 91 */
-	OP_NOT,		/* 92 */
-	OP_COMPLEMENT,	/* 93 */
-	OP_SMARTMATCH,	/* 94 */
-	OP_ATAN2,	/* 95 */
-	OP_SIN,		/* 96 */
-	OP_COS,		/* 97 */
-	OP_RAND,	/* 98 */
-	OP_SRAND,	/* 99 */
-	OP_EXP,		/* 100 */
-	OP_LOG,		/* 101 */
-	OP_SQRT,	/* 102 */
-	OP_INT,		/* 103 */
-	OP_HEX,		/* 104 */
-	OP_OCT,		/* 105 */
-	OP_ABS,		/* 106 */
-	OP_LENGTH,	/* 107 */
-	OP_SUBSTR,	/* 108 */
-	OP_VEC,		/* 109 */
-	OP_INDEX,	/* 110 */
-	OP_RINDEX,	/* 111 */
-	OP_SPRINTF,	/* 112 */
-	OP_ORD,		/* 113 */
-	OP_CHR,		/* 114 */
-	OP_CRYPT,	/* 115 */
-	OP_UCFIRST,	/* 116 */
-	OP_LCFIRST,	/* 117 */
-	OP_UC,		/* 118 */
-	OP_LC,		/* 119 */
-	OP_QUOTEMETA,	/* 120 */
-	OP_RV2AV,	/* 121 */
-	OP_AELEMFAST,	/* 122 */
-	OP_AELEM,	/* 123 */
-	OP_ASLICE,	/* 124 */
-	OP_EACH,	/* 125 */
-	OP_VALUES,	/* 126 */
-	OP_KEYS,	/* 127 */
-	OP_DELETE,	/* 128 */
-	OP_EXISTS,	/* 129 */
-	OP_RV2HV,	/* 130 */
-	OP_HELEM,	/* 131 */
-	OP_HSLICE,	/* 132 */
-	OP_UNPACK,	/* 133 */
-	OP_PACK,	/* 134 */
-	OP_SPLIT,	/* 135 */
-	OP_JOIN,	/* 136 */
-	OP_LIST,	/* 137 */
-	OP_LSLICE,	/* 138 */
-	OP_ANONLIST,	/* 139 */
-	OP_ANONHASH,	/* 140 */
-	OP_SPLICE,	/* 141 */
-	OP_PUSH,	/* 142 */
-	OP_POP,		/* 143 */
-	OP_SHIFT,	/* 144 */
-	OP_UNSHIFT,	/* 145 */
-	OP_SORT,	/* 146 */
-	OP_REVERSE,	/* 147 */
-	OP_GREPSTART,	/* 148 */
-	OP_GREPWHILE,	/* 149 */
-	OP_MAPSTART,	/* 150 */
-	OP_MAPWHILE,	/* 151 */
-	OP_RANGE,	/* 152 */
-	OP_FLIP,	/* 153 */
-	OP_FLOP,	/* 154 */
-	OP_AND,		/* 155 */
-	OP_OR,		/* 156 */
-	OP_XOR,		/* 157 */
-	OP_DOR,		/* 158 */
-	OP_COND_EXPR,	/* 159 */
-	OP_ANDASSIGN,	/* 160 */
-	OP_ORASSIGN,	/* 161 */
-	OP_DORASSIGN,	/* 162 */
-	OP_METHOD,	/* 163 */
-	OP_ENTERSUB,	/* 164 */
-	OP_LEAVESUB,	/* 165 */
-	OP_LEAVESUBLV,	/* 166 */
-	OP_CALLER,	/* 167 */
-	OP_WARN,	/* 168 */
-	OP_DIE,		/* 169 */
-	OP_LINESEQ,	/* 170 */
-	OP_NEXTSTATE,	/* 171 */
-	OP_DBSTATE,	/* 172 */
-	OP_UNSTACK,	/* 173 */
-	OP_ENTER,	/* 174 */
-	OP_LEAVE,	/* 175 */
-	OP_SCOPE,	/* 176 */
-	OP_ENTERITER,	/* 177 */
-	OP_ITER,	/* 178 */
-	OP_ENTERLOOP,	/* 179 */
-	OP_LEAVELOOP,	/* 180 */
-	OP_RETURN,	/* 181 */
-	OP_LAST,	/* 182 */
-	OP_NEXT,	/* 183 */
-	OP_REDO,	/* 184 */
-	OP_DUMP,	/* 185 */
-	OP_GOTO,	/* 186 */
-	OP_EXIT,	/* 187 */
-	OP_METHOD_NAMED,/* 188 */
-	OP_ENTERGIVEN,	/* 189 */
-	OP_LEAVEGIVEN,	/* 190 */
-	OP_ENTERWHEN,	/* 191 */
-	OP_LEAVEWHEN,	/* 192 */
-	OP_BREAK,	/* 193 */
-	OP_CONTINUE,	/* 194 */
-	OP_OPEN,	/* 195 */
-	OP_CLOSE,	/* 196 */
-	OP_PIPE_OP,	/* 197 */
-	OP_FILENO,	/* 198 */
-	OP_UMASK,	/* 199 */
-	OP_BINMODE,	/* 200 */
-	OP_TIE,		/* 201 */
-	OP_UNTIE,	/* 202 */
-	OP_TIED,	/* 203 */
-	OP_SSELECT,	/* 204 */
-	OP_SELECT,	/* 205 */
-	OP_GETC,	/* 206 */
-	OP_READ,	/* 207 */
-	OP_PRTF,	/* 208 */
-	OP_PRINT,	/* 209 */
-	OP_SYSOPEN,	/* 210 */
-	OP_SYSSEEK,	/* 211 */
-	OP_SYSREAD,	/* 212 */
-	OP_SYSWRITE,	/* 213 */
-	OP_SEND,	/* 214 */
-	OP_RECV,	/* 215 */
-	OP_EOF,		/* 216 */
-	OP_TELL,	/* 217 */
-	OP_SEEK,	/* 218 */
-	OP_TRUNCATE,	/* 219 */
-	OP_FCNTL,	/* 220 */
-	OP_IOCTL,	/* 221 */
-	OP_FLOCK,	/* 222 */
-	OP_SOCKET,	/* 223 */
-	OP_SOCKPAIR,	/* 224 */
-	OP_BIND,	/* 225 */
-	OP_CONNECT,	/* 226 */
-	OP_LISTEN,	/* 227 */
-	OP_ACCEPT,	/* 228 */
-	OP_SHUTDOWN,	/* 229 */
-	OP_GSOCKOPT,	/* 230 */
-	OP_SSOCKOPT,	/* 231 */
-	OP_GETSOCKNAME,	/* 232 */
-	OP_GETPEERNAME,	/* 233 */
-	OP_LSTAT,	/* 234 */
-	OP_STAT,	/* 235 */
-	OP_FTRREAD,	/* 236 */
-	OP_FTRWRITE,	/* 237 */
-	OP_FTREXEC,	/* 238 */
-	OP_FTEREAD,	/* 239 */
-	OP_FTEWRITE,	/* 240 */
-	OP_FTEEXEC,	/* 241 */
-	OP_FTIS,	/* 242 */
-	OP_FTSIZE,	/* 243 */
-	OP_FTMTIME,	/* 244 */
-	OP_FTATIME,	/* 245 */
-	OP_FTCTIME,	/* 246 */
-	OP_FTROWNED,	/* 247 */
-	OP_FTEOWNED,	/* 248 */
-	OP_FTZERO,	/* 249 */
-	OP_FTSOCK,	/* 250 */
-	OP_FTCHR,	/* 251 */
-	OP_FTBLK,	/* 252 */
-	OP_FTFILE,	/* 253 */
-	OP_FTDIR,	/* 254 */
-	OP_FTPIPE,	/* 255 */
-	OP_FTSUID,	/* 256 */
-	OP_FTSGID,	/* 257 */
-	OP_FTSVTX,	/* 258 */
-	OP_FTLINK,	/* 259 */
-	OP_FTTTY,	/* 260 */
-	OP_FTTEXT,	/* 261 */
-	OP_FTBINARY,	/* 262 */
-	OP_CHDIR,	/* 263 */
-	OP_CHOWN,	/* 264 */
-	OP_CHROOT,	/* 265 */
-	OP_UNLINK,	/* 266 */
-	OP_CHMOD,	/* 267 */
-	OP_UTIME,	/* 268 */
-	OP_RENAME,	/* 269 */
-	OP_LINK,	/* 270 */
-	OP_SYMLINK,	/* 271 */
-	OP_READLINK,	/* 272 */
-	OP_MKDIR,	/* 273 */
-	OP_RMDIR,	/* 274 */
-	OP_OPEN_DIR,	/* 275 */
-	OP_READDIR,	/* 276 */
-	OP_TELLDIR,	/* 277 */
-	OP_SEEKDIR,	/* 278 */
-	OP_REWINDDIR,	/* 279 */
-	OP_CLOSEDIR,	/* 280 */
-	OP_FORK,	/* 281 */
-	OP_WAIT,	/* 282 */
-	OP_WAITPID,	/* 283 */
-	OP_SYSTEM,	/* 284 */
-	OP_EXEC,	/* 285 */
-	OP_KILL,	/* 286 */
-	OP_GETPPID,	/* 287 */
-	OP_GETPGRP,	/* 288 */
-	OP_SETPGRP,	/* 289 */
-	OP_GETPRIORITY,	/* 290 */
-	OP_SETPRIORITY,	/* 291 */
-	OP_TIME,	/* 292 */
-	OP_TMS,		/* 293 */
-	OP_LOCALTIME,	/* 294 */
-	OP_GMTIME,	/* 295 */
-	OP_ALARM,	/* 296 */
-	OP_SLEEP,	/* 297 */
-	OP_SHMGET,	/* 298 */
-	OP_SHMCTL,	/* 299 */
-	OP_SHMREAD,	/* 300 */
-	OP_SHMWRITE,	/* 301 */
-	OP_MSGGET,	/* 302 */
-	OP_MSGCTL,	/* 303 */
-	OP_MSGSND,	/* 304 */
-	OP_MSGRCV,	/* 305 */
-	OP_SEMOP,	/* 306 */
-	OP_SEMGET,	/* 307 */
-	OP_SEMCTL,	/* 308 */
-	OP_REQUIRE,	/* 309 */
-	OP_DOFILE,	/* 310 */
-	OP_ENTEREVAL,	/* 311 */
-	OP_LEAVEEVAL,	/* 312 */
-	OP_ENTERTRY,	/* 313 */
-	OP_LEAVETRY,	/* 314 */
-	OP_GHBYNAME,	/* 315 */
-	OP_GHBYADDR,	/* 316 */
-	OP_GHOSTENT,	/* 317 */
-	OP_GNBYNAME,	/* 318 */
-	OP_GNBYADDR,	/* 319 */
-	OP_GNETENT,	/* 320 */
-	OP_GPBYNAME,	/* 321 */
-	OP_GPBYNUMBER,	/* 322 */
-	OP_GPROTOENT,	/* 323 */
-	OP_GSBYNAME,	/* 324 */
-	OP_GSBYPORT,	/* 325 */
-	OP_GSERVENT,	/* 326 */
-	OP_SHOSTENT,	/* 327 */
-	OP_SNETENT,	/* 328 */
-	OP_SPROTOENT,	/* 329 */
-	OP_SSERVENT,	/* 330 */
-	OP_EHOSTENT,	/* 331 */
-	OP_ENETENT,	/* 332 */
-	OP_EPROTOENT,	/* 333 */
-	OP_ESERVENT,	/* 334 */
-	OP_GPWNAM,	/* 335 */
-	OP_GPWUID,	/* 336 */
-	OP_GPWENT,	/* 337 */
-	OP_SPWENT,	/* 338 */
-	OP_EPWENT,	/* 339 */
-	OP_GGRNAM,	/* 340 */
-	OP_GGRGID,	/* 341 */
-	OP_GGRENT,	/* 342 */
-	OP_SGRENT,	/* 343 */
-	OP_EGRENT,	/* 344 */
-	OP_GETLOGIN,	/* 345 */
-	OP_SYSCALL,	/* 346 */
-	OP_LOCK,	/* 347 */
-	OP_COMPSUB,	/* 348 */
-	OP_CUSTOM,	/* 349 */
+	OP_NULL		 = 0,
+	OP_STUB		 = 1,
+	OP_SCALAR	 = 2,
+	OP_PUSHMARK	 = 3,
+	OP_WANTARRAY	 = 4,
+	OP_CONST	 = 5,
+	OP_GVSV		 = 6,
+	OP_GV		 = 7,
+	OP_GELEM	 = 8,
+	OP_PADSV	 = 9,
+	OP_PADAV	 = 10,
+	OP_PADHV	 = 11,
+	OP_PADANY	 = 12,
+	OP_PUSHRE	 = 13,
+	OP_RV2GV	 = 14,
+	OP_RV2SV	 = 15,
+	OP_AV2ARYLEN	 = 16,
+	OP_RV2CV	 = 17,
+	OP_ANONCODE	 = 18,
+	OP_PROTOTYPE	 = 19,
+	OP_REFGEN	 = 20,
+	OP_SREFGEN	 = 21,
+	OP_REF		 = 22,
+	OP_BLESS	 = 23,
+	OP_BACKTICK	 = 24,
+	OP_GLOB		 = 25,
+	OP_READLINE	 = 26,
+	OP_RCATLINE	 = 27,
+	OP_REGCMAYBE	 = 28,
+	OP_REGCRESET	 = 29,
+	OP_REGCOMP	 = 30,
+	OP_MATCH	 = 31,
+	OP_QR		 = 32,
+	OP_SUBST	 = 33,
+	OP_SUBSTCONT	 = 34,
+	OP_TRANS	 = 35,
+	OP_SASSIGN	 = 36,
+	OP_AASSIGN	 = 37,
+	OP_CHOP		 = 38,
+	OP_SCHOP	 = 39,
+	OP_CHOMP	 = 40,
+	OP_SCHOMP	 = 41,
+	OP_DEFINED	 = 42,
+	OP_UNDEF	 = 43,
+	OP_STUDY	 = 44,
+	OP_POS		 = 45,
+	OP_PREINC	 = 46,
+	OP_I_PREINC	 = 47,
+	OP_PREDEC	 = 48,
+	OP_I_PREDEC	 = 49,
+	OP_POSTINC	 = 50,
+	OP_I_POSTINC	 = 51,
+	OP_POSTDEC	 = 52,
+	OP_I_POSTDEC	 = 53,
+	OP_POW		 = 54,
+	OP_MULTIPLY	 = 55,
+	OP_I_MULTIPLY	 = 56,
+	OP_DIVIDE	 = 57,
+	OP_I_DIVIDE	 = 58,
+	OP_MODULO	 = 59,
+	OP_I_MODULO	 = 60,
+	OP_REPEAT	 = 61,
+	OP_ADD		 = 62,
+	OP_I_ADD	 = 63,
+	OP_SUBTRACT	 = 64,
+	OP_I_SUBTRACT	 = 65,
+	OP_CONCAT	 = 66,
+	OP_STRINGIFY	 = 67,
+	OP_LEFT_SHIFT	 = 68,
+	OP_RIGHT_SHIFT	 = 69,
+	OP_LT		 = 70,
+	OP_I_LT		 = 71,
+	OP_GT		 = 72,
+	OP_I_GT		 = 73,
+	OP_LE		 = 74,
+	OP_I_LE		 = 75,
+	OP_GE		 = 76,
+	OP_I_GE		 = 77,
+	OP_EQ		 = 78,
+	OP_I_EQ		 = 79,
+	OP_NE		 = 80,
+	OP_I_NE		 = 81,
+	OP_NCMP		 = 82,
+	OP_I_NCMP	 = 83,
+	OP_SEQ		 = 84,
+	OP_SNE		 = 85,
+	OP_SCMP		 = 86,
+	OP_BIT_AND	 = 87,
+	OP_BIT_XOR	 = 88,
+	OP_BIT_OR	 = 89,
+	OP_NEGATE	 = 90,
+	OP_I_NEGATE	 = 91,
+	OP_NOT		 = 92,
+	OP_COMPLEMENT	 = 93,
+	OP_SMARTMATCH	 = 94,
+	OP_ATAN2	 = 95,
+	OP_SIN		 = 96,
+	OP_COS		 = 97,
+	OP_RAND		 = 98,
+	OP_SRAND	 = 99,
+	OP_EXP		 = 100,
+	OP_LOG		 = 101,
+	OP_SQRT		 = 102,
+	OP_INT		 = 103,
+	OP_HEX		 = 104,
+	OP_OCT		 = 105,
+	OP_ABS		 = 106,
+	OP_LENGTH	 = 107,
+	OP_SUBSTR	 = 108,
+	OP_VEC		 = 109,
+	OP_INDEX	 = 110,
+	OP_RINDEX	 = 111,
+	OP_SPRINTF	 = 112,
+	OP_ORD		 = 113,
+	OP_CHR		 = 114,
+	OP_CRYPT	 = 115,
+	OP_UCFIRST	 = 116,
+	OP_LCFIRST	 = 117,
+	OP_UC		 = 118,
+	OP_LC		 = 119,
+	OP_QUOTEMETA	 = 120,
+	OP_RV2AV	 = 121,
+	OP_AELEMFAST	 = 122,
+	OP_AELEM	 = 123,
+	OP_ASLICE	 = 124,
+	OP_EACH		 = 125,
+	OP_VALUES	 = 126,
+	OP_KEYS		 = 127,
+	OP_DELETE	 = 128,
+	OP_EXISTS	 = 129,
+	OP_RV2HV	 = 130,
+	OP_HELEM	 = 131,
+	OP_HSLICE	 = 132,
+	OP_UNPACK	 = 133,
+	OP_PACK		 = 134,
+	OP_SPLIT	 = 135,
+	OP_JOIN		 = 136,
+	OP_LIST		 = 137,
+	OP_LSLICE	 = 138,
+	OP_ANONLIST	 = 139,
+	OP_ANONHASH	 = 140,
+	OP_SPLICE	 = 141,
+	OP_PUSH		 = 142,
+	OP_POP		 = 143,
+	OP_SHIFT	 = 144,
+	OP_UNSHIFT	 = 145,
+	OP_SORT		 = 146,
+	OP_REVERSE	 = 147,
+	OP_GREPSTART	 = 148,
+	OP_GREPWHILE	 = 149,
+	OP_MAPSTART	 = 150,
+	OP_MAPWHILE	 = 151,
+	OP_RANGE	 = 152,
+	OP_FLIP		 = 153,
+	OP_FLOP		 = 154,
+	OP_AND		 = 155,
+	OP_OR		 = 156,
+	OP_XOR		 = 157,
+	OP_DOR		 = 158,
+	OP_COND_EXPR	 = 159,
+	OP_ANDASSIGN	 = 160,
+	OP_ORASSIGN	 = 161,
+	OP_DORASSIGN	 = 162,
+	OP_METHOD	 = 163,
+	OP_ENTERSUB	 = 164,
+	OP_LEAVESUB	 = 165,
+	OP_LEAVESUBLV	 = 166,
+	OP_CALLER	 = 167,
+	OP_WARN		 = 168,
+	OP_DIE		 = 169,
+	OP_LINESEQ	 = 170,
+	OP_NEXTSTATE	 = 171,
+	OP_DBSTATE	 = 172,
+	OP_UNSTACK	 = 173,
+	OP_ENTER	 = 174,
+	OP_LEAVE	 = 175,
+	OP_SCOPE	 = 176,
+	OP_ENTERITER	 = 177,
+	OP_ITER		 = 178,
+	OP_ENTERLOOP	 = 179,
+	OP_LEAVELOOP	 = 180,
+	OP_RETURN	 = 181,
+	OP_LAST		 = 182,
+	OP_NEXT		 = 183,
+	OP_REDO		 = 184,
+	OP_DUMP		 = 185,
+	OP_GOTO		 = 186,
+	OP_EXIT		 = 187,
+	OP_METHOD_NAMED	 = 188,
+	OP_ENTERGIVEN	 = 189,
+	OP_LEAVEGIVEN	 = 190,
+	OP_ENTERWHEN	 = 191,
+	OP_LEAVEWHEN	 = 192,
+	OP_BREAK	 = 193,
+	OP_CONTINUE	 = 194,
+	OP_OPEN		 = 195,
+	OP_CLOSE	 = 196,
+	OP_PIPE_OP	 = 197,
+	OP_FILENO	 = 198,
+	OP_UMASK	 = 199,
+	OP_BINMODE	 = 200,
+	OP_TIE		 = 201,
+	OP_UNTIE	 = 202,
+	OP_TIED		 = 203,
+	OP_SSELECT	 = 204,
+	OP_SELECT	 = 205,
+	OP_GETC		 = 206,
+	OP_READ		 = 207,
+	OP_PRTF		 = 208,
+	OP_PRINT	 = 209,
+	OP_SYSOPEN	 = 210,
+	OP_SYSSEEK	 = 211,
+	OP_SYSREAD	 = 212,
+	OP_SYSWRITE	 = 213,
+	OP_EOF		 = 214,
+	OP_TELL		 = 215,
+	OP_SEEK		 = 216,
+	OP_TRUNCATE	 = 217,
+	OP_FCNTL	 = 218,
+	OP_IOCTL	 = 219,
+	OP_FLOCK	 = 220,
+	OP_SEND		 = 221,
+	OP_RECV		 = 222,
+	OP_SOCKET	 = 223,
+	OP_SOCKPAIR	 = 224,
+	OP_BIND		 = 225,
+	OP_CONNECT	 = 226,
+	OP_LISTEN	 = 227,
+	OP_ACCEPT	 = 228,
+	OP_SHUTDOWN	 = 229,
+	OP_GSOCKOPT	 = 230,
+	OP_SSOCKOPT	 = 231,
+	OP_GETSOCKNAME	 = 232,
+	OP_GETPEERNAME	 = 233,
+	OP_LSTAT	 = 234,
+	OP_STAT		 = 235,
+	OP_FTRREAD	 = 236,
+	OP_FTRWRITE	 = 237,
+	OP_FTREXEC	 = 238,
+	OP_FTEREAD	 = 239,
+	OP_FTEWRITE	 = 240,
+	OP_FTEEXEC	 = 241,
+	OP_FTIS		 = 242,
+	OP_FTSIZE	 = 243,
+	OP_FTMTIME	 = 244,
+	OP_FTATIME	 = 245,
+	OP_FTCTIME	 = 246,
+	OP_FTROWNED	 = 247,
+	OP_FTEOWNED	 = 248,
+	OP_FTZERO	 = 249,
+	OP_FTSOCK	 = 250,
+	OP_FTCHR	 = 251,
+	OP_FTBLK	 = 252,
+	OP_FTFILE	 = 253,
+	OP_FTDIR	 = 254,
+	OP_FTPIPE	 = 255,
+	OP_FTSUID	 = 256,
+	OP_FTSGID	 = 257,
+	OP_FTSVTX	 = 258,
+	OP_FTLINK	 = 259,
+	OP_FTTTY	 = 260,
+	OP_FTTEXT	 = 261,
+	OP_FTBINARY	 = 262,
+	OP_CHDIR	 = 263,
+	OP_CHOWN	 = 264,
+	OP_CHROOT	 = 265,
+	OP_UNLINK	 = 266,
+	OP_CHMOD	 = 267,
+	OP_UTIME	 = 268,
+	OP_RENAME	 = 269,
+	OP_LINK		 = 270,
+	OP_SYMLINK	 = 271,
+	OP_READLINK	 = 272,
+	OP_MKDIR	 = 273,
+	OP_RMDIR	 = 274,
+	OP_OPEN_DIR	 = 275,
+	OP_READDIR	 = 276,
+	OP_TELLDIR	 = 277,
+	OP_SEEKDIR	 = 278,
+	OP_REWINDDIR	 = 279,
+	OP_CLOSEDIR	 = 280,
+	OP_FORK		 = 281,
+	OP_WAIT		 = 282,
+	OP_WAITPID	 = 283,
+	OP_SYSTEM	 = 284,
+	OP_EXEC		 = 285,
+	OP_KILL		 = 286,
+	OP_GETPPID	 = 287,
+	OP_GETPGRP	 = 288,
+	OP_SETPGRP	 = 289,
+	OP_GETPRIORITY	 = 290,
+	OP_SETPRIORITY	 = 291,
+	OP_TIME		 = 292,
+	OP_TMS		 = 293,
+	OP_LOCALTIME	 = 294,
+	OP_GMTIME	 = 295,
+	OP_ALARM	 = 296,
+	OP_SLEEP	 = 297,
+	OP_SHMGET	 = 298,
+	OP_SHMCTL	 = 299,
+	OP_SHMREAD	 = 300,
+	OP_SHMWRITE	 = 301,
+	OP_MSGGET	 = 302,
+	OP_MSGCTL	 = 303,
+	OP_MSGSND	 = 304,
+	OP_MSGRCV	 = 305,
+	OP_SEMOP	 = 306,
+	OP_SEMGET	 = 307,
+	OP_SEMCTL	 = 308,
+	OP_REQUIRE	 = 309,
+	OP_DOFILE	 = 310,
+	OP_ENTEREVAL	 = 311,
+	OP_LEAVEEVAL	 = 312,
+	OP_ENTERTRY	 = 313,
+	OP_LEAVETRY	 = 314,
+	OP_GHBYNAME	 = 315,
+	OP_GHBYADDR	 = 316,
+	OP_GHOSTENT	 = 317,
+	OP_GNBYNAME	 = 318,
+	OP_GNBYADDR	 = 319,
+	OP_GNETENT	 = 320,
+	OP_GPBYNAME	 = 321,
+	OP_GPBYNUMBER	 = 322,
+	OP_GPROTOENT	 = 323,
+	OP_GSBYNAME	 = 324,
+	OP_GSBYPORT	 = 325,
+	OP_GSERVENT	 = 326,
+	OP_SHOSTENT	 = 327,
+	OP_SNETENT	 = 328,
+	OP_SPROTOENT	 = 329,
+	OP_SSERVENT	 = 330,
+	OP_EHOSTENT	 = 331,
+	OP_ENETENT	 = 332,
+	OP_EPROTOENT	 = 333,
+	OP_ESERVENT	 = 334,
+	OP_GPWNAM	 = 335,
+	OP_GPWUID	 = 336,
+	OP_GPWENT	 = 337,
+	OP_SPWENT	 = 338,
+	OP_EPWENT	 = 339,
+	OP_GGRNAM	 = 340,
+	OP_GGRGID	 = 341,
+	OP_GGRENT	 = 342,
+	OP_SGRENT	 = 343,
+	OP_EGRENT	 = 344,
+	OP_GETLOGIN	 = 345,
+	OP_SYSCALL	 = 346,
+	OP_LOCK		 = 347,
+	OP_COMPSUB	 = 348,
+	OP_CUSTOM	 = 349,
 	OP_max		
 } opcode;
 
@@ -373,49 +373,14 @@ typedef enum opcode {
 #define OP_phoney_OUTPUT_ONLY -2
 
 
-#define OP_IS_SOCKET(op)	\
-	((op) == OP_ACCEPT || \
-	 (op) == OP_BIND || \
-	 (op) == OP_CONNECT || \
-	 (op) == OP_GETPEERNAME || \
-	 (op) == OP_GETSOCKNAME || \
-	 (op) == OP_GSOCKOPT || \
-	 (op) == OP_LISTEN || \
-	 (op) == OP_RECV || \
-	 (op) == OP_SEND || \
-	 (op) == OP_SHUTDOWN || \
-	 (op) == OP_SOCKET || \
-	 (op) == OP_SOCKPAIR || \
-	 (op) == OP_SSOCKOPT)
+/* the OP_IS_(SOCKET|FILETEST) macros are optimized to a simple range
+    check because all the member OPs are contiguous in opcode.pl
+    <DATA> table.  opcode.pl verifies the range contiguity.  */
 
+#define OP_IS_SOCKET(op)	\
+	((op) >= OP_SEND && (op) <= OP_GETPEERNAME)
 
 #define OP_IS_FILETEST(op)	\
-	((op) == OP_FTATIME || \
-	 (op) == OP_FTBINARY || \
-	 (op) == OP_FTBLK || \
-	 (op) == OP_FTCHR || \
-	 (op) == OP_FTCTIME || \
-	 (op) == OP_FTDIR || \
-	 (op) == OP_FTEEXEC || \
-	 (op) == OP_FTEOWNED || \
-	 (op) == OP_FTEREAD || \
-	 (op) == OP_FTEWRITE || \
-	 (op) == OP_FTFILE || \
-	 (op) == OP_FTIS || \
-	 (op) == OP_FTLINK || \
-	 (op) == OP_FTMTIME || \
-	 (op) == OP_FTPIPE || \
-	 (op) == OP_FTREXEC || \
-	 (op) == OP_FTROWNED || \
-	 (op) == OP_FTRREAD || \
-	 (op) == OP_FTRWRITE || \
-	 (op) == OP_FTSGID || \
-	 (op) == OP_FTSIZE || \
-	 (op) == OP_FTSOCK || \
-	 (op) == OP_FTSUID || \
-	 (op) == OP_FTSVTX || \
-	 (op) == OP_FTTEXT || \
-	 (op) == OP_FTTTY || \
-	 (op) == OP_FTZERO)
+	((op) >= OP_FTRREAD && (op) <= OP_FTBINARY)
 
 /* ex: set ro: */
