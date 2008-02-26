@@ -645,7 +645,8 @@ S_dopoptolabel(pTHX_ const char *label)
 	    if (CxTYPE(cx) == CXt_NULL)
 		return -1;
 	    break;
-	case CXt_LOOP_STACK:
+	case CXt_LOOP_LAZYIV:
+	case CXt_LOOP_LAZYSV:
 	case CXt_LOOP_FOR:
 	case CXt_LOOP_PLAIN:
 	    if ( !CxLABEL(cx) || strNE(label, CxLABEL(cx)) ) {
@@ -747,7 +748,8 @@ S_dopoptoloop(pTHX_ I32 startingblock)
 	    if ((CxTYPE(cx)) == CXt_NULL)
 		return -1;
 	    break;
-	case CXt_LOOP_STACK:
+	case CXt_LOOP_LAZYIV:
+	case CXt_LOOP_LAZYSV:
 	case CXt_LOOP_FOR:
 	case CXt_LOOP_PLAIN:
 	    DEBUG_l( Perl_deb(aTHX_ "(Found loop #%ld)\n", (long)i));
@@ -773,7 +775,8 @@ S_dopoptogiven(pTHX_ I32 startingblock)
 	case CXt_LOOP_PLAIN:
 	    assert(!CxFOREACHDEF(cx));
 	    break;
-	case CXt_LOOP_STACK:
+	case CXt_LOOP_LAZYIV:
+	case CXt_LOOP_LAZYSV:
 	case CXt_LOOP_FOR:
 	    if (CxFOREACHDEF(cx)) {
 		DEBUG_l( Perl_deb(aTHX_ "(Found foreach #%ld)\n", (long)i));
@@ -825,7 +828,8 @@ Perl_dounwind(pTHX_ I32 cxix)
 	case CXt_EVAL:
 	    POPEVAL(cx);
 	    break;
-	case CXt_LOOP_STACK:
+	case CXt_LOOP_LAZYIV:
+	case CXt_LOOP_LAZYSV:
 	case CXt_LOOP_FOR:
 	case CXt_LOOP_PLAIN:
 	    POPLOOP(cx);
@@ -1168,9 +1172,9 @@ PP(pp_enteriter)
     register PERL_CONTEXT *cx;
     const I32 gimme = GIMME_V;
     SV **svp;
-    U16 cxtype = 0;
+    U8 cxtype = CXt_LOOP_FOR;
 #ifdef USE_ITHREADS
-    void *iterdata;
+    PAD *iterdata;
 #endif
 
     ENTER;
@@ -1182,13 +1186,11 @@ PP(pp_enteriter)
 	    SAVESETSVFLAGS(PAD_SVl(PL_op->op_targ),
 		    SVs_PADSTALE, SVs_PADSTALE);
 	}
+	SAVEPADSVANDMORTALIZE(PL_op->op_targ);
 #ifndef USE_ITHREADS
 	svp = &PAD_SVl(PL_op->op_targ);		/* "my" variable */
-	SAVESPTR(*svp);
 #else
-	SAVEPADSV(PL_op->op_targ);
-	iterdata = INT2PTR(void*, PL_op->op_targ);
-	cxtype |= CXp_PADVAR;
+	iterdata = NULL;
 #endif
     }
     else {
@@ -1197,7 +1199,7 @@ PP(pp_enteriter)
 	SAVEGENERICSV(*svp);
 	*svp = newSV(0);
 #ifdef USE_ITHREADS
-	iterdata = (void*)gv;
+	iterdata = (PAD*)gv;
 #endif
     }
 
@@ -1206,21 +1208,25 @@ PP(pp_enteriter)
 
     ENTER;
 
-    cxtype |= (PL_op->op_flags & OPf_STACKED) ? CXt_LOOP_FOR : CXt_LOOP_STACK;
     PUSHBLOCK(cx, cxtype, SP);
 #ifdef USE_ITHREADS
-    PUSHLOOP_FOR(cx, iterdata, MARK);
+    PUSHLOOP_FOR(cx, iterdata, MARK, PL_op->op_targ);
 #else
-    PUSHLOOP_FOR(cx, svp, MARK);
+    PUSHLOOP_FOR(cx, svp, MARK, /*Not used*/);
 #endif
     if (PL_op->op_flags & OPf_STACKED) {
-	cx->blk_loop.iterary = (AV*)SvREFCNT_inc(POPs);
-	if (SvTYPE(cx->blk_loop.iterary) != SVt_PVAV) {
+	SV *maybe_ary = POPs;
+	if (SvTYPE(maybe_ary) != SVt_PVAV) {
 	    dPOPss;
-	    SV * const right = (SV*)cx->blk_loop.iterary;
+	    SV * const right = maybe_ary;
 	    SvGETMAGIC(sv);
 	    SvGETMAGIC(right);
 	    if (RANGE_IS_NUMERIC(sv,right)) {
+		cx->cx_type &= ~CXTYPEMASK;
+		cx->cx_type |= CXt_LOOP_LAZYIV;
+		/* Make sure that no-one re-orders cop.h and breaks our
+		   assumptions */
+		assert(CxTYPE(cx) == CXt_LOOP_LAZYIV);
 #ifdef NV_PRESERVES_UV
 		if ((SvOK(sv) && ((SvNV(sv) < (NV)IV_MIN) ||
 				  (SvNV(sv) > (NV)IV_MAX)))
@@ -1241,33 +1247,50 @@ PP(pp_enteriter)
 					 (SvNV(right) > (NV)UV_MAX))))))
 #endif
 		    DIE(aTHX_ "Range iterator outside integer range");
-		cx->blk_loop.iterix = SvIV(sv);
-		cx->blk_loop.itermax = SvIV(right);
+		cx->blk_loop.state_u.lazyiv.cur = SvIV(sv);
+		cx->blk_loop.state_u.lazyiv.end = SvIV(right);
 #ifdef DEBUGGING
 		/* for correct -Dstv display */
 		cx->blk_oldsp = sp - PL_stack_base;
 #endif
 	    }
 	    else {
-		cx->blk_loop.iterlval = newSVsv(sv);
-		(void) SvPV_force_nolen(cx->blk_loop.iterlval);
+		cx->cx_type &= ~CXTYPEMASK;
+		cx->cx_type |= CXt_LOOP_LAZYSV;
+		/* Make sure that no-one re-orders cop.h and breaks our
+		   assumptions */
+		assert(CxTYPE(cx) == CXt_LOOP_LAZYSV);
+		cx->blk_loop.state_u.lazysv.cur = newSVsv(sv);
+		cx->blk_loop.state_u.lazysv.end = right;
+		SvREFCNT_inc(right);
+		(void) SvPV_force_nolen(cx->blk_loop.state_u.lazysv.cur);
+		/* This will do the upgrade to SVt_PV, and warn if the value
+		   is uninitialised.  */
 		(void) SvPV_nolen_const(right);
+		/* Doing this avoids a check every time in pp_iter in pp_hot.c
+		   to replace !SvOK() with a pointer to "".  */
+		if (!SvOK(right)) {
+		    SvREFCNT_dec(right);
+		    cx->blk_loop.state_u.lazysv.end = &PL_sv_no;
+		}
 	    }
 	}
-	else if (PL_op->op_private & OPpITER_REVERSED) {
-	    cx->blk_loop.itermax = 0xDEADBEEF;
-	    cx->blk_loop.iterix = AvFILL(cx->blk_loop.iterary) + 1;
-
+	else /* SvTYPE(maybe_ary) == SVt_PVAV */ {
+	    cx->blk_loop.state_u.ary.ary = (AV*)maybe_ary;
+	    SvREFCNT_inc(maybe_ary);
+	    cx->blk_loop.state_u.ary.ix =
+		(PL_op->op_private & OPpITER_REVERSED) ?
+		AvFILL(cx->blk_loop.state_u.ary.ary) + 1 :
+		-1;
 	}
     }
-    else {
-	cx->blk_loop.iterary = (SV*)0xDEADBEEF;
+    else { /* iterating over items on the stack */
+	cx->blk_loop.state_u.ary.ary = NULL; /* means to use the stack */
 	if (PL_op->op_private & OPpITER_REVERSED) {
-	    cx->blk_loop.itermax = MARK - PL_stack_base + 1;
-	    cx->blk_loop.iterix = cx->blk_oldsp + 1;
+	    cx->blk_loop.state_u.ary.ix = cx->blk_oldsp + 1;
 	}
 	else {
-	    cx->blk_loop.iterix = MARK - PL_stack_base;
+	    cx->blk_loop.state_u.ary.ix = MARK - PL_stack_base;
 	}
     }
 
@@ -1483,7 +1506,8 @@ PP(pp_last)
     cxstack_ix++; /* temporarily protect top context */
     mark = newsp;
     switch (CxTYPE(cx)) {
-    case CXt_LOOP_STACK:
+    case CXt_LOOP_LAZYIV:
+    case CXt_LOOP_LAZYSV:
     case CXt_LOOP_FOR:
     case CXt_LOOP_PLAIN:
 	pop2 = CxTYPE(cx);
@@ -1524,8 +1548,9 @@ PP(pp_last)
     cxstack_ix--;
     /* Stack values are safe: */
     switch (pop2) {
+    case CXt_LOOP_LAZYIV:
     case CXt_LOOP_PLAIN:
-    case CXt_LOOP_STACK:
+    case CXt_LOOP_LAZYSV:
     case CXt_LOOP_FOR:
 	POPLOOP(cx);	/* release loop vars ... */
 	LEAVE;
@@ -1879,7 +1904,8 @@ PP(pp_goto)
 		    break;
                 }
                 /* else fall through */
-	    case CXt_LOOP_STACK:
+	    case CXt_LOOP_LAZYIV:
+	    case CXt_LOOP_LAZYSV:
 	    case CXt_LOOP_FOR:
 	    case CXt_LOOP_PLAIN:
 		gotoprobe = cx->blk_oldcop->op_sibling;
