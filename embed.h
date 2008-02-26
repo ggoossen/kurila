@@ -175,7 +175,7 @@
 #define do_exec			Perl_do_exec
 #endif
 #endif
-#if defined(WIN32) || defined(__SYMBIAN32__)
+#if defined(WIN32) || defined(__SYMBIAN32__) || defined(VMS)
 #define do_aspawn		Perl_do_aspawn
 #define do_spawn		Perl_do_spawn
 #define do_spawn_nowait		Perl_do_spawn_nowait
@@ -1160,7 +1160,6 @@
 #define ck_grep			Perl_ck_grep
 #define ck_index		Perl_ck_index
 #define ck_join			Perl_ck_join
-#define ck_lengthconst		Perl_ck_lengthconst
 #define ck_lfun			Perl_ck_lfun
 #define ck_listiob		Perl_ck_listiob
 #define ck_match		Perl_ck_match
@@ -1931,7 +1930,6 @@
 #define ck_glob			Perl_ck_glob
 #define ck_grep			Perl_ck_grep
 #define ck_index		Perl_ck_index
-#define ck_lengthconst		Perl_ck_lengthconst
 #define ck_lfun			Perl_ck_lfun
 #define ck_listiob		Perl_ck_listiob
 #define ck_match		Perl_ck_match
@@ -2099,6 +2097,7 @@
 #define pp_gvsv			Perl_pp_gvsv
 #define pp_helem		Perl_pp_helem
 #define pp_hex			Perl_pp_hex
+#define pp_hintseval		Perl_pp_hintseval
 #define pp_hslice		Perl_pp_hslice
 #define pp_i_add		Perl_pp_i_add
 #define pp_i_divide		Perl_pp_i_divide
@@ -2435,7 +2434,7 @@
 #define do_exec(a)		Perl_do_exec(aTHX_ a)
 #endif
 #endif
-#if defined(WIN32) || defined(__SYMBIAN32__)
+#if defined(WIN32) || defined(__SYMBIAN32__) || defined(VMS)
 #define do_aspawn(a,b,c)	Perl_do_aspawn(aTHX_ a,b,c)
 #define do_spawn(a)		Perl_do_spawn(aTHX_ a)
 #define do_spawn_nowait(a)	Perl_do_spawn_nowait(aTHX_ a)
@@ -3416,7 +3415,6 @@
 #define ck_grep(a)		Perl_ck_grep(aTHX_ a)
 #define ck_index(a)		Perl_ck_index(aTHX_ a)
 #define ck_join(a)		Perl_ck_join(aTHX_ a)
-#define ck_lengthconst(a)	Perl_ck_lengthconst(aTHX_ a)
 #define ck_lfun(a)		Perl_ck_lfun(aTHX_ a)
 #define ck_listiob(a)		Perl_ck_listiob(aTHX_ a)
 #define ck_match(a)		Perl_ck_match(aTHX_ a)
@@ -4204,7 +4202,6 @@
 #define ck_glob(a)		Perl_ck_glob(aTHX_ a)
 #define ck_grep(a)		Perl_ck_grep(aTHX_ a)
 #define ck_index(a)		Perl_ck_index(aTHX_ a)
-#define ck_lengthconst(a)	Perl_ck_lengthconst(aTHX_ a)
 #define ck_lfun(a)		Perl_ck_lfun(aTHX_ a)
 #define ck_listiob(a)		Perl_ck_listiob(aTHX_ a)
 #define ck_match(a)		Perl_ck_match(aTHX_ a)
@@ -4372,6 +4369,7 @@
 #define pp_gvsv()		Perl_pp_gvsv(aTHX)
 #define pp_helem()		Perl_pp_helem(aTHX)
 #define pp_hex()		Perl_pp_hex(aTHX)
+#define pp_hintseval()		Perl_pp_hintseval(aTHX)
 #define pp_hslice()		Perl_pp_hslice(aTHX)
 #define pp_i_add()		Perl_pp_i_add(aTHX)
 #define pp_i_divide()		Perl_pp_i_divide(aTHX)

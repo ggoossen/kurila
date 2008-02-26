@@ -112,8 +112,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPf_STACKED	64	/* Some arg is arriving on the stack. */
 #define OPf_SPECIAL	128	/* Do something weird for this op: */
 				/*  On local LVAL, don't init local value. */
-				/*  On OP_CONST, value is the hints hash for
-				    eval, so return a copy from pp_const() */
 				/*  On OP_SORT, subroutine is inlined. */
 				/*  On OP_NOT, inversion was implicit. */
 				/*  On OP_LEAVE, don't restore curpm. */
@@ -267,13 +265,6 @@ Deprecated.  Use C<GIMME_V> instead.
 /* Private for OP_FTXXX */
 #define OPpFT_ACCESS		2	/* use filetest 'access' */
 #define OPpFT_STACKED		4	/* stacked filetest, as in "-f -x $f" */
-#define OP_IS_FILETEST_ACCESS(op) 		\
-	(((op)->op_type) == OP_FTRREAD  ||	\
-	 ((op)->op_type) == OP_FTRWRITE ||	\
-	 ((op)->op_type) == OP_FTREXEC  ||	\
-	 ((op)->op_type) == OP_FTEREAD  ||	\
-	 ((op)->op_type) == OP_FTEWRITE ||	\
-	 ((op)->op_type) == OP_FTEEXEC)
 
 /* Private for OP_(MAP|GREP)(WHILE|START) */
 #define OPpGREP_LEX		2	/* iterate over lexical $_ */

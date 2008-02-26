@@ -207,7 +207,7 @@ pmb	|bool	|do_exec	|NN const char* cmd
 p	|bool	|do_exec	|NN const char* cmd
 #endif
 
-#if defined(WIN32) || defined(__SYMBIAN32__)
+#if defined(WIN32) || defined(__SYMBIAN32__) || defined(VMS)
 Ap	|int	|do_aspawn	|NULLOK SV* really|NN SV** mark|NN SV** sp
 Ap	|int	|do_spawn	|NN char* cmd
 Ap	|int	|do_spawn_nowait|NN char* cmd
@@ -1177,7 +1177,6 @@ pR	|OP*	|ck_glob	|NN OP *o
 pR	|OP*	|ck_grep	|NN OP *o
 pR	|OP*	|ck_index	|NN OP *o
 pR	|OP*	|ck_join	|NN OP *o
-pR	|OP*	|ck_lengthconst	|NN OP *o
 pR	|OP*	|ck_lfun	|NN OP *o
 pR	|OP*	|ck_listiob	|NN OP *o
 pR	|OP*	|ck_match	|NN OP *o

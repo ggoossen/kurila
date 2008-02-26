@@ -574,7 +574,7 @@ PERL_CALLCONV bool	Perl_do_exec(pTHX_ const char* cmd)
 
 #endif
 
-#if defined(WIN32) || defined(__SYMBIAN32__)
+#if defined(WIN32) || defined(__SYMBIAN32__) || defined(VMS)
 PERL_CALLCONV int	Perl_do_aspawn(pTHX_ SV* really, SV** mark, SV** sp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
@@ -4321,12 +4321,6 @@ PERL_CALLCONV OP*	Perl_ck_join(pTHX_ OP *o)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CK_JOIN	\
-	assert(o)
-
-PERL_CALLCONV OP*	Perl_ck_lengthconst(pTHX_ OP *o)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CK_LENGTHCONST	\
 	assert(o)
 
 PERL_CALLCONV OP*	Perl_ck_lfun(pTHX_ OP *o)

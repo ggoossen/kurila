@@ -114,7 +114,7 @@ threads->create(sub {
             print $@ && $@->{description} =~ m/disallowed/
               ? '' : 'not ', "ok $test # TODO $TODO - unique_hash\n";
         } else {
-            print("ok $test # Skip $TODO - unique_hash\n");
+            print("ok $test # skip: $TODO - unique_hash\n");
         }
         $test++;
     })->join;

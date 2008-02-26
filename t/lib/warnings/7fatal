@@ -295,7 +295,8 @@ time ;
 
 {
     use warnings FATAL => qw(void) ;
-    length "abc" ;
+    $a = "abc";
+    length $a ;
 }
 
 join "", 1,2,3 ;
@@ -303,7 +304,7 @@ join "", 1,2,3 ;
 print "done\n" ;
 EXPECT
 Useless use of time in void context at - line 4.
-Useless use of length in void context at - line 8.
+Useless use of length in void context at - line 9.
 ########
 # TODO ? !$Config{usethreads} && $::UTF8 && ($ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
 
@@ -313,7 +314,8 @@ time ;
 
 {
     use warnings FATAL => qw(void) ;
-    length "abc" ;
+    $a = "abc";
+    length $a ;
 }
 
 join "", 1,2,3 ;
@@ -321,7 +323,7 @@ join "", 1,2,3 ;
 print "done\n" ;
 EXPECT
 Useless use of time in void context at - line 4.
-Useless use of length in void context at - line 8.
+Useless use of length in void context at - line 9.
 ########
 
 use warnings FATAL => 'all';
@@ -372,35 +374,39 @@ Use of uninitialized value $b in scalar chop at - line 7.
 
 use warnings FATAL => 'syntax', NONFATAL => 'void' ;
 
-length "abc";
+$a = "abc";
+length $a;
 print STDERR "The End.\n" ;
 EXPECT
-Useless use of length in void context at - line 4.
+Useless use of length in void context at - line 5.
 The End.
 ########
 
 use warnings FATAL => 'all', NONFATAL => 'void' ;
 
-length "abc";
+$a = "abc";
+length $a;
 print STDERR "The End.\n" ;
 EXPECT
-Useless use of length in void context at - line 4.
+Useless use of length in void context at - line 5.
 The End.
 ########
 
 use warnings FATAL => 'all', NONFATAL => 'void' ;
 
 my $a ; chomp $a;
-length "abc";
+
+$b = "abc" ;
+length $b;
 print STDERR "The End.\n" ;
 EXPECT
-Useless use of length in void context at - line 5.
+Useless use of length in void context at - line 7.
 Use of uninitialized value $a in scalar chomp at - line 4.
 ########
 
 use warnings FATAL => 'void', NONFATAL => 'void' ;
-
-length "abc";
+$a = "abc";
+length $a;
 print STDERR "The End.\n" ;
 EXPECT
 Useless use of length in void context at - line 4.
@@ -409,8 +415,8 @@ The End.
 # TODO ? !$Config{usethreads} && $::UTF8 && ($ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
 
 use warnings NONFATAL => 'void', FATAL => 'void' ;
-
-length "abc";
+$a = "abc";
+length $a;
 print STDERR "The End.\n" ;
 EXPECT
 Useless use of length in void context at - line 4.

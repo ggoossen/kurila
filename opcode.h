@@ -344,6 +344,7 @@ EXTCONST char* const PL_op_name[] = {
 	"semctl",
 	"require",
 	"dofile",
+	"hintseval",
 	"entereval",
 	"leaveeval",
 	"entertry",
@@ -703,6 +704,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"semctl",
 	"require",
 	"do \"file\"",
+	"eval hints",
 	"eval \"string\"",
 	"eval \"string\" exit",
 	"eval {block}",
@@ -1074,6 +1076,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_semctl),
 	MEMBER_TO_FPTR(Perl_pp_require),
 	MEMBER_TO_FPTR(Perl_pp_require),	/* Perl_pp_dofile */
+	MEMBER_TO_FPTR(Perl_pp_hintseval),
 	MEMBER_TO_FPTR(Perl_pp_entereval),
 	MEMBER_TO_FPTR(Perl_pp_leaveeval),
 	MEMBER_TO_FPTR(Perl_pp_entertry),
@@ -1238,7 +1241,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* hex */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* oct */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* abs */
-	MEMBER_TO_FPTR(Perl_ck_lengthconst),	/* length */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* length */
 	MEMBER_TO_FPTR(Perl_ck_substr),	/* substr */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* vec */
 	MEMBER_TO_FPTR(Perl_ck_index),	/* index */
@@ -1442,6 +1445,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* semctl */
 	MEMBER_TO_FPTR(Perl_ck_require),	/* require */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* dofile */
+	MEMBER_TO_FPTR(Perl_ck_svconst),	/* hintseval */
 	MEMBER_TO_FPTR(Perl_ck_eval),	/* entereval */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* leaveeval */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* entertry */
@@ -1600,14 +1604,14 @@ EXTCONST U32 PL_opargs[] = {
 	0x0001378e,	/* hex */
 	0x0001378e,	/* oct */
 	0x0001378e,	/* abs */
-	0x0001379c,	/* length */
+	0x0001379e,	/* length */
 	0x1322280c,	/* substr */
 	0x0022281c,	/* vec */
 	0x0122291c,	/* index */
 	0x0122291c,	/* rindex */
-	0x0004280d,	/* sprintf */
-	0x0001379c,	/* ord */
-	0x0001378c,	/* chr */
+	0x0004280f,	/* sprintf */
+	0x0001379e,	/* ord */
+	0x0001378e,	/* chr */
 	0x0002290e,	/* crypt */
 	0x0001368c,	/* ucfirst */
 	0x0001368c,	/* lcfirst */
@@ -1804,6 +1808,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x0222281d,	/* semctl */
 	0x000136c0,	/* require */
 	0x00002240,	/* dofile */
+	0x00000c04,	/* hintseval */
 	0x00003640,	/* entereval */
 	0x00002200,	/* leaveeval */
 	0x00000600,	/* entertry */

@@ -1045,6 +1045,7 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 #endif
 	break;
     case OP_CONST:
+    case OP_HINTSEVAL:
     case OP_METHOD_NAMED:
 #ifndef USE_ITHREADS
 	/* with ITHREADS, consts are stored in the pad, and the right pad
@@ -1924,6 +1925,7 @@ Perl_debop(pTHX_ const OP *o)
     Perl_deb(aTHX_ "%s", OP_NAME(o));
     switch (o->op_type) {
     case OP_CONST:
+    case OP_HINTSEVAL:
 	PerlIO_printf(Perl_debug_log, "(%s)", SvPEEK(cSVOPo_sv));
 	break;
     case OP_GVSV:
@@ -2619,6 +2621,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 #endif
 	break;
     case OP_CONST:
+    case OP_HINTSEVAL:
     case OP_METHOD_NAMED:
 #ifndef USE_ITHREADS
 	/* with ITHREADS, consts are stored in the pad, and the right pad
