@@ -4221,7 +4221,7 @@ PP(pp_split)
     I32 base;
     const I32 gimme = GIMME_V;
     const I32 oldsave = PL_savestack_ix;
-    I32 make_mortal = 1;
+    U32 make_mortal = SVs_TEMP;
     bool multiline = 0;
     MAGIC *mg = NULL;
 
@@ -4310,9 +4310,7 @@ PP(pp_split)
 	    if (m >= strend)
 		break;
 
-	    dstr = newSVpvn(s, m-s);
-	    if (make_mortal)
-		sv_2mortal(dstr);
+	    dstr = newSVpvn_flags(s, m-s, make_mortal);
 	    XPUSHs(dstr);
 
 	    /* skip the whitespace found last */
@@ -4338,9 +4336,7 @@ PP(pp_split)
 	    m++;
 	    if (m >= strend)
 		break;
-	    dstr = newSVpvn(s, m-s);
-	    if (make_mortal)
-		sv_2mortal(dstr);
+	    dstr = newSVpvn_flags(s, m-s, make_mortal);
 	    XPUSHs(dstr);
 	    s = m;
 	}
@@ -4359,9 +4355,7 @@ PP(pp_split)
 		    ;
 		if (m >= strend)
 		    break;
-		dstr = newSVpvn(s, m-s);
-		if (make_mortal)
-		    sv_2mortal(dstr);
+		dstr = newSVpvn_flags(s, m-s, make_mortal);
 		XPUSHs(dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
@@ -4371,9 +4365,7 @@ PP(pp_split)
 	      (m = fbm_instr((char*)s, (char*)strend,
 			     csv, multiline ? FBMrf_MULTILINE : 0)) )
 	    {
-		dstr = newSVpvn(s, m-s);
-		if (make_mortal)
-		    sv_2mortal(dstr);
+		dstr = newSVpvn_flags(s, m-s, make_mortal);
 		XPUSHs(dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
@@ -4399,9 +4391,7 @@ PP(pp_split)
 		strend = s + (strend - m);
 	    }
 	    m = RX_OFFS(rx)[0].start + orig;
-	    dstr = newSVpvn(s, m-s);
-	    if (make_mortal)
-		sv_2mortal(dstr);
+	    dstr = newSVpvn_flags(s, m-s, make_mortal);
 	    XPUSHs(dstr);
 	    if (RX_NPARENS(rx)) {
 		I32 i;
@@ -4413,12 +4403,10 @@ PP(pp_split)
 		       parens that didn't match -- they should be set to
 		       undef, not the empty string */
 		    if (m >= orig && s >= orig) {
-			dstr = newSVpvn(s, m-s);
+			dstr = newSVpvn_flags(s, m-s, make_mortal);
 		    }
 		    else
 			dstr = &PL_sv_undef;  /* undef, not "" */
-		    if (make_mortal)
-			sv_2mortal(dstr);
 		    XPUSHs(dstr);
 		}
 	    }
@@ -4433,9 +4421,7 @@ PP(pp_split)
     /* keep field after final delim? */
     if (s < strend || (iters && origlimit)) {
         const STRLEN l = strend - s;
-	dstr = newSVpvn(s, l);
-	if (make_mortal)
-	    sv_2mortal(dstr);
+	dstr = newSVpvn_flags(s, l, make_mortal);
 	XPUSHs(dstr);
 	iters++;
     }

@@ -362,12 +362,13 @@ $a = sub {
     $a =~ m/foo/;
 }
 ####
+# 51 Anonymous arrays and hashes, and references to them
 my $a = {};
 my $b = \{};
 my $c = [];
 my $d = \[];
 ####
-# 51 implicit smartmatch in given/when
+# 52 implicit smartmatch in given/when
 given ('foo') {
     when ('bar') { continue; }
     when ($_ ~~ 'quux') { continue; }

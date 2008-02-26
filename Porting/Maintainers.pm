@@ -248,7 +248,6 @@ sub show_results {
     }
 }
 
-sub warn_maintainer(_);
 my %files;
 
 sub maintainers_files {
@@ -269,18 +268,20 @@ sub duplicated_maintainers {
     }
 }
 
+sub warn_maintainer {
+    my $name = shift;
+    warn "File $name has no maintainer\n" if not $files{$name};
+}
+
 sub missing_maintainers {
     my($check, @path) = @_;
     maintainers_files();
     my @dir;
-    for (@path) { if( -d ) { push @dir, $_ } else { warn_maintainer() } }
+    for my $d (@path) {
+	if( -d $d ) { push @dir, $d } else { warn_maintainer($d) }
+    }
     find sub { warn_maintainer($File::Find::name) if m/$check/; }, @dir
 	if @dir;
-}
-
-sub warn_maintainer(_) {
-    my $name = shift;
-    warn "File $name has no maintainer\n" if not $files{$name};
 }
 
 1;

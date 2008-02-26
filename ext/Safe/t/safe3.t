@@ -1,4 +1,4 @@
-#!perl
+#!perl -w
 
 BEGIN {
     require Config; Config->import;
