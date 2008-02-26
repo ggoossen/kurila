@@ -2805,6 +2805,11 @@ PP(pp_require)
 
     SAVEHINTS();
     PL_hints = DEFAULT_HINTS;
+    if (PL_compiling.cop_hints_hash) {
+	SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	PL_compiling.cop_hints_hash = NULL;
+    }
+
     SAVECOMPILEWARNINGS();
     if (PL_dowarn & G_WARN_ALL_ON)
         PL_compiling.cop_warnings = pWARN_ALL ;

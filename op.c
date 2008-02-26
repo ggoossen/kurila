@@ -90,7 +90,7 @@ recursive, but it's recursive on basic blocks, not on tree nodes.
    magic type 'H'. This magic (itself) does nothing, but its presence causes
    the values to gain magic type 'h', which has entries for set and clear.
    C<Perl_magic_sethint> updates C<PL_compiling.cop_hints_hash> with a store
-   record, with deletes written by C<Perl_magic_clearhint>. C<SAVE_HINTS>
+   record, with deletes written by C<Perl_magic_clearhint>. C<SAVEHINTS>
    saves the current C<PL_compiling.cop_hints_hash> on the save stack, so that
    it will be correctly restored when any inner compiling scope is exited.
 */
@@ -531,7 +531,7 @@ Perl_op_clear(pTHX_ OP *o)
     switch (o->op_type) {
     case OP_NULL:	/* Was holding old type, if any. */
 	if (PL_madskills && o->op_targ != OP_NULL) {
-	    o->op_type = o->op_targ;
+	    o->op_type = (optype)o->op_targ;
 	    o->op_targ = 0;
 	    goto retry;
 	}
@@ -993,7 +993,13 @@ Perl_scalarvoid(pTHX_ OP *o)
 	    no_bareword_allowed(o);
 	else {
 	    if (ckWARN(WARN_VOID)) {
-		useless = "a constant";
+		if (SvOK(sv)) {
+		    SV* msv = sv_2mortal(Perl_newSVpvf(aTHX_
+				"a constant (%"SVf")", sv));
+		    useless = SvPV_nolen(msv);
+		}
+		else
+		    useless = "a constant (undef)";
 		/* don't warn on optimised away booleans, eg 
 		 * use constant Foo, 5; Foo || print; */
 		if (cSVOPo->op_private & OPpCONST_SHORTCIRCUIT)
@@ -4836,7 +4842,7 @@ S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
     PERL_ARGS_ASSERT_NEWGIVWHENOP;
 
     NewOp(1101, enterop, 1, LOGOP);
-    enterop->op_type = enter_opcode;
+    enterop->op_type = (optype)enter_opcode;
     enterop->op_ppaddr = PL_ppaddr[enter_opcode];
     enterop->op_flags =  (U8) OPf_KIDS;
     enterop->op_targ = ((entertarg == NOT_IN_PAD) ? 0 : entertarg);

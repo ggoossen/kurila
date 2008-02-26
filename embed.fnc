@@ -290,7 +290,7 @@ Ap	|GV*	|gv_fetchfile_flags|NN const char *const name|const STRLEN len\
 				|const U32 flags
 Apd	|GV*	|gv_fetchmeth	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
 Apdb	|GV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
-Ap	|GV*	|gv_fetchpv	|NN const char* name|I32 add|I32 sv_type
+Ap	|GV*	|gv_fetchpv	|NN const char* nambeg|I32 add|const svtype sv_type
 Ap	|void	|gv_fullname4	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix|bool keepmain
 pMox	|GP *	|newGP		|NN GV *const gv
 Ap	|void	|gv_init	|NN GV* gv|NULLOK HV* stash|NN const char* name|STRLEN len|int multi
@@ -593,7 +593,7 @@ Afpda	|SV*	|newSVpvf	|NN const char* pat|...
 Apa	|SV*	|vnewSVpvf	|NN const char* pat|NULLOK va_list* args
 Apd	|SV*	|newSVrv	|NN SV* rv|NULLOK const char* classname
 Apda	|SV*	|newSVsv	|NULLOK SV* old
-Apda	|SV*	|newSV_type	|svtype type
+Apda	|SV*	|newSV_type	|const svtype type
 Apa	|OP*	|newUNOP	|I32 type|I32 flags|NULLOK OP* first
 Apa	|OP*	|newWHENOP	|NULLOK OP* cond|NN OP* block
 Apa	|OP*	|newWHILEOP	|I32 flags|I32 debuggable|NULLOK LOOP* loop \
@@ -1123,7 +1123,7 @@ sR	|I32	|do_trans_complex_utf8	|NN SV * const sv
 #endif
 
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
-s	|void	|gv_init_sv	|NN GV *gv|I32 sv_type
+s	|void	|gv_init_sv	|NN GV *gv|const svtype sv_type
 s	|HV*	|gv_get_super_pkg|NN const char* name|I32 namelen
 s	|HV*	|require_tie_mod|NN GV *gv|NN const char *varpv|NN SV* namesv \
 				|NN const char *methpv|const U32 flags
@@ -1793,8 +1793,8 @@ np	|long	|my_betohl	|long n
 
 np	|void	|my_swabn	|NN void* ptr|int n
 
-Ap	|GV*	|gv_fetchpvn_flags|NN const char* name|STRLEN len|I32 flags|I32 sv_type
-Ap	|GV*	|gv_fetchsv|NN SV *name|I32 flags|I32 sv_type
+Ap	|GV*	|gv_fetchpvn_flags|NN const char* name|STRLEN len|I32 flags|const svtype sv_type
+Ap	|GV*	|gv_fetchsv|NN SV *name|I32 flags|const svtype sv_type
 dpR	|bool	|is_gv_magical_sv|NN SV *name|U32 flags
 
 ApR	|bool	|stashpv_hvname_match|NN const COP *c|NN const HV *hv
