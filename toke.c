@@ -365,6 +365,9 @@ STATIC int
 S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_TOKEREPORT;
+
     if (DEBUG_T_TEST) {
 	const char *name = NULL;
 	enum token_type type = TOKENTYPE_NONE;
@@ -426,6 +429,9 @@ STATIC void
 S_printbuf(pTHX_ const char *const fmt, const char *const s)
 {
     SV* const tmp = newSVpvs("");
+
+    PERL_ARGS_ASSERT_PRINTBUF;
+
     PerlIO_printf(Perl_debug_log, fmt, pv_display(tmp, s, strlen(s), 0, 60));
     SvREFCNT_dec(tmp);
 }
@@ -475,6 +481,8 @@ S_no_op(pTHX_ const char *const what, char *s)
     dVAR;
     char * const oldbp = PL_bufptr;
     const bool is_first = (PL_oldbufptr == PL_linestart);
+
+    PERL_ARGS_ASSERT_NO_OP;
 
     if (!s)
 	s = oldbp;
@@ -560,6 +568,9 @@ S_feature_is_enabled(pTHX_ const char *const name, STRLEN namelen)
     dVAR;
     HV * const hinthv = GvHV(PL_hintgv);
     char he_name[8 + MAX_FEATURE_LEN] = "feature_";
+
+    PERL_ARGS_ASSERT_FEATURE_IS_ENABLED;
+
     assert(namelen <= MAX_FEATURE_LEN);
     memcpy(&he_name[8], name, namelen);
 
@@ -573,6 +584,8 @@ S_feature_is_enabled(pTHX_ const char *const name, STRLEN namelen)
 void
 Perl_deprecate(pTHX_ const char *const s)
 {
+    PERL_ARGS_ASSERT_DEPRECATE;
+
     if (ckWARN(WARN_DEPRECATED))
 	Perl_warner(aTHX_ packWARN(WARN_DEPRECATED), "Use of %s is deprecated", s);
 }
@@ -587,6 +600,8 @@ Perl_deprecate_old(pTHX_ const char *const s)
     /* warnings category hierarchy. The "deprecated" category used to     */
     /* live under the "syntax" category. It is now a top-level category   */
     /* in its own right.                                                  */
+
+    PERL_ARGS_ASSERT_DEPRECATE_OLD;
 
     if (ckWARN2(WARN_DEPRECATED, WARN_SYNTAX))
 	Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
@@ -604,6 +619,9 @@ strip_return(SV *sv)
 {
     register const char *s = SvPVX_const(sv);
     register const char * const e = s + SvCUR(sv);
+
+    PERL_ARGS_ASSERT_STRIP_RETURN;
+
     /* outer loop optimized to do nothing if there are no CR-LFs */
     while (s < e) {
 	if (*s++ == '\r' && *s == '\n') {
@@ -723,6 +741,8 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
 void
 Perl_parser_free(pTHX_  const yy_parser *parser)
 {
+    PERL_ARGS_ASSERT_PARSER_FREE;
+
     PL_curcop = parser->saved_curcop;
     SvREFCNT_dec(parser->linestr);
 
@@ -771,6 +791,8 @@ S_incline(pTHX_ const char *s)
     const char *t;
     const char *n;
     const char *e;
+
+    PERL_ARGS_ASSERT_INCLINE;
 
     CopLINE_inc(PL_curcop);
     if (*s++ != '#')
@@ -888,6 +910,8 @@ S_incline(pTHX_ const char *s)
 STATIC char *
 S_skipspace0(pTHX_ register char *s)
 {
+    PERL_ARGS_ASSERT_SKIPSPACE0;
+
     s = skipspace(s);
     if (!PL_madskills)
 	return s;
@@ -909,6 +933,8 @@ S_skipspace1(pTHX_ register char *s)
 {
     const char *start = s;
     I32 startoff = start - SvPVX(PL_linestr);
+
+    PERL_ARGS_ASSERT_SKIPSPACE1;
 
     s = skipspace(s);
     if (!PL_madskills)
@@ -935,6 +961,8 @@ S_skipspace2(pTHX_ register char *s, SV **svp)
     char *start;
     const I32 bufptroff = PL_bufptr - SvPVX(PL_linestr);
     const I32 startoff = s - SvPVX(PL_linestr);
+
+    PERL_ARGS_ASSERT_SKIPSPACE2;
 
     s = skipspace(s);
     PL_bufptr = SvPVX(PL_linestr) + bufptroff;
@@ -988,11 +1016,14 @@ S_skipspace(pTHX_ register char *s)
     int curoff;
     int startoff = s - SvPVX(PL_linestr);
 
+    PERL_ARGS_ASSERT_SKIPSPACE;
+
     if (PL_skipwhite) {
 	sv_free(PL_skipwhite);
 	PL_skipwhite = 0;
     }
 #endif
+    PERL_ARGS_ASSERT_SKIPSPACE;
 
     for (;;) {
 	STRLEN prevlen;
@@ -1195,6 +1226,9 @@ STATIC I32
 S_lop(pTHX_ I32 f, int x, char *s)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_LOP;
+
     pl_yylval.ival = f;
     CLINE;
     PL_expect = x;
@@ -1341,6 +1375,8 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
     register char *s;
     STRLEN len;
 
+    PERL_ARGS_ASSERT_FORCE_WORD;
+
     start = SKIPSPACE1(start);
     s = start;
     if (isIDFIRST_lazy_if(s,UTF) ||
@@ -1385,6 +1421,9 @@ STATIC void
 S_force_ident(pTHX_ register const char *s, int kind)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_FORCE_IDENT;
+
     if (*s) {
 	const STRLEN len = strlen(s);
 	OP* const o = (OP*)newSVOP(OP_CONST, 0, newSVpvn(s, len));
@@ -1423,6 +1462,8 @@ S_force_version(pTHX_ char *s)
 #ifdef PERL_MAD
     I32 startoff = s - SvPVX(PL_linestr);
 #endif
+
+    PERL_ARGS_ASSERT_FORCE_VERSION;
 
     s = SKIPSPACE1(s);
 
@@ -1463,6 +1504,9 @@ S_force_version(pTHX_ char *s)
 STATIC SV *
 S_tokeq(pTHX_ SV *sv)
 {
+
+    PERL_ARGS_ASSERT_TOKEQ;
+
     if ( PL_hints & HINT_NEW_STRING )
        return new_constant(NULL, 0, "q", sv, sv, "q", 1);
     return sv;
@@ -1973,6 +2017,8 @@ S_scan_const(pTHX_ char *start)
     bool in_codepoints = (IN_CODEPOINTS != 0);  /* PL_curtoken can be changed ?! */
     bool in_pat = ((PL_lex_flags & LEXf_INPAT) != 0);
 
+    PERL_ARGS_ASSERT_SCAN_CONST;
+
     while (s < send || dorange) {
         /* get transliterations out of the way (they're most literal) */
 	if (PL_lex_inwhat == OP_TRANS) {
@@ -2213,6 +2259,9 @@ STATIC int
 S_intuit_more(pTHX_ register char *s)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_INTUIT_MORE;
+
     if (PL_lex_brackets)
 	return TRUE;
     if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{' || s[2] == '@'))
@@ -2273,6 +2322,8 @@ Perl_filter_del(pTHX_ filter_t funcp)
     dVAR;
     SV *datasv;
 
+    PERL_ARGS_ASSERT_FILTER_DEL;
+
 #ifdef DEBUGGING
     DEBUG_P(PerlIO_printf(Perl_debug_log, "filter_del func %p",
 			  FPTR2DPTR(void*, funcp)));
@@ -2312,6 +2363,8 @@ Perl_filter_read(pTHX_ int idx, SV *buf_sv, int maxlen)
 	INT_MAX
 #endif
 	: maxlen;
+
+    PERL_ARGS_ASSERT_FILTER_READ;
 
     if (!PL_parser || !PL_rsfp_filters)
 	return -1;
@@ -2368,6 +2421,9 @@ STATIC char *
 S_filter_gets(pTHX_ register SV *sv, register PerlIO *fp, STRLEN append)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_FILTER_GETS;
+
 #ifdef PERL_CR_FILTER
     if (!PL_rsfp_filters) {
 	filter_add(S_cr_textfilter,NULL);
@@ -2598,6 +2654,9 @@ Perl_madlex(pTHX)
 STATIC char *
 S_tokenize_use(pTHX_ int is_use, char *s) {
     dVAR;
+
+    PERL_ARGS_ASSERT_TOKENIZE_USE;
+
     if (PL_expect != XSTATE)
 	yyerror(Perl_form(aTHX_ "\"%s\" not allowed in expression",
 		    is_use ? "use" : "no"));
@@ -6287,6 +6346,9 @@ I32
 Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_KEYWORD;
+
   switch (len)
   {
     case 1: /* 5 tokens of length 1 */
@@ -9568,6 +9630,8 @@ S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
 {
     dVAR;
 
+    PERL_ARGS_ASSERT_CHECKCOMMA;
+
     if (*s == ' ' && s[1] == '(') {	/* XXX gotta be a better way */
 	if (ckWARN(WARN_SYNTAX)) {
 	    int level = 1;
@@ -9629,6 +9693,8 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     SV **cvp;
     SV *cv, *typesv;
     const char *why1 = "", *why2 = "", *why3 = "";
+
+    PERL_ARGS_ASSERT_NEW_CONSTANT;
 
     if (!table || !(PL_hints & HINT_LOCALIZE_HH)) {
 	SV *msg;
@@ -9724,6 +9790,9 @@ S_scan_word(pTHX_ register char *s, char *dest, STRLEN destlen, int allow_packag
     dVAR;
     register char *d = dest;
     register char * const e = d + destlen - 3;  /* two-character token, ending NUL */
+
+    PERL_ARGS_ASSERT_SCAN_WORD;
+
     for (;;) {
 	if (d >= e)
 	    Perl_croak(aTHX_ ident_too_long);
@@ -9761,6 +9830,8 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
     char funny = *s++;
     register char *d = dest;
     register char * const e = d + destlen + 3;    /* two-character token, ending NUL */
+
+    PERL_ARGS_ASSERT_SCAN_IDENT;
 
     if (isSPACE(*s))
 	s = PEEKSPACE(s);
@@ -9916,6 +9987,8 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 void
 Perl_pmflag(pTHX_ U32* pmfl, int ch)
 {
+    PERL_ARGS_ASSERT_PMFLAG;
+
     PERL_UNUSED_CONTEXT;
     if (ch<256) {
         const char c = (char)ch;
@@ -9944,6 +10017,7 @@ S_scan_pat(pTHX_ char *start, I32 type)
     char *modstart;
 #endif
 
+    PERL_ARGS_ASSERT_SCAN_PAT;
 
     if (!s) {
 	Perl_croak(aTHX_
@@ -9990,6 +10064,8 @@ S_scan_subst(pTHX_ char *start)
 #ifdef PERL_MAD
     char *modstart;
 #endif
+
+    PERL_ARGS_ASSERT_SCAN_SUBST;
 
     pl_yylval.ival = OP_NULL;
 
@@ -10073,6 +10149,8 @@ S_scan_trans(pTHX_ char *start)
 #ifdef PERL_MAD
     char *modstart;
 #endif
+
+    PERL_ARGS_ASSERT_SCAN_TRANS;
 
     pl_yylval.ival = OP_NULL;
 
@@ -10170,6 +10248,8 @@ S_scan_heredoc(pTHX_ register char *s)
  
     PL_realtokenstart = -1;
 #endif
+
+    PERL_ARGS_ASSERT_SCAN_HEREDOC;
 
     s += 2;
     d = PL_tokenbuf;
@@ -10436,6 +10516,8 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
     char *tstart;
 #endif
 
+    PERL_ARGS_ASSERT_SCAN_STR;
+
     /* skip space before the delimiter */
     if (isSPACE(*s)) {
 	s = PEEKSPACE(s);
@@ -10662,6 +10744,8 @@ Perl_scan_num(pTHX_ const char *start, YYSTYPE* lvalp)
     bool floatit;			/* boolean: int or float? */
     const char *lastub = NULL;		/* position of last underbar */
     static char const number_too_long[] = "Number too long";
+
+    PERL_ARGS_ASSERT_SCAN_NUM;
 
     /* We use the first character to decide what type of number this is */
 
@@ -11058,6 +11142,9 @@ int
 Perl_yywarn(pTHX_ const char *const s)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_YYWARN;
+
     PL_in_eval |= EVAL_WARNONLY;
     yyerror(s);
     PL_in_eval &= ~EVAL_WARNONLY;
@@ -11073,6 +11160,8 @@ Perl_yyerror(pTHX_ const char *const s)
     int contlen = -1;
     SV *msg;
     int yychar  = PL_parser->yychar;
+
+    PERL_ARGS_ASSERT_YYERROR;
 
     if (!yychar || (yychar == ';' && !PL_rsfp))
 	where = "at EOF";
@@ -11172,6 +11261,7 @@ S_swallow_bom(pTHX_ char *s)
     dVAR;
     U8 *u8s = (U8*)s;
     const STRLEN slen = SvCUR(PL_linestr);
+    PERL_ARGS_ASSERT_SWALLOW_BOM;
     switch (u8s[0]) {
     case 0xFF:
 	if (u8s[1] == 0xFE) {
@@ -11347,6 +11437,9 @@ Perl_scan_vstring(pTHX_ const char *s, const char *const e, SV *sv)
 {
     dVAR;
     const char *pos = s;
+
+    PERL_ARGS_ASSERT_SCAN_VSTRING;
+
     if (*pos == 'v') pos++;  /* get past 'v' */
     while (pos < e && (isDIGIT(*pos) || *pos == '_'))
 	pos++;

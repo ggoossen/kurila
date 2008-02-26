@@ -3248,6 +3248,8 @@ S_dooneliner(pTHX_ const char *cmd, const char *filename)
     int anum = 1;
     Size_t size = strlen(cmd) + (strlen(filename) * 2) + 10;
 
+    PERL_ARGS_ASSERT_DOONELINER;
+
     Newx(cmdline, size, char);
     my_strlcpy(cmdline, cmd, size);
     my_strlcat(cmdline, " ", size);
@@ -4254,6 +4256,8 @@ static SV *
 S_space_join_names_mortal(pTHX_ char *const *array)
 {
     SV *target;
+
+    PERL_ARGS_ASSERT_SPACE_JOIN_NAMES_MORTAL;
 
     if (array && *array) {
 	target = newSVpvs_flags("", SVs_TEMP);

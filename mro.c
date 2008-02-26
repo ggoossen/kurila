@@ -29,7 +29,7 @@ Perl_mro_meta_init(pTHX_ HV* stash)
 {
     struct mro_meta* newmeta;
 
-    assert(stash);
+    PERL_ARGS_ASSERT_MRO_META_INIT;
     assert(HvAUX(stash));
     assert(!(HvAUX(stash)->xhv_mro_meta));
     Newxz(newmeta, 1, struct mro_meta);
@@ -48,7 +48,7 @@ Perl_mro_meta_dup(pTHX_ struct mro_meta* smeta, CLONE_PARAMS* param)
 {
     struct mro_meta* newmeta;
 
-    assert(smeta);
+    PERL_ARGS_ASSERT_MRO_META_DUP;
 
     Newx(newmeta, 1, struct mro_meta);
     Copy(smeta, newmeta, 1, struct mro_meta);
@@ -92,7 +92,7 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
     const HEK* stashhek;
     struct mro_meta* meta;
 
-    assert(stash);
+    PERL_ARGS_ASSERT_MRO_GET_LINEAR_ISA_C3;
     assert(HvAUX(stash));
 
     stashhek = HvNAME_HEK(stash);
@@ -305,7 +305,7 @@ Perl_mro_get_linear_isa(pTHX_ HV *stash)
 {
     struct mro_meta* meta;
 
-    assert(stash);
+    PERL_ARGS_ASSERT_MRO_GET_LINEAR_ISA;
     if(!SvOOK(stash))
         Perl_croak(aTHX_ "Can't linearize anonymous symbol table");
 
@@ -336,6 +336,8 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 
     const char * const stashname = HvNAME_get(stash);
     const STRLEN stashname_len = HvNAMELEN_get(stash);
+
+    PERL_ARGS_ASSERT_MRO_ISA_CHANGED_IN;
 
     if(!stashname)
         Perl_croak(aTHX_ "Can't call mro_isa_changed_in() on anonymous symbol table");
@@ -469,6 +471,8 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
 
     SV ** const svp = hv_fetch(PL_isarev, stashname, stashname_len, 0);
     HV * const isarev = svp ? (HV*)*svp : NULL;
+
+    PERL_ARGS_ASSERT_MRO_METHOD_CHANGED_IN;
 
     if(!stashname)
         Perl_croak(aTHX_ "Can't call mro_method_changed_in() on anonymous symbol table");

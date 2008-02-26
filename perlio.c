@@ -1627,18 +1627,24 @@ PerlIO_openn(pTHX_ const char *layers, const char *mode, int fd,
 SSize_t
 Perl_PerlIO_read(pTHX_ PerlIO *f, void *vbuf, Size_t count)
 {
+     PERL_ARGS_ASSERT_PERLIO_READ;
+
      Perl_PerlIO_or_Base(f, Read, read, -1, (aTHX_ f, vbuf, count));
 }
 
 SSize_t
 Perl_PerlIO_unread(pTHX_ PerlIO *f, const void *vbuf, Size_t count)
 {
+     PERL_ARGS_ASSERT_PERLIO_UNREAD;
+
      Perl_PerlIO_or_Base(f, Unread, unread, -1, (aTHX_ f, vbuf, count));
 }
 
 SSize_t
 Perl_PerlIO_write(pTHX_ PerlIO *f, const void *vbuf, Size_t count)
 {
+     PERL_ARGS_ASSERT_PERLIO_WRITE;
+
      Perl_PerlIO_or_fail(f, Write, -1, (aTHX_ f, vbuf, count));
 }
 
@@ -4097,6 +4103,9 @@ void
 PerlIOBuf_set_ptrcnt(pTHX_ PerlIO *f, STDCHAR * ptr, SSize_t cnt)
 {
     PerlIOBuf * const b = PerlIOSelf(f, PerlIOBuf);
+#ifndef DEBUGGING
+    PERL_UNUSED_ARG(cnt);
+#endif
     if (!b->buf)
 	PerlIO_get_base(f);
     b->ptr = ptr;

@@ -196,6 +196,8 @@ PP(pp_rv2gv)
 GV *
 Perl_softref2xv(pTHX_ SV *const sv, const char *const what)
 {
+    PERL_ARGS_ASSERT_SOFTREF2XV;
+
     if (SvOK(sv))
 	Perl_die(aTHX_ PL_no_symref_sv, sv, what);
     else
@@ -442,6 +444,8 @@ S_refto(pTHX_ SV *sv)
 {
     dVAR;
     SV* rv;
+
+    PERL_ARGS_ASSERT_REFTO;
 
     if (SvTYPE(sv) == SVt_PVLV && LvTYPE(sv) == 'y') {
 	if (LvTARGLEN(sv))

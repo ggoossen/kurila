@@ -238,8 +238,9 @@ S_regcppop(pTHX_ const regexp *rex)
     dVAR;
     U32 i;
     char *input;
-
     GET_RE_DEBUG_FLAGS_DECL;
+
+    PERL_ARGS_ASSERT_REGCPPOP;
 
     /* Pop REGCP_OTHER_ELEMS before the parentheses loop starts. */
     i = SSPOPINT;
@@ -315,6 +316,8 @@ Perl_pregexec(pTHX_ REGEXP * const prog, char* stringarg, register char *strend,
 /* minend: end of match must be >=minend after stringarg. */
 /* nosave: For optimizations. */
 {
+    PERL_ARGS_ASSERT_PREGEXEC;
+
     return
 	regexec_flags(prog, stringarg, strend, strbeg, minend, screamer, NULL,
 		      nosave ? 0 : REXEC_COPY_STR);
@@ -393,8 +396,9 @@ Perl_re_intuit_start(pTHX_ REGEXP * const rx, SV *sv, char *strpos,
 #ifdef DEBUGGING
     const char * const i_strpos = strpos;
 #endif
-
     GET_RE_DEBUG_FLAGS_DECL;
+
+    PERL_ARGS_ASSERT_RE_INTUIT_START;
 
     DEBUG_EXECUTE_r( 
         debug_start_match(rx, do_utf8, strpos, strend, 
@@ -1065,6 +1069,8 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	register I32 tmp = 1;	/* Scratch variable? */
 	register const bool do_utf8 = (prog->extflags & RXf_PMf_UTF8) != 0;
         RXi_GET_DECL(prog,progi);
+
+	PERL_ARGS_ASSERT_FIND_BYCLASS;
         
 	GET_RE_DEBUG_FLAGS_DECL;
 
@@ -1402,8 +1408,11 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 }
 
 static void 
-S_swap_match_buff (pTHX_ regexp *prog) {
+S_swap_match_buff (pTHX_ regexp *prog)
+{
     regexp_paren_pair *t;
+
+    PERL_ARGS_ASSERT_SWAP_MATCH_BUFF;
 
     if (!prog->swap) {
     /* We have to be careful. If the previous successful match
@@ -1450,9 +1459,9 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
     RXi_GET_DECL(prog,progi);
     regmatch_info reginfo;  /* create some info to pass to regtry etc */
     bool swap_on_fail = 0;
-
     GET_RE_DEBUG_FLAGS_DECL;
 
+    PERL_ARGS_ASSERT_REGEXEC_FLAGS;
     PERL_UNUSED_ARG(data);
 
     /* Be paranoid... */
@@ -1874,6 +1883,9 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
     regexp *const prog = (struct regexp *)SvANY(rx);
     RXi_GET_DECL(prog,progi);
     GET_RE_DEBUG_FLAGS_DECL;
+
+    PERL_ARGS_ASSERT_REGTRY;
+
     reginfo->cutpoint=NULL;
 
     DEBUG_EXECUTE_r(
@@ -2234,6 +2246,9 @@ S_debug_start_match(pTHX_ const REGEXP *prog, const bool do_utf8,
     const char *start, const char *end, const char *blurb)
 {
     const bool utf8_pat= RX_EXTFLAGS(prog) & RXf_PMf_UTF8 ? 1 : 0;
+
+    PERL_ARGS_ASSERT_DEBUG_START_MATCH;
+
     if (!PL_colorset)   
             reginitcolors();    
     {
@@ -2276,6 +2291,8 @@ S_dump_exec_pos(pTHX_ const char *locinput,
     int pref_len = (locinput - loc_bostr) > (5 + taill) - l
 	? (5 + taill) - l : locinput - loc_bostr;
     int pref0_len;
+
+    PERL_ARGS_ASSERT_DUMP_EXEC_POS;
 
     while (do_utf8 && UTF8_IS_CONTINUATION(*(locinput - pref_len)))
 	pref_len++;
@@ -2327,11 +2344,15 @@ S_dump_exec_pos(pTHX_ const char *locinput,
  * or 0 if non of the buffers matched.
  */
 STATIC I32
-S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan) {
+S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan)
+{
     I32 n;
     RXi_GET_DECL(rex,rexi);
     SV *sv_dat=(SV*)rexi->data->data[ ARG( scan ) ];
     I32 *nums=(I32*)SvPVX(sv_dat);
+
+    PERL_ARGS_ASSERT_REG_CHECK_NAMED_BUFF_MATCHED;
+
     for ( n=0; n<SvIVX(sv_dat); n++ ) {
         if ((I32)*PL_reglastparen >= nums[n] &&
             PL_regoffs[nums[n]].end != -1)
@@ -2382,10 +2403,8 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
     register const bool do_utf8 = (RX_EXTFLAGS(reginfo->prog) & RXf_PMf_UTF8) != 0;
     
     I32	oldsave;
-
     /* the current state. This is a cached copy of PL_regmatch_state */
     register regmatch_state *st;
-
     /* cache heavy used fields of st in registers */
     register regnode *scan;
     register regnode *next;
@@ -2400,13 +2419,11 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
     const U32 max_nochange_depth =
         (3 * rex->nparens > MAX_RECURSE_EVAL_NOCHANGE_DEPTH) ?
         3 * rex->nparens : MAX_RECURSE_EVAL_NOCHANGE_DEPTH;
-            
     regmatch_state *yes_state = NULL; /* state to pop to on success of
 							    subpattern */
     /* mark_state piggy backs on the yes_state logic so that when we unwind 
        the stack on success we can update the mark_state as we go */
     regmatch_state *mark_state = NULL; /* last mark state we have seen */
-    
     regmatch_state *cur_eval = NULL; /* most recent EVAL_AB state */
     struct regmatch_state  *cur_curlyx = NULL; /* most recent curlyx */
     U32 state_num;
@@ -2419,10 +2436,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                                during a successfull match */
     U32 lastopen = 0;       /* last open we saw */
     bool has_cutgroup = RX_HAS_CUTGROUP(rex) ? 1 : 0;   
-
     SV* const oreplsv = GvSV(PL_replgv);
-               
-    
     /* these three flags are set by various ops to signal information to
      * the very next op. They have a useful lifetime of exactly one loop
      * iteration, and are not preserved or restored by state pushes/pops
@@ -2437,10 +2451,11 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			        false: plain (?=foo)
 				true:  used as a condition: (?(?=foo))
 			    */
-
 #ifdef DEBUGGING
     GET_RE_DEBUG_FLAGS_DECL;
 #endif
+
+    PERL_ARGS_ASSERT_REGMATCH;
 
     DEBUG_OPTIMISE_r( DEBUG_EXECUTE_r({
 	    PerlIO_printf(Perl_debug_log,"regmatch start\n");
@@ -4719,6 +4734,8 @@ S_regrepeat(pTHX_ const regexp *prog, const regnode *p, I32 max, int depth)
     PERL_UNUSED_ARG(depth);
 #endif
 
+    PERL_ARGS_ASSERT_REGREPEAT;
+
     scan = PL_reginput;
     if (max == REG_INFTY)
 	max = I32_MAX;
@@ -4835,6 +4852,7 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
 
     RXi_GET_DECL(prog, progi);
     GET_RE_DEBUG_FLAGS_DECL;
+    PERL_ARGS_ASSERT_REGINCLASS;
 
     if (flags & ANYOF_FOLD)
 	PL_reg_flags |= RF_tainted;
@@ -4916,6 +4934,7 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
 STATIC char*
 S_reghop3(char *s, I32 off, char* lim)
 {
+    PERL_ARGS_ASSERT_REGHOP3;
     return s + off;
     if (off >= 0) {
 	return s + off > lim ? lim : s + off;
@@ -4928,6 +4947,8 @@ S_reghop3(char *s, I32 off, char* lim)
 STATIC char*
 S_reghop3x(char *s, I32 off, char* lim)
 {
+    PERL_ARGS_ASSERT_REGHOP3X;
+
     if (off >= 0) {
 	return s + off > lim ? lim : s + off;
     }
@@ -4940,6 +4961,9 @@ STATIC char *
 S_reghop3c(char *s, I32 off, char* lim)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_REGHOP3C;
+
     if (off >= 0) {
 	while (off-- && s < lim) {
 	    /* XXX could check well-formedness here */
@@ -4962,6 +4986,7 @@ S_reghop3c(char *s, I32 off, char* lim)
 STATIC char *
 S_reghop4(char *s, I32 off, const char* llim, const char* rlim)
 {
+    PERL_ARGS_ASSERT_REGHOP4;
     return (off >= 0)
 	? s + off > rlim ? rlim : s + off
 	: s + off < llim ? llim : s + off
@@ -4971,6 +4996,7 @@ S_reghop4(char *s, I32 off, const char* llim, const char* rlim)
 STATIC char *
 S_reghopmaybe3(char* s, I32 off, const char* lim)
 {
+    PERL_ARGS_ASSERT_REGHOPMAYBE3;
     if (off >= 0) {
 	return s + off > lim ? NULL : s + off;
     }

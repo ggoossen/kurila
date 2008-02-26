@@ -210,6 +210,9 @@ S_Slab_to_rw(pTHX_ void *op)
 {
     I32 * const * const ptr = (I32 **) op;
     I32 * const slab = ptr[-1];
+
+    PERL_ARGS_ASSERT_SLAB_TO_RW;
+
     assert( ptr-1 > (I32 **) slab );
     assert( ptr < ( (I32 **) slab + PERL_SLAB_SIZE) );
     assert( *slab > 0 );
@@ -233,6 +236,7 @@ Perl_op_refcnt_inc(pTHX_ OP *o)
 PADOFFSET
 Perl_op_refcnt_dec(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_OP_REFCNT_DEC;
     Slab_to_rw(o);
     return --o->op_targ;
 }
@@ -245,6 +249,7 @@ Perl_Slab_Free(pTHX_ void *op)
 {
     I32 * const * const ptr = (I32 **) op;
     I32 * const slab = ptr[-1];
+    PERL_ARGS_ASSERT_SLAB_FREE;
     assert( ptr-1 > (I32 **) slab );
     assert( ptr < ( (I32 **) slab + PERL_SLAB_SIZE) );
     assert( *slab > 0 );
@@ -304,6 +309,9 @@ STATIC const char*
 S_gv_ename(pTHX_ GV *gv)
 {
     SV* const tmpsv = sv_newmortal();
+
+    PERL_ARGS_ASSERT_GV_ENAME;
+
     gv_efullname4(tmpsv, gv, NULL, TRUE);
     return SvPV_nolen_const(tmpsv);
 }
@@ -311,6 +319,8 @@ S_gv_ename(pTHX_ GV *gv)
 STATIC OP *
 S_no_fh_allowed(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_NO_FH_ALLOWED;
+
     yyerror(Perl_form(aTHX_ "Missing comma after first argument to %s function",
 		 OP_DESC(o)));
     return o;
@@ -319,6 +329,8 @@ S_no_fh_allowed(pTHX_ OP *o)
 STATIC OP *
 S_too_few_arguments(pTHX_ OP *o, const char *name)
 {
+    PERL_ARGS_ASSERT_TOO_FEW_ARGUMENTS;
+
     yyerror(Perl_form(aTHX_ "Not enough arguments for %s", name));
     return o;
 }
@@ -326,6 +338,8 @@ S_too_few_arguments(pTHX_ OP *o, const char *name)
 STATIC OP *
 S_too_many_arguments(pTHX_ OP *o, const char *name)
 {
+    PERL_ARGS_ASSERT_TOO_MANY_ARGUMENTS;
+
     yyerror(Perl_form(aTHX_ "Too many arguments for %s", name));
     return o;
 }
@@ -333,6 +347,8 @@ S_too_many_arguments(pTHX_ OP *o, const char *name)
 STATIC void
 S_bad_type(pTHX_ I32 n, const char *t, const char *name, const OP *kid)
 {
+    PERL_ARGS_ASSERT_BAD_TYPE;
+
     yyerror(Perl_form(aTHX_ "Type of arg %d to %s must be %s (not %s)",
 		 (int)n, name, t, OP_DESC(kid)));
 }
@@ -340,6 +356,8 @@ S_bad_type(pTHX_ I32 n, const char *t, const char *name, const OP *kid)
 STATIC void
 S_no_bareword_allowed(pTHX_ const OP *o)
 {
+    PERL_ARGS_ASSERT_NO_BAREWORD_ALLOWED;
+
     if (PL_madskills)
 	return;		/* various ok barewords are hidden in extra OP_NULL */
     qerror(Perl_mess(aTHX_
@@ -355,6 +373,8 @@ Perl_allocmy(pTHX_ const char *const name)
     dVAR;
     PADOFFSET off;
     const bool is_our = (PL_parser->in_my == KEY_our);
+
+    PERL_ARGS_ASSERT_ALLOCMY;
 
     /* complain about "my $<special_var>" etc etc */
     if (*name &&
@@ -489,6 +509,9 @@ Perl_op_clear(pTHX_ OP *o)
 {
 
     dVAR;
+
+    PERL_ARGS_ASSERT_OP_CLEAR;
+
 #ifdef PERL_MAD
     /* if (o->op_madprop && o->op_madprop->mad_next)
        abort(); */
@@ -628,6 +651,8 @@ clear_pmop:
 STATIC void
 S_cop_free(pTHX_ COP* cop)
 {
+    PERL_ARGS_ASSERT_COP_FREE;
+
     CopLABEL_free(cop);
     CopFILE_free(cop);
     CopSTASH_free(cop);
@@ -640,6 +665,9 @@ void
 Perl_op_null(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_OP_NULL;
+
     if (o->op_type == OP_NULL)
 	return;
     if (!PL_madskills)
@@ -673,6 +701,8 @@ OP *
 Perl_linklist(pTHX_ OP *o)
 {
     OP *first;
+
+    PERL_ARGS_ASSERT_LINKLIST;
 
     if (o->op_next)
 	return o->op_next;
@@ -714,6 +744,9 @@ STATIC OP *
 S_scalarboolean(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_SCALARBOOLEAN;
+
     if (o->op_type == OP_SASSIGN && cBINOPo->op_first->op_type == OP_CONST) {
 	if (ckWARN(WARN_SYNTAX)) {
 	    const line_t oldline = CopLINE(PL_curcop);
@@ -807,6 +840,8 @@ Perl_scalarvoid(pTHX_ OP *o)
     const char* useless = NULL;
     SV* sv;
     U8 want;
+
+    PERL_ARGS_ASSERT_SCALARVOID;
 
     /* trailing mad null ops don't count as "there" for void processing */
     if (PL_madskills &&
@@ -1521,6 +1556,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
 STATIC bool
 S_scalar_mod_type(const OP *o, I32 type)
 {
+    PERL_ARGS_ASSERT_SCALAR_MOD_TYPE;
+
     switch (type) {
     case OP_SASSIGN:
 	if (o->op_type == OP_RV2GV)
@@ -1569,6 +1606,8 @@ S_scalar_mod_type(const OP *o, I32 type)
 STATIC bool
 S_is_handle_constructor(const OP *o, I32 numargs)
 {
+    PERL_ARGS_ASSERT_IS_HANDLE_CONSTRUCTOR;
+
     switch (o->op_type) {
     case OP_PIPE_OP:
     case OP_SOCKPAIR:
@@ -1605,6 +1644,8 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 {
     dVAR;
     OP *kid;
+
+    PERL_ARGS_ASSERT_DOREF;
 
     if (!o || (PL_parser && PL_parser->error_count))
 	return o;
@@ -1697,6 +1738,8 @@ S_dup_attrlist(pTHX_ OP *o)
     dVAR;
     OP *rop;
 
+    PERL_ARGS_ASSERT_DUP_ATTRLIST;
+
     /* An attrlist is either a simple OP_CONST or an OP_LIST with kids,
      * where the first kid is OP_PUSHMARK and the remaining ones
      * are OP_CONST.  We need to push the OP_CONST values.
@@ -1725,6 +1768,8 @@ S_apply_attrs(pTHX_ HV *stash, SV *target, OP *attrs, bool for_my)
 {
     dVAR;
     SV *stashsv;
+
+    PERL_ARGS_ASSERT_APPLY_ATTRS;
 
     /* fake up C<use attributes $pkg,$rv,@attrs> */
     ENTER;		/* need to protect against side-effects of 'use' */
@@ -1762,6 +1807,8 @@ S_apply_attrs_my(pTHX_ HV *stash, OP *target, OP *attrs, OP **imopsp)
     dVAR;
     OP *pack, *imop, *arg;
     SV *meth, *stashsv;
+
+    PERL_ARGS_ASSERT_APPLY_ATTRS_MY;
 
     if (!attrs)
 	return;
@@ -1823,6 +1870,8 @@ Perl_apply_attrs_string(pTHX_ const char *stashpv, CV *cv,
 {
     OP *attrs = NULL;
 
+    PERL_ARGS_ASSERT_APPLY_ATTRS_STRING;
+
     if (!len) {
         len = strlen(attrstr);
     }
@@ -1853,6 +1902,8 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 {
     dVAR;
     I32 type;
+
+    PERL_ARGS_ASSERT_MY_KID;
 
     if (!o || (PL_parser && PL_parser->error_count))
 	return o;
@@ -1928,6 +1979,8 @@ Perl_my_attrs(pTHX_ OP *o, OP *attrs)
     OP *rops;
     int maybe_scalar = 0;
 
+    PERL_ARGS_ASSERT_MY_ATTRS;
+
 /* [perl #17376]: this appears to be premature, and results in code such as
    C< our(%x); > executing in list mode rather than void mode */
 #if 0
@@ -1957,6 +2010,8 @@ Perl_my_attrs(pTHX_ OP *o, OP *attrs)
 OP *
 Perl_my(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_MY;
+
     return my_attrs(o, NULL);
 }
 
@@ -1976,6 +2031,8 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
     bool ismatchop = 0;
     const OPCODE ltype = left->op_type;
     const OPCODE rtype = right->op_type;
+
+    PERL_ARGS_ASSERT_BIND_MATCH;
 
     if ( (ltype == OP_RV2AV || ltype == OP_RV2HV || ltype == OP_PADAV
 	  || ltype == OP_PADHV) && ckWARN(WARN_MISC))
@@ -2112,6 +2169,9 @@ void
 Perl_newPROG(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_NEWPROG;
+
     if (PL_in_eval) {
 	if (PL_eval_root)
 		return;
@@ -2159,6 +2219,9 @@ OP *
 Perl_localize(pTHX_ OP *o, I32 lex)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_LOCALIZE;
+
     if (o->op_flags & OPf_PARENS)
 /* [perl #17376]: this appears to be premature, and results in code such as
    C< our(%x); > executing in list mode rather than void mode */
@@ -2216,6 +2279,8 @@ Perl_localize(pTHX_ OP *o, I32 lex)
 OP *
 Perl_jmaybe(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_JMAYBE;
+
     if (o->op_type == OP_LIST) {
 	OP * const o2
 	    = newSVREF(newGVOP(OP_GV, 0, gv_fetchpvs(";", GV_ADD|GV_NOTQUAL, SVt_PV)));
@@ -2238,6 +2303,8 @@ Perl_fold_constants(pTHX_ register OP *o)
     SV * const oldwarnhook = PL_warnhook;
     SV * const olddiehook  = PL_diehook;
     dJMPENV;
+
+    PERL_ARGS_ASSERT_FOLD_CONSTANTS;
 
     if (PL_opargs[type] & OA_RETSCALAR)
 	scalar(o);
@@ -2519,6 +2586,8 @@ Perl_newMADTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop)
 void
 Perl_token_free(pTHX_ MADTOKEN* tk)
 {
+    PERL_ARGS_ASSERT_TOKEN_FREE;
+
     if (tk->tk_type != 12345)
 	return;
     mad_free(tk->tk_mad);
@@ -2530,6 +2599,9 @@ Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot)
 {
     MADPROP* mp;
     MADPROP* tm;
+
+    PERL_ARGS_ASSERT_TOKEN_GETMAD;
+
     if (tk->tk_type != 12345) {
 	Perl_warner(aTHX_ packWARN(WARN_MISC),
 	     "Invalid MADTOKEN object ignored");
@@ -2699,6 +2771,8 @@ Perl_addmad(pTHX_ MADPROP* tm, MADPROP** root, char slot)
 MADPROP *
 Perl_newMADsv(pTHX_ char key, SV* sv)
 {
+    PERL_ARGS_ASSERT_NEWMADSV;
+
     return newMADPROP(key, MAD_SV, sv, 0);
 }
 
@@ -2911,6 +2985,9 @@ Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
     const I32 squash     = o->op_private & OPpTRANS_SQUASH;
     I32 del              = o->op_private & OPpTRANS_DELETE;
     SV* swash;
+
+    PERL_ARGS_ASSERT_PMTRANS;
+
     PL_hints |= HINT_BLOCK_SCOPE;
 
     if (IN_CODEPOINTS)
@@ -3266,6 +3343,8 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
     OP* repl = NULL;
     bool reglist;
 
+    PERL_ARGS_ASSERT_PMRUNTIME;
+
     if (o->op_type == OP_SUBST || o->op_type == OP_TRANS) {
 	/* last element in list is the replacement; pop it */
 	OP* kid;
@@ -3452,6 +3531,9 @@ Perl_newSVOP(pTHX_ I32 type, I32 flags, SV *sv)
 {
     dVAR;
     SVOP *svop;
+
+    PERL_ARGS_ASSERT_NEWSVOP;
+
     NewOp(1101, svop, 1, SVOP);
     svop->op_type = (OPCODE)type;
     svop->op_ppaddr = PL_ppaddr[type];
@@ -3471,6 +3553,9 @@ Perl_newPADOP(pTHX_ I32 type, I32 flags, SV *sv)
 {
     dVAR;
     PADOP *padop;
+
+    PERL_ARGS_ASSERT_NEWPADOP;
+
     NewOp(1101, padop, 1, PADOP);
     padop->op_type = (OPCODE)type;
     padop->op_ppaddr = PL_ppaddr[type];
@@ -3493,7 +3578,9 @@ OP *
 Perl_newGVOP(pTHX_ I32 type, I32 flags, GV *gv)
 {
     dVAR;
-    assert(gv);
+
+    PERL_ARGS_ASSERT_NEWGVOP;
+
 #ifdef USE_ITHREADS
     GvIN_PAD_on(gv);
     return newPADOP(type, flags, SvREFCNT_inc_simple_NN(gv));
@@ -3532,6 +3619,8 @@ Perl_package(pTHX_ OP *o)
 #ifdef PERL_MAD
     OP *pegop;
 #endif
+
+    PERL_ARGS_ASSERT_PACKAGE;
 
     save_hptr(&PL_curstash);
     save_item(PL_curstname);
@@ -3572,6 +3661,8 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 #ifdef PERL_MAD
     OP *pegop = newOP(OP_NULL,0);
 #endif
+
+    PERL_ARGS_ASSERT_UTILIZE;
 
     if (idop->op_type != OP_CONST)
 	Perl_croak(aTHX_ "Module name must be constant");
@@ -3693,6 +3784,9 @@ void
 Perl_load_module(pTHX_ U32 flags, SV *name, SV *ver, ...)
 {
     va_list args;
+
+    PERL_ARGS_ASSERT_LOAD_MODULE;
+
     va_start(args, ver);
     vload_module(flags, name, ver, &args);
     va_end(args);
@@ -3704,6 +3798,7 @@ Perl_load_module_nocontext(U32 flags, SV *name, SV *ver, ...)
 {
     dTHX;
     va_list args;
+    PERL_ARGS_ASSERT_LOAD_MODULE_NOCONTEXT;
     va_start(args, ver);
     vload_module(flags, name, ver, &args);
     va_end(args);
@@ -3715,8 +3810,10 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
 {
     dVAR;
     OP *veop, *imop;
-
     OP * const modname = newSVOP(OP_CONST, 0, name);
+
+    PERL_ARGS_ASSERT_VLOAD_MODULE;
+
     modname->op_private |= OPpCONST_BARE;
     if (ver) {
 	veop = newSVOP(OP_CONST, 0, ver);
@@ -3759,6 +3856,8 @@ Perl_dofile(pTHX_ OP *term, I32 force_builtin)
     dVAR;
     OP *doop;
     GV *gv = NULL;
+
+    PERL_ARGS_ASSERT_DOFILE;
 
     if (!force_builtin) {
 	gv = gv_fetchpvs("do", GV_NOTQUAL, SVt_PVCV);
@@ -4102,6 +4201,9 @@ OP *
 Perl_newLOGOP(pTHX_ I32 type, I32 flags, OP *first, OP *other)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_NEWLOGOP;
+
     return new_logop(type, flags, &first, &other);
 }
 
@@ -4113,6 +4215,8 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     OP *o;
     OP *first = *firstp;
     OP * const other = *otherp;
+
+    PERL_ARGS_ASSERT_NEW_LOGOP;
 
     if (type == OP_XOR)		/* Not short circuit, but here by precedence. */
 	return newBINOP(type, flags, scalar(first), scalar(other));
@@ -4264,6 +4368,8 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
     OP *start;
     OP *o;
 
+    PERL_ARGS_ASSERT_NEWCONDOP;
+
     if (!falseop)
 	return newLOGOP(OP_AND, 0, first, trueop);
     if (!trueop)
@@ -4328,6 +4434,8 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
     OP *flop;
     OP *leftstart;
     OP *o;
+
+    PERL_ARGS_ASSERT_NEWRANGE;
 
     NewOp(1101, range, 1, LOGOP);
 
@@ -4538,6 +4646,8 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     I32 iterpflags = 0;
     OP *madsv = NULL;
 
+    PERL_ARGS_ASSERT_NEWFOROP;
+
     if (sv) {
 	if (sv->op_type == OP_RV2SV) {	/* symbol table variable */
 	    iterpflags = sv->op_private & OPpOUR_INTRO; /* for our $x () */
@@ -4657,6 +4767,8 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
     dVAR;
     OP *o;
 
+    PERL_ARGS_ASSERT_NEWLOOPEX;
+
     if (type != OP_GOTO || label->op_type == OP_CONST) {
 	/* "last()" means "last" */
 	if (label->op_type == OP_STUB && (label->op_flags & OPf_PARENS))
@@ -4721,6 +4833,8 @@ S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
     LOGOP *enterop;
     OP *o;
 
+    PERL_ARGS_ASSERT_NEWGIVWHENOP;
+
     NewOp(1101, enterop, 1, LOGOP);
     enterop->op_type = enter_opcode;
     enterop->op_ppaddr = PL_ppaddr[enter_opcode];
@@ -4770,6 +4884,9 @@ STATIC bool
 S_looks_like_bool(pTHX_ const OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_LOOKS_LIKE_BOOL;
+
     switch(o->op_type) {
 	case OP_OR:
 	    return looks_like_bool(cLOGOPo->op_first);
@@ -4830,7 +4947,7 @@ OP *
 Perl_newGIVENOP(pTHX_ OP *cond, OP *block, PADOFFSET defsv_off)
 {
     dVAR;
-    assert( cond );
+    PERL_ARGS_ASSERT_NEWGIVENOP;
     return newGIVWHENOP(
     	ref_array_or_hash(cond),
     	block,
@@ -4844,6 +4961,8 @@ Perl_newWHENOP(pTHX_ OP *cond, OP *block)
 {
     const bool cond_llb = (!cond || looks_like_bool(cond));
     OP *cond_op;
+
+    PERL_ARGS_ASSERT_NEWWHENOP;
 
     if (cond_llb)
 	cond_op = cond;
@@ -4874,6 +4993,8 @@ void
 Perl_cv_undef(pTHX_ CV *cv)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CV_UNDEF;
 
     DEBUG_X(PerlIO_printf(Perl_debug_log,
 	  "CV undef: cv=0x%"UVxf" comppad=0x%"UVxf"\n",
@@ -4926,6 +5047,8 @@ void
 Perl_cv_ckproto_len(pTHX_ const CV *cv, const GV *gv, const char *p,
 		    const STRLEN len)
 {
+    PERL_ARGS_ASSERT_CV_CKPROTO_LEN;
+
     /* Can't just use a strcmp on the prototype, as CONSTSUBs "cheat" by
        relying on SvCUR, and doubling up the buffer to hold CvFILE().  */
     if (((!p != !SvPOK(cv)) /* One has prototype, one has not.  */
@@ -5452,6 +5575,8 @@ S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv,
     const char *const colon = strrchr(fullname,':');
     const char *const name = colon ? colon + 1 : fullname;
 
+    PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCKS;
+
     if (*name == 'B') {
 	if (strEQ(name, "BEGIN")) {
 	    const I32 oldscope = PL_scopestack_ix;
@@ -5580,6 +5705,8 @@ Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr,
 {
     CV *cv = newXS(name, subaddr, filename);
 
+    PERL_ARGS_ASSERT_NEWXS_FLAGS;
+
     if (flags & XS_DYNAMIC_FILENAME) {
 	/* We need to "make arrangements" (ie cheat) to ensure that the
 	   filename lasts as long as the PVCV we just created, but also doesn't
@@ -5635,6 +5762,8 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 			(PL_curstash ? "__ANON__" : "__ANON__::__ANON__"),
 			GV_ADDMULTI, SVt_PVCV);
     register CV *cv;
+
+    PERL_ARGS_ASSERT_NEWXS;
 
     if (!subaddr)
 	Perl_croak(aTHX_ "panic: no address for '%s' in '%s'", name, filename);
@@ -5727,6 +5856,9 @@ OP *
 Perl_oopsAV(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_OOPSAV;
+
     switch (o->op_type) {
     case OP_PADSV:
 	o->op_type = OP_PADAV;
@@ -5751,6 +5883,9 @@ OP *
 Perl_oopsHV(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_OOPSHV;
+
     switch (o->op_type) {
     case OP_PADSV:
     case OP_PADAV:
@@ -5777,6 +5912,9 @@ OP *
 Perl_newAVREF(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_NEWAVREF;
+
     if (o->op_type == OP_PADANY) {
 	o->op_type = OP_PADAV;
 	o->op_ppaddr = PL_ppaddr[OP_PADAV];
@@ -5802,6 +5940,9 @@ OP *
 Perl_newHVREF(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_NEWHVREF;
+
     if (o->op_type == OP_PADANY) {
 	o->op_type = OP_PADHV;
 	o->op_ppaddr = PL_ppaddr[OP_PADHV];
@@ -5825,6 +5966,9 @@ OP *
 Perl_newSVREF(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_NEWSVREF;
+
     if (o->op_type == OP_PADANY) {
 	o->op_type = OP_PADSV;
 	o->op_ppaddr = PL_ppaddr[OP_PADSV];
@@ -5839,6 +5983,8 @@ Perl_newSVREF(pTHX_ OP *o)
 OP *
 Perl_ck_anoncode(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_ANONCODE;
+
     cSVOPo->op_targ = pad_add_anon(cSVOPo->op_sv, o->op_type);
     if (!PL_madskills)
 	cSVOPo->op_sv = NULL;
@@ -5849,6 +5995,9 @@ OP *
 Perl_ck_bitop(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CK_BITOP;
+
 #define OP_IS_NUMCOMPARE(op) \
 	((op) == OP_LT   || (op) == OP_I_LT || \
 	 (op) == OP_GT   || (op) == OP_I_GT || \
@@ -5883,7 +6032,10 @@ OP *
 Perl_ck_concat(pTHX_ OP *o)
 {
     const OP * const kid = cUNOPo->op_first;
+
+    PERL_ARGS_ASSERT_CK_CONCAT;
     PERL_UNUSED_CONTEXT;
+
     if (kid->op_type == OP_CONCAT && !(kid->op_private & OPpTARGET_MY) &&
 	    !(kUNOP->op_first->op_flags & OPf_MOD))
         o->op_flags |= OPf_STACKED;
@@ -5894,6 +6046,9 @@ OP *
 Perl_ck_spair(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CK_SPAIR;
+
     if (o->op_flags & OPf_KIDS) {
 	OP* newop;
 	OP* kid;
@@ -5922,6 +6077,8 @@ Perl_ck_spair(pTHX_ OP *o)
 OP *
 Perl_ck_delete(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_DELETE;
+
     o = ck_fun(o);
     o->op_private = 0;
     if (o->op_flags & OPf_KIDS) {
@@ -5950,6 +6107,8 @@ Perl_ck_delete(pTHX_ OP *o)
 OP *
 Perl_ck_die(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_DIE;
+
 #ifdef VMS
     if (VMSISH_HUSHED) o->op_private |= OPpHUSH_VMSISH;
 #endif
@@ -5960,6 +6119,8 @@ OP *
 Perl_ck_eof(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CK_EOF;
 
     if (o->op_flags & OPf_KIDS) {
 	if (cLISTOPo->op_first->op_type == OP_STUB) {
@@ -5981,6 +6142,9 @@ OP *
 Perl_ck_eval(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CK_EVAL;
+
     PL_hints |= HINT_BLOCK_SCOPE;
     if (o->op_flags & OPf_KIDS) {
 	SVOP * const kid = (SVOP*)cUNOPo->op_first;
@@ -6046,6 +6210,8 @@ Perl_ck_eval(pTHX_ OP *o)
 OP *
 Perl_ck_exit(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_EXIT;
+
 #ifdef VMS
     HV * const table = GvHV(PL_hintgv);
     if (table) {
@@ -6061,6 +6227,8 @@ Perl_ck_exit(pTHX_ OP *o)
 OP *
 Perl_ck_exec(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_EXEC;
+
     if (o->op_flags & OPf_STACKED) {
         OP *kid;
 	o = ck_fun(o);
@@ -6077,6 +6245,9 @@ OP *
 Perl_ck_exists(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CK_EXISTS;
+
     o = ck_fun(o);
     if (o->op_flags & OPf_KIDS) {
 	OP * const kid = cUNOPo->op_first;
@@ -6103,6 +6274,8 @@ Perl_ck_rvconst(pTHX_ register OP *o)
 {
     dVAR;
     SVOP * const kid = (SVOP*)cUNOPo->op_first;
+
+    PERL_ARGS_ASSERT_CK_RVCONST;
 
     if (o->op_type == OP_RV2CV)
 	o->op_private &= ~1;
@@ -6208,6 +6381,8 @@ Perl_ck_ftst(pTHX_ OP *o)
     dVAR;
     const I32 type = o->op_type;
 
+    PERL_ARGS_ASSERT_CK_FTST;
+
     if (o->op_flags & OPf_REF) {
 	NOOP;
     }
@@ -6252,6 +6427,8 @@ Perl_ck_fun(pTHX_ OP *o)
     dVAR;
     const int type = o->op_type;
     register I32 oa = PL_opargs[type] >> OASHIFT;
+
+    PERL_ARGS_ASSERT_CK_FUN;
 
     if (o->op_flags & OPf_STACKED) {
 	if ((oa & OA_OPTIONAL) && (oa >> 4) && !((oa >> 4) & OA_OPTIONAL))
@@ -6528,6 +6705,8 @@ Perl_ck_glob(pTHX_ OP *o)
     dVAR;
     GV *gv;
 
+    PERL_ARGS_ASSERT_CK_GLOB;
+
     o = ck_fun(o);
     if ((o->op_flags & OPf_KIDS) && !cLISTOPo->op_first->op_sibling)
 	append_elem(OP_GLOB, o, newDEFSVOP());
@@ -6585,6 +6764,8 @@ Perl_ck_grep(pTHX_ OP *o)
     OP *kid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
     PADOFFSET offset;
+
+    PERL_ARGS_ASSERT_CK_GREP;
 
     o->op_ppaddr = PL_ppaddr[OP_GREPSTART];
     /* don't allocate gwop here, as we may leak it if PL_parser->error_count > 0 */
@@ -6645,6 +6826,8 @@ Perl_ck_grep(pTHX_ OP *o)
 OP *
 Perl_ck_index(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_INDEX;
+
     if (o->op_flags & OPf_KIDS) {
 	OP *kid = cLISTOPo->op_first->op_sibling;	/* get past pushmark */
 	if (kid)
@@ -6658,6 +6841,8 @@ Perl_ck_index(pTHX_ OP *o)
 OP *
 Perl_ck_lengthconst(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_LENGTHCONST;
+
     /* XXX length optimization goes here */
     return ck_fun(o);
 }
@@ -6666,12 +6851,17 @@ OP *
 Perl_ck_lfun(pTHX_ OP *o)
 {
     const OPCODE type = o->op_type;
+
+    PERL_ARGS_ASSERT_CK_LFUN;
+
     return modkids(ck_fun(o), type);
 }
 
 OP *
 Perl_ck_defined(pTHX_ OP *o)		/* 19990527 MJD */
 {
+    PERL_ARGS_ASSERT_CK_DEFINED;
+
     if ((o->op_flags & OPf_KIDS) && ckWARN2(WARN_DEPRECATED, WARN_SYNTAX)) {
 	switch (cUNOPo->op_first->op_type) {
 	case OP_RV2AV:
@@ -6710,6 +6900,8 @@ Perl_ck_defined(pTHX_ OP *o)		/* 19990527 MJD */
 OP *
 Perl_ck_readline(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_READLINE;
+
     if (!(o->op_flags & OPf_KIDS)) {
 	OP * const newop
 	    = newUNOP(OP_READLINE, 0, newGVOP(OP_GV, 0, PL_argvgv));
@@ -6727,6 +6919,9 @@ OP *
 Perl_ck_rfun(pTHX_ OP *o)
 {
     const OPCODE type = o->op_type;
+
+    PERL_ARGS_ASSERT_CK_RFUN;
+
     return refkids(ck_fun(o), type);
 }
 
@@ -6734,6 +6929,8 @@ OP *
 Perl_ck_listiob(pTHX_ OP *o)
 {
     register OP *kid;
+
+    PERL_ARGS_ASSERT_CK_LISTIOB;
 
     kid = cLISTOPo->op_first;
     if (!kid) {
@@ -6833,6 +7030,9 @@ Perl_ck_sassign(pTHX_ OP *o)
 {
     dVAR;
     OP * const kid = cLISTOPo->op_first;
+
+    PERL_ARGS_ASSERT_CK_SASSIGN;
+
     /* has a disposable target? */
     if ((PL_opargs[kid->op_type] & OA_TARGLEX)
 	&& !(kid->op_flags & OPf_STACKED)
@@ -6866,6 +7066,9 @@ OP *
 Perl_ck_match(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CK_MATCH;
+
     if (o->op_type != OP_QR && PL_compcv) {
 	const PADOFFSET offset = pad_findmy("$_");
 	if (offset != NOT_IN_PAD && !(PAD_COMPNAME_FLAGS_isOUR(offset))) {
@@ -6882,6 +7085,9 @@ OP *
 Perl_ck_method(pTHX_ OP *o)
 {
     OP * const kid = cUNOPo->op_first;
+
+    PERL_ARGS_ASSERT_CK_METHOD;
+
     if (kid->op_type == OP_CONST) {
 	SV* sv = kSVOP->op_sv;
 	const char * const method = SvPVX_const(sv);
@@ -6908,6 +7114,7 @@ Perl_ck_method(pTHX_ OP *o)
 OP *
 Perl_ck_null(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_NULL;
     PERL_UNUSED_CONTEXT;
     return o;
 }
@@ -6917,6 +7124,9 @@ Perl_ck_open(pTHX_ OP *o)
 {
     dVAR;
     HV * const table = GvHV(PL_hintgv);
+
+    PERL_ARGS_ASSERT_CK_OPEN;
+
     if (table) {
 	SV **svp = hv_fetchs(table, "open_IN", FALSE);
 	if (svp && *svp) {
@@ -6974,6 +7184,8 @@ Perl_ck_open(pTHX_ OP *o)
 OP *
 Perl_ck_repeat(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_REPEAT;
+
     if (cBINOPo->op_first->op_flags & OPf_PARENS) {
 	o->op_private |= OPpREPEAT_DOLIST;
 	cBINOPo->op_first = force_list(cBINOPo->op_first);
@@ -6988,6 +7200,8 @@ Perl_ck_require(pTHX_ OP *o)
 {
     dVAR;
     GV* gv = NULL;
+
+    PERL_ARGS_ASSERT_CK_REQUIRE;
 
     if (o->op_flags & OPf_KIDS) {	/* Shall we supply missing .pm? */
 	SVOP * const kid = (SVOP*)cUNOPo->op_first;
@@ -7058,6 +7272,9 @@ OP *
 Perl_ck_return(pTHX_ OP *o)
 {
     dVAR;
+
+    PERL_ARGS_ASSERT_CK_RETURN;
+
     return o;
 }
 
@@ -7066,6 +7283,9 @@ Perl_ck_select(pTHX_ OP *o)
 {
     dVAR;
     OP* kid;
+
+    PERL_ARGS_ASSERT_CK_SELECT;
+
     if (o->op_flags & OPf_KIDS) {
 	kid = cLISTOPo->op_first->op_sibling;	/* get past pushmark */
 	if (kid && kid->op_sibling) {
@@ -7085,6 +7305,8 @@ Perl_ck_shift(pTHX_ OP *o)
 {
     dVAR;
     const I32 type = o->op_type;
+
+    PERL_ARGS_ASSERT_CK_SHIFT;
 
     if (!(o->op_flags & OPf_KIDS)) {
 	OP *argop;
@@ -7112,6 +7334,8 @@ Perl_ck_sort(pTHX_ OP *o)
 {
     dVAR;
     OP *firstkid;
+
+    PERL_ARGS_ASSERT_CK_SORT;
 
     if (o->op_type == OP_SORT && (PL_hints & HINT_LOCALIZE_HH) != 0) {
 	HV * const hinthv = GvHV(PL_hintgv);
@@ -7194,6 +7418,9 @@ S_simplify_sort(pTHX_ OP *o)
     int descending;
     GV *gv;
     const char *gvname;
+
+    PERL_ARGS_ASSERT_SIMPLIFY_SORT;
+
     if (!(o->op_flags & OPf_STACKED))
 	return;
     GvMULTI_on(gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV));
@@ -7265,6 +7492,8 @@ Perl_ck_split(pTHX_ OP *o)
     dVAR;
     register OP *kid;
 
+    PERL_ARGS_ASSERT_CK_SPLIT;
+
     if (o->op_flags & OPf_STACKED)
 	return no_fh_allowed(o);
 
@@ -7333,6 +7562,8 @@ Perl_ck_subr(pTHX_ OP *o)
     I32 contextclass = 0;
     const char *e = NULL;
     bool delete_op = 0;
+
+    PERL_ARGS_ASSERT_CK_SUBR;
 
     o->op_private |= OPpENTERSUB_HASTARG;
     for (cvop = o2; cvop->op_sibling; cvop = cvop->op_sibling) ;
@@ -7575,6 +7806,7 @@ Perl_ck_subr(pTHX_ OP *o)
 OP *
 Perl_ck_svconst(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_SVCONST;
     PERL_UNUSED_CONTEXT;
     SvREADONLY_on(cSVOPo->op_sv);
     return o;
@@ -7599,6 +7831,8 @@ Perl_ck_chdir(pTHX_ OP *o)
 OP *
 Perl_ck_trunc(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_TRUNC;
+
     if (o->op_flags & OPf_KIDS) {
 	SVOP *kid = (SVOP*)cUNOPo->op_first;
 
@@ -7618,6 +7852,9 @@ OP *
 Perl_ck_unpack(pTHX_ OP *o)
 {
     OP *kid = cLISTOPo->op_first;
+
+    PERL_ARGS_ASSERT_CK_UNPACK;
+
     if (kid->op_sibling) {
 	kid = kid->op_sibling;
 	if (!kid->op_sibling)
@@ -7629,6 +7866,8 @@ Perl_ck_unpack(pTHX_ OP *o)
 OP *
 Perl_ck_substr(pTHX_ OP *o)
 {
+    PERL_ARGS_ASSERT_CK_SUBSTR;
+
     o = ck_fun(o);
     if ((o->op_flags & OPf_KIDS) && (o->op_private == 4)) {
 	OP *kid = cLISTOPo->op_first;
@@ -8213,6 +8452,8 @@ Perl_custom_op_name(pTHX_ const OP* o)
     SV* keysv;
     HE* he;
 
+    PERL_ARGS_ASSERT_CUSTOM_OP_NAME;
+
     if (!PL_custom_op_names) /* This probably shouldn't happen */
         return (char *)PL_op_name[OP_CUSTOM];
 
@@ -8232,6 +8473,8 @@ Perl_custom_op_desc(pTHX_ const OP* o)
     const IV index = PTR2IV(o->op_ppaddr);
     SV* keysv;
     HE* he;
+
+    PERL_ARGS_ASSERT_CUSTOM_OP_DESC;
 
     if (!PL_custom_op_descs)
         return (char *)PL_op_desc[OP_CUSTOM];

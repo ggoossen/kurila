@@ -1170,7 +1170,6 @@
 #define ck_readline		Perl_ck_readline
 #define ck_repeat		Perl_ck_repeat
 #define ck_require		Perl_ck_require
-#define ck_retarget		Perl_ck_retarget
 #define ck_return		Perl_ck_return
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
@@ -1338,17 +1337,18 @@
 #endif
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
 #if defined(PERL_CORE) || defined(PERL_EXT)
+#define regclassfold		S_regclassfold
+#define regclassfold_value	S_regclassfold_value
+#define anyof_get_swash		S_anyof_get_swash
 #define reg			S_reg
 #define reganode		S_reganode
 #define regatom			S_regatom
 #define regbranch		S_regbranch
 #define reguni			S_reguni
 #define regclass		S_regclass
-#define regclassfold		S_regclassfold
-#define regclassfold_value	S_regclassfold_value
-#define anyof_get_swash		S_anyof_get_swash
 #define regcurly		S_regcurly
 #define reg_node		S_reg_node
+#define reg_recode		S_reg_recode
 #define regpiece		S_regpiece
 #define reg_namedseq		S_reg_namedseq
 #define reginsert		S_reginsert
@@ -3426,7 +3426,6 @@
 #define ck_readline(a)		Perl_ck_readline(aTHX_ a)
 #define ck_repeat(a)		Perl_ck_repeat(aTHX_ a)
 #define ck_require(a)		Perl_ck_require(aTHX_ a)
-#define ck_retarget(a)		Perl_ck_retarget(aTHX_ a)
 #define ck_return(a)		Perl_ck_return(aTHX_ a)
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
@@ -3604,17 +3603,18 @@
 #endif
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
 #if defined(PERL_CORE) || defined(PERL_EXT)
+#define regclassfold(a,b)	S_regclassfold(aTHX_ a,b)
+#define regclassfold_value(a,b)	S_regclassfold_value(aTHX_ a,b)
+#define anyof_get_swash(a,b,c,d)	S_anyof_get_swash(aTHX_ a,b,c,d)
 #define reg(a,b,c,d)		S_reg(aTHX_ a,b,c,d)
 #define reganode(a,b,c)		S_reganode(aTHX_ a,b,c)
 #define regatom(a,b,c)		S_regatom(aTHX_ a,b,c)
 #define regbranch(a,b,c,d)	S_regbranch(aTHX_ a,b,c,d)
 #define reguni(a,b,c)		S_reguni(aTHX_ a,b,c)
 #define regclass(a,b)		S_regclass(aTHX_ a,b)
-#define regclassfold(a,b)	S_regclassfold(aTHX_ a,b)
-#define regclassfold_value(a,b)	S_regclassfold_value(aTHX_ a,b)
-#define anyof_get_swash(a,b,c,d)	S_anyof_get_swash(aTHX_ a,b,c,d)
 #define regcurly		S_regcurly
 #define reg_node(a,b)		S_reg_node(aTHX_ a,b)
+#define reg_recode(a,b)		S_reg_recode(aTHX_ a,b)
 #define regpiece(a,b,c)		S_regpiece(aTHX_ a,b,c)
 #define reg_namedseq(a,b)	S_reg_namedseq(aTHX_ a,b)
 #define reginsert(a,b,c,d)	S_reginsert(aTHX_ a,b,c,d)
