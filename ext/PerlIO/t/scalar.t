@@ -135,7 +135,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
         sub TIESCALAR { bless [] }
         sub FETCH { $fetch++; return undef }
     }
-    tie my $scalar, MgUndef;
+    tie my $scalar, 'MgUndef';
 
     open my $fh, '<', \$scalar;
     close $fh;

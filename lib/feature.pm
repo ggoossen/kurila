@@ -137,7 +137,7 @@ with the same effect.
 sub import {
     my $class = shift;
     if (@_ == 0) {
-	croak("No features specified");
+	die("No features specified");
     }
     while (@_) {
 	my $name = shift(@_);
@@ -192,19 +192,14 @@ sub unimport {
 
 sub unknown_feature {
     my $feature = shift;
-    croak(sprintf('Feature "%s" is not supported by Perl %vd',
-	    $feature, $^V));
+    die(sprintf('Feature "%s" is not supported by Perl %s',
+                $feature, $^V));
 }
 
 sub unknown_feature_bundle {
     my $feature = shift;
-    croak(sprintf('Feature bundle "%s" is not supported by Perl %vd',
+    die(sprintf('Feature bundle "%s" is not supported by Perl %s',
 	    $feature, $^V));
-}
-
-sub croak {
-    require Carp;
-    Carp::croak(@_);
 }
 
 1;

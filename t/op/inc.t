@@ -233,15 +233,15 @@ EOC
     }
 }
 
-my $h_uv_max = 1 + (~0 >> 1);
+my $h_uv_max = 1 + (^~^0 >> 1);
 my $found;
 for my $n (47..113) {
     my $power_of_2 = 2**$n;
     my $plus_1 = $power_of_2 + 1;
     next if $plus_1 != $power_of_2;
     my ($start_p, $start_n);
-    if ($h_uv_max > $power_of_2 / 2) {
-	my $uv_max = 1 + 2 * (~0 >> 1);
+    if ($h_uv_max +> $power_of_2 / 2) {
+	my $uv_max = 1 + 2 * (^~^0 >> 1);
 	# UV_MAX is 2**$something - 1, so subtract 1 to get the start value
 	$start_p = $uv_max - 1;
 	# whereas IV_MIN is -(2**$something), so subtract 2

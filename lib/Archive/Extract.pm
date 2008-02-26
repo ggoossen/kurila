@@ -1183,7 +1183,7 @@ sub _unlzma {
        @methods = reverse @methods if $PREFER_BIN;
 
     for my $method (@methods) {
-        $self->_extractor($method) && return 1 if $self->$method();
+        $self->_extractor($method) && return 1 if $self->?$method();
     }
 
     return $self->_error(loc("Unable to unlzma file '%1'", $self->archive));

@@ -317,7 +317,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	print "# Tick! $i $ival\n";
 	my $exp = 0.3 * (5 - $i);
 	# This test is more sensitive, so impose a softer limit.
-	if (abs($ival/$exp - 1) > 4*$limit) {
+	if (abs($ival/$exp - 1) +> 4*$limit) {
 	    my $ratio = abs($ival/$exp);
 	    $not = "tick: $exp sleep took $ival ratio $ratio";
 	    $i = 0;

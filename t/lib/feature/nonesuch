@@ -4,21 +4,21 @@ __END__
 use feature "nonesuch";
 EXPECT
 OPTIONS regex
-^Feature "nonesuch" is not supported by Perl [v0-9.]+
+^Feature "nonesuch" is not supported by Perl \S+
 ########
 no feature "nonesuch";
 EXPECT
 OPTIONS regex
-^Feature "nonesuch" is not supported by Perl [v0-9.]+
+^Feature "nonesuch" is not supported by Perl \S+
 ########
 use feature ":nonesuch";
 EXPECT
 OPTIONS regex
-^Feature bundle "nonesuch" is not supported by Perl [v0-9.]+
+^Feature bundle "nonesuch" is not supported by Perl \S+
 ########
 no feature ":nonesuch";
 EXPECT
 OPTIONS regex
-^Feature bundle "nonesuch" is not supported by Perl [v0-9.]+
+^Feature bundle "nonesuch" is not supported by Perl \S+
 
 ########

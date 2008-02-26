@@ -16,11 +16,7 @@ BEGIN {
 use threads;
 use Thread::Queue;
 
-if ($] == 5.008) {
-    require 't/test.pl';   # Test::More work-alike for Perl 5.8.0
-} else {
-    require Test::More;
-}
+require Test::More;
 Test::More->import();
 plan('tests' => 81);
 
@@ -35,14 +31,14 @@ is($q->pending(), $nthreads, 'Pre-populated queue count');
 sub reader {
     my $id = threads->tid();
     while ((my $el = $q->dequeue()) != -1) {
-        ok($el >= 1, "Thread $id got $el");
+        ok($el +>= 1, "Thread $id got $el");
         select(undef, undef, undef, rand(1));
     }
     ok(1, "Thread $id done");
 }
 
 my @threads;
-push(@threads, threads->create('reader')) for (1..$nthreads);
+push(@threads, threads->create(\&reader)) for (1..$nthreads);
 
 for (1..20) {
     select(undef, undef, undef, rand(1));
@@ -94,7 +90,7 @@ sub reader2 {
     }
 }
 
-push(@threads, threads->create('reader2')) for (1..$nthreads);
+push(@threads, threads->create(\&reader2)) for (1..$nthreads);
 
 $q->enqueue(1..4*$count*$nthreads);
 $q->enqueue((0) x ($count*$nthreads));

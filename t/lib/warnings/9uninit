@@ -649,14 +649,10 @@ $foo =~ s/y/z/;
 $foo =~ s/$m1/z/;
 $foo =~ s//$g1/;
 $foo =~ s/$m1/$g1/;
-<<<<<<< HEAD:t/lib/warnings/9uninit
 $foo =~ s/./{$m1}/;
-=======
-$foo =~ s/./$m1/e;
 undef $g1;
 $m1 = '$g1';
-$foo =~ s//$m1/ee;
->>>>>>> 16a4150d6cfb7eb7f2457d581b31f83dc19b8d2d:t/lib/warnings/9uninit
+$foo =~ s//{eval $m1}/;
 EXPECT
 Use of uninitialized value $_ in pattern match (m//) at - line 5.
 Use of uninitialized value $m1 in regexp compilation at - line 6.

@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 92;
+plan tests => 90;
 
 our ($a, $b, $c);
 

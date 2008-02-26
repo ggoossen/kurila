@@ -15,7 +15,7 @@ krunch.pm krunch.pmc whap.pm whap.pmc);
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
 my $Is_UTF8   = (${^OPEN} || "") =~ m/:utf8/;
-my $total_tests = 50;
+my $total_tests = 38;
 if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
 
@@ -217,9 +217,9 @@ EOT
 {
     do_require
 	'use strict;sub MODIFY_CODE_ATTRIBUTE{} sub f:Blah {$nosuchvar}';
-    my $err = $@;
-    $err .= "\n" unless $err =~ /\n$/;
-    unless ($err =~ /Global symbol "\$nosuchvar" requires /) {
+    my $err = $@ && $@->message;
+    $err .= "\n" unless $err =~ m/\n$/;
+    unless ($err =~ m/Global symbol "\$nosuchvar" requires /) {
 	$err =~ s/^/# /mg;
 	print "${err}not ";
     }
@@ -239,14 +239,6 @@ require utf8;
 my $utf8 = utf8::chr(0xFEFF);
 
 $i++; do_require(qq(${utf8}print "ok $i\n"; 1;\n));
-
-sub bytes_to_utf16 {
-    my $utf16 = pack("$_[0]*", unpack("C*", $_[1]));
-    return @_ == 3 && $_[2] ? pack("$_[0]", 0xFEFF) . $utf16 : $utf16;
-}
-
-$i++; do_require(bytes_to_utf16('n', qq(print "ok $i\\n"; 1;\n), 1)); # BE
-$i++; do_require(bytes_to_utf16('v', qq(print "ok $i\\n"; 1;\n), 1)); # LE
 
 END {
     foreach my $file (@fjles_to_delete) {

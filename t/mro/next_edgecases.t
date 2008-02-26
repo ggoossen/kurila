@@ -77,7 +77,7 @@ require q(./test.pl); plan(tests => 12);
         }
 
         eval { $baz->bar() };
-        ok($@, '... calling bar() with next::method failed') || diag $@;
+        ok($@, '... calling bar() with next::method failed') || diag($@);
     }
 
     # Test with non-existing class (used to segfault)

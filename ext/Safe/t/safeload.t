@@ -6,8 +6,8 @@ BEGIN {
 	@INC = '../lib';
     }
     require Config;
-    import Config;
-    if ($Config{'extensions'} !~ /\bOpcode\b/) {
+    Config->import();
+    if ($Config{'extensions'} !~ m/\bOpcode\b/) {
 	print "1..0\n";
 	exit 0;
     }
@@ -24,7 +24,7 @@ use Test::More;
 use Safe;
 plan(tests => 1);
 
-my $c = new Safe;
+my $c = Safe->new;
 $c->permit(qw(require caller entereval unpack));
 my $r = $c->reval(q{ use version; 1 });
-ok( defined $r, "Can load version.pm in a Safe compartment" ) or diag $@;
+ok( defined $r, "Can load version.pm in a Safe compartment" ) or diag $@->{description};

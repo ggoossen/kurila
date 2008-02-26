@@ -6,7 +6,7 @@ use warnings;
 our $VERSION = '2.06';
 
 use threads::shared 0.96;
-use Scalar::Util 1.10 qw(looks_like_number);
+use Scalar::Util v1.10 qw(looks_like_number);
 
 # Predeclarations for internal functions
 my ($make_shared, $validate_count, $validate_index);
@@ -45,8 +45,8 @@ sub dequeue
     my $count = @_ ? $validate_count->(shift) : 1;
 
     # Wait for requisite number of items
-    cond_wait(@$queue) until (@$queue >= $count);
-    cond_signal(@$queue) if (@$queue > $count);
+    cond_wait(@$queue) until (@$queue +>= $count);
+    cond_signal(@$queue) if (@$queue +> $count);
 
     # Return single item
     return shift(@$queue) if ($count == 1);
@@ -97,16 +97,16 @@ sub insert
     return if (! @_);   # Nothing to insert
 
     # Support negative indices
-    if ($index < 0) {
+    if ($index +< 0) {
         $index += @$queue;
-        if ($index < 0) {
+        if ($index +< 0) {
             $index = 0;
         }
     }
 
     # Dequeue items from $index onward
     my @tmp;
-    while (@$queue > $index) {
+    while (@$queue +> $index) {
         unshift(@tmp, pop(@$queue))
     }
 
@@ -130,24 +130,24 @@ sub extract
     my $count = @_ ? $validate_count->(shift) : 1;
 
     # Support negative indices
-    if ($index < 0) {
+    if ($index +< 0) {
         $index += @$queue;
-        if ($index < 0) {
+        if ($index +< 0) {
             $count += $index;
-            return if ($count <= 0);            # Beyond the head of the queue
+            return if ($count +<= 0);            # Beyond the head of the queue
             return $queue->dequeue_nb($count);  # Extract from the head
         }
     }
 
     # Dequeue items from $index+$count onward
     my @tmp;
-    while (@$queue > ($index+$count)) {
+    while (@$queue +> ($index+$count)) {
         unshift(@tmp, pop(@$queue))
     }
 
     # Extract desired items
     my @items;
-    unshift(@items, pop(@$queue)) while (@$queue > $index);
+    unshift(@items, pop(@$queue)) while (@$queue +> $index);
 
     # Add back any removed items
     push(@$queue, @tmp);
@@ -246,12 +246,11 @@ $validate_index = sub {
 $validate_count = sub {
     my $count = shift;
 
-    if ((! looks_like_number($count)) || (int($count) != $count) || ($count < 1)) {
-        require Carp;
+    if ((! looks_like_number($count)) || (int($count) != $count) || ($count +< 1)) {
         my ($method) = (caller(1))[3];
         $method =~ s/Thread::Queue:://;
         $count = 'undef' if (! defined($count));
-        Carp::croak("Invalid 'count' argument ($count) to '$method' method");
+        die("Invalid 'count' argument ($count) to '$method' method");
     }
 
     return $count;

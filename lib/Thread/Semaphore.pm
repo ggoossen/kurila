@@ -6,7 +6,7 @@ use warnings;
 our $VERSION = '2.07';
 
 use threads::shared;
-use Scalar::Util 1.10 qw(looks_like_number);
+use Scalar::Util v1.10 qw(looks_like_number);
 
 # Create a new semaphore optionally with specified count (count defaults to 1)
 sub new {
@@ -25,12 +25,11 @@ sub down {
     my $sema = shift;
     lock($$sema);
     my $dec = @_ ? shift : 1;
-    if (! looks_like_number($dec) || (int($dec) != $dec) || ($dec < 1)) {
-        require Carp;
+    if (! looks_like_number($dec) || (int($dec) != $dec) || ($dec +< 1)) {
         $dec = 'undef' if (! defined($dec));
-        Carp::croak("Semaphore decrement is not a positive integer: $dec");
+        die("Semaphore decrement is not a positive integer: $dec");
     }
-    cond_wait($$sema) until ($$sema >= $dec);
+    cond_wait($$sema) until ($$sema +>= $dec);
     $$sema -= $dec;
 }
 
@@ -39,12 +38,11 @@ sub up {
     my $sema = shift;
     lock($$sema);
     my $inc = @_ ? shift : 1;
-    if (! looks_like_number($inc) || (int($inc) != $inc) || ($inc < 1)) {
-        require Carp;
+    if (! looks_like_number($inc) || (int($inc) != $inc) || ($inc +< 1)) {
         $inc = 'undef' if (! defined($inc));
-        Carp::croak("Semaphore increment is not a positive integer: $inc");
+        die("Semaphore increment is not a positive integer: $inc");
     }
-    ($$sema += $inc) > 0 and cond_broadcast($$sema);
+    ($$sema += $inc) +> 0 and cond_broadcast($$sema);
 }
 
 1;

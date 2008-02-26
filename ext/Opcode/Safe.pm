@@ -60,7 +60,6 @@ my $default_share = [qw[
     $version::VERSION
     $version::CLASS
     @version::ISA
-], ($] >= 5.010 && qw[
     &re::is_regexp
     &re::regname
     &re::regnames
@@ -83,7 +82,7 @@ my $default_share = [qw[
     &version::numify
     &version::normal
     &version::(cmp
-    &version::(<=>
+    &version::(<+>
     &version::vcmp
     &version::(bool
     &version::boolean
@@ -91,9 +90,12 @@ my $default_share = [qw[
     &version::noop
     &version::is_alpha
     &version::qv
-]), ($] >= 5.011 && qw[
     &re::regexp_pattern
-])];
+    &error::create
+    &error::message
+    &error::write_to_stderr
+    &Symbol::fetch_glob
+]];
 
 sub new {
     my($class, $root, $mask) = @_;
