@@ -1322,7 +1322,6 @@ OP *
 Perl_die(pTHX_ const char* pat, ...)
 {
     va_list args;
-    PERL_ARGS_ASSERT_DIE_NOCONTEXT;
     va_start(args, pat);
     vdie(pat, &args);
     /* NOTREACHED */
