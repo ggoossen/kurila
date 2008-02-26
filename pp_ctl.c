@@ -1212,7 +1212,7 @@ PP(pp_enteriter)
 #ifdef USE_ITHREADS
     PUSHLOOP_FOR(cx, iterdata, MARK, PL_op->op_targ);
 #else
-    PUSHLOOP_FOR(cx, svp, MARK, /*Not used*/);
+    PUSHLOOP_FOR(cx, svp, MARK, 0);
 #endif
     if (PL_op->op_flags & OPf_STACKED) {
 	SV *maybe_ary = POPs;
