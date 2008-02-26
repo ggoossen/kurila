@@ -247,8 +247,6 @@ EXTCONST char* const PL_op_name[] = {
 	"sysseek",
 	"sysread",
 	"syswrite",
-	"send",
-	"recv",
 	"eof",
 	"tell",
 	"seek",
@@ -256,6 +254,8 @@ EXTCONST char* const PL_op_name[] = {
 	"fcntl",
 	"ioctl",
 	"flock",
+	"send",
+	"recv",
 	"socket",
 	"sockpair",
 	"bind",
@@ -606,8 +606,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"sysseek",
 	"sysread",
 	"syswrite",
-	"send",
-	"recv",
 	"eof",
 	"tell",
 	"seek",
@@ -615,6 +613,8 @@ EXTCONST char* const PL_op_desc[] = {
 	"fcntl",
 	"ioctl",
 	"flock",
+	"send",
+	"recv",
 	"socket",
 	"socketpair",
 	"bind",
@@ -977,8 +977,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_sysseek),
 	MEMBER_TO_FPTR(Perl_pp_sysread),
 	MEMBER_TO_FPTR(Perl_pp_send),	/* Perl_pp_syswrite */
-	MEMBER_TO_FPTR(Perl_pp_send),
-	MEMBER_TO_FPTR(Perl_pp_sysread),	/* Perl_pp_recv */
 	MEMBER_TO_FPTR(Perl_pp_eof),
 	MEMBER_TO_FPTR(Perl_pp_tell),
 	MEMBER_TO_FPTR(Perl_pp_sysseek),	/* Perl_pp_seek */
@@ -986,6 +984,8 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_ioctl),	/* Perl_pp_fcntl */
 	MEMBER_TO_FPTR(Perl_pp_ioctl),
 	MEMBER_TO_FPTR(Perl_pp_flock),
+	MEMBER_TO_FPTR(Perl_pp_send),
+	MEMBER_TO_FPTR(Perl_pp_sysread),	/* Perl_pp_recv */
 	MEMBER_TO_FPTR(Perl_pp_socket),
 	MEMBER_TO_FPTR(Perl_pp_sockpair),
 	MEMBER_TO_FPTR(Perl_pp_bind),
@@ -1345,8 +1345,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysseek */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysread */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* syswrite */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* send */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* recv */
 	MEMBER_TO_FPTR(Perl_ck_eof),	/* eof */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* tell */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* seek */
@@ -1354,6 +1352,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* fcntl */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* ioctl */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* flock */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* send */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* recv */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* socket */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sockpair */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* bind */
@@ -1707,8 +1707,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0022c804,	/* sysseek */
 	0x122ec81d,	/* sysread */
 	0x1322c81d,	/* syswrite */
-	0x1222c81d,	/* send */
-	0x022ec81d,	/* recv */
 	0x0001d614,	/* eof */
 	0x0001d60c,	/* tell */
 	0x0022c804,	/* seek */
@@ -1716,6 +1714,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x0022c80c,	/* fcntl */
 	0x0022c80c,	/* ioctl */
 	0x0002c91c,	/* flock */
+	0x1222c81d,	/* send */
+	0x022ec81d,	/* recv */
 	0x0222c814,	/* socket */
 	0x222cc814,	/* sockpair */
 	0x0002c814,	/* bind */

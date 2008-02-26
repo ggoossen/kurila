@@ -23,7 +23,7 @@ require DynaLoader;
 		 stat
 		);
 
-$VERSION = v1.9711;
+$VERSION = v1.9712;
 $XS_VERSION = $VERSION;
 
 sub import {
