@@ -10,8 +10,7 @@ BEGIN {
     use Config;
     my $ithreads = $Config{'useithreads'} eq 'define';
     eval qq{
-	sub ITHREADS() { $ithreads }
-	sub VERSION() { $] }
+	sub ITHREADS() \{ $ithreads \}
     }; die $@ if $@;
 }
 
@@ -82,7 +81,6 @@ sub B::PMOP::debug {
     $op->B::LISTOP::debug();
     printf "\top_pmreplroot\t0x%x\n", ${$op->pmreplroot};
     printf "\top_pmreplstart\t0x%x\n", ${$op->pmreplstart};
-    printf "\top_pmnext\t0x%x\n", ${$op->pmnext} if $] < 5.009005;
     if (ITHREADS) {
       printf "\top_pmstashpv\t%s\n", cstring($op->pmstashpv);
       printf "\top_pmoffset\t%d\n", $op->pmoffset;
@@ -91,9 +89,7 @@ sub B::PMOP::debug {
     }
     printf "\top_precomp->precomp\t%s\n", cstring($op->precomp);
     printf "\top_pmflags\t0x%x\n", $op->pmflags;
-    printf "\top_reflags\t0x%x\n", $op->reflags if $] >= 5.009;
-    printf "\top_pmpermflags\t0x%x\n", $op->pmpermflags if $] < 5.009;
-    printf "\top_pmdynflags\t0x%x\n", $op->pmdynflags if $] < 5.009;
+    printf "\top_reflags\t0x%x\n", $op->reflags;
     $op->pmreplroot->debug;
 }
 

@@ -8,7 +8,7 @@ BEGIN {
 my $no_endianness = '';
 my $no_signedness = '';
 
-plan tests => 14697;
+plan tests => 14651;
 
 use strict;
 use warnings qw(FATAL all);
@@ -1899,6 +1899,6 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 }
 {
     #50256
-    my ($v) = split //, unpack ('(B)*', 'ab');
+    my ($v) = split m//, unpack ('(B)*', 'ab');
     is($v, 0); # Doesn't SEGV :-)
 }

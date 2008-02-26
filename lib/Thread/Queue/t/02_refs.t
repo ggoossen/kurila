@@ -17,11 +17,7 @@ use threads;
 use threads::shared;
 use Thread::Queue;
 
-if ($] == 5.008) {
-    require 't/test.pl';   # Test::More work-alike for Perl 5.8.0
-} else {
-    require Test::More;
-}
+require Test::More;
 Test::More->import();
 plan('tests' => 39);
 
@@ -84,7 +80,7 @@ threads->create(sub {
     my $tary2 = $q->dequeue();
     ok($tary2, 'Thread got item');
     is(ref($tary2), 'ARRAY', 'Item is array ref');
-    for (my $ii=0; $ii < @ary2; $ii++) {
+    for (my $ii=0; $ii +< @ary2; $ii++) {
         is($$tary2[$ii], $ary2[$ii], 'Shared array element check');
     }
     $$tary2[1] = 444;

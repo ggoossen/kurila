@@ -628,7 +628,6 @@ static const char * const context_name[] = {
     NULL, /* CXt_LOOP_LAZYSV never actually needs "loop" */
     NULL, /* CXt_LOOP_LAZYIV never actually needs "loop" */
     "subroutine",
-    "format",
     "eval",
     "substitution",
 };

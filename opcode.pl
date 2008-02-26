@@ -768,9 +768,9 @@ vec		vec			ck_fun		ist@	S S S
 index		index			ck_index	isT@	S S S?
 rindex		rindex			ck_index	isT@	S S S?
 
-sprintf		sprintf			ck_fun		fmst@	S L
-ord		ord			ck_fun		ifsTu%	S?
-chr		chr			ck_fun		fsTu%	S?
+sprintf		sprintf			ck_fun		mst@	S L
+ord		ord			ck_fun		isTu%	S?
+chr		chr			ck_fun		sTu%	S?
 crypt		crypt			ck_fun		fsT@	S S
 ucfirst		ucfirst			ck_fun		stu%	S?
 lcfirst		lcfirst			ck_fun		stu%	S?

@@ -22,7 +22,7 @@ use vars qw($self); # Used in 'sourcing' the hints.
 #      expression?
 my $ld_exeext = ($^O eq 'cygwin' ||
                  $^O eq 'os2' && $Config{ldflags} =~ m/-Zexe\b/) ? '.exe' :
-                (($^O eq 'vos') ? $Config{exe_ext} : ''));
+                (($^O eq 'vos') ? $Config{exe_ext} : '');
 
 unless($ENV{PERL_CORE}) {
     $ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
