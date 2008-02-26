@@ -647,6 +647,7 @@ ext/re/t/re.t			see if re pragma works
 ext/Safe/t/safe1.t		See if Safe works
 ext/Safe/t/safe2.t		See if Safe works
 ext/Safe/t/safe3.t		See if Safe works
+ext/Safe/t/safeload.t		Tests that some modules can be loaded by Safe
 ext/Safe/t/safeops.t		Tests that all ops can be trapped by Safe
 ext/Safe/t/safeuniversal.t	Tests Safe with functions from universal.c
 ext/Socket/Makefile.PL		Socket extension makefile writer
@@ -2585,6 +2586,7 @@ t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
 t/lib/Dev/Null.pm		Module for testing Test::Harness
 t/lib/Dummy.pm			Module for testing base.pm
+t/lib/feature/bundle		Tests for feature bundles
 t/lib/feature/implicit		Tests for implicit loading of feature.pm
 t/lib/feature/nonesuch		Tests for enabling/disabling nonexistent feature
 t/lib/feature/switch		Tests for enabling/disabling switch feature

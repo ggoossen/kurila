@@ -154,7 +154,7 @@ Public API:
  */
 
 void
-Perl_offer_nice_chunk(pTHX_ void *chunk, U32 chunk_size)
+Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 {
     dVAR;
     void *new_chunk;
@@ -332,7 +332,7 @@ and split it into a list of free SVs.
 */
 
 void
-Perl_sv_add_arena(pTHX_ char *ptr, U32 size, U32 flags)
+Perl_sv_add_arena(pTHX_ char *const ptr, const U32 size, const U32 flags)
 {
     dVAR;
     SV* const sva = (SV*)ptr;
@@ -370,7 +370,7 @@ Perl_sv_add_arena(pTHX_ char *ptr, U32 size, U32 flags)
  * whose flags field matches the flags/mask args. */
 
 STATIC I32
-S_visit(pTHX_ SVFUNC_t f, U32 flags, U32 mask)
+S_visit(pTHX_ SVFUNC_t f, const U32 flags, const U32 mask)
 {
     dVAR;
     SV* sva;
@@ -427,7 +427,7 @@ Perl_sv_report_used(pTHX)
 /* called by sv_clean_objs() for each live SV */
 
 static void
-do_clean_objs(pTHX_ SV *ref)
+do_clean_objs(pTHX_ SV *const ref)
 {
     dVAR;
     assert (SvROK(ref));
@@ -503,7 +503,7 @@ Perl_sv_clean_objs(pTHX)
 /* called by sv_clean_all() for each live SV */
 
 static void
-do_clean_all(pTHX_ SV *sv)
+do_clean_all(pTHX_ SV *const sv)
 {
     dVAR;
     DEBUG_D((PerlIO_printf(Perl_debug_log, "Cleaning loops: SV at 0x%"UVxf"\n", PTR2UV(sv)) ));
@@ -663,7 +663,7 @@ Perl_sv_free_arenas(pTHX)
    TBD: export properly for hv.c: S_more_he().
 */
 void*
-Perl_get_arena(pTHX_ size_t arena_size, U32 misc)
+Perl_get_arena(pTHX_ const size_t arena_size, const U32 misc)
 {
     dVAR;
     struct arena_desc* adesc;
@@ -1023,7 +1023,7 @@ static const struct body_details bodies_by_type[] = {
 	my_safecalloc((details)->body_size + (details)->offset)
 
 STATIC void *
-S_more_bodies (pTHX_ svtype sv_type)
+S_more_bodies (pTHX_ const svtype sv_type)
 {
     dVAR;
     void ** const root = &PL_body_roots[sv_type];
@@ -1086,7 +1086,7 @@ S_more_bodies (pTHX_ svtype sv_type)
 #ifndef PURIFY
 
 STATIC void *
-S_new_body(pTHX_ svtype sv_type)
+S_new_body(pTHX_ const svtype sv_type)
 {
     dVAR;
     void *xpv;
@@ -1110,7 +1110,7 @@ You generally want to use the C<SvUPGRADE> macro wrapper. See also C<svtype>.
 */
 
 void
-Perl_sv_upgrade(pTHX_ register SV *sv, svtype new_type)
+Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
 {
     dVAR;
     void*	old_body;
@@ -1387,7 +1387,7 @@ wrapper instead.
 */
 
 int
-Perl_sv_backoff(pTHX_ register SV *sv)
+Perl_sv_backoff(pTHX_ register SV *const sv)
 {
     STRLEN delta;
     const char * const s = SvPVX_const(sv);
@@ -1416,7 +1416,7 @@ Use the C<SvGROW> wrapper instead.
 */
 
 char *
-Perl_sv_grow(pTHX_ register SV *sv, register STRLEN newlen)
+Perl_sv_grow(pTHX_ register SV *const sv, register STRLEN newlen)
 {
     register char *s;
 
@@ -1484,7 +1484,7 @@ Does not handle 'set' magic.  See also C<sv_setiv_mg>.
 */
 
 void
-Perl_sv_setiv(pTHX_ register SV *sv, IV i)
+Perl_sv_setiv(pTHX_ register SV *const sv, const IV i)
 {
     dVAR;
     SV_CHECK_THINKFIRST_COW_DROP(sv);
@@ -1520,7 +1520,7 @@ Like C<sv_setiv>, but also handles 'set' magic.
 */
 
 void
-Perl_sv_setiv_mg(pTHX_ register SV *sv, IV i)
+Perl_sv_setiv_mg(pTHX_ register SV *const sv, const IV i)
 {
     sv_setiv(sv,i);
     SvSETMAGIC(sv);
@@ -1536,7 +1536,7 @@ Does not handle 'set' magic.  See also C<sv_setuv_mg>.
 */
 
 void
-Perl_sv_setuv(pTHX_ register SV *sv, UV u)
+Perl_sv_setuv(pTHX_ register SV *const sv, const UV u)
 {
     /* With these two if statements:
        u=1.49  s=0.52  cu=72.49  cs=10.64  scripts=270  tests=20865
@@ -1564,7 +1564,7 @@ Like C<sv_setuv>, but also handles 'set' magic.
 */
 
 void
-Perl_sv_setuv_mg(pTHX_ register SV *sv, UV u)
+Perl_sv_setuv_mg(pTHX_ register SV *const sv, const UV u)
 {
     sv_setuv(sv,u);
     SvSETMAGIC(sv);
@@ -1580,7 +1580,7 @@ Does not handle 'set' magic.  See also C<sv_setnv_mg>.
 */
 
 void
-Perl_sv_setnv(pTHX_ register SV *sv, NV num)
+Perl_sv_setnv(pTHX_ register SV *const sv, const NV num)
 {
     dVAR;
     SV_CHECK_THINKFIRST_COW_DROP(sv);
@@ -1617,7 +1617,7 @@ Like C<sv_setnv>, but also handles 'set' magic.
 */
 
 void
-Perl_sv_setnv_mg(pTHX_ register SV *sv, NV num)
+Perl_sv_setnv_mg(pTHX_ register SV *const sv, const NV num)
 {
     sv_setnv(sv,num);
     SvSETMAGIC(sv);
@@ -1628,7 +1628,7 @@ Perl_sv_setnv_mg(pTHX_ register SV *sv, NV num)
  */
 
 STATIC void
-S_not_a_number(pTHX_ SV *sv)
+S_not_a_number(pTHX_ SV *const sv)
 {
      dVAR;
      SV *dsv;
@@ -1657,7 +1657,7 @@ non-numeric warning), even if your atof() doesn't grok them.
 */
 
 I32
-Perl_looks_like_number(pTHX_ SV *sv)
+Perl_looks_like_number(pTHX_ SV *const sv)
 {
     register const char *sbegin;
     STRLEN len;
@@ -1758,7 +1758,7 @@ Perl_looks_like_number(pTHX_ SV *sv)
 
 /* For sv_2nv these three cases are "SvNOK and don't bother casting"  */
 STATIC int
-S_sv_2iuv_non_preserve(pTHX_ register SV *sv
+S_sv_2iuv_non_preserve(pTHX_ register SV *const sv
 #  ifdef DEBUGGING
 		       , I32 numtype
 #  endif
@@ -1810,7 +1810,7 @@ S_sv_2iuv_non_preserve(pTHX_ register SV *sv
 #endif /* !NV_PRESERVES_UV*/
 
 STATIC bool
-S_sv_2iuv_common(pTHX_ SV *sv) {
+S_sv_2iuv_common(pTHX_ SV *const sv) {
     dVAR;
     if (SvNOKp(sv)) {
 	/* erm. not sure. *should* never get NOKp (without NOK) from sv_2nv
@@ -2086,7 +2086,7 @@ Normally used via the C<SvIV(sv)> function.
 */
 
 IV
-Perl_sv_2iv_flags(pTHX_ register SV *sv, I32 flags)
+Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
 {
     dVAR;
     if (!sv)
@@ -2170,7 +2170,7 @@ Normally used via the C<SvUV(sv)> and C<SvUVx(sv)> macros.
 */
 
 UV
-Perl_sv_2uv_flags(pTHX_ register SV *sv, I32 flags)
+Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
 {
     dVAR;
     if (!sv)
@@ -2247,7 +2247,7 @@ macros.
 */
 
 NV
-Perl_sv_2nv(pTHX_ register SV *sv)
+Perl_sv_2nv(pTHX_ register SV *const sv)
 {
     dVAR;
     if (!sv)
@@ -2465,7 +2465,7 @@ access this function.
 */
 
 SV *
-Perl_sv_2num(pTHX_ register SV *sv)
+Perl_sv_2num(pTHX_ register SV *const sv)
 {
     if (!SvROK(sv))
 	return sv;
@@ -2485,7 +2485,7 @@ Perl_sv_2num(pTHX_ register SV *sv)
  */
 
 static char *
-S_uiv_2buf(char *buf, IV iv, UV uv, int is_uv, char **peob)
+S_uiv_2buf(char *const buf, const IV iv, UV uv, const int is_uv, char **const peob)
 {
     char *ptr = buf + TYPE_CHARS(UV);
     char * const ebuf = ptr;
@@ -2522,7 +2522,7 @@ usually end up here too.
 */
 
 char *
-Perl_sv_2pv_flags(pTHX_ register SV *sv, STRLEN *lp, I32 flags)
+Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags)
 {
     dVAR;
     register char *s;
@@ -2790,7 +2790,7 @@ would lose the UTF-8'ness of the PV.
 */
 
 void
-Perl_sv_copypv(pTHX_ SV *dsv, register SV *ssv)
+Perl_sv_copypv(pTHX_ SV *const dsv, register SV *const ssv)
 {
     STRLEN len;
     const char * const s = SvPV_const(ssv,len);
