@@ -775,7 +775,7 @@
 #define save_pptr		Perl_save_pptr
 #define save_vptr		Perl_save_vptr
 #define save_re_context		Perl_save_re_context
-#define save_padsv		Perl_save_padsv
+#define save_padsv_and_mortalize	Perl_save_padsv_and_mortalize
 #define save_sptr		Perl_save_sptr
 #define save_svref		Perl_save_svref
 #ifdef PERL_CORE
@@ -2234,7 +2234,6 @@
 #define pp_seq			Perl_pp_seq
 #define pp_setpgrp		Perl_pp_setpgrp
 #define pp_setpriority		Perl_pp_setpriority
-#define pp_setstate		Perl_pp_setstate
 #define pp_sgrent		Perl_pp_sgrent
 #define pp_shift		Perl_pp_shift
 #define pp_shmctl		Perl_pp_shmctl
@@ -3037,7 +3036,7 @@
 #define save_pptr(a)		Perl_save_pptr(aTHX_ a)
 #define save_vptr(a)		Perl_save_vptr(aTHX_ a)
 #define save_re_context()	Perl_save_re_context(aTHX)
-#define save_padsv(a)		Perl_save_padsv(aTHX_ a)
+#define save_padsv_and_mortalize(a)	Perl_save_padsv_and_mortalize(aTHX_ a)
 #define save_sptr(a)		Perl_save_sptr(aTHX_ a)
 #define save_svref(a)		Perl_save_svref(aTHX_ a)
 #ifdef PERL_CORE
@@ -4508,7 +4507,6 @@
 #define pp_seq()		Perl_pp_seq(aTHX)
 #define pp_setpgrp()		Perl_pp_setpgrp(aTHX)
 #define pp_setpriority()	Perl_pp_setpriority(aTHX)
-#define pp_setstate()		Perl_pp_setstate(aTHX)
 #define pp_sgrent()		Perl_pp_sgrent(aTHX)
 #define pp_shift()		Perl_pp_shift(aTHX)
 #define pp_shmctl()		Perl_pp_shmctl(aTHX)

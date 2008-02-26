@@ -467,7 +467,7 @@ Perl_op_free(pTHX_ OP *o)
 
     /* COP* is not cleared by op_clear() so that we may track line
      * numbers etc even after null() */
-    if (type == OP_NEXTSTATE || type == OP_SETSTATE || type == OP_DBSTATE) {
+    if (type == OP_NEXTSTATE || type == OP_DBSTATE) {
 	cop_free((COP*)o);
     }
 
@@ -824,10 +824,8 @@ Perl_scalarvoid(pTHX_ OP *o)
     }
 
     if (o->op_type == OP_NEXTSTATE
-	|| o->op_type == OP_SETSTATE
 	|| o->op_type == OP_DBSTATE
 	|| (o->op_type == OP_NULL && (o->op_targ == OP_NEXTSTATE
-				      || o->op_targ == OP_SETSTATE
 				      || o->op_targ == OP_DBSTATE)))
 	PL_curcop = (COP*)o;		/* for warning below */
 
@@ -7667,7 +7665,6 @@ Perl_peep(pTHX_ register OP *o)
 	o->op_opt = 1;
 	PL_op = o;
 	switch (o->op_type) {
-	case OP_SETSTATE:
 	case OP_NEXTSTATE:
 	case OP_DBSTATE:
 	    PL_curcop = ((COP*)o);		/* for warnings */
@@ -7737,8 +7734,7 @@ Perl_peep(pTHX_ register OP *o)
 	    goto nothin;
 	case OP_NULL:
 	    if (o->op_targ == OP_NEXTSTATE
-		|| o->op_targ == OP_DBSTATE
-		|| o->op_targ == OP_SETSTATE)
+		|| o->op_targ == OP_DBSTATE)
 	    {
 		PL_curcop = ((COP*)o);
 	    }

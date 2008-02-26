@@ -1034,7 +1034,6 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 	Perl_dump_indent(aTHX_ level, file, "SV = %s\n", SvPEEK(cSVOPo_sv));
 #endif
 	break;
-    case OP_SETSTATE:
     case OP_NEXTSTATE:
     case OP_DBSTATE:
 	if (CopLINE(cCOPo))
@@ -1524,7 +1523,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 			 (UV) COP_SEQ_RANGE_HIGH(sv));
     } else if ((type >= SVt_PVNV && type != SVt_PVAV && type != SVt_PVHV
 		&& type != SVt_PVCV && type != SVt_REGEXP
-		&& !isGV_with_GP(sv) && !SvVALID(sv))
+		&& type != SVt_PVIO && !isGV_with_GP(sv) && !SvVALID(sv))
 	       || type == SVt_NV) {
 	/* %Vg doesn't work? --jhi */
 #ifdef USE_LONG_DOUBLE
@@ -2570,7 +2569,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
 	do_op_xmldump(level+1, file, CvROOT(cSVOPo_sv));
 	break;
-    case OP_SETSTATE:
     case OP_NEXTSTATE:
     case OP_DBSTATE:
 	if (CopLINE(cCOPo))

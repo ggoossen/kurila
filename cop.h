@@ -393,57 +393,45 @@ struct block_loop {
     /* (except for non_ithreads we need to modify next_op in pp_ctl.c, hence
 	why next_op is conditionally defined below.)  */
 #ifdef USE_ITHREADS
-    void *	iterdata;
-    PAD		*oldcomppad;
+    PAD		*oldcomppad; /* Also used for the GV, if targoffset is 0 */
+    /* This is also accesible via cx->blk_loop.my_op->op_targ */
+    PADOFFSET	targoffset;
 #else
     OP *	next_op;
     SV **	itervar;
 #endif
-    SV *	itersave;
-    /* (from inspection of source code) for a .. range of strings this is the
-       current string.  */
-    SV *	iterlval;
-    /* (from inspection of source code) for a foreach loop this is the array
-       being iterated over. For a .. range of numbers it's the current value.
-       A check is often made on the SvTYPE of iterary to determine whether
-       we are iterating over an array or a range. (numbers or strings)  */
-    AV *	iterary;
-    IV		iterix;
-    /* (from inspection of source code) for a .. range of numbers this is the
-       maximum value.  */
-    IV		itermax;
+    union {
+	struct { /* valid if type is LOOP_FOR or LOOP_PLAIN (but {NULL,0})*/
+	    AV * ary; /* use the stack if this is NULL */
+	    IV ix;
+	} ary;
+	struct { /* valid if type is LOOP_LAZYIV */
+	    IV cur;
+	    IV end;
+	} lazyiv;
+	struct { /* valid if type if LOOP_LAZYSV */
+	    SV * cur;
+	    SV * end; /* maxiumum value (or minimum in reverse) */
+	} lazysv;
+    } state_u;
 };
-/* It might be possible to squeeze this structure further. As best I can tell
-   itermax and iterlval are never used at the same time, so it might be possible
-   to make them into a union. However, I'm not confident that there are enough
-   flag bits/NULLable pointers in this structure alone to encode which is
-   active. There is, however, U8 of space free in struct block, which could be
-   used. Right now it may not be worth squeezing this structure further, as it's
-   the largest part of struct block, and currently struct block is 64 bytes on
-   an ILP32 system, which will give good cache alignment.
-*/
 
 #ifdef USE_ITHREADS
 #  define CxITERVAR(c)							\
-	((c)->blk_loop.iterdata						\
-	 ? (CxPADLOOP(cx) 						\
-	    ? &CX_CURPAD_SV( (c)->blk_loop, 				\
-		    INT2PTR(PADOFFSET, (c)->blk_loop.iterdata))		\
-	    : &GvSV((GV*)(c)->blk_loop.iterdata))			\
+	((c)->blk_loop.oldcomppad					\
+	 ? (CxPADLOOP(c) 						\
+	    ? &CX_CURPAD_SV( (c)->blk_loop, (c)->blk_loop.targoffset )	\
+	    : &GvSV((GV*)(c)->blk_loop.oldcomppad))			\
 	 : (SV**)NULL)
-#  define CX_ITERDATA_SET(cx,idata)					\
-	CX_CURPAD_SAVE(cx->blk_loop);					\
-	if ((cx->blk_loop.iterdata = (idata)))				\
-	    cx->blk_loop.itersave = SvREFCNT_inc(*CxITERVAR(cx));	\
+#  define CX_ITERDATA_SET(cx,idata,o)					\
+	if ((cx->blk_loop.targoffset = (o)))				\
+	    CX_CURPAD_SAVE(cx->blk_loop);				\
 	else								\
-	    cx->blk_loop.itersave = NULL;
+	    cx->blk_loop.oldcomppad = (idata);
 #else
 #  define CxITERVAR(c)		((c)->blk_loop.itervar)
-#  define CX_ITERDATA_SET(cx,ivar)					\
-	if ((cx->blk_loop.itervar = (SV**)(ivar)))			\
-	    cx->blk_loop.itersave = SvREFCNT_inc(*CxITERVAR(cx));	\
-	else								\
-	    cx->blk_loop.itersave = NULL;
+#  define CX_ITERDATA_SET(cx,ivar,o)					\
+	cx->blk_loop.itervar = (SV**)(ivar);
 #endif
 #define CxLABEL(c)	(0 + (c)->blk_oldcop->cop_label)
 #define CxHASARGS(c)	(((c)->cx_type & CXp_HASARGS) == CXp_HASARGS)
@@ -461,33 +449,25 @@ struct block_loop {
 	cx->blk_loop.resetsp = s - PL_stack_base;			\
 	cx->blk_loop.my_op = cLOOP;					\
 	PUSHLOOP_OP_NEXT;						\
-	cx->blk_loop.iterlval = NULL;					\
-	cx->blk_loop.iterary = NULL;					\
-	CX_ITERDATA_SET(cx,NULL);
+	cx->blk_loop.state_u.ary.ary = NULL;				\
+	cx->blk_loop.state_u.ary.ix = 0;				\
+	CX_ITERDATA_SET(cx, NULL, 0);
 
-#define PUSHLOOP_FOR(cx, dat, s)					\
+#define PUSHLOOP_FOR(cx, dat, s, offset)				\
 	cx->blk_loop.resetsp = s - PL_stack_base;			\
 	cx->blk_loop.my_op = cLOOP;					\
 	PUSHLOOP_OP_NEXT;						\
-	cx->blk_loop.iterlval = NULL;					\
-	cx->blk_loop.iterary = NULL;					\
-	cx->blk_loop.iterix = -1;					\
-	CX_ITERDATA_SET(cx,dat);
+	cx->blk_loop.state_u.ary.ary = NULL;				\
+	cx->blk_loop.state_u.ary.ix = 0;				\
+	CX_ITERDATA_SET(cx, dat, offset);
 
 #define POPLOOP(cx)							\
-	SvREFCNT_dec(cx->blk_loop.iterlval);				\
-	if (CxITERVAR(cx)) {						\
-            if (SvPADMY(cx->blk_loop.itersave)) {			\
-		SV ** const s_v_p = CxITERVAR(cx);			\
-		sv_2mortal(*s_v_p);					\
-		*s_v_p = cx->blk_loop.itersave;				\
-	    }								\
-	    else {							\
-		SvREFCNT_dec(cx->blk_loop.itersave);			\
-	    }								\
+	if (CxTYPE(cx) == CXt_LOOP_LAZYSV) {				\
+	    SvREFCNT_dec(cx->blk_loop.state_u.lazysv.cur);		\
+	    SvREFCNT_dec(cx->blk_loop.state_u.lazysv.end);		\
 	}								\
-	if ((CxTYPE(cx) != CXt_LOOP_STACK) && cx->blk_loop.iterary)	\
-	    SvREFCNT_dec(cx->blk_loop.iterary);
+	if (CxTYPE(cx) == CXt_LOOP_FOR)					\
+	    SvREFCNT_dec(cx->blk_loop.state_u.ary.ary);
 
 /* given/when context */
 struct block_givwhen {
@@ -633,11 +613,11 @@ struct context {
 #define CXt_SUBST	4
 #define CXt_BLOCK	5
 #define CXt_GIVEN	6
-#define CXt_LOOP_PLAIN	8 /* hard-coded 8 is used in CxTYPE_is_LOOP */
-#define CXt_LOOP_FOR	9
-/* Foreach on a temporary list on the stack */
-#define CXt_LOOP_STACK	10
-#define CXt_LOOP_RES2	11
+/* This is first so that CXt_LOOP_FOR|CXt_LOOP_LAZYIV is CXt_LOOP_LAZYIV */
+#define CXt_LOOP_FOR	8 /* hard-coded 8 is used in CxTYPE_is_LOOP */
+#define CXt_LOOP_PLAIN	9
+#define CXt_LOOP_LAZYSV	10
+#define CXt_LOOP_LAZYIV	11
 
 /* private flags for CXt_SUB and CXt_NULL
    However, this is checked in many places which do not check the type, so
@@ -656,10 +636,9 @@ struct context {
 /* private flags for CXt_LOOP */
 #define CXp_FOR_DEF	0x10	/* foreach using $_ */
 #ifdef USE_ITHREADS
-#  define CXp_PADVAR	0x20	/* itervar lives on pad, iterdata has pad
-				   offset; if not set, iterdata holds GV* */
-#  define CxPADLOOP(c)	(CxTYPE_is_LOOP(c) && ((c)->cx_type & (CXp_PADVAR)))
+#  define CxPADLOOP(c)	((c)->blk_loop.targoffset)
 #endif
+
 /* private flags for CXt_SUBST */
 #define CXp_ONCE	0x10	/* What was sbu_once in struct subst */
 

@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
+use kurila;
 
 BEGIN {
     # Get function prototypes
@@ -331,7 +332,7 @@ my %opflags = (
     'f' =>   2,		# fold constants
     's' =>   4,		# always produces scalar
     't' =>   8,		# needs target scalar
-    'T' =>   8 | 256,	# ... which may be lexical
+    'T' =>   8 ^|^ 256,	# ... which may be lexical
     'i' =>  16,		# always produces integer
     'I' =>  32,		# has corresponding int op
     'd' =>  64,		# danger, unknown side effects
@@ -355,7 +356,7 @@ for my $op (@ops) {
     }
     die qq[Opcode '$op' has no class indicator ($flags{$op} => $flags)]
 	unless exists $opclass{$flags};
-    $argsum |= $opclass{$flags} << $OCSHIFT;
+    $argsum ^|^= $opclass{$flags} << $OCSHIFT;
     my $argshift = $OASHIFT;
     for my $arg (split(' ',$args{$op})) {
 	if ($arg =~ m/^F/) {
@@ -829,7 +830,6 @@ redo		redo			ck_null		ds}
 dump		dump			ck_null		ds}	
 goto		goto			ck_null		ds}	
 exit		exit			ck_exit		ds%	S?
-setstate	set statement info	ck_null		s;
 method_named	method with known name	ck_null		d$
 
 entergiven	given()			ck_null		d|
