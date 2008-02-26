@@ -1,14 +1,14 @@
 package ExtUtils::Command::MM;
 
 use strict;
+use warnings;
 
 require Exporter;
-use vars qw($VERSION @ISA @EXPORT);
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
-@EXPORT  = qw(test_harness pod2man perllocal_install uninstall 
-              warn_if_old_packlist);
-$VERSION = '6.42';
+our @EXPORT  = qw(test_harness pod2man perllocal_install uninstall 
+                  warn_if_old_packlist);
+our $VERSION = '6.43_01';
 
 my $Is_VMS = $^O eq 'VMS';
 
@@ -88,14 +88,14 @@ If no arguments are given to pod2man it will read from @ARGV.
 =cut
 
 sub pod2man {
+    local @ARGV = @_ ? @_ : @ARGV;
+
     require Pod::Man;
     require Getopt::Long;
 
-    my %options = ();
-
     # We will cheat and just use Getopt::Long.  We fool it by putting
     # our arguments into @ARGV.  Should be safe.
-    local @ARGV = @_ ? @_ : @ARGV;
+    my %options = ();
     Getopt::Long::config ('bundling_override');
     Getopt::Long::GetOptions (\%options, 
                 'section|s=s', 'release|r=s', 'center|c=s',
@@ -192,7 +192,8 @@ sub perllocal_install {
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
-    @ARGV = split m/\|/, ~< *STDIN if $Is_VMS;
+    my @mod_info = $Is_VMS ? split m/\|/, ~< *STDIN
+                           : @ARGV;
 
     my $pod;
     $pod = sprintf <<POD, scalar localtime;
@@ -203,7 +204,7 @@ sub perllocal_install {
 POD
 
     do {
-        my($key, $val) = splice(@ARGV, 0, 2);
+        my($key, $val) = splice(@mod_info, 0, 2);
 
         $pod .= <<POD
  =item *
@@ -212,7 +213,7 @@ POD
  
 POD
 
-    } while(@ARGV);
+    } while(@mod_info);
 
     $pod .= "=back\n\n";
     $pod =~ s/^ //mg;

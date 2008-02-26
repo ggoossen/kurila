@@ -24,17 +24,15 @@ use File::Basename;
 use File::Spec;
 use ExtUtils::MakeMaker qw( neatvalue );
 
-use vars qw(@ISA $VERSION);
-
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-@ISA = qw( ExtUtils::MM_Unix );
-$VERSION = '6.42';
+our @ISA = qw( ExtUtils::MM_Unix );
+our $VERSION = '6.43_01';
 
 $ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my $BORLAND = 1 if $Config{'cc'} =~ m/^bcc/i;
-my $GCC     = 1 if $Config{'cc'} =~ m/^gcc/i;
+my $BORLAND = $Config{'cc'} =~ m/^bcc/i ? 1 : 0;
+my $GCC     = $Config{'cc'} =~ m/^gcc/i ? 1 : 0;
 
 
 =head2 Overridden methods
