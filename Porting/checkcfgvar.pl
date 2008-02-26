@@ -87,7 +87,7 @@ for my $cfg (@CFG) {
     my %cfg;
     read_file($cfg,
 	      sub {
-		  return if m/^\#/ || m/^\s*$/;
+		  return if m/^\#/ || m/^\s*$/ || m/^\:/;
 		  if ($cfg eq 'configure.com') {
 		      s/(\s*!.*|\s*)$//; # remove trailing comments or whitespace
 		      return if ! m/^\$\s+WC "(\w+)='(.*)'"$/;
