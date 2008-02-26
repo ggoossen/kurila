@@ -3999,7 +3999,7 @@ typedef Sighandler_t Sigsave_t;
 #endif
 
 #ifdef USE_PERLIO
-EXTERN_C void PerlIO_teardown();
+EXTERN_C void PerlIO_teardown(void);
 # ifdef USE_ITHREADS
 #  define PERLIO_INIT MUTEX_INIT(&PL_perlio_mutex)
 #  define PERLIO_TERM 				\
@@ -4626,7 +4626,7 @@ typedef regexp*(CPERLscope(*regdupe_t)) (pTHX_ const regexp* r, CLONE_PARAMS *pa
 
 typedef void (*DESTRUCTORFUNC_NOCONTEXT_t) (void*);
 typedef void (*DESTRUCTORFUNC_t) (pTHX_ void*);
-typedef void (*SVFUNC_t) (pTHX_ SV*);
+typedef void (*SVFUNC_t) (pTHX_ SV* const);
 typedef I32  (*SVCOMPARE_t) (pTHX_ SV*, SV*);
 typedef void (*XSINIT_t) (pTHX);
 typedef void (*ATEXIT_t) (pTHX_ void*);

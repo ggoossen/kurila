@@ -563,6 +563,7 @@ Perl_op_clear(pTHX_ OP *o)
 	break;
     case OP_METHOD_NAMED:
     case OP_CONST:
+    case OP_HINTSEVAL:
 	SvREFCNT_dec(cSVOPo->op_sv);
 	cSVOPo->op_sv = NULL;
 #ifdef USE_ITHREADS
@@ -828,6 +829,7 @@ Perl_scalar(pTHX_ OP *o)
     case OP_SORT:
 	if (ckWARN(WARN_VOID))
 	    Perl_warner(aTHX_ packWARN(WARN_VOID), "Useless use of sort in scalar context");
+	break;
     }
     return o;
 }
@@ -2308,6 +2310,7 @@ Perl_fold_constants(pTHX_ register OP *o)
     OP *old_next;
     SV * const oldwarnhook = PL_warnhook;
     SV * const olddiehook  = PL_diehook;
+    COP not_compiling;
     dJMPENV;
 
     PERL_ARGS_ASSERT_FOLD_CONSTANTS;
@@ -2359,6 +2362,13 @@ Perl_fold_constants(pTHX_ register OP *o)
     oldscope = PL_scopestack_ix;
     create_eval_scope(G_FAKINGEVAL);
 
+    /* Verify that we don't need to save it:  */
+    assert(PL_curcop == &PL_compiling);
+    StructCopy(&PL_compiling, &not_compiling, COP);
+    PL_curcop = &not_compiling;
+    /* The above ensures that we run with all the correct hints of the
+       currently compiling COP, but that IN_PERL_RUNTIME is not true. */
+    assert(IN_PERL_RUNTIME);
     PL_warnhook = PERL_WARNHOOK_FATAL;
     PL_diehook  = PERL_DIEHOOK_IGNORE;
     JMPENV_PUSH(ret);
@@ -2392,6 +2402,7 @@ Perl_fold_constants(pTHX_ register OP *o)
     JMPENV_POP;
     PL_warnhook = oldwarnhook;
     PL_diehook  = olddiehook;
+    PL_curcop = &PL_compiling;
 
     if (PL_scopestack_ix > oldscope)
 	delete_eval_scope();
@@ -6201,11 +6212,8 @@ Perl_ck_eval(pTHX_ OP *o)
     }
     o->op_targ = (PADOFFSET)PL_hints;
     if ((PL_hints & HINT_LOCALIZE_HH) != 0 && GvHV(PL_hintgv)) {
-	/* Store a copy of %^H that pp_entereval can pick up.
-	   OPf_SPECIAL flags the opcode as being for this purpose,
-	   so that it in turn will return a copy at every
-	   eval.*/
-	OP *hhop = newSVOP(OP_CONST, OPf_SPECIAL,
+	/* Store a copy of %^H that pp_entereval can pick up. */
+	OP *hhop = newSVOP(OP_HINTSEVAL, 0,
 			   (SV*)Perl_hv_copy_hints_hv(aTHX_ GvHV(PL_hintgv)));
 	cUNOPo->op_first->op_sibling = hhop;
 	o->op_private |= OPpEVAL_HAS_HH;
@@ -6406,7 +6414,7 @@ Perl_ck_ftst(pTHX_ OP *o)
 #endif
 	    return newop;
 	}
-	if ((PL_hints & HINT_FILETEST_ACCESS) && OP_IS_FILETEST_ACCESS(o))
+	if ((PL_hints & HINT_FILETEST_ACCESS) && OP_IS_FILETEST_ACCESS(o->op_type))
 	    o->op_private |= OPpFT_ACCESS;
 	if (PL_check[kidtype] == MEMBER_TO_FPTR(Perl_ck_ftst)
 		&& kidtype != OP_STAT && kidtype != OP_LSTAT)
@@ -6841,15 +6849,6 @@ Perl_ck_index(pTHX_ OP *o)
 	if (kid && kid->op_type == OP_CONST)
 	    fbm_compile(((SVOP*)kid)->op_sv, 0);
     }
-    return ck_fun(o);
-}
-
-OP *
-Perl_ck_lengthconst(pTHX_ OP *o)
-{
-    PERL_ARGS_ASSERT_CK_LENGTHCONST;
-
-    /* XXX length optimization goes here */
     return ck_fun(o);
 }
 
@@ -7919,20 +7918,21 @@ Perl_peep(pTHX_ register OP *o)
 	    if (cSVOPo->op_private & OPpCONST_STRICT)
 		no_bareword_allowed(o);
 #ifdef USE_ITHREADS
+	case OP_HINTSEVAL:
 	case OP_METHOD_NAMED:
 	    /* Relocate sv to the pad for thread safety.
 	     * Despite being a "constant", the SV is written to,
 	     * for reference counts, sv_upgrade() etc. */
 	    if (cSVOP->op_sv) {
 		const PADOFFSET ix = pad_alloc(OP_CONST, SVs_PADTMP);
-		if (o->op_type == OP_CONST && SvPADTMP(cSVOPo->op_sv)) {
+		if (o->op_type != OP_METHOD_NAMED && SvPADTMP(cSVOPo->op_sv)) {
 		    /* If op_sv is already a PADTMP then it is being used by
 		     * some pad, so make a copy. */
 		    sv_setsv(PAD_SVl(ix),cSVOPo->op_sv);
 		    SvREADONLY_on(PAD_SVl(ix));
 		    SvREFCNT_dec(cSVOPo->op_sv);
 		}
-		else if (o->op_type == OP_CONST
+		else if (o->op_type != OP_METHOD_NAMED
 			 && cSVOPo->op_sv == &PL_sv_undef) {
 		    /* PL_sv_undef is hack - it's unsafe to store it in the
 		       AV that is the pad, because av_fetch treats values of

@@ -464,7 +464,7 @@ do_clean_objs(pTHX_ SV *const ref)
 
 #ifndef DISABLE_DESTRUCTOR_KLUDGE
 static void
-do_clean_named_objs(pTHX_ SV *sv)
+do_clean_named_objs(pTHX_ SV *const sv)
 {
     dVAR;
     assert(SvTYPE(sv) == SVt_PVGV);
@@ -5982,11 +5982,6 @@ Perl_sv_collxfrm(pTHX_ SV *sv, STRLEN *nxp)
 	    Safefree(mg->mg_ptr);
 	s = SvPV_const(sv, len);
 	if ((xf = mem_collxfrm(s, len, &xlen))) {
-	    if (SvREADONLY(sv)) {
-		SAVEFREEPV(xf);
-		*nxp = xlen;
-		return xf + sizeof(PL_collation_ix);
-	    }
 	    if (! mg) {
 #ifdef PERL_OLD_COPY_ON_WRITE
 		if (SvIsCOW(sv))
@@ -10493,7 +10488,7 @@ Perl_ss_dup(pTHX_ PerlInterpreter *proto_perl, CLONE_PARAMS* param)
  * so we know which stashes want their objects cloned */
 
 static void
-do_mark_cloneable_stash(pTHX_ SV *sv)
+do_mark_cloneable_stash(pTHX_ SV *const sv)
 {
     const HEK * const hvname = HvNAME_HEK((HV*)sv);
     if (hvname) {
@@ -11769,6 +11764,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	goto do_op2;
 
 
+    case OP_ENTEREVAL: /* could be eval $undef or $x='$undef'; eval $x */
     case OP_RV2SV:
     case OP_CUSTOM:
 	match = 1; /* XS or custom code could trigger random warnings */
