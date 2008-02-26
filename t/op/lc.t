@@ -4,9 +4,14 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 86;
+plan tests => 92;
 
 our ($a, $b, $c);
+
+is(lc(undef),	   "", "lc(undef) is ''");
+is(lcfirst(undef), "", "lcfirst(undef) is ''");
+is(uc(undef),	   "", "uc(undef) is ''");
+is(ucfirst(undef), "", "ucfirst(undef) is ''");
 
 $a = "HELLO.* world";
 $b = "hello.* WORLD";
