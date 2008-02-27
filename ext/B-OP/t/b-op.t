@@ -14,7 +14,7 @@ use B qw|svref_2object|;
     my $cop = svref_2object(\&foo)->START;
     is ref($cop), "B::COP", "start opcode";
     is $cop->line, 11, '&foo line number';
-    isa_ok($cop->io, "B::RV");
+    isa_ok($cop->io, "B::PV");
     is $cop->io->sv, ":crlf\0:bytes";
 }
 
