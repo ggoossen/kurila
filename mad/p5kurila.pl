@@ -641,10 +641,26 @@ sub error_str {
 
     for my $op (map { $xml->findnodes($_) } qw|//op_rv2sv //op_null[@was="rv2sv"]|) {
         next unless (get_madprop($op, "variable") || '') eq '$@';
-        next unless $op->parent->tag eq "op_match";
+        next unless $op->parent->tag eq "op_match" or
+          $op->parent->findnodes(q|.//*[@gv="main::like"]|);
 
         # horrible way to insert description
         set_madprop($op, "variable", '$@->{description}');
+    }
+
+    # replae $SIG{__DIE__} with ${^DIE_HOOK}
+    for my $op_const ($xml->findnodes('//op_const')) {
+        for my $name (qw|DIE WARN|) {
+            next unless ($op_const->att('PV') || '') eq "__${name}__";
+            next unless $op_const->parent->tag eq "op_helem";
+            my $rv2hv = $op_const->parent->child(1);
+            next unless $rv2hv->tag eq "op_rv2hv";
+            next unless get_madprop($rv2hv, "variable") eq '$SIG';
+            set_madprop($rv2hv, "variable", '${^' . $name . '_HOOK}');
+            set_madprop($op_const->parent, "curly_open", '');
+            set_madprop($op_const->parent, "curly_close", '');
+            set_madprop($op_const, $_, '') for qw|value quote_open quote_close assign|;
+        }
     }
 }
 
