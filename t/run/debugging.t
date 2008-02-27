@@ -57,7 +57,7 @@ EO_DX_OUT
 # escape the regex chars in the reference dump
 $refdump =~ s/([{}()\\\[\]])/\\$1/gms;
 $refdump =~ s/(.*)\@THR\n/{ $Config::Config{useithreads} ? $1 . "\n" : '' }/g;
-$refdump =~ s/(.*)\@NO_THR\n/{ $Config::Config{useithreads} ? '' : $1 }/g;
+$refdump =~ s/(.*)\@NO_THR\n/{ $Config::Config{useithreads} ? '' : $1."\n" }/g;
 
 my $qr = qr/$refdump/;
 # diag($qr);
