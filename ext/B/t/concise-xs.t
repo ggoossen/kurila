@@ -144,7 +144,7 @@ my $testpkgs = {
 		    compile_stats clearsym class
 		    )],
 	XS => [qw(
-		  warnhook walkoptree_debug walkoptree threadsv_names
+		  warnhook walkoptree_debug walkoptree 
 		  svref_2object sv_yes sv_undef sv_no save_BEGINs
 		  regex_padav ppname perlstring opnumber minus_c
 		  main_start main_root main_cv init_av inc_gv hash
