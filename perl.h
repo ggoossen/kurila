@@ -3801,6 +3801,8 @@ Gid_t getegid (void);
 #  ifndef assert
 #    error "'assert' is missing"
 #  endif
+#else
+#  define assert(a)
 #endif
 
 
