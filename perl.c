@@ -1728,6 +1728,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     SAVEFREESV(sv);
     init_main_stash();
 
+    boot_core_PerlIO();
+    boot_core_UNIVERSAL();
+    boot_core_xsutils();
+    boot_core_mro();
+
     {
 	const char *s;
     for (argc--,argv++; argc > 0; argc--,argv++) {
@@ -2114,11 +2119,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     CvPADLIST(PL_compcv) = pad_new(0);
 
     PL_isarev = newHV();
-
-    boot_core_PerlIO();
-    boot_core_UNIVERSAL();
-    boot_core_xsutils();
-    boot_core_mro();
 
     if (xsinit)
 	(*xsinit)(aTHX);	/* in case linked C routines want magical variables */
