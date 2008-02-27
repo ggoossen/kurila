@@ -2806,7 +2806,7 @@ PP(pp_require)
     PL_hints = DEFAULT_HINTS;
     if (PL_compiling.cop_hints_hash) {
 	SvREFCNT_dec(PL_compiling.cop_hints_hash);
-	PL_compiling.cop_hints_hash = NULL;
+	PL_compiling.cop_hints_hash = newHV();
     }
 
     SAVECOMPILEWARNINGS();
