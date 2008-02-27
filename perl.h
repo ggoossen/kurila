@@ -3794,13 +3794,15 @@ Gid_t getegid (void);
 #define PERL_MAGIC_arylen_p	  '@' /* to move arylen out of XPVAV */
 #define PERL_MAGIC_ext		  '~' /* Available for use by extensions */
 
-#if defined(DEBUGGING) && defined(I_ASSERT)
-#  include <assert.h>
+#if defined(DEBUGGING) 
+#  if defined(I_ASSERT)
+#    include <assert.h>
+#  endif
+#  ifndef assert
+#    error "'assert' is missing"
+#  endif
 #endif
 
-#ifndef assert
-#  error "No assert"
-#endif
 
 struct ufuncs {
     I32 (*uf_val)(pTHX_ IV, SV*);
