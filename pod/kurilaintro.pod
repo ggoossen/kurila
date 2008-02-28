@@ -29,6 +29,10 @@ Both can be installed at the same time.
 
 =over 4
 
+=item *
+
+error objects
+
 =item * 
 
 Added compilations subroutines, see L<compsub>.

@@ -1,0 +1,30 @@
+=head1 NAME
+
+error - Error Objects
+
+=head1 SYNOPSIS
+
+  eval {
+    die "I'm dead";
+  };
+  print STDERR $@->message;
+
+=head1 DESCRIPTION
+
+Error Objects are automaticly created when die/warn is used.
+
+=head2 Object Methods
+
+=over 4
+
+=item * message
+
+Returns the error message. This includes a full dump of the stack.
+
+=back
+
+=head1 AUTHOR
+
+Gerard Goossen E<lt>gerard@tty.nlE<gt>
+
+=cut
