@@ -87,6 +87,10 @@ Declare constants
 
 Produce verbose warning diagnostics
 
+=item error
+
+Error Objects
+
 =item feature
 
 Enable new syntactic features
@@ -433,6 +437,10 @@ Methods to override UN*X behaviour in ExtUtils::MakeMaker
 
 DOS specific subclass of ExtUtils::MM_Unix
 
+=item ExtUtils::MM_Darwin
+
+Special behaviors for OS X
+
 =item ExtUtils::MM_MacOS
 
 Once produced Makefiles for MacOS Classic
@@ -752,6 +760,10 @@ Read RFC 1951 files/buffers
 =item IO::Uncompress::Unzip
 
 Read zip files/buffers
+
+=item IO::Zlib
+
+IO:: style interface to L<Compress::Zlib>
 
 =item IPC::Cmd
 
