@@ -1120,6 +1120,8 @@ lib/Env.pm			Map environment into ordinary variables
 lib/Env/t/array.t		See if Env works for arrays
 lib/Env/t/env.t			See if Env works
 lib/error.t                     See if error works
+lib/error.pm                    Error Objects
+lib/error.pod                   Error Objects documentation
 lib/Exporter/Heavy.pm		Complicated routines for Exporter
 lib/Exporter.pm			Exporter base class
 lib/Exporter.t			See if Exporter works
@@ -2220,6 +2222,7 @@ pod/kurila14delta.pod	What is new for Perl Kurila 1.4
 pod/kurila15delta.pod	What is new for Perl Kurila 1.5
 pod/kurila16delta.pod	What is new for Perl Kurila 1.6
 pod/kurila17delta.pod	What is new for Perl Kurila 1.7
+pod/kurila18delta.pod	What is new for Perl Kurila 1.8
 pod/kurilaintro.pod	Description of Perl Kurila
 pod/kurilatoc.pod		Perl Kurila documentation table of contents
 pod.lst				List the pods and their roles
