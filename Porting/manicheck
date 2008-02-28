@@ -41,7 +41,7 @@ my %mand = qw(. 1);
 use File::Basename qw(dirname);
 
 while ( ~< *MANIFEST) {
-  if (m/^(\S+)\t+(.+)$/) {
+  if (m/^(\S+)\s+(.+)$/) {
     $mani{$1}++;
     my $d = dirname($1);
     while($d ne '.') {
