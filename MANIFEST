@@ -1122,6 +1122,8 @@ lib/Env/t/env.t			See if Env works
 lib/error.t                     See if error works
 lib/error.pm                    Error Objects
 lib/error.pod                   Error Objects documentation
+lib/kurila.t                    See if kurila.pm works
+lib/kurila.pm                   Package to identify kurila
 lib/Exporter/Heavy.pm		Complicated routines for Exporter
 lib/Exporter.pm			Exporter base class
 lib/Exporter.t			See if Exporter works
@@ -2472,6 +2474,7 @@ scope.c				Scope entry and exit code
 scope.h				Scope entry and exit header
 sv.c				Scalar value code
 sv.h				Scalar value header
+svx.h				Scalar value header
 symbian/bld.inf			Symbian sample app build config
 symbian/config.pl		Configuration script for Symbian
 symbian/config.sh		Configuration data for Symbian
@@ -2740,6 +2743,9 @@ t/arch/64bitint.t			See if 64 bit integers work
 t/sv/alarm.t			See if alarm works
 t/sv/anonsub.t			See if anonymous subroutines work
 t/op/concat.t			See if . works
+t/op/re.t			See if re core functions works
+t/op/view.t			See if view function works
+t/run/debugging.t		See if debugging runs work
 t/sv/args.t			See if operations on @_ work
 t/op/arith.t			See if arithmetic works
 t/sv/array.t			See if array operations work
@@ -2753,6 +2759,7 @@ t/op/bop.t			See if bitops work
 t/op/caller.pl			Tests shared between caller.t and XS op.t
 t/op/caller.t			See if caller() works
 t/lex/chars.t			See if character escapes work
+t/lex/qr.t			See if qr work
 t/op/chdir.t			See if chdir works
 t/op/chop.t			See if chop works
 t/op/chr.t			See if chr works
