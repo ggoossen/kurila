@@ -156,7 +156,7 @@ sv_to_wstr(pTHX_ SV *sv)
     WCHAR *wstr;
     STRLEN len;
     char *str = SvPV(sv, len);
-    UINT cp = SvUTF8(sv) ? CP_UTF8 : CP_ACP;
+    UINT cp = CP_UTF8;
 
     wlen = MultiByteToWideChar(cp, 0, str, len+1, NULL, 0);
     New(0, wstr, wlen, WCHAR);
@@ -181,7 +181,7 @@ wstr_to_sv(pTHX_ WCHAR *wstr)
         len = WideCharToMultiByte(CP_UTF8, 0, wstr, wlen, NULL, 0, NULL, NULL);
         sv_grow(sv, len);
         len = WideCharToMultiByte(CP_UTF8, 0, wstr, wlen, SvPVX(sv), len, NULL, NULL);
-        SvUTF8_on(sv);
+        /* SvUTF8_on(sv); */
     }
     /* Shouldn't really ever fail since we ask for the required length first, but who knows... */
     if (len) {
@@ -1066,7 +1066,7 @@ XS(w32_SetCwd)
     if (items != 1)
 	Perl_croak(aTHX_ "usage: Win32::SetCwd($cwd)");
 
-    if (IsWin2000() && SvUTF8(ST(0))) {
+    if (IsWin2000()) {
         WCHAR *wide = sv_to_wstr(aTHX_ ST(0));
         char *ansi = my_ansipath(wide);
         int rc = PerlDir_chdir(ansi);
@@ -1437,7 +1437,7 @@ XS(w32_GetFullPathName)
      * XXX The one missing case is where we could downgrade $filename
      * XXX from UTF8 into the current codepage.
      */
-    if (IsWin2000() && SvUTF8(ST(0))) {
+    if (IsWin2000()) {
         WCHAR *filename = sv_to_wstr(aTHX_ ST(0));
         WCHAR *mappedname = PerlDir_mapW(filename);
         Safefree(filename);
@@ -1575,13 +1575,9 @@ XS(w32_OutputDebugString)
     if (items != 1)
 	Perl_croak(aTHX_ "usage: Win32::OutputDebugString($string)");
 
-    if (SvUTF8(ST(0))) {
         WCHAR *str = sv_to_wstr(aTHX_ ST(0));
         OutputDebugStringW(str);
         Safefree(str);
-    }
-    else
-        OutputDebugStringA(SvPV_nolen(ST(0)));
 
     XSRETURN_EMPTY;
 }
@@ -1601,7 +1597,7 @@ XS(w32_CreateDirectory)
     if (items != 1)
 	Perl_croak(aTHX_ "usage: Win32::CreateDirectory($dir)");
 
-    if (IsWin2000() && SvUTF8(ST(0))) {
+    if (IsWin2000()) {
         WCHAR *dir = sv_to_wstr(aTHX_ ST(0));
         result = CreateDirectoryW(dir, NULL);
         Safefree(dir);
@@ -1622,7 +1618,7 @@ XS(w32_CreateFile)
     if (items != 1)
 	Perl_croak(aTHX_ "usage: Win32::CreateFile($file)");
 
-    if (IsWin2000() && SvUTF8(ST(0))) {
+    if (IsWin2000()) {
         WCHAR *file = sv_to_wstr(aTHX_ ST(0));
         handle = CreateFileW(file, GENERIC_WRITE, FILE_SHARE_WRITE,
                              NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
