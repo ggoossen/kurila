@@ -1346,7 +1346,6 @@ LISTOP_children(o)
 #  define PMOP_pmdynflags(o)      o->op_pmdynflags
 #endif
 #define PMOP_pmnext(o)		o->op_pmnext
-#define PMOP_pmregexp(o)	PM_GETRE(o)
 #define PMOP_pmflags(o)		o->op_pmflags
 
 MODULE = B::OP	PACKAGE = B::PMOP		PREFIX = PMOP_
