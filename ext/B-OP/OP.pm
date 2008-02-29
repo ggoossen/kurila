@@ -241,19 +241,28 @@ The object should not be used after this.
 
 =item pmreplstart
 
-=item pmnext
-
-=item pmregexp
+=item precomp
 
 =item pmflags
 
-=item extflags
+=item reflags
 
-=item precomp
+Additional flags stored in regexp->extflags.
+Extension and partially overlapping with op->pmflags.
+Exactly the RXf_PMf_ flags, 0x800-0x1FFFF, are the same, the rest
+are new for the new matcher.
 
 =item pmoffset
 
 Only when perl was compiled with ithreads.
+
+=item pmstashpv
+
+Only when perl was compiled with ithreads.
+
+=item pmstash
+
+Only when perl was compiled without ithreads.
 
 =back
 
