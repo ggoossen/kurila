@@ -2645,7 +2645,7 @@ Perl_madlex(pTHX)
     }
 
     /* Create new token struct.  Note: opvals return early above. */
-    pl_yylval.tkval = newMADTOKEN(optype, yylval, PL_thismad);
+    pl_yylval.tkval = newMADTOKEN(optype, pl_yylval, PL_thismad);
     PL_thismad = 0;
     return optype;
 }
