@@ -2603,8 +2603,8 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	S_xmldump_attr(aTHX_ level, file, "padix=\"%" IVdf "\"", (IV)cPADOPo->op_padix);
 #else
 	if (cSVOPo->op_sv) {
-	    SV * const tmpsv1 = newSVpvn_utf8(NULL, 0, TRUE);
-	    SV * const tmpsv2 = newSVpvn_utf8("", 0, TRUE);
+	    SV * const tmpsv1 = newSVpvn(NULL, 0);
+	    SV * const tmpsv2 = newSVpvn("", 0);
 	    char *s;
 	    STRLEN len;
 	    ENTER;
