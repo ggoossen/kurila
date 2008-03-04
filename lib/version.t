@@ -5,7 +5,7 @@
 #########################
 
 use Test::More qw(no_plan);
-no warnings 'once';
+use POSIX;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 

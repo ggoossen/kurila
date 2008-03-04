@@ -376,7 +376,7 @@ binmode() on unopened filehandle at - line 4.
 ########
 # pp_sys.c [pp_lstat]
 use warnings 'io';
-open FH, "<", "harness" or die "# $!";
+open FH, "<", "TEST" or die "# $!";
 lstat FH;
 open my $fh, "<", $0 or die "# $!";
 lstat $fh;
