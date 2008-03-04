@@ -5,9 +5,7 @@
 #########################
 
 use Test::More qw(no_plan);
-require Test::Harness;
 no warnings 'once';
-*Verbose = \$Test::Harness::Verbose;
 
 diag "Tests with base class" unless $ENV{PERL_CORE};
 
