@@ -123,23 +123,24 @@ for (@INPUT) {
   $integer = ($comment =~ m/^i_/) ? "use integer" : '' ;
   (print "#skipping $comment:\nok $ord\n"), next if $skip eq 'skip';
   
-  eval <<EOE;
+  eval <<EOE . <<'EOE';
   local \$\{^WARN_HOOK\} = \\&wrn;
   my \$a = 'fake';
   $integer;
   \$a = $op;
   \$b = $expectop;
-  if (\$a ne \$b) \{
-    print "# \$comment: got `\$a', expected `\$b'\n";
-    print "\$skip " if \$a ne \$b or \$skip eq 'skip';
-  \}
-  print "ok \$ord\\n";
+EOE
+  if (ref $a ? (not $a \== $b) : $a ne $b) {
+    print "# $comment: got `$a', expected `$b'\n";
+    print "$skip " if $a ne $b or $skip eq 'skip';
+  }
+  print "ok $ord\n";
 EOE
   if ($@) {
     if ($@->{description} =~ m/is unimplemented/) {
       print "# skipping $comment: unimplemented:\nok $ord\n";
     } else {
-      warn $@;
+      print "# error: {$@->message}";
       print "# '$_'\nnot ok $ord\n";
     }
   }
@@ -278,7 +279,7 @@ grep $_, 1,0,2,0,3		# grepwhile
 map "x$_", 1,0,2,0,3		# mapwhile
 subb()				# entersub
 caller				# caller
-warn "ignore this\n"		# warn
+'???'                           # warn
 'faked'				# die
 open BLAH, "<", "non-existent"	# open
 fileno STDERR			# fileno

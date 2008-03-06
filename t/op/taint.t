@@ -94,10 +94,12 @@ sub taint_these (@) {
 
 # How to identify taint when you see it
 sub any_tainted (@) {
-    not eval { join("",@_), kill 0; 1 };
+    return scalar grep { tainted($_) } @_;
 }
 sub tainted ($) {
-    any_tainted @_;
+    my $tainted = not eval { $_[0], kill 0; 1};
+    die if $@ and $@->message !~ m/^Insecure dependency in kill while running with -T switch/;
+    return $tainted;
 }
 sub all_tainted (@) {
     for (@_) { return 0 unless tainted $_ }

@@ -225,7 +225,8 @@ sub cmp_ok ($$$@) {
         # (all string operators have alphabetic names, so tr/a-z// is true)
         # This will also show numbers for some uneeded cases, but will
         # definately be helpful for things such as == and <= that fail
-        if ($got eq $expected and $type !~ tr/a-z//) {
+        if (not ref $got and not ref $expected
+            and $got eq $expected and $type !~ tr/a-z//) {
             unshift @mess, "# $got - $expected = " . ($got - $expected) . "\n";
         }
         unshift(@mess, "#      got "._q($got)."\n",

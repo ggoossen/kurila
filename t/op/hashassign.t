@@ -6,7 +6,7 @@ BEGIN {
 
 # use strict;
 
-plan tests => 215;
+plan tests => 223;
 
 my @comma = ("key", "value");
 
@@ -293,16 +293,14 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 # test stringification of keys
 {
     no warnings 'once';
-    my @types = qw( SCALAR         ARRAY HASH CODE    GLOB);
     my @refs =    ( \ do { my $x }, [],   {},  sub {}, \ *x);
-    my(%h, %expect);
-    @h{@refs} = @types;
-    @expect{map "$_", @refs} = @types;
-    ok (eq_hash(\%h, \%expect), 'unblessed ref stringification');
+    for my $ref (@refs) {
+        dies_like( sub { $h{$ref} }, qr/reference as string/ );
+    }
 
     bless $_ for @refs;
-    %h = (); %expect = ();
-    @h{@refs} = @types;
-    @expect{map "$_", @refs} = @types;
-    ok (eq_hash(\%h, \%expect), 'blessed ref stringification');
+    %h = ();
+    for my $ref (@refs) {
+        dies_like( sub { $h{$ref} }, qr/reference as string/ );
+    }
 }

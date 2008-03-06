@@ -20,7 +20,7 @@ sub import
      $layer = "${class}::$layer";
     }
    eval "require $layer";
-   warn $@ if $@;
+   warn "failed loading $layer\: {$@->message}" if $@;
   }
 }
 

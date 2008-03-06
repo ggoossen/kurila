@@ -353,11 +353,11 @@ tie %h, 'X';
 tie @a, 'X';
 my $r1 = \$h{1};
 my $r2 = \$a[0];
-my $s = "$r1 ". ref($r1) . " $r2 " . ref($r2);
+my $s = ref($r1) . " " . ref($r2);
 $s=~ s/\(0x\w+\)//g;
 print $s, "\n";
 EXPECT
-SCALAR SCALAR SCALAR SCALAR
+SCALAR SCALAR
 ########
 # [perl #23287] segfault in untie
 sub TIESCALAR { bless $_[1], $_[0] }
