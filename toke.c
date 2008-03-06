@@ -4532,8 +4532,13 @@ Perl_yylex(pTHX)
 	if (PL_lex_inwhat && isDIGIT(*s) && ckWARN(WARN_SYNTAX))
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),"Can't use \\%c to mean $%c in expression",
 			*s, *s);
-	if (PL_expect == XOPERATOR)
+	if (PL_expect == XOPERATOR) {
+	    if (*s == '=' && s[1] == '=') {
+		s += 2;
+		Eop(OP_REF_EQ);
+	    }
 	    no_op("Backslash",s);
+	}
 	OPERATOR(REFGEN);
 
     case 'v':

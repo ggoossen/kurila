@@ -4498,6 +4498,20 @@ PP(pp_lock)
     RETURN;
 }
 
+PP(pp_ref_eq)
+{
+    dSP;
+
+    if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
+        SP--;
+	SETs(boolSV(SvRV(TOPs) == SvRV(TOPp1s)));
+	RETURN;
+    }
+    SP--;
+    SETs(boolSV(FALSE));
+    RETURN;
+}
+
 PP(pp_compsub)
 {
     dVAR;
