@@ -216,12 +216,15 @@ sub fred
 } 
 {
   local ${^WARN_HOOK} = sub {
-    die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
+    if ($_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
+        print "ok\n";
+        exit 0;
+    }
   };
   fred();
 }
 EXPECT
-
+ok
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
@@ -231,7 +234,10 @@ sub fred
 } 
 {
   local ${^WARN_HOOK} = sub {
-    die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
+    if ($_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
+        print "ok\n"
+        exit 0;
+    }
   };
   fred();
 }

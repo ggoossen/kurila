@@ -275,7 +275,7 @@ one_or_two_a(@_,@_);
 testing \&a_sub, '&';
 
 sub a_sub (&) {
-    print "# \@_ = (",join(",",@_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
     &{$_[0]};
 }
 
@@ -296,7 +296,7 @@ printf "ok %d\n",$i++;
 testing \&a_subx, '\&';
 
 sub a_subx (\&) {
-    print "# \@_ = (",join(",",@_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
     &{$_[0]};
 }
 
@@ -315,7 +315,7 @@ printf "ok %d\n",$i++;
 testing \&sub_aref, '&\@';
 
 sub sub_aref (&\@) {
-    print "# \@_ = (",join(",",@_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
     my($sub,$array) = @_;
     print "not " unless @_ == 2 && @{$array} == 4;
     print map { &{$sub}($_) } @{$array}
@@ -332,7 +332,7 @@ print "\n";
 testing \&sub_array, '&@';
 
 sub sub_array (&@) {
-    print "# \@_ = (",join(",",@_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
     print "not " unless @_ == 5;
     my $sub = shift;
     print map { &{$sub}($_) } @_
@@ -350,7 +350,7 @@ print "\n";
 testing \&a_hash, '%';
 
 sub a_hash (%) {
-    print "# \@_ = (",join(",",@_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
     scalar(@_);
 }
 
@@ -367,7 +367,7 @@ printf "ok %d\n",$i++;
 testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
-    print "# \@_ = (",join(",",@_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
     print "not " unless ref($_[0]) && $_[0]->{'a'};
     printf "ok %d\n",$i++;
     $_[0]->{'b'} = 2;
@@ -385,7 +385,7 @@ printf "ok %d\n",$i++;
 testing \&array_ref_plus, '\@@';
 
 sub array_ref_plus (\@@) {
-    print "# \@_ = (",join(",",@_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
     print "not " unless @_ == 2 && ref($_[0]) && 1 == @{$_[0]} && $_[1] eq 'x';
     printf "ok %d\n",$i++;
     @{$_[0]} = (qw(ok)," ",$i++,"\n");
@@ -466,19 +466,19 @@ star($star, sub {
 	print "ok $i - star(\$star)\n";
     }); $i++;
 star *FOO, sub {
-    print "not " unless $_[0] eq \*FOO;
+    print "not " unless $_[0] \== \*FOO;
     print "ok $i - star *FOO\n";
 }; $i++;
 star(*FOO, sub {
-	print "not " unless $_[0] eq \*FOO;
+	print "not " unless $_[0] \== \*FOO;
 	print "ok $i - star(*FOO)\n";
     }); $i++;
 star \*FOO, sub {
-    print "not " unless $_[0] eq \*FOO;
+    print "not " unless $_[0] \== \*FOO;
     print "ok $i - star \\*FOO\n";
 }; $i++;
 star(\*FOO, sub {
-	print "not " unless $_[0] eq \*FOO;
+	print "not " unless $_[0] \== \*FOO;
 	print "ok $i - star(\\*FOO)\n";
     }); $i++;
 star2 'FOO', BAR, sub {
@@ -514,21 +514,21 @@ star2($star, $star, sub {
 	print "ok $i - star2(\$star, \$star)\n";
     }); $i++;
 star2 *FOO, *BAR, sub {
-    print "not " unless $_[0] eq \*FOO and $_[1] eq \*BAR;
+    print "not " unless $_[0] \== \*FOO and $_[1] \== \*BAR;
     print "ok $i - star2 *FOO, *BAR\n";
 }; $i++;
 star2(*FOO, *BAR, sub {
-	print "not " unless $_[0] eq \*FOO and $_[1] eq \*BAR;
+	print "not " unless $_[0] \== \*FOO and $_[1] \== \*BAR;
 	print "ok $i - star2(*FOO, *BAR)\n";
     }); $i++;
 star2 \*FOO, \*BAR, sub {
     no strict 'refs';
-    print "not " unless $_[0] eq \*{Symbol::fetch_glob('FOO')} and $_[1] eq \*{Symbol::fetch_glob('BAR')};
+    print "not " unless $_[0] \== \*{Symbol::fetch_glob('FOO')} and $_[1] \== \*{Symbol::fetch_glob('BAR')};
     print "ok $i - star2 \*FOO, \*BAR\n";
 }; $i++;
 star2(\*FOO, \*BAR, sub {
 	no strict 'refs';
-	print "not " unless $_[0] eq \*{Symbol::fetch_glob('FOO')} and $_[1] eq \*{Symbol::fetch_glob('BAR')};
+	print "not " unless $_[0] \== \*{Symbol::fetch_glob('FOO')} and $_[1] \== \*{Symbol::fetch_glob('BAR')};
 	print "ok $i - star2(\*FOO, \*BAR)\n";
     }); $i++;
 
@@ -571,7 +571,7 @@ print "ok ", $i++, "\n";
     sub mysub { print "not calling mysub I hope\n" }
     local *myglob;
 
-    sub myref (\[$@%&*]) { print "# $_[0]\n"; return "$_[0]" }
+    sub myref (\[$@%&*]) { return dump::view($_[0]) }
 
     print "not " unless myref($myvar)   =~ m/^SCALAR\(/;
     print "ok ", $i++, "\n";
