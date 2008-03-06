@@ -1,7 +1,7 @@
 #!./perl
 
 require './test.pl';
-plan( tests => 16 );
+plan( tests => 12 );
 
 use strict;
 use warnings;
@@ -30,20 +30,13 @@ my $fail_not_hr   = 'Not a HASH reference at ';
     cmp_ok(substr($warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg');
 
     @warnings = ();
-    %hash = { 1..3 };
-    cmp_ok(scalar(@warnings),'==',2,'odd hashref count');
-    cmp_ok(substr($warnings[0],0,length($fail_odd_anon)),'eq',$fail_odd_anon,'odd hashref msg 1');
-    cmp_ok(substr($warnings[1],0,length($fail_ref)),'eq',$fail_ref,'odd hashref msg 2');
+    dies_like( sub { %hash = { 1..3 }; }, qr/reference as string/ );
 
     @warnings = ();
-    %hash = [ 1..3 ];
-    cmp_ok(scalar(@warnings),'==',1,'arrayref count');
-    cmp_ok(substr($warnings[0],0,length($fail_ref)),'eq',$fail_ref,'arrayref msg');
+    dies_like( sub { %hash = [ 1..3 ]; }, qr/reference as string/ );
 
     @warnings = ();
-    %hash = sub { print "fenice" };
-    cmp_ok(scalar(@warnings),'==',1,'coderef count');
-    cmp_ok(substr($warnings[0],0,length($fail_odd)),'eq',$fail_odd,'coderef msg');
+    dies_like( sub { %hash = sub { print "fenice" }; }, qr/reference as string/ );
 
     @warnings = ();
     $_ = { 1..10 };

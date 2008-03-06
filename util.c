@@ -1238,7 +1238,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 
     ENTER;
     SAVESPTR(*hook);
-    *hook = NULL;
+    *hook = PERL_DIEHOOK_IGNORE;
     cv = sv_2cv(oldhook, &stash, &gv, 0);
     LEAVE;
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {

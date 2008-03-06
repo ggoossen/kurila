@@ -58,7 +58,7 @@ sub ov_method {
   my $globref = shift;
   return undef unless $globref;
   my $sub = \&{*$globref};
-  return $sub if $sub ne \&nil;
+  return $sub if not $sub \== \&nil;
   return shift->can($ {*$globref});
 }
 
@@ -145,10 +145,10 @@ sub constant {
         warnings::warnif ("Odd number of arguments for overload::constant");
         last;
     }
-    elsif (!exists $constants {$_ [0]}) {
+    elsif (!exists $constants{$_[0]}) {
         warnings::warnif ("`$_[0]' is not an overloadable type");
     }
-    elsif (!ref $_ [1] || "$_[1]" !~ m/CODE\(0x[\da-f]+\)$/) {
+    elsif (ref $_[1] ne "CODE") {
         # Can't use C<ref $_[1] eq "CODE"> above as code references can be
         # blessed, and C<ref> would return the package the ref is blessed into.
         if (warnings::enabled) {

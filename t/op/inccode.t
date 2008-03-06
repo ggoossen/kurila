@@ -56,21 +56,21 @@ die $@ if $@;
 ok( $evalret,                      'require Foo; magic via code ref'  );
 ok( exists $INC{'Foo.pm'},         '  %INC sees Foo.pm' );
 is( ref $INC{'Foo.pm'}, 'CODE',    '  val Foo.pm is a coderef in %INC' );
-is( $INC{'Foo.pm'}, \&fooinc,	   '  val Foo.pm is correct in %INC' );
+cmp_ok( $INC{'Foo.pm'}, '\==', \&fooinc,	   '  val Foo.pm is correct in %INC' );
 
 $evalret = eval "use Foo1; 1;";
 die $@ if $@;
 ok( $evalret,                      'use Foo1' );
 ok( exists $INC{'Foo1.pm'},        '  %INC sees Foo1.pm' );
 is( ref $INC{'Foo1.pm'}, 'CODE',   '  val Foo1.pm is a coderef in %INC' );
-is( $INC{'Foo1.pm'}, \&fooinc,     '  val Foo1.pm is correct in %INC' );
+cmp_ok( $INC{'Foo1.pm'}, '\==', \&fooinc,     '  val Foo1.pm is correct in %INC' );
 
 $evalret = eval { do 'Foo2.pl'; 1 };
 die $@ if $@;
 ok( $evalret,                      'do "Foo2.pl"' );
 ok( exists $INC{'Foo2.pl'},        '  %INC sees Foo2.pl' );
 is( ref $INC{'Foo2.pl'}, 'CODE',   '  val Foo2.pl is a coderef in %INC' );
-is( $INC{'Foo2.pl'}, \&fooinc,     '  val Foo2.pl is correct in %INC' );
+cmp_ok( $INC{'Foo2.pl'}, '\==', \&fooinc,     '  val Foo2.pl is correct in %INC' );
 
 pop @INC;
 
@@ -99,17 +99,17 @@ die $@ if $@;
 ok( $evalret,                     'require Bar; magic via array ref' );
 ok( exists $INC{'Bar.pm'},        '  %INC sees Bar.pm' );
 is( ref $INC{'Bar.pm'}, 'ARRAY',  '  val Bar.pm is an arrayref in %INC' );
-is( $INC{'Bar.pm'}, $arrayref,    '  val Bar.pm is correct in %INC' );
+cmp_ok( $INC{'Bar.pm'}, '\==', $arrayref,    '  val Bar.pm is correct in %INC' );
 
 ok( eval "use Bar1; 1;",          'use Bar1' );
 ok( exists $INC{'Bar1.pm'},       '  %INC sees Bar1.pm' );
 is( ref $INC{'Bar1.pm'}, 'ARRAY', '  val Bar1.pm is an arrayref in %INC' );
-is( $INC{'Bar1.pm'}, $arrayref,   '  val Bar1.pm is correct in %INC' );
+cmp_ok( $INC{'Bar1.pm'}, '\==', $arrayref,   '  val Bar1.pm is correct in %INC' );
 
 ok( eval { do 'Bar2.pl'; 1 },     'do "Bar2.pl"' );
 ok( exists $INC{'Bar2.pl'},       '  %INC sees Bar2.pl' );
 is( ref $INC{'Bar2.pl'}, 'ARRAY', '  val Bar2.pl is an arrayref in %INC' );
-is( $INC{'Bar2.pl'}, $arrayref,   '  val Bar2.pl is correct in %INC' );
+cmp_ok( $INC{'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in %INC' );
 
 pop @INC;
 
@@ -132,7 +132,7 @@ ok( $evalret,                      'require Quux; magic via hash object' );
 ok( exists $INC{'Quux.pm'},        '  %INC sees Quux.pm' );
 is( ref $INC{'Quux.pm'}, 'FooLoader',
 				   '  val Quux.pm is an object in %INC' );
-is( $INC{'Quux.pm'}, $href,        '  val Quux.pm is correct in %INC' );
+cmp_ok( $INC{'Quux.pm'}, '\==', $href,        '  val Quux.pm is correct in %INC' );
 
 pop @INC;
 
@@ -145,7 +145,7 @@ ok( $evalret,                      'require Quux1; magic via array object' );
 ok( exists $INC{'Quux1.pm'},       '  %INC sees Quux1.pm' );
 is( ref $INC{'Quux1.pm'}, 'FooLoader',
 				   '  val Quux1.pm is an object in %INC' );
-is( $INC{'Quux1.pm'}, $aref,       '  val Quux1.pm  is correct in %INC' );
+cmp_ok( $INC{'Quux1.pm'}, '\==', $aref,       '  val Quux1.pm  is correct in %INC' );
 
 pop @INC;
 
@@ -158,7 +158,7 @@ ok( $evalret,                      'require Quux2; magic via scalar object' );
 ok( exists $INC{'Quux2.pm'},       '  %INC sees Quux2.pm' );
 is( ref $INC{'Quux2.pm'}, 'FooLoader',
 				   '  val Quux2.pm is an object in %INC' );
-is( $INC{'Quux2.pm'}, $sref,       '  val Quux2.pm is correct in %INC' );
+cmp_ok( $INC{'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct in %INC' );
 
 pop @INC;
 

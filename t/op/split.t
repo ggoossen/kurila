@@ -275,7 +275,7 @@ ok(@ary == 3 &&
 
 {
     no strict 'refs';
-    is (\@a, \@{*{Symbol::fetch_glob("a")}}, '@a must be global for following test');
+    cmp_ok(\@a, '\==', \@{*{Symbol::fetch_glob("a")}}, '@a must be global for following test');
     $p="";
     $n = @a = split m/,/,$p;
     is ($n, 0, '#21765 - pmreplroot hack used to return undef for 0 iters');

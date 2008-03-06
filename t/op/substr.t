@@ -22,7 +22,7 @@ ${^WARN_HOOK} = sub {
 
 require './test.pl';
 
-plan(235);
+plan(234);
 
 run_tests() unless caller;
 
@@ -230,10 +230,7 @@ $w = 0 ;
 # coercion of references
 {
   my $s = [];
-  substr($s, 0, 1, 'Foo');
-  is (substr($s,0,7), "FooRRAY");
-  is ($w,2, " # TODO warn about coercion of references" );
-  $w = 0;
+  dies_like( sub { substr($s, 0, 1, 'Foo'); }, qr/reference as string/ );
 }
 
 # check no spurious warnings

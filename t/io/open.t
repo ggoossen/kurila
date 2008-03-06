@@ -292,7 +292,7 @@ SKIP: {
 	 "bad open (>>>) failure");
 
     eval { open(F, ">:u", "afile" ) };
-    like($w, qr/Unknown PerlIO layer "u"/,
+    like($@->message, qr/Unknown PerlIO layer "u"/,
 	 'bad layer ">:u" warning');
     eval { open(F, "<:u", "afile" ) };
     like($w, qr/Unknown PerlIO layer "u"/,
