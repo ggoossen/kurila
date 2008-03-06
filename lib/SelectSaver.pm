@@ -1,6 +1,7 @@
 package SelectSaver;
 
 our $VERSION = '1.01';
+
 =head1 NAME
 
 SelectSaver - save and restore selected file handle
@@ -10,13 +11,13 @@ SelectSaver - save and restore selected file handle
     use SelectSaver;
 
     {
-       my $saver = new SelectSaver(FILEHANDLE);
+       my $saver = SelectSaver->new(FILEHANDLE);
        # FILEHANDLE is selected
     }
     # previous handle is selected
 
     {
-       my $saver = new SelectSaver;
+       my $saver = SelectSaver->new;
        # new handle may be selected, or not
     }
     # previous handle is selected
@@ -33,11 +34,8 @@ that was selected when it was created.
 
 =cut
 
-use Carp;
-use Symbol;
-
 sub new {
-    @_ +>= 1 && @_ +<= 2 or croak 'usage: new SelectSaver [FILEHANDLE]';
+    @_ +>= 1 && @_ +<= 2 or die 'usage: SelectSaver->new([FILEHANDLE])';
     my $fh = select;
     my $self = bless \$fh, $_[0];
     select $_[1] if @_ +> 1;
