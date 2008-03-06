@@ -1302,11 +1302,6 @@ Perl_my_lstat(pTHX)
 		Perl_croak(aTHX_ no_prev_lstat);
 	    return PL_laststatval;
 	}
-	if (ckWARN(WARN_IO)) {
-	    Perl_warner(aTHX_ packWARN(WARN_IO), "Use of -l on filehandle %s",
-		    GvENAME(cGVOP_gv));
-	    return (PL_laststatval = -1);
-	}
     }
     else if (PL_laststype != OP_LSTAT
 	    && (PL_op->op_private & OPpFT_STACKED) && ckWARN(WARN_IO))
@@ -1316,11 +1311,6 @@ Perl_my_lstat(pTHX)
     PL_statgv = NULL;
     sv = POPs;
     PUTBACK;
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV && ckWARN(WARN_IO)) {
-	Perl_warner(aTHX_ packWARN(WARN_IO), "Use of -l on filehandle %s",
-		GvENAME((GV*) SvRV(sv)));
-	return (PL_laststatval = -1);
-    }
     file = SvPV_nolen_const(sv);
     sv_setpv(PL_statname,file);
     PL_laststatval = PerlLIO_lstat(file,&PL_statcache);

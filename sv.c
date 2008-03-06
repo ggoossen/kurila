@@ -2672,7 +2672,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 		    return RX_WRAPPED(re);
 		}
 	    }
-	    Perl_croak(aTHX_ "Tried to use reference as string");
+	    Perl_croak(aTHX_ "Tried to use reference as string in %s", OP_DESC(PL_op));
 	}
 	if (SvREADONLY(sv) && !SvOK(sv)) {
 	    if (lp)
