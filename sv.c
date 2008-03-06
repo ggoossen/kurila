@@ -2654,6 +2654,24 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 		    return pv;
 		}
 	    }
+	    {
+		const SV *const referent = (SV*)SvRV(sv);
+
+		if (referent && SvTYPE(referent) == SVt_REGEXP) {
+		    const REGEXP * const re = (REGEXP *)referent;
+		    I32 seen_evals = 0;
+
+		    assert(re);
+                       
+		    if ((seen_evals = RX_SEEN_EVALS(re)))
+			PL_reginterp_cnt += seen_evals;
+
+		    if (lp)
+			*lp = RX_WRAPLEN(re);
+ 
+		    return RX_WRAPPED(re);
+		}
+	    }
 	    Perl_croak(aTHX_ "Tried to use reference as string");
 	}
 	if (SvREADONLY(sv) && !SvOK(sv)) {
