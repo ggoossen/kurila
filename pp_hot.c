@@ -881,15 +881,7 @@ S_do_oddball(pTHX_ HV *hash, SV **relem, SV **firstrelem)
 
         if (ckWARN(WARN_MISC)) {
 	    const char *err;
-	    if (relem == firstrelem &&
-		SvROK(*relem) &&
-		(SvTYPE(SvRV(*relem)) == SVt_PVAV ||
-		 SvTYPE(SvRV(*relem)) == SVt_PVHV))
-	    {
-		err = "Reference found where even-sized list expected";
-	    }
-	    else
-		err = "Odd number of elements in hash assignment";
+	    err = "Odd number of elements in hash assignment";
 	    Perl_warner(aTHX_ packWARN(WARN_MISC), err);
 	}
 
@@ -2689,10 +2681,6 @@ PP(pp_aelem)
     const U32 defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
     SV *sv;
 
-    if (SvROK(elemsv) && !SvGAMAGIC(elemsv) && ckWARN(WARN_MISC))
-	Perl_warner(aTHX_ packWARN(WARN_MISC),
-		    "Use of reference \"%"SVf"\" as array index",
-		    SVfARG(elemsv));
     if (SvTYPE(av) != SVt_PVAV)
 	RETPUSHUNDEF;
     svp = av_fetch(av, elem, lval && !defer);
