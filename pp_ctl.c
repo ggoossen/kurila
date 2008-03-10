@@ -2761,7 +2761,7 @@ PP(pp_require)
 		    AV * const ar = GvAVn(PL_incgv);
 		    I32 i;
 		    SV * const msg = sv_2mortal(Perl_newSVpvf(aTHX_ 
-			"%s in @IN (@INC contains:", msgstr));
+			"%s in @INC (@INC contains:", msgstr));
 		    
 		    for (i = 0; i <= AvFILL(ar); i++) {
 			sv_catpvs(msg, " ");

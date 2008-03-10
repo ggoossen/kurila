@@ -30,7 +30,7 @@ my $numtests = 39;
 my $currtest = 1;
 print "1..$numtests\n";
 
-my $ref = []; my $ref1 = [];
+my $ref = "somekey"; my $ref1 = "someotherkey";
 
 package Boustrophedon; # A class with overloaded "".
 sub new { my ($c, $s) = @_; bless \$s, $c }
@@ -57,7 +57,7 @@ foreach my $class ('Tie::RefHash', 'Tie::RefHash::Nestable') {
         
         my $ok = 1;
         local $^W = 0;
-        $ok = 0 if (defined($or) != defined($tr)) or ($or ne $tr);
+        $ok = 0 if (defined($or) != defined($tr)) or (ref $or ? $or \!= $tr : $or ne $tr);
         $ok = 0 if (defined($ow) != defined($tw)) or ($ow ne $tw);
         $ok = 0 if (defined($oe) != defined($te)) or ($oe ne $te);
         
@@ -85,7 +85,7 @@ $h = eval { tie %h, 'Tie::RefHash' };
 warn $@ if $@;
 test(not $@);
 test(ref($h) eq 'Tie::RefHash');
-test(defined(tied(%h)) and tied(%h) =~ m/^Tie::RefHash/);
+test(defined(tied(%h)) and (ref tied(%h)) =~ m/^Tie::RefHash/);
 $h{$ref} = 'cholet';
 test($h{$ref} eq 'cholet');
 test(exists $h{$ref});
@@ -119,13 +119,12 @@ $h = eval { tie %h, 'Tie::RefHash::Nestable' };
 warn $@ if $@;
 test(not $@);
 test(ref($h) eq 'Tie::RefHash::Nestable');
-test(defined(tied(%h)) and tied(%h) =~ m/^Tie::RefHash::Nestable/);
+test((ref tied(%h)) =~ m/^Tie::RefHash::Nestable/);
 $h{$ref}->{$ref1} = 'bungo';
 test($h{$ref}->{$ref1} eq 'bungo');
 
 # Test that the nested hash is also tied (for current implementation)
-test(defined(tied(%{$h{$ref}}))
-     and tied(%{$h{$ref}}) =~ m/^Tie::RefHash::Nestable=/ );
+test((ref tied(%{$h{$ref}})) =~ m/^Tie::RefHash::Nestable=/ );
 
 test((keys %h) == 1);
 test((keys %h)[0] eq $ref);
@@ -206,7 +205,7 @@ sub runtests {
         warn $@ if $@;
         test(not $@);
         test(ref($h) eq $class);
-        test(defined(tied(%h)) and tied(%h) =~ m/^\Q$class\E/);
+        test(defined(tied(%h)) and (ref tied(%h)) =~ m/^\Q$class\E/);
     }
 
     foreach (@$tests) {
@@ -215,7 +214,7 @@ sub runtests {
         $result = scalar(eval $_);
         if ($@)
          {
-          die "$@:$_" unless defined $class;
+          die "{$@->message}:$_" unless defined $class;
           $exception = $@;
          }
 
@@ -256,9 +255,9 @@ sub standard_hash_tests {
     # Library of standard tests on keys, values and each
     my $STD_TESTS = <<'END'
     join $;, sort keys %h;
-    join $;, sort values %h;
+    join $;, sort map { dump::view($_) } values %h;
     { my ($v, %tmp); $tmp{$v}++ while (defined($v = each %h)); dumph(\%tmp) }
-    { my ($k, $v, %tmp); $tmp{"$k$;$v"}++ while (($k, $v) = each %h); dumph(\%tmp) }
+    { my ($k, $v, %tmp); $tmp{"$k$;{dump::view($v)}"}++ while (($k, $v) = each %h); dumph(\%tmp) }
 END
   ;
     

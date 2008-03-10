@@ -285,7 +285,7 @@ sub unwrap {
 	    print "$sp-> ";
 	    DumpElem $$v, $s, $m-1;
     } elsif ( $item_type eq 'REF' ) { 
-	    print "$sp-> $$v\n";
+	    print "$sp-> {dump::view($$v)}\n";
             return unless defined $$v;
 	    unwrap($$v, $s+3, $m-1);
     } elsif ( $item_type eq 'CODE' ) { 
@@ -437,14 +437,13 @@ sub dumpsub {
     my ($off,$sub) = @_;
     my $ini = $sub;
     my $s;
-    $sub = $1 if $sub =~ m/^\{\*(.*)\}$/;
+    $sub = $1 if (!ref $sub) && ($sub =~ m/^\{\*(.*)\}$/);
     my $subref = defined $1 ? \&$sub : \&$ini;
-    my $place = $DB::sub{$sub} || (($s = $subs{"$subref"}) && $DB::sub{$s})
-      || (($s = CvGV_name_or_bust($subref)) && $DB::sub{$s})
-      || ($subdump && ($s = findsubs("$subref")) && $DB::sub{$s});
+    my $place = (($s = CvGV_name_or_bust($subref)) && $DB::sub{$s})
+                 || ($subdump && ($s = findsubs($subref)) && $DB::sub{$s});
     $place = '???' unless defined $place;
     $s = $sub unless defined $s;
-    print( (' ' x $off) .  "&$s in $place\n" );
+    print( (' ' x $off) .  "&{dump::view($s)} in $place\n" );
 }
 
 sub findsubs {
@@ -452,10 +451,10 @@ sub findsubs {
   my ($addr, $name, $loc);
   while (($name, $loc) = each %DB::sub) {
     $addr = \&{*{Symbol::fetch_glob($name)}};
-    $subs{"$addr"} = $name;
+    $subs{dump::view($addr)} = $name;
   }
   $subdump = 0;
-  $subs{ shift() };
+  $subs{ dump::view( shift() ) };
 }
 
 sub main::dumpvar {

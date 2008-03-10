@@ -133,8 +133,7 @@ sub heavy_export {
 	    }
 	}
 	if ($oops) {
-	    require Carp;
-	    Carp::croak("@{carp}Can't continue after import errors");
+	    die("@{carp}Can't continue after import errors");
 	}
     }
     else {

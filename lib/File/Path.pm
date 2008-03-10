@@ -648,11 +648,11 @@ sub rmtree {
         $arg->{verbose} = defined $verbose ? $verbose : 0;
         $arg->{safe}    = defined $safe    ? $safe    : 0;
 
-        if (defined($paths) and length($paths)) {
+        if (defined($paths)) {
             $paths = [$paths] unless UNIVERSAL::isa($paths,'ARRAY');
         }
         else {
-            _carp ("No root path(s) specified\n");
+            die ("No root path(s) specified\n");
             return 0;
         }
     }

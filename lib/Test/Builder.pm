@@ -727,8 +727,8 @@ $code" . "\$got $type \$expect;";
 sub _cmp_diag {
     my($self, $got, $type, $expect) = @_;
     
-    $got    = defined $got    ? "'$got'"    : 'undef';
-    $expect = defined $expect ? "'$expect'" : 'undef';
+    $got    = dump::view($got);
+    $expect = dump::view($expect);
     return $self->diag(sprintf <<DIAGNOSTIC, $got, $type, $expect);
     %s
         %s

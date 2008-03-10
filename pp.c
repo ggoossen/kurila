@@ -4502,13 +4502,37 @@ PP(pp_ref_eq)
 {
     dSP;
 
-    if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
-        SP--;
-	SETs(boolSV(SvRV(TOPs) == SvRV(TOPp1s)));
-	RETURN;
-    }
+    if (SvMAGICAL(TOPs))
+	mg_get(TOPs);
+    if (SvMAGICAL(TOPm1s))
+	mg_get(TOPm1s);
+
+    if (! SvROK(TOPs))
+	DIE(aTHX_ "Not a reference");
+    if (! SvROK(TOPm1s))
+	DIE(aTHX_ "Not a reference");
+
     SP--;
-    SETs(boolSV(FALSE));
+    SETs(boolSV(SvRV(TOPs) == SvRV(TOPp1s)));
+    RETURN;
+}
+
+PP(pp_ref_ne)
+{
+    dSP;
+
+    if (SvMAGICAL(TOPs))
+	mg_get(TOPs);
+    if (SvMAGICAL(TOPm1s))
+	mg_get(TOPm1s);
+
+    if (! SvROK(TOPs))
+	DIE(aTHX_ "Not a reference");
+    if (! SvROK(TOPm1s))
+	DIE(aTHX_ "Not a reference");
+
+    SP--;
+    SETs(boolSV(SvRV(TOPs) != SvRV(TOPp1s)));
     RETURN;
 }
 

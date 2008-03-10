@@ -121,12 +121,10 @@ gt		(+>
 ge		(+>=
 eq		(==
 ne		(!=
-slt		(lt
-sle		(le
-sgt		(gt
-sge		(ge
 seq		(eq
 sne		(ne
+
+ref_eq          (\==
 
 nomethod	(nomethod
 add		(+

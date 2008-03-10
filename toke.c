@@ -4537,6 +4537,10 @@ Perl_yylex(pTHX)
 		s += 2;
 		Eop(OP_REF_EQ);
 	    }
+	    if (*s == '!' && s[1] == '=') {
+		s += 2;
+		Eop(OP_REF_NE);
+	    }
 	    no_op("Backslash",s);
 	}
 	OPERATOR(REFGEN);

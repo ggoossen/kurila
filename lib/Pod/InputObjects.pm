@@ -537,7 +537,7 @@ sub _unset_child2parent_links {
    $self->{'-parent_sequence'} = undef;
    my $ptree = $self->{'-ptree'};
    for (@$ptree) {
-      next  unless (length  and  ref  and  ref ne 'SCALAR');
+      next  unless (ref  and  ref ne 'SCALAR');
       $_->_unset_child2parent_links()
           if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
    }
