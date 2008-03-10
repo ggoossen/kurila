@@ -1398,7 +1398,7 @@ EO_GRIPE
     } ## end unless (is_safe_file($file...
 
     do $file;
-    CORE::warn("perldb: couldn't parse $file: $@") if $@;
+    CORE::warn("perldb: couldn't parse $file\: {$@->message}") if $@;
 } ## end sub safe_do
 
 # This is the safety test itself.
@@ -5332,7 +5332,7 @@ debugger output.
 sub print_lineinfo {
 
     # Make the terminal sensible if we're not the primary debugger.
-    resetterm(1) if $LINEINFO eq $OUT and $term_pid != $$;
+    resetterm(1) if $LINEINFO \== $OUT and $term_pid != $$;
     local $\ = '';
     local $, = '';
     print $LINEINFO @_;
@@ -6612,7 +6612,7 @@ sub parse_options {
           && defined $val;
 
         # Not initialization - echo the value we set it to.
-        dump_option($option) unless $OUT eq \*STDERR;
+        dump_option($option) unless $OUT \== \*STDERR;
     } ## end while (length)
 } ## end sub parse_options
 

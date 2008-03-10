@@ -142,11 +142,6 @@ use strict;
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
 
-sub myconfig;
-sub config_sh;
-sub config_vars;
-sub config_re;
-
 my %%Export_Cache = map {($_ => 1)} (@Config::EXPORT, @Config::EXPORT_OK);
 
 our %%Config;
@@ -697,8 +692,6 @@ my $fast_config = join '', map { "    $_,\n" } sort values %Common;
 # Sanity check needed to stop an infite loop if Config_heavy.pl fails to define
 # &launcher for some reason (eg it got truncated)
 $config_txt .= sprintf <<'ENDOFTIE', $fast_config;
-
-sub DESTROY { }
 
 my @heavy_subs = (qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
                      config_vars|);

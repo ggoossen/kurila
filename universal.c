@@ -786,11 +786,11 @@ STATIC AV* S_error_backtrace(pTHX)
 	    break;
 	
 	/* caller() should not report the automatic calls to &DB::sub */
-	if (PL_DBsub && GvCV(PL_DBsub) &&
-	    ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub)) {
-	    cxix = dopoptosub_at(ccstack, cxix - 1);
-	    continue;
-	}
+/* 	if (PL_DBsub && GvCV(PL_DBsub) && */
+/* 	    ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub)) { */
+/* 	    cxix = dopoptosub_at(ccstack, cxix - 1); */
+/* 	    continue; */
+/* 	} */
 
 	/* stop on BEGIN/CHECK/.../END blocks */
 	if ((CxTYPE(&ccstack[cxix]) == CXt_SUB) &&
