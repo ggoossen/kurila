@@ -2176,9 +2176,6 @@ some extra work on your own. Also remember that hash keys must be
 unique, but two different variables can store the same reference (and
 those variables can change later).
 
-The C<Tie::RefHash> module, which is distributed with perl, might be
-what you want. It handles that extra work.
-
 =head1 Data: Misc
 
 =head2 How do I handle binary data correctly?
