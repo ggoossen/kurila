@@ -21,7 +21,7 @@ my $template = File::Spec->catfile(File::Spec->tmpdir, 'wowserXXXX');
 
 (my $fh, $template) = mkstemp($template);
 
-print "# MKSTEMP: FH is $fh File is $template fileno=".fileno($fh)."\n";
+print "# MKSTEMP: FH is {dump::view($fh)} File is $template fileno=".fileno($fh)."\n";
 # Check if the file exists
 ok( (-e $template) );
 

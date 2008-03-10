@@ -155,7 +155,7 @@ sub validate {
                         $orig_sigwarn->(@_);
                     }
                     else {
-                        warn "@_";
+                        print STDERR $_[0]->message;
                     }
                 };
 

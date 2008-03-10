@@ -24,7 +24,7 @@ $ENV{'REQUEST_METHOD'} = 'GET';
 $ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-US, zh-TW';
 
 my $x = Whunk::L10N->get_handle;
-print "# LH object: $x\n";
+print "# LH object: {dump::view($x)}\n";
 ok $x->maketext('hello'), "HI AND STUFF!";
 print "# OK bye\n";
 ok 1;

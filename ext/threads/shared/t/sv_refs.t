@@ -48,7 +48,7 @@ ok(2,my $temp1 = $@->{description} =~ m/^Invalid\b.*shared scalar/, "Wrong error
 
 share($bar);
 $foo = \$bar;
-ok(3, $temp1 = $foo =~ m/SCALAR/, "Check that is a ref");
+ok(3, $temp1 = dump::view($foo) =~ m/SCALAR/, "Check that is a ref");
 ok(4, $$foo eq "foo", "Check that it points to the correct value");
 $bar = "yeah";
 ok(5, $$foo eq "yeah", "Check that assignment works");

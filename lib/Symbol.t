@@ -17,7 +17,7 @@ ok( ref($sym1) eq 'GLOB', 'gensym() returns a GLOB' );
 
 $sym2 = gensym;
 
-ok( $sym1 ne $sym2, 'gensym() returns a different GLOB' );
+ok( $sym1 \!= $sym2, 'gensym() returns a different GLOB' );
 
 ungensym $sym1;
 
@@ -28,12 +28,12 @@ $sym1 = $sym2 = undef;
 use Symbol qw(geniosym);
 
 $sym1 = geniosym;
-like( $sym1, qr/=IO\(/, 'got an IO ref' );
+is( (ref $sym1), 'IO::Handle', 'got an IO ref' );
 
 $FOO = 'Eymascalar';
 *FOO = $sym1;
 
-is( $sym1, *FOO{IO}, 'assigns into glob OK' );
+cmp_ok( $sym1, '\==', *FOO{IO}, 'assigns into glob OK' );
 
 is( $FOO, 'Eymascalar', 'leaves scalar alone' );
 
@@ -65,15 +65,14 @@ use Symbol qw(qualify qualify_to_ref);  # must import into this package too
 
 # Test qualify_to_ref()
 {
-    no strict 'refs';
-    ::ok( \*{qualify_to_ref("x")} eq \*foo::x, 'qualify_to_ref() with a simple identifier' );
+    ::ok( \*{qualify_to_ref("x")} \== \*foo::x, 'qualify_to_ref() with a simple identifier' );
 }
 
 # test fetch_glob()
 
 ::ok( (ref Symbol::fetch_glob("x")) eq "GLOB", "fetch_glob returns a ref to a glob" );
-::ok( Symbol::fetch_glob("x") eq \*foo::x, "fetch_glob with unqualified name" );
-::ok( Symbol::fetch_glob("foo::x") eq \*foo::x, "fetch_glob with qualified name" );
+::ok( Symbol::fetch_glob("x") \== \*foo::x, "fetch_glob with unqualified name" );
+::ok( Symbol::fetch_glob("foo::x") \== \*foo::x, "fetch_glob with qualified name" );
 
 # test stash()
 ::ok( (ref Symbol::stash("foo")) eq "HASH", "stash returns a ref to a hash" );

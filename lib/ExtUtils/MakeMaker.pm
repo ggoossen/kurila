@@ -787,7 +787,7 @@ sub _run_hintfile {
     local @INC = (File::Spec->curdir, @INC);
     my $ret = do $hint_file;
     if( !defined $ret ) {
-        my $error = $@ || $!;
+        my $error = $@ && $@->message || $!;
         print STDERR $error;
     }
 }

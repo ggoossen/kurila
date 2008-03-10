@@ -120,10 +120,10 @@ sub batch_convert {
   $self ||= __PACKAGE__; # tolerate being called as an optionless function
   $self = $self->new unless ref $self; # tolerate being used as a class method
 
-  if(!defined($dirs)  or  $dirs eq ''  or  $dirs eq '@INC' ) {
-    $dirs = '';
-  } elsif(ref $dirs) {
+  if(ref $dirs) {
     # OK, it's an explicit set of dirs to scan, specified as an arrayref.
+  } elsif(!defined($dirs)  or  $dirs eq ''  or  $dirs eq '@INC' ) {
+    $dirs = '';
   } else {
     # OK, it's an explicit set of dirs to scan, specified as a
     #  string like "/thing:/also:/whatever/perl" (":"-delim, as usual)

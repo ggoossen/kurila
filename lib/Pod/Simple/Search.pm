@@ -639,23 +639,14 @@ sub _accessorize {  # A simple-minded method-maker
 sub _state_as_string {
   my $self = $_[0];
   return '' unless ref $self;
-  my @out = "\{\n  # State of $self ...\n";
+  my @out = "\{\n  # State of {dump::view($self)} ...\n";
   foreach my $k (sort keys %$self) {
-    push @out, "  ", _esc($k), " => ", _esc($self->{$k}), ",\n";
+    push @out, "  {dump::view($k)} => {dump::view($self->{$k})}\n";
   }
   push @out, "\}\n";
   my $x = join '', @out;
   $x =~ s/^/#/mg;
   return $x;
-}
-
-sub _esc {
-  my $in = $_[0];
-  return 'undef' unless defined $in;
-  $in =~
-    s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
-     <{'\\x['.(unpack("H2",$1).']')}>g;
-  return qq{"$in"};
 }
 
 #==========================================================================

@@ -18,14 +18,14 @@ use Test::Builder;
 my $more_tb = Test::More->builder;
 isa_ok $more_tb, 'Test::Builder';
 
-is $more_tb, Test::More->builder, 'create does not interfere with ->builder';
-is $more_tb, Test::Builder->new,  '       does not interfere with ->new';
+cmp_ok $more_tb, '\==', Test::More->builder, 'create does not interfere with ->builder';
+cmp_ok $more_tb, '\==', Test::Builder->new,  '       does not interfere with ->new';
 
 {
     my $new_tb  = Test::Builder->create;
 
     isa_ok $new_tb,  'Test::Builder';
-    isnt $more_tb, $new_tb, 'Test::Builder->create makes a new object';
+    cmp_ok $more_tb, '\!=', $new_tb, 'Test::Builder->create makes a new object';
 
     $new_tb->output("some_file");
     END { 1 while unlink "some_file" }

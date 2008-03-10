@@ -1110,8 +1110,6 @@ lib/Digest/t/digest.t		See if Digest extensions work
 lib/Digest/t/file.t		See if Digest extensions work
 lib/DirHandle.pm		like FileHandle only for directories
 lib/DirHandle.t			See if DirHandle works
-lib/Dumpvalue.pm		Screen dump of perl values
-lib/Dumpvalue.t			See if Dumpvalue works
 lib/dumpvar.pl			A variable dumper
 lib/dumpvar.t			A variable dumper tester
 lib/English.pm			Readable aliases for short variables
@@ -1461,7 +1459,6 @@ lib/Net/t/datasend.t		libnet
 lib/Net/t/ftp.t			libnet
 lib/Net/t/hostname.t		libnet
 lib/Net/Time.pm			libnet
-lib/Net/t/libnet_t.pl		libnet
 lib/Net/t/netrc.t		libnet
 lib/Net/t/nntp.t		libnet
 lib/Net/t/require.t		libnet

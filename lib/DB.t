@@ -18,7 +18,7 @@ use Scalar::Util qw( dualvar );
 my $dualfalse = dualvar(0, 'false');
 my $dualtrue = dualvar(1, 'true');
 
-use Test::More tests => 106;
+use Test::More tests => 104;
 
 # must happen at compile time for DB:: package variable localizations to work
 BEGIN {
@@ -82,12 +82,6 @@ BEGIN {
         ok( $DB::signal, 'DB::catch() should set $DB::signal' );
         # add clients and test to see if they are awakened
 }
-
-# test DB::_clientname()
-is( DB::_clientname('foo=A(1)'), 'foo',
-    'DB::_clientname should return refname');
-cmp_ok( DB::_clientname('bar'), 'eq', '',
-        'DB::_clientname should not return non refname');
 
 # test DB::next() and DB::step()
 {

@@ -157,9 +157,9 @@ tie $scalar, 'TIED_SCALAR';
 
 $scalar = 'foo';
 $hash{'attribute'} = 'plain value';
-$array[0] = \$scalar;
-$array[1] = $c;
-$array[2] = \@array;
+$array[0] = dump::view(\$scalar);
+$array[1] = dump::view($c);
+$array[2] = dump::view(\@array);
 $array[3] = "plaine scalaire";
 
 @tied = (\$scalar, \@array, \%hash);
@@ -178,7 +178,7 @@ ok 3, defined $root;
 $got = &dump($root);
 ok 4, 1;
 
-ok 5, $got ne $dumped;		# our hooks did not handle refs in array
+ok 5, $got eq $dumped;
 
 $g = freeze($root);
 ok 6, length($f) == length($g);

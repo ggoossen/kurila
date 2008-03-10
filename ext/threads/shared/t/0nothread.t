@@ -31,7 +31,7 @@ sub hash
     my @keys = keys %hash;
     is(join(',',sort @keys),'0,1,2',"Keys correct");
     my @hval = @hash{0,1,2};
-    is(join(',',@hval),join(',',@val),"Values correct");
+    is_deeply(\@hval,\@val,"Values correct");
     my $val = delete $hash{1};
     is($val,$val[1],"Delete value correct");
     is(keys %hash,2,"Size correct");
