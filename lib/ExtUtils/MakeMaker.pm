@@ -802,7 +802,7 @@ sub mv_all_methods {
 
     local ${^WARN_HOOK} = sub { 
         # can't use 'no warnings redefined', 5.6 only
-        warn @_ unless $_[0] =~ m/^Subroutine .* redefined/ 
+        warn $_[0]->message unless $_[0]->message =~ m/^Subroutine .* redefined/ 
     };
     foreach my $method (@Overridable) {
 

@@ -236,6 +236,7 @@ XS(XS_dump_view);
 XS(XS_error_create);
 XS(XS_error_message);
 XS(XS_error_write_to_stderr);
+XS(XS_ref_address);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -308,6 +309,8 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("error::create", XS_error_create, file);
     newXS("error::message", XS_error_message, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
+
+    newXS("ref::address", XS_ref_address, file);
 
     PL_errorcreatehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create"))));
     PL_diehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr"))));
@@ -2115,6 +2118,27 @@ XS(XS_dump_view)
     XSRETURN(1);
 }
 
+XS(XS_ref_address)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "ref::address", "sv");
+
+    {
+	SV* sv = ST(0);
+	if (SvMAGICAL(sv))
+	    mg_get(sv);
+	if(!SvROK(sv)) {
+	    XSRETURN_UNDEF;
+	}
+	SP -= items;
+	mPUSHi(PTR2UV(SvRV(sv)));
+	XSRETURN(1);
+    }
+}
 
 /*
  * Local variables:

@@ -127,7 +127,7 @@ sub mycan {				# Real can would leave stubs.
 	 assign		  => "+= -= *= /= %= **= <<= >>= x= .=",
 	 num_comparison	  => "+< +<= +>  +>= == !=",
 	 '3way_comparison'=> "<+> cmp",
-	 str_comparison	  => "lt le gt ge eq ne",
+	 str_comparison	  => "eq ne",
 	 binary		  => '^&^ ^&^= ^|^ ^|^= ^^^ ^^^=',
 	 unary		  => "neg ! ^~^",
 	 mutators	  => '++ --',
@@ -353,7 +353,7 @@ substitutions.
 =item * I<Comparison operations>
 
     "<",  "<=", ">",  ">=", "==", "!=", "<=>",
-    "lt", "le", "gt", "ge", "eq", "ne", "cmp",
+    "eq", "ne", "cmp",
 
 If the corresponding "spaceship" variant is available, it can be
 used to substitute for the missing operation.  During C<sort>ing

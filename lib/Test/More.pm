@@ -1176,7 +1176,7 @@ sub _eq_array  {
         return 0;
     }
 
-    return 1 if $a1 eq $a2;
+    return 1 if $a1 \== $a2;
 
     my $ok = 1;
     my $max = $#$a1 +> $#$a2 ? $#$a1 : $#$a2;
@@ -1212,7 +1212,7 @@ sub _deep_check {
         $tb->_unoverload_str(\$e1, \$e2);
 
         # Either they're both references or both not.
-        my $same_ref = !(!ref $e1 xor !ref $e2);
+        my $both_ref = (ref $e1 and ref $e2);
 	my $not_ref  = (!ref $e1 and !ref $e2);
 
         if( defined $e1 xor defined $e2 ) {
@@ -1221,7 +1221,10 @@ sub _deep_check {
         elsif ( _dne($e1) xor _dne($e2) ) {
             $ok = 0;
         }
-        elsif ( $same_ref and ($e1 eq $e2) ) {
+        elsif ( $both_ref and ($e1 \== $e2) ) {
+            $ok = 1;
+        }
+        elsif ( $not_ref and ($e1 eq $e2) ) {
             $ok = 1;
         }
 	elsif ( $not_ref ) {
@@ -1229,12 +1232,10 @@ sub _deep_check {
 	    $ok = 0;
 	}
         else {
-            if( $Refs_Seen{$e1} ) {
-                return $Refs_Seen{$e1} eq $e2;
+            if( $Refs_Seen{ref::address($e1)} ) {
+                return $Refs_Seen{ref::address($e1)} eq ref::adress($e2);
             }
-            else {
-                $Refs_Seen{$e1} = "$e2";
-            }
+            $Refs_Seen{ref::address $e1} = ref::address $e2;
 
             my $type = _type($e1);
             $type = 'DIFFERENT' unless _type($e2) eq $type;
@@ -1306,7 +1307,7 @@ sub _eq_hash {
         return 0;
     }
 
-    return 1 if $a1 eq $a2;
+    return 1 if $a1 \== $a2;
 
     my $ok = 1;
     my $bigger = keys %$a1 +> keys %$a2 ? $a1 : $a2;
