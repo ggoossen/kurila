@@ -46,7 +46,7 @@ sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
 	my ($x, $obj) = @_;
-	die "STORABLE_thaw #1" unless $obj eq $self;
+	die "STORABLE_thaw #1" unless $obj \== $self;
 	my $len = length $x;
 	my $a = thaw $x;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY';
@@ -71,7 +71,7 @@ sub STORABLE_freeze {
 sub STORABLE_thaw {
 	my $self = shift;
 	my ($cloning, $undef, $a, $obj) = @_;
-	die "STORABLE_thaw #1" unless $obj eq $self;
+	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY' || @$a != 2;
 	$self->{ok} = $self;
 }
@@ -99,7 +99,7 @@ sub STORABLE_freeze {
 sub STORABLE_thaw {
 	my $self = shift;
 	my ($cloning, $undef, $a, $r, $obj, $ext) = @_;
-	die "STORABLE_thaw #1" unless $obj eq $self;
+	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY';
 	die "STORABLE_thaw #3" unless ref $r eq 'HASH';
 	die "STORABLE_thaw #4" unless $a->[1] == $r->{ext};
@@ -128,7 +128,7 @@ sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
 	my ($x, $obj) = @_;
-	die "STORABLE_thaw #1" unless $obj eq $self;
+	die "STORABLE_thaw #1" unless $obj \== $self;
 	$self->[0] = thaw($x) if $x ne "no";
 	$recursed--;
 }
@@ -286,13 +286,13 @@ package Foo2;
 
 sub new {
 	my $self = bless {}, $_[0];
-	$self->{freezed} = "$self";
+	$self->{freezed} = dump::view($self);
 	return $self;
 }
 
 sub DESTROY {
 	my $self = shift;
-	$::refcount_ok = 1 unless "$self" eq $self->{freezed};
+	$::refcount_ok = 1 unless dump::view($self) eq $self->{freezed};
 }
 
 package Foo3;

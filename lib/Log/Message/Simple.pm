@@ -207,14 +207,10 @@ BEGIN {
     my $log         = Log::Message->new();
 
     for my $func ( @EXPORT, @EXPORT_OK ) {
-        no strict 'refs';
-        
                         ### up the carplevel for the carp emulation
                         ### functions
         *{Symbol::fetch_glob($func)}
-          = sub {  local $Carp::CarpLevel += 2
-                            if grep { $_ eq $func } @EXPORT_OK;
-                            
+          = sub {  
                         my $msg     = shift;
                         $log->store(
                                 message => $msg,
@@ -226,7 +222,7 @@ BEGIN {
     }
 
     sub flush {
-        return reverse $log->flush;
+        return @{[ reverse $log->flush ]};
     }
 
     sub stack {

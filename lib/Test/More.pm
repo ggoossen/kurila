@@ -151,31 +151,6 @@ sub plan {
 }
 
 
-# This implements "use Test::More 'no_diag'" but the behavior is
-# deprecated.
-sub import_extra {
-    my $class = shift;
-    my $list  = shift;
-
-    my @other = ();
-    my $idx = 0;
-    while( $idx +<= $#{$list} ) {
-        my $item = $list->[$idx];
-
-        if( defined $item and $item eq 'no_diag' ) {
-            $class->builder->no_diag(1);
-        }
-        else {
-            push @other, $item;
-        }
-
-        $idx++;
-    }
-
-    @$list = @other;
-}
-
-
 =head2 Test names
 
 By convention, each test is assigned a number in order.  This is
@@ -664,18 +639,18 @@ package $pack;
 use $module \@imports;
 USE
         }
-        $eval_error = $@;
+        $eval_error = $@ && $@->message;
     }
 
     my $ok = $tb->ok( !$eval_error, "use $module;" );
 
     unless( $ok ) {
-        chomp $eval_error;
-        $@ =~ s{^BEGIN failed--compilation aborted at .*$}
-                {BEGIN failed--compilation aborted at $filename line $line.}m;
+        $eval_error =~ 
+          s{^BEGIN failed--compilation aborted at .*$}
+           {BEGIN failed--compilation aborted at $filename line $line.}m;
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
-    Error:  {$eval_error->message}
+    Error:  {$eval_error}
 DIAGNOSTIC
 
     }
@@ -711,7 +686,6 @@ REQUIRE
     my $ok = $tb->ok( !$@, "require $module;" );
 
     unless( $ok ) {
-        chomp $@;
         $tb->diag(<<DIAGNOSTIC);
     Tried to require '$module'.
     Error:  {$@->message}
@@ -847,10 +821,7 @@ sub _format_stack {
     my $out = "Structures begin differing at:\n";
     foreach my $idx (0..$#vals) {
         my $val = $vals[$idx];
-        $vals[$idx] = !defined $val ? 'undef'          :
-                      _dne($val)    ? "Does not exist" :
-                      ref $val      ? "$val"           :
-                                      "'$val'";
+        $vals[$idx] = _dne($val)    ? "Does not exist" : dump::view($val);
     }
 
     $out .= "$vars[0] = $vals[0]\n";
@@ -1233,7 +1204,7 @@ sub _deep_check {
 	}
         else {
             if( $Refs_Seen{ref::address($e1)} ) {
-                return $Refs_Seen{ref::address($e1)} eq ref::adress($e2);
+                return $Refs_Seen{ref::address($e1)} eq ref::address($e2);
             }
             $Refs_Seen{ref::address $e1} = ref::address $e2;
 

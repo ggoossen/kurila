@@ -386,13 +386,13 @@ sub parse_file {
   my($self, $source) = (@_);
 
   if(!defined $source) {
-    Carp::croak("Can't use empty-string as a source for parse_file");
+    die("Can't use empty-string as a source for parse_file");
   } elsif(ref(\$source) eq 'GLOB') {
-    $self->{'source_filename'} = '' . ($source);
+    $self->{'source_filename'} = dump::view($source);
   } elsif(ref $source) {
-    $self->{'source_filename'} = '' . ($source);
+    $self->{'source_filename'} = dump::view($source);
   } elsif(!length $source) {
-    Carp::croak("Can't use empty-string as a source for parse_file");
+    die("Can't use empty-string as a source for parse_file");
   } else {
     {
       local *PODSOURCE;
@@ -1004,7 +1004,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
         
       # bitch if it's empty
       if(  @{$treelet->[$i]} == 2
-       or (@{$treelet->[$i]} == 3 and $treelet->[$i][2] eq '')
+       or (@{$treelet->[$i]} == 3 and not ref $treelet->[$i][2] and $treelet->[$i][2] eq '')
       ) {
         $self->whine( $start_line, "An empty L<>" );
         $treelet->[$i] = 'L<>';  # just make it a text node

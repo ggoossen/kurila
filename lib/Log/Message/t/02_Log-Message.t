@@ -118,7 +118,7 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
 
     {
         ok( $item->remove,          q[Removing item from stack] );
-        ok( (!grep{ $item eq $_ } $log->retrieve), 
+        ok( (!grep{ $item \== $_ } $log->retrieve), 
                                     q[  Item removed from stack] );
     }
 

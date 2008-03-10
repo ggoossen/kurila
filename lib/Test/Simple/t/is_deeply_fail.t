@@ -102,7 +102,7 @@ is( $err, <<ERR,                        '    right diagnostic' );
 #   at $0 line 99.
 #     Structures begin differing at:
 #          \$got->\{this\} = Does not exist
-#     \$expected->\{this\} = '42'
+#     \$expected->\{this\} = 42
 ERR
 
 #line 110
@@ -114,7 +114,7 @@ is( $err, <<ERR,                        '    right diagnostic' );
 #   at $0 line 110.
 #     Structures begin differing at:
 #          \$got->[9] = Does not exist
-#     \$expected->[9] = '10'
+#     \$expected->[9] = 10
 ERR
 
 #line 121
@@ -206,7 +206,7 @@ is( $err, <<ERR,                            '    right diagnostic' );
 #   at $0 line 198.
 #     Structures begin differing at:
 #          \$got->\{that\}\{foo\} = Does not exist
-#     \$expected->\{that\}\{foo\} = '42'
+#     \$expected->\{that\}\{foo\} = 42
 ERR
 
 
@@ -237,8 +237,8 @@ ok( @Test::More::Data_Stack == 0, '@Data_Stack not holding onto things' );
 #line 258
 # [rt.cpan.org 7031]
 my $a = [];
-ok !is_deeply($a, $a.''),       "don't compare refs like strings";
-ok !is_deeply([$a], [$a.'']),   "  even deep inside";
+ok !is_deeply($a, dump::view($a).''),       "don't compare refs like strings";
+ok !is_deeply([$a], [dump::view($a).'']),   "  even deep inside";
 
 
 #line 265
@@ -266,8 +266,8 @@ is( $out, "not ok 21\n", 'scalar vs ref' );
 is( $err, <<ERR,        '  right diagnostic');
 #   Failed test at $0 line 286.
 #     Structures begin differing at:
-#          \$got = '23'
-#     \$expected = $ref
+#          \$got = 23
+#     \$expected = {dump::view($ref)}
 ERR
 
 #line 296
@@ -276,8 +276,8 @@ is( $out, "not ok 22\n", 'ref vs scalar' );
 is( $err, <<ERR,        '  right diagnostic');
 #   Failed test at $0 line 296.
 #     Structures begin differing at:
-#          \$got = $ref
-#     \$expected = '23'
+#          \$got = {dump::view($ref)}
+#     \$expected = 23
 ERR
 
 #line 306
@@ -302,8 +302,8 @@ ERR
     is( $err, <<ERR, 	     '  right diagnostic' );
 #   Failed test at $0 line 321.
 #     Structures begin differing at:
-#          \$got = $array
-#     \$expected = $hash
+#          \$got = {dump::view($array)}
+#     \$expected = {dump::view($hash)}
 ERR
 
 #line 332
@@ -312,8 +312,8 @@ ERR
     is( $err, <<ERR,	     '  right diagnostic' );
 #   Failed test at $0 line 332.
 #     Structures begin differing at:
-#          \$got->[0] = $array
-#     \$expected->[0] = $hash
+#          \$got->[0] = {dump::view($array)}
+#     \$expected->[0] = {dump::view($hash)}
 ERR
 
 
@@ -332,7 +332,7 @@ ERR
 	is( $err, <<ERR,	     '  right diagnostic' );
 #   Failed test at $0 line 353.
 #     Structures begin differing at:
-#          \$got->[0] = $foo
+#          \$got->[0] = {dump::view($foo)}
 #     \$expected->[0] = 'wibble'
 ERR
 

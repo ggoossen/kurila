@@ -70,8 +70,8 @@ my $shared :shared = &share({});
 $$shared{'foo'} = 'bar';
 
 for(1..10) {
-  my $str1 = "$shared";
-  my $str2 = "$shared";
+  my $str1 = dump::view($shared);
+  my $str2 = dump::view($shared);
   ok($test_count++, $str1 eq $str2, 'stringify');
   $str1 = $$shared{'foo'};
   $str2 = $$shared{'foo'};

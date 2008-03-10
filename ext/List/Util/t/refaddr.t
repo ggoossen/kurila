@@ -14,7 +14,7 @@ BEGIN {
 }
 
 
-use Test::More tests => 29;
+use Test::More tests => 23;
 
 use Scalar::Util qw(refaddr);
 use vars qw($t $y $x *F $v $r);
@@ -29,7 +29,7 @@ foreach $v (undef, 10, 'string') {
 }
 
 foreach $r ({}, \$t, [], \*F, sub {}) {
-  my $n = "$r";
+  my $n = dump::view($r);
   $n =~ m/0x(\w+)/;
   my $addr = do { local $^W; hex $1 };
   my $before = ref($r);
@@ -39,24 +39,6 @@ foreach $r ({}, \$t, [], \*F, sub {}) {
   my $obj = bless $r, 'FooBar';
   is( refaddr($r), $addr, "blessed with overload $n");
   is( ref($r), 'FooBar', $n);
-}
-
-{
-  my $z = '77';
-  my $y = \$z;
-  my $a = '78';
-  my $b = \$a;
-  tie my %x, 'Hash3', {};
-  $x{$y} = 22;
-  $x{$b} = 23;
-  my $xy = $x{$y};
-  my $xb = $x{$b}; 
-  ok(ref($x{$y}));
-  ok(ref($x{$b}));
-  ok(refaddr($xy) == refaddr($y));
-  ok(refaddr($xb) == refaddr($b));
-  ok(refaddr($x{$y}));
-  ok(refaddr($x{$b}));
 }
 
 package FooBar;

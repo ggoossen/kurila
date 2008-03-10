@@ -189,14 +189,14 @@ err_ok( <<ERR );
 #     expected: 23
 #   Failed test '       !='
 #   at $0 line 70.
-#     '42'
+#     42
 #         !=
-#     '42'
+#     42
 #   Failed test '       &&'
 #   at $0 line 71.
-#     '1'
+#     1
 #         &&
-#     '0'
+#     0
 ERR
 
 

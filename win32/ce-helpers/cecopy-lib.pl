@@ -96,7 +96,6 @@ sub BEGIN {
     Tie/Handle.pm
     Tie/Hash.pm
     Tie/Memoize.pm
-    Tie/RefHash.pm
     Tie/Scalar.pm
     Tie/SubstrHash.pm
     Text/Abbrev.pm

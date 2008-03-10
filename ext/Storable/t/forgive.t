@@ -43,7 +43,7 @@ my $result;
 
 eval {$result = store ($bad , 'store')};
 print ((!defined $result)?"ok $test\n":"not ok $test\n"); $test++;
-print (($@ ne '')?"ok $test\n":"not ok $test\n"); $test++;
+print ($@?"ok $test\n":"not ok $test\n"); $test++;
 
 $Storable::forgive_me=1;
 

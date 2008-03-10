@@ -14,7 +14,7 @@ print "# Some basic sanity tests...\n";
 
 my $x = Pod::Simple::Search->new;
 die "Couldn't make an object!?" unless ok defined $x;
-print "# New object: $x\n";
+print "# New object: {dump::view($x)}\n";
 print "# Version: ", $x->VERSION, "\n";
 ok defined $x->can('callback');
 ok defined $x->can('dir_prefix');

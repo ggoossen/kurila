@@ -319,7 +319,7 @@ invert_opset function.
     not complement
 
     lt i_lt gt i_gt le i_le ge i_ge eq i_eq ne i_ne ncmp i_ncmp
-    seq sne scmp
+    seq sne scmp ref_eq ref_ne
 
     substr vec stringify study pos length index rindex ord chr
 

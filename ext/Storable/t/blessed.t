@@ -52,7 +52,7 @@ sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
 	my ($x, $obj) = @_;
-	die "STORABLE_thaw" unless $obj eq $self;
+	die "STORABLE_thaw" unless $obj \== $self;
 }
 
 package main;

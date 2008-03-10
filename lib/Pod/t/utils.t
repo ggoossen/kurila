@@ -1,12 +1,7 @@
 
 # Test hyperlinks et al from Pod::ParseUtils
 
-BEGIN {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-        require Test; Test->import();
-        plan(tests => 22);
-}
+use Test::More tests => 21;
 
 use strict;
 use Pod::ParseUtils;
@@ -39,11 +34,9 @@ my @results = (
 	       "Q<text>",
 	      );
 
-ok(@results,@links);
-
 for my $i( 0..@links ) {
   my $link = Pod::Hyperlink->new( $links[$i]);
-  ok($link->markup, $results[$i]);
+  is($link->markup, $results[$i]);
 }
 
 # Now test lists
@@ -55,9 +48,9 @@ my $list = Pod::List->new( -indent => 4,
 
 ok($list);
 
-ok($list->indent, 4);
-ok($list->start, 52);
-ok($list->type, "OL");
+is($list->indent, 4);
+is($list->start, 52);
+is($list->type, "OL");
 
 
 # Pod::Cache
@@ -78,14 +71,14 @@ my $item = $cache->find_page("Pod::ParseUtils");
 ok($item);
 
 # and a failure
-ok($cache->find_page("Junk"), undef);
+is($cache->find_page("Junk"), undef);
 
 # Make sure that the item we found is the same one as the
 # first in the list
 my @i = $cache->item;
-ok($i[0], $item);
+cmp_ok($i[0], '\==', $item);
 
 # Check the contents
-ok($item->page, "Pod::ParseUtils");
-ok($item->description, "A description");
-ok($item->file, "file.t");
+is($item->page, "Pod::ParseUtils");
+is($item->description, "A description");
+is($item->file, "file.t");

@@ -86,7 +86,7 @@ sub skip {
         print $fh "test\n";
         return $fh;
     })->join();
-    ok(ref($retval) eq 'GLOB', "Check that we can return FH $retval");
+    ok(ref($retval) eq 'GLOB', "Check that we can return FH {dump::view($retval)}");
     print $retval "test2\n";
     close($retval);
     unlink("threadtest");

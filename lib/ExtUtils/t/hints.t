@@ -49,5 +49,5 @@ like( $out->read, qr/Processing hints file $hint_file\nArgh!/, 'hint files produ
 
 END {
     use File::Path;
-    rmtree ['hints'];
+    rmtree 'hints';
 }
