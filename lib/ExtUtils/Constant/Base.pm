@@ -636,8 +636,8 @@ sub normalise_items
             $type ||= $default_type;
             $what->{$type} = 1;
             $item = {name=>$name, type=>$type};
-            $item->{macro} = $macro if defined $macro and not $macro eq $name;
-            $item->{value} = $value if defined $value and not $value \== $name;
+            $item->{macro} = $macro if defined $macro and (ref $macro or $macro ne $name);
+            $item->{value} = $value if defined $value and (ref $value or $value ne $name);
             foreach my $key (qw(default pre post def_pre def_post weight
                                 not_constant)) {
                 my $value = $orig->{$key};

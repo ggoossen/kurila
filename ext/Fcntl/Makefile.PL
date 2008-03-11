@@ -1,12 +1,5 @@
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant v0.11 'WriteConstants';
-WriteMakefile(
-    NAME 	=> 'Fcntl',
-    MAN3PODS 	=> {}, 	# Pods will be built by installman.
-    XSPROTOARG => '-noprototypes', 		# XXX remove later?
-    VERSION_FROM => 'Fcntl.pm',
-    realclean => {FILES=> 'const-c.inc const-xs.inc'},
-);
 
 my @names = (qw(
 	       DN_ACCESS DN_MODIFY DN_CREATE DN_DELETE DN_RENAME
@@ -43,4 +36,12 @@ WriteConstants(
     PROXYSUBS => 1,
     NAME => 'Fcntl',
     NAMES => \@names,
+);
+
+WriteMakefile(
+    NAME 	=> 'Fcntl',
+    MAN3PODS 	=> {}, 	# Pods will be built by installman.
+    XSPROTOARG => '-noprototypes', 		# XXX remove later?
+    VERSION_FROM => 'Fcntl.pm',
+    realclean => {FILES=> 'const-c.inc const-xs.inc'},
 );

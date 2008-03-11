@@ -117,7 +117,7 @@ ok(10, $dbh->{cachesize} == 65 );
 
 my $some_sub = sub {} ;
 $dbh->{hash} = $some_sub;
-ok(11, $dbh->{hash} eq $some_sub );
+ok(11, $dbh->{hash} \== $some_sub );
 
 $dbh->{lorder} = 1234 ;
 ok(12, $dbh->{lorder} == 1234 );

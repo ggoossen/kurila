@@ -1779,7 +1779,6 @@ lib/Test/Simple/t/lib/MyOverload.pm	Test::More test module
 lib/Test/Simple/t/maybe_regex.t	Test::Builder->maybe_regex() tests
 lib/Test/Simple/t/missing.t	Test::Simple test, missing tests
 lib/Test/Simple/t/More.t	Test::More test, basic stuff
-lib/Test/Simple/t/no_diag.t	Test::Simple test
 lib/Test/Simple/t/no_ending.t	Test::Builder test, no_ending()
 lib/Test/Simple/t/no_header.t	Test::Builder test, no_header()
 lib/Test/Simple/t/no_plan.t	Test::Simple test, forgot the plan
