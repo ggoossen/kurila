@@ -252,8 +252,8 @@ sub compileOpts {
     # set rendering state from options and args
     my (@options,@args);
     if (@_) {
-	@options = grep(m/^-/, @_);
-	@args = grep(!m/^-/, @_);
+	@options = grep { ! ref && m/^-/ } @_;
+	@args = grep { ref || !m/^-/ } @_;
     }
     for my $o (@options) {
 	# mode/order
@@ -321,23 +321,23 @@ sub compile {
 	for my $objname (@args) {
 	    next unless $objname; # skip null args to avoid noisy responses
 
-	    if ($objname eq "BEGIN") {
+	    if (!ref $objname && $objname eq "BEGIN") {
 		concise_specials("BEGIN", $order,
 				 B::begin_av->isa("B::AV") ?
 				 B::begin_av->ARRAY : ());
-	    } elsif ($objname eq "INIT") {
+	    } elsif (!ref $objname && $objname eq "INIT") {
 		concise_specials("INIT", $order,
 				 B::init_av->isa("B::AV") ?
 				 B::init_av->ARRAY : ());
-	    } elsif ($objname eq "CHECK") {
+	    } elsif (!ref $objname && $objname eq "CHECK") {
 		concise_specials("CHECK", $order,
 				 B::check_av->isa("B::AV") ?
 				 B::check_av->ARRAY : ());
-	    } elsif ($objname eq "UNITCHECK") {
+	    } elsif (!ref $objname && $objname eq "UNITCHECK") {
 		concise_specials("UNITCHECK", $order,
 				 B::unitcheck_av->isa("B::AV") ?
 				 B::unitcheck_av->ARRAY : ());
-	    } elsif ($objname eq "END") {
+	    } elsif (!ref $objname && $objname eq "END") {
 		concise_specials("END", $order,
 				 B::end_av->isa("B::AV") ?
 				 B::end_av->ARRAY : ());
@@ -346,9 +346,10 @@ sub compile {
 		# convert function names to subrefs
 		my $objref;
 		if (ref $objname) {
+		    $objref = $objname;
+                    $objname = dump::view($objname);
 		    print $walkHandle "B::Concise::compile($objname)\n"
 			if $banner;
-		    $objref = $objname;
 		} else {
 		    $objname = "main::" . $objname unless $objname =~ m/::/;
 		    print $walkHandle "$objname:\n";
@@ -680,7 +681,7 @@ sub concise_sv {
     $hr->{svclass} = class($sv);
     $hr->{svclass} = "UV"
       if $hr->{svclass} eq "IV" and $sv->FLAGS ^&^ SVf_IVisUV;
-    Carp::cluck("bad concise_sv: $sv") unless $sv and $$sv;
+    warn("bad concise_sv: $sv") unless $sv and $$sv;
     $hr->{svaddr} = sprintf("%#x", $$sv);
     if ($hr->{svclass} eq "GV") {
 	my $gv = $sv;

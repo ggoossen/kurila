@@ -253,7 +253,7 @@ sub tie_hash_or_array
         if defined $arg[1] ;
 
     $arg[4] = tied %{ $arg[4] } 
-	if @arg +>= 5 && ref $arg[4] && $arg[4] =~ m/=HASH/ && tied %{ $arg[4] } ;
+	if @arg +>= 5 && ref $arg[4] && ref $arg[4] eq m/=HASH/ && tied %{ $arg[4] } ;
 
     $arg[2] = O_CREAT()^|^O_RDWR() if @arg +>=3 && ! defined $arg[2];
     $arg[3] = 0666               if @arg +>=4 && ! defined $arg[3];
@@ -264,7 +264,7 @@ sub tie_hash_or_array
         $arg[2] ^|^= O_CREAT();
     }
 
-    if ($db_version +> 1 and defined $arg[4] and $arg[4] =~ m/RECNO/ and 
+    if ($db_version +> 1 and defined $arg[4] and (ref $arg[4]) =~ m/RECNO/ and 
 	$arg[1] and ! -e $arg[1]) {
 	open(FH, ">", "$arg[1]") or return undef ;
 	close FH ;

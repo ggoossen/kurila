@@ -32,7 +32,7 @@ ok(! $!{$err});
 
 ok(join(",",sort keys(%!)) eq join(",",sort @Errno::EXPORT_OK));
 
-eval { exists $!{[]} };
+eval { exists $!{''} };
 ok(! $@);
 
 eval {$!{$err} = "qunckkk" };

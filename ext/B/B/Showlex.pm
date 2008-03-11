@@ -90,8 +90,8 @@ sub showlex_main {
 }
 
 sub compile {
-    my @options = grep(m/^-/, @_);
-    my @args = grep(!m/^-/, @_);
+    my @options = grep { ! ref && m/^-/ } @_;
+    my @args = grep { ref || !m/^-/ } @_;
     for my $o (@options) {
 	$newlex = 1 if $o eq "-newlex";
 	$nosp1  = 1 if $o eq "-nosp";
@@ -104,8 +104,9 @@ sub compile {
 	    next unless $objname;	# skip nulls w/o carping
 
 	    if (ref $objname) {
-		print $walkHandle "B::Showlex::compile($objname)\n";
+		print $walkHandle "B::Showlex::compile({dump::view($objname)})\n";
 		$objref = $objname;
+                $objname = dump::view($objname);
 	    } else {
 		$objname = "main::$objname" unless $objname =~ m/::/;
 		print $walkHandle "$objname:\n";

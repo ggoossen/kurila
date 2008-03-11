@@ -58,8 +58,8 @@ sub TEST {
   if ($@) {
       diag("error: {$@->message}");
   }
-  if ($t ne $WANT) {
-      diag("--Expected--\n$WANT\n--Got--\n$@$t\n");
+  elsif ($t ne $WANT) {
+      diag("--Expected--\n$WANT\n--Got--\n$t\n");
   }
 
   eval "$t";
@@ -78,10 +78,10 @@ sub TEST {
   }
   ok($t eq $WANT and not $@);
   if ($@) {
-      diag("error: $@");
+      diag("error: {$@->message}");
   }
-  if ($t ne $WANT) {
-      diag("--Expected--\n$WANT\n--Got--\n$@$t\n");
+  elsif ($t ne $WANT) {
+      diag("--Expected--\n$WANT\n--Got--\n$t\n");
   }
 }
 
@@ -789,7 +789,7 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Purity(1)->Dumpxs;)
 #  b => {
 #    c => [
 #      {
-#        e => 'ARRAY(0xdeadbeef)'
+#        e => ARRAY(0xdeadbeef)
 #      }
 #    ]
 #  }
@@ -806,11 +806,11 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Maxdepth(4)->Dumpxs;)
 ##
   $WANT = <<'EOT';
 #$a = {
-#  b => 'HASH(0xdeadbeef)'
+#  b => HASH(0xdeadbeef)
 #};
 #$b = $a->{b};
 #$c = [
-#  'HASH(0xdeadbeef)'
+#  HASH(0xdeadbeef)
 #];
 EOT
 
@@ -929,8 +929,8 @@ TEST q(Data::Dumper->new([$c])->Dumpxs;)
   sub sort205 {
     my $hash = shift;
     return [ 
-      $hash eq $c ? (sort { $a <+> $b } keys %$hash)
-		  : (reverse sort keys %$hash)
+      $hash \== $c ? (sort { $a <+> $b } keys %$hash)
+		   : (reverse sort keys %$hash)
     ];
   }
 
