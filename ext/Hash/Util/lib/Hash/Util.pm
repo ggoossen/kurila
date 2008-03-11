@@ -33,10 +33,6 @@ Hash::Util->bootstrap($VERSION);
 
 sub import {
     my $class = shift;
-    if ( grep m/fieldhash/, @_ ) {
-        require Hash::Util::FieldHash;
-        Hash::Util::FieldHash->import(':all'); # for re-export
-    }
     unshift @_, $class;
     goto &Exporter::import;
 }
@@ -86,14 +82,12 @@ Hash::Util - A selection of general-utility hash subroutines
 
 =head1 DESCRIPTION
 
-C<Hash::Util> and C<Hash::Util::FieldHash> contain special functions
+C<Hash::Util> contains special functions
 for manipulating hashes that don't really warrant a keyword.
 
 C<Hash::Util> contains a set of functions that support
 L<restricted hashes|/"Restricted hashes">. These are described in
-this document.  C<Hash::Util::FieldHash> contains an (unrelated)
-set of functions that support the use of hashes in
-I<inside-out classes>, described in L<Hash::Util::FieldHash>.
+this document.
 
 By default C<Hash::Util> does not export anything.
 
