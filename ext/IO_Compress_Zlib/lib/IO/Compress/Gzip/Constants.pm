@@ -93,8 +93,8 @@ use constant GZIP_FEXTRA_SUBFIELD_MAX_SIZE    => GZIP_FEXTRA_MAX_SIZE -
                                                  GZIP_FEXTRA_SUBFIELD_HEADER_SIZE ;
 
 
-    $GZIP_FNAME_INVALID_CHAR_RE       =  '[\x00-\x1F\x7F-\x9F]';
-    $GZIP_FCOMMENT_INVALID_CHAR_RE    =  '[\x00-\x09\x11-\x1F\x7F-\x9F]';
+    $GZIP_FNAME_INVALID_CHAR_RE       =  '[\x[00]-\x[1F]\x[7F]-\x[9F]]';
+    $GZIP_FCOMMENT_INVALID_CHAR_RE    =  '[\x[00]-\x[09]\x[11]-\x[1F]\x[7F]-\x[9F]]';
 
 use constant GZIP_FHCRC_SIZE        => 2 ; # aka CONTINUATION in gzip
 

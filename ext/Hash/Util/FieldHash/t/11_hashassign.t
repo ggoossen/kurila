@@ -310,13 +310,6 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
     my @refs =    ( \ do { my $x }, [],   {},  sub {}, \ *x);
     my(%h, %expect);
     fieldhash %h;
-    @h{@refs} = @types;
-    @expect{map "$_", @refs} = @types;
-    ok (!eq_hash(\%h, \%expect), 'unblessed ref stringification different');
-
-    bless $_ for @refs;
-    %h = (); %expect = ();
-    @h{@refs} = @types;
-    @expect{map "$_", @refs} = @types;
-    ok (!eq_hash(\%h, \%expect), 'blessed ref stringification different');
+    eval { @h{@refs} = @types; };
+    like $@ && $@->message, qr/reference as string/;
 }

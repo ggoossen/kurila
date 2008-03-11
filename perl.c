@@ -835,14 +835,6 @@ perl_destruct(pTHXx)
 	    PL_defoutgv = NULL; /* may have been freed */
     }
 
-    /* unhook hooks which will soon be, or use, destroyed data */
-    SvREFCNT_dec(PL_errorcreatehook);
-    PL_errorcreatehook = NULL;
-    SvREFCNT_dec(PL_warnhook);
-    PL_warnhook = NULL;
-    SvREFCNT_dec(PL_diehook);
-    PL_diehook = NULL;
-
     /* call exit list functions */
     while (PL_exitlistlen-- > 0)
 	PL_exitlist[PL_exitlistlen].fn(aTHX_ PL_exitlist[PL_exitlistlen].ptr);
@@ -910,6 +902,14 @@ perl_destruct(pTHXx)
 
     SvREFCNT_dec((SV*) PL_stashcache);
     PL_stashcache = NULL;
+
+    /* unhook hooks which will soon be, or use, destroyed data */
+    SvREFCNT_dec(PL_errorcreatehook);
+    PL_errorcreatehook = NULL;
+    SvREFCNT_dec(PL_warnhook);
+    PL_warnhook = NULL;
+    SvREFCNT_dec(PL_diehook);
+    PL_diehook = NULL;
 
     /* loosen bonds of global variables */
 

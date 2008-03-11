@@ -47,6 +47,7 @@ sub mask {
     my $io = shift;
     my $fd = fileno($io);
     return unless defined $fd;
+    $io = dump::view($io);
     if (@_) {
 	my $mask = shift;
 	if($mask) {
@@ -100,6 +101,7 @@ sub events {
     my $self = shift;
     my $io = shift;
     my $fd = fileno($io);
+    $io = dump::view($io);
     exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io} 
                 ? $self->[1]{$fd} ^&^ ($self->[0]{$fd}{$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
 	: 0;

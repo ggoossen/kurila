@@ -259,8 +259,8 @@ sub Validator::new
         return $obj;
     }
     
-    $obj->croakError("$reportClass: input and output $inType are identical")
-        if $inType eq $outType && $_[0] eq $_[1] && $_[0] ne '-' ;
+    die("$reportClass: input and output $inType are identical")
+        if $inType eq $outType && (ref $_[0] ? $_[0] \== $_[1] : $_[0] eq $_[1] && $_[0] ne '-' );
 
     if ($inType eq 'fileglob') # && $outType ne 'fileglob'
     {
