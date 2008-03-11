@@ -40,10 +40,7 @@ BEGIN {
   }
 }
 
-(my $libnet_t = __FILE__) =~ s/datasend.t/libnet_t.pl/;
-require $libnet_t or die;
-
-print "1..51\n";
+use Test::More tests => 51;
 
 sub check {
   my $expect = pop;

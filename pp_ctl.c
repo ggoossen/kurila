@@ -3509,6 +3509,7 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	    }
 	    RETPUSHNO;
 	}
+	RETPUSHNO;
     }
     else if (!SvOK(d) || !SvOK(e)) {
 	if (!SvOK(d) && !SvOK(e))
@@ -3583,6 +3584,13 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	    RETPUSHYES;
 	else
 	    RETPUSHNO;
+    }
+    else if ( SvROK(d) && SvROK(e) ) {
+	PUSHs(boolSV(SvRV(d) == SvRV(e)));
+	RETURN;
+    }
+    else if ( SvROK(d) || SvROK(e) ) {
+	RETPUSHNO;
     }
     
     /* As a last resort, use string comparison */

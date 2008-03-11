@@ -78,7 +78,7 @@ err_ok( <<ERR );
 #   Failed test 'undef is 0?'
 #   at $0 line 42.
 #          got: undef
-#     expected: '0'
+#     expected: 0
 #   Failed test 'empty string is 0?'
 #   at $0 line 43.
 #          got: ''

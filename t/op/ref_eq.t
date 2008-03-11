@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 6;
+plan tests => 14;
 
 my $x = 1;
 my $y = 1;
@@ -28,5 +28,30 @@ is( $rx1 \== $rx2, 1, "ref are vars");
 # is( $rx1 +==+ $rx2, 1, "ref are vars");
 # is( $rx1 +== $rx2, 1, "ref are vars");
 
-is( 1 \== 2, '', "\== on non-refs");
-is( 1 \== 1, '', "\== on identical non-refs");
+dies_like( sub { $x \== \$y }, qr/Not a reference/ );
+dies_like( sub { \$x \== $y }, qr/Not a reference/ );
+dies_like( sub { $x \== $y }, qr/Not a reference/ );
+
+
+## ref_ne
+
+is( \$x \!= \$x, '', "\!= true");
+is( \$x \!= \$y, 1, "\!= false");
+is( [] \!= [], 1, "\!= using anonymous refs");
+
+is( $rx1 \!= $rx2, '', "ref are vars");
+# is( $rx1 \==\ $rx2, 1, "ref are vars");
+# is( $rx1 ref_eq $rx2, 1, "ref are vars");
+# is( $rx1 req $rx2, 1, "ref are vars");
+# is( $rx1 =\= $rx2, 1, "ref are vars");
+# is( $rx1 *== $rx2, 1, "ref are vars");
+# is( $rx1 *==* $rx2, 1, "ref are vars");
+# is( $rx1 ==\ $rx2, 1, "ref are vars");
+# is( $rx1 |==| $rx2, 1, "ref are vars");
+# is( $rx1 |== $rx2, 1, "ref are vars");
+# is( $rx1 +==+ $rx2, 1, "ref are vars");
+# is( $rx1 +== $rx2, 1, "ref are vars");
+
+dies_like( sub { $x \!= \$y }, qr/Not a reference/ );
+dies_like( sub { \$x \!= $y }, qr/Not a reference/ );
+dies_like( sub { $x \!= $y }, qr/Not a reference/ );

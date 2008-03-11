@@ -175,16 +175,7 @@ sub concise_cv_obj {
 	return;
     }
     if (class($cv->START) eq "NULL") {
-	no strict 'refs';
-	if (ref $name eq 'CODE') {
-	    print $walkHandle "coderef $name has no START\n";
-	}
-	elsif (exists &$name) {
-	    print $walkHandle "$name exists in stash, but has no START\n";
-	}
-	else {
-	    print $walkHandle "$name not in symbol table\n";
-	}
+        print $walkHandle "coderef $name has no START\n";
 	return;
     }
     sequence($cv->START);
@@ -252,8 +243,8 @@ sub compileOpts {
     # set rendering state from options and args
     my (@options,@args);
     if (@_) {
-	@options = grep { ! ref && m/^-/ } @_;
-	@args = grep { ref || !m/^-/ } @_;
+	@options = grep { (! ref) && m/^-/ } @_;
+	@args = grep { (ref $_) || !m/^-/ } @_;
     }
     for my $o (@options) {
 	# mode/order
@@ -318,7 +309,8 @@ sub compile {
 	my @newargs = compileOpts(@_); # accept new rendering options
 	warn "disregarding non-options: @newargs\n" if @newargs;
 
-	for my $objname (@args) {
+	for (@args) {
+            my $objname = $_;
 	    next unless $objname; # skip null args to avoid noisy responses
 
 	    if (!ref $objname && $objname eq "BEGIN") {
@@ -358,7 +350,7 @@ sub compile {
 			print $walkHandle "err: unknown function ($objname)\n";
 			return;
 		    }
-		    $objref = \&$objname;
+		    $objref = \&{*{Symbol::fetch_glob($objname)}};
 		}
 		concise_subref($order, $objref, $objname);
 	    }

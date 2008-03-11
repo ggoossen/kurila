@@ -176,6 +176,9 @@ sub is ($$@) {
         # undef only matches undef
         $pass = !defined $got && !defined $expected;
     }
+    elsif (ref $got and ref $expected) {
+        $pass = $got \== $expected;
+    }
     else {
         local $@;
         $pass = eval { $got eq $expected };
@@ -195,6 +198,9 @@ sub isnt ($$@) {
     if( !defined $got || !defined $isnt ) {
         # undef only matches undef
         $pass = defined $got || defined $isnt;
+    }
+    elsif (ref $got and ref $isnt) {
+        $pass = $got \!= $isnt;
     }
     else {
         $pass = $got ne $isnt;
