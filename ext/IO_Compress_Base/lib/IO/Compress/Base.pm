@@ -490,7 +490,7 @@ sub _wr2
         return $self->saveErrorString(undef, $!, $!) 
             if $status +< 0 ;
 
-        if ( (!$isFilehandle || *$self->{AutoClose}) && $input ne '-')
+        if ( (!$isFilehandle || *$self->{AutoClose}) && ! ref $input && $input ne '-')
         {    
             $fh->close() 
                 or return undef ;

@@ -24,7 +24,6 @@ BEGIN {
 
 my $fail_odd      = 'Odd number of elements in hash assignment';
 my $fail_odd_anon = 'Odd number of elements in anonymous hash';
-my $fail_ref      = 'Reference found where even-sized list expected';
 my $fail_not_hr   = 'Not a HASH reference';
 
 {
@@ -43,12 +42,12 @@ my $fail_not_hr   = 'Not a HASH reference';
     %hash = { 1..3 };
     cmp_ok(scalar(@warnings),'==',2,'odd hashref count');
     cmp_ok(substr($warnings[0],0,length($fail_odd_anon)),'eq',$fail_odd_anon,'odd hashref msg 1');
-    cmp_ok(substr($warnings[1],0,length($fail_ref)),'eq',$fail_ref,'odd hashref msg 2');
+    cmp_ok(substr($warnings[1],0,length($fail_odd)),'eq',$fail_odd,'odd hashref msg 2');
 
     @warnings = ();
     %hash = [ 1..3 ];
     cmp_ok(scalar(@warnings),'==',1,'arrayref count');
-    cmp_ok(substr($warnings[0],0,length($fail_ref)),'eq',$fail_ref,'arrayref msg');
+    cmp_ok(substr($warnings[0],0,length($fail_odd)),'eq',$fail_odd,'arrayref msg');
 
     @warnings = ();
     %hash = sub { print "fenice" };
