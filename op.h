@@ -685,7 +685,6 @@ struct token {
  * 2       2nd ; from for(;;)
  * 2       retired apodosis
  * 3       C-style for list
- * a       sub or var attributes
  * a       non-method arrow operator
  * A       method arrow operator
  * A       use import args
@@ -700,6 +699,7 @@ struct token {
  * f       folded constant op
  * F       peg op for format
  * g       op was forced to be a word
+ * h       sub or var attributes
  * i       if/unless modifier
  * I       if/elsif/unless statement
  * k       local declarator

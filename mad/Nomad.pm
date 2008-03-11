@@ -985,7 +985,7 @@ BEGIN {
 	'&' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('d n s a : { & } ;');
+	    push @newkids, $self->madness('d n s h : { & } ;');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -1429,7 +1429,7 @@ package PLXML::op_rv2sv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o dx d ( $ ) : a')]);
+    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o dx d ( $ ) : h')]);
 }
 
 sub ast {
@@ -1440,7 +1440,7 @@ sub ast {
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
-    push @newkids, $self->madness(') : a');
+    push @newkids, $self->madness(') : h');
     return $self->newtype->new(Kids => [@newkids]);
 }
 

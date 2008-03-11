@@ -497,7 +497,7 @@ case 2:
 			      op_getmad(o,(yyval.opval),'&');
 			      op_getmad((ps[(3) - (6)].val.opval),(yyval.opval),'n');
 			      op_getmad((ps[(4) - (6)].val.opval),(yyval.opval),'s');
-			      op_getmad((ps[(5) - (6)].val.opval),(yyval.opval),'a');
+			      op_getmad((ps[(5) - (6)].val.opval),(yyval.opval),'h');
 			      token_getmad((ps[(1) - (6)].val.i_tkval),(yyval.opval),'d');
 			      append_madprops((ps[(6) - (6)].val.opval)->op_madprop, (yyval.opval), 0);
 			      (ps[(6) - (6)].val.opval)->op_madprop = 0;
@@ -1116,7 +1116,7 @@ case 2:
 			  (yyval.opval) = newANONATTRSUB((ps[(2) - (5)].val.ival), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), (ps[(5) - (5)].val.opval));
 			  TOKEN_GETMAD((ps[(1) - (5)].val.i_tkval),(yyval.opval),'o');
 			  OP_GETMAD((ps[(3) - (5)].val.opval),(yyval.opval),'s');
-			  OP_GETMAD((ps[(4) - (5)].val.opval),(yyval.opval),'a');
+			  OP_GETMAD((ps[(4) - (5)].val.opval),(yyval.opval),'h');
 			;}
     break;
 
@@ -1461,7 +1461,7 @@ case 2:
     { (yyval.opval) = my_attrs((ps[(2) - (3)].val.opval),(ps[(3) - (3)].val.opval));
 			  DO_MAD(
 			      token_getmad((ps[(1) - (3)].val.i_tkval),(yyval.opval),'d');
-			      append_madprops((ps[(3) - (3)].val.opval)->op_madprop, (yyval.opval), 'a');
+			      append_madprops((ps[(3) - (3)].val.opval)->op_madprop, (yyval.opval), 'h');
 			      (ps[(3) - (3)].val.opval)->op_madprop = 0;
 			  )
 			;}

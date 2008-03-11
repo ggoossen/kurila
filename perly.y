@@ -547,7 +547,7 @@ subrout	:	SUB startsub subname proto subattrlist subbody
 			      op_getmad(o,$$,'&');
 			      op_getmad($3,$$,'n');
 			      op_getmad($4,$$,'s');
-			      op_getmad($5,$$,'a');
+			      op_getmad($5,$$,'h');
 			      token_getmad($1,$$,'d');
 			      append_madprops($6->op_madprop, $$, 0);
 			      $6->op_madprop = 0;
@@ -1012,7 +1012,7 @@ anonymous:	'[' expr ']'
 			  $$ = newANONATTRSUB($2, $3, $4, $5);
 			  TOKEN_GETMAD($1,$$,'o');
 			  OP_GETMAD($3,$$,'s');
-			  OP_GETMAD($4,$$,'a');
+			  OP_GETMAD($4,$$,'h');
 			}
 
     ;
@@ -1244,7 +1244,7 @@ myattrterm:	MY myterm myattrlist
 			{ $$ = my_attrs($2,$3);
 			  DO_MAD(
 			      token_getmad($1,$$,'d');
-			      append_madprops($3->op_madprop, $$, 'a');
+			      append_madprops($3->op_madprop, $$, 'h');
 			      $3->op_madprop = 0;
 			  )
 			}
