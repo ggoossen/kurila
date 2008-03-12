@@ -4534,7 +4534,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 	}
     }
     /* search for a constant op that could let us fold the test */
-    if ((cstop = search_const(first))) {
+    if ((cstop = search_const(first)) && !PL_madskills) {
 	if (cstop->op_private & OPpCONST_STRICT)
 	    no_bareword_allowed(cstop);
 	else if ((cstop->op_private & OPpCONST_BARE) && ckWARN(WARN_BAREWORD))
@@ -4551,78 +4551,85 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 		newop->op_targ = type;	/* set "was" field */
 		return newop;
 	    }
-	    op_free(first);
-	    return other;
 	}
-	else {
-	    /* check for C<my $x if 0>, or C<my($x,$y) if 0> */
-	    const OP *o2 = other;
-	    if ( ! (o2->op_type == OP_LIST
-		    && (( o2 = cUNOPx(o2)->op_first))
-		    && o2->op_type == OP_PUSHMARK
-		    && (( o2 = o2->op_sibling)) )
-	    )
-		o2 = other;
-	    if ((o2->op_type == OP_PADSV || o2->op_type == OP_PADAV
-			|| o2->op_type == OP_PADHV)
-		&& o2->op_private & OPpLVAL_INTRO
-		&& !(o2->op_private & OPpPAD_STATE)
-		&& ckWARN(WARN_DEPRECATED))
-	    {
-		Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
-			    "Deprecated use of my() in false conditional");
+	if (first->op_type == OP_CONST) {
+	    if (first->op_private & OPpCONST_STRICT)
+		no_bareword_allowed(first);
+	    else if ((first->op_private & OPpCONST_BARE) && ckWARN(WARN_BAREWORD))
+		Perl_warner(aTHX_ packWARN(WARN_BAREWORD), "Bareword found in conditional");
+	    if ((type == OP_AND &&  SvTRUE(((SVOP*)first)->op_sv)) ||
+		(type == OP_OR  && !SvTRUE(((SVOP*)first)->op_sv)) ||
+		(type == OP_DOR && !SvOK(((SVOP*)first)->op_sv))) {
+		*firstp = NULL;
+		if (other->op_type == OP_CONST)
+		    other->op_private |= OPpCONST_SHORTCIRCUIT;
+		op_free(first);
+		return other;
 	    }
+	    else {
+		/* check for C<my $x if 0>, or C<my($x,$y) if 0> */
+		const OP *o2 = other;
+		if ( ! (o2->op_type == OP_LIST
+			&& (( o2 = cUNOPx(o2)->op_first))
+			&& o2->op_type == OP_PUSHMARK
+			&& (( o2 = o2->op_sibling)) )
+		    )
+		    o2 = other;
+		if ((o2->op_type == OP_PADSV || o2->op_type == OP_PADAV
+		     || o2->op_type == OP_PADHV)
+		    && o2->op_private & OPpLVAL_INTRO
+		    && !(o2->op_private & OPpPAD_STATE)
+		    && ckWARN(WARN_DEPRECATED))
+		    {
+			Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
+				    "Deprecated use of my() in false conditional");
+		    }
 
-	    *otherp = NULL;
-	    if (first->op_type == OP_CONST)
-		first->op_private |= OPpCONST_SHORTCIRCUIT;
-	    if (PL_madskills) {
-		first = newUNOP(OP_NULL, 0, first);
-		op_getmad(other, first, '2');
-		first->op_targ = type;	/* set "was" field */
-	    }
-	    else
+		*otherp = NULL;
+		if (first->op_type == OP_CONST)
+		    first->op_private |= OPpCONST_SHORTCIRCUIT;
 		op_free(other);
-	    return first;
-	}
-    }
-    else if ((first->op_flags & OPf_KIDS) && type != OP_DOR
-	&& ckWARN(WARN_MISC)) /* [#24076] Don't warn for <FH> err FOO. */
-    {
-	const OP * const k1 = ((UNOP*)first)->op_first;
-	const OP * const k2 = k1->op_sibling;
-	OPCODE warnop = 0;
-	switch (first->op_type)
-	{
-	case OP_NULL:
-	    if (k2 && k2->op_type == OP_READLINE
-		  && (k2->op_flags & OPf_STACKED)
-		  && ((k1->op_flags & OPf_WANT) == OPf_WANT_SCALAR))
-	    {
-		warnop = k2->op_type;
+		return first;
 	    }
-	    break;
+	}
+	else if ((first->op_flags & OPf_KIDS) && type != OP_DOR
+		 && ckWARN(WARN_MISC)) /* [#24076] Don't warn for <FH> err FOO. */
+        {
+	    const OP * const k1 = ((UNOP*)first)->op_first;
+	    const OP * const k2 = k1->op_sibling;
+	    OPCODE warnop = 0;
+	    switch (first->op_type)
+		{
+		case OP_NULL:
+		    if (k2 && k2->op_type == OP_READLINE
+			&& (k2->op_flags & OPf_STACKED)
+			&& ((k1->op_flags & OPf_WANT) == OPf_WANT_SCALAR))
+			{
+			    warnop = k2->op_type;
+			}
+		    break;
 
-	case OP_SASSIGN:
-	    if (k1->op_type == OP_READDIR
-		  || k1->op_type == OP_GLOB
-		  || (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
-		  || k1->op_type == OP_EACH)
-	    {
-		warnop = ((k1->op_type == OP_NULL)
-			  ? (OPCODE)k1->op_targ : k1->op_type);
-	    }
-	    break;
-	}
-	if (warnop) {
-	    const line_t oldline = CopLINE(PL_curcop);
-	    CopLINE_set(PL_curcop, PL_parser->copline);
-	    Perl_warner(aTHX_ packWARN(WARN_MISC),
+		case OP_SASSIGN:
+		    if (k1->op_type == OP_READDIR
+			|| k1->op_type == OP_GLOB
+			|| (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
+			|| k1->op_type == OP_EACH)
+			{
+			    warnop = ((k1->op_type == OP_NULL)
+				      ? (OPCODE)k1->op_targ : k1->op_type);
+			}
+		    break;
+		}
+	    if (warnop) {
+		const line_t oldline = CopLINE(PL_curcop);
+		CopLINE_set(PL_curcop, PL_parser->copline);
+		Perl_warner(aTHX_ packWARN(WARN_MISC),
 		 "Value of %s%s can be \"0\"; test with defined()",
-		 PL_op_desc[warnop],
-		 ((warnop == OP_READLINE || warnop == OP_GLOB)
-		  ? " construct" : "() operator"));
-	    CopLINE_set(PL_curcop, oldline);
+			    PL_op_desc[warnop],
+			    ((warnop == OP_READLINE || warnop == OP_GLOB)
+			     ? " construct" : "() operator"));
+		CopLINE_set(PL_curcop, oldline);
+	    }
 	}
     }
 

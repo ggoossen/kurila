@@ -681,9 +681,7 @@ struct token {
  * #       whitespace/comment following ; or }
  * #       $# sigil
  * 1       1st ; from for(;;)
- * 1       retired protasis
  * 2       2nd ; from for(;;)
- * 2       retired apodosis
  * 3       C-style for list
  * a       non-method arrow operator
  * A       method arrow operator

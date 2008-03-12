@@ -2311,48 +2311,19 @@ package PLXML::op_and;
 sub astnull {
     my $self = shift;
     my @newkids;
-    my @first = $self->madness('1');
-    my @second = $self->madness('2');
     my @stuff = $$self{Kids}[0]->ast();
     if (my @I = $self->madness('I')) {
-	if (@second) {
-	    push @newkids, @I;
-	    push @newkids, $self->madness('(');
-	    push @newkids, @stuff;
-	    push @newkids, $self->madness(')');
-	    push @newkids, @second;
-	}
-	else {
-	    push @newkids, @I;
-	    push @newkids, $self->madness('(');
-	    push @newkids, @first;
-	    push @newkids, $self->madness(')');
-	    push @newkids, @stuff;
-	}
+        push @newkids, @I;
+        push @newkids, $self->madness('(');
+        push @newkids, $self->madness(')');
     }
     elsif (my @i = $self->madness('i')) {
-	if (@second) {
-	    push @newkids, @second;
-	    push @newkids, @i;
-	    push @newkids, @stuff;
-	}
-	else {
-	    push @newkids, @stuff;
-	    push @newkids, @i;
-	    push @newkids, @first;
-	}
+        push @newkids, @stuff;
+        push @newkids, @i;
     }
     elsif (my @o = $self->madness('o')) {
-	if (@second) {
-	    push @newkids, @stuff;
-	    push @newkids, @o;
-	    push @newkids, @second;
-	}
-	else {
-	    push @newkids, @first;
-	    push @newkids, @o;
-	    push @newkids, @stuff;
-	}
+        push @newkids, @o;
+        push @newkids, @stuff;
     }
     return P5AST::op_and->new(Kids => [@newkids]);
 }
@@ -2362,33 +2333,15 @@ package PLXML::op_or;
 sub astnull {
     my $self = shift;
     my @newkids;
-    my @first = $self->madness('1');
-    my @second = $self->madness('2');
     my @i = $self->madness('i');
     my @stuff = $$self{Kids}[0]->ast();
-    if (@second) {
-	if (@i) {
-	    push @newkids, @second;
-	    push @newkids, $self->madness('i');
-	    push @newkids, @stuff;
-	}
-	else {
-	    push @newkids, @stuff;
-	    push @newkids, $self->madness('o');
-	    push @newkids, @second;
-	}
+    if (@i) {
+        push @newkids, @stuff;
+        push @newkids, $self->madness('i');
     }
     else {
-	if (@i) {
-	    push @newkids, @stuff;
-	    push @newkids, $self->madness('i');
-	    push @newkids, @first;
-	}
-	else {
-	    push @newkids, @first;
-	    push @newkids, $self->madness('o');
-	    push @newkids, @stuff;
-	}
+        push @newkids, $self->madness('o');
+        push @newkids, @stuff;
     }
     return "P5AST::op_$$self{was}"->new(Kids => [@newkids]);
 }
@@ -2771,17 +2724,7 @@ sub ast {
     my $andor;
 
     if (ref $nextthing eq 'PLXML::op_null') {
-	if ($$nextthing{mp}{'1'}) {
-	    push @newkids, $nextthing->madness('1');
-	    push @newkids, $self->madness(')');
-	    push @newkids, $$nextthing{Kids}[0]->blockast($self,@_);
-	}
-	elsif ($$nextthing{mp}{'2'}) {
-	    push @newkids, $$nextthing{Kids}[0]->ast($self,@_);
-	    push @newkids, $self->madness(')');
-	    push @newkids, $$nextthing{mp}{'2'}->blockast($self,@_);
-	}
-	elsif ($$nextthing{mp}{'U'}) {
+	if ($$nextthing{mp}{'U'}) {
 	    push @newkids, $nextthing->ast($self,@_);
 	}
 	else {
