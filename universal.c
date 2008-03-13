@@ -237,6 +237,7 @@ XS(XS_error_create);
 XS(XS_error_message);
 XS(XS_error_write_to_stderr);
 XS(XS_ref_address);
+XS(XS_ref_reftype);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -311,6 +312,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
     newXS("ref::address", XS_ref_address, file);
+    newXS("ref::reftype", XS_ref_reftype, file);
 
     PL_errorcreatehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create"))));
     PL_diehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr"))));
@@ -2136,6 +2138,30 @@ XS(XS_ref_address)
 	}
 	SP -= items;
 	mPUSHi(PTR2UV(SvRV(sv)));
+	XSRETURN(1);
+    }
+}
+
+XS(XS_ref_reftype)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "ref::reftype", "sv");
+
+    {
+	SV* sv = ST(0);
+	const char* type; 
+	if (SvMAGICAL(sv))
+	    mg_get(sv);
+	if(!SvROK(sv)) {
+	    XSRETURN_UNDEF;
+	}
+	SP -= items;
+	type = sv_reftype(SvRV(sv), 0);
+	mPUSHp(type, strlen(type));
 	XSRETURN(1);
     }
 }
