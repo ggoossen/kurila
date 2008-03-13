@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl" }
 
-plan tests => 10;
+plan tests => 11;
 
 is dump::view('foo'), q|'foo'|;
 is dump::view("'foo"), q|"'foo"|;
