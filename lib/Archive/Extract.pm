@@ -1196,7 +1196,7 @@ sub _unlzma_bin {
     return $self->_error(loc("No '%1' program found", '/bin/unlzma'))
         unless $self->bin_unlzma;
 
-    my $fh = FileHandle->new('>'. $self->_gunzip_to) or
+    my $fh = FileHandle->new($self->_gunzip_to, '>') or
         return $self->_error(loc("Could not open '%1' for writing: %2",
                             $self->_gunzip_to, $! ));
 
