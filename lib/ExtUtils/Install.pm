@@ -1037,9 +1037,9 @@ sub pm_to_blib {
             _symlink( $from, $to );
             print "symlink $from $to\n";
         }
-        my($mode,$atime,$mtime) = (stat $from)[2,8,9];
-        utime($atime,$mtime+$Is_VMS,$to);
-        _chmod(0444 ^|^ ( $mode ^&^ 0111 ? 0111 : 0 ),$to);
+#         my($mode,$atime,$mtime) = (stat $from)[2,8,9];
+#         utime($atime,$mtime+$Is_VMS,$to);
+#         _chmod(0444 ^|^ ( $mode ^&^ 0111 ? 0111 : 0 ),$to);
     }
 }
 
