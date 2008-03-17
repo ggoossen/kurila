@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use Config;
-use Carp;
 
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 BEGIN {
@@ -88,7 +87,7 @@ sub _feature_init {
                     };
 
         exists $Config{ "d_" . $feep }
-            || confess("$IE Configure doesn't d_$feep");
+            || die("$IE Configure doesn't d_$feep");
         $Groks{$short} = defined $Config{ "d_" . $feep };
     }
     # assume that any that are left are always there
@@ -113,8 +112,8 @@ sub pw_has {
     our %Groks;         # whether build system knew how to do this feature
     my $cando = 1;
     my $sploder = caller() ne __PACKAGE__
-                    ? \&croak
-                    : sub { confess("$IE @_") };
+                    ? \&die
+                    : sub { die("$IE @_") };
     if (@_ == 0) {
         my @valid = sort grep { $Groks{$_} } keys %Groks;
         return wantarray ? @valid : "@valid";

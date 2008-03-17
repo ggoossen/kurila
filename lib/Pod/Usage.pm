@@ -423,7 +423,6 @@ with re-writing this manpage.
 
 use strict;
 #use diagnostics;
-use Carp;
 use Config;
 use Exporter;
 use File::Spec;

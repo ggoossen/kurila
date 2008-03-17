@@ -21,7 +21,6 @@ package Pod::Simple::BlackBox;
 
 use integer; # vroom!
 use strict;
-use Carp ();
 BEGIN {
   require Pod::Simple;
   *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG

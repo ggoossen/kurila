@@ -38,8 +38,6 @@ POD parsing and processing (i.e. in POD formatters and translators).
 
 package Pod::List;
 
-use Carp;
-
 =head2 Pod::List
 
 B<Pod::List> can be used to hold information about POD lists
@@ -234,8 +232,6 @@ of the class C<Pod::Hyperlink> is returned. The value C<undef> indicates a
 failure, the error message is stored in C<$@>.
 
 =cut
-
-use Carp;
 
 sub new {
     my $this = shift;

@@ -36,8 +36,6 @@ $VERSION = '2.18';
     eval "use Log::Agent";
 }
 
-require Carp;
-
 #
 # They might miss :flock in Fcntl
 #
@@ -72,11 +70,11 @@ Storable->bootstrap;
 #
 
 sub logcroak {
-    Carp::croak(@_);
+    die(@_);
 }
 
 sub logcarp {
-  Carp::carp(@_);
+  warn(@_);
 }
 
 #

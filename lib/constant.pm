@@ -35,8 +35,7 @@ sub import {
 
     if ( $multiple ) {
 	if (ref $_[0] ne 'HASH') {
-	    require Carp;
-	    Carp::croak("Invalid reference type '".ref(shift)."' not 'HASH'");
+	    die("Invalid reference type '".ref(shift)."' not 'HASH'");
 	}
 	$constants = shift;
     } else {
@@ -45,8 +44,7 @@ sub import {
 
     foreach my $name ( keys %$constants ) {
 	unless (defined $name) {
-	    require Carp;
-	    Carp::croak("Can't use undef as constant name");
+	    die("Can't use undef as constant name");
 	}
 
 	# Normal constant name
@@ -55,13 +53,11 @@ sub import {
 
 	# Name forced into main, but we're not in main. Fatal.
 	} elsif ($forced_into_main{$name} and $pkg ne 'main') {
-	    require Carp;
-	    Carp::croak("Constant name '$name' is forced into main::");
+	    die("Constant name '$name' is forced into main::");
 
 	# Starts with double underscore. Fatal.
 	} elsif ($name =~ m/^__/) {
-	    require Carp;
-	    Carp::croak("Constant name '$name' begins with '__'");
+	    die("Constant name '$name' begins with '__'");
 
 	# Maybe the name is tolerable
 	} elsif ($name =~ m/^[A-Za-z_]\w*\z/) {
@@ -78,17 +74,15 @@ sub import {
 	# Looks like a boolean
 	# use constant FRED == fred;
 	} elsif ($name =~ m/^[01]?\z/) {
-            require Carp;
 	    if (@_) {
-		Carp::croak("Constant name '$name' is invalid");
+		die("Constant name '$name' is invalid");
 	    } else {
-		Carp::croak("Constant name looks like boolean value");
+		die("Constant name looks like boolean value");
 	    }
 
 	} else {
 	   # Must have bad characters
-            require Carp;
-	    Carp::croak("Constant name '$name' has invalid characters");
+	    die("Constant name '$name' has invalid characters");
 	}
 
 	{

@@ -7,8 +7,6 @@ use strict;
 use warnings::register;
 our(@ISA, @EXPORT, $VERSION);
 
-use Carp;
-
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(struct);
@@ -100,7 +98,7 @@ sub struct {
 
     # Create constructor.
 
-    croak "function 'new' already defined in package $class"
+    die "function 'new' already defined in package $class"
         if do { no strict 'refs'; defined &{Symbol::fetch_glob($class . "::new")} };
 
     my @methods = ();
@@ -111,7 +109,7 @@ sub struct {
     my $got_class = 0;
     my $out = '';
 
-    $out = "\{\n  package $class;\n  use Carp;\n  sub new \{\n";
+    $out = "\{\n  package $class;\n  sub new \{\n";
     $out .= "    my (\$class, \%init) = \@_;\n";
     $out .= "    \$class = __PACKAGE__ unless \@_;\n";
 
@@ -144,13 +142,13 @@ sub struct {
         }
         my $init = "defined(\$init\{'$name'\}) ? \$init\{'$name'\} :";
         if( $type eq '@' ){
-            $out .= "    croak 'Initializer for $name must be array reference'\n"; 
+            $out .= "    die 'Initializer for $name must be array reference'\n"; 
             $out .= "        if defined(\$init\{'$name'\}) && ref(\$init\{'$name'\}) ne 'ARRAY';\n";
             $out .= "    \$r->$elem = $init [];$cmt\n"; 
             $arrays{$name}++;
         }
         elsif( $type eq '%' ){
-            $out .= "    croak 'Initializer for $name must be hash reference'\n";
+            $out .= "    die 'Initializer for $name must be hash reference'\n";
             $out .= "        if defined(\$init\{'$name'\}) && ref(\$init\{'$name'\}) ne 'HASH';\n";
             $out .= "    \$r->$elem = $init \{\};$cmt\n";
             $hashes{$name}++;
@@ -164,13 +162,13 @@ sub struct {
             $out .= "            \{ \$r->$elem = $type->new(\%\{\$init\{'$name'\}\}) \} $cmt\n";
            $out .= "       elsif (UNIVERSAL::isa(\$init\{'$name'\}, '$type'))\n";
             $out .= "            \{ \$r->$elem = \$init\{'$name'\} \} $cmt\n";
-            $out .= "       else \{ croak 'Initializer for $name must be hash or $type reference' \}\n";
+            $out .= "       else \{ die 'Initializer for $name must be hash or $type reference' \}\n";
             $out .= "    \}\n";
             $classes{$name} = $type;
             $got_class = 1;
         }
         else{
-            croak "'$type' is not a valid struct element type";
+            die "'$type' is not a valid struct element type";
         }
         $idx += 2;
     }
@@ -212,9 +210,9 @@ sub struct {
                 $sel = "->\{\$i\}";
             }
             elsif( defined $classes{$name} ){
-                $out .= "    croak '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '$classes{$name}');\n";
+                $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '$classes{$name}');\n";
             }
-            $out .= "    croak 'Too many args to $name' if \@_ +> 1;\n";
+            $out .= "    die 'Too many args to $name' if \@_ +> 1;\n";
             $out .= "    \@_ ? ($pre\$r->$elem$sel = shift$pst) : $pre\$r->$elem$sel$pst;\n";
             $out .= "  \}\n";
         }
@@ -223,15 +221,15 @@ sub struct {
 
     print $out if $print;
     my $result = eval $out;
-    carp $@ if $@;
+    warn $@ if $@;
 }
 
 sub _usage_error {
-    confess "struct usage error";
+    die "struct usage error";
 }
 
 sub _subclass_error {
-    croak 'struct class cannot be a subclass (@ISA not allowed)';
+    die 'struct class cannot be a subclass (@ISA not allowed)';
 }
 
 1; # for require
@@ -421,7 +419,7 @@ class or to one of its subclasses. The element is not initialized
 by default.
 
 The accessor's argument, if any, is assigned to the element. The
-accessor will C<croak> if this is not an appropriate object
+accessor will C<die> if this is not an appropriate object
 reference.
 
 If the element type does not start with a C<'*'>, the accessor

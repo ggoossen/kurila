@@ -20,7 +20,6 @@
 #
 use strict;
 use warnings;
-use Carp;
 use File::Spec;
 
 BEGIN {
@@ -33,11 +32,11 @@ our $PACKAGE = 'Unicode::Normalize, mkheader';
 
 our $Combin = do "unicore/CombiningClass.pl"
     || do "unicode/CombiningClass.pl"
-    || croak "$PACKAGE: CombiningClass.pl not found";
+    || die "$PACKAGE: CombiningClass.pl not found";
 
 our $Decomp = do "unicore/Decomposition.pl"
     || do "unicode/Decomposition.pl"
-    || croak "$PACKAGE: Decomposition.pl not found";
+    || die "$PACKAGE: Decomposition.pl not found";
 
 our %Combin;	# $codepoint => $number    : combination class
 our %Canon;	# $codepoint => \@codepoints : canonical decomp.
@@ -92,7 +91,7 @@ sub decomposeHangul {
 	last if open($fh, "<", $f);
 	$f = undef;
     }
-    croak "$PACKAGE: neither unicore/CompositionExclusions.txt "
+    die "$PACKAGE: neither unicore/CompositionExclusions.txt "
 	. "nor unicode/CompExcl.txt is found in @INC" unless defined $f;
 
     while ( ~< $fh) {
@@ -145,7 +144,7 @@ while ($Decomp =~ m/(.+)/g) {
 	    } elsif (@$dec == 1) {
 		$Single{ $ini } = 1;
 	    } else {
-		croak("Weird Canonical Decomposition of U+$tab[0]");
+		die("Weird Canonical Decomposition of U+$tab[0]");
 	    }
 	}
     } else {
@@ -166,7 +165,7 @@ while ($Decomp =~ m/(.+)/g) {
 		} elsif (@$dec == 1) {
 		    $Single{ $u } = 1;
 		} else {
-		    croak("Weird Canonical Decomposition of U+$tab[0]");
+		    die("Weird Canonical Decomposition of U+$tab[0]");
 		}
 	    }
 	}
@@ -260,7 +259,7 @@ my @boolfunc = (
 );
 
 my $file = "unfexc.h";
-open FH, ">", "$file" or croak "$PACKAGE: $file can't be made";
+open FH, ">", "$file" or die "$PACKAGE: $file can't be made";
 binmode FH; select FH;
 
     print << 'EOF';
@@ -348,7 +347,7 @@ foreach my $tbl (@tripletable) {
     my $null = $tbl->{null};
     my $init = $tbl->{init};
 
-    open FH, ">", "$file" or croak "$PACKAGE: $file can't be made";
+    open FH, ">", "$file" or die "$PACKAGE: $file can't be made";
     binmode FH; select FH;
     my %val;
 
@@ -362,7 +361,7 @@ EOF
     print $init if defined $init;
 
     foreach my $uv (keys %$hash) {
-	croak sprintf("a Unicode code point 0x%04X over 0x10FFFF.", $uv)
+	die sprintf("a Unicode code point 0x%04X over 0x10FFFF.", $uv)
 	    unless $uv +<= 0x10FFFF;
 	my @c = unpack 'CCCC', pack 'N', $uv;
 	$val{ $c[1] }{ $c[2] }{ $c[3] } = $hash->{$uv};

@@ -340,7 +340,6 @@ get the well-known behavior.
 
 use strict;
 #use diagnostics;
-use Carp;
 use Exporter;
 use Pod::Parser;
 

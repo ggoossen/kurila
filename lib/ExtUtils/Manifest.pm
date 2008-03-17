@@ -6,7 +6,6 @@ use File::Basename;
 use File::Copy 'copy';
 use File::Find;
 use File::Spec;
-use Carp;
 use strict;
 
 use vars qw($VERSION @ISA @EXPORT_OK 
@@ -463,7 +462,7 @@ default.
 
 sub manicopy {
     my($read,$target,$how)=@_;
-    croak "manicopy() called without target argument" unless defined $target;
+    die "manicopy() called without target argument" unless defined $target;
     $how ||= 'cp';
     require File::Path;
     require File::Basename;
@@ -492,7 +491,7 @@ sub manicopy {
 
 sub cp_if_diff {
     my($from, $to, $how)=@_;
-    -f $from or carp "$0: $from not found";
+    -f $from or warn "$0: $from not found";
     my($diff) = 0;
     local(*F,*T);
     open(F, "<","$from\0") or die "Can't read $from: $!\n";
@@ -506,13 +505,13 @@ sub cp_if_diff {
     close F;
     if ($diff) {
 	if (-e $to) {
-	    unlink($to) or confess "unlink $to: $!";
+	    unlink($to) or die "unlink $to: $!";
 	}
         STRICT_SWITCH: {
 	    best($from,$to), last STRICT_SWITCH if $how eq 'best';
 	    cp($from,$to), last STRICT_SWITCH if $how eq 'cp';
 	    ln($from,$to), last STRICT_SWITCH if $how eq 'ln';
-	    croak("ExtUtils::Manifest::cp_if_diff " .
+	    die("ExtUtils::Manifest::cp_if_diff " .
 		  "called with illegal how argument [$how]. " .
 		  "Legal values are 'best', 'cp', and 'ln'.");
 	}
