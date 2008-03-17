@@ -46,7 +46,7 @@ END { rmtree 'blib' }
 ok( -d 'blib/lib',              'pm_to_blib created blib dir' );
 ok( -r 'blib/lib/Big/Dummy.pm', '  copied .pm file' );
 ok( -r 'blib/lib/auto',         '  created autosplit dir' );
-is( $stdout->read, "cp lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
+is( $stdout->read, "symlink lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
 
 pm_to_blib( { 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' },
             'blib/lib/auto'

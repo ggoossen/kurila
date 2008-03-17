@@ -1803,7 +1803,7 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{RM_RF}      ||= "rm -rf";
     $self->{TOUCH}      ||= "touch";
     $self->{TEST_F}     ||= "test -f";
-    $self->{CP}         ||= "ln"; # HACK to keep using original files. "cp";
+    $self->{CP}         ||= "cp";
     $self->{MV}         ||= "mv";
     $self->{CHMOD}      ||= "chmod";
     $self->{MKPATH}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e mkpath';
