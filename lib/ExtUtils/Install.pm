@@ -519,6 +519,30 @@ sub _copy {
     }
 }
 
+=item _symlink($old,$new,$verbose,$fake)
+
+Wrapper around symlink to handle errors.
+
+If $verbose is true and >1 then additional dignostics will be emitted.
+
+If $fake is true then the copy will not actually occur.
+
+Dies if the copy fails.
+
+=cut
+
+sub _symlink {
+    my ( $old, $new, $verbose, $nonono)=@_;
+    if ($verbose && $verbose+>1) {
+        printf "symlink(%s,%s)\n", $old, $new;
+    }
+    if (!$nonono) {
+        $old = File::Spec->rel2abs( $old );
+        symlink($old,$new)
+            or Carp::croak( _estr "ERROR: Cannot symlink '$new' to '$old': $!" );
+    }
+}
+
 =item _chdir($from)
 
 Wrapper around chdir to catch errors.
@@ -1000,7 +1024,7 @@ sub pm_to_blib {
             print "Skip $to (unchanged)\n";
             next;
         }
-        if (-f $to){
+        if (-f $to or -l $to){
             # we wont try hard here. its too likely to mess things up.
             forceunlink($to);
         } else {
@@ -1010,8 +1034,8 @@ sub pm_to_blib {
             run_filter($pm_filter, $from, $to);
             print "$pm_filter <$from >$to\n";
         } else {
-            _copy( $from, $to );
-            print "cp $from $to\n";
+            _symlink( $from, $to );
+            print "symlink $from $to\n";
         }
         my($mode,$atime,$mtime) = (stat $from)[2,8,9];
         utime($atime,$mtime+$Is_VMS,$to);
