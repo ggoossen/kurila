@@ -18,7 +18,6 @@
 package Pod::PlainText;
 
 
-use Carp qw(carp croak);
 use Pod::Select ();
 
 use strict;
@@ -233,10 +232,10 @@ sub interior_sequence {
     local $_ = shift;
     return '' if ($command eq 'X' || $command eq 'Z');
 
-    # Expand escapes into the actual character now, carping if invalid.
+    # Expand escapes into the actual character now, warning if invalid.
     if ($command eq 'E') {
         return $ESCAPES{$_} if defined $ESCAPES{$_};
-        carp "Unknown escape: E<$_>";
+        warn "Unknown escape: E<$_>";
         return "E<$_>";
     }
 
@@ -257,7 +256,7 @@ sub interior_sequence {
     elsif ($command eq 'F') { return $self->seq_f ($_) }
     elsif ($command eq 'I') { return $self->seq_i ($_) }
     elsif ($command eq 'L') { return $self->seq_l ($_) }
-    else { carp "Unknown sequence $command<$_>" }
+    else { warn "Unknown sequence $command<$_>" }
 }
 
 # Called for each paragraph that's actually part of the POD.  We take
@@ -334,7 +333,7 @@ sub cmd_back {
     my $self = shift;
     $$self{MARGIN} = pop @{ $$self{INDENTS} };
     unless (defined $$self{MARGIN}) {
-        carp "Unmatched =back";
+        warn "Unmatched =back";
         $$self{MARGIN} = $$self{indent};
     }
 }
@@ -458,7 +457,7 @@ sub item {
     local $_ = shift;
     my $tag = $$self{ITEM};
     unless (defined $tag) {
-        carp "item called without tag";
+        warn "item called without tag";
         return;
     }
     undef $$self{ITEM};
@@ -565,7 +564,7 @@ sub pod2text {
     if (defined $_[1]) {
         local *IN;
         unless (open (IN, "<", $_[0])) {
-            croak ("Can't open $_[0] for reading: $!\n");
+            die ("Can't open $_[0] for reading: $!\n");
             return;
         }
         $_[0] = \*IN;

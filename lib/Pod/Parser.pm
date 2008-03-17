@@ -202,7 +202,6 @@ use vars qw(@ISA);
 use strict;
 #use diagnostics;
 use Pod::InputObjects;
-use Carp;
 use Exporter;
 @ISA = qw(Exporter);
 
@@ -1156,7 +1155,7 @@ sub parse_from_file {
     ## Is $infile a filename or a (possibly implied) filehandle
     if (defined $infile && ref $infile) {
         if (ref($infile) =~ m/^(SCALAR|ARRAY|HASH|CODE|REF)$/) {
-            croak "Input from $1 reference not supported!\n";
+            die "Input from $1 reference not supported!\n";
         }
         ## Must be a filehandle-ref (or else assume its a ref to an object
         ## that supports the common IO read operations).
@@ -1175,7 +1174,7 @@ sub parse_from_file {
         ## We have a filename, open it for reading
         $myData{_INFILE} = $infile;
         open($in_fh, "<", "$infile")  or
-             croak "Can't open $infile for reading: $!\n";
+             die "Can't open $infile for reading: $!\n";
         $close_input = 1;
     }
 
@@ -1189,7 +1188,7 @@ sub parse_from_file {
     if (ref $outfile) {
         ## we need to check for ref() first, as other checks involve reading
         if (ref($outfile) =~ m/^(ARRAY|HASH|CODE)$/) {
-            croak "Output to $1 reference not supported!\n";
+            die "Output to $1 reference not supported!\n";
         }
         elsif (ref($outfile) eq 'SCALAR') {
 #           # NOTE: IO::String isn't a part of the perl distribution,
@@ -1197,7 +1196,7 @@ sub parse_from_file {
 #           require IO::String;
 #           $myData{_OUTFILE} = "$outfile";
 #           $out_fh = IO::String->new($outfile);
-            croak "Output to SCALAR reference not supported!\n";
+            die "Output to SCALAR reference not supported!\n";
         }
         else {
             ## Must be a filehandle-ref (or else assume its a ref to an
@@ -1227,9 +1226,9 @@ sub parse_from_file {
     else {
         ## We have a filename, open it for writing
         $myData{_OUTFILE} = $outfile;
-        (-d $outfile) and croak "$outfile is a directory, not POD input!\n";
+        (-d $outfile) and die "$outfile is a directory, not POD input!\n";
         open($out_fh, ">", "$outfile")  or
-             croak "Can't open $outfile for writing: $!\n";
+             die "Can't open $outfile for writing: $!\n";
         $close_output = 1;
     }
 
@@ -1239,9 +1238,9 @@ sub parse_from_file {
     $self->parse_from_filehandle(\%opts, $in_fh, $out_fh);
 
     $close_input  and 
-        close($in_fh) || croak "Can't close $infile after reading: $!\n";
+        close($in_fh) || die "Can't close $infile after reading: $!\n";
     $close_output  and
-        close($out_fh) || croak "Can't close $outfile after writing: $!\n";
+        close($out_fh) || die "Can't close $outfile after writing: $!\n";
 }
 
 #############################################################################

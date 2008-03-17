@@ -92,7 +92,6 @@ C<undef>.  The value of the macro is not needed.
 
 use warnings;
 use strict;
-use Carp qw(croak cluck);
 
 use Exporter;
 use ExtUtils::Constant::Utils qw(C_stringify);
@@ -101,7 +100,7 @@ use ExtUtils::Constant::XS qw(%XS_Constant %XS_TypeSet);
 @ISA = 'Exporter';
 
 %EXPORT_TAGS = ( 'all' => [ qw(
-	XS_constant constant_types return_clause memEQ_clause C_stringify
+	XS_constant constant_types C_stringify
 	C_constant WriteConstants WriteMakefileSnippet
 ) ] );
 
@@ -116,26 +115,6 @@ constants used internally between the generated C and XS functions.
 
 sub constant_types {
   ExtUtils::Constant::XS->header();
-}
-
-sub memEQ_clause {
-  cluck "ExtUtils::Constant::memEQ_clause is deprecated";
-  ExtUtils::Constant::XS->memEQ_clause({name=>$_[0], checked_at=>$_[1],
-					indent=>$_[2]});
-}
-
-sub return_clause ($$) {
-  cluck "ExtUtils::Constant::return_clause is deprecated";
-  my $indent = shift;
-  ExtUtils::Constant::XS->return_clause({indent=>$indent}, @_);
-}
-
-sub switch_clause {
-  cluck "ExtUtils::Constant::switch_clause is deprecated";
-  my $indent = shift;
-  my $comment = shift;
-  ExtUtils::Constant::XS->switch_clause({indent=>$indent, comment=>$comment},
-					@_);
 }
 
 sub C_constant {
@@ -408,7 +387,7 @@ sub WriteConstants {
 
   $ARGS{C_SUBNAME} ||= $ARGS{SUBNAME}; # No-one sane will have C_SUBNAME eq '0'
 
-  croak "Module name not specified" unless length $ARGS{NAME};
+  die "Module name not specified" unless length $ARGS{NAME};
 
   my $c_fh = $ARGS{C_FH};
   if (!$c_fh) {

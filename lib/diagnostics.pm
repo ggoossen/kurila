@@ -181,7 +181,6 @@ Tom Christiansen <F<tchrist@mox.perl.com>>, 25 June 1995.
 =cut
 
 use strict;
-use Carp;
 $Carp::Internal{__PACKAGE__.""}++;
 
 our $VERSION = 1.17;
@@ -285,7 +284,7 @@ if (eof(POD_DIAG)) {
     'gt'	=>	'>',	#   right chevron, greater-than
     'quot'	=>	'"',	#   double quote
 
-    "Aacute"	=>	"\xC1"	#   capital A, acute accent
+    "Aacute"	=>	"\x[C1]"	#   capital A, acute accent
 
     # etc
 );
@@ -534,7 +533,7 @@ sub death_trap {
     # Have carp skip over death_trap() when showing the stack trace.
     local($Carp::CarpLevel) = 1;
 
-    confess "Uncaught exception from user code:\n\t$exception";
+    die "Uncaught exception from user code:\n\t$exception";
 	# up we go; where we stop, nobody knows, but i think we die now
 	# but i'm deeply afraid of the &$olddie guy reraising and us getting
 	# into an indirect recursion loop

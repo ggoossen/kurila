@@ -3,7 +3,6 @@ package TestCompare;
 use vars qw(@ISA @EXPORT $MYPKG);
 #use strict;
 #use diagnostics;
-use Carp;
 use Exporter;
 use File::Basename;
 use File::Spec;

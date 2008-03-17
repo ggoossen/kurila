@@ -14,7 +14,6 @@ package Pod::Find;
 
 use vars qw($VERSION);
 $VERSION = 1.34;   ## Current version of this package
-use Carp;
 
 #############################################################################
 
@@ -377,7 +376,7 @@ sub pod_where {
   }
 
   # Check usage
-  carp 'Usage: pod_where({options}, $pod)' unless (scalar(@_));
+  warn 'Usage: pod_where({options}, $pod)' unless (scalar(@_));
 
   # Read argument
   my $pod = shift;

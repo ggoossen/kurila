@@ -928,8 +928,6 @@ Perl_die_where(pTHX_ SV *msv)
 		SV * const nsv = cx->blk_eval.old_namesv;
                 (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                                &PL_sv_undef, 0);
-/* 		DIE(aTHX_ "%sCompilation failed in require", */
-/* 		    *message ? message : "Unknown error\n"); */
 		die_where(ERRSV);
 	    }
 	    assert(CxTYPE(cx) == CXt_EVAL);

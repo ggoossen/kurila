@@ -7,10 +7,10 @@ BEGIN {
     plan skip_all => "Not portable on Win32 or VMS\n";
   }
   else {
-    plan tests => 15;
+    plan tests => 14;
   }
-  use_ok ("Pod::Usage");
 }
+use Pod::Usage;
 
 sub getoutput
 {

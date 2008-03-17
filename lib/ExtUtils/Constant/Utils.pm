@@ -2,7 +2,6 @@ package ExtUtils::Constant::Utils;
 
 use strict;
 use vars qw($VERSION @EXPORT_OK @ISA);
-use Carp;
 
 @ISA = 'Exporter';
 @EXPORT_OK = qw(C_stringify perl_stringify);
@@ -40,7 +39,7 @@ sub C_stringify {
   local $_ = shift;
   return unless defined $_;
   # grr 5.6.1
-  confess "Wide character in '$_' intended as a C identifier"
+  die "Wide character in '$_' intended as a C identifier"
     if tr/\0-\377// != length;
   s/\\/\\\\/g;
   s/([\"\'])/\\$1/g;	# Grr. fix perl mode.

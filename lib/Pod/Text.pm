@@ -29,7 +29,6 @@ use strict;
 use utf8;
 use vars qw(@ISA @EXPORT $VERSION);
 
-use Carp qw(carp croak);
 use Exporter ();
 use Pod::Simple ();
 
@@ -108,7 +107,7 @@ sub new {
         $$self{LQUOTE} = $1;
         $$self{RQUOTE} = $2;
     } else {
-        croak qq(Invalid quote specification "$$self{opt_quotes}");
+        die qq(Invalid quote specification "$$self{opt_quotes}");
     }
 
     # If requested, do something with the non-POD text.
@@ -287,7 +286,7 @@ sub item {
     my ($self, $text) = @_;
     my $tag = $$self{ITEM};
     unless (defined $tag) {
-        carp "Item called without tag";
+        warn "Item called without tag";
         return;
     }
     undef $$self{ITEM};
@@ -571,7 +570,7 @@ sub pod2text {
         my @fhs = @_;
         local *IN;
         unless (open (IN, "<", $fhs[0])) {
-            croak ("Can't open $fhs[0] for reading: $!\n");
+            die ("Can't open $fhs[0] for reading: $!\n");
             return;
         }
         $fhs[0] = \*IN;
