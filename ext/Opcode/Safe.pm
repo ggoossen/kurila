@@ -2,7 +2,7 @@ package Safe;
 
 use strict;
 
-$Safe::VERSION = "2.15";
+$Safe::VERSION = "2.16";
 
 # *** Don't declare any lexicals above this point ***
 #
@@ -45,7 +45,6 @@ my $default_root  = 0;
 my $default_share = [qw[
     *_
     &PerlIO::get_layers
-    &Regexp::DESTROY
     &UNIVERSAL::isa
     &UNIVERSAL::can
     &UNIVERSAL::VERSION
@@ -60,6 +59,7 @@ my $default_share = [qw[
     $version::VERSION
     $version::CLASS
     @version::ISA
+    &Regexp::DESTROY
     &re::is_regexp
     &re::regname
     &re::regnames
