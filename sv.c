@@ -5470,8 +5470,8 @@ Perl_sv_pos_u2b(pTHX_ register SV *const sv, I32 *const offsetp, I32 *const lenp
    from.   
 */
 static void
-S_utf8_mg_pos_cache_update(pTHX_ SV *sv, MAGIC **mgp, STRLEN byte, STRLEN utf8,
-			   STRLEN blen)
+S_utf8_mg_pos_cache_update(pTHX_ SV *const sv, MAGIC **const mgp, const STRLEN byte,
+                           const STRLEN utf8, const STRLEN blen)
 {
     STRLEN *cache;
 
@@ -5649,7 +5649,7 @@ Handles magic and type coercion.
  *
  */
 void
-Perl_sv_pos_b2u(pTHX_ register SV* sv, I32* offsetp)
+Perl_sv_pos_b2u(pTHX_ register SV *const sv, I32 *const offsetp)
 {
     const char* s;
     const STRLEN byte = *offsetp;
@@ -5805,7 +5805,7 @@ coerce its args to strings if necessary.  See also C<sv_cmp_locale>.
 */
 
 I32
-Perl_sv_cmp(pTHX_ register SV *sv1, register SV *sv2)
+Perl_sv_cmp(pTHX_ register SV *const sv1, register SV *const sv2)
 {
     dVAR;
     STRLEN cur1, cur2;
@@ -5862,7 +5862,7 @@ if necessary.  See also C<sv_cmp>.
 */
 
 I32
-Perl_sv_cmp_locale(pTHX_ register SV *sv1, register SV *sv2)
+Perl_sv_cmp_locale(pTHX_ register SV *const sv1, register SV *const sv2)
 {
     dVAR;
 #ifdef USE_LOCALE_COLLATE
@@ -5927,7 +5927,7 @@ settings.
 */
 
 char *
-Perl_sv_collxfrm(pTHX_ SV *sv, STRLEN *nxp)
+Perl_sv_collxfrm(pTHX_ SV *const sv, STRLEN *const nxp)
 {
     dVAR;
     MAGIC *mg;
@@ -5985,7 +5985,7 @@ appending to the currently-stored string.
 */
 
 char *
-Perl_sv_gets(pTHX_ register SV *sv, register PerlIO *fp, I32 append)
+Perl_sv_gets(pTHX_ register SV *const sv, register PerlIO *const fp, I32 append)
 {
     dVAR;
     const char *rsptr;
@@ -6314,7 +6314,7 @@ if necessary. Handles 'get' magic.
 */
 
 void
-Perl_sv_inc(pTHX_ register SV *sv)
+Perl_sv_inc(pTHX_ register SV *const sv)
 {
     dVAR;
     register char *d;
@@ -6478,7 +6478,7 @@ if necessary. Handles 'get' magic.
 */
 
 void
-Perl_sv_dec(pTHX_ register SV *sv)
+Perl_sv_dec(pTHX_ register SV *const sv)
 {
     dVAR;
     int flags;
@@ -6607,7 +6607,7 @@ statement boundaries.  See also C<sv_newmortal> and C<sv_2mortal>.
  * permanent location. */
 
 SV *
-Perl_sv_mortalcopy(pTHX_ SV *oldstr)
+Perl_sv_mortalcopy(pTHX_ SV *const oldstr)
 {
     dVAR;
     register SV *sv;
