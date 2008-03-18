@@ -1129,7 +1129,7 @@ perl_destruct(pTHXx)
     }
 
     /* the 2 is for PL_fdpid and PL_strtab */
-    while (PL_sv_count > 2 && sv_clean_all())
+    while (sv_clean_all() > 2)
 	;
 
     AvREAL_off(PL_fdpid);		/* no surviving entries */

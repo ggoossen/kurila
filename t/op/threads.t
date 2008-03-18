@@ -118,8 +118,6 @@ TODO: {
     no strict 'vars';   # Accessing $TODO from test.pl
     local $TODO = 'refcount issues with threads';
 
-    print "not ok # TODO threads->create inside CHECK/INIT\n" for 1..2;
-    if (0) {
 # Scalars leaked: 1
 foreach my $BLOCK (qw(CHECK INIT)) {
     fresh_perl_is(<<EOI, 'ok', { }, "threads in $BLOCK block");
@@ -128,7 +126,6 @@ foreach my $BLOCK (qw(CHECK INIT)) {
         print 'ok';
 EOI
     }
-}
 
 # Scalars leaked: 1
 fresh_perl_is(<<'EOI', 'ok', { }, 'Bug #41138');
