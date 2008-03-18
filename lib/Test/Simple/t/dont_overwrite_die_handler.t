@@ -8,12 +8,12 @@ BEGIN {
 }
 
 # Make sure this is in place before Test::More is loaded.
-my $handler_called;
+my $handler;
 BEGIN {
-    $SIG{__DIE__} = sub { $handler_called++ };
+    $handler = sub { die "ARR"; };
+    ${^DIE_HOOK} = $handler;
 }
 
-use Test::More tests => 2;
+use Test::More tests => 1;
 
-ok !eval { die };
-is $handler_called, 1, 'existing DIE handler not overridden';
+is ${^DIE_HOOK}, $handler, 'existing DIE handler not overridden';

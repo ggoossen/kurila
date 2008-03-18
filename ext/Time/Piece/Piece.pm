@@ -598,11 +598,11 @@ sub add_months {
     
     my $final_month = $time->_mon + $num_months;
     my $num_years = 0;
-    if ($final_month > 11 || $final_month < 0) {
+    if ($final_month +> 11 || $final_month +< 0) {
         # these two ops required because we have no POSIX::floor and don't
         # want to load POSIX.pm
         $num_years = int($final_month / 12);
-        $num_years-- if ($final_month < 0);
+        $num_years-- if ($final_month +< 0);
         
         $final_month = $final_month % 12;
     }

@@ -620,7 +620,7 @@ sub use_ok ($;@) {
     my($pack,$filename,$line) = caller;
 
     my $code;
-    if( @imports == 1 and $imports[0] =~ m/^\d+(?:\.\d+)?$/ ) {
+    if( @imports == 1 and $imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         $code = <<USE;
@@ -632,22 +632,18 @@ USE
     else {
         $code = <<USE;
 package $pack;
-use $module \@{\$args[0]};
+use $module \@\{\$args[0]\};
 1;
 USE
     }
-
 
     my($eval_result, $eval_error) = _eval($code, \@imports);
     my $ok = $tb->ok( $eval_result, "use $module;" );
     
     unless( $ok ) {
-        $eval_error =~ 
-          s{^BEGIN failed--compilation aborted at .*$}
-           {BEGIN failed--compilation aborted at $filename line $line.}m;
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
-    Error:  {$eval_error}
+    Error:  {$eval_error->message}
 DIAGNOSTIC
 
     }
@@ -662,7 +658,7 @@ sub _eval {
 
     # Work around oddities surrounding resetting of $@ by immediately
     # storing it.
-    local($@,$!,$SIG{__DIE__});   # isolate eval
+    local($@,$!);   # isolate eval
     my $eval_result = eval $code;
     my $eval_error  = $@;
 
