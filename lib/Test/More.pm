@@ -1,10 +1,9 @@
 package Test::More;
 
-
 use strict;
 
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
-$VERSION = '0.74';
+$VERSION = '0.75';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 use Test::Builder::Module;
@@ -620,30 +619,28 @@ sub use_ok ($;@) {
 
     my($pack,$filename,$line) = caller;
 
-    # Work around a glitch in $@ and eval
-    my $eval_error;
-    {
-        local($@,$!);   # isolate eval
-
-        if( @imports == 1 and $imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
-            # probably a version check.  Perl needs to see the bare number
-            # for it to work with non-Exporter based modules.
-            eval <<USE;
+    my $code;
+    if( @imports == 1 and $imports[0] =~ m/^\d+(?:\.\d+)?$/ ) {
+        # probably a version check.  Perl needs to see the bare number
+        # for it to work with non-Exporter based modules.
+        $code = <<USE;
 package $pack;
 use $module $imports[0];
+1;
 USE
-        }
-        else {
-            eval <<USE;
+    }
+    else {
+        $code = <<USE;
 package $pack;
-use $module \@imports;
+use $module \@{\$args[0]};
+1;
 USE
-        }
-        $eval_error = $@ && $@->message;
     }
 
-    my $ok = $tb->ok( !$eval_error, "use $module;" );
 
+    my($eval_result, $eval_error) = _eval($code, \@imports);
+    my $ok = $tb->ok( $eval_result, "use $module;" );
+    
     unless( $ok ) {
         $eval_error =~ 
           s{^BEGIN failed--compilation aborted at .*$}
@@ -656,6 +653,20 @@ DIAGNOSTIC
     }
 
     return $ok;
+}
+
+
+sub _eval {
+    my($code) = shift;
+    my @args = @_;
+
+    # Work around oddities surrounding resetting of $@ by immediately
+    # storing it.
+    local($@,$!,$SIG{__DIE__});   # isolate eval
+    my $eval_result = eval $code;
+    my $eval_error  = $@;
+
+    return($eval_result, $eval_error);
 }
 
 =item B<require_ok>
@@ -677,18 +688,19 @@ sub require_ok ($) {
     # Module names must be barewords, files not.
     $module = qq['$module'] unless _is_module_name($module);
 
-    local($!, $@); # isolate eval
-    eval <<REQUIRE;
+    my $code = <<REQUIRE;
 package $pack;
 require $module;
+1;
 REQUIRE
 
-    my $ok = $tb->ok( !$@, "require $module;" );
+    my($eval_result, $eval_error) = _eval($code);
+    my $ok = $tb->ok( $eval_result, "require $module;" );
 
     unless( $ok ) {
         $tb->diag(<<DIAGNOSTIC);
     Tried to require '$module'.
-    Error:  {$@->message}
+    Error:  {$eval_error->message}
 DIAGNOSTIC
 
     }
@@ -1400,7 +1412,7 @@ B<NOTE>  This behavior may go away in future versions.
 
 =item Backwards compatibility
 
-Test::More works with Perls as old as 5.004_05.
+Test::More works with Perls as old as 5.6.0.
 
 
 =item Overloaded objects

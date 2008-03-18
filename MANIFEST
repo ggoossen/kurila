@@ -1746,6 +1746,7 @@ lib/Test/Simple.pm		Basic utility for writing tests
 lib/Test/Simple/README		Test::Simple README
 lib/Test/Simple/t/bad_plan.t	Test::Builder plan() test
 lib/Test/Simple/t/bail_out.t	Test::Builder BAIL_OUT test
+lib/Test/Simple/t/BEGIN_require_ok.t	Test::More require_ok() testing
 lib/Test/Simple/t/BEGIN_use_ok.t	Test::More use_ok() testing
 lib/Test/Simple/t/buffer.t	Test::Builder buffering test
 lib/Test/Simple/t/Builder.t	Test::Builder tests
