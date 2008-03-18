@@ -73,7 +73,7 @@ TODO: {
         todo_skip "Just testing todo_skip";
         fail("So very failed");
     }
-    like( $warning, qr/^\Qtodo_skip() needs to know \E\$how_many tests are in the block .* at \Q$0 line 82/ms,
+    like( $warning, qr/^\Qtodo_skip() needs to know \E\$how_many tests are in the block/ms,
         'todo_skip without $how_many warning' );
 }
 

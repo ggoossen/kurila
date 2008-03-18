@@ -49,7 +49,7 @@ END { rmtree 'blib' }
 ok( -d 'blib/lib',              'pm_to_blib created blib dir' );
 ok( -r 'blib/lib/Big/Dummy.pm', '  copied .pm file' );
 ok( -r 'blib/lib/auto',         '  created autosplit dir' );
-is( $stdout->read, "cp lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
+is( $stdout->read, "symlink lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
 
 pm_to_blib( { 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' },
             'blib/lib/auto'
@@ -79,9 +79,9 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' );
 ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
-open(PACKLIST, 'install-test/packlist' );
-my %packlist = map { chomp;  ($_ => 1) } <PACKLIST>;
-close PACKLIST;
+open(my $packlist, '<', 'install-test/packlist' ) or die;
+my %packlist = map { chomp;  ($_ => 1) } ~< $packlist;
+close $packlist or die;
 
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might
 # be lowercase. :(
@@ -102,7 +102,7 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm', '  UNINST=1 preserved same' );
 
 
 chmod 0644, 'blib/lib/Big/Dummy.pm' or die $!;
-open(DUMMY, ">>blib/lib/Big/Dummy.pm") or die $!;
+open(DUMMY, ">>", "blib/lib/Big/Dummy.pm") or die $!;
 print DUMMY "Extra stuff\n";
 close DUMMY;
 
@@ -132,7 +132,7 @@ close DUMMY;
   local $ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local $SIG{__WARN__}=sub { push @warn, @_; return };
+  local ${^WARN_HOOK}=sub { push @warn, $_[0]->message; return };
   my $ok=eval {
     install([from_to=> { 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',

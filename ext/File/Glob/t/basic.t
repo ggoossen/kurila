@@ -116,11 +116,8 @@ SKIP: {
 mkdir "pteerslo", 0777;
 chdir "pteerslo";
 
-my @f_names = qw(Ax.pl Bx.pl Cx.pl aY.pl bY.pl cY.pl);
+my @f_names = sort qw(Ax.pl Bx.pl Cx.pl aY.pl bY.pl cY.pl);
 my @f_alpha = qw(Ax.pl aY.pl Bx.pl bY.pl Cx.pl cY.pl);
-if ('a' lt 'A') { # EBCDIC char sets sort lower case before UPPER
-    @f_names = sort(@f_names);
-}
 if ($^O eq 'VMS') { # VMS is happily caseignorant
     @f_alpha = qw(ax.pl ay.pl bx.pl by.pl cx.pl cy.pl);
     @f_names = @f_alpha;
