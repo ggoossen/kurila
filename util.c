@@ -1224,7 +1224,12 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     if ( *hook == NULL ) {
 	const char *msg;
 	STRLEN msglen;
-	msg = SvPV_const(msv, msglen);
+	if (SvPOK(msv))
+	    msg = SvPV_const(msv, msglen);
+	else {
+	    msg = "Unknown error";
+	    msglen = strlen(msg);
+	}
 	write_to_stderr(msg, msglen);
 	return FALSE;
     }
