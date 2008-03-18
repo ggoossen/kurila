@@ -1300,9 +1300,6 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	}
     }
 
-    DEBUG_S(PerlIO_printf(Perl_debug_log,
-			  "%p: die/croak\ndiehook = %p\n",
-			  (void*)thr, (void*)PL_diehook));
     vdie_common(msv, FALSE);
     return msv;
 }
@@ -1312,10 +1309,6 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
 {
     dVAR;
     SV* msv;
-
-    DEBUG_S(PerlIO_printf(Perl_debug_log,
-			  "%p: die: curstack = %p, mainstack = %p\n",
-			  (void*)thr, (void*)PL_curstack, (void*)PL_mainstack));
 
     msv = vdie_croak_common(pat, args);
     die_where(msv);
