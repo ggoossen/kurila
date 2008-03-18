@@ -1356,7 +1356,6 @@ Perl_croak_nocontext(const char *pat, ...)
 {
     dTHX;
     va_list args;
-    PERL_ARGS_ASSERT_CROAK_NOCONTEXT;
     va_start(args, pat);
     vdie(pat, &args);
     /* NOTREACHED */
