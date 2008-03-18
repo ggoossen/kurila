@@ -175,7 +175,7 @@ my $MANIFEST = do {
 };
 
 for $file (($MANIFEST =~ m/^(\S+\.c)\t/gm), ($MANIFEST =~ m/^(\S+\.h)\t/gm)) {
-    open F, "<", " $file" or die "Cannot open $file for docs: $!\n";
+    open F, "<", $file or die "Cannot open $file for docs: $!\n";
     $curheader = "Functions in file $file\n";
     autodoc(\*F,$file);
     close F or die "Error closing $file: $!\n";
