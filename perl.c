@@ -1128,18 +1128,9 @@ perl_destruct(pTHXx)
 		 (long)cxstack_ix + 1);
     }
 
-    /* Now absolutely destruct everything, somehow or other, loops or no. */
-    SvFLAGS(PL_fdpid) |= SVTYPEMASK;		/* don't clean out pid table now */
-    SvFLAGS(PL_strtab) |= SVTYPEMASK;		/* don't clean out strtab now */
-
     /* the 2 is for PL_fdpid and PL_strtab */
     while (PL_sv_count > 2 && sv_clean_all())
 	;
-
-    SvFLAGS(PL_fdpid) &= ~SVTYPEMASK;
-    SvFLAGS(PL_fdpid) |= SVt_PVAV;
-    SvFLAGS(PL_strtab) &= ~SVTYPEMASK;
-    SvFLAGS(PL_strtab) |= SVt_PVHV;
 
     AvREAL_off(PL_fdpid);		/* no surviving entries */
     SvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
