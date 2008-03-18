@@ -2,7 +2,7 @@ package ExtUtils::Mkbootstrap;
 
 use strict;
 
-our $VERSION = '6.43_01';
+our $VERSION = '6.44';
 
 require Exporter;
 our @ISA = ('Exporter');

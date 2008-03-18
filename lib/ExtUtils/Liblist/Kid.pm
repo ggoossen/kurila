@@ -8,7 +8,7 @@ package ExtUtils::Liblist::Kid;
 # Broken out of MakeMaker from version 4.11
 
 use strict;
-our $VERSION = 6.43_01;
+our $VERSION = 6.44;
 
 use Config;
 use Cwd 'cwd';
