@@ -69,7 +69,7 @@ TODO: {
         # perl gets the line number a little wrong on the first
         # statement inside a block.
         1 == 1;
-#line 82
+#line 73
         todo_skip "Just testing todo_skip";
         fail("So very failed");
     }
@@ -78,11 +78,10 @@ TODO: {
 }
 
 
-{
+TODO: {
     Test::More->builder->exported_to("Wibble");
-    $Wibble::TODO = '';     # shut up used only once warning
-    TODO: {
-        local $Wibble::TODO = $Why;
-        fail("TODO honors exported_to()");
-    }
+    
+    local $TODO = "testing \$TODO with an incorrect exported_to()";
+    
+    fail("Just testing todo");
 }

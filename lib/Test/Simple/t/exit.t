@@ -20,21 +20,9 @@ if( $^O eq 'MacOS' ) {
     exit 0;
 }
 
-our $TODO;
-
-my $test_num = 1;
-# Utility testing functions.
-sub ok ($;$) {
-    my($test, $name) = @_;
-    my $ok = '';
-    $ok .= "not " unless $test;
-    $ok .= "ok $test_num";
-    $ok .= " # TODO " if defined $TODO;
-    $ok .= " - $name" if defined $name;
-    $ok .= "\n";
-    print $ok;
-    $test_num++;
-}
+require Test::Builder;
+my $TB = Test::Builder->create();
+$TB->level(0);
 
 
 package main;
@@ -57,10 +45,11 @@ my %Tests = (
              'pre_plan_death.plx'       => ['not zero',    'not zero'],
              'death_in_eval.plx'        => [0,      0],
              'require.plx'              => [0,      0],
-	     'exit.plx'                 => [1,      4],
+             'death_with_handler.plx'   => [255,    4],
+             'exit.plx'                 => [1,      4],
             );
 
-print "1..".keys(%Tests)."\n";
+$TB->plan( tests => scalar keys(%Tests) );
 
 eval { require POSIX; &POSIX::WEXITSTATUS(0) };
 if( $@ ) {
@@ -89,12 +78,12 @@ while( my($test_name, $exit_codes) = each %Tests ) {
 
     local $My::Test::TODO = 1 if $test_name =~ m/last_minute_death/;
     if( $exit_code eq 'not zero' ) {
-        My::Test::ok( $actual_exit != 0,
+        $TB->isnt_num( $actual_exit, 0,
                       "$test_name exited with $actual_exit ".
                       "(expected $exit_code)");
     }
     else {
-        My::Test::ok( $actual_exit == $exit_code, 
+        $TB->is_num( $actual_exit, $exit_code, 
                       "$test_name exited with $actual_exit ".
                       "(expected $exit_code)");
     }

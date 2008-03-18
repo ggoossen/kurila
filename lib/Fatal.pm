@@ -3,7 +3,7 @@ package Fatal;
 use strict;
 our($Debug, $VERSION);
 
-$VERSION = 1.05;
+$VERSION = 1.06;
 
 $Debug = 0 unless defined $Debug;
 
@@ -97,7 +97,7 @@ sub _make_fatal {
         $proto = eval { prototype "CORE::$name" };
 	die "$name is neither a builtin, nor a Perl subroutine" 
 	  if $@;
-	die "Cannot make a non-overridable builtin fatal"
+	die "Cannot make the non-overridable builtin $name fatal"
 	  if not defined $proto;
 	$core = 1;
 	$call = "CORE::$name";

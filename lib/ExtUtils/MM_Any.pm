@@ -1,7 +1,7 @@
 package ExtUtils::MM_Any;
 
 use strict;
-our $VERSION = '6.43_01';
+our $VERSION = '6.44';
 
 use File::Spec;
 BEGIN { our @ISA = qw(File::Spec); }

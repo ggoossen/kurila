@@ -34,3 +34,9 @@ print "ok $i\n"; ++$i;
 eval { my $a = opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
 print "not " if $@ && $@->{description} =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
+
+eval { Fatal->import(qw(print)) };
+if ($@ !~ m{Cannot make the non-overridable builtin print fatal}) {
+    print "not ";
+}
+print "ok $i\n"; ++$i;
