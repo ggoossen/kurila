@@ -56,7 +56,7 @@ sub rename_if_different {
 sub safer_open {
     my $name = shift;
     my $fh = gensym;
-    open $fh, ">$name" or die "Can't create $name: $!";
+    open $fh, ">", $name or die "Can't create $name: $!";
     *{$fh}->{SCALAR} = $name;
     binmode $fh;
     $fh;

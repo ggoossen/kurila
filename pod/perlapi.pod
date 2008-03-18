@@ -5529,16 +5529,6 @@ type coercion.
 =for hackers
 Found in file sv.c
 
-=item sv_pvbyten_force
-X<sv_pvbyten_force>
-
-The backend for the C<SvPVbytex_force> macro. Always use the macro instead.
-
-	char*	sv_pvbyten_force(SV *const sv, STRLEN *const lp)
-
-=for hackers
-Found in file sv.c
-
 =item sv_pvn_force
 X<sv_pvn_force>
 
@@ -5562,16 +5552,6 @@ You normally want to use the various wrapper macros instead: see
 C<SvPV_force> and C<SvPV_force_nomg>
 
 	char*	sv_pvn_force_flags(SV *const sv, STRLEN *const lp, const I32 flags)
-
-=for hackers
-Found in file sv.c
-
-=item sv_pvutf8n_force
-X<sv_pvutf8n_force>
-
-The backend for the C<SvPVutf8x_force> macro. Always use the macro instead.
-
-	char*	sv_pvutf8n_force(SV *const sv, STRLEN *const lp)
 
 =for hackers
 Found in file sv.c
