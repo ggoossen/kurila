@@ -111,6 +111,10 @@ C<use> a Perl module if a condition holds
 
 Use integer arithmetic instead of floating point
 
+=item kurila
+
+Perl Kurila
+
 =item less
 
 Request less of something
@@ -336,10 +340,6 @@ Digest base class
 =item Digest::file
 
 Calculate digests of files
-
-=item Dumpvalue
-
-Provides screen dump of Perl data.
 
 =item DynaLoader
 
@@ -644,10 +644,6 @@ Process single-character switches with switch clustering
 =item Hash::Util
 
 A selection of general-utility hash subroutines
-
-=item Hash::Util::FieldHash
-
-Support for Inside-Out Classes
 
 =item I18N::Collate
 
@@ -1169,6 +1165,10 @@ A selection of general-utility scalar subroutines
 
 Search for key in dictionary file
 
+=item SelectSaver
+
+Save and restore selected file handle
+
 =item Socket
 
 Load the C socket.h defines and structure manipulators 
@@ -1233,38 +1233,6 @@ Test testsuites that have been built with
 
 Turn on colour in Test::Builder::Tester
 
-=item Test::Harness
-
-Run Perl standard test scripts with statistics
-
-=item Test::Harness::Assert
-
-Simple assert
-
-=item Test::Harness::Iterator
-
-Internal Test::Harness Iterator
-
-=item Test::Harness::Point
-
-Object for tracking a single test point
-
-=item Test::Harness::Results
-
-Object for tracking results from a single test file
-
-=item Test::Harness::Straps
-
-Detailed analysis of test results
-
-=item Test::Harness::TAP
-
-Documentation for the TAP format
-
-=item Test::Harness::Util
-
-Utility functions for Test::Harness::*
-
 =item Test::More
 
 Yet another framework for writing test scripts
@@ -1328,10 +1296,6 @@ Base class definitions for tied hashes
 =item Tie::Hash::NamedCapture
 
 Named regexp capture buffers
-
-=item Tie::RefHash
-
-Use references as hash keys
 
 =item Tie::Scalar
 
