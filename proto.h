@@ -318,10 +318,7 @@ PERL_CALLCONV void	Perl_vcroak(pTHX_ const char* pat, va_list* args)
 #if defined(PERL_IMPLICIT_CONTEXT)
 PERL_CALLCONV void	Perl_croak_nocontext(const char* pat, ...)
 			__attribute__noreturn__
-			__attribute__format__(__printf__,1,2)
-			__attribute__nonnull__(1);
-#define PERL_ARGS_ASSERT_CROAK_NOCONTEXT	\
-	assert(pat)
+			__attribute__format__null_ok__(__printf__,1,2);
 
 PERL_CALLCONV void	Perl_die_nocontext(const char* pat, ...)
 			__attribute__format__(__printf__,1,2)
@@ -3648,7 +3645,7 @@ PERL_CALLCONV int	Perl_yywarn(pTHX_ const char *const s)
 	assert(s)
 
 #if defined(MYMALLOC)
-PERL_CALLCONV void	Perl_dump_mstats(pTHX_ char* s)
+PERL_CALLCONV void	Perl_dump_mstats(pTHX_ const char* s)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DUMP_MSTATS	\
 	assert(s)
