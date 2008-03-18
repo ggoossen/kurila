@@ -7293,47 +7293,6 @@ Perl_sv_pvn_force_flags(pTHX_ SV *const sv, STRLEN *const lp, const I32 flags)
 }
 
 /*
-<<<<<<< HEAD:sv.c
-=======
-=for apidoc sv_pvbyten_force
-
-The backend for the C<SvPVbytex_force> macro. Always use the macro instead.
-
-=cut
-*/
-
-char *
-Perl_sv_pvbyten_force(pTHX_ SV *const sv, STRLEN *const lp)
-{
-    PERL_ARGS_ASSERT_SV_PVBYTEN_FORCE;
-
-    sv_pvn_force(sv,lp);
-    sv_utf8_downgrade(sv,0);
-    *lp = SvCUR(sv);
-    return SvPVX(sv);
-}
-
-/*
-=for apidoc sv_pvutf8n_force
-
-The backend for the C<SvPVutf8x_force> macro. Always use the macro instead.
-
-=cut
-*/
-
-char *
-Perl_sv_pvutf8n_force(pTHX_ SV *const sv, STRLEN *const lp)
-{
-    PERL_ARGS_ASSERT_SV_PVUTF8N_FORCE;
-
-    sv_pvn_force(sv,lp);
-    sv_utf8_upgrade(sv);
-    *lp = SvCUR(sv);
-    return SvPVX(sv);
-}
-
-/*
->>>>>>> 7dcf65ca52e6dc018b8ae9d149d26f270ae6ac65:sv.c
 =for apidoc sv_reftype
 
 Returns a string describing what the SV is a reference to.
@@ -7666,7 +7625,7 @@ Perl_sv_bless(pTHX_ SV *const sv, HV *const stash)
  */
 
 STATIC void
-S_sv_unglob(pTHX_ SV *sv)
+S_sv_unglob(pTHX_ SV *const sv)
 {
     dVAR;
     void *xpvmg;
@@ -7723,7 +7682,7 @@ See C<SvROK_off>.
 */
 
 void
-Perl_sv_unref_flags(pTHX_ SV *ref, U32 flags)
+Perl_sv_unref_flags(pTHX_ SV *const ref, const U32 flags)
 {
     SV* const target = SvRV(ref);
 
@@ -7753,7 +7712,7 @@ Untaint an SV. Use C<SvTAINTED_off> instead.
 */
 
 void
-Perl_sv_untaint(pTHX_ SV *sv)
+Perl_sv_untaint(pTHX_ SV *const sv)
 {
     PERL_ARGS_ASSERT_SV_UNTAINT;
 
@@ -7772,7 +7731,7 @@ Test an SV for taintedness. Use C<SvTAINTED> instead.
 */
 
 bool
-Perl_sv_tainted(pTHX_ SV *sv)
+Perl_sv_tainted(pTHX_ SV *const sv)
 {
     PERL_ARGS_ASSERT_SV_TAINTED;
 
@@ -7794,7 +7753,7 @@ Does not handle 'set' magic.  See C<sv_setpviv_mg>.
 */
 
 void
-Perl_sv_setpviv(pTHX_ SV *sv, IV iv)
+Perl_sv_setpviv(pTHX_ SV *const sv, const IV iv)
 {
     char buf[TYPE_CHARS(UV)];
     char *ebuf;
@@ -7814,7 +7773,7 @@ Like C<sv_setpviv>, but also handles 'set' magic.
 */
 
 void
-Perl_sv_setpviv_mg(pTHX_ SV *sv, IV iv)
+Perl_sv_setpviv_mg(pTHX_ SV *const sv, const IV iv)
 {
     PERL_ARGS_ASSERT_SV_SETPVIV_MG;
 
@@ -7830,7 +7789,7 @@ Perl_sv_setpviv_mg(pTHX_ SV *sv, IV iv)
  */
 
 void
-Perl_sv_setpvf_nocontext(SV *sv, const char* pat, ...)
+Perl_sv_setpvf_nocontext(SV *const sv, const char *const pat, ...)
 {
     dTHX;
     va_list args;
@@ -7848,7 +7807,7 @@ Perl_sv_setpvf_nocontext(SV *sv, const char* pat, ...)
  */
 
 void
-Perl_sv_setpvf_mg_nocontext(SV *sv, const char* pat, ...)
+Perl_sv_setpvf_mg_nocontext(SV *const sv, const char *const pat, ...)
 {
     dTHX;
     va_list args;
@@ -7871,7 +7830,7 @@ appending it.  Does not handle 'set' magic.  See C<sv_setpvf_mg>.
 */
 
 void
-Perl_sv_setpvf(pTHX_ SV *sv, const char* pat, ...)
+Perl_sv_setpvf(pTHX_ SV *const sv, const char *const pat, ...)
 {
     va_list args;
 
@@ -7894,7 +7853,7 @@ Usually used via its frontend C<sv_setpvf>.
 */
 
 void
-Perl_sv_vsetpvf(pTHX_ SV *sv, const char* pat, va_list* args)
+Perl_sv_vsetpvf(pTHX_ SV *const sv, const char *const pat, va_list *const args)
 {
     PERL_ARGS_ASSERT_SV_VSETPVF;
 
@@ -7910,7 +7869,7 @@ Like C<sv_setpvf>, but also handles 'set' magic.
 */
 
 void
-Perl_sv_setpvf_mg(pTHX_ SV *sv, const char* pat, ...)
+Perl_sv_setpvf_mg(pTHX_ SV *const sv, const char *const pat, ...)
 {
     va_list args;
 
@@ -7932,7 +7891,7 @@ Usually used via its frontend C<sv_setpvf_mg>.
 */
 
 void
-Perl_sv_vsetpvf_mg(pTHX_ SV *sv, const char* pat, va_list* args)
+Perl_sv_vsetpvf_mg(pTHX_ SV *const sv, const char *const pat, va_list *const args)
 {
     PERL_ARGS_ASSERT_SV_VSETPVF_MG;
 
@@ -7948,7 +7907,7 @@ Perl_sv_vsetpvf_mg(pTHX_ SV *sv, const char* pat, va_list* args)
  */
 
 void
-Perl_sv_catpvf_nocontext(SV *sv, const char* pat, ...)
+Perl_sv_catpvf_nocontext(SV *const sv, const char *const pat, ...)
 {
     dTHX;
     va_list args;
@@ -7966,7 +7925,7 @@ Perl_sv_catpvf_nocontext(SV *sv, const char* pat, ...)
  */
 
 void
-Perl_sv_catpvf_mg_nocontext(SV *sv, const char* pat, ...)
+Perl_sv_catpvf_mg_nocontext(SV *const sv, const char *const pat, ...)
 {
     dTHX;
     va_list args;
