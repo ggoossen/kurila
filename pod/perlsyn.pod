@@ -632,8 +632,9 @@ You can use the C<continue> keyword to fall through from one
 case to the next:
 
     given($foo) {
-	when (/x/) { print '$foo contains an x'; continue }
-	when (/y/) { print '$foo contains a y' }
+	when (m/x/) { print '$foo contains an x'; continue }
+	when (m/y/) { print '$foo contains a y' }
+	default    { say '$foo does not contain a y' }
 	default    { print '$foo contains neither an x nor a y' }
     }
 
