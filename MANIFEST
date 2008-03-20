@@ -2559,6 +2559,7 @@ t/lib/compress/zlib-generic.pl	Compress::Zlib
 t/lib/contains_pod.xr		Pod-Parser test file
 t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
+t/lib/Dev/Null.pm		Module for testing Test::Harness	
 t/lib/Dummy.pm			Module for testing base.pm
 t/lib/feature/bundle		Tests for feature bundles
 t/lib/feature/implicit		Tests for implicit loading of feature.pm
@@ -2670,6 +2671,10 @@ t/sv/alarm.t			See if alarm works
 t/sv/anonsub.t			See if anonymous subroutines work
 t/op/concat.t			See if . works
 t/op/re.t			See if re core functions works
+t/op/ref_address.t			See if ref::address works
+t/op/ref_eq.t			See if \== and \!= work
+t/op/reftype.t			See if ref::reftype works
+t/sv/sv_2pv.t			See if stringification (sv_2pv) works
 t/op/view.t			See if view function works
 t/run/debugging.t		See if debugging runs work
 t/sv/args.t			See if operations on @_ work
