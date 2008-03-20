@@ -5740,11 +5740,10 @@ pv_display X<pv_display>, pv_escape X<pv_escape>, pv_pretty X<pv_pretty>
 pack_cat X<pack_cat>, sv_2pv_nolen X<sv_2pv_nolen>, sv_catpvn_mg
 X<sv_catpvn_mg>, sv_catsv_mg X<sv_catsv_mg>, sv_force_normal
 X<sv_force_normal>, sv_iv X<sv_iv>, sv_nolocking X<sv_nolocking>,
-sv_nounlocking X<sv_nounlocking>, sv_nv X<sv_nv>, sv_pv X<sv_pv>, sv_pvbyte
-X<sv_pvbyte>, sv_pvbyten X<sv_pvbyten>, sv_pvn X<sv_pvn>, sv_pvutf8
-X<sv_pvutf8>, sv_pvutf8n X<sv_pvutf8n>, sv_taint X<sv_taint>, sv_unref
-X<sv_unref>, sv_usepvn X<sv_usepvn>, sv_usepvn_mg X<sv_usepvn_mg>, sv_uv
-X<sv_uv>, unpack_str X<unpack_str>
+sv_nounlocking X<sv_nounlocking>, sv_nv X<sv_nv>, sv_pv X<sv_pv>, sv_pvn
+X<sv_pvn>, sv_taint X<sv_taint>, sv_unref X<sv_unref>, sv_usepvn
+X<sv_usepvn>, sv_usepvn_mg X<sv_usepvn_mg>, sv_uv X<sv_uv>, unpack_str
+X<unpack_str>
 
 =item Functions in file pp_ctl.c
 
@@ -5884,31 +5883,31 @@ SvIOK X<SvIOK>, SvIOKp X<SvIOKp>, SvIOK_notUV X<SvIOK_notUV>, SvIOK_off
 X<SvIOK_off>, SvIOK_on X<SvIOK_on>, SvIOK_only X<SvIOK_only>, SvIOK_only_UV
 X<SvIOK_only_UV>, SvIOK_UV X<SvIOK_UV>, SvIsCOW X<SvIsCOW>,
 SvIsCOW_shared_hash X<SvIsCOW_shared_hash>, SvIV X<SvIV>, SvIVX X<SvIVX>,
-SvIVx X<SvIVx>, SvIV_nomg X<SvIV_nomg>, SvIV_set X<SvIV_set>, SvLEN
-X<SvLEN>, SvLEN_set X<SvLEN_set>, SvMAGIC_set X<SvMAGIC_set>, SvNIOK
-X<SvNIOK>, SvNIOKp X<SvNIOKp>, SvNIOK_off X<SvNIOK_off>, SvNOK X<SvNOK>,
-SvNOKp X<SvNOKp>, SvNOK_off X<SvNOK_off>, SvNOK_on X<SvNOK_on>, SvNOK_only
-X<SvNOK_only>, SvNV X<SvNV>, SvNVX X<SvNVX>, SvNVx X<SvNVx>, SvNV_set
-X<SvNV_set>, SvOK X<SvOK>, SvOOK X<SvOOK>, SvOOK_offset X<SvOOK_offset>,
-SvPOK X<SvPOK>, SvPOKp X<SvPOKp>, SvPOK_off X<SvPOK_off>, SvPOK_on
-X<SvPOK_on>, SvPOK_only X<SvPOK_only>, SvPV X<SvPV>, SvPVX X<SvPVX>, SvPVx
-X<SvPVx>, SvPV_force X<SvPV_force>, SvPV_force_nomg X<SvPV_force_nomg>,
-SvPV_nolen X<SvPV_nolen>, SvPV_nomg X<SvPV_nomg>, SvPV_set X<SvPV_set>,
-SvREFCNT X<SvREFCNT>, SvREFCNT_dec X<SvREFCNT_dec>, SvREFCNT_inc
-X<SvREFCNT_inc>, SvREFCNT_inc_NN X<SvREFCNT_inc_NN>, SvREFCNT_inc_simple
-X<SvREFCNT_inc_simple>, SvREFCNT_inc_simple_NN X<SvREFCNT_inc_simple_NN>,
-SvREFCNT_inc_simple_void X<SvREFCNT_inc_simple_void>,
-SvREFCNT_inc_simple_void_NN X<SvREFCNT_inc_simple_void_NN>,
-SvREFCNT_inc_void X<SvREFCNT_inc_void>, SvREFCNT_inc_void_NN
-X<SvREFCNT_inc_void_NN>, SvROK X<SvROK>, SvROK_off X<SvROK_off>, SvROK_on
-X<SvROK_on>, SvRV X<SvRV>, SvRV_set X<SvRV_set>, SvSTASH X<SvSTASH>,
-SvSTASH_set X<SvSTASH_set>, SvTAINT X<SvTAINT>, SvTAINTED X<SvTAINTED>,
-SvTAINTED_off X<SvTAINTED_off>, SvTAINTED_on X<SvTAINTED_on>, SvTRUE
-X<SvTRUE>, SvTYPE X<SvTYPE>, SvUOK X<SvUOK>, SvUPGRADE X<SvUPGRADE>, SvUV
-X<SvUV>, SvUVX X<SvUVX>, SvUVx X<SvUVx>, SvUV_nomg X<SvUV_nomg>, SvUV_set
-X<SvUV_set>, sv_catpvn_nomg X<sv_catpvn_nomg>, sv_catsv_nomg
-X<sv_catsv_nomg>, sv_derived_from X<sv_derived_from>, sv_does X<sv_does>,
-sv_report_used X<sv_report_used>, sv_setsv_nomg X<sv_setsv_nomg>
+SvIV_nomg X<SvIV_nomg>, SvIV_set X<SvIV_set>, SvLEN X<SvLEN>, SvLEN_set
+X<SvLEN_set>, SvMAGIC_set X<SvMAGIC_set>, SvNIOK X<SvNIOK>, SvNIOKp
+X<SvNIOKp>, SvNIOK_off X<SvNIOK_off>, SvNOK X<SvNOK>, SvNOKp X<SvNOKp>,
+SvNOK_off X<SvNOK_off>, SvNOK_on X<SvNOK_on>, SvNOK_only X<SvNOK_only>,
+SvNV X<SvNV>, SvNVX X<SvNVX>, SvNV_set X<SvNV_set>, SvOK X<SvOK>, SvOOK
+X<SvOOK>, SvOOK_offset X<SvOOK_offset>, SvPOK X<SvPOK>, SvPOKp X<SvPOKp>,
+SvPOK_off X<SvPOK_off>, SvPOK_on X<SvPOK_on>, SvPOK_only X<SvPOK_only>,
+SvPV X<SvPV>, SvPVX X<SvPVX>, SvPVx X<SvPVx>, SvPV_force X<SvPV_force>,
+SvPV_force_nomg X<SvPV_force_nomg>, SvPV_nolen X<SvPV_nolen>, SvPV_nomg
+X<SvPV_nomg>, SvPV_set X<SvPV_set>, SvREFCNT X<SvREFCNT>, SvREFCNT_dec
+X<SvREFCNT_dec>, SvREFCNT_inc X<SvREFCNT_inc>, SvREFCNT_inc_NN
+X<SvREFCNT_inc_NN>, SvREFCNT_inc_simple X<SvREFCNT_inc_simple>,
+SvREFCNT_inc_simple_NN X<SvREFCNT_inc_simple_NN>, SvREFCNT_inc_simple_void
+X<SvREFCNT_inc_simple_void>, SvREFCNT_inc_simple_void_NN
+X<SvREFCNT_inc_simple_void_NN>, SvREFCNT_inc_void X<SvREFCNT_inc_void>,
+SvREFCNT_inc_void_NN X<SvREFCNT_inc_void_NN>, SvROK X<SvROK>, SvROK_off
+X<SvROK_off>, SvROK_on X<SvROK_on>, SvRV X<SvRV>, SvRV_set X<SvRV_set>,
+SvSTASH X<SvSTASH>, SvSTASH_set X<SvSTASH_set>, SvTAINT X<SvTAINT>,
+SvTAINTED X<SvTAINTED>, SvTAINTED_off X<SvTAINTED_off>, SvTAINTED_on
+X<SvTAINTED_on>, SvTRUE X<SvTRUE>, SvTYPE X<SvTYPE>, SvUOK X<SvUOK>,
+SvUPGRADE X<SvUPGRADE>, SvUV X<SvUV>, SvUVX X<SvUVX>, SvUV_nomg
+X<SvUV_nomg>, SvUV_set X<SvUV_set>, sv_catpvn_nomg X<sv_catpvn_nomg>,
+sv_catsv_nomg X<sv_catsv_nomg>, sv_derived_from X<sv_derived_from>, sv_does
+X<sv_does>, sv_report_used X<sv_report_used>, sv_setsv_nomg
+X<sv_setsv_nomg>
 
 =item SV-Body Allocation
 
@@ -5934,13 +5933,14 @@ sv_isa X<sv_isa>, sv_isobject X<sv_isobject>, sv_len X<sv_len>, sv_len_utf8
 X<sv_len_utf8>, sv_magic X<sv_magic>, sv_magicext X<sv_magicext>,
 sv_mortalcopy X<sv_mortalcopy>, sv_newmortal X<sv_newmortal>, sv_newref
 X<sv_newref>, sv_pos_b2u X<sv_pos_b2u>, sv_pos_u2b X<sv_pos_u2b>,
-sv_pvn_force_flags X<sv_pvn_force_flags>, sv_replace X<sv_replace>,
-sv_setiv X<sv_setiv>, sv_setiv_mg X<sv_setiv_mg>, sv_setnv X<sv_setnv>,
-sv_setnv_mg X<sv_setnv_mg>, sv_setpv X<sv_setpv>, sv_setpvf X<sv_setpvf>,
-sv_setpvf_mg X<sv_setpvf_mg>, sv_setpviv X<sv_setpviv>, sv_setpviv_mg
-X<sv_setpviv_mg>, sv_setpvn X<sv_setpvn>, sv_setpvn_mg X<sv_setpvn_mg>,
-sv_setpvs X<sv_setpvs>, sv_setpv_mg X<sv_setpv_mg>, sv_setref_iv
-X<sv_setref_iv>, sv_setref_nv X<sv_setref_nv>, sv_setref_pv
+sv_pvn_force X<sv_pvn_force>, sv_pvn_force_flags X<sv_pvn_force_flags>,
+sv_reftype X<sv_reftype>, sv_replace X<sv_replace>, sv_rvweaken
+X<sv_rvweaken>, sv_setiv X<sv_setiv>, sv_setiv_mg X<sv_setiv_mg>, sv_setnv
+X<sv_setnv>, sv_setnv_mg X<sv_setnv_mg>, sv_setpv X<sv_setpv>, sv_setpvf
+X<sv_setpvf>, sv_setpvf_mg X<sv_setpvf_mg>, sv_setpviv X<sv_setpviv>,
+sv_setpviv_mg X<sv_setpviv_mg>, sv_setpvn X<sv_setpvn>, sv_setpvn_mg
+X<sv_setpvn_mg>, sv_setpvs X<sv_setpvs>, sv_setpv_mg X<sv_setpv_mg>,
+sv_setref_iv X<sv_setref_iv>, sv_setref_nv X<sv_setref_nv>, sv_setref_pv
 X<sv_setref_pv>, sv_setref_pvn X<sv_setref_pvn>, sv_setref_uv
 X<sv_setref_uv>, sv_setsv X<sv_setsv>, sv_setsv_flags X<sv_setsv_flags>,
 sv_setsv_mg X<sv_setsv_mg>, sv_setuv X<sv_setuv>, sv_setuv_mg
@@ -6025,8 +6025,8 @@ magic_sethint X<magic_sethint>, mg_localize X<mg_localize>
 
 =item MRO Functions
 
-mro_get_linear_isa_c3 X<mro_get_linear_isa_c3>, mro_get_linear_isa_dfs
-X<mro_get_linear_isa_dfs>, mro_isa_changed_in X<mro_isa_changed_in>
+mro_get_linear_isa_c3 X<mro_get_linear_isa_c3>, mro_isa_changed_in
+X<mro_isa_changed_in>
 
 =item Pad Data Structures
 
@@ -6048,7 +6048,7 @@ X<PL_ofs_sv>, PL_rs X<PL_rs>
 
 =item Stack Manipulation Macros
 
-djSP X<djSP>, LVRET X<LVRET>
+djSP X<djSP>
 
 =item SV Manipulation Functions
 
@@ -22477,6 +22477,67 @@ modules, verbose, nocache
 =item Caveats
 
 =item ACKNOWLEDGEMENTS
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 Module::Load::Conditional - Looking up module information / loading
+at runtime
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item Methods
+
+=item $href = check_install( module => NAME [, version => VERSION, verbose
+=> BOOL ] );
+
+module, version, verbose, file, version, uptodate
+
+=back
+
+=over 4
+
+=item $bool = can_load( modules => { NAME => VERSION [,NAME => VERSION] },
+[verbose => BOOL, nocache => BOOL] )
+
+modules, verbose, nocache
+
+=back
+
+=over 4
+
+=item @list = requires( MODULE );
+
+=back
+
+=over 4
+
+=item Global Variables
+
+=over 4
+
+=item $Module::Load::Conditional::VERBOSE
+
+=item $Module::Load::Conditional::FIND_VERSION
+
+=item $Module::Load::Conditional::CHECK_INC_HASH
+
+=item $Module::Load::Conditional::CACHE
+
+=item $Module::Load::Conditional::ERROR
+
+=back
+
+=item See Also
 
 =item BUG REPORTS
 
