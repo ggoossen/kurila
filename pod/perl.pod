@@ -145,6 +145,7 @@ For ease of access, the Perl manual has been split up into several sections.
     perldoc		Look up Perl documentation in Pod format
 
     perlhist		Perl history records
+    kurila19delta       What is new for Perl Kurila 1.9
     kurila18delta       What is new for Perl Kurila 1.8
     kurila17delta       What is new for Perl Kurila 1.7
     kurila16delta       What is new for Perl Kurila 1.6
