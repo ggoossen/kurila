@@ -2183,6 +2183,7 @@ pod/kurila15delta.pod	What is new for Perl Kurila 1.5
 pod/kurila16delta.pod	What is new for Perl Kurila 1.6
 pod/kurila17delta.pod	What is new for Perl Kurila 1.7
 pod/kurila18delta.pod	What is new for Perl Kurila 1.8
+pod/kurila19delta.pod	What is new for Perl Kurila 1.9
 pod/kurilaintro.pod	Description of Perl Kurila
 pod/kurilatoc.pod		Perl Kurila documentation table of contents
 pod.lst				List the pods and their roles
