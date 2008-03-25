@@ -115,7 +115,6 @@ our %failing = map { $_, 1 } qw|
 ../t/op/symbolcache.t
 
 ../t/op/exec.t
-../t/io/say.t
 
 ../t/op/state.t
 ../t/op/tiehandle.t
@@ -250,4 +249,15 @@ state $x = 4;
 my $x;
 "$x->@"
 ########
+s/\Q$(\E(INSTALL(?!DIRS)${MACRO_RE})\Q)\E/\$(DEST$1)/g;
+########
 $a !~ tr/a-z//;
+########
+s/foo/$bar/;
+s/$foo/$bar/;
+########
+$a =~ s/$foo/$bar/;
+########
+my $msg = "ce ºtii tu, bã ?\n";
+use utf8;
+my $msg = "ce ºtii tu, bã ?\n";

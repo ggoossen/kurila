@@ -2281,11 +2281,12 @@ Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len, int utf8)
   retry:
     while (pv < e) {
 	if (utf8) {
-	    c = utf8_to_uvchr((U8*)pv, &cl);
-	    if (cl == 0) {
-		SvCUR(dsv) = dsvcur;
-		pv = start;
-		utf8 = 0;
+	    c = utf8n_to_uvchr((U8*)pv, UTF8_MAXBYTES, &cl, UTF8_CHECK_ONLY);
+	    if ( (cl == (STRLEN)-1) ) {
+		c = ((U8)*pv & 0xFF);
+		Perl_sv_catpvf(aTHX_ dsv, "STUPIDXML(#x[%X])", c);
+		pv++;
+
 		goto retry;
 	    }
 	}
