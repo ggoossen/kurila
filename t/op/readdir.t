@@ -48,5 +48,5 @@ if (opendir($fh[0], "op")) { print "ok 6\n"; } else { print "not ok 6\n"; }
 if (ref($fh[0]) eq 'GLOB') { print "ok 7\n"; } else { print "not ok 7\n"; }
 if (opendir($fh{abc}, "op")) { print "ok 8\n"; } else { print "not ok 8\n"; }
 if (ref($fh{abc}) eq 'GLOB') { print "ok 9\n"; } else { print "not ok 9\n"; }
-if ("$fh" ne "$fh[0]") { print "ok 10\n"; } else { print "not ok 10\n"; }
-if ("$fh" ne "$fh{abc}") { print "ok 11\n"; } else { print "not ok 11\n"; }
+if (not $fh \== $fh[0]) { print "ok 10\n"; } else { print "not ok 10\n"; }
+if (not $fh \== $fh{abc}) { print "ok 11\n"; } else { print "not ok 11\n"; }

@@ -15,7 +15,8 @@ our $test;
     cmp_ok("@mapped", 'eq', "3 0 3", 'map scalar list of list');
 
     my @grepped = grep {scalar @$_} @lol;
-    cmp_ok("@grepped", 'eq', "$lol[0] $lol[2]", 'grep scalar list of list');
+    cmp_ok( (join ' ', map { dump::view($_) } @grepped), 'eq',
+            dump::view($lol[0]) . ' ' . dump::view($lol[2]), 'grep scalar list of list');
     $test++;
 
     @grepped = grep { $_ } @mapped;

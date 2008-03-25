@@ -4665,46 +4665,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		(goto-char (match-beginning b1))
 		(kurila-backward-to-noncomment (point-min))
 		(or bb
-		    (if (eq b1 11)	; bare /blah/ or ?blah? or <foo>
-			(setq argument ""
-			      b1 nil
-			      bb	; Not a regexp?
-			      (progn
-				(not
-				 ;; What is below: regexp-p?
-				 (and
-				  (or (memq (preceding-char)
-					    (append (if (memq c '(?\? ?\<))
-							;; $a++ ? 1 : 2
-							"~{(=|&*!,;:"
-						      "~{(=|&+-*!,;:") nil))
-				      (and (eq (preceding-char) ?\})
-					   (kurila-after-block-p (point-min)))
-				      (and (eq (char-syntax (preceding-char)) ?w)
-					   (progn
-					     (forward-sexp -1)
-;;; After these keywords `/' starts a RE.  One should add all the
-;;; functions/builtins which expect an argument, but ...
-					     (if (eq (preceding-char) ?-)
-						 ;; -d ?foo? is a RE
-						 (looking-at "[a-zA-Z]\\>")
-					       (and
-						(not (memq (preceding-char)
-							   '(?$ ?@ ?& ?%)))
-						(looking-at
-						 "\\(while\\|if\\|unless\\|until\\|and\\|or\\|not\\|xor\\|split\\|grep\\|map\\|print\\)\\>")))))
-				      (and (eq (preceding-char) ?.)
-					   (eq (char-after (- (point) 2)) ?.))
-				      (bobp))
-				  ;;  m|blah| ? foo : bar;
-				  (not
-				   (and (eq c ?\?)
-					kurila-use-syntax-table-text-property
-					(not (bobp))
-					(progn
-					  (forward-char -1)
-					  (looking-at "\\s|")))))))
-			      b (1- b))
+                    (progn
 		      ;; s y tr m
 		      ;; Check for $a -> y
 		      (setq b1 (preceding-char)

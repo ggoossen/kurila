@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl" }
 
-plan tests => 10;
+plan tests => 11;
 
 is dump::view('foo'), q|'foo'|;
 is dump::view("'foo"), q|"'foo"|;
@@ -14,5 +14,9 @@ is dump::view(*foo), '*main::foo';
 is dump::view(15), '15';
 is dump::view(15.55), '15.55';
 is dump::view(undef), q|undef|, "undef";
+{
+    local $TODO = 1;
+    is dump::view(qr/foo/), '...', "view regex";
+}
 like dump::view(\"foobar"), qr/SCALAR[(]0x\w*[)]/;
 

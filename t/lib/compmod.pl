@@ -11,8 +11,7 @@ my $module = shift;
 eval "use $module ();";
 if( $@ ) {
     print "not ";
-    $@ =~ s/\n/\n# /g;
-    warn "# require failed with '$@'\n";
+    warn "# require failed with {dump::view($@->message)}\n";
 }
 print "ok - $module\n";
 

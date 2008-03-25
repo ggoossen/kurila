@@ -178,11 +178,11 @@ Perl_safesysrealloc(Malloc_t where,MEM_SIZE size)
     ptr = (Malloc_t)PerlMem_realloc(where,size);
     PERL_ALLOC_CHECK(ptr);
 
-    DEBUG_m(PerlIO_printf(Perl_debug_log, "0x%"UVxf": (%05ld) rfree\n",PTR2UV(where),(long)PL_an++));
-    DEBUG_m(PerlIO_printf(Perl_debug_log, "0x%"UVxf": (%05ld) realloc %ld bytes\n",PTR2UV(ptr),(long)PL_an++,(long)size));
-
-    if (ptr != NULL) {
+    /* MUST do this fixup first, before doing ANYTHING else, as anything else
+       might allocate memory/free/move memory, and until we do the fixup, it
+       may well be chasing (and writing to) free memory.  */
 #ifdef PERL_TRACK_MEMPOOL
+    if (ptr != NULL) {
 	struct perl_memory_debug_header *const header
 	    = (struct perl_memory_debug_header *)ptr;
 
@@ -198,7 +198,17 @@ Perl_safesysrealloc(Malloc_t where,MEM_SIZE size)
 	header->prev->next = header;
 
         ptr = (Malloc_t)((char*)ptr+sTHX);
+    }
 #endif
+
+    /* In particular, must do that fixup above before logging anything via
+     *printf(), as it can reallocate memory, which can cause SEGVs.  */
+
+    DEBUG_m(PerlIO_printf(Perl_debug_log, "0x%"UVxf": (%05ld) rfree\n",PTR2UV(where),(long)PL_an++));
+    DEBUG_m(PerlIO_printf(Perl_debug_log, "0x%"UVxf": (%05ld) realloc %ld bytes\n",PTR2UV(ptr),(long)PL_an++,(long)size));
+
+
+    if (ptr != NULL) {
 	return ptr;
     }
     else if (PL_nomemok)
@@ -1224,7 +1234,12 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     if ( *hook == NULL ) {
 	const char *msg;
 	STRLEN msglen;
-	msg = SvPV_const(msv, msglen);
+	if (SvPOK(msv))
+	    msg = SvPV_const(msv, msglen);
+	else {
+	    msg = "Unknown error";
+	    msglen = strlen(msg);
+	}
 	write_to_stderr(msg, msglen);
 	return FALSE;
     }
@@ -1238,7 +1253,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 
     ENTER;
     SAVESPTR(*hook);
-    *hook = NULL;
+    *hook = PERL_DIEHOOK_IGNORE;
     cv = sv_2cv(oldhook, &stash, &gv, 0);
     LEAVE;
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
@@ -1295,9 +1310,6 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	}
     }
 
-    DEBUG_S(PerlIO_printf(Perl_debug_log,
-			  "%p: die/croak\ndiehook = %p\n",
-			  (void*)thr, (void*)PL_diehook));
     vdie_common(msv, FALSE);
     return msv;
 }
@@ -1307,10 +1319,6 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
 {
     dVAR;
     SV* msv;
-
-    DEBUG_S(PerlIO_printf(Perl_debug_log,
-			  "%p: die: curstack = %p, mainstack = %p\n",
-			  (void*)thr, (void*)PL_curstack, (void*)PL_mainstack));
 
     msv = vdie_croak_common(pat, args);
     die_where(msv);
@@ -1348,7 +1356,6 @@ Perl_croak_nocontext(const char *pat, ...)
 {
     dTHX;
     va_list args;
-    PERL_ARGS_ASSERT_CROAK_NOCONTEXT;
     va_start(args, pat);
     vdie(pat, &args);
     /* NOTREACHED */
@@ -2927,6 +2934,7 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 #endif
     if (result < 0 && errno == EINTR) {
 	PERL_ASYNC_CHECK();
+	errno = EINTR; /* reset in case a signal handler changed $! */
     }
     return result;
 }

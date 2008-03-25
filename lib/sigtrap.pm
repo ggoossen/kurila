@@ -6,8 +6,6 @@ sigtrap - Perl pragma to enable simple signal handling
 
 =cut
 
-use Carp;
-
 $VERSION = 1.04;
 $Verbose ||= 0;
 
@@ -24,7 +22,7 @@ sub import {
 	if (m/^[A-Z][A-Z0-9]*$/) {
 	    $saw_sig++;
 	    unless ($untrapped and $SIG{$_} and $SIG{$_} ne 'DEFAULT') {
-		print "Installing handler $handler for $_\n" if $Verbose;
+		print "Installing handler {dump::view($handler)} for $_\n" if $Verbose;
 		$SIG{$_} = $handler;
 	    }
 	}
@@ -47,7 +45,7 @@ sub import {
 	    $handler = \&handler_die;
 	}
 	elsif ($_ eq 'handler') {
-	    @_ or croak "No argument specified after 'handler'";
+	    @_ or die "No argument specified after 'handler'";
 	    $handler = shift;
 	    unless (ref $handler or $handler eq 'IGNORE'
 			or $handler eq 'DEFAULT') {
@@ -62,11 +60,11 @@ sub import {
 	    $untrapped = 0;
 	}
 	elsif ($_ =~ m/^\d/) {
-	    $VERSION +>= $_ or croak "sigtrap.pm version $_ required,"
+	    $VERSION +>= $_ or die "sigtrap.pm version $_ required,"
 		    	    	    	. " but this is only version $VERSION";
 	}
 	else {
-	    croak "Unrecognized argument $_";
+	    die "Unrecognized argument $_";
 	}
     }
     unless ($saw_sig) {
@@ -76,7 +74,7 @@ sub import {
 }
 
 sub handler_die {
-    croak "Caught a SIG$_[0]";
+    die "Caught a SIG$_[0]";
 }
 
 sub handler_traceback {
@@ -173,7 +171,7 @@ handler.
 =item B<die>
 
 The handler used for subsequently installed signals calls C<die>
-(actually C<croak>) with a message indicating which signal was caught.
+with a message indicating which signal was caught.
 
 =item B<handler> I<your-handler>
 

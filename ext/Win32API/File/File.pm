@@ -12,7 +12,7 @@ use vars qw( @EXPORT @EXPORT_OK @EXPORT_FAIL %EXPORT_TAGS );
 
 $VERSION= '0.1001_01';
 
-use base qw( Exporter DynaLoader Tie::Handle IO::File );
+use base qw( DynaLoader Tie::Handle IO::File Exporter );
 
 # Math::BigInt optimizations courtesy of Tels
 my $_64BITINT;
@@ -152,7 +152,7 @@ my $FFFFFFFF   = $_64BITINT ? 0xFFFFFFFF : Math::BigInt->new(0xFFFFFFFF);
     my $key;
     foreach $key (  keys(%EXPORT_TAGS)  ) {
 	push( @EXPORT_OK, @{$EXPORT_TAGS{$key}} );
-	#push( @EXPORT_FAIL, @{$EXPORT_TAGS{$key}} )   unless  $key =~ /^Func/;
+	#push( @EXPORT_FAIL, @{$EXPORT_TAGS{$key}} )   unless  $key =~ m/^Func/;
     }
 }
 $EXPORT_TAGS{ALL}= \@EXPORT_OK;
@@ -177,16 +177,16 @@ if(  ! defined &GENERIC_READ  ) {
 sub fileConstant
 {
     my( $name )= @_;
-    if(  1 != @_  ||  ! $name  ||  $name =~ /\W/  ) {
+    if(  1 != @_  ||  ! $name  ||  $name =~ m/\W/  ) {
 	require Carp;
 	Carp::croak( 'Usage: ',__PACKAGE__,'::fileConstant("CONST_NAME")' );
     }
     my $proto= prototype $name;
-    if(  defined \&*{Symbol::fetch_glob($name)}
+    if(  defined \&{*{Symbol::fetch_glob($name)}}
      &&  defined $proto
      &&  "" eq $proto  ) {
 	no strict 'refs';
-	return &*{Symbol::fetch_glob($name)};
+	return \&{*{Symbol::fetch_glob($name)}};
     }
     return undef;
 }
@@ -238,7 +238,7 @@ package Win32API::File;
 my $_error = Win32API::File::_error->new();
 
 sub fileLastError {
-    croak 'Usage: ',__PACKAGE__,'::fileLastError( [$setWin32ErrCode] )'	if @_ > 1;
+    croak 'Usage: ',__PACKAGE__,'::fileLastError( [$setWin32ErrCode] )'	if @_ +> 1;
     $_error->set($_[0]) if defined $_[0];
     return $_error;
 }
@@ -265,15 +265,15 @@ sub OsFHandleOpen {
     }
     my( $fh, $osfh, $access )= @_;
     if(  ! ref($fh)  ) {
-	if(  $fh !~ /('|::)/  ) {
+	if(  $fh !~ m/('|::)/  ) {
 	    $fh= caller() . "::" . $fh;
 	}
 	no strict "refs";
 	$fh= \*{$fh};
     }
     my( $mode, $pref );
-    if(  $access =~ /r/i  ) {
-	if(  $access =~ /w/i  ) {
+    if(  $access =~ m/r/i  ) {
+	if(  $access =~ m/w/i  ) {
 	    $mode= O_RDWR;
 	    $pref= "+<";
 	} else {
@@ -281,7 +281,7 @@ sub OsFHandleOpen {
 	    $pref= "<";
 	}
     } else {
-	if(  $access =~ /w/i  ) {
+	if(  $access =~ m/w/i  ) {
 	    $mode= O_WRONLY;
 	    $pref= ">";
 	} else {
@@ -291,20 +291,20 @@ sub OsFHandleOpen {
 	    $pref= "<";
 	}
     }
-    $mode ^|^= O_APPEND   if  $access =~ /a/i;
-    #$mode |= O_TEXT   if  $access =~ /t/i;
+    $mode ^|^= O_APPEND   if  $access =~ m/a/i;
+    #$mode |= O_TEXT   if  $access =~ m/t/i;
     # Some versions of the Fcntl module are broken and won't autoload O_TEXT:
-    if(  $access =~ /t/i  ) {
+    if(  $access =~ m/t/i  ) {
 	my $o_text= eval "O_TEXT";
 	$o_text= 0x4000   if  $@;
 	$mode ^|^= $o_text;
     }
-    $mode ^|^= O_BINARY   if  $access =~ /b/i;
+    $mode ^|^= O_BINARY   if  $access =~ m/b/i;
     my $fd = eval { OsFHandleOpenFd( $osfh, $mode ) };
     if ($@) {
 	return tie *{$fh}, __PACKAGE__, $osfh;
     }
-    return  undef if  $fd < 0;
+    return  undef if  $fd +< 0;
     return  open( $fh, $pref."&=".$fd );
 }
 
@@ -314,14 +314,11 @@ sub GetOsFHandle {
     }
     my( $file )= @_;
     if(  ! ref($file)  ) {
-	if(  $file !~ /('|::)/  ) {
+	if(  $file !~ m/('|::)/  ) {
 	    $file= caller() . "::" . $file;
 	}
 	no strict "refs";
-	# The eval "" is necessary in Perl 5.6, avoid it otherwise.
-	my $tied = !defined($^]) || $^] < 5.008
-                       ? eval "tied *{$file}"
-                       : tied *{$file};
+	my $tied = tied *{$file};
 
 	if (UNIVERSAL::isa($tied => __PACKAGE__)) {
 		return $tied->win32_handle;
@@ -331,7 +328,7 @@ sub GetOsFHandle {
     }
     my( $fd )= fileno($file);
     if(  ! defined( $fd )  ) {
-	if(  $file =~ /^\d+\Z/  ) {
+	if(  $file =~ m/^\d+\Z/  ) {
 	    $fd= $file;
 	} else {
 	    return ();	# $! should be set by fileno().
@@ -403,7 +400,7 @@ sub attrLetsToBits
       "r"=>FILE_ATTRIBUTE_READONLY(),	"s"=>FILE_ATTRIBUTE_SYSTEM(),
       "t"=>FILE_ATTRIBUTE_TEMPORARY() );
     my( $bits )= 0;
-    foreach(  split(//,$lets)  ) {
+    foreach(  split(m//,$lets)  ) {
 	croak "Win32API::File::attrLetsToBits: Unknown attribute letter ($_)"
 	  unless  exists $a{$_};
 	$bits ^|^= $a{$_};
@@ -419,14 +416,14 @@ use vars qw( @_createFile_Opts %_createFile_Opts );
 sub createFile
 {
     my $opts= "";
-    if(  2 <= @_  &&  "HASH" eq ref($_[$#_])  ) {
+    if(  2 +<= @_  &&  "HASH" eq ref($_[$#_])  ) {
 	$opts= pop( @_ );
     }
     my( $sPath, $svAccess, $svShare )= @_;
-    if(  @_ < 1  ||  3 < @_  ) {
+    if(  @_ +< 1  ||  3 +< @_  ) {
 	croak "Win32API::File::createFile() usage:  \$hObject= createFile(\n",
 	      "  \$sPath, [\$svAccess_qrw_ktn_ce,[\$svShare_rwd,]]",
-	      " [{Option=>\$Value}] )\n",
+	      " [\{Option=>\$Value\}] )\n",
 	      "    options: @_createFile_Opts\nCalled";
     }
     my( $create, $flags, $sec, $model )= ( "", 0, [], 0 );
@@ -444,13 +441,13 @@ sub createFile
     }
     $svAccess= "r"		unless  defined($svAccess);
     $svShare= "rw"		unless  defined($svShare);
-    if(  $svAccess =~ /^[qrw ktn ce]*$/i  ) {
+    if(  $svAccess =~ m/^[qrw ktn ce]*$/i  ) {
 	( my $c= $svAccess ) =~ tr/qrw QRW//d;
 	$create= $c   if  "" ne $c  &&  "" eq $create;
 	local( $_ )= $svAccess;
 	$svAccess= 0;
-	$svAccess ^|^= GENERIC_READ()   if  /r/i;
-	$svAccess ^|^= GENERIC_WRITE()   if  /w/i;
+	$svAccess ^|^= GENERIC_READ()   if  m/r/i;
+	$svAccess ^|^= GENERIC_WRITE()   if  m/w/i;
     } elsif(  "?" eq $svAccess  ) {
 	croak
 	  "Win32API::File::createFile:  \$svAccess can use the following:\n",
@@ -471,14 +468,14 @@ sub createFile
 	      "  'rw' is the same as 'rw k c'\n",
 	      "  'rt' or 'rn' implies 'c'.\n",
 	      "  Or \$svAccess can be numeric.\n", "Called from";
-    } elsif(  $svAccess == 0  &&  $svAccess !~ /^[-+.]*0/  ) {
+    } elsif(  $svAccess == 0  &&  $svAccess !~ m/^[-+.]*0/  ) {
 	croak "Win32API::File::createFile:  Invalid \$svAccess ($svAccess)";
     }
-    if(  $create =~ /^[ktn ce]*$/  ) {
+    if(  $create =~ m/^[ktn ce]*$/  ) {
         local( $_ )= $create;
-        my( $k, $t, $n, $c, $e )= ( scalar(/k/i), scalar(/t/i),
-	  scalar(/n/i), scalar(/c/i), scalar(/e/i) );
-	if(  1 < $k + $t + $n  ) {
+        my( $k, $t, $n, $c, $e )= ( scalar(m/k/i), scalar(m/t/i),
+	  scalar(m/n/i), scalar(m/c/i), scalar(m/e/i) );
+	if(  1 +< $k + $t + $n  ) {
 	    croak "Win32API::File::createFile: \$create must not use ",
 	      qq<more than one of "k", "t", and "n" ($create)>;
 	}
@@ -506,20 +503,20 @@ sub createFile
 	    }
 	}
     } elsif(  "?" eq $create  ) {
-	croak 'Win32API::File::createFile: $create !~ /^[ktn ce]*$/;',
+	croak 'Win32API::File::createFile: $create !~ m/^[ktn ce]*$/;',
 	      ' pass $svAccess as "?" for more information.';
     } elsif(  $create == 0  &&  $create ne "0"  ) {
 	croak "Win32API::File::createFile: Invalid \$create ($create)";
     }
-    if(  $svShare =~ /^[drw]*$/  ) {
+    if(  $svShare =~ m/^[drw]*$/  ) {
         my %s= ( "d"=>FILE_SHARE_DELETE(), "r"=>FILE_SHARE_READ(),
 	         "w"=>FILE_SHARE_WRITE() );
-        my @s= split(//,$svShare);
+        my @s= split(m//,$svShare);
 	$svShare= 0;
 	foreach( @s ) {
 	    $svShare ^|^= $s{$_};
 	}
-    } elsif(  $svShare == 0  &&  $svShare !~ /^[-+.]*0/  ) {
+    } elsif(  $svShare == 0  &&  $svShare !~ m/^[-+.]*0/  ) {
 	croak "Win32API::File::createFile: Invalid \$svShare ($svShare)";
     }
     return  CreateFileA(
@@ -535,12 +532,12 @@ sub getLogicalDrives
 	return undef;
     }
     if(  ! defined($ref)  ) {
-	return  split( /\0/, $s );
+	return  split( m/\0/, $s );
     } elsif(  "ARRAY" ne ref($ref)  ) {
 	croak 'Usage:  C<@arr= getLogicalDrives()> ',
 	      'or C<getLogicalDrives(\\@arr)>', "\n";
     }
-    @$ref= split( /\0/, $s );
+    @$ref= split( m/\0/, $s );
     return $ref;
 }
 
@@ -602,7 +599,7 @@ sub OPEN {
 # FIXME: this needs to parse the full Perl open syntax in $expr
 
 	my ($mixed, $mode, $path) =
-		($expr =~ /^\s* (\+)? \s* (<|>|>>)? \s* (.*?) \s*$/x);
+		($expr =~ m/^\s* (\+)? \s* (<|>|>>)? \s* (.*?) \s*$/x);
 
 	croak "Unsupported open mode" if not $path;
 
@@ -676,14 +673,14 @@ sub READ {
 	my $data;
 	$offset        = 0 if not defined $offset;
 
-	if ($buf_length >= $len) {
+	if ($buf_length +>= $len) {
 		$data       = substr($buffer, 0, $len => "");
 		$bytes_read = $len;
 		$self->_buffer($buffer);
 	} else {
-		if ($buf_length > 0) {
+		if ($buf_length +> 0) {
 			$len -= $buf_length;
-			substr($$into, $offset) = $buffer;
+			substr($$into, $offset, undef, $buffer);
 			$offset += $buf_length;
 		}
 
@@ -697,7 +694,7 @@ sub READ {
 
 	$$into = "" if not defined $$into;
 
-	substr($$into, $offset) = $data;
+	substr($$into, $offset, undef, $data);
 
 	return $bytes_read;
 }

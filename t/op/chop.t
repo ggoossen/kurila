@@ -140,14 +140,11 @@ is (chop(@stuff{1, 3}), '4');
 # chomp should not stringify references unless it decides to modify them
 $_ = [];
 $/ = "\n";
-$got = chomp();
-ok ($got == 0) or print "# got $got\n";
-is (ref($_), "ARRAY", "chomp ref (modify)");
-
+dies_like( sub { $got = chomp(); }, qr/reference as string/, "chomp ref" );
+is (ref($_), "ARRAY", "chomp ref (no modify)");
 $/ = ")";  # the last char of something like "ARRAY(0x80ff6e4)"
-$got = chomp();
-ok ($got == 1) or print "# got $got\n";
-ok (!ref($_), "chomp ref (no modify)");
+dies_like( sub { $got = chomp(); }, qr/reference as string/, "chomp ref no modify" );
+is (ref($_), "ARRAY", "chomp ref (no modify)");
 
 $/ = "\n";
 

@@ -1,6 +1,7 @@
 package Log::Message::Item;
 
 use strict;
+use Carp;
 use Params::Check qw[check];
 use Log::Message::Handlers;
 

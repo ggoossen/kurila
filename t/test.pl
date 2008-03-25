@@ -176,6 +176,9 @@ sub is ($$@) {
         # undef only matches undef
         $pass = !defined $got && !defined $expected;
     }
+    elsif (ref $got and ref $expected) {
+        $pass = $got \== $expected;
+    }
     else {
         local $@;
         $pass = eval { $got eq $expected };
@@ -195,6 +198,9 @@ sub isnt ($$@) {
     if( !defined $got || !defined $isnt ) {
         # undef only matches undef
         $pass = defined $got || defined $isnt;
+    }
+    elsif (ref $got and ref $isnt) {
+        $pass = $got \!= $isnt;
     }
     else {
         $pass = $got ne $isnt;
@@ -225,7 +231,8 @@ sub cmp_ok ($$$@) {
         # (all string operators have alphabetic names, so tr/a-z// is true)
         # This will also show numbers for some uneeded cases, but will
         # definately be helpful for things such as == and <= that fail
-        if ($got eq $expected and $type !~ tr/a-z//) {
+        if (not ref $got and not ref $expected
+            and $got eq $expected and $type !~ tr/a-z//) {
             unshift @mess, "# $got - $expected = " . ($got - $expected) . "\n";
         }
         unshift(@mess, "#      got "._q($got)."\n",

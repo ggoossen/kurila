@@ -127,7 +127,7 @@ for my $test (
     ok(eq_array( [ eval { call_pv('d', $flags, @$args) }, $@->{description} ],
 	[ "its_dead_jim\n" ]), "$description eval \{ call_pv('d') \}");
 
-    ok(eq_array( [ eval { eval_sv('d', $flags), $@ }, $@ ],
+    ok(eq_array( [ eval { eval_sv('d', $flags), $@ && $@->message }, $@ && $@->message ],
 	[ @$returnval,
 		"its_dead_jim\n", '' ]),
 	"$description eval \{ eval_sv('d') \}");

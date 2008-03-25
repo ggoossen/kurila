@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 103;
+plan tests => 104;
 
 our ($x, $f);
 
@@ -29,11 +29,11 @@ is($_, "aBCDEFGHIJKLMNOPQRSTUVWXYz",    'partial uc');
 # untouched (and not became \x8a).
 {
     no utf8;
-    $_ = "I\xcaJ";
+    $_ = "I\x[ca]J";
 
     tr/I-J/i-j/;
 
-    is($_, "i\xcaj",    'EBCDIC discontinuity');
+    is($_, "i\x[ca]j",    'EBCDIC discontinuity');
 }
 #
 
@@ -165,10 +165,10 @@ eval_dies_like( '"123" =~ tr/1/2/',
 # Transliterate a byte to a byte, all four ways.
 {
     use bytes;
-    ($a = "a\xc4b\xc4") =~ tr/\xc4/\xc5/;
-    is($a, "a\xc5b\xc5",    'byte2byte transliteration');
+    ($a = "a\x[c4]b\x[c4]") =~ tr/\x[c4]/\x[c5]/;
+    is($a, "a\x[c5]b\x[c5]",    'byte2byte transliteration');
 
-    is((($a = "a\xc4b\xc4") =~ tr/\xc4/\xc5/), 2,
+    is((($a = "a\x[c4]b\x[c4]") =~ tr/\x[c4]/\x[c5]/), 2,
        'transliterate and count');
 }
 
@@ -238,11 +238,11 @@ is($a, "X");
 
 {
 use bytes;
-$c = ($a = "\x89\x8a\x8b\x8c\x8d\x8f\x90\x91") =~ tr/\x89-\x91/X/;
+$c = ($a = "\x[89]\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]\x[91]") =~ tr/\x[89]-\x[91]/X/;
 is($c, 8);
 is($a, "XXXXXXXX");
 
-$c = ($a = "\xc9\xca\xcb\xcc\xcd\xcf\xd0\xd1") =~ tr/\xc9-\xd1/X/;
+$c = ($a = "\x[c9]\x[ca]\x[cb]\x[cc]\x[cd]\x[cf]\x[d0]\x[d1]") =~ tr/\x[c9]-\x[d1]/X/;
 is($c, 8);
 is($a, "XXXXXXXX");
 }
@@ -250,23 +250,23 @@ is($a, "XXXXXXXX");
 SKIP: {
     skip "not EBCDIC", 4 unless $Is_EBCDIC;
 
-    $c = ($a = "\x89\x8a\x8b\x8c\x8d\x8f\x90\x91") =~ tr/i-j/X/;
+    $c = ($a = "\x[89]\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]\x[91]") =~ tr/i-j/X/;
     is($c, 2);
-    is($a, "X\x8a\x8b\x8c\x8d\x8f\x90X");
+    is($a, "X\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]X");
    
-    $c = ($a = "\xc9\xca\xcb\xcc\xcd\xcf\xd0\xd1") =~ tr/I-J/X/;
+    $c = ($a = "\x[c9]\x[ca]\x[cb]\x[cc]\x[cd]\x[cf]\x[d0]\x[d1]") =~ tr/I-J/X/;
     is($c, 2);
-    is($a, "X\xca\xcb\xcc\xcd\xcf\xd0X");
+    is($a, "X\x[ca]\x[cb]\x[cc]\x[cd]\x[cf]\x[d0]X");
 }
 
 my $x = "\x{100}";
 use bytes;
 {
     local $TODO = "byte range";
-    ($a = $x) =~ tr/\x00-\xff/X/c;
+    ($a = $x) =~ tr/\x[00]-\x[ff]/X/c;
     is(ord($a), ord("X"), "byte tr///");
 
-    ($a = $x) =~ tr/\x00-\xff/X/cs;
+    ($a = $x) =~ tr/\x[00]-\x[ff]/X/cs;
     is(ord($a), ord("X"), "byte tr///");
 }
 
@@ -328,7 +328,7 @@ is( $@, '',         'implicit count outside hash bounds' );
 is( scalar keys %foo, 0,   "    doesn't extend the hash");
 
 $x = \"foo";
-ok $x =~ tr/A/A/;
+dies_like( sub { $x =~ tr/A/A/; }, qr/Tried to use reference as string/ );
 is( ref $x, 'SCALAR', "    doesn't stringify its argument" );
 
 # rt.perl.org 36622.  Perl didn't like a y/// at end of file.  No trailing
@@ -415,3 +415,10 @@ is($s, "AxBC", "utf8, DELETE");
     is($c, "\x20\x30\x40\x50\x60", "tr/\\x00-\\x1f//d");
 }
 
+($s) = keys %{{pie => 3}};
+my $wasro = Internals::SvREADONLY($s);
+{
+    $wasro or local $TODO = "didn't have a COW";
+    $s =~ tr/i//;
+    ok( Internals::SvREADONLY($s), "count-only tr doesn't deCOW COWs" );
+}

@@ -148,20 +148,6 @@ EXPECT
 Unsuccessful stat on filename containing newline at - line 3.
 Unsuccessful stat on filename containing newline at - line 4.
 ########
-# doio.c [Perl_my_stat]
-use warnings 'io';
--l STDIN;
--l $fh;
-open $fh, "<", $0 or die "# $!";
--l $fh;
-no warnings 'io';
--l STDIN;
--l $fh;
-close $fh;
-EXPECT
-Use of -l on filehandle STDIN at - line 3.
-Use of -l on filehandle $fh at - line 6.
-########
 # doio.c [Perl_do_aexec5]
 BEGIN {
     if ($^O eq 'MacOS') {
@@ -281,9 +267,9 @@ EOM
 }
 use warnings 'io' ;
 close STDOUT;
-open FH1, "<", "harness"; close FH1;
+open FH1, "<", "TEST"; close FH1;
 no warnings 'io' ;
-open FH2, "<", "harness"; close FH2;
+open FH2, "<", "TEST"; close FH2;
 EXPECT
 Filehandle STDOUT reopened as FH1 only for input at - line 14.
 ########

@@ -1,4 +1,4 @@
-# $Id: /local/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm 41372 2008-01-02T00:07:06.491251Z schwern  $
+# $Id: /local/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm 54639 2008-02-29T00:06:55.056100Z schwern  $
 package ExtUtils::MakeMaker;
 
 use strict;
@@ -15,8 +15,8 @@ my @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
 
-our $VERSION = '6.43_01';
-our ($Revision) = q$Revision: 41372 $ =~ m/Revision:\s+(\S+)/;
+our $VERSION = '6.44';
+our ($Revision) = q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/;
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
 our @ISA = qw(Exporter);
@@ -787,7 +787,7 @@ sub _run_hintfile {
     local @INC = (File::Spec->curdir, @INC);
     my $ret = do $hint_file;
     if( !defined $ret ) {
-        my $error = $@ || $!;
+        my $error = $@ && $@->message || $!;
         print STDERR $error;
     }
 }
@@ -802,7 +802,7 @@ sub mv_all_methods {
 
     local ${^WARN_HOOK} = sub { 
         # can't use 'no warnings redefined', 5.6 only
-        warn @_ unless $_[0] =~ m/^Subroutine .* redefined/ 
+        warn $_[0]->message unless $_[0]->message =~ m/^Subroutine .* redefined/ 
     };
     foreach my $method (@Overridable) {
 
@@ -960,7 +960,7 @@ sub neatvalue {
         push @m, "]";
         return join "", @m;
     }
-    return "$v" unless $t eq 'HASH';
+    return dump::view($v) unless $t eq 'HASH';
     my(@m, $key, $val);
     while (($key,$val) = each %$v){
         last unless defined $key; # cautious programming in case (undef,undef) is true
@@ -2173,7 +2173,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION   = '1.00';
     *VERSION   = \'1.01';
-    ($VERSION) = q$Revision: 41372 $ =~ /(\d+)/g;
+    ($VERSION) = q$Revision: 54639 $ =~ /(\d+)/g;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
 

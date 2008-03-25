@@ -114,7 +114,7 @@ $heavy_txt .= <<'ENDOFBEG';
 # made to this file will be lost the next time perl is built.
 
 package Config;
-use strict;
+# use strict;
 # use warnings; Pulls in Carp
 # use vars pulls in Carp
 
@@ -133,7 +133,7 @@ $config_txt .= sprintf <<'ENDOFBEG', ($myver) x 3;
 # made to this file will be lost the next time perl is built.
 
 package Config;
-use strict;
+# use strict;
 # use warnings; Pulls in Carp
 # use vars pulls in Carp
 @Config::EXPORT = qw(%%Config);
@@ -141,11 +141,6 @@ use strict;
 
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
-
-sub myconfig;
-sub config_sh;
-sub config_vars;
-sub config_re;
 
 my %%Export_Cache = map {($_ => 1)} (@Config::EXPORT, @Config::EXPORT_OK);
 
@@ -698,14 +693,12 @@ my $fast_config = join '', map { "    $_,\n" } sort values %Common;
 # &launcher for some reason (eg it got truncated)
 $config_txt .= sprintf <<'ENDOFTIE', $fast_config;
 
-sub DESTROY { }
-
 my @heavy_subs = (qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
                      config_vars|);
 for my $name (@heavy_subs) {
-    Symbol::fetch_glob($name)->* =
+    Symbol::fetch_glob("Config::$name")->* =
        sub { require 'Config_heavy.pl';
-             goto &{Symbol::fetch_glob($name)->*};
+             goto &{Symbol::fetch_glob("Config::$name")->*};
            };
 }
 

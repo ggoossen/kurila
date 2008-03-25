@@ -700,7 +700,7 @@ EOM
     main::ok(92, $@ eq "") ;
 
     my $ret = eval '$h{"fred"} = 3 ; return $h{"fred"} ' ;
-    main::ok(93, $@ eq "") ;
+    main::ok(93, ! $@) ;
     main::ok(94, $ret == 5) ;
 
     my $value = 0;

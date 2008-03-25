@@ -124,7 +124,7 @@ my $t;
 $t = $p->get_token;
 ok $t && $t->type, 'start';
 ok $t && $t->tagname, 'Document';
-print "# ungetting ($t).\n";
+print "# ungetting ({dump::view($t)}).\n";
 $p->unget_token($t);
 ok 1;
 
@@ -138,7 +138,7 @@ ok $t && $t->type, 'start';
 ok $t && $t->tagname, 'Para';
 push @to_save, $t;
 
-print "# ungetting (@to_save).\n";
+print "# ungetting ({dump::view(\@to_save)}.\n";
 $p->unget_token(@to_save);
 splice @to_save;
 

@@ -928,8 +928,6 @@ Perl_die_where(pTHX_ SV *msv)
 		SV * const nsv = cx->blk_eval.old_namesv;
                 (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                                &PL_sv_undef, 0);
-/* 		DIE(aTHX_ "%sCompilation failed in require", */
-/* 		    *message ? message : "Unknown error\n"); */
 		die_where(ERRSV);
 	    }
 	    assert(CxTYPE(cx) == CXt_EVAL);
@@ -2761,13 +2759,7 @@ PP(pp_require)
 		    AV * const ar = GvAVn(PL_incgv);
 		    I32 i;
 		    SV * const msg = sv_2mortal(Perl_newSVpvf(aTHX_ 
-			"%s in @INC%s%s (@INC contains:",
-			msgstr,
-			(instr(msgstr, ".h ")
-			 ? " (change .h to .ph maybe?)" : ""),
-			(instr(msgstr, ".ph ")
-			 ? " (did you run h2ph?)" : "")
-							      ));
+			"%s in @INC (@INC contains:", msgstr));
 		    
 		    for (i = 0; i <= AvFILL(ar); i++) {
 			sv_catpvs(msg, " ");
@@ -3515,6 +3507,7 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	    }
 	    RETPUSHNO;
 	}
+	RETPUSHNO;
     }
     else if (!SvOK(d) || !SvOK(e)) {
 	if (!SvOK(d) && !SvOK(e))
@@ -3589,6 +3582,13 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	    RETPUSHYES;
 	else
 	    RETPUSHNO;
+    }
+    else if ( SvROK(d) && SvROK(e) ) {
+	PUSHs(boolSV(SvRV(d) == SvRV(e)));
+	RETURN;
+    }
+    else if ( SvROK(d) || SvROK(e) ) {
+	RETPUSHNO;
     }
     
     /* As a last resort, use string comparison */

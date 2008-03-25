@@ -20,7 +20,7 @@ BEGIN {
         if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
 
-    plan tests => 910 + $extra ;
+    plan tests => 907 + $extra ;
 
     use_ok('Compress::Raw::Zlib') ;
     use_ok('IO::Compress::Gzip::Constants') ;
@@ -356,7 +356,6 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
                                    => "SubField Data too long"],
 
             [ { 'abc', 1 }        => "SubField ID not two chars long"],
-            [ { \1 , "abc" }    => "SubField ID not two chars long"],
             [ { "ab", \1 }     => "SubField Data is a reference"],
         );
 
@@ -543,7 +542,7 @@ EOM
     {
         title "Header Corruption - Fingerprint wrong 2nd byte" ;
         my $buffer = $good ;
-        substr($buffer, 1, 1, "\xFF") ;
+        substr($buffer, 1, 1, "\x[FF]") ;
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
         ok $GunzipError =~ m/Header Error: Bad Magic/;
@@ -562,7 +561,7 @@ EOM
     {
         title "Header Corruption - Use of Reserved Flags";
         my $buffer = $good ;
-        substr($buffer, 3, 1, "\xff");
+        substr($buffer, 3, 1, "\x[ff]");
 
         ok ! IO::Uncompress::Gunzip->new( \$buffer, -Transparent => 0)  ;
         like $GunzipError, '/Header Error: Use of Reserved Bits in FLG field./';
@@ -607,7 +606,7 @@ EOM
     title "Header Corruption - Create Name with Illegal Chars";
 
     my $x;
-    eval { IO::Compress::Gzip->new( \$x, -Name => "fred\x02") };
+    eval { IO::Compress::Gzip->new( \$x, -Name => "fred\x[02]") };
     like $@->{description}, mkErr('Non ISO 8859-1 Character found in Name');
     like $GzipError, '/Non ISO 8859-1 Character found in Name/';
 

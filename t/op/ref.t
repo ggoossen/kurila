@@ -212,7 +212,7 @@ is ($object->doit("BAR"), 'bar');
 # Test not working indirect-object-style method invocation.
 
 eval q{$foo = doit $object "FOO";};
-main::isnt (@$, 'foo');
+main::like($@->message, qr/syntax error at/);
 
 sub BASEOBJ::doit {
     local $ref = shift;
@@ -493,7 +493,7 @@ is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
     eval q/ *$ref /;
     is($@, '', "Glob dereference of PVIO is acceptable");
 
-    is($ref, *{$ref}{IO}, "IO slot of the temporary glob is set correctly");
+    cmp_ok($ref, '\==', *{$ref}{IO}, "IO slot of the temporary glob is set correctly");
 }
 
 # Bit of a hack to make test.pl happy. There are 3 more tests after it leaves.

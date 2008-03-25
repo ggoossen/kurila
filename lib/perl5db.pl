@@ -513,8 +513,6 @@ BEGIN {eval 'use IO::Handle'};	# Needed for flush only? breaks under miniperl
 # Debugger for Perl 5.00x; perl5db.pl patch level:
 $VERSION = 1.30;
 
-use Carp::Heavy;
-
 $header = "perl5db.pl version $VERSION";
 
 =head1 DEBUGGER ROUTINES
@@ -1034,9 +1032,6 @@ warn(               # Do not ;-)
     # used to save @ARGV and extract any debugger-related flags.
     @ARGS,
 
-    # used to control die() reporting in diesignal()
-    $Carp::CarpLevel,
-
     # used to prevent multiple entries to diesignal()
     # (if for instance diesignal() itself dies)
     $panic,
@@ -1231,16 +1226,6 @@ share($CommandSet);
 
 =pod
 
-The default C<die>, C<warn>, and C<signal> handlers are set up.
-
-=cut
-
-warnLevel($warnLevel);
-dieLevel($dieLevel);
-signalLevel($signalLevel);
-
-=pod
-
 The pager to be used is needed next. We try to get it from the
 environment first.  If it's not defined there, we try to find it in
 the Perl C<Config.pm>.  If it's not there, we default to C<more>. We
@@ -1264,6 +1249,16 @@ pager(
     : 'more'
   )
   unless defined $pager;
+
+=pod
+
+The default C<die>, C<warn>, and C<signal> handlers are set up.
+
+=cut
+
+warnLevel($warnLevel);
+dieLevel($dieLevel);
+signalLevel($signalLevel);
 
 =pod
 
@@ -1403,7 +1398,7 @@ EO_GRIPE
     } ## end unless (is_safe_file($file...
 
     do $file;
-    CORE::warn("perldb: couldn't parse $file: $@") if $@;
+    CORE::warn("perldb: couldn't parse $file\: {$@->message}") if $@;
 } ## end sub safe_do
 
 # This is the safety test itself.
@@ -3631,19 +3626,15 @@ sub sub {
 	# lock ourselves under threads
 	lock($DBGR);
 
-    # Whether or not the autoloader was running, a scalar to put the
-    # sub's return value in (if needed), and an array to put the sub's
-    # return value in (if needed).
-    my ( $al, $ret, @ret ) = "";
-	if ($sub =~ m/^threads::new$/ && $ENV{PERL5DB_THREADED}) {
+        # Whether or not the autoloader was running, a scalar to put the
+        # sub's return value in (if needed), and an array to put the sub's
+        # return value in (if needed).
+        my ( $ret, @ret ) = "";
+        my $subname = ref $sub ? dump::view($sub) : $sub;
+        $sub = ref $sub ? $sub : \&{Symbol::fetch_glob($sub)->*};
+	if ( $subname =~ m/^threads::new$/ && $ENV{PERL5DB_THREADED}) {
 		print "creating new thread\n"; 
 	}
-
-    # If the last ten characters are '::AUTOLOAD', note we've traced
-    # into AUTOLOAD for $sub.
-    if ( length($sub) +> 10 && substr( $sub, -10, 10 ) eq '::AUTOLOAD' ) {
-        $al = " for $$sub" if defined $$sub;
-    }
 
     # We stack the stack pointer and then increment it to protect us
     # from a situation that might unwind a whole bunch of call frames
@@ -3674,9 +3665,9 @@ sub sub {
             # Because print_trace will call add 1 to it and then call
             # dump_trace; this results in our skipping -1+1 = 0 stack frames
             # in dump_trace.
-            print_trace( $LINEINFO, -1, 1, 1, "$sub$al" )
+            print_trace( $LINEINFO, -1, 1, 1, "$subname" )
           )
-        : print_lineinfo( ' ' x ( $stack_depth - 1 ), "entering $sub$al\n" )
+        : print_lineinfo( ' ' x ( $stack_depth - 1 ), "entering $subname\n" )
 
           # standard frame entry message
       )
@@ -3688,7 +3679,7 @@ sub sub {
         # Called in array context. call sub and capture output.
         # DB::DB will recursively get control again if appropriate; we'll come
         # back here when the sub is finished.
-	@ret = &{Symbol::fetch_glob($sub)->*};
+	@ret = &{$sub};
 
         # Pop the single-step value back off the stack.
         $single ^|^= $stack[ $stack_depth-- ];
@@ -3698,9 +3689,9 @@ sub sub {
             $frame ^&^ 4    # Extended exit message
             ? (
                 print_lineinfo( ' ' x $stack_depth, "out " ),
-                print_trace( $LINEINFO, -1, 1, 1, "$sub$al" )
+                print_trace( $LINEINFO, -1, 1, 1, "$subname" )
               )
-            : print_lineinfo( ' ' x $stack_depth, "exited $sub$al\n" )
+            : print_lineinfo( ' ' x $stack_depth, "exited $subname\n" )
 
               # Standard exit message
           )
@@ -3717,7 +3708,7 @@ sub sub {
             print $fh ' ' x $stack_depth if $frame ^&^ 16;
 
             # Print the return value.
-            print $fh "list context return from $sub:\n";
+            print $fh "list context return from $subname:\n";
             dumpit( $fh, \@ret );
 
             # And don't print it again.
@@ -3732,12 +3723,12 @@ sub sub {
 	if ( defined wantarray ) {
 
 	    # Save the value if it's wanted at all.
-	    $ret = &{*{Symbol::fetch_glob($sub)}};
+	    $ret = &{$sub};
 	}
 	else {
 
 	    # Void return, explicitly.
-	    &{*{Symbol::fetch_glob($sub)}};
+	    &{$sub};
 	    undef $ret;
 	}
 
@@ -3749,9 +3740,9 @@ sub sub {
             $frame ^&^ 4    # Extended messsages
             ? (
                 print_lineinfo( ' ' x $stack_depth, "out " ),
-                print_trace( $LINEINFO, -1, 1, 1, "$sub$al" )
+                print_trace( $LINEINFO, -1, 1, 1, "$subname" )
               )
-            : print_lineinfo( ' ' x $stack_depth, "exited $sub$al\n" )
+            : print_lineinfo( ' ' x $stack_depth, "exited $subname\n" )
 
               # Standard messages
           )
@@ -3764,8 +3755,8 @@ sub sub {
             print $fh ( ' ' x $stack_depth ) if $frame ^&^ 16;
             print $fh (
                 defined wantarray
-                ? "scalar context return from $sub: "
-                : "void context return from $sub\n"
+                ? "scalar context return from $subname: "
+                : "void context return from $subname\n"
             );
             dumpit( $fh, $ret ) if defined wantarray;
             $doret = -2;
@@ -5341,7 +5332,7 @@ debugger output.
 sub print_lineinfo {
 
     # Make the terminal sensible if we're not the primary debugger.
-    resetterm(1) if $LINEINFO eq $OUT and $term_pid != $$;
+    resetterm(1) if $LINEINFO \== $OUT and $term_pid != $$;
     local $\ = '';
     local $, = '';
     print $LINEINFO @_;
@@ -6621,7 +6612,7 @@ sub parse_options {
           && defined $val;
 
         # Not initialization - echo the value we set it to.
-        dump_option($option) unless $OUT eq \*STDERR;
+        dump_option($option) unless $OUT \== \*STDERR;
     } ## end while (length)
 } ## end sub parse_options
 
@@ -7590,25 +7581,9 @@ sub diesignal {
     # abort signal (so we just terminate).
     kill 'ABRT', $$ if $panic++;
 
-    # If we can show detailed info, do so.
-    if ( defined &Carp::longmess ) {
-
-        # Don't recursively enter the warn handler, since we're carping.
-        local ${^WARN_HOOK} = '';
-
-        # Skip two levels before reporting traceback: we're skipping
-        # mydie and confess.
-        local $Carp::CarpLevel = 2;    # mydie + confess
-
-        # Tell us all about it.
-        &warn( Carp::longmess("Signal @_") );
-    }
-
-    # No Carp. Tell us about the signal as best we can.
-    else {
-        local $\ = '';
-        print $DB::OUT "Got signal @_\n";
-    }
+    local $\ = '';
+    print $DB::OUT "Got signal: \n";
+    print $DB::OUT "@_\n";
 
     # Drop dead.
     kill 'ABRT', $$;
@@ -7616,8 +7591,8 @@ sub diesignal {
 
 =head2 C<dbwarn>
 
-The debugger's own default C<$SIG{__WARN__}> handler. We load C<Carp> to
-be able to get a stack trace, and output the warning message vi C<DB::dbwarn()>.
+The debugger's own default C<$SIG{__WARN__}> handler. We output the
+warning message vi C<DB::dbwarn()>.
 
 =cut
 
@@ -7634,27 +7609,12 @@ sub dbwarn {
     local ${^WARN_HOOK} = '';
     local ${^DIE_HOOK}  = '';
 
-    # Load Carp if we can. If $^S is false (current thing being compiled isn't
-    # done yet), we may not be able to do a require.
-    if (defined $^S) {    # If error/warning during compilation,
-                         # require may be broken.
-        eval { require Carp; };
-    }
-
-    # Use the core warn() unless Carp loaded OK.
-    CORE::warn( @_,
-        "\nCannot print stack trace, load with -MCarp option to see stack" ),
-      return
-      unless defined &Carp::longmess;
-
     # Save the current values of $single and $trace, and then turn them off.
     my ( $mysingle, $mytrace ) = ( $single, $trace );
     $single = 0;
     $trace  = 0;
 
-    # We can call Carp::longmess without its being "debugged" (which we
-    # don't want - we just want to use it!). Capture this for later.
-    my $mess = Carp::longmess(@_);
+    my $mess = $_[0]->message;
 
     # Restore $single and $trace to their original values.
     ( $single, $trace ) = ( $mysingle, $mytrace );
@@ -7666,10 +7626,7 @@ sub dbwarn {
 
 =head2 C<dbdie>
 
-The debugger's own C<$SIG{__DIE__}> handler. Handles providing a stack trace
-by loading C<Carp> and calling C<Carp::longmess()> to get it. We turn off 
-single stepping and tracing during the call to C<Carp::longmess> to avoid 
-debugging it - we just want to use it.
+The debugger's own C<$SIG{__DIE__}> handler.
 
 If C<dieLevel> is zero, we let the program being debugged handle the
 exceptions. If it's 1, you get backtraces for any exception. If it's 2,
@@ -7695,15 +7652,6 @@ sub dbdie {
         die @_ if $^S;    # in eval propagate
     }
 
-    # The code used to check $^S to see if compiliation of the current thing
-    # hadn't finished. We don't do it anymore, figuring eval is pretty stable.
-    eval { require Carp };
-    die if $@;
-
-    die( @_,
-        "\nCannot print stack trace, load with -MCarp option to see stack" )
-      unless defined &Carp::longmess;
-
     # We do not want to debug this chunk (automatic disabling works
     # inside DB::DB, but not in Carp). Save $single and $trace, turn them off,
     # get the stack trace from Carp::longmess (if possible), restore $signal
@@ -7711,14 +7659,9 @@ sub dbdie {
     my ( $mysingle, $mytrace ) = ( $single, $trace );
     $single = 0;
     $trace  = 0;
-    my $mess = "@_";
-    {
-
-        package Carp;    # Do not include us in the list
-        eval { $mess = Carp::longmess(@_); };
-    }
+    my $mess = $_[0]->message;
     ( $single, $trace ) = ( $mysingle, $mytrace );
-    die $mess;
+    print STDERR $mess;
 } ## end sub dbdie
 
 =head2 C<warnlevel()>
@@ -8177,8 +8120,6 @@ my @pods = qw(
         delete $ENV{MANPATH};
     }
 } ## end sub runman
-
-#use Carp;                          # This did break, left for debugging
 
 =head1 DEBUGGER INITIALIZATION - THE SECOND BEGIN BLOCK
 

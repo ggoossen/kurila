@@ -125,7 +125,7 @@ foreach my $BLOCK (qw(CHECK INIT)) {
         $BLOCK \{ threads->create(sub \{\})->join; \}
         print 'ok';
 EOI
-}
+    }
 
 # Scalars leaked: 1
 fresh_perl_is(<<'EOI', 'ok', { }, 'Bug #41138');

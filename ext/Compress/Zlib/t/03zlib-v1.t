@@ -126,7 +126,7 @@ ok $hello eq $uncompr ;
 $compr = compress(\$hello) ;
 ok $compr ne "" ;
 
-substr($compr,0, 1, "\xFF");
+substr($compr,0, 1, "\x[FF]");
 ok !defined uncompress (\$compr) ;
 
 # deflate/inflate - small buffer

@@ -18,13 +18,6 @@ require IO::File;
     output_record_separator
     input_record_separator
     input_line_number
-    format_page_number
-    format_lines_per_page
-    format_lines_left
-    format_name
-    format_top_name
-    format_line_break_characters
-    format_formfeed
 
     print
     printf
@@ -35,6 +28,7 @@ require IO::File;
 #
 # Everything we're willing to export, we must first import.
 #
+require IO::Handle;
 IO::Handle->import(grep { !defined(&$_) } @EXPORT, @EXPORT_OK);
 
 #
@@ -46,7 +40,7 @@ IO::Handle->import(grep { !defined(&$_) } @EXPORT, @EXPORT_OK);
 
     my %import = (
 	'IO::Handle' =>
-	    [qw(DESTROY new_from_fd fdopen close fileno getc ungetc gets
+	    [qw(new_from_fd fdopen close fileno getc ungetc gets
 		eof flush error clearerr setbuf setvbuf _open_mode_string)],
 	'IO::Seekable' =>
 	    [qw(seek tell getpos setpos)],

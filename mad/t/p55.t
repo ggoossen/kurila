@@ -112,8 +112,6 @@ our %failing = map { $_, 1 } qw|
 
 ../t/op/exec.t
 
-** sources filters **
-../ext/Encode/t/jperl.t
 |;
 
 my @files;

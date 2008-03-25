@@ -555,8 +555,6 @@ more like
 And then at least you can use the values(), which will be
 real refs, instead of the keys(), which won't.
 
-The standard Tie::RefHash module provides a convenient workaround to this.
-
 =head1 SEE ALSO
 
 Besides the obvious documents, source code can be instructive.

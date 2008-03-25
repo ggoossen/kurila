@@ -11,8 +11,6 @@ my %Cache;
 
 our (%PropertyAlias, %PA_reverse, %PropValueAlias, %PVA_reverse, %PVA_abbr_map);
 
-# sub croak { require Carp; Carp::croak(@_) }
-
 ##
 ## "SWASH" == "SWATCH HASH". A "swatch" is a swatch of the Unicode landscape.
 ## It's a data structure that encodes a set of Unicode characters.

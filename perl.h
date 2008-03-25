@@ -3560,7 +3560,7 @@ Gid_t getegid (void);
 #define DEBUG_H_FLAG		0x00002000 /*   8192 */
 #define DEBUG_X_FLAG		0x00004000 /*  16384 */
 #define DEBUG_D_FLAG		0x00008000 /*  32768 */
-#define DEBUG_S_FLAG		0x00010000 /*  65536 */
+/* 0x00010000 is unused, used to be S */
 #define DEBUG_T_FLAG		0x00020000 /* 131072 */
 #define DEBUG_R_FLAG		0x00040000 /* 262144 */
 #define DEBUG_J_FLAG		0x00080000 /* 524288 */
@@ -3568,7 +3568,7 @@ Gid_t getegid (void);
 #define DEBUG_C_FLAG		0x00200000 /*2097152 */
 #define DEBUG_A_FLAG		0x00400000 /*4194304 */
 #define DEBUG_q_FLAG		0x00800000 /*8388608 */
-#define DEBUG_MASK		0x00FFEFFF /* mask of all the standard flags */
+#define DEBUG_MASK		0x00FEEFFF /* mask of all the standard flags */
 
 #define DEBUG_DB_RECURSE_FLAG	0x40000000
 #define DEBUG_TOP_FLAG		0x80000000 /* XXX what's this for ??? Signal
@@ -3590,7 +3590,6 @@ Gid_t getegid (void);
 #  define DEBUG_H_TEST_ (PL_debug & DEBUG_H_FLAG)
 #  define DEBUG_X_TEST_ (PL_debug & DEBUG_X_FLAG)
 #  define DEBUG_D_TEST_ (PL_debug & DEBUG_D_FLAG)
-#  define DEBUG_S_TEST_ (PL_debug & DEBUG_S_FLAG)
 #  define DEBUG_T_TEST_ (PL_debug & DEBUG_T_FLAG)
 #  define DEBUG_R_TEST_ (PL_debug & DEBUG_R_FLAG)
 #  define DEBUG_J_TEST_ (PL_debug & DEBUG_J_FLAG)
@@ -3619,7 +3618,6 @@ Gid_t getegid (void);
 #  define DEBUG_H_TEST DEBUG_H_TEST_
 #  define DEBUG_X_TEST DEBUG_X_TEST_
 #  define DEBUG_D_TEST DEBUG_D_TEST_
-#  define DEBUG_S_TEST DEBUG_S_TEST_
 #  define DEBUG_T_TEST DEBUG_T_TEST_
 #  define DEBUG_R_TEST DEBUG_R_TEST_
 #  define DEBUG_J_TEST DEBUG_J_TEST_
@@ -3667,8 +3665,6 @@ Gid_t getegid (void);
 #  define DEBUG_Xv(a) DEBUG__(DEBUG_Xv_TEST, a)
 #  define DEBUG_Uv(a) DEBUG__(DEBUG_Uv_TEST, a)
 
-#  define DEBUG_S(a)
-
 #  define DEBUG_T(a) DEBUG__(DEBUG_T_TEST, a)
 #  define DEBUG_R(a) DEBUG__(DEBUG_R_TEST, a)
 #  define DEBUG_v(a) DEBUG__(DEBUG_v_TEST, a)
@@ -3694,7 +3690,6 @@ Gid_t getegid (void);
 #  define DEBUG_H_TEST (0)
 #  define DEBUG_X_TEST (0)
 #  define DEBUG_D_TEST (0)
-#  define DEBUG_S_TEST (0)
 #  define DEBUG_T_TEST (0)
 #  define DEBUG_R_TEST (0)
 #  define DEBUG_J_TEST (0)
@@ -3723,7 +3718,6 @@ Gid_t getegid (void);
 #  define DEBUG_H(a)
 #  define DEBUG_X(a)
 #  define DEBUG_D(a)
-#  define DEBUG_S(a)
 #  define DEBUG_T(a)
 #  define DEBUG_R(a)
 #  define DEBUG_v(a)
@@ -4058,6 +4052,8 @@ struct perl_memory_debug_header {
 	(MEM_ALIGNBYTES - sizeof(struct perl_memory_debug_header) \
 	 %MEM_ALIGNBYTES) % MEM_ALIGNBYTES)
 
+#else
+#  define sTHX	0
 #endif
 
 #ifdef PERL_TRACK_MEMPOOL
@@ -4070,6 +4066,21 @@ struct perl_memory_debug_header {
 #  define INIT_TRACK_MEMPOOL(header, interp)
 #endif
 
+#ifdef MYMALLOC
+#  define Perl_safesysmalloc_size(where)	Perl_malloced_size(where)
+#else
+#   ifdef HAS_MALLOC_SIZE
+#	define Perl_safesysmalloc_size(where)			\
+	    (malloc_size(((char *)(where)) - sTHX) - sTHX)
+#   endif
+#   ifdef HAS_MALLOC_GOOD_SIZE
+#	define Perl_malloc_good_size(how_much)			\
+	    (malloc_good_size((how_much) + sTHX) - sTHX)
+#   else
+/* Having this as the identity operation makes some code simpler.  */
+#	define Perl_malloc_good_size(how_much)	(how_much)
+#   endif
+#endif
 
 typedef int (CPERLscope(*runops_proc_t)) (pTHX);
 typedef void (CPERLscope(*share_proc_t)) (pTHX_ SV *sv);
@@ -4631,7 +4642,7 @@ typedef regexp*(CPERLscope(*regdupe_t)) (pTHX_ const regexp* r, CLONE_PARAMS *pa
 typedef void (*DESTRUCTORFUNC_NOCONTEXT_t) (void*);
 typedef void (*DESTRUCTORFUNC_t) (pTHX_ void*);
 typedef void (*SVFUNC_t) (pTHX_ SV* const);
-typedef I32  (*SVCOMPARE_t) (pTHX_ SV*, SV*);
+typedef I32  (*SVCOMPARE_t) (pTHX_ SV* const, SV* const);
 typedef void (*XSINIT_t) (pTHX);
 typedef void (*ATEXIT_t) (pTHX_ void*);
 typedef void (*XSUBADDR_t) (pTHX_ CV *);

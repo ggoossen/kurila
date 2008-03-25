@@ -26,7 +26,7 @@ EOT
 
 my @tests = (
     [
-        "perl-store\x041234\4\4\4\xD4\xC2\32\b\3\13\0\0\0v\b\xC5\32\b...",
+        "perl-store\x[04]1234\4\4\4\x[D4]\x[C2]\32\b\3\13\0\0\0v\b\x[C5]\32\b...",
         {
           byteorder  => 1234,
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.1.le32",
@@ -40,7 +40,7 @@ my @tests = (
         },
     ],
     [
-        "perl-store\0\x041234\4\4\4\x8Co\34\b\3\13\0\0\0v\x94v\34...",
+        "perl-store\0\x[04]1234\4\4\4\x[8C]o\34\b\3\13\0\0\0v\x[94]v\34...",
         {
           byteorder  => 1234,
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.4_07.le32",

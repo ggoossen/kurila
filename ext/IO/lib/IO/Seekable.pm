@@ -94,7 +94,6 @@ Derived from FileHandle.pm by Graham Barr E<lt>gbarr@pobox.comE<gt>
 
 =cut
 
-use Carp;
 use strict;
 our($VERSION, @EXPORT, @ISA);
 use IO::Handle ();
@@ -110,17 +109,17 @@ $VERSION = "1.10";
 $VERSION = eval $VERSION;
 
 sub seek {
-    @_ == 3 or croak 'usage: $io->seek(POS, WHENCE)';
+    @_ == 3 or die 'usage: $io->seek(POS, WHENCE)';
     seek($_[0], $_[1], $_[2]);
 }
 
 sub sysseek {
-    @_ == 3 or croak 'usage: $io->sysseek(POS, WHENCE)';
+    @_ == 3 or die 'usage: $io->sysseek(POS, WHENCE)';
     sysseek($_[0], $_[1], $_[2]);
 }
 
 sub tell {
-    @_ == 1 or croak 'usage: $io->tell()';
+    @_ == 1 or die 'usage: $io->tell()';
     tell($_[0]);
 }
 

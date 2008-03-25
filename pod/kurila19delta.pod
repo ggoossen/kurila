@@ -1,0 +1,67 @@
+=head1 NAME
+
+kurila19delta - what is new for Perl Kurila 1.9
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.8 and Perl Kurila 1.9
+
+=head1 Highlights In Perl Kurila 1.9
+
+=over 4
+
+=item *
+
+Conversion of a reference to a string raises an error
+
+=item *
+
+New reference comparison operators \== and \!=
+
+=item *
+
+Integrate bleadperl changes upto Change 33541
+
+=back
+
+=head1 Core Enhancements
+
+=head2 Conversion of a reference to a string raises an error
+
+When a reference is used as a string an error is raised.
+dump::view can be used to view the variable.
+ref::address can be used to get the address of the variable.
+
+=head2 New reference comparison operators \== and \!=
+
+There are two new operators \== and \!= which can be used to compare reference.
+Both arguments to the operators must be references otherwise an error is raised.
+\== returns true if both references refer to the same referent, false otherwise.
+
+=head2 Integrate bleadperl changes upto Change 33541
+
+bleadperl changes are integrated upto Change 33541
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut

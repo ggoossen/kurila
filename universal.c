@@ -236,6 +236,8 @@ XS(XS_dump_view);
 XS(XS_error_create);
 XS(XS_error_message);
 XS(XS_error_write_to_stderr);
+XS(XS_ref_address);
+XS(XS_ref_reftype);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -308,6 +310,9 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("error::create", XS_error_create, file);
     newXS("error::message", XS_error_message, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
+
+    newXS("ref::address", XS_ref_address, file);
+    newXS("ref::reftype", XS_ref_reftype, file);
 
     PL_errorcreatehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create"))));
     PL_diehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr"))));
@@ -786,11 +791,11 @@ STATIC AV* S_error_backtrace(pTHX)
 	    break;
 	
 	/* caller() should not report the automatic calls to &DB::sub */
-	if (PL_DBsub && GvCV(PL_DBsub) && 
-	    ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub)) {
-	    cxix = dopoptosub_at(ccstack, cxix - 1);
-	    continue;
-	}
+/* 	if (PL_DBsub && GvCV(PL_DBsub) && */
+/* 	    ccstack[cxix].blk_sub.cv == GvCV(PL_DBsub)) { */
+/* 	    cxix = dopoptosub_at(ccstack, cxix - 1); */
+/* 	    continue; */
+/* 	} */
 
 	/* stop on BEGIN/CHECK/.../END blocks */
 	if ((CxTYPE(&ccstack[cxix]) == CXt_SUB) &&
@@ -2115,6 +2120,51 @@ XS(XS_dump_view)
     XSRETURN(1);
 }
 
+XS(XS_ref_address)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "ref::address", "sv");
+
+    {
+	SV* sv = ST(0);
+	if (SvMAGICAL(sv))
+	    mg_get(sv);
+	if(!SvROK(sv)) {
+	    XSRETURN_UNDEF;
+	}
+	SP -= items;
+	mPUSHi(PTR2UV(SvRV(sv)));
+	XSRETURN(1);
+    }
+}
+
+XS(XS_ref_reftype)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "ref::reftype", "sv");
+
+    {
+	SV* sv = ST(0);
+	const char* type; 
+	if (SvMAGICAL(sv))
+	    mg_get(sv);
+	if(!SvROK(sv)) {
+	    XSRETURN_UNDEF;
+	}
+	SP -= items;
+	type = sv_reftype(SvRV(sv), 0);
+	mPUSHp(type, strlen(type));
+	XSRETURN(1);
+    }
+}
 
 /*
  * Local variables:

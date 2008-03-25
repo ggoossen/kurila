@@ -10,11 +10,11 @@ our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
 sub expected {
     my($object, $package, $type) = @_;
-    print "# $object $package $type\n";
+    print "# {dump::view($object)} $package $type\n";
     is(ref($object), $package);
     my $r = qr/^\Q$package\E=(\w+)\(0x([0-9a-f]+)\)$/;
-    like("$object", $r);
-    if ("$object" =~ $r) {
+    like(dump::view($object), $r);
+    if (dump::view($object) =~ $r) {
 	is($1, $type);
 	# in 64-bit platforms hex warns for 32+ -bit values
 	cmp_ok(do {no warnings 'portable'; hex($2)}, '==', $object);
@@ -96,7 +96,7 @@ expected(bless({}, $1), "E", "HASH");
 # no class, or empty string (with a warning), or undef (with two)
 expected(bless([]), 'main', "ARRAY");
 {
-    local ${^WARN_HOOK} = sub { push @w, join '', @_ };
+    local ${^WARN_HOOK} = sub { push @w, $_[0]->message };
     use warnings;
 
     my $m = bless [];
@@ -117,7 +117,7 @@ expected(bless([]), 'main', "ARRAY");
 # class is a ref
 $a1 = bless {}, "A4";
 $b1 = eval { bless {}, $a1 };
-isnt ($@, '', "class is a ref");
+like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
 
 # class is an overloaded ref
 {

@@ -343,7 +343,7 @@ sub check {
             ### of objects, but we do want to see *roughly* what we passed
             _store_error(loc(q|Key '%1' (%2) is of invalid type for '%3' |.
                              q|provided by %4|,
-                            $key, "$args{$key}", _who_was_it(),
+                            $key, dump::view($args{$key}), _who_was_it(),
                             _who_was_it(1)), $verbose);
             $wrong ||= 1;
             next;

@@ -1151,17 +1151,15 @@ sub check
   print "ok3\n" if !warnings::enabled("all") ;
   print "ok4\n" if  warnings::enabled("abc") ;
   print "ok5\n" if !warnings::enabled("def") ;
-  print "ok6\n" if  warnings::enabled($self) ;
 
   warnings::warn("my message 1") ;
-  warnings::warn($self, "my message 2") ;
+  warnings::warn("my message 2") ;
 
   warnings::warnif("my message 3") ;
   warnings::warnif('abc', "my message 4") ;
   warnings::warnif('def', "my message 5") ;
   warnings::warnif('io', "my message 6") ;
   warnings::warnif('all', "my message 7") ;
-  warnings::warnif($self, "my message 8") ;
 }
 sub in2 
 {
@@ -1203,21 +1201,15 @@ ok1
 ok2
 ok3
 ok5
-ok6
 my message 1 at .../warnings.pm line xxx.
-    warnings::warn called at def.pm line 21.
-    def::check called at def.pm line 35.
-    def::in2 called at def.pm line 41.
+    warnings::warn called at def.pm line 20.
+    def::check called at def.pm line 33.
+    def::in2 called at def.pm line 39.
     def::in1 called at - line 5.
 my message 2 at .../warnings.pm line xxx.
-    warnings::warn called at def.pm line 22.
-    def::check called at def.pm line 35.
-    def::in2 called at def.pm line 41.
-    def::in1 called at - line 5.
-my message 8 at .../warnings.pm line xxx.
-    warnings::warnif called at def.pm line 29.
-    def::check called at def.pm line 35.
-    def::in2 called at def.pm line 41.
+    warnings::warn called at def.pm line 21.
+    def::check called at def.pm line 33.
+    def::in2 called at def.pm line 39.
     def::in1 called at - line 5.
 **
 ok1
@@ -1225,14 +1217,14 @@ ok2
 ok3
 ok5
 my message 1 at .../warnings.pm line xxx.
-    warnings::warn called at def.pm line 21.
-    def::check called at def.pm line 35.
-    def::in2 called at def.pm line 41.
+    warnings::warn called at def.pm line 20.
+    def::check called at def.pm line 33.
+    def::in2 called at def.pm line 39.
     def::in1 called at - line 8.
 my message 2 at .../warnings.pm line xxx.
-    warnings::warn called at def.pm line 22.
-    def::check called at def.pm line 35.
-    def::in2 called at def.pm line 41.
+    warnings::warn called at def.pm line 21.
+    def::check called at def.pm line 33.
+    def::in2 called at def.pm line 39.
     def::in1 called at - line 8.
 ########
 

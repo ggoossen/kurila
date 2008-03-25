@@ -268,7 +268,7 @@ SKIP: {
         sub f {
             my $depth = shift;
             my $cloned = ""; # XXX due to recursion, doesn't get initialized
-            $cloned .= "$_" =~ m/ARRAY/ ? '1' : '0' for @objs;
+            $cloned .= "{dump::view($_)}" =~ m/ARRAY/ ? '1' : '0' for @objs;
             is($cloned, ($depth ? '00010001111' : '11111111111'),
                 "objs clone skip at depth $depth");
             threads->create( \&f, $depth+1)->join if $depth +< 2;

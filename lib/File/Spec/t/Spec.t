@@ -243,8 +243,6 @@ if ($^O eq 'MacOS') {
 [ "Win32->canonpath('/..\\')",          '\'                  ],
 [ "Win32->canonpath('d1/../foo')",      'foo'                 ],
 
-[ "Win32->can('_cwd')",                 '/CODE/'              ],
-
 # FakeWin32 subclass (see below) just sets CWD to C:\one\two and getdcwd('D') to D:\alpha\beta
 
 [ "FakeWin32->abs2rel('/t1/t2/t3','/t1/t2/t3')",     '.'                      ],
@@ -703,7 +701,7 @@ if ($^O eq 'MacOS') {
 
 
 
-plan tests => scalar @tests;
+plan tests => scalar @tests + 1;
 
 {
     package File::Spec::FakeWin32;
@@ -731,6 +729,8 @@ plan tests => scalar @tests;
     }
 }
 
+
+ok("Win32->can('_cwd')", "Win32->can('_cwd')");
 
 # Test out the class methods
 for ( @tests ) {

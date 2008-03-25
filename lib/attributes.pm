@@ -8,16 +8,6 @@ our %EXPORT_TAGS = (ALL => [@EXPORT, @EXPORT_OK]);
 
 use strict;
 
-sub croak {
-    require Carp;
-    goto &Carp::croak;
-}
-
-sub carp {
-    require Carp;
-    goto &Carp::carp;
-}
-
 ## forward declaration(s) rather than wrapping the bootstrap call in BEGIN{}
 #sub reftype ($) ;
 #sub _fetch_attrs ($) ;
@@ -52,7 +42,7 @@ sub import {
 		    $attr =~ s/\(.+\z//s;
 		}
 		my $s = ((@pkgattrs == 1) ? '' : 's');
-		carp "$svtype package attribute$s " .
+		warn "$svtype package attribute$s " .
 		    "may clash with future reserved word$s: " .
 		    join(' : ' , @pkgattrs);
 	    }
@@ -62,7 +52,7 @@ sub import {
 	@badattrs = _modify_attrs($svref, @attrs);
     }
     if (@badattrs) {
-	croak "Invalid $svtype attribute" .
+	die "Invalid $svtype attribute" .
 	    (( @badattrs == 1 ) ? '' : 's') .
 	    ": " .
 	    join(' : ', @badattrs);
@@ -71,7 +61,7 @@ sub import {
 
 sub get ($) {
     @_ == 1  && ref $_[0] or
-	croak 'Usage: '.__PACKAGE__.'::get $ref';
+	die 'Usage: '.__PACKAGE__.'::get $ref';
     my $svref = shift;
     my $svtype = uc reftype $svref;
     my $stash = _guess_stash $svref;
@@ -207,7 +197,7 @@ has been loaded:
 
 This routine expects a single parameter--a reference to a
 subroutine or variable.  It returns a list of attributes, which may be
-empty.  If passed invalid arguments, it uses die() (via L<Carp::croak|Carp>)
+empty.  If passed invalid arguments, it uses die()
 to raise a fatal exception.  If it can find an appropriate package name
 for a class method lookup, it will include the results from a
 C<FETCH_I<type>_ATTRIBUTES> call in its return list, as described in

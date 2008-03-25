@@ -423,7 +423,6 @@ with re-writing this manpage.
 
 use strict;
 #use diagnostics;
-use Carp;
 use Config;
 use Exporter;
 use File::Spec;
@@ -501,14 +500,14 @@ sub pod2usage {
 
     ## Look up input file in path if it doesnt exist.
     unless ((ref $opts{"-input"}) || (-e $opts{"-input"})) {
-        my ($dirname, $basename) = ('', $opts{"-input"});
+        my ($basename) = ($opts{"-input"});
         my $pathsep = ($^O =~ m/^(?:dos|os2|MSWin32)$/) ? ";"
                             : (($^O eq 'MacOS' || $^O eq 'VMS') ? ',' :  ":");
         my $pathspec = $opts{"-pathlist"} || $ENV{PATH} || $ENV{PERL5LIB};
 
         my @paths = (ref $pathspec) ? @$pathspec : split($pathsep, $pathspec);
-        for $dirname (@paths) {
-            $_ = File::Spec->catfile($dirname, $basename)  if length;
+        for my $dirname (@paths) {
+            local $_ = File::Spec->catfile($dirname, $basename) if length $dirname;
             last if (-e $_) && ($opts{"-input"} = $_);
         }
     }

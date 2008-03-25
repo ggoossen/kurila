@@ -48,7 +48,7 @@ sub match_test {
     my $res;
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 
-    die "{$@->message} in '$tstr'" if $@ ne "";
+    die "{$@->message} in '$tstr'" if $@;
     ok( ($yn =~ m/!/ xor $res), "$tstr: $res");
 }
 

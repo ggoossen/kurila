@@ -61,7 +61,7 @@ B::Concise->import(qw( set_style set_style_standard add_callback
 # test that walk_output rejects non-HANDLE args
 foreach my $foo ("string", [], {}) {
     eval {  walk_output($foo) };
-    isnt ($@, '', "walk_output() rejects arg '$foo'");
+    isnt ($@ && $@->message, '', "walk_output() rejects arg {dump::view($foo)}");
     $@=''; # clear the fail for next test
 }
 # test accessor mode when arg undefd or 0

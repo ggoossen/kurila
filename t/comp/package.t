@@ -61,7 +61,8 @@ eval { $Q->param; };
 print $@->{description} =~ m/^Can't use anonymous symbol table for method lookup/ ?
   "ok 10\n" : "not ok 10 # '$@'\n";
 
-print "$Q" =~ m/^__ANON__=/ ? "ok 11\n" : "not ok 11 # '$Q'\n";
+eval { "$Q" };
+print $@->message =~ qr/reference as string/ ? "ok 11\n" : "not ok 11 # '$Q'\n";
 
 print ref $Q eq "__ANON__" ? "ok 12\n" : "not ok 12 # '$Q'\n";
 

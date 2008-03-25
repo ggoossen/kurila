@@ -121,10 +121,10 @@ require_ok("B::Concise");
 
 my %matchers = 
     ( constant	=> qr{ (?-x: is a constant sub, optimized to a \w+)
-		      |(?-x: exists in stash, but has no START) }x,
+		      |(?-x:coderef .* has no START) }x,
       XS	=> qr/ is XS code/,
       perl	=> qr/ (next|db)state/,
-      noSTART	=> qr/ exists in stash, but has no START/,
+      noSTART	=> qr/coderef .* has no START/,
 );
 
 my $testpkgs = {

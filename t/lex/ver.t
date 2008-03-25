@@ -35,9 +35,9 @@ like( $@->{description}, qr/Too many decimal points/ );
 is(v5.6.0 cmp v5.7.0, -1, "v5.6.0 cmp v5.7.0");
 
 # part of 20000323.059
-is(v200, +v200,         "v200 eq +v200"         );
-is(v200, eval( "v200"), 'v200 eq "v200"'        );
-is(v200, eval("+v200"), 'v200 eq eval("+v200")' );
+ok(v200 eq +v200,         "v200 eq +v200"         );
+ok(v200 eq eval( "v200"), 'v200 eq "v200"'        );
+ok(v200 eq eval("+v200"), 'v200 eq eval("+v200")' );
 
 # Tests for magic v-strings 
 

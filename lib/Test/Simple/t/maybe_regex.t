@@ -11,16 +11,22 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 13;
+use Test::More tests => 16;
 
 use Test::Builder;
 my $Test = Test::Builder->new;
 
-{
-           my $r = $Test->maybe_regex(qr/^FOO$/i);
-           ok(defined $r, 'qr// detected');
-           ok(('foo' =~ m/$r/), 'qr// good match');
-           ok(('bar' !~ m/$r/), 'qr// bad match');
+my $r = $Test->maybe_regex(qr/^FOO$/i);
+ok(defined $r, 'qr// detected');
+ok(('foo' =~ m/$r/), 'qr// good match');
+ok(('bar' !~ m/$r/), 'qr// bad match');
+
+SKIP: {
+    my $obj = bless qr/foo/, 'Wibble';
+    my $re = $Test->maybe_regex($obj);
+    ok( defined $re, "blessed regex detected" );
+    ok( ('foo' =~ m/$re/), 'blessed qr/foo/ good match' );
+    ok( ('bar' !~ m/$re/), 'blessed qr/foo/ bad math' );
 }
 
 {

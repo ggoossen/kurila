@@ -1350,6 +1350,10 @@ array of hashes or arrays?
 =item How do I flush/unbuffer an output filehandle?  Why must I do this?
 X<flush> X<buffer> X<unbuffer> X<autoflush>
 
+=item How do I change, delete, or insert a line in a file, or append to the
+beginning of a file?
+X<file, editing>
+
 =item How do I count the number of lines in a file?
 X<file, counting lines> X<lines> X<line>
 
@@ -1380,6 +1384,9 @@ X<write, into a string>
 
 =item How can I open a filehandle to a string?
 X<string>, X<open>, X<IO::Scalar>, X<filehandle>
+
+=item How can I output my numbers with commas added?
+X<number, commify>
 
 =item How can I translate tildes (~) in a filename?
 X<tilde> X<tilde expansion>
@@ -4308,9 +4315,10 @@ X<CLONE> X<CLONE_SKIP> X<thread> X<threads> X<ithread>
 =item Pragmatic Modules
 
 attributes, attrs, autouse, base, blib, bytes, charnames, compsub,
-constant, diagnostics, error, feature, fields, filetest, if, integer, less,
-lib, mro, open, ops, overload, re, sigtrap, sort, strict, threads,
-threads::shared, utf8, vars, version, vmsish, warnings, warnings::register
+constant, diagnostics, error, feature, fields, filetest, if, integer,
+kurila, less, lib, mro, open, ops, overload, re, sigtrap, sort, strict,
+threads, threads::shared, utf8, vars, version, vmsish, warnings,
+warnings::register
 
 =item Standard Modules
 
@@ -4319,28 +4327,27 @@ B::Debug, B::Deparse, B::Showlex, B::Terse, B::Xref, Benchmark, CORE, CPAN,
 CPAN::API::HOWTO, CPAN::FirstTime, CPAN::Kwalify, CPAN::Nox, CPAN::Version,
 Carp, Carp::Heavy, Class::ISA, Class::Struct, Compress::Raw::Zlib,
 Compress::Zlib, Config, Cwd, DB, DB_File, Data::Dumper, Digest,
-Digest::MD5, Digest::SHA, Digest::base, Digest::file, Dumpvalue,
-DynaLoader, English, Env, Errno, Exporter, Exporter::Heavy,
-ExtUtils::CBuilder, ExtUtils::CBuilder::Platform::Windows,
-ExtUtils::Command, ExtUtils::Command::MM, ExtUtils::Constant,
-ExtUtils::Constant::Base, ExtUtils::Constant::Utils,
-ExtUtils::Constant::XS, ExtUtils::Embed, ExtUtils::Install,
-ExtUtils::Installed, ExtUtils::Liblist, ExtUtils::MM, ExtUtils::MM_AIX,
-ExtUtils::MM_Any, ExtUtils::MM_BeOS, ExtUtils::MM_Cygwin, ExtUtils::MM_DOS,
-ExtUtils::MM_Darwin, ExtUtils::MM_MacOS, ExtUtils::MM_NW5,
-ExtUtils::MM_OS2, ExtUtils::MM_QNX, ExtUtils::MM_UWIN, ExtUtils::MM_Unix,
-ExtUtils::MM_VMS, ExtUtils::MM_VOS, ExtUtils::MM_Win32, ExtUtils::MM_Win95,
-ExtUtils::MY, ExtUtils::MakeMaker, ExtUtils::MakeMaker::Config,
-ExtUtils::MakeMaker::FAQ, ExtUtils::MakeMaker::Tutorial,
-ExtUtils::MakeMaker::bytes, ExtUtils::MakeMaker::vmsish,
-ExtUtils::Manifest, ExtUtils::Mkbootstrap, ExtUtils::Mksymlists,
-ExtUtils::Packlist, ExtUtils::ParseXS, ExtUtils::testlib, Fatal, Fcntl,
-File::Basename, File::CheckTree, File::Compare, File::Copy, File::DosGlob,
-File::Fetch, File::Find, File::Glob, File::GlobMapper, File::Path,
-File::Spec, File::Spec::Cygwin, File::Spec::Epoc, File::Spec::Functions,
-File::Spec::Mac, File::Spec::OS2, File::Spec::Unix, File::Spec::VMS,
-File::Spec::Win32, File::Temp, File::stat, FileHandle, FindBin,
-Getopt::Long, Getopt::Std, Hash::Util, Hash::Util::FieldHash,
+Digest::MD5, Digest::SHA, Digest::base, Digest::file, DynaLoader, English,
+Env, Errno, Exporter, Exporter::Heavy, ExtUtils::CBuilder,
+ExtUtils::CBuilder::Platform::Windows, ExtUtils::Command,
+ExtUtils::Command::MM, ExtUtils::Constant, ExtUtils::Constant::Base,
+ExtUtils::Constant::Utils, ExtUtils::Constant::XS, ExtUtils::Embed,
+ExtUtils::Install, ExtUtils::Installed, ExtUtils::Liblist, ExtUtils::MM,
+ExtUtils::MM_AIX, ExtUtils::MM_Any, ExtUtils::MM_BeOS, ExtUtils::MM_Cygwin,
+ExtUtils::MM_DOS, ExtUtils::MM_Darwin, ExtUtils::MM_MacOS,
+ExtUtils::MM_NW5, ExtUtils::MM_OS2, ExtUtils::MM_QNX, ExtUtils::MM_UWIN,
+ExtUtils::MM_Unix, ExtUtils::MM_VMS, ExtUtils::MM_VOS, ExtUtils::MM_Win32,
+ExtUtils::MM_Win95, ExtUtils::MY, ExtUtils::MakeMaker,
+ExtUtils::MakeMaker::Config, ExtUtils::MakeMaker::FAQ,
+ExtUtils::MakeMaker::Tutorial, ExtUtils::MakeMaker::bytes,
+ExtUtils::MakeMaker::vmsish, ExtUtils::Manifest, ExtUtils::Mkbootstrap,
+ExtUtils::Mksymlists, ExtUtils::Packlist, ExtUtils::ParseXS,
+ExtUtils::testlib, Fatal, Fcntl, File::Basename, File::CheckTree,
+File::Compare, File::Copy, File::DosGlob, File::Fetch, File::Find,
+File::Glob, File::GlobMapper, File::Path, File::Spec, File::Spec::Cygwin,
+File::Spec::Epoc, File::Spec::Functions, File::Spec::Mac, File::Spec::OS2,
+File::Spec::Unix, File::Spec::VMS, File::Spec::Win32, File::Temp,
+File::stat, FileHandle, FindBin, Getopt::Long, Getopt::Std, Hash::Util,
 I18N::Collate, I18N::LangTags, I18N::LangTags::Detect,
 I18N::LangTags::List, I18N::Langinfo, IO, IO::Compress::Base,
 IO::Compress::Deflate, IO::Compress::Gzip, IO::Compress::RawDeflate,
@@ -4375,21 +4382,18 @@ Pod::Simple::RTF, Pod::Simple::Search, Pod::Simple::SimpleTree,
 Pod::Simple::Subclassing, Pod::Simple::Text, Pod::Simple::TextContent,
 Pod::Simple::XMLOutStream, Pod::Text, Pod::Text::Color,
 Pod::Text::Overstrike, Pod::Text::Termcap, Pod::Usage, Safe, Scalar::Util,
-Search::Dict, Socket, Storable, Symbol, Sys::Hostname, Sys::Syslog,
-Sys::Syslog::win32::Win32, Term::ANSIColor, Term::Cap, Term::Complete,
-Term::ReadLine, Term::UI, Test, Test::Builder, Test::Builder::Module,
-Test::Builder::Tester, Test::Builder::Tester::Color, Test::Harness,
-Test::Harness::Assert, Test::Harness::Iterator, Test::Harness::Point,
-Test::Harness::Results, Test::Harness::Straps, Test::Harness::TAP,
-Test::Harness::Util, Test::More, Test::Simple, Test::Tutorial,
-Text::Abbrev, Text::Balanced, Text::ParseWords, Text::Soundex, Text::Tabs,
-Text::Wrap, Thread, Thread::Queue, Thread::Semaphore, Tie::Array,
-Tie::Handle, Tie::Hash, Tie::Hash::NamedCapture, Tie::RefHash, Tie::Scalar,
-Tie::SubstrHash, Time::HiRes, Time::Local, Time::Piece,
-Time::Piece::Seconds, Time::gmtime, Time::localtime, Time::tm, UNIVERSAL,
-Unicode::Collate, Unicode::Normalize, Unicode::UCD, User::grent,
-User::pwent, Win32, Win32API::File, Win32CORE, XS::APItest, XS::Typemap,
-XSLoader
+Search::Dict, SelectSaver, Socket, Storable, Symbol, Sys::Hostname,
+Sys::Syslog, Sys::Syslog::win32::Win32, Term::ANSIColor, Term::Cap,
+Term::Complete, Term::ReadLine, Term::UI, Test, Test::Builder,
+Test::Builder::Module, Test::Builder::Tester, Test::Builder::Tester::Color,
+Test::More, Test::Simple, Test::Tutorial, Text::Abbrev, Text::Balanced,
+Text::ParseWords, Text::Soundex, Text::Tabs, Text::Wrap, Thread,
+Thread::Queue, Thread::Semaphore, Tie::Array, Tie::Handle, Tie::Hash,
+Tie::Hash::NamedCapture, Tie::Scalar, Tie::SubstrHash, Time::HiRes,
+Time::Local, Time::Piece, Time::Piece::Seconds, Time::gmtime,
+Time::localtime, Time::tm, UNIVERSAL, Unicode::Collate, Unicode::Normalize,
+Unicode::UCD, User::grent, User::pwent, Win32, Win32API::File, Win32CORE,
+XS::APItest, XS::Typemap, XSLoader
 
 =item Extension Modules
 
@@ -4660,8 +4664,8 @@ L<config_data|config_data>, L<libnetcfg|libnetcfg>, L<perlivp>
 
 =item Development
 
-L<perlbug|perlbug>, L<h2ph|h2ph>, L<h2xs|h2xs>, L<enc2xs>, L<xsubpp>,
-L<dprofpp|dprofpp>, L<prove>, L<corelist>
+L<perlbug|perlbug>, L<perlthanks|perlthanks>, L<h2ph|h2ph>, L<h2xs|h2xs>,
+L<enc2xs>, L<xsubpp>, L<dprofpp|dprofpp>, L<prove>, L<corelist>
 
 =item General tools
 
@@ -5736,11 +5740,10 @@ pv_display X<pv_display>, pv_escape X<pv_escape>, pv_pretty X<pv_pretty>
 pack_cat X<pack_cat>, sv_2pv_nolen X<sv_2pv_nolen>, sv_catpvn_mg
 X<sv_catpvn_mg>, sv_catsv_mg X<sv_catsv_mg>, sv_force_normal
 X<sv_force_normal>, sv_iv X<sv_iv>, sv_nolocking X<sv_nolocking>,
-sv_nounlocking X<sv_nounlocking>, sv_nv X<sv_nv>, sv_pv X<sv_pv>, sv_pvbyte
-X<sv_pvbyte>, sv_pvbyten X<sv_pvbyten>, sv_pvn X<sv_pvn>, sv_pvutf8
-X<sv_pvutf8>, sv_pvutf8n X<sv_pvutf8n>, sv_taint X<sv_taint>, sv_unref
-X<sv_unref>, sv_usepvn X<sv_usepvn>, sv_usepvn_mg X<sv_usepvn_mg>, sv_uv
-X<sv_uv>, unpack_str X<unpack_str>
+sv_nounlocking X<sv_nounlocking>, sv_nv X<sv_nv>, sv_pv X<sv_pv>, sv_pvn
+X<sv_pvn>, sv_taint X<sv_taint>, sv_unref X<sv_unref>, sv_usepvn
+X<sv_usepvn>, sv_usepvn_mg X<sv_usepvn_mg>, sv_uv X<sv_uv>, unpack_str
+X<unpack_str>
 
 =item Functions in file pp_ctl.c
 
@@ -5880,31 +5883,31 @@ SvIOK X<SvIOK>, SvIOKp X<SvIOKp>, SvIOK_notUV X<SvIOK_notUV>, SvIOK_off
 X<SvIOK_off>, SvIOK_on X<SvIOK_on>, SvIOK_only X<SvIOK_only>, SvIOK_only_UV
 X<SvIOK_only_UV>, SvIOK_UV X<SvIOK_UV>, SvIsCOW X<SvIsCOW>,
 SvIsCOW_shared_hash X<SvIsCOW_shared_hash>, SvIV X<SvIV>, SvIVX X<SvIVX>,
-SvIVx X<SvIVx>, SvIV_nomg X<SvIV_nomg>, SvIV_set X<SvIV_set>, SvLEN
-X<SvLEN>, SvLEN_set X<SvLEN_set>, SvMAGIC_set X<SvMAGIC_set>, SvNIOK
-X<SvNIOK>, SvNIOKp X<SvNIOKp>, SvNIOK_off X<SvNIOK_off>, SvNOK X<SvNOK>,
-SvNOKp X<SvNOKp>, SvNOK_off X<SvNOK_off>, SvNOK_on X<SvNOK_on>, SvNOK_only
-X<SvNOK_only>, SvNV X<SvNV>, SvNVX X<SvNVX>, SvNVx X<SvNVx>, SvNV_set
-X<SvNV_set>, SvOK X<SvOK>, SvOOK X<SvOOK>, SvOOK_offset X<SvOOK_offset>,
-SvPOK X<SvPOK>, SvPOKp X<SvPOKp>, SvPOK_off X<SvPOK_off>, SvPOK_on
-X<SvPOK_on>, SvPOK_only X<SvPOK_only>, SvPV X<SvPV>, SvPVX X<SvPVX>, SvPVx
-X<SvPVx>, SvPV_force X<SvPV_force>, SvPV_force_nomg X<SvPV_force_nomg>,
-SvPV_nolen X<SvPV_nolen>, SvPV_nomg X<SvPV_nomg>, SvPV_set X<SvPV_set>,
-SvREFCNT X<SvREFCNT>, SvREFCNT_dec X<SvREFCNT_dec>, SvREFCNT_inc
-X<SvREFCNT_inc>, SvREFCNT_inc_NN X<SvREFCNT_inc_NN>, SvREFCNT_inc_simple
-X<SvREFCNT_inc_simple>, SvREFCNT_inc_simple_NN X<SvREFCNT_inc_simple_NN>,
-SvREFCNT_inc_simple_void X<SvREFCNT_inc_simple_void>,
-SvREFCNT_inc_simple_void_NN X<SvREFCNT_inc_simple_void_NN>,
-SvREFCNT_inc_void X<SvREFCNT_inc_void>, SvREFCNT_inc_void_NN
-X<SvREFCNT_inc_void_NN>, SvROK X<SvROK>, SvROK_off X<SvROK_off>, SvROK_on
-X<SvROK_on>, SvRV X<SvRV>, SvRV_set X<SvRV_set>, SvSTASH X<SvSTASH>,
-SvSTASH_set X<SvSTASH_set>, SvTAINT X<SvTAINT>, SvTAINTED X<SvTAINTED>,
-SvTAINTED_off X<SvTAINTED_off>, SvTAINTED_on X<SvTAINTED_on>, SvTRUE
-X<SvTRUE>, SvTYPE X<SvTYPE>, SvUOK X<SvUOK>, SvUPGRADE X<SvUPGRADE>, SvUV
-X<SvUV>, SvUVX X<SvUVX>, SvUVx X<SvUVx>, SvUV_nomg X<SvUV_nomg>, SvUV_set
-X<SvUV_set>, sv_catpvn_nomg X<sv_catpvn_nomg>, sv_catsv_nomg
-X<sv_catsv_nomg>, sv_derived_from X<sv_derived_from>, sv_does X<sv_does>,
-sv_report_used X<sv_report_used>, sv_setsv_nomg X<sv_setsv_nomg>
+SvIV_nomg X<SvIV_nomg>, SvIV_set X<SvIV_set>, SvLEN X<SvLEN>, SvLEN_set
+X<SvLEN_set>, SvMAGIC_set X<SvMAGIC_set>, SvNIOK X<SvNIOK>, SvNIOKp
+X<SvNIOKp>, SvNIOK_off X<SvNIOK_off>, SvNOK X<SvNOK>, SvNOKp X<SvNOKp>,
+SvNOK_off X<SvNOK_off>, SvNOK_on X<SvNOK_on>, SvNOK_only X<SvNOK_only>,
+SvNV X<SvNV>, SvNVX X<SvNVX>, SvNV_set X<SvNV_set>, SvOK X<SvOK>, SvOOK
+X<SvOOK>, SvOOK_offset X<SvOOK_offset>, SvPOK X<SvPOK>, SvPOKp X<SvPOKp>,
+SvPOK_off X<SvPOK_off>, SvPOK_on X<SvPOK_on>, SvPOK_only X<SvPOK_only>,
+SvPV X<SvPV>, SvPVX X<SvPVX>, SvPVx X<SvPVx>, SvPV_force X<SvPV_force>,
+SvPV_force_nomg X<SvPV_force_nomg>, SvPV_nolen X<SvPV_nolen>, SvPV_nomg
+X<SvPV_nomg>, SvPV_set X<SvPV_set>, SvREFCNT X<SvREFCNT>, SvREFCNT_dec
+X<SvREFCNT_dec>, SvREFCNT_inc X<SvREFCNT_inc>, SvREFCNT_inc_NN
+X<SvREFCNT_inc_NN>, SvREFCNT_inc_simple X<SvREFCNT_inc_simple>,
+SvREFCNT_inc_simple_NN X<SvREFCNT_inc_simple_NN>, SvREFCNT_inc_simple_void
+X<SvREFCNT_inc_simple_void>, SvREFCNT_inc_simple_void_NN
+X<SvREFCNT_inc_simple_void_NN>, SvREFCNT_inc_void X<SvREFCNT_inc_void>,
+SvREFCNT_inc_void_NN X<SvREFCNT_inc_void_NN>, SvROK X<SvROK>, SvROK_off
+X<SvROK_off>, SvROK_on X<SvROK_on>, SvRV X<SvRV>, SvRV_set X<SvRV_set>,
+SvSTASH X<SvSTASH>, SvSTASH_set X<SvSTASH_set>, SvTAINT X<SvTAINT>,
+SvTAINTED X<SvTAINTED>, SvTAINTED_off X<SvTAINTED_off>, SvTAINTED_on
+X<SvTAINTED_on>, SvTRUE X<SvTRUE>, SvTYPE X<SvTYPE>, SvUOK X<SvUOK>,
+SvUPGRADE X<SvUPGRADE>, SvUV X<SvUV>, SvUVX X<SvUVX>, SvUV_nomg
+X<SvUV_nomg>, SvUV_set X<SvUV_set>, sv_catpvn_nomg X<sv_catpvn_nomg>,
+sv_catsv_nomg X<sv_catsv_nomg>, sv_derived_from X<sv_derived_from>, sv_does
+X<sv_does>, sv_report_used X<sv_report_used>, sv_setsv_nomg
+X<sv_setsv_nomg>
 
 =item SV-Body Allocation
 
@@ -6022,8 +6025,8 @@ magic_sethint X<magic_sethint>, mg_localize X<mg_localize>
 
 =item MRO Functions
 
-mro_get_linear_isa_c3 X<mro_get_linear_isa_c3>, mro_get_linear_isa_dfs
-X<mro_get_linear_isa_dfs>, mro_isa_changed_in X<mro_isa_changed_in>
+mro_get_linear_isa_c3 X<mro_get_linear_isa_c3>, mro_isa_changed_in
+X<mro_isa_changed_in>
 
 =item Pad Data Structures
 
@@ -6045,7 +6048,7 @@ X<PL_ofs_sv>, PL_rs X<PL_rs>
 
 =item Stack Manipulation Macros
 
-djSP X<djSP>, LVRET X<LVRET>
+djSP X<djSP>
 
 =item SV Manipulation Functions
 
@@ -6471,6 +6474,8 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =item strcat(), strcpy(), strncat(), strncpy(), sprintf(), vsprintf()
 
 =item -D_FORTIFY_SOURCE=2, -fstack-protector
+
+=item Arenas for GPs? For MAGIC?
 
 =back
 
@@ -13494,8 +13499,8 @@ children
 
 =item B::PMOP Methods
 
-pmreplroot, pmreplstart, pmnext, pmregexp, pmflags, extflags, precomp,
-pmoffset
+pmreplroot, pmreplstart, precomp, pmflags, reflags, pmoffset, pmstashpv,
+pmstash
 
 =item B::SVOP METHOD
 
@@ -13704,14 +13709,6 @@ strict, $[, bytes, utf8, integer, re, warnings, hint_bits, warning_bits,
 
 =back
 
-=head2 B::Lint::Debug - Adds debugging stringification to B::
-
-=over 4
-
-=item DESCRIPTION
-
-=back
-
 =head2 B::O, O - Generic interface to Perl Compiler backends
 
 =over 4
@@ -13763,8 +13760,8 @@ children
 
 =item B::PMOP Methods
 
-pmreplroot, pmreplstart, pmnext, pmregexp, pmflags, extflags, precomp,
-pmoffset
+pmreplroot, pmreplstart, precomp, pmflags, reflags, pmoffset, pmstashpv,
+pmstash
 
 =item B::SVOP METHOD
 
@@ -15589,32 +15586,6 @@ $algorithm, [$arg,...] ), digest_file_base64( $file, $algorithm, [$arg,...]
 
 =back
 
-=head2 Dumpvalue - provides screen dump of Perl data.
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Creation
-
-C<arrayDepth>, C<hashDepth>, C<compactDump>, C<veryCompact>, C<globPrint>,
-C<dumpDBFiles>, C<dumpPackages>, C<dumpReused>, C<tick>, C<quoteHighBit>,
-C<printUndef>, C<usageOnly>, unctrl, subdump, bareStringify, quoteHighBit,
-stopDbSignal
-
-=item Methods
-
-dumpValue, dumpValues, stringify, dumpvars, set_quote, set_unctrl,
-compactDump, veryCompact, set, get
-
-=back
-
-=back
-
 =head2 DynaLoader - Dynamically load C libraries into Perl code
 
 =over 4
@@ -16037,6 +16008,10 @@ ccopts(), xsi_header(), xsi_protos(@modules), xsi_body(@modules)
 
 =item SYNOPSIS
 
+=back
+
+=over 4
+
 =item DESCRIPTION
 
 _chmod($$;$), _warnonce(@), _choke(@)
@@ -16051,21 +16026,23 @@ _unlink_or_rename( $file, $tryhard, $installing )
 
 =item Functions
 
-B<install>
+_get_install_skip
 
 =back
-
-_get_install_skip
 
 _have_write_access
 
 _can_write_dir(C<$dir>)
 
-_mkpath($dir,$show,$mode,$verbose,$fake)
+_mkpath($dir,$show,$mode,$verbose,$dry_run)
 
-_copy($from,$to,$verbose,$fake)
+_copy($from,$to,$verbose,$dry_run)
+
+_symlink($old,$new,$verbose,$fake)
 
 _chdir($from)
+
+B<install>
 
 _do_cleanup
 
@@ -16079,7 +16056,7 @@ B<install_default> I<DISCOURAGED>
 
 B<uninstall>
 
-inc_uninstall($filepath,$libdir,$verbose,$nonono,$ignore)
+inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results)
 
 run_filter($cmd,$src,$dest)
 
@@ -16092,7 +16069,7 @@ _invokant
 =item ENVIRONMENT
 
 B<PERL_INSTALL_ROOT>, B<EU_INSTALL_IGNORE_SKIP>,
-B<EU_INSTALL_SITE_SKIPFILE>
+B<EU_INSTALL_SITE_SKIPFILE>, B<EU_INSTALL_ALWAYS_COPY>
 
 =item AUTHOR
 
@@ -18269,133 +18246,6 @@ unlock_hashref_recurse, hash_ref_unlocked, legal_ref_keys, hidden_ref_keys
 =item AUTHOR
 
 =item SEE ALSO
-
-=back
-
-=head2 Hash::Util::FieldHash - Support for Inside-Out Classes
-
-=over 4
-
-=item SYNOPSIS
-
-=item FUNCTIONS
-
-id, id_2obj, register, idhash, idhashes, fieldhash, fieldhashes
-
-=item DESCRIPTION
-
-=over 4
-
-=item The Inside-out Technique
-
-=item Problems of Inside-out
-
-=item Solutions
-
-=item More Problems
-
-=item The Generic Object
-
-=item How to use Field Hashes
-
-=item Garbage-Collected Hashes
-
-=back
-
-=item EXAMPLES
-
-C<init()>, C<first()>, C<last()>, C<name()>, C<Name_hash>, C<Name_id>,
-C<Name_idhash>, C<Name_id_reg>, C<Name_idhash_reg>, C<Name_fieldhash>
-
-=over 4
-
-=item Example 1
-
-=item Example 2
-
-=back
-
-=item GUTS
-
-=over 4
-
-=item The C<PERL_MAGIC_uvar> interface for hashes
-
-=item Weakrefs call uvar magic
-
-=item How field hashes work
-
-=item Internal function Hash::Util::FieldHash::_fieldhash
-
-=back
-
-=item AUTHOR
-
-=item COPYRIGHT AND LICENSE
-
-=back
-
-=head2 Hash::Util::FieldHash::lib::Hash::Util::FieldHash,
-Hash::Util::FieldHash - Support for Inside-Out Classes
-
-=over 4
-
-=item SYNOPSIS
-
-=item FUNCTIONS
-
-id, id_2obj, register, idhash, idhashes, fieldhash, fieldhashes
-
-=item DESCRIPTION
-
-=over 4
-
-=item The Inside-out Technique
-
-=item Problems of Inside-out
-
-=item Solutions
-
-=item More Problems
-
-=item The Generic Object
-
-=item How to use Field Hashes
-
-=item Garbage-Collected Hashes
-
-=back
-
-=item EXAMPLES
-
-C<init()>, C<first()>, C<last()>, C<name()>, C<Name_hash>, C<Name_id>,
-C<Name_idhash>, C<Name_id_reg>, C<Name_idhash_reg>, C<Name_fieldhash>
-
-=over 4
-
-=item Example 1
-
-=item Example 2
-
-=back
-
-=item GUTS
-
-=over 4
-
-=item The C<PERL_MAGIC_uvar> interface for hashes
-
-=item Weakrefs call uvar magic
-
-=item How field hashes work
-
-=item Internal function Hash::Util::FieldHash::_fieldhash
-
-=back
-
-=item AUTHOR
-
-=item COPYRIGHT AND LICENSE
 
 =back
 
@@ -22409,38 +22259,6 @@ decode_qp($str);
 
 =back
 
-=head2 Math::BigInt::CalcEmu - Emulate low-level math with BigInt code
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=over 4
-
-=item __emu_bxor
-
-=item __emu_band
-
-=item __emu_bior
-
-=back
-
-=item LICENSE
-
-This program is free software; you may redistribute it and/or modify it
-under
-the same terms as Perl itself. 
-
-=item AUTHORS
-
-=item SEE ALSO
-
-=back
-
 =head2 Math::Complex - complex numbers and associated mathematical
 functions
 
@@ -25804,6 +25622,8 @@ set_prototype CODEREF, PROTOTYPE, tainted EXPR, weaken REF
 
 =back
 
+=head2 SelectSaver - save and restore selected file handle
+
 =over 4
 
 =item SYNOPSIS
@@ -26388,11 +26208,9 @@ B<reset>
 
 =item Setting up tests
 
-B<exported_to>
+B<plan>
 
 =back
-
-B<plan>
 
 B<expected_tests>
 
@@ -26401,6 +26219,8 @@ B<no_plan>
 B<has_plan>
 
 B<skip_all>
+
+B<exported_to>
 
 =over 4
 
@@ -26591,370 +26411,6 @@ Test::Builder::Tester
 =item BUGS
 
 =item SEE ALSO
-
-=back
-
-=head2 Test::Harness - Run Perl standard test scripts with statistics
-
-=over 4
-
-=item VERSION
-
-=back
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Taint mode
-
-=item Configuration variables.
-
-C<$Test::Harness::Verbose>, C<$Test::Harness::switches>,
-C<$Test::Harness::Timer>
-
-=item Failure
-
-B<Failed Test>, B<Stat>, B<Wstat>, B<Total>, B<Fail>, B<List of Failed>
-
-=back
-
-=item FUNCTIONS
-
-=over 4
-
-=item runtests( @test_files )
-
-=back
-
-=back
-
-=over 4
-
-=item execute_tests( tests => \@test_files, out => \*FH )
-
-=back
-
-=over 4
-
-=item EXPORT
-
-=item DIAGNOSTICS
-
-C<All tests successful.\nFiles=%d,  Tests=%d, %s>, C<FAILED tests
-%s\n\tFailed %d/%d tests, %.2f%% okay.>, C<Test returned status %d (wstat
-%d)>, C<Failed 1 test, %.2f%% okay. %s>, C<Failed %d/%d tests, %.2f%% okay.
-%s>, C<FAILED--Further testing stopped: %s>
-
-=item ENVIRONMENT VARIABLES THAT TEST::HARNESS SETS
-
-C<HARNESS_ACTIVE>, C<HARNESS_VERSION>
-
-=item ENVIRONMENT VARIABLES THAT AFFECT TEST::HARNESS
-
-C<HARNESS_COLUMNS>, C<HARNESS_COMPILE_TEST>, C<HARNESS_DEBUG>,
-C<HARNESS_FILELEAK_IN_DIR>, C<HARNESS_NOTTY>, C<HARNESS_PERL>,
-C<HARNESS_PERL_SWITCHES>, C<HARNESS_TIMER>, C<HARNESS_VERBOSE>,
-C<HARNESS_STRAP_CLASS>
-
-=item EXAMPLE
-
-=item SEE ALSO
-
-=item TODO
-
-=item BUGS
-
-=item SUPPORT
-
-AnnoCPAN: Annotated CPAN documentation, CPAN Ratings, RT: CPAN's request
-tracker, Search CPAN
-
-=item SOURCE CODE
-
-=item AUTHORS
-
-=item COPYRIGHT
-
-=back
-
-=head2 Test::Harness::Assert - simple assert
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item FUNCTIONS
-
-=over 4
-
-=item C<assert()>
-
-=back
-
-=back
-
-=over 4
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Test::Harness::Iterator - Internal Test::Harness Iterator
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item new()
-
-=item next()
-
-=back
-
-=back
-
-=head2 Test::Harness::Point - object for tracking a single test point
-
-=over 4
-
-=item SYNOPSIS
-
-=item CONSTRUCTION
-
-=over 4
-
-=item new()
-
-=back
-
-=back
-
-=over 4
-
-=item from_test_line( $line )
-
-=back
-
-=over 4
-
-=item ACCESSORS
-
-ok, number
-
-=back
-
-=head2 Test::Harness::Results - object for tracking results from a single
-test file
-
-=over 4
-
-=item SYNOPSIS
-
-=item CONSTRUCTION
-
-=over 4
-
-=item new()
-
-=back
-
-=back
-
-=over 4
-
-=item ACCESSORS
-
-wait, exit
-
-=back
-
-=head2 Test::Harness::Straps - detailed analysis of test results
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item CONSTRUCTION
-
-=over 4
-
-=item new()
-
-=back
-
-=back
-
-=over 4
-
-=item ANALYSIS
-
-=over 4
-
-=item $strap->analyze( $name, \@output_lines )
-
-=back
-
-=back
-
-=over 4
-
-=item $strap->analyze_file( $test_file )
-
-=back
-
-=over 4
-
-=item Parsing
-
-=back
-
-=over 4
-
-=item EXAMPLES
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=back
-
-=head2 Test::Harness::TAP - Documentation for the TAP format
-
-=over 4
-
-=item SYNOPSIS
-
-=item TODO
-
-=item THE TAP FORMAT
-
-=item HARNESS BEHAVIOR
-
-=item TESTS LINES AND THE PLAN
-
-=over 4
-
-=item The plan
-
-=item The test line
-
-C<ok> or C<not ok>, Test number, Description, Directive, ok/not ok
-(required), Test number (recommended), Description (recommended), Directive
-(only when necessary)
-
-=back
-
-=item DIRECTIVES
-
-=over 4
-
-=item TODO tests
-
-=item Skipping tests
-
-=back
-
-=item OTHER LINES
-
-=over 4
-
-=item Bail out!
-
-=item Diagnostics
-
-=item Anything else
-
-=back
-
-=item EXAMPLES
-
-=over 4
-
-=item Common with explanation
-
-=item Unknown amount and failures
-
-=item Giving up
-
-=item Skipping a few
-
-=item Skipping everything
-
-=item Got spare tuits?
-
-=item Creative liberties
-
-=back
-
-=item Non-Perl TAP
-
-=over 4
-
-=item C/C++
-
-Specify a test plan, Run tests, Skip tests in certain situations, Have TODO
-tests, Produce TAP compatible diagnostics
-
-=item Python
-
-=item JavaScript
-
-=item PHP
-
-phpt, PHPUnit, SimpleTest, Apache-Test
-
-=back
-
-=item AUTHORS
-
-=item ACKNOWLEDGEMENTS
-
-=item COPYRIGHT
-
-=back
-
-=head2 Test::Harness::Util - Utility functions for Test::Harness::*
-
-=over 4
-
-=item SYNOPSIS
-
-=item PUBLIC FUNCTIONS
-
-=over 4
-
-=item all_in( {parm => value, parm => value} )
-
-start, recurse
-
-=back
-
-=back
-
-=over 4
-
-=item shuffle( @list )
-
-=back
-
-=over 4
-
-=item blibdir()
 
 =back
 
@@ -27418,74 +26874,6 @@ SHIFT this, UNSHIFT this, LIST, SPLICE this, offset, length, LIST
 
 =back
 
-=head2 Tie::File - Access the lines of a disk file via a Perl array
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item C<recsep>
-
-=item C<autochomp>
-
-=item C<mode>
-
-=item C<memory>
-
-=item C<dw_size>
-
-=item Option Format
-
-=back
-
-=item Public Methods
-
-=over 4
-
-=item C<flock>
-
-=item C<autochomp>
-
-=item C<defer>, C<flush>, C<discard>, and C<autodefer>
-
-=item C<offset>
-
-=back
-
-=item Tying to an already-opened filehandle
-
-=item Deferred Writing
-
-=over 4
-
-=item Autodeferring
-
-=back
-
-=item CONCURRENT ACCESS TO FILES
-
-=item CAVEATS
-
-=item SUBCLASSING
-
-=item WHAT ABOUT C<DB_File>?
-
-=item AUTHOR
-
-=item LICENSE
-
-=item WARRANTY
-
-=item THANKS
-
-=item TODO
-
-=back
-
 =head2 Tie::Handle - base class definitions for tied handles
 
 =over 4
@@ -27535,30 +26923,6 @@ this, SCALAR this
 =item SYNOPSIS
 
 =item DESCRIPTION
-
-=item SEE ALSO
-
-=back
-
-=head2 Tie::RefHash - use references as hash keys
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item EXAMPLE
-
-=item THREAD SUPPORT
-
-=item STORABLE SUPPORT
-
-=item RELIC SUPPORT
-
-=item MAINTAINER
-
-=item AUTHOR
 
 =item SEE ALSO
 

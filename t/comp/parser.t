@@ -327,8 +327,7 @@ EOSTANZA
 	'literal -> after an array subscript within ""');
     @x = ['string'];
     # this used to give "string"
-    like("$x[0]-> [0]", qr/^ARRAY\([^)]*\)-> \[0]\z/,
-	'literal -> [0] after an array subscript within ""');
+    dies_like( sub { "$x[0]-> [0]" }, qr/reference as string/ );
 }
 
 __END__

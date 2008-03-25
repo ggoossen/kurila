@@ -27,7 +27,7 @@ skip "no perlio in this build", $tests unless $Config::Config{useperlio};
 
 ${^WARN_HOOK} = sub {
     my $err = shift;
-    $err =~ m/Subroutine re::(un)?install redefined/ and return;
+    $err->message =~ m/Subroutine re::(un)?install redefined/ and return;
 };
 #################################
 pass("CANONICAL B::Concise EXAMPLE");

@@ -127,6 +127,8 @@ Perl_pp_ne
 Perl_pp_i_ne
 Perl_pp_ncmp
 Perl_pp_i_ncmp
+Perl_pp_ref_eq
+Perl_pp_ref_ne
 Perl_pp_seq
 Perl_pp_sne
 Perl_pp_scmp

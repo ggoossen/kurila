@@ -14,7 +14,7 @@ my $Is_MacOS = $^O eq 'MacOS';
 
 our ($f);
 
-plan tests => 102;
+plan tests => 104;
 
 my $Perl = which_perl();
 
@@ -292,9 +292,11 @@ SKIP: {
 	 "bad open (>>>) failure");
 
     eval { open(F, ">:u", "afile" ) };
+    ok( ! $@ );
     like($w, qr/Unknown PerlIO layer "u"/,
 	 'bad layer ">:u" warning');
     eval { open(F, "<:u", "afile" ) };
+    ok( ! $@ );
     like($w, qr/Unknown PerlIO layer "u"/,
 	 'bad layer "<:u" warning');
     eval { open(F, ":c", "afile" ) };

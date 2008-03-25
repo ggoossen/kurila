@@ -31,7 +31,7 @@ our (@FOO, $expect);
 @FOO = ('s', 'N/A', 'a', 'NaN', -1, undef, 0, 1, 3.14, 1e37, 0.632120558, -.5,
 	'Inf'+1, '-Inf'-1, 0x0, 0x1, 0x5, 0xFFFFFFFF, $uv_max, $uv_maxm1,
 	$uv_big, $uv_bigi, $iv0, $iv1, $ivm1, $iv_min, $iv_max, $iv_big,
-	$iv_small, \$array[0], \$array[0], \$array[1], \$^X);
+	$iv_small);
 
 $expect = 5 * ($#FOO+2) * ($#FOO+1);
 print "1..$expect\n";
