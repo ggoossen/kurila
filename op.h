@@ -698,6 +698,7 @@ struct token {
  * f       folded constant op
  * F       peg op for format
  * g       op was forced to be a word
+ * G       __END__ section
  * h       sub or var attributes
  * i       if/unless modifier
  * I       if/elsif/unless statement
