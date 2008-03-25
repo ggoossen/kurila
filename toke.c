@@ -5976,8 +5976,6 @@ Perl_yylex(pTHX)
 	    UNI(OP_EXISTS);
 	
 	case KEY_exit:
-	    if (PL_madskills)
-		UNI(OP_INT);
 	    UNI(OP_EXIT);
 
 	case KEY_eval:
