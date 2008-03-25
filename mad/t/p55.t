@@ -249,6 +249,7 @@ state $x = 4;
 my $x;
 "$x->@"
 ########
+# TODO \Q and \E
 s/\Q$(\E(INSTALL(?!DIRS)${MACRO_RE})\Q)\E/\$(DEST$1)/g;
 ########
 $a !~ tr/a-z//;
