@@ -27,11 +27,11 @@ eval{ sigtrap->import('handler') };
 like( $@->{description}, qr/^No argument specified/, 'send handler without subref' );
 
 sigtrap->import('AFAKE');
-is( $SIG{AFAKE}, \&sigtrap::handler_traceback, 'install normal handler' );
+cmp_ok( $SIG{AFAKE}, '\==', \&sigtrap::handler_traceback, 'install normal handler' );
 
 sigtrap->import('die', 'AFAKE', 'stack-trace', 'FAKE2');
-is( $SIG{AFAKE}, \&sigtrap::handler_die, 'install the die handler' );
-is( $SIG{FAKE2}, \&sigtrap::handler_traceback, 'install traceback handler' );
+cmp_ok( $SIG{AFAKE}, '\==', \&sigtrap::handler_die, 'install the die handler' );
+cmp_ok( $SIG{FAKE2}, '\==',\&sigtrap::handler_traceback, 'install traceback handler' );
 
 my @normal = qw( HUP INT PIPE TERM );
 @SIG{@normal} = '' x @normal;
@@ -50,7 +50,7 @@ is( (grep { ref $_ } @SIG{@old}), @old, 'check old-interface-signals set' );
 
 my $handler = sub {};
 sigtrap->import(handler => $handler, 'FAKE3');
-is( $SIG{FAKE3}, $handler, 'install custom handler' );
+cmp_ok( $SIG{FAKE3}, '\==', $handler, 'install custom handler' );
 
 $SIG{FAKE} = 'IGNORE';
 sigtrap->import('untrapped', 'FAKE');
@@ -60,7 +60,7 @@ my $out = tie *STDOUT, 'TieOut';
 $SIG{FAKE} = 'DEFAULT';
 $sigtrap::Verbose = 1;
 sigtrap->import('any', 'FAKE');
-is( $SIG{FAKE}, \&sigtrap::handler_traceback, 'should set default handler' );
+cmp_ok( $SIG{FAKE}, '\==', \&sigtrap::handler_traceback, 'should set default handler' );
 like( $out->read, qr/^Installing handler/, 'does it talk with $Verbose set?' );
 
 # handler_die croaks with first argument

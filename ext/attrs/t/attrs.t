@@ -77,10 +77,8 @@ print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 eval 'sub e1 ($) : plugh ;';
-unless ($@ && $@->{description} =~ m/^Invalid CODE attribute: ["']?plugh["']? at/) {
-    my $x = $@;
-    $x =~ s/\n.*\z//s;
-    print "# $x\n";
+unless ($@ && $@->message =~ m/^Invalid CODE attribute: ["']?plugh["']? at/) {
+    print "# {$@->message}\n";
     print "not ";
     $failed = 1;
 }

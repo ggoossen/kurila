@@ -1404,23 +1404,12 @@ cmp_pat_4bytes(unsigned char *s, size_t nbytes, const unsigned char *fill)
 #  define FILLCHECK_DEADBEEF(s, n)	((void)0)
 #endif
 
-Malloc_t
-Perl_malloc(register size_t nbytes)
+int
+S_ajust_size_and_find_bucket(size_t *nbytes_p)
 {
-        dVAR;
-  	register union overhead *p;
-  	register int bucket;
-  	register MEM_SIZE shiftr;
-
-#if defined(DEBUGGING) || defined(RCHECK)
-	MEM_SIZE size = nbytes;
-#endif
-
-	BARK_64K_LIMIT("Allocation",nbytes,nbytes);
-#ifdef DEBUGGING
-	if ((long)nbytes < 0)
-	    croak("%s", "panic: malloc");
-#endif
+  	MEM_SIZE shiftr;
+	int bucket;
+	size_t nbytes = *nbytes_p;
 
 	/*
 	 * Convert amount of memory requested into
@@ -1455,6 +1444,28 @@ Perl_malloc(register size_t nbytes)
 	    while (shiftr >>= 1)
   		bucket += BUCKETS_PER_POW2;
 	}
+	*nbytes_p = nbytes;
+	return bucket;
+}
+
+Malloc_t
+Perl_malloc(size_t nbytes)
+{
+        dVAR;
+  	register union overhead *p;
+  	register int bucket;
+
+#if defined(DEBUGGING) || defined(RCHECK)
+	MEM_SIZE size = nbytes;
+#endif
+
+	BARK_64K_LIMIT("Allocation",nbytes,nbytes);
+#ifdef DEBUGGING
+	if ((long)nbytes < 0)
+	    croak("%s", "panic: malloc");
+#endif
+
+	bucket = S_ajust_size_and_find_bucket(&nbytes);
 	MALLOC_LOCK;
 	/*
 	 * If nothing in hash bucket right now,
@@ -2376,6 +2387,13 @@ Perl_malloced_size(void *p)
     return BUCKET_SIZE_REAL(bucket);
 }
 
+
+MEM_SIZE
+Perl_malloc_good_size(size_t wanted)
+{
+    return BUCKET_SIZE_REAL(S_ajust_size_and_find_bucket(&wanted));
+}
+
 #  ifdef BUCKETS_ROOT2
 #    define MIN_EVEN_REPORT 6
 #  else
@@ -2432,6 +2450,8 @@ Perl_get_mstats(pTHX_ perl_mstats_t *buf, int buflen, int level)
 		buf->bucket_available_size[i] = BUCKET_SIZE_REAL(i);
 	    }
 	}
+#else /* defined DEBUGGING_MSTATS */
+	PerlIO_printf(Perl_error_log, "perl not compiled with DEBUGGING_MSTATS\n");
 #endif	/* defined DEBUGGING_MSTATS */
 	return 0;		/* XXX unused */
 }
@@ -2443,7 +2463,7 @@ Perl_get_mstats(pTHX_ perl_mstats_t *buf, int buflen, int level)
  * frees for each size category.
  */
 void
-Perl_dump_mstats(pTHX_ char *s)
+Perl_dump_mstats(pTHX_ const char *s)
 {
 #ifdef DEBUGGING_MSTATS
   	register int i;
@@ -2505,6 +2525,8 @@ Perl_dump_mstats(pTHX_ char *s)
 		      buffer.total_sbrk, buffer.sbrks, buffer.sbrk_good,
 		      buffer.sbrk_slack, buffer.start_slack,
 		      buffer.total_chain, buffer.sbrked_remains);
+#else /* DEBUGGING_MSTATS */
+	PerlIO_printf(Perl_error_log, "%s: perl not compiled with DEBUGGING_MSTATS\n",s);
 #endif /* DEBUGGING_MSTATS */
 }
 

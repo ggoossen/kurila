@@ -16,13 +16,11 @@ sub import {
 	    if ($sym =~ m/\W/) {
 		# time for a more-detailed check-up
 		if ($sym =~ m/^\w+[[{].*[]}]$/) {
-		    require Carp;
-		    Carp::croak("Can't declare individual elements of hash or array");
+		    die("Can't declare individual elements of hash or array");
 		} elsif (warnings::enabled() and length($sym) == 1 and $sym !~ tr/a-zA-Z//) {
 		    warnings::warn("No need to declare built-in vars");
 		} elsif  (($^H ^&^= strict::bits('vars'))) {
-		    require Carp;
-		    Carp::croak("'$_' is not a valid variable name under strict vars");
+		    die("'$_' is not a valid variable name under strict vars");
 		}
 	    }
 	    $sym = "${callpack}::$sym" unless $sym =~ m/::/;
@@ -32,13 +30,10 @@ sub import {
 		 : $ch eq "\%" ? \%{*{Symbol::fetch_glob($sym)}}
 		 : $ch eq "\*" ? \*{Symbol::fetch_glob($sym)}
 		 : $ch eq "\&" ? \&{*{Symbol::fetch_glob($sym)}}
-		 : do {
-		     require Carp;
-		     Carp::croak("'$_' is not a valid variable name");
-		 });
+		 : die("'$_' is not a valid variable name")
+		 );
 	} else {
-	    require Carp;
-	    Carp::croak("'$_' is not a valid variable name");
+	    die("'$_' is not a valid variable name");
 	}
     }
 };

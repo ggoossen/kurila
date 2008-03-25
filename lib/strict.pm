@@ -4,7 +4,6 @@ $strict::VERSION = "1.04";
 
 # Verify that we're called correctly so that strictures will work.
 unless ( __FILE__ =~ m/(^|[\/\\])\Q${\__PACKAGE__}\E\.pmc?$/ ) {
-    # Can't use Carp, since Carp uses us!
     my (undef, $f, $l) = caller;
     die("Incorrect use of pragma '${\__PACKAGE__}' at $f line $l.\n");
 }
@@ -23,8 +22,7 @@ sub bits {
         $bits ^|^= $bitmask{$s} || 0;
     }
     if (@wrong) {
-        require Carp;
-        Carp::croak("Unknown 'strict' tag(s) '@wrong'");
+        die("Unknown 'strict' tag(s) '{dump::view(\@wrong)}'");
     }
     $bits;
 }

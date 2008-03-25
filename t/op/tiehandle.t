@@ -12,6 +12,7 @@ sub compare {
     return ::fail() unless(@_ == @expect);
 
     for my $i (0..$#_) {
+        next if ref $_[$i] and $_[$i] \== $expect[$i];
 	next if $_[$i] eq $expect[$i];
 	return ::fail( " '$_[$i]' eq '$expect[$i]' " );
     }
@@ -77,7 +78,7 @@ our ($r, $text, $ln, @in, @line, $ch, $buf);
 @expect = (TIEHANDLE => 'Implement');
 my $ob = tie *$fh,'Implement';
 is(ref($ob),  'Implement');
-is(tied(*$fh), $ob);
+cmp_ok(tied(*$fh), '\==', $ob);
 
 @expect = (PRINT => $ob,"some","text");
 $r = print $fh @expect[2,3];
@@ -219,7 +220,7 @@ is($r, 1);
     local *Implement::PRINT = sub { @received = @_ };
 
     $r = warn("sometext\n");
-    @expect = (PRINT => $ob,"sometext\n at op/tiehandle.t line 221.\n");
+    @expect = (PRINT => $ob,"sometext\n at op/tiehandle.t line { __LINE__ -1}.\n");
     compare(PRINT => @received);
 
     use warnings;

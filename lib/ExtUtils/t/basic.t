@@ -17,7 +17,7 @@ use strict;
 use Config;
 use ExtUtils::MakeMaker;
 
-use Test::More tests => 83;
+use Test::More tests => 85;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use File::Find;
@@ -116,18 +116,22 @@ like( $ppd_html, qr{^\s*</SOFTPKG>}m,                      '  </SOFTPKG>');
 END { unlink 'Big-Dummy.ppd' }
 
 
-my $test_out = run("$make test");
-like( $test_out, qr/All tests successful/, 'make test' );
-is( $?, 0,                                 '  exited normally' ) || 
-    diag $test_out;
+SKIP: {
+    skip 'Test::Harness required for "make test"', 5 if not eval 'require Test::Harness; 1';
 
-# Test 'make test TEST_VERBOSE=1'
-my $make_test_verbose = make_macro($make, 'test', TEST_VERBOSE => 1);
-$test_out = run("$make_test_verbose");
-like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
-like( $test_out, qr/All tests successful/,  '  successful' );
-is( $?, 0,                                  '  exited normally' ) ||
-    diag $test_out;
+    my $test_out = run("$make test");
+    like( $test_out, qr/All tests successful/, 'make test' );
+    is( $?, 0,                                 '  exited normally' ) || 
+      diag $test_out;
+
+    # Test 'make test TEST_VERBOSE=1'
+    my $make_test_verbose = make_macro($make, 'test', TEST_VERBOSE => 1);
+    $test_out = run("$make_test_verbose");
+    like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
+    like( $test_out, qr/All tests successful/,  '  successful' );
+    is( $?, 0,                                  '  exited normally' ) ||
+      diag $test_out;
+}
 
 
 my $install_out = run("$make install");
@@ -236,8 +240,17 @@ SKIP: {
 }
 
 
-my $dist_test_out = run("$make disttest");
-is( $?, 0, 'disttest' ) || diag($dist_test_out);
+my $dist_out = run("$make dist");
+is( $?, 0, 'dist' ) || diag($dist_out);
+
+my $distdir_out2 = run("$make distdir");
+is( $?, 0, 'distdir' ) || diag($distdir_out2);
+
+SKIP: {
+    skip 'Test::Harness required for "make disttest"', 1 if not eval 'require Test::Harness; 1';
+    my $dist_test_out = run("$make disttest");
+    is( $?, 0, 'disttest' ) || diag($dist_test_out);
+}
 
 # Test META.yml generation
 use ExtUtils::Manifest qw(maniread);
@@ -299,13 +312,13 @@ ok( grep(m/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
 
 # I know we'll get ignored errors from make here, that's ok.
 # Send STDERR off to oblivion.
-open(SAVERR, ">", "&STDERR") or die $!;
+open(SAVERR, ">&", \*STDERR) or die $!;
 open(STDERR, ">", "".File::Spec->devnull) or die $!;
 
 my $realclean_out = run("$make realclean");
 is( $?, 0, 'realclean' ) || diag($realclean_out);
 
-open(STDERR, ">", "&SAVERR") or die $!;
+open(STDERR, ">&", \*SAVERR) or die $!;
 close SAVERR;
 
 

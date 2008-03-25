@@ -39,7 +39,7 @@ while (@$D) {
     my $vpack = "version"; # hide the name from 5.004
     my $vres = eval { $vpack->new($l) cmp $vpack->new($r); };
     if ($@) {
-      push @other, "v.pm: $@";
+      push @other, "v.pm: {$@->message}";
     } elsif ($vres != $res) {
       push @other, sprintf "v.pm: %d", $vres;
     }

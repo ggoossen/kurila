@@ -78,7 +78,7 @@ err_ok( <<ERR );
 #   Failed test 'undef is 0?'
 #   at $0 line 42.
 #          got: undef
-#     expected: '0'
+#     expected: 0
 #   Failed test 'empty string is 0?'
 #   at $0 line 43.
 #          got: ''
@@ -189,14 +189,14 @@ err_ok( <<ERR );
 #     expected: 23
 #   Failed test '       !='
 #   at $0 line 70.
-#     '42'
+#     42
 #         !=
-#     '42'
+#     42
 #   Failed test '       &&'
 #   at $0 line 71.
-#     '1'
+#     1
 #         &&
-#     '0'
+#     0
 ERR
 
 

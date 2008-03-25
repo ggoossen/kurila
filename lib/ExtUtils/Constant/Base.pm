@@ -2,7 +2,6 @@ package ExtUtils::Constant::Base;
 
 use strict;
 use vars qw($VERSION);
-use Carp;
 use Text::Wrap;
 use ExtUtils::Constant::Utils qw(C_stringify perl_stringify);
 $VERSION = '0.04';
@@ -218,7 +217,7 @@ sub dump_names {
     my $type;
     if (ref $_) {
       $type = $_->{type} || $default_type;
-      confess "No more utf8 flag" if ($_->{utf8});
+      die "No more utf8 flag" if ($_->{utf8});
     } else {
       $_ = {name=>$_};
       $type = $default_type;
@@ -313,8 +312,8 @@ sub assign {
     $clause .= ";" unless $pre =~ m/;$/;
     $clause .= "\n";
   }
-  confess "undef \$type" unless defined $type;
-  confess "Can't generate code for type $type"
+  die "undef \$type" unless defined $type;
+  die "Can't generate code for type $type"
     unless $self->valid_type($type);
 
   $clause .= join '', map {"$indent$_\n"}
@@ -357,7 +356,7 @@ sub return_clause {
   $indent = ' ' x ($indent || 6);
   unless (defined $type) {
     # use Data::Dumper; print STDERR Dumper ($item);
-    confess "undef \$type";
+    die "undef \$type";
   }
 
   ##ifdef thingy
@@ -398,7 +397,7 @@ sub match_clause {
   my $body = '';
   my ($no, $yes, $either, $name, $inner_indent);
   if (ref $item eq 'ARRAY') {
-      confess("utf8 removed '$item->[0]{name}' - '$item->[1]{name}'");
+      die("utf8 removed '$item->[0]{name}' - '$item->[1]{name}'");
   } else {
     $name = $item->{name};
     $inner_indent = $indent;
@@ -454,7 +453,7 @@ sub switch_clause {
   }
   my @safe_names = @names;
   foreach (@safe_names) {
-    confess sprintf "Name '$_' is length %d, not $namelen", length
+    die sprintf "Name '$_' is length %d, not $namelen", length
       unless length == $namelen;
     # Argh. 5.6.1
     # next unless tr/A-Za-z0-9_//c;
@@ -478,7 +477,7 @@ sub switch_clause {
     foreach (@names) {
       my $char = substr $_, $i, 1;
       my $ord = ord $char;
-      confess "char $ord is out of range" if $ord +> 255;
+      die "char $ord is out of range" if $ord +> 255;
       $max = $ord if $ord +> $max;
       $min = $ord if $ord +< $min;
       push @{$spread{$char}}, $_;
@@ -505,7 +504,7 @@ sub switch_clause {
       @best = ($rms, $max - $min, $i, \%spread);
     }
   }
-  confess "Internal error. Failed to pick a switch point for @names"
+  die "Internal error. Failed to pick a switch point for @names"
     unless defined $best[2];
   # use Data::Dumper; print Dumper (@best);
   my ($offset, $best) = @best[2,3];
@@ -518,9 +517,9 @@ sub switch_clause {
     $body .= $indent . "switch (" . $self->name_param() . "[$offset]) \{\n";
   }
   foreach my $char (sort keys %$best) {
-    confess sprintf "'$char' is %d bytes long, not 1", length $char
+    die sprintf "'$char' is %d bytes long, not 1", length $char
       if length ($char) != 1;
-    confess sprintf "char %#X is out of range", ord $char if ord ($char) +> 255;
+    die sprintf "char %#X is out of range", ord $char if ord ($char) +> 255;
     $body .= $indent . "case '" . C_stringify ($char) . "':\n";
     foreach my $thisone (sort {
 	# Deal with the case of an item actually being an array ref to 1 or 2
@@ -636,8 +635,8 @@ sub normalise_items
             $type ||= $default_type;
             $what->{$type} = 1;
             $item = {name=>$name, type=>$type};
-            $item->{macro} = $macro if defined $macro and $macro ne $name;
-            $item->{value} = $value if defined $value and $value ne $name;
+            $item->{macro} = $macro if defined $macro and (ref $macro or $macro ne $name);
+            $item->{value} = $value if defined $value and (ref $value or $value ne $name);
             foreach my $key (qw(default pre post def_pre def_post weight
                                 not_constant)) {
                 my $value = $orig->{$key};

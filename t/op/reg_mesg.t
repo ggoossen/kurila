@@ -132,7 +132,6 @@ while (@death)
 	print "# oops, $regex didn't die\nnot ok $count\n";
 	next;
     }
-    chomp $@;
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     $result .= " at ";

@@ -38,6 +38,7 @@
 #if defined(MYMALLOC)
 #ifdef PERL_CORE
 #define malloced_size		Perl_malloced_size
+#define malloc_good_size	Perl_malloc_good_size
 #endif
 #endif
 #define get_context		Perl_get_context
@@ -2199,6 +2200,8 @@
 #define pp_recv			Perl_pp_recv
 #define pp_redo			Perl_pp_redo
 #define pp_ref			Perl_pp_ref
+#define pp_ref_eq		Perl_pp_ref_eq
+#define pp_ref_ne		Perl_pp_ref_ne
 #define pp_refgen		Perl_pp_refgen
 #define pp_regcmaybe		Perl_pp_regcmaybe
 #define pp_regcomp		Perl_pp_regcomp
@@ -2313,6 +2316,7 @@
 #if defined(MYMALLOC)
 #ifdef PERL_CORE
 #define malloced_size		Perl_malloced_size
+#define malloc_good_size	Perl_malloc_good_size
 #endif
 #endif
 #define get_context		Perl_get_context
@@ -4471,6 +4475,8 @@
 #define pp_recv()		Perl_pp_recv(aTHX)
 #define pp_redo()		Perl_pp_redo(aTHX)
 #define pp_ref()		Perl_pp_ref(aTHX)
+#define pp_ref_eq()		Perl_pp_ref_eq(aTHX)
+#define pp_ref_ne()		Perl_pp_ref_ne(aTHX)
 #define pp_refgen()		Perl_pp_refgen(aTHX)
 #define pp_regcmaybe()		Perl_pp_regcmaybe(aTHX)
 #define pp_regcomp()		Perl_pp_regcomp(aTHX)

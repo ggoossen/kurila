@@ -4,7 +4,7 @@
 # Rerun `sh Makefile.SH; make depend' after making any change.
 
 # Additional rules supported: libperl.a (for static linking),
-# ld2 and perlld removed
+# ld2 and perlld removed. Revised logic for major_minor_sub dllname here.
 #
 
 #! /bin/sh
@@ -34,7 +34,16 @@ cygwin.c: cygwin/cygwin.c
 libperl=`echo $libperl|sed -e s,\\\..*,,`
 linklibperl=-l`echo $libperl|sed -e s,^lib,,`
 vers=`echo $version|tr '.' '_'`
+vers=`echo $vers|sed -e's/\([0-9]_[0-9]\)_[0-9]$/\1/'`
 dllname=`echo $libperl|sed -e s,^lib,cyg,`$vers
+# append "d" suffix to -DDEBUGGING build: cygperl5_10d.dll
+case $config_args in
+  *DEBUGGING*)
+      dllname="${dllname}"d
+      ;;
+esac
+# added -mms-bitfields to be able to link to MSVC win32 bitfields libs 
+# (4 byte instead of 2 byte alignment)
 
 $spitshell >>Makefile <<!GROK!THIS!
 LIBPERL = $libperl
@@ -42,6 +51,7 @@ LLIBPERL= $linklibperl
 DLLNAME= $dllname
 CLDFLAGS= -L$addtopath $ldflags
 LDDLFLAGS = --shared -L$addtopath $ldflags
+CCFLAGS=$ccflags -mms-bitfields 
 PLDLFLAGS = 
 CAT = $cat
 AWK = $awk

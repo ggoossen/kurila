@@ -25,7 +25,7 @@ print "# TMPNAM file name: $tmpnam\n";
 # Not strict posix behaviour
 (my $fh, $tmpnam) = tmpnam();
 
-print "# TMPNAM: in list context: $fh $tmpnam\n";
+print "# TMPNAM: in list context: {dump::view($fh)} $tmpnam\n";
 
 # File is opened - make sure it exists
 ok( (-e $tmpnam ));
@@ -44,7 +44,7 @@ $fh = tmpfile();
 
 if (defined $fh) {
   ok( $fh );
-  print "# TMPFILE: tmpfile got FH $fh\n";
+  print "# TMPFILE: tmpfile got FH {dump::view($fh)}\n";
 
   $fh->autoflush(1);
 

@@ -248,7 +248,7 @@ sub set_source {
     DEBUG and print "$self 's source is array ref $_[0]\n";
     return;
   } elsif(ref $_[0]) {
-    $self->{'source_filename'} = '' . ($handle = $_[0]);
+    $self->{'source_filename'} = dump::view($handle = $_[0]);
     DEBUG and print "$self 's source is fh-obj $_[0]\n";
   } elsif(!length $_[0]) {
     Carp::croak("Can't use empty-string as a source for set_source");

@@ -106,7 +106,7 @@ is ($@, '');
 is $testimport->[1], "joe";
 
 eval "use testuse v1.01 qw(freda)";
-isnt($@, '');
+isnt( ref $@, '' );
 is $testimport->[1], "joe", "testimport is still 'joe'";
 
 {

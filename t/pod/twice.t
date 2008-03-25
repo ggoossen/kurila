@@ -5,8 +5,6 @@ use File::Spec;
 BEGIN { plan tests => 1 }
 
 use Pod::Parser;
-use Carp;
-${^DIE_HOOK} = \&Carp::confess;
 
 eval {require IO::String;};
 skip($@ ? 'no IO::String' : '', sub {

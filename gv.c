@@ -1737,10 +1737,6 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
 	 case eq_amg:
 	 case ne_amg:
 	   postpr = 1; off=ncmp_amg; break;
-	 case slt_amg:
-	 case sle_amg:
-	 case sgt_amg:
-	 case sge_amg:
 	 case seq_amg:
 	 case sne_amg:
 	   postpr = 1; off=scmp_amg; break;
@@ -1758,10 +1754,6 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
 	 case ge_amg:
 	 case eq_amg:
 	 case ne_amg:
-	 case slt_amg:
-	 case sle_amg:
-	 case sgt_amg:
-	 case sge_amg:
 	 case seq_amg:
 	 case sne_amg:
 	   postpr = 0; break;
@@ -1900,16 +1892,12 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
       int ans;
       switch (method) {
       case le_amg:
-      case sle_amg:
 	ans=SvIV(res)<=0; break;
       case lt_amg:
-      case slt_amg:
 	ans=SvIV(res)<0; break;
       case ge_amg:
-      case sge_amg:
 	ans=SvIV(res)>=0; break;
       case gt_amg:
-      case sgt_amg:
 	ans=SvIV(res)>0; break;
       case eq_amg:
       case seq_amg:

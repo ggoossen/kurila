@@ -16,10 +16,8 @@ BEGIN {
     $INC{'IO/Socket/INET.pm'} = 1;
 }
 
-(my $libnet_t = __FILE__) =~ s/time.t/libnet_t.pl/;
-require $libnet_t;
+use Test::More tests => 12;
 
-print "1..12\n";
 # cannot use(), otherwise it will use IO::Socket and IO::Select
 eval{ require Net::Time; };
 ok( !$@, 'should be able to require() Net::Time safely' );

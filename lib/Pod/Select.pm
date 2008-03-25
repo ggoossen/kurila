@@ -237,7 +237,6 @@ C</=item mine/../=(item|back)/>
 
 use strict;
 #use diagnostics;
-use Carp;
 use Pod::Parser v1.04;
 use vars qw(@ISA @EXPORT $MAX_HEADING_LEVEL);
 
@@ -373,7 +372,7 @@ sub select {
             push(@selected_sections, $_);
         }
         else {
-            carp "Ignoring section spec \"$spec\"!\n";
+            warn "Ignoring section spec \"$spec\"!\n";
         }
     }
 }
@@ -657,8 +656,8 @@ section specification (as described in L<"SECTION SPECIFICATIONS">)
 given in C<$section_sepc>, and compiles it into a list of regular
 expressions. If C<$section_spec> has no syntax errors, then a reference
 to the list (array) of corresponding regular expressions is returned;
-otherwise C<undef> is returned and an error message is printed (using
-B<carp>) for each invalid regex.
+otherwise C<undef> is returned and an error message is printed  for
+each invalid regex.
 
 =end _PRIVATE_
 
@@ -691,7 +690,7 @@ sub _compile_section_spec {
         eval "m/$_/";         ## check regex syntax
         if ($@) {
             ++$bad_regexs;
-            carp "Bad regular expression /$_/ in \"$section_spec\": $@\n";
+            warn "Bad regular expression /$_/ in \"$section_spec\": $@\n";
         }
         else {
             ## Add the forward and rear anchors (and put the negator back)

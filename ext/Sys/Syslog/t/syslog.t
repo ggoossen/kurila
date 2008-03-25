@@ -135,40 +135,40 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
         $r = eval { openlog('perl', '', 'local0') } || 0;
         skip "can't connect to syslog", 16 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' and without option 'ndelay'" );
-        ok( $r, "[$sock_type] openlog() should return true: '$r'" );
+        ok( $r, "[$sock_type] openlog() should return true: {dump::view($r)}" );
 
         # openlog() with the option NDELAY
         $r = eval { openlog('perl', 'ndelay', 'local0') } || 0;
         skip "can't connect to syslog", 14 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' with option 'ndelay'" );
-        ok( $r, "[$sock_type] openlog() should return true: '$r'" );
+        ok( $r, "[$sock_type] openlog() should return true: {dump::view($r)}" );
 
         # syslog() with negative level, should fail
         $r = eval { syslog(-1, "$test_string by connecting to a $sock_type socket") } || 0;
         like( $@->{description}, '/^syslog: invalid level\/facility: /', "[$sock_type] syslog() called with level -1" );
-        ok( !$r, "[$sock_type] syslog() should return false: '$r'" );
+        ok( !$r, "[$sock_type] syslog() should return false: {dump::view($r)}" );
 
         # syslog() with levels "info" and "notice" (as a strings), should fail
         $r = eval { syslog('info,notice', "$test_string by connecting to a $sock_type socket") } || 0;
         like( $@->{description}, '/^syslog: too many levels given: notice/', "[$sock_type] syslog() called with level 'info,notice'" );
-        ok( !$r, "[$sock_type] syslog() should return false: '$r'" );
+        ok( !$r, "[$sock_type] syslog() should return false: {dump::view($r)}" );
 
         # syslog() with facilities "local0" and "local1" (as a strings), should fail
         $r = eval { syslog('local0,local1', "$test_string by connecting to a $sock_type socket") } || 0;
         like( $@->{description}, '/^syslog: too many facilities given: local1/', "[$sock_type] syslog() called with level 'local0,local1'" );
-        ok( !$r, "[$sock_type] syslog() should return false: '$r'" );
+        ok( !$r, "[$sock_type] syslog() should return false: {dump::view($r)}" );
 
         # syslog() with level "info" (as a string), should pass
         $r = eval { syslog('info', "$test_string by connecting to a $sock_type socket") } || 0;
         is( $@, '', "[$sock_type] syslog() called with level 'info' (string)" );
-        ok( $r, "[$sock_type] syslog() should return true: '$r'" );
+        ok( $r, "[$sock_type] syslog() should return true: {dump::view($r)}" );
 
         # syslog() with level "info" (as a macro), should pass
         { local $! = 1;
           $r = eval { syslog(LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: %m") } || 0;
         }
         is( $@, '', "[$sock_type] syslog() called with level 'info' (macro)" );
-        ok( $r, "[$sock_type] syslog() should return true: '$r'" );
+        ok( $r, "[$sock_type] syslog() should return true: {dump::view($r)}" );
 
         push @passed, $sock_type;
 

@@ -13,7 +13,7 @@ use ExtUtils::MakeMaker qw($Verbose neatvalue);
 
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);
-$VERSION = '6.43_02';
+$VERSION = '6.44';
 
 require ExtUtils::MM_Any;
 our @ISA = qw(ExtUtils::MM_Any);
@@ -698,7 +698,7 @@ sub dist_target {
 
     my $date_check = $self->oneliner(<<'CODE', ['-l']);
 print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
-    if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' < -M '$(FIRST_MAKEFILE)';
+    if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' +< -M '$(FIRST_MAKEFILE)';
 CODE
 
     return sprintf <<'MAKE_FRAG', $date_check;
@@ -1803,7 +1803,7 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{RM_RF}      ||= "rm -rf";
     $self->{TOUCH}      ||= "touch";
     $self->{TEST_F}     ||= "test -f";
-    $self->{CP}         ||= "ln"; # HACK to keep using original files. "cp";
+    $self->{CP}         ||= "cp";
     $self->{MV}         ||= "mv";
     $self->{CHMOD}      ||= "chmod";
     $self->{MKPATH}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e mkpath';
@@ -2443,7 +2443,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	push @$extra, $_;
     }
 
-    map(s/^(.*)/"-I$1"/, @{$perlinc || []});
+    s/^(.*)/"-I$1"/ for @{$perlinc || []}; 
 
     $target ||= "perl";
     $tmp    ||= ".";

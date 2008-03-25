@@ -64,7 +64,7 @@ sub xsinit {
 	$fh = \*STDOUT;
     }
     else {
-	$fh = FileHandle->new("> $file");
+	$fh = FileHandle->new("$file", ">");
     }
 
     push(@mods, static_ext()) if defined $std;

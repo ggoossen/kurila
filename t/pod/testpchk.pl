@@ -17,7 +17,6 @@ use Pod::Checker;
 use vars qw(@ISA @EXPORT $MYPKG);
 #use strict;
 #use diagnostics;
-use Carp;
 use Exporter;
 #use File::Compare;
 
@@ -44,9 +43,9 @@ sub msgcmp( $ $ ) {
 
 sub testpodcheck( @ ) {
    my %args = @_;
-   my $infile  = $args{'-In'}  || croak "No input file given!";
-   my $outfile = $args{'-Out'} || croak "No output file given!";
-   my $cmpfile = $args{'-Cmp'} || croak "No compare-result file given!";
+   my $infile  = $args{'-In'}  || die "No input file given!";
+   my $outfile = $args{'-Out'} || die "No output file given!";
+   my $cmpfile = $args{'-Cmp'} || die "No compare-result file given!";
 
    my $different = '';
    my $testname = basename $cmpfile, '.t', '.xr';

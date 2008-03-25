@@ -81,17 +81,10 @@ is unchanged (except for $io->autoflush will actually turn ON
 autoflush by default).
 
     $io->autoflush ( [BOOL] )                         $|
-    $io->format_page_number( [NUM] )                  $%
-    $io->format_lines_per_page( [NUM] )               $=
-    $io->format_lines_left( [NUM] )                   $-
-    $io->format_name( [STR] )                         $~
-    $io->format_top_name( [STR] )                     $^
     $io->input_line_number( [NUM])                    $.
 
 The following methods are not supported on a per-filehandle basis.
 
-    IO::Handle->format_line_break_characters( [STR] ) $:
-    IO::Handle->format_formfeed( [STR])               $^L
     IO::Handle->output_field_separator( [STR] )       $,
     IO::Handle->output_record_separator( [STR] )      $\
 
@@ -124,7 +117,7 @@ list context but still returns just one line.  If used as the conditional
 
 This works like <$io> when called in a list context to read all
 the remaining lines in a file, except that it's more readable.
-It will also croak() if accidentally called in a scalar context.
+It will also die() if accidentally called in a scalar context.
 
 =item $io->ungetc ( ORD )
 
@@ -253,7 +246,6 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 
 use strict;
 our($VERSION, @EXPORT_OK, @ISA);
-use Carp;
 use Symbol;
 use SelectSaver;
 use IO ();	# Load the XS module
@@ -270,13 +262,6 @@ $VERSION = eval $VERSION;
     output_record_separator
     input_record_separator
     input_line_number
-    format_page_number
-    format_lines_per_page
-    format_lines_left
-    format_name
-    format_top_name
-    format_line_break_characters
-    format_formfeed
 
     print
     printf
@@ -300,29 +285,20 @@ $VERSION = eval $VERSION;
 
 sub new {
     my $class = ref($_[0]) || $_[0] || "IO::Handle";
-    @_ == 1 or croak "usage: new $class";
+    @_ == 1 or die "usage: new $class";
     my $io = gensym;
     bless $io, $class;
 }
 
 sub new_from_fd {
     my $class = ref($_[0]) || $_[0] || "IO::Handle";
-    @_ == 3 or croak "usage: new_from_fd $class FD, MODE";
+    @_ == 3 or die "usage: new_from_fd $class FD, MODE";
     my $io = gensym;
     shift;
     IO::Handle::fdopen($io, @_)
 	or return undef;
     bless $io, $class;
 }
-
-#
-# There is no need for DESTROY to do anything, because when the
-# last reference to an IO object is gone, Perl automatically
-# closes its associated files (if any).  However, to avoid any
-# attempts to autoload DESTROY, we here define it to do nothing.
-#
-sub DESTROY {}
-
 
 ################################################
 ## Open and close.
@@ -334,12 +310,12 @@ sub _open_mode_string {
       or $mode =~ s/^r(\+?)$/$1</
       or $mode =~ s/^w(\+?)$/$1>/
       or $mode =~ s/^a(\+?)$/$1>>/
-      or croak "IO::Handle: bad open mode: $mode";
+      or die "IO::Handle: bad open mode: $mode";
     $mode;
 }
 
 sub fdopen {
-    @_ == 3 or croak 'usage: $io->fdopen(FD, MODE)';
+    @_ == 3 or die 'usage: $io->fdopen(FD, MODE)';
     my ($io, $fd, $mode) = @_;
 
     my $fdmode = '&';
@@ -353,7 +329,7 @@ sub fdopen {
 }
 
 sub close {
-    @_ == 1 or croak 'usage: $io->close()';
+    @_ == 1 or die 'usage: $io->close()';
     my($io) = @_;
 
     close($io);
@@ -367,39 +343,39 @@ sub close {
 # select
 
 sub opened {
-    @_ == 1 or croak 'usage: $io->opened()';
+    @_ == 1 or die 'usage: $io->opened()';
     defined fileno($_[0]);
 }
 
 sub fileno {
-    @_ == 1 or croak 'usage: $io->fileno()';
+    @_ == 1 or die 'usage: $io->fileno()';
     fileno($_[0]);
 }
 
 sub getc {
-    @_ == 1 or croak 'usage: $io->getc()';
+    @_ == 1 or die 'usage: $io->getc()';
     getc($_[0]);
 }
 
 sub eof {
-    @_ == 1 or croak 'usage: $io->eof()';
+    @_ == 1 or die 'usage: $io->eof()';
     eof($_[0]);
 }
 
 sub print {
-    @_ or croak 'usage: $io->print(ARGS)';
+    @_ or die 'usage: $io->print(ARGS)';
     my $this = shift;
     print $this @_;
 }
 
 sub printf {
-    @_ +>= 2 or croak 'usage: $io->printf(FMT,[ARGS])';
+    @_ +>= 2 or die 'usage: $io->printf(FMT,[ARGS])';
     my $this = shift;
     printf $this @_;
 }
 
 sub getline {
-    @_ == 1 or croak 'usage: $io->getline()';
+    @_ == 1 or die 'usage: $io->getline()';
     my $this = shift;
     return scalar ~< $this;
 } 
@@ -407,37 +383,37 @@ sub getline {
 *gets = \&getline;  # deprecated
 
 sub getlines {
-    @_ == 1 or croak 'usage: $io->getlines()';
+    @_ == 1 or die 'usage: $io->getlines()';
     wantarray or
-	croak q|Can't call $io->getlines in a scalar context, use $io->getline|;
+	die q|Can't call $io->getlines in a scalar context, use $io->getline|;
     my $this = shift;
     return ~< $this;
 }
 
 sub truncate {
-    @_ == 2 or croak 'usage: $io->truncate(LEN)';
+    @_ == 2 or die 'usage: $io->truncate(LEN)';
     truncate($_[0], $_[1]);
 }
 
 sub read {
-    @_ == 3 || @_ == 4 or croak 'usage: $io->read(BUF, LEN [, OFFSET])';
+    @_ == 3 || @_ == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
     read($_[0], $_[1], $_[2], $_[3] || 0);
 }
 
 sub sysread {
-    @_ == 3 || @_ == 4 or croak 'usage: $io->sysread(BUF, LEN [, OFFSET])';
+    @_ == 3 || @_ == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
     sysread($_[0], $_[1], $_[2], $_[3] || 0);
 }
 
 sub write {
-    @_ +>= 2 && @_ +<= 4 or croak 'usage: $io->write(BUF [, LEN [, OFFSET]])';
+    @_ +>= 2 && @_ +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
     local($\) = "";
     $_[2] = length($_[1]) unless defined $_[2];
     print { $_[0] } substr($_[1], $_[3] || 0, $_[2]);
 }
 
 sub syswrite {
-    @_ +>= 2 && @_ +<= 4 or croak 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
+    @_ +>= 2 && @_ +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
     if (defined($_[2])) {
 	syswrite($_[0], $_[1], $_[2], $_[3] || 0);
     } else {
@@ -446,7 +422,7 @@ sub syswrite {
 }
 
 sub stat {
-    @_ == 1 or croak 'usage: $io->stat()';
+    @_ == 1 or die 'usage: $io->stat()';
     stat($_[0]);
 }
 
@@ -462,7 +438,7 @@ sub autoflush {
 }
 
 sub output_field_separator {
-    carp "output_field_separator is not supported on a per-handle basis"
+    warn "output_field_separator is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $,;
     $, = $_[1] if @_ +> 1;
@@ -470,7 +446,7 @@ sub output_field_separator {
 }
 
 sub output_record_separator {
-    carp "output_record_separator is not supported on a per-handle basis"
+    warn "output_record_separator is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $\;
     $\ = $_[1] if @_ +> 1;
@@ -478,7 +454,7 @@ sub output_record_separator {
 }
 
 sub input_record_separator {
-    carp "input_record_separator is not supported on a per-handle basis"
+    warn "input_record_separator is not supported on a per-handle basis"
 	if ref($_[0]);
     my $prev = $/;
     $/ = $_[1] if @_ +> 1;
@@ -493,72 +469,16 @@ sub input_line_number {
     $prev;
 }
 
-sub format_page_number {
-    my $old;
-    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
-    my $prev = $%;
-    $% = $_[1] if @_ +> 1;
-    $prev;
-}
-
-sub format_lines_per_page {
-    my $old;
-    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
-    my $prev = $=;
-    $= = $_[1] if @_ +> 1;
-    $prev;
-}
-
-sub format_lines_left {
-    my $old;
-    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
-    my $prev = $-;
-    $- = $_[1] if @_ +> 1;
-    $prev;
-}
-
-sub format_name {
-    my $old;
-    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
-    my $prev = $~;
-    $~ = qualify($_[1], caller) if @_ +> 1;
-    $prev;
-}
-
-sub format_top_name {
-    my $old;
-    $old = SelectSaver->new( qualify($_[0], caller)) if ref($_[0]);
-    my $prev = $^;
-    $^ = qualify($_[1], caller) if @_ +> 1;
-    $prev;
-}
-
-sub format_line_break_characters {
-    carp "format_line_break_characters is not supported on a per-handle basis"
-	if ref($_[0]);
-    my $prev = $:;
-    $: = $_[1] if @_ +> 1;
-    $prev;
-}
-
-sub format_formfeed {
-    carp "format_formfeed is not supported on a per-handle basis"
-	if ref($_[0]);
-    my $prev = $^L;
-    $^L = $_[1] if @_ +> 1;
-    $prev;
-}
-
 # XXX undocumented
 sub fcntl {
-    @_ == 3 || croak 'usage: $io->fcntl( OP, VALUE );';
+    @_ == 3 || die 'usage: $io->fcntl( OP, VALUE );';
     my ($io, $op) = @_;
     return fcntl($io, $op, $_[2]);
 }
 
 # XXX undocumented
 sub ioctl {
-    @_ == 3 || croak 'usage: $io->ioctl( OP, VALUE );';
+    @_ == 3 || die 'usage: $io->ioctl( OP, VALUE );';
     my ($io, $op) = @_;
     return ioctl($io, $op, $_[2]);
 }

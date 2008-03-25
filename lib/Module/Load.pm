@@ -25,7 +25,7 @@ sub load (*;@)  {
             for my $flag ( qw[1 0] ) {
                 my $file = _to_file( $mod, $flag);
                 eval { require $file };
-                $@ ? $err .= $@ : last LOAD;
+                $@ ? $err .= $@->message : last LOAD;
             }
             die $err if $err;
         }

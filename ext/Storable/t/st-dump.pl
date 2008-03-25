@@ -69,7 +69,7 @@ sub recursive_dump {
 	# Get something like SCALAR(0x...) or TYPE=SCALAR(0x...).
 	# Then extract the bless, ref and address parts of that string.
 
-	my $what = "$object";		# Stringify
+	my $what = dump::view($object);		# Stringify
 	my ($bless, $ref, $addr) = $what =~ m/^(\w+)=(\w+)\((0x.*)\)$/;
 	($ref, $addr) = $what =~ m/^(\w+)\((0x.*)\)$/ unless $bless;
 

@@ -314,8 +314,9 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	    XPUSHs(val); PUTBACK;
 	    i = perl_call_method(SvPVX_const(freezer), G_EVAL|G_VOID);
 	    SPAGAIN;
-	    if (SvTRUE(ERRSV))
-		warn("WARNING(Freezer method call failed): %"SVf"", ERRSV);
+	    if (SvTRUE(ERRSV)) {
+		warn("WARNING(Freezer method call failed)"); /* : %"SVf"", ERRSV); */
+            }
 	    PUTBACK; FREETMPS; LEAVE;
 	}
 	
@@ -431,11 +432,18 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 	 * at this depth (i.e., 'Foo=ARRAY(0xdeadbeef)').
 	 */
 	if (!purity && maxdepth > 0 && *levelp >= maxdepth) {
-	    STRLEN vallen;
-	    const char * const valstr = SvPV(val,vallen);
-	    sv_catpvn(retval, "'", 1);
-	    sv_catpvn(retval, valstr, vallen);
-	    sv_catpvn(retval, "'", 1);
+            dSP;
+            ENTER;
+            PUSHMARK(SP);
+            XPUSHs(val);
+            PUTBACK;
+            call_pv("dump::view", G_SCALAR);
+            SPAGAIN;
+            
+	    sv_catsv(retval, POPs);
+
+            PUTBACK;
+            LEAVE;
 	    return 1;
 	}
 

@@ -64,7 +64,7 @@ for (@prgs) {
     my $ERR = $@;
     untie $out;
     if ($ERR) {
-        ok(0, "$prog - $ERR");
+        ok(0, "$prog - {$ERR->message}");
     } else {
 	if ($expected =~ m:^/:) {
 	    like($$out, $expected, $prog);

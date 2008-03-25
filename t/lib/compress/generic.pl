@@ -252,7 +252,7 @@ EOM
       my $fh = 'IO::File'->new( "$name", ">") ;
       ok $fh, "opened file $name ok";
       my $x = $CompressClass-> new( $fh)  ;
-      ok $x, " created $CompressClass $fh"  ;
+      ok $x, " created $CompressClass {dump::view($fh)}"  ;
 
       is $x->fileno(), fileno($fh), "fileno match" ;
       is $x->write(''), 0, "Write empty string is ok";

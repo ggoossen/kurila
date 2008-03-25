@@ -1,7 +1,6 @@
 package Tie::Array;
 
 use strict;
-use Carp;
 our $VERSION = '1.03';
 
 # Pod documentation after __END__ below.
@@ -73,12 +72,12 @@ sub SPLICE {
 
 sub EXISTS {
     my $pkg = ref $_[0];
-    croak "$pkg doesn't define an EXISTS method";
+    die "$pkg doesn't define an EXISTS method";
 }
 
 sub DELETE {
     my $pkg = ref $_[0];
-    croak "$pkg doesn't define a DELETE method";
+    die "$pkg doesn't define a DELETE method";
 }
 
 package Tie::StdArray;
@@ -163,7 +162,7 @@ This module provides methods for array-tying classes. See
 L<perltie> for a list of the functions required in order to tie an array
 to a package. The basic B<Tie::Array> package provides stub C<DESTROY>,
 and C<EXTEND> methods that do nothing, stub C<DELETE> and C<EXISTS>
-methods that croak() if the delete() or exists() builtins are ever called
+methods that die() if the delete() or exists() builtins are ever called
 on the tied array, and implementations of C<PUSH>, C<POP>, C<SHIFT>,
 C<UNSHIFT>, C<SPLICE> and C<CLEAR> in terms of basic C<FETCH>, C<STORE>,
 C<FETCHSIZE>, C<STORESIZE>.
@@ -220,13 +219,13 @@ Can be used to optimize allocation. This method need do nothing.
 
 Verify that the element at index I<key> exists in the tied array I<this>.
 
-The B<Tie::Array> implementation is a stub that simply croaks.
+The B<Tie::Array> implementation is a stub that simply dies.
 
 =item DELETE this, key
 
 Delete the element at index I<key> from the tied array I<this>.
 
-The B<Tie::Array> implementation is a stub that simply croaks.
+The B<Tie::Array> implementation is a stub that simply dies.
 
 =item CLEAR this
 

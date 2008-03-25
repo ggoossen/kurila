@@ -3,7 +3,6 @@
 package IO;
 
 use XSLoader ();
-use Carp;
 use strict;
 use warnings;
 
@@ -19,7 +18,7 @@ sub import {
     my @l = @_ ? @_ : qw(Handle Seekable File Pipe Socket Dir);
 
     eval join("", map { "require IO::" . (m/(\w+)/)[0] . ";\n" } @l)
-	or croak $@;
+	or die $@;
 }
 
 1;

@@ -482,7 +482,7 @@ sub new {
 
     ## Initialize contents if they havent been already
     my $ptree = $self->{'-ptree'} || Pod::ParseTree->new();
-    if ( ref $ptree =~ m/^(ARRAY)?$/ ) {
+    if ( (ref $ptree) =~ m/^(ARRAY)?$/ ) {
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
         $ptree = Pod::ParseTree->new($1 ? [$ptree] : $ptree);
@@ -521,7 +521,7 @@ sub _set_child2parent_links {
    my ($self, @children) = @_;
    ## Make sure any sequences know who their parent is
    for (@children) {
-      next  unless (length  and  ref  and  ref ne 'SCALAR');
+      next  unless (ref  and  ref ne 'SCALAR');
       if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
           UNIVERSAL::can($_, 'nested'))
       {
@@ -537,7 +537,7 @@ sub _unset_child2parent_links {
    $self->{'-parent_sequence'} = undef;
    my $ptree = $self->{'-ptree'};
    for (@$ptree) {
-      next  unless (length  and  ref  and  ref ne 'SCALAR');
+      next  unless (ref  and  ref ne 'SCALAR');
       $_->_unset_child2parent_links()
           if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
    }
@@ -897,7 +897,7 @@ sub _unset_child2parent_links {
    my $self = shift;
    local *ptree = $self;
    for (@ptree) {
-       next  unless (defined and length  and  ref  and  ref ne 'SCALAR');
+       next  unless (defined and  ref  and  ref ne 'SCALAR');
        $_->_unset_child2parent_links()
            if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
    }

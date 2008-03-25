@@ -241,7 +241,7 @@ use constant TRUE   => sub { 1 };
     
     for my $val ( 1, 'foo', [], bless({},__PACKAGE__) ) {
         my $rv      = check( $tmpl, { foo => $val } );
-        my $text    = "Key 'foo' ($val) is of invalid type";
+        my $text    = "Key 'foo' ({dump::view($val)}) is of invalid type";
         my $re      = quotemeta $text;
         
         ok(!$rv,                    "check() fails with unalllowed value" );

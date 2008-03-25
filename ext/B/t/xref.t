@@ -28,7 +28,7 @@ open SAVEOUT, ">&", \*STDOUT or diag $!;
 close STDOUT;
 # line 100
 our $compilesub = B::Xref::compile("-o$file");
-ok( ref $compilesub eq 'CODE', "compile() returns a coderef ($compilesub)" );
+ok( ref $compilesub eq 'CODE', "compile() returns a coderef ({dump::view($compilesub)})" );
 $compilesub->(); # Compile this test script
 close STDOUT;
 open STDOUT, ">&", \*SAVEOUT or diag $!;

@@ -63,7 +63,8 @@ sub sub {
   push(@stack, $DB::single);
   $DB::single ^&^= 1;
   $DB::single ^|^= 4 if $#stack == $deep;
-  if ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY' or not defined wantarray) {
+  if ((! ref $DB::sub and ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY'))
+      or not defined wantarray) {
     &$DB::sub;
     $DB::single ^|^= pop(@stack);
     $DB::ret = undef;
@@ -197,7 +198,7 @@ sub done {
 
 sub _clientname {
   my $name = shift;
-  "$name" =~ m/^(.+)=[A-Z]+\(.+\)$/;
+  dump::view($name) =~ m/^(.+)=[A-Z]+\(.+\)$/;
   return $1;
 }
 

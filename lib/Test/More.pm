@@ -1,10 +1,9 @@
 package Test::More;
 
-
 use strict;
 
 use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
-$VERSION = '0.74';
+$VERSION = '0.78';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 use Test::Builder::Module;
@@ -19,7 +18,7 @@ use Test::Builder::Module;
              plan
              can_ok  isa_ok
              diag
-	     BAIL_OUT
+             BAIL_OUT
             );
 
 
@@ -148,31 +147,6 @@ sub plan {
     my $tb = Test::More->builder;
 
     $tb->plan(@_);
-}
-
-
-# This implements "use Test::More 'no_diag'" but the behavior is
-# deprecated.
-sub import_extra {
-    my $class = shift;
-    my $list  = shift;
-
-    my @other = ();
-    my $idx = 0;
-    while( $idx +<= $#{$list} ) {
-        my $item = $list->[$idx];
-
-        if( defined $item and $item eq 'no_diag' ) {
-            $class->builder->no_diag(1);
-        }
-        else {
-            push @other, $item;
-        }
-
-        $idx++;
-    }
-
-    @$list = @other;
 }
 
 
@@ -645,34 +619,28 @@ sub use_ok ($;@) {
 
     my($pack,$filename,$line) = caller;
 
-    # Work around a glitch in $@ and eval
-    my $eval_error;
-    {
-        local($@,$!);   # isolate eval
-
-        if( @imports == 1 and $imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
-            # probably a version check.  Perl needs to see the bare number
-            # for it to work with non-Exporter based modules.
-            eval <<USE;
+    my $code;
+    if( @imports == 1 and $imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
+        # probably a version check.  Perl needs to see the bare number
+        # for it to work with non-Exporter based modules.
+        $code = <<USE;
 package $pack;
 use $module $imports[0];
+1;
 USE
-        }
-        else {
-            eval <<USE;
+    }
+    else {
+        $code = <<USE;
 package $pack;
-use $module \@imports;
+use $module \@\{\$args[0]\};
+1;
 USE
-        }
-        $eval_error = $@;
     }
 
-    my $ok = $tb->ok( !$eval_error, "use $module;" );
-
+    my($eval_result, $eval_error) = _eval($code, \@imports);
+    my $ok = $tb->ok( $eval_result, "use $module;" );
+    
     unless( $ok ) {
-        chomp $eval_error;
-        $@ =~ s{^BEGIN failed--compilation aborted at .*$}
-                {BEGIN failed--compilation aborted at $filename line $line.}m;
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
     Error:  {$eval_error->message}
@@ -681,6 +649,20 @@ DIAGNOSTIC
     }
 
     return $ok;
+}
+
+
+sub _eval {
+    my($code) = shift;
+    my @args = @_;
+
+    # Work around oddities surrounding resetting of $@ by immediately
+    # storing it.
+    local($@,$!);   # isolate eval
+    my $eval_result = eval $code;
+    my $eval_error  = $@;
+
+    return($eval_result, $eval_error);
 }
 
 =item B<require_ok>
@@ -702,19 +684,19 @@ sub require_ok ($) {
     # Module names must be barewords, files not.
     $module = qq['$module'] unless _is_module_name($module);
 
-    local($!, $@); # isolate eval
-    eval <<REQUIRE;
+    my $code = <<REQUIRE;
 package $pack;
 require $module;
+1;
 REQUIRE
 
-    my $ok = $tb->ok( !$@, "require $module;" );
+    my($eval_result, $eval_error) = _eval($code);
+    my $ok = $tb->ok( $eval_result, "require $module;" );
 
     unless( $ok ) {
-        chomp $@;
         $tb->diag(<<DIAGNOSTIC);
     Tried to require '$module'.
-    Error:  {$@->message}
+    Error:  {$eval_error->message}
 DIAGNOSTIC
 
     }
@@ -847,10 +829,7 @@ sub _format_stack {
     my $out = "Structures begin differing at:\n";
     foreach my $idx (0..$#vals) {
         my $val = $vals[$idx];
-        $vals[$idx] = !defined $val ? 'undef'          :
-                      _dne($val)    ? "Does not exist" :
-                      ref $val      ? "$val"           :
-                                      "'$val'";
+        $vals[$idx] = _dne($val)    ? "Does not exist" : dump::view($val);
     }
 
     $out .= "$vars[0] = $vals[0]\n";
@@ -1176,7 +1155,7 @@ sub _eq_array  {
         return 0;
     }
 
-    return 1 if $a1 eq $a2;
+    return 1 if $a1 \== $a2;
 
     my $ok = 1;
     my $max = $#$a1 +> $#$a2 ? $#$a1 : $#$a2;
@@ -1212,7 +1191,7 @@ sub _deep_check {
         $tb->_unoverload_str(\$e1, \$e2);
 
         # Either they're both references or both not.
-        my $same_ref = !(!ref $e1 xor !ref $e2);
+        my $both_ref = (ref $e1 and ref $e2);
 	my $not_ref  = (!ref $e1 and !ref $e2);
 
         if( defined $e1 xor defined $e2 ) {
@@ -1221,7 +1200,10 @@ sub _deep_check {
         elsif ( _dne($e1) xor _dne($e2) ) {
             $ok = 0;
         }
-        elsif ( $same_ref and ($e1 eq $e2) ) {
+        elsif ( $both_ref and ($e1 \== $e2) ) {
+            $ok = 1;
+        }
+        elsif ( $not_ref and ($e1 eq $e2) ) {
             $ok = 1;
         }
 	elsif ( $not_ref ) {
@@ -1229,12 +1211,10 @@ sub _deep_check {
 	    $ok = 0;
 	}
         else {
-            if( $Refs_Seen{$e1} ) {
-                return $Refs_Seen{$e1} eq $e2;
+            if( $Refs_Seen{ref::address($e1)} ) {
+                return $Refs_Seen{ref::address($e1)} eq ref::address($e2);
             }
-            else {
-                $Refs_Seen{$e1} = "$e2";
-            }
+            $Refs_Seen{ref::address $e1} = ref::address $e2;
 
             my $type = _type($e1);
             $type = 'DIFFERENT' unless _type($e2) eq $type;
@@ -1306,7 +1286,7 @@ sub _eq_hash {
         return 0;
     }
 
-    return 1 if $a1 eq $a2;
+    return 1 if $a1 \== $a2;
 
     my $ok = 1;
     my $bigger = keys %$a1 +> keys %$a2 ? $a1 : $a2;
@@ -1428,7 +1408,7 @@ B<NOTE>  This behavior may go away in future versions.
 
 =item Backwards compatibility
 
-Test::More works with Perls as old as 5.004_05.
+Test::More works with Perls as old as 5.6.0.
 
 
 =item Overloaded objects

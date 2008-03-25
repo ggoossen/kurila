@@ -86,8 +86,7 @@ fresh_perl_is('print readline', 'foo',
               'readline() defaults to *ARGV');
 
 my $obj = bless [];
-$obj .= ~< *DATA;
-like($obj, qr/main=ARRAY.*world/, 'rcatline and refs');
+dies_like( sub { $obj .= ~< *DATA; }, qr/reference as string/, 'rcatline and refs');
 
 # bug #38631
 require Tie::Scalar;

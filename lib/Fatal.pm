@@ -1,10 +1,9 @@
 package Fatal;
 
-use Carp;
 use strict;
 our($Debug, $VERSION);
 
-$VERSION = 1.05;
+$VERSION = 1.06;
 
 $Debug = 0 unless defined $Debug;
 
@@ -69,10 +68,10 @@ sub one_invocation {
   local $" = ', ';
   if ($void) { 
     return qq/(defined wantarray)?$call(@argv):
-              $call(@argv) || croak "Can't $name(\@_)/ . 
+              $call(@argv) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})/ . 
            ($core ? ': $!' : ', \$! is \"$!\"') . '"'
   } else {
-    return qq{$call(@argv) || croak "Can't $name(\@_)} . 
+    return qq{$call(@argv) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
            ($core ? ': $!' : ', \$! is \"$!\"') . '"';
   }
 }
@@ -86,7 +85,7 @@ sub _make_fatal {
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
     print "# _make_fatal: sub=$sub pkg=$pkg name=$name void=$void\n" if $Debug;
-    croak "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
+    die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
 	$sref = \&$sub;
 	$proto = prototype $sref;
@@ -98,7 +97,7 @@ sub _make_fatal {
         $proto = eval { prototype "CORE::$name" };
 	die "$name is neither a builtin, nor a Perl subroutine" 
 	  if $@;
-	die "Cannot make a non-overridable builtin fatal"
+	die "Cannot make the non-overridable builtin $name fatal"
 	  if not defined $proto;
 	$core = 1;
 	$call = "CORE::$name";
@@ -119,7 +118,7 @@ EOS
     print $code if $Debug;
     {
       no strict 'refs'; # to avoid: Can't use string (...) as a symbol ref ...
-      $code = eval("package $pkg; use Carp; $code");
+      $code = eval("package $pkg; $code");
       die if $@;
       no warnings;   # to avoid: Subroutine foo redefined ...
       *{Symbol::fetch_glob($sub)} = $code;

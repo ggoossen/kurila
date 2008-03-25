@@ -21,9 +21,6 @@
   Odd number of elements in hash list		[pp_aassign]
 	%X = (1,2,3) ;
 
-  Reference found where even-sized list expected [pp_aassign]
-	$X = [ 1 ..3 ];
-
   Filehandle %s opened only for output		[Perl_do_readline] 
   	open (FH, ">./xcv") ;
 	my $a = ~< *FH ;
@@ -162,14 +159,6 @@ my %Y ; %Y = (1,2,3) ;
 EXPECT
 Odd number of elements in hash assignment at - line 3.
 ########
-# pp_hot.c [pp_aassign]
-use warnings 'misc' ;
-my %X ; %X = [1 .. 3] ;
-no warnings 'misc' ;
-my %Y ; %Y = [1 .. 3] ;
-EXPECT
-Reference found where even-sized list expected at - line 3.
-########
 # pp_hot.c [Perl_do_readline]
 use warnings 'closed' ;
 close STDIN        ; $a = ~< *STDIN ;
@@ -216,12 +205,15 @@ sub fred
 } 
 {
   local ${^WARN_HOOK} = sub {
-    die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
+    if ($_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
+        print "ok\n";
+        exit 0;
+    }
   };
   fred();
 }
 EXPECT
-
+ok
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
@@ -231,7 +223,10 @@ sub fred
 } 
 {
   local ${^WARN_HOOK} = sub {
-    die "ok\n" if $_[0] =~ m/^Deep recursion on subroutine "main::fred"/
+    if ($_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
+        print "ok\n";
+        exit 0;
+    }
   };
   fred();
 }
@@ -374,37 +369,4 @@ Use of uninitialized value $x in concatenation (.) or string at - line 6.
 Use of uninitialized value $y in concatenation (.) or string at - line 6.
 Use of uninitialized value $y in concatenation (.) or string at - line 7.
 Use of uninitialized value $y in concatenation (.) or string at - line 8.
-########
-# pp_hot.c [pp_aelem]
-{
-use warnings 'misc';
-print $x[\1];
-}
-{
-no warnings 'misc';
-print $x[\1];
-}
-
-EXPECT
-OPTION regex
-Use of reference ".*" as array index at - line 4.
-########
-# pp_hot.c [pp_aelem]
-package Foo;use overload q("") => sub {};package main;$a = bless {}, "Foo";
-$b = {};
-{
-use warnings 'misc';
-print $x[$a];
-print $x[$b];
-}
-{
-no warnings 'misc';
-print $x[$a];
-print $x[$b];
-}
-
-EXPECT
-OPTION regex
-Use of reference ".*" as array index at - line 7.
-
 ########

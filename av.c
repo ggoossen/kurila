@@ -28,6 +28,7 @@ Perl_av_reify(pTHX_ AV *av)
     I32 key;
 
     PERL_ARGS_ASSERT_AV_REIFY;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (AvREAL(av))
 	return;
@@ -67,6 +68,7 @@ Perl_av_extend(pTHX_ AV *av, I32 key)
     MAGIC *mg;
 
     PERL_ARGS_ASSERT_AV_EXTEND;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     mg = SvTIED_mg((SV*)av, PERL_MAGIC_tied);
     if (mg) {
@@ -117,8 +119,22 @@ Perl_av_extend(pTHX_ AV *av, I32 key)
 		IV itmp;
 #endif
 
-#ifdef MYMALLOC
-		newmax = malloced_size((void*)AvALLOC(av))/sizeof(SV*) - 1;
+#ifdef Perl_safesysmalloc_size
+		/* Whilst it would be quite possible to move this logic around
+		   (as I did in the SV code), so as to set AvMAX(av) early,
+		   based on calling Perl_safesysmalloc_size() immediately after
+		   allocation, I'm not convinced that it is a great idea here.
+		   In an array we have to loop round setting everything to
+		   &PL_sv_undef, which means writing to memory, potentially lots
+		   of it, whereas for the SV buffer case we don't touch the
+		   "bonus" memory. So there there is no cost in telling the
+		   world about it, whereas here we have to do work before we can
+		   tell the world about it, and that work involves writing to
+		   memory that might never be read. So, I feel, better to keep
+		   the current lazy system of only writing to it if our caller
+		   has a need for more space. NWC  */
+		newmax = Perl_safesysmalloc_size((void*)AvALLOC(av)) /
+		    sizeof(SV*) - 1;
 
 		if (key <= newmax) 
 		    goto resized;
@@ -147,7 +163,7 @@ Perl_av_extend(pTHX_ AV *av, I32 key)
 		    Safefree(AvALLOC(av));
 		AvALLOC(av) = ary;
 #endif
-#ifdef MYMALLOC
+#ifdef Perl_safesysmalloc_size
 	      resized:
 #endif
 		ary = AvALLOC(av) + AvMAX(av) + 1;
@@ -196,6 +212,7 @@ Perl_av_fetch(pTHX_ register AV *av, I32 key, I32 lval)
     dVAR;
 
     PERL_ARGS_ASSERT_AV_FETCH;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvRMAGICAL(av)) {
         const MAGIC * const tied_magic = mg_find((SV*)av, PERL_MAGIC_tied);
@@ -279,6 +296,7 @@ Perl_av_store(pTHX_ register AV *av, I32 key, SV *val)
     SV** ary;
 
     PERL_ARGS_ASSERT_AV_STORE;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     /* S_regclass relies on being able to pass in a NULL sv
        (unicode_alternate may be NULL).
@@ -370,6 +388,8 @@ Perl_av_make(pTHX_ register I32 size, register SV **strp)
     register AV * const av = (AV*)newSV_type(SVt_PVAV);
     /* sv_upgrade does AvREAL_only()  */
     PERL_ARGS_ASSERT_AV_MAKE;
+    assert(SvTYPE(av) == SVt_PVAV);
+
     if (size) {		/* "defined" was returning undef for size==0 anyway. */
         register SV** ary;
         register I32 i;
@@ -403,6 +423,8 @@ Perl_av_clear(pTHX_ register AV *av)
     I32 extra;
 
     PERL_ARGS_ASSERT_AV_CLEAR;
+    assert(SvTYPE(av) == SVt_PVAV);
+
 #ifdef DEBUGGING
     if (SvREFCNT(av) == 0 && ckWARN_d(WARN_DEBUGGING)) {
 	Perl_warner(aTHX_ packWARN(WARN_DEBUGGING), "Attempt to clear deleted array");
@@ -415,7 +437,7 @@ Perl_av_clear(pTHX_ register AV *av)
     /* Give any tie a chance to cleanup first */
     if (SvRMAGICAL(av)) {
 	const MAGIC* const mg = SvMAGIC(av);
-	if (PL_delaymagic && mg->mg_type == PERL_MAGIC_isa)
+	if (PL_delaymagic && mg && mg->mg_type == PERL_MAGIC_isa)
 	    PL_delaymagic |= DM_ARRAY;
         else
 	    mg_clear((SV*)av); 
@@ -456,6 +478,7 @@ void
 Perl_av_undef(pTHX_ register AV *av)
 {
     PERL_ARGS_ASSERT_AV_UNDEF;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     /* Give any tie a chance to cleanup first */
     if (SvTIED_mg((SV*)av, PERL_MAGIC_tied)) 
@@ -489,6 +512,7 @@ void
 Perl_av_create_and_push(pTHX_ AV **const avp, SV *const val)
 {
     PERL_ARGS_ASSERT_AV_CREATE_AND_PUSH;
+
     if (!*avp)
 	*avp = newAV();
     av_push(*avp, val);
@@ -510,6 +534,7 @@ Perl_av_push(pTHX_ register AV *av, SV *val)
     MAGIC *mg;
 
     PERL_ARGS_ASSERT_AV_PUSH;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
 	Perl_croak(aTHX_ PL_no_modify);
@@ -548,6 +573,7 @@ Perl_av_pop(pTHX_ register AV *av)
     MAGIC* mg;
 
     PERL_ARGS_ASSERT_AV_POP;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
 	Perl_croak(aTHX_ PL_no_modify);
@@ -591,6 +617,7 @@ SV **
 Perl_av_create_and_unshift_one(pTHX_ AV **const avp, SV *const val)
 {
     PERL_ARGS_ASSERT_AV_CREATE_AND_UNSHIFT_ONE;
+
     if (!*avp)
 	*avp = newAV();
     av_unshift(*avp, 1);
@@ -615,6 +642,7 @@ Perl_av_unshift(pTHX_ register AV *av, register I32 num)
     MAGIC* mg;
 
     PERL_ARGS_ASSERT_AV_UNSHIFT;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
 	Perl_croak(aTHX_ PL_no_modify);
@@ -686,6 +714,7 @@ Perl_av_shift(pTHX_ register AV *av)
     MAGIC* mg;
 
     PERL_ARGS_ASSERT_AV_SHIFT;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
 	Perl_croak(aTHX_ PL_no_modify);
@@ -731,6 +760,8 @@ I32
 Perl_av_len(pTHX_ register const AV *av)
 {
     PERL_ARGS_ASSERT_AV_LEN;
+    assert(SvTYPE(av) == SVt_PVAV);
+
     return AvFILL(av);
 }
 
@@ -755,6 +786,7 @@ Perl_av_fill(pTHX_ register AV *av, I32 fill)
     MAGIC *mg;
 
     PERL_ARGS_ASSERT_AV_FILL;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (fill < 0)
 	fill = -1;
@@ -813,6 +845,7 @@ Perl_av_delete(pTHX_ AV *av, I32 key, I32 flags)
     SV *sv;
 
     PERL_ARGS_ASSERT_AV_DELETE;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
 	Perl_croak(aTHX_ PL_no_modify);
@@ -899,6 +932,7 @@ Perl_av_exists(pTHX_ AV *av, I32 key)
 {
     dVAR;
     PERL_ARGS_ASSERT_AV_EXISTS;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvRMAGICAL(av)) {
         const MAGIC * const tied_magic = mg_find((SV*)av, PERL_MAGIC_tied);
@@ -955,6 +989,7 @@ Perl_av_arylen_p(pTHX_ AV *av) {
     MAGIC *mg;
 
     PERL_ARGS_ASSERT_AV_ARYLEN_P;
+    assert(SvTYPE(av) == SVt_PVAV);
 
     mg = mg_find((SV*)av, PERL_MAGIC_arylen_p);
 

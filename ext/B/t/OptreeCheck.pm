@@ -531,7 +531,7 @@ sub getRendering {
 		$code = eval "$pkg sub \{ $code \} \}";
 	    }
 	    # return errors
-	    if ($@) { chomp $@; push @errs, $@->{description} }
+	    if ($@) { push @errs, $@->message }
 	}
 	# set walk-output b4 compiling, which writes 'announce' line
 	walk_output(\$rendering);

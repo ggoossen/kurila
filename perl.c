@@ -835,14 +835,6 @@ perl_destruct(pTHXx)
 	    PL_defoutgv = NULL; /* may have been freed */
     }
 
-    /* unhook hooks which will soon be, or use, destroyed data */
-    SvREFCNT_dec(PL_errorcreatehook);
-    PL_errorcreatehook = NULL;
-    SvREFCNT_dec(PL_warnhook);
-    PL_warnhook = NULL;
-    SvREFCNT_dec(PL_diehook);
-    PL_diehook = NULL;
-
     /* call exit list functions */
     while (PL_exitlistlen-- > 0)
 	PL_exitlist[PL_exitlistlen].fn(aTHX_ PL_exitlist[PL_exitlistlen].ptr);
@@ -910,6 +902,14 @@ perl_destruct(pTHXx)
 
     SvREFCNT_dec((SV*) PL_stashcache);
     PL_stashcache = NULL;
+
+    /* unhook hooks which will soon be, or use, destroyed data */
+    SvREFCNT_dec(PL_errorcreatehook);
+    PL_errorcreatehook = NULL;
+    SvREFCNT_dec(PL_warnhook);
+    PL_warnhook = NULL;
+    SvREFCNT_dec(PL_diehook);
+    PL_diehook = NULL;
 
     /* loosen bonds of global variables */
 
@@ -1128,18 +1128,9 @@ perl_destruct(pTHXx)
 		 (long)cxstack_ix + 1);
     }
 
-    /* Now absolutely destruct everything, somehow or other, loops or no. */
-    SvFLAGS(PL_fdpid) |= SVTYPEMASK;		/* don't clean out pid table now */
-    SvFLAGS(PL_strtab) |= SVTYPEMASK;		/* don't clean out strtab now */
-
     /* the 2 is for PL_fdpid and PL_strtab */
-    while (PL_sv_count > 2 && sv_clean_all())
+    while (sv_clean_all() > 2)
 	;
-
-    SvFLAGS(PL_fdpid) &= ~SVTYPEMASK;
-    SvFLAGS(PL_fdpid) |= SVt_PVAV;
-    SvFLAGS(PL_strtab) &= ~SVTYPEMASK;
-    SvFLAGS(PL_strtab) |= SVt_PVHV;
 
     AvREAL_off(PL_fdpid);		/* no surviving entries */
     SvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
@@ -1386,10 +1377,17 @@ perl_free(pTHXx)
 	 */
 	const char * const s = PerlEnv_getenv("PERL_DESTRUCT_LEVEL");
 	if (!s || atoi(s) == 0) {
+	    const U32 old_debug = PL_debug;
 	    /* Emulate the PerlHost behaviour of free()ing all memory allocated in this
 	       thread at thread exit.  */
+	    if (DEBUG_m_TEST) {
+		PerlIO_puts(Perl_debug_log, "Disabling memory debugging as we "
+			    "free this thread's memory\n");
+		PL_debug &= ~ DEBUG_m_FLAG;
+	    }
 	    while(aTHXx->Imemory_debug_header.next != &(aTHXx->Imemory_debug_header))
 		safesysfree(sTHX + (char *)(aTHXx->Imemory_debug_header.next));
+	    PL_debug = old_debug;
 	}
     }
 #endif
@@ -2370,8 +2368,6 @@ S_run_body(pTHX_ I32 oldscope)
 	if (!DEBUG_q_TEST)
 	  PERL_DEBUG(PerlIO_printf(Perl_debug_log, "\nEXECUTING...\n\n"));
 #endif
-	DEBUG_S(PerlIO_printf(Perl_debug_log, "main thread is 0x%"UVxf"\n",
-			      PTR2UV(thr)));
 
 	if (PL_minus_c) {
 #ifdef MACOS_TRADITIONAL
@@ -2980,7 +2976,6 @@ Perl_get_debug_opts(pTHX_ const char **s, bool givehelp)
       "  H  Hash dump -- usurps values()",
       "  X  Scratchpad allocation",
       "  D  Cleaning up",
-      "  S  Thread synchronization",
       "  T  Tokenising",
       "  R  Include reference counts of dumped variables (eg when using -Ds)",
       "  J  Do not s,t,P-debug (Jump over) opcodes within package DB",
@@ -3031,6 +3026,7 @@ Perl_moreswitches(pTHX_ const char *s)
 {
     dVAR;
     UV rschar;
+    const char option = *s; /* used to remember option in -m/-M code */
 
     PERL_ARGS_ASSERT_MORESWITCHES;
 
@@ -3229,6 +3225,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	    const char *end;
 	    SV *sv;
 	    const char *use = "use ";
+	    bool colon = FALSE;
 	    /* -M-foo == 'no foo'	*/
 	    /* Leading space on " no " is deliberate, to make both
 	       possibilities the same length.  */
@@ -3236,19 +3233,30 @@ Perl_moreswitches(pTHX_ const char *s)
 	    sv = newSVpvn(use,4);
 	    start = s;
 	    /* We allow -M'Module qw(Foo Bar)'	*/
-	    while(isALNUM(*s) || *s==':') ++s;
+	    while(isALNUM(*s) || *s==':') {
+		if( *s++ == ':' ) {
+		    if( *s == ':' ) 
+			s++;
+		    else
+			colon = TRUE;
+		}
+	    }
+	    if (s == start)
+		Perl_croak(aTHX_ "Module name required with -%c option",
+				    option);
+	    if (colon) 
+		Perl_croak(aTHX_ "Invalid module name %.*s with -%c option: "
+				    "contains single ':'",
+				    s - start, start, option);
 	    end = s + strlen(s);
 	    if (*s != '=') {
 		sv_catpvn(sv, start, end - start);
-		if (*(start-1) == 'm') {
+		if (option == 'm') {
 		    if (*s != '\0')
 			Perl_croak(aTHX_ "Can't use '%c' after -mname", *s);
 		    sv_catpvs( sv, " ()");
 		}
 	    } else {
-                if (s == start)
-                    Perl_croak(aTHX_ "Module name required with -%c option",
-			       s[-1]);
 		sv_catpvn(sv, start, s-start);
 		/* Use NUL as q''-delimiter.  */
 		sv_catpvs(sv, " split(m/,/,q\0");
@@ -3260,7 +3268,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	    Perl_av_create_and_push(aTHX_ &PL_preambleav, sv);
 	}
 	else
-	    Perl_croak(aTHX_ "Missing argument to -%c", *(s-1));
+	    Perl_croak(aTHX_ "Missing argument to -%c", option);
 	return s;
     case 'n':
 	PL_minus_n = TRUE;
@@ -5196,8 +5204,6 @@ void
 Perl_my_exit(pTHX_ U32 status)
 {
     dVAR;
-    DEBUG_S(PerlIO_printf(Perl_debug_log, "my_exit: thread %p, status %lu\n",
-			  (void*)thr, (unsigned long) status));
     switch (status) {
     case 0:
 	STATUS_ALL_SUCCESS;

@@ -268,7 +268,7 @@ sub _dump {
     my $freezer = $s->{freezer};
     if ($freezer and UNIVERSAL::can($val, $freezer)) {
       eval { $val->?$freezer() };
-      warn "WARNING(Freezer method call failed): $@" if $@;
+      warn "WARNING(Freezer method call failed): {$@->message}" if $@;
     }
 
     require Scalar::Util;
@@ -327,7 +327,7 @@ sub _dump {
 	and $s->{maxdepth} +> 0
 	and $s->{level} +>= $s->{maxdepth})
     {
-      return qq['$val'];
+      return dump::view($val);
     }
 
     # we have a blessed ref
@@ -402,7 +402,7 @@ sub _dump {
 	($name =~ m/^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
 	  ($mname = $name . '->');
       $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-      my ($sortkeys, $keys, $key) = ("$s->{sortkeys}");
+      my ($sortkeys, $keys, $key) = ($s->{sortkeys});
       if ($sortkeys) {
 	if (ref($s->{sortkeys}) eq 'CODE') {
 	  $keys = $s->{sortkeys}($val);
@@ -477,7 +477,7 @@ sub _dump {
 	$s->{seen}{$id} = ["\\$name", $ref];
       }
     }
-    if (ref($ref) eq 'GLOB' or "$ref" =~ m/=GLOB\([^()]+\)$/) {  # glob
+    if (ref($ref) eq 'GLOB') {  # glob
       my $name = Symbol::glob_name($val);
       if ($name =~ m/^[A-Za-z_][\w:]*$/) {
 	$name =~ s/^main::/::/;

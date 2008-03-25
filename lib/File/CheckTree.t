@@ -232,10 +232,6 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( $@->{description} =~ m/syntax error/) {
-	# We got a syntax error for a malformed file query
-        ok(1);
-    } else {
-        ok(0);
-    };
+    # We got a syntax error for a malformed file query
+    like ( $@->message, qr/syntax error/);
 }

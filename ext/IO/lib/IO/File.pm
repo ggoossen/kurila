@@ -126,7 +126,6 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>.
 
 use strict;
 our($VERSION, @EXPORT, @EXPORT_OK, @ISA);
-use Carp;
 use Symbol;
 use SelectSaver;
 use IO::Seekable;
@@ -156,7 +155,7 @@ sub new {
     my $type = shift;
     my $class = ref($type) || $type || "IO::File";
     @_ +>= 0 && @_ +<= 3
-	or croak "usage: new $class [FILENAME [,MODE [,PERMS]]]";
+	or die "usage: new $class [FILENAME [,MODE [,PERMS]]]";
     my $fh = $class->SUPER::new();
     if (@_) {
 	$fh->open(@_)
@@ -170,7 +169,7 @@ sub new {
 ##
 
 sub open {
-    @_ +>= 2 && @_ +<= 4 or croak 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
+    @_ +>= 2 && @_ +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
     my ($fh, $file) = @_;
     if (@_ +> 2) {
 	my ($mode, $perms) = @_[2, 3];
@@ -179,12 +178,12 @@ sub open {
 	    return sysopen($fh, $file, $mode, $perms);
 	} elsif ($mode =~ m/:/) {
 	    return open($fh, $mode, $file) if @_ == 3;
-	    croak 'usage: $fh->open(FILENAME, IOLAYERS)';
+	    die 'usage: $fh->open(FILENAME, IOLAYERS)';
 	} else {
             return open($fh, IO::Handle::_open_mode_string($mode), $file);
         }
     }
-    $file =~ m/^<|>>?/ and croak 'MODE may not be part of the filename';
+    $file =~ m/^<|>>?/ and die 'MODE may not be part of the filename';
     open($fh, "<", $file);
 }
 
@@ -193,7 +192,7 @@ sub open {
 ##
 
 sub binmode {
-    ( @_ == 1 or @_ == 2 ) or croak 'usage $fh->binmode([LAYER])';
+    ( @_ == 1 or @_ == 2 ) or die 'usage $fh->binmode([LAYER])';
 
     my($fh, $layer) = @_;
 

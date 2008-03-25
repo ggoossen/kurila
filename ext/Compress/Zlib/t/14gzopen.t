@@ -364,7 +364,7 @@ foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
     my $stdin = $stdio->[0];
     my $stdout = $stdio->[1];
 
-    title "Pass gzopen a filehandle - use $stdin" ;
+    title "Pass gzopen a filehandle - use {dump::view($stdin)}" ;
 
     my $lex = LexFile->new( my $name) ;
 

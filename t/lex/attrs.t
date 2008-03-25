@@ -63,7 +63,7 @@ like $@->message, qr/^Invalid SCALAR attribute: ["']?plugh\(}\)["']? at/;
 eval 'my $x : switch(10,foo(7,3))  :  expensive;';
 like $@->message, qr/^Invalid SCALAR attributes: ["']?switch\(10,foo\(7,3\)\) : expensive["']? at/;
 eval q/my $x : Ugly('\(") :Bad;/;
-like $@->{description}, qr/^Invalid SCALAR attributes: ["']?Ugly\('\\\("\) : Bad["']? at/;
+like $@->message, qr/^Invalid SCALAR attributes: ["']?Ugly\('\\\("\) : Bad["']? at/;
 eval 'my $x : _5x5;';
 like $@->message, qr/^Invalid SCALAR attribute: ["']?_5x5["']? at/;
 eval 'my $x : locked method;';

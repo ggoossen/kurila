@@ -15,7 +15,6 @@ BEGIN {
 
 #use strict;
 #use diagnostics;
-use Carp;
 use Exporter;
 #use File::Compare;
 #use Cwd qw(abs_path);
@@ -108,9 +107,9 @@ sub podinc2plaintext( $ $ ) {
 
 sub testpodinc2plaintext( @ ) {
    my %args = @_;
-   my $infile  = $args{'-In'}  || croak "No input file given!";
-   my $outfile = $args{'-Out'} || croak "No output file given!";
-   my $cmpfile = $args{'-Cmp'} || croak "No compare-result file given!";
+   my $infile  = $args{'-In'}  || die "No input file given!";
+   my $outfile = $args{'-Out'} || die "No output file given!";
+   my $cmpfile = $args{'-Cmp'} || die "No compare-result file given!";
 
    my $different = '';
    my $testname = basename $cmpfile, '.t', '.xr';

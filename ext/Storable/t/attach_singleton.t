@@ -19,7 +19,7 @@ isa_ok( $object, 'My::Singleton' );
 # Confirm (for the record) that the class is actually a Singleton
 my $object2 = My::Singleton->new;
 isa_ok( $object2, 'My::Singleton' );
-is( "$object", "$object2", 'Class is a singleton' );
+is( $object, $object2, 'Class is a singleton' );
 
 ############
 # Main Tests
@@ -37,7 +37,7 @@ my $thawed = Storable::thaw( $frozen );
 is_deeply( $struct, $thawed, 'Struct superficially looks like the original' );
 
 # ... EXCEPT that the Singleton should be the same instance of the object
-is( "$struct->[1]", "$thawed->[1]", 'Singleton thaws correctly' );
+is( $struct->[1], $thawed->[1], 'Singleton thaws correctly' );
 
 # We can also test this empirically
 $struct->[1]->{value} = 'Goodbye cruel world!';

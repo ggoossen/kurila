@@ -1,7 +1,6 @@
 
 package Pod::Simple;
 use strict;
-use Carp ();
 BEGIN           { *DEBUG = sub () {0} unless defined &DEBUG }
 use integer;
 use Pod::Escapes v1.03 ();
@@ -201,9 +200,9 @@ sub _accept_directives {
   my($this, $type) = splice @_,0,2;
   foreach my $d (@_) {
     next unless defined $d and length $d;
-    Carp::croak "\"$d\" isn't a valid directive name"
+    die "\"$d\" isn't a valid directive name"
      unless $d =~ m/^[a-zA-Z][a-zA-Z0-9]*$/s;
-    Carp::croak "\"$d\" is already a reserved Pod directive name"
+    die "\"$d\" is already a reserved Pod directive name"
      if exists $Known_directives{$d};
     $this->{'accept_directives'}{$d} = $type;
     DEBUG +> 2 and print "Learning to accept \"=$d\" as directive of type $type\n";
@@ -224,9 +223,9 @@ sub unaccept_directives {
   my $this = shift;
   foreach my $d (@_) {
     next unless defined $d and length $d;
-    Carp::croak "\"$d\" isn't a valid directive name"
+    die "\"$d\" isn't a valid directive name"
      unless $d =~ m/^[a-zA-Z][a-zA-Z0-9]*$/s;
-    Carp::croak "But you must accept \"$d\" directives -- it's a builtin!"
+    die "But you must accept \"$d\" directives -- it's a builtin!"
      if exists $Known_directives{$d};
     delete $this->{'accept_directives'}{$d};
     DEBUG +> 2 and print "OK, won't accept \"=$d\" as directive.\n";
@@ -288,7 +287,7 @@ sub accept_codes {  # Add some codes
     next unless defined $new_code and length $new_code;
     if(ASCII) {
       # A good-enough check that it's good as an XML Name symbol:
-      Carp::croak "\"$new_code\" isn't a valid element name"
+      die "\"$new_code\" isn't a valid element name"
         if $new_code =~
           m/[\x[00]-\x[2C]\x[2F]\x[39]\x[3B]-\x[40]\x[5B]-\x[5E]\x[60]\x[7B]-\x[7F]]/
             # Characters under 0x80 that aren't legal in an XML Name.
@@ -323,7 +322,7 @@ sub unaccept_codes { # remove some codes
     next unless defined $new_code and length $new_code;
     if(ASCII) {
       # A good-enough check that it's good as an XML Name symbol:
-      Carp::croak "\"$new_code\" isn't a valid element name"
+      die "\"$new_code\" isn't a valid element name"
         if $new_code =~
           m/\x[00]-\x[2C]\x[2F]\x[39]\x[3B]-\x[40]\x[5B]-\x[5E]\x[60]\x[7B]-\x[7F]/
             # Characters under 0x80 that aren't legal in an XML Name.
@@ -333,7 +332,7 @@ sub unaccept_codes { # remove some codes
             #  an XML Name still can't start with.
     }
     
-    Carp::croak "But you must accept \"$new_code\" codes -- it's a builtin!"
+    die "But you must accept \"$new_code\" codes -- it's a builtin!"
      if grep $new_code eq $_, @Known_formatting_codes;
 
     delete $this->{'accept_codes'}{$new_code};
@@ -386,17 +385,17 @@ sub parse_file {
   my($self, $source) = (@_);
 
   if(!defined $source) {
-    Carp::croak("Can't use empty-string as a source for parse_file");
+    die("Can't use empty-string as a source for parse_file");
   } elsif(ref(\$source) eq 'GLOB') {
-    $self->{'source_filename'} = '' . ($source);
+    $self->{'source_filename'} = dump::view($source);
   } elsif(ref $source) {
-    $self->{'source_filename'} = '' . ($source);
+    $self->{'source_filename'} = dump::view($source);
   } elsif(!length $source) {
-    Carp::croak("Can't use empty-string as a source for parse_file");
+    die("Can't use empty-string as a source for parse_file");
   } else {
     {
       local *PODSOURCE;
-      open(PODSOURCE, "<", "$source") || Carp::croak("Can't open $source: $!");
+      open(PODSOURCE, "<", "$source") || die "Can't open $source: $!";
       $self->{'source_filename'} = $source;
       $source = *PODSOURCE{IO};
     }
@@ -450,7 +449,7 @@ sub parse_from_file {
     require Symbol;
     my $out_fh = Symbol::gensym();
     DEBUG and print "Write-opening to $to\n";
-    open($out_fh, ">", "$to")  or  Carp::croak "Can't write-open $to: $!";
+    open($out_fh, ">", "$to")  or  die "Can't write-open $to: $!";
     binmode($out_fh)
      if $self->can('write_with_binmode') and $self->write_with_binmode;
     $self->output_fh($out_fh);
@@ -1004,7 +1003,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
         
       # bitch if it's empty
       if(  @{$treelet->[$i]} == 2
-       or (@{$treelet->[$i]} == 3 and $treelet->[$i][2] eq '')
+       or (@{$treelet->[$i]} == 3 and not ref $treelet->[$i][2] and $treelet->[$i][2] eq '')
       ) {
         $self->whine( $start_line, "An empty L<>" );
         $treelet->[$i] = 'L<>';  # just make it a text node
@@ -1391,9 +1390,8 @@ sub _accessorize {  # A simple-minded method-maker
     next if $attrname =~ m/::/; # a hack
     *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
       use strict;
-      $Carp::CarpLevel = 1,  Carp::croak(
-       "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
-      ) unless (@_ == 1 or @_ == 2) and ref $_[0];
+      die "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
+        unless (@_ == 1 or @_ == 2) and ref $_[0];
       (@_ == 1) ?  $_[0]->{$attrname}
                 : ($_[0]->{$attrname} = $_[1]);
     };
@@ -1459,12 +1457,12 @@ sub _duo {
   
   my $class = shift(@_);
   
-  Carp::croak "But $class->_duo is useful only in list context!"
+  die "But $class->_duo is useful only in list context!"
    unless wantarray;
 
   my $mutor = shift(@_) if @_ and ref($_[0] || '') eq 'CODE';
 
-  Carp::croak "But $class->_duo takes two parameters, not: @_"
+  die "But $class->_duo takes two parameters, not: @_"
    unless @_ == 2;
 
   my(@out);

@@ -340,7 +340,7 @@ typedef struct {
 
 
 static I32
-cmp_desc(pTHX_ gptr a, gptr b)
+cmp_desc(pTHX_ gptr const a, gptr const b)
 {
     dVAR;
     return -PL_sort_RealCmp(aTHX_ a, b);
@@ -1315,7 +1315,7 @@ S_qsortsvu(pTHX_ SV ** array, size_t num_elts, SVCOMPARE_t compare)
 
 
 static I32
-cmpindir(pTHX_ gptr a, gptr b)
+cmpindir(pTHX_ gptr const a, gptr const b)
 {
     dVAR;
     gptr * const ap = (gptr *)a;
@@ -1328,7 +1328,7 @@ cmpindir(pTHX_ gptr a, gptr b)
 }
 
 static I32
-cmpindir_desc(pTHX_ gptr a, gptr b)
+cmpindir_desc(pTHX_ gptr const a, gptr const b)
 {
     dVAR;
     gptr * const ap = (gptr *)a;
@@ -1734,7 +1734,7 @@ PP(pp_sort)
 }
 
 static I32
-S_sortcv(pTHX_ SV *a, SV *b)
+S_sortcv(pTHX_ SV *const a, SV *const b)
 {
     dVAR;
     const I32 oldsaveix = PL_savestack_ix;
@@ -1761,7 +1761,7 @@ S_sortcv(pTHX_ SV *a, SV *b)
 }
 
 static I32
-S_sortcv_stacked(pTHX_ SV *a, SV *b)
+S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
 {
     dVAR;
     const I32 oldsaveix = PL_savestack_ix;
@@ -1803,7 +1803,7 @@ S_sortcv_stacked(pTHX_ SV *a, SV *b)
 }
 
 static I32
-S_sortcv_xsub(pTHX_ SV *a, SV *b)
+S_sortcv_xsub(pTHX_ SV *const a, SV *const b)
 {
     dVAR; dSP;
     const I32 oldsaveix = PL_savestack_ix;
@@ -1834,7 +1834,7 @@ S_sortcv_xsub(pTHX_ SV *a, SV *b)
 
 
 static I32
-S_sv_ncmp(pTHX_ SV *a, SV *b)
+S_sv_ncmp(pTHX_ SV *const a, SV *const b)
 {
     const NV nv1 = SvNSIV(a);
     const NV nv2 = SvNSIV(b);
@@ -1845,7 +1845,7 @@ S_sv_ncmp(pTHX_ SV *a, SV *b)
 }
 
 static I32
-S_sv_i_ncmp(pTHX_ SV *a, SV *b)
+S_sv_i_ncmp(pTHX_ SV *const a, SV *const b)
 {
     const IV iv1 = SvIV(a);
     const IV iv2 = SvIV(b);
@@ -1863,7 +1863,7 @@ S_sv_i_ncmp(pTHX_ SV *a, SV *b)
 #define SORT_NORMAL_RETURN_VALUE(val)  (((val) > 0) ? 1 : ((val) ? -1 : 0))
 
 static I32
-S_amagic_ncmp(pTHX_ register SV *a, register SV *b)
+S_amagic_ncmp(pTHX_ register SV *const a, register SV *const b)
 {
     dVAR;
     SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp);
@@ -1884,7 +1884,7 @@ S_amagic_ncmp(pTHX_ register SV *a, register SV *b)
 }
 
 static I32
-S_amagic_i_ncmp(pTHX_ register SV *a, register SV *b)
+S_amagic_i_ncmp(pTHX_ register SV *const a, register SV *const b)
 {
     dVAR;
     SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp);
@@ -1905,7 +1905,7 @@ S_amagic_i_ncmp(pTHX_ register SV *a, register SV *b)
 }
 
 static I32
-S_amagic_cmp(pTHX_ register SV *str1, register SV *str2)
+S_amagic_cmp(pTHX_ register SV *const str1, register SV *const str2)
 {
     dVAR;
     SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp);

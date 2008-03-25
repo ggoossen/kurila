@@ -10,10 +10,6 @@ sub _get_encname {
     return;
 }
 
-sub croak {
-    require Carp; goto &Carp::croak;
-}
-
 sub _drop_oldenc {
     # If by the time we arrive here there already is at the top of the
     # perlio layer stack an encoding identical to what we would like
@@ -39,11 +35,11 @@ sub _drop_oldenc {
     require Encode;
     my ($loname, $lcname) = _get_encname($old[-2]);
     unless (defined $lcname) { # Should we trust get_layers()?
-	croak("open: Unknown encoding '$loname'");
+	die("open: Unknown encoding '$loname'");
     }
     my ($voname, $vcname) = _get_encname($new[-1]);
     unless (defined $vcname) {
-	croak("open: Unknown encoding '$voname'");
+	die("open: Unknown encoding '$voname'");
     }
     if ($lcname eq $vcname) {
 	binmode($h, ":pop"); # utf8 is part of the encoding layer
@@ -52,7 +48,7 @@ sub _drop_oldenc {
 
 sub import {
     my ($class,@args) = @_;
-    croak("open: needs explicit list of PerlIO layers") unless @args;
+    die("open: needs explicit list of PerlIO layers") unless @args;
     my $std;
     my ($in,$out) = split(m/\0/,(${^OPEN} || "\0"), -1);
     while (@args) {
@@ -106,7 +102,7 @@ sub import {
 	    $in = $out = join(' ', @val);
 	}
 	else {
-	    croak "Unknown PerlIO layer class '$type'";
+	    die "Unknown PerlIO layer class '$type'";
 	}
     }
     ${^OPEN} = join("\0", $in, $out);

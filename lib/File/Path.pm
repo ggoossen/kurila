@@ -555,10 +555,10 @@ sub _error {
 sub mkpath {
     my $old_style = (
         UNIVERSAL::isa($_[0],'ARRAY')
-        or (@_ == 2 and (defined $_[1] ? $_[1] =~ m/\A\d+\z/ : 1))
+        or (@_ == 2 and ((defined $_[1] && ! ref $_[1]) ? $_[1] =~ m/\A\d+\z/ : 1))
         or (@_ == 3
-            and (defined $_[1] ? $_[1] =~ m/\A\d+\z/ : 1)
-            and (defined $_[2] ? $_[2] =~ m/\A\d+\z/ : 1)
+            and ((defined $_[1] && ! ref $_[1]) ? $_[1] =~ m/\A\d+\z/ : 1)
+            and ((defined $_[2] && ! ref $_[2]) ? $_[2] =~ m/\A\d+\z/ : 1)
         )
     ) ? 1 : 0;
 
@@ -630,14 +630,7 @@ sub _mkpath {
 }
 
 sub rmtree {
-    my $old_style = (
-        UNIVERSAL::isa($_[0],'ARRAY')
-        or (@_ == 2 and (defined $_[1] ? $_[1] =~ m/\A\d+\z/ : 1))
-        or (@_ == 3
-            and (defined $_[1] ? $_[1] =~ m/\A\d+\z/ : 1)
-            and (defined $_[2] ? $_[2] =~ m/\A\d+\z/ : 1)
-        )
-    ) ? 1 : 0;
+    my $old_style = (UNIVERSAL::isa($_[0],'ARRAY')) ? 1 : 0;
 
     my $arg;
     my $paths;
@@ -648,11 +641,11 @@ sub rmtree {
         $arg->{verbose} = defined $verbose ? $verbose : 0;
         $arg->{safe}    = defined $safe    ? $safe    : 0;
 
-        if (defined($paths) and length($paths)) {
+        if (defined($paths)) {
             $paths = [$paths] unless UNIVERSAL::isa($paths,'ARRAY');
         }
         else {
-            _carp ("No root path(s) specified\n");
+            die ("No root path(s) specified\n");
             return 0;
         }
     }

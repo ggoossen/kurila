@@ -6058,8 +6058,8 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
     SV *listsv = NULL;
     AV* unicode_alternate  = NULL;
 
-    PERL_ARGS_ASSERT_REG_NAMEDSEQ;
     GET_RE_DEBUG_FLAGS_DECL;
+    PERL_ARGS_ASSERT_REG_NAMEDSEQ;
 
     /* Assume we are going to generate an ANYOF node. */
     ret = reganode(pRExC_state, (UTF ? ANYOFU : ANYOF), 0);

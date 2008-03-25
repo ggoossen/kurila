@@ -1,5 +1,25 @@
 #!/usr/bin/perl
 
+=pod
+
+=head1 NAME
+
+mad convert
+
+=head1 SYNOPSIS
+
+To convert a file 'source.pm' from Perl 5.10 to Kurila you need to do:
+
+  kurilapath=/usr/src/perl/kurila-1.9
+  bleadpath=/usr/src/perl/perl-5.11.0
+  cd $kurilapath
+  madfrom='perl-5.10' madto='kurila-1.9' \
+    madconvert="/usr/bin/perl $kurilapath/mad/p5kurila.pl" \
+    madpath="$bleadpath/mad" \
+    mad/convert /path/to/source.pm
+
+=cut
+
 use strict;
 use warnings;
 

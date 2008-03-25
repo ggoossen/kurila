@@ -50,7 +50,7 @@ use Test::More tests => 13;
 
     eval { load $mod };
 
-    is( $@, '', qq[Loading Ambigious File '$mod'] );
+    is( $@ && $@->message, '', qq[Loading Ambigious File '$mod'] );
     ok( defined($INC{$file}), q[... found in %INC] );
 }
 

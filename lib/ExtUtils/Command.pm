@@ -1,7 +1,6 @@
 package ExtUtils::Command;
 
 use strict;
-use Carp;
 use File::Copy;
 use File::Compare;
 use File::Basename;
@@ -128,7 +127,7 @@ sub rm_f {
 
         next if _unlink($file);
 
-        carp "Cannot delete $file: $!";
+        warn "Cannot delete $file: $!";
     }
 }
 
@@ -178,7 +177,7 @@ sub mv {
     my @src = @ARGV;
     my $dst = pop @src;
 
-    croak("Too many arguments") if (@src +> 1 && ! -d $dst);
+    die("Too many arguments") if (@src +> 1 && ! -d $dst);
 
     my $nok = 0;
     foreach my $src (@src) {
@@ -204,7 +203,7 @@ sub cp {
     my @src = @ARGV;
     my $dst = pop @src;
 
-    croak("Too many arguments") if (@src +> 1 && ! -d $dst);
+    die("Too many arguments") if (@src +> 1 && ! -d $dst);
 
     my $nok = 0;
     foreach my $src (@src) {
