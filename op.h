@@ -652,7 +652,7 @@ struct madprop {
     char mad_type;
 };
 
-struct token {
+struct madtoken {
     I32 tk_type;
     YYSTYPE tk_lval;
     MADPROP* tk_mad;
