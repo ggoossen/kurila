@@ -559,7 +559,7 @@ sub rename_pointy_ops {
 
     # rename '<' to '+<'
     for my $op (map { $xml->findnodes(qq'//$_') } map { ("op_i_$_", "op_$_") } qw|lt le gt ge|) {
-        next unless get_madprop($op, "operator") =~ m/^[<>]/;
+        next unless get_madprop($op, "operator") =~ m/^(?:&lt;|&gt;)/;
         set_madprop($op, operator => '+' . get_madprop($op, "operator") );
     }
 
@@ -722,7 +722,7 @@ my $twig= XML::Twig->new( # keep_spaces => 1,
 
 $twig->parsefile( "-" );
 
-if ($from->{v} < 1.4 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < 1.4 - 0.05) {
     # replacing.
     for my $op ($twig->findnodes(q|//op_entersub|)) {
         entersub_handler($twig, $op);
@@ -740,7 +740,7 @@ if ($from->{v} < 1.4 - 0.05) {
     remove_typed_declaration($twig);
 }
 
-if ($from->{v} < 1.5 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < 1.5 - 0.05) {
     rename_bit_operators($twig);
     remove_useversion($twig);
     change_deref_method($twig);
@@ -752,22 +752,24 @@ if ($from->{v} < 1.5 - 0.05) {
 }
 #t_parenthesis($twig);
 
-if ($from->{v} < 1.6 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < 1.6 - 0.05) {
     remove_vstring( $twig );
     use_pkg_version($twig);
     lvalue_subs( $twig );
 }
 
-#rename_pointy_ops( $twig );
 #pointy_anon_hash( $twig );
-if ($from->{v} < 1.7 - 0.05) {
-     force_m( $twig );
-     qq_block( $twig );
-     qstring( $twig );
-     open_3args($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < 1.7 - 0.05) {
+    rename_pointy_ops( $twig );
+    force_m( $twig );
+    qq_block( $twig );
+    qstring( $twig );
+    open_3args($twig);
 }
 
-error_str($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < 1.8 - 0.05) {
+    error_str($twig);
+}
 
 # print
 $twig->print( pretty_print => 'indented' );
