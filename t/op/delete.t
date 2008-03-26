@@ -94,7 +94,7 @@ $foo = join('',@foo);
 cmp_ok($foo,'eq','ac','ary elems');
 cmp_ok(scalar(@foo),'==',4,'four is the number thou shalt count');
 
-foreach $key (0 .. $#foo) {
+foreach $key (0 .. (@foo-1)) {
     delete $foo[$key];
 }
 

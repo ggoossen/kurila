@@ -16,7 +16,7 @@ sub STORESIZE
 {        
  $seen{'STORESIZE'}++;
  my ($ob,$sz) = @_; 
- return $#{$ob} = $sz-1;
+ return (@-1){$ob} = $sz-1;
 }
 
 sub EXTEND
@@ -158,7 +158,7 @@ my $test = 1;
 print "not " unless @ary == 3;
 print "ok ", $test++,"\n";
 
-print "not " unless $#ary == 2;
+print "not " unless (@ary-1) == 2;
 print "ok ", $test++,"\n";
 
 print "not " unless join(':',@ary) eq '3:2:1';

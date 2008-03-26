@@ -275,7 +275,7 @@ sub charinrange {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
 	unless defined $code;
-    _search($range, 0, $#$range, $code);
+    _search($range, 0, (@-1)$range, $code);
 }
 
 =head2 charblock
@@ -332,7 +332,7 @@ sub charblock {
     my $code = _getcode($arg);
 
     if (defined $code) {
-	_search(\@BLOCKS, 0, $#BLOCKS, $code);
+	_search(\@BLOCKS, 0, (@BLOCKS-1), $code);
     } else {
 	if (exists $BLOCKS{$arg}) {
 	    return dclone $BLOCKS{$arg};
@@ -397,7 +397,7 @@ sub charscript {
     my $code = _getcode($arg);
 
     if (defined $code) {
-	_search(\@SCRIPTS, 0, $#SCRIPTS, $code);
+	_search(\@SCRIPTS, 0, (@SCRIPTS-1), $code);
     } else {
 	if (exists $SCRIPTS{$arg}) {
 	    return dclone $SCRIPTS{$arg};

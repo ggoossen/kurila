@@ -411,17 +411,17 @@ sub _gettemp {
 
     # If @dirs only has one entry (i.e. the directory template) that means
     # we are in the current directory
-    if ($#dirs == 0) {
+    if ((@dirs-1) == 0) {
       $parent = File::Spec->curdir;
     } else {
 
       if ($^O eq 'VMS') {  # need volume to avoid relative dir spec
-        $parent = File::Spec->catdir($volume, @dirs[0..$#dirs-1]);
+        $parent = File::Spec->catdir($volume, @dirs[0..(@dirs-1)-1]);
         $parent = 'sys$disk:[]' if $parent eq '';
       } else {
 
 	# Put it back together without the last one
-	$parent = File::Spec->catdir(@dirs[0..$#dirs-1]);
+	$parent = File::Spec->catdir(@dirs[0..(@dirs-1)-1]);
 
 	# ...and attach the volume (no filename)
 	$parent = File::Spec->catpath($volume, $parent, '');
@@ -625,10 +625,10 @@ sub _replace_XX {
   # Alternatively, could simply set $ignore to length($path)-1
   # Don't want to always use substr when not required though.
   if ($ignore) {
-      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/{$CHARS[ int( rand( $#CHARS ) ) ]}/g;
+      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/{$CHARS[ int( rand( (@CHARS-1) ) ) ]}/g;
       substr($path, 0, - $ignore, $x);
   } else {
-    $path =~ s/X(?=X*\z)/{$CHARS[ int( rand( $#CHARS ) ) ]}/g;
+    $path =~ s/X(?=X*\z)/{$CHARS[ int( rand( (@CHARS-1) ) ) ]}/g;
   }
   return $path;
 }
@@ -768,10 +768,10 @@ sub _is_verysafe {
   my @dirs = File::Spec->splitdir($directories);
 
   # Concatenate one less directory each time around
-  foreach my $pos (0.. $#dirs) {
+  foreach my $pos (0.. (@dirs-1)) {
     # Get a directory name
     my $dir = File::Spec->catpath($volume,
-				  File::Spec->catdir(@dirs[0.. $#dirs - $pos]),
+				  File::Spec->catdir(@dirs[0.. (@dirs-1) - $pos]),
 				  ''
 				  );
 
@@ -2035,15 +2035,15 @@ sub cmpstat {
   # depending on whether it is a file or a handle.
   # Cannot simply compare all members of the stat return
   # Select the ones we can use
-  my @okstat = (0..$#fh);  # Use all by default
+  my @okstat = (0..(@fh-1));  # Use all by default
   if ($^O eq 'MSWin32') {
     @okstat = (1,2,3,4,5,7,8,9,10);
   } elsif ($^O eq 'os2') {
-    @okstat = (0, 2..$#fh);
+    @okstat = (0, 2..(@fh-1));
   } elsif ($^O eq 'VMS') { # device and file ID are sufficient
     @okstat = (0, 1);
   } elsif ($^O eq 'dos') {
-    @okstat = (0,2..7,11..$#fh);
+    @okstat = (0,2..7,11..(@fh-1));
   } elsif ($^O eq 'mpeix') {
     @okstat = (0..4,8..10);
   }

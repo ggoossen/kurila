@@ -252,7 +252,7 @@ my @test = (5,6,7);
 $p = T_OPAQUEPTR_IN_struct(@test);
 my @result = T_OPAQUEPTR_OUT_struct($p);
 is(scalar(@result),scalar(@test));
-for (0..$#test) {
+for (0..(@test-1)) {
   is($result[$_], $test[$_]);
 }
 
@@ -271,7 +271,7 @@ my @opq = (2,4,8);
 my $packed = T_OPAQUE_array(@opq);
 my @uopq = unpack("i*",$packed);
 is(scalar(@uopq), scalar(@opq));
-for (0..$#opq) {
+for (0..(@opq-1)) {
   is( $uopq[$_], $opq[$_]);
 }
 
@@ -289,7 +289,7 @@ my @inarr = (1,2,3,4,5,6,7,8,9,10);
 my @outarr = T_ARRAY( 5, @inarr );
 is(scalar(@outarr), scalar(@inarr));
 
-for (0..$#inarr) {
+for (0..(@inarr-1)) {
   is($outarr[$_], $inarr[$_]);
 }
 

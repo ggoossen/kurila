@@ -37,7 +37,7 @@ sub populate (@) {
     $h_addrtype  =    $hob->[2] 	     = $_[2];
     $h_length	 =    $hob->[3] 	     = $_[3];
     $h_addr 	 =                             $_[4];
-    @h_addr_list = @{ $hob->[4] } =          @_[ (4 .. $#_) ];
+    @h_addr_list = @{ $hob->[4] } =          @_[ (4 .. (@_-1)) ];
     return $hob;
 } 
 

@@ -91,7 +91,7 @@ sub assignment_clause_for_type {
   if (ref $typeset) {
     die "Type $type is aggregate, but only single value given"
       if @_ == 1;
-    return map {"$typeset->[$_]$_[$_];"} 0 .. $#$typeset;
+    return map {"$typeset->[$_]$_[$_];"} 0 .. (@-1)$typeset;
   } elsif (defined $typeset) {
     die "Aggregate value given for type $type"
       if @_ +> 1;

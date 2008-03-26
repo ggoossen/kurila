@@ -464,7 +464,7 @@ sub new {
     ## See if odd number of args
     if ((@_ % 2) != 0) {
        ## Yup - need an implicit '-ptree' before the last parameter
-       splice @_, $#_, 0, '-ptree';
+       splice @_, (@_-1), 0, '-ptree';
     }
 
     ## Any remaining arguments are treated as initial values for the

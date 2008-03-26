@@ -4284,16 +4284,7 @@ Perl_yylex(pTHX)
 	CLINE;
 
 	if (s[1] == '#' && (isIDFIRST_lazy_if(s+2,UTF) || strchr("{$:+-", s[2]))) {
-	    PL_tokenbuf[0] = '@';
-	    s = scan_ident(s + 1, PL_bufend, PL_tokenbuf + 1,
-			   sizeof PL_tokenbuf - 1, FALSE);
-	    if (PL_expect == XOPERATOR)
-		no_op("Array length", s);
-	    if (!PL_tokenbuf[1])
-		PREREF(DOLSHARP);
-	    PL_expect = XOPERATOR;
-	    PL_pending_ident = '#';
-	    TOKEN(DOLSHARP);
+	    Perl_croak(aTHX_ "$# is not allowed");
 	}
 
 	PL_tokenbuf[0] = '$';

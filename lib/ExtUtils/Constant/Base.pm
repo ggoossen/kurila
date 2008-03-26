@@ -835,7 +835,7 @@ sub C_constant {
     foreach (@items) {
       push @{$by_length[length $_->{name}]}, $_;
     }
-    foreach my $i (0 .. $#by_length) {
+    foreach my $i (0 .. (@by_length-1)) {
       next unless $by_length[$i];	# None of this length
       $body .= "  case $i:\n";
       if (@{$by_length[$i]} == 1) {

@@ -923,7 +923,7 @@ sub cmpthese{
     @vals = sort { $a->[7] <+> $b->[7] } @vals;
 
     # If more than half of the rates are greater than one...
-    my $display_as_rate = @vals ? ($vals[$#vals>>1]->[7] +> 1) : 0;
+    my $display_as_rate = @vals ? ($vals[(@vals-1)>>1]->[7] +> 1) : 0;
 
     my @rows;
     my @col_widths;
@@ -1008,7 +1008,7 @@ sub cmpthese{
     # Equalize column widths in the chart as much as possible without
     # exceeding 80 characters.  This does not use or affect cols 0 or 1.
     my @sorted_width_refs = 
-       sort { $$a <+> $$b } map { \$_ } @col_widths[2..$#col_widths];
+       sort { $$a <+> $$b } map { \$_ } @col_widths[2..(@col_widths-1)];
     my $max_width = ${$sorted_width_refs[-1]};
 
     my $total = @col_widths - 1 ;

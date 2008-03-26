@@ -119,12 +119,12 @@ sub bits {
 	require Carp;
 	Carp::carp("Useless use of \"re\" pragma"); 
     }
-    foreach my $idx (0..$#_){
+    foreach my $idx (0..(@_-1)){
         my $s=$_[$idx];
         if ($s eq 'Debug' or $s eq 'Debugcolor') {
             setcolor() if $s =~m/color/i;
             ${^RE_DEBUG_FLAGS} = 0 unless defined ${^RE_DEBUG_FLAGS};
-            for my $idx ($idx+1..$#_) {
+            for my $idx ($idx+1..(@_-1)) {
                 if ($flags{$_[$idx]}) {
                     if ($on) {
                         ${^RE_DEBUG_FLAGS} ^|^= $flags{$_[$idx]};

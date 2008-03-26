@@ -43,8 +43,8 @@ $h{'z'} = 'Z';
 @keys = keys %h;
 @values = values %h;
 
-is ($#keys, 29, "keys");
-is ($#values, 29, "values");
+is ((@keys-1), 29, "keys");
+is ((@values-1), 29, "values");
 
 $i = 0;		# stop -w complaints
 
@@ -59,7 +59,7 @@ while (($key,$value) = each(%h)) {
 is ($i, 30, "each count");
 
 @keys = ('blurfl', keys(%h), 'dyick');
-is ($#keys, 31, "added a key");
+is ((@keys-1), 31, "added a key");
 
 $size = ((split('/',scalar %h))[1]);
 keys %h = $size * 5;

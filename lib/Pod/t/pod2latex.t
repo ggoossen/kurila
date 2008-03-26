@@ -60,7 +60,7 @@ open(INFH, "<", "test.tex") or die "Unable to read test tex file: $!\n";
 my @output = ~< *INFH;
 
 ok(@output, @reference);
-for my $i (0..$#reference) {
+for my $i (0..(@reference-1)) {
   next if $reference[$i] =~ m/^%%/; # skip timestamp comments
 
   # if we are running a new version of Pod::ParseUtils we need

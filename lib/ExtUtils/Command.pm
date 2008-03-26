@@ -226,7 +226,7 @@ sub chmod {
     expand_wildcards();
 
     if( $Is_VMS ) {
-        foreach my $idx (0..$#ARGV) {
+        foreach my $idx (0..(@ARGV-1)) {
             my $path = $ARGV[$idx];
             next unless -d $path;
 

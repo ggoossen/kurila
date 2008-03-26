@@ -806,7 +806,7 @@ sub simple {
   my ($name, @items) = @_;
   my $test_header;
   my $test_body = "my \$value;\n";
-  foreach my $counter (1 .. $#_) {
+  foreach my $counter (1 .. (@_-1)) {
     my $thisname = $_[$counter];
     $test_header .= "#define $thisname $counter\n";
     $test_body .= <<"EOT";
