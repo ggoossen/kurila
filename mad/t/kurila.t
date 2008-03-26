@@ -16,7 +16,7 @@ use Fatal qw|open close|;
 use Convert;
 
 my $from = 'kurila-1.7';
-my $to = 'kurila-1.71';
+my $to = 'kurila-1.8';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -31,6 +31,7 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_carp();
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
@@ -853,5 +854,17 @@ s/${a}{4}//g;
 s//ab\{c/g;
 s''de{f'g;
 s/${a}{4}//g;
+END
+}
+
+sub t_carp {
+    my $x = "abc";
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+use Carp;
+confess "foo";
+----
+use Carp;
+die "foo";
+====
 END
 }
