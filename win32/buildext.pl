@@ -61,7 +61,7 @@ if ($opts{'list-static-libs'} || $opts{'create-perllibst-h'}) {
     print $fh "/*DO NOT EDIT\n  this file is included from perllib.c to init static extensions */\n";
     print $fh "#ifdef STATIC1\n",(map {"    \"$_\",\n"} @statics),"#undef STATIC1\n#endif\n";
     print $fh "#ifdef STATIC2\n",(map {"    EXTERN_C void boot_$_ (pTHX_ CV* cv);\n"} @statics1),"#undef STATIC2\n#endif\n";
-    print $fh "#ifdef STATIC3\n",(map {"    newXS(\"$statics2[$_]::bootstrap\", boot_$statics1[$_], file);\n"} 0 .. $#statics),"#undef STATIC3\n#endif\n";
+    print $fh "#ifdef STATIC3\n",(map {"    newXS(\"$statics2[$_]::bootstrap\", boot_$statics1[$_], file);\n"} 0 .. (@statics-1)),"#undef STATIC3\n#endif\n";
     close $fh;
   } else {
     my %extralibs;
@@ -128,7 +128,7 @@ foreach $dir (sort @ext)
                    ? ('LINKTYPE=static') : ()), # if ext is static
 		);
       if (defined $::Cross::platform) {
-	@perl = (@perl[0,1],"-MCross=$::Cross::platform",@perl[2..$#perl]);
+	@perl = (@perl[0,1],"-MCross=$::Cross::platform",@perl[2..(@perl-1)]);
       }
       print join(' ', @perl), "\n";
       $code = system(@perl);

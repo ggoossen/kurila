@@ -92,7 +92,7 @@ ok( (!defined do 6) && $!, "'do 6' : $!" );
 
 # [perl #19545]
 push @t, ($u = (do {} . "This should be pushed."));
-ok( $#t == 0, "empty do result value" );
+ok( (@t-1) == 0, "empty do result value" );
 
 END {
     1 while unlink("$$.16", "$$.17", "$$.18");

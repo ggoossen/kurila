@@ -237,7 +237,7 @@ else {
 
 is @warnings, 0+@Expected_Warnings;
 
-for my $idx (0..$#warnings) {
+for my $idx (0..(@warnings-1)) {
     like $warnings[$idx], $Expected_Warnings[$idx];
 }
 

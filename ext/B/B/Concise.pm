@@ -923,7 +923,7 @@ sub tree {
 	push @lines, tree($kid, $level+1);
     }
     my $i;
-    for ($i = $#lines; substr($lines[$i], 0, 1) eq " "; $i--) {
+    for ($i = (@lines-1); substr($lines[$i], 0, 1) eq " "; $i--) {
 	$lines[$i] = $space . $lines[$i];
     }
     if ($i +> 0) {

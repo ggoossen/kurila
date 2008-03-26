@@ -93,7 +93,7 @@ sub FIRSTKEY {
 sub NEXTKEY {
   # print "nextkey `@_'\n" if $debug;
   my $self = shift;
-  return undef unless $self->[2]++ +< $#{$self->[1]};
+  return undef unless $self->[2]++ +< (@-1){$self->[1]};
   my $key = $self->[1]->[$self->[2]];
   return $key; #, OS2::Prf::Get($self->[0]->[0], $self->[2], $key));
 }
@@ -183,7 +183,7 @@ sub FIRSTKEY {
 sub NEXTKEY {
   # print "nextkey `@_'\n" if $debug;
   my $self = shift;
-  return undef unless $self->[2]++ +< $#{$self->[1]};
+  return undef unless $self->[2]++ +< (@-1){$self->[1]};
   my $key = $self->[1]->[$self->[2]];
   return $key; #, OS2::Prf::Get($self->[0]->[0], $self->[2], $key));
 }

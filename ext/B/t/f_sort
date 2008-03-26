@@ -45,7 +45,7 @@ print sort @george, 'to', @harry;
 @new = @old[ sort {
     $nums[$b] <+> $nums[$a]
 	|| $caps[$a] cmp $caps[$b]
-	} 0..$#old  ];
+	} 0..(@old-1)  ];
 
 # same thing, but without any temps
 @new = map { $_->[0] }

@@ -55,8 +55,8 @@ test "Storing", sub {
 };
 
 test "Truncation", sub {
-    $#FOO = 0;
-    $#BAR = 0;
+    (@FOO-1) = 0;
+    (@BAR-1) = 0;
 };
 
 test "Push", sub {

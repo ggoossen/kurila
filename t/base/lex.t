@@ -12,7 +12,7 @@ $x = $#[0];
 if ($x eq '') {print "ok 2\n";} else {print "not ok 2\n";}
 
 our @x;
-$x = $#x;
+$x = (@x-1);
 
 if ($x eq '-1') {print "ok 3\n";} else {print "not ok 3\n";}
 

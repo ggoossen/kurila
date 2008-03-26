@@ -82,7 +82,7 @@ sub import {
     $t->plan(@plan);
 
     my @imports = ();
-    foreach my $idx (0..$#plan) {
+    foreach my $idx (0..(@plan-1)) {
         if( $plan[$idx] eq 'import' ) {
             @imports = @{$plan[$idx+1]};
             last;

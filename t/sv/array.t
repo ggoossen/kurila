@@ -12,40 +12,40 @@ my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 @ary = (1,2,3,4,5);
 is(join('',@ary), '12345');
 
-$tmp = $ary[$#ary]; --$#ary;
+$tmp = $ary[(@ary-1)]; --(@ary-1);
 is($tmp, 5);
-is($#ary, 3);
+is((@ary-1), 3);
 is(join('',@ary), '1234');
 
 @foo = ();
-$r = join(',', $#foo, @foo);
+$r = join(',', (@foo-1), @foo);
 is($r, "-1");
 $foo[0] = '0';
-$r = join(',', $#foo, @foo);
+$r = join(',', (@foo-1), @foo);
 is($r, "0,0");
 $foo[2] = '2';
-$r = join(',', $#foo, @foo);
+$r = join(',', (@foo-1), @foo);
 is($r, "2,0,,2");
 @bar = ();
 $bar[0] = '0';
 $bar[1] = '1';
-$r = join(',', $#bar, @bar);
+$r = join(',', (@bar-1), @bar);
 is($r, "1,0,1");
 @bar = ();
-$r = join(',', $#bar, @bar);
+$r = join(',', (@bar-1), @bar);
 is($r, "-1");
 $bar[0] = '0';
-$r = join(',', $#bar, @bar);
+$r = join(',', (@bar-1), @bar);
 is($r, "0,0");
 $bar[2] = '2';
-$r = join(',', $#bar, @bar);
+$r = join(',', (@bar-1), @bar);
 is($r, "2,0,,2");
 @bar = ();
 $bar[0] = '0';
-$r = join(',', $#bar, @bar);
+$r = join(',', (@bar-1), @bar);
 is($r, "0,0");
 $bar[2] = '2';
-$r = join(',', $#bar, @bar);
+$r = join(',', (@bar-1), @bar);
 is($r, "2,0,,2");
 
 $foo = 'now is the time';
@@ -101,7 +101,7 @@ is($foo, 'b');
     no strict 'vars';
     @foox = ( 'foo', 'bar', 'burbl');
     push(foox, 'blah');
-    is($#foox, 3);
+    is((@foox-1), 3);
 }
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
@@ -280,16 +280,16 @@ sub test_arylen {
 }
 
 {
-    my $a = \$#{[]};
+    my $a = \(@-1){[]};
     # Need a new statement to make it go out of scope
     test_arylen ($a);
-    test_arylen (do {my @a; \$#a});
+    test_arylen (do {my @a; \(@a-1)});
 }
 
 {
     use vars '@array';
 
-    my $outer = \$#array;
+    my $outer = \(@array-1);
     is ($$outer, -1);
     is (scalar @array, 0);
 
@@ -302,7 +302,7 @@ sub test_arylen {
     my $inner;
     {
 	local @array;
-	$inner = \$#array;
+	$inner = \(@array-1);
 
 	is ($$inner, -1);
 	is (scalar @array, 0);
@@ -319,7 +319,7 @@ sub test_arylen {
     is (scalar @array, 7);
     is ($$outer, 6);
 
-    is ($$inner, undef, "orphaned $#foo is always undef");
+    is ($$inner, undef, "orphaned (@foo-1) is always undef");
 
     is (scalar @array, 7);
     is ($$outer, 6);
@@ -342,7 +342,7 @@ sub test_arylen {
     for (1,2) {
 	{
 	    local @a;
-	    is ($#a, -1);
+	    is ((@a-1), -1);
 	    @a=(1..4)
 	}
     }
@@ -352,11 +352,11 @@ sub test_arylen {
     # Bug #37350
     no strict 'refs';
     my @array = (1..4);
-    $#{*{Symbol::fetch_glob(scalar @array)}} = 7;
-    is ($#{4}, 7);
+    (@-1){*{Symbol::fetch_glob(scalar @array)}} = 7;
+    is ((@{4}-1), 7);
 
     my $x;
-    $#{$x} = 3;
+    (@-1){$x} = 3;
     is(scalar @$x, 4);
 
     push @{*{Symbol::fetch_glob(scalar @array)}}, 23;
@@ -367,11 +367,11 @@ sub test_arylen {
     no strict 'refs';
     use vars '@array';
     @array = (1..4);
-    $#{*{Symbol::fetch_glob(scalar @array)}} = 7;
-    is ($#{4}, 7);
+    (@-1){*{Symbol::fetch_glob(scalar @array)}} = 7;
+    is ((@{4}-1), 7);
 
     my $x;
-    $#{$x} = 3;
+    (@-1){$x} = 3;
     is(scalar @$x, 4);
 
     push @{*{Symbol::fetch_glob(scalar @array)}}, 23;

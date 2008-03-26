@@ -95,7 +95,7 @@ sub caller_info {
   if ($call_info{has_args}) {
     my @args = map {Carp::format_arg($_)} @DB::args;
     if ($MaxArgNums and @args +> $MaxArgNums) { # More than we want to show?
-      $#args = $MaxArgNums;
+      (@args-1) = $MaxArgNums;
       push @args, '...';
     }
     # Push the args onto the subroutine

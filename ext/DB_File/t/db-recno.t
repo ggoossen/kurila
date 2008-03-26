@@ -514,7 +514,7 @@ EOM
     $h[1] = "def" ;
     $h[2] = "ghi" ;
     $h[3] = "jkl" ;
-    ok(84, $FA ? $#h == 3 : $self->length() == 4) ;
+    ok(84, $FA ? (@h-1) == 3 : $self->length() == 4) ;
     undef $self ;
     ok(85, safeUntie \@h);
     my $x = docat($Dfile) ;
@@ -525,10 +525,10 @@ EOM
     ok(87, $self) 
         or warn "# $DB_File::Error\n";
     if ($FA)
-      { $#h = 3 }
+      { (@h-1) = 3 }
     else 
       { $self->STORESIZE(4) }
-    ok(88, $FA ? $#h == 3 : $self->length() == 4) ;
+    ok(88, $FA ? (@h-1) == 3 : $self->length() == 4) ;
     undef $self ;
     ok(89, safeUntie \@h);
     $x = docat($Dfile) ;
@@ -537,10 +537,10 @@ EOM
     # $# sets array to bigger
     ok(91, $self = tie @h, 'DB_File', $Dfile, O_RDWR, 0640, $DB_RECNO ) ;
     if ($FA)
-      { $#h = 6 }
+      { (@h-1) = 6 }
     else 
       { $self->STORESIZE(7) }
-    ok(92, $FA ? $#h == 6 : $self->length() == 7) ;
+    ok(92, $FA ? (@h-1) == 6 : $self->length() == 7) ;
     undef $self ;
     ok(93, safeUntie \@h);
     $x = docat($Dfile) ;
@@ -549,10 +549,10 @@ EOM
     # $# sets array smaller
     ok(95, $self = tie @h, 'DB_File', $Dfile, O_RDWR, 0640, $DB_RECNO ) ;
     if ($FA)
-      { $#h = 2 }
+      { (@h-1) = 2 }
     else 
       { $self->STORESIZE(3) }
-    ok(96, $FA ? $#h == 2 : $self->length() == 3) ;
+    ok(96, $FA ? (@h-1) == 2 : $self->length() == 3) ;
     undef $self ;
     ok(97, safeUntie \@h);
     $x = docat($Dfile) ;

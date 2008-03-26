@@ -1006,19 +1006,19 @@ sub index
 	# try to match
 	while ( @strWt +> @subWt || (@strWt == @subWt && $i +> $end) ) {
 	    if ($iniPos[0] != NOMATCHPOS &&
-		    $finPos[$#subWt] != NOMATCHPOS &&
+		    $finPos[(@subWt-1)] != NOMATCHPOS &&
 			_eqArray(\@strWt, \@subWt, $lev)) {
 		my $temp = $iniPos[0] + $pos;
 
 		if ($grob) {
-		    push @g_ret, [$temp, $finPos[$#subWt] - $iniPos[0]];
-		    splice @strWt,  0, $#subWt;
-		    splice @iniPos, 0, $#subWt;
-		    splice @finPos, 0, $#subWt;
+		    push @g_ret, [$temp, $finPos[(@subWt-1)] - $iniPos[0]];
+		    splice @strWt,  0, (@subWt-1);
+		    splice @iniPos, 0, (@subWt-1);
+		    splice @finPos, 0, (@subWt-1);
 		}
 		else {
 		    return wantarray
-			? ($temp, $finPos[$#subWt] - $iniPos[0])
+			? ($temp, $finPos[(@subWt-1)] - $iniPos[0])
 			:  $temp;
 		}
 	    }

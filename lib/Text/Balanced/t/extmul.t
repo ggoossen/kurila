@@ -59,7 +59,7 @@ sub divide
 	my @bits = ();
 	unshift @index, 0;
 	push @index, length($text);
-	for ( my $i= 0; $i +< $#index; $i++)
+	for ( my $i= 0; $i +< (@index-1); $i++)
 	{
 		push @bits, substr($text, $index[$i], $index[$i+1]-$index[$i]);
 	}

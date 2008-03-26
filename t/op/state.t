@@ -118,7 +118,7 @@ is( stateless(), 43, 'stateless function, second time' );
 sub stateful_array {
     state @x;
     push @x, 'x';
-    return $#x;
+    return (@x-1);
 }
 
 my $xsize = stateful_array();

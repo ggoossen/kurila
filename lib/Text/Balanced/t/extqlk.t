@@ -49,7 +49,7 @@ while (defined($str = ~< *DATA))
 		debug "\t   on: [" . esc($setup_cmd) . "][" . esc($str) . "]\n";
 		my @res;
 		eval qq{\@res = $cmd; };
-		debug "\t  got:\n" . join "", map { "\t\t\t$_: [" . esc($res[$_]) . "]\n"} (0..$#res);
+		debug "\t  got:\n" . join "", map { "\t\t\t$_: [" . esc($res[$_]) . "]\n"} (0..(@res-1));
 		debug "\t left: [" . esc($str) . "]\n";
 		debug "\t  pos: [" . esc(substr($str,pos($str))) . "...]\n";
 		print "not " if (substr($str,pos($str),1) eq ';')==$neg;

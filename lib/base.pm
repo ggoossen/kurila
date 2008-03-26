@@ -146,7 +146,7 @@ END
         }
     }
 
-    foreach my $idx (1..$#{$battr}) {
+    foreach my $idx (1..(@-1){$battr}) {
         next if defined $dattr->[$idx];
         $dattr->[$idx] = $battr->[$idx] ^&^ INHERITED;
     }

@@ -283,10 +283,10 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
     is( scalar( ($x,%h) = (0,1,2,1,3,1,4,1,5) ), 3,
 	'scalar + hash assignment in scalar context' );
     $ar = [ %h = (1,2,1,3,1,4,1,5) ];
-    is( $#$ar, 1, 'hash assignment in list context' );
+    is( (@-1)$ar, 1, 'hash assignment in list context' );
     is( "@$ar", "1 5", '...gets the last values' );
     $ar = [ ($x,%h) = (0,1,2,1,3,1,4,1,5) ];
-    is( $#$ar, 2, 'scalar + hash assignment in list context' );
+    is( (@-1)$ar, 2, 'scalar + hash assignment in list context' );
     is( "@$ar", "0 1 5", '...gets the last values' );
 }
 

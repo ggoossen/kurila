@@ -21,7 +21,7 @@ open $ch, "<", "$cSH" or die "Cannot open $cSH: $!\n";
 sub ch_index ()
 {
     %ch = ();
-    foreach my $ch (0 .. $#ch) {
+    foreach my $ch (0 .. (@ch-1)) {
 	while ($ch[$ch] =~ m{^/\* ([A-Z]\w+)}gm) {
 	    $ch{$1} = $ch;
 	    }

@@ -261,7 +261,7 @@ $X->DELETE('goner3');
 my @keys = keys(%h);
 my @values = values(%h);
 
-ok(25, $#keys == 29 && $#values == 29) ;
+ok(25, (@keys-1) == 29 && (@values-1) == 29) ;
 
 $i = 0 ;
 while (($key,$value) = each(%h)) {
@@ -274,7 +274,7 @@ while (($key,$value) = each(%h)) {
 ok(26, $i == 30) ;
 
 @keys = ('blurfl', keys(%h), 'dyick');
-ok(27, $#keys == 31) ;
+ok(27, (@keys-1) == 31) ;
 
 #Check that the keys can be retrieved in order
 my @b = keys %h ;

@@ -114,7 +114,7 @@ sub process {
     print FILE $myhead;
     print FILE $start, ( $OPT{'w'} ? " -w" : "" ),
 	       "\n#line ", ($headlines+1), "\n" unless $linedone;
-    print FILE @file[$skiplines..$#file];
+    print FILE @file[$skiplines..(@file-1)];
     print FILE $tail unless $taildone;
     close( FILE );
 }

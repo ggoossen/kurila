@@ -142,12 +142,12 @@ is(join(":", map "[$_]", @foo), '[]');
 # again with magic
 {
     my @a = (1..3);
-    @foo=(); push @foo, $_ for undef..$#a;
+    @foo=(); push @foo, $_ for undef..(@a-1);
     is(join(":", @foo), '0:1:2');
 }
 {
     my @a = ();
-    @foo=(); push @foo, $_ for $#a..undef;
+    @foo=(); push @foo, $_ for (@a-1)..undef;
     is(join(":", @foo), '-1:0');
 }
 {

@@ -72,7 +72,7 @@ if ($^O eq 'VMS') {
     foreach(@compare) {
         $count += grep {m/$_/} @result;
     }
-    ok($count/($#result+1)-1,$#compare);
+    ok($count/((@result-1)+1)-1,(@compare-1));
 }
 elsif ('File::Spec'->case_tolerant || $^O eq 'dos') {
     ok(lc $result,lc $compare);

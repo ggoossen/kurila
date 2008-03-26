@@ -54,7 +54,7 @@ sub module {
 }
 
 sub load {
-  confess 'Usage: load OS2::DLL <file> [<dirs>]' unless $#_ +>= 1;
+  confess 'Usage: load OS2::DLL <file> [<dirs>]' unless (@_-1) +>= 1;
   $load_with_dirs->(@_, @libs);
 }
 
