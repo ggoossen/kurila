@@ -1541,8 +1541,9 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $$self{Kids}[0]->madness('l');
+    push @newkids, $$self{Kids}[0]->madness('wrap_open l');
     push @newkids, $$self{Kids}[0]->ast();
+    push @newkids, $$self{Kids}[0]->madness('wrap_close');
     return $self->newtype->new(Kids => [@newkids]);
 }
 

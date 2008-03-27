@@ -4,6 +4,7 @@ use lib "$ENV{madpath}/mad";
 
 use strict;
 use warnings;
+use version;
 
 use XML::Twig;
 use XML::Twig::XPath;
@@ -708,10 +709,48 @@ sub pointy_anon_hash {
     }
 }
 
+sub remove_dolsharp {
+    my $xml = shift;
+    # conversion of $#foo to (@foo-1)
+    for my $op (map { $xml->findnodes($_) } qw|//op_av2arylen|) {
+        my $varop = (grep { $_->tag =~ m/^op_(pad.v|rv2av)$/ } $op->children)[0] || $op;
+        if (get_madprop($varop, "arylen") =~ m/^\$\#/) {
+            my $name = get_madprop($varop, "arylen");
+            $name =~ s/^\$\#/\@/;
+            set_madprop($varop, "arylen", $name);
+            set_madprop($varop, "wrap_open", "(");
+            set_madprop($varop, "wrap_close", "-1)");
+        }
+    }
+}
+
+sub no_sigil_change {
+    my $xml = shift;
+
+    # conversion of $foo[1] to @foo[1]
+    for my $op (map { $xml->findnodes($_) } qw|//op_aelemfast|) {
+        if (get_madprop($op, "variable") =~ m/^\$/) {
+            my $name = get_madprop($op, "variable");
+            $name =~ s/^\$/\@/;
+            set_madprop($op, "variable", $name);
+        }
+    }
+
+    # conversion of $foo[$a] to @foo[$a] and $foo{$a} to %foo{$a}
+    for my $op (map { $xml->findnodes($_) } qw|//op_aelem //op_null[@was='aelem'] //op_helem //op_null[@was='helem']|) {
+        my $varop = (($op->child(1)->tag || '') =~ m/^op_pad.v$/) ? $op->child(1) : $op;
+        if (get_madprop($varop, "variable") =~ m/^\$/) {
+            my $name = get_madprop($varop, "variable");
+            ($op->tag eq "op_helem" || ($op->att('was') || '') eq 'helem') ? $name =~ s/^\$/\%/ : $name =~ s/^\$/\@/;
+            set_madprop($varop, "variable", $name);
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
-$from = { branch => $1, 'v' => $2};
+$from = { branch => $1, 'v' => qv $2};
 
 my $filename = shift @ARGV;
 
@@ -722,7 +761,7 @@ my $twig= XML::Twig->new( # keep_spaces => 1,
 
 $twig->parsefile( "-" );
 
-if ($from->{branch} ne "kurila" or $from->{v} < 1.4 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < v1.4) {
     # replacing.
     for my $op ($twig->findnodes(q|//op_entersub|)) {
         entersub_handler($twig, $op);
@@ -740,7 +779,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < 1.4 - 0.05) {
     remove_typed_declaration($twig);
 }
 
-if ($from->{branch} ne "kurila" or $from->{v} < 1.5 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < v1.5) {
     rename_bit_operators($twig);
     remove_useversion($twig);
     change_deref_method($twig);
@@ -752,14 +791,14 @@ if ($from->{branch} ne "kurila" or $from->{v} < 1.5 - 0.05) {
 }
 #t_parenthesis($twig);
 
-if ($from->{branch} ne "kurila" or $from->{v} < 1.6 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < v1.6) {
     remove_vstring( $twig );
     use_pkg_version($twig);
     lvalue_subs( $twig );
 }
 
 #pointy_anon_hash( $twig );
-if ($from->{branch} ne "kurila" or $from->{v} < 1.7 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < v1.7) {
     rename_pointy_ops( $twig );
     force_m( $twig );
     qq_block( $twig );
@@ -767,8 +806,13 @@ if ($from->{branch} ne "kurila" or $from->{v} < 1.7 - 0.05) {
     open_3args($twig);
 }
 
-if ($from->{branch} ne "kurila" or $from->{v} < 1.8 - 0.05) {
+if ($from->{branch} ne "kurila" or $from->{v} < v1.8) {
     error_str($twig);
+}
+
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.10') {
+    remove_dolsharp($twig);
+    no_sigil_change($twig);
 }
 
 # print
