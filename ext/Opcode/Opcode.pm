@@ -307,7 +307,7 @@ invert_opset function.
 
     rv2sv sassign
 
-    rv2av aassign aelem aelemfast aslice av2arylen
+    rv2av aassign aelem aelemfast aslice
 
     rv2hv helem hslice each values keys exists delete
 

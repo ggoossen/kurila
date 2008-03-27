@@ -4169,7 +4169,6 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
 
     */
     if (!obj || obj == sv ||
-	how == PERL_MAGIC_arylen ||
 	how == PERL_MAGIC_symtab ||
 	(SvTYPE(obj) == SVt_PVGV &&
 	    (GvSV(obj) == sv || GvHV(obj) == (HV*)sv || GvAV(obj) == (AV*)sv ||
@@ -4354,7 +4353,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_vec:
 	vtable = &PL_vtbl_vec;
 	break;
-    case PERL_MAGIC_arylen_p:
     case PERL_MAGIC_rhash:
     case PERL_MAGIC_symtab:
     case PERL_MAGIC_vstring:
@@ -4365,9 +4363,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	break;
     case PERL_MAGIC_defelem:
 	vtable = &PL_vtbl_defelem;
-	break;
-    case PERL_MAGIC_arylen:
-	vtable = &PL_vtbl_arylen;
 	break;
     case PERL_MAGIC_pos:
 	vtable = &PL_vtbl_pos;

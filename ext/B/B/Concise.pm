@@ -570,7 +570,7 @@ our %priv; # used to display each opcode's BASEOP.op_private values
 
 $priv{$_}{128} = "LVINTRO"
   for ("pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv",
-       "rv2av", "rv2arylen", "aelem", "helem", "aslice", "hslice", "padsv",
+       "rv2av", "aelem", "helem", "aslice", "hslice", "padsv",
        "padav", "padhv", "enteriter");
 $priv{$_}{64} = "REFC" for ("leave", "leavesub", "leavesublv", "leavewrite");
 $priv{"aassign"}{64} = "COMMON";

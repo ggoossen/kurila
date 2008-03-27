@@ -253,11 +253,6 @@ PERL_CALLCONV void	Perl_av_unshift(pTHX_ AV *av, I32 num)
 #define PERL_ARGS_ASSERT_AV_UNSHIFT	\
 	assert(av)
 
-PERL_CALLCONV SV**	Perl_av_arylen_p(pTHX_ AV *av)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_AV_ARYLEN_P	\
-	assert(av)
-
 PERL_CALLCONV OP*	Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_2)
@@ -1500,12 +1495,6 @@ PERL_CALLCONV int	Perl_magic_get(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_GET	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_getarylen(pTHX_ SV* sv, const MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_GETARYLEN	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_getdefelem(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1596,18 +1585,6 @@ PERL_CALLCONV int	Perl_magic_setamagic(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SETAMAGIC	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_setarylen(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SETARYLEN	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_freearylen_p(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_FREEARYLEN_P	\
 	assert(sv); assert(mg)
 
 PERL_CALLCONV int	Perl_magic_setdbline(pTHX_ SV* sv, MAGIC* mg)

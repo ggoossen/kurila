@@ -75,7 +75,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DOLSHARP DO HASHBRACK NOAMP
+%token <i_tkval> DO HASHBRACK NOAMP
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
@@ -87,7 +87,7 @@
 %type <opval> decl subrout mysubrout package use peg
 
 %type <opval> block mblock lineseq line loop cond else
-%type <opval> expr term subscripted scalar ary hsh arylen star amper sideff
+%type <opval> expr term subscripted scalar ary hsh star amper sideff
 %type <opval> argexpr nexpr texpr iexpr mexpr mnexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
 %type <opval> subname proto subbody cont my_scalar
@@ -1143,8 +1143,6 @@ term	:	termbinop
 			{ $$ = $1; }
 	|	ary 	%prec '('
 			{ $$ = $1; }
-	|	arylen 	%prec '('                    /* $#x, $#{ something } */
-			{ $$ = newUNOP(OP_AV2ARYLEN, 0, ref($1, OP_AV2ARYLEN));}
 	|       subscripted
 			{ $$ = $1; }
 	|	ary '[' expr ']'                     /* array slice */
@@ -1373,12 +1371,6 @@ ary	:	'@' indirob
 hsh	:	'%' indirob
 			{ $$ = newHVREF($2);
 			  TOKEN_GETMAD($1,$$,'%');
-			}
-	;
-
-arylen	:	DOLSHARP indirob
-			{ $$ = newAVREF($2);
-			  TOKEN_GETMAD($1,$$,'l');
 			}
 	;
 

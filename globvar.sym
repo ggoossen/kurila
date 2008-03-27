@@ -37,7 +37,6 @@ uuemap
 varies
 vtbl_amagic
 vtbl_amagicelem
-vtbl_arylen
 vtbl_backref
 vtbl_bm
 vtbl_collxfrm

@@ -164,7 +164,7 @@ wantarray ; 		# OP_WANTARRAY
 			# OP_PADAV
 			# OP_PADHV
 			# OP_PADANY
-			# OP_AV2ARYLEN
+
 ref ;			# OP_REF
 \@a ;			# OP_REFGEN
 \$a ;			# OP_SREFGEN
@@ -269,7 +269,7 @@ wantarray ; 		# OP_WANTARRAY
 			# OP_PADAV
 			# OP_PADHV
 			# OP_PADANY
-			# OP_AV2ARYLEN
+
 ref ;			# OP_REF
 \@a ;			# OP_REFGEN
 \$a ;			# OP_SREFGEN

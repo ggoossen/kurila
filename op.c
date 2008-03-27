@@ -904,7 +904,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_PADAV:
     case OP_PADHV:
     case OP_PADANY:
-    case OP_AV2ARYLEN:
     case OP_REF:
     case OP_REFGEN:
     case OP_SREFGEN:
@@ -1435,7 +1434,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	localize = 1;
 	/* FALL THROUGH */
     case OP_GV:
-    case OP_AV2ARYLEN:
 	PL_hints |= HINT_BLOCK_SCOPE;
     case OP_SASSIGN:
     case OP_ANDASSIGN:

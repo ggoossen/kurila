@@ -944,8 +944,8 @@ referring to 'U' magic rather than C<PERL_MAGIC_uvar> for example.
 The C<obj> argument is stored in the C<mg_obj> field of the C<MAGIC>
 structure.  If it is not the same as the C<sv> argument, the reference
 count of the C<obj> object is incremented.  If it is the same, or if
-the C<how> argument is C<PERL_MAGIC_arylen>, or if it is a NULL pointer,
-then C<obj> is merely stored, without the reference count being incremented.
+it is a NULL pointer, then C<obj> is merely stored, without the
+reference count being incremented.
 
 See also C<sv_magicext> in L<perlapi> for a more flexible way to add magic
 to an SV.
@@ -1060,13 +1060,11 @@ The current kinds of Magic Virtual Tables are:
     y  PERL_MAGIC_defelem        vtbl_defelem    Shadow "foreach" iterator
                                                  variable / smart parameter
                                                  vivification
-    #  PERL_MAGIC_arylen         vtbl_arylen     Array length ($#ary)
     .  PERL_MAGIC_pos            vtbl_pos        pos() lvalue
     <  PERL_MAGIC_backref        vtbl_backref    back pointer to a weak ref 
     ~  PERL_MAGIC_ext            (none)          Available for use by extensions
     :  PERL_MAGIC_symtab         (none)          hash used as symbol table
     %  PERL_MAGIC_rhash          (none)          hash used as restricted hash
-    @  PERL_MAGIC_arylen_p       vtbl_arylen_p   pointer to $#a from @a
 
 
 When an uppercase and lowercase letter both exist in the table, then the

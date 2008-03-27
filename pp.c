@@ -255,19 +255,6 @@ PP(pp_rv2sv)
     RETURN;
 }
 
-PP(pp_av2arylen)
-{
-    dVAR; dSP;
-    AV * const av = (AV*)TOPs;
-    SV ** const sv = Perl_av_arylen_p(aTHX_ (AV*)av);
-    if (!*sv) {
-	*sv = newSV_type(SVt_PVMG);
-	sv_magic(*sv, (SV*)av, PERL_MAGIC_arylen, NULL, 0);
-    }
-    SETs(*sv);
-    RETURN;
-}
-
 PP(pp_pos)
 {
     dVAR; dSP; dTARGET; dPOPss;
