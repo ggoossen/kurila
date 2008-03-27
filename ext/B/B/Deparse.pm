@@ -1142,7 +1142,7 @@ sub deparse_root {
     }
     $self->walk_lineseq($op, \@kids,
 			sub { print $self->indent($_[0].';');
-			      print "\n" unless $_[1] == $#kids;
+			      print "\n" unless $_[1] ==( @kids-1);
 			  });
 }
 
@@ -1153,7 +1153,7 @@ sub walk_lineseq {
 	my $expr = "";
 	if (is_state $kids[$i]) {
 	    $expr = $self->deparse($kids[$i++], 0);
-	    if ($i +> $#kids) {
+	    if ($i +>( @kids-1)) {
 		$callback->($expr, $i);
 		last;
 	    }
@@ -3808,10 +3808,10 @@ sub collapse {
     for ($c = 0; $c +< @chars; $c++) {
 	$tr = $chars[$c];
 	$str .= pchr($tr);
-	if ($c +<= $#chars - 2 and $chars[$c + 1] == $tr + 1 and
+	if ($c +<=( @chars-1) - 2 and $chars[$c + 1] == $tr + 1 and
 	    $chars[$c + 2] == $tr + 2)
 	{
-	    for (; $c +<= $#chars-1 and $chars[$c + 1] == $chars[$c] + 1; $c++)
+	    for (; $c +<=( @chars-1)-1 and $chars[$c + 1] == $chars[$c] + 1; $c++)
 	      {}
 	    $str .= "-";
 	    $str .= pchr($chars[$c]);
@@ -3856,7 +3856,7 @@ sub tr_decode_byte {
 	@from = @newfrom;
     }
     unless ($flags ^&^ OPpTRANS_DELETE || !@to) {
-	pop @to while $#to and $to[$#to] == $to[$#to -1];
+	pop @to while( @to-1) and $to[(@to-1)] == $to[(@to-1) -1];
     }
     my($from, $to);
     $from = collapse(@from);
@@ -3903,7 +3903,7 @@ sub tr_decode_utf8 {
 	    push @to, [$result, $result + $max - $min];
 	}
     }
-    for my $i (0 .. $#from) {
+    for my $i (0 ..( @from-1)) {
 	if ($from[$i][0] == ord '-') {
 	    unshift @from, splice(@from, $i, 1);
 	    unshift @to, splice(@to, $i, 1);
@@ -3916,7 +3916,7 @@ sub tr_decode_utf8 {
 	    last;
 	}
     }
-    for my $i (0 .. $#delfrom) {
+    for my $i (0 ..( @delfrom-1)) {
 	if ($delfrom[$i][0] == ord '-') {
 	    push @delfrom, splice(@delfrom, $i, 1);
 	    last;
@@ -3926,14 +3926,14 @@ sub tr_decode_utf8 {
 	    last;
 	}
     }
-    if (defined $final and $to[$#to][1] != $final) {
+    if (defined $final and $to[(@to-1)][1] != $final) {
 	push @to, [$final, $final];
     }
     push @from, @delfrom;
     if ($flags ^&^ OPpTRANS_COMPLEMENT) {
 	my @newfrom;
 	my $next = 0;
-	for my $i (0 .. $#from) {
+	for my $i (0 ..( @from-1)) {
 	    push @newfrom, [$next, $from[$i][0] - 1];
 	    $next = $from[$i][1] + 1;
 	}

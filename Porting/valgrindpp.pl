@@ -163,7 +163,7 @@ sub summary {
       my $data = $nl{$l}{$frames};
       my @stack = split m/</, $frames;
       $data->{count} +> 1 and $stack[-1] .= " [$data->{count} paths]";
-      print $fh join('', map { ' 'x4 . "$_:$stack[$_]\n" } 0 .. $#stack ),
+      print $fh join('', map { ' 'x4 . "$_:$stack[$_]\n" } 0 ..( @stack-1) ),
                 format_tests($data->{tests}), "\n\n";
     }
   }
@@ -213,7 +213,7 @@ sub filter {
   my $address  = qr/^\s+Address $hexaddr is \d+ bytes (?:before|inside|after) a block of size \d+/;
   my $leak     = qr/^\s*\d+ bytes in \d+ blocks are (still reachable|(?:definite|possib)ly lost)/;
 
-  for my $i (0 .. $#l) {
+  for my $i (0 ..( @l-1)) {
     $l[$i]   =~ $topframe or next; # Match on any topmost frame...
     $l[$i-1] =~ $address and next; # ...but not if it's only address details
     my $line = $l[$i-1]; # The error / leak description line

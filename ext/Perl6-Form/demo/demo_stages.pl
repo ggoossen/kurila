@@ -12,7 +12,7 @@ print "The best Shakespearean roles are:\n\n";
 print form
 	 "   * \{<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\}   |\{:<<<<<<<>>>>>>>:\}|",
            $character[$_],                $disclaimer
-				for 0..$#character;
+				for 0..(@character-1);
 
 pos $disclaimer = 0;
 unshift @character, "Either of the 'two foolish officers': Dogberry and Verges";

@@ -206,7 +206,7 @@ sub display_ordered {
   my $i = @sorted;
   return unless @sorted;
   my $sum = 0;
-  foreach my $i ($reverse ? 0 .. $#sorted : reverse 0 .. $#sorted) {
+  foreach my $i ($reverse ? 0 ..( @sorted-1) : reverse 0 ..( @sorted-1)) {
     next unless $sorted[$i];
     my $prefix;
     $sum += $i * @{$sorted[$i]};

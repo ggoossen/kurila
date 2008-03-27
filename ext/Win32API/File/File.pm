@@ -416,7 +416,7 @@ use vars qw( @_createFile_Opts %_createFile_Opts );
 sub createFile
 {
     my $opts= "";
-    if(  2 +<= @_  &&  "HASH" eq ref($_[$#_])  ) {
+    if(  2 +<= @_  &&  "HASH" eq ref($_[(@_-1)])  ) {
 	$opts= pop( @_ );
     }
     my( $sPath, $svAccess, $svShare )= @_;
