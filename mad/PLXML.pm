@@ -1144,6 +1144,25 @@ sub check { 'ck_null' }
 sub flags { 'ifs2' }
 sub args { 'S S' }
 
+package PLXML::op_ref_eq;
+
+our @ISA = ('PLXML::binop');
+
+sub key { 'ref_eq' }
+sub desc { 'ref eq' }
+sub check { 'ck_null' }
+sub flags { 'ifs2' }
+sub args { 'S S' }
+
+package PLXML::op_ref_ne;
+
+our @ISA = ('PLXML::binop');
+
+sub key { 'ref_ne' }
+sub desc { 'ref ne' }
+sub check { 'ck_null' }
+sub flags { 'ifs2' }
+sub args { 'S S' }
 
 package PLXML::op_scmp;
 
