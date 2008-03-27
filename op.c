@@ -5875,14 +5875,10 @@ Perl_oopsAV(pTHX_ OP *o)
     PERL_ARGS_ASSERT_OOPSAV;
 
     switch (o->op_type) {
-    case OP_PADSV:
-	o->op_type = OP_PADAV;
-	o->op_ppaddr = PL_ppaddr[OP_PADAV];
+    case OP_PADAV:
 	return ref(o, OP_RV2AV);
 
-    case OP_RV2SV:
-	o->op_type = OP_RV2AV;
-	o->op_ppaddr = PL_ppaddr[OP_RV2AV];
+    case OP_RV2AV:
 	ref(o, OP_RV2AV);
 	break;
 
@@ -5902,16 +5898,10 @@ Perl_oopsHV(pTHX_ OP *o)
     PERL_ARGS_ASSERT_OOPSHV;
 
     switch (o->op_type) {
-    case OP_PADSV:
-    case OP_PADAV:
-	o->op_type = OP_PADHV;
-	o->op_ppaddr = PL_ppaddr[OP_PADHV];
+    case OP_PADHV:
 	return ref(o, OP_RV2HV);
 
-    case OP_RV2SV:
-    case OP_RV2AV:
-	o->op_type = OP_RV2HV;
-	o->op_ppaddr = PL_ppaddr[OP_RV2HV];
+    case OP_RV2HV:
 	ref(o, OP_RV2HV);
 	break;
 

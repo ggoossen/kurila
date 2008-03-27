@@ -75,7 +75,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DO HASHBRACK NOAMP
+%token <i_tkval> DO HASHBRACK NOAMP HSLICE ASLICE
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
@@ -792,7 +792,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             $$ = newCVREF(0, $1);
                             TOKEN_GETMAD($2,$$,'a');
                         }
-	|	scalar '[' expr ']'          /* $array[$element] */
+	|	ary '[' expr ']'          /* $array[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0, oopsAV($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
@@ -812,7 +812,18 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
 			}
-	|	scalar '{' expr ';' '}'    /* $foo->{bar();} */
+	|	hsh HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
+			{ $$ = prepend_elem(OP_HSLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_HSLICE, 0,
+					list($3),
+					ref($1, OP_HSLICE)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'{');
+			  TOKEN_GETMAD($4,$$,';');
+			  TOKEN_GETMAD($5,$$,'}');
+			}
+	|	hsh '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
 			{ $$ = newBINOP(OP_HELEM, 0, oopsHV($1), jmaybe($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
@@ -867,14 +878,14 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
 			}
-	|	'(' expr ')' '[' expr ']'            /* list slice */
+	|	'(' expr ')' ASLICE expr ']' ']'            /* list slice */
 			{ $$ = newSLICEOP(0, $5, $2);
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
 			  TOKEN_GETMAD($4,$$,'[');
 			  TOKEN_GETMAD($6,$$,']');
 			}
-	|	'(' ')' '[' expr ']'                 /* empty list slice! */
+	|	'(' ')' ASLICE expr ']' ']'                 /* empty list slice! */
 			{ $$ = newSLICEOP(0, $4, (OP*)NULL);
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
@@ -1145,7 +1156,7 @@ term	:	termbinop
 			{ $$ = $1; }
 	|       subscripted
 			{ $$ = $1; }
-	|	ary '[' expr ']'                     /* array slice */
+	|	ary ASLICE expr ']' ']'                     /* array slice */
 			{ $$ = prepend_elem(OP_ASLICE,
 				newOP(OP_PUSHMARK, 0),
 				    newLISTOP(OP_ASLICE, 0,
@@ -1153,17 +1164,6 @@ term	:	termbinop
 					ref($1, OP_ASLICE)));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
-			}
-	|	ary '{' expr ';' '}'                 /* @hash{@keys} */
-			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0),
-				    newLISTOP(OP_HSLICE, 0,
-					list($3),
-					ref(oopsHV($1), OP_HSLICE)));
-			    PL_parser->expect = XOPERATOR;
-			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
-			  TOKEN_GETMAD($5,$$,'}');
 			}
 	|	THING	%prec '('
 			{ $$ = $1; }
