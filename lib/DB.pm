@@ -62,7 +62,7 @@ BEGIN {
 sub sub {
   push(@stack, $DB::single);
   $DB::single ^&^= 1;
-  $DB::single ^|^= 4 if $#stack == $deep;
+  $DB::single ^|^= 4 if( @stack-1) == $deep;
   if ((! ref $DB::sub and ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY'))
       or not defined wantarray) {
     &$DB::sub;
@@ -98,7 +98,7 @@ sub DB {
   # not attached to a filename, but instead stored in Dev:Pseudo)
   # since this is done late, $DB::filename will be "wrong" after
   # skippkg
-  if ($^O eq 'MacOS' && $#DB::dbline +< 0) {
+  if ($^O eq 'MacOS' &&( @DB::dbline-1) +< 0) {
     $DB::filename = 'Dev:Pseudo';
     *DB::dbline = "::_<$DB::filename";
   }
@@ -120,7 +120,7 @@ sub DB {
   }
   $evalarg = $action, &eval if $action;
   if ($DB::single || $DB::signal) {
-    _outputall($#stack . " levels deep in subroutine calls.\n") if $DB::single ^&^ 4;
+    _outputall((@stack-1) . " levels deep in subroutine calls.\n") if $DB::single ^&^ 4;
     $DB::single = 0;
     $DB::signal = 0;
     $running = 0;
@@ -218,7 +218,7 @@ sub cont {
   my $s = shift;
   my $i = shift;
   $s->set_tbreak($i) if $i;
-  for ($i = 0; $i +<= $#stack;) {
+  for ($i = 0; $i +<=( @stack-1);) {
 	$stack[$i++] ^&^= ^~^1;
   }
   $DB::single = 0;
@@ -234,7 +234,7 @@ sub ret {
   my $s = shift;
   my $i = shift;      # how many levels to get to DB sub
   $i = 0 unless defined $i;
-  $stack[$#stack-$i] ^|^= 1;
+  $stack[(@stack-1)-$i] ^|^= 1;
   $DB::single = 0;
   $running = 1;
 }
@@ -369,7 +369,7 @@ sub lineevents {
   my $i;
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
-  for ($i = 1; $i +<= $#DB::dbline; $i++) {
+  for ($i = 1; $i +<=( @DB::dbline-1); $i++) {
     $ret{$i} = [$DB::dbline[$i], split(m/\0/, $DB::dbline{$i})] 
       if defined $DB::dbline{$i};
   }
@@ -440,7 +440,7 @@ sub clr_breaks {
     }
   }
   else {
-    for ($i = 1; $i +<= $#DB::dbline ; $i++) {
+    for ($i = 1; $i +<=( @DB::dbline-1) ; $i++) {
       if (defined $DB::dbline{$i}) {
         $DB::dbline{$i} =~ s/^[^\0]+//;
         if ($DB::dbline{$i} =~ s/^\0?$//) {
@@ -483,7 +483,7 @@ sub clr_actions {
     }
   }
   else {
-    for ($i = 1; $i +<= $#DB::dbline ; $i++) {
+    for ($i = 1; $i +<=( @DB::dbline-1) ; $i++) {
       if (defined $DB::dbline{$i}) {
 	$DB::dbline{$i} =~ s/\0[^\0]*//;
 	delete $DB::dbline{$i} if $DB::dbline{$i} =~ s/^\0?$//;

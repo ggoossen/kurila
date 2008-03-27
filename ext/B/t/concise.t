@@ -272,8 +272,8 @@ SKIP: {
     }
     # crosscheck that samples are all text-different
     my @list = sort keys %combos;
-    for my $i (0..$#list) {
-	for my $j ($i+1..$#list) {
+    for my $i (0..(@list-1)) {
+	for my $j ($i+1..(@list-1)) {
 	    isnt ($combos{$list[$i]}, $combos{$list[$j]},
 		  "combos for $list[$i] and $list[$j] are different, as expected");
 	}
@@ -314,8 +314,8 @@ SKIP: {
     }
     # crosscheck that samples are all text-different
     my @nm = sort keys %combos;
-    for my $i (0..$#nm) {
-	for my $j ($i+1..$#nm) {
+    for my $i (0..(@nm-1)) {
+	for my $j ($i+1..(@nm-1)) {
 	    isnt ($combos{$nm[$i]}, $combos{$nm[$j]},
 		  "results for $nm[$i] and $nm[$j] are different, as expected");
 	}

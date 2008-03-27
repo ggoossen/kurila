@@ -135,7 +135,7 @@ sub catfile {
 
     # Compatibility with File::Spec <= 3.26:
     #     catfile('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( ($_[0].'\\'), @_[1..$#_] )
+    return _canon_cat( ($_[0].'\\'), @_[1..(@_-1)] )
         if $_[0] =~ m{^$DRIVE_RX\z}o;
 
     return _canon_cat( @_ );
@@ -153,7 +153,7 @@ sub catdir {
 
     # Compatibility with File::Spec <= 3.26:
     #     catdir('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( ($_[0].'\\'), @_[1..$#_] )
+    return _canon_cat( ($_[0].'\\'), @_[1..(@_-1)] )
         if $_[0] =~ m{^$DRIVE_RX\z}o;
 
     return _canon_cat( @_ );
@@ -266,7 +266,7 @@ sub splitdir {
         # then do the split, then replace it with ''.
         #
         my( @directories )= split( m|[\\/]|, "${directories}dummy" ) ;
-        $directories[ $#directories ]= '' ;
+        $directories[( @directories-1) ]= '' ;
         return @directories ;
     }
 }

@@ -13,7 +13,7 @@ print form
 	'Name             Score   Time  | Normalized',   
 	'-------------------------------------------',   
 	'{[[[[[[[[[[[[}   {III}   {II}  |  {]]].[[}',
-	 \@name,          \@score,\@time, [map $score[$_]/$time[$_], 0..$#score];
+	 \@name,          \@score,\@time, [map $score[$_]/$time[$_], 0..(@score-1)];
 
 print "\n"x2;
 

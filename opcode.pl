@@ -31,7 +31,7 @@ while ( ~< *DATA) {
     $seen{$key} = qq[opcode "$key"];
 
     push(@ops, $key);
-    $opnum{$key} = $#ops;
+    $opnum{$key} =( @ops-1);
     $desc{$key} = $desc;
     $check{$key} = $check;
     $ckname{$check}++;

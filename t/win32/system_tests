@@ -92,7 +92,7 @@ for my $cmds (@commands) {
 	my @args = defined($args) ? (ref($args) ? @$args : $args) : ();
 	print "######## [@cmds]\n";
 	print "<", join('><',
-			$cmds[$#cmds],
+			$cmds[(@cmds-1)],
 			map { my $x = $_; $x =~ s/"//g; $x } @args),
 	      ">\n";
 	if (system(@cmds,@args) != 0) {

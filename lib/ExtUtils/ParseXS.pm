@@ -653,10 +653,10 @@ sub process_para {
       unshift(@args, $arg0);
       ($report_args = "$arg0, $report_args") =~ s/^\w+, $/$arg0/;
     }
-    foreach my $i (0 .. $#args) {
+    foreach my $i (0 ..( @args-1)) {
       if ($args[$i] =~ s/\.\.\.//) {
 	$ellipsis = 1;
-	if ($args[$i] eq '' && $i == $#args) {
+	if ($args[$i] eq '' && $i ==( @args-1)) {
 	  $report_args .= ", ...";
 	  pop(@args);
 	  last;

@@ -350,7 +350,7 @@ sub glob {
 		#FIXME: There should be checking for this.
 		#  How or what should be done about failure is beond me.
 	}
-	if ( $#appendpat != -1
+	if (( @appendpat-1) != -1
 		) {
 	    #print "LOOP\n";
 	    #FIXME: Max loop, no way! :")

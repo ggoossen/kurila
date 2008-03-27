@@ -95,7 +95,7 @@ if ($^O eq 'VMS') {
     push(@cmd,ldopts());
    }
    if ($borl) {
-     @cmd = ($cmd[0],(grep{m/^-[LI]/}@cmd[1..$#cmd]),(grep{!m/^-[LI]/}@cmd[1..$#cmd]));
+     @cmd = ($cmd[0],(grep{m/^-[LI]/}@cmd[1..(@cmd-1)]),(grep{!m/^-[LI]/}@cmd[1..(@cmd-1)]));
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
