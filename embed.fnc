@@ -123,7 +123,6 @@ Apd	|SV**	|av_store	|NN AV *av|I32 key|NULLOK SV *val
 Apd	|void	|av_undef	|NN AV *av
 ApdoxM	|SV**	|av_create_and_unshift_one|NN AV **const avp|NN SV *const val
 Apd	|void	|av_unshift	|NN AV *av|I32 num
-Apo	|SV**	|av_arylen_p	|NN AV *av
 pR	|OP*	|bind_match	|I32 type|NN OP *left|NN OP *right
 pR	|OP*	|block_end	|I32 floor|NULLOK OP* seq
 ApR	|I32	|block_gimme
@@ -433,7 +432,6 @@ p	|int	|magic_clearsig	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_existspack|NN SV* sv|NN const MAGIC* mg
 p	|int	|magic_freeovrld|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_get	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_getarylen|NN SV* sv|NN const MAGIC* mg
 p	|int	|magic_getdefelem|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getnkeys	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getpack	|NN SV* sv|NN MAGIC* mg
@@ -449,8 +447,6 @@ p	|int	|magic_regdatum_get|NN SV* sv|NN MAGIC* mg
 pr	|int	|magic_regdatum_set|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_set	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setamagic|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_setarylen|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_freearylen_p|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdbline|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdefelem|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setenv	|NN SV* sv|NN MAGIC* mg

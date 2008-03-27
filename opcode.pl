@@ -627,7 +627,6 @@ pushre		push regexp		ck_null		d/
 
 rv2gv		ref-to-glob cast	ck_rvconst	ds1	
 rv2sv		scalar dereference	ck_rvconst	ds1	
-av2arylen	array length		ck_null		is1	
 rv2cv		subroutine dereference	ck_rvconst	d1
 anoncode	anonymous subroutine	ck_anoncode	$	
 prototype	subroutine prototype	ck_null		s%	S

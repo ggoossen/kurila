@@ -192,7 +192,7 @@ static const char* const lex_state_names[] = {
  * Convenience functions to return different tokens and prime the
  * lexer for the next token.  They all take an argument.
  *
- * TOKEN        : generic token (used for '(', DOLSHARP, etc)
+ * TOKEN        : generic token (used for '(', etc)
  * OPERATOR     : generic operator
  * AOPERATOR    : assignment operator
  * PREBLOCK     : beginning the block after an if, while, foreach, ...
@@ -305,7 +305,6 @@ static struct debug_tokens {
     { CONTINUE,		TOKENTYPE_NONE,		"CONTINUE" },
     { DEFAULT,		TOKENTYPE_NONE,		"DEFAULT" },
     { DO,		TOKENTYPE_NONE,		"DO" },
-    { DOLSHARP,		TOKENTYPE_NONE,		"DOLSHARP" },
     { DORDOR,		TOKENTYPE_NONE,		"DORDOR" },
     { DOROP,		TOKENTYPE_OPNUM,	"DOROP" },
     { DOTDOT,		TOKENTYPE_IVAL,		"DOTDOT" },

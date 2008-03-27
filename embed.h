@@ -405,7 +405,6 @@
 #define magic_existspack	Perl_magic_existspack
 #define magic_freeovrld		Perl_magic_freeovrld
 #define magic_get		Perl_magic_get
-#define magic_getarylen		Perl_magic_getarylen
 #define magic_getdefelem	Perl_magic_getdefelem
 #define magic_getnkeys		Perl_magic_getnkeys
 #define magic_getpack		Perl_magic_getpack
@@ -421,8 +420,6 @@
 #define magic_regdatum_set	Perl_magic_regdatum_set
 #define magic_set		Perl_magic_set
 #define magic_setamagic		Perl_magic_setamagic
-#define magic_setarylen		Perl_magic_setarylen
-#define magic_freearylen_p	Perl_magic_freearylen_p
 #define magic_setdbline		Perl_magic_setdbline
 #define magic_setdefelem	Perl_magic_setdefelem
 #define magic_setenv		Perl_magic_setenv
@@ -1969,7 +1966,6 @@
 #define pp_anonlist		Perl_pp_anonlist
 #define pp_aslice		Perl_pp_aslice
 #define pp_atan2		Perl_pp_atan2
-#define pp_av2arylen		Perl_pp_av2arylen
 #define pp_backtick		Perl_pp_backtick
 #define pp_bind			Perl_pp_bind
 #define pp_binmode		Perl_pp_binmode
@@ -2671,7 +2667,6 @@
 #define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
 #define magic_freeovrld(a,b)	Perl_magic_freeovrld(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
-#define magic_getarylen(a,b)	Perl_magic_getarylen(aTHX_ a,b)
 #define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
 #define magic_getnkeys(a,b)	Perl_magic_getnkeys(aTHX_ a,b)
 #define magic_getpack(a,b)	Perl_magic_getpack(aTHX_ a,b)
@@ -2687,8 +2682,6 @@
 #define magic_regdatum_set(a,b)	Perl_magic_regdatum_set(aTHX_ a,b)
 #define magic_set(a,b)		Perl_magic_set(aTHX_ a,b)
 #define magic_setamagic(a,b)	Perl_magic_setamagic(aTHX_ a,b)
-#define magic_setarylen(a,b)	Perl_magic_setarylen(aTHX_ a,b)
-#define magic_freearylen_p(a,b)	Perl_magic_freearylen_p(aTHX_ a,b)
 #define magic_setdbline(a,b)	Perl_magic_setdbline(aTHX_ a,b)
 #define magic_setdefelem(a,b)	Perl_magic_setdefelem(aTHX_ a,b)
 #define magic_setenv(a,b)	Perl_magic_setenv(aTHX_ a,b)
@@ -4244,7 +4237,6 @@
 #define pp_anonlist()		Perl_pp_anonlist(aTHX)
 #define pp_aslice()		Perl_pp_aslice(aTHX)
 #define pp_atan2()		Perl_pp_atan2(aTHX)
-#define pp_av2arylen()		Perl_pp_av2arylen(aTHX)
 #define pp_backtick()		Perl_pp_backtick(aTHX)
 #define pp_bind()		Perl_pp_bind(aTHX)
 #define pp_binmode()		Perl_pp_binmode(aTHX)

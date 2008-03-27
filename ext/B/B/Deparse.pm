@@ -2833,18 +2833,6 @@ sub pp_rv2sv { maybe_local(@_, rv2x(@_, "\$")) }
 sub pp_rv2hv { maybe_local(@_, rv2x(@_, "%")) }
 sub pp_rv2gv { maybe_local(@_, rv2x(@_, "*")) }
 
-# skip rv2av
-sub pp_av2arylen {
-    my $self = shift;
-    my($op, $cx) = @_;
-    if ($op->first->name eq "padav") {
-	return $self->maybe_local($op, $cx, '$#' . $self->padany($op->first));
-    } else {
-	return $self->maybe_local($op, $cx,
-				  $self->rv2x($op->first, $cx, '$#'));
-    }
-}
-
 # skip down to the old, ex-rv2cv
 sub pp_rv2cv {
     my ($self, $op, $cx) = @_;
