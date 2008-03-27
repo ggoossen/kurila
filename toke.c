@@ -2130,6 +2130,12 @@ S_scan_const(pTHX_ char *start)
 	    if (!in_pat && (s[1] == '+' || s[1] == '-'))
 		break; /* in regexp, neither @+ nor @- are interpolated */
 	}
+	else if (*s == '%' && s[1]) {
+	    if (isALNUM_lazy_if(s+1,UTF))
+		break;
+	    if (strchr(":'{$", s[1]))
+		break;
+	}
 
 	/* check for embedded scalars.  only stop if we're sure it's a
 	   variable.
@@ -3736,13 +3742,20 @@ Perl_yylex(pTHX)
 	}
 	Perl_croak(aTHX_ "Unknown operator '~' found");
     case '[':
-	PL_lex_brackets++;
-	/* FALL THROUGH */
-    case ',':
-	{
-	    const char tmp = *s++;
-	    OPERATOR(tmp);
+	s++;
+	if (PL_expect == XOPERATOR && *s == '[') {
+	    s++;
+	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_expect = XSTATE;
+	    TOKEN(ASLICE);
+	    /* NOT REACHED */
 	}
+	PL_lex_brackets++;
+	OPERATOR('[');
+    case ',':
+	s++;
+	OPERATOR(',');
     case ':':
 	if (s[1] == ':') {
 	    len = 0;
@@ -3947,6 +3960,14 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
 	    OPERATOR(HASHBRACK);
 	case XOPERATOR:
+	    if (*s == '[') {
+		s++;
+		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+		PL_expect = XSTATE;
+		TOKEN(HSLICE);
+		/* NOT REACHED */
+	    }
 	    while (s < PL_bufend && SPACE_OR_TAB(*s))
 		s++;
 	    d = s;
@@ -4306,6 +4327,7 @@ Perl_yylex(pTHX)
 	    if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
 		&& intuit_more(s)) {
 		if (*s == '[') {
+		    Perl_croak(aTHX_ "array element should be @name[$name] instead of $name[$index]");
 		    PL_tokenbuf[0] = '@';
 		    if (ckWARN(WARN_SYNTAX)) {
 			char *t = s+1;
@@ -4324,6 +4346,7 @@ Perl_yylex(pTHX)
 		}
 		else if (*s == '{') {
 		    char *t;
+		    Perl_croak(aTHX_ "array element should be @name[$name] instead of $name[$index]");
 		    PL_tokenbuf[0] = '%';
 		    if (strEQ(PL_tokenbuf+1, "SIG")  && ckWARN(WARN_SYNTAX)
 			&& (t = strchr(s, '}')) && (t = strchr(t, '=')))
@@ -4403,25 +4426,27 @@ Perl_yylex(pTHX)
 	if (PL_lex_state == LEX_NORMAL)
 	    s = SKIPSPACE1(s);
 	if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop) && intuit_more(s)) {
-	    if (*s == '{')
+	    if (*s == '{') {
+		Perl_croak(aTHX_ "hash slice should be %%name{[@keys]} instead of @name{@keys}");
 		PL_tokenbuf[0] = '%';
+	    }
 
 	    /* Warn about @ where they meant $. */
-	    if (*s == '[' || *s == '{') {
-		if (ckWARN(WARN_SYNTAX)) {
-		    const char *t = s + 1;
-		    while (*t && (isALNUM_lazy_if(t,UTF) || strchr(" \t$#+-'\"", *t)))
-			t++;
-		    if (*t == '}' || *t == ']') {
-			t++;
-			PL_bufptr = PEEKSPACE(PL_bufptr); /* XXX can realloc */
-			Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-			    "Scalar value %.*s better written as $%.*s",
-			    (int)(t-PL_bufptr), PL_bufptr,
-			    (int)(t-PL_bufptr-1), PL_bufptr+1);
-		    }
-		}
-	    }
+/* 	    if (*s == '[' || *s == '{') { */
+/* 		if (ckWARN(WARN_SYNTAX)) { */
+/* 		    const char *t = s + 1; */
+/* 		    while (*t && (isALNUM_lazy_if(t,UTF) || strchr(" \t$#+-'\"", *t))) */
+/* 			t++; */
+/* 		    if (*t == '}' || *t == ']') { */
+/* 			t++; */
+/* 			PL_bufptr = PEEKSPACE(PL_bufptr); /\* XXX can realloc *\/ */
+/* 			Perl_warner(aTHX_ packWARN(WARN_SYNTAX), */
+/* 			    "Scalar value %.*s better written as $%.*s", */
+/* 			    (int)(t-PL_bufptr), PL_bufptr, */
+/* 			    (int)(t-PL_bufptr-1), PL_bufptr+1); */
+/* 		    } */
+/* 		} */
+/* 	    } */
 	}
 	PL_pending_ident = '@';
 	TERM('@');
@@ -4499,7 +4524,7 @@ Perl_yylex(pTHX)
 	/* FIXME. I think that this can be const if char *d is replaced by
 	   more localised variables.  */
 	for (d = SvPV(PL_lex_stuff.str_sv, len); len; len--, d++) {
-	    if (*d == '{' || *d == '$' || *d == '@' || *d == '\\' || !UTF8_IS_INVARIANT(*d)) {
+	    if (*d == '{' || *d == '$' || *d == '@' || *d == '%' || *d == '\\' || !UTF8_IS_INVARIANT(*d)) {
 		pl_yylval.ival = OP_STRINGIFY;
 		break;
 	    }
