@@ -31,7 +31,8 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_carp();
+t_no_sigil_change();
+#t_carp();
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
@@ -865,6 +866,40 @@ confess "foo";
 ----
 use Carp;
 die "foo";
+====
+END
+}
+
+sub t_no_sigil_change {
+    my $x = "abc";
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my @foo;
+$#foo;
+----
+my @foo;
+(@foo-1);
+====
+$#$foo
+----
+(@$foo-1)
+====
+my @foo;
+$foo[1];
+$foo[$a];
+----
+my @foo;
+@foo[1];
+@foo[$a];
+====
+my %foo;
+$foo{1};
+$foo{$a};
+exists $foo{$a};
+----
+my %foo;
+%foo{1};
+%foo{$a};
+exists %foo{$a};
 ====
 END
 }
