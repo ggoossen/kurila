@@ -146,7 +146,7 @@ $as_ary{0}="a0";
 sub NewShell
 {
   local($Host) = @_;
-  my($m2) = $#Shells++;
+  my($m2) = 0+@Shells;
   $Shells[$m2]{HOST} = $Host;
   return $m2;
 }

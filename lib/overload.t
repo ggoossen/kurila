@@ -429,7 +429,7 @@ is($b, "_<oups1
   sub vars { my $p = shift; tie($_, $p), $_->nop foreach @_; }
   sub STORE { 
     my $obj = shift; 
-    $#$obj = 1; 
+    #@$obj = 2; 
     $obj->[1] = shift;
   }
 }
@@ -550,7 +550,7 @@ is($b, "_<oups1
   sub vars { my $p = shift; tie($_, $p), $_->nop foreach @_; }
   sub STORE { 
     my $obj = shift; 
-    $#$obj = 1; 
+    #@$obj = 2; 
     $obj->[1] = shift;
   }
 }
@@ -732,7 +732,7 @@ else {
   is("@sorted", '22 11 5 2 1');
   # Array
   is("@$deref", '11 12 13');
-  is($#$deref, '2');
+  is((scalar @$deref), '3');
   my $l = @$deref;
   is($l, 3);
   is($deref->[2], '13');

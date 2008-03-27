@@ -70,7 +70,7 @@ sub encode_list {
 sub list_eq ($$) {
   my ($l, $r) = @_;
   return 0 unless @$l == @$r;
-  for my $i (0..$#$l) {
+  for my $i (0..@$l -1) {
     if (defined $l->[$i]) {
       return 0 unless defined ($r->[$i]) && $l->[$i] eq $r->[$i];
     } else {
@@ -94,7 +94,7 @@ sub list_eq ($$) {
     my $foo = pack($format,@ary);
     my @ary2 = unpack($format,$foo);
 
-    is($#ary, $#ary2);
+    is((scalar @ary), (scalar @ary2));
 
     my $out1=join(':',@ary);
     my $out2=join(':',@ary2);
@@ -793,7 +793,7 @@ SKIP: {
         }
       }
 
-      for my $i (0 .. $#val) {
+      for my $i (0 .. @val-1) {
         my($nat,$be,$le) = eval { map { pack $format.$_, $val[$i] } '', '>', '<' };
         is($@, '');
 

@@ -417,7 +417,7 @@ sub test {
 		$args = "'$op'";		# Really the value
 		$try = "abs(\$z0 - \$z1) +<= $eps ? \$z1 : \$z0";
 		push @script, "\$res = $try; ";
-		push @script, "check($test, $args[0], \$res, \$z$#args, $args);\n";
+		push @script, "check($test, $args[0], \$res, \$z{@args-1}, $args);\n";
 	} else {
 		my ($try, $args);
 		if (@args == 2) {
@@ -428,7 +428,7 @@ sub test {
 			$args = "'$args[0]', '$args[1]'";
 		}
 		push @script, "\$res = $try; ";
-		push @script, "check($test, '$try', \$res, \$z$#args, $args);\n";
+		push @script, "check($test, '$try', \$res, \$z{@args-1}, $args);\n";
 		if (@args +> 2 and $baop) { # binary assignment ops
 			$test++;
 			# check the op= works
@@ -443,7 +443,7 @@ sub test {
 	\$za $op= \$zb;
 	my (\$zbr, \$zbi) = \@\{\$zb->_cartesian\};
 
-	check($test, '\$z0 $op= \$z1', \$za, \$z$#args, $args);
+	check($test, '\$z0 $op= \$z1', \$za, \$z{@args-1}, $args);
 EOB
 			$test++;
 			# check that the rhs has not changed

@@ -45,7 +45,7 @@ sub genarray {
 
     if    ($size +< 0) { $size = 0; }	# avoid complexity with sqrt
     elsif ($size +> $BigEnough) { $size = $BigEnough; }
-    (@a-1) = $size - 1;			# preallocate array
+    @a = $size;			# preallocate array
     $items = int(sqrt($size));		# number of distinct items
     for ($i = 0; $i +< $size; ++$i) {
 	$a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
@@ -61,7 +61,7 @@ sub checkorder {
     my $status = '';			# so far, so good
     my ($i, $disorder);
 
-    for ($i = 0; $i +< (@-1)$aref; ++$i) {
+    for ($i = 0; $i +< (@$aref-1); ++$i) {
 	# Equality shouldn't happen, but catch it in the contents check
 	next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq

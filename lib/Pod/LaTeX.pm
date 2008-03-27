@@ -569,10 +569,10 @@ sub Head1Level {
    my $self = shift;
    if (@_) {
      my $arg = shift;
-     if ($arg =~ m/^\d$/ && $arg +<= $#LatexSections) {
+     if ($arg =~ m/^\d$/ && $arg +< @LatexSections) {
        $self->{Head1Level} = $arg;
      } else {
-       carp "Head1Level supplied ($arg) must be integer in range 0 to ".$#LatexSections . "- Ignoring\n";
+       carp "Head1Level supplied ($arg) must be integer in range 0 to ".(@LatexSections-1) . "- Ignoring\n";
      }
    }
    return $self->{Head1Level};
@@ -1201,7 +1201,7 @@ sub textblock {
     # as subsections of the main name section unless we are already
     # at maximum [Head1Level() could check this itself - CHECK]
     $self->Head1Level( $self->Head1Level() + 1)
-      unless $self->Head1Level == $#LatexSections;
+      unless $self->Head1Level == @LatexSections-1;
 
     # Now write out the new latex paragraph
     $purpose = ucfirst($purpose);
@@ -1518,11 +1518,11 @@ sub head {
   my $level = $self->Head1Level() - 1 + $num;
 
   # Warn if heading to large
-  if ($num +> $#LatexSections) {
+  if ($num +>= @LatexSections) {
     my $line = $parobj->file_line;
     my $file = $self->input_file;
     warn "Heading level too large ($level) for LaTeX at line $line of file $file\n";
-    $level = $#LatexSections;
+    $level = @LatexSections-1;
   }
 
   # Check to see whether section should be unnumbered

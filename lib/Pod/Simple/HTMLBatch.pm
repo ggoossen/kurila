@@ -439,7 +439,7 @@ sub _contents_filespec {
 sub makepath {
   my($self, $outdir, $namelets) = @_;
   return unless @$namelets +> 1;
-  for my $i (0 .. ($#$namelets - 1)) {
+  for my $i (0 .. (@$namelets - 2)) {
     my $dir = $self->filespecsys->catdir( $outdir, @$namelets[0 .. $i] );
     if(-e $dir) {
       die "$dir exists but not as a directory!?" unless -d $dir;

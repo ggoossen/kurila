@@ -275,7 +275,7 @@ sub charinrange {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
 	unless defined $code;
-    _search($range, 0, (@-1)$range, $code);
+    _search($range, 0, (@$range-1), $code);
 }
 
 =head2 charblock

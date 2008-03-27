@@ -77,7 +77,7 @@ sub _compile {
               push @code, q{ '} . $c[-1] . "',\n";
               $c[-1] = ''; # reuse this slot
             } else {
-              push @code, ' $c[' . $#c . "],\n";
+              push @code, ' $c[' . (@c-1) . "],\n";
               push @c, ''; # new chunk
             }
           }
@@ -176,7 +176,7 @@ sub _compile {
             } else {
               # Stow it on the chunk-stack, and just refer to that.
               push @c, $p;
-              push @code, ' $c[' . $#c . "], ";
+              push @code, ' $c[' . (@c-1) . "], ";
             }
           }
           $code[-1] .= "),\n";

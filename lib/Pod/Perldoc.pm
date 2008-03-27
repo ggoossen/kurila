@@ -969,7 +969,7 @@ sub render_findings {
     warn 
      "Perldoc is only really meant for reading one document at a time.\n",
      "So these parameters are being ignored: ",
-     join(' ', @$found_things[1 .. $#$found_things] ),
+     join(' ', @$found_things[1 .. @$found_things-1] ),
      "\n"
   }
 

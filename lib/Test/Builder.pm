@@ -1509,7 +1509,7 @@ sub current_test {
         }
         # If backward, wipe history.  Its their funeral.
         elsif( $num +< @$test_results ) {
-            $#{$test_results} = $num - 1;
+            splice @{$test_results}, $num;
         }
     }
     return $self->{Curr_Test};

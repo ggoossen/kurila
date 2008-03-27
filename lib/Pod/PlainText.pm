@@ -204,8 +204,8 @@ sub textblock {
         my $i;
         for ($i = 0; $i +< @items; $i++) {
             $string .= $items[$i];
-            $string .= ", " if @items +> 2 && $i != $#items;
-            $string .= " and " if ($i == $#items - 1);
+            $string .= ", " if @items +> 2 && $i != @items-1;
+            $string .= " and " if ($i == @items - 2);
         }
         $string .= " entries elsewhere in this document";
         $string;

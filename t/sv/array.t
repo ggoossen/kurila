@@ -2,7 +2,7 @@
 
 require './test.pl';
 
-plan (117);
+plan (87);
 
 my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 #
@@ -12,7 +12,7 @@ my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 @ary = (1,2,3,4,5);
 is(join('',@ary), '12345');
 
-$tmp = $ary[(@ary-1)]; --(@ary-1);
+$tmp = $ary[(@ary-1)]; pop @ary;
 is($tmp, 5);
 is((@ary-1), 3);
 is(join('',@ary), '1234');
@@ -236,7 +236,7 @@ my $got = runperl (
 	prog => q{
                     our @a;
 		    sub X::DESTROY { @a = () }
-		    @a = (bless {}, \'X\');
+		    @a = (bless {}, "X");
 		    @a = ();
 		},
 	stderr => 1
@@ -268,73 +268,6 @@ is ($got, '');
                     qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0");
 }
 
-sub test_arylen {
-    my $ref = shift;
-    local $^W = 1;
-    is ($$ref, undef, "\$# on freed array is undef");
-    my @warn;
-    local ${^WARN_HOOK} = sub {push @warn, $_[0]->message};
-    $$ref = 1000;
-    is (scalar @warn, 1);
-    like ($warn[0], qr/^Attempt to set length of freed array/);
-}
-
-{
-    my $a = \(@-1){[]};
-    # Need a new statement to make it go out of scope
-    test_arylen ($a);
-    test_arylen (do {my @a; \(@a-1)});
-}
-
-{
-    use vars '@array';
-
-    my $outer = \(@array-1);
-    is ($$outer, -1);
-    is (scalar @array, 0);
-
-    $$outer = 3;
-    is ($$outer, 3);
-    is (scalar @array, 4);
-
-    my $ref = \@array;
-
-    my $inner;
-    {
-	local @array;
-	$inner = \(@array-1);
-
-	is ($$inner, -1);
-	is (scalar @array, 0);
-	$$outer = 6;
-
-	is (scalar @$ref, 7);
-
-	is ($$inner, -1);
-	is (scalar @array, 0);
-
-	$$inner = 42;
-    }
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
-
-    is ($$inner, undef, "orphaned (@foo-1) is always undef");
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
-
-    $$inner = 1;
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
-
-    $$inner = 503; # Bang!
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
-}
-
 {
     # Bug #36211
     no strict 'vars';
@@ -346,36 +279,6 @@ sub test_arylen {
 	    @a=(1..4)
 	}
     }
-}
-
-{
-    # Bug #37350
-    no strict 'refs';
-    my @array = (1..4);
-    (@-1){*{Symbol::fetch_glob(scalar @array)}} = 7;
-    is ((@{4}-1), 7);
-
-    my $x;
-    (@-1){$x} = 3;
-    is(scalar @$x, 4);
-
-    push @{*{Symbol::fetch_glob(scalar @array)}}, 23;
-    is ($4[8], 23);
-}
-{
-    # Bug #37350 -- once more with a global
-    no strict 'refs';
-    use vars '@array';
-    @array = (1..4);
-    (@-1){*{Symbol::fetch_glob(scalar @array)}} = 7;
-    is ((@{4}-1), 7);
-
-    my $x;
-    (@-1){$x} = 3;
-    is(scalar @$x, 4);
-
-    push @{*{Symbol::fetch_glob(scalar @array)}}, 23;
-    is ($4[8], 23);
 }
 
 # more tests for AASSIGN_COMMON

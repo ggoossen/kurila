@@ -328,7 +328,7 @@ sub init_globals {
 #
 sub clean_data($){
     my( $dataref ) = @_;
-    for my $i ( 0..$#{$dataref} ) {
+    for my $i ( 0..@{$dataref}-1 ) {
 	${$dataref}[$i] =~ s/\s+\Z//;
 
         # have a look for all-space lines
@@ -521,7 +521,7 @@ END_OF_INDEX
     # now convert this file
     my $after_item;             # set to true after an =item
     warn "Converting input file $Podfile\n" if $Verbose;
-    foreach my $i (0..$#poddata){
+    foreach my $i (0..@poddata-1){
 	$_ = $poddata[$i];
 	$Paragraph = $i+1;
 	if (m/^(=.*)/s) {	# is it a pod directive?
@@ -1070,7 +1070,7 @@ sub scan_items {
     $pod =~ s/\.pod\z//;
     $pod .= ".html" if $pod;
 
-    foreach $i (0..$#poddata) {
+    foreach $i (0..@poddata-1) {
 	my $txt = depod( $poddata[$i] );
 
 	# figure out what kind of item it is.

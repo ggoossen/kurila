@@ -11,7 +11,7 @@ sub compare {
     return unless @expect;
     return ::fail() unless(@_ == @expect);
 
-    for my $i (0..$#_) {
+    for my $i (0..@_-1) {
         next if ref $_[$i] and $_[$i] \== $expect[$i];
 	next if $_[$i] eq $expect[$i];
 	return ::fail( " '$_[$i]' eq '$expect[$i]' " );

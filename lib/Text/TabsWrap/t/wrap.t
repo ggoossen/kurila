@@ -169,7 +169,7 @@ while(@st) {
 	$in =~ s/^TEST(\d+)?\n//;
 
 	my @in = split("\n", $in, -1);
-	@in = ((map { "$_\n" } @in[0..$#in-1]), $in[-1]);
+	@in = ((map { "$_\n" } @in[0..@in-2]), $in[-1]);
 	
 	my $back = wrap('   ', ' ', @in);
 

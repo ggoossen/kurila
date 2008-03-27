@@ -1,7 +1,6 @@
 package Time::Local;
 
 require Exporter;
-use Carp;
 use Config;
 use strict;
 use integer;
@@ -98,11 +97,11 @@ sub timegm {
     unless ( $Options{no_range_check} ) {
         if ( abs($year) +>= 0x7fff ) {
             $year += 1900;
-            croak
+            die
                 "Cannot handle date ($sec, $min, $hour, $mday, $month, *$year*)";
         }
 
-        croak "Month '$month' out of range 0..11"
+        die "Month '$month' out of range 0..11"
             if $month +> 11
             or $month +< 0;
 
@@ -110,10 +109,10 @@ sub timegm {
         ++$md
             if $month == 1 && _is_leap_year( $year + 1900 );
 
-        croak "Day '$mday' out of range 1..$md"  if $mday +> $md or $mday +< 1;
-        croak "Hour '$hour' out of range 0..23"  if $hour +> 23  or $hour +< 0;
-        croak "Minute '$min' out of range 0..59" if $min +> 59   or $min +< 0;
-        croak "Second '$sec' out of range 0..59" if $sec +> 59   or $sec +< 0;
+        die "Day '$mday' out of range 1..$md"  if $mday +> $md or $mday +< 1;
+        die "Hour '$hour' out of range 0..23"  if $hour +> 23  or $hour +< 0;
+        die "Minute '$min' out of range 0..59" if $min +> 59   or $min +< 0;
+        die "Second '$sec' out of range 0..59" if $sec +> 59   or $sec +< 0;
     }
 
     my $days = _daygm( undef, undef, undef, $mday, $month, $year );
@@ -125,7 +124,7 @@ sub timegm {
 	$year += 1900;
         $msg .=  "Cannot handle date ($sec, $min, $hour, $mday, $month, $year)";
 
-	croak $msg;
+	die $msg;
     }
 
     return $sec
@@ -281,7 +280,7 @@ of C<time_t> (usually a signed integer) on the given
 platform. Currently, this is 32 bits for most systems, yielding an
 approximate range from Dec 1901 to Jan 2038.
 
-Both C<timelocal()> and C<timegm()> croak if given dates outside the
+Both C<timelocal()> and C<timegm()> die if given dates outside the
 supported range.
 
 =head2 Ambiguous Local Times (DST)

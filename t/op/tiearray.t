@@ -16,7 +16,7 @@ sub STORESIZE
 {        
  $seen{'STORESIZE'}++;
  my ($ob,$sz) = @_; 
- return (@-1){$ob} = $sz-1;
+ return (@$ob = $sz)-1;
 }
 
 sub EXTEND

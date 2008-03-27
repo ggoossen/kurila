@@ -44,8 +44,6 @@ The hash does not support exists().
 our ($self, $key, $klen, $vlen, $tsize, $rlen, $offset, $hash,
      $record, $val, $entries, $iterix, $hashbase);
 
-use Carp;
-
 sub TIEHASH {
     my $pack = shift;
     my ($klen, $vlen, $tsize) = @_;
@@ -86,8 +84,8 @@ sub FETCH {
 sub STORE {
     local($self,$key,$val) = @_;
     local($klen, $vlen, $tsize, $rlen) = @$self[1..4];
-    croak("Table is full ($tsize->[0] elements)") if $$self[5] +> $tsize->[0];
-    croak(qq/Value "$val" is not $vlen characters long/)
+    die("Table is full ($tsize->[0] elements)") if $$self[5] +> $tsize->[0];
+    die(qq/Value "$val" is not $vlen characters long/)
 	if length($val) != $vlen;
     my $writeoffset;
 
@@ -156,11 +154,11 @@ sub NEXTKEY {
 }
 
 sub EXISTS {
-    croak "Tie::SubstrHash does not support exists()";
+    die "Tie::SubstrHash does not support exists()";
 }
 
 sub hashkey {
-    croak(qq/Key "$key" is not $klen characters long/)
+    die(qq/Key "$key" is not $klen characters long/)
 	if length($key) != $klen;
     $hash = 2;
     for (unpack('C*', $key)) {

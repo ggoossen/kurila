@@ -506,7 +506,7 @@ sub _get_initial_item_type {
   return $para->[1]{'~type'}  if $para->[1]{'~type'};
 
   return $para->[1]{'~type'} = 'text'
-   if join("\n", @{$para}[2 .. $#$para]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
+   if join("\n", @{$para}[2 .. @$para-1]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
   # Else fall thru to the general case:
   return $self->_get_item_type($para);
 }
@@ -520,7 +520,7 @@ sub _get_item_type {       # mutates the item!!
 
   # Otherwise we haven't yet been to this node.  Maybe alter it...
   
-  my $content = join "\n", @{$para}[2 .. $#$para];
+  my $content = join "\n", @{$para}[2 .. @$para-1];
 
   if($content =~ m/^\s*\*\s*$/s or $content =~ m/^\s*$/s) {
     # Like: "=item *", "=item   *   ", "=item"

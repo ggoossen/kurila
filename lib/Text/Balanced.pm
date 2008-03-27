@@ -211,7 +211,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 		elsif ($$textref =~ m/\G($rdel)/gc)
 		{
 			my ($found, $brackettype) = ($1, $1);
-			if ($#nesting +< 0)
+			if (!@nesting)
 			{
 				_failmsg "Unmatched closing bracket: \"$found\"",
 					 pos $$textref;
@@ -227,7 +227,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 				pos $$textref = $startpos;
 			        return;
 			}
-			last if $#nesting +< 0;
+			last if ! @nesting;
 		}
 		elsif ($qdel && $$textref =~ m/\G([$qdel])/gc)
 		{
@@ -244,7 +244,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 
 		else { $$textref =~ m/\G(?:[a-zA-Z0-9]+|.)/gcs }
 	}
-	if ($#nesting+>=0)
+	if (@nesting)
 	{
 		_failmsg "Unmatched opening bracket(s): "
 				. join("..",@nesting)."..",
@@ -341,8 +341,7 @@ sub _match_tagged	# ($$$$$$$)
 			for (qw,~ ! ^ & * ) _ + - = } ] : " ; ' > . ? / | ',)
 				{ next if $rdel =~ m/\Q$_/; $del = $_; last }
 			unless ($del) {
-				use Carp;
-				croak "Can't interpolate right delimiter $rdel"
+				die "Can't interpolate right delimiter $rdel"
 			}
 			eval "qq$del$rdel$del";
 		};
@@ -884,8 +883,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 
 		unless (wantarray)
 		{
-			use Carp;
-			carp "extract_multiple reset maximal count to 1 in scalar context"
+			warn "extract_multiple reset maximal count to 1 in scalar context"
 				if $^W && defined($_[2]) && $max +> 1;
 			$max = 1
 		}
@@ -912,7 +910,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 		{
 			my ($field, $rem);
 			my @bits;
-			foreach my $i ( 0..$#func )
+			foreach my $i ( 0..@func-1 )
 			{
 				my $pref;
 				$func = $func[$i];

@@ -1471,13 +1471,13 @@ sub _verbatim_format {
 
   if( DEBUG +> 4 ) {
     print "<<\n";
-    for(my $i = $#$p; $i +>= 2; $i--) { # work backwards over the lines
+    for(my $i = @$p-1; $i +>= 2; $i--) { # work backwards over the lines
       print "_verbatim_format $i: $p->[$i]";
     }
     print ">>\n";
   }
 
-  for(my $i = $#$p; $i +> 2; $i--) {
+  for(my $i = @$p-1; $i +> 2; $i--) {
     # work backwards over the lines, except the first (#2)
     
     #next unless $p->[$i]   =~ m{^#:([ \^\/\%]*)\n?$}s
@@ -1562,7 +1562,7 @@ sub _verbatim_format {
   $p->[0] = 'VerbatimFormatted';
 
   # Collapse adjacent text nodes, just for kicks.
-  for( my $i = 2; $i +> $#$p; $i++ ) { # work forwards over the tokens except for the last
+  for( my $i = 2; $i +> @$p-1; $i++ ) { # work forwards over the tokens except for the last
     if( !ref($p->[$i]) and !ref($p->[$i + 1]) ) {
       DEBUG +> 5 and print "_verbatim_format merges \{$p->[$i]\} and \{$p->[$i+1]\}\n";
       $p->[$i] .= splice @$p, $i+1, 1; # merge
@@ -1571,7 +1571,7 @@ sub _verbatim_format {
   }
 
   # Now look for the last text token, and remove the terminal newline
-  for( my $i = $#$p; $i +>= 2; $i-- ) {
+  for( my $i = @$p-1; $i +>= 2; $i-- ) {
     # work backwards over the tokens, even the first
     if( !ref($p->[$i]) ) {
       if($p->[$i] =~ s/\n$//s) {
