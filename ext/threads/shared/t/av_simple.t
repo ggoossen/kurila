@@ -52,7 +52,7 @@ $foo[2] = "test";
 ok(6, $foo[2] eq "test", "Check extending the array works");
 ok(7, !defined $foo[1], "Check undef value again");
 ok(8, scalar(@foo) == 3, "Check the length of the array");
-ok(9,$#foo == 2, "Check last element of array");
+ok(9,@foo == 3, "Check last element of array");
 threads->create(sub { $foo[0] = "thread1" })->join;
 ok(10, $foo[0] eq "thread1", "Check that a value can be changed in another thread");
 push(@foo, "another value");
@@ -106,7 +106,6 @@ ok(33, exists($foo[0]) == 0, "Check that zero index doesn't index");
 @foo = ("sky");
 ok(34, exists($foo[0]) == 1, "Check that zero index exists now");
 ok(35, $foo[0] eq "sky", "And check that it also contains the right value");
-$#foo = 20;
 $foo[20] = "sky";
 ok(36, delete($foo[20]) eq "sky", "Check delete works");
 

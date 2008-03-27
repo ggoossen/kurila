@@ -525,7 +525,7 @@ EOM
     ok(87, $self) 
         or warn "# $DB_File::Error\n";
     if ($FA)
-      { (@h-1) = 3 }
+      { splice @h, 4 }
     else 
       { $self->STORESIZE(4) }
     ok(88, $FA ? (@h-1) == 3 : $self->length() == 4) ;
@@ -537,7 +537,7 @@ EOM
     # $# sets array to bigger
     ok(91, $self = tie @h, 'DB_File', $Dfile, O_RDWR, 0640, $DB_RECNO ) ;
     if ($FA)
-      { (@h-1) = 6 }
+      { $h[6] = $h[6] }
     else 
       { $self->STORESIZE(7) }
     ok(92, $FA ? (@h-1) == 6 : $self->length() == 7) ;
@@ -549,10 +549,10 @@ EOM
     # $# sets array smaller
     ok(95, $self = tie @h, 'DB_File', $Dfile, O_RDWR, 0640, $DB_RECNO ) ;
     if ($FA)
-      { (@h-1) = 2 }
+      { splice @h, 3 }
     else 
       { $self->STORESIZE(3) }
-    ok(96, $FA ? (@h-1) == 2 : $self->length() == 3) ;
+    ok(96, $FA ? @h == 3 : $self->length() == 3) ;
     undef $self ;
     ok(97, safeUntie \@h);
     $x = docat($Dfile) ;

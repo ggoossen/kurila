@@ -81,7 +81,6 @@ padany		SKIP (not implemented)
 pushre		SKIP split m/foo/
 rv2gv		*x
 rv2sv		$x
-av2arylen	$#x
 rv2cv		f()
 anoncode	sub { }
 prototype	prototype 'foo'

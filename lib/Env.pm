@@ -140,9 +140,9 @@ sub STORESIZE {
     my ($self, $size) = @_;
     my @temp = split($sep, $ENV{$$self});
     if (@temp +> $size) {
-        splice(@temp, $size);
+        splice @temp, $size;
     } else {
-        $temp[$size-1] = undef;
+        $temp[$size-1] = $tem[$size-1];
     }
     $ENV{$$self} = join($sep, @temp);
 }
@@ -199,15 +199,17 @@ sub SHIFT {
 
 sub SPLICE {
     my $self = shift;
-    my $offset = shift;
-    my $length = shift;
     my @temp = split($sep, $ENV{$$self});
     if (wantarray) {
-	my @result = splice @temp, $self, $offset, $length, @_;
+	my @result = @_ +>= 2 ? splice @temp, shift, shift, @_
+          : @_ +>= 1 ?
+            splice @temp, shift : splice @temp;
 	$ENV{$$self} = join($sep, @temp);
 	return @result;
     } else {
-	my $result = scalar splice @temp, $offset, $length, @_;
+	my $result = @_ +>= 2 ? splice @temp, shift, shift, @_
+          : @_ +>= 1 ?
+            splice @temp, shift : splice @temp;
 	$ENV{$$self} = join($sep, @temp);
 	return $result;
     }
