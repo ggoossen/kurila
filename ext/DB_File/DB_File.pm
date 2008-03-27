@@ -324,6 +324,7 @@ sub SPLICE
 	$offset = 0;
     }
 
+    my $no_length = ! @_;
     my $length = @_ ? shift : 0;
     # Carping about definedness comes _after_ the OFFSET sanity check.
     # This is so we get the same error messages as Perl's splice().
@@ -357,7 +358,7 @@ sub SPLICE
     }
 
     # 'If LENGTH is omitted, removes everything from OFFSET onward.'
-    if (not defined $length) {
+    if ($no_length) {
 	$length = $size - $offset;
     }
 

@@ -176,7 +176,7 @@ ok 6, length($f) == length($g);
 
 # Ensure the tied items in the retrieved image work
 @old = ($scalar_fetch, $array_fetch, $hash_fetch);
-@tied = ($tscalar, $tarray, $thash) = @{$root->[(@-1){$root}]};
+@tied = ($tscalar, $tarray, $thash) = @{$root->[@$root -1]};
 @type = qw(SCALAR  ARRAY  HASH);
 
 ok 7, tied $$tscalar;

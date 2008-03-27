@@ -217,7 +217,7 @@ $X->DELETE('goner3');
 my @keys = keys(%h);
 my @values = values(%h);
 
-ok(23, $#keys == 29 && $#values == 29) ;
+ok(23, @keys == 30 && @values == 30) ;
 
 $i = 0 ;
 while (($key,$value) = each(%h)) {
@@ -230,7 +230,7 @@ while (($key,$value) = each(%h)) {
 ok(24, $i == 30) ;
 
 @keys = ('blurfl', keys(%h), 'dyick');
-ok(25, $#keys == 31) ;
+ok(25, @keys == 32) ;
 
 $h{'foo'} = '';
 ok(26, $h{'foo'} eq '' );

@@ -16,7 +16,7 @@ BEGIN {
 }
 
 my @vecs = map { eval } ~< *DATA;
-$#vecs -= 2 if $MODULE eq "Digest::SHA::PurePerl";
+splice @vecs, -2 if $MODULE eq "Digest::SHA::PurePerl";
 
 my $numtests = scalar(@vecs) / 2;
 print "1..$numtests\n";

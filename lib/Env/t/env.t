@@ -55,8 +55,8 @@ test "Storing", sub {
 };
 
 test "Truncation", sub {
-    (@FOO-1) = 0;
-    (@BAR-1) = 0;
+    splice @FOO, 1;
+    splice @BAR, 1;
 };
 
 test "Push", sub {
