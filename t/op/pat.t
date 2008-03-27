@@ -655,7 +655,7 @@ print "ok $test\n";
 $test++;
 
 m/a(?=.$)/;
-print "not " if $#+ != 0 or $#- != 0;
+print "not " if @+ != 1 or @- != 1;
 print "ok $test\n";
 $test++;
 
@@ -669,7 +669,7 @@ print "ok $test\n";
 $test++;
 
 m/a(a)(a)/;
-print "not " if $#+ != 2 or $#- != 2;
+print "not " if @+ != 3 or @- != 3;
 print "ok $test\n";
 $test++;
 
@@ -691,7 +691,7 @@ print "ok $test\n";
 $test++;
 
 m/.(a)(b)?(a)/;
-print "not " if $#+ != 3 or $#- != 3;
+print "not " if @+ != 4 or @- != 4;
 print "ok $test\n";
 $test++;
 
@@ -713,7 +713,7 @@ print "ok $test\n";
 $test++;
 
 m/.(a)/;
-print "not " if $#+ != 1 or $#- != 1;
+print "not " if @+ != 2 or @- != 2;
 print "ok $test\n";
 $test++;
 
@@ -752,7 +752,7 @@ eval { @- = qw(foo bar); };
 ok( $@->{description} =~ m/^Modification of a read-only value attempted/ );
 
 m/.(a)(ba*)?/;
-print "#$#-..$#+\nnot " if $#+ != 2 or $#- != 1;
+print "#@-..@+\nnot " if @+ != 3 or @- != 2;
 print "ok $test\n";
 $test++;
 
@@ -1812,7 +1812,7 @@ if (ord("A") == 65) {
     
     my @a = ($a =~ m/./gs);
     
-    print "not " unless $#a == 12;
+    print "not " unless @a == 13;
     print "ok 675\n";
 }
 
@@ -3493,7 +3493,7 @@ sub iseq($$;$) {
     if ('1234'=~m/(?<A>1)(?<B>2)(?<A>3)(?<B>4)/) {
         foreach my $name (sort keys(%-)) {
             my $ary = $-{$name};
-            foreach my $idx (0..$#$ary) {
+            foreach my $idx (0..@$ary-1) {
                 push @res,"$name:$idx:$ary->[$idx]";
             }
         }
@@ -3631,7 +3631,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $count=0;
     my $mval=0;
     my $pval=0;
-    while ($str=~m/b/g) { $mval=$#-; $pval=$#+; $count++ }
+    while ($str=~m/b/g) { $mval=@- -1; $pval=@+ -1; $count++ }
     iseq($mval,0,"\@- should be empty [RT#36046]");
     iseq($pval,0,"\@+ should be empty [RT#36046]");
     iseq($count,1,"should have matched once only [RT#36046]");
@@ -4110,8 +4110,8 @@ sub kt
     my @strs= ('ss','sS','Ss','SS',chr(0xDF));
     my @ss= @strs;
 
-    for my $ssi (0..$#ss) {
-        for my $dfi (0..$#df) {
+    for my $ssi (0..@ss-1) {
+        for my $dfi (0..@df-1) {
             my $pat= $df[$dfi];
             my $str= $ss[$ssi];
             (my $sstr=$str)=~s/\x{DF}/\\x\{DF\}/;

@@ -1215,7 +1215,7 @@ sub DESTROY {
         foreach $file (sort keys %$self) {
             $plural = @{$self->{$file}} +> 1 ? "s" : "";
             print "## Differing version$plural of $file found. You might like to\n";
-            for (0..(@-1){$self->{$file}}) {
+            for (0..@{$self->{$file}}-1) {
                 print "rm ", $self->{$file}[$_], "\n";
                 $i++;
             }

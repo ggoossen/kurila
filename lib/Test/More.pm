@@ -827,9 +827,8 @@ sub _format_stack {
     ($vars[1] = $var) =~ s/\$FOO/\$expected/;
 
     my $out = "Structures begin differing at:\n";
-    foreach my $idx (0..$#vals) {
-        my $val = $vals[$idx];
-        $vals[$idx] = _dne($val)    ? "Does not exist" : dump::view($val);
+    foreach my $val (@vals) {
+        $val = _dne($val)    ? "Does not exist" : dump::view($val);
     }
 
     $out .= "$vars[0] = $vals[0]\n";
@@ -1158,10 +1157,10 @@ sub _eq_array  {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $max = $#$a1 +> $#$a2 ? $#$a1 : $#$a2;
-    for (0..$max) {
-        my $e1 = $_ +> $#$a1 ? $DNE : $a1->[$_];
-        my $e2 = $_ +> $#$a2 ? $DNE : $a2->[$_];
+    my $max = @$a1 +> @$a2 ? @$a1 : @$a2;
+    for (0..$max-1) {
+        my $e1 = $_ +> @$a1-1 ? $DNE : $a1->[$_];
+        my $e2 = $_ +> @$a2-1 ? $DNE : $a2->[$_];
 
         push @Data_Stack, { type => 'ARRAY', idx => $_, vals => [$e1, $e2] };
         $ok = _deep_check($e1,$e2);

@@ -139,7 +139,11 @@ sub FETCHSIZE {
 sub STORESIZE {
     my ($self, $size) = @_;
     my @temp = split($sep, $ENV{$$self});
-    (@temp-1) = $size - 1;
+    if (@temp +> $size) {
+        splice(@temp, $size);
+    } else {
+        $temp[$size-1] = undef;
+    }
     $ENV{$$self} = join($sep, @temp);
 }
 

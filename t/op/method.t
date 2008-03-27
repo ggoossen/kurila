@@ -48,7 +48,7 @@ is(A->d, "D::d");		# Update hash table;
 {
     local @A::ISA = qw(C);	# Update hash table with split() assignment
     is(A->d, "C::d");
-    (@A::ISA-1) = -1;
+    @A::ISA = 0;
     is(eval { A->d } || "fail", "fail");
 }
 is(A->d, "D::d");

@@ -782,7 +782,7 @@ sub make_col {
 		($text,$more,$eol) = $f->{break}->($str_ref,$width,$f->{opts}{ws});
 		if ($f->{opts}{ws}) {
 			$text =~ s{($f->{opts}{ws})}
-					  {{ @caps = grep { defined $$_ } 2..$#+;
+					  {{ @caps = grep { defined $$_ } 2..(@+ -1);
 						@caps = length($1) ? " " : "" unless @caps;
 						join "", @caps;
 					  
@@ -826,7 +826,7 @@ sub balance_cols {
 			push @cols, make_col($f,$opts,$medheight)
 		}
 		if ($maxheight +<= $minheight+1) {
-			for (0..$#cols) {
+			for (0..@cols-1) {
 				$group->[$_]{formcol} = $cols[$_];
 			}
 			return;
@@ -916,7 +916,7 @@ sub make_cols($$\@\%$) {
 		}
 	}
 	elsif ($opts->{layout} eq 'down') { # column-by-column
-		for my $col (0..$#$formatters) {
+		for my $col (0..@$formatters-1) {
 			my $f = $formatters->[$col];
 			next if $f->{isbullet} || $f->{opts}{height}{minimal};
 			$parts->[$col] = make_col($f,$opts, $maxheight);
@@ -924,12 +924,12 @@ sub make_cols($$\@\%$) {
 		$maxheight = min $maxheight,
 						 max map { defined() ? scalar @$_ : 0 } @$parts
 			if $has_nonminimal;
-		for my $col (0..$#$formatters) {
+		for my $col (0..@$formatters-1) {
 			my $f = $formatters->[$col];
 			next if $f->{isbullet} || !$f->{opts}{height}{minimal};
 			$parts->[$col] = make_col($f,$opts, $maxheight);
 		}
-		for my $col (0..$#$formatters) {
+		for my $col (0..@$formatters-1) {
 			my $f = $formatters->[$col];
 			next unless $f->{isbullet};
 			$parts->[$col] = $f->{bullets}||[];
@@ -939,10 +939,10 @@ sub make_cols($$\@\%$) {
 		my %incomplete = (first=>1);
 		for (my $row=0;$row+<$maxheight && grep {$_} values %incomplete;$row++) {
 			%incomplete = ();
-			for my $col (0..$#$formatters) {
+			for my $col (0..@$formatters-1) {
 				$parts->[$col] ||= [];
 			}
-			for my $col (0..$#$formatters) {
+			for my $col (0..@$formatters-1) {
 				my $f = $formatters->[$col];
 				next if $f->{isbullet} || $f->{opts}{height}{minimal};
 				next if $f->{line} && $row+>0 || $f->{done};
@@ -956,7 +956,7 @@ sub make_cols($$\@\%$) {
 				$incomplete{$str_ref} = $more
 					unless $f->{literal} || $f->{line} || $f->{done};
 			}
-			for my $col (0..$#$formatters) {
+			for my $col (0..@$formatters-1) {
 				my $f = $formatters->[$col];
 				next if $f->{isbullet} || !$f->{opts}{height}{minimal};
 				next if $f->{line} && $row+>0 || $f->{done};
@@ -970,7 +970,7 @@ sub make_cols($$\@\%$) {
 				$incomplete{$str_ref} = $more
 					unless $has_nonminimal || $f->{done};
 			}
-			for my $col (0..$#$formatters) {
+			for my $col (0..@$formatters-1) {
 				my $f = $formatters->[$col];
 				next unless $f->{isbullet};
 				$parts->[$col][$row] = shift @{$f->{bullets}};
@@ -979,10 +979,10 @@ sub make_cols($$\@\%$) {
 	}
 	else { # tabular layout: down to the first \n, then across, then fill
 		my $finished = 0;
-		for my $col (0..$#$formatters) { $parts->[$col] = []; }
+		for my $col (0..@$formatters-1) { $parts->[$col] = []; }
 		while (!$finished) {
 			$finished = 1;
-			for my $col (0..$#$formatters) {
+			for my $col (0..@$formatters-1) {
 				my $tabular_more = 1;
 				my $f = $formatters->[$col];
 				next if $f->{isbullet} || $f->{opts}{height}{minimal};
@@ -993,14 +993,14 @@ sub make_cols($$\@\%$) {
 			my $minimaxheight = min $maxheight,
 							 max map { defined() ? scalar @$_ : 0 } @$parts
 				if $has_nonminimal;
-			for my $col (0..$#$formatters) {
+			for my $col (0..@$formatters-1) {
 				my $tabular = 1;
 				my $f = $formatters->[$col];
 				next if $f->{isbullet} || !$f->{opts}{height}{minimal};
 				push @{$parts->[$col]},
 					 @{make_col($f,$opts, $maxheight, $tabular)};
 			}
-			for my $col (0..$#$formatters-1) {
+			for my $col (0..@$formatters-2) {
 				my $f = $formatters->[$col];
 				if ($f->{isbullet}) {
 					push @{$parts->[$col]}, @{$f->{bullets}||[]};
@@ -1190,14 +1190,14 @@ sub make_page {
 			shift @{$section->{formatters}} unless $more;
 			my $maxheight = 0;
 			my $maxwidth = 0;
-			for my $col (0..$#parts) {
+			for my $col (0..@parts-1) {
 				local $_ = $parts[$col];
 				pop @$_ while @$_ && ! length($_->[-1]);
 				$maxheight = max($maxheight, scalar(@$_), $formatters->[$col]{opts}{height}{min}||0);
 				# $formatters->[$col]{pos} = $maxwidth;
 				# $maxwidth += $formatters->[$col]{width};
 			}
-			for my $col (0..$#parts) {
+			for my $col (0..@parts-1) {
 				my $f = $formatters->[$col];
 				push @{$parts[$col]}, ("") x (($f->{height}{min}||0)-@{$parts[$col]});
 				my $fopts = $f->{opts};
@@ -1206,7 +1206,7 @@ sub make_page {
 				my $lfill = first {defined $_} @{$fopts}{qw(lfill hfill fill)}, " ";
 				my $rfill = first {defined $_} @{$fopts}{qw(rfill hfill fill)}, " ";
 				$f->{vjust}->($maxheight,$tfill,$bfill,$parts[$col]);
-				for my $row (0..$#{$parts[$col]}) {
+				for my $row (0..@{$parts[$col]}-1) {
 					my $last = $parts[$col][$row] =~ s/\r//;
 					$f->{hjust}->($parts[$col][$row], pre=>$lfill, post=>$rfill,
 								  last=>$last, pos=>$f->{pos},
@@ -1215,7 +1215,7 @@ sub make_page {
 				}
 			}
 			for my $row (0..$maxheight-1) {
-				push @text, join "",map $parts[$_][$row],0..$#parts;
+				push @text, join "",map $parts[$_][$row],0..@parts-1;
 			}
 		}
 		return (\@text, $more);
@@ -1232,11 +1232,11 @@ sub section {
         my $type = ref $row or die "Too many indices (starting with [@index])";
         if ($type eq 'HASH') {
 			@index = keys %$row unless @index;
-            push @{$section[$_]}, $row->{$index[$_]} for 0..$#index;
+            push @{$section[$_]}, $row->{$index[$_]} for 0..@index-1;
         }
         elsif ($type eq 'ARRAY') {
-			@index = (0..$#$row) unless @index;
-            push @{$section[$_]}, $row->[$index[$_]] for 0..$#index;
+			@index = (0..@$row-1) unless @index;
+            push @{$section[$_]}, $row->[$index[$_]] for 0..@index-1;
         }
         else {
 			my $what = ref $structure;
@@ -1306,8 +1306,8 @@ sub break_at {
 			while ($rem +> 0 && (pos()||0) +< length()) {
 				if ($ws && m/\G ($ws) $wsnzw/gcx) {
 					my $captured;
-					if ($#+ +> 1) { 		# may be extra captures...
-						for (2..$#+) {
+					if (@+ +> 2) { 		# may be extra captures...
+						for (2..@+ -1) {
 							next unless defined $$_;
 							$captured++;
 							$res .= $$_;
@@ -1896,7 +1896,7 @@ the specified width. For example:
         'Name             Score   Time  | Normalized',   
         '-------------------------------------------',   
         '{[[[[[[[[[[[[}   {III}   {II}  |  {]]].[[} ',
-         @name,           @score, @time,   [map {$score[$_]/$time[$_]} 0..$#score]
+         @name,           @score, @time,   [map {$score[$_]/$time[$_]} 0..@score-1]
 
 is a very easy way to produce the table:
 

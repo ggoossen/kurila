@@ -63,7 +63,7 @@ sub TIESCALAR {
 sub FETCH {
     my $self = shift;
     ++$self->{read};
-    $self->{values}[(@-1){ $self->{values} }];
+    $self->{values}[@{ $self->{values} }-1];
 }
 
 sub STORE {

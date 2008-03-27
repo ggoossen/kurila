@@ -386,7 +386,7 @@ sub _dump {
 	$sname = $mname . '[' . $i . ']';
 	$out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
 	$out .= $pad . $ipad . $s->_dump($v, $sname);
-	$out .= "," if $i++ +< $#$val;
+	$out .= "," if $i++ +< @$val -1;
       }
       $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
       $out .= ($name =~ m/^\@/) ? ')' : ']';

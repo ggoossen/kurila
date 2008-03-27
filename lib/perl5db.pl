@@ -1525,7 +1525,7 @@ if ( exists $ENV{PERLDB_RESTART} ) {
 
     # restore breakpoints/actions
     my @had_breakpoints = get_list("PERLDB_VISITED");
-    for ( 0 .. $#had_breakpoints ) {
+    for ( 0 .. @had_breakpoints-1 ) {
         my %pf = get_list("PERLDB_FILE_$_");
         $postponed_file{ $had_breakpoints[$_] } = \%pf if %pf;
     }
@@ -1908,13 +1908,13 @@ sub DB {
 
     # we need to check for pseudofiles on Mac OS (these are files
     # not attached to a filename, but instead stored in Dev:Pseudo)
-    if ( $^O eq 'MacOS' && $#dbline +< 0 ) {
+    if ( $^O eq 'MacOS' && ! @dbline ) {
         $filename_ini = $filename = 'Dev:Pseudo';
         *dbline = $main::{ '_<' . $filename };
     }
 
     # Last line in the program.
-    local $max = $#dbline;
+    local $max = @dbline-1;
 
     # if we have something here, see if we should break.
     if ( $dbline{$line}
@@ -1941,7 +1941,7 @@ sub DB {
 
     # If we have any watch expressions ...
     if ( $trace ^&^ 2 ) {
-        for ( my $n = 0 ; $n +<= $#to_watch ; $n++ ) {
+        for ( my $n = 0 ; $n +< @to_watch ; $n++ ) {
             $evalarg = $to_watch[$n];
             local $onetimeDump;    # Tell DB::eval() to not output results
 
@@ -2234,7 +2234,7 @@ the new command. This is faster, but perhaps a bit more convoluted.
                 $cmd = &readline(
                         "$pidprompt $tid DB"
                       . ( '<' x $level )
-                      . ( $#hist + 1 )
+                      . ( @hist )
                       . ( '>' x $level ) . " "
                 )
             )
@@ -2513,7 +2513,7 @@ Just uses C<DB::methods> to determine what methods are available.
                     # We switched, so switch the debugger internals around.
                     elsif ( $file ne $filename ) {
                         *dbline   = $main::{ '_<' . $file };
-                        $max      = $#dbline;
+                        $max      = @dbline-1;
                         $filename = $file;
                         $start    = 1;
                         $cmd      = "l";
@@ -2541,7 +2541,7 @@ and then we look up the line in the magical C<%dbline> hash.
                     $start    = $line;
                     $filename = $filename_ini;
                     *dbline   = $main::{ '_<' . $filename };
-                    $max      = $#dbline;
+                    $max      = @dbline-1;
 
                     # Now where are we?
                     print_lineinfo($position);
@@ -2740,7 +2740,7 @@ in this and all call levels above this one.
 
                             # Scan forward to the first executable line
                             # after the 'sub whatever' line.
-                            $max = $#dbline;
+                            $max = @dbline-1;
                             ++$i while $dbline[$i] == 0 && $i +< $max;
                         } ## end if ($i)
 
@@ -3010,7 +3010,7 @@ into C<$cmd>, and redoes the loop to execute it.
                     #  Y - index back from most recent (by 1 if bare minus)
                     #  N - go to that particular command slot or the last
                     #      thing if nothing following.
-                    $i = $1 ? ( $#hist - ( $2 || 1 ) ) : ( $2 || $#hist );
+                    $i = $1 ? ( @hist-1 - ( $2 || 1 ) ) : ( $2 || @hist-1 );
 
                     # Pick out the command desired.
                     $cmd = $hist[$i];
@@ -3054,7 +3054,7 @@ If a command is found, it is placed in C<$cmd> and executed via C<redo>.
                     pop(@hist) if length($cmd) +> 1;
 
                     # Look backward through the history.
-                    for ( $i = $#hist ; $i ; --$i ) {
+                    for ( $i = @hist-1 ; $i ; --$i ) {
 
                         # Stop if we find it.
                         last if $hist[$i] =~ m/$pat/;
@@ -3122,7 +3122,7 @@ Prints the contents of C<@hist> (if any).
 
                     # Anything other than negative numbers is ignored by
                     # the (incorrect) pattern, so this test does nothing.
-                    $end = $2 ? ( $#hist - $2 ) : 0;
+                    $end = $2 ? ( @hist-1 - $2 ) : 0;
 
                     # Set to the minimum if less than zero.
                     $hist = 0 if $hist +< 0;
@@ -3130,7 +3130,7 @@ Prints the contents of C<@hist> (if any).
                     # Start at the end of the array.
                     # Stay in while we're still above the ending value.
                     # Tick back by one each time around the loop.
-                    for ( $i = $#hist ; $i +> $end ; $i-- ) {
+                    for ( $i = @hist-1 ; $i +> $end ; $i-- ) {
 
                         # Print the command  unless it has no arguments.
                         print $OUT "$i: ", $hist[$i], "\n"
@@ -3643,7 +3643,7 @@ sub sub {
     local $stack_depth = $stack_depth + 1;    # Protect from non-local exits
 
     # Expand @stack.
-    $#stack = $stack_depth;
+    @stack = $stack_depth+1;
 
     # Save current single-step setting.
     $stack[-1] = $single;
@@ -3966,7 +3966,7 @@ sub delete_action {
         print $OUT "Deleting all actions...\n";
         for my $file ( keys %had_breakpoints ) {
             local *dbline = $main::{ '_<' . $file };
-            my $max = $#dbline;
+            my $max = @dbline-1;
             my $was;
             for ( $i = 1 ; $i +<= $max ; $i++ ) {
                 if ( defined $dbline{$i} ) {
@@ -4199,18 +4199,18 @@ sub breakable_line {
         my $delta = $from +< $to ? +1 : -1;
 
         # Keep us from running off the ends of the file.
-        my $limit = $delta +> 0 ? $#dbline : 1;
+        my $limit = $delta +> 0 ? @dbline-1 : 1;
 
         # Clever test. If you're a mathematician, it's obvious why this
         # test works. If not:
-        # If $delta is positive (going forward), $limit will be $#dbline.
+        # If $delta is positive (going forward), $limit will be @dbline-1.
         #    If $to is less than $limit, ($limit - $to) will be positive, times
         #    $delta of 1 (positive), so the result is > 0 and we should use $to
         #    as the stopping point.
         #
         #    If $to is greater than $limit, ($limit - $to) is negative,
         #    times $delta of 1 (positive), so the result is < 0 and we should
-        #    use $limit ($#dbline) as the stopping point.
+        #    use $limit (@dbline-1) as the stopping point.
         #
         # If $delta is negative (going backward), $limit will be 1.
         #    If $to is zero, ($limit - $to) will be 1, times $delta of -1
@@ -4566,7 +4566,7 @@ sub delete_breakpoint {
             # Switch to the desired file temporarily.
             local *dbline = $main::{ '_<' . $file };
 
-            my $max = $#dbline;
+            my $max = @dbline-1;
             my $was;
 
             # For all lines in this file ...
@@ -4857,7 +4857,7 @@ sub cmd_l {
 
             # Switch debugger's magic structures.
             *dbline   = $main::{ '_<' . $file };
-            $max      = $#dbline;
+            $max      = @dbline-1;
             $filename = $file;
         } ## end if ($file ne $filename)
 
@@ -5010,7 +5010,7 @@ sub cmd_L {
             local *dbline = $main::{ '_<' . $file };
 
             # Set up to look through the whole file.
-            my $max = $#dbline;
+            my $max = @dbline-1;
             my $was;    # Flag: did we print something
                         # in this file?
 
@@ -5381,7 +5381,7 @@ sub postponed_sub {
             $had_breakpoints{$file} ^|^= 1;
 
             # Last line in file.
-            my $max = $#dbline;
+            my $max = @dbline-1;
 
             # Search forward until we hit a breakable line or get to
             # the end of the file.
@@ -5608,7 +5608,7 @@ sub print_trace {
 
     # Run through the traceback info, format it, and print it.
     my $s;
-    for ( $i = 0 ; $i +<= $#sub ; $i++ ) {
+    for ( $i = 0 ; $i +< @sub ; $i++ ) {
 
         # Drop out if the user has lost interest and hit control-C.
         last if $signal;
@@ -5648,7 +5648,7 @@ sub print_trace {
               . " called from $file"
               . " line $sub[$i]{line}\n";
         }
-    } ## end for ($i = 0 ; $i <= $#sub...
+    } ## end for ($i = 0 ; $i < @sub...
 } ## end sub print_trace
 
 =head2 dump_trace(skip[,count])
@@ -6039,7 +6039,7 @@ sub save_hist {
     $histsize //= option_val("HistSize",100);
     my @copy = grep { $_ ne '?' } @hist;
     my $start = scalar(@copy) +> $histsize ? scalar(@copy)-$histsize : 0;
-    for ($start .. $#copy) {
+    for ($start .. @copy-1) {
         print $fh "$copy[$_]\n";
     }
     close $fh or die "Could not write '$histfile': $!";
@@ -6639,12 +6639,12 @@ sub set_list {
 
     # Grab each item in the list, escape the backslashes, encode the non-ASCII
     # as hex, and then save in the appropriate VAR_0, VAR_1, etc.
-    for $i ( 0 .. $#list ) {
+    for $i ( 0 .. @list-1 ) {
         $val = $list[$i];
         $val =~ s/\\/\\\\/g;
         $val =~ s/([\0-\37\177\200-\377])/{"\\0x" . unpack('H2',$1)}/g;
         $ENV{"${stem}_$i"} = $val;
-    } ## end for $i (0 .. $#list)
+    } ## end for $i (0 .. @list)
 } ## end sub set_list
 
 =head2 get_list
@@ -8238,7 +8238,7 @@ BEGIN {    # This does not compile, alas. (XXX eh?)
 
     # Used to track the current stack depth using the auto-stacked-variable
     # trick.
-    $stack_depth = 0;      # Localized repeatedly; simple way to track $#stack
+    $stack_depth = 0;      # Localized repeatedly; simple way to track @stack
 
     # Don't print return values on exiting a subroutine.
     $doret = -2;
@@ -8723,7 +8723,7 @@ sub rerun {
     unless (defined $truehist[$i]) {
         print "Unable to return to non-existent command: $i\n";
     } else {
-        $#truehist = ($i +< 0 ? $#truehist + $i : $i +> 0 ? $i : $#truehist);
+        @truehist = ($i +< 0 ? @truehist + $i : $i +> 0 ? $i + 1 : @truehist);
         my @temp = @truehist;            # store
         push(@DB::typeahead, @truehist); # saved
         @truehist = @hist = ();          # flush
@@ -8771,7 +8771,7 @@ sub restart {
     # the 'require perl5db.pl;' line), and add them back on
     # to the command line to be executed.
     if ( $0 eq '-e' ) {
-        for ( 1 .. $#{*{Symbol::fetch_glob('::_<-e')}} ) {  # The first line is PERL5DB
+        for ( 1 .. @{*{Symbol::fetch_glob('::_<-e')}} -1) {  # The first line is PERL5DB
             chomp( $cl = ${*{Symbol::fetch_glob('::_<-e')}}[$_] );
             push @script, '-e', $cl;
         }
@@ -8824,7 +8824,7 @@ variable via C<DB::set_list>.
     # Go through all the breakpoints and make sure they're
     # still valid.
     my @hard;
-    for ( 0 .. $#had_breakpoints ) {
+    for ( 0 .. @had_breakpoints-1 ) {
 
         # We were in this file.
         my $file = $had_breakpoints[$_];
@@ -8849,7 +8849,7 @@ variable via C<DB::set_list>.
 
         # Save the list of all the breakpoints for this file.
         set_list( "PERLDB_FILE_$_", %dbline, @add );
-    } ## end for (0 .. $#had_breakpoints)
+    } ## end for (0 .. @had_breakpoints-1)
 
     # The breakpoint was inside an eval. This is a little
     # more difficult. XXX and I don't understand it.
@@ -9120,7 +9120,7 @@ sub cmd_pre580_D {
             # Switch to the desired file temporarily.
             local *dbline = $main::{ '_<' . $file };
 
-            my $max = $#dbline;
+            my $max = @dbline-1;
             my $was;
 
             # For all lines in this file ...

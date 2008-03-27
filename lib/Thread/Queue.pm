@@ -232,11 +232,9 @@ $validate_index = sub {
     my $index = shift;
 
     if (! looks_like_number($index) || (int($index) != $index)) {
-        require Carp;
         my ($method) = (caller(1))[3];
         $method =~ s/Thread::Queue:://;
-        $index = 'undef' if (! defined($index));
-        Carp::croak("Invalid 'index' argument ($index) to '$method' method");
+        die("Invalid 'index' argument ({dump::view($index)}) to '$method' method");
     }
 
     return $index;

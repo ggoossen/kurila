@@ -1005,7 +1005,7 @@ local(@a[1,2]);		# OP_ASLICE		ok
 local(@a{1,2});		# OP_HSLICE		ok
 local(@a = (1,2));	# OP_AASSIGN
 #local($$x);		# OP_RV2SV		ok
-local($#a);		# OP_AV2ARYLEN
+
 local($x =   1);	# OP_SASSIGN
 local($x &&= 1);	# OP_ANDASSIGN
 local($x ||= 1);	# OP_ORASSIGN
@@ -1039,7 +1039,6 @@ Useless localization of integer modulus (%) at - line 26.
 Useless localization of integer addition (+) at - line 27.
 Useless localization of integer subtraction (-) at - line 28.
 Useless localization of list assignment at - line 37.
-Useless localization of array length at - line 39.
 Useless localization of scalar assignment at - line 40.
 Useless localization of logical and assignment (&&=) at - line 41.
 Useless localization of logical or assignment (||=) at - line 42.

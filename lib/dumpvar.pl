@@ -114,13 +114,13 @@ sub _escaped_ord {
 }
 
 sub ShortArray {
-  my $tArrayDepth = $#{$_[0]} ; 
-  $tArrayDepth = $#{$_[0]} +< $arrayDepth-1 ? $#{$_[0]} : $arrayDepth-1 
+  my $tArrayDepth = @{$_[0]}-1 ; 
+  $tArrayDepth = @{$_[0]} +< $arrayDepth ? @{$_[0]}-1 : $arrayDepth-1 
     unless  $arrayDepth eq '' ; 
   my $shortmore = "";
-  $shortmore = " ..." if $tArrayDepth +< $#{$_[0]} ;
+  $shortmore = " ..." if $tArrayDepth +< @{$_[0]}-1 ;
   if (!grep(ref $_, @{$_[0]})) {
-    $short = "0..$#{$_[0]}  '" . 
+    $short = "0..@{$_[0]}-1  '" . 
       join("' '", @{$_[0]}[0..$tArrayDepth]) . "'$shortmore";
     return $short if length $short +<= $compactDump;
   }
@@ -131,12 +131,12 @@ sub DumpElem {
   my $short = &stringify($_[0], ref $_[0]);
   if ($veryCompact && ref $_[0]
       && (ref $_[0] eq 'ARRAY' and !grep(ref $_, @{$_[0]}) )) {
-    my $end = "0..$#{$v}  '" . 
+    my $end = "0..@{$v}-1  '" . 
       join("' '", @{$_[0]}[0..$tArrayDepth]) . "'$shortmore";
   } elsif ($veryCompact && ref $_[0]
       && (ref $_[0] eq 'HASH') and !grep(ref $_, values %{$_[0]})) {
     my $end = 1;
-	  $short = $sp . "0..$#{$v}  '" . 
+	  $short = $sp . "0..@{$v}-1  '" . 
 	    join("' '", @{$v}[0..$tArrayDepth]) . "'$shortmore";
   } else {
     print "$short\n";
@@ -203,13 +203,13 @@ sub unwrap {
         # Hash ref or hash-based object.
 	my @sortKeys = sort keys(%$v) ;
 	undef $more ; 
-	$tHashDepth = $#sortKeys ; 
-	$tHashDepth = $#sortKeys +< $hashDepth-1 ? $#sortKeys : $hashDepth-1
+	$tHashDepth = @sortKeys-1 ; 
+	$tHashDepth = @sortKeys-1 +< $hashDepth-1 ? @sortKeys-1 : $hashDepth-1
 	  unless $hashDepth eq '' ; 
-	$more = "....\n" if $tHashDepth +< $#sortKeys ; 
+	$more = "....\n" if $tHashDepth +< @sortKeys-1 ; 
 	$shortmore = "";
-	$shortmore = ", ..." if $tHashDepth +< $#sortKeys ; 
-	$#sortKeys = $tHashDepth ; 
+	$shortmore = ", ..." if $tHashDepth +< @sortKeys-1 ; 
+	splice(@sortKeys, $tHashDepth+1);
 	if ($compactDump && !grep(ref $_, values %{$v})) {
 	  #$short = $sp . 
 	  #  (join ', ', 
@@ -236,19 +236,19 @@ sub unwrap {
     } elsif ( $item_type eq 'ARRAY' ) { 
         # Array ref or array-based object. Also: undef.
         # See how big the array is.
-	$tArrayDepth = $#{$v} ; 
+	$tArrayDepth = @$v-1; 
 	undef $more ; 
         # Bigger than the max?
-	$tArrayDepth = $#{$v} +< $arrayDepth-1 ? $#{$v} : $arrayDepth-1 
+	$tArrayDepth = @$v-1 +< $arrayDepth-1 ? @$v-1 : $arrayDepth-1 
 	  if defined $arrayDepth && $arrayDepth ne '';
         # Yep. Don't show it all.
-	$more = "....\n" if $tArrayDepth +< $#{$v} ; 
+	$more = "....\n" if $tArrayDepth +< @$v-1 ;
 	$shortmore = "";
-	$shortmore = " ..." if $tArrayDepth +< $#{$v} ;
+	$shortmore = " ..." if $tArrayDepth +< @$v-1 ;
 
 	if ($compactDump && !grep(ref $_, @{$v})) {
-	  if ($#$v +>= 0) {
-	    $short = $sp . "0..$#{$v}  " . 
+	  if (@$v) {
+	    $short = $sp . "0..@{$v}-1  " . 
 	      join(" ", 
 		   map {exists $v->[$_] ? stringify $v->[$_] : "empty"} ($[..$tArrayDepth)
 		  ) . "$shortmore";

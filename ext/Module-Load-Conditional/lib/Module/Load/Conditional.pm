@@ -200,7 +200,7 @@ sub check_install {
                     ($fh) = $dir->($dir, $file);
     
                 } elsif (UNIVERSAL::isa($dir, 'ARRAY')) {
-                    ($fh) = $dir->[0]->($dir, $file, @{$dir}{1..$#{$dir}})
+                    ($fh) = $dir->[0]->($dir, $file, @{$dir}{1..(@{$dir}-1)})
     
                 } elsif (UNIVERSAL::can($dir, 'INC')) {
                     ($fh) = $dir->INC->($dir, $file);

@@ -207,7 +207,7 @@ my @trypod = (
 	  );
 # handy for development testing of new warnings etc
 unshift @trypod, "./pod/perldiag.pod" if -e "pod/perldiag.pod";
-(my $PODFILE) = ((grep { -e } @trypod), $trypod[$#trypod])[0];
+(my $PODFILE) = ((grep { -e } @trypod), $trypod[-1])[0];
 
 if ($^O eq 'MacOS') {
     # just updir one from each lib dir, we'll find it ...
@@ -378,14 +378,14 @@ my %msg;
         my @toks = split( m/(%l?[dx]|%c|%(?:\.\d+)?s)/, $header );
 	if (@toks +> 1) {
             my $conlen = 0;
-            for my $i (0..$#toks){
+            for my $i (0..@toks-1){
                 if( $i % 2 ){
                     if(      $toks[$i] eq '%c' ){
                         $toks[$i] = '.';
                     } elsif( $toks[$i] eq '%d' ){
                         $toks[$i] = '\d+';
                     } elsif( $toks[$i] eq '%s' ){
-                        $toks[$i] = $i == $#toks ? '.*' : '.*?';
+                        $toks[$i] = $i == @toks-1 ? '.*' : '.*?';
                     } elsif( $toks[$i] =~ '%.(\d+)s' ){
                         $toks[$i] = ".\{$1\}";
                      } elsif( $toks[$i] =~ '^%l*x$' ){
@@ -562,7 +562,7 @@ sub splainthis {
     my @secs = split( m/ at / );
     return unless @secs;
     $_ = $secs[0];
-    for my $i ( 1..$#secs ){
+    for my $i ( 1..@secs-1 ){
         if( $secs[$i] =~ m/.+? (?:line|chunk) \d+/ ){
             $real = 1;
             last;

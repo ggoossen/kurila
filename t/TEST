@@ -22,8 +22,8 @@ our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
 {
     my @argv = ();
-    foreach my $idx (0..$#ARGV) {
-	push( @argv, $ARGV[$idx] ), next unless $ARGV[$idx] =~ m/^-(\S+)$/;
+    foreach my $iargv (@ARGV) {
+	push( @argv, $iargv ), next unless $iargv =~ m/^-(\S+)$/;
 	$::core    = 1 if $1 eq 'core';
 	$::verbose = 1 if $1 eq 'v';
 	$::torture = 1 if $1 eq 'torture';
@@ -449,7 +449,7 @@ EOT
 	    elsif (@valgrind) {
 		my $leaks = 0;
 		my $errors = 0;
-		for my $i (0..$#valgrind) {
+		for my $i (0..@valgrind-1) {
 		    local $_ = $valgrind[$i];
 		    if (m/^==\d+== ERROR SUMMARY: (\d+) errors? /) {
 			$errors += $1;   # there may be multiple error summaries
