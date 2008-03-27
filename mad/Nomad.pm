@@ -2021,6 +2021,8 @@ package PLXML::op_sge;
 package PLXML::op_seq;
 package PLXML::op_sne;
 package PLXML::op_scmp;
+package PLXML::op_ref_eq;
+package PLXML::op_ref_ne;
 package PLXML::op_bit_and;
 package PLXML::op_bit_xor;
 package PLXML::op_bit_or;
