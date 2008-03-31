@@ -740,7 +740,7 @@ if (\$rfc1149 ne "$parent_rfc1149") \{
 \$test++;
 
 if (\$rfc1149 != 1149) \{
-  printf "not ok \$test # \%d != 1149\n", \$rfc1149;
+  printf "not ok \$test # \\\%d != 1149\n", \$rfc1149;
 \} else \{
   print "ok \$test\n";
 \}

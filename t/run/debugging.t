@@ -8,7 +8,7 @@ BEGIN {
 # skip all tests unless perl was compiled with -DDEBUGGING
 BEGIN {
     require Config;
-    if ($Config::Config{'ccflags'} !~ m/-DDEBUGGING\b/) {
+    if (%Config::Config{'ccflags'} !~ m/-DDEBUGGING\b/) {
         print "1..0 # Skip -- Perl built w/o -DDEBUGGING\n";
         exit 0;
     }
@@ -56,8 +56,8 @@ EO_DX_OUT
 
 # escape the regex chars in the reference dump
 $refdump =~ s/([{}()\\\[\]])/\\$1/gms;
-$refdump =~ s/(.*)\@THR\n/{ $Config::Config{useithreads} ? $1 . "\n" : '' }/g;
-$refdump =~ s/(.*)\@NO_THR\n/{ $Config::Config{useithreads} ? '' : $1."\n" }/g;
+$refdump =~ s/(.*)\@THR\n/{ %Config::Config{useithreads} ? $1 . "\n" : '' }/g;
+$refdump =~ s/(.*)\@NO_THR\n/{ %Config::Config{useithreads} ? '' : $1."\n" }/g;
 
 my $qr = qr/$refdump/;
 # diag($qr);

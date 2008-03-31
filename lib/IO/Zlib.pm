@@ -307,8 +307,8 @@ use Symbol;
 use Tie::Handle;
 
 # These might use some $^O logic.
-my $gzip_read_open   = "gzip -dc \%s";
-my $gzip_write_open  = "gzip > \%s";
+my $gzip_read_open   = 'gzip -dc %s';
+my $gzip_write_open  = 'gzip > %s';
 
 my $gzip_external;
 my $gzip_used;
@@ -349,7 +349,7 @@ sub _import {
 	    if (@_) {
 		$gzip_read_open = shift;
 		croak "$import: ':gzip_read_open' '$gzip_read_open' is illegal"
-		    unless $gzip_read_open =~ m/^.+%s.+$/;
+		    unless $gzip_read_open =~ m/^.+\%s.+$/;
 	    } else {
 		croak "$import: ':gzip_read_open' requires an argument";
 	    }
@@ -359,7 +359,7 @@ sub _import {
 	    if (@_) {
 		$gzip_write_open = shift;
 		croak "$import: ':gzip_write_open' '$gzip_read_open' is illegal"
-		    unless $gzip_write_open =~ m/^.+%s.*$/;
+		    unless $gzip_write_open =~ m/^.+\%s.*$/;
 	    } else {
 		croak "$import: ':gzip_write_open' requires an argument";
 	    }

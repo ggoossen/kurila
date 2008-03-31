@@ -522,7 +522,7 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
 
 {   # Check usage error messages
     my %usage = %Benchmark::_Usage;
-    delete $usage{runloop};  # not public, not worrying about it just now
+    delete %usage{runloop};  # not public, not worrying about it just now
 
     my @takes_no_args = qw(clearallcache disablecache enablecache);
 
@@ -532,7 +532,7 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
                     );
     while( my($name, $code) = each %cmpthese ) {
         eval $code;
-        is( $@->{description}, $usage{cmpthese}, "cmpthese usage: $name" );
+        is( $@->{description}, %usage{cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = ('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
@@ -542,7 +542,7 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
 
     while( my($name, $code) = each %timethese ) {
         eval $code;
-        is( $@->{description}, $usage{timethese}, "timethese usage: $name" );
+        is( $@->{description}, %usage{timethese}, "timethese usage: $name" );
     }
 
 
@@ -554,7 +554,7 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
 
     foreach my $func (@takes_no_args) {
         eval "$func(42)";
-        is( $@->{description}, $usage{$func}, "$func usage: with args" );
+        is( $@->{description}, %usage{$func}, "$func usage: with args" );
     }
 }
 

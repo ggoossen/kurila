@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir 't' if -d 't';
         @INC = ("../lib", "lib/compress");
     }
@@ -51,7 +51,7 @@ sub readWithGzip
 
     if ( system("$comp $file >$outfile") == 0 )
     {
-        $_[0] = readFile($outfile);
+        @_[0] = readFile($outfile);
         return 1 
     }
 
@@ -89,7 +89,7 @@ BEGIN {
     my $name = $^O =~ m/mswin/i ? 'gzip.exe' : 'gzip';
     my $split = $^O =~ m/mswin/i ? ";" : ":";
 
-    for my $dir (reverse split $split, $ENV{PATH})    
+    for my $dir (reverse split $split, %ENV{PATH})    
     {
         $GZIP = "$dir/$name"
             if -x "$dir/$name" ;

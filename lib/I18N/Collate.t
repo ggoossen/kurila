@@ -5,7 +5,7 @@ BEGIN {
     @INC = '../lib';
     our %Config;
     require Config; Config->import;
-    if (!$Config{d_setlocale} || $Config{ccflags} =~ m/\bD?NO_LOCALE\b/) {
+    if (!%Config{d_setlocale} || %Config{ccflags} =~ m/\bD?NO_LOCALE\b/) {
 	print "1..0\n";
 	exit;
     }
@@ -23,7 +23,7 @@ print "ok 2\n";
 
 {
     use warnings;
-    local ${^WARN_HOOK} = sub { $@ = $_[0] };
+    local ${^WARN_HOOK} = sub { $@ = @_[0] };
     $b = I18N::Collate->new("foo");
     print "not " unless $@->{description} =~ m/\bHAS BEEN DEPRECATED\b/;
     print "ok 3\n";

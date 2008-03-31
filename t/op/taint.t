@@ -148,7 +148,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
     if ($Is_MSWin32 && %Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split m/$Config{path_sep}/, %ENV{PATH}) {
+	foreach my $dir (split m/%Config{path_sep}/, %ENV{PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -353,7 +353,7 @@ SKIP: {
 {
     dies_like( sub { chmod 0, $TAINT }, qr/^Insecure dependency/);
 
-    # There is no feature test in $Config{} for truncate,
+    # There is no feature test in %Config{} for truncate,
     #   so we allow for the possibility that it's missing.
     dies_like( sub { truncate 'NoSuChFiLe', $TAINT0 }, 
                qr/^(?:Insecure dependency|truncate not implemented)/);
@@ -988,10 +988,10 @@ TODO: {
     our %nonmagicalenv = ( PATH => "util" );
     local *ENV = \%nonmagicalenv;
     dies_like(sub { system("lskdfj") },
-              qr/^%ENV is aliased to another variable while running with -T switch/);
+              qr/^\%ENV is aliased to another variable while running with -T switch/);
     local *ENV = *nonmagicalenv;
     dies_like( sub { system("lskdfj"); },
-               qr/^%ENV is aliased to %nonmagicalenv while running with -T switch/);
+               qr/^\%ENV is aliased to \%nonmagicalenv while running with -T switch/);
 }
 {
     # [perl #24248]

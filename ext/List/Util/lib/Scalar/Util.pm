@@ -59,26 +59,26 @@ push @EXPORT_FAIL, qw(weaken isweak dualvar isvstring set_prototype);
 # The code beyond here is only used if the XS is not installed
 
 # Hope nobody defines a sub by this name
-sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }
+sub UNIVERSAL::a_sub_not_likely_to_be_here { ref(@_[0]) }
 
 sub blessed ($) {
   local($@, ${^WARN_HOOK});
-  length(ref($_[0]))
-    ? eval { $_[0]->a_sub_not_likely_to_be_here }
+  length(ref(@_[0]))
+    ? eval { @_[0]->a_sub_not_likely_to_be_here }
     : undef
 }
 
 sub refaddr($) {
-  my $pkg = ref($_[0]) or return undef;
-  if (blessed($_[0])) {
-    bless $_[0], 'Scalar::Util::Fake';
+  my $pkg = ref(@_[0]) or return undef;
+  if (blessed(@_[0])) {
+    bless @_[0], 'Scalar::Util::Fake';
   }
   else {
     $pkg = undef;
   }
-  "$_[0]" =~ /0x(\w+)/;
+  "@_[0]" =~ /0x(\w+)/;
   my $i = do { local $^W; hex $1 };
-  bless $_[0], $pkg if defined $pkg;
+  bless @_[0], $pkg if defined $pkg;
   $i;
 }
 
@@ -115,17 +115,17 @@ sub reftype ($) {
 sub tainted {
   local($@, ${^WARN_HOOK});
   local $^W = 0;
-  eval { kill 0 * $_[0] };
+  eval { kill 0 * @_[0] };
   $@ =~ /^Insecure/;
 }
 
 sub readonly {
-  return 0 if tied($_[0]) || (ref(\($_[0])) ne "SCALAR");
+  return 0 if tied(@_[0]) || (ref(\(@_[0])) ne "SCALAR");
 
   local($@, ${^WARN_HOOK});
-  my $tmp = $_[0];
+  my $tmp = @_[0];
 
-  !eval { $_[0] = $tmp; 1 };
+  !eval { @_[0] = $tmp; 1 };
 }
 
 sub looks_like_number {
@@ -231,7 +231,7 @@ handle. Otherwise C<undef> is returned.
 
 Returns true if SCALAR is readonly.
 
-    sub foo { readonly($_[0]) }
+    sub foo { readonly(@_[0]) }
 
     $readonly = foo($bar);              # false
     $readonly = foo(0);                 # true

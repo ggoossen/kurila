@@ -14,7 +14,7 @@ fresh_perl_is(
 
 # Used to segfault
 fresh_perl_is(
-    'BEGIN { $::{"X::"} = 2 }',
+    'BEGIN { %::{"X::"} = 2 }',
     '',
     { switches => [ '-w' ] },
     q(Insert a non-GV in a stash, under warnings 'once'),

@@ -1065,10 +1065,10 @@ distribution for more examples.)
     use Data::Dumper;
 
     package Foo;
-    sub new {bless {'a' => 1, 'b' => sub { return "foo" }}, $_[0]};
+    sub new {bless {'a' => 1, 'b' => sub { return "foo" }}, @_[0]};
 
     package Fuz;                       # a weird REF-REF-SCALAR object
-    sub new {bless \($_ = \ 'fu\'z'), $_[0]};
+    sub new {bless \($_ = \ 'fu\'z'), @_[0]};
 
     package main;
     $foo = Foo->new;

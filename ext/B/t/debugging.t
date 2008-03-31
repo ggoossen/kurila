@@ -2,7 +2,7 @@
 # Test -DEBUGGING things (in dump.c)
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
         chdir('t') if -d 't';
         @INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -11,7 +11,7 @@ BEGIN {
     }
     # skip all tests unless perl was compiled with -DDEBUGGING
     require Config;
-    if ($Config::Config{'ccflags'} !~ m/-DDEBUGGING /) {
+    if (%Config::Config{'ccflags'} !~ m/-DDEBUGGING /) {
         print "1..0 # Skip -- Perl built w/o -DEBUGGING\n";
         exit 0;
     }

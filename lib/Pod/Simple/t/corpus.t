@@ -1,11 +1,11 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
 
     use Config;
-    if ($Config::Config{'extensions'} !~ m/\bEncode\b/) {
+    if (%Config::Config{'extensions'} !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
@@ -23,7 +23,7 @@ BEGIN {
 
 sub source_path {
     my $file = shift;
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir($updir, 'lib', 'Pod', 'Simple', 't');
@@ -58,15 +58,15 @@ sub source_path {
   my @f = map File::Spec->catfile(@bits, $_), readdir(INDIR);
   closedir(INDIR);
   my %f;
-  @f{@f} = ();
+  %f{[@f]} = ();
   foreach my $maybetest (sort @f) {
     my $xml = $maybetest;
     $xml =~ s/\.(txt|pod)$/\.xml/is  or  next;
-    $wouldxml{$maybetest} = $xml;
+    %wouldxml{$maybetest} = $xml;
     push @testfiles, $maybetest;
     foreach my $x ($xml, uc($xml), lc($xml)) {
-      next unless exists $f{$x};
-      $xmlfiles{$maybetest} = $x;
+      next unless exists %f{$x};
+      %xmlfiles{$maybetest} = $x;
       last;
     }
   }
@@ -92,7 +92,7 @@ require Pod::Simple::DumpAsXML;
 
 
 foreach my $f (@testfiles) {
-  my $xml = $xmlfiles{$f};
+  my $xml = %xmlfiles{$f};
   if($xml) {
     print "#\n#To test $f against $xml\n";
   } else {
@@ -125,7 +125,7 @@ foreach my $f (@testfiles) {
 
   # foo.xml.out is not a portable filename. foo.xml_out may be a bit more portable
 
-  my $outfilename = ($HACK +> 1) ? $wouldxml{$f} : "$wouldxml{$f}_out";
+  my $outfilename = ($HACK +> 1) ? %wouldxml{$f} : "%wouldxml{$f}_out";
   if($HACK) {
     open OUT, ">", "$outfilename" or die "Can't write-open $outfilename: $!\n";
     binmode(OUT);

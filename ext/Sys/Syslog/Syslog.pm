@@ -299,11 +299,11 @@ sub syslog {
 
     connect_log() unless $connected;
 
-    if ($mask =~ m/%m/) {
+    if ($mask =~ m/\%m/) {
         # escape percent signs for sprintf()
         $error =~ s/%/\%\%/g if @_;
         # replace %m with $error, if preceded by an even number of percent signs
-        $mask =~ s/(?<!%)((?:%%)*)%m/$1$error/g;
+        $mask =~ s/(?<!\%)((?:\%\%)*)\%m/$1$error/g;
     }
 
     $mask .= "\n" unless $mask =~ m/\n$/;

@@ -27,8 +27,8 @@ require './test.pl';
 # These are various ways of re-defining MCTest::Base::foo and checking whether the method is cached when it shouldn't be
 my @testsubs = (
     sub { is('MCTest::Derived'->foo(0), 1); },
-    sub { eval 'sub MCTest::Base::foo { return $_[1]+2 }'; is('MCTest::Derived'->foo(0), 2); },
-    sub { eval 'sub MCTest::Base::foo($) { return $_[1]+3 }'; is('MCTest::Derived'->foo(0), 3); },
+    sub { eval 'sub MCTest::Base::foo { return @_[1]+2 }'; is('MCTest::Derived'->foo(0), 2); },
+    sub { eval 'sub MCTest::Base::foo($) { return @_[1]+3 }'; is('MCTest::Derived'->foo(0), 3); },
     sub { eval 'sub MCTest::Base::foo($) { 4 }'; is('MCTest::Derived'->foo(0), 4); },
     sub { *MCTest::Base::foo = sub { @_[1]+5 }; is('MCTest::Derived'->foo(0), 5); },
     sub { local *MCTest::Base::foo = sub { @_[1]+6 }; is('MCTest::Derived'->foo(0), 6); },
@@ -43,20 +43,20 @@ my @testsubs = (
     sub { %{MCTest::Base::}{foo} = sub { @_[1]+11 }; is('MCTest::Derived'->foo(0), 11); },
 
     sub { undef *MCTest::Base::foo; eval { 'MCTest::Derived'->foo(0) }; like($@->{description}, qr/locate object method/); },
-    sub { eval 'package MCTest::Base; sub foo { $_[1]+12 }'; is('MCTest::Derived'->foo(0), 12); },
-    sub { eval 'package ZZZ; sub foo { $_[1]+13 }'; *MCTest::Base::foo = \&ZZZ::foo; is('MCTest::Derived'->foo(0), 13); },
+    sub { eval 'package MCTest::Base; sub foo { @_[1]+12 }'; is('MCTest::Derived'->foo(0), 12); },
+    sub { eval 'package ZZZ; sub foo { @_[1]+13 }'; *MCTest::Base::foo = \&ZZZ::foo; is('MCTest::Derived'->foo(0), 13); },
     sub { %{MCTest::Base::}{foo} = sub { @_[1]+14 }; is('MCTest::Derived'->foo(0), 14); },
     # 5.8.8 fails this one
     sub { undef *{MCTest::Base::}; eval { 'MCTest::Derived'->foo(0) }; like($@->{description}, qr/locate object method/); },
-    sub { eval 'package MCTest::Base; sub foo { $_[1]+15 }'; is('MCTest::Derived'->foo(0), 15); },
+    sub { eval 'package MCTest::Base; sub foo { @_[1]+15 }'; is('MCTest::Derived'->foo(0), 15); },
     sub { undef %{MCTest::Base::}; eval { 'MCTest::Derived'->foo(0) }; like($@->{description}, qr/locate object method/); },
-    sub { eval 'package MCTest::Base; sub foo { $_[1]+16 }'; is('MCTest::Derived'->foo(0), 16); },
+    sub { eval 'package MCTest::Base; sub foo { @_[1]+16 }'; is('MCTest::Derived'->foo(0), 16); },
     sub { %{MCTest::Base::} = (); eval { 'MCTest::Derived'->foo(0) }; like($@->{description}, qr/locate object method/); },
-    sub { eval 'package MCTest::Base; sub foo { $_[1]+17 }'; is('MCTest::Derived'->foo(0), 17); },
+    sub { eval 'package MCTest::Base; sub foo { @_[1]+17 }'; is('MCTest::Derived'->foo(0), 17); },
     # 5.8.8 fails this one too
     sub { *{MCTest::Base::} = *{Foo::}; eval { 'MCTest::Derived'->foo(0) }; like($@->{description}, qr/locate object method/); },
     sub { *MCTest::Derived::foo = \&MCTest::Base::foo; eval { MCTest::Derived::foo(0,0) }; ok(!$@); undef *MCTest::Derived::foo },
-    sub { eval 'package MCTest::Base; sub foo { $_[1]+18 }'; is('MCTest::Derived'->foo(0), 18); },
+    sub { eval 'package MCTest::Base; sub foo { @_[1]+18 }'; is('MCTest::Derived'->foo(0), 18); },
 );
 
 plan(tests => scalar(@testsubs));

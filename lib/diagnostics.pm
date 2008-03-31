@@ -375,7 +375,7 @@ my %msg;
 	# strip formatting directives from =item line
 	$header =~ s/[A-Z]<(.*?)>/$1/g;
 
-        my @toks = split( m/(%l?[dx]|%c|%(?:\.\d+)?s)/, $header );
+        my @toks = split( m/(\%l?[dx]|\%c|%(?:\.\d+)?s)/, $header );
 	if (@toks +> 1) {
             my $conlen = 0;
             for my $i (0..@toks-1){

@@ -25,12 +25,12 @@ else {
 }
 chomp($wd);
 
-my $has_link            = $Config{d_link};
+my $has_link            = %Config{d_link};
 my $accurate_timestamps =
     !($^O eq 'MSWin32' || $^O eq 'NetWare' ||
       $^O eq 'dos'     || $^O eq 'os2'     ||
       $^O eq 'mint'    || $^O eq 'cygwin'  ||
-      $^O eq 'amigaos' || $wd =~ m#$Config{afsroot}/# ||
+      $^O eq 'amigaos' || $wd =~ m#%Config{afsroot}/# ||
       $Is_MacOS
      );
 
@@ -49,7 +49,7 @@ my $needs_fh_reopen =
 $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 
 my $skip_mode_checks =
-    $^O eq 'cygwin' && $ENV{CYGWIN} !~ m/ntsec/;
+    $^O eq 'cygwin' && %ENV{CYGWIN} !~ m/ntsec/;
 
 plan tests => 51;
 
@@ -103,7 +103,7 @@ SKIP: {
      $blksize,$blocks) = stat('c');
 
     SKIP: {
-        skip "no nlink", 1 if $Config{dont_use_nlink};
+        skip "no nlink", 1 if %Config{dont_use_nlink};
 
         is($nlink, 3, "link count of triply-linked file");
     }
@@ -176,7 +176,7 @@ SKIP: {
 }
 
 SKIP: {
-    skip "no fchmod", 5 unless ($Config{d_fchmod} || "") eq "define";
+    skip "no fchmod", 5 unless (%Config{d_fchmod} || "") eq "define";
     ok(open(my $fh, "<", "a"), "open a");
     is(chmod(0, $fh), 1, "fchmod");
     $mode = (stat "a")[2];
@@ -193,20 +193,20 @@ SKIP: {
 }
 
 SKIP: {
-    skip "no fchown", 1 unless ($Config{d_fchown} || "") eq "define";
+    skip "no fchown", 1 unless (%Config{d_fchown} || "") eq "define";
     open(my $fh, "<", "a");
     is(chown(-1, -1, $fh), 1, "fchown");
 }
 
 SKIP: {
-    skip "has fchmod", 1 if ($Config{d_fchmod} || "") eq "define";
+    skip "has fchmod", 1 if (%Config{d_fchmod} || "") eq "define";
     open(my $fh, "<", "a");
     eval { chmod(0777, $fh); };
     like($@->{description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
 }
 
 SKIP: {
-    skip "has fchown", 1 if ($Config{d_fchown} || "") eq "define";
+    skip "has fchown", 1 if (%Config{d_fchown} || "") eq "define";
     open(my $fh, "<", "a");
     eval { chown(0, 0, $fh); };
     like($@->{description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
@@ -233,7 +233,7 @@ isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');
 
 SKIP: {
-    skip "no futimes", 4 unless ($Config{d_futimes} || "") eq "define";
+    skip "no futimes", 4 unless (%Config{d_futimes} || "") eq "define";
     open(my $fh, "<", 'b');
     $foo = (utime 500000000,500000000 + $delta, $fh);
     is($foo, 1, "futime");
@@ -296,7 +296,7 @@ sub check_utime_result {
 }
 
 SKIP: {
-    skip "has futimes", 1 if ($Config{d_futimes} || "") eq "define";
+    skip "has futimes", 1 if (%Config{d_futimes} || "") eq "define";
     open(my $fh, "<", "b") || die;
     eval { utime(undef, undef, $fh); };
     like($@->{description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
@@ -419,7 +419,7 @@ SKIP: {
 # check if rename() can be used to just change case of filename
 SKIP: {
     skip "Works in Cygwin only if check_case is set to relaxed", 1
-      if ($ENV{'CYGWIN'} && ($ENV{'CYGWIN'} =~ m/check_case:(?:adjust|strict)/));
+      if (%ENV{'CYGWIN'} && (%ENV{'CYGWIN'} =~ m/check_case:(?:adjust|strict)/));
 
     chdir './tmp';
     open(FH, ">",'x') || die "Can't create x";

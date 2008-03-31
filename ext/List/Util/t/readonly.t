@@ -6,7 +6,7 @@ BEGIN {
 	@INC = '../lib';
 	require Config; Config->import;
 	keys %Config; # Silence warning
-	if ($Config{extensions} !~ m/\bList\/Util\b/) {
+	if (%Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
 	}
@@ -39,13 +39,13 @@ ok( !readonly(*STDOUT),	'glob');
 
 sub try
 {
-    my $v = \$_[0];
+    my $v = \@_[0];
     return readonly $$v;
 }
 
 $var = 123;
 {
-    local $TODO = $Config::Config{useithreads} ? "doesn't work with threads" : undef;
+    local $TODO = %Config::Config{useithreads} ? "doesn't work with threads" : undef;
     ok( try ("abc"), 'reference a constant in a sub');
 }
 ok( !try ($var), 'reference a non-constant in a sub');

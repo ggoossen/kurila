@@ -58,8 +58,7 @@ sub import
 
 sub threads::shared::tie::SPLICE
 {
-    require Carp;
-    Carp::croak('Splice not implemented for shared arrays');
+    die('Splice not implemented for shared arrays');
 }
 
 1;

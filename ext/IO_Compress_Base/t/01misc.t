@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = ("../lib", "lib/compress");
     }
@@ -69,7 +69,7 @@ sub My::testParseParameters()
         use Config;
 
         skip 'readonly + threads', 1
-            if $Config{useithreads};
+            if %Config{useithreads};
 
         eval { ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, 0]}, Fred => 'abc') ; };
         like $@->{description}, mkErr("Parameter 'Fred' not writable"), 

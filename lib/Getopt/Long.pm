@@ -288,7 +288,7 @@ sub GetOptionsFromArray($@) {
     my ($argv, @optionlist) = @_;	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
     my %opctl = ();		# table of option specs
-    my $pkg = $caller || (caller)[[0]];	# current context
+    my $pkg = $caller || (caller)[0];	# current context
 				# Needed if linkage is omitted.
     my @ret = ();		# accum for non-options
     my %linkage;		# linkage
@@ -445,17 +445,20 @@ sub GetOptionsFromArray($@) {
 	    if ( %opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY ) {
 		print STDERR ("=> link \"$orig\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage\{\$orig\} = \\\@".$pkg."::opt_$ov;");
+		eval ("\%linkage\{\$orig\} = \\\@".$pkg."::opt_$ov;");
+                die if $@;
 	    }
 	    elsif ( %opctl{$name}[CTL_DEST] == CTL_DEST_HASH ) {
 		print STDERR ("=> link \"$orig\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage\{\$orig\} = \\\%".$pkg."::opt_$ov;");
+		eval ("\%linkage\{\$orig\} = \\\%".$pkg."::opt_$ov;");
+                die if $@;
 	    }
 	    else {
 		print STDERR ("=> link \"$orig\" to \$$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage\{\$orig\} = \\\$".$pkg."::opt_$ov;");
+		eval ("\%linkage\{\$orig\} = \\\$".$pkg."::opt_$ov;");
+                die if $@;
 	    }
 	}
     }
@@ -485,7 +488,7 @@ sub GetOptionsFromArray($@) {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
 	while ( ($k,$v) = each(%opctl) ) {
-	    print STDERR ($arrow, "\$opctl\{$k\} = $v ", OptCtl($v), "\n");
+	    print STDERR ($arrow, "\%opctl\{$k\} = {dump::view($v)} ", dump::view(OptCtl($v)), "\n");
 	    $arrow = "   ";
 	}
     }

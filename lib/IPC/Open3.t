@@ -5,15 +5,15 @@ BEGIN {
     @INC = '../lib';
     our %Config;
     require Config; Config->import;
-    if (!$Config{'d_fork'}
+    if (!%Config{'d_fork'}
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
-       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || $Config{'cc'} =~ m/^bcc/i))
+       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || %Config{'cc'} =~ m/^bcc/i))
     {
 	print "1..0\n";
 	exit 0;
     }
     # make warnings fatal
-    $SIG{__WARN__} = sub { die @_ };
+    ${^WARN_HOOK} = sub { die @_ };
 }
 
 use strict;
@@ -41,7 +41,7 @@ sub cmd_line {
 		return qq/"$cmd"/;
 	}
 	else {
-		return $_[0];
+		return @_[0];
 	}
 }
 
@@ -138,7 +138,7 @@ waitpid $pid, 0;
 # command line in single parameter variant of open3
 # for understanding of Config{'sh'} test see exec description in camel book
 my $cmd = 'print(scalar(~< *STDIN))';
-$cmd = $Config{'sh'} =~ m/sh/ ? "'$cmd'" : cmd_line($cmd);
+$cmd = %Config{'sh'} =~ m/sh/ ? "'$cmd'" : cmd_line($cmd);
 eval{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($@) {
 	print "error $@\n";

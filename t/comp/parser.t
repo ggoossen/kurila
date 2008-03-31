@@ -323,7 +323,7 @@ EOSTANZA
 
 {
     my @x = 'string';
-    is(eval q{ "$x[0]->strung" }, 'string->strung',
+    is(eval q{ "@x[0]->strung" }, 'string->strung',
 	'literal -> after an array subscript within ""');
     @x = ['string'];
     # this used to give "string"

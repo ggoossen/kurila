@@ -4,7 +4,7 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
 	require Config;
-	if (($Config::Config{'extensions'} !~ m/\bre\b/) ){
+	if ((%Config::Config{'extensions'} !~ m/\bre\b/) ){
         	print "1..0 # Skip -- Perl configured without re module\n";
 		exit 0;
 	}
@@ -16,30 +16,30 @@ use Test::More tests => 13;
 require_ok( 're' );
 
 # setcolor
-$INC{ 'Term/Cap.pm' } = 1;
-local $ENV{PERL_RE_TC};
+%INC{ 'Term/Cap.pm' } = 1;
+local %ENV{PERL_RE_TC};
 re::setcolor();
-is( $ENV{PERL_RE_COLORS}, "md\tme\tso\tse\tus\tue", 
+is( %ENV{PERL_RE_COLORS}, "md\tme\tso\tse\tus\tue", 
 	'setcolor() should provide default colors' );
-$ENV{PERL_RE_TC} = 'su,n,ny';
+%ENV{PERL_RE_TC} = 'su,n,ny';
 re::setcolor();
-is( $ENV{PERL_RE_COLORS}, "su\tn\tny", '... or use $ENV{PERL_RE_COLORS}' );
+is( %ENV{PERL_RE_COLORS}, "su\tn\tny", '... or use %ENV{PERL_RE_COLORS}' );
 
 # bits
 # get on
 my $warn;
 local ${^WARN_HOOK} = sub {
-	$warn = $_[0]->{description};
+	$warn = @_[0]->{description};
 };
 #eval { re::bits(1) };
 #like( $warn, qr/Useless use/, 'bits() should warn with no args' );
 
-delete $ENV{PERL_RE_COLORS};
+delete %ENV{PERL_RE_COLORS};
 re::bits(0, 'debug');
-is( $ENV{PERL_RE_COLORS}, undef,
+is( %ENV{PERL_RE_COLORS}, undef,
 	"... should not set regex colors given 'debug'" );
 re::bits(0, 'debugcolor');
-isnt( $ENV{PERL_RE_COLORS}, '', 
+isnt( %ENV{PERL_RE_COLORS}, '', 
 	"... should set regex colors given 'debugcolor'" );
 re::bits(0, 'nosuchsubpragma');
 like( $warn, qr/Unknown "re" subpragma/, 
@@ -68,9 +68,9 @@ ok( $ok, 'No segv!' );
 package Term::Cap;
 
 sub Tgetent {
-	bless({}, $_[0]);
+	bless({}, @_[0]);
 }
 
 sub Tputs {
-	return $_[1];
+	return @_[1];
 }

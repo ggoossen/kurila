@@ -21,7 +21,7 @@ my $tcount = 0;
 
 sub ok {
   $tcount++;
-  my $not = $_[0] ? '' : 'not ';
+  my $not = @_[0] ? '' : 'not ';
   print "${not}ok $tcount\n";
 }
 

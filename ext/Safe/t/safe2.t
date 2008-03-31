@@ -74,15 +74,15 @@ $cpt->reval(q{
     sub other_sayok { print "ok @_\n" }
     package main;
     print $foo ? $foo : "not ok 8\n";
-    print $bar{key} ? $bar{key} : "not ok 9\n";
+    print %bar{key} ? %bar{key} : "not ok 9\n";
     (@baz) ? print "@baz\n" : print "not ok 10\n";
     print $glob;
     other::other_sayok(12);
     $foo =~ s/8/14/;
-    $bar{new} = "ok 15\n";
+    %bar{new} = "ok 15\n";
     @glob = qw(ok 16);
 });
-print $@ ? "not ok 13\n#$@" : "ok 13\n";
+print $@ ? "not ok 13\n#{$@->message}" : "ok 13\n";
 $" = ' ';
 print $foo, %bar{new}, "@glob\n";
 

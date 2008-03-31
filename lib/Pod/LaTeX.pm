@@ -1610,7 +1610,7 @@ sub _replace_special_chars {
 
   # Must be done after escape of \ since this command adds latex escapes
   # Replace characters that can be escaped
-  $paragraph =~ s/([\$\#&%_{}])/\\$1/g;
+  $paragraph =~ s/([\$\#&\%_\{\}])/\\$1/g;
 
   # Replace ^ characters with \^{} so that $^F works okay
   $paragraph =~ s/(\^)/\\$1\{\}/g;

@@ -10,15 +10,15 @@ use strict;
 use Config;
 
 BEGIN {
-    if (!$Config{useithreads}) {
+    if (!%Config{useithreads}) {
 	print "1..0 # Skip: no ithreads\n";
 	exit;
     }
-    if (!$Config{d_getppid}) {
+    if (!%Config{d_getppid}) {
 	print "1..0 # Skip: no getppid\n";
 	exit;
     }
-    if ($ENV{PERL_CORE_MINITEST}) {
+    if (%ENV{PERL_CORE_MINITEST}) {
         print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
         exit 0;
     }

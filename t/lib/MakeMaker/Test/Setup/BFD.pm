@@ -30,7 +30,7 @@ END
 use ExtUtils::MakeMaker;
 
 # This will interfere with the PREREQ_PRINT tests.
-printf "Current package is: %s\n", __PACKAGE__ unless "@ARGV" =~ m/PREREQ/;
+printf "Current package is: \%s\n", __PACKAGE__ unless "@ARGV" =~ m/PREREQ/;
 
 WriteMakefile(
     NAME          => 'Big::Dummy',

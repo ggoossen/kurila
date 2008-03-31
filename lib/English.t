@@ -18,7 +18,7 @@ $_ = 1;
 is( $ARG, $_, '$ARG' );
 
 sub foo {
-	is($ARG[0], $_[0], '@ARG' );
+	is(@ARG[0], @_[0], '@ARG' );
 }
 foo(1);
 
@@ -61,8 +61,8 @@ undef $OUTPUT_FIELD_SEPARATOR;
 if ($threads) { $" = "\n" } else { $LIST_SEPARATOR = "\n" };
 @foo = (8, 9);
 @foo = split(m/\n/, "@foo");
-is( $foo[0], 8, '$"' );
-is( $foo[1], 9, '$LIST_SEPARATOR' );
+is( @foo[0], 8, '$"' );
+is( @foo[1], 9, '$LIST_SEPARATOR' );
 
 undef $OUTPUT_RECORD_SEPARATOR;
 
@@ -82,7 +82,7 @@ is( $DEBUGGING, $^D, '$DEBUGGING' );
 
 is( $WARNING, 0, '$WARNING' );
 like( $EXECUTABLE_NAME, qr/perl/i, '$EXECUTABLE_NAME' );
-is( $OSNAME, $Config{osname}, '$OSNAME' );
+is( $OSNAME, %Config{osname}, '$OSNAME' );
 
 # may be non-portable
 ok( $SYSTEM_FD_MAX +>= 2, '$SYSTEM_FD_MAX should be at least 2' );
@@ -93,8 +93,8 @@ is( $INPLACE_EDIT, '.inplace', '$INPLACE_EDIT' );
 is( $LAST_PAREN_MATCH, 'cc', '$LAST_PARENT_MATCH' );
 is( $LAST_REGEXP_CODE_RESULT, 9, '$LAST_REGEXP_CODE_RESULT' );
 
-is( $LAST_MATCH_START[1], 0, '@LAST_MATCH_START' );
-is( $LAST_MATCH_END[1], 2, '@LAST_MATCH_END' );
+is( @LAST_MATCH_START[1], 0, '@LAST_MATCH_START' );
+is( @LAST_MATCH_END[1], 2, '@LAST_MATCH_END' );
 
 ok( !$PERLDB, '$PERLDB should be false' );
 
@@ -108,20 +108,20 @@ is( $INPUT_LINE_NUMBER, 2, '$INPUT_LINE_NUMBER' );
 
 my %hash;
 $SUBSCRIPT_SEPARATOR = '|';
-$hash{'d','e','f'} = 1;
+%hash{'d','e','f'} = 1;
 $SUBSEP = ',';
-$hash{'a', 'b', 'c'} = 1;
+%hash{'a', 'b', 'c'} = 1;
 my @keys = sort keys %hash;
 
-is( $keys[0], 'a,b,c', '$SUBSCRIPT_SEPARATOR' );
-is( $keys[1], 'd|e|f', '$SUBSCRIPT_SEPARATOR' );
+is( @keys[0], 'a,b,c', '$SUBSCRIPT_SEPARATOR' );
+is( @keys[1], 'd|e|f', '$SUBSCRIPT_SEPARATOR' );
 
 eval { is( $EXCEPTIONS_BEING_CAUGHT, 1, '$EXCEPTIONS_BEING_CAUGHT' ) };
 ok( !$EXCEPTIONS_BEING_CAUGHT, '$EXCEPTIONS_BEING_CAUGHT should be false' );
 
 eval { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, "<", $f); };
 is( $OS_ERROR, $ERRNO, '$OS_ERROR' );
-ok( $OS_ERROR{ENOENT}, '%OS_ERROR (ENOENT should be set)' );
+ok( %OS_ERROR{ENOENT}, '%OS_ERROR (ENOENT should be set)' );
 
 package B;
 

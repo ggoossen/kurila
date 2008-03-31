@@ -577,7 +577,7 @@ EONT_EONT
 # chunk: # using a prototype allows you to use any comparison subroutine
 # as a sort subroutine (including other package's subroutines)
 package other;
-sub backwards ($$) { $_[1] cmp $_[0]; }     # $a and $b are not set here
+sub backwards ($$) { @_[1] cmp @_[0]; }     # $a and $b are not set here
 package main;
 @new = sort other::backwards @old;
 
@@ -585,7 +585,7 @@ package main;
 
 checkOptree(name   => q{sort other::sub LIST },
 	    bcopts => q{-exec},
-	    code   => q{package other; sub backwards ($$) { $_[1] cmp $_[0]; }
+	    code   => q{package other; sub backwards ($$) { @_[1] cmp @_[0]; }
 			package main; @new = sort other::backwards @old; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 614 (eval 36):2) v:{
@@ -619,14 +619,14 @@ EONT_EONT
 =for gentest
 
 # chunk: # repeat, condensed. $main::a and $b are unaffected
-sub other::backwards ($$) { $_[1] cmp $_[0]; }
+sub other::backwards ($$) { @_[1] cmp @_[0]; }
 @new = sort other::backwards @old;
 
 =cut
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{sub other::backwards ($$) { $_[1] cmp $_[0]; } @new = sort other::backwards @old; },
+	    code   => q{sub other::backwards ($$) { @_[1] cmp @_[0]; } @new = sort other::backwards @old; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 619 (eval 38):1) v
 # 2  <0> pushmark s

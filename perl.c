@@ -1927,11 +1927,11 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
-			     "@env = map { \"$_=\\\"$ENV{$_}\\\"\" } "
+			     "@env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
 			     "sort grep {m/^PERL/} keys %ENV; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
-			     "push @env, \"CYGWIN=\\\"$ENV{CYGWIN}\\\"\";");
+			     "push @env, \"CYGWIN=\\\"%ENV{CYGWIN}\\\"\";");
 #endif
 		    sv_catpvs(opts_prog, 
 			     "print \"  \\%ENV:\\n    @env\\n\" if @env;"

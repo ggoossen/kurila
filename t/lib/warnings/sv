@@ -52,11 +52,11 @@ __END__
 # sv.c
 use integer ;
 use warnings 'uninitialized' ;
-$x = 1 + $a[0] ; # a
+$x = 1 + @a[0] ; # a
 no warnings 'uninitialized' ;
-$x = 1 + $b[0] ; # a
+$x = 1 + @b[0] ; # a
 EXPECT
-Use of uninitialized value $a[0] in integer addition (+) at - line 4.
+Use of uninitialized value @a[0] in integer addition (+) at - line 4.
 ########
 # sv.c (sv_2iv)
 package fred ;
@@ -101,30 +101,30 @@ Use of uninitialized value $A in bitwise or (^|^) at - line 10.
 # sv.c
 use warnings 'uninitialized' ;
 my $Y = 1 ; 
-my $x = 1 ^|^ $a[$Y] ;
+my $x = 1 ^|^ @a[$Y] ;
 no warnings 'uninitialized' ;
 my $Y = 1 ; 
-$x = 1 ^|^ $b[$Y] ;
+$x = 1 ^|^ @b[$Y] ;
 EXPECT
 Use of uninitialized value within @a in bitwise or (^|^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
 my $Y = 1 ; 
-my $x = 1 ^&^ $a[$Y] ;
+my $x = 1 ^&^ @a[$Y] ;
 no warnings 'uninitialized' ;
 my $Y = 1 ; 
-$x = 1 ^&^ $b[$Y] ;
+$x = 1 ^&^ @b[$Y] ;
 EXPECT
 Use of uninitialized value within @a in bitwise and (^&^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
 my $Y = 1 ; 
-my $x = ^~^$a[$Y] ;
+my $x = ^~^@a[$Y] ;
 no warnings 'uninitialized' ;
 my $Y = 1 ; 
-$x = ^~^$b[$Y] ;
+$x = ^~^@b[$Y] ;
 EXPECT
 Use of uninitialized value within @a in 1's complement (^~^) at - line 4.
 ########
@@ -138,11 +138,11 @@ Use of uninitialized value $x in multiplication (*) at - line 3.
 ########
 # sv.c
 use warnings 'uninitialized' ;
-$x = 1 + $a[0] ; # e
+$x = 1 + @a[0] ; # e
 no warnings 'uninitialized' ;
-$x = 1 + $b[0] ; # e
+$x = 1 + @b[0] ; # e
 EXPECT
-Use of uninitialized value $a[0] in addition (+) at - line 3.
+Use of uninitialized value @a[0] in addition (+) at - line 3.
 ########
 # sv.c (sv_2nv)
 package fred ;
@@ -285,19 +285,19 @@ Subroutine main::fred redefined at - line 5.
 # sv.c
 use warnings 'printf' ;
 open F, ">", ($^O eq 'VMS'? 'NL:' : '/dev/null') ;
-printf F "%z\n" ;
-my $a = sprintf "%z" ;
-printf F "%" ;
-$a = sprintf "%" ;
-printf F "%\x{02}" ;
-$a = sprintf "%\x{02}" ;
+printf F "\%z\n" ;
+my $a = sprintf "\%z" ;
+printf F "\%" ;
+$a = sprintf "\%" ;
+printf F "\%\x{02}" ;
+$a = sprintf "\%\x{02}" ;
 no warnings 'printf' ;
-printf F "%z\n" ;
-$a = sprintf "%z" ;
-printf F "%" ;
-$a = sprintf "%" ;
-printf F "%\x{02}" ;
-$a = sprintf "%\x{02}" ;
+printf F "\%z\n" ;
+$a = sprintf "\%z" ;
+printf F "\%" ;
+$a = sprintf "\%" ;
+printf F "\%\x{02}" ;
+$a = sprintf "\%\x{02}" ;
 EXPECT
 Invalid conversion in printf: "%z" at - line 4.
 Invalid conversion in sprintf: "%z" at - line 5.

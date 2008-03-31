@@ -35,19 +35,19 @@ print "${e}ok 5\n";
 # this is inside eval() to avoid creation of symbol table entries and
 # to avoid "used once" warnings
 eval <<'EOE';
-$e = ! $main::{p} && 'not ';
+$e = ! %main::{p} && 'not ';
 print "${e}ok 6\n";
 $e = ! *q{ARRAY} && 'not ';
 print "${e}ok 7\n";
 $e = ! *r{HASH} && 'not ';
 print "${e}ok 8\n";
-$e = ! $main::{s} && 'not ';
+$e = ! %main::{s} && 'not ';
 print "${e}ok 9\n";
 $e = ! *t{CODE} && 'not ';
 print "${e}ok 10\n";
-$e = defined $X::{q} && 'not ';
+$e = defined %X::{q} && 'not ';
 print "${e}ok 11\n";
-$e = ! $X::{p} && 'not ';
+$e = ! %X::{p} && 'not ';
 print "${e}ok 12\n";
 EOE
 $e = $@ && 'not ';
@@ -86,7 +86,7 @@ print "${e}ok 21\n";
 
 use strict 'vars';
 eval 'use vars qw(@y%%)';
-$e = $@->{description} !~ m/^'\@y%%' is not a valid variable name under strict vars/ && 'not ';
+$e = $@->{description} !~ m/^'\@y\%\%' is not a valid variable name under strict vars/ && 'not ';
 print "${e}ok 22\n";
 $e = *{Symbol::fetch_glob('y%%')}{ARRAY} && 'not ';
 print "${e}ok 23\n";

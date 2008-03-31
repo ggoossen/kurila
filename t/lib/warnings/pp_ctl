@@ -276,7 +276,7 @@ EXPECT
 # pp_ctl.c
 use warnings 'misc' ;
 package Foo;
-DESTROY { die "@{$_[0]} foo bar" }
+DESTROY { die "@{@_[0]} foo bar" }
 { bless ['A'], 'Foo' for 1..10 }
 { bless ['B'], 'Foo' for 1..10 }
 EXPECT
@@ -344,7 +344,7 @@ B foo bar at - line 4.
 # pp_ctl.c
 no warnings 'misc' ;
 package Foo;
-DESTROY { die "@{$_[0]} foo bar" }
+DESTROY { die "@{@_[0]} foo bar" }
 { bless ['A'], 'Foo' for 1..10 }
 { bless ['B'], 'Foo' for 1..10 }
 EXPECT

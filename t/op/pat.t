@@ -3380,9 +3380,9 @@ SKIP:{
 	my ($r1, $c1, $r2, $c2) = eval qq{
 	    use utf8;
 	    scalar("..foo foo.." =~ m/(?'${uni}'foo) \\k'${uni}'/),
-		\$+\{${uni}\},
+		\%+\{${uni}\},
 	    scalar("..bar bar.." =~ m/(?<${uni}>bar) \\k<${uni}>/),
-		\$+\{${uni}\};
+		\%+\{${uni}\};
 	};
 	ok($r1,                         "Named capture UTF (?'')");
 	ok(defined $c1 && $c1 eq 'foo', "Named capture UTF \%+");
@@ -3444,9 +3444,9 @@ sub iseq($$;$) {
     iseq("@k","A B C", "Got expected keys");
     iseq("@v","bar baz foo", "Got expected values");
     eval'
-        print for $+{this_key_doesnt_exist};
+        print for %+{this_key_doesnt_exist};
     ';
-    ok(!$@,'lvalue $+{...} should not throw an exception');
+    ok(!$@,'lvalue %+{...} should not throw an exception');
 }
 {
     #
@@ -3455,7 +3455,7 @@ sub iseq($$;$) {
     my $s = 'foo bar baz';
     my (@k,@v,@fetch,$res);
     my $count = 0;
-    my @names = qw($+{A} $+{B} $+{C} $+{D});
+    my @names = qw(%+{A} %+{B} %+{C} %+{D});
     if ($s =~ m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/) {
 	while (my ($k,$v) = each(%+)) {
 	    $count++;
@@ -3483,9 +3483,9 @@ sub iseq($$;$) {
     iseq("@k","A B C D", "Got expected keys -- bug 50496");
     iseq("@v","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
     eval'
-	print for $+{this_key_doesnt_exist};
+	print for %+{this_key_doesnt_exist};
     ';
-    ok(!$@,'lvalue $+{...} should not throw an exception');
+    ok(!$@,'lvalue %+{...} should not throw an exception');
 }
 {
     my $s='foo bar baz';
@@ -3501,9 +3501,9 @@ sub iseq($$;$) {
     my @expect=qw(A:0:1 A:1:3 B:0:2 B:1:4);
     iseq("@res","@expect","Check \%-");
     eval'
-        print for $-{this_key_doesnt_exist};
+        print for %-{this_key_doesnt_exist};
     ';
-    ok(!$@,'lvalue $-{...} should not throw an exception');
+    ok(!$@,'lvalue %-{...} should not throw an exception');
 }
 # stress test CURLYX/WHILEM.
 #

@@ -805,10 +805,52 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($3,$$,'[');
 			  TOKEN_GETMAD($5,$$,']');
 			}
+	|	term ARROW HSLICE expr ']' ';' '}'    /* someref->{[bar();]} */
+			{ $$ = prepend_elem(OP_HSLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_HSLICE, 0,
+					list($4),
+					ref(newHVREF($1), OP_HSLICE)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'a');
+			  TOKEN_GETMAD($3,$$,'{');
+			  TOKEN_GETMAD($5,$$,';');
+			  TOKEN_GETMAD($6,$$,'}');
+			}
+	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
+			{ $$ = prepend_elem(OP_ASLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_ASLICE, 0,
+					list($4),
+					ref(newAVREF($1), OP_ASLICE)));
+			  TOKEN_GETMAD($2,$$,'a');
+			  TOKEN_GETMAD($3,$$,'[');
+			  TOKEN_GETMAD($5,$$,']');
+			}
 	|	subscripted '[' expr ']'    /* $foo->[$bar]->[$baz] */
 			{ $$ = newBINOP(OP_AELEM, 0,
 					ref(newAVREF($1),OP_RV2AV),
 					scalar($3));
+			  TOKEN_GETMAD($2,$$,'[');
+			  TOKEN_GETMAD($4,$$,']');
+			}
+	|	subscripted HSLICE expr ']' ';' '}'    /* $foo->{[bar();]} */
+			{ $$ = prepend_elem(OP_HSLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_HSLICE, 0,
+					list($3),
+					ref(newHVREF($1), OP_HSLICE)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'{');
+			  TOKEN_GETMAD($4,$$,';');
+			  TOKEN_GETMAD($5,$$,'}');
+			}
+	|	subscripted ASLICE expr ']' ']'                     /* $foo->[[...]] */
+			{ $$ = prepend_elem(OP_ASLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_ASLICE, 0,
+					list($3),
+					ref(newAVREF($1), OP_ASLICE)));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
 			}

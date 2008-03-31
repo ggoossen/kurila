@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config;
-    if (($Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
+    if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
 	print "1..0 # Skip -- Perl configured without List::Util module\n";
 	exit 0;
     }
@@ -13,33 +13,33 @@ BEGIN {
 package Oscalar;
 use overload ( 
 				# Anonymous subroutines:
-'+'	=>	sub { Oscalar->new( $ {$_[0]}+$_[1])},
+'+'	=>	sub { Oscalar->new( $ {@_[0]}+@_[1])},
 '-'	=>	sub { Oscalar->new(
-		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
+		       @_[2]? @_[1]-${@_[0]} : ${@_[0]}-@_[1])},
 '<+>'	=>	sub { Oscalar->new(
-		       $_[2]? $_[1]-${$_[0]} : ${$_[0]}-$_[1])},
+		       @_[2]? @_[1]-${@_[0]} : ${@_[0]}-@_[1])},
 'cmp'	=>	sub { Oscalar->new(
-		       $_[2]? ($_[1] cmp ${$_[0]}) : (${$_[0]} cmp $_[1]))},
-'*'	=>	sub { Oscalar->new( ${$_[0]}*$_[1])},
+		       @_[2]? (@_[1] cmp ${@_[0]}) : (${@_[0]} cmp @_[1]))},
+'*'	=>	sub { Oscalar->new( ${@_[0]}*@_[1])},
 '/'	=>	sub { Oscalar->new( 
-		       $_[2]? $_[1]/${$_[0]} :
-			 ${$_[0]}/$_[1])},
+		       @_[2]? @_[1]/${@_[0]} :
+			 ${@_[0]}/@_[1])},
 '%'	=>	sub { Oscalar->new(
-		       $_[2]? $_[1]%${$_[0]} : ${$_[0]}%$_[1])},
+		       @_[2]? @_[1]%${@_[0]} : ${@_[0]}%@_[1])},
 '**'	=>	sub { Oscalar->new(
-		       $_[2]? $_[1]**${$_[0]} : ${$_[0]}-$_[1])},
+		       @_[2]? @_[1]**${@_[0]} : ${@_[0]}-@_[1])},
 
 '""'	=> \&stringify,
 '0+'	=> \&numify,			# Order of arguments insignificant
 );
 
 sub new {
-  my $foo = $_[1];
-  bless \$foo, $_[0];
+  my $foo = @_[1];
+  bless \$foo, @_[0];
 }
 
-sub stringify { "${$_[0]}" }
-sub numify { 0 + "${$_[0]}" }	# Not needed, additional overhead
+sub stringify { "${@_[0]}" }
+sub numify { 0 + "${@_[0]}" }	# Not needed, additional overhead
 				# comparing to direct compilation based on
 				# stringify
 
@@ -91,7 +91,7 @@ is($a, "087");
 is($b, "88");
 is(ref $a, "Oscalar");
 
-eval q[ package Oscalar; use overload ('++' => sub { $ {$_[0]}++;$_[0] } ) ];
+eval q[ package Oscalar; use overload ('++' => sub { $ {@_[0]}++;@_[0] } ) ];
 
 $b=$a;
 
@@ -118,7 +118,7 @@ is(ref $a, "Oscalar");
 
 undef $b;			# Destroying updates tables too...
 
-eval q[package Oscalar; use overload ('++' => sub { $ {$_[0]} += 2; $_[0] } ) ];
+eval q[package Oscalar; use overload ('++' => sub { $ {@_[0]} += 2; @_[0] } ) ];
 
 $b=$a;
 
@@ -155,7 +155,7 @@ ok($b? 1:0);
 
 eval q[ package Oscalar; use overload ('=' => sub {$main::copies++; 
 						   package Oscalar;
-						   local $new=$ {$_[0]};
+						   local $new=$ {@_[0]};
 						   bless \$new } ) ];
 
 $b= Oscalar->new( "$a");
@@ -199,8 +199,8 @@ is($b, "89");
 is(ref $a, "Oscalar");
 is($copies, 1);
 
-eval q[package Oscalar; use overload ('+=' => sub {$ {$_[0]} += 3*$_[1];
-						   $_[0] } ) ];
+eval q[package Oscalar; use overload ('+=' => sub {$ {@_[0]} += 3*@_[1];
+						   @_[0] } ) ];
 $c= Oscalar->new();			# Cause rehash
 
 $b=$a;
@@ -236,17 +236,17 @@ is($b, "360");
 is($copies, 2);
 
 eval q[package Oscalar; 
-       use overload ('x' => sub {Oscalar->new( $_[2] ? "_.$_[1]._" x $ {$_[0]}
-					      : "_.${$_[0]}._" x $_[1])}) ];
+       use overload ('x' => sub {Oscalar->new( @_[2] ? "_.@_[1]._" x $ {@_[0]}
+					      : "_.${@_[0]}._" x @_[1])}) ];
 
 $a= Oscalar->new( "yy");
 $a x= 3;
 is($a, "_.yy.__.yy.__.yy._");
 
 eval q[package Oscalar; 
-       use overload ('.' => sub {Oscalar->new( $_[2] ? 
-					      "_.$_[1].__.$ {$_[0]}._"
-					      : "_.$ {$_[0]}.__.$_[1]._")}) ];
+       use overload ('.' => sub {Oscalar->new( @_[2] ? 
+					      "_.@_[1].__.$ {@_[0]}._"
+					      : "_.$ {@_[0]}.__.@_[1]._")}) ];
 
 $a= Oscalar->new( "xx");
 
@@ -324,8 +324,8 @@ $foo = 'foo';
 $foo1 = q|f'o\\o|;
 {
   BEGIN { $q = $qr = 7; 
-	  overload::constant 'q' => sub {$q++; push @q, shift, ($_[1] || 'none'); shift},
-			     'qr' => sub {$qr++; push @qr, shift, ($_[1] || 'none'); shift}; }
+	  overload::constant 'q' => sub {$q++; push @q, shift, (@_[1] || 'none'); shift},
+			     'qr' => sub {$qr++; push @qr, shift, (@_[1] || 'none'); shift}; }
   $out = 'foo';
   $out1 = q|f'o\\o|;
   $out2 = "a\a$foo,\,";
@@ -344,8 +344,8 @@ is($qr, 9);
 
 {
   $_ = '!<b>!foo!<-.>!';
-  BEGIN { overload::constant 'q' => sub {push @q1, shift, ($_[1] || 'none'); "_<" . (shift) . ">_"},
-			     'qr' => sub {push @qr1, shift, ($_[1] || 'none'); "!<" . (shift) . ">!"}; }
+  BEGIN { overload::constant 'q' => sub {push @q1, shift, (@_[1] || 'none'); "_<" . (shift) . ">_"},
+			     'qr' => sub {push @qr1, shift, (@_[1] || 'none'); "!<" . (shift) . ">!"}; }
   $out = 'foo';
   $out1 = q|f'o\\o|;
   $out2 = "a\a$foo,\,";
@@ -381,8 +381,8 @@ is($b, "_<oups1
     my $self = shift;
     bless [@$self], ref $self;
   }
-  sub inc { $_[0] = bless ['++', $_[0], 1]; }
-  sub dec { $_[0] = bless ['--', $_[0], 1]; }
+  sub inc { @_[0] = bless ['++', @_[0], 1]; }
+  sub dec { @_[0] = bless ['--', @_[0], 1]; }
   sub wrap {
     my ($obj, $other, $inv, $meth) = @_;
     if ($meth eq '++' or $meth eq '--') {
@@ -401,23 +401,23 @@ is($b, "_<oups1
       "[$meth $a]";
     }
   } 
-  my %subr = ( 'n' => sub {$_[0]} );
-  foreach my $op (split " ", $overload::ops{with_assign}) {
-    $subr{$op} = $subr{"$op="} = eval "sub \{shift() $op shift()\}";
+  my %subr = ( 'n' => sub {@_[0]} );
+  foreach my $op (split " ", %overload::ops{with_assign}) {
+    %subr{$op} = %subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
   my @bins = qw(binary 3way_comparison num_comparison str_comparison);
-  foreach my $op (split " ", "@overload::ops{ @bins }") {
-    $subr{$op} = eval "sub \{shift() $op shift()\}";
+  foreach my $op (split " ", "%overload::ops{[ @bins ]}") {
+    %subr{$op} = eval "sub \{shift() $op shift()\}";
   }
-  foreach my $op (split " ", "@overload::ops{qw(unary func)}") {
-    $subr{$op} = eval "sub \{$op shift()\}";
+  foreach my $op (split " ", "%overload::ops{[qw(unary func)]}") {
+    %subr{$op} = eval "sub \{$op shift()\}";
   }
-  $subr{'++'} = $subr{'+'};
-  $subr{'--'} = $subr{'-'};
+  %subr{'++'} = %subr{'+'};
+  %subr{'--'} = %subr{'-'};
   
   sub num {
     my ($meth, $a, $b) = @{+shift};
-    my $subr = $subr{$meth} 
+    my $subr = %subr{$meth} 
       or die "Do not know how to ($meth) in symbolic";
     $a = $a->num if ref $a eq __PACKAGE__;
     $b = $b->num if ref $b eq __PACKAGE__;
@@ -437,23 +437,23 @@ is($b, "_<oups1
 {
   my $foo = symbolic->new( 11);
   my $baz = $foo++;
-  is((sprintf "%d", $foo), '12');
-  is((sprintf "%d", $baz), '11');
+  is((sprintf '%d', $foo), '12');
+  is((sprintf '%d', $baz), '11');
   my $bar = $foo;
   $baz = ++$foo;
-  is((sprintf "%d", $foo), '13');
-  is((sprintf "%d", $bar), '12');
-  is((sprintf "%d", $baz), '13');
+  is((sprintf '%d', $foo), '13');
+  is((sprintf '%d', $bar), '12');
+  is((sprintf '%d', $baz), '13');
   my $ban = $foo;
   $baz = ($foo += 1);
-  is((sprintf "%d", $foo), '14');
-  is((sprintf "%d", $bar), '12');
-  is((sprintf "%d", $baz), '14');
-  is((sprintf "%d", $ban), '13');
+  is((sprintf '%d', $foo), '14');
+  is((sprintf '%d', $bar), '12');
+  is((sprintf '%d', $baz), '14');
+  is((sprintf '%d', $ban), '13');
   $baz = 0;
   $baz = $foo++;
-  is((sprintf "%d", $foo), '15');
-  is((sprintf "%d", $baz), '14');
+  is((sprintf '%d', $foo), '15');
+  is((sprintf '%d', $baz), '14');
   is("$foo", '[++ [+= [++ [++ [n 11] 1] 1] 1] 1]');
 }
 
@@ -468,7 +468,7 @@ is($b, "_<oups1
   }
   my $pi = $side*(2**($iter+2));
   is("$side", '[/ [- [sqrt [+ 1 [** [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]] 2]]] 1] [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]]]');
-  is((sprintf "%f", $pi), '3.182598');
+  is((sprintf '%f', $pi), '3.182598');
 }
 
 {
@@ -481,7 +481,7 @@ is($b, "_<oups1
   }
   my $pi = $side*(2**($iter+2));
   is("$side", '[/ [- [sqrt [+ 1 [** [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]] 2]]] 1] [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]]]');
-  is((sprintf "%f", $pi), '3.182598');
+  is((sprintf '%f', $pi), '3.182598');
 }
 
 {
@@ -489,9 +489,9 @@ is($b, "_<oups1
   symbolic->vars($a, $b);
   my $c = sqrt($a**2 + $b**2);
   $a = 3; $b = 4;
-  is((sprintf "%d", $c), '5');
+  is((sprintf '%d', $c), '5');
   $a = 12; $b = 5;
-  is((sprintf "%d", $c), '13');
+  is((sprintf '%d', $c), '13');
 }
 
 {
@@ -522,23 +522,23 @@ is($b, "_<oups1
       "[$meth $a]";
     }
   } 
-  my %subr = ( 'n' => sub {$_[0]} );
-  foreach my $op (split " ", $overload::ops{with_assign}) {
-    $subr{$op} = $subr{"$op="} = eval "sub \{shift() $op shift()\}";
+  my %subr = ( 'n' => sub {@_[0]} );
+  foreach my $op (split " ", %overload::ops{with_assign}) {
+    %subr{$op} = %subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
   my @bins = qw(binary 3way_comparison num_comparison str_comparison);
-  foreach my $op (split " ", "@overload::ops{ @bins }") {
-    $subr{$op} = eval "sub \{shift() $op shift()\}";
+  foreach my $op (split " ", "%overload::ops{[ @bins ]}") {
+    %subr{$op} = eval "sub \{shift() $op shift()\}";
   }
-  foreach my $op (split " ", "@overload::ops{qw(unary func)}") {
-    $subr{$op} = eval "sub \{$op shift()\}";
+  foreach my $op (split " ", "%overload::ops{[qw(unary func)]}") {
+    %subr{$op} = eval "sub \{$op shift()\}";
   }
-  $subr{'++'} = $subr{'+'};
-  $subr{'--'} = $subr{'-'};
+  %subr{'++'} = %subr{'+'};
+  %subr{'--'} = %subr{'-'};
   
   sub num {
     my ($meth, $a, $b) = @{+shift};
-    my $subr = $subr{$meth} 
+    my $subr = %subr{$meth} 
       or die "Do not know how to ($meth) in symbolic";
     $a = $a->num if ref $a eq __PACKAGE__;
     $b = $b->num if ref $b eq __PACKAGE__;
@@ -558,23 +558,23 @@ is($b, "_<oups1
 {
   my $foo = symbolic1->new( 11);
   my $baz = $foo++;
-  is((sprintf "%d", $foo), '12');
-  is((sprintf "%d", $baz), '11');
+  is((sprintf '%d', $foo), '12');
+  is((sprintf '%d', $baz), '11');
   my $bar = $foo;
   $baz = ++$foo;
-  is((sprintf "%d", $foo), '13');
-  is((sprintf "%d", $bar), '12');
-  is((sprintf "%d", $baz), '13');
+  is((sprintf '%d', $foo), '13');
+  is((sprintf '%d', $bar), '12');
+  is((sprintf '%d', $baz), '13');
   my $ban = $foo;
   $baz = ($foo += 1);
-  is((sprintf "%d", $foo), '14');
-  is((sprintf "%d", $bar), '12');
-  is((sprintf "%d", $baz), '14');
-  is((sprintf "%d", $ban), '13');
+  is((sprintf '%d', $foo), '14');
+  is((sprintf '%d', $bar), '12');
+  is((sprintf '%d', $baz), '14');
+  is((sprintf '%d', $ban), '13');
   $baz = 0;
   $baz = $foo++;
-  is((sprintf "%d", $foo), '15');
-  is((sprintf "%d", $baz), '14');
+  is((sprintf '%d', $foo), '15');
+  is((sprintf '%d', $baz), '14');
   is("$foo", '[++ [+= [++ [++ [n 11] 1] 1] 1] 1]');
 }
 
@@ -589,7 +589,7 @@ is($b, "_<oups1
   }
   my $pi = $side*(2**($iter+2));
   is("$side", '[/ [- [sqrt [+ 1 [** [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]] 2]]] 1] [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]]]');
-  is((sprintf "%f", $pi), '3.182598');
+  is((sprintf '%f', $pi), '3.182598');
 }
 
 {
@@ -602,7 +602,7 @@ is($b, "_<oups1
   }
   my $pi = $side*(2**($iter+2));
   is("$side", '[/ [- [sqrt [+ 1 [** [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]] 2]]] 1] [/ [- [sqrt [+ 1 [** [n 1] 2]]] 1] [n 1]]]');
-  is((sprintf "%f", $pi), '3.182598');
+  is((sprintf '%f', $pi), '3.182598');
 }
 
 {
@@ -610,9 +610,9 @@ is($b, "_<oups1
   symbolic1->vars($a, $b);
   my $c = sqrt($a**2 + $b**2);
   $a = 3; $b = 4;
-  is((sprintf "%d", $c), '5');
+  is((sprintf '%d', $c), '5');
   $a = 12; $b = 5;
-  is((sprintf "%d", $c), '13');
+  is((sprintf '%d', $c), '13');
 }
 
 {
@@ -626,7 +626,7 @@ is($b, "_<oups1
 
 {
   my $seven = two_face->new("vii", 7);
-  is((sprintf "seven=$seven, seven=%d, eight=%d", $seven, $seven+1),
+  is((sprintf "seven=$seven, seven=\%d, eight=\%d", $seven, $seven+1),
 	'seven=vii, seven=7, eight=8');
   is(scalar ($seven =~ m/i/), '1');
 }
@@ -763,16 +763,16 @@ else {
   sub TIEHASH { my $p = shift; bless \ shift, $p }
   my %fields;
   my $i = 0;
-  $fields{$_} = $i++ foreach qw{zero one two three};
+  %fields{$_} = $i++ foreach qw{zero one two three};
   sub STORE { 
     my $self = ${shift()};
-    my $key = $fields{shift()};
+    my $key = %fields{shift()};
     defined $key or die "Out of band access";
     $$self->[$key] = shift;
   }
   sub FETCH { 
     my $self = ${shift()};
-    my $key = $fields{shift()};
+    my $key = %fields{shift()};
     defined $key or die "Out of band access";
     $$self->[$key];
   }
@@ -816,16 +816,16 @@ is($bar->[3], 13);
   sub TIEHASH { my $p = shift; bless \ shift, $p }
   my %fields;
   my $i = 0;
-  $fields{$_} = $i++ foreach qw{zero one two three};
+  %fields{$_} = $i++ foreach qw{zero one two three};
   sub STORE { 
     my $a = ${shift()};
-    my $key = $fields{shift()};
+    my $key = %fields{shift()};
     defined $key or die "Out of band access";
     $a->[$key] = shift;
   }
   sub FETCH { 
     my $a = ${shift()};
-    my $key = $fields{shift()};
+    my $key = %fields{shift()};
     defined $key or die "Out of band access";
     $a->[$key];
   }
@@ -876,7 +876,7 @@ unless ($aaa) {
 {
     # check the Odd number of arguments for overload::constant warning
     my $a = "" ;
-    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
     $x = eval ' overload::constant "integer" ; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -885,9 +885,9 @@ unless ($aaa) {
 }
 
 {
-    # check the `$_[0]' is not an overloadable type warning
+    # check the `@_[0]' is not an overloadable type warning
     my $a = "" ;
-    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
     $x = eval ' overload::constant "fred" => sub {} ; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -896,9 +896,9 @@ unless ($aaa) {
 }
 
 {
-    # check the `$_[1]' is not a code reference warning
+    # check the `@_[1]' is not a code reference warning
     my $a = "" ;
-    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
     $x = eval ' overload::constant "integer" => 1; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -958,7 +958,7 @@ unless ($aaa) {
 package Foo;
 
 use overload
-  'bool' => sub { return !$_[0]->is_zero() || undef; }
+  'bool' => sub { return !@_[0]->is_zero() || undef; }
 ;
  
 sub is_zero
@@ -987,7 +987,7 @@ is(($r || 0), 0);
 package utf8_o;
 
 use overload 
-  '""'  =>  sub { return $_[0]->{var}; }
+  '""'  =>  sub { return @_[0]->{var}; }
   ;
   
 sub new
@@ -1009,12 +1009,12 @@ is("$utfvar", "\x{c8}\x{2}\x{1}"); # 223 - stringify
 # were to eval the overload code in the caller's namespace, the privatisation
 # would be quite transparent.
 package Hderef;
-use overload '%{}' => sub { (caller(0))[0] eq 'Foo' ? $_[0] : die "zap" };
+use overload '%{}' => sub { (caller(0))[0] eq 'Foo' ? @_[0] : die "zap" };
 package Foo;
 @Foo::ISA = 'Hderef';
 sub new { bless {}, shift }
-sub xet { @_ == 2 ? $_[0]->{$_[1]} :
-	  @_ == 3 ? ($_[0]->{$_[1]} = $_[2]) : undef }
+sub xet { @_ == 2 ? @_[0]->{@_[1]} :
+	  @_ == 3 ? (@_[0]->{@_[1]} = @_[2]) : undef }
 package main;
 my $a = Foo->new;
 $a->xet('b', 42);
@@ -1025,7 +1025,7 @@ like ($@->{description}, qr/zap/);
 {
    package t229;
    use overload '='  => sub { 42 },
-                '++' => sub { my $x = ${$_[0]}; $_[0] };
+                '++' => sub { my $x = ${@_[0]}; @_[0] };
    sub new { my $x = 42; bless \$x }
 
    my $warn;
@@ -1055,11 +1055,11 @@ like ($@->{description}, qr/zap/);
     use overload ('0+' => \&numify, fallback => 1);
 
     sub new {
-	my $val = $_[1];
-	bless \$val, $_[0];
+	my $val = @_[1];
+	bless \$val, @_[0];
     }
 
-    sub numify { ${$_[0]} }
+    sub numify { ${@_[0]} }
 }
 
 {
@@ -1093,7 +1093,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     foreach my $l (keys %map) {
 	foreach my $r (keys %map) {
 	    my $ocode = "\$$l $op \$$r";
-	    my $rcode = "$map{$l} $op $map{$r}";
+	    my $rcode = "%map{$l} $op %map{$r}";
 
 	    my $got = eval $ocode;
 	    die if $@;
@@ -1108,12 +1108,12 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     {
 	package Foo493;
 	use overload
-	    '""' => sub { "^$_[0][0]\$" },
+	    '""' => sub { "^@_[0][0]\$" },
 	    '.'  => sub { 
 		    bless [
-			     $_[2]
-			    ? (ref $_[1] ? $_[1][0] : $_[1]) . ':' .$_[0][0] 
-			    : $_[0][0] . ':' . (ref $_[1] ? $_[1][0] : $_[1])
+			     @_[2]
+			    ? (ref @_[1] ? @_[1][0] : @_[1]) . ':' .@_[0][0] 
+			    : @_[0][0] . ':' . (ref @_[1] ? @_[1][0] : @_[1])
 		    ], 'Foo493'
 			};
     }
@@ -1139,12 +1139,12 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
 	bool     => sub { shift->is_cool };
 
     sub is_cool {
-	$_[0]->{name} eq 'cool';
+	@_[0]->{name} eq 'cool';
     }
 
     sub delete {
-	undef %{$_[0]};
-	bless $_[0], 'Brap';
+	undef %{@_[0]};
+	bless @_[0], 'Brap';
 	return 1;
     }
 
@@ -1210,15 +1210,15 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     package bit;
     # bit operations have overloadable assignment variants too
 
-    sub new { bless \$_[1], $_[0] }
+    sub new { bless \@_[1], @_[0] }
 
     use overload
-          "^&^=" => sub { bit->new($_[0]->val . ' & ' . $_[1]->val) }, 
-          "^^^=" => sub { bit->new($_[0]->val . ' ^ ' . $_[1]->val) },
-          "^|^"  => sub { bit->new($_[0]->val . ' | ' . $_[1]->val) }, # |= by fallback
+          "^&^=" => sub { bit->new(@_[0]->val . ' & ' . @_[1]->val) }, 
+          "^^^=" => sub { bit->new(@_[0]->val . ' ^ ' . @_[1]->val) },
+          "^|^"  => sub { bit->new(@_[0]->val . ' | ' . @_[1]->val) }, # |= by fallback
           ;
 
-    sub val { ${$_[0]} }
+    sub val { ${@_[0]} }
 
     package main;
 
@@ -1252,7 +1252,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
 
     package main;
     local $^W = 1;
-    local ${^WARN_HOOK} = sub { $warning = $_[0] };
+    local ${^WARN_HOOK} = sub { $warning = @_[0] };
 
     my $f = bless [], 'nomethod_false';
     ($warning, $method) = ("", "");
@@ -1297,10 +1297,10 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
 
     package kayo;
 
-    use overload '""' => sub {${$_[0]}};
+    use overload '""' => sub {${@_[0]}};
 
     sub Pie {
-	return "$_[0], $_[1]";
+	return "@_[0], @_[1]";
     }
 
     package main;
@@ -1330,11 +1330,11 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
 
 {
     package numify_int;
-    use overload "0+" => sub { $_[0][0] += 1; 42 };
+    use overload "0+" => sub { @_[0][0] += 1; 42 };
     package numify_self;
-    use overload "0+" => sub { $_[0][0]++; $_[0] };
+    use overload "0+" => sub { @_[0][0]++; @_[0] };
     package numify_other;
-    use overload "0+" => sub { $_[0][0]++; $_[0][1] = bless [], 'numify_int' };
+    use overload "0+" => sub { @_[0][0]++; @_[0][1] = bless [], 'numify_int' };
     package numify_by_fallback;
     use overload fallback => 1;
 

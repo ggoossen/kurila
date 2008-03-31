@@ -237,7 +237,7 @@ Filehandle STDOUT opened only for output at - line 3.
 # doio.c [Perl_do_openn]
 use Config;
 BEGIN {
-    if ($Config{useperlio}) {
+    if (%Config{useperlio}) {
 	print <<EOM;
 SKIPPED
 # warns only without perlio
@@ -257,7 +257,7 @@ Can't open a reference at - line 14.
 # doio.c [Perl_do_openn]
 use Config;
 BEGIN {
-    if (!$Config{useperlio}) {
+    if (!%Config{useperlio}) {
 	print <<EOM;
 SKIPPED
 # warns only with perlio
@@ -276,7 +276,7 @@ Filehandle STDOUT reopened as FH1 only for input at - line 14.
 # doio.c [Perl_do_openn]
 use Config;
 BEGIN {
-    if (!$Config{useperlio}) {
+    if (!%Config{useperlio}) {
 	print <<EOM;
 SKIPPED
 # warns only with perlio

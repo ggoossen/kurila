@@ -180,7 +180,7 @@ sub _max
 sub select
 {
  shift
-   if defined $_[0] && !ref($_[0]);
+   if defined @_[0] && !ref(@_[0]);
 
  my($r,$w,$e,$t) = @_;
  my @result = ();

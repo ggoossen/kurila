@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config;
-    if (($Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
+    if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
 	print "1..0 # Skip -- Perl configured without List::Util module\n";
 	exit 0;
     }
@@ -27,9 +27,9 @@ plan tests => scalar @prgs;
 
 require "dumpvar.pl";
 
-sub unctrl    { print dumpvar::unctrl($_[0]), "\n" }
-sub uniescape { print dumpvar::uniescape($_[0]), "\n" }
-sub stringify { print dumpvar::stringify($_[0]), "\n" }
+sub unctrl    { print dumpvar::unctrl(@_[0]), "\n" }
+sub uniescape { print dumpvar::uniescape(@_[0]), "\n" }
+sub stringify { print dumpvar::stringify(@_[0]), "\n" }
 sub dumpvalue { 
 	# Call main::dumpValue exactly as the perl5db.pl calls it.
         local $\ = '';
@@ -47,7 +47,7 @@ package Bar;
 
 sub new { my $class = shift; bless [ @_ ], $class }
 
-use overload '""' => sub { "Bar<@{$_[0]}>" };
+use overload '""' => sub { "Bar<@{@_[0]}>" };
 
 package main;
 
@@ -77,7 +77,7 @@ for (@prgs) {
 package TieOut;
 
 sub TIEHANDLE {
-    bless( \(my $self), $_[0] );
+    bless( \(my $self), @_[0] );
 }
 
 sub PRINT {

@@ -11452,13 +11452,11 @@ S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
 
     if (subscript_type == FUV_SUBSCRIPT_HASH) {
 	SV * const sv = newSV(0);
-	*SvPVX(name) = '$';
 	Perl_sv_catpvf(aTHX_ name, "{%s}",
 	    pv_display(sv,SvPVX_const(keyname), SvCUR(keyname), 0, 32));
 	SvREFCNT_dec(sv);
     }
     else if (subscript_type == FUV_SUBSCRIPT_ARRAY) {
-	*SvPVX(name) = '$';
 	Perl_sv_catpvf(aTHX_ name, "[%"IVdf"]", (IV)aindex);
     }
     else if (subscript_type == FUV_SUBSCRIPT_WITHIN)
@@ -11573,7 +11571,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 		if (!svp || *svp != uninit_sv)
 		    break;
 	    }
-	    return varname(NULL, '$', obase->op_targ,
+	    return varname(NULL, '@', obase->op_targ,
 		    NULL, (I32)obase->op_private, FUV_SUBSCRIPT_ARRAY);
 	}
 	else {
@@ -11589,7 +11587,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 		if (!svp || *svp != uninit_sv)
 		    break;
 	    }
-	    return varname(gv, '$', 0,
+	    return varname(gv, '@', 0,
 		    NULL, (I32)obase->op_private, FUV_SUBSCRIPT_ARRAY);
 	}
 	break;

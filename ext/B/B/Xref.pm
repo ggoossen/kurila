@@ -329,10 +329,10 @@ sub xref_definitions {
     foreach $pack (qw(B O DynaLoader XSLoader Config DB VMS
 		      strict vars FileHandle Exporter Carp PerlIO::Layer
 		      attributes utf8 warnings)) {
-        $exclude{$pack."::"} = 1;
+        %exclude{$pack."::"} = 1;
     }
     no strict qw(vars refs);
-    walksymtable(\%{*{Symbol::fetch_glob("main::")}}, "xref", sub { !defined($exclude{$_[0]}) });
+    walksymtable(\%{*{Symbol::fetch_glob("main::")}}, "xref", sub { !defined(%exclude{@_[0]}) });
 }
 
 sub output {

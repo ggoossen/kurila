@@ -4,7 +4,7 @@ BEGIN {
         chdir 't' if -d 't';
         @INC = '../lib';
 	require Config;
-	if (($Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
+	if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
 		print "1..0 # Skip -- Perl configured without List::Util module\n";
 		exit 0;
 	}
@@ -118,16 +118,16 @@ BEGIN {
 
         my $line = __LINE__ + 1;
         my @ret = eval { DB->backtrace() };
-        like( $ret[0], qr/file.+\Q$0\E/, 'DB::backtrace() should report current file');
-        like( $ret[0], qr/line $line/, '... should report calling line number' );
-        like( $ret[0], qr/eval {...}/, '... should catch eval BLOCK' );
+        like( @ret[0], qr/file.+\Q$0\E/, 'DB::backtrace() should report current file');
+        like( @ret[0], qr/line $line/, '... should report calling line number' );
+        like( @ret[0], qr/eval {...}/, '... should catch eval BLOCK' );
 
         @ret = eval "one(2)";
         is( scalar @ret, 1, '... should report from provided stack frame number' );
-        like( $ret[0], qr/\@ = &eval \'one.+?2\)\'/, #'
+        like( @ret[0], qr/\@ = &eval \'one.+?2\)\'/, #'
                 '... should find eval STRING construct');
-        $ret[0] = check_context(1);
-        like( $ret[0], qr/\$ = &main::check_context/, 
+        @ret[0] = check_context(1);
+        like( @ret[0], qr/\$ = &main::check_context/, 
                 '... should respect context of calling construct');
         
         $DB::signal = 1;
@@ -139,7 +139,7 @@ BEGIN {
 }
 
 sub check_context {
-        return (eval "one($_[0])")[-1];
+        return (eval "one(@_[0])")[-1];
 }
 sub one { DB->backtrace(@_) }
 sub two { one(@_) }
@@ -232,7 +232,7 @@ SKIP: {
         is( scalar keys %ret, 3, 'DB::lineevents() should pick up defined lines' );
 
         # array access in DB::lineevents() starts at element 1, not 0
-        is( join(' ', @{ $ret{1} }), 'two foo bar', '... should stash data in hash');
+        is( join(' ', @{ %ret{1} }), 'two foo bar', '... should stash data in hash');
 }
 
 # test DB::set_break()
@@ -253,21 +253,21 @@ SKIP: {
         );
          
         DB->set_break(1, 'foo');
-        is( $DB::dbline{1}, "foo\0", 'DB::set_break() should set break condition' );
+        is( %DB::dbline{1}, "foo\0", 'DB::set_break() should set break condition' );
 
         $DB::lineno = 1;
         DB->set_break(undef, 'bar');
-        is( $DB::dbline{1}, "bar\0", 
+        is( %DB::dbline{1}, "bar\0", 
                 '... should use $DB::lineno without specified line' );
 
         DB->set_break(4);
-        is( $DB::dbline{4}, "1\0abc", '... should use default condition if needed');
+        is( %DB::dbline{4}, "1\0abc", '... should use default condition if needed');
 
         local %DB::sub = (
                 'main::foo'     => 'foo:1-4',
         );
         DB->set_break('foo', 'baz');
-        is( $DB::dbline{4}, "baz\0abc", 
+        is( %DB::dbline{4}, "baz\0abc", 
                 '... should use _find_subline() to resolve subname' );
 
         my $db = FakeDB->new();
@@ -284,13 +284,13 @@ SKIP: {
         *DB::dbline = [ $dualfalse, $dualtrue, $dualfalse, $dualfalse, $dualtrue ];
 
         DB->set_tbreak(1);
-        is( $DB::dbline{1}, ';9', 'DB::set_tbreak() should set tbreak condition' );
+        is( %DB::dbline{1}, ';9', 'DB::set_tbreak() should set tbreak condition' );
 
         local %DB::sub = (
                 'main::foo'     => 'foo:1-4',
         );
         DB->set_tbreak('foo', 'baz');
-        is( $DB::dbline{4}, ';9', 
+        is( %DB::dbline{4}, ';9', 
                 '... should use _find_subline() to resolve subname' );
 
         my $db = FakeDB->new();
@@ -313,7 +313,7 @@ SKIP: {
                 'bar::bar'      => 'foo:10-16',
         );
 
-        $foo[11] = $dualtrue;
+        @foo[11] = $dualtrue;
 
         is( DB::_find_subline('TEST::foo'), 11, 
                 'DB::_find_subline() should find fully qualified sub' );
@@ -325,7 +325,7 @@ SKIP: {
         is( DB::_find_subline('bar'), 11, 
                 '... should resolve unqualified name with $DB::package, if defined' );
         
-        $foo[11] = $dualfalse;
+        @foo[11] = $dualfalse;
 
         is( DB::_find_subline('TEST::foo'), 15, 
                 '... should increment past lines with no events' );
@@ -347,9 +347,9 @@ SKIP: {
         %DB::dbline = %lines;
         DB->clr_breaks(1 .. 4);
         is( scalar keys %DB::dbline, 3, 'DB::clr_breaks() should clear breaks' );
-        ok( ! exists($DB::dbline{1}), '... should delete empty actions' );
-        is( $DB::dbline{3}, "\0\0\0abc", '... should remove break, leaving action');
-        is( $DB::dbline{4}, "\0\0\0abc", '... should not remove set actions' );
+        ok( ! exists(%DB::dbline{1}), '... should delete empty actions' );
+        is( %DB::dbline{3}, "\0\0\0abc", '... should remove break, leaving action');
+        is( %DB::dbline{4}, "\0\0\0abc", '... should not remove set actions' );
 
         local *{Symbol::fetch_glob( "::_<foo") } = [ 0, 0, 0, 1 ];
 
@@ -361,7 +361,7 @@ SKIP: {
         %DB::dbline = %lines;
         DB->clr_breaks('foo');
 
-        is( $DB::dbline{3}, "\0\0\0abc", 
+        is( %DB::dbline{3}, "\0\0\0abc", 
                 '... should find lines via _find_subline()' );
         
         my $db = FakeDB->new();
@@ -376,10 +376,10 @@ SKIP: {
 
         is( scalar keys %DB::dbline, 4, 
                 'Relying on @DB::dbline in DB::clr_breaks() should clear breaks' );
-        ok( ! exists($DB::dbline{1}), '... should delete empty actions' );
-        is( $DB::dbline{3}, "\0\0\0abc", '... should remove break, leaving action');
-        is( $DB::dbline{4}, "\0\0\0abc", '... should not remove set actions' );
-        ok( exists($DB::dbline{5}), 
+        ok( ! exists(%DB::dbline{1}), '... should delete empty actions' );
+        is( %DB::dbline{3}, "\0\0\0abc", '... should remove break, leaving action');
+        is( %DB::dbline{4}, "\0\0\0abc", '... should not remove set actions' );
+        ok( exists(%DB::dbline{5}), 
                 '... should only go to last index of @DB::dbline' );
 }
 
@@ -394,10 +394,10 @@ SKIP: {
         *DB::dbline = [ $dualfalse, $dualfalse, $dualtrue, $dualtrue ];
 
         DB->set_action(2, 'def');
-        is( $DB::dbline{2}, "\0def", 
+        is( %DB::dbline{2}, "\0def", 
                 'DB::set_action() should replace existing action' );
         DB->set_action(3, '');
-        is( $DB::dbline{3}, "\0", '... should set new action' );
+        is( %DB::dbline{3}, "\0", '... should set new action' );
 
         my $db = FakeDB->new();
         DB::set_action($db, 'abadsubname');
@@ -425,9 +425,9 @@ SKIP: {
         DB->clr_actions(1 .. 4);
 
         is( scalar keys %DB::dbline, 2, 'DB::clr_actions() should clear actions' );
-        ok( ! exists($DB::dbline{1}), '... should delete empty actions' );
-        is( $DB::dbline{3}, "123", '... should remove action, leaving break');
-        is( $DB::dbline{4}, "abc\0", '... should not remove set breaks' );
+        ok( ! exists(%DB::dbline{1}), '... should delete empty actions' );
+        is( %DB::dbline{3}, "123", '... should remove action, leaving break');
+        is( %DB::dbline{4}, "abc\0", '... should not remove set breaks' );
 
         local *{Symbol::fetch_glob( "::_<foo") } = [ 0, 0, 0, 1 ];
 
@@ -439,7 +439,7 @@ SKIP: {
         %DB::dbline = %lines;
         DB->clr_actions('foo');
 
-        is( $DB::dbline{3}, "123", '... should find lines via _find_subline()' );
+        is( %DB::dbline{3}, "123", '... should find lines via _find_subline()' );
         
         my $db = FakeDB->new();
         DB::clr_actions($db, 'abadsubname');
@@ -453,10 +453,10 @@ SKIP: {
 
         is( scalar keys %DB::dbline, 4, 
                 'Relying on @DB::dbline in DB::clr_actions() should clear actions' );
-        ok( ! exists($DB::dbline{1}), '... should delete empty actions' );
-        is( $DB::dbline{3}, "123", '... should remove action, leaving break');
-        is( $DB::dbline{4}, "abc\0", '... should not remove set breaks' );
-        ok( exists($DB::dbline{5}), 
+        ok( ! exists(%DB::dbline{1}), '... should delete empty actions' );
+        is( %DB::dbline{3}, "123", '... should remove action, leaving break');
+        is( %DB::dbline{4}, "abc\0", '... should not remove set breaks' );
+        ok( exists(%DB::dbline{5}), 
                 '... should only go to last index of @DB::dbline' );
 }
 
@@ -500,7 +500,7 @@ package FakeDB;
 use vars qw( $output );
 
 sub new {
-        bless({}, $_[0]);
+        bless({}, @_[0]);
 }
 
 sub set_tbreak {

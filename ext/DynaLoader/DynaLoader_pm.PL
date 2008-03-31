@@ -263,8 +263,6 @@ if ($dl_debug) {
 1; # End of main code
 
 
-sub croak   { require Carp; Carp::croak(@_)   }
-
 use vars qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
             @do_expand);
 
@@ -286,13 +284,12 @@ sub bootstrap {
     local(@dirs, $file);
 
     unless ($module) {
-	require Carp;
-	Carp::confess("Usage: DynaLoader::bootstrap(module)");
+	die("Usage: DynaLoader::bootstrap(module)");
     }
 
     # A common error on platforms which don't support dynamic loading.
     # Since it's fatal and potentially confusing we give a detailed message.
-    croak("Can't load module $module, dynamic loading not available in this perl.\n".
+    die("Can't load module $module, dynamic loading not available in this perl.\n".
 	"  (You may need to build a new perl executable which either supports\n".
 	"  dynamic loading or has the $module module statically linked into it.)\n")
 	unless defined(&dl_load_file);
@@ -352,7 +349,7 @@ sub bootstrap {
     # last resort, let dl_findfile have a go in all known locations
     $file = dl_findfile(map("-L$_",@dirs,@INC), $modfname) unless $file;
 
-    croak("Can't locate loadable object for module $module in \@INC (\@INC contains: @INC)")
+    die("Can't locate loadable object for module $module in \@INC (\@INC contains: @INC)")
 	unless $file;	# wording similar to error from 'require'
 
     <<$^O-eq-VMS>>$file = uc($file) if %Config::Config{d_vms_case_sensitive_symbols};<</$^O-eq-VMS>>
@@ -387,18 +384,17 @@ sub bootstrap {
     # it executed.
 
     my $libref = dl_load_file($file, $module->dl_load_flags) or
-	croak("Can't load '$file' for module $module: ".dl_error());
+	die("Can't load '$file' for module $module: ".dl_error());
 
     push(@dl_librefs,$libref);  # record loaded object
 
     my @unresolved = dl_undef_symbols();
     if (@unresolved) {
-	require Carp;
-	Carp::carp("Undefined symbols present after loading $file: @unresolved\n");
+	die("Undefined symbols present after loading $file: @unresolved\n");
     }
 
     $boot_symbol_ref = dl_find_symbol($libref, $bootname) or
-         croak("Can't find '$bootname' symbol in $file\n");
+         die("Can't find '$bootname' symbol in $file\n");
 
     push(@dl_modules, $module); # record loaded module
 
@@ -565,8 +561,7 @@ sub dl_expandspec {
 
     <<$^O-eq-VMS>>
         # dl_expandspec should be defined in dl_vms.xs
-	require Carp;
-	Carp::croak("dl_expandspec: should be defined in XS file!\n");
+	die("dl_expandspec: should be defined in XS file!\n");
     <<|$^O-eq-VMS>>
 	return undef unless -f $file;
     <</$^O-eq-VMS>>

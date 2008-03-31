@@ -40,7 +40,7 @@ is( $FOO, 'Eymascalar', 'leaves scalar alone' );
 {
     local $^W=1;		# 5.005 compat.
     my $warn;
-    local ${^WARN_HOOK} = sub { $warn .= $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { $warn .= @_[0]->{description} };
     readline *FOO;
     like( $warn, qr/unopened filehandle/, 'warns like an unopened filehandle' );
 }
@@ -85,9 +85,9 @@ use Symbol qw(qualify qualify_to_ref);  # must import into this package too
 # tests for delete_package
 package main;
 $Transient::variable = 42;
-ok( exists $::{'Transient::'}, 'transient stash exists' );
-ok( defined $Transient::{variable}, 'transient variable in stash' );
+ok( exists %::{'Transient::'}, 'transient stash exists' );
+ok( defined %Transient::{variable}, 'transient variable in stash' );
 Symbol::delete_package('Transient');
-ok( !exists $Transient::{variable}, 'transient variable no longer in stash' );
+ok( !exists %Transient::{variable}, 'transient variable no longer in stash' );
 is( scalar(keys %Transient::), 0, 'transient stash is empty' );
-ok( !exists $::{'Transient::'}, 'no transient stash' );
+ok( !exists %::{'Transient::'}, 'no transient stash' );

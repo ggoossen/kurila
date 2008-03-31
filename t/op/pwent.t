@@ -11,7 +11,7 @@ BEGIN {
     eval { require Config; Config->import; };
     my $reason;
     if (%Config{'i_pwd'} ne 'define') {
-	$reason = '$Config{i_pwd} undefined';
+	$reason = '%Config{i_pwd} undefined';
     }
     elsif (not -f "/etc/passwd" ) { # Play safe.
 	$reason = 'no /etc/passwd file';

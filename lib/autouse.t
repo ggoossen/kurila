@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config;
-    if (($Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
+    if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
 	print "1..0 # Skip -- Perl configured without List::Util module\n";
 	exit 0;
     }
@@ -40,9 +40,9 @@ ok( (first { $_ +> 3 } @a), 4);
 use autouse 'Errno' => qw(EPERM);
 
 my $mod_file = 'Errno.pm';   # just fine and portable for %INC
-ok( !exists $INC{$mod_file} );
+ok( !exists %INC{$mod_file} );
 ok( EPERM ); # test if non-zero
-ok( exists $INC{$mod_file} );
+ok( exists %INC{$mod_file} );
 
 use autouse Env => "something";
 eval { something() };
@@ -53,4 +53,4 @@ ok( $@->{description}, qr/^\Qautoused module Env has unique import() method/ );
 require UNIVERSAL;
 autouse->import("Class::ISA" => 'self_and_super_versions');
 my %versions = self_and_super_versions("Class::ISA");
-ok( $versions{"Class::ISA"}, $Class::ISA::VERSION );
+ok( %versions{"Class::ISA"}, $Class::ISA::VERSION );

@@ -246,7 +246,7 @@ DEBUG_INFO
 	  $code .= <<"END_MARK_ONE";
 
 BEGIN \{ \$\{^WARN_HOOK\} = sub \{ 
-    my \$msg = \$_[0]->message;
+    my \$msg = \@_[0]->message;
 END_MARK_ONE
 
 	  $code .=  <<"END_MARK_TWO" if $nc_attempt;
@@ -261,9 +261,9 @@ END_MARK_TWO
 \{
     my \$test = $test;
     sub test (&) \{
-      my \$ok = &\{\$_[0]\};
+      my \$ok = &\{\@_[0]\};
       print \$ok ? "ok \$test\n" : "not ok \$test\n";
-      printf "# Failed at line \%d\n", (caller)[2] unless \$ok;
+      printf "# Failed at line \\\%d\n", (caller)[2] unless \$ok;
       \$test++;
     \}
 \}
@@ -341,17 +341,17 @@ END
 	    } elsif ($inner_sub_test eq 'sub_scalar') {
 	      $code .= '{ ++$sub_scalar }'
 	    } elsif ($inner_sub_test eq 'global_array') {
-	      $code .= '{ ++$global_array[1] }'
+	      $code .= '{ ++@global_array[1] }'
 	    } elsif ($inner_sub_test eq 'fs_array') {
-	      $code .= '{ ++$fs_array[1] }'
+	      $code .= '{ ++@fs_array[1] }'
 	    } elsif ($inner_sub_test eq 'sub_array') {
-	      $code .= '{ ++$sub_array[1] }'
+	      $code .= '{ ++@sub_array[1] }'
 	    } elsif ($inner_sub_test eq 'global_hash') {
-	      $code .= '{ ++$global_hash{3002} }'
+	      $code .= '{ ++%global_hash{3002} }'
 	    } elsif ($inner_sub_test eq 'fs_hash') {
-	      $code .= '{ ++$fs_hash{6002} }'
+	      $code .= '{ ++%fs_hash{6002} }'
 	    } elsif ($inner_sub_test eq 'sub_hash') {
-	      $code .= '{ ++$sub_hash{9002} }'
+	      $code .= '{ ++%sub_hash{9002} }'
 	    } elsif ($inner_sub_test eq 'foreach') {
 	      $code .= '{ ++$foreach }'
 	    } else {
@@ -647,10 +647,10 @@ f16302();
     open(T, ">", "$progfile") or die "$0: $!\n";
     print T << '__EOF__';
         print
-            sub {$_[0]->(@_)} -> (
+            sub {@_[0]->(@_)} -> (
                 sub {
-                    $_[1]
-                        ?  $_[0]->($_[0], $_[1] - 1) .  sub {"x"}->()
+                    @_[1]
+                        ?  @_[0]->(@_[0], @_[1] - 1) .  sub {"x"}->()
                         : "y"
                 },   
                 2

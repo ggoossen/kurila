@@ -19,13 +19,13 @@ sub eval_ok ($;$) {
     is( $@, '', @_);
 }
 
-eval_ok 'sub t1 ($) : locked { $_[0]++ }';
-eval_ok 'sub t2 : locked { $_[0]++ }';
+eval_ok 'sub t1 ($) : locked { @_[0]++ }';
+eval_ok 'sub t2 : locked { @_[0]++ }';
 eval_ok 'sub t3 ($) : locked ;';
 eval_ok 'sub t4 : locked ;';
-eval_ok '$anon1 = sub ($) : locked:method { $_[0]++ }';
-eval_ok '$anon2 = sub : locked : method { $_[0]++ }';
-eval_ok '$anon3 = sub : method { $_[0]->[1] }';
+eval_ok '$anon1 = sub ($) : locked:method { @_[0]++ }';
+eval_ok '$anon2 = sub : locked : method { @_[0]++ }';
+eval_ok '$anon3 = sub : method { @_[0]->[1] }';
 
 eval 'sub e1 ($) : plugh ;';
 like $@->message, qr/^Invalid CODE attributes?: ["']?plugh["']? at/;
@@ -119,13 +119,13 @@ eval 'package A; sub PS : locked';
 is "@attrs", "locked";
 
 # Test ability to modify existing sub's (or XSUB's) attributes.
-eval 'package A; sub X { $_[0] } sub X : locked';
+eval 'package A; sub X { @_[0] } sub X : locked';
 @attrs = eval 'attributes::get \&A::X';
 is "@attrs", "locked";
 
 # Above not with just 'pure' built-in attributes.
 sub Z::MODIFY_CODE_ATTRIBUTES { (); }
-eval 'package Z; sub L { $_[0] } sub L : Z locked';
+eval 'package Z; sub L { @_[0] } sub L : Z locked';
 @attrs = eval 'attributes::get \&Z::L';
 is "@attrs", "locked Z";
 

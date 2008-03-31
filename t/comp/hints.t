@@ -64,16 +64,16 @@ BEGIN {
     }
     # op_entereval should keep the pragmas it was compiled with
     eval q*
-	print "not " if $^H{foo} ne "a";
-	print "ok 13 - \$^H\{foo\} is 'a' at eval-\"\" time\n";
+	print "not " if %^H{foo} ne "a";
+	print "ok 13 - \%^H\{foo\} is 'a' at eval-\"\" time\n";
 	print "not " unless $^H ^&^ 0x00020000;
-	print "ok 14 - \$^H contains HINT_LOCALIZE_HH at eval\"\"-time\n";
+	print "ok 14 - \%^H contains HINT_LOCALIZE_HH at eval\"\"-time\n";
     *;
     die if $@;
 }
 BEGIN {
     print "not " if exists %^H{foo};
-    print "ok 7 - \$^H\{foo\} doesn't exist while finishing compilation\n";
+    print "ok 7 - \%^H\{foo\} doesn't exist while finishing compilation\n";
     if (${^OPEN}) {
 	print "not " unless $^H ^&^ 0x00020000;
 	print "ok 8 - \$^H contains HINT_LOCALIZE_HH while finishing compilation with ${^OPEN}\n";
@@ -98,12 +98,11 @@ print "# got: $result\n" if length $result;
     BEGIN{%^H{x}=1};
     for(1..2) {
         eval q(
-            print $^H{x}==1 && !$^H{y} ? "ok\n" : "not ok\n";
-            $^H{y} = 1;
+            print %^H{x}==1 && !%^H{y} ? "ok\n" : "not ok\n";
+            %^H{y} = 1;
         );
         if ($@) {
-            (my $str = $@)=~s/^/# /gm;
-            print "not ok\n$str\n";
+            print "not ok\n{$@->message}\n";
         }
     }
 }

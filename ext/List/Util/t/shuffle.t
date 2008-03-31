@@ -6,7 +6,7 @@ BEGIN {
 	@INC = '../lib';
 	require Config; Config->import;
 	keys %Config; # Silence warning
-	if ($Config{extensions} !~ m/\bList\/Util\b/) {
+	if (%Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
 	}
@@ -24,7 +24,7 @@ ok( !@r,	'no args');
 
 @r = shuffle(9);
 is( 0+@r,	1,	'1 in 1 out');
-is( $r[0],	9,	'one arg');
+is( @r[0],	9,	'one arg');
 
 my @in = 1..100;
 @r = shuffle(@in);

@@ -52,13 +52,13 @@ sub configure {
 
 sub hostpath {
     @_ == 1 or croak 'usage: $sock->hostpath()';
-    my $n = $_[0]->sockname || return undef;
+    my $n = @_[0]->sockname || return undef;
     (sockaddr_un($n))[0];
 }
 
 sub peerpath {
     @_ == 1 or croak 'usage: $sock->peerpath()';
-    my $n = $_[0]->peername || return undef;
+    my $n = @_[0]->peername || return undef;
     (sockaddr_un($n))[0];
 }
 

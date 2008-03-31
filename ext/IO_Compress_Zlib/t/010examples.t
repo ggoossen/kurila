@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = ("../lib", "lib/compress");
     }
@@ -28,14 +28,14 @@ BEGIN
 
 my $Inc = join " ", map qq["-I$_"] => @INC;
 $Inc = '"-MExtUtils::testlib"'
-    if ! $ENV{PERL_CORE} && eval " require ExtUtils::testlib; " ;
+    if ! %ENV{PERL_CORE} && eval " require ExtUtils::testlib; " ;
 
-my $Perl = ($ENV{'FULLPERL'} or $^X or 'perl') ;
+my $Perl = (%ENV{'FULLPERL'} or $^X or 'perl') ;
 $Perl = qq["$Perl"] if $^O eq 'MSWin32' ;
  
 $Perl = "$Perl $Inc -w" ;
 #$Perl .= " -Mblib " ;
-my $examples = $ENV{PERL_CORE} ? "../ext/Compress/Zlib/examples" 
+my $examples = %ENV{PERL_CORE} ? "../ext/Compress/Zlib/examples" 
                                : "./examples";
 
 my $hello1 = <<EOM ;
