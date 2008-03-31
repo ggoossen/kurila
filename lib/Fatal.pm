@@ -11,7 +11,7 @@ sub import {
     my $self = shift(@_);
     my($sym, $pkg);
     my $void = 0;
-    $pkg = (caller)[0];
+    $pkg = (caller)[[0]];
     foreach $sym (@_) {
 	if ($sym eq ":void") {
 	    $void = 1;
@@ -41,7 +41,7 @@ sub fill_protos {
 sub write_invocation {
   my ($core, $call, $name, $void, @argvs) = @_;
   if (@argvs == 1) {		# No optional arguments
-    my @argv = @{$argvs[0]};
+    my @argv = @{@argvs[0]};
     shift @argv;
     return "\t" . one_invocation($core, $call, $name, $void, @argv) . ";\n";
   } else {

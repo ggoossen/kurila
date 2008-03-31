@@ -120,30 +120,30 @@ print "# --- Done with ", __FILE__, " --- \n";
 
 sub deq { # deep-equals
   #print "# deq ", Pod::Simple::pretty($_[0], $_[1]), "\n";
-  return 1 unless defined $_[0] or defined $_[1]; # two undefs = same
-  return '' if defined $_[0] xor defined $_[1];
-  return '' if ref($_[0]) ne ref($_[1]); # unequal referentiality
-  return $_[0] eq $_[1] unless ref $_[0];
+  return 1 unless defined @_[0] or defined @_[1]; # two undefs = same
+  return '' if defined @_[0] xor defined @_[1];
+  return '' if ref(@_[0]) ne ref(@_[1]); # unequal referentiality
+  return @_[0] eq @_[1] unless ref @_[0];
   # So it's a ref:
   use UNIVERSAL;
-  if(UNIVERSAL::isa($_[0], 'ARRAY')) {
-    return '' unless @{$_[0]} == @{$_[1]};
-    for(my $i = 0; $i +< @{$_[0]}; $i++) {
-      print("# NEQ ", Pod::Simple::pretty($_[0]),
-          "\n#  != ", Pod::Simple::pretty($_[1]), "\n"),
-       return '' unless deq($_[0][$i], $_[1][$i]); # recurse!
+  if(UNIVERSAL::isa(@_[0], 'ARRAY')) {
+    return '' unless @{@_[0]} == @{@_[1]};
+    for(my $i = 0; $i +< @{@_[0]}; $i++) {
+      print("# NEQ ", Pod::Simple::pretty(@_[0]),
+          "\n#  != ", Pod::Simple::pretty(@_[1]), "\n"),
+       return '' unless deq(@_[0][$i], @_[1][$i]); # recurse!
     }
     return 1;
-  } elsif(UNIVERSAL::isa($_[0], 'HASH')) {
+  } elsif(UNIVERSAL::isa(@_[0], 'HASH')) {
     return 1 if $hashes_dont_matter;
-    return '' unless keys %{$_[0]} == keys %{$_[1]};
-    foreach my $k (keys %{$_[0]}) {
-      return '' unless exists $_[1]{$k};
-      return '' unless deq($_[0]{$k}, $_[1]{$k});
+    return '' unless keys %{@_[0]} == keys %{@_[1]};
+    foreach my $k (keys %{@_[0]}) {
+      return '' unless exists @_[1]{$k};
+      return '' unless deq(@_[0]{$k}, @_[1]{$k});
     }
     return 1;
   } else {
-    print "# I don't know how to deque $_[0] & $_[1]\n";
+    print "# I don't know how to deque @_[0] & @_[1]\n";
     return 1;
   }
 }

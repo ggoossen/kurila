@@ -46,12 +46,12 @@ close FOO;
 
 open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 
-my($nlink, $mtime, $ctime) = (stat(*FOO))[$NLINK, $MTIME, $CTIME];
+my($nlink, $mtime, $ctime) = (stat(*FOO))[[$NLINK, $MTIME, $CTIME]];
 
 #nlink should if link support configured in Perl.
 SKIP: {
     skip "No link count - Hard link support not built in.", 1
-	unless $Config{d_link};
+	unless %Config{d_link};
 
     is($nlink, 1, 'nlink on regular file');
 }
@@ -84,12 +84,12 @@ SKIP: {
     ok( $lnk_result,    'linked tmp testfile' );
     ok( chmod(0644, $tmpfile),             'chmoded tmp testfile' );
 
-    my($nlink, $mtime, $ctime) = (stat($tmpfile))[$NLINK, $MTIME, $CTIME];
+    my($nlink, $mtime, $ctime) = (stat($tmpfile))[[$NLINK, $MTIME, $CTIME]];
 
     SKIP: {
-        skip "No link count", 1 if $Config{dont_use_nlink};
+        skip "No link count", 1 if %Config{dont_use_nlink};
         skip "Cygwin9X fakes hard links by copying", 1
-          if $Config{myuname} =~ m/^cygwin_(?:9\d|me)\b/i;
+          if %Config{myuname} =~ m/^cygwin_(?:9\d|me)\b/i;
 
         is($nlink, 2,     'Link count on hard linked file' );
     }
@@ -100,7 +100,7 @@ SKIP: {
                                      if $Is_Solaris and $cwd =~ m#^/tmp# and
                                         $mtime && $mtime == $ctime;
         skip "AFS has different mtime/ctime link semantics", 2
-                                     if $cwd =~ m#$Config{'afsroot'}/#;
+                                     if $cwd =~ m#%Config{'afsroot'}/#;
         skip "AmigaOS has different mtime/ctime link semantics", 2
                                      if $Is_Amiga;
         # Win32 could pass $mtime test but as FAT and NTFS have
@@ -230,7 +230,7 @@ SKIP: {
     skip "ls command not available to Perl in OpenVMS right now.", 6
       if $Is_VMS;
 
-    my $LS  = $Config{d_readlink} ? "ls -lL" : "ls -l";
+    my $LS  = %Config{d_readlink} ? "ls -lL" : "ls -l";
     my $CMD = "$LS /dev 2>/dev/null";
     my $DEV = qx($CMD);
 
@@ -266,11 +266,11 @@ SKIP: {
     }
 
     my $try = sub {
-	my @c1 = eval qq[\$DEV =~ m/^$_[0].*/mg];
-	my @c2 = eval qq[grep \{ $_[1] "/dev/\$_" \} \@DEV];
+	my @c1 = eval qq[\$DEV =~ m/^@_[0].*/mg];
+	my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \} \@DEV];
 	my $c1 = scalar @c1;
 	my $c2 = scalar @c2;
-	is($c1, $c2, "ls and $_[1] agreeing on /dev ($c1 $c2)");
+	is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)");
     };
 
 SKIP: {
@@ -320,7 +320,7 @@ SKIP: {
 # may not be available (at, cron  rsh etc), the PERL_SKIP_TTY_TEST env var
 # can be set to skip the tests that need a tty.
 SKIP: {
-    skip "These tests require a TTY", 4 if $ENV{PERL_SKIP_TTY_TEST};
+    skip "These tests require a TTY", 4 if %ENV{PERL_SKIP_TTY_TEST};
 
     my $TTY = $Is_Rhapsody ? "/dev/ttyp0" : "/dev/tty";
 
@@ -434,7 +434,7 @@ eval { -l _ };
 is( "$@", "", "-l _ ok after lstat" );
   
 SKIP: {
-    skip "No lstat", 2 unless $Config{d_lstat};
+    skip "No lstat", 2 unless %Config{d_lstat};
 
     # bug id 20020124.004
     # If we have d_lstat, we should have symlink()
@@ -479,7 +479,7 @@ ok(unlink($f), 'unlink tmp file');
 }
 
 SKIP: {
-    skip "No dirfd()", 9 unless $Config{d_dirfd} || $Config{d_dir_dd_fd};
+    skip "No dirfd()", 9 unless %Config{d_dirfd} || %Config{d_dir_dd_fd};
     ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $!";
     ok(stat(*DIR), "stat() on dirhandle works"); 
     ok(-d -r _ , "chained -x's on dirhandle"); 
@@ -488,7 +488,7 @@ SKIP: {
     # And now for the ambigious bareword case
     ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
 	|| diag "Can't open 'TEST':  $!";
-    my $size = (stat(*DIR))[7];
+    my $size = (stat(*DIR))[[7]];
     ok(defined $size, "stat() on bareword works");
     is($size, -s "TEST", "size returned by stat of bareword is for the file");
     ok(-f _, "ambiguous bareword uses file handle, not dir handle");
@@ -509,7 +509,7 @@ SKIP: {
     #PVIO's hold dirhandle information, so let's test them too.
 
     SKIP: {
-        skip "No dirfd()", 9 unless $Config{d_dirfd} || $Config{d_dir_dd_fd};
+        skip "No dirfd()", 9 unless %Config{d_dirfd} || %Config{d_dir_dd_fd};
         ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $!";
         ok(stat(*DIR{IO}), "stat() on *DIR\{IO\} works");
 	ok(-d _ , "The special file handle _ is set correctly"); 
@@ -518,7 +518,7 @@ SKIP: {
 	# And now for the ambigious bareword case
 	ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
 	    || diag "Can't open 'TEST':  $!";
-	my $size = (stat(*DIR{IO}))[7];
+	my $size = (stat(*DIR{IO}))[[7]];
 	ok(defined $size, "stat() on *THINGY\{IO\} works");
 	is($size, -s "TEST",
 	   "size returned by stat of *THINGY\{IO\} is for the file");

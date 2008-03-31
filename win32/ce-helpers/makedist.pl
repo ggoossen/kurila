@@ -29,7 +29,7 @@ my %opts = (
 
 my $cwd = cwd;
 
-if ($opts{'clean-exts'}) {
+if (%opts{'clean-exts'}) {
   # unfortunately, unlike perl58.dll and like, extensions for different
   # platforms are built in same directory, therefore we must be able to clean
   # them often
@@ -43,11 +43,11 @@ if ($opts{'clean-exts'}) {
 }
 
 # zip
-if ($opts{'zip'}) {
-  if ($opts{'verbose'} +>=1) {
+if (%opts{'zip'}) {
+  if (%opts{'verbose'} +>=1) {
     print STDERR "zipping...\n";
   }
-  chdir $opts{'distdir'};
+  chdir %opts{'distdir'};
   unlink glob("*.zip");
   `zip -R perl-$opts{'cross-name'} *`;
   exit;
@@ -62,17 +62,17 @@ chdir '../lib';
 find({no_chdir=>1,wanted=>sub{push @lfiles, $_ if m/\.p[lm]$/}},'.');
 chdir $cwd;
 # exclusions
-@lfiles = grep {!exists $libexclusions{$_}} @lfiles;
+@lfiles = grep {!exists %libexclusions{$_}} @lfiles;
 #inclusions
 #...
 #copy them
-if ($opts{'verbose'} +>=1) {
+if (%opts{'verbose'} +>=1) {
   print STDERR "Copying perl lib files...\n";
 }
 for (@lfiles) {
   m/^(.*)\/[^\/]+$/;
-  mkpath "$opts{distdir}/lib/$1";
-  copy "../lib/$_", "$opts{distdir}/lib/$_";
+  mkpath "%opts{distdir}/lib/$1";
+  copy "../lib/$_", "%opts{distdir}/lib/$_";
 }
 
 #ext
@@ -86,33 +86,33 @@ chdir $cwd;
 #...
 #copy them
 #{s[/(\w+)/\1\.pm][/$1.pm]} @efiles;
-if ($opts{'verbose'} +>=1) {
+if (%opts{'verbose'} +>=1) {
   print STDERR "Copying perl core extensions...\n";
 }
 for (@efiles) {
   if (m#^.*?/lib/(.*)$#) {
-    copy "../ext/$_", "$opts{distdir}/lib/$1";
+    copy "../ext/$_", "%opts{distdir}/lib/$1";
   }
   else {
     m/^(.*)\/([^\/]+)\/([^\/]+)$/;
-    copy "../ext/$_", "$opts{distdir}/lib/$1/$3";
+    copy "../ext/$_", "%opts{distdir}/lib/$1/$3";
   }
 }
 my ($dynaloader_pm);
-if ($opts{adaptation}) {
+if (%opts{adaptation}) {
   # let's copy our Dynaloader.pm (make this optional?)
-  open my $fhdyna, ">", "$opts{distdir}/lib/Dynaloader.pm";
+  open my $fhdyna, ">", "%opts{distdir}/lib/Dynaloader.pm";
   print $fhdyna $dynaloader_pm;
   close $fhdyna;
 }
 
 # Config.pm, perl binaries
-if ($opts{'verbose'} +>=1) {
+if (%opts{'verbose'} +>=1) {
   print STDERR "Copying Config.pm, perl.dll and perl.exe...\n";
 }
-copy "../xlib/$opts{'cross-name'}/Config.pm", "$opts{distdir}/lib/Config.pm";
-copy "$opts{'cross-name'}/perl.exe", "$opts{distdir}/bin/perl.exe";
-copy "$opts{'cross-name'}/perl.dll", "$opts{distdir}/bin/perl.dll";
+copy "../xlib/%opts{'cross-name'}/Config.pm", "%opts{distdir}/lib/Config.pm";
+copy "%opts{'cross-name'}/perl.exe", "%opts{distdir}/bin/perl.exe";
+copy "%opts{'cross-name'}/perl.dll", "%opts{distdir}/bin/perl.dll";
 # how do we know exact name of perl.dll?
 
 # auto
@@ -121,18 +121,18 @@ my %aexcl = (socket=>'Socket_1');
 # on WinCE, %aexcl needed to replace it with a different name that however
 # will be found by Dynaloader
 my @afiles;
-chdir "../xlib/$opts{'cross-name'}/auto";
+chdir "../xlib/%opts{'cross-name'}/auto";
 find({no_chdir=>1,wanted=>sub{push @afiles, $_ if m/\.(dll|bs)$/}},'.');
 chdir $cwd;
-if ($opts{'verbose'} +>=1) {
+if (%opts{'verbose'} +>=1) {
   print STDERR "Copying binaries for perl core extensions...\n";
 }
 for (@afiles) {
-  if (m/^(.*)\/(\w+)\.dll$/i && exists $aexcl{lc($2)}) {
-    copy "../xlib/$opts{'cross-name'}/auto/$_", "$opts{distdir}/lib/auto/$1/$aexcl{lc($2)}.dll";
+  if (m/^(.*)\/(\w+)\.dll$/i && exists %aexcl{lc($2)}) {
+    copy "../xlib/%opts{'cross-name'}/auto/$_", "%opts{distdir}/lib/auto/$1/%aexcl{lc($2)}.dll";
   }
   else {
-    copy "../xlib/$opts{'cross-name'}/auto/$_", "$opts{distdir}/lib/auto/$_";
+    copy "../xlib/%opts{'cross-name'}/auto/$_", "%opts{distdir}/lib/auto/$_";
   }
 }
 
@@ -142,7 +142,7 @@ sub copy($$) {
   binmode $fh;
   local $/;
   my $ffrom = ~< $fh;
-  if ($opts{'strip-pod'}) {
+  if (%opts{'strip-pod'}) {
     # actually following regexp is suspicious to not work everywhere.
     # but we've checked on our set of modules, and it's fit for our purposes
     $ffrom =~ s/^=\w+.*?^=cut(?:\n|\Z)//msg;
@@ -156,7 +156,7 @@ sub copy($$) {
   open my $fhout, ">", "$fnto";
   binmode $fhout;
   print $fhout $ffrom;
-  if ($opts{'verbose'} +>=2) {
+  if (%opts{'verbose'} +>=2) {
     print STDERR "copying $fnfrom=>$fnto\n";
   }
 }

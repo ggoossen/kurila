@@ -24,9 +24,9 @@ sub ok {
     ++$t;
 }
 
-sub ok_undef { ok(!defined($_[0]), shift, "undef", @_) }
-sub ok_numeric { ok($_[0] == $_[1], @_) }
-sub ok_string { ok($_[0] eq $_[1], @_) }
+sub ok_undef { ok(!defined(@_[0]), shift, "undef", @_) }
+sub ok_numeric { ok(@_[0] == @_[1], @_) }
+sub ok_string { ok(@_[0] eq @_[1], @_) }
 
 my($r, $s);
 # the thing itself

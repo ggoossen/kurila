@@ -4,12 +4,12 @@
 #
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
         chdir 't' if -d 't';
         @INC = '../lib';
         our %Config;
         require Config; Config->import;
-        if ($Config{'extensions'} !~ m/\bData\/Dumper\b/) {
+        if (%Config{'extensions'} !~ m/\bData\/Dumper\b/) {
             print "1..0 # Skip: Data::Dumper was not built\n";
             exit 0;
         }
@@ -25,7 +25,7 @@ use Data::Dumper;
 use Config;
 use utf8;
 use strict;
-my $Is_ebcdic = defined($Config{'ebcdic'}) && $Config{'ebcdic'} eq 'define';
+my $Is_ebcdic = defined(%Config{'ebcdic'}) && %Config{'ebcdic'} eq 'define';
 
 $Data::Dumper::Pad = "#";
 my $TMAX;
@@ -339,8 +339,8 @@ EOT
   $foo = 5;
   @foo = (-10,\*foo);
   %foo = (a=>1,b=>\$foo,c=>\@foo);
-  $foo{d} = \%foo;
-  $foo[2] = \%foo;
+  %foo{d} = \%foo;
+  @foo[2] = \%foo;
 
 ############# 49
 ##
@@ -506,10 +506,10 @@ EOT
   package main;
   @dogs = ( 'Fido', 'Wags' );
   %kennel = (
-            First => \$dogs[0],
-            Second =>  \$dogs[1],
+            First => \@dogs[0],
+            Second =>  \@dogs[1],
            );
-  $dogs[2] = \%kennel;
+  @dogs[2] = \%kennel;
   $mutts = \%kennel;
   $mutts = $mutts;         # avoid warning
   
@@ -1146,17 +1146,17 @@ EOT
 # Use them in an integer context
 foreach (@numbers_i, @numbers_ni, @numbers_nis, @numbers_is,
          @strings_i, @strings_ni, @strings_nis, @strings_is) {
-  my $b = sprintf "%d", $_;
+  my $b = sprintf "\%d", $_;
 }
 # Use them in a floating point context
 foreach (@numbers_n, @numbers_ni, @numbers_nis, @numbers_ns,
          @strings_n, @strings_ni, @strings_nis, @strings_ns) {
-  my $b = sprintf "%e", $_;
+  my $b = sprintf "\%e", $_;
 }
 # Use them in a string context
 foreach (@numbers_s, @numbers_is, @numbers_nis, @numbers_ns,
          @strings_s, @strings_is, @strings_nis, @strings_ns) {
-  my $b = sprintf "%s", $_;
+  my $b = sprintf "\%s", $_;
 }
 
 # use Devel::Peek; Dump ($_) foreach @vanilla_c;
@@ -1180,8 +1180,8 @@ TEST q(Data::Dumper->new(\@strings_ns)->Dump), 'Strings NV,PV';
 TEST q(Data::Dumper->new(\@strings_ni)->Dump), 'Strings NV,IV';
 TEST q(Data::Dumper->new(\@strings_nis)->Dump), 'Strings NV,IV,PV';
 if ($XS) {
- my $nv_preserves_uv = defined $Config{d_nv_preserves_uv};
- my $nv_preserves_uv_4bits = $Config{nv_preserves_uv_bits} +>= 4;
+ my $nv_preserves_uv = defined %Config{d_nv_preserves_uv};
+ my $nv_preserves_uv_4bits = %Config{nv_preserves_uv_bits} +>= 4;
   $WANT=$WANT_XS_N;
   TEST q(Data::Dumper->new(\@numbers)->Dumpxs), 'XS Numbers';
   TEST q(Data::Dumper->new(\@numbers_s)->Dumpxs), 'XS Numbers PV';
@@ -1411,7 +1411,7 @@ EOT
 #];
 EOT
     @foo = ();
-    $foo[2] = 1;
+    @foo[2] = 1;
     TEST q(Data::Dumper->Dump([\@foo])), 'Richard Clamp, Message-Id: <20030104005247.GA27685@mirth.demon.co.uk>';
     TEST q(Data::Dumper->Dumpxs([\@foo])) if $XS;
 }

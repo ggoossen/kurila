@@ -104,7 +104,7 @@ use ExtUtils::Constant::XS qw(%XS_Constant %XS_TypeSet);
 	C_constant WriteConstants WriteMakefileSnippet
 ) ] );
 
-@EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+@EXPORT_OK = ( @{ %EXPORT_TAGS{'all'} } );
 
 =item constant_types
 
@@ -215,7 +215,7 @@ EOT
 
   # If anyone is insane enough to suggest a package name containing %
   my $package_sprintf_safe = $package;
-  $package_sprintf_safe =~ s/%/%%/g;
+  $package_sprintf_safe =~ s/%/\%\%/g;
 
   $xs .= << "EOT";
       /* Return 1 or 2 items. First is error message, or undef if no error.
@@ -223,12 +223,12 @@ EOT
         switch (type) \{
         case PERL_constant_NOTFOUND:
           sv =
-	    sv_2mortal(newSVpvf("%s is not a valid $package_sprintf_safe macro", s));
+	    sv_2mortal(newSVpvf("\%s is not a valid $package_sprintf_safe macro", s));
           PUSHs(sv);
           break;
         case PERL_constant_NOTDEF:
           sv = sv_2mortal(newSVpvf(
-	    "Your vendor has not defined $package_sprintf_safe macro %s, used",
+	    "Your vendor has not defined $package_sprintf_safe macro \%s, used",
 				   s));
           PUSHs(sv);
           break;
@@ -240,11 +240,11 @@ EOT
     $xs .= "\t/* Uncomment this if you need to return ${type}s\n"
       unless $what->{$type};
     $xs .= "        case PERL_constant_IS$type:\n";
-    if (length $XS_Constant{$type}) {
+    if (length %XS_Constant{$type}) {
       $xs .= << "EOT";
           EXTEND(SP, 1);
           PUSHs(&PL_sv_undef);
-          $XS_Constant{$type};
+          %XS_Constant{$type};
 EOT
     } else {
       # Do nothing. return (), which will be correctly interpreted as
@@ -259,7 +259,7 @@ EOT
   $xs .= << "EOT";
         default:
           sv = sv_2mortal(newSVpvf(
-	    "Unexpected return type %d while processing $package_sprintf_safe macro %s, used",
+	    "Unexpected return type \%d while processing $package_sprintf_safe macro \%s, used",
                type, s));
           PUSHs(sv);
         \}
@@ -284,28 +284,28 @@ C<XS_FILE> are recognised.
 
 sub WriteMakefileSnippet {
   my %args = @_;
-  my $indent = $args{INDENT} || 2;
+  my $indent = %args{INDENT} || 2;
 
   my $result = <<"EOT";
 ExtUtils::Constant::WriteConstants(
-                                   NAME         => '$args{NAME}',
+                                   NAME         => '%args{NAME}',
                                    NAMES        => \\\@names,
-                                   DEFAULT_TYPE => '$args{DEFAULT_TYPE}',
+                                   DEFAULT_TYPE => '%args{DEFAULT_TYPE}',
                                    PROXYSUBS    => 1,
 EOT
   foreach (qw (C_FILE XS_FILE)) {
-    next unless exists $args{$_};
-    $result .= sprintf "                                   %-12s => '%s',\n",
-      $_, $args{$_};
+    next unless exists %args{$_};
+    $result .= sprintf "                                   \%-12s => '\%s',\n",
+      $_, %args{$_};
   }
   $result .= <<'EOT';
                                 );
 EOT
 
   $result =~ s/^/{' 'x$indent}/gm;
-  return ExtUtils::Constant::XS->dump_names({default_type=>$args{DEFAULT_TYPE},
+  return ExtUtils::Constant::XS->dump_names({default_type=>%args{DEFAULT_TYPE},
 					     indent=>$indent,},
-					    @{$args{NAMES}})
+					    @{%args{NAMES}})
     . $result;
 }
 
@@ -385,35 +385,35 @@ sub WriteConstants {
      DEFAULT_TYPE => 'IV',
      @_);
 
-  $ARGS{C_SUBNAME} ||= $ARGS{SUBNAME}; # No-one sane will have C_SUBNAME eq '0'
+  %ARGS{C_SUBNAME} ||= %ARGS{SUBNAME}; # No-one sane will have C_SUBNAME eq '0'
 
-  die "Module name not specified" unless length $ARGS{NAME};
+  die "Module name not specified" unless length %ARGS{NAME};
 
-  my $c_fh = $ARGS{C_FH};
+  my $c_fh = %ARGS{C_FH};
   if (!$c_fh) {
-      open $c_fh, ">", "$ARGS{C_FILE}" or die "Can't open $ARGS{C_FILE}: $!";
+      open $c_fh, ">", "%ARGS{C_FILE}" or die "Can't open %ARGS{C_FILE}: $!";
   }
 
-  my $xs_fh = $ARGS{XS_FH};
+  my $xs_fh = %ARGS{XS_FH};
   if (!$xs_fh) {
-      open $xs_fh, ">", "$ARGS{XS_FILE}" or die "Can't open $ARGS{XS_FILE}: $!";
+      open $xs_fh, ">", "%ARGS{XS_FILE}" or die "Can't open %ARGS{XS_FILE}: $!";
   }
 
   # As this subroutine is intended to make code that isn't edited, there's no
   # need for the user to specify any types that aren't found in the list of
   # names.
   
-  if ($ARGS{PROXYSUBS}) {
+  if (%ARGS{PROXYSUBS}) {
       require ExtUtils::Constant::ProxySubs;
-      $ARGS{C_FH} = $c_fh;
-      $ARGS{XS_FH} = $xs_fh;
+      %ARGS{C_FH} = $c_fh;
+      %ARGS{XS_FH} = $xs_fh;
       ExtUtils::Constant::ProxySubs->WriteConstants(%ARGS);
   } else {
       die "Ony ProxySubs are supported";
   }
 
-  close $c_fh or warn "Error closing $ARGS{C_FILE}: $!" unless $ARGS{C_FH};
-  close $xs_fh or warn "Error closing $ARGS{XS_FILE}: $!" unless $ARGS{XS_FH};
+  close $c_fh or warn "Error closing %ARGS{C_FILE}: $!" unless %ARGS{C_FH};
+  close $xs_fh or warn "Error closing %ARGS{XS_FILE}: $!" unless %ARGS{XS_FH};
 }
 
 1;

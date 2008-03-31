@@ -41,23 +41,23 @@ my $tr = $^O eq 'os390' ? Convert::EBCDIC->new() : undef;
 sub toebcdic {
   my $cmd = shift;
 
-  unless (exists ${*$cmd}{'net_cmd_asciipeer'}) {
-    my $string    = $_[0];
+  unless (exists %{*$cmd}{'net_cmd_asciipeer'}) {
+    my $string    = @_[0];
     my $ebcdicstr = $tr->toebcdic($string);
-    ${*$cmd}{'net_cmd_asciipeer'} = $string !~ m/^\d+/ && $ebcdicstr =~ m/^\d+/;
+    %{*$cmd}{'net_cmd_asciipeer'} = $string !~ m/^\d+/ && $ebcdicstr =~ m/^\d+/;
   }
 
-  ${*$cmd}{'net_cmd_asciipeer'}
-    ? $tr->toebcdic($_[0])
-    : $_[0];
+  %{*$cmd}{'net_cmd_asciipeer'}
+    ? $tr->toebcdic(@_[0])
+    : @_[0];
 }
 
 
 sub toascii {
   my $cmd = shift;
-  ${*$cmd}{'net_cmd_asciipeer'}
-    ? $tr->toascii($_[0])
-    : $_[0];
+  %{*$cmd}{'net_cmd_asciipeer'}
+    ? $tr->toascii(@_[0])
+    : @_[0];
 }
 
 
@@ -67,27 +67,27 @@ sub _print_isa {
   my $pkg = shift;
   my $cmd = $pkg;
 
-  $debug{$pkg} ||= 0;
+  %debug{$pkg} ||= 0;
 
   my %done = ();
   my @do   = ($pkg);
   my %spc  = ($pkg, "");
 
   while ($pkg = shift @do) {
-    next if defined $done{$pkg};
+    next if defined %done{$pkg};
 
-    $done{$pkg} = 1;
+    %done{$pkg} = 1;
 
     my $v =
       defined ${*{Symbol::fetch_glob("${pkg}::VERSION")}}
       ? "(" . ${*{Symbol::fetch_glob("${pkg}::VERSION")}} . ")"
       : "";
 
-    my $spc = $spc{$pkg};
+    my $spc = %spc{$pkg};
     $cmd->debug_print(1, "${spc}${pkg}${v}\n");
 
     if (@{*{Symbol::fetch_glob("${pkg}::ISA")}}) {
-      @spc{@{*{Symbol::fetch_glob("${pkg}::ISA")}}} = ("  " . $spc{$pkg}) x @{*{Symbol::fetch_glob("${pkg}::ISA")}};
+      %spc{[@{*{Symbol::fetch_glob("${pkg}::ISA")}}]} = ("  " . %spc{$pkg}) x @{*{Symbol::fetch_glob("${pkg}::ISA")}};
       unshift(@do, @{*{Symbol::fetch_glob("${pkg}::ISA")}});
     }
   }
@@ -102,26 +102,26 @@ sub debug {
   my $oldval = 0;
 
   if (ref($cmd)) {
-    $oldval = ${*$cmd}{'net_cmd_debug'} || 0;
+    $oldval = %{*$cmd}{'net_cmd_debug'} || 0;
   }
   else {
-    $oldval = $debug{$pkg} || 0;
+    $oldval = %debug{$pkg} || 0;
   }
 
   return $oldval
     unless @_ == 2;
 
-  $level = $debug{$pkg} || 0
+  $level = %debug{$pkg} || 0
     unless defined $level;
 
   _print_isa($pkg)
-    if ($level && !exists $debug{$pkg});
+    if ($level && !exists %debug{$pkg});
 
   if (ref($cmd)) {
-    ${*$cmd}{'net_cmd_debug'} = $level;
+    %{*$cmd}{'net_cmd_debug'} = $level;
   }
   else {
-    $debug{$pkg} = $level;
+    %debug{$pkg} = $level;
   }
 
   $oldval;
@@ -134,12 +134,12 @@ sub message {
   my $cmd = shift;
 
   wantarray
-    ? @{${*$cmd}{'net_cmd_resp'}}
-    : join("", @{${*$cmd}{'net_cmd_resp'}});
+    ? @{%{*$cmd}{'net_cmd_resp'}}
+    : join("", @{%{*$cmd}{'net_cmd_resp'}});
 }
 
 
-sub debug_text { $_[2] }
+sub debug_text { @_[2] }
 
 
 sub debug_print {
@@ -153,10 +153,10 @@ sub code {
 
   my $cmd = shift;
 
-  ${*$cmd}{'net_cmd_code'} = "000"
-    unless exists ${*$cmd}{'net_cmd_code'};
+  %{*$cmd}{'net_cmd_code'} = "000"
+    unless exists %{*$cmd}{'net_cmd_code'};
 
-  ${*$cmd}{'net_cmd_code'};
+  %{*$cmd}{'net_cmd_code'};
 }
 
 
@@ -165,7 +165,7 @@ sub status {
 
   my $cmd = shift;
 
-  substr(${*$cmd}{'net_cmd_code'}, 0, 1);
+  substr(%{*$cmd}{'net_cmd_code'}, 0, 1);
 }
 
 
@@ -178,7 +178,7 @@ sub set_status {
   $resp = [$resp]
     unless ref($resp);
 
-  (${*$cmd}{'net_cmd_code'}, ${*$cmd}{'net_cmd_resp'}) = ($code, $resp);
+  (%{*$cmd}{'net_cmd_code'}, %{*$cmd}{'net_cmd_resp'}) = ($code, $resp);
 
   1;
 }
@@ -194,10 +194,10 @@ sub command {
 
 
   $cmd->dataend()
-    if (exists ${*$cmd}{'net_cmd_last_ch'});
+    if (exists %{*$cmd}{'net_cmd_last_ch'});
 
   if (scalar(@_)) {
-    local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+    local %SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
 
     my $str = join(
       " ",
@@ -219,8 +219,8 @@ sub command {
     $cmd->debug_print(1, $str)
       if ($cmd->debug);
 
-    ${*$cmd}{'net_cmd_resp'} = [];       # the response
-    ${*$cmd}{'net_cmd_code'} = "000";    # Made this one up :-)
+    %{*$cmd}{'net_cmd_resp'} = [];       # the response
+    %{*$cmd}{'net_cmd_code'} = "000";    # Made this one up :-)
   }
 
   $cmd;
@@ -230,7 +230,7 @@ sub command {
 sub ok {
   @_ == 1 or croak 'usage: $obj->ok()';
 
-  my $code = $_[0]->code;
+  my $code = @_[0]->code;
   0 +< $code && $code +< 400;
 }
 
@@ -238,8 +238,8 @@ sub ok {
 sub unsupported {
   my $cmd = shift;
 
-  ${*$cmd}{'net_cmd_resp'} = ['Unsupported command'];
-  ${*$cmd}{'net_cmd_code'} = 580;
+  %{*$cmd}{'net_cmd_resp'} = ['Unsupported command'];
+  %{*$cmd}{'net_cmd_code'} = 580;
   0;
 }
 
@@ -247,12 +247,12 @@ sub unsupported {
 sub getline {
   my $cmd = shift;
 
-  ${*$cmd}{'net_cmd_lines'} ||= [];
+  %{*$cmd}{'net_cmd_lines'} ||= [];
 
-  return shift @{${*$cmd}{'net_cmd_lines'}}
-    if scalar(@{${*$cmd}{'net_cmd_lines'}});
+  return shift @{%{*$cmd}{'net_cmd_lines'}}
+    if scalar(@{%{*$cmd}{'net_cmd_lines'}});
 
-  my $partial = defined(${*$cmd}{'net_cmd_partial'}) ? ${*$cmd}{'net_cmd_partial'} : "";
+  my $partial = defined(%{*$cmd}{'net_cmd_partial'}) ? %{*$cmd}{'net_cmd_partial'} : "";
   my $fd      = fileno($cmd);
 
   return undef
@@ -263,7 +263,7 @@ sub getline {
 
   my $buf;
 
-  until (scalar(@{${*$cmd}{'net_cmd_lines'}})) {
+  until (scalar(@{%{*$cmd}{'net_cmd_lines'}})) {
     my $timeout = $cmd->timeout || undef;
     my $rout;
 
@@ -282,7 +282,7 @@ sub getline {
 
       $partial = pop @buf;
 
-      push(@{${*$cmd}{'net_cmd_lines'}}, map {"$_\n"} @buf);
+      push(@{%{*$cmd}{'net_cmd_lines'}}, map {"$_\n"} @buf);
 
     }
     else {
@@ -292,29 +292,29 @@ sub getline {
     }
   }
 
-  ${*$cmd}{'net_cmd_partial'} = $partial;
+  %{*$cmd}{'net_cmd_partial'} = $partial;
 
   if ($tr) {
-    foreach my $ln (@{${*$cmd}{'net_cmd_lines'}}) {
+    foreach my $ln (@{%{*$cmd}{'net_cmd_lines'}}) {
       $ln = $cmd->toebcdic($ln);
     }
   }
 
-  shift @{${*$cmd}{'net_cmd_lines'}};
+  shift @{%{*$cmd}{'net_cmd_lines'}};
 }
 
 
 sub ungetline {
   my ($cmd, $str) = @_;
 
-  ${*$cmd}{'net_cmd_lines'} ||= [];
-  unshift(@{${*$cmd}{'net_cmd_lines'}}, $str);
+  %{*$cmd}{'net_cmd_lines'} ||= [];
+  unshift(@{%{*$cmd}{'net_cmd_lines'}}, $str);
 }
 
 
 sub parse_response {
   return ()
-    unless $_[1] =~ s/^(\d\d\d)(.?)//o;
+    unless @_[1] =~ s/^(\d\d\d)(.?)//o;
   ($1, $2 eq "-");
 }
 
@@ -323,7 +323,7 @@ sub response {
   my $cmd = shift;
   my ($code, $more) = (undef) x 2;
 
-  ${*$cmd}{'net_cmd_resp'} ||= [];
+  %{*$cmd}{'net_cmd_resp'} ||= [];
 
   while (1) {
     my $str = $cmd->getline();
@@ -340,9 +340,9 @@ sub response {
       last;
     }
 
-    ${*$cmd}{'net_cmd_code'} = $code;
+    %{*$cmd}{'net_cmd_code'} = $code;
 
-    push(@{${*$cmd}{'net_cmd_resp'}}, $str);
+    push(@{%{*$cmd}{'net_cmd_resp'}}, $str);
 
     last unless ($more);
   }
@@ -380,13 +380,13 @@ sub read_until_dot {
 
 sub datasend {
   my $cmd  = shift;
-  my $arr  = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
+  my $arr  = @_ == 1 && ref(@_[0]) ? @_[0] : \@_;
   my $line = join("", @$arr);
 
   return 0 unless defined(fileno($cmd));
 
-  my $last_ch = ${*$cmd}{'net_cmd_last_ch'};
-  $last_ch = ${*$cmd}{'net_cmd_last_ch'} = "\012" unless defined $last_ch;
+  my $last_ch = %{*$cmd}{'net_cmd_last_ch'};
+  $last_ch = %{*$cmd}{'net_cmd_last_ch'} = "\012" unless defined $last_ch;
 
   return 1 unless length $line;
 
@@ -411,7 +411,7 @@ sub datasend {
 
   substr($line, 0, 0, $first_ch);
 
-  ${*$cmd}{'net_cmd_last_ch'} = substr($line, -1, 1);
+  %{*$cmd}{'net_cmd_last_ch'} = substr($line, -1, 1);
 
   my $len    = length($line);
   my $offset = 0;
@@ -419,7 +419,7 @@ sub datasend {
   vec($win, fileno($cmd), 1) = 1;
   my $timeout = $cmd->timeout || undef;
 
-  local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+  local %SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
 
   while ($len) {
     my $wout;
@@ -446,7 +446,7 @@ sub datasend {
 
 sub rawdatasend {
   my $cmd  = shift;
-  my $arr  = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
+  my $arr  = @_ == 1 && ref(@_[0]) ? @_[0] : \@_;
   my $line = join("", @$arr);
 
   return 0 unless defined(fileno($cmd));
@@ -465,7 +465,7 @@ sub rawdatasend {
   vec($win, fileno($cmd), 1) = 1;
   my $timeout = $cmd->timeout || undef;
 
-  local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+  local %SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
   while ($len) {
     my $wout;
     if (select(undef, $wout = $win, undef, $timeout) +> 0) {
@@ -492,7 +492,7 @@ sub dataend {
 
   return 0 unless defined(fileno($cmd));
 
-  my $ch = ${*$cmd}{'net_cmd_last_ch'};
+  my $ch = %{*$cmd}{'net_cmd_last_ch'};
   my $tosend;
 
   if (!defined $ch) {
@@ -504,14 +504,14 @@ sub dataend {
 
   $tosend .= ".\015\012";
 
-  local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+  local %SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
 
   $cmd->debug_print(1, ".\n")
     if ($cmd->debug);
 
   syswrite($cmd, $tosend, length $tosend);
 
-  delete ${*$cmd}{'net_cmd_last_ch'};
+  delete %{*$cmd}{'net_cmd_last_ch'};
 
   $cmd->response() == CMD_OK;
 }
@@ -519,7 +519,7 @@ sub dataend {
 # read and write to tied filehandle
 sub tied_fh {
   my $cmd = shift;
-  ${*$cmd}{'net_cmd_readbuf'} = '';
+  %{*$cmd}{'net_cmd_readbuf'} = '';
   my $fh = gensym();
   tie *$fh, ref($cmd), $cmd;
   return $fh;
@@ -536,20 +536,20 @@ sub TIEHANDLE {
 # end-of-file when the dot is encountered.
 sub READ {
   my $cmd = shift;
-  my ($len, $offset) = @_[1, 2];
-  return unless exists ${*$cmd}{'net_cmd_readbuf'};
+  my ($len, $offset) = @_[[1, 2]];
+  return unless exists %{*$cmd}{'net_cmd_readbuf'};
   my $done = 0;
-  while (!$done and length(${*$cmd}{'net_cmd_readbuf'}) +< $len) {
-    ${*$cmd}{'net_cmd_readbuf'} .= $cmd->getline() or return;
-    $done++ if ${*$cmd}{'net_cmd_readbuf'} =~ s/^\.\r?\n\Z//m;
+  while (!$done and length(%{*$cmd}{'net_cmd_readbuf'}) +< $len) {
+    %{*$cmd}{'net_cmd_readbuf'} .= $cmd->getline() or return;
+    $done++ if %{*$cmd}{'net_cmd_readbuf'} =~ s/^\.\r?\n\Z//m;
   }
 
-  $_[0] = '';
-  substr($_[0], $offset + 0, undef, substr(${*$cmd}{'net_cmd_readbuf'}, 0, $len));
-  substr(${*$cmd}{'net_cmd_readbuf'}, 0, $len, '');
-  delete ${*$cmd}{'net_cmd_readbuf'} if $done;
+  @_[0] = '';
+  substr(@_[0], $offset + 0, undef, substr(%{*$cmd}{'net_cmd_readbuf'}, 0, $len));
+  substr(%{*$cmd}{'net_cmd_readbuf'}, 0, $len, '');
+  delete %{*$cmd}{'net_cmd_readbuf'} if $done;
 
-  return length $_[0];
+  return length @_[0];
 }
 
 
@@ -558,7 +558,7 @@ sub READLINE {
 
   # in this context, we use the presence of readbuf to
   # indicate that we have not yet reached the eof
-  return unless exists ${*$cmd}{'net_cmd_readbuf'};
+  return unless exists %{*$cmd}{'net_cmd_readbuf'};
   my $line = $cmd->getline;
   return if $line =~ m/^\.\r?\n/;
   $line;
@@ -571,16 +571,16 @@ sub PRINT {
   $len ||= length($buf);
   $offset += 0;
   return unless $cmd->datasend(substr($buf, $offset, $len));
-  ${*$cmd}{'net_cmd_sending'}++;    # flag that we should call dataend()
+  %{*$cmd}{'net_cmd_sending'}++;    # flag that we should call dataend()
   return $len;
 }
 
 
 sub CLOSE {
   my $cmd = shift;
-  my $r = exists(${*$cmd}{'net_cmd_sending'}) ? $cmd->dataend : 1;
-  delete ${*$cmd}{'net_cmd_readbuf'};
-  delete ${*$cmd}{'net_cmd_sending'};
+  my $r = exists(%{*$cmd}{'net_cmd_sending'}) ? $cmd->dataend : 1;
+  delete %{*$cmd}{'net_cmd_readbuf'};
+  delete %{*$cmd}{'net_cmd_sending'};
   $r;
 }
 

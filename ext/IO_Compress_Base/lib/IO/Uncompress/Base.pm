@@ -25,15 +25,15 @@ use List::Util qw(min);
 use Carp ;
 
 %EXPORT_TAGS = ( );
-push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
+push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
 #Exporter::export_ok_tags('all') ;
 
 
 sub smartRead
 {
-    my $self = $_[0];
-    my $out = $_[1];
-    my $size = $_[2];
+    my $self = @_[0];
+    my $out = @_[1];
+    my $size = @_[2];
     $$out = "" ;
 
     my $offset = 0 ;
@@ -105,23 +105,23 @@ sub pushBack
 {
     my $self = shift ;
 
-    return if ! defined $_[0] || length $_[0] == 0 ;
+    return if ! defined @_[0] || length @_[0] == 0 ;
 
     if (defined *$self->{FH} || defined *$self->{InputEvent} ) {
-        *$self->{Prime} = $_[0] . *$self->{Prime} ;
-        *$self->{InputLengthRemaining} += length($_[0]);
+        *$self->{Prime} = @_[0] . *$self->{Prime} ;
+        *$self->{InputLengthRemaining} += length(@_[0]);
     }
     else {
-        my $len = length $_[0];
+        my $len = length @_[0];
 
         if($len +> *$self->{BufferOffset}) {
-            *$self->{Prime} = substr($_[0], 0, $len - *$self->{BufferOffset}) . *$self->{Prime} ;
+            *$self->{Prime} = substr(@_[0], 0, $len - *$self->{BufferOffset}) . *$self->{Prime} ;
             *$self->{InputLengthRemaining} = *$self->{InputLength};
             *$self->{BufferOffset} = 0
         }
         else {
-            *$self->{InputLengthRemaining} += length($_[0]);
-            *$self->{BufferOffset} -= length($_[0]) ;
+            *$self->{InputLengthRemaining} += length(@_[0]);
+            *$self->{BufferOffset} -= length(@_[0]) ;
         }
     }
 }
@@ -164,12 +164,12 @@ sub smartWrite
 
 sub smartReadExact
 {
-    return $_[0]->smartRead($_[1], $_[2]) == $_[2];
+    return @_[0]->smartRead(@_[1], @_[2]) == @_[2];
 }
 
 sub smartEof
 {
-    my ($self) = $_[0];
+    my ($self) = @_[0];
     local $.; 
 
     return 0 if length *$self->{Prime} || *$self->{PushMode};
@@ -221,8 +221,8 @@ sub saveErrorString
 sub croakError
 {
     my $self   = shift ;
-    $self->saveErrorString(0, $_[0]);
-    croak $_[0];
+    $self->saveErrorString(0, @_[0]);
+    croak @_[0];
 }
 
 
@@ -257,25 +257,25 @@ sub errorNo
 sub HeaderError
 {
     my ($self) = shift;
-    return $self->saveErrorString(undef, "Header Error: $_[0]", STATUS_ERROR);
+    return $self->saveErrorString(undef, "Header Error: @_[0]", STATUS_ERROR);
 }
 
 sub TrailerError
 {
     my ($self) = shift;
-    return $self->saveErrorString(G_ERR, "Trailer Error: $_[0]", STATUS_ERROR);
+    return $self->saveErrorString(G_ERR, "Trailer Error: @_[0]", STATUS_ERROR);
 }
 
 sub TruncatedHeader
 {
     my ($self) = shift;
-    return $self->HeaderError("Truncated in $_[0] Section");
+    return $self->HeaderError("Truncated in @_[0] Section");
 }
 
 sub TruncatedTrailer
 {
     my ($self) = shift;
-    return $self->TrailerError("Truncated in $_[0] Section");
+    return $self->TrailerError("Truncated in @_[0] Section");
 }
 
 sub postCheckParams
@@ -455,7 +455,7 @@ sub ckInputParam
 {
     my $self = shift ;
     my $from = shift ;
-    my $inType = whatIsInput($_[0], $_[1]);
+    my $inType = whatIsInput(@_[0], @_[1]);
 
     $self->croakError("$from: input parameter not a filename, filehandle, array ref or scalar ref")
         if ! $inType ;
@@ -463,12 +463,12 @@ sub ckInputParam
     if ($inType  eq 'filename' )
     {
         $self->croakError("$from: input filename is undef or null string")
-            if ! defined $_[0] || $_[0] eq ''  ;
+            if ! defined @_[0] || @_[0] eq ''  ;
 
-        if ($_[0] ne '-' && ! -e $_[0] )
+        if (@_[0] ne '-' && ! -e @_[0] )
         {
             return $self->saveErrorString(undef, 
-                            "input file '$_[0]' does not exist", STATUS_ERROR);
+                            "input file '@_[0]' does not exist", STATUS_ERROR);
         }
     }
 
@@ -480,8 +480,8 @@ sub _inf
 {
     my $obj = shift ;
 
-    my $class = (caller)[0] ;
-    my $name = (caller(1))[3] ;
+    my $class = (caller)[[0]] ;
+    my $name = (caller(1))[[3]] ;
 
     $obj->croakError("$name: expected at least 1 parameters\n")
         unless @_ +>= 1 ;
@@ -696,7 +696,7 @@ sub _rd2
 
 sub TIEHANDLE
 {
-    return $_[0] if ref($_[0]);
+    return @_[0] if ref(@_[0]);
     die "OOPS\n" ;
 
 }
@@ -982,23 +982,23 @@ sub read
     #            "::read: buffer parameter is read-only")
     #    if Compress::Raw::Zlib::_readonly_ref($_[0]);
 
-    if (ref $_[0] ) {
+    if (ref @_[0] ) {
         $self->croakError(*$self->{ClassName} . "::read: buffer parameter is read-only")
-            if readonly(${ $_[0] });
+            if readonly(${ @_[0] });
 
-        $self->croakError(*$self->{ClassName} . "::read: not a scalar reference $_[0]" )
-            unless ref $_[0] eq 'SCALAR' ;
-        $buffer = $_[0] ;
+        $self->croakError(*$self->{ClassName} . "::read: not a scalar reference @_[0]" )
+            unless ref @_[0] eq 'SCALAR' ;
+        $buffer = @_[0] ;
     }
     else {
         $self->croakError(*$self->{ClassName} . "::read: buffer parameter is read-only")
-            if readonly($_[0]);
+            if readonly(@_[0]);
 
-        $buffer = \$_[0] ;
+        $buffer = \@_[0] ;
     }
 
-    my $length = $_[1] ;
-    my $offset = $_[2] || 0;
+    my $length = @_[1] ;
+    my $offset = @_[2] || 0;
 
     # the core read will return 0 if asked for 0 bytes
     return 0 if defined $length && $length == 0 ;
@@ -1162,7 +1162,7 @@ sub ungetc
 {
     my $self = shift;
     *$self->{Pending} = ""  unless defined *$self->{Pending} ;    
-    *$self->{Pending} = $_[0] . *$self->{Pending} ;    
+    *$self->{Pending} = @_[0] . *$self->{Pending} ;    
 }
 
 
@@ -1322,7 +1322,7 @@ sub input_line_number
 {
     my $self = shift ;
     my $last = *$self->{LineNo};
-    $. = *$self->{LineNo} = $_[1] if @_ ;
+    $. = *$self->{LineNo} = @_[1] if @_ ;
     return $last;
 }
 

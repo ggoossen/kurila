@@ -1,5 +1,5 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
 	@INC = '../lib';
 	chdir 't';
     }
@@ -28,7 +28,7 @@ this is a test
 EOM
 
 ok(1, tie *OUT, "IO::Zlib", $name, "wb");
-ok(2, printf OUT "%s - %d\n", "hello", 123);
+ok(2, printf OUT "\%s - \%d\n", "hello", 123);
 ok(3, print OUT $hello);
 ok(4, untie *OUT);
 

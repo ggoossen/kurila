@@ -3,24 +3,24 @@
 print "1..145\n";
 
 sub try ($$) {
-   print +($_[1] ? "ok" : "not ok"), " $_[0]\n";
+   print +(@_[1] ? "ok" : "not ok"), " @_[0]\n";
 }
 sub tryeq ($$$) {
-  if ($_[1] == $_[2]) {
-    print "ok $_[0]\n";
+  if (@_[1] == @_[2]) {
+    print "ok @_[0]\n";
   } else {
-    print "not ok $_[0] # $_[1] != $_[2]\n";
+    print "not ok @_[0] # @_[1] != @_[2]\n";
   }
 }
 sub tryeq_sloppy ($$$) {
-  if ($_[1] == $_[2]) {
-    print "ok $_[0]\n";
+  if (@_[1] == @_[2]) {
+    print "ok @_[0]\n";
   } else {
-    my $error = abs ($_[1] - $_[2]) / $_[1];
+    my $error = abs (@_[1] - @_[2]) / @_[1];
     if ($error +< 1e-9) {
-      print "ok $_[0] # $_[1] is close to $_[2], \$^O eq $^O\n";
+      print "ok @_[0] # @_[1] is close to @_[2], \$^O eq $^O\n";
     } else {
-      print "not ok $_[0] # $_[1] != $_[2]\n";
+      print "not ok @_[0] # @_[1] != @_[2]\n";
     }
   }
 }
@@ -288,7 +288,7 @@ my $vms_no_ieee;
 if ($^O eq 'VMS') {
   use vars '%Config';
   eval {require Config; Config->import() };
-  $vms_no_ieee = 1 unless defined($Config{useieee});
+  $vms_no_ieee = 1 unless defined(%Config{useieee});
 }
 
 if ($^O eq 'vos') {

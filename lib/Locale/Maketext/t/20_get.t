@@ -11,8 +11,8 @@ print "# --- Making sure that get_handle works ---\n";
 {
   package Woozle;
   @ISA = ('Locale::Maketext');
-  sub dubbil   { return $_[1] * 2 }
-  sub numerate { return $_[2] . 'en' }
+  sub dubbil   { return @_[1] * 2 }
+  sub numerate { return @_[2] . 'en' }
 }
 {
   package Woozle::eu_mt;
@@ -34,35 +34,35 @@ ok $lh && $lh->maketext('d2', 7), "hum 14"      ;
 
 print "# Make sure we can assign to ENV entries\n",
       "# (Otherwise we can't run the subsequent tests)...\n";
-$ENV{'MYORP'}   = 'Zing';
-ok $ENV{'MYORP'}, 'Zing';
-$ENV{'SWUZ'}   = 'KLORTHO HOOBOY';
-ok $ENV{'SWUZ'}, 'KLORTHO HOOBOY';
+%ENV{'MYORP'}   = 'Zing';
+ok %ENV{'MYORP'}, 'Zing';
+%ENV{'SWUZ'}   = 'KLORTHO HOOBOY';
+ok %ENV{'SWUZ'}, 'KLORTHO HOOBOY';
 
-delete $ENV{'MYORP'};
-delete $ENV{'SWUZ'};
+delete %ENV{'MYORP'};
+delete %ENV{'SWUZ'};
 
 
 print "# Test LANG...\n";
-$ENV{'LC_ALL'} = '';
-$ENV{'LC_MESSAGES'} = '';
-$ENV{'REQUEST_METHOD'} = '';
-$ENV{'LANG'}     = 'Eu_MT';
-$ENV{'LANGUAGE'} = '';
+%ENV{'LC_ALL'} = '';
+%ENV{'LC_MESSAGES'} = '';
+%ENV{'REQUEST_METHOD'} = '';
+%ENV{'LANG'}     = 'Eu_MT';
+%ENV{'LANGUAGE'} = '';
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
 
 print "# Test LANGUAGE...\n";
-$ENV{'LANG'}     = '';
-$ENV{'LANGUAGE'} = 'Eu-MT';
+%ENV{'LANG'}     = '';
+%ENV{'LANGUAGE'} = 'Eu-MT';
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
 
 print "# Test HTTP_ACCEPT_LANGUAGE...\n";
-$ENV{'REQUEST_METHOD'}       = 'GET';
-$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'eu-MT';
+%ENV{'REQUEST_METHOD'}       = 'GET';
+%ENV{'HTTP_ACCEPT_LANGUAGE'} = 'eu-MT';
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
-$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eu-MT, i-klung';
+%ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eu-MT, i-klung';
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
-$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eU-Mt, i-klung';
+%ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eU-Mt, i-klung';
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
 
 

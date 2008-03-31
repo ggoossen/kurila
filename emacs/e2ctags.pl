@@ -27,7 +27,7 @@ while ( ~< *ARGV) {
     chomp;
     s/,\d+$//;
     $filename = $_;
-    ++$files{$filename};
+    ++%files{$filename};
     next;
   }
   ##Figure out how many records in this line and
@@ -42,10 +42,10 @@ while ( ~< *ARGV) {
   }
   next unless $tag;
   ##Take only the first entry per tag
-  next if defined($tags{$tag});
-  $tags{$tag}{FILE} = $filename;
-  $tags{$tag}{LINE_NO} = $line_no;
-  push @{$filetags{$filename}}, $tag;
+  next if defined(%tags{$tag});
+  %tags{$tag}{FILE} = $filename;
+  %tags{$tag}{LINE_NO} = $line_no;
+  push @{%filetags{$filename}}, $tag;
 }
 
 foreach $filename (keys %files) {
@@ -53,8 +53,8 @@ foreach $filename (keys %files) {
   @lines = ~< *FILE;
   close FILE;
   chomp @lines;
-  foreach $tag ( @{$filetags{$filename}} ) {
-    $line = $lines[$tags{$tag}{LINE_NO}-1];
+  foreach $tag ( @{%filetags{$filename}} ) {
+    $line = @lines[%tags{$tag}{LINE_NO}-1];
     if (length($line) +>= 50) {
       $line = substr($line,0,50);
     }
@@ -62,10 +62,10 @@ foreach $filename (keys %files) {
       $line .= '$';
     }
     $line =~ s#\\#\\\\#;
-    $tags{$tag}{LINE} = join '', '/^',$line,'/';
+    %tags{$tag}{LINE} = join '', '/^',$line,'/';
   }
 }
 
 foreach $tag ( sort keys %tags ) {
-  print "$tag\t$tags{$tag}{FILE}\t$tags{$tag}{LINE}\n";
+  print "$tag\t%tags{$tag}{FILE}\t%tags{$tag}{LINE}\n";
 }

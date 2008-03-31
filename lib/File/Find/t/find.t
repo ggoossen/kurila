@@ -10,7 +10,7 @@ my $warn_msg;
 use Carp::Heavy (); # make sure Carp::Heavy is already loaded, because @INC is relative
 
 BEGIN {
-    ${^WARN_HOOK} = sub { $warn_msg = $_[0]; warn "# $_[0]"; }
+    ${^WARN_HOOK} = sub { $warn_msg = @_[0]; warn "# @_[0]"; }
 }
 
 if ( $symlink_exists ) { print "1..199\n"; }
@@ -101,35 +101,35 @@ END {
 
 sub Check($) {
     $case++;
-    if ($_[0]) { print "ok $case\n"; }
+    if (@_[0]) { print "ok $case\n"; }
     else       { print "not ok $case\n"; }
 }
 
 sub CheckDie($) {
     $case++;
-    if ($_[0]) { print "ok $case\n"; }
+    if (@_[0]) { print "ok $case\n"; }
     else { print "not ok $case\n $!\n"; exit 0; }
 }
 
 sub touch {
-    CheckDie( open(my $T,'>',$_[0]) );
+    CheckDie( open(my $T,'>',@_[0]) );
 }
 
 sub MkDir($$) {
-    CheckDie( mkdir($_[0],$_[1]) );
+    CheckDie( mkdir(@_[0],@_[1]) );
 }
 
 sub wanted_File_Dir {
     printf "# \$File::Find::dir => '$File::Find::dir'\t\$_ => '$_'\n";
     s#\.$## if ($^O eq 'VMS' && $_ ne '.');
     s/(.dir)?$//i if ($^O eq 'VMS' && -d _);
-    Check( $Expect_File{$_} );
+    Check( %Expect_File{$_} );
     if ( $FastFileTests_OK ) {
-        delete $Expect_File{ $_} 
-          unless ( $Expect_Dir{$_} && ! -d _ );
+        delete %Expect_File{ $_} 
+          unless ( %Expect_Dir{$_} && ! -d _ );
     } else {
-        delete $Expect_File{$_} 
-          unless ( $Expect_Dir{$_} && ! -d $_ );
+        delete %Expect_File{$_} 
+          unless ( %Expect_Dir{$_} && ! -d $_ );
     }
 }
 
@@ -143,28 +143,28 @@ sub wanted_Name {
     $n =~ s#\.$## if ($^O eq 'VMS' && $n ne '.');
     print "# \$File::Find::name => '$n'\n";
     my $i = rindex($n,'/');
-    my $OK = exists($Expect_Name{$n});
+    my $OK = exists(%Expect_Name{$n});
     unless ($^O eq 'MacOS') {
         if ( $OK ) {
-            $OK= exists($Expect_Name{substr($n,0,$i)})  if $i +>= 0;    
+            $OK= exists(%Expect_Name{substr($n,0,$i)})  if $i +>= 0;    
         }
     }
     Check($OK);
-    delete $Expect_Name{$n};
+    delete %Expect_Name{$n};
 }
 
 sub wanted_File {
     print "# \$_ => '$_'\n";
     s#\.$## if ($^O eq 'VMS' && $_ ne '.');
     my $i = rindex($_,'/');
-    my $OK = exists($Expect_File{ $_});
+    my $OK = exists(%Expect_File{ $_});
     unless ($^O eq 'MacOS') {
         if ( $OK ) {
-            $OK= exists($Expect_File{ substr($_,0,$i)})  if $i +>= 0;
+            $OK= exists(%Expect_File{ substr($_,0,$i)})  if $i +>= 0;
         }
     }
     Check($OK);
-    delete $Expect_File{ $_};
+    delete %Expect_File{ $_};
 }
 
 sub simple_wanted {
@@ -181,19 +181,19 @@ sub my_preprocess {
     foreach $file (@files) {
         $file =~ s/\.(dir)?$// if $^O eq 'VMS';
         print "#   $file \n";
-        delete $Expect_Dir{ $File::Find::dir }->{$file};
+        delete %Expect_Dir{ $File::Find::dir }->{$file};
     }
     print "# --end preprocess--\n";
-    Check(scalar(keys %{$Expect_Dir{ $File::Find::dir }}) == 0);
-    if (scalar(keys %{$Expect_Dir{ $File::Find::dir }}) == 0) {
-        delete $Expect_Dir{ $File::Find::dir }
+    Check(scalar(keys %{%Expect_Dir{ $File::Find::dir }}) == 0);
+    if (scalar(keys %{%Expect_Dir{ $File::Find::dir }}) == 0) {
+        delete %Expect_Dir{ $File::Find::dir }
     }
     return @files;
 }
 
 sub my_postprocess {
     print "# postprocess: \$File::Find::dir => '$File::Find::dir' \n";
-    delete $Expect_Dir{ $File::Find::dir};
+    delete %Expect_Dir{ $File::Find::dir};
 }
 
 
@@ -329,14 +329,14 @@ touch( file_path('fa', 'fab', 'faba', 'faba_ord') );
                 file_path('fab_ord') => 1, file_path('faba') => 1,
                 file_path('faa') => 1, file_path('faa_ord') => 1);
 
-delete $Expect_File{ file_path('fsl') } unless $symlink_exists;
+delete %Expect_File{ file_path('fsl') } unless $symlink_exists;
 %Expect_Name = ();
 
 %Expect_Dir = ( dir_path('fa') => 1, dir_path('faa') => 1,
                 dir_path('fab') => 1, dir_path('faba') => 1,
                 dir_path('fb') => 1, dir_path('fba') => 1);
 
-delete @Expect_Dir{ dir_path('fb'), dir_path('fba') } unless $symlink_exists;
+delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
 File::Find::find( {wanted => \&wanted_File_Dir_prune}, topdir('fa') ); 
 Check( scalar(keys %Expect_File) == 0 );
 
@@ -348,14 +348,14 @@ print "# check re-entrancy\n";
                 file_path('fab_ord') => 1, file_path('faba') => 1,
                 file_path('faa') => 1, file_path('faa_ord') => 1);
 
-delete $Expect_File{ file_path('fsl') } unless $symlink_exists;
+delete %Expect_File{ file_path('fsl') } unless $symlink_exists;
 %Expect_Name = ();
 
 %Expect_Dir = ( dir_path('fa') => 1, dir_path('faa') => 1,
                 dir_path('fab') => 1, dir_path('faba') => 1,
                 dir_path('fb') => 1, dir_path('fba') => 1);
 
-delete @Expect_Dir{ dir_path('fb'), dir_path('fba') } unless $symlink_exists;
+delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
 
 File::Find::find( {wanted => sub { wanted_File_Dir_prune();
                                     File::Find::find( {wanted => sub
@@ -377,7 +377,7 @@ Check( scalar(keys %Expect_File) == 0 );
 		file_path_name('fa', 'faa') => 1,
                 file_path_name('fa', 'faa', 'faa_ord') => 1,);
 
-delete $Expect_File{ file_path_name('fa', 'fsl') } unless $symlink_exists;
+delete %Expect_File{ file_path_name('fa', 'fsl') } unless $symlink_exists;
 %Expect_Name = ();
 
 %Expect_Dir = (dir_path('fa') => 1,
@@ -387,7 +387,7 @@ delete $Expect_File{ file_path_name('fa', 'fsl') } unless $symlink_exists;
 	       dir_path('fb') => 1,
 	       dir_path('fb', 'fba') => 1);
 
-delete @Expect_Dir{ dir_path('fb'), dir_path('fb', 'fba') }
+delete %Expect_Dir{[dir_path('fb'), dir_path('fb', 'fba') ]}
     unless $symlink_exists;
 
 File::Find::find( {wanted => \&wanted_File_Dir, no_chdir => 1},
@@ -411,7 +411,7 @@ File::Find::find( {wanted => \&wanted_File_Dir, no_chdir => 1},
 		file_path_name('.', 'fb', 'fba', 'fba_ord') => 1,
 		file_path_name('.', 'fb', 'fb_ord') => 1);
 
-delete $Expect_Name{ file_path('.', 'fa', 'fsl') } unless $symlink_exists;
+delete %Expect_Name{ file_path('.', 'fa', 'fsl') } unless $symlink_exists;
 %Expect_Dir = (); 
 File::Find::finddepth( {wanted => \&wanted_Name}, File::Spec->curdir );
 Check( scalar(keys %Expect_Name) == 0 );
@@ -435,7 +435,7 @@ Check( scalar(keys %Expect_Name) == 0 );
 		file_path_name('.', 'fb', 'fba', 'fba_ord') => 1,
 		file_path_name('.', 'fb', 'fb_ord') => 1);
 
-delete $Expect_File{ file_path_name('.', 'fa', 'fsl') } unless $symlink_exists;
+delete %Expect_File{ file_path_name('.', 'fa', 'fsl') } unless $symlink_exists;
 %Expect_Name = ();
 %Expect_Dir = (); 
 
@@ -490,7 +490,7 @@ Check( scalar(keys %Expect_Dir) == 0 );
     my %pre = map { $_ => } @foo;
 
     File::Find::find( sub {  } , 'fa' ) for @foo;
-    delete $pre{$_} for @foo;
+    delete %pre{$_} for @foo;
 
     Check( scalar( keys %pre ) == 0 );
 }
@@ -498,7 +498,7 @@ Check( scalar(keys %Expect_Dir) == 0 );
 # see thread starting
 # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2004-02/msg00351.html
 {
-    print "# checking that &_ and %_ are still accessible and that\n",
+    print "# checking that &_ and \%_ are still accessible and that\n",
 	"# tie magic on \$_ is not triggered\n";
     
     my $true_count;
@@ -518,16 +518,16 @@ Check( scalar(keys %Expect_Dir) == 0 );
 
     Check( scalar( keys %_ ) == 0 );
     my @foo = 'n';
-    tie $foo[0], "Foo";
+    tie @foo[0], "Foo";
 
-    File::Find::find( sub { $true_count++; $_{$_}++; &_; } , 'fa' ) for @foo;
+    File::Find::find( sub { $true_count++; %_{$_}++; &_; } , 'fa' ) for @foo;
     untie $_;
 
     Check( $tie_called == 0);
     Check( scalar( keys %_ ) == $true_count );
     Check( $sub == $true_count );
     Check( scalar( @foo ) == 1);
-    Check( $foo[0] eq 'N' );
+    Check( @foo[0] eq 'N' );
 }
 
 if ( $symlink_exists ) {
@@ -679,7 +679,7 @@ if ( $symlink_exists ) {
 
         File::Find::find( {wanted => \&wanted_File, follow => 1,
 			   dangling_symlinks =>
-			       sub { $warn_msg = "$_[0] is a dangling symbolic link" }
+			       sub { $warn_msg = "@_[0] is a dangling symbolic link" }
                            },
                            topdir('dangling_dir_sl'), topdir('fa') );
 
@@ -814,7 +814,7 @@ if ( $symlink_exists ) {
     Check( @names == 1 );
     # Normalise both to the original name
     s/_sl// foreach @names;
-    Check ($names[0] eq file_path_name('fa', 'faa', 'faa_ord'));
+    Check (@names[0] eq file_path_name('fa', 'faa', 'faa_ord'));
     unlink file_path('fa', 'faa_sl');
 
 }

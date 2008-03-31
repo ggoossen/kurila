@@ -20,7 +20,7 @@ sub page_for_perldoc {
   my($self, $tempfile, $perldoc) = @_;
   return unless $perldoc->IS_MSWin32;
   
-  my $rtf_pager = $ENV{'RTFREADER'} || 'write.exe';
+  my $rtf_pager = %ENV{'RTFREADER'} || 'write.exe';
   
   $perldoc->aside( "About to launch <\"$rtf_pager\" \"$tempfile\">\n" );
   

@@ -22,7 +22,7 @@ sub file_name_is_absolute {
 }
 
 sub path {
-    my $path = $ENV{PATH};
+    my $path = %ENV{PATH};
     $path =~ s:\\:/:g;
     my @path = split(';',$path);
     foreach (@path) { $_ = '.' if $_ eq '' }
@@ -37,8 +37,8 @@ sub _cwd {
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    my @d = @ENV{qw(TMPDIR TEMP TMP)};	# function call could autovivivy
-    $tmpdir = $_[0]->_tmpdir( @d, '/tmp', '/'  );
+    my @d = %ENV{[qw(TMPDIR TEMP TMP)]};	# function call could autovivivy
+    $tmpdir = @_[0]->_tmpdir( @d, '/tmp', '/'  );
 }
 
 sub catdir {
@@ -163,7 +163,7 @@ sub abs2rel {
 
     while ( @pathchunks && 
             @basechunks && 
-            lc( $pathchunks[0] ) eq lc( $basechunks[0] ) 
+            lc( @pathchunks[0] ) eq lc( @basechunks[0] ) 
           ) {
         shift @pathchunks ;
         shift @basechunks ;
@@ -212,7 +212,7 @@ sub rel2abs {
         }
 
         my ( $path_directories, $path_file ) =
-            ($self->splitpath( $path, 1 ))[1,2] ;
+            ($self->splitpath( $path, 1 ))[[1,2]] ;
 
         my ( $base_volume, $base_directories ) =
             $self->splitpath( $base, 1 ) ;

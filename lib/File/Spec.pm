@@ -17,7 +17,7 @@ my %module = (MacOS   => 'Mac',
 	      cygwin  => 'Cygwin');
 
 
-my $module = $module{$^O} || 'Unix';
+my $module = %module{$^O} || 'Unix';
 
 require "File/Spec/$module.pm";
 @ISA = ("File::Spec::$module");

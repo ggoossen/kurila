@@ -12,7 +12,7 @@ my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 @ary = (1,2,3,4,5);
 is(join('',@ary), '12345');
 
-$tmp = $ary[(@ary-1)]; pop @ary;
+$tmp = @ary[(@ary-1)]; pop @ary;
 is($tmp, 5);
 is((@ary-1), 3);
 is(join('',@ary), '1234');
@@ -20,31 +20,31 @@ is(join('',@ary), '1234');
 @foo = ();
 $r = join(',', (@foo-1), @foo);
 is($r, "-1");
-$foo[0] = '0';
+@foo[0] = '0';
 $r = join(',', (@foo-1), @foo);
 is($r, "0,0");
-$foo[2] = '2';
+@foo[2] = '2';
 $r = join(',', (@foo-1), @foo);
 is($r, "2,0,,2");
 @bar = ();
-$bar[0] = '0';
-$bar[1] = '1';
+@bar[0] = '0';
+@bar[1] = '1';
 $r = join(',', (@bar-1), @bar);
 is($r, "1,0,1");
 @bar = ();
 $r = join(',', (@bar-1), @bar);
 is($r, "-1");
-$bar[0] = '0';
+@bar[0] = '0';
 $r = join(',', (@bar-1), @bar);
 is($r, "0,0");
-$bar[2] = '2';
+@bar[2] = '2';
 $r = join(',', (@bar-1), @bar);
 is($r, "2,0,,2");
 @bar = ();
-$bar[0] = '0';
+@bar[0] = '0';
 $r = join(',', (@bar-1), @bar);
 is($r, "0,0");
-$bar[2] = '2';
+@bar[2] = '2';
 $r = join(',', (@bar-1), @bar);
 is($r, "2,0,,2");
 
@@ -60,15 +60,15 @@ ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
 
 %foo = ('blurfl','dyick','foo','bar','etc.','etc.');
 %bar = %foo;
-is($bar{'foo'}, 'bar');
+is(%bar{'foo'}, 'bar');
 %bar = ();
-is($bar{'foo'}, undef);
+is(%bar{'foo'}, undef);
 (%bar,$a,$b) = (%foo,'how','now');
-is($bar{'foo'}, 'bar');
-is($bar{'how'}, 'now');
-@bar{keys %foo} = values %foo;
-is($bar{'foo'}, 'bar');
-is($bar{'how'}, 'now');
+is(%bar{'foo'}, 'bar');
+is(%bar{'how'}, 'now');
+%bar{[keys %foo]} = values %foo;
+is(%bar{'foo'}, 'bar');
+is(%bar{'how'}, 'now');
 
 @foo = grep(m/e/,split(' ','now is the time for all good men to come to'));
 is(join(' ',@foo), 'the time men come');
@@ -76,24 +76,24 @@ is(join(' ',@foo), 'the time men come');
 @foo = grep(!m/e/,split(' ','now is the time for all good men to come to'));
 is(join(' ',@foo), 'now is for all good to to');
 
-$foo = join('',('a','b','c','d','e','f')[0..5]);
+$foo = join('',('a','b','c','d','e','f')[[0..5]]);
 is($foo, 'abcdef');
 
-$foo = join('',('a','b','c','d','e','f')[0..1]);
+$foo = join('',('a','b','c','d','e','f')[[0..1]]);
 is($foo, 'ab');
 
-$foo = join('',('a','b','c','d','e','f')[6]);
+$foo = join('',('a','b','c','d','e','f')[[6]]);
 is($foo, '');
 
-@foo = ('a','b','c','d','e','f')[0,2,4];
-@bar = ('a','b','c','d','e','f')[1,3,5];
-$foo = join('',(@foo,@bar)[0..5]);
+@foo = ('a','b','c','d','e','f')[[0,2,4]];
+@bar = ('a','b','c','d','e','f')[[1,3,5]];
+$foo = join('',(@foo,@bar)[[0..5]]);
 is($foo, 'acebdf');
 
-$foo = ('a','b','c','d','e','f')[0,2,4];
+$foo = ('a','b','c','d','e','f')[[0,2,4]];
 is($foo, 'e');
 
-$foo = ('a','b','c','d','e','f')[1];
+$foo = ('a','b','c','d','e','f')[[1]];
 is($foo, 'b');
 
 @foo = ( 'foo', 'bar', 'burbl', 'blah');
@@ -209,14 +209,14 @@ our @bim;
 
 # make sure reification behaves
 my $t = curr_test();
-sub reify { $_[1] = $t++; print "@_\n"; }
+sub reify { @_[1] = $t++; print "@_\n"; }
 reify('ok');
 reify('ok');
 
 curr_test($t);
 
 # qw() is no longer a runtime split, it's compiletime.
-is (qw(foo bar snorfle)[2], 'snorfle');
+is (qw(foo bar snorfle)[[2]], 'snorfle');
 
 @ary = (12,23,34,45,56);
 
@@ -226,8 +226,8 @@ is(push(@ary,56), 4);
 is(unshift(@ary,12), 5);
 
 sub foo { "a" }
-my @foo=(foo())[0,0];
-is ($foo[1], "a");
+my @foo=(foo())[[0,0]];
+is (@foo[1], "a");
 
 # bugid #15439 - clearing an array calls destructors which may try
 # to modify the array - caused 'Attempt to free unreferenced scalar'
@@ -250,15 +250,15 @@ is ($got, '');
 
 {
     my @a = 0..4;
-    is($a[-1], 4);
-    is($a[-2], 3);
-    is($a[-5], 0);
-    ok(!defined $a[-6]);
+    is(@a[-1], 4);
+    is(@a[-2], 3);
+    is(@a[-5], 0);
+    ok(!defined @a[-6]);
 
-    is($a[2.1]  , 2);
-    is($a[2.9]  , 2);
-    is($a[undef], 0);
-    is($a["3rd"], 3);
+    is(@a[2.1]  , 2);
+    is(@a[2.9]  , 2);
+    is(@a[undef], 0);
+    is(@a["3rd"], 3);
 }
 
 

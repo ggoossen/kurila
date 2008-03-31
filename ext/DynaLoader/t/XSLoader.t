@@ -1,7 +1,7 @@
 #!/usr/bin/perl -T
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -48,7 +48,7 @@ like( $@->{description}, q{/^Can't locate loadable object for module Thwack in @
         "calling XSLoader::load() under a package with no XS part" );
 
 # Now try to load well known XS modules
-my $extensions = $Config{'extensions'};
+my $extensions = %Config{'extensions'};
 $extensions =~ s|/|::|g;
 
 for my $module (sort keys %modules) {
@@ -62,7 +62,7 @@ for my $module (sort keys %modules) {
         eval qq{ package $module; XSLoader::load('$module'); };
         is( $@, '',  "XSLoader::load($module)");
 
-        eval qq{ package $module; $modules{$module}; };
+        eval qq{ package $module; %modules{$module}; };
     }
 }
 

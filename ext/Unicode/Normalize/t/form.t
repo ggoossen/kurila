@@ -8,7 +8,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -23,7 +23,7 @@ BEGIN { plan tests => 37 };
 use Unicode::Normalize qw(:all);
 ok(1); # If we made it this far, we're ok.
 
-sub answer { defined $_[0] ? $_[0] ? "YES" : "NO" : "MAYBE" }
+sub answer { defined @_[0] ? @_[0] ? "YES" : "NO" : "MAYBE" }
 
 #########################
 

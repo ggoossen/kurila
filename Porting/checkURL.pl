@@ -13,16 +13,16 @@ my @dummy = qw(
 	      );
 my %dummy;
 
-@dummy{@dummy} = ();
+%dummy{[@dummy]} = ();
 
 foreach my $file (glob("*/*.pod */*/*.pod */*/*/*.pod README README.* INSTALL")) {
     open my $fh , "<", $file or die "Failed to open $file: $!\n";
     while ( ~< $fh) {
-        if (m{(?:http|ftp)://(?:(?!\w<)[-\w~?@=.])+} && !exists $dummy{$&}) {
+        if (m{(?:http|ftp)://(?:(?!\w<)[-\w~?@=.])+} && !exists %dummy{$&}) {
             my $url = $&;
             $url =~ s/\.$//;
-            $urls {$url} ||= { };
-            $urls {$url} {$file} = 1;
+            %urls {$url} ||= { };
+            %urls {$url} {$file} = 1;
         }
     }
     close $fh;
@@ -33,7 +33,7 @@ sub fisher_yates_shuffle {
     my $i = @$deck;
     while (--$i) {
 	my $j = int rand ($i+1);
-	@$deck[$i,$j] = @$deck[$j,$i];
+	@$deck[[$i,$j]] = @$deck[[$j,$i]];
     }
 }
 
@@ -60,7 +60,7 @@ while (@urls) {
     todo();
 
     for ($i = 0; $i +< $MAXFORK; $i++) {
-	$list[$i] = [ splice @urls, 0, $MAXURL ];
+	@list[$i] = [ splice @urls, 0, $MAXURL ];
 	$pid = fork;
 	die "Failed to fork: $!\n" unless defined $pid;
 	last unless $pid; # Child.
@@ -72,11 +72,11 @@ while (@urls) {
 	1 until -1 == wait; # Reap.
     } else {
         # Child.
-        foreach my $url (@{$list[$i]}) {
+        foreach my $url (@{@list[$i]}) {
             my $code = getstore $url, "/dev/null";
             next if $code == 200;
-            my $f = join ", " => keys %{$urls {$url}};
-            printf "%03d  %s: %s\n" => $code, $url, $f;
+            my $f = join ", " => keys %{%urls {$url}};
+            printf "\%03d  \%s: \%s\n" => $code, $url, $f;
         }
 
         exit;

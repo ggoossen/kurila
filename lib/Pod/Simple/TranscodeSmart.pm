@@ -15,7 +15,7 @@ sub all_encodings {
 }
 
 sub encoding_is_available {
-  return Encode::resolve_alias($_[1]);
+  return Encode::resolve_alias(@_[1]);
 }
 
 sub encmodver {
@@ -23,7 +23,7 @@ sub encmodver {
 }
 
 sub make_transcoder {
-  my($e) = $_[1];
+  my($e) = @_[1];
   die "WHAT ENCODING!?!?" unless $e;
   my $x;
   return sub {

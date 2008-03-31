@@ -68,16 +68,16 @@ my $load = sub {
   if (grep {-e File::Spec->catfile($_, @package, 'Platform', $^O) . '.pm'} @INC) {
     $load->(__PACKAGE__ . "::Platform::$^O");
     
-  } elsif (exists $OSTYPES{$^O} and
-	   grep {-e File::Spec->catfile($_, @package, 'Platform', $OSTYPES{$^O}) . '.pm'} @INC) {
-    $load->(__PACKAGE__ . "::Platform::$OSTYPES{$^O}");
+  } elsif (exists %OSTYPES{$^O} and
+	   grep {-e File::Spec->catfile($_, @package, 'Platform', %OSTYPES{$^O}) . '.pm'} @INC) {
+    $load->(__PACKAGE__ . "::Platform::%OSTYPES{$^O}");
     
   } else {
     $load->(__PACKAGE__ . "::Base");
   }
 }
 
-sub os_type { $OSTYPES{$^O} }
+sub os_type { %OSTYPES{$^O} }
 
 1;
 __END__

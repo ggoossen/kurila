@@ -76,8 +76,8 @@ sub normalize($$)
 {
     my $form = shift;
     my $str = shift;
-    if (exists $formNorm{$form}) {
-	return $formNorm{$form}->($str);
+    if (exists %formNorm{$form}) {
+	return %formNorm{$form}->($str);
     }
     croak($PACKAGE."::normalize: invalid form name: $form");
 }
@@ -99,8 +99,8 @@ sub check($$)
 {
     my $form = shift;
     my $str = shift;
-    if (exists $formCheck{$form}) {
-	return $formCheck{$form}->($str);
+    if (exists %formCheck{$form}) {
+	return %formCheck{$form}->($str);
     }
     croak($PACKAGE."::check: invalid form name: $form");
 }

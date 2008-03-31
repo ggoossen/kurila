@@ -149,7 +149,7 @@ sub get_reply {
             $prompt_add = $i if $choice eq $args->{default};
 
             ### create a "DIGIT> choice" type line
-            $args->{print_me} .= sprintf "\n%3s> %-s", $i, $choice;
+            $args->{print_me} .= sprintf "\n\%3s> \%-s", $i, $choice;
         }
 
         ### we listed some choices -- add another newline for 
@@ -353,7 +353,7 @@ sub _tt_readline {
         ### otherwise just return the answer, or answers, depending
         ### on the multi setting
         } else {
-            return $multi ? @rv : $rv[0];
+            return $multi ? @rv : @rv[0];
         }
     }
 }

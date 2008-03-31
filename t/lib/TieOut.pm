@@ -2,7 +2,7 @@ package TieOut;
 
 sub TIEHANDLE {
     my $scalar = '';
-    bless( \$scalar, $_[0]);
+    bless( \$scalar, @_[0]);
 }
 
 sub PRINT {

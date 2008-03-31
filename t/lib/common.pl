@@ -102,7 +102,7 @@ for (@prgs){
         my(@files) = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error: test $_ didn't split into pairs, got " .
-		scalar(@files) . "[" . join("%%%%", @files) ."]\n"
+		scalar(@files) . "[" . join("\%\%\%\%", @files) ."]\n"
 	    if @files % 2 ;
 	while (@files +> 2) {
 	    my $filename = shift @files ;

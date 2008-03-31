@@ -19,34 +19,34 @@ sub unimport {
 BEGIN { bytes::import() }
 
 sub length (_) {
-    return CORE::length($_[0]);
+    return CORE::length(@_[0]);
 }
 
 sub substr ($$;$$) {
     return
-	@_ == 2 ? CORE::substr($_[0], $_[1]) :
-	@_ == 3 ? CORE::substr($_[0], $_[1], $_[2]) :
-	          CORE::substr($_[0], $_[1], $_[2], $_[3]) ;
+	@_ == 2 ? CORE::substr(@_[0], @_[1]) :
+	@_ == 3 ? CORE::substr(@_[0], @_[1], @_[2]) :
+	          CORE::substr(@_[0], @_[1], @_[2], @_[3]) ;
 }
 
 sub ord (_) {
-    return CORE::ord($_[0]);
+    return CORE::ord(@_[0]);
 }
 
 sub chr (_) {
-    return CORE::chr($_[0]);
+    return CORE::chr(@_[0]);
 }
 
 sub index ($$;$) {
     return
-	@_ == 2 ? CORE::index($_[0], $_[1]) :
-	          CORE::index($_[0], $_[1], $_[2]) ;
+	@_ == 2 ? CORE::index(@_[0], @_[1]) :
+	          CORE::index(@_[0], @_[1], @_[2]) ;
 }
 
 sub rindex ($$;$) {
     return
-	@_ == 2 ? CORE::rindex($_[0], $_[1]) :
-	          CORE::rindex($_[0], $_[1], $_[2]) ;
+	@_ == 2 ? CORE::rindex(@_[0], @_[1]) :
+	          CORE::rindex(@_[0], @_[1], @_[2]) ;
 }
 
 BEGIN { bytes::import() }

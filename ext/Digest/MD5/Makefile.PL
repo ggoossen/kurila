@@ -10,8 +10,8 @@ my @extra;
 @extra = (DEFINE => "-DU32_ALIGNMENT_REQUIRED") unless free_u32_alignment();
 
 if ($^O eq 'VMS') {
-    if (defined($Config{ccname})) {
-        if (grep(m/VMS_VAX/, @INC) && ($Config{ccname} eq 'DEC')) {
+    if (defined(%Config{ccname})) {
+        if (grep(m/VMS_VAX/, @INC) && (%Config{ccname} eq 'DEC')) {
             # VAX compiler optimizer even as late as v6.4 gets stuck
             push(@extra, OPTIMIZE => "/Optimize=(NODISJOINT)");
         }
@@ -36,11 +36,11 @@ WriteMakefile(
 sub free_u32_alignment
 {
     $|=1;
-    if (exists $Config{d_u32align}) {
+    if (exists %Config{d_u32align}) {
        print "Perl's config says that U32 access must ";
-       print "not " unless $Config{d_u32align};
+       print "not " unless %Config{d_u32align};
        print "be aligned.\n";
-       return !$Config{d_u32align};
+       return !%Config{d_u32align};
     }
     
     if ($^O eq 'VMS' || $^O eq 'MSWin32') {
@@ -48,7 +48,7 @@ sub free_u32_alignment
        return 1;
     }
     
-    if ($^O eq 'hpux' && $Config{osvers} +< 11.0) {
+    if ($^O eq 'hpux' && %Config{osvers} +< 11.0) {
        print "Will not test for free alignment on older HP-UX.\n";
        return 0;
     }
@@ -118,19 +118,19 @@ int main(int argc, char** argv, char** env)
 /*--------------------------------------------------------------*/
 EOT
 
-    my $cc_cmd = "$Config{cc} $Config{ccflags} -I$Config{archlibexp}/CORE";
-    my $exe = "u32align$Config{exe_ext}";
+    my $cc_cmd = "%Config{cc} %Config{ccflags} -I%Config{archlibexp}/CORE";
+    my $exe = "u32align%Config{exe_ext}";
     $cc_cmd .= " -o $exe";
     my $rc;
-    $rc = system("$cc_cmd $Config{ldflags} u32align.c $Config{libs}");
+    $rc = system("$cc_cmd %Config{ldflags} u32align.c %Config{libs}");
     if ($rc) {
 	print "Can't compile test program.  Will ensure alignment to play safe.\n\n";
-	unlink("u32align.c", $exe, "u32align$Config{obj_ext}");
+	unlink("u32align.c", $exe, "u32align%Config{obj_ext}");
 	return 0;
     }
 
     $rc = system("./$exe");
-    unlink("u32align.c", $exe, "u32align$Config{obj_ext}");
+    unlink("u32align.c", $exe, "u32align%Config{obj_ext}");
 
     return 1 unless $rc;
 

@@ -16,7 +16,7 @@ sub import
 
 package main;
 
-BEGIN { $INC{'Foo.pm'} = "/lib/Foo.pm" }
+BEGIN { %INC{'Foo.pm'} = "/lib/Foo.pm" }
 
 use Foo;
 

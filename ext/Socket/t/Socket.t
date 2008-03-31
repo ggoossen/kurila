@@ -2,12 +2,12 @@
 
 BEGIN {
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bSocket\b/ && 
-        !(($^O eq 'VMS') && $Config{d_socket})) {
+    if (%Config{'extensions'} !~ m/\bSocket\b/ && 
+        !(($^O eq 'VMS') && %Config{d_socket})) {
 	print "1..0\n";
 	exit 0;
     }
-    $has_alarm = $Config{d_alarm};
+    $has_alarm = %Config{d_alarm};
 }
 	
 use Socket qw(:all);
@@ -18,13 +18,13 @@ $has_echo = $^O ne 'MSWin32';
 $alarmed = 0;
 sub arm      { $alarmed = 0; alarm(shift) if $has_alarm }
 sub alarmed  { $alarmed = 1 }
-$SIG{ALRM} = \&alarmed                    if $has_alarm;
+%SIG{ALRM} = \&alarmed                    if $has_alarm;
 
 if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
   print "ok 1\n";
   
   arm(5);
-  my $host = $^O eq 'MacOS' || ($^O eq 'irix' && $Config{osvers} == 5) ?
+  my $host = $^O eq 'MacOS' || ($^O eq 'irix' && %Config{osvers} == 5) ?
                  '127.0.0.1' : 'localhost';
   my $localhost = inet_aton($host);
 
@@ -34,7 +34,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 	print "ok 2\n";
 
 	print "# Connected to " .
-		inet_ntoa((unpack_sockaddr_in(getpeername(T)))[1])."\n";
+		inet_ntoa((unpack_sockaddr_in(getpeername(T)))[[1]])."\n";
 
 	arm(5);
 	syswrite(T,"hello",5);
@@ -78,7 +78,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
 	print "ok 5\n";
 
 	print "# Connected to " .
-		inet_ntoa((unpack_sockaddr_in(getpeername(S)))[1])."\n";
+		inet_ntoa((unpack_sockaddr_in(getpeername(S)))[[1]])."\n";
 
 	arm(5);
 	syswrite(S,"olleh",5);
@@ -112,7 +112,7 @@ else {
 
 # warnings
 ${^WARN_HOOK} = sub {
-    ++ $w if $_[0]->{description} =~ m/^6-ARG sockaddr_in call is deprecated/ ;
+    ++ $w if @_[0]->{description} =~ m/^6-ARG sockaddr_in call is deprecated/ ;
 } ;
 $w = 0 ;
 sockaddr_in(1,2,3,4,5,6) ;
@@ -123,7 +123,7 @@ print ($w == 1 ? "ok 8\n" : "not ok 8\n") ;
 
 # Thest that whatever we give into pack/unpack_sockaddr retains
 # the value thru the entire chain.
-if((inet_ntoa((unpack_sockaddr_in(pack_sockaddr_in(100,inet_aton("10.250.230.10"))))[1])) eq '10.250.230.10') {
+if((inet_ntoa((unpack_sockaddr_in(pack_sockaddr_in(100,inet_aton("10.250.230.10"))))[[1]])) eq '10.250.230.10') {
     print "ok 9\n"; 
 } else {
     print "not ok 9\n"; 

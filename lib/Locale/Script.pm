@@ -16,7 +16,7 @@ use Locale::Constants;
 #	Public Global Variables
 #-----------------------------------------------------------------------
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
-$VERSION   = sprintf("%d.%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
+$VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
 @ISA       = qw(Exporter);
 @EXPORT    = qw(code2script script2code
                 all_script_codes all_script_names
@@ -52,7 +52,7 @@ sub code2script
     if ($codeset == LOCALE_CODE_NUMERIC)
     {
 	return undef if ($code =~ m/\D/);
-	$code = sprintf("%.3d", $code);
+	$code = sprintf("\%.3d", $code);
     }
     else
     {

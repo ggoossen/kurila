@@ -27,7 +27,7 @@ BEGIN {
   # http://gnupoc.sourceforge.net/
   # http://symbianos.org/~andreh/ You
   # will also need the 'uidcrc' utility.
-  die "$0: Looks like Cygwin, aborting.\n" if exists $ENV{'!C:'};
+  die "$0: Looks like Cygwin, aborting.\n" if exists %ENV{'!C:'};
 }
 
 sub die_with_usage {
@@ -80,7 +80,7 @@ unless (defined $Variant) {
   $Variant = $VariantDefault;
 }
 
-unless (exists $Variant{$Variant}) {
+unless (exists %Variant{$Variant}) {
   die "$0: Unknown variant '$Variant'\n";
 }
 
@@ -118,9 +118,9 @@ die_with_usage("With the lib option unset, specify at least one .pl file")
 
 if (!defined $AppName) {
   if (defined $Library) {
-    $AppName = $SisDir[0];
+    $AppName = @SisDir[0];
     $AppName =~ tr!/!-!;
-  } elsif (@SisPl +> 0 && $SisPl[0] =~ m/^(.+)\.pl$/i) {
+  } elsif (@SisPl +> 0 && @SisPl[0] =~ m/^(.+)\.pl$/i) {
     $AppName = basename($1);
   }
 }
@@ -132,13 +132,13 @@ print "[app name '$AppName']\n" if $Debug;
 
 unless (defined $SisUid) {
   $SisUid = $SisUidDefault;
-  printf "[default app uid '0x%08x']\n", $SisUid;
+  printf "[default app uid '0x\%08x']\n", $SisUid;
 } elsif ($SisUid =~ m/^(?:0x)?([0-9a-f]{8})$/i) {
   $SisUid = hex($1);
 } else {
   die_with_usage("Bad uid '$SisUid'");
 }
-$SisUid = sprintf "0x%08x", $SisUid;
+$SisUid = sprintf "0x\%08x", $SisUid;
 
 die_with_usage("Bad uid '$SisUid'")
   if $SisUid !~ m/^0x[0-9a-f]{8}$/i;
@@ -162,8 +162,8 @@ for my $file (@SisPl, @SisPm, @SisOther) {
   do_system("copy $file $tempdir");
 }
 if (@SisPl) {
-    do_system("copy $SisPl[0] $tempdir\\default.pl")
-	unless $SisPl[0] eq "default.pl";
+    do_system("copy @SisPl[0] $tempdir\\default.pl")
+	unless @SisPl[0] eq "default.pl";
 }
 for my $dir (@SisDir) {
   print "[copying directory '$dir']\n" if $Debug;
@@ -195,7 +195,7 @@ if (@SisPl) {
 	print $fo $_;
       }
       print $fo "use lib qw(\\system\\apps\\$AppName \\system\\apps\\$AppName\\lib);\n";
-      printf $fo qq[# %d "$SisPl[0]"\n], $.;
+      printf $fo qq[# \%d "@SisPl[0]"\n], $.;
       print $fo $_;
       while ( ~< $fi) {
 	print $fo $_;

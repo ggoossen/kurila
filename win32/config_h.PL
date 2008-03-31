@@ -11,21 +11,21 @@ use File::Copy qw(copy);
 my $name = $0;
 $name =~ s#^(.*)\.PL$#../$1.SH#;
 my %opt;
-while (@ARGV && $ARGV[0] =~ m/^([\w_]+)=(.*)$/)
+while (@ARGV && @ARGV[0] =~ m/^([\w_]+)=(.*)$/)
  {
-  $opt{$1}=$2;
+  %opt{$1}=$2;
   shift(@ARGV);
  }
 
-$opt{CONFIG_H} ||= 'config.h';
-$opt{CORE_DIR} ||= '../lib/CORE';
+%opt{CONFIG_H} ||= 'config.h';
+%opt{CORE_DIR} ||= '../lib/CORE';
 
-warn "Writing $opt{CONFIG_H}\n";
+warn "Writing %opt{CONFIG_H}\n";
 
-my $patchlevel = $opt{INST_VER};
+my $patchlevel = %opt{INST_VER};
 $patchlevel =~ s|^[\\/]||;
-$patchlevel =~ s|~VERSION~|$Config{version}|g;
-$patchlevel ||= $Config{version};
+$patchlevel =~ s|~VERSION~|%Config{version}|g;
+$patchlevel ||= %Config{version};
 $patchlevel = qq["$patchlevel"];
 
 open(SH, "<","$name") || die "Cannot open $name:$!";
@@ -35,7 +35,7 @@ while ( ~< *SH)
  }
 ($term,$file,$pat) = m/^\s*sed\s+<<(\S+)\s+>(\S+)\s+(.*)$/;
 
-$file =~ s/^\$(\w+)$/$opt{$1}/g;
+$file =~ s/^\$(\w+)$/%opt{$1}/g;
 
 my $str = "sub munge\n\{\n";
 
@@ -77,9 +77,9 @@ close(H);
 close(SH);
 
 
-chmod(0666,"$opt{CORE_DIR}/$opt{CONFIG_H}");
-copy("$file.new","$opt{CORE_DIR}/$opt{CONFIG_H}") || die "Cannot copy:$!";
-chmod(0444,"$opt{CORE_DIR}/$opt{CONFIG_H}");
+chmod(0666,"%opt{CORE_DIR}/%opt{CONFIG_H}");
+copy("$file.new","%opt{CORE_DIR}/%opt{CONFIG_H}") || die "Cannot copy:$!";
+chmod(0444,"%opt{CORE_DIR}/%opt{CONFIG_H}");
 
 if (compare("$file.new",$file))
  {
@@ -99,7 +99,7 @@ else
 sub Config
 {
  my $var = shift;
- my $val = $Config{$var};
+ my $val = %Config{$var};
  $val = 'undef' unless defined $val;
  $val =~ s/\\/\\\\/g;
  return $val;

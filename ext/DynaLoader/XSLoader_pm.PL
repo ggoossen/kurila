@@ -24,7 +24,7 @@ our $VERSION = "0.08";
 
 EOT
 
-print OUT '  my $dl_dlext = ', to_string($Config::Config{'dlext'}), ";\n" ;
+print OUT '  my $dl_dlext = ', to_string(%Config::Config{'dlext'}), ";\n" ;
 
 print OUT <<'EOT';
 

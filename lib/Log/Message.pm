@@ -241,7 +241,7 @@ sub import {
     my %hash    = @_;
 
     $CONFIG = Log::Message::Config->new( %hash)
-                or die loc(qq[Problem initialising %1], __PACKAGE__);
+                or die loc(qq[Problem initialising \%1], __PACKAGE__);
 
 }
 
@@ -394,7 +394,7 @@ sub store {
     ### single arg means just the message
     ### otherwise, they are named
     if( @_ == 1 ) {
-        $hash{message} = shift;
+        %hash{message} = shift;
     } else {
         %hash = @_;
     }
@@ -482,7 +482,7 @@ sub retrieve {
     ### single arg means just the amount
     ### otherwise, they are named
     if( @_ == 1 ) {
-        $hash{amount} = shift;
+        %hash{amount} = shift;
     } else {
         %hash = @_;
     }
@@ -509,7 +509,7 @@ sub retrieve {
                             ? splice(@list,0,$amount)
                             : @list;
 
-    return wantarray ? @rv : $rv[0];
+    return wantarray ? @rv : @rv[0];
 }
 
 =head2 first

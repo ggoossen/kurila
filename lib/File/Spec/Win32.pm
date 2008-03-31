@@ -69,7 +69,7 @@ variables are tainted, they are not used.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = $_[0]->_tmpdir( map( $ENV{$_}, qw(TMPDIR TEMP TMP) ),
+    $tmpdir = @_[0]->_tmpdir( map( %ENV{$_}, qw(TMPDIR TEMP TMP) ),
 			      'SYS:/temp',
 			      'C:\system\temp',
 			      'C:/temp',
@@ -131,12 +131,12 @@ sub catfile {
     # Legacy / compatibility support
     #
     shift, return _canon_cat( "/", @_ )
-	if $_[0] eq "";
+	if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
     #     catfile('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( ($_[0].'\\'), @_[1..(@_-1)] )
-        if $_[0] =~ m{^$DRIVE_RX\z}o;
+    return _canon_cat( (@_[0].'\\'), @_[[1..(@_-1)]] )
+        if @_[0] =~ m{^$DRIVE_RX\z}o;
 
     return _canon_cat( @_ );
 }
@@ -149,18 +149,18 @@ sub catdir {
     return ""
     	unless @_;
     shift, return _canon_cat( "/", @_ )
-	if $_[0] eq "";
+	if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
     #     catdir('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( ($_[0].'\\'), @_[1..(@_-1)] )
-        if $_[0] =~ m{^$DRIVE_RX\z}o;
+    return _canon_cat( (@_[0].'\\'), @_[[1..(@_-1)]] )
+        if @_[0] =~ m{^$DRIVE_RX\z}o;
 
     return _canon_cat( @_ );
 }
 
 sub path {
-    my @path = split(';', $ENV{PATH});
+    my @path = split(';', %ENV{PATH});
     s/"//g for @path;
     @path = grep length, @path;
     unshift(@path, ".");
@@ -181,8 +181,8 @@ On Win32 makes
 sub canonpath {
     # Legacy / compatibility support
     #
-    return $_[1] if !defined($_[1]) or $_[1] eq '';
-    return _canon_cat( $_[1] );
+    return @_[1] if !defined(@_[1]) or @_[1] eq '';
+    return _canon_cat( @_[1] );
 }
 
 =item splitpath
@@ -266,7 +266,7 @@ sub splitdir {
         # then do the split, then replace it with ''.
         #
         my( @directories )= split( m|[\\/]|, "${directories}dummy" ) ;
-        $directories[( @directories-1) ]= '' ;
+        @directories[( @directories-1) ]= '' ;
         return @directories ;
     }
 }
@@ -310,7 +310,7 @@ sub catpath {
 }
 
 sub _same {
-  lc($_[1]) eq lc($_[2]);
+  lc(@_[1]) eq lc(@_[2]);
 }
 
 sub rel2abs {
@@ -323,13 +323,13 @@ sub rel2abs {
 
     if ($is_abs) {
       # It's missing a volume, add one
-      my $vol = ($self->splitpath( $self->_cwd() ))[0];
+      my $vol = ($self->splitpath( $self->_cwd() ))[[0]];
       return $self->canonpath( $vol . $path );
     }
 
     if ( !defined( $base ) || $base eq '' ) {
       require Cwd ;
-      $base = Cwd::getdcwd( ($self->splitpath( $path ))[0] ) if defined &Cwd::getdcwd ;
+      $base = Cwd::getdcwd( ($self->splitpath( $path ))[[0]] ) if defined &Cwd::getdcwd ;
       $base = $self->_cwd() unless defined $base ;
     }
     elsif ( ! $self->file_name_is_absolute( $base ) ) {
@@ -340,7 +340,7 @@ sub rel2abs {
     }
 
     my ( $path_directories, $path_file ) =
-      ($self->splitpath( $path, 1 ))[1,2] ;
+      ($self->splitpath( $path, 1 ))[[1,2]] ;
 
     my ( $base_volume, $base_directories ) =
       $self->splitpath( $base, 1 ) ;

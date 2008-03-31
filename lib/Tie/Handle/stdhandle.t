@@ -25,7 +25,7 @@ print "not " unless print $f "SomeData\n";
 print "ok 4\n";
 print "not " unless tell($f) == 9;
 print "ok 5\n";
-print "not " unless printf $f "Some %d value\n",1234;
+print "not " unless printf $f "Some \%d value\n",1234;
 print "ok 6\n";
 print "not " unless seek($f,0,0);
 print "ok 7\n";

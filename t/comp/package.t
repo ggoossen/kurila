@@ -50,7 +50,7 @@ sub foo {
    }
 }
 
-print((foo(1))[0] eq 'PQR' ? "ok 8\n" : "not ok 8\n");
+print((foo(1))[[0]] eq 'PQR' ? "ok 8\n" : "not ok 8\n");
 
 my $Q = xyz->new();
 undef %xyz::;

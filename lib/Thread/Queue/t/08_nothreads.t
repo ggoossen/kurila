@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir('t');
         unshift(@INC, '../lib');
     }
@@ -30,8 +30,8 @@ bless($obj1, 'Foo');
 
 # Shared hash-based object
 my $obj2 = &threads::shared::share({});
-$$obj2{'bar'} = 86;
-$$obj2{'key'} = 'foo';
+%$obj2{'bar'} = 86;
+%$obj2{'key'} = 'foo';
 bless($obj2, 'Bar');
 
 # Scalar ref
@@ -74,7 +74,7 @@ is($q->pending(), 7, 'Queue count');
     ok($tary2, 'Thread got item');
     is(ref($tary2), 'ARRAY', 'Item is array ref');
     for (my $ii=0; $ii +< @ary2; $ii++) {
-        is($$tary2[$ii], $ary2[$ii], 'Shared array element check');
+        is(@$tary2[$ii], @ary2[$ii], 'Shared array element check');
     }
 
     my $tobj1 = $q->dequeue();
@@ -85,8 +85,8 @@ is($q->pending(), 7, 'Queue count');
     my $tobj2 = $q->dequeue();
     ok($tobj2, 'Thread got item');
     is(ref($tobj2), 'Bar', 'Item is object');
-    is($$tobj2{'bar'}, 86, 'Shared object element check');
-    is($$tobj2{'key'}, 'foo', 'Shared object element check');
+    is(%$tobj2{'bar'}, 86, 'Shared object element check');
+    is(%$tobj2{'key'}, 'foo', 'Shared object element check');
 
     my $tsref1 = $q->dequeue();
     ok($tsref1, 'Thread got item');

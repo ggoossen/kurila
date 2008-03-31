@@ -77,12 +77,12 @@ if (0) {
 }
 
 # Global readpipe() override
-BEGIN { *CORE::GLOBAL::readpipe = sub ($) { "$_[0] " . --$r }; }
+BEGIN { *CORE::GLOBAL::readpipe = sub ($) { "@_[0] " . --$r }; }
 is( `rm`,	    "rm 10", '``' );
 is( qx/cp/,	    "cp 9", 'qx' );
 
 # Non-global readpipe() override
-BEGIN { *Rgs::readpipe = sub ($) { ++$r . " $_[0]" }; }
+BEGIN { *Rgs::readpipe = sub ($) { ++$r . " @_[0]" }; }
 {
     package Rgs;
     ::is( `rm`,		  "10 rm", '``' );
@@ -93,7 +93,7 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " $_[0]" }; }
 # by the indirect object notation
 {
     local ${^WARN_HOOK} = sub {
-	::like( $_[0]->message, qr/^ok overriden at/ );
+	::like( @_[0]->message, qr/^ok overriden at/ );
     };
     BEGIN { *OverridenWarn::warn = sub { CORE::warn "@_ overriden"; }; }
     package OverridenWarn;
@@ -101,7 +101,7 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " $_[0]" }; }
     warn( OverridenWarn->foo() );
     warn OverridenWarn->foo();
 }
-BEGIN { *OverridenPop::pop = sub { ::is( $_[0][0], "ok" ) }; }
+BEGIN { *OverridenPop::pop = sub { ::is( @_[0][0], "ok" ) }; }
 {
     package OverridenPop;
     sub foo { [ "ok" ] }
@@ -112,7 +112,7 @@ BEGIN { *OverridenPop::pop = sub { ::is( $_[0][0], "ok" ) }; }
 {
     eval {
         local *CORE::GLOBAL::require = sub {
-            CORE::require($_[0]);
+            CORE::require(@_[0]);
         }        ;
         require Text::ParseWords;
     };

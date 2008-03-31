@@ -17,8 +17,8 @@ use base qw( DynaLoader Tie::Handle IO::File Exporter );
 # Math::BigInt optimizations courtesy of Tels
 my $_64BITINT;
 BEGIN {
-    $_64BITINT = defined($Config{use64bitint}) &&
-                 ($Config{use64bitint} eq 'define');
+    $_64BITINT = defined(%Config{use64bitint}) &&
+                 (%Config{use64bitint} eq 'define');
 
     require Math::BigInt unless $_64BITINT;
 }
@@ -151,11 +151,11 @@ my $FFFFFFFF   = $_64BITINT ? 0xFFFFFFFF : Math::BigInt->new(0xFFFFFFFF);
 {
     my $key;
     foreach $key (  keys(%EXPORT_TAGS)  ) {
-	push( @EXPORT_OK, @{$EXPORT_TAGS{$key}} );
+	push( @EXPORT_OK, @{%EXPORT_TAGS{$key}} );
 	#push( @EXPORT_FAIL, @{$EXPORT_TAGS{$key}} )   unless  $key =~ m/^Func/;
     }
 }
-$EXPORT_TAGS{ALL}= \@EXPORT_OK;
+%EXPORT_TAGS{ALL}= \@EXPORT_OK;
 
 Win32API::File->bootstrap( $VERSION);
 
@@ -231,7 +231,7 @@ use overload
     'fallback' => 1;
 
 sub new { return bless {}, shift }
-sub set { Win32API::File::_fileLastError($_[1]); return $_[0] }
+sub set { Win32API::File::_fileLastError(@_[1]); return @_[0] }
 
 package Win32API::File;
 
@@ -239,7 +239,7 @@ my $_error = Win32API::File::_error->new();
 
 sub fileLastError {
     croak 'Usage: ',__PACKAGE__,'::fileLastError( [$setWin32ErrCode] )'	if @_ +> 1;
-    $_error->set($_[0]) if defined $_[0];
+    $_error->set(@_[0]) if defined @_[0];
     return $_error;
 }
 
@@ -402,8 +402,8 @@ sub attrLetsToBits
     my( $bits )= 0;
     foreach(  split(m//,$lets)  ) {
 	croak "Win32API::File::attrLetsToBits: Unknown attribute letter ($_)"
-	  unless  exists $a{$_};
-	$bits ^|^= $a{$_};
+	  unless  exists %a{$_};
+	$bits ^|^= %a{$_};
     }
     return $bits;
 }
@@ -411,12 +411,12 @@ sub attrLetsToBits
 use vars qw( @_createFile_Opts %_createFile_Opts );
 @_createFile_Opts= qw( Access Create Share Attributes
 		       Flags Security Model );
-@_createFile_Opts{@_createFile_Opts}= (1) x @_createFile_Opts;
+%_createFile_Opts{[@_createFile_Opts]}= (1) x @_createFile_Opts;
 
 sub createFile
 {
     my $opts= "";
-    if(  2 +<= @_  &&  "HASH" eq ref($_[(@_-1)])  ) {
+    if(  2 +<= @_  &&  "HASH" eq ref(@_[(@_-1)])  ) {
 	$opts= pop( @_ );
     }
     my( $sPath, $svAccess, $svShare )= @_;
@@ -428,7 +428,7 @@ sub createFile
     }
     my( $create, $flags, $sec, $model )= ( "", 0, [], 0 );
     if(  ref($opts)  ) {
-        my @err= grep( ! $_createFile_Opts{$_}, keys(%$opts) );
+        my @err= grep( ! %_createFile_Opts{$_}, keys(%$opts) );
 	@err  and  croak "_createFile:  Invalid options (@err)";
 	$flags= $opts->{Flags}		if  exists( $opts->{Flags} );
 	$flags ^|^= attrLetsToBits( $opts->{Attributes} )
@@ -514,7 +514,7 @@ sub createFile
         my @s= split(m//,$svShare);
 	$svShare= 0;
 	foreach( @s ) {
-	    $svShare ^|^= $s{$_};
+	    $svShare ^|^= %s{$_};
 	}
     } elsif(  $svShare == 0  &&  $svShare !~ m/^[-+.]*0/  ) {
 	croak "Win32API::File::createFile: Invalid \$svShare ($svShare)";
@@ -576,19 +576,19 @@ sub TIEHANDLE {
 # This is called for getting the tied object from hard refs to glob refs in
 # some cases, for reasons I don't quite grok.
 
-sub FETCH { return $_[0] }
+sub FETCH { return @_[0] }
 
 # Public accessors
 
-sub win32_handle{ $_[0]->{_win32_handle}||= $_[1] }
+sub win32_handle{ @_[0]->{_win32_handle}||= @_[1] }
 
 # Protected accessors
 
-sub _buffer	{ $_[0]->{_buffer}	||= $_[1] }
-sub _binmode	{ $_[0]->{_binmode}	||= $_[1] }
-sub _fileno	{ $_[0]->{_fileno}	||= $_[1] }
-sub _access	{ $_[0]->{_access}	||= $_[1] }
-sub _append	{ $_[0]->{_append}	||= $_[1] }
+sub _buffer	{ @_[0]->{_buffer}	||= @_[1] }
+sub _binmode	{ @_[0]->{_binmode}	||= @_[1] }
+sub _fileno	{ @_[0]->{_fileno}	||= @_[1] }
+sub _access	{ @_[0]->{_access}	||= @_[1] }
+sub _append	{ @_[0]->{_append}	||= @_[1] }
 
 # Tie interface
 
@@ -625,7 +625,7 @@ sub OPEN {
 }
 
 sub BINMODE {
-	$_[0]->_binmode(1);
+	@_[0]->_binmode(1);
 }
 
 sub WRITE {
@@ -664,7 +664,7 @@ sub PRINT {
 
 sub READ {
 	my $self = shift;
-	my $into = \$_[0]; shift;
+	my $into = \@_[0]; shift;
 	my ($len, $offset, $overlap) = @_;
 
 	my $buffer     = defined $self->_buffer ? $self->_buffer : "";
@@ -748,14 +748,14 @@ sub SEEK {
 		fileConstant($_)
 	} qw(FILE_BEGIN FILE_CURRENT FILE_END);
 
-	my $from_where = $file_consts[$whence];
+	my $from_where = @file_consts[$whence];
 
 	return setFilePointer($self->win32_handle, $pos, $from_where);
 }
 
 sub TELL {
 # SetFilePointer with position 0 at FILE_CURRENT will return position.
-	return $_[0]->SEEK(0, 1);
+	return @_[0]->SEEK(0, 1);
 }
 
 sub EOF {

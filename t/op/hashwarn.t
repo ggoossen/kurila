@@ -9,7 +9,7 @@ use warnings;
 use vars qw{ @warnings };
 
 BEGIN {
-    ${^WARN_HOOK} = sub { push @warnings, $_[0]->message };
+    ${^WARN_HOOK} = sub { push @warnings, @_[0]->message };
     $| = 1;
 }
 
@@ -22,12 +22,12 @@ my $fail_not_hr   = 'Not a HASH reference at ';
     @warnings = ();
     my %hash = (1..3);
     cmp_ok(scalar(@warnings),'==',1,'odd count');
-    cmp_ok(substr($warnings[0],0,length($fail_odd)),'eq',$fail_odd,'odd msg');
+    cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'odd msg');
 
     @warnings = ();
     %hash = 1;
     cmp_ok(scalar(@warnings),'==',1,'scalar count');
-    cmp_ok(substr($warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg');
+    cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg');
 
     @warnings = ();
     dies_like( sub { %hash = { 1..3 }; }, qr/reference as string/ );

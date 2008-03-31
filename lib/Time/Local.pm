@@ -15,7 +15,7 @@ $VERSION   = '1.18_01';
 my @MonthDays = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
 # Determine breakpoint for rolling century
-my $ThisYear    = ( localtime() )[5];
+my $ThisYear    = ( localtime() )[[5]];
 my $Breakpoint  = ( $ThisYear + 50 ) % 100;
 my $NextCentury = $ThisYear - $ThisYear % 100;
 $NextCentury += 100 if $Breakpoint +< 50;
@@ -28,12 +28,12 @@ use constant SECS_PER_MINUTE => 60;
 use constant SECS_PER_HOUR   => 3600;
 use constant SECS_PER_DAY    => 86400;
 
-my $MaxInt = ( ( 1 << ( 8 * $Config{ivsize} - 2 ) ) - 1 ) * 2 + 1;
+my $MaxInt = ( ( 1 << ( 8 * %Config{ivsize} - 2 ) ) - 1 ) * 2 + 1;
 my $MaxDay = int( ( $MaxInt - ( SECS_PER_DAY / 2 ) ) / SECS_PER_DAY ) - 1;
 
 if ( $^O eq 'MacOS' ) {
     # time_t is unsigned...
-    $MaxInt = ( 1 << ( 8 * $Config{ivsize} ) ) - 1;
+    $MaxInt = ( 1 << ( 8 * %Config{ivsize} ) ) - 1;
 }
 
 # Determine the EPOC day for this machine
@@ -61,10 +61,10 @@ sub _daygm {
 
     # This is written in such a byzantine way in order to avoid
     # lexical variables and sub calls, for speed
-    return $_[3] + (
-        $Cheat{ pack( 'ss', @_[ 4, 5 ] ) } ||= do {
-            my $month = ( $_[4] + 10 ) % 12;
-            my $year  = $_[5] + 1900 - $month / 10;
+    return @_[3] + (
+        %Cheat{ pack( 'ss', @_[[ 4, 5 ]] ) } ||= do {
+            my $month = ( @_[4] + 10 ) % 12;
+            my $year  = @_[5] + 1900 - $month / 10;
 
             ( ( 365 * $year )
               + ( $year / 4 )
@@ -79,7 +79,7 @@ sub _daygm {
 
 sub _timegm {
     my $sec =
-        $SecOff + $_[0] + ( SECS_PER_MINUTE * $_[1] ) + ( SECS_PER_HOUR * $_[2] );
+        $SecOff + @_[0] + ( SECS_PER_MINUTE * @_[1] ) + ( SECS_PER_HOUR * @_[2] );
 
     return $sec + ( SECS_PER_DAY * &_daygm );
 }
@@ -94,7 +94,7 @@ sub timegm {
         $year += ( $year +> $Breakpoint ) ? $Century : $NextCentury;
     }
 
-    unless ( $Options{no_range_check} ) {
+    unless ( %Options{no_range_check} ) {
         if ( abs($year) +>= 0x7fff ) {
             $year += 1900;
             die
@@ -105,7 +105,7 @@ sub timegm {
             if $month +> 11
             or $month +< 0;
 
-	my $md = $MonthDays[$month];
+	my $md = @MonthDays[$month];
         ++$md
             if $month == 1 && _is_leap_year( $year + 1900 );
 
@@ -117,7 +117,7 @@ sub timegm {
 
     my $days = _daygm( undef, undef, undef, $mday, $month, $year );
 
-    unless ($Options{no_range_check} or abs($days) +< $MaxDay) {
+    unless (%Options{no_range_check} or abs($days) +< $MaxDay) {
         my $msg = '';
         $msg .= "Day too big - $days > $MaxDay\n" if $days +> $MaxDay;
 
@@ -135,15 +135,15 @@ sub timegm {
 }
 
 sub _is_leap_year {
-    return 0 if $_[0] % 4;
-    return 1 if $_[0] % 100;
-    return 0 if $_[0] % 400;
+    return 0 if @_[0] % 4;
+    return 1 if @_[0] % 100;
+    return 0 if @_[0] % 400;
 
     return 1;
 }
 
 sub timegm_nocheck {
-    local $Options{no_range_check} = 1;
+    local %Options{no_range_check} = 1;
     return &timegm;
 }
 
@@ -177,13 +177,13 @@ sub timelocal {
     # If the original date was a non-extent gap in a forward DST jump,
     # we should now have the wrong answer - undo the DST adjustment
     my ( $s, $m, $h ) = localtime($loc_t);
-    $loc_t -= $dst_off if $s != $_[0] || $m != $_[1] || $h != $_[2];
+    $loc_t -= $dst_off if $s != @_[0] || $m != @_[1] || $h != @_[2];
 
     return $loc_t;
 }
 
 sub timelocal_nocheck {
-    local $Options{no_range_check} = 1;
+    local %Options{no_range_check} = 1;
     return &timelocal;
 }
 

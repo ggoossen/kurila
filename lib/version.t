@@ -7,7 +7,7 @@
 use Test::More qw(no_plan);
 use POSIX;
 
-diag "Tests with base class" unless $ENV{PERL_CORE};
+diag "Tests with base class" unless %ENV{PERL_CORE};
 
 BEGIN {
     use_ok("version", 0.50); # If we made it this far, we are ok.
@@ -15,7 +15,7 @@ BEGIN {
 
 BaseTests("version");
 
-diag "Tests with empty derived class" unless $ENV{PERL_CORE};
+diag "Tests with empty derived class" unless %ENV{PERL_CORE};
 
 package version::Empty;
 use base 'version';
@@ -39,7 +39,7 @@ ok( $verobj +> $testobj, "Comparison vs parent class" );
 is( $verobj cmp $testobj, 1, "Comparison vs parent class" );
 BaseTests("version::Empty");
 
-diag "tests with bad subclass" unless $ENV{PERL_CORE};
+diag "tests with bad subclass" unless %ENV{PERL_CORE};
 $testobj = version::Bad->new(1.002_003);
 isa_ok( $testobj, "version::Bad" );
 eval { my $string = $testobj->numify };
@@ -56,7 +56,7 @@ like($@->{description}, qr/Invalid version object/,
     "Bad subclass vcmp");
 
 # dummy up a redundant call to satify David Wheeler
-local ${^WARN_HOOK} = sub { die $_[0] };
+local ${^WARN_HOOK} = sub { die @_[0] };
 eval 'use version;';
 unlike ($@, qr/^Subroutine main::qv redefined/,
     "Only export qv once per package (to prevent redefined warnings)."); 
@@ -107,7 +107,7 @@ sub BaseTests {
     
     # for this first test, just upgrade the warn() to die()
     eval {
-	local ${^WARN_HOOK} = sub { die $_[0]->{description} };
+	local ${^WARN_HOOK} = sub { die @_[0]->{description} };
 	$version = $CLASS->new("1.2b3");
     };
     my $warnregex = "Version string '.+' contains invalid data; ".
@@ -119,7 +119,7 @@ sub BaseTests {
     # from here on out capture the warning and test independently
     {
     my $warning;
-    local ${^WARN_HOOK} = sub { $warning = $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { $warning = @_[0]->{description} };
     $version = $CLASS->new("99 and 44/100 pure");
 
     like($warning, qr/$warnregex/,
@@ -480,7 +480,7 @@ EOF
 SKIP: {
 	# test locale handling
 	my $warning;
-	local ${^WARN_HOOK} = sub { $warning = $_[0] };
+	local ${^WARN_HOOK} = sub { $warning = @_[0] };
 	my $ver = 1.23;  # has to be floating point number
 	my $loc;
 	while ( ~< *DATA) {
@@ -506,7 +506,7 @@ SKIP: {
 
     {
 	my $warning;
-	local ${^WARN_HOOK} = sub { $warning = $_[0] };
+	local ${^WARN_HOOK} = sub { $warning = @_[0] };
 	eval { my $v = $CLASS->new(^~^0); };
 	unlike($@, qr/Integer overflow in version/, "Too large version");
 	like($warning->{description}, qr/Integer overflow in version/, "Too large version");

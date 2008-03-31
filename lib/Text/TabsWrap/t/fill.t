@@ -57,7 +57,7 @@ use Text::Wrap;
 
 use strict;
 
-my $rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
 my $tn = 1;
 while (@tests) {

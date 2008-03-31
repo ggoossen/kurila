@@ -1,6 +1,6 @@
 ### Module::Load test suite ###
 BEGIN { 
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir '../lib/Module/Load' if -d '../lib/Module/Load';
         unshift @INC, '../../..';
     }
@@ -21,7 +21,7 @@ use Test::More tests => 13;
     eval { load $mod };
 
     is( $@, '', qq[Loading module '$mod'] );
-    ok( defined($INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{$file}), q[... found in %INC] );
 }
 
 {
@@ -31,7 +31,7 @@ use Test::More tests => 13;
     eval { load $mod };
 
     is( $@, '', qq[Loading File '$mod'] );
-    ok( defined($INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{$file}), q[... found in %INC] );
 }
 
 {
@@ -41,7 +41,7 @@ use Test::More tests => 13;
     eval { load $mod };
 
     is( $@, '', qq[Loading Ambigious Module '$mod'] );
-    ok( defined($INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{$file}), q[... found in %INC] );
 }
 
 {
@@ -51,7 +51,7 @@ use Test::More tests => 13;
     eval { load $mod };
 
     is( $@ && $@->message, '', qq[Loading Ambigious File '$mod'] );
-    ok( defined($INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{$file}), q[... found in %INC] );
 }
 
 ### Test importing functions ###

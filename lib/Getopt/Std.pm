@@ -96,7 +96,7 @@ sub getopt (;$$) {
     local $_;
     local @EXPORT;
 
-    while (@ARGV && ($_ = $ARGV[0]) =~ m/^-(.)(.*)/) {
+    while (@ARGV && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/) {
 	($first,$rest) = ($1,$2);
 	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
@@ -111,7 +111,7 @@ sub getopt (;$$) {
 		$rest = shift(@ARGV);
 	    }
 	    if (ref $hash) {
-	        $$hash{$first} = $rest;
+	        %$hash{$first} = $rest;
 	    }
 	    else {
                 no strict 'refs';
@@ -121,7 +121,7 @@ sub getopt (;$$) {
 	}
 	else {
 	    if (ref $hash) {
-	        $$hash{$first} = 1;
+	        %$hash{$first} = 1;
 	    }
 	    else {
                 no strict 'refs';
@@ -129,7 +129,7 @@ sub getopt (;$$) {
 	        push( @EXPORT, "\$opt_$first" );
 	    }
 	    if ($rest ne '') {
-		$ARGV[0] = "-$rest";
+		@ARGV[0] = "-$rest";
 	    }
 	    else {
 		shift(@ARGV);
@@ -229,7 +229,7 @@ sub getopts ($;$) {
     local @EXPORT;
 
     @args = split( m/ */, $argumentative );
-    while(@ARGV && ($_ = $ARGV[0]) =~ m/^-(.)(.*)/s) {
+    while(@ARGV && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s) {
 	($first,$rest) = ($1,$2);
 	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
@@ -237,14 +237,14 @@ sub getopts ($;$) {
 	}
 	my $pos = index($argumentative,$first);
 	if ($pos +>= 0) {
-	    if (defined($args[$pos+1]) and ($args[$pos+1] eq ':')) {
+	    if (defined(@args[$pos+1]) and (@args[$pos+1] eq ':')) {
 		shift(@ARGV);
 		if ($rest eq '') {
 		    ++$errs unless @ARGV;
 		    $rest = shift(@ARGV);
 		}
 		if (ref $hash) {
-		    $$hash{$first} = $rest;
+		    %$hash{$first} = $rest;
 		}
 		else {
                     no strict 'refs';
@@ -254,7 +254,7 @@ sub getopts ($;$) {
 	    }
 	    else {
 		if (ref $hash) {
-		    $$hash{$first} = 1;
+		    %$hash{$first} = 1;
 		}
 		else {
                     no strict 'refs';
@@ -265,7 +265,7 @@ sub getopts ($;$) {
 		    shift(@ARGV);
 		}
 		else {
-		    $ARGV[0] = "-$rest";
+		    @ARGV[0] = "-$rest";
 		}
 	    }
 	}
@@ -285,7 +285,7 @@ sub getopts ($;$) {
 	    warn "Unknown option: $first\n";
 	    ++$errs;
 	    if ($rest ne '') {
-		$ARGV[0] = "-$rest";
+		@ARGV[0] = "-$rest";
 	    }
 	    else {
 		shift(@ARGV);

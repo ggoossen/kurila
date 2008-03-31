@@ -24,14 +24,14 @@ BEGIN {
 	 12 => '1.1897314953572317650857593266280070162E+4932',
 	 16 => '1.1897314953572317650857593266280070162E+4932',
 	);
-    my $nvsize = $Config{nvsize} ||
-	        ($Config{uselongdouble} && $Config{longdblsize}) ||
-                 $Config{doublesize};
+    my $nvsize = %Config{nvsize} ||
+	        (%Config{uselongdouble} && %Config{longdblsize}) ||
+                 %Config{doublesize};
     die "Math::Complex: Could not figure out nvsize\n"
 	unless defined $nvsize;
     die "Math::Complex: Cannot not figure out max nv (nvsize = $nvsize)\n"
-	unless defined $DBL_MAX{$nvsize};
-    my $DBL_MAX = eval $DBL_MAX{$nvsize};
+	unless defined %DBL_MAX{$nvsize};
+    my $DBL_MAX = eval %DBL_MAX{$nvsize};
     die "Math::Complex: Could not figure out max nv (nvsize = $nvsize)\n"
 	unless defined $DBL_MAX;
     my $BIGGER_THAN_THIS = 1e30;  # Must find something bigger than this.
@@ -50,7 +50,7 @@ BEGIN {
 	    'INFINITY',
 	    '1e99999',
 	    ) {
-	    local $SIG{FPE} = { };
+	    local %SIG{FPE} = { };
 	    local $^W = 0;
 	    my $i = eval "$t+1.0";
 	    if (defined $i && $i +> $BIGGER_THAN_THIS) {
@@ -148,7 +148,7 @@ my $eps            = 1e-14;		# Epsilon
 # Die on bad *make() arguments.
 
 sub _cannot_make {
-    die "@{[(caller(1))[3]]}: Cannot take $_[0] of '$_[1]'.\n";
+    die "@{[(caller(1))[[3]]]}: Cannot take @_[0] of '@_[1]'.\n";
 }
 
 sub _make {
@@ -208,9 +208,9 @@ sub make {
     if (@_ == 0) {
 	($re, $im) = (0, 0);
     } elsif (@_ == 1) {
-	return (ref $self)->emake($_[0])
-	    if ($_[0] =~ m/^\s*\[/);
-	($re, $im) = _make($_[0]);
+	return (ref $self)->emake(@_[0])
+	    if (@_[0] =~ m/^\s*\[/);
+	($re, $im) = _make(@_[0]);
     } elsif (@_ == 2) {
 	($re, $im) = @_;
     }
@@ -236,9 +236,9 @@ sub emake {
     if (@_ == 0) {
 	($rho, $theta) = (0, 0);
     } elsif (@_ == 1) {
-	return (ref $self)->make($_[0])
-	    if ($_[0] =~ m/^\s*\(/ || $_[0] =~ m/i\s*$/);
-	($rho, $theta) = _emake($_[0]);
+	return (ref $self)->make(@_[0])
+	    if (@_[0] =~ m/^\s*\(/ || @_[0] =~ m/i\s*$/);
+	($rho, $theta) = _emake(@_[0]);
     } elsif (@_ == 2) {
 	($rho, $theta) = @_;
     }
@@ -349,15 +349,15 @@ sub _ip2 () { i / 2 }
 # Attribute access/set routines
 #
 
-sub _cartesian {$_[0]->{c_dirty} ?
-		   $_[0]->_update_cartesian : $_[0]->{'cartesian'}}
-sub _polar     {$_[0]->{p_dirty} ?
-		   $_[0]->_update_polar : $_[0]->{'polar'}}
+sub _cartesian {@_[0]->{c_dirty} ?
+		   @_[0]->_update_cartesian : @_[0]->{'cartesian'}}
+sub _polar     {@_[0]->{p_dirty} ?
+		   @_[0]->_update_polar : @_[0]->{'polar'}}
 
-sub _set_cartesian { $_[0]->{p_dirty}++; $_[0]->{c_dirty} = 0;
-		     $_[0]->{'cartesian'} = $_[1] }
-sub _set_polar     { $_[0]->{c_dirty}++; $_[0]->{p_dirty} = 0;
-		     $_[0]->{'polar'} = $_[1] }
+sub _set_cartesian { @_[0]->{p_dirty}++; @_[0]->{c_dirty} = 0;
+		     @_[0]->{'cartesian'} = @_[1] }
+sub _set_polar     { @_[0]->{c_dirty}++; @_[0]->{p_dirty} = 0;
+		     @_[0]->{'polar'} = @_[1] }
 
 #
 # ->_update_cartesian
@@ -459,17 +459,17 @@ sub _multiply {
 # Die on division by zero.
 #
 sub _divbyzero {
-    my $mess = "$_[0]: Division by zero.\n";
+    my $mess = "@_[0]: Division by zero.\n";
 
-    if (defined $_[1]) {
-	$mess .= "(Because in the definition of $_[0], the divisor ";
-	$mess .= "$_[1] " unless ("$_[1]" eq '0');
+    if (defined @_[1]) {
+	$mess .= "(Because in the definition of @_[0], the divisor ";
+	$mess .= "@_[1] " unless ("@_[1]" eq '0');
 	$mess .= "is 0)\n";
     }
 
     my @up = caller(1);
 
-    $mess .= "Died at $up[1] line $up[2].\n";
+    $mess .= "Died at @up[1] line @up[2].\n";
 
     die $mess;
 }
@@ -613,23 +613,23 @@ sub abs {
 	my ($z, $rho) = @_;
 	unless (ref $z) {
 	    if (@_ == 2) {
-		$_[0] = $_[1];
+		@_[0] = @_[1];
 	    } else {
 		return CORE::abs($z);
 	    }
 	}
 	if (defined $rho) {
-	    $z->{'polar'} = [ $rho, ${$z->_polar}[1] ];
+	    $z->{'polar'} = [ $rho, @{$z->_polar}[1] ];
 	    $z->{p_dirty} = 0;
 	    $z->{c_dirty} = 1;
 	    return $rho;
 	} else {
-	    return ${$z->_polar}[0];
+	    return @{$z->_polar}[0];
 	}
 }
 
 sub _theta {
-    my $theta = $_[0];
+    my $theta = @_[0];
 
     if    ($$theta +>   pi()) { $$theta -= pi2 }
     elsif ($$theta +<= -pi()) { $$theta += pi2 }
@@ -645,11 +645,11 @@ sub arg {
 	return $z unless ref $z;
 	if (defined $theta) {
 	    _theta(\$theta);
-	    $z->{'polar'} = [ ${$z->_polar}[0], $theta ];
+	    $z->{'polar'} = [ @{$z->_polar}[0], $theta ];
 	    $z->{p_dirty} = 0;
 	    $z->{c_dirty} = 1;
 	} else {
-	    $theta = ${$z->_polar}[1];
+	    $theta = @{$z->_polar}[1];
 	    _theta(\$theta);
 	}
 	return $theta;
@@ -703,11 +703,11 @@ sub cbrt {
 # Die on bad root.
 #
 sub _rootbad {
-    my $mess = "Root '$_[0]' illegal, root rank must be positive integer.\n";
+    my $mess = "Root '@_[0]' illegal, root rank must be positive integer.\n";
 
     my @up = caller(1);
 
-    $mess .= "Died at $up[1] line $up[2].\n";
+    $mess .= "Died at @up[1] line @up[2].\n";
 
     die $mess;
 }
@@ -755,11 +755,11 @@ sub Re {
 	my ($z, $Re) = @_;
 	return $z unless ref $z;
 	if (defined $Re) {
-	    $z->{'cartesian'} = [ $Re, ${$z->_cartesian}[1] ];
+	    $z->{'cartesian'} = [ $Re, @{$z->_cartesian}[1] ];
 	    $z->{c_dirty} = 0;
 	    $z->{p_dirty} = 1;
 	} else {
-	    return ${$z->_cartesian}[0];
+	    return @{$z->_cartesian}[0];
 	}
 }
 
@@ -772,11 +772,11 @@ sub Im {
 	my ($z, $Im) = @_;
 	return 0 unless ref $z;
 	if (defined $Im) {
-	    $z->{'cartesian'} = [ ${$z->_cartesian}[0], $Im ];
+	    $z->{'cartesian'} = [ @{$z->_cartesian}[0], $Im ];
 	    $z->{c_dirty} = 0;
 	    $z->{p_dirty} = 1;
 	} else {
-	    return ${$z->_cartesian}[1];
+	    return @{$z->_cartesian}[1];
 	}
 }
 
@@ -815,17 +815,17 @@ sub exp {
 # Die on logarithm of zero.
 #
 sub _logofzero {
-    my $mess = "$_[0]: Logarithm of zero.\n";
+    my $mess = "@_[0]: Logarithm of zero.\n";
 
-    if (defined $_[1]) {
-	$mess .= "(Because in the definition of $_[0], the argument ";
-	$mess .= "$_[1] " unless ($_[1] eq '0');
+    if (defined @_[1]) {
+	$mess .= "(Because in the definition of @_[0], the argument ";
+	$mess .= "@_[1] " unless (@_[1] eq '0');
 	$mess .= "is 0)\n";
     }
 
     my @up = caller(1);
 
-    $mess .= "Died at $up[1] line $up[2].\n";
+    $mess .= "Died at @up[1] line @up[2].\n";
 
     die $mess;
 }
@@ -862,7 +862,7 @@ sub ln { Math::Complex::log(@_) }
 #
 
 sub log10 {
-	return Math::Complex::log($_[0]) * _uplog10;
+	return Math::Complex::log(@_[0]) * _uplog10;
 }
 
 #
@@ -873,8 +873,8 @@ sub log10 {
 sub logn {
 	my ($z, $n) = @_;
 	$z = cplx($z, 0) unless ref $z;
-	my $logn = $LOGN{$n};
-	$logn = $LOGN{$n} = CORE::log($n) unless defined $logn;	# Cache log(n)
+	my $logn = %LOGN{$n};
+	$logn = %LOGN{$n} = CORE::log($n) unless defined $logn;	# Cache log(n)
 	return &log($z) / $logn;
 }
 
@@ -980,7 +980,7 @@ sub cotan { Math::Complex::cot(@_) }
 # Computes the arc cosine acos(z) = -i log(z + sqrt(z*z-1)).
 #
 sub acos {
-	my $z = $_[0];
+	my $z = @_[0];
 	return CORE::atan2(CORE::sqrt(1-$z*$z), $z)
 	    if (! ref $z) && CORE::abs($z) +<= 1;
 	$z = cplx($z, 0) unless ref $z;
@@ -1005,7 +1005,7 @@ sub acos {
 # Computes the arc sine asin(z) = -i log(iz + sqrt(1-z*z)).
 #
 sub asin {
-	my $z = $_[0];
+	my $z = @_[0];
 	return CORE::atan2($z, CORE::sqrt(1-$z*$z))
 	    if (! ref $z) && CORE::abs($z) +<= 1;
 	$z = cplx($z, 0) unless ref $z;
@@ -1366,14 +1366,14 @@ sub display_format {
 	if (ref $self) {			# Called as an object method
 	    if (exists $self->{display_format}) {
 		my %obj = %{$self->{display_format}};
-		@display_format{keys %obj} = values %obj;
+		%display_format{[keys %obj]} = values %obj;
 	    }
 	}
 	if (@_ == 1) {
-	    $display_format{style} = shift;
+	    %display_format{style} = shift;
 	} else {
 	    my %new = @_;
-	    @display_format{keys %new} = values %new;
+	    %display_format{[keys %new]} = values %new;
 	}
 
 	if (ref $self) { # Called as an object method
@@ -1389,7 +1389,7 @@ sub display_format {
 	return
 	    wantarray ?
 		%DISPLAY_FORMAT :
-		    $DISPLAY_FORMAT{style};
+		    %DISPLAY_FORMAT{style};
 }
 
 #
@@ -1407,7 +1407,7 @@ sub _stringify {
 
 	my $style = $z->display_format;
 
-	$style = $DISPLAY_FORMAT{style} unless defined $style;
+	$style = %DISPLAY_FORMAT{style} unless defined $style;
 
 	return $z->_stringify_polar if $style =~ m/^p/i;
 	return $z->_stringify_cartesian;
@@ -1424,7 +1424,7 @@ sub _stringify_cartesian {
 	my ($re, $im);
 
 	my %format = $z->display_format;
-	my $format = $format{format};
+	my $format = %format{format};
 
 	if ($x) {
 	    if ($x =~ m/^NaN[QS]?$/i) {
@@ -1486,7 +1486,7 @@ sub _stringify_polar {
 	my $theta;
 
 	my %format = $z->display_format;
-	my $format = $format{format};
+	my $format = %format{format};
 
 	if ($t =~ m/^NaN[QS]?$/i || $t =~ m/^-?\Q$Inf\E$/i) {
 	    $theta = $t; 
@@ -1504,7 +1504,7 @@ sub _stringify_polar {
 
 	$t -= int(CORE::abs($t) / pi2) * pi2;
 
-	if ($format{polar_pretty_print} && $t) {
+	if (%format{polar_pretty_print} && $t) {
 	    my ($a, $b);
 	    for $a (2..9) {
 		$b = $t * $a / pi;

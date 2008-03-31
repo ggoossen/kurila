@@ -5,4 +5,4 @@ my $Class = 'Log::Message::Simple';
 
 use_ok( $Class );
 
-diag( "Testing $Class version " . $Class->VERSION ) unless $ENV{PERL_CORE};
+diag( "Testing $Class version " . $Class->VERSION ) unless %ENV{PERL_CORE};

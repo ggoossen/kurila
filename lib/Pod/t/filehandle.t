@@ -10,7 +10,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         @INC = '../lib';
     } else {
         unshift (@INC, '../blib/lib');

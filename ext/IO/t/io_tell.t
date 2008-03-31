@@ -14,7 +14,7 @@ BEGIN {
 use Config;
 
 BEGIN {
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
 	print "1..0\n";
 	exit 0;
     }

@@ -14,8 +14,8 @@ use overload( # So it'll stringify nice
 );
 
 sub tack_on {
-  $_[0] = ['', {}, "$_[0]" ];
-  return $_[0][2] .= $_[1];
+  @_[0] = ['', {}, "@_[0]" ];
+  return @_[0][2] .= @_[1];
 }
 
 sub as_string {
@@ -30,10 +30,10 @@ sub new {
   $class = ref($class) || $class;
   my $new;
   if(@_ == 1) {
-    if (!ref($_[0] || '')) { # most common case: one bare string
-      return bless ['', {}, $_[0] ], $class;
-    } elsif( ref($_[0] || '') eq 'ARRAY') {
-      $new = [ @{ $_[0] } ];
+    if (!ref(@_[0] || '')) { # most common case: one bare string
+      return bless ['', {}, @_[0] ], $class;
+    } elsif( ref(@_[0] || '') eq 'ARRAY') {
+      $new = [ @{ @_[0] } ];
     } else {
       Carp::croak( "$class new() doesn't know to clone $new" );
     }

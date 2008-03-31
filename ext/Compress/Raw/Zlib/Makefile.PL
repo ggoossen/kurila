@@ -12,7 +12,7 @@ my $BUILD_ZLIB = 0 ;
 my $OLD_ZLIB = '' ;
 my $WALL = '' ;
 my $GZIP_OS_CODE = -1 ;
-my $USE_PPPORT_H = ($ENV{PERL_CORE}) ? '' : '-DUSE_PPPORT_H';
+my $USE_PPPORT_H = (%ENV{PERL_CORE}) ? '' : '-DUSE_PPPORT_H';
 
 #$WALL = ' -pedantic ' if $Config{'cc'} =~ /gcc/ ;
 #$WALL = ' -Wall -Wno-comment ' if $Config{'cc'} =~ /gcc/ ;
@@ -23,7 +23,7 @@ my $USE_PPPORT_H = ($ENV{PERL_CORE}) ? '' : '-DUSE_PPPORT_H';
 
 # Don't ask if MM_USE_DEFAULT is set -- enables perl core building on cygwin
 if ($^O =~ m/cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
-        and not ($ENV{PERL_MM_USE_DEFAULT} or $ENV{PERL_CORE}))
+        and not (%ENV{PERL_MM_USE_DEFAULT} or %ENV{PERL_CORE}))
 {
     print <<EOM ;
 
@@ -59,7 +59,7 @@ EOM
 ParseCONFIG() ;
 
 UpDowngrade(getPerlFiles('MANIFEST')) 
-    unless $ENV{PERL_CORE};
+    unless %ENV{PERL_CORE};
 
 WriteMakefile( 
     NAME         => 'Compress::Raw::Zlib',
@@ -76,7 +76,7 @@ WriteMakefile(
                     },
 
     (
-      $ENV{SKIP_FOR_CORE}
+      %ENV{SKIP_FOR_CORE}
         ? (MAN3PODS    => {})
         : ()
     ),
@@ -153,7 +153,7 @@ require ExtUtils::Constant;
     {
         last if m/^\s*\)/ ;
         m/(\S+)/ ;
-        delete $names{$1} if defined $1 ;
+        delete %names{$1} if defined $1 ;
     }
     close F ;
 
@@ -195,9 +195,9 @@ sub ParseCONFIG
 
 	($k, $v) = split(m/\s+=\s+/, $_, 2) ;
 	$k = uc $k ;
-	if ($ValidOption{$k}) {
-	    delete $Parsed{$k} ;
-	    $Info{$k} = $v ;
+	if (%ValidOption{$k}) {
+	    delete %Parsed{$k} ;
+	    %Info{$k} = $v ;
 	}
 	else {
 	    push(@badkey, $k) ;
@@ -213,18 +213,18 @@ sub ParseCONFIG
     die "The following keys are missing from $CONFIG  [@missing]\n" 
         if @missing = keys %Parsed ;
 
-    $ZLIB_INCLUDE = $ENV{'ZLIB_INCLUDE'} || $Info{'INCLUDE'} ;
-    $ZLIB_LIB = $ENV{'ZLIB_LIB'} || $Info{'LIB'} ;
+    $ZLIB_INCLUDE = %ENV{'ZLIB_INCLUDE'} || %Info{'INCLUDE'} ;
+    $ZLIB_LIB = %ENV{'ZLIB_LIB'} || %Info{'LIB'} ;
 
     if ($^O eq 'VMS') {
         $ZLIB_INCLUDE = VMS::Filespec::vmspath($ZLIB_INCLUDE);
         $ZLIB_LIB = VMS::Filespec::vmspath($ZLIB_LIB);
     }
 
-    my $y = $ENV{'OLD_ZLIB'} || $Info{'OLD_ZLIB'} ;
+    my $y = %ENV{'OLD_ZLIB'} || %Info{'OLD_ZLIB'} ;
     $OLD_ZLIB = '-DOLD_ZLIB' if $y and $y =~ m/^yes|on|true|1$/i;
 
-    my $x = $ENV{'BUILD_ZLIB'} || $Info{'BUILD_ZLIB'} ;
+    my $x = %ENV{'BUILD_ZLIB'} || %Info{'BUILD_ZLIB'} ;
 
     if ($x and $x =~ m/^yes|on|true|1$/i ) {
 
@@ -248,9 +248,9 @@ sub ParseCONFIG
 	print "Building Zlib enabled\n" ;
     }
 
-    $GZIP_OS_CODE = defined $ENV{'GZIP_OS_CODE'} 
-                          ? $ENV{'GZIP_OS_CODE'} 
-                          : $Info{'GZIP_OS_CODE'} ;
+    $GZIP_OS_CODE = defined %ENV{'GZIP_OS_CODE'} 
+                          ? %ENV{'GZIP_OS_CODE'} 
+                          : %Info{'GZIP_OS_CODE'} ;
 
 	die "GZIP_OS_CODE not 'AUTO_DETECT' or a number between 0 and 255\n"
 	   unless uc $GZIP_OS_CODE eq 'AUTO_DETECT'
@@ -357,7 +357,7 @@ BEGIN
     [ ''        => 255,  'Unknown OS'                   ],
   );
 
-  %OSnames = map { $$_[1] => $$_[2] }  
+  %OSnames = map { @$_[1] => @$_[2] }  
              @GZIP_OS_Names ;
 }
 
@@ -382,7 +382,7 @@ sub getOSname
 {
     my $code = shift ;
 
-    return $OSnames{$code} || 'Unknown OS' ;
+    return %OSnames{$code} || 'Unknown OS' ;
 }
 
 # end of file Makefile.PL

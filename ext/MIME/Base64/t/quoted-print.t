@@ -1,5 +1,5 @@
 BEGIN {
-        if ($ENV{PERL_CORE}) {
+        if (%ENV{PERL_CORE}) {
                 chdir 't' if -d 't';
                 @INC = '../lib';
         }
@@ -183,7 +183,7 @@ y. -- H. L. Mencken=\n"],
 );
 
 } else {
-  die sprintf "Unknown character set: ord('A') == %d\n", ord('A');
+  die sprintf "Unknown character set: ord('A') == \%d\n", ord('A');
 }
 
 $notests = @tests + 15;

@@ -29,7 +29,7 @@ sub quotes          { shift->_perldoc_elem('quotes'         , @_) }
 sub release         { shift->_perldoc_elem('release'        , @_) }
 sub section         { shift->_perldoc_elem('section'        , @_) }
 
-sub new { return bless {}, ref($_[0]) || $_[0] }
+sub new { return bless {}, ref(@_[0]) || @_[0] }
 
 use File::Spec::Functions qw(catfile);
 
@@ -114,7 +114,7 @@ sub parse_from_file {
     
   } else {
     print $outfh $rslt
-     or die "Can't print to $$self{__output_file}: $!";
+     or die "Can't print to %$self{__output_file}: $!";
   }
   
   return;
@@ -125,9 +125,9 @@ sub ___Do_filter_nroff {
   my $self = shift;
   my @data = split m/\n{2,}/, shift;
   
-  shift @data while @data and $data[0] !~ m/\S/; # Go to header
-  shift @data if @data and $data[0] =~ m/Contributed\s+Perl/; # Skip header
-  pop @data if @data and $data[-1] =~ m/^\w/; # Skip footer, like
+  shift @data while @data and @data[0] !~ m/\S/; # Go to header
+  shift @data if @data and @data[0] =~ m/Contributed\s+Perl/; # Skip header
+  pop @data if @data and @data[-1] =~ m/^\w/; # Skip footer, like
 				# 28/Jan/99 perl 5.005, patch 53 1
   join "\n\n", @data;
 }

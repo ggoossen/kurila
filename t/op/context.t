@@ -17,7 +17,7 @@ foo;
 foo(foo);
 
 my $before = curr_test();
-$h{foo} = foo;
+%h{foo} = foo;
 my $after = curr_test();
 
 cmp_ok($after-$before,'==',1,'foo called once')

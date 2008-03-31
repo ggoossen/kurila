@@ -274,10 +274,10 @@ sub _init_headings {
     local *myData = $self;
 
     ## Initialize current section heading titles if necessary
-    unless (defined $myData{_SECTION_HEADINGS}) {
-        local *section_headings = $myData{_SECTION_HEADINGS} = [];
+    unless (defined %myData{_SECTION_HEADINGS}) {
+        local *section_headings = %myData{_SECTION_HEADINGS} = [];
         for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
-            $section_headings[$i] = '';
+            @section_headings[$i] = '';
         }
     }
 }
@@ -304,7 +304,7 @@ sub curr_headings {
     my $self = shift;
     $self->_init_headings()  unless (defined $self->{_SECTION_HEADINGS});
     my @headings = @{ $self->{_SECTION_HEADINGS} };
-    return (@_ +> 0  and  $_[0] =~ m/^\d+$/) ? $headings[$_[0] - 1] : @headings;
+    return (@_ +> 0  and  @_[0] =~ m/^\d+$/) ? @headings[@_[0] - 1] : @headings;
 }
 
 ##---------------------------------------------------------------------------
@@ -353,16 +353,16 @@ sub select {
     ## it seems incredibly unlikely that "+" would ever correspond to
     ## a legitimate section heading
     ##---------------------------------------------------------------------
-    my $add = ($sections[0] eq "+") ? shift(@sections) : "";
+    my $add = (@sections[0] eq "+") ? shift(@sections) : "";
 
     ## Reset the set of sections to use
     unless (@sections +> 0) {
-        delete $myData{_SELECTED_SECTIONS}  unless ($add);
+        delete %myData{_SELECTED_SECTIONS}  unless ($add);
         return;
     }
-    $myData{_SELECTED_SECTIONS} = []
-        unless ($add  &&  exists $myData{_SELECTED_SECTIONS});
-    local *selected_sections = $myData{_SELECTED_SECTIONS};
+    %myData{_SELECTED_SECTIONS} = []
+        unless ($add  &&  exists %myData{_SELECTED_SECTIONS});
+    local *selected_sections = %myData{_SELECTED_SECTIONS};
 
     ## Compile each spec
     my $spec;
@@ -443,14 +443,14 @@ sub match_section {
     local *myData = $self;
 
     ## Return true if no restrictions were explicitly specified
-    my $selections = (exists $myData{_SELECTED_SECTIONS})
-                       ?  $myData{_SELECTED_SECTIONS}  :  undef;
+    my $selections = (exists %myData{_SELECTED_SECTIONS})
+                       ?  %myData{_SELECTED_SECTIONS}  :  undef;
     return  1  unless ((defined $selections) && (@{$selections} +> 0));
 
     ## Default any unspecified sections to the current one
     my @current_headings = $self->curr_headings();
     for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
-        (defined $headings[$i])  or  $headings[$i] = $current_headings[$i];
+        (defined @headings[$i])  or  @headings[$i] = @current_headings[$i];
     }
 
     ## Look for a match against the specified section expressions
@@ -466,8 +466,8 @@ sub match_section {
         for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
-            $match  ^&^= ($negated ? ($headings[$i] !~ m/${regex}/)
-                                 : ($headings[$i] =~ m/${regex}/));
+            $match  ^&^= ($negated ? (@headings[$i] !~ m/${regex}/)
+                                 : (@headings[$i] =~ m/${regex}/));
             last unless ($match);
         }
         return  1  if ($match);
@@ -499,7 +499,7 @@ sub is_selected {
     local $_;
     local *myData = $self;
 
-    $self->_init_headings()  unless (defined $myData{_SECTION_HEADINGS});
+    $self->_init_headings()  unless (defined %myData{_SECTION_HEADINGS});
 
     ## Keep track of current sections levels and headings
     $_ = $paragraph;
@@ -509,10 +509,10 @@ sub is_selected {
         my ($level, $heading) = ($2, $3);
         $level = 1 + (length($1) / 3)  if ((! length $level) || (length $1));
         ## Reset the current section heading at this level
-        $myData{_SECTION_HEADINGS}->[$level - 1] = $heading;
+        %myData{_SECTION_HEADINGS}->[$level - 1] = $heading;
         ## Reset subsection headings of this one to empty
         for (my $i = $level; $i +< $MAX_HEADING_LEVEL; ++$i) {
-            $myData{_SECTION_HEADINGS}->[$i] = '';
+            %myData{_SECTION_HEADINGS}->[$i] = '';
         }
     }
 
@@ -598,7 +598,7 @@ sub podselect {
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
             %opts = map {
-                my ($key, $val) = (lc $_, $opts{$_});
+                my ($key, $val) = (lc $_, %opts{$_});
                 $key =~ s/^(?=\w)/-/;
                 $key =~ m/^-se[cl]/  and  $key  = '-sections';
                 #! $key eq '-range'    and  $key .= 's';
@@ -606,12 +606,12 @@ sub podselect {
             } (keys %opts);
 
             ## Process the options
-            (exists $opts{'-output'})  and  $output = $opts{'-output'};
+            (exists %opts{'-output'})  and  $output = %opts{'-output'};
 
             ## Select the desired sections
-            $pod_parser->select(@{ $opts{'-sections'} })
-                if ( (defined $opts{'-sections'})
-                     && ((ref $opts{'-sections'}) eq 'ARRAY') );
+            $pod_parser->select(@{ %opts{'-sections'} })
+                if ( (defined %opts{'-sections'})
+                     && ((ref %opts{'-sections'}) eq 'ARRAY') );
 
             #! ## Select the desired paragraph ranges
             #! $pod_parser->select(@{ $opts{'-ranges'} })
@@ -677,8 +677,8 @@ sub _compile_section_spec {
 
     ## Set default regex for ommitted levels
     for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
-        $regexs[$i]  = '.*'  unless ((defined $regexs[$i])
-                                     && (length $regexs[$i]));
+        @regexs[$i]  = '.*'  unless ((defined @regexs[$i])
+                                     && (length @regexs[$i]));
     }
     ## Modify the regexs as needed and validate their syntax
     my $bad_regexs = 0;

@@ -116,7 +116,7 @@ sub gensym () {
     no strict 'refs';
     my $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};
     $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};  # second time to supress only-used once warning.
-    delete ${Symbol::stash($genpkg)}{$name};
+    delete %{Symbol::stash($genpkg)}{$name};
     $ref;
 }
 
@@ -135,13 +135,13 @@ sub qualify ($;$) {
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
 	my $pkg;
 	# Global names: special character, "^xyz", or other. 
-	if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || $global{$name}) {
+	if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{$name}) {
 	    # RGS 2001-11-05 : translate leading ^X to control-char
 	    $name =~ s/^\^([a-z_])/{eval 'qq(\c'.$1.')'}/i;
 	    $pkg = "main";
 	}
 	else {
-	    $pkg = (@_ +> 1) ? $_[1] : caller;
+	    $pkg = (@_ +> 1) ? @_[1] : caller;
 	}
 	$name = $pkg . "::" . $name;
     }
@@ -149,7 +149,7 @@ sub qualify ($;$) {
 }
 
 sub qualify_to_ref ($) {
-    return \*{ Symbol::fetch_glob( qualify $_[0], @_ +> 1 ? $_[1] : caller ) };
+    return \*{ Symbol::fetch_glob( qualify @_[0], @_ +> 1 ? @_[1] : caller ) };
 }
 
 #

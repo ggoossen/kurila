@@ -167,15 +167,15 @@ foreach my $argv (@ARGV) {
 	next;
     }
     print "Reading $in...\n" if $::opt_v and @ARGV +> 1;
-    $ls = $ls{$in} ||= { is_in => 1, in => $in };
+    $ls = %ls{$in} ||= { is_in => 1, in => $in };
     my $type;
     while ( ~< *F) {
 	unless (m/^([-+*]{3}) / || m/^(Index):/) {
 	    # not an interesting patch line
 	    # but possibly meta-information or prologue
 	    if ($prologue) {
-		$added{$1}   = 1    if m/^touch\s+(\S+)/;
-		$removed{$1} = 1    if m/^rm\s+(?:-f)?\s*(\S+)/;
+		%added{$1}   = 1    if m/^touch\s+(\S+)/;
+		%removed{$1} = 1    if m/^rm\s+(?:-f)?\s*(\S+)/;
 		$prologue = 0       if m/^exit\b/;
 	    }
 	    get_meta_info($ls, $_) if $::opt_m;
@@ -288,10 +288,10 @@ if ($::opt_4) {
 	join("\n\t", '', map { $_->{in} } @no_outs), "\n" if @no_outs;
 
     my %patched = map { ($_, 1) } map { keys %{$_->{out}} } @patches;
-    delete @patched{keys %added};
+    delete %patched{[keys %added]};
     my @patched = sort keys %patched;
     foreach(@patched) {
-	next if $removed{$_};
+	next if %removed{$_};
 	my $edit = ($::opt_e && !-f $_) ? "add " : "edit";
 	print "p4 $edit   $_$tail\n";
     }
@@ -309,7 +309,7 @@ if ($::opt_I) {
 	++$n_patches;
 	my @outs = keys %{$in->{out}};
 	push @no_outs, $in unless @outs;
-	@all_out{@outs} = ($in->{in}) x @outs;
+	%all_out{[@outs]} = ($in->{in}) x @outs;
     }
     my @all_out = sort keys %all_out;
     my @missing = grep { ! -f $_ } @all_out;
@@ -320,14 +320,14 @@ if ($::opt_I) {
     if ($::opt_v and @no_outs) {
 	print "Patch files which don't contain patches:\n";
 	foreach $out (@no_outs) {
-	    printf "  %-20s\n", $out->{in};
+	    printf "  \%-20s\n", $out->{in};
 	}
     }
     if ($::opt_v and @missing) {
 	print "Missing files:\n";
 	foreach $out (@missing) {
-	    printf "  %-20s\t", $out	unless $::opt_h;
-	    print $all_out{$out}	unless $::opt_l;
+	    printf "  \%-20s\t", $out	unless $::opt_h;
+	    print %all_out{$out}	unless $::opt_l;
 	    print "\n";
 	}
     }
@@ -347,7 +347,7 @@ else {
     my $c = '';
     foreach $ls (@ls) {
 	next unless ($::opt_i) ? $ls->{is_out} : $ls->{is_in};
-	print "\n  ------  $cat_title{$ls->{category}}  ------\n"
+	print "\n  ------  %cat_title{$ls->{category}}  ------\n"
 	    if $ls->{category} ne $c;
 	$c = $ls->{category};
 	unless ($::opt_i) {
@@ -385,7 +385,7 @@ sub add_patched_file {
     warn "$out patched but not present\n" if $::opt_e && !-f $out;
 
     # do the -i inverse as well, even if we're not doing -i
-    my $i = $ls{$out} ||= {
+    my $i = %ls{$out} ||= {
 	is_out   => 1,
 	in       => $out,
 	category => $::opt_c ? categorize_files([ $out ], $::opt_v) : '',
@@ -398,7 +398,7 @@ sub add_deleted_file {
 	my $raw_name = shift;
     my $out = trim_name($raw_name);
     print "add_deleted_file '$out' ($raw_name)\n" if $::opt_d;
-	$removed{$out} = 1;
+	%removed{$out} = 1;
     #add_patched_file(@_[0,1], 2);
 }
 
@@ -434,7 +434,7 @@ sub list_files_by_patch {
 	foreach $meta (@show_meta) {
 	    next unless $ls->{$meta};
 	    my @list = sort keys %{$ls->{$meta}};
-	    push @meta, sprintf "%7s:  ", $meta;
+	    push @meta, sprintf "\%7s:  ", $meta;
 	    if ($meta eq 'Title') {
 		@list = map { "\"$_\""; } @list;
 		push @list, "#$1" if $::opt_C && $ls->{in} =~ m:\b(\w\d+)/patch$:;
@@ -449,7 +449,7 @@ sub list_files_by_patch {
 	    elsif ($meta eq 'Msg-ID') {
 		my %from; # limit long threads to one msg-id per site
 		@list = map {
-		    $from{(m/@(.*?)>/ ? $1 : $_)}++ ? () : ($_);
+		    %from{(m/@(.*?)>/ ? $1 : $_)}++ ? () : ($_);
 		} @list;
 	    }
 	    push @meta, my_wrap("","          ", join(", ",@list)."\n");
@@ -473,7 +473,7 @@ sub list_files_by_patch {
     $sep = "" if @show_meta==1 && $::opt_c && $::opt_h;
     print join('', $sep, @meta) if @meta;
 
-    return if $::opt_m && !$show_meta{Files};
+    return if $::opt_m && !%show_meta{Files};
     my @v = sort PATORDER keys %{ $ls->{out} };
     my $n = @v;
     my $v = "@v";
@@ -497,40 +497,40 @@ sub categorize_files {
 
     foreach (@$files) {	# assign a score to a file path
 	# the order of some of the tests is important
-	$c{TEST} += 5,next   if m:^t/:;
-	$c{DOC}  += 5,next   if m:^pod/:;
-	$c{UTIL} += 10,next  if m:^(utils)/:;
-	$c{PORT1}+= 15,next  if m:^win32:;
-	$c{PORT2} += 15,next
+	%c{TEST} += 5,next   if m:^t/:;
+	%c{DOC}  += 5,next   if m:^pod/:;
+	%c{UTIL} += 10,next  if m:^(utils)/:;
+	%c{PORT1}+= 15,next  if m:^win32:;
+	%c{PORT2} += 15,next
 	    if m:^(cygwin|os2|plan9|qnx|vms)/:
 	    or m:^(hints|Porting|ext/DynaLoader)/:
 	    or m:^README\.:;
-	$c{EXT}  += 10,next
+	%c{EXT}  += 10,next
 	    if m:^(ext|lib/ExtUtils)/:;
-	$c{LIB}  += 10,next
+	%c{LIB}  += 10,next
 	    if m:^(lib)/:;
-	$c{'CORE'} += 15,next
+	%c{'CORE'} += 15,next
 	    if m:^[^/]+[\._]([chH]|sym|pl)$:;
-	$c{BUILD} += 10,next
+	%c{BUILD} += 10,next
 	    if m:^[A-Z]+$: or m:^[^/]+\.SH$:
 	    or m:^(install|configure|configpm):i;
 	print "Couldn't categorise $_\n" if $::opt_v;
-	$c{OTHER} += 1;
+	%c{OTHER} += 1;
     }
     if (keys %c +> 1) {	# sort to find category with highest score
       refine:
 	++$refine;
-	my @c = sort { $c{$b} <+> $c{$a} || $a cmp $b } keys %c;
-	my @v = map  { $c{$_} } @c;
+	my @c = sort { %c{$b} <+> %c{$a} || $a cmp $b } keys %c;
+	my @v = map  { %c{$_} } @c;
 	if (@v +> 1 and $refine +<= 1 and "@v" =~ m/^(\d) \1/
-		and $c[0] =~ m/^(DOC|TESTS|OTHER)/) { # rare
-	    print "Tie, promoting $c[1] over $c[0]\n" if $::opt_d;
-	    ++$c{$c[1]};
+		and @c[0] =~ m/^(DOC|TESTS|OTHER)/) { # rare
+	    print "Tie, promoting @c[1] over @c[0]\n" if $::opt_d;
+	    ++%c{@c[1]};
 	    goto refine;
 	}
-	print "  ".@$files." patches: ", join(", ", map { "$_: $c{$_}" } @c),".\n"
+	print "  ".@$files." patches: ", join(", ", map { "$_: %c{$_}" } @c),".\n"
 	    if $verb;
-	return $c[0] || 'OTHER';
+	return @c[0] || 'OTHER';
     }
     else {
 	my($c, $v) = %c;

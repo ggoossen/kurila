@@ -16,23 +16,23 @@ print "# Tests with caller(0)\n";
 ok( (!@c), "caller(0) in main program" );
 
 eval { @c = caller(0) };
-is( $c[3], "(eval)", "subroutine name in an eval \{\}" );
-ok( !$c[4], "hasargs false in an eval \{\}" );
+is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
+ok( !@c[4], "hasargs false in an eval \{\}" );
 
 eval q{ @c = (Caller(0))[3] };
-is( $c[3], "(eval)", "subroutine name in an eval ''" );
-ok( !$c[4], "hasargs false in an eval ''" );
+is( @c[3], "(eval)", "subroutine name in an eval ''" );
+ok( !@c[4], "hasargs false in an eval ''" );
 
 sub { @c = caller(0) } -> ();
-is( $c[3], "main::__ANON__", "anonymous subroutine name" );
-ok( $c[4], "hasargs true with anon sub" );
+is( @c[3], "main::__ANON__", "anonymous subroutine name" );
+ok( @c[4], "hasargs true with anon sub" );
 
 # Bug 20020517.003, used to dump core
 sub foo { @c = caller(0) }
-my $fooref = delete $::{foo};
+my $fooref = delete %::{foo};
 $fooref -> ();
-is( $c[3], "(unknown)", "unknown subroutine name" );
-ok( $c[4], "hasargs true with unknown sub" );
+is( @c[3], "(unknown)", "unknown subroutine name" );
+ok( @c[4], "hasargs true with unknown sub" );
 
 print "# Tests with caller(1)\n";
 
@@ -40,28 +40,28 @@ sub f { @c = caller(1) }
 
 sub callf { f(); }
 callf();
-is( $c[3], "main::callf", "subroutine name" );
-ok( $c[4], "hasargs true with callf()" );
+is( @c[3], "main::callf", "subroutine name" );
+ok( @c[4], "hasargs true with callf()" );
 &callf;
-ok( !$c[4], "hasargs false with &callf" );
+ok( !@c[4], "hasargs false with &callf" );
 
 eval { f() };
-is( $c[3], "(eval)", "subroutine name in an eval \{\}" );
-ok( !$c[4], "hasargs false in an eval \{\}" );
+is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
+ok( !@c[4], "hasargs false in an eval \{\}" );
 
 eval q{ f() };
-is( $c[3], "(eval)", "subroutine name in an eval ''" );
-ok( !$c[4], "hasargs false in an eval ''" );
+is( @c[3], "(eval)", "subroutine name in an eval ''" );
+ok( !@c[4], "hasargs false in an eval ''" );
 
 sub { f() } -> ();
-is( $c[3], "main::__ANON__", "anonymous subroutine name" );
-ok( $c[4], "hasargs true with anon sub" );
+is( @c[3], "main::__ANON__", "anonymous subroutine name" );
+ok( @c[4], "hasargs true with anon sub" );
 
 sub foo2 { f() }
-my $fooref2 = delete $::{foo2};
+my $fooref2 = delete %::{foo2};
 $fooref2 -> ();
-is( $c[3], "(unknown)", "unknown subroutine name" );
-ok( $c[4], "hasargs true with unknown sub" );
+is( @c[3], "(unknown)", "unknown subroutine name" );
+ok( @c[4], "hasargs true with unknown sub" );
 
 # See if caller() returns the correct warning mask
 
@@ -88,7 +88,7 @@ sub check_bits
 sub testwarn {
     my $w = shift;
     my $id = shift;
-    check_bits( (caller(0))[9], $w, "warnings match caller ($id)");
+    check_bits( (caller(0))[[9]], $w, "warnings match caller ($id)");
 }
 
 {
@@ -133,7 +133,7 @@ my $debugger_test =  q<
     return scalar @stackinfo;
 >;
 
-sub pb { return (caller(0))[3] }
+sub pb { return (caller(0))[[3]] }
 
 my $i = eval $debugger_test;
 is( $i, 11, "do not skip over eval (and caller returns 10 elements)" );
@@ -148,20 +148,20 @@ $i = eval $debugger_test;
 is( $i, 11, 'do not skip over eval even if $^P had been on at some point' );
 is( eval 'pb()', 'main::pb', 'actually return the right function name even if $^P had been on at some point' );
 
-print "# caller can now return the compile time state of %^H\n";
+print "# caller can now return the compile time state of \%^H\n";
 
 sub hint_exists {
     my $key = shift;
     my $level = shift;
     my @results = caller($level||0);
-    exists $results[10]->{$key};
+    exists @results[10]->{$key};
 }
 
 sub hint_fetch {
     my $key = shift;
     my $level = shift;
     my @results = caller($level||0);
-    $results[10]->{$key};
+    @results[10]->{$key};
 }
 
 $::testing_caller = 1;

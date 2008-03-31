@@ -108,13 +108,13 @@ sub pod2man {
     return 0 unless @ARGV;
 
     # Official sets --center, but don't override things explicitly set.
-    if ($options{official} && !defined $options{center}) {
-        $options{center} = q[Perl Programmer's Reference Guide];
+    if (%options{official} && !defined %options{center}) {
+        %options{center} = q[Perl Programmer's Reference Guide];
     }
 
     # This isn't a valid Pod::Man option and is only accepted for backwards
     # compatibility.
-    delete $options{lax};
+    delete %options{lax};
 
     do {{  # so 'next' works
         my ($pod, $man) = splice(@ARGV, 0, 2);
@@ -129,9 +129,9 @@ sub pod2man {
         $parser->parse_from_file($pod, $man)
           or do { warn("Could not install $man\n");  next };
 
-        if (length $options{perm_rw}) {
-            chmod(oct($options{perm_rw}), $man)
-              or do { warn("chmod $options{perm_rw} $man: $!\n"); next };
+        if (length %options{perm_rw}) {
+            chmod(oct(%options{perm_rw}), $man)
+              or do { warn("chmod %options{perm_rw} $man: $!\n"); next };
         }
     }} while @ARGV;
 
@@ -149,7 +149,7 @@ filename from @ARGV.
 =cut
 
 sub warn_if_old_packlist {
-    my $packlist = $ARGV[0];
+    my $packlist = @ARGV[0];
 
     return unless -f $packlist;
     print <<"PACKLIST_WARNING";
@@ -197,7 +197,7 @@ sub perllocal_install {
 
     my $pod;
     $pod = sprintf <<POD, scalar localtime;
- =head2 %s: C<$type> L<$name|$name>
+ =head2 \%s: C<$type> L<$name|$name>
  
  =over 4
  

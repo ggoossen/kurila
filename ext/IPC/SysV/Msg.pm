@@ -39,7 +39,7 @@ sub new {
     @_ == 3 || croak 'new IPC::Msg ( KEY , FLAGS )';
     my $class = shift;
 
-    my $id = msgget($_[0],$_[1]);
+    my $id = msgget(@_[0],@_[1]);
 
     defined($id)
 	? bless \$id, $class
@@ -81,24 +81,24 @@ sub set {
 
 sub remove {
     my $self = shift;
-    (msgctl($$self,IPC_RMID,0), undef $$self)[0];
+    (msgctl($$self,IPC_RMID,0), undef $$self)[[0]];
 }
 
 sub rcv {
     @_ +<= 5 && @_ +>= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
     my $self = shift;
     my $buf = "";
-    msgrcv($$self,$buf,$_[1],$_[2] || 0, $_[3] || 0) or
+    msgrcv($$self,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
 	return;
     my $type;
-    ($type,$_[0]) = unpack("l! a*",$buf);
+    ($type,@_[0]) = unpack("l! a*",$buf);
     $type;
 }
 
 sub snd {
     @_ +<= 4 && @_ +>= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
     my $self = shift;
-    msgsnd($$self,pack("l! a*",$_[0],$_[1]), $_[2] || 0);
+    msgsnd($$self,pack("l! a*",@_[0],@_[1]), @_[2] || 0);
 }
 
 

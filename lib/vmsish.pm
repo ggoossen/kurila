@@ -133,7 +133,7 @@ sub import {
     my $sememe;
 
     foreach $sememe (@_ ? @_ : qw(exit hushed)) {
-        $^H{'vmsish_exit'}   = 1 if $sememe eq 'exit';
+        %^H{'vmsish_exit'}   = 1 if $sememe eq 'exit';
         vmsish::hushed(1) if $sememe eq 'hushed';
     }
 }
@@ -146,7 +146,7 @@ sub unimport {
     my $sememe;
 
     foreach $sememe (@_ ? @_ : qw(exit hushed)) {
-        $^H{'vmsish_exit'}   = 0 if $sememe eq 'exit';
+        %^H{'vmsish_exit'}   = 0 if $sememe eq 'exit';
         vmsish::hushed(0) if $sememe eq 'hushed';
     }
 }

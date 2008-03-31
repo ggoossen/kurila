@@ -18,7 +18,7 @@ sub shellwords {
     foreach my $line (@lines) {
 	$line =~ s/^\s+//;
 	my @words = parse_line('\s+', 0, $line);
-	pop @words if (@words and !defined $words[-1]);
+	pop @words if (@words and !defined @words[-1]);
 	return() unless (@words || !length($line));
 	push(@allwords, @words);
     }
@@ -46,8 +46,8 @@ sub nested_quotewords {
     my($i, @allwords);
 
     for ($i = 0; $i +< @lines; $i++) {
-	@{$allwords[$i]} = parse_line($delim, $keep, $lines[$i]);
-	return() unless (@{$allwords[$i]} || !length($lines[$i]));
+	@{@allwords[$i]} = parse_line($delim, $keep, @lines[$i]);
+	return() unless (@{@allwords[$i]} || !length(@lines[$i]));
     }
     return(@allwords);
 }

@@ -14,23 +14,23 @@ use File::Compare;
 use File::Find;
 use File::Spec::Functions qw(rel2abs abs2rel catfile catdir curdir);
 
-for (@ARGV[0, 1]) {
+for (@ARGV[[0, 1]]) {
     die "$0: '$_' does not look like Perl directory\n"
 	unless -f catfile($_, "perl.h") && -d catdir($_, "Porting");
 }
 
-my $dir2 = rel2abs($ARGV[1]);
-chdir $ARGV[0] or die "$0: chdir '$ARGV[0]' failed: $!\n";
+my $dir2 = rel2abs(@ARGV[1]);
+chdir @ARGV[0] or die "$0: chdir '@ARGV[0]' failed: $!\n";
 
 # Files to skip from the check for one reason or another,
 # usually because they pull in their version from some other file.
 my %skip;
-@skip{'./lib/Exporter/Heavy.pm'} = ();
+%skip{['./lib/Exporter/Heavy.pm']} = ();
 
 my @wanted;
 find(
      sub { m/\.pm$/ &&
-	       ! exists $skip{$File::Find::name}
+	       ! exists %skip{$File::Find::name}
 	       &&
 	       do { my $file2 =
 			catfile(catdir($dir2, $File::Find::dir), $_);

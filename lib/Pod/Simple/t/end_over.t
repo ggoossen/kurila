@@ -1,5 +1,5 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -20,7 +20,7 @@ print "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e     ($$) { Pod::Simple::XMLOutStream->_duo(\&nowhine, @_) }
 
 sub nowhine {
-  $_[0]->{'no_whining'} = 1;
+  @_[0]->{'no_whining'} = 1;
 }
 
 &ok(e(

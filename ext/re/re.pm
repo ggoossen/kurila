@@ -37,15 +37,15 @@ sub setcolor {
   require Term::Cap;
 
   my $terminal = Term::Cap->Tgetent({OSPEED => 9600}); # Avoid warning.
-  my $props = $ENV{PERL_RE_TC} || 'md,me,so,se,us,ue';
+  my $props = %ENV{PERL_RE_TC} || 'md,me,so,se,us,ue';
   my @props = split m/,/, $props;
   my $colors = join "\t", map {$terminal->Tputs($_,1)} @props;
 
   $colors =~ s/\0//g;
-  $ENV{PERL_RE_COLORS} = $colors;
+  %ENV{PERL_RE_COLORS} = $colors;
  };
  if ($@) {
-    $ENV{PERL_RE_COLORS} ||= qq'\t\t> <\t> <\t\t';
+    %ENV{PERL_RE_COLORS} ||= qq'\t\t> <\t> <\t\t';
  }
 
 }
@@ -72,12 +72,12 @@ our %flags = (
     STACK           => 0x280000,
     BUFFERS         => 0x400000,
 );
-$flags{ALL} = -1 ^&^ ^~^($flags{OFFSETS}^|^$flags{OFFSETSDBG}^|^$flags{BUFFERS});
-$flags{All} = $flags{all} = $flags{DUMP} ^|^ $flags{EXECUTE};
-$flags{Extra} = $flags{EXECUTE} ^|^ $flags{COMPILE};
-$flags{More} = $flags{MORE} = $flags{All} ^|^ $flags{TRIEC} ^|^ $flags{TRIEM} ^|^ $flags{STATE};
-$flags{State} = $flags{DUMP} ^|^ $flags{EXECUTE} ^|^ $flags{STATE};
-$flags{TRIE} = $flags{DUMP} ^|^ $flags{EXECUTE} ^|^ $flags{TRIEC};
+%flags{ALL} = -1 ^&^ ^~^(%flags{OFFSETS}^|^%flags{OFFSETSDBG}^|^%flags{BUFFERS});
+%flags{All} = %flags{all} = %flags{DUMP} ^|^ %flags{EXECUTE};
+%flags{Extra} = %flags{EXECUTE} ^|^ %flags{COMPILE};
+%flags{More} = %flags{MORE} = %flags{All} ^|^ %flags{TRIEC} ^|^ %flags{TRIEM} ^|^ %flags{STATE};
+%flags{State} = %flags{DUMP} ^|^ %flags{EXECUTE} ^|^ %flags{STATE};
+%flags{TRIE} = %flags{DUMP} ^|^ %flags{EXECUTE} ^|^ %flags{TRIEC};
 
 my $installed;
 my $installed_error;
@@ -105,10 +105,10 @@ sub _load_unload {
 	    # in C resolves to a structure containing the regex
 	    # hooks. Setting it to a random integer will guarantee
 	    # segfaults.
-	    $^H{regcomp} = install();
+	    %^H{regcomp} = install();
         }
     } else {
-        delete $^H{regcomp};
+        delete %^H{regcomp};
     }
 }
 
@@ -120,20 +120,20 @@ sub bits {
 	Carp::carp("Useless use of \"re\" pragma"); 
     }
     foreach my $idx (0..(@_-1)){
-        my $s=$_[$idx];
+        my $s=@_[$idx];
         if ($s eq 'Debug' or $s eq 'Debugcolor') {
             setcolor() if $s =~m/color/i;
             ${^RE_DEBUG_FLAGS} = 0 unless defined ${^RE_DEBUG_FLAGS};
             for my $idx ($idx+1..(@_-1)) {
-                if ($flags{$_[$idx]}) {
+                if (%flags{@_[$idx]}) {
                     if ($on) {
-                        ${^RE_DEBUG_FLAGS} ^|^= $flags{$_[$idx]};
+                        ${^RE_DEBUG_FLAGS} ^|^= %flags{@_[$idx]};
                     } else {
-                        ${^RE_DEBUG_FLAGS} ^&^= ^~^ $flags{$_[$idx]};
+                        ${^RE_DEBUG_FLAGS} ^&^= ^~^ %flags{@_[$idx]};
                     }
                 } else {
                     require Carp;
-                    Carp::carp("Unknown \"re\" Debug flag '$_[$idx]', possible flags: ",
+                    Carp::carp("Unknown \"re\" Debug flag '@_[$idx]', possible flags: ",
                                join(", ",sort keys %flags ) );
                 }
             }
@@ -143,16 +143,16 @@ sub bits {
 	    setcolor() if $s =~m/color/i;
 	    _load_unload($on);
 	    last;
-        } elsif (exists $bitmask{$s}) {
-	    $bits ^|^= $bitmask{$s};
-        } elsif ($XS_FUNCTIONS{$s}) {
+        } elsif (exists %bitmask{$s}) {
+	    $bits ^|^= %bitmask{$s};
+        } elsif (%XS_FUNCTIONS{$s}) {
             _do_install();
             if (! $installed) {
                 die("\"re\" function '$s' not available");
             }
             require Exporter;
             re->export_to_level(2, 're', $s);
-	} elsif ($EXPORT_OK{$s}) {
+	} elsif (%EXPORT_OK{$s}) {
 	    require Exporter;
 	    re->export_to_level(2, 're', $s);
 	} else {

@@ -2,33 +2,33 @@
 
 sub foo1 {
     'true1';
-    if ($_[0]) { 'true2'; }
+    if (@_[0]) { 'true2'; }
 }
 
 sub foo2 {
     'true1';
-    if ($_[0]) { return 'true2'; } else { return 'true3'; }
+    if (@_[0]) { return 'true2'; } else { return 'true3'; }
     'true0';
 }
 
 sub foo3 {
     'true1';
-    unless ($_[0]) { 'true2'; }
+    unless (@_[0]) { 'true2'; }
 }
 
 sub foo4 {
     'true1';
-    unless ($_[0]) { 'true2'; } else { 'true3'; }
+    unless (@_[0]) { 'true2'; } else { 'true3'; }
 }
 
 sub foo5 {
     'true1';
-    'true2' if $_[0];
+    'true2' if @_[0];
 }
 
 sub foo6 {
     'true1';
-    'true2' unless $_[0];
+    'true2' unless @_[0];
 }
 
 print "1..36\n";
@@ -68,7 +68,7 @@ sub fib {
 
 for ($i = 1; $i +<= 10; $i++) {
     $foo = $i + 12;
-    if (&fib($i) == $good[$i]) {
+    if (&fib($i) == @good[$i]) {
 	print "ok $foo\n";
     }
     else {
@@ -176,7 +176,7 @@ sub iseof {
  }
 }
 
-sub autov { $_[0] = 23 };
+sub autov { @_[0] = 23 };
 
 my $href = {};
 print keys %$href ? 'not ' : '', "ok 35\n";

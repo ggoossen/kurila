@@ -387,7 +387,7 @@ sub recurse1 {
 }
 sub recurse2 {
     my $x = shift;
-    $_[0] ? +1 + recurse1($_[0] - 1) : 0
+    @_[0] ? +1 + recurse1(@_[0] - 1) : 0
 }
 is(recurse1(500), 500, 'recursive goto &foo');
 
@@ -395,7 +395,7 @@ is(recurse1(500), 500, 'recursive goto &foo');
 
 sub a32039 { @_=("foo"); goto &b32039; }
 sub b32039 { goto &c32039; }
-sub c32039 { is($_[0], 'foo', 'chained &goto') }
+sub c32039 { is(@_[0], 'foo', 'chained &goto') }
 a32039();
 
 # [perl #35214] next and redo re-entered the loop with the wrong cop,

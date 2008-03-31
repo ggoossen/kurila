@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    $ENV{PERL5LIB} = '../lib';
+    %ENV{PERL5LIB} = '../lib';
 }
 
 $| = 1;
@@ -12,7 +12,7 @@ print "1..27\n";
 
 # catch "used once" warnings
 my @warns;
-BEGIN { ${^WARN_HOOK} = sub { push @warns, $_[0]->{description} }; $^W = 1 };
+BEGIN { ${^WARN_HOOK} = sub { push @warns, @_[0]->{description} }; $^W = 1 };
 
 %x = ();
 $y = 3;

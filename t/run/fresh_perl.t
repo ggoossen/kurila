@@ -26,7 +26,7 @@ while( ~< *DATA) {
         push @prgs, ['', $1];
     }
     else { 
-        $prgs[-1][0] .= $_;
+        @prgs[-1][0] .= $_;
     }
 }
 plan tests => scalar @prgs;

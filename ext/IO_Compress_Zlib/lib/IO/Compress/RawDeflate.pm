@@ -50,17 +50,17 @@ $RawDeflateError = '';
     my %seen;
     foreach (keys %EXPORT_TAGS )
     {
-        push @{$EXPORT_TAGS{constants}}, 
-                 grep { !$seen{$_}++ } 
-                 @{ $EXPORT_TAGS{$_} }
+        push @{%EXPORT_TAGS{constants}}, 
+                 grep { !%seen{$_}++ } 
+                 @{ %EXPORT_TAGS{$_} }
     }
-    $EXPORT_TAGS{all} = $EXPORT_TAGS{constants} ;
+    %EXPORT_TAGS{all} = %EXPORT_TAGS{constants} ;
 }
 
 
 %DEFLATE_CONSTANTS = %EXPORT_TAGS;
 
-push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
+push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
 
 Exporter::export_ok_tags('all');
               

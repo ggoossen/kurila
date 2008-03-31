@@ -22,8 +22,8 @@ while ( ~< *DESC) {
     }
     unless ($lastregop) {
         $ind++;
-        ($name[$ind], $desc, $rest[$ind]) = split m/\t+/, $_, 3;  
-        ($type[$ind], $code[$ind], $args[$ind], $longj[$ind]) 
+        (@name[$ind], $desc, @rest[$ind]) = split m/\t+/, $_, 3;  
+        (@type[$ind], @code[$ind], @args[$ind], @longj[$ind]) 
           = split m/[,\s]\s*/, $desc, 4;
     } else {
         my ($type,@lists)=split m/\s*\t+\s*/, $_;
@@ -47,9 +47,9 @@ while ( ~< *DESC) {
                 }
                 foreach my $suffix (@suffix) {
                     $ind++;
-                    $name[$ind]="$real$suffix";
-                    $type[$ind]=$type;
-                    $rest[$ind]="state for $type";
+                    @name[$ind]="$real$suffix";
+                    @type[$ind]=$type;
+                    @rest[$ind]="state for $type";
                 }
             }
         }
@@ -80,8 +80,8 @@ printf $out <<EOP,
 
 /* Regops and State definitions */
 
-#define %*s\t%d
-#define %*s\t%d
+#define \%*s\t\%d
+#define \%*s\t\%d
 
 EOP
     -$width, REGNODE_MAX        => $lastregop - 1,
@@ -91,13 +91,13 @@ EOP
 
 for ($ind=1; $ind +<= $lastregop ; $ind++) {
   my $oind = $ind - 1;
-  printf $out "#define\t%*s\t%d\t/* %#04x %s */\n",
-    -$width, $name[$ind], $ind-1, $ind-1, $rest[$ind];
+  printf $out "#define\t\%*s\t\%d\t/* \%#04x \%s */\n",
+    -$width, @name[$ind], $ind-1, $ind-1, @rest[$ind];
 }
 print $out "\t/* ------------ States ------------- */\n";
 for ( ; $ind +<= $tot ; $ind++) {
-  printf $out "#define\t%*s\t(REGNODE_MAX + %d)\t/* %s */\n",
-    -$width, $name[$ind], $ind - $lastregop, $rest[$ind];
+  printf $out "#define\t\%*s\t(REGNODE_MAX + \%d)\t/* \%s */\n",
+    -$width, @name[$ind], $ind - $lastregop, @rest[$ind];
 }
 
 print $out <<EOP;
@@ -112,8 +112,8 @@ EOP
 
 $ind = 0;
 while (++$ind +<= $tot) {
-  printf $out "\t%*s\t/* %*s */\n",
-             -1-$twidth, "$type[$ind],", -$width, $name[$ind];
+  printf $out "\t\%*s\t/* \%*s */\n",
+             -1-$twidth, "@type[$ind],", -$width, @name[$ind];
   print $out "\t/* ------------ States ------------- */\n"
     if $ind == $lastregop and $lastregop != $tot;
 }
@@ -131,10 +131,10 @@ EOP
 $ind = 0;
 while (++$ind +<= $lastregop) {
   my $size = 0;
-  $size = "EXTRA_SIZE(struct regnode_$args[$ind])" if $args[$ind];
+  $size = "EXTRA_SIZE(struct regnode_@args[$ind])" if @args[$ind];
   
-  printf $out "\t%*s\t/* %*s */\n",
-	-37, "$size,",-$rwidth,$name[$ind];
+  printf $out "\t\%*s\t/* \%*s */\n",
+	-37, "$size,",-$rwidth,@name[$ind];
 }
 
 print $out <<EOP;
@@ -147,10 +147,10 @@ EOP
 
 $ind = 0;
 while (++$ind +<= $lastregop) {
-  my $size = $longj[$ind] || 0;
+  my $size = @longj[$ind] || 0;
 
-  printf $out "\t%d,\t/* %*s */\n",
-	$size, -$rwidth, $name[$ind]
+  printf $out "\t\%d,\t/* \%*s */\n",
+	$size, -$rwidth, @name[$ind]
 }
 
 print $out <<EOP;
@@ -170,10 +170,10 @@ $ind = 0;
 my $ofs = 1;
 my $sym = "";
 while (++$ind +<= $tot) {
-  my $size = $longj[$ind] || 0;
+  my $size = @longj[$ind] || 0;
 
-  printf $out "\t%*s\t/* $sym%#04x */\n",
-	-3-$width,qq("$name[$ind]",), $ind - $ofs;
+  printf $out "\t\%*s\t/* $sym\%#04x */\n",
+	-3-$width,qq("@name[$ind]",), $ind - $ofs;
   if ($ind == $lastregop and $lastregop != $tot) {
     print $out "\t/* ------------ States ------------- */\n";
     $ofs = $lastregop;
@@ -202,19 +202,19 @@ while (~< $fh) {
     if (m/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i) {
 	my $newval = eval $2;
 	if($val ^&^ $newval) {
-	    die sprintf "Both $1 and $reverse{$newval} use %08X", $newval;
+	    die sprintf "Both $1 and %reverse{$newval} use \%08X", $newval;
 	}
         $val^|^=$newval;
-        $rxfv{$1}= $newval;
-	$reverse{$newval} = $1;
+        %rxfv{$1}= $newval;
+	%reverse{$newval} = $1;
     }
 }    
 my %vrxf=reverse %rxfv;
-printf $out "\t/* Bits in extflags defined: %032b */\n",$val;
+printf $out "\t/* Bits in extflags defined: \%032b */\n",$val;
 for (0..31) {
-    my $n=$vrxf{2**$_}||"UNUSED_BIT_$_";
+    my $n=%vrxf{2**$_}||"UNUSED_BIT_$_";
     $n=~s/^RXf_(PMf_)?//;
-    printf $out qq(\t%-20s/* 0x%08x */\n), 
+    printf $out qq(\t\%-20s/* 0x\%08x */\n), 
         qq("$n",),2**$_;
 }  
  

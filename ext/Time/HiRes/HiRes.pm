@@ -51,7 +51,7 @@ sub tv_interval {
     # probably could have been done in C
     my ($a, $b) = @_;
     $b = [gettimeofday()] unless defined($b);
-    (${$b}[0] - ${$a}[0]) + ((${$b}[1] - ${$a}[1]) / 1_000_000);
+    (@{$b}[0] - @{$a}[0]) + ((@{$b}[1] - @{$a}[1]) / 1_000_000);
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

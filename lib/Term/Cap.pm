@@ -117,27 +117,27 @@ sub termcap_path
     my @termcap_path;
 
     # $TERMCAP, if it's a filespec
-    push( @termcap_path, $ENV{TERMCAP} )
+    push( @termcap_path, %ENV{TERMCAP} )
       if (
-        ( exists $ENV{TERMCAP} )
+        ( exists %ENV{TERMCAP} )
         && (
             ( $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'dos' )
-            ? $ENV{TERMCAP} =~ m/^[a-z]:[\\\/]/is
-            : $ENV{TERMCAP} =~ m/^\//s
+            ? %ENV{TERMCAP} =~ m/^[a-z]:[\\\/]/is
+            : %ENV{TERMCAP} =~ m/^\//s
         )
       );
-    if ( ( exists $ENV{TERMPATH} ) && ( $ENV{TERMPATH} ) )
+    if ( ( exists %ENV{TERMPATH} ) && ( %ENV{TERMPATH} ) )
     {
 
         # Add the users $TERMPATH
-        push( @termcap_path, split( m/(:|\s+)/, $ENV{TERMPATH} ) );
+        push( @termcap_path, split( m/(:|\s+)/, %ENV{TERMPATH} ) );
     }
     else
     {
 
         # Defaults
         push( @termcap_path,
-            exists $ENV{'HOME'} ? $ENV{'HOME'} . '/.termcap' : undef,
+            exists %ENV{'HOME'} ? %ENV{'HOME'} . '/.termcap' : undef,
             '/etc/termcap', '/usr/share/misc/termcap', );
     }
 
@@ -228,7 +228,7 @@ sub Tgetent
             0,    200, 133.3, 90.9, 74.3, 66.7, 50, 33.3,
             16.7, 8.3, 5.5,   4.1,  2,    1,    .5, .2
         );
-        $self->{PADDING} = $pad[ $self->{OSPEED} ];
+        $self->{PADDING} = @pad[ $self->{OSPEED} ];
     }
     else
     {
@@ -237,9 +237,9 @@ sub Tgetent
 
     unless ( $self->{TERM} )
     {
-       if ( $ENV{TERM} )
+       if ( %ENV{TERM} )
        {
-         $self->{TERM} =  $ENV{TERM} ;
+         $self->{TERM} =  %ENV{TERM} ;
        }
        else
        {
@@ -263,7 +263,7 @@ sub Tgetent
     $termpat = $tmp_term;
     $termpat =~ s/(\W)/\\$1/g;
 
-    my $foo = ( exists $ENV{TERMCAP} ? $ENV{TERMCAP} : '' );
+    my $foo = ( exists %ENV{TERMCAP} ? %ENV{TERMCAP} : '' );
 
     # $entry is the extracted termcap entry
     if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)${termpat}[:|]/s ) )
@@ -277,7 +277,7 @@ sub Tgetent
     {
 
         # last resort--fake up a termcap from terminfo
-        local $ENV{TERM} = $term;
+        local %ENV{TERM} = $term;
 
         if ( $^O eq 'VMS' )
         {
@@ -285,7 +285,7 @@ sub Tgetent
         }
         else
         {
-            if ( grep { -x "$_/infocmp" } split m/:/, $ENV{PATH} )
+            if ( grep { -x "$_/infocmp" } split m/:/, %ENV{PATH} )
             {
                 eval {
                     my $tmp = `infocmp -C 2>/dev/null`;
@@ -618,7 +618,7 @@ sub Tgoto
 	$code = $2;
 	$string = $3;
 	if ($code eq 'd') {
-	    $result .= sprintf("%d",shift(@tmp));
+	    $result .= sprintf("\%d",shift(@tmp));
 	}
 	elsif ($code eq '.') {
 	    $tmp = shift(@tmp);
@@ -630,11 +630,11 @@ sub Tgoto
 		    ++$tmp, $after .= $self->{'_bc'};
 		}
 	    }
-	    $result .= sprintf("%c",$tmp);
+	    $result .= sprintf("\%c",$tmp);
 	    $online = !$online;
 	}
 	elsif ($code eq '+') {
-	    $result .= sprintf("%c",shift(@tmp)+ord($string));
+	    $result .= sprintf("\%c",shift(@tmp)+ord($string));
 	    $string = substr($string,1,99);
 	    $online = !$online;
 	}
@@ -645,16 +645,16 @@ sub Tgoto
 	}
 	elsif ($code eq '>') {
 	    ($code,$tmp,$string) = unpack("CCa99",$string);
-	    if ($tmp[$[] +> $code) {
-		$tmp[$[] += $tmp;
+	    if (@tmp[$[] +> $code) {
+		@tmp[$[] += $tmp;
 	    }
 	}
 	elsif ($code eq '2') {
-	    $result .= sprintf("%02d",shift(@tmp));
+	    $result .= sprintf("\%02d",shift(@tmp));
 	    $online = !$online;
 	}
 	elsif ($code eq '3') {
-	    $result .= sprintf("%03d",shift(@tmp));
+	    $result .= sprintf("\%03d",shift(@tmp));
 	    $online = !$online;
 	}
 	elsif ($code eq 'i') {

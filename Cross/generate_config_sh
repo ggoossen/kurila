@@ -13,7 +13,7 @@
 
 my $config = shift;
 
-my $sys = $ENV{SYS};
+my $sys = %ENV{SYS};
 
 my $callbacks = {};
 $callbacks->{'ar'} = [\&simple_process, ["AR", "arm-linux-ar"]];
@@ -28,7 +28,7 @@ $callbacks->{'cpp'} = [\&simple_process, ["CCP", "arm-linux-cpp"]];
 $callbacks->{'cppflags'} = [\&simple_process, ["CCPFLAGS", "-fno-strict-aliasing"]];
 $callbacks->{'cpprun'} = [\&simple_process_append, ["CC", "arm-linux-gcc -E", "-E"]];
 $callbacks->{'cppstdin'} = [\&simple_process_append, ["CC", "arm-linux-gcc -E", "-E"]];
-$callbacks->{'full_ar'} = [\&backtick, ["AR", "which $ENV{AR}", "/usr/local/arm/2.95.3/bin/arm-linux-ar"]];
+$callbacks->{'full_ar'} = [\&backtick, ["AR", "which %ENV{AR}", "/usr/local/arm/2.95.3/bin/arm-linux-ar"]];
 $callbacks->{'ld'} = [\&simple_process, ["LD", "arm-linux-ld"]];
 $callbacks->{'ldflags'} = [\&simple_process, ["LDFLAGS", ""]];
 $callbacks->{'ldflags_uselargefiles'} = [\&simple_process, ["LDFLAGS", ""]];
@@ -71,7 +71,7 @@ sub backtick {
 	my $value = shift;
 	my $envvar = $callbacks->{$key}->[1][0];
 
-	if ($ENV{$envvar}) {
+	if (%ENV{$envvar}) {
 		my $rawtext = `$callbacks->{$key}->[1][1]`;
 		chomp($rawtext);
 		print("$key=\'$rawtext\'\n");
@@ -85,8 +85,8 @@ sub simple_process {
 	my $key = shift;
 	my $envvar = $callbacks->{$key}->[1][0];
 
-	if ($ENV{$envvar}) {
-		print("$key=\"$ENV{$envvar}\"\n");
+	if (%ENV{$envvar}) {
+		print("$key=\"%ENV{$envvar}\"\n");
 	} else {
 		print("$key=\'$callbacks->{$key}->[1][1]\'\n");
 	}
@@ -97,8 +97,8 @@ sub simple_process_append {
 	my $key = shift;
 	my $envvar = $callbacks->{$key}->[1][0];
 
-	if ($ENV{$envvar}) {
-		print("$key=\"$ENV{$envvar} $callbacks->{$key}->[1][2]\"\n");
+	if (%ENV{$envvar}) {
+		print("$key=\"%ENV{$envvar} $callbacks->{$key}->[1][2]\"\n");
 	} else {
 		print("$key=\'$callbacks->{$key}->[1][1]\'\n");
 	}
@@ -110,8 +110,8 @@ sub library_munge {
 	my $value = shift;
 	my $envvar = $callbacks->{$key}->[1][0];
 
-	if ($ENV{$envvar}) {
-		$value =~ s/$callbacks->{$key}->[1][1]/$ENV{$envvar}/g;
+	if (%ENV{$envvar}) {
+		$value =~ s/$callbacks->{$key}->[1][1]/%ENV{$envvar}/g;
 		print("$key=$value\n");
 	} else {
 		print("$key=$value\n");

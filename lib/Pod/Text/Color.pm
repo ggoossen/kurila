@@ -50,9 +50,9 @@ sub cmd_head2 {
 }
 
 # Fix the various formatting codes.
-sub cmd_b { return colored ($_[2], 'bold')   }
-sub cmd_f { return colored ($_[2], 'cyan')   }
-sub cmd_i { return colored ($_[2], 'yellow') }
+sub cmd_b { return colored (@_[2], 'bold')   }
+sub cmd_f { return colored (@_[2], 'cyan')   }
+sub cmd_i { return colored (@_[2], 'yellow') }
 
 # Output any included code in green.
 sub output_code {
@@ -67,8 +67,8 @@ sub wrap {
     my $self = shift;
     local $_ = shift;
     my $output = '';
-    my $spaces = ' ' x $$self{MARGIN};
-    my $width = $$self{opt_width} - $$self{MARGIN};
+    my $spaces = ' ' x %$self{MARGIN};
+    my $width = %$self{opt_width} - %$self{MARGIN};
 
     # We have to do $shortchar and $longchar in variables because the
     # construct ${char}{0,$width} didn't do the right thing until Perl 5.8.x.

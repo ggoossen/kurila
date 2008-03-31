@@ -3,7 +3,7 @@
 use strict;
 print "1..1\n";
 
-if (!$ENV{TEST_SIGNATURE}) {
+if (!%ENV{TEST_SIGNATURE}) {
     print "ok 1 # skip set the environment variable TEST_SIGNATURE to enable this test\n";
 }
 elsif (!-s 'SIGNATURE') {

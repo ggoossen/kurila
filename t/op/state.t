@@ -131,7 +131,7 @@ is( $xsize, 1, 'uninitialized state array after one iteration' );
 
 sub stateful_hash {
     state %hx;
-    return $hx{foo}++;
+    return %hx{foo}++;
 }
 
 my $xhval = stateful_hash();
@@ -175,9 +175,9 @@ is( pugnax(), 42, 'scalar state assignment return value' );
 {
     my @f;
     push @f, sub { state $x; ++$x } for 1..2;
-    $f[0]->() for 1..10;
-    is $f[0]->(), 11;
-    is $f[1]->(), 1;
+    @f[0]->() for 1..10;
+    is @f[0]->(), 11;
+    is @f[1]->(), 1;
 }
 
 # each copy of an anon sub should get its own 'once block'
@@ -185,11 +185,11 @@ is( pugnax(), 42, 'scalar state assignment return value' );
 {
     my $x; # used to force a closure
     my @f;
-    push @f, sub { $x=0; state $s ||= $_[0]; $s } for 1..2;
-    is $f[0]->(1), 1;
-    is $f[0]->(2), 1;
-    is $f[1]->(3), 3;
-    is $f[1]->(4), 3;
+    push @f, sub { $x=0; state $s ||= @_[0]; $s } for 1..2;
+    is @f[0]->(1), 1;
+    is @f[0]->(2), 1;
+    is @f[1]->(3), 3;
+    is @f[1]->(4), 3;
 }
 
 
@@ -206,7 +206,7 @@ foreach my $forbidden (~< *DATA) {
 
 {
     my @warnings;
-    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->message };
+    local ${^WARN_HOOK} = sub { push @warnings, @_[0]->message };
 
     eval q{
 	use warnings;

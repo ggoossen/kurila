@@ -45,8 +45,8 @@ sub new {
 
     # $ENV{HOME} is usually not set on Windows.  The default Term::Cap path
     # may not work on Solaris.
-    my $home = exists $ENV{HOME} ? "$ENV{HOME}/.termcap:" : '';
-    $ENV{TERMPATH} = $home . '/etc/termcap:/usr/share/misc/termcap'
+    my $home = exists %ENV{HOME} ? "%ENV{HOME}/.termcap:" : '';
+    %ENV{TERMPATH} = $home . '/etc/termcap:/usr/share/misc/termcap'
                            . ':/usr/share/lib/termcap';
 
     # Fall back on a hard-coded terminal speed if POSIX::Termios isn't
@@ -61,13 +61,13 @@ sub new {
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
     eval { $term = Term::Cap->Tgetent( { TERM => undef, OSPEED => $ospeed }) };
-    $$self{BOLD} = $$term{_md} || "\e[1m";
-    $$self{UNDL} = $$term{_us} || "\e[4m";
-    $$self{NORM} = $$term{_me} || "\e[m";
+    %$self{BOLD} = %$term{_md} || "\e[1m";
+    %$self{UNDL} = %$term{_us} || "\e[4m";
+    %$self{NORM} = %$term{_me} || "\e[m";
 
-    unless (defined $$self{width}) {
-        $$self{opt_width} = $ENV{COLUMNS} || $$term{_co} || 80;
-        $$self{opt_width} -= 2;
+    unless (defined %$self{width}) {
+        %$self{opt_width} = %ENV{COLUMNS} || %$term{_co} || 80;
+        %$self{opt_width} -= 2;
     }
 
     return $self;
@@ -77,24 +77,24 @@ sub new {
 sub cmd_head1 {
     my ($self, $attrs, $text) = @_;
     $text =~ s/\s+$//;
-    $self->SUPER::cmd_head1 ($attrs, "$$self{BOLD}$text$$self{NORM}");
+    $self->SUPER::cmd_head1 ($attrs, "%$self{BOLD}$text%$self{NORM}");
 }
 
 # Make level two headings bold.
 sub cmd_head2 {
     my ($self, $attrs, $text) = @_;
     $text =~ s/\s+$//;
-    $self->SUPER::cmd_head2 ($attrs, "$$self{BOLD}$text$$self{NORM}");
+    $self->SUPER::cmd_head2 ($attrs, "%$self{BOLD}$text%$self{NORM}");
 }
 
 # Fix up B<> and I<>.  Note that we intentionally don't do F<>.
-sub cmd_b { my $self = shift; return "$$self{BOLD}$_[1]$$self{NORM}" }
-sub cmd_i { my $self = shift; return "$$self{UNDL}$_[1]$$self{NORM}" }
+sub cmd_b { my $self = shift; return "%$self{BOLD}@_[1]%$self{NORM}" }
+sub cmd_i { my $self = shift; return "%$self{UNDL}@_[1]%$self{NORM}" }
 
 # Output any included code in bold.
 sub output_code {
     my ($self, $code) = @_;
-    $self->output ($$self{BOLD} . $code . $$self{NORM});
+    $self->output (%$self{BOLD} . $code . %$self{NORM});
 }
 
 # Override the wrapping code to igore the special sequences.
@@ -102,14 +102,14 @@ sub wrap {
     my $self = shift;
     local $_ = shift;
     my $output = '';
-    my $spaces = ' ' x $$self{MARGIN};
-    my $width = $$self{opt_width} - $$self{MARGIN};
+    my $spaces = ' ' x %$self{MARGIN};
+    my $width = %$self{opt_width} - %$self{MARGIN};
 
     # $codes matches a single special sequence.  $char matches any number of
     # special sequences preceeding a single character other than a newline.
     # We have to do $shortchar and $longchar in variables because the
     # construct ${char}{0,$width} didn't do the right thing until Perl 5.8.x.
-    my $codes = "(?:\Q$$self{BOLD}\E|\Q$$self{UNDL}\E|\Q$$self{NORM}\E)";
+    my $codes = "(?:\Q%$self{BOLD}\E|\Q%$self{UNDL}\E|\Q%$self{NORM}\E)";
     my $char = "(?:$codes*[^\\n])";
     my $shortchar = $char . "\{0,$width\}";
     my $longchar = $char . "\{$width\}";

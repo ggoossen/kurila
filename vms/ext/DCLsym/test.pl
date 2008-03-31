@@ -7,10 +7,10 @@ tie %syms, 'VMS::DCLsym' or die "failed 2\n";
 print "ok 2\n";
 
 $name = 'FOO_'.time();
-$syms{$name} = 'Perl_test';
+%syms{$name} = 'Perl_test';
 print +($! ? "(\$! = $!) not " : ''),"ok 3\n";
 
-print +($syms{$name} eq 'Perl_test' ? '' : 'not '),"ok 4\n";
+print +(%syms{$name} eq 'Perl_test' ? '' : 'not '),"ok 4\n";
 
 ($val) = `Show Symbol $name` =~ m/(\w+)"$/;
 print +($val eq 'Perl_test' ? '' : 'not '),"ok 5\n";
@@ -20,10 +20,10 @@ while (($sym,$val) = each %syms) {
 }
 print +($sym ? '' : 'not '),"ok 6\n";
 
-delete $syms{$name};
+delete %syms{$name};
 print +($! ? "(\$! = $!) not " : ''),"ok 7\n";
 
-print +(defined($syms{$name}) ? 'not ' : ''),"ok 8\n";
+print +(defined(%syms{$name}) ? 'not ' : ''),"ok 8\n";
 undef %syms;
 
 $obj = VMS::DCLsym->new( 'GLOBAL');

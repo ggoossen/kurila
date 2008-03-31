@@ -63,16 +63,16 @@ is (ref($vstref), "version", "ref(vstr) eq 'version'");
 
 my $test = curr_test();
 @ary = ($test,$test+1,$test+2,$test+3);
-$ref[0] = \@a;
-$ref[1] = \@b;
-$ref[2] = \@c;
-$ref[3] = \@d;
+@ref[0] = \@a;
+@ref[1] = \@b;
+@ref[2] = \@c;
+@ref[3] = \@d;
 for my $i (3,1,2,0) {
-    push(@{$ref[$i]}, "ok $ary[$i]\n");
+    push(@{@ref[$i]}, "ok @ary[$i]\n");
 }
 print @a;
-print ${$ref[1]}[0];
-print @{$ref[2]}[0];
+print @{@ref[1]}[0];
+print @{@ref[2]}[[0]];
 {
     no strict 'refs';
     print @{*{Symbol::fetch_glob('d')}};
@@ -89,9 +89,9 @@ is ($$$refref, 'Good');
 
 $ref = [[],2,[3,4,5,]];
 is (scalar @$ref, 3);
-is ($$ref[1], 2);
-is (${$$ref[2]}[2], 5);
-is (scalar @{$$ref[0]}, 0);
+is (@$ref[1], 2);
+is (@{@$ref[2]}[2], 5);
+is (scalar @{@$ref[0]}, 0);
 
 is ($ref->[1], 2);
 is ($ref->[2]->[0], 3);
@@ -104,16 +104,16 @@ is ($refref->{"key"}->[2]->[0], 3);
 
 # Test to see if anonymous subarrays spring into existence.
 
-$spring[5]->[0] = 123;
-$spring[5]->[1] = 456;
-push(@{$spring[5]}, 789);
-is (join(':',@{$spring[5]}), "123:456:789");
+@spring[5]->[0] = 123;
+@spring[5]->[1] = 456;
+push(@{@spring[5]}, 789);
+is (join(':',@{@spring[5]}), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
-@{$spring2{"foo"}} = (1,2,3);
-$spring2{"foo"}->[3] = 4;
-is (join(':',@{$spring2{"foo"}}), "1:2:3:4");
+@{%spring2{"foo"}} = (1,2,3);
+%spring2{"foo"}->[3] = 4;
+is (join(':',@{%spring2{"foo"}}), "1:2:3:4");
 
 # Test references to subroutines.
 
@@ -152,7 +152,7 @@ is (join('', sort values %$anonhash2), 'BARXYZ');
     is("".$x->%, "".%$x);
     my $w = \*foo428;
     is(Symbol::glob_name($w->*), "main::foo428");
-    my $v = sub { return $_[0]; };
+    my $v = sub { return @_[0]; };
     is($v->&(55), 55);
 }
 
@@ -175,7 +175,7 @@ sub mymethod {
     local($THIS, @ARGS) = @_;
     die 'Got a "' . ref($THIS). '" instead of a MYHASH'
 	unless ref $THIS eq 'MYHASH';
-    main::is ($ARGS[0], "argument");
+    main::is (@ARGS[0], "argument");
     main::is ($THIS->{FOO}, 'BAR');
 }
 
@@ -302,7 +302,7 @@ curr_test($test + 2);
     };
     package C;
     sub new { bless {}, shift }
-    DESTROY { $_[0] = 'foo' }
+    DESTROY { @_[0] = 'foo' }
     {
 	print "# should generate an error...\n";
 	my $c = C->new;
@@ -313,7 +313,7 @@ curr_test($test + 2);
 # test if refgen behaves with autoviv magic
 {
     my @a;
-    $a[1] = "good";
+    @a[1] = "good";
     my $got;
     for (@a) {
 	$got .= ${\$_};
@@ -407,13 +407,13 @@ TODO: {
     ok (!defined*{Symbol::fetch_glob($name2)}->[0],
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = @{*{Symbol::fetch_glob($name1)}}[2,3];
-    my (undef, $two) = @{*{Symbol::fetch_glob($name2)}}[2,3];
+    my (undef, $one) = @{*{Symbol::fetch_glob($name1)}}[[2,3]];
+    my (undef, $two) = @{*{Symbol::fetch_glob($name2)}}[[2,3]];
     is ($one, undef, 'Nothing before we start (array slices)');
     is ($two, undef, 'Nothing before we start');
-    @{*{Symbol::fetch_glob($name1)}}[2,3] = ("Very", "Yummy");
-    (undef, $one) = @{*{Symbol::fetch_glob($name1)}}[2,3];
-    (undef, $two) = @{*{Symbol::fetch_glob($name2)}}[2,3];
+    @{*{Symbol::fetch_glob($name1)}}[[2,3]] = ("Very", "Yummy");
+    (undef, $one) = @{*{Symbol::fetch_glob($name1)}}[[2,3]];
+    (undef, $two) = @{*{Symbol::fetch_glob($name2)}}[[2,3]];
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
@@ -431,13 +431,13 @@ TODO: {
     ok (!defined *{Symbol::fetch_glob($name2)}->{PWOF},
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = @{*{Symbol::fetch_glob($name1)}}{'SNIF', 'BEEYOOP'};
-    my (undef, $two) = @{*{Symbol::fetch_glob($name2)}}{'SNIF', 'BEEYOOP'};
+    my (undef, $one) = %{*{Symbol::fetch_glob($name1)}}{['SNIF', 'BEEYOOP']};
+    my (undef, $two) = %{*{Symbol::fetch_glob($name2)}}{['SNIF', 'BEEYOOP']};
     is ($one, undef, 'Nothing before we start (hash slices)');
     is ($two, undef, 'Nothing before we start');
-    @{*{Symbol::fetch_glob($name1)}}{'SNIF', 'BEEYOOP'} = ("Very", "Yummy");
-    (undef, $one) = @{*{Symbol::fetch_glob($name1)}}{'SNIF', 'BEEYOOP'};
-    (undef, $two) = @{*{Symbol::fetch_glob($name2)}}{'SNIF', 'BEEYOOP'};
+    %{*{Symbol::fetch_glob($name1)}}{['SNIF', 'BEEYOOP']} = ("Very", "Yummy");
+    (undef, $one) = %{*{Symbol::fetch_glob($name1)}}{['SNIF', 'BEEYOOP']};
+    (undef, $two) = %{*{Symbol::fetch_glob($name2)}}{['SNIF', 'BEEYOOP']};
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
@@ -460,17 +460,17 @@ TODO: {
 
 # test derefs after list slice
 
-is ( ({foo => "bar"})[0]{foo}, "bar", 'hash deref from list slice w/o ->' );
-is ( ({foo => "bar"})[0]->{foo}, "bar", 'hash deref from list slice w/ ->' );
-is ( ([qw/foo bar/])[0][1], "bar", 'array deref from list slice w/o ->' );
-is ( ([qw/foo bar/])[0]->[1], "bar", 'array deref from list slice w/ ->' );
-is ( (sub {"bar"})[0](), "bar", 'code deref from list slice w/o ->' );
-is ( (sub {"bar"})[0]->(), "bar", 'code deref from list slice w/ ->' );
+is ( ({foo => "bar"})[[0]]{foo}, "bar", 'hash deref from list slice w/o ->' );
+is ( ({foo => "bar"})[[0]]->{foo}, "bar", 'hash deref from list slice w/ ->' );
+is ( ([qw/foo bar/])[[0]][1], "bar", 'array deref from list slice w/o ->' );
+is ( ([qw/foo bar/])[[0]]->[1], "bar", 'array deref from list slice w/ ->' );
+is ( (sub {"bar"})[[0]](), "bar", 'code deref from list slice w/o ->' );
+is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 
 # deref on empty list shouldn't autovivify
 {
     local $@->{description};
-    eval { ()[0]{foo} };
+    eval { ()[[0]]{foo} };
     like ( "$@->{description}", "Can't use an undefined value as a HASH reference",
            "deref of undef from list slice fails" );
 }
@@ -516,6 +516,6 @@ our ($ref3, $ref1);
 }
 
 DESTROY {
-    print $_[0][0];
+    print @_[0][0];
 }
 

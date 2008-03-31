@@ -537,7 +537,7 @@ sub Follow_SymLink($) {
     ($DEV, $INO)= lstat $AbsName;
 
     while (-l _) {
-	if ($SLnkSeen{$DEV, $INO}++) {
+	if (%SLnkSeen{$DEV, $INO}++) {
 	    if ($follow_skip +< 2) {
 		die "$AbsName is encountered a second time";
 	    }
@@ -561,7 +561,7 @@ sub Follow_SymLink($) {
 	return undef unless defined $DEV;  #  dangling symbolic link
     }
 
-    if ($full_check && defined $DEV && $SLnkSeen{$DEV, $INO}++) {
+    if ($full_check && defined $DEV && %SLnkSeen{$DEV, $INO}++) {
 	if ( ($follow_skip +< 1) || ((-d _) && ($follow_skip +< 2)) ) {
 	    die "$AbsName encountered a second time";
 	}
@@ -589,7 +589,7 @@ sub is_tainted_pp {
 
 sub _find_opt {
     my $wanted = shift;
-    die "invalid top directory" unless defined $_[0];
+    die "invalid top directory" unless defined @_[0];
 
     # This function must local()ize everything because callbacks may
     # call find() or finddepth()
@@ -936,7 +936,7 @@ sub _find_dir($$$) {
 		    # Seen all the subdirs?
 		    # check for directoriness.
 		    # stat is faster for a file in the current directory
-		    $sub_nlink = (lstat ($no_chdir ? $dir_pref . $FN : $FN))[3];
+		    $sub_nlink = (lstat ($no_chdir ? $dir_pref . $FN : $FN))[[3]];
 
 		    if (-d _) {
 			--$subcount;
@@ -1322,7 +1322,7 @@ $File::Find::dont_use_nlink = 1
 # See, e.g. hints/machten.sh for MachTen 2.2.
 unless ($File::Find::dont_use_nlink) {
     require Config;
-    $File::Find::dont_use_nlink = 1 if ($Config::Config{'dont_use_nlink'});
+    $File::Find::dont_use_nlink = 1 if (%Config::Config{'dont_use_nlink'});
 }
 
 # We need a function that checks if a scalar is tainted. Either use the

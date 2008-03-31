@@ -8,7 +8,7 @@ use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError);
 die "Usage: zipcat file" 
     if @ARGV != 1 ;
 
-my $file = $ARGV[0] ;
+my $file = @ARGV[0] ;
 
 my $fh = IO::File->new( "<$file")
             or die "Cannot open '$file': $!\n";

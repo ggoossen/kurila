@@ -23,7 +23,7 @@ use ExtUtils::MakeMaker qw( neatvalue );
 sub _cc
 {
     # Some day, $Config{_cc} might be defined for us:
-    return $Config{_cc}   if  $Config{_cc};
+    return %Config{_cc}   if  %Config{_cc};
     return ".cxx";	# Seems to be the most widely accepted extension.
 }
 
@@ -59,11 +59,11 @@ sub ParseAttribs
 	PERL_PE_CODE => \$perlcode,
 	PERL_FILE_LIST => \@perlfiles,
 	PERL_FILE_CODES => \%perlfilecodes,
-	PERL_FILES => sub { map {($_,$perlfilecodes{$_})} @perlfiles },
+	PERL_FILES => sub { map {($_,%perlfilecodes{$_})} @perlfiles },
 	C_PE_CODE => \$ccode,
 	C_FILE_LIST => \@cfiles,
 	C_FILE_CODES => \%cfilecodes,
-	C_FILES => sub { map {($_,$cfilecodes{$_})} @cfiles },
+	C_FILES => sub { map {($_,%cfilecodes{$_})} @cfiles },
 	DO_EXPORT => \$export,
 	IMPORT_TO => \$importto,
 	IMPORT_LIST => \@importlist,
@@ -78,29 +78,29 @@ sub ParseAttribs
 	FINAL_PERL => \$final,
 	NO_REBUILD => \$norebuild,
     );
-    {   my @err= grep {! defined $params{$_}} keys %$hvAttr;
+    {   my @err= grep {! defined %params{$_}} keys %$hvAttr;
 	carp "ExtUtils::Myconst2perl::ParseAttribs:  ",
 	  "Unsupported option(s) (@err).\n"
 	  if  @err;
     }
     $norebuild= $hvAttr->{NO_REBUILD}   if  exists $hvAttr->{NO_REBUILD};
-    my $module= ( split m/::/, $pkg )[-1];
+    my $module= ( split m/::/, $pkg )[[-1]];
     $base= "c".$module;
     $base= $hvAttr->{BASEFILENAME}   if  exists $hvAttr->{BASEFILENAME};
-    my $ext=  ! $cplusplus  ?  ($Config{_c}||".c")
+    my $ext=  ! $cplusplus  ?  (%Config{_c}||".c")
       :  $cplusplus =~ m/^[.]/  ?  $cplusplus  :  _cc();
     if(  $writeperl  ) {
 	$outfile= $base . "_pc" . $ext;
-	$object= $base . "_pc" . ($Config{_o}||$Config{obj_ext});
+	$object= $base . "_pc" . (%Config{_o}||%Config{obj_ext});
 	$object= $hvAttr->{OBJECT}   if  $hvAttr->{OBJECT};
-	$binary= $base . "_pc" . ($Config{_exe}||$Config{exe_ext});
+	$binary= $base . "_pc" . (%Config{_exe}||%Config{exe_ext});
 	$binary= $hvAttr->{BINARY}   if  $hvAttr->{BINARY};
 	$final= $base . ".pc";
 	$final= $hvAttr->{FINAL_PERL}   if  $hvAttr->{FINAL_PERL};
 	$subroutine= "main";
     } elsif(  $cplusplus  ) {
 	$outfile= $base . $ext;
-	$object= $base . ($Config{_o}||$Config{obj_ext});
+	$object= $base . (%Config{_o}||%Config{obj_ext});
 	$object= $hvAttr->{OBJECT}   if  $hvAttr->{OBJECT};
 	$subroutine= "const2perl_" . $pkg;
 	$subroutine =~ s/\W/_/g;
@@ -127,7 +127,7 @@ sub ParseAttribs
 	  if  $hvAttr->{PERL_FILE_CODES};
     }
     for my $file (  @perlfiles  ) {
-	$perlfilecodes{$file}= $perlcode  if  ! $perlfilecodes{$file};
+	%perlfilecodes{$file}= $perlcode  if  ! %perlfilecodes{$file};
     }
     if(  ! $subroutine  ) {
 	; # Don't process any C source code files.
@@ -149,20 +149,20 @@ sub ParseAttribs
 	%cfilecodes= %{$hvAttr->{C_FILE_CODES}}   if  $hvAttr->{C_FILE_CODES};
     }
     for my $file (  @cfiles  ) {
-	$cfilecodes{$file}= $ccode  if  ! $cfilecodes{$file};
+	%cfilecodes{$file}= $ccode  if  ! %cfilecodes{$file};
     }
     for my $key (  keys %$hvRequests  ) {
-	if(  ! $params{$key}  ) {
+	if(  ! %params{$key}  ) {
 	    carp "ExtUtils::Myconst2perl::ParseAttribs:  ",
 	      "Unsupported output ($key).\n";
-	} elsif(  "SCALAR" eq ref( $params{$key} )  ) {
-	    ${$hvRequests->{$key}}= ${$params{$key}};
-	} elsif(  "ARRAY" eq ref( $params{$key} )  ) {
-	    @{$hvRequests->{$key}}= @{$params{$key}};
-	} elsif(  "HASH" eq ref( $params{$key} )  ) {
-	    %{$hvRequests->{$key}}= %{$params{$key}};
-	} elsif(  "CODE" eq ref( $params{$key} )  ) {
-	    @{$hvRequests->{$key}}=  &{$params{$key}};
+	} elsif(  "SCALAR" eq ref( %params{$key} )  ) {
+	    ${$hvRequests->{$key}}= ${%params{$key}};
+	} elsif(  "ARRAY" eq ref( %params{$key} )  ) {
+	    @{$hvRequests->{$key}}= @{%params{$key}};
+	} elsif(  "HASH" eq ref( %params{$key} )  ) {
+	    %{$hvRequests->{$key}}= %{%params{$key}};
+	} elsif(  "CODE" eq ref( %params{$key} )  ) {
+	    @{$hvRequests->{$key}}=  &{%params{$key}};
 	} else {
 	    die "Impossible value in \$params\{$key\}";
 	}
@@ -200,7 +200,7 @@ sub Myconst2perl
 	C_FILE_CODES => \%ccode,
 	SUBROUTINE => \$routine,
     } );
-    my $module= ( split m/::/, $pkg )[-1];
+    my $module= ( split m/::/, $pkg )[[-1]];
 
     warn "Writing $outfile...\n";
     open( STDOUT, ">", "$outfile" )  or  die "Can't create $outfile: $!\n";
@@ -208,11 +208,11 @@ sub Myconst2perl
     my $code= "";
     my $file;
     foreach $file (  @perlfile  ) {
-	warn "Reading Perl file, $file:  $perlcode{$file}\n";
+	warn "Reading Perl file, $file:  %perlcode{$file}\n";
 	open( MODULE, "<", "$file" )  or  die "Can't read Perl file, $file: $!\n";
 	eval qq[
 	    while(  <MODULE>  ) \{
-		$perlcode{$file};
+		%perlcode{$file};
 		\$code .= \$_;
 	    \}
 	    1;
@@ -228,24 +228,24 @@ sub Myconst2perl
 	#  " /* Ignore Perl's main() prototype */\n\n";
 	if(  $writeperl  ) {
 	    # Here are more reasons why the WRITE_PERL option is discouraged.
-	    if(  $Config{useperlio}  ) {
+	    if(  %Config{useperlio}  ) {
 		print "#define PERLIO_IS_STDIO 1\n";
 	    }
 	    print "#define WIN32IO_IS_STDIO 1\n";	# May cause a warning
 	    print "#define NO_XSLOCKS 1\n";	# What a hack!
 	}
 	foreach $file (  @cfile  ) {
-	    warn "Reading C file, $file:  $ccode{$file}\n";
+	    warn "Reading C file, $file:  %ccode{$file}\n";
 	    open( XS, "<", "$file" )  or  die "Can't read C file, $file: $!\n";
-	    my $code= $ccode{$file};
+	    my $code= %ccode{$file};
 	    $code =~ s#\\#\\\\#g;
-	    $code =~ s#([^\s -~])#{"\\x".sprintf "%02X",unpack "C",$1}#g;
+	    $code =~ s#([^\s -~])#{"\\x".sprintf "\%02X",unpack "C",$1}#g;
 	    $code =~ s#[*]/#*\\/#g;
 	    print qq[\n/* Include $file:  $code */\n];
 	    print qq[\n#line 1 "$file"\n];
 	    eval qq[
 		while(  <XS>  ) \{
-		    $ccode{$file};
+		    %ccode{$file};
 		    print;
 		\}
 		1;
@@ -275,7 +275,7 @@ sub Myconst2perl
 	  . "        \$pkg->$port( $arg2 $var );\n"
 	  . "    \}\n"
 	  . "    \{   no strict 'refs';\n"
-	  . "        $var=  sort keys %\{'_constants::'\};   \}\n"
+	  . "        $var=  sort keys \%\{'_constants::'\};   \}\n"
 	  . "    warn 0 + $var, qq[ symbols ${port}ed.\\n];\n"
 	  . "\}\n1;\n"
 	  or  die "eval: $@\n";
@@ -296,24 +296,24 @@ sub Myconst2perl
 	$head= " *"   if  ! $writeperl;
 	my $key;
 	foreach $key (  sort keys %spec  ) {
-	    my $val= neatvalue($spec{$key});
+	    my $val= neatvalue(%spec{$key});
 	    $val =~ s/\\/\\\\/g   if  $writeperl;
 	    print $head, "    $key => ", $val, $tail;
 	}
 	print $head, " Perl files eval'd:", $tail;
 	foreach $key (  @perlfile  ) {
-	    my $code= $perlcode{$key};
+	    my $code= %perlcode{$key};
 	    $code =~ s#\\#\\\\#g;
-	    $code =~ s#([^ -~])#{"\\".sprintf "%03o",unpack "C",$1}#g;
+	    $code =~ s#([^ -~])#{"\\".sprintf "\%03o",unpack "C",$1}#g;
 	    $code =~ s#"#\\"#g   if  $writeperl;
 	    print $head, "    $key => ", $code, $tail;
 	}
 	if(  $writeperl  ) {
 	    print $head, " C files included:", $tail;
 	    foreach $key (  @cfile  ) {
-		my $code= $ccode{$key};
+		my $code= %ccode{$key};
 		$code =~ s#\\#\\\\#g;
-		$code =~ s#([^ -~])#{"\\".sprintf "%03o",unpack "C",$1}#g;
+		$code =~ s#([^ -~])#{"\\".sprintf "\%03o",unpack "C",$1}#g;
 		$code =~ s#"#\\"#g;
 		print $head, "    $key => ", $code, $tail;
 	    }

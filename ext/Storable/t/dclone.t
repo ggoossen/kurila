@@ -7,14 +7,14 @@
 #
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -65,16 +65,16 @@ print "ok 6\n";
 
 # Ensure refs to "undef" values are properly shared during cloning
 my $hash;
-push @{$$hash{''}}, \$$hash{a};
-print "not " unless $$hash{''}[0] == \$$hash{a};
+push @{%$hash{''}}, \%$hash{a};
+print "not " unless %$hash{''}[0] == \%$hash{a};
 print "ok 7\n";
 
 my $cloned = dclone(dclone($hash));
-print "not " unless $$cloned{''}[0] == \$$cloned{a};
+print "not " unless %$cloned{''}[0] == \%$cloned{a};
 print "ok 8\n";
 
-$$cloned{a} = "blah";
-print "not " unless $$cloned{''}[0] == \$$cloned{a};
+%$cloned{a} = "blah";
+print "not " unless %$cloned{''}[0] == \%$cloned{a};
 print "ok 9\n";
 
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
@@ -95,13 +95,13 @@ print ref $clone eq ref $empty_string_obj &&
 # Do not fail if Tie::Hash and/or Tie::StdHash is not available
 if (eval { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     tie my %tie, "Tie::StdHash" or die $!;
-    $tie{array} = [1,2,3,4];
-    $tie{hash} = {1,2,3,4};
-    my $clone_array = dclone $tie{array};
-    print "not " unless "@$clone_array" eq "@{$tie{array}}";
+    %tie{array} = [1,2,3,4];
+    %tie{hash} = {1,2,3,4};
+    my $clone_array = dclone %tie{array};
+    print "not " unless "@$clone_array" eq "@{%tie{array}}";
     print "ok 11\n";
-    my $clone_hash = dclone $tie{hash};
-    print "not " unless $clone_hash->{1} eq $tie{hash}{1};
+    my $clone_hash = dclone %tie{hash};
+    print "not " unless $clone_hash->{1} eq %tie{hash}{1};
     print "ok 12\n";
 } else {
     print <<EOF;

@@ -1,6 +1,6 @@
 #!../miniperl
 
-$ENV{LC_ALL} = 'C';
+%ENV{LC_ALL} = 'C';
 
 open (OUT, ">", "perlmodlib.pod") or die $!;
 my (@pragma, @mod, @MANIFEST);

@@ -118,13 +118,13 @@ for (@TESTS) {
     for (0..4) {
         # Make sure to check undef explicitly; we don't want undef to match
         # the empty string because they're semantically different.
-        unless ((!defined ($results[$_]) && !defined ($expected[$_]))
-                || (defined ($results[$_]) && defined ($expected[$_])
-                    && $results[$_] eq $expected[$_])) {
+        unless ((!defined (@results[$_]) && !defined (@expected[$_]))
+                || (defined (@results[$_]) && defined (@expected[$_])
+                    && @results[$_] eq @expected[$_])) {
             print "not ok $n\n" if $okay;
-            print "# Incorrect $names[$_]:\n";
-            print "#   expected: $expected[$_]\n";
-            print "#       seen: $results[$_]\n";
+            print "# Incorrect @names[$_]:\n";
+            print "#   expected: @expected[$_]\n";
+            print "#       seen: @results[$_]\n";
             $okay = 0;
         }
     }

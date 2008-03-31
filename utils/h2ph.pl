@@ -18,7 +18,7 @@ my @inc_dirs = inc_dirs() if $opt_a;
 
 my $Exit = 0;
 
-my $Dest_dir = $opt_d || $Config{installsitearch};
+my $Dest_dir = $opt_d || %Config{installsitearch};
 die "Destination directory $Dest_dir doesn't exist or isn't a directory\n"
     unless -d $Dest_dir;
 
@@ -32,7 +32,7 @@ my @isatype = qw(
 );
 
 my %isatype;
-@isatype{@isatype} = (1) x @isatype;
+%isatype{[@isatype]} = (1) x @isatype;
 my $inif = 0;
 my %Is_converted;
 my %bad_file = ();
@@ -103,7 +103,7 @@ while (defined (my $file = next_file())) {
 			$proto = '';
 			foreach my $arg (split(m/,\s*/,$args)) {
 			    $arg =~ s/^\s*([^\s].*[^\s])\s*$/$1/;
-			    $curargs{$arg} = 1;
+			    %curargs{$arg} = 1;
 			}
 			$args =~ s/\b(\w)/\$$1/g;
 			$args = "my($args) = \@_;\n$t    ";
@@ -154,7 +154,7 @@ while (defined (my $file = next_file())) {
                 $incl_type = $1;
                 $incl = $2;
                 if (($incl_type eq 'include_next') ||
-                    ($opt_e && exists($bad_file{$incl}))) {
+                    ($opt_e && exists(%bad_file{$incl}))) {
                     $incl =~ s/\.h$/.ph/;
 		print OUT ($t,
 			   "eval \{\n");
@@ -298,7 +298,7 @@ while (defined (my $file = next_file())) {
 	    if (s/^\(([^()]*)\)\s*(\w+\s*)*//) {
 		for my $arg (split m/,/, $1) {
 		    if ($arg =~ m/(\w+)\s*$/) {
-			$curargs{$1} = 1;
+			%curargs{$1} = 1;
 			push @args, $1;
 		    }
 		}
@@ -342,8 +342,8 @@ while (defined (my $file = next_file())) {
 	    goto EMIT;
 	}
     }
-    $Is_converted{$file} = 1;
-    if ($opt_e && exists($bad_file{$file})) {
+    %Is_converted{$file} = 1;
+    if ($opt_e && exists(%bad_file{$file})) {
         unlink($Dest_dir . '/' . $outfile);
         $next = '';
     } else {
@@ -372,7 +372,7 @@ sub expr {
 	s/^0X([0-9A-F]+)[UL]*//i
 	    && do {my $hex = $1;
 		   $hex =~ s/^0+//;
-		   if (length $hex +> 8 && !$Config{use64bitint}) {
+		   if (length $hex +> 8 && !%Config{use64bitint}) {
 		       # Croak if nv_preserves_uv_bits < 64 ?
 		       $new .=         hex(substr($hex, -8)) +
 			       2**32 * hex(substr($hex,  0, -8));
@@ -387,7 +387,7 @@ sub expr {
 	s/^(\d+)\s*[LU]*//i	&& do {$new .= $1; next;};
 	s/^("(\\"|[^"])*")//	&& do {$new .= $1; next;};
 	s/^'((\\"|[^"])*)'//	&& do {
-	    if ($curargs{$1}) {
+	    if (%curargs{$1}) {
 		$new .= "ord('\$$1')";
 	    } else {
 		$new .= "ord('$1')";
@@ -423,7 +423,7 @@ sub expr {
 	m/\(([\w\s]+)[\*\s]*\)\s*[\w\(]/ && do {
 	    my $doit = 1;
 	    foreach (split m/\s+/, $1) {  # Make sure all the words are types,
-	        unless($isatype{$_} or $_ eq 'struct' or $_ eq 'union'){
+	        unless(%isatype{$_} or $_ eq 'struct' or $_ eq 'union'){
 		    $doit = 0;
 		    last;
 		}
@@ -440,7 +440,7 @@ sub expr {
 	    while($id =~ m/\[\s*([^\$\&\d\]]+)\]/) {
 		my($index) = $1;
 		$index =~ s/\s//g;
-		if(exists($curargs{$index})) {
+		if(exists(%curargs{$index})) {
 		    $index = "\$$index";
 		} else {
 		    $index = "&$index";
@@ -454,12 +454,12 @@ sub expr {
 	    if ($id eq 'struct' || $id eq 'union') {
 		s/^\s+(\w+)//;
 		$id .= ' ' . $1;
-		$isatype{$id} = 1;
+		%isatype{$id} = 1;
 	    } elsif ($id =~ m/^((un)?signed)|(long)|(short)$/) {
 		while (s/^\s+(\w+)//) { $id .= ' ' . $1; }
-		$isatype{$id} = 1;
+		%isatype{$id} = 1;
 	    }
-	    if ($curargs{$id}) {
+	    if (%curargs{$id}) {
 		$new .= "\$$id";
 		$new .= '->' if m/^[\[\{]/;
 	    } elsif ($id eq 'defined') {
@@ -467,7 +467,7 @@ sub expr {
 	    } elsif (m/^\s*\(/) {
 		s/^\s*\((\w),/("$1",/ if $id =~ m/^_IO[WR]*$/i;	# cheat
 		$new .= " &$id";
-	    } elsif ($isatype{$id}) {
+	    } elsif (%isatype{$id}) {
 		if ($new =~ m/{\s*$/) {
 		    $new .= "'$id'";
 		} elsif ($new =~ m/\(\s*$/ && m/^[\s*]*\)/) {
@@ -572,7 +572,7 @@ sub next_line
             } else {
                 if ($opt_e) {
                     warn "Cannot parse $file:\n$in\n";
-                    $bad_file{$file} = 1;
+                    %bad_file{$file} = 1;
                     $in = '';
                     $out = undef;
                     last READ;
@@ -689,7 +689,7 @@ sub queue_includes_from
             }
 
             if ($line =~ m/^#\s*include\s+<(.*?)>/) {
-                push(@ARGV, $1) unless $Is_converted{$1};
+                push(@ARGV, $1) unless %Is_converted{$1};
             }
         }
     close HEADER;
@@ -709,7 +709,7 @@ sub inc_dirs
            $from_gcc = '';
        };
     };
-    length($from_gcc) ? ($from_gcc, $Config{usrinc}) : ($Config{usrinc});
+    length($from_gcc) ? ($from_gcc, %Config{usrinc}) : (%Config{usrinc});
 }
 
 
@@ -740,27 +740,27 @@ sub build_preamble_if_necessary
 
 	foreach (sort keys %define) {
 	    if ($opt_D) {
-		print PREAMBLE "# $_=$define{$_}\n";
+		print PREAMBLE "# $_=%define{$_}\n";
 	    }
-	    if ($define{$_} =~ m/^\((.*)\)$/) {
+	    if (%define{$_} =~ m/^\((.*)\)$/) {
 		# parenthesized value:  d=(v)
-		$define{$_} = $1;
+		%define{$_} = $1;
 	    }
-	    if ($define{$_} =~ m/^([+-]?(\d+)?\.\d+([eE][+-]?\d+)?)[FL]?$/) {
+	    if (%define{$_} =~ m/^([+-]?(\d+)?\.\d+([eE][+-]?\d+)?)[FL]?$/) {
 		# float:
 		print PREAMBLE
 		    "unless (defined &$_) \{ sub $_() \{ $1 \} \}\n\n";
-	    } elsif ($define{$_} =~ m/^([+-]?\d+)U?L{0,2}$/i) {
+	    } elsif (%define{$_} =~ m/^([+-]?\d+)U?L{0,2}$/i) {
 		# integer:
 		print PREAMBLE
 		    "unless (defined &$_) \{ sub $_() \{ $1 \} \}\n\n";
-	    } elsif ($define{$_} =~ m/^\w+$/) {
+	    } elsif (%define{$_} =~ m/^\w+$/) {
 		print PREAMBLE
-		    "unless (defined &$_) \{ sub $_() \{ &$define{$_} \} \}\n\n";
+		    "unless (defined &$_) \{ sub $_() \{ &%define{$_} \} \}\n\n";
 	    } else {
 		print PREAMBLE
 		    "unless (defined &$_) \{ sub $_() \{ \"",
-		    quotemeta($define{$_}), "\" \} \}\n\n";
+		    quotemeta(%define{$_}), "\" \} \}\n\n";
 	    }
 	}
     close PREAMBLE               or die "Cannot close $preamble:  $!";
@@ -774,11 +774,11 @@ sub _extract_cc_defines
 {
     my %define;
     my $allsymbols  = join " ",
-	@Config{'ccsymbols', 'cppsymbols', 'cppccsymbols'};
+	%Config{['ccsymbols', 'cppsymbols', 'cppccsymbols']};
 
     # Split compiler pre-definitions into `key=value' pairs:
     while ($allsymbols =~ m/([^\s]+)=((\\\s|[^\s])+)/g) {
-	$define{$1} = $2;
+	%define{$1} = $2;
 	if ($opt_D) {
 	    print STDERR "$_:  $1 -> $2\n";
 	}

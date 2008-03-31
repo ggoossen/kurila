@@ -15,31 +15,31 @@ $VERSION = '0.11';
 
 sub reading {
   my $data = shift;
-  ${*$data}{'net_ftp_bytesread'} = 0;
+  %{*$data}{'net_ftp_bytesread'} = 0;
 }
 
 
 sub abort {
   my $data = shift;
-  my $ftp  = ${*$data}{'net_ftp_cmd'};
+  my $ftp  = %{*$data}{'net_ftp_cmd'};
 
   # no need to abort if we have finished the xfer
   return $data->close
-    if ${*$data}{'net_ftp_eof'};
+    if %{*$data}{'net_ftp_eof'};
 
   # for some reason if we continously open RETR connections and not
   # read a single byte, then abort them after a while the server will
   # close our connection, this prevents the unexpected EOF on the
   # command channel -- GMB
-  if (exists ${*$data}{'net_ftp_bytesread'}
-    && (${*$data}{'net_ftp_bytesread'} == 0))
+  if (exists %{*$data}{'net_ftp_bytesread'}
+    && (%{*$data}{'net_ftp_bytesread'} == 0))
   {
     my $buf     = "";
     my $timeout = $data->timeout;
     $data->can_read($timeout) && sysread($data, $buf, 1);
   }
 
-  ${*$data}{'net_ftp_eof'} = 1;    # fake
+  %{*$data}{'net_ftp_eof'} = 1;    # fake
 
   $ftp->abort;                     # this will close me
 }
@@ -47,31 +47,31 @@ sub abort {
 
 sub _close {
   my $data = shift;
-  my $ftp  = ${*$data}{'net_ftp_cmd'};
+  my $ftp  = %{*$data}{'net_ftp_cmd'};
 
   $data->SUPER::close();
 
-  delete ${*$ftp}{'net_ftp_dataconn'}
-    if exists ${*$ftp}{'net_ftp_dataconn'}
-    && $data == ${*$ftp}{'net_ftp_dataconn'};
+  delete %{*$ftp}{'net_ftp_dataconn'}
+    if exists %{*$ftp}{'net_ftp_dataconn'}
+    && $data == %{*$ftp}{'net_ftp_dataconn'};
 }
 
 
 sub close {
   my $data = shift;
-  my $ftp  = ${*$data}{'net_ftp_cmd'};
+  my $ftp  = %{*$data}{'net_ftp_cmd'};
 
-  if (exists ${*$data}{'net_ftp_bytesread'} && !${*$data}{'net_ftp_eof'}) {
+  if (exists %{*$data}{'net_ftp_bytesread'} && !%{*$data}{'net_ftp_eof'}) {
     my $junk;
     $data->read($junk, 1, 0);
-    return $data->abort unless ${*$data}{'net_ftp_eof'};
+    return $data->abort unless %{*$data}{'net_ftp_eof'};
   }
 
   $data->_close;
 
   $ftp->response() == CMD_OK
     && $ftp->message =~ m/unique file name:\s*(\S*)\s*\)/
-    && (${*$ftp}{'net_ftp_unique'} = $1);
+    && (%{*$ftp}{'net_ftp_unique'} = $1);
 
   $ftp->status == CMD_OK;
 }
@@ -91,7 +91,7 @@ sub _select {
     last if $nfound +>= 0;
 
     croak "select: $!"
-      unless $!{EINTR};
+      unless %!{EINTR};
   }
 
   $nfound;
@@ -99,26 +99,26 @@ sub _select {
 
 
 sub can_read {
-  _select(@_[0, 1], 1);
+  _select(@_[[0, 1]], 1);
 }
 
 
 sub can_write {
-  _select(@_[0, 1], 0);
+  _select(@_[[0, 1]], 0);
 }
 
 
 sub cmd {
   my $ftp = shift;
 
-  ${*$ftp}{'net_ftp_cmd'};
+  %{*$ftp}{'net_ftp_cmd'};
 }
 
 
 sub bytes_read {
   my $ftp = shift;
 
-  ${*$ftp}{'net_ftp_bytesread'} || 0;
+  %{*$ftp}{'net_ftp_bytesread'} || 0;
 }
 
 1;

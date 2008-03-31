@@ -13,7 +13,7 @@ use Config;
  
 BEGIN {
     if(-d "lib" && -f "TEST") {
-        if ($Config{'extensions'} !~ m/\bDB_File\b/ ) {
+        if (%Config{'extensions'} !~ m/\bDB_File\b/ ) {
             print "1..0 # Skip: DB_File was not built\n";
             exit 0;
         }
@@ -107,9 +107,9 @@ sub bad_one
 # tests 61, 63, 64 and 65.
 EOM
         if ($^O eq 'darwin'
-	    && $Config{db_version_major} == 1
-	    && $Config{db_version_minor} == 0
-	    && $Config{db_version_patch} == 0) {
+	    && %Config{db_version_major} == 1
+	    && %Config{db_version_minor} == 0
+	    && %Config{db_version_patch} == 0) {
 	    print STDERR <<EOM ;
 #
 # For example Mac OS X 10.2 (or earlier) has such an old
@@ -206,8 +206,8 @@ ok(17, $X = tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) ;
 
 my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
 
-ok(18, ((stat($Dfile))[2] ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
-	||  $noMode{$^O} );
+ok(18, ((stat($Dfile))[[2]] ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
+	||  %noMode{$^O} );
 
 #my $l = @h ;
 my $l = $X->length ;
@@ -215,33 +215,33 @@ ok(19, ($FA ? @h == 0 : !$l) );
 
 my @data = qw( a b c d ever f g h  i j k longername m n o p) ;
 
-$h[0] = shift @data ;
-ok(20, $h[0] eq 'a' );
+@h[0] = shift @data ;
+ok(20, @h[0] eq 'a' );
 
 my $ i;
 foreach (@data)
-  { $h[++$i] = $_ }
+  { @h[++$i] = $_ }
 
 unshift (@data, 'a') ;
 
-ok(21, defined $h[1] );
-ok(22, ! defined $h[16] );
+ok(21, defined @h[1] );
+ok(22, ! defined @h[16] );
 ok(23, $FA ? @h == @data : $X->length == @data );
 
 
 # Overwrite an entry & check fetch it
-$h[3] = 'replaced' ;
-$data[3] = 'replaced' ;
-ok(24, $h[3] eq 'replaced' );
+@h[3] = 'replaced' ;
+@data[3] = 'replaced' ;
+ok(24, @h[3] eq 'replaced' );
 
 #PUSH
 my @push_data = qw(added to the end) ;
 ($FA ? push(@h, @push_data) : $X->push(@push_data)) ;
 push (@data, @push_data) ;
-ok(25, $h[++$i] eq 'added' );
-ok(26, $h[++$i] eq 'to' );
-ok(27, $h[++$i] eq 'the' );
-ok(28, $h[++$i] eq 'end' );
+ok(25, @h[++$i] eq 'added' );
+ok(26, @h[++$i] eq 'to' );
+ok(27, @h[++$i] eq 'the' );
+ok(28, @h[++$i] eq 'end' );
 
 # POP
 my $popped = pop (@data) ;
@@ -263,15 +263,15 @@ my @new_data = qw(add this to the start of the array) ;
 $FA ? unshift (@h, @new_data) : $X->unshift (@new_data) ;
 unshift (@data, @new_data) ;
 ok(32, $FA ? @h == @data : $X->length == @data );
-ok(33, $h[0] eq "add") ;
-ok(34, $h[1] eq "this") ;
-ok(35, $h[2] eq "to") ;
-ok(36, $h[3] eq "the") ;
-ok(37, $h[4] eq "start") ;
-ok(38, $h[5] eq "of") ;
-ok(39, $h[6] eq "the") ;
-ok(40, $h[7] eq "array") ;
-ok(41, $h[8] eq $data[8]) ;
+ok(33, @h[0] eq "add") ;
+ok(34, @h[1] eq "this") ;
+ok(35, @h[2] eq "to") ;
+ok(36, @h[3] eq "the") ;
+ok(37, @h[4] eq "start") ;
+ok(38, @h[5] eq "of") ;
+ok(39, @h[6] eq "the") ;
+ok(40, @h[7] eq "array") ;
+ok(41, @h[8] eq @data[8]) ;
 
 # Brief test for SPLICE - more thorough 'soak test' is later.
 my @old;
@@ -281,16 +281,16 @@ if ($FA) {
 else {
     @old = $X->splice(1, 2, qw(bananas just before));
 }
-ok(42, $h[0] eq "add") ;
-ok(43, $h[1] eq "bananas") ;
-ok(44, $h[2] eq "just") ;
-ok(45, $h[3] eq "before") ;
-ok(46, $h[4] eq "the") ;
-ok(47, $h[5] eq "start") ;
-ok(48, $h[6] eq "of") ;
-ok(49, $h[7] eq "the") ;
-ok(50, $h[8] eq "array") ;
-ok(51, $h[9] eq $data[8]) ;
+ok(42, @h[0] eq "add") ;
+ok(43, @h[1] eq "bananas") ;
+ok(44, @h[2] eq "just") ;
+ok(45, @h[3] eq "before") ;
+ok(46, @h[4] eq "the") ;
+ok(47, @h[5] eq "start") ;
+ok(48, @h[6] eq "of") ;
+ok(49, @h[7] eq "the") ;
+ok(50, @h[8] eq "array") ;
+ok(51, @h[9] eq @data[8]) ;
 $FA ? splice(@h, 1, 3, @old) : $X->splice(1, 3, @old);
 
 # Now both arrays should be identical
@@ -299,20 +299,20 @@ my $ok = 1 ;
 my $j = 0 ;
 foreach (@data)
 {
-   $ok = 0, last if $_ ne $h[$j ++] ; 
+   $ok = 0, last if $_ ne @h[$j ++] ; 
 }
 ok(52, $ok );
 
 # Neagtive subscripts
 
 # get the last element of the array
-ok(53, $h[-1] eq $data[-1] );
-ok(54, $h[-1] eq $h[ ($FA ? @h : $X->length) -1] );
+ok(53, @h[-1] eq @data[-1] );
+ok(54, @h[-1] eq @h[ ($FA ? @h : $X->length) -1] );
 
 # get the first element using a negative subscript
 eval '$h[ - ( $FA ? @h : $X->length)] = "abcd"' ;
 ok(55, $@ eq "" );
-ok(56, $h[0] eq "abcd" );
+ok(56, @h[0] eq "abcd" );
 
 # now try to read before the start of the array
 eval '$h[ - (1 + ($FA ? @h : $X->length))] = 1234' ;
@@ -332,9 +332,9 @@ unlink $Dfile;
     my @h = () ;
     my $dbh = DB_File::RECNOINFO->new() ;
     ok(59, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
-    $h[0] = "abc" ;
-    $h[1] = "def" ;
-    $h[3] = "ghi" ;
+    @h[0] = "abc" ;
+    @h[1] = "def" ;
+    @h[3] = "ghi" ;
     ok(60, safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
@@ -348,9 +348,9 @@ unlink $Dfile;
     my $dbh = DB_File::RECNOINFO->new() ;
     $dbh->{bval} = "-" ;
     ok(62, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
-    $h[0] = "abc" ;
-    $h[1] = "def" ;
-    $h[3] = "ghi" ;
+    @h[0] = "abc" ;
+    @h[1] = "def" ;
+    @h[3] = "ghi" ;
     ok(63, safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
@@ -367,9 +367,9 @@ unlink $Dfile;
     $dbh->{flags} = R_FIXEDLEN ;
     $dbh->{reclen} = 5 ;
     ok(65, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
-    $h[0] = "abc" ;
-    $h[1] = "def" ;
-    $h[3] = "ghi" ;
+    @h[0] = "abc" ;
+    @h[1] = "def" ;
+    @h[3] = "ghi" ;
     ok(66, safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
@@ -387,9 +387,9 @@ unlink $Dfile;
     $dbh->{bval} = "-" ;
     $dbh->{reclen} = 5 ;
     ok(68, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
-    $h[0] = "abc" ;
-    $h[1] = "def" ;
-    $h[3] = "ghi" ;
+    @h[0] = "abc" ;
+    @h[1] = "def" ;
+    @h[3] = "ghi" ;
     ok(69, safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
@@ -510,10 +510,10 @@ EOM
     my $self ;
     unlink $Dfile;
     ok(83, $self = tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) ;
-    $h[0] = "abc" ;
-    $h[1] = "def" ;
-    $h[2] = "ghi" ;
-    $h[3] = "jkl" ;
+    @h[0] = "abc" ;
+    @h[1] = "def" ;
+    @h[2] = "ghi" ;
+    @h[3] = "jkl" ;
     ok(84, $FA ? (@h-1) == 3 : $self->length() == 4) ;
     undef $self ;
     ok(85, safeUntie \@h);
@@ -537,7 +537,7 @@ EOM
     # $# sets array to bigger
     ok(91, $self = tie @h, 'DB_File', $Dfile, O_RDWR, 0640, $DB_RECNO ) ;
     if ($FA)
-      { $h[6] = $h[6] }
+      { @h[6] = @h[6] }
     else 
       { $self->STORESIZE(7) }
     ok(92, $FA ? (@h-1) == 6 : $self->length() == 7) ;
@@ -601,12 +601,12 @@ EOM
 
    $_ = "original" ;
 
-   $h[0] = "joe" ;
+   @h[0] = "joe" ;
    #                   fk   sk     fv   sv
    ok(100, checkOutput( "", 0, "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(101, $h[0] eq "joe");
+   ok(101, @h[0] eq "joe");
    #                   fk  sk  fv    sv
    ok(102, checkOutput( "", 0, "joe", "")) ;
 
@@ -626,12 +626,12 @@ EOM
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   $h[1] = "Joe" ;
+   @h[1] = "Joe" ;
    #                   fk   sk     fv    sv
    ok(105, checkOutput( "", 2, "", "Jxe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(106, $h[1] eq "[Jxe]");
+   ok(106, @h[1] eq "[Jxe]");
    #                   fk   sk     fv    sv
    ok(107, checkOutput( "", 2, "[Jxe]", "")) ;
 
@@ -647,11 +647,11 @@ EOM
    $db->filter_store_value ($old_sv);
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   $h[0] = "joe" ;
+   @h[0] = "joe" ;
    ok(110, checkOutput( "", 0, "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(111, $h[0] eq "joe");
+   ok(111, @h[0] eq "joe");
    ok(112, checkOutput( "", 0, "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
@@ -665,11 +665,11 @@ EOM
    $db->filter_store_value (undef);
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   $h[0] = "joe" ;
+   @h[0] = "joe" ;
    ok(115, checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(116, $h[0] eq "joe");
+   ok(116, @h[0] eq "joe");
    ok(117, checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
@@ -701,7 +701,7 @@ EOM
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     $result{$name} = "$name - $count: [@kept]" ;
+		     %result{$name} = "$name - $count: [@kept]" ;
 		   }
     }
 
@@ -712,32 +712,32 @@ EOM
 
     $_ = "original" ;
 
-    $h[0] = "joe" ;
-    ok(122, $result{"store key"} eq "store key - 1: [0]");
-    ok(123, $result{"store value"} eq "store value - 1: [joe]");
-    ok(124, ! defined $result{"fetch key"} );
-    ok(125, ! defined $result{"fetch value"} );
+    @h[0] = "joe" ;
+    ok(122, %result{"store key"} eq "store key - 1: [0]");
+    ok(123, %result{"store value"} eq "store value - 1: [joe]");
+    ok(124, ! defined %result{"fetch key"} );
+    ok(125, ! defined %result{"fetch value"} );
     ok(126, $_ eq "original") ;
 
     ok(127, $db->FIRSTKEY() == 0 ) ;
-    ok(128, $result{"store key"} eq "store key - 1: [0]");
-    ok(129, $result{"store value"} eq "store value - 1: [joe]");
-    ok(130, $result{"fetch key"} eq "fetch key - 1: [0]");
-    ok(131, ! defined $result{"fetch value"} );
+    ok(128, %result{"store key"} eq "store key - 1: [0]");
+    ok(129, %result{"store value"} eq "store value - 1: [joe]");
+    ok(130, %result{"fetch key"} eq "fetch key - 1: [0]");
+    ok(131, ! defined %result{"fetch value"} );
     ok(132, $_ eq "original") ;
 
-    $h[7]  = "john" ;
-    ok(133, $result{"store key"} eq "store key - 2: [0 7]");
-    ok(134, $result{"store value"} eq "store value - 2: [joe john]");
-    ok(135, $result{"fetch key"} eq "fetch key - 1: [0]");
-    ok(136, ! defined $result{"fetch value"} );
+    @h[7]  = "john" ;
+    ok(133, %result{"store key"} eq "store key - 2: [0 7]");
+    ok(134, %result{"store value"} eq "store value - 2: [joe john]");
+    ok(135, %result{"fetch key"} eq "fetch key - 1: [0]");
+    ok(136, ! defined %result{"fetch value"} );
     ok(137, $_ eq "original") ;
 
-    ok(138, $h[0] eq "joe");
-    ok(139, $result{"store key"} eq "store key - 3: [0 7 0]");
-    ok(140, $result{"store value"} eq "store value - 2: [joe john]");
-    ok(141, $result{"fetch key"} eq "fetch key - 1: [0]");
-    ok(142, $result{"fetch value"} eq "fetch value - 1: [joe]");
+    ok(138, @h[0] eq "joe");
+    ok(139, %result{"store key"} eq "store key - 3: [0 7 0]");
+    ok(140, %result{"store value"} eq "store value - 2: [joe john]");
+    ok(141, %result{"fetch key"} eq "fetch key - 1: [0]");
+    ok(142, %result{"fetch value"} eq "fetch value - 1: [joe]");
     ok(143, $_ eq "original") ;
 
     undef $db ;
@@ -754,7 +754,7 @@ EOM
 
    ok(145, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) );
 
-   $db->filter_store_key (sub { $_ = $h[0] }) ;
+   $db->filter_store_key (sub { $_ = @h[0] }) ;
 
    eval '$h[1] = 1234' ;
    ok(146, $@->{description} =~ m/^recursion detected in filter_store_key/ );
@@ -784,9 +784,9 @@ EOM
         or die "Cannot open file 'text': $!\n" ;
 
     # Add a few key/value pairs to the file
-    $h[0] = "orange" ;
-    $h[1] = "blue" ;
-    $h[2] = "yellow" ;
+    @h[0] = "orange" ;
+    @h[1] = "blue" ;
+    @h[2] = "yellow" ;
 
     $FA ? push @h, "green", "black" 
         : $x->push("green", "black") ;
@@ -803,11 +803,11 @@ EOM
     print "shifted $first\n" ;
 
     # Check for existence of a key
-    print "Element 1 Exists with value $h[1]\n" if $h[1] ;
+    print "Element 1 Exists with value @h[1]\n" if @h[1] ;
 
     # use a negative index
-    print "The last element is $h[-1]\n" ;
-    print "The 2nd last element is $h[-2]\n" ;
+    print "The last element is @h[-1]\n" ;
+    print "The 2nd last element is @h[-2]\n" ;
 
     undef $x ;
     untie @h ;
@@ -842,11 +842,11 @@ EOM
         or die "Cannot open file $file: $!\n" ;
     
     # first create a text file to play with
-    $h[0] = "zero" ;
-    $h[1] = "one" ;
-    $h[2] = "two" ;
-    $h[3] = "three" ;
-    $h[4] = "four" ;
+    @h[0] = "zero" ;
+    @h[1] = "one" ;
+    @h[2] = "two" ;
+    @h[3] = "three" ;
+    @h[4] = "four" ;
 
     
     # Print the records in order.
@@ -857,7 +857,7 @@ EOM
 
     print "\nORIGINAL\n" ;
     foreach $i (0 .. $H->length - 1) {
-        print "$i: $h[$i]\n" ;
+        print "$i: @h[$i]\n" ;
     }
 
     # use the push & pop methods
@@ -884,7 +884,7 @@ EOM
     # now print the records in reverse order
     print "\nREVERSE\n" ;
     for ($i = $H->length - 1 ; $i +>= 0 ; -- $i)
-      { print "$i: $h[$i]\n" }
+      { print "$i: @h[$i]\n" }
 
     # same again, but use the API functions instead
     print "\nREVERSE again\n" ;
@@ -943,11 +943,11 @@ EOM
     unlink $Dfile;
     my @h ;
     my $a = "";
-    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
     
     tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_RECNO 
 	or die "Can't open file: $!\n" ;
-    $h[0] = undef;
+    @h[0] = undef;
     ok(150, $a eq "") ;
     ok(151, safeUntie \@h);
     unlink $Dfile;
@@ -960,7 +960,7 @@ EOM
     use strict ;
     use DB_File ;
     my $a = "";
-    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
 
     unlink $Dfile;
     my @h ;
@@ -990,10 +990,10 @@ EOM
 
    $_ = "original" ;
 
-   $h[0] = "joe" ;
-   ok(155, $h[0] eq "joe");
+   @h[0] = "joe" ;
+   ok(155, @h[0] eq "joe");
 
-   eval { my @r= grep { $h[$_] } (1, 2, 3) };
+   eval { my @r= grep { @h[$_] } (1, 2, 3) };
    ok (156, ! $@);
 
 
@@ -1003,11 +1003,11 @@ EOM
    $db->filter_fetch_value (undef);
    $db->filter_store_value (undef);
 
-   $h[1] = "joe" ;
+   @h[1] = "joe" ;
 
-   ok(157, $h[1] eq "joe");
+   ok(157, @h[1] eq "joe");
 
-   eval { my @r= grep { $h[$_] } (1, 2, 3) };
+   eval { my @r= grep { @h[$_] } (1, 2, 3) };
    ok (158, ! $@);
 
    undef $db ;
@@ -1051,7 +1051,7 @@ EOM
 
    $key = 51 ;
    $value = 454;
-   $h[$key] = $value ;
+   @h[$key] = $value ;
    ok 166, $key == 51;
    ok 167, $value == 454 ;
    ok 168, $_ eq 'fred';
@@ -1080,7 +1080,7 @@ EOM
     ok(169, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO) );
 
     my $warned = '';
-    local ${^WARN_HOOK} = sub {$warned = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$warned = @_[0]} ;
 
     # db-put with substr of key
     my %remember = () ;
@@ -1088,7 +1088,7 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{substr($key,0, 1)} = $value ;
+        %remember{substr($key,0, 1)} = $value ;
         $db->put(substr($key,0, 1), $value) ;
     }
 
@@ -1101,7 +1101,7 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{$ix} = $value ;
+        %remember{$ix} = $value ;
         $db->put($ix, substr($value,0)) ;
     }
 
@@ -1115,8 +1115,8 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{substr($key,0,1)} = $value ;
-        $h[substr($key,0,1)] = $value ;
+        %remember{substr($key,0,1)} = $value ;
+        @h[substr($key,0,1)] = $value ;
     }
 
     ok 172, $warned eq '' 
@@ -1129,8 +1129,8 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{$ix} = $value ;
-        $h[$ix] = substr($value,0) ;
+        %remember{$ix} = $value ;
+        @h[$ix] = substr($value,0) ;
     }
 
     ok 173, $warned eq '' 
@@ -1143,12 +1143,12 @@ EOM
          $status = $db->seq($key, $value, R_NEXT ) ) {
 
         #print "# key [$key] value [$value]\n" ;
-        if (defined $remember{$key} && defined $value && 
-             $remember{$key} eq $value) {
-            delete $remember{$key} ;
+        if (defined %remember{$key} && defined $value && 
+             %remember{$key} eq $value) {
+            delete %remember{$key} ;
         }
         else {
-            $bad{$key} = $value ;
+            %bad{$key} = $value ;
         }
     }
     
@@ -1198,7 +1198,7 @@ exit unless $FA ;
 
     my $a = '';
     my @a = (1);
-    local ${^WARN_HOOK} = sub {$a = $_[0]->{description}} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]->{description}} ;
 
     unlink $Dfile;
     my @tied ;
@@ -1393,7 +1393,7 @@ sub test_splice {
       or die "cannot open $tmp: $!";
 
     my $i = 0;
-    foreach ( @array ) { $h[$i++] = $_ }
+    foreach ( @array ) { @h[$i++] = $_ }
     
     return "basic DB_File sanity check failed"
       if list_diff(\@array, \@h);
@@ -1403,7 +1403,7 @@ sub test_splice {
     # 
     my ($s_r, $s_error, @s_warnings);
 
-    my $gather_warning = sub { push @s_warnings, $_[0]->{description} };
+    my $gather_warning = sub { push @s_warnings, @_[0]->{description} };
     if ($context eq 'list') {
 	my @r;
 	eval {
@@ -1443,7 +1443,7 @@ sub test_splice {
 
     # Now do the same for DB_File's version of splice
     my ($ms_r, $ms_error, @ms_warnings);
-    $gather_warning = sub { push @ms_warnings, $_[0]->{description} };
+    $gather_warning = sub { push @ms_warnings, @_[0]->{description} };
     if ($context eq 'list') {
 	my @r;
 	eval {
@@ -1546,7 +1546,7 @@ sub list_diff {
     my @a = @$a; my @b = @$b;
     return 1 if (scalar @a) != (scalar @b);
     for (my $i = 0; $i +< @a; $i++) {
-	my ($ae, $be) = ($a[$i], $b[$i]);
+	my ($ae, $be) = (@a[$i], @b[$i]);
 	if (defined $ae and defined $be) {
 	    return 1 if $ae ne $be;
 	}
@@ -1570,7 +1570,7 @@ sub list_diff {
 sub rand_test {
     die 'usage: rand_test()' if @_;
     my @contexts = qw<list scalar void>;
-    my $context = $contexts[int(rand @contexts)];
+    my $context = @contexts[int(rand @contexts)];
     return [ rand_list(),
 	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
 	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
@@ -1595,7 +1595,7 @@ sub rand_word {
     my $r = '';
     my @chars = qw<a b c d e f g h i j k l m n o p q r s t u v w x y z>;
     while (rand() +> 0.1 * (length($r) + 1)) {
-	$r .= $chars[int(rand(scalar @chars))];
+	$r .= @chars[int(rand(scalar @chars))];
     }
     return $r;
 }

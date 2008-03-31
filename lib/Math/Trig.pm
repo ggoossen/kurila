@@ -24,7 +24,7 @@ my @angcnv = qw(rad2deg rad2grad
 
 my @areal = qw(asin_real acos_real);
 
-@EXPORT = (@{$Math::Complex::EXPORT_TAGS{'trig'}},
+@EXPORT = (@{%Math::Complex::EXPORT_TAGS{'trig'}},
 	   @angcnv, @areal);
 
 my @rdlcnv = qw(cartesian_to_cylindrical
@@ -68,45 +68,45 @@ sub _GR  () { pi2/400 }
 
 sub _remt ($$) {
     # Oh yes, POSIX::fmod() would be faster. Possibly. If it is available.
-    $_[0] - $_[1] * int($_[0] / $_[1]);
+    @_[0] - @_[1] * int(@_[0] / @_[1]);
 }
 
 #
 # Angle conversions.
 #
 
-sub rad2rad($)     { _remt($_[0], pi2) }
+sub rad2rad($)     { _remt(@_[0], pi2) }
 
-sub deg2deg($)     { _remt($_[0], 360) }
+sub deg2deg($)     { _remt(@_[0], 360) }
 
-sub grad2grad($)   { _remt($_[0], 400) }
+sub grad2grad($)   { _remt(@_[0], 400) }
 
-sub rad2deg ($;$)  { my $d = _RD * $_[0]; $_[1] ? $d : deg2deg($d) }
+sub rad2deg ($;$)  { my $d = _RD * @_[0]; @_[1] ? $d : deg2deg($d) }
 
-sub deg2rad ($;$)  { my $d = _DR * $_[0]; $_[1] ? $d : rad2rad($d) }
+sub deg2rad ($;$)  { my $d = _DR * @_[0]; @_[1] ? $d : rad2rad($d) }
 
-sub grad2deg ($;$) { my $d = _GD * $_[0]; $_[1] ? $d : deg2deg($d) }
+sub grad2deg ($;$) { my $d = _GD * @_[0]; @_[1] ? $d : deg2deg($d) }
 
-sub deg2grad ($;$) { my $d = _DG * $_[0]; $_[1] ? $d : grad2grad($d) }
+sub deg2grad ($;$) { my $d = _DG * @_[0]; @_[1] ? $d : grad2grad($d) }
 
-sub rad2grad ($;$) { my $d = _RG * $_[0]; $_[1] ? $d : grad2grad($d) }
+sub rad2grad ($;$) { my $d = _RG * @_[0]; @_[1] ? $d : grad2grad($d) }
 
-sub grad2rad ($;$) { my $d = _GR * $_[0]; $_[1] ? $d : rad2rad($d) }
+sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[1] ? $d : rad2rad($d) }
 
 #
 # acos and asin functions which always return a real number
 #
 
 sub acos_real {
-    return 0  if $_[0] +>=  1;
-    return pi if $_[0] +<= -1;
-    return acos($_[0]);
+    return 0  if @_[0] +>=  1;
+    return pi if @_[0] +<= -1;
+    return acos(@_[0]);
 }
 
 sub asin_real {
-    return  &pip2 if $_[0] +>=  1;
-    return -&pip2 if $_[0] +<= -1;
-    return asin($_[0]);
+    return  &pip2 if @_[0] +>=  1;
+    return -&pip2 if @_[0] +<= -1;
+    return asin(@_[0]);
 }
 
 sub cartesian_to_spherical {
@@ -130,7 +130,7 @@ sub spherical_to_cartesian {
 sub spherical_to_cylindrical {
     my ( $x, $y, $z ) = spherical_to_cartesian( @_ );
 
-    return ( sqrt( $x * $x + $y * $y ), $_[1], $z );
+    return ( sqrt( $x * $x + $y * $y ), @_[1], $z );
 }
 
 sub cartesian_to_cylindrical {
@@ -212,7 +212,7 @@ sub great_circle_waypoint {
 }
 
 sub great_circle_midpoint {
-    great_circle_waypoint(@_[0..3], 0.5);
+    great_circle_waypoint(@_[[0..3]], 0.5);
 }
 
 sub great_circle_destination {

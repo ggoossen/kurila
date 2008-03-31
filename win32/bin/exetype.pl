@@ -11,26 +11,26 @@ my %subsys = (NATIVE    => 1,
               WINDOWSCE => 9);
 
 unless (0 +< @ARGV && @ARGV +< 3) {
-    printf "Usage: $0 exefile [%s]\n", join '|', sort keys %subsys;
+    printf "Usage: $0 exefile [\%s]\n", join '|', sort keys %subsys;
     exit;
 }
 
-$ARGV[1] = uc $ARGV[1] if $ARGV[1];
-unless (@ARGV == 1 || defined $subsys{$ARGV[1]}) {
+@ARGV[1] = uc @ARGV[1] if @ARGV[1];
+unless (@ARGV == 1 || defined %subsys{@ARGV[1]}) {
     (my $subsys = join(', ', sort keys %subsys)) =~ s/, (\w+)$/ or $1/;
-    print "Invalid subsystem $ARGV[1], please use $subsys\n";
+    print "Invalid subsystem @ARGV[1], please use $subsys\n";
     exit;
 }
 
 my ($record,$magic,$signature,$offset,$size);
-open EXE, "+<", "$ARGV[0]" or die "Cannot open $ARGV[0]: $!\n";
+open EXE, "+<", "@ARGV[0]" or die "Cannot open @ARGV[0]: $!\n";
 binmode EXE;
 
 # read IMAGE_DOS_HEADER structure
 read EXE, $record, 64;
 ($magic,$offset) = unpack "Sx58L", $record;
 
-die "$ARGV[0] is not an MSDOS executable file.\n"
+die "@ARGV[0] is not an MSDOS executable file.\n"
     unless $magic == 0x5a4d; # "MZ"
 
 # read signature, IMAGE_FILE_HEADER and first WORD of IMAGE_OPTIONAL_HEADER
@@ -50,10 +50,10 @@ if (@ARGV == 1) {
     read EXE, $record, 2;
     my ($subsys) = unpack "S", $record;
     $subsys = {reverse %subsys}->{$subsys} || "UNKNOWN($subsys)";
-    print "$ARGV[0] uses the $subsys subsystem.\n";
+    print "@ARGV[0] uses the $subsys subsystem.\n";
 }
 else {
-    print EXE pack "S", $subsys{$ARGV[1]};
+    print EXE pack "S", %subsys{@ARGV[1]};
 }
 close EXE;
 __END__

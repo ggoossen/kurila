@@ -29,7 +29,7 @@ print $x == -7 ? "ok 5\n" : "# expected -7, got $x\nnot ok 5\n";
 # check bad strings still get converted
 
 @x = ( 6, 8, 10);
-print "not " if $x["1foo"] != 8;
+print "not " if @x["1foo"] != 8;
 print "ok 7\n";
 
 # check values > 32 bits work.

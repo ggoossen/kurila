@@ -5,7 +5,7 @@ BEGIN { plan tests => 22 };
 BEGIN { ok 1 }
 use I18N::LangTags (':ALL');
 
-print "#  Loaded from ", $INC{'I18N/LangTags.pm'} || "??", "\n";
+print "#  Loaded from ", %INC{'I18N/LangTags.pm'} || "??", "\n";
 
 ok lc locale2language_tag('en'),    'en';
 ok lc locale2language_tag('en_US'),    'en-us';

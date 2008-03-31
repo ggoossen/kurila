@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib/');
     }
@@ -15,9 +15,9 @@ use Config ();
 
 BEGIN { use_ok 'ExtUtils::MakeMaker::Config'; }
 
-is $Config{path_sep}, $Config::Config{path_sep};
+is %Config{path_sep}, %Config::Config{path_sep};
 
 eval {
-    $Config{wibble} = 42;
+    %Config{wibble} = 42;
 };
-is $Config{wibble}, 42;
+is %Config{wibble}, 42;

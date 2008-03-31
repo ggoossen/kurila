@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    $INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
+    %INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
 print "1..26\n";
@@ -38,7 +38,7 @@ sub _ok {
 	    print "not ok $test\n";
 	}
 	my @caller = caller(2);
-	print "# Failed test at $caller[1] line $caller[2]\n";
+	print "# Failed test at @caller[1] line @caller[2]\n";
 	print "# Got      '$got'\n";
 	if ($type eq 'is') {
 	    print "# Expected '$expected'\n";
@@ -74,9 +74,9 @@ like ($@->message, qr/use VERSION is not valid in Perl Kurila/);
 # fake package 'testuse'
 our $testimport;
 our $version_check;
-$INC{'testuse.pm'} = 1;
+%INC{'testuse.pm'} = 1;
 *testuse::import = sub { $testimport = [@_] };
-*testuse::VERSION = sub { $version_check = $_[1] };
+*testuse::VERSION = sub { $version_check = @_[1] };
 
 # test calling of 'VERSION' and 'import' with correct arguments
 eval "use testuse v0.9";

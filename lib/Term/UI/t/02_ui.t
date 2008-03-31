@@ -15,16 +15,16 @@ $Term::UI::VERBOSE      = $Term::UI::VERBOSE    = 0;
 $^W = 1;
 
 ### perl core gets upset if we print stuff to STDOUT...
-if( $ENV{PERL_CORE} ) {
+if( %ENV{PERL_CORE} ) {
     *STDOUT_SAVE = *STDOUT_SAVE = *STDOUT;
     close *STDOUT;
     open *STDOUT, ">", "termui.$$" or diag("Could not open tempfile");
 }
-END { close *STDOUT && unlink "termui.$$" if $ENV{PERL_CORE} }
+END { close *STDOUT && unlink "termui.$$" if %ENV{PERL_CORE} }
 
 
 ### so T::RL doesn't go nuts over no console
-BEGIN{ $ENV{LINES}=25; $ENV{COLUMNS}=80; }
+BEGIN{ %ENV{LINES}=25; %ENV{COLUMNS}=80; }
 my $term = Term::ReadLine->new('test')
                 or diag "Could not create a new term. Dying", die;
 
@@ -73,7 +73,7 @@ my $tmpl = {
     };
     
     my $warnings = '';
-    local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
+    local ${^WARN_HOOK} = sub { $warnings .= @_[0]->message };
     
     my $res = $term->get_reply( %$args );
 

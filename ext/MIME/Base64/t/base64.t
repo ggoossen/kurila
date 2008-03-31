@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -14,11 +14,11 @@ print "# Testing MIME::Base64-", $MIME::Base64::VERSION, "\n";
 
 BEGIN {
  if (ord('A') == 0x41) {
-  *ASCII = sub { return $_[0] };
+  *ASCII = sub { return @_[0] };
  }
  else {
   require Encode;
-  *ASCII = sub { Encode::encode('ascii',$_[0]) };
+  *ASCII = sub { Encode::encode('ascii',@_[0]) };
  }
 }
 
@@ -323,7 +323,7 @@ sub encodeTest
     );
 
     for $test (@encode_tests) {
-	my($plain, $expected) = ($$test[0], $$test[1]);
+	my($plain, $expected) = (@$test[0], @$test[1]);
 
 	my $encoded = encode_base64($plain, '');
 	if ($encoded ne $expected) {
@@ -345,7 +345,7 @@ sub decodeTest
 {
     print "# decode test\n";
 
-    local ${^WARN_HOOK} = sub { print $_[0] };  # avoid warnings on stderr
+    local ${^WARN_HOOK} = sub { print @_[0] };  # avoid warnings on stderr
 
     my @decode_tests = (
 	['YWE='   => ASCII('aa')],
@@ -366,7 +366,7 @@ sub decodeTest
     );
 
     for $test (@decode_tests) {
-	my($encoded, $expected) = ($$test[0], $$test[1]);
+	my($encoded, $expected) = (@$test[0], @$test[1]);
 
 	my $decoded = decode_base64($encoded);
 	if ($decoded ne $expected) {

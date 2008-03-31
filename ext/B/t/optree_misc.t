@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -19,7 +19,7 @@ use Config;
 plan tests => 2;
 
 SKIP: {
-skip "no perlio in this build", 1 unless $Config::Config{useperlio};
+skip "no perlio in this build", 1 unless %Config::Config{useperlio};
 
 # The regression this is testing is that the first aelemfast, derived
 # from a lexical array, is supposed to be a BASEOP "<0>", while the
@@ -28,7 +28,7 @@ skip "no perlio in this build", 1 unless $Config::Config{useperlio};
 # B.xs:cc_opclass() for the relevant code.
 
 checkOptree ( name	=> 'OP_AELEMFAST opclass',
-	      code	=> sub { my @x; our @y; $x[0] + $y[0]},
+	      code	=> sub { my @x; our @y; @x[0] + @y[0]},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # a  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->a

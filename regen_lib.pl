@@ -10,7 +10,7 @@ use Symbol;
 $Is_W32 = $^O eq 'MSWin32';
 $Is_OS2 = $^O eq 'os2';
 $Is_Cygwin = $^O eq 'cygwin';
-$Is_NetWare = $Config{osname} eq 'NetWare';
+$Is_NetWare = %Config{osname} eq 'NetWare';
 if ($Is_NetWare) {
   $Is_W32 = 0;
 }

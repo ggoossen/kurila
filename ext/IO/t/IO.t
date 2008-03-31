@@ -6,7 +6,7 @@ BEGIN {
 	@INC = '../lib';
     }
 	require Config;
-	if ($Config::Config{'extensions'} !~ m/\bSocket\b/) {
+	if (%Config::Config{'extensions'} !~ m/\bSocket\b/) {
 		print "1..0 # Skip: Socket not built - IO.pm uses Socket";
 		exit 0;
 	}
@@ -15,7 +15,7 @@ BEGIN {
 use strict;
 use File::Path;
 use File::Spec;
-require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
+require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
 plan(tests => 18);
 
 {
@@ -30,15 +30,15 @@ plan(tests => 18);
 	# use_ok() calls import, which we do not want to do
 	require_ok( 'IO' );
 	ok( @load, 'IO should call XSLoader::load()' );
-	is( $load[0][0], 'IO', '... loading the IO library' );
-	is( $load[0][1], $IO::VERSION, '... with the current .pm version' );
+	is( @load[0][0], 'IO', '... loading the IO library' );
+	is( @load[0][1], $IO::VERSION, '... with the current .pm version' );
 }
 
 my @default = map { "IO/$_.pm" } qw( Handle Seekable File Pipe Socket Dir );
-delete @INC{ @default };
+delete %INC{[@default ]};
 
 my $warn = '' ;
-local ${^WARN_HOOK} = sub { $warn = $_[0]->{description} } ;
+local ${^WARN_HOOK} = sub { $warn = @_[0]->{description} } ;
 
 {
     no warnings ;
@@ -80,7 +80,7 @@ local ${^WARN_HOOK} = sub { $warn = $_[0]->{description} } ;
 
 foreach my $default (@default)
 {
-	ok( exists $INC{ $default }, "... import should default load $default" );
+	ok( exists %INC{ $default }, "... import should default load $default" );
 }
 
 eval { IO->import( 'nothere' ) };

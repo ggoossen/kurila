@@ -1,5 +1,5 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         use File::Spec;
         @INC = (File::Spec->rel2abs('../lib') );
@@ -52,10 +52,10 @@ ok grep( m/strict\.(pod|pm)/, keys %$where2name );
 my  $strictpath = $name2where->{'strict'};
 if( $strictpath ) {
   my @x = ($x->find('strict')||'(nil)', $strictpath);
-  print "# Comparing \"$x[0]\" to \"$x[1]\"\n";
+  print "# Comparing \"@x[0]\" to \"@x[1]\"\n";
   for(@x) { s{[/\\]}{/}g; }
-  print "#        => \"$x[0]\" to \"$x[1]\"\n";
-  ok $x[0], $x[1], " find('strict') should match survey's name2where\{strict\}";
+  print "#        => \"@x[0]\" to \"@x[1]\"\n";
+  ok @x[0], @x[1], " find('strict') should match survey's name2where\{strict\}";
 } else {
   ok 0;  # no 'thatpath/strict.pm' means can't test find()
 }

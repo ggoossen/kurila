@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
@@ -16,7 +16,7 @@ use threads::shared;
 ### Start of Testing ###
 
 # Make sure threads are really off
-ok( !$INC{"threads.pm"} );
+ok( !%INC{"threads.pm"} );
 
 # Check each faked function.
 foreach my $func (qw(share cond_wait cond_signal cond_broadcast)) {
@@ -28,8 +28,8 @@ foreach my $func (qw(share cond_wait cond_signal cond_broadcast)) {
     my %hash = (foo => 42, bar => 23);
     eval qq{$func(\%hash)};
     is( $@, '' );
-    is( $hash{foo}, 42 );
-    is( $hash{bar}, 23 );
+    is( %hash{foo}, 42 );
+    is( %hash{bar}, 23 );
 }
 
 # These all have no return value.

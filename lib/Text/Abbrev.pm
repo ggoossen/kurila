@@ -45,10 +45,10 @@ sub abbrev {
     my ($word, $hashref, $glob, %table, $returnvoid);
 
     @_ or return;   # So we don't autovivify onto @_ and trigger warning
-    if (ref($_[0])) {           # hash reference preferably
+    if (ref(@_[0])) {           # hash reference preferably
       $hashref = shift;
       $returnvoid = 1;
-    } elsif (ref \$_[0] eq 'GLOB') {  # is actually a glob (deprecated)
+    } elsif (ref \@_[0] eq 'GLOB') {  # is actually a glob (deprecated)
       $hashref = \%{shift()};
       $returnvoid = 1;
     }
@@ -57,7 +57,7 @@ sub abbrev {
     WORD: foreach $word (@_) {
         for (my $len = (length $word) - 1; $len +> 0; --$len) {
 	    my $abbrev = substr($word,0,$len);
-	    my $seen = ++$table{$abbrev};
+	    my $seen = ++%table{$abbrev};
 	    if ($seen == 1) {	    # We're the first word so far to have
 	    			    # this abbreviation.
 	        $hashref->{$abbrev} = $word;

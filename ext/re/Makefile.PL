@@ -19,7 +19,7 @@ WriteMakefile(
 package MY;
 
 sub upupfile {
-    File::Spec->catfile(File::Spec->updir, File::Spec->updir, $_[0]);
+    File::Spec->catfile(File::Spec->updir, File::Spec->updir, @_[0]);
 }
 
 sub postamble {
@@ -47,7 +47,7 @@ sub MY::c_o {
     package MY; # so that "SUPER" works right
     my $inh = $self->SUPER::c_o(@_);
     use Config;
-    if ($Config{osname} eq 'aix' && $Config{ccversion} eq '5.0.1.0') {
+    if (%Config{osname} eq 'aix' && %Config{ccversion} eq '5.0.1.0') {
 	# Known buggy optimizer.
 	my $cccmd = $self->const_cccmd;
 	$cccmd =~ s/^CCCMD\s*=\s*//;

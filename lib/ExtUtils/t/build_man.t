@@ -3,7 +3,7 @@
 # Test if MakeMaker declines to build man pages under the right conditions.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -25,7 +25,7 @@ use ExtUtils::MakeMaker::Config;
 
 # Simulate an installation which has man page generation turned off to
 # ensure these tests will still work.
-$Config{installman3dir} = 'none';
+%Config{installman3dir} = 'none';
 
 chdir 't';
 
@@ -43,7 +43,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 ok( my $stdout = tie *STDOUT, 'TieOut' );
 
 {
-    local $Config{installman3dir} = File::Spec->catdir(qw(t lib));
+    local %Config{installman3dir} = File::Spec->catdir(qw(t lib));
 
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',

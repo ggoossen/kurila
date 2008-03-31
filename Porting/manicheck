@@ -14,7 +14,7 @@
 
 BEGIN {
   ${^WARN_HOOK} = sub {
-    help() if $_[0] =~ m/"main::\w" used only once: possible typo at /;
+    help() if @_[0] =~ m/"main::\w" used only once: possible typo at /;
   };
 }
 
@@ -42,10 +42,10 @@ use File::Basename qw(dirname);
 
 while ( ~< *MANIFEST) {
   if (m/^(\S+)\s+(.+)$/) {
-    $mani{$1}++;
+    %mani{$1}++;
     my $d = dirname($1);
     while($d ne '.') {
-	$mand{$d}++;
+	%mand{$d}++;
 	$d = dirname($d);
     }
   } else {
@@ -60,18 +60,18 @@ use File::Find;
 find(sub {
        my $n = $File::Find::name;
        $n =~ s:^\./::;
-       $find{$n}++;
+       %find{$n}++;
      }, '.' );
 
 my @xtra;
 my @miss;
 
 for (sort keys %find) {
-  push @xtra, $_ unless $mani{$_} || $mand{$_};
+  push @xtra, $_ unless %mani{$_} || %mand{$_};
 }
 
 for (sort keys %mani) {
-  push @miss, $_ unless $find{$_};
+  push @miss, $_ unless %find{$_};
 }
 
 $" = "\n" if $l;

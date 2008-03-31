@@ -2,15 +2,15 @@ use ExtUtils::MakeMaker;
 use Config;
 use File::Spec;
 
-my $e = $Config{'exe_ext'};
-my $o = $Config{'obj_ext'};
+my $e = %Config{'exe_ext'};
+my $o = %Config{'obj_ext'};
 my $exeout_flag = '-o ';
 my $core = grep { $_ eq 'PERL_CORE=1' } @ARGV;
 if ($^O eq 'MSWin32') {
-    if ($Config{'cc'} =~ m/^cl/i) {
+    if (%Config{'cc'} =~ m/^cl/i) {
 	$exeout_flag = '-Fe';
     }
-    elsif ($Config{'cc'} =~ m/^bcc/i) {
+    elsif (%Config{'cc'} =~ m/^bcc/i) {
 	$exeout_flag = '-e';
     }
 }
@@ -28,7 +28,7 @@ WriteMakefile(
 package MY;
 
 sub post_constants {
-    "\nLIBS = $Config::Config{libs}\n"
+    "\nLIBS = %Config::Config{libs}\n"
 }
 
 sub headerfilefile {
@@ -40,7 +40,7 @@ sub headerpath {
 	return File::Spec->catdir(File::Spec->updir,
 				   File::Spec->updir);
     } else {
-	return File::Spec->catdir($Config::Config{archlibexp}, "CORE");
+	return File::Spec->catdir(%Config::Config{archlibexp}, "CORE");
     }
 }
 

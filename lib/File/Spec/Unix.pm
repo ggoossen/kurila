@@ -160,7 +160,7 @@ sub _tmpdir {
 
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = $_[0]->_tmpdir( $ENV{TMPDIR}, "/tmp" );
+    $tmpdir = @_[0]->_tmpdir( %ENV{TMPDIR}, "/tmp" );
 }
 
 =item updir
@@ -214,8 +214,8 @@ Takes no argument, returns the environment variable PATH as an array.
 =cut
 
 sub path {
-    return () unless exists $ENV{PATH};
-    my @path = split(':', $ENV{PATH});
+    return () unless exists %ENV{PATH};
+    my @path = split(':', %ENV{PATH});
     foreach (@path) { $_ = '.' if $_ eq '' }
     return @path;
 }
@@ -294,7 +294,7 @@ Yields:
 =cut
 
 sub splitdir {
-    return split m|/|, $_[1], -1;  # Preserve trailing fields
+    return split m|/|, @_[1], -1;  # Preserve trailing fields
 }
 
 
@@ -372,8 +372,8 @@ sub abs2rel {
     # Can't relativize across volumes
     return $path unless $path_volume eq $base_volume;
 
-    my $path_directories = ($self->splitpath($path, 1))[1];
-    my $base_directories = ($self->splitpath($base, 1))[1];
+    my $path_directories = ($self->splitpath($path, 1))[[1]];
+    my $base_directories = ($self->splitpath($base, 1))[[1]];
 
     # For UNC paths, the user might give a volume like //foo/bar that
     # strictly speaking has no directory portion.  Treat it as if it
@@ -391,7 +391,7 @@ sub abs2rel {
       return $self->canonpath( $self->catpath('', $self->catdir( @pathchunks ), '') );
     }
 
-    while (@pathchunks && @basechunks && $self->_same($pathchunks[0], $basechunks[0])) {
+    while (@pathchunks && @basechunks && $self->_same(@pathchunks[0], @basechunks[0])) {
         shift @pathchunks ;
         shift @basechunks ;
     }
@@ -404,7 +404,7 @@ sub abs2rel {
 }
 
 sub _same {
-  $_[1] eq $_[2];
+  @_[1] eq @_[2];
 }
 
 =item rel2abs()
@@ -489,15 +489,15 @@ sub _collapse {
 
     my($vol, $dirs, $file) = $fs->splitpath($path);
     my @dirs = $fs->splitdir($dirs);
-    pop @dirs if @dirs && $dirs[-1] eq '';
+    pop @dirs if @dirs && @dirs[-1] eq '';
 
     my @collapsed;
     foreach my $dir (@dirs) {
         if( $dir eq $updir              and   # if we have an updir
             @collapsed                  and   # and something to collapse
-            length $collapsed[-1]       and   # and its not the rootdir
-            $collapsed[-1] ne $updir    and   # nor another updir
-            $collapsed[-1] ne $curdir         # nor the curdir
+            length @collapsed[-1]       and   # and its not the rootdir
+            @collapsed[-1] ne $updir    and   # nor another updir
+            @collapsed[-1] ne $curdir         # nor the curdir
           ) 
         {                                     # then
             pop @collapsed;                   # collapse

@@ -28,10 +28,10 @@ eval '$> = 1';		# so switch uid (may not be implemented)
 print "# oldeuid = $oldeuid, euid = $>\n";
 
 SKIP: {
-    if (!$Config{d_seteuid}) {
+    if (!%Config{d_seteuid}) {
 	skip('no seteuid');
     } 
-    elsif ($Config{config_args} =~m/Dmksymlinks/) {
+    elsif (%Config{config_args} =~m/Dmksymlinks/) {
 	skip('we cannot chmod symlinks');
     }
     elsif ($bad_chmod) {
@@ -53,7 +53,7 @@ ok( -r 'op' );
 # this would fail for the euid 1
 # (unless we have unpacked the source code as uid 1...)
 SKIP: {
-    if ($Config{d_seteuid}) {
+    if (%Config{d_seteuid}) {
 	ok( -w 'op' );
     } else {
 	skip('no seteuid');

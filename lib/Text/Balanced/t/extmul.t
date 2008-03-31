@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
         @INC = qw(../lib);
     }
@@ -61,7 +61,7 @@ sub divide
 	push @index, length($text);
 	for ( my $i= 0; $i +< (@index-1); $i++)
 	{
-		push @bits, substr($text, $index[$i], $index[$i+1]-$index[$i]);
+		push @bits, substr($text, @index[$i], @index[$i+1]-@index[$i]);
 	}
 	pop @bits;
 	return @bits;

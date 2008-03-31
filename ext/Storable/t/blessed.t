@@ -7,14 +7,14 @@
 #
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -123,7 +123,7 @@ sub STORABLE_freeze {
   # Some reference some number of times.
   my $self = shift;
   my ($what, $times) = @$self;
-  return ("$what$times", ($::immortals{$what}) x $times);
+  return ("$what$times", (%::immortals{$what}) x $times);
 }
 
 sub STORABLE_thaw {
@@ -133,7 +133,7 @@ sub STORABLE_thaw {
 	my ($what, $times) = $x =~ m/(.)(\d+)/;
 	die "'$x' didn't match" unless defined $times;
 	main::ok ++$test, @refs == $times;
-	my $expect = $::immortals{$what};
+	my $expect = %::immortals{$what};
 	die "'$x' did not give a reference" unless ref $expect;
 	my $fail;
 	foreach (@refs) {

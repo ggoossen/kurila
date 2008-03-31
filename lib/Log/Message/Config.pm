@@ -18,7 +18,7 @@ sub new {
     ### find out if the user specified a config file to use
     ### and/or a default configuration object
     ### and remove them from the argument hash
-    my %special =   map { lc, delete $hash{$_} }
+    my %special =   map { lc, delete %hash{$_} }
                     grep m/^config|default$/i, keys %hash;
 
     ### allow provided arguments to override the values from the config ###
@@ -31,15 +31,15 @@ sub new {
         chrono  => { default => 1       },
     };
 
-    my %lc_hash = map { lc, $hash{$_} } keys %hash;
+    my %lc_hash = map { lc, %hash{$_} } keys %hash;
 
     my $file_conf;
-    if( $special{config} ) {
-        $file_conf = _read_config_file( $special{config} )
+    if( %special{config} ) {
+        $file_conf = _read_config_file( %special{config} )
                         or ( warn( loc(q[Could not parse config file!]) ), return );
     }
 
-    my $def_conf = \%{ $special{default} || {} };
+    my $def_conf = \%{ %special{default} || {} };
 
     ### make sure to only include keys that are actually defined --
     ### the checker will assign even 'undef' if you have provided that
@@ -51,7 +51,7 @@ sub new {
     my %to_check =  map     { @$_ }
                     grep    { defined $_->[1] }
                     map     {   [ $_ =>
-                                    defined $lc_hash{$_}        ? $lc_hash{$_}      :
+                                    defined %lc_hash{$_}        ? %lc_hash{$_}      :
                                     defined $file_conf->{$_}    ? $file_conf->{$_}  :
                                     defined $def_conf->{$_}     ? $def_conf->{$_}   :
                                     undef
@@ -96,7 +96,7 @@ sub _read_config_file {
 }
 
 for my $name (qw|private verbose tag level remove chrono|) {
-    Symbol::fetch_glob($name)->* = sub { return $_[0]->{$name} };
+    Symbol::fetch_glob($name)->* = sub { return @_[0]->{$name} };
 }
 
 sub DESTROY { 1 }

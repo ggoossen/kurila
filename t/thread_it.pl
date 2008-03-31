@@ -3,11 +3,11 @@ use strict;
 use warnings;
 
 use Config;
-if (!$Config{useithreads}) {
+if (!%Config{useithreads}) {
     print "1..0 # Skip: no ithreads\n";
     exit 0;
 }
-if ($ENV{PERL_CORE_MINITEST}) {
+if (%ENV{PERL_CORE_MINITEST}) {
     print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
     exit 0;
 }

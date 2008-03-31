@@ -4,7 +4,7 @@
 package My::Test;
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -53,10 +53,10 @@ $TB->plan( tests => scalar keys(%Tests) );
 
 eval { require POSIX; &POSIX::WEXITSTATUS(0) };
 if( $@ ) {
-    *exitstatus = sub { $_[0] >> 8 };
+    *exitstatus = sub { @_[0] >> 8 };
 }
 else {
-    *exitstatus = sub { POSIX::WEXITSTATUS($_[0]) }
+    *exitstatus = sub { POSIX::WEXITSTATUS(@_[0]) }
 }
 
 chdir 't';

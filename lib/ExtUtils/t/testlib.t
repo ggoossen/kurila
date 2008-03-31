@@ -1,7 +1,7 @@
 #!/usr/bin/perl -Tw
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -17,7 +17,7 @@ use Test::More tests => 5;
 BEGIN { 
     # non-core tests will have blib in their path.  We remove it
     # and just use the one in lib/.
-    unless( $ENV{PERL_CORE} ) {
+    unless( %ENV{PERL_CORE} ) {
         @INC = grep !m/blib/, @INC;
         unshift @INC, '../lib';
     }

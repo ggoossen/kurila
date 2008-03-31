@@ -54,7 +54,7 @@ foreach my $module (@Core_Modules) {
 # We do this as a separate process else we'll blow the hell
 # out of our namespace.
 sub compile_module {
-    my ($module) = $_[0];
+    my ($module) = @_[0];
 
     my $compmod = catfile(curdir(), 'lib', 'compmod.pl');
     my $lib     = '-I' . catdir(updir(), 'lib');

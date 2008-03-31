@@ -23,9 +23,9 @@ $Is_MacOS = $^O eq 'MacOS';
 $Is_VMS   = $^O eq 'VMS';
 require VMS::Filespec if $Is_VMS;
 
-$Debug   = $ENV{PERL_MM_MANIFEST_DEBUG} || 0;
-$Verbose = defined $ENV{PERL_MM_MANIFEST_VERBOSE} ?
-                   $ENV{PERL_MM_MANIFEST_VERBOSE} : 1;
+$Debug   = %ENV{PERL_MM_MANIFEST_DEBUG} || 0;
+$Verbose = defined %ENV{PERL_MM_MANIFEST_VERBOSE} ?
+                   %ENV{PERL_MM_MANIFEST_VERBOSE} : 1;
 $Quiet = 0;
 $MANIFEST = 'MANIFEST';
 
@@ -100,7 +100,7 @@ sub mkmanifest {
     my $found = manifind();
     my($key,$val,$file,%all);
     %all = (%$found, %$read);
-    $all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
+    %all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
     foreach $file (_sort keys %all) {
 	if ($skip->($file)) {
@@ -112,7 +112,7 @@ sub mkmanifest {
 	if ($Verbose){
 	    warn "Added to $MANIFEST: $file\n" unless exists $read->{$file};
 	}
-	my $text = $all{$file};
+	my $text = %all{$file};
 	$file = _unmacify($file);
 	my $tabs = (5 - (length($file)+1)/8);
 	$tabs = 1 if $tabs +< 1;
@@ -321,7 +321,7 @@ sub maniread {
 
         if ($Is_MacOS) {
             $file = _macify($file);
-            $file =~ s/\\([0-3][0-7][0-7])/{sprintf("%c", oct($1))}/g;
+            $file =~ s/\\([0-3][0-7][0-7])/{sprintf("\%c", oct($1))}/g;
         }
         elsif ($Is_VMS) {
             require File::Basename;
@@ -365,7 +365,7 @@ sub _maniskip {
     # any of them contain alternations
     my $regex = join '|', map "(?:$_)", @skip;
 
-    return sub { $_[0] =~ qr{$opts$regex} };
+    return sub { @_[0] =~ qr{$opts$regex} };
 }
 
 # checks for the special directives
@@ -520,7 +520,7 @@ sub cp_if_diff {
 
 sub cp {
     my ($srcFile, $dstFile) = @_;
-    my ($access,$mod) = (stat $srcFile)[8,9];
+    my ($access,$mod) = (stat $srcFile)[[8,9]];
 
     copy($srcFile,$dstFile);
     utime $access, $mod + ($Is_VMS ? 1 : 0), $dstFile;
@@ -546,7 +546,7 @@ sub ln {
 sub _manicopy_chmod {
     my($srcFile, $dstFile) = @_;
 
-    my $perm = 0444 ^|^ (stat $srcFile)[2] ^&^ 0700;
+    my $perm = 0444 ^|^ (stat $srcFile)[[2]] ^&^ 0700;
     chmod( $perm ^|^ ( $perm ^&^ 0100 ? 0111 : 0 ), $dstFile );
 }
 
@@ -556,7 +556,7 @@ sub best {
     my ($srcFile, $dstFile) = @_;
 
     my $is_exception = grep $srcFile =~ m/$_/, @Exceptions;
-    if ($is_exception or !$Config{d_link} or -l $srcFile) {
+    if ($is_exception or !%Config{d_link} or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
 	ln($srcFile, $dstFile) or cp($srcFile, $dstFile);
@@ -593,7 +593,7 @@ sub _unmacify {
     return $file unless $Is_MacOS;
 
     $file =~ s|^:||;
-    $file =~ s|([/ \n])|{sprintf("\\%03o", unpack("c", $1))}|g;
+    $file =~ s|([/ \n])|{sprintf("\\\%03o", unpack("c", $1))}|g;
     $file =~ y|:|/|;
 
     $file;
@@ -625,7 +625,7 @@ sub maniadd {
 
     foreach my $file (_sort @needed) {
         my $comment = $additions->{$file} || '';
-        printf MANIFEST "%-40s %s\n", $file, $comment;
+        printf MANIFEST "\%-40s \%s\n", $file, $comment;
     }
     close MANIFEST or die "Error closing $MANIFEST: $!";
 
@@ -644,7 +644,7 @@ sub _fix_manifest {
     my @manifest = ~< *MANIFEST;
     close MANIFEST;
 
-    unless( $manifest[-1] =~ m/\n\z/ ) {
+    unless( @manifest[-1] =~ m/\n\z/ ) {
         open MANIFEST, ">>", "$MANIFEST" or die "Could not open $MANIFEST: $!";
         print MANIFEST "\n";
         close MANIFEST;

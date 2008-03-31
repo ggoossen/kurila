@@ -108,14 +108,14 @@ sub parents { \@parents }
 # For debugging
 sub peekop {
     my $op = shift;
-    return sprintf("%s (0x%x) %s", class($op), $$op, $op->name);
+    return sprintf("\%s (0x\%x) \%s", class($op), $$op, $op->name);
 }
 
 sub walkoptree_slow {
     my($op, $method, $level) = @_;
     $op_count++; # just for statistics
     $level ||= 0;
-    warn(sprintf("walkoptree: %d. %s\n", $level, peekop($op))) if $debug;
+    warn(sprintf("walkoptree: \%d. \%s\n", $level, peekop($op))) if $debug;
     $op->?$method($level) if $op->can($method);
     if ($$op && ($op->flags ^&^ OPf_KIDS)) {
 	my $kid;
@@ -143,7 +143,7 @@ sub compile_stats {
 sub timing_info {
     my ($sec, $min, $hr) = localtime;
     my ($user, $sys) = times;
-    sprintf("%02d:%02d:%02d user=$user sys=$sys",
+    sprintf("\%02d:\%02d:\%02d user=$user sys=$sys",
 	    $hr, $min, $sec, $user, $sys);
 }
 
@@ -156,12 +156,12 @@ sub clearsym {
 sub savesym {
     my ($obj, $value) = @_;
 #    warn(sprintf("savesym: sym_%x => %s\n", $$obj, $value)); # debug
-    $symtable{sprintf("sym_%x", $$obj)} = $value;
+    %symtable{sprintf("sym_\%x", $$obj)} = $value;
 }
 
 sub objsym {
     my $obj = shift;
-    return $symtable{sprintf("sym_%x", $$obj)};
+    return %symtable{sprintf("sym_\%x", $$obj)};
 }
 
 sub walkoptree_exec {
@@ -175,7 +175,7 @@ sub walkoptree_exec {
 	    print $prefix, "goto $sym\n";
 	    return;
 	}
-	savesym($op, sprintf("%s (0x%lx)", class($op), $$op));
+	savesym($op, sprintf("\%s (0x\%lx)", class($op), $$op));
 	$op->?$method($level);
 	$ppname = $op->name;
 	if ($ppname =~
@@ -244,13 +244,13 @@ sub walksymtable {
 	my ($class, $section, $symtable, $default) = @_;
 	$output_fh ||= FileHandle->new_tmpfile;
 	my $obj = bless [-1, $section, $symtable, $default], $class;
-	$sections{$section} = $obj;
+	%sections{$section} = $obj;
 	return $obj;
     }
 
     sub get {
 	my ($class, $section) = @_;
-	return $sections{$section};
+	return %sections{$section};
     }
 
     sub add {

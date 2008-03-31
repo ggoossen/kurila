@@ -874,9 +874,9 @@ sub begin_pod {
 
   # Comment message to say where this came from
   my $comment = << "__TEX_COMMENT__";
-%%  Latex generated from POD in document $infile
-%%  Using the perl module $class
-%%  Converted on $date
+\%\%  Latex generated from POD in document $infile
+\%\%  Using the perl module $class
+\%\%  Converted on $date
 __TEX_COMMENT__
 
   # Write the preamble
@@ -891,7 +891,7 @@ __TEX_COMMENT__
       $preamble = $self->UserPreamble;
 
       # Add the description of where this came from
-      $preamble .=  "\n$comment\n%%  Preamble supplied by user.\n\n";
+      $preamble .=  "\n$comment\n\%\%  Preamble supplied by user.\n\n";
 
     } else {
 
@@ -1237,8 +1237,8 @@ sub interior_sequence {
     if ($seq_argument =~ m/^\d+$/) {
       return chr($seq_argument);
     # Look up escape in hash table
-    } elsif (exists $HTML_Escapes{$seq_argument}) {
-      return $HTML_Escapes{$seq_argument};
+    } elsif (exists %HTML_Escapes{$seq_argument}) {
+      return %HTML_Escapes{$seq_argument};
 
     } else {
       my ($file, $line) = $pod_seq->file_line();
@@ -1529,7 +1529,7 @@ sub head {
   my $star = ($level +>= $self->LevelNoNum ? '*' : '');
 
   # Section
-  $self->_output("\\" .$LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n");
+  $self->_output("\\" .@LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n");
 
 }
 

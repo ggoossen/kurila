@@ -35,7 +35,7 @@ sub _expansion {
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg in $&"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my ($if,$el) = ($1,$2);
-        if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
             return $if
         }
         else {
@@ -44,7 +44,7 @@ sub _expansion {
     }
     else {
         # #if;#endif
-        if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
             return $expr
         }
         else {
@@ -112,11 +112,11 @@ sub dl_load_flags { 0x00 }
 
 EOT
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (",
-              to_string($Config{'dlext'}), ",",
-              to_string($Config{'so'}), ",",
-              to_string($Config{'dlsrc'}), ")\n;" ;
+              to_string(%Config{'dlext'}), ",",
+              to_string(%Config{'so'}), ",",
+              to_string(%Config{'dlsrc'}), ")\n;" ;
 }
 else {
     print OUT <<'EOT';
@@ -164,12 +164,12 @@ sub dquoted_comma_list {
 
 our @dl_library_path;
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     eval $cfg_dl_library_path;
-    if (!$ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
+    if (!%ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
         my $dl_library_path = dquoted_comma_list(@dl_library_path);
         print OUT <<EOT;
-# The below \@dl_library_path has been expanded (%Config) in Perl build time.
+# The below \@dl_library_path has been expanded (\%Config) in Perl build time.
 
 \@dl_library_path = ($dl_library_path);
 
@@ -190,10 +190,10 @@ my $ldlibpthname;
 my $ldlibpthname_defined;
 my $pthsep;
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
-    $ldlibpthname         = to_string($Config::Config{ldlibpthname});
-    $ldlibpthname_defined = to_string(defined $Config::Config{ldlibpthname} ? 1 : 0);
-    $pthsep               = to_string($Config::Config{path_sep});
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+    $ldlibpthname         = to_string(%Config::Config{ldlibpthname});
+    $ldlibpthname_defined = to_string(defined %Config::Config{ldlibpthname} ? 1 : 0);
+    $pthsep               = to_string(%Config::Config{path_sep});
 }
 else {
     $ldlibpthname         = q($Config::Config{ldlibpthname});
@@ -222,7 +222,7 @@ if ($ldlibpthname_defined &&
 }
 EOT
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && $ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && %ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
     eval $env_dl_library_path;
 }
 else {
@@ -235,10 +235,10 @@ $env_dl_library_path
 EOT
 }
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && $ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && %ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
     my $dl_library_path = dquoted_comma_list(@dl_library_path);
     print OUT <<EOT;
-# The below \@dl_library_path has been expanded (%Config, %ENV)
+# The below \@dl_library_path has been expanded (\%Config, \%ENV)
 # in Perl build time.
 
 \@dl_library_path = ($dl_library_path);

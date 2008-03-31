@@ -22,7 +22,7 @@ our @EXPORT_FAIL = qw(verbose);	# hook to enable verbose mode
 # to do this thanks to @EXPORT_FAIL, above.  $_[1] will contain the word
 # 'verbose'.
 
-sub export_fail { shift; $Verbose = shift if $_[0] eq 'verbose'; @_ }
+sub export_fail { shift; $Verbose = shift if @_[0] eq 'verbose'; @_ }
 
 # fixed hooks for stashes to point to
 sub longmess  { goto &longmess_jmp }

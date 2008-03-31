@@ -10,7 +10,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         @INC = '../lib';
     } else {
         unshift (@INC, '../blib/lib');
@@ -36,7 +36,7 @@ while ( ~< *DATA) {
     while ( ~< *DATA) {
         last if $_ eq "###\n";
         my ($option, $value) = split;
-        $options{$option} = $value;
+        %options{$option} = $value;
     }
     open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";
     while ( ~< *DATA) {

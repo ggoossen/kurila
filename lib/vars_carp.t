@@ -5,7 +5,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    $ENV{PERL5LIB} = '../lib';
+    %ENV{PERL5LIB} = '../lib';
 }
 
 $| = 1;

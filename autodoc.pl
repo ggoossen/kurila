@@ -97,14 +97,14 @@ DOC:
 	    $docs = "\n$docs" if $docs and $docs !~ m/^\n/;
 	    if ($flags =~ m/m/) {
 		if ($flags =~ m/A/) {
-		    $apidocs{$curheader}{$name} = [$flags, $docs, $ret, $file, @args];
+		    %apidocs{$curheader}{$name} = [$flags, $docs, $ret, $file, @args];
 		}
 		else {
-		    $gutsdocs{$curheader}{$name} = [$flags, $docs, $ret, $file, @args];
+		    %gutsdocs{$curheader}{$name} = [$flags, $docs, $ret, $file, @args];
 		}
 	    }
 	    else {
-		$docfuncs{$name} = [$flags, $docs, $ret, $file, $curheader, @args];
+		%docfuncs{$name} = [$flags, $docs, $ret, $file, $curheader, @args];
 	    }
 	    if (defined $doc) {
 		if ($doc =~ m/^=(?:for|head)/) {
@@ -190,21 +190,21 @@ walk_table {	# load documented functions into appropriate hash
 	return "" unless $flags =~ m/d/;
 	$func =~ s/\t//g; $flags =~ s/p//; # clean up fields from embed.pl
 	$retval =~ s/\t//;
-	my $docref = delete $docfuncs{$func};
-	$seenfuncs{$func} = 1;
+	my $docref = delete %docfuncs{$func};
+	%seenfuncs{$func} = 1;
 	if ($docref and @$docref) {
 	    if ($flags =~ m/A/) {
 		$docref->[0].="x" if $flags =~ m/M/;
-		$apidocs{$docref->[4]}{$func} =
+		%apidocs{$docref->[4]}{$func} =
 		    [$docref->[0] . 'A', $docref->[1], $retval, $docref->[3],
 			@args];
 	    } else {
-		$gutsdocs{$docref->[4]}{$func} =
+		%gutsdocs{$docref->[4]}{$func} =
 		    [$docref->[0], $docref->[1], $retval, $docref->[3], @args];
 	    }
 	}
 	else {
-	    warn "no docs for $func\n" unless $seenfuncs{$func};
+	    warn "no docs for $func\n" unless %seenfuncs{$func};
 	}
     }
     return "";
@@ -244,7 +244,7 @@ _EOB_
 my $key;
 # case insensitive sort, with fallback for determinacy
 for $key (sort { uc($a) cmp uc($b) || $a cmp $b } keys %apidocs) {
-    my $section = $apidocs{$key}; 
+    my $section = %apidocs{$key}; 
     print $doc "\n=head1 $key\n\n=over 8\n\n";
     # Again, fallback for determinacy
     for my $key (sort { uc($a) cmp uc($b) || $a cmp $b } keys %$section) {
@@ -299,7 +299,7 @@ B<they are not for use in extensions>!
 END
 
 for $key (sort { uc($a) cmp uc($b); } keys %gutsdocs) {
-    my $section = $gutsdocs{$key}; 
+    my $section = %gutsdocs{$key}; 
     print $guts "\n=head1 $key\n\n=over 8\n\n";
     for my $key (sort { uc($a) cmp uc($b); } keys %$section) {
         docout($guts, $key, $section->{$key});

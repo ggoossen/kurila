@@ -1,5 +1,5 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir '../lib/Archive/Tar' if -d '../lib/Archive/Tar';
     }       
     use lib '../../..';

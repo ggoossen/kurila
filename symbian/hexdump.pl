@@ -2,10 +2,10 @@
 
 use strict;
 
-die "$0: EPOCROOT unset\n" unless exists $ENV{EPOCROOT};
-die "$0: EPOCROOT directory does exists\n" unless -d $ENV{EPOCROOT};
+die "$0: EPOCROOT unset\n" unless exists %ENV{EPOCROOT};
+die "$0: EPOCROOT directory does exists\n" unless -d %ENV{EPOCROOT};
 
-my $EPOC32 = "$ENV{EPOCROOT}epoc32";
+my $EPOC32 = "%ENV{EPOCROOT}epoc32";
 my $EXE = "$EPOC32\\release\\thumb\\urel\\perlapp.app";
 my $RSC = "$EPOC32\\data\\z\\system\\apps\\perlapp\\perlapp.rsc";
 
@@ -19,7 +19,7 @@ for my $fn ($EXE, $RSC) {
 	my $buffer;
 	my $size = -s $fn;
 	my $read;
-	my $newfn = $new{$fn};
+	my $newfn = %new{$fn};
 	unlink($newfn);
 	if (($read = sysread($fh, $buffer, $size)) == $size) {
 	    if (open(my $newfh, ">", "$newfn")) {
