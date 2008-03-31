@@ -13,11 +13,11 @@ BEGIN { require '../lib/warnings.pm'; warnings->import() };
 
 # Let tests know they're running in the perl core.  Useful for modules
 # which live dual lives on CPAN.
-$ENV{PERL_CORE} = 1;
+%ENV{PERL_CORE} = 1;
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
 @ARGV = grep($_,@ARGV) if $^O eq 'VMS';
-our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
+our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
 {
@@ -32,7 +32,7 @@ our $show_elapsed_time = $ENV{HARNESS_TIMER} || 0;
 	$::taintwarn = 1 if $1 eq 'taintwarn';
 	$::failed = 1 if $1 eq 'failed';
 	$::failed = 2 if $1 eq 'ffailed';
-	$ENV{PERL_CORE_MINITEST} = 1 if $1 eq 'minitest';
+	%ENV{PERL_CORE_MINITEST} = 1 if $1 eq 'minitest';
 	if ($1 =~ m/^deparse(,.+)?$/) {
 	    $::deparse = 1;
 	    $::deparse_opts = $1;
@@ -46,7 +46,7 @@ chdir 't' if -f 't/TEST';
 die "You need to run \"make test\" first to set things up.\n"
   unless -e 'perl' or -e 'perl.exe' or -e 'perl.pm';
 
-if ($ENV{PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
+if (%ENV{PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
     unless (-x 'perl.third') {
 	unless (-x '../perl.third') {
 	    die "You need to run \"make perl.third first.\n";
@@ -62,9 +62,9 @@ if ($ENV{PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
 }
 
 # check leakage for embedders
-$ENV{PERL_DESTRUCT_LEVEL} = 2 unless exists $ENV{PERL_DESTRUCT_LEVEL};
+%ENV{PERL_DESTRUCT_LEVEL} = 2 unless exists %ENV{PERL_DESTRUCT_LEVEL};
 
-$ENV{EMXSHELL} = 'sh';        # For OS/2
+%ENV{EMXSHELL} = 'sh';        # For OS/2
 
 # Roll your own File::Find!
 use TestInit;
@@ -102,7 +102,7 @@ sub _quote_args {
 }
 
 sub _populate_hash {
-    return map {$_, 1} split m/\s+/, $_[0];
+    return map {$_, 1} split m/\s+/, @_[0];
 }
 
 if ($::failed) {
@@ -111,7 +111,7 @@ if ($::failed) {
     push @ARGV, map { chomp; $_ } ~< $fh;
     close $fh;
     if ($::failed +> 1) {
-        @ARGV = ($ARGV[0]);
+        @ARGV = (@ARGV[0]);
     }
 }
 
@@ -141,7 +141,7 @@ unless (@ARGV) {
 	if (%extensions) {
 	    if (%known_extensions) {
 		foreach (keys %known_extensions) {
-		    $skip{$_}++ unless $extensions{$_};
+		    %skip{$_}++ unless %extensions{$_};
 		}
 	    } else {
 		warn "No known_extensions line found in $configsh";
@@ -162,11 +162,11 @@ unless (@ARGV) {
 		    if (defined $extension) {
 			$extension =~ s!/t$!!;
 			# XXX Do I want to warn that I'm skipping these?
-			next if $skip{$extension};
+			next if %skip{$extension};
 		    }
 		    my $path = File::Spec->catfile($updir, $t);
 		    push @ARGV, $path;
-		    $::path_to_name{$path} = $t;
+		    %::path_to_name{$path} = $t;
 		}
 	    }
 	}
@@ -225,14 +225,14 @@ EOT
     $::bad_files = 0;
 
     foreach my $t (@tests) {
-      unless (exists $::path_to_name{$t}) {
+      unless (exists %::path_to_name{$t}) {
 	my $tname = File::Spec->catfile('t',$t);
 	$tname = VMS::Filespec::unixify($tname) if $^O eq 'VMS';
-	$::path_to_name{$t} = $tname;
+	%::path_to_name{$t} = $tname;
       }
     }
     my $maxlen = 0;
-    foreach (@::path_to_name{@tests}) {
+    foreach (%::path_to_name{[@tests]}) {
 	s/\.\w+\z/./;
 	my $len = length ;
 	$maxlen = $len if $len +> $maxlen;
@@ -251,7 +251,7 @@ EOT
         # read previously failed tests
         if (-e 'TEST_FAILED') {
             open my $fh, "<", "TEST_FAILED" or die;
-            while ( ~< $fh) { chomp; $failed_tests{$_} = 0; }
+            while ( ~< $fh) { chomp; %failed_tests{$_} = 0; }
             close $fh;
         }
     }
@@ -272,8 +272,8 @@ EOT
 		next;
 	    }
 	}
-	my $te = $::path_to_name{$test} . '.'
-		    x ($dotdotdot - length($::path_to_name{$test}));
+	my $te = %::path_to_name{$test} . '.'
+		    x ($dotdotdot - length(%::path_to_name{$test}));
 
 	if ($^O ne 'VMS') {  # defer printing on VMS due to piping bug
 	    print $te;
@@ -281,7 +281,7 @@ EOT
 	}
 
 	# XXX DAPM %OVER not defined anywhere
-	# $test = $OVER{$test} if exists $OVER{$test};
+	# $test = %OVER{$test} if exists %OVER{$test};
 
 	open(SCRIPT,"<",$test) or die "Can't run $test.\n";
 	$_ = ~< *SCRIPT;
@@ -325,11 +325,11 @@ EOT
 		or print "can't deparse '$deparse_cmd': $!.\n";
 	}
 	elsif ($type eq 'perl') {
-	    my $perl = $ENV{PERL} || './perl';
+	    my $perl = %ENV{PERL} || './perl';
 	    my $redir = $^O eq 'VMS' ? '2>&1' : '';
-	    if ($ENV{PERL_VALGRIND}) {
-		my $valgrind = $ENV{VALGRIND} // 'valgrind';
-		my $vg_opts = $ENV{VG_OPTS}
+	    if (%ENV{PERL_VALGRIND}) {
+		my $valgrind = %ENV{VALGRIND} // 'valgrind';
+		my $vg_opts = %ENV{VG_OPTS}
 		    //  "--suppressions=perl.supp --leak-check=yes "
 			. "--leak-resolution=high --show-reachable=yes "
 			. "--num-callers=50"; 
@@ -401,7 +401,7 @@ EOT
 			    # this still conforms to TAP:
 			    # http://search.cpan.org/dist/TAP/TAP.pod
 			    $extra and $istodo = $extra =~ m/#\s*(?:TODO|SKIP)\b/;
-			    $istodo = 1 if $todo{$num};
+			    $istodo = 1 if %todo{$num};
 
 			    if( $not && !$istodo ) {
 				$failure ||= "FAILED at test $num";
@@ -429,7 +429,7 @@ EOT
 	    $failure = 'FAILED--no leader found' unless $seen_leader;
 	}
 
-	if ($ENV{PERL_VALGRIND}) {
+	if (%ENV{PERL_VALGRIND}) {
 	    my @valgrind;
 	    if (-e $valgrind_log) {
 		if (open(V, "<", $valgrind_log)) {
@@ -439,7 +439,7 @@ EOT
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
 		}
 	    }
-	    if (($ENV{VG_OPTS} || '') =~ m/cachegrind/) {
+	    if ((%ENV{VG_OPTS} || '') =~ m/cachegrind/) {
 		if (rename $valgrind_log, "$test.valgrind") {
 		    $valgrind++;
 		} else {
@@ -450,12 +450,12 @@ EOT
 		my $leaks = 0;
 		my $errors = 0;
 		for my $i (0..@valgrind-1) {
-		    local $_ = $valgrind[$i];
+		    local $_ = @valgrind[$i];
 		    if (m/^==\d+== ERROR SUMMARY: (\d+) errors? /) {
 			$errors += $1;   # there may be multiple error summaries
 		    } elsif (m/^==\d+== LEAK SUMMARY:/) {
 			for my $off (1 .. 4) {
-			    if ($valgrind[$i+$off] =~
+			    if (@valgrind[$i+$off] =~
 				m/(?:lost|reachable):\s+\d+ bytes in (\d+) blocks/) {
 				$leaks += $1;
 			    }
@@ -480,7 +480,7 @@ EOT
 	if ($type eq 'deparse') {
 	    unlink "./$test.dp";
 	}
-	if ($ENV{PERL_3LOG}) {
+	if (%ENV{PERL_3LOG}) {
 	    my $tpp = $test;
 	    $tpp =~ s:^\.\./::;
 	    $tpp =~ s:/:_:g;
@@ -504,10 +504,10 @@ EOT
 	    if ($test =~ m/^base/) {
 		die "Failed a basic test ($test) -- cannot continue.\n";
 	    }
-	    ++$failed_tests{$test};
+	    ++%failed_tests{$test};
 	}
 	else {
-            delete $failed_tests{$test};
+            delete %failed_tests{$test};
 	    if ($max) {
 		my $elapsed;
 		if ( $show_elapsed_time ) {
@@ -539,7 +539,7 @@ EOT
 	my $pct = $tested_files ? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) : "0.00";
 	my $s = $::bad_files == 1 ? "" : "s";
 	print STDERR "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
-	for my $test ( sort grep { $failed_tests{$_} } keys %failed_tests ) {
+	for my $test ( sort grep { %failed_tests{$_} } keys %failed_tests ) {
 	    print "\t$test\n";
 	}
 	print STDERR <<'SHRDLU_1';
@@ -553,12 +553,12 @@ SHRDLU_1
 ### in the 't' directory since most (>=80%) of the tests succeeded.
 SHRDLU_2
 	if (eval {require Config; Config->import; 1}) {
-	    if ($::Config{usedl} && (my $p = $::Config{ldlibpthname})) {
+	    if (%::Config{usedl} && (my $p = %::Config{ldlibpthname})) {
 		print STDERR <<SHRDLU_3;
 ### You may have to set your dynamic library search path,
 ### $p, to point to the build directory:
 SHRDLU_3
-		if (exists $ENV{$p} && $ENV{$p} ne '') {
+		if (exists %ENV{$p} && %ENV{$p} ne '') {
 		    print STDERR <<SHRDLU_4a;
 ###   setenv $p `pwd`:\$$p; cd t; ./perl harness
 ###   $p=`pwd`:\$$p; export $p; cd t; ./perl harness
@@ -587,9 +587,9 @@ SHRDLU_5
     }
 
     my ($user,$sys,$cuser,$csys) = times;
-    print sprintf("u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d\n",
+    print sprintf('u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d' . "\n",
 	$user,$sys,$cuser,$csys,$tested_files,$totmax);
-    if ($ENV{PERL_VALGRIND}) {
+    if (%ENV{PERL_VALGRIND}) {
 	my $s = $valgrind == 1 ? '' : 's';
 	print "$valgrind valgrind report$s created.\n", ;
     }

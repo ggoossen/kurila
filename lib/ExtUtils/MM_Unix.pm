@@ -215,11 +215,11 @@ sub cflags {
     if ($prog = %Config{$name}) {
 	# Expand hints for this extension via the shell
 	print STDOUT "Processing $name hint:\n" if $Verbose;
-	my(@o)=`cc=\"$cflags{cc}\"
-	  ccflags=\"$cflags{ccflags}\"
-	  optimize=\"$cflags{optimize}\"
-	  perltype=\"$cflags{perltype}\"
-	  optdebug=\"$cflags{optdebug}\"
+	my(@o)=`cc=\"%cflags{cc}\"
+	  ccflags=\"%cflags{ccflags}\"
+	  optimize=\"%cflags{optimize}\"
+	  perltype=\"%cflags{perltype}\"
+	  optdebug=\"%cflags{optdebug}\"
 	  eval '$prog'
 	  echo cc=\$cc
 	  echo ccflags=\$ccflags

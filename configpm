@@ -158,7 +158,7 @@ sub import {
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
 	die sprintf qq{"%%s" is not exported by the %%s module\n},
-	    $func, __PACKAGE__ unless $Export_Cache{$func};
+	    $func, __PACKAGE__ unless %%Export_Cache{$func};
 	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{$func};
     }
 
@@ -292,7 +292,7 @@ EOT
 EOT
 }
 $fetch_string .= <<'EOT';
-    # So we can say "if $Config{'foo'}".
+    # So we can say "if %Config{'foo'}".
     $value = undef if $value eq 'undef';
     $self->{$key} = $value; # cache it
 }
@@ -456,7 +456,7 @@ my $summary_expanded;
 
 sub myconfig {
     return $summary_expanded if $summary_expanded;
-    ($summary_expanded = $summary) =~ s!\$(\w+)!{ my $c = $Config::Config{$1}; defined($c) ? $c : 'undef' }!g;
+    ($summary_expanded = $summary) =~ s!\$(\w+)!{ my $c = %Config::Config{$1}; defined($c) ? $c : 'undef' }!g;
     $summary_expanded;
 }
 
@@ -578,13 +578,13 @@ $heavy_txt .= <<'ENDOFEND';
 }
 
 sub EXISTS {
-    return 1 if exists($_[0]->{$_[1]});
+    return 1 if exists(@_[0]->{@_[1]});
 
-    return(index($Config_SH_expanded, "\n$_[1]='") != -1
+    return(index($Config_SH_expanded, "\n@_[1]='") != -1
 ENDOFEND
 if (%seen_quotes{'"'}) {
 $heavy_txt .= <<'ENDOFEND';
-           or index($Config_SH_expanded, "\n$_[1]=\"") != -1
+           or index($Config_SH_expanded, "\n@_[1]=\"") != -1
 ENDOFEND
 }
 $heavy_txt .= <<'ENDOFEND';
@@ -621,7 +621,7 @@ sub config_vars {
 	    print map "$_$lnend", @matches ? @matches : "$qry: not found"		if !$notag;
 	    print map { s/\w+=//; "$_$lnend" } @matches ? @matches : "$qry: not found"	if  $notag;
 	} else {
-	    my $v = (exists $Config::Config{$qry}) ? $Config::Config{$qry}
+	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
 						   : 'UNKNOWN';
 	    $v = 'undef' unless defined $v;
 	    print "${prfx}'${v}'$lnend";
@@ -639,10 +639,10 @@ if ($OS2::is_aout) {
     my ($value, $v) = $Config_SH_expanded =~ m/^used_aout='(.*)'\s*$/m;
     for (split ' ', $value) {
         ($v) = $Config_SH_expanded =~ m/^aout_$_='(.*)'\s*$/m;
-        $preconfig{$_} = $v eq 'undef' ? undef : $v;
+        %preconfig{$_} = $v eq 'undef' ? undef : $v;
     }
 }
-$preconfig{d_fork} = undef unless $OS2::can_fork; # Some funny cases can't
+%preconfig{d_fork} = undef unless $OS2::can_fork; # Some funny cases can't
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
@@ -654,12 +654,12 @@ ENDOFSET
 	}
     }
     $config_txt .= <<ENDOFSET if $dll;
-\$preconfig\{dll_name\} = '$dll';
+\%preconfig\{dll_name\} = '$dll';
 ENDOFSET
 } else {
     $config_txt .= <<'ENDOFSET';
 sub TIEHASH {
-    bless $_[1], $_[0];
+    bless @_[1], @_[0];
 }
 ENDOFSET
 }
@@ -717,7 +717,7 @@ Config - access Perl configuration information
 =head1 SYNOPSIS
 
     use Config;
-    if ($Config{usethreads}) {
+    if (%Config{usethreads}) {
 	print "has thread support\n"
     } 
 
@@ -782,19 +782,19 @@ Here's a more sophisticated example of using %Config:
 
     my %sig_num;
     my @sig_name;
-    unless($Config{sig_name} && $Config{sig_num}) {
+    unless(%Config{sig_name} && %Config{sig_num}) {
 	die "No sigs?";
     } else {
-	my @names = split ' ', $Config{sig_name};
-	@sig_num{@names} = split ' ', $Config{sig_num};
+	my @names = split ' ', %Config{sig_name};
+	%sig_num{[@names]} = split ' ', %Config{sig_num};
 	foreach (@names) {
-	    $sig_name[$sig_num{$_}] ||= $_;
+	    @sig_name[$sig_num{$_}] ||= $_;
 	}   
     }
 
-    print "signal #17 = $sig_name[17]\n";
-    if ($sig_num{ALRM}) { 
-	print "SIGALRM is $sig_num{ALRM}\n";
+    print "signal #17 = @sig_name[17]\n";
+    if (%sig_num{ALRM}) { 
+	print "SIGALRM is %sig_num{ALRM}\n";
     }   
 
 =head1 WARNING
@@ -804,7 +804,7 @@ itself it is possible (but unlikely) that the information does not
 relate to the actual perl binary which is being used to access it.
 
 The Config module is installed into the architecture and version
-specific library directory ($Config{installarchlib}) and it checks the
+specific library directory (%Config{installarchlib}) and it checks the
 perl version number when loaded.
 
 The values stored in config.sh may be either single-quoted or

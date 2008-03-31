@@ -1757,7 +1757,7 @@ sub generate_init {
     $subexpr =~ s/ntype/subtype/g;
     $subexpr =~ s/\$arg/ST(ix_$var)/g;
     $subexpr =~ s/\n\t/\n\t\t/g;
-    $subexpr =~ s/is not of (.*\")/[arg %d] is not of $1, ix_$var + 1/g;
+    $subexpr =~ s/is not of (.*\")/[arg \%d] is not of $1, ix_$var + 1/g;
     $subexpr =~ s/\$var/${var}[ix_$var - $argoff]/;
     $expr =~ s/DO_ARRAY_ELEM/$subexpr/;
   }
