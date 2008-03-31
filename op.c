@@ -5882,8 +5882,7 @@ Perl_oopsAV(pTHX_ OP *o)
 	ref(o, OP_RV2AV);
 	break;
 
-    case OP_LIST:
-	o = convert(OP_ANONLIST, OPf_SPECIAL, o);
+    case OP_ANONLIST:
 	return ref(newAVREF(o), OP_RV2AV);
 
     default:
